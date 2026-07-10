@@ -1,0 +1,172 @@
+{
+  "auth": "public",
+  "availability": {
+    "lifecycle": "active",
+    "retrieval_mode": "retrievable",
+    "visibility": "visible"
+  },
+  "capabilities": [
+    "stock_valuation",
+    "market_cap",
+    "pe_pb_ps",
+    "valuation_timeseries"
+  ],
+  "defaults": {
+    "limit": 50
+  },
+  "identity": {
+    "description": "获取单只 A 股在指定 start/end 交易日范围内的日级估值和市值序列。",
+    "display_name": "个股估值查询",
+    "domain": "stock",
+    "owner": "tools"
+  },
+  "invocation_example": "stock_valuation_query(stock=\"贵州茅台\", start=\"2026-06-01\", end=\"2026-06-30\")",
+  "match_contract": {
+    "request_families": [
+      "data_access"
+    ],
+    "work_item_types": [
+      "tool"
+    ],
+    "capability_classes": [
+      "data_retrieval",
+      "valuation_lookup"
+    ],
+    "side_effect_level": "read_only"
+  },
+  "name": "stock_valuation_query",
+  "post_process": {
+    "deterministic": {
+      "enabled": false,
+      "handler": ""
+    },
+    "llm": {
+      "enabled": false,
+      "prompt_key": ""
+    }
+  },
+  "profiles": {
+    "mock": {
+      "enabled": true,
+      "implementation": {
+        "kind": "inline_result"
+      },
+      "result": {
+        "data": {
+          "rows": [],
+          "subject": "贵州茅台",
+          "code": "600519.SH",
+          "name": "贵州茅台"
+        },
+        "error": "",
+        "ok": true,
+        "tool": "stock_valuation_query"
+      }
+    },
+    "real": {
+      "enabled": true,
+      "implementation": {
+        "kind": "python_callable",
+        "target": "src.tools.stock_valuation_query_tool:run"
+      }
+    }
+  },
+  "retention": {
+    "drop_default": [],
+    "high_value_for_reasoning": [
+      "data.code",
+      "data.name",
+      "data.rows"
+    ],
+    "high_value_for_render": [],
+    "recommended_reducers": {
+      "data.rows": "summarize_timeseries"
+    },
+    "usually_too_large_for_prompt": [
+      "data.rows"
+    ]
+  },
+  "runtime_hints": {
+    "cost_class": "low",
+    "latency_class": "low",
+    "supports_async_submit": false,
+    "supports_stream": false
+  },
+  "safety": {
+    "network": true,
+    "persistence": false,
+    "side_effect": "none"
+  },
+  "schemas": {
+    "input": {
+      "$id": "stock_valuation_query.input.schema.json",
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "stock": {
+          "type": "string",
+          "description": "股票代码、简称或名称。"
+        },
+        "start": {
+          "description": "开始交易日，YYYY-MM-DD。只提供 start 或 end 时按单日精确查询。",
+          "type": "string"
+        },
+        "end": {
+          "description": "结束交易日，YYYY-MM-DD。start/end 同时提供时按闭区间查询。",
+          "type": "string"
+        },
+        "limit": {
+          "description": "底层查询保护上限，默认 50。",
+          "minimum": 1,
+          "maximum": 500,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "stock"
+      ],
+      "type": "object"
+    },
+    "output": {
+      "$ref": "src/tools/schemas/stock_valuation_query.schema.json"
+    }
+  },
+  "status": "active",
+  "tags": [
+    "stock",
+    "valuation",
+    "market_cap",
+    "factor"
+  ],
+  "tests": {
+    "golden_cases": [],
+    "sample_inputs": [
+      {
+        "arguments": {
+          "start": "2026-06-01",
+          "end": "2026-06-30",
+          "limit": 50,
+          "stock": "贵州茅台"
+        },
+        "name": "stock_valuation_default"
+      }
+    ]
+  },
+  "ui_hints": {
+    "editable_sections": [
+      "identity",
+      "schemas.input",
+      "schemas.output",
+      "capabilities",
+      "profiles",
+      "retention",
+      "post_process",
+      "tests"
+    ]
+  },
+  "version": "v1",
+  "subject_tags": [
+    "stock"
+  ],
+  "tool_priority": 1
+}

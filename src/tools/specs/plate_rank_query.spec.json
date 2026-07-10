@@ -1,0 +1,52 @@
+{
+  "best_for": [
+    "用于查询热门板块的行情、成交额和主力资金排名。",
+    "可用 plate 按板块代码或名称过滤，也可以不传 plate 直接取全市场排名。",
+    "sort_by 支持涨跌幅、成交额和主力净流入。",
+    "include_members 可附带每个板块内的代表个股，但该工具不替代板块成分股明细查询。"
+  ],
+  "input_guidance": {
+    "optional_fields": [
+      "trade_date",
+      "top_k",
+      "sort_by",
+      "plate",
+      "include_members",
+      "member_limit"
+    ],
+    "required_fields": []
+  },
+  "invocation_example": "plate_rank_query(top_k=10, sort_by=\"rise_fall_rate\")",
+  "output_guidance": {
+    "drop_default": [],
+    "field_policies": {
+      "data.items": {
+        "strategy": "auto"
+      },
+      "data.items.[].leaders": {
+        "strategy": "auto"
+      },
+      "data.sort_by": {
+        "strategy": "prompt_full"
+      },
+      "data.trade_date": {
+        "strategy": "prompt_full"
+      }
+    },
+    "high_value_for_reasoning": [
+      "data.trade_date",
+      "data.sort_by",
+      "data.items"
+    ],
+    "high_value_for_render": [],
+    "recommended_reducers": {
+      "data.items": "summarize_ranked_list",
+      "data.items.[].leaders": "summarize_ranked_list"
+    },
+    "usually_too_large_for_prompt": [
+      "data.items"
+    ]
+  },
+  "purpose": "查询热门板块的行情、成交额和主力资金排名。",
+  "tool_name": "plate_rank_query"
+}

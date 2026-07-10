@@ -1,0 +1,171 @@
+{
+  "auth": "public",
+  "availability": {
+    "lifecycle": "active",
+    "retrieval_mode": "retrievable",
+    "visibility": "visible"
+  },
+  "capabilities": [
+    "index_daily_market",
+    "index_valuation",
+    "market_index_lookup"
+  ],
+  "defaults": {
+    "limit": 50
+  },
+  "identity": {
+    "description": "获取单只指数在指定 start/end 交易日范围内的日级行情和估值序列。",
+    "display_name": "指数日行情查询",
+    "domain": "index",
+    "owner": "tools"
+  },
+  "invocation_example": "index_daily_market_query(index=\"000300.SH\", start=\"2026-06-01\", end=\"2026-06-30\")",
+  "match_contract": {
+    "request_families": [
+      "data_access"
+    ],
+    "work_item_types": [
+      "tool"
+    ],
+    "capability_classes": [
+      "data_retrieval",
+      "index_market_lookup"
+    ],
+    "side_effect_level": "read_only"
+  },
+  "name": "index_daily_market_query",
+  "post_process": {
+    "deterministic": {
+      "enabled": false,
+      "handler": ""
+    },
+    "llm": {
+      "enabled": false,
+      "prompt_key": ""
+    }
+  },
+  "profiles": {
+    "mock": {
+      "enabled": true,
+      "implementation": {
+        "kind": "inline_result"
+      },
+      "result": {
+        "tool": "index_daily_market_query",
+        "ok": true,
+        "data": {
+          "subject": "000300.SH",
+          "code": "000300.SH",
+          "name": "沪深300",
+          "rows": []
+        },
+        "error": ""
+      }
+    },
+    "real": {
+      "enabled": true,
+      "implementation": {
+        "kind": "python_callable",
+        "target": "src.tools.index_daily_market_query_tool:run"
+      }
+    }
+  },
+  "retention": {
+    "drop_default": [],
+    "high_value_for_reasoning": [
+      "data.code",
+      "data.name",
+      "data.rows"
+    ],
+    "high_value_for_render": [],
+    "recommended_reducers": {
+      "data.rows": "summarize_timeseries"
+    },
+    "usually_too_large_for_prompt": [
+      "data.rows"
+    ]
+  },
+  "runtime_hints": {
+    "cost_class": "low",
+    "latency_class": "low",
+    "supports_async_submit": false,
+    "supports_stream": false
+  },
+  "safety": {
+    "network": true,
+    "persistence": false,
+    "side_effect": "none"
+  },
+  "schemas": {
+    "input": {
+      "$id": "index_daily_market_query.input.schema.json",
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "index": {
+          "type": "string",
+          "description": "指数代码或简称。"
+        },
+        "start": {
+          "description": "开始交易日，YYYY-MM-DD。只提供 start 或 end 时按单日精确查询。",
+          "type": "string"
+        },
+        "end": {
+          "description": "结束交易日，YYYY-MM-DD。start/end 同时提供时按闭区间查询。",
+          "type": "string"
+        },
+        "limit": {
+          "description": "底层查询保护上限，默认 50。",
+          "minimum": 1,
+          "maximum": 500,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "index"
+      ],
+      "type": "object"
+    },
+    "output": {
+      "$ref": "src/tools/schemas/index_daily_market_query.schema.json"
+    }
+  },
+  "status": "active",
+  "tags": [
+    "index",
+    "market_data",
+    "daily_market",
+    "valuation"
+  ],
+  "tests": {
+    "golden_cases": [],
+    "sample_inputs": [
+      {
+        "name": "index_daily_market_default",
+        "arguments": {
+          "start": "2026-06-01",
+          "end": "2026-06-30",
+          "limit": 50,
+          "index": "000300.SH"
+        }
+      }
+    ]
+  },
+  "ui_hints": {
+    "editable_sections": [
+      "identity",
+      "schemas.input",
+      "schemas.output",
+      "capabilities",
+      "profiles",
+      "retention",
+      "post_process",
+      "tests"
+    ]
+  },
+  "version": "v1",
+  "subject_tags": [
+    "index"
+  ],
+  "tool_priority": 1
+}

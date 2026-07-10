@@ -1,0 +1,56 @@
+{
+  "tool_name": "quant_data_provider",
+  "purpose": "按股票池和数据需求准备量化选股数据 artifact。",
+  "best_for": [
+    "用于为受控代码运行准备日 K、资金、估值、财务或新闻数据。",
+    "用于把多源数据整理成可审计的 table artifact。",
+    "用于返回覆盖率和缺口说明，不直接执行选股策略。"
+  ],
+  "invocation_example": "quant_data_provider(universe=[\"600000\", \"000001.SZ\"], date_range={\"start\":\"2026-05-01\",\"end\":\"2026-05-29\"}, required_data=[\"daily_price\"], max_preview_rows=5)",
+  "input_guidance": {
+    "required_fields": [
+      "universe",
+      "required_data"
+    ],
+    "optional_fields": [
+      "report_period",
+      "max_preview_rows"
+    ]
+  },
+  "output_guidance": {
+    "field_policies": {
+      "data.artifacts": {
+        "strategy": "prompt_summary",
+        "summary_prompt": "只保留 source_id、artifact_ref、row_count、columns 和 physical_format。"
+      },
+      "data.data_coverage": {
+        "strategy": "prompt_full"
+      },
+      "data.source_coverage": {
+        "strategy": "prompt_full"
+      },
+      "data.schemas": {
+        "strategy": "prompt_full"
+      },
+      "data.samples": {
+        "strategy": "prompt_summary",
+        "summary_prompt": "只保留每个数据源的少量样例，不展开 artifact 全量行。"
+      }
+    },
+    "high_value_for_reasoning": [
+      "data.artifacts",
+      "data.data_coverage",
+      "data.source_coverage",
+      "data.schemas"
+    ],
+    "high_value_for_render": [],
+    "usually_too_large_for_prompt": [
+      "data.samples"
+    ],
+    "drop_default": [],
+    "recommended_reducers": {
+      "data.artifacts": "summarize_table_artifacts",
+      "data.source_coverage": "summarize_coverage"
+    }
+  }
+}

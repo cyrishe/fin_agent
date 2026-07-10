@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "quant_factor_screening.schema.json",
+  "title": "Quant Factor Screening Output",
+  "type": "object",
+  "required": [
+    "tool",
+    "ok",
+    "data",
+    "error"
+  ],
+  "properties": {
+    "tool": {
+      "const": "quant_factor_screening"
+    },
+    "ok": {
+      "type": "boolean"
+    },
+    "data": {
+      "type": "object",
+      "properties": {
+        "selected_stocks": {
+          "type": "array"
+        },
+        "factor_table": {
+          "type": "object"
+        },
+        "factor_definitions": {
+          "type": "array"
+        },
+        "data_coverage": {
+          "type": "object"
+        },
+        "risk_warnings": {
+          "type": "array"
+        },
+        "audit": {
+          "type": "object"
+        },
+        "factor_plan": {
+          "type": "object"
+        }
+      },
+      "additionalProperties": true
+    },
+    "error": {
+      "type": "string"
+    },
+    "meta": {
+      "type": "object"
+    }
+  },
+  "additionalProperties": true
+}

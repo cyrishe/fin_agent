@@ -1,0 +1,51 @@
+{
+  "best_for": [
+    "用于查看某个板块、行业或概念下的成分股列表。",
+    "用于查询单只股票所属的行业、板块或概念关系。",
+    "用于为主题扩展、板块驱动选股和后续行情分析提供候选关系。"
+  ],
+  "input_guidance": {
+    "optional_fields": [
+      "subject_type",
+      "trade_date",
+      "limit",
+      "sort_by"
+    ],
+    "required_fields": [
+      "subject"
+    ]
+  },
+  "invocation_example": "plate_member_query(subject=\"半导体\", subject_type=\"plate\", limit=50)",
+  "output_guidance": {
+    "drop_default": [],
+    "field_policies": {
+      "data.mode": {
+        "strategy": "prompt_full"
+      },
+      "data.items": {
+        "strategy": "auto"
+      }
+    },
+    "high_value_for_reasoning": [
+      "data.mode",
+      "data.items"
+    ],
+    "high_value_for_render": [],
+    "recommended_reducers": {
+      "data.items": "top_rows"
+    },
+    "usually_too_large_for_prompt": [
+      "data.items"
+    ]
+  },
+  "purpose": "查询板块成分股或单只股票所属板块关系。",
+  "tool_name": "plate_member_query",
+  "status": "disabled",
+  "enabled": false,
+  "retrieval": {
+    "mode": "direct_only",
+    "visibility": "hidden"
+  },
+  "visibility": "hidden",
+  "deprecation_note": "混合了板块到成分股和股票到所属板块两种不同语义；请改用 plate_members_query 或 stock_plate_membership_query。"
+}

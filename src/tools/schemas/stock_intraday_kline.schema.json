@@ -1,0 +1,73 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "stock_intraday_kline.schema.json",
+  "title": "Stock Intraday Kline Tool Output",
+  "type": "object",
+  "required": [
+    "tool",
+    "ok",
+    "data",
+    "error"
+  ],
+  "properties": {
+    "data": {
+      "type": "object",
+      "required": [
+        "code",
+        "intraday_kline",
+        "minute_count",
+        "name"
+      ],
+      "properties": {
+        "code": {
+          "description": "六位证券代码。",
+          "type": "string"
+        },
+        "intraday_kline": {
+          "additionalProperties": false,
+          "description": "",
+          "properties": {
+            "candles": {
+              "description": "日内分钟K列表。",
+              "items": {
+                "$ref": "#/$defs/candle"
+              },
+              "type": "array"
+            },
+            "indicators": {
+              "description": "扩展指标位，当前默认空数组。",
+              "type": "array"
+            }
+          },
+          "required": [
+            "candles",
+            "indicators"
+          ],
+          "type": "object"
+        },
+        "minute_count": {
+          "description": "返回的分钟K点数。",
+          "type": "integer"
+        },
+        "name": {
+          "description": "个股名称。",
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "error": {
+      "description": "错误信息，成功时为空字符串。",
+      "type": "string"
+    },
+    "ok": {
+      "description": "工具执行是否成功。",
+      "type": "boolean"
+    },
+    "tool": {
+      "const": "stock_intraday_kline",
+      "description": "工具名称。"
+    }
+  },
+  "additionalProperties": false
+}

@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "default_assistant Run Input",
+  "type": "object",
+  "properties": {
+    "question": {
+      "type": "string"
+    },
+    "thread_id": {
+      "type": "string"
+    },
+    "context": {
+      "type": "object"
+    }
+  },
+  "additionalProperties": true
+}

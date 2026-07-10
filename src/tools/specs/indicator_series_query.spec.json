@@ -1,0 +1,122 @@
+{
+  "best_for": [
+    "用于按明确的指标 ID 查询一个或多个主体的指标序列。",
+    "当前支持 close_ma_5、close_ma_10、close_ma_20，分别表示 5/10/20 日收盘价均线。",
+    "用于读取 aiia_indicator_series 中已计算好的指标，不负责临时计算新指标。"
+  ],
+  "display_name": "指标序列查询",
+  "input_guidance": {
+    "required_fields": [
+      "indicator_ids"
+    ],
+    "optional_fields": [
+      "range_days",
+      "subject_codes"
+    ]
+  },
+  "input_schema": "src/tools/definitions/indicator_series_query.tool.json#/schemas/input",
+  "invocation_example": "indicator_series_query(indicator_ids=[\"close_ma_5\"], subject_codes=[\"000001.SH\"], range_days=30)",
+  "name": "indicator_series_query",
+  "output_guidance": {
+    "drop_default": [],
+    "field_policies": {
+      "data.[]": {
+        "strategy": "auto"
+      },
+      "data.[].calc_mode": {
+        "strategy": "auto"
+      },
+      "data.[].indicator_name": {
+        "strategy": "auto"
+      },
+      "data.[].indicator_value": {
+        "strategy": "auto"
+      },
+      "data.[].is_finalized": {
+        "strategy": "auto"
+      },
+      "data.[].measure_name": {
+        "strategy": "auto"
+      },
+      "data.[].minute_index": {
+        "strategy": "auto"
+      },
+      "data.[].snapshot_time": {
+        "strategy": "auto"
+      },
+      "data.[].source_summary": {
+        "strategy": "auto"
+      },
+      "data.[].code": {
+        "strategy": "auto"
+      },
+      "data.[].name": {
+        "strategy": "auto"
+      },
+      "data.[].subject_type": {
+        "strategy": "auto"
+      },
+      "data.[].trade_date": {
+        "strategy": "auto"
+      },
+      "data.[].unit": {
+        "strategy": "auto"
+      },
+      "data.[].window_size": {
+        "strategy": "auto"
+      },
+      "data.calc_mode": {
+        "strategy": "auto"
+      },
+      "data.indicator_name": {
+        "strategy": "auto"
+      },
+      "data.indicator_value": {
+        "strategy": "auto"
+      },
+      "data.is_finalized": {
+        "strategy": "auto"
+      },
+      "data.measure_name": {
+        "strategy": "auto"
+      },
+      "data.minute_index": {
+        "strategy": "auto"
+      },
+      "data.snapshot_time": {
+        "strategy": "auto"
+      },
+      "data.source_summary": {
+        "strategy": "auto"
+      },
+      "data.code": {
+        "strategy": "auto"
+      },
+      "data.name": {
+        "strategy": "auto"
+      },
+      "data.subject_type": {
+        "strategy": "auto"
+      },
+      "data.trade_date": {
+        "strategy": "auto"
+      },
+      "data.unit": {
+        "strategy": "auto"
+      },
+      "data.window_size": {
+        "strategy": "auto"
+      }
+    },
+    "high_value_for_reasoning": [],
+    "high_value_for_render": [],
+    "recommended_reducers": {
+      "data": "summarize_timeseries",
+      "series_map": "summarize_timeseries"
+    },
+    "usually_too_large_for_prompt": []
+  },
+  "output_schema": "src/tools/schemas/indicator_series_query.schema.json",
+  "purpose": "获取已计算好的指标时间序列。当前支持 close_ma_5、close_ma_10、close_ma_20。",
+  "tool_name": "indicator_series_query"
+}

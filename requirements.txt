@@ -1,0 +1,48 @@
+# -----------------------------
+# 基础爬虫与网络请求
+requests==2.31.0
+beautifulsoup4==4.12.2
+
+# -----------------------------
+# Selenium（动态爬虫，需要配合对应的浏览器Driver）
+selenium==4.10.0
+
+# 如果想使用Playwright，可替换/补充如下
+# playwright==1.38.0
+
+# -----------------------------
+# NLP相关
+jieba==0.42.1
+# 可选：如果使用 HanLP 或 pkuseg, spacy 等，需要自行添加
+# hanlp==2.1.0
+# pkuseg==0.0.25
+# spacy==3.5.3
+sentence-transformers==3.0.1
+
+# -----------------------------
+# OpenAI大模型调用
+openai==0.27.0
+openai-codex==0.1.0b3
+
+# -----------------------------
+# 测试 & Mock
+pytest==7.4.0
+pytest-mock==3.11.1
+# unittest.mock 是内置库，不需要额外安装
+# 如果还需要其他测试工具，可在这里补充
+
+# -----------------------------
+# 日志 & 配置
+PyYAML==6.0  # 用于读取logger_conf.yaml
+# 如果使用 python-dotenv 或 pydantic 做配置管理，也可添加
+# python-dotenv==1.0.0
+# pydantic==1.10.9
+
+# -----------------------------
+# 其他常用工具库
+# (这些库可能根据需要选择性添加)
+lxml==4.9.3   # 如果要用 lxml 解析
+schedule==1.2.0  # 如果需要 python-schedule 做定时任务
+tqdm==4.65.0  # 进度条显示
+openpyxl==3.1.5  # 读取 xlsx 文件
+python-docx==1.1.2  # 读取 docx 文件

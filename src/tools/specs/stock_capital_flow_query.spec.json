@@ -1,0 +1,48 @@
+{
+  "tool_name": "stock_capital_flow_query",
+  "purpose": "获取单只股票在指定 start/end 交易日范围内的日级资金流向序列。",
+  "best_for": [
+    "用于获取个股主力净流入、主力净流入占比等日级资金流数据。",
+    "用于查看超大单、大单、中单和小单资金分布。",
+    "用于读取 kcrp_stock_moneyflow 个股资金流，不承载板块或通用主体资金流。"
+  ],
+  "input_guidance": {
+    "required_fields": [
+      "stock"
+    ],
+    "optional_fields": [
+      "start",
+      "end",
+      "limit"
+    ]
+  },
+  "output_guidance": {
+    "high_value_for_reasoning": [
+      "data.code",
+      "data.name",
+      "data.rows"
+    ],
+    "high_value_for_render": [],
+    "usually_too_large_for_prompt": [
+      "data.rows"
+    ],
+    "recommended_reducers": {
+      "data.rows": "summarize_timeseries"
+    },
+    "drop_default": [
+      "_meta"
+    ],
+    "field_policies": {
+      "data.code": {
+        "strategy": "prompt_full"
+      },
+      "data.name": {
+        "strategy": "prompt_full"
+      },
+      "data.rows": {
+        "strategy": "prompt_summary"
+      }
+    }
+  },
+  "invocation_example": "stock_capital_flow_query(stock=\"贵州茅台\", start=\"2026-06-01\", end=\"2026-06-30\")"
+}

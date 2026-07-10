@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>优小智 Agent UI Style Variants</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: #eef1f5;
+      color: #111827;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      letter-spacing: 0;
+    }
+    .page { max-width: 1220px; margin: 0 auto; padding: 28px 20px 72px; }
+    .hero { margin-bottom: 22px; }
+    .hero h1 { margin: 0; font-size: 24px; }
+    .hero p { margin: 8px 0 0; color: #667085; line-height: 1.6; font-size: 14px; }
+    .variant { margin-top: 22px; border-radius: 10px; overflow: hidden; border: 1px solid #d8dee8; box-shadow: 0 18px 52px rgba(16,24,40,.08); }
+    .variant-title { padding: 14px 16px; font-weight: 850; display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+    .tag { font-size: 12px; padding: 5px 8px; border-radius: 999px; font-weight: 800; }
+    .prompt { max-width: 720px; padding: 12px 14px; border-radius: 8px; line-height: 1.55; font-size: 14px; }
+    .two { display: grid; grid-template-columns: 340px minmax(0,1fr); gap: 14px; }
+    .panel { border-radius: 8px; overflow: hidden; }
+    .panel h3 { margin: 0; padding: 11px 12px; font-size: 13px; }
+    .panel-body { padding: 12px; display: grid; gap: 10px; }
+    .step { display: grid; grid-template-columns: 18px minmax(0,1fr); gap: 8px; font-size: 13px; line-height: 1.45; }
+    .mark { width: 18px; height: 18px; border-radius: 50%; display: grid; place-items: center; font-size: 11px; font-weight: 900; }
+    .card { border-radius: 8px; padding: 12px; }
+    .card strong { display: block; margin-bottom: 5px; }
+    .muted { color: #667085; font-size: 13px; line-height: 1.55; }
+    .actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+    button { border: 0; border-radius: 8px; padding: 8px 11px; font-weight: 800; cursor: pointer; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th, td { padding: 9px; text-align: left; border-bottom: 1px solid rgba(148,163,184,.25); }
+    th { color: #667085; font-weight: 850; }
+    pre { margin: 0; padding: 12px; border-radius: 8px; overflow: auto; white-space: pre; font-size: 12px; line-height: 1.55; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
+    .flow { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+    .node { border-radius: 8px; padding: 9px 10px; min-width: 112px; text-align: center; font-size: 13px; line-height: 1.35; }
+    .arrow { font-weight: 900; color: #94a3b8; }
+
+    /* Variant 1 */
+    .v-console { background: #0b1220; color: #e5e7eb; }
+    .v-console .variant-title { background: #111827; border-bottom: 1px solid #1f2937; }
+    .v-console .tag { background: #1d4ed8; color: #dbeafe; }
+    .v-console .content { padding: 16px; display: grid; gap: 14px; }
+    .v-console .prompt { background: #172554; color: #dbeafe; margin-left: auto; }
+    .v-console .panel { border: 1px solid #243044; background: #0f172a; }
+    .v-console .panel h3 { background: #111827; color: #f8fafc; border-bottom: 1px solid #243044; }
+    .v-console .mark { background: #2563eb; color: #fff; }
+    .v-console .card { background: #111827; border: 1px solid #243044; }
+    .v-console .muted { color: #cbd5e1; }
+    .v-console button { background: #2563eb; color: #fff; }
+    .v-console pre { background: #020617; color: #d1d5db; }
+    .v-console .node { background: #111827; border: 1px solid #334155; color: #e5e7eb; }
+
+    /* Variant 2 */
+    .v-minimal { background: #fff; }
+    .v-minimal .variant-title { background: #fff; border-bottom: 1px solid #eaecf0; }
+    .v-minimal .tag { background: #f2f4f7; color: #344054; }
+    .v-minimal .content { padding: 20px; display: grid; gap: 16px; }
+    .v-minimal .prompt { background: #eff6ff; color: #1e3a8a; margin-left: auto; }
+    .v-minimal .panel { border: 1px solid #eaecf0; background: #fff; }
+    .v-minimal .panel h3 { background: #fff; border-bottom: 1px solid #eaecf0; }
+    .v-minimal .mark { background: #12b76a; color: #fff; }
+    .v-minimal .card { background: #f9fafb; border: 1px solid #eaecf0; }
+    .v-minimal button { background: #111827; color: #fff; }
+    .v-minimal pre { background: #f8fafc; color: #111827; border: 1px solid #eaecf0; }
+    .v-minimal .node { background: #f8fafc; border: 1px solid #d8dee8; }
+
+    /* Variant 3 */
+    .v-mobile { background: linear-gradient(135deg, #f8fafc, #e0f2fe); }
+    .v-mobile .variant-title { background: rgba(255,255,255,.75); border-bottom: 1px solid rgba(148,163,184,.35); backdrop-filter: blur(12px); }
+    .v-mobile .tag { background: #e0f2fe; color: #0369a1; }
+    .v-mobile .content { padding: 18px; display: grid; place-items: center; }
+    .phone { width: 390px; max-width: 100%; background: #fff; border: 1px solid #d8dee8; border-radius: 28px; padding: 16px; box-shadow: 0 24px 72px rgba(14,116,144,.18); }
+    .phone-top { height: 28px; display: grid; place-items: center; color: #94a3b8; font-size: 12px; }
+    .v-mobile .prompt { background: #dbeafe; color: #1e3a8a; margin-left: auto; font-size: 13px; }
+    .v-mobile .panel { border: 0; background: transparent; }
+    .v-mobile .panel h3 { padding-left: 0; background: transparent; }
+    .v-mobile .card { background: #f8fafc; border: 1px solid #e2e8f0; }
+    .v-mobile .mark { background: #0ea5e9; color: #fff; }
+    .v-mobile button { background: #0ea5e9; color: #fff; width: 100%; }
+    .v-mobile pre { background: #0f172a; color: #e5e7eb; }
+    .v-mobile .node { background: #fff; border: 1px solid #bae6fd; }
+
+    /* Variant 4 */
+    .v-desk { background: #f8fafc; }
+    .v-desk .variant-title { background: #1f2937; color: #fff; }
+    .v-desk .tag { background: #fef3c7; color: #92400e; }
+    .v-desk .content { padding: 16px; display: grid; grid-template-columns: 1.05fr .95fr; gap: 14px; }
+    .v-desk .prompt { background: #fff7ed; color: #7c2d12; border: 1px solid #fed7aa; grid-column: 1 / -1; }
+    .v-desk .panel { border: 1px solid #d8dee8; background: #fff; }
+    .v-desk .panel h3 { background: #f8fafc; border-bottom: 1px solid #d8dee8; }
+    .v-desk .mark { background: #f79009; color: #fff; }
+    .v-desk .card { background: #fff; border: 1px solid #e5e7eb; }
+    .v-desk button { background: #f79009; color: #fff; }
+    .v-desk pre { background: #111827; color: #e5e7eb; }
+    .v-desk .node { background: #fff7ed; border: 1px solid #fed7aa; }
+
+    @media (max-width: 900px) {
+      .two, .v-desk .content { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <div class="hero">
+      <h1>Agent 输出展示风格方案</h1>
+      <p>四个静态风格使用同一套内容结构：用户问题、过程区、回答区、模块/代码/流程图/操作按钮。差异主要在视觉语言和信息密度。</p>
+    </div>
+
+    <section class="variant v-console">
+      <div class="variant-title">版本 A：专业控制台 <span class="tag">agent / cli</span></div>
+      <div class="content">
+        <div class="prompt">/custom_tool create 阿布大盘买入决策...</div>
+        <div class="two">
+          <div class="panel"><h3>思考和执行过程</h3><div class="panel-body">
+            <div class="step"><span class="mark">1</span><span><strong>需求理解</strong>构建个人决策工具</span></div>
+            <div class="step"><span class="mark">2</span><span><strong>上下文加载</strong>金融 API 与设计稿已准备</span></div>
+            <div class="step"><span class="mark">3</span><span><strong>样例测试</strong>local sandbox passed</span></div>
+          </div></div>
+          <div class="panel"><h3>回答</h3><div class="panel-body">
+            <div class="card"><strong>阿布大盘买入决策</strong><span class="muted">状态：draft_ready。样例测试通过，可提交为个人工具。</span><div class="actions"><button>提交工具</button><button>继续修改</button></div></div>
+            <pre>def run(inputs):
+    market = market_state(inputs)
+    signal = stock_signal(inputs, market)
+    return build_output(market, signal)</pre>
+          </div></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="variant v-minimal">
+      <div class="variant-title">版本 B：极简对话 <span class="tag">calm / chat</span></div>
+      <div class="content">
+        <div class="prompt">请帮我创建一个阿布大盘买入决策工具。</div>
+        <div class="two">
+          <div class="panel"><h3>过程</h3><div class="panel-body">
+            <div class="step"><span class="mark">✓</span><span><strong>设计稿完成</strong>输入、输出和规则已整理</span></div>
+            <div class="step"><span class="mark">✓</span><span><strong>实现完成</strong>模块化代码逻辑已生成</span></div>
+            <div class="step"><span class="mark">✓</span><span><strong>测试通过</strong>样例输出有效</span></div>
+          </div></div>
+          <div class="panel"><h3>结果</h3><div class="panel-body">
+            <div class="card"><strong>可提交的个人工具</strong><span class="muted">工具会根据大盘状态和个股 15 分钟信号，输出可买或不可买。</span><div class="actions"><button>提交工具</button></div></div>
+            <table><thead><tr><th>字段</th><th>说明</th></tr></thead><tbody><tr><td>decision</td><td>可买 / 不可买</td></tr><tr><td>rule_details</td><td>规则命中明细</td></tr></tbody></table>
+          </div></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="variant v-mobile">
+      <div class="variant-title">版本 C：移动端卡片 <span class="tag">mobile / compact</span></div>
+      <div class="content">
+        <div class="phone">
+          <div class="phone-top">优小智</div>
+          <div class="prompt">创建阿布大盘买入决策工具</div>
+          <div class="panel"><h3>进度</h3><div class="panel-body">
+            <div class="step"><span class="mark">✓</span><span><strong>设计</strong>已完成</span></div>
+            <div class="step"><span class="mark">✓</span><span><strong>实现</strong>已完成</span></div>
+            <div class="step"><span class="mark">✓</span><span><strong>测试</strong>通过</span></div>
+          </div></div>
+          <div class="card"><strong>工具已准备好</strong><span class="muted">确认后提交到个人工具库。</span><div class="actions"><button>提交工具</button></div></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="variant v-desk">
+      <div class="variant-title">版本 D：数据工作台 <span class="tag">research desk</span></div>
+      <div class="content">
+        <div class="prompt">/custom_tool create 阿布大盘买入决策...</div>
+        <div class="panel"><h3>执行过程</h3><div class="panel-body">
+          <div class="step"><span class="mark">1</span><span><strong>需求抽取</strong>目标、输入、输出</span></div>
+          <div class="step"><span class="mark">2</span><span><strong>代码逻辑</strong>模块化实现</span></div>
+          <div class="step"><span class="mark">3</span><span><strong>测试</strong>样例通过</span></div>
+          <div class="flow"><span class="node">输入</span><span class="arrow">→</span><span class="node">大盘判断</span><span class="arrow">→</span><span class="node">个股信号</span><span class="arrow">→</span><span class="node">决策</span></div>
+        </div></div>
+        <div class="panel"><h3>回答与控件</h3><div class="panel-body">
+          <table><thead><tr><th>项目</th><th>值</th></tr></thead><tbody><tr><td>工具状态</td><td>draft_ready</td></tr><tr><td>测试</td><td>通过</td></tr><tr><td>下一步</td><td>提交或继续修改</td></tr></tbody></table>
+          <div class="card"><strong>代码逻辑</strong><pre>market = market_state(inputs)
+signal = stock_signal(inputs, market)
+decision = build_decision(market, signal)</pre></div>
+          <div class="actions"><button>提交工具</button><button>继续修改</button></div>
+        </div></div>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

@@ -1,0 +1,82 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "大盘整体情况.schema.json",
+  "title": "大盘整体情况 Output",
+  "type": "object",
+  "required": [
+    "tool",
+    "ok",
+    "data",
+    "error"
+  ],
+  "properties": {
+    "data": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "index_desc",
+          "name",
+          "index_value"
+        ],
+        "properties": {
+          "index_desc": {
+            "description": "",
+            "type": "string"
+          },
+          "name": {
+            "description": "",
+            "type": "string"
+          },
+          "index_value": {
+            "description": "",
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "error": {
+      "type": "string"
+    },
+    "meta": {
+      "additionalProperties": false,
+      "properties": {
+        "baseline_days_used": {
+          "type": "integer"
+        },
+        "lookback_days": {
+          "type": "integer"
+        },
+        "minute_index": {
+          "type": "integer"
+        },
+        "recent_daily_days_used": {
+          "type": "integer"
+        },
+        "snapshot_time": {
+          "type": "string"
+        },
+        "trade_date": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "trade_date",
+        "snapshot_time",
+        "minute_index",
+        "lookback_days",
+        "baseline_days_used",
+        "recent_daily_days_used"
+      ],
+      "type": "object"
+    },
+    "ok": {
+      "type": "boolean"
+    },
+    "tool": {
+      "const": "大盘整体情况"
+    }
+  },
+  "additionalProperties": true
+}

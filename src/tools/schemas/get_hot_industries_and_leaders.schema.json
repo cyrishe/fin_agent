@@ -1,0 +1,56 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "hot_theme_leaders_simple.schema.json",
+  "title": "Hot Theme Leaders Simple Output",
+  "type": "object",
+  "required": [
+    "tool",
+    "ok",
+    "data",
+    "error"
+  ],
+  "properties": {
+    "data": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "event",
+          "hotness",
+          "ind_name",
+          "leaders"
+        ],
+        "properties": {
+          "event": {
+            "description": "热点行业事件摘要",
+            "type": "string"
+          },
+          "hotness": {
+            "description": "参考热度，由平台计算",
+            "type": "integer"
+          },
+          "ind_name": {
+            "description": "热点行业名称",
+            "type": "string"
+          },
+          "leaders": {
+            "description": "热点行业的近期龙头股",
+            "type": "array"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "error": {
+      "type": "string"
+    },
+    "ok": {
+      "type": "boolean"
+    },
+    "tool": {
+      "const": "get_hot_industries_and_leaders",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false
+}

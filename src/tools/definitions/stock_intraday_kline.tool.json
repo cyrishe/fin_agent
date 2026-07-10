@@ -1,0 +1,166 @@
+{
+  "auth": "public",
+  "availability": {
+    "lifecycle": "retired",
+    "retrieval_mode": "direct_only",
+    "visibility": "hidden"
+  },
+  "capabilities": [
+    "intraday_kline",
+    "minute_kline",
+    "intraday"
+  ],
+  "defaults": {
+    "minute_count": "240"
+  },
+  "identity": {
+    "description": "查询个股日内分钟 K 线。",
+    "display_name": "个股日内分钟K线",
+    "domain": "stock",
+    "owner": "tools"
+  },
+  "invocation_example": "stock_intraday_kline(name=\"贵州茅台\", minute_count=240)",
+  "match_contract": {
+    "request_families": [
+      "data_access"
+    ],
+    "work_item_types": [
+      "tool"
+    ],
+    "capability_classes": [
+      "data_retrieval",
+      "kline_timeseries"
+    ],
+    "side_effect_level": "read_only"
+  },
+  "name": "stock_intraday_kline",
+  "post_process": {
+    "deterministic": {
+      "enabled": false,
+      "handler": ""
+    },
+    "llm": {
+      "enabled": false,
+      "prompt_key": ""
+    }
+  },
+  "profiles": {
+    "mock": {
+      "enabled": true,
+      "implementation": {
+        "kind": "inline_result"
+      },
+      "result": {
+        "data": {
+          "code": "code_示例",
+          "intraday_kline": {
+            "candles": [
+              null
+            ],
+            "indicators": [
+              null
+            ]
+          },
+          "minute_count": 0,
+          "name": "name_示例"
+        },
+        "error": "error_示例",
+        "ok": false,
+        "tool": "stock_intraday_kline"
+      }
+    },
+    "real": {
+      "enabled": true,
+      "implementation": {
+        "kind": "python_callable",
+        "target": "src.tools.stock_quote_tool:run_intraday_kline"
+      }
+    }
+  },
+  "retention": {
+    "drop_default": [],
+    "high_value_for_reasoning": [
+      "data.name",
+      "data.code"
+    ],
+    "high_value_for_render": [
+      "data.intraday_kline"
+    ],
+    "recommended_reducers": {
+      "data.intraday_kline": "summarize_timeseries"
+    },
+    "usually_too_large_for_prompt": [
+      "data.intraday_kline.candles"
+    ]
+  },
+  "runtime_hints": {
+    "cost_class": "medium",
+    "latency_class": "medium",
+    "supports_async_submit": false,
+    "supports_stream": false
+  },
+  "safety": {
+    "network": true,
+    "persistence": false,
+    "side_effect": "none"
+  },
+  "schemas": {
+    "input": {
+      "$id": "stock_intraday_kline.input.schema.json",
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "minute_count": {
+          "type": "integer",
+          "description": "返回最近多少个分钟K点，默认240。"
+        },
+        "name": {
+          "type": "string",
+          "description": "个股名称或代码。"
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "type": "object"
+    },
+    "output": {
+      "$ref": "src/tools/schemas/stock_intraday_kline.schema.json"
+    }
+  },
+  "status": "deprecated",
+  "tags": [
+    "stock",
+    "intraday",
+    "kline"
+  ],
+  "tests": {
+    "golden_cases": [],
+    "sample_inputs": [
+      {
+        "arguments": {
+          "minute_count": 240,
+          "name": "贵州茅台"
+        },
+        "name": "default_stock_intraday_kline"
+      }
+    ]
+  },
+  "ui_hints": {
+    "editable_sections": [
+      "identity",
+      "schemas.input",
+      "schemas.output",
+      "capabilities",
+      "profiles",
+      "retention",
+      "post_process",
+      "tests"
+    ]
+  },
+  "version": "v1",
+  "subject_tags": [
+    "stock"
+  ],
+  "tool_priority": 1
+}

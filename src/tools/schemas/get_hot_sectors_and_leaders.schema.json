@@ -1,0 +1,56 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "hot_theme_leaders_simple.schema.json",
+  "title": "Hot Theme Leaders Simple Output",
+  "type": "object",
+  "required": [
+    "tool",
+    "ok",
+    "data",
+    "error"
+  ],
+  "properties": {
+    "data": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "event",
+          "hotness",
+          "leaders",
+          "sector_name"
+        ],
+        "properties": {
+          "event": {
+            "description": "sector的当前重点事件或者情况",
+            "type": "string"
+          },
+          "hotness": {
+            "description": "1-10 热度值",
+            "type": "number"
+          },
+          "leaders": {
+            "description": "相关的龙头企业1-3个",
+            "type": "array"
+          },
+          "sector_name": {
+            "description": "热点板块名称",
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "error": {
+      "type": "string"
+    },
+    "ok": {
+      "type": "boolean"
+    },
+    "tool": {
+      "const": "get_hot_sectors_and_leaders",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false
+}

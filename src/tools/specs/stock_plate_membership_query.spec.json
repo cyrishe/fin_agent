@@ -1,0 +1,42 @@
+{
+  "tool_name": "stock_plate_membership_query",
+  "purpose": "获取指定股票所属的板块关系列表。",
+  "best_for": [
+    "用于查看单只股票属于哪些板块。",
+    "用于获取所属板块代码、名称和最近板块行情/资金字段。",
+    "用于为个股归因和板块联动分析提供基础关系数据。"
+  ],
+  "input_guidance": {
+    "required_fields": [
+      "stock"
+    ],
+    "optional_fields": [
+      "as_of",
+      "limit",
+      "sort_by"
+    ]
+  },
+  "invocation_example": "stock_plate_membership_query(stock=\"600519.SH\", limit=20, sort_by=\"plate_rise_fall_rate\")",
+  "output_guidance": {
+    "drop_default": [],
+    "field_policies": {
+      "data.mode": {
+        "strategy": "prompt_full"
+      },
+      "data.items": {
+        "strategy": "auto"
+      }
+    },
+    "high_value_for_reasoning": [
+      "data.mode",
+      "data.items"
+    ],
+    "high_value_for_render": [],
+    "recommended_reducers": {
+      "data.items": "top_rows"
+    },
+    "usually_too_large_for_prompt": [
+      "data.items"
+    ]
+  }
+}

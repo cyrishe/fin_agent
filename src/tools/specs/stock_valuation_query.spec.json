@@ -1,0 +1,58 @@
+{
+  "best_for": [
+    "用于获取 PE、PB、PS、总市值和流通市值等日级估值指标。",
+    "用于回看单只股票估值指标在指定日期范围内的变化。",
+    "用于为低估值筛选、因子排序和个股估值分析提供基础估值数据。"
+  ],
+  "input_guidance": {
+    "required_fields": [
+      "stock"
+    ],
+    "optional_fields": [
+      "start",
+      "end",
+      "limit"
+    ]
+  },
+  "invocation_example": "stock_valuation_query(stock=\"贵州茅台\", start=\"2026-06-01\", end=\"2026-06-30\")",
+  "output_guidance": {
+    "drop_default": [],
+    "field_policies": {
+      "data.rows": {
+        "strategy": "auto"
+      },
+      "data.rows.[].pb_lf": {
+        "strategy": "auto"
+      },
+      "data.rows.[].pb_mrq": {
+        "strategy": "auto"
+      },
+      "data.rows.[].pe_ttm": {
+        "strategy": "auto"
+      },
+      "data.rows.[].ps_ttm": {
+        "strategy": "auto"
+      },
+      "data.code": {
+        "strategy": "prompt_full"
+      },
+      "data.name": {
+        "strategy": "prompt_full"
+      }
+    },
+    "high_value_for_reasoning": [
+      "data.code",
+      "data.name",
+      "data.rows"
+    ],
+    "high_value_for_render": [],
+    "recommended_reducers": {
+      "data.rows": "summarize_timeseries"
+    },
+    "usually_too_large_for_prompt": [
+      "data.rows"
+    ]
+  },
+  "purpose": "获取单只 A 股在指定 start/end 交易日范围内的日级估值和市值序列。",
+  "tool_name": "stock_valuation_query"
+}

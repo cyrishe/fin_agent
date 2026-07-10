@@ -1,0 +1,100 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "security_universe_query.schema.json",
+  "title": "Security Universe Query Tool Output",
+  "type": "object",
+  "required": [
+    "tool",
+    "ok",
+    "data",
+    "error"
+  ],
+  "properties": {
+    "tool": {
+      "const": "security_universe_query",
+      "type": "string"
+    },
+    "ok": {
+      "type": "boolean"
+    },
+    "error": {
+      "type": "string"
+    },
+    "data": {
+      "type": "object",
+      "required": [
+        "as_of",
+        "metrics",
+        "rows"
+      ],
+      "properties": {
+        "as_of": {
+          "type": "string"
+        },
+        "metrics": {
+          "type": "object"
+        },
+        "rows": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "code": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "trade_date": {
+                "type": "string"
+              },
+              "minute_index": {
+                "type": "integer"
+              },
+              "price": {
+                "type": "number"
+              },
+              "open": {
+                "type": "number"
+              },
+              "high": {
+                "type": "number"
+              },
+              "low": {
+                "type": "number"
+              },
+              "preclose": {
+                "type": "number"
+              },
+              "change": {
+                "type": "number"
+              },
+              "change_pct": {
+                "type": "number"
+              },
+              "volume": {
+                "type": "number"
+              },
+              "amount": {
+                "type": "number"
+              },
+              "plate_code": {
+                "type": "string"
+              },
+              "plate_name": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "code",
+              "name"
+            ],
+            "type": "object"
+          },
+          "type": "array"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

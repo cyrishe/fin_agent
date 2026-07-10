@@ -1,0 +1,600 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>优小智 Live Agent Stream Mock</title>
+  <style>
+    :root {
+      --bg: #f5f6f8;
+      --panel: #fff;
+      --line: #d8dee9;
+      --text: #101828;
+      --muted: #667085;
+      --soft: #eef2f7;
+      --blue: #2563eb;
+      --blue-soft: #dbeafe;
+      --green: #12b76a;
+      --green-soft: #dcfae6;
+      --amber: #f79009;
+      --amber-soft: #fef0c7;
+      --red: #f04438;
+      --red-soft: #fee4e2;
+      --shadow: 0 14px 42px rgba(16, 24, 40, .08);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--bg); color: var(--text); letter-spacing: 0; }
+    .page { min-height: 100vh; display: grid; grid-template-rows: auto 1fr; }
+    .top {
+      position: sticky; top: 0; z-index: 10;
+      border-bottom: 1px solid var(--line);
+      background: rgba(251, 252, 254, .94);
+      backdrop-filter: blur(10px);
+    }
+    .top-inner {
+      max-width: 1160px; margin: 0 auto; padding: 14px 20px;
+      display: flex; align-items: center; justify-content: space-between; gap: 16px;
+    }
+    .brand { display: flex; align-items: center; gap: 10px; }
+    .logo {
+      width: 32px; height: 32px; border-radius: 8px;
+      background: var(--blue); color: #fff; display: grid; place-items: center;
+      font-weight: 800;
+    }
+    .brand strong { display: block; font-size: 16px; }
+    .brand span { display: block; margin-top: 2px; color: var(--muted); font-size: 12px; }
+    .controls { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    button {
+      border: 1px solid var(--line); background: #fff; color: #344054;
+      border-radius: 8px; padding: 8px 11px; font-size: 13px; font-weight: 700;
+      cursor: pointer;
+    }
+    button.primary { border-color: var(--blue); background: var(--blue); color: #fff; }
+    button.warn { border-color: #fedf89; background: #fffbeb; color: #b45309; }
+    button:disabled { opacity: .55; cursor: not-allowed; }
+    .badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 5px 8px; border-radius: 999px;
+      background: var(--soft); color: #475467; font-size: 12px; font-weight: 800;
+    }
+    .badge.ok { background: var(--green-soft); color: #047857; }
+    .badge.warn { background: var(--amber-soft); color: #b45309; }
+    .badge.run { background: var(--blue-soft); color: #1d4ed8; }
+    .main { max-width: 1160px; width: 100%; margin: 0 auto; padding: 22px 20px 64px; }
+    .prompt-row { display: flex; justify-content: flex-end; margin: 4px 0 16px; }
+    .prompt {
+      max-width: 760px; padding: 13px 15px; border-radius: 8px;
+      background: #cfe0ff; color: #172554; line-height: 1.6; font-size: 15px;
+    }
+    .agent-card { display: grid; gap: 12px; }
+    .area {
+      background: var(--panel); border: 1px solid var(--line); border-radius: 8px;
+      overflow: hidden; box-shadow: var(--shadow);
+    }
+    .process-area { background: #111827; border-color: #1f2937; }
+    .answer-area { background: #fff; }
+    .area-head {
+      display: flex; align-items: center; justify-content: space-between; gap: 12px;
+      padding: 14px 16px; border-bottom: 1px solid var(--line); background: #fbfcfe;
+    }
+    .process-area .area-head { background: #0f172a; border-color: #1f2937; color: #f8fafc; }
+    .process-area .area-title small { color: #94a3b8; }
+    .answer-area .area-head { background: #fff; }
+    .area-title { display: flex; align-items: center; gap: 9px; font-weight: 800; font-size: 14px; }
+    .area-title small { color: var(--muted); font-weight: 600; }
+    .pulse {
+      width: 9px; height: 9px; border-radius: 50%; background: var(--blue);
+      box-shadow: 0 0 0 0 rgba(37, 99, 235, .4);
+      animation: pulse 1.4s infinite;
+    }
+    .pulse.idle { background: var(--muted); animation: none; box-shadow: none; }
+    .pulse.done { background: var(--green); animation: none; box-shadow: none; }
+    @keyframes pulse {
+      70% { box-shadow: 0 0 0 8px rgba(37, 99, 235, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(37, 99, 235, 0); }
+    }
+    .area-body { padding: 16px; display: grid; gap: 14px; }
+    .process-body {
+      height: 360px;
+      overflow-y: auto;
+      display: grid;
+      grid-template-columns: 270px minmax(0, 1fr);
+      gap: 16px;
+      align-content: start;
+      background: #111827;
+    }
+    .timeline { display: grid; gap: 8px; align-content: start; position: sticky; top: 0; }
+    .step {
+      display: grid; grid-template-columns: 22px minmax(0, 1fr); gap: 9px;
+      color: #475467; font-size: 13px; line-height: 1.45;
+      opacity: .45; transition: opacity .2s ease, transform .2s ease;
+    }
+    .process-area .step { color: #94a3b8; }
+    .step.active, .step.done, .step.warn { opacity: 1; }
+    .step.active { transform: translateX(2px); }
+    .mark {
+      width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center;
+      background: var(--soft); color: var(--muted); font-size: 12px; font-weight: 800;
+    }
+    .step.done .mark { background: var(--green); color: #fff; }
+    .step.active .mark { background: var(--blue); color: #fff; }
+    .step.warn .mark { background: var(--amber); color: #fff; }
+    .step strong { display: block; color: #101828; margin-bottom: 2px; }
+    .process-area .step strong { color: #f8fafc; }
+    .blocks { display: grid; gap: 12px; align-content: start; }
+    .block {
+      border: 1px solid var(--line); border-radius: 8px; background: #fff; overflow: hidden;
+      opacity: 0; transform: translateY(8px); animation: enter .22s ease forwards;
+    }
+    .process-area .block { background: #0f172a; border-color: #263244; }
+    .answer-area .block { border-color: #e5e7eb; box-shadow: 0 8px 24px rgba(16, 24, 40, .04); }
+    @keyframes enter { to { opacity: 1; transform: translateY(0); } }
+    .block-head {
+      padding: 10px 12px; border-bottom: 1px solid var(--line); background: #fbfcfe;
+      display: flex; justify-content: space-between; gap: 12px; font-size: 13px; font-weight: 800;
+    }
+    .process-area .block-head { background: #111827; border-color: #263244; color: #e5e7eb; }
+    .answer-area .block-head { background: #f8fafc; }
+    .block-body { padding: 12px; }
+    .md { color: #344054; line-height: 1.65; font-size: 14px; }
+    .process-area .md { color: #cbd5e1; }
+    .md ul { margin: 8px 0 0; padding-left: 18px; }
+    .code {
+      margin: 0; padding: 14px; overflow: auto; border-radius: 6px;
+      background: #0f172a; color: #e5e7eb; font-size: 12.5px; line-height: 1.58;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      white-space: pre;
+      tab-size: 2;
+    }
+    .py-keyword { color: #93c5fd; font-weight: 700; }
+    .py-string { color: #86efac; }
+    .py-number { color: #fbbf24; }
+    .py-comment { color: #94a3b8; font-style: italic; }
+    .kv { display: grid; gap: 0; }
+    .row {
+      display: grid; grid-template-columns: 130px minmax(0, 1fr); gap: 10px;
+      padding: 9px 0; border-bottom: 1px solid #eef2f7; font-size: 13px;
+    }
+    .row:last-child { border-bottom: 0; }
+    .row span:first-child { color: var(--muted); font-weight: 800; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th { text-align: left; color: var(--muted); background: #f8fafc; padding: 10px; border-bottom: 1px solid var(--line); font-weight: 800; }
+    td { padding: 10px; border-bottom: 1px solid #eef2f7; color: #344054; vertical-align: top; }
+    tr:last-child td { border-bottom: 0; }
+    .schema { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+    .field { border: 1px solid var(--line); background: #fbfcfe; border-radius: 8px; padding: 10px; }
+    .field strong { display: block; font-size: 13px; margin-bottom: 4px; }
+    .field span { color: var(--muted); font-size: 12px; line-height: 1.45; }
+    .flow-visual { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+    .flow-node {
+      min-width: 120px; max-width: 190px; min-height: 58px;
+      border: 1px solid #dbe3ef; border-radius: 8px; background: #f8fafc;
+      display: grid; place-items: center; text-align: center;
+      padding: 9px 10px; color: #1f2937; font-size: 13px; line-height: 1.4;
+    }
+    .flow-arrow { color: #94a3b8; font-weight: 900; }
+    .action-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+    .answer-note { color: var(--muted); font-size: 13px; }
+
+    .composer {
+      position: fixed; left: 0; right: 0; bottom: 0; z-index: 20;
+      border-top: 1px solid var(--line);
+      background: rgba(251, 252, 254, .95);
+      backdrop-filter: blur(10px);
+    }
+    .composer-inner {
+      max-width: 1160px; margin: 0 auto; padding: 12px 20px;
+      display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px; align-items: end;
+    }
+    textarea {
+      width: 100%; resize: none; border: 1px solid var(--line); border-radius: 8px;
+      padding: 11px 12px; font: inherit; line-height: 1.55; color: #344054; background: #fff;
+      outline: none;
+    }
+    textarea:focus { border-color: #93c5fd; box-shadow: 0 0 0 3px rgba(37, 99, 235, .12); }
+    .hidden { display: none; }
+    @media (max-width: 900px) {
+      .process-body, .schema { grid-template-columns: 1fr; height: 420px; }
+      .timeline { position: static; }
+      .top-inner { align-items: flex-start; flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header class="top">
+      <div class="top-inner">
+        <div class="brand">
+          <div class="logo">优</div>
+          <div>
+            <strong>优小智 · 动态输出模拟</strong>
+            <span>真实 SSE 协议 mock：run_started / block / done / error</span>
+          </div>
+        </div>
+        <div class="controls">
+          <span id="runStatus" class="badge run">未开始</span>
+          <button id="resetBtn">重置</button>
+        </div>
+      </div>
+    </header>
+
+    <main class="main">
+      <div id="userPromptRow" class="prompt-row hidden">
+        <div id="userPrompt" class="prompt"></div>
+      </div>
+
+      <article class="agent-card">
+        <section class="area process-area">
+          <div class="area-head">
+            <div class="area-title"><span id="processPulse" class="pulse idle"></span>思考和执行过程 <small id="elapsed">0.0s</small></div>
+            <div><span id="phaseBadge" class="badge run">等待启动</span></div>
+          </div>
+          <div class="area-body process-body" id="processScroll">
+            <div class="timeline" id="timeline"></div>
+            <div class="blocks" id="processBlocks"></div>
+          </div>
+        </section>
+
+        <section class="area answer-area">
+          <div class="area-head">
+            <div class="area-title">回答区域 <small id="answerState">阶段性结果会逐步出现</small></div>
+            <div id="answerActions"></div>
+          </div>
+          <div class="area-body">
+            <div class="blocks" id="answerBlocks">
+              <div class="block" id="block-waiting">
+                <div class="block-head">等待结果</div>
+                <div class="block-body md">先生成设计稿；点击“确认实现”后，再启动代码实现 run。过程区固定高度滚动，回答区持续追加阶段产物。</div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </article>
+    </main>
+
+    <footer class="composer">
+      <div class="composer-inner">
+        <textarea id="chatInput" rows="2">/custom_tool create 阿布大盘买入决策：根据上证指数日线、15分钟强弱和个股15分钟买入信号，输出可买/不可买，并给出止损参考。</textarea>
+        <button id="sendBtn" class="primary">发送</button>
+      </div>
+    </footer>
+  </div>
+
+  <script>
+    const steps = [
+      { id: "understand", title: "理解需求", desc: "整理目标、输入、输出和约束" },
+      { id: "design", title: "生成设计稿", desc: "工具名、schema、实现逻辑" },
+      { id: "confirm", title: "等待确认", desc: "按钮触发下一阶段，不要求手输" },
+      { id: "context", title: "加载上下文", desc: "读取金融 API 和工具资料" },
+      { id: "coding", title: "生成代码逻辑", desc: "产出模块化实现代码" },
+      { id: "test", title: "执行测试", desc: "本地 sandbox 运行样例" },
+      { id: "ready", title: "等待提交", desc: "draft_ready，可 commit" },
+    ];
+
+    function block(seq, stage, block_id, block_type, mode, title, content = "", data = {}, actions = []) {
+      const runId = stage === "coding" ? "mock_coding_001" : "mock_design_001";
+      return {event: "block", run_id: runId, seq, stage, block_id, block_type, mode, title, content, data, actions, elapsed_ms: 0};
+    }
+
+
+    const designMermaid = `flowchart TD
+  A[输入股票和时间] --> B[判断上证日线趋势]
+  B --> C[聚合上证15分钟K线]
+  C --> D[判断大盘状态]
+  D --> E{大盘可操作?}
+  E -- 否 --> F[输出不可买]
+  E -- 是/谨慎 --> G[聚合个股15分钟K线]
+  G --> H[追强/回调/阻力位判断]
+  H --> I[输出可买或不可买]`;
+
+    const implementationMermaid = `flowchart TD
+  A[run inputs] --> B[validate_inputs]
+  B --> C[market_state]
+  C --> D{不可操作?}
+  D -- 是 --> E[build_output: 不可买]
+  D -- 否 --> F[stock_signal]
+  F --> G[strong_buy_check]
+  F --> H[pullback_buy_check]
+  G --> I[build_output]
+  H --> I`;
+
+    const designStream = [
+      { at: 0, payload: { event: "run_started", run_id: "mock_design_001", message: "智能体开始处理自定义工具设计。" }, active: "understand", phase: "需求理解" },
+      { at: 600, payload: block(1, "design", "design_thinking", "markdown", "append", "思考过程", "识别到这是一个个人自定义金融决策工具。目标是将规则固化为可复用工具，而不是一次性查询。"), active: "understand" },
+      { at: 1200, done: "understand" },
+      { at: 1400, payload: block(2, "design", "design_status", "status", "replace", "执行状态", "阶段开始：生成设计稿。"), active: "design", phase: "生成设计" },
+      { at: 2100, payload: block(3, "design", "design_final_summary", "markdown", "replace", "设计结果", "已生成自定义工具设计。\\n\\n- tool_name: `ct_abu_market_buy_decision`\\n- display_name: 阿布大盘买入决策\\n- description: 根据大盘状态和个股 15 分钟买入信号，输出可买或不可买，并给出止损参考。") },
+      { at: 2800, payload: block(4, "design", "design_inputs", "table", "replace", "输入字段", "", {headers: ["name", "type", "required", "description"], rows: [["stock_code", "string", "是", "待判断个股代码"], ["trade_date", "string", "是", "盘中判断日期"], ["as_of_time", "string", "否", "盘中截止时间"], ["market_index_code", "string", "否", "默认上证指数"]]}) },
+      { at: 3400, payload: block(5, "design", "design_outputs", "table", "replace", "输出字段", "", {headers: ["name", "type", "required", "description"], rows: [["decision", "string", "是", "可买 / 不可买"], ["market_status", "string", "是", "大盘状态"], ["buy_type", "string", "否", "追强 / 回调 / 无"], ["rule_details", "object", "否", "规则命中明细"]]}) },
+      { at: 4000, payload: block(6, "design", "design_logic_mermaid", "flowchart", "replace", "实现流程图", "", {format: "mermaid", code: designMermaid}) },
+      { at: 4600, payload: block(7, "design", "design_confirm_action", "action", "replace", "下一步", "设计稿已准备好。确认后进入代码逻辑生成和样例测试。", {}, [{id: "confirm_implementation", kind: "confirm", label: "确认实现", command: "确认实现"}, {id: "cancel", kind: "cancel", label: "取消", command: "/custom_tool cancel"}]) },
+      { at: 4900, done: "design" },
+      { at: 5100, done: "confirm", payload: { event: "done", run_id: "mock_design_001", thread_id: 1922, turn_id: 201, message: "设计完成，等待确认实现。", result: { mode: "custom_tool_flow", state: { status: "awaiting_design_confirmation" } } } },
+    ];
+
+    const codeStream = [
+      { at: 0, payload: { event: "run_started", run_id: "mock_coding_001", message: "收到确认，开始实现自定义工具。" }, active: "context", phase: "加载上下文" },
+      { at: 700, payload: block(8, "coding", "coding_status", "status", "replace", "执行状态", "上下文资料已准备：金融 API、custom_tool SDK、设计稿。"), active: "context" },
+      { at: 1200, payload: block(9, "coding", "coding_tool_output", "code", "append", "运行记录", "load finance api context\\nload design contract\\nprepare python sandbox\\n") },
+      { at: 1600, done: "context" },
+      { at: 1800, payload: block(10, "coding", "coding_thinking", "markdown", "append", "思考过程", "将实现拆成主入口、输入校验、行情数据获取、15分钟聚合、规则判断、结果组装几个模块。"), active: "coding", phase: "代码逻辑生成" },
+      { at: 2600, payload: block(11, "coding", "implementation_modules", "table", "replace", "实现模块", "", {headers: ["module", "purpose"], rows: [["run(inputs)", "工具主入口，组织全流程"], ["validate_inputs", "校验股票代码、日期、截止时间"], ["market_state", "计算日线趋势和15分钟强弱"], ["stock_signal", "计算追强、回调、阻力位"], ["build_output", "组装 decision 和 rule_details"]]}) },
+      { at: 3400, payload: block(12, "coding", "core_implementation_code", "code", "replace", "核心实现代码", "def run(inputs: dict[str, Any]) -> dict[str, Any]:\\n    params = validate_inputs(inputs)\\n    market = market_state(params)\\n    if market.status == '不可操作':\\n        return build_output(decision='不可买', market=market)\\n    signal = stock_signal(params, market)\\n    return build_output(decision=signal.decision, market=market, signal=signal)") },
+      { at: 4300, payload: block(13, "coding", "implementation_flow_mermaid", "flowchart", "replace", "代码逻辑流程", "", {format: "mermaid", code: implementationMermaid}) },
+      { at: 5000, done: "coding" },
+      { at: 5200, payload: block(14, "coding", "coding_status", "status", "replace", "执行状态", "开始执行样例测试。"), active: "test", phase: "执行测试" },
+      { at: 5900, payload: block(15, "coding", "coding_tool_output", "code", "append", "运行记录", "sample input: {stock_code: '600519.SH', trade_date: '20260709'}\\npython sandbox: local_dev\\noutput.json generated\\n") },
+      { at: 6700, payload: block(16, "coding", "coding_tests", "table", "replace", "测试用例", "", {headers: ["name", "status", "summary"], rows: [["sample_smoke", "passed", "local_dev sandbox output.json generated"]]}) },
+      { at: 7300, payload: block(17, "coding", "custom_tool_draft_summary", "table", "replace", "Draft 结果", "", {headers: ["item", "value"], rows: [["tool_name", "ct_abu_market_buy_decision"], ["display_name", "阿布大盘买入决策"], ["status", "draft"], ["test", "通过"]]}) },
+      { at: 7700, payload: block(18, "coding", "custom_tool_test_result", "markdown", "replace", "样例测试", "样例测试通过。") },
+      { at: 8100, payload: block(19, "coding", "coding_commit_action", "action", "replace", "下一步", "确认可用后提交工具；如果逻辑不符合预期，可以继续修改。", {}, [{id: "commit_tool", kind: "confirm", label: "提交工具", command: "/custom_tool commit ct_abu_market_buy_decision"}, {id: "edit_tool", kind: "choice", label: "继续修改", command: "请修改这个工具："}]) },
+      { at: 8500, done: "test" },
+      { at: 8700, done: "ready", payload: { event: "done", run_id: "mock_coding_001", thread_id: 1922, turn_id: 202, message: "任务已完成", result: { mode: "custom_tool_flow", message: "已生成 draft：ct_abu_market_buy_decision。样例测试：通过。", state: { status: "draft_ready", tool_name: "ct_abu_market_buy_decision" } } } },
+    ];
+
+    let currentRun = "design";
+    const state = {
+      timers: [],
+      running: false,
+      startedAt: 0,
+      elapsedTimer: null,
+      doneSteps: new Set(),
+      activeStep: "",
+    };
+
+    const timeline = document.getElementById("timeline");
+    const processBlocks = document.getElementById("processBlocks");
+    const answerBlocks = document.getElementById("answerBlocks");
+    const runStatus = document.getElementById("runStatus");
+    const phaseBadge = document.getElementById("phaseBadge");
+    const elapsed = document.getElementById("elapsed");
+    const processPulse = document.getElementById("processPulse");
+    const answerState = document.getElementById("answerState");
+    const answerActions = document.getElementById("answerActions");
+    const resetBtn = document.getElementById("resetBtn");
+    const sendBtn = document.getElementById("sendBtn");
+    const chatInput = document.getElementById("chatInput");
+    const userPromptRow = document.getElementById("userPromptRow");
+    const userPrompt = document.getElementById("userPrompt");
+    const processScroll = document.getElementById("processScroll");
+
+
+    function renderTimeline() {
+      timeline.innerHTML = steps.map((step, idx) => {
+        const cls = state.doneSteps.has(step.id) ? "done" : (state.activeStep === step.id ? "active" : "");
+        const mark = state.doneSteps.has(step.id) ? "✓" : idx + 1;
+        return `<div class="step ${cls}"><div class="mark">${mark}</div><div><strong>${escapeHtml(step.title)}</strong>${escapeHtml(step.desc)}</div></div>`;
+      }).join("");
+    }
+
+    function escapeHtml(text) {
+      return String(text ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#39;");
+    }
+
+    function markdownHtml(text) {
+      return escapeHtml(text)
+        .replace(/`([^`]+)`/g, "<strong>$1</strong>")
+        .replace(/\n/g, "<br>");
+    }
+
+    function pythonHighlight(code) {
+      const escaped = escapeHtml(code || "");
+      return escaped
+        .replace(/(#.*)$/gm, '<span class="py-comment">$1</span>')
+        .replace(/(&#39;[^\\n]*?&#39;|&quot;[^\\n]*?&quot;)/g, '<span class="py-string">$1</span>')
+        .replace(/\b(def|return|if|else|elif|for|while|in|not|and|or|class|from|import|try|except|with|as|None|True|False)\b/g, '<span class="py-keyword">$1</span>')
+        .replace(/\b(\d+(?:\.\d+)?)\b/g, '<span class="py-number">$1</span>');
+    }
+
+    function renderFlowchart(code) {
+      const labels = new Map();
+      const order = [];
+      String(code || "").split(/\n+/).forEach((line) => {
+        const matches = [...line.matchAll(/([A-Za-z]\w*)\[(.*?)\]|([A-Za-z]\w*)\{(.*?)\}/g)];
+        matches.forEach((match) => {
+          const id = match[1] || match[3];
+          const label = match[2] || match[4] || id;
+          if (!labels.has(id)) {
+            labels.set(id, label);
+            order.push(id);
+          }
+        });
+      });
+      if (!order.length) return '<div class="md">无流程图数据</div>';
+      return `<div class="flow-visual">${order.map((id, index) => `
+        ${index ? '<div class="flow-arrow">→</div>' : ''}
+        <div class="flow-node">${escapeHtml(labels.get(id))}</div>
+      `).join("")}</div>`;
+    }
+
+    function blockHtml(block) {
+      if (block.kind === "markdown") {
+        return `<div class="block" id="block-${block.id}"><div class="block-head">${escapeHtml(block.title)}</div><div class="block-body md">${markdownHtml(block.body || "")}</div></div>`;
+      }
+      if (block.kind === "code") {
+        return `<div class="block" id="block-${block.id}"><div class="block-head">${escapeHtml(block.title)}<span>${escapeHtml(block.label || "python")}</span></div><div class="block-body"><pre class="code"><code>${pythonHighlight(block.code)}</code></pre></div></div>`;
+      }
+      if (block.kind === "kv") {
+        return `<div class="block" id="block-${block.id}"><div class="block-head">${escapeHtml(block.title)}</div><div class="block-body kv">${(block.rows || []).map(([k, v]) => `<div class="row"><span>${escapeHtml(k)}</span><span>${escapeHtml(v)}</span></div>`).join("")}</div></div>`;
+      }
+      if (block.kind === "table") {
+        const headers = Array.isArray(block.data?.headers) ? block.data.headers : [];
+        const rows = Array.isArray(block.data?.rows) ? block.data.rows : [];
+        return `<div class="block" id="block-${block.id}"><div class="block-head">${escapeHtml(block.title)}</div><div class="block-body"><table><thead><tr>${headers.map((h) => `<th>${escapeHtml(h)}</th>`).join("")}</tr></thead><tbody>${rows.map((row) => `<tr>${(Array.isArray(row) ? row : []).map((cell) => `<td>${escapeHtml(cell)}</td>`).join("")}</tr>`).join("")}</tbody></table></div></div>`;
+      }
+      if (block.kind === "action") {
+        return `<div class="block" id="block-${block.id}"><div class="block-head">${escapeHtml(block.title)}</div><div class="block-body md">${escapeHtml(block.body || "")}<div class="action-row">${(block.actions || []).map((action) => `<button class="${action.id === "confirm_implementation" || action.id === "commit_tool" ? "primary" : ""}" data-action-kind="${escapeHtml(action.kind || "")}" data-command="${escapeHtml(action.command || "")}">${escapeHtml(action.label || action.id || "确认")}</button>`).join("")}</div></div></div>`;
+      }
+      if (block.kind === "flowchart") {
+        return `<div class="block" id="block-${block.id}"><div class="block-head">${escapeHtml(block.title)}<span>flowchart</span></div><div class="block-body">${renderFlowchart(block.data?.code || "")}</div></div>`;
+      }
+      return `<div class="block" id="block-${block.id}"><div class="block-head">${escapeHtml(block.title || "Block")}</div><div class="block-body md">${escapeHtml(JSON.stringify(block))}</div></div>`;
+    }
+
+    function upsertBlock(root, block) {
+      const old = document.getElementById(`block-${block.id}`);
+      const html = blockHtml(block);
+      if (old) old.outerHTML = html;
+      else root.insertAdjacentHTML("beforeend", html);
+      attachActionHandlers();
+      if (root === processBlocks) {
+        window.setTimeout(() => processScroll.scrollTop = processScroll.scrollHeight, 20);
+      }
+    }
+
+    function isProcessBlock(payload) {
+      const blockType = String(payload?.block_type || "").trim();
+      const blockId = String(payload?.block_id || "").trim();
+      return blockType === "status" || blockId.includes("_thinking") || blockId.includes("_assistant") || blockId.includes("_tool_output");
+    }
+
+    function normalizeRenderBlock(payload) {
+      const kindMap = {markdown: "markdown", status: "kv", code: "code", table: "table", action: "action", flowchart: "flowchart", bar_chart: "bar_chart", line_chart: "line_chart"};
+      const kind = kindMap[payload.block_type] || "markdown";
+      if (kind === "kv" && payload.block_type === "status") {
+        return {id: payload.block_id, kind: "kv", title: payload.title || "执行状态", rows: [["阶段", payload.stage || "-"], ["状态", payload.content || "-"]]};
+      }
+      if (kind === "table") return {id: payload.block_id, kind: "table", title: payload.title || "表格", data: payload.data || {}};
+      if (kind === "action") return {id: payload.block_id, kind: "action", title: payload.title || "操作", body: payload.content || "", actions: payload.actions || []};
+      if (kind === "flowchart") return {id: payload.block_id, kind: "flowchart", title: payload.title || "流程", data: payload.data || {}};
+      if (kind === "code") return {id: payload.block_id, kind: "code", title: payload.title || "代码", label: payload.stage || "code", code: payload.content || ""};
+      return {id: payload.block_id, kind: "markdown", title: payload.title || "内容", body: payload.content || ""};
+    }
+
+    function applyBackendPayload(payload) {
+      if (!payload || typeof payload !== "object") return;
+      if (payload.event === "run_started") {
+        runStatus.textContent = "运行中";
+        runStatus.className = "badge run";
+        processPulse.className = "pulse";
+        upsertBlock(processBlocks, {id: `${payload.run_id}_started`, kind: "kv", title: "运行启动", rows: [["状态", payload.message || "-"]]});
+        return;
+      }
+      if (payload.event === "block") {
+        const normalized = normalizeRenderBlock(payload);
+        if (isProcessBlock(payload)) {
+          upsertBlock(processBlocks, normalized);
+        } else {
+          if (answerBlocks.querySelector("#block-waiting")) answerBlocks.innerHTML = "";
+          answerState.textContent = "阶段性结果已更新";
+          upsertBlock(answerBlocks, normalized);
+        }
+        return;
+      }
+      if (payload.event === "done") {
+        state.running = false;
+        runStatus.textContent = currentRun === "design" ? "等待确认" : "已完成";
+        runStatus.className = currentRun === "design" ? "badge warn" : "badge ok";
+        phaseBadge.textContent = currentRun === "design" ? "等待确认" : "完成";
+        phaseBadge.className = currentRun === "design" ? "badge warn" : "badge ok";
+        processPulse.className = currentRun === "design" ? "pulse idle" : "pulse done";
+        answerState.textContent = payload.result?.message || payload.message || "完成";
+        sendBtn.disabled = false;
+      }
+    }
+
+    function applyEvent(event) {
+      if (event.active) {
+        state.activeStep = event.active;
+        renderTimeline();
+      }
+      if (event.phase) {
+        phaseBadge.textContent = event.phase;
+      }
+      if (event.done) {
+        state.doneSteps.add(event.done);
+        renderTimeline();
+      }
+      if (event.payload) {
+        applyBackendPayload(event.payload);
+      }
+    }
+
+    function runStream(name, stream) {
+      currentRun = name;
+      clearTimers();
+      state.running = true;
+      state.startedAt = performance.now();
+      sendBtn.disabled = true;
+      state.elapsedTimer = window.setInterval(() => {
+        elapsed.textContent = `${((performance.now() - state.startedAt) / 1000).toFixed(1)}s`;
+      }, 100);
+      stream.forEach((event) => {
+        const timer = window.setTimeout(() => applyEvent(event), event.at);
+        state.timers.push(timer);
+      });
+    }
+
+    function clearTimers() {
+      state.timers.forEach((timer) => window.clearTimeout(timer));
+      state.timers = [];
+      if (state.elapsedTimer) window.clearInterval(state.elapsedTimer);
+      state.elapsedTimer = null;
+    }
+
+    function reset() {
+      clearTimers();
+      currentRun = "design";
+      state.running = false;
+      state.doneSteps = new Set();
+      state.activeStep = "";
+      elapsed.textContent = "0.0s";
+      processBlocks.innerHTML = "";
+      answerBlocks.innerHTML = `<div class="block" id="block-waiting"><div class="block-head">等待结果</div><div class="block-body md">先生成设计稿；点击“确认实现”后，再启动代码实现 run。过程区固定高度滚动，回答区持续追加阶段产物。</div></div>`;
+      answerActions.innerHTML = "";
+      answerState.textContent = "阶段性结果会逐步出现";
+      phaseBadge.textContent = "等待启动";
+      phaseBadge.className = "badge run";
+      processPulse.className = "pulse idle";
+      runStatus.textContent = "未开始";
+      runStatus.className = "badge run";
+      sendBtn.disabled = false;
+      userPromptRow.classList.add("hidden");
+      userPrompt.textContent = "";
+      renderTimeline();
+    }
+
+    function attachActionHandlers() {
+      document.querySelectorAll("[data-command]").forEach((button) => {
+        if (button.dataset.bound === "1") return;
+        button.dataset.bound = "1";
+        button.addEventListener("click", () => {
+          const command = button.dataset.command || "";
+          if (command === "确认实现") {
+            state.doneSteps.add("confirm");
+            renderTimeline();
+            runStream("coding", codeStream);
+          } else {
+            answerState.textContent = `已选择：${command}`;
+          }
+        });
+      });
+    }
+
+    function sendCurrentInput() {
+      if (state.running) return;
+      const text = String(chatInput.value || "").trim();
+      if (!text) return;
+      userPrompt.textContent = text;
+      userPromptRow.classList.remove("hidden");
+      runStream("design", designStream);
+    }
+
+    sendBtn.addEventListener("click", sendCurrentInput);
+    chatInput.addEventListener("keydown", (event) => {
+      if (event.key === "Enter" && !event.shiftKey) {
+        event.preventDefault();
+        sendCurrentInput();
+      }
+    });
+    resetBtn.addEventListener("click", reset);
+    renderTimeline();
+  </script>
+</body>
+</html>

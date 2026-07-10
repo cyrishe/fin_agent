@@ -1,0 +1,16 @@
+{
+  "prompt_key": "system.skill_runtime.format_retry",
+  "layer": "system",
+  "owner": "skill_runtime",
+  "version": "v1",
+  "messages": [
+    {
+      "role": "assistant",
+      "template": "$assistant_raw"
+    },
+    {
+      "role": "user",
+      "template": "你上一条回复不符合协议，请只修正格式与结构问题。错误原因: $retry_feedback\n保留原有业务意图，不要新增解释，不要输出 markdown，只输出合法 JSON 对象。"
+    }
+  ]
+}

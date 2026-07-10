@@ -1,0 +1,151 @@
+{
+  "auth": "public",
+  "availability": {
+    "lifecycle": "active",
+    "retrieval_mode": "retrievable",
+    "visibility": "visible"
+  },
+  "capabilities": [
+    "fund_profile",
+    "fund_index_flags",
+    "etf_profile"
+  ],
+  "defaults": {},
+  "identity": {
+    "description": "查询单只基金或 ETF 的基础资料和最新交易属性快照。",
+    "display_name": "基金基础资料查询",
+    "domain": "fund",
+    "owner": "tools"
+  },
+  "invocation_example": "fund_profile_query(fund=\"510300\")",
+  "match_contract": {
+    "request_families": [
+      "data_access"
+    ],
+    "work_item_types": [
+      "tool"
+    ],
+    "capability_classes": [
+      "data_retrieval",
+      "fund_profile_lookup"
+    ],
+    "side_effect_level": "read_only"
+  },
+  "name": "fund_profile_query",
+  "post_process": {
+    "deterministic": {
+      "enabled": false,
+      "handler": ""
+    },
+    "llm": {
+      "enabled": false,
+      "prompt_key": ""
+    }
+  },
+  "profiles": {
+    "mock": {
+      "enabled": true,
+      "implementation": {
+        "kind": "inline_result"
+      },
+      "result": {
+        "tool": "fund_profile_query",
+        "ok": true,
+        "data": {
+          "subject": "510300",
+          "code": "510300",
+          "name": "沪深300ETF",
+          "profile": {},
+          "latest_index_flags": {}
+        },
+        "error": ""
+      }
+    },
+    "real": {
+      "enabled": true,
+      "implementation": {
+        "kind": "python_callable",
+        "target": "src.tools.fund_profile_query_tool:run"
+      }
+    }
+  },
+  "retention": {
+    "drop_default": [],
+    "high_value_for_reasoning": [
+      "data.code",
+      "data.name",
+      "data.profile",
+      "data.latest_index_flags",
+      "data.coverage"
+    ],
+    "high_value_for_render": [],
+    "recommended_reducers": {},
+    "usually_too_large_for_prompt": []
+  },
+  "runtime_hints": {
+    "cost_class": "low",
+    "latency_class": "low",
+    "supports_async_submit": false,
+    "supports_stream": false
+  },
+  "safety": {
+    "network": true,
+    "persistence": false,
+    "side_effect": "none"
+  },
+  "schemas": {
+    "input": {
+      "$id": "fund_profile_query.input.schema.json",
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "fund": {
+          "type": "string",
+          "description": "基金代码、简称或全称。"
+        }
+      },
+      "required": [
+        "fund"
+      ],
+      "type": "object"
+    },
+    "output": {
+      "$ref": "src/tools/schemas/fund_profile_query.schema.json"
+    }
+  },
+  "status": "active",
+  "tags": [
+    "fund",
+    "etf",
+    "profile",
+    "static_data"
+  ],
+  "tests": {
+    "golden_cases": [],
+    "sample_inputs": [
+      {
+        "name": "fund_profile_default",
+        "arguments": {
+          "fund": "510300"
+        }
+      }
+    ]
+  },
+  "ui_hints": {
+    "editable_sections": [
+      "identity",
+      "schemas.input",
+      "schemas.output",
+      "capabilities",
+      "profiles",
+      "retention",
+      "post_process",
+      "tests"
+    ]
+  },
+  "version": "v1",
+  "subject_tags": [
+    "fund"
+  ],
+  "tool_priority": 1
+}

@@ -1,0 +1,152 @@
+{
+  "availability": {
+    "lifecycle": "retired",
+    "retrieval_mode": "direct_only",
+    "visibility": "hidden"
+  },
+  "capabilities": [
+    "quote",
+    "kline",
+    "intraday",
+    "timeseries",
+    "technical_indicator"
+  ],
+  "defaults": {
+    "history_days": 60,
+    "minute_count": 100,
+    "minute_line_type": 2
+  },
+  "identity": {
+    "description": "查询个股行情和 K 线。",
+    "display_name": "个股行情查询",
+    "domain": "stock",
+    "owner": "tools"
+  },
+  "name": "stock_quote",
+  "post_process": {
+    "deterministic": {
+      "enabled": false,
+      "handler": ""
+    },
+    "llm": {
+      "enabled": false,
+      "prompt_key": ""
+    }
+  },
+  "profiles": {
+    "mock": {
+      "enabled": true,
+      "implementation": {
+        "kind": "inline_result"
+      },
+      "result": {
+        "data": {
+          "code": "code_示例",
+          "daily_kline": "daily_kline_示例",
+          "intraday_kline": "intraday_kline_示例",
+          "name": "name_示例",
+          "realtime_quote": "realtime_quote_示例"
+        },
+        "error": "",
+        "ok": true,
+        "tool": "stock_quote"
+      }
+    },
+    "real": {
+      "enabled": true,
+      "implementation": {
+        "kind": "python_callable",
+        "target": "src.tools.stock_quote_tool:run"
+      }
+    }
+  },
+  "retention": {
+    "drop_default": [],
+    "high_value_for_reasoning": [
+      "data.realtime_quote",
+      "data.code",
+      "data.name"
+    ],
+    "high_value_for_render": [
+      "data.daily_kline",
+      "data.intraday_kline"
+    ],
+    "recommended_reducers": {
+      "data.daily_kline": "summarize_timeseries",
+      "data.intraday_kline": "summarize_timeseries"
+    },
+    "usually_too_large_for_prompt": [
+      "data.daily_kline.kline",
+      "data.daily_kline.indicators",
+      "data.intraday_kline.kline",
+      "data.intraday_kline.indicators"
+    ]
+  },
+  "runtime_hints": {
+    "cost_class": "medium",
+    "latency_class": "medium",
+    "supports_async_submit": false,
+    "supports_stream": false
+  },
+  "safety": {
+    "network": true,
+    "persistence": false,
+    "side_effect": "none"
+  },
+  "schemas": {
+    "input": {
+      "$id": "stock_quote.input.schema.json",
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "code": {
+          "type": "string",
+          "description": "证券代码或公司名称。工具内部会自动解析并使用默认历史窗口和分钟线策略。"
+        }
+      },
+      "required": [
+        "code"
+      ],
+      "type": "object"
+    },
+    "output": {
+      "$ref": "src/tools/schemas/stock_quote.schema.json"
+    }
+  },
+  "status": "deprecated",
+  "tags": [
+    "market",
+    "quote",
+    "technical",
+    "stock"
+  ],
+  "tests": {
+    "golden_cases": [],
+    "sample_inputs": [
+      {
+        "arguments": {
+          "code": "600519"
+        },
+        "name": "default_quote"
+      }
+    ]
+  },
+  "ui_hints": {
+    "editable_sections": [
+      "identity",
+      "schemas.input",
+      "schemas.output",
+      "capabilities",
+      "profiles",
+      "retention",
+      "post_process",
+      "tests"
+    ]
+  },
+  "version": "v1",
+  "auth": "public",
+  "subject_tags": [
+    "stock"
+  ],
+  "tool_priority": 1
+}

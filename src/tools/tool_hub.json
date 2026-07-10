@@ -1,0 +1,684 @@
+[
+  {
+    "capabilities": [
+      "news_search",
+      "company_news",
+      "concept_news",
+      "event_news",
+      "timeline"
+    ],
+    "description": "查询公司、行业、板块、主题或事件相关的金融新闻。",
+    "keywords": [
+      "新闻",
+      "热点",
+      "概念",
+      "板块",
+      "公司",
+      "催化",
+      "事件",
+      "资讯",
+      "时间线"
+    ],
+    "name": "financial_news_search",
+    "priority": 10
+  },
+  {
+    "availability": {
+      "lifecycle": "retired",
+      "retrieval_mode": "direct_only",
+      "visibility": "hidden"
+    },
+    "capabilities": [
+      "research",
+      "institution_opinion",
+      "sell_side_report"
+    ],
+    "description": "查询指定个股的专业的研究报告，提供机构对个股的看多看空以及依据、目标价、预测分析、风险提示、个股所在行业的经营分析等内容",
+    "keywords": [
+      "研报",
+      "机构",
+      "分析师",
+      "目标价",
+      "评级"
+    ],
+    "name": "equity_research_search",
+    "priority": 0
+  },
+  {
+    "availability": {
+      "lifecycle": "retired",
+      "retrieval_mode": "direct_only",
+      "visibility": "hidden"
+    },
+    "name": "stock_funds",
+    "description": "获取个股资金流向、主力净额、行业资金和资金新闻。",
+    "capabilities": [
+      "capital_flow",
+      "funds",
+      "money_flow"
+    ],
+    "keywords": [
+      "资金",
+      "主力",
+      "净流入",
+      "净流出",
+      "资金面"
+    ],
+    "priority": 0
+  },
+  {
+    "availability": {
+      "lifecycle": "retired",
+      "retrieval_mode": "direct_only",
+      "visibility": "hidden"
+    },
+    "capabilities": [
+      "capital_flow",
+      "realtime_funds",
+      "money_flow"
+    ],
+    "description": "输入个股名称或代码，查询当前资金流入流出，按特大单、大单、中单、小单四档返回。适合做单只股票的实时资金确认。",
+    "keywords": [
+      "资金",
+      "主力",
+      "特大单",
+      "大单",
+      "中单",
+      "小单",
+      "净流入",
+      "净流出"
+    ],
+    "name": "stock_realtime_funds_flow",
+    "priority": 0
+  },
+  {
+    "availability": {
+      "lifecycle": "retired",
+      "retrieval_mode": "direct_only",
+      "visibility": "hidden"
+    },
+    "capabilities": [
+      "capital_flow",
+      "history_funds",
+      "money_flow_history"
+    ],
+    "description": "查询指定个股的最近N天的日资金流向历史。适合看近期主力净流入变化。",
+    "keywords": [
+      "历史资金",
+      "近N日",
+      "资金历史",
+      "主力净流入",
+      "资金变化"
+    ],
+    "name": "stock_history_funds_flow",
+    "priority": 0
+  },
+  {
+    "availability": {
+      "lifecycle": "retired",
+      "retrieval_mode": "direct_only",
+      "visibility": "hidden"
+    },
+    "capabilities": [
+      "capital_flow",
+      "industry_funds",
+      "peer_funds"
+    ],
+    "description": "输入个股名称或代码，查询该个股所属行业资金流情况，以及行业内主力净流入和净流出靠前的公司。\n主要是看资金面，分大单小单（主力/散户）的流入流出量和对比",
+    "keywords": [
+      "行业资金",
+      "同行资金",
+      "行业净流入",
+      "行业对比"
+    ],
+    "name": "stock_industry_funds_flow",
+    "priority": 0
+  },
+  {
+    "capabilities": [
+      "quote",
+      "realtime_quote",
+      "snapshot"
+    ],
+    "description": "查询单只股票的实时行情快照。",
+    "keywords": [
+      "实时行情",
+      "现价",
+      "开盘",
+      "最高",
+      "最低",
+      "成交量",
+      "成交额"
+    ],
+    "name": "stock_realtime_quote",
+    "priority": 9
+  },
+  {
+    "capabilities": [
+      "daily_kline",
+      "history_kline",
+      "timeseries"
+    ],
+    "description": "查询指定个股最近N天的历史日K，结果中包括当天最新一根日K（如果未收盘则为盘中实时K线）。",
+    "keywords": [
+      "历史行情",
+      "日K",
+      "日线",
+      "历史K线",
+      "最近N天"
+    ],
+    "name": "stock_history_kline",
+    "priority": 9
+  },
+  {
+    "capabilities": [
+      "intraday_kline",
+      "minute_kline",
+      "intraday"
+    ],
+    "description": "查询单个股票的日内分钟K线。\n每分钟的开盘价、收盘价、最高、最低、成交量（成交笔数）、成交额（金额）等\n注意只是*当前分钟*的成交量/成交额，如果需要当天累计的成交量/成交额，需要用行情工具",
+    "keywords": [
+      "分钟K线",
+      "分时K线",
+      "日内",
+      "盘中走势",
+      "分钟线"
+    ],
+    "name": "stock_intraday_kline",
+    "priority": 9
+  },
+  {
+    "capabilities": [
+      "quote",
+      "kline",
+      "intraday",
+      "timeseries",
+      "technical_indicator"
+    ],
+    "description": "输入股票代码，获取个股实时行情、分时K线和历史日线K线，用于判断价格状态、趋势阶段、量价结构和技术形态。适合做行情面和技术面分析。\n输出有列表的分钟K线，和历史的日K线，包含开盘价、收盘价、最高价、最低价、交易量、交易额、换手率等等常见的指标\n其中K线的列表还可以用于渲染图像用于展示",
+    "keywords": [
+      "行情",
+      "K线",
+      "分时",
+      "走势",
+      "量价",
+      "异动",
+      "技术面",
+      "价格"
+    ],
+    "name": "stock_quote",
+    "priority": 8
+  },
+  {
+    "capabilities": [],
+    "description": "输入公司名称或者查询语句，查询非结构化公司研报文本片段，用于检索具体公司的研究观点、行业事件背景和前因后果。适合做文本检索型研报查询。",
+    "keywords": [
+      "研报",
+      "公司研报",
+      "行业事件",
+      "文本检索",
+      "研究观点"
+    ],
+    "name": "公司研报查询",
+    "priority": 5
+  },
+  {
+    "capabilities": [
+      "market_sentiment",
+      "bpwl_brwl_ratio"
+    ],
+    "description": "基于全市场历史K线计算大盘情绪轮动比，当前只输出 bpwl_brwl_ratio，并附带固定说明文本。",
+    "keywords": [
+      "大盘情绪",
+      "轮动比",
+      "情绪指标",
+      "市场情绪",
+      "补涨补跌"
+    ],
+    "name": "大盘情绪指标",
+    "priority": 10
+  },
+  {
+    "capabilities": [
+      "market_breadth",
+      "limit_stats",
+      "market_realtime"
+    ],
+    "description": "查询市场实时上涨、下跌、平盘、涨停和跌停家数。",
+    "keywords": [
+      "上涨家数",
+      "下跌家数",
+      "持平家数",
+      "涨停家数",
+      "跌停家数",
+      "市场广度"
+    ],
+    "name": "market_realtime_breadth",
+    "priority": 10
+  },
+  {
+    "capabilities": [
+      "market_amount_history",
+      "market_turnover_history",
+      "market_database"
+    ],
+    "description": "查询指定市场最近多个交易日的总成交额序列。",
+    "keywords": [
+      "总成交额",
+      "市场资金",
+      "历史成交额",
+      "近五日成交额"
+    ],
+    "name": "market_history_amount",
+    "priority": 10
+  },
+  {
+    "capabilities": [
+      "market_minute_amount",
+      "market_same_minute_compare",
+      "market_database"
+    ],
+    "description": "查询市场当前分钟与历史同分钟累计成交额序列。",
+    "keywords": [
+      "分钟成交额",
+      "同分钟比较",
+      "盘中量能",
+      "成交额序列"
+    ],
+    "name": "market_minute_amount_series",
+    "priority": 10
+  },
+  {
+    "capabilities": [
+      "market_overview",
+      "breadth",
+      "limit_stats",
+      "turnover_overview"
+    ],
+    "description": "查询和返回当前市场的\n1 上涨、下跌的公司数\n2 涨、跌停的公司数\n3 五日成交额\n4 截止当前分钟的当天的成交额，对比前五日的截止当前分钟的成交额均值的比值",
+    "keywords": [
+      "大盘",
+      "整体情况",
+      "上涨家数",
+      "下跌家数",
+      "涨停",
+      "跌停",
+      "成交额",
+      "市场广度"
+    ],
+    "name": "大盘整体情况",
+    "priority": 10
+  },
+  {
+    "capabilities": [
+      "realtime_market_ranking",
+      "minute_snapshot_lookup",
+      "topk_ranking",
+      "market_screening"
+    ],
+    "description": "查询市场内股票的实时涨跌幅、成交额或成交量排名。",
+    "keywords": [
+      "实时行情",
+      "排名",
+      "涨幅榜",
+      "跌幅榜",
+      "成交额榜",
+      "成交量榜"
+    ],
+    "name": "实时行情排名查询",
+    "priority": 10
+  },
+  {
+    "capabilities": [
+      "limit_board_list",
+      "minute_snapshot_lookup",
+      "market_screening"
+    ],
+    "description": "查询指定市场的涨停股或跌停股列表。",
+    "keywords": [
+      "涨停",
+      "跌停",
+      "涨停股",
+      "跌停股",
+      "涨停列表",
+      "跌停列表"
+    ],
+    "name": "涨跌停列表查询",
+    "priority": 10
+  },
+  {
+    "capabilities": [
+      "indicator_series",
+      "indicator_query",
+      "offline_indicator"
+    ],
+    "description": "查询技术指标或离线指标的时间序列。",
+    "keywords": [
+      "均线",
+      "MACD",
+      "RSI",
+      "指标序列",
+      "时间序列",
+      "技术指标"
+    ],
+    "name": "indicator_series_query",
+    "priority": 9
+  },
+  {
+    "capabilities": [
+      "stock_momentum_ranking",
+      "cross_sectional_ranking",
+      "rank_change",
+      "realtime_or_daily",
+      "custom_stock_scope"
+    ],
+    "description": "动量是利用近几日的量价指标计算的一个特有的因子\n该工具提供查询指定日期的个股动量排名结果，\n返回 4 日和 5 日动量、涨幅、成交额及排名变化。\n适合做强势股筛选、横截面比较和短期强弱观察。\n分别针对全市场和中证50用动量因子选top输出",
+    "keywords": [
+      "动量",
+      "排名",
+      "强势股",
+      "横截面",
+      "排名变化",
+      "短期强弱"
+    ],
+    "name": "个股动量排名",
+    "priority": 10
+  },
+  {
+    "capabilities": [
+      "stock_momentum",
+      "ranking",
+      "realtime_quote",
+      "index_universe_filter"
+    ],
+    "description": "比较精确的工具，适用于特定场景\n基本不参与常规的问答\n计算个股实时价格相对参考收盘价的动量，并返回指定股池中排名前列的股票。适合盘中寻找最强股票和相对强弱筛选。",
+    "keywords": [
+      "实时动量",
+      "实时排名",
+      "强势股",
+      "盘中",
+      "相对强弱"
+    ],
+    "name": "实时个股动量排名",
+    "priority": 9
+  },
+  {
+    "capabilities": [
+      "company_taxonomy",
+      "industry_mapping",
+      "sector_mapping",
+      "concept_mapping",
+      "event_mapping"
+    ],
+    "description": "查询单只股票所属行业、板块、概念和相关事件归属。",
+    "keywords": [
+      "行业",
+      "板块",
+      "概念",
+      "公司画像",
+      "所属行业",
+      "所属板块",
+      "热点概念",
+      "归属"
+    ],
+    "name": "get_company_taxonomy_profile",
+    "priority": 9
+  },
+  {
+    "capabilities": [
+      "hot_concepts",
+      "concept_leaders",
+      "taxonomy_snapshot"
+    ],
+    "description": "获取当前市场的热点概念及对应龙头股列表。\n热点概念是最热最新的一种时效性的、动态的分类",
+    "keywords": [
+      "热点概念",
+      "概念热点",
+      "概念龙头",
+      "热门概念",
+      "题材热点",
+      "概念事件"
+    ],
+    "name": "get_hot_concepts_and_leaders",
+    "priority": 9
+  },
+  {
+    "capabilities": [
+      "hot_industries",
+      "industry_leaders",
+      "taxonomy_snapshot"
+    ],
+    "description": "获取当前市场的热门行业及对应龙头股列表\n行业是最稳定的市场个股分类维度，一般有标准的申万行业体系、证监会行业体系等",
+    "keywords": [
+      "热门行业",
+      "行业热点",
+      "行业龙头",
+      "强势行业",
+      "行业热度",
+      "行业事件"
+    ],
+    "name": "get_hot_industries_and_leaders",
+    "priority": 9
+  },
+  {
+    "capabilities": [
+      "hot_sectors",
+      "sector_leaders",
+      "taxonomy_snapshot"
+    ],
+    "description": "获取当前热门板块及对应龙头股列表，用于板块热点观察和板块龙头识别。\n热门板块是介于相对稳定的行业分类和相对实时动态的热点概念分类中间的分类体系，相对灵活",
+    "keywords": [
+      "热门板块",
+      "板块热点",
+      "板块龙头",
+      "强势板块",
+      "板块热度",
+      "板块事件"
+    ],
+    "name": "get_hot_sectors_and_leaders",
+    "priority": 9
+  },
+  {
+    "name": "finance_data_query",
+    "description": "金融数据查询顶层工具。执行 subject/dataview/function 协议请求串，内部路由股票、基金、债券、行业、板块、指数和热点事件数据。",
+    "capabilities": [
+      "finance_data_query",
+      "finance_data_protocol",
+      "subject_dataview_function_gateway",
+      "data_retrieval"
+    ],
+    "keywords": [
+      "金融查询",
+      "股票",
+      "基金",
+      "债券",
+      "行业",
+      "板块",
+      "指数",
+      "热点事件",
+      "行情",
+      "资金流",
+      "估值",
+      "财务"
+    ],
+    "priority": 3
+  },
+  {
+    "name": "file_io",
+    "description": "统一文件读写工具。按文件后缀或 MIME 路由读取 CSV、Excel、Word、文本等文件；写入生成 runtime artifact。",
+    "capabilities": [
+      "file_io",
+      "file_read",
+      "file_write",
+      "table_read",
+      "document_read",
+      "runtime_artifact"
+    ],
+    "keywords": [
+      "文件",
+      "上传文件",
+      "CSV",
+      "Excel",
+      "Word",
+      "txt",
+      "读写",
+      "artifact"
+    ],
+    "priority": 4
+  },
+  {
+    "capabilities": [
+      "quant_data_provider",
+      "dbinfo_registry",
+      "table_artifact",
+      "bounded_preview",
+      "data_coverage"
+    ],
+    "description": "按股票池和数据需求准备量化选股数据 artifact。",
+    "keywords": [
+      "量化选股",
+      "因子计算数据",
+      "日K",
+      "分钟行情",
+      "资金流",
+      "估值",
+      "财务指标",
+      "现金流",
+      "概念信号",
+      "新闻数据",
+      "artifact"
+    ],
+    "name": "quant_data_provider",
+    "priority": 9
+  },
+  {
+    "capabilities": [
+      "quant_factor_screening",
+      "factor_plan",
+      "quant_data_provider",
+      "code_runtime",
+      "audit_trace"
+    ],
+    "description": "执行量化因子筛选并返回候选股、因子表和审计信息。",
+    "keywords": [
+      "量化选股",
+      "因子筛选",
+      "消息面选股",
+      "资金流",
+      "量价",
+      "概念催化",
+      "code runtime"
+    ],
+    "name": "quant_factor_screening",
+    "priority": 10
+  },
+  {
+    "name": "fund_daily_market_query",
+    "description": "查询单只基金或 ETF 的日级行情序列。",
+    "capabilities": [],
+    "keywords": [],
+    "priority": 8
+  },
+  {
+    "name": "fund_profile_query",
+    "description": "查询单只基金或 ETF 的基础资料和最新交易属性快照。",
+    "capabilities": [
+      "fund_profile",
+      "fund_index_flags",
+      "etf_profile"
+    ],
+    "keywords": [
+      "基金资料",
+      "ETF",
+      "指数基金",
+      "基础信息",
+      "交易属性",
+      "跟踪指数"
+    ],
+    "priority": 9
+  },
+  {
+    "name": "index_daily_market_query",
+    "description": "查询单只指数的日级行情和估值序列。",
+    "capabilities": [],
+    "keywords": [],
+    "priority": 8
+  },
+  {
+    "name": "plate_capital_flow_query",
+    "description": "查询板块、行业或概念的资金流向序列。",
+    "capabilities": [],
+    "keywords": [],
+    "priority": 8
+  },
+  {
+    "name": "plate_member_query",
+    "description": "查询板块成分股或单只股票所属板块关系。",
+    "capabilities": [],
+    "keywords": [],
+    "priority": 8
+  },
+  {
+    "name": "plate_rank_query",
+    "description": "查询热门板块的行情、成交额和主力资金排名。",
+    "capabilities": [],
+    "keywords": [],
+    "priority": 8
+  },
+  {
+    "name": "security_universe_query",
+    "description": "对股票集合执行过滤、聚合和排序查询。",
+    "capabilities": [],
+    "keywords": [],
+    "priority": 8
+  },
+  {
+    "name": "stock_announcement_query",
+    "description": "查询单只股票的交易所公告和披露记录。",
+    "capabilities": [],
+    "keywords": [],
+    "priority": 8
+  },
+  {
+    "name": "stock_capital_flow_query",
+    "description": "查询单只股票的资金流向序列。",
+    "capabilities": [],
+    "keywords": [],
+    "priority": 8
+  },
+  {
+    "name": "stock_daily_kline_query",
+    "description": "查询单只股票的日级 K 线行情序列。",
+    "capabilities": [],
+    "keywords": [],
+    "priority": 8
+  },
+  {
+    "name": "stock_financial_statement_query",
+    "description": "查询单只 A 股的核心财务三表数据。",
+    "capabilities": [],
+    "keywords": [],
+    "priority": 8
+  },
+  {
+    "name": "stock_fundamental_snapshot",
+    "description": "查询单只 A 股的基本面快照和最新财务指标。",
+    "capabilities": [],
+    "keywords": [],
+    "priority": 8
+  },
+  {
+    "name": "stock_intraday_kline_query",
+    "description": "查询单只股票的日内分钟行情序列。",
+    "capabilities": [],
+    "keywords": [],
+    "priority": 8
+  },
+  {
+    "name": "stock_valuation_query",
+    "description": "查询单只 A 股的日级估值和市值序列。",
+    "capabilities": [],
+    "keywords": [],
+    "priority": 8
+  }
+]

@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "hot_theme_leaders_simple.schema.json",
+  "title": "Hot Theme Leaders Simple Output",
+  "type": "object",
+  "required": ["tool", "ok", "data", "error"],
+  "properties": {
+    "tool": {
+      "type": "string"
+    },
+    "ok": {
+      "type": "boolean"
+    },
+    "error": {
+      "type": "string"
+    },
+    "data": {
+      "type": "object",
+      "required": ["query_date", "items"],
+      "properties": {
+        "query_date": {
+          "type": "string"
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["theme_type", "theme_name", "hotness", "leaders", "event_summary", "performance_summary", "query_date"],
+            "properties": {
+              "theme_type": { "type": "string" },
+              "theme_name": { "type": "string" },
+              "hotness": { "type": "number" },
+              "leaders": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "required": ["name", "code", "role", "performance"],
+                  "properties": {
+                    "name": { "type": "string" },
+                    "code": { "type": "string" },
+                    "role": { "type": "string" },
+                    "performance": { "type": "string" }
+                  },
+                  "additionalProperties": false
+                }
+              },
+              "event_summary": { "type": "string" },
+              "performance_summary": { "type": "string" },
+              "query_date": { "type": "string" }
+            },
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

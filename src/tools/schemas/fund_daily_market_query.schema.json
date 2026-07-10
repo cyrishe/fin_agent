@@ -1,0 +1,73 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "fund_daily_market_query.schema.json",
+  "title": "Fund Daily Market Query Tool Output",
+  "type": "object",
+  "required": ["tool", "ok", "data", "error"],
+  "properties": {
+    "tool": {"const": "fund_daily_market_query", "type": "string"},
+    "ok": {"type": "boolean"},
+    "error": {"type": "string"},
+    "data": {
+      "type": "object",
+      "required": ["subject", "code", "name", "rows", "coverage"],
+      "properties": {
+        "source": {"type": "array", "items": {"type": "string"}},
+        "subject": {"type": "string"},
+        "code": {"type": "string"},
+        "name": {"type": "string"},
+        "date_range": {
+          "type": "object",
+          "properties": {
+            "start": {"type": "string"},
+            "end": {"type": "string"}
+          },
+          "additionalProperties": false
+        },
+        "row_count": {"type": "integer"},
+        "rows": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/marketRow"}
+        },
+        "coverage": {
+          "type": "object",
+          "properties": {
+            "requested_days": {"type": "integer"},
+            "returned_rows": {"type": "integer"},
+            "latest_trade_date": {"type": "string"},
+            "profile_available": {"type": "boolean"}
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "$defs": {
+    "marketRow": {
+      "type": "object",
+      "required": ["trade_date", "code", "close", "amount", "volume"],
+      "properties": {
+        "trade_date": {"type": "string"},
+        "code": {"type": "string"},
+        "nav_unit": {"type": "number"},
+        "preclose": {"type": "number"},
+        "open": {"type": "number"},
+        "high": {"type": "number"},
+        "low": {"type": "number"},
+        "close": {"type": "number"},
+        "avg_price": {"type": "number"},
+        "differ": {"type": "number"},
+        "differ_range": {"type": "number"},
+        "turn_ratio": {"type": "number"},
+        "volume": {"type": "number"},
+        "amount": {"type": "number"},
+        "amplitude": {"type": "number"},
+        "discount": {"type": "number"},
+        "unit_total": {"type": "number"}
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

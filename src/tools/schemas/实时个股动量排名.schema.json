@@ -1,0 +1,95 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "实时个股动量排名.schema.json",
+  "title": "实时个股动量排名 Output",
+  "type": "object",
+  "required": [
+    "tool",
+    "ok",
+    "data",
+    "error"
+  ],
+  "properties": {
+    "data": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "avg_amount_wan",
+          "k",
+          "momentum_value",
+          "price_change_ratio",
+          "rank",
+          "realtime_amount_wan",
+          "realtime_price",
+          "reference_close",
+          "code",
+          "name",
+          "universe_label",
+          "window_total_amount_wan"
+        ],
+        "properties": {
+          "avg_amount_wan": {
+            "description": "当前动量窗口内的日均成交额，单位万元",
+            "type": "number"
+          },
+          "k": {
+            "description": "回看交易日数量",
+            "type": "integer"
+          },
+          "momentum_value": {
+            "description": "最终动量值 = x * y / 100，其中 y 为包含当日实时成交额在内的当前窗口日均成交额(万元)",
+            "type": "number"
+          },
+          "price_change_ratio": {
+            "description": "价格变化比 x = (当前实时价 / 同窗口参考收盘价) - 1",
+            "type": "number"
+          },
+          "rank": {
+            "description": "排名",
+            "type": "integer"
+          },
+          "realtime_amount_wan": {
+            "description": "当日截至当前时刻的实时累计成交额，单位万元",
+            "type": "number"
+          },
+          "realtime_price": {
+            "description": "实时价格",
+            "type": "number"
+          },
+          "reference_close": {
+            "description": "K 个交易日前的参考收盘价",
+            "type": "number"
+          },
+          "code": {
+            "description": "股票代码",
+            "type": "string"
+          },
+          "name": {
+            "description": "股票名称",
+            "type": "string"
+          },
+          "universe_label": {
+            "description": "股池中文名称",
+            "type": "string"
+          },
+          "window_total_amount_wan": {
+            "description": "当前动量窗口内的成交总金额，包含当日实时成交额和前 k-1 个已完成交易日成交额，单位万元",
+            "type": "number"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "error": {
+      "type": "string"
+    },
+    "ok": {
+      "type": "boolean"
+    },
+    "tool": {
+      "const": "实时个股动量排名"
+    }
+  },
+  "additionalProperties": true
+}

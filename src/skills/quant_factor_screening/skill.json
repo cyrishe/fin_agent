@@ -1,0 +1,38 @@
+{
+  "skill_name": "quant_factor_screening",
+  "availability": {
+    "lifecycle": "active",
+    "retrieval_mode": "retrievable"
+  },
+  "purpose": "自然语言量化与消息面选股，生成 factor plan，调用 provider 准备数据，并通过 code runtime 输出可审计候选筛选结果。",
+  "best_for": [
+    "量化选股",
+    "多因子筛选",
+    "消息面与概念催化组合筛选"
+  ],
+  "skill_body": "先将需求拆成股票池、窗口、数据源、因子和排序，再调用 quant_factor_screening。缺少 verified 数据时输出覆盖率和缺口，不编造候选股，不承诺收益。",
+  "tool_policy": {
+    "mode": "strict"
+  },
+  "tools": [
+    "quant_factor_screening",
+    "quant_data_provider",
+    "file_io"
+  ],
+  "default_max_steps": 6,
+  "required_tools_before_final": [
+    "quant_factor_screening"
+  ],
+  "expected_render_page_type": "quant_factor_screening",
+  "enable_think": false,
+  "output_mode": "process_guided",
+  "presentation_preference": "输出候选股表、因子解释、数据覆盖率、风险提示和审计摘要。",
+  "owner": "system",
+  "auth": "internal",
+  "tags": [
+    "quant",
+    "screening",
+    "factor",
+    "code_runtime"
+  ]
+}

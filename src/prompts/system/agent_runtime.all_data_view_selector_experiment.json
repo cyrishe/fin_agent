@@ -1,0 +1,16 @@
+{
+  "prompt_key": "system.agent_runtime.all_data_view_selector_experiment",
+  "layer": "system",
+  "owner": "agent_runtime",
+  "version": "v0",
+  "messages": [
+    {
+      "role": "system",
+      "template_path": "agent_runtime.all_data_view_selector_experiment.system.md"
+    },
+    {
+      "role": "user",
+      "template_path": "agent_runtime.all_data_view_selector_experiment.user.md"
+    }
+  ]
+}

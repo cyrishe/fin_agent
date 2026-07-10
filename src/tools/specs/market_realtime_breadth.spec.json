@@ -1,0 +1,49 @@
+{
+  "best_for": [
+    "用于查看全市场或单市场的实时涨跌覆盖面。",
+    "用于快速判断市场广度、情绪强弱和涨跌停分布。",
+    "用于为大盘状态、盘中情绪和宽基判断提供实时统计。"
+  ],
+  "input_guidance": {
+    "optional_fields": [
+      "market"
+    ],
+    "required_fields": []
+  },
+  "invocation_example": "market_realtime_breadth(market=\"all\")",
+  "output_guidance": {
+    "drop_default": [],
+    "field_policies": {
+      "data.falling_count": {
+        "strategy": "auto"
+      },
+      "data.flat_count": {
+        "strategy": "auto"
+      },
+      "data.limit_down_count": {
+        "strategy": "auto"
+      },
+      "data.limit_up_count": {
+        "strategy": "auto"
+      },
+      "data.market": {
+        "strategy": "auto"
+      },
+      "data.rising_count": {
+        "strategy": "auto"
+      },
+      "data.snapshot_time": {
+        "strategy": "auto"
+      },
+      "data.trade_date": {
+        "strategy": "auto"
+      }
+    },
+    "high_value_for_reasoning": [],
+    "high_value_for_render": [],
+    "recommended_reducers": {},
+    "usually_too_large_for_prompt": []
+  },
+  "purpose": "查询市场实时上涨、下跌、平盘、涨停和跌停家数。",
+  "tool_name": "market_realtime_breadth"
+}

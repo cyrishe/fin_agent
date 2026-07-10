@@ -1,0 +1,16 @@
+{
+  "prompt_key": "system.assistant.tool_candidate_rerank",
+  "layer": "system",
+  "owner": "assistant",
+  "version": "v1",
+  "messages": [
+    {
+      "role": "system",
+      "template_path": "assistant.tool_candidate_rerank.system.md"
+    },
+    {
+      "role": "user",
+      "template_path": "assistant.tool_candidate_rerank.user.md"
+    }
+  ]
+}

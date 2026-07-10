@@ -1,0 +1,48 @@
+{
+  "tool_policy": {
+    "mode": "strict"
+  },
+  "tools": [
+    "stock_realtime_quote",
+    "stock_history_kline",
+    "stock_intraday_kline",
+    "stock_realtime_funds_flow",
+    "stock_history_funds_flow",
+    "stock_industry_funds_flow",
+    "equity_research_search",
+    "financial_news_search"
+  ],
+  "default_max_steps": 8,
+  "required_tools_before_final": [
+    "stock_realtime_quote",
+    "stock_history_kline",
+    "stock_realtime_funds_flow",
+    "stock_history_funds_flow",
+    "stock_industry_funds_flow",
+    "equity_research_search",
+    "financial_news_search"
+  ],
+  "expected_render_page_type": "stock_deep_dive",
+  "enable_think": false,
+  "skill_name": "stock_deep_dive",
+  "availability": {
+    "lifecycle": "active",
+    "retrieval_mode": "direct_only"
+  },
+  "purpose": "针对单只股票输出一份投顾式深度分析，覆盖行情、资金、研报、新闻催化和风险观察。",
+  "best_for": [
+    "单只股票深度分析",
+    "代表股逻辑梳理",
+    "异动个股二次分析"
+  ],
+  "skill_body": "先确认标的与行情位置，再补资金、研报和新闻催化，最后形成核心逻辑、驱动因素和主要风险的结构化分析。",
+  "output_mode": "process_guided",
+  "presentation_preference": "默认输出结构化分析文本；涉及价格和指标时优先用折线图或表格补充。",
+  "owner": "system",
+  "auth": "public",
+  "tags": [
+    "stock",
+    "deep_dive",
+    "analysis"
+  ]
+}

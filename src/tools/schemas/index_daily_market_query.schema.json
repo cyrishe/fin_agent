@@ -1,0 +1,146 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "index_daily_market_query.schema.json",
+  "title": "Index Daily Market Query Tool Output",
+  "type": "object",
+  "required": [
+    "tool",
+    "ok",
+    "data",
+    "error"
+  ],
+  "properties": {
+    "tool": {
+      "const": "index_daily_market_query",
+      "type": "string"
+    },
+    "ok": {
+      "type": "boolean"
+    },
+    "error": {
+      "type": "string"
+    },
+    "data": {
+      "type": "object",
+      "required": [
+        "subject",
+        "code",
+        "name",
+        "rows"
+      ],
+      "properties": {
+        "subject": {
+          "type": "string"
+        },
+        "code": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "rows": {
+          "items": {
+            "$ref": "#/$defs/marketRow"
+          },
+          "type": "array"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "$defs": {
+    "marketRow": {
+      "type": "object",
+      "required": [
+        "trade_date",
+        "code",
+        "name",
+        "preclose",
+        "open",
+        "high",
+        "low",
+        "close",
+        "rise_fall_rate",
+        "volume",
+        "amount",
+        "turn_ratio",
+        "pe_lyr",
+        "pe_ttm",
+        "pb_mrq",
+        "pcf_lyr",
+        "pcf_ttm",
+        "ps_lyr",
+        "ps_ttm",
+        "total_mv",
+        "float_mv"
+      ],
+      "properties": {
+        "trade_date": {
+          "type": "string"
+        },
+        "code": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "preclose": {
+          "type": "number"
+        },
+        "open": {
+          "type": "number"
+        },
+        "high": {
+          "type": "number"
+        },
+        "low": {
+          "type": "number"
+        },
+        "close": {
+          "type": "number"
+        },
+        "rise_fall_rate": {
+          "type": "number"
+        },
+        "volume": {
+          "type": "number"
+        },
+        "amount": {
+          "type": "number"
+        },
+        "turn_ratio": {
+          "type": "number"
+        },
+        "pe_lyr": {
+          "type": "number"
+        },
+        "pe_ttm": {
+          "type": "number"
+        },
+        "pb_mrq": {
+          "type": "number"
+        },
+        "pcf_lyr": {
+          "type": "number"
+        },
+        "pcf_ttm": {
+          "type": "number"
+        },
+        "ps_lyr": {
+          "type": "number"
+        },
+        "ps_ttm": {
+          "type": "number"
+        },
+        "total_mv": {
+          "type": "number"
+        },
+        "float_mv": {
+          "type": "number"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

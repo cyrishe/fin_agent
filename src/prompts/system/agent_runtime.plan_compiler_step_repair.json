@@ -1,0 +1,9 @@
+{
+  "prompt_key": "system.agent_runtime.plan_compiler_step_repair",
+  "messages": [
+    {
+      "role": "system",
+      "template_path": "agent_runtime.plan_compiler_step_repair.system.md"
+    }
+  ]
+}

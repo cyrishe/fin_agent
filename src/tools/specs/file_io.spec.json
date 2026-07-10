@@ -1,0 +1,53 @@
+{
+  "tool_name": "file_io",
+  "purpose": "统一文件读写工具。读取由文件后缀和 MIME 规则确定 parser；写入只生成 runtime artifact，不直接覆盖本地文件。",
+  "best_for": [
+    "读取用户上传或本地 CSV/TSV/XLSX/DOCX/TXT 文件",
+    "把文本、JSON 或表格结果写成 runtime artifact 供后续步骤引用",
+    "作为文件类能力的唯一顶层入口，替代 file_read_csv/file_read_excel/file_read_word"
+  ],
+  "input_guidance": {
+    "required_fields": [
+      "action"
+    ],
+    "optional_fields": [
+      "file_path",
+      "file_id",
+      "file_type",
+      "content",
+      "rows",
+      "header",
+      "file_name",
+      "max_chars",
+      "max_preview_rows"
+    ],
+    "notes": [
+      "读取时优先使用 file_id；本地文件读取可使用 file_path。",
+      "file_type 可省略，系统会按后缀判断。",
+      "写入不会覆盖本地路径，只生成 runtime artifact。"
+    ]
+  },
+  "output_guidance": {
+    "high_value_for_reasoning": [
+      "data.file_type",
+      "data.data.header",
+      "data.data.rows",
+      "data.data.document.preview_text",
+      "data.artifact_ref"
+    ],
+    "high_value_for_render": [
+      "data.data.header",
+      "data.data.rows",
+      "data.data.document.preview_text"
+    ],
+    "usually_too_large_for_prompt": [
+      "data.data.rows",
+      "data.data.document.preview_text"
+    ],
+    "drop_default": [],
+    "recommended_reducers": {
+      "data.data.rows": "head:20",
+      "data.data.document.preview_text": "truncate:5000"
+    }
+  }
+}

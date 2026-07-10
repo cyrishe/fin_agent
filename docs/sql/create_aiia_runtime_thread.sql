@@ -1,0 +1,20 @@
+CREATE TABLE IF NOT EXISTS aiia_runtime_thread (
+  thread_id bigint unsigned NOT NULL AUTO_INCREMENT COMMENT '线程主键',
+  thread_type varchar(32) NOT NULL DEFAULT 'chat' COMMENT '线程类型：chat/task/workflow/analysis',
+  title varchar(255) NOT NULL DEFAULT '' COMMENT '线程标题',
+  owner_type varchar(32) NOT NULL DEFAULT 'user' COMMENT '所有者类型：user/system/team',
+  owner_id varchar(64) NOT NULL DEFAULT '' COMMENT '所有者标识',
+  status varchar(32) NOT NULL DEFAULT 'active' COMMENT '状态：active/paused/completed/archived/failed',
+  context_summary mediumtext DEFAULT NULL COMMENT '线程上下文摘要',
+  active_task_id bigint unsigned DEFAULT NULL COMMENT '当前活跃任务',
+  latest_checkpoint_id bigint unsigned DEFAULT NULL COMMENT '最新 checkpoint',
+  latest_turn_id bigint unsigned DEFAULT NULL COMMENT '最新轮次',
+  last_event_at datetime DEFAULT NULL COMMENT '最后事件时间',
+  metadata_json json DEFAULT NULL COMMENT '线程元信息',
+  created_at datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  updated_at datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (thread_id),
+  KEY idx_owner_status (owner_type, owner_id, status),
+  KEY idx_thread_type_status (thread_type, status),
+  KEY idx_last_event_at (last_event_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='运行时线程表；承载多轮对话、任务和工作流的长期上下文';

@@ -1,0 +1,127 @@
+{
+  "name": "file_read_excel",
+  "version": "v1",
+  "status": "retired",
+  "availability": {
+    "lifecycle": "retired",
+    "retrieval_mode": "direct_only",
+    "visibility": "hidden"
+  },
+  "identity": {
+    "display_name": "Excel 文件读取",
+    "description": "读取 Excel xlsx 表格文件并返回结构化行列数据。",
+    "domain": "file_intake",
+    "owner": "tools"
+  },
+  "match_contract": {
+    "request_families": [
+      "data_access"
+    ],
+    "work_item_types": [
+      "tool"
+    ],
+    "capability_classes": [
+      "data_retrieval",
+      "table_file_read"
+    ],
+    "side_effect_level": "read_only"
+  },
+  "capabilities": [
+    "file_intake",
+    "excel_read",
+    "table_read"
+  ],
+  "tags": [
+    "file",
+    "excel",
+    "xlsx",
+    "table"
+  ],
+  "schemas": {
+    "input": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "file_read_excel.input.schema.json",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "file_path"
+      ],
+      "properties": {
+        "file_path": {
+          "type": "string",
+          "description": ".xlsx 文件路径。"
+        }
+      }
+    },
+    "output": {
+      "$ref": "src/tools/schemas/file_read_excel.schema.json"
+    }
+  },
+  "profiles": {
+    "real": {
+      "enabled": true,
+      "implementation": {
+        "kind": "python_callable",
+        "target": "src.tools.file_intake_tools:run_excel"
+      }
+    },
+    "mock": {
+      "enabled": false,
+      "implementation": {
+        "kind": "inline_result"
+      }
+    }
+  },
+  "retention": {
+    "high_value_for_reasoning": [
+      "data.header",
+      "data.rows"
+    ],
+    "high_value_for_render": [
+      "data.header",
+      "data.rows"
+    ],
+    "usually_too_large_for_prompt": [
+      "data.rows"
+    ],
+    "drop_default": [],
+    "recommended_reducers": {
+      "data.rows": "summarize_table_rows"
+    }
+  },
+  "safety": {
+    "network": false,
+    "persistence": false,
+    "side_effect": "none"
+  },
+  "runtime_hints": {
+    "cost_class": "low",
+    "latency_class": "medium",
+    "supports_stream": false,
+    "supports_async_submit": false
+  },
+  "tests": {
+    "sample_inputs": [
+      {
+        "name": "local_xlsx",
+        "arguments": {
+          "file_path": "/tmp/sample.xlsx"
+        }
+      }
+    ]
+  },
+  "ui_hints": {
+    "editable_sections": [
+      "identity",
+      "schemas.input",
+      "schemas.output",
+      "retention",
+      "tests"
+    ]
+  },
+  "auth": "public",
+  "subject_tags": [
+    "general"
+  ],
+  "tool_priority": 1
+}

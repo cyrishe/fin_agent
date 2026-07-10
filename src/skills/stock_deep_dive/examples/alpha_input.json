@@ -1,0 +1,11 @@
+{
+  "task_type": "stock_deep_dive",
+  "code": "600691",
+  "name": "阳煤化工",
+  "runtime_mode": "interactive",
+  "question": "请从行情、资金、研报、新闻和风险角度，对阳煤化工做一份专业、克制的投顾式分析。",
+  "context": {
+    "focus": "全面分析",
+    "as_of_date": "2026-03-16"
+  }
+}

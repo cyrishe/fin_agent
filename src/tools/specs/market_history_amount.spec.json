@@ -1,0 +1,54 @@
+{
+  "best_for": [
+    "用于查看全市场、上证、深证或北证的历史成交额。",
+    "用于比较最近多个交易日的市场整体量能变化。",
+    "用于为市场热度和资金活跃度判断提供日级成交额数据。"
+  ],
+  "input_guidance": {
+    "optional_fields": [
+      "days",
+      "market"
+    ],
+    "required_fields": []
+  },
+  "invocation_example": "market_history_amount(market=\"all\", days=5)",
+  "output_guidance": {
+    "drop_default": [],
+    "field_policies": {
+      "data.days": {
+        "strategy": "auto"
+      },
+      "data.history": {
+        "strategy": "prompt_full"
+      },
+      "data.history.[]": {
+        "strategy": "auto"
+      },
+      "data.history.[].date": {
+        "strategy": "auto"
+      },
+      "data.history.[].total_amount": {
+        "strategy": "auto"
+      },
+      "data.market": {
+        "strategy": "auto"
+      }
+    },
+    "high_value_for_reasoning": [
+      "data.history"
+    ],
+    "high_value_for_render": [],
+    "recommended_reducers": {},
+    "usually_too_large_for_prompt": []
+  },
+  "purpose": "查询指定市场最近多个交易日的总成交额序列。",
+  "tool_name": "market_history_amount",
+  "status": "disabled",
+  "enabled": false,
+  "retrieval": {
+    "mode": "direct_only",
+    "visibility": "hidden"
+  },
+  "visibility": "hidden",
+  "deprecation_note": "市场成交额历史聚合属于高级派生能力，先由基础行情工具与 DSL/Agent 组合完成。"
+}

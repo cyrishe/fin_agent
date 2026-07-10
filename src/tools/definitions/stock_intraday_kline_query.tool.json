@@ -1,0 +1,162 @@
+{
+  "auth": "public",
+  "availability": {
+    "lifecycle": "active",
+    "retrieval_mode": "retrievable",
+    "visibility": "visible"
+  },
+  "capabilities": [
+    "stock_intraday_kline",
+    "minute_kline",
+    "intraday"
+  ],
+  "defaults": {
+    "minute_count": 240
+  },
+  "identity": {
+    "description": "获取单只股票最近可用交易日的日内分钟行情序列。",
+    "display_name": "个股分钟线查询",
+    "domain": "stock",
+    "owner": "tools"
+  },
+  "invocation_example": "stock_intraday_kline_query(stock=\"600519.SH\", minute_count=240)",
+  "match_contract": {
+    "request_families": [
+      "data_access"
+    ],
+    "work_item_types": [
+      "tool"
+    ],
+    "capability_classes": [
+      "data_retrieval",
+      "kline_timeseries"
+    ],
+    "side_effect_level": "read_only"
+  },
+  "name": "stock_intraday_kline_query",
+  "post_process": {
+    "deterministic": {
+      "enabled": false,
+      "handler": ""
+    },
+    "llm": {
+      "enabled": false,
+      "prompt_key": ""
+    }
+  },
+  "profiles": {
+    "mock": {
+      "enabled": true,
+      "implementation": {
+        "kind": "inline_result"
+      },
+      "result": {
+        "tool": "stock_intraday_kline_query",
+        "ok": true,
+        "data": {
+          "subject": "600519.SH",
+          "code": "600519.SH",
+          "name": "贵州茅台",
+          "trade_date": "",
+          "rows": []
+        },
+        "error": ""
+      }
+    },
+    "real": {
+      "enabled": true,
+      "implementation": {
+        "kind": "python_callable",
+        "target": "src.tools.stock_intraday_kline_query_tool:run"
+      }
+    }
+  },
+  "retention": {
+    "drop_default": [],
+    "high_value_for_reasoning": [
+      "data.code",
+      "data.name",
+      "data.rows"
+    ],
+    "high_value_for_render": [],
+    "recommended_reducers": {
+      "data.rows": "summarize_timeseries"
+    },
+    "usually_too_large_for_prompt": [
+      "data.rows"
+    ]
+  },
+  "runtime_hints": {
+    "cost_class": "low",
+    "latency_class": "low",
+    "supports_async_submit": false,
+    "supports_stream": false
+  },
+  "safety": {
+    "network": true,
+    "persistence": false,
+    "side_effect": "none"
+  },
+  "schemas": {
+    "input": {
+      "$id": "stock_intraday_kline_query.input.schema.json",
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "stock": {
+          "type": "string",
+          "description": "股票代码、简称或名称。"
+        },
+        "minute_count": {
+          "description": "返回最近 N 个分钟点；默认 240，表示尽量返回最近可用交易日的全部分钟行情。",
+          "minimum": 1,
+          "maximum": 1000,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "stock"
+      ],
+      "type": "object"
+    },
+    "output": {
+      "$ref": "src/tools/schemas/stock_intraday_kline_query.schema.json"
+    }
+  },
+  "status": "active",
+  "tags": [
+    "stock",
+    "intraday",
+    "minute_kline",
+    "market_data"
+  ],
+  "tests": {
+    "golden_cases": [],
+    "sample_inputs": [
+      {
+        "name": "stock_intraday_kline_default",
+        "arguments": {
+          "minute_count": 240,
+          "stock": "600519.SH"
+        }
+      }
+    ]
+  },
+  "ui_hints": {
+    "editable_sections": [
+      "identity",
+      "schemas.input",
+      "schemas.output",
+      "capabilities",
+      "profiles",
+      "retention",
+      "post_process",
+      "tests"
+    ]
+  },
+  "version": "v1",
+  "subject_tags": [
+    "stock"
+  ],
+  "tool_priority": 1
+}

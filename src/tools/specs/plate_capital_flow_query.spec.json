@@ -1,0 +1,62 @@
+{
+  "tool_name": "plate_capital_flow_query",
+  "purpose": "查询板块、行业或概念的资金流向序列。",
+  "best_for": [
+    "用于查看概念、行业或市场板块的主力净流入趋势。",
+    "用于比较板块资金流、净流入占比和大小单分布。",
+    "用于为板块排序、主题轮动和选股流程提供资金数据。"
+  ],
+  "input_guidance": {
+    "required_fields": [
+      "subject"
+    ],
+    "optional_fields": [
+      "plate_type",
+      "trade_date",
+      "days",
+      "granularity",
+      "limit"
+    ]
+  },
+  "output_guidance": {
+    "high_value_for_reasoning": [
+      "data.plate_type",
+      "data.code",
+      "data.name",
+      "data.rows"
+    ],
+    "high_value_for_render": [],
+    "usually_too_large_for_prompt": [
+      "data.rows"
+    ],
+    "recommended_reducers": {
+      "data.rows": "summarize_timeseries"
+    },
+    "drop_default": [
+      "_meta"
+    ],
+    "field_policies": {
+      "data.plate_type": {
+        "strategy": "prompt_full"
+      },
+      "data.code": {
+        "strategy": "prompt_full"
+      },
+      "data.name": {
+        "strategy": "prompt_full"
+      },
+      "data.rows": {
+        "strategy": "prompt_summary"
+      }
+    }
+  },
+  "invocation_example": "plate_capital_flow_query(subject=\"白酒\", plate_type=\"concept\", days=20)",
+  "status": "retired",
+  "enabled": false,
+  "retrieval": {
+    "mode": "direct_only",
+    "visibility": "hidden"
+  },
+  "visibility": "hidden",
+  "deprecation_note": "板块资金流工具已退役；原依赖的通用资金流快照源不再作为基础工具数据源。"
+}

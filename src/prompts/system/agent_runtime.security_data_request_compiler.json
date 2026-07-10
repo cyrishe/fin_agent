@@ -1,0 +1,16 @@
+{
+  "prompt_key": "system.agent_runtime.security_data_request_compiler",
+  "layer": "system",
+  "owner": "agent_runtime",
+  "version": "v1",
+  "messages": [
+    {
+      "role": "system",
+      "template_path": "agent_runtime.security_data_request_compiler.system.md"
+    },
+    {
+      "role": "user",
+      "template_path": "agent_runtime.security_data_request_compiler.user.md"
+    }
+  ]
+}

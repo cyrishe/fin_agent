@@ -1,0 +1,231 @@
+{
+  "auth": "public",
+  "availability": {
+    "lifecycle": "disabled",
+    "retrieval_mode": "direct_only",
+    "visibility": "hidden"
+  },
+  "capabilities": [
+    "security_universe_filter",
+    "security_universe_aggregate",
+    "security_universe_ranking",
+    "market_breadth"
+  ],
+  "defaults": {
+    "as_of": "latest",
+    "limit": 50
+  },
+  "identity": {
+    "description": "对股票集合执行过滤、聚合和排序查询。",
+    "display_name": "股票集合过滤聚合",
+    "domain": "market",
+    "owner": "tools"
+  },
+  "invocation_example": "security_universe_query(universe={\"type\":\"market\"}, metrics=[{\"name\":\"count\",\"alias\":\"rising_count\",\"condition\":{\"field\":\"change_pct\",\"op\":\">\",\"value\":0}}])",
+  "match_contract": {
+    "request_families": [
+      "data_access"
+    ],
+    "work_item_types": [
+      "tool"
+    ],
+    "capability_classes": [
+      "data_retrieval",
+      "market_screening",
+      "aggregate_query",
+      "ranking_query"
+    ],
+    "side_effect_level": "read_only"
+  },
+  "name": "security_universe_query",
+  "post_process": {
+    "deterministic": {
+      "enabled": false,
+      "handler": ""
+    },
+    "llm": {
+      "enabled": false,
+      "prompt_key": ""
+    }
+  },
+  "profiles": {
+    "mock": {
+      "enabled": false,
+      "implementation": {
+        "kind": "inline_result"
+      },
+      "result": {
+        "tool": "security_universe_query",
+        "ok": true,
+        "data": {
+          "universe": {
+            "type": "market",
+            "code": "",
+            "name": "",
+            "stock_codes": []
+          },
+          "as_of": "latest",
+          "filters": [],
+          "metrics": {
+            "count": 0
+          },
+          "sort": [],
+          "rows": []
+        },
+        "error": ""
+      }
+    },
+    "real": {
+      "enabled": false,
+      "implementation": {
+        "kind": "python_callable",
+        "target": "src.tools.security_universe_query_tool:run"
+      }
+    }
+  },
+  "retention": {
+    "drop_default": [],
+    "high_value_for_reasoning": [
+      "data.metrics"
+    ],
+    "high_value_for_render": [
+      "data.rows"
+    ],
+    "recommended_reducers": {
+      "data.rows": "summarize_ranked_list"
+    },
+    "usually_too_large_for_prompt": [
+      "data.rows"
+    ]
+  },
+  "runtime_hints": {
+    "cost_class": "low",
+    "latency_class": "low",
+    "supports_async_submit": false,
+    "supports_stream": false
+  },
+  "safety": {
+    "network": true,
+    "persistence": false,
+    "side_effect": "none"
+  },
+  "schemas": {
+    "input": {
+      "$id": "security_universe_query.input.schema.json",
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "universe": {
+          "description": "股票集合定义。type 支持 market、plate、stock_list。",
+          "type": "object"
+        },
+        "as_of": {
+          "description": "latest 或 YYYY-MM-DD。",
+          "type": "string"
+        },
+        "filters": {
+          "description": "过滤条件数组，字段和操作符受服务白名单约束；op 使用 =、!=、>、>=、<、<=、in、between、contains。",
+          "items": {
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "metrics": {
+          "description": "聚合指标数组，支持 count、sum、avg、min、max。",
+          "items": {
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "sort": {
+          "description": "排序规则数组。",
+          "items": {
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "limit": {
+          "description": "返回行数，0 表示只返回聚合指标。",
+          "maximum": 500,
+          "minimum": 0,
+          "type": "integer"
+        }
+      },
+      "required": [],
+      "type": "object"
+    },
+    "output": {
+      "$ref": "src/tools/schemas/security_universe_query.schema.json"
+    }
+  },
+  "status": "disabled",
+  "tags": [
+    "market",
+    "screening",
+    "aggregate",
+    "ranking",
+    "kingdomai"
+  ],
+  "tests": {
+    "golden_cases": [],
+    "sample_inputs": [
+      {
+        "name": "market_breadth_counts",
+        "arguments": {
+          "universe": {
+            "type": "market"
+          },
+          "metrics": [
+            {
+              "name": "count",
+              "alias": "rising_count",
+              "condition": {
+                "field": "change_pct",
+                "op": ">",
+                "value": 0
+              }
+            },
+            {
+              "name": "count",
+              "alias": "falling_count",
+              "condition": {
+                "field": "change_pct",
+                "op": "<",
+                "value": 0
+              }
+            }
+          ],
+          "limit": 0
+        }
+      }
+    ]
+  },
+  "ui_hints": {
+    "editable_sections": [
+      "identity",
+      "schemas.input",
+      "schemas.output",
+      "capabilities",
+      "profiles",
+      "retention",
+      "post_process",
+      "tests"
+    ]
+  },
+  "version": "v1",
+  "enabled": false,
+  "retrieval": {
+    "mode": "direct_only",
+    "visibility": "hidden"
+  },
+  "visibility": "hidden",
+  "deprecation_note": "股票集合过滤/聚合/排序 mini-query 工具已从基础工具池移除；后续使用清晰的 stock/plate 基础数据工具加 DSL/Agent 组合。",
+  "subject_tags": [
+    "stock",
+    "fund",
+    "bond",
+    "plate",
+    "index"
+  ],
+  "tool_priority": 1
+}

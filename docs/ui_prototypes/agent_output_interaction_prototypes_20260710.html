@@ -1,0 +1,819 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>优小智 Agent Output Prototypes</title>
+  <style>
+    :root {
+      --bg: #f6f7f9;
+      --panel: #ffffff;
+      --soft: #eef2f7;
+      --line: #d9dee8;
+      --text: #111827;
+      --muted: #667085;
+      --blue: #2563eb;
+      --blue-soft: #dbeafe;
+      --green: #12b76a;
+      --green-soft: #dcfae6;
+      --red: #f04438;
+      --red-soft: #fee4e2;
+      --amber: #f79009;
+      --amber-soft: #fef0c7;
+      --violet: #7a5af8;
+      --shadow: 0 16px 48px rgba(16, 24, 40, 0.08);
+      --radius: 8px;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      letter-spacing: 0;
+    }
+    .app {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 280px minmax(0, 1fr);
+    }
+    .sidebar {
+      border-right: 1px solid var(--line);
+      background: #fbfcfe;
+      padding: 22px 18px;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 22px;
+    }
+    .logo {
+      width: 30px;
+      height: 30px;
+      display: grid;
+      place-items: center;
+      border-radius: 8px;
+      background: var(--blue);
+      color: #fff;
+      font-weight: 800;
+    }
+    .brand strong {
+      font-size: 17px;
+      display: block;
+    }
+    .brand span {
+      display: block;
+      margin-top: 2px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+    .tabs {
+      display: grid;
+      gap: 6px;
+    }
+    .tab {
+      border: 0;
+      background: transparent;
+      color: #344054;
+      padding: 11px 12px;
+      border-radius: 8px;
+      text-align: left;
+      cursor: pointer;
+      display: grid;
+      gap: 3px;
+    }
+    .tab strong {
+      font-size: 14px;
+    }
+    .tab span {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.35;
+    }
+    .tab.active {
+      background: #eef4ff;
+      color: #1d4ed8;
+    }
+    .workspace {
+      padding: 24px;
+    }
+    .shell {
+      max-width: 1160px;
+      margin: 0 auto;
+    }
+    .topbar {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 18px;
+    }
+    .title h1 {
+      margin: 0;
+      font-size: 22px;
+      line-height: 1.25;
+    }
+    .title p {
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+    .state-pill {
+      flex: 0 0 auto;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 11px;
+      border-radius: 999px;
+      border: 1px solid #bbf7d0;
+      background: #f0fdf4;
+      color: #047857;
+      font-size: 13px;
+      font-weight: 700;
+    }
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: currentColor;
+    }
+    .scenario {
+      display: none;
+    }
+    .scenario.active {
+      display: block;
+    }
+    .question {
+      display: flex;
+      justify-content: flex-end;
+      margin: 18px 0 14px;
+    }
+    .question-bubble {
+      max-width: 760px;
+      padding: 14px 16px;
+      border-radius: 8px;
+      background: #cfe0ff;
+      color: #172554;
+      line-height: 1.65;
+      font-size: 15px;
+    }
+    .agent-message {
+      display: grid;
+      gap: 12px;
+    }
+    .run-area,
+    .answer-area {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+    .area-head {
+      min-height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--line);
+      background: #fbfcfe;
+    }
+    .area-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 800;
+      font-size: 14px;
+    }
+    .area-title small {
+      color: var(--muted);
+      font-weight: 600;
+    }
+    .area-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .btn {
+      border: 1px solid var(--line);
+      background: #fff;
+      border-radius: 8px;
+      padding: 8px 11px;
+      font-size: 13px;
+      font-weight: 700;
+      color: #344054;
+      cursor: pointer;
+    }
+    .btn.primary {
+      border-color: var(--blue);
+      background: var(--blue);
+      color: #fff;
+    }
+    .btn.warning {
+      border-color: #fedf89;
+      background: #fffbeb;
+      color: #b45309;
+    }
+    .area-body {
+      padding: 16px;
+      display: grid;
+      gap: 14px;
+    }
+    .process-grid {
+      display: grid;
+      grid-template-columns: 240px minmax(0, 1fr);
+      gap: 16px;
+    }
+    .step-list {
+      display: grid;
+      gap: 8px;
+      align-content: start;
+    }
+    .step {
+      display: grid;
+      grid-template-columns: 18px minmax(0, 1fr);
+      gap: 8px;
+      align-items: start;
+      color: #344054;
+      font-size: 13px;
+      line-height: 1.45;
+    }
+    .step-mark {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      font-size: 11px;
+      margin-top: 1px;
+      background: var(--soft);
+      color: var(--muted);
+    }
+    .step.done .step-mark { background: var(--green); color: #fff; }
+    .step.run .step-mark { background: var(--blue); color: #fff; }
+    .step.warn .step-mark { background: var(--amber); color: #fff; }
+    .step strong {
+      display: block;
+      color: #101828;
+      margin-bottom: 2px;
+      font-size: 13px;
+    }
+    .block {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: #fff;
+      overflow: hidden;
+    }
+    .block-head {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--line);
+      background: #fbfcfe;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      font-weight: 800;
+      font-size: 13px;
+    }
+    .block-body {
+      padding: 12px;
+    }
+    .md {
+      line-height: 1.65;
+      color: #344054;
+      font-size: 14px;
+    }
+    .md strong {
+      color: #101828;
+    }
+    .md ul {
+      margin: 8px 0 0;
+      padding-left: 18px;
+    }
+    .md li + li {
+      margin-top: 4px;
+    }
+    .code {
+      margin: 0;
+      padding: 14px;
+      overflow: auto;
+      background: #0f172a;
+      color: #e5e7eb;
+      border-radius: 6px;
+      font-size: 12.5px;
+      line-height: 1.6;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    }
+    .result {
+      display: grid;
+      grid-template-columns: 120px minmax(0, 1fr);
+      gap: 10px;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid #eef2f7;
+      font-size: 13px;
+    }
+    .result:last-child { border-bottom: 0; }
+    .result-label { color: var(--muted); font-weight: 700; }
+    .result-value { color: #101828; }
+    .status-ok { color: #047857; font-weight: 800; }
+    .status-bad { color: #b42318; font-weight: 800; }
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+    }
+    .metric {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 12px;
+      background: #fbfcfe;
+    }
+    .metric span {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      margin-bottom: 6px;
+    }
+    .metric strong {
+      font-size: 18px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+    th {
+      text-align: left;
+      color: var(--muted);
+      background: #f8fafc;
+      padding: 10px;
+      border-bottom: 1px solid var(--line);
+      font-weight: 800;
+    }
+    td {
+      padding: 10px;
+      border-bottom: 1px solid #eef2f7;
+      color: #344054;
+    }
+    tr:last-child td { border-bottom: 0; }
+    .schema {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+    .field {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 10px;
+      background: #fbfcfe;
+    }
+    .field strong {
+      display: block;
+      font-size: 13px;
+      margin-bottom: 4px;
+    }
+    .field span {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.45;
+    }
+    .bars {
+      display: grid;
+      gap: 10px;
+    }
+    .bar-row {
+      display: grid;
+      grid-template-columns: 110px minmax(0, 1fr) 54px;
+      gap: 10px;
+      align-items: center;
+      font-size: 13px;
+    }
+    .track {
+      height: 9px;
+      border-radius: 999px;
+      background: #e5e7eb;
+      overflow: hidden;
+    }
+    .fill {
+      height: 100%;
+      border-radius: 999px;
+      background: var(--blue);
+    }
+    .flow {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 8px;
+      align-items: stretch;
+    }
+    .flow-node {
+      min-height: 76px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 10px;
+      background: #fbfcfe;
+      display: grid;
+      align-content: center;
+      gap: 5px;
+      position: relative;
+      font-size: 13px;
+    }
+    .flow-node:not(:last-child)::after {
+      content: "";
+      position: absolute;
+      top: 50%;
+      right: -8px;
+      width: 8px;
+      border-top: 2px solid #98a2b3;
+    }
+    .flow-node strong { color: #101828; }
+    .flow-node span { color: var(--muted); font-size: 12px; line-height: 1.35; }
+    .split {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: 14px;
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 8px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 800;
+      background: var(--soft);
+      color: #475467;
+    }
+    .badge.ok { background: var(--green-soft); color: #047857; }
+    .badge.warn { background: var(--amber-soft); color: #b45309; }
+    .badge.bad { background: var(--red-soft); color: #b42318; }
+    .collapsed-note {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+    @media (max-width: 980px) {
+      .app { grid-template-columns: 1fr; }
+      .sidebar {
+        position: static;
+        height: auto;
+        border-right: 0;
+        border-bottom: 1px solid var(--line);
+      }
+      .tabs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .process-grid,
+      .split,
+      .schema,
+      .metrics,
+      .flow {
+        grid-template-columns: 1fr;
+      }
+      .flow-node:not(:last-child)::after { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="logo">优</div>
+        <div>
+          <strong>优小智</strong>
+          <span>Agent output prototypes</span>
+        </div>
+      </div>
+      <nav class="tabs" id="tabs">
+        <button class="tab active" data-target="p1"><strong>金融查询</strong><span>分段过程 + 数据结果</span></button>
+        <button class="tab" data-target="p2"><strong>工具设计</strong><span>设计稿确认前</span></button>
+        <button class="tab" data-target="p3"><strong>工具实现</strong><span>代码 + 测试 + 提交</span></button>
+        <button class="tab" data-target="p4"><strong>代码调试</strong><span>执行日志和修复</span></button>
+        <button class="tab" data-target="p5"><strong>异常重试</strong><span>need check 和回滚</span></button>
+      </nav>
+    </aside>
+    <main class="workspace">
+      <div class="shell">
+        <div class="topbar">
+          <div class="title">
+            <h1>模块化 Agent 展示层原型</h1>
+            <p>每条 assistant 消息固定拆成思考和执行过程区域、回答区域。两个区域都只使用少量稳定 render blocks。</p>
+          </div>
+          <div class="state-pill"><span class="dot"></span>prototype</div>
+        </div>
+
+        <section id="p1" class="scenario active">
+          <div class="question">
+            <div class="question-bubble">筛选最近20个交易日收盘价高于开盘价超过15天的股票，并展示前几只。</div>
+          </div>
+          <article class="agent-message">
+            <section class="run-area">
+              <div class="area-head">
+                <div class="area-title">思考和执行过程 <small>3 步 · 已完成</small></div>
+                <div class="area-actions"><span class="badge ok">通过</span><button class="btn">收起</button></div>
+              </div>
+              <div class="area-body process-grid">
+                <div class="step-list">
+                  <div class="step done"><div class="step-mark">1</div><div><strong>解析需求</strong>识别为股票行情条件筛选。</div></div>
+                  <div class="step done"><div class="step-mark">2</div><div><strong>生成查询</strong>使用 stock.quote.dynamic_cal。</div></div>
+                  <div class="step done"><div class="step-mark">3</div><div><strong>执行计算</strong>返回 48 条结果。</div></div>
+                </div>
+                <div class="block">
+                  <div class="block-head">动态计算任务</div>
+                  <div class="block-body md">
+                    基于最近 20 个交易日的 quote 数据，按股票分组统计 close &gt; open 的天数，保留天数大于 15 的股票。
+                  </div>
+                </div>
+              </div>
+            </section>
+            <section class="answer-area">
+              <div class="area-head">
+                <div class="area-title">回答 <small>筛选结果</small></div>
+                <div class="area-actions"><button class="btn">导出</button><button class="btn primary">继续分析行业</button></div>
+              </div>
+              <div class="area-body">
+                <div class="metrics">
+                  <div class="metric"><span>命中股票</span><strong>48</strong></div>
+                  <div class="metric"><span>时间窗口</span><strong>20 日</strong></div>
+                  <div class="metric"><span>阈值</span><strong>&gt; 15</strong></div>
+                  <div class="metric"><span>数据源</span><strong>stock.quote</strong></div>
+                </div>
+                <div class="block">
+                  <div class="block-head">前 5 条</div>
+                  <div class="block-body">
+                    <table>
+                      <thead><tr><th>股票代码</th><th>股票名称</th><th>最新价</th><th>涨跌幅</th><th>满足天数</th></tr></thead>
+                      <tbody>
+                        <tr><td>688592.SH</td><td>司南导航</td><td>30.45</td><td>2.59%</td><td>20</td></tr>
+                        <tr><td>600585.SH</td><td>海螺水泥</td><td>16.77</td><td>0.78%</td><td>20</td></tr>
+                        <tr><td>688286.SH</td><td>敏芯股份</td><td>90.57</td><td>-4.91%</td><td>20</td></tr>
+                        <tr><td>688669.SH</td><td>聚石化学</td><td>105.50</td><td>-5.80%</td><td>18</td></tr>
+                        <tr><td>603690.SH</td><td>至纯科技</td><td>34.12</td><td>-5.45%</td><td>17</td></tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </section>
+          </article>
+        </section>
+
+        <section id="p2" class="scenario">
+          <div class="question">
+            <div class="question-bubble">/custom_tool create 我想做一个阿布大盘买入决策工具，输入股票和时间，输出可买或不可买。</div>
+          </div>
+          <article class="agent-message">
+            <section class="run-area">
+              <div class="area-head">
+                <div class="area-title">思考和执行过程 <small>需求整理中</small></div>
+                <div class="area-actions"><span class="badge warn">等待确认</span></div>
+              </div>
+              <div class="area-body process-grid">
+                <div class="step-list">
+                  <div class="step done"><div class="step-mark">1</div><div><strong>提取目标</strong>构建个人决策工具。</div></div>
+                  <div class="step done"><div class="step-mark">2</div><div><strong>整理输入输出</strong>股票、日期、盘中时间。</div></div>
+                  <div class="step run"><div class="step-mark">3</div><div><strong>等待确认</strong>确认后进入代码实现。</div></div>
+                </div>
+                <div class="block">
+                  <div class="block-head">流程图</div>
+                  <div class="block-body">
+                    <div class="flow">
+                      <div class="flow-node"><strong>需求</strong><span>自然语言规则</span></div>
+                      <div class="flow-node"><strong>设计</strong><span>工具名和 schema</span></div>
+                      <div class="flow-node"><strong>确认</strong><span>等待用户</span></div>
+                      <div class="flow-node"><strong>实现</strong><span>Codex coding</span></div>
+                      <div class="flow-node"><strong>测试</strong><span>样例验证</span></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </section>
+            <section class="answer-area">
+              <div class="area-head">
+                <div class="area-title">回答 <small>工具设计稿</small></div>
+                <div class="area-actions"><button class="btn">修改设计</button><button class="btn primary">确认实现</button></div>
+              </div>
+              <div class="area-body">
+                <div class="block">
+                  <div class="block-head">工具摘要</div>
+                  <div class="block-body md">
+                    <strong>ct_abu_market_buy_decision / 阿布大盘买入决策</strong><br>
+                    基于上证指数日线、15 分钟强弱和个股 15 分钟买入信号，输出唯一结论：可买或不可买。
+                  </div>
+                </div>
+                <div class="split">
+                  <div class="block">
+                    <div class="block-head">输入 schema</div>
+                    <div class="block-body schema">
+                      <div class="field"><strong>stock_code</strong><span>string · 必填 · 股票代码</span></div>
+                      <div class="field"><strong>trade_date</strong><span>string · 必填 · 交易日</span></div>
+                      <div class="field"><strong>as_of_time</strong><span>string · 可选 · 截止时间</span></div>
+                      <div class="field"><strong>market_index_code</strong><span>string · 可选 · 默认上证指数</span></div>
+                    </div>
+                  </div>
+                  <div class="block">
+                    <div class="block-head">输出 schema</div>
+                    <div class="block-body schema">
+                      <div class="field"><strong>decision</strong><span>可买 / 不可买</span></div>
+                      <div class="field"><strong>market_status</strong><span>可操作 / 谨慎操作 / 不可操作</span></div>
+                      <div class="field"><strong>buy_type</strong><span>追强 / 回调 / 无</span></div>
+                      <div class="field"><strong>rule_details</strong><span>规则命中明细</span></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </section>
+          </article>
+        </section>
+
+        <section id="p3" class="scenario">
+          <div class="question">
+            <div class="question-bubble">确认实现</div>
+          </div>
+          <article class="agent-message">
+            <section class="run-area">
+              <div class="area-head">
+                <div class="area-title">思考和执行过程 <small>Codex coding · 已完成</small></div>
+                <div class="area-actions"><span class="badge ok">draft_ready</span><button class="btn">展开日志</button></div>
+              </div>
+              <div class="area-body process-grid">
+                <div class="step-list">
+                  <div class="step done"><div class="step-mark">1</div><div><strong>加载工具上下文</strong>读取金融 API 说明。</div></div>
+                  <div class="step done"><div class="step-mark">2</div><div><strong>生成代码</strong>写入 tool.py。</div></div>
+                  <div class="step done"><div class="step-mark">3</div><div><strong>样例测试</strong>本地 sandbox 通过。</div></div>
+                </div>
+                <div class="block">
+                  <div class="block-head">代码片段</div>
+                  <div class="block-body">
+                    <pre class="code"><code>def run(inputs: dict[str, Any]) -> dict[str, Any]:
+    params = _validate_inputs(inputs)
+    daily = _daily_trend(_fetch_index_daily(...))
+    strength = _intraday_strength(_aggregate_15m(...))
+    market_status = _market_status(daily["status"], strength["status"])
+    return {"ok": True, "data": {...}}</code></pre>
+                  </div>
+                </div>
+              </div>
+            </section>
+            <section class="answer-area">
+              <div class="area-head">
+                <div class="area-title">回答 <small>实现结果确认</small></div>
+                <div class="area-actions"><button class="btn">继续修改</button><button class="btn primary">提交工具</button></div>
+              </div>
+              <div class="area-body">
+                <div class="block">
+                  <div class="block-head">实现摘要</div>
+                  <div class="block-body md">
+                    <ul>
+                      <li>实现入口：<strong>run(inputs)</strong></li>
+                      <li>数据入口：index.quote、stock.quote 分钟快照</li>
+                      <li>核心模块：日线趋势、15 分钟强弱、追强买入、回调买入、阻力位过滤</li>
+                      <li>状态：draft，可提交为 active</li>
+                    </ul>
+                  </div>
+                </div>
+                <div class="block">
+                  <div class="block-head">样例测试</div>
+                  <div class="block-body">
+                    <div class="result"><div class="result-label">backend</div><div class="result-value">local_dev</div></div>
+                    <div class="result"><div class="result-label">status</div><div class="result-value status-ok">passed</div></div>
+                    <div class="result"><div class="result-label">next</div><div class="result-value">/custom_tool commit ct_abu_market_buy_decision</div></div>
+                  </div>
+                </div>
+              </div>
+            </section>
+          </article>
+        </section>
+
+        <section id="p4" class="scenario">
+          <div class="question">
+            <div class="question-bubble">请帮我测试 600519.SH 在 20260709 这个工具输出是否正常。</div>
+          </div>
+          <article class="agent-message">
+            <section class="run-area">
+              <div class="area-head">
+                <div class="area-title">思考和执行过程 <small>代码执行</small></div>
+                <div class="area-actions"><span class="badge ok">运行完成</span></div>
+              </div>
+              <div class="area-body split">
+                <div class="block">
+                  <div class="block-head">调用参数</div>
+                  <div class="block-body">
+                    <pre class="code"><code>{
+  "tool_name": "ct_abu_market_buy_decision",
+  "arguments": {
+    "stock_code": "600519.SH",
+    "trade_date": "20260709"
+  }
+}</code></pre>
+                  </div>
+                </div>
+                <div class="block">
+                  <div class="block-head">执行结果</div>
+                  <div class="block-body">
+                    <div class="result"><div class="result-label">输入校验</div><div class="result-value status-ok">通过</div></div>
+                    <div class="result"><div class="result-label">沙箱执行</div><div class="result-value status-ok">通过</div></div>
+                    <div class="result"><div class="result-label">输出 JSON</div><div class="result-value status-ok">通过</div></div>
+                  </div>
+                </div>
+              </div>
+            </section>
+            <section class="answer-area">
+              <div class="area-head">
+                <div class="area-title">回答 <small>工具运行报告</small></div>
+                <div class="area-actions"><button class="btn">查看完整明细</button><button class="btn primary">保存测试样例</button></div>
+              </div>
+              <div class="area-body">
+                <div class="metrics">
+                  <div class="metric"><span>结论</span><strong>不可买</strong></div>
+                  <div class="metric"><span>大盘状态</span><strong>谨慎操作</strong></div>
+                  <div class="metric"><span>追强</span><strong>false</strong></div>
+                  <div class="metric"><span>回调</span><strong>false</strong></div>
+                </div>
+                <div class="block">
+                  <div class="block-head">规则命中</div>
+                  <div class="block-body bars">
+                    <div class="bar-row"><span>日线趋势</span><div class="track"><div class="fill" style="width: 70%"></div></div><strong>3/5</strong></div>
+                    <div class="bar-row"><span>15分钟强弱</span><div class="track"><div class="fill" style="width: 50%"></div></div><strong>2/4</strong></div>
+                    <div class="bar-row"><span>追强条件</span><div class="track"><div class="fill" style="width: 40%"></div></div><strong>2/5</strong></div>
+                    <div class="bar-row"><span>回调条件</span><div class="track"><div class="fill" style="width: 55%"></div></div><strong>4/7</strong></div>
+                  </div>
+                </div>
+              </div>
+            </section>
+          </article>
+        </section>
+
+        <section id="p5" class="scenario">
+          <div class="question">
+            <div class="question-bubble">把刚才工具的阻力位逻辑改宽松一点，然后重新测试。</div>
+          </div>
+          <article class="agent-message">
+            <section class="run-area">
+              <div class="area-head">
+                <div class="area-title">思考和执行过程 <small>检测到需要回到设计</small></div>
+                <div class="area-actions"><span class="badge warn">need_check</span></div>
+              </div>
+              <div class="area-body process-grid">
+                <div class="step-list">
+                  <div class="step done"><div class="step-mark">1</div><div><strong>读取当前 draft</strong>找到阻力位参数。</div></div>
+                  <div class="step warn"><div class="step-mark">2</div><div><strong>需要澄清</strong>宽松规则未指定范围。</div></div>
+                  <div class="step"><div class="step-mark">3</div><div><strong>等待反馈</strong>确认后再重新实现。</div></div>
+                </div>
+                <div class="block">
+                  <div class="block-head">检查反馈</div>
+                  <div class="block-body md">
+                    当前阻力位规则是“前高 3% 以内过滤”。“宽松一点”可以理解为 2%、1.5%，也可以理解为扩大回看窗口。需要先确认修改方向。
+                  </div>
+                </div>
+              </div>
+            </section>
+            <section class="answer-area">
+              <div class="area-head">
+                <div class="area-title">回答 <small>等待用户确认</small></div>
+                <div class="area-actions"><button class="btn warning">改为 2%</button><button class="btn warning">改为 1.5%</button><button class="btn">直接输入修改要求</button></div>
+              </div>
+              <div class="area-body">
+                <div class="block">
+                  <div class="block-head">建议修改项</div>
+                  <div class="block-body">
+                    <table>
+                      <thead><tr><th>字段</th><th>当前</th><th>建议</th><th>影响</th></tr></thead>
+                      <tbody>
+                        <tr><td>resistance_threshold_pct</td><td>3%</td><td>2%</td><td>更容易通过阻力位过滤</td></tr>
+                        <tr><td>resistance_lookback_bars</td><td>80</td><td>60</td><td>阻力参考更偏近期</td></tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+                <div class="block">
+                  <div class="block-head">下一步</div>
+                  <div class="block-body md">
+                    你可以直接回复：<strong>把前高阻力位阈值从 3% 改成 2%</strong>。系统会在同一个 custom tool draft 上生成 revision 3，并重新跑样例测试。
+                  </div>
+                </div>
+              </div>
+            </section>
+          </article>
+        </section>
+      </div>
+    </main>
+  </div>
+  <script>
+    const tabs = Array.from(document.querySelectorAll(".tab"));
+    const scenarios = Array.from(document.querySelectorAll(".scenario"));
+    tabs.forEach((tab) => {
+      tab.addEventListener("click", () => {
+        const target = tab.dataset.target;
+        tabs.forEach((item) => item.classList.toggle("active", item === tab));
+        scenarios.forEach((item) => item.classList.toggle("active", item.id === target));
+      });
+    });
+  </script>
+</body>
+</html>

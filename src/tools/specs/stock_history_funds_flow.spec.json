@@ -1,0 +1,53 @@
+{
+  "best_for": [
+    "观察个股资金净流入变化",
+    "比较主力净流入的连续性"
+  ],
+  "input_guidance": {
+    "optional_fields": [
+      "days"
+    ],
+    "required_fields": [
+      "name"
+    ]
+  },
+  "invocation_example": "stock_history_funds_flow(name=\"贵州茅台\", days=20)",
+  "output_guidance": {
+    "drop_default": [],
+    "field_policies": {
+      "data.code": {
+        "strategy": "prompt_full"
+      },
+      "data.history": {
+        "strategy": "prompt_full"
+      },
+      "data.history.[]": {
+        "strategy": "auto"
+      },
+      "data.history.[].date": {
+        "strategy": "auto"
+      },
+      "data.history.[].main_net_inflow_wan": {
+        "strategy": "auto"
+      },
+      "data.history.[].net_inflow_wan": {
+        "strategy": "auto"
+      },
+      "data.name": {
+        "strategy": "prompt_full"
+      }
+    },
+    "high_value_for_reasoning": [
+      "data.code",
+      "data.history",
+      "data.name"
+    ],
+    "high_value_for_render": [],
+    "recommended_reducers": {
+      "data.history": "summarize_timeseries"
+    },
+    "usually_too_large_for_prompt": []
+  },
+  "purpose": "查询指定个股的最近N天的日资金流向历史。适合看近期主力净流入变化。",
+  "tool_name": "stock_history_funds_flow"
+}

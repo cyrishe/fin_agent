@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "stock_capital_flow_query.schema.json",
+  "title": "个股资金流向输出协议",
+  "type": "object",
+  "required": ["tool", "ok", "data", "error"],
+  "properties": {
+    "tool": {"const": "stock_capital_flow_query", "type": "string"},
+    "ok": {"type": "boolean"},
+    "error": {"type": "string"},
+    "data": {
+      "type": "object",
+      "required": ["subject", "code", "name", "granularity", "rows"],
+      "properties": {
+        "subject": {"type": "string", "description": "查询主体。"},
+        "code": {"type": "string", "description": "股票代码。"},
+        "name": {"type": "string", "description": "股票名称。"},
+        "granularity": {"type": "string", "description": "数据粒度。"},
+        "rows": {
+          "type": "array",
+          "description": "资金流向序列。",
+          "items": {
+            "type": "object",
+            "required": ["trade_date", "code", "name"],
+            "properties": {
+              "trade_date": {"type": "string", "description": "交易日。"},
+              "snapshot_time": {"type": "string", "description": "快照时间。"},
+              "code": {"type": "string", "description": "股票代码。"},
+              "name": {"type": "string", "description": "股票名称。"},
+              "total_net_inflow_wan": {"type": "number", "description": "净流入，万元。"},
+              "total_net_ratio_pct": {"type": "number", "description": "净流入占比，%。"},
+              "main_net_inflow_wan": {"type": "number", "description": "主力净流入，万元。"},
+              "main_net_ratio_pct": {"type": "number", "description": "主力净流入占比，%。"},
+              "retail_net_inflow_wan": {"type": "number", "description": "散户净流入，万元。"},
+              "retail_net_ratio_pct": {"type": "number", "description": "散户净流入占比，%。"},
+              "super_large_net_inflow_wan": {"type": "number", "description": "超大单净流入，万元。"},
+              "large_net_inflow_wan": {"type": "number", "description": "大单净流入，万元。"},
+              "medium_net_inflow_wan": {"type": "number", "description": "中单净流入，万元。"},
+              "small_net_inflow_wan": {"type": "number", "description": "小单净流入，万元。"}
+            },
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "_meta": {"type": "object"}
+  },
+  "additionalProperties": false
+}

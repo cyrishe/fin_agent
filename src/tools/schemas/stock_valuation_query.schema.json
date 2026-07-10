@@ -1,0 +1,114 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "stock_valuation_query.schema.json",
+  "title": "Stock Valuation Query Tool Output",
+  "type": "object",
+  "required": [
+    "tool",
+    "ok",
+    "data",
+    "error"
+  ],
+  "properties": {
+    "data": {
+      "type": "object",
+      "required": [
+        "subject",
+        "code",
+        "name",
+        "rows"
+      ],
+      "properties": {
+        "subject": {
+          "type": "string"
+        },
+        "code": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "rows": {
+          "items": {
+            "$ref": "#/$defs/valuationRow"
+          },
+          "type": "array"
+        }
+      },
+      "additionalProperties": false
+    },
+    "error": {
+      "type": "string"
+    },
+    "ok": {
+      "type": "boolean"
+    },
+    "tool": {
+      "const": "stock_valuation_query",
+      "type": "string"
+    }
+  },
+  "$defs": {
+    "valuationRow": {
+      "additionalProperties": false,
+      "properties": {
+        "float_mv": {
+          "type": "number"
+        },
+        "free_float_mv": {
+          "type": "number"
+        },
+        "pb_lf": {
+          "type": "number"
+        },
+        "pb_mrq": {
+          "type": "number"
+        },
+        "pe_dynamic": {
+          "type": "number"
+        },
+        "pe_lyr": {
+          "type": "number"
+        },
+        "pe_ttm": {
+          "type": "number"
+        },
+        "pe_ttm_deduct": {
+          "type": "number"
+        },
+        "ps_lyr": {
+          "type": "number"
+        },
+        "ps_ttm": {
+          "type": "number"
+        },
+        "code": {
+          "type": "string"
+        },
+        "total_mv": {
+          "type": "number"
+        },
+        "trade_date": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "trade_date",
+        "code",
+        "total_mv",
+        "free_float_mv",
+        "float_mv",
+        "pe_lyr",
+        "pe_ttm",
+        "pe_ttm_deduct",
+        "pe_dynamic",
+        "pb_mrq",
+        "pb_lf",
+        "ps_lyr",
+        "ps_ttm"
+      ],
+      "type": "object"
+    }
+  },
+  "additionalProperties": false
+}

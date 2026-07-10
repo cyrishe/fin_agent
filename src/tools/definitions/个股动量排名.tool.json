@@ -1,0 +1,200 @@
+{
+  "auth": "public",
+  "availability": {
+    "lifecycle": "disabled",
+    "retrieval_mode": "direct_only",
+    "visibility": "hidden"
+  },
+  "capabilities": [
+    "stock_momentum_ranking",
+    "cross_sectional_ranking",
+    "rank_change",
+    "realtime_or_daily",
+    "custom_stock_scope"
+  ],
+  "defaults": {
+    "top_n": "10"
+  },
+  "identity": {
+    "description": "查询个股动量排名。",
+    "display_name": "个股动量排名",
+    "domain": "market",
+    "owner": "tools"
+  },
+  "name": "个股动量排名",
+  "post_process": {
+    "deterministic": {
+      "enabled": false,
+      "handler": ""
+    },
+    "llm": {
+      "enabled": false,
+      "prompt_key": ""
+    }
+  },
+  "profiles": {
+    "mock": {
+      "enabled": false,
+      "implementation": {
+        "kind": "inline_result"
+      },
+      "result": {
+        "data": [
+          {
+            "group": "group_示例",
+            "group_label": "group_label_示例",
+            "items": [
+              {
+                "current_amount": null,
+                "current_pct": null,
+                "is_new": false,
+                "momentum_value": 0,
+                "prev_rank": null,
+                "rank": 0,
+                "rank_change": null,
+                "code": "stock_code_示例",
+                "name": "stock_name_示例"
+              }
+            ],
+            "window": 0
+          }
+        ],
+        "error": "error_示例",
+        "meta": {
+          "calc_mode": "realtime_intraday",
+          "groups": [
+            "groups_item_示例"
+          ],
+          "prev_trade_date": "prev_trade_date_示例",
+          "scope_type": "grouped",
+          "snapshot_time": "snapshot_time_示例",
+          "top_n": 0,
+          "trade_date": "trade_date_示例",
+          "windows": [
+            0
+          ]
+        },
+        "ok": false,
+        "tool": "个股动量排名"
+      }
+    },
+    "real": {
+      "enabled": false,
+      "implementation": {
+        "kind": "python_callable",
+        "target": "src.tools.stock_momentum_ranking_tool:run_unified"
+      }
+    }
+  },
+  "retention": {
+    "drop_default": [],
+    "high_value_for_reasoning": [
+      "data",
+      "meta"
+    ],
+    "high_value_for_render": [
+      "data",
+      "meta"
+    ],
+    "recommended_reducers": {},
+    "usually_too_large_for_prompt": []
+  },
+  "runtime_hints": {
+    "cost_class": "medium",
+    "latency_class": "medium",
+    "supports_async_submit": false,
+    "supports_stream": false
+  },
+  "safety": {
+    "network": true,
+    "persistence": false,
+    "side_effect": "none"
+  },
+  "schemas": {
+    "input": {
+      "$id": "个股动量排名.input.schema.json",
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "stock_list": {
+          "type": "array",
+          "description": "自定义股票列表。传入后仅在该列表中计算并排序，不再返回默认的全市场和中证100分组。"
+        },
+        "top_n": {
+          "type": "integer",
+          "description": "每个分组和窗口返回的前 N 名股票，默认 10。"
+        },
+        "trade_date": {
+          "type": "string",
+          "description": "目标日期，格式 YYYY-MM-DD。为空时自动读取当前最新可用日期。"
+        }
+      },
+      "required": [],
+      "type": "object"
+    },
+    "output": {
+      "$ref": "src/tools/schemas/个股动量排名.schema.json"
+    }
+  },
+  "status": "disabled",
+  "tags": [
+    "market",
+    "momentum",
+    "ranking",
+    "stock",
+    "realtime",
+    "daily"
+  ],
+  "tests": {
+    "golden_cases": [],
+    "sample_inputs": [
+      {
+        "arguments": {},
+        "name": "default_grouped"
+      },
+      {
+        "arguments": {
+          "top_n": 20,
+          "trade_date": "2026-03-27"
+        },
+        "name": "daily_top20"
+      },
+      {
+        "arguments": {
+          "stock_list": [
+            "600519",
+            "000333",
+            "601318"
+          ],
+          "top_n": 10,
+          "trade_date": "2026-03-30"
+        },
+        "name": "custom_stock_list"
+      }
+    ]
+  },
+  "ui_hints": {
+    "editable_sections": [
+      "identity",
+      "schemas.input",
+      "schemas.output",
+      "capabilities",
+      "profiles",
+      "retention",
+      "post_process",
+      "tests"
+    ]
+  },
+  "version": "v1",
+  "enabled": false,
+  "retrieval": {
+    "mode": "direct_only",
+    "visibility": "hidden"
+  },
+  "visibility": "hidden",
+  "deprecation_note": "动量排名属于策略/高级计算能力，先由 Agent 组合基础行情数据完成。",
+  "subject_tags": [
+    "stock"
+  ],
+  "tool_priority": 1
+}

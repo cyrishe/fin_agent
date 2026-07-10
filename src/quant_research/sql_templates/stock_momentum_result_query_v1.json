@@ -1,0 +1,43 @@
+{
+  "template_id": "stock_momentum_result_query",
+  "version": "v1",
+  "target_db": "kingdomai",
+  "sql_template": "SELECT trade_date, strategy_name, strategy_version, strategy_instance_key, universe, universe_label, subject_code, subject_name, rank_no, value_decimal, strategy_detail_json, snapshot_time FROM aiia_stock_strategy_result_daily WHERE trade_date = :trade_date AND strategy_name = :strategy_name AND strategy_version = :strategy_version AND strategy_instance_key = :strategy_instance_key AND universe = :universe ORDER BY rank_no ASC LIMIT :limit",
+  "params_schema": {
+    "type": "object",
+    "required": ["trade_date", "strategy_name", "strategy_version", "strategy_instance_key", "universe", "limit"],
+    "properties": {
+      "trade_date": {"type": "string", "description": "Target trade date in YYYY-MM-DD format."},
+      "strategy_name": {"type": "string", "default": "stock_momentum_ranking"},
+      "strategy_version": {"type": "string", "default": "v1"},
+      "strategy_instance_key": {"type": "string", "description": "Momentum window instance such as k_4 or k_5."},
+      "universe": {"type": "string", "description": "Universe key. Empty string means full market."},
+      "limit": {"type": "integer", "minimum": 1, "maximum": 500, "default": 30}
+    },
+    "additionalProperties": false
+  },
+  "output_schema": {
+    "columns": [
+      "trade_date",
+      "strategy_name",
+      "strategy_version",
+      "strategy_instance_key",
+      "universe",
+      "universe_label",
+      "subject_code",
+      "subject_name",
+      "rank_no",
+      "value_decimal",
+      "strategy_detail_json",
+      "snapshot_time"
+    ]
+  },
+  "source_tables": ["aiia_stock_strategy_result_daily"],
+  "status": "draft",
+  "created_by": "phase2_sql_template_authoring",
+  "audit": {
+    "side_effect": "read_only",
+    "execution": "not_executed_in_phase2",
+    "notes": "Template prepares a parameterized query for stored momentum strategy results."
+  }
+}

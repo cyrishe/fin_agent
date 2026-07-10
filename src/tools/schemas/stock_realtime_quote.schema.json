@@ -1,0 +1,106 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "stock_realtime_quote.schema.json",
+  "title": "Stock Realtime Quote Tool Output",
+  "type": "object",
+  "required": [
+    "tool",
+    "ok",
+    "data",
+    "error"
+  ],
+  "properties": {
+    "tool": {
+      "const": "stock_realtime_quote",
+      "type": "string"
+    },
+    "ok": {
+      "type": "boolean"
+    },
+    "error": {
+      "type": "string"
+    },
+    "data": {
+      "type": "object",
+      "required": [
+        "code",
+        "name",
+        "trade_date",
+        "minute_index",
+        "minute_time",
+        "snapshot_time",
+        "snapshot_slot",
+        "quote"
+      ],
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "trade_date": {
+          "type": "string"
+        },
+        "minute_index": {
+          "type": "integer"
+        },
+        "minute_time": {
+          "type": "string"
+        },
+        "snapshot_time": {
+          "type": "string"
+        },
+        "snapshot_slot": {
+          "type": "string"
+        },
+        "quote": {
+          "type": "object",
+          "required": [
+            "open",
+            "current",
+            "high",
+            "low",
+            "preclose",
+            "change",
+            "change_pct",
+            "volume",
+            "amount"
+          ],
+          "properties": {
+            "open": {
+              "type": "number"
+            },
+            "current": {
+              "type": "number"
+            },
+            "high": {
+              "type": "number"
+            },
+            "low": {
+              "type": "number"
+            },
+            "preclose": {
+              "type": "number"
+            },
+            "change": {
+              "type": "number"
+            },
+            "change_pct": {
+              "type": "number"
+            },
+            "volume": {
+              "type": "number"
+            },
+            "amount": {
+              "type": "number"
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

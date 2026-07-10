@@ -1,0 +1,219 @@
+{
+  "cases": [
+    {
+      "case_id": "staged_001_market_cap_range_industry_count",
+      "question": "市值大于300亿且小于500亿的股票行情，并按行业分组统计这些股票数量",
+      "stage1_plan": {
+        "steps": [
+          {
+            "id": "S1",
+            "action": "fetch",
+            "subject": "stock",
+            "dataviews": ["base_info", "quote", "pricevalue"],
+            "requirement": "Find stocks with market value greater than 30 billion and less than 50 billion, and fetch their market quote data.",
+            "depends_on": [],
+            "expected_result": "Stock identity and quote rows for the filtered stocks."
+          },
+          {
+            "id": "S2",
+            "action": "fetch",
+            "subject": "industry",
+            "dataviews": ["base_info", "constitution"],
+            "requirement": "Find industry membership for the stocks returned by S1.",
+            "depends_on": ["S1"],
+            "expected_result": "Industry identity and stock membership rows."
+          },
+          {
+            "id": "S3",
+            "action": "compute",
+            "subject": "",
+            "dataviews": [],
+            "requirement": "Group S2 by industry and count the number of stocks in each industry.",
+            "depends_on": ["S2"],
+            "expected_result": "Industry-level company counts."
+          },
+          {
+            "id": "S4",
+            "action": "output",
+            "subject": "",
+            "dataviews": [],
+            "requirement": "Return S1 quote rows and S3 industry count rows.",
+            "depends_on": ["S1", "S3"],
+            "expected_result": "Two user-visible result sets."
+          }
+        ]
+      }
+    },
+    {
+      "case_id": "staged_002_top_volume_industry_count",
+      "question": "今天成交量最高的10个股票，按行业分组统计这些股票数量",
+      "stage1_plan": {
+        "steps": [
+          {
+            "id": "S1",
+            "action": "fetch",
+            "subject": "stock",
+            "dataviews": ["base_info", "quote"],
+            "requirement": "Find today's top 10 stocks by trading volume and fetch their quote data.",
+            "depends_on": [],
+            "expected_result": "Top-volume stock identity and quote rows."
+          },
+          {
+            "id": "S2",
+            "action": "fetch",
+            "subject": "industry",
+            "dataviews": ["base_info", "constitution"],
+            "requirement": "Find industry membership for the stocks returned by S1.",
+            "depends_on": ["S1"],
+            "expected_result": "Industry identity and stock membership rows."
+          },
+          {
+            "id": "S3",
+            "action": "compute",
+            "subject": "",
+            "dataviews": [],
+            "requirement": "Group S2 by industry and count the number of stocks in each industry.",
+            "depends_on": ["S2"],
+            "expected_result": "Industry-level company counts."
+          },
+          {
+            "id": "S4",
+            "action": "output",
+            "subject": "",
+            "dataviews": [],
+            "requirement": "Return S1 top-volume stock rows and S3 industry count rows.",
+            "depends_on": ["S1", "S3"],
+            "expected_result": "Two user-visible result sets."
+          }
+        ]
+      }
+    },
+    {
+      "case_id": "staged_003_industry_kd_pct_rank",
+      "question": "找出近5日涨幅最高的10个行业，并查看这些行业的成分股",
+      "stage1_plan": {
+        "steps": [
+          {
+            "id": "S1",
+            "action": "fetch",
+            "subject": "industry",
+            "dataviews": ["base_info", "quote"],
+            "requirement": "Find the top 10 industries by 5-trading-day percentage change.",
+            "depends_on": [],
+            "expected_result": "Ranked industry identity and quote-derived metric rows."
+          },
+          {
+            "id": "S2",
+            "action": "fetch",
+            "subject": "industry",
+            "dataviews": ["constitution"],
+            "requirement": "Fetch constituent stocks for the industries returned by S1.",
+            "depends_on": ["S1"],
+            "expected_result": "Industry constituent stock rows."
+          },
+          {
+            "id": "S3",
+            "action": "output",
+            "subject": "",
+            "dataviews": [],
+            "requirement": "Return S1 ranked industries and S2 constituent rows.",
+            "depends_on": ["S1", "S2"],
+            "expected_result": "Two user-visible result sets."
+          }
+        ]
+      }
+    },
+    {
+      "case_id": "staged_004_stock_quote_fixed_methods",
+      "question": "查询贵州茅台近5日涨幅和近10日最高收盘价，同时返回最新收盘价和涨幅",
+      "stage1_plan": {
+        "steps": [
+          {
+            "id": "S1",
+            "action": "fetch",
+            "subject": "stock",
+            "dataviews": ["base_info", "quote"],
+            "requirement": "For Guizhou Moutai, fetch latest close and pct, 5-trading-day percentage change, and highest close over the last 10 trading days.",
+            "depends_on": [],
+            "expected_result": "Stock identity with latest close, latest pct, kd_pct_sum, and kd_close_high."
+          },
+          {
+            "id": "S2",
+            "action": "output",
+            "subject": "",
+            "dataviews": [],
+            "requirement": "Return S1 result.",
+            "depends_on": ["S1"],
+            "expected_result": "One user-visible result set."
+          }
+        ]
+      },
+      "stage2_bindings": {
+        "S1": {
+          "step_id": "S1",
+          "status": "ready",
+          "executable_request": {
+            "type": "fetch",
+            "api_calls": [
+              {
+                "api_id": "stock.base_info",
+                "tool_name": "stock_profile_query",
+                "operation": "query",
+                "arguments": {
+                  "security_name": "贵州茅台"
+                },
+                "filters": [],
+                "outputs": ["code", "name"]
+              },
+              {
+                "api_id": "stock.quote",
+                "tool_name": "stock_daily_kline_query",
+                "operation": "query",
+                "arguments": {
+                  "security_name": "贵州茅台"
+                },
+                "filters": [],
+                "outputs": ["code", "name", "trade_date", "close", "pct"],
+                "method_calls": [
+                  {
+                    "method_id": "stock.quote.close",
+                    "call_style": "method",
+                    "arguments": {"trade_date": "latest"}
+                  },
+                  {
+                    "method_id": "stock.quote.pct",
+                    "call_style": "method",
+                    "arguments": {"trade_date": "latest"}
+                  },
+                  {
+                    "method_id": "stock.quote.pct.kd_pct_sum",
+                    "call_style": "method",
+                    "arguments": {"k": 5, "end_date": "latest"}
+                  },
+                  {
+                    "method_id": "stock.quote.close.kd_close_high",
+                    "call_style": "method",
+                    "arguments": {"k": 10, "end_date": "latest"}
+                  }
+                ]
+              }
+            ],
+            "compute": null,
+            "output": null
+          },
+          "result_schema": [
+            "stock.base_info.code",
+            "stock.base_info.name",
+            "stock.quote.trade_date",
+            "stock.quote.close",
+            "stock.quote.pct",
+            "stock.quote.pct.kd_pct_sum",
+            "stock.quote.close.kd_close_high"
+          ],
+          "dependency_refs": [],
+          "issues": []
+        }
+      }
+    }
+  ]
+}

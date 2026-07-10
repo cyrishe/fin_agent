@@ -1,0 +1,162 @@
+{
+  "auth": "public",
+  "availability": {
+    "lifecycle": "active",
+    "retrieval_mode": "retrievable",
+    "visibility": "visible"
+  },
+  "capabilities": [
+    "news_search",
+    "company_news",
+    "concept_news",
+    "event_news",
+    "timeline"
+  ],
+  "defaults": {},
+  "identity": {
+    "description": "查询公司、行业、板块、主题或事件相关的金融新闻。",
+    "display_name": "金融新闻查询",
+    "domain": "news",
+    "owner": "tools"
+  },
+  "invocation_example": "financial_news_search(query=\"贵州茅台\")",
+  "match_contract": {
+    "request_families": [
+      "data_access"
+    ],
+    "work_item_types": [
+      "tool"
+    ],
+    "capability_classes": [
+      "data_retrieval",
+      "news_or_research_retrieval"
+    ],
+    "side_effect_level": "write"
+  },
+  "name": "financial_news_search",
+  "post_process": {
+    "deterministic": {
+      "enabled": false,
+      "handler": ""
+    },
+    "llm": {
+      "enabled": false,
+      "prompt_key": ""
+    }
+  },
+  "profiles": {
+    "mock": {
+      "enabled": true,
+      "implementation": {
+        "kind": "inline_result"
+      },
+      "result": {
+        "data": [
+          {
+            "publish_time": "publish_time_示例",
+            "site": "site_示例",
+            "snippet": "snippet_示例",
+            "title": "title_示例",
+            "url": "url_示例"
+          }
+        ],
+        "error": "error_示例",
+        "ok": false,
+        "tool": "financial_news_search"
+      }
+    },
+    "real": {
+      "enabled": true,
+      "implementation": {
+        "kind": "python_callable",
+        "target": "src.tools.company_news_tool:run"
+      }
+    }
+  },
+  "retention": {
+    "drop_default": [],
+    "high_value_for_reasoning": [
+      "data"
+    ],
+    "high_value_for_render": [
+      "data"
+    ],
+    "recommended_reducers": {
+      "data": "summarize_news_list"
+    },
+    "usually_too_large_for_prompt": [
+      "data[*].snippet"
+    ]
+  },
+  "runtime_hints": {
+    "cost_class": "medium",
+    "latency_class": "slow",
+    "supports_async_submit": false,
+    "supports_stream": false
+  },
+  "safety": {
+    "network": true,
+    "persistence": true,
+    "side_effect": "optional_persistence"
+  },
+  "schemas": {
+    "input": {
+      "$id": "financial_news_search.input.schema.json",
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "query": {
+          "type": "string",
+          "description": "公司名、股票代码、概念、主题或事件关键词"
+        }
+      },
+      "required": [
+        "query"
+      ],
+      "type": "object"
+    },
+    "output": {
+      "$ref": "src/tools/schemas/financial_news_search.schema.json"
+    }
+  },
+  "status": "active",
+  "tags": [
+    "news",
+    "search",
+    "timeline",
+    "catalyst"
+  ],
+  "tests": {
+    "golden_cases": [],
+    "sample_inputs": [
+      {
+        "arguments": {
+          "query": "贵州茅台"
+        },
+        "name": "default_financial_news_search"
+      }
+    ]
+  },
+  "ui_hints": {
+    "editable_sections": [
+      "identity",
+      "schemas.input",
+      "schemas.output",
+      "capabilities",
+      "profiles",
+      "retention",
+      "post_process",
+      "tests"
+    ]
+  },
+  "version": "v1",
+  "subject_tags": [
+    "stock",
+    "fund",
+    "bond",
+    "plate",
+    "index",
+    "general"
+  ],
+  "tool_priority": 1
+}

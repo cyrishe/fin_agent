@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "execution_plan.schema.json",
+  "title": "ExecutionPlan",
+  "type": "object",
+  "required": [
+    "skill_name",
+    "skill_version",
+    "input_payload",
+    "selected_tools",
+    "selected_sections",
+    "required_evidence_types",
+    "runtime_limits",
+    "stage_plan"
+  ],
+  "properties": {
+    "skill_name": { "type": "string" },
+    "skill_version": { "type": "string" },
+    "input_payload": { "type": "object" },
+    "selected_tools": { "type": "array", "items": { "type": "string" } },
+    "selected_sections": { "type": "array", "items": { "type": "string" } },
+    "required_evidence_types": { "type": "array", "items": { "type": "string" } },
+    "runtime_limits": {
+      "type": "object",
+      "properties": {
+        "max_steps": { "type": "integer" },
+        "enable_think": { "type": "boolean" }
+      },
+      "additionalProperties": true
+    },
+    "stage_plan": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["stage", "goal"],
+        "properties": {
+          "stage": { "type": "string" },
+          "goal": { "type": "string" },
+          "expected_outputs": { "type": "array", "items": { "type": "string" } }
+        },
+        "additionalProperties": true
+      }
+    },
+    "fallback_rules": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "tool_selection": { "type": "object" },
+    "source_skill_spec": { "type": "object" }
+  },
+  "additionalProperties": true
+}

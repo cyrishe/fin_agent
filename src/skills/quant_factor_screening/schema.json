@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Quant Factor Screening Skill Output",
+  "type": "object",
+  "required": [
+    "brief",
+    "selected_stocks",
+    "data_coverage",
+    "risk_warnings",
+    "render_payload",
+    "audit"
+  ],
+  "properties": {
+    "brief": {"type": "string"},
+    "selected_stocks": {"type": "array"},
+    "factor_definitions": {"type": "array"},
+    "data_coverage": {"type": "object"},
+    "risk_warnings": {"type": "array"},
+    "render_payload": {"type": "object"},
+    "audit": {"type": "object"}
+  },
+  "additionalProperties": true
+}

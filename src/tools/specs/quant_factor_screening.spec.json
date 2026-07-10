@@ -1,0 +1,52 @@
+{
+  "tool_name": "quant_factor_screening",
+  "purpose": "执行量化因子筛选并返回候选股、因子表和审计信息。",
+  "best_for": [
+    "用于根据自然语言或显式 factor_plan 做候选股筛选。",
+    "用于串联数据 provider 和受控代码运行完成可审计计算。",
+    "用于返回候选股排序、因子表、覆盖率、风险提示和运行审计。"
+  ],
+  "invocation_example": "quant_factor_screening(user_text=\"最近20个交易日涨幅靠前且成交额放大的股票\", universe=[\"600000\", \"000001.SZ\"], date_range={\"start\":\"2026-05-01\",\"end\":\"2026-05-29\"}, required_data=[\"daily_price\"], top_n=20)",
+  "input_guidance": {
+    "required_fields": [
+      "user_text 或 factor_plan",
+      "universe"
+    ],
+    "optional_fields": [
+      "report_period",
+      "required_data",
+      "top_n"
+    ]
+  },
+  "output_guidance": {
+    "field_policies": {
+      "data.selected_stocks": {
+        "strategy": "prompt_full"
+      },
+      "data.factor_table": {
+        "strategy": "prompt_summary",
+        "summary_prompt": "保留 artifact_ref、row_count、columns 和 bounded rows。"
+      },
+      "data.data_coverage": {
+        "strategy": "prompt_full"
+      },
+      "data.risk_warnings": {
+        "strategy": "prompt_full"
+      },
+      "data.audit": {
+        "strategy": "prompt_summary",
+        "summary_prompt": "保留 factor_plan_hash、code_hash、data_artifacts 和 runtime_status。"
+      }
+    },
+    "usually_too_large_for_prompt": [
+      "data.factor_table.rows"
+    ],
+    "high_value_for_reasoning": [
+      "data.selected_stocks",
+      "data.data_coverage",
+      "data.risk_warnings",
+      "data.audit"
+    ],
+    "high_value_for_render": []
+  }
+}

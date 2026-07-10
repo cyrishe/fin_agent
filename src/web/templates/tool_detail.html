@@ -1,0 +1,594 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ page_title or "Tool Detail" }}</title>
+  <style>
+    :root {
+      --bg: #f2eee5;
+      --panel: #fffdf8;
+      --panel-2: #f6f0e5;
+      --line: #d9cfbf;
+      --text: #1f1c17;
+      --muted: #6d6458;
+      --accent: #8e5b2d;
+      --shadow: 0 16px 40px rgba(74, 52, 23, 0.08);
+      --mono: "SFMono-Regular", Menlo, Consolas, monospace;
+      --sans: "PingFang SC", "Noto Sans SC", "Helvetica Neue", sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: var(--sans);
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(222, 186, 137, 0.28), transparent 28%),
+        linear-gradient(180deg, #f8f3ea 0%, #f0e8db 100%);
+    }
+    .shell { max-width: 1480px; margin: 0 auto; padding: 24px; display: grid; gap: 18px; }
+    .hero, .panel {
+      background: var(--panel);
+      border: 1px solid rgba(151, 90, 43, 0.12);
+      border-radius: 22px;
+      box-shadow: var(--shadow);
+    }
+    .hero {
+      padding: 22px 24px;
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: flex-start;
+    }
+    .hero h1 { margin: 0; font-size: 28px; }
+    .hero p { margin: 8px 0 0; color: var(--muted); line-height: 1.6; max-width: 780px; }
+    .toolbar { display: flex; gap: 10px; flex-wrap: wrap; }
+    .btn {
+      border: 1px solid var(--line);
+      background: var(--panel-2);
+      color: var(--text);
+      padding: 10px 14px;
+      border-radius: 12px;
+      cursor: pointer;
+      font-weight: 600;
+      text-decoration: none;
+    }
+    .btn.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+    .panel { padding: 18px; }
+    .panel h2 { margin: 0 0 12px; font-size: 18px; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+    .stack { display: grid; gap: 18px; }
+    .callout {
+      background: #fff9f1;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 14px;
+      color: var(--muted);
+      line-height: 1.55;
+      margin-bottom: 12px;
+    }
+    .meta-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+    .meta-chip { background: #f3dfc7; color: #744117; border-radius: 999px; padding: 6px 10px; font-size: 12px; }
+    .status { padding: 12px 14px; border-radius: 14px; display:none; white-space: pre-wrap; }
+    .status.show { display:block; }
+    .status.err { background:#fdeeee; color:#a12626; border:1px solid rgba(161,38,38,.18);}
+    .kv { display: grid; gap: 10px; }
+    .kv-row {
+      display: grid;
+      grid-template-columns: 180px 1fr;
+      gap: 14px;
+      align-items: start;
+      padding: 10px 0;
+      border-top: 1px solid rgba(217, 207, 191, 0.7);
+    }
+    .kv-row:first-child { border-top: 0; padding-top: 0; }
+    .label { color: var(--muted); font-size: 12px; letter-spacing: .04em; }
+    .value { line-height: 1.6; }
+    .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+    .chip { background: #f3dfc7; color: #744117; border-radius: 999px; padding: 6px 10px; font-size: 12px; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+      background: #fffaf3;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      overflow: hidden;
+    }
+    th, td {
+      padding: 10px 12px;
+      border-bottom: 1px solid rgba(217, 207, 191, 0.7);
+      text-align: left;
+      vertical-align: top;
+    }
+    th { color: var(--muted); font-weight: 600; background: #f8f1e4; }
+    tr:last-child td { border-bottom: 0; }
+    pre {
+      margin: 0;
+      white-space: pre-wrap;
+      word-break: break-word;
+      background: #fff9f1;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 14px;
+      font-family: var(--mono);
+      font-size: 12px;
+      line-height: 1.5;
+      max-height: 420px;
+      overflow: auto;
+    }
+    .hidden { display:none !important; }
+    .tree-stack { display: grid; gap: 10px; margin-top: 12px; }
+    .tree-node {
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: #fffaf3;
+      padding: 12px;
+    }
+    .tree-node summary {
+      cursor: pointer;
+      list-style: none;
+      font-weight: 700;
+    }
+    .tree-node summary::-webkit-details-marker { display: none; }
+    .tree-head { display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin-bottom:8px; }
+    .tree-title { font-weight:700; }
+    .tree-type, .tree-path, .tree-strategy {
+      font-size: 12px;
+      color: var(--muted);
+      background: #f6f0e5;
+      border-radius: 999px;
+      padding: 4px 8px;
+    }
+    .tree-strategy { background: #f3dfc7; color: #744117; }
+    .tree-desc { color: var(--muted); font-size: 13px; line-height: 1.5; margin-bottom: 8px; }
+    @media (max-width: 1100px) {
+      .grid { grid-template-columns: 1fr; }
+      .hero { display: grid; }
+      .kv-row { grid-template-columns: 1fr; gap: 6px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <section class="hero">
+      <div>
+        <h1 id="heroTitle">加载中</h1>
+        <p id="heroSubtitle">读取工具详情中。</p>
+        <div id="heroMeta" class="meta-row"></div>
+      </div>
+      <div class="toolbar">
+        <a id="backLink" class="btn" href="#">返回列表</a>
+        <button id="toggleRawBtn" class="btn">查看原始 JSON</button>
+        <a id="editLink" class="btn primary" href="#">编辑设计</a>
+      </div>
+    </section>
+
+    <div id="globalStatus" class="status"></div>
+
+    <section id="summaryView" class="stack">
+      <section class="panel">
+        <h2>核心定义</h2>
+        <div class="callout">这里优先展示一个 tool 最需要理解和维护的业务信息。协议底层细节仍然保留在原始 JSON 视图中。</div>
+        <div class="kv">
+          <div class="kv-row"><div class="label">工具标识</div><div class="value" id="toolNameValue">-</div></div>
+          <div class="kv-row"><div class="label">展示名称</div><div class="value" id="displayNameValue">-</div></div>
+          <div class="kv-row"><div class="label">状态</div><div class="value" id="statusValue">-</div></div>
+          <div class="kv-row"><div class="label">版本</div><div class="value" id="versionValue">-</div></div>
+          <div class="kv-row"><div class="label">归属 / 领域</div><div class="value" id="identityMetaValue">-</div></div>
+          <div class="kv-row"><div class="label">工具说明</div><div class="value" id="descriptionValue">-</div></div>
+          <div class="kv-row"><div class="label">能力标签</div><div class="value chips" id="capabilitiesValue"></div></div>
+          <div class="kv-row"><div class="label">分类标签</div><div class="value chips" id="tagsValue"></div></div>
+        </div>
+      </section>
+
+      <section class="grid">
+        <section class="panel">
+          <h2>输入协议</h2>
+          <div class="kv">
+            <div class="kv-row"><div class="label">输入标题</div><div class="value" id="inputTitleValue">-</div></div>
+            <div class="kv-row"><div class="label">允许额外字段</div><div class="value" id="inputAdditionalValue">-</div></div>
+          </div>
+          <div style="margin-top:12px;">
+            <table>
+              <thead>
+                <tr>
+                  <th>字段名</th>
+                  <th>类型</th>
+                  <th>是否必填</th>
+                  <th>默认值</th>
+                  <th>字段说明</th>
+                </tr>
+              </thead>
+              <tbody id="inputFieldsBody"></tbody>
+            </table>
+          </div>
+        </section>
+        <section class="panel">
+          <h2>执行配置</h2>
+          <div class="kv">
+            <div class="kv-row"><div class="label">真实执行</div><div class="value" id="realProfileValue">-</div></div>
+            <div class="kv-row"><div class="label">真实执行入口</div><div class="value" id="realTargetValue">-</div></div>
+            <div class="kv-row"><div class="label">Mock 执行</div><div class="value" id="mockProfileValue">-</div></div>
+            <div class="kv-row"><div class="label">Mock 返回摘要</div><div class="value" id="mockSummaryValue">-</div></div>
+          </div>
+        </section>
+      </section>
+
+      <section class="panel">
+        <h2>输出协议与字段策略</h2>
+        <div class="callout">这里按业务输出 `data` 的字段树展示结构和消费策略，不包含 `tool / ok / error / meta` 等系统层字段。`展示` 和 `忽略` 都不会进入后续大模型上下文；`摘要后进上下文` 会在拿到真实结果后先归纳，再把摘要传给后续步骤。</div>
+        <div id="outputTreeView" class="tree-stack"></div>
+      </section>
+
+      <section class="grid">
+        <section class="panel">
+          <h2>用途与检索信息</h2>
+          <div class="kv">
+            <div class="kv-row"><div class="label">用途说明</div><div class="value" id="purposeValue">-</div></div>
+            <div class="kv-row"><div class="label">调用示例</div><div class="value" id="invocationExampleValue">-</div></div>
+            <div class="kv-row"><div class="label">适用场景</div><div class="value chips" id="bestForValue"></div></div>
+            <div class="kv-row"><div class="label">目录页说明</div><div class="value" id="hubDescriptionValue">-</div></div>
+            <div class="kv-row"><div class="label">检索关键词</div><div class="value chips" id="hubKeywordsValue"></div></div>
+            <div class="kv-row"><div class="label">目录优先级</div><div class="value" id="hubPriorityValue">-</div></div>
+          </div>
+        </section>
+        <section class="panel">
+          <h2>推理与渲染提示</h2>
+          <div class="kv">
+            <div class="kv-row"><div class="label">高价值推理字段</div><div class="value chips" id="reasoningValue"></div></div>
+            <div class="kv-row"><div class="label">高价值渲染字段</div><div class="value chips" id="renderValue"></div></div>
+            <div class="kv-row"><div class="label">输入注意事项</div><div class="value chips" id="inputNotesValue"></div></div>
+            <div class="kv-row"><div class="label">过大不宜进 Prompt 的输出</div><div class="value chips" id="largeOutputValue"></div></div>
+          </div>
+        </section>
+      </section>
+    </section>
+
+    <section id="rawView" class="grid hidden">
+      <section class="panel">
+        <h2>原始 Definition</h2>
+        <pre id="definitionPreview">{}</pre>
+      </section>
+      <section class="panel">
+        <h2>原始 Output Schema</h2>
+        <pre id="schemaPreview">{}</pre>
+      </section>
+      <section class="panel">
+        <h2>原始 Tool Spec</h2>
+        <pre id="specPreview">{}</pre>
+      </section>
+      <section class="panel">
+        <h2>原始 Tool Hub Entry</h2>
+        <pre id="hubPreview">{}</pre>
+      </section>
+    </section>
+  </div>
+  <script>
+    const toolName = {{ tool_name|tojson }};
+    const apiToolBundleBaseUrl = {{ api_tool_bundle_base_url|tojson }};
+    const toolStudioBaseUrl = {{ tool_studio_base_url|tojson }};
+    const toolsBaseUrl = {{ tools_base_url|tojson }};
+    const appRoot = (() => {
+      const marker = "/tools/";
+      const path = window.location.pathname;
+      const idx = path.indexOf(marker);
+      return idx >= 0 ? path.slice(0, idx) : "";
+    })();
+    const resolvedApiToolBundleBaseUrl = apiToolBundleBaseUrl.startsWith("/") ? `${appRoot}${apiToolBundleBaseUrl}` : apiToolBundleBaseUrl;
+    const resolvedToolStudioBaseUrl = toolStudioBaseUrl.startsWith("/") ? `${appRoot}${toolStudioBaseUrl}` : toolStudioBaseUrl;
+    const resolvedToolsBaseUrl = toolsBaseUrl.startsWith("/") ? `${appRoot}${toolsBaseUrl}` : toolsBaseUrl;
+
+    function pretty(value) {
+      return JSON.stringify(value || {}, null, 2);
+    }
+
+    function setStatus(text) {
+      const el = document.getElementById("globalStatus");
+      if (!text) {
+        el.className = "status";
+        el.textContent = "";
+        return;
+      }
+      el.className = "status show err";
+      el.textContent = text;
+    }
+
+    function statusLabel(value) {
+      return ({draft: "草稿", active: "启用", deprecated: "废弃"})[String(value || "").trim()] || String(value || "-");
+    }
+
+    function yesNo(value) {
+      return value ? "是" : "否";
+    }
+
+    function setText(id, value) {
+      document.getElementById(id).textContent = String(value || "-");
+    }
+
+    function setChips(id, items) {
+      const root = document.getElementById(id);
+      root.innerHTML = "";
+      const values = Array.isArray(items) ? items.filter(Boolean) : [];
+      if (!values.length) {
+        root.textContent = "-";
+        return;
+      }
+      for (const item of values) {
+        const chip = document.createElement("div");
+        chip.className = "chip";
+        chip.textContent = String(item);
+        root.appendChild(chip);
+      }
+    }
+
+    async function fetchJson(url) {
+      const res = await fetch(url);
+      const payload = await res.json();
+      if (!res.ok || payload.ok === false) {
+        throw new Error((payload && payload.error) || `HTTP ${res.status}`);
+      }
+      return payload;
+    }
+
+    function renderInputFields(inputSchema, defaults) {
+      const tbody = document.getElementById("inputFieldsBody");
+      tbody.innerHTML = "";
+      const required = Array.isArray(inputSchema.required) ? inputSchema.required : [];
+      const properties = inputSchema.properties || {};
+      const rows = Object.entries(properties);
+      if (!rows.length) {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `<td colspan="5">当前还没有定义输入字段</td>`;
+        tbody.appendChild(tr);
+        return;
+      }
+      for (const [name, field] of rows) {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${String(name)}</td>
+          <td>${String(field.type || "-")}</td>
+          <td>${required.includes(name) ? "必填" : "可选"}</td>
+          <td>${defaults && Object.prototype.hasOwnProperty.call(defaults, name) ? String(defaults[name]) : "-"}</td>
+          <td>${String(field.description || "-")}</td>
+        `;
+        tbody.appendChild(tr);
+      }
+    }
+
+    function strategyLabel(strategy) {
+      return ({
+        auto: "自动",
+        render: "展示",
+        prompt_full: "原样进上下文",
+        prompt_summary: "摘要后进上下文",
+        reference: "作为参考",
+        ignore: "忽略",
+      })[String(strategy || "").trim()] || "未设置";
+    }
+
+    function renderTypeLabel(renderType) {
+      return ({
+        auto: "自动",
+        kline: "K线",
+        line: "折线",
+        flow: "流程",
+        pie: "饼图",
+        bar: "柱状图",
+      })[String(renderType || "").trim()] || "";
+    }
+
+    function defaultSummaryPrompt(path) {
+      return `请用中文概括字段 ${path} 的核心内容，提炼主要信息、结构含义、关键结论和异常点。若这是表格或列表，请说明字段含义和最值得关注的观察。`;
+    }
+
+    function resolveRef(rootSchema, ref) {
+      const schema = rootSchema && typeof rootSchema === "object" ? rootSchema : {};
+      if (!ref || typeof ref !== "string" || !ref.startsWith("#/")) return null;
+      const parts = ref.slice(2).split("/").filter(Boolean);
+      let cur = schema;
+      for (const part of parts) {
+        if (!cur || typeof cur !== "object") return null;
+        cur = cur[part];
+      }
+      return cur && typeof cur === "object" ? cur : null;
+    }
+
+    function resolveSchemaNode(rootSchema, node) {
+      let current = node && typeof node === "object" ? node : {};
+      let guard = 0;
+      while (current && typeof current === "object" && current.$ref && guard < 8) {
+        const resolved = resolveRef(rootSchema, current.$ref);
+        if (!resolved || resolved === current) break;
+        current = resolved;
+        guard += 1;
+      }
+      return current && typeof current === "object" ? current : {};
+    }
+
+    function resolveBusinessDataSchema(outputSchema) {
+      const schema = outputSchema && typeof outputSchema === "object" ? outputSchema : {};
+      const dataNode = schema.properties && schema.properties.data;
+      if (!dataNode || typeof dataNode !== "object") return {};
+      return resolveSchemaNode(schema, dataNode);
+    }
+
+    function readOutputGuidancePolicies(outputGuidance) {
+      const guidance = outputGuidance && typeof outputGuidance === "object" ? outputGuidance : {};
+      const policies = JSON.parse(JSON.stringify(guidance.field_policies || {}));
+      const normalizePath = (rawPath) => {
+        const path = String(rawPath || "").trim();
+        if (!path) return "";
+        return path.startsWith("data") ? path : `data.${path}`;
+      };
+      for (const rawPath of guidance.high_value_for_render || []) {
+        const path = normalizePath(rawPath);
+        if (!path) continue;
+        policies[path] = Object.assign({}, policies[path] || {}, {strategy: "render"});
+      }
+      for (const rawPath of guidance.high_value_for_reasoning || []) {
+        const path = normalizePath(rawPath);
+        if (!path) continue;
+        policies[path] = Object.assign({}, policies[path] || {}, {strategy: "prompt_full"});
+      }
+      for (const rawPath of guidance.usually_too_large_for_prompt || []) {
+        const path = normalizePath(rawPath);
+        if (!path) continue;
+        policies[path] = Object.assign({}, policies[path] || {}, {
+          strategy: "prompt_summary",
+          summary_prompt: (policies[path] || {}).summary_prompt || defaultSummaryPrompt(path),
+        });
+      }
+      for (const rawPath of guidance.drop_default || []) {
+        const path = normalizePath(rawPath);
+        if (!path) continue;
+        policies[path] = Object.assign({}, policies[path] || {}, {strategy: "ignore"});
+      }
+      for (const [rawPath, policy] of Object.entries(guidance.field_policies || {})) {
+        const path = normalizePath(rawPath);
+        if (!path || !policy || typeof policy !== "object") continue;
+        const normalized = Object.assign({}, policies[path] || {});
+        if (String(policy.strategy || "").trim() === "reference") {
+          normalized.strategy = "reference";
+        }
+        if (String(policy.render_type || "").trim()) {
+          normalized.render_type = String(policy.render_type || "").trim();
+        }
+        policies[path] = normalized;
+      }
+      return policies;
+    }
+
+    function renderOutputNode(schema, path, policies, depth = 0, fallbackName = "root") {
+      const rootSchema = state.bundle && state.bundle.files && state.bundle.files.output_schema;
+      const resolvedSchema = resolveSchemaNode(rootSchema, schema);
+      const currentPath = path || fallbackName;
+      const state = Object.assign({strategy: "ignore", summary_prompt: ""}, (policies && policies[currentPath]) || {});
+      const node = document.createElement("details");
+      node.className = "tree-node";
+      if (depth < 2) node.open = true;
+      const type = String(resolvedSchema.type || (resolvedSchema.properties ? "object" : (resolvedSchema.items ? "array" : "-")) || "-");
+      const description = String(resolvedSchema.description || "").trim();
+      node.innerHTML = `
+        <summary>
+          <div class="tree-head">
+            <span class="tree-title">${fallbackName}</span>
+            <span class="tree-type">${type}</span>
+            <span class="tree-path">${currentPath}</span>
+            <span class="tree-strategy">${strategyLabel(state.strategy)}${renderTypeLabel(state.render_type) ? ` / ${renderTypeLabel(state.render_type)}` : ""}</span>
+          </div>
+        </summary>
+        <div class="tree-desc">${description || "暂无字段说明"}</div>
+        ${state.strategy === "prompt_summary" ? `<div class="callout" style="margin-bottom:10px;">摘要提示词：${String(state.summary_prompt || defaultSummaryPrompt(currentPath))}</div>` : ""}
+        <div data-role="children" class="tree-stack"></div>
+      `;
+      const childRoot = node.querySelector('[data-role="children"]');
+      const properties = resolvedSchema.properties && typeof resolvedSchema.properties === "object" ? resolvedSchema.properties : {};
+      for (const [key, subSchema] of Object.entries(properties)) {
+        childRoot.appendChild(renderOutputNode(subSchema, currentPath ? `${currentPath}.${key}` : key, policies, depth + 1, key));
+      }
+      if (resolvedSchema.items && typeof resolvedSchema.items === "object") {
+        childRoot.appendChild(renderOutputNode(resolvedSchema.items, `${currentPath}[]`, policies, depth + 1, "items"));
+      }
+      if (!childRoot.children.length) childRoot.classList.add("hidden");
+      return node;
+    }
+
+    function renderOutputTree(outputSchema, outputGuidance) {
+      const root = document.getElementById("outputTreeView");
+      root.innerHTML = "";
+      const schema = resolveBusinessDataSchema(outputSchema);
+      const policies = readOutputGuidancePolicies(outputGuidance || {});
+      if (!schema || typeof schema !== "object" || (!schema.properties && !schema.items)) {
+        root.innerHTML = `<div class="callout">当前还没有定义业务输出 ` + "`data`" + ` 的字段。</div>`;
+        return;
+      }
+      if (schema.type === "array" && schema.items && typeof schema.items === "object") {
+        root.appendChild(renderOutputNode(schema.items, "data[]", policies, 0, "items"));
+        return;
+      }
+      const properties = schema.properties && typeof schema.properties === "object" ? schema.properties : {};
+      for (const [key, subSchema] of Object.entries(properties)) {
+        root.appendChild(renderOutputNode(subSchema, `data.${key}`, policies, 0, key));
+      }
+    }
+
+    function toggleRawView() {
+      const summary = document.getElementById("summaryView");
+      const raw = document.getElementById("rawView");
+      const rawVisible = raw.classList.contains("hidden");
+      summary.classList.toggle("hidden", rawVisible);
+      raw.classList.toggle("hidden", !rawVisible);
+      document.getElementById("toggleRawBtn").textContent = rawVisible ? "返回结构化视图" : "查看原始 JSON";
+    }
+
+    async function main() {
+      const payload = await fetchJson(`${resolvedApiToolBundleBaseUrl}/${encodeURIComponent(toolName)}/bundle`);
+      const bundle = payload.bundle || {};
+      const files = bundle.files || {};
+      const definition = files.definition || {};
+      const identity = definition.identity || {};
+      const spec = files.tool_spec || {};
+      const hub = files.tool_hub || {};
+      const inputSchema = ((definition.schemas || {}).input) || {};
+      const profiles = definition.profiles || {};
+      const realProfile = profiles.real || {};
+      const mockProfile = profiles.mock || {};
+
+      document.getElementById("heroTitle").textContent = String(identity.display_name || toolName);
+      document.getElementById("heroSubtitle").textContent = String(identity.description || "");
+      document.getElementById("definitionPreview").textContent = pretty(definition);
+      document.getElementById("schemaPreview").textContent = pretty(files.output_schema || {});
+      document.getElementById("specPreview").textContent = pretty(files.tool_spec || {});
+      document.getElementById("hubPreview").textContent = pretty(files.tool_hub || {});
+
+      setText("toolNameValue", toolName);
+      setText("displayNameValue", identity.display_name || toolName);
+      setText("statusValue", statusLabel(definition.status));
+      setText("versionValue", definition.version || "-");
+      setText("identityMetaValue", `${String(identity.owner || "-")} / ${String(identity.domain || "-")}`);
+      setText("descriptionValue", identity.description || "-");
+      setChips("capabilitiesValue", definition.capabilities || []);
+      setChips("tagsValue", definition.tags || []);
+
+      setText("inputTitleValue", inputSchema.title || "-");
+      setText("inputAdditionalValue", yesNo(Boolean(inputSchema.additionalProperties)));
+      renderInputFields(inputSchema, definition.defaults || {});
+
+      setText("realProfileValue", Boolean(realProfile.enabled) ? "启用" : "停用");
+      setText("realTargetValue", (((realProfile.implementation || {}).target) || "-"));
+      setText("mockProfileValue", Boolean(mockProfile.enabled) ? "启用" : "停用");
+      const mockSummary = mockProfile.result ? `已定义 mock 返回，顶层字段：${Object.keys(mockProfile.result).join(", ")}` : "未定义";
+      setText("mockSummaryValue", mockSummary);
+
+      setText("purposeValue", spec.purpose || "-");
+      setText("invocationExampleValue", spec.invocation_example || definition.invocation_example || "-");
+      setChips("bestForValue", spec.best_for || []);
+      setText("hubDescriptionValue", hub.description || "-");
+      setChips("hubKeywordsValue", hub.keywords || []);
+      setText("hubPriorityValue", String(hub.priority ?? "-"));
+
+      const outputGuidance = spec.output_guidance || {};
+      const inputGuidance = spec.input_guidance || {};
+      setChips("reasoningValue", outputGuidance.high_value_for_reasoning || []);
+      setChips("renderValue", outputGuidance.high_value_for_render || []);
+      setChips("inputNotesValue", inputGuidance.notes || []);
+      setChips("largeOutputValue", outputGuidance.usually_too_large_for_prompt || []);
+      renderOutputTree(files.output_schema || {}, outputGuidance);
+
+      const metaRoot = document.getElementById("heroMeta");
+      for (const text of [`标识：${toolName}`, `版本：${String(definition.version || "-")}`, `状态：${statusLabel(definition.status)}`]) {
+        const chip = document.createElement("div");
+        chip.className = "meta-chip";
+        chip.textContent = text;
+        metaRoot.appendChild(chip);
+      }
+      document.getElementById("backLink").href = resolvedToolsBaseUrl;
+      document.getElementById("editLink").href = `${resolvedToolStudioBaseUrl}/${encodeURIComponent(toolName)}`;
+      document.getElementById("toggleRawBtn").addEventListener("click", toggleRawView);
+    }
+
+    main().catch((err) => setStatus(String(err.message || err)));
+  </script>
+</body>
+</html>

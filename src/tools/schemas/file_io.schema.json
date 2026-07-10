@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "file_io.schema.json",
+  "title": "File I/O Output",
+  "type": "object",
+  "required": [
+    "tool",
+    "ok",
+    "data",
+    "error"
+  ],
+  "properties": {
+    "tool": {
+      "const": "file_io"
+    },
+    "ok": {
+      "type": "boolean"
+    },
+    "data": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "mode": {
+          "type": "string"
+        },
+        "file_type": {
+          "type": "string"
+        },
+        "legacy_tool": {
+          "type": "string"
+        },
+        "artifact_ref": {
+          "type": "string"
+        },
+        "data": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "manifest": {
+          "type": "object",
+          "additionalProperties": true
+        }
+      }
+    },
+    "error": {
+      "type": "string"
+    },
+    "meta": {
+      "type": "object",
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": true
+}

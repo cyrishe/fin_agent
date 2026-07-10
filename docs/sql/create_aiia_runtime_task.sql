@@ -1,0 +1,22 @@
+CREATE TABLE IF NOT EXISTS aiia_runtime_task (
+  task_id bigint unsigned NOT NULL AUTO_INCREMENT COMMENT '任务主键',
+  thread_id bigint unsigned NOT NULL COMMENT '所属线程',
+  parent_task_id bigint unsigned DEFAULT NULL COMMENT '父任务，可为空',
+  task_type varchar(64) NOT NULL DEFAULT 'general' COMMENT '任务类型：analysis/research/ops/workflow_step',
+  goal varchar(255) NOT NULL DEFAULT '' COMMENT '任务目标摘要',
+  input_json json DEFAULT NULL COMMENT '任务输入',
+  status varchar(32) NOT NULL DEFAULT 'pending' COMMENT '状态：pending/running/blocked/completed/failed/cancelled',
+  assigned_artifact_id bigint unsigned DEFAULT NULL COMMENT '分配的 artifact',
+  assigned_agent varchar(64) NOT NULL DEFAULT '' COMMENT '分配的 agent/worker 名称',
+  priority int NOT NULL DEFAULT 0 COMMENT '优先级',
+  result_summary text DEFAULT NULL COMMENT '任务结果摘要',
+  error_text text DEFAULT NULL COMMENT '错误信息',
+  started_at datetime DEFAULT NULL COMMENT '开始时间',
+  finished_at datetime DEFAULT NULL COMMENT '结束时间',
+  created_at datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  updated_at datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (task_id),
+  KEY idx_thread_status (thread_id, status, priority),
+  KEY idx_parent_task (parent_task_id),
+  KEY idx_assigned_artifact (assigned_artifact_id, status)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='运行时任务表；支持多任务拆分、追踪与恢复';

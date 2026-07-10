@@ -1,0 +1,540 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ page_title or "Task Router Studio" }}</title>
+  <style>
+    :root {
+      --bg: #efe9dd;
+      --panel: #fffdf8;
+      --panel-2: #f6f1e7;
+      --line: #d9cfbf;
+      --text: #211d18;
+      --muted: #6c655c;
+      --accent: #8c5225;
+      --ok: #1d6b45;
+      --warn: #9a5d08;
+      --err: #a12626;
+      --mono: "SFMono-Regular", Menlo, Consolas, monospace;
+      --sans: "PingFang SC", "Noto Sans SC", "Helvetica Neue", sans-serif;
+      --shadow: 0 18px 48px rgba(74, 52, 23, 0.08);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: var(--sans);
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(224, 191, 153, 0.32), transparent 30%),
+        linear-gradient(180deg, #f8f2e8 0%, #eee5d7 100%);
+    }
+    .shell {
+      max-width: 1560px;
+      margin: 0 auto;
+      padding: 24px;
+      display: grid;
+      gap: 18px;
+    }
+    .hero, .panel {
+      background: var(--panel);
+      border: 1px solid rgba(140, 82, 37, 0.14);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+    }
+    .hero {
+      padding: 22px 24px;
+      display: flex;
+      justify-content: space-between;
+      gap: 18px;
+      align-items: flex-start;
+    }
+    .hero h1 { margin: 0; font-size: 30px; }
+    .hero p { margin: 8px 0 0; color: var(--muted); line-height: 1.65; max-width: 860px; }
+    .hero-meta { display: flex; gap: 8px; flex-wrap: wrap; }
+    .chip {
+      border-radius: 999px;
+      background: #f7ead7;
+      color: #6f411b;
+      padding: 6px 10px;
+      font-size: 12px;
+    }
+    .layout {
+      display: grid;
+      grid-template-columns: 1.08fr 0.92fr;
+      gap: 18px;
+    }
+    .stack { display: grid; gap: 18px; }
+    .panel { padding: 18px; }
+    .panel h2 { margin: 0 0 12px; font-size: 18px; }
+    .subtle { color: var(--muted); font-size: 13px; line-height: 1.55; }
+    .field-label {
+      font-size: 12px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      margin-bottom: 6px;
+    }
+    textarea, input, select {
+      width: 100%;
+      border: 1px solid var(--line);
+      background: #fffdfa;
+      border-radius: 14px;
+      padding: 12px 14px;
+      font: inherit;
+      color: var(--text);
+    }
+    textarea {
+      resize: vertical;
+      min-height: 140px;
+      font-family: var(--mono);
+      line-height: 1.45;
+    }
+    pre {
+      margin: 0;
+      white-space: pre-wrap;
+      word-break: break-word;
+      background: #fff9f1;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 14px;
+      font-family: var(--mono);
+      font-size: 12px;
+      line-height: 1.5;
+      max-height: 360px;
+      overflow: auto;
+    }
+    .toolbar {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+    }
+    .btn {
+      border: 1px solid var(--line);
+      background: var(--panel-2);
+      color: var(--text);
+      padding: 10px 14px;
+      border-radius: 12px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    .btn.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+    .status {
+      display: none;
+      padding: 12px 14px;
+      border-radius: 14px;
+      font-size: 13px;
+      line-height: 1.5;
+      white-space: pre-wrap;
+    }
+    .status.show { display: block; }
+    .status.ok { background: #edf8f2; color: var(--ok); border: 1px solid rgba(29,107,69,.18); }
+    .status.warn { background: #fff7eb; color: var(--warn); border: 1px solid rgba(154,93,8,.18); }
+    .status.err { background: #fdeeee; color: var(--err); border: 1px solid rgba(161,38,38,.18); }
+    .jobs {
+      display: grid;
+      gap: 10px;
+      max-height: 520px;
+      overflow: auto;
+    }
+    .job-card {
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: #fffaf3;
+      padding: 14px;
+      display: grid;
+      gap: 8px;
+    }
+    .job-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: center;
+    }
+    .job-title { font-weight: 700; }
+    .job-meta {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      color: var(--muted);
+      font-size: 12px;
+    }
+    .job-links {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .job-link {
+      color: var(--accent);
+      text-decoration: none;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .launch-list {
+      display: grid;
+      gap: 10px;
+    }
+    .launch-card {
+      border: 1px dashed var(--line);
+      border-radius: 16px;
+      background: #fff8ef;
+      padding: 14px;
+      display: grid;
+      gap: 8px;
+    }
+    iframe {
+      width: 100%;
+      min-height: 880px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: #fff;
+    }
+    @media (max-width: 1180px) {
+      .layout { grid-template-columns: 1fr; }
+      .hero { display: grid; }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <section class="hero">
+      <div>
+        <h1>Task Router Studio</h1>
+        <p>统一的任务测试入口。这里不绑定某个具体 skill，而是先看自然语言请求如何路由、是否需要澄清、是否建议走多 skill 计划，再决定是否创建任务。</p>
+      </div>
+      <div class="hero-meta">
+        <div class="chip">自然语言入口</div>
+        <div class="chip">Route / Clarify / Composite Plan</div>
+        <div class="chip">任务启动与调试</div>
+      </div>
+    </section>
+
+    <div id="globalStatus" class="status"></div>
+
+    <section class="layout">
+      <div class="stack">
+        <section class="panel">
+          <h2>任务输入</h2>
+          <div class="subtle">第一版统一测试台。单 skill 自动建任务；多 skill 先展示 composite plan，并允许按步骤单独启动子任务。</div>
+          <div class="toolbar" style="margin-top:12px;">
+            <button id="previewRouteBtn" class="btn">预览 Route</button>
+            <button id="submitTaskBtn" class="btn primary">提交任务</button>
+          </div>
+          <div class="field-label">自然语言请求</div>
+          <textarea id="userTextEditor" placeholder="例如：请分析机器人概念当前热点是否具备持续性，并深挖代表股"></textarea>
+          <div class="field-label" style="margin-top:12px;">可选上下文（JSON）</div>
+          <textarea id="contextEditor" placeholder='{"concept":"机器人"}'></textarea>
+          <div class="field-label" style="margin-top:12px;">Execution Profile</div>
+          <select id="executionProfileSelect">
+            <option value="real">real</option>
+            <option value="mock">mock</option>
+          </select>
+        </section>
+
+        <section class="panel">
+          <h2>路由调试信息</h2>
+          <div class="field-label">Route Snapshot</div>
+          <pre id="routeSnapshotPreview">{}</pre>
+          <div class="field-label" style="margin-top:12px;">Clarification State</div>
+          <pre id="clarificationPreview">{}</pre>
+          <div class="field-label" style="margin-top:12px;">Composite Execution Plan</div>
+          <pre id="compositePlanPreview">{}</pre>
+          <div class="field-label" style="margin-top:12px;">Tool Argument Plans</div>
+          <pre id="toolArgumentPlanPreview">{}</pre>
+        </section>
+
+        <section class="panel">
+          <h2>多 Skill 分步启动</h2>
+          <div class="subtle">当前第一版不伪装“多 skill 已自动编排”。如果路由结果是 multi-skill，这里会显示每一步的候选启动 payload，你可以单独启动子任务。</div>
+          <div id="launchList" class="launch-list"></div>
+        </section>
+      </div>
+
+      <div class="stack">
+        <section class="panel">
+          <h2>任务列表</h2>
+          <div class="subtle">当前页面内创建的任务会出现在这里，并自动刷新状态。点“内嵌查看”会在下方切换详情页。</div>
+          <div id="jobList" class="jobs"></div>
+        </section>
+
+        <section class="panel">
+          <h2>任务详情嵌入视图</h2>
+          <div class="subtle">默认打开最新创建的任务。你也可以在新窗口打开详情页做完整观察。</div>
+          <iframe id="taskFrame" title="Task Detail"></iframe>
+        </section>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    const apiRouterPreviewUrl = {{ api_router_preview_url|tojson }};
+    const apiRouterSubmitUrl = {{ api_router_submit_url|tojson }};
+    const apiTaskBaseUrl = {{ api_task_base_url|tojson }};
+    const apiSkillBaseUrl = {{ api_skill_base_url|tojson }};
+    const appRoot = (() => {
+      const marker = "/router/studio";
+      const altMarker = "/tasks/studio";
+      const path = window.location.pathname;
+      const idx = path.indexOf(marker);
+      if (idx >= 0) return path.slice(0, idx);
+      const altIdx = path.indexOf(altMarker);
+      return altIdx >= 0 ? path.slice(0, altIdx) : "";
+    })();
+    function resolveUrl(url) {
+      if (!url) return url;
+      if (/^https?:\/\//.test(url)) return url;
+      if (url.startsWith("/")) return url;
+      return `${appRoot}/${String(url).replace(/^\/+/, "")}`;
+    }
+    const resolvedApiRouterPreviewUrl = resolveUrl(apiRouterPreviewUrl);
+    const resolvedApiRouterSubmitUrl = resolveUrl(apiRouterSubmitUrl);
+    const resolvedApiTaskBaseUrl = resolveUrl(apiTaskBaseUrl);
+    const resolvedApiSkillBaseUrl = resolveUrl(apiSkillBaseUrl);
+
+    const state = {
+      routeSnapshot: null,
+      launchables: [],
+      jobs: [],
+      pollTimer: null,
+      skillDebug: null,
+    };
+
+    function setStatus(kind, text) {
+      const el = document.getElementById("globalStatus");
+      if (!text) {
+        el.className = "status";
+        el.textContent = "";
+        return;
+      }
+      el.className = `status show ${kind || "warn"}`;
+      el.textContent = text;
+    }
+
+    async function fetchJson(url, options) {
+      const res = await fetch(url, options || {});
+      const text = await res.text();
+      let payload = null;
+      try {
+        payload = text ? JSON.parse(text) : null;
+      } catch (err) {
+        throw new Error(`HTTP ${res.status} ${res.statusText}; non_json_response: ${text.slice(0, 500)}`);
+      }
+      if (!res.ok || (payload && payload.ok === false)) {
+        const message = payload && payload.error ? payload.error : `HTTP ${res.status}`;
+        throw new Error(message);
+      }
+      return payload;
+    }
+
+    function pretty(value) {
+      return JSON.stringify(value || {}, null, 2);
+    }
+
+    function parseContext() {
+      const raw = document.getElementById("contextEditor").value.trim();
+      if (!raw) return {};
+      const payload = JSON.parse(raw);
+      if (!payload || typeof payload !== "object" || Array.isArray(payload)) {
+        throw new Error("上下文 JSON 顶层必须是对象");
+      }
+      return payload;
+    }
+
+    function collectRequestPayload() {
+      const userText = String(document.getElementById("userTextEditor").value || "").trim();
+      if (!userText) throw new Error("自然语言请求不能为空");
+      return {
+        user_text: userText,
+        context: parseContext(),
+        execution_profile: String(document.getElementById("executionProfileSelect").value || "real").trim() || "real",
+      };
+    }
+
+    async function previewRoute() {
+      const req = collectRequestPayload();
+      const payload = await fetchJson(resolvedApiRouterPreviewUrl, {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify(req),
+      });
+      state.routeSnapshot = payload.route_snapshot || null;
+      state.skillDebug = payload.skill_debug || null;
+      document.getElementById("routeSnapshotPreview").textContent = pretty(state.routeSnapshot || {});
+      document.getElementById("clarificationPreview").textContent = pretty((state.routeSnapshot || {}).clarification_state || {});
+      document.getElementById("compositePlanPreview").textContent = pretty((state.routeSnapshot || {}).composite_execution_plan || {});
+      document.getElementById("toolArgumentPlanPreview").textContent = pretty((state.skillDebug && state.skillDebug.tool_argument_plans) || {});
+      setStatus("ok", "Route 预览完成");
+      renderLaunchables(payload.launchables || []);
+      return payload;
+    }
+
+    function upsertJob(job, extra) {
+      const idx = state.jobs.findIndex((item) => item.job_id === job.job_id);
+      const merged = {...(idx >= 0 ? state.jobs[idx] : {}), ...job, ...(extra || {})};
+      if (idx >= 0) state.jobs[idx] = merged;
+      else state.jobs.unshift(merged);
+      renderJobs();
+      if (merged.job_id) {
+        document.getElementById("taskFrame").src = `${window.location.origin}${appRoot}/tasks/${encodeURIComponent(merged.job_id)}/view`;
+      }
+    }
+
+    async function submitTask() {
+      const req = collectRequestPayload();
+      const payload = await fetchJson(resolvedApiRouterSubmitUrl, {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify(req),
+      });
+      state.routeSnapshot = payload.route_snapshot || null;
+      state.skillDebug = payload.skill_debug || null;
+      document.getElementById("routeSnapshotPreview").textContent = pretty(state.routeSnapshot || {});
+      document.getElementById("clarificationPreview").textContent = pretty(payload.clarification_state || (state.routeSnapshot || {}).clarification_state || {});
+      document.getElementById("compositePlanPreview").textContent = pretty(payload.composite_execution_plan || (state.routeSnapshot || {}).composite_execution_plan || {});
+      document.getElementById("toolArgumentPlanPreview").textContent = pretty((payload.skill_debug && payload.skill_debug.tool_argument_plans) || {});
+      renderLaunchables(payload.launchables || []);
+      if (payload.submit_status === "submitted" && payload.job) {
+        upsertJob(payload.job, {skill_name: payload.skill_name || ""});
+        setStatus("ok", `已创建任务 ${payload.job.job_id}`);
+      } else if (payload.submit_status === "planned") {
+        setStatus("warn", "当前请求被判定为 multi-skill。已生成 composite plan，请在下方按步骤单独启动子任务。");
+      } else if (payload.submit_status === "clarify") {
+        setStatus("warn", String(((payload.clarification_state || {}).prompt) || "需要补充信息后再提交。"));
+      }
+      startPolling();
+      return payload;
+    }
+
+    async function launchStep(launchable) {
+      const skillName = String(launchable.skill_name || "").trim();
+      const inputPayload = {
+        ...(launchable.input_payload || {}),
+        _execution_profile: String(document.getElementById("executionProfileSelect").value || "real").trim() || "real",
+      };
+      if (!skillName || !inputPayload || typeof inputPayload !== "object") {
+        throw new Error("当前步骤缺少可启动的 skill_name/input_payload");
+      }
+      const payload = await fetchJson(`${resolvedApiSkillBaseUrl}/${encodeURIComponent(skillName)}/jobs`, {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({
+          input_payload: inputPayload,
+          source_type: "router_studio",
+          route_snapshot: state.routeSnapshot || null,
+        })
+      });
+      if (payload.job) {
+        upsertJob(payload.job, {
+          skill_name: skillName,
+          parent_step_id: launchable.step_id || "",
+        });
+        setStatus("ok", `已创建子任务 ${payload.job.job_id}`);
+      }
+      startPolling();
+    }
+
+    function renderLaunchables(items) {
+      state.launchables = Array.isArray(items) ? items : [];
+      const root = document.getElementById("launchList");
+      root.innerHTML = "";
+      if (!state.launchables.length) {
+        root.innerHTML = '<div class="subtle">当前没有可分步启动的子任务。</div>';
+        return;
+      }
+      state.launchables.forEach((item) => {
+        const node = document.createElement("div");
+        node.className = "launch-card";
+        const canLaunch = !item.launch_error && item.input_payload;
+        node.innerHTML = `
+          <div><strong>${String(item.step_id || "-")}</strong> · ${String(item.skill_name || "-")}</div>
+          <div class="subtle">${String(item.goal || "")}</div>
+          ${item.depends_on && item.depends_on.length ? `<div class="subtle">depends_on: ${item.depends_on.join(", ")}</div>` : ""}
+          ${item.launch_error ? `<div class="status show err">${String(item.launch_error)}</div>` : `<pre>${pretty({input_payload: item.input_payload || {}, tool_argument_plans: (item.skill_debug || {}).tool_argument_plans || []})}</pre>`}
+        `;
+        if (canLaunch) {
+          const btn = document.createElement("button");
+          btn.className = "btn primary";
+          btn.textContent = "启动这一步";
+          btn.addEventListener("click", async () => {
+            try { await launchStep(item); } catch (err) { setStatus("err", String(err.message || err)); }
+          });
+          node.appendChild(btn);
+        }
+        root.appendChild(node);
+      });
+    }
+
+    function renderJobs() {
+      const root = document.getElementById("jobList");
+      root.innerHTML = "";
+      if (!state.jobs.length) {
+        root.innerHTML = '<div class="subtle">当前还没有创建任务。</div>';
+        return;
+      }
+      state.jobs.forEach((job) => {
+        const node = document.createElement("div");
+        node.className = "job-card";
+        node.innerHTML = `
+          <div class="job-top">
+            <div class="job-title">${String(job.skill_name || job.task_type || "-")}</div>
+            <div class="chip">${String(job.status || "queued")}</div>
+          </div>
+          <div class="job-meta">
+            <span>${String(job.job_id || "-")}</span>
+            <span>${String(job.current_stage || "-")}</span>
+            <span>${Number(job.progress || 0).toFixed(0)}%</span>
+          </div>
+          <div class="job-links">
+            <a class="job-link" href="${window.location.origin}${appRoot}/tasks/${encodeURIComponent(job.job_id || "")}/view" target="_blank" rel="noopener">打开详情</a>
+            <a class="job-link" href="#" data-job-view="${String(job.job_id || "")}">内嵌查看</a>
+          </div>
+        `;
+        const viewLink = node.querySelector("[data-job-view]");
+        if (viewLink) {
+          viewLink.addEventListener("click", (event) => {
+            event.preventDefault();
+            document.getElementById("taskFrame").src = `${window.location.origin}${appRoot}/tasks/${encodeURIComponent(job.job_id || "")}/view`;
+          });
+        }
+        root.appendChild(node);
+      });
+    }
+
+    async function pollJobsOnce() {
+      if (!state.jobs.length) return;
+      const jobs = await Promise.all(state.jobs.map(async (job) => {
+        try {
+          const payload = await fetchJson(`${resolvedApiTaskBaseUrl}/${encodeURIComponent(job.job_id)}`, { cache: "no-store" });
+          return payload.job || job;
+        } catch (err) {
+          return {...job, poll_error: String(err.message || err)};
+        }
+      }));
+      state.jobs = jobs.map((job, index) => ({...state.jobs[index], ...job}));
+      renderJobs();
+    }
+
+    function startPolling() {
+      if (state.pollTimer) return;
+      state.pollTimer = window.setInterval(() => {
+        pollJobsOnce().catch((err) => setStatus("err", String(err.message || err)));
+      }, 2500);
+    }
+
+    document.getElementById("previewRouteBtn").addEventListener("click", async () => {
+      try { await previewRoute(); } catch (err) { setStatus("err", String(err.message || err)); }
+    });
+    document.getElementById("submitTaskBtn").addEventListener("click", async () => {
+      try { await submitTask(); } catch (err) { setStatus("err", String(err.message || err)); }
+    });
+
+    document.getElementById("userTextEditor").value = "请从行情、资金、研报、新闻和风险角度，对天孚通信做一份专业、克制的投顾式分析。";
+    document.getElementById("contextEditor").value = JSON.stringify({"name":"天孚通信","code":"300394"}, null, 2);
+    document.getElementById("executionProfileSelect").value = "real";
+    document.getElementById("toolArgumentPlanPreview").textContent = "{}";
+    renderJobs();
+    renderLaunchables([]);
+  </script>
+</body>
+</html>

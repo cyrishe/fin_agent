@@ -1,0 +1,227 @@
+{
+  "auth": "public",
+  "availability": {
+    "lifecycle": "active",
+    "retrieval_mode": "retrievable",
+    "visibility": "visible"
+  },
+  "capabilities": [
+    "indicator_series",
+    "indicator_query",
+    "offline_indicator"
+  ],
+  "defaults": {
+    "indicator_ids": [
+      "close_ma_5"
+    ],
+    "range_days": 30,
+    "subject_codes": [
+      "000001.SH"
+    ]
+  },
+  "identity": {
+    "description": "获取已计算好的指标时间序列。当前支持 close_ma_5、close_ma_10、close_ma_20。",
+    "display_name": "指标序列查询",
+    "domain": "market",
+    "owner": "tools"
+  },
+  "invocation_example": "indicator_series_query(indicator_ids=[\"close_ma_5\"], subject_codes=[\"000001.SH\"], range_days=30)",
+  "match_contract": {
+    "request_families": [
+      "data_access"
+    ],
+    "work_item_types": [
+      "tool"
+    ],
+    "capability_classes": [
+      "data_retrieval",
+      "indicator_series"
+    ],
+    "side_effect_level": "read_only"
+  },
+  "name": "indicator_series_query",
+  "post_process": {
+    "deterministic": {
+      "enabled": false,
+      "handler": ""
+    },
+    "llm": {
+      "enabled": false,
+      "prompt_key": ""
+    }
+  },
+  "profiles": {
+    "mock": {
+      "enabled": true,
+      "implementation": {
+        "kind": "inline_result"
+      },
+      "result": {
+        "data": [
+          {
+            "calc_mode": "calc_mode_示例",
+            "indicator_name": "indicator_name_示例",
+            "indicator_value": "indicator_value_示例",
+            "is_finalized": false,
+            "measure_name": "measure_name_示例",
+            "minute_index": "minute_index_示例",
+            "snapshot_time": "snapshot_time_示例",
+            "source_summary": "source_summary_示例",
+            "code": "subject_code_示例",
+            "name": "subject_name_示例",
+            "subject_type": "subject_type_示例",
+            "trade_date": "trade_date_示例",
+            "unit": "unit_示例",
+            "window_size": 0
+          }
+        ],
+        "error": "error_示例",
+        "meta": {
+          "indicator_ids": [
+            "indicator_ids_item_示例"
+          ],
+          "indicator_name": "indicator_name_示例",
+          "indicator_names": [
+            "indicator_names_item_示例"
+          ],
+          "range_days": 0,
+          "returned_points": 0,
+          "code": "subject_code_示例",
+          "subject_codes": [
+            "subject_codes_item_示例"
+          ],
+          "name": "subject_name_示例",
+          "subject_names": [
+            "subject_names_item_示例"
+          ],
+          "subject_type": "subject_type_示例"
+        },
+        "ok": false,
+        "series_map": {},
+        "tool": "indicator_series_query"
+      }
+    },
+    "real": {
+      "enabled": true,
+      "implementation": {
+        "kind": "python_callable",
+        "target": "src.tools.indicator_series_tool:run"
+      }
+    }
+  },
+  "retention": {
+    "drop_default": [],
+    "high_value_for_reasoning": [
+      "meta",
+      "series_map"
+    ],
+    "high_value_for_render": [
+      "series_map"
+    ],
+    "recommended_reducers": {
+      "data": "summarize_timeseries",
+      "series_map": "summarize_timeseries"
+    },
+    "usually_too_large_for_prompt": [
+      "data",
+      "series_map"
+    ]
+  },
+  "runtime_hints": {
+    "cost_class": "low",
+    "latency_class": "low",
+    "supports_async_submit": false,
+    "supports_stream": false
+  },
+  "safety": {
+    "network": false,
+    "persistence": false,
+    "side_effect": "none"
+  },
+  "schemas": {
+    "input": {
+      "$id": "indicator_series_query.input.schema.json",
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "indicator_ids": {
+          "type": "array",
+          "description": "指标 ID 列表。当前支持 close_ma_5、close_ma_10、close_ma_20。",
+          "items": {
+            "type": "string",
+            "enum": [
+              "close_ma_5",
+              "close_ma_10",
+              "close_ma_20"
+            ]
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "range_days": {
+          "type": "integer",
+          "description": "返回最近多少个交易日的数据点，默认 30。",
+          "minimum": 1,
+          "maximum": 365
+        },
+        "subject_codes": {
+          "type": "array",
+          "description": "主体标准代码列表，例如 [\"000001.SH\"] 或 [\"600519.SH\"]。",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1
+        }
+      },
+      "required": [
+        "indicator_ids"
+      ],
+      "type": "object"
+    },
+    "output": {
+      "$ref": "src/tools/schemas/indicator_series_query.schema.json"
+    }
+  },
+  "status": "active",
+  "tags": [
+    "market",
+    "indicator",
+    "series",
+    "database"
+  ],
+  "tests": {
+    "golden_cases": [],
+    "sample_inputs": [
+      {
+        "arguments": {
+          "indicator_ids": [
+            "close_ma_5",
+            "close_ma_20"
+          ],
+          "range_days": 30,
+          "subject_codes": [
+            "000001.SH"
+          ]
+        },
+        "name": "default_sh_index_ma"
+      }
+    ]
+  },
+  "ui_hints": {
+    "editable_sections": [
+      "identity",
+      "schemas.input",
+      "schemas.output",
+      "capabilities",
+      "profiles",
+      "retention",
+      "post_process",
+      "tests"
+    ]
+  },
+  "version": "v1",
+  "subject_tags": [
+    "general"
+  ],
+  "tool_priority": 1
+}

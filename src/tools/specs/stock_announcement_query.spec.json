@@ -1,0 +1,51 @@
+{
+  "best_for": [
+    "用于查询单只股票的交易所公告和披露记录。",
+    "输入 stock 表示股票代码、简称或公司名称。",
+    "可按公告日期范围和关键词过滤，默认返回最近公告。",
+    "该工具只返回公告元数据和可选截断正文，不做事件判断或投资结论。"
+  ],
+  "input_guidance": {
+    "optional_fields": [
+      "start_date",
+      "end_date",
+      "keyword",
+      "limit",
+      "include_text",
+      "max_text_chars"
+    ],
+    "required_fields": [
+      "stock"
+    ]
+  },
+  "invocation_example": "stock_announcement_query(stock=\"600519.SH\", limit=20)",
+  "output_guidance": {
+    "drop_default": [],
+    "field_policies": {
+      "data.items": {
+        "strategy": "auto"
+      },
+      "data.code": {
+        "strategy": "prompt_full"
+      },
+      "data.name": {
+        "strategy": "prompt_full"
+      }
+    },
+    "high_value_for_reasoning": [
+      "data.code",
+      "data.name",
+      "data.items"
+    ],
+    "high_value_for_render": [],
+    "recommended_reducers": {
+      "data.items": "summarize_news_list"
+    },
+    "usually_too_large_for_prompt": [
+      "data.items[*].text",
+      "data.items[*].snippet"
+    ]
+  },
+  "purpose": "查询单只股票的交易所公告和披露记录。",
+  "tool_name": "stock_announcement_query"
+}

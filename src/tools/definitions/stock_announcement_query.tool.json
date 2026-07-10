@@ -1,0 +1,200 @@
+{
+  "auth": "public",
+  "availability": {
+    "lifecycle": "active",
+    "retrieval_mode": "retrievable",
+    "visibility": "visible"
+  },
+  "capabilities": [
+    "stock_announcement",
+    "company_disclosure",
+    "announcement_lookup"
+  ],
+  "defaults": {
+    "limit": 20,
+    "include_text": false,
+    "max_text_chars": 500
+  },
+  "identity": {
+    "description": "查询单只股票的交易所公告和披露记录。输入 stock 表示股票代码、简称或公司名称。可按公告日期范围和关键词过滤，默认返回最近公告。该工具只返回公告元数据和可选截断正文，不做事件判断或投资结论。",
+    "display_name": "股票公告查询",
+    "domain": "news",
+    "owner": "tools"
+  },
+  "invocation_example": "stock_announcement_query(stock=\"600519.SH\", limit=20)",
+  "match_contract": {
+    "request_families": [
+      "data_access"
+    ],
+    "work_item_types": [
+      "tool"
+    ],
+    "capability_classes": [
+      "data_retrieval",
+      "announcement_lookup"
+    ],
+    "side_effect_level": "read_only"
+  },
+  "name": "stock_announcement_query",
+  "post_process": {
+    "deterministic": {
+      "enabled": false,
+      "handler": ""
+    },
+    "llm": {
+      "enabled": false,
+      "prompt_key": ""
+    }
+  },
+  "profiles": {
+    "mock": {
+      "enabled": true,
+      "implementation": {
+        "kind": "inline_result"
+      },
+      "result": {
+        "tool": "stock_announcement_query",
+        "ok": true,
+        "data": {
+          "stock": "600519.SH",
+          "code": "600519.SH",
+          "name": "贵州茅台",
+          "filters": {
+            "start_date": "",
+            "end_date": "",
+            "keyword": "",
+            "include_text": false
+          },
+          "items": []
+        },
+        "error": ""
+      }
+    },
+    "real": {
+      "enabled": true,
+      "implementation": {
+        "kind": "python_callable",
+        "target": "src.tools.stock_announcement_query_tool:run"
+      }
+    }
+  },
+  "retention": {
+    "drop_default": [],
+    "high_value_for_reasoning": [
+      "data.code",
+      "data.name",
+      "data.items"
+    ],
+    "high_value_for_render": [],
+    "recommended_reducers": {
+      "data.items": "summarize_news_list"
+    },
+    "usually_too_large_for_prompt": [
+      "data.items[*].text",
+      "data.items[*].snippet"
+    ]
+  },
+  "runtime_hints": {
+    "cost_class": "low",
+    "latency_class": "low",
+    "supports_async_submit": false,
+    "supports_stream": false
+  },
+  "safety": {
+    "network": true,
+    "persistence": false,
+    "side_effect": "none"
+  },
+  "schemas": {
+    "input": {
+      "$id": "stock_announcement_query.input.schema.json",
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "stock": {
+          "description": "股票代码、股票简称或公司名称。",
+          "type": "string"
+        },
+        "start_date": {
+          "description": "公告起始日期，YYYY-MM-DD。",
+          "type": "string"
+        },
+        "end_date": {
+          "description": "公告截止日期，YYYY-MM-DD；为空时取最近公告。",
+          "type": "string"
+        },
+        "keyword": {
+          "description": "标题或正文关键词过滤。",
+          "type": "string"
+        },
+        "limit": {
+          "description": "返回公告条数，默认 20。",
+          "minimum": 1,
+          "maximum": 200,
+          "type": "integer"
+        },
+        "include_text": {
+          "description": "是否返回截断公告正文，默认 false。",
+          "type": "boolean"
+        },
+        "max_text_chars": {
+          "description": "include_text=true 时返回正文最大字符数。",
+          "minimum": 80,
+          "maximum": 5000,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "stock"
+      ],
+      "type": "object"
+    },
+    "output": {
+      "$ref": "src/tools/schemas/stock_announcement_query.schema.json"
+    }
+  },
+  "status": "active",
+  "tags": [
+    "stock",
+    "announcement",
+    "disclosure",
+    "news"
+  ],
+  "tests": {
+    "golden_cases": [],
+    "sample_inputs": [
+      {
+        "name": "stock_announcement_default",
+        "arguments": {
+          "stock": "600519.SH",
+          "limit": 20
+        }
+      },
+      {
+        "name": "stock_announcement_keyword",
+        "arguments": {
+          "stock": "贵州茅台",
+          "keyword": "回购",
+          "limit": 10
+        }
+      }
+    ]
+  },
+  "ui_hints": {
+    "editable_sections": [
+      "identity",
+      "schemas.input",
+      "schemas.output",
+      "capabilities",
+      "profiles",
+      "retention",
+      "post_process",
+      "tests"
+    ]
+  },
+  "version": "v1",
+  "subject_tags": [
+    "stock"
+  ],
+  "tool_priority": 1
+}

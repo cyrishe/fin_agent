@@ -1,0 +1,97 @@
+{
+  "auth": "public",
+  "availability": {
+    "lifecycle": "retired",
+    "retrieval_mode": "direct_only",
+    "visibility": "hidden"
+  },
+  "capabilities": [
+    "hot_concepts",
+    "concept_leaders",
+    "taxonomy_snapshot"
+  ],
+  "defaults": {},
+  "identity": {
+    "description": "获取当前市场的热点概念及对应龙头股列表。\n热点概念是最热最新的一种时效性的、动态的分类",
+    "display_name": "热点概念与概念龙头",
+    "domain": "market",
+    "owner": "tools"
+  },
+  "invocation_example": "get_hot_concepts_and_leaders()",
+  "match_contract": {
+    "request_families": [
+      "data_access"
+    ],
+    "work_item_types": [
+      "tool"
+    ],
+    "capability_classes": [
+      "data_retrieval",
+      "taxonomy_lookup",
+      "market_screening"
+    ],
+    "side_effect_level": "read_only"
+  },
+  "name": "get_hot_concepts_and_leaders",
+  "enabled": false,
+  "profiles": {
+    "mock": {
+      "enabled": false,
+      "implementation": {
+        "kind": "inline_result"
+      },
+      "result": {
+        "data": [
+          {
+            "concept": "concept_示例",
+            "event_summary": "event_summary_示例",
+            "hotness": 0,
+            "leaders": [
+              null
+            ]
+          }
+        ],
+        "error": "error_示例",
+        "ok": false,
+        "tool": "get_hot_concepts_and_leaders"
+      }
+    },
+    "real": {
+      "enabled": true,
+      "implementation": {
+        "kind": "python_callable",
+        "target": "src.tools.mock_market_taxonomy_tools:get_hot_concepts_and_leaders"
+      }
+    }
+  },
+  "retention": {},
+  "safety": {
+    "network": false,
+    "persistence": false,
+    "side_effect": "read_only"
+  },
+  "schemas": {
+    "input": {
+      "$id": "get_hot_concepts_and_leaders.input.schema.json",
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {},
+      "required": [],
+      "type": "object"
+    },
+    "output": {
+      "$ref": "src/tools/schemas/hot_theme_leaders_simple.schema.json"
+    }
+  },
+  "status": "retired",
+  "tags": [
+    "concept",
+    "leaders",
+    "hotspot"
+  ],
+  "version": "v1",
+  "subject_tags": [
+    "plate"
+  ],
+  "tool_priority": 1
+}

@@ -1,0 +1,207 @@
+{
+  "name": "quant_data_provider",
+  "version": "v1",
+  "status": "active",
+  "availability": {
+    "lifecycle": "active",
+    "retrieval_mode": "retrievable"
+  },
+  "identity": {
+    "display_name": "量化选股数据 Provider",
+    "description": "按股票池和数据需求准备量化选股数据 artifact。",
+    "domain": "quant_screening",
+    "owner": "tools"
+  },
+  "match_contract": {
+    "request_families": [
+      "data_access"
+    ],
+    "work_item_types": [
+      "tool"
+    ],
+    "capability_classes": [
+      "data_retrieval",
+      "quant_data_provider",
+      "file_or_table_artifact"
+    ],
+    "side_effect_level": "write"
+  },
+  "capabilities": [
+    "quant_data_provider",
+    "dbinfo_registry",
+    "table_artifact",
+    "bounded_preview",
+    "data_coverage"
+  ],
+  "tags": [
+    "quant",
+    "screening",
+    "dbinfo",
+    "artifact",
+    "market_data",
+    "fundamental_data"
+  ],
+  "schemas": {
+    "input": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "quant_data_provider.input.schema.json",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "universe",
+        "required_data"
+      ],
+      "properties": {
+        "universe": {
+          "description": "股票池，支持 6 位代码、交易所后缀代码或包含 code/stk_code 的对象列表。",
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "array"
+            },
+            {
+              "type": "object"
+            }
+          ]
+        },
+        "date_range": {
+          "type": "object",
+          "description": "交易日窗口。",
+          "additionalProperties": true,
+          "properties": {
+            "start": {
+              "type": "string"
+            },
+            "end": {
+              "type": "string"
+            }
+          }
+        },
+        "report_period": {
+          "type": "object",
+          "description": "财务报告期窗口，支持 YYYYQn、YYYYMMDD 或 YYYY-MM-DD。",
+          "additionalProperties": true,
+          "properties": {
+            "start": {
+              "type": "string"
+            },
+            "end": {
+              "type": "string"
+            }
+          }
+        },
+        "required_data": {
+          "type": "array",
+          "description": "需要准备的数据源。",
+          "items": {
+            "type": "string",
+            "enum": [
+              "universe",
+              "daily_price",
+              "minute_price",
+              "moneyflow",
+              "valuation",
+              "financial_indicator",
+              "cashflow",
+              "concept_signal",
+              "news"
+            ]
+          }
+        },
+        "max_preview_rows": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100,
+          "default": 50
+        }
+      }
+    },
+    "output": {
+      "$ref": "src/tools/schemas/quant_data_provider.schema.json"
+    }
+  },
+  "profiles": {
+    "real": {
+      "enabled": true,
+      "implementation": {
+        "kind": "python_callable",
+        "target": "src.tools.quant_data_provider_tool:run"
+      }
+    },
+    "mock": {
+      "enabled": false,
+      "implementation": {
+        "kind": "inline_result"
+      }
+    }
+  },
+  "retention": {
+    "high_value_for_reasoning": [
+      "data.artifacts",
+      "data.data_coverage",
+      "data.source_coverage",
+      "data.schemas",
+      "data.samples"
+    ],
+    "high_value_for_render": [],
+    "usually_too_large_for_prompt": [
+      "data.samples"
+    ],
+    "drop_default": [],
+    "recommended_reducers": {
+      "data.artifacts": "summarize_table_artifacts",
+      "data.source_coverage": "summarize_coverage"
+    }
+  },
+  "safety": {
+    "network": false,
+    "persistence": true,
+    "side_effect": "write_runtime_artifact"
+  },
+  "runtime_hints": {
+    "cost_class": "medium",
+    "latency_class": "medium",
+    "supports_stream": false,
+    "supports_async_submit": false
+  },
+  "tests": {
+    "sample_inputs": [
+      {
+        "name": "daily_price_gap_safe_default",
+        "arguments": {
+          "universe": [
+            "600000",
+            "000001.SZ"
+          ],
+          "date_range": {
+            "start": "2026-05-29",
+            "end": "2026-05-29"
+          },
+          "required_data": [
+            "daily_price"
+          ],
+          "max_preview_rows": 5
+        }
+      }
+    ]
+  },
+  "ui_hints": {
+    "editable_sections": [
+      "identity",
+      "schemas.input",
+      "schemas.output",
+      "retention",
+      "tests"
+    ]
+  },
+  "auth": "internal",
+  "subject_tags": [
+    "stock",
+    "fund",
+    "plate",
+    "index"
+  ],
+  "tool_priority": 1
+}

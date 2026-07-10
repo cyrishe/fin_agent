@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "file_read_word.schema.json",
+  "title": "Word File Read Output",
+  "type": "object",
+  "required": [
+    "tool",
+    "ok",
+    "data",
+    "error"
+  ],
+  "properties": {
+    "tool": {
+      "const": "file_read_word"
+    },
+    "ok": {
+      "type": "boolean"
+    },
+    "data": {
+      "type": "object",
+      "properties": {
+        "file_meta": {
+          "type": "object"
+        },
+        "document": {
+          "type": "object"
+        }
+      },
+      "additionalProperties": true
+    },
+    "error": {
+      "type": "string"
+    },
+    "meta": {
+      "type": "object"
+    }
+  },
+  "additionalProperties": true
+}

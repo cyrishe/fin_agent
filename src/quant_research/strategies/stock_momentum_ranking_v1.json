@@ -1,0 +1,34 @@
+{
+  "strategy_id": "stock_momentum_ranking",
+  "version": "v1",
+  "display_name": "Stock Momentum Ranking",
+  "universe": {"type": "all_a_share"},
+  "date_policy": {
+    "anchor": "latest_trade_date",
+    "frequency": "daily"
+  },
+  "filters": [],
+  "factors": [
+    {
+      "factor_id": "price_volume_momentum",
+      "weight": 1.0,
+      "params": {"window": 5}
+    }
+  ],
+  "ranking": {
+    "method": "factor_value",
+    "primary_factor": "price_volume_momentum",
+    "sort": "desc",
+    "top_n": 30
+  },
+  "output": {
+    "columns": ["rank", "stock_code", "stock_name", "momentum_value", "price_change_ratio", "avg_amount_wan"],
+    "artifact_kind": "StrategyRun"
+  },
+  "risk_notes": [
+    "For intraday use, realtime amount source and snapshot_time must be recorded.",
+    "For daily final use, strategy result should be reproducible from stock_daily_kline."
+  ],
+  "status": "draft",
+  "tags": ["momentum", "ranking", "stock"]
+}

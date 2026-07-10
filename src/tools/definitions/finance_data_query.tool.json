@@ -1,0 +1,123 @@
+{
+  "auth": "public",
+  "availability": {
+    "lifecycle": "active",
+    "retrieval_mode": "retrievable",
+    "visibility": "visible"
+  },
+  "capabilities": [
+    "finance_data_protocol",
+    "subject_dataview_function_gateway",
+    "protocol_request_execution"
+  ],
+  "identity": {
+    "description": "金融数据查询顶层工具。执行 subject/dataview/function 协议请求串，内部由金融数据 catalog、validator 和 provider 处理。",
+    "display_name": "金融数据协议查询",
+    "domain": "finance_data",
+    "owner": "tools"
+  },
+  "invocation_example": "finance_data_query(request=\"r1 = stock.quote(filter = \\\"code = 600519.SH\\\", order = \\\"tradedate desc\\\", limit = 1) -> code, name, tradedate, close, pct\")",
+  "match_contract": {
+    "request_families": [
+      "data_access"
+    ],
+    "work_item_types": [
+      "tool"
+    ],
+    "capability_classes": [
+      "data_retrieval",
+      "protocol_data_gateway"
+    ],
+    "side_effect_level": "read_only"
+  },
+  "name": "finance_data_query",
+  "profiles": {
+    "mock": {
+      "enabled": true,
+      "implementation": {
+        "kind": "inline_result"
+      },
+      "result": {
+        "tool": "finance_data_query",
+        "ok": true,
+        "data": {
+          "protocol": "finance_data_tool.v1",
+          "request": "",
+          "validation": {
+            "ok": true,
+            "errors": [],
+            "warnings": []
+          },
+          "result": null
+        },
+        "error": ""
+      }
+    },
+    "real": {
+      "enabled": true,
+      "implementation": {
+        "kind": "python_callable",
+        "target": "src.tools.finance_data_query_tool:run"
+      }
+    }
+  },
+  "runtime_hints": {
+    "cost_class": "low",
+    "latency_class": "medium",
+    "supports_async_submit": false,
+    "supports_stream": false
+  },
+  "safety": {
+    "network": true,
+    "persistence": false,
+    "side_effect": "none"
+  },
+  "schemas": {
+    "input": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "finance_data_query.input.schema.json",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "request"
+      ],
+      "properties": {
+        "request": {
+          "type": "string",
+          "description": "一条已通过阶段二生成的金融数据协议请求串，例如 r1 = stock.quote(...) -> code, name。"
+        }
+      }
+    },
+    "output": {
+      "$ref": "src/tools/schemas/finance_data_query.schema.json"
+    }
+  },
+  "status": "active",
+  "tags": [
+    "finance_data",
+    "protocol",
+    "subject_dataview_function"
+  ],
+  "tests": {
+    "golden_cases": [],
+    "sample_inputs": [
+      {
+        "name": "stock_quote_latest",
+        "arguments": {
+          "request": "r1 = stock.quote(filter = \"code = 600519.SH\", order = \"tradedate desc\", limit = 1) -> code, name, tradedate, close, pct"
+        }
+      }
+    ]
+  },
+  "version": "v1",
+  "subject_tags": [
+    "stock",
+    "fund",
+    "bond",
+    "industry",
+    "plate",
+    "index",
+    "hot_event"
+  ],
+  "tool_priority": 1
+}

@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "stock_protocol_data_query.output.schema.json",
+  "type": "object",
+  "required": ["protocol", "request", "catalog_entry", "data"],
+  "properties": {
+    "protocol": {
+      "type": "string"
+    },
+    "request": {
+      "type": "object"
+    },
+    "catalog_entry": {
+      "type": "object"
+    },
+    "data": {
+      "type": "object"
+    }
+  },
+  "additionalProperties": true
+}

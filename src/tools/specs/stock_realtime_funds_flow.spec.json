@@ -1,0 +1,86 @@
+{
+  "best_for": [
+    "确认单只股票实时资金强弱",
+    "观察四档资金净流入分布",
+    "从资金流层面观察当前股票的市场主力是买入还是卖出为主"
+  ],
+  "input_guidance": {
+    "optional_fields": [],
+    "required_fields": [
+      "name"
+    ]
+  },
+  "invocation_example": "stock_realtime_funds_flow(name=\"贵州茅台\")",
+  "output_guidance": {
+    "drop_default": [],
+    "field_policies": {
+      "data.code": {
+        "strategy": "prompt_full"
+      },
+      "data.funds": {
+        "strategy": "prompt_full"
+      },
+      "data.funds.large": {
+        "strategy": "auto"
+      },
+      "data.funds.large.inflow_wan": {
+        "strategy": "auto"
+      },
+      "data.funds.large.net_inflow_wan": {
+        "strategy": "auto"
+      },
+      "data.funds.large.outflow_wan": {
+        "strategy": "auto"
+      },
+      "data.funds.medium": {
+        "strategy": "auto"
+      },
+      "data.funds.medium.inflow_wan": {
+        "strategy": "auto"
+      },
+      "data.funds.medium.net_inflow_wan": {
+        "strategy": "auto"
+      },
+      "data.funds.medium.outflow_wan": {
+        "strategy": "auto"
+      },
+      "data.funds.small": {
+        "strategy": "auto"
+      },
+      "data.funds.small.inflow_wan": {
+        "strategy": "auto"
+      },
+      "data.funds.small.net_inflow_wan": {
+        "strategy": "auto"
+      },
+      "data.funds.small.outflow_wan": {
+        "strategy": "auto"
+      },
+      "data.funds.super_large": {
+        "strategy": "auto"
+      },
+      "data.funds.super_large.inflow_wan": {
+        "strategy": "auto"
+      },
+      "data.funds.super_large.net_inflow_wan": {
+        "strategy": "auto"
+      },
+      "data.funds.super_large.outflow_wan": {
+        "strategy": "auto"
+      },
+      "data.name": {
+        "strategy": "prompt_full"
+      }
+    },
+    "high_value_for_reasoning": [
+      "data.code",
+      "data.funds",
+      "data.name"
+    ],
+    "high_value_for_render": [],
+    "recommended_reducers": {},
+    "usually_too_large_for_prompt": []
+  },
+  "purpose": "输入个股名称或代码，查询当前资金流入流出，按特大单、大单、中单、小单四档返回。适合做单只股票的实时资金确认。",
+  "tool_name": "stock_realtime_funds_flow"
+}

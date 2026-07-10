@@ -1,0 +1,16 @@
+{
+  "prompt_key": "system.agent_runtime.planner",
+  "layer": "system",
+  "owner": "agent_runtime",
+  "version": "v4",
+  "messages": [
+    {
+      "role": "system",
+      "template_path": "agent_runtime.planner.system.md"
+    },
+    {
+      "role": "user",
+      "template": "user_objective:\n$user_objective\n\ncandidate_tools_summary:\n$candidate_tools_summary\n\ncandidate_skills_summary:\n$candidate_skills_summary"
+    }
+  ]
+}

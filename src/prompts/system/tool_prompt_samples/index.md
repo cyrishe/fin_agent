@@ -1,0 +1,16 @@
+- equity_research_search: src/prompts/system/tool_prompt_samples/equity_research_search.sample.md
+- financial_news_search: src/prompts/system/tool_prompt_samples/financial_news_search.sample.md
+- get_company_taxonomy_profile: src/prompts/system/tool_prompt_samples/get_company_taxonomy_profile.sample.md
+- get_hot_concepts_and_leaders: src/prompts/system/tool_prompt_samples/get_hot_concepts_and_leaders.sample.md
+- get_hot_industries_and_leaders: src/prompts/system/tool_prompt_samples/get_hot_industries_and_leaders.sample.md
+- get_hot_sectors_and_leaders: src/prompts/system/tool_prompt_samples/get_hot_sectors_and_leaders.sample.md
+- indicator_series_query: src/prompts/system/tool_prompt_samples/indicator_series_query.sample.md
+- stock_funds: src/prompts/system/tool_prompt_samples/stock_funds.sample.md
+- stock_quote: src/prompts/system/tool_prompt_samples/stock_quote.sample.md
+- theme_leaders: src/prompts/system/tool_prompt_samples/theme_leaders.sample.md
+- 个股动量排名: src/prompts/system/tool_prompt_samples/个股动量排名.sample.md
+- 大盘情绪指标: src/prompts/system/tool_prompt_samples/大盘情绪指标.sample.md
+- 大盘整体情况: src/prompts/system/tool_prompt_samples/大盘整体情况.sample.md
+- 实时个股动量排名: src/prompts/system/tool_prompt_samples/实时个股动量排名.sample.md
+- 实时行情排名查询: src/prompts/system/tool_prompt_samples/实时行情排名查询.sample.md
+- 涨跌停列表查询: src/prompts/system/tool_prompt_samples/涨跌停列表查询.sample.md

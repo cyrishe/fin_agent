@@ -1,0 +1,75 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "market_minute_amount_series.schema.json",
+  "title": "市场分钟成交额序列 Output",
+  "type": "object",
+  "required": [
+    "tool",
+    "ok",
+    "data",
+    "error"
+  ],
+  "properties": {
+    "data": {
+      "type": "object",
+      "required": [
+        "market",
+        "minute_index",
+        "series",
+        "snapshot_time",
+        "trade_date"
+      ],
+      "properties": {
+        "market": {
+          "description": "市场范围。",
+          "type": "string"
+        },
+        "minute_index": {
+          "description": "当前分钟索引。",
+          "type": "integer"
+        },
+        "series": {
+          "description": "当前分钟和近几日同分钟位置的累计成交额序列。",
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "date": {
+                "description": "日期。",
+                "type": "string"
+              },
+              "total_amount": {
+                "description": "截至该分钟的累计成交额。",
+                "type": "number"
+              }
+            },
+            "required": [
+              "date",
+              "total_amount"
+            ],
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "snapshot_time": {
+          "description": "当前快照时间。",
+          "type": "string"
+        },
+        "trade_date": {
+          "description": "当前交易日。",
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "error": {
+      "type": "string"
+    },
+    "ok": {
+      "type": "boolean"
+    },
+    "tool": {
+      "const": "market_minute_amount_series"
+    }
+  },
+  "additionalProperties": true
+}

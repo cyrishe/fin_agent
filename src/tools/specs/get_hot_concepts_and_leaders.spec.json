@@ -1,0 +1,53 @@
+{
+  "best_for": [
+    "用于查询当前市场的热点概念，并给出热点概念相关的事件热点，以及该热点近期的龙头股票"
+  ],
+  "input_guidance": {
+    "optional_fields": [],
+    "required_fields": []
+  },
+  "invocation_example": "get_hot_concepts_and_leaders()",
+  "output_guidance": {
+    "drop_default": [],
+    "field_policies": {
+      "data.[]": {
+        "strategy": "auto"
+      },
+      "data.[].concept": {
+        "strategy": "auto"
+      },
+      "data.[].event_summary": {
+        "strategy": "auto"
+      },
+      "data.[].hotness": {
+        "strategy": "auto"
+      },
+      "data.[].leaders": {
+        "strategy": "auto"
+      },
+      "data.concept": {
+        "strategy": "prompt_full"
+      },
+      "data.event_summary": {
+        "strategy": "prompt_full"
+      },
+      "data.hotness": {
+        "strategy": "prompt_full"
+      },
+      "data.leaders": {
+        "strategy": "prompt_full"
+      }
+    },
+    "high_value_for_reasoning": [
+      "data.concept",
+      "data.event_summary",
+      "data.hotness",
+      "data.leaders"
+    ],
+    "high_value_for_render": [],
+    "recommended_reducers": {},
+    "usually_too_large_for_prompt": []
+  },
+  "purpose": "获取当前市场的热点概念及对应龙头股列表。\n热点概念是最热最新的一种时效性的、动态的分类",
+  "tool_name": "get_hot_concepts_and_leaders"
+}

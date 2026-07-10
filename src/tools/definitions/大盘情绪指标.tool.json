@@ -1,0 +1,161 @@
+{
+  "auth": "public",
+  "availability": {
+    "lifecycle": "disabled",
+    "retrieval_mode": "direct_only",
+    "visibility": "hidden"
+  },
+  "capabilities": [
+    "market_sentiment",
+    "bpwl_brwl_ratio"
+  ],
+  "defaults": {
+    "lookback_days": "20",
+    "ma_window": "5",
+    "top_n": "20"
+  },
+  "identity": {
+    "description": "基于全市场历史K线计算大盘情绪轮动比，当前只输出 bpwl_brwl_ratio，并附带固定说明文本。",
+    "display_name": "大盘情绪指标",
+    "domain": "market",
+    "owner": "tools"
+  },
+  "invocation_example": "大盘情绪指标(lookback_days=20, ma_window=5, top_n=20)",
+  "name": "大盘情绪指标",
+  "post_process": {
+    "deterministic": {
+      "enabled": false,
+      "handler": ""
+    },
+    "llm": {
+      "enabled": false,
+      "prompt_key": ""
+    }
+  },
+  "profiles": {
+    "mock": {
+      "enabled": false,
+      "implementation": {
+        "kind": "inline_result"
+      },
+      "result": {
+        "data": [
+          {
+            "index_desc": "index_desc_示例",
+            "name": "index_name_示例",
+            "index_value": "index_value_示例"
+          }
+        ],
+        "error": "error_示例",
+        "ok": false,
+        "tool": "大盘情绪指标"
+      }
+    },
+    "real": {
+      "enabled": false,
+      "implementation": {
+        "kind": "python_callable",
+        "target": "src.tools.market_sentiment_indicator_tool:run"
+      }
+    }
+  },
+  "retention": {
+    "drop_default": [],
+    "high_value_for_reasoning": [
+      "data"
+    ],
+    "high_value_for_render": [
+      "data"
+    ],
+    "recommended_reducers": {},
+    "usually_too_large_for_prompt": []
+  },
+  "runtime_hints": {
+    "cost_class": "medium",
+    "latency_class": "medium",
+    "supports_async_submit": false,
+    "supports_stream": false
+  },
+  "safety": {
+    "network": false,
+    "persistence": false,
+    "side_effect": "none"
+  },
+  "schemas": {
+    "input": {
+      "$id": "大盘情绪指标.input.schema.json",
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "end_date": {
+          "type": "string",
+          "description": "当 history_kline 为空时，用于数据库兜底取数的结束日期，格式 YYYY-MM-DD"
+        },
+        "history_kline": {
+          "type": "array",
+          "description": "全市场历史K线矩阵，格式为 [[code, date, open, close, high, low, vol, amount], ...]"
+        },
+        "lookback_days": {
+          "type": "integer",
+          "description": "窗口长度，默认 20"
+        },
+        "ma_window": {
+          "type": "integer",
+          "description": "平滑均线窗口，默认 5"
+        },
+        "top_n": {
+          "type": "integer",
+          "description": "强弱股取样数量，默认 20"
+        }
+      },
+      "required": [],
+      "type": "object"
+    },
+    "output": {
+      "$ref": "src/tools/schemas/大盘情绪指标.schema.json"
+    }
+  },
+  "status": "disabled",
+  "tags": [
+    "market",
+    "sentiment",
+    "database"
+  ],
+  "tests": {
+    "golden_cases": [],
+    "sample_inputs": [
+      {
+        "arguments": {
+          "lookback_days": 20,
+          "ma_window": 5,
+          "top_n": 20
+        },
+        "name": "db_fallback_default"
+      }
+    ]
+  },
+  "ui_hints": {
+    "editable_sections": [
+      "identity",
+      "schemas.input",
+      "schemas.output",
+      "capabilities",
+      "profiles",
+      "retention",
+      "post_process",
+      "tests"
+    ]
+  },
+  "version": "v1",
+  "enabled": false,
+  "retrieval": {
+    "mode": "direct_only",
+    "visibility": "hidden"
+  },
+  "visibility": "hidden",
+  "deprecation_note": "大盘情绪指标属于高级计算能力，先从基础行情工具和 DSL/Agent 组合中生成。",
+  "subject_tags": [
+    "general"
+  ],
+  "tool_priority": 1
+}

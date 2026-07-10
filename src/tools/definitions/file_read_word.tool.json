@@ -1,0 +1,136 @@
+{
+  "name": "file_read_word",
+  "version": "v1",
+  "status": "retired",
+  "availability": {
+    "lifecycle": "retired",
+    "retrieval_mode": "direct_only",
+    "visibility": "hidden"
+  },
+  "identity": {
+    "display_name": "Word 文件读取",
+    "description": "读取 Word docx 文档并返回标题、段落和预览文本。",
+    "domain": "file_intake",
+    "owner": "tools"
+  },
+  "match_contract": {
+    "request_families": [
+      "data_access"
+    ],
+    "work_item_types": [
+      "tool"
+    ],
+    "capability_classes": [
+      "data_retrieval",
+      "file_or_table_artifact"
+    ],
+    "side_effect_level": "write"
+  },
+  "capabilities": [
+    "file_intake",
+    "word_read",
+    "document_artifact",
+    "bounded_preview"
+  ],
+  "tags": [
+    "file",
+    "word",
+    "docx",
+    "document",
+    "artifact"
+  ],
+  "schemas": {
+    "input": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "file_read_word.input.schema.json",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "file_id"
+      ],
+      "properties": {
+        "file_id": {
+          "type": "string",
+          "description": "上传文件 id 或 runtime://artifact/<opaque_id>。禁止传 path、absolute_path 或 storage_path。"
+        },
+        "extract_tables": {
+          "type": "boolean",
+          "default": true
+        },
+        "max_chars": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 200000,
+          "default": 50000
+        }
+      }
+    },
+    "output": {
+      "$ref": "src/tools/schemas/file_read_word.schema.json"
+    }
+  },
+  "profiles": {
+    "real": {
+      "enabled": true,
+      "implementation": {
+        "kind": "python_callable",
+        "target": "src.tools.file_intake_tools:run_word"
+      }
+    },
+    "mock": {
+      "enabled": false,
+      "implementation": {
+        "kind": "inline_result"
+      }
+    }
+  },
+  "retention": {
+    "high_value_for_reasoning": [
+      "data.file_meta",
+      "data.document.text_artifact_ref"
+    ],
+    "high_value_for_render": [],
+    "usually_too_large_for_prompt": [
+      "data.document.paragraphs",
+      "data.document.tables"
+    ],
+    "drop_default": [],
+    "recommended_reducers": {}
+  },
+  "safety": {
+    "network": false,
+    "persistence": true,
+    "side_effect": "write_runtime_artifact"
+  },
+  "runtime_hints": {
+    "cost_class": "low",
+    "latency_class": "medium",
+    "supports_stream": false,
+    "supports_async_submit": false
+  },
+  "tests": {
+    "sample_inputs": [
+      {
+        "name": "uploaded_docx",
+        "arguments": {
+          "file_id": "att_example",
+          "max_chars": 5000
+        }
+      }
+    ]
+  },
+  "ui_hints": {
+    "editable_sections": [
+      "identity",
+      "schemas.input",
+      "schemas.output",
+      "retention",
+      "tests"
+    ]
+  },
+  "auth": "public",
+  "subject_tags": [
+    "general"
+  ],
+  "tool_priority": 1
+}

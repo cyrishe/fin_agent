@@ -1,0 +1,88 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "equity_research_search.schema.json",
+  "title": "Equity Research Search Output",
+  "type": "object",
+  "required": [
+    "tool",
+    "ok",
+    "data",
+    "error"
+  ],
+  "properties": {
+    "data": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "analyst",
+          "institution",
+          "publish_time",
+          "report_type",
+          "site",
+          "snippet",
+          "stock_code",
+          "stock_name",
+          "title",
+          "url"
+        ],
+        "properties": {
+          "analyst": {
+            "description": "分析师",
+            "type": "string"
+          },
+          "institution": {
+            "description": "发布机构",
+            "type": "string"
+          },
+          "publish_time": {
+            "description": "发布时间",
+            "type": "string"
+          },
+          "report_type": {
+            "description": "研报类型",
+            "type": "string"
+          },
+          "site": {
+            "description": "来源站点",
+            "type": "string"
+          },
+          "snippet": {
+            "description": "研报摘要",
+            "type": "string"
+          },
+          "stock_code": {
+            "description": "股票代码",
+            "type": "string"
+          },
+          "stock_name": {
+            "description": "股票名称",
+            "type": "string"
+          },
+          "title": {
+            "description": "研报标题",
+            "type": "string"
+          },
+          "url": {
+            "description": "研报链接",
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "error": {
+      "description": "错误信息，成功时为空",
+      "type": "string"
+    },
+    "ok": {
+      "description": "执行是否成功",
+      "type": "boolean"
+    },
+    "tool": {
+      "const": "equity_research_search",
+      "description": "工具标识"
+    }
+  },
+  "additionalProperties": false
+}

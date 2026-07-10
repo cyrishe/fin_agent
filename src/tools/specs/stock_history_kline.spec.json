@@ -1,0 +1,67 @@
+{
+  "best_for": [
+    "查看最近N天历史日K",
+    "分析日线趋势和形态"
+  ],
+  "input_guidance": {
+    "optional_fields": [
+      "days"
+    ],
+    "required_fields": [
+      "name"
+    ]
+  },
+  "invocation_example": "stock_history_kline(name=\"贵州茅台\", days=60)",
+  "output_guidance": {
+    "drop_default": [],
+    "field_policies": {
+      "data.code": {
+        "strategy": "prompt_full"
+      },
+      "data.daily_kline": {
+        "strategy": "render",
+        "render_type": "kline"
+      },
+      "data.daily_kline.candles": {
+        "strategy": "prompt_summary",
+        "summary_prompt": "请用中文概括字段 data.daily_kline.candles 的核心内容，提炼主要信息、结构含义、关键结论和异常点。若这是表格或列表，请说明字段含义和最值得关注的观察。"
+      },
+      "data.daily_kline.candles.[]": {
+        "strategy": "auto"
+      },
+      "data.daily_kline.indicators": {
+        "strategy": "prompt_summary",
+        "summary_prompt": "请用中文概括字段 data.daily_kline.indicators 的核心内容，提炼主要信息、结构含义、关键结论和异常点。若这是表格或列表，请说明字段含义和最值得关注的观察。"
+      },
+      "data.daily_kline.indicators.[]": {
+        "strategy": "auto"
+      },
+      "data.days": {
+        "strategy": "auto"
+      },
+      "data.latest_candle": {
+        "strategy": "prompt_full"
+      },
+      "data.name": {
+        "strategy": "prompt_full"
+      }
+    },
+    "high_value_for_reasoning": [
+      "data.code",
+      "data.latest_candle",
+      "data.name"
+    ],
+    "high_value_for_render": [
+      "data.daily_kline"
+    ],
+    "recommended_reducers": {
+      "data.daily_kline": "summarize_timeseries"
+    },
+    "usually_too_large_for_prompt": [
+      "data.daily_kline.candles",
+      "data.daily_kline.indicators"
+    ]
+  },
+  "purpose": "查询指定个股最近N天的历史日K，结果中包括当天最新一根日K（如果未收盘则为盘中实时K线）。",
+  "tool_name": "stock_history_kline"
+}

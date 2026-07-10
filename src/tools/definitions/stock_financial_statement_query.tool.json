@@ -1,0 +1,192 @@
+{
+  "auth": "public",
+  "availability": {
+    "lifecycle": "active",
+    "retrieval_mode": "retrievable",
+    "visibility": "visible"
+  },
+  "capabilities": [
+    "stock_financial_statement",
+    "balance_sheet",
+    "income_statement",
+    "cashflow_statement"
+  ],
+  "defaults": {
+    "statement_type": "all",
+    "periods": 4
+  },
+  "identity": {
+    "description": "查询单只股票的核心财务三表数据。输入 stock 表示股票代码、简称或公司名称。可选择资产负债表、利润表、现金流量表或一次返回三表。该工具只返回结构化报表字段，不返回估值、行情或公司简介。",
+    "display_name": "个股财务三表查询",
+    "domain": "financial_statement",
+    "owner": "tools"
+  },
+  "invocation_example": "stock_financial_statement_query(stock=\"贵州茅台\", statement_type=\"all\", periods=4)",
+  "match_contract": {
+    "request_families": [
+      "data_access"
+    ],
+    "work_item_types": [
+      "tool"
+    ],
+    "capability_classes": [
+      "data_retrieval",
+      "financial_statement_lookup"
+    ],
+    "side_effect_level": "read_only"
+  },
+  "name": "stock_financial_statement_query",
+  "post_process": {
+    "deterministic": {
+      "enabled": false,
+      "handler": ""
+    },
+    "llm": {
+      "enabled": false,
+      "prompt_key": ""
+    }
+  },
+  "profiles": {
+    "mock": {
+      "enabled": true,
+      "implementation": {
+        "kind": "inline_result"
+      },
+      "result": {
+        "tool": "stock_financial_statement_query",
+        "ok": true,
+        "data": {
+          "stock": "贵州茅台",
+          "code": "600519.SH",
+          "name": "贵州茅台",
+          "statement_type": "all",
+          "report_period": "",
+          "statements": {
+            "balance_sheet": [],
+            "income": [],
+            "cashflow": []
+          }
+        },
+        "error": ""
+      }
+    },
+    "real": {
+      "enabled": true,
+      "implementation": {
+        "kind": "python_callable",
+        "target": "src.tools.stock_financial_statement_query_tool:run"
+      }
+    }
+  },
+  "retention": {
+    "drop_default": [],
+    "high_value_for_reasoning": [
+      "data.code",
+      "data.name",
+      "data.statement_type",
+      "data.statements"
+    ],
+    "high_value_for_render": [],
+    "recommended_reducers": {
+      "data.statements.balance_sheet": "summarize_timeseries",
+      "data.statements.income": "summarize_timeseries",
+      "data.statements.cashflow": "summarize_timeseries"
+    },
+    "usually_too_large_for_prompt": [
+      "data.statements"
+    ]
+  },
+  "runtime_hints": {
+    "cost_class": "low",
+    "latency_class": "low",
+    "supports_async_submit": false,
+    "supports_stream": false
+  },
+  "safety": {
+    "network": true,
+    "persistence": false,
+    "side_effect": "none"
+  },
+  "schemas": {
+    "input": {
+      "$id": "stock_financial_statement_query.input.schema.json",
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "stock": {
+          "description": "股票名称或代码。",
+          "type": "string"
+        },
+        "statement_type": {
+          "description": "报表类型。",
+          "enum": [
+            "balance_sheet",
+            "income",
+            "cashflow",
+            "all"
+          ],
+          "type": "string"
+        },
+        "report_period": {
+          "description": "报告期上限，如 20240331；为空时取最新记录。",
+          "type": "string"
+        },
+        "periods": {
+          "description": "返回最近几个报告期，默认 4。",
+          "minimum": 1,
+          "maximum": 20,
+          "type": "integer"
+        },
+        "accounting_statement_type": {
+          "description": "底层报表口径代码；为空时资产负债表/利润表默认 HB，现金流默认 HBTZ。",
+          "type": "string"
+        }
+      },
+      "required": [
+        "stock"
+      ],
+      "type": "object"
+    },
+    "output": {
+      "$ref": "src/tools/schemas/stock_financial_statement_query.schema.json"
+    }
+  },
+  "status": "active",
+  "tags": [
+    "stock",
+    "financial_statement",
+    "balance_sheet",
+    "income",
+    "cashflow"
+  ],
+  "tests": {
+    "golden_cases": [],
+    "sample_inputs": [
+      {
+        "name": "stock_financial_statement_default",
+        "arguments": {
+          "stock": "贵州茅台",
+          "statement_type": "all",
+          "periods": 4
+        }
+      }
+    ]
+  },
+  "ui_hints": {
+    "editable_sections": [
+      "identity",
+      "schemas.input",
+      "schemas.output",
+      "capabilities",
+      "profiles",
+      "retention",
+      "post_process",
+      "tests"
+    ]
+  },
+  "version": "v1",
+  "subject_tags": [
+    "stock"
+  ],
+  "tool_priority": 1
+}

@@ -1,0 +1,241 @@
+[
+  {
+    "case_id": "market_amount_10d_by_market",
+    "suite": "tool_selection_and_arguments",
+    "priority": "P0",
+    "stage_group": "task_planning",
+    "title": "市场总成交额按市场近 10 日走势",
+    "user_text": "最近 10 个交易日，上证、深证、北证三大市场的总成交额分别是什么走势？帮我按日期列出来。",
+    "thread_context": {},
+    "attachments": [],
+    "judge_mode": "hybrid",
+    "expected_reply": "应围绕三大市场的总成交额历史数据展开，按日期列出，并避免将市场整体误解为指数或个股 K 线。",
+    "checks": [
+      {
+        "stage": "round_task",
+        "mode": "llm_judge",
+        "assertion": "任务描述保留市场、最近10个交易日、总成交额、按日期列出这些核心语义。",
+        "must_include": ["三大市场", "最近10个交易日", "总成交额"],
+        "must_not_include": ["个股", "日K", "K线", "指数历史行情"]
+      },
+      {
+        "stage": "tool_selection",
+        "mode": "structured",
+        "must_all_tools": ["market_history_amount"],
+        "forbid_tools": ["stock_history_kline", "stock_history_funds_flow"]
+      },
+      {
+        "stage": "plan_compile",
+        "mode": "structured",
+        "expected_arguments": {"market_history_amount": {"days": 10}},
+        "argument_policy": "用户显式说最近10个交易日，应绑定 days=10。market 可根据工具设计选择 all 或拆分市场执行。"
+      }
+    ],
+    "tags": ["market", "amount", "arguments", "regression"]
+  },
+  {
+    "case_id": "continuity_second_company_followup",
+    "suite": "conversation_continuity",
+    "priority": "P0",
+    "stage_group": "dialogue_preprocess",
+    "title": "指代第二个对象的续问",
+    "user_text": "第二个公司的资金面也看一下。",
+    "thread_context": {
+      "thread_summary": "上一轮对比了公司A和公司B的实时行情。",
+      "reference_memory": {
+        "objects": [
+          {"object_type": "company", "object_id": "公司A", "display_name": "公司A", "order_index": 0},
+          {"object_type": "company", "object_id": "公司B", "display_name": "公司B", "order_index": 1}
+        ]
+      }
+    },
+    "attachments": [],
+    "judge_mode": "structured",
+    "expected_reply": "应识别“第二个公司”为公司B，并围绕公司B资金面继续处理。",
+    "checks": [
+      {
+        "stage": "interaction_preprocess",
+        "mode": "structured",
+        "expected_fields": {
+          "needs_reference_resolution": true,
+          "domain": "business"
+        }
+      },
+      {
+        "stage": "context_resolution",
+        "mode": "structured",
+        "expected_focus": {"display_name": "公司B"}
+      },
+      {
+        "stage": "tool_selection",
+        "mode": "structured",
+        "must_any_tool_groups": [["stock_realtime_funds_flow", "stock_history_funds_flow"]]
+      }
+    ],
+    "tags": ["continuity", "reference", "funds"]
+  },
+  {
+    "case_id": "attachment_company_reference_funds",
+    "suite": "attachment_reference",
+    "priority": "P0",
+    "stage_group": "dialogue_preprocess",
+    "title": "引用附件中提到的公司",
+    "user_text": "图片里提到的那家公司，帮我看看资金情况。",
+    "thread_context": {
+      "recent_attachments": [
+        {
+          "attachment_ids": ["img_001"],
+          "kind": "image",
+          "summary": "图片内容提到公司A正在扩产。"
+        }
+      ]
+    },
+    "attachments": [],
+    "judge_mode": "hybrid",
+    "expected_reply": "应把“那家公司”解析为附件摘要中的公司A，并进入资金相关工具或明确说明缺少可解析标的。",
+    "checks": [
+      {
+        "stage": "context_resolution",
+        "mode": "structured",
+        "expected_focus": {"display_name": "公司A"}
+      },
+      {
+        "stage": "tool_selection",
+        "mode": "structured",
+        "must_any_tool_groups": [["stock_realtime_funds_flow", "stock_history_funds_flow"]]
+      }
+    ],
+    "tags": ["attachment", "reference", "funds"]
+  },
+  {
+    "case_id": "limitup_top1_quote_news",
+    "suite": "task_decomposition",
+    "priority": "P1",
+    "stage_group": "planning",
+    "title": "集合筛选后查询行情和新闻",
+    "user_text": "从今天涨停股里找出成交量最大的那只，再查它的行情和相关新闻。",
+    "thread_context": {},
+    "attachments": [],
+    "judge_mode": "hybrid",
+    "expected_reply": "应先获取涨停股集合，再筛选成交量最大股票，随后对该股票查询行情和新闻。",
+    "checks": [
+      {
+        "stage": "tool_selection",
+        "mode": "structured",
+        "must_all_tools": ["涨跌停列表查询", "stock_realtime_quote"],
+        "must_any_tool_groups": [["financial_news_search"]]
+      },
+      {
+        "stage": "plan_compile",
+        "mode": "llm_judge",
+        "assertion": "计划中存在先集合查询、再排序/取top1、再对目标股票执行后续查询的依赖关系。"
+      }
+    ],
+    "tags": ["decomposition", "dependency", "ranking", "news"]
+  },
+  {
+    "case_id": "tool_gap_pe_ratio",
+    "suite": "capability_gap",
+    "priority": "P1",
+    "stage_group": "planning",
+    "title": "当前工具不覆盖市盈率时识别缺口",
+    "user_text": "这两家公司当前市盈率分别是多少？",
+    "thread_context": {
+      "thread_summary": "上一轮已经确认公司A和公司B为本轮比较对象。",
+      "reference_memory": {
+        "objects": [
+          {"object_type": "company", "object_id": "公司A", "display_name": "公司A", "order_index": 0},
+          {"object_type": "company", "object_id": "公司B", "display_name": "公司B", "order_index": 1}
+        ]
+      }
+    },
+    "attachments": [],
+    "judge_mode": "hybrid",
+    "expected_reply": "如果当前工具没有市盈率字段，应识别为工具能力缺口，而不是误用实时行情工具给出伪结果。",
+    "checks": [
+      {
+        "stage": "tool_selection",
+        "mode": "structured",
+        "forbid_tools": ["stock_realtime_quote"],
+        "allow_gap_response": true
+      },
+      {
+        "stage": "final_answer",
+        "mode": "llm_judge",
+        "assertion": "回答不得伪造市盈率；如果无法查询，应说明当前能力限制和需要的工具/数据。"
+      }
+    ],
+    "tags": ["gap", "referential", "fundamental"]
+  },
+  {
+    "case_id": "quote_with_explicit_fields",
+    "suite": "tool_selection_and_arguments",
+    "priority": "P1",
+    "stage_group": "planning",
+    "title": "单个标的实时行情字段确认",
+    "user_text": "帮我看一下公司A现在的实时价格、开盘价、盘中最高和最低，以及成交额。",
+    "thread_context": {},
+    "attachments": [],
+    "judge_mode": "structured",
+    "expected_reply": "应选择单标的实时行情工具，并把公司A作为查询标的。",
+    "checks": [
+      {
+        "stage": "tool_selection",
+        "mode": "structured",
+        "must_all_tools": ["stock_realtime_quote"]
+      },
+      {
+        "stage": "plan_compile",
+        "mode": "structured",
+        "expected_arguments": {"stock_realtime_quote": {"name": "公司A"}}
+      }
+    ],
+    "tags": ["quote", "arguments"]
+  },
+  {
+    "case_id": "same_minute_market_amount_compare",
+    "suite": "tool_selection_and_arguments",
+    "priority": "P1",
+    "stage_group": "planning",
+    "title": "同分钟市场成交额对比",
+    "user_text": "现在这个时间点，全市场累计成交额和过去 5 个交易日同一时间相比，是放量还是缩量？",
+    "thread_context": {},
+    "attachments": [],
+    "judge_mode": "hybrid",
+    "expected_reply": "应使用同分钟成交额序列工具，而不是全日历史成交额工具单独回答。",
+    "checks": [
+      {
+        "stage": "tool_selection",
+        "mode": "structured",
+        "must_all_tools": ["market_minute_amount_series"],
+        "acceptable_tools": ["market_history_amount"]
+      },
+      {
+        "stage": "plan_compile",
+        "mode": "structured",
+        "expected_arguments": {"market_minute_amount_series": {"days": 5, "market": "all"}}
+      }
+    ],
+    "tags": ["market", "minute", "amount", "arguments"]
+  },
+  {
+    "case_id": "long_list_render_compaction",
+    "suite": "answer_presentation",
+    "priority": "P2",
+    "stage_group": "rendering",
+    "title": "长列表结果需要压缩展示",
+    "user_text": "把最近一批候选股票都列出来，并说明每只的关键指标。",
+    "thread_context": {},
+    "attachments": [],
+    "judge_mode": "llm_judge",
+    "expected_reply": "回答应避免一行一个长列表刷屏。长列表应表格化、摘要化或截断，并保留关键字段。",
+    "checks": [
+      {
+        "stage": "final_answer",
+        "mode": "llm_judge",
+        "assertion": "最终回答结构清晰，长列表有表格、摘要或省略策略，不应输出大量无组织原始 JSON 或逐项长文本。"
+      }
+    ],
+    "tags": ["rendering", "answer_quality", "long_list"]
+  }
+]

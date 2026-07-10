@@ -1,0 +1,72 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "market_realtime_breadth.schema.json",
+  "title": "大盘实时涨跌情况 Output",
+  "type": "object",
+  "required": [
+    "tool",
+    "ok",
+    "data",
+    "error"
+  ],
+  "properties": {
+    "data": {
+      "type": "object",
+      "required": [
+        "falling_count",
+        "flat_count",
+        "limit_down_count",
+        "limit_up_count",
+        "market",
+        "rising_count",
+        "snapshot_time",
+        "trade_date"
+      ],
+      "properties": {
+        "falling_count": {
+          "description": "下跌公司数。",
+          "type": "integer"
+        },
+        "flat_count": {
+          "description": "持平公司数。",
+          "type": "integer"
+        },
+        "limit_down_count": {
+          "description": "跌停公司数。",
+          "type": "integer"
+        },
+        "limit_up_count": {
+          "description": "涨停公司数。",
+          "type": "integer"
+        },
+        "market": {
+          "description": "市场范围。",
+          "type": "string"
+        },
+        "rising_count": {
+          "description": "上涨公司数。",
+          "type": "integer"
+        },
+        "snapshot_time": {
+          "description": "快照时间。",
+          "type": "string"
+        },
+        "trade_date": {
+          "description": "交易日。",
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "error": {
+      "type": "string"
+    },
+    "ok": {
+      "type": "boolean"
+    },
+    "tool": {
+      "const": "market_realtime_breadth"
+    }
+  },
+  "additionalProperties": true
+}

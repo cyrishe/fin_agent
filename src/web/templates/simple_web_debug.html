@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <title>{{ page_title }}</title>
+  <style>
+    :root {
+      --bg: #f3efe6;
+      --paper: #fffdf8;
+      --ink: #1f2521;
+      --muted: #5f6b63;
+      --line: #d8d0c2;
+      --accent: #17624a;
+      --accent-soft: #e0efe8;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "PingFang SC", "Helvetica Neue", sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at top left, #e5efe8 0, transparent 30%),
+        linear-gradient(180deg, #f6f1e8 0%, #efe7d8 100%);
+      min-height: 100vh;
+    }
+    .shell {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 28px 20px 48px;
+    }
+    h1 {
+      margin: 0 0 8px;
+      font-size: 32px;
+    }
+    .sub {
+      margin: 0 0 24px;
+      color: var(--muted);
+    }
+    .panel {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 18px;
+      box-shadow: 0 10px 30px rgba(31, 37, 33, 0.06);
+      margin-bottom: 18px;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+    }
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .field.span-2 { grid-column: span 2; }
+    .field.span-4 { grid-column: span 4; }
+    label {
+      font-size: 13px;
+      color: var(--muted);
+    }
+    input, textarea, select, button {
+      font: inherit;
+    }
+    input, textarea, select {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 10px 12px;
+      background: #fff;
+      color: var(--ink);
+    }
+    textarea {
+      min-height: 90px;
+      resize: vertical;
+    }
+    .actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-top: 14px;
+    }
+    button {
+      border: 0;
+      border-radius: 999px;
+      background: var(--accent);
+      color: #fff;
+      padding: 10px 18px;
+      cursor: pointer;
+    }
+    button:disabled {
+      opacity: 0.6;
+      cursor: wait;
+    }
+    .hint, .status {
+      color: var(--muted);
+      font-size: 13px;
+    }
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+    .card {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: #fff;
+      padding: 14px;
+    }
+    .meta {
+      color: var(--muted);
+      font-size: 12px;
+      margin-bottom: 6px;
+    }
+    .title {
+      font-weight: 700;
+      margin-bottom: 8px;
+      line-height: 1.5;
+    }
+    .snippet {
+      font-size: 14px;
+      line-height: 1.6;
+      white-space: pre-wrap;
+    }
+    pre {
+      margin: 0;
+      white-space: pre-wrap;
+      word-break: break-word;
+      font-size: 12px;
+      line-height: 1.5;
+    }
+    .summary-strip {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 14px;
+    }
+    .metric {
+      background: var(--accent-soft);
+      border-radius: 999px;
+      padding: 8px 12px;
+      font-size: 13px;
+    }
+    @media (max-width: 900px) {
+      .grid, .cards { grid-template-columns: 1fr; }
+      .field.span-2, .field.span-4 { grid-column: span 1; }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <h1>{{ page_title }}</h1>
+    <p class="sub">用于快速验证简单网页站点配置、搜索效果、正文抽取质量和前几条结果，不需要先接入正式 skill。</p>
+
+    <div class="panel">
+      <div class="grid">
+        <div class="field span-2">
+          <label for="query">Query</label>
+          <input id="query" value="机器人">
+        </div>
+        <div class="field">
+          <label for="max_results_per_site">Max Results</label>
+          <input id="max_results_per_site" type="number" value="5">
+        </div>
+        <div class="field">
+          <label for="keep_days">Keep Days</label>
+          <input id="keep_days" type="number" value="2">
+        </div>
+        <div class="field span-2">
+          <label for="site_names">Site Names</label>
+          <input id="site_names" value="cnstock_search" placeholder="多个站点用逗号分隔">
+        </div>
+        <div class="field">
+          <label for="fetch_mode_override">Fetch Mode</label>
+          <select id="fetch_mode_override">
+            <option value="">site default</option>
+            <option value="requests">requests</option>
+            <option value="selenium">selenium</option>
+          </select>
+        </div>
+      </div>
+      <div class="actions">
+        <button id="runBtn">Run Debug</button>
+        <span class="status" id="status">Idle</span>
+      </div>
+      <div class="hint">这个页面只保留最常用的调试输入。搜索结果页进入正文页是固定行为；去重和不落库也固定处理，不再暴露为页面参数。</div>
+    </div>
+
+    <div class="panel">
+      <div class="summary-strip" id="summaryStrip"></div>
+      <div class="cards" id="cards"></div>
+    </div>
+
+    <div class="panel">
+      <pre id="rawOutput">{}</pre>
+    </div>
+  </div>
+
+  <script>
+    const apiUrl = {{ api_debug_url|tojson }};
+    const runBtn = document.getElementById("runBtn");
+    const statusEl = document.getElementById("status");
+    const cardsEl = document.getElementById("cards");
+    const rawOutputEl = document.getElementById("rawOutput");
+    const summaryStripEl = document.getElementById("summaryStrip");
+
+    function getPayload() {
+      return {
+        query: document.getElementById("query").value.trim(),
+        site_names: document.getElementById("site_names").value.trim(),
+        max_results_per_site: document.getElementById("max_results_per_site").value.trim(),
+        keep_days: document.getElementById("keep_days").value.trim(),
+        fetch_mode_override: document.getElementById("fetch_mode_override").value.trim(),
+        follow_depth: 0,
+        persist: false,
+        dedupe: true
+      };
+    }
+
+    function renderSummary(result) {
+      const stats = (result && result.stats) || {};
+      const sites = (result && result.sites) || [];
+      const metrics = [
+        ["sites", sites.join(", ") || "all enabled"],
+        ["total", String(stats.total || 0)],
+        ["deduped", String(stats.deduped || 0)],
+        ["persisted", String(stats.persisted || 0)]
+      ];
+      summaryStripEl.innerHTML = metrics.map(([k, v]) => (
+        `<div class="metric"><strong>${k}</strong>: ${v}</div>`
+      )).join("");
+    }
+
+    function renderCards(result) {
+      const items = (result && result.items) || [];
+      cardsEl.innerHTML = items.slice(0, 12).map((item) => `
+        <div class="card">
+          <div class="meta">${item.site || ""} | ${item.publish_time || ""}</div>
+          <div class="title"><a href="${item.url || "#"}" target="_blank" rel="noreferrer">${item.title || "(no title)"}</a></div>
+          <div class="meta">depth=${item.depth || 0} host=${item.host || ""}</div>
+          <div class="snippet">${(item.snippet || "").replace(/[<>&]/g, (s) => ({'<':'&lt;','>':'&gt;','&':'&amp;'}[s]))}</div>
+        </div>
+      `).join("");
+    }
+
+    async function runDebug() {
+      const payload = getPayload();
+      if (!payload.query) {
+        statusEl.textContent = "query required";
+        return;
+      }
+      runBtn.disabled = true;
+      statusEl.textContent = "Running...";
+      cardsEl.innerHTML = "";
+      summaryStripEl.innerHTML = "";
+      rawOutputEl.textContent = "{}";
+      try {
+        const resp = await fetch(apiUrl, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+        const data = await resp.json();
+        rawOutputEl.textContent = JSON.stringify(data, null, 2);
+        if (!resp.ok || !data.ok) {
+          statusEl.textContent = data.error || `HTTP ${resp.status}`;
+          return;
+        }
+        renderSummary(data.result || {});
+        renderCards(data.result || {});
+        statusEl.textContent = "Completed";
+      } catch (err) {
+        statusEl.textContent = String(err);
+      } finally {
+        runBtn.disabled = false;
+      }
+    }
+
+    runBtn.addEventListener("click", runDebug);
+  </script>
+</body>
+</html>

@@ -216,3 +216,16 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# macOS metadata
+.DS_Store
+._*
+
+# Local agent runtime state
+data/assistant_uploads/
+data/custom_tool_context/
+data/custom_tools/
+data/runtime_custom_tools/
+data/runtime_file_artifacts/
+data/session_variables/
+data/capability_embeddings*.json

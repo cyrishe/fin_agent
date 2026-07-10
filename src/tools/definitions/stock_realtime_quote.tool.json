@@ -1,0 +1,161 @@
+{
+  "auth": "public",
+  "availability": {
+    "lifecycle": "active",
+    "retrieval_mode": "retrievable",
+    "visibility": "visible"
+  },
+  "capabilities": [
+    "quote",
+    "realtime_quote",
+    "snapshot"
+  ],
+  "defaults": {},
+  "identity": {
+    "description": "查询单只股票的实时行情快照。",
+    "display_name": "个股实时行情",
+    "domain": "stock",
+    "owner": "tools"
+  },
+  "invocation_example": "stock_realtime_quote(stock=\"600519.SH\")",
+  "match_contract": {
+    "request_families": [
+      "data_access"
+    ],
+    "work_item_types": [
+      "tool"
+    ],
+    "capability_classes": [
+      "data_retrieval",
+      "quote_lookup"
+    ],
+    "side_effect_level": "read_only"
+  },
+  "name": "stock_realtime_quote",
+  "post_process": {
+    "deterministic": {
+      "enabled": false,
+      "handler": ""
+    },
+    "llm": {
+      "enabled": false,
+      "prompt_key": ""
+    }
+  },
+  "profiles": {
+    "mock": {
+      "enabled": true,
+      "implementation": {
+        "kind": "inline_result"
+      },
+      "result": {
+        "data": {
+          "code": "code_示例",
+          "name": "name_示例",
+          "quote": {
+            "amount": 0,
+            "change": 0,
+            "change_pct": 0,
+            "current": 0,
+            "high": 0,
+            "low": 0,
+            "open": 0,
+            "preclose": 0,
+            "volume": 0
+          },
+          "minute_index": 0,
+          "minute_time": "",
+          "snapshot_slot": "",
+          "snapshot_time": "",
+          "trade_date": ""
+        },
+        "error": "error_示例",
+        "ok": false,
+        "tool": "stock_realtime_quote"
+      }
+    },
+    "real": {
+      "enabled": true,
+      "implementation": {
+        "kind": "python_callable",
+        "target": "src.tools.stock_realtime_quote_tool:run"
+      }
+    }
+  },
+  "retention": {
+    "drop_default": [],
+    "high_value_for_reasoning": [
+      "data.name",
+      "data.code",
+      "data.quote"
+    ],
+    "high_value_for_render": [],
+    "recommended_reducers": {},
+    "usually_too_large_for_prompt": []
+  },
+  "runtime_hints": {
+    "cost_class": "low",
+    "latency_class": "low",
+    "supports_async_submit": false,
+    "supports_stream": false
+  },
+  "safety": {
+    "network": true,
+    "persistence": false,
+    "side_effect": "none"
+  },
+  "schemas": {
+    "input": {
+      "$id": "stock_realtime_quote.input.schema.json",
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "stock": {
+          "type": "string",
+          "description": "股票代码、简称或名称。"
+        }
+      },
+      "required": [
+        "stock"
+      ],
+      "type": "object"
+    },
+    "output": {
+      "$ref": "src/tools/schemas/stock_realtime_quote.schema.json"
+    }
+  },
+  "status": "active",
+  "tags": [
+    "stock",
+    "quote",
+    "realtime"
+  ],
+  "tests": {
+    "golden_cases": [],
+    "sample_inputs": [
+      {
+        "arguments": {
+          "stock": "贵州茅台"
+        },
+        "name": "default_stock_realtime_quote"
+      }
+    ]
+  },
+  "ui_hints": {
+    "editable_sections": [
+      "identity",
+      "schemas.input",
+      "schemas.output",
+      "capabilities",
+      "profiles",
+      "retention",
+      "post_process",
+      "tests"
+    ]
+  },
+  "version": "v1",
+  "subject_tags": [
+    "stock"
+  ],
+  "tool_priority": 1
+}

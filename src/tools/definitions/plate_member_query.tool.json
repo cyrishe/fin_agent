@@ -1,0 +1,208 @@
+{
+  "auth": "public",
+  "availability": {
+    "lifecycle": "disabled",
+    "retrieval_mode": "direct_only",
+    "visibility": "hidden"
+  },
+  "capabilities": [
+    "plate_member",
+    "stock_plate_membership",
+    "plate_constituent_lookup"
+  ],
+  "defaults": {
+    "subject_type": "auto",
+    "limit": 50,
+    "sort_by": "stock_rise_fall_rate"
+  },
+  "identity": {
+    "description": "查询板块成分股或单只股票所属板块关系。",
+    "display_name": "板块成分查询",
+    "domain": "plate",
+    "owner": "tools"
+  },
+  "invocation_example": "plate_member_query(subject=\"半导体\", subject_type=\"plate\", limit=50)",
+  "match_contract": {
+    "request_families": [
+      "data_access"
+    ],
+    "work_item_types": [
+      "tool"
+    ],
+    "capability_classes": [
+      "data_retrieval",
+      "taxonomy_lookup",
+      "plate_member_lookup"
+    ],
+    "side_effect_level": "read_only"
+  },
+  "name": "plate_member_query",
+  "post_process": {
+    "deterministic": {
+      "enabled": false,
+      "handler": ""
+    },
+    "llm": {
+      "enabled": false,
+      "prompt_key": ""
+    }
+  },
+  "profiles": {
+    "mock": {
+      "enabled": false,
+      "implementation": {
+        "kind": "inline_result"
+      },
+      "result": {
+        "tool": "plate_member_query",
+        "ok": true,
+        "data": {
+          "subject": "半导体",
+          "subject_type": "plate",
+          "mode": "by_plate",
+          "trade_date": "",
+          "sort_by": "stock_rise_fall_rate",
+          "items": []
+        },
+        "error": ""
+      }
+    },
+    "real": {
+      "enabled": false,
+      "implementation": {
+        "kind": "python_callable",
+        "target": "src.tools.plate_member_query_tool:run"
+      }
+    }
+  },
+  "retention": {
+    "drop_default": [],
+    "high_value_for_reasoning": [
+      "data.mode",
+      "data.items"
+    ],
+    "high_value_for_render": [],
+    "recommended_reducers": {
+      "data.items": "top_rows"
+    },
+    "usually_too_large_for_prompt": [
+      "data.items"
+    ]
+  },
+  "runtime_hints": {
+    "cost_class": "low",
+    "latency_class": "low",
+    "supports_async_submit": false,
+    "supports_stream": false
+  },
+  "safety": {
+    "network": true,
+    "persistence": false,
+    "side_effect": "none"
+  },
+  "schemas": {
+    "input": {
+      "$id": "plate_member_query.input.schema.json",
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "subject": {
+          "description": "板块代码/名称，或股票代码/名称。",
+          "type": "string"
+        },
+        "subject_type": {
+          "description": "查询主体类型；auto 会做轻量代码形态判断。",
+          "enum": [
+            "auto",
+            "plate",
+            "stock"
+          ],
+          "type": "string"
+        },
+        "trade_date": {
+          "description": "行情和资金字段的截止交易日，YYYY-MM-DD；为空时取最近记录。",
+          "type": "string"
+        },
+        "limit": {
+          "description": "返回关系行数，默认 50。",
+          "minimum": 1,
+          "maximum": 500,
+          "type": "integer"
+        },
+        "sort_by": {
+          "description": "排序字段。",
+          "enum": [
+            "stock_code",
+            "stock_rise_fall_rate",
+            "stock_amount",
+            "stock_main_net_inflow",
+            "plate_rise_fall_rate",
+            "plate_amount",
+            "plate_main_net_inflow"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "subject"
+      ],
+      "type": "object"
+    },
+    "output": {
+      "$ref": "src/tools/schemas/plate_member_query.schema.json"
+    }
+  },
+  "status": "disabled",
+  "tags": [
+    "plate",
+    "concept",
+    "membership",
+    "constituents",
+    "taxonomy"
+  ],
+  "tests": {
+    "golden_cases": [],
+    "sample_inputs": [
+      {
+        "name": "plate_members_by_plate",
+        "arguments": {
+          "subject": "半导体",
+          "subject_type": "plate",
+          "limit": 50
+        }
+      },
+      {
+        "name": "plate_membership_by_stock",
+        "arguments": {
+          "subject": "600519.SH",
+          "subject_type": "stock",
+          "limit": 20
+        }
+      }
+    ]
+  },
+  "ui_hints": {
+    "editable_sections": [
+      "identity",
+      "schemas.input",
+      "schemas.output",
+      "capabilities",
+      "profiles",
+      "retention",
+      "post_process",
+      "tests"
+    ]
+  },
+  "version": "v1",
+  "enabled": false,
+  "retrieval": {
+    "mode": "direct_only",
+    "visibility": "hidden"
+  },
+  "visibility": "hidden",
+  "deprecation_note": "混合了板块到成分股和股票到所属板块两种不同语义；请改用 plate_members_query 或 stock_plate_membership_query。",
+  "subject_tags": [
+    "plate"
+  ],
+  "tool_priority": 1
+}

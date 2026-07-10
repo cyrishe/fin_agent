@@ -1,0 +1,67 @@
+{
+  "best_for": [
+    "用于获取目标主体的近期新闻和事件线索。",
+    "用于补充行情、板块或个股异动背后的消息催化。",
+    "用于把新闻标题、来源、时间和摘要交给后续分析步骤。"
+  ],
+  "display_name": "金融新闻查询",
+  "input_guidance": {
+    "notes": [
+      "query 使用用户可见的公司名、股票代码、行业、板块、主题或事件关键词。"
+    ],
+    "optional_fields": [],
+    "required_fields": [
+      "query"
+    ]
+  },
+  "input_schema": "src/tools/definitions/financial_news_search.tool.json#/schemas/input",
+  "invocation_example": "financial_news_search(query=\"贵州茅台\")",
+  "name": "financial_news_search",
+  "output_guidance": {
+    "drop_default": [],
+    "field_policies": {
+      "data.[]": {
+        "strategy": "auto"
+      },
+      "data.[].publish_time": {
+        "strategy": "auto"
+      },
+      "data.[].site": {
+        "strategy": "auto"
+      },
+      "data.[].snippet": {
+        "strategy": "auto"
+      },
+      "data.[].title": {
+        "strategy": "auto"
+      },
+      "data.[].url": {
+        "strategy": "auto"
+      },
+      "data.publish_time": {
+        "strategy": "auto"
+      },
+      "data.site": {
+        "strategy": "auto"
+      },
+      "data.snippet": {
+        "strategy": "auto"
+      },
+      "data.title": {
+        "strategy": "auto"
+      },
+      "data.url": {
+        "strategy": "auto"
+      }
+    },
+    "high_value_for_reasoning": [],
+    "high_value_for_render": [],
+    "recommended_reducers": {
+      "data": "summarize_news_list"
+    },
+    "usually_too_large_for_prompt": []
+  },
+  "output_schema": "src/tools/schemas/financial_news_search.schema.json",
+  "purpose": "查询公司、行业、板块、主题或事件相关的金融新闻。",
+  "tool_name": "financial_news_search"
+}

@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "intent_route.schema.json",
+  "title": "IntentRoute",
+  "type": "object",
+  "required": [
+    "route_type",
+    "confidence",
+    "reason",
+    "candidate_skills",
+    "selected_skill",
+    "missing_slots",
+    "normalized_input"
+  ],
+  "properties": {
+    "route_type": {
+      "type": "string",
+      "enum": ["single_skill", "multi_skill", "clarify", "reject"]
+    },
+    "confidence": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
+    },
+    "reason": {
+      "type": "string"
+    },
+    "candidate_skills": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "selected_skill": {
+      "type": ["string", "null"]
+    },
+    "missing_slots": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "normalized_input": {
+      "type": "object"
+    },
+    "composite_plan_hint": {
+      "type": ["object", "null"]
+    }
+  },
+  "additionalProperties": false
+}

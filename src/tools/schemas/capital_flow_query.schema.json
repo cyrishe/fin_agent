@@ -1,0 +1,180 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "capital_flow_query.schema.json",
+  "title": "Capital Flow Query Tool Output",
+  "type": "object",
+  "required": [
+    "tool",
+    "ok",
+    "data",
+    "error"
+  ],
+  "properties": {
+    "data": {
+      "type": "object",
+      "required": [
+        "source",
+        "subject_type",
+        "subject",
+        "subject_code",
+        "subject_name",
+        "granularity",
+        "date_range",
+        "row_count",
+        "rows",
+        "coverage"
+      ],
+      "properties": {
+        "source": {
+          "description": "数据来源表。",
+          "type": "string"
+        },
+        "subject_type": {
+          "description": "主体类型。",
+          "type": "string"
+        },
+        "subject": {
+          "description": "用户输入的主体名称或代码。",
+          "type": "string"
+        },
+        "subject_code": {
+          "description": "主体代码。",
+          "type": "string"
+        },
+        "subject_name": {
+          "description": "主体名称。",
+          "type": "string"
+        },
+        "granularity": {
+          "description": "数据粒度。",
+          "type": "string"
+        },
+        "date_range": {
+          "type": "object",
+          "required": [
+            "start",
+            "end"
+          ],
+          "properties": {
+            "start": {
+              "type": "string"
+            },
+            "end": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false
+        },
+        "row_count": {
+          "type": "integer"
+        },
+        "rows": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/flowRow"
+          }
+        },
+        "coverage": {
+          "type": "object",
+          "required": [
+            "requested_days",
+            "returned_rows",
+            "latest_trade_date"
+          ],
+          "properties": {
+            "requested_days": {
+              "type": "integer"
+            },
+            "returned_rows": {
+              "type": "integer"
+            },
+            "latest_trade_date": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "error": {
+      "description": "错误信息，成功时为空字符串。",
+      "type": "string"
+    },
+    "ok": {
+      "description": "工具执行是否成功。",
+      "type": "boolean"
+    },
+    "tool": {
+      "const": "capital_flow_query",
+      "description": "工具名称。"
+    }
+  },
+  "$defs": {
+    "flowRow": {
+      "type": "object",
+      "required": [
+        "trade_date",
+        "snapshot_time",
+        "subject_code",
+        "subject_name",
+        "total_net_inflow_wan",
+        "total_net_ratio_pct",
+        "main_net_inflow_wan",
+        "main_net_ratio_pct",
+        "retail_net_inflow_wan",
+        "retail_net_ratio_pct",
+        "super_large_net_inflow_wan",
+        "large_net_inflow_wan",
+        "medium_net_inflow_wan",
+        "small_net_inflow_wan"
+      ],
+      "properties": {
+        "trade_date": {
+          "type": "string"
+        },
+        "snapshot_time": {
+          "type": "string"
+        },
+        "subject_code": {
+          "type": "string"
+        },
+        "subject_name": {
+          "type": "string"
+        },
+        "total_net_inflow_wan": {
+          "type": "number"
+        },
+        "total_net_ratio_pct": {
+          "type": "number"
+        },
+        "main_net_inflow_wan": {
+          "type": "number"
+        },
+        "main_net_ratio_pct": {
+          "type": "number"
+        },
+        "retail_net_inflow_wan": {
+          "type": "number"
+        },
+        "retail_net_ratio_pct": {
+          "type": "number"
+        },
+        "super_large_net_inflow_wan": {
+          "type": "number"
+        },
+        "large_net_inflow_wan": {
+          "type": "number"
+        },
+        "medium_net_inflow_wan": {
+          "type": "number"
+        },
+        "small_net_inflow_wan": {
+          "type": "number"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

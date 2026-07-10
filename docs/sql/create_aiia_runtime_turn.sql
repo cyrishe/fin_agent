@@ -1,0 +1,20 @@
+CREATE TABLE IF NOT EXISTS aiia_runtime_turn (
+  turn_id bigint unsigned NOT NULL AUTO_INCREMENT COMMENT '轮次主键',
+  thread_id bigint unsigned NOT NULL COMMENT '所属线程',
+  turn_no int unsigned NOT NULL COMMENT '在线程内递增轮次号',
+  user_input_text longtext DEFAULT NULL COMMENT '用户输入文本',
+  assistant_output_text longtext DEFAULT NULL COMMENT '助手输出文本',
+  input_structured_json json DEFAULT NULL COMMENT '结构化输入',
+  output_structured_json json DEFAULT NULL COMMENT '结构化输出',
+  status varchar(32) NOT NULL DEFAULT 'completed' COMMENT '状态：running/completed/failed/cancelled',
+  model_name varchar(64) NOT NULL DEFAULT '' COMMENT '使用的模型名',
+  token_usage_json json DEFAULT NULL COMMENT 'token 用量',
+  started_at datetime DEFAULT NULL COMMENT '开始时间',
+  finished_at datetime DEFAULT NULL COMMENT '结束时间',
+  created_at datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  updated_at datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (turn_id),
+  UNIQUE KEY uniq_thread_turn_no (thread_id, turn_no),
+  KEY idx_thread_status (thread_id, status),
+  KEY idx_started_at (started_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='运行时轮次表；记录线程中的一次用户-助手交互';

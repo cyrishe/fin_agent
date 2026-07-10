@@ -1,0 +1,129 @@
+{
+  "auth": "public",
+  "availability": {
+    "lifecycle": "disabled",
+    "retrieval_mode": "direct_only",
+    "visibility": "hidden"
+  },
+  "capabilities": [
+    "market_minute_amount",
+    "market_same_minute_compare",
+    "market_database"
+  ],
+  "defaults": {
+    "days": "5",
+    "market": "all"
+  },
+  "identity": {
+    "description": "查询市场当前分钟与历史同分钟累计成交额序列。",
+    "display_name": "市场分钟成交额序列",
+    "domain": "market",
+    "owner": "tools"
+  },
+  "invocation_example": "market_minute_amount_series(market=\"all\", days=5)",
+  "match_contract": {
+    "request_families": [
+      "data_access"
+    ],
+    "work_item_types": [
+      "tool"
+    ],
+    "capability_classes": [
+      "data_retrieval",
+      "market_amount_series"
+    ],
+    "side_effect_level": "read_only"
+  },
+  "name": "market_minute_amount_series",
+  "profiles": {
+    "mock": {
+      "enabled": false,
+      "implementation": {
+        "kind": "inline_result"
+      },
+      "result": {
+        "data": {
+          "market": "market_示例",
+          "minute_index": 0,
+          "series": [
+            {
+              "date": "date_示例",
+              "total_amount": 0
+            }
+          ],
+          "snapshot_time": "snapshot_time_示例",
+          "trade_date": "trade_date_示例"
+        },
+        "error": "error_示例",
+        "ok": false,
+        "tool": "market_minute_amount_series"
+      }
+    },
+    "real": {
+      "enabled": false,
+      "implementation": {
+        "kind": "python_callable",
+        "target": "src.tools.market_snapshot_tools:run_market_minute_amount_series"
+      }
+    }
+  },
+  "safety": {
+    "network": false,
+    "persistence": false,
+    "side_effect": "read_only"
+  },
+  "schemas": {
+    "input": {
+      "$id": "market_minute_amount_series.input.schema.json",
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "days": {
+          "type": "integer",
+          "description": "最近几个交易日，默认 5。"
+        },
+        "market": {
+          "type": "string",
+          "description": "市场范围，可选 all、sh、sz、bj。"
+        }
+      },
+      "required": [],
+      "type": "object"
+    },
+    "output": {
+      "$ref": "src/tools/schemas/market_minute_amount_series.schema.json"
+    }
+  },
+  "status": "disabled",
+  "tags": [
+    "market",
+    "amount",
+    "minute",
+    "database"
+  ],
+  "tests": {
+    "golden_cases": [],
+    "sample_inputs": [
+      {
+        "arguments": {
+          "days": 5,
+          "market": "all"
+        },
+        "name": "default_market_minute_amount_series"
+      }
+    ]
+  },
+  "version": "v1",
+  "retention": {},
+  "enabled": false,
+  "retrieval": {
+    "mode": "direct_only",
+    "visibility": "hidden"
+  },
+  "visibility": "hidden",
+  "deprecation_note": "市场分钟成交额对比属于高级派生能力，先由基础行情工具与 DSL/Agent 组合完成。",
+  "subject_tags": [
+    "general"
+  ],
+  "tool_priority": 1
+}

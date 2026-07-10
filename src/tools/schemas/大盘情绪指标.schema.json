@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "大盘情绪指标.schema.json",
+  "title": "大盘情绪指标 Output",
+  "type": "object",
+  "required": [
+    "tool",
+    "ok",
+    "data",
+    "error"
+  ],
+  "properties": {
+    "data": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "index_desc",
+          "name",
+          "index_value"
+        ],
+        "properties": {
+          "index_desc": {
+            "description": "固化在代码中的指标解释说明",
+            "type": "string"
+          },
+          "name": {
+            "description": "指标名称",
+            "type": "string"
+          },
+          "index_value": {
+            "description": "指标值",
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "error": {
+      "type": "string"
+    },
+    "ok": {
+      "type": "boolean"
+    },
+    "tool": {
+      "const": "大盘情绪指标"
+    }
+  },
+  "additionalProperties": true
+}

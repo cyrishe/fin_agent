@@ -1,0 +1,144 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "plate_rank_query.schema.json",
+  "title": "Plate Rank Query Tool Output",
+  "type": "object",
+  "required": [
+    "tool",
+    "ok",
+    "data",
+    "error"
+  ],
+  "properties": {
+    "data": {
+      "type": "object",
+      "required": [
+        "trade_date",
+        "sort_by",
+        "query",
+        "items"
+      ],
+      "properties": {
+        "trade_date": {
+          "description": "实际返回的交易日。",
+          "type": "string"
+        },
+        "sort_by": {
+          "description": "排序指标。",
+          "type": "string"
+        },
+        "query": {
+          "description": "板块名称或代码过滤词。",
+          "type": "string"
+        },
+        "items": {
+          "items": {
+            "$ref": "#/$defs/plateRankItem"
+          },
+          "type": "array"
+        }
+      },
+      "additionalProperties": false
+    },
+    "error": {
+      "type": "string"
+    },
+    "ok": {
+      "type": "boolean"
+    },
+    "tool": {
+      "const": "plate_rank_query",
+      "type": "string"
+    }
+  },
+  "$defs": {
+    "leader": {
+      "additionalProperties": false,
+      "properties": {
+        "amount": {
+          "type": "number"
+        },
+        "main_net_inflow_wan": {
+          "type": "number"
+        },
+        "rise_fall_rate": {
+          "type": "number"
+        },
+        "code": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "code",
+        "name",
+        "rise_fall_rate",
+        "amount",
+        "main_net_inflow_wan"
+      ],
+      "type": "object"
+    },
+    "plateRankItem": {
+      "additionalProperties": false,
+      "properties": {
+        "amount": {
+          "type": "number"
+        },
+        "close": {
+          "type": "number"
+        },
+        "leaders": {
+          "items": {
+            "$ref": "#/$defs/leader"
+          },
+          "type": "array"
+        },
+        "main_net_inflow_wan": {
+          "type": "number"
+        },
+        "main_net_ratio_pct": {
+          "type": "number"
+        },
+        "plate_code": {
+          "type": "string"
+        },
+        "plate_name": {
+          "type": "string"
+        },
+        "retail_net_inflow_wan": {
+          "type": "number"
+        },
+        "retail_net_ratio_pct": {
+          "type": "number"
+        },
+        "rise_fall_rate": {
+          "type": "number"
+        },
+        "trade_date": {
+          "type": "string"
+        },
+        "volume": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "plate_code",
+        "plate_name",
+        "trade_date",
+        "close",
+        "rise_fall_rate",
+        "amount",
+        "volume",
+        "main_net_inflow_wan",
+        "main_net_ratio_pct",
+        "retail_net_inflow_wan",
+        "retail_net_ratio_pct",
+        "leaders"
+      ],
+      "type": "object"
+    }
+  },
+  "additionalProperties": false
+}

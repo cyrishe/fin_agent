@@ -1,0 +1,135 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "stock_fundamental_snapshot.schema.json",
+  "title": "Stock Fundamental Snapshot Tool Output",
+  "type": "object",
+  "required": [
+    "tool",
+    "ok",
+    "data",
+    "error"
+  ],
+  "properties": {
+    "tool": {
+      "const": "stock_fundamental_snapshot",
+      "type": "string"
+    },
+    "ok": {
+      "type": "boolean"
+    },
+    "error": {
+      "type": "string"
+    },
+    "data": {
+      "type": "object",
+      "required": [
+        "subject",
+        "code",
+        "name",
+        "profile"
+      ],
+      "properties": {
+        "subject": {
+          "type": "string"
+        },
+        "profile": {
+          "$ref": "#/$defs/profile"
+        },
+        "coverage": {
+          "type": "object",
+          "properties": {
+            "profile_available": {
+              "type": "boolean"
+            }
+          },
+          "additionalProperties": false
+        },
+        "code": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "$defs": {
+    "profile": {
+      "additionalProperties": false,
+      "properties": {
+        "actual_controller": {
+          "type": "string"
+        },
+        "board": {
+          "type": "string"
+        },
+        "board_secretary": {
+          "type": "string"
+        },
+        "brief_intro": {
+          "type": "string"
+        },
+        "business_major": {
+          "type": "string"
+        },
+        "city": {
+          "type": "string"
+        },
+        "company_name": {
+          "type": "string"
+        },
+        "company_name_eng": {
+          "type": "string"
+        },
+        "delist_date": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "eng_short_name": {
+          "type": "string"
+        },
+        "establishment_date": {
+          "type": "string"
+        },
+        "general_manager": {
+          "type": "string"
+        },
+        "legal_representative": {
+          "type": "string"
+        },
+        "list_date": {
+          "type": "string"
+        },
+        "market": {
+          "type": "string"
+        },
+        "office_address": {
+          "type": "string"
+        },
+        "province": {
+          "type": "string"
+        },
+        "registered_address": {
+          "type": "string"
+        },
+        "registered_capital": {
+          "type": "number"
+        },
+        "code": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "website": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    }
+  },
+  "additionalProperties": false
+}

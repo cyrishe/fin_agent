@@ -1,0 +1,606 @@
+[
+  {
+    "id": 1,
+    "name": "01_市场整体资金趋势",
+    "title": "市场整体资金趋势",
+    "text": "最近 10 个交易日，上证、深证、北证三大市场的总成交额分别是什么走势？帮我按日期列出来。",
+    "must_all": [
+      "market_history_amount"
+    ],
+    "must_any_groups": [],
+    "acceptable": []
+  },
+  {
+    "id": 2,
+    "name": "02_盘中放量还是缩量",
+    "title": "盘中放量还是缩量",
+    "text": "现在这个时间点，全市场累计成交额和过去 5 个交易日同一时间相比，是放量还是缩量？",
+    "must_all": [
+      "market_minute_amount_series"
+    ],
+    "must_any_groups": [],
+    "acceptable": []
+  },
+  {
+    "id": 3,
+    "name": "03_大盘实时宽度",
+    "title": "大盘实时宽度",
+    "text": "现在全市场上涨家数和下跌家数分别是多少？涨停和跌停家数也一起给我。",
+    "must_all": [
+      "market_realtime_breadth"
+    ],
+    "must_any_groups": [],
+    "acceptable": []
+  },
+  {
+    "id": 4,
+    "name": "04_个股实时行情确认",
+    "title": "个股实时行情确认",
+    "text": "帮我看一下宁德时代现在的实时价格、开盘价、盘中最高和最低，以及成交额。",
+    "must_all": [
+      "stock_realtime_quote"
+    ],
+    "must_any_groups": [],
+    "acceptable": []
+  },
+  {
+    "id": 5,
+    "name": "05_个股主力资金状态",
+    "title": "个股主力资金状态",
+    "text": "比亚迪现在主力资金是净流入还是净流出？特大单和大单分别是什么情况？",
+    "must_all": [
+      "stock_realtime_funds_flow"
+    ],
+    "must_any_groups": [],
+    "acceptable": []
+  },
+  {
+    "id": 6,
+    "name": "06_日内分时结构",
+    "title": "日内分时结构",
+    "text": "我想看一下中际旭创今天盘中的分钟线表现，尤其是早盘冲高回落那一段。",
+    "must_all": [
+      "stock_intraday_kline"
+    ],
+    "must_any_groups": [],
+    "acceptable": [
+      "stock_realtime_quote"
+    ]
+  },
+  {
+    "id": 7,
+    "name": "07_近期日k走势",
+    "title": "近期日K走势",
+    "text": "把寒武纪最近 30 个交易日的日K给我拉一下，我想看它这波反弹的结构。",
+    "must_all": [
+      "stock_history_kline"
+    ],
+    "must_any_groups": [],
+    "acceptable": [
+      "indicator_series_query"
+    ]
+  },
+  {
+    "id": 8,
+    "name": "08_近期资金趋势",
+    "title": "近期资金趋势",
+    "text": "帮我看一下东方财富最近 10 天主力资金净流入的变化趋势。",
+    "must_all": [
+      "stock_history_funds_flow"
+    ],
+    "must_any_groups": [],
+    "acceptable": []
+  },
+  {
+    "id": 9,
+    "name": "09_技术指标序列",
+    "title": "技术指标序列",
+    "text": "帮我查一下中信证券最近 20 个交易日的 MA5、MA10、MACD 和 RSI 序列。",
+    "must_all": [
+      "indicator_series_query"
+    ],
+    "must_any_groups": [],
+    "acceptable": [
+      "stock_history_kline"
+    ]
+  },
+  {
+    "id": 10,
+    "name": "10_涨停列表",
+    "title": "涨停列表",
+    "text": "现在市场涨停股有哪些？帮我列出涨停列表。",
+    "must_all": [
+      "涨跌停列表查询"
+    ],
+    "must_any_groups": [],
+    "acceptable": []
+  },
+  {
+    "id": 11,
+    "name": "11_个股研报",
+    "title": "个股研报",
+    "text": "帮我查一下隆基绿能最近有没有机构研报，主要观点是偏乐观还是偏谨慎？",
+    "must_all": [
+      "equity_research_search"
+    ],
+    "must_any_groups": [],
+    "acceptable": []
+  },
+  {
+    "id": 12,
+    "name": "12_个股新闻",
+    "title": "个股新闻",
+    "text": "最近和中芯国际相关的新闻有哪些？帮我看一下有没有比较重要的事件。",
+    "must_all": [
+      "financial_news_search"
+    ],
+    "must_any_groups": [],
+    "acceptable": []
+  },
+  {
+    "id": 13,
+    "name": "13_实时行情排名",
+    "title": "实时行情排名",
+    "text": "帮我看一下现在全市场成交额排名前 20 的股票。",
+    "must_all": [
+      "实时行情排名查询"
+    ],
+    "must_any_groups": [],
+    "acceptable": []
+  },
+  {
+    "id": 14,
+    "name": "14_热门板块与龙头",
+    "title": "热门板块与龙头",
+    "text": "今天市场最热的板块有哪些？每个板块的龙头是谁？",
+    "must_all": [
+      "get_hot_sectors_and_leaders"
+    ],
+    "must_any_groups": [],
+    "acceptable": [
+      "实时行情排名查询"
+    ]
+  },
+  {
+    "id": 15,
+    "name": "15_热门行业与龙头",
+    "title": "热门行业与龙头",
+    "text": "现在市场最强的几个行业是什么？对应龙头股分别是谁？",
+    "must_all": [
+      "get_hot_industries_and_leaders"
+    ],
+    "must_any_groups": [],
+    "acceptable": [
+      "实时行情排名查询"
+    ]
+  },
+  {
+    "id": 16,
+    "name": "16_热点概念与龙头",
+    "title": "热点概念与龙头",
+    "text": "最近市场最活跃的热点概念有哪些？龙头股分别是谁？",
+    "must_all": [
+      "get_hot_concepts_and_leaders"
+    ],
+    "must_any_groups": [],
+    "acceptable": [
+      "实时行情排名查询"
+    ]
+  },
+  {
+    "id": 17,
+    "name": "17_公司画像",
+    "title": "公司画像",
+    "text": "帮我看一下兆易创新属于什么行业、板块和热点概念。",
+    "must_all": [
+      "get_company_taxonomy_profile"
+    ],
+    "must_any_groups": [],
+    "acceptable": []
+  },
+  {
+    "id": 18,
+    "name": "18_放量上涨是否可信",
+    "title": "放量上涨是否可信",
+    "text": "今天北方华创盘中拉升得很快，你帮我判断一下这波上涨更像是资金推动，还是有基本面消息在催化。",
+    "must_all": [
+      "stock_realtime_quote",
+      "stock_realtime_funds_flow",
+      "financial_news_search"
+    ],
+    "must_any_groups": [],
+    "acceptable": [
+      "equity_research_search",
+      "stock_history_kline"
+    ]
+  },
+  {
+    "id": 19,
+    "name": "19_技术形态背后有没有逻辑支撑",
+    "title": "技术形态背后有没有逻辑支撑",
+    "text": "贵州茅台这两天价格重新站上短期均线，我想知道这次走强到底只是技术反弹，还是背后有新的业务逻辑支持。",
+    "must_all": [
+      "indicator_series_query"
+    ],
+    "must_any_groups": [
+      [
+        "equity_research_search",
+        "financial_news_search"
+      ]
+    ],
+    "acceptable": [
+      "stock_history_kline",
+      "equity_research_search",
+      "financial_news_search"
+    ]
+  },
+  {
+    "id": 20,
+    "name": "20_板块走强下的龙头确认",
+    "title": "板块走强下的龙头确认",
+    "text": "今天机器人方向又有点起势，你帮我确认一下现在真正带头的是谁，最好结合板块热度和个股资金状态一起看。",
+    "must_all": [
+      "get_hot_concepts_and_leaders",
+      "stock_realtime_funds_flow"
+    ],
+    "must_any_groups": [],
+    "acceptable": [
+      "实时行情排名查询",
+      "stock_realtime_quote"
+    ]
+  },
+  {
+    "id": 21,
+    "name": "21_市场风格判断",
+    "title": "市场风格判断",
+    "text": "我想知道今天市场更像是权重带动，还是题材活跃，你帮我从成交额、上涨家数和热点方向三个角度一起判断一下。",
+    "must_all": [
+      "market_realtime_breadth"
+    ],
+    "must_any_groups": [
+      [
+        "get_hot_concepts_and_leaders",
+        "get_hot_industries_and_leaders"
+      ],
+      [
+        "market_minute_amount_series",
+        "market_history_amount"
+      ]
+    ],
+    "acceptable": [
+      "get_hot_concepts_and_leaders",
+      "get_hot_industries_and_leaders",
+      "实时行情排名查询",
+      "成交额：分钟成交额序列更贴近盘中，历史成交额更贴近日度背景",
+      "热点方向：概念和行业都可以，若同时使用更好"
+    ]
+  },
+  {
+    "id": 22,
+    "name": "22_个股异动的行业映射",
+    "title": "个股异动的行业映射",
+    "text": "我看到工业富联今天表现很强，想知道它是个股自己走强，还是所在行业和概念一起在共振。",
+    "must_all": [
+      "get_company_taxonomy_profile",
+      "stock_realtime_quote"
+    ],
+    "must_any_groups": [
+      [
+        "get_hot_industries_and_leaders",
+        "get_hot_concepts_and_leaders"
+      ]
+    ],
+    "acceptable": [
+      "get_hot_industries_and_leaders",
+      "get_hot_concepts_and_leaders",
+      "stock_realtime_funds_flow"
+    ]
+  },
+  {
+    "id": 23,
+    "name": "23_盘中是否有调仓迹象",
+    "title": "盘中是否有调仓迹象",
+    "text": "今天银行股看起来比较稳，但我不太确定是不是市场在做高低切，你帮我看看是不是有从成长切到银行的迹象。",
+    "must_all": [
+      "get_hot_industries_and_leaders",
+      "market_minute_amount_series",
+      "实时行情排名查询"
+    ],
+    "must_any_groups": [],
+    "acceptable": [
+      "market_realtime_breadth",
+      "stock_industry_funds_flow",
+      "银行等低波/低估值行业是否走强",
+      "市场盘中成交结构",
+      "排名是否体现风格切换"
+    ]
+  },
+  {
+    "id": 24,
+    "name": "24_涨停潮是否有持续性",
+    "title": "涨停潮是否有持续性",
+    "text": "今天这个题材方向涨停不少，但我担心只是情绪冲一波，你帮我看一下它到底是板块性行情，还是零散个股炒作。",
+    "must_all": [
+      "涨跌停列表查询",
+      "get_hot_concepts_and_leaders"
+    ],
+    "must_any_groups": [],
+    "acceptable": [
+      "market_realtime_breadth",
+      "实时行情排名查询"
+    ]
+  },
+  {
+    "id": 25,
+    "name": "25_个股大涨的可信度诊断",
+    "title": "个股大涨的可信度诊断",
+    "text": "寒武纪今天这波上冲很猛，你帮我判断一下，这更像是短线资金推动的情绪脉冲，还是基本面预期真的在改善。",
+    "must_all": [
+      "stock_realtime_quote",
+      "stock_realtime_funds_flow"
+    ],
+    "must_any_groups": [
+      [
+        "financial_news_search",
+        "equity_research_search"
+      ]
+    ],
+    "acceptable": [
+      "stock_history_kline",
+      "indicator_series_query",
+      "financial_news_search",
+      "equity_research_search",
+      "先确认涨势",
+      "再看资金结构",
+      "再看有没有基本面/预期催化"
+    ]
+  },
+  {
+    "id": 26,
+    "name": "26_判断一只股票是否值得继续跟踪",
+    "title": "判断一只股票是否值得继续跟踪",
+    "text": "兆易创新最近又有点走强了，我想知道它现在值不值得放进持续跟踪名单，不只是看今天涨没涨，而是看有没有板块配合、资金支持和基本面催化。",
+    "must_all": [
+      "stock_history_kline",
+      "stock_realtime_funds_flow",
+      "get_company_taxonomy_profile"
+    ],
+    "must_any_groups": [
+      [
+        "financial_news_search",
+        "equity_research_search"
+      ]
+    ],
+    "acceptable": [
+      "stock_realtime_quote",
+      "get_hot_industries_and_leaders",
+      "get_hot_concepts_and_leaders",
+      "financial_news_search",
+      "equity_research_search"
+    ]
+  },
+  {
+    "id": 27,
+    "name": "27_判断市场是否进入风险偏好回升阶段",
+    "title": "判断市场是否进入风险偏好回升阶段",
+    "text": "我想知道今天市场是不是开始重新提升风险偏好了，你帮我从成交活跃度、上涨扩散、热点题材和强势股表现几个方面综合看一下。",
+    "must_all": [
+      "market_minute_amount_series",
+      "market_realtime_breadth",
+      "get_hot_concepts_and_leaders",
+      "实时行情排名查询"
+    ],
+    "must_any_groups": [],
+    "acceptable": [
+      "涨跌停列表查询",
+      "market_history_amount",
+      "盘中活跃度",
+      "上涨扩散度",
+      "热点题材活跃",
+      "强势股赚钱效应"
+    ]
+  },
+  {
+    "id": 28,
+    "name": "28_判断一波行情是不是产业逻辑驱动",
+    "title": "判断一波行情是不是产业逻辑驱动",
+    "text": "最近算力链又开始活跃了，我不想只看股价涨跌，你帮我判断一下，这一轮更像是产业逻辑重新发酵，还是短期交易性反弹。",
+    "must_all": [
+      "financial_news_search",
+      "equity_research_search"
+    ],
+    "must_any_groups": [
+      [
+        "get_hot_concepts_and_leaders",
+        "get_hot_industries_and_leaders"
+      ]
+    ],
+    "acceptable": [
+      "实时行情排名查询",
+      "stock_realtime_funds_flow",
+      "stock_history_kline",
+      "get_hot_concepts_and_leaders",
+      "get_hot_industries_and_leaders"
+    ]
+  },
+  {
+    "id": 29,
+    "name": "29_行业轮动识别",
+    "title": "行业轮动识别",
+    "text": "我最近感觉市场有点从高弹性科技往低估值方向切，你帮我验证一下这个判断是不是成立。",
+    "must_all": [
+      "get_hot_industries_and_leaders",
+      "market_minute_amount_series",
+      "实时行情排名查询"
+    ],
+    "must_any_groups": [],
+    "acceptable": [
+      "market_realtime_breadth",
+      "market_history_amount",
+      "stock_industry_funds_flow",
+      "market_minute_amount_series"
+    ]
+  },
+  {
+    "id": 30,
+    "name": "30_龙头股强势是否具有扩散效应",
+    "title": "龙头股强势是否具有扩散效应",
+    "text": "如果一个热点方向里只有龙头在涨、后排跟不上，我会比较谨慎。你帮我看一下今天这个方向是不是已经有扩散效应了。",
+    "must_all": [
+      "get_hot_concepts_and_leaders",
+      "实时行情排名查询",
+      "涨跌停列表查询"
+    ],
+    "must_any_groups": [],
+    "acceptable": [
+      "market_realtime_breadth",
+      "stock_realtime_quote",
+      "龙头确认",
+      "后排跟随情况",
+      "涨停扩散分布"
+    ]
+  },
+  {
+    "id": 31,
+    "name": "31_研判个股异动是否需要追踪公告或消息",
+    "title": "研判个股异动是否需要追踪公告或消息",
+    "text": "立讯精密今天突然放量走强，我更关心的是这是不是有消息面支撑，还是纯粹资金短打，你帮我做个快速判断。",
+    "must_all": [
+      "stock_realtime_quote",
+      "stock_realtime_funds_flow",
+      "financial_news_search"
+    ],
+    "must_any_groups": [],
+    "acceptable": [
+      "equity_research_search",
+      "stock_history_kline"
+    ]
+  },
+  {
+    "id": 32,
+    "name": "32_判断当前更适合做趋势还是做事件驱动",
+    "title": "判断当前更适合做趋势还是做事件驱动",
+    "text": "现在这个市场环境里，更适合围绕热点趋势去做，还是更适合围绕个别事件驱动去找机会？你帮我从盘面和消息两个层面一起看一下。",
+    "must_all": [
+      "market_realtime_breadth",
+      "get_hot_concepts_and_leaders",
+      "financial_news_search"
+    ],
+    "must_any_groups": [],
+    "acceptable": [
+      "涨跌停列表查询",
+      "实时行情排名查询"
+    ]
+  },
+  {
+    "id": 33,
+    "name": "33_判断当前仓位结构是否需要调整",
+    "title": "判断当前仓位结构是否需要调整",
+    "text": "如果我现在持仓里成长偏多，你帮我看一下今天市场有没有必要往更稳一些的方向做一点调整。",
+    "must_all": [
+      "get_hot_industries_and_leaders",
+      "market_minute_amount_series",
+      "实时行情排名查询"
+    ],
+    "must_any_groups": [],
+    "acceptable": [
+      "market_realtime_breadth",
+      "get_hot_concepts_and_leaders"
+    ]
+  },
+  {
+    "id": 34,
+    "name": "34_判断热点是否从主题炒作走向主线",
+    "title": "判断热点是否从主题炒作走向主线",
+    "text": "这个方向之前像是短炒题材，但我想知道它现在是不是已经有点往阶段性主线演变的意思了。",
+    "must_all": [
+      "get_hot_concepts_and_leaders",
+      "涨跌停列表查询",
+      "financial_news_search"
+    ],
+    "must_any_groups": [],
+    "acceptable": [
+      "实时行情排名查询",
+      "market_realtime_breadth",
+      "热点强度",
+      "扩散程度",
+      "催化是否持续"
+    ]
+  },
+  {
+    "id": 35,
+    "name": "35_判断一只股票当前适合看趋势还是看事件",
+    "title": "判断一只股票当前适合看趋势还是看事件",
+    "text": "我最近在看中科曙光，但我拿不准现在该把它当趋势股看，还是当事件驱动股看，你帮我判断一下。",
+    "must_all": [
+      "stock_history_kline",
+      "indicator_series_query",
+      "financial_news_search"
+    ],
+    "must_any_groups": [],
+    "acceptable": [
+      "equity_research_search",
+      "stock_realtime_funds_flow"
+    ]
+  },
+  {
+    "id": 36,
+    "name": "36_判断指数环境对个股进攻是否友好",
+    "title": "判断指数环境对个股进攻是否友好",
+    "text": "我不是特别担心个股本身，主要想知道现在这个盘面对做进攻型个股是不是友好。",
+    "must_all": [
+      "market_realtime_breadth",
+      "market_minute_amount_series",
+      "涨跌停列表查询"
+    ],
+    "must_any_groups": [],
+    "acceptable": [
+      "实时行情排名查询",
+      "get_hot_concepts_and_leaders"
+    ]
+  },
+  {
+    "id": 37,
+    "name": "37_快速判断一只股票是否具备_板块龙头候选_特征",
+    "title": "快速判断一只股票是否具备“板块龙头候选”特征",
+    "text": "帮我看看沪电股份现在有没有成为这一轮板块核心龙头的条件，不只是股价强，还要看市场认可度。",
+    "must_all": [
+      "get_company_taxonomy_profile",
+      "stock_realtime_quote",
+      "stock_realtime_funds_flow",
+      "实时行情排名查询"
+    ],
+    "must_any_groups": [
+      [
+        "get_hot_industries_and_leaders",
+        "get_hot_concepts_and_leaders"
+      ]
+    ],
+    "acceptable": [
+      "涨跌停列表查询",
+      "get_hot_industries_and_leaders",
+      "get_hot_concepts_and_leaders",
+      "找所属方向",
+      "看方向是否热",
+      "看个股是否强",
+      "看资金是否认可",
+      "看市场是否把它推到前排"
+    ]
+  },
+  {
+    "id": 38,
+    "name": "38_判断今天是否出现_指数稳_个股弱_或_指数弱_个股强",
+    "title": "判断今天是否出现“指数稳、个股弱”或“指数弱、个股强”",
+    "text": "我总觉得今天盘面有点别扭，你帮我看一下，是不是出现了指数和个股表现不一致的情况。",
+    "must_all": [
+      "market_realtime_breadth",
+      "market_minute_amount_series",
+      "实时行情排名查询"
+    ],
+    "must_any_groups": [],
+    "acceptable": [
+      "market_history_amount",
+      "涨跌停列表查询"
+    ]
+  }
+]

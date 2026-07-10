@@ -1,0 +1,58 @@
+{
+  "tool_name": "security_universe_query",
+  "purpose": "对股票集合执行过滤、聚合和排序查询。",
+  "best_for": [
+    "用于按市场、板块或股票列表定义股票池。",
+    "用于对股票池执行白名单字段过滤、聚合统计和排序。",
+    "用于回答数量统计、条件筛选和 TopK 排名类问题。"
+  ],
+  "input_guidance": {
+    "required_fields": [],
+    "optional_fields": [
+      "universe",
+      "as_of",
+      "filters",
+      "metrics",
+      "sort",
+      "limit",
+      "select_fields"
+    ]
+  },
+  "invocation_example": "security_universe_query(universe={\"type\":\"market\"}, metrics=[{\"name\":\"count\",\"alias\":\"rising_count\",\"condition\":{\"field\":\"change_pct\",\"op\":\"gt\",\"value\":0}}])",
+  "output_guidance": {
+    "high_value_for_reasoning": [
+      "data.metrics"
+    ],
+    "high_value_for_render": [
+      "data.rows"
+    ],
+    "drop_default": [],
+    "usually_too_large_for_prompt": [
+      "data.rows"
+    ],
+    "recommended_reducers": {
+      "data.rows": "summarize_ranked_list"
+    },
+    "field_policies": {
+      "data.metrics": {
+        "strategy": "prompt_full"
+      },
+      "data.rows": {
+        "strategy": "auto"
+      }
+    }
+  },
+  "status": "disabled",
+  "enabled": false,
+  "availability": {
+    "lifecycle": "disabled",
+    "retrieval_mode": "direct_only",
+    "visibility": "hidden"
+  },
+  "retrieval": {
+    "mode": "direct_only",
+    "visibility": "hidden"
+  },
+  "visibility": "hidden",
+  "deprecation_note": "股票集合过滤/聚合/排序 mini-query 工具已从基础工具池移除；后续使用清晰的 stock/plate 基础数据工具加 DSL/Agent 组合。"
+}

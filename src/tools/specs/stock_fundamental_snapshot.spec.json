@@ -1,0 +1,50 @@
+{
+  "best_for": [
+    "用于获取股票代码、名称、上市市场、上市日期等基础资料。",
+    "用于获取公司名称、主营业务、注册地址、官网和联系方式等公司资料。",
+    "用于读取 kcrp_stock_baseinfo 与 kcrp_stock_company，不返回财务指标、盈利预测或财务三表。"
+  ],
+  "input_guidance": {
+    "required_fields": [
+      "stock"
+    ],
+    "optional_fields": []
+  },
+  "invocation_example": "stock_fundamental_snapshot(stock=\"贵州茅台\")",
+  "output_guidance": {
+    "drop_default": [],
+    "field_policies": {
+      "data.profile": {
+        "strategy": "auto"
+      },
+      "data.profile.brief_intro": {
+        "strategy": "truncate"
+      },
+      "data.profile.business_major": {
+        "strategy": "truncate"
+      },
+      "data.code": {
+        "strategy": "prompt_full"
+      },
+      "data.name": {
+        "strategy": "prompt_full"
+      }
+    },
+    "high_value_for_reasoning": [
+      "data.code",
+      "data.name",
+      "data.profile"
+    ],
+    "high_value_for_render": [],
+    "recommended_reducers": {
+      "data.profile.brief_intro": "truncate_text",
+      "data.profile.business_major": "truncate_text"
+    },
+    "usually_too_large_for_prompt": [
+      "data.profile.brief_intro",
+      "data.profile.business_major"
+    ]
+  },
+  "purpose": "获取单只 A 股的基础资料和公司资料快照。",
+  "tool_name": "stock_fundamental_snapshot"
+}

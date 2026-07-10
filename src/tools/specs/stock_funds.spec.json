@@ -1,0 +1,69 @@
+{
+  "tool_name": "stock_funds",
+  "purpose": "获取个股资金流向、主力净额、行业资金、历史资金表和资金相关新闻，用于资金面和情绪面分析。",
+  "best_for": [
+    "资金面分析",
+    "主力资金强弱判断",
+    "行业资金共振判断",
+    "融资融券热点识别"
+  ],
+  "input_guidance": {
+    "required_fields": [
+      "code"
+    ],
+    "optional_fields": []
+  },
+  "output_guidance": {
+    "field_policies": {
+      "data.snapshot.chart_payloads.realtime_trade_distribution_pie": {
+        "strategy": "render",
+        "render_type": "pie"
+      },
+      "data.snapshot.chart_payloads.intraday_funds_line": {
+        "strategy": "render",
+        "render_type": "line"
+      },
+      "data.snapshot.chart_payloads.size_order_bar": {
+        "strategy": "render",
+        "render_type": "bar"
+      },
+      "data.snapshot.chart_payloads.recent_main_funds_bar_line": {
+        "strategy": "render",
+        "render_type": "bar"
+      },
+      "data.snapshot.chart_payloads.historical_net_inflow_line": {
+        "strategy": "render",
+        "render_type": "line"
+      },
+      "data.snapshot.chart_payloads.industry_top_buy_sell_bar": {
+        "strategy": "render",
+        "render_type": "bar"
+      }
+    },
+    "high_value_for_reasoning": [
+      "data.snapshot.today_funds",
+      "data.snapshot.industry_funds",
+      "data.snapshot.capital_flow_news",
+      "data.capital_flow_news_items"
+    ],
+    "high_value_for_render": [
+      "data.snapshot.chart_payloads",
+      "data.snapshot.hidden_series",
+      "data.snapshot.historical_table",
+      "data.snapshot.recent_n_day_series"
+    ],
+    "usually_too_large_for_prompt": [
+      "data.snapshot.chart_payloads",
+      "data.snapshot.historical_table",
+      "data.snapshot.readable_sections"
+    ],
+    "drop_default": [],
+    "recommended_reducers": {
+      "data.snapshot.today_funds": "extract_metrics",
+      "data.snapshot.industry_funds": "extract_metrics",
+      "data.snapshot.historical_table": "summarize_table",
+      "data.snapshot.recent_n_day_series": "summarize_timeseries",
+      "data.capital_flow_news_items": "summarize_news_list"
+    }
+  }
+}

@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "quant_data_provider.schema.json",
+  "title": "Quant Data Provider Output",
+  "type": "object",
+  "required": [
+    "tool",
+    "ok",
+    "data",
+    "error"
+  ],
+  "properties": {
+    "tool": {
+      "const": "quant_data_provider"
+    },
+    "ok": {
+      "type": "boolean"
+    },
+    "data": {
+      "type": "object",
+      "properties": {
+        "artifacts": {
+          "type": "array"
+        },
+        "data_coverage": {
+          "type": "object"
+        },
+        "source_coverage": {
+          "type": "object"
+        },
+        "schemas": {
+          "type": "object"
+        },
+        "samples": {
+          "type": "object"
+        }
+      },
+      "additionalProperties": true
+    },
+    "error": {
+      "type": "string"
+    },
+    "meta": {
+      "type": "object"
+    }
+  },
+  "additionalProperties": true
+}

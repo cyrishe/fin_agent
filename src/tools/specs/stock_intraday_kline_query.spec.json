@@ -1,0 +1,44 @@
+{
+  "best_for": [
+    "用于获取单只股票最近可用交易日的分钟级价格、成交量和成交额。",
+    "用于按 minute_count 获取最近 N 个分钟点，默认尽量返回当日全部分钟行情。",
+    "用于读取 kingdomai 结构化分钟行情，不接收 start/end 日期区间。"
+  ],
+  "input_guidance": {
+    "required_fields": [
+      "stock"
+    ],
+    "optional_fields": [
+      "minute_count"
+    ]
+  },
+  "invocation_example": "stock_intraday_kline_query(stock=\"600519.SH\", minute_count=240)",
+  "output_guidance": {
+    "drop_default": [],
+    "field_policies": {
+      "data.rows": {
+        "strategy": "auto"
+      },
+      "data.code": {
+        "strategy": "prompt_full"
+      },
+      "data.name": {
+        "strategy": "prompt_full"
+      }
+    },
+    "high_value_for_reasoning": [
+      "data.code",
+      "data.name",
+      "data.rows"
+    ],
+    "high_value_for_render": [],
+    "recommended_reducers": {
+      "data.rows": "summarize_timeseries"
+    },
+    "usually_too_large_for_prompt": [
+      "data.rows"
+    ]
+  },
+  "purpose": "获取单只股票最近可用交易日的日内分钟行情序列。",
+  "tool_name": "stock_intraday_kline_query"
+}

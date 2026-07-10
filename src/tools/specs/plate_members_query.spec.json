@@ -1,0 +1,42 @@
+{
+  "tool_name": "plate_members_query",
+  "purpose": "获取指定板块的成分股列表。",
+  "best_for": [
+    "用于查看某个板块下包含哪些股票。",
+    "用于获取板块成分股的代码、名称和最近行情/资金字段。",
+    "用于把板块主题扩展为候选股票池，后续排序和过滤交给 DSL 或 Agent。"
+  ],
+  "input_guidance": {
+    "required_fields": [
+      "plate"
+    ],
+    "optional_fields": [
+      "as_of",
+      "limit",
+      "sort_by"
+    ]
+  },
+  "invocation_example": "plate_members_query(plate=\"半导体\", limit=50, sort_by=\"stock_rise_fall_rate\")",
+  "output_guidance": {
+    "drop_default": [],
+    "field_policies": {
+      "data.mode": {
+        "strategy": "prompt_full"
+      },
+      "data.items": {
+        "strategy": "auto"
+      }
+    },
+    "high_value_for_reasoning": [
+      "data.mode",
+      "data.items"
+    ],
+    "high_value_for_render": [],
+    "recommended_reducers": {
+      "data.items": "top_rows"
+    },
+    "usually_too_large_for_prompt": [
+      "data.items"
+    ]
+  }
+}

@@ -1,0 +1,55 @@
+{
+  "best_for": [
+    "获取个股相关行业的资金流向和主力动向",
+    "查看行业内资金流入流出靠前的公司"
+  ],
+  "input_guidance": {
+    "optional_fields": [],
+    "required_fields": [
+      "name"
+    ]
+  },
+  "invocation_example": "stock_industry_funds_flow(name=\"贵州茅台\")",
+  "output_guidance": {
+    "drop_default": [],
+    "field_policies": {
+      "data.code": {
+        "strategy": "prompt_full"
+      },
+      "data.industry_name": {
+        "strategy": "prompt_full"
+      },
+      "data.industry_net_flow_wan": {
+        "strategy": "prompt_full"
+      },
+      "data.name": {
+        "strategy": "prompt_full"
+      },
+      "data.top_buy": {
+        "strategy": "prompt_full"
+      },
+      "data.top_buy.[]": {
+        "strategy": "auto"
+      },
+      "data.top_sell": {
+        "strategy": "prompt_full"
+      },
+      "data.top_sell.[]": {
+        "strategy": "auto"
+      }
+    },
+    "high_value_for_reasoning": [
+      "data.code",
+      "data.industry_name",
+      "data.industry_net_flow_wan",
+      "data.name",
+      "data.top_buy",
+      "data.top_sell"
+    ],
+    "high_value_for_render": [],
+    "recommended_reducers": {},
+    "usually_too_large_for_prompt": []
+  },
+  "purpose": "输入个股名称或代码，查询该个股所属行业资金流情况，以及行业内主力净流入和净流出靠前的公司。\n主要是看资金面，分大单小单（主力/散户）的流入流出量和对比",
+  "tool_name": "stock_industry_funds_flow"
+}

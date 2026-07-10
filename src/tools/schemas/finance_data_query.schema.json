@@ -1,0 +1,56 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "finance_data_query.output.schema.json",
+  "type": "object",
+  "required": [
+    "protocol",
+    "request",
+    "call",
+    "validation",
+    "result"
+  ],
+  "properties": {
+    "protocol": {
+      "type": "string"
+    },
+    "request": {
+      "type": "string"
+    },
+    "call": {
+      "type": "object"
+    },
+    "validation": {
+      "type": "object",
+      "required": [
+        "ok",
+        "errors",
+        "warnings"
+      ],
+      "properties": {
+        "ok": {
+          "type": "boolean"
+        },
+        "errors": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "warnings": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "additionalProperties": true
+    },
+    "result": {
+      "type": [
+        "object",
+        "null"
+      ]
+    }
+  },
+  "additionalProperties": true
+}

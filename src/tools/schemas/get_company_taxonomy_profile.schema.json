@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "get_company_taxonomy_profile.schema.json",
+  "title": "get_company_taxonomy_profile Output",
+  "type": "object",
+  "required": [
+    "tool",
+    "ok",
+    "data",
+    "error"
+  ],
+  "properties": {
+    "data": {
+      "type": "object",
+      "required": [
+        "concept_name",
+        "ind_name",
+        "sector_name"
+      ],
+      "properties": {
+        "concept_name": {
+          "description": "公司所属热点概念名称",
+          "type": "array"
+        },
+        "ind_name": {
+          "description": "公司所属行业名称",
+          "type": "array"
+        },
+        "sector_name": {
+          "description": "公司所属板块名称",
+          "type": "array"
+        }
+      },
+      "additionalProperties": false
+    },
+    "error": {
+      "type": "string"
+    },
+    "ok": {
+      "type": "boolean"
+    },
+    "tool": {
+      "const": "get_company_taxonomy_profile"
+    }
+  },
+  "additionalProperties": true
+}

@@ -1,0 +1,16 @@
+{
+  "prompt_key": "system.agent_runtime.plan_compiler_repair",
+  "layer": "system",
+  "owner": "agent_runtime",
+  "version": "v1",
+  "messages": [
+    {
+      "role": "system",
+      "template_path": "agent_runtime.plan_compiler_repair.system.md"
+    },
+    {
+      "role": "user",
+      "template": "high_level_plan_text:\n$high_level_plan_text\n\ncandidate_tool_contract_sections:\n$candidate_tool_contract_sections\n\ncurrent_plan_json:\n$current_plan_json\n\nvalidation_errors_json:\n$validation_errors_json"
+    }
+  ]
+}

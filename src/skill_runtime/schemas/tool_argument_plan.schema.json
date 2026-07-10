@@ -1,0 +1,64 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "tool_argument_plan.schema.json",
+  "title": "ToolArgumentPlan",
+  "type": "object",
+  "required": [
+    "plan_type",
+    "tool_name",
+    "status",
+    "arguments",
+    "missing_arguments",
+    "argument_sources",
+    "confidence"
+  ],
+  "properties": {
+    "plan_type": {
+      "type": "string",
+      "const": "tool_argument_plan"
+    },
+    "tool_name": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["ready", "clarify", "unsupported"]
+    },
+    "intent": {
+      "type": "string"
+    },
+    "arguments": {
+      "type": "object"
+    },
+    "missing_arguments": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "required_arguments": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "defaults_applied": {
+      "type": "object"
+    },
+    "argument_sources": {
+      "type": "object"
+    },
+    "search_plan": {
+      "type": ["object", "null"]
+    },
+    "ranking_plan": {
+      "type": ["object", "null"]
+    },
+    "notes": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "confidence": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
+    }
+  },
+  "additionalProperties": false
+}

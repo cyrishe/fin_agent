@@ -1,0 +1,55 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "get_hot_concepts_and_leaders.schema.json",
+  "title": "get_hot_concepts_and_leaders Output",
+  "type": "object",
+  "required": [
+    "tool",
+    "ok",
+    "data",
+    "error"
+  ],
+  "properties": {
+    "data": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "concept",
+          "event_summary",
+          "hotness",
+          "leaders"
+        ],
+        "properties": {
+          "concept": {
+            "description": "热点概念",
+            "type": "string"
+          },
+          "event_summary": {
+            "description": "热点概念的相关事件说明",
+            "type": "string"
+          },
+          "hotness": {
+            "description": "1-10热度",
+            "type": "integer"
+          },
+          "leaders": {
+            "description": "热点概念龙头股1-3个",
+            "type": "array"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "error": {
+      "type": "string"
+    },
+    "ok": {
+      "type": "boolean"
+    },
+    "tool": {
+      "const": "get_hot_concepts_and_leaders"
+    }
+  },
+  "additionalProperties": true
+}

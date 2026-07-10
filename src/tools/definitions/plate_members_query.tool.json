@@ -1,0 +1,160 @@
+{
+  "auth": "public",
+  "availability": {
+    "lifecycle": "active",
+    "retrieval_mode": "retrievable",
+    "visibility": "visible"
+  },
+  "capabilities": [
+    "plate_members",
+    "plate_constituents"
+  ],
+  "defaults": {
+    "limit": 50,
+    "sort_by": "stock_rise_fall_rate"
+  },
+  "identity": {
+    "description": "获取指定板块的成分股列表。",
+    "display_name": "板块成分股查询",
+    "domain": "plate",
+    "owner": "tools"
+  },
+  "invocation_example": "plate_members_query(plate=\"半导体\", limit=50, sort_by=\"stock_rise_fall_rate\")",
+  "match_contract": {
+    "request_families": [
+      "data_access"
+    ],
+    "work_item_types": [
+      "tool"
+    ],
+    "capability_classes": [
+      "data_retrieval",
+      "plate_membership_lookup"
+    ],
+    "side_effect_level": "read_only"
+  },
+  "name": "plate_members_query",
+  "profiles": {
+    "mock": {
+      "enabled": true,
+      "implementation": {
+        "kind": "inline_result"
+      },
+      "result": {
+        "tool": "plate_members_query",
+        "ok": true,
+        "data": {
+          "items": []
+        },
+        "error": ""
+      }
+    },
+    "real": {
+      "enabled": true,
+      "implementation": {
+        "kind": "python_callable",
+        "target": "src.tools.plate_members_query_tool:run"
+      }
+    }
+  },
+  "retention": {
+    "drop_default": [],
+    "high_value_for_reasoning": [
+      "data.resolved_subject",
+      "data.items"
+    ],
+    "high_value_for_render": [],
+    "recommended_reducers": {
+      "data.items": "top_rows"
+    },
+    "usually_too_large_for_prompt": [
+      "data.items"
+    ]
+  },
+  "runtime_hints": {
+    "cost_class": "low",
+    "latency_class": "low",
+    "supports_async_submit": false,
+    "supports_stream": false
+  },
+  "safety": {
+    "network": true,
+    "persistence": false,
+    "side_effect": "none"
+  },
+  "schemas": {
+    "input": {
+      "$id": "plate_members_query.input.schema.json",
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "plate": {
+          "type": "string",
+          "description": "板块代码或板块名称。"
+        },
+        "as_of": {
+          "description": "可选快照交易日，YYYY-MM-DD；为空时使用最近可用行情数据。",
+          "type": "string"
+        },
+        "limit": {
+          "description": "返回成分股数量，默认 50。",
+          "minimum": 1,
+          "maximum": 500,
+          "type": "integer"
+        },
+        "sort_by": {
+          "description": "成分股排序字段。",
+          "enum": [
+            "stock_code",
+            "stock_rise_fall_rate",
+            "stock_amount",
+            "stock_main_net_inflow"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "plate"
+      ],
+      "type": "object"
+    },
+    "output": {
+      "$ref": "src/tools/schemas/plate_members_query.schema.json"
+    }
+  },
+  "status": "active",
+  "tags": [
+    "plate",
+    "membership",
+    "constituents"
+  ],
+  "tests": {
+    "golden_cases": [],
+    "sample_inputs": [
+      {
+        "name": "plate_members_query_sample",
+        "arguments": {
+          "limit": 50,
+          "sort_by": "stock_rise_fall_rate",
+          "plate": "半导体"
+        }
+      }
+    ]
+  },
+  "ui_hints": {
+    "editable_sections": [
+      "identity",
+      "schemas.input",
+      "schemas.output",
+      "capabilities",
+      "profiles",
+      "retention",
+      "tests"
+    ]
+  },
+  "version": "v1",
+  "subject_tags": [
+    "plate"
+  ],
+  "tool_priority": 1
+}

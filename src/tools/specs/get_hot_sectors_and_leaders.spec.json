@@ -1,0 +1,54 @@
+{
+  "best_for": [
+    "当明确提到板块相关的分析需求",
+    "或需要从板块的角度去分析个股"
+  ],
+  "input_guidance": {
+    "optional_fields": [],
+    "required_fields": []
+  },
+  "invocation_example": "get_hot_sectors_and_leaders()",
+  "output_guidance": {
+    "drop_default": [],
+    "field_policies": {
+      "data.[]": {
+        "strategy": "auto"
+      },
+      "data.[].event": {
+        "strategy": "auto"
+      },
+      "data.[].hotness": {
+        "strategy": "auto"
+      },
+      "data.[].leaders": {
+        "strategy": "auto"
+      },
+      "data.[].sector_name": {
+        "strategy": "auto"
+      },
+      "data.event": {
+        "strategy": "prompt_full"
+      },
+      "data.hotness": {
+        "strategy": "prompt_full"
+      },
+      "data.leaders": {
+        "strategy": "prompt_full"
+      },
+      "data.sector_name": {
+        "strategy": "prompt_full"
+      }
+    },
+    "high_value_for_reasoning": [
+      "data.event",
+      "data.hotness",
+      "data.leaders",
+      "data.sector_name"
+    ],
+    "high_value_for_render": [],
+    "recommended_reducers": {},
+    "usually_too_large_for_prompt": []
+  },
+  "purpose": "获取当前热门板块及对应龙头股列表，用于板块热点观察和板块龙头识别。\n热门板块是介于相对稳定的行业分类和相对实时动态的热点概念分类中间的分类体系，相对灵活",
+  "tool_name": "get_hot_sectors_and_leaders"
+}

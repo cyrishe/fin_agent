@@ -1,0 +1,16 @@
+{
+  "prompt_key": "system.agent_runtime.security_subject_classifier",
+  "layer": "system",
+  "owner": "agent_runtime",
+  "version": "v1",
+  "messages": [
+    {
+      "role": "system",
+      "template_path": "agent_runtime.security_subject_classifier.system.md"
+    },
+    {
+      "role": "user",
+      "template": "task_desc:\n$task_desc"
+    }
+  ]
+}

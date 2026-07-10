@@ -1,0 +1,16 @@
+{
+  "prompt_key": "system.assistant.interaction_preprocess",
+  "layer": "system",
+  "owner": "assistant",
+  "version": "v2",
+  "messages": [
+    {
+      "role": "system",
+      "template_path": "assistant.interaction_preprocess.system.md"
+    },
+    {
+      "role": "user",
+      "template_path": "assistant.interaction_preprocess.user.md"
+    }
+  ]
+}

@@ -1,0 +1,63 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "financial_news_search.schema.json",
+  "title": "Financial News Search Output",
+  "type": "object",
+  "required": [
+    "tool",
+    "ok",
+    "data",
+    "error"
+  ],
+  "properties": {
+    "data": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "publish_time",
+          "site",
+          "snippet",
+          "title",
+          "url"
+        ],
+        "properties": {
+          "publish_time": {
+            "description": "发布时间",
+            "type": "string"
+          },
+          "site": {
+            "description": "新闻来源站点",
+            "type": "string"
+          },
+          "snippet": {
+            "description": "新闻摘要",
+            "type": "string"
+          },
+          "title": {
+            "description": "新闻标题",
+            "type": "string"
+          },
+          "url": {
+            "description": "新闻链接",
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "error": {
+      "description": "错误信息，成功时为空",
+      "type": "string"
+    },
+    "ok": {
+      "description": "执行是否成功",
+      "type": "boolean"
+    },
+    "tool": {
+      "const": "financial_news_search",
+      "description": "工具标识"
+    }
+  },
+  "additionalProperties": false
+}

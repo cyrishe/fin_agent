@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{{ page_title }}</title>
+  <style>
+    :root {
+      --bg: #f5f1e8;
+      --panel: #fffdf7;
+      --ink: #1d252c;
+      --muted: #6a7882;
+      --line: #d7d0c2;
+      --accent: #0f766e;
+      --accent-soft: #d8efe9;
+      --warn: #a16207;
+      --danger: #b42318;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "SF Mono", "Menlo", monospace;
+      color: var(--ink);
+      background: linear-gradient(180deg, #efe9dd 0%, var(--bg) 100%);
+    }
+    .shell {
+      display: grid;
+      grid-template-columns: 320px 1fr;
+      min-height: 100vh;
+    }
+    .sidebar, .main {
+      padding: 20px;
+    }
+    .sidebar {
+      border-right: 1px solid var(--line);
+      background: rgba(255,255,255,0.5);
+    }
+    .main {
+      display: grid;
+      grid-template-rows: auto auto 1fr 1fr 1fr;
+      gap: 12px;
+    }
+    h1, h2 { margin: 0 0 12px; font-size: 16px; }
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 14px;
+      box-shadow: 0 10px 30px rgba(17, 24, 39, 0.04);
+    }
+    .list { display: grid; gap: 8px; margin-top: 12px; }
+    .item {
+      padding: 10px 12px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: white;
+      cursor: pointer;
+    }
+    .item.active {
+      border-color: var(--accent);
+      background: var(--accent-soft);
+    }
+    .item .meta {
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 4px;
+    }
+    .toolbar {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    input[type="text"], textarea {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 10px 12px;
+      font: inherit;
+      color: inherit;
+      background: white;
+    }
+    textarea {
+      min-height: 180px;
+      resize: vertical;
+    }
+    button {
+      border: 1px solid var(--ink);
+      border-radius: 999px;
+      background: var(--ink);
+      color: white;
+      padding: 8px 14px;
+      font: inherit;
+      cursor: pointer;
+    }
+    button.secondary {
+      background: white;
+      color: var(--ink);
+    }
+    .status { color: var(--muted); font-size: 12px; }
+    .status.error { color: var(--danger); }
+    .status.warn { color: var(--warn); }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <aside class="sidebar">
+      <div class="panel">
+        <h1>Application Studio</h1>
+        <div class="toolbar">
+          <input id="new-name" type="text" placeholder="new_application" />
+          <button id="create-btn">新建</button>
+        </div>
+        <div id="catalog" class="list"></div>
+      </div>
+    </aside>
+    <main class="main">
+      <div class="panel">
+        <div class="toolbar">
+          <input id="application-name" type="text" placeholder="application_name" />
+          <button id="save-btn">保存</button>
+          <button id="reload-btn" class="secondary">重载</button>
+        </div>
+        <div id="status" class="status">准备就绪</div>
+      </div>
+      <div class="panel">
+        <h2>APPLICATION.md</h2>
+        <textarea id="application-md"></textarea>
+      </div>
+      <div class="panel">
+        <h2>application.json</h2>
+        <textarea id="application-config"></textarea>
+      </div>
+      <div class="panel">
+        <h2>schema.json</h2>
+        <textarea id="schema-text"></textarea>
+      </div>
+    </main>
+  </div>
+  <script>
+    const apiCatalogUrl = {{ api_catalog_url|tojson }};
+    const apiBundleBaseUrl = {{ api_bundle_base_url|tojson }};
+    const initialApplicationName = {{ initial_application_name|tojson }};
+
+    const state = {
+      selected: initialApplicationName || "",
+      items: [],
+    };
+
+    const el = {
+      catalog: document.getElementById("catalog"),
+      status: document.getElementById("status"),
+      applicationName: document.getElementById("application-name"),
+      applicationMd: document.getElementById("application-md"),
+      applicationConfig: document.getElementById("application-config"),
+      schemaText: document.getElementById("schema-text"),
+      createBtn: document.getElementById("create-btn"),
+      saveBtn: document.getElementById("save-btn"),
+      reloadBtn: document.getElementById("reload-btn"),
+      newName: document.getElementById("new-name"),
+    };
+
+    function setStatus(text, level = "") {
+      el.status.textContent = text || "";
+      el.status.className = `status ${level}`.trim();
+    }
+
+    function renderCatalog() {
+      el.catalog.innerHTML = "";
+      for (const item of state.items) {
+        const div = document.createElement("div");
+        div.className = `item ${item.application_name === state.selected ? "active" : ""}`.trim();
+        div.innerHTML = `
+          <div>${item.display_name || item.application_name}</div>
+          <div class="meta">${item.application_name} · ${item.status || "-"}</div>
+        `;
+        div.addEventListener("click", () => loadBundle(item.application_name));
+        el.catalog.appendChild(div);
+      }
+    }
+
+    async function loadCatalog() {
+      const resp = await fetch(apiCatalogUrl);
+      const payload = await resp.json();
+      if (!payload.ok) throw new Error(payload.error || "加载 catalog 失败");
+      state.items = payload.items || [];
+      renderCatalog();
+      if (!state.selected && state.items.length) {
+        await loadBundle(state.items[0].application_name);
+      }
+    }
+
+    async function loadBundle(name) {
+      const applicationName = String(name || "").trim();
+      if (!applicationName) return;
+      setStatus(`正在加载 ${applicationName} ...`);
+      const resp = await fetch(`${apiBundleBaseUrl}/${encodeURIComponent(applicationName)}/bundle`);
+      const payload = await resp.json();
+      if (!payload.ok) throw new Error(payload.error || "加载 bundle 失败");
+      const bundle = payload.bundle || {};
+      const files = bundle.files || {};
+      state.selected = applicationName;
+      el.applicationName.value = applicationName;
+      el.applicationMd.value = files.application_md_text || "";
+      el.applicationConfig.value = files.application_config_text || "";
+      el.schemaText.value = files.schema_text || "";
+      renderCatalog();
+      setStatus(`已加载 ${applicationName}`);
+    }
+
+    async function saveBundle() {
+      const applicationName = String(el.applicationName.value || "").trim();
+      if (!applicationName) {
+        setStatus("application_name 不能为空", "error");
+        return;
+      }
+      setStatus(`正在保存 ${applicationName} ...`);
+      const resp = await fetch(`${apiBundleBaseUrl}/${encodeURIComponent(applicationName)}/bundle`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          application_md_text: el.applicationMd.value,
+          application_config_text: el.applicationConfig.value,
+          schema_text: el.schemaText.value,
+        }),
+      });
+      const payload = await resp.json();
+      if (!payload.ok) throw new Error(payload.error || "保存失败");
+      state.selected = applicationName;
+      await loadCatalog();
+      await loadBundle(applicationName);
+      setStatus(`已保存 ${applicationName}`);
+    }
+
+    async function createBundle() {
+      const name = String(el.newName.value || "").trim();
+      if (!name) {
+        setStatus("请先输入 application 名称", "warn");
+        return;
+      }
+      state.selected = name;
+      el.applicationName.value = name;
+      el.applicationMd.value = `# ${name}\n\n## 目标\n\n请描述这个 application 面向什么用户和业务场景。\n`;
+      el.applicationConfig.value = JSON.stringify({
+        name,
+        display_name: name,
+        version: "v1",
+        status: "draft",
+        enabled: true,
+        owner: "applications",
+        domain: "generic",
+        capabilities: [],
+        tags: [],
+        keywords: [],
+        default_agents: [],
+        default_skills: [],
+        default_tools: []
+      }, null, 2);
+      el.schemaText.value = JSON.stringify({
+        $schema: "https://json-schema.org/draft/2020-12/schema",
+        title: `${name} Session Payload`,
+        type: "object",
+        properties: {},
+        additionalProperties: true
+      }, null, 2);
+      setStatus(`已生成 application 模板：${name}`, "warn");
+    }
+
+    el.createBtn.addEventListener("click", () => createBundle().catch(err => setStatus(err.message, "error")));
+    el.saveBtn.addEventListener("click", () => saveBundle().catch(err => setStatus(err.message, "error")));
+    el.reloadBtn.addEventListener("click", () => loadBundle(el.applicationName.value || state.selected).catch(err => setStatus(err.message, "error")));
+
+    loadCatalog()
+      .then(async () => {
+        if (initialApplicationName) {
+          await loadBundle(initialApplicationName);
+        }
+      })
+      .catch(err => setStatus(err.message, "error"));
+  </script>
+</body>
+</html>

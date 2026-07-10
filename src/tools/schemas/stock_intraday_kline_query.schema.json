@@ -1,0 +1,134 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "stock_intraday_kline_query.schema.json",
+  "title": "Stock Intraday Kline Query Tool Output",
+  "type": "object",
+  "required": [
+    "tool",
+    "ok",
+    "data",
+    "error"
+  ],
+  "properties": {
+    "tool": {
+      "const": "stock_intraday_kline_query",
+      "type": "string"
+    },
+    "ok": {
+      "type": "boolean"
+    },
+    "error": {
+      "type": "string"
+    },
+    "data": {
+      "type": "object",
+      "required": [
+        "subject",
+        "code",
+        "name",
+        "trade_date",
+        "rows"
+      ],
+      "properties": {
+        "subject": {
+          "type": "string"
+        },
+        "code": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "trade_date": {
+          "type": "string"
+        },
+        "rows": {
+          "items": {
+            "$ref": "#/$defs/minuteRow"
+          },
+          "type": "array"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "$defs": {
+    "minuteRow": {
+      "type": "object",
+      "required": [
+        "trade_date",
+        "minute_index",
+        "minute_time",
+        "snapshot_time",
+        "snapshot_slot",
+        "code",
+        "name",
+        "latest_price",
+        "open_price",
+        "high_price",
+        "low_price",
+        "preclose_price",
+        "chg_value",
+        "chg_ratio",
+        "amount",
+        "volume",
+        "is_fallback"
+      ],
+      "properties": {
+        "trade_date": {
+          "type": "string"
+        },
+        "minute_index": {
+          "type": "integer"
+        },
+        "minute_time": {
+          "type": "string"
+        },
+        "snapshot_time": {
+          "type": "string"
+        },
+        "snapshot_slot": {
+          "type": "string"
+        },
+        "code": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "latest_price": {
+          "type": "number"
+        },
+        "open_price": {
+          "type": "number"
+        },
+        "high_price": {
+          "type": "number"
+        },
+        "low_price": {
+          "type": "number"
+        },
+        "preclose_price": {
+          "type": "number"
+        },
+        "chg_value": {
+          "type": "number"
+        },
+        "chg_ratio": {
+          "type": "number"
+        },
+        "amount": {
+          "type": "number"
+        },
+        "volume": {
+          "type": "number"
+        },
+        "is_fallback": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

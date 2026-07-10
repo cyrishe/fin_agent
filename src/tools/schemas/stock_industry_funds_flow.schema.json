@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "stock_industry_funds_flow.schema.json",
+  "title": "Stock Industry Funds Flow Output",
+  "type": "object",
+  "required": [
+    "tool",
+    "ok",
+    "data",
+    "error"
+  ],
+  "properties": {
+    "data": {
+      "type": "object",
+      "required": [
+        "code",
+        "industry_name",
+        "industry_net_flow_wan",
+        "name",
+        "source",
+        "top_buy",
+        "top_sell"
+      ],
+      "properties": {
+        "code": {
+          "description": "股票代码",
+          "type": "string"
+        },
+        "industry_name": {
+          "description": "所属行业名称",
+          "type": "string"
+        },
+        "industry_net_flow_wan": {
+          "description": "行业资金净流入，单位万元",
+          "type": "string"
+        },
+        "name": {
+          "description": "股票名称",
+          "type": "string"
+        },
+        "source": {
+          "description": "数据来源",
+          "type": "string"
+        },
+        "top_buy": {
+          "description": "行业内主力净流入靠前公司",
+          "items": {
+            "$ref": "#/$defs/companyRow"
+          },
+          "type": "array"
+        },
+        "top_sell": {
+          "description": "行业内主力净流出靠前公司",
+          "items": {
+            "$ref": "#/$defs/companyRow"
+          },
+          "type": "array"
+        }
+      },
+      "additionalProperties": false
+    },
+    "error": {
+      "description": "错误信息，成功时为空",
+      "type": "string"
+    },
+    "ok": {
+      "description": "执行是否成功",
+      "type": "boolean"
+    },
+    "tool": {
+      "const": "stock_industry_funds_flow",
+      "description": "工具标识"
+    }
+  },
+  "additionalProperties": false
+}

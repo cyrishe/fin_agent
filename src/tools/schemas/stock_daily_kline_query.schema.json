@@ -1,0 +1,142 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "stock_daily_kline_query.schema.json",
+  "title": "Stock Daily Kline Query Tool Output",
+  "type": "object",
+  "required": [
+    "tool",
+    "ok",
+    "data",
+    "error"
+  ],
+  "properties": {
+    "tool": {
+      "const": "stock_daily_kline_query",
+      "type": "string"
+    },
+    "ok": {
+      "type": "boolean"
+    },
+    "error": {
+      "type": "string"
+    },
+    "data": {
+      "type": "object",
+      "required": [
+        "subject",
+        "code",
+        "name",
+        "rows"
+      ],
+      "properties": {
+        "subject": {
+          "type": "string"
+        },
+        "code": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "rows": {
+          "items": {
+            "$ref": "#/$defs/dailyRow"
+          },
+          "type": "array"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "$defs": {
+    "dailyRow": {
+      "type": "object",
+      "required": [
+        "trade_date",
+        "code",
+        "preclose",
+        "open",
+        "high",
+        "low",
+        "close",
+        "avg_price",
+        "differ",
+        "rise_fall_rate",
+        "turn_ratio",
+        "volume",
+        "amount",
+        "amplitude",
+        "adjpreclose",
+        "adjopen",
+        "adjhigh",
+        "adjlow",
+        "adjclose",
+        "is_limit_price"
+      ],
+      "properties": {
+        "trade_date": {
+          "type": "string"
+        },
+        "code": {
+          "type": "string"
+        },
+        "preclose": {
+          "type": "number"
+        },
+        "open": {
+          "type": "number"
+        },
+        "high": {
+          "type": "number"
+        },
+        "low": {
+          "type": "number"
+        },
+        "close": {
+          "type": "number"
+        },
+        "avg_price": {
+          "type": "number"
+        },
+        "differ": {
+          "type": "number"
+        },
+        "rise_fall_rate": {
+          "type": "number"
+        },
+        "turn_ratio": {
+          "type": "number"
+        },
+        "volume": {
+          "type": "number"
+        },
+        "amount": {
+          "type": "number"
+        },
+        "amplitude": {
+          "type": "number"
+        },
+        "adjpreclose": {
+          "type": "number"
+        },
+        "adjopen": {
+          "type": "number"
+        },
+        "adjhigh": {
+          "type": "number"
+        },
+        "adjlow": {
+          "type": "number"
+        },
+        "adjclose": {
+          "type": "number"
+        },
+        "is_limit_price": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

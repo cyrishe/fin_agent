@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "file_read_excel.schema.json",
+  "title": "Excel 文件读取输出协议",
+  "type": "object",
+  "required": ["tool", "ok", "data", "error"],
+  "properties": {
+    "tool": {"const": "file_read_excel", "type": "string"},
+    "ok": {"type": "boolean"},
+    "data": {
+      "type": "object",
+      "required": ["header", "rows"],
+      "properties": {
+        "header": {"type": "array", "items": {"type": "string"}},
+        "rows": {"type": "array", "items": {"type": "array"}}
+      },
+      "additionalProperties": false
+    },
+    "error": {"type": "string"}
+  },
+  "additionalProperties": false
+}

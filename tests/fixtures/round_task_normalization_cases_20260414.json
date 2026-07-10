@@ -1,0 +1,144 @@
+[
+  {
+    "case_id": "followup_continue",
+    "category": "followup",
+    "input": {
+      "raw_user_text": "继续",
+      "thread_state": {
+        "recent_result_subject": "宁德时代",
+        "thread_summary": "上一轮已完成公司画像，并建议下一步查看资金面。"
+      }
+    },
+    "expected": {
+      "domain": "business",
+      "context_relation": "followup",
+      "round_task_desc": "延续上一轮未完成分析。继续执行上一轮建议的下一步，查看宁德时代的资金面信息。"
+    }
+  },
+  {
+    "case_id": "referential_second_item",
+    "category": "referential",
+    "input": {
+      "raw_user_text": "第二个再看一下",
+      "thread_state": {
+        "reference_memory": {
+          "objects": [
+            {"object_type": "stock", "object_id": "贵州茅台", "order_index": 0},
+            {"object_type": "stock", "object_id": "宁德时代", "order_index": 1}
+          ]
+        }
+      }
+    },
+    "expected": {
+      "domain": "business",
+      "context_relation": "referential",
+      "needs_reference_resolution": true,
+      "focus": {"type": "stock", "id": "宁德时代"},
+      "round_task_desc": "用户引用上一轮结果中的第二个对象。当前希望继续查看宁德时代。"
+    }
+  },
+  {
+    "case_id": "corrective_target_change",
+    "category": "corrective",
+    "input": {
+      "raw_user_text": "你前面理解错了，我要的是涨停股",
+      "thread_state": {
+        "thread_summary": "上一轮系统将问题理解为成交量排行分析。"
+      }
+    },
+    "expected": {
+      "domain": "business",
+      "context_relation": "corrective",
+      "round_task_desc": "用户纠正上一轮理解。当前目标改为分析涨停股相关信息。"
+    }
+  },
+  {
+    "case_id": "followup_explain_previous_plan_item",
+    "category": "followup",
+    "input": {
+      "raw_user_text": "请你对第二点计划作出解释",
+      "thread_state": {
+        "thread_summary": "上一轮计划包括：1. 获取龙头列表；2. 从中筛选前两只；3. 查询资金和新闻。"
+      }
+    },
+    "expected": {
+      "domain": "business",
+      "context_relation": "followup",
+      "needs_reference_resolution": true,
+      "round_task_desc": "上一轮计划的第二点是从龙头列表中筛选前两只。当前用户希望对这一点做进一步解释和说明。"
+    }
+  },
+  {
+    "case_id": "attachment_followup",
+    "category": "referential",
+    "input": {
+      "raw_user_text": "前面图片提到的公司，你帮我看看资金面",
+      "thread_state": {
+        "recent_attachments": [
+          {
+            "attachment_ids": ["img_1"],
+            "kind": "image",
+            "summary": "图片内容提到了工业富联。"
+          }
+        ]
+      }
+    },
+    "expected": {
+      "domain": "business",
+      "context_relation": "referential",
+      "needs_reference_resolution": true,
+      "round_task_desc": "用户引用前面图片中提到的公司，希望进一步查看该公司的资金面。"
+    }
+  },
+  {
+    "case_id": "new_topic_switch",
+    "category": "new",
+    "input": {
+      "raw_user_text": "换个话题，看一下宁德时代今天的市盈率",
+      "thread_state": {
+        "recent_result_subject": "贵州茅台",
+        "thread_summary": "上一轮讨论的是贵州茅台资金面。"
+      }
+    },
+    "expected": {
+      "domain": "business",
+      "context_relation": "new",
+      "focus": {"type": "stock", "id": "宁德时代"},
+      "round_task_desc": "用户结束上一话题，提出新的业务问题：查看宁德时代今天的市盈率。"
+    }
+  },
+  {
+    "case_id": "system_edit_skill",
+    "category": "system",
+    "input": {
+      "raw_user_text": "把刚才那个skill优化一下，加入新闻摘要",
+      "thread_state": {
+        "thread_active_skill_name": "hotspot_report_skill",
+        "thread_active_skill_canonical_name": "hotspot_report_skill"
+      }
+    },
+    "expected": {
+      "domain": "system",
+      "context_relation": "followup",
+      "target_asset": {"type": "skill", "id": "hotspot_report_skill"},
+      "round_task_desc": "用户希望继续优化当前 skill，并加入新闻摘要能力。"
+    }
+  },
+  {
+    "case_id": "time_reference_normalization",
+    "category": "business",
+    "input": {
+      "raw_user_text": "今天涨停股里成交量最大的那只，帮我查新闻",
+      "preprocessing": {
+        "time_refs": [
+          {"raw": "今天", "normalized": "2026-04-14"}
+        ]
+      }
+    },
+    "expected": {
+      "domain": "business",
+      "context_relation": "new",
+      "round_task_desc": "分析 2026-04-14 的涨停股，找出成交量最大的个股，并查询相关新闻。"
+    }
+  }
+]

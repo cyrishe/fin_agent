@@ -1,0 +1,286 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ page_title or "Tools" }}</title>
+  <style>
+    :root {
+      --bg: #f2eee5;
+      --panel: #fffdf8;
+      --line: #d9cfbf;
+      --text: #1f1c17;
+      --muted: #6d6458;
+      --accent: #8e5b2d;
+      --ok: #1d6b45;
+      --warn: #a65d00;
+      --err: #a12626;
+      --shadow: 0 16px 40px rgba(74, 52, 23, 0.08);
+      --sans: "PingFang SC", "Noto Sans SC", "Helvetica Neue", sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: var(--sans);
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(222, 186, 137, 0.28), transparent 28%),
+        linear-gradient(180deg, #f8f3ea 0%, #f0e8db 100%);
+    }
+    .shell { max-width: 1480px; margin: 0 auto; padding: 24px; display: grid; gap: 18px; }
+    .hero, .panel {
+      background: var(--panel);
+      border: 1px solid rgba(151, 90, 43, 0.12);
+      border-radius: 22px;
+      box-shadow: var(--shadow);
+    }
+    .hero {
+      padding: 22px 24px;
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: flex-start;
+    }
+    .hero h1 { margin: 0; font-size: 28px; }
+    .hero p { margin: 8px 0 0; color: var(--muted); line-height: 1.6; max-width: 780px; }
+    .toolbar { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+    .btn {
+      border: 1px solid var(--line);
+      background: #f6f0e5;
+      color: var(--text);
+      padding: 10px 14px;
+      border-radius: 12px;
+      cursor: pointer;
+      font-weight: 600;
+      text-decoration: none;
+    }
+    .btn.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+    input {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 10px 12px;
+      min-width: 220px;
+      background: #fffdfa;
+      color: var(--text);
+      font: inherit;
+    }
+    .panel { padding: 18px; }
+    .status {
+      padding: 12px 14px;
+      border-radius: 14px;
+      font-size: 13px;
+      line-height: 1.5;
+      display: none;
+      white-space: pre-wrap;
+    }
+    .status.show { display: block; }
+    .status.ok { background: #eef9f2; color: var(--ok); border: 1px solid rgba(29,107,69,.18); }
+    .status.err { background: #fdeeee; color: var(--err); border: 1px solid rgba(161,38,38,.18); }
+    .grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+    .card {
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: #fffaf3;
+      padding: 16px;
+      display: grid;
+      gap: 10px;
+    }
+    .title { font-weight: 700; font-size: 18px; }
+    .muted { color: var(--muted); font-size: 13px; line-height: 1.55; }
+    .chips, .actions { display: flex; flex-wrap: wrap; gap: 10px; }
+    .chip { background: #f3dfc7; color: #744117; border-radius: 999px; padding: 6px 10px; font-size: 12px; }
+    .links { display: flex; gap: 8px; flex-wrap: wrap; }
+    .link { color: var(--accent); text-decoration: none; font-size: 13px; font-weight: 600; }
+    .switch {
+      border: 1px solid var(--line);
+      background: #fff;
+      color: var(--text);
+      border-radius: 999px;
+      padding: 6px 10px 6px 8px;
+      min-height: 34px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      font-size: 12px;
+    }
+    .switch-track {
+      width: 34px;
+      height: 20px;
+      border-radius: 999px;
+      background: #d8ccba;
+      position: relative;
+      transition: background .18s ease;
+      flex: 0 0 auto;
+    }
+    .switch-track::after {
+      content: "";
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: #fff;
+      box-shadow: 0 1px 3px rgba(0,0,0,.18);
+      transition: transform .18s ease;
+    }
+    .switch.on {
+      background: #eef9f2;
+      color: var(--ok);
+      border-color: rgba(29,107,69,.18);
+    }
+    .switch.on .switch-track { background: #4ca06f; }
+    .switch.on .switch-track::after { transform: translateX(14px); }
+    .switch-label { white-space: nowrap; font-weight: 600; }
+    @media (max-width: 1180px) {
+      .grid { grid-template-columns: 1fr 1fr; }
+      .hero { display: grid; }
+    }
+    @media (max-width: 760px) {
+      .grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <section class="hero">
+      <div>
+        <h1>工具目录</h1>
+        <p>这里负责浏览现有 tools、查看详情，并跳转到工具设计台做定义设计与在线编辑。</p>
+      </div>
+      <div class="toolbar">
+        <input id="newToolNameInput" placeholder="输入新工具名，例如 theme_leaders_v2">
+        <button id="createToolBtn" class="btn primary">新增 Tool</button>
+        <a id="studioLink" class="btn" href="#">打开工具设计台</a>
+      </div>
+    </section>
+
+    <div id="globalStatus" class="status"></div>
+
+    <section class="panel">
+      <div id="toolGrid" class="grid"></div>
+    </section>
+  </div>
+
+  <script>
+    const apiToolCatalogUrl = {{ api_tool_catalog_url|tojson }};
+    const apiToolBaseUrl = {{ api_tool_base_url|tojson }};
+    const toolStudioBaseUrl = {{ tool_studio_base_url|tojson }};
+    const toolDetailBaseUrl = {{ tool_detail_base_url|tojson }};
+    const appRoot = (() => {
+      const marker = "/tools";
+      const path = window.location.pathname;
+      const idx = path.indexOf(marker);
+      return idx >= 0 ? path.slice(0, idx) : "";
+    })();
+    function resolveUrl(url) {
+      if (!url) return url;
+      if (/^https?:\/\//.test(url)) return url;
+      if (url.startsWith("/")) return url;
+      return `${appRoot}/${String(url).replace(/^\/+/, "")}`;
+    }
+    const resolvedApiToolCatalogUrl = resolveUrl(apiToolCatalogUrl);
+    const resolvedApiToolBaseUrl = resolveUrl(apiToolBaseUrl);
+    const resolvedToolStudioBaseUrl = resolveUrl(toolStudioBaseUrl);
+    const resolvedToolDetailBaseUrl = resolveUrl(toolDetailBaseUrl);
+
+    function setStatus(text, ok=false) {
+      const el = document.getElementById("globalStatus");
+      if (!text) {
+        el.className = "status";
+        el.textContent = "";
+        return;
+      }
+      el.className = `status show ${ok ? "ok" : "err"}`;
+      el.textContent = text;
+    }
+
+    async function fetchJson(url, options) {
+      const res = await fetch(url, options || {});
+      const text = await res.text();
+      let payload = null;
+      try {
+        payload = JSON.parse(text);
+      } catch (err) {
+        throw new Error(`接口未返回 JSON: ${res.status} ${String(text || "").slice(0, 120)}`);
+      }
+      if (!res.ok || payload.ok === false) {
+        throw new Error((payload && payload.error) || `HTTP ${res.status}`);
+      }
+      return payload;
+    }
+
+    async function updateAvailability(toolName, patch) {
+      await fetchJson(`${resolvedApiToolBaseUrl}/${encodeURIComponent(toolName)}/availability`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(patch || {}),
+      });
+      setStatus(`已更新 ${toolName}`, true);
+      await loadCatalog();
+    }
+
+    function renderTools(items) {
+      const root = document.getElementById("toolGrid");
+      root.innerHTML = "";
+      for (const item of items || []) {
+        const node = document.createElement("div");
+        node.className = "card";
+        const caps = Array.isArray(item.capabilities) ? item.capabilities : [];
+        const availability = item.availability || {};
+        const lifecycle = String(availability.lifecycle || "active");
+        const retrievalMode = String(availability.retrieval_mode || "retrievable");
+        node.innerHTML = `
+          <div class="title">${String(item.display_name || item.tool_name || "-")}</div>
+          <div class="muted">${String(item.description || "")}</div>
+          <div class="chips">
+            <div class="chip">${String(item.tool_name || "-")}</div>
+            <div class="chip">${lifecycle}</div>
+            <div class="chip">${retrievalMode}</div>
+            <div class="chip">真实执行：${item.real_enabled ? "启用" : "停用"}</div>
+            <div class="chip">Mock：${item.mock_enabled ? "启用" : "停用"}</div>
+            <div class="chip">状态：${String(item.status || "-")}</div>
+          </div>
+          <div class="chips">${caps.slice(0, 6).map((cap) => `<div class="chip">${String(cap)}</div>`).join("")}</div>
+          <div class="actions">
+            <button class="switch ${lifecycle === "active" ? "on" : ""}" data-action="lifecycle" type="button"><span class="switch-track"></span><span class="switch-label">${lifecycle === "active" ? "在用" : "下线"}</span></button>
+            <button class="switch ${retrievalMode === "retrievable" ? "on" : ""}" data-action="retrieval" type="button"><span class="switch-track"></span><span class="switch-label">${retrievalMode === "retrievable" ? "参与搜索" : "不参与搜索"}</span></button>
+          </div>
+          <div class="links">
+            <a class="link" href="${resolvedToolDetailBaseUrl}/${encodeURIComponent(item.tool_name || "")}/view">查看详情</a>
+            <a class="link" href="${resolvedToolStudioBaseUrl}/${encodeURIComponent(item.tool_name || "")}">编辑设计</a>
+          </div>
+        `;
+        node.querySelector('[data-action="lifecycle"]').addEventListener("click", async () => {
+          const next = lifecycle === "active" ? "retired" : "active";
+          try { await updateAvailability(item.tool_name, { lifecycle: next }); } catch (err) { setStatus(String(err.message || err)); }
+        });
+        node.querySelector('[data-action="retrieval"]').addEventListener("click", async () => {
+          const next = retrievalMode === "retrievable" ? "direct_only" : "retrievable";
+          try { await updateAvailability(item.tool_name, { retrieval_mode: next }); } catch (err) { setStatus(String(err.message || err)); }
+        });
+        root.appendChild(node);
+      }
+    }
+
+    async function loadCatalog() {
+      const payload = await fetchJson(resolvedApiToolCatalogUrl);
+      renderTools(payload.items || []);
+    }
+
+    document.getElementById("studioLink").href = resolvedToolStudioBaseUrl;
+    document.getElementById("createToolBtn").addEventListener("click", () => {
+      const raw = String(document.getElementById("newToolNameInput").value || "").trim();
+      if (!raw) {
+        setStatus("请先输入新工具名");
+        return;
+      }
+      const safeName = raw.replace(/\s+/g, "_");
+      window.location.href = `${resolvedToolStudioBaseUrl}/${encodeURIComponent(safeName)}?new=1`;
+    });
+
+    loadCatalog().catch((err) => setStatus(String(err.message || err)));
+  </script>
+</body>
+</html>

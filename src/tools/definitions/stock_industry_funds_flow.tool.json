@@ -1,0 +1,146 @@
+{
+  "auth": "public",
+  "availability": {
+    "lifecycle": "retired",
+    "retrieval_mode": "direct_only",
+    "visibility": "hidden"
+  },
+  "enabled": false,
+  "capabilities": [
+    "capital_flow",
+    "industry_funds",
+    "peer_funds"
+  ],
+  "defaults": {},
+  "identity": {
+    "description": "输入个股名称或代码，查询该个股所属行业资金流情况，以及行业内主力净流入和净流出靠前的公司。\n主要是看资金面，分大单小单（主力/散户）的流入流出量和对比",
+    "display_name": "行业资金对比",
+    "domain": "capital_flow",
+    "owner": "tools"
+  },
+  "invocation_example": "stock_industry_funds_flow(name=\"贵州茅台\")",
+  "name": "stock_industry_funds_flow",
+  "post_process": {
+    "deterministic": {
+      "enabled": false,
+      "handler": ""
+    },
+    "llm": {
+      "enabled": false,
+      "prompt_key": ""
+    }
+  },
+  "profiles": {
+    "mock": {
+      "enabled": false,
+      "implementation": {
+        "kind": "inline_result"
+      },
+      "result": {
+        "data": {
+          "code": "code_示例",
+          "industry_name": "industry_name_示例",
+          "industry_net_flow_wan": "industry_net_flow_wan_示例",
+          "name": "name_示例",
+          "source": "source_示例",
+          "top_buy": [
+            null
+          ],
+          "top_sell": [
+            null
+          ]
+        },
+        "error": "error_示例",
+        "ok": false,
+        "tool": "stock_industry_funds_flow"
+      }
+    },
+    "real": {
+      "enabled": false,
+      "implementation": {
+        "kind": "python_callable",
+        "target": "src.tools.stock_funds_split_tools:run_industry_funds_flow"
+      }
+    }
+  },
+  "retention": {
+    "drop_default": [],
+    "high_value_for_reasoning": [
+      "data.name",
+      "data.code",
+      "data.industry_name",
+      "data.industry_net_flow_wan",
+      "data.top_buy",
+      "data.top_sell"
+    ],
+    "high_value_for_render": [],
+    "recommended_reducers": {},
+    "usually_too_large_for_prompt": []
+  },
+  "runtime_hints": {
+    "cost_class": "medium",
+    "latency_class": "medium",
+    "supports_async_submit": false,
+    "supports_stream": false
+  },
+  "safety": {
+    "network": true,
+    "persistence": false,
+    "side_effect": "none"
+  },
+  "schemas": {
+    "input": {
+      "$id": "stock_industry_funds_flow.input.schema.json",
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "股票名称或代码。"
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "type": "object"
+    },
+    "output": {
+      "$ref": "src/tools/schemas/stock_industry_funds_flow.schema.json"
+    }
+  },
+  "status": "disabled",
+  "tags": [
+    "capital_flow",
+    "stock",
+    "industry"
+  ],
+  "tests": {
+    "golden_cases": [],
+    "sample_inputs": [
+      {
+        "arguments": {
+          "name": "贵州茅台"
+        },
+        "name": "default_stock_industry_funds_flow"
+      }
+    ]
+  },
+  "ui_hints": {
+    "editable_sections": [
+      "identity",
+      "schemas.input",
+      "schemas.output",
+      "capabilities",
+      "profiles",
+      "retention",
+      "post_process",
+      "tests"
+    ]
+  },
+  "version": "v1",
+  "subject_tags": [
+    "stock",
+    "plate"
+  ],
+  "tool_priority": 1
+}

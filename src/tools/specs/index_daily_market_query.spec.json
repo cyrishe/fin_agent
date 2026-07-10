@@ -1,0 +1,46 @@
+{
+  "best_for": [
+    "用于获取指数指定交易日或日期范围内的收盘价、涨跌幅和成交额。",
+    "用于获取指数 PE、PB、PS、市值等日级估值指标。",
+    "用于为大盘判断、指数对比或基金跟踪指数分析提供基础序列数据。"
+  ],
+  "input_guidance": {
+    "required_fields": [
+      "index"
+    ],
+    "optional_fields": [
+      "start",
+      "end",
+      "limit"
+    ]
+  },
+  "invocation_example": "index_daily_market_query(index=\"000300.SH\", start=\"2026-06-01\", end=\"2026-06-30\")",
+  "output_guidance": {
+    "drop_default": [],
+    "field_policies": {
+      "data.code": {
+        "strategy": "prompt_full"
+      },
+      "data.name": {
+        "strategy": "prompt_full"
+      },
+      "data.rows": {
+        "strategy": "auto"
+      }
+    },
+    "high_value_for_reasoning": [
+      "data.code",
+      "data.name",
+      "data.rows"
+    ],
+    "high_value_for_render": [],
+    "recommended_reducers": {
+      "data.rows": "summarize_timeseries"
+    },
+    "usually_too_large_for_prompt": [
+      "data.rows"
+    ]
+  },
+  "purpose": "获取单只指数在指定 start/end 交易日范围内的日级行情和估值序列。",
+  "tool_name": "index_daily_market_query"
+}

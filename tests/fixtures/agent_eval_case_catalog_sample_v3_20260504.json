@@ -1,0 +1,241 @@
+[
+  {
+    "case_id": "market_amount_10d_by_market",
+    "suite": "planning_core",
+    "priority": "P0",
+    "title": "市场总成交额近 10 日走势",
+    "scope": {
+      "mode": "e2e",
+      "entry": "conversation",
+      "stages": [
+        "conversation.preprocess",
+        "conversation.round_task",
+        "planner.recall",
+        "planner.rerank",
+        "planner.high_level",
+        "planner.compile",
+        "planner.validate",
+        "runtime.execute",
+        "render.compose",
+        "answer.final"
+      ]
+    },
+    "input": {
+      "messages": [
+        {
+          "role": "user",
+          "content": "最近 10 个交易日，上证、深证、北证三大市场的总成交额分别是什么走势？帮我按日期列出来。"
+        }
+      ]
+    },
+    "expected": {
+      "task": {
+        "summary": "查询上证、深证、北证最近 10 个交易日的市场总成交额走势，并按日期列出。",
+        "focus": ["市场总成交额", "三大市场", "最近10个交易日"]
+      },
+      "capability": {
+        "tools": [
+          {"name": "market_history_amount", "role": "primary"}
+        ]
+      },
+      "tool_args": {
+        "market_history_amount": {"days": 10}
+      },
+      "runtime": {
+        "tools": [
+          {"name": "market_history_amount", "status": "completed"}
+        ],
+        "result_shape": "date_series"
+      },
+      "render": {
+        "blocks": ["table"],
+        "compact": true
+      },
+      "answer": {
+        "grounding": "tool_result",
+        "format": "table_or_series"
+      }
+    },
+    "tags": ["market", "amount", "planning", "arguments"]
+  },
+  {
+    "case_id": "second_item_followup_funds",
+    "suite": "dialogue_continuity",
+    "priority": "P0",
+    "title": "第二个对象续问资金面",
+    "scope": {
+      "mode": "stage_range",
+      "entry": "conversation",
+      "stages": [
+        "conversation.preprocess",
+        "conversation.context_resolution",
+        "conversation.round_task",
+        "planner.recall",
+        "planner.rerank",
+        "planner.compile"
+      ]
+    },
+    "input": {
+      "messages": [
+        {"role": "user", "content": "比较一下公司A和公司B今天的行情。"},
+        {"role": "assistant", "content": "已比较公司A和公司B，公司A是第一个对象，公司B是第二个对象。"},
+        {"role": "user", "content": "第二个公司的资金面也看一下。"}
+      ]
+    },
+    "expected": {
+      "conversation": {
+        "reference_resolution": "公司B",
+        "context_dependency": "referential"
+      },
+      "task": {
+        "summary": "承接上文，把“第二个公司”解析为公司B，并查询它的资金面。",
+        "focus": ["第二个公司", "公司B", "资金面"]
+      },
+      "capability": {
+        "tools": [
+          {"name": "stock_realtime_funds_flow", "role": "primary", "alternatives": ["stock_history_funds_flow"]}
+        ]
+      },
+      "tool_args": {
+        "stock_realtime_funds_flow": {"name": "公司B"}
+      },
+      "answer": {
+        "grounding": "tool_result"
+      }
+    },
+    "tags": ["continuity", "reference", "funds"]
+  },
+  {
+    "case_id": "attachment_company_reference",
+    "suite": "attachment_reference",
+    "priority": "P0",
+    "title": "附件中公司引用",
+    "scope": {
+      "mode": "stage_range",
+      "entry": "conversation",
+      "stages": [
+        "conversation.preprocess",
+        "conversation.context_resolution",
+        "conversation.round_task",
+        "planner.recall",
+        "planner.rerank",
+        "planner.compile"
+      ]
+    },
+    "input": {
+      "messages": [
+        {"role": "user", "content": "图片里提到的那家公司，帮我看看资金情况。"}
+      ],
+      "attachments": [
+        {
+          "type": "image",
+          "summary": "图片提到公司A正在扩产。"
+        }
+      ]
+    },
+    "expected": {
+      "conversation": {
+        "reference_resolution": "公司A",
+        "context_dependency": "attachment_reference"
+      },
+      "task": {
+        "summary": "从附件语境中识别图片提到的公司A，并查询它的资金情况。",
+        "focus": ["附件引用", "公司A", "资金情况"]
+      },
+      "capability": {
+        "tools": [
+          {"name": "stock_realtime_funds_flow", "role": "primary", "alternatives": ["stock_history_funds_flow"]}
+        ]
+      },
+      "tool_args": {
+        "stock_realtime_funds_flow": {"name": "公司A"}
+      },
+      "answer": {
+        "grounding": "tool_result"
+      }
+    },
+    "tags": ["attachment", "reference", "funds"]
+  },
+  {
+    "case_id": "limitup_top1_then_quote_news",
+    "suite": "task_decomposition",
+    "priority": "P1",
+    "title": "集合筛选后查行情和新闻",
+    "scope": {
+      "mode": "stage_range",
+      "entry": "planner",
+      "stages": [
+        "planner.recall",
+        "planner.rerank",
+        "planner.high_level",
+        "planner.compile",
+        "planner.validate"
+      ]
+    },
+    "input": {
+      "messages": [
+        {"role": "user", "content": "从今天涨停股里找出成交量最大的那只，再查它的行情和相关新闻。"}
+      ]
+    },
+    "expected": {
+      "task": {
+        "summary": "先从今天涨停股中找成交量最大的股票，再查询该股票行情和相关新闻。",
+        "focus": ["今日涨停股", "成交量最大", "行情", "新闻"]
+      },
+      "capability": {
+        "tools": [
+          {"name": "涨跌停列表查询", "role": "producer"},
+          {"name": "stock_realtime_quote", "role": "consumer"},
+          {"name": "financial_news_search", "role": "consumer"}
+        ]
+      },
+      "planning": {
+        "requires_dependency": true
+      },
+      "answer": {
+        "grounding": "tool_result"
+      }
+    },
+    "tags": ["decomposition", "dependency", "quote", "news"]
+  },
+  {
+    "case_id": "capability_gap_pe_ratio",
+    "suite": "capability_gap",
+    "priority": "P1",
+    "title": "当前工具不覆盖市盈率",
+    "scope": {
+      "mode": "single_stage",
+      "entry": "planner",
+      "stages": [
+        "planner.recall",
+        "planner.rerank"
+      ]
+    },
+    "input": {
+      "messages": [
+        {"role": "user", "content": "这两家公司当前市盈率分别是多少？"}
+      ],
+      "context": {
+        "referents": ["公司A", "公司B"]
+      }
+    },
+    "expected": {
+      "task": {
+        "summary": "承接上下文中的两家公司，尝试查询它们当前市盈率。",
+        "focus": ["两家公司", "市盈率"]
+      },
+      "capability": {
+        "tools": [],
+        "gap": {
+          "expected": true,
+          "missing": "pe_ratio_lookup"
+        }
+      },
+      "answer": {
+        "grounding": "capability_gap",
+        "fabrication_allowed": false
+      }
+    },
+    "tags": ["gap", "reference", "fundamental"]
+  }
+]

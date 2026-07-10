@@ -1,0 +1,228 @@
+{
+  "auth": "public",
+  "availability": {
+    "lifecycle": "retired",
+    "retrieval_mode": "direct_only",
+    "visibility": "hidden"
+  },
+  "capabilities": [
+    "capital_flow",
+    "money_flow",
+    "stock_moneyflow",
+    "plate_moneyflow",
+    "market_moneyflow"
+  ],
+  "defaults": {
+    "subject_type": "stock",
+    "days": 20,
+    "granularity": "daily",
+    "limit": 50
+  },
+  "identity": {
+    "description": "查询个股、板块、行业、概念、指数或市场的资金流向序列，返回主力、散户和分档净流入数据。",
+    "display_name": "资金流向查询",
+    "domain": "capital_flow",
+    "owner": "tools"
+  },
+  "invocation_example": "capital_flow_query(subject_type=\"stock\", subject=\"贵州茅台\", days=20)",
+  "match_contract": {
+    "request_families": [
+      "data_access"
+    ],
+    "work_item_types": [
+      "tool"
+    ],
+    "capability_classes": [
+      "data_retrieval",
+      "capital_flow_lookup"
+    ],
+    "side_effect_level": "read_only"
+  },
+  "name": "capital_flow_query",
+  "post_process": {
+    "deterministic": {
+      "enabled": false,
+      "handler": ""
+    },
+    "llm": {
+      "enabled": false,
+      "prompt_key": ""
+    }
+  },
+  "profiles": {
+    "mock": {
+      "enabled": false,
+      "implementation": {
+        "kind": "inline_result"
+      },
+      "result": {
+        "data": {
+          "coverage": {
+            "latest_trade_date": "",
+            "requested_days": 20,
+            "returned_rows": 0
+          },
+          "date_range": {
+            "end": "",
+            "start": ""
+          },
+          "granularity": "daily",
+          "row_count": 0,
+          "rows": [],
+          "source": "kcrp_stock_moneyflow",
+          "subject": "贵州茅台",
+          "subject_code": "600519.SH",
+          "subject_name": "贵州茅台",
+          "subject_type": "stock"
+        },
+        "error": "",
+        "ok": true,
+        "tool": "capital_flow_query"
+      }
+    },
+    "real": {
+      "enabled": false,
+      "implementation": {
+        "kind": "python_callable",
+        "target": "src.tools.capital_flow_query_tool:run"
+      }
+    }
+  },
+  "retention": {
+    "drop_default": [],
+    "high_value_for_reasoning": [
+      "data.subject_type",
+      "data.code",
+      "data.name",
+      "data.rows"
+    ],
+    "high_value_for_render": [],
+    "recommended_reducers": {
+      "data.rows": "summarize_timeseries"
+    },
+    "usually_too_large_for_prompt": [
+      "data.rows"
+    ]
+  },
+  "runtime_hints": {
+    "cost_class": "low",
+    "latency_class": "low",
+    "supports_async_submit": false,
+    "supports_stream": false
+  },
+  "safety": {
+    "network": true,
+    "persistence": false,
+    "side_effect": "none"
+  },
+  "schemas": {
+    "input": {
+      "$id": "capital_flow_query.input.schema.json",
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "subject_type": {
+          "description": "主体类型。",
+          "enum": [
+            "stock",
+            "industry",
+            "concept",
+            "sector",
+            "index",
+            "market",
+            "other"
+          ],
+          "type": "string"
+        },
+        "subject": {
+          "description": "主体名称或代码。subject_type=market 时可为空。",
+          "type": "string"
+        },
+        "trade_date": {
+          "description": "截止交易日，YYYY-MM-DD；为空时取最近数据。",
+          "type": "string"
+        },
+        "days": {
+          "description": "最多返回最近 N 条，默认 20。",
+          "maximum": 250,
+          "minimum": 1,
+          "type": "integer"
+        },
+        "granularity": {
+          "description": "资金流序列粒度。",
+          "enum": [
+            "daily",
+            "minute"
+          ],
+          "type": "string"
+        },
+        "limit": {
+          "description": "底层查询保护上限，默认 50。",
+          "maximum": 500,
+          "minimum": 1,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "subject_type"
+      ],
+      "type": "object"
+    },
+    "output": {
+      "$ref": "src/tools/schemas/capital_flow_query.schema.json"
+    }
+  },
+  "enabled": false,
+  "status": "retired",
+  "tags": [
+    "capital_flow",
+    "money_flow",
+    "stock",
+    "plate",
+    "market"
+  ],
+  "tests": {
+    "golden_cases": [],
+    "sample_inputs": [
+      {
+        "arguments": {
+          "days": 20,
+          "subject": "贵州茅台",
+          "subject_type": "stock"
+        },
+        "name": "stock_capital_flow"
+      },
+      {
+        "arguments": {
+          "days": 5,
+          "subject": "白酒",
+          "subject_type": "concept"
+        },
+        "name": "concept_capital_flow"
+      }
+    ]
+  },
+  "ui_hints": {
+    "editable_sections": [
+      "identity",
+      "schemas.input",
+      "schemas.output",
+      "capabilities",
+      "profiles",
+      "retention",
+      "post_process",
+      "tests"
+    ]
+  },
+  "version": "v1",
+  "retrieval": {
+    "mode": "direct_only",
+    "visibility": "hidden"
+  },
+  "visibility": "hidden",
+  "deprecation_note": "通用资金流工具已退役；不再使用 aiia_capital_flow_snapshot 作为基础资金流入口。",
+  "subject_tags": [
+    "general"
+  ],
+  "tool_priority": 1
+}

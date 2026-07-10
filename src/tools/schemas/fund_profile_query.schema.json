@@ -1,0 +1,82 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "fund_profile_query.schema.json",
+  "title": "Fund Profile Query Tool Output",
+  "type": "object",
+  "required": ["tool", "ok", "data", "error"],
+  "properties": {
+    "tool": {"const": "fund_profile_query", "type": "string"},
+    "ok": {"type": "boolean"},
+    "error": {"type": "string"},
+    "data": {
+      "type": "object",
+      "required": ["subject", "code", "name", "profile", "latest_index_flags", "coverage"],
+      "properties": {
+        "source": {"type": "array", "items": {"type": "string"}},
+        "subject": {"type": "string"},
+        "code": {"type": "string"},
+        "name": {"type": "string"},
+        "profile": {"$ref": "#/$defs/profile"},
+        "latest_index_flags": {"$ref": "#/$defs/indexFlags"},
+        "coverage": {
+          "type": "object",
+          "properties": {
+            "profile_available": {"type": "boolean"},
+            "index_flags_available": {"type": "boolean"},
+            "latest_index_trade_date": {"type": "string"}
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "$defs": {
+    "profile": {
+      "type": "object",
+      "properties": {
+        "code": {"type": "string"},
+        "name": {"type": "string"},
+        "fund_fullname": {"type": "string"},
+        "market": {"type": "string"},
+        "fund_operation": {"type": "string"},
+        "fund_invest_type": {"type": "string"},
+        "fund_nature": {"type": "string"},
+        "fund_invest_style": {"type": "string"},
+        "establishment_date": {"type": "string"},
+        "maturity_date": {"type": "string"},
+        "list_date": {"type": "string"},
+        "delist_date": {"type": "string"},
+        "invest_scope": {"type": "string"},
+        "invest_object": {"type": "string"},
+        "etf_track_index_code": {"type": "string"},
+        "is_index_fund": {"type": "boolean"},
+        "is_intraday_trading": {"type": "boolean"}
+      },
+      "additionalProperties": false
+    },
+    "indexFlags": {
+      "type": "object",
+      "properties": {
+        "trade_date": {"type": "string"},
+        "name": {"type": "string"},
+        "market": {"type": "string"},
+        "sort": {"type": "string"},
+        "operation": {"type": "string"},
+        "invest_type": {"type": "string"},
+        "nature": {"type": "string"},
+        "invest_style": {"type": "string"},
+        "listed_nature_day": {"type": "number"},
+        "listed_trade_day": {"type": "number"},
+        "is_maturity_date": {"type": "boolean"},
+        "is_delist_date": {"type": "boolean"},
+        "is_exchange_guarantee": {"type": "boolean"},
+        "is_exchange_rz_underlying": {"type": "boolean"},
+        "is_exchange_rq_underlying": {"type": "boolean"},
+        "is_index_fund": {"type": "boolean"}
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

@@ -1,0 +1,373 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "stock_deep_dive.skill.schema.json",
+  "title": "Stock Deep Dive Skill Output",
+  "type": "object",
+  "required": [
+    "brief",
+    "investment_view",
+    "market_signals",
+    "capital_flow",
+    "research_view",
+    "news_catalysts",
+    "risk_watch",
+    "section_sources",
+    "render_payload",
+    "storage_payload"
+  ],
+  "properties": {
+    "brief": {
+      "type": "string"
+    },
+    "investment_view": {
+      "type": "object",
+      "required": [
+        "stage",
+        "thesis",
+        "supports",
+        "uncertainties"
+      ],
+      "properties": {
+        "stage": {
+          "type": "string"
+        },
+        "thesis": {
+          "type": "string"
+        },
+        "supports": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "uncertainties": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "market_signals": {
+      "type": "object",
+      "required": [
+        "summary",
+        "price_trend",
+        "volume_signal",
+        "signal_points"
+      ],
+      "properties": {
+        "summary": {
+          "type": "string"
+        },
+        "price_trend": {
+          "type": "string"
+        },
+        "volume_signal": {
+          "type": "string"
+        },
+        "signal_points": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "capital_flow": {
+      "type": "object",
+      "required": [
+        "summary",
+        "main_force_view",
+        "industry_flow_view",
+        "signal_points"
+      ],
+      "properties": {
+        "summary": {
+          "type": "string"
+        },
+        "main_force_view": {
+          "type": "string"
+        },
+        "industry_flow_view": {
+          "type": "string"
+        },
+        "signal_points": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "research_view": {
+      "type": "object",
+      "required": [
+        "summary",
+        "consensus_view",
+        "latest_opinions"
+      ],
+      "properties": {
+        "summary": {
+          "type": "string"
+        },
+        "consensus_view": {
+          "type": "string"
+        },
+        "latest_opinions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "news_catalysts": {
+      "type": "object",
+      "required": [
+        "summary",
+        "catalyst_type",
+        "items"
+      ],
+      "properties": {
+        "summary": {
+          "type": "string"
+        },
+        "catalyst_type": {
+          "type": "string"
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "risk_watch": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "section_sources": {
+      "type": "object",
+      "required": [
+        "brief",
+        "market_signals",
+        "capital_flow",
+        "research_view",
+        "news_catalysts"
+      ],
+      "properties": {
+        "brief": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/sourceRef"
+          }
+        },
+        "market_signals": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/sourceRef"
+          }
+        },
+        "capital_flow": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/sourceRef"
+          }
+        },
+        "research_view": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/sourceRef"
+          }
+        },
+        "news_catalysts": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/sourceRef"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "render_payload": {
+      "type": "object",
+      "required": [
+        "version",
+        "page_id",
+        "page_type",
+        "title",
+        "subtitle",
+        "summary",
+        "sections"
+      ],
+      "properties": {
+        "version": {
+          "type": "string"
+        },
+        "page_id": {
+          "type": "string"
+        },
+        "page_type": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "subtitle": {
+          "type": "string"
+        },
+        "as_of": {
+          "type": "string"
+        },
+        "theme": {
+          "type": "object"
+        },
+        "summary": {
+          "type": "object"
+        },
+        "sections": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/renderSection"
+          }
+        },
+        "evidence_docs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/sourceRef"
+          }
+        }
+      },
+      "additionalProperties": true
+    },
+    "storage_payload": {
+      "type": "object",
+      "required": [
+        "tags",
+        "confidence",
+        "market_phase"
+      ],
+      "properties": {
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "confidence": {
+          "type": [
+            "string",
+            "number",
+            "integer"
+          ]
+        },
+        "market_phase": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "sourceRef": {
+      "type": "object",
+      "required": [
+        "source",
+        "provider"
+      ],
+      "properties": {
+        "source": {
+          "type": "string"
+        },
+        "provider": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string"
+        },
+        "time": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": true
+    },
+    "renderBlock": {
+      "type": "object",
+      "required": [
+        "block_id",
+        "type",
+        "span",
+        "height",
+        "data"
+      ],
+      "properties": {
+        "block_id": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "span": {
+          "type": "object"
+        },
+        "height": {
+          "type": "string"
+        },
+        "data": {
+          "type": "object"
+        }
+      },
+      "additionalProperties": true
+    },
+    "renderSection": {
+      "type": "object",
+      "required": [
+        "section_id",
+        "section_kind",
+        "title",
+        "layout",
+        "blocks"
+      ],
+      "properties": {
+        "section_id": {
+          "type": "string"
+        },
+        "section_kind": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "layout": {
+          "type": "object"
+        },
+        "blocks": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/renderBlock"
+          }
+        }
+      },
+      "additionalProperties": true
+    }
+  }
+}

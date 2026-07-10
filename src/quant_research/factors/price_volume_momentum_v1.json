@@ -1,0 +1,26 @@
+{
+  "factor_id": "price_volume_momentum",
+  "version": "v1",
+  "family": "price_volume",
+  "display_name": "Price Volume Momentum",
+  "inputs": ["stock_daily_kline"],
+  "params_schema": {
+    "window": {"type": "integer", "minimum": 1, "maximum": 250, "default": 5},
+    "price_field": {"type": "string", "enum": ["close"], "default": "close"},
+    "amount_field": {"type": "string", "enum": ["amount"], "default": "amount"}
+  },
+  "default_params": {
+    "window": 5,
+    "price_field": "close",
+    "amount_field": "amount"
+  },
+  "formula": "((close_t / close_t_window) - 1) * avg_amount_wan / 100",
+  "outputs": ["momentum_value", "price_change_ratio", "avg_amount_wan", "window_total_amount_wan"],
+  "direction": "higher_better",
+  "risk_notes": [
+    "Requires continuous trade-date window per stock.",
+    "Adjusted-price policy must be explicit before long-horizon backtest use."
+  ],
+  "status": "draft",
+  "tags": ["momentum", "price_volume", "stock"]
+}

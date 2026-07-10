@@ -1,0 +1,54 @@
+{
+  "invocation_example": "theme_leaders(query=\"机器人\")",
+  "best_for": [
+    "用于按主题名称查找代表股、龙头股或候选股。",
+    "用于查看主题内股票的代码、名称、市值和涨幅信息。",
+    "用于为主题分析、板块扩展和候选股识别提供入口。"
+  ],
+  "input_guidance": {
+    "optional_fields": [],
+    "required_fields": [
+      "query"
+    ]
+  },
+  "output_guidance": {
+    "drop_default": [
+      "data.realtime_pct",
+      "data.code",
+      "data.name",
+      "data.theme_name",
+      "data.week_pct"
+    ],
+    "field_policies": {
+      "data.realtime_pct": {
+        "strategy": "ignore"
+      },
+      "data.code": {
+        "strategy": "ignore"
+      },
+      "data.name": {
+        "strategy": "ignore"
+      },
+      "data.theme_name": {
+        "strategy": "ignore"
+      },
+      "data.week_pct": {
+        "strategy": "ignore"
+      }
+    },
+    "high_value_for_reasoning": [],
+    "high_value_for_render": [],
+    "recommended_reducers": {},
+    "usually_too_large_for_prompt": []
+  },
+  "purpose": "查询指定主题、概念或板块的龙头股候选列表。",
+  "tool_name": "theme_leaders",
+  "status": "disabled",
+  "enabled": false,
+  "retrieval": {
+    "mode": "direct_only",
+    "visibility": "hidden"
+  },
+  "visibility": "hidden",
+  "deprecation_note": "主题龙头当前为 mock/高级候选能力，先禁用；后续通过板块成分股基础工具和排序 DSL 组合。"
+}

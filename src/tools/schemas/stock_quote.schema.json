@@ -1,0 +1,210 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "stock_quote.schema.json",
+  "title": "Stock Quote Tool Output",
+  "type": "object",
+  "required": [
+    "tool",
+    "ok",
+    "data",
+    "error"
+  ],
+  "properties": {
+    "tool": {
+      "const": "stock_quote",
+      "description": "工具标识"
+    },
+    "ok": {
+      "type": "boolean",
+      "description": "执行是否成功"
+    },
+    "data": {
+      "$ref": "#/$defs/stockQuotePayload",
+      "description": "行情业务结果"
+    },
+    "error": {
+      "type": "string",
+      "description": "错误信息，成功时为空"
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "indicatorPoint": {
+      "type": "array",
+      "description": "指标点，格式为 [时间, 数值]",
+      "minItems": 2,
+      "prefixItems": [
+        {
+          "type": "string",
+          "description": "时间标签"
+        },
+        {
+          "type": "number",
+          "description": "指标值"
+        }
+      ]
+    },
+    "klineRow": {
+      "type": "array",
+      "description": "K线数据行，格式为 [时间, 开盘, 收盘, 最低, 最高, 成交量, 涨跌幅]",
+      "minItems": 7,
+      "prefixItems": [
+        {
+          "type": "string",
+          "description": "时间标签"
+        },
+        {
+          "type": "number",
+          "description": "开盘价"
+        },
+        {
+          "type": "number",
+          "description": "收盘价"
+        },
+        {
+          "type": "number",
+          "description": "最低价"
+        },
+        {
+          "type": "number",
+          "description": "最高价"
+        },
+        {
+          "type": "number",
+          "description": "成交量"
+        },
+        {
+          "type": "number",
+          "description": "涨跌幅"
+        }
+      ]
+    },
+    "klinePayload": {
+      "type": "object",
+      "description": "K线或分时图原始数据，可直接映射为 K线或折线图",
+      "required": [
+        "kline",
+        "indicators"
+      ],
+      "properties": {
+        "kline": {
+          "type": "array",
+          "description": "K线主序列",
+          "items": {
+            "$ref": "#/$defs/klineRow"
+          }
+        },
+        "indicators": {
+          "type": "object",
+          "description": "指标曲线，如 MA5 / MACD / RSI",
+          "additionalProperties": {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/indicatorPoint"
+            }
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "realtimeQuote": {
+      "type": "object",
+      "description": "实时行情快照",
+      "properties": {
+        "现价": {
+          "type": "number",
+          "description": "当前价格"
+        },
+        "开盘": {
+          "type": "number",
+          "description": "开盘价"
+        },
+        "最高": {
+          "type": "number",
+          "description": "最高价"
+        },
+        "最低": {
+          "type": "number",
+          "description": "最低价"
+        },
+        "涨跌额": {
+          "type": "number",
+          "description": "涨跌额"
+        },
+        "涨跌幅": {
+          "type": "number",
+          "description": "涨跌幅"
+        },
+        "成交额": {
+          "type": "number",
+          "description": "成交额"
+        },
+        "成交量": {
+          "type": "number",
+          "description": "成交量"
+        },
+        "昨收": {
+          "type": "number",
+          "description": "昨收价"
+        }
+      },
+      "additionalProperties": true
+    },
+    "renderBlock": {
+      "type": "object",
+      "required": [
+        "type",
+        "title",
+        "data"
+      ],
+      "properties": {
+        "type": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "data": {
+          "type": "object"
+        },
+        "meta": {
+          "type": "object"
+        }
+      },
+      "additionalProperties": true
+    },
+    "stockQuotePayload": {
+      "type": "object",
+      "description": "个股行情结果",
+      "required": [
+        "code",
+        "daily_kline",
+        "intraday_kline",
+        "name",
+        "realtime_quote"
+      ],
+      "properties": {
+        "code": {
+          "type": "string",
+          "description": "输入代码或名称"
+        },
+        "name": {
+          "type": "string",
+          "description": "股票名称"
+        },
+        "realtime_quote": {
+          "$ref": "#/$defs/realtimeQuote"
+        },
+        "daily_kline": {
+          "$ref": "#/$defs/klinePayload",
+          "description": "日线K线数据，默认应按 K线 渲染"
+        },
+        "intraday_kline": {
+          "$ref": "#/$defs/klinePayload",
+          "description": "分时K线数据，默认应按 折线 渲染"
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

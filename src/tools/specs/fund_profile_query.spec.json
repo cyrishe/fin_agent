@@ -1,0 +1,49 @@
+{
+  "best_for": [
+    "用于查看基金简称、全称、市场、成立日期、上市日期和投资范围。",
+    "用于确认基金是否为指数基金、是否支持日内交易和跟踪指数代码。",
+    "用于获取最新交易属性快照，例如融资融券标的、担保券和上市天数。"
+  ],
+  "input_guidance": {
+    "optional_fields": [],
+    "required_fields": [
+      "fund"
+    ],
+    "notes": [
+      "fund 使用基金代码、简称或全称；本工具不接受 trade_date。"
+    ]
+  },
+  "invocation_example": "fund_profile_query(fund=\"510300\")",
+  "output_guidance": {
+    "drop_default": [],
+    "field_policies": {
+      "data.code": {
+        "strategy": "prompt_full"
+      },
+      "data.name": {
+        "strategy": "prompt_full"
+      },
+      "data.profile": {
+        "strategy": "auto"
+      },
+      "data.latest_index_flags": {
+        "strategy": "auto"
+      },
+      "data.coverage": {
+        "strategy": "auto"
+      }
+    },
+    "high_value_for_reasoning": [
+      "data.code",
+      "data.name",
+      "data.profile",
+      "data.latest_index_flags",
+      "data.coverage"
+    ],
+    "high_value_for_render": [],
+    "recommended_reducers": {},
+    "usually_too_large_for_prompt": []
+  },
+  "purpose": "查询单只基金或 ETF 的基础资料和最新交易属性快照。",
+  "tool_name": "fund_profile_query"
+}

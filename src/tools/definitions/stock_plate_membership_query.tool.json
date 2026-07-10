@@ -1,0 +1,160 @@
+{
+  "auth": "public",
+  "availability": {
+    "lifecycle": "active",
+    "retrieval_mode": "retrievable",
+    "visibility": "visible"
+  },
+  "capabilities": [
+    "stock_plate_membership",
+    "plate_membership"
+  ],
+  "defaults": {
+    "limit": 50,
+    "sort_by": "plate_rise_fall_rate"
+  },
+  "identity": {
+    "description": "获取指定股票所属的板块关系列表。",
+    "display_name": "个股所属板块查询",
+    "domain": "plate",
+    "owner": "tools"
+  },
+  "invocation_example": "stock_plate_membership_query(stock=\"600519.SH\", limit=20, sort_by=\"plate_rise_fall_rate\")",
+  "match_contract": {
+    "request_families": [
+      "data_access"
+    ],
+    "work_item_types": [
+      "tool"
+    ],
+    "capability_classes": [
+      "data_retrieval",
+      "plate_membership_lookup"
+    ],
+    "side_effect_level": "read_only"
+  },
+  "name": "stock_plate_membership_query",
+  "profiles": {
+    "mock": {
+      "enabled": true,
+      "implementation": {
+        "kind": "inline_result"
+      },
+      "result": {
+        "tool": "stock_plate_membership_query",
+        "ok": true,
+        "data": {
+          "items": []
+        },
+        "error": ""
+      }
+    },
+    "real": {
+      "enabled": true,
+      "implementation": {
+        "kind": "python_callable",
+        "target": "src.tools.stock_plate_membership_query_tool:run"
+      }
+    }
+  },
+  "retention": {
+    "drop_default": [],
+    "high_value_for_reasoning": [
+      "data.resolved_subject",
+      "data.items"
+    ],
+    "high_value_for_render": [],
+    "recommended_reducers": {
+      "data.items": "top_rows"
+    },
+    "usually_too_large_for_prompt": [
+      "data.items"
+    ]
+  },
+  "runtime_hints": {
+    "cost_class": "low",
+    "latency_class": "low",
+    "supports_async_submit": false,
+    "supports_stream": false
+  },
+  "safety": {
+    "network": true,
+    "persistence": false,
+    "side_effect": "none"
+  },
+  "schemas": {
+    "input": {
+      "$id": "stock_plate_membership_query.input.schema.json",
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "stock": {
+          "type": "string",
+          "description": "股票代码、简称或名称。"
+        },
+        "as_of": {
+          "description": "可选快照交易日，YYYY-MM-DD；为空时使用最近可用行情数据。",
+          "type": "string"
+        },
+        "limit": {
+          "description": "返回所属板块数量，默认 50。",
+          "minimum": 1,
+          "maximum": 500,
+          "type": "integer"
+        },
+        "sort_by": {
+          "description": "所属板块排序字段。",
+          "enum": [
+            "plate_rise_fall_rate",
+            "plate_amount",
+            "plate_main_net_inflow"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "stock"
+      ],
+      "type": "object"
+    },
+    "output": {
+      "$ref": "src/tools/schemas/stock_plate_membership_query.schema.json"
+    }
+  },
+  "status": "active",
+  "tags": [
+    "plate",
+    "membership",
+    "constituents"
+  ],
+  "tests": {
+    "golden_cases": [],
+    "sample_inputs": [
+      {
+        "name": "stock_plate_membership_query_sample",
+        "arguments": {
+          "limit": 20,
+          "sort_by": "plate_rise_fall_rate",
+          "stock": "600519.SH"
+        }
+      }
+    ]
+  },
+  "ui_hints": {
+    "editable_sections": [
+      "identity",
+      "schemas.input",
+      "schemas.output",
+      "capabilities",
+      "profiles",
+      "retention",
+      "tests"
+    ]
+  },
+  "version": "v1",
+  "subject_tags": [
+    "stock",
+    "plate"
+  ],
+  "tool_priority": 1
+}

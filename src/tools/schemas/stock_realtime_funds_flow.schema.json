@@ -1,0 +1,80 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "stock_realtime_funds_flow.schema.json",
+  "title": "Stock Realtime Funds Flow Output",
+  "type": "object",
+  "required": [
+    "tool",
+    "ok",
+    "data",
+    "error"
+  ],
+  "properties": {
+    "data": {
+      "type": "object",
+      "required": [
+        "code",
+        "funds",
+        "name",
+        "source"
+      ],
+      "properties": {
+        "code": {
+          "description": "股票代码",
+          "type": "string"
+        },
+        "funds": {
+          "additionalProperties": false,
+          "description": "四档资金流结果",
+          "properties": {
+            "large": {
+              "$ref": "#/$defs/bucket",
+              "description": "大单"
+            },
+            "medium": {
+              "$ref": "#/$defs/bucket",
+              "description": "中单"
+            },
+            "small": {
+              "$ref": "#/$defs/bucket",
+              "description": "小单"
+            },
+            "super_large": {
+              "$ref": "#/$defs/bucket",
+              "description": "特大单"
+            }
+          },
+          "required": [
+            "super_large",
+            "large",
+            "medium",
+            "small"
+          ],
+          "type": "object"
+        },
+        "name": {
+          "description": "股票名称",
+          "type": "string"
+        },
+        "source": {
+          "description": "数据来源",
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "error": {
+      "description": "错误信息，成功时为空",
+      "type": "string"
+    },
+    "ok": {
+      "description": "执行是否成功",
+      "type": "boolean"
+    },
+    "tool": {
+      "const": "stock_realtime_funds_flow",
+      "description": "工具标识"
+    }
+  },
+  "additionalProperties": false
+}

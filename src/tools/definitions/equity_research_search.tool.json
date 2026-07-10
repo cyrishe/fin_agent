@@ -1,0 +1,149 @@
+{
+  "auth": "public",
+  "availability": {
+    "lifecycle": "retired",
+    "retrieval_mode": "direct_only",
+    "visibility": "hidden"
+  },
+  "enabled": false,
+  "capabilities": [
+    "report_search",
+    "research_viewpoint",
+    "rating_snapshot",
+    "text_retrieval"
+  ],
+  "defaults": {},
+  "identity": {
+    "description": "查询指定个股的专业的研究报告，提供机构对个股的看多看空以及依据、目标价、预测分析、风险提示、个股所在行业的经营分析等内容",
+    "display_name": "个股研报查询",
+    "domain": "research",
+    "owner": "tools"
+  },
+  "invocation_example": "equity_research_search(company=\"贵州茅台\")",
+  "name": "equity_research_search",
+  "post_process": {
+    "deterministic": {
+      "enabled": false,
+      "handler": ""
+    },
+    "llm": {
+      "enabled": false,
+      "prompt_key": ""
+    }
+  },
+  "profiles": {
+    "mock": {
+      "enabled": false,
+      "implementation": {
+        "kind": "inline_result"
+      },
+      "result": {
+        "data": [
+          {
+            "analyst": "analyst_示例",
+            "institution": "institution_示例",
+            "publish_time": "publish_time_示例",
+            "report_type": "report_type_示例",
+            "site": "site_示例",
+            "snippet": "snippet_示例",
+            "stock_code": "stock_code_示例",
+            "stock_name": "stock_name_示例",
+            "title": "title_示例",
+            "url": "url_示例"
+          }
+        ],
+        "error": "error_示例",
+        "ok": false,
+        "tool": "equity_research_search"
+      }
+    },
+    "real": {
+      "enabled": false,
+      "implementation": {
+        "kind": "python_callable",
+        "target": "src.tools.stock_reports_tool:run"
+      }
+    }
+  },
+  "retention": {
+    "drop_default": [],
+    "high_value_for_reasoning": [
+      "data"
+    ],
+    "high_value_for_render": [
+      "data"
+    ],
+    "recommended_reducers": {
+      "data": "summarize_report_list"
+    },
+    "usually_too_large_for_prompt": [
+      "data[*].snippet"
+    ]
+  },
+  "runtime_hints": {
+    "cost_class": "medium",
+    "latency_class": "medium",
+    "supports_async_submit": false,
+    "supports_stream": false
+  },
+  "safety": {
+    "network": true,
+    "persistence": true,
+    "side_effect": "optional_persistence"
+  },
+  "schemas": {
+    "input": {
+      "$id": "equity_research_search.input.schema.json",
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "company": {
+          "type": "string",
+          "description": "公司名称或证券代码。工具内部会自动解析为标准证券代码。"
+        }
+      },
+      "required": [
+        "company"
+      ],
+      "type": "object"
+    },
+    "output": {
+      "$ref": "src/tools/schemas/equity_research_search.schema.json"
+    }
+  },
+  "status": "disabled",
+  "tags": [
+    "report",
+    "research",
+    "rating",
+    "stock"
+  ],
+  "tests": {
+    "golden_cases": [],
+    "sample_inputs": [
+      {
+        "arguments": {
+          "company": "贵州茅台"
+        },
+        "name": "default_equity_research_search"
+      }
+    ]
+  },
+  "ui_hints": {
+    "editable_sections": [
+      "identity",
+      "schemas.input",
+      "schemas.output",
+      "capabilities",
+      "profiles",
+      "retention",
+      "post_process",
+      "tests"
+    ]
+  },
+  "version": "v1",
+  "subject_tags": [
+    "stock"
+  ],
+  "tool_priority": 1
+}

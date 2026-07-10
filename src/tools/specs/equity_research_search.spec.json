@@ -1,0 +1,93 @@
+{
+  "best_for": [
+    "研报内容查询",
+    "可以提供针对个股的市场机构观点，经营情况的预测、基本面分析等"
+  ],
+  "display_name": "个股研报查询",
+  "input_guidance": {
+    "optional_fields": [],
+    "required_fields": [
+      "company"
+    ]
+  },
+  "input_schema": "src/tools/definitions/equity_research_search.tool.json#/schemas/input",
+  "invocation_example": "equity_research_search(company=\"贵州茅台\")",
+  "name": "equity_research_search",
+  "output_guidance": {
+    "drop_default": [],
+    "field_policies": {
+      "data.[]": {
+        "strategy": "auto"
+      },
+      "data.[].analyst": {
+        "strategy": "auto"
+      },
+      "data.[].institution": {
+        "strategy": "auto"
+      },
+      "data.[].publish_time": {
+        "strategy": "auto"
+      },
+      "data.[].report_type": {
+        "strategy": "auto"
+      },
+      "data.[].site": {
+        "strategy": "auto"
+      },
+      "data.[].snippet": {
+        "strategy": "auto"
+      },
+      "data.[].code": {
+        "strategy": "auto"
+      },
+      "data.[].name": {
+        "strategy": "auto"
+      },
+      "data.[].title": {
+        "strategy": "auto"
+      },
+      "data.[].url": {
+        "strategy": "auto"
+      },
+      "data.analyst": {
+        "strategy": "auto"
+      },
+      "data.institution": {
+        "strategy": "auto"
+      },
+      "data.publish_time": {
+        "strategy": "auto"
+      },
+      "data.report_type": {
+        "strategy": "auto"
+      },
+      "data.site": {
+        "strategy": "auto"
+      },
+      "data.snippet": {
+        "strategy": "auto"
+      },
+      "data.code": {
+        "strategy": "auto"
+      },
+      "data.name": {
+        "strategy": "auto"
+      },
+      "data.title": {
+        "strategy": "auto"
+      },
+      "data.url": {
+        "strategy": "auto"
+      }
+    },
+    "high_value_for_reasoning": [],
+    "high_value_for_render": [],
+    "recommended_reducers": {
+      "data": "summarize_report_list"
+    },
+    "usually_too_large_for_prompt": []
+  },
+  "output_schema": "src/tools/schemas/equity_research_search.schema.json",
+  "purpose": "查询指定个股的专业的研究报告，提供机构对个股的看多看空以及依据、目标价、预测分析、风险提示、个股所在行业的经营分析等内容",
+  "tool_name": "equity_research_search"
+}

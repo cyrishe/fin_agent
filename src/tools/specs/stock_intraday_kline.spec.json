@@ -1,0 +1,57 @@
+{
+  "best_for": [
+    "分钟 K 线查询"
+  ],
+  "input_guidance": {
+    "optional_fields": [
+      "minute_count"
+    ],
+    "required_fields": [
+      "name"
+    ]
+  },
+  "invocation_example": "stock_intraday_kline(name=\"贵州茅台\", minute_count=240)",
+  "output_guidance": {
+    "drop_default": [],
+    "field_policies": {
+      "data.code": {
+        "strategy": "prompt_full"
+      },
+      "data.intraday_kline": {
+        "strategy": "render",
+        "render_type": "kline"
+      },
+      "data.intraday_kline.candles": {
+        "strategy": "prompt_summary",
+        "summary_prompt": "请用中文概括字段 data.intraday_kline.candles 的核心内容，提炼主要信息、结构含义、关键结论和异常点。若这是表格或列表，请说明字段含义和最值得关注的观察。"
+      },
+      "data.intraday_kline.candles.[]": {
+        "strategy": "auto"
+      },
+      "data.intraday_kline.indicators": {
+        "strategy": "auto"
+      },
+      "data.minute_count": {
+        "strategy": "auto"
+      },
+      "data.name": {
+        "strategy": "prompt_full"
+      }
+    },
+    "high_value_for_reasoning": [
+      "data.code",
+      "data.name"
+    ],
+    "high_value_for_render": [
+      "data.intraday_kline"
+    ],
+    "recommended_reducers": {
+      "data.intraday_kline": "summarize_timeseries"
+    },
+    "usually_too_large_for_prompt": [
+      "data.intraday_kline.candles"
+    ]
+  },
+  "purpose": "查询个股日内分钟 K 线。",
+  "tool_name": "stock_intraday_kline"
+}

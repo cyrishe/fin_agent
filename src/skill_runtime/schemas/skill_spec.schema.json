@@ -1,0 +1,117 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "skill_spec.schema.json",
+  "title": "SkillSpec",
+  "type": "object",
+  "required": [
+    "identity",
+    "goal",
+    "inputs",
+    "tool_policy",
+    "output_contract",
+    "display_contract",
+    "runtime_hints"
+  ],
+  "properties": {
+    "identity": {
+      "type": "object",
+      "required": ["skill_name", "title", "version"],
+      "properties": {
+        "skill_name": { "type": "string" },
+        "title": { "type": "string" },
+        "version": { "type": "string" },
+        "purpose": { "type": "string" },
+        "description": { "type": "string" },
+        "owner": { "type": "string", "enum": ["system", "personal"] },
+        "auth": { "type": "string", "enum": ["public", "private"] },
+        "tags": { "type": "array", "items": { "type": "string" } }
+      },
+      "additionalProperties": true
+    },
+    "goal": {
+      "type": "object",
+      "required": ["summary"],
+      "properties": {
+        "summary": { "type": "string" },
+        "success_criteria": { "type": "array", "items": { "type": "string" } },
+        "avoid_rules": { "type": "array", "items": { "type": "string" } }
+      },
+      "additionalProperties": true
+    },
+    "inputs": {
+      "type": "object",
+      "properties": {
+        "expected_fields": { "type": "array", "items": { "type": "string" } },
+        "example_inputs": { "type": "array", "items": { "type": "object" } }
+      },
+      "additionalProperties": true
+    },
+    "tool_policy": {
+      "type": "object",
+      "required": ["mode"],
+      "properties": {
+        "mode": { "type": "string" },
+        "tools": { "type": "array", "items": { "type": "string" } },
+        "required_tools_before_final": { "type": "array", "items": { "type": "string" } },
+        "preferred_tools": { "type": "array", "items": { "type": "string" } },
+        "forbidden_tools": { "type": "array", "items": { "type": "string" } },
+        "default_max_steps": { "type": "integer" }
+      },
+      "additionalProperties": true
+    },
+    "execution_process": {
+      "type": "object",
+      "properties": {
+        "summary": { "type": "string" },
+        "skill_body": { "type": "string" }
+      },
+      "additionalProperties": true
+    },
+    "reasoning_requirements": {
+      "type": "object",
+      "properties": {
+        "must_cover": { "type": "array", "items": { "type": "string" } },
+        "evidence_types": { "type": "array", "items": { "type": "string" } },
+        "notes": { "type": "array", "items": { "type": "string" } }
+      },
+      "additionalProperties": true
+    },
+    "output_contract": {
+      "type": "object",
+      "properties": {
+        "required_top_level_fields": { "type": "array", "items": { "type": "string" } },
+        "output_schema": { "type": "object" },
+        "output_mode": { "type": "string", "enum": ["default", "process_guided", "raw_tool_results"] }
+      },
+      "additionalProperties": true
+    },
+    "display_contract": {
+      "type": "object",
+      "properties": {
+        "presentation_preference": { "type": "string" },
+        "page_type": { "type": "string" },
+        "default_sections": { "type": "array", "items": { "type": "string" } },
+        "preferred_block_types": { "type": "array", "items": { "type": "string" } }
+      },
+      "additionalProperties": true
+    },
+    "runtime_hints": {
+      "type": "object",
+      "properties": {
+        "default_max_steps": { "type": "integer" },
+        "enable_think": { "type": "boolean" }
+      },
+      "additionalProperties": true
+    },
+    "source_bundle": {
+      "type": "object",
+      "properties": {
+        "skill_md_text": { "type": "string" },
+        "skill_config_text": { "type": "string" },
+        "output_schema_text": { "type": "string" }
+      },
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": true
+}

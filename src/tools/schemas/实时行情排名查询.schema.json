@@ -1,0 +1,99 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "实时行情排名查询.schema.json",
+  "title": "实时行情排名查询 Output",
+  "type": "object",
+  "required": [
+    "tool",
+    "ok",
+    "data",
+    "error"
+  ],
+  "properties": {
+    "data": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "amount",
+          "chg_ratio",
+          "chg_value",
+          "high_price",
+          "latest_price",
+          "low_price",
+          "open_price",
+          "preclose_price",
+          "snapshot_time",
+          "code",
+          "name",
+          "volume"
+        ],
+        "properties": {
+          "amount": {
+            "description": "",
+            "type": "string"
+          },
+          "chg_ratio": {
+            "description": "",
+            "type": "string"
+          },
+          "chg_value": {
+            "description": "",
+            "type": "string"
+          },
+          "high_price": {
+            "description": "",
+            "type": "string"
+          },
+          "latest_price": {
+            "description": "",
+            "type": "string"
+          },
+          "low_price": {
+            "description": "",
+            "type": "string"
+          },
+          "open_price": {
+            "description": "",
+            "type": "string"
+          },
+          "preclose_price": {
+            "description": "",
+            "type": "string"
+          },
+          "snapshot_time": {
+            "description": "",
+            "type": "string"
+          },
+          "code": {
+            "description": "",
+            "type": "string"
+          },
+          "name": {
+            "description": "",
+            "type": "string"
+          },
+          "volume": {
+            "description": "",
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "error": {
+      "type": "string"
+    },
+    "meta": {
+      "additionalProperties": true,
+      "type": "object"
+    },
+    "ok": {
+      "type": "boolean"
+    },
+    "tool": {
+      "const": "实时行情排名查询"
+    }
+  },
+  "additionalProperties": true
+}

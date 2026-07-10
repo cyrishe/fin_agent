@@ -1,0 +1,171 @@
+{
+  "auth": "public",
+  "availability": {
+    "lifecycle": "active",
+    "retrieval_mode": "retrievable",
+    "visibility": "visible"
+  },
+  "capabilities": [
+    "limit_board_list",
+    "minute_snapshot_lookup",
+    "market_screening"
+  ],
+  "defaults": {
+    "limit_type": "涨停",
+    "market": "all",
+    "top_k": "50"
+  },
+  "identity": {
+    "description": "查询指定市场的涨停股或跌停股列表。",
+    "display_name": "涨跌停列表查询",
+    "domain": "market",
+    "owner": "tools"
+  },
+  "invocation_example": "涨跌停列表查询(market=\"all\", limit_type=\"涨停\", top_k=50)",
+  "match_contract": {
+    "request_families": [
+      "data_access"
+    ],
+    "work_item_types": [
+      "tool"
+    ],
+    "capability_classes": [
+      "data_retrieval",
+      "market_screening"
+    ],
+    "side_effect_level": "read_only"
+  },
+  "name": "涨跌停列表查询",
+  "post_process": {
+    "deterministic": {
+      "enabled": false,
+      "handler": ""
+    },
+    "llm": {
+      "enabled": false,
+      "prompt_key": ""
+    }
+  },
+  "profiles": {
+    "mock": {
+      "enabled": true,
+      "implementation": {
+        "kind": "inline_result"
+      },
+      "result": {
+        "data": [
+          {
+            "amount": 0,
+            "chg_ratio": 0,
+            "chg_value": 0,
+            "high_price": 0,
+            "latest_price": 0,
+            "low_price": 0,
+            "open_price": 0,
+            "preclose_price": 0,
+            "snapshot_time": "snapshot_time_示例",
+            "code": "stock_code_示例",
+            "name": "stock_name_示例",
+            "volume": 0
+          }
+        ],
+        "error": "error_示例",
+        "meta": {},
+        "ok": false,
+        "tool": "涨跌停列表查询"
+      }
+    },
+    "real": {
+      "enabled": true,
+      "implementation": {
+        "kind": "python_callable",
+        "target": "src.tools.limit_board_list_tool:run"
+      }
+    }
+  },
+  "retention": {
+    "drop_default": [],
+    "high_value_for_reasoning": [
+      "data"
+    ],
+    "high_value_for_render": [
+      "data"
+    ],
+    "recommended_reducers": {},
+    "usually_too_large_for_prompt": []
+  },
+  "runtime_hints": {
+    "cost_class": "low",
+    "latency_class": "low",
+    "supports_async_submit": false,
+    "supports_stream": false
+  },
+  "safety": {
+    "network": false,
+    "persistence": false,
+    "side_effect": "none"
+  },
+  "schemas": {
+    "input": {
+      "$id": "涨跌停列表查询.input.schema.json",
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "limit_type": {
+          "type": "string",
+          "description": "列表类型：涨停 或 跌停。"
+        },
+        "market": {
+          "type": "string",
+          "description": "市场范围：sh / sz / bj / all，默认 all。"
+        },
+        "top_k": {
+          "type": "integer",
+          "description": "返回前 N 条，默认 50。"
+        }
+      },
+      "required": [],
+      "type": "object"
+    },
+    "output": {
+      "$ref": "src/tools/schemas/涨跌停列表查询.schema.json"
+    }
+  },
+  "status": "active",
+  "tags": [
+    "market",
+    "limit",
+    "snapshot",
+    "screening"
+  ],
+  "tests": {
+    "golden_cases": [],
+    "sample_inputs": [
+      {
+        "arguments": {
+          "limit_type": "涨停",
+          "market": "all",
+          "top_k": 50
+        },
+        "name": "limit_up_list"
+      }
+    ]
+  },
+  "ui_hints": {
+    "editable_sections": [
+      "identity",
+      "schemas.input",
+      "schemas.output",
+      "capabilities",
+      "profiles",
+      "retention",
+      "post_process",
+      "tests"
+    ]
+  },
+  "version": "v1",
+  "subject_tags": [
+    "general"
+  ],
+  "tool_priority": 1
+}

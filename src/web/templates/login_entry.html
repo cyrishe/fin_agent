@@ -1,0 +1,221 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ page_title or "登录入口" }}</title>
+  <style>
+    :root {
+      --bg: #f4f5f7;
+      --panel: #ffffff;
+      --line: #e4e7ec;
+      --text: #101828;
+      --muted: #667085;
+      --accent: #155eef;
+      --accent-soft: #eef4ff;
+      --shadow: 0 12px 32px rgba(16, 24, 40, 0.06);
+      --sans: "PingFang SC", "Noto Sans SC", "Helvetica Neue", sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: var(--sans);
+      color: var(--text);
+      background: linear-gradient(180deg, #f7f8fa 0%, #eef1f5 100%);
+      display: grid;
+      place-items: center;
+      padding: 20px;
+    }
+    .panel {
+      width: min(100%, 560px);
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      box-shadow: var(--shadow);
+      padding: 24px;
+      display: grid;
+      gap: 18px;
+    }
+    .header {
+      display: grid;
+      gap: 8px;
+    }
+    .title {
+      margin: 0;
+      font-size: 24px;
+      font-weight: 700;
+    }
+    .desc {
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.7;
+    }
+    .block {
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 16px;
+      display: grid;
+      gap: 10px;
+      background: #fcfcfd;
+    }
+    .block-title {
+      font-size: 15px;
+      font-weight: 700;
+    }
+    .meta {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+    .actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .thread-list {
+      display: grid;
+      gap: 10px;
+    }
+    .thread-item {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 12px 14px;
+      display: grid;
+      gap: 6px;
+      background: #fff;
+      text-decoration: none;
+      color: inherit;
+    }
+    .thread-item:hover {
+      border-color: #cbd5e1;
+      background: #fdfdff;
+    }
+    .thread-title {
+      font-size: 14px;
+      font-weight: 700;
+    }
+    .thread-sub {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+    .thread-snippet {
+      font-size: 13px;
+      color: #344054;
+      line-height: 1.6;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .btn {
+      appearance: none;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 10px 14px;
+      background: #fff;
+      color: var(--text);
+      font: inherit;
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .btn.primary {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+    }
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      border: 1px solid #cfe0ff;
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 600;
+      padding: 6px 10px;
+      width: fit-content;
+    }
+    @media (max-width: 680px) {
+      .panel {
+        padding: 18px;
+      }
+      .actions {
+        display: grid;
+      }
+      .btn {
+        width: 100%;
+        text-align: center;
+      }
+    }
+  </style>
+</head>
+<body>
+  <section class="panel">
+    <div class="header">
+      <div class="tag">AIIA Assistant</div>
+      <h1 class="title">统一入口</h1>
+      <div class="desc">
+        先统一处理登录、临时 guest 和会话恢复，再进入 assistant。<br>
+        当前微信登录未接入，先支持 guest 和最近对话恢复。
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="block-title">当前会话</div>
+      <div class="meta">
+        {% if guest_user_id %}guest_user_id: {{ guest_user_id }}{% else %}尚未建立 guest 身份{% endif %}<br>
+        {% if existing_thread_id %}最近 thread_id: {{ existing_thread_id }}{% else %}暂无最近对话{% endif %}
+      </div>
+      <div class="actions">
+        {% if existing_thread_id %}
+        <a class="btn primary" href="{{ assistant_url }}">继续最近对话</a>
+        {% endif %}
+        <a class="btn" href="{{ new_conversation_url }}">开启新对话</a>
+      </div>
+    </div>
+
+    {% if recent_threads %}
+    <div class="block">
+      <div class="block-title">最近会话</div>
+      <div class="thread-list">
+        {% for item in recent_threads %}
+        <a class="thread-item" href="{{ thread_select_base_url }}/{{ item.thread_id }}">
+          <div class="thread-title">{{ item.title or ('会话 ' ~ item.thread_id) }}</div>
+          <div class="thread-sub">thread_id: {{ item.thread_id }} · 最近活跃: {{ item.last_event_at or item.updated_at or item.created_at }}</div>
+          {% if item.latest_user_input %}
+          <div class="thread-snippet">用户：{{ item.latest_user_input }}</div>
+          {% elif item.latest_assistant_output %}
+          <div class="thread-snippet">助手：{{ item.latest_assistant_output }}</div>
+          {% endif %}
+        </a>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+    <div class="block">
+      <div class="block-title">临时进入</div>
+      <div class="meta">
+        以 guest 方式进入 assistant。后续正式登录将统一接到这里。
+      </div>
+      <div class="actions">
+        <a class="btn primary" href="{{ guest_entry_url }}">临时 guest 进入</a>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="block-title">正式登录</div>
+      <div class="meta">
+        微信登录 / 企业登录后续接入。当前先保留这个统一入口，不直接暴露到 assistant 内部。
+      </div>
+      <div class="actions">
+        <button class="btn" type="button" disabled>微信登录（待接入）</button>
+      </div>
+    </div>
+  </section>
+</body>
+</html>

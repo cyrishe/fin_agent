@@ -1,0 +1,80 @@
+{
+  "schema_version": "security_data_request_protocol.v1",
+  "subjects": ["stock", "fund", "bond", "industry", "plate", "index", "hot_event"],
+  "data_views": [
+    "realtime_market",
+    "historical_market",
+    "capital_flow",
+    "valuation",
+    "profile",
+    "fundamental",
+    "constituent",
+    "research_report",
+    "news",
+    "announcement"
+  ],
+  "ops": ["query", "aggregate"],
+  "condition_operators": ["=", "!=", ">", ">=", "<", "<=", "in", "between", "contains"],
+  "metric_methods": ["count", "sum", "avg", "min", "max", "median"],
+  "sort_directions": ["asc", "desc"],
+  "support_statuses": ["protocol_supported", "missing_provider", "executable_now", "protocol_gap"],
+  "request_contract": {
+    "required_fields": ["request_id", "subject", "data_view", "op"],
+    "list_fields": ["conditions", "fields", "group_by", "metrics", "sort", "depends_on"],
+    "condition_required_fields": ["field", "operator"],
+    "condition_value_fields": ["value"],
+    "reference_value_format": "r<request_number>.<output_field>",
+    "metric_required_fields": ["field", "method"],
+    "sort_required_fields": ["field", "direction"]
+  },
+  "subject_data_views": {
+    "stock": [
+      "realtime_market",
+      "historical_market",
+      "capital_flow",
+      "valuation",
+      "profile",
+      "fundamental",
+      "research_report",
+      "news",
+      "announcement"
+    ],
+    "fund": [
+      "historical_market",
+      "profile",
+      "news"
+    ],
+    "bond": [
+      "news"
+    ],
+    "industry": [
+      "capital_flow",
+      "profile",
+      "constituent",
+      "news"
+    ],
+    "plate": [
+      "realtime_market",
+      "historical_market",
+      "capital_flow",
+      "valuation",
+      "profile",
+      "constituent",
+      "news"
+    ],
+    "index": [
+      "realtime_market",
+      "historical_market",
+      "capital_flow",
+      "valuation",
+      "profile",
+      "constituent",
+      "news"
+    ],
+    "hot_event": [
+      "profile",
+      "constituent",
+      "news"
+    ]
+  }
+}

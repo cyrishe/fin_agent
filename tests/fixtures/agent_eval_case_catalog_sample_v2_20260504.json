@@ -1,0 +1,257 @@
+[
+  {
+    "case_id": "market_amount_10d_by_market",
+    "suite": "tool_selection_and_arguments",
+    "priority": "P0",
+    "title": "市场总成交额近 10 日走势",
+    "input": {
+      "messages": [
+        {
+          "role": "user",
+          "content": "最近 10 个交易日，上证、深证、北证三大市场的总成交额分别是什么走势？帮我按日期列出来。"
+        }
+      ],
+      "context": {},
+      "attachments": []
+    },
+    "checks": [
+      {
+        "stage": "dialogue_understanding",
+        "assert": {
+          "needs_reference_resolution": false
+        }
+      },
+      {
+        "stage": "task_normalization",
+        "assert": {
+          "must_include": ["市场", "最近10个交易日", "总成交额"],
+          "must_not_include": ["个股", "K线", "指数历史行情"]
+        }
+      },
+      {
+        "stage": "tool_selection",
+        "assert": {
+          "must_include_tools": ["market_history_amount"],
+          "must_not_include_tools": ["stock_history_kline", "stock_history_funds_flow"]
+        }
+      },
+      {
+        "stage": "plan_compile",
+        "assert": {
+          "tool_arguments": {
+            "market_history_amount": {
+              "days": 10
+            }
+          }
+        }
+      }
+    ],
+    "tags": ["market", "amount", "tool_selection", "arguments"]
+  },
+  {
+    "case_id": "second_item_followup_funds",
+    "suite": "conversation_continuity",
+    "priority": "P0",
+    "title": "第二个对象续问资金面",
+    "input": {
+      "messages": [
+        {
+          "role": "user",
+          "content": "比较一下公司A和公司B今天的行情。"
+        },
+        {
+          "role": "assistant",
+          "content": "已比较公司A和公司B，公司A为第一个对象，公司B为第二个对象。"
+        },
+        {
+          "role": "user",
+          "content": "第二个公司的资金面也看一下。"
+        }
+      ],
+      "context": {
+        "referents": [
+          {"label": "公司A", "type": "company", "ordinal": 1},
+          {"label": "公司B", "type": "company", "ordinal": 2}
+        ]
+      },
+      "attachments": []
+    },
+    "checks": [
+      {
+        "stage": "dialogue_understanding",
+        "assert": {
+          "needs_reference_resolution": true
+        }
+      },
+      {
+        "stage": "reference_resolution",
+        "assert": {
+          "resolved_label": "公司B"
+        }
+      },
+      {
+        "stage": "tool_selection",
+        "assert": {
+          "must_include_any_tool_group": [["stock_realtime_funds_flow", "stock_history_funds_flow"]]
+        }
+      },
+      {
+        "stage": "plan_compile",
+        "assert": {
+          "tool_arguments_any": {
+            "stock_realtime_funds_flow": {"name": "公司B"},
+            "stock_history_funds_flow": {"name": "公司B"}
+          }
+        }
+      }
+    ],
+    "tags": ["continuity", "reference", "funds"]
+  },
+  {
+    "case_id": "attachment_company_reference",
+    "suite": "attachment_reference",
+    "priority": "P0",
+    "title": "附件中公司引用",
+    "input": {
+      "messages": [
+        {
+          "role": "user",
+          "content": "图片里提到的那家公司，帮我看看资金情况。"
+        }
+      ],
+      "context": {},
+      "attachments": [
+        {
+          "id": "att_001",
+          "type": "image",
+          "summary": "图片提到公司A正在扩产。"
+        }
+      ]
+    },
+    "checks": [
+      {
+        "stage": "reference_resolution",
+        "assert": {
+          "resolved_label": "公司A"
+        }
+      },
+      {
+        "stage": "tool_selection",
+        "assert": {
+          "must_include_any_tool_group": [["stock_realtime_funds_flow", "stock_history_funds_flow"]]
+        }
+      }
+    ],
+    "tags": ["attachment", "reference", "funds"]
+  },
+  {
+    "case_id": "limitup_top1_then_quote_news",
+    "suite": "task_decomposition",
+    "priority": "P1",
+    "title": "集合筛选后查行情和新闻",
+    "input": {
+      "messages": [
+        {
+          "role": "user",
+          "content": "从今天涨停股里找出成交量最大的那只，再查它的行情和相关新闻。"
+        }
+      ],
+      "context": {},
+      "attachments": []
+    },
+    "checks": [
+      {
+        "stage": "tool_selection",
+        "assert": {
+          "must_include_tools": ["涨跌停列表查询", "stock_realtime_quote", "financial_news_search"]
+        }
+      },
+      {
+        "stage": "plan_compile",
+        "assert": {
+          "dependency_pattern": [
+            "list_candidates",
+            "select_top1",
+            "query_selected_target"
+          ]
+        }
+      }
+    ],
+    "tags": ["decomposition", "dependency", "news", "quote"]
+  },
+  {
+    "case_id": "capability_gap_pe_ratio",
+    "suite": "capability_gap",
+    "priority": "P1",
+    "title": "当前工具不覆盖市盈率",
+    "input": {
+      "messages": [
+        {
+          "role": "user",
+          "content": "这两家公司当前市盈率分别是多少？"
+        }
+      ],
+      "context": {
+        "referents": [
+          {"label": "公司A", "type": "company", "ordinal": 1},
+          {"label": "公司B", "type": "company", "ordinal": 2}
+        ]
+      },
+      "attachments": []
+    },
+    "checks": [
+      {
+        "stage": "tool_selection",
+        "assert": {
+          "must_not_include_tools": ["stock_realtime_quote"],
+          "allow_capability_gap": true
+        }
+      },
+      {
+        "stage": "final_answer",
+        "assert": {
+          "must_not_fabricate": ["市盈率"],
+          "must_indicate_capability_gap": true
+        }
+      }
+    ],
+    "tags": ["gap", "reference", "fundamental"]
+  },
+  {
+    "case_id": "same_minute_amount_compare",
+    "suite": "tool_selection_and_arguments",
+    "priority": "P1",
+    "title": "同分钟市场成交额对比",
+    "input": {
+      "messages": [
+        {
+          "role": "user",
+          "content": "现在这个时间点，全市场累计成交额和过去 5 个交易日同一时间相比，是放量还是缩量？"
+        }
+      ],
+      "context": {},
+      "attachments": []
+    },
+    "checks": [
+      {
+        "stage": "tool_selection",
+        "assert": {
+          "must_include_tools": ["market_minute_amount_series"],
+          "acceptable_extra_tools": ["market_history_amount"]
+        }
+      },
+      {
+        "stage": "plan_compile",
+        "assert": {
+          "tool_arguments": {
+            "market_minute_amount_series": {
+              "market": "all",
+              "days": 5
+            }
+          }
+        }
+      }
+    ],
+    "tags": ["market", "minute", "amount", "arguments"]
+  }
+]

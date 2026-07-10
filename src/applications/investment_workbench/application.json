@@ -1,0 +1,179 @@
+{
+  "name": "investment_workbench",
+  "display_name": "Investment Workbench",
+  "version": "v1",
+  "status": "active",
+  "enabled": true,
+  "owner": "applications",
+  "domain": "market",
+  "capabilities": [
+    "conversation_entry",
+    "workspace_orchestration",
+    "task_creation",
+    "result_rendering"
+  ],
+  "tags": [
+    "application",
+    "investment",
+    "workbench"
+  ],
+  "keywords": [
+    "对话工作台",
+    "投研",
+    "市场分析",
+    "任务"
+  ],
+  "assistant_agent": "default_assistant",
+  "default_agents": [
+    "investment_analyst"
+  ],
+  "available_agents": [
+    "default_assistant",
+    "investment_analyst",
+    "system_agent"
+  ],
+  "default_skills": [],
+  "default_tools": [],
+  "workspace": {
+    "type": "router",
+    "title": "Task Router",
+    "url": "/router/studio"
+  },
+  "workspace_links": [
+    {
+      "label": "Skills",
+      "url": "/skills/studio"
+    },
+    {
+      "label": "Tools",
+      "url": "/tools"
+    },
+    {
+      "label": "Tasks",
+      "url": "/router/studio"
+    }
+  ],
+  "result_workspace_routes": {
+    "applications_catalog": {
+      "type": "applications_catalog",
+      "title": "Application Studio",
+      "url": "/applications/studio"
+    },
+    "agents_catalog": {
+      "type": "agents_catalog",
+      "title": "Agent Studio",
+      "url": "/agents/studio"
+    },
+    "skills_catalog": {
+      "type": "skills_catalog",
+      "title": "Skill Studio",
+      "url": "/skills/studio"
+    },
+    "tools_catalog": {
+      "type": "tools_catalog",
+      "title": "Tools Catalog",
+      "url": "/tools"
+    },
+    "tasks_catalog": {
+      "type": "router",
+      "title": "Task Router",
+      "url": "/router/studio"
+    },
+    "free_chat": {
+      "type": "router",
+      "title": "任务路由",
+      "url": "/router/studio"
+    },
+    "route_preview": {
+      "type": "router",
+      "title": "任务路由",
+      "url": "/router/studio"
+    },
+    "route_submit_clarify": {
+      "type": "router",
+      "title": "任务路由",
+      "url": "/router/studio"
+    },
+    "route_submit_planned": {
+      "type": "router",
+      "title": "任务编排计划",
+      "url": "/router/studio"
+    },
+    "route_submit_submitted": {
+      "type": "router",
+      "title": "任务执行中",
+      "url": "/router/studio"
+    },
+    "new_skill": {
+      "type": "skill_editor",
+      "title": "Skill Editor",
+      "url": "/skills/studio/{skill_name}"
+    },
+    "draft_skill": {
+      "type": "skill_editor",
+      "title": "Skill Draft",
+      "url": "/skills/studio/{skill_name}"
+    },
+    "application_detail": {
+      "type": "application_editor",
+      "title": "Application Editor",
+      "url": "/applications/studio/{application_name}"
+    },
+    "new_application": {
+      "type": "application_editor",
+      "title": "Application Editor",
+      "url": "/applications/studio/{application_name}"
+    },
+    "new_agent": {
+      "type": "agent_editor",
+      "title": "Agent Editor",
+      "url": "/agents/studio/{agent_name}"
+    },
+    "agent_detail": {
+      "type": "agent_editor",
+      "title": "Agent Editor",
+      "url": "/agents/studio/{agent_name}"
+    },
+    "skill_detail": {
+      "type": "skill_editor",
+      "title": "Skill Editor",
+      "url": "/skills/studio/{skill_name}"
+    },
+    "tool_detail": {
+      "type": "tool_editor",
+      "title": "Tool Editor",
+      "url": "/tools/studio/{tool_name}"
+    }
+  },
+  "quick_commands": [
+    "/applications",
+    "/agents",
+    "/skills",
+    "/tools",
+    "/tasks"
+  ],
+  "quick_actions": [
+    {
+      "title": "新建 Skill",
+      "description": "通过模板先生成 skill 骨架，再进入 Skill Studio 调整。",
+      "prompt": "/new-skill my_new_skill"
+    },
+    {
+      "title": "需求生成 Skill 草稿",
+      "description": "先根据自然语言生成 skill 骨架，再进入 Skill Studio 精修。",
+      "prompt": "/draft-skill momentum_review_draft 根据动量榜和资金流，输出一份简洁的市场复盘。"
+    },
+    {
+      "title": "优化已有 Skill",
+      "description": "基于已有 skill 生成一份优化 draft，再进入 Skill Studio 调整。",
+      "prompt": "/refine-skill stock_deep_dive 加强对资金流和风险部分的分析，输出更简洁。"
+    },
+    {
+      "title": "自由对话",
+      "description": "自然语言先走 route，再决定是否进入 skill 或 task。",
+      "prompt": "请分析今天的动量榜，并告诉我下一步应该看哪个 skill 或 tool。"
+    }
+  ],
+  "chat_placeholder": "输入自由问题，或使用 /applications /agents /skills /tools /tasks /new-skill xxx",
+  "assistant_intro": "可以先试：/applications、/agents、/skills、/tools、/tasks、/new-skill my_new_skill、/draft-skill xxx 需求描述，或者直接输入自然语言问题。"
+}

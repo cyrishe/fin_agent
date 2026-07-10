@@ -1,0 +1,152 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "个股动量排名.schema.json",
+  "title": "个股动量排名 Output",
+  "type": "object",
+  "required": [
+    "tool",
+    "ok",
+    "data",
+    "error"
+  ],
+  "properties": {
+    "data": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "group",
+          "group_label",
+          "items",
+          "window"
+        ],
+        "properties": {
+          "group": {
+            "description": "",
+            "type": "string"
+          },
+          "group_label": {
+            "description": "",
+            "type": "string"
+          },
+          "items": {
+            "description": "",
+            "items": {
+              "additionalProperties": true,
+              "properties": {
+                "current_amount": {
+                  "type": [
+                    "number",
+                    "null"
+                  ]
+                },
+                "current_pct": {
+                  "type": [
+                    "number",
+                    "null"
+                  ]
+                },
+                "is_new": {
+                  "type": "boolean"
+                },
+                "momentum_value": {
+                  "type": "number"
+                },
+                "prev_rank": {
+                  "type": [
+                    "integer",
+                    "null"
+                  ]
+                },
+                "rank": {
+                  "type": "integer"
+                },
+                "rank_change": {
+                  "type": [
+                    "integer",
+                    "null"
+                  ]
+                },
+                "code": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "rank",
+                "code",
+                "name",
+                "momentum_value",
+                "is_new"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "window": {
+            "description": "",
+            "type": "integer"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "error": {
+      "type": "string"
+    },
+    "meta": {
+      "additionalProperties": true,
+      "properties": {
+        "calc_mode": {
+          "enum": [
+            "realtime_intraday",
+            "daily_final",
+            "custom_list_recomputed"
+          ],
+          "type": "string"
+        },
+        "groups": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "prev_trade_date": {
+          "type": "string"
+        },
+        "scope_type": {
+          "enum": [
+            "grouped",
+            "custom_list"
+          ],
+          "type": "string"
+        },
+        "snapshot_time": {
+          "type": "string"
+        },
+        "top_n": {
+          "type": "integer"
+        },
+        "trade_date": {
+          "type": "string"
+        },
+        "windows": {
+          "items": {
+            "type": "integer"
+          },
+          "type": "array"
+        }
+      },
+      "type": "object"
+    },
+    "ok": {
+      "type": "boolean"
+    },
+    "tool": {
+      "const": "个股动量排名"
+    }
+  },
+  "additionalProperties": true
+}

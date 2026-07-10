@@ -1,0 +1,297 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "stock_financial_statement_query.schema.json",
+  "title": "Stock Financial Statement Query Tool Output",
+  "type": "object",
+  "required": [
+    "tool",
+    "ok",
+    "data",
+    "error"
+  ],
+  "properties": {
+    "tool": {
+      "const": "stock_financial_statement_query",
+      "type": "string"
+    },
+    "ok": {
+      "type": "boolean"
+    },
+    "error": {
+      "type": "string"
+    },
+    "data": {
+      "type": "object",
+      "required": [
+        "stock",
+        "code",
+        "name",
+        "statement_type",
+        "report_period",
+        "statements"
+      ],
+      "properties": {
+        "stock": {
+          "type": "string"
+        },
+        "code": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "statement_type": {
+          "type": "string"
+        },
+        "report_period": {
+          "type": "string"
+        },
+        "statements": {
+          "type": "object",
+          "properties": {
+            "balance_sheet": {
+              "items": {
+                "$ref": "#/$defs/balanceSheetRow"
+              },
+              "type": "array"
+            },
+            "income": {
+              "items": {
+                "$ref": "#/$defs/incomeRow"
+              },
+              "type": "array"
+            },
+            "cashflow": {
+              "items": {
+                "$ref": "#/$defs/cashflowRow"
+              },
+              "type": "array"
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "$defs": {
+    "baseRow": {
+      "type": "object",
+      "required": [
+        "report_period",
+        "ann_date",
+        "statement_type",
+        "currency"
+      ],
+      "properties": {
+        "report_period": {
+          "type": "string"
+        },
+        "ann_date": {
+          "type": "string"
+        },
+        "statement_type": {
+          "type": "string"
+        },
+        "currency": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "balanceSheetRow": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/baseRow"
+        },
+        {
+          "type": "object",
+          "required": [
+            "monetary_cap",
+            "tot_cur_assets",
+            "tot_non_cur_assets",
+            "tot_assets",
+            "tot_cur_liab",
+            "tot_non_cur_liab",
+            "tot_liab",
+            "shares",
+            "total_quity_atsopc",
+            "minority_int",
+            "total_holders_equity",
+            "tot_liab_shrhldr_eqy"
+          ],
+          "properties": {
+            "monetary_cap": {
+              "type": "number"
+            },
+            "tot_cur_assets": {
+              "type": "number"
+            },
+            "tot_non_cur_assets": {
+              "type": "number"
+            },
+            "tot_assets": {
+              "type": "number"
+            },
+            "tot_cur_liab": {
+              "type": "number"
+            },
+            "tot_non_cur_liab": {
+              "type": "number"
+            },
+            "tot_liab": {
+              "type": "number"
+            },
+            "shares": {
+              "type": "number"
+            },
+            "total_quity_atsopc": {
+              "type": "number"
+            },
+            "minority_int": {
+              "type": "number"
+            },
+            "total_holders_equity": {
+              "type": "number"
+            },
+            "tot_liab_shrhldr_eqy": {
+              "type": "number"
+            }
+          },
+          "additionalProperties": false
+        }
+      ]
+    },
+    "incomeRow": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/baseRow"
+        },
+        {
+          "type": "object",
+          "required": [
+            "tot_oper_rev",
+            "oper_rev",
+            "tot_oper_cost",
+            "less_oper_cost",
+            "oper_profit",
+            "tot_profit",
+            "inc_tax",
+            "net_profit_atsopc",
+            "net_profit_after_nrgal_atsolc",
+            "s_fa_eps_basic",
+            "s_fa_eps_diluted",
+            "ebit",
+            "ebitda"
+          ],
+          "properties": {
+            "tot_oper_rev": {
+              "type": "number"
+            },
+            "oper_rev": {
+              "type": "number"
+            },
+            "tot_oper_cost": {
+              "type": "number"
+            },
+            "less_oper_cost": {
+              "type": "number"
+            },
+            "oper_profit": {
+              "type": "number"
+            },
+            "tot_profit": {
+              "type": "number"
+            },
+            "inc_tax": {
+              "type": "number"
+            },
+            "net_profit_atsopc": {
+              "type": "number"
+            },
+            "net_profit_after_nrgal_atsolc": {
+              "type": "number"
+            },
+            "s_fa_eps_basic": {
+              "type": "number"
+            },
+            "s_fa_eps_diluted": {
+              "type": "number"
+            },
+            "ebit": {
+              "type": "number"
+            },
+            "ebitda": {
+              "type": "number"
+            }
+          },
+          "additionalProperties": false
+        }
+      ]
+    },
+    "cashflowRow": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/baseRow"
+        },
+        {
+          "type": "object",
+          "required": [
+            "stot_cash_inflows_oper_act",
+            "stot_cash_outflows_oper_act",
+            "net_cash_flows_oper_act",
+            "stot_cash_inflows_inv_act",
+            "stot_cash_outflows_inv_act",
+            "net_cash_flows_inv_act",
+            "stot_cash_inflows_fnc_act",
+            "stot_cash_outflows_fnc_act",
+            "net_cash_flows_fnc_act",
+            "net_increase_in_cce",
+            "initial_balance_of_cce",
+            "cash_cash_equ_end_period"
+          ],
+          "properties": {
+            "stot_cash_inflows_oper_act": {
+              "type": "number"
+            },
+            "stot_cash_outflows_oper_act": {
+              "type": "number"
+            },
+            "net_cash_flows_oper_act": {
+              "type": "number"
+            },
+            "stot_cash_inflows_inv_act": {
+              "type": "number"
+            },
+            "stot_cash_outflows_inv_act": {
+              "type": "number"
+            },
+            "net_cash_flows_inv_act": {
+              "type": "number"
+            },
+            "stot_cash_inflows_fnc_act": {
+              "type": "number"
+            },
+            "stot_cash_outflows_fnc_act": {
+              "type": "number"
+            },
+            "net_cash_flows_fnc_act": {
+              "type": "number"
+            },
+            "net_increase_in_cce": {
+              "type": "number"
+            },
+            "initial_balance_of_cce": {
+              "type": "number"
+            },
+            "cash_cash_equ_end_period": {
+              "type": "number"
+            }
+          },
+          "additionalProperties": false
+        }
+      ]
+    }
+  },
+  "additionalProperties": false
+}

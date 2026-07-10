@@ -1,0 +1,196 @@
+{
+  "auth": "public",
+  "availability": {
+    "lifecycle": "active",
+    "retrieval_mode": "retrievable",
+    "visibility": "visible"
+  },
+  "capabilities": [
+    "realtime_stock_ranking",
+    "market_ranking"
+  ],
+  "defaults": {
+    "market": "all",
+    "sort_by": "chg_ratio",
+    "order": "desc",
+    "top_k": 20
+  },
+  "identity": {
+    "description": "获取市场内股票的实时行情 TopK 排名。",
+    "display_name": "实时行情排名",
+    "domain": "market",
+    "owner": "tools"
+  },
+  "invocation_example": "实时行情排名查询(market=\"all\", sort_by=\"amount\", order=\"desc\", top_k=20)",
+  "match_contract": {
+    "request_families": [
+      "data_access"
+    ],
+    "work_item_types": [
+      "tool"
+    ],
+    "capability_classes": [
+      "data_retrieval",
+      "market_screening",
+      "ranking_transform"
+    ],
+    "side_effect_level": "read_only"
+  },
+  "name": "实时行情排名查询",
+  "post_process": {
+    "deterministic": {
+      "enabled": false,
+      "handler": ""
+    },
+    "llm": {
+      "enabled": false,
+      "prompt_key": ""
+    }
+  },
+  "profiles": {
+    "mock": {
+      "enabled": true,
+      "implementation": {
+        "kind": "inline_result"
+      },
+      "result": {
+        "data": [
+          {
+            "amount": "amount_示例",
+            "chg_ratio": "chg_ratio_示例",
+            "chg_value": "chg_value_示例",
+            "high_price": "high_price_示例",
+            "latest_price": "latest_price_示例",
+            "low_price": "low_price_示例",
+            "open_price": "open_price_示例",
+            "preclose_price": "preclose_price_示例",
+            "snapshot_time": "snapshot_time_示例",
+            "code": "stock_code_示例",
+            "name": "stock_name_示例",
+            "volume": "volume_示例"
+          }
+        ],
+        "error": "error_示例",
+        "meta": {},
+        "ok": false,
+        "tool": "实时行情排名查询"
+      }
+    },
+    "real": {
+      "enabled": true,
+      "implementation": {
+        "kind": "python_callable",
+        "target": "src.tools.realtime_market_ranking_tool:run"
+      }
+    }
+  },
+  "retention": {
+    "drop_default": [],
+    "high_value_for_reasoning": [
+      "data",
+      "meta"
+    ],
+    "high_value_for_render": [
+      "data"
+    ],
+    "recommended_reducers": {},
+    "usually_too_large_for_prompt": []
+  },
+  "runtime_hints": {
+    "cost_class": "low",
+    "latency_class": "low",
+    "supports_async_submit": false,
+    "supports_stream": false
+  },
+  "safety": {
+    "network": false,
+    "persistence": false,
+    "side_effect": "none"
+  },
+  "schemas": {
+    "input": {
+      "$id": "实时行情排名查询.input.schema.json",
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "market": {
+          "type": "string",
+          "description": "市场范围。",
+          "enum": [
+            "all",
+            "sh",
+            "sz",
+            "bj"
+          ]
+        },
+        "sort_by": {
+          "type": "string",
+          "description": "排序字段。当前支持 chg_ratio、amount、volume；不支持 turnover。",
+          "enum": [
+            "chg_ratio",
+            "amount",
+            "volume"
+          ]
+        },
+        "order": {
+          "type": "string",
+          "description": "排序方向。desc 表示从大到小，asc 表示从小到大。",
+          "enum": [
+            "desc",
+            "asc"
+          ]
+        },
+        "top_k": {
+          "type": "integer",
+          "description": "返回排名前 N 只股票，默认 20。",
+          "minimum": 1,
+          "maximum": 100
+        }
+      },
+      "required": [],
+      "type": "object"
+    },
+    "output": {
+      "$ref": "src/tools/schemas/实时行情排名查询.schema.json"
+    }
+  },
+  "status": "active",
+  "tags": [
+    "market",
+    "ranking",
+    "realtime",
+    "snapshot",
+    "topk"
+  ],
+  "tests": {
+    "golden_cases": [],
+    "sample_inputs": [
+      {
+        "arguments": {
+          "market": "all",
+          "sort_by": "chg_ratio",
+          "top_k": 10,
+          "order": "desc"
+        },
+        "name": "default_risers"
+      }
+    ]
+  },
+  "ui_hints": {
+    "editable_sections": [
+      "identity",
+      "schemas.input",
+      "schemas.output",
+      "capabilities",
+      "profiles",
+      "retention",
+      "post_process",
+      "tests"
+    ]
+  },
+  "version": "v1",
+  "subject_tags": [
+    "general"
+  ],
+  "tool_priority": 1
+}

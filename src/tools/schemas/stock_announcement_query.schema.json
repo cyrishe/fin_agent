@@ -1,0 +1,93 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "stock_announcement_query.schema.json",
+  "title": "Stock Announcement Query Tool Output",
+  "type": "object",
+  "required": [
+    "tool",
+    "ok",
+    "data",
+    "error"
+  ],
+  "properties": {
+    "tool": {
+      "const": "stock_announcement_query",
+      "type": "string"
+    },
+    "ok": {
+      "type": "boolean"
+    },
+    "error": {
+      "type": "string"
+    },
+    "data": {
+      "type": "object",
+      "required": [
+        "subject",
+        "code",
+        "name",
+        "items"
+      ],
+      "properties": {
+        "subject": {
+          "type": "string"
+        },
+        "code": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "items": {
+          "items": {
+            "$ref": "#/$defs/announcementRow"
+          },
+          "type": "array"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "$defs": {
+    "announcementRow": {
+      "type": "object",
+      "required": [
+        "news_id",
+        "data_source",
+        "code",
+        "ann_date",
+        "title",
+        "url",
+        "snippet"
+      ],
+      "properties": {
+        "news_id": {
+          "type": "string"
+        },
+        "data_source": {
+          "type": "string"
+        },
+        "code": {
+          "type": "string"
+        },
+        "ann_date": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string"
+        },
+        "snippet": {
+          "type": "string"
+        },
+        "text": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

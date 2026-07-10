@@ -1,0 +1,54 @@
+{
+  "best_for": [
+    "用于查询单只股票的核心财务三表数据。",
+    "输入 stock 表示股票代码、简称或公司名称。",
+    "可选择资产负债表、利润表、现金流量表或一次返回三表。",
+    "该工具只返回结构化报表字段，不返回估值、行情或公司简介。"
+  ],
+  "input_guidance": {
+    "optional_fields": [
+      "statement_type",
+      "report_period",
+      "periods",
+      "accounting_statement_type"
+    ],
+    "required_fields": [
+      "stock"
+    ]
+  },
+  "invocation_example": "stock_financial_statement_query(stock=\"贵州茅台\", statement_type=\"all\", periods=4)",
+  "output_guidance": {
+    "drop_default": [],
+    "field_policies": {
+      "data.statement_type": {
+        "strategy": "prompt_full"
+      },
+      "data.statements": {
+        "strategy": "auto"
+      },
+      "data.code": {
+        "strategy": "prompt_full"
+      },
+      "data.name": {
+        "strategy": "prompt_full"
+      }
+    },
+    "high_value_for_reasoning": [
+      "data.code",
+      "data.name",
+      "data.statement_type",
+      "data.statements"
+    ],
+    "high_value_for_render": [],
+    "recommended_reducers": {
+      "data.statements.balance_sheet": "summarize_timeseries",
+      "data.statements.income": "summarize_timeseries",
+      "data.statements.cashflow": "summarize_timeseries"
+    },
+    "usually_too_large_for_prompt": [
+      "data.statements"
+    ]
+  },
+  "purpose": "查询单只 A 股的核心财务三表数据。",
+  "tool_name": "stock_financial_statement_query"
+}

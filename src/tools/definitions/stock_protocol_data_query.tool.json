@@ -1,0 +1,169 @@
+{
+  "auth": "public",
+  "availability": {
+    "lifecycle": "active",
+    "retrieval_mode": "direct_only",
+    "visibility": "hidden"
+  },
+  "capabilities": [
+    "stock_protocol_data",
+    "protocol_tool_contract",
+    "stock_data_gateway"
+  ],
+  "identity": {
+    "description": "按 stock subject/domain/data_view/op 协议查询个股基础数据。当前用于旁路验证，不进入 planner 默认候选。",
+    "display_name": "个股协议化数据查询",
+    "domain": "stock",
+    "owner": "tools"
+  },
+  "invocation_example": "stock_protocol_data_query(subject=\"贵州茅台\", domain=\"market_data\", data_view=\"quote\", op=\"snapshot\")",
+  "match_contract": {
+    "request_families": [
+      "data_access"
+    ],
+    "work_item_types": [
+      "tool"
+    ],
+    "capability_classes": [
+      "data_retrieval",
+      "protocol_data_gateway"
+    ],
+    "side_effect_level": "read_only"
+  },
+  "name": "stock_protocol_data_query",
+  "profiles": {
+    "mock": {
+      "enabled": true,
+      "implementation": {
+        "kind": "inline_result"
+      },
+      "result": {
+        "tool": "stock_protocol_data_query",
+        "ok": true,
+        "data": {
+          "protocol": "stock_data_tool.v1",
+          "request": {},
+          "catalog_entry": {},
+          "data": {}
+        },
+        "error": ""
+      }
+    },
+    "real": {
+      "enabled": true,
+      "implementation": {
+        "kind": "python_callable",
+        "target": "src.tools.stock_protocol_data_query_tool:run"
+      }
+    }
+  },
+  "runtime_hints": {
+    "cost_class": "low",
+    "latency_class": "low",
+    "supports_async_submit": false,
+    "supports_stream": false
+  },
+  "safety": {
+    "network": true,
+    "persistence": false,
+    "side_effect": "none"
+  },
+  "schemas": {
+    "input": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "stock_protocol_data_query.input.schema.json",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "subject",
+        "domain",
+        "data_view",
+        "op"
+      ],
+      "properties": {
+        "subject": {
+          "type": "string",
+          "description": "股票代码、简称或名称。"
+        },
+        "domain": {
+          "type": "string",
+          "enum": [
+            "market_data",
+            "valuation",
+            "capital_flow",
+            "profile",
+            "fundamental",
+            "news_event"
+          ]
+        },
+        "data_view": {
+          "type": "string",
+          "enum": [
+            "quote",
+            "kline",
+            "valuation",
+            "moneyflow",
+            "profile",
+            "financial_statement",
+            "announcement"
+          ]
+        },
+        "op": {
+          "type": "string",
+          "enum": [
+            "lookup",
+            "snapshot",
+            "series"
+          ]
+        },
+        "params": {
+          "type": "object",
+          "additionalProperties": true,
+          "description": "具体 data_view 的受控参数，例如 start/end/limit/interval/statement_type。"
+        }
+      }
+    },
+    "output": {
+      "$ref": "src/tools/schemas/stock_protocol_data_query.schema.json"
+    }
+  },
+  "status": "active",
+  "tags": [
+    "stock",
+    "protocol",
+    "data_gateway"
+  ],
+  "tests": {
+    "golden_cases": [],
+    "sample_inputs": [
+      {
+        "name": "stock_quote_snapshot",
+        "arguments": {
+          "subject": "贵州茅台",
+          "domain": "market_data",
+          "data_view": "quote",
+          "op": "snapshot"
+        }
+      },
+      {
+        "name": "stock_daily_kline_series",
+        "arguments": {
+          "subject": "贵州茅台",
+          "domain": "market_data",
+          "data_view": "kline",
+          "op": "series",
+          "params": {
+            "start": "2026-06-01",
+            "end": "2026-06-05",
+            "limit": 120
+          }
+        }
+      }
+    ]
+  },
+  "version": "v1",
+  "subject_tags": [
+    "stock"
+  ],
+  "tool_priority": 2
+}

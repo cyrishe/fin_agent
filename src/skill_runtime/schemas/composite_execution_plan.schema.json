@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "composite_execution_plan.schema.json",
+  "title": "CompositeExecutionPlan",
+  "type": "object",
+  "required": [
+    "plan_type",
+    "summary",
+    "steps",
+    "final_merge_strategy"
+  ],
+  "properties": {
+    "plan_type": {
+      "type": "string",
+      "const": "multi_skill"
+    },
+    "summary": {
+      "type": "string"
+    },
+    "steps": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "step_id",
+          "skill_name",
+          "goal",
+          "depends_on"
+        ],
+        "properties": {
+          "step_id": { "type": "string" },
+          "skill_name": { "type": "string" },
+          "goal": { "type": "string" },
+          "depends_on": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "input_hint": { "type": "object" }
+        },
+        "additionalProperties": false
+      }
+    },
+    "final_merge_strategy": {
+      "type": "string"
+    }
+  },
+  "additionalProperties": false
+}

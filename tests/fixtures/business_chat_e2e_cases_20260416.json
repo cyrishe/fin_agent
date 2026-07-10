@@ -1,0 +1,36 @@
+[
+  {
+    "name": "theme_top2_funds_news_compare",
+    "text": "机器人概念前两只龙头的资金和新闻分别看一下，再比较一下",
+    "thread_context": {}
+  },
+  {
+    "name": "limit_up_top1_news_then_quote",
+    "text": "从今天涨停股里找出成交量最大的那只，再查新闻和行情",
+    "thread_context": {}
+  },
+  {
+    "name": "referential_followup_pe",
+    "text": "他们的市盈率分别是多少？",
+    "thread_context": {
+      "thread_summary": "上一轮已经给出贵州茅台和五粮液今天的股价与成交量，并询问用户是否需要进一步对比。",
+      "recent_result_subject": "贵州茅台、五粮液",
+      "reference_memory": {
+        "objects": [
+          {
+            "object_type": "stock",
+            "object_id": "贵州茅台",
+            "display_name": "贵州茅台",
+            "order_index": 0
+          },
+          {
+            "object_type": "stock",
+            "object_id": "五粮液",
+            "display_name": "五粮液",
+            "order_index": 1
+          }
+        ]
+      }
+    }
+  }
+]

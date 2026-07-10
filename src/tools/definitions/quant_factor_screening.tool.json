@@ -1,0 +1,134 @@
+{
+  "name": "quant_factor_screening",
+  "version": "v1",
+  "status": "active",
+  "availability": {
+    "lifecycle": "active",
+    "retrieval_mode": "retrievable"
+  },
+  "identity": {
+    "display_name": "自然语言量化与消息面选股",
+    "description": "执行量化因子筛选并返回候选股、因子表和审计信息。",
+    "domain": "quant_screening",
+    "owner": "tools"
+  },
+  "match_contract": {
+    "request_families": [
+      "data_transform",
+      "code_execution"
+    ],
+    "work_item_types": [
+      "tool"
+    ],
+    "capability_classes": [
+      "factor_screening",
+      "quant_data_provider",
+      "analysis_transform",
+      "file_or_table_artifact"
+    ],
+    "side_effect_level": "write"
+  },
+  "capabilities": [
+    "quant_factor_screening",
+    "factor_plan",
+    "quant_data_provider",
+    "code_runtime",
+    "audit_trace"
+  ],
+  "tags": [
+    "quant",
+    "screening",
+    "factor",
+    "news",
+    "code_runtime"
+  ],
+  "schemas": {
+    "input": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "quant_factor_screening.input.schema.json",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "user_text": {
+          "type": "string"
+        },
+        "query": {
+          "type": "string"
+        },
+        "universe": {},
+        "date_range": {
+          "type": "object"
+        },
+        "report_period": {
+          "type": "object"
+        },
+        "required_data": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "top_n": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100
+        },
+        "factor_plan": {
+          "type": "object"
+        }
+      }
+    },
+    "output": {
+      "$ref": "src/tools/schemas/quant_factor_screening.schema.json"
+    }
+  },
+  "profiles": {
+    "real": {
+      "enabled": true,
+      "implementation": {
+        "kind": "python_callable",
+        "target": "src.tools.quant_factor_screening_tool:run"
+      }
+    },
+    "mock": {
+      "enabled": false,
+      "implementation": {
+        "kind": "inline_result"
+      }
+    }
+  },
+  "retention": {
+    "high_value_for_reasoning": [
+      "data.selected_stocks",
+      "data.factor_definitions",
+      "data.data_coverage",
+      "data.risk_warnings",
+      "data.audit"
+    ],
+    "high_value_for_render": [],
+    "usually_too_large_for_prompt": [
+      "data.factor_table.rows"
+    ],
+    "drop_default": [],
+    "recommended_reducers": {
+      "data.factor_table": "summarize_table_artifacts",
+      "data.audit": "summarize_audit_trace"
+    }
+  },
+  "safety": {
+    "network": false,
+    "persistence": true,
+    "side_effect": "write_runtime_artifact"
+  },
+  "runtime_hints": {
+    "cost_class": "high",
+    "latency_class": "medium",
+    "supports_stream": false,
+    "supports_async_submit": false
+  },
+  "auth": "internal",
+  "subject_tags": [
+    "stock"
+  ],
+  "tool_priority": 1
+}

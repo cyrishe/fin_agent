@@ -1,0 +1,41 @@
+{
+  "tool_name": "file_read_excel",
+  "purpose": "读取 Excel xlsx 表格文件并返回结构化行列数据。",
+  "best_for": [
+    "用于读取用户上传的 Excel xlsx 工作簿。",
+    "用于提取工作表、表头和行数据供后续分析使用。",
+    "用于轻量检查表格内容，不负责金融语义判断。"
+  ],
+  "invocation_example": "file_read_excel(file_path=\"/tmp/sample.xlsx\")",
+  "input_guidance": {
+    "required_fields": [
+      "file_path"
+    ],
+    "optional_fields": []
+  },
+  "output_guidance": {
+    "field_policies": {
+      "data.header": {
+        "strategy": "prompt_full"
+      },
+      "data.rows": {
+        "strategy": "prompt_summary"
+      }
+    },
+    "high_value_for_reasoning": [
+      "data.header",
+      "data.rows"
+    ],
+    "high_value_for_render": [
+      "data.header",
+      "data.rows"
+    ],
+    "usually_too_large_for_prompt": [
+      "data.rows"
+    ],
+    "drop_default": [],
+    "recommended_reducers": {
+      "data.rows": "summarize_table_rows"
+    }
+  }
+}

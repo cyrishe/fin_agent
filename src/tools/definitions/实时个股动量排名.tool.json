@@ -1,0 +1,172 @@
+{
+  "auth": "public",
+  "availability": {
+    "lifecycle": "disabled",
+    "retrieval_mode": "direct_only",
+    "visibility": "hidden"
+  },
+  "capabilities": [
+    "stock_momentum",
+    "ranking",
+    "realtime_quote",
+    "index_universe_filter"
+  ],
+  "defaults": {
+    "k": "5",
+    "t": "20"
+  },
+  "identity": {
+    "description": "查询实时个股动量排名。",
+    "display_name": "实时个股动量排名",
+    "domain": "market",
+    "owner": "tools"
+  },
+  "name": "实时个股动量排名",
+  "post_process": {
+    "deterministic": {
+      "enabled": false,
+      "handler": ""
+    },
+    "llm": {
+      "enabled": false,
+      "prompt_key": ""
+    }
+  },
+  "profiles": {
+    "mock": {
+      "enabled": false,
+      "implementation": {
+        "kind": "inline_result"
+      },
+      "result": {
+        "data": [
+          {
+            "avg_amount_wan": 0,
+            "k": 0,
+            "momentum_value": 0,
+            "price_change_ratio": 0,
+            "rank": 0,
+            "realtime_amount_wan": 0,
+            "realtime_price": 0,
+            "reference_close": 0,
+            "code": "stock_code_示例",
+            "name": "stock_name_示例",
+            "universe": "universe_示例",
+            "universe_label": "universe_label_示例",
+            "window_total_amount_wan": 0
+          }
+        ],
+        "error": "error_示例",
+        "ok": false,
+        "tool": "实时个股动量排名"
+      }
+    },
+    "real": {
+      "enabled": false,
+      "implementation": {
+        "kind": "python_callable",
+        "target": "src.tools.stock_momentum_ranking_tool:run"
+      }
+    }
+  },
+  "retention": {
+    "drop_default": [],
+    "high_value_for_reasoning": [
+      "data"
+    ],
+    "high_value_for_render": [
+      "data"
+    ],
+    "recommended_reducers": {},
+    "usually_too_large_for_prompt": []
+  },
+  "runtime_hints": {
+    "cost_class": "medium",
+    "latency_class": "medium",
+    "supports_async_submit": false,
+    "supports_stream": false
+  },
+  "safety": {
+    "network": true,
+    "persistence": false,
+    "side_effect": "none"
+  },
+  "schemas": {
+    "input": {
+      "$id": "实时个股动量排名.input.schema.json",
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "k": {
+          "type": "integer",
+          "description": "动量回看交易日数量，例如 5 表示相对 5 个交易日前收盘价"
+        },
+        "t": {
+          "type": "integer",
+          "description": "返回排名前 t 的股票"
+        },
+        "universe": {
+          "type": "string",
+          "description": "股池范围。空字符串表示全市场；当前支持 sz_50、zz_100，后续可继续扩展"
+        }
+      },
+      "required": [],
+      "type": "object"
+    },
+    "output": {
+      "$ref": "src/tools/schemas/实时个股动量排名.schema.json"
+    }
+  },
+  "status": "disabled",
+  "tags": [
+    "market",
+    "momentum",
+    "ranking",
+    "realtime"
+  ],
+  "tests": {
+    "golden_cases": [],
+    "sample_inputs": [
+      {
+        "arguments": {
+          "k": 5,
+          "t": 20,
+          "universe": ""
+        },
+        "name": "default_full_market"
+      },
+      {
+        "arguments": {
+          "k": 10,
+          "t": 10,
+          "universe": "zz_100"
+        },
+        "name": "zz100_top10"
+      }
+    ]
+  },
+  "ui_hints": {
+    "editable_sections": [
+      "identity",
+      "schemas.input",
+      "schemas.output",
+      "capabilities",
+      "profiles",
+      "retention",
+      "post_process",
+      "tests"
+    ]
+  },
+  "version": "v1",
+  "enabled": false,
+  "retrieval": {
+    "mode": "direct_only",
+    "visibility": "hidden"
+  },
+  "visibility": "hidden",
+  "deprecation_note": "实时动量排名属于高级计算能力，先由 Agent 组合实时行情数据完成。",
+  "subject_tags": [
+    "stock"
+  ],
+  "tool_priority": 1
+}

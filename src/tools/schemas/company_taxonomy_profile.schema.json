@@ -1,0 +1,77 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "company_taxonomy_profile.schema.json",
+  "title": "Stock Plate Profile Output",
+  "type": "object",
+  "required": [
+    "tool",
+    "ok",
+    "data",
+    "error"
+  ],
+  "properties": {
+    "tool": {
+      "const": "get_company_taxonomy_profile",
+      "type": "string"
+    },
+    "ok": {
+      "type": "boolean"
+    },
+    "error": {
+      "type": "string"
+    },
+    "data": {
+      "type": "object",
+      "required": [
+        "stock",
+        "code",
+        "name",
+        "as_of",
+        "plates"
+      ],
+      "properties": {
+        "stock": {
+          "type": "string"
+        },
+        "as_of": {
+          "type": "string"
+        },
+        "plates": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "plate_code",
+              "plate_name",
+              "trade_date",
+              "amount"
+            ],
+            "properties": {
+              "plate_code": {
+                "type": "string"
+              },
+              "plate_name": {
+                "type": "string"
+              },
+              "trade_date": {
+                "type": "string"
+              },
+              "amount": {
+                "type": "number"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "code": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

@@ -1,0 +1,161 @@
+{
+  "auth": "public",
+  "availability": {
+    "lifecycle": "retired",
+    "retrieval_mode": "direct_only",
+    "visibility": "hidden"
+  },
+  "capabilities": [
+    "market_overview",
+    "breadth",
+    "limit_stats",
+    "turnover_overview"
+  ],
+  "defaults": {
+    "lookback_days": "5"
+  },
+  "identity": {
+    "description": "查询市场整体状态。",
+    "display_name": "大盘整体情况",
+    "domain": "market",
+    "owner": "tools"
+  },
+  "name": "大盘整体情况",
+  "invocation_example": "大盘整体情况()",
+  "post_process": {
+    "deterministic": {
+      "enabled": false,
+      "handler": ""
+    },
+    "llm": {
+      "enabled": false,
+      "prompt_key": ""
+    }
+  },
+  "profiles": {
+    "mock": {
+      "enabled": true,
+      "implementation": {
+        "kind": "inline_result"
+      },
+      "result": {
+        "data": [
+          {
+            "index_desc": "index_desc_示例",
+            "name": "index_name_示例",
+            "index_value": "index_value_示例"
+          }
+        ],
+        "error": "error_示例",
+        "meta": {
+          "baseline_days_used": 0,
+          "lookback_days": 0,
+          "minute_index": 0,
+          "recent_daily_days_used": 0,
+          "snapshot_time": "snapshot_time_示例",
+          "trade_date": "trade_date_示例"
+        },
+        "ok": false,
+        "tool": "大盘整体情况"
+      }
+    },
+    "real": {
+      "enabled": true,
+      "implementation": {
+        "kind": "python_callable",
+        "target": "src.tools.market_overview_tool:run"
+      }
+    }
+  },
+  "retention": {
+    "drop_default": [],
+    "high_value_for_reasoning": [
+      "data",
+      "meta"
+    ],
+    "high_value_for_render": [
+      "data",
+      "meta"
+    ],
+    "recommended_reducers": {},
+    "usually_too_large_for_prompt": []
+  },
+  "runtime_hints": {
+    "cost_class": "low",
+    "latency_class": "low",
+    "supports_async_submit": false,
+    "supports_stream": false
+  },
+  "safety": {
+    "network": false,
+    "persistence": false,
+    "side_effect": "none"
+  },
+  "schemas": {
+    "input": {
+      "$id": "大盘整体情况.input.schema.json",
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "lookback_days": {
+          "type": "integer",
+          "description": "近几日成交额统计窗口，默认 5。"
+        },
+        "minute_index": {
+          "type": "integer",
+          "description": "可选。指定分钟索引 HH*60+MM；为空时自动读取该交易日最新可用分钟。"
+        },
+        "trade_date": {
+          "type": "string",
+          "description": "可选。指定查询的交易日，格式 YYYY-MM-DD；为空时自动读取最新可用快照日期。"
+        }
+      },
+      "required": [],
+      "type": "object"
+    },
+    "output": {
+      "$ref": "src/tools/schemas/大盘整体情况.schema.json"
+    }
+  },
+  "status": "deprecated",
+  "tags": [
+    "market",
+    "overview",
+    "database",
+    "minute_snapshot"
+  ],
+  "tests": {
+    "golden_cases": [],
+    "sample_inputs": [
+      {
+        "arguments": {},
+        "name": "latest_snapshot"
+      },
+      {
+        "arguments": {
+          "lookback_days": 5,
+          "minute_index": 651,
+          "trade_date": "2026-03-25"
+        },
+        "name": "fixed_slot"
+      }
+    ]
+  },
+  "ui_hints": {
+    "editable_sections": [
+      "identity",
+      "schemas.input",
+      "schemas.output",
+      "capabilities",
+      "profiles",
+      "retention",
+      "post_process",
+      "tests"
+    ]
+  },
+  "version": "v1",
+  "subject_tags": [
+    "general"
+  ],
+  "tool_priority": 1
+}

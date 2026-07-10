@@ -1,0 +1,51 @@
+{
+  "version": "v1",
+  "tool": "file_io",
+  "actions": {
+    "read": {
+      "desc": "读取文件内容，按文件后缀或 MIME 自动选择 reader。",
+      "readers": {
+        "csv": {
+          "extensions": [".csv", ".tsv"],
+          "provider": "src.tools.file_intake_tools:run_csv",
+          "status": "active"
+        },
+        "excel": {
+          "extensions": [".xlsx"],
+          "provider": "src.tools.file_intake_tools:run_excel",
+          "status": "active"
+        },
+        "word": {
+          "extensions": [".docx"],
+          "provider": "src.tools.file_intake_tools:run_word",
+          "status": "active"
+        },
+        "text": {
+          "extensions": [".txt", ".md", ".json"],
+          "provider": "src.services.file_io_tool_service:read_text",
+          "status": "active"
+        },
+        "pdf": {
+          "extensions": [".pdf"],
+          "provider": "",
+          "status": "provider_pending"
+        }
+      }
+    },
+    "write": {
+      "desc": "写入 runtime artifact，不直接覆盖本地文件。",
+      "writers": {
+        "text": {
+          "formats": ["text", "txt", "md", "json"],
+          "artifact_kind": "document",
+          "status": "active"
+        },
+        "table": {
+          "formats": ["csv", "tsv", "table"],
+          "artifact_kind": "table",
+          "status": "active"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,52 @@
+{
+  "best_for": [
+    "行情查询",
+    "K 线查询"
+  ],
+  "input_guidance": {
+    "optional_fields": [],
+    "required_fields": [
+      "code"
+    ]
+  },
+  "output_guidance": {
+    "drop_default": [
+      "data.code"
+    ],
+    "field_policies": {
+      "data.code": {
+        "strategy": "prompt_full"
+      },
+      "data.daily_kline": {
+        "strategy": "render",
+        "render_type": "kline"
+      },
+      "data.intraday_kline": {
+        "strategy": "render",
+        "render_type": "line"
+      },
+      "data.name": {
+        "strategy": "prompt_full"
+      },
+      "data.realtime_quote": {
+        "strategy": "prompt_full"
+      }
+    },
+    "high_value_for_reasoning": [
+      "data.code",
+      "data.name",
+      "data.realtime_quote"
+    ],
+    "high_value_for_render": [
+      "data.daily_kline",
+      "data.intraday_kline"
+    ],
+    "recommended_reducers": {
+      "data.daily_kline": "summarize_timeseries",
+      "data.intraday_kline": "summarize_timeseries"
+    },
+    "usually_too_large_for_prompt": []
+  },
+  "purpose": "查询个股行情和 K 线。",
+  "tool_name": "stock_quote"
+}

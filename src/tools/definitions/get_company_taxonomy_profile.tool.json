@@ -1,0 +1,109 @@
+{
+  "availability": {
+    "lifecycle": "active",
+    "retrieval_mode": "retrievable",
+    "visibility": "visible"
+  },
+  "capabilities": [
+    "stock_plate_profile",
+    "stock_plate_membership"
+  ],
+  "defaults": {},
+  "identity": {
+    "description": "获取单只股票所属的板块归属画像。",
+    "display_name": "股票板块归属查询",
+    "domain": "plate",
+    "owner": "tools"
+  },
+  "invocation_example": "get_company_taxonomy_profile(stock=\"工业富联\")",
+  "match_contract": {
+    "request_families": [
+      "data_access"
+    ],
+    "work_item_types": [
+      "tool"
+    ],
+    "capability_classes": [
+      "data_retrieval",
+      "taxonomy_lookup"
+    ],
+    "side_effect_level": "read_only"
+  },
+  "name": "get_company_taxonomy_profile",
+  "profiles": {
+    "mock": {
+      "enabled": true,
+      "implementation": {
+        "kind": "inline_result"
+      },
+      "result": {
+        "data": {
+          "stock": "工业富联",
+          "code": "601138.SH",
+          "name": "工业富联",
+          "as_of": "",
+          "plates": []
+        },
+        "error": "",
+        "ok": true,
+        "tool": "get_company_taxonomy_profile"
+      }
+    },
+    "real": {
+      "enabled": true,
+      "implementation": {
+        "kind": "python_callable",
+        "target": "src.tools.company_taxonomy_profile_tool:run"
+      }
+    }
+  },
+  "retention": {},
+  "safety": {
+    "network": false,
+    "persistence": false,
+    "side_effect": "read_only"
+  },
+  "schemas": {
+    "input": {
+      "$id": "get_company_taxonomy_profile.input.schema.json",
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "stock": {
+          "type": "string",
+          "description": "股票代码、简称或名称。"
+        },
+        "as_of": {
+          "type": "string",
+          "description": "可选快照交易日，YYYY-MM-DD；为空时使用最近可用板块行情日期。"
+        },
+        "top_k": {
+          "type": "integer",
+          "description": "返回成交额靠前的板块数量，默认 3。",
+          "minimum": 1,
+          "maximum": 10
+        }
+      },
+      "required": [
+        "stock"
+      ],
+      "type": "object"
+    },
+    "output": {
+      "$ref": "src/tools/schemas/company_taxonomy_profile.schema.json"
+    }
+  },
+  "status": "active",
+  "tags": [
+    "stock",
+    "plate",
+    "membership"
+  ],
+  "version": "v1",
+  "auth": "public",
+  "subject_tags": [
+    "stock",
+    "plate"
+  ],
+  "tool_priority": 1
+}

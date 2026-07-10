@@ -1,0 +1,50 @@
+{
+  "best_for": [
+    "用于获取单只基金指定交易日或日期范围内的净值、收盘价和成交额。",
+    "用于为基金行情展示、趋势分析或后续计算提供结构化价格序列。",
+    "用于读取基金日级行情，不返回基金基础资料或最新交易属性快照。"
+  ],
+  "input_guidance": {
+    "required_fields": [
+      "fund"
+    ],
+    "optional_fields": [
+      "start",
+      "end",
+      "limit"
+    ]
+  },
+  "invocation_example": "fund_daily_market_query(fund=\"510300\", start=\"2026-06-01\", end=\"2026-06-30\")",
+  "output_guidance": {
+    "drop_default": [],
+    "field_policies": {
+      "data.code": {
+        "strategy": "prompt_full"
+      },
+      "data.name": {
+        "strategy": "prompt_full"
+      },
+      "data.coverage": {
+        "strategy": "auto"
+      },
+      "data.rows": {
+        "strategy": "auto"
+      }
+    },
+    "high_value_for_reasoning": [
+      "data.code",
+      "data.name",
+      "data.rows",
+      "data.coverage"
+    ],
+    "high_value_for_render": [],
+    "recommended_reducers": {
+      "data.rows": "summarize_timeseries"
+    },
+    "usually_too_large_for_prompt": [
+      "data.rows"
+    ]
+  },
+  "purpose": "获取单只基金或 ETF 在指定 start/end 交易日范围内的日级行情序列。",
+  "tool_name": "fund_daily_market_query"
+}

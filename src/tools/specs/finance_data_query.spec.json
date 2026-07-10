@@ -1,0 +1,35 @@
+{
+  "tool_name": "finance_data_query",
+  "purpose": "执行已经生成好的金融数据协议请求串，作为 subject/dataview/function 新工具体系的统一执行入口。",
+  "best_for": [
+    "阶段二已产出 rN = subject.dataview(...) -> fields 请求串后的受控执行",
+    "验证金融数据协议 request 与实际 provider/validator 是否一致"
+  ],
+  "input_guidance": {
+    "required_fields": [
+      "request"
+    ],
+    "optional_fields": [],
+    "notes": [
+      "request 必须是单条协议请求串，不接收自然语言问题。"
+    ]
+  },
+  "output_guidance": {
+    "high_value_for_reasoning": [
+      "validation",
+      "result.columns",
+      "result.data.status",
+      "result.data.row_count"
+    ],
+    "high_value_for_render": [
+      "result.data.rows"
+    ],
+    "usually_too_large_for_prompt": [
+      "result.data.rows"
+    ],
+    "drop_default": [],
+    "recommended_reducers": {
+      "result.data.rows": "head:3"
+    }
+  }
+}

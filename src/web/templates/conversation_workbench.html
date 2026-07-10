@@ -1,0 +1,2951 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ page_title or "Assistant" }}</title>
+  <style>
+    :root {
+      --bg: #f4f5f7;
+      --panel: #ffffff;
+      --line: #e4e7ec;
+      --text: #101828;
+      --muted: #667085;
+      --accent: #155eef;
+      --accent-soft: #eef4ff;
+      --user-bg: #eef4ff;
+      --assistant-bg: #ffffff;
+      --shadow: 0 12px 32px rgba(16, 24, 40, 0.06);
+      --sans: "PingFang SC", "Noto Sans SC", "Helvetica Neue", sans-serif;
+    }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      height: 100vh;
+      overflow: hidden;
+      font-family: var(--sans);
+      color: var(--text);
+      background: linear-gradient(180deg, #f7f8fa 0%, #eef1f5 100%);
+    }
+    .shell {
+      max-width: 1220px;
+      height: 100vh;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 260px minmax(0, 1fr);
+      grid-template-rows: auto minmax(0, 1fr) auto;
+      gap: 16px;
+      padding: 20px 18px 24px;
+    }
+    .sidebar {
+      grid-row: 1 / span 3;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      box-shadow: var(--shadow);
+      padding: 14px;
+      display: grid;
+      grid-template-rows: auto auto 1fr;
+      gap: 12px;
+      min-height: 0;
+    }
+    .sidebar-head {
+      display: grid;
+      gap: 8px;
+    }
+    .sidebar-title {
+      font-size: 16px;
+      font-weight: 700;
+    }
+    .sidebar-sub {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+    .session-list {
+      min-height: 0;
+      overflow: auto;
+      display: grid;
+      gap: 8px;
+      align-content: start;
+    }
+    .session-item {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: #fcfcfd;
+      padding: 10px;
+      cursor: pointer;
+      display: grid;
+      gap: 5px;
+      text-align: left;
+    }
+    .session-item.active {
+      border-color: #cfe0ff;
+      background: var(--accent-soft);
+    }
+    .session-title {
+      font-size: 13px;
+      font-weight: 700;
+    }
+    .session-meta,
+    .session-snippet {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+    .topbar,
+    .messages,
+    .composer {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      box-shadow: var(--shadow);
+    }
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 16px;
+    }
+    .title {
+      display: grid;
+      gap: 4px;
+    }
+    .title h1 {
+      margin: 0;
+      font-size: 18px;
+      font-weight: 700;
+    }
+    .title .meta {
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .pill-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .pill {
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 6px 10px;
+      font-size: 12px;
+      color: var(--muted);
+      background: #fff;
+    }
+    .messages {
+      padding: 18px;
+      overflow: auto;
+      min-height: 0;
+      display: grid;
+      gap: 14px;
+      align-content: start;
+      overflow-x: hidden;
+    }
+    .message {
+      display: grid;
+      gap: 8px;
+      min-width: 0;
+    }
+    .message.user {
+      justify-items: end;
+    }
+    .message.assistant {
+      justify-items: start;
+    }
+    .bubble {
+      max-width: min(82%, 760px);
+      width: fit-content;
+      min-width: 0;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 12px 14px;
+      line-height: 1.65;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+      word-break: break-word;
+      background: var(--assistant-bg);
+    }
+    .bubble-attachments {
+      width: min(82%, 760px);
+      max-width: 100%;
+      min-width: 0;
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .thumb {
+      width: 92px;
+      height: 92px;
+      border-radius: 12px;
+      border: 1px solid var(--line);
+      background: #fff;
+      overflow: hidden;
+      position: relative;
+      flex: 0 0 auto;
+    }
+    .thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .thumb-remove {
+      position: absolute;
+      top: 6px;
+      right: 6px;
+      width: 22px;
+      height: 22px;
+      border: 0;
+      border-radius: 999px;
+      background: rgba(16, 24, 40, 0.72);
+      color: #fff;
+      cursor: pointer;
+      font-size: 12px;
+      line-height: 1;
+    }
+    .message.user .bubble {
+      background: var(--user-bg);
+      border-color: #cfe0ff;
+    }
+    .message.assistant .bubble {
+      background: #ffffff;
+      border-color: #d0d5dd;
+      box-shadow: 0 4px 14px rgba(16, 24, 40, 0.04);
+    }
+    .message .role {
+      font-size: 11px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .04em;
+      padding: 0 2px;
+    }
+    .cards {
+      width: min(82%, 760px);
+      max-width: 100%;
+      min-width: 0;
+      display: grid;
+      gap: 8px;
+    }
+    .card {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 12px;
+      background: #fcfcfd;
+    }
+    .card-title {
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    .card-kv {
+      display: grid;
+      gap: 6px;
+      font-size: 13px;
+      line-height: 1.5;
+      color: var(--text);
+    }
+    .card-kv strong {
+      color: var(--muted);
+      font-weight: 600;
+      margin-right: 6px;
+    }
+    .card-actions {
+      margin-top: 10px;
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .process-panel,
+    .result-blocks {
+      width: min(82%, 760px);
+      max-width: 100%;
+      min-width: 0;
+      display: grid;
+      gap: 10px;
+    }
+    .assistant-result {
+      width: min(82%, 760px);
+      max-width: 100%;
+      min-width: 0;
+      display: grid;
+      gap: 12px;
+    }
+    .process-panel {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 0;
+      background: #fafbfc;
+      max-height: 260px;
+      overflow: hidden;
+      color: #667085;
+      font-size: 12px;
+    }
+    .process-panel.thinking {
+      background: linear-gradient(180deg, #f8fbff 0%, #f5f8fc 100%);
+      border-color: #d7e5ff;
+    }
+    .process-panel.thinking .process-title {
+      color: #344054;
+    }
+    .process-panel.thinking .process-badge {
+      color: #155eef;
+      background: #eef4ff;
+      border-color: #cfe0ff;
+    }
+    .process-panel.thinking .process-bar-fill {
+      background: linear-gradient(90deg, #528bff 0%, #7aa2ff 100%);
+    }
+    .process-panel.runtime {
+      background: linear-gradient(180deg, #f8fbf8 0%, #f4f8f5 100%);
+      border-color: #d6eadb;
+    }
+    .process-panel.runtime .process-title {
+      color: #344054;
+    }
+    .process-panel.runtime .process-badge {
+      color: #027a48;
+      background: #ecfdf3;
+      border-color: #c7ead8;
+    }
+    .process-panel.runtime .process-bar-fill {
+      background: linear-gradient(90deg, #16a34a 0%, #34c759 100%);
+    }
+    .process-frame {
+      padding: 10px 12px;
+    }
+    .process-frame > summary {
+      list-style: none;
+      cursor: pointer;
+    }
+    .process-frame > summary::-webkit-details-marker {
+      display: none;
+    }
+    .process-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+    }
+    .process-title,
+    .result-block-title {
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .process-badge {
+      font-size: 10px;
+      color: #475467;
+      background: #f2f4f7;
+      border: 1px solid #e4e7ec;
+      border-radius: 999px;
+      padding: 4px 8px;
+    }
+    .process-meta {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      font-size: 11px;
+      color: var(--muted);
+    }
+    .process-bar {
+      height: 8px;
+      border-radius: 999px;
+      background: #edf2f7;
+      overflow: hidden;
+    }
+    .process-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #155eef 0%, #528bff 100%);
+    }
+    .process-steps {
+      display: grid;
+      gap: 8px;
+      max-height: 150px;
+      overflow: auto;
+      padding-right: 4px;
+    }
+    .process-group {
+      border-left: 2px solid #d0d5dd;
+      padding-left: 10px;
+    }
+    .process-group details {
+      background: transparent;
+    }
+    .process-group summary {
+      cursor: pointer;
+      list-style: none;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      font-size: 11px;
+      font-weight: 600;
+      color: #344054;
+      padding: 2px 0;
+    }
+    .process-group summary::-webkit-details-marker {
+      display: none;
+    }
+    .process-group-head {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 0;
+    }
+    .process-group-count {
+      font-size: 11px;
+      color: var(--muted);
+      font-weight: 500;
+    }
+    .process-outline {
+      margin: 6px 0 0;
+      padding-left: 16px;
+      display: grid;
+      gap: 6px;
+    }
+    .process-step {
+      font-size: 11px;
+      line-height: 1.55;
+      color: #475467;
+    }
+    .process-step-title {
+      font-weight: 600;
+    }
+    .process-step-message {
+      color: var(--muted);
+      margin-top: 2px;
+    }
+    .result-block {
+      border: 1px solid #d0d5dd;
+      border-radius: 16px;
+      padding: 14px;
+      background: #ffffff;
+      box-shadow: 0 8px 20px rgba(16, 24, 40, 0.05);
+      display: grid;
+      gap: 10px;
+    }
+    .result-hero {
+      border: 1px solid #d0d5dd;
+      border-radius: 16px;
+      background: #fff;
+      box-shadow: 0 8px 20px rgba(16, 24, 40, 0.05);
+      padding: 14px;
+      display: grid;
+      gap: 6px;
+    }
+    .result-hero-title {
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 700;
+    }
+    .result-hero-summary {
+      font-size: 14px;
+      line-height: 1.75;
+      color: var(--text);
+      white-space: pre-wrap;
+    }
+    .result-panel {
+      border: 1px solid #d0d5dd;
+      border-radius: 16px;
+      background: #ffffff;
+      box-shadow: 0 8px 20px rgba(16, 24, 40, 0.05);
+      padding: 14px;
+      display: grid;
+      gap: 12px;
+    }
+    .result-panel-title {
+      font-size: 12px;
+      font-weight: 700;
+      color: #344054;
+    }
+    .result-panel-section {
+      display: grid;
+      gap: 8px;
+    }
+    .result-panel-section + .result-panel-section {
+      padding-top: 10px;
+      border-top: 1px solid #eaecf0;
+    }
+    .result-panel-section-title {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--muted);
+    }
+    .result-group {
+      display: grid;
+      gap: 10px;
+    }
+    .result-section {
+      display: grid;
+      gap: 6px;
+    }
+    .result-section-title {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: none;
+    }
+    .result-text,
+    .result-empty {
+      font-size: 14px;
+      line-height: 1.7;
+      white-space: pre-wrap;
+    }
+    .result-empty {
+      color: var(--muted);
+    }
+    .result-list {
+      margin: 0;
+      padding-left: 18px;
+      font-size: 14px;
+      line-height: 1.7;
+    }
+    .result-note {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+    .result-kv-list {
+      display: grid;
+      gap: 8px;
+    }
+    .result-kv-item {
+      display: grid;
+      grid-template-columns: 128px minmax(0, 1fr);
+      gap: 8px;
+      align-items: start;
+    }
+    .result-kv-key {
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 600;
+      word-break: break-word;
+    }
+    .result-kv-value {
+      min-width: 0;
+    }
+    .result-table-wrap {
+      overflow: auto;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: #fff;
+      max-width: 100%;
+    }
+    .result-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+    }
+    .result-table th,
+    .result-table td {
+      padding: 8px 10px;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      vertical-align: top;
+    }
+    .result-table th {
+      color: var(--muted);
+      font-weight: 700;
+      background: #f8fafc;
+    }
+    .render-sections {
+      display: grid;
+      gap: 12px;
+    }
+    .render-section {
+      display: grid;
+      gap: 10px;
+      padding: 0;
+    }
+    .render-section-head {
+      display: grid;
+      gap: 4px;
+    }
+    .render-section-title {
+      font-size: 13px;
+      font-weight: 700;
+    }
+    .render-section-desc {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+    .render-block {
+      display: grid;
+      gap: 8px;
+      padding: 10px 0 0;
+    }
+    .render-block-title {
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .agent-run {
+      width: min(82%, 860px);
+      max-width: 100%;
+      min-width: 0;
+      display: grid;
+      gap: 12px;
+      border: 1px solid #dbe3ef;
+      background: #ffffff;
+      border-radius: 14px;
+      padding: 14px;
+      box-shadow: 0 8px 24px rgba(16, 24, 40, 0.06);
+    }
+    .agent-run-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+      border-bottom: 1px solid #eef2f7;
+      padding-bottom: 10px;
+    }
+    .agent-run-title {
+      font-weight: 800;
+      font-size: 14px;
+      color: #101828;
+    }
+    .agent-run-subtitle {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.5;
+      margin-top: 4px;
+    }
+    .agent-run-status {
+      flex: 0 0 auto;
+      border: 1px solid #c7d7fe;
+      background: #eef4ff;
+      color: #155eef;
+      border-radius: 999px;
+      padding: 5px 9px;
+      font-size: 12px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .agent-run-status.done {
+      border-color: #abefc6;
+      background: #ecfdf3;
+      color: #067647;
+    }
+    .agent-run-status.error {
+      border-color: #fecaca;
+      background: #fef2f2;
+      color: #b42318;
+    }
+    .agent-artifacts {
+      display: grid;
+      gap: 12px;
+    }
+    .agent-stream-block {
+      display: grid;
+      gap: 8px;
+    }
+    .agent-stream-title {
+      font-size: 12px;
+      font-weight: 800;
+      color: #344054;
+    }
+    .agent-markdown {
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+      line-height: 1.65;
+      color: #1d2939;
+      font-size: 13px;
+    }
+    .agent-code {
+      margin: 0;
+      padding: 12px;
+      overflow: auto;
+      max-height: 380px;
+      border-radius: 10px;
+      background: #0b1220;
+      color: #e5e7eb;
+      font-size: 12px;
+      line-height: 1.55;
+    }
+    .agent-process {
+      border-top: 1px solid #eef2f7;
+      padding-top: 8px;
+    }
+    .agent-process summary {
+      cursor: pointer;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+      list-style: none;
+    }
+    .agent-process summary::-webkit-details-marker {
+      display: none;
+    }
+    .agent-process-list {
+      display: grid;
+      gap: 8px;
+      margin-top: 10px;
+    }
+    .agent-process-item {
+      border-left: 2px solid #d0d5dd;
+      padding-left: 10px;
+      color: #475467;
+      font-size: 12px;
+      line-height: 1.55;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+    }
+    .agent-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .agent-action-btn {
+      border: 1px solid #155eef;
+      background: #155eef;
+      color: #fff;
+      border-radius: 9px;
+      padding: 8px 12px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .metric-strip {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 8px;
+    }
+    .metric-card {
+      padding: 10px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: #fff;
+      display: grid;
+      gap: 4px;
+    }
+    .metric-label {
+      font-size: 11px;
+      color: var(--muted);
+    }
+    .metric-value {
+      font-size: 14px;
+      font-weight: 700;
+    }
+    .metric-change {
+      font-size: 11px;
+      color: var(--muted);
+    }
+    .line-chart-wrap {
+      display: grid;
+      gap: 8px;
+      overflow: auto;
+    }
+    .line-chart-svg {
+      width: 100%;
+      min-width: 520px;
+      height: 240px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: #fff;
+    }
+    .line-chart-legend {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .line-chart-legend-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .line-chart-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      display: inline-block;
+    }
+    .reference-materials {
+      width: min(82%, 760px);
+      max-width: 100%;
+      min-width: 0;
+      display: grid;
+      gap: 8px;
+    }
+    .reference-block {
+      border: 1px dashed #d0d5dd;
+      border-radius: 14px;
+      padding: 10px 12px;
+      background: #fbfcfd;
+      color: #475467;
+      font-size: 12px;
+      display: grid;
+      gap: 8px;
+    }
+    .reference-title {
+      font-size: 12px;
+      font-weight: 700;
+      color: #344054;
+    }
+    .reference-list {
+      display: grid;
+      gap: 6px;
+    }
+    .reference-item {
+      display: grid;
+      gap: 2px;
+    }
+    .reference-link {
+      color: #155eef;
+      text-decoration: none;
+      word-break: break-all;
+    }
+    .reference-meta {
+      color: #667085;
+      font-size: 11px;
+    }
+    .mini-btn,
+    .btn {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: #fff;
+      color: var(--text);
+      cursor: pointer;
+      font: inherit;
+    }
+    .mini-btn {
+      padding: 6px 10px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .composer {
+      padding: 14px;
+      display: grid;
+      gap: 10px;
+      position: relative;
+    }
+    .status {
+      display: none;
+      padding: 10px 12px;
+      border-radius: 12px;
+      font-size: 13px;
+      white-space: pre-wrap;
+      background: #fff7ed;
+      color: #9a3412;
+      border: 1px solid #fed7aa;
+    }
+    .status.show { display: block; }
+    .attachment-strip {
+      display: none;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .attachment-strip.show {
+      display: flex;
+    }
+    textarea {
+      width: 100%;
+      min-height: 96px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 14px;
+      font: inherit;
+      resize: vertical;
+      background: #fff;
+      color: var(--text);
+      outline: none;
+    }
+    textarea:focus {
+      border-color: #b2ccff;
+      box-shadow: 0 0 0 4px rgba(21, 94, 239, 0.08);
+    }
+    .toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .toolbar-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .toolbar-right {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+    .btn {
+      padding: 10px 14px;
+      font-weight: 600;
+    }
+    .btn.primary {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+    }
+    .hint {
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .command-menu {
+      position: absolute;
+      left: 14px;
+      right: 14px;
+      bottom: calc(100% + 8px);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: #fff;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      display: none;
+      z-index: 20;
+    }
+    .command-menu.show { display: block; }
+    .command-item {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--line);
+      cursor: pointer;
+      display: grid;
+      gap: 2px;
+    }
+    .command-item:last-child {
+      border-bottom: 0;
+    }
+    .command-item.active {
+      background: var(--accent-soft);
+    }
+    .command-item .cmd {
+      font-size: 13px;
+      font-weight: 700;
+    }
+    .command-item .desc {
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .context-menu {
+      position: fixed;
+      min-width: 168px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: #fff;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      display: none;
+      z-index: 40;
+    }
+    .context-menu.show {
+      display: block;
+    }
+    .context-item {
+      width: 100%;
+      text-align: left;
+      border: 0;
+      background: #fff;
+      color: var(--text);
+      cursor: pointer;
+      padding: 10px 12px;
+      font: inherit;
+      font-size: 13px;
+      border-bottom: 1px solid var(--line);
+    }
+    .context-item:last-child {
+      border-bottom: 0;
+    }
+    .context-item:hover {
+      background: var(--accent-soft);
+    }
+    @media (max-width: 760px) {
+      body {
+        height: auto;
+        overflow: auto;
+      }
+      .shell {
+        height: auto;
+        padding: 10px;
+        gap: 12px;
+        grid-template-columns: 1fr;
+        grid-template-rows: auto auto minmax(0, 1fr) auto;
+      }
+      .sidebar {
+        grid-row: auto;
+      }
+      .topbar {
+        align-items: start;
+        padding: 12px;
+      }
+      .bubble,
+      .cards,
+      .process-panel,
+      .result-blocks {
+        max-width: 100%;
+        width: 100%;
+      }
+      .messages {
+        padding: 12px;
+      }
+      .composer {
+        padding: 12px;
+      }
+      textarea {
+        min-height: 84px;
+        padding: 12px;
+      }
+      .toolbar {
+        align-items: stretch;
+      }
+      .toolbar-left,
+      .toolbar-right {
+        width: 100%;
+      }
+      .toolbar-right {
+        justify-content: space-between;
+      }
+      .btn {
+        flex: 1 1 auto;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <aside class="sidebar">
+      <div class="sidebar-head">
+        <div class="sidebar-title">会话</div>
+        <div class="sidebar-sub">最近对话会在这里恢复。新对话会清空当前 thread。</div>
+      </div>
+      <div class="toolbar-left">
+        <button id="newThreadBtn" class="btn">新对话</button>
+      </div>
+      <div id="sessionList" class="session-list"></div>
+    </aside>
+    <header class="topbar">
+      <div class="title">
+        <h1>{{ application_display_name or "Assistant" }}</h1>
+        <div class="meta">
+          application: {{ application_name or "investment_workbench" }}
+          {% if assistant_agent %} · assistant: {{ assistant_agent.display_name or assistant_agent.agent_name }}{% endif %}
+        </div>
+      </div>
+      <div class="pill-row">
+        <span class="pill">/skills /tools /applications /agents /run-skill</span>
+      </div>
+    </header>
+
+    <main id="messages" class="messages"></main>
+
+    <section class="composer">
+      <div id="commandMenu" class="command-menu"></div>
+      <div id="status" class="status"></div>
+      <div id="attachmentStrip" class="attachment-strip"></div>
+      <textarea id="inputBox" placeholder="{{ chat_placeholder or '输入问题，或输入 / 查看命令' }}"></textarea>
+      <input id="fileInput" type="file" accept="image/png,image/jpeg,image/webp,image/gif" multiple hidden>
+      <div class="toolbar">
+        <div class="toolbar-left">
+          <span class="hint">输入 <code>/</code> 可选择命令。支持粘贴截图或上传图片。</span>
+        </div>
+        <div class="toolbar-right">
+          <button id="attachBtn" class="btn">上传图片</button>
+          <button id="clearBtn" class="btn">清空</button>
+          <button id="sendBtn" class="btn primary">发送</button>
+        </div>
+      </div>
+    </section>
+  </div>
+  <div id="contextMenu" class="context-menu"></div>
+
+  <script>
+    const rawApiDispatchUrl = {{ api_dispatch_url|tojson }};
+    const rawApiApplicationBaseUrl = {{ api_application_base_url|tojson }};
+    const rawApiSkillCatalogUrl = {{ api_skill_catalog_url|tojson }};
+    const rawApiToolCatalogUrl = {{ api_tool_catalog_url|tojson }};
+    const rawApiAgentCatalogUrl = {{ api_agent_catalog_url|tojson }};
+    const rawApiApplicationCatalogUrl = {{ api_application_catalog_url|tojson }};
+    const rawApiTaskBaseUrl = {{ api_task_base_url|tojson }};
+    const rawApiAttachmentUploadUrl = {{ api_attachment_upload_url|tojson }};
+    const rawApiAssistantThreadsUrl = {{ api_assistant_threads_url|tojson }};
+    const rawApiCustomToolStreamStartUrl = {{ api_custom_tool_stream_start_url|tojson }};
+    const rawScriptRoot = {{ (script_root or "")|tojson }};
+    const state = {
+      messages: [],
+      nextMessageId: 1,
+      threadId: {{ initial_thread_id|tojson }},
+      applicationName: {{ application_name|tojson }},
+      applicationDisplayName: {{ application_display_name|tojson }},
+      chatPlaceholder: {{ (chat_placeholder or "")|tojson }},
+      assistantIntro: {{ (assistant_intro or "可以直接输入自然语言问题。")|tojson }},
+      assistantAgent: {{ (assistant_agent or {})|tojson }},
+      defaultAgent: {{ (default_agent or {})|tojson }},
+      guestUserId: {{ (guest_user_id or "")|tojson }},
+      slashItems: [],
+      commandVisible: false,
+      commandIndex: 0,
+      catalogs: {
+        skills: [],
+        tools: [],
+        agents: [],
+        applications: [],
+      },
+      pendingAttachments: [],
+      customToolActive: false,
+      threads: [],
+      contextMenu: {
+        visible: false,
+        x: 0,
+        y: 0,
+        messageId: null,
+      },
+    };
+
+    const slashCatalog = [
+      { command: "/applications", desc: "查看 applications" },
+      { command: "/agents", desc: "查看 agents" },
+      { command: "/skills", desc: "查看 skills" },
+      { command: "/tools", desc: "查看 tools" },
+      { command: "/tasks", desc: "查看 tasks" },
+      { command: "/new-skill ", desc: "新建 skill 模板" },
+      { command: "/draft-skill ", desc: "根据自然语言生成 skill 草稿" },
+      { command: "/refine-skill ", desc: "基于已有 skill 生成优化草稿" },
+      { command: "/run-skill ", desc: "直接执行指定 skill" },
+      { command: "/custom_tool create ", desc: "用自然语言创建个人工具" },
+      { command: "/custom_tool edit ", desc: "优化进行中的个人工具设计" },
+      { command: "/custom_tool commit ", desc: "发布已通过测试的个人工具" },
+      { command: "/new-application ", desc: "新建 application" },
+      { command: "/new-agent ", desc: "新建 agent" },
+      { command: "/application ", desc: "切换或查看 application" },
+      { command: "/agent ", desc: "查看 agent" },
+    ];
+
+    function inferScriptRoot() {
+      const explicit = String(rawScriptRoot || "").trim().replace(/\/+$/, "");
+      if (explicit) return explicit;
+      const pathname = String(window.location.pathname || "").trim();
+      const markers = [
+        "/assistant/",
+        "/assistant",
+        "/skills/studio/",
+        "/skills/studio",
+        "/applications/studio/",
+        "/applications/studio",
+        "/agents/studio/",
+        "/agents/studio",
+        "/tools/studio/",
+        "/tools/studio",
+        "/tools/",
+        "/tools",
+        "/router/studio/",
+        "/router/studio",
+        "/studio/",
+        "/studio",
+      ];
+      for (const marker of markers) {
+        const idx = pathname.indexOf(marker);
+        if (idx > 0) return pathname.slice(0, idx);
+        if (idx === 0) return "";
+      }
+      return "";
+    }
+
+    const scriptRoot = inferScriptRoot();
+
+    function withScriptRoot(path) {
+      const raw = String(path || "").trim();
+      if (!raw) return "";
+      if (/^https?:\/\//i.test(raw)) return raw;
+      if (!raw.startsWith("/")) return raw;
+      const base = String(scriptRoot || "").trim().replace(/\/+$/, "");
+      if (!base) return raw;
+      if (raw === base || raw.startsWith(`${base}/`)) return raw;
+      return `${base}${raw}`;
+    }
+
+    const apiDispatchUrl = withScriptRoot(rawApiDispatchUrl);
+    const apiApplicationBaseUrl = withScriptRoot(rawApiApplicationBaseUrl);
+    const apiSkillCatalogUrl = withScriptRoot(rawApiSkillCatalogUrl);
+    const apiToolCatalogUrl = withScriptRoot(rawApiToolCatalogUrl);
+    const apiAgentCatalogUrl = withScriptRoot(rawApiAgentCatalogUrl);
+    const apiApplicationCatalogUrl = withScriptRoot(rawApiApplicationCatalogUrl);
+    const apiTaskBaseUrl = withScriptRoot(rawApiTaskBaseUrl);
+    const apiAttachmentUploadUrl = withScriptRoot(rawApiAttachmentUploadUrl);
+    const apiAssistantThreadsUrl = withScriptRoot(rawApiAssistantThreadsUrl);
+    const apiCustomToolStreamStartUrl = withScriptRoot(rawApiCustomToolStreamStartUrl);
+
+    function setStatus(text) {
+      const el = document.getElementById("status");
+      if (!text) {
+        el.className = "status";
+        el.textContent = "";
+        return;
+      }
+      el.className = "status show";
+      el.textContent = text;
+    }
+
+    function addMessage(role, body, payload = {}) {
+      const item = { id: state.nextMessageId++, role, body, payload };
+      state.messages.push(item);
+      renderMessages();
+      return item;
+    }
+
+    function updateMessage(message, { body, payload } = {}) {
+      if (!message) return null;
+      if (body != null) message.body = body;
+      if (payload && typeof payload === "object") message.payload = payload;
+      renderMessages();
+      return message;
+    }
+
+    function buildProcessState(jobId, stage, progress, steps) {
+      return {
+        job: {
+          job_id: jobId,
+          current_stage: stage,
+          progress,
+        },
+        steps,
+      };
+    }
+
+    function buildPendingAssistantPayload() {
+      return {
+        planning_task_state: buildProcessState("planning_pending", "处理中", 8, [
+          { seq: 1, stage: "planning", step_type: "planning", title: "理解问题", message: "正在理解你的问题与当前上下文", status: "running" },
+          { seq: 2, stage: "planning", step_type: "planning", title: "整理上下文", message: "如有需要，将提取近几轮中真正相关的信息", status: "pending" },
+          { seq: 3, stage: "planning", step_type: "planning", title: "整理任务", message: "正在把问题整理成明确的任务描述", status: "pending" },
+          { seq: 4, stage: "planning", step_type: "planning", title: "生成执行方案", message: "正在选择合适的工具与步骤", status: "pending" },
+        ]),
+        runtime_task_state: buildProcessState("runtime_pending", "等待执行", 0, [
+          { seq: 1, stage: "runtime", step_type: "runtime", title: "等待执行", message: "执行步骤会在方案生成后显示在这里", status: "pending" },
+        ]),
+      };
+    }
+
+    function startAssistantPlaceholderProgress(message) {
+      if (!message) return null;
+      const stages = [
+        { title: "理解问题", message: "正在理解你的问题与当前上下文", progress: 12 },
+        { title: "整理上下文", message: "正在提取近几轮里真正相关的信息", progress: 28 },
+        { title: "整理任务", message: "正在整理本轮明确的任务目标", progress: 46 },
+        { title: "生成执行方案", message: "正在选择工具并生成步骤", progress: 66 },
+      ];
+      let index = 0;
+      const tick = () => {
+        const payload = message.payload && typeof message.payload === "object" ? message.payload : buildPendingAssistantPayload();
+        const planningState = payload.planning_task_state && typeof payload.planning_task_state === "object"
+          ? payload.planning_task_state
+          : buildPendingAssistantPayload().planning_task_state;
+        const current = stages[Math.min(index, stages.length - 1)];
+        const steps = (Array.isArray(planningState.steps) ? planningState.steps : []).map((step, stepIndex) => {
+          if (stepIndex < index) return { ...step, status: "completed" };
+          if (stepIndex === index) return { ...step, title: current.title, message: current.message, status: "running" };
+          return { ...step, status: "pending" };
+        });
+        message.payload = {
+          ...payload,
+          planning_task_state: buildProcessState(
+            planningState.job?.job_id || "planning_pending",
+            current.title,
+            current.progress,
+            steps,
+          ),
+        };
+        renderMessages();
+        if (index < stages.length - 1) index += 1;
+      };
+      tick();
+      return window.setInterval(tick, 1600);
+    }
+
+    function stopAssistantPlaceholderProgress(timerId) {
+      if (timerId) window.clearInterval(timerId);
+    }
+
+    function escapeHtml(text) {
+      return String(text || "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#39;");
+    }
+
+    function renderPendingAttachments() {
+      const root = document.getElementById("attachmentStrip");
+      if (!state.pendingAttachments.length) {
+        root.className = "attachment-strip";
+        root.innerHTML = "";
+        return;
+      }
+      root.className = "attachment-strip show";
+      root.innerHTML = state.pendingAttachments.map((item, idx) => `
+        <div class="thumb">
+          <img src="${escapeHtml(withScriptRoot(item.preview_url || ""))}" alt="${escapeHtml(item.file_name || "attachment")}">
+          <button class="thumb-remove" data-remove-attachment="${idx}" title="移除">×</button>
+        </div>
+      `).join("");
+      root.querySelectorAll("[data-remove-attachment]").forEach((node) => {
+        node.addEventListener("click", () => {
+          const index = Number(node.getAttribute("data-remove-attachment") || -1);
+          if (index < 0) return;
+          state.pendingAttachments.splice(index, 1);
+          renderPendingAttachments();
+        });
+      });
+    }
+
+    function renderSessionList() {
+      const root = document.getElementById("sessionList");
+      if (!Array.isArray(state.threads) || !state.threads.length) {
+        root.innerHTML = `<div class="session-meta">暂无最近会话</div>`;
+        return;
+      }
+      root.innerHTML = state.threads.map((item) => `
+        <button class="session-item ${Number(item.thread_id) === Number(state.threadId || 0) ? "active" : ""}" data-thread-id="${escapeHtml(item.thread_id)}">
+          <div class="session-title">${escapeHtml(item.title || `会话 ${item.thread_id}`)}</div>
+          <div class="session-meta">#${escapeHtml(item.thread_id)} · ${escapeHtml(item.last_event_at || item.updated_at || "")}</div>
+          <div class="session-snippet">${escapeHtml(item.latest_user_input || item.latest_assistant_output || "")}</div>
+        </button>
+      `).join("");
+      root.querySelectorAll("[data-thread-id]").forEach((node) => {
+        node.addEventListener("click", async () => {
+          const threadId = Number(node.getAttribute("data-thread-id") || 0);
+          if (!threadId) return;
+          try {
+            await loadThread(threadId);
+            setStatus("");
+          } catch (err) {
+            setStatus(String(err.message || err));
+          }
+        });
+      });
+    }
+
+    function messageAttachmentsHtml(attachments) {
+      if (!Array.isArray(attachments) || !attachments.length) return "";
+      const items = attachments
+        .filter((item) => item && typeof item === "object")
+        .slice(0, 8)
+        .map((item) => `
+          <div class="thumb">
+            <img src="${escapeHtml(withScriptRoot(item.preview_url || ""))}" alt="${escapeHtml(item.file_name || "attachment")}">
+          </div>
+        `);
+      return items.length ? `<div class="bubble-attachments">${items.join("")}</div>` : "";
+    }
+
+    function cardTitle(item) {
+      return item.display_name || item.skill_name || item.tool_name || item.application_name || item.agent_name || item.service_id || item.job_id || item.name || "-";
+    }
+
+    function cardMetaLines(item) {
+      const lines = [];
+      if (item.application_name) lines.push(`<div><strong>application</strong>${escapeHtml(item.application_name)}</div>`);
+      if (item.agent_name) lines.push(`<div><strong>agent</strong>${escapeHtml(item.agent_name)}</div>`);
+      if (item.skill_name) lines.push(`<div><strong>skill</strong>${escapeHtml(item.skill_name)}</div>`);
+      if (item.tool_name) lines.push(`<div><strong>tool</strong>${escapeHtml(item.tool_name)}</div>`);
+      if (item.role) lines.push(`<div><strong>role</strong>${escapeHtml(item.role)}</div>`);
+      if (item.status) lines.push(`<div><strong>status</strong>${escapeHtml(item.status)}</div>`);
+      if (item.created_from) lines.push(`<div><strong>created_from</strong>${escapeHtml(item.created_from)}</div>`);
+      if (Object.prototype.hasOwnProperty.call(item, "llm_enabled")) lines.push(`<div><strong>llm_enabled</strong>${escapeHtml(item.llm_enabled ? "true" : "false")}</div>`);
+      if (item.source_skill_name) lines.push(`<div><strong>source_skill</strong>${escapeHtml(item.source_skill_name)}</div>`);
+      if (item.version) lines.push(`<div><strong>version</strong>${escapeHtml(item.version)}</div>`);
+      if (item.tool_mode) lines.push(`<div><strong>tool_mode</strong>${escapeHtml(item.tool_mode)}</div>`);
+      if (item.default_max_steps) lines.push(`<div><strong>max_steps</strong>${escapeHtml(item.default_max_steps)}</div>`);
+      if (item.route_type) lines.push(`<div><strong>route_type</strong>${escapeHtml(item.route_type)}</div>`);
+      if (item.submit_status) lines.push(`<div><strong>submit_status</strong>${escapeHtml(item.submit_status)}</div>`);
+      if (item.input_error) lines.push(`<div><strong>input_error</strong>${escapeHtml(item.input_error)}</div>`);
+      if (item.job_id) lines.push(`<div><strong>job_id</strong>${escapeHtml(item.job_id)}</div>`);
+      if (Array.isArray(item.skills) && item.skills.length) lines.push(`<div><strong>skills</strong>${escapeHtml(item.skills.join(", "))}</div>`);
+      if (Array.isArray(item.tools) && item.tools.length) lines.push(`<div><strong>tools</strong>${escapeHtml(item.tools.join(", "))}</div>`);
+      if (Array.isArray(item.default_agents) && item.default_agents.length) lines.push(`<div><strong>default_agents</strong>${escapeHtml(item.default_agents.join(", "))}</div>`);
+      if (item.example_count) lines.push(`<div><strong>examples</strong>${escapeHtml(item.example_count)}</div>`);
+      return lines;
+    }
+
+    function cardWorkspaceUrl(item) {
+      if (item.workspace_url) return withScriptRoot(item.workspace_url);
+      if (item.application_name) return withScriptRoot(`/applications/studio/${encodeURIComponent(item.application_name)}`);
+      if (item.agent_name) return withScriptRoot(`/agents/studio/${encodeURIComponent(item.agent_name)}`);
+      if (item.skill_name) return withScriptRoot(`/skills/studio/${encodeURIComponent(item.skill_name)}`);
+      if (item.tool_name) return withScriptRoot(`/tools/studio/${encodeURIComponent(item.tool_name)}`);
+      return "";
+    }
+
+    function cardHtml(item) {
+      const title = cardTitle(item);
+      const meta = cardMetaLines(item);
+      const workspaceUrl = cardWorkspaceUrl(item);
+      const actions = [];
+      if (workspaceUrl) {
+        actions.push(`<button class="mini-btn" data-open-url="${workspaceUrl}">查看编辑</button>`);
+      }
+      if (item.application_name) {
+        actions.push(`<button class="mini-btn" data-switch-application="${escapeHtml(item.application_name)}">切换上下文</button>`);
+      }
+      return `
+        <div class="card">
+          <div class="card-title">${escapeHtml(title)}</div>
+          <div class="card-kv">${meta.join("") || `<div>${escapeHtml(JSON.stringify(item))}</div>`}</div>
+          ${actions.length ? `<div class="card-actions">${actions.join("")}</div>` : ""}
+        </div>
+      `;
+    }
+
+    function getMessageById(messageId) {
+      return state.messages.find((item) => item.id === Number(messageId)) || null;
+    }
+
+    function buildReferenceText(message) {
+      const body = String(message?.body || "").trim();
+      if (!body) return "";
+      const compact = body.replace(/\s+/g, " ").trim();
+      return compact.length > 180 ? `${compact.slice(0, 180)}...` : compact;
+    }
+
+    function appendToInput(text, { replace = false } = {}) {
+      const input = document.getElementById("inputBox");
+      const prefix = replace ? "" : (input.value && !input.value.endsWith("\n") ? "\n" : "");
+      input.value = `${replace ? "" : input.value}${prefix}${text}`;
+      input.focus();
+      input.dispatchEvent(new Event("input", { bubbles: true }));
+    }
+
+    function hideContextMenu() {
+      state.contextMenu.visible = false;
+      state.contextMenu.messageId = null;
+      const menu = document.getElementById("contextMenu");
+      menu.className = "context-menu";
+      menu.innerHTML = "";
+    }
+
+    function renderContextMenu() {
+      const menu = document.getElementById("contextMenu");
+      if (!state.contextMenu.visible || !state.contextMenu.messageId) {
+        hideContextMenu();
+        return;
+      }
+      const message = getMessageById(state.contextMenu.messageId);
+      if (!message) {
+        hideContextMenu();
+        return;
+      }
+      menu.className = "context-menu show";
+      menu.style.left = `${state.contextMenu.x}px`;
+      menu.style.top = `${state.contextMenu.y}px`;
+      menu.innerHTML = `
+        <button class="context-item" data-action="quote">引用到输入框</button>
+        <button class="context-item" data-action="followup">基于这条继续追问</button>
+        <button class="context-item" data-action="copy">复制内容</button>
+      `;
+      menu.querySelectorAll("[data-action]").forEach((node) => {
+        node.addEventListener("click", async () => {
+          const action = node.getAttribute("data-action") || "";
+          const referenceText = buildReferenceText(message);
+          if (action === "quote") {
+            appendToInput(`引用：${referenceText}`);
+          } else if (action === "followup") {
+            appendToInput(`基于刚才这条结果，请继续：${referenceText}`);
+          } else if (action === "copy") {
+            try {
+              await navigator.clipboard.writeText(String(message.body || ""));
+              setStatus("已复制到剪贴板");
+              window.setTimeout(() => setStatus(""), 1200);
+            } catch (_err) {
+              setStatus("复制失败，请手动复制");
+            }
+          }
+          hideContextMenu();
+        });
+      });
+      const menuRect = menu.getBoundingClientRect();
+      const maxLeft = Math.max(8, window.innerWidth - menuRect.width - 8);
+      const maxTop = Math.max(8, window.innerHeight - menuRect.height - 8);
+      menu.style.left = `${Math.min(state.contextMenu.x, maxLeft)}px`;
+      menu.style.top = `${Math.min(state.contextMenu.y, maxTop)}px`;
+    }
+
+    const STRUCTURED_PREVIEW_MAX_TEXT = 420;
+    const STRUCTURED_PREVIEW_MAX_LIST_ITEMS = 8;
+    const STRUCTURED_PREVIEW_MAX_OBJECT_ENTRIES = 10;
+    const STRUCTURED_PREVIEW_MAX_TABLE_COLUMNS = 8;
+    const STRUCTURED_PREVIEW_MAX_DEPTH = 2;
+
+    function truncateText(text, maxLen = STRUCTURED_PREVIEW_MAX_TEXT) {
+      const raw = String(text == null ? "" : text);
+      if (raw.length <= maxLen) return { text: raw, omitted: 0 };
+      return { text: `${raw.slice(0, maxLen)}…`, omitted: raw.length - maxLen };
+    }
+
+    function previewStructuredValue(value) {
+      if (value == null || value === "") return "无数据";
+      if (Array.isArray(value)) return `列表，共 ${value.length} 项`;
+      if (typeof value === "object") {
+        const keys = Object.keys(value);
+        if (!keys.length) return "空对象";
+        return `对象，字段 ${keys.slice(0, 4).join("、")}${keys.length > 4 ? " 等" : ""}`;
+      }
+      return String(value);
+    }
+
+    function renderPrimitive(value) {
+      const { text, omitted } = truncateText(value);
+      return `
+        <div class="result-text">${escapeHtml(text)}</div>
+        ${omitted > 0 ? `<div class="result-note">已省略 ${escapeHtml(omitted)} 个字符</div>` : ""}
+      `;
+    }
+
+    function renderList(items) {
+      const rows = Array.isArray(items) ? items : [];
+      if (!rows.length) return '<div class="result-empty">无数据</div>';
+      const visibleRows = rows.slice(0, STRUCTURED_PREVIEW_MAX_LIST_ITEMS);
+      const omitted = Math.max(0, rows.length - visibleRows.length);
+      if (visibleRows.every((item) => item && typeof item === "object" && !Array.isArray(item))) {
+        const keys = [];
+        visibleRows.forEach((row) => {
+          Object.keys(row).forEach((key) => {
+            if (!keys.includes(key)) keys.push(key);
+          });
+        });
+        const visibleKeys = keys.slice(0, STRUCTURED_PREVIEW_MAX_TABLE_COLUMNS);
+        return `
+          <div class="result-group">
+            <div class="result-table-wrap">
+              <table class="result-table">
+                <thead><tr>${visibleKeys.map((key) => `<th>${escapeHtml(key)}</th>`).join("")}</tr></thead>
+                <tbody>
+                  ${visibleRows.map((row) => `<tr>${visibleKeys.map((key) => `<td>${escapeHtml(row[key] == null ? "" : typeof row[key] === "object" ? previewStructuredValue(row[key]) : row[key])}</td>`).join("")}</tr>`).join("")}
+                </tbody>
+              </table>
+            </div>
+            ${omitted > 0 ? `<div class="result-note">列表共 ${rows.length} 项，仅展示前 ${visibleRows.length} 项</div>` : ""}
+            ${keys.length > visibleKeys.length ? `<div class="result-note">字段较多，仅展示前 ${visibleKeys.length} 列</div>` : ""}
+          </div>
+        `;
+      }
+      return `
+        <div class="result-group">
+          <ul class="result-list">${visibleRows.map((item) => `<li>${escapeHtml(typeof item === "object" ? previewStructuredValue(item) : item)}</li>`).join("")}</ul>
+          ${omitted > 0 ? `<div class="result-note">列表共 ${rows.length} 项，仅展示前 ${visibleRows.length} 项</div>` : ""}
+        </div>
+      `;
+    }
+
+    function renderObjectEntries(data, depth = 0) {
+      const entries = Object.entries(data || {});
+      if (!entries.length) return '<div class="result-empty">无数据</div>';
+      const visibleEntries = entries.slice(0, STRUCTURED_PREVIEW_MAX_OBJECT_ENTRIES);
+      const omitted = Math.max(0, entries.length - visibleEntries.length);
+      if (depth >= STRUCTURED_PREVIEW_MAX_DEPTH) {
+        return `
+          <div class="result-kv-list">
+            ${visibleEntries.map(([key, value]) => `
+              <div class="result-kv-item">
+                <div class="result-kv-key">${escapeHtml(key)}</div>
+                <div class="result-kv-value">${renderPrimitive(previewStructuredValue(value))}</div>
+              </div>
+            `).join("")}
+            ${omitted > 0 ? `<div class="result-note">对象共 ${entries.length} 个字段，仅展示前 ${visibleEntries.length} 个</div>` : ""}
+          </div>
+        `;
+      }
+      return `
+        <div class="result-kv-list">
+          ${visibleEntries.map(([key, value]) => `
+            <div class="result-kv-item">
+              <div class="result-kv-key">${escapeHtml(key)}</div>
+              <div class="result-kv-value">${renderStructuredValue(value, depth + 1)}</div>
+            </div>
+          `).join("")}
+          ${omitted > 0 ? `<div class="result-note">对象共 ${entries.length} 个字段，仅展示前 ${visibleEntries.length} 个</div>` : ""}
+        </div>
+      `;
+    }
+
+    function renderStructuredValue(value, depth = 0) {
+      if (value == null || value === "") return '<div class="result-empty">无数据</div>';
+      if (Array.isArray(value)) return renderList(value);
+      if (typeof value === "object") return renderObjectEntries(value, depth);
+      return renderPrimitive(value);
+    }
+
+    function omitRenderPayload(finalOutput) {
+      if (!finalOutput || typeof finalOutput !== "object") return finalOutput;
+      const copy = { ...finalOutput };
+      delete copy.render_payload;
+      return copy;
+    }
+
+    function renderNamedSection(title, bodyHtml) {
+      if (!bodyHtml) return "";
+      return `
+        <div class="result-panel-section">
+          <div class="result-panel-section-title">${escapeHtml(title)}</div>
+          <div class="result-section-body">${bodyHtml}</div>
+        </div>
+      `;
+    }
+
+    function renderFinalOutputPreferred(finalOutput) {
+      const clean = omitRenderPayload(finalOutput);
+      if (!clean || typeof clean !== "object") return "";
+
+      const sections = [];
+      if (Array.isArray(clean.facts) && clean.facts.length) {
+        sections.push(renderNamedSection("关键事实", renderList(clean.facts)));
+      }
+      if (Array.isArray(clean.risks) && clean.risks.length) {
+        sections.push(renderNamedSection("风险提示", renderList(clean.risks)));
+      }
+
+      const rest = { ...clean };
+      delete rest.summary;
+      delete rest.facts;
+      delete rest.risks;
+      if (Object.keys(rest).length) {
+        sections.push(renderNamedSection("补充结果", renderStructuredValue(rest)));
+      }
+      return sections.join("");
+    }
+
+    function renderTableBlock(data) {
+      const headers = Array.isArray(data?.headers) ? data.headers : (Array.isArray(data?.columns) ? data.columns : []);
+      const rows = Array.isArray(data?.rows) ? data.rows : [];
+      if (!headers.length || !rows.length) return '<div class="result-empty">无表格数据</div>';
+      const visibleHeaders = headers.slice(0, STRUCTURED_PREVIEW_MAX_TABLE_COLUMNS);
+      const visibleRows = rows.slice(0, STRUCTURED_PREVIEW_MAX_LIST_ITEMS);
+      const omittedRows = Math.max(0, rows.length - visibleRows.length);
+      return `
+        <div class="result-group">
+          <div class="result-table-wrap">
+            <table class="result-table">
+              <thead>
+                <tr>${visibleHeaders.map((header) => `<th>${escapeHtml(header)}</th>`).join("")}</tr>
+              </thead>
+              <tbody>
+                ${visibleRows.map((row) => `<tr>${(Array.isArray(row) ? row.slice(0, visibleHeaders.length) : visibleHeaders.map((key) => row?.[key])).map((cell) => `<td>${escapeHtml(cell == null ? "" : typeof cell === "object" ? previewStructuredValue(cell) : cell)}</td>`).join("")}</tr>`).join("")}
+              </tbody>
+            </table>
+          </div>
+          ${omittedRows > 0 ? `<div class="result-note">表格共 ${rows.length} 行，仅展示前 ${visibleRows.length} 行</div>` : ""}
+          ${headers.length > visibleHeaders.length ? `<div class="result-note">表格共 ${headers.length} 列，仅展示前 ${visibleHeaders.length} 列</div>` : ""}
+        </div>
+      `;
+    }
+
+    function renderLineChartBlock(data) {
+      const series = Array.isArray(data?.series) ? data.series.filter((item) => item && Array.isArray(item.data) && item.data.length) : [];
+      if (!series.length) return '<div class="result-empty">无曲线数据</div>';
+      const labels = Array.isArray(data?.x_axis) && data.x_axis.length
+        ? data.x_axis
+        : (Array.isArray(data?.labels) && data.labels.length
+          ? data.labels
+          : series.reduce((longest, item) => item.data.length > longest.length ? item.data.map((_, idx) => String(idx + 1)) : longest, []));
+      const maxLen = labels.length || Math.max(...series.map((item) => item.data.length));
+      const width = 640;
+      const height = 220;
+      const padding = { top: 16, right: 18, bottom: 26, left: 42 };
+      const innerWidth = width - padding.left - padding.right;
+      const innerHeight = height - padding.top - padding.bottom;
+      const values = series.flatMap((item) => item.data.map((v) => Number(v)).filter((v) => Number.isFinite(v)));
+      if (!values.length) return '<div class="result-empty">无有效数值</div>';
+      let min = Math.min(...values);
+      let max = Math.max(...values);
+      if (min === max) {
+        min -= 1;
+        max += 1;
+      }
+      const colors = ["#155eef", "#f79009", "#12b76a", "#7a5af8", "#f04438"];
+      const xFor = (idx) => padding.left + (maxLen <= 1 ? innerWidth / 2 : (idx / (maxLen - 1)) * innerWidth);
+      const yFor = (value) => padding.top + innerHeight - ((value - min) / (max - min)) * innerHeight;
+      const yTicks = 4;
+      const grid = Array.from({ length: yTicks + 1 }, (_, idx) => {
+        const ratio = idx / yTicks;
+        const y = padding.top + ratio * innerHeight;
+        const value = max - ratio * (max - min);
+        return { y, value };
+      });
+      const polyline = series.map((item, idx) => {
+        const points = item.data
+          .map((value, pointIdx) => Number(value))
+          .filter((value) => Number.isFinite(value) || value === 0)
+          .map((value, pointIdx) => `${xFor(pointIdx)},${yFor(value)}`)
+          .join(" ");
+        return {
+          name: item.name || `series_${idx + 1}`,
+          color: colors[idx % colors.length],
+          points,
+        };
+      }).filter((item) => item.points);
+      return `
+        <div class="line-chart-wrap">
+          <svg class="line-chart-svg" viewBox="0 0 ${width} ${height}" preserveAspectRatio="none">
+            ${grid.map((tick) => `
+              <g>
+                <line x1="${padding.left}" y1="${tick.y}" x2="${width - padding.right}" y2="${tick.y}" stroke="#eaecf0" stroke-width="1" />
+                <text x="${padding.left - 8}" y="${tick.y + 4}" text-anchor="end" font-size="11" fill="#667085">${escapeHtml(tick.value.toFixed(2))}</text>
+              </g>
+            `).join("")}
+            ${labels.map((label, idx) => `
+              <text x="${xFor(idx)}" y="${height - 6}" text-anchor="middle" font-size="11" fill="#667085">${escapeHtml(String(label))}</text>
+            `).join("")}
+            ${polyline.map((item) => `
+              <polyline fill="none" stroke="${item.color}" stroke-width="2.2" points="${item.points}" />
+            `).join("")}
+          </svg>
+          <div class="line-chart-legend">
+            ${polyline.map((item) => `
+              <span class="line-chart-legend-item">
+                <span class="line-chart-dot" style="background:${item.color}"></span>
+                <span>${escapeHtml(item.name)}</span>
+              </span>
+            `).join("")}
+          </div>
+        </div>
+      `;
+    }
+
+    function renderBarChartBlock(data) {
+      const groups = Array.isArray(data?.groups) ? data.groups.filter((item) => item && Array.isArray(item.data) && Array.isArray(item.x_axis)) : [];
+      if (groups.length) {
+        return `
+          <div class="line-chart-wrap">
+            <div class="metric-strip">
+              ${groups.map((group) => `
+                <div class="metric-card" style="grid-column: 1 / -1;">
+                  <div class="metric-label">${escapeHtml(group.name || "-")}</div>
+                  <div class="render-list">
+                    ${(group.x_axis || []).map((label, index) => `
+                      <div class="render-list-item">
+                        <strong>${escapeHtml(label)}</strong>
+                        <span>${escapeHtml(Number(group.data?.[index]))}</span>
+                      </div>
+                    `).join("")}
+                  </div>
+                </div>
+              `).join("")}
+            </div>
+          </div>
+        `;
+      }
+      const categories = Array.isArray(data?.x_axis) ? data.x_axis : (Array.isArray(data?.categories) ? data.categories : []);
+      const series = Array.isArray(data?.series) ? data.series.filter((item) => item && Array.isArray(item.data)) : [];
+      if (!categories.length || !series.length) return '<div class="result-empty">无柱状图数据</div>';
+      const primary = series[0];
+      const values = primary.data.map((item) => Number(item)).filter((item) => Number.isFinite(item));
+      if (!values.length) return '<div class="result-empty">无有效柱状图数值</div>';
+      const max = Math.max(...values, 1);
+      return `
+        <div class="line-chart-wrap">
+          <div class="metric-strip">
+            ${categories.map((label, index) => {
+              const rawValue = Number(primary.data[index]);
+              const ratio = Number.isFinite(rawValue) ? Math.max(0, Math.min(100, rawValue / max * 100)) : 0;
+              return `
+                <div class="metric-card">
+                  <div class="metric-label">${escapeHtml(label)}</div>
+                  <div class="metric-value">${escapeHtml(Number.isFinite(rawValue) ? rawValue : "-")}</div>
+                  <div style="margin-top:8px;height:8px;border-radius:999px;background:#e5e7eb;overflow:hidden;">
+                    <div style="width:${ratio}%;height:100%;background:#155eef;"></div>
+                  </div>
+                </div>
+              `;
+            }).join("")}
+          </div>
+        </div>
+      `;
+    }
+
+    function renderPieChartBlock(data) {
+      const items = Array.isArray(data?.items)
+        ? data.items.filter((item) => item && Number.isFinite(Number(item.value)))
+        : (Array.isArray(data?.series) ? data.series.map((item) => ({ label: item?.label || item?.name, value: item?.value })) : []).filter((item) => item && Number.isFinite(Number(item.value)));
+      if (!items.length) return '<div class="result-empty">无饼图数据</div>';
+      const total = items.reduce((sum, item) => sum + Number(item.value || 0), 0);
+      if (!total) return '<div class="result-empty">无有效饼图数值</div>';
+      const colors = ["#155eef", "#f79009", "#12b76a", "#7a5af8", "#f04438", "#0ea5e9"];
+      let offset = 0;
+      const slices = items.map((item, index) => {
+        const value = Number(item.value || 0);
+        const angle = value / total * 360;
+        const slice = `${colors[index % colors.length]} ${offset}deg ${offset + angle}deg`;
+        offset += angle;
+        return slice;
+      }).join(", ");
+      return `
+        <div class="line-chart-wrap">
+          <div style="display:flex;gap:18px;align-items:center;flex-wrap:wrap;">
+            <div style="width:180px;height:180px;border-radius:50%;background:conic-gradient(${slices});border:1px solid #e5e7eb;"></div>
+            <div class="line-chart-legend">
+              ${items.map((item, index) => `
+                <span class="line-chart-legend-item">
+                  <span class="line-chart-dot" style="background:${colors[index % colors.length]}"></span>
+                  <span>${escapeHtml(item.label || "-")}：${escapeHtml(item.value)}</span>
+                </span>
+              `).join("")}
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderFlowBlock(data) {
+      const nodes = Array.isArray(data?.nodes) ? data.nodes : (Array.isArray(data) ? data : []);
+      if (!nodes.length) return '<div class="result-empty">无流程数据</div>';
+      return `
+        <div class="render-list">
+          ${nodes.map((node, index) => `
+            <div class="render-list-item" style="display:grid;gap:8px;">
+              <div style="font-weight:700;color:#0f172a;">${escapeHtml(node.label || node.title || node.name || `步骤 ${index + 1}`)}</div>
+              ${index < nodes.length - 1 ? '<div style="color:#98a2b3;font-size:12px;">↓</div>' : ''}
+            </div>
+          `).join("")}
+        </div>
+      `;
+    }
+
+    function renderKlineBlock(data) {
+      const standardizedCandles = Array.isArray(data?.candles)
+        ? data.candles
+            .filter((row) => row && typeof row === "object")
+            .map((row) => [row.time, row.open, row.close, row.low, row.high, row.volume, row.pct])
+        : [];
+      const candles = standardizedCandles.length
+        ? standardizedCandles
+        : (Array.isArray(data?.kline) ? data.kline.filter((row) => Array.isArray(row) && row.length >= 6) : []);
+      if (!candles.length) return '<div class="result-empty">无 K 线数据</div>';
+      const sampled = candles.slice(-80);
+      const width = 680;
+      const height = 280;
+      const padding = { top: 14, right: 16, bottom: 26, left: 44 };
+      const innerWidth = width - padding.left - padding.right;
+      const innerHeight = height - padding.top - padding.bottom;
+      const lows = sampled.map((row) => Number(row[3])).filter((v) => Number.isFinite(v));
+      const highs = sampled.map((row) => Number(row[4])).filter((v) => Number.isFinite(v));
+      if (!lows.length || !highs.length) return '<div class="result-empty">无有效 K 线数值</div>';
+      let min = Math.min(...lows);
+      let max = Math.max(...highs);
+      if (min === max) {
+        min -= 1;
+        max += 1;
+      }
+      const xFor = (idx) => padding.left + (sampled.length <= 1 ? innerWidth / 2 : (idx / (sampled.length - 1)) * innerWidth);
+      const yFor = (value) => padding.top + innerHeight - ((value - min) / (max - min)) * innerHeight;
+      const candleWidth = Math.max(4, Math.floor(innerWidth / Math.max(sampled.length, 1) * 0.56));
+      const grid = Array.from({ length: 5 }, (_, idx) => {
+        const ratio = idx / 4;
+        const y = padding.top + ratio * innerHeight;
+        const value = max - ratio * (max - min);
+        return { y, value };
+      });
+      const standardizedIndicators = Array.isArray(data?.indicators)
+        ? Object.fromEntries((data.indicators || []).filter((item) => item && item.name).map((item) => [item.name, (item.points || []).map((point) => [point.time, point.value])]))
+        : {};
+      const indicatorMap = Object.keys(standardizedIndicators).length ? standardizedIndicators : (data?.indicators && typeof data.indicators === "object" ? data.indicators : {});
+      const indicatorColors = ["#155eef", "#12b76a", "#f79009", "#7a5af8"];
+      const indicatorPaths = Object.entries(indicatorMap).slice(0, 4).map(([name, rows], idx) => {
+        const points = (Array.isArray(rows) ? rows : [])
+          .slice(-sampled.length)
+          .map((row, pointIdx) => {
+            if (!Array.isArray(row) || row.length < 2 || !Number.isFinite(Number(row[1]))) return "";
+            return `${xFor(pointIdx)},${yFor(Number(row[1]))}`;
+          })
+          .filter(Boolean)
+          .join(" ");
+        return { name, color: indicatorColors[idx % indicatorColors.length], points };
+      }).filter((item) => item.points);
+      return `
+        <div class="line-chart-wrap">
+          <svg class="line-chart-svg" viewBox="0 0 ${width} ${height}" preserveAspectRatio="none">
+            ${grid.map((tick) => `
+              <g>
+                <line x1="${padding.left}" y1="${tick.y}" x2="${width - padding.right}" y2="${tick.y}" stroke="#eaecf0" stroke-width="1" />
+                <text x="${padding.left - 8}" y="${tick.y + 4}" text-anchor="end" font-size="11" fill="#667085">${escapeHtml(tick.value.toFixed(2))}</text>
+              </g>
+            `).join("")}
+            ${sampled.map((row, idx) => {
+              const label = String(row[0] ?? "");
+              const open = Number(row[1]);
+              const close = Number(row[2]);
+              const low = Number(row[3]);
+              const high = Number(row[4]);
+              const x = xFor(idx);
+              const color = close >= open ? "#f04438" : "#12b76a";
+              const top = yFor(Math.max(open, close));
+              const bottom = yFor(Math.min(open, close));
+              const bodyY = Math.min(top, bottom);
+              const bodyH = Math.max(1.5, Math.abs(bottom - top));
+              return `
+                <g>
+                  <line x1="${x}" y1="${yFor(low)}" x2="${x}" y2="${yFor(high)}" stroke="${color}" stroke-width="1.2" />
+                  <rect x="${x - candleWidth / 2}" y="${bodyY}" width="${candleWidth}" height="${bodyH}" fill="${color}" opacity="0.82" rx="1" />
+                  ${idx % Math.max(1, Math.floor(sampled.length / 6)) === 0 ? `<text x="${x}" y="${height - 6}" text-anchor="middle" font-size="11" fill="#667085">${escapeHtml(label)}</text>` : ""}
+                </g>
+              `;
+            }).join("")}
+            ${indicatorPaths.map((item) => `<polyline fill="none" stroke="${item.color}" stroke-width="1.8" points="${item.points}" />`).join("")}
+          </svg>
+          <div class="line-chart-legend">
+            <span class="line-chart-legend-item"><span class="line-chart-dot" style="background:#f04438"></span><span>阳线</span></span>
+            <span class="line-chart-legend-item"><span class="line-chart-dot" style="background:#12b76a"></span><span>阴线</span></span>
+            ${indicatorPaths.map((item) => `
+              <span class="line-chart-legend-item">
+                <span class="line-chart-dot" style="background:${item.color}"></span>
+                <span>${escapeHtml(item.name)}</span>
+              </span>
+            `).join("")}
+          </div>
+        </div>
+      `;
+    }
+
+    function renderTextListBlock(data) {
+      const items = Array.isArray(data?.items) ? data.items : [];
+      if (!items.length) return '<div class="result-empty">无列表数据</div>';
+      const visibleItems = items.slice(0, STRUCTURED_PREVIEW_MAX_LIST_ITEMS);
+      const omitted = Math.max(0, items.length - visibleItems.length);
+      return `
+        <div class="result-group">
+          <ul class="result-list">
+          ${visibleItems.map((item) => {
+            if (typeof item !== "object" || item == null) return `<li>${escapeHtml(item)}</li>`;
+            const title = escapeHtml(item.title || "");
+            const desc = escapeHtml(item.desc || item.text || "");
+            const time = escapeHtml(item.time || "");
+            return `<li><strong>${title}</strong>${time ? ` <span class="result-empty">(${time})</span>` : ""}${desc ? `<div>${desc}</div>` : ""}</li>`;
+          }).join("")}
+          </ul>
+          ${omitted > 0 ? `<div class="result-note">列表共 ${items.length} 项，仅展示前 ${visibleItems.length} 项</div>` : ""}
+        </div>
+      `;
+    }
+
+    function renderMetricStripBlock(data) {
+      const items = Array.isArray(data?.items) ? data.items : [];
+      if (!items.length) return '<div class="result-empty">无指标数据</div>';
+      return `
+        <div class="metric-strip">
+          ${items.map((item) => `
+            <div class="metric-card">
+              <div class="metric-label">${escapeHtml(item.label || item.title || "-")}</div>
+              <div class="metric-value">${escapeHtml(item.value || "-")}</div>
+              <div class="metric-change">${escapeHtml(item.change || item.desc || "")}</div>
+            </div>
+          `).join("")}
+        </div>
+      `;
+    }
+
+    function renderBlock(block) {
+      const type = String(block?.type || "").trim();
+      const title = escapeHtml(block?.title || "");
+      const data = block?.data && typeof block.data === "object" ? block.data : {};
+      let body = "";
+      if (type === "table") {
+        body = renderTableBlock(data);
+      } else if (type === "line") {
+        body = renderLineChartBlock(data);
+      } else if (type === "bar") {
+        body = renderBarChartBlock(data);
+      } else if (type === "pie") {
+        body = renderPieChartBlock(data);
+      } else if (type === "flow") {
+        body = renderFlowBlock(data);
+      } else if (type === "text_list") {
+        body = renderTextListBlock(data);
+      } else if (type === "metric_strip" || type === "key_metrics") {
+        body = renderMetricStripBlock(data.items ? data : { items: Object.entries(data || {}).map(([key, value]) => ({ label: key, value })) });
+      } else if (type === "kline") {
+        body = renderKlineBlock(data);
+      } else {
+        body = renderStructuredValue(data);
+      }
+      return `
+        <div class="render-block">
+          ${title ? `<div class="render-block-title">${title}</div>` : ""}
+          <div class="render-block-body">${body}</div>
+        </div>
+      `;
+    }
+
+    function streamBlockToRenderBlock(block) {
+      const blockType = String(block?.block_type || block?.type || "").trim();
+      const data = block?.data && typeof block.data === "object" ? block.data : {};
+      const mappedType = {
+        table: "table",
+        bar_chart: "bar",
+        line_chart: "line",
+        flowchart: "flow",
+      }[blockType] || blockType;
+      return {
+        type: mappedType,
+        title: block?.title || "",
+        data,
+      };
+    }
+
+    function renderStreamBlock(block) {
+      const blockType = String(block?.block_type || block?.type || "").trim();
+      const title = escapeHtml(block?.title || "");
+      const content = String(block?.content || "");
+      let body = "";
+      if (blockType === "markdown") {
+        body = `<div class="agent-markdown">${escapeHtml(content)}</div>`;
+      } else if (blockType === "code") {
+        body = `<pre class="agent-code"><code>${escapeHtml(content)}</code></pre>`;
+      } else if (blockType === "action") {
+        const actions = Array.isArray(block?.actions) ? block.actions : [];
+        body = `
+          ${content ? `<div class="agent-markdown">${escapeHtml(content)}</div>` : ""}
+          <div class="agent-actions">
+            ${actions.map((action) => `
+              <button class="agent-action-btn" data-agent-command="${escapeHtml(action.command || action.label || "")}">
+                ${escapeHtml(action.label || action.id || "确认")}
+              </button>
+            `).join("")}
+          </div>
+        `;
+      } else if (["table", "bar_chart", "line_chart", "flowchart"].includes(blockType)) {
+        body = renderBlock(streamBlockToRenderBlock(block));
+      } else {
+        body = `<div class="agent-markdown">${escapeHtml(content || previewStructuredValue(block?.data || {}))}</div>`;
+      }
+      return `
+        <div class="agent-stream-block">
+          ${title ? `<div class="agent-stream-title">${title}</div>` : ""}
+          ${body}
+        </div>
+      `;
+    }
+
+    function mergeStreamBlock(list, block) {
+      if (!Array.isArray(list) || !block) return;
+      const id = String(block.block_id || block.id || `block_${block.seq || list.length + 1}`);
+      const mode = String(block.mode || "replace");
+      const next = { ...block, block_id: id };
+      const index = list.findIndex((item) => String(item.block_id || "") === id);
+      if (index < 0) {
+        list.push(next);
+        return;
+      }
+      if (mode === "append") {
+        list[index] = {
+          ...list[index],
+          ...next,
+          content: `${String(list[index].content || "")}${String(next.content || "")}`,
+          data: next.data || list[index].data || {},
+        };
+        return;
+      }
+      list[index] = next;
+    }
+
+    function isProcessStreamBlock(block) {
+      const blockType = String(block?.block_type || "").trim();
+      const blockId = String(block?.block_id || "").trim();
+      return blockType === "status" || blockId.includes("_thinking") || blockId.includes("_assistant") || blockId.includes("_tool_output");
+    }
+
+    function applyAgentStreamEvent(message, payload) {
+      if (!message || !payload || typeof payload !== "object") return;
+      const agentRun = message.payload.agent_run && typeof message.payload.agent_run === "object"
+        ? message.payload.agent_run
+        : { status: "running", title: "优小智正在处理", summary: "正在运行智能体任务", artifacts: [], process: [] };
+      if (payload.event === "run_started") {
+        agentRun.status = "running";
+        agentRun.summary = payload.message || "智能体任务已开始";
+      } else if (payload.event === "block") {
+        if (isProcessStreamBlock(payload)) {
+          mergeStreamBlock(agentRun.process, payload);
+          if (payload.block_type === "status" && payload.content) {
+            agentRun.summary = payload.content;
+          }
+        } else {
+          mergeStreamBlock(agentRun.artifacts, payload);
+        }
+      } else if (payload.event === "done") {
+        agentRun.status = "done";
+        agentRun.summary = "任务已完成";
+        message.body = "";
+        message.payload = {
+          ...message.payload,
+          ...(payload.result && typeof payload.result === "object" ? payload.result : {}),
+        };
+        const finalMessage = String(payload.result?.message || "").trim();
+        if (finalMessage && finalMessage.length <= 600) {
+          mergeStreamBlock(agentRun.artifacts, {
+            block_id: "final_message",
+            block_type: "markdown",
+            mode: "replace",
+            title: "结果说明",
+            content: finalMessage,
+          });
+        }
+        if (payload.thread_id) state.threadId = payload.thread_id;
+        const patch = payload.result?.thread_context_patch;
+        state.customToolActive = Boolean(patch && patch.custom_tool_state);
+      } else if (payload.event === "error") {
+        agentRun.status = "error";
+        agentRun.summary = payload.message || "任务失败";
+        mergeStreamBlock(agentRun.artifacts, {
+          block_id: "stream_error",
+          block_type: "markdown",
+          mode: "replace",
+          title: "处理失败",
+          content: agentRun.summary,
+        });
+      }
+      message.payload.agent_run = agentRun;
+      renderMessages();
+    }
+
+    function renderAgentRun(agentRun) {
+      if (!agentRun || typeof agentRun !== "object") return "";
+      const status = String(agentRun.status || "running");
+      const statusLabel = status === "done" ? "已完成" : (status === "error" ? "失败" : "运行中");
+      const artifacts = Array.isArray(agentRun.artifacts) ? agentRun.artifacts : [];
+      const process = Array.isArray(agentRun.process) ? agentRun.process : [];
+      return `
+        <div class="agent-run">
+          <div class="agent-run-head">
+            <div>
+              <div class="agent-run-title">${escapeHtml(agentRun.title || "优小智智能体")}</div>
+              <div class="agent-run-subtitle">${escapeHtml(agentRun.summary || "正在处理")}</div>
+            </div>
+            <div class="agent-run-status ${escapeHtml(status)}">${statusLabel}</div>
+          </div>
+          ${artifacts.length ? `<div class="agent-artifacts">${artifacts.map((block) => renderStreamBlock(block)).join("")}</div>` : ""}
+          ${process.length ? `
+            <details class="agent-process">
+              <summary>过程流 · ${process.length} 个片段</summary>
+              <div class="agent-process-list">
+                ${process.map((block) => `
+                  <div class="agent-process-item">
+                    ${block.title ? `<strong>${escapeHtml(block.title)}</strong>\n` : ""}${escapeHtml(block.content || "")}
+                  </div>
+                `).join("")}
+              </div>
+            </details>
+          ` : ""}
+        </div>
+      `;
+    }
+
+    function renderProtocolPayload(renderPayload) {
+      const sections = Array.isArray(renderPayload?.sections) ? renderPayload.sections : [];
+      if (!sections.length) return "";
+      return `
+        <div class="render-sections">
+          ${sections.map((section) => `
+            <div class="render-section">
+              <div class="render-section-head">
+                <div class="render-section-title">${escapeHtml(section.title || section.section_id || "Section")}</div>
+                ${section.description ? `<div class="render-section-desc">${escapeHtml(section.description)}</div>` : ""}
+              </div>
+              <div class="render-section-blocks">
+                ${(Array.isArray(section.blocks) ? section.blocks : []).map((block) => renderBlock(block)).join("")}
+              </div>
+            </div>
+          `).join("")}
+        </div>
+      `;
+    }
+
+    function renderPresentationContract(contract, resultPayload) {
+      if (!contract || typeof contract !== "object") return "";
+      const hero = contract.hero && typeof contract.hero === "object" ? contract.hero : null;
+      const sections = Array.isArray(contract.sections) ? contract.sections : [];
+      const parts = [];
+      if (hero && (hero.summary || hero.title)) {
+        parts.push(`
+          <div class="result-hero">
+            ${hero.title ? `<div class="result-hero-title">${escapeHtml(hero.title)}</div>` : ""}
+            ${hero.summary ? `<div class="result-hero-summary">${escapeHtml(hero.summary)}</div>` : ""}
+          </div>
+        `);
+      }
+      const sectionHtml = sections.map((section) => {
+        if (!section || typeof section !== "object") return "";
+        const sectionType = String(section.section_type || "").trim();
+        if (sectionType === "analysis") {
+          const fragments = [];
+          if (Array.isArray(section.facts) && section.facts.length) {
+            fragments.push(`
+              <div class="result-section">
+                <div class="result-section-title">关键事实</div>
+                <div class="result-section-body">${renderList(section.facts)}</div>
+              </div>
+            `);
+          }
+          if (Array.isArray(section.risks) && section.risks.length) {
+            fragments.push(`
+              <div class="result-section">
+                <div class="result-section-title">风险提示</div>
+                <div class="result-section-body">${renderList(section.risks)}</div>
+              </div>
+            `);
+          }
+          if (!fragments.length) return "";
+          return `
+            <div class="result-panel-section">
+              <div class="result-panel-section-title">${escapeHtml(section.title || "结论与提示")}</div>
+              ${fragments.join("")}
+            </div>
+          `;
+        }
+        const blocks = Array.isArray(section.blocks) ? section.blocks : [];
+        if (!blocks.length) return "";
+        return `
+          <div class="result-panel-section">
+            <div class="result-panel-section-title">${escapeHtml(section.title || "结果")}</div>
+            <div class="render-sections">
+              ${blocks.map((block) => renderBlock(block)).join("")}
+            </div>
+          </div>
+        `;
+      }).filter(Boolean).join("");
+      if (sectionHtml) {
+        parts.push(`<div class="result-panel"><div class="result-panel-title">结果展示</div>${sectionHtml}</div>`);
+      }
+      return parts.length ? `<div class="assistant-result">${parts.join("")}</div>` : "";
+    }
+
+    function groupProcessSteps(steps) {
+      const items = Array.isArray(steps) ? steps : [];
+      const groups = [];
+      const keyMap = new Map();
+      items.forEach((step, idx) => {
+        const rawStage = String(step?.stage || step?.step_type || "progress").trim();
+        const groupKey = rawStage || "progress";
+        if (!keyMap.has(groupKey)) {
+          const group = { key: groupKey, title: groupKey, items: [] };
+          keyMap.set(groupKey, group);
+          groups.push(group);
+        }
+        keyMap.get(groupKey).items.push({
+          id: idx + 1,
+          title: String(step?.title || step?.step_type || step?.stage || "步骤").trim(),
+          message: String(step?.message || step?.status || "").trim(),
+          status: String(step?.status || "").trim(),
+        });
+      });
+      return groups;
+    }
+
+    function processHtml(taskState, panelTitle = "执行过程") {
+      if (!taskState || typeof taskState !== "object") return "";
+      const job = taskState.job || {};
+      const steps = Array.isArray(taskState.steps) ? taskState.steps : [];
+      const stage = String(job.current_stage || job.status || "running");
+      const progress = Number(job.progress || 0);
+      const grouped = groupProcessSteps(steps.slice(-18));
+      const panelClass = panelTitle.includes("思考") ? "thinking" : panelTitle.includes("执行") ? "runtime" : "";
+      return `
+        <div class="process-panel ${panelClass}">
+          <details class="process-frame" open>
+            <summary>
+              <div class="process-head">
+                <div class="process-title">${escapeHtml(panelTitle)}</div>
+                <div class="process-badge">${escapeHtml(stage)}</div>
+              </div>
+            </summary>
+            <div class="process-meta">
+              <span>job_id: ${escapeHtml(job.job_id || "-")}</span>
+              <span>progress: ${escapeHtml(`${progress}%`)}</span>
+            </div>
+            <div class="process-bar"><div class="process-bar-fill" style="width:${Math.max(0, Math.min(progress, 100))}%"></div></div>
+            <div class="process-steps">
+              ${grouped.map((group, index) => `
+                <div class="process-group">
+                  <details ${index >= grouped.length - 2 ? "open" : ""}>
+                    <summary>
+                      <span class="process-group-head">
+                        <span>${escapeHtml(group.title)}</span>
+                        <span class="process-group-count">${escapeHtml(`${group.items.length} steps`)}</span>
+                      </span>
+                    </summary>
+                    <ol class="process-outline">
+                      ${group.items.map((step) => `
+                        <li class="process-step">
+                          <div class="process-step-title">${escapeHtml(step.title || `步骤 ${step.id}`)}</div>
+                          ${step.message ? `<div class="process-step-message">${escapeHtml(step.message)}</div>` : ""}
+                        </li>
+                      `).join("")}
+                    </ol>
+                  </details>
+                </div>
+              `).join("")}
+            </div>
+          </details>
+        </div>
+      `;
+    }
+
+    function processPanelsHtml(payload) {
+      if (!payload || typeof payload !== "object") return "";
+      const planningTaskState = payload.planning_task_state && typeof payload.planning_task_state === "object"
+        ? payload.planning_task_state
+        : null;
+      const runtimeTaskState = payload.runtime_task_state && typeof payload.runtime_task_state === "object"
+        ? payload.runtime_task_state
+        : null;
+      const mergedTaskState = payload.task_state && typeof payload.task_state === "object"
+        ? payload.task_state
+        : null;
+      const blocks = [];
+      if (planningTaskState) {
+        blocks.push(processHtml(planningTaskState, "思考过程"));
+      }
+      if (runtimeTaskState) {
+        blocks.push(processHtml(runtimeTaskState, "执行进展"));
+      }
+      if (!blocks.length && mergedTaskState) {
+        blocks.push(processHtml(mergedTaskState, "执行过程"));
+      }
+      return blocks.join("");
+    }
+
+    function resultHtml(resultPayload) {
+      if (!resultPayload || typeof resultPayload !== "object") return "";
+      const finalOutput = resultPayload.final_output && typeof resultPayload.final_output === "object" ? resultPayload.final_output : null;
+      const renderPayload = resultPayload.render_payload && typeof resultPayload.render_payload === "object" ? resultPayload.render_payload : null;
+      const presentationContract = renderPayload && renderPayload.presentation_contract && typeof renderPayload.presentation_contract === "object"
+        ? renderPayload.presentation_contract
+        : null;
+      if (presentationContract) {
+        return renderPresentationContract(presentationContract, resultPayload);
+      }
+      const blocks = [];
+      if (finalOutput) {
+        blocks.push(`
+          <div class="result-block">
+            <div class="result-block-title">结果</div>
+            ${renderFinalOutputPreferred(finalOutput)}
+          </div>
+        `);
+      }
+      if (renderPayload) {
+        blocks.push(`
+          <div class="result-block">
+            <div class="result-block-title">结构化展示</div>
+            ${renderProtocolPayload(renderPayload) || renderStructuredValue(renderPayload)}
+          </div>
+        `);
+      }
+      return blocks.length ? `<div class="result-blocks">${blocks.join("")}</div>` : "";
+    }
+
+    function renderReferenceMaterials(resultPayload) {
+      if (!resultPayload || typeof resultPayload !== "object") return "";
+      const items = Array.isArray(resultPayload.reference_materials)
+        ? resultPayload.reference_materials
+        : (Array.isArray(resultPayload.render_payload?.reference_materials) ? resultPayload.render_payload.reference_materials : []);
+      if (!items.length) return "";
+      return `
+        <div class="reference-materials">
+          <div class="reference-block">
+            <div class="reference-title">参考资料</div>
+            <div class="reference-list">
+              ${items.map((item) => {
+                const title = escapeHtml(item?.title || item?.path || "参考资料");
+                const url = String(item?.url || "").trim();
+                const meta = escapeHtml(item?.meta || item?.tool_name || "");
+                const summary = escapeHtml(item?.summary || "");
+                return `
+                  <div class="reference-item">
+                    ${url ? `<a class="reference-link" href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer">${title}</a>` : `<div>${title}</div>`}
+                    ${meta ? `<div class="reference-meta">${meta}</div>` : ""}
+                    ${!url && summary ? `<div class="reference-meta">${summary}</div>` : ""}
+                  </div>
+                `;
+              }).join("")}
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderMessages() {
+      const root = document.getElementById("messages");
+      root.innerHTML = "";
+      for (const item of state.messages) {
+        const node = document.createElement("div");
+        node.className = `message ${item.role}`;
+        node.dataset.messageId = String(item.id);
+        const cards = Array.isArray(item.payload.items) && item.payload.items.length
+          ? `<div class="cards">${item.payload.items.slice(0, 8).map(cardHtml).join("")}</div>`
+          : "";
+        const attachments = messageAttachmentsHtml(item.payload.attachments);
+        const process = processPanelsHtml(item.payload);
+        const agentRun = renderAgentRun(item.payload.agent_run);
+        const result = resultHtml(item.payload.task_result);
+        const references = renderReferenceMaterials(item.payload.task_result);
+        const bubbleHtml = String(item.body || "").trim()
+          ? `<div class="bubble">${escapeHtml(item.body)}</div>`
+          : "";
+        const contentHtml = item.role === "assistant"
+          ? `
+            ${process}
+            ${agentRun}
+            ${bubbleHtml}
+            ${attachments}
+            ${cards}
+            ${result}
+            ${references}
+          `
+          : `
+            ${bubbleHtml}
+            ${attachments}
+            ${cards}
+            ${process}
+            ${result}
+          `;
+        node.innerHTML = `
+          <div class="role">${item.role}</div>
+          ${contentHtml}
+        `;
+        root.appendChild(node);
+      }
+      root.scrollTop = root.scrollHeight;
+      root.querySelectorAll(".message").forEach((node) => {
+        node.addEventListener("contextmenu", (event) => {
+          event.preventDefault();
+          const messageId = Number(node.dataset.messageId || 0);
+          if (!messageId) return;
+          state.contextMenu.visible = true;
+          state.contextMenu.messageId = messageId;
+          state.contextMenu.x = event.clientX;
+          state.contextMenu.y = event.clientY;
+          renderContextMenu();
+        });
+      });
+      root.querySelectorAll("[data-open-url]").forEach((node) => {
+        node.addEventListener("click", () => {
+          const url = node.getAttribute("data-open-url") || "";
+          if (!url) return;
+          window.open(withScriptRoot(url), "_blank", "noopener");
+        });
+      });
+      root.querySelectorAll("[data-switch-application]").forEach((node) => {
+        node.addEventListener("click", async () => {
+          const target = node.getAttribute("data-switch-application") || "";
+          if (!target) return;
+          try {
+            const appCtx = await loadApplicationContext(target);
+            applyApplicationContext(appCtx);
+            addMessage("assistant", `已切换 application：${target}`);
+            setStatus("");
+          } catch (err) {
+            setStatus(String(err.message || err));
+          }
+        });
+      });
+      root.querySelectorAll("[data-agent-command]").forEach((node) => {
+        node.addEventListener("click", () => {
+          const command = node.getAttribute("data-agent-command") || "";
+          if (!command) return;
+          const input = document.getElementById("inputBox");
+          input.value = command;
+          input.focus();
+        });
+      });
+      hideContextMenu();
+      renderSessionList();
+    }
+
+    async function loadApplicationContext(applicationName) {
+      const target = String(applicationName || "").trim();
+      if (!target) return null;
+      const res = await fetch(`${apiApplicationBaseUrl}/${encodeURIComponent(target)}/context`);
+      const payload = await res.json();
+      if (!res.ok || payload.ok === false) {
+        throw new Error((payload && payload.error) || `HTTP ${res.status}`);
+      }
+      return payload.context || null;
+    }
+
+    function applyApplicationContext(appCtx) {
+      if (!appCtx || typeof appCtx !== "object") return;
+      const nextApplicationName = String(appCtx.application_name || "").trim();
+      if (nextApplicationName && nextApplicationName !== state.applicationName) {
+        state.threadId = null;
+      }
+      state.applicationName = nextApplicationName || state.applicationName;
+      state.applicationDisplayName = String(appCtx.display_name || state.applicationDisplayName || "").trim();
+      state.chatPlaceholder = String(appCtx.chat_placeholder || state.chatPlaceholder || "").trim();
+      state.assistantIntro = String(appCtx.assistant_intro || state.assistantIntro || "").trim();
+      state.assistantAgent = (appCtx.assistant_agent && typeof appCtx.assistant_agent === "object") ? appCtx.assistant_agent : {};
+      state.defaultAgent = (appCtx.default_agent && typeof appCtx.default_agent === "object") ? appCtx.default_agent : {};
+      document.title = state.applicationDisplayName || "Assistant";
+      document.getElementById("inputBox").placeholder = state.chatPlaceholder || "输入问题，或输入 / 查看命令";
+      const metaEl = document.querySelector(".title .meta");
+      const assistantName = state.assistantAgent.display_name || state.assistantAgent.agent_name || "";
+      metaEl.textContent = `application: ${state.applicationName || "-"}${assistantName ? ` · assistant: ${assistantName}` : ""}`;
+    }
+
+    async function dispatchText(text, attachmentIds = []) {
+      const res = await fetch(apiDispatchUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          text,
+          thread_id: state.threadId,
+          application_name: state.applicationName,
+          attachment_ids: Array.isArray(attachmentIds) ? attachmentIds.filter(Boolean) : [],
+        }),
+      });
+      const payload = await res.json();
+      if (!res.ok || payload.ok === false) {
+        throw new Error((payload && payload.error) || `HTTP ${res.status}`);
+      }
+      return payload;
+    }
+
+    function shouldUseCustomToolStream(text, attachmentIds = []) {
+      if (Array.isArray(attachmentIds) && attachmentIds.length) return false;
+      const raw = String(text || "").trim();
+      if (!raw) return false;
+      if (/^\/custom_tool\s+(create|edit)\b/i.test(raw)) return true;
+      return state.customToolActive && !raw.startsWith("/");
+    }
+
+    async function startCustomToolStream(text, assistantMessage) {
+      const res = await fetch(apiCustomToolStreamStartUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          text,
+          thread_id: state.threadId,
+          application_name: state.applicationName,
+        }),
+      });
+      const payload = await res.json();
+      if (!res.ok || payload.ok === false) {
+        throw new Error((payload && payload.error) || `HTTP ${res.status}`);
+      }
+      const streamUrl = withScriptRoot(payload.stream_url || "");
+      if (!streamUrl) throw new Error("stream_url 为空");
+      updateMessage(assistantMessage, {
+        body: "",
+        payload: {
+          agent_run: {
+            status: "running",
+            title: "优小智正在处理",
+            summary: "正在连接智能体运行流",
+            artifacts: [],
+            process: [],
+          },
+        },
+      });
+      await new Promise((resolve, reject) => {
+        const source = new EventSource(streamUrl);
+        source.onmessage = (event) => {
+          try {
+            const data = JSON.parse(event.data || "{}");
+            applyAgentStreamEvent(assistantMessage, data);
+            if (data.event === "done") {
+              source.close();
+              resolve(data);
+            }
+            if (data.event === "error") {
+              source.close();
+              reject(new Error(data.message || "stream failed"));
+            }
+          } catch (err) {
+            source.close();
+            reject(err);
+          }
+        };
+        source.onerror = () => {
+          source.close();
+          reject(new Error("智能体运行流连接中断"));
+        };
+      });
+    }
+
+    async function uploadFiles(files) {
+      const list = Array.from(files || []).filter((file) => file && /^image\//i.test(String(file.type || "")));
+      if (!list.length) return;
+      const form = new FormData();
+      list.forEach((file) => form.append("files", file));
+      setStatus("上传图片中...");
+      const res = await fetch(apiAttachmentUploadUrl, { method: "POST", body: form });
+      const payload = await res.json();
+      if (!res.ok || payload.ok === false) {
+        throw new Error((payload && payload.error) || `HTTP ${res.status}`);
+      }
+      state.pendingAttachments.push(...(payload.items || []));
+      renderPendingAttachments();
+      setStatus("");
+    }
+
+    async function fetchJson(url) {
+      const res = await fetch(url, { cache: "no-store" });
+      const payload = await res.json();
+      if (!res.ok || payload.ok === false) {
+        throw new Error((payload && payload.error) || `HTTP ${res.status}`);
+      }
+      return payload;
+    }
+
+    async function pollTaskResult(messageItem, jobId) {
+      const maxRounds = 120;
+      for (let round = 0; round < maxRounds; round += 1) {
+        const [jobPayload, stepsPayload] = await Promise.all([
+          fetchJson(`${apiTaskBaseUrl}/${encodeURIComponent(jobId)}`),
+          fetchJson(`${apiTaskBaseUrl}/${encodeURIComponent(jobId)}/steps`),
+        ]);
+        const job = jobPayload.job || {};
+        const steps = stepsPayload.items || [];
+        messageItem.payload.task_state = { job, steps };
+        renderMessages();
+        if (job.status === "succeeded") {
+          const resultPayload = await fetchJson(`${apiTaskBaseUrl}/${encodeURIComponent(jobId)}/result`);
+          const results = resultPayload.results || {};
+          messageItem.body = `任务执行完成：${messageItem.payload.skill_name || job.task_type || "skill"}`;
+          messageItem.payload.task_result = {
+            final_output: results.final_output || null,
+            render_payload: results.render_payload || null,
+          };
+          renderMessages();
+          return;
+        }
+        if (job.status === "failed") {
+          messageItem.body = `任务执行失败：${job.error_message || "未知错误"}`;
+          renderMessages();
+          return;
+        }
+        await new Promise((resolve) => window.setTimeout(resolve, 2000));
+      }
+      messageItem.body = "任务仍在运行中，请稍后查看任务详情。";
+      renderMessages();
+    }
+
+    function toCatalogItems(items, kind) {
+      if (!Array.isArray(items)) return [];
+      if (kind === "skills") return items.map((item) => String(item.skill_name || "").trim()).filter(Boolean);
+      if (kind === "tools") return items.map((item) => String(item.tool_name || "").trim()).filter(Boolean);
+      if (kind === "agents") return items.map((item) => String(item.agent_name || "").trim()).filter(Boolean);
+      if (kind === "applications") return items.map((item) => String(item.application_name || "").trim()).filter(Boolean);
+      return [];
+    }
+
+    async function fetchCatalog(url, kind) {
+      try {
+        const res = await fetch(url, { cache: "no-store" });
+        const payload = await res.json();
+        if (!res.ok || payload.ok === false) return;
+        state.catalogs[kind] = toCatalogItems(payload.items || [], kind);
+      } catch (_err) {
+        state.catalogs[kind] = [];
+      }
+    }
+
+    async function preloadCatalogs() {
+      await Promise.all([
+        fetchCatalog(apiSkillCatalogUrl, "skills"),
+        fetchCatalog(apiToolCatalogUrl, "tools"),
+        fetchCatalog(apiAgentCatalogUrl, "agents"),
+        fetchCatalog(apiApplicationCatalogUrl, "applications"),
+      ]);
+    }
+
+    function hydrateMessagesFromTurns(turns) {
+      const items = [];
+      let nextId = 1;
+      (Array.isArray(turns) ? turns : []).forEach((turn) => {
+        const userText = String(turn.user_input_text || "").trim();
+        const inputPayload = turn.input_payload && typeof turn.input_payload === "object" ? turn.input_payload : {};
+        const inputAttachments = Array.isArray(inputPayload.attachments) ? inputPayload.attachments : [];
+        if (userText || inputAttachments.length) {
+          items.push({
+            id: nextId++,
+            role: "user",
+            body: userText || `已发送 ${inputAttachments.length} 个图片附件`,
+            payload: { attachments: inputAttachments },
+          });
+        }
+        const assistantText = String(turn.assistant_output_text || "").trim();
+        const outputPayload = turn.output_payload && typeof turn.output_payload === "object" ? turn.output_payload : {};
+        if (assistantText || Object.keys(outputPayload).length) {
+          items.push({
+            id: nextId++,
+            role: "assistant",
+            body: assistantText || "已处理。",
+            payload: outputPayload,
+          });
+        }
+      });
+      state.messages = items;
+      state.nextMessageId = nextId;
+      renderMessages();
+    }
+
+    async function loadThreads() {
+      const payload = await fetchJson(apiAssistantThreadsUrl);
+      state.threads = Array.isArray(payload.items) ? payload.items : [];
+      renderSessionList();
+      return state.threads;
+    }
+
+    async function loadThread(threadId) {
+      const payload = await fetchJson(`${apiAssistantThreadsUrl}/${encodeURIComponent(threadId)}`);
+      const thread = payload.thread || {};
+      const turns = payload.turns || [];
+      state.threadId = thread.thread_id || threadId;
+      state.customToolActive = Boolean(payload.custom_tool_active);
+      hydrateMessagesFromTurns(turns);
+      await loadThreads();
+    }
+
+    function buildEntitySuggestions(raw) {
+      const normalized = String(raw || "").trimStart();
+      const parts = normalized.split(/\s+/);
+      const command = String(parts[0] || "").trim();
+      const query = normalized.slice(command.length).trim();
+      const mappings = {
+        "/run-skill": { kind: "skills", label: "执行 skill", prefix: "/run-skill " },
+        "/skill": { kind: "skills", label: "查看 skill", prefix: "/skill " },
+        "/tool": { kind: "tools", label: "查看 tool", prefix: "/tool " },
+        "/agent": { kind: "agents", label: "查看 agent", prefix: "/agent " },
+        "/application": { kind: "applications", label: "切换 application", prefix: "/application " },
+        "/refine-skill": { kind: "skills", label: "优化 skill", prefix: "/refine-skill " },
+      };
+      const spec = mappings[command];
+      if (!spec) return [];
+      if (parts.length > 2 && command !== "/refine-skill") return [];
+      const needle = String(query || "").toLowerCase();
+      return (state.catalogs[spec.kind] || [])
+        .filter((name) => !needle || String(name).toLowerCase().includes(needle))
+        .slice(0, 8)
+        .map((name) => ({
+          command: `${spec.prefix}${name}${command === "/run-skill" || command === "/skill" || command === "/tool" || command === "/agent" || command === "/application" ? " " : " "}`,
+          desc: `${spec.label}: ${name}`,
+        }));
+    }
+
+    function filteredSlashItems(text) {
+      const raw = String(text || "").trimStart();
+      if (!raw.startsWith("/")) return [];
+      const entityItems = buildEntitySuggestions(raw);
+      if (entityItems.length) return entityItems;
+      return slashCatalog.filter((item) => item.command.startsWith(raw)).slice(0, 8);
+    }
+
+    function renderCommandMenu() {
+      const menu = document.getElementById("commandMenu");
+      if (!state.commandVisible || !state.slashItems.length) {
+        menu.className = "command-menu";
+        menu.innerHTML = "";
+        return;
+      }
+      menu.className = "command-menu show";
+      menu.innerHTML = state.slashItems.map((item, idx) => `
+        <div class="command-item ${idx === state.commandIndex ? "active" : ""}" data-command="${escapeHtml(item.command)}">
+          <div class="cmd">${escapeHtml(item.command)}</div>
+          <div class="desc">${escapeHtml(item.desc)}</div>
+        </div>
+      `).join("");
+      menu.querySelectorAll("[data-command]").forEach((node) => {
+        node.addEventListener("mousedown", (event) => {
+          event.preventDefault();
+          applyCommand(node.getAttribute("data-command") || "");
+        });
+      });
+    }
+
+    function updateSlashMenu() {
+      const text = document.getElementById("inputBox").value || "";
+      state.slashItems = filteredSlashItems(text);
+      state.commandIndex = 0;
+      state.commandVisible = text.trimStart().startsWith("/") && state.slashItems.length > 0;
+      renderCommandMenu();
+    }
+
+    function applyCommand(command) {
+      const input = document.getElementById("inputBox");
+      input.value = command;
+      input.focus();
+      state.commandVisible = false;
+      renderCommandMenu();
+    }
+
+    async function send() {
+      const input = document.getElementById("inputBox");
+      const text = String(input.value || "").trim();
+      const attachments = state.pendingAttachments.slice();
+      const attachmentIds = attachments.map((item) => item.attachment_id).filter(Boolean);
+      if (!text && !attachments.length) return;
+      addMessage("user", text || `已发送 ${attachments.length} 个图片附件`, { attachments });
+      input.value = "";
+      state.pendingAttachments = [];
+      renderPendingAttachments();
+      state.commandVisible = false;
+      renderCommandMenu();
+      setStatus("");
+      const useStream = shouldUseCustomToolStream(text, attachmentIds);
+      const assistantMessage = addMessage("assistant", "", useStream ? {
+        agent_run: {
+          status: "running",
+          title: "优小智正在处理",
+          summary: "正在启动智能体",
+          artifacts: [],
+          process: [],
+        },
+      } : buildPendingAssistantPayload());
+      const placeholderTimer = useStream ? null : startAssistantPlaceholderProgress(assistantMessage);
+      try {
+        if (useStream) {
+          await startCustomToolStream(text, assistantMessage);
+          loadThreads().catch(() => null);
+          setStatus("");
+          return;
+        }
+        const payload = await dispatchText(text, attachmentIds);
+        if (payload.thread_id) state.threadId = payload.thread_id;
+        if (payload.application_context) applyApplicationContext(payload.application_context);
+        const patch = payload.thread_context_patch;
+        state.customToolActive = Boolean(patch && patch.custom_tool_state);
+        stopAssistantPlaceholderProgress(placeholderTimer);
+        updateMessage(assistantMessage, {
+          body: payload.message || "已处理。",
+          payload,
+        });
+        loadThreads().catch(() => null);
+        const jobId = String(((payload.job || {}).job_id) || "").trim();
+        if (payload.mode === "run_skill_submitted" && jobId) {
+          pollTaskResult(assistantMessage, jobId).catch((err) => {
+            assistantMessage.body = `任务结果同步失败：${String(err.message || err)}`;
+            renderMessages();
+          });
+        }
+        setStatus("");
+      } catch (err) {
+        stopAssistantPlaceholderProgress(placeholderTimer);
+        if (useStream) {
+          applyAgentStreamEvent(assistantMessage, {
+            event: "error",
+            message: String(err.message || err),
+          });
+        } else {
+          updateMessage(assistantMessage, {
+            body: `处理失败：${String(err.message || err)}`,
+            payload: {},
+          });
+        }
+        setStatus(String(err.message || err));
+      }
+    }
+
+    const inputBox = document.getElementById("inputBox");
+    const fileInput = document.getElementById("fileInput");
+    const attachBtn = document.getElementById("attachBtn");
+    document.getElementById("sendBtn").addEventListener("click", send);
+    document.getElementById("newThreadBtn").addEventListener("click", async () => {
+      try {
+        await fetch(withScriptRoot("/api/assistant/thread/reset"), { method: "POST" });
+      } catch (_err) {
+      }
+      state.messages = [];
+      state.threadId = null;
+      state.pendingAttachments = [];
+      renderPendingAttachments();
+      renderMessages();
+      addMessage("assistant", state.assistantIntro || "可以直接输入自然语言问题。");
+      loadThreads().catch(() => null);
+    });
+    attachBtn.addEventListener("click", () => fileInput.click());
+    fileInput.addEventListener("change", async () => {
+      try {
+        await uploadFiles(fileInput.files);
+      } catch (err) {
+        setStatus(String(err.message || err));
+      } finally {
+        fileInput.value = "";
+      }
+    });
+    document.getElementById("clearBtn").addEventListener("click", async () => {
+      try {
+        await fetch(withScriptRoot("/api/assistant/thread/reset"), { method: "POST" });
+      } catch (_err) {
+        // ignore reset transport failure and still clear local state
+      }
+      state.messages = [];
+      state.threadId = null;
+      state.pendingAttachments = [];
+      renderPendingAttachments();
+      renderMessages();
+      setStatus("");
+      loadThreads().catch(() => null);
+    });
+    document.addEventListener("click", (event) => {
+      const menu = document.getElementById("contextMenu");
+      if (!menu.contains(event.target)) {
+        hideContextMenu();
+      }
+    });
+    document.getElementById("messages").addEventListener("scroll", hideContextMenu);
+    window.addEventListener("resize", hideContextMenu);
+    inputBox.addEventListener("input", updateSlashMenu);
+    inputBox.addEventListener("paste", async (event) => {
+      const items = Array.from(event.clipboardData?.items || []);
+      const files = items
+        .filter((item) => /^image\//i.test(String(item.type || "")))
+        .map((item) => item.getAsFile())
+        .filter(Boolean);
+      if (!files.length) return;
+      event.preventDefault();
+      try {
+        await uploadFiles(files);
+      } catch (err) {
+        setStatus(String(err.message || err));
+      }
+    });
+    inputBox.addEventListener("keydown", (event) => {
+      if ((event.metaKey || event.ctrlKey) && event.key === "Enter") {
+        event.preventDefault();
+        send();
+        return;
+      }
+      if (!state.commandVisible || !state.slashItems.length) return;
+      if (event.key === "ArrowDown") {
+        event.preventDefault();
+        state.commandIndex = (state.commandIndex + 1) % state.slashItems.length;
+        renderCommandMenu();
+      } else if (event.key === "ArrowUp") {
+        event.preventDefault();
+        state.commandIndex = (state.commandIndex - 1 + state.slashItems.length) % state.slashItems.length;
+        renderCommandMenu();
+      } else if (event.key === "Enter" && !event.shiftKey) {
+        event.preventDefault();
+        applyCommand(state.slashItems[state.commandIndex]?.command || "");
+      } else if (event.key === "Escape") {
+        state.commandVisible = false;
+        renderCommandMenu();
+      }
+    });
+
+    applyApplicationContext({
+      application_name: state.applicationName,
+      display_name: state.applicationDisplayName,
+      chat_placeholder: state.chatPlaceholder,
+      assistant_intro: state.assistantIntro,
+      default_agent: state.defaultAgent,
+    });
+    if (state.threadId) {
+      loadThread(state.threadId).catch(() => {
+        state.messages = [];
+        addMessage("assistant", state.assistantIntro || "可以直接输入自然语言问题。");
+        loadThreads().catch(() => null);
+      });
+    } else {
+      addMessage("assistant", state.assistantIntro || "可以直接输入自然语言问题。");
+      loadThreads().catch(() => null);
+    }
+    renderPendingAttachments();
+    preloadCatalogs().catch(() => null);
+  </script>
+</body>
+</html>

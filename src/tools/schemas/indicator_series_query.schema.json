@@ -1,0 +1,190 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "indicator_series_query.schema.json",
+  "title": "Indicator Series Query Output",
+  "type": "object",
+  "required": [
+    "tool",
+    "ok",
+    "data",
+    "error"
+  ],
+  "properties": {
+    "data": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "calc_mode",
+          "indicator_name",
+          "indicator_value",
+          "is_finalized",
+          "measure_name",
+          "minute_index",
+          "snapshot_time",
+          "source_summary",
+          "code",
+          "name",
+          "subject_type",
+          "trade_date",
+          "unit",
+          "window_size"
+        ],
+        "properties": {
+          "calc_mode": {
+            "description": "",
+            "type": "string"
+          },
+          "indicator_name": {
+            "description": "",
+            "type": "string"
+          },
+          "indicator_value": {
+            "description": "",
+            "type": "string"
+          },
+          "is_finalized": {
+            "description": "",
+            "type": "boolean"
+          },
+          "measure_name": {
+            "description": "",
+            "type": "string"
+          },
+          "minute_index": {
+            "description": "",
+            "type": "string"
+          },
+          "snapshot_time": {
+            "description": "",
+            "type": "string"
+          },
+          "source_summary": {
+            "description": "",
+            "type": "string"
+          },
+          "code": {
+            "description": "",
+            "type": "string"
+          },
+          "name": {
+            "description": "",
+            "type": "string"
+          },
+          "subject_type": {
+            "description": "",
+            "type": "string"
+          },
+          "trade_date": {
+            "description": "",
+            "type": "string"
+          },
+          "unit": {
+            "description": "",
+            "type": "string"
+          },
+          "window_size": {
+            "description": "",
+            "type": "integer"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "error": {
+      "type": "string"
+    },
+    "meta": {
+      "additionalProperties": false,
+      "properties": {
+        "indicator_ids": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "indicator_name": {
+          "type": "string"
+        },
+        "indicator_names": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "range_days": {
+          "type": "integer"
+        },
+        "returned_points": {
+          "type": "integer"
+        },
+        "code": {
+          "type": "string"
+        },
+        "subject_codes": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "name": {
+          "type": "string"
+        },
+        "subject_names": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "subject_type": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "indicator_name",
+        "indicator_names",
+        "indicator_ids",
+        "subject_type",
+        "code",
+        "name",
+        "subject_codes",
+        "subject_names",
+        "range_days",
+        "returned_points"
+      ],
+      "type": "object"
+    },
+    "ok": {
+      "type": "boolean"
+    },
+    "series_map": {
+      "additionalProperties": {
+        "items": {
+          "additionalProperties": false,
+          "properties": {
+            "trade_date": {
+              "type": "string"
+            },
+            "value": {
+              "type": [
+                "number",
+                "null"
+              ]
+            }
+          },
+          "required": [
+            "trade_date",
+            "value"
+          ],
+          "type": "object"
+        },
+        "type": "array"
+      },
+      "type": "object"
+    },
+    "tool": {
+      "const": "indicator_series_query"
+    }
+  },
+  "additionalProperties": true
+}

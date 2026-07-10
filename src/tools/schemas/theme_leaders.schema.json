@@ -1,0 +1,60 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "theme_leaders.schema.json",
+  "title": "Theme Leaders Tool Output",
+  "type": "object",
+  "required": [
+    "tool",
+    "ok",
+    "data",
+    "error"
+  ],
+  "properties": {
+    "data": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "realtime_pct",
+          "code",
+          "name",
+          "theme_name",
+          "week_pct"
+        ],
+        "properties": {
+          "realtime_pct": {
+            "description": "实时/当天涨幅",
+            "type": "string"
+          },
+          "code": {
+            "description": "龙头股代码",
+            "type": "string"
+          },
+          "name": {
+            "description": "龙头股名称",
+            "type": "string"
+          },
+          "theme_name": {
+            "description": "所属板块或者概念",
+            "type": "string"
+          },
+          "week_pct": {
+            "description": "一周涨幅",
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "error": {
+      "type": "string"
+    },
+    "ok": {
+      "type": "boolean"
+    },
+    "tool": {
+      "const": "theme_leaders"
+    }
+  },
+  "additionalProperties": true
+}

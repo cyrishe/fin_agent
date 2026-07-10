@@ -1,0 +1,65 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "market_history_amount.schema.json",
+  "title": "市场整体资金 Output",
+  "type": "object",
+  "required": [
+    "tool",
+    "ok",
+    "data",
+    "error"
+  ],
+  "properties": {
+    "data": {
+      "type": "object",
+      "required": [
+        "days",
+        "history",
+        "market"
+      ],
+      "properties": {
+        "days": {
+          "description": "最近交易日数量。",
+          "type": "integer"
+        },
+        "history": {
+          "description": "历史总成交额列表。",
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "date": {
+                "description": "日期。",
+                "type": "string"
+              },
+              "total_amount": {
+                "description": "总成交额。",
+                "type": "number"
+              }
+            },
+            "required": [
+              "date",
+              "total_amount"
+            ],
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "market": {
+          "description": "市场范围。",
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "error": {
+      "type": "string"
+    },
+    "ok": {
+      "type": "boolean"
+    },
+    "tool": {
+      "const": "market_history_amount"
+    }
+  },
+  "additionalProperties": true
+}

@@ -1,0 +1,1111 @@
+{
+  "version": "0.1",
+  "issue": "issues/001_dbinfo_for_quant_screening.md",
+  "status_enum": [
+    "verified",
+    "candidate",
+    "unavailable",
+    "unverified"
+  ],
+  "generated_at": "2026-05-29",
+  "validation_state": {
+    "overall_status": "unverified",
+    "reason": "Current implementation environment has no live read-only database credentials or network access. Table and field notes are seeded from issue requirements plus in-repo DDL/code evidence and must be revalidated with scripts/inspect_quant_dbinfo.py --execute before provider use.",
+    "inspector": "scripts/inspect_quant_dbinfo.py",
+    "dry_run_checked": true
+  },
+  "databases": [
+    {
+      "database": "kingdomai",
+      "tables": [
+        {
+          "database": "kingdomai",
+          "table": "aiia_stock_realtime_minute_snapshot",
+          "business_name": "A股全市场分钟级实时行情快照",
+          "status": "unverified",
+          "evidence": [
+            "docs/sql/create_aiia_stock_realtime_minute_snapshot.sql",
+            "src/market_realtime_minute_snapshot.py",
+            "src/tools/market_snapshot_tools.py"
+          ],
+          "grain": "stk_code + trade_date + minute_index",
+          "primary_key": [
+            "trade_date",
+            "minute_index",
+            "stk_code"
+          ],
+          "indexes": [
+            [
+              "trade_date",
+              "minute_index"
+            ],
+            [
+              "stk_code",
+              "trade_date",
+              "minute_index"
+            ],
+            [
+              "snapshot_time"
+            ]
+          ],
+          "time_fields": [
+            "trade_date",
+            "minute_index",
+            "snapshot_time",
+            "snapshot_slot"
+          ],
+          "entity_fields": [
+            "stk_code",
+            "stk_name"
+          ],
+          "core_fields": [
+            "latest_price",
+            "open_price",
+            "high_price",
+            "low_price",
+            "preclose_price",
+            "chg_value",
+            "chg_ratio",
+            "amount",
+            "volume"
+          ],
+          "fields": [
+            {
+              "name": "trade_date",
+              "meaning": "交易日",
+              "role": "time"
+            },
+            {
+              "name": "minute_index",
+              "meaning": "分钟索引 HH*60+MM",
+              "role": "time"
+            },
+            {
+              "name": "stk_code",
+              "meaning": "6位证券代码",
+              "role": "entity"
+            },
+            {
+              "name": "amount",
+              "meaning": "截至该分钟的成交额",
+              "role": "metric"
+            }
+          ],
+          "data_role": "intraday_market_snapshot",
+          "provider_eligibility": "eligible_after_verification",
+          "recommended_use": [
+            "盘中涨跌幅、成交额、成交量、涨跌停家数和市场宽度筛选",
+            "与日线表联动计算盘中放量或缩量"
+          ],
+          "join_keys": [
+            {
+              "to_table": "kcrp_stock_price",
+              "keys": [
+                "stk_code",
+                "trade_date"
+              ],
+              "caveat": "本表 stk_code 为6位代码，日线表代码可能为 600000.SH；join 前需要统一代码格式。"
+            }
+          ],
+          "caveats": [
+            "当前字段结构来自本仓库 DDL，未在目标库现场验证。",
+            "chg_ratio 的单位需现场确认是百分数还是比例值；代码注释称接口原始比例值。",
+            "amount 可能是当日累计成交额，不是单分钟增量，做分钟差分前需验证。"
+          ],
+          "sample_queries": [
+            {
+              "name": "latest_slot",
+              "sql": "SELECT trade_date, minute_index, snapshot_time FROM kingdomai.aiia_stock_realtime_minute_snapshot ORDER BY trade_date DESC, minute_index DESC LIMIT 1"
+            },
+            {
+              "name": "sample_rows",
+              "sql": "SELECT trade_date, minute_index, stk_code, stk_name, latest_price, amount, volume FROM kingdomai.aiia_stock_realtime_minute_snapshot LIMIT 3"
+            }
+          ],
+          "validation_queries": [
+            "SELECT column_name, column_type, column_key, column_comment FROM information_schema.columns WHERE table_schema = 'kingdomai' AND table_name = 'aiia_stock_realtime_minute_snapshot' ORDER BY ordinal_position",
+            "SELECT COUNT(*) AS row_count FROM kingdomai.aiia_stock_realtime_minute_snapshot"
+          ],
+          "validation_result": {
+            "status": "not_run",
+            "note": "Awaiting live DB inspection."
+          },
+          "sample_rows_shape": "not_run"
+        },
+        {
+          "database": "kingdomai",
+          "table": "kcrp_stock_price",
+          "business_name": "日K线与日级量价",
+          "status": "unverified",
+          "evidence": [
+            "src/utils/mysql_utils.py",
+            "src/services/stock_momentum_service.py",
+            "src/tools/market_overview_tool.py"
+          ],
+          "grain": "stk_code + trade_date",
+          "primary_key": [],
+          "indexes": [],
+          "time_fields": [
+            "trade_date"
+          ],
+          "entity_fields": [
+            "stk_code"
+          ],
+          "core_fields": [
+            "open",
+            "close",
+            "adjclose",
+            "high",
+            "low",
+            "volume",
+            "amount",
+            "turn_ratio"
+          ],
+          "fields": [
+            {
+              "name": "stk_code",
+              "meaning": "证券代码，代码中已见 600000.SH 形态使用",
+              "role": "entity"
+            },
+            {
+              "name": "trade_date",
+              "meaning": "交易日期",
+              "role": "time"
+            },
+            {
+              "name": "adjclose",
+              "meaning": "复权收盘价候选字段；实际复权口径待验证",
+              "role": "metric"
+            }
+          ],
+          "data_role": "daily_price_volume",
+          "provider_eligibility": "eligible_after_verification",
+          "recommended_use": [
+            "日级涨跌幅、均线、动量、成交额、成交量筛选",
+            "作为资金流、估值、财务指标的交易日基准表"
+          ],
+          "join_keys": [
+            {
+              "to_table": "kcrp_stock_moneyflow",
+              "keys": [
+                "stk_code",
+                "trade_date"
+              ],
+              "caveat": "资金流表时间字段和代码格式待现场确认。"
+            },
+            {
+              "to_table": "kcrp_stock_baseinfo",
+              "keys": [
+                "stk_code"
+              ],
+              "caveat": "baseinfo 是代码中既有依赖，但不属于本 issue 明确目标表；仅作为 join 候选。"
+            }
+          ],
+          "caveats": [
+            "open/high/low/close 与 adjclose 的复权口径必须实测后再用于因子。",
+            "指数、ETF、个股是否混在同表中需通过 baseinfo 或代码规则过滤。"
+          ],
+          "sample_queries": [
+            {
+              "name": "latest_trade_dates",
+              "sql": "SELECT trade_date, COUNT(*) AS row_count FROM kingdomai.kcrp_stock_price GROUP BY trade_date ORDER BY trade_date DESC LIMIT 5"
+            },
+            {
+              "name": "sample_daily_rows",
+              "sql": "SELECT stk_code, trade_date, open, close, high, low, volume, amount FROM kingdomai.kcrp_stock_price ORDER BY trade_date DESC LIMIT 3"
+            }
+          ],
+          "validation_queries": [
+            "SELECT column_name, column_type, column_key, column_comment FROM information_schema.columns WHERE table_schema = 'kingdomai' AND table_name = 'kcrp_stock_price' ORDER BY ordinal_position",
+            "SELECT MIN(trade_date) AS min_trade_date, MAX(trade_date) AS max_trade_date, COUNT(*) AS row_count FROM kingdomai.kcrp_stock_price"
+          ],
+          "validation_result": {
+            "status": "not_run",
+            "note": "Awaiting live DB inspection."
+          },
+          "sample_rows_shape": "not_run"
+        },
+        {
+          "database": "kingdomai",
+          "table": "kcrp_stock_moneyflow",
+          "business_name": "日级或周期资金流向",
+          "status": "unverified",
+          "evidence": [
+            "issues/001_dbinfo_for_quant_screening.md"
+          ],
+          "grain": "待验证，预期为 stk_code + trade_date",
+          "primary_key": [],
+          "indexes": [],
+          "time_fields": [
+            "trade_date"
+          ],
+          "entity_fields": [
+            "stk_code"
+          ],
+          "core_fields": [
+            "main_net_inflow",
+            "large_net_inflow",
+            "medium_net_inflow",
+            "small_net_inflow"
+          ],
+          "fields": [],
+          "data_role": "capital_flow",
+          "provider_eligibility": "eligible_after_verification",
+          "recommended_use": [
+            "主力/大单/中单/小单资金净流入筛选",
+            "与日线表组合判断价跌资金流入、放量资金承接"
+          ],
+          "join_keys": [
+            {
+              "to_table": "kcrp_stock_price",
+              "keys": [
+                "stk_code",
+                "trade_date"
+              ],
+              "caveat": "字段名和粒度未验证。"
+            }
+          ],
+          "caveats": [
+            "资金流方向、单位和是否复权无关，但需确认正负号口径。",
+            "不能默认与分钟快照同粒度。"
+          ],
+          "sample_queries": [
+            {
+              "name": "sample_moneyflow_rows",
+              "sql": "SELECT * FROM kingdomai.kcrp_stock_moneyflow LIMIT 3"
+            }
+          ],
+          "validation_queries": [
+            "SELECT column_name, column_type, column_key, column_comment FROM information_schema.columns WHERE table_schema = 'kingdomai' AND table_name = 'kcrp_stock_moneyflow' ORDER BY ordinal_position"
+          ],
+          "validation_result": {
+            "status": "not_run",
+            "note": "Awaiting live DB inspection."
+          },
+          "sample_rows_shape": "not_run"
+        },
+        {
+          "database": "kingdomai",
+          "table": "kcrp_stock_pricevaluate",
+          "business_name": "股票估值与量价扩展指标",
+          "status": "unverified",
+          "evidence": [
+            "issues/001_dbinfo_for_quant_screening.md"
+          ],
+          "grain": "待验证，预期为 stk_code + trade_date 或 stk_code + report_date",
+          "primary_key": [],
+          "indexes": [],
+          "time_fields": [
+            "trade_date"
+          ],
+          "entity_fields": [
+            "stk_code"
+          ],
+          "core_fields": [
+            "pe",
+            "pb",
+            "market_cap",
+            "turnover_rate"
+          ],
+          "fields": [],
+          "data_role": "valuation",
+          "provider_eligibility": "eligible_after_verification",
+          "recommended_use": [
+            "低估值、高换手、总市值过滤",
+            "与日线和资金流组合做量价估值筛选"
+          ],
+          "join_keys": [
+            {
+              "to_table": "kcrp_stock_price",
+              "keys": [
+                "stk_code",
+                "trade_date"
+              ],
+              "caveat": "是否存在 trade_date 待验证。"
+            }
+          ],
+          "caveats": [
+            "估值指标单位、是否 TTM、是否使用最新财报需现场确认。",
+            "若时间字段是报告期，不可直接当交易日 join。"
+          ],
+          "sample_queries": [
+            {
+              "name": "sample_valuation_rows",
+              "sql": "SELECT * FROM kingdomai.kcrp_stock_pricevaluate LIMIT 3"
+            }
+          ],
+          "validation_queries": [
+            "SELECT column_name, column_type, column_key, column_comment FROM information_schema.columns WHERE table_schema = 'kingdomai' AND table_name = 'kcrp_stock_pricevaluate' ORDER BY ordinal_position"
+          ],
+          "validation_result": {
+            "status": "not_run",
+            "note": "Awaiting live DB inspection."
+          },
+          "sample_rows_shape": "not_run"
+        },
+        {
+          "database": "kingdomai",
+          "table": "kcrp_stock_cashflow",
+          "business_name": "现金流量表",
+          "status": "unverified",
+          "evidence": [
+            "issues/001_dbinfo_for_quant_screening.md"
+          ],
+          "grain": "待验证，预期为 stk_code + report_period",
+          "primary_key": [],
+          "indexes": [],
+          "time_fields": [
+            "report_date",
+            "end_date"
+          ],
+          "entity_fields": [
+            "stk_code"
+          ],
+          "core_fields": [
+            "operating_cashflow",
+            "investing_cashflow",
+            "financing_cashflow",
+            "net_cashflow"
+          ],
+          "fields": [],
+          "data_role": "financial_statement_cashflow",
+          "provider_eligibility": "auxiliary_after_verification",
+          "recommended_use": [
+            "现金流质量、经营现金流改善、财务解释展示",
+            "与财务指标表按报告期组合"
+          ],
+          "join_keys": [
+            {
+              "to_table": "kcrp_stock_financial_indicator",
+              "keys": [
+                "stk_code",
+                "report_period"
+              ],
+              "caveat": "报告期字段名待验证。"
+            }
+          ],
+          "caveats": [
+            "财报报告期不能直接等同交易日。",
+            "公告发布时间和报告期不同，回测时需避免未来函数。"
+          ],
+          "sample_queries": [
+            {
+              "name": "sample_cashflow_rows",
+              "sql": "SELECT * FROM kingdomai.kcrp_stock_cashflow LIMIT 3"
+            }
+          ],
+          "validation_queries": [
+            "SELECT column_name, column_type, column_key, column_comment FROM information_schema.columns WHERE table_schema = 'kingdomai' AND table_name = 'kcrp_stock_cashflow' ORDER BY ordinal_position"
+          ],
+          "validation_result": {
+            "status": "not_run",
+            "note": "Awaiting live DB inspection."
+          },
+          "sample_rows_shape": "not_run"
+        },
+        {
+          "database": "kingdomai",
+          "table": "kcrp_stock_financial_indicator",
+          "business_name": "财务指标表",
+          "status": "unverified",
+          "evidence": [
+            "issues/001_dbinfo_for_quant_screening.md"
+          ],
+          "grain": "待验证，预期为 stk_code + report_period",
+          "primary_key": [],
+          "indexes": [],
+          "time_fields": [
+            "report_date",
+            "end_date"
+          ],
+          "entity_fields": [
+            "stk_code"
+          ],
+          "core_fields": [
+            "roe",
+            "gross_margin",
+            "net_profit_margin",
+            "revenue_growth",
+            "profit_growth"
+          ],
+          "fields": [],
+          "data_role": "financial_factor",
+          "provider_eligibility": "auxiliary_after_verification",
+          "recommended_use": [
+            "ROE、毛利率、净利率、营收利润增长等基本面筛选",
+            "与估值表组合做质量估值类因子"
+          ],
+          "join_keys": [
+            {
+              "to_table": "kcrp_stock_price",
+              "keys": [
+                "stk_code"
+              ],
+              "caveat": "只能按可得报告期向后生效，不能用报告期直接 join 交易日。"
+            }
+          ],
+          "caveats": [
+            "报告期、公告日期、数据发布日期三者需区分。",
+            "做历史选股时必须有可得日期，否则只能用于当前解释展示。"
+          ],
+          "sample_queries": [
+            {
+              "name": "sample_financial_indicator_rows",
+              "sql": "SELECT * FROM kingdomai.kcrp_stock_financial_indicator LIMIT 3"
+            }
+          ],
+          "validation_queries": [
+            "SELECT column_name, column_type, column_key, column_comment FROM information_schema.columns WHERE table_schema = 'kingdomai' AND table_name = 'kcrp_stock_financial_indicator' ORDER BY ordinal_position"
+          ],
+          "validation_result": {
+            "status": "not_run",
+            "note": "Awaiting live DB inspection."
+          },
+          "sample_rows_shape": "not_run"
+        },
+        {
+          "database": "kingdomai",
+          "table": "kcrp_yp_plate",
+          "business_name": "板块/概念基础表",
+          "status": "candidate",
+          "evidence": [
+            "src/utils/mysql_utils.py get_company_concept_profile"
+          ],
+          "grain": "plate_code",
+          "primary_key": [],
+          "indexes": [],
+          "time_fields": [
+            "begin_date",
+            "end_date"
+          ],
+          "entity_fields": [
+            "plate_code",
+            "plate_name"
+          ],
+          "core_fields": [
+            "plate_code",
+            "plate_name",
+            "begin_date",
+            "end_date"
+          ],
+          "fields": [],
+          "data_role": "plate_dimension",
+          "provider_eligibility": "eligible_after_verification",
+          "recommended_use": [
+            "股票所属板块/概念解释",
+            "概念筛选的板块名称维表"
+          ],
+          "join_keys": [
+            {
+              "to_table": "kcrp_yp_plate_member",
+              "keys": [
+                "plate_code"
+              ],
+              "caveat": "候选表，需现场验证存在性和字段。"
+            }
+          ],
+          "caveats": [
+            "这是代码中发现的 *plate* 候选表，不是 issue 显式给出的已验证表名。",
+            "需确认 plate_type 或其他字段是否区分行业、概念、地域、指数成分。"
+          ],
+          "sample_queries": [
+            {
+              "name": "sample_plate_rows",
+              "sql": "SELECT * FROM kingdomai.kcrp_yp_plate LIMIT 3"
+            }
+          ],
+          "validation_queries": [
+            "SELECT table_name, table_comment FROM information_schema.tables WHERE table_schema = 'kingdomai' AND table_name LIKE '%plate%' ORDER BY table_name"
+          ],
+          "validation_result": {
+            "status": "not_run",
+            "note": "Candidate from code path only."
+          },
+          "sample_rows_shape": "not_run"
+        },
+        {
+          "database": "kingdomai",
+          "table": "kcrp_yp_plate_member",
+          "business_name": "股票-板块/概念成分关系表",
+          "status": "candidate",
+          "evidence": [
+            "src/utils/mysql_utils.py get_company_concept_profile"
+          ],
+          "grain": "stk_code + plate_code + effective date range",
+          "primary_key": [],
+          "indexes": [],
+          "time_fields": [
+            "begin_date",
+            "end_date"
+          ],
+          "entity_fields": [
+            "stk_code",
+            "plate_code"
+          ],
+          "core_fields": [
+            "stk_code",
+            "plate_code"
+          ],
+          "fields": [],
+          "data_role": "stock_plate_membership",
+          "provider_eligibility": "eligible_after_verification",
+          "recommended_use": [
+            "股票所属概念、板块、行业筛选",
+            "消息面概念与股票池映射"
+          ],
+          "join_keys": [
+            {
+              "to_table": "kcrp_stock_price",
+              "keys": [
+                "stk_code"
+              ],
+              "caveat": "代码格式和有效期需验证。"
+            },
+            {
+              "to_table": "kcrp_yp_plate",
+              "keys": [
+                "plate_code"
+              ],
+              "caveat": "需确认成分有效期字段是否在本表或板块表。"
+            }
+          ],
+          "caveats": [
+            "板块关系是区间有效，不应默认永久有效。",
+            "板块、概念、指数成分可能混在一套表中，需要 plate_type 或名称过滤。"
+          ],
+          "sample_queries": [
+            {
+              "name": "sample_plate_member_rows",
+              "sql": "SELECT * FROM kingdomai.kcrp_yp_plate_member LIMIT 3"
+            }
+          ],
+          "validation_queries": [
+            "SELECT column_name, column_type, column_key, column_comment FROM information_schema.columns WHERE table_schema = 'kingdomai' AND table_name = 'kcrp_yp_plate_member' ORDER BY ordinal_position"
+          ],
+          "validation_result": {
+            "status": "not_run",
+            "note": "Candidate from code path only."
+          },
+          "sample_rows_shape": "not_run"
+        },
+        {
+          "database": "kingdomai",
+          "table": "kcrp_yp_plate_price",
+          "business_name": "板块/概念日级行情或成交额",
+          "status": "candidate",
+          "evidence": [
+            "src/utils/mysql_utils.py get_latest_plate_trade_date"
+          ],
+          "grain": "plate_code + trade_date",
+          "primary_key": [],
+          "indexes": [],
+          "time_fields": [
+            "trade_date"
+          ],
+          "entity_fields": [
+            "plate_code"
+          ],
+          "core_fields": [
+            "amount"
+          ],
+          "fields": [],
+          "data_role": "plate_market_data",
+          "provider_eligibility": "eligible_after_verification",
+          "recommended_use": [
+            "板块热度、成交额排序、概念强度辅助筛选",
+            "股票概念关系排序时按板块成交额取代表概念"
+          ],
+          "join_keys": [
+            {
+              "to_table": "kcrp_yp_plate",
+              "keys": [
+                "plate_code"
+              ],
+              "caveat": "候选 join，需现场验证。"
+            }
+          ],
+          "caveats": [
+            "只适合作为板块层指标，不可与个股成交额重复统计。",
+            "amount 单位待验证。"
+          ],
+          "sample_queries": [
+            {
+              "name": "sample_plate_price_rows",
+              "sql": "SELECT * FROM kingdomai.kcrp_yp_plate_price ORDER BY trade_date DESC LIMIT 3"
+            }
+          ],
+          "validation_queries": [
+            "SELECT column_name, column_type, column_key, column_comment FROM information_schema.columns WHERE table_schema = 'kingdomai' AND table_name = 'kcrp_yp_plate_price' ORDER BY ordinal_position"
+          ],
+          "validation_result": {
+            "status": "not_run",
+            "note": "Candidate from code path only."
+          },
+          "sample_rows_shape": "not_run"
+        }
+      ]
+    },
+    {
+      "database": "stock_agent",
+      "tables": [
+        {
+          "database": "stock_agent",
+          "table": "realtime_stock_concept_info",
+          "business_name": "股票概念实时信息表",
+          "status": "unverified",
+          "evidence": [
+            "db_bk/db_sql.sql",
+            "src/utils/mysql_utils.py"
+          ],
+          "grain": "company + concepts + trigger_date",
+          "primary_key": [
+            "id"
+          ],
+          "indexes": [
+            [
+              "company",
+              "concepts",
+              "trigger_date"
+            ],
+            [
+              "trigger_date"
+            ],
+            [
+              "trigger_date",
+              "is_ready"
+            ],
+            [
+              "company"
+            ],
+            [
+              "code"
+            ]
+          ],
+          "time_fields": [
+            "trigger_date",
+            "first_trigger_time",
+            "create_time",
+            "update_time"
+          ],
+          "entity_fields": [
+            "company",
+            "code",
+            "concepts"
+          ],
+          "core_fields": [
+            "events",
+            "trend_weekly",
+            "trend_realtime",
+            "first_trigger_price",
+            "source",
+            "is_ready"
+          ],
+          "fields": [
+            {
+              "name": "sotck_info",
+              "meaning": "股票信息 JSON/text；字段名疑似拼写错误但现有表就是该名称",
+              "role": "metadata"
+            }
+          ],
+          "data_role": "stock_concept_signal",
+          "provider_eligibility": "auxiliary_after_verification",
+          "recommended_use": [
+            "消息面/概念触发股票池",
+            "解释某股票关联概念和触发事件"
+          ],
+          "join_keys": [
+            {
+              "to_table": "kingdomai.kcrp_stock_price",
+              "keys": [
+                "code -> stk_code",
+                "trigger_date -> trade_date"
+              ],
+              "caveat": "code 是6位代码，日线表可能为带交易所后缀代码。"
+            }
+          ],
+          "caveats": [
+            "events 字段长度有限，长文本证据应优先回查 page_crawled_history 或 hotspot_trace。",
+            "concepts 字段可能含单个概念或组合文本，需验证分隔口径。"
+          ],
+          "sample_queries": [
+            {
+              "name": "latest_concept_stock_rows",
+              "sql": "SELECT company, code, concepts, events, trigger_date, first_trigger_time FROM stock_agent.realtime_stock_concept_info ORDER BY trigger_date DESC, id DESC LIMIT 3"
+            }
+          ],
+          "validation_queries": [
+            "SELECT column_name, column_type, column_key, column_comment FROM information_schema.columns WHERE table_schema = 'stock_agent' AND table_name = 'realtime_stock_concept_info' ORDER BY ordinal_position"
+          ],
+          "validation_result": {
+            "status": "not_run",
+            "note": "Awaiting live DB inspection."
+          },
+          "sample_rows_shape": "not_run"
+        },
+        {
+          "database": "stock_agent",
+          "table": "realtime_concepts",
+          "business_name": "实时概念热度表",
+          "status": "unverified",
+          "evidence": [
+            "db_bk/db_sql.sql",
+            "src/utils/mysql_utils.py"
+          ],
+          "grain": "concept + trigger_date",
+          "primary_key": [
+            "id"
+          ],
+          "indexes": [],
+          "time_fields": [
+            "trigger_date",
+            "first_trigger_time",
+            "create_time",
+            "update_time"
+          ],
+          "entity_fields": [
+            "concept"
+          ],
+          "core_fields": [
+            "concept_event",
+            "hotness",
+            "source_url"
+          ],
+          "fields": [],
+          "data_role": "concept_hotness",
+          "provider_eligibility": "auxiliary_after_verification",
+          "recommended_use": [
+            "概念热度排序",
+            "与股票概念信息联动做消息面概念筛选"
+          ],
+          "join_keys": [
+            {
+              "to_table": "realtime_stock_concept_info",
+              "keys": [
+                "concept -> concepts",
+                "trigger_date"
+              ],
+              "caveat": "concepts 字段是否严格等于 concept 待验证。"
+            }
+          ],
+          "caveats": [
+            "hotness 计算口径待验证。",
+            "source_url 可辅助回溯证据，但不等同完整新闻表。"
+          ],
+          "sample_queries": [
+            {
+              "name": "latest_concepts",
+              "sql": "SELECT concept, hotness, trigger_date, concept_event FROM stock_agent.realtime_concepts ORDER BY trigger_date DESC, hotness DESC LIMIT 5"
+            }
+          ],
+          "validation_queries": [
+            "SELECT column_name, column_type, column_key, column_comment FROM information_schema.columns WHERE table_schema = 'stock_agent' AND table_name = 'realtime_concepts' ORDER BY ordinal_position"
+          ],
+          "validation_result": {
+            "status": "not_run",
+            "note": "Awaiting live DB inspection."
+          },
+          "sample_rows_shape": "not_run"
+        },
+        {
+          "database": "stock_agent",
+          "table": "stock_concept_snapshot",
+          "business_name": "概念追踪快照表",
+          "status": "unverified",
+          "evidence": [
+            "db_bk/db_sql.sql",
+            "src/utils/mysql_utils.py"
+          ],
+          "grain": "company + code + trigger_date + snap_index",
+          "primary_key": [
+            "id"
+          ],
+          "indexes": [],
+          "time_fields": [
+            "trigger_date",
+            "first_trigger_time"
+          ],
+          "entity_fields": [
+            "company",
+            "code",
+            "concept_t1",
+            "concept_t2",
+            "std_concept"
+          ],
+          "core_fields": [
+            "events",
+            "first_trigger_price",
+            "source",
+            "snap_index"
+          ],
+          "fields": [],
+          "data_role": "concept_snapshot_history",
+          "provider_eligibility": "auxiliary_after_verification",
+          "recommended_use": [
+            "按概念和快照索引回看当日概念成分",
+            "保留概念事件和股票快照关系"
+          ],
+          "join_keys": [
+            {
+              "to_table": "realtime_stock_concept_info",
+              "keys": [
+                "company",
+                "code",
+                "trigger_date"
+              ],
+              "caveat": "snapshot 表不一定与实时表一一对应。"
+            }
+          ],
+          "caveats": [
+            "snap_index 类型为 varchar，排序前需确认是否可按数值理解。",
+            "code 字段长度为50，可能含交易所后缀或其他格式。"
+          ],
+          "sample_queries": [
+            {
+              "name": "latest_snapshot_rows",
+              "sql": "SELECT company, code, concept_t1, std_concept, trigger_date, snap_index FROM stock_agent.stock_concept_snapshot ORDER BY trigger_date DESC, snap_index DESC LIMIT 3"
+            }
+          ],
+          "validation_queries": [
+            "SELECT column_name, column_type, column_key, column_comment FROM information_schema.columns WHERE table_schema = 'stock_agent' AND table_name = 'stock_concept_snapshot' ORDER BY ordinal_position"
+          ],
+          "validation_result": {
+            "status": "not_run",
+            "note": "Awaiting live DB inspection."
+          },
+          "sample_rows_shape": "not_run"
+        },
+        {
+          "database": "stock_agent",
+          "table": "page_crawled_history",
+          "business_name": "网页/新闻抓取历史",
+          "status": "unverified",
+          "evidence": [
+            "src/utils/mysql_utils.py",
+            "src/hotspot_agent/sql/hotspot_trace_incremental_migration.sql"
+          ],
+          "grain": "url",
+          "primary_key": [
+            "id"
+          ],
+          "indexes": [
+            [
+              "url"
+            ],
+            [
+              "search_key",
+              "crawled_time"
+            ]
+          ],
+          "time_fields": [
+            "crawled_time",
+            "create_time",
+            "update_time"
+          ],
+          "entity_fields": [
+            "url",
+            "host",
+            "search_key",
+            "page_type"
+          ],
+          "core_fields": [
+            "title",
+            "content",
+            "page_type"
+          ],
+          "fields": [],
+          "data_role": "news_or_web_evidence",
+          "provider_eligibility": "auxiliary_after_verification",
+          "recommended_use": [
+            "按股票、概念或热点关键词检索近期新闻/研报/网页证据",
+            "消息面选股的文本证据来源"
+          ],
+          "join_keys": [
+            {
+              "to_table": "realtime_stock_concept_info",
+              "keys": [
+                "search_key -> company/concepts"
+              ],
+              "caveat": "search_key 是检索词，不是严格外键。"
+            }
+          ],
+          "caveats": [
+            "content 可能是清洗后的网页文本，长度被截断。",
+            "page_type 枚举含义来自代码常量：0 新闻、1 研报、2 公告、3 财报。"
+          ],
+          "sample_queries": [
+            {
+              "name": "latest_pages",
+              "sql": "SELECT url, host, search_key, title, crawled_time, page_type FROM stock_agent.page_crawled_history ORDER BY crawled_time DESC LIMIT 5"
+            }
+          ],
+          "validation_queries": [
+            "SELECT column_name, column_type, column_key, column_comment FROM information_schema.columns WHERE table_schema = 'stock_agent' AND table_name = 'page_crawled_history' ORDER BY ordinal_position"
+          ],
+          "validation_result": {
+            "status": "not_run",
+            "note": "Awaiting live DB inspection."
+          },
+          "sample_rows_shape": "not_run"
+        },
+        {
+          "database": "stock_agent",
+          "table": "url_crawled_history",
+          "business_name": "URL级抓取历史",
+          "status": "unverified",
+          "evidence": [
+            "db_bk/db_sql.sql"
+          ],
+          "grain": "url",
+          "primary_key": [
+            "id"
+          ],
+          "indexes": [
+            [
+              "url"
+            ],
+            [
+              "search_key",
+              "crawled_time"
+            ]
+          ],
+          "time_fields": [
+            "crawled_time",
+            "create_time",
+            "update_time"
+          ],
+          "entity_fields": [
+            "url",
+            "host",
+            "search_key"
+          ],
+          "core_fields": [
+            "title",
+            "content"
+          ],
+          "fields": [],
+          "data_role": "legacy_url_evidence",
+          "provider_eligibility": "auxiliary_after_verification",
+          "recommended_use": [
+            "历史 URL 去重或新闻文本候选来源"
+          ],
+          "join_keys": [
+            {
+              "to_table": "page_crawled_history",
+              "keys": [
+                "url"
+              ],
+              "caveat": "两个历史表是否并存、是否重复需现场验证。"
+            }
+          ],
+          "caveats": [
+            "与 page_crawled_history 的职责边界未确认。",
+            "若实际库无此表，应标为 unavailable，不得纳入 provider。"
+          ],
+          "sample_queries": [
+            {
+              "name": "latest_url_history",
+              "sql": "SELECT url, host, search_key, title, crawled_time FROM stock_agent.url_crawled_history ORDER BY crawled_time DESC LIMIT 5"
+            }
+          ],
+          "validation_queries": [
+            "SELECT column_name, column_type, column_key, column_comment FROM information_schema.columns WHERE table_schema = 'stock_agent' AND table_name = 'url_crawled_history' ORDER BY ordinal_position"
+          ],
+          "validation_result": {
+            "status": "not_run",
+            "note": "Awaiting live DB inspection."
+          },
+          "sample_rows_shape": "not_run"
+        }
+      ]
+    }
+  ],
+  "cross_table_checks": [
+    {
+      "name": "daily_price_to_moneyflow",
+      "status": "not_run",
+      "sql": "SELECT p.stk_code, p.trade_date, p.close FROM kingdomai.kcrp_stock_price p JOIN kingdomai.kcrp_stock_moneyflow m ON p.stk_code = m.stk_code AND p.trade_date = m.trade_date LIMIT 5",
+      "purpose": "验证股票代码和交易日可连接日线与资金流。"
+    },
+    {
+      "name": "stock_to_plate_membership",
+      "status": "not_run",
+      "sql": "SELECT pm.stk_code, p.plate_code, p.plate_name FROM kingdomai.kcrp_yp_plate_member pm JOIN kingdomai.kcrp_yp_plate p ON pm.plate_code = p.plate_code LIMIT 5",
+      "purpose": "验证股票与板块/概念关系。"
+    },
+    {
+      "name": "concept_signal_to_daily_price",
+      "status": "not_run",
+      "sql": "SELECT c.company, c.code, c.concepts, p.trade_date, p.close FROM stock_agent.realtime_stock_concept_info c JOIN kingdomai.kcrp_stock_price p ON c.code = LEFT(p.stk_code, 6) AND c.trigger_date = p.trade_date LIMIT 5",
+      "purpose": "验证消息面概念信号与日级行情能通过股票代码和触发日连接。"
+    }
+  ],
+  "natural_language_mappings": [
+    {
+      "request": "找出最近三天资金持续净流入，同时今天股价回调但没破5日线的股票",
+      "tables": [
+        "kingdomai.kcrp_stock_moneyflow",
+        "kingdomai.kcrp_stock_price"
+      ],
+      "fields": [
+        "stk_code",
+        "trade_date",
+        "close",
+        "low",
+        "main_net_inflow"
+      ],
+      "caveats": [
+        "资金流字段名和净流入口径未验证。",
+        "5日线用日线收盘价计算，今天盘中回调需另接分钟快照。"
+      ]
+    },
+    {
+      "request": "筛选低PE、ROE提升且经营现金流改善的股票",
+      "tables": [
+        "kingdomai.kcrp_stock_pricevaluate",
+        "kingdomai.kcrp_stock_financial_indicator",
+        "kingdomai.kcrp_stock_cashflow"
+      ],
+      "fields": [
+        "stk_code",
+        "report_period",
+        "pe",
+        "roe",
+        "operating_cashflow"
+      ],
+      "caveats": [
+        "财务报告期不能当交易日；需要公告日或数据可得日防止未来函数。"
+      ]
+    },
+    {
+      "request": "找出机器人概念里今天放量涨停且最近有消息催化的股票",
+      "tables": [
+        "stock_agent.realtime_stock_concept_info",
+        "stock_agent.page_crawled_history",
+        "kingdomai.aiia_stock_realtime_minute_snapshot",
+        "kingdomai.kcrp_yp_plate_member"
+      ],
+      "fields": [
+        "concepts",
+        "code",
+        "events",
+        "search_key",
+        "title",
+        "content",
+        "latest_price",
+        "preclose_price",
+        "amount"
+      ],
+      "caveats": [
+        "概念来源有 stock_agent 概念信号和 kingdomai 板块关系两条路径，需验证优先级。",
+        "涨停判断需按板块、ST、创业板/科创板/北交所规则计算。"
+      ]
+    }
+  ],
+  "known_gaps": [
+    "No live database inspection has been executed in this environment.",
+    "Exact field names for kcrp_stock_moneyflow, kcrp_stock_pricevaluate, kcrp_stock_cashflow, and kcrp_stock_financial_indicator are unknown.",
+    "Actual *plate* table list must be discovered from information_schema before being treated as confirmed.",
+    "News table scope is not fully confirmed; page_crawled_history and url_crawled_history are current candidates.",
+    "No database credentials, host names, or passwords are stored in this artifact."
+  ]
+}

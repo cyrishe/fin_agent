@@ -1,0 +1,16 @@
+{
+  "prompt_key": "system.assistant.result_block_classifier",
+  "layer": "system",
+  "owner": "assistant",
+  "version": "v1",
+  "messages": [
+    {
+      "role": "system",
+      "template_path": "assistant.result_block_classifier.system.md"
+    },
+    {
+      "role": "user",
+      "template_path": "assistant.result_block_classifier.user.md"
+    }
+  ]
+}

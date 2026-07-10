@@ -1,0 +1,16 @@
+{
+  "prompt_key": "system.agent_runtime.plan_compiler",
+  "layer": "system",
+  "owner": "agent_runtime",
+  "version": "v2",
+  "messages": [
+    {
+      "role": "system",
+      "template_path": "agent_runtime.plan_compiler.system.md"
+    },
+    {
+      "role": "user",
+      "template": "high_level_plan_text:\n$high_level_plan_text\n\ncandidate_tool_contract_sections:\n$candidate_tool_contract_sections"
+    }
+  ]
+}

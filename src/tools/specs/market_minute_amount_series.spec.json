@@ -1,0 +1,60 @@
+{
+  "best_for": [
+    "用于比较盘中当前累计成交额与最近几日同时间段水平。",
+    "用于判断市场盘中量能强弱和成交额放大程度。",
+    "用于为大盘实时状态分析提供分钟位置对比数据。"
+  ],
+  "input_guidance": {
+    "optional_fields": [
+      "days",
+      "market"
+    ],
+    "required_fields": []
+  },
+  "invocation_example": "market_minute_amount_series(market=\"all\", days=5)",
+  "output_guidance": {
+    "drop_default": [],
+    "field_policies": {
+      "data.market": {
+        "strategy": "auto"
+      },
+      "data.minute_index": {
+        "strategy": "auto"
+      },
+      "data.series": {
+        "strategy": "prompt_full"
+      },
+      "data.series.[]": {
+        "strategy": "auto"
+      },
+      "data.series.[].date": {
+        "strategy": "auto"
+      },
+      "data.series.[].total_amount": {
+        "strategy": "auto"
+      },
+      "data.snapshot_time": {
+        "strategy": "auto"
+      },
+      "data.trade_date": {
+        "strategy": "auto"
+      }
+    },
+    "high_value_for_reasoning": [
+      "data.series"
+    ],
+    "high_value_for_render": [],
+    "recommended_reducers": {},
+    "usually_too_large_for_prompt": []
+  },
+  "purpose": "查询市场当前分钟与历史同分钟累计成交额序列。",
+  "tool_name": "market_minute_amount_series",
+  "status": "disabled",
+  "enabled": false,
+  "retrieval": {
+    "mode": "direct_only",
+    "visibility": "hidden"
+  },
+  "visibility": "hidden",
+  "deprecation_note": "市场分钟成交额对比属于高级派生能力，先由基础行情工具与 DSL/Agent 组合完成。"
+}

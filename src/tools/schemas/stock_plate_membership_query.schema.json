@@ -1,0 +1,140 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "stock_plate_membership_query.schema.json",
+  "title": "Stock Plate Membership Query Tool Output",
+  "type": "object",
+  "required": [
+    "tool",
+    "ok",
+    "data",
+    "error"
+  ],
+  "properties": {
+    "tool": {
+      "const": "stock_plate_membership_query",
+      "type": "string"
+    },
+    "ok": {
+      "type": "boolean"
+    },
+    "error": {
+      "type": "string"
+    },
+    "data": {
+      "type": "object",
+      "required": [
+        "subject",
+        "subject_type",
+        "mode",
+        "trade_date",
+        "sort_by",
+        "items"
+      ],
+      "properties": {
+        "subject": {
+          "type": "string"
+        },
+        "subject_type": {
+          "enum": [
+            "stock"
+          ],
+          "type": "string"
+        },
+        "mode": {
+          "enum": [
+            "by_stock"
+          ],
+          "type": "string"
+        },
+        "trade_date": {
+          "type": "string"
+        },
+        "sort_by": {
+          "type": "string"
+        },
+        "items": {
+          "items": {
+            "$ref": "#/$defs/memberRow"
+          },
+          "type": "array"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "$defs": {
+    "memberRow": {
+      "type": "object",
+      "required": [
+        "plate_code",
+        "plate_name",
+        "plate_begin_date",
+        "plate_end_date",
+        "code",
+        "name",
+        "stock_trade_date",
+        "stock_close",
+        "stock_rise_fall_rate",
+        "stock_amount",
+        "stock_main_net_inflow_wan",
+        "plate_trade_date",
+        "plate_close",
+        "plate_rise_fall_rate",
+        "plate_amount",
+        "plate_main_net_inflow_wan"
+      ],
+      "properties": {
+        "plate_code": {
+          "type": "string"
+        },
+        "plate_name": {
+          "type": "string"
+        },
+        "plate_begin_date": {
+          "type": "string"
+        },
+        "plate_end_date": {
+          "type": "string"
+        },
+        "code": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "stock_trade_date": {
+          "type": "string"
+        },
+        "stock_close": {
+          "type": "number"
+        },
+        "stock_rise_fall_rate": {
+          "type": "number"
+        },
+        "stock_amount": {
+          "type": "number"
+        },
+        "stock_main_net_inflow_wan": {
+          "type": "number"
+        },
+        "plate_trade_date": {
+          "type": "string"
+        },
+        "plate_close": {
+          "type": "number"
+        },
+        "plate_rise_fall_rate": {
+          "type": "number"
+        },
+        "plate_amount": {
+          "type": "number"
+        },
+        "plate_main_net_inflow_wan": {
+          "type": "number"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

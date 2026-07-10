@@ -1,0 +1,181 @@
+{
+  "availability": {
+    "lifecycle": "disabled",
+    "retrieval_mode": "direct_only",
+    "visibility": "hidden"
+  },
+  "capabilities": [
+    "leader_candidates",
+    "concept_leaders",
+    "sector_leaders",
+    "ranking",
+    "theme_stocks"
+  ],
+  "defaults": {
+    "sort_by": 1,
+    "top_k": 3
+  },
+  "identity": {
+    "description": "查询指定主题、概念或板块的龙头股候选列表。",
+    "display_name": "主题龙头查询",
+    "domain": "market",
+    "owner": "tools"
+  },
+  "name": "theme_leaders",
+  "invocation_example": "theme_leaders(query=\"机器人\")",
+  "match_contract": {
+    "request_families": [
+      "data_access"
+    ],
+    "work_item_types": [
+      "tool"
+    ],
+    "capability_classes": [
+      "data_retrieval",
+      "taxonomy_lookup",
+      "market_screening",
+      "ranking_transform"
+    ],
+    "side_effect_level": "read_only"
+  },
+  "post_process": {
+    "deterministic": {
+      "enabled": false,
+      "handler": ""
+    },
+    "llm": {
+      "enabled": false,
+      "prompt_key": ""
+    }
+  },
+  "profiles": {
+    "mock": {
+      "enabled": false,
+      "implementation": {
+        "kind": "inline_result"
+      },
+      "result": {
+        "data": [
+          {
+            "realtime_pct": 5.2,
+            "code": "002050",
+            "name": "三花智控",
+            "theme_name": "人形机器人",
+            "week_pct": 12.5
+          }
+        ],
+        "error": "",
+        "ok": true,
+        "tool": "theme_leaders"
+      }
+    },
+    "real": {
+      "enabled": false,
+      "implementation": {
+        "kind": "python_callable",
+        "target": "src.tools.theme_leaders_tool:run"
+      }
+    }
+  },
+  "retention": {
+    "drop_default": [],
+    "high_value_for_reasoning": [
+      "data.theme_name",
+      "data.theme_type",
+      "data.items",
+      "data.stats"
+    ],
+    "high_value_for_render": [
+      "data.items"
+    ],
+    "recommended_reducers": {},
+    "usually_too_large_for_prompt": []
+  },
+  "runtime_hints": {
+    "cost_class": "low",
+    "latency_class": "medium",
+    "supports_async_submit": false,
+    "supports_stream": false
+  },
+  "safety": {
+    "network": false,
+    "persistence": false,
+    "side_effect": "none"
+  },
+  "schemas": {
+    "input": {
+      "$id": "theme_leaders.input.schema.json",
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "query": {
+          "type": "string",
+          "description": "板块/热点名称，用于检索并返回龙头股列表"
+        }
+      },
+      "required": [
+        "query"
+      ],
+      "type": "object"
+    },
+    "output": {
+      "$ref": "src/tools/schemas/theme_leaders.schema.json"
+    }
+  },
+  "status": "disabled",
+  "tags": [
+    "theme",
+    "sector",
+    "concept",
+    "leaders",
+    "ranking"
+  ],
+  "tests": {
+    "golden_cases": [],
+    "sample_inputs": [
+      {
+        "arguments": {
+          "sort_by": "change_pct_1d",
+          "theme_name": "机器人",
+          "theme_type": "concept",
+          "top_k": 5
+        },
+        "name": "robotics_leaders_by_daily_change"
+      },
+      {
+        "arguments": {
+          "sort_by": "total_market_cap",
+          "theme_name": "半导体",
+          "theme_type": "sector",
+          "top_k": 10
+        },
+        "name": "semiconductor_leaders_by_market_cap"
+      }
+    ]
+  },
+  "ui_hints": {
+    "editable_sections": [
+      "identity",
+      "schemas.input",
+      "schemas.output",
+      "capabilities",
+      "profiles",
+      "retention",
+      "post_process",
+      "tests"
+    ]
+  },
+  "version": "v1",
+  "auth": "public",
+  "enabled": false,
+  "retrieval": {
+    "mode": "direct_only",
+    "visibility": "hidden"
+  },
+  "visibility": "hidden",
+  "deprecation_note": "主题龙头当前为 mock/高级候选能力，先禁用；后续通过板块成分股基础工具和排序 DSL 组合。",
+  "subject_tags": [
+    "plate"
+  ],
+  "tool_priority": 1
+}

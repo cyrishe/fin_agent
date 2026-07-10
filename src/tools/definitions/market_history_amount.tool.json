@@ -1,0 +1,127 @@
+{
+  "auth": "public",
+  "availability": {
+    "lifecycle": "disabled",
+    "retrieval_mode": "direct_only",
+    "visibility": "hidden"
+  },
+  "capabilities": [
+    "market_amount_history",
+    "market_turnover_history",
+    "market_database"
+  ],
+  "defaults": {
+    "days": "5",
+    "market": "all"
+  },
+  "identity": {
+    "description": "查询指定市场最近多个交易日的总成交额序列。",
+    "display_name": "市场整体资金",
+    "domain": "market",
+    "owner": "tools"
+  },
+  "invocation_example": "market_history_amount(market=\"all\", days=5)",
+  "match_contract": {
+    "request_families": [
+      "data_access"
+    ],
+    "work_item_types": [
+      "tool"
+    ],
+    "capability_classes": [
+      "data_retrieval",
+      "market_amount_series"
+    ],
+    "side_effect_level": "read_only"
+  },
+  "name": "market_history_amount",
+  "profiles": {
+    "mock": {
+      "enabled": false,
+      "implementation": {
+        "kind": "inline_result"
+      },
+      "result": {
+        "data": {
+          "days": 0,
+          "history": [
+            {
+              "date": "date_示例",
+              "total_amount": 0
+            }
+          ],
+          "market": "market_示例"
+        },
+        "error": "error_示例",
+        "ok": false,
+        "tool": "market_history_amount"
+      }
+    },
+    "real": {
+      "enabled": false,
+      "implementation": {
+        "kind": "python_callable",
+        "target": "src.tools.market_snapshot_tools:run_market_history_amount"
+      }
+    }
+  },
+  "safety": {
+    "network": false,
+    "persistence": false,
+    "side_effect": "read_only"
+  },
+  "schemas": {
+    "input": {
+      "$id": "market_history_amount.input.schema.json",
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "days": {
+          "type": "integer",
+          "description": "最近几个交易日，默认 5。"
+        },
+        "market": {
+          "type": "string",
+          "description": "市场范围，可选 all、sh、sz、bj。"
+        }
+      },
+      "required": [],
+      "type": "object"
+    },
+    "output": {
+      "$ref": "src/tools/schemas/market_history_amount.schema.json"
+    }
+  },
+  "status": "disabled",
+  "tags": [
+    "market",
+    "amount",
+    "history",
+    "database"
+  ],
+  "tests": {
+    "golden_cases": [],
+    "sample_inputs": [
+      {
+        "arguments": {
+          "days": 5,
+          "market": "all"
+        },
+        "name": "default_market_history_amount"
+      }
+    ]
+  },
+  "version": "v1",
+  "retention": {},
+  "enabled": false,
+  "retrieval": {
+    "mode": "direct_only",
+    "visibility": "hidden"
+  },
+  "visibility": "hidden",
+  "deprecation_note": "市场成交额历史聚合属于高级派生能力，先由基础行情工具与 DSL/Agent 组合完成。",
+  "subject_tags": [
+    "general"
+  ],
+  "tool_priority": 1
+}

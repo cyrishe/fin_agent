@@ -1,0 +1,99 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "涨跌停列表查询.schema.json",
+  "title": "涨跌停列表查询 Output",
+  "type": "object",
+  "required": [
+    "tool",
+    "ok",
+    "data",
+    "error"
+  ],
+  "properties": {
+    "data": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "amount",
+          "chg_ratio",
+          "chg_value",
+          "high_price",
+          "latest_price",
+          "low_price",
+          "open_price",
+          "preclose_price",
+          "snapshot_time",
+          "code",
+          "name",
+          "volume"
+        ],
+        "properties": {
+          "amount": {
+            "description": "成交额。",
+            "type": "number"
+          },
+          "chg_ratio": {
+            "description": "涨跌幅。",
+            "type": "number"
+          },
+          "chg_value": {
+            "description": "涨跌额。",
+            "type": "number"
+          },
+          "high_price": {
+            "description": "最高价。",
+            "type": "number"
+          },
+          "latest_price": {
+            "description": "最新价。",
+            "type": "number"
+          },
+          "low_price": {
+            "description": "最低价。",
+            "type": "number"
+          },
+          "open_price": {
+            "description": "开盘价。",
+            "type": "number"
+          },
+          "preclose_price": {
+            "description": "昨收价。",
+            "type": "number"
+          },
+          "snapshot_time": {
+            "description": "分钟快照时间。",
+            "type": "string"
+          },
+          "code": {
+            "description": "股票代码。",
+            "type": "string"
+          },
+          "name": {
+            "description": "股票名称。",
+            "type": "string"
+          },
+          "volume": {
+            "description": "成交量。",
+            "type": "number"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "error": {
+      "type": "string"
+    },
+    "meta": {
+      "additionalProperties": true,
+      "type": "object"
+    },
+    "ok": {
+      "type": "boolean"
+    },
+    "tool": {
+      "const": "涨跌停列表查询"
+    }
+  },
+  "additionalProperties": true
+}

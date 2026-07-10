@@ -1,0 +1,22 @@
+CREATE TABLE IF NOT EXISTS aiia_runtime_memory_item (
+  memory_id bigint unsigned NOT NULL AUTO_INCREMENT COMMENT '记忆条目主键',
+  owner_type varchar(32) NOT NULL DEFAULT 'thread' COMMENT '记忆所有者类型：thread/user/team/system',
+  owner_id varchar(64) NOT NULL COMMENT '记忆所有者标识',
+  memory_type varchar(64) NOT NULL COMMENT '记忆类型：preference/fact/summary/heuristic',
+  namespace varchar(64) NOT NULL DEFAULT 'default' COMMENT '记忆命名空间',
+  title varchar(255) NOT NULL DEFAULT '' COMMENT '记忆标题',
+  content_text mediumtext DEFAULT NULL COMMENT '记忆正文',
+  content_json longtext DEFAULT NULL COMMENT '结构化记忆内容',
+  salience_score decimal(8,4) NOT NULL DEFAULT 0.0000 COMMENT '显著性分数',
+  confidence_score decimal(8,4) NOT NULL DEFAULT 0.0000 COMMENT '置信度',
+  source_context_id bigint unsigned DEFAULT NULL COMMENT '来源上下文对象',
+  source_event_id bigint unsigned DEFAULT NULL COMMENT '来源事件',
+  is_active tinyint(1) NOT NULL DEFAULT 1 COMMENT '是否激活',
+  last_used_at datetime DEFAULT NULL COMMENT '最近命中时间',
+  created_at datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  updated_at datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (memory_id),
+  KEY idx_owner_namespace (owner_type, owner_id, namespace, is_active),
+  KEY idx_memory_type_active (memory_type, is_active),
+  KEY idx_last_used_at (last_used_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='运行时长期记忆表；保存偏好、事实和摘要等持久记忆';

@@ -1,0 +1,46 @@
+{
+  "best_for": [
+    "用于获取单只股票指定交易日或日期范围内的开高低收、成交量和成交额。",
+    "用于为趋势判断、因子计算和规则化选股提供基础日线序列。",
+    "用于读取 kingdomai 结构化日行情，不返回分钟行情、估值或基本面资料。"
+  ],
+  "input_guidance": {
+    "required_fields": [
+      "stock"
+    ],
+    "optional_fields": [
+      "start",
+      "end",
+      "limit"
+    ]
+  },
+  "invocation_example": "stock_daily_kline_query(stock=\"600519.SH\", start=\"2026-06-01\", end=\"2026-06-30\")",
+  "output_guidance": {
+    "drop_default": [],
+    "field_policies": {
+      "data.rows": {
+        "strategy": "auto"
+      },
+      "data.code": {
+        "strategy": "prompt_full"
+      },
+      "data.name": {
+        "strategy": "prompt_full"
+      }
+    },
+    "high_value_for_reasoning": [
+      "data.code",
+      "data.name",
+      "data.rows"
+    ],
+    "high_value_for_render": [],
+    "recommended_reducers": {
+      "data.rows": "summarize_timeseries"
+    },
+    "usually_too_large_for_prompt": [
+      "data.rows"
+    ]
+  },
+  "purpose": "获取单只股票在指定 start/end 交易日范围内的日级 K 线行情序列。",
+  "tool_name": "stock_daily_kline_query"
+}

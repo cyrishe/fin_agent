@@ -1,0 +1,45 @@
+{
+  "best_for": [
+    "用于查看单只股票属于哪些板块。",
+    "用于获取股票相关板块的代码、名称、快照日期和成交额。",
+    "用于为个股板块归因和板块扩展提供基础关系数据，不返回行业、概念或事件标签。"
+  ],
+  "input_guidance": {
+    "required_fields": [
+      "stock"
+    ],
+    "optional_fields": [
+      "as_of",
+      "top_k"
+    ]
+  },
+  "invocation_example": "get_company_taxonomy_profile(stock=\"工业富联\")",
+  "output_guidance": {
+    "high_value_for_reasoning": [
+      "data.code",
+      "data.name",
+      "data.plates"
+    ],
+    "high_value_for_render": [],
+    "usually_too_large_for_prompt": [
+      "data.plates"
+    ],
+    "recommended_reducers": {
+      "data.plates": "top_rows"
+    },
+    "drop_default": [],
+    "field_policies": {
+      "data.code": {
+        "strategy": "prompt_full"
+      },
+      "data.name": {
+        "strategy": "prompt_full"
+      },
+      "data.plates": {
+        "strategy": "auto"
+      }
+    }
+  },
+  "purpose": "获取单只股票所属的板块归属画像。",
+  "tool_name": "get_company_taxonomy_profile"
+}

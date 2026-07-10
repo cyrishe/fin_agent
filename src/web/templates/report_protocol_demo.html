@@ -1,0 +1,2494 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>热点追踪详情</title>
+  <style>
+    :root {
+      --bg: #09131f;
+      --bg-soft: #0f1c2a;
+      --panel: rgba(16, 28, 42, 0.88);
+      --panel-strong: #132235;
+      --panel-alt: #0d1826;
+      --text: #eaf2fb;
+      --muted: #93a7bf;
+      --line: rgba(138, 170, 201, 0.18);
+      --accent: #1fb6ff;
+      --accent-2: #19d3a2;
+      --accent-soft: rgba(31, 182, 255, 0.12);
+      --good: #22c58b;
+      --bad: #ff6a6a;
+      --warn: #ffb74d;
+      --shadow: 0 22px 56px rgba(0, 0, 0, 0.28);
+      --radius-xl: 28px;
+      --radius-lg: 22px;
+      --radius-md: 16px;
+      --radius-sm: 12px;
+      --container: 1440px;
+      --font-ui: "IBM Plex Sans", "PingFang SC", "Microsoft YaHei", sans-serif;
+      --font-display: "Space Grotesk", "PingFang SC", "Microsoft YaHei", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      color: var(--text);
+      font-family: var(--font-ui);
+      background:
+        radial-gradient(circle at top left, rgba(31, 182, 255, 0.16), transparent 28%),
+        radial-gradient(circle at 82% 8%, rgba(25, 211, 162, 0.12), transparent 22%),
+        linear-gradient(180deg, #07111b 0%, #0b1622 48%, #09131f 100%);
+      min-height: 100vh;
+    }
+
+    .shell {
+      max-width: var(--container);
+      margin: 0 auto;
+      padding: 22px 18px 54px;
+    }
+
+    .hero {
+      position: relative;
+      overflow: hidden;
+      padding: 26px;
+      border-radius: 34px;
+      border: 1px solid var(--line);
+      background:
+        linear-gradient(135deg, rgba(19, 34, 53, 0.96), rgba(10, 24, 38, 0.94)),
+        linear-gradient(120deg, rgba(31, 182, 255, 0.12), transparent 38%);
+      box-shadow: var(--shadow);
+    }
+
+    .hero::before,
+    .hero::after {
+      content: "";
+      position: absolute;
+      border-radius: 50%;
+      pointer-events: none;
+    }
+
+    .hero::before {
+      right: -80px;
+      top: -90px;
+      width: 260px;
+      height: 260px;
+      background: radial-gradient(circle, rgba(31, 182, 255, 0.2), transparent 70%);
+    }
+
+    .hero::after {
+      left: -120px;
+      bottom: -140px;
+      width: 320px;
+      height: 320px;
+      background: radial-gradient(circle, rgba(25, 211, 162, 0.12), transparent 70%);
+    }
+
+    .hero-top {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .eyebrow,
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      height: 32px;
+      padding: 0 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(138, 170, 201, 0.16);
+      background: rgba(255, 255, 255, 0.04);
+      font-size: 12px;
+      color: var(--muted);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .eyebrow strong,
+    .badge strong {
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) minmax(300px, 0.8fr);
+      gap: 22px;
+      margin-top: 18px;
+    }
+
+    .hero-main h1 {
+      margin: 0;
+      font-family: var(--font-display);
+      font-size: clamp(34px, 5vw, 58px);
+      line-height: 0.94;
+      letter-spacing: -0.04em;
+    }
+
+    .hero-main p {
+      margin: 16px 0 0;
+      max-width: 760px;
+      line-height: 1.72;
+      color: var(--muted);
+      font-size: 15px;
+    }
+
+    .hero-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    .hero-tag {
+      display: inline-flex;
+      align-items: center;
+      height: 34px;
+      padding: 0 12px;
+      border-radius: 999px;
+      background: rgba(31, 182, 255, 0.08);
+      border: 1px solid rgba(31, 182, 255, 0.16);
+      color: #d7f1ff;
+      font-size: 13px;
+    }
+
+    .hero-side {
+      display: grid;
+      gap: 12px;
+    }
+
+    .hero-card {
+      padding: 16px;
+      border-radius: var(--radius-lg);
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--line);
+      backdrop-filter: blur(10px);
+    }
+
+    .hero-card-label {
+      color: var(--muted);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .hero-card-value {
+      margin-top: 10px;
+      font-size: 20px;
+      font-weight: 700;
+      line-height: 1.2;
+    }
+
+    .section-nav {
+      position: sticky;
+      top: 10px;
+      z-index: 8;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin: 18px 0 20px;
+      padding: 10px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: rgba(9, 19, 31, 0.78);
+      backdrop-filter: blur(10px);
+    }
+
+    .nav-link {
+      display: inline-flex;
+      align-items: center;
+      height: 36px;
+      padding: 0 14px;
+      border-radius: 999px;
+      color: var(--text);
+      text-decoration: none;
+      font-size: 13px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid transparent;
+    }
+
+    .nav-link:hover {
+      border-color: rgba(31, 182, 255, 0.28);
+      background: rgba(31, 182, 255, 0.08);
+    }
+
+    .section {
+      margin-top: 24px;
+      padding: 20px;
+      border-radius: 30px;
+      border: 1px solid var(--line);
+      background: linear-gradient(180deg, rgba(16, 28, 42, 0.92), rgba(10, 24, 38, 0.9));
+      box-shadow: var(--shadow);
+    }
+
+    .section-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: end;
+      margin-bottom: 16px;
+    }
+
+    .section-title {
+      margin: 0;
+      font-size: clamp(24px, 3vw, 36px);
+      font-family: var(--font-display);
+      line-height: 1.02;
+      letter-spacing: -0.03em;
+    }
+
+    .section-desc {
+      margin: 8px 0 0;
+      max-width: 720px;
+      color: var(--muted);
+      line-height: 1.7;
+      font-size: 14px;
+    }
+
+    .section-kind {
+      white-space: nowrap;
+      color: var(--accent);
+      font-size: 12px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .block {
+      grid-column: span 12;
+      min-width: 0;
+      padding: 18px;
+      border-radius: var(--radius-xl);
+      border: 1px solid var(--line);
+      background: linear-gradient(180deg, rgba(19, 34, 53, 0.96), rgba(13, 24, 38, 0.96));
+      overflow: hidden;
+      position: relative;
+    }
+
+    .block::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(31, 182, 255, 0.04), transparent 22%);
+      pointer-events: none;
+    }
+
+    .block.compact { padding: 16px; }
+    .block.tall { min-height: 420px; }
+
+    .block-head {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: start;
+      margin-bottom: 14px;
+    }
+
+    .block-title {
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .block-subtitle {
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .metric-strip {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(148px, 1fr));
+      gap: 12px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .metric-card,
+    .mini-card {
+      padding: 14px;
+      border-radius: var(--radius-md);
+      border: 1px solid rgba(138, 170, 201, 0.12);
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    .metric-label,
+    .mini-label {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .metric-value {
+      margin-top: 10px;
+      font-size: 26px;
+      font-weight: 700;
+      line-height: 1;
+    }
+
+    .metric-change {
+      margin-top: 8px;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .rise { color: var(--good); }
+    .fall { color: var(--bad); }
+    .warn { color: var(--warn); }
+
+    .text-stack,
+    .analysis-flow,
+    .timeline,
+    .insight-grid,
+    .tabbed-panel {
+      position: relative;
+      z-index: 1;
+    }
+
+    .structured-lead {
+      font-size: 19px;
+      line-height: 1.72;
+      font-weight: 600;
+    }
+
+    .structured-paragraph,
+    .timeline-text,
+    .insight-text,
+    .tab-panel p,
+    .analysis-text {
+      margin-top: 12px;
+      color: var(--muted);
+      line-height: 1.76;
+      font-size: 14px;
+    }
+
+    .bullet-list {
+      display: grid;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .bullet-item {
+      padding: 12px 14px;
+      border-radius: var(--radius-sm);
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(138, 170, 201, 0.1);
+      line-height: 1.7;
+      font-size: 14px;
+    }
+
+    .callout {
+      margin-top: 16px;
+      padding: 14px 16px;
+      border-radius: var(--radius-md);
+      background: rgba(31, 182, 255, 0.08);
+      border: 1px solid rgba(31, 182, 255, 0.16);
+      line-height: 1.72;
+      font-size: 14px;
+    }
+
+    .insight-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px;
+    }
+
+    .insight-card {
+      padding: 16px;
+      border-radius: var(--radius-lg);
+      border: 1px solid rgba(138, 170, 201, 0.12);
+      background: rgba(255, 255, 255, 0.03);
+      min-height: 170px;
+    }
+
+    .insight-card.accent {
+      background: linear-gradient(180deg, rgba(31, 182, 255, 0.14), rgba(255, 255, 255, 0.03));
+      border-color: rgba(31, 182, 255, 0.22);
+    }
+
+    .insight-card.soft {
+      background: linear-gradient(180deg, rgba(25, 211, 162, 0.1), rgba(255, 255, 255, 0.03));
+      border-color: rgba(25, 211, 162, 0.18);
+    }
+
+    .insight-title {
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    .insight-meta {
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .timeline {
+      display: grid;
+      gap: 12px;
+    }
+
+    .timeline-item {
+      display: grid;
+      grid-template-columns: 92px 1fr;
+      gap: 14px;
+      align-items: start;
+      padding: 14px 0;
+      border-top: 1px solid rgba(138, 170, 201, 0.08);
+    }
+
+    .timeline-item:first-child { border-top: none; padding-top: 0; }
+
+    .timeline-time {
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      padding-top: 2px;
+    }
+
+    .timeline-body {
+      padding-left: 14px;
+      border-left: 2px solid rgba(31, 182, 255, 0.18);
+    }
+
+    .timeline-title {
+      font-weight: 700;
+      font-size: 15px;
+    }
+
+    .tab-head {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .tab-btn {
+      height: 36px;
+      padding: 0 14px;
+      border-radius: 999px;
+      border: 1px solid rgba(138, 170, 201, 0.14);
+      background: rgba(255, 255, 255, 0.03);
+      color: var(--muted);
+      cursor: pointer;
+      font-size: 13px;
+    }
+
+    .tab-btn.active {
+      color: var(--text);
+      border-color: rgba(31, 182, 255, 0.3);
+      background: rgba(31, 182, 255, 0.12);
+    }
+
+    .tab-panel {
+      padding: 16px;
+      border-radius: var(--radius-lg);
+      border: 1px solid rgba(138, 170, 201, 0.12);
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    .tab-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+
+    .mini-value {
+      margin-top: 8px;
+      font-size: 20px;
+      font-weight: 700;
+    }
+
+    .analysis-flow {
+      display: grid;
+      gap: 12px;
+    }
+
+    .analysis-step {
+      display: grid;
+      grid-template-columns: 124px 1fr;
+      gap: 14px;
+      padding: 14px;
+      border-radius: var(--radius-md);
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(138, 170, 201, 0.1);
+    }
+
+    .analysis-label {
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding-top: 2px;
+    }
+
+    .placeholder-chart {
+      min-height: 260px;
+      padding: 18px;
+      border-radius: var(--radius-lg);
+      border: 1px dashed rgba(31, 182, 255, 0.28);
+      background:
+        linear-gradient(180deg, rgba(31, 182, 255, 0.08), transparent 36%),
+        rgba(255, 255, 255, 0.02);
+    }
+
+    .placeholder-title {
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .placeholder-note {
+      margin-top: 10px;
+      color: var(--muted);
+      line-height: 1.7;
+      max-width: 620px;
+    }
+
+    .placeholder-lines {
+      display: grid;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .placeholder-line {
+      height: 10px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, rgba(31, 182, 255, 0.18), rgba(25, 211, 162, 0.08));
+    }
+
+    .table-wrap,
+    .fallback-box,
+    .chart-frame,
+    .flowchart-box {
+      position: relative;
+      z-index: 1;
+      overflow: auto;
+      border-radius: var(--radius-md);
+      border: 1px solid rgba(138, 170, 201, 0.1);
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    table {
+      width: 100%;
+      min-width: 640px;
+      border-collapse: collapse;
+    }
+
+    th, td {
+      padding: 12px 14px;
+      text-align: left;
+      vertical-align: top;
+      border-bottom: 1px solid rgba(138, 170, 201, 0.08);
+      font-size: 13px;
+      line-height: 1.65;
+    }
+
+    th {
+      position: sticky;
+      top: 0;
+      background: #112033;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      font-size: 12px;
+      z-index: 1;
+    }
+
+    .chart-frame { padding: 12px; }
+
+    .chart-meta {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .chart-symbol {
+      color: var(--text);
+      font-weight: 700;
+    }
+
+    .flowchart-box { padding: 14px; }
+
+    .flowchart-source,
+    .fallback-box pre {
+      margin: 0;
+      white-space: pre-wrap;
+      line-height: 1.65;
+      font-size: 12px;
+      font-family: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+      color: #c4d2e2;
+    }
+
+    .heatmap-groups {
+      display: grid;
+      gap: 16px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .heatmap-group {
+      padding: 14px;
+      border-radius: var(--radius-lg);
+      border: 1px solid rgba(138, 170, 201, 0.1);
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    .heatmap-group-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: baseline;
+      margin-bottom: 12px;
+    }
+
+    .heatmap-group-title {
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    .heatmap-group-note {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .heatmap-cells {
+      display: grid;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .heatmap-cell {
+      min-height: 88px;
+      border-radius: 14px;
+      color: #fff;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .heatmap-cell-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: start;
+      font-size: 12px;
+      opacity: 0.92;
+    }
+
+    .heatmap-label {
+      font-size: 15px;
+      font-weight: 700;
+      line-height: 1.2;
+    }
+
+    .heatmap-score {
+      font-size: 24px;
+      font-weight: 700;
+      line-height: 1;
+    }
+
+    .code-chip {
+      display: inline-flex;
+      align-items: center;
+      padding: 5px 8px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.16);
+      font-size: 12px;
+    }
+
+    .empty {
+      padding: 18px;
+      border-radius: var(--radius-md);
+      background: rgba(255, 255, 255, 0.03);
+      color: var(--muted);
+      text-align: center;
+      border: 1px dashed rgba(138, 170, 201, 0.14);
+    }
+
+    .task-panel {
+      position: sticky;
+      top: 10px;
+      z-index: 20;
+      margin-bottom: 18px;
+      padding: 16px;
+      border-radius: 24px;
+      border: 1px solid var(--line);
+      background: linear-gradient(180deg, rgba(16, 28, 42, 0.92), rgba(10, 24, 38, 0.9));
+      box-shadow: var(--shadow);
+    }
+
+    .task-panel.collapsed .task-panel-body {
+      display: none;
+    }
+
+    .task-panel-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .task-panel-title {
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .task-head-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .task-toggle-btn {
+      height: 34px;
+      padding: 0 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(138, 170, 201, 0.16);
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--text);
+      cursor: pointer;
+      font-size: 12px;
+    }
+
+    .task-live-line {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 12px;
+      padding: 12px 14px;
+      border-radius: 18px;
+      background: rgba(31, 182, 255, 0.08);
+      border: 1px solid rgba(31, 182, 255, 0.12);
+    }
+
+    .task-live-label {
+      color: var(--muted);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .task-live-text {
+      font-size: 14px;
+      font-weight: 700;
+      color: #dff5ff;
+    }
+
+    .task-panel-body {
+      display: grid;
+      gap: 14px;
+      max-height: 56vh;
+      overflow: auto;
+      resize: vertical;
+      min-height: 220px;
+    }
+
+    .task-stage-rail {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 10px;
+    }
+
+    .task-stage-chip {
+      padding: 12px 12px;
+      border-radius: 16px;
+      border: 1px solid rgba(138, 170, 201, 0.12);
+      background: rgba(255, 255, 255, 0.03);
+      color: var(--muted);
+    }
+
+    .task-stage-chip.active {
+      border-color: rgba(31, 182, 255, 0.3);
+      background: rgba(31, 182, 255, 0.12);
+      color: #dff5ff;
+    }
+
+    .task-stage-chip.done {
+      border-color: rgba(25, 211, 162, 0.24);
+      background: rgba(25, 211, 162, 0.08);
+      color: #d7fff3;
+    }
+
+    .task-stage-name {
+      font-size: 12px;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .task-stage-desc {
+      margin-top: 6px;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .task-status-chip {
+      display: inline-flex;
+      align-items: center;
+      height: 32px;
+      padding: 0 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(31, 182, 255, 0.24);
+      background: rgba(31, 182, 255, 0.08);
+      color: #d7f1ff;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .task-meta {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .task-meta-item {
+      padding: 12px;
+      border-radius: var(--radius-md);
+      border: 1px solid rgba(138, 170, 201, 0.12);
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    .task-meta-label {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .task-meta-value {
+      margin-top: 8px;
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    .task-progress {
+      width: 100%;
+      height: 10px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.08);
+      overflow: hidden;
+      margin-bottom: 14px;
+    }
+
+    .task-progress-bar {
+      height: 100%;
+      width: 0;
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+      transition: width 0.25s ease;
+    }
+
+    .task-error-box {
+      margin-bottom: 14px;
+      padding: 12px 14px;
+      border-radius: var(--radius-md);
+      border: 1px solid rgba(255, 106, 106, 0.24);
+      background: rgba(255, 106, 106, 0.08);
+      color: #ffd6d6;
+      line-height: 1.7;
+      font-size: 13px;
+      white-space: pre-wrap;
+      display: none;
+    }
+
+    .task-steps {
+      display: grid;
+      gap: 10px;
+    }
+
+    .task-step-item {
+      padding: 14px;
+      border-radius: var(--radius-md);
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(138, 170, 201, 0.1);
+    }
+
+    .task-step-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: baseline;
+    }
+
+    .task-step-title {
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .task-step-stage {
+      color: var(--accent);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .task-step-message {
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.7;
+    }
+
+    .task-step-meta {
+      margin-top: 10px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .task-pill {
+      display: inline-flex;
+      align-items: center;
+      height: 28px;
+      padding: 0 10px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(138, 170, 201, 0.12);
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .result-shell {
+      display: grid;
+      gap: 24px;
+    }
+
+    .intermediate-shell {
+      display: grid;
+      gap: 18px;
+      padding: 18px;
+      border-radius: 24px;
+      border: 1px solid rgba(31, 182, 255, 0.16);
+      background: linear-gradient(180deg, rgba(14, 27, 41, 0.92), rgba(10, 22, 34, 0.92));
+      box-shadow: var(--shadow);
+    }
+
+    .intermediate-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: end;
+    }
+
+    .intermediate-title {
+      font-size: 20px;
+      font-weight: 700;
+    }
+
+    .intermediate-note {
+      margin-top: 6px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.7;
+    }
+
+    .intermediate-status {
+      display: inline-flex;
+      align-items: center;
+      height: 30px;
+      padding: 0 12px;
+      border-radius: 999px;
+      background: rgba(25, 211, 162, 0.12);
+      border: 1px solid rgba(25, 211, 162, 0.18);
+      color: #d7fff3;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .section.reveal-enter {
+      opacity: 0;
+      transform: translateY(22px);
+    }
+
+    .section.reveal-enter-active {
+      opacity: 1;
+      transform: translateY(0);
+      transition: opacity 0.36s ease, transform 0.36s ease;
+    }
+
+    @media (max-width: 1080px) {
+      .hero-grid { grid-template-columns: 1fr; }
+      .section { padding: 18px; }
+      .task-panel { position: static; }
+    }
+
+    @media (max-width: 720px) {
+      .shell { padding: 14px 12px 40px; }
+      .hero { padding: 18px; border-radius: 24px; }
+      .section-nav { position: static; border-radius: 22px; }
+      .section { padding: 14px; border-radius: 22px; }
+      .block { padding: 14px; border-radius: 18px; }
+      .timeline-item,
+      .analysis-step { grid-template-columns: 1fr; }
+      .timeline-body { padding-left: 12px; }
+      .heatmap-cells { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <div id="app"></div>
+  </div>
+
+  <script>
+    (function() {
+      const payloadApiUrl = "{{ payload_api_url }}";
+      const asyncJobEnabled = {{ (async_job_enabled or False)|tojson }};
+      const asyncJobCreateUrl = {{ (async_job_create_url or "")|tojson }};
+      const asyncJobBaseUrl = {{ (async_job_base_url or "")|tojson }};
+      const asyncJobRequestPayload = {{ (async_job_request_payload or {})|tojson }};
+      const taskViewEnabled = {{ (task_view_enabled or False)|tojson }};
+      const taskViewJobId = {{ (task_view_job_id or "")|tojson }};
+      const taskViewRefreshMs = {{ (task_view_refresh_ms or 10000)|tojson }};
+      const renderers = {
+        metric_strip: renderMetricStrip,
+        key_metrics: renderKeyMetrics,
+        structured_text: renderStructuredText,
+        table: renderTable,
+        kline: renderKline,
+        mini_chart: renderMiniChart,
+        flowchart: renderFlowchart,
+        heatmap: renderHeatmap,
+        timeline: renderTimeline,
+        insight_cards: renderInsightCards,
+        text_list: renderTextList,
+        tabs_panel: renderTabsPanel,
+        placeholder_chart: renderPlaceholderChart,
+        analysis_flow: renderAnalysisFlow,
+        series_chart: renderSeriesChart,
+        bullet_points: renderBulletPoints
+      };
+      const resolvedPayloadApiUrl = resolveAppUrl(payloadApiUrl);
+      const resolvedAsyncJobCreateUrl = resolveAppUrl(asyncJobCreateUrl);
+      const resolvedAsyncJobBaseUrl = resolveAppUrl(asyncJobBaseUrl);
+
+      boot();
+
+      async function boot() {
+        const root = document.getElementById("app");
+        root.innerHTML = "";
+        const taskPanel = (asyncJobEnabled || taskViewEnabled) ? createTaskPanel(root) : null;
+        if (asyncJobEnabled) {
+          try {
+            updateTaskPanel(taskPanel, { status: "queued", current_stage: "queued", progress: 0 }, [
+              { title: "任务初始化", stage: "queued", message: "正在创建异步任务。", status: "completed" }
+            ]);
+            const job = await createAsyncJob();
+            updateTaskPanel(taskPanel, { job_id: job.job_id, status: "queued", current_stage: "queued", progress: 0 }, [
+              { title: "任务已创建", stage: "queued", message: "已拿到 job_id，开始轮询任务状态。", status: "completed" }
+            ]);
+            await pollAsyncJob(taskPanel, job.job_id, root);
+            return;
+          } catch (error) {
+            if (taskPanel) {
+              updateTaskPanel(
+                taskPanel,
+                { status: "failed", current_stage: "failed", progress: 100, error_message: String(error) },
+                [],
+                `create_job_failed: ${String(error)}`
+              );
+            }
+            root.insertAdjacentHTML("beforeend", '<div class="empty">异步任务创建失败，请检查接口或服务端日志。</div>');
+            console.error(error);
+            return;
+          }
+        }
+        if (taskViewEnabled) {
+          try {
+            updateTaskPanel(
+              taskPanel,
+              { job_id: taskViewJobId, status: "loading", current_stage: "loading", progress: 0 },
+              [
+                {
+                  title: "查看已有任务",
+                  stage: "loading",
+                  message: "正在读取任务状态与结果。",
+                  status: "completed",
+                },
+              ]
+            );
+            await pollAsyncJob(taskPanel, taskViewJobId, root, taskViewRefreshMs);
+            return;
+          } catch (error) {
+            if (taskPanel) {
+              updateTaskPanel(
+                taskPanel,
+                { job_id: taskViewJobId, status: "failed", current_stage: "failed", progress: 100, error_message: String(error) },
+                [],
+                `task_view_failed: ${String(error)}`
+              );
+            }
+            root.insertAdjacentHTML("beforeend", '<div class="empty">任务详情页加载失败，请检查 job_id 或服务端日志。</div>');
+            console.error(error);
+            return;
+          }
+        }
+        root.innerHTML = '<div class="empty">页面加载中...</div>';
+        try {
+          const response = await fetch(resolvedPayloadApiUrl, { cache: "no-store" });
+          const payload = await response.json();
+          const resultRoot = createResultRoot(root);
+          resultRoot.innerHTML = "";
+          renderPage(resultRoot, payload);
+        } catch (error) {
+          root.innerHTML = '<div class="empty">页面加载失败，请检查接口或 payload 结构。</div>';
+          console.error(error);
+        }
+      }
+
+      async function createAsyncJob() {
+        const payload = await fetchJson(resolvedAsyncJobCreateUrl, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(asyncJobRequestPayload || {})
+        });
+        if (!payload.ok || !payload.data || !payload.data.ok || !payload.data.job || !payload.data.job.job_id) {
+          throw new Error((payload && payload.error) || "创建任务失败");
+        }
+        return payload.data.job;
+      }
+
+      async function pollAsyncJob(taskPanel, jobId, root, refreshMs) {
+        let done = false;
+        const intervalMs = Number(refreshMs || 2000);
+        while (!done) {
+          let jobPayload;
+          let stepsPayload;
+          let executionPlanPayload = null;
+          let routeSnapshotPayload = null;
+          let taskSummaryPayload = null;
+          let intermediatePayload = null;
+          try {
+            [jobPayload, stepsPayload] = await Promise.all([
+              fetchJson(`${resolvedAsyncJobBaseUrl}/${jobId}`, { cache: "no-store" }),
+              fetchJson(`${resolvedAsyncJobBaseUrl}/${jobId}/steps`, { cache: "no-store" })
+            ]);
+          } catch (error) {
+            updateTaskPanel(
+              taskPanel,
+              { job_id: jobId, status: "failed", current_stage: "failed", progress: 100 },
+              [],
+              `poll_job_failed: ${String(error)}`
+            );
+            throw error;
+          }
+          if (!jobPayload.ok || !jobPayload.data || !jobPayload.data.ok) {
+            updateTaskPanel(
+              taskPanel,
+              { job_id: jobId, status: "failed", current_stage: "failed", progress: 100, error_message: jobPayload.error || "" },
+              stepsPayload && stepsPayload.ok && stepsPayload.data && stepsPayload.data.ok ? (stepsPayload.data.items || []) : [],
+              `job_status_failed: ${String(jobPayload.error || "查询任务状态失败")}`
+            );
+            throw new Error(jobPayload.error || "查询任务状态失败");
+          }
+          const job = jobPayload.data.job || {};
+          const steps = stepsPayload.ok && stepsPayload.data && stepsPayload.data.ok ? (stepsPayload.data.items || []) : [];
+          try {
+            [executionPlanPayload, routeSnapshotPayload, taskSummaryPayload, intermediatePayload] = await Promise.all([
+              fetchJson(`${resolvedAsyncJobBaseUrl}/${jobId}/result?result_type=execution_plan`, { cache: "no-store" }),
+              fetchJson(`${resolvedAsyncJobBaseUrl}/${jobId}/result?result_type=route_snapshot`, { cache: "no-store" }),
+              fetchJson(`${resolvedAsyncJobBaseUrl}/${jobId}/result?result_type=task_summary`, { cache: "no-store" }),
+              fetchJson(`${resolvedAsyncJobBaseUrl}/${jobId}/result?result_type=intermediate_render_payload`, { cache: "no-store" })
+            ]);
+          } catch (error) {
+            executionPlanPayload = null;
+            routeSnapshotPayload = null;
+            taskSummaryPayload = null;
+            intermediatePayload = null;
+          }
+          const executionPlan = executionPlanPayload && executionPlanPayload.ok && executionPlanPayload.data && executionPlanPayload.data.ok
+            ? executionPlanPayload.data.content
+            : null;
+          const routeSnapshot = routeSnapshotPayload && routeSnapshotPayload.ok && routeSnapshotPayload.data && routeSnapshotPayload.data.ok
+            ? routeSnapshotPayload.data.content
+            : null;
+          const taskSummary = taskSummaryPayload && taskSummaryPayload.ok && taskSummaryPayload.data && taskSummaryPayload.data.ok
+            ? taskSummaryPayload.data.content
+            : null;
+          const intermediateRenderPayload = intermediatePayload && intermediatePayload.ok && intermediatePayload.data && intermediatePayload.data.ok
+            ? intermediatePayload.data.content
+            : null;
+          updateTaskPanel(taskPanel, job, steps, "", executionPlan, routeSnapshot, taskSummary);
+          renderIntermediateState(root, intermediateRenderPayload, job);
+
+          if (job.status === "succeeded") {
+            let resultPayload;
+            try {
+              resultPayload = await fetchJson(`${resolvedAsyncJobBaseUrl}/${jobId}/result?result_type=render_payload`, { cache: "no-store" });
+            } catch (error) {
+              updateTaskPanel(taskPanel, job, steps, `fetch_render_payload_failed: ${String(error)}`, executionPlan, routeSnapshot, taskSummary);
+              throw error;
+            }
+            if (!resultPayload.ok || !resultPayload.data || !resultPayload.data.ok || !resultPayload.data.content) {
+              updateTaskPanel(taskPanel, job, steps, `render_payload_missing: ${String((resultPayload && resultPayload.error) || "获取 render_payload 失败")}`, executionPlan, routeSnapshot, taskSummary);
+              throw new Error((resultPayload && resultPayload.error) || "获取 render_payload 失败");
+            }
+            try {
+              const resultRoot = createResultRoot(root);
+              resultRoot.innerHTML = "";
+              await renderPageProgressive(resultRoot, resultPayload.data.content);
+              clearIntermediateState(root);
+              collapseTaskPanel(taskPanel, true);
+              updateTaskPanel(taskPanel, { ...job, status: "succeeded", current_stage: "completed", progress: 100 }, steps, "", executionPlan, routeSnapshot, taskSummary);
+            } catch (error) {
+              updateTaskPanel(taskPanel, job, steps, `render_page_failed: ${String(error)}`, executionPlan, routeSnapshot, taskSummary);
+              createResultRoot(root).insertAdjacentHTML("beforeend", '<div class="empty">render_payload 已获取，但页面渲染失败，请查看控制台。</div>');
+              throw error;
+            }
+            done = true;
+            return;
+          }
+
+          if (job.status === "failed") {
+            clearIntermediateState(root);
+            updateTaskPanel(taskPanel, job, steps, `job_failed: ${String(job.error_message || "未知错误")}`, executionPlan, routeSnapshot, taskSummary);
+            root.insertAdjacentHTML("beforeend", `<div class="empty">任务执行失败：${escapeHtml(job.error_message || "未知错误")}</div>`);
+            done = true;
+            return;
+          }
+
+          await sleep(intervalMs);
+        }
+      }
+
+      function createTaskPanel(root) {
+        const panel = create("section", "task-panel");
+        panel.innerHTML = `
+          <div class="task-panel-head">
+            <div class="task-panel-title">任务执行面板</div>
+            <div class="task-head-actions">
+              <button type="button" class="task-toggle-btn" data-task-toggle>收起过程</button>
+              <div class="task-status-chip">queued</div>
+            </div>
+          </div>
+          <div class="task-live-line">
+            <div class="task-live-label">当前执行</div>
+            <div class="task-live-text" data-task-live-text>等待任务启动</div>
+          </div>
+          <div class="task-panel-body" data-task-body>
+            <div class="task-meta">
+              <div class="task-meta-item"><div class="task-meta-label">任务ID</div><div class="task-meta-value" data-task-job-id>-</div></div>
+              <div class="task-meta-item"><div class="task-meta-label">当前阶段</div><div class="task-meta-value" data-task-stage>-</div></div>
+              <div class="task-meta-item"><div class="task-meta-label">执行进度</div><div class="task-meta-value" data-task-progress>0%</div></div>
+              <div class="task-meta-item"><div class="task-meta-label">总 Tokens</div><div class="task-meta-value" data-task-total-tokens>-</div></div>
+            </div>
+            <div class="task-progress"><div class="task-progress-bar" data-task-progress-bar></div></div>
+            <div class="task-stage-rail" data-task-stage-rail></div>
+            <div class="task-step-item" data-task-plan-box style="display:none;"></div>
+            <div class="task-error-box" data-task-error></div>
+            <div class="task-steps" data-task-steps></div>
+          </div>
+        `;
+        const toggle = panel.querySelector("[data-task-toggle]");
+        const body = panel.querySelector("[data-task-body]");
+        body.dataset.autoFollow = "1";
+        body.addEventListener("scroll", () => {
+          const distance = body.scrollHeight - body.scrollTop - body.clientHeight;
+          body.dataset.autoFollow = distance <= 40 ? "1" : "0";
+        });
+        toggle.addEventListener("click", () => {
+          const collapsed = panel.classList.toggle("collapsed");
+          toggle.textContent = collapsed ? "展开过程" : "收起过程";
+        });
+        root.appendChild(panel);
+        return panel;
+      }
+
+      function updateTaskPanel(panel, job, steps, explicitError, executionPlan, routeSnapshot, taskSummary) {
+        if (!panel) return;
+        const statusChip = panel.querySelector(".task-status-chip");
+        const liveText = panel.querySelector("[data-task-live-text]");
+        const jobIdValue = panel.querySelector("[data-task-job-id]");
+        const stageValue = panel.querySelector("[data-task-stage]");
+        const progressValue = panel.querySelector("[data-task-progress]");
+        const totalTokensValue = panel.querySelector("[data-task-total-tokens]");
+        const progressBar = panel.querySelector("[data-task-progress-bar]");
+        const stageRail = panel.querySelector("[data-task-stage-rail]");
+        const planBox = panel.querySelector("[data-task-plan-box]");
+        const errorNode = panel.querySelector("[data-task-error]");
+        const stepsNode = panel.querySelector("[data-task-steps]");
+        const bodyNode = panel.querySelector("[data-task-body]");
+        statusChip.textContent = String(job.status || "queued");
+        jobIdValue.textContent = String(job.job_id || "-");
+        stageValue.textContent = String(job.current_stage || "-");
+        const progress = Number(job.progress || 0);
+        progressValue.textContent = `${progress.toFixed(0)}%`;
+        progressBar.style.width = `${Math.max(0, Math.min(100, progress))}%`;
+        const tokenUsage = taskSummary && taskSummary.token_usage ? taskSummary.token_usage : {};
+        const totalTokens = Number(tokenUsage.total_tokens || 0);
+        totalTokensValue.textContent = totalTokens > 0 ? String(totalTokens) : "-";
+        const latestStep = (steps || []).length ? steps[steps.length - 1] : null;
+        liveText.textContent = latestStep
+          ? `${latestStep.title || "执行步骤"}${latestStep.message ? ` · ${latestStep.message}` : ""}`
+          : (job.status === "succeeded" ? "结果已生成，正在完成渲染。" : "等待更多执行信息...");
+        renderTaskStages(stageRail, job, steps);
+        renderTaskPlan(planBox, executionPlan, routeSnapshot, taskSummary);
+        const errorText = explicitError || job.error_message || "";
+        if (errorText) {
+          errorNode.style.display = "block";
+          errorNode.textContent = String(errorText);
+        } else {
+          errorNode.style.display = "none";
+          errorNode.textContent = "";
+        }
+        stepsNode.innerHTML = "";
+        if (!(steps || []).length) {
+          stepsNode.appendChild(renderEmpty("任务尚未产出步骤记录"));
+          return;
+        }
+        (steps || []).slice(-12).forEach((step) => {
+          const item = create("div", "task-step-item");
+          const toolName = step.tool_name ? ` / ${escapeHtml(step.tool_name)}` : "";
+          const summary = buildStepPills(step);
+          item.innerHTML = `
+            <div class="task-step-top">
+              <div class="task-step-title">${escapeHtml(step.title || "执行步骤")}${toolName}</div>
+              <div class="task-step-stage">${escapeHtml(step.stage || step.status || "")}</div>
+            </div>
+            <div class="task-step-message">${escapeHtml(step.message || step.status || "")}</div>
+            ${summary}
+          `;
+          stepsNode.appendChild(item);
+        });
+        if (bodyNode && bodyNode.dataset.autoFollow !== "0") {
+          bodyNode.scrollTop = bodyNode.scrollHeight;
+        }
+      }
+
+      function renderTaskPlan(node, executionPlan, routeSnapshot, taskSummary) {
+        if (!node) return;
+        const plan = executionPlan && typeof executionPlan === "object" ? executionPlan : null;
+        const route = routeSnapshot && typeof routeSnapshot === "object" ? routeSnapshot : null;
+        const summary = taskSummary && typeof taskSummary === "object" ? taskSummary : null;
+        if (!plan && !route && !summary) {
+          node.style.display = "none";
+          node.innerHTML = "";
+          return;
+        }
+        node.style.display = "block";
+        const routeObj = route && route.route && typeof route.route === "object" ? route.route : null;
+        const routePills = routeObj
+          ? [
+              routeObj.route_type ? `<span class="task-pill">${escapeHtml(String(routeObj.route_type))}</span>` : "",
+              routeObj.selected_skill ? `<span class="task-pill">${escapeHtml(String(routeObj.selected_skill))}</span>` : "",
+            ].filter(Boolean).join("")
+          : "";
+        const toolPills = ((plan && plan.selected_tools) || []).map((item) => `<span class="task-pill">${escapeHtml(String(item))}</span>`).join("");
+        const sectionPills = ((plan && plan.selected_sections) || []).slice(0, 8).map((item) => `<span class="task-pill">${escapeHtml(String(item))}</span>`).join("");
+        const stageItems = ((plan && plan.stage_plan) || []).map((item) => `<li><strong>${escapeHtml(String(item.stage || "-"))}</strong>：${escapeHtml(String(item.goal || ""))}</li>`).join("");
+        const tokenUsage = summary && summary.token_usage ? summary.token_usage : {};
+        node.innerHTML = `
+          <div class="task-step-top">
+            <div class="task-step-title">执行计划</div>
+            <div class="task-step-stage">${escapeHtml(String((plan && plan.skill_version) || "-"))}</div>
+          </div>
+          ${routePills ? `<div class="task-step-meta">${routePills}</div>` : ""}
+          ${(routeObj && routeObj.reason) ? `<div class="task-step-message">入口路由：${escapeHtml(String(routeObj.reason || ""))}</div>` : ""}
+          ${toolPills ? `<div class="task-step-meta">${toolPills}</div>` : ""}
+          ${sectionPills ? `<div class="task-step-meta">${sectionPills}</div>` : ""}
+          ${stageItems ? `<ul class="text-list">${stageItems}</ul>` : ""}
+          ${(summary && summary.ok !== undefined) ? `<div class="task-step-message">任务摘要：steps=${escapeHtml(String(summary.step_count || 0))} · llm_calls=${escapeHtml(String(tokenUsage.llm_call_count || 0))} · tokens=${escapeHtml(String(tokenUsage.total_tokens || 0))}</div>` : ""}
+        `;
+      }
+
+      function renderTaskStages(node, job, steps) {
+        if (!node) return;
+        const order = [
+          ["queued", "准备任务"],
+          ["collecting_data", "数据获取"],
+          ["synthesizing", "综合分析"],
+          ["rendering", "结果生成"],
+          ["completed", "完成"],
+        ];
+        const current = String(job.current_stage || "");
+        const finished = new Set((steps || []).map((item) => String(item.stage || "")));
+        node.innerHTML = "";
+        order.forEach(([key, label], index) => {
+          const card = create("div", "task-stage-chip");
+          if (current === key) card.classList.add("active");
+          if (finished.has(key) || (job.status === "succeeded" && key === "completed")) card.classList.add("done");
+          card.innerHTML = `
+            <div class="task-stage-name">${escapeHtml(label)}</div>
+            <div class="task-stage-desc">${escapeHtml(describeStage(key, current, index, job.status))}</div>
+          `;
+          node.appendChild(card);
+        });
+      }
+
+      function buildStepPills(step) {
+        const pills = [];
+        const outputSummary = step.output_summary || {};
+        if (typeof outputSummary.items_count === "number") pills.push(`条目 ${outputSummary.items_count}`);
+        if (typeof outputSummary.historical_rows === "number") pills.push(`表格 ${outputSummary.historical_rows} 行`);
+        const llmUsage = step.llm_usage || {};
+        if (typeof llmUsage.total_tokens === "number" && llmUsage.total_tokens > 0) pills.push(`tokens ${llmUsage.total_tokens}`);
+        if (!pills.length) return "";
+        return `<div class="task-step-meta">${pills.map((text) => `<span class="task-pill">${escapeHtml(String(text))}</span>`).join("")}</div>`;
+      }
+
+      function describeStage(key, current, index, jobStatus) {
+        if (jobStatus === "succeeded" && key === "completed") return "已完成";
+        if (key === current) return "进行中";
+        const order = ["queued", "collecting_data", "synthesizing", "rendering", "completed"];
+        const currentIndex = order.indexOf(current);
+        if (currentIndex > index) return "已完成";
+        return "等待中";
+      }
+
+      function createResultRoot(root) {
+        let node = root.querySelector("[data-result-root]");
+        if (!node) {
+          node = create("div", "result-shell");
+          node.setAttribute("data-result-root", "1");
+          root.appendChild(node);
+        }
+        return node;
+      }
+
+      function collapseTaskPanel(panel, collapsed) {
+        if (!panel) return;
+        panel.classList.toggle("collapsed", !!collapsed);
+        const toggle = panel.querySelector("[data-task-toggle]");
+        if (toggle) {
+          toggle.textContent = collapsed ? "展开过程" : "收起过程";
+        }
+      }
+
+      function getIntermediateRoot(root) {
+        let node = root.querySelector("[data-intermediate-root]");
+        if (!node) {
+          node = create("section", "intermediate-shell");
+          node.setAttribute("data-intermediate-root", "1");
+          root.appendChild(node);
+        }
+        return node;
+      }
+
+      function clearIntermediateState(root) {
+        const node = root.querySelector("[data-intermediate-root]");
+        if (node) node.remove();
+      }
+
+      function renderIntermediateState(root, payload, job) {
+        if (!payload || !Array.isArray(payload.sections) || !payload.sections.length || String(job.status || "") === "succeeded") {
+          clearIntermediateState(root);
+          return;
+        }
+        const node = getIntermediateRoot(root);
+        node.innerHTML = `
+          <div class="intermediate-head">
+            <div>
+              <div class="intermediate-title">中间结果预览</div>
+              <div class="intermediate-note">执行中的已完成模块会逐步出现在这里，和执行过程区分开展示。</div>
+            </div>
+            <div class="intermediate-status">${escapeHtml(String(job.current_stage || "running"))}</div>
+          </div>
+        `;
+        const resultRoot = create("div", "result-shell");
+        resultRoot.setAttribute("data-intermediate-content", "1");
+        node.appendChild(resultRoot);
+        renderPage(resultRoot, payload);
+      }
+
+      async function renderPageProgressive(root, payload) {
+        root.innerHTML = "";
+        root.appendChild(renderHero(payload));
+        root.appendChild(renderSectionNav((payload.sections || []).filter(hasRenderableBlocks)));
+        const sections = (payload.sections || []).filter(hasRenderableBlocks);
+        for (const section of sections) {
+          const node = renderSection(section);
+          node.classList.add("reveal-enter");
+          root.appendChild(node);
+          await nextFrame();
+          node.classList.add("reveal-enter-active");
+          node.classList.remove("reveal-enter");
+          await sleep(120);
+        }
+      }
+
+      function nextFrame() {
+        return new Promise((resolve) => window.requestAnimationFrame(() => resolve()));
+      }
+
+      function sleep(ms) {
+        return new Promise((resolve) => window.setTimeout(resolve, ms));
+      }
+
+      function resolveAppUrl(url) {
+        const raw = String(url || "");
+        if (!raw) return raw;
+        if (/^https?:\/\//i.test(raw)) return raw;
+        if (!raw.startsWith("/")) return raw;
+        const path = String(window.location.pathname || "");
+        const markers = ["/skills/", "/tasks/", "/api/", "/report_protocol_demo", "/stock_deep_dive"];
+        let prefix = "";
+        for (const marker of markers) {
+          const idx = path.indexOf(marker);
+          if (idx > 0) {
+            prefix = path.slice(0, idx);
+            break;
+          }
+        }
+        if (!prefix) return raw;
+        return `${prefix}${raw}`;
+      }
+
+      async function fetchJson(url, options) {
+        const response = await fetch(url, options);
+        const raw = await response.text();
+        let data = null;
+        try {
+          data = raw ? JSON.parse(raw) : null;
+        } catch (error) {
+          const snippet = String(raw || "").slice(0, 240);
+          throw new Error(`HTTP ${response.status} ${response.statusText}; non_json_response: ${snippet}`);
+        }
+        if (!response.ok) {
+          throw new Error((data && data.error) || `HTTP ${response.status} ${response.statusText}`);
+        }
+        return { ok: true, data, raw };
+      }
+
+      function renderPage(root, payload) {
+        root.appendChild(renderHero(payload));
+        root.appendChild(renderSectionNav((payload.sections || []).filter(hasRenderableBlocks)));
+        (payload.sections || []).filter(hasRenderableBlocks).forEach((section) => {
+          root.appendChild(renderSection(section));
+        });
+      }
+
+      function renderHero(payload) {
+        const node = create("section", "hero");
+        const summary = payload.summary || {};
+        const summaryData = summary.data || {};
+        const summaryTags = Array.isArray(summary.tags)
+          ? summary.tags
+          : Array.isArray(summaryData.tags)
+            ? summaryData.tags
+            : [];
+        const summaryText = typeof summaryData.content === "string" && summaryData.content
+          ? summaryData.content
+          : (payload.subtitle || "后端决定传哪些块，前端只负责把有用信息稳定地铺开。");
+        const marketPhase = summary.market_phase || summaryData.market_phase || "-";
+        const tags = summaryTags.map((tag) => `<span class="hero-tag">${escapeHtml(tag)}</span>`).join("");
+        node.innerHTML = `
+          <div class="hero-top">
+            <div class="eyebrow"><strong>Hot Trace</strong> 协议驱动详情页</div>
+            <div class="badge"><strong>${escapeHtml(payload.page_type || "detail")}</strong></div>
+          </div>
+          <div class="hero-grid">
+            <div class="hero-main">
+              <h1>${escapeHtml(payload.title || "未命名热点")}</h1>
+              <p>${escapeHtml(summaryText)}</p>
+              <div class="hero-tags">${tags || '<span class="hero-tag">暂无标签</span>'}</div>
+            </div>
+            <div class="hero-side">
+              <div class="hero-card">
+                <div class="hero-card-label">模板族</div>
+                <div class="hero-card-value">${escapeHtml(payload.template_family || "-")}</div>
+              </div>
+              <div class="hero-card">
+                <div class="hero-card-label">更新时间</div>
+                <div class="hero-card-value">${escapeHtml(payload.as_of || "-")}</div>
+              </div>
+              <div class="hero-card">
+                <div class="hero-card-label">市场阶段</div>
+                <div class="hero-card-value">${escapeHtml(marketPhase)}</div>
+              </div>
+            </div>
+          </div>
+        `;
+        return node;
+      }
+
+      function renderSectionNav(sections) {
+        const nav = create("div", "section-nav");
+        if (!sections.length) {
+          nav.appendChild(renderEmpty("暂无可展示区块"));
+          return nav;
+        }
+        sections.forEach((section) => {
+          const link = create("a", "nav-link");
+          link.href = `#${section.section_id || ""}`;
+          link.textContent = section.title || section.section_kind || "未命名区块";
+          nav.appendChild(link);
+        });
+        return nav;
+      }
+
+      function renderSection(section) {
+        const node = create("section", "section");
+        node.id = section.section_id || "";
+        node.innerHTML = `
+          <div class="section-head">
+            <div>
+              <h2 class="section-title">${escapeHtml(section.title || "未命名区块")}</h2>
+              <div class="section-desc">${escapeHtml(section.description || "")}</div>
+            </div>
+            <div class="section-kind">${escapeHtml(section.section_kind || "section")}</div>
+          </div>
+        `;
+        const grid = create("div", "grid");
+        (section.blocks || []).filter(hasRenderableData).forEach((block) => grid.appendChild(renderBlock(block)));
+        if (!grid.children.length) {
+          grid.appendChild(wrapGridItem(renderEmpty("该区块暂时没有可展示内容")));
+        }
+        node.appendChild(grid);
+        return node;
+      }
+
+      function renderBlock(block) {
+        const node = create("article", "block");
+        if (block.height === "compact" || block.height === "tall") {
+          node.classList.add(block.height);
+        }
+        const desktop = getSpan(block, "desktop", 12);
+        const tablet = getSpan(block, "tablet", desktop);
+        const mobile = getSpan(block, "mobile", 1);
+        const updateSpan = () => {
+          if (window.matchMedia("(max-width: 720px)").matches) {
+            node.style.gridColumn = `span ${mobile}`;
+          } else if (window.matchMedia("(max-width: 1080px)").matches) {
+            node.style.gridColumn = `span ${tablet}`;
+          } else {
+            node.style.gridColumn = `span ${desktop}`;
+          }
+        };
+        updateSpan();
+        window.addEventListener("resize", updateSpan);
+
+        const subtitle = block.subtitle ? `<div class="block-subtitle">${escapeHtml(block.subtitle)}</div>` : "";
+        node.innerHTML = `
+          <div class="block-head">
+            <div>
+              <div class="block-title">${escapeHtml(block.title || block.type || "内容块")}</div>
+              ${subtitle}
+            </div>
+          </div>
+        `;
+        const renderer = renderers[block.type] || renderFallback;
+        node.appendChild(renderer(block));
+        return node;
+      }
+
+      function renderMetricStrip(block) {
+        const wrap = create("div", "metric-strip");
+        const data = ((block || {}).data || {});
+        const items = Array.isArray(data.items)
+          ? data.items
+          : Array.isArray(data.metrics)
+            ? data.metrics.map((item) => ({
+                label: item.label,
+                value: `${item.value || "-"}${item.unit || ""}`,
+                change: item.change || "",
+                trend: item.trend || "",
+              }))
+            : [];
+        if (!items.length) {
+          wrap.appendChild(renderEmpty());
+          return wrap;
+        }
+        items.forEach((item) => {
+          const card = create("div", "metric-card");
+          const change = String(item.change || "");
+          const trendClass = change.startsWith("-") ? "fall" : (change.startsWith("+") ? "rise" : "");
+          card.innerHTML = `
+            <div class="metric-label">${escapeHtml(item.label || "")}</div>
+            <div class="metric-value">${escapeHtml(item.value || "-")}</div>
+            <div class="metric-change ${trendClass}">${escapeHtml(change)}</div>
+          `;
+          wrap.appendChild(card);
+        });
+        return wrap;
+      }
+
+      function renderKeyMetrics(block) {
+        const data = ((block || {}).data || {});
+        const wrap = create("div", "metric-strip");
+        const items = [
+          { label: "现价", value: data.price, change: formatSigned(data.change_pct, "%") },
+          { label: "成交额", value: formatLargeNumber(data.turnover), change: "" },
+          { label: "成交量", value: formatLargeNumber(data.volume), change: "" }
+        ].filter((item) => item.value !== undefined && item.value !== null && String(item.value) !== "");
+        if (!items.length) {
+          wrap.appendChild(renderEmpty());
+          return wrap;
+        }
+        items.forEach((item) => {
+          const card = create("div", "metric-card");
+          const change = String(item.change || "");
+          const trendClass = change.startsWith("-") ? "fall" : (change.startsWith("+") ? "rise" : "");
+          card.innerHTML = `
+            <div class="metric-label">${escapeHtml(item.label || "")}</div>
+            <div class="metric-value">${escapeHtml(String(item.value || "-"))}</div>
+            <div class="metric-change ${trendClass}">${escapeHtml(change)}</div>
+          `;
+          wrap.appendChild(card);
+        });
+        return wrap;
+      }
+
+      function renderStructuredText(block) {
+        const wrap = create("div", "text-stack");
+        const data = (block || {}).data || {};
+        if (typeof data.content === "string" && data.content.trim()) {
+          if (looksLikeHtml(data.content)) {
+            const rich = create("div", "structured-paragraph");
+            rich.innerHTML = sanitizeRichHtml(data.content);
+            wrap.appendChild(rich);
+          } else {
+            const paragraphs = data.content.split(/\n+/).map((item) => item.trim()).filter(Boolean);
+            paragraphs.forEach((text, index) => {
+              const p = create("div", index === 0 ? "structured-lead" : "structured-paragraph");
+              p.textContent = text;
+              wrap.appendChild(p);
+            });
+          }
+        }
+        if (data.lead) {
+          const lead = create("div", "structured-lead");
+          lead.textContent = data.lead;
+          wrap.appendChild(lead);
+        }
+        (data.paragraphs || []).forEach((text) => {
+          const p = create("div", "structured-paragraph");
+          p.textContent = text;
+          wrap.appendChild(p);
+        });
+        if ((data.bullets || []).length) {
+          const list = create("div", "bullet-list");
+          data.bullets.forEach((item) => {
+            const line = create("div", "bullet-item");
+            const label = item.label ? `${item.label}: ` : "";
+            line.textContent = `${label}${item.text || ""}`;
+            list.appendChild(line);
+          });
+          wrap.appendChild(list);
+        }
+        if (data.callout && data.callout.text) {
+          const callout = create("div", "callout");
+          callout.textContent = data.callout.text;
+          wrap.appendChild(callout);
+        }
+        if (!wrap.children.length) {
+          wrap.appendChild(renderEmpty());
+        }
+        return wrap;
+      }
+
+      function renderInsightCards(block) {
+        const wrap = create("div", "insight-grid");
+        const data = ((block || {}).data || {});
+        const items = Array.isArray(data.items)
+          ? data.items
+          : Array.isArray(data.cards)
+            ? data.cards.map((item) => ({
+                title: item.title,
+                text: item.content || item.desc || "",
+                meta: item.tag || item.value || "",
+                tone: normalizeCardTone(item.sentiment || item.status),
+              }))
+            : [];
+        if (!items.length) {
+          wrap.appendChild(renderEmpty());
+          return wrap;
+        }
+        items.forEach((item) => {
+          const card = create("div", `insight-card ${item.tone || ""}`.trim());
+          card.innerHTML = `
+            <div class="insight-title">${escapeHtml(item.title || "未命名卡片")}</div>
+            <div class="insight-text">${escapeHtml(item.text || "")}</div>
+            ${item.meta ? `<div class="insight-meta">${escapeHtml(item.meta)}</div>` : ""}
+          `;
+          wrap.appendChild(card);
+        });
+        return wrap;
+      }
+
+      function renderTextList(block) {
+        const wrap = create("div", "bullet-list");
+        const items = (((block || {}).data || {}).items) || [];
+        if (!items.length) {
+          wrap.appendChild(renderEmpty());
+          return wrap;
+        }
+        items.forEach((item) => {
+          const row = create("div", "bullet-item");
+          const time = item.time ? `<span class="task-pill">${escapeHtml(item.time)}</span>` : "";
+          row.innerHTML = `
+            <div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start;">
+              <div style="font-weight:700;color:var(--text);">${escapeHtml(item.title || "未命名条目")}</div>
+              ${time}
+            </div>
+            <div style="margin-top:8px;color:var(--muted);line-height:1.7;">${escapeHtml(item.desc || item.text || "")}</div>
+          `;
+          wrap.appendChild(row);
+        });
+        return wrap;
+      }
+
+      function renderTabsPanel(block) {
+        const wrap = create("div", "tabbed-panel");
+        const tabs = (((block || {}).data || {}).tabs) || [];
+        if (!tabs.length) {
+          wrap.appendChild(renderEmpty());
+          return wrap;
+        }
+        const head = create("div", "tab-head");
+        const panel = create("div", "tab-panel");
+        let activeIndex = 0;
+
+        const renderActive = () => {
+          const current = tabs[activeIndex] || {};
+          panel.innerHTML = "";
+          if ((current.stats || []).length) {
+            const statsWrap = create("div", "tab-grid");
+            (current.stats || []).forEach((item) => {
+              const card = create("div", "mini-card");
+              card.innerHTML = `
+                <div class="mini-label">${escapeHtml(item.label || "")}</div>
+                <div class="mini-value">${escapeHtml(item.value || "-")}</div>
+              `;
+              statsWrap.appendChild(card);
+            });
+            panel.appendChild(statsWrap);
+          }
+          if (current.paragraph) {
+            const p = create("p");
+            p.textContent = current.paragraph;
+            panel.appendChild(p);
+          }
+          if ((current.bullets || []).length) {
+            const list = create("div", "bullet-list");
+            current.bullets.forEach((item) => {
+              const line = create("div", "bullet-item");
+              const label = item.label ? `${item.label}: ` : "";
+              line.textContent = `${label}${item.text || ""}`;
+              list.appendChild(line);
+            });
+            panel.appendChild(list);
+          }
+          if (!panel.children.length) {
+            panel.appendChild(renderEmpty());
+          }
+        };
+
+        tabs.forEach((tab, index) => {
+          const btn = create("button", "tab-btn");
+          btn.type = "button";
+          btn.textContent = tab.label || `标签 ${index + 1}`;
+          if (index === activeIndex) btn.classList.add("active");
+          btn.addEventListener("click", () => {
+            activeIndex = index;
+            Array.from(head.children).forEach((child, childIndex) => {
+              child.classList.toggle("active", childIndex === activeIndex);
+            });
+            renderActive();
+          });
+          head.appendChild(btn);
+        });
+
+        wrap.appendChild(head);
+        wrap.appendChild(panel);
+        renderActive();
+        return wrap;
+      }
+
+      function renderTimeline(block) {
+        const wrap = create("div", "timeline");
+        const items = (((block || {}).data || {}).items) || [];
+        if (!items.length) {
+          wrap.appendChild(renderEmpty());
+          return wrap;
+        }
+        items.forEach((item) => {
+          const node = create("div", "timeline-item");
+          node.innerHTML = `
+            <div class="timeline-time">${escapeHtml(item.time || "")}</div>
+            <div class="timeline-body">
+              <div class="timeline-title">${escapeHtml(item.title || "")}</div>
+              <div class="timeline-text">${escapeHtml(item.text || "")}</div>
+            </div>
+          `;
+          wrap.appendChild(node);
+        });
+        return wrap;
+      }
+
+      function renderBulletPoints(block) {
+        const wrap = create("div", "bullet-list");
+        const data = (block || {}).data || {};
+        const points = Array.isArray(data.points) ? data.points : [];
+        if (!points.length) {
+          wrap.appendChild(renderEmpty());
+          return wrap;
+        }
+        points.forEach((point) => {
+          const item = create("div", "bullet-item");
+          item.textContent = String(point || "");
+          wrap.appendChild(item);
+        });
+        return wrap;
+      }
+
+      function renderAnalysisFlow(block) {
+        const wrap = create("div", "analysis-flow");
+        const steps = (((block || {}).data || {}).steps) || [];
+        if (!steps.length) {
+          wrap.appendChild(renderEmpty());
+          return wrap;
+        }
+        steps.forEach((step) => {
+          const node = create("div", "analysis-step");
+          node.innerHTML = `
+            <div class="analysis-label">${escapeHtml(step.label || "分析")}</div>
+            <div class="analysis-text">${escapeHtml(step.text || "")}</div>
+          `;
+          wrap.appendChild(node);
+        });
+        return wrap;
+      }
+
+      function renderPlaceholderChart(block) {
+        const data = (block || {}).data || {};
+        const wrap = create("div", "placeholder-chart");
+        wrap.innerHTML = `
+          <div class="placeholder-title">${escapeHtml(data.headline || "预留图表区域")}</div>
+          <div class="placeholder-note">${escapeHtml(data.note || "当前为占位设计，后端补真实图表数据后可直接替换。")}</div>
+          <div class="placeholder-lines">
+            <div class="placeholder-line" style="width: 92%;"></div>
+            <div class="placeholder-line" style="width: 76%;"></div>
+            <div class="placeholder-line" style="width: 84%;"></div>
+            <div class="placeholder-line" style="width: 64%;"></div>
+          </div>
+        `;
+        return wrap;
+      }
+
+      function renderTable(block) {
+        const data = (block || {}).data || {};
+        const columns = Array.isArray(data.columns)
+          ? data.columns
+          : Array.isArray(data.headers)
+            ? data.headers.map((header, index) => ({ key: `col_${index}`, label: header }))
+            : [];
+        const rows = data.rows || [];
+        const wrap = create("div", "table-wrap");
+        if (!columns.length) {
+          wrap.appendChild(renderEmpty());
+          return wrap;
+        }
+        const table = create("table");
+        const thead = create("thead");
+        const tr = create("tr");
+        columns.forEach((column) => {
+          const th = create("th");
+          th.textContent = column.label || column.key || "";
+          tr.appendChild(th);
+        });
+        thead.appendChild(tr);
+        table.appendChild(thead);
+        const tbody = create("tbody");
+        rows.forEach((row) => {
+          const rowNode = create("tr");
+          columns.forEach((column) => {
+            const td = create("td");
+            const value = Array.isArray(row) ? row[extractColumnIndex(column.key)] : row[column.key];
+            td.innerHTML = colorizeCell(value);
+            rowNode.appendChild(td);
+          });
+          tbody.appendChild(rowNode);
+        });
+        table.appendChild(tbody);
+        wrap.appendChild(table);
+        return wrap;
+      }
+
+      function renderHeatmap(block) {
+        const groups = (((block || {}).data || {}).groups) || [];
+        const wrap = create("div", "heatmap-groups");
+        if (!groups.length) {
+          wrap.appendChild(renderEmpty());
+          return wrap;
+        }
+        groups.forEach((group) => {
+          const card = create("div", "heatmap-group");
+          card.innerHTML = `
+            <div class="heatmap-group-head">
+              <div class="heatmap-group-title">${escapeHtml(group.name || "未命名分组")}</div>
+              <div class="heatmap-group-note">${(group.items || []).length} 个标的</div>
+            </div>
+          `;
+          const cells = create("div", "heatmap-cells");
+          (group.items || []).forEach((item) => {
+            const cell = create("div", "heatmap-cell");
+            cell.style.gridColumn = `span ${normalizeSpan(item.weight || item.value || 12)}`;
+            cell.style.background = heatColor(item.change);
+            cell.innerHTML = `
+              <div class="heatmap-cell-top">
+                <span class="code-chip">${escapeHtml(item.code || "item")}</span>
+                <span>${formatSigned(item.change)}%</span>
+              </div>
+              <div class="heatmap-label">${escapeHtml(item.label || "")}</div>
+              <div class="heatmap-score">${escapeHtml(String(item.value || "-"))}</div>
+            `;
+            cells.appendChild(cell);
+          });
+          card.appendChild(cells);
+          wrap.appendChild(card);
+        });
+        return wrap;
+      }
+
+      function renderKline(block) {
+        const data = (block || {}).data || {};
+        const candles = Array.isArray(data.candles)
+          ? data.candles
+          : Array.isArray(data.kline)
+            ? data.kline
+            : [];
+        const lines = normalizeKlineLines(data.lines || data.indicators || {});
+        const wrap = create("div", "chart-frame");
+        if (!candles.length) {
+          const fallback = create("div", "placeholder-chart");
+          fallback.innerHTML = `
+            <div class="placeholder-title">K 线数据暂未透传</div>
+            <div class="placeholder-note">当前仅返回概要信息：周期 ${escapeHtml(data.period || "-")}，数据点 ${escapeHtml(String(data.data_points || "-"))}，指标 ${escapeHtml((data.indicators || []).join(", ") || "-")}。</div>
+            <div class="placeholder-lines">
+              <div class="placeholder-line" style="width: 92%;"></div>
+              <div class="placeholder-line" style="width: 76%;"></div>
+              <div class="placeholder-line" style="width: 84%;"></div>
+            </div>
+          `;
+          wrap.appendChild(fallback);
+          return wrap;
+        }
+        const meta = create("div", "chart-meta");
+        meta.innerHTML = `
+          <div><span class="chart-symbol">${escapeHtml(data.name || "-")}</span> ${escapeHtml(data.symbol || "")}</div>
+          <div>${candles.length} 根K线</div>
+        `;
+        wrap.appendChild(meta);
+
+        const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+        svg.setAttribute("viewBox", "0 0 720 320");
+        svg.setAttribute("width", "100%");
+        svg.setAttribute("height", "320");
+
+        const maxPrice = Math.max(...candles.map((x) => Number(x[4] || x[2] || 0)));
+        const minPrice = Math.min(...candles.map((x) => Number(x[3] || x[2] || 0)));
+        const maxVolume = Math.max(...candles.map((x) => Number(x[5] || 0)), 1);
+        const chartLeft = 36;
+        const chartRight = 680;
+        const priceTop = 18;
+        const priceBottom = 210;
+        const volumeTop = 238;
+        const volumeBottom = 296;
+        const candleWidth = Math.max(4, Math.floor((chartRight - chartLeft) / candles.length * 0.62));
+
+        for (let i = 0; i < 4; i += 1) {
+          const y = priceTop + (priceBottom - priceTop) * i / 3;
+          svg.appendChild(lineSvg(chartLeft, y, chartRight, y, "rgba(147, 167, 191, 0.16)", 1));
+        }
+        svg.appendChild(lineSvg(chartLeft, volumeTop, chartRight, volumeTop, "rgba(147, 167, 191, 0.16)", 1));
+
+        candles.forEach((item, index) => {
+          const x = chartLeft + (chartRight - chartLeft) * (index + 0.5) / candles.length;
+          const open = Number(item[1] || 0);
+          const close = Number(item[2] || 0);
+          const low = Number(item[3] || 0);
+          const high = Number(item[4] || 0);
+          const volume = Number(item[5] || 0);
+          const color = close >= open ? "#22c58b" : "#ff6a6a";
+          const yOpen = mapPrice(open, minPrice, maxPrice, priceTop, priceBottom);
+          const yClose = mapPrice(close, minPrice, maxPrice, priceTop, priceBottom);
+          const yLow = mapPrice(low, minPrice, maxPrice, priceTop, priceBottom);
+          const yHigh = mapPrice(high, minPrice, maxPrice, priceTop, priceBottom);
+          const rectTop = Math.min(yOpen, yClose);
+          const rectHeight = Math.max(2, Math.abs(yClose - yOpen));
+          svg.appendChild(lineSvg(x, yLow, x, yHigh, color, 1.4));
+          svg.appendChild(rectSvg(x - candleWidth / 2, rectTop, candleWidth, rectHeight, color));
+          const barHeight = Math.max(2, (volume / maxVolume) * (volumeBottom - volumeTop));
+          svg.appendChild(rectSvg(x - candleWidth / 2, volumeBottom - barHeight, candleWidth, barHeight, `${color}88`));
+        });
+
+        Object.keys(lines).forEach((lineName, lineIndex) => {
+          const points = (lines[lineName] || []).map((item, index) => {
+            const x = chartLeft + (chartRight - chartLeft) * (index + 0.5) / Math.max((lines[lineName] || []).length, 1);
+            const y = mapPrice(Number(item[1] || 0), minPrice, maxPrice, priceTop, priceBottom);
+            return `${x},${y}`;
+          }).join(" ");
+          const polyline = document.createElementNS("http://www.w3.org/2000/svg", "polyline");
+          polyline.setAttribute("points", points);
+          polyline.setAttribute("fill", "none");
+          polyline.setAttribute("stroke", ["#1fb6ff", "#19d3a2", "#ffb74d"][lineIndex % 3]);
+          polyline.setAttribute("stroke-width", "2");
+          svg.appendChild(polyline);
+        });
+
+        svg.appendChild(textSvg(8, 24, maxPrice.toFixed(2)));
+        svg.appendChild(textSvg(8, 204, minPrice.toFixed(2)));
+        svg.appendChild(textSvg(8, 252, "成交量"));
+        wrap.appendChild(svg);
+        return wrap;
+      }
+
+      function renderMiniChart(block) {
+        const data = (block || {}).data || {};
+        const wrap = create("div", "placeholder-chart");
+        const source = String(data.source || "").trim();
+        let title = "行情图表待补充";
+        let note = "当前任务已给出数据来源标识，但尚未透传完整图线数据。";
+        if (source === "intraday_kline") {
+          title = "日内分时走势";
+          note = "该卡片当前指向分时数据源，后续将直接透传分时价格线、均价线与成交量。";
+        } else if (source === "daily_kline") {
+          title = "历史K线走势";
+          note = "该卡片当前指向历史K线数据源，后续将补上日K、均线、MACD等指标。";
+        }
+        wrap.innerHTML = `
+          <div class="placeholder-title">${escapeHtml(title)}</div>
+          <div class="placeholder-note">${escapeHtml(note)}</div>
+          <div class="placeholder-lines">
+            <div class="placeholder-line" style="width: 92%;"></div>
+            <div class="placeholder-line" style="width: 76%;"></div>
+            <div class="placeholder-line" style="width: 84%;"></div>
+            <div class="placeholder-line" style="width: 64%;"></div>
+          </div>
+        `;
+        return wrap;
+      }
+
+      function renderSeriesChart(block) {
+        const data = (block || {}).data || {};
+        const categories = Array.isArray(data.categories) ? data.categories : [];
+        const series = Array.isArray(data.series) ? data.series : [];
+        const wrap = create("div", "chart-frame");
+        if (!categories.length || !series.length) {
+          wrap.appendChild(renderEmpty("暂无图表数据"));
+          return wrap;
+        }
+
+        const sampled = categories.length > 48 ? sampleChartData(categories, series, 48) : { categories, series };
+        const sampledCategories = sampled.categories;
+        const sampledSeries = sampled.series;
+        const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+        svg.setAttribute("viewBox", "0 0 720 320");
+        svg.setAttribute("width", "100%");
+        svg.setAttribute("height", "320");
+
+        const chartLeft = 44;
+        const chartRight = 690;
+        const chartTop = 18;
+        const chartBottom = 270;
+        const values = [];
+        sampledSeries.forEach((item) => {
+          (item.data || []).forEach((value) => {
+            const num = Number(value);
+            if (!Number.isNaN(num)) values.push(num);
+          });
+        });
+        const maxValue = values.length ? Math.max(...values) : 0;
+        const minValue = values.length ? Math.min(...values) : 0;
+        const maxAbs = Math.max(Math.abs(maxValue), Math.abs(minValue), 1);
+
+        for (let i = 0; i < 4; i += 1) {
+          const y = chartTop + (chartBottom - chartTop) * i / 3;
+          svg.appendChild(lineSvg(chartLeft, y, chartRight, y, "rgba(147, 167, 191, 0.16)", 1));
+        }
+        const zeroY = mapValueToY(0, -maxAbs, maxAbs, chartTop, chartBottom);
+        svg.appendChild(lineSvg(chartLeft, zeroY, chartRight, zeroY, "rgba(255,255,255,0.18)", 1));
+
+        sampledSeries.forEach((item, seriesIndex) => {
+          const type = String(item.type || data.chart_type || "line").toLowerCase();
+          const color = ["#1fb6ff", "#19d3a2", "#ffb74d", "#ff6a6a"][seriesIndex % 4];
+          if (type === "bar") {
+            const barWidth = Math.max(4, Math.floor((chartRight - chartLeft) / Math.max(sampledCategories.length, 1) * 0.55));
+            (item.data || []).forEach((value, index) => {
+              const num = Number(value);
+              if (Number.isNaN(num)) return;
+              const x = chartLeft + (chartRight - chartLeft) * (index + 0.5) / Math.max(sampledCategories.length, 1);
+              const y = mapValueToY(num, -maxAbs, maxAbs, chartTop, chartBottom);
+              const top = Math.min(y, zeroY);
+              const height = Math.max(2, Math.abs(zeroY - y));
+              svg.appendChild(rectSvg(x - barWidth / 2, top, barWidth, height, `${color}bb`));
+            });
+            return;
+          }
+          const points = (item.data || []).map((value, index) => {
+            const num = Number(value);
+            if (Number.isNaN(num)) return null;
+            const x = chartLeft + (chartRight - chartLeft) * (index + 0.5) / Math.max(sampledCategories.length, 1);
+            const y = mapValueToY(num, -maxAbs, maxAbs, chartTop, chartBottom);
+            return `${x},${y}`;
+          }).filter(Boolean).join(" ");
+          const polyline = document.createElementNS("http://www.w3.org/2000/svg", "polyline");
+          polyline.setAttribute("points", points);
+          polyline.setAttribute("fill", "none");
+          polyline.setAttribute("stroke", color);
+          polyline.setAttribute("stroke-width", "2");
+          svg.appendChild(polyline);
+        });
+
+        svg.appendChild(textSvg(8, 24, formatCompactNumber(maxAbs)));
+        svg.appendChild(textSvg(8, zeroY - 4, "0"));
+        svg.appendChild(textSvg(8, chartBottom, formatCompactNumber(-maxAbs)));
+        wrap.appendChild(svg);
+
+        const meta = create("div", "chart-meta");
+        meta.innerHTML = `
+          <div><span class="chart-symbol">${escapeHtml(data.title || block.title || "图表")}</span></div>
+          <div>${sampledCategories.length} 点 · ${(data.unit || data.left_unit || "") ? escapeHtml(data.unit || data.left_unit || "") : "series"}</div>
+        `;
+        wrap.prepend(meta);
+        return wrap;
+      }
+
+      function renderFlowchart(block) {
+        const wrap = create("div", "flowchart-box");
+        const pre = create("pre", "flowchart-source");
+        pre.textContent = (((block || {}).data || {}).source) || "暂无流程图数据";
+        wrap.appendChild(pre);
+        return wrap;
+      }
+
+      function renderFallback(block) {
+        const wrap = create("div", "fallback-box");
+        const pre = create("pre");
+        pre.textContent = JSON.stringify(block, null, 2);
+        wrap.appendChild(pre);
+        return wrap;
+      }
+
+      function renderEmpty(text) {
+        const node = create("div", "empty");
+        node.textContent = text || "暂无数据";
+        return node;
+      }
+
+      function wrapGridItem(node) {
+        const holder = create("div");
+        holder.style.gridColumn = "span 12";
+        holder.appendChild(node);
+        return holder;
+      }
+
+      function hasRenderableBlocks(section) {
+        return Array.isArray(section.blocks) && section.blocks.some(hasRenderableData);
+      }
+
+      function hasRenderableData(block) {
+        return !!block && typeof block === "object";
+      }
+
+      function create(tag, className) {
+        const node = document.createElement(tag);
+        if (className) node.className = className;
+        return node;
+      }
+
+      function getSpan(block, key, fallback) {
+        const span = ((block || {}).span || {});
+        if (span[key]) return span[key];
+        if (key === "desktop" && span.md) return span.md;
+        if (key === "mobile" && span.xs) return Math.max(1, Math.min(12, Number(span.xs) || 1));
+        if (key === "desktop" && span.col) return Math.max(1, Math.min(12, Math.floor(12 / Math.max(1, Number(span.col) || 1))));
+        return fallback;
+      }
+
+      function extractColumnIndex(key) {
+        const match = String(key || "").match(/col_(\d+)/);
+        return match ? Number(match[1]) : 0;
+      }
+
+      function normalizeCardTone(value) {
+        const text = String(value || "").toLowerCase();
+        if (text === "positive" || text === "up") return "accent";
+        if (text === "negative" || text === "down" || text === "warning") return "soft";
+        return "";
+      }
+
+      function formatLargeNumber(value) {
+        const num = Number(value);
+        if (Number.isNaN(num)) return String(value || "-");
+        if (Math.abs(num) >= 100000000) return `${(num / 100000000).toFixed(2)} 亿`;
+        if (Math.abs(num) >= 10000) return `${(num / 10000).toFixed(2)} 万`;
+        return `${num}`;
+      }
+
+      function normalizeKlineLines(lines) {
+        if (!lines || typeof lines !== "object") return {};
+        const result = {};
+        Object.keys(lines).forEach((key) => {
+          const value = lines[key];
+          if (Array.isArray(value)) {
+            result[key] = value;
+          }
+        });
+        return result;
+      }
+
+      function looksLikeHtml(value) {
+        return /<[a-z][\s\S]*>/i.test(String(value || ""));
+      }
+
+      function sanitizeRichHtml(html) {
+        const template = document.createElement("template");
+        template.innerHTML = String(html || "");
+        const allowedTags = new Set(["DIV", "P", "UL", "OL", "LI", "STRONG", "B", "EM", "I", "BR", "SPAN"]);
+        const walker = document.createTreeWalker(template.content, NodeFilter.SHOW_ELEMENT, null);
+        const toProcess = [];
+        let node = walker.nextNode();
+        while (node) {
+          toProcess.push(node);
+          node = walker.nextNode();
+        }
+        toProcess.forEach((element) => {
+          if (!allowedTags.has(element.tagName)) {
+            const parent = element.parentNode;
+            while (element.firstChild) {
+              parent.insertBefore(element.firstChild, element);
+            }
+            parent.removeChild(element);
+            return;
+          }
+          Array.from(element.attributes).forEach((attr) => {
+            if (attr.name !== "style") {
+              element.removeAttribute(attr.name);
+            }
+          });
+          if (element.hasAttribute("style")) {
+            element.removeAttribute("style");
+          }
+        });
+        return template.innerHTML;
+      }
+
+      function normalizeSpan(weight) {
+        if (weight >= 28) return 4;
+        if (weight >= 20) return 3;
+        if (weight >= 12) return 2;
+        return 1;
+      }
+
+      function heatColor(change) {
+        const value = Number(change || 0);
+        if (value >= 7) return "linear-gradient(135deg, #0f8a61, #22c58b)";
+        if (value >= 3) return "linear-gradient(135deg, #1598c7, #1fb6ff)";
+        if (value >= 0) return "linear-gradient(135deg, #486178, #6a87a3)";
+        if (value >= -3) return "linear-gradient(135deg, #b76262, #d97a7a)";
+        return "linear-gradient(135deg, #a14e4e, #cf5d5d)";
+      }
+
+      function formatSigned(value) {
+        const num = Number(value || 0);
+        return num > 0 ? `+${num.toFixed(2)}` : num.toFixed(2);
+      }
+
+      function colorizeCell(value) {
+        const text = escapeHtml(value == null ? "-" : String(value));
+        if (/^[+-]?\d+(\.\d+)?%?$/.test(String(value || ""))) {
+          const num = Number(String(value).replace("%", ""));
+          const cls = num > 0 ? "rise" : (num < 0 ? "fall" : "");
+          return `<span class="${cls}">${text}</span>`;
+        }
+        return text;
+      }
+
+      function mapPrice(price, minPrice, maxPrice, top, bottom) {
+        if (maxPrice === minPrice) return (top + bottom) / 2;
+        const ratio = (price - minPrice) / (maxPrice - minPrice);
+        return bottom - ratio * (bottom - top);
+      }
+
+      function mapValueToY(value, minValue, maxValue, top, bottom) {
+        if (maxValue === minValue) return (top + bottom) / 2;
+        const ratio = (value - minValue) / (maxValue - minValue);
+        return bottom - ratio * (bottom - top);
+      }
+
+      function sampleChartData(categories, series, maxPoints) {
+        if (!Array.isArray(categories) || categories.length <= maxPoints) {
+          return { categories, series };
+        }
+        const step = Math.ceil(categories.length / maxPoints);
+        const sampledCategories = [];
+        const sampledSeries = series.map((item) => ({ ...item, data: [] }));
+        for (let i = 0; i < categories.length; i += step) {
+          sampledCategories.push(categories[i]);
+          sampledSeries.forEach((item, idx) => {
+            item.data.push(((series[idx] || {}).data || [])[i]);
+          });
+        }
+        return { categories: sampledCategories, series: sampledSeries };
+      }
+
+      function formatCompactNumber(value) {
+        const num = Number(value || 0);
+        if (Math.abs(num) >= 10000) return `${(num / 10000).toFixed(1)}万`;
+        return num.toFixed(0);
+      }
+
+      function lineSvg(x1, y1, x2, y2, color, width) {
+        const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+        line.setAttribute("x1", x1);
+        line.setAttribute("y1", y1);
+        line.setAttribute("x2", x2);
+        line.setAttribute("y2", y2);
+        line.setAttribute("stroke", color);
+        line.setAttribute("stroke-width", width);
+        return line;
+      }
+
+      function rectSvg(x, y, width, height, fill) {
+        const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+        rect.setAttribute("x", x);
+        rect.setAttribute("y", y);
+        rect.setAttribute("width", width);
+        rect.setAttribute("height", height);
+        rect.setAttribute("fill", fill);
+        rect.setAttribute("rx", "1.5");
+        return rect;
+      }
+
+      function textSvg(x, y, text) {
+        const node = document.createElementNS("http://www.w3.org/2000/svg", "text");
+        node.setAttribute("x", x);
+        node.setAttribute("y", y);
+        node.setAttribute("fill", "#93a7bf");
+        node.setAttribute("font-size", "11");
+        node.textContent = text;
+        return node;
+      }
+
+      function escapeHtml(value) {
+        return String(value == null ? "" : value)
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;")
+          .replace(/'/g, "&#39;");
+      }
+    })();
+  </script>
+</body>
+</html>

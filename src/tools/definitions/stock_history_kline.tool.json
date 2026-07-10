@@ -1,0 +1,169 @@
+{
+  "auth": "public",
+  "availability": {
+    "lifecycle": "retired",
+    "retrieval_mode": "direct_only",
+    "visibility": "hidden"
+  },
+  "capabilities": [
+    "daily_kline",
+    "history_kline",
+    "timeseries"
+  ],
+  "defaults": {
+    "days": "60"
+  },
+  "identity": {
+    "description": "查询指定个股最近N天的历史日K，结果中包括当天最新一根日K（如果未收盘则为盘中实时K线）。",
+    "display_name": "个股历史日K",
+    "domain": "stock",
+    "owner": "tools"
+  },
+  "invocation_example": "stock_history_kline(name=\"贵州茅台\", days=60)",
+  "match_contract": {
+    "request_families": [
+      "data_access"
+    ],
+    "work_item_types": [
+      "tool"
+    ],
+    "capability_classes": [
+      "data_retrieval",
+      "kline_timeseries"
+    ],
+    "side_effect_level": "read_only"
+  },
+  "name": "stock_history_kline",
+  "post_process": {
+    "deterministic": {
+      "enabled": false,
+      "handler": ""
+    },
+    "llm": {
+      "enabled": false,
+      "prompt_key": ""
+    }
+  },
+  "profiles": {
+    "mock": {
+      "enabled": true,
+      "implementation": {
+        "kind": "inline_result"
+      },
+      "result": {
+        "data": {
+          "code": "code_示例",
+          "daily_kline": {
+            "candles": [
+              null
+            ],
+            "indicators": [
+              null
+            ]
+          },
+          "days": 0,
+          "latest_candle": "latest_candle_示例",
+          "name": "name_示例"
+        },
+        "error": "error_示例",
+        "ok": false,
+        "tool": "stock_history_kline"
+      }
+    },
+    "real": {
+      "enabled": true,
+      "implementation": {
+        "kind": "python_callable",
+        "target": "src.tools.stock_quote_tool:run_history_kline"
+      }
+    }
+  },
+  "retention": {
+    "drop_default": [],
+    "high_value_for_reasoning": [
+      "data.name",
+      "data.code",
+      "data.latest_candle"
+    ],
+    "high_value_for_render": [
+      "data.daily_kline"
+    ],
+    "recommended_reducers": {
+      "data.daily_kline": "summarize_timeseries"
+    },
+    "usually_too_large_for_prompt": [
+      "data.daily_kline.candles",
+      "data.daily_kline.indicators"
+    ]
+  },
+  "runtime_hints": {
+    "cost_class": "medium",
+    "latency_class": "medium",
+    "supports_async_submit": false,
+    "supports_stream": false
+  },
+  "safety": {
+    "network": true,
+    "persistence": false,
+    "side_effect": "none"
+  },
+  "schemas": {
+    "input": {
+      "$id": "stock_history_kline.input.schema.json",
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "days": {
+          "type": "integer",
+          "description": "最近N天日K，默认60。"
+        },
+        "name": {
+          "type": "string",
+          "description": "个股名称或代码。"
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "type": "object"
+    },
+    "output": {
+      "$ref": "src/tools/schemas/stock_history_kline.schema.json"
+    }
+  },
+  "status": "deprecated",
+  "tags": [
+    "stock",
+    "kline",
+    "history"
+  ],
+  "tests": {
+    "golden_cases": [],
+    "sample_inputs": [
+      {
+        "arguments": {
+          "days": 60,
+          "name": "贵州茅台"
+        },
+        "name": "default_stock_history_kline"
+      }
+    ]
+  },
+  "ui_hints": {
+    "editable_sections": [
+      "identity",
+      "schemas.input",
+      "schemas.output",
+      "capabilities",
+      "profiles",
+      "retention",
+      "post_process",
+      "tests"
+    ]
+  },
+  "version": "v1",
+  "subject_tags": [
+    "stock"
+  ],
+  "tool_priority": 1
+}

@@ -1,0 +1,103 @@
+[
+  {
+    "case_id": "market_amount_10d_by_market",
+    "suite": "planner",
+    "priority": "P0",
+    "title": "市场总成交额近 10 日走势",
+    "run": "e2e",
+    "input": {
+      "messages": [
+        {
+          "role": "user",
+          "content": "最近 10 个交易日，上证、深证、北证三大市场的总成交额分别是什么走势？帮我按日期列出来。"
+        }
+      ]
+    },
+    "expect": {
+      "task": "查询上证、深证、北证最近 10 个交易日的市场总成交额，并按日期列出。",
+      "tools": ["market_history_amount"],
+      "tool_args": {
+        "market_history_amount": {"days": 10}
+      },
+      "answer": "基于工具结果回答，不编造数据。"
+    },
+    "tags": ["market", "amount"]
+  },
+  {
+    "case_id": "second_item_followup_funds",
+    "suite": "conversation",
+    "priority": "P0",
+    "title": "第二个对象续问资金面",
+    "run": "conversation",
+    "input": {
+      "messages": [
+        {"role": "user", "content": "比较一下公司A和公司B今天的行情。"},
+        {"role": "assistant", "content": "已比较公司A和公司B，公司A是第一个对象，公司B是第二个对象。"},
+        {"role": "user", "content": "第二个公司的资金面也看一下。"}
+      ]
+    },
+    "expect": {
+      "task": "把第二个公司理解为公司B，并继续查询公司B的资金面。"
+    },
+    "tags": ["continuity", "reference"]
+  },
+  {
+    "case_id": "attachment_company_reference",
+    "suite": "conversation",
+    "priority": "P0",
+    "title": "附件中公司引用",
+    "run": "conversation",
+    "input": {
+      "messages": [
+        {"role": "user", "content": "图片里提到的那家公司，帮我看看资金情况。"}
+      ],
+      "attachments": [
+        {
+          "type": "image",
+          "summary": "图片提到公司A正在扩产。"
+        }
+      ]
+    },
+    "expect": {
+      "task": "从附件中识别公司A，并查询公司A的资金情况。"
+    },
+    "tags": ["attachment", "reference"]
+  },
+  {
+    "case_id": "limitup_top1_then_quote_news",
+    "suite": "planner",
+    "priority": "P1",
+    "title": "集合筛选后查行情和新闻",
+    "run": "planner",
+    "input": {
+      "messages": [
+        {"role": "user", "content": "从今天涨停股里找出成交量最大的那只，再查它的行情和相关新闻。"}
+      ]
+    },
+    "expect": {
+      "task": "先找今天涨停股中成交量最大的股票，再查询该股票行情和相关新闻。",
+      "tools": ["涨跌停列表查询", "stock_realtime_quote", "financial_news_search"]
+    },
+    "tags": ["decomposition", "dependency", "quote", "news"]
+  },
+  {
+    "case_id": "capability_gap_pe_ratio",
+    "suite": "planner",
+    "priority": "P1",
+    "title": "当前工具不覆盖市盈率",
+    "run": "planner",
+    "input": {
+      "messages": [
+        {"role": "user", "content": "这两家公司当前市盈率分别是多少？"}
+      ],
+      "context": {
+        "referents": ["公司A", "公司B"]
+      }
+    },
+    "expect": {
+      "task": "承接上下文中的公司A和公司B，尝试查询两家公司当前市盈率。",
+      "answer": "如果当前能力不支持市盈率查询，应说明能力缺口，不编造数据。"
+    },
+    "tags": ["gap", "reference"]
+  }
+]

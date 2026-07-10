@@ -1,0 +1,195 @@
+{
+  "auth": "public",
+  "availability": {
+    "lifecycle": "active",
+    "retrieval_mode": "retrievable",
+    "visibility": "visible"
+  },
+  "capabilities": [
+    "hot_plate_rank",
+    "plate_daily_market",
+    "plate_moneyflow",
+    "plate_leaders"
+  ],
+  "defaults": {
+    "top_k": 10,
+    "sort_by": "rise_fall_rate",
+    "include_members": true,
+    "member_limit": 3
+  },
+  "identity": {
+    "description": "查询热门板块的行情、成交额和主力资金排名。可用 plate 按板块代码或名称过滤，也可以不传 plate 直接取全市场排名。sort_by 支持涨跌幅、成交额和主力净流入。include_members 可附带每个板块内的代表个股，但该工具不替代板块成分股明细查询。",
+    "display_name": "热门板块排名",
+    "domain": "plate",
+    "owner": "tools"
+  },
+  "invocation_example": "plate_rank_query(top_k=10, sort_by=\"rise_fall_rate\")",
+  "match_contract": {
+    "request_families": [
+      "data_access"
+    ],
+    "work_item_types": [
+      "tool"
+    ],
+    "capability_classes": [
+      "data_retrieval",
+      "market_screening",
+      "plate_rank_lookup"
+    ],
+    "side_effect_level": "read_only"
+  },
+  "name": "plate_rank_query",
+  "post_process": {
+    "deterministic": {
+      "enabled": false,
+      "handler": ""
+    },
+    "llm": {
+      "enabled": false,
+      "prompt_key": ""
+    }
+  },
+  "profiles": {
+    "mock": {
+      "enabled": true,
+      "implementation": {
+        "kind": "inline_result"
+      },
+      "result": {
+        "data": {
+          "items": [],
+          "plate": "",
+          "sort_by": "rise_fall_rate",
+          "trade_date": ""
+        },
+        "error": "",
+        "ok": true,
+        "tool": "plate_rank_query"
+      }
+    },
+    "real": {
+      "enabled": true,
+      "implementation": {
+        "kind": "python_callable",
+        "target": "src.tools.plate_rank_query_tool:run"
+      }
+    }
+  },
+  "retention": {
+    "drop_default": [],
+    "high_value_for_reasoning": [
+      "data.trade_date",
+      "data.sort_by",
+      "data.items"
+    ],
+    "high_value_for_render": [],
+    "recommended_reducers": {
+      "data.items": "summarize_ranked_list",
+      "data.items.[].leaders": "summarize_ranked_list"
+    },
+    "usually_too_large_for_prompt": [
+      "data.items"
+    ]
+  },
+  "runtime_hints": {
+    "cost_class": "low",
+    "latency_class": "low",
+    "supports_async_submit": false,
+    "supports_stream": false
+  },
+  "safety": {
+    "network": true,
+    "persistence": false,
+    "side_effect": "none"
+  },
+  "schemas": {
+    "input": {
+      "$id": "plate_rank_query.input.schema.json",
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "trade_date": {
+          "description": "截止交易日，YYYY-MM-DD；为空时取最近交易日。",
+          "type": "string"
+        },
+        "top_k": {
+          "description": "返回板块数量，默认 10。",
+          "maximum": 50,
+          "minimum": 1,
+          "type": "integer"
+        },
+        "sort_by": {
+          "description": "排序指标。",
+          "enum": [
+            "rise_fall_rate",
+            "amount",
+            "main_net_inflow"
+          ],
+          "type": "string"
+        },
+        "plate": {
+          "description": "可选板块名称或代码过滤词。",
+          "type": "string"
+        },
+        "include_members": {
+          "description": "是否附带板块内个股 leader。",
+          "type": "boolean"
+        },
+        "member_limit": {
+          "description": "每个板块最多返回几个成分股 leader。",
+          "maximum": 10,
+          "minimum": 0,
+          "type": "integer"
+        }
+      },
+      "required": [],
+      "type": "object"
+    },
+    "output": {
+      "$ref": "src/tools/schemas/plate_rank_query.schema.json"
+    }
+  },
+  "status": "active",
+  "tags": [
+    "plate",
+    "hotspot",
+    "market_screening",
+    "capital_flow"
+  ],
+  "tests": {
+    "golden_cases": [],
+    "sample_inputs": [
+      {
+        "arguments": {
+          "sort_by": "rise_fall_rate",
+          "top_k": 10
+        },
+        "name": "top_plate_by_rise"
+      },
+      {
+        "arguments": {
+          "sort_by": "main_net_inflow",
+          "top_k": 10
+        },
+        "name": "top_plate_by_main_net_inflow"
+      }
+    ]
+  },
+  "ui_hints": {
+    "editable_sections": [
+      "identity",
+      "schemas.input",
+      "schemas.output",
+      "capabilities",
+      "profiles",
+      "retention",
+      "post_process",
+      "tests"
+    ]
+  },
+  "version": "v1",
+  "subject_tags": [
+    "plate"
+  ],
+  "tool_priority": 1
+}

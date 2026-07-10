@@ -1,0 +1,81 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "stock_history_kline.schema.json",
+  "title": "Stock History Kline Tool Output",
+  "type": "object",
+  "required": [
+    "tool",
+    "ok",
+    "data",
+    "error"
+  ],
+  "properties": {
+    "data": {
+      "type": "object",
+      "required": [
+        "code",
+        "daily_kline",
+        "days",
+        "latest_candle",
+        "name"
+      ],
+      "properties": {
+        "code": {
+          "description": "六位证券代码。",
+          "type": "string"
+        },
+        "daily_kline": {
+          "additionalProperties": false,
+          "description": "",
+          "properties": {
+            "candles": {
+              "description": "历史日K列表。",
+              "items": {
+                "$ref": "#/$defs/candle"
+              },
+              "type": "array"
+            },
+            "indicators": {
+              "description": "配套指标序列。",
+              "items": {
+                "$ref": "#/$defs/indicatorSeries"
+              },
+              "type": "array"
+            }
+          },
+          "required": [
+            "candles",
+            "indicators"
+          ],
+          "type": "object"
+        },
+        "days": {
+          "description": "返回的历史日K天数。",
+          "type": "integer"
+        },
+        "latest_candle": {
+          "description": "最新一根日K，便于推理时直接使用。",
+          "type": "string"
+        },
+        "name": {
+          "description": "个股名称。",
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "error": {
+      "description": "错误信息，成功时为空字符串。",
+      "type": "string"
+    },
+    "ok": {
+      "description": "工具执行是否成功。",
+      "type": "boolean"
+    },
+    "tool": {
+      "const": "stock_history_kline",
+      "description": "工具名称。"
+    }
+  },
+  "additionalProperties": false
+}

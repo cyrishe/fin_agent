@@ -1,0 +1,1151 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ page_title or "Tool Studio" }}</title>
+  <style>
+    :root {
+      --bg: #f4f6f8;
+      --panel: #ffffff;
+      --panel-soft: #f7f9fb;
+      --line: #e1e6ec;
+      --line-strong: #c6d0da;
+      --text: #16202a;
+      --muted: #667384;
+      --accent: #176c5d;
+      --accent-strong: #0f5549;
+      --accent-soft: #e6f3ef;
+      --blue-soft: #eaf2ff;
+      --blue: #2459a6;
+      --err: #b42318;
+      --ok: #067647;
+      --shadow: 0 16px 40px rgba(22, 32, 42, 0.08);
+      --sans: "PingFang SC", "Noto Sans SC", "Helvetica Neue", Arial, sans-serif;
+      --mono: "SFMono-Regular", Menlo, Consolas, monospace;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      color: var(--text);
+      background: var(--bg);
+      font-family: var(--sans);
+    }
+    button, input, textarea, select { font: inherit; }
+    button { cursor: pointer; }
+    .layout {
+      display: grid;
+      grid-template-columns: 340px minmax(0, 1fr);
+      min-height: 100vh;
+    }
+    .sidebar {
+      border-right: 1px solid var(--line);
+      background: var(--panel);
+      padding: 20px 18px;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow: auto;
+    }
+    .brand {
+      font-size: 21px;
+      font-weight: 800;
+      margin-bottom: 18px;
+      letter-spacing: .01em;
+    }
+    .nav {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+      margin-bottom: 18px;
+    }
+    .nav a {
+      display: block;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 9px 10px;
+      color: var(--text);
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 700;
+      background: #fbfcfd;
+    }
+    .nav a.active {
+      border-color: var(--accent);
+      background: var(--accent-soft);
+      color: var(--accent);
+    }
+    .category-tabs {
+      display: grid;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+    .category-tab {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 12px 13px;
+      background: #fbfcfd;
+      text-align: left;
+      color: var(--text);
+      font-weight: 750;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    .category-tab.active {
+      border-color: var(--accent);
+      background: var(--accent-soft);
+      color: var(--accent);
+    }
+    .count {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .search {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 11px 12px;
+      background: #fff;
+      margin-bottom: 14px;
+    }
+    .tree {
+      display: grid;
+      gap: 5px;
+      font-size: 13px;
+    }
+    .tree details {
+      border-left: 1px solid transparent;
+      padding-left: 8px;
+    }
+    .tree details[open] {
+      border-left-color: var(--line);
+    }
+    .tree summary {
+      list-style: none;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      min-height: 32px;
+      border-radius: 9px;
+      padding: 5px 7px;
+      color: var(--text);
+      font-weight: 700;
+    }
+    .tree summary::-webkit-details-marker { display: none; }
+    .tree summary::before {
+      content: "›";
+      color: var(--muted);
+      transform: rotate(0deg);
+      transition: transform .12s ease;
+    }
+    .tree details[open] > summary::before {
+      transform: rotate(90deg);
+    }
+    .node-btn {
+      width: 100%;
+      border: 0;
+      background: transparent;
+      color: var(--text);
+      text-align: left;
+      border-radius: 10px;
+      padding: 8px 9px;
+      display: grid;
+      grid-template-columns: 82px minmax(0, 1fr);
+      gap: 8px;
+      align-items: center;
+    }
+    .node-btn:hover,
+    .node-btn.active {
+      background: var(--accent-soft);
+      color: var(--accent);
+    }
+    .node-kind {
+      color: var(--muted);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+      font-weight: 750;
+    }
+    .node-name {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      font-weight: 650;
+    }
+    .main {
+      padding: 22px;
+      display: grid;
+      grid-template-rows: auto 1fr;
+      gap: 14px;
+      min-width: 0;
+    }
+    .topbar,
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      box-shadow: var(--shadow);
+    }
+    .topbar {
+      padding: 18px 20px;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+    }
+    .title {
+      margin: 0;
+      font-size: 24px;
+      line-height: 1.25;
+    }
+    .subtitle {
+      margin-top: 6px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+    .actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+    .btn {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 9px 12px;
+      background: #fff;
+      color: var(--text);
+      font-weight: 750;
+      text-decoration: none;
+    }
+    .btn.primary {
+      border-color: var(--accent);
+      background: var(--accent);
+      color: #fff;
+    }
+    .btn:disabled {
+      opacity: .52;
+      cursor: not-allowed;
+    }
+    .workspace {
+      display: grid;
+      grid-template-columns: minmax(420px, 1fr) minmax(340px, 430px);
+      gap: 16px;
+      min-height: 0;
+    }
+    .panel {
+      padding: 18px;
+      min-width: 0;
+      overflow: auto;
+    }
+    .panel h2 {
+      margin: 0 0 14px;
+      font-size: 17px;
+    }
+    .form {
+      display: grid;
+      gap: 15px;
+    }
+    .field {
+      display: grid;
+      gap: 6px;
+    }
+    .label {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 750;
+      letter-spacing: .02em;
+    }
+    .readonly {
+      min-height: 40px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 10px 11px;
+      background: var(--panel-soft);
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: 12px;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+    textarea,
+    input {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 11px 12px;
+      background: #fff;
+      color: var(--text);
+    }
+    textarea:focus,
+    input:focus {
+      outline: 2px solid rgba(23, 108, 93, .16);
+      border-color: var(--accent);
+    }
+    textarea {
+      min-height: 118px;
+      resize: vertical;
+      font-family: var(--mono);
+      font-size: 12px;
+      line-height: 1.55;
+    }
+    textarea.short { min-height: 82px; }
+    .status {
+      display: none;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 10px 11px;
+      font-size: 13px;
+      line-height: 1.45;
+      white-space: pre-wrap;
+    }
+    .status.show { display: block; }
+    .status.ok {
+      border-color: rgba(6, 118, 71, .22);
+      background: #ecfdf3;
+      color: var(--ok);
+    }
+    .status.err {
+      border-color: rgba(180, 35, 24, .2);
+      background: #fef3f2;
+      color: var(--err);
+    }
+    .muted {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.55;
+    }
+    .panel-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+    .panel-head h2 { margin: 0; }
+    .badge {
+      border-radius: 999px;
+      padding: 5px 9px;
+      background: var(--blue-soft);
+      color: var(--blue);
+      font-size: 12px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+    .summary-card {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: var(--panel-soft);
+      padding: 13px;
+      display: grid;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .summary-title {
+      font-size: 15px;
+      font-weight: 800;
+      line-height: 1.35;
+      word-break: break-word;
+    }
+    .summary-desc {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.55;
+      word-break: break-word;
+    }
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+    .info-tile {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: #fff;
+      padding: 11px;
+      min-width: 0;
+    }
+    .info-label {
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 800;
+      margin-bottom: 6px;
+    }
+    .info-value {
+      font-size: 13px;
+      font-weight: 750;
+      line-height: 1.4;
+      overflow-wrap: anywhere;
+    }
+    .section-title {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+      margin: 16px 0 8px;
+    }
+    .chip-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+    }
+    .chip {
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: #fff;
+      padding: 6px 9px;
+      color: var(--text);
+      font-size: 12px;
+      font-weight: 700;
+      max-width: 100%;
+      overflow-wrap: anywhere;
+    }
+    .text-list {
+      display: grid;
+      gap: 8px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+    .text-list li,
+    .example-item {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: #fff;
+      padding: 10px 11px;
+      color: var(--text);
+      font-size: 13px;
+      line-height: 1.55;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+    }
+    .example-list {
+      display: grid;
+      gap: 9px;
+    }
+    .side-panel {
+      background: #fbfcfd;
+    }
+    .hidden { display: none !important; }
+    @media (max-width: 1100px) {
+      .layout { grid-template-columns: 1fr; }
+      .sidebar { position: static; height: auto; }
+      .workspace { grid-template-columns: 1fr; }
+      .topbar { display: grid; }
+      .actions { justify-content: flex-start; }
+    }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="brand">工具设计台</div>
+      <nav class="nav" aria-label="Studio 导航">
+        <a id="navTools" class="active" href="#">工具</a>
+        <a id="navSkills" href="#">Skill</a>
+        <a id="navAgents" href="#">Agent</a>
+        <a id="navApplications" href="#">应用</a>
+      </nav>
+      <div class="category-tabs">
+        <button class="category-tab active" type="button" data-category="finance">
+          <span>金融查询</span><span id="financeCount" class="count">0</span>
+        </button>
+        <button class="category-tab" type="button" data-category="file">
+          <span>文件 IO</span><span id="fileCount" class="count">0</span>
+        </button>
+        <button class="category-tab" type="button" data-category="search">
+          <span>搜索</span><span id="searchCount" class="count">0</span>
+        </button>
+      </div>
+      <input id="treeSearch" class="search" placeholder="搜索节点">
+      <div id="treeRoot" class="tree"></div>
+    </aside>
+
+    <main class="main">
+      <section class="topbar">
+        <div>
+          <h1 id="pageTitle" class="title">金融查询</h1>
+          <div id="pageSubtitle" class="subtitle">加载中</div>
+        </div>
+        <div class="actions">
+          <a id="backToToolsLink" class="btn" href="#">工具列表</a>
+          <button id="reloadBtn" class="btn" type="button">重新加载</button>
+          <button id="saveBtn" class="btn primary" type="button" disabled>保存当前节点</button>
+        </div>
+      </section>
+
+      <div id="globalStatus" class="status"></div>
+
+      <section class="workspace">
+        <section class="panel">
+          <div class="panel-head">
+            <h2 id="editorTitle">选择一个节点</h2>
+            <span id="editorBadge" class="badge hidden"></span>
+          </div>
+          <div id="emptyEditor" class="muted">从左侧树选择节点后编辑。</div>
+          <div id="nodeForm" class="form hidden">
+            <div class="field">
+              <div class="label">路径</div>
+              <div id="nodePath" class="readonly"></div>
+            </div>
+            <div class="field">
+              <div class="label">类型</div>
+              <div id="nodeType" class="readonly"></div>
+            </div>
+            <div id="descField" class="field">
+              <div class="label">描述</div>
+              <textarea id="descInput" class="short"></textarea>
+            </div>
+            <div id="apiFunctionField" class="field hidden">
+              <div class="label">函数说明</div>
+              <textarea id="apiFunctionInput" class="short"></textarea>
+            </div>
+            <div id="callPatternField" class="field hidden">
+              <div class="label">调用格式</div>
+              <textarea id="callPatternInput" class="short"></textarea>
+            </div>
+            <div id="outputRuleField" class="field hidden">
+              <div class="label">输出规则</div>
+              <textarea id="outputRuleInput" class="short"></textarea>
+            </div>
+            <div id="rulesField" class="field">
+              <div class="label">规则</div>
+              <textarea id="rulesInput" placeholder="一行一条"></textarea>
+            </div>
+            <div id="examplesField" class="field">
+              <div class="label">示例</div>
+              <textarea id="examplesInput" placeholder="一段一个，用空行分隔"></textarea>
+            </div>
+            <div id="aliasesField" class="field hidden">
+              <div class="label">别名</div>
+              <textarea id="aliasesInput" class="short" placeholder="一行一个"></textarea>
+            </div>
+            <div id="methodsField" class="field hidden">
+              <div class="label">支持方法</div>
+              <textarea id="methodsInput" class="short" placeholder="一行一个"></textarea>
+            </div>
+            <div id="argsField" class="field hidden">
+              <div class="label">参数结构</div>
+              <textarea id="argsInput"></textarea>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel side-panel">
+          <div class="panel-head">
+            <h2>节点信息</h2>
+            <span id="nodeKindBadge" class="badge hidden"></span>
+          </div>
+          <div id="emptyInfo" class="muted">选择节点后查看。</div>
+          <div id="nodeInfo" class="hidden">
+            <div class="summary-card">
+              <div id="infoName" class="summary-title"></div>
+              <div id="infoDesc" class="summary-desc"></div>
+            </div>
+            <div id="infoGrid" class="info-grid"></div>
+            <div id="chipSection" class="hidden">
+              <div class="section-title">标签</div>
+              <div id="chipList" class="chip-list"></div>
+            </div>
+            <div id="ruleSection" class="hidden">
+              <div class="section-title">规则</div>
+              <ul id="ruleList" class="text-list"></ul>
+            </div>
+            <div id="exampleSection" class="hidden">
+              <div class="section-title">示例</div>
+              <div id="exampleList" class="example-list"></div>
+            </div>
+          </div>
+        </section>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const apiToolCatalogUrl = {{ api_tool_catalog_url|tojson }};
+    const apiFinanceDataCatalogUrl = {{ api_finance_data_catalog_url|tojson }};
+    const apiToolBundleBaseUrl = {{ api_tool_bundle_base_url|tojson }};
+    const toolsBaseUrl = {{ tools_base_url|tojson }};
+    const appRoot = (() => {
+      const marker = "/tools/studio";
+      const path = window.location.pathname;
+      const idx = path.indexOf(marker);
+      return idx >= 0 ? path.slice(0, idx) : "";
+    })();
+
+    function resolveUrl(url) {
+      if (!url) return url;
+      if (/^https?:\/\//.test(url)) return url;
+      if (url.startsWith("/")) return url;
+      return `${appRoot}/${url}`.replace(/\/+/g, "/");
+    }
+
+    const urls = {
+      tools: resolveUrl(apiToolCatalogUrl),
+      finance: resolveUrl(apiFinanceDataCatalogUrl),
+      bundleBase: resolveUrl(apiToolBundleBaseUrl),
+      toolsBase: resolveUrl(toolsBaseUrl),
+    };
+
+    const state = {
+      category: "finance",
+      tools: [],
+      financePayload: null,
+      rawCatalog: null,
+      selected: null,
+      toolBundles: new Map(),
+      search: "",
+    };
+
+    function escapeHtml(value) {
+      return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+    }
+
+    function pretty(value) {
+      return JSON.stringify(value ?? {}, null, 2);
+    }
+
+    function kindLabel(kind) {
+      return {
+        pattern: "请求格式",
+        subject: "主体",
+        dataview: "数据视图",
+        field: "字段",
+        function: "函数",
+        tool: "顶层工具",
+      }[kind] || kind;
+    }
+
+    function compactPath(path) {
+      return (path || []).map((item) => String(item)).join(" / ");
+    }
+
+    function asList(value) {
+      return Array.isArray(value) ? value.filter((item) => String(item || "").trim()) : [];
+    }
+
+    function parseLines(value) {
+      return String(value || "")
+        .split(/\n+/)
+        .map((item) => item.trim())
+        .filter(Boolean);
+    }
+
+    function parseBlocks(value) {
+      return String(value || "")
+        .split(/\n\s*\n+/)
+        .map((item) => item.trim())
+        .filter(Boolean);
+    }
+
+    function setStatus(kind, text) {
+      const el = document.getElementById("globalStatus");
+      el.className = `status show ${kind}`;
+      el.textContent = text;
+      if (kind === "ok") {
+        window.setTimeout(() => {
+          if (el.textContent === text) el.className = "status";
+        }, 2400);
+      }
+    }
+
+    async function fetchJson(url, options) {
+      const res = await fetch(url, options || {});
+      const text = await res.text();
+      let payload = {};
+      try {
+        payload = text ? JSON.parse(text) : {};
+      } catch (err) {
+        throw new Error(`响应不是 JSON: ${text.slice(0, 180)}`);
+      }
+      if (!res.ok || payload.ok === false) {
+        throw new Error(payload.error || `请求失败: ${res.status}`);
+      }
+      return payload;
+    }
+
+    function classifyTool(tool) {
+      const name = String(tool.tool_name || "");
+      const display = String(tool.display_name || "");
+      const desc = String(tool.description || "");
+      const caps = Array.isArray(tool.capabilities) ? tool.capabilities.join(" ") : "";
+      const text = `${name} ${display} ${desc} ${caps}`.toLowerCase();
+      if (name === "finance_data_query" || text.includes("finance_data_protocol")) return "finance";
+      if (name === "file_io" || text.includes("file_io") || text.includes("file_read") || text.includes("file_write")) return "file";
+      if (text.includes("search") || text.includes("新闻") || text.includes("研报")) return "search";
+      return "other";
+    }
+
+    function setCategory(category) {
+      state.category = category;
+      state.selected = null;
+      document.querySelectorAll(".category-tab").forEach((btn) => {
+        btn.classList.toggle("active", btn.dataset.category === category);
+      });
+      const titles = {
+        finance: "金融查询",
+        file: "文件 IO",
+        search: "搜索",
+      };
+      const subtitles = {
+        finance: "按 subject / dataview / function 维护金融查询协议。",
+        file: "统一文件读取、写入与 artifact 生成入口。",
+        search: "新闻、研报和外部信息检索入口。",
+      };
+      document.getElementById("pageTitle").textContent = titles[category] || "工具";
+      document.getElementById("pageSubtitle").textContent = subtitles[category] || "";
+      document.getElementById("saveBtn").disabled = true;
+      resetEditor();
+      renderTree();
+    }
+
+    function resetEditor() {
+      document.getElementById("editorTitle").textContent = "选择一个节点";
+      document.getElementById("editorBadge").classList.add("hidden");
+      document.getElementById("emptyEditor").classList.remove("hidden");
+      document.getElementById("nodeForm").classList.add("hidden");
+      document.getElementById("emptyInfo").classList.remove("hidden");
+      document.getElementById("nodeInfo").classList.add("hidden");
+      document.getElementById("nodeKindBadge").classList.add("hidden");
+      document.getElementById("saveBtn").disabled = true;
+      document.querySelectorAll(".node-btn").forEach((btn) => btn.classList.remove("active"));
+    }
+
+    function nodeMatches(label) {
+      const query = state.search.trim().toLowerCase();
+      if (!query) return true;
+      return String(label || "").toLowerCase().includes(query);
+    }
+
+    function nodeButton(kind, name, path, raw, options = {}) {
+      const key = JSON.stringify(path);
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "node-btn";
+      button.dataset.path = key;
+      button.innerHTML = `<span class="node-kind">${escapeHtml(kind)}</span><span class="node-name">${escapeHtml(name)}</span>`;
+      button.addEventListener("click", () => selectNode({kind, name, path, raw, ...options}));
+      return button;
+    }
+
+    function branch(label, children, open = false) {
+      const details = document.createElement("details");
+      details.open = open;
+      const summary = document.createElement("summary");
+      summary.textContent = label;
+      details.appendChild(summary);
+      for (const child of children) details.appendChild(child);
+      return details;
+    }
+
+    function renderTree() {
+      const root = document.getElementById("treeRoot");
+      root.innerHTML = "";
+      if (state.category === "finance") {
+        renderFinanceTree(root);
+        return;
+      }
+      renderToolCategoryTree(root, state.category);
+    }
+
+    function renderFinanceTree(root) {
+      const raw = state.rawCatalog || {};
+      const children = [];
+      const patternNodes = [];
+      const patterns = raw.api_class_patterns || {};
+      for (const [name, cfg] of Object.entries(patterns)) {
+        if (!nodeMatches(`pattern ${name} ${cfg.desc || ""}`)) continue;
+        patternNodes.push(nodeButton("pattern", name, ["api_class_patterns", name], cfg));
+      }
+      if (patternNodes.length) children.push(branch("request patterns", patternNodes, true));
+
+      const subjectNodes = [];
+      const subjects = raw.subjects || {};
+      for (const [subjectName, subjectCfg] of Object.entries(subjects)) {
+        if (!subjectCfg || typeof subjectCfg !== "object") continue;
+        const dataviewNodes = [];
+        const meta = subjectCfg._meta || {};
+        dataviewNodes.push(nodeButton("subject", subjectName, ["subjects", subjectName, "_meta"], meta));
+        for (const [viewName, viewCfg] of Object.entries(subjectCfg)) {
+          if (viewName.startsWith("_") || !viewCfg || typeof viewCfg !== "object") continue;
+          const label = `${subjectName}.${viewName} ${viewCfg.desc || ""}`;
+          const viewChildren = [
+            nodeButton("dataview", viewName, ["subjects", subjectName, viewName], viewCfg),
+          ];
+          const fieldNodes = [];
+          for (const [fieldName, fieldCfg] of Object.entries(viewCfg.fields || {})) {
+            if (!nodeMatches(`${subjectName}.${viewName}.${fieldName} ${Array.isArray(fieldCfg) ? fieldCfg.join(" ") : ""}`)) continue;
+            fieldNodes.push(nodeButton("field", fieldName, ["subjects", subjectName, viewName, "fields", fieldName], fieldCfg));
+          }
+          if (fieldNodes.length) viewChildren.push(branch("fields", fieldNodes, false));
+          const functionNodes = [];
+          (viewCfg.api || []).forEach((apiRow, index) => {
+            const apiName = apiRow && apiRow.api_name ? apiRow.api_name : `api_${index + 1}`;
+            if (!nodeMatches(`${apiName} ${apiRow.api_function || ""} ${apiRow.api_class || ""}`)) return;
+            functionNodes.push(nodeButton("function", apiName, ["subjects", subjectName, viewName, "api", index], apiRow));
+          });
+          if (functionNodes.length) viewChildren.push(branch("functions", functionNodes, false));
+          if (nodeMatches(label) || viewChildren.length > 1) dataviewNodes.push(branch(viewName, viewChildren, false));
+        }
+        if (dataviewNodes.length > 1 || nodeMatches(`${subjectName} ${meta.desc || ""}`)) {
+          subjectNodes.push(branch(subjectName, dataviewNodes, subjectName === "stock"));
+        }
+      }
+      if (subjectNodes.length) children.push(branch("subjects", subjectNodes, true));
+      for (const child of children) root.appendChild(child);
+      if (!children.length) root.innerHTML = '<div class="muted">无匹配节点</div>';
+    }
+
+    function renderToolCategoryTree(root, category) {
+      const items = state.tools.filter((tool) => classifyTool(tool) === category);
+      if (!items.length) {
+        root.innerHTML = '<div class="muted">暂无工具</div>';
+        return;
+      }
+      const nodes = items
+        .filter((tool) => nodeMatches(`${tool.tool_name} ${tool.display_name} ${tool.description}`))
+        .map((tool) => nodeButton("tool", tool.display_name || tool.tool_name, ["tools", tool.tool_name], tool, {toolName: tool.tool_name}));
+      root.appendChild(branch(category === "file" ? "file tools" : "search tools", nodes, true));
+    }
+
+    async function selectNode(node) {
+      state.selected = node;
+      document.querySelectorAll(".node-btn").forEach((btn) => {
+        btn.classList.toggle("active", btn.dataset.path === JSON.stringify(node.path));
+      });
+      if (node.kind === "tool") {
+        await loadToolNode(node);
+        return;
+      }
+      renderNodeEditor(node);
+    }
+
+    async function loadToolNode(node) {
+      const toolName = node.toolName || node.path[1];
+      let bundle = state.toolBundles.get(toolName);
+      if (!bundle) {
+        const payload = await fetchJson(`${urls.bundleBase}/${encodeURIComponent(toolName)}/bundle`);
+        bundle = payload.bundle;
+        state.toolBundles.set(toolName, bundle);
+      }
+      const files = bundle.files || {};
+      const definition = files.definition || {};
+      const spec = files.tool_spec || {};
+      const identity = definition.identity || {};
+      node.raw = {
+        identity,
+        purpose: spec.purpose || "",
+        rules: ((spec.input_guidance || {}).notes || []),
+        capabilities: definition.capabilities || [],
+      };
+      node.bundle = bundle;
+      renderNodeEditor(node);
+    }
+
+    function addInfoTile(items, label, value) {
+      const text = String(value ?? "").trim();
+      if (!text) return;
+      items.push({label, value: text});
+    }
+
+    function renderList(rootId, sectionId, rows, itemClass = "") {
+      const section = document.getElementById(sectionId);
+      const root = document.getElementById(rootId);
+      root.innerHTML = "";
+      const cleanRows = rows.map((item) => String(item || "").trim()).filter(Boolean);
+      section.classList.toggle("hidden", !cleanRows.length);
+      for (const row of cleanRows) {
+        const item = document.createElement(itemClass ? "div" : "li");
+        if (itemClass) item.className = itemClass;
+        item.textContent = row;
+        root.appendChild(item);
+      }
+    }
+
+    function renderNodeInfo(node) {
+      const raw = node.raw;
+      const isList = Array.isArray(raw);
+      const isObject = raw && typeof raw === "object" && !isList;
+      const desc = node.kind === "function"
+        ? raw.api_function
+        : node.kind === "tool"
+          ? ((raw.identity || {}).description || raw.purpose || "")
+          : isObject
+            ? raw.desc
+            : "";
+      const badgeText = kindLabel(node.kind);
+
+      document.getElementById("emptyInfo").classList.add("hidden");
+      document.getElementById("nodeInfo").classList.remove("hidden");
+      document.getElementById("nodeKindBadge").classList.remove("hidden");
+      document.getElementById("nodeKindBadge").textContent = badgeText;
+      document.getElementById("infoName").textContent = node.name || "-";
+      document.getElementById("infoDesc").textContent = desc || "暂无描述";
+
+      const meta = [];
+      addInfoTile(meta, "路径", compactPath(node.path));
+      addInfoTile(meta, "类型", badgeText);
+      if (isObject) {
+        addInfoTile(meta, "API", raw.api_name);
+        addInfoTile(meta, "API Class", raw.api_class);
+        addInfoTile(meta, "调用格式", raw.call_pattern);
+        addInfoTile(meta, "输出规则", raw.output_rule);
+        if (raw.fields && typeof raw.fields === "object") addInfoTile(meta, "字段数", Object.keys(raw.fields).length);
+        if (Array.isArray(raw.api)) addInfoTile(meta, "函数数", raw.api.length);
+        if (raw.identity && typeof raw.identity === "object") addInfoTile(meta, "显示名称", raw.identity.display_name);
+      }
+      const grid = document.getElementById("infoGrid");
+      grid.innerHTML = "";
+      for (const item of meta.slice(0, 8)) {
+        const tile = document.createElement("div");
+        tile.className = "info-tile";
+        tile.innerHTML = `<div class="info-label">${escapeHtml(item.label)}</div><div class="info-value">${escapeHtml(item.value)}</div>`;
+        grid.appendChild(tile);
+      }
+
+      const chips = [];
+      if (isList) chips.push(...raw);
+      if (isObject) {
+        chips.push(...asList(raw.aliases));
+        chips.push(...asList(raw.methods));
+        chips.push(...asList(raw.capabilities));
+        if (raw.args && Array.isArray(raw.args.required)) chips.push(...raw.args.required.map((item) => `必填 ${item}`));
+        if (raw.args && Array.isArray(raw.args.optional)) chips.push(...raw.args.optional.map((item) => `可选 ${item}`));
+      }
+      const chipSection = document.getElementById("chipSection");
+      const chipList = document.getElementById("chipList");
+      chipList.innerHTML = "";
+      chipSection.classList.toggle("hidden", !chips.length);
+      for (const chip of chips.slice(0, 32)) {
+        const item = document.createElement("span");
+        item.className = "chip";
+        item.textContent = chip;
+        chipList.appendChild(item);
+      }
+
+      renderList("ruleList", "ruleSection", isObject ? asList(raw.rules) : []);
+      renderList("exampleList", "exampleSection", isObject ? asList(raw.examples) : [], "example-item");
+    }
+
+    function renderNodeEditor(node) {
+      const raw = node.raw;
+      document.getElementById("emptyEditor").classList.add("hidden");
+      document.getElementById("nodeForm").classList.remove("hidden");
+      document.getElementById("editorTitle").textContent = node.name;
+      document.getElementById("editorBadge").classList.remove("hidden");
+      document.getElementById("editorBadge").textContent = kindLabel(node.kind);
+      document.getElementById("nodePath").textContent = compactPath(node.path);
+      document.getElementById("nodeType").textContent = kindLabel(node.kind);
+      document.getElementById("saveBtn").disabled = false;
+      renderNodeInfo(node);
+
+      const isList = Array.isArray(raw);
+      const isObject = raw && typeof raw === "object" && !isList;
+      const desc = node.kind === "function"
+        ? raw.api_function
+        : node.kind === "tool"
+          ? ((raw.identity || {}).description || raw.purpose || "")
+          : (isObject ? raw.desc : "");
+
+      document.getElementById("descInput").value = desc || "";
+      document.getElementById("rulesInput").value = isObject && Array.isArray(raw.rules) ? raw.rules.join("\n") : "";
+      document.getElementById("examplesInput").value = isObject && Array.isArray(raw.examples) ? raw.examples.join("\n\n") : "";
+      document.getElementById("apiFunctionInput").value = isObject ? (raw.api_function || "") : "";
+      document.getElementById("callPatternInput").value = isObject ? (raw.call_pattern || "") : "";
+      document.getElementById("outputRuleInput").value = isObject ? (raw.output_rule || "") : "";
+      document.getElementById("aliasesInput").value = isList
+        ? raw.join("\n")
+        : (isObject && Array.isArray(raw.aliases) ? raw.aliases.join("\n") : "");
+      document.getElementById("methodsInput").value = isObject && Array.isArray(raw.methods) ? raw.methods.join("\n") : "";
+      document.getElementById("argsInput").value = isObject && raw.args ? pretty(raw.args) : "";
+
+      toggleField("descField", !isList && node.kind !== "function");
+      toggleField("rulesField", !isList && node.kind !== "function");
+      toggleField("examplesField", !isList && node.kind !== "function" && node.kind !== "tool");
+      toggleField("apiFunctionField", isObject && node.kind === "function");
+      toggleField("callPatternField", isObject && Object.prototype.hasOwnProperty.call(raw, "call_pattern"));
+      toggleField("outputRuleField", isObject && Object.prototype.hasOwnProperty.call(raw, "output_rule"));
+      toggleField("aliasesField", isList || (isObject && Object.prototype.hasOwnProperty.call(raw, "aliases")));
+      toggleField("methodsField", isObject && Object.prototype.hasOwnProperty.call(raw, "methods"));
+      toggleField("argsField", isObject && Object.prototype.hasOwnProperty.call(raw, "args"));
+    }
+
+    function toggleField(id, show) {
+      document.getElementById(id).classList.toggle("hidden", !show);
+    }
+
+    function collectFinanceNode() {
+      const node = state.selected;
+      const raw = node.raw;
+      if (Array.isArray(raw)) {
+        return {aliases: parseLines(document.getElementById("aliasesInput").value)};
+      }
+      const payload = {};
+      if (!document.getElementById("descField").classList.contains("hidden")) {
+        if (node.kind === "function") {
+          payload.api_function = document.getElementById("descInput").value.trim();
+        } else {
+          payload.desc = document.getElementById("descInput").value.trim();
+        }
+      }
+      if (!document.getElementById("apiFunctionField").classList.contains("hidden")) {
+        payload.api_function = document.getElementById("apiFunctionInput").value.trim();
+      }
+      if (!document.getElementById("callPatternField").classList.contains("hidden")) {
+        payload.call_pattern = document.getElementById("callPatternInput").value.trim();
+      }
+      if (!document.getElementById("outputRuleField").classList.contains("hidden")) {
+        payload.output_rule = document.getElementById("outputRuleInput").value.trim();
+      }
+      if (!document.getElementById("rulesField").classList.contains("hidden")) {
+        payload.rules = parseLines(document.getElementById("rulesInput").value);
+      }
+      if (!document.getElementById("examplesField").classList.contains("hidden")) {
+        payload.examples = parseBlocks(document.getElementById("examplesInput").value);
+      }
+      if (!document.getElementById("aliasesField").classList.contains("hidden")) {
+        payload.aliases = parseLines(document.getElementById("aliasesInput").value);
+      }
+      if (!document.getElementById("methodsField").classList.contains("hidden")) {
+        payload.methods = parseLines(document.getElementById("methodsInput").value);
+      }
+      if (!document.getElementById("argsField").classList.contains("hidden")) {
+        try {
+          payload.args = JSON.parse(document.getElementById("argsInput").value || "{}");
+        } catch (err) {
+          throw new Error(`args JSON 解析失败: ${err.message || err}`);
+        }
+      }
+      return payload;
+    }
+
+    async function saveFinanceNode() {
+      const payload = {
+        path: state.selected.path,
+        node: collectFinanceNode(),
+      };
+      await fetchJson(`${urls.finance}/node`, {
+        method: "PUT",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify(payload),
+      });
+      await loadFinanceCatalog();
+      setStatus("ok", "已保存当前节点");
+    }
+
+    async function saveToolNode() {
+      const node = state.selected;
+      const bundle = node.bundle;
+      const files = bundle.files || {};
+      const definition = files.definition || {};
+      const spec = files.tool_spec || {};
+      definition.identity = definition.identity && typeof definition.identity === "object" ? definition.identity : {};
+      definition.identity.description = document.getElementById("descInput").value.trim();
+      spec.input_guidance = spec.input_guidance && typeof spec.input_guidance === "object" ? spec.input_guidance : {};
+      spec.input_guidance.notes = parseLines(document.getElementById("rulesInput").value);
+
+      const toolHub = files.tool_hub || {name: node.toolName || node.path[1]};
+      toolHub.name = toolHub.name || (node.toolName || node.path[1]);
+      if (definition.identity.description) toolHub.description = definition.identity.description;
+
+      const payload = {
+        definition_text: pretty(definition),
+        output_schema_text: pretty(files.output_schema || {}),
+        tool_spec_text: pretty(spec),
+        tool_hub_text: pretty(toolHub),
+      };
+      const result = await fetchJson(`${urls.bundleBase}/${encodeURIComponent(node.toolName || node.path[1])}/bundle`, {
+        method: "PUT",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify(payload),
+      });
+      state.toolBundles.set(node.toolName || node.path[1], result.bundle);
+      await loadToolCatalog();
+      setStatus("ok", "已保存当前工具");
+    }
+
+    async function saveCurrentNode() {
+      if (!state.selected) return;
+      if (state.selected.kind === "tool") {
+        await saveToolNode();
+      } else {
+        await saveFinanceNode();
+      }
+    }
+
+    async function loadToolCatalog() {
+      const payload = await fetchJson(urls.tools);
+      state.tools = payload.items || [];
+      const counts = {finance: 0, file: 0, search: 0};
+      state.tools.forEach((tool) => {
+        const category = classifyTool(tool);
+        if (counts[category] !== undefined) counts[category] += 1;
+      });
+      document.getElementById("financeCount").textContent = counts.finance;
+      document.getElementById("fileCount").textContent = counts.file;
+      document.getElementById("searchCount").textContent = counts.search;
+    }
+
+    async function loadFinanceCatalog() {
+      const payload = await fetchJson(urls.finance);
+      state.financePayload = payload.catalog || {};
+      state.rawCatalog = state.financePayload.raw_catalog || {};
+      const catalog = state.financePayload.catalog || {};
+      document.getElementById("pageSubtitle").textContent =
+        state.category === "finance"
+          ? `${catalog.catalog_path || ""} · subject ${catalog.subject_count || 0} · pattern ${catalog.api_class_count || 0}`
+          : "";
+      if (state.category === "finance") renderTree();
+    }
+
+    async function reloadAll() {
+      await loadToolCatalog();
+      await loadFinanceCatalog();
+      renderTree();
+      resetEditor();
+    }
+
+    function setupNavLinks() {
+      document.getElementById("backToToolsLink").href = urls.toolsBase || "#";
+      document.getElementById("navTools").href = urls.toolsBase || "#";
+      document.getElementById("navSkills").href = `${appRoot}/skills`;
+      document.getElementById("navAgents").href = `${appRoot}/agents`;
+      document.getElementById("navApplications").href = `${appRoot}/applications`;
+    }
+
+    document.querySelectorAll(".category-tab").forEach((btn) => {
+      btn.addEventListener("click", () => setCategory(btn.dataset.category));
+    });
+    document.getElementById("treeSearch").addEventListener("input", (event) => {
+      state.search = event.target.value || "";
+      renderTree();
+    });
+    document.getElementById("reloadBtn").addEventListener("click", async () => {
+      try {
+        await reloadAll();
+        setStatus("ok", "已重新加载");
+      } catch (err) {
+        setStatus("err", err.message || String(err));
+      }
+    });
+    document.getElementById("saveBtn").addEventListener("click", async () => {
+      try {
+        await saveCurrentNode();
+      } catch (err) {
+        setStatus("err", err.message || String(err));
+      }
+    });
+
+    setupNavLinks();
+    reloadAll().catch((err) => setStatus("err", err.message || String(err)));
+  </script>
+</body>
+</html>

@@ -1,0 +1,160 @@
+{
+  "auth": "public",
+  "availability": {
+    "lifecycle": "retired",
+    "retrieval_mode": "direct_only",
+    "visibility": "hidden"
+  },
+  "enabled": false,
+  "capabilities": [
+    "capital_flow",
+    "funds",
+    "money_flow"
+  ],
+  "defaults": {
+    "n_days": 10,
+    "include_flow_news": true
+  },
+  "identity": {
+    "description": "输入证券代码或公司名称，获取个股资金流向、主力净额、行业资金和资金相关新闻，用于资金面和情绪面分析。",
+    "display_name": "个股资金查询",
+    "domain": "capital_flow",
+    "owner": "tools"
+  },
+  "name": "stock_funds",
+  "post_process": {
+    "deterministic": {
+      "enabled": false,
+      "handler": ""
+    },
+    "llm": {
+      "enabled": false,
+      "prompt_key": ""
+    }
+  },
+  "profiles": {
+    "mock": {
+      "enabled": false,
+      "implementation": {
+        "kind": "inline_result"
+      },
+      "result": {
+        "tool": "stock_funds",
+        "ok": true,
+        "data": {
+          "render_blocks": [],
+          "snapshot": {
+            "today_funds": {},
+            "industry_funds": {},
+            "capital_flow_news": [],
+            "recent_n_day_series": {
+              "n_days": 10,
+              "series": []
+            }
+          },
+          "capital_flow_news_items": []
+        },
+        "error": ""
+      }
+    },
+    "real": {
+      "enabled": false,
+      "implementation": {
+        "kind": "python_callable",
+        "target": "src.tools.stock_funds_tool:run"
+      }
+    }
+  },
+  "retention": {
+    "drop_default": [],
+    "high_value_for_reasoning": [
+      "data.snapshot.today_funds",
+      "data.snapshot.industry_funds",
+      "data.snapshot.capital_flow_news",
+      "data.capital_flow_news_items"
+    ],
+    "high_value_for_render": [
+      "data.snapshot.chart_payloads",
+      "data.snapshot.hidden_series",
+      "data.snapshot.historical_table",
+      "data.snapshot.recent_n_day_series"
+    ],
+    "recommended_reducers": {
+      "data.snapshot.today_funds": "extract_metrics",
+      "data.snapshot.industry_funds": "extract_metrics",
+      "data.snapshot.historical_table": "summarize_table",
+      "data.snapshot.recent_n_day_series": "summarize_timeseries",
+      "data.capital_flow_news_items": "summarize_news_list"
+    },
+    "usually_too_large_for_prompt": [
+      "data.snapshot.chart_payloads",
+      "data.snapshot.historical_table",
+      "data.snapshot.readable_sections"
+    ]
+  },
+  "runtime_hints": {
+    "cost_class": "medium",
+    "latency_class": "medium",
+    "supports_async_submit": false,
+    "supports_stream": false
+  },
+  "safety": {
+    "network": true,
+    "persistence": true,
+    "side_effect": "optional_persistence"
+  },
+  "schemas": {
+    "input": {
+      "$id": "stock_funds.input.schema.json",
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "code"
+      ],
+      "properties": {
+        "code": {
+          "type": "string",
+          "description": "证券代码或公司名称。工具内部会自动解析并使用默认资金窗口与新闻策略。"
+        }
+      }
+    },
+    "output": {
+      "$ref": "src/tools/schemas/stock_funds.schema.json"
+    }
+  },
+  "status": "disabled",
+  "tags": [
+    "capital_flow",
+    "money_flow",
+    "stock"
+  ],
+  "tests": {
+    "golden_cases": [],
+    "sample_inputs": [
+      {
+        "name": "default_stock_funds",
+        "arguments": {
+          "code": "600519"
+        }
+      }
+    ]
+  },
+  "ui_hints": {
+    "editable_sections": [
+      "identity",
+      "schemas.input",
+      "schemas.output",
+      "capabilities",
+      "profiles",
+      "retention",
+      "post_process",
+      "tests"
+    ]
+  },
+  "version": "v1",
+  "subject_tags": [
+    "stock"
+  ],
+  "tool_priority": 1
+}

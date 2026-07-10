@@ -1,0 +1,53 @@
+{
+  "best_for": [
+    "涉及到市场热点的行业分析、公司和行业相关的分析时，此工具可以提供近期的及时信息"
+  ],
+  "input_guidance": {
+    "optional_fields": [],
+    "required_fields": []
+  },
+  "invocation_example": "get_hot_industries_and_leaders()",
+  "output_guidance": {
+    "drop_default": [],
+    "field_policies": {
+      "data.[]": {
+        "strategy": "auto"
+      },
+      "data.[].event": {
+        "strategy": "auto"
+      },
+      "data.[].hotness": {
+        "strategy": "auto"
+      },
+      "data.[].ind_name": {
+        "strategy": "auto"
+      },
+      "data.[].leaders": {
+        "strategy": "auto"
+      },
+      "data.event": {
+        "strategy": "prompt_full"
+      },
+      "data.hotness": {
+        "strategy": "prompt_full"
+      },
+      "data.ind_name": {
+        "strategy": "prompt_full"
+      },
+      "data.leaders": {
+        "strategy": "prompt_full"
+      }
+    },
+    "high_value_for_reasoning": [
+      "data.event",
+      "data.hotness",
+      "data.ind_name",
+      "data.leaders"
+    ],
+    "high_value_for_render": [],
+    "recommended_reducers": {},
+    "usually_too_large_for_prompt": []
+  },
+  "purpose": "获取当前市场的热门行业及对应龙头股列表\n行业是最稳定的市场个股分类维度，一般有标准的申万行业体系、证监会行业体系等",
+  "tool_name": "get_hot_industries_and_leaders"
+}

@@ -1,0 +1,75 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "stock_funds.schema.json",
+  "title": "Stock Funds Tool Output",
+  "type": "object",
+  "required": ["tool", "ok", "data", "error"],
+  "properties": {
+    "tool": { "const": "stock_funds", "description": "工具标识" },
+    "ok": { "type": "boolean", "description": "执行是否成功" },
+    "data": { "$ref": "#/$defs/stockFundsPayload", "description": "资金面业务结果" },
+    "error": { "type": "string", "description": "错误信息，成功时为空" }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "capitalFlowNewsItem": {
+      "type": "object",
+      "description": "与资金面相关的新闻条目",
+      "required": [
+        "title",
+        "url",
+        "site",
+        "publish_time",
+        "snippet",
+        "matched_keywords",
+        "stock_code",
+        "stock_name"
+      ],
+      "properties": {
+        "title": { "type": "string", "description": "新闻标题" },
+        "url": { "type": "string", "description": "新闻链接" },
+        "site": { "type": "string", "description": "新闻来源站点" },
+        "publish_time": { "type": "string", "description": "发布时间" },
+        "snippet": { "type": "string", "description": "新闻摘要" },
+        "matched_keywords": {
+          "type": "array",
+          "description": "命中的资金面关键词",
+          "items": { "type": "string" }
+        },
+        "stock_code": { "type": "string", "description": "股票代码" },
+        "stock_name": { "type": "string", "description": "股票名称" }
+      },
+      "additionalProperties": false
+    },
+    "renderBlock": {
+      "type": "object",
+      "required": ["type", "title", "data"],
+      "properties": {
+        "type": { "type": "string" },
+        "title": { "type": "string" },
+        "data": { "type": "object" },
+        "meta": { "type": "object" }
+      },
+      "additionalProperties": true
+    },
+    "stockFundsPayload": {
+      "type": "object",
+      "description": "个股资金面结果",
+      "required": ["snapshot", "capital_flow_news_items"],
+      "properties": {
+        "snapshot": { "type": "object", "description": "资金面快照" },
+        "render_blocks": {
+          "type": "array",
+          "description": "标准展示块协议，前端应优先消费该字段渲染图表与指标。",
+          "items": { "$ref": "#/$defs/renderBlock" }
+        },
+        "capital_flow_news_items": {
+          "type": "array",
+          "description": "资金面相关新闻列表",
+          "items": { "$ref": "#/$defs/capitalFlowNewsItem" }
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

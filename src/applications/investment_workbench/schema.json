@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "investment_workbench Session Payload",
+  "type": "object",
+  "properties": {
+    "user_text": {
+      "type": "string"
+    },
+    "thread_id": {
+      "type": "string"
+    },
+    "route_mode": {
+      "type": "string"
+    }
+  },
+  "additionalProperties": true
+}

@@ -1,0 +1,45 @@
+{
+  "tool_name": "file_read_word",
+  "purpose": "读取 Word docx 文档并返回标题、段落和预览文本。",
+  "best_for": [
+    "用于读取用户上传的 Word docx 文档。",
+    "用于提取标题、段落、预览和 document artifact 引用。",
+    "用于把文档文本交给后续总结、检索或分析步骤。"
+  ],
+  "invocation_example": "file_read_word(file_id=\"att_xxx\", max_chars=5000)",
+  "input_guidance": {
+    "required_fields": [
+      "file_id"
+    ],
+    "optional_fields": [
+      "extract_tables",
+      "max_chars"
+    ]
+  },
+  "output_guidance": {
+    "field_policies": {
+      "data.file_meta": {
+        "strategy": "prompt_full"
+      },
+      "data.document.text_artifact_ref": {
+        "strategy": "prompt_full"
+      },
+      "data.document.preview_text": {
+        "strategy": "prompt_summary",
+        "summary_prompt": "只保留文档主题、标题和关键段落摘要。"
+      }
+    },
+    "high_value_for_reasoning": [
+      "data.file_meta",
+      "data.document.text_artifact_ref"
+    ],
+    "high_value_for_render": [],
+    "usually_too_large_for_prompt": [
+      "data.document.paragraphs",
+      "data.document.tables",
+      "data.document.preview_text"
+    ],
+    "drop_default": [],
+    "recommended_reducers": {}
+  }
+}

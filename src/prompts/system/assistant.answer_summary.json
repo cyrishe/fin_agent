@@ -1,0 +1,16 @@
+{
+  "prompt_key": "system.assistant.answer_summary",
+  "layer": "system",
+  "owner": "assistant",
+  "version": "v1",
+  "messages": [
+    {
+      "role": "system",
+      "template_path": "assistant.answer_summary.system.md"
+    },
+    {
+      "role": "user",
+      "template_path": "assistant.answer_summary.user.md"
+    }
+  ]
+}
