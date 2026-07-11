@@ -315,7 +315,12 @@ def test_custom_tool_agent_design_contract_coding_commit_with_injected_coder(tmp
     assert design["state"]["status"] == "awaiting_design_confirmation"
     assert design["state"]["design_contract"]["tool_name"] == "sum_values"
 
-    drafted = agent.continue_flow("确认实现", state=design["state"], owner_id="user_a")
+    drafted = agent.continue_flow_action(
+        "custom_tool.confirm_design",
+        state=design["state"],
+        expected_revision=design["state"]["design_revision"],
+        owner_id="user_a",
+    )
     assert drafted["state"]["status"] == "draft_ready"
     assert drafted["test_result"]["ok"] is True
     assert drafted["test_result"]["data"]["total"] == 6
@@ -326,6 +331,32 @@ def test_custom_tool_agent_design_contract_coding_commit_with_injected_coder(tmp
 
     committed = agent.commit("ct_sum_values")
     assert committed["manifest"]["status"] == "active"
+
+
+def test_custom_tool_structured_action_rejects_unknown_action_and_state() -> None:
+    agent = CustomToolAgentService(use_codex=False)
+
+    assert agent.interaction_user_text("custom_tool.confirm_design") == "确认并继续"
+    with pytest.raises(Exception, match="unknown custom tool action"):
+        agent.interaction_user_text("custom_tool.run_arbitrary_command")
+    with pytest.raises(Exception, match="is not allowed"):
+        agent.continue_flow_action(
+            "custom_tool.confirm_design",
+            state={"status": "collect_requirement"},
+            owner_id="user_a",
+        )
+
+
+def test_custom_tool_structured_action_rejects_stale_design_revision() -> None:
+    agent = CustomToolAgentService(use_codex=False)
+
+    with pytest.raises(Exception, match="design revision changed"):
+        agent.continue_flow_action(
+            "custom_tool.confirm_design",
+            state={"status": "awaiting_design_confirmation", "design_revision": 3},
+            expected_revision=2,
+            owner_id="user_a",
+        )
 
 
 def test_custom_tool_agent_sample_input_supports_sdk_json_string():

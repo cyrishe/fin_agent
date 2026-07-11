@@ -24,7 +24,7 @@ class LlmStreamBlockBuilder:
         content = _trim(event.get("content"))
         metadata = event.get("metadata") if isinstance(event.get("metadata"), Mapping) else {}
         stage = _trim(metadata.get("stage")) or self._infer_stage(event)
-        if not content and event_type not in {"turn_started", "turn_completed", "stage_start", "stage_result", "context_ready"}:
+        if not content and event_type not in {"turn_started", "turn_completed", "stage_start", "stage_result", "context_ready", "final"}:
             return []
 
         if source == "codex" and event_type in {"reasoning_summary_delta", "reasoning_delta", "plan_delta"}:
@@ -90,7 +90,10 @@ class LlmStreamBlockBuilder:
             if not isinstance(item, Mapping):
                 continue
             block_type = _trim(item.get("block_type") or item.get("type"))
-            if block_type not in {"markdown", "table", "bar_chart", "line_chart", "flowchart", "code", "action"}:
+            if block_type not in {
+                "markdown", "table", "bar_chart", "line_chart", "flowchart", "code",
+                "narrative", "workflow", "artifact", "assessment",
+            }:
                 continue
             data = item.get("data") if isinstance(item.get("data"), Mapping) else {}
             data_json = _trim(item.get("data_json"))
@@ -115,58 +118,158 @@ class LlmStreamBlockBuilder:
 
     def _design_final_blocks(self, final: Mapping[str, Any], *, status: str, stage: str) -> List[Dict[str, Any]]:
         design = final.get("design") if isinstance(final.get("design"), Mapping) else {}
+        understanding = final.get("understanding") if isinstance(final.get("understanding"), Mapping) else {}
+        existing_analysis = final.get("existing_analysis") if isinstance(final.get("existing_analysis"), Mapping) else {}
+        artifact_context = final.get("design_artifact") if isinstance(final.get("design_artifact"), Mapping) else {}
+        artifact_id = _trim(artifact_context.get("design_artifact_id"))
+        artifact_revision = int(artifact_context.get("design_revision") or 0)
         message = _trim(final.get("message"))
-        questions = [str(item) for item in final.get("questions") or [] if _trim(item)]
-        title = "设计结果" if status == "design_ready" else "需要补充信息"
-        summary_lines = []
-        if message:
-            summary_lines.append(message)
-        if design:
-            summary_lines.extend([
-                "",
-                f"- tool_name: `{_trim(design.get('tool_name')) or '-'}`",
-                f"- display_name: {_trim(design.get('display_name')) or '-'}",
-                f"- description: {_trim(design.get('description')) or '-'}",
-            ])
-        if questions:
-            summary_lines.extend(["", "需要确认：", *[f"- {item}" for item in questions]])
+        questions = self._normalize_design_questions(final.get("questions"))
+        reviewable = status in {"review", "design_ready"}
+        goal = _trim(understanding.get("goal"))
+        expected_result = _trim(understanding.get("expected_result"))
+        summary = message or goal or ("工具规格已经形成。" if reviewable else "还需要补充信息。")
+        if expected_result and expected_result != summary:
+            summary = f"{summary}\n预期结果：{expected_result}"
         blocks = [self._block(
             block_id=f"{stage}_final_summary",
-            block_type="markdown",
+            block_type="narrative",
             mode="replace",
-            title=title,
-            content="\n".join(summary_lines).strip(),
+            title="设计结果" if reviewable else "需要补充信息",
+            content=summary,
             stage=stage,
         )]
-        blocks.extend(self._fields_table_blocks(design, stage=stage))
-        logic = [str(item) for item in design.get("logic") or [] if _trim(item)] if isinstance(design, Mapping) else []
-        if logic:
+
+        if design:
             blocks.append(self._block(
-                block_id=f"{stage}_logic_flow",
-                block_type="flowchart",
+                block_id=f"{stage}_artifact",
+                block_type="artifact",
                 mode="replace",
-                title="实现逻辑",
+                title=_trim(design.get("display_name")) or "工具规格",
                 stage=stage,
-                data={"nodes": [{"label": item} for item in logic]},
+                data={
+                    "artifact_id": artifact_id,
+                    "artifact_type": "finance.tool_spec",
+                    "content_schema_version": "finance.tool_spec.v1",
+                    "lifecycle": "reviewable" if reviewable else "draft",
+                    "revision": artifact_revision,
+                    "summary": _trim(design.get("description")) or goal,
+                    "items": [
+                        {"label": "工具标识", "value": _trim(design.get("tool_name")) or "-"},
+                        {"label": "输入", "value": f"{len(design.get('inputs') or [])} 个字段"},
+                        {"label": "输出", "value": f"{len(design.get('outputs') or [])} 个字段"},
+                        {"label": "规则", "value": f"{len(design.get('rules') or design.get('logic') or [])} 条"},
+                    ],
+                    "details": {
+                        "understanding": dict(understanding),
+                        "inputs": [dict(item) for item in design.get("inputs") or [] if isinstance(item, Mapping)],
+                        "outputs": [dict(item) for item in design.get("outputs") or [] if isinstance(item, Mapping)],
+                        "modules": [dict(item) for item in design.get("modules") or [] if isinstance(item, Mapping)],
+                        "rules": [dict(item) for item in design.get("rules") or [] if isinstance(item, Mapping)],
+                        "logic": [str(item) for item in design.get("logic") or [] if _trim(item)],
+                        "flow": dict(design.get("flow")) if isinstance(design.get("flow"), Mapping) else {"steps": [], "links": []},
+                        "data_requirements": [dict(item) for item in design.get("data_requirements") or [] if isinstance(item, Mapping)],
+                        "exceptions": [dict(item) for item in design.get("exceptions") or [] if isinstance(item, Mapping)],
+                        "acceptance": [dict(item) for item in design.get("acceptance") or [] if isinstance(item, Mapping)],
+                        "existing_analysis": dict(existing_analysis),
+                    },
+                },
             ))
-        if status == "design_ready":
+
+        if questions:
             blocks.append(self._block(
-                block_id=f"{stage}_confirm_action",
-                block_type="action",
+                block_id=f"{stage}_questions",
+                block_type="interaction",
                 mode="replace",
-                title="下一步",
-                content="确认后进入代码生成和样例测试。",
+                title="需要补充",
+                content="请在对话中补充以下信息。",
                 stage=stage,
-                actions=[{"id": "confirm_implementation", "label": "确认实现", "command": "确认实现"}],
+                data={
+                    "interaction_id": "custom_tool.requirement_clarification",
+                    "intent": "provide_input",
+                    "submission_mode": "conversation",
+                    "prompt": "请选择常用答案，或直接在对话中补充。",
+                    "questions": questions,
+                    "actions": [],
+                },
+            ))
+        if reviewable:
+            blocks.append(self._block(
+                block_id=f"{stage}_design_review",
+                block_type="interaction",
+                mode="replace",
+                title="确认设计",
+                content="确认后进入实现和样例验证；需要调整时，直接在对话中说明修改点。",
+                stage=stage,
+                data={
+                    "interaction_id": "custom_tool.design_review",
+                    "intent": "confirm",
+                    "submission_mode": "action",
+                    "prompt": "是否按当前规格继续？",
+                    "subject_ref": artifact_id,
+                    "subject_revision": artifact_revision,
+                    "review": {
+                        "assumptions": [str(item) for item in understanding.get("assumptions") or [] if _trim(item)],
+                        "constraints": [str(item) for item in understanding.get("constraints") or [] if _trim(item)],
+                        "data_requirements": len(design.get("data_requirements") or []),
+                        "acceptance": len(design.get("acceptance") or []),
+                    },
+                    "actions": [
+                        {
+                            "action_id": "custom_tool.confirm_design",
+                            "label": "确认并继续",
+                            "intent": "accept",
+                            "style": "primary",
+                            "expected_revision": artifact_revision,
+                        },
+                        {
+                            "action_id": "custom_tool.revise_design",
+                            "label": "修改",
+                            "intent": "edit",
+                            "style": "default",
+                        },
+                    ],
+                },
             ))
         return blocks
+
+    @staticmethod
+    def _normalize_design_questions(raw_questions: Any) -> List[Dict[str, Any]]:
+        questions: List[Dict[str, Any]] = []
+        for index, item in enumerate(raw_questions if isinstance(raw_questions, list) else []):
+            if isinstance(item, Mapping):
+                question = _trim(item.get("question"))
+                if not question:
+                    continue
+                questions.append({
+                    "id": _trim(item.get("id")) or f"Q{index + 1}",
+                    "question": question,
+                    "reason": _trim(item.get("reason")),
+                    "answer_type": _trim(item.get("answer_type")) or "text",
+                    "required": item.get("required") is True,
+                    "options": [dict(option) for option in item.get("options") or [] if isinstance(option, Mapping)],
+                    "allow_custom": item.get("allow_custom") is not False,
+                })
+                continue
+            text = _trim(item)
+            if text:
+                questions.append({
+                    "id": f"Q{index + 1}",
+                    "question": text,
+                    "reason": "",
+                    "answer_type": "text",
+                    "required": True,
+                    "options": [],
+                    "allow_custom": True,
+                })
+        return questions[:5]
 
     def _coding_final_blocks(self, final: Mapping[str, Any], *, status: str, stage: str) -> List[Dict[str, Any]]:
         blocks = [self._block(
             block_id=f"{stage}_final_summary",
-            block_type="markdown",
+            block_type="narrative",
             mode="replace",
-            title="代码结果" if status == "code_ready" else "需要回到设计",
+            title="实现结果" if status == "code_ready" else "需要回到设计",
             content="\n".join(
                 item for item in [
                     _trim(final.get("message")),
@@ -178,73 +281,58 @@ class LlmStreamBlockBuilder:
         files = [item for item in final.get("files") or [] if isinstance(item, Mapping)]
         if files:
             blocks.append(self._block(
-                block_id=f"{stage}_files",
-                block_type="table",
+                block_id=f"{stage}_artifact",
+                block_type="artifact",
                 mode="replace",
-                title="生成文件",
+                title="可运行版本",
                 stage=stage,
                 data={
-                    "headers": ["path", "role", "lines"],
-                    "rows": [[_trim(item.get("path")), _trim(item.get("role")), len(_trim(item.get("content")).splitlines())] for item in files],
+                    "artifact_type": "finance.custom_tool_implementation",
+                    "lifecycle": "draft",
+                    "version": "0.1",
+                    "summary": _trim(final.get("code_summary")) or f"已生成 {len(files)} 个实现文件。",
+                    "items": [
+                        {"label": "实现文件", "value": f"{len(files)} 个"},
+                    ],
+                    "details": {
+                        "files": [
+                            {
+                                "path": _trim(item.get("path")),
+                                "role": _trim(item.get("role")),
+                                "lines": len(_trim(item.get("content")).splitlines()),
+                            }
+                            for item in files
+                        ]
+                    },
                 },
             ))
-            main_file = next((item for item in files if _trim(item.get("content")) and (_trim(item.get("role")) == "tool" or _trim(item.get("path")).endswith(".py"))), None)
-            if main_file:
-                blocks.append(self._block(
-                    block_id=f"{stage}_main_code",
-                    block_type="code",
-                    mode="replace",
-                    title=_trim(main_file.get("path")) or "生成代码",
-                    content=_trim(main_file.get("content")),
-                    stage=stage,
-                ))
         tests = [item for item in final.get("tests") or [] if isinstance(item, Mapping)]
-        if tests:
+        risks = [str(item) for item in final.get("risks") or [] if _trim(item)]
+        if tests or risks:
+            passed = sum(1 for item in tests if _trim(item.get("status")) in {"passed", "pass", "succeeded"})
+            overall = "pass" if tests and passed == len(tests) and not risks else ("warn" if status == "code_ready" else "fail")
             blocks.append(self._block(
-                block_id=f"{stage}_tests",
-                block_type="table",
+                block_id=f"{stage}_assessment",
+                block_type="assessment",
                 mode="replace",
-                title="测试用例",
+                title="验证结果",
                 stage=stage,
                 data={
-                    "headers": ["name", "status", "summary"],
-                    "rows": [[_trim(item.get("name")), _trim(item.get("status")), _trim(item.get("summary"))] for item in tests],
+                    "overall": overall,
+                    "summary": f"{passed} / {len(tests)} 项样例通过" if tests else "存在需要检查的风险。",
+                    "issues": risks,
+                    "details": {
+                        "tests": [
+                            {
+                                "name": _trim(item.get("name")),
+                                "status": _trim(item.get("status")),
+                                "summary": _trim(item.get("summary")),
+                            }
+                            for item in tests
+                        ]
+                    },
                 },
             ))
-        risks = [str(item) for item in final.get("risks") or [] if _trim(item)]
-        if risks:
-            blocks.append(self._block(
-                block_id=f"{stage}_risks",
-                block_type="markdown",
-                mode="replace",
-                title="风险提示",
-                content="\n".join(f"- {item}" for item in risks),
-                stage=stage,
-            ))
-        return blocks
-
-    def _fields_table_blocks(self, design: Mapping[str, Any], *, stage: str) -> List[Dict[str, Any]]:
-        blocks: List[Dict[str, Any]] = []
-        for key, title in (("inputs", "输入字段"), ("outputs", "输出字段")):
-            rows = []
-            for item in design.get(key) or []:
-                if not isinstance(item, Mapping):
-                    continue
-                rows.append([
-                    _trim(item.get("name")),
-                    _trim(item.get("type")),
-                    "是" if item.get("required") is True else "否",
-                    _trim(item.get("description")),
-                ])
-            if rows:
-                blocks.append(self._block(
-                    block_id=f"{stage}_{key}",
-                    block_type="table",
-                    mode="replace",
-                    title=title,
-                    stage=stage,
-                    data={"headers": ["name", "type", "required", "description"], "rows": rows},
-                ))
         return blocks
 
     def _block(

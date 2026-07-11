@@ -23,7 +23,7 @@ from src.services.application_studio_service import ApplicationStudioError, Appl
 from src.services.application_workbench_service import ApplicationWorkbenchService
 from src.services.assistant_dispatch_planner import AssistantDispatchPlanner
 from src.services.attachment_service import AttachmentService, AttachmentServiceError
-from src.services.custom_tool_service import CustomToolAgentService
+from src.services.custom_tool_service import CustomToolAgentService, CustomToolError
 from src.services.llm_stream_block_service import LlmStreamBlockBuilder
 from src.services.runtime_conversation_service import RuntimeConversationService
 from src.services.skill_blueprint_service import SkillBlueprintError, SkillBlueprintService
@@ -641,52 +641,51 @@ def _custom_tool_result_blocks(result: dict, builder: LlmStreamBlockBuilder) -> 
                 seen.add(key)
             blocks.append(item)
 
-    raw = result.get("raw") if isinstance(result.get("raw"), dict) else {}
-    final = raw.get("final") if isinstance(raw.get("final"), dict) else {}
-    if final:
-        _add_many(builder.final_to_blocks(final))
-
     design = result.get("design") if isinstance(result.get("design"), dict) else {}
     if design:
         _add_many(builder.final_to_blocks({
             "source": "model",
             "type": "final",
-            "status": "design_ready",
-            "message": "已生成自定义工具设计。",
-            "questions": [],
+            "status": str(result.get("design_status") or "review"),
+            "understanding": result.get("understanding") if isinstance(result.get("understanding"), dict) else {},
+            "questions": result.get("questions") if isinstance(result.get("questions"), list) else [],
             "design": design,
-            "render_blocks": [],
+            "design_artifact": result.get("design_artifact") if isinstance(result.get("design_artifact"), dict) else {},
+            "existing_analysis": result.get("existing_analysis") if isinstance(result.get("existing_analysis"), dict) else {},
         }, stage="design"))
 
     tool = result.get("tool") if isinstance(result.get("tool"), dict) else {}
     manifest = tool.get("manifest") if isinstance(tool.get("manifest"), dict) else {}
     test_result = result.get("test_result") if isinstance(result.get("test_result"), dict) else {}
     if manifest:
-        rows = [
-            ["tool_name", manifest.get("tool_name")],
-            ["display_name", manifest.get("display_name")],
-            ["status", manifest.get("status")],
-            ["test", "通过" if test_result.get("ok") else ("失败" if test_result else "-")],
-        ]
         _add_many([builder.make_block(
             block_id="custom_tool_draft_summary",
-            block_type="table",
+            block_type="artifact",
             mode="replace",
-            title="Draft 结果",
-            data={"headers": ["item", "value"], "rows": rows},
+            title=str(manifest.get("display_name") or "工具草稿"),
+            data={
+                "artifact_type": "finance.custom_tool_implementation",
+                "lifecycle": "draft",
+                "version": str(manifest.get("current_revision") or "0.1"),
+                "summary": str(manifest.get("description") or "").strip(),
+                "items": [
+                    {"label": "工具标识", "value": manifest.get("tool_name")},
+                    {"label": "当前状态", "value": manifest.get("status")},
+                ],
+            },
             stage="coding",
         )])
         if test_result:
             _add_many([builder.make_block(
                 block_id="custom_tool_test_result",
-                block_type="markdown",
+                block_type="assessment",
                 mode="replace",
                 title="样例测试",
-                content=(
-                    "样例测试通过。"
-                    if test_result.get("ok")
-                    else f"样例测试失败：{test_result.get('error') or '未知错误'}"
-                ),
+                data={
+                    "overall": "pass" if test_result.get("ok") else "fail",
+                    "summary": "样例测试通过。" if test_result.get("ok") else "样例测试失败。",
+                    "issues": [] if test_result.get("ok") else [str(test_result.get("error") or "未知错误")],
+                },
                 stage="coding",
             )])
     return blocks
@@ -694,6 +693,7 @@ def _custom_tool_result_blocks(result: dict, builder: LlmStreamBlockBuilder) -> 
 
 def _run_custom_tool_stream_payload(payload: dict, *, emit) -> None:
     text = str(payload.get("text") or "").strip()
+    interaction_response = payload.get("interaction_response") if isinstance(payload.get("interaction_response"), dict) else {}
     application_name = str(payload.get("application_name") or "investment_workbench").strip() or "investment_workbench"
     thread_id_payload = payload.get("thread_id")
     guest_identity = payload.get("guest_identity") if isinstance(payload.get("guest_identity"), dict) else {}
@@ -702,6 +702,8 @@ def _run_custom_tool_stream_payload(payload: dict, *, emit) -> None:
 
     def event_sink(event: dict) -> None:
         raw_events.append(event)
+        if str(event.get("source") or "") == "model" and str(event.get("type") or "") == "final":
+            return
         for block in builder.event_to_blocks(event):
             emit(block)
 
@@ -725,16 +727,40 @@ def _run_custom_tool_stream_payload(payload: dict, *, emit) -> None:
             thread_id=thread_id,
         )
         thread_context = {**thread_context, "_custom_tool_owner_ids": owner_ids}
+        active_state = thread_context.get("custom_tool_state") if isinstance(thread_context.get("custom_tool_state"), dict) else {}
+        action_id = str(interaction_response.get("action_id") or "").strip()
+        interaction_id = str(interaction_response.get("interaction_id") or "").strip()
+        action_intent = str(interaction_response.get("action") or "").strip()
+        expected_revision = interaction_response.get("expected_revision")
+        if interaction_response:
+            if interaction_id != "custom_tool.design_review":
+                raise CustomToolError(f"unknown custom tool interaction: {interaction_id or '-'}")
+            if action_intent != "accept":
+                raise CustomToolError(f"unsupported custom tool interaction action: {action_intent or '-'}")
+            text = custom_tool_agent_service.interaction_user_text(action_id)
         turn_id = runtime_conversation_service.create_turn(
             thread_id=thread_id,
             user_input_text=text,
-            input_payload=_to_json_safe({**payload, "application_name": application_name}),
+            input_payload=_to_json_safe({
+                **payload,
+                "text": text,
+                "application_name": application_name,
+            }),
         )
         parsed = _parse_chat_command(text)
-        active_state = thread_context.get("custom_tool_state") if isinstance(thread_context.get("custom_tool_state"), dict) else {}
         owner_id = owner_ids[0] if owner_ids else ""
         dispatch_plan = {}
-        if parsed.get("kind") == "slash" and str(parsed.get("command") or "").lower() == "/custom_tool":
+        if interaction_response:
+            if not active_state:
+                raise ValueError("当前没有可继续的自定义工具流程。")
+            result = custom_tool_agent_service.continue_flow_action(
+                action_id,
+                state=active_state,
+                expected_revision=int(expected_revision),
+                owner_id=owner_id,
+                event_sink=event_sink,
+            )
+        elif parsed.get("kind") == "slash" and str(parsed.get("command") or "").lower() == "/custom_tool":
             args = parsed.get("args") or []
             sub_action = str(args[0] if args else "").strip().lower()
             rest_args = args[1:] if args else []
@@ -785,6 +811,8 @@ def _run_custom_tool_stream_payload(payload: dict, *, emit) -> None:
         if result["thread_context_patch"]:
             runtime_conversation_service.update_thread_context(thread_id=thread_id, patch=result["thread_context_patch"])
         assistant_message = str(result.get("message") or "已处理。").strip()
+        final_events = _custom_tool_result_blocks(result, builder)
+        result["surface_blocks"] = final_events
         runtime_conversation_service.complete_turn(
             thread_id=thread_id,
             turn_id=turn_id,
@@ -793,11 +821,6 @@ def _run_custom_tool_stream_payload(payload: dict, *, emit) -> None:
             model_name=str(result.get("model_name") or "").strip(),
             token_usage=result.get("llm_usage") if isinstance(result.get("llm_usage"), dict) else None,
         )
-        final_events = []
-        for event in raw_events:
-            if str(event.get("source") or "") == "model" and str(event.get("type") or "") == "final":
-                final_events.extend(builder.final_to_blocks(event, stage=str((event.get("metadata") or {}).get("stage") or "")))
-        final_events.extend(_custom_tool_result_blocks(result, builder))
         for block in final_events:
             emit(block)
         emit({
@@ -2570,13 +2593,19 @@ def api_custom_tool_stream_start():
     try:
         payload = _extract_request_payload()
         text = str(payload.get("text") or payload.get("message") or "").strip()
-        if not text:
-            return jsonify({"ok": False, "error": "text 不能为空"}), 400
+        interaction_response = payload.get("interaction_response") if isinstance(payload.get("interaction_response"), dict) else {}
+        if not text and not interaction_response:
+            return jsonify({"ok": False, "error": "text 或 interaction_response 不能为空"}), 400
+        if interaction_response and not str(interaction_response.get("action_id") or "").strip():
+            return jsonify({"ok": False, "error": "interaction_response.action_id 不能为空"}), 400
+        if interaction_response and not isinstance(interaction_response.get("expected_revision"), int):
+            return jsonify({"ok": False, "error": "interaction_response.expected_revision 必须是整数"}), 400
         guest_identity = _resolve_current_guest_identity()
         run_id = uuid.uuid4().hex
         stored_payload = {
             "run_id": run_id,
             "text": text,
+            "interaction_response": interaction_response,
             "thread_id": payload.get("thread_id"),
             "application_name": str(payload.get("application_name") or "investment_workbench").strip() or "investment_workbench",
             "guest_identity": guest_identity,
@@ -2712,7 +2741,14 @@ def api_assistant_thread_detail(thread_id: int):
             return jsonify({"ok": False, "error": "无权访问该 thread"}), 403
         thread_context = runtime_conversation_service.get_thread_context(thread_id=int(thread_id))
         custom_tool_state = thread_context.get("custom_tool_state") if isinstance(thread_context.get("custom_tool_state"), dict) else {}
-        turns = runtime_conversation_service.list_turns(thread_id=int(thread_id), limit=100, include_output_payload=False)
+        turns = runtime_conversation_service.list_turns(thread_id=int(thread_id), limit=100, include_output_payload=True)
+        for turn in turns:
+            output_payload = turn.get("output_payload") if isinstance(turn.get("output_payload"), dict) else {}
+            surface_blocks = output_payload.get("surface_blocks") if isinstance(output_payload.get("surface_blocks"), list) else []
+            turn["output_payload"] = {
+                "mode": str(output_payload.get("mode") or "").strip(),
+                "surface_blocks": surface_blocks,
+            } if surface_blocks else {}
         response = jsonify(_to_json_safe({
             "ok": True,
             "thread": thread,

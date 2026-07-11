@@ -416,26 +416,42 @@ class CustomToolAgentService:
         status = _trim(design_result.get("status"))
         if status == "ok":
             return self._return_legacy_design(requirement_text, owner_id=owner_id, design=design_result["design"])
-        if status != "design_ready":
+        design_ready = status in {"review", "design_ready"}
+        understanding = design_result.get("understanding") if isinstance(design_result.get("understanding"), Mapping) else {}
+        existing_analysis = design_result.get("existing_analysis") if isinstance(design_result.get("existing_analysis"), Mapping) else {}
+        questions = design_result.get("questions") if isinstance(design_result.get("questions"), list) else []
+        design = design_result.get("design") if isinstance(design_result.get("design"), Mapping) else {}
+        design_artifact = self._design_artifact_identity(design, state=state)
+        if not design_ready:
             next_state = {
                 "status": "collect_requirement",
                 "requirement_text": requirement_text,
                 "owner_id": owner_id,
-                "partial_design": design_result.get("design") if isinstance(design_result.get("design"), Mapping) else {},
+                "partial_design": design,
+                "understanding": dict(understanding),
+                "questions": questions,
+                **design_artifact,
             }
             return {
                 "message": design_result.get("message") or "请补充工具需求。",
-                "questions": design_result.get("questions") or design_result.get("missing") or [],
+                "design_status": status or "clarification",
+                "understanding": dict(understanding),
+                "questions": questions or design_result.get("missing") or [],
+                "design": design,
+                "design_artifact": design_artifact,
+                "existing_analysis": dict(existing_analysis),
                 "events": design_result.get("events") or [],
                 "state": next_state,
                 "thread_context_patch": {"custom_tool_state": next_state},
             }
-        design = design_result.get("design") if isinstance(design_result.get("design"), Mapping) else {}
         next_state = {
             "status": "awaiting_design_confirmation",
             "requirement_text": requirement_text,
             "owner_id": owner_id,
             "design_contract": design,
+            "understanding": dict(understanding),
+            "existing_analysis": dict(existing_analysis),
+            **design_artifact,
         }
         tool_name = _trim(design.get("tool_name")) or "custom_tool"
         display_name = _trim(design.get("display_name")) or tool_name
@@ -447,8 +463,12 @@ class CustomToolAgentService:
         )
         return {
             "message": message,
+            "design_status": status,
+            "understanding": dict(understanding),
             "state": next_state,
             "design": design,
+            "design_artifact": design_artifact,
+            "existing_analysis": dict(existing_analysis),
             "events": design_result.get("events") or [],
             "thread_context_patch": {"custom_tool_state": next_state},
         }
@@ -472,6 +492,39 @@ class CustomToolAgentService:
             requirement = "\n".join([_trim(state.get("requirement_text")), raw]).strip()
             return self.start_create(requirement, owner_id=owner_id or _trim(state.get("owner_id")), state=state, event_sink=event_sink)
         return {"message": "当前没有进行中的自定义工具创建流程。", "state": {}}
+
+    def continue_flow_action(
+        self,
+        action_id: str,
+        *,
+        state: Mapping[str, Any],
+        expected_revision: Optional[int] = None,
+        owner_id: str = "",
+        event_sink: Optional[Callable[[Dict[str, Any]], None]] = None,
+    ) -> Dict[str, Any]:
+        """Resolve a trusted UI action without executing model-provided commands."""
+        normalized_action = _trim(action_id)
+        status = _trim(state.get("status"))
+        if status == "awaiting_design_confirmation" and normalized_action == "custom_tool.confirm_design":
+            current_revision = int(state.get("design_revision") or 0)
+            if expected_revision is not None and int(expected_revision) != current_revision:
+                raise CustomToolError(
+                    f"design revision changed: expected {int(expected_revision)}, current {current_revision}"
+                )
+            return self._confirm_and_code(state=state, owner_id=owner_id, event_sink=event_sink)
+        raise CustomToolError(
+            f"action {normalized_action or '-'} is not allowed while custom tool state is {status or '-'}"
+        )
+
+    @staticmethod
+    def interaction_user_text(action_id: str) -> str:
+        labels = {
+            "custom_tool.confirm_design": "确认并继续",
+        }
+        normalized_action = _trim(action_id)
+        if normalized_action not in labels:
+            raise CustomToolError(f"unknown custom tool action: {normalized_action or '-'}")
+        return labels[normalized_action]
 
     def call(
         self,
@@ -652,7 +705,48 @@ class CustomToolAgentService:
         logic = design.get("logic")
         if isinstance(logic, list):
             return "\n".join(_trim(item) for item in logic if _trim(item))
+        rules = design.get("rules") if isinstance(design.get("rules"), list) else []
+        rule_lines = [
+            f"{_trim(item.get('name'))}: {_trim(item.get('logic'))}".strip(": ")
+            for item in rules
+            if isinstance(item, Mapping) and (_trim(item.get("name")) or _trim(item.get("logic")))
+        ]
+        if rule_lines:
+            return "\n".join(rule_lines)
+        modules = design.get("modules") if isinstance(design.get("modules"), list) else []
+        module_lines = [
+            f"{_trim(item.get('name'))}: {_trim(item.get('responsibility'))}".strip(": ")
+            for item in modules
+            if isinstance(item, Mapping) and (_trim(item.get("name")) or _trim(item.get("responsibility")))
+        ]
+        if module_lines:
+            return "\n".join(module_lines)
         return _trim(logic)
+
+    @staticmethod
+    def _design_artifact_identity(
+        design: Mapping[str, Any],
+        *,
+        state: Optional[Mapping[str, Any]],
+    ) -> Dict[str, Any]:
+        current_text = json.dumps(dict(design), ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+        current_fingerprint = hashlib.sha256(current_text.encode("utf-8")).hexdigest()
+        previous_state = state if isinstance(state, Mapping) else {}
+        previous_fingerprint = _trim(previous_state.get("design_fingerprint"))
+        previous_revision = int(previous_state.get("design_revision") or 0)
+        revision = previous_revision if previous_fingerprint == current_fingerprint else previous_revision + 1
+        if revision < 1:
+            revision = 1
+        artifact_id = _trim(previous_state.get("design_artifact_id"))
+        if not artifact_id:
+            seed = _trim(design.get("tool_name")) or current_fingerprint[:16]
+            normalized_seed = re.sub(r"[^a-zA-Z0-9_]+", "_", seed).strip("_") or current_fingerprint[:16]
+            artifact_id = f"finance_tool_spec_{normalized_seed[:48]}"
+        return {
+            "design_artifact_id": artifact_id,
+            "design_revision": revision,
+            "design_fingerprint": current_fingerprint,
+        }
 
     @staticmethod
     def _schema_from_fields(fields: List[Any]) -> Dict[str, Any]:

@@ -51,6 +51,7 @@ class CodexExecSkillHarness:
         self,
         *,
         skill_path: str,
+        output_schema_path: str = "",
         user_request: str,
         context: Optional[Mapping[str, Any]] = None,
         session_id: str = "",
@@ -74,6 +75,19 @@ class CodexExecSkillHarness:
             return {
                 "ok": False,
                 "error": f"skill file not found: {skill_file}",
+                "events": [],
+                "final": {},
+                "session_id": session_id,
+            }
+        try:
+            output_schema_file = self._resolve_output_schema_file(
+                skill_file=skill_file,
+                output_schema_path=output_schema_path,
+            )
+        except (FileNotFoundError, ValueError) as exc:
+            return {
+                "ok": False,
+                "error": str(exc),
                 "events": [],
                 "final": {},
                 "session_id": session_id,
@@ -112,6 +126,7 @@ class CodexExecSkillHarness:
             skill_text=skill_file.read_text(encoding="utf-8"),
             user_request=user_request,
             context=run_context,
+            structured_output=output_schema_file is not None,
         )
         with tempfile.NamedTemporaryFile("w+", encoding="utf-8", suffix=".txt", delete=False) as output_file:
             output_path = output_file.name
@@ -128,6 +143,8 @@ class CodexExecSkillHarness:
         ]
         if self.model:
             command.extend(["--model", self.model])
+        if output_schema_file is not None:
+            command.extend(["--output-schema", str(output_schema_file)])
         command.append("-")
 
         started_at = time.time()
@@ -190,7 +207,13 @@ class CodexExecSkillHarness:
 
         events = stage_events + process_events
         events.extend(self._extract_model_events(last_message))
-        final = self._find_final(events)
+        final = self._final_from_text(last_message) or self._find_final(events)
+        if final and not self._find_final(events):
+            self._append_event(
+                events,
+                {**final, "metadata": {"stage": stage_name}},
+                event_sink,
+            )
         self._append_event(
             events,
             {
@@ -365,13 +388,28 @@ class CodexExecSkillHarness:
         events.append(event)
         cls._send_event(event, event_sink)
 
-    def _build_prompt(self, *, skill_text: str, user_request: str, context: Mapping[str, Any]) -> str:
+    def _build_prompt(
+        self,
+        *,
+        skill_text: str,
+        user_request: str,
+        context: Mapping[str, Any],
+        structured_output: bool = False,
+    ) -> str:
         bundle = context.get("context_bundle") if isinstance(context.get("context_bundle"), Mapping) else {}
         bundle_dir = _trim(bundle.get("bundle_dir"))
+        output_instruction = (
+            ""
+            if structured_output
+            else (
+                "只输出该 SKILL 要求的 NDJSON 事件；不要修改工作区文件。\n"
+                "最后一行必须是 source=model,type=final 的 JSON 对象。\n"
+            )
+        )
         return (
             "请严格按照下面的 SKILL 执行任务。\n"
-            "只输出该 SKILL 要求的 NDJSON 事件；不要修改工作区文件。\n"
-            "最后一行必须是 source=model,type=final 的 JSON 对象。\n\n"
+            "不要修改工作区文件。\n"
+            f"{output_instruction}\n"
             "# AVAILABLE FILE CONTEXT\n"
             f"资料包目录：{bundle_dir}\n"
             "如果任务需要金融数据工具能力，先读取资料包中的 api_catalog/index.json；再只读取相关 subject 文件。\n"
@@ -383,6 +421,34 @@ class CodexExecSkillHarness:
             "# USER REQUEST\n"
             f"{user_request}\n"
         )
+
+    def _resolve_output_schema_file(self, *, skill_file: Path, output_schema_path: str = "") -> Optional[Path]:
+        explicit_path = _trim(output_schema_path)
+        if explicit_path:
+            schema_file = Path(explicit_path)
+            if not schema_file.is_absolute():
+                schema_file = self.cwd / schema_file
+            if not schema_file.exists():
+                raise FileNotFoundError(f"output schema file not found: {schema_file}")
+            self._load_output_schema(schema_file)
+            return schema_file
+
+        for filename in ("schema.json", "output_schema.json"):
+            candidate = skill_file.parent / filename
+            if candidate.exists():
+                self._load_output_schema(candidate)
+                return candidate
+        return None
+
+    @staticmethod
+    def _load_output_schema(schema_file: Path) -> Dict[str, Any]:
+        try:
+            payload = json.loads(schema_file.read_text(encoding="utf-8"))
+        except json.JSONDecodeError as exc:
+            raise ValueError(f"invalid output schema JSON: {schema_file}: {exc}") from exc
+        if not isinstance(payload, Mapping):
+            raise ValueError(f"output schema must be a JSON object: {schema_file}")
+        return dict(payload)
 
     @staticmethod
     def _infer_stage(skill_file: Path) -> str:
@@ -474,6 +540,22 @@ class CodexExecSkillHarness:
         return final
 
     @staticmethod
+    def _final_from_text(text: str) -> Dict[str, Any]:
+        stripped = _trim(text)
+        if not stripped:
+            return {}
+        try:
+            payload = json.loads(stripped)
+        except Exception:
+            return {}
+        if not isinstance(payload, Mapping):
+            return {}
+        final = dict(payload)
+        final.setdefault("source", "model")
+        final.setdefault("type", "final")
+        return final if _trim(final.get("source")) == "model" and _trim(final.get("type")) == "final" else {}
+
+    @staticmethod
     def _event_text(payload: Mapping[str, Any]) -> str:
         for key in ("message", "content", "text", "delta"):
             value = payload.get(key)
@@ -524,6 +606,7 @@ class CodexSdkSkillHarness(CodexExecSkillHarness):
         self,
         *,
         skill_path: str,
+        output_schema_path: str = "",
         user_request: str,
         context: Optional[Mapping[str, Any]] = None,
         session_id: str = "",
@@ -548,6 +631,24 @@ class CodexSdkSkillHarness(CodexExecSkillHarness):
             return {
                 "ok": False,
                 "error": f"skill file not found: {skill_file}",
+                "events": [],
+                "final": {},
+                "session_id": session_id,
+            }
+        try:
+            output_schema_file = self._resolve_output_schema_file(
+                skill_file=skill_file,
+                output_schema_path=output_schema_path,
+            )
+            output_schema = (
+                self._load_output_schema(output_schema_file)
+                if output_schema_file is not None
+                else self._output_schema(stage_name)
+            )
+        except (FileNotFoundError, ValueError) as exc:
+            return {
+                "ok": False,
+                "error": str(exc),
                 "events": [],
                 "final": {},
                 "session_id": session_id,
@@ -587,7 +688,6 @@ class CodexSdkSkillHarness(CodexExecSkillHarness):
             context=run_context,
             stage=stage_name,
         )
-        output_schema = self._output_schema(stage_name)
         events = list(stage_events)
         final: Dict[str, Any] = {}
         final_response = ""
@@ -604,7 +704,12 @@ class CodexSdkSkillHarness(CodexExecSkillHarness):
 
             sdk_sandbox = self._sdk_sandbox(Sandbox)
             sdk_env = self._sdk_env()
-            config = CodexConfig(cwd=str(self.cwd), env=sdk_env or None)
+            codex_bin = shutil.which(self.codex_bin)
+            config = CodexConfig(
+                codex_bin=codex_bin,
+                cwd=str(self.cwd),
+                env=sdk_env or None,
+            )
             self._append_event(
                 events,
                 {
@@ -616,6 +721,8 @@ class CodexSdkSkillHarness(CodexExecSkillHarness):
                         "sandbox": self.sandbox,
                         "idle_timeout_seconds": self.timeout_seconds,
                         "hard_timeout_seconds": self.hard_timeout_seconds,
+                        "codex_bin": codex_bin or "<sdk-pinned>",
+                        "output_schema_path": str(output_schema_file or "<built-in>"),
                     },
                 },
                 event_sink,
@@ -681,6 +788,12 @@ class CodexSdkSkillHarness(CodexExecSkillHarness):
 
         events.extend(self._extract_model_events(final_response))
         final = self._final_from_text(final_response) or self._find_final(events)
+        if final and not self._find_final(events):
+            self._append_event(
+                events,
+                {**final, "metadata": {"stage": stage_name}},
+                event_sink,
+            )
         ok = bool(final) and not error and not timeout
         self._append_event(
             events,
@@ -712,19 +825,11 @@ class CodexSdkSkillHarness(CodexExecSkillHarness):
         }
 
     def _build_sdk_prompt(self, *, skill_text: str, user_request: str, context: Mapping[str, Any], stage: str) -> str:
-        prompt = self._build_prompt(skill_text=skill_text, user_request=user_request, context=context)
-        return (
-            f"{prompt}\n\n"
-            "# SDK FINAL OUTPUT CONTRACT\n"
-            "Use stream events for progress, but the final assistant response must be exactly one JSON object.\n"
-            "The final JSON object must use `source: model` and `type: final`, and must match the provided output_schema.\n"
-            "Always include `render_blocks` as an array; use [] when no special rendering is needed. "
-            "When useful, fill `render_blocks` to describe frontend rendering. Supported block_type values are: "
-            "markdown, table, bar_chart, line_chart, flowchart, code, action. "
-            "For table/chart/flowchart data, put the render payload in `data_json` as a compact JSON string; use `{}` when no data is needed. "
-            "Use render_blocks for user-facing artifacts only; keep raw trace/progress in stream events.\n"
-            "For coding stages, set `sample_input_json` to one valid JSON object string for smoke testing the generated tool.\n"
-            "Do not wrap the final JSON in markdown.\n"
+        return self._build_prompt(
+            skill_text=skill_text,
+            user_request=user_request,
+            context=context,
+            structured_output=True,
         )
 
     @staticmethod
@@ -847,24 +952,6 @@ class CodexSdkSkillHarness(CodexExecSkillHarness):
         return _trim(error.get("message") if isinstance(error, Mapping) else "")
 
     @staticmethod
-    def _final_from_text(text: str) -> Dict[str, Any]:
-        stripped = _trim(text)
-        if not stripped:
-            return {}
-        try:
-            payload = json.loads(stripped)
-        except Exception:
-            return {}
-        if not isinstance(payload, Mapping):
-            return {}
-        final = dict(payload)
-        if not _trim(final.get("source")):
-            final["source"] = "model"
-        if not _trim(final.get("type")):
-            final["type"] = "final"
-        return final if _trim(final.get("source")) == "model" and _trim(final.get("type")) == "final" else {}
-
-    @staticmethod
     def _output_schema(stage: str) -> Dict[str, Any]:
         if stage == "coding":
             return {
@@ -964,9 +1051,16 @@ class CodexSdkSkillHarness(CodexExecSkillHarness):
 
 
 class CodexCustomToolDesigner:
-    def __init__(self, *, harness: Optional[CodexExecSkillHarness] = None, skill_path: str = "SKILL_requirement_understanding_event_format.md") -> None:
+    def __init__(
+        self,
+        *,
+        harness: Optional[CodexExecSkillHarness] = None,
+        skill_path: str = "src/skills/financial-tool-requirement-design-v3/SKILL.md",
+        output_schema_path: str = "src/skills/financial-tool-requirement-design-v3/schema.json",
+    ) -> None:
         self.harness = harness or CodexExecSkillHarness(cwd=".")
         self.skill_path = skill_path
+        self.output_schema_path = output_schema_path
 
     def design(
         self,
@@ -977,6 +1071,7 @@ class CodexCustomToolDesigner:
     ) -> Dict[str, Any]:
         result = self.harness.run_skill(
             skill_path=self.skill_path,
+            output_schema_path=self.output_schema_path,
             user_request=requirement_text,
             context=context or {},
             stage="design",
@@ -990,12 +1085,23 @@ class CodexCustomToolDesigner:
                 "raw": result,
             }
         final = dict(result.get("final") or {})
-        status = _trim(final.get("status")) or "need_more_info"
+        status = _trim(final.get("status")) or "clarification"
+        understanding = final.get("understanding") if isinstance(final.get("understanding"), Mapping) else {}
+        questions = [dict(item) if isinstance(item, Mapping) else str(item) for item in final.get("questions") or []]
+        has_required_question = any(
+            isinstance(item, Mapping) and item.get("required") is True
+            for item in questions
+        )
+        if status == "review" and has_required_question:
+            status = "clarification"
+        goal = _trim(understanding.get("goal"))
         return {
             "status": status,
-            "message": _trim(final.get("message")) or ("设计已生成。" if status == "design_ready" else "请补充工具需求。"),
-            "questions": final.get("questions") or [],
+            "message": (f"{goal}的设计已形成，请检查后确认。" if goal else "设计已形成，请检查后确认。") if status == "review" else "还需要确认几个会影响设计的关键条件。",
+            "understanding": dict(understanding),
+            "questions": questions[:5],
             "design": final.get("design") if isinstance(final.get("design"), Mapping) else {},
+            "existing_analysis": dict(final.get("existing_analysis")) if isinstance(final.get("existing_analysis"), Mapping) else {},
             "events": result.get("events") or [],
             "raw": result,
         }

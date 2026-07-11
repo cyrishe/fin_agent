@@ -1,0 +1,71 @@
+{
+  "status": "clarification",
+  "understanding": {
+    "goal": "设计一个结合量价和热点信息的股票筛选工具。",
+    "usage": "用户按指定频率运行工具，从标的池中筛选股票。",
+    "expected_result": "输出形式和排序方式尚待确认。",
+    "confirmed_requirements": ["同时使用量价和热点信息"],
+    "constraints": ["核心筛选规则必须能够由确定性代码实现"],
+    "assumptions": []
+  },
+  "questions": [
+    {
+      "id": "Q1",
+      "question": "工具最终希望输出哪种结果？",
+      "reason": "输出形式会决定规则融合方式和接口结构。",
+      "answer_type": "single_choice",
+      "required": true,
+      "options": [
+        {
+          "value": "candidate_list",
+          "label": "候选列表",
+          "description": "返回满足规则的股票及命中原因。",
+          "recommended": true
+        },
+        {
+          "value": "ranking",
+          "label": "评分排名",
+          "description": "计算综合分数并排序，需要继续确认权重。",
+          "recommended": false
+        }
+      ],
+      "allow_custom": true
+    }
+  ],
+  "design": {
+    "tool_name": "volume_price_hotspot_selector",
+    "display_name": "量价热点选股",
+    "description": "根据待确认的量价和热点规则筛选股票。",
+    "inputs": [],
+    "outputs": [],
+    "modules": [
+      {
+        "name": "量价分析",
+        "responsibility": "计算待确认的量价特征。",
+        "depends_on": ["证券行情"]
+      },
+      {
+        "name": "热点分析",
+        "responsibility": "计算待确认的热点特征。",
+        "depends_on": ["热点数据"]
+      },
+      {
+        "name": "规则融合",
+        "responsibility": "根据待确认方式组合量价和热点结果。",
+        "depends_on": ["量价分析", "热点分析"]
+      }
+    ],
+    "flow": {"steps": [], "links": []},
+    "rules": [],
+    "data_requirements": [],
+    "exceptions": [],
+    "acceptance": []
+  },
+  "existing_analysis": {
+    "analyzed": false,
+    "current_behavior": [],
+    "gaps": [],
+    "affected_areas": [],
+    "evidence": []
+  }
+}

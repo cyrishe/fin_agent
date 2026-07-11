@@ -1,0 +1,294 @@
+{
+  "type": "object",
+  "properties": {
+    "status": {
+      "type": "string",
+      "enum": ["clarification", "review"]
+    },
+    "understanding": {
+      "$ref": "#/$defs/understanding"
+    },
+    "questions": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/question"
+      }
+    },
+    "design": {
+      "$ref": "#/$defs/design"
+    },
+    "existing_analysis": {
+      "$ref": "#/$defs/existing_analysis"
+    }
+  },
+  "required": ["status", "understanding", "questions", "design", "existing_analysis"],
+  "additionalProperties": false,
+  "$defs": {
+    "understanding": {
+      "type": "object",
+      "properties": {
+        "goal": {"type": "string"},
+        "usage": {"type": "string"},
+        "expected_result": {"type": "string"},
+        "confirmed_requirements": {
+          "type": "array",
+          "items": {"type": "string"}
+        },
+        "constraints": {
+          "type": "array",
+          "items": {"type": "string"}
+        },
+        "assumptions": {
+          "type": "array",
+          "items": {"type": "string"}
+        }
+      },
+      "required": ["goal", "usage", "expected_result", "confirmed_requirements", "constraints", "assumptions"],
+      "additionalProperties": false
+    },
+    "option": {
+      "type": "object",
+      "properties": {
+        "value": {"type": "string"},
+        "label": {"type": "string"},
+        "description": {"type": "string"},
+        "recommended": {"type": "boolean"}
+      },
+      "required": ["value", "label", "description", "recommended"],
+      "additionalProperties": false
+    },
+    "question": {
+      "type": "object",
+      "properties": {
+        "id": {"type": "string"},
+        "question": {"type": "string"},
+        "reason": {"type": "string"},
+        "answer_type": {
+          "type": "string",
+          "enum": ["single_choice", "multiple_choice", "number", "text", "boolean"]
+        },
+        "required": {"type": "boolean"},
+        "options": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/option"}
+        },
+        "allow_custom": {"type": "boolean"}
+      },
+      "required": ["id", "question", "reason", "answer_type", "required", "options", "allow_custom"],
+      "additionalProperties": false
+    },
+    "input": {
+      "type": "object",
+      "properties": {
+        "name": {"type": "string"},
+        "label": {"type": "string"},
+        "type": {
+          "type": "string",
+          "enum": ["string", "integer", "number", "boolean", "array", "object"]
+        },
+        "required": {"type": "boolean"},
+        "description": {"type": "string"},
+        "validation": {
+          "type": "array",
+          "items": {"type": "string"}
+        }
+      },
+      "required": ["name", "label", "type", "required", "description", "validation"],
+      "additionalProperties": false
+    },
+    "output": {
+      "type": "object",
+      "properties": {
+        "name": {"type": "string"},
+        "label": {"type": "string"},
+        "type": {
+          "type": "string",
+          "enum": ["string", "integer", "number", "boolean", "array", "object"]
+        },
+        "description": {"type": "string"},
+        "values": {
+          "type": "array",
+          "items": {"type": "string"}
+        }
+      },
+      "required": ["name", "label", "type", "description", "values"],
+      "additionalProperties": false
+    },
+    "module": {
+      "type": "object",
+      "properties": {
+        "name": {"type": "string"},
+        "responsibility": {"type": "string"},
+        "depends_on": {
+          "type": "array",
+          "items": {"type": "string"}
+        }
+      },
+      "required": ["name", "responsibility", "depends_on"],
+      "additionalProperties": false
+    },
+    "step": {
+      "type": "object",
+      "properties": {
+        "id": {"type": "string"},
+        "type": {
+          "type": "string",
+          "enum": ["start", "input", "validate", "process", "decision", "loop", "output", "error", "end"]
+        },
+        "name": {"type": "string"},
+        "description": {"type": "string"}
+      },
+      "required": ["id", "type", "name", "description"],
+      "additionalProperties": false
+    },
+    "link": {
+      "type": "object",
+      "properties": {
+        "from": {"type": "string"},
+        "to": {"type": "string"},
+        "condition": {"type": "string"}
+      },
+      "required": ["from", "to", "condition"],
+      "additionalProperties": false
+    },
+    "flow": {
+      "type": "object",
+      "properties": {
+        "steps": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/step"}
+        },
+        "links": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/link"}
+        }
+      },
+      "required": ["steps", "links"],
+      "additionalProperties": false
+    },
+    "rule": {
+      "type": "object",
+      "properties": {
+        "name": {"type": "string"},
+        "logic": {"type": "string"},
+        "parameters": {
+          "type": "array",
+          "items": {"type": "string"}
+        },
+        "on_missing_data": {"type": "string"}
+      },
+      "required": ["name", "logic", "parameters", "on_missing_data"],
+      "additionalProperties": false
+    },
+    "data_requirement": {
+      "type": "object",
+      "properties": {
+        "name": {"type": "string"},
+        "fields": {
+          "type": "array",
+          "items": {"type": "string"}
+        },
+        "frequency": {"type": "string"},
+        "purpose": {"type": "string"},
+        "source_ref": {"type": "string"},
+        "availability": {
+          "type": "string",
+          "enum": ["verified", "needs_mapping", "unavailable"]
+        },
+        "fallback": {"type": "string"}
+      },
+      "required": ["name", "fields", "frequency", "purpose", "source_ref", "availability", "fallback"],
+      "additionalProperties": false
+    },
+    "exception": {
+      "type": "object",
+      "properties": {
+        "case": {"type": "string"},
+        "behavior": {"type": "string"}
+      },
+      "required": ["case", "behavior"],
+      "additionalProperties": false
+    },
+    "acceptance": {
+      "type": "object",
+      "properties": {
+        "scenario": {"type": "string"},
+        "expected": {"type": "string"}
+      },
+      "required": ["scenario", "expected"],
+      "additionalProperties": false
+    },
+    "design": {
+      "type": "object",
+      "properties": {
+        "tool_name": {"type": "string"},
+        "display_name": {"type": "string"},
+        "description": {"type": "string"},
+        "inputs": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/input"}
+        },
+        "outputs": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/output"}
+        },
+        "modules": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/module"}
+        },
+        "flow": {"$ref": "#/$defs/flow"},
+        "rules": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/rule"}
+        },
+        "data_requirements": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/data_requirement"}
+        },
+        "exceptions": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/exception"}
+        },
+        "acceptance": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/acceptance"}
+        }
+      },
+      "required": ["tool_name", "display_name", "description", "inputs", "outputs", "modules", "flow", "rules", "data_requirements", "exceptions", "acceptance"],
+      "additionalProperties": false
+    },
+    "evidence": {
+      "type": "object",
+      "properties": {
+        "location": {"type": "string"},
+        "finding": {"type": "string"}
+      },
+      "required": ["location", "finding"],
+      "additionalProperties": false
+    },
+    "existing_analysis": {
+      "type": "object",
+      "properties": {
+        "analyzed": {"type": "boolean"},
+        "current_behavior": {
+          "type": "array",
+          "items": {"type": "string"}
+        },
+        "gaps": {
+          "type": "array",
+          "items": {"type": "string"}
+        },
+        "affected_areas": {
+          "type": "array",
+          "items": {"type": "string"}
+        },
+        "evidence": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/evidence"}
+        }
+      },
+      "required": ["analyzed", "current_behavior", "gaps", "affected_areas", "evidence"],
+      "additionalProperties": false
+    }
+  }
+}

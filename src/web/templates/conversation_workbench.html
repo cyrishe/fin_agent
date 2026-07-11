@@ -583,16 +583,12 @@
       font-weight: 700;
     }
     .agent-run {
-      width: min(82%, 860px);
+      width: min(100%, 860px);
       max-width: 100%;
       min-width: 0;
       display: grid;
       gap: 12px;
-      border: 1px solid #dbe3ef;
-      background: #ffffff;
-      border-radius: 14px;
-      padding: 14px;
-      box-shadow: 0 8px 24px rgba(16, 24, 40, 0.06);
+      background: transparent;
     }
     .agent-run-head {
       display: flex;
@@ -699,14 +695,330 @@
       flex-wrap: wrap;
     }
     .agent-action-btn {
-      border: 1px solid #155eef;
-      background: #155eef;
-      color: #fff;
-      border-radius: 9px;
+      border: 1px solid #d0d5dd;
+      background: #fff;
+      color: #344054;
+      border-radius: 8px;
       padding: 8px 12px;
       font-size: 12px;
       font-weight: 700;
       cursor: pointer;
+    }
+    .agent-action-btn.primary {
+      border-color: #155eef;
+      background: #155eef;
+      color: #fff;
+    }
+    .agent-action-btn:disabled {
+      cursor: not-allowed;
+      opacity: 0.55;
+    }
+    .agent-semantic-block {
+      border: 1px solid #dbe3ef;
+      border-radius: 8px;
+      background: #fff;
+      overflow: hidden;
+    }
+    .agent-semantic-body {
+      display: grid;
+      gap: 10px;
+      padding: 12px;
+    }
+    .agent-semantic-summary {
+      color: #344054;
+      font-size: 13px;
+      line-height: 1.6;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+    }
+    .agent-kv-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 8px 16px;
+      padding-top: 2px;
+    }
+    .agent-kv-item {
+      display: grid;
+      gap: 2px;
+      min-width: 0;
+    }
+    .agent-kv-label {
+      color: #667085;
+      font-size: 11px;
+    }
+    .agent-kv-value {
+      color: #101828;
+      font-size: 13px;
+      font-weight: 700;
+      overflow-wrap: anywhere;
+    }
+    .agent-logic,
+    .agent-issues,
+    .agent-questions {
+      margin: 0;
+      padding-left: 20px;
+      color: #475467;
+      font-size: 12px;
+      line-height: 1.65;
+    }
+    .agent-assessment-status {
+      width: fit-content;
+      border: 1px solid #d0d5dd;
+      border-radius: 999px;
+      padding: 3px 8px;
+      color: #475467;
+      font-size: 11px;
+      font-weight: 700;
+    }
+    .agent-assessment-status.pass {
+      border-color: #abefc6;
+      background: #ecfdf3;
+      color: #067647;
+    }
+    .agent-assessment-status.fail {
+      border-color: #fecdca;
+      background: #fef3f2;
+      color: #b42318;
+    }
+    .design-artifact-tabs {
+      display: flex;
+      gap: 2px;
+      overflow-x: auto;
+      border-bottom: 1px solid #e4e7ec;
+      scrollbar-width: thin;
+    }
+    .design-artifact-tab {
+      flex: 0 0 auto;
+      border: 0;
+      border-bottom: 2px solid transparent;
+      background: transparent;
+      color: #667085;
+      padding: 9px 10px 8px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .design-artifact-tab.active {
+      border-bottom-color: #155eef;
+      color: #155eef;
+    }
+    .design-artifact-view {
+      display: none;
+      gap: 14px;
+      padding-top: 2px;
+    }
+    .design-artifact-view.active {
+      display: grid;
+    }
+    .design-section {
+      display: grid;
+      gap: 7px;
+      min-width: 0;
+    }
+    .design-section + .design-section {
+      border-top: 1px solid #eef2f6;
+      padding-top: 12px;
+    }
+    .design-section-title {
+      color: #344054;
+      font-size: 12px;
+      font-weight: 800;
+    }
+    .design-copy {
+      color: #475467;
+      font-size: 12px;
+      line-height: 1.65;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+    }
+    .design-list {
+      display: grid;
+      gap: 6px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+    .design-list-item {
+      display: grid;
+      gap: 3px;
+      border-left: 2px solid #d0d5dd;
+      padding-left: 9px;
+      color: #475467;
+      font-size: 12px;
+      line-height: 1.55;
+    }
+    .design-list-item strong {
+      color: #1d2939;
+    }
+    .design-field-list {
+      display: grid;
+      border-top: 1px solid #eaecf0;
+    }
+    .design-field-row {
+      display: grid;
+      grid-template-columns: minmax(120px, .8fr) minmax(100px, .55fr) minmax(0, 1.65fr);
+      gap: 12px;
+      align-items: start;
+      border-bottom: 1px solid #eaecf0;
+      padding: 9px 0;
+      font-size: 12px;
+      line-height: 1.5;
+    }
+    .design-field-name {
+      display: grid;
+      gap: 2px;
+      min-width: 0;
+    }
+    .design-field-name strong,
+    .design-field-name span {
+      overflow-wrap: anywhere;
+    }
+    .design-field-name span,
+    .design-field-meta {
+      color: #667085;
+      font-size: 11px;
+    }
+    .design-flow {
+      display: flex;
+      gap: 8px;
+      align-items: stretch;
+      overflow-x: auto;
+      padding-bottom: 4px;
+    }
+    .design-flow-step {
+      position: relative;
+      flex: 0 0 min(180px, 45vw);
+      border-left: 3px solid #84adff;
+      padding: 7px 10px;
+      background: #f8faff;
+      font-size: 11px;
+      line-height: 1.5;
+    }
+    .design-flow-step + .design-flow-step::before {
+      content: "→";
+      position: absolute;
+      left: -10px;
+      top: 50%;
+      transform: translate(-100%, -50%);
+      color: #98a2b3;
+    }
+    .design-flow-step strong,
+    .design-flow-step span {
+      display: block;
+    }
+    .design-flow-step span {
+      margin-top: 3px;
+      color: #667085;
+    }
+    .design-data-row {
+      display: grid;
+      grid-template-columns: minmax(120px, .8fr) minmax(0, 1.7fr) auto;
+      gap: 10px;
+      align-items: start;
+      border-bottom: 1px solid #eaecf0;
+      padding: 9px 0;
+      font-size: 12px;
+      line-height: 1.5;
+    }
+    .design-data-row:last-child {
+      border-bottom: 0;
+    }
+    .design-data-status {
+      border: 1px solid #d0d5dd;
+      border-radius: 999px;
+      padding: 2px 7px;
+      color: #475467;
+      font-size: 10px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .design-data-status.verified {
+      border-color: #abefc6;
+      background: #ecfdf3;
+      color: #067647;
+    }
+    .design-data-status.unavailable {
+      border-color: #fecdca;
+      background: #fef3f2;
+      color: #b42318;
+    }
+    .agent-question-list {
+      display: grid;
+      gap: 14px;
+    }
+    .agent-question {
+      display: grid;
+      gap: 7px;
+      border-top: 1px solid #eaecf0;
+      padding-top: 12px;
+    }
+    .agent-question:first-child {
+      border-top: 0;
+      padding-top: 0;
+    }
+    .agent-question-title {
+      color: #1d2939;
+      font-size: 13px;
+      font-weight: 800;
+      line-height: 1.5;
+    }
+    .agent-question-required {
+      color: #b42318;
+      font-size: 11px;
+      font-weight: 700;
+    }
+    .agent-question-reason {
+      color: #667085;
+      font-size: 11px;
+      line-height: 1.55;
+    }
+    .agent-question-options {
+      display: flex;
+      gap: 7px;
+      flex-wrap: wrap;
+    }
+    .agent-question-option {
+      border: 1px solid #d0d5dd;
+      border-radius: 7px;
+      background: #fff;
+      color: #344054;
+      padding: 7px 9px;
+      text-align: left;
+      font-size: 11px;
+      line-height: 1.4;
+      cursor: pointer;
+    }
+    .agent-question-option:hover,
+    .agent-question-option.selected {
+      border-color: #84adff;
+      background: #f5f8ff;
+      color: #1849a9;
+    }
+    .agent-question-option small {
+      display: block;
+      margin-top: 2px;
+      color: #667085;
+    }
+    .agent-question-option em {
+      margin-left: 5px;
+      color: #155eef;
+      font-style: normal;
+      font-weight: 700;
+    }
+    .design-review-strip {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 8px 16px;
+      border-top: 1px solid #eaecf0;
+      padding-top: 10px;
+      color: #667085;
+      font-size: 11px;
+    }
+    .design-review-strip strong {
+      display: block;
+      margin-top: 2px;
+      color: #1d2939;
+      font-size: 12px;
     }
     .metric-strip {
       display: grid;
@@ -1005,6 +1317,17 @@
       .btn {
         flex: 1 1 auto;
       }
+      .design-field-row,
+      .design-data-row {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 4px;
+      }
+      .design-data-status {
+        justify-self: start;
+      }
+      .agent-question-option {
+        width: 100%;
+      }
     }
   </style>
 </head>
@@ -1013,7 +1336,6 @@
     <aside class="sidebar">
       <div class="sidebar-head">
         <div class="sidebar-title">会话</div>
-        <div class="sidebar-sub">最近对话会在这里恢复。新对话会清空当前 thread。</div>
       </div>
       <div class="toolbar-left">
         <button id="newThreadBtn" class="btn">新对话</button>
@@ -1023,13 +1345,6 @@
     <header class="topbar">
       <div class="title">
         <h1>{{ application_display_name or "Assistant" }}</h1>
-        <div class="meta">
-          application: {{ application_name or "investment_workbench" }}
-          {% if assistant_agent %} · assistant: {{ assistant_agent.display_name or assistant_agent.agent_name }}{% endif %}
-        </div>
-      </div>
-      <div class="pill-row">
-        <span class="pill">/skills /tools /applications /agents /run-skill</span>
       </div>
     </header>
 
@@ -1042,9 +1357,6 @@
       <textarea id="inputBox" placeholder="{{ chat_placeholder or '输入问题，或输入 / 查看命令' }}"></textarea>
       <input id="fileInput" type="file" accept="image/png,image/jpeg,image/webp,image/gif" multiple hidden>
       <div class="toolbar">
-        <div class="toolbar-left">
-          <span class="hint">输入 <code>/</code> 可选择命令。支持粘贴截图或上传图片。</span>
-        </div>
         <div class="toolbar-right">
           <button id="attachBtn" class="btn">上传图片</button>
           <button id="clearBtn" class="btn">清空</button>
@@ -1089,6 +1401,7 @@
       },
       pendingAttachments: [],
       customToolActive: false,
+      resolvedInteractions: {},
       threads: [],
       contextMenu: {
         visible: false,
@@ -1986,27 +2299,219 @@
       };
     }
 
+    function renderSemanticItems(items) {
+      const rows = Array.isArray(items) ? items : [];
+      if (!rows.length) return "";
+      return `
+        <div class="agent-kv-list">
+          ${rows.slice(0, 8).map((item) => `
+            <div class="agent-kv-item">
+              <div class="agent-kv-label">${escapeHtml(item?.label || "")}</div>
+              <div class="agent-kv-value">${escapeHtml(item?.value ?? "-")}</div>
+            </div>
+          `).join("")}
+        </div>
+      `;
+    }
+
+    function renderDesignTextList(items) {
+      const rows = Array.isArray(items) ? items.filter(Boolean) : [];
+      if (!rows.length) return '<div class="result-empty">暂无</div>';
+      return `<ul class="design-list">${rows.map((item) => `<li class="design-list-item">${escapeHtml(item)}</li>`).join("")}</ul>`;
+    }
+
+    function renderDesignFieldList(items, kind) {
+      const rows = Array.isArray(items) ? items : [];
+      if (!rows.length) return '<div class="result-empty">尚未定义</div>';
+      return `<div class="design-field-list">${rows.map((item) => `
+        <div class="design-field-row">
+          <div class="design-field-name"><strong>${escapeHtml(item?.label || item?.name || "-")}</strong><span>${escapeHtml(item?.name || "")}</span></div>
+          <div class="design-field-meta">${escapeHtml(item?.type || "-")}${kind === "input" && item?.required ? " · 必填" : ""}</div>
+          <div class="design-copy">${escapeHtml(item?.description || "")}${Array.isArray(item?.values) && item.values.length ? `<div class="result-note">可选值：${item.values.map(escapeHtml).join(" / ")}</div>` : ""}${Array.isArray(item?.validation) && item.validation.length ? `<div class="result-note">校验：${item.validation.map(escapeHtml).join("；")}</div>` : ""}</div>
+        </div>
+      `).join("")}</div>`;
+    }
+
+    function renderDesignModulesAndRules(details) {
+      const modules = Array.isArray(details?.modules) ? details.modules : [];
+      const rules = Array.isArray(details?.rules) ? details.rules : [];
+      const legacyLogic = Array.isArray(details?.logic) ? details.logic : [];
+      const flow = details?.flow && typeof details.flow === "object" ? details.flow : {};
+      const steps = Array.isArray(flow.steps) ? flow.steps : [];
+      return `
+        ${modules.length ? `<div class="design-section"><div class="design-section-title">模块</div><ul class="design-list">${modules.map((item) => `<li class="design-list-item"><strong>${escapeHtml(item?.name || "模块")}</strong><span>${escapeHtml(item?.responsibility || "")}</span>${Array.isArray(item?.depends_on) && item.depends_on.length ? `<span class="result-note">依赖：${item.depends_on.map(escapeHtml).join("、")}</span>` : ""}</li>`).join("")}</ul></div>` : ""}
+        <div class="design-section"><div class="design-section-title">规则</div>${rules.length ? `<ul class="design-list">${rules.map((item) => `<li class="design-list-item"><strong>${escapeHtml(item?.name || "规则")}</strong><span>${escapeHtml(item?.logic || "")}</span>${Array.isArray(item?.parameters) && item.parameters.length ? `<span class="result-note">参数：${item.parameters.map(escapeHtml).join("；")}</span>` : ""}${item?.on_missing_data ? `<span class="result-note">数据不足：${escapeHtml(item.on_missing_data)}</span>` : ""}</li>`).join("")}</ul>` : renderDesignTextList(legacyLogic)}</div>
+        ${steps.length ? `<div class="design-section"><div class="design-section-title">流程</div><div class="design-flow">${steps.map((item) => `<div class="design-flow-step"><strong>${escapeHtml(item?.name || item?.id || "步骤")}</strong><span>${escapeHtml(item?.description || "")}</span></div>`).join("")}</div></div>` : ""}
+      `;
+    }
+
+    function renderDesignData(details) {
+      const rows = Array.isArray(details?.data_requirements) ? details.data_requirements : [];
+      if (!rows.length) return '<div class="result-empty">尚未定义数据需求</div>';
+      const labels = { verified: "已映射", needs_mapping: "待映射", unavailable: "不可用" };
+      return `<div>${rows.map((item) => `
+        <div class="design-data-row">
+          <div><strong>${escapeHtml(item?.name || "数据")}</strong><div class="result-note">${escapeHtml(item?.frequency || "")}</div></div>
+          <div class="design-copy">${escapeHtml(item?.purpose || "")}${Array.isArray(item?.fields) && item.fields.length ? `<div class="result-note">字段：${item.fields.map(escapeHtml).join("、")}</div>` : ""}${item?.source_ref ? `<div class="result-note">来源：${escapeHtml(item.source_ref)}</div>` : ""}${item?.fallback ? `<div class="result-note">缺失：${escapeHtml(item.fallback)}</div>` : ""}</div>
+          <span class="design-data-status ${escapeHtml(item?.availability || "")}">${escapeHtml(labels[item?.availability] || "待确认")}</span>
+        </div>
+      `).join("")}</div>`;
+    }
+
+    function renderToolDesignArtifact(block, data) {
+      const details = data?.details && typeof data.details === "object" ? data.details : {};
+      const understanding = details.understanding && typeof details.understanding === "object" ? details.understanding : {};
+      const analysis = details.existing_analysis && typeof details.existing_analysis === "object" ? details.existing_analysis : {};
+      const artifactKey = String(block?.block_id || "tool_design").replace(/[^a-zA-Z0-9_-]/g, "_");
+      const tabs = [
+        ["overview", "概览"],
+        ["interface", "输入输出"],
+        ["logic", "逻辑"],
+        ["data", "数据"],
+        ["acceptance", "验收"]
+      ];
+      const acceptance = Array.isArray(details.acceptance) ? details.acceptance : [];
+      const exceptions = Array.isArray(details.exceptions) ? details.exceptions : [];
+      return `
+        <div class="agent-semantic-block design-artifact" data-design-artifact-root="${escapeHtml(artifactKey)}">
+          <div class="agent-semantic-body">
+            ${data.summary ? `<div class="agent-semantic-summary">${escapeHtml(data.summary)}</div>` : ""}
+            ${renderSemanticItems(data.items)}
+            <div class="design-artifact-tabs" role="tablist">
+              ${tabs.map(([id, label], index) => `<button class="design-artifact-tab ${index === 0 ? "active" : ""}" type="button" role="tab" data-design-artifact="${escapeHtml(artifactKey)}" data-design-tab="${id}">${label}</button>`).join("")}
+            </div>
+            <div class="design-artifact-view active" data-design-artifact-view="${escapeHtml(artifactKey)}" data-design-view="overview">
+              <div class="design-section"><div class="design-section-title">目标</div><div class="design-copy">${escapeHtml(understanding.goal || data.summary || "尚未明确")}</div></div>
+              <div class="design-section"><div class="design-section-title">使用场景</div><div class="design-copy">${escapeHtml(understanding.usage || "尚未明确")}</div></div>
+              <div class="design-section"><div class="design-section-title">已确认要求</div>${renderDesignTextList(understanding.confirmed_requirements)}</div>
+              ${Array.isArray(understanding.assumptions) && understanding.assumptions.length ? `<div class="design-section"><div class="design-section-title">当前假设</div>${renderDesignTextList(understanding.assumptions)}</div>` : ""}
+              ${analysis.analyzed ? `<div class="design-section"><div class="design-section-title">现有实现</div>${renderDesignTextList(analysis.current_behavior)}${renderDesignTextList(analysis.gaps)}</div>` : ""}
+            </div>
+            <div class="design-artifact-view" data-design-artifact-view="${escapeHtml(artifactKey)}" data-design-view="interface">
+              <div class="design-section"><div class="design-section-title">输入</div>${renderDesignFieldList(details.inputs, "input")}</div>
+              <div class="design-section"><div class="design-section-title">输出</div>${renderDesignFieldList(details.outputs, "output")}</div>
+            </div>
+            <div class="design-artifact-view" data-design-artifact-view="${escapeHtml(artifactKey)}" data-design-view="logic">${renderDesignModulesAndRules(details)}</div>
+            <div class="design-artifact-view" data-design-artifact-view="${escapeHtml(artifactKey)}" data-design-view="data"><div class="design-section"><div class="design-section-title">数据依赖</div>${renderDesignData(details)}</div></div>
+            <div class="design-artifact-view" data-design-artifact-view="${escapeHtml(artifactKey)}" data-design-view="acceptance">
+              <div class="design-section"><div class="design-section-title">验收场景</div>${acceptance.length ? `<ul class="design-list">${acceptance.map((item) => `<li class="design-list-item"><strong>${escapeHtml(item?.scenario || "场景")}</strong><span>${escapeHtml(item?.expected || "")}</span></li>`).join("")}</ul>` : '<div class="result-empty">尚未定义</div>'}</div>
+              <div class="design-section"><div class="design-section-title">异常与边界</div>${exceptions.length ? `<ul class="design-list">${exceptions.map((item) => `<li class="design-list-item"><strong>${escapeHtml(item?.case || "异常")}</strong><span>${escapeHtml(item?.behavior || "")}</span></li>`).join("")}</ul>` : '<div class="result-empty">尚未定义</div>'}</div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderArtifactStreamBlock(block) {
+      const data = block?.data && typeof block.data === "object" ? block.data : {};
+      if (data.artifact_type === "finance.custom_tool_spec") {
+        return renderToolDesignArtifact(block, data);
+      }
+      const logic = Array.isArray(data.logic) ? data.logic.filter(Boolean) : [];
+      return `
+        <div class="agent-semantic-block">
+          <div class="agent-semantic-body">
+            ${data.summary ? `<div class="agent-semantic-summary">${escapeHtml(data.summary)}</div>` : ""}
+            ${renderSemanticItems(data.items)}
+            ${logic.length ? `<ol class="agent-logic">${logic.slice(0, 6).map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ol>` : ""}
+          </div>
+        </div>
+      `;
+    }
+
+    function renderAssessmentStreamBlock(block) {
+      const data = block?.data && typeof block.data === "object" ? block.data : {};
+      const overall = String(data.overall || "unknown").trim();
+      const issues = Array.isArray(data.issues) ? data.issues.filter(Boolean) : [];
+      const labels = { pass: "通过", warn: "需关注", fail: "未通过", unknown: "待确认" };
+      return `
+        <div class="agent-semantic-block">
+          <div class="agent-semantic-body">
+            <div class="agent-assessment-status ${escapeHtml(overall)}">${escapeHtml(labels[overall] || labels.unknown)}</div>
+            ${data.summary ? `<div class="agent-semantic-summary">${escapeHtml(data.summary)}</div>` : ""}
+            ${issues.length ? `<ul class="agent-issues">${issues.slice(0, 8).map((item) => `<li>${escapeHtml(item?.summary || item?.message || item)}</li>`).join("")}</ul>` : ""}
+          </div>
+        </div>
+      `;
+    }
+
+    function renderWorkflowStreamBlock(block) {
+      const data = block?.data && typeof block.data === "object" ? block.data : {};
+      const items = Array.isArray(data.items) ? data.items : [];
+      return `
+        <div class="agent-semantic-block">
+          <div class="agent-semantic-body">
+            ${data.summary ? `<div class="agent-semantic-summary">${escapeHtml(data.summary)}</div>` : ""}
+            ${items.length ? `
+              <ol class="agent-logic">
+                ${items.slice(0, 10).map((item) => `
+                  <li>${escapeHtml(item?.title || item?.label || "步骤")} · ${escapeHtml(item?.status || "pending")}</li>
+                `).join("")}
+              </ol>
+            ` : ""}
+          </div>
+        </div>
+      `;
+    }
+
+    function renderInteractionStreamBlock(block) {
+      const data = block?.data && typeof block.data === "object" ? block.data : {};
+      const actions = Array.isArray(data.actions) ? data.actions : [];
+      const questions = Array.isArray(data.questions) ? data.questions.filter(Boolean) : [];
+      const review = data.review && typeof data.review === "object" ? data.review : null;
+      return `
+        <div class="agent-semantic-block">
+          <div class="agent-semantic-body">
+            ${data.prompt || block?.content ? `<div class="agent-semantic-summary">${escapeHtml(data.prompt || block.content)}</div>` : ""}
+            ${questions.length ? `<div class="agent-question-list">${questions.slice(0, 5).map((raw, index) => {
+              const item = raw && typeof raw === "object" ? raw : { id: `Q${index + 1}`, question: String(raw || ""), required: true, options: [] };
+              let options = Array.isArray(item.options) ? item.options : [];
+              if (item.answer_type === "boolean" && !options.length) options = [{ value: "true", label: "是", description: "", recommended: false }, { value: "false", label: "否", description: "", recommended: false }];
+              return `<div class="agent-question">
+                <div class="agent-question-title">${escapeHtml(item.question || "需要补充")}${item.required ? ' <span class="agent-question-required">必答</span>' : ""}</div>
+                ${item.reason ? `<div class="agent-question-reason">${escapeHtml(item.reason)}</div>` : ""}
+                ${options.length ? `<div class="agent-question-options">${options.map((option) => `<button type="button" class="agent-question-option" data-question-option data-answer-type="${escapeHtml(item.answer_type || "single_choice")}" data-question-text="${escapeHtml(encodeURIComponent(item.question || ""))}" data-answer-label="${escapeHtml(encodeURIComponent(option?.label || option?.value || ""))}"><span>${escapeHtml(option?.label || option?.value || "选项")}${option?.recommended ? "<em>推荐</em>" : ""}</span>${option?.description ? `<small>${escapeHtml(option.description)}</small>` : ""}</button>`).join("")}</div>` : `<div class="result-note">请在下方对话输入框中回答。</div>`}
+              </div>`;
+            }).join("")}</div>` : ""}
+            ${review ? `<div class="design-review-strip"><span>数据需求<strong>${escapeHtml(review.data_requirements || 0)} 项</strong></span><span>验收场景<strong>${escapeHtml(review.acceptance || 0)} 项</strong></span><span>关键假设<strong>${escapeHtml((review.assumptions || []).length)} 项</strong></span><span>约束<strong>${escapeHtml((review.constraints || []).length)} 项</strong></span></div>` : ""}
+            ${actions.length ? `
+              <div class="agent-actions">
+                ${actions.map((action) => `
+                  <button
+                    class="agent-action-btn ${action.style === "primary" ? "primary" : ""}"
+                    data-agent-action="${escapeHtml(action.action_id || "")}"
+                    data-interaction-id="${escapeHtml(data.interaction_id || "")}"
+                    data-action-intent="${escapeHtml(action.intent || "")}"
+                    data-expected-revision="${escapeHtml(action.expected_revision ?? data.subject_revision ?? "")}"
+                    ${state.resolvedInteractions[data.interaction_id] ? "disabled" : ""}
+                  >${escapeHtml(action.label || "继续")}</button>
+                `).join("")}
+              </div>
+            ` : ""}
+          </div>
+        </div>
+      `;
+    }
+
     function renderStreamBlock(block) {
       const blockType = String(block?.block_type || block?.type || "").trim();
       const title = escapeHtml(block?.title || "");
       const content = String(block?.content || "");
       let body = "";
-      if (blockType === "markdown") {
+      if (["markdown", "narrative"].includes(blockType)) {
         body = `<div class="agent-markdown">${escapeHtml(content)}</div>`;
       } else if (blockType === "code") {
         body = `<pre class="agent-code"><code>${escapeHtml(content)}</code></pre>`;
+      } else if (blockType === "artifact") {
+        body = renderArtifactStreamBlock(block);
+      } else if (blockType === "assessment") {
+        body = renderAssessmentStreamBlock(block);
+      } else if (blockType === "workflow") {
+        body = renderWorkflowStreamBlock(block);
+      } else if (blockType === "interaction") {
+        body = renderInteractionStreamBlock(block);
       } else if (blockType === "action") {
-        const actions = Array.isArray(block?.actions) ? block.actions : [];
-        body = `
-          ${content ? `<div class="agent-markdown">${escapeHtml(content)}</div>` : ""}
-          <div class="agent-actions">
-            ${actions.map((action) => `
-              <button class="agent-action-btn" data-agent-command="${escapeHtml(action.command || action.label || "")}">
-                ${escapeHtml(action.label || action.id || "确认")}
-              </button>
-            `).join("")}
-          </div>
-        `;
+        body = `<div class="agent-markdown">${escapeHtml(content || "请在对话输入框中继续。")}</div>`;
       } else if (["table", "bar_chart", "line_chart", "flowchart"].includes(blockType)) {
         body = renderBlock(streamBlockToRenderBlock(block));
       } else {
@@ -2052,10 +2557,10 @@
       if (!message || !payload || typeof payload !== "object") return;
       const agentRun = message.payload.agent_run && typeof message.payload.agent_run === "object"
         ? message.payload.agent_run
-        : { status: "running", title: "优小智正在处理", summary: "正在运行智能体任务", artifacts: [], process: [] };
+        : { status: "running", title: "Fin Agent", summary: "正在处理", artifacts: [], process: [] };
       if (payload.event === "run_started") {
         agentRun.status = "running";
-        agentRun.summary = payload.message || "智能体任务已开始";
+        agentRun.summary = payload.message || "正在处理";
       } else if (payload.event === "block") {
         if (isProcessStreamBlock(payload)) {
           mergeStreamBlock(agentRun.process, payload);
@@ -2107,19 +2612,22 @@
       const statusLabel = status === "done" ? "已完成" : (status === "error" ? "失败" : "运行中");
       const artifacts = Array.isArray(agentRun.artifacts) ? agentRun.artifacts : [];
       const process = Array.isArray(agentRun.process) ? agentRun.process : [];
+      const runHead = status === "done" ? "" : `
+        <div class="agent-run-head">
+          <div>
+            <div class="agent-run-title">${escapeHtml(agentRun.title || "Fin Agent")}</div>
+            ${agentRun.summary ? `<div class="agent-run-subtitle">${escapeHtml(agentRun.summary)}</div>` : ""}
+          </div>
+          <div class="agent-run-status ${escapeHtml(status)}">${statusLabel}</div>
+        </div>
+      `;
       return `
         <div class="agent-run">
-          <div class="agent-run-head">
-            <div>
-              <div class="agent-run-title">${escapeHtml(agentRun.title || "优小智智能体")}</div>
-              <div class="agent-run-subtitle">${escapeHtml(agentRun.summary || "正在处理")}</div>
-            </div>
-            <div class="agent-run-status ${escapeHtml(status)}">${statusLabel}</div>
-          </div>
+          ${runHead}
           ${artifacts.length ? `<div class="agent-artifacts">${artifacts.map((block) => renderStreamBlock(block)).join("")}</div>` : ""}
           ${process.length ? `
             <details class="agent-process">
-              <summary>过程流 · ${process.length} 个片段</summary>
+              <summary>过程</summary>
               <div class="agent-process-list">
                 ${process.map((block) => `
                   <div class="agent-process-item">
@@ -2442,13 +2950,43 @@
           }
         });
       });
-      root.querySelectorAll("[data-agent-command]").forEach((node) => {
+      root.querySelectorAll("[data-agent-action]").forEach((node) => {
         node.addEventListener("click", () => {
-          const command = node.getAttribute("data-agent-command") || "";
-          if (!command) return;
+          handleAgentInteraction(node).catch((err) => setStatus(String(err.message || err)));
+        });
+      });
+      root.querySelectorAll("[data-design-tab]").forEach((node) => {
+        node.addEventListener("click", () => {
+          const artifact = String(node.getAttribute("data-design-artifact") || "");
+          const tab = String(node.getAttribute("data-design-tab") || "overview");
+          root.querySelectorAll(`[data-design-artifact="${artifact}"]`).forEach((item) => item.classList.toggle("active", item === node));
+          root.querySelectorAll(`[data-design-artifact-view="${artifact}"]`).forEach((item) => item.classList.toggle("active", String(item.getAttribute("data-design-view")) === tab));
+        });
+      });
+      root.querySelectorAll("[data-question-option]").forEach((node) => {
+        node.addEventListener("click", () => {
+          const answerType = String(node.getAttribute("data-answer-type") || "single_choice");
+          const question = decodeURIComponent(String(node.getAttribute("data-question-text") || ""));
+          const answer = decodeURIComponent(String(node.getAttribute("data-answer-label") || ""));
+          const optionRoot = node.closest(".agent-question-options");
+          if (answerType === "multiple_choice") {
+            node.classList.toggle("selected");
+          } else if (optionRoot) {
+            optionRoot.querySelectorAll("[data-question-option]").forEach((item) => item.classList.toggle("selected", item === node));
+          }
+          const selected = optionRoot
+            ? Array.from(optionRoot.querySelectorAll("[data-question-option].selected")).map((item) => decodeURIComponent(String(item.getAttribute("data-answer-label") || ""))).filter(Boolean)
+            : [answer];
           const input = document.getElementById("inputBox");
-          input.value = command;
+          const prefix = `${question}：`;
+          const lines = String(input.value || "")
+            .split("\n")
+            .map((line) => line.trim())
+            .filter((line) => line && !line.startsWith(prefix));
+          if (selected.length) lines.push(`${prefix}${selected.join("、")}`);
+          input.value = lines.join("\n");
           input.focus();
+          updateSlashMenu();
         });
       });
       hideContextMenu();
@@ -2480,9 +3018,6 @@
       state.defaultAgent = (appCtx.default_agent && typeof appCtx.default_agent === "object") ? appCtx.default_agent : {};
       document.title = state.applicationDisplayName || "Assistant";
       document.getElementById("inputBox").placeholder = state.chatPlaceholder || "输入问题，或输入 / 查看命令";
-      const metaEl = document.querySelector(".title .meta");
-      const assistantName = state.assistantAgent.display_name || state.assistantAgent.agent_name || "";
-      metaEl.textContent = `application: ${state.applicationName || "-"}${assistantName ? ` · assistant: ${assistantName}` : ""}`;
     }
 
     async function dispatchText(text, attachmentIds = []) {
@@ -2511,7 +3046,7 @@
       return state.customToolActive && !raw.startsWith("/");
     }
 
-    async function startCustomToolStream(text, assistantMessage) {
+    async function startCustomToolStream(text, assistantMessage, interactionResponse = null) {
       const res = await fetch(apiCustomToolStreamStartUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -2519,6 +3054,7 @@
           text,
           thread_id: state.threadId,
           application_name: state.applicationName,
+          ...(interactionResponse ? { interaction_response: interactionResponse } : {}),
         }),
       });
       const payload = await res.json();
@@ -2532,8 +3068,8 @@
         payload: {
           agent_run: {
             status: "running",
-            title: "优小智正在处理",
-            summary: "正在连接智能体运行流",
+            title: "Fin Agent",
+            summary: "连接中",
             artifacts: [],
             process: [],
           },
@@ -2563,6 +3099,58 @@
           reject(new Error("智能体运行流连接中断"));
         };
       });
+    }
+
+    async function handleAgentInteraction(node) {
+      const actionId = String(node?.getAttribute("data-agent-action") || "").trim();
+      const interactionId = String(node?.getAttribute("data-interaction-id") || "").trim();
+      const intent = String(node?.getAttribute("data-action-intent") || "").trim();
+      const expectedRevision = Number(node?.getAttribute("data-expected-revision"));
+      if (!actionId || !interactionId) return;
+      const input = document.getElementById("inputBox");
+      if (intent === "edit") {
+        input.value = "";
+        input.placeholder = "请直接说明需要修改的内容…";
+        input.focus();
+        return;
+      }
+      if (intent !== "accept") return;
+
+      const response = {
+        interaction_id: interactionId,
+        action_id: actionId,
+        action: "accept",
+        expected_revision: expectedRevision,
+      };
+      state.resolvedInteractions[interactionId] = actionId;
+      rootActionButtons(actionId).forEach((button) => { button.disabled = true; });
+      addMessage("user", node.textContent.trim() || "确认并继续", { interaction_response: response });
+      const assistantMessage = addMessage("assistant", "", {
+        agent_run: {
+          status: "running",
+          title: "Fin Agent",
+          summary: "正在继续当前任务",
+          artifacts: [],
+          process: [],
+        },
+      });
+      try {
+        await startCustomToolStream("", assistantMessage, response);
+        loadThreads().catch(() => null);
+        setStatus("");
+      } catch (err) {
+        delete state.resolvedInteractions[interactionId];
+        applyAgentStreamEvent(assistantMessage, {
+          event: "error",
+          message: String(err.message || err),
+        });
+        setStatus(String(err.message || err));
+      }
+    }
+
+    function rootActionButtons(actionId) {
+      return Array.from(document.querySelectorAll("[data-agent-action]"))
+        .filter((button) => String(button.getAttribute("data-agent-action") || "") === actionId);
     }
 
     async function uploadFiles(files) {
@@ -2669,12 +3257,23 @@
         }
         const assistantText = String(turn.assistant_output_text || "").trim();
         const outputPayload = turn.output_payload && typeof turn.output_payload === "object" ? turn.output_payload : {};
+        const surfaceBlocks = Array.isArray(outputPayload.surface_blocks) ? outputPayload.surface_blocks : [];
+        const hydratedPayload = surfaceBlocks.length ? {
+          ...outputPayload,
+          agent_run: {
+            status: "done",
+            title: "Fin Agent",
+            summary: assistantText || "任务已完成",
+            artifacts: surfaceBlocks.filter((block) => !isProcessStreamBlock(block)),
+            process: surfaceBlocks.filter((block) => isProcessStreamBlock(block)),
+          },
+        } : outputPayload;
         if (assistantText || Object.keys(outputPayload).length) {
           items.push({
             id: nextId++,
             role: "assistant",
-            body: assistantText || "已处理。",
-            payload: outputPayload,
+            body: surfaceBlocks.length ? "" : (assistantText || "已处理。"),
+            payload: hydratedPayload,
           });
         }
       });
@@ -2696,6 +3295,7 @@
       const turns = payload.turns || [];
       state.threadId = thread.thread_id || threadId;
       state.customToolActive = Boolean(payload.custom_tool_active);
+      state.resolvedInteractions = {};
       hydrateMessagesFromTurns(turns);
       await loadThreads();
     }
@@ -2789,8 +3389,8 @@
       const assistantMessage = addMessage("assistant", "", useStream ? {
         agent_run: {
           status: "running",
-          title: "优小智正在处理",
-          summary: "正在启动智能体",
+          title: "Fin Agent",
+          summary: "正在处理",
           artifacts: [],
           process: [],
         },
@@ -2850,6 +3450,7 @@
       }
       state.messages = [];
       state.threadId = null;
+      state.resolvedInteractions = {};
       state.pendingAttachments = [];
       renderPendingAttachments();
       renderMessages();
@@ -2874,6 +3475,7 @@
       }
       state.messages = [];
       state.threadId = null;
+      state.resolvedInteractions = {};
       state.pendingAttachments = [];
       renderPendingAttachments();
       renderMessages();
@@ -2937,6 +3539,7 @@
     if (state.threadId) {
       loadThread(state.threadId).catch(() => {
         state.messages = [];
+        state.resolvedInteractions = {};
         addMessage("assistant", state.assistantIntro || "可以直接输入自然语言问题。");
         loadThreads().catch(() => null);
       });

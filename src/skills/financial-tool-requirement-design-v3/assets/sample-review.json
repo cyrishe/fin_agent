@@ -1,0 +1,141 @@
+{
+  "status": "review",
+  "understanding": {
+    "goal": "根据市场趋势和个股放量突破规则输出单只股票的研究信号。",
+    "usage": "盘后使用截至分析日的日线数据执行判断。",
+    "expected_result": "输出信号状态和逐条命中原因。",
+    "confirmed_requirements": [
+      "市场条件优先于个股信号",
+      "使用日线数据和前复权价格",
+      "结果仅用于研究，不产生交易动作"
+    ],
+    "constraints": ["不得使用分析日之后的数据", "核心规则必须确定性执行"],
+    "assumptions": []
+  },
+  "questions": [],
+  "design": {
+    "tool_name": "market_stock_breakout_signal",
+    "display_name": "市场与个股突破信号",
+    "description": "先判断市场趋势，再判断个股是否出现放量突破，并返回研究信号及原因。",
+    "inputs": [
+      {
+        "name": "market_code",
+        "label": "市场基准代码",
+        "type": "string",
+        "required": true,
+        "description": "用于计算市场趋势的指数代码。",
+        "validation": ["必须能映射到有效指数"]
+      },
+      {
+        "name": "stock_code",
+        "label": "股票代码",
+        "type": "string",
+        "required": true,
+        "description": "待分析股票代码。",
+        "validation": ["必须能映射到有效股票"]
+      },
+      {
+        "name": "as_of",
+        "label": "分析日期",
+        "type": "string",
+        "required": true,
+        "description": "只使用该交易日及之前可得的数据。",
+        "validation": ["格式为 YYYY-MM-DD", "必须是有效交易日"]
+      }
+    ],
+    "outputs": [
+      {
+        "name": "signal",
+        "label": "研究信号",
+        "type": "string",
+        "description": "市场和个股规则合成后的状态。",
+        "values": ["满足", "不满足", "数据不足"]
+      },
+      {
+        "name": "reasons",
+        "label": "判定原因",
+        "type": "array",
+        "description": "市场和个股规则的逐条命中结果。",
+        "values": []
+      }
+    ],
+    "modules": [
+      {
+        "name": "市场趋势判断",
+        "responsibility": "使用市场基准的 20 日均线位置和方向判断市场是否允许继续。",
+        "depends_on": ["指数日线"]
+      },
+      {
+        "name": "个股放量突破判断",
+        "responsibility": "判断个股是否突破前 20 个交易日高点且成交量放大。",
+        "depends_on": ["股票日线", "市场趋势判断"]
+      },
+      {
+        "name": "信号合成",
+        "responsibility": "按市场优先规则合成唯一研究信号和原因。",
+        "depends_on": ["市场趋势判断", "个股放量突破判断"]
+      }
+    ],
+    "flow": {
+      "steps": [
+        {"id": "S1", "type": "validate", "name": "校验历史数据", "description": "检查两个标的截至 as_of 至少有 25 个有效交易日。"},
+        {"id": "S2", "type": "decision", "name": "判断市场趋势", "description": "执行市场趋势规则。"},
+        {"id": "S3", "type": "decision", "name": "判断个股突破", "description": "仅在市场允许时执行个股规则。"},
+        {"id": "S4", "type": "output", "name": "输出研究信号", "description": "返回信号和逐条原因。"}
+      ],
+      "links": [
+        {"from": "S1", "to": "S2", "condition": "数据校验通过"},
+        {"from": "S2", "to": "S3", "condition": "市场趋势满足"},
+        {"from": "S2", "to": "S4", "condition": "市场趋势不满足或数据不足"},
+        {"from": "S3", "to": "S4", "condition": "个股判断完成"}
+      ]
+    },
+    "rules": [
+      {
+        "name": "市场趋势规则",
+        "logic": "as_of 收盘价高于当日 MA20，且当日 MA20 高于 5 个交易日前的 MA20 时为满足，否则为不满足。",
+        "parameters": ["均线窗口=20 个交易日", "方向比较间隔=5 个交易日"],
+        "on_missing_data": "有效数据不足 25 个交易日时返回数据不足。"
+      },
+      {
+        "name": "个股放量突破规则",
+        "logic": "as_of 收盘价高于此前 20 个交易日最高价，且 as_of 成交量大于此前 20 个交易日平均成交量的 1.5 倍时为满足。",
+        "parameters": ["突破窗口=前 20 个交易日", "成交量倍数=1.5"],
+        "on_missing_data": "有效数据不足 21 个交易日时返回数据不足。"
+      },
+      {
+        "name": "市场优先规则",
+        "logic": "只有市场趋势和个股放量突破均满足时输出满足；任一规则不满足时输出不满足。",
+        "parameters": [],
+        "on_missing_data": "任一必要规则数据不足时输出数据不足。"
+      }
+    ],
+    "data_requirements": [
+      {
+        "name": "指数和股票日线",
+        "fields": ["trade_date", "open", "high", "low", "close", "volume"],
+        "frequency": "1d",
+        "purpose": "计算市场均线、个股突破和成交量规则。",
+        "source_ref": "stock_daily_kline_query",
+        "availability": "verified",
+        "fallback": "数据不足时返回数据不足，不产生满足信号。"
+      }
+    ],
+    "exceptions": [
+      {"case": "as_of 非交易日", "behavior": "返回输入错误，不自动回退到上一交易日。"},
+      {"case": "停牌或历史数据不足", "behavior": "返回数据不足，并说明缺少的有效交易日数量。"}
+    ],
+    "acceptance": [
+      {"scenario": "市场趋势不满足但个股突破满足", "expected": "输出不满足，并说明市场趋势规则优先。"},
+      {"scenario": "市场和个股规则均满足", "expected": "输出满足，并返回两条规则的计算依据。"},
+      {"scenario": "任一标的有效历史不足", "expected": "输出数据不足，不产生满足信号。"}
+    ]
+  },
+  "existing_analysis": {
+    "analyzed": false,
+    "current_behavior": [],
+    "gaps": [],
+    "affected_areas": [],
+    "evidence": []
+  }
+}
