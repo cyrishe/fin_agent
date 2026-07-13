@@ -3,7 +3,12 @@ import pytest
 pytest.importorskip("claude_agent_sdk")
 
 from app.backend import ClaudeAgentBackend
-from app.config import DEEPSEEK_ANTHROPIC_BASE_URL, ROOT_DIR, Settings
+from app.config import (
+    DASHSCOPE_ANTHROPIC_BASE_URL,
+    DEEPSEEK_ANTHROPIC_BASE_URL,
+    ROOT_DIR,
+    Settings,
+)
 from app.contracts import BackendRequest
 
 
@@ -27,6 +32,7 @@ def test_real_sdk_accepts_generated_options() -> None:
 
     assert options.skills == ["financial-research"]
     assert options.tools == ["Skill", "WebSearch"]
+    assert "Skill" in options.allowed_tools
     assert options.permission_mode == "dontAsk"
     assert options.strict_mcp_config is True
     assert "Bash" in options.disallowed_tools
@@ -80,3 +86,30 @@ def test_real_sdk_accepts_deepseek_v4_flash_profile() -> None:
     assert options.env["ANTHROPIC_AUTH_TOKEN"] == "deepseek-test-secret"
     assert options.env["ANTHROPIC_DEFAULT_HAIKU_MODEL"] == "deepseek-v4-flash"
     assert options.env["CLAUDE_CODE_SUBPROCESS_ENV_SCRUB"] == "1"
+
+
+def test_real_sdk_accepts_dashscope_deepseek_profile() -> None:
+    backend = ClaudeAgentBackend(
+        Settings(
+            root_dir=ROOT_DIR,
+            backend="claude",
+            provider="dashscope",
+            model="deepseek-v4-flash",
+            base_url=DASHSCOPE_ANTHROPIC_BASE_URL,
+            auth_token="dashscope-test-secret",
+        )
+    )
+
+    options = backend.build_options(
+        BackendRequest(
+            run_id="run_dashscope",
+            question="test",
+            skill_names=["financial-research"],
+            enable_web_search=False,
+        )
+    )
+
+    assert options.model == "deepseek-v4-flash"
+    assert options.env["ANTHROPIC_BASE_URL"] == DASHSCOPE_ANTHROPIC_BASE_URL
+    assert options.env["ANTHROPIC_AUTH_TOKEN"] == "dashscope-test-secret"
+    assert options.env["ANTHROPIC_DEFAULT_OPUS_MODEL"] == "deepseek-v4-flash"

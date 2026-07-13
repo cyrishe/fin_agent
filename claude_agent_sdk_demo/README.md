@@ -120,6 +120,22 @@ set +a
 
 当前工作区已经准备好 Python 3.13 的独立 `.venv`；不需要修改或激活主项目环境。
 
+### 阿里云百炼 DashScope 上的 DeepSeek V4 Flash
+
+百炼的 `/compatible-mode/v1` 是 OpenAI 协议，不能直接给 Claude Code 使用。按量计费的 Anthropic 兼容入口是 `https://dashscope.aliyuncs.com/apps/anthropic`。demo 可复用主项目 `.env` 中的 `LLM_KEY` 与 `LLM_DEFAULT_MODEL`，不会读取或改写 `LLM_ENDPOINT`：
+
+```bash
+cd claude_agent_sdk_demo
+set -a
+source ../.env
+set +a
+export CLAUDE_DEMO_BACKEND=claude
+export CLAUDE_PROVIDER=dashscope
+.venv/bin/python scripts/check_deepseek.py
+```
+
+也可以复制 `.env.dashscope.example` 使用独立 `DASHSCOPE_API_KEY`。通过后按相同环境启动 uvicorn。该 profile 将凭据限制到百炼官方 Anthropic endpoint。
+
 ## 5. API 合同
 
 ### `POST /v1/runs/stream`

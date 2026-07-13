@@ -38,7 +38,10 @@ class ClaudeAgentBackend:
         builtin_tools = ["Skill"]
         if request.enable_web_search and self.settings.web_search_backend == "builtin":
             builtin_tools.append("WebSearch")
-        allowed_tools = [name for name in builtin_tools if name != "Skill"] + custom_tool_names
+        # Keep every visible built-in explicit. In hardened subprocess mode the
+        # Claude runtime otherwise downgrades dontAsk and warns that Skill is
+        # only implicitly allowed by the SDK's skills option.
+        allowed_tools = [*builtin_tools, *custom_tool_names]
         if not request.enable_web_search:
             allowed_tools = [name for name in allowed_tools if not name.endswith("__web_search")]
         policy = ToolPolicy(frozenset(["Skill", *allowed_tools]))

@@ -2,6 +2,7 @@
 .env.*
 !.env.example
 !.env.deepseek.example
+!.env.dashscope.example
 .runtime/
 .venv/
 __pycache__/

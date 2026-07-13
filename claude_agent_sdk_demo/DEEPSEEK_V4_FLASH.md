@@ -100,3 +100,28 @@ claude
 ```
 
 Python demo 不要求全局安装 `claude` 命令；`claude-agent-sdk` 包会管理它自己的 Claude Code runtime。
+
+## 阿里云百炼 DashScope
+
+百炼为按量计费 API 同时提供两种不同协议入口：
+
+- OpenAI：`https://dashscope.aliyuncs.com/compatible-mode/v1`
+- Anthropic：`https://dashscope.aliyuncs.com/apps/anthropic`
+
+Claude Code/Agent SDK 必须使用后者。主项目现有 `.env` 的 `LLM_ENDPOINT` 保持不变，demo 的 `dashscope` profile 只复用 `LLM_KEY` 和 `LLM_DEFAULT_MODEL`，并将 Claude Code 模型角色统一映射到 `deepseek-v4-flash`。
+
+```bash
+cd claude_agent_sdk_demo
+set -a
+source ../.env
+set +a
+export CLAUDE_DEMO_BACKEND=claude
+export CLAUDE_PROVIDER=dashscope
+.venv/bin/python scripts/check_deepseek.py
+```
+
+官方依据：
+
+- [百炼接入 Claude Code](https://help.aliyun.com/zh/model-studio/claude-code)
+- [百炼第三方编程工具协议入口](https://help.aliyun.com/en/model-studio/more-tools)
+- [百炼模型上下架与更新](https://help.aliyun.com/zh/model-studio/newly-released-models)

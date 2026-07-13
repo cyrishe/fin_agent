@@ -2,7 +2,7 @@ from pathlib import Path
 
 import pytest
 
-from app.config import DEEPSEEK_ANTHROPIC_BASE_URL, Settings
+from app.config import DASHSCOPE_ANTHROPIC_BASE_URL, DEEPSEEK_ANTHROPIC_BASE_URL, Settings
 
 
 def test_fake_settings_are_ready_without_sdk_or_credentials(tmp_path: Path) -> None:
@@ -96,3 +96,44 @@ def test_credential_placeholder_is_not_ready(tmp_path: Path) -> None:
 
     assert result["ready"] is False
     assert any("placeholder" in issue for issue in result["issues"])
+
+
+def test_dashscope_profile_maps_main_project_maas_environment(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv("CLAUDE_PROVIDER", "dashscope")
+    monkeypatch.setenv("CLAUDE_DEMO_BACKEND", "claude")
+    monkeypatch.setenv("LLM_KEY", "dashscope-test-secret")
+    monkeypatch.setenv("LLM_DEFAULT_MODEL", "deepseek-v4-flash")
+    monkeypatch.setenv("LLM_ENDPOINT", "https://dashscope.aliyuncs.com/compatible-mode/v1")
+    monkeypatch.delenv("DASHSCOPE_API_KEY", raising=False)
+    monkeypatch.delenv("CLAUDE_AUTH_TOKEN", raising=False)
+    monkeypatch.delenv("CLAUDE_MODEL", raising=False)
+    monkeypatch.delenv("ANTHROPIC_MODEL", raising=False)
+    monkeypatch.delenv("CLAUDE_BASE_URL", raising=False)
+    monkeypatch.delenv("ANTHROPIC_BASE_URL", raising=False)
+
+    settings = Settings.from_env()
+    env = settings.provider_env()
+
+    assert settings.model == "deepseek-v4-flash"
+    assert settings.base_url == DASHSCOPE_ANTHROPIC_BASE_URL
+    assert settings.readiness()["ready"] is True
+    assert env["ANTHROPIC_AUTH_TOKEN"] == "dashscope-test-secret"
+    assert env["ANTHROPIC_BASE_URL"] == DASHSCOPE_ANTHROPIC_BASE_URL
+    assert env["ANTHROPIC_DEFAULT_SONNET_MODEL"] == "deepseek-v4-flash"
+
+
+def test_dashscope_key_cannot_be_sent_to_an_arbitrary_host(tmp_path: Path) -> None:
+    settings = Settings(
+        root_dir=tmp_path,
+        backend="claude",
+        provider="dashscope",
+        model="deepseek-v4-flash",
+        base_url="https://attacker.example/apps/anthropic",
+        auth_token="dashscope-test-secret",
+    )
+
+    assert settings.readiness()["ready"] is False
+    with pytest.raises(ValueError, match="official Anthropic endpoint"):
+        settings.provider_env()

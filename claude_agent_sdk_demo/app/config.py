@@ -10,6 +10,7 @@ from urllib.parse import urlparse
 
 ROOT_DIR = Path(__file__).resolve().parents[1]
 DEEPSEEK_ANTHROPIC_BASE_URL = "https://api.deepseek.com/anthropic"
+DASHSCOPE_ANTHROPIC_BASE_URL = "https://dashscope.aliyuncs.com/apps/anthropic"
 DEEPSEEK_MODELS = frozenset({"deepseek-v4-flash", "deepseek-v4-pro"})
 EFFORT_LEVELS = frozenset({"low", "medium", "high", "xhigh", "max"})
 CREDENTIAL_PLACEHOLDERS = frozenset({"replace-me", "your-key", "your-api-key"})
@@ -67,12 +68,26 @@ class Settings:
         root_dir = Path(os.getenv("CLAUDE_DEMO_ROOT", str(ROOT_DIR))).expanduser().resolve()
         provider = os.getenv("CLAUDE_PROVIDER", "anthropic").strip().lower()
         deepseek_mode = provider == "deepseek"
-        model_default = "deepseek-v4-flash" if deepseek_mode else "sonnet"
-        base_url_default = DEEPSEEK_ANTHROPIC_BASE_URL if deepseek_mode else ""
-        if deepseek_mode:
+        dashscope_mode = provider == "dashscope"
+        model_default = (
+            "deepseek-v4-flash"
+            if deepseek_mode
+            else (os.getenv("LLM_DEFAULT_MODEL", "deepseek-v4-flash") if dashscope_mode else "sonnet")
+        )
+        base_url_default = (
+            DEEPSEEK_ANTHROPIC_BASE_URL
+            if deepseek_mode
+            else (DASHSCOPE_ANTHROPIC_BASE_URL if dashscope_mode else "")
+        )
+        if deepseek_mode or dashscope_mode:
             # Do not accidentally reuse an Anthropic credential left in the
-            # parent shell when switching this demo to the DeepSeek endpoint.
-            auth_token = (os.getenv("CLAUDE_AUTH_TOKEN") or os.getenv("DEEPSEEK_API_KEY") or "").strip()
+            # parent shell when switching this demo to another provider.
+            provider_key = (
+                os.getenv("DEEPSEEK_API_KEY")
+                if deepseek_mode
+                else (os.getenv("DASHSCOPE_API_KEY") or os.getenv("LLM_KEY"))
+            )
+            auth_token = (os.getenv("CLAUDE_AUTH_TOKEN") or provider_key or "").strip()
             anthropic_api_key = ""
         else:
             auth_token = (
@@ -136,15 +151,22 @@ class Settings:
             "CLAUDE_CODE_SUBPROCESS_ENV_SCRUB": "1",
             "CLAUDE_CONFIG_DIR": str(self.claude_config_dir),
         }
-        if self.provider == "deepseek" and self.base_url != DEEPSEEK_ANTHROPIC_BASE_URL:
-            raise ValueError("DeepSeek credentials may only be sent to the official Anthropic endpoint")
+        trusted_provider_endpoints = {
+            "deepseek": DEEPSEEK_ANTHROPIC_BASE_URL,
+            "dashscope": DASHSCOPE_ANTHROPIC_BASE_URL,
+        }
+        expected_endpoint = trusted_provider_endpoints.get(self.provider)
+        if expected_endpoint and self.base_url != expected_endpoint:
+            raise ValueError(
+                f"{self.provider} credentials may only be sent to its configured official Anthropic endpoint"
+            )
         if self.base_url:
             env["ANTHROPIC_BASE_URL"] = self.base_url
         if self.auth_token:
             env["ANTHROPIC_AUTH_TOKEN"] = self.auth_token
         elif self.anthropic_api_key:
             env["ANTHROPIC_API_KEY"] = self.anthropic_api_key
-        if self.provider == "deepseek":
+        if self.provider in {"deepseek", "dashscope"}:
             # Pin every Claude Code model role to the selected DeepSeek model. This
             # avoids an unexpected provider/model switch for background work.
             env.update(
@@ -165,8 +187,10 @@ class Settings:
         warnings: list[str] = []
         if self.backend not in {"fake", "claude"}:
             issues.append("CLAUDE_DEMO_BACKEND must be 'fake' or 'claude'")
-        if self.provider not in {"anthropic", "deepseek", "gateway"}:
-            issues.append("CLAUDE_PROVIDER must be 'anthropic', 'deepseek', or 'gateway'")
+        if self.provider not in {"anthropic", "deepseek", "dashscope", "gateway"}:
+            issues.append(
+                "CLAUDE_PROVIDER must be 'anthropic', 'deepseek', 'dashscope', or 'gateway'"
+            )
         if self.effort and self.effort not in EFFORT_LEVELS:
             issues.append("CLAUDE_EFFORT must be low, medium, high, xhigh, or max")
         if self.web_search_backend not in {"builtin", "searxng", "disabled"}:
@@ -199,6 +223,14 @@ class Settings:
                 )
             warnings.append(
                 "DeepSeek Anthropic compatibility is text/tool oriented; image, document, and MCP connector blocks are unsupported"
+            )
+        if self.provider == "dashscope":
+            if self.base_url != DASHSCOPE_ANTHROPIC_BASE_URL:
+                issues.append(
+                    f"DashScope mode requires the official endpoint {DASHSCOPE_ANTHROPIC_BASE_URL}"
+                )
+            warnings.append(
+                "DashScope provider capabilities depend on its Anthropic compatibility layer and selected model; run the credentialed tool/SDK probes"
             )
         if self.web_search_backend == "searxng":
             if not self.searxng_base_url:

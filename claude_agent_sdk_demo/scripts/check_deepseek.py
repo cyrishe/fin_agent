@@ -79,7 +79,10 @@ async def _run_sdk_probe(settings: Settings, *, web_search: bool) -> dict[str, A
 
 async def main() -> int:
     parser = argparse.ArgumentParser(
-        description="Verify DeepSeek V4 Flash Anthropic streaming, tools, Skills, and Claude Agent SDK."
+        description=(
+            "Verify DeepSeek V4 Flash streaming, tools, Skills, and Claude Agent SDK through "
+            "the official DeepSeek or Alibaba Cloud Model Studio Anthropic endpoint."
+        )
     )
     parser.add_argument(
         "--with-web-search",
@@ -91,8 +94,12 @@ async def main() -> int:
     settings = Settings.from_env()
     readiness = settings.readiness()
     print(json.dumps(readiness, ensure_ascii=False, indent=2))
-    if settings.provider != "deepseek" or settings.backend != "claude" or not readiness["ready"]:
-        print("DeepSeek profile is not ready; see issues above.", file=sys.stderr)
+    if (
+        settings.provider not in {"deepseek", "dashscope"}
+        or settings.backend != "claude"
+        or not readiness["ready"]
+    ):
+        print("DeepSeek/DashScope profile is not ready; see issues above.", file=sys.stderr)
         return 2
 
     try:

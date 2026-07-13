@@ -30,12 +30,14 @@ src/services/agent_provider_harness.py
 
 ```text
 CUSTOM_TOOL_AGENT_PROVIDER=codex|claude
-CLAUDE_PROVIDER=anthropic|deepseek|gateway
+CLAUDE_PROVIDER=anthropic|deepseek|dashscope|gateway
 CLAUDE_BASE_URL=...
 CLAUDE_MODEL=...
 ```
 
 `deepseek` 只代表 DeepSeek 官方 Anthropic endpoint，并使用专用 `DEEPSEEK_API_KEY`；第三方 MaaS 即使承载 DeepSeek weights，也应使用 `gateway` profile 和独立凭据。不要根据 model name 在业务层散落 DeepSeek 分支，provider adapter 应输出统一 capability：text、stream、tools、web search、vision、structured output 等。
+
+`dashscope` 代表百炼官方 Anthropic endpoint。主线原有 `/compatible-mode/v1` 继续服务 OpenAI SDK；Claude adapter 必须改用同地域的 `/apps/anthropic`，不能把两个 base URL 混用。
 
 design/coding stage 继续使用现有业务 schema。Claude SDK 可通过 `output_format` 返回 `ResultMessage.structured_output`，adapter 再包装成现有 `final`，不要求 Claude 输出 Codex NDJSON。
 

@@ -25,6 +25,7 @@
 
 - `CLAUDE_PROVIDER=anthropic`：Anthropic 官方 API。
 - `CLAUDE_PROVIDER=deepseek`：只允许 DeepSeek 官方 Anthropic endpoint，并使用专用 `DEEPSEEK_API_KEY`。
+- `CLAUDE_PROVIDER=dashscope`：阿里云百炼按量付费 Anthropic endpoint；可安全映射主项目的 `LLM_KEY` 与 `LLM_DEFAULT_MODEL`。
 - `CLAUDE_PROVIDER=gateway`：自有 MaaS 或第三方托管模型；必须实现 Anthropic Messages streaming/tool-use 合同。
 
 不要按 model name 在业务代码中散落分支。主线应维护 provider capability，例如 text、stream、tools、web search、vision、structured output，再由 adapter 处理差异。

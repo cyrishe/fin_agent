@@ -89,8 +89,8 @@ def summarize_anthropic_sse(model: str, data_payloads: Iterable[str]) -> DirectT
 
 async def probe_deepseek_anthropic_stream(settings: Settings) -> DirectToolProbeResult:
     """Make one small paid request that forces a standard Anthropic tool call."""
-    if settings.provider != "deepseek":
-        raise DeepSeekProbeError("CLAUDE_PROVIDER must be deepseek")
+    if settings.provider not in {"deepseek", "dashscope"}:
+        raise DeepSeekProbeError("CLAUDE_PROVIDER must be deepseek or dashscope")
     provider_env = settings.provider_env()
     headers = {
         "accept": "text/event-stream",
