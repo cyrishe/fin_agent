@@ -3,11 +3,13 @@ from __future__ import annotations
 import json
 import os
 from pathlib import Path
+import queue
 import selectors
 import signal
 import shutil
 import subprocess
 import tempfile
+import threading
 import time
 from typing import Any, Callable, Dict, Iterable, List, Mapping, Optional
 
@@ -694,6 +696,7 @@ class CodexSdkSkillHarness(CodexExecSkillHarness):
         completed_texts: List[str] = []
         agent_deltas: List[str] = []
         error = ""
+        transient_errors: List[str] = []
         timeout = False
         timeout_kind = ""
         timeout_after_seconds = 0
@@ -744,11 +747,43 @@ class CodexSdkSkillHarness(CodexExecSkillHarness):
                     sandbox=sdk_sandbox,
                     summary=ReasoningSummary.model_validate("concise"),
                 )
-                for notification in turn.stream():
-                    if time.time() - started_at > self.hard_timeout_seconds:
-                        timeout = True
-                        timeout_kind = "hard timeout"
-                        timeout_after_seconds = self.hard_timeout_seconds
+                notification_queue: queue.Queue[tuple[str, Any]] = queue.Queue()
+
+                def _pump_turn_notifications() -> None:
+                    try:
+                        for streamed_notification in turn.stream():
+                            notification_queue.put(("notification", streamed_notification))
+                    except BaseException as exc:  # surfaced on the controlling thread
+                        notification_queue.put(("error", exc))
+                    finally:
+                        notification_queue.put(("done", None))
+
+                stream_thread = threading.Thread(
+                    target=_pump_turn_notifications,
+                    name=f"codex-sdk-{stage_name}-stream",
+                    daemon=True,
+                )
+                stream_thread.start()
+                last_activity_at = time.time()
+                while True:
+                    now = time.time()
+                    hard_remaining = self.hard_timeout_seconds - (now - started_at)
+                    idle_remaining = self.timeout_seconds - (now - last_activity_at)
+                    wait_seconds = max(0.01, min(hard_remaining, idle_remaining, 1.0))
+                    try:
+                        queue_kind, queue_value = notification_queue.get(timeout=wait_seconds)
+                    except queue.Empty:
+                        now = time.time()
+                        if now - started_at >= self.hard_timeout_seconds:
+                            timeout = True
+                            timeout_kind = "hard timeout"
+                            timeout_after_seconds = self.hard_timeout_seconds
+                        elif now - last_activity_at >= self.timeout_seconds:
+                            timeout = True
+                            timeout_kind = "idle timeout"
+                            timeout_after_seconds = self.timeout_seconds
+                        if not timeout:
+                            continue
                         try:
                             turn.interrupt()
                         except Exception:
@@ -756,13 +791,28 @@ class CodexSdkSkillHarness(CodexExecSkillHarness):
                         timeout_event = {
                             "source": "harness",
                             "type": "tool_result",
-                            "content": "codex sdk hard timeout",
-                            "metadata": {"stage": stage_name, "status": "error", "timeout_kind": timeout_kind, "duration_ms": int((time.time() - started_at) * 1000)},
+                            "content": f"codex sdk {timeout_kind}",
+                            "metadata": {
+                                "stage": stage_name,
+                                "status": "error",
+                                "timeout_kind": timeout_kind,
+                                "timeout_after_seconds": timeout_after_seconds,
+                                "duration_ms": int((now - started_at) * 1000),
+                            },
                         }
                         events.append(timeout_event)
                         self._send_event(timeout_event, event_sink)
                         break
-                    new_events = self._normalize_sdk_notification(notification)
+                    if queue_kind == "error":
+                        raise queue_value
+                    if queue_kind == "done":
+                        break
+                    notification = queue_value
+                    last_activity_at = time.time()
+                    new_events = self._attach_stage(
+                        self._normalize_sdk_notification(notification),
+                        stage_name,
+                    )
                     method = _trim(getattr(notification, "method", ""))
                     payload = getattr(notification, "payload", None)
                     if method == "item/agentMessage/delta":
@@ -774,7 +824,9 @@ class CodexSdkSkillHarness(CodexExecSkillHarness):
                         if text:
                             completed_texts.append(text)
                     if method == "error":
-                        error = self._sdk_error_text(payload) or error
+                        transient_error = self._sdk_error_text(payload)
+                        if transient_error:
+                            transient_errors.append(transient_error)
                     if method == "turn/completed":
                         error = self._sdk_turn_error_text(payload) or error
                     events.extend(new_events)
@@ -814,11 +866,14 @@ class CodexSdkSkillHarness(CodexExecSkillHarness):
         return {
             "ok": ok,
             "error": error or (f"codex sdk {timeout_kind or 'timeout'} after {timeout_after_seconds or self.hard_timeout_seconds}s" if timeout else ""),
+            "timeout": timeout,
+            "timeout_kind": timeout_kind,
+            "timeout_after_seconds": timeout_after_seconds,
             "events": events,
             "final": final,
             "session_id": session_id,
             "raw_stdout": "",
-            "raw_stderr": error,
+            "raw_stderr": "\n".join(transient_errors + ([error] if error else [])),
             "last_message": final_response,
             "context_bundle": bundle,
             "duration_ms": int((time.time() - started_at) * 1000),
@@ -910,6 +965,13 @@ class CodexSdkSkillHarness(CodexExecSkillHarness):
                 return events
             return [{"source": "codex", "type": "item_completed", "content": text, "metadata": {"method": method}}] if text else []
         return [{"source": "codex", "type": "event", "content": method, "metadata": self._payload_json(payload)}] if method else []
+
+    @staticmethod
+    def _attach_stage(events: List[Dict[str, Any]], stage: str) -> List[Dict[str, Any]]:
+        for event in events:
+            metadata = event.get("metadata") if isinstance(event.get("metadata"), Mapping) else {}
+            event["metadata"] = {**metadata, "stage": stage}
+        return events
 
     @staticmethod
     def _text_event(source: str, event_type: str, content: Any) -> List[Dict[str, Any]]:
@@ -1057,10 +1119,12 @@ class CodexCustomToolDesigner:
         harness: Optional[CodexExecSkillHarness] = None,
         skill_path: str = "src/skills/financial-tool-requirement-design-v3/SKILL.md",
         output_schema_path: str = "src/skills/financial-tool-requirement-design-v3/schema.json",
+        revision_schema_path: str = "src/skills/financial-tool-requirement-design-v3/revision-schema.json",
     ) -> None:
         self.harness = harness or CodexExecSkillHarness(cwd=".")
         self.skill_path = skill_path
         self.output_schema_path = output_schema_path
+        self.revision_schema_path = revision_schema_path
 
     def design(
         self,
@@ -1069,9 +1133,11 @@ class CodexCustomToolDesigner:
         context: Optional[Mapping[str, Any]] = None,
         event_sink: Optional[Callable[[Dict[str, Any]], None]] = None,
     ) -> Dict[str, Any]:
+        scenario = _trim((context or {}).get("design_scenario"))
+        is_revision = scenario in {"create_revision_round", "optimize_existing_tool"}
         result = self.harness.run_skill(
             skill_path=self.skill_path,
-            output_schema_path=self.output_schema_path,
+            output_schema_path=self.revision_schema_path if is_revision else self.output_schema_path,
             user_request=requirement_text,
             context=context or {},
             stage="design",
@@ -1086,6 +1152,21 @@ class CodexCustomToolDesigner:
             }
         final = dict(result.get("final") or {})
         status = _trim(final.get("status")) or "clarification"
+        if is_revision:
+            questions = [dict(item) for item in final.get("questions") or [] if isinstance(item, Mapping)]
+            has_required_question = any(item.get("required") is True for item in questions)
+            if status == "review" and has_required_question:
+                status = "clarification"
+            return {
+                "status": status,
+                "message": _trim(final.get("change_summary")) or "已根据本轮反馈更新设计。",
+                "protocol_mode": "revision_fields",
+                "change_summary": _trim(final.get("change_summary")),
+                "questions": questions[:5],
+                "changes": [dict(item) for item in final.get("changes") or [] if isinstance(item, Mapping)],
+                "events": result.get("events") or [],
+                "raw": result,
+            }
         understanding = final.get("understanding") if isinstance(final.get("understanding"), Mapping) else {}
         questions = [dict(item) if isinstance(item, Mapping) else str(item) for item in final.get("questions") or []]
         has_required_question = any(
@@ -1108,9 +1189,16 @@ class CodexCustomToolDesigner:
 
 
 class CodexCustomToolCoder:
-    def __init__(self, *, harness: Optional[CodexExecSkillHarness] = None, skill_path: str = "SKILL_requirement_coding.md") -> None:
+    def __init__(
+        self,
+        *,
+        harness: Optional[CodexExecSkillHarness] = None,
+        skill_path: str = "src/skills/financial-tool-coding-v1/SKILL.md",
+        output_schema_path: str = "src/skills/financial-tool-coding-v1/schema.json",
+    ) -> None:
         self.harness = harness or CodexExecSkillHarness(cwd=".")
         self.skill_path = skill_path
+        self.output_schema_path = output_schema_path
 
     def code(
         self,
@@ -1129,15 +1217,19 @@ class CodexCustomToolCoder:
         run_context["design"] = dict(design)
         result = self.harness.run_skill(
             skill_path=self.skill_path,
+            output_schema_path=self.output_schema_path,
             user_request=request,
             context=run_context,
             stage="coding",
             event_sink=event_sink,
         )
         if not result.get("ok"):
+            failure = self._failure_summary(result.get("error"))
             return {
-                "status": "need_design_fix",
-                "message": result.get("error") or "Codex coding skill 未能生成最终代码。",
+                "status": "coding_failed",
+                "message": f"实现未完成：{failure['summary']} 当前设计已保留，可以重试。",
+                "error": failure,
+                "error_detail": result.get("error") or "",
                 "events": result.get("events") or [],
                 "raw": result,
             }
@@ -1150,3 +1242,22 @@ class CodexCustomToolCoder:
             "events": result.get("events") or [],
             "raw": result,
         }
+
+    @staticmethod
+    def _failure_summary(error_detail: Any) -> Dict[str, str]:
+        text = _trim(error_detail)
+        lowered = text.lower()
+        if "invalid_json_schema" in lowered or "invalid schema for response_format" in lowered:
+            field = ""
+            marker = "in context=('properties', '"
+            if marker in lowered:
+                field = lowered.split(marker, 1)[1].split("'", 1)[0].strip()
+            detail = f"字段 {field} 缺少严格 Schema 所需的类型声明。" if field else "结构化输出 Schema 不符合严格格式要求。"
+            return {"code": "coding_schema_invalid", "summary": detail}
+        if "authorizationrequired" in lowered or "oauth authorization required" in lowered or "re-authorization required" in lowered:
+            return {"code": "coding_auth_required", "summary": "Codex 授权已失效，需要重新授权。"}
+        if "timeout" in lowered:
+            return {"code": "coding_timeout", "summary": "Coding 调用超时，未取得有效结果。"}
+        if "stream disconnected" in lowered or "reconnecting" in lowered:
+            return {"code": "coding_connection_failed", "summary": "Coding 连接中断，未取得有效结果。"}
+        return {"code": "coding_runtime_failed", "summary": "Coding 运行失败，未取得有效结果。"}

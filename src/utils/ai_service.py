@@ -34,8 +34,13 @@ client_next = OpenAI(
 
 
 llm_client = OpenAI(
-    api_key=os.getenv("LLM_API_KEY") or os.getenv("DASHSCOPE_API_KEY") or "not-configured",
-    base_url=os.getenv("LLM_BASE_URL", os.getenv("DASHSCOPE_BASE_URL", "https://dashscope.aliyuncs.com/compatible-mode/v1")),
+    api_key=os.getenv("LLM_API_KEY") or os.getenv("LLM_KEY") or os.getenv("DASHSCOPE_API_KEY") or "not-configured",
+    base_url=(
+        os.getenv("LLM_BASE_URL")
+        or os.getenv("LLM_ENDPOINT")
+        or os.getenv("DASHSCOPE_BASE_URL")
+        or "https://dashscope.aliyuncs.com/compatible-mode/v1"
+    ),
     timeout=float(os.getenv("LLM_CLIENT_TIMEOUT_SECONDS", "45")),
     max_retries=int(os.getenv("LLM_CLIENT_MAX_RETRIES", "1")),
 )

@@ -1,0 +1,79 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "source",
+    "type",
+    "status",
+    "message",
+    "implementation",
+    "tests",
+    "sample_input_json",
+    "implementation_notes",
+    "design_issues",
+    "risks"
+  ],
+  "properties": {
+    "source": {"type": "string", "enum": ["model"]},
+    "type": {"type": "string", "enum": ["final"]},
+    "status": {"type": "string", "enum": ["code_ready", "need_design_fix"]},
+    "message": {"type": "string"},
+    "implementation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["summary", "entry_module", "modules"],
+      "properties": {
+        "summary": {"type": "string"},
+        "entry_module": {"type": "string"},
+        "modules": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["module_id", "role", "language", "entrypoint", "functions", "source_code"],
+            "properties": {
+              "module_id": {"type": "string"},
+              "role": {"type": "string"},
+              "language": {"type": "string", "enum": ["python"]},
+              "entrypoint": {"type": "string", "enum": ["run"]},
+              "functions": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": ["name", "responsibility"],
+                  "properties": {
+                    "name": {"type": "string"},
+                    "responsibility": {"type": "string"}
+                  }
+                }
+              },
+              "source_code": {"type": "string", "minLength": 1}
+            }
+          }
+        }
+      }
+    },
+    "tests": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["test_id", "category", "status", "input_json", "expected_json", "purpose"],
+        "properties": {
+          "test_id": {"type": "string"},
+          "category": {"type": "string", "enum": ["happy_path", "boundary", "invalid_input", "data_gap"]},
+          "status": {"type": "string", "enum": ["proposed"]},
+          "input_json": {"type": "string"},
+          "expected_json": {"type": "string"},
+          "purpose": {"type": "string"}
+        }
+      }
+    },
+    "sample_input_json": {"type": "string"},
+    "implementation_notes": {"type": "array", "items": {"type": "string"}},
+    "design_issues": {"type": "array", "items": {"type": "string"}},
+    "risks": {"type": "array", "items": {"type": "string"}}
+  }
+}

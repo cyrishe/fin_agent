@@ -350,72 +350,72 @@
             "trade_date"
           ],
           "preclose": [
-            "昨收价",
+            "昨收价（元）",
             "前收盘价"
           ],
           "open": [
-            "当日开盘价",
+            "当日开盘价（元）",
             "开盘价"
           ],
           "close": [
-            "截至该分钟最新价",
+            "截至该分钟最新价（元）",
             "最新价",
             "收盘价"
           ],
           "high": [
-            "截至该分钟当日最高价",
+            "截至该分钟当日最高价（元）",
             "最高价"
           ],
           "low": [
-            "截至该分钟当日最低价",
+            "截至该分钟当日最低价（元）",
             "最低价"
           ],
           "avg_price": [
-            "均价",
+            "均价（元）",
             "avg_price"
           ],
           "differ": [
-            "涨跌额"
+            "涨跌额（元）"
           ],
           "pct": [
-            "涨跌幅",
+            "涨跌幅（%，3.5%记为3.5）",
             "涨幅"
           ],
           "turn_ratio": [
-            "换手率",
+            "换手率（%，3.5%记为3.5）",
             "turn_ratio"
           ],
           "amount": [
-            "截至该分钟累计成交额",
+            "截至该分钟累计成交额（元）",
             "累计成交额"
           ],
           "volumn": [
-            "截至该分钟累计成交量",
+            "累计成交量（历史日线：股；实时分钟快照：手，1手=100股）",
             "累计成交量",
             "volume"
           ],
           "amplitude": [
-            "振幅",
+            "振幅（%，3.5%记为3.5）",
             "amplitude"
           ],
           "adjpreclose": [
-            "复权昨收价",
+            "复权昨收价（元）",
             "adjpreclose"
           ],
           "adjopen": [
-            "复权开盘价",
+            "复权开盘价（元）",
             "adjopen"
           ],
           "adjhigh": [
-            "复权最高价",
+            "复权最高价（元）",
             "adjhigh"
           ],
           "adjlow": [
-            "复权最低价",
+            "复权最低价（元）",
             "adjlow"
           ],
           "adjclose": [
-            "复权收盘价",
+            "复权收盘价（元）",
             "adjclose"
           ],
           "is_limit_price": [
@@ -439,11 +439,11 @@
             "时刻"
           ],
           "minute_amount": [
-            "当前分钟成交额",
+            "当前分钟成交额（元）",
             "分钟成交额"
           ],
           "minute_volumn": [
-            "当前分钟成交量",
+            "当前分钟成交量（手，1手=100股）",
             "分钟成交量",
             "minute_volume"
           ]
@@ -544,64 +544,64 @@
             "tradedate"
           ],
           "huge_buy": [
-            "超大单流入",
+            "超大单流入（元）",
             "huge_buy"
           ],
           "huge_sell": [
-            "超大单流出",
+            "超大单流出（元）",
             "huge_sell"
           ],
           "huge_ratio": [
-            "超大单净流入占比",
+            "超大单净流入占比（%，3.5%记为3.5）",
             "huge_ratio"
           ],
           "large_buy": [
-            "大单流入",
+            "大单流入（元）",
             "large_buy"
           ],
           "large_sell": [
-            "大单流出",
+            "大单流出（元）",
             "large_sell"
           ],
           "large_net": [
-            "大单净流入",
+            "大单净流入（元）",
             "large_net"
           ],
           "large_ratio": [
-            "大单净流入占比",
+            "大单净流入占比（%，3.5%记为3.5）",
             "large_ratio"
           ],
           "medium_buy": [
-            "中单流入",
+            "中单流入（元）",
             "medium_buy"
           ],
           "medium_sell": [
-            "中单流出",
+            "中单流出（元）",
             "medium_sell"
           ],
           "small_buy": [
-            "小单流入",
+            "小单流入（元）",
             "small_buy"
           ],
           "small_sell": [
-            "小单流出",
+            "小单流出（元）",
             "small_sell"
           ],
           "main_buy": [
-            "主力流入",
+            "主力流入（元）",
             "main_buy"
           ],
           "main_sell": [
-            "主力流出",
+            "主力流出（元）",
             "main_sell"
           ],
           "main_net": [
-            "主力净流入",
+            "主力净流入（元）",
             "主力资金流向",
             "main_net"
           ],
           "main_ratio": [
-            "主力净流入占比",
+            "主力净流入占比（%，3.5%记为3.5）",
             "main_ratio"
           ]
         },
@@ -641,97 +641,97 @@
             "tradedate"
           ],
           "pe": [
-            "PE",
+            "PE（倍）",
             "市盈率",
             "pe"
           ],
           "pe_lyr": [
-            "静态市盈率",
+            "静态市盈率（倍）",
             "PE LYR",
             "pe_lyr"
           ],
           "pe_ttm": [
-            "滚动市盈率",
+            "滚动市盈率（倍）",
             "PE TTM",
             "pe_ttm"
           ],
           "pe_ttm_deduct": [
-            "扣非滚动市盈率",
+            "扣非滚动市盈率（倍）",
             "pe_ttm_deduct"
           ],
           "pe_dynamic": [
-            "动态市盈率",
+            "动态市盈率（倍）",
             "pe_dynamic"
           ],
           "pb": [
-            "PB",
+            "PB（倍）",
             "市净率",
             "pb"
           ],
           "pb_mrq": [
-            "市净率MRQ",
+            "市净率MRQ（倍）",
             "pb_mrq"
           ],
           "pb_lf": [
-            "市净率LF",
+            "市净率LF（倍）",
             "pb_lf"
           ],
           "ps": [
-            "PS",
+            "PS（倍）",
             "市销率",
             "ps"
           ],
           "ps_lyr": [
-            "静态市销率",
+            "静态市销率（倍）",
             "ps_lyr"
           ],
           "ps_ttm": [
-            "滚动市销率",
+            "滚动市销率（倍）",
             "ps_ttm"
           ],
           "pcf_cfottm": [
-            "经营现金流TTM市现率",
+            "经营现金流TTM市现率（倍）",
             "pcf_cfottm"
           ],
           "pcf_ncfttm": [
-            "净现金流TTM市现率",
+            "净现金流TTM市现率（倍）",
             "pcf_ncfttm"
           ],
           "pcf_cfolyr": [
-            "经营现金流LYR市现率",
+            "经营现金流LYR市现率（倍）",
             "pcf_cfolyr"
           ],
           "pcf_ncflyr": [
-            "净现金流LYR市现率",
+            "净现金流LYR市现率（倍）",
             "pcf_ncflyr"
           ],
           "prr_lyr": [
-            "市研率",
+            "市研率（倍）",
             "prr_lyr"
           ],
           "market_value": [
-            "市值",
+            "市值（元）",
             "总市值",
             "market_value"
           ],
           "free_float_mv": [
-            "自由流通市值",
+            "自由流通市值（元）",
             "free_float_mv"
           ],
           "float_mv": [
-            "流通市值",
+            "流通市值（元）",
             "float_mv"
           ],
           "total_share": [
-            "总股本",
+            "总股本（股）",
             "total_share"
           ],
           "float_share": [
-            "流通股本",
+            "流通股本（股）",
             "float_share"
           ],
           "turn_ratio": [
-            "换手率",
+            "换手率（%，3.5%记为3.5）",
             "turn_ratio"
           ]
         },
@@ -810,193 +810,193 @@
             "currency"
           ],
           "revenue": [
-            "营收",
+            "营收（单位见currency；CNY为元）",
             "营业收入",
             "revenue"
           ],
           "total_revenue": [
-            "营业总收入",
+            "营业总收入（单位见currency；CNY为元）",
             "total_revenue"
           ],
           "operating_revenue": [
-            "营业收入",
+            "营业收入（单位见currency；CNY为元）",
             "operating_revenue"
           ],
           "profit": [
-            "利润",
+            "利润（单位见currency；CNY为元）",
             "净利润",
             "profit"
           ],
           "net_profit": [
-            "净利润",
+            "净利润（单位见currency；CNY为元）",
             "net_profit"
           ],
           "parent_net_profit": [
-            "归母净利润",
+            "归母净利润（单位见currency；CNY为元）",
             "parent_net_profit"
           ],
           "deducted_parent_net_profit": [
-            "扣非归母净利润",
+            "扣非归母净利润（单位见currency；CNY为元）",
             "deducted_parent_net_profit"
           ],
           "operating_profit": [
-            "营业利润",
+            "营业利润（单位见currency；CNY为元）",
             "operating_profit"
           ],
           "total_profit": [
-            "利润总额",
+            "利润总额（单位见currency；CNY为元）",
             "total_profit"
           ],
           "operating_cost": [
-            "营业成本",
+            "营业成本（单位见currency；CNY为元）",
             "operating_cost"
           ],
           "total_cost": [
-            "营业总成本",
+            "营业总成本（单位见currency；CNY为元）",
             "total_cost"
           ],
           "sales_expense": [
-            "销售费用",
+            "销售费用（单位见currency；CNY为元）",
             "sales_expense"
           ],
           "admin_expense": [
-            "管理费用",
+            "管理费用（单位见currency；CNY为元）",
             "admin_expense"
           ],
           "rd_expense": [
-            "研发费用",
+            "研发费用（单位见currency；CNY为元）",
             "rd_expense"
           ],
           "financial_expense": [
-            "财务费用",
+            "财务费用（单位见currency；CNY为元）",
             "financial_expense"
           ],
           "eps_basic": [
-            "基本每股收益",
+            "基本每股收益（元/股）",
             "eps_basic"
           ],
           "eps_diluted": [
-            "稀释每股收益",
+            "稀释每股收益（元/股）",
             "eps_diluted"
           ],
           "total_assets": [
-            "总资产",
+            "总资产（单位见currency；CNY为元）",
             "资产总计",
             "total_assets"
           ],
           "total_liab": [
-            "总负债",
+            "总负债（单位见currency；CNY为元）",
             "负债合计",
             "total_liab"
           ],
           "total_equity": [
-            "股东权益合计",
+            "股东权益合计（单位见currency；CNY为元）",
             "所有者权益",
             "total_equity"
           ],
           "parent_equity": [
-            "归母所有者权益",
+            "归母所有者权益（单位见currency；CNY为元）",
             "parent_equity"
           ],
           "monetary_cap": [
-            "货币资金",
+            "货币资金（单位见currency；CNY为元）",
             "monetary_cap"
           ],
           "accounts_receivable": [
-            "应收账款",
+            "应收账款（单位见currency；CNY为元）",
             "accounts_receivable"
           ],
           "inventory": [
-            "存货",
+            "存货（单位见currency；CNY为元）",
             "inventory"
           ],
           "fixed_assets": [
-            "固定资产",
+            "固定资产（单位见currency；CNY为元）",
             "fixed_assets"
           ],
           "goodwill": [
-            "商誉",
+            "商誉（单位见currency；CNY为元）",
             "goodwill"
           ],
           "short_term_borrowing": [
-            "短期借款",
+            "短期借款（单位见currency；CNY为元）",
             "short_term_borrowing"
           ],
           "long_term_borrowing": [
-            "长期借款",
+            "长期借款（单位见currency；CNY为元）",
             "long_term_borrowing"
           ],
           "cashflow_operating": [
-            "经营活动现金流量净额",
+            "经营活动现金流量净额（单位见currency；CNY为元）",
             "cashflow_operating"
           ],
           "operating_cashflow": [
-            "经营现金流",
+            "经营现金流（单位见currency；CNY为元）",
             "经营活动现金流量净额",
             "operating_cashflow"
           ],
           "cashflow_investing": [
-            "投资活动现金流量净额",
+            "投资活动现金流量净额（单位见currency；CNY为元）",
             "cashflow_investing"
           ],
           "investing_cashflow": [
-            "投资现金流",
+            "投资现金流（单位见currency；CNY为元）",
             "investing_cashflow"
           ],
           "cashflow_financing": [
-            "筹资活动现金流量净额",
+            "筹资活动现金流量净额（单位见currency；CNY为元）",
             "cashflow_financing"
           ],
           "financing_cashflow": [
-            "筹资现金流",
+            "筹资现金流（单位见currency；CNY为元）",
             "financing_cashflow"
           ],
           "net_cashflow": [
-            "现金及现金等价物净增加额",
+            "现金及现金等价物净增加额（单位见currency；CNY为元）",
             "现金流净额",
             "net_cashflow"
           ],
           "cash_end": [
-            "期末现金及现金等价物余额",
+            "期末现金及现金等价物余额（单位见currency；CNY为元）",
             "cash_end"
           ],
           "roe": [
-            "ROE",
+            "ROE（%，3.5%记为3.5）",
             "净资产收益率",
             "roe"
           ],
           "roe_deducted": [
-            "扣非ROE",
+            "扣非ROE（%，3.5%记为3.5）",
             "roe_deducted"
           ],
           "roa": [
-            "ROA",
+            "ROA（%，3.5%记为3.5）",
             "总资产报酬率",
             "roa"
           ],
           "gross_margin": [
-            "毛利率",
+            "毛利率（%，3.5%记为3.5）",
             "gross_margin"
           ],
           "net_margin": [
-            "净利率",
+            "净利率（%，3.5%记为3.5）",
             "net_margin"
           ],
           "debt_ratio": [
-            "资产负债率",
+            "资产负债率（%，3.5%记为3.5）",
             "负债率",
             "debt_ratio"
           ],
           "current_ratio": [
-            "流动比率",
+            "流动比率（倍）",
             "current_ratio"
           ],
           "quick_ratio": [
-            "速动比率",
+            "速动比率（倍）",
             "quick_ratio"
           ],
           "asset_turnover": [
-            "总资产周转率",
+            "总资产周转率（次）",
             "asset_turnover"
           ]
         },
@@ -1042,7 +1042,7 @@
             "short_term_borrowing",
             "long_term_borrowing"
           ],
-          "desc": "支持按基础财务字段生成同比和环比类派生指标。"
+          "desc": "支持按基础财务字段生成同比和环比类派生指标；派生值单位为%，增长3.5%记为3.5。"
         }
       },
       "margin": {
@@ -1064,40 +1064,40 @@
             "tradedate"
           ],
           "financing_balance": [
-            "融资余额"
+            "融资余额（元）"
           ],
           "financing_buy": [
-            "融资买入额"
+            "融资买入额（元）"
           ],
           "financing_repay": [
-            "融资偿还额"
+            "融资偿还额（元）"
           ],
           "financing_net_buy": [
-            "融资净买入",
+            "融资净买入（元）",
             "融资买入净额"
           ],
           "securities_lending_balance": [
-            "融券余额"
+            "融券余额（元）"
           ],
           "securities_lending_balancevol": [
-            "融券余量"
+            "融券余量（股）"
           ],
           "securities_lending_sell_vol": [
-            "融券卖出量"
+            "融券卖出量（股）"
           ],
           "securities_lending_repay_vol": [
-            "融券偿还量"
+            "融券偿还量（股）"
           ],
           "margin_balance": [
-            "融资融券余额",
+            "融资融券余额（元）",
             "两融余额"
           ],
           "margin_diff": [
-            "融资融券差额",
+            "融资融券差额（元）",
             "两融差额"
           ],
           "financing_balance_float_mv_ratio": [
-            "融资余额占流通市值比例"
+            "融资余额占流通市值比例（%，3.5%记为3.5）"
           ]
         },
         "api": [
@@ -1220,7 +1220,7 @@
             "field": "financing_balance",
             "method": "sum",
             "api_function": "计算个股近K个有数据交易日融资余额合计。",
-            "value": "对近K个有数据交易日的字段值求和。",
+            "value": "对近K个有数据交易日的字段值求和；单位：元。",
             "example": "r1 = stock.margin.kd_financing_balance_sum(k = 5, order = \"value desc\", limit = 10, realtime = 0) -> code, name, value as financing_balance_sum_5d"
           },
           {
@@ -1229,7 +1229,7 @@
             "field": "financing_balance",
             "method": "avg",
             "api_function": "计算个股近K个有数据交易日融资余额均值。",
-            "value": "对近K个有数据交易日的字段值求均值。",
+            "value": "对近K个有数据交易日的字段值求均值；单位：元。",
             "example": "r1 = stock.margin.kd_financing_balance_avg(k = 5, order = \"value desc\", limit = 10, realtime = 0) -> code, name, value as financing_balance_avg_5d"
           },
           {
@@ -1238,7 +1238,7 @@
             "field": "financing_balance",
             "method": "max",
             "api_function": "计算个股近K个有数据交易日融资余额最大值。",
-            "value": "取近K个有数据交易日的最大字段值。",
+            "value": "取近K个有数据交易日的最大字段值；单位：元。",
             "example": "r1 = stock.margin.kd_financing_balance_max(k = 5, order = \"value desc\", limit = 10, realtime = 0) -> code, name, value as financing_balance_max_5d"
           },
           {
@@ -1247,7 +1247,7 @@
             "field": "financing_balance",
             "method": "min",
             "api_function": "计算个股近K个有数据交易日融资余额最小值。",
-            "value": "取近K个有数据交易日的最小字段值。",
+            "value": "取近K个有数据交易日的最小字段值；单位：元。",
             "example": "r1 = stock.margin.kd_financing_balance_min(k = 5, order = \"value desc\", limit = 10, realtime = 0) -> code, name, value as financing_balance_min_5d"
           },
           {
@@ -1256,7 +1256,7 @@
             "field": "financing_balance",
             "method": "median",
             "api_function": "计算个股近K个有数据交易日融资余额中位数。",
-            "value": "取近K个有数据交易日的字段值中位数。",
+            "value": "取近K个有数据交易日的字段值中位数；单位：元。",
             "example": "r1 = stock.margin.kd_financing_balance_median(k = 5, order = \"value desc\", limit = 10, realtime = 0) -> code, name, value as financing_balance_median_5d"
           },
           {
@@ -1265,7 +1265,7 @@
             "field": "financing_balance",
             "method": "change",
             "api_function": "计算个股近K个有数据交易日融资余额变化值。",
-            "value": "窗口最新值 - 窗口起始值。",
+            "value": "窗口最新值 - 窗口起始值；单位：元。",
             "example": "r1 = stock.margin.kd_financing_balance_change(k = 5, order = \"value desc\", limit = 10, realtime = 0) -> code, name, value as financing_balance_change_5d"
           },
           {
@@ -1274,7 +1274,7 @@
             "field": "financing_balance",
             "method": "pct_change",
             "api_function": "计算个股近K个有数据交易日融资余额变化率。",
-            "value": "窗口变化率，计算为 (latest - first) / first * 100。",
+            "value": "窗口变化率，计算为 (latest - first) / first * 100；单位：%（增长3.5%记为3.5）。",
             "example": "r1 = stock.margin.kd_financing_balance_pct_change(k = 5, order = \"value desc\", limit = 10, realtime = 0) -> code, name, value as financing_balance_pct_change_5d"
           },
           {
@@ -1283,7 +1283,7 @@
             "field": "financing_buy",
             "method": "sum",
             "api_function": "计算个股近K个有数据交易日融资买入额合计。",
-            "value": "对近K个有数据交易日的字段值求和。",
+            "value": "对近K个有数据交易日的字段值求和；单位：元。",
             "example": "r1 = stock.margin.kd_financing_buy_sum(k = 5, order = \"value desc\", limit = 10, realtime = 0) -> code, name, value as financing_buy_sum_5d"
           },
           {
@@ -1292,7 +1292,7 @@
             "field": "financing_buy",
             "method": "avg",
             "api_function": "计算个股近K个有数据交易日融资买入额均值。",
-            "value": "对近K个有数据交易日的字段值求均值。",
+            "value": "对近K个有数据交易日的字段值求均值；单位：元。",
             "example": "r1 = stock.margin.kd_financing_buy_avg(k = 5, order = \"value desc\", limit = 10, realtime = 0) -> code, name, value as financing_buy_avg_5d"
           },
           {
@@ -1301,7 +1301,7 @@
             "field": "financing_buy",
             "method": "max",
             "api_function": "计算个股近K个有数据交易日融资买入额最大值。",
-            "value": "取近K个有数据交易日的最大字段值。",
+            "value": "取近K个有数据交易日的最大字段值；单位：元。",
             "example": "r1 = stock.margin.kd_financing_buy_max(k = 5, order = \"value desc\", limit = 10, realtime = 0) -> code, name, value as financing_buy_max_5d"
           },
           {
@@ -1310,7 +1310,7 @@
             "field": "financing_buy",
             "method": "min",
             "api_function": "计算个股近K个有数据交易日融资买入额最小值。",
-            "value": "取近K个有数据交易日的最小字段值。",
+            "value": "取近K个有数据交易日的最小字段值；单位：元。",
             "example": "r1 = stock.margin.kd_financing_buy_min(k = 5, order = \"value desc\", limit = 10, realtime = 0) -> code, name, value as financing_buy_min_5d"
           },
           {
@@ -1319,7 +1319,7 @@
             "field": "financing_buy",
             "method": "median",
             "api_function": "计算个股近K个有数据交易日融资买入额中位数。",
-            "value": "取近K个有数据交易日的字段值中位数。",
+            "value": "取近K个有数据交易日的字段值中位数；单位：元。",
             "example": "r1 = stock.margin.kd_financing_buy_median(k = 5, order = \"value desc\", limit = 10, realtime = 0) -> code, name, value as financing_buy_median_5d"
           },
           {
@@ -1328,7 +1328,7 @@
             "field": "financing_buy",
             "method": "change",
             "api_function": "计算个股近K个有数据交易日融资买入额变化值。",
-            "value": "窗口最新值 - 窗口起始值。",
+            "value": "窗口最新值 - 窗口起始值；单位：元。",
             "example": "r1 = stock.margin.kd_financing_buy_change(k = 5, order = \"value desc\", limit = 10, realtime = 0) -> code, name, value as financing_buy_change_5d"
           },
           {
@@ -1337,7 +1337,7 @@
             "field": "financing_buy",
             "method": "pct_change",
             "api_function": "计算个股近K个有数据交易日融资买入额变化率。",
-            "value": "窗口变化率，计算为 (latest - first) / first * 100。",
+            "value": "窗口变化率，计算为 (latest - first) / first * 100；单位：%（增长3.5%记为3.5）。",
             "example": "r1 = stock.margin.kd_financing_buy_pct_change(k = 5, order = \"value desc\", limit = 10, realtime = 0) -> code, name, value as financing_buy_pct_change_5d"
           },
           {
@@ -1346,7 +1346,7 @@
             "field": "financing_repay",
             "method": "sum",
             "api_function": "计算个股近K个有数据交易日融资偿还额合计。",
-            "value": "对近K个有数据交易日的字段值求和。",
+            "value": "对近K个有数据交易日的字段值求和；单位：元。",
             "example": "r1 = stock.margin.kd_financing_repay_sum(k = 5, order = \"value desc\", limit = 10, realtime = 0) -> code, name, value as financing_repay_sum_5d"
           },
           {
@@ -1355,7 +1355,7 @@
             "field": "financing_repay",
             "method": "avg",
             "api_function": "计算个股近K个有数据交易日融资偿还额均值。",
-            "value": "对近K个有数据交易日的字段值求均值。",
+            "value": "对近K个有数据交易日的字段值求均值；单位：元。",
             "example": "r1 = stock.margin.kd_financing_repay_avg(k = 5, order = \"value desc\", limit = 10, realtime = 0) -> code, name, value as financing_repay_avg_5d"
           },
           {
@@ -1364,7 +1364,7 @@
             "field": "financing_repay",
             "method": "max",
             "api_function": "计算个股近K个有数据交易日融资偿还额最大值。",
-            "value": "取近K个有数据交易日的最大字段值。",
+            "value": "取近K个有数据交易日的最大字段值；单位：元。",
             "example": "r1 = stock.margin.kd_financing_repay_max(k = 5, order = \"value desc\", limit = 10, realtime = 0) -> code, name, value as financing_repay_max_5d"
           },
           {
@@ -1373,7 +1373,7 @@
             "field": "financing_repay",
             "method": "min",
             "api_function": "计算个股近K个有数据交易日融资偿还额最小值。",
-            "value": "取近K个有数据交易日的最小字段值。",
+            "value": "取近K个有数据交易日的最小字段值；单位：元。",
             "example": "r1 = stock.margin.kd_financing_repay_min(k = 5, order = \"value desc\", limit = 10, realtime = 0) -> code, name, value as financing_repay_min_5d"
           },
           {
@@ -1382,7 +1382,7 @@
             "field": "financing_repay",
             "method": "median",
             "api_function": "计算个股近K个有数据交易日融资偿还额中位数。",
-            "value": "取近K个有数据交易日的字段值中位数。",
+            "value": "取近K个有数据交易日的字段值中位数；单位：元。",
             "example": "r1 = stock.margin.kd_financing_repay_median(k = 5, order = \"value desc\", limit = 10, realtime = 0) -> code, name, value as financing_repay_median_5d"
           },
           {
@@ -1391,7 +1391,7 @@
             "field": "financing_repay",
             "method": "change",
             "api_function": "计算个股近K个有数据交易日融资偿还额变化值。",
-            "value": "窗口最新值 - 窗口起始值。",
+            "value": "窗口最新值 - 窗口起始值；单位：元。",
             "example": "r1 = stock.margin.kd_financing_repay_change(k = 5, order = \"value desc\", limit = 10, realtime = 0) -> code, name, value as financing_repay_change_5d"
           },
           {
@@ -1400,7 +1400,7 @@
             "field": "financing_repay",
             "method": "pct_change",
             "api_function": "计算个股近K个有数据交易日融资偿还额变化率。",
-            "value": "窗口变化率，计算为 (latest - first) / first * 100。",
+            "value": "窗口变化率，计算为 (latest - first) / first * 100；单位：%（增长3.5%记为3.5）。",
             "example": "r1 = stock.margin.kd_financing_repay_pct_change(k = 5, order = \"value desc\", limit = 10, realtime = 0) -> code, name, value as financing_repay_pct_change_5d"
           },
           {
@@ -1409,7 +1409,7 @@
             "field": "financing_net_buy",
             "method": "sum",
             "api_function": "计算个股近K个有数据交易日融资净买入合计。",
-            "value": "对近K个有数据交易日的字段值求和。",
+            "value": "对近K个有数据交易日的字段值求和；单位：元。",
             "example": "r1 = stock.margin.kd_financing_net_buy_sum(k = 5, order = \"value desc\", limit = 10, realtime = 0) -> code, name, value as financing_net_buy_sum_5d"
           },
           {
@@ -1418,7 +1418,7 @@
             "field": "financing_net_buy",
             "method": "avg",
             "api_function": "计算个股近K个有数据交易日融资净买入均值。",
-            "value": "对近K个有数据交易日的字段值求均值。",
+            "value": "对近K个有数据交易日的字段值求均值；单位：元。",
             "example": "r1 = stock.margin.kd_financing_net_buy_avg(k = 5, order = \"value desc\", limit = 10, realtime = 0) -> code, name, value as financing_net_buy_avg_5d"
           },
           {
@@ -1427,7 +1427,7 @@
             "field": "financing_net_buy",
             "method": "max",
             "api_function": "计算个股近K个有数据交易日融资净买入最大值。",
-            "value": "取近K个有数据交易日的最大字段值。",
+            "value": "取近K个有数据交易日的最大字段值；单位：元。",
             "example": "r1 = stock.margin.kd_financing_net_buy_max(k = 5, order = \"value desc\", limit = 10, realtime = 0) -> code, name, value as financing_net_buy_max_5d"
           },
           {
@@ -1436,7 +1436,7 @@
             "field": "financing_net_buy",
             "method": "min",
             "api_function": "计算个股近K个有数据交易日融资净买入最小值。",
-            "value": "取近K个有数据交易日的最小字段值。",
+            "value": "取近K个有数据交易日的最小字段值；单位：元。",
             "example": "r1 = stock.margin.kd_financing_net_buy_min(k = 5, order = \"value desc\", limit = 10, realtime = 0) -> code, name, value as financing_net_buy_min_5d"
           },
           {
@@ -1445,7 +1445,7 @@
             "field": "financing_net_buy",
             "method": "median",
             "api_function": "计算个股近K个有数据交易日融资净买入中位数。",
-            "value": "取近K个有数据交易日的字段值中位数。",
+            "value": "取近K个有数据交易日的字段值中位数；单位：元。",
             "example": "r1 = stock.margin.kd_financing_net_buy_median(k = 5, order = \"value desc\", limit = 10, realtime = 0) -> code, name, value as financing_net_buy_median_5d"
           },
           {
@@ -1454,7 +1454,7 @@
             "field": "financing_net_buy",
             "method": "change",
             "api_function": "计算个股近K个有数据交易日融资净买入变化值。",
-            "value": "窗口最新值 - 窗口起始值。",
+            "value": "窗口最新值 - 窗口起始值；单位：元。",
             "example": "r1 = stock.margin.kd_financing_net_buy_change(k = 5, order = \"value desc\", limit = 10, realtime = 0) -> code, name, value as financing_net_buy_change_5d"
           },
           {
@@ -1463,7 +1463,7 @@
             "field": "financing_net_buy",
             "method": "pct_change",
             "api_function": "计算个股近K个有数据交易日融资净买入变化率。",
-            "value": "窗口变化率，计算为 (latest - first) / first * 100。",
+            "value": "窗口变化率，计算为 (latest - first) / first * 100；单位：%（增长3.5%记为3.5）。",
             "example": "r1 = stock.margin.kd_financing_net_buy_pct_change(k = 5, order = \"value desc\", limit = 10, realtime = 0) -> code, name, value as financing_net_buy_pct_change_5d"
           },
           {
@@ -1472,7 +1472,7 @@
             "field": "securities_lending_balance",
             "method": "sum",
             "api_function": "计算个股近K个有数据交易日融券余额合计。",
-            "value": "对近K个有数据交易日的字段值求和。",
+            "value": "对近K个有数据交易日的字段值求和；单位：元。",
             "example": "r1 = stock.margin.kd_securities_lending_balance_sum(k = 5, order = \"value desc\", limit = 10, realtime = 0) -> code, name, value as securities_lending_balance_sum_5d"
           },
           {
@@ -1481,7 +1481,7 @@
             "field": "securities_lending_balance",
             "method": "avg",
             "api_function": "计算个股近K个有数据交易日融券余额均值。",
-            "value": "对近K个有数据交易日的字段值求均值。",
+            "value": "对近K个有数据交易日的字段值求均值；单位：元。",
             "example": "r1 = stock.margin.kd_securities_lending_balance_avg(k = 5, order = \"value desc\", limit = 10, realtime = 0) -> code, name, value as securities_lending_balance_avg_5d"
           },
           {
@@ -1490,7 +1490,7 @@
             "field": "securities_lending_balance",
             "method": "max",
             "api_function": "计算个股近K个有数据交易日融券余额最大值。",
-            "value": "取近K个有数据交易日的最大字段值。",
+            "value": "取近K个有数据交易日的最大字段值；单位：元。",
             "example": "r1 = stock.margin.kd_securities_lending_balance_max(k = 5, order = \"value desc\", limit = 10, realtime = 0) -> code, name, value as securities_lending_balance_max_5d"
           },
           {
@@ -1499,7 +1499,7 @@
             "field": "securities_lending_balance",
             "method": "min",
             "api_function": "计算个股近K个有数据交易日融券余额最小值。",
-            "value": "取近K个有数据交易日的最小字段值。",
+            "value": "取近K个有数据交易日的最小字段值；单位：元。",
             "example": "r1 = stock.margin.kd_securities_lending_balance_min(k = 5, order = \"value desc\", limit = 10, realtime = 0) -> code, name, value as securities_lending_balance_min_5d"
           },
           {
@@ -1508,7 +1508,7 @@
             "field": "securities_lending_balance",
             "method": "median",
             "api_function": "计算个股近K个有数据交易日融券余额中位数。",
-            "value": "取近K个有数据交易日的字段值中位数。",
+            "value": "取近K个有数据交易日的字段值中位数；单位：元。",
             "example": "r1 = stock.margin.kd_securities_lending_balance_median(k = 5, order = \"value desc\", limit = 10, realtime = 0) -> code, name, value as securities_lending_balance_median_5d"
           },
           {
@@ -1517,7 +1517,7 @@
             "field": "securities_lending_balance",
             "method": "change",
             "api_function": "计算个股近K个有数据交易日融券余额变化值。",
-            "value": "窗口最新值 - 窗口起始值。",
+            "value": "窗口最新值 - 窗口起始值；单位：元。",
             "example": "r1 = stock.margin.kd_securities_lending_balance_change(k = 5, order = \"value desc\", limit = 10, realtime = 0) -> code, name, value as securities_lending_balance_change_5d"
           },
           {
@@ -1526,7 +1526,7 @@
             "field": "securities_lending_balance",
             "method": "pct_change",
             "api_function": "计算个股近K个有数据交易日融券余额变化率。",
-            "value": "窗口变化率，计算为 (latest - first) / first * 100。",
+            "value": "窗口变化率，计算为 (latest - first) / first * 100；单位：%（增长3.5%记为3.5）。",
             "example": "r1 = stock.margin.kd_securities_lending_balance_pct_change(k = 5, order = \"value desc\", limit = 10, realtime = 0) -> code, name, value as securities_lending_balance_pct_change_5d"
           },
           {
@@ -1535,7 +1535,7 @@
             "field": "securities_lending_balancevol",
             "method": "sum",
             "api_function": "计算个股近K个有数据交易日融券余量合计。",
-            "value": "对近K个有数据交易日的字段值求和。",
+            "value": "对近K个有数据交易日的字段值求和；单位：股。",
             "example": "r1 = stock.margin.kd_securities_lending_balancevol_sum(k = 5, order = \"value desc\", limit = 10, realtime = 0) -> code, name, value as securities_lending_balancevol_sum_5d"
           },
           {
@@ -1544,7 +1544,7 @@
             "field": "securities_lending_balancevol",
             "method": "avg",
             "api_function": "计算个股近K个有数据交易日融券余量均值。",
-            "value": "对近K个有数据交易日的字段值求均值。",
+            "value": "对近K个有数据交易日的字段值求均值；单位：股。",
             "example": "r1 = stock.margin.kd_securities_lending_balancevol_avg(k = 5, order = \"value desc\", limit = 10, realtime = 0) -> code, name, value as securities_lending_balancevol_avg_5d"
           },
           {
@@ -1553,7 +1553,7 @@
             "field": "securities_lending_balancevol",
             "method": "max",
             "api_function": "计算个股近K个有数据交易日融券余量最大值。",
-            "value": "取近K个有数据交易日的最大字段值。",
+            "value": "取近K个有数据交易日的最大字段值；单位：股。",
             "example": "r1 = stock.margin.kd_securities_lending_balancevol_max(k = 5, order = \"value desc\", limit = 10, realtime = 0) -> code, name, value as securities_lending_balancevol_max_5d"
           },
           {
@@ -1562,7 +1562,7 @@
             "field": "securities_lending_balancevol",
             "method": "min",
             "api_function": "计算个股近K个有数据交易日融券余量最小值。",
-            "value": "取近K个有数据交易日的最小字段值。",
+            "value": "取近K个有数据交易日的最小字段值；单位：股。",
             "example": "r1 = stock.margin.kd_securities_lending_balancevol_min(k = 5, order = \"value desc\", limit = 10, realtime = 0) -> code, name, value as securities_lending_balancevol_min_5d"
           },
           {
@@ -1571,7 +1571,7 @@
             "field": "securities_lending_balancevol",
             "method": "median",
             "api_function": "计算个股近K个有数据交易日融券余量中位数。",
-            "value": "取近K个有数据交易日的字段值中位数。",
+            "value": "取近K个有数据交易日的字段值中位数；单位：股。",
             "example": "r1 = stock.margin.kd_securities_lending_balancevol_median(k = 5, order = \"value desc\", limit = 10, realtime = 0) -> code, name, value as securities_lending_balancevol_median_5d"
           },
           {
@@ -1580,7 +1580,7 @@
             "field": "securities_lending_balancevol",
             "method": "change",
             "api_function": "计算个股近K个有数据交易日融券余量变化值。",
-            "value": "窗口最新值 - 窗口起始值。",
+            "value": "窗口最新值 - 窗口起始值；单位：股。",
             "example": "r1 = stock.margin.kd_securities_lending_balancevol_change(k = 5, order = \"value desc\", limit = 10, realtime = 0) -> code, name, value as securities_lending_balancevol_change_5d"
           },
           {
@@ -1589,7 +1589,7 @@
             "field": "securities_lending_balancevol",
             "method": "pct_change",
             "api_function": "计算个股近K个有数据交易日融券余量变化率。",
-            "value": "窗口变化率，计算为 (latest - first) / first * 100。",
+            "value": "窗口变化率，计算为 (latest - first) / first * 100；单位：%（增长3.5%记为3.5）。",
             "example": "r1 = stock.margin.kd_securities_lending_balancevol_pct_change(k = 5, order = \"value desc\", limit = 10, realtime = 0) -> code, name, value as securities_lending_balancevol_pct_change_5d"
           },
           {
@@ -1598,7 +1598,7 @@
             "field": "securities_lending_sell_vol",
             "method": "sum",
             "api_function": "计算个股近K个有数据交易日融券卖出量合计。",
-            "value": "对近K个有数据交易日的字段值求和。",
+            "value": "对近K个有数据交易日的字段值求和；单位：股。",
             "example": "r1 = stock.margin.kd_securities_lending_sell_vol_sum(k = 5, order = \"value desc\", limit = 10, realtime = 0) -> code, name, value as securities_lending_sell_vol_sum_5d"
           },
           {
@@ -1607,7 +1607,7 @@
             "field": "securities_lending_sell_vol",
             "method": "avg",
             "api_function": "计算个股近K个有数据交易日融券卖出量均值。",
-            "value": "对近K个有数据交易日的字段值求均值。",
+            "value": "对近K个有数据交易日的字段值求均值；单位：股。",
             "example": "r1 = stock.margin.kd_securities_lending_sell_vol_avg(k = 5, order = \"value desc\", limit = 10, realtime = 0) -> code, name, value as securities_lending_sell_vol_avg_5d"
           },
           {
@@ -1616,7 +1616,7 @@
             "field": "securities_lending_sell_vol",
             "method": "max",
             "api_function": "计算个股近K个有数据交易日融券卖出量最大值。",
-            "value": "取近K个有数据交易日的最大字段值。",
+            "value": "取近K个有数据交易日的最大字段值；单位：股。",
             "example": "r1 = stock.margin.kd_securities_lending_sell_vol_max(k = 5, order = \"value desc\", limit = 10, realtime = 0) -> code, name, value as securities_lending_sell_vol_max_5d"
           },
           {
@@ -1625,7 +1625,7 @@
             "field": "securities_lending_sell_vol",
             "method": "min",
             "api_function": "计算个股近K个有数据交易日融券卖出量最小值。",
-            "value": "取近K个有数据交易日的最小字段值。",
+            "value": "取近K个有数据交易日的最小字段值；单位：股。",
             "example": "r1 = stock.margin.kd_securities_lending_sell_vol_min(k = 5, order = \"value desc\", limit = 10, realtime = 0) -> code, name, value as securities_lending_sell_vol_min_5d"
           },
           {
@@ -1634,7 +1634,7 @@
             "field": "securities_lending_sell_vol",
             "method": "median",
             "api_function": "计算个股近K个有数据交易日融券卖出量中位数。",
-            "value": "取近K个有数据交易日的字段值中位数。",
+            "value": "取近K个有数据交易日的字段值中位数；单位：股。",
             "example": "r1 = stock.margin.kd_securities_lending_sell_vol_median(k = 5, order = \"value desc\", limit = 10, realtime = 0) -> code, name, value as securities_lending_sell_vol_median_5d"
           },
           {
@@ -1643,7 +1643,7 @@
             "field": "securities_lending_sell_vol",
             "method": "change",
             "api_function": "计算个股近K个有数据交易日融券卖出量变化值。",
-            "value": "窗口最新值 - 窗口起始值。",
+            "value": "窗口最新值 - 窗口起始值；单位：股。",
             "example": "r1 = stock.margin.kd_securities_lending_sell_vol_change(k = 5, order = \"value desc\", limit = 10, realtime = 0) -> code, name, value as securities_lending_sell_vol_change_5d"
           },
           {
@@ -1652,7 +1652,7 @@
             "field": "securities_lending_sell_vol",
             "method": "pct_change",
             "api_function": "计算个股近K个有数据交易日融券卖出量变化率。",
-            "value": "窗口变化率，计算为 (latest - first) / first * 100。",
+            "value": "窗口变化率，计算为 (latest - first) / first * 100；单位：%（增长3.5%记为3.5）。",
             "example": "r1 = stock.margin.kd_securities_lending_sell_vol_pct_change(k = 5, order = \"value desc\", limit = 10, realtime = 0) -> code, name, value as securities_lending_sell_vol_pct_change_5d"
           },
           {
@@ -1661,7 +1661,7 @@
             "field": "securities_lending_repay_vol",
             "method": "sum",
             "api_function": "计算个股近K个有数据交易日融券偿还量合计。",
-            "value": "对近K个有数据交易日的字段值求和。",
+            "value": "对近K个有数据交易日的字段值求和；单位：股。",
             "example": "r1 = stock.margin.kd_securities_lending_repay_vol_sum(k = 5, order = \"value desc\", limit = 10, realtime = 0) -> code, name, value as securities_lending_repay_vol_sum_5d"
           },
           {
@@ -1670,7 +1670,7 @@
             "field": "securities_lending_repay_vol",
             "method": "avg",
             "api_function": "计算个股近K个有数据交易日融券偿还量均值。",
-            "value": "对近K个有数据交易日的字段值求均值。",
+            "value": "对近K个有数据交易日的字段值求均值；单位：股。",
             "example": "r1 = stock.margin.kd_securities_lending_repay_vol_avg(k = 5, order = \"value desc\", limit = 10, realtime = 0) -> code, name, value as securities_lending_repay_vol_avg_5d"
           },
           {
@@ -1679,7 +1679,7 @@
             "field": "securities_lending_repay_vol",
             "method": "max",
             "api_function": "计算个股近K个有数据交易日融券偿还量最大值。",
-            "value": "取近K个有数据交易日的最大字段值。",
+            "value": "取近K个有数据交易日的最大字段值；单位：股。",
             "example": "r1 = stock.margin.kd_securities_lending_repay_vol_max(k = 5, order = \"value desc\", limit = 10, realtime = 0) -> code, name, value as securities_lending_repay_vol_max_5d"
           },
           {
@@ -1688,7 +1688,7 @@
             "field": "securities_lending_repay_vol",
             "method": "min",
             "api_function": "计算个股近K个有数据交易日融券偿还量最小值。",
-            "value": "取近K个有数据交易日的最小字段值。",
+            "value": "取近K个有数据交易日的最小字段值；单位：股。",
             "example": "r1 = stock.margin.kd_securities_lending_repay_vol_min(k = 5, order = \"value desc\", limit = 10, realtime = 0) -> code, name, value as securities_lending_repay_vol_min_5d"
           },
           {
@@ -1697,7 +1697,7 @@
             "field": "securities_lending_repay_vol",
             "method": "median",
             "api_function": "计算个股近K个有数据交易日融券偿还量中位数。",
-            "value": "取近K个有数据交易日的字段值中位数。",
+            "value": "取近K个有数据交易日的字段值中位数；单位：股。",
             "example": "r1 = stock.margin.kd_securities_lending_repay_vol_median(k = 5, order = \"value desc\", limit = 10, realtime = 0) -> code, name, value as securities_lending_repay_vol_median_5d"
           },
           {
@@ -1706,7 +1706,7 @@
             "field": "securities_lending_repay_vol",
             "method": "change",
             "api_function": "计算个股近K个有数据交易日融券偿还量变化值。",
-            "value": "窗口最新值 - 窗口起始值。",
+            "value": "窗口最新值 - 窗口起始值；单位：股。",
             "example": "r1 = stock.margin.kd_securities_lending_repay_vol_change(k = 5, order = \"value desc\", limit = 10, realtime = 0) -> code, name, value as securities_lending_repay_vol_change_5d"
           },
           {
@@ -1715,7 +1715,7 @@
             "field": "securities_lending_repay_vol",
             "method": "pct_change",
             "api_function": "计算个股近K个有数据交易日融券偿还量变化率。",
-            "value": "窗口变化率，计算为 (latest - first) / first * 100。",
+            "value": "窗口变化率，计算为 (latest - first) / first * 100；单位：%（增长3.5%记为3.5）。",
             "example": "r1 = stock.margin.kd_securities_lending_repay_vol_pct_change(k = 5, order = \"value desc\", limit = 10, realtime = 0) -> code, name, value as securities_lending_repay_vol_pct_change_5d"
           },
           {
@@ -1724,7 +1724,7 @@
             "field": "margin_balance",
             "method": "sum",
             "api_function": "计算个股近K个有数据交易日融资融券余额合计。",
-            "value": "对近K个有数据交易日的字段值求和。",
+            "value": "对近K个有数据交易日的字段值求和；单位：元。",
             "example": "r1 = stock.margin.kd_margin_balance_sum(k = 5, order = \"value desc\", limit = 10, realtime = 0) -> code, name, value as margin_balance_sum_5d"
           },
           {
@@ -1733,7 +1733,7 @@
             "field": "margin_balance",
             "method": "avg",
             "api_function": "计算个股近K个有数据交易日融资融券余额均值。",
-            "value": "对近K个有数据交易日的字段值求均值。",
+            "value": "对近K个有数据交易日的字段值求均值；单位：元。",
             "example": "r1 = stock.margin.kd_margin_balance_avg(k = 5, order = \"value desc\", limit = 10, realtime = 0) -> code, name, value as margin_balance_avg_5d"
           },
           {
@@ -1742,7 +1742,7 @@
             "field": "margin_balance",
             "method": "max",
             "api_function": "计算个股近K个有数据交易日融资融券余额最大值。",
-            "value": "取近K个有数据交易日的最大字段值。",
+            "value": "取近K个有数据交易日的最大字段值；单位：元。",
             "example": "r1 = stock.margin.kd_margin_balance_max(k = 5, order = \"value desc\", limit = 10, realtime = 0) -> code, name, value as margin_balance_max_5d"
           },
           {
@@ -1751,7 +1751,7 @@
             "field": "margin_balance",
             "method": "min",
             "api_function": "计算个股近K个有数据交易日融资融券余额最小值。",
-            "value": "取近K个有数据交易日的最小字段值。",
+            "value": "取近K个有数据交易日的最小字段值；单位：元。",
             "example": "r1 = stock.margin.kd_margin_balance_min(k = 5, order = \"value desc\", limit = 10, realtime = 0) -> code, name, value as margin_balance_min_5d"
           },
           {
@@ -1760,7 +1760,7 @@
             "field": "margin_balance",
             "method": "median",
             "api_function": "计算个股近K个有数据交易日融资融券余额中位数。",
-            "value": "取近K个有数据交易日的字段值中位数。",
+            "value": "取近K个有数据交易日的字段值中位数；单位：元。",
             "example": "r1 = stock.margin.kd_margin_balance_median(k = 5, order = \"value desc\", limit = 10, realtime = 0) -> code, name, value as margin_balance_median_5d"
           },
           {
@@ -1769,7 +1769,7 @@
             "field": "margin_balance",
             "method": "change",
             "api_function": "计算个股近K个有数据交易日融资融券余额变化值。",
-            "value": "窗口最新值 - 窗口起始值。",
+            "value": "窗口最新值 - 窗口起始值；单位：元。",
             "example": "r1 = stock.margin.kd_margin_balance_change(k = 5, order = \"value desc\", limit = 10, realtime = 0) -> code, name, value as margin_balance_change_5d"
           },
           {
@@ -1778,7 +1778,7 @@
             "field": "margin_balance",
             "method": "pct_change",
             "api_function": "计算个股近K个有数据交易日融资融券余额变化率。",
-            "value": "窗口变化率，计算为 (latest - first) / first * 100。",
+            "value": "窗口变化率，计算为 (latest - first) / first * 100；单位：%（增长3.5%记为3.5）。",
             "example": "r1 = stock.margin.kd_margin_balance_pct_change(k = 5, order = \"value desc\", limit = 10, realtime = 0) -> code, name, value as margin_balance_pct_change_5d"
           },
           {
@@ -1787,7 +1787,7 @@
             "field": "margin_diff",
             "method": "sum",
             "api_function": "计算个股近K个有数据交易日融资融券差额合计。",
-            "value": "对近K个有数据交易日的字段值求和。",
+            "value": "对近K个有数据交易日的字段值求和；单位：元。",
             "example": "r1 = stock.margin.kd_margin_diff_sum(k = 5, order = \"value desc\", limit = 10, realtime = 0) -> code, name, value as margin_diff_sum_5d"
           },
           {
@@ -1796,7 +1796,7 @@
             "field": "margin_diff",
             "method": "avg",
             "api_function": "计算个股近K个有数据交易日融资融券差额均值。",
-            "value": "对近K个有数据交易日的字段值求均值。",
+            "value": "对近K个有数据交易日的字段值求均值；单位：元。",
             "example": "r1 = stock.margin.kd_margin_diff_avg(k = 5, order = \"value desc\", limit = 10, realtime = 0) -> code, name, value as margin_diff_avg_5d"
           },
           {
@@ -1805,7 +1805,7 @@
             "field": "margin_diff",
             "method": "max",
             "api_function": "计算个股近K个有数据交易日融资融券差额最大值。",
-            "value": "取近K个有数据交易日的最大字段值。",
+            "value": "取近K个有数据交易日的最大字段值；单位：元。",
             "example": "r1 = stock.margin.kd_margin_diff_max(k = 5, order = \"value desc\", limit = 10, realtime = 0) -> code, name, value as margin_diff_max_5d"
           },
           {
@@ -1814,7 +1814,7 @@
             "field": "margin_diff",
             "method": "min",
             "api_function": "计算个股近K个有数据交易日融资融券差额最小值。",
-            "value": "取近K个有数据交易日的最小字段值。",
+            "value": "取近K个有数据交易日的最小字段值；单位：元。",
             "example": "r1 = stock.margin.kd_margin_diff_min(k = 5, order = \"value desc\", limit = 10, realtime = 0) -> code, name, value as margin_diff_min_5d"
           },
           {
@@ -1823,7 +1823,7 @@
             "field": "margin_diff",
             "method": "median",
             "api_function": "计算个股近K个有数据交易日融资融券差额中位数。",
-            "value": "取近K个有数据交易日的字段值中位数。",
+            "value": "取近K个有数据交易日的字段值中位数；单位：元。",
             "example": "r1 = stock.margin.kd_margin_diff_median(k = 5, order = \"value desc\", limit = 10, realtime = 0) -> code, name, value as margin_diff_median_5d"
           },
           {
@@ -1832,7 +1832,7 @@
             "field": "margin_diff",
             "method": "change",
             "api_function": "计算个股近K个有数据交易日融资融券差额变化值。",
-            "value": "窗口最新值 - 窗口起始值。",
+            "value": "窗口最新值 - 窗口起始值；单位：元。",
             "example": "r1 = stock.margin.kd_margin_diff_change(k = 5, order = \"value desc\", limit = 10, realtime = 0) -> code, name, value as margin_diff_change_5d"
           },
           {
@@ -1841,7 +1841,7 @@
             "field": "margin_diff",
             "method": "pct_change",
             "api_function": "计算个股近K个有数据交易日融资融券差额变化率。",
-            "value": "窗口变化率，计算为 (latest - first) / first * 100。",
+            "value": "窗口变化率，计算为 (latest - first) / first * 100；单位：%（增长3.5%记为3.5）。",
             "example": "r1 = stock.margin.kd_margin_diff_pct_change(k = 5, order = \"value desc\", limit = 10, realtime = 0) -> code, name, value as margin_diff_pct_change_5d"
           },
           {
@@ -1850,7 +1850,7 @@
             "field": "financing_balance_float_mv_ratio",
             "method": "sum",
             "api_function": "计算个股近K个有数据交易日融资余额占流通市值比例合计。",
-            "value": "对近K个有数据交易日的字段值求和。",
+            "value": "对近K个有数据交易日的字段值求和；单位：%。",
             "example": "r1 = stock.margin.kd_financing_balance_float_mv_ratio_sum(k = 5, order = \"value desc\", limit = 10, realtime = 0) -> code, name, value as financing_balance_float_mv_ratio_sum_5d"
           },
           {
@@ -1859,7 +1859,7 @@
             "field": "financing_balance_float_mv_ratio",
             "method": "avg",
             "api_function": "计算个股近K个有数据交易日融资余额占流通市值比例均值。",
-            "value": "对近K个有数据交易日的字段值求均值。",
+            "value": "对近K个有数据交易日的字段值求均值；单位：%。",
             "example": "r1 = stock.margin.kd_financing_balance_float_mv_ratio_avg(k = 5, order = \"value desc\", limit = 10, realtime = 0) -> code, name, value as financing_balance_float_mv_ratio_avg_5d"
           },
           {
@@ -1868,7 +1868,7 @@
             "field": "financing_balance_float_mv_ratio",
             "method": "max",
             "api_function": "计算个股近K个有数据交易日融资余额占流通市值比例最大值。",
-            "value": "取近K个有数据交易日的最大字段值。",
+            "value": "取近K个有数据交易日的最大字段值；单位：%。",
             "example": "r1 = stock.margin.kd_financing_balance_float_mv_ratio_max(k = 5, order = \"value desc\", limit = 10, realtime = 0) -> code, name, value as financing_balance_float_mv_ratio_max_5d"
           },
           {
@@ -1877,7 +1877,7 @@
             "field": "financing_balance_float_mv_ratio",
             "method": "min",
             "api_function": "计算个股近K个有数据交易日融资余额占流通市值比例最小值。",
-            "value": "取近K个有数据交易日的最小字段值。",
+            "value": "取近K个有数据交易日的最小字段值；单位：%。",
             "example": "r1 = stock.margin.kd_financing_balance_float_mv_ratio_min(k = 5, order = \"value desc\", limit = 10, realtime = 0) -> code, name, value as financing_balance_float_mv_ratio_min_5d"
           },
           {
@@ -1886,7 +1886,7 @@
             "field": "financing_balance_float_mv_ratio",
             "method": "median",
             "api_function": "计算个股近K个有数据交易日融资余额占流通市值比例中位数。",
-            "value": "取近K个有数据交易日的字段值中位数。",
+            "value": "取近K个有数据交易日的字段值中位数；单位：%。",
             "example": "r1 = stock.margin.kd_financing_balance_float_mv_ratio_median(k = 5, order = \"value desc\", limit = 10, realtime = 0) -> code, name, value as financing_balance_float_mv_ratio_median_5d"
           },
           {
@@ -1895,7 +1895,7 @@
             "field": "financing_balance_float_mv_ratio",
             "method": "change",
             "api_function": "计算个股近K个有数据交易日融资余额占流通市值比例变化值。",
-            "value": "窗口最新值 - 窗口起始值。",
+            "value": "窗口最新值 - 窗口起始值；单位：%。",
             "example": "r1 = stock.margin.kd_financing_balance_float_mv_ratio_change(k = 5, order = \"value desc\", limit = 10, realtime = 0) -> code, name, value as financing_balance_float_mv_ratio_change_5d"
           },
           {
@@ -1904,7 +1904,7 @@
             "field": "financing_balance_float_mv_ratio",
             "method": "pct_change",
             "api_function": "计算个股近K个有数据交易日融资余额占流通市值比例变化率。",
-            "value": "窗口变化率，计算为 (latest - first) / first * 100。",
+            "value": "窗口变化率，计算为 (latest - first) / first * 100；单位：%（增长3.5%记为3.5）。",
             "example": "r1 = stock.margin.kd_financing_balance_float_mv_ratio_pct_change(k = 5, order = \"value desc\", limit = 10, realtime = 0) -> code, name, value as financing_balance_float_mv_ratio_pct_change_5d"
           }
         ],
@@ -1949,11 +1949,11 @@
             "报告期"
           ],
           "holder_num": [
-            "股东户数",
+            "股东户数（户）",
             "股东人数"
           ],
           "holder_total_num": [
-            "股东总户数"
+            "股东总户数（户）"
           ],
           "holder_name": [
             "股东名称"
@@ -1965,20 +1965,20 @@
             "股东排名"
           ],
           "holder_quantity": [
-            "持股数量"
+            "持股数量（股）"
           ],
           "holder_pct": [
-            "持股比例",
+            "持股比例（%，3.5%记为3.5）",
             "持股占比"
           ],
           "holder_accpledge": [
-            "累计质押股份"
+            "累计质押股份（股）"
           ],
           "holder_accfrozen": [
-            "累计冻结股份"
+            "累计冻结股份（股）"
           ],
           "holder_pledge_ratio": [
-            "股东质押比例"
+            "股东质押比例（%，3.5%记为3.5）"
           ],
           "share_type": [
             "股份类型"
@@ -2034,13 +2034,13 @@
             "质押方"
           ],
           "pledge_ratio": [
-            "质押比例"
+            "质押比例（%，3.5%记为3.5）"
           ],
           "pledge_sharenum": [
-            "质押股数"
+            "质押股数（股）"
           ],
           "pledge_shares": [
-            "质押股份数"
+            "质押股份数（股）"
           ],
           "discharge_date": [
             "解押日期"
@@ -2049,19 +2049,19 @@
             "是否解押"
           ],
           "total_holding_shr": [
-            "总持股数"
+            "总持股数（股）"
           ],
           "total_pledge_shr": [
-            "总质押股数"
+            "总质押股数（股）"
           ],
           "pledge_ratio_comp": [
-            "占公司总股本比例"
+            "占公司总股本比例（%，3.5%记为3.5）"
           ],
           "pledge_total_num": [
-            "累计质押数量"
+            "累计质押数量（股）"
           ],
           "frozen_total_num": [
-            "累计冻结数量"
+            "累计冻结数量（股）"
           ]
         },
         "api": [
@@ -2114,16 +2114,16 @@
             "分红进度"
           ],
           "div_cash_pre_tax": [
-            "税前现金分红"
+            "税前现金分红（元/股）"
           ],
           "div_total_cash": [
-            "现金分红总额"
+            "现金分红总额（元）"
           ],
           "div_conversed_rate": [
-            "转增比例"
+            "转增比例（股/股，0.5表示10转5）"
           ],
           "div_bonus_rate": [
-            "送股比例"
+            "送股比例（股/股，0.4表示10送4）"
           ],
           "ai_type": [
             "增发类型"
@@ -2132,19 +2132,19 @@
             "增发进度"
           ],
           "ai_price": [
-            "增发价格"
+            "增发价格（元）"
           ],
           "ai_raised_funds": [
-            "增发募资金额"
+            "增发募资金额（元）"
           ],
           "ri_progress": [
             "配股进度"
           ],
           "ri_price": [
-            "配股价格"
+            "配股价格（元）"
           ],
           "ri_ratio": [
-            "配股比例"
+            "配股比例（股/股，0.3表示10配3）"
           ],
           "holder_name": [
             "股东名称"
@@ -2153,25 +2153,25 @@
             "解禁日期"
           ],
           "free_num": [
-            "解禁数量"
+            "解禁数量（股）"
           ],
           "limited_num": [
-            "限售数量"
+            "限售数量（股）"
           ],
           "ipo_price": [
-            "IPO发行价"
+            "IPO发行价（元）"
           ],
           "ipo_amount": [
-            "IPO发行数量"
+            "IPO发行数量（股）"
           ],
           "online_ratio": [
-            "网上中签率"
+            "网上中签率（%，3.5%记为3.5）"
           ],
           "diluted_pe_ratio": [
-            "摊薄市盈率"
+            "摊薄市盈率（倍）"
           ],
           "issue_total_mv": [
-            "发行总市值"
+            "发行总市值（元）"
           ]
         },
         "api": [
@@ -2228,25 +2228,25 @@
             "业绩预告摘要"
           ],
           "net_profit_chg_ratio": [
-            "净利润变动比例"
+            "净利润变动比例（%，3.5%记为3.5）"
           ],
           "net_profit_chg_lower": [
-            "净利润变动下限"
+            "净利润变动下限（%，3.5%记为3.5）"
           ],
           "net_profit_chg_upper": [
-            "净利润变动上限"
+            "净利润变动上限（%，3.5%记为3.5）"
           ],
           "net_profit_lower": [
-            "净利润下限"
+            "净利润下限（单位见currency；CNY为元）"
           ],
           "net_profit_upper": [
-            "净利润上限"
+            "净利润上限（单位见currency；CNY为元）"
           ],
           "revenue_lower": [
-            "营业收入下限"
+            "营业收入下限（单位见currency；CNY为元）"
           ],
           "revenue_upper": [
-            "营业收入上限"
+            "营业收入上限（单位见currency；CNY为元）"
           ]
         },
         "api": [
@@ -2300,34 +2300,34 @@
             "项目细分名称"
           ],
           "segment_sales": [
-            "分部收入",
+            "分部收入（元）",
             "主营收入"
           ],
           "segment_cost": [
-            "分部成本",
+            "分部成本（元）",
             "主营成本"
           ],
           "segment_profit": [
-            "分部利润",
+            "分部利润（元）",
             "毛利"
           ],
           "gross_profit_margin": [
-            "毛利率"
+            "毛利率（%，3.5%记为3.5）"
           ],
           "pct_segment_sales": [
-            "收入占比"
+            "收入占比（%，3.5%记为3.5）"
           ],
           "inc_segment_sales": [
-            "收入同比增速"
+            "收入同比增速（%，3.5%记为3.5）"
           ],
           "info_compname": [
             "客户或供应商名称"
           ],
           "salesamount": [
-            "销售或采购金额"
+            "销售或采购金额（元）"
           ],
           "pct": [
-            "占比"
+            "占比（%，3.5%记为3.5）"
           ],
           "interchange_code": [
             "类型代码",
@@ -2392,50 +2392,50 @@
             "tradedate"
           ],
           "preclose": [
-            "昨收价",
+            "昨收点位（点）",
             "前收盘价",
             "preclose"
           ],
           "open": [
-            "开盘价",
+            "开盘点位（点）",
             "open"
           ],
           "close": [
-            "收盘价",
+            "收盘点位（点）",
             "最新价",
             "close"
           ],
           "high": [
-            "最高价",
+            "最高点位（点）",
             "high"
           ],
           "low": [
-            "最低价",
+            "最低点位（点）",
             "low"
           ],
           "avg_price": [
-            "均价",
+            "均值点位（点）",
             "avg_price"
           ],
           "differ": [
-            "涨跌额",
+            "涨跌点数（点）",
             "differ"
           ],
           "pct": [
-            "涨幅",
+            "涨跌幅（%，3.5%记为3.5）",
             "涨跌幅",
             "pct"
           ],
           "turn_ratio": [
-            "换手率",
+            "换手率（%，3.5%记为3.5）",
             "turn_ratio"
           ],
           "amount": [
-            "成交额",
+            "成交额（元）",
             "amount"
           ],
           "volumn": [
-            "成交量",
+            "成交量（股）",
             "volume",
             "volumn"
           ]
@@ -2476,46 +2476,46 @@
             "tradedate"
           ],
           "pe": [
-            "PE",
+            "PE（倍）",
             "pe"
           ],
           "pe_lyr": [
-            "静态市盈率",
+            "静态市盈率（倍）",
             "PE LYR",
             "pe_lyr"
           ],
           "pe_ttm": [
-            "滚动市盈率",
+            "滚动市盈率（倍）",
             "PE TTM",
             "pe_ttm"
           ],
           "pb": [
-            "PB",
+            "PB（倍）",
             "pb"
           ],
           "pb_mrq": [
-            "市净率MRQ",
+            "市净率MRQ（倍）",
             "pb_mrq"
           ],
           "ps": [
-            "PS",
+            "PS（倍）",
             "ps"
           ],
           "ps_lyr": [
-            "静态市销率",
+            "静态市销率（倍）",
             "ps_lyr"
           ],
           "ps_ttm": [
-            "滚动市销率",
+            "滚动市销率（倍）",
             "ps_ttm"
           ],
           "market_value": [
-            "市值",
+            "市值（元）",
             "总市值",
             "market_value"
           ],
           "float_mv": [
-            "流通市值",
+            "流通市值（元）",
             "float_mv"
           ]
         },
@@ -2714,37 +2714,37 @@
             "tradedate"
           ],
           "preclose": [
-            "昨收价",
+            "昨收点位（点）",
             "前收盘价",
             "preclose"
           ],
           "open": [
-            "开盘价",
+            "开盘点位（点）",
             "open"
           ],
           "close": [
-            "收盘价",
+            "收盘点位（点）",
             "最新价",
             "close"
           ],
           "high": [
-            "最高价",
+            "最高点位（点）",
             "high"
           ],
           "low": [
-            "最低价",
+            "最低点位（点）",
             "low"
           ],
           "avg_price": [
-            "均价",
+            "均值点位（点）",
             "avg_price"
           ],
           "differ": [
-            "涨跌额",
+            "涨跌点数（点）",
             "differ"
           ],
           "pct": [
-            "涨幅",
+            "涨跌幅（%，3.5%记为3.5）",
             "涨跌幅",
             "pct"
           ],
@@ -2753,11 +2753,11 @@
             "turn_ratio"
           ],
           "amount": [
-            "成交额",
+            "成交额（元）",
             "amount"
           ],
           "volumn": [
-            "成交量",
+            "成交量（股）",
             "volume",
             "volumn"
           ]
@@ -2800,64 +2800,64 @@
             "tradedate"
           ],
           "huge_buy": [
-            "超大单流入",
+            "超大单流入（元）",
             "huge_buy"
           ],
           "huge_sell": [
-            "超大单流出",
+            "超大单流出（元）",
             "huge_sell"
           ],
           "huge_ratio": [
-            "超大单净流入占比",
+            "超大单净流入占比（%，3.5%记为3.5）",
             "huge_ratio"
           ],
           "large_buy": [
-            "大单流入",
+            "大单流入（元）",
             "large_buy"
           ],
           "large_sell": [
-            "大单流出",
+            "大单流出（元）",
             "large_sell"
           ],
           "large_net": [
-            "大单净流入",
+            "大单净流入（元）",
             "large_net"
           ],
           "large_ratio": [
-            "大单净流入占比",
+            "大单净流入占比（%，3.5%记为3.5）",
             "large_ratio"
           ],
           "medium_buy": [
-            "中单流入",
+            "中单流入（元）",
             "medium_buy"
           ],
           "medium_sell": [
-            "中单流出",
+            "中单流出（元）",
             "medium_sell"
           ],
           "small_buy": [
-            "小单流入",
+            "小单流入（元）",
             "small_buy"
           ],
           "small_sell": [
-            "小单流出",
+            "小单流出（元）",
             "small_sell"
           ],
           "main_buy": [
-            "主力流入",
+            "主力流入（元）",
             "main_buy"
           ],
           "main_sell": [
-            "主力流出",
+            "主力流出（元）",
             "main_sell"
           ],
           "main_net": [
-            "主力净流入",
+            "主力净流入（元）",
             "主力资金流向",
             "main_net"
           ],
           "main_ratio": [
-            "主力净流入占比",
+            "主力净流入占比（%，3.5%记为3.5）",
             "main_ratio"
           ]
         },
@@ -2903,29 +2903,29 @@
             "tradedate"
           ],
           "pe": [
-            "PE",
+            "PE（倍）",
             "pe"
           ],
           "pe_lyr": [
-            "静态市盈率",
+            "静态市盈率（倍）",
             "PE LYR",
             "pe_lyr"
           ],
           "pe_ttm": [
-            "滚动市盈率",
+            "滚动市盈率（倍）",
             "PE TTM",
             "pe_ttm"
           ],
           "pb": [
-            "PB",
+            "PB（倍）",
             "pb"
           ],
           "ps": [
-            "PS",
+            "PS（倍）",
             "ps"
           ],
           "ps_lyr": [
-            "静态市销率",
+            "静态市销率（倍）",
             "ps_lyr"
           ]
         },
@@ -3027,67 +3027,67 @@
             "tradedate"
           ],
           "preclose": [
-            "昨收价",
+            "昨收价（元）",
             "前收盘价",
             "preclose"
           ],
           "open": [
-            "开盘价",
+            "开盘价（元）",
             "open"
           ],
           "close": [
-            "收盘价",
+            "收盘价（元）",
             "最新价",
             "close"
           ],
           "high": [
-            "最高价",
+            "最高价（元）",
             "high"
           ],
           "low": [
-            "最低价",
+            "最低价（元）",
             "low"
           ],
           "avg_price": [
-            "均价",
+            "均价（元）",
             "avg_price"
           ],
           "differ": [
-            "涨跌额",
+            "涨跌额（元）",
             "differ"
           ],
           "pct": [
-            "涨幅",
+            "涨跌幅（%，3.5%记为3.5）",
             "涨跌幅",
             "pct"
           ],
           "turn_ratio": [
-            "换手率",
+            "换手率（%，3.5%记为3.5）",
             "turn_ratio"
           ],
           "amount": [
-            "成交额",
+            "成交额（元）",
             "amount"
           ],
           "volumn": [
-            "成交量",
+            "成交量（份）",
             "volume",
             "volumn"
           ],
           "nav_unit": [
-            "单位净值",
+            "单位净值（元/份）",
             "nav_unit"
           ],
           "amplitude": [
-            "振幅",
+            "振幅（%，3.5%记为3.5）",
             "amplitude"
           ],
           "discount": [
-            "折价率",
+            "折价额（元，单位净值-收盘价）",
             "discount"
           ],
           "unit_total": [
-            "累计净值",
+            "基金份额（份）",
             "unit_total"
           ]
         },
@@ -3156,42 +3156,42 @@
             "tradedate"
           ],
           "preclose": [
-            "昨收价",
+            "昨收价（元）",
             "前收盘价",
             "preclose"
           ],
           "open": [
-            "开盘价",
+            "开盘价（元）",
             "open"
           ],
           "close": [
-            "收盘价",
+            "收盘价（元）",
             "最新价",
             "close"
           ],
           "high": [
-            "最高价",
+            "最高价（元）",
             "high"
           ],
           "low": [
-            "最低价",
+            "最低价（元）",
             "low"
           ],
           "pct": [
-            "涨幅",
+            "涨跌幅（%，3.5%记为3.5）",
             "涨跌幅",
             "pct"
           ],
           "turn_ratio": [
-            "换手率",
+            "换手率（%，3.5%记为3.5）",
             "turn_ratio"
           ],
           "amount": [
-            "成交额",
+            "成交额（元）",
             "amount"
           ],
           "volumn": [
-            "成交量",
+            "成交量（张）",
             "volume",
             "volumn"
           ]
@@ -3254,21 +3254,21 @@
             "是否活跃"
           ],
           "loop_times": [
-            "激活次数",
+            "激活次数（次）",
             "轮动次数"
           ],
           "max_exist_days": [
-            "最长持续天数"
+            "最长持续天数（天）"
           ],
           "slience_days": [
-            "沉寂天数"
+            "沉寂天数（天）"
           ],
           "company_num": [
-            "历史关联公司数",
+            "历史关联公司数（家）",
             "公司数"
           ],
           "current_company_num": [
-            "当前公司数",
+            "当前公司数（家）",
             "当前活跃公司数"
           ],
           "core_event_desc": [
@@ -3326,17 +3326,17 @@
             "状态标签"
           ],
           "company_num": [
-            "公司数",
+            "公司数（家）",
             "活跃公司数"
           ],
           "avg_lift": [
-            "平均涨幅"
+            "平均涨幅（%，3.5%记为3.5）"
           ],
           "limited_count": [
-            "涨停数量"
+            "涨停数量（只）"
           ],
           "board_strength": [
-            "大盘强弱",
+            "大盘涨跌幅（%，3.5%记为3.5）",
             "大盘涨跌幅"
           ]
         },

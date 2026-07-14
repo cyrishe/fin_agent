@@ -33,6 +33,11 @@ def test_design_final_uses_conversation_core_blocks_without_complex_renderers() 
                 "design_artifact_id": "finance_tool_spec_market_state",
                 "design_revision": 2,
             },
+            "design_context": {
+                "scenario": "create_first_round",
+                "round": 1,
+                "is_first_round": True,
+            },
             "existing_analysis": {"analyzed": False, "current_behavior": [], "gaps": [], "affected_areas": [], "evidence": []},
         },
         stage="design",
@@ -45,6 +50,8 @@ def test_design_final_uses_conversation_core_blocks_without_complex_renderers() 
     assert artifact["data"]["artifact_type"] == "finance.tool_spec"
     assert artifact["data"]["artifact_id"] == "finance_tool_spec_market_state"
     assert artifact["data"]["revision"] == 2
+    assert artifact["data"]["design_context"]["scenario"] == "create_first_round"
+    assert artifact["data"]["design_context"]["round"] == 1
     assert artifact["data"]["items"][1]["value"] == "1 个字段"
     assert artifact["data"]["details"]["rules"][0]["name"] == "趋势规则"
     assert artifact["data"]["details"]["data_requirements"][0]["availability"] == "verified"
@@ -94,10 +101,18 @@ def test_coding_final_defaults_to_summary_artifact_and_assessment() -> None:
         {
             "status": "code_ready",
             "message": "实现和样例测试已完成。",
-            "code_summary": "实现市场状态合成逻辑。",
-            "files": [
-                {"path": "tool.py", "role": "tool", "content": "def run(inputs):\n    return inputs\n"},
-            ],
+            "implementation": {
+                "summary": "实现市场状态合成逻辑。",
+                "entry_module": "main",
+                "modules": [
+                    {
+                        "module_id": "main",
+                        "role": "动态执行入口",
+                        "entrypoint": "run",
+                        "source_code": "def run(inputs):\n    return inputs\n",
+                    },
+                ],
+            },
             "tests": [
                 {"name": "basic", "status": "passed", "summary": "基础场景通过"},
             ],
@@ -107,6 +122,8 @@ def test_coding_final_defaults_to_summary_artifact_and_assessment() -> None:
     )
 
     assert [block["block_type"] for block in blocks] == ["narrative", "artifact", "assessment"]
+    assert blocks[1]["data"]["items"][0] == {"label": "实现模块", "value": "1 个"}
+    assert "files" not in blocks[1]["data"]["details"]
     assert not {"table", "flowchart", "code"} & {block["block_type"] for block in blocks}
     assessment = next(block for block in blocks if block["block_type"] == "assessment")
     assert assessment["data"]["overall"] == "pass"
@@ -132,3 +149,50 @@ def test_explicit_legacy_action_block_is_not_forwarded() -> None:
     )
 
     assert all(block["block_type"] != "action" for block in blocks)
+
+
+def test_high_frequency_sdk_deltas_are_not_forwarded_as_surface_blocks() -> None:
+    builder = LlmStreamBlockBuilder(run_id="run_test")
+
+    assert builder.event_to_blocks({"source": "codex", "type": "agent_delta", "content": "{"}) == []
+    assert builder.event_to_blocks({"source": "codex", "type": "reasoning_delta", "content": "raw token"}) == []
+    assert builder.event_to_blocks({"source": "codex", "type": "event", "content": "thread/tokenUsage/updated"}) == []
+
+    summary = builder.event_to_blocks({"source": "codex", "type": "reasoning_summary_delta", "content": "正在核对金融口径"})
+    assert len(summary) == 1
+    assert summary[0]["block_type"] == "workflow"
+    assert summary[0]["block_id"] == "design_live_progress"
+    assert summary[0]["data"]["role"] == "live_progress"
+    assert "正在核对金融口径" not in str(summary[0])
+
+
+def test_runtime_events_become_user_facing_progress_without_raw_sdk_text() -> None:
+    builder = LlmStreamBlockBuilder(run_id="run_progress")
+
+    start = builder.event_to_blocks({
+        "source": "harness",
+        "type": "stage_start",
+        "content": "codex sdk skill stage started: design",
+        "metadata": {"stage": "design"},
+    })
+    context = builder.event_to_blocks({
+        "source": "harness",
+        "type": "context_ready",
+        "content": "/private/tmp/raw/context.json",
+        "metadata": {"stage": "design", "bundle_dir": "/private/tmp/raw"},
+    })
+    reasoning = builder.event_to_blocks({
+        "source": "codex",
+        "type": "reasoning_summary_delta",
+        "content": '{"partial":"raw model text"}',
+        "metadata": {"stage": "design"},
+    })
+
+    assert [block["block_type"] for block in start] == ["status", "workflow"]
+    assert start[0]["content"] == "正在准备任务"
+    assert context[0]["content"] == "需求上下文已整理"
+    assert context[-1]["data"]["current_step"] == "scope"
+    assert reasoning[0]["data"]["current_step"] == "interface"
+    assert reasoning[0]["data"]["summary"] == "正在整理输入输出…"
+    assert "/private/tmp" not in str(context)
+    assert "raw model text" not in str(reasoning[0])

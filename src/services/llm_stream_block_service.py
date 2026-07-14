@@ -13,10 +13,30 @@ def _trim(value: Any) -> str:
 class LlmStreamBlockBuilder:
     """Normalize LLM/Codex runtime events into stable frontend render blocks."""
 
+    PROGRESS_STEPS = {
+        "design": [
+            ("understand", "理解核心目标"),
+            ("scope", "收敛功能范围"),
+            ("interface", "整理输入输出"),
+            ("rules", "形成判断规则"),
+            ("boundaries", "检查数据与边界"),
+            ("deliver", "生成可确认设计"),
+        ],
+        "coding": [
+            ("read_design", "读取已确认设计"),
+            ("plan", "规划实现方式"),
+            ("implement", "生成工具代码"),
+            ("test", "运行样例验证"),
+            ("review", "检查实现结果"),
+            ("deliver", "准备可运行产物"),
+        ],
+    }
+
     def __init__(self, *, run_id: str = "") -> None:
         self.run_id = _trim(run_id) or uuid.uuid4().hex
         self.started_at = time.time()
         self.seq = 0
+        self.progress_positions: Dict[str, int] = {}
 
     def event_to_blocks(self, event: Mapping[str, Any]) -> List[Dict[str, Any]]:
         source = _trim(event.get("source"))
@@ -27,24 +47,12 @@ class LlmStreamBlockBuilder:
         if not content and event_type not in {"turn_started", "turn_completed", "stage_start", "stage_result", "context_ready", "final"}:
             return []
 
-        if source == "codex" and event_type in {"reasoning_summary_delta", "reasoning_delta", "plan_delta"}:
-            return [self._block(
-                block_id=f"{stage}_thinking",
-                block_type="markdown",
-                mode="append",
-                title="思考过程",
-                content=content,
-                stage=stage,
-            )]
-        if source == "codex" and event_type in {"agent_delta", "agent_update", "item_completed"}:
-            return [self._block(
-                block_id=f"{stage}_assistant",
-                block_type="markdown",
-                mode="append",
-                title="模型输出",
-                content=content,
-                stage=stage,
-            )]
+        if source == "codex" and event_type in {"reasoning_summary_delta", "plan_delta"}:
+            return [self._progress_block(stage=stage, event_type=event_type)]
+        if source == "codex" and event_type in {"agent_update", "item_completed"}:
+            return [self._progress_block(stage=stage, event_type=event_type)]
+        if source == "codex" and event_type in {"agent_delta", "reasoning_delta", "event"}:
+            return []
         if source == "tool" and event_type in {"command_output", "mcp_progress"}:
             return [self._block(
                 block_id=f"{stage}_tool_output",
@@ -58,15 +66,69 @@ class LlmStreamBlockBuilder:
             return self.final_to_blocks(event, stage=stage)
 
         status_text = self._status_text(event_type, content)
-        return [self._block(
+        blocks = [self._block(
             block_id=f"{stage}_status",
             block_type="status",
             mode="replace",
             title="执行状态",
             content=status_text,
             stage=stage,
-            data={"source": source, "event_type": event_type, "metadata": dict(metadata)},
+            data={"source": source, "event_type": event_type},
         )] if status_text else []
+        if event_type in {"stage_start", "context_ready", "tool_call", "turn_started", "turn_completed", "stage_result", "error"}:
+            blocks.append(self._progress_block(stage=stage, event_type=event_type))
+        return blocks
+
+    def _progress_block(self, *, stage: str, event_type: str) -> Dict[str, Any]:
+        stage_name = stage if stage in self.PROGRESS_STEPS else "design"
+        steps = self.PROGRESS_STEPS[stage_name]
+        current = int(self.progress_positions.get(stage_name, 0))
+        complete = False
+        failed = event_type == "error"
+        if event_type == "stage_start":
+            current = 0
+        elif event_type == "context_ready":
+            current = max(current, 1)
+        elif event_type in {"tool_call", "turn_started"}:
+            current = max(current, 1)
+        elif event_type in {"reasoning_summary_delta", "plan_delta"}:
+            current = min(len(steps) - 1, max(2, current + 1))
+        elif event_type in {"agent_update", "item_completed"}:
+            current = max(current, len(steps) - 2)
+        elif event_type == "turn_completed":
+            current = len(steps) - 1
+        elif event_type == "stage_result":
+            current = len(steps) - 1
+            complete = True
+        self.progress_positions[stage_name] = current
+        status = "error" if failed else ("completed" if complete else "running")
+        items = []
+        for index, (step_id, title) in enumerate(steps):
+            item_status = "completed" if complete or index < current else ("running" if index == current else "pending")
+            if failed and index == current:
+                item_status = "error"
+            items.append({"id": step_id, "title": title, "status": item_status})
+        summary = (
+            "处理失败，请查看错误信息。"
+            if failed
+            else ("设计结果已形成。" if complete and stage_name == "design" else
+                  "实现结果已形成。" if complete else f"正在{steps[current][1]}…")
+        )
+        return self._block(
+            block_id=f"{stage_name}_live_progress",
+            block_type="workflow",
+            mode="replace",
+            title="设计进展" if stage_name == "design" else "实现进展",
+            stage=stage_name,
+            data={
+                "role": "live_progress",
+                "stage": stage_name,
+                "status": status,
+                "current_step": steps[current][0],
+                "summary": summary,
+                "items": items,
+            },
+        )
 
     def final_to_blocks(self, final: Mapping[str, Any], *, stage: str = "") -> List[Dict[str, Any]]:
         stage_name = _trim(stage) or self._infer_stage(final)
@@ -120,6 +182,7 @@ class LlmStreamBlockBuilder:
         design = final.get("design") if isinstance(final.get("design"), Mapping) else {}
         understanding = final.get("understanding") if isinstance(final.get("understanding"), Mapping) else {}
         existing_analysis = final.get("existing_analysis") if isinstance(final.get("existing_analysis"), Mapping) else {}
+        design_context = final.get("design_context") if isinstance(final.get("design_context"), Mapping) else {}
         artifact_context = final.get("design_artifact") if isinstance(final.get("design_artifact"), Mapping) else {}
         artifact_id = _trim(artifact_context.get("design_artifact_id"))
         artifact_revision = int(artifact_context.get("design_revision") or 0)
@@ -154,6 +217,7 @@ class LlmStreamBlockBuilder:
                     "lifecycle": "reviewable" if reviewable else "draft",
                     "revision": artifact_revision,
                     "summary": _trim(design.get("description")) or goal,
+                    "design_context": dict(design_context),
                     "items": [
                         {"label": "工具标识", "value": _trim(design.get("tool_name")) or "-"},
                         {"label": "输入", "value": f"{len(design.get('inputs') or [])} 个字段"},
@@ -265,6 +329,8 @@ class LlmStreamBlockBuilder:
         return questions[:5]
 
     def _coding_final_blocks(self, final: Mapping[str, Any], *, status: str, stage: str) -> List[Dict[str, Any]]:
+        implementation = final.get("implementation") if isinstance(final.get("implementation"), Mapping) else {}
+        modules = [item for item in implementation.get("modules") or [] if isinstance(item, Mapping)]
         blocks = [self._block(
             block_id=f"{stage}_final_summary",
             block_type="narrative",
@@ -273,13 +339,12 @@ class LlmStreamBlockBuilder:
             content="\n".join(
                 item for item in [
                     _trim(final.get("message")),
-                    _trim(final.get("code_summary")),
+                    _trim(implementation.get("summary")),
                 ] if item
             ),
             stage=stage,
         )]
-        files = [item for item in final.get("files") or [] if isinstance(item, Mapping)]
-        if files:
+        if modules:
             blocks.append(self._block(
                 block_id=f"{stage}_artifact",
                 block_type="artifact",
@@ -290,18 +355,20 @@ class LlmStreamBlockBuilder:
                     "artifact_type": "finance.custom_tool_implementation",
                     "lifecycle": "draft",
                     "version": "0.1",
-                    "summary": _trim(final.get("code_summary")) or f"已生成 {len(files)} 个实现文件。",
+                    "summary": _trim(implementation.get("summary")) or f"已生成 {len(modules)} 个动态实现模块。",
                     "items": [
-                        {"label": "实现文件", "value": f"{len(files)} 个"},
+                        {"label": "实现模块", "value": f"{len(modules)} 个"},
+                        {"label": "加载方式", "value": "数据库动态加载"},
                     ],
                     "details": {
-                        "files": [
+                        "modules": [
                             {
-                                "path": _trim(item.get("path")),
+                                "module_id": _trim(item.get("module_id")),
                                 "role": _trim(item.get("role")),
-                                "lines": len(_trim(item.get("content")).splitlines()),
+                                "entrypoint": _trim(item.get("entrypoint")),
+                                "lines": len(_trim(item.get("source_code")).splitlines()),
                             }
-                            for item in files
+                            for item in modules
                         ]
                     },
                 },
@@ -400,17 +467,13 @@ class LlmStreamBlockBuilder:
     @staticmethod
     def _status_text(event_type: str, content: str) -> str:
         labels = {
-            "stage_start": "阶段开始",
-            "context_ready": "上下文资料已准备",
-            "tool_call": "调用 Codex",
-            "turn_started": "模型回合开始",
-            "turn_completed": "模型回合完成",
+            "stage_start": "正在准备任务",
+            "context_ready": "需求上下文已整理",
+            "tool_call": "设计模型已启动",
+            "turn_started": "开始分析核心需求",
+            "turn_completed": "分析完成，正在校验结果",
             "tool_result": "工具调用完成",
-            "stage_result": "阶段结果已解析",
+            "stage_result": "结构化结果已校验",
+            "error": "处理失败",
         }
-        label = labels.get(event_type, content)
-        if not label:
-            return ""
-        if content and content != label:
-            return f"{label}: {content}"
-        return label
+        return labels.get(event_type, "")

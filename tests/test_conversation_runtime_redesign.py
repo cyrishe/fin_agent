@@ -26,34 +26,6 @@ def test_interaction_preprocessor_normalizes_minimal_top_level_payload():
     assert normalized["info_ready"] is False
 
 
-def test_interaction_preprocessor_builds_recent_rounds_context_from_questions_and_answer_summaries():
-    preprocessor = AssistantInteractionPreprocessor()
-
-    recent_rounds = preprocessor._build_recent_rounds_context(  # noqa: SLF001
-        thread_context={
-            "context_window": [
-                {"round": 8, "role": "user", "text": "先看一下机器人概念龙头"},
-                {"round": 8, "role": "assistant", "text": "本轮围绕机器人概念龙头给出识别结果。完成度：回答已结束。"},
-                {"round": 9, "role": "user", "text": "他们的资金面怎么样"},
-                {"round": 9, "role": "assistant", "text": "本轮围绕两只股票的资金面给出结果总结。完成度：回答已结束。"},
-            ]
-        }
-    )
-
-    assert recent_rounds == [
-        {
-            "round": 8,
-            "user_question": "先看一下机器人概念龙头",
-            "assistant_answer_summary": "本轮围绕机器人概念龙头给出识别结果。完成度：回答已结束。",
-        },
-        {
-            "round": 9,
-            "user_question": "他们的资金面怎么样",
-            "assistant_answer_summary": "本轮围绕两只股票的资金面给出结果总结。完成度：回答已结束。",
-        },
-    ]
-
-
 class _StubInteractionPreprocessor:
     def classify(self, **_: object) -> dict:
         return {
@@ -272,7 +244,8 @@ def test_conversation_preprocess_emits_parallel_turn_frame():
     turn_frame = result["turn_frame"]
 
     assert result["domain"] == "system"
-    assert result["dispatch_plan"]["selected_agent"] == "system_agent"
+    assert result["dispatch_plan"]["selected_agent"] == "default_assistant"
+    assert result["dispatch_plan"]["turn_mode"] == "system_operation"
     assert "优化" in turn_frame["current_goal"]
     assert "股票信息" in turn_frame["current_goal"]
     assert turn_frame["focus_object"]["type"] in {"skill", "reference", "catalog"}
@@ -336,8 +309,8 @@ def test_conversation_preprocess_exposes_four_module_eight_node_contract():
         "execution_runtime",
     ]
     assert list(node_by_name) == [
-        "interaction_preprocess",
         "context_resolution",
+        "interaction_preprocess",
         "conversation_task_finalization",
         "conversation_state_update",
         "dispatch_planning",
@@ -345,6 +318,7 @@ def test_conversation_preprocess_exposes_four_module_eight_node_contract():
         "runtime_execute",
         "observe_present_writeback",
     ]
+    assert node_by_name["interaction_preprocess"]["output"]["turn_mode"] == ""
     assert node_by_name["interaction_preprocess"]["output"]["domain_hint"] == "system"
     assert node_by_name["dispatch_planning"]["output"]["entry"] == result["dispatch_plan"]["entry"]
     assert node_by_name["runtime_execute"]["status"] == "pending"

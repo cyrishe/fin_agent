@@ -10,10 +10,11 @@ from collections import defaultdict
 from copy import deepcopy
 from decimal import Decimal
 from itertools import combinations
+from pathlib import Path
 from urllib.parse import quote, urlencode
 
 import pandas as pd
-from flask import Flask, Response, jsonify, make_response, redirect, render_template, request
+from flask import Flask, Response, jsonify, make_response, redirect, render_template, request, send_from_directory
 
 from src.services.agent_execution_service import AgentExecutionError, AgentExecutionService
 from src.services.agent_studio_service import AgentStudioError, AgentStudioService
@@ -24,6 +25,8 @@ from src.services.application_workbench_service import ApplicationWorkbenchServi
 from src.services.assistant_dispatch_planner import AssistantDispatchPlanner
 from src.services.attachment_service import AttachmentService, AttachmentServiceError
 from src.services.custom_tool_service import CustomToolAgentService, CustomToolError
+from src.services.custom_tool_run_trace_service import CustomToolRunTrace
+from src.services.conversation_title_service import ConversationTitleService
 from src.services.llm_stream_block_service import LlmStreamBlockBuilder
 from src.services.runtime_conversation_service import RuntimeConversationService
 from src.services.skill_blueprint_service import SkillBlueprintError, SkillBlueprintService
@@ -39,6 +42,10 @@ from src.tools.simple_web_tool import search_simple_web
 
 
 app = Flask(__name__, static_folder="static", static_url_path="/static")
+REACT_FRONTEND_DIST_DIR = Path(
+    os.environ.get("FIN_AGENT_FRONTEND_DIST")
+    or Path(__file__).resolve().parents[2] / "frontend" / "dist"
+).resolve()
 
 stock_deep_dive_runner = SkillRunner()
 async_task_service = AsyncTaskService()
@@ -59,6 +66,7 @@ vision_intake_service = VisionIntakeService(attachment_service=attachment_servic
 tool_plan_runtime_service = ToolPlanRuntimeService()
 system_command_service = SystemCommandService()
 answer_summary_service = AnswerSummaryService()
+conversation_title_service = ConversationTitleService()
 custom_tool_agent_service = CustomToolAgentService()
 custom_tool_stream_requests: dict[str, dict] = {}
 agent_execution_service = AgentExecutionService(
@@ -108,6 +116,25 @@ def _parse_bool_flag(value: str, default: bool = False) -> bool:
     if not text:
         return bool(default)
     return text not in {"0", "false", "no", "off"}
+
+
+def _schedule_thread_title(*, thread_id: int, user_text: str, expected_title: str) -> None:
+    normalized_text = str(user_text or "").strip()
+    if not thread_id or not normalized_text:
+        return
+
+    def worker() -> None:
+        try:
+            result = conversation_title_service.generate(user_text=normalized_text)
+            runtime_conversation_service.update_thread_title(
+                thread_id=int(thread_id),
+                title=str(result.get("title") or "").strip(),
+                expected_title=str(expected_title or "").strip(),
+            )
+        except Exception as exc:
+            app.logger.warning("thread title generation failed thread_id=%s error=%s", thread_id, exc)
+
+    threading.Thread(target=worker, daemon=True, name=f"thread-title-{int(thread_id)}").start()
 
 
 def _with_script_root(path: str) -> str:
@@ -651,13 +678,58 @@ def _custom_tool_result_blocks(result: dict, builder: LlmStreamBlockBuilder) -> 
             "questions": result.get("questions") if isinstance(result.get("questions"), list) else [],
             "design": design,
             "design_artifact": result.get("design_artifact") if isinstance(result.get("design_artifact"), dict) else {},
+            "design_context": result.get("design_context") if isinstance(result.get("design_context"), dict) else {},
             "existing_analysis": result.get("existing_analysis") if isinstance(result.get("existing_analysis"), dict) else {},
         }, stage="design"))
 
     tool = result.get("tool") if isinstance(result.get("tool"), dict) else {}
     manifest = tool.get("manifest") if isinstance(tool.get("manifest"), dict) else {}
     test_result = result.get("test_result") if isinstance(result.get("test_result"), dict) else {}
+    coding_status = str(result.get("coding_status") or "").strip()
+    if coding_status == "coding_failed":
+        coding_error = result.get("coding_error") if isinstance(result.get("coding_error"), dict) else {}
+        error_summary = str(coding_error.get("summary") or "本次没有取得有效实现结果。").strip()
+        _add_many([
+            builder.make_block(
+                block_id="custom_tool_coding_failure",
+                block_type="assessment",
+                mode="replace",
+                title="实现未完成",
+                data={
+                    "overall": "fail",
+                    "summary": "Coding 服务本次未返回有效实现，已保留当前设计。",
+                    "issues": [error_summary],
+                    "details": {
+                        "error_code": str(coding_error.get("code") or "coding_runtime_failed"),
+                        "trace_id": str((result.get("diagnostic_trace") or {}).get("run_id") or ""),
+                    },
+                },
+                stage="coding",
+            ),
+            builder.make_block(
+                block_id="custom_tool_coding_retry",
+                block_type="interaction",
+                mode="replace",
+                title="重试实现",
+                content="设计稿没有被修改。可以直接重试 Coding，或在对话中补充实现反馈。",
+                data={
+                    "interaction_id": "custom_tool.coding_failure",
+                    "intent": "retry",
+                    "submission_mode": "action",
+                    "prompt": "是否重新执行实现阶段？",
+                    "actions": [{
+                        "action_id": "custom_tool.retry_coding",
+                        "label": "重试实现",
+                        "intent": "accept",
+                        "style": "primary",
+                    }],
+                },
+                stage="coding",
+            ),
+        ])
     if manifest:
+        storage = tool.get("storage") if isinstance(tool.get("storage"), dict) else {}
+        is_active = str(manifest.get("status") or "").strip() == "active"
         _add_many([builder.make_block(
             block_id="custom_tool_draft_summary",
             block_type="artifact",
@@ -665,29 +737,90 @@ def _custom_tool_result_blocks(result: dict, builder: LlmStreamBlockBuilder) -> 
             title=str(manifest.get("display_name") or "工具草稿"),
             data={
                 "artifact_type": "finance.custom_tool_implementation",
-                "lifecycle": "draft",
+                "lifecycle": "active" if is_active else "draft",
                 "version": str(manifest.get("current_revision") or "0.1"),
                 "summary": str(manifest.get("description") or "").strip(),
                 "items": [
                     {"label": "工具标识", "value": manifest.get("tool_name")},
-                    {"label": "当前状态", "value": manifest.get("status")},
+                    {"label": "当前状态", "value": "已启用" if is_active else "待确认"},
+                    {"label": "加载方式", "value": "数据库动态加载" if storage.get("kind") == "database_code_module" else "动态加载"},
                 ],
+                "details": {
+                    "modules": [
+                        {
+                            "module_id": str(item.get("module_id") or ""),
+                            "role": str(item.get("role") or ""),
+                            "entrypoint": str(item.get("entrypoint") or "run"),
+                        }
+                        for item in (tool.get("modules") or [])
+                        if isinstance(item, dict)
+                    ]
+                },
             },
             stage="coding",
         )])
         if test_result:
+            cases = [item for item in test_result.get("cases") or [] if isinstance(item, dict)]
+            gate_passed = test_result.get("gate_passed") is True
             _add_many([builder.make_block(
                 block_id="custom_tool_test_result",
                 block_type="assessment",
                 mode="replace",
                 title="样例测试",
                 data={
-                    "overall": "pass" if test_result.get("ok") else "fail",
-                    "summary": "样例测试通过。" if test_result.get("ok") else "样例测试失败。",
-                    "issues": [] if test_result.get("ok") else [str(test_result.get("error") or "未知错误")],
+                    "overall": "pass" if gate_passed else "fail",
+                    "summary": str(test_result.get("summary") or ("样例测试通过。" if gate_passed else "样例测试失败。")),
+                    "issues": [] if gate_passed else [str(test_result.get("error") or "实际结果未达到测试预期")],
+                    "details": {
+                        "tests": [
+                            {
+                                "name": str(item.get("test_id") or ""),
+                                "status": str(item.get("status") or ""),
+                                "summary": str(item.get("purpose") or item.get("error") or ""),
+                                "input": item.get("input") if isinstance(item.get("input"), dict) else {},
+                                "expected": item.get("expected") if isinstance(item.get("expected"), dict) else {},
+                                "actual": item.get("actual") if isinstance(item.get("actual"), dict) else {},
+                                "logs": [dict(log) for log in (item.get("logs") or []) if isinstance(log, dict)],
+                            }
+                            for item in cases
+                        ]
+                    },
                 },
                 stage="coding",
             )])
+            if gate_passed and not is_active:
+                revision = int(manifest.get("current_revision") or 0)
+                _add_many([builder.make_block(
+                    block_id="custom_tool_coding_review",
+                    block_type="interaction",
+                    mode="replace",
+                    title="确认实现",
+                    content="测试已通过。确认后启用当前版本；如果结果不符合预期，直接在对话中说明修改点。",
+                    data={
+                        "interaction_id": "custom_tool.coding_review",
+                        "intent": "confirm",
+                        "submission_mode": "action",
+                        "prompt": "是否启用这个动态工具版本？",
+                        "subject_ref": str(manifest.get("tool_name") or ""),
+                        "subject_revision": revision,
+                        "actions": [
+                            {
+                                "action_id": "custom_tool.activate_draft",
+                                "label": "确认并启用",
+                                "intent": "accept",
+                                "style": "primary",
+                                "expected_revision": revision,
+                            },
+                            {
+                                "action_id": "custom_tool.revise_implementation",
+                                "label": "继续修改",
+                                "intent": "edit",
+                                "style": "default",
+                            },
+                        ],
+                    },
+                    stage="coding",
+                )])
     return blocks
 
 
@@ -698,10 +831,33 @@ def _run_custom_tool_stream_payload(payload: dict, *, emit) -> None:
     thread_id_payload = payload.get("thread_id")
     guest_identity = payload.get("guest_identity") if isinstance(payload.get("guest_identity"), dict) else {}
     builder = LlmStreamBlockBuilder(run_id=str(payload.get("run_id") or ""))
+    run_trace = CustomToolRunTrace(run_id=builder.run_id)
+    run_trace.snapshot("incoming_request", payload, section="request")
     raw_events: list[dict] = []
+    thread_id = None
+    turn_id = None
+    raw_event_count = 0
+    event_type_counts: dict[str, int] = defaultdict(int)
+    persisted_event_types = {
+        "stage_start",
+        "context_ready",
+        "tool_call",
+        "turn_started",
+        "turn_completed",
+        "tool_result",
+        "stage_result",
+        "error",
+    }
 
     def event_sink(event: dict) -> None:
-        raw_events.append(event)
+        nonlocal raw_event_count
+        run_trace.record(event)
+        raw_event_count += 1
+        event_type = str(event.get("type") or "unknown").strip() or "unknown"
+        source = str(event.get("source") or "unknown").strip() or "unknown"
+        event_type_counts[f"{source}:{event_type}"] += 1
+        if event_type in persisted_event_types and len(raw_events) < 200:
+            raw_events.append(event)
         if str(event.get("source") or "") == "model" and str(event.get("type") or "") == "final":
             return
         for block in builder.event_to_blocks(event):
@@ -709,18 +865,23 @@ def _run_custom_tool_stream_payload(payload: dict, *, emit) -> None:
 
     try:
         app_ctx = application_runtime_service.get_application_context(application_name)
+        initial_thread_title = str(app_ctx.get("display_name") or application_name)
+        requested_thread_id = (
+            int(thread_id_payload)
+            if str(thread_id_payload or "").strip().isdigit()
+            else UserSessionService._safe_int(str(payload.get("cookie_thread_id") or ""))
+        )
         thread_id = runtime_conversation_service.ensure_thread(
-            thread_id=(
-                int(thread_id_payload)
-                if str(thread_id_payload or "").strip().isdigit()
-                else UserSessionService._safe_int(str(payload.get("cookie_thread_id") or ""))
-            ),
-            title=str(app_ctx.get("display_name") or application_name),
+            thread_id=requested_thread_id,
+            title=initial_thread_title,
             owner_type="user",
             owner_id=str(guest_identity.get("user_id") or ""),
             context_summary=f"{application_name} 会话",
         )
         thread_context = runtime_conversation_service.get_thread_context(thread_id=thread_id)
+        context_window = runtime_conversation_service.get_context_window(thread_id=thread_id, max_rounds=5)
+        if context_window:
+            thread_context = {**thread_context, "context_window": context_window}
         owner_ids = _custom_tool_owner_ids(
             thread_context=thread_context,
             user_id=str(guest_identity.get("user_id") or ""),
@@ -728,15 +889,33 @@ def _run_custom_tool_stream_payload(payload: dict, *, emit) -> None:
         )
         thread_context = {**thread_context, "_custom_tool_owner_ids": owner_ids}
         active_state = thread_context.get("custom_tool_state") if isinstance(thread_context.get("custom_tool_state"), dict) else {}
+        run_trace.snapshot(
+            "resolved_runtime_context",
+            {
+                "application": app_ctx,
+                "thread_id": thread_id,
+                "turn_input": text,
+                "thread_context": thread_context,
+                "active_custom_tool_state": active_state,
+            },
+            section="request",
+        )
         action_id = str(interaction_response.get("action_id") or "").strip()
         interaction_id = str(interaction_response.get("interaction_id") or "").strip()
         action_intent = str(interaction_response.get("action") or "").strip()
         expected_revision = interaction_response.get("expected_revision")
         if interaction_response:
-            if interaction_id != "custom_tool.design_review":
+            allowed_interactions = {
+                "custom_tool.design_review": {"custom_tool.confirm_design"},
+                "custom_tool.coding_review": {"custom_tool.activate_draft"},
+                "custom_tool.coding_failure": {"custom_tool.retry_coding"},
+            }
+            if interaction_id not in allowed_interactions:
                 raise CustomToolError(f"unknown custom tool interaction: {interaction_id or '-'}")
             if action_intent != "accept":
                 raise CustomToolError(f"unsupported custom tool interaction action: {action_intent or '-'}")
+            if action_id not in allowed_interactions[interaction_id]:
+                raise CustomToolError(f"action {action_id or '-'} does not belong to interaction {interaction_id}")
             text = custom_tool_agent_service.interaction_user_text(action_id)
         turn_id = runtime_conversation_service.create_turn(
             thread_id=thread_id,
@@ -747,9 +926,16 @@ def _run_custom_tool_stream_payload(payload: dict, *, emit) -> None:
                 "application_name": application_name,
             }),
         )
+        if not requested_thread_id:
+            _schedule_thread_title(
+                thread_id=thread_id,
+                user_text=text,
+                expected_title=initial_thread_title,
+            )
         parsed = _parse_chat_command(text)
         owner_id = owner_ids[0] if owner_ids else ""
         dispatch_plan = {}
+        routed_outside_custom_tool = False
         if interaction_response:
             if not active_state:
                 raise ValueError("当前没有可继续的自定义工具流程。")
@@ -758,9 +944,16 @@ def _run_custom_tool_stream_payload(payload: dict, *, emit) -> None:
                 state=active_state,
                 expected_revision=int(expected_revision),
                 owner_id=owner_id,
+                turn_id=turn_id,
                 event_sink=event_sink,
             )
         elif parsed.get("kind") == "slash" and str(parsed.get("command") or "").lower() == "/custom_tool":
+            dispatch_plan = assistant_dispatch_planner.plan_free_chat(
+                text=text,
+                attachments=[],
+                thread_context=thread_context,
+                application_context=app_ctx,
+            )
             args = parsed.get("args") or []
             sub_action = str(args[0] if args else "").strip().lower()
             rest_args = args[1:] if args else []
@@ -768,7 +961,7 @@ def _run_custom_tool_stream_payload(payload: dict, *, emit) -> None:
                 result = custom_tool_agent_service.start_create(
                     _custom_tool_arg_text(rest_args),
                     owner_id=owner_id,
-                    state=active_state,
+                    turn_id=turn_id,
                     event_sink=event_sink,
                 )
             elif sub_action == "edit":
@@ -781,6 +974,7 @@ def _run_custom_tool_stream_payload(payload: dict, *, emit) -> None:
                     edit_text,
                     state=active_state,
                     owner_id=owner_id,
+                    turn_id=turn_id,
                     event_sink=event_sink,
                 )
             else:
@@ -793,25 +987,61 @@ def _run_custom_tool_stream_payload(payload: dict, *, emit) -> None:
                 application_context=app_ctx,
             )
             if str(dispatch_plan.get("entry") or "").strip() != "custom_tool_flow":
-                raise ValueError("当前输入未进入自定义工具流程。")
-            result = custom_tool_agent_service.continue_flow(
-                text,
-                state=active_state,
-                owner_id=owner_id,
-                event_sink=event_sink,
-            )
+                routed_outside_custom_tool = True
+                result = _build_chat_dispatch_payload(
+                    text,
+                    application_context=app_ctx,
+                    thread_context=thread_context,
+                    attachments=[],
+                    thread_id=thread_id,
+                    turn_id=turn_id,
+                    precomputed_plan=dispatch_plan,
+                )
+            else:
+                result = custom_tool_agent_service.continue_flow(
+                    text,
+                    state=active_state,
+                    owner_id=owner_id,
+                    turn_id=turn_id,
+                    event_sink=event_sink,
+                )
         else:
             raise ValueError("当前没有可流式执行的 custom_tool 流程。")
 
-        result.setdefault("mode", "custom_tool_flow")
+        if not routed_outside_custom_tool:
+            result.setdefault("mode", "custom_tool_flow")
         if dispatch_plan:
             result["dispatch_plan"] = dispatch_plan
-        result["events"] = raw_events or result.get("events") or []
-        result["thread_context_patch"] = _custom_tool_context_patch(result.get("state") if isinstance(result.get("state"), dict) else {})
+        if routed_outside_custom_tool:
+            result.setdefault("events", [])
+        else:
+            result["events"] = raw_events
+            result["event_summary"] = {
+                "total": raw_event_count,
+                "persisted": len(raw_events),
+                "by_type": dict(sorted(event_type_counts.items())),
+            }
+        result["diagnostic_trace"] = {
+            "run_id": builder.run_id,
+            "format": "timed_business_sections_text_v1",
+            "path": str(run_trace.path),
+        }
+        if routed_outside_custom_tool:
+            result["thread_context_patch"] = (
+                result.get("thread_context_patch")
+                if isinstance(result.get("thread_context_patch"), dict)
+                else {}
+            )
+        else:
+            result["thread_context_patch"] = _custom_tool_context_patch(result.get("state") if isinstance(result.get("state"), dict) else {})
         if result["thread_context_patch"]:
             runtime_conversation_service.update_thread_context(thread_id=thread_id, patch=result["thread_context_patch"])
         assistant_message = str(result.get("message") or "已处理。").strip()
-        final_events = _custom_tool_result_blocks(result, builder)
+        final_events = (
+            [dict(item) for item in result.get("surface_blocks") or [] if isinstance(item, dict)]
+            if routed_outside_custom_tool
+            else _custom_tool_result_blocks(result, builder)
+        )
         result["surface_blocks"] = final_events
         runtime_conversation_service.complete_turn(
             thread_id=thread_id,
@@ -821,6 +1051,7 @@ def _run_custom_tool_stream_payload(payload: dict, *, emit) -> None:
             model_name=str(result.get("model_name") or "").strip(),
             token_usage=result.get("llm_usage") if isinstance(result.get("llm_usage"), dict) else None,
         )
+        run_trace.finish(result)
         for block in final_events:
             emit(block)
         emit({
@@ -832,6 +1063,15 @@ def _run_custom_tool_stream_payload(payload: dict, *, emit) -> None:
             "result": result,
         })
     except Exception as exc:
+        run_trace.finish({}, error=str(exc))
+        if thread_id is not None and turn_id is not None:
+            runtime_conversation_service.complete_turn(
+                thread_id=thread_id,
+                turn_id=turn_id,
+                assistant_output_text="本轮处理失败，已保留上一轮状态。",
+                output_payload={"ok": False, "error": str(exc), "run_id": builder.run_id},
+                status="failed",
+            )
         emit({
             "event": "error",
             "run_id": builder.run_id,
@@ -847,6 +1087,7 @@ def _build_chat_dispatch_payload(
     attachments: list[dict] | None = None,
     thread_id: int | None = None,
     turn_id: int | None = None,
+    precomputed_plan: dict | None = None,
 ) -> dict:
     parsed = _parse_chat_command(text)
     raw = parsed.get("raw") or ""
@@ -855,11 +1096,15 @@ def _build_chat_dispatch_payload(
     attachments = attachments if isinstance(attachments, list) else []
     execution_agent = application_context.get("execution_agent") if isinstance(application_context.get("execution_agent"), dict) else {}
     if parsed["kind"] == "free_chat":
-        plan = assistant_dispatch_planner.plan_free_chat(
-            text=raw,
-            attachments=attachments,
-            thread_context=thread_context,
-            application_context=application_context,
+        plan = (
+            precomputed_plan
+            if isinstance(precomputed_plan, dict) and precomputed_plan
+            else assistant_dispatch_planner.plan_free_chat(
+                text=raw,
+                attachments=attachments,
+                thread_context=thread_context,
+                application_context=application_context,
+            )
         )
         planning_task_state = _finalize_planning_task_state(
             plan.get("task_state") if isinstance(plan.get("task_state"), dict) else {},
@@ -893,6 +1138,7 @@ def _build_chat_dispatch_payload(
                 raw,
                 state=active_state,
                 owner_id=owner_ids[0] if owner_ids else "",
+                turn_id=turn_id,
             )
             result.setdefault("mode", "custom_tool_flow")
             result["dispatch_plan"] = plan
@@ -1275,14 +1521,14 @@ def _build_chat_dispatch_payload(
         owner_id = owner_ids[0] if owner_ids else ""
         active_state = thread_context.get("custom_tool_state") if isinstance(thread_context.get("custom_tool_state"), dict) else {}
         if sub_action == "create":
-            result = custom_tool_agent_service.start_create(_custom_tool_arg_text(rest_args), owner_id=owner_id, state=active_state)
+            result = custom_tool_agent_service.start_create(_custom_tool_arg_text(rest_args), owner_id=owner_id, turn_id=turn_id)
         elif sub_action == "edit":
             edit_text = _custom_tool_arg_text(rest_args)
             if not edit_text:
                 raise ValueError("请使用 /custom_tool edit <修改要求>")
             if not active_state:
                 active_state = {"status": "collect_requirement", "owner_id": owner_id, "requirement_text": ""}
-            result = custom_tool_agent_service.continue_flow(edit_text, state=active_state, owner_id=owner_id)
+            result = custom_tool_agent_service.continue_flow(edit_text, state=active_state, owner_id=owner_id, turn_id=turn_id)
         elif sub_action == "call":
             tool_name, call_args = _parse_custom_tool_json_arg(_custom_tool_arg_text(rest_args))
             if not tool_name:
@@ -2307,10 +2553,42 @@ def login_resume_thread(thread_id: int):
 @app.route("/assistant", methods=["GET"])
 @app.route("/assistant/", methods=["GET"])
 def conversation_workbench_page():
-    has_guest = bool(str(request.cookies.get(UserSessionService.GUEST_COOKIE_NAME, "") or "").strip())
-    has_session = bool(str(request.cookies.get("aiia_guest_session_token", "") or "").strip())
-    if not (has_guest and has_session):
-        return redirect(_with_script_root("/login"))
+    if (REACT_FRONTEND_DIST_DIR / "index.html").is_file():
+        guest_identity = _resolve_current_guest_identity()
+        response = make_response(send_from_directory(REACT_FRONTEND_DIST_DIR, "index.html"))
+        response.set_cookie(
+            UserSessionService.GUEST_COOKIE_NAME,
+            str(guest_identity.get("user_id") or ""),
+            max_age=60 * 60 * 24 * 180,
+            samesite="Lax",
+        )
+        response.set_cookie(
+            "aiia_guest_session_token",
+            str(guest_identity.get("session_token") or ""),
+            max_age=60 * 60 * 24 * 30,
+            samesite="Lax",
+            httponly=True,
+        )
+        return response
+    return _legacy_conversation_workbench_page()
+
+
+@app.route("/assistant/legacy", methods=["GET"])
+def legacy_conversation_workbench_page():
+    return _legacy_conversation_workbench_page()
+
+
+@app.route("/assistant/<path:frontend_path>", methods=["GET"])
+def react_conversation_workbench_asset(frontend_path: str):
+    requested = (REACT_FRONTEND_DIST_DIR / str(frontend_path or "")).resolve()
+    if requested.is_file() and requested.is_relative_to(REACT_FRONTEND_DIST_DIR):
+        return send_from_directory(REACT_FRONTEND_DIST_DIR, str(frontend_path))
+    if (REACT_FRONTEND_DIST_DIR / "index.html").is_file():
+        return send_from_directory(REACT_FRONTEND_DIST_DIR, "index.html")
+    return redirect(_with_script_root("/assistant/legacy"))
+
+
+def _legacy_conversation_workbench_page():
     app_ctx = _ui_application_context("investment_workbench")
     guest_identity = _resolve_current_guest_identity()
     initial_thread_id = UserSessionService._safe_int(
@@ -2478,13 +2756,15 @@ def api_chat_dispatch():
         guest_identity = _resolve_current_guest_identity()
         application_name = str(payload.get("application_name") or "investment_workbench").strip() or "investment_workbench"
         app_ctx = application_runtime_service.get_application_context(application_name)
+        initial_thread_title = str(app_ctx.get("display_name") or application_name)
+        requested_thread_id = (
+            int(payload.get("thread_id"))
+            if str(payload.get("thread_id") or "").strip().isdigit()
+            else UserSessionService._safe_int(request.cookies.get(UserSessionService.THREAD_COOKIE_NAME, ""))
+        )
         thread_id = runtime_conversation_service.ensure_thread(
-            thread_id=(
-                int(payload.get("thread_id"))
-                if str(payload.get("thread_id") or "").strip().isdigit()
-                else UserSessionService._safe_int(request.cookies.get(UserSessionService.THREAD_COOKIE_NAME, ""))
-            ),
-            title=str(app_ctx.get("display_name") or application_name),
+            thread_id=requested_thread_id,
+            title=initial_thread_title,
             owner_type="user",
             owner_id=str(guest_identity.get("user_id") or ""),
             context_summary=f"{application_name} 会话",
@@ -2509,6 +2789,12 @@ def api_chat_dispatch():
             user_input_text=text or f"[attachment:{len(attachments)}]",
             input_payload=_to_json_safe({**payload, "application_name": application_name, "attachments": attachments}),
         )
+        if not requested_thread_id:
+            _schedule_thread_title(
+                thread_id=thread_id,
+                user_text=text or f"分析 {len(attachments)} 个图片附件",
+                expected_title=initial_thread_title,
+            )
         result = _build_chat_dispatch_payload(
             text,
             application_context=app_ctx,
@@ -2725,7 +3011,30 @@ def api_assistant_threads():
             owner_id=str(guest_identity.get("user_id") or ""),
             limit=20,
         )
-        return jsonify(_to_json_safe({"ok": True, "items": items}))
+        requested_thread_id = UserSessionService._safe_int(
+            request.cookies.get(UserSessionService.THREAD_COOKIE_NAME, "")
+        )
+        owned_thread_ids = {int(item.get("thread_id") or 0) for item in items}
+        active_thread_id = requested_thread_id if requested_thread_id in owned_thread_ids else 0
+        response = jsonify(_to_json_safe({
+            "ok": True,
+            "items": items,
+            "active_thread_id": active_thread_id or None,
+        }))
+        response.set_cookie(
+            UserSessionService.GUEST_COOKIE_NAME,
+            str(guest_identity.get("user_id") or ""),
+            max_age=60 * 60 * 24 * 180,
+            samesite="Lax",
+        )
+        response.set_cookie(
+            "aiia_guest_session_token",
+            str(guest_identity.get("session_token") or ""),
+            max_age=60 * 60 * 24 * 30,
+            samesite="Lax",
+            httponly=True,
+        )
+        return response
     except Exception as exc:
         return jsonify({"ok": False, "error": f"读取会话列表失败: {exc}"}), 500
 
@@ -2744,11 +3053,22 @@ def api_assistant_thread_detail(thread_id: int):
         turns = runtime_conversation_service.list_turns(thread_id=int(thread_id), limit=100, include_output_payload=True)
         for turn in turns:
             output_payload = turn.get("output_payload") if isinstance(turn.get("output_payload"), dict) else {}
-            surface_blocks = output_payload.get("surface_blocks") if isinstance(output_payload.get("surface_blocks"), list) else []
-            turn["output_payload"] = {
-                "mode": str(output_payload.get("mode") or "").strip(),
-                "surface_blocks": surface_blocks,
-            } if surface_blocks else {}
+            retained_fields = {
+                key: output_payload[key]
+                for key in (
+                    "mode",
+                    "message",
+                    "surface_blocks",
+                    "render_blocks",
+                    "render_payload",
+                    "surface",
+                    "items",
+                    "workspace",
+                    "task_state",
+                )
+                if key in output_payload
+            }
+            turn["output_payload"] = retained_fields
         response = jsonify(_to_json_safe({
             "ok": True,
             "thread": thread,

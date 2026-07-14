@@ -29,8 +29,7 @@
   ],
   "available_agents": [
     "default_assistant",
-    "investment_analyst",
-    "system_agent"
+    "investment_analyst"
   ],
   "default_skills": [],
   "default_tools": [],

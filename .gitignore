@@ -226,6 +226,7 @@ data/assistant_uploads/
 data/custom_tool_context/
 data/custom_tools/
 data/runtime_custom_tools/
+data/runtime_traces/
 data/runtime_file_artifacts/
 data/session_variables/
 data/capability_embeddings*.json

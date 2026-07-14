@@ -42,7 +42,6 @@
   "skills": [],
   "tools": [],
   "handoff_agents": [
-    "investment_analyst",
-    "system_agent"
+    "investment_analyst"
   ]
 }

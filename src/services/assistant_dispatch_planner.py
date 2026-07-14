@@ -39,6 +39,8 @@ class AssistantDispatchPlanner:
         intent = result.get("intent") if isinstance(result.get("intent"), dict) else {}
         work_context = result.get("work_context") if isinstance(result.get("work_context"), dict) else {}
         normalized_input = result.get("normalized_input") if isinstance(result.get("normalized_input"), dict) else {}
+        normalized_request = result.get("normalized_request") if isinstance(result.get("normalized_request"), dict) else {}
+        turn_mode = self._trim(dispatch_plan.get("turn_mode") or interaction.get("turn_mode")) or "normal_qa"
         execution_plan = (
             dispatch_plan.get("execution_plan_preview")
             if isinstance(dispatch_plan.get("execution_plan_preview"), dict)
@@ -50,7 +52,7 @@ class AssistantDispatchPlanner:
         )
         task_state = self._build_planning_task_state(
             interaction=interaction,
-            normalized_request=result.get("normalized_request") if isinstance(result.get("normalized_request"), dict) else {},
+            normalized_request=normalized_request,
             context_resolution=result.get("context_resolution") if isinstance(result.get("context_resolution"), dict) else {},
             execution_plan=execution_plan,
             entry=entry,
@@ -59,6 +61,7 @@ class AssistantDispatchPlanner:
 
         return {
             "entry": entry,
+            "turn_mode": turn_mode,
             "domain": self._trim(result.get("domain")),
             "interaction_mode": self._trim(result.get("interaction_mode")),
             "execution_path": self._trim(result.get("execution_path")),
@@ -75,6 +78,11 @@ class AssistantDispatchPlanner:
             "task_domain": self._trim(result.get("task_domain")),
             "capability_family": self._trim(result.get("capability_family")),
             "selected_agent": self._trim(dispatch_plan.get("selected_agent")),
+            "semantic_turn": {
+                "ori_question": self._trim(normalized_request.get("ori_question") or normalized_request.get("raw_user_text")),
+                "resolved_question": self._trim(normalized_request.get("resolved_question") or normalized_request.get("round_task_desc")),
+                "context_refs": normalized_request.get("context_refs") if isinstance(normalized_request.get("context_refs"), list) else [],
+            },
             "planning_scope": self._trim(dispatch_plan.get("planning_scope")) or "top_level_dispatch",
             "execution_plan": (
                 execution_plan

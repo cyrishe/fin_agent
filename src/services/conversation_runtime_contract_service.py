@@ -16,8 +16,8 @@ class ConversationRuntimeContractService:
             "module": "conversation_management",
             "title": "对话管理",
             "nodes": [
-                "interaction_preprocess",
                 "context_resolution",
+                "interaction_preprocess",
                 "conversation_task_finalization",
                 "conversation_state_update",
             ],
@@ -75,6 +75,9 @@ class ConversationRuntimeContractService:
                 node="interaction_preprocess",
                 status="completed",
                 output={
+                    "agent_name": self._trim(interaction.get("agent_name") or interaction.get("agent_hint")),
+                    "turn_mode": self._trim(interaction.get("turn_mode")),
+                    # Compatibility fields retained for existing trace consumers.
                     "domain_hint": self._trim(interaction.get("domain_hint")),
                     "agent_hint": self._trim(interaction.get("agent_hint")),
                     "needs_reference_resolution": bool(interaction.get("needs_reference_resolution")),
@@ -85,13 +88,16 @@ class ConversationRuntimeContractService:
                     "reason": self._trim(interaction.get("reason") or interaction.get("analize")),
                     "confidence": interaction.get("confidence") if isinstance(interaction.get("confidence"), (int, float)) else None,
                     "input_refs": ["normalized_input.text", "thread_context", "application_context"],
-                    "output_refs": ["interaction.domain_hint", "interaction.agent_hint", "interaction.needs_reference_resolution"],
+                    "output_refs": ["interaction.agent_name", "interaction.turn_mode"],
                 },
             ),
             self._node(
                 node="context_resolution",
                 status="skipped" if self._source(context_resolution) == "skipped" else "completed",
                 output={
+                    "ori_question": self._trim(context_resolution.get("ori_question")),
+                    "resolved_question": self._trim(context_resolution.get("resolved_question")),
+                    "context_refs": context_resolution.get("context_refs") if isinstance(context_resolution.get("context_refs"), list) else [],
                     "resolved_count": len(context_resolution.get("resolved_items") or []) if isinstance(context_resolution.get("resolved_items"), list) else 0,
                     "resolution_summary": self._trim(context_resolution.get("resolution_summary")),
                 },
@@ -100,13 +106,14 @@ class ConversationRuntimeContractService:
                     "reason": "needs_reference_resolution=false" if self._source(context_resolution) == "skipped" else self._trim(context_resolution.get("analize")),
                     "confidence": None,
                     "input_refs": ["context_window", "thread_state", "preprocessing_signals", "interaction"],
-                    "output_refs": ["context_resolution.resolved_items", "context_resolution.resolution_summary"],
+                    "output_refs": ["context_resolution.resolved_question", "context_resolution.context_refs"],
                 },
             ),
             self._node(
                 node="conversation_task_finalization",
                 status="completed",
                 output={
+                    "resolved_question": self._trim(normalized_request.get("resolved_question")),
                     "round_task_desc": self._trim(normalized_request.get("round_task_desc")),
                     "task_split_count": len(normalized_request.get("task_splitd") or []) if isinstance(normalized_request.get("task_splitd"), list) else 0,
                     "context_relation": self._trim(normalized_request.get("context_relation")),
@@ -198,6 +205,17 @@ class ConversationRuntimeContractService:
                 },
             ),
         ]
+        node_order = [
+            "context_resolution",
+            "interaction_preprocess",
+            "conversation_task_finalization",
+            "conversation_state_update",
+            "dispatch_planning",
+            "agent_runtime_planning",
+            "runtime_execute",
+            "observe_present_writeback",
+        ]
+        node_results.sort(key=lambda item: node_order.index(str(item.get("node") or "")))
         return {
             "version": "conversation_runtime_contract.v1",
             "phase": "preprocess",

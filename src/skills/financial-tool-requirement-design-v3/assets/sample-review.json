@@ -63,16 +63,19 @@
       {
         "name": "市场趋势判断",
         "responsibility": "使用市场基准的 20 日均线位置和方向判断市场是否允许继续。",
+        "functions": [{"name": "evaluate_market_trend", "responsibility": "计算并返回市场趋势规则结果。"}],
         "depends_on": ["指数日线"]
       },
       {
         "name": "个股放量突破判断",
         "responsibility": "判断个股是否突破前 20 个交易日高点且成交量放大。",
+        "functions": [{"name": "evaluate_stock_breakout", "responsibility": "计算并返回个股突破与放量规则结果。"}],
         "depends_on": ["股票日线", "市场趋势判断"]
       },
       {
         "name": "信号合成",
         "responsibility": "按市场优先规则合成唯一研究信号和原因。",
+        "functions": [{"name": "compose_signal", "responsibility": "合成最终信号与可解释原因。"}],
         "depends_on": ["市场趋势判断", "个股放量突破判断"]
       }
     ],

@@ -119,12 +119,25 @@
       "properties": {
         "name": {"type": "string"},
         "responsibility": {"type": "string"},
+        "functions": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/module_function"}
+        },
         "depends_on": {
           "type": "array",
           "items": {"type": "string"}
         }
       },
-      "required": ["name", "responsibility", "depends_on"],
+      "required": ["name", "responsibility", "functions", "depends_on"],
+      "additionalProperties": false
+    },
+    "module_function": {
+      "type": "object",
+      "properties": {
+        "name": {"type": "string"},
+        "responsibility": {"type": "string"}
+      },
+      "required": ["name", "responsibility"],
       "additionalProperties": false
     },
     "step": {

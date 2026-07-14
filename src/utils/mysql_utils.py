@@ -1,7 +1,7 @@
 # src/utils/mysql_utils.py
 import pymysql
 import datetime
-from urllib.parse import urlparse
+from urllib.parse import unquote, urlparse
 import pandas as pd
 from pymysql.constants import FIELD_TYPE
 from pymysql.converters import conversions
@@ -2313,8 +2313,8 @@ class StockInfoDbUtils:
     """
 
     def __init__(self,
-                 host="47.113.122.220",
-                 user="creditrisk",
+                 host=None,
+                 user=None,
                  password=None,
                  database="kingdomai",
                  connect_timeout=30,  # 延长连接超时时间
@@ -2325,11 +2325,26 @@ class StockInfoDbUtils:
         # 覆盖DECIMAL类型转换规则
         self.conv[FIELD_TYPE.DECIMAL] = float
         self.conv[FIELD_TYPE.NEWDECIMAL] = float
-        self.host = host
-        self.user = user
-        self.password = password if password is not None else os.getenv("KINGDOMAI_DB_PASSWORD", "")
-        self.database = database
-        self.port = port
+        resolved_host = host or os.getenv("KINGDOMAI_DB_HOST", "127.0.0.1")
+        resolved_user = user or os.getenv("KINGDOMAI_DB_USER", "")
+        resolved_password = password if password is not None else os.getenv("KINGDOMAI_DB_PASSWORD", "")
+        resolved_database = database
+        resolved_port = port
+        business_url = str(os.getenv("BUSINESS_DB_URL") or "").strip()
+        if password is None and not resolved_password and business_url:
+            parsed = urlparse(business_url.replace("mysql+pymysql://", "mysql://", 1))
+            url_database = (parsed.path or "/").lstrip("/")
+            if parsed.scheme == "mysql" and parsed.hostname and url_database == database:
+                resolved_host = parsed.hostname
+                resolved_user = unquote(parsed.username or resolved_user)
+                resolved_password = unquote(parsed.password or "")
+                resolved_database = url_database
+                resolved_port = parsed.port or port
+        self.host = resolved_host
+        self.user = resolved_user
+        self.password = resolved_password
+        self.database = resolved_database
+        self.port = resolved_port
         self.conn = None
         self.connect_db()
 
@@ -3556,7 +3571,7 @@ class StockInfoDbUtils:
 #     print("test stock detail.")
 #     # 源库：kingdomai
 #     src = StockInfoDbUtils(
-#         host="47.113.122.220",
+#         host="<configured-host>",
 #         user="creditrisk",
 #         database="kingdomai",
 #         port=3306

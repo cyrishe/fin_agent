@@ -120,17 +120,45 @@ class ConversationPreprocessService:
         normalized_command = normalized_input.get("normalized_command") if isinstance(normalized_input.get("normalized_command"), dict) else {}
         command_action = self._trim(normalized_command.get("action"))
         is_free_chat = not command_action
-        active_workflow = work_context.get("active_workflow") if isinstance(work_context.get("active_workflow"), dict) else {}
-        is_active_custom_tool_flow = is_free_chat and self._trim(active_workflow.get("type")) == "custom_tool_authoring"
-        preprocess_enable_llm = enable_llm and not is_active_custom_tool_flow
+        is_slash_command = self._trim((normalized_input.get("slash_command") or {}).get("kind")) == "slash"
+        thread_state = self._build_thread_state(
+            thread_context=thread_context,
+            work_context=work_context,
+        )
+        context_window = self._build_context_window(
+            thread_context=thread_context,
+        )
+        pre_context_signals = self._build_preprocessing_signals(
+            normalized_input=normalized_input,
+            thread_context=thread_context,
+            work_context=work_context,
+            interaction={},
+        )
+        context_resolution = self.context_resolution_service.resolve(
+            user_text=normalized_input["text"],
+            context_window=context_window,
+            thread_state=thread_state,
+            preprocessing_signals=pre_context_signals,
+            interaction_result={},
+            enable_llm=enable_llm and not is_slash_command,
+        )
         interaction = (
+            self._classify_slash_command(
+                normalized_command=normalized_command,
+                application_context=application_context,
+            )
+            if is_slash_command
+            else
             self.interaction_preprocessor.classify(
                 user_text=normalized_input["text"],
                 thread_context=thread_context,
                 application_context=application_context,
+                context_resolution=context_resolution,
             )
-            if preprocess_enable_llm and is_free_chat
+            if enable_llm
             else {
+                "agent_name": "",
+                "turn_mode": "",
                 "analize": "",
                 "domain_hint": "",
                 "agent_hint": "",
@@ -139,6 +167,11 @@ class ConversationPreprocessService:
                 "source": "disabled",
             }
         )
+        if not is_slash_command:
+            interaction = self._apply_natural_language_policy(
+                interaction=interaction,
+                work_context=work_context,
+            )
         intent = (
             self.assistant_intent_service.classify(
                 user_text=normalized_input["text"],
@@ -153,47 +186,47 @@ class ConversationPreprocessService:
             work_context=work_context,
             interaction=interaction,
         )
-        thread_state = self._build_thread_state(
-            thread_context=thread_context,
-            work_context=work_context,
-        )
-        context_window = self._build_context_window(
-            thread_context=thread_context,
-        )
-        context_resolution = self.context_resolution_service.resolve(
-            user_text=normalized_input["text"],
-            context_window=context_window,
-            thread_state=thread_state,
-            preprocessing_signals=preprocessing_signals,
-            interaction_result=interaction,
-            enable_llm=preprocess_enable_llm,
-        )
         normalized_request = self._build_normalized_request(
             normalized_input=normalized_input,
             interaction=interaction,
             preprocessing_signals=preprocessing_signals,
             context_resolution=context_resolution,
-            enable_llm=preprocess_enable_llm,
+            enable_llm=enable_llm and not is_slash_command,
         )
-        if is_active_custom_tool_flow:
+        turn_mode = self._resolve_turn_mode(
+            interaction=interaction,
+            normalized_command=normalized_command,
+            work_context=work_context,
+            text=self._trim(normalized_request.get("round_task_desc")),
+        )
+        if turn_mode == "tool_development":
             task_domain_decision = self._decision(
-                "system_operation",
-                "thread_context",
-                "continue active custom tool authoring flow",
+                "business_dialog",
+                "top_intent",
+                "turn_mode_tool_development",
             )
-            task_domain = "system_operation"
+            task_domain = "business_dialog"
             capability_family_decision = self._decision(
                 "custom_tool_authoring",
-                "thread_context",
-                "active custom tool state is present",
+                "top_intent",
+                "turn_mode_tool_development",
             )
             capability_family = "custom_tool_authoring"
-            selected_agent = "custom_tool_builder"
+            selected_agent = self._select_agent_name(
+                task_domain=task_domain,
+                work_context=work_context,
+                interaction=interaction,
+                application_context=application_context,
+            )
             execution_plan_preview = {}
         else:
-            task_domain_decision = self._decide_task_domain(
-                normalized_input=normalized_input,
-                normalized_request=normalized_request,
+            task_domain_decision = (
+                self._decision("system_operation", "top_intent", "turn_mode_system_operation")
+                if turn_mode == "system_operation"
+                else self._decide_task_domain(
+                    normalized_input=normalized_input,
+                    normalized_request=normalized_request,
+                )
             )
             task_domain = self._trim(task_domain_decision.get("value")) or "business_dialog"
             capability_family_decision = self._decide_capability_family(
@@ -206,6 +239,7 @@ class ConversationPreprocessService:
                 task_domain=task_domain,
                 work_context=work_context,
                 interaction=interaction,
+                application_context=application_context,
             )
             execution_plan_preview = self._build_execution_plan_preview(
                 normalized_request=normalized_request,
@@ -226,6 +260,7 @@ class ConversationPreprocessService:
             selected_agent=selected_agent,
             execution_plan_preview=execution_plan_preview,
         )
+        dispatch_plan["turn_mode"] = turn_mode
         turn_frame = self._build_turn_frame(
             normalized_input=normalized_input,
             normalized_request=normalized_request,
@@ -379,7 +414,7 @@ class ConversationPreprocessService:
                 code_runtime_hint = True
                 normalized_text = self._trim(parts[1] if len(parts) > 1 else "")
         normalized_attachments = self._normalize_attachments(attachments)
-        parsed_command = self._parse_slash_command(normalized_text)
+        parsed_command = self._parse_slash_command(raw_text if code_runtime_hint else normalized_text)
         normalized_command = (
             self.system_command_service.normalize(
                 command=str(parsed_command.get("command") or ""),
@@ -469,10 +504,18 @@ class ConversationPreprocessService:
             "recent_result_subject": self._trim(ctx.get("recent_result_subject")),
         }
         if custom_tool_state:
+            tool_name = self._trim(custom_tool_state.get("tool_name"))
+            display_name = self._trim(
+                ((custom_tool_state.get("design_contract") or {}) if isinstance(custom_tool_state.get("design_contract"), dict) else {}).get("display_name")
+            )
+            context_name = tool_name or display_name or "current"
             work_context["active_workflow"] = {
                 "type": "custom_tool_authoring",
                 "status": self._trim(custom_tool_state.get("status")),
-                "tool_name": self._trim(custom_tool_state.get("tool_name")),
+                "tool_name": tool_name,
+                "context_ref": f"custom_tool:{context_name}",
+                "summary": f"最近的工具开发任务：{display_name or tool_name or '当前工具'}",
+                "owner_agent": self._trim(execution_agent.get("agent_name")),
             }
         owner_ids = [
             self._trim(item)
@@ -518,6 +561,17 @@ class ConversationPreprocessService:
         ctx = thread_context if isinstance(thread_context, dict) else {}
         work = work_context if isinstance(work_context, dict) else {}
         reference_memory = ctx.get("reference_memory") if isinstance(ctx.get("reference_memory"), dict) else {}
+        active_workflow = work.get("active_workflow") if isinstance(work.get("active_workflow"), dict) else {}
+        context_objects: List[Dict[str, str]] = []
+        if active_workflow:
+            context_ref = self._trim(active_workflow.get("context_ref"))
+            if context_ref:
+                context_objects.append(
+                    {
+                        "context_ref": context_ref,
+                        "summary": self._trim(active_workflow.get("summary")),
+                    }
+                )
         return {
             "session_application_name": self._trim(work.get("application_name")),
             "session_assistant_agent": self._trim(work.get("assistant_agent")),
@@ -528,6 +582,8 @@ class ConversationPreprocessService:
             "recent_result_subject": self._trim(work.get("recent_result_subject")),
             "reference_memory": reference_memory,
             "thread_summary": self._trim(ctx.get("thread_summary")),
+            "active_workflow": active_workflow,
+            "context_objects": context_objects,
         }
 
     def _build_context_window(
@@ -610,8 +666,30 @@ class ConversationPreprocessService:
             text=text,
             domain_hint=self._trim(interaction.get("domain_hint")),
         )
-        domain = "system" if self._trim(interaction.get("domain_hint")) == "system" else "business"
+        domain = "system" if self._trim(interaction.get("turn_mode")) == "system_operation" or self._trim(interaction.get("domain_hint")) == "system" else "business"
         command = normalized_input.get("normalized_command") if isinstance(normalized_input.get("normalized_command"), dict) else {}
+        ori_question = self._trim(context_resolution.get("ori_question")) or text
+        resolved_question = self._trim(context_resolution.get("resolved_question"))
+        context_refs = context_resolution.get("context_refs") if isinstance(context_resolution.get("context_refs"), list) else []
+        if resolved_question:
+            return {
+                "ori_question": ori_question,
+                "resolved_question": resolved_question,
+                "context_refs": list(context_refs),
+                # Compatibility fields while the execution runtime migrates to the v1 turn protocol.
+                "raw_user_text": ori_question,
+                "analize": "",
+                "round_task_desc": resolved_question,
+                "task_splitd": [],
+                "domain": domain,
+                "context_relation": context_relation,
+                "focus": focus,
+                "target_asset": target_asset,
+                "needs_reference_resolution": bool(context_refs),
+                "info_ready": True,
+                "source": self._trim(context_resolution.get("source")) or "context_resolution",
+                "llm_usage": context_resolution.get("llm_usage") if isinstance(context_resolution.get("llm_usage"), dict) else {},
+            }
         resolved_items = context_resolution.get("resolved_items") if isinstance(context_resolution.get("resolved_items"), list) else []
         has_context_resolution = bool(resolved_items) or bool(self._trim(context_resolution.get("resolution_summary")))
         interaction_requires_reference = bool(interaction.get("needs_reference_resolution"))
@@ -638,6 +716,9 @@ class ConversationPreprocessService:
             )
         round_task_desc = self._trim(finalized.get("round_task_desc")) or text
         return {
+            "ori_question": text,
+            "resolved_question": round_task_desc,
+            "context_refs": [],
             "raw_user_text": text,
             "analize": self._trim(finalized.get("analize")),
             "round_task_desc": round_task_desc,
@@ -650,6 +731,97 @@ class ConversationPreprocessService:
             "info_ready": bool(preprocessing_signals.get("info_ready")),
             "source": self._trim(finalized.get("source")) or "raw_input",
             "llm_usage": finalized.get("llm_usage") if isinstance(finalized.get("llm_usage"), dict) else {},
+        }
+
+    def _resolve_turn_mode(
+        self,
+        *,
+        interaction: Dict[str, Any],
+        normalized_command: Dict[str, Any],
+        work_context: Dict[str, Any],
+        text: str,
+    ) -> str:
+        action = self._trim(normalized_command.get("action"))
+        args = normalized_command.get("args") if isinstance(normalized_command.get("args"), list) else []
+        sub_action = self._trim(args[0]).lower() if args else ""
+        if action:
+            if action == "custom_tool" and sub_action in {"create", "edit"}:
+                return "tool_development"
+            return "system_operation"
+        turn_mode = self._trim(interaction.get("turn_mode"))
+        if turn_mode in {"normal_qa", "system_operation", "tool_development"}:
+            return turn_mode
+        if self._trim(interaction.get("domain_hint")) == "system":
+            return "system_operation"
+        active_workflow = work_context.get("active_workflow") if isinstance(work_context.get("active_workflow"), dict) else {}
+        if active_workflow and self._contains_any(
+            text,
+            ["工具", "设计", "实现", "代码", "流程图", "测试", "确认", "启用", "重试", "继续"],
+        ):
+            return "tool_development"
+        return "normal_qa"
+
+    def _classify_slash_command(
+        self,
+        *,
+        normalized_command: Dict[str, Any],
+        application_context: Optional[Dict[str, Any]],
+    ) -> Dict[str, Any]:
+        action = self._trim(normalized_command.get("action"))
+        args = normalized_command.get("args") if isinstance(normalized_command.get("args"), list) else []
+        sub_action = self._trim(args[0]).lower() if args else ""
+        turn_mode = (
+            "tool_development"
+            if action == "custom_tool" and sub_action in {"create", "edit"}
+            else "system_operation"
+        )
+        app = application_context if isinstance(application_context, dict) else {}
+        rows = app.get("available_agents") if isinstance(app.get("available_agents"), list) else []
+        available_names = [
+            self._trim(item.get("agent_name") or item.get("name"))
+            for item in rows
+            if isinstance(item, dict) and self._trim(item.get("agent_name") or item.get("name"))
+        ]
+        if action == "custom_tool":
+            execution = app.get("execution_agent") if isinstance(app.get("execution_agent"), dict) else {}
+            preferred = self._trim(execution.get("agent_name"))
+        else:
+            assistant = app.get("assistant_agent") if isinstance(app.get("assistant_agent"), dict) else {}
+            preferred = self._trim(assistant.get("agent_name"))
+        agent_name = preferred if preferred in available_names else (available_names[0] if available_names else preferred)
+        return {
+            "agent_name": agent_name,
+            "turn_mode": turn_mode,
+            "agent_hint": agent_name,
+            "domain_hint": "system" if turn_mode == "system_operation" else "business",
+            "needs_reference_resolution": False,
+            "info_ready": True,
+            "source": "rule:slash_command",
+        }
+
+    def _apply_natural_language_policy(
+        self,
+        *,
+        interaction: Dict[str, Any],
+        work_context: Dict[str, Any],
+    ) -> Dict[str, Any]:
+        active_workflow = work_context.get("active_workflow") if isinstance(work_context.get("active_workflow"), dict) else {}
+        if self._trim(interaction.get("turn_mode")) != "tool_development":
+            return interaction
+        if active_workflow:
+            owner_agent = self._trim(active_workflow.get("owner_agent"))
+            if owner_agent:
+                return {
+                    **interaction,
+                    "agent_name": owner_agent,
+                    "agent_hint": owner_agent,
+                }
+            return interaction
+        return {
+            **interaction,
+            "turn_mode": "normal_qa",
+            "domain_hint": "business",
+            "source": self._trim(interaction.get("source")) or "rule:natural_language",
         }
 
     def _work_context_active_skill(self, work_context: Dict[str, Any]) -> str:
@@ -1283,17 +1455,23 @@ class ConversationPreprocessService:
         task_domain: str,
         work_context: Dict[str, Any],
         interaction: Dict[str, Any],
+        application_context: Optional[Dict[str, Any]] = None,
     ) -> str:
-        if task_domain == "system_operation":
-            return "system_agent"
-        if task_domain == "design_refinement":
-            return "system_agent"
-        if task_domain == "business_dialog":
-            agent_hint = self._trim(interaction.get("agent_hint"))
-            if agent_hint in {"default_assistant", "investment_analyst", "system_agent"}:
-                return agent_hint
-            return self._trim(work_context.get("execution_agent")) or self._trim(work_context.get("assistant_agent"))
-        return self._trim(work_context.get("assistant_agent"))
+        app = application_context if isinstance(application_context, dict) else {}
+        rows = app.get("available_agents") if isinstance(app.get("available_agents"), list) else []
+        allowed_ordered = [
+            self._trim(item.get("agent_name") or item.get("name"))
+            for item in rows
+            if isinstance(item, dict) and self._trim(item.get("agent_name") or item.get("name"))
+        ]
+        allowed_names = set(allowed_ordered)
+        agent_name = self._trim(interaction.get("agent_name") or interaction.get("agent_hint"))
+        if agent_name and (not allowed_names or agent_name in allowed_names):
+            return agent_name
+        fallback = self._trim(work_context.get("execution_agent")) or self._trim(work_context.get("assistant_agent"))
+        if fallback and (not allowed_names or fallback in allowed_names):
+            return fallback
+        return allowed_ordered[0] if allowed_ordered else self._trim(work_context.get("assistant_agent"))
 
     @staticmethod
     def _contains_any(text: str, keywords: List[str]) -> bool:

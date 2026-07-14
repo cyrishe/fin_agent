@@ -218,6 +218,39 @@ class RuntimeConversationService:
         finally:
             db.close_db()
 
+    def update_thread_title(
+        self,
+        *,
+        thread_id: int,
+        title: str,
+        expected_title: str = "",
+    ) -> bool:
+        normalized_title = self._trim(title)[:80]
+        if not normalized_title:
+            return False
+        db = StockInfoDbUtils()
+        try:
+            with db.conn.cursor() as cursor:
+                if self._trim(expected_title):
+                    cursor.execute(
+                        f"""
+                        UPDATE {THREAD_TABLE}
+                        SET title = %s, updated_at = NOW()
+                        WHERE thread_id = %s AND title = %s
+                        """,
+                        (normalized_title, int(thread_id), self._trim(expected_title)),
+                    )
+                else:
+                    cursor.execute(
+                        f"UPDATE {THREAD_TABLE} SET title = %s, updated_at = NOW() WHERE thread_id = %s",
+                        (normalized_title, int(thread_id)),
+                    )
+                updated = int(cursor.rowcount or 0) > 0
+            db.conn.commit()
+            return updated
+        finally:
+            db.close_db()
+
     def list_turns(self, *, thread_id: int, limit: int = 80, include_output_payload: bool = True) -> list[Dict[str, Any]]:
         db = StockInfoDbUtils()
         output_payload_select = "output_structured_json" if include_output_payload else "NULL AS output_structured_json"

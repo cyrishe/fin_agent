@@ -146,6 +146,7 @@ class CustomToolContextBundleService:
 - Do not read secrets.
 - Do not directly access database tables, raw provider modules, or network from generated tool code.
 - If finance data is needed, use `custom_tool_sdk.finance_query(request=...)`.
+- Use `custom_tool_sdk.info(message, data)` and `custom_tool_sdk.debug(message, data)` for a small number of core calculation facts.
 - If search is needed, use `custom_tool_sdk.web_search(query=...)`; it may return an unavailable error when no search provider is configured.
 """
 
@@ -156,12 +157,14 @@ class CustomToolContextBundleService:
 Generated custom-tool code can use these stable helpers:
 
 ```python
-from custom_tool_sdk import finance_query, web_search
+from custom_tool_sdk import debug, finance_query, info, web_search
 
 def run(inputs: dict) -> dict:
+    info("calculation_started", {"stock_code": inputs.get("stock_code")})
     quote = finance_query(
         request='r1 = stock.quote(filter = "code = 600519.SH", order = "tradedate desc", limit = 1) -> code, name, tradedate, close, pct'
     )
+    debug("quote_selected", {"close": (quote.get("data") or [{}])[0].get("close")})
     return {"quote": quote}
 ```
 
@@ -170,6 +173,26 @@ def run(inputs: dict) -> dict:
 `finance_query(request: str) -> dict`
 
 Use the finance data protocol request string. The API catalog files describe available subjects, dataviews, fields, and request patterns.
+
+The injected SDK normalizes every successful query to this stable envelope:
+
+```python
+{
+    "ok": True,
+    "error": "",
+    "columns": ["code", "tradedate", "adjclose"],
+    "data": [{"code": "600519.SH", "tradedate": "...", "adjclose": 1.0}],
+    "rows": [...]  # same list as data
+}
+```
+
+Generated modules should read rows from `result["data"]` after checking `result["ok"]`. Provider-specific nesting remains internal to the SDK adapter.
+
+## info / debug
+
+- `info(message: str, data: dict | None = None)` records stage summaries and counts.
+- `debug(message: str, data: dict | None = None)` records the formula inputs and core intermediate metrics that explain the final result.
+- Keep records small and structured. Do not log secrets, raw provider envelopes, or full market-data rows.
 
 ## web_search
 
