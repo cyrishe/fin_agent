@@ -1,6 +1,7 @@
 import type {
   Attachment,
   InteractionResponse,
+  InvocationAsset,
   StreamEvent,
   ThreadDetail,
   ThreadListResult,
@@ -9,7 +10,17 @@ import type {
 } from "./types";
 
 async function readJson<T>(response: Response): Promise<T> {
-  const payload = (await response.json()) as T & { ok?: boolean; error?: string };
+  const body = await response.text();
+  if (!body.trim()) {
+    throw new Error(`服务未返回内容（HTTP ${response.status}），可能正在重启，请稍后重试`);
+  }
+
+  let payload: T & { ok?: boolean; error?: string };
+  try {
+    payload = JSON.parse(body) as T & { ok?: boolean; error?: string };
+  } catch {
+    throw new Error(`服务返回格式异常（HTTP ${response.status}），请刷新后重试`);
+  }
   if (!response.ok || payload.ok === false) {
     throw new Error(payload.error || `HTTP ${response.status}`);
   }
@@ -32,6 +43,27 @@ export async function loadThread(threadId: number): Promise<ThreadDetail> {
       credentials: "include",
     }),
   );
+}
+
+export async function loadInvocationAssets(): Promise<InvocationAsset[]> {
+  const [tools, skills] = await Promise.all([
+    readJson<{ items?: UnknownRecord[] }>(await fetch("/api/tools/catalog", { credentials: "include" })),
+    readJson<{ items?: UnknownRecord[] }>(await fetch("/api/skills/catalog", { credentials: "include" })),
+  ]);
+  return [
+    ...(tools.items || []).map((item) => ({
+      name: String(item.tool_name || item.name || ""),
+      displayName: String(item.display_name || item.tool_name || item.name || ""),
+      description: String(item.description || ""),
+      kind: "tool" as const,
+    })),
+    ...(skills.items || []).map((item) => ({
+      name: String(item.skill_name || item.name || ""),
+      displayName: String(item.display_name || item.skill_name || item.name || ""),
+      description: String(item.description || item.purpose || ""),
+      kind: "skill" as const,
+    })),
+  ].filter((item) => item.name);
 }
 
 export async function resetThread(): Promise<void> {

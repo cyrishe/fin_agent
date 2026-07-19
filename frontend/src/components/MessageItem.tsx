@@ -1,13 +1,21 @@
 import { Bot, FileText, UserRound } from "lucide-react";
-import type { ChatMessage, InteractionResponse } from "../types";
+import type { ChatMessage, InteractionDraft, InteractionFeedbackRequest, InteractionResponse } from "../types";
 import BlockRenderer from "./BlockRenderer";
 import MarkdownContent from "./MarkdownContent";
 
 interface Props {
   message: ChatMessage;
-  onInsertText: (text: string) => void;
-  onInteraction: (response: InteractionResponse, label: string) => void;
-  resolvedInteractions: Set<string>;
+  interactionDrafts: Record<string, InteractionDraft>;
+  selectedInteractions: Record<string, string>;
+  submittedInteractions: Set<string>;
+  disabled: boolean;
+  onDraftChange: (draft: InteractionDraft) => void;
+  onRequestCustomAnswer: (question: string) => void;
+  onClearCustomAnswer: (question: string) => void;
+  onSubmitDraft: (draft: InteractionDraft) => void;
+  onInteraction: (response: InteractionResponse, label: string, key: string) => void;
+  onRequestFeedback: (request: InteractionFeedbackRequest) => void;
+  onSubmitFeedback: () => void;
 }
 
 function UserContent({ content }: { content: string }) {
@@ -16,7 +24,7 @@ function UserContent({ content }: { content: string }) {
   return <><span className="command-token">{match[1]}</span>{match[2]}</>;
 }
 
-export default function MessageItem({ message, onInsertText, onInteraction, resolvedInteractions }: Props) {
+export default function MessageItem({ message, interactionDrafts, selectedInteractions, submittedInteractions, disabled, onDraftChange, onRequestCustomAnswer, onClearCustomAnswer, onSubmitDraft, onInteraction, onRequestFeedback, onSubmitFeedback }: Props) {
   const run = message.run;
   return (
     <article className={`message message-${message.role}`}>
@@ -31,9 +39,17 @@ export default function MessageItem({ message, onInsertText, onInteraction, reso
             {run.artifacts.map((block) => <BlockRenderer
               key={block.block_id}
               block={block}
-              onInsertText={onInsertText}
+              interactionDrafts={interactionDrafts}
+              selectedInteractions={selectedInteractions}
+              submittedInteractions={submittedInteractions}
+              disabled={disabled}
+              onDraftChange={onDraftChange}
+              onRequestCustomAnswer={onRequestCustomAnswer}
+              onClearCustomAnswer={onClearCustomAnswer}
+              onSubmitDraft={onSubmitDraft}
               onInteraction={onInteraction}
-              resolved={resolvedInteractions.has(String(block.data?.interaction_id || ""))}
+              onRequestFeedback={onRequestFeedback}
+              onSubmitFeedback={onSubmitFeedback}
             />)}
           </div>}
         </div>

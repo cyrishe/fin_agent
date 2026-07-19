@@ -2,21 +2,31 @@ import { AlertCircle, CheckCircle2, Circle, Clock3, PlayCircle } from "lucide-re
 import { lazy, Suspense } from "react";
 import { chooseRenderer } from "../rendering/registry";
 import { normalizeRenderObject } from "../rendering/normalize";
-import type { InteractionResponse, SurfaceBlock, UnknownRecord } from "../types";
+import type { InteractionDraft, InteractionFeedbackRequest, InteractionResponse, SurfaceBlock, UnknownRecord } from "../types";
 import DataTable from "./DataTable";
 import MarkdownContent from "./MarkdownContent";
 import CodeArtifact from "./renderers/CodeArtifact";
+import DesignArtifact from "./renderers/DesignArtifact";
 import FlowRenderer from "./renderers/FlowRenderer";
 import MetricStrip from "./renderers/MetricStrip";
+import InteractionRenderer from "./renderers/InteractionRenderer";
 
 const ChartBlock = lazy(() => import("./ChartBlock"));
 const FinanceChart = lazy(() => import("./renderers/FinanceChart"));
 
 interface Props {
   block: SurfaceBlock;
-  onInsertText: (text: string) => void;
-  onInteraction: (response: InteractionResponse, label: string) => void;
-  resolved: boolean;
+  interactionDrafts?: Record<string, InteractionDraft>;
+  selectedInteractions?: Record<string, string>;
+  submittedInteractions?: Set<string>;
+  disabled?: boolean;
+  onDraftChange?: (draft: InteractionDraft) => void;
+  onRequestCustomAnswer?: (question: string) => void;
+  onClearCustomAnswer?: (question: string) => void;
+  onSubmitDraft?: (draft: InteractionDraft) => void;
+  onInteraction?: (response: InteractionResponse, label: string, key: string) => void;
+  onRequestFeedback?: (request: InteractionFeedbackRequest) => void;
+  onSubmitFeedback?: () => void;
 }
 
 const record = (value: unknown): UnknownRecord => value && typeof value === "object" && !Array.isArray(value) ? value as UnknownRecord : {};
@@ -127,46 +137,6 @@ function Assessment({ data, content }: { data: UnknownRecord; content: string })
   );
 }
 
-function Interaction({ data, content, onInsertText, onInteraction, resolved }: Props & { data: UnknownRecord; content: string }) {
-  const questions = list(data.questions).map((item, index) => typeof item === "object" ? record(item) : { id: `q${index}`, question: String(item) });
-  const actions = list(data.actions).map(record);
-  const interactionId = String(data.interaction_id || "");
-  return (
-    <div className="interaction-block">
-      <div className="interaction-prompt">{String(data.prompt || content || "请确认下一步")}</div>
-      {questions.map((question, index) => {
-        const options = list(question.options).map(record);
-        return <div className="question-card" key={String(question.id || index)}>
-          <strong>{String(question.question || "需要补充")}{question.required ? <em>必答</em> : null}</strong>
-          {Boolean(question.reason) && <p>{String(question.reason)}</p>}
-          {options.length > 0 ? <div className="option-list">{options.map((option, optionIndex) => {
-            const label = String(option.label || option.value || `选项 ${optionIndex + 1}`);
-            return <button key={label} type="button" onClick={() => onInsertText(`${String(question.question || "问题")}：${label}`)}><span>{label}{option.recommended ? <small>推荐</small> : null}</span>{Boolean(option.description) && <p>{String(option.description)}</p>}</button>;
-          })}</div> : <p className="muted">请在下方输入框中直接回答。</p>}
-        </div>;
-      })}
-      {actions.length > 0 && <div className="interaction-actions">{actions.map((action, index) => {
-        const label = String(action.label || "继续");
-        const intent = String(action.intent || "");
-        return <button
-          type="button"
-          className={action.style === "primary" ? "primary" : ""}
-          disabled={resolved}
-          key={String(action.action_id || index)}
-          onClick={() => intent === "edit"
-            ? onInsertText("")
-            : onInteraction({
-              interaction_id: interactionId,
-              action_id: String(action.action_id || ""),
-              action: intent === "accept" ? "accept" : intent,
-              expected_revision: Number(action.expected_revision ?? data.subject_revision ?? 0),
-            }, label)}
-        >{resolved ? "已处理" : label}</button>;
-      })}</div>}
-    </div>
-  );
-}
-
 export default function BlockRenderer(props: Props) {
   const { block } = props;
   const object = normalizeRenderObject(block);
@@ -182,9 +152,27 @@ export default function BlockRenderer(props: Props) {
   else if (renderer === "finance.intraday") content = <Suspense fallback={<div className="block-skeleton">正在加载分时图…</div>}><FinanceChart object={object} mode="intraday" /></Suspense>;
   else if (renderer === "diagram.flow" || renderer === "diagram.hierarchy") content = <FlowRenderer object={object} />;
   else if (renderer === "workflow.steps") content = block.block_type === "status" ? <div className="status-line"><Clock3 size={15} />{block.content || String(data.summary || "处理中")}</div> : <Workflow data={data} />;
-  else if (renderer === "artifact.spec") content = <Artifact data={record(data.content || data)} content={block.content || String(data.change_summary || "")} />;
+  else if (renderer === "artifact.spec") content = String(data.artifact_type || "") === "finance.tool_spec"
+    ? <DesignArtifact data={record(data.content || data)} content={block.content || String(data.change_summary || "")} />
+    : <Artifact data={record(data.content || data)} content={block.content || String(data.change_summary || "")} />;
   else if (renderer === "assessment.review") content = <Assessment data={data} content={block.content || ""} />;
-  else if (renderer === "interaction.form") content = <Interaction {...props} data={data} content={block.content || ""} />;
+  else if (renderer === "interaction.form") {
+    const key = `${String(data.interaction_id || "interaction")}:${Number(data.subject_revision ?? data.expected_revision ?? 0)}`;
+    content = <InteractionRenderer
+      data={data}
+      content={block.content || ""}
+      draft={props.interactionDrafts?.[key]}
+      selectedActionId={props.selectedInteractions?.[key]}
+      disabled={props.disabled || props.submittedInteractions?.has(key)}
+      onDraftChange={props.onDraftChange || (() => undefined)}
+      onRequestCustomAnswer={props.onRequestCustomAnswer || (() => undefined)}
+      onClearCustomAnswer={props.onClearCustomAnswer || (() => undefined)}
+      onSubmitDraft={props.onSubmitDraft || (() => undefined)}
+      onAction={props.onInteraction || (() => undefined)}
+      onRequestFeedback={props.onRequestFeedback || (() => undefined)}
+      onSubmitFeedback={props.onSubmitFeedback || (() => undefined)}
+    />;
+  }
   else if (renderer === "resource.list") {
     const resources = Array.isArray(data.resources) ? data.resources.map(record) : [];
     content = <div className="resource-list">{resources.length ? resources.map((resource, index) => <div key={String(resource.resource_id || index)}><div><strong>{String(resource.title || `资源 ${index + 1}`)}</strong><span>{String(resource.relation || resource.mime_type || "")}</span></div>{resource.uri ? <code>{String(resource.uri)}</code> : null}</div>) : <div className="empty-block">暂无可展示资源</div>}</div>;
@@ -192,8 +180,9 @@ export default function BlockRenderer(props: Props) {
     content = <pre className="structured-fallback">{JSON.stringify(data, null, 2)}</pre>;
   }
 
+  const stage = String(block.stage || record(block.data).stage || record(block.meta).stage || "");
   return (
-    <section className={`surface-block block-${object.kind} renderer-${renderer.replaceAll(".", "-")}`} data-block-id={block.block_id} data-renderer={renderer}>
+    <section className={`surface-block block-${object.kind} renderer-${renderer.replaceAll(".", "-")}${stage ? ` stage-${stage}` : ""}`} data-block-id={block.block_id} data-renderer={renderer}>
       {block.title && <div className="surface-title">{block.title}</div>}
       {content}
     </section>

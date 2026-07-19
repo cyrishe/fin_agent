@@ -12,11 +12,26 @@ function graphToMermaid(object: RenderObject): string {
   if (!graph.nodes.length) return "";
 
   const lines = ["flowchart LR"];
+  const nodeIds = new Map(graph.nodes.map((node, index) => [node.id, `n${index + 1}`]));
   graph.nodes.forEach((node) => {
-    const shape = node.status === "running" ? `{${safeLabel(node.label)}}` : `[${safeLabel(node.label)}]`;
-    lines.push(`  ${node.id}${shape}`);
+    const id = nodeIds.get(node.id)!;
+    const label = safeLabel(node.label);
+    const shape = node.status === "decision" ? `{${label}}`
+      : node.status === "validate" ? `([${label}])`
+        : node.status === "output" ? `[/ ${label} /]`
+          : `[${label}]`;
+    lines.push(`  ${id}${shape}`);
+    if (["validate", "decision", "output", "process"].includes(String(node.status))) lines.push(`  class ${id} ${node.status}`);
   });
-  graph.edges.forEach((edge) => lines.push(`  ${edge.from} -->${edge.label ? `|${safeLabel(edge.label)}|` : ""} ${edge.to}`));
+  graph.edges.forEach((edge) => {
+    const from = nodeIds.get(edge.from);
+    const to = nodeIds.get(edge.to);
+    if (from && to) lines.push(`  ${from} -->${edge.label ? `|${safeLabel(edge.label)}|` : ""} ${to}`);
+  });
+  lines.push("  classDef validate fill:#f3f7ff,stroke:#7d9fdf,color:#264f9e");
+  lines.push("  classDef process fill:#f7f9fc,stroke:#aeb9ca,color:#33445f");
+  lines.push("  classDef decision fill:#fff8e9,stroke:#d6a34a,color:#795612");
+  lines.push("  classDef output fill:#eefaf6,stroke:#55a88d,color:#165f4b");
   const grouped = new Map<string, string[]>();
   graph.nodes.forEach((node) => {
     if (!node.status) return;

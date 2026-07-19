@@ -1,12 +1,13 @@
 import { Menu, MessageSquarePlus, PanelRight, Sparkles } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { dispatchChat, loadThread, loadThreads, resetThread, startCustomToolStream, uploadAttachments } from "./api";
+import { dispatchChat, loadInvocationAssets, loadThread, loadThreads, resetThread, startCustomToolStream, uploadAttachments } from "./api";
 import Composer from "./components/Composer";
 import MessageItem from "./components/MessageItem";
 import RunPanel from "./components/RunPanel";
 import Sidebar from "./components/Sidebar";
 import { applyStreamEvent, blocksFromPayload, initialRun, isProcessBlock } from "./surface";
-import type { AgentRun, Attachment, ChatMessage, InteractionResponse, StreamEvent, ThreadSummary, UnknownRecord } from "./types";
+import { customAnswerPrompt, prepareClarificationSubmission, readFeedbackValue, removeComposerPrompt, upsertComposerPrompt } from "./interactionDraft";
+import type { AgentRun, Attachment, ChatMessage, InteractionDraft, InteractionFeedbackRequest, InteractionResponse, InvocationAsset, StreamEvent, ThreadSummary, UnknownRecord } from "./types";
 
 const intro: ChatMessage = {
   id: "intro",
@@ -51,10 +52,15 @@ export default function App() {
   const [busy, setBusy] = useState(false);
   const [customToolActive, setCustomToolActive] = useState(false);
   const [attachments, setAttachments] = useState<Attachment[]>([]);
-  const [resolvedInteractions, setResolvedInteractions] = useState<Set<string>>(new Set());
+  const [interactionDrafts, setInteractionDrafts] = useState<Record<string, InteractionDraft>>({});
+  const [selectedInteractions, setSelectedInteractions] = useState<Record<string, string>>({});
+  const [submittedInteractions, setSubmittedInteractions] = useState<Set<string>>(new Set());
+  const [pendingFeedback, setPendingFeedback] = useState<InteractionFeedbackRequest | null>(null);
+  const [composerFocusRequest, setComposerFocusRequest] = useState(0);
   const [error, setError] = useState("");
   const [leftOpen, setLeftOpen] = useState(false);
   const [rightOpen, setRightOpen] = useState(false);
+  const [invocationAssets, setInvocationAssets] = useState<InvocationAsset[]>([]);
   const bottomRef = useRef<HTMLDivElement>(null);
 
   const latestRun = useMemo(() => [...messages].reverse().find((message) => message.run)?.run, [messages]);
@@ -85,6 +91,9 @@ export default function App() {
       }
     })();
   }, [refreshThreads]);
+  useEffect(() => {
+    void loadInvocationAssets().then(setInvocationAssets).catch(() => setInvocationAssets([]));
+  }, []);
   useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: busy ? "auto" : "smooth", block: "end" }); }, [messages.length, busy]);
 
   const selectThread = async (selectedId: number) => {
@@ -94,7 +103,10 @@ export default function App() {
       setThreadId(Number(detail.thread?.thread_id || selectedId));
       setMessages(hydrateMessages(detail.turns || []));
       setCustomToolActive(Boolean(detail.custom_tool_active));
-      setResolvedInteractions(new Set());
+      setInteractionDrafts({});
+      setSelectedInteractions({});
+      setSubmittedInteractions(new Set());
+      setPendingFeedback(null);
       setLeftOpen(false);
     } catch (reason) { setError(reason instanceof Error ? reason.message : String(reason)); }
   };
@@ -104,7 +116,10 @@ export default function App() {
     setThreadId(null);
     setMessages([{ ...intro, id: id(), createdAt: Date.now() }]);
     setCustomToolActive(false);
-    setResolvedInteractions(new Set());
+    setInteractionDrafts({});
+    setSelectedInteractions({});
+    setSubmittedInteractions(new Set());
+    setPendingFeedback(null);
     setAttachments([]);
     setInput("");
     setLeftOpen(false);
@@ -134,7 +149,77 @@ export default function App() {
     await refreshThreads();
   }, [refreshThreads, threadId, updateRun]);
 
+  const interact = async (response: InteractionResponse, label: string, key: string, text = "") => {
+    if (busy) return;
+    setSelectedInteractions((current) => ({ ...current, [key]: response.action_id }));
+    setSubmittedInteractions((current) => new Set(current).add(key));
+    const assistantId = id();
+    setMessages((current) => [...current, { id: id(), role: "user", content: label, createdAt: Date.now() }, { id: assistantId, role: "assistant", content: "", run: initialRun("正在继续当前任务"), createdAt: Date.now() }]);
+    setBusy(true);
+    setError("");
+    try { await runStream(text, assistantId, { ...response, label }); }
+    catch (reason) {
+      setSubmittedInteractions((current) => { const next = new Set(current); next.delete(key); return next; });
+      const message = reason instanceof Error ? reason.message : String(reason);
+      setError(message);
+      updateRun(assistantId, { event: "error", message });
+    } finally { setBusy(false); }
+  };
+
+  const requestCustomAnswer = (question: string) => {
+    setInput((current) => upsertComposerPrompt(current, customAnswerPrompt(question)));
+    setComposerFocusRequest((current) => current + 1);
+  };
+
+  const clearCustomAnswer = (question: string) => {
+    setInput((current) => removeComposerPrompt(current, customAnswerPrompt(question)));
+  };
+
+  const submitDraft = async (draft: InteractionDraft) => {
+    if (busy) return;
+    const submission = prepareClarificationSubmission(draft, input);
+    if (submission.missing.length) {
+      setError(`请先填写：${submission.missing.join("、")}`);
+      setComposerFocusRequest((current) => current + 1);
+      return;
+    }
+    setInput("");
+    await interact(submission.response, submission.summary || "已确认待确认项", draft.key);
+  };
+
+  const requestFeedback = (request: InteractionFeedbackRequest) => {
+    setPendingFeedback(request);
+    setSelectedInteractions((current) => ({ ...current, [request.key]: request.response.action_id }));
+    setInput((current) => upsertComposerPrompt(current, request.prompt));
+    setComposerFocusRequest((current) => current + 1);
+  };
+
+  const submitFeedback = async () => {
+    if (!pendingFeedback || busy) return;
+    const value = readFeedbackValue(input, pendingFeedback.prompt);
+    if (!value) {
+      setError("请先在输入框中写明希望 Fin Agent 如何处理");
+      setComposerFocusRequest((current) => current + 1);
+      return;
+    }
+    const request = pendingFeedback;
+    setInput("");
+    setPendingFeedback(null);
+    await interact({ ...request.response, feedback_text: value }, `${request.prompt}${value}`, request.key, value);
+  };
+
   const send = async () => {
+    if (pendingFeedback) {
+      await submitFeedback();
+      return;
+    }
+    const pendingCustomDraft = Object.values(interactionDrafts).reverse().find((draft) =>
+      !submittedInteractions.has(draft.key) && Object.values(draft.answers).some((answer) => answer.mode === "custom"),
+    );
+    if (pendingCustomDraft) {
+      await submitDraft(pendingCustomDraft);
+      return;
+    }
     const text = input.trim();
     if ((!text && !attachments.length) || busy) return;
     const userMessage: ChatMessage = { id: id(), role: "user", content: text || `已发送 ${attachments.length} 个附件`, attachments, createdAt: Date.now() };
@@ -172,21 +257,6 @@ export default function App() {
     } finally { setBusy(false); }
   };
 
-  const interact = async (response: InteractionResponse, label: string) => {
-    if (busy) return;
-    setResolvedInteractions((current) => new Set(current).add(response.interaction_id));
-    const assistantId = id();
-    setMessages((current) => [...current, { id: id(), role: "user", content: label, createdAt: Date.now() }, { id: assistantId, role: "assistant", content: "", run: initialRun("正在继续当前任务"), createdAt: Date.now() }]);
-    setBusy(true);
-    try { await runStream("", assistantId, response); }
-    catch (reason) {
-      setResolvedInteractions((current) => { const next = new Set(current); next.delete(response.interaction_id); return next; });
-      const message = reason instanceof Error ? reason.message : String(reason);
-      setError(message);
-      updateRun(assistantId, { event: "error", message });
-    } finally { setBusy(false); }
-  };
-
   const addFiles = async (files: File[]) => {
     if (!files.length) return;
     setError("");
@@ -208,10 +278,24 @@ export default function App() {
           <div className="header-actions"><button className="header-new" type="button" onClick={() => void newThread()}><MessageSquarePlus size={16} /><span>新对话</span></button><button className="icon-button mobile-only" onClick={() => setRightOpen(true)} aria-label="打开运行信息"><PanelRight size={20} /></button></div>
         </header>
         <section className="message-scroll" aria-live="polite">
-          <div className="message-list">{messages.map((message) => <MessageItem key={message.id} message={message} onInsertText={(text) => setInput((current) => text ? `${current}${current ? "\n" : ""}${text}` : "")} onInteraction={(response, label) => void interact(response, label)} resolvedInteractions={resolvedInteractions} />)}<div ref={bottomRef} /></div>
+          <div className="message-list">{messages.map((message) => <MessageItem
+            key={message.id}
+            message={message}
+            interactionDrafts={interactionDrafts}
+            selectedInteractions={selectedInteractions}
+            submittedInteractions={submittedInteractions}
+            disabled={busy}
+            onDraftChange={(draft) => setInteractionDrafts((current) => ({ ...current, [draft.key]: draft }))}
+            onRequestCustomAnswer={requestCustomAnswer}
+            onClearCustomAnswer={clearCustomAnswer}
+            onSubmitDraft={(draft) => void submitDraft(draft)}
+            onInteraction={(response, label, key) => void interact(response, label, key)}
+            onRequestFeedback={requestFeedback}
+            onSubmitFeedback={() => void submitFeedback()}
+          />)}<div ref={bottomRef} /></div>
         </section>
         {error && <div className="global-error" role="alert">{error}<button type="button" onClick={() => setError("")}>关闭</button></div>}
-        <Composer value={input} onChange={setInput} onSend={() => void send()} busy={busy} attachments={attachments} onFiles={(files) => void addFiles(files)} onRemoveAttachment={(index) => setAttachments((current) => current.filter((_, itemIndex) => itemIndex !== index))} />
+        <Composer value={input} onChange={setInput} onSend={() => void send()} busy={busy} focusRequest={composerFocusRequest} assets={invocationAssets} attachments={attachments} onFiles={(files) => void addFiles(files)} onRemoveAttachment={(index) => setAttachments((current) => current.filter((_, itemIndex) => itemIndex !== index))} />
       </main>
       <div className={`run-slot ${rightOpen ? "mobile-open" : ""}`}><RunPanel run={latestRun} onClose={() => setRightOpen(false)} /></div>
     </div>

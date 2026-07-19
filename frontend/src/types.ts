@@ -88,4 +88,39 @@ export interface InteractionResponse {
   action_id: string;
   action: string;
   expected_revision: number;
+  label?: string;
+  subject_ref?: string;
+  answers?: InteractionAnswer[];
+  feedback_text?: string;
+}
+
+export interface InteractionAnswer {
+  question_id: string;
+  question: string;
+  value: string;
+  label: string;
+  mode: "option" | "custom";
+}
+
+export interface InteractionDraft {
+  key: string;
+  interactionId: string;
+  actionId: string;
+  action: string;
+  expectedRevision: number;
+  answers: Record<string, InteractionAnswer>;
+}
+
+export interface InteractionFeedbackRequest {
+  key: string;
+  prompt: string;
+  label: string;
+  response: InteractionResponse;
+}
+
+export interface InvocationAsset {
+  name: string;
+  displayName: string;
+  description: string;
+  kind: "tool" | "skill";
 }
