@@ -1,9 +1,11 @@
 from __future__ import annotations
 
 import json
+import hashlib
 import os
 from pathlib import Path
 import queue
+import re
 import selectors
 import signal
 import shutil
@@ -13,7 +15,26 @@ import threading
 import time
 from typing import Any, Callable, Dict, Iterable, List, Mapping, Optional
 
+from src.services.agent_providers.protocol import AgentEventCoalescer, normalize_agent_run_result
+from src.services.agent_providers.runtime_policy import AgentCapabilityPolicy, WebSearchPolicy
 from src.services.custom_tool_context_bundle_service import CustomToolContextBundleService
+
+
+_SKILL_EXECUTION_DEVELOPER_INSTRUCTIONS = (
+    "Execute only the Skill task supplied in the user prompt. The SKILL.md content is already present; do not read it "
+    "again. Do not inspect AGENTS.md, memory files, unrelated skills, or unrelated repository files. Read only the "
+    "playbooks and references explicitly selected by the Skill, plus the minimum required context-bundle files. "
+    "If the Skill routes to a playbook, load that playbook before answering; never skip that required playbook read. "
+    "Do not modify workspace files."
+)
+
+_CODING_WORKSPACE_DEVELOPER_INSTRUCTIONS = (
+    "Execute only the Skill task supplied in the user prompt. The SKILL.md content is already present; do not read it "
+    "again. Do not inspect AGENTS.md, memory files, unrelated skills, or unrelated repository files. Read only the "
+    "task, design, feedback, implementation, API catalog, and Skill reference files explicitly supplied in the "
+    "context bundle. You may edit only the module files listed in CONTEXT.current_implementation.module_files, "
+    "and may create temporary focused tests only under scratch/. Do not modify any other file."
+)
 
 
 def _trim(value: Any) -> str:
@@ -22,6 +43,13 @@ def _trim(value: Any) -> str:
 
 def _json_text(value: Any) -> str:
     return json.dumps(value, ensure_ascii=False, indent=2)
+
+
+def _requirement_understanding(value: Any) -> Dict[str, Any]:
+    if isinstance(value, Mapping):
+        return dict(value)
+    brief = _trim(value)
+    return {"requirement_brief": brief} if brief else {}
 
 
 class CodexExecSkillHarness:
@@ -112,7 +140,10 @@ class CodexExecSkillHarness:
             context=run_context,
             run_id=session_id,
         )
-        run_context["context_bundle"] = bundle
+        public_bundle = self._public_bundle(bundle)
+        prompt_context = self._prompt_context(bundle, run_context)
+        prompt_context["context_bundle"] = public_bundle
+        execution_cwd = self._execution_cwd(public_bundle)
         self._append_event(
             stage_events,
             {
@@ -126,18 +157,22 @@ class CodexExecSkillHarness:
 
         prompt = self._build_prompt(
             skill_text=skill_file.read_text(encoding="utf-8"),
+            skill_root=str(skill_file.parent.resolve()),
             user_request=user_request,
-            context=run_context,
+            context=prompt_context,
             structured_output=output_schema_file is not None,
+            stage=stage_name,
         )
         with tempfile.NamedTemporaryFile("w+", encoding="utf-8", suffix=".txt", delete=False) as output_file:
             output_path = output_file.name
+        schema_path = output_schema_file
+        transient_schema_path = ""
         command = [
             self.codex_bin,
             "exec",
             "--json",
             "--cd",
-            str(self.cwd),
+            str(execution_cwd),
             "--sandbox",
             self.sandbox,
             "--output-last-message",
@@ -145,8 +180,8 @@ class CodexExecSkillHarness:
         ]
         if self.model:
             command.extend(["--model", self.model])
-        if output_schema_file is not None:
-            command.extend(["--output-schema", str(output_schema_file)])
+        if schema_path is not None:
+            command.extend(["--output-schema", str(schema_path)])
         command.append("-")
 
         started_at = time.time()
@@ -166,7 +201,18 @@ class CodexExecSkillHarness:
             },
             event_sink,
         )
-        run_result = self._run_process(command, prompt, started_at=started_at, event_sink=event_sink)
+        run_result = self._run_process(
+            command,
+            prompt,
+            started_at=started_at,
+            cwd=execution_cwd,
+            event_sink=event_sink,
+        )
+        if transient_schema_path:
+            try:
+                os.unlink(transient_schema_path)
+            except OSError:
+                pass
         self._append_event(
             stage_events,
             {
@@ -193,7 +239,7 @@ class CodexExecSkillHarness:
                 "session_id": session_id,
                 "raw_stdout": run_result.get("stdout") or "",
                 "raw_stderr": run_result.get("stderr") or "",
-                "context_bundle": bundle,
+                "context_bundle": public_bundle,
             }
 
         last_message = ""
@@ -210,10 +256,12 @@ class CodexExecSkillHarness:
         events = stage_events + process_events
         events.extend(self._extract_model_events(last_message))
         final = self._final_from_text(last_message) or self._find_final(events)
+        if final and stage_name == "coding":
+            final = self._collect_coding_result(bundle, final)
         if final and not self._find_final(events):
             self._append_event(
                 events,
-                {**final, "metadata": {"stage": stage_name}},
+                {**final, "metadata": {"stage": stage_name, "provider": self.provider_name}},
                 event_sink,
             )
         self._append_event(
@@ -240,7 +288,7 @@ class CodexExecSkillHarness:
             "raw_stdout": run_result.get("stdout") or "",
             "raw_stderr": run_result.get("stderr") or "",
             "last_message": last_message,
-            "context_bundle": bundle,
+            "context_bundle": public_bundle,
             "duration_ms": int((time.time() - started_at) * 1000),
         }
 
@@ -250,6 +298,7 @@ class CodexExecSkillHarness:
         prompt: str,
         *,
         started_at: float,
+        cwd: Optional[Path] = None,
         event_sink: Optional[Callable[[Dict[str, Any]], None]] = None,
     ) -> Dict[str, Any]:
         proc = subprocess.Popen(
@@ -258,7 +307,7 @@ class CodexExecSkillHarness:
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             text=True,
-            cwd=str(self.cwd),
+            cwd=str(cwd or self.cwd),
             bufsize=1,
             start_new_session=True,
         )
@@ -394,12 +443,16 @@ class CodexExecSkillHarness:
         self,
         *,
         skill_text: str,
+        skill_root: str = "",
         user_request: str,
         context: Mapping[str, Any],
         structured_output: bool = False,
+        stage: str = "",
     ) -> str:
         bundle = context.get("context_bundle") if isinstance(context.get("context_bundle"), Mapping) else {}
         bundle_dir = _trim(bundle.get("bundle_dir"))
+        coding_workspace = bundle.get("coding_workspace") if isinstance(bundle.get("coding_workspace"), Mapping) else {}
+        editable_workspace = coding_workspace.get("editable") is True
         output_instruction = (
             ""
             if structured_output
@@ -408,20 +461,72 @@ class CodexExecSkillHarness:
                 "最后一行必须是 source=model,type=final 的 JSON 对象。\n"
             )
         )
+        workspace_instruction = (
+            "当前实现已放在隔离的临时 Coding 工作区。先用 rg/sed 按需定位相关函数、反馈和 API，"
+            "只修改 CONTEXT.current_implementation.module_files 列出的模块文件。最终结构化输出必须反映修改后的内容；"
+            "外层系统会从工作区回收源码并保存数据库 revision。\n"
+            if editable_workspace
+            else "不要修改工作区文件。\n"
+        )
+        skill_resources = ""
+        if _trim(skill_root):
+            skill_resources = (
+                "# SKILL RESOURCES\n"
+                f"Skill 目录：{_trim(skill_root)}\n"
+                "SKILL 中的相对文件引用均从该目录解析；只读取当前任务明确需要的文件。\n\n"
+            )
+        file_context = ""
+        if _trim(stage) == "design":
+            file_context = (
+                "如果 CONTEXT 提供 design_ref，只按需读取该设计资产；不要读取 API Catalog 或实现资料。\n"
+            )
+        elif _trim(stage) == "coding":
+            file_context = (
+                "如果任务需要金融数据工具能力，先读取资料包中的 api_catalog/index.json；再只读取相关 subject 文件。\n"
+                "生成动态代码时参考 custom_tool_sdk.md。\n"
+            )
         return (
             "请严格按照下面的 SKILL 执行任务。\n"
-            "不要修改工作区文件。\n"
+            f"{workspace_instruction}"
             f"{output_instruction}\n"
             "# AVAILABLE FILE CONTEXT\n"
             f"资料包目录：{bundle_dir}\n"
-            "如果任务需要金融数据工具能力，先读取资料包中的 api_catalog/index.json；再只读取相关 subject 文件。\n"
-            "如果任务需要在生成代码中使用金融数据或搜索能力，参考 custom_tool_sdk.md。\n\n"
+            f"{file_context}\n"
             "# SKILL\n"
             f"{skill_text}\n\n"
+            f"{skill_resources}"
             "# CONTEXT\n"
             f"{_json_text(dict(context))}\n\n"
             "# USER REQUEST\n"
             f"{user_request}\n"
+        )
+
+    def _execution_cwd(self, bundle: Mapping[str, Any]) -> Path:
+        workspace = bundle.get("coding_workspace") if isinstance(bundle.get("coding_workspace"), Mapping) else {}
+        bundle_dir = _trim(bundle.get("bundle_dir"))
+        if workspace and bundle_dir:
+            return Path(bundle_dir)
+        return self.cwd
+
+    def _public_bundle(self, bundle: Mapping[str, Any]) -> Dict[str, Any]:
+        method = getattr(self.context_bundle_service, "public_bundle", None)
+        return dict(method(bundle)) if callable(method) else dict(bundle)
+
+    def _prompt_context(self, bundle: Mapping[str, Any], fallback: Mapping[str, Any]) -> Dict[str, Any]:
+        method = getattr(self.context_bundle_service, "prompt_context", None)
+        return dict(method(bundle, fallback)) if callable(method) else dict(fallback)
+
+    def _collect_coding_result(self, bundle: Mapping[str, Any], final: Mapping[str, Any]) -> Dict[str, Any]:
+        method = getattr(self.context_bundle_service, "collect_coding_result", None)
+        return dict(method(bundle, final)) if callable(method) else dict(final)
+
+    @staticmethod
+    def _developer_instructions(bundle: Mapping[str, Any]) -> str:
+        workspace = bundle.get("coding_workspace") if isinstance(bundle.get("coding_workspace"), Mapping) else {}
+        return (
+            _CODING_WORKSPACE_DEVELOPER_INSTRUCTIONS
+            if workspace.get("editable") is True
+            else _SKILL_EXECUTION_DEVELOPER_INSTRUCTIONS
         )
 
     def _resolve_output_schema_file(self, *, skill_file: Path, output_schema_path: str = "") -> Optional[Path]:
@@ -575,6 +680,8 @@ class CodexExecSkillHarness:
 class CodexSdkSkillHarness(CodexExecSkillHarness):
     """SDK-backed Codex runner with stream events and structured final output."""
 
+    provider_name = "codex"
+
     def __init__(
         self,
         *,
@@ -582,8 +689,11 @@ class CodexSdkSkillHarness(CodexExecSkillHarness):
         timeout_seconds: int = 180,
         hard_timeout_seconds: int = 0,
         model: str = "",
+        reasoning_effort: str = "medium",
         sandbox: str = "workspace-write",
         auth_mode: str = "",
+        complexity_level: str = "",
+        capabilities: Optional[AgentCapabilityPolicy] = None,
         context_bundle_service: Optional[CustomToolContextBundleService] = None,
     ) -> None:
         super().__init__(
@@ -596,6 +706,9 @@ class CodexSdkSkillHarness(CodexExecSkillHarness):
             context_bundle_service=context_bundle_service,
         )
         self.auth_mode = _trim(auth_mode or os.environ.get("STOCK_AGENT_CODEX_AUTH_MODE") or "auto")
+        self.reasoning_effort = _trim(reasoning_effort) or "medium"
+        self.complexity_level = _trim(complexity_level).lower()
+        self.capabilities = capabilities
 
     def available(self) -> bool:
         try:
@@ -619,24 +732,24 @@ class CodexSdkSkillHarness(CodexExecSkillHarness):
         stage_name = stage or self._infer_stage(Path(skill_path))
         stage_events: List[Dict[str, Any]] = []
         if not self.available():
-            return {
+            return normalize_agent_run_result({
                 "ok": False,
                 "error": "`openai-codex` is not available",
                 "events": [],
                 "final": {},
                 "session_id": session_id,
-            }
+            }, provider=self.provider_name, stage=stage_name, session_id=session_id)
         skill_file = Path(skill_path)
         if not skill_file.is_absolute():
             skill_file = self.cwd / skill_file
         if not skill_file.exists():
-            return {
+            return normalize_agent_run_result({
                 "ok": False,
                 "error": f"skill file not found: {skill_file}",
                 "events": [],
                 "final": {},
                 "session_id": session_id,
-            }
+            }, provider=self.provider_name, stage=stage_name, session_id=session_id)
         try:
             output_schema_file = self._resolve_output_schema_file(
                 skill_file=skill_file,
@@ -648,22 +761,23 @@ class CodexSdkSkillHarness(CodexExecSkillHarness):
                 else self._output_schema(stage_name)
             )
         except (FileNotFoundError, ValueError) as exc:
-            return {
+            return normalize_agent_run_result({
                 "ok": False,
                 "error": str(exc),
                 "events": [],
                 "final": {},
                 "session_id": session_id,
-            }
+            }, provider=self.provider_name, stage=stage_name, session_id=session_id)
 
         run_context = dict(context or {})
+        provider_session_id = _trim(run_context.pop("_provider_session_id", ""))
         self._append_event(
             stage_events,
             {
                 "source": "harness",
                 "type": "stage_start",
                 "content": f"codex sdk skill stage started: {stage_name}",
-                "metadata": {"stage": stage_name, "session_id": session_id},
+                "metadata": {"stage": stage_name, "session_id": session_id, "provider": self.provider_name},
             },
             event_sink,
         )
@@ -673,21 +787,36 @@ class CodexSdkSkillHarness(CodexExecSkillHarness):
             context=run_context,
             run_id=session_id,
         )
-        run_context["context_bundle"] = bundle
+        public_bundle = self._public_bundle(bundle)
+        prompt_context = self._prompt_context(bundle, run_context)
+        prompt_context["context_bundle"] = public_bundle
+        execution_cwd = self._execution_cwd(public_bundle)
         self._append_event(
             stage_events,
             {
                 "source": "harness",
                 "type": "context_ready",
                 "content": "context bundle prepared",
-                "metadata": {"stage": stage_name, "bundle_dir": bundle.get("bundle_dir")},
+                "metadata": {
+                    "stage": stage_name,
+                    "bundle_dir": bundle.get("bundle_dir"),
+                    "provider": self.provider_name,
+                    "api_sources": list(public_bundle.get("api_sources") or []),
+                    "module_plan": list(
+                        (public_bundle.get("coding_workspace") or {}).get("module_plan_items") or []
+                    ),
+                    "first_implementation": bool(
+                        (public_bundle.get("coding_workspace") or {}).get("first_implementation")
+                    ),
+                },
             },
             event_sink,
         )
         prompt = self._build_sdk_prompt(
             skill_text=skill_file.read_text(encoding="utf-8"),
+            skill_root=str(skill_file.parent.resolve()),
             user_request=user_request,
-            context=run_context,
+            context=prompt_context,
             stage=stage_name,
         )
         events = list(stage_events)
@@ -700,17 +829,21 @@ class CodexSdkSkillHarness(CodexExecSkillHarness):
         timeout = False
         timeout_kind = ""
         timeout_after_seconds = 0
+        isolated_home: Optional[tempfile.TemporaryDirectory[str]] = None
+        active_provider_session_id = provider_session_id
+        event_coalescer = AgentEventCoalescer()
 
         try:
-            from openai_codex import ApprovalMode, Codex, CodexConfig, Sandbox
-            from openai_codex.types import Personality, ReasoningSummary
+            from openai_codex import ApprovalMode, Codex, CodexConfig, Sandbox, SkillInput, TextInput
+            from openai_codex.types import Personality, ReasoningEffort, ReasoningSummary
 
             sdk_sandbox = self._sdk_sandbox(Sandbox)
-            sdk_env = self._sdk_env()
+            sdk_env, isolated_home = self._sdk_runtime_env(session_id=session_id)
             codex_bin = shutil.which(self.codex_bin)
             config = CodexConfig(
                 codex_bin=codex_bin,
-                cwd=str(self.cwd),
+                config_overrides=self._codex_config_overrides(),
+                cwd=str(execution_cwd),
                 env=sdk_env or None,
             )
             self._append_event(
@@ -726,26 +859,57 @@ class CodexSdkSkillHarness(CodexExecSkillHarness):
                         "hard_timeout_seconds": self.hard_timeout_seconds,
                         "codex_bin": codex_bin or "<sdk-pinned>",
                         "output_schema_path": str(output_schema_file or "<built-in>"),
+                        "complexity": self.complexity_level,
+                        "model": self.model,
+                        "reasoning_effort": self.reasoning_effort,
+                        "resumed": bool(provider_session_id),
+                        "web_search": self.capabilities.web_search.value if self.capabilities else "inherited",
+                        "mcp_server_count": len(self.capabilities.mcp_servers) if self.capabilities else -1,
                     },
                 },
                 event_sink,
             )
             with Codex(config=config) as codex:
                 self._apply_auth(codex)
-                thread = codex.thread_start(
-                    approval_mode=ApprovalMode.deny_all,
-                    cwd=str(self.cwd),
-                    model=self.model or None,
-                    sandbox=sdk_sandbox,
+                if provider_session_id:
+                    thread = codex.thread_resume(
+                        provider_session_id,
+                        approval_mode=ApprovalMode.deny_all,
+                        cwd=str(execution_cwd),
+                        model=self.model or None,
+                        sandbox=sdk_sandbox,
+                    )
+                else:
+                    thread = codex.thread_start(
+                        approval_mode=ApprovalMode.deny_all,
+                        cwd=str(execution_cwd),
+                        developer_instructions=self._developer_instructions(public_bundle),
+                        model=self.model or None,
+                        sandbox=sdk_sandbox,
+                    )
+                active_provider_session_id = _trim(getattr(thread, "id", "")) or provider_session_id
+                skill_name = self._skill_name(skill_file)
+                turn_input = (
+                    [TextInput(text=self._build_sdk_resume_prompt(user_request=user_request, context=prompt_context))]
+                    if provider_session_id
+                    else [
+                        SkillInput(name=skill_name, path=str(skill_file.resolve())),
+                        TextInput(text=prompt),
+                    ]
                 )
+                turn_options = {
+                    "approval_mode": ApprovalMode.deny_all,
+                    "effort": ReasoningEffort(self.reasoning_effort),
+                    "model": self.model or None,
+                    "output_schema": output_schema,
+                    "personality": Personality.pragmatic,
+                    "sandbox": sdk_sandbox,
+                }
+                if self._supports_reasoning_summary():
+                    turn_options["summary"] = ReasoningSummary.model_validate("concise")
                 turn = thread.turn(
-                    prompt,
-                    approval_mode=ApprovalMode.deny_all,
-                    model=self.model or None,
-                    output_schema=output_schema,
-                    personality=Personality.pragmatic,
-                    sandbox=sdk_sandbox,
-                    summary=ReasoningSummary.model_validate("concise"),
+                    turn_input,
+                    **turn_options,
                 )
                 notification_queue: queue.Queue[tuple[str, Any]] = queue.Queue()
 
@@ -816,7 +980,7 @@ class CodexSdkSkillHarness(CodexExecSkillHarness):
                     method = _trim(getattr(notification, "method", ""))
                     payload = getattr(notification, "payload", None)
                     if method == "item/agentMessage/delta":
-                        delta = _trim(getattr(payload, "delta", ""))
+                        delta = str(getattr(payload, "delta", "") or "")
                         if delta:
                             agent_deltas.append(delta)
                     if method == "item/completed":
@@ -829,21 +993,30 @@ class CodexSdkSkillHarness(CodexExecSkillHarness):
                             transient_errors.append(transient_error)
                     if method == "turn/completed":
                         error = self._sdk_turn_error_text(payload) or error
-                    events.extend(new_events)
                     for event in new_events:
-                        self._send_event(event, event_sink)
+                        for ready_event in event_coalescer.push(event):
+                            events.append(ready_event)
+                            self._send_event(ready_event, event_sink)
                     if method == "turn/completed":
                         break
                 final_response = _trim(completed_texts[-1] if completed_texts else "".join(agent_deltas))
         except Exception as exc:
             error = str(exc)
+        finally:
+            for ready_event in event_coalescer.flush():
+                events.append(ready_event)
+                self._send_event(ready_event, event_sink)
+            if isolated_home is not None:
+                isolated_home.cleanup()
 
         events.extend(self._extract_model_events(final_response))
         final = self._final_from_text(final_response) or self._find_final(events)
+        if final and stage_name == "coding":
+            final = self._collect_coding_result(bundle, final)
         if final and not self._find_final(events):
             self._append_event(
                 events,
-                {**final, "metadata": {"stage": stage_name}},
+                {**final, "metadata": {"stage": stage_name, "provider": self.provider_name}},
                 event_sink,
             )
         ok = bool(final) and not error and not timeout
@@ -855,6 +1028,7 @@ class CodexSdkSkillHarness(CodexExecSkillHarness):
                 "content": "codex sdk skill stage parsed",
                 "metadata": {
                     "stage": stage_name,
+                    "provider": self.provider_name,
                     "ok": ok,
                     "final_status": final.get("status"),
                     "timeout": timeout,
@@ -863,7 +1037,7 @@ class CodexSdkSkillHarness(CodexExecSkillHarness):
             },
             event_sink,
         )
-        return {
+        return normalize_agent_run_result({
             "ok": ok,
             "error": error or (f"codex sdk {timeout_kind or 'timeout'} after {timeout_after_seconds or self.hard_timeout_seconds}s" if timeout else ""),
             "timeout": timeout,
@@ -872,20 +1046,315 @@ class CodexSdkSkillHarness(CodexExecSkillHarness):
             "events": events,
             "final": final,
             "session_id": session_id,
+            "provider_session_id": active_provider_session_id,
             "raw_stdout": "",
             "raw_stderr": "\n".join(transient_errors + ([error] if error else [])),
             "last_message": final_response,
-            "context_bundle": bundle,
+            "context_bundle": public_bundle,
             "duration_ms": int((time.time() - started_at) * 1000),
-        }
+        }, provider=self.provider_name, stage=stage_name, session_id=session_id)
 
-    def _build_sdk_prompt(self, *, skill_text: str, user_request: str, context: Mapping[str, Any], stage: str) -> str:
-        return self._build_prompt(
-            skill_text=skill_text,
-            user_request=user_request,
-            context=context,
-            structured_output=True,
+    def run_turn(
+        self,
+        *,
+        prompt: str,
+        developer_instructions: str,
+        output_schema: Mapping[str, Any],
+        stage: str,
+        event_sink: Optional[Callable[[Dict[str, Any]], None]] = None,
+    ) -> Dict[str, Any]:
+        """Run one structured Codex turn without loading a Skill."""
+        started_at = time.time()
+        events: List[Dict[str, Any]] = []
+        if not self.available():
+            return normalize_agent_run_result(
+                {"ok": False, "error": "`openai-codex` is not available", "events": [], "final": {}},
+                provider=self.provider_name,
+                stage=stage,
+            )
+        self._append_event(
+            events,
+            {
+                "source": "harness",
+                "type": "stage_start",
+                "content": f"codex direct turn started: {stage}",
+                "metadata": {"stage": stage, "provider": self.provider_name},
+            },
+            event_sink,
         )
+        final_response = ""
+        error = ""
+        usage: Dict[str, Any] = {}
+        isolated_home: Optional[tempfile.TemporaryDirectory[str]] = None
+        try:
+            from openai_codex import ApprovalMode, Codex, CodexConfig, Sandbox
+            from openai_codex.types import Personality, ReasoningEffort, ReasoningSummary
+
+            sdk_sandbox = self._sdk_sandbox(Sandbox)
+            codex_bin = shutil.which(self.codex_bin)
+            sdk_env, isolated_home = self._sdk_runtime_env()
+            config = CodexConfig(
+                codex_bin=codex_bin,
+                config_overrides=self._codex_config_overrides(),
+                cwd=str(self.cwd),
+                env=sdk_env or None,
+            )
+            self._append_event(
+                events,
+                {
+                    "source": "harness",
+                    "type": "tool_call",
+                    "content": "codex sdk direct turn running",
+                    "metadata": {
+                        "stage": stage,
+                        "model": self.model or "default",
+                        "reasoning_effort": self.reasoning_effort,
+                        "sandbox": self.sandbox,
+                        "complexity": self.complexity_level,
+                        "web_search": self.capabilities.web_search.value if self.capabilities else "inherited",
+                        "mcp_server_count": len(self.capabilities.mcp_servers) if self.capabilities else -1,
+                    },
+                },
+                event_sink,
+            )
+            with Codex(config=config) as codex:
+                self._apply_auth(codex)
+                thread = codex.thread_start(
+                    approval_mode=ApprovalMode.deny_all,
+                    cwd=str(self.cwd),
+                    developer_instructions=developer_instructions,
+                    ephemeral=True,
+                    model=self.model or None,
+                    sandbox=sdk_sandbox,
+                )
+                turn_options = {
+                    "approval_mode": ApprovalMode.deny_all,
+                    "effort": ReasoningEffort(self.reasoning_effort),
+                    "model": self.model or None,
+                    "output_schema": dict(output_schema),
+                    "personality": Personality.pragmatic,
+                    "sandbox": sdk_sandbox,
+                }
+                if self._supports_reasoning_summary():
+                    turn_options["summary"] = ReasoningSummary.model_validate("concise")
+                turn = thread.turn(prompt, **turn_options)
+                turn_result = turn.run()
+                final_response = _trim(turn_result.final_response)
+                if turn_result.error is not None:
+                    error = _trim(getattr(turn_result.error, "message", "") or turn_result.error)
+                if turn_result.usage is not None:
+                    usage = self._payload_json(turn_result.usage)
+        except Exception as exc:
+            error = str(exc)
+        finally:
+            if isolated_home is not None:
+                isolated_home.cleanup()
+
+        final = self._final_from_text(final_response)
+        ok = bool(final) and not error
+        self._append_event(
+            events,
+            {
+                "source": "harness",
+                "type": "stage_result",
+                "content": "codex direct turn completed" if ok else "codex direct turn failed",
+                "metadata": {
+                    "stage": stage,
+                    "provider": self.provider_name,
+                    "ok": ok,
+                    "duration_ms": int((time.time() - started_at) * 1000),
+                },
+            },
+            event_sink,
+        )
+        return normalize_agent_run_result({
+            "ok": ok,
+            "error": error or ("Codex did not return a structured result" if not final else ""),
+            "events": events,
+            "final": final,
+            "last_message": final_response,
+            "llm_usage": usage,
+            "duration_ms": int((time.time() - started_at) * 1000),
+        }, provider=self.provider_name, stage=stage)
+
+    def _codex_config_overrides(self) -> tuple[str, ...]:
+        """Translate explicit capability policy without mutating user config."""
+        disabled_features = (
+            "apps",
+            "browser_use",
+            "computer_use",
+            "image_generation",
+            "in_app_browser",
+            "memories",
+            "multi_agent",
+            "plugins",
+            "remote_plugin",
+            "skill_mcp_dependency_install",
+            "skill_search",
+            "tool_suggest",
+            "workspace_dependencies",
+        )
+        overrides = [f"features.{name}=false" for name in disabled_features]
+        if self.capabilities is None:
+            return tuple(overrides)
+        web_search = {
+            WebSearchPolicy.DISABLED: "disabled",
+            WebSearchPolicy.PROVIDER_DEFAULT: "cached",
+            WebSearchPolicy.LIVE: "live",
+        }[self.capabilities.web_search]
+        overrides.append(f"web_search={json.dumps(web_search)}")
+        for name in sorted(self.capabilities.mcp_servers):
+            overrides.append(f"mcp_servers.{name}.enabled=true")
+            raw_config = dict(self.capabilities.mcp_servers[name])
+            allowed_tools = raw_config.pop("allowed_tools", None)
+            policy_tools = [
+                tool_name.split("__", 2)[2]
+                for tool_name in self.capabilities.mcp_allowed_tools
+                if tool_name.startswith(f"mcp__{name}__")
+            ]
+            normalized_allowed_tools = list(dict.fromkeys(list(allowed_tools or ()) + policy_tools))
+            if normalized_allowed_tools:
+                raw_config["enabled_tools"] = normalized_allowed_tools
+            raw_config.pop("type", None)
+            allowed_keys = {
+                "command",
+                "args",
+                "cwd",
+                "url",
+                "bearer_token_env_var",
+                "env_vars",
+                "env_http_headers",
+                "startup_timeout_sec",
+                "tool_timeout_sec",
+                "enabled_tools",
+                "disabled_tools",
+                "required",
+            }
+            unsupported = sorted(set(raw_config) - allowed_keys)
+            if unsupported:
+                raise ValueError(f"unsupported Codex MCP config fields for {name}: {', '.join(unsupported)}")
+            for key, value in sorted(raw_config.items()):
+                overrides.append(f"mcp_servers.{name}.{key}={self._toml_value(value)}")
+        return tuple(overrides)
+
+    def _supports_reasoning_summary(self) -> bool:
+        # The model capability is provider metadata, not a business routing
+        # rule.  Spark rejects the parameter at request validation time.
+        return self.model != "gpt-5.3-codex-spark"
+
+    def _sdk_runtime_env(
+        self,
+        *,
+        session_id: str = "",
+    ) -> tuple[Dict[str, str], Optional[tempfile.TemporaryDirectory[str]]]:
+        """Isolate explicit capability runs from global Codex plugins and MCPs."""
+        env = self._sdk_env()
+        if self.capabilities is None:
+            return env, None
+        configured_home = _trim(os.environ.get("CODEX_HOME"))
+        source_home = Path(configured_home).expanduser() if configured_home else Path.home() / ".codex"
+        logical_session_id = _trim(session_id)
+        isolated_home: Optional[tempfile.TemporaryDirectory[str]] = None
+        if logical_session_id:
+            session_root = Path(
+                _trim(os.environ.get("CUSTOM_TOOL_AGENT_SESSION_ROOT")) or "data/agent_sessions"
+            )
+            session_key = hashlib.sha256(logical_session_id.encode("utf-8")).hexdigest()[:24]
+            isolated_path = session_root / "codex" / session_key
+            isolated_path.mkdir(parents=True, exist_ok=True)
+            try:
+                isolated_path.chmod(0o700)
+            except OSError:
+                pass
+        else:
+            isolated_home = tempfile.TemporaryDirectory(prefix="fin-agent-codex-")
+            isolated_path = Path(isolated_home.name)
+        auth_file = source_home / "auth.json"
+        isolated_auth = isolated_path / "auth.json"
+        if auth_file.is_file() and not isolated_auth.exists():
+            isolated_auth.symlink_to(auth_file.resolve())
+        env["CODEX_HOME"] = str(isolated_path.resolve())
+        return env, isolated_home
+
+    @staticmethod
+    def _build_sdk_resume_prompt(*, user_request: str, context: Mapping[str, Any]) -> str:
+        """Continue a Coding thread with only the new contribution.
+
+        The resumed thread already has the Skill, design, API references and
+        workspace history.  Updated feedback and implementation files live in
+        the same bundle directory.
+        """
+        feedback_refs = [
+            _trim(context.get("test_feedback_ref")),
+            _trim((context.get("current_implementation") or {}).get("last_test_ref"))
+            if isinstance(context.get("current_implementation"), Mapping)
+            else "",
+        ]
+        available_refs = [item for item in feedback_refs if item]
+        reference_text = f"最新真实反馈：{', '.join(available_refs)}。" if available_refs else ""
+        coding_feedback = _trim(context.get("coding_feedback"))
+        current_request = coding_feedback or user_request
+        return (
+            "继续当前金融工具 Coding 会话。保持未受影响的实现不变，只处理本轮新增要求或真实运行反馈。"
+            f"{reference_text}\n本轮要求：{current_request}"
+        )
+
+    @staticmethod
+    def _toml_value(value: Any) -> str:
+        if isinstance(value, bool):
+            return "true" if value else "false"
+        if isinstance(value, (int, float)) and not isinstance(value, bool):
+            return str(value)
+        if isinstance(value, str):
+            return json.dumps(value)
+        if isinstance(value, (list, tuple)):
+            return "[" + ",".join(CodexSdkSkillHarness._toml_value(item) for item in value) + "]"
+        if isinstance(value, Mapping):
+            entries = []
+            for key, item in sorted(value.items()):
+                normalized_key = _trim(key)
+                if not re.fullmatch(r"[A-Za-z0-9_-]+", normalized_key):
+                    raise ValueError(f"invalid TOML key: {normalized_key or '-'}")
+                entries.append(f"{normalized_key}={CodexSdkSkillHarness._toml_value(item)}")
+            return "{" + ",".join(entries) + "}"
+        raise ValueError(f"unsupported TOML value type: {type(value).__name__}")
+
+    def _build_sdk_prompt(
+        self,
+        *,
+        skill_text: str,
+        skill_root: str = "",
+        user_request: str,
+        context: Mapping[str, Any],
+        stage: str,
+    ) -> str:
+        bundle = context.get("context_bundle") if isinstance(context.get("context_bundle"), Mapping) else {}
+        stage_guidance = ""
+        if _trim(stage) == "coding":
+            stage_guidance = (
+                "先读 CODING_WORKSPACE.md。若存在 api_catalog/task_context.json，先用它匹配当前设计需要的数据主题和字段；"
+                "只有信息不足时再查 index.json 和相关 subject。按 implementation/module_plan.json 中的逻辑函数组实现，"
+                "每完成一个内聚函数组就做一次聚焦编译或样例测试，并用一句自然语言说明完成内容和测试结果。"
+                "源码写入 CONTEXT.current_implementation.module_files；最终结构化结果保持简洁，不重复搬运工作区上下文。\n"
+            )
+        return (
+            "执行随本轮输入启用的 Skill。\n"
+            f"资料包目录：{_trim(bundle.get('bundle_dir'))}\n"
+            "按需使用 rg/sed 读取 CONTEXT 引用的资产和 API Catalog；不要展开无关文件。\n\n"
+            f"{stage_guidance}\n"
+            "# CONTEXT\n"
+            f"{_json_text(dict(context))}\n\n"
+            "# USER REQUEST\n"
+            f"{user_request}\n"
+        )
+
+    @staticmethod
+    def _skill_name(skill_file: Path) -> str:
+        try:
+            match = re.search(r"(?m)^name:\s*([^\n]+)$", skill_file.read_text(encoding="utf-8"))
+        except OSError:
+            match = None
+        return _trim(match.group(1)) if match else skill_file.parent.name
 
     @staticmethod
     def _render_block_schema() -> Dict[str, Any]:
@@ -947,7 +1416,15 @@ class CodexSdkSkillHarness(CodexExecSkillHarness):
         if method == "turn/completed":
             return [{"source": "harness", "type": "turn_completed", "content": "turn completed", "metadata": self._payload_json(payload)}]
         if method == "item/agentMessage/delta":
-            return self._text_event("codex", "agent_delta", getattr(payload, "delta", ""))
+            return self._raw_text_event(
+                "codex",
+                "agent_delta",
+                getattr(payload, "delta", ""),
+                metadata={
+                    "item_id": _trim(getattr(payload, "item_id", "")),
+                    "turn_id": _trim(getattr(payload, "turn_id", "")),
+                },
+            )
         if method == "item/reasoning/summaryTextDelta":
             return self._text_event("codex", "reasoning_summary_delta", getattr(payload, "delta", ""))
         if method == "item/reasoning/textDelta":
@@ -960,10 +1437,28 @@ class CodexSdkSkillHarness(CodexExecSkillHarness):
             return [{"source": "tool", "type": "mcp_progress", "content": "", "metadata": self._payload_json(payload)}]
         if method == "item/completed":
             text = self._completed_item_text(payload)
+            item_metadata = self._completed_item_metadata(payload)
+            if _trim(item_metadata.get("phase")) in {"commentary", "progress"}:
+                try:
+                    parsed = json.loads(text)
+                except (TypeError, json.JSONDecodeError):
+                    parsed = {}
+                message = _trim(parsed.get("message")) if isinstance(parsed, Mapping) else ""
+                return [{
+                    "source": "codex",
+                    "type": "item_completed",
+                    "content": message or text,
+                    "metadata": {"method": method, "item": item_metadata},
+                }] if message or text else []
             events = self._extract_model_events(text)
             if events:
                 return events
-            return [{"source": "codex", "type": "item_completed", "content": text, "metadata": {"method": method}}] if text else []
+            return [{
+                "source": "codex",
+                "type": "item_completed",
+                "content": text,
+                "metadata": {"method": method, "item": item_metadata, **self._payload_json(payload)},
+            }] if text else []
         return [{"source": "codex", "type": "event", "content": method, "metadata": self._payload_json(payload)}] if method else []
 
     @staticmethod
@@ -977,6 +1472,31 @@ class CodexSdkSkillHarness(CodexExecSkillHarness):
     def _text_event(source: str, event_type: str, content: Any) -> List[Dict[str, Any]]:
         text = _trim(content)
         return [{"source": source, "type": event_type, "content": text}] if text else []
+
+    @staticmethod
+    def _raw_text_event(
+        source: str,
+        event_type: str,
+        content: Any,
+        *,
+        metadata: Mapping[str, Any] | None = None,
+    ) -> List[Dict[str, Any]]:
+        """Keep structured-output deltas byte-for-byte for semantic assembly.
+
+        The raw text is never sent to the UI.  It is consumed by
+        ``LlmStreamBlockBuilder`` and only complete domain objects become
+        Surface blocks.
+        """
+        text = str(content or "")
+        event = {
+            "source": source,
+            "type": event_type,
+            "content": text,
+        }
+        compact_metadata = {str(key): value for key, value in (metadata or {}).items() if _trim(value)}
+        if compact_metadata:
+            event["metadata"] = compact_metadata
+        return [event] if text else []
 
     @staticmethod
     def _payload_json(payload: Any) -> Dict[str, Any]:
@@ -1001,6 +1521,19 @@ class CodexSdkSkillHarness(CodexExecSkillHarness):
             return ""
 
     @staticmethod
+    def _completed_item_metadata(payload: Any) -> Dict[str, Any]:
+        try:
+            item = getattr(payload, "item", None)
+            root = getattr(item, "root", None)
+            return {
+                "id": _trim(getattr(root, "id", "")),
+                "type": _trim(getattr(root, "type", "")),
+                "phase": _trim(getattr(root, "phase", "")),
+            }
+        except Exception:
+            return {}
+
+    @staticmethod
     def _sdk_error_text(payload: Any) -> str:
         data = CodexSdkSkillHarness._payload_json(payload)
         error = data.get("error") if isinstance(data.get("error"), Mapping) else {}
@@ -1015,99 +1548,10 @@ class CodexSdkSkillHarness(CodexExecSkillHarness):
 
     @staticmethod
     def _output_schema(stage: str) -> Dict[str, Any]:
-        if stage == "coding":
-            return {
-                "type": "object",
-                "properties": {
-                    "source": {"type": "string", "enum": ["model"]},
-                    "type": {"type": "string", "enum": ["final"]},
-                    "status": {"type": "string", "enum": ["code_ready", "need_design_fix"]},
-                    "message": {"type": "string"},
-                    "code_summary": {"type": "string"},
-                    "files": {
-                        "type": "array",
-                        "items": {
-                            "type": "object",
-                            "properties": {
-                                "path": {"type": "string"},
-                                "role": {"type": "string"},
-                                "content": {"type": "string"},
-                            },
-                            "required": ["path", "role", "content"],
-                            "additionalProperties": False,
-                        },
-                    },
-                    "tests": {
-                        "type": "array",
-                        "items": {
-                            "type": "object",
-                            "properties": {
-                                "name": {"type": "string"},
-                                "status": {"type": "string"},
-                                "input": {"type": "object", "properties": {}, "required": [], "additionalProperties": False},
-                                "expected": {"type": "object", "properties": {}, "required": [], "additionalProperties": False},
-                                "actual": {"type": "object", "properties": {}, "required": [], "additionalProperties": False},
-                                "summary": {"type": "string"},
-                            },
-                            "required": ["name", "status", "input", "expected", "actual", "summary"],
-                            "additionalProperties": False,
-                        },
-                    },
-                    "implementation_notes": {"type": "array", "items": {"type": "string"}},
-                    "need_design_fix": {"type": "string"},
-                    "risks": {"type": "array", "items": {"type": "string"}},
-                    "sample_input_json": {"type": "string"},
-                    "render_blocks": CodexSdkSkillHarness._render_block_schema(),
-                },
-                "required": ["source", "type", "status", "message", "code_summary", "files", "tests", "implementation_notes", "need_design_fix", "risks", "sample_input_json", "render_blocks"],
-                "additionalProperties": False,
-            }
-        field_schema = {
-            "type": "object",
-            "properties": {
-                "name": {"type": "string"},
-                "type": {"type": "string"},
-                "required": {"type": "boolean"},
-                "description": {"type": "string"},
-            },
-            "required": ["name", "type", "required", "description"],
-            "additionalProperties": False,
-        }
-        output_field_schema = {
-            "type": "object",
-            "properties": {
-                "name": {"type": "string"},
-                "type": {"type": "string"},
-                "description": {"type": "string"},
-            },
-            "required": ["name", "type", "description"],
-            "additionalProperties": False,
-        }
         return {
             "type": "object",
-            "properties": {
-                "source": {"type": "string", "enum": ["model"]},
-                "type": {"type": "string", "enum": ["final"]},
-                "status": {"type": "string", "enum": ["need_more_info", "design_ready"]},
-                "message": {"type": "string"},
-                "questions": {"type": "array", "items": {"type": "string"}},
-                "design": {
-                    "type": "object",
-                    "properties": {
-                        "tool_name": {"type": "string"},
-                        "display_name": {"type": "string"},
-                        "description": {"type": "string"},
-                        "inputs": {"type": "array", "items": field_schema},
-                        "outputs": {"type": "array", "items": output_field_schema},
-                        "logic": {"type": "array", "items": {"type": "string"}},
-                        "diagram": {"type": "string"},
-                    },
-                    "required": ["tool_name", "display_name", "description", "inputs", "outputs", "logic", "diagram"],
-                    "additionalProperties": False,
-                },
-                "render_blocks": CodexSdkSkillHarness._render_block_schema(),
-            },
-            "required": ["source", "type", "status", "message", "questions", "design", "render_blocks"],
+            "properties": {"message": {"type": "string"}},
+            "required": ["message"],
             "additionalProperties": False,
         }
 
@@ -1117,14 +1561,20 @@ class CodexCustomToolDesigner:
         self,
         *,
         harness: Optional[CodexExecSkillHarness] = None,
-        skill_path: str = "src/skills/financial-tool-requirement-design-v3/SKILL.md",
-        output_schema_path: str = "src/skills/financial-tool-requirement-design-v3/schema.json",
-        revision_schema_path: str = "src/skills/financial-tool-requirement-design-v3/revision-schema.json",
+        requirement_skill_path: str = "src/skills/financial-tool-development/skills/financial-tool-requirement/SKILL.md",
+        requirement_schema_path: str = "src/skills/financial-tool-development/skills/financial-tool-requirement/schema.json",
+        skill_path: str = "src/skills/financial-tool-development/skills/financial-tool-design/SKILL.md",
+        output_schema_path: str = "src/skills/financial-tool-development/schema.json",
+        flowchart_skill_path: str = "src/skills/financial-tool-development/skills/financial-tool-flowchart/SKILL.md",
+        flowchart_schema_path: str = "src/skills/financial-tool-development/skills/financial-tool-flowchart/schema.json",
     ) -> None:
         self.harness = harness or CodexExecSkillHarness(cwd=".")
+        self.requirement_skill_path = requirement_skill_path
+        self.requirement_schema_path = requirement_schema_path
         self.skill_path = skill_path
         self.output_schema_path = output_schema_path
-        self.revision_schema_path = revision_schema_path
+        self.flowchart_skill_path = flowchart_skill_path
+        self.flowchart_schema_path = flowchart_schema_path
 
     def design(
         self,
@@ -1133,59 +1583,174 @@ class CodexCustomToolDesigner:
         context: Optional[Mapping[str, Any]] = None,
         event_sink: Optional[Callable[[Dict[str, Any]], None]] = None,
     ) -> Dict[str, Any]:
-        scenario = _trim((context or {}).get("design_scenario"))
-        is_revision = scenario in {"create_revision_round", "optimize_existing_tool"}
-        result = self.harness.run_skill(
-            skill_path=self.skill_path,
-            output_schema_path=self.revision_schema_path if is_revision else self.output_schema_path,
-            user_request=requirement_text,
-            context=context or {},
-            stage="design",
-            event_sink=event_sink,
-        )
-        if not result.get("ok"):
+        run_context = dict(context or {})
+        selected = [
+            _trim(item)
+            for item in run_context.get("selected_skills") or []
+            if _trim(item)
+        ]
+        if not selected:
+            selected = ["financial-tool-requirement"]
+        run_requirement = "financial-tool-requirement" in selected
+        run_design = "financial-tool-design" in selected
+        run_flowchart = "financial-tool-flowchart" in selected
+        stage_context = dict(run_context)
+        stage_context.pop("selected_skills", None)
+        events: List[Dict[str, Any]] = []
+        requirement_final: Dict[str, Any] = {}
+
+        if run_requirement:
+            def requirement_event_sink(event: Dict[str, Any]) -> None:
+                if _trim(event.get("source")) == "model" and _trim(event.get("type")) == "final":
+                    return
+                if event_sink:
+                    event_sink(event)
+
+            requirement_result = self.harness.run_skill(
+                skill_path=self.requirement_skill_path,
+                output_schema_path=self.requirement_schema_path,
+                user_request=requirement_text,
+                context=stage_context,
+                stage="requirement",
+                event_sink=requirement_event_sink,
+            )
+            events.extend(
+                event
+                for event in requirement_result.get("events") or []
+                if not (_trim(event.get("source")) == "model" and _trim(event.get("type")) == "final")
+            )
+            if not requirement_result.get("ok"):
+                return self._failure(requirement_result, events)
+            requirement_final = dict(requirement_result.get("final") or {})
+            stage_context["requirement_brief"] = requirement_final.get("requirement_brief") or ""
+            stage_context["requirement_questions"] = [
+                dict(item)
+                for item in requirement_final.get("questions") or []
+                if isinstance(item, Mapping)
+            ]
+
+        requirement_questions = [
+            dict(item)
+            for item in requirement_final.get("questions") or []
+            if isinstance(item, Mapping)
+        ]
+        if run_requirement and requirement_questions:
+            brief = _requirement_understanding(requirement_final.get("requirement_brief"))
             return {
-                "status": "need_more_info",
-                "message": result.get("error") or "Codex design skill 未能生成最终设计。",
-                "events": result.get("events") or [],
-                "raw": result,
+                "ok": True,
+                "message": _trim(requirement_final.get("summary")) or "请补充影响核心方案的信息。",
+                "understanding": brief,
+                "questions": requirement_questions,
+                "design": {},
+                "existing_analysis": {},
+                "events": events,
+                "raw": {"requirement": requirement_final},
             }
-        final = dict(result.get("final") or {})
-        status = _trim(final.get("status")) or "clarification"
-        if is_revision:
-            questions = [dict(item) for item in final.get("questions") or [] if isinstance(item, Mapping)]
-            has_required_question = any(item.get("required") is True for item in questions)
-            if status == "review" and has_required_question:
-                status = "clarification"
+        # A complete, high-confidence requirement can continue in this turn.
+        if run_requirement and not run_design and not run_flowchart and not requirement_questions:
+            run_design = True
+            run_flowchart = True
+        if not run_design and not run_flowchart:
+            brief = _requirement_understanding(requirement_final.get("requirement_brief"))
             return {
-                "status": status,
-                "message": _trim(final.get("change_summary")) or "已根据本轮反馈更新设计。",
-                "protocol_mode": "revision_fields",
-                "change_summary": _trim(final.get("change_summary")),
-                "questions": questions[:5],
-                "changes": [dict(item) for item in final.get("changes") or [] if isinstance(item, Mapping)],
-                "events": result.get("events") or [],
-                "raw": result,
+                "ok": True,
+                "message": _trim(requirement_final.get("summary")) or "请补充影响核心方案的信息。",
+                "understanding": brief,
+                "questions": requirement_questions,
+                "design": {},
+                "existing_analysis": {},
+                "events": events,
+                "raw": {"requirement": requirement_final},
             }
-        understanding = final.get("understanding") if isinstance(final.get("understanding"), Mapping) else {}
-        questions = [dict(item) if isinstance(item, Mapping) else str(item) for item in final.get("questions") or []]
-        has_required_question = any(
-            isinstance(item, Mapping) and item.get("required") is True
-            for item in questions
+
+        result: Dict[str, Any] = {}
+        final: Dict[str, Any] = {}
+        if run_design:
+            result = self.harness.run_skill(
+                skill_path=self.skill_path,
+                output_schema_path=self.output_schema_path,
+                user_request=requirement_text,
+                context=stage_context,
+                stage="design",
+                event_sink=event_sink,
+            )
+            events.extend(result.get("events") or [])
+            if not result.get("ok"):
+                return self._failure(result, events)
+            final = dict(result.get("final") or {})
+        understanding = _requirement_understanding(
+            requirement_final.get("requirement_brief")
+            if requirement_final
+            else stage_context.get("requirement_brief")
         )
-        if status == "review" and has_required_question:
-            status = "clarification"
+        questions = requirement_questions
+        design_value = final.get("design") if final.get("design") is not None else stage_context.get("current_design")
+        design = (
+            {"document": _trim(design_value)}
+            if isinstance(design_value, str) and _trim(design_value)
+            else dict(design_value)
+            if isinstance(design_value, Mapping)
+            else {}
+        )
+        if run_flowchart and not design:
+            return self._failure({"error": "流程图生成前没有可读取的模块与流程设计。"}, events)
+        flowchart_final: Dict[str, Any] = {}
+        if run_flowchart and design:
+            flowchart_context = dict(stage_context)
+            flowchart_context["design"] = design
+            flowchart_result = self.harness.run_skill(
+                skill_path=self.flowchart_skill_path,
+                output_schema_path=self.flowchart_schema_path,
+                user_request="请根据当前模块和流程设计生成对应流程图，不改变方案。",
+                context=flowchart_context,
+                stage="flowchart",
+                event_sink=event_sink,
+            )
+            events.extend(flowchart_result.get("events") or [])
+            if not flowchart_result.get("ok"):
+                return self._failure(flowchart_result, events)
+            flowchart_final = dict(flowchart_result.get("final") or {})
+            if isinstance(flowchart_final.get("flow"), Mapping):
+                design["flow"] = dict(flowchart_final.get("flow") or {})
         goal = _trim(understanding.get("goal"))
         return {
-            "status": status,
-            "message": (f"{goal}的设计已形成，请检查后确认。" if goal else "设计已形成，请检查后确认。") if status == "review" else "还需要确认几个会影响设计的关键条件。",
-            "understanding": dict(understanding),
-            "questions": questions[:5],
-            "design": final.get("design") if isinstance(final.get("design"), Mapping) else {},
-            "existing_analysis": dict(final.get("existing_analysis")) if isinstance(final.get("existing_analysis"), Mapping) else {},
-            "events": result.get("events") or [],
-            "raw": result,
+            "ok": True,
+            "message": _trim(final.get("summary")) or _trim(flowchart_final.get("summary")) or (
+                f"{goal}的实现方案已形成，请检查后确认。" if goal else "实现方案已形成，请检查后确认。"
+            ),
+            "understanding": understanding,
+            "questions": questions,
+            "design": design,
+            "existing_analysis": {},
+            "events": events,
+            "raw": {"requirement": requirement_final, "design": result, "flowchart": flowchart_final},
         }
+
+    @staticmethod
+    def _failure(result: Mapping[str, Any], events: List[Dict[str, Any]]) -> Dict[str, Any]:
+        return {
+            "ok": False,
+            "message": "Design 调用失败，当前设计和实现均未改变。",
+            "error": result.get("error") or "Agent design skill 未能生成最终设计。",
+            "events": events,
+            "raw": dict(result),
+        }
+
+    @staticmethod
+    def _merge_questions(first: Any, second: Any) -> List[Dict[str, Any]]:
+        merged: List[Dict[str, Any]] = []
+        seen: set[str] = set()
+        for item in list(first or []) + list(second or []):
+            if not isinstance(item, Mapping):
+                continue
+            question = dict(item)
+            identity = _trim(question.get("id")) or _trim(question.get("question"))
+            if identity and identity in seen:
+                continue
+            if identity:
+                seen.add(identity)
+            merged.append(question)
+        return merged
 
 
 class CodexCustomToolCoder:
@@ -1193,8 +1758,8 @@ class CodexCustomToolCoder:
         self,
         *,
         harness: Optional[CodexExecSkillHarness] = None,
-        skill_path: str = "src/skills/financial-tool-coding-v1/SKILL.md",
-        output_schema_path: str = "src/skills/financial-tool-coding-v1/schema.json",
+        skill_path: str = "src/skills/financial-tool-development/skills/financial-tool-implementation/SKILL.md",
+        output_schema_path: str = "src/skills/financial-tool-development/skills/financial-tool-implementation/schema.json",
     ) -> None:
         self.harness = harness or CodexExecSkillHarness(cwd=".")
         self.skill_path = skill_path
@@ -1208,39 +1773,51 @@ class CodexCustomToolCoder:
         context: Optional[Mapping[str, Any]] = None,
         event_sink: Optional[Callable[[Dict[str, Any]], None]] = None,
     ) -> Dict[str, Any]:
-        request = (
-            "请根据已确认的自定义工具设计稿生成代码。\n"
-            f"原始需求：{requirement_text}\n"
-            f"设计稿：{_json_text(dict(design))}"
-        )
+        request = "请根据 CONTEXT.design 或 CONTEXT.design_ref 中的权威设计实现或修订可动态加载执行的金融工具模块。"
         run_context = dict(context or {})
+        agent_runtime = run_context.pop("_agent_runtime", None)
+        agent_runtime = dict(agent_runtime) if isinstance(agent_runtime, Mapping) else {}
+        provider_session_id = _trim(agent_runtime.get("provider_session_id"))
+        if provider_session_id:
+            run_context["_provider_session_id"] = provider_session_id
         run_context["design"] = dict(design)
         result = self.harness.run_skill(
             skill_path=self.skill_path,
             output_schema_path=self.output_schema_path,
             user_request=request,
             context=run_context,
+            session_id=_trim(agent_runtime.get("session_id")),
             stage="coding",
             event_sink=event_sink,
         )
         if not result.get("ok"):
             failure = self._failure_summary(result.get("error"))
             return {
-                "status": "coding_failed",
+                "ok": False,
                 "message": f"实现未完成：{failure['summary']} 当前设计已保留，可以重试。",
                 "error": failure,
                 "error_detail": result.get("error") or "",
                 "events": result.get("events") or [],
                 "raw": result,
+                "agent_runtime": {
+                    **agent_runtime,
+                    "provider_session_id": _trim(result.get("provider_session_id")) or provider_session_id,
+                },
             }
         final = dict(result.get("final") or {})
-        status = _trim(final.get("status")) or "need_design_fix"
+        modules = [item for item in ((final.get("implementation") or {}).get("modules") or []) if isinstance(item, Mapping)]
+        has_code = bool(modules and any(_trim(item.get("source_code")) for item in modules))
         return {
-            "status": status,
-            "message": _trim(final.get("message")) or ("代码已生成。" if status == "code_ready" else "需要回到设计阶段确认。"),
+            "ok": has_code,
+            "message": _trim(final.get("message")) or ("代码已生成。" if has_code else "本次没有生成可执行模块。"),
+            **({"error": {"code": "coding_output_empty", "summary": "本次没有生成可执行模块。"}} if not has_code else {}),
             "final": final,
             "events": result.get("events") or [],
             "raw": result,
+            "agent_runtime": {
+                **agent_runtime,
+                "provider_session_id": _trim(result.get("provider_session_id")) or provider_session_id,
+            },
         }
 
     @staticmethod
@@ -1255,9 +1832,59 @@ class CodexCustomToolCoder:
             detail = f"字段 {field} 缺少严格 Schema 所需的类型声明。" if field else "结构化输出 Schema 不符合严格格式要求。"
             return {"code": "coding_schema_invalid", "summary": detail}
         if "authorizationrequired" in lowered or "oauth authorization required" in lowered or "re-authorization required" in lowered:
-            return {"code": "coding_auth_required", "summary": "Codex 授权已失效，需要重新授权。"}
+            return {"code": "coding_auth_required", "summary": "Agent 服务授权已失效，需要重新授权。"}
         if "timeout" in lowered:
             return {"code": "coding_timeout", "summary": "Coding 调用超时，未取得有效结果。"}
         if "stream disconnected" in lowered or "reconnecting" in lowered:
             return {"code": "coding_connection_failed", "summary": "Coding 连接中断，未取得有效结果。"}
         return {"code": "coding_runtime_failed", "summary": "Coding 运行失败，未取得有效结果。"}
+
+
+class CodexCustomToolTester:
+    def __init__(
+        self,
+        *,
+        harness: Optional[CodexExecSkillHarness] = None,
+        skill_path: str = "src/skills/financial-tool-development/skills/financial-tool-test-execution/SKILL.md",
+        output_schema_path: str = "src/skills/financial-tool-development/skills/financial-tool-test-execution/schema.json",
+    ) -> None:
+        self.harness = harness or CodexExecSkillHarness(cwd=".")
+        self.skill_path = skill_path
+        self.output_schema_path = output_schema_path
+
+    def plan(
+        self,
+        request: str,
+        *,
+        context: Optional[Mapping[str, Any]] = None,
+        event_sink: Optional[Callable[[Dict[str, Any]], None]] = None,
+    ) -> Dict[str, Any]:
+        result = self.harness.run_skill(
+            skill_path=self.skill_path,
+            output_schema_path=self.output_schema_path,
+            user_request=request,
+            context=dict(context or {}),
+            stage="test",
+            event_sink=event_sink,
+        )
+        if not result.get("ok"):
+            return {
+                "ok": False,
+                "message": "测试样例规划失败，当前实现未改变。",
+                "error": result.get("error") or "test planning failed",
+                "events": result.get("events") or [],
+            }
+        final = dict(result.get("final") or {})
+        cases = [dict(item) for item in final.get("cases") or [] if isinstance(item, Mapping)]
+        next_action = _trim(final.get("next_action"))
+        if next_action not in {"run_tests", "finish"}:
+            next_action = "run_tests" if cases else "finish"
+        return {
+            "ok": True,
+            "message": _trim(final.get("summary")),
+            "next_action": next_action,
+            "assessment": _trim(final.get("assessment")),
+            "cases": cases,
+            "presentation": dict(final.get("presentation") or {}),
+            "events": result.get("events") or [],
+        }

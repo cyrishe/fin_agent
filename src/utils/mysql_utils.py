@@ -110,11 +110,26 @@ class MySQLUtils:
                  connect_timeout=30,  # 延长连接超时时间
                  read_timeout=60 ,     # 延长查询超时时间
                  port=3312):
-        self.host = host
-        self.user = user
-        self.password = password if password is not None else os.getenv("STOCK_AGENT_DB_PASSWORD", "")
-        self.database = database
-        self.port = port
+        resolved_host = host
+        resolved_user = user
+        resolved_password = password if password is not None else os.getenv("STOCK_AGENT_DB_PASSWORD", "")
+        resolved_database = database
+        resolved_port = port
+        platform_url = str(os.getenv("PLATFORM_DB_URL") or "").strip()
+        if password is None and not resolved_password and platform_url:
+            parsed = urlparse(platform_url.replace("mysql+pymysql://", "mysql://", 1))
+            url_database = (parsed.path or "/").lstrip("/")
+            if parsed.scheme == "mysql" and parsed.hostname and url_database == database:
+                resolved_host = parsed.hostname
+                resolved_user = unquote(parsed.username or resolved_user)
+                resolved_password = unquote(parsed.password or "")
+                resolved_database = url_database
+                resolved_port = parsed.port or port
+        self.host = resolved_host
+        self.user = resolved_user
+        self.password = resolved_password
+        self.database = resolved_database
+        self.port = resolved_port
         self.conn = None
         self.connect_db()
 

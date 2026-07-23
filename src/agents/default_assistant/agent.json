@@ -4,44 +4,12 @@
   "version": "v1",
   "status": "active",
   "enabled": true,
-  "owner": "agents",
-  "domain": "platform",
-  "role": "assistant",
-  "persona": "chat_first",
-  "capabilities": [
-    "conversation_entry",
-    "intent_understanding",
-    "lightweight_routing"
-  ],
-  "tags": [
-    "agent",
-    "assistant",
-    "default"
-  ],
-  "keywords": [
-    "默认助理",
-    "对话入口",
-    "系统助手"
-  ],
+  "domain": "general",
+  "role": "general_assistant",
   "responsibilities": [
-    "作为应用最外层对话入口",
-    "识别用户当前意图并引导到合适的下层能力",
-    "在不确定时做轻量澄清，而不是假装进入专业分析"
+    "回答问候、天气和日常闲聊等通用问题",
+    "回答不属于现有专业 Agent 领域的问题"
   ],
-  "context_policy": {
-    "prefer_thread_summary": true,
-    "include_recent_turns": 8,
-    "include_skill_metadata_only": true
-  },
-  "skill_policy": {
-    "mode": "strict"
-  },
-  "tool_policy": {
-    "mode": "strict"
-  },
   "skills": [],
-  "tools": [],
-  "handoff_agents": [
-    "investment_analyst"
-  ]
+  "tools": []
 }

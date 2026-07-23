@@ -29,3 +29,21 @@ def test_trace_formats_structured_payload_as_json(tmp_path: Path) -> None:
 
     text = trace.path.read_text(encoding="utf-8")
     assert json.dumps({"a": 1}, ensure_ascii=False, indent=2) in text
+
+
+def test_trace_coalesces_stream_deltas_without_losing_text(tmp_path: Path) -> None:
+    trace = CustomToolRunTrace(run_id="stream_demo", root_dir=str(tmp_path))
+    for index in range(100):
+        trace.record({
+            "source": "codex",
+            "type": "agent_delta",
+            "content": str(index % 10),
+            "metadata": {"stage": "coding"},
+        })
+    trace.finish({"status": "code_ready"})
+
+    text = trace.path.read_text(encoding="utf-8")
+    assert "0123456789" * 10 in text
+    assert '"coalesced_events": 100' in text
+    assert text.count("codex/agent_delta") == 1
+    assert "event_count: 2" in text

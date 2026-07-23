@@ -10,7 +10,7 @@ export function isProcessBlock(block: SurfaceBlock): boolean {
   const type = String(block.block_type || "");
   const id = String(block.block_id || "");
   const role = String(asRecord(block.data).role || "");
-  return type === "status" || role === "process" ||
+  return type === "status" || role === "process" || role === "live_progress" ||
     id.includes("_thinking") || id.includes("_assistant") || id.includes("_tool_output");
 }
 
@@ -67,7 +67,7 @@ export function applyStreamEvent(run: AgentRun, event: StreamEvent): AgentRun {
     };
   }
   if (["done", "run.finished"].includes(type)) {
-    return { ...run, status: "done", summary: "任务已完成" };
+    return { ...run, status: "done", summary: "本轮处理完成" };
   }
   if (["error", "stream.error"].includes(type)) {
     const message = String(event.message || "任务失败");
@@ -93,9 +93,11 @@ export function blocksFromPayload(payload: UnknownRecord): SurfaceBlock[] {
     : Array.isArray(payload.render_blocks)
       ? payload.render_blocks
       : [];
+  const taskResult = asRecord(payload.task_result);
+  const nestedRenderPayload = asRecord(taskResult.render_payload);
   const renderPayload = payload.render_payload && typeof payload.render_payload === "object"
     ? payload.render_payload as UnknownRecord
-    : {};
+    : nestedRenderPayload;
   const sections = Array.isArray(renderPayload.sections) ? renderPayload.sections : [];
   const sectionBlocks = sections.flatMap((section) => {
     const candidate = section && typeof section === "object" ? section as UnknownRecord : {};
@@ -107,7 +109,13 @@ export function blocksFromPayload(payload: UnknownRecord): SurfaceBlock[] {
     const candidate = section && typeof section === "object" ? section as UnknownRecord : {};
     return Array.isArray(candidate.blocks) ? candidate.blocks : [];
   });
-  const selected = direct.length ? direct : v1Blocks.length ? v1Blocks : sectionBlocks;
+  const hasInvocationPreview = direct.some((item) =>
+    item && typeof item === "object" && String((item as UnknownRecord).block_id || "") === "asset_invocation_preview"
+  );
+  const resultBlocks = v1Blocks.length ? v1Blocks : sectionBlocks;
+  const selected = direct.length
+    ? hasInvocationPreview ? [...direct, ...resultBlocks] : direct
+    : resultBlocks;
   const normalized = selected
     .filter((item): item is UnknownRecord => Boolean(item && typeof item === "object"))
     .map((item, index) => normalizeBlock({

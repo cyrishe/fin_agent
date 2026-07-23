@@ -7,7 +7,7 @@ import pymysql
 
 from src.services.capability_search_service import CapabilitySearchService
 from src.tools.registry import TOOL_REGISTRY
-from src.utils.mysql_utils import StockInfoDbUtils
+from src.utils.system_db_utils import SystemDbUtils
 
 
 ARTIFACT_TABLE = "aiia_runtime_artifact"
@@ -158,7 +158,7 @@ class RuntimeArtifactService:
         }
 
     def _upsert_artifact(self, payload: Dict[str, Any]) -> Dict[str, Any]:
-        db = StockInfoDbUtils()
+        db = SystemDbUtils()
         try:
             with db.conn.cursor(pymysql.cursors.DictCursor) as cursor:
                 cursor.execute(
@@ -323,7 +323,7 @@ class RuntimeArtifactService:
             db.close_db()
 
     def _replace_edges(self, *, artifact_id: int, edge_names: List[str]) -> None:
-        db = StockInfoDbUtils()
+        db = SystemDbUtils()
         try:
             with db.conn.cursor() as cursor:
                 cursor.execute(
@@ -556,7 +556,7 @@ class RuntimeArtifactService:
                 self._trim(config_obj.get("display_name")),
                 description,
                 markdown_text,
-                "\n".join(str(x) for x in config_obj.get("default_agents", []) if self._trim(x)),
+                self._trim(config_obj.get("default_agent")),
                 "\n".join(str(x) for x in config_obj.get("default_skills", []) if self._trim(x)),
                 "\n".join(str(x) for x in config_obj.get("default_tools", []) if self._trim(x)),
             ]
@@ -606,7 +606,7 @@ class RuntimeArtifactService:
             edge_names=[
                 self._trim(name)
                 for name in (
-                    list(config_obj.get("default_agents", []) or [])
+                    [config_obj.get("default_agent")]
                     + list(config_obj.get("default_skills", []) or [])
                     + list(config_obj.get("default_tools", []) or [])
                 )

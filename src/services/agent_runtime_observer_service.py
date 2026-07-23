@@ -23,19 +23,13 @@ class AgentRuntimeObserverService:
         execution_plan: Optional[Dict[str, Any]] = None,
         evidence_state: Optional[Dict[str, Any]] = None,
         completed_items: Optional[List[Dict[str, Any]]] = None,
-        interaction_frame: Optional[Dict[str, Any]] = None,
-        conversation_state: Optional[Dict[str, Any]] = None,
         enable_llm: bool = True,
     ) -> Dict[str, Any]:
         plan = execution_plan if isinstance(execution_plan, dict) else {}
         evidence = evidence_state if isinstance(evidence_state, dict) else {}
         completed = completed_items if isinstance(completed_items, list) else []
-        frame = interaction_frame if isinstance(interaction_frame, dict) else {}
-        state = conversation_state if isinstance(conversation_state, dict) else {}
         prompt_context_sections = self.prompt_context_compiler.compile_sections(
             profile="observer",
-            interaction_frame=frame,
-            conversation_state=state,
             execution_plan=plan,
             output_contract=evidence.get("output_contract") if isinstance(evidence.get("output_contract"), dict) else {},
         )

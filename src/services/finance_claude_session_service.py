@@ -1,0 +1,525 @@
+from __future__ import annotations
+
+import asyncio
+from concurrent.futures import Future, ThreadPoolExecutor
+from contextlib import contextmanager
+from datetime import datetime, timezone
+import fcntl
+import hashlib
+import json
+import os
+from pathlib import Path
+import threading
+import time
+from typing import Any, Callable, Dict, Mapping, Optional
+import uuid
+
+from src.services.agent_providers.claude import ClaudeSdkSkillHarness
+
+
+def _trim(value: Any) -> str:
+    return str(value or "").strip()
+
+
+class FinanceClaudeSessionService:
+    """Run a provider-backed Finance CC conversation without owning routing or DB state."""
+
+    def __init__(
+        self,
+        *,
+        enabled: Optional[bool] = None,
+        provider: str = "",
+        model: str = "",
+        root_dir: str | Path = "data/finance_cc_sessions",
+        log_path: str | Path = "outputs/finance_cc_shadow/events.jsonl",
+        max_workers: int = 2,
+        turn_runner: Optional[Callable[..., Dict[str, Any]]] = None,
+        system_tools: Any = None,
+        requirement_only: Optional[bool] = None,
+    ) -> None:
+        enabled_text = _trim(os.environ.get("FINANCE_CC_SHADOW_ENABLED")).lower()
+        self.enabled = bool(enabled) if enabled is not None else enabled_text in {"1", "true", "yes", "on"}
+        requirement_only_text = _trim(os.environ.get("FINANCE_CC_REQUIREMENT_ONLY")).lower()
+        self.requirement_only = (
+            bool(requirement_only)
+            if requirement_only is not None
+            else requirement_only_text in {"1", "true", "yes", "on"}
+        )
+        self.provider = _trim(provider or os.environ.get("FINANCE_CC_PROVIDER") or "dashscope").lower()
+        self.model = _trim(model or os.environ.get("FINANCE_CC_MODEL") or "deepseek-v4-flash")
+        self.root_dir = Path(root_dir)
+        self.log_path = Path(log_path)
+        self.system_prompt_path = Path("src/prompts/finance_cc/main.system.md")
+        self._turn_runner = turn_runner or self._run_client_turn
+        self.system_tools = system_tools
+        self._executor = ThreadPoolExecutor(max_workers=max(1, int(max_workers)), thread_name_prefix="finance-cc-shadow")
+        self._locks_guard = threading.Lock()
+        self._session_locks: dict[str, threading.Lock] = {}
+        self._log_lock = threading.Lock()
+        self._futures_guard = threading.Lock()
+        self._futures: set[Future] = set()
+
+    def submit(
+        self,
+        *,
+        thread_id: int | str,
+        owner_id: str,
+        user_text: str,
+        context: Optional[Mapping[str, Any]] = None,
+        turn_id: int | str = "",
+        event_sink: Optional[Callable[[Dict[str, Any]], None]] = None,
+    ) -> bool:
+        if not self.enabled or not _trim(user_text):
+            return False
+        future = self._executor.submit(
+            self.run_turn,
+            thread_id=thread_id,
+            owner_id=owner_id,
+            user_text=user_text,
+            context=context,
+            turn_id=turn_id,
+            event_sink=event_sink,
+        )
+        with self._futures_guard:
+            self._futures.add(future)
+        future.add_done_callback(self._finish_future)
+        return True
+
+    def run_turn(
+        self,
+        *,
+        thread_id: int | str,
+        owner_id: str,
+        user_text: str,
+        context: Optional[Mapping[str, Any]] = None,
+        turn_id: int | str = "",
+        event_sink: Optional[Callable[[Dict[str, Any]], None]] = None,
+    ) -> Dict[str, Any]:
+        key = self._session_key(thread_id=thread_id, owner_id=owner_id)
+        with self._session_lock(key), self._process_session_lock(self._session_dir(key)):
+            session_dir = self._session_dir(key)
+            marker_path = session_dir / "session.json"
+            session_dir.mkdir(parents=True, exist_ok=True)
+            marker: Dict[str, Any] = {}
+            if marker_path.is_file():
+                try:
+                    loaded_marker = json.loads(marker_path.read_text(encoding="utf-8"))
+                    marker = loaded_marker if isinstance(loaded_marker, dict) else {}
+                except (OSError, json.JSONDecodeError):
+                    marker = {}
+            generation = max(0, int(marker.get("generation") or 0))
+            session_id = _trim(marker.get("session_id")) or self._session_id(key, generation=generation)
+            resumed = bool(marker.get("resumable", bool(marker))) and bool(_trim(marker.get("session_id")))
+            prompt = self.build_user_prompt(user_text, context or {})
+            runtime_tool_context = dict(context or {})
+            runtime_tool_context["_agent_runtime_scope"] = key
+            runtime_tool_context["_finance_cc_requirement_only"] = self.requirement_only
+            started_at = time.monotonic()
+            try:
+                result = self._turn_runner(
+                    prompt=prompt,
+                    session_id=session_id,
+                    resume=resumed,
+                    session_dir=session_dir,
+                    owner_id=owner_id,
+                    tool_context=runtime_tool_context,
+                    event_sink=event_sink,
+                )
+                ok = bool(result.get("ok"))
+                if ok:
+                    marker_path.write_text(
+                        json.dumps(
+                            {"session_id": session_id, "generation": generation, "resumable": True},
+                            ensure_ascii=False,
+                        ),
+                        encoding="utf-8",
+                    )
+                else:
+                    next_generation = generation + 1
+                    marker_path.write_text(
+                        json.dumps(
+                            {
+                                "session_id": self._session_id(key, generation=next_generation),
+                                "generation": next_generation,
+                                "resumable": False,
+                            },
+                            ensure_ascii=False,
+                        ),
+                        encoding="utf-8",
+                    )
+                record = {
+                    "timestamp": datetime.now(timezone.utc).isoformat(),
+                    "thread_id": str(thread_id),
+                    "turn_id": str(turn_id or ""),
+                    "session_id": session_id,
+                    "resumed": resumed,
+                    "ok": ok,
+                    "duration_ms": round((time.monotonic() - started_at) * 1_000),
+                    "stream_event_count": int(result.get("stream_event_count") or 0),
+                    "text_delta_count": int(result.get("text_delta_count") or 0),
+                    "result": _trim(result.get("result"))[:2_000],
+                    "error": _trim(result.get("error"))[:500],
+                    "tool_calls": [dict(item) for item in result.get("tool_calls") or [] if isinstance(item, Mapping)],
+                    "agent_tool_names": [_trim(item) for item in result.get("agent_tool_names") or [] if _trim(item)],
+                    "skill_results": [
+                        _trim(item)[:5_000] for item in result.get("skill_results") or [] if _trim(item)
+                    ],
+                    "interaction_requests": [
+                        dict(item) for item in result.get("interaction_requests") or [] if isinstance(item, Mapping)
+                    ],
+                    "artifact_updates": [
+                        dict(item) for item in result.get("artifact_updates") or [] if isinstance(item, Mapping)
+                    ],
+                    "asset_reads": [dict(item) for item in result.get("asset_reads") or [] if isinstance(item, Mapping)],
+                    "dynamic_runs": [dict(item) for item in result.get("dynamic_runs") or [] if isinstance(item, Mapping)],
+                    "implementation_runs": [
+                        dict(item) for item in result.get("implementation_runs") or [] if isinstance(item, Mapping)
+                    ],
+                    "result_refs": [
+                        dict(item) for item in result.get("result_refs") or [] if isinstance(item, Mapping)
+                    ],
+                }
+            except Exception as exc:
+                next_generation = generation + 1
+                marker_path.write_text(
+                    json.dumps(
+                        {
+                            "session_id": self._session_id(key, generation=next_generation),
+                            "generation": next_generation,
+                            "resumable": False,
+                        },
+                        ensure_ascii=False,
+                    ),
+                    encoding="utf-8",
+                )
+                record = {
+                    "timestamp": datetime.now(timezone.utc).isoformat(),
+                    "thread_id": str(thread_id),
+                    "turn_id": str(turn_id or ""),
+                    "session_id": session_id,
+                    "resumed": resumed,
+                    "ok": False,
+                    "duration_ms": round((time.monotonic() - started_at) * 1_000),
+                    "stream_event_count": 0,
+                    "text_delta_count": 0,
+                    "result": "",
+                    "error": f"{type(exc).__name__}: {str(exc)[:400]}",
+                }
+            self._append_record(record)
+            return record
+
+    @staticmethod
+    def build_user_prompt(user_text: str, context: Mapping[str, Any]) -> str:
+        lines = [f"用户当前的问题是：\n{_trim(user_text)}"]
+        ui_action = context.get("ui_action") if isinstance(context.get("ui_action"), Mapping) else {}
+        action_label = _trim(ui_action.get("label") or ui_action.get("action_id"))
+        if action_label:
+            lines.append(f"用户同时通过界面提交了：{action_label}。")
+        lines.append("请结合当前会话历史和按需读取的系统资产，处理本轮新增信息。")
+        return "\n\n".join(lines)
+
+    def drain(self, timeout: float = 30.0) -> list[Dict[str, Any]]:
+        with self._futures_guard:
+            futures = list(self._futures)
+        results = []
+        deadline = time.monotonic() + max(0.0, timeout)
+        for future in futures:
+            remaining = max(0.0, deadline - time.monotonic())
+            try:
+                value = future.result(timeout=remaining)
+            except Exception:
+                continue
+            if isinstance(value, Mapping):
+                results.append(dict(value))
+        return results
+
+    def _run_client_turn(
+        self,
+        *,
+        prompt: str,
+        session_id: str,
+        resume: bool,
+        session_dir: Path,
+        owner_id: str,
+        tool_context: Mapping[str, Any],
+        event_sink: Optional[Callable[[Dict[str, Any]], None]],
+    ) -> Dict[str, Any]:
+        return asyncio.run(
+            self._run_client_turn_async(
+                prompt=prompt,
+                session_id=session_id,
+                resume=resume,
+                session_dir=session_dir,
+                owner_id=owner_id,
+                tool_context=tool_context,
+                event_sink=event_sink,
+            )
+        )
+
+    async def _run_client_turn_async(
+        self,
+        *,
+        prompt: str,
+        session_id: str,
+        resume: bool,
+        session_dir: Path,
+        owner_id: str,
+        tool_context: Mapping[str, Any],
+        event_sink: Optional[Callable[[Dict[str, Any]], None]],
+    ) -> Dict[str, Any]:
+        from claude_agent_sdk import ClaudeAgentOptions, ClaudeSDKClient
+
+        provider_env = ClaudeSdkSkillHarness(
+            provider=self.provider,
+            model=self.model,
+            query_impl=lambda **_: None,
+        ).provider_env()
+        provider_env.update(
+            {
+                "CLAUDE_CONFIG_DIR": str(session_dir / "claude"),
+                "CLAUDE_CODE_DISABLE_AUTO_MEMORY": "1",
+                "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "1",
+                "CLAUDE_CODE_SUBPROCESS_ENV_SCRUB": "1",
+            }
+        )
+        if not provider_env.get("ANTHROPIC_AUTH_TOKEN") and not provider_env.get("ANTHROPIC_API_KEY"):
+            raise RuntimeError(f"missing credential for Finance CC provider {self.provider}")
+        system_prompt = self.system_prompt_path.read_text(encoding="utf-8")
+        requirement_only = bool(tool_context.get("_finance_cc_requirement_only"))
+        if requirement_only:
+            system_prompt += (
+                "\n\n## 当前评测范围\n\n"
+                "本轮只处理需求理解与确认。形成并保存 requirement；"
+                "若需要用户补充则发起交互，然后直接结束本轮。"
+                "不要进入模块与流程设计、流程图、代码实现、运行或测试。"
+            )
+        mcp_servers: dict[str, Any] = {}
+        allowed_tools: list[str] = []
+        tracker: Dict[str, Any] = {
+            "calls": [],
+            "interaction_requests": [],
+            "artifact_updates": [],
+            "asset_reads": [],
+            "dynamic_runs": [],
+            "implementation_runs": [],
+            "result_refs": [],
+        }
+        if self.system_tools is not None:
+            from claude_agent_sdk import create_sdk_mcp_server
+
+            tools, allowed_tools, tracker = self.system_tools.build_tools(
+                owner_ids=[owner_id] if owner_id else [],
+                tool_context=tool_context,
+                event_sink=event_sink,
+            )
+            mcp_servers["finance"] = create_sdk_mcp_server(name="finance", version="1.0.0", tools=tools)
+        skill_root = Path("src/skills/financial-tool-development").resolve()
+        skill_names = ["fin-agent-financial-tools:financial-tool-requirement"]
+        if not requirement_only:
+            skill_names.extend(
+                [
+                    "fin-agent-financial-tools:financial-tool-design",
+                    "fin-agent-financial-tools:financial-tool-flowchart",
+                ]
+            )
+        options = ClaudeAgentOptions(
+            tools=["Skill"],
+            allowed_tools=["Skill", *allowed_tools],
+            disallowed_tools=[
+                "Bash", "Edit", "Write", "Read", "Glob", "Grep", "WebFetch", "WebSearch",
+                "Agent", "Task", "AskUserQuestion", "NotebookEdit",
+            ],
+            system_prompt=system_prompt,
+            mcp_servers=mcp_servers,
+            strict_mcp_config=bool(mcp_servers),
+            permission_mode="dontAsk",
+            setting_sources=[],
+            plugins=[{"type": "local", "path": str(skill_root)}],
+            skills=skill_names,
+            cwd=str(session_dir),
+            include_partial_messages=True,
+            max_turns=max(2, int(os.environ.get("FINANCE_CC_MAX_TURNS") or 12)),
+            model=self.model,
+            effort=_trim(os.environ.get("FINANCE_CC_EFFORT") or "low"),
+            resume=session_id if resume else None,
+            session_id=None if resume else session_id,
+            env=provider_env,
+        )
+        evidence: Dict[str, Any] = {
+            "ok": False,
+            "result": "",
+            "error": "ClaudeSDKClient stream ended without ResultMessage",
+            "stream_event_count": 0,
+            "text_delta_count": 0,
+            "tool_calls": tracker["calls"],
+            "interaction_requests": tracker["interaction_requests"],
+            "artifact_updates": tracker["artifact_updates"],
+            "asset_reads": tracker["asset_reads"],
+            "dynamic_runs": tracker["dynamic_runs"],
+            "implementation_runs": tracker["implementation_runs"],
+            "result_refs": tracker["result_refs"],
+            "agent_tool_names": [],
+            "skill_results": [],
+        }
+        tool_names_by_id: dict[str, str] = {}
+        active_stage = "runtime"
+        last_progress_at = 0.0
+        self._send_event(
+            event_sink,
+            {"source": "claude", "type": "stage_start", "content": "Finance CC started", "metadata": {"stage": active_stage}},
+        )
+        state = tool_context.get("custom_tool_state") if isinstance(tool_context.get("custom_tool_state"), Mapping) else {}
+        has_confirmed_design = isinstance(state.get("design_contract"), Mapping) and bool(state.get("design_contract"))
+        timeout_env = "FINANCE_CC_LONG_TURN_TIMEOUT_SECONDS" if has_confirmed_design else "FINANCE_CC_TURN_TIMEOUT_SECONDS"
+        timeout_default = 900 if has_confirmed_design else 180
+        timeout_seconds = max(30, int(os.environ.get(timeout_env) or timeout_default))
+        try:
+            async with asyncio.timeout(timeout_seconds):
+                async with ClaudeSDKClient(options=options) as client:
+                    await client.query(prompt)
+                    async for message in client.receive_response():
+                        class_name = type(message).__name__
+                        if class_name == "StreamEvent":
+                            evidence["stream_event_count"] += 1
+                            event = getattr(message, "event", None)
+                            event = event if isinstance(event, dict) else {}
+                            if event.get("type") == "content_block_delta":
+                                delta = event.get("delta") if isinstance(event.get("delta"), dict) else {}
+                                if delta.get("type") == "text_delta" and delta.get("text"):
+                                    evidence["text_delta_count"] += 1
+                                    now = time.monotonic()
+                                    if now - last_progress_at >= 0.8:
+                                        last_progress_at = now
+                                        self._send_event(
+                                            event_sink,
+                                            {
+                                                "source": "claude",
+                                                "type": "reasoning_summary_delta",
+                                                "content": "Finance CC is working",
+                                                "metadata": {"stage": active_stage},
+                                            },
+                                        )
+                        if class_name == "AssistantMessage":
+                            for block in getattr(message, "content", None) or []:
+                                if type(block).__name__ == "ToolUseBlock":
+                                    name = _trim(getattr(block, "name", ""))
+                                    tool_input = getattr(block, "input", None)
+                                    tool_input = tool_input if isinstance(tool_input, Mapping) else {}
+                                    active_stage = self._stage_for_tool(name, tool_input)
+                                    tool_use_id = _trim(getattr(block, "id", ""))
+                                    if tool_use_id and name:
+                                        tool_names_by_id[tool_use_id] = name
+                                    if name and name not in evidence["agent_tool_names"]:
+                                        evidence["agent_tool_names"].append(name)
+                                    self._send_event(
+                                        event_sink,
+                                        {
+                                            "source": "claude",
+                                            "type": "tool_call",
+                                            "content": name or "Finance CC tool",
+                                            "metadata": {"stage": active_stage, "tool": name},
+                                        },
+                                    )
+                        if class_name == "UserMessage":
+                            for block in getattr(message, "content", None) or []:
+                                if type(block).__name__ != "ToolResultBlock":
+                                    continue
+                                tool_name = tool_names_by_id.get(_trim(getattr(block, "tool_use_id", "")), "")
+                                if tool_name != "Skill":
+                                    continue
+                                content = getattr(block, "content", "")
+                                if isinstance(content, list):
+                                    content = json.dumps(content, ensure_ascii=False, default=str)
+                                skill_result = _trim(content)
+                                if skill_result:
+                                    evidence["skill_results"].append(skill_result[:5_000])
+                        if class_name == "ResultMessage":
+                            evidence["ok"] = (
+                                not bool(getattr(message, "is_error", False))
+                                and _trim(getattr(message, "subtype", "")) == "success"
+                            )
+                            evidence["result"] = _trim(getattr(message, "result", ""))
+                            evidence["error"] = "" if evidence["ok"] else evidence["result"]
+        except TimeoutError:
+            evidence["ok"] = False
+            evidence["error"] = f"Finance CC turn timed out after {timeout_seconds}s"
+        self._send_event(
+            event_sink,
+            {
+                "source": "claude",
+                "type": "stage_result" if evidence["ok"] else "error",
+                "content": "Finance CC completed" if evidence["ok"] else evidence["error"],
+                "metadata": {"stage": active_stage, "ok": evidence["ok"]},
+            },
+        )
+        return evidence
+
+    @staticmethod
+    def _stage_for_tool(name: str, tool_input: Mapping[str, Any]) -> str:
+        normalized = _trim(name).lower()
+        if normalized == "skill":
+            skill_text = json.dumps(dict(tool_input), ensure_ascii=False).lower()
+            if "requirement" in skill_text:
+                return "requirement"
+            if "flowchart" in skill_text:
+                return "flowchart"
+            if "test-execution" in skill_text:
+                return "test"
+            return "design"
+        if normalized.endswith("implement_dynamic_tool"):
+            return "coding"
+        if normalized.endswith("run_dynamic_tool"):
+            return "test"
+        if normalized.endswith("read_finance_asset"):
+            return "view"
+        return "runtime"
+
+    @staticmethod
+    def _send_event(
+        event_sink: Optional[Callable[[Dict[str, Any]], None]],
+        event: Dict[str, Any],
+    ) -> None:
+        if event_sink is None:
+            return
+        try:
+            event_sink(event)
+        except Exception:
+            return
+
+    def _session_key(self, *, thread_id: int | str, owner_id: str) -> str:
+        owner_hash = hashlib.sha256(_trim(owner_id).encode("utf-8")).hexdigest()[:16]
+        thread_text = _trim(thread_id) or "unknown"
+        return f"{owner_hash}/{thread_text}"
+
+    def _session_dir(self, key: str) -> Path:
+        return self.root_dir / key
+
+    @staticmethod
+    def _session_id(key: str, *, generation: int = 0) -> str:
+        return str(uuid.uuid5(uuid.NAMESPACE_URL, f"fin-agent:finance-cc:{key}:{max(0, int(generation))}"))
+
+    def _session_lock(self, key: str) -> threading.Lock:
+        with self._locks_guard:
+            return self._session_locks.setdefault(key, threading.Lock())
+
+    @staticmethod
+    @contextmanager
+    def _process_session_lock(session_dir: Path):
+        session_dir.mkdir(parents=True, exist_ok=True)
+        lock_handle = (session_dir / "session.lock").open("a+", encoding="utf-8")
+        try:
+            fcntl.flock(lock_handle.fileno(), fcntl.LOCK_EX)
+            yield
+        finally:
+            fcntl.flock(lock_handle.fileno(), fcntl.LOCK_UN)
+            lock_handle.close()
+
+    def _append_record(self, record: Mapping[str, Any]) -> None:
+        with self._log_lock:
+            self.log_path.parent.mkdir(parents=True, exist_ok=True)
+            with self.log_path.open("a", encoding="utf-8") as handle:
+                handle.write(json.dumps(dict(record), ensure_ascii=False) + "\n")
+
+    def _finish_future(self, future: Future) -> None:
+        with self._futures_guard:
+            self._futures.discard(future)

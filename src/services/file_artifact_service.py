@@ -157,6 +157,15 @@ class FileArtifactService:
         return manifest
 
     def read_table_preview(self, artifact_ref: Any, *, max_preview_rows: int = 50) -> tuple[dict[str, Any], list[dict[str, Any]]]:
+        return self.read_table_rows(artifact_ref, offset=0, limit=max_preview_rows)
+
+    def read_table_rows(
+        self,
+        artifact_ref: Any,
+        *,
+        offset: int = 0,
+        limit: int = 50,
+    ) -> tuple[dict[str, Any], list[dict[str, Any]]]:
         manifest = self.read_manifest(artifact_ref)
         if manifest.get("kind") != "table":
             raise FileArtifactError("unsupported_format", "artifact is not a table")
@@ -164,10 +173,13 @@ class FileArtifactService:
         files = manifest.get("files") if isinstance(manifest.get("files"), dict) else {}
         data_path = self._contained_path(artifact_dir, Path(self.trim(files.get("data"))), must_exist=True)
         rows = []
-        limit = self._bounded_int(max_preview_rows, default=50, min_value=1, max_value=self.MAX_PREVIEW_ROWS)
+        start = self._bounded_int(offset, default=0, min_value=0, max_value=self.MAX_ROWS)
+        page_size = self._bounded_int(limit, default=50, min_value=1, max_value=self.MAX_PREVIEW_ROWS)
         with data_path.open("r", encoding="utf-8") as handle:
-            for line in handle:
-                if len(rows) >= limit:
+            for index, line in enumerate(handle):
+                if index < start:
+                    continue
+                if len(rows) >= page_size:
                     break
                 if line.strip():
                     rows.append(json.loads(line))

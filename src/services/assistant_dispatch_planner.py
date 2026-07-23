@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import Any, Dict, Optional
 
 from src.services.conversation_preprocess_service import ConversationPreprocessService
+from src.services.top_level_shortcut_service import TopLevelShortcutService
 
 
 class AssistantDispatchPlanner:
@@ -10,12 +11,37 @@ class AssistantDispatchPlanner:
         self,
         *,
         preprocess_service: Optional[ConversationPreprocessService] = None,
+        shortcut_service: Optional[TopLevelShortcutService] = None,
     ) -> None:
         self.preprocess_service = preprocess_service or ConversationPreprocessService()
+        self.shortcut_service = shortcut_service or TopLevelShortcutService()
 
     @staticmethod
     def _trim(value: Any) -> str:
         return str(value or "").strip()
+
+    def plan_turn(
+        self,
+        *,
+        text: str,
+        attachments: list[dict] | None = None,
+        thread_context: dict | None = None,
+        application_context: dict | None = None,
+        interaction_response: dict | None = None,
+    ) -> Dict[str, Any]:
+        shortcut = self.shortcut_service.resolve(
+            text=text,
+            interaction_response=interaction_response,
+            application_context=application_context,
+        )
+        if shortcut is not None:
+            return shortcut
+        return self.plan_free_chat(
+            text=text,
+            attachments=attachments,
+            thread_context=thread_context,
+            application_context=application_context,
+        )
 
     def plan_free_chat(
         self,
@@ -40,7 +66,9 @@ class AssistantDispatchPlanner:
         work_context = result.get("work_context") if isinstance(result.get("work_context"), dict) else {}
         normalized_input = result.get("normalized_input") if isinstance(result.get("normalized_input"), dict) else {}
         normalized_request = result.get("normalized_request") if isinstance(result.get("normalized_request"), dict) else {}
-        turn_mode = self._trim(dispatch_plan.get("turn_mode") or interaction.get("turn_mode")) or "normal_qa"
+        turn_mode = self._trim(dispatch_plan.get("turn_mode") or interaction.get("turn_mode"))
+        if turn_mode not in {"normal_qa", "system_operation", "tool_development"}:
+            raise ValueError(f"顶层意图协议错误：未知 turn_mode={turn_mode or '-'}")
         execution_plan = (
             dispatch_plan.get("execution_plan_preview")
             if isinstance(dispatch_plan.get("execution_plan_preview"), dict)
@@ -88,11 +116,7 @@ class AssistantDispatchPlanner:
                 execution_plan
             ),
             "task_state": task_state,
-            "continuity_axes": result.get("continuity_axes") if isinstance(result.get("continuity_axes"), dict) else {},
             "thread_context_patch_preview": result.get("thread_context_patch_preview") if isinstance(result.get("thread_context_patch_preview"), dict) else {},
-            "interaction_frame": result.get("interaction_frame") if isinstance(result.get("interaction_frame"), dict) else {},
-            "conversation_state": result.get("conversation_state") if isinstance(result.get("conversation_state"), dict) else {},
-            "observation_preview": result.get("observation_preview") if isinstance(result.get("observation_preview"), dict) else {},
             "runtime_contract": result.get("runtime_contract") if isinstance(result.get("runtime_contract"), dict) else {},
             "conversation_mainline": result.get("conversation_mainline") if isinstance(result.get("conversation_mainline"), dict) else {},
             "runtime_modules": result.get("runtime_modules") if isinstance(result.get("runtime_modules"), list) else [],

@@ -1,37 +1,8 @@
 import json
 from pathlib import Path
 
-from src.services.custom_tool_service import CustomToolAgentService
 from src.services.llm_stream_block_service import LlmStreamBlockBuilder
 from src.web import flask_app as web
-
-
-SKILL_DIR = Path("src/skills/financial-tool-requirement-design-v3")
-
-
-class _RecordingDesigner:
-    def __init__(self) -> None:
-        self.calls = []
-
-    def design(self, requirement_text, context=None, event_sink=None):
-        self.calls.append({
-            "requirement_text": requirement_text,
-            "context": dict(context or {}),
-        })
-        if event_sink:
-            event_sink({
-                "source": "harness",
-                "type": "stage_start",
-                "content": "design started",
-                "metadata": {"stage": "design"},
-            })
-            event_sink({
-                "source": "harness",
-                "type": "turn_started",
-                "content": "turn started",
-                "metadata": {"stage": "design"},
-            })
-        return json.loads((SKILL_DIR / "assets/sample-review.json").read_text(encoding="utf-8"))
 
 
 class _ApplicationRuntimeStub:
@@ -86,21 +57,50 @@ class _NormalFinanceDispatchPlannerStub:
             "thread_context_patch_preview": {},
         }
 
+    def plan_turn(self, **kwargs):
+        return self.plan_free_chat(**kwargs)
 
-def test_create_first_round_runs_command_to_persisted_surface_without_inheriting_old_state(monkeypatch) -> None:
-    designer = _RecordingDesigner()
-    agent = CustomToolAgentService(designer=designer, use_codex=False)
+
+class _ToolDevelopmentDispatchPlannerStub:
+    def plan_free_chat(self, **kwargs):
+        return {
+            "entry": "custom_tool_flow",
+            "turn_mode": "tool_development",
+            "selected_agent": "investment_analyst",
+            "thread_context_patch_preview": {},
+        }
+
+    def plan_turn(self, **kwargs):
+        return self.plan_free_chat(**kwargs)
+
+
+def test_natural_language_tool_development_starts_a_first_round_when_no_tool_is_active(monkeypatch) -> None:
+    class _FirstRoundAgent:
+        def __init__(self) -> None:
+            self.calls = []
+
+        def start_create(self, text, **kwargs):
+            self.calls.append({"text": text, **kwargs})
+            return {
+                "message": "我先为这个选股工具梳理设计方案。",
+                "state": {"status": "awaiting_design_confirmation", "design_round": 1},
+                "surface_blocks": [],
+            }
+
     conversations = _ConversationRuntimeStub()
+    conversations.context = {}
+    agent = _FirstRoundAgent()
     emitted = []
 
-    monkeypatch.setattr(web, "custom_tool_agent_service", agent)
     monkeypatch.setattr(web, "application_runtime_service", _ApplicationRuntimeStub())
     monkeypatch.setattr(web, "runtime_conversation_service", conversations)
+    monkeypatch.setattr(web, "assistant_dispatch_planner", _ToolDevelopmentDispatchPlannerStub())
+    monkeypatch.setattr(web, "custom_tool_agent_service", agent)
 
     web._run_custom_tool_stream_payload(
         {
-            "run_id": "run_first_round",
-            "text": "/custom_tool create 创建一个放量突破识别工具",
+            "run_id": "natural_language_first_round",
+            "text": "帮我创建一个选股工具，逻辑是最近20日涨幅超过10%且成交量放大。",
             "application_name": "investment_workbench",
             "guest_identity": {"user_id": "user_a"},
             "thread_id": 101,
@@ -108,57 +108,15 @@ def test_create_first_round_runs_command_to_persisted_surface_without_inheriting
         emit=emitted.append,
     )
 
-    assert designer.calls == [{
-        "requirement_text": "创建一个放量突破识别工具",
-        "context": {
-            "owner_id": "user_a",
-            "state": {},
-            "design_scenario": "create_first_round",
-            "design_round": 1,
-            "design_policy": {
-                "scope_mode": "minimum_viable_core",
-                "progressive_expansion": True,
-                "implicit_adjacent_features": False,
-                "first_round_budget": {
-                    "required_questions": 3,
-                    "modules": 3,
-                    "rules": 5,
-                    "outputs": 5,
-                    "exceptions": 3,
-                    "acceptance": 5,
-                    "flow_steps": 7,
-                },
-            },
-        },
+    assert agent.calls == [{
+        "text": "帮我创建一个选股工具，逻辑是最近20日涨幅超过10%且成交量放大。",
+        "owner_id": "user_a",
+        "thread_id": 101,
+        "turn_id": 202,
+        "event_sink": agent.calls[0]["event_sink"],
     }]
-    assert len(conversations.completed) == 1
-    output_payload = conversations.completed[0]["output_payload"]
-    assert output_payload["state"]["status"] == "awaiting_design_confirmation"
-    assert output_payload["state"]["design_round"] == 1
-    assert output_payload["state"]["design_artifact_id"] != "old_artifact"
-    assert output_payload["event_summary"] == {
-        "total": 2,
-        "persisted": 2,
-        "by_type": {
-            "harness:stage_start": 1,
-            "harness:turn_started": 1,
-        },
-    }
-    artifact = next(block for block in output_payload["surface_blocks"] if block["block_type"] == "artifact")
-    assert artifact["data"]["artifact_type"] == "finance.tool_spec"
-    assert artifact["data"]["design_context"] == {
-        "scenario": "create_first_round",
-        "round": 1,
-        "is_first_round": True,
-    }
-    interaction = next(block for block in output_payload["surface_blocks"] if block["block_type"] == "interaction")
-    assert interaction["data"]["interaction_id"] == "custom_tool.design_review"
-    assert interaction["data"]["subject_revision"] == 1
-    first_artifact_index = next(index for index, event in enumerate(emitted) if event.get("block_type") == "artifact")
-    assert any(event.get("block_type") == "status" for event in emitted[:first_artifact_index])
-    assert emitted[-1]["event"] == "done"
-    assert emitted[-1]["thread_id"] == 101
-    assert emitted[-1]["turn_id"] == 202
+    assert conversations.completed[0]["output_payload"]["state"]["design_round"] == 1
+    assert conversations.context["custom_tool_state"]["status"] == "awaiting_design_confirmation"
 
 
 def test_active_custom_tool_stream_can_route_a_new_finance_question_outside_tool_flow(monkeypatch) -> None:
@@ -196,10 +154,425 @@ def test_active_custom_tool_stream_can_route_a_new_finance_question_outside_tool
     assert conversations.context["custom_tool_state"]["status"] == "awaiting_design_confirmation"
 
 
+def test_active_tool_can_switch_to_finance_and_then_resume_design(monkeypatch) -> None:
+    class SequencePlanner:
+        def plan_turn(self, *, text, **kwargs):
+            if text == "今天茅台的收盘价是多少？":
+                return {
+                    "entry": "tool_plan_run",
+                    "turn_mode": "normal_qa",
+                    "selected_agent": "investment_analyst",
+                    "thread_context_patch_preview": {},
+                }
+            return {
+                "entry": "custom_tool_flow",
+                "turn_mode": "tool_development",
+                "selected_agent": "investment_analyst",
+                "thread_context_patch_preview": {},
+            }
+
+    class RevisionAgent:
+        def __init__(self):
+            self.calls = []
+
+        def handle_turn(self, text, **kwargs):
+            self.calls.append({"text": text, **kwargs})
+            state = {**dict(kwargs["state"]), "design_revision": 5}
+            return {
+                "message": "已将计算周期调整为10个交易日。",
+                "state": state,
+                "thread_context_patch": {"custom_tool_state": state},
+            }
+
+    conversations = _ConversationRuntimeStub()
+    agent = RevisionAgent()
+    emitted = []
+    monkeypatch.setattr(web, "application_runtime_service", _ApplicationRuntimeStub())
+    monkeypatch.setattr(web, "runtime_conversation_service", conversations)
+    monkeypatch.setattr(web, "assistant_dispatch_planner", SequencePlanner())
+    monkeypatch.setattr(web, "custom_tool_agent_service", agent)
+    monkeypatch.setattr(
+        web,
+        "_build_chat_dispatch_payload",
+        lambda *args, **kwargs: {
+            "mode": "finance_quote",
+            "message": "贵州茅台今日收盘价已返回。",
+            "thread_context_patch": {},
+        },
+    )
+
+    web._run_custom_tool_stream_payload(
+        {
+            "run_id": "switch_to_finance",
+            "text": "今天茅台的收盘价是多少？",
+            "application_name": "investment_workbench",
+            "guest_identity": {"user_id": "user_a"},
+            "thread_id": 101,
+        },
+        emit=emitted.append,
+    )
+
+    assert conversations.context["custom_tool_state"]["status"] == "awaiting_design_confirmation"
+    assert conversations.context["custom_tool_state"]["design_revision"] == 4
+
+    web._run_custom_tool_stream_payload(
+        {
+            "run_id": "resume_tool_design",
+            "text": "回到刚才的工具，把计算周期改成10个交易日",
+            "application_name": "investment_workbench",
+            "guest_identity": {"user_id": "user_a"},
+            "thread_id": 101,
+        },
+        emit=emitted.append,
+    )
+
+    assert agent.calls[0]["state"]["status"] == "awaiting_design_confirmation"
+    assert conversations.context["custom_tool_state"]["design_revision"] == 5
+    assert conversations.completed[0]["output_payload"]["mode"] == "finance_quote"
+    assert conversations.completed[1]["output_payload"]["message"] == "已将计算周期调整为10个交易日。"
+
+
+def test_active_custom_tool_stream_renders_view_answer_without_design_or_coding(monkeypatch) -> None:
+    class ViewAgent:
+        def __init__(self):
+            self.calls = []
+
+        def handle_turn(self, text, **kwargs):
+            self.calls.append({"text": text, **kwargs})
+            state = dict(kwargs.get("state") or {})
+            answer = "```python\ndef run(inputs):\n    return inputs\n```"
+            return {
+                "message": answer,
+                "view_answer": answer,
+                "tool_turn": {"action": "view", "request": text, "change_request": "", "ok": True},
+                "state": state,
+                "thread_context_patch": {"custom_tool_state": state},
+            }
+
+    agent = ViewAgent()
+    conversations = _ConversationRuntimeStub()
+    conversations.context["custom_tool_state"].update({
+        "status": "draft_ready",
+        "tool_name": "ct_demo",
+        "implementation_revision": 2,
+    })
+    emitted = []
+    monkeypatch.setattr(web, "custom_tool_agent_service", agent)
+    monkeypatch.setattr(web, "application_runtime_service", _ApplicationRuntimeStub())
+    monkeypatch.setattr(web, "runtime_conversation_service", conversations)
+    monkeypatch.setattr(web, "assistant_dispatch_planner", _ToolDevelopmentDispatchPlannerStub())
+
+    web._run_custom_tool_stream_payload(
+        {
+            "run_id": "view_custom_tool_answer",
+            "text": "给我看一下这个工具的实际核心代码",
+            "application_name": "investment_workbench",
+            "guest_identity": {"user_id": "user_a"},
+            "thread_id": 101,
+        },
+        emit=emitted.append,
+    )
+
+    output_payload = conversations.completed[0]["output_payload"]
+    assert agent.calls[0]["text"] == "给我看一下这个工具的实际核心代码"
+    assert output_payload["tool_turn"]["action"] == "view"
+    assert output_payload["state"]["implementation_revision"] == 2
+    assert [block["block_type"] for block in output_payload["surface_blocks"]] == ["markdown"]
+    assert output_payload["surface_blocks"][0]["data"]["state_changed"] is False
+    assert output_payload["surface_blocks"][0]["stage"] == "view"
+    assert emitted[-1]["event"] == "done"
+
+
+def test_view_assets_render_saved_code_and_flow_with_specialized_blocks() -> None:
+    blocks = web._custom_tool_result_blocks(
+        {
+            "message": "已读取当前工具资产。",
+            "view_answer": "已读取当前工具资产。",
+            "tool_turn": {"action": "view"},
+            "view_assets": [
+                {
+                    "type": "code",
+                    "payload": {
+                        "modules": [{
+                            "module_id": "main",
+                            "language": "python",
+                            "source_code": "def run(inputs):\n    return inputs\n",
+                        }],
+                    },
+                },
+                {
+                    "type": "flow",
+                    "payload": {
+                        "steps": [{"id": "read", "name": "读取数据"}, {"id": "result", "name": "返回结果"}],
+                        "links": [{"from": "read", "to": "result"}],
+                    },
+                },
+            ],
+        },
+        LlmStreamBlockBuilder(run_id="view_assets"),
+    )
+
+    assert [block["block_type"] for block in blocks] == ["markdown", "code", "flowchart"]
+    assert blocks[1]["data"]["files"][0]["content"].startswith("def run")
+    assert blocks[2]["data"]["nodes"][0]["label"] == "读取数据"
+
+
+def test_requirement_confirmation_renders_before_design_exists() -> None:
+    blocks = web._custom_tool_result_blocks(
+        {
+            "message": "我理解为识别最近30个交易日内的金叉，按这个实现可以吗？",
+            "design_status": "clarification",
+            "understanding": {
+                "goal": "判断单只股票最近30个交易日内是否出现金叉",
+            },
+            "questions": [],
+            "design": {},
+            "tool_turn": {"action": "design"},
+        },
+        LlmStreamBlockBuilder(run_id="requirement_confirmation"),
+    )
+
+    assert [block["block_type"] for block in blocks] == ["narrative"]
+    assert "按这个实现可以吗" in blocks[0]["content"]
+
+
+def test_design_then_view_blocks_follow_declared_action_order() -> None:
+    blocks = web._custom_tool_result_blocks(
+        {
+            "message": "设计已更新。",
+            "design_status": "review",
+            "design": {
+                "tool_name": "demo",
+                "display_name": "演示工具",
+                "description": "演示多步输出。",
+                "inputs": [],
+                "outputs": [],
+                "modules": [],
+                "rules": [],
+                "data_requirements": [],
+                "exceptions": [],
+                "acceptance": [],
+                "flow": {"steps": [], "links": []},
+            },
+            "tool_turn": {"action": "design", "actions": ["design", "view"]},
+            "view_answer": "已读取当前工具资产。",
+            "view_assets": [{
+                "type": "flow",
+                "payload": {"steps": [{"id": "done", "name": "新流程"}], "links": []},
+            }],
+        },
+        LlmStreamBlockBuilder(run_id="design_then_view"),
+    )
+
+    stages = [block["stage"] for block in blocks]
+    assert stages[-2:] == ["view", "view"]
+    assert "design" in stages[:-2]
+
+
+def test_structured_clarification_is_submitted_as_text_with_ui_context(monkeypatch) -> None:
+    class FeedbackAgent:
+        def __init__(self):
+            self.calls = []
+
+        def handle_turn(self, text, **kwargs):
+            self.calls.append({"text": text, **kwargs})
+            state = {**dict(kwargs["state"]), "status": "awaiting_design_confirmation"}
+            return {
+                "message": "设计已按确认信息更新。",
+                "state": state,
+                "thread_context_patch": {"custom_tool_state": state},
+            }
+
+    agent = FeedbackAgent()
+    conversations = _ConversationRuntimeStub()
+    conversations.context["custom_tool_state"].update({"status": "collect_requirement", "design_revision": 4})
+    emitted = []
+    monkeypatch.setattr(web, "custom_tool_agent_service", agent)
+    monkeypatch.setattr(web, "application_runtime_service", _ApplicationRuntimeStub())
+    monkeypatch.setattr(web, "runtime_conversation_service", conversations)
+    monkeypatch.setattr(web, "assistant_dispatch_planner", _ToolDevelopmentDispatchPlannerStub())
+
+    web._run_custom_tool_stream_payload(
+        {
+            "run_id": "submit_design_clarification",
+            "text": "",
+            "interaction_response": {
+                "interaction_id": "custom_tool.requirement_clarification",
+                "action_id": "custom_tool.submit_clarification",
+                "action": "submit",
+                "expected_revision": 4,
+                "answers": [
+                    {"question": "金额单位是什么？", "answer": "系统依据数据接口口径处理"},
+                    {"question": "计算周期是什么？", "answer": "最近 20 个交易日"},
+                ],
+            },
+            "application_name": "investment_workbench",
+            "guest_identity": {"user_id": "user_a"},
+            "thread_id": 101,
+        },
+        emit=emitted.append,
+    )
+
+    assert agent.calls[0]["text"] == "关于「金额单位是什么？」，我的回答是：系统依据数据接口口径处理。\n关于「计算周期是什么？」，我的回答是：最近 20 个交易日。"
+    assert agent.calls[0]["ui_action"]["action_id"] == "custom_tool.submit_clarification"
+    assert conversations.completed[0]["output_payload"]["state"]["status"] == "awaiting_design_confirmation"
+
+
+def test_confirmation_button_with_text_uses_semantic_route_instead_of_action_shortcut(monkeypatch) -> None:
+    class SemanticAgent:
+        def __init__(self):
+            self.calls = []
+
+        def handle_turn(self, text, **kwargs):
+            self.calls.append({"text": text, **kwargs})
+            state = {**dict(kwargs["state"]), "design_revision": 5}
+            return {
+                "message": "设计窗口已调整为 60 个交易日，尚未进入实现。",
+                "tool_turn": {"version": "v1", "action": "design", "request": text, "change_request": text, "ok": True},
+                "state": state,
+                "thread_context_patch": {"custom_tool_state": state},
+            }
+
+        def continue_flow_action(self, *args, **kwargs):
+            raise AssertionError("button with text must not execute the action shortcut")
+
+    agent = SemanticAgent()
+    conversations = _ConversationRuntimeStub()
+    monkeypatch.setattr(web, "custom_tool_agent_service", agent)
+    monkeypatch.setattr(web, "application_runtime_service", _ApplicationRuntimeStub())
+    monkeypatch.setattr(web, "runtime_conversation_service", conversations)
+    monkeypatch.setattr(web, "assistant_dispatch_planner", _ToolDevelopmentDispatchPlannerStub())
+
+    web._run_custom_tool_stream_payload(
+        {
+            "run_id": "confirm_with_text",
+            "text": "先不要实现，把窗口改成 60 个交易日",
+            "interaction_response": {
+                "interaction_id": "custom_tool.design_review",
+                "action_id": "custom_tool.confirm_design",
+                "action": "accept",
+                "expected_revision": 4,
+            },
+            "application_name": "investment_workbench",
+            "guest_identity": {"user_id": "user_a"},
+            "thread_id": 101,
+        },
+        emit=lambda event: None,
+    )
+
+    assert agent.calls[0]["text"] == "先不要实现，把窗口改成 60 个交易日"
+    assert agent.calls[0]["ui_action"] == {
+        "interaction_id": "custom_tool.design_review",
+        "action_id": "custom_tool.confirm_design",
+        "action": "accept",
+        "expected_revision": 4,
+    }
+    output = conversations.completed[0]["output_payload"]
+    assert output["tool_turn"]["action"] == "design"
+    assert output["state"]["design_revision"] == 5
+
+
+def test_confirmation_button_without_text_enters_coding_directly(monkeypatch) -> None:
+    class ShortcutPlanner(_ToolDevelopmentDispatchPlannerStub):
+        def plan_turn(self, **kwargs):
+            return {
+                **super().plan_turn(**kwargs),
+                "shortcut": {"handler": "custom_tool.action"},
+            }
+
+    class DirectAgent:
+        finance_cc_enabled = True
+
+        def __init__(self):
+            self.actions = []
+
+        def continue_flow_action(self, action_id, **kwargs):
+            self.actions.append({"action_id": action_id, **kwargs})
+            return {
+                "message": "已直接进入 Coding。",
+                "state": dict(kwargs["state"]),
+                "thread_context_patch": {"custom_tool_state": dict(kwargs["state"])},
+            }
+
+        def handle_turn(self, *args, **kwargs):
+            raise AssertionError("pure confirmation must not start Finance CC")
+
+    agent = DirectAgent()
+    conversations = _ConversationRuntimeStub()
+    monkeypatch.setattr(web, "custom_tool_agent_service", agent)
+    monkeypatch.setattr(web, "application_runtime_service", _ApplicationRuntimeStub())
+    monkeypatch.setattr(web, "runtime_conversation_service", conversations)
+    monkeypatch.setattr(web, "assistant_dispatch_planner", ShortcutPlanner())
+
+    web._run_custom_tool_stream_payload(
+        {
+            "run_id": "confirm_design_direct",
+            "text": "",
+            "interaction_response": {
+                "interaction_id": "custom_tool.design_review",
+                "action_id": "custom_tool.confirm_design",
+                "action": "accept",
+                "expected_revision": 4,
+            },
+            "application_name": "investment_workbench",
+            "guest_identity": {"user_id": "user_a"},
+            "thread_id": 101,
+        },
+        emit=lambda event: None,
+    )
+
+    assert agent.actions[0]["action_id"] == "custom_tool.confirm_design"
+    assert agent.actions[0]["expected_revision"] == 4
+
+
+def test_structured_coding_feedback_is_submitted_as_text_with_ui_context(monkeypatch) -> None:
+    class FeedbackAgent:
+        def __init__(self):
+            self.calls = []
+
+        def handle_turn(self, text, **kwargs):
+            self.calls.append({"text": text, **kwargs})
+            state = dict(kwargs["state"])
+            return {"message": "实现已更新。", "state": state, "thread_context_patch": {"custom_tool_state": state}}
+
+    agent = FeedbackAgent()
+    conversations = _ConversationRuntimeStub()
+    conversations.context["custom_tool_state"] = {
+        "status": "draft_ready",
+        "tool_name": "ct_demo",
+        "implementation_revision": 2,
+    }
+    monkeypatch.setattr(web, "custom_tool_agent_service", agent)
+    monkeypatch.setattr(web, "application_runtime_service", _ApplicationRuntimeStub())
+    monkeypatch.setattr(web, "runtime_conversation_service", conversations)
+    monkeypatch.setattr(web, "assistant_dispatch_planner", _ToolDevelopmentDispatchPlannerStub())
+
+    web._run_custom_tool_stream_payload(
+        {
+            "run_id": "submit_coding_feedback",
+            "text": "",
+            "interaction_response": {
+                "interaction_id": "custom_tool.coding_review",
+                "action_id": "custom_tool.revise_implementation",
+                "action": "edit",
+                "expected_revision": 2,
+                "feedback_text": "测试结果中补充核心中间指标",
+            },
+            "application_name": "investment_workbench",
+            "guest_identity": {"user_id": "user_a"},
+            "thread_id": 101,
+        },
+        emit=lambda event: None,
+    )
+
+    assert agent.calls[0]["text"] == "测试结果中补充核心中间指标"
+    assert agent.calls[0]["ui_action"]["action_id"] == "custom_tool.revise_implementation"
+
+
 def test_custom_tool_stream_persists_failure_instead_of_leaving_turn_running(monkeypatch) -> None:
     class FailingAgent:
         def start_create(self, *args, **kwargs):
-            raise ValueError("invalid value_json for design.rules")
+            raise ValueError("merged design is invalid")
 
     conversations = _ConversationRuntimeStub()
     emitted = []
@@ -220,7 +593,7 @@ def test_custom_tool_stream_persists_failure_instead_of_leaving_turn_running(mon
 
     assert len(conversations.completed) == 1
     assert conversations.completed[0]["status"] == "failed"
-    assert conversations.completed[0]["output_payload"]["error"] == "invalid value_json for design.rules"
+    assert conversations.completed[0]["output_payload"]["error"] == "merged design is invalid"
     assert emitted[-1]["event"] == "error"
 
 
@@ -278,7 +651,7 @@ def test_coding_surface_uses_modules_test_and_activation_without_file_concepts()
             },
             "test_result": {
                 "ok": True,
-                "gate_passed": True,
+                "execution_ok": True,
                 "summary": "1 / 1 项运行测试通过",
                 "cases": [{
                     "test_id": "sample_smoke",
@@ -334,15 +707,15 @@ def test_coding_surface_uses_modules_test_and_activation_without_file_concepts()
     assert blocks[-1]["data"]["actions"][0]["action_id"] == "custom_tool.activate_draft"
 
 
-def test_execution_success_without_full_test_gate_does_not_offer_activation() -> None:
+def test_execution_failure_does_not_offer_activation() -> None:
     blocks = web._custom_tool_result_blocks(
         {
             "tool": {
                 "manifest": {"tool_name": "ct_demo", "display_name": "演示工具", "status": "draft", "current_revision": 1},
             },
             "test_result": {
-                "ok": True,
-                "gate_passed": False,
+                "ok": False,
+                "execution_ok": False,
                 "summary": "0 / 1 项运行测试通过",
                 "cases": [],
             },

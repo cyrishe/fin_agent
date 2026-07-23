@@ -12,6 +12,7 @@ class CustomToolRunTrace:
     """Append-only, human-readable diagnostic trace for one custom-tool turn."""
 
     SECRET_MARKERS = ("password", "secret", "token", "api_key", "apikey", "authorization", "cookie")
+    STREAM_DELTA_TYPES = {"agent_delta", "reasoning_summary_delta"}
     SECTION_LABELS = {
         "request": "请求与会话上下文",
         "prepare": "运行准备",
@@ -28,6 +29,7 @@ class CustomToolRunTrace:
         self.sequence = 0
         self.current_section = ""
         self.lock = threading.Lock()
+        self.pending_delta: dict[str, Any] = {}
         day = datetime.now(timezone.utc).astimezone().strftime("%Y-%m-%d")
         self.path = Path(root_dir) / day / f"{self.run_id}.txt"
         self.path.parent.mkdir(parents=True, exist_ok=True)
@@ -59,34 +61,32 @@ class CustomToolRunTrace:
         content = event_payload.get("content")
         metadata = event_payload.get("metadata")
         with self.lock:
-            self.sequence += 1
-            chunks: list[str] = []
-            if event_section != self.current_section:
-                self.current_section = event_section
-                label = self.SECTION_LABELS.get(event_section, event_section or "其他事件")
-                chunks.append(f"\n## {label}\n")
-            elapsed_ms = int((time.time() - self.started_at) * 1000)
-            chunks.append(
-                f"\n### {self.sequence:06d} | {self._timestamp()} | +{elapsed_ms}ms | {source}/{event_type}\n"
+            if event_type in self.STREAM_DELTA_TYPES and isinstance(content, str):
+                delta_key = (event_section, source, event_type)
+                pending_key = self.pending_delta.get("key")
+                if pending_key not in (None, delta_key):
+                    self._flush_pending_delta_locked()
+                if not self.pending_delta:
+                    self.pending_delta = {
+                        "key": delta_key,
+                        "section": event_section,
+                        "source": source,
+                        "type": event_type,
+                        "chunks": [],
+                        "count": 0,
+                    }
+                self.pending_delta["chunks"].append(content)
+                self.pending_delta["count"] += 1
+                return
+            self._flush_pending_delta_locked()
+            self._write_event_locked(
+                event_payload=event_payload,
+                event_section=event_section,
+                source=source,
+                event_type=event_type,
+                content=content,
+                metadata=metadata,
             )
-            if content not in (None, ""):
-                chunks.append("\n**content**\n\n")
-                chunks.append(self._format_value(content))
-                chunks.append("\n")
-            remaining = {
-                key: value
-                for key, value in event_payload.items()
-                if key not in {"source", "type", "content", "metadata"}
-            }
-            if metadata not in (None, {}, []):
-                remaining["metadata"] = metadata
-            if remaining:
-                chunks.append("\n**data**\n\n```json\n")
-                chunks.append(json.dumps(self._redact(remaining), ensure_ascii=False, indent=2, default=str))
-                chunks.append("\n```\n")
-            with self.path.open("a", encoding="utf-8") as handle:
-                handle.write("".join(chunks))
-                handle.flush()
 
     def finish(self, result: Any, *, error: str = "") -> None:
         if error:
@@ -97,13 +97,73 @@ class CustomToolRunTrace:
         else:
             self.snapshot("final_result", result, section="final")
         elapsed_ms = int((time.time() - self.started_at) * 1000)
+        with self.lock:
+            self._flush_pending_delta_locked()
+            with self.path.open("a", encoding="utf-8") as handle:
+                handle.write(
+                    "\n## 记录结束\n\n"
+                    f"- finished_at: {self._timestamp()}\n"
+                    f"- elapsed_ms: {elapsed_ms}\n"
+                    f"- event_count: {self.sequence}\n"
+                )
+
+    def _flush_pending_delta_locked(self) -> None:
+        if not self.pending_delta:
+            return
+        pending = self.pending_delta
+        self.pending_delta = {}
+        self._write_event_locked(
+            event_payload={
+                "source": pending["source"],
+                "type": pending["type"],
+                "content": "".join(pending["chunks"]),
+                "metadata": {"coalesced_events": int(pending["count"])},
+            },
+            event_section=pending["section"],
+            source=pending["source"],
+            event_type=pending["type"],
+            content="".join(pending["chunks"]),
+            metadata={"coalesced_events": int(pending["count"])},
+        )
+
+    def _write_event_locked(
+        self,
+        *,
+        event_payload: Mapping[str, Any],
+        event_section: str,
+        source: str,
+        event_type: str,
+        content: Any,
+        metadata: Any,
+    ) -> None:
+        self.sequence += 1
+        chunks: list[str] = []
+        if event_section != self.current_section:
+            self.current_section = event_section
+            label = self.SECTION_LABELS.get(event_section, event_section or "其他事件")
+            chunks.append(f"\n## {label}\n")
+        elapsed_ms = int((time.time() - self.started_at) * 1000)
+        chunks.append(
+            f"\n### {self.sequence:06d} | {self._timestamp()} | +{elapsed_ms}ms | {source}/{event_type}\n"
+        )
+        if content not in (None, ""):
+            chunks.append("\n**content**\n\n")
+            chunks.append(self._format_value(content))
+            chunks.append("\n")
+        remaining = {
+            key: value
+            for key, value in event_payload.items()
+            if key not in {"source", "type", "content", "metadata"}
+        }
+        if metadata not in (None, {}, []):
+            remaining["metadata"] = metadata
+        if remaining:
+            chunks.append("\n**data**\n\n```json\n")
+            chunks.append(json.dumps(self._redact(remaining), ensure_ascii=False, indent=2, default=str))
+            chunks.append("\n```\n")
         with self.path.open("a", encoding="utf-8") as handle:
-            handle.write(
-                "\n## 记录结束\n\n"
-                f"- finished_at: {self._timestamp()}\n"
-                f"- elapsed_ms: {elapsed_ms}\n"
-                f"- event_count: {self.sequence}\n"
-            )
+            handle.write("".join(chunks))
+            handle.flush()
 
     @staticmethod
     def _timestamp() -> str:

@@ -12,6 +12,33 @@
 
 金融数据协议中的 `hot_event` 仍作为通用查询主体保留；它不等同于旧的 `hotspot_trace` 生产链路。
 
+## Agent Core providers
+
+普通问答和轻量语义路由继续使用基础 LLM。自定义工具的 Design/Coding 等慢思考阶段通过统一 harness 协议选择 Codex 或 Claude Agent SDK：
+
+```python
+from src.services.agent_providers import (
+    AgentCapabilityPolicy,
+    WebSearchPolicy,
+    build_agent_skill_harness,
+)
+
+harness = build_agent_skill_harness(
+    "claude",  # 或 "codex"
+    cwd=".",
+    complexity="fast",
+    capabilities=AgentCapabilityPolicy(web_search=WebSearchPolicy.DISABLED),
+)
+result = harness.run_skill(
+    skill_path="src/skills/financial-tool-development/SKILL.md",
+    output_schema_path="src/skills/financial-tool-development/schema.json",
+    user_request="设计一个金融工具",
+    stage="design",
+)
+```
+
+生产主线用 `CUSTOM_TOOL_AGENT_PROVIDER=codex|claude` 切换，并可用 `fastest|fast|mid|high` 四级 profile 统一选择模型与推理强度。Web Search 与 MCP 是独立 capability 参数，不随 profile 隐式开启。两者共享同一份 Skill、上下文资料包和业务 Output Schema；provider 的事件、权限、凭据和超时只在 adapter 内处理。Claude provider 默认通过 DashScope Anthropic 入口使用 `deepseek-v4-flash`，配置见 [.env.example](.env.example)，完整映射与边界见 [Claude Agent SDK 主线接入](docs/claude_agent_sdk_integration.md)。
+
 ## Run
 
 ```bash

@@ -2,11 +2,11 @@ from __future__ import annotations
 
 import hashlib
 import json
-import os
 from typing import Any, Callable, Dict, List, Mapping, Optional
-from urllib.parse import unquote, urlparse
 
 import pymysql
+
+from src.utils.system_db_utils import connect_system_db
 
 
 ARTIFACT_TABLE = "aiia_runtime_artifact"
@@ -37,20 +37,7 @@ class DatabaseCustomToolStoreService:
 
     @staticmethod
     def _connect() -> Any:
-        raw_url = _trim(os.environ.get("BUSINESS_DB_URL"))
-        if not raw_url:
-            raise RuntimeError("BUSINESS_DB_URL is required for database custom-tool storage")
-        normalized = raw_url.replace("mysql+pymysql://", "mysql://", 1)
-        parsed = urlparse(normalized)
-        if parsed.scheme != "mysql" or not parsed.hostname:
-            raise RuntimeError("BUSINESS_DB_URL must be a MySQL URL")
-        return pymysql.connect(
-            host=parsed.hostname,
-            user=unquote(parsed.username or ""),
-            password=unquote(parsed.password or ""),
-            database=(parsed.path or "/").lstrip("/"),
-            port=parsed.port or 3306,
-            charset="utf8mb4",
+        return connect_system_db(
             cursorclass=pymysql.cursors.DictCursor,
             autocommit=False,
         )
@@ -109,6 +96,8 @@ class DatabaseCustomToolStoreService:
             },
             "sample_input": dict(design.get("sample_input") or {}),
             "proposed_tests": [dict(item) for item in design.get("proposed_tests") or [] if isinstance(item, Mapping)],
+            "implementation_explanation": dict(design.get("implementation_explanation") or {}),
+            "implementation_review": dict(design.get("implementation_review") or {}),
             "design_contract": dict(design.get("design_contract") or {}),
             "design_provenance": dict(design.get("design_provenance") or {}),
             "design_feedback_evidence": [dict(item) for item in design.get("design_feedback_evidence") or [] if isinstance(item, Mapping)],
@@ -263,6 +252,8 @@ class DatabaseCustomToolStoreService:
                 "modules": [dict(item) for item in modules if isinstance(item, Mapping)],
                 "sample_input": dict(spec.get("sample_input") or {}),
                 "proposed_tests": [dict(item) for item in spec.get("proposed_tests") or [] if isinstance(item, Mapping)],
+                "implementation_explanation": dict(spec.get("implementation_explanation") or {}),
+                "implementation_review": dict(spec.get("implementation_review") or {}),
                 "design_contract": dict(spec.get("design_contract") or {}),
                 "design_provenance": dict(spec.get("design_provenance") or {}),
                 "design_feedback_evidence": [dict(item) for item in spec.get("design_feedback_evidence") or [] if isinstance(item, Mapping)],
@@ -313,8 +304,8 @@ class DatabaseCustomToolStoreService:
     def commit(self, tool_name: str, *, owner_ids: Optional[List[str]] = None) -> Dict[str, Any]:
         bundle = self.load_for_runtime(tool_name, owner_ids=owner_ids, allow_inactive=True)
         manifest = bundle["manifest"]
-        if (manifest.get("last_test") or {}).get("gate_passed") is not True:
-            self._raise("custom tool must pass sandbox test before activation")
+        if (manifest.get("last_test") or {}).get("execution_ok") is not True:
+            self._raise("custom tool must complete a technical run before activation")
         db = self.connection_factory()
         try:
             with db.cursor() as cursor:
@@ -340,8 +331,6 @@ class DatabaseCustomToolStoreService:
                     "ok": bool(result.get("ok")),
                     "execution_ok": bool(result.get("execution_ok", result.get("ok"))),
                     "contract_ok": bool(result.get("contract_ok", result.get("ok"))),
-                    "business_ok": bool(result.get("business_ok", result.get("ok"))),
-                    "gate_passed": bool(result.get("gate_passed", result.get("ok"))),
                     "error": _trim(result.get("error")),
                     "backend": _trim((((result.get("meta") or {}).get("diagnostics") or {}).get("backend"))),
                 }
@@ -352,8 +341,7 @@ class DatabaseCustomToolStoreService:
                 if self._table_exists(cursor, TEST_RUN_TABLE):
                     aggregate_execution_ok = bool(result.get("execution_ok", result.get("ok")))
                     aggregate_contract_ok = bool(result.get("contract_ok", result.get("ok")))
-                    aggregate_business_ok = bool(result.get("business_ok", result.get("ok")))
-                    aggregate_passed = bool(result.get("gate_passed", result.get("ok")))
+                    aggregate_passed = aggregate_execution_ok and aggregate_contract_ok
                     supplied_cases = [dict(item) for item in result.get("cases") or [] if isinstance(item, Mapping)]
                     cases = supplied_cases or [{
                         "test_kind": "sample_smoke",
@@ -367,9 +355,10 @@ class DatabaseCustomToolStoreService:
                             test_kind = "regression"
                         execution_ok = bool(case.get("execution_ok", aggregate_execution_ok))
                         contract_ok = bool(case.get("contract_ok", aggregate_contract_ok))
-                        business_ok = bool(case.get("business_ok", aggregate_business_ok))
+                        # Legacy non-null storage column only; it is not read as a business gate.
+                        legacy_business_ok = True
                         status = _trim(case.get("status")) or (
-                            "passed" if execution_ok and contract_ok and business_ok else "failed"
+                            "passed" if execution_ok and contract_ok else "failed"
                         )
                         if status not in {"passed", "failed", "blocked"}:
                             status = "failed"
@@ -395,7 +384,7 @@ class DatabaseCustomToolStoreService:
                                 status,
                                 int(execution_ok),
                                 int(contract_ok),
-                                int(business_ok),
+                                int(legacy_business_ok),
                                 json.dumps(case.get("input") or {}, ensure_ascii=False),
                                 json.dumps(case.get("actual") or result.get("data") or {}, ensure_ascii=False),
                                 _trim(case.get("error")) or _trim(result.get("error")),
@@ -420,8 +409,8 @@ class DatabaseCustomToolStoreService:
             self._raise("public publication requires custom_tool:publish permission")
         bundle = self.load_for_runtime(tool_name, owner_ids=owner_ids, allow_inactive=False)
         manifest = bundle["manifest"]
-        if (manifest.get("last_test") or {}).get("gate_passed") is not True:
-            self._raise("custom tool must pass the test gate before publication")
+        if (manifest.get("last_test") or {}).get("execution_ok") is not True:
+            self._raise("custom tool must complete a technical run before publication")
         artifact_id = int((bundle.get("storage") or {}).get("artifact_id") or 0)
         db = self.connection_factory()
         try:

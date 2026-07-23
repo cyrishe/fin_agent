@@ -76,7 +76,7 @@ class _Db:
 
 
 def test_runtime_title_update_only_replaces_expected_placeholder(monkeypatch) -> None:
-    monkeypatch.setattr(runtime_module, "StockInfoDbUtils", _Db)
+    monkeypatch.setattr(runtime_module, "SystemDbUtils", _Db)
     service = runtime_module.RuntimeConversationService()
 
     updated = service.update_thread_title(

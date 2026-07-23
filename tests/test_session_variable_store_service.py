@@ -89,3 +89,24 @@ def test_runtime_session_variable_registration_failure_does_not_fail_tool() -> N
     assert result["ok"] is True
     assert result["data"] == {"value": 1}
     assert result["meta"]["session_variable_error"] == "store unavailable"
+
+
+def test_session_variable_store_keeps_full_non_table_result_outside_prompt_summary(tmp_path: Path) -> None:
+    store = SessionVariableStoreService(data_root=tmp_path / "data")
+    large_text = "x" * 250_000
+    variable = store.register_tool_result(
+        session_id="owner/thread-1",
+        tool_name="demo_object_tool",
+        result={"ok": True, "data": {"payload": large_text}},
+    )
+
+    assert variable is not None
+    assert large_text not in store.format_variables_for_prompt(session_id="owner/thread-1")
+    loaded = store.load_data_ref(
+        session_id="owner/thread-1",
+        data_ref=variable["data_ref"],
+        offset=249_900,
+        limit=200,
+    )
+    assert loaded["page"]["total"] > 250_000
+    assert "x" * 50 in loaded["text"]

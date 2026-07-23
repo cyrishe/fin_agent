@@ -131,8 +131,6 @@ class AgentRuntimeLLMPlannerService:
         tool_queries: Optional[List[str]] = None,
         work_context: Optional[Dict[str, Any]] = None,
         application_context: Optional[Dict[str, Any]] = None,
-        interaction_frame: Optional[Dict[str, Any]] = None,
-        conversation_state: Optional[Dict[str, Any]] = None,
         enable_llm: bool = True,
         allow_fallback: bool = True,
     ) -> Dict[str, Any]:
@@ -140,8 +138,6 @@ class AgentRuntimeLLMPlannerService:
         retrieval_query = self._trim(recall_query) or objective
         ctx = work_context if isinstance(work_context, dict) else {}
         app_ctx = application_context if isinstance(application_context, dict) else {}
-        frame = interaction_frame if isinstance(interaction_frame, dict) else {}
-        state = conversation_state if isinstance(conversation_state, dict) else {}
         agent_context = self._build_agent_context(app_ctx, ctx)
         subject_result = self._classify_security_subject(
             objective=objective,
@@ -203,8 +199,6 @@ class AgentRuntimeLLMPlannerService:
         prompt_context_sections = self.prompt_context_compiler.compile_sections(
             profile="planner",
             agent_context=agent_context,
-            interaction_frame=frame,
-            conversation_state=state,
             work_context=ctx,
             candidate_skills=planner_skills,
             candidate_tools=planner_tools,
@@ -729,12 +723,10 @@ class AgentRuntimeLLMPlannerService:
         return bool(step_errors)
 
     def _build_agent_context(self, application_context: Dict[str, Any], work_context: Dict[str, Any]) -> Dict[str, Any]:
-        execution_agent = application_context.get("execution_agent") if isinstance(application_context.get("execution_agent"), dict) else {}
-        assistant_agent = application_context.get("assistant_agent") if isinstance(application_context.get("assistant_agent"), dict) else {}
+        default_agent = application_context.get("default_agent") if isinstance(application_context.get("default_agent"), dict) else {}
         return {
             "application_name": self._trim(application_context.get("application_name")),
-            "assistant_agent": self._trim(assistant_agent.get("agent_name")),
-            "execution_agent": self._trim(execution_agent.get("agent_name")) or self._trim(work_context.get("execution_agent")),
+            "default_agent": self._trim(default_agent.get("agent_name")) or self._trim(work_context.get("default_agent")),
             "active_skill_name": self._trim(
                 work_context.get("thread_active_skill_canonical_name")
                 or work_context.get("thread_active_skill_name")
@@ -1140,7 +1132,7 @@ class AgentRuntimeLLMPlannerService:
         return {
             "planner_type": "agent_runtime_llm_planner",
             "planner_scope": "agent_local",
-            "planner_agent": self._trim(agent_context.get("execution_agent")) or "execution_agent",
+            "planner_agent": self._trim(agent_context.get("default_agent")) or "default_agent",
             "objective": self._trim(payload.get("objective")) or self._trim(fallback_plan.get("objective")),
             "domain": "business",
             "legacy_domain": "business_dialog",

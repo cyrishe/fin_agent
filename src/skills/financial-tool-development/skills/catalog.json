@@ -1,0 +1,45 @@
+{
+  "version": "v1",
+  "skills": [
+    {
+      "name": "financial-tool-requirement",
+      "path": "financial-tool-requirement/SKILL.md",
+      "role": "高级金融需求分析师",
+      "description": "结合金融经验形成最可能的需求理解供用户确认；无法形成有意义方案时提出必要问题或选项。",
+      "default_complexity": "fast",
+      "produces": ["requirement_brief", "questions"]
+    },
+    {
+      "name": "financial-tool-design",
+      "path": "financial-tool-design/SKILL.md",
+      "role": "高级金融产品经理与软件架构师",
+      "description": "梳理实现流程，并设计顶级入口函数、必要子模块、公开输入输出和数据使用方式；也负责局部修改已有方案。",
+      "default_complexity": "fast",
+      "produces": ["design"]
+    },
+    {
+      "name": "financial-tool-flowchart",
+      "path": "financial-tool-flowchart/SKILL.md",
+      "role": "金融产品信息设计师",
+      "description": "根据已经形成的模块和流程设计生成可读流程图，不改变业务方案。",
+      "default_complexity": "fast",
+      "produces": ["flow"]
+    },
+    {
+      "name": "financial-tool-implementation",
+      "path": "financial-tool-implementation/SKILL.md",
+      "role": "高级 Python 金融工程师",
+      "description": "根据设计生成动态代码并执行技术测试；失败时根据真实错误修复并重跑。",
+      "default_complexity": "mid",
+      "produces": ["implementation"]
+    },
+    {
+      "name": "financial-tool-test-execution",
+      "path": "financial-tool-test-execution/SKILL.md",
+      "role": "高级金融产品测试工程师",
+      "description": "规划真实公司或用户指定条件的样例，组织实际结果、核心中间指标和必要日志供用户确认。",
+      "default_complexity": "fast",
+      "produces": ["test_evidence"]
+    }
+  ]
+}

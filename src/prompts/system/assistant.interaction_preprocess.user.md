@@ -8,4 +8,9 @@ $available_agents
 $resolved_turn
 ```
 
+当前进行中的业务上下文如下；没有则为 null：
+```
+$active_context
+```
+
 请输出顶层意图路由结果。

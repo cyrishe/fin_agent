@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS aiia_custom_tool_test_run (
   status varchar(16) NOT NULL COMMENT 'passed/failed/blocked',
   execution_ok tinyint(1) NOT NULL DEFAULT 0 COMMENT '沙箱是否成功执行',
   contract_ok tinyint(1) NOT NULL DEFAULT 0 COMMENT '输出是否符合 Schema',
-  business_ok tinyint(1) NOT NULL DEFAULT 0 COMMENT '业务结果是否满足预期且非错误载荷',
+  business_ok tinyint(1) NULL COMMENT '历史兼容字段；新流程不判断业务正确性',
   input_json longtext DEFAULT NULL COMMENT '测试输入快照',
   output_json longtext DEFAULT NULL COMMENT '测试输出快照',
   error_text text DEFAULT NULL COMMENT '安全化错误摘要',

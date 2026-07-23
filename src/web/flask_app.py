@@ -14,8 +14,12 @@ from pathlib import Path
 from urllib.parse import quote, urlencode
 
 import pandas as pd
-from flask import Flask, Response, jsonify, make_response, redirect, render_template, request, send_from_directory
+from dotenv import load_dotenv
+from flask import Flask, Response, has_request_context, jsonify, make_response, redirect, render_template, request, send_from_directory
 
+load_dotenv(Path(__file__).resolve().parents[2] / ".env", override=False)
+
+from src.services.agent_direct_response_service import AgentDirectResponseService
 from src.services.agent_execution_service import AgentExecutionError, AgentExecutionService
 from src.services.agent_studio_service import AgentStudioError, AgentStudioService
 from src.services.answer_summary_service import AnswerSummaryService
@@ -24,8 +28,14 @@ from src.services.application_studio_service import ApplicationStudioError, Appl
 from src.services.application_workbench_service import ApplicationWorkbenchService
 from src.services.assistant_dispatch_planner import AssistantDispatchPlanner
 from src.services.attachment_service import AttachmentService, AttachmentServiceError
-from src.services.custom_tool_service import CustomToolAgentService, CustomToolError
+from src.services.asset_invocation_service import AssetInvocationError, AssetInvocationService
+from src.services.custom_tool_service import (
+    CustomToolAgentService,
+    CustomToolError,
+)
 from src.services.custom_tool_run_trace_service import CustomToolRunTrace
+from src.services.finance_claude_session_service import FinanceClaudeSessionService
+from src.services.finance_cc_system_tools import FinanceCcSystemTools
 from src.services.conversation_title_service import ConversationTitleService
 from src.services.llm_stream_block_service import LlmStreamBlockBuilder
 from src.services.runtime_conversation_service import RuntimeConversationService
@@ -68,12 +78,29 @@ system_command_service = SystemCommandService()
 answer_summary_service = AnswerSummaryService()
 conversation_title_service = ConversationTitleService()
 custom_tool_agent_service = CustomToolAgentService()
+finance_cc_shadow_service = FinanceClaudeSessionService(
+    enabled=any(
+        str(os.environ.get(name) or "").strip().lower() in {"1", "true", "yes", "on"}
+        for name in ("FINANCE_CC_SHADOW_ENABLED", "FINANCE_CC_TOOL_DEVELOPMENT_ENABLED")
+    ),
+    system_tools=FinanceCcSystemTools(
+        custom_tool_store=custom_tool_agent_service.store,
+        custom_tool_runtime=custom_tool_agent_service.runtime,
+        implementation_runner=custom_tool_agent_service.implement_dynamic_tool,
+    )
+)
+custom_tool_agent_service.set_finance_cc_service(finance_cc_shadow_service)
+asset_invocation_service = AssetInvocationService(
+    custom_tool_store=custom_tool_agent_service.store,
+    attachment_service=attachment_service,
+)
 custom_tool_stream_requests: dict[str, dict] = {}
 agent_execution_service = AgentExecutionService(
     application_runtime_service=application_runtime_service,
     skill_studio_service=skill_studio_service,
     async_task_service=async_task_service,
 )
+agent_direct_response_service = AgentDirectResponseService()
 
 
 @app.route("/", methods=["GET"])
@@ -82,9 +109,17 @@ def root_entry():
 
 
 def _resolve_current_guest_identity() -> dict:
+    cookie_user_id = str(request.cookies.get(UserSessionService.GUEST_COOKIE_NAME, "") or "").strip()
+    cookie_session_token = str(request.cookies.get("aiia_guest_session_token", "") or "").strip()
+    if cookie_user_id and cookie_session_token:
+        return {
+            "user_id": cookie_user_id,
+            "user_type": "guest",
+            "session_token": cookie_session_token,
+        }
     return user_session_service.resolve_or_create_guest(
-        cookie_user_id=request.cookies.get(UserSessionService.GUEST_COOKIE_NAME, ""),
-        cookie_session_token=request.cookies.get("aiia_guest_session_token", ""),
+        cookie_user_id=cookie_user_id,
+        cookie_session_token=cookie_session_token,
         user_agent=request.headers.get("User-Agent", ""),
         remote_addr=request.headers.get("X-Forwarded-For", "") or request.remote_addr or "",
     )
@@ -137,12 +172,67 @@ def _schedule_thread_title(*, thread_id: int, user_text: str, expected_title: st
     threading.Thread(target=worker, daemon=True, name=f"thread-title-{int(thread_id)}").start()
 
 
+def _submit_finance_cc_shadow(
+    *,
+    thread_id: int,
+    turn_id: int,
+    owner_id: str,
+    user_text: str,
+    dispatch_plan: dict,
+    application_context: dict,
+    thread_context: dict,
+) -> None:
+    shadow_enabled = str(os.environ.get("FINANCE_CC_SHADOW_ENABLED") or "").strip().lower() in {"1", "true", "yes", "on"}
+    if not shadow_enabled or not finance_cc_shadow_service.enabled or not str(user_text or "").strip():
+        return
+    default_agent = application_context.get("default_agent") if isinstance(application_context.get("default_agent"), dict) else {}
+    selected_agent = str(dispatch_plan.get("selected_agent") or default_agent.get("agent_name") or "").strip()
+    if selected_agent != "investment_analyst":
+        return
+    tool_development_enabled = str(os.environ.get("FINANCE_CC_TOOL_DEVELOPMENT_ENABLED") or "").strip().lower() in {
+        "1", "true", "yes", "on"
+    }
+    if tool_development_enabled and str(dispatch_plan.get("entry") or "").strip() == "custom_tool_flow":
+        return
+    finance_cc_shadow_service.submit(
+        thread_id=thread_id,
+        turn_id=turn_id,
+        owner_id=owner_id,
+        user_text=user_text,
+        context={
+            "selected_agent": selected_agent,
+            "turn_mode": str(dispatch_plan.get("turn_mode") or "").strip(),
+            "entry": str(dispatch_plan.get("entry") or "").strip(),
+            "has_custom_tool_state": isinstance(thread_context.get("custom_tool_state"), dict)
+            and bool(thread_context.get("custom_tool_state")),
+            "custom_tool_state": (
+                dict(thread_context.get("custom_tool_state") or {})
+                if isinstance(thread_context.get("custom_tool_state"), dict)
+                else {}
+            ),
+            "custom_tool_name": str(
+                (
+                    thread_context.get("custom_tool_state")
+                    if isinstance(thread_context.get("custom_tool_state"), dict)
+                    else {}
+                ).get("tool_name")
+                or ""
+            ).strip(),
+        },
+    )
+
+
 def _with_script_root(path: str) -> str:
-    forwarded_prefix = str(request.headers.get("X-Forwarded-Prefix", "") or "").strip()
-    script_name = str(request.headers.get("X-Script-Name", "") or "").strip()
+    forwarded_prefix = ""
+    script_name = ""
+    request_script_root = ""
+    if has_request_context():
+        forwarded_prefix = str(request.headers.get("X-Forwarded-Prefix", "") or "").strip()
+        script_name = str(request.headers.get("X-Script-Name", "") or "").strip()
+        request_script_root = str(request.script_root or "").strip()
     app_root = str(app.config.get("APPLICATION_ROOT", "") or "").strip()
     candidates = [
-        str(request.script_root or "").strip(),
+        request_script_root,
         forwarded_prefix,
         script_name,
         app_root,
@@ -214,8 +304,7 @@ def _build_application_bundle_item(application_name: str, bundle: dict) -> dict:
         "status": str(config.get("status") or "").strip(),
         "version": str(config.get("version") or "").strip(),
         "domain": str(config.get("domain") or "").strip(),
-        "assistant_agent": str(config.get("assistant_agent") or "").strip(),
-        "default_agents": _compact_names(config.get("default_agents") or []),
+        "default_agent": str(config.get("default_agent") or "").strip(),
         "available_agents": _compact_names(config.get("available_agents") or []),
         "default_skills": _compact_names(config.get("default_skills") or []),
         "default_tools": _compact_names(config.get("default_tools") or []),
@@ -431,12 +520,6 @@ def _build_active_skill_context(skill_name: str) -> dict:
 def _merge_thread_context_patches(*patches: dict | None) -> dict:
     merged: dict = {}
     allowed_top_level = {
-        "interaction_frame",
-        "conversation_state",
-        "continuity_axes",
-        "active_focus_type",
-        "active_focus_id",
-        "reference_scope",
         "reference_memory",
         "active_skill_name",
         "active_skill_canonical_name",
@@ -448,6 +531,7 @@ def _merge_thread_context_patches(*patches: dict | None) -> dict:
         "last_visual_subjects",
         "recent_task_type",
         "recent_result_subject",
+        "custom_tool_state",
     }
     for patch in patches:
         if not isinstance(patch, dict):
@@ -455,34 +539,6 @@ def _merge_thread_context_patches(*patches: dict | None) -> dict:
         for key, value in patch.items():
             normalized_key = str(key)
             if normalized_key not in allowed_top_level:
-                continue
-            if normalized_key == "interaction_frame" and isinstance(value, dict):
-                merged[normalized_key] = {
-                    "interaction_mode": str(value.get("interaction_mode") or "").strip(),
-                    "active_focus_type": str(value.get("active_focus_type") or "").strip(),
-                    "active_focus_id": str(value.get("active_focus_id") or "").strip(),
-                    "current_user_goal": str(value.get("current_user_goal") or "").strip(),
-                    "accepted_constraints": value.get("accepted_constraints") if isinstance(value.get("accepted_constraints"), list) else [],
-                    "pending_questions": value.get("pending_questions") if isinstance(value.get("pending_questions"), list) else [],
-                    "suspended_task_id": str(value.get("suspended_task_id") or "").strip(),
-                    "suspended_task_stack": value.get("suspended_task_stack") if isinstance(value.get("suspended_task_stack"), list) else [],
-                    "resume_hint": str(value.get("resume_hint") or "").strip(),
-                    "reference_scope": value.get("reference_scope") if isinstance(value.get("reference_scope"), list) else [],
-                }
-                continue
-            if normalized_key == "conversation_state" and isinstance(value, dict):
-                merged[normalized_key] = {
-                    "state": str(value.get("state") or "").strip(),
-                    "resume_hint": str(value.get("resume_hint") or "").strip(),
-                    "suspended_task_stack": value.get("suspended_task_stack") if isinstance(value.get("suspended_task_stack"), list) else [],
-                }
-                continue
-            if normalized_key == "continuity_axes" and isinstance(value, dict):
-                merged[normalized_key] = {
-                    "domain": str(value.get("domain") or "").strip(),
-                    "interaction_mode": str(value.get("interaction_mode") or "").strip(),
-                    "execution_path": str(value.get("execution_path") or "").strip(),
-                }
                 continue
             if normalized_key == "reference_memory" and isinstance(value, dict):
                 merged[normalized_key] = {
@@ -668,19 +724,123 @@ def _custom_tool_result_blocks(result: dict, builder: LlmStreamBlockBuilder) -> 
                 seen.add(key)
             blocks.append(item)
 
+    tool_turn = result.get("tool_turn") if isinstance(result.get("tool_turn"), dict) else {}
+    tool_turn_action = str(tool_turn.get("action") or "").strip()
+    tool_turn_actions = [
+        str(item or "").strip()
+        for item in (tool_turn.get("actions") if isinstance(tool_turn.get("actions"), list) else [tool_turn_action])
+        if str(item or "").strip()
+    ]
+    tool_turn_actions = ["view" if item == "direct" else item for item in tool_turn_actions]
+    view_block_count = 0
+    if "view" in tool_turn_actions:
+        view_answer = str(result.get("view_answer") or result.get("direct_answer") or result.get("message") or "").strip()
+        if view_answer:
+            _add_many([builder.make_block(
+                block_id="custom_tool_view_answer",
+                block_type="markdown",
+                mode="replace",
+                title="当前工具",
+                content=view_answer,
+                stage="view",
+                data={"role": "view_answer", "state_changed": False},
+            )])
+        view_assets = result.get("view_assets") or result.get("direct_assets") or []
+        for asset in view_assets:
+            if not isinstance(asset, dict):
+                continue
+            asset_type = str(asset.get("type") or "").strip()
+            payload = asset.get("payload") if isinstance(asset.get("payload"), dict) else {}
+            if asset_type == "design":
+                _add_many([builder.make_block(
+                    block_id="custom_tool_view_design",
+                    block_type="artifact",
+                    title="当前设计",
+                    stage="view",
+                    data={"artifact_type": "finance.tool_spec", "content": payload},
+                )])
+            elif asset_type == "flow":
+                steps = [item for item in payload.get("steps") or [] if isinstance(item, dict)]
+                links = [item for item in payload.get("links") or [] if isinstance(item, dict)]
+                _add_many([builder.make_block(
+                    block_id="custom_tool_view_flow",
+                    block_type="flowchart",
+                    title="当前流程",
+                    stage="view",
+                    data={
+                        "nodes": [
+                            {
+                                "id": str(item.get("id") or item.get("step_id") or f"step_{index + 1}"),
+                                "label": str(item.get("name") or item.get("title") or item.get("label") or f"步骤 {index + 1}"),
+                                "detail": str(item.get("description") or item.get("detail") or ""),
+                            }
+                            for index, item in enumerate(steps)
+                        ],
+                        "edges": [
+                            {
+                                "from": str(item.get("from") or item.get("source") or ""),
+                                "to": str(item.get("to") or item.get("target") or ""),
+                                "label": str(item.get("label") or item.get("condition") or ""),
+                            }
+                            for item in links
+                        ],
+                    },
+                )])
+            elif asset_type == "code":
+                modules = [item for item in payload.get("modules") or [] if isinstance(item, dict)]
+                files = [
+                    {
+                        "id": str(item.get("module_id") or item.get("name") or f"module_{index + 1}"),
+                        "name": str(item.get("module_id") or item.get("name") or f"module_{index + 1}"),
+                        "language": str(item.get("language") or "python"),
+                        "content": str(item.get("source_code") or item.get("code") or item.get("content") or ""),
+                    }
+                    for index, item in enumerate(modules)
+                ]
+                if not files and str(payload.get("code") or "").strip():
+                    files = [{"id": "main", "name": "main", "language": "python", "content": str(payload.get("code") or "")}]
+                _add_many([builder.make_block(
+                    block_id="custom_tool_view_code",
+                    block_type="code",
+                    title="当前核心代码",
+                    stage="view",
+                    data={"files": files, "runtime": payload.get("runtime") or {"status": "idle"}},
+                )])
+            elif asset_type == "tests":
+                cases = [item for item in payload.get("cases") or [] if isinstance(item, dict)]
+                _add_many([builder.make_block(
+                    block_id="custom_tool_view_tests",
+                    block_type="assessment",
+                    title="最近测试结果",
+                    stage="view",
+                    data={
+                        "overall": "pass" if payload.get("execution_ok") is True else "fail",
+                        "summary": str(payload.get("summary") or "最近一次测试结果"),
+                        "issues": [] if payload.get("execution_ok") is True else [str(payload.get("error") or "技术运行失败")],
+                        "details": {"tests": cases},
+                    },
+                )])
+        view_block_count = len(blocks)
+
     design = result.get("design") if isinstance(result.get("design"), dict) else {}
-    if design:
+    understanding = result.get("understanding") if isinstance(result.get("understanding"), dict) else {}
+    notice = result.get("notice") if isinstance(result.get("notice"), list) else []
+    questions = result.get("questions") if isinstance(result.get("questions"), list) else []
+    if design or understanding or notice or questions:
+        result_stage = "design" if design else "requirement"
         _add_many(builder.final_to_blocks({
             "source": "model",
             "type": "final",
             "status": str(result.get("design_status") or "review"),
-            "understanding": result.get("understanding") if isinstance(result.get("understanding"), dict) else {},
-            "questions": result.get("questions") if isinstance(result.get("questions"), list) else [],
+            "message": str(result.get("message") or ""),
+            "understanding": understanding,
+            "notice": notice,
+            "questions": questions,
             "design": design,
             "design_artifact": result.get("design_artifact") if isinstance(result.get("design_artifact"), dict) else {},
             "design_context": result.get("design_context") if isinstance(result.get("design_context"), dict) else {},
             "existing_analysis": result.get("existing_analysis") if isinstance(result.get("existing_analysis"), dict) else {},
-        }, stage="design"))
+        }, stage=result_stage))
 
     tool = result.get("tool") if isinstance(result.get("tool"), dict) else {}
     manifest = tool.get("manifest") if isinstance(tool.get("manifest"), dict) else {}
@@ -761,16 +921,16 @@ def _custom_tool_result_blocks(result: dict, builder: LlmStreamBlockBuilder) -> 
         )])
         if test_result:
             cases = [item for item in test_result.get("cases") or [] if isinstance(item, dict)]
-            gate_passed = test_result.get("gate_passed") is True
+            execution_ok = test_result.get("execution_ok") is True
             _add_many([builder.make_block(
                 block_id="custom_tool_test_result",
                 block_type="assessment",
                 mode="replace",
                 title="样例测试",
                 data={
-                    "overall": "pass" if gate_passed else "fail",
-                    "summary": str(test_result.get("summary") or ("样例测试通过。" if gate_passed else "样例测试失败。")),
-                    "issues": [] if gate_passed else [str(test_result.get("error") or "实际结果未达到测试预期")],
+                    "overall": "pass" if execution_ok else "fail",
+                    "summary": str(test_result.get("summary") or ("样例技术运行成功。" if execution_ok else "样例技术运行失败。")),
+                    "issues": [] if execution_ok else [str(test_result.get("error") or "技术运行失败")],
                     "details": {
                         "tests": [
                             {
@@ -788,7 +948,7 @@ def _custom_tool_result_blocks(result: dict, builder: LlmStreamBlockBuilder) -> 
                 },
                 stage="coding",
             )])
-            if gate_passed and not is_active:
+            if execution_ok and not is_active:
                 revision = int(manifest.get("current_revision") or 0)
                 _add_many([builder.make_block(
                     block_id="custom_tool_coding_review",
@@ -816,17 +976,62 @@ def _custom_tool_result_blocks(result: dict, builder: LlmStreamBlockBuilder) -> 
                                 "label": "继续修改",
                                 "intent": "edit",
                                 "style": "default",
+                                "expected_revision": revision,
                             },
                         ],
                     },
                     stage="coding",
                 )])
+    work_positions = [
+        tool_turn_actions.index(action)
+        for action in ("design", "coding")
+        if action in tool_turn_actions
+    ]
+    if view_block_count and work_positions and tool_turn_actions.index("view") > min(work_positions):
+        blocks = blocks[view_block_count:] + blocks[:view_block_count]
     return blocks
+
+
+def _custom_tool_interaction_text(text: str, response: dict) -> str:
+    raw = str(text or "").strip()
+    action_id = str(response.get("action_id") or "").strip()
+    if action_id == "custom_tool.submit_clarification":
+        lines = []
+        for item in response.get("answers") if isinstance(response.get("answers"), list) else []:
+            if not isinstance(item, dict):
+                continue
+            question = str(item.get("question") or item.get("question_id") or "待确认项").strip()
+            value = str(item.get("answer") or item.get("value") or "").strip()
+            if not value:
+                continue
+            lines.append(f"关于「{question}」，我的回答是：{value}。")
+        if raw:
+            lines.append(raw)
+        return "\n".join(lines)
+    if raw:
+        return raw
+    if action_id in {"custom_tool.revise_design", "custom_tool.revise_implementation"}:
+        return str(response.get("feedback_text") or "").strip()
+    return ""
+
+
+def _resolved_dispatch_question(dispatch_plan: dict, fallback: str) -> str:
+    resolution = dispatch_plan.get("context_resolution") if isinstance(dispatch_plan.get("context_resolution"), dict) else {}
+    return str(resolution.get("resolved_question") or fallback or "").strip()
 
 
 def _run_custom_tool_stream_payload(payload: dict, *, emit) -> None:
     text = str(payload.get("text") or "").strip()
     interaction_response = payload.get("interaction_response") if isinstance(payload.get("interaction_response"), dict) else {}
+    text = _custom_tool_interaction_text(text, interaction_response)
+    interaction_action_id = str(interaction_response.get("action_id") or "").strip()
+    if interaction_response and not text and interaction_action_id in {
+        "custom_tool.submit_clarification",
+        "custom_tool.revise_design",
+        "custom_tool.revise_implementation",
+    }:
+        raise CustomToolError("请先填写本轮反馈")
+    direct_interaction = bool(interaction_response and not text)
     application_name = str(payload.get("application_name") or "investment_workbench").strip() or "investment_workbench"
     thread_id_payload = payload.get("thread_id")
     guest_identity = payload.get("guest_identity") if isinstance(payload.get("guest_identity"), dict) else {}
@@ -902,24 +1107,26 @@ def _run_custom_tool_stream_payload(payload: dict, *, emit) -> None:
         )
         action_id = str(interaction_response.get("action_id") or "").strip()
         interaction_id = str(interaction_response.get("interaction_id") or "").strip()
-        action_intent = str(interaction_response.get("action") or "").strip()
         expected_revision = interaction_response.get("expected_revision")
-        if interaction_response:
-            allowed_interactions = {
-                "custom_tool.design_review": {"custom_tool.confirm_design"},
-                "custom_tool.coding_review": {"custom_tool.activate_draft"},
-                "custom_tool.coding_failure": {"custom_tool.retry_coding"},
+        expected_revision = expected_revision if isinstance(expected_revision, int) else None
+        routing_thread_context = dict(thread_context)
+        if interaction_response and text:
+            routing_thread_context["_current_ui_action"] = {
+                "interaction_id": interaction_id,
+                "action_id": action_id,
             }
-            if interaction_id not in allowed_interactions:
-                raise CustomToolError(f"unknown custom tool interaction: {interaction_id or '-'}")
-            if action_intent != "accept":
-                raise CustomToolError(f"unsupported custom tool interaction action: {action_intent or '-'}")
-            if action_id not in allowed_interactions[interaction_id]:
-                raise CustomToolError(f"action {action_id or '-'} does not belong to interaction {interaction_id}")
-            text = custom_tool_agent_service.interaction_user_text(action_id)
+        dispatch_plan = assistant_dispatch_planner.plan_turn(
+            text=text,
+            attachments=[],
+            thread_context=routing_thread_context,
+            application_context=app_ctx,
+            interaction_response=interaction_response if direct_interaction else None,
+        )
+        shortcut = dispatch_plan.get("shortcut") if isinstance(dispatch_plan.get("shortcut"), dict) else {}
+        display_text = text or str(interaction_response.get("label") or action_id or "确认当前内容").strip()
         turn_id = runtime_conversation_service.create_turn(
             thread_id=thread_id,
-            user_input_text=text,
+            user_input_text=display_text,
             input_payload=_to_json_safe({
                 **payload,
                 "text": text,
@@ -932,28 +1139,62 @@ def _run_custom_tool_stream_payload(payload: dict, *, emit) -> None:
                 user_text=text,
                 expected_title=initial_thread_title,
             )
+        _submit_finance_cc_shadow(
+            thread_id=thread_id,
+            turn_id=turn_id,
+            owner_id=owner_ids[0] if owner_ids else "",
+            user_text=_resolved_dispatch_question(dispatch_plan, text),
+            dispatch_plan=dispatch_plan,
+            application_context=app_ctx,
+            thread_context=thread_context,
+        )
         parsed = _parse_chat_command(text)
         owner_id = owner_ids[0] if owner_ids else ""
-        dispatch_plan = {}
         routed_outside_custom_tool = False
-        if interaction_response:
+        if direct_interaction:
             if not active_state:
                 raise ValueError("当前没有可继续的自定义工具流程。")
-            result = custom_tool_agent_service.continue_flow_action(
-                action_id,
-                state=active_state,
-                expected_revision=int(expected_revision),
-                owner_id=owner_id,
-                turn_id=turn_id,
-                event_sink=event_sink,
-            )
+            shortcut_handler = str(shortcut.get("handler") or "").strip()
+            if shortcut_handler == "custom_tool.action" and action_id == "custom_tool.activate_draft":
+                result = custom_tool_agent_service.continue_flow_action(
+                    action_id,
+                    state=active_state,
+                    expected_revision=expected_revision,
+                    owner_id=owner_id,
+                    turn_id=turn_id,
+                    event_sink=event_sink,
+                )
+            elif shortcut_handler == "custom_tool.action" and action_id == "custom_tool.confirm_design":
+                result = custom_tool_agent_service.continue_flow_action(
+                    action_id,
+                    state=active_state,
+                    expected_revision=expected_revision,
+                    owner_id=owner_id,
+                    turn_id=turn_id,
+                    event_sink=event_sink,
+                )
+            elif shortcut_handler == "custom_tool.action" and custom_tool_agent_service.finance_cc_enabled:
+                result = custom_tool_agent_service.handle_turn(
+                    text or str(interaction_response.get("label") or action_id or "确认当前内容").strip(),
+                    state=active_state,
+                    ui_action=interaction_response,
+                    owner_id=owner_id,
+                    thread_id=thread_id,
+                    turn_id=turn_id,
+                    event_sink=event_sink,
+                )
+            elif shortcut_handler == "custom_tool.action":
+                result = custom_tool_agent_service.continue_flow_action(
+                    action_id,
+                    state=active_state,
+                    expected_revision=expected_revision,
+                    owner_id=owner_id,
+                    turn_id=turn_id,
+                    event_sink=event_sink,
+                )
+            else:
+                raise CustomToolError(f"unsupported custom tool shortcut: {shortcut_handler or '-'}")
         elif parsed.get("kind") == "slash" and str(parsed.get("command") or "").lower() == "/custom_tool":
-            dispatch_plan = assistant_dispatch_planner.plan_free_chat(
-                text=text,
-                attachments=[],
-                thread_context=thread_context,
-                application_context=app_ctx,
-            )
             args = parsed.get("args") or []
             sub_action = str(args[0] if args else "").strip().lower()
             rest_args = args[1:] if args else []
@@ -961,6 +1202,7 @@ def _run_custom_tool_stream_payload(payload: dict, *, emit) -> None:
                 result = custom_tool_agent_service.start_create(
                     _custom_tool_arg_text(rest_args),
                     owner_id=owner_id,
+                    thread_id=thread_id,
                     turn_id=turn_id,
                     event_sink=event_sink,
                 )
@@ -969,23 +1211,18 @@ def _run_custom_tool_stream_payload(payload: dict, *, emit) -> None:
                 if not edit_text:
                     raise ValueError("请使用 /custom_tool edit <修改要求>")
                 if not active_state:
-                    active_state = {"status": "collect_requirement", "owner_id": owner_id, "requirement_text": ""}
-                result = custom_tool_agent_service.continue_flow(
+                    active_state = {"owner_id": owner_id, "requirement_text": ""}
+                result = custom_tool_agent_service.start_create(
                     edit_text,
                     state=active_state,
                     owner_id=owner_id,
+                    thread_id=thread_id,
                     turn_id=turn_id,
                     event_sink=event_sink,
                 )
             else:
                 raise ValueError("流式 custom_tool 仅支持 create/edit 和进行中流程的继续。")
         elif active_state:
-            dispatch_plan = assistant_dispatch_planner.plan_free_chat(
-                text=text,
-                attachments=[],
-                thread_context=thread_context,
-                application_context=app_ctx,
-            )
             if str(dispatch_plan.get("entry") or "").strip() != "custom_tool_flow":
                 routed_outside_custom_tool = True
                 result = _build_chat_dispatch_payload(
@@ -998,13 +1235,30 @@ def _run_custom_tool_stream_payload(payload: dict, *, emit) -> None:
                     precomputed_plan=dispatch_plan,
                 )
             else:
-                result = custom_tool_agent_service.continue_flow(
-                    text,
+                result = custom_tool_agent_service.handle_turn(
+                    _resolved_dispatch_question(dispatch_plan, text),
                     state=active_state,
+                    ui_action=interaction_response if interaction_response else None,
                     owner_id=owner_id,
+                    thread_id=thread_id,
                     turn_id=turn_id,
                     event_sink=event_sink,
                 )
+                app.logger.info(
+                    "custom_tool turn routed thread_id=%s turn_id=%s action=%s protocol=%s",
+                    thread_id,
+                    turn_id,
+                    str((result.get("tool_turn") or {}).get("action") or ""),
+                    str((result.get("tool_turn") or {}).get("version") or ""),
+                )
+        elif str(dispatch_plan.get("entry") or "").strip() == "custom_tool_flow":
+            result = custom_tool_agent_service.start_create(
+                text,
+                owner_id=owner_id,
+                thread_id=thread_id,
+                turn_id=turn_id,
+                event_sink=event_sink,
+            )
         else:
             raise ValueError("当前没有可流式执行的 custom_tool 流程。")
 
@@ -1079,6 +1333,105 @@ def _run_custom_tool_stream_payload(payload: dict, *, emit) -> None:
         })
 
 
+def _run_asset_invocation_stream_payload(payload: dict, *, emit) -> None:
+    run_id = str(payload.get("run_id") or "").strip()
+    text = str(payload.get("text") or "").strip()
+    selected_asset = payload.get("selected_asset") if isinstance(payload.get("selected_asset"), dict) else {}
+    attachment_ids = payload.get("attachment_ids") if isinstance(payload.get("attachment_ids"), list) else []
+    application_name = str(payload.get("application_name") or "investment_workbench").strip() or "investment_workbench"
+    guest_identity = payload.get("guest_identity") if isinstance(payload.get("guest_identity"), dict) else {}
+    thread_id = None
+    turn_id = None
+    try:
+        attachments = attachment_service.list_attachments(attachment_ids)
+        app_ctx = application_runtime_service.get_application_context(application_name)
+        requested_thread_id = (
+            int(payload.get("thread_id"))
+            if str(payload.get("thread_id") or "").strip().isdigit()
+            else UserSessionService._safe_int(str(payload.get("cookie_thread_id") or ""))
+        )
+        thread_id = runtime_conversation_service.ensure_thread(
+            thread_id=requested_thread_id,
+            title=str(app_ctx.get("display_name") or application_name),
+            owner_type="user",
+            owner_id=str(guest_identity.get("user_id") or ""),
+            context_summary=f"{application_name} 会话",
+        )
+        thread_context = runtime_conversation_service.get_thread_context(thread_id=thread_id)
+        context_window = runtime_conversation_service.get_context_window(thread_id=thread_id, max_rounds=5)
+        if context_window:
+            thread_context = {**thread_context, "context_window": context_window}
+        thread_context = {
+            **thread_context,
+            "_custom_tool_owner_ids": _custom_tool_owner_ids(
+                thread_context=thread_context,
+                user_id=str(guest_identity.get("user_id") or ""),
+                thread_id=thread_id,
+            ),
+        }
+        display_text = text or f"${str(selected_asset.get('name') or '').strip()}"
+        turn_id = runtime_conversation_service.create_turn(
+            thread_id=thread_id,
+            user_input_text=display_text,
+            input_payload=_to_json_safe({**payload, "attachments": attachments}),
+        )
+        if not requested_thread_id:
+            _schedule_thread_title(
+                thread_id=thread_id,
+                user_text=display_text,
+                expected_title=str(app_ctx.get("display_name") or application_name),
+            )
+        invocation = asset_invocation_service.plan(
+            text=text,
+            selected_asset=selected_asset,
+            attachments=attachments,
+            thread_context=thread_context,
+            owner_ids=_custom_tool_owner_ids(thread_context=thread_context, thread_id=thread_id),
+        )
+        if not invocation:
+            raise AssetInvocationError("没有选择可调用的 Tool 或 Skill")
+        if invocation.get("status") == "ready":
+            emit(_asset_invocation_preview_block(invocation))
+        result = _execute_asset_invocation_payload(
+            invocation,
+            text=text,
+            application_context=app_ctx,
+            thread_context=thread_context,
+            thread_id=thread_id,
+            turn_id=turn_id,
+        )
+        assistant_message = str(result.get("message") or "已处理。").strip()
+        runtime_conversation_service.complete_turn(
+            thread_id=thread_id,
+            turn_id=turn_id,
+            assistant_output_text=assistant_message,
+            output_payload=_to_json_safe(result),
+            model_name=str(result.get("model_name") or "").strip(),
+            token_usage=result.get("llm_usage") if isinstance(result.get("llm_usage"), dict) else None,
+        )
+        for block in result.get("surface_blocks") or []:
+            if isinstance(block, dict) and str(block.get("block_id") or "") != "asset_invocation_preview":
+                emit({"event": "block", **block})
+        emit({
+            "event": "done",
+            "run_id": run_id,
+            "thread_id": thread_id,
+            "turn_id": turn_id,
+            "message": "任务已完成",
+            "result": result,
+        })
+    except Exception as exc:
+        if thread_id is not None and turn_id is not None:
+            runtime_conversation_service.complete_turn(
+                thread_id=thread_id,
+                turn_id=turn_id,
+                assistant_output_text="本轮处理失败。",
+                output_payload={"ok": False, "error": str(exc), "run_id": run_id},
+                status="failed",
+            )
+        emit({"event": "error", "run_id": run_id, "message": str(exc)})
+
+
 def _build_chat_dispatch_payload(
     text: str,
     *,
@@ -1094,12 +1447,12 @@ def _build_chat_dispatch_payload(
     application_context = application_context if isinstance(application_context, dict) else {}
     thread_context = thread_context if isinstance(thread_context, dict) else {}
     attachments = attachments if isinstance(attachments, list) else []
-    execution_agent = application_context.get("execution_agent") if isinstance(application_context.get("execution_agent"), dict) else {}
+    default_agent = application_context.get("default_agent") if isinstance(application_context.get("default_agent"), dict) else {}
     if parsed["kind"] == "free_chat":
         plan = (
             precomputed_plan
             if isinstance(precomputed_plan, dict) and precomputed_plan
-            else assistant_dispatch_planner.plan_free_chat(
+            else assistant_dispatch_planner.plan_turn(
                 text=raw,
                 attachments=attachments,
                 thread_context=thread_context,
@@ -1131,15 +1484,22 @@ def _build_chat_dispatch_payload(
         execution_plan = plan.get("execution_plan") if isinstance(plan.get("execution_plan"), dict) else {}
         if plan_entry == "custom_tool_flow":
             active_state = thread_context.get("custom_tool_state") if isinstance(thread_context.get("custom_tool_state"), dict) else {}
-            if not active_state:
-                raise ValueError("当前没有进行中的自定义工具创建流程。")
             owner_ids = _custom_tool_owner_ids(thread_context=thread_context, thread_id=thread_id)
-            result = custom_tool_agent_service.continue_flow(
-                raw,
-                state=active_state,
-                owner_id=owner_ids[0] if owner_ids else "",
-                turn_id=turn_id,
-            )
+            if active_state:
+                result = custom_tool_agent_service.handle_turn(
+                    _resolved_dispatch_question(plan, raw),
+                    state=active_state,
+                    owner_id=owner_ids[0] if owner_ids else "",
+                    thread_id=thread_id,
+                    turn_id=turn_id,
+                )
+            else:
+                result = custom_tool_agent_service.start_create(
+                    raw,
+                    owner_id=owner_ids[0] if owner_ids else "",
+                    thread_id=thread_id,
+                    turn_id=turn_id,
+                )
             result.setdefault("mode", "custom_tool_flow")
             result["dispatch_plan"] = plan
             result["thread_context_patch"] = _merge_thread_context_patches(
@@ -1211,7 +1571,7 @@ def _build_chat_dispatch_payload(
                     selected_tools=selected_tools,
                     selected_skills=selected_skills,
                     application_name=str(application_context.get("application_name") or "").strip(),
-                    agent_name=str((application_context.get("execution_agent") or {}).get("agent_name") or "").strip(),
+                    agent_name=str((application_context.get("default_agent") or {}).get("agent_name") or "").strip(),
                 )
                 skill_studio_service.save_skill_bundle(
                     skill_name=target_skill_name,
@@ -1465,6 +1825,43 @@ def _build_chat_dispatch_payload(
                 )
                 return _attach_planning_state(result)
 
+        selected_agent_name = str(plan.get("selected_agent") or "").strip()
+        selected_agent = next(
+            (
+                item for item in (application_context.get("available_agents") or [])
+                if isinstance(item, dict) and str(item.get("agent_name") or "").strip() == selected_agent_name
+            ),
+            {},
+        )
+        selected_agent_config = selected_agent.get("config") if isinstance(selected_agent.get("config"), dict) else {}
+        static_response = str(selected_agent_config.get("static_response") or "").strip()
+        if static_response:
+            result = _apply_application_workspace_orchestration({
+                "mode": "agent_static_response",
+                "message": static_response,
+                "items": [],
+                "dispatch_plan": plan,
+                "thread_context_patch": _merge_thread_context_patches(continuity_patch_preview, {}),
+            }, application_context)
+            return _attach_planning_state(result)
+
+        selected_skills = selected_agent.get("skills") if isinstance(selected_agent.get("skills"), list) else []
+        selected_tools = selected_agent.get("tools") if isinstance(selected_agent.get("tools"), list) else []
+        if selected_agent and not selected_skills and not selected_tools:
+            direct_answer = agent_direct_response_service.answer(
+                user_text=raw,
+                agent=selected_agent,
+            )
+            result = _apply_application_workspace_orchestration({
+                "mode": "agent_direct_response",
+                "message": direct_answer["message"],
+                "items": [],
+                "agent_llm_usage": direct_answer.get("llm_usage") or {},
+                "dispatch_plan": plan,
+                "thread_context_patch": _merge_thread_context_patches(continuity_patch_preview, {}),
+            }, application_context)
+            return _attach_planning_state(result)
+
         preview = agent_execution_service.preview_route(
             user_text=raw,
             application_name=str(application_context.get("application_name") or "investment_workbench").strip() or "investment_workbench",
@@ -1491,7 +1888,7 @@ def _build_chat_dispatch_payload(
             "items": [
                 _build_route_item(
                     application_name=str(application_context.get("application_name") or "").strip(),
-                    agent_name=str(execution_agent.get("agent_name") or "").strip(),
+                    agent_name=selected_agent_name or str(default_agent.get("agent_name") or "").strip(),
                     route_snapshot=route_snapshot,
                 )
             ],
@@ -1521,14 +1918,25 @@ def _build_chat_dispatch_payload(
         owner_id = owner_ids[0] if owner_ids else ""
         active_state = thread_context.get("custom_tool_state") if isinstance(thread_context.get("custom_tool_state"), dict) else {}
         if sub_action == "create":
-            result = custom_tool_agent_service.start_create(_custom_tool_arg_text(rest_args), owner_id=owner_id, turn_id=turn_id)
+            result = custom_tool_agent_service.start_create(
+                _custom_tool_arg_text(rest_args),
+                owner_id=owner_id,
+                thread_id=thread_id,
+                turn_id=turn_id,
+            )
         elif sub_action == "edit":
             edit_text = _custom_tool_arg_text(rest_args)
             if not edit_text:
                 raise ValueError("请使用 /custom_tool edit <修改要求>")
             if not active_state:
-                active_state = {"status": "collect_requirement", "owner_id": owner_id, "requirement_text": ""}
-            result = custom_tool_agent_service.continue_flow(edit_text, state=active_state, owner_id=owner_id, turn_id=turn_id)
+                active_state = {"owner_id": owner_id, "requirement_text": ""}
+            result = custom_tool_agent_service.start_create(
+                edit_text,
+                state=active_state,
+                owner_id=owner_id,
+                thread_id=thread_id,
+                turn_id=turn_id,
+            )
         elif sub_action == "call":
             tool_name, call_args = _parse_custom_tool_json_arg(_custom_tool_arg_text(rest_args))
             if not tool_name:
@@ -1955,6 +2363,134 @@ def _build_chat_dispatch_payload(
         "mode": "unknown_command",
         "message": f"暂不支持的指令：{command}",
     }
+
+
+def _build_asset_invocation_payload(
+    text: str,
+    *,
+    selected_asset: dict | None = None,
+    application_context: dict | None = None,
+    thread_context: dict | None = None,
+    attachments: list[dict] | None = None,
+    thread_id: int | None = None,
+    turn_id: int | None = None,
+) -> dict:
+    application_context = application_context if isinstance(application_context, dict) else {}
+    thread_context = thread_context if isinstance(thread_context, dict) else {}
+    attachments = attachments if isinstance(attachments, list) else []
+    invocation = asset_invocation_service.plan(
+        text=text,
+        selected_asset=selected_asset,
+        attachments=attachments,
+        thread_context=thread_context,
+        owner_ids=_custom_tool_owner_ids(thread_context=thread_context, thread_id=thread_id),
+    )
+    if not invocation:
+        raise AssetInvocationError("没有选择可调用的 Tool 或 Skill")
+    return _execute_asset_invocation_payload(
+        invocation,
+        text=text,
+        application_context=application_context,
+        thread_context=thread_context,
+        thread_id=thread_id,
+        turn_id=turn_id,
+    )
+
+
+def _asset_invocation_preview_block(invocation: dict) -> dict:
+    preview = invocation.get("preview") if isinstance(invocation.get("preview"), dict) else {}
+    return {
+        "event": "block",
+        "block_id": "asset_invocation_preview",
+        "block_type": "structured_text",
+        "title": "本次调用",
+        "content": str(preview.get("message") or invocation.get("message") or "正在准备调用。").strip(),
+        "data": preview,
+    }
+
+
+def _execute_asset_invocation_payload(
+    invocation: dict,
+    *,
+    text: str,
+    application_context: dict,
+    thread_context: dict,
+    thread_id: int | None,
+    turn_id: int | None,
+) -> dict:
+    if invocation.get("status") != "ready":
+        message = str(invocation.get("message") or "还需要补充调用参数。").strip()
+        return {
+            "mode": "asset_invocation_needs_input",
+            "message": message,
+            "asset_invocation": invocation,
+            "surface_blocks": [
+                {
+                    "block_id": "asset_invocation_needs_input",
+                    "block_type": "narrative",
+                    "content": message,
+                }
+            ],
+            "llm_usage": invocation.get("llm_usage") or {},
+        }
+
+    target = invocation.get("target") if isinstance(invocation.get("target"), dict) else {}
+    if str(target.get("kind") or "").strip() == "tool":
+        execution_plan = asset_invocation_service.build_tool_execution_plan(invocation)
+        result = tool_plan_runtime_service.execute_for_assistant(
+            execution_plan=execution_plan,
+            user_text=str(invocation.get("user_request") or text).strip(),
+            application_context=application_context,
+            thread_context=thread_context,
+            thread_id=thread_id,
+            turn_id=turn_id,
+        )
+        result = _apply_application_workspace_orchestration(result, application_context)
+        result["asset_invocation"] = invocation
+        result["surface_blocks"] = [
+            _asset_invocation_preview_block(invocation),
+            *[item for item in (result.get("surface_blocks") or []) if isinstance(item, dict)],
+        ]
+        result["llm_usage"] = _merge_llm_usage(
+            invocation.get("llm_usage") if isinstance(invocation.get("llm_usage"), dict) else None,
+            result.get("llm_usage") if isinstance(result.get("llm_usage"), dict) else None,
+        )
+        return result
+
+    skill_name = str(target.get("name") or "").strip()
+    jobs = [
+        _submit_generic_skill_job(
+            skill_name,
+            {
+                "input_payload": call,
+                "source_type": "assistant_explicit_skill_invocation",
+                "thread_id": thread_id,
+                "turn_id": turn_id,
+                "application_name": str(application_context.get("application_name") or "").strip(),
+                "agent_name": str((application_context.get("default_agent") or {}).get("agent_name") or "").strip(),
+                "agent_runtime_profile": (
+                    (application_context.get("default_agent") or {}).get("runtime_profile")
+                    if isinstance((application_context.get("default_agent") or {}).get("runtime_profile"), dict)
+                    else {}
+                ),
+            },
+        )
+        for call in invocation.get("calls") or []
+        if isinstance(call, dict)
+    ]
+    return _apply_application_workspace_orchestration(
+        {
+            "mode": "asset_invocation_submitted",
+            "message": f"已提交 {len(jobs)} 项 Skill 任务：{skill_name}",
+            "skill_name": skill_name,
+            "jobs": jobs,
+            "items": [_build_task_job_item(job) for job in jobs],
+            "asset_invocation": invocation,
+            "surface_blocks": [_asset_invocation_preview_block(invocation)],
+            "llm_usage": invocation.get("llm_usage") or {},
+        },
+        application_context,
+    )
 
 
 def _submit_stock_deep_dive_job(args: dict) -> dict:
@@ -2604,7 +3140,6 @@ def _legacy_conversation_workbench_page():
         chat_placeholder=app_ctx.get("chat_placeholder") or "",
         assistant_intro=app_ctx.get("assistant_intro") or "",
         workspace_links=app_ctx.get("workspace_links") or [],
-        assistant_agent=app_ctx.get("assistant_agent"),
         default_agent=app_ctx.get("default_agent"),
         api_dispatch_url=_with_script_root("/api/chat/dispatch"),
         api_application_base_url=_with_script_root("/api/applications"),
@@ -2751,8 +3286,9 @@ def api_chat_dispatch():
         if not isinstance(attachment_ids, list):
             attachment_ids = []
         attachments = attachment_service.list_attachments(attachment_ids)
-        if not text and not attachments:
-            return jsonify({"ok": False, "error": "text 和 attachments 不能同时为空"}), 400
+        selected_asset = payload.get("selected_asset") if isinstance(payload.get("selected_asset"), dict) else {}
+        if not text and not attachments and not selected_asset:
+            return jsonify({"ok": False, "error": "text、attachments 和 selected_asset 不能同时为空"}), 400
         guest_identity = _resolve_current_guest_identity()
         application_name = str(payload.get("application_name") or "investment_workbench").strip() or "investment_workbench"
         app_ctx = application_runtime_service.get_application_context(application_name)
@@ -2786,7 +3322,7 @@ def api_chat_dispatch():
         }
         turn_id = runtime_conversation_service.create_turn(
             thread_id=thread_id,
-            user_input_text=text or f"[attachment:{len(attachments)}]",
+            user_input_text=text or (f"${str(selected_asset.get('name') or '').strip()}" if selected_asset else f"[attachment:{len(attachments)}]"),
             input_payload=_to_json_safe({**payload, "application_name": application_name, "attachments": attachments}),
         )
         if not requested_thread_id:
@@ -2795,15 +3331,35 @@ def api_chat_dispatch():
                 user_text=text or f"分析 {len(attachments)} 个图片附件",
                 expected_title=initial_thread_title,
             )
-        result = _build_chat_dispatch_payload(
-            text,
-            application_context=app_ctx,
-            thread_context=thread_context,
-            attachments=attachments,
+        if selected_asset or text.startswith("$"):
+            result = _build_asset_invocation_payload(
+                text,
+                selected_asset=selected_asset,
+                application_context=app_ctx,
+                thread_context=thread_context,
+                attachments=attachments,
+                thread_id=thread_id,
+                turn_id=turn_id,
+            )
+        else:
+            result = _build_chat_dispatch_payload(
+                text,
+                application_context=app_ctx,
+                thread_context=thread_context,
+                attachments=attachments,
+                thread_id=thread_id,
+                turn_id=turn_id,
+            )
+        dispatch_plan_payload = result.get("dispatch_plan") if isinstance(result.get("dispatch_plan"), dict) else {}
+        _submit_finance_cc_shadow(
             thread_id=thread_id,
             turn_id=turn_id,
+            owner_id=str(guest_identity.get("user_id") or ""),
+            user_text=text,
+            dispatch_plan=dispatch_plan_payload,
+            application_context=app_ctx,
+            thread_context=thread_context,
         )
-        dispatch_plan_payload = result.get("dispatch_plan") if isinstance(result.get("dispatch_plan"), dict) else {}
         merged_llm_usage = _merge_llm_usage(
             result.get("llm_usage") if isinstance(result.get("llm_usage"), dict) else None,
             dispatch_plan_payload.get("llm_usage") if isinstance(dispatch_plan_payload.get("llm_usage"), dict) else None,
@@ -2880,11 +3436,18 @@ def api_custom_tool_stream_start():
         payload = _extract_request_payload()
         text = str(payload.get("text") or payload.get("message") or "").strip()
         interaction_response = payload.get("interaction_response") if isinstance(payload.get("interaction_response"), dict) else {}
-        if not text and not interaction_response:
-            return jsonify({"ok": False, "error": "text 或 interaction_response 不能为空"}), 400
+        selected_asset = payload.get("selected_asset") if isinstance(payload.get("selected_asset"), dict) else {}
+        attachment_ids = payload.get("attachment_ids") if isinstance(payload.get("attachment_ids"), list) else []
+        if not text and not interaction_response and not selected_asset and not attachment_ids:
+            return jsonify({"ok": False, "error": "text、interaction_response、selected_asset 和 attachment_ids 不能同时为空"}), 400
         if interaction_response and not str(interaction_response.get("action_id") or "").strip():
             return jsonify({"ok": False, "error": "interaction_response.action_id 不能为空"}), 400
-        if interaction_response and not isinstance(interaction_response.get("expected_revision"), int):
+        action_id = str(interaction_response.get("action_id") or "").strip()
+        revision_actions = {"custom_tool.confirm_design", "custom_tool.activate_draft"}
+        expected_revision = interaction_response.get("expected_revision")
+        if interaction_response and action_id in revision_actions and not isinstance(expected_revision, int):
+            return jsonify({"ok": False, "error": "确认设计或启用实现时 expected_revision 必须是整数"}), 400
+        if interaction_response and expected_revision is not None and not isinstance(expected_revision, int):
             return jsonify({"ok": False, "error": "interaction_response.expected_revision 必须是整数"}), 400
         guest_identity = _resolve_current_guest_identity()
         run_id = uuid.uuid4().hex
@@ -2892,6 +3455,8 @@ def api_custom_tool_stream_start():
             "run_id": run_id,
             "text": text,
             "interaction_response": interaction_response,
+            "selected_asset": selected_asset,
+            "attachment_ids": attachment_ids,
             "thread_id": payload.get("thread_id"),
             "application_name": str(payload.get("application_name") or "investment_workbench").strip() or "investment_workbench",
             "guest_identity": guest_identity,
@@ -2935,17 +3500,21 @@ def api_custom_tool_stream(run_id: str):
 
     def worker() -> None:
         try:
-            _run_custom_tool_stream_payload(payload, emit=emit)
+            if payload.get("selected_asset") or str(payload.get("text") or "").lstrip().startswith("$"):
+                _run_asset_invocation_stream_payload(payload, emit=emit)
+            else:
+                _run_custom_tool_stream_payload(payload, emit=emit)
         finally:
             event_queue.put(stop_token)
 
     threading.Thread(target=worker, daemon=True).start()
 
     def generate():
+        is_asset_invocation = bool(payload.get("selected_asset")) or str(payload.get("text") or "").lstrip().startswith("$")
         yield _sse_payload({
             "event": "run_started",
             "run_id": payload.get("run_id"),
-            "message": "智能体开始处理自定义工具任务。",
+            "message": "正在解析本次工具调用。" if is_asset_invocation else "智能体开始处理自定义工具任务。",
         })
         while True:
             item = event_queue.get()
@@ -3043,14 +3612,24 @@ def api_assistant_threads():
 def api_assistant_thread_detail(thread_id: int):
     try:
         guest_identity = _resolve_current_guest_identity()
-        thread = runtime_conversation_service.get_thread(thread_id=int(thread_id))
+        thread = runtime_conversation_service.get_thread(thread_id=int(thread_id), include_context=True)
         if not thread:
             return jsonify({"ok": False, "error": "thread 不存在"}), 404
         if thread.get("owner_type") != "user" or str(thread.get("owner_id") or "") != str(guest_identity.get("user_id") or ""):
             return jsonify({"ok": False, "error": "无权访问该 thread"}), 403
-        thread_context = runtime_conversation_service.get_thread_context(thread_id=int(thread_id))
+        embedded_context = thread.pop("_thread_context", None)
+        thread_context = (
+            embedded_context
+            if isinstance(embedded_context, dict)
+            else runtime_conversation_service.get_thread_context(thread_id=int(thread_id))
+        )
         custom_tool_state = thread_context.get("custom_tool_state") if isinstance(thread_context.get("custom_tool_state"), dict) else {}
-        turns = runtime_conversation_service.list_turns(thread_id=int(thread_id), limit=100, include_output_payload=True)
+        turns = runtime_conversation_service.list_turns(
+            thread_id=int(thread_id),
+            limit=100,
+            include_output_payload=True,
+            history_payload_only=True,
+        )
         for turn in turns:
             output_payload = turn.get("output_payload") if isinstance(turn.get("output_payload"), dict) else {}
             retained_fields = {
@@ -3488,7 +4067,55 @@ def api_simple_web_debug():
 @app.route("/api/tools/catalog", methods=["GET"])
 def api_tool_catalog():
     try:
-        return jsonify(_to_json_safe({"ok": True, "items": tool_studio_service.list_tools()}))
+        items = tool_studio_service.list_tools()
+        # The React composer uses this endpoint for `$` suggestions.  Custom
+        # tools live in the runtime artifact store rather than the static
+        # tool-definition directory, so merge the active tools visible to the
+        # current guest into the same catalog response.
+        guest_identity = _resolve_current_guest_identity()
+        owner_id = str(guest_identity.get("user_id") or "").strip()
+        custom_manifests = custom_tool_agent_service.store.list_tools(
+            owner_ids=[owner_id] if owner_id else None,
+        )
+        known_names = {
+            str(item.get("tool_name") or "").strip()
+            for item in items
+            if isinstance(item, dict) and str(item.get("tool_name") or "").strip()
+        }
+        for manifest in custom_manifests:
+            if not isinstance(manifest, dict):
+                continue
+            tool_name = str(manifest.get("tool_name") or "").strip()
+            if not tool_name or tool_name in known_names:
+                continue
+            try:
+                bundle = custom_tool_agent_service.store.load_for_runtime(
+                    tool_name,
+                    owner_ids=[owner_id] if owner_id else None,
+                    allow_inactive=False,
+                )
+            except Exception:
+                bundle = {}
+            items.append(
+                {
+                    "tool_name": tool_name,
+                    "display_name": str(manifest.get("display_name") or tool_name).strip(),
+                    "description": str(manifest.get("description") or "").strip(),
+                    "status": str(manifest.get("status") or "active").strip(),
+                    "version": "v1",
+                    "availability": {
+                        "lifecycle": "active",
+                        "retrieval_mode": "retrievable",
+                        "visibility": str(manifest.get("visibility") or "personal").strip(),
+                    },
+                    "capabilities": list(manifest.get("capabilities") or ["custom_tool"]),
+                    "custom_tool": True,
+                    "input_schema": bundle.get("input_schema") if isinstance(bundle.get("input_schema"), dict) else {},
+                    "sample_input": bundle.get("sample_input") if isinstance(bundle.get("sample_input"), dict) else {},
+                }
+            )
+            known_names.add(tool_name)
+        return jsonify(_to_json_safe({"ok": True, "items": items}))
     except Exception as exc:
         return jsonify({"ok": False, "error": f"获取 tool 目录失败: {exc}"}), 500
 

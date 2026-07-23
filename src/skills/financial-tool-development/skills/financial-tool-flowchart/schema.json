@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["summary", "flow", "mermaid"],
+  "properties": {
+    "summary": {"type": "string"},
+    "flow": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["steps", "links"],
+      "properties": {
+        "steps": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["id", "type", "name", "description"],
+            "properties": {
+              "id": {"type": "string"},
+              "type": {"type": "string", "enum": ["start", "input", "process", "decision", "output", "error", "end"]},
+              "name": {"type": "string"},
+              "description": {"type": "string"}
+            }
+          }
+        },
+        "links": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["from", "to", "condition"],
+            "properties": {
+              "from": {"type": "string"},
+              "to": {"type": "string"},
+              "condition": {"type": "string"}
+            }
+          }
+        }
+      }
+    },
+    "mermaid": {"type": "string"}
+  }
+}

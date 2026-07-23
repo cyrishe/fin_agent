@@ -169,7 +169,7 @@ class ToolPlanRuntimeService:
         )
         return {
             "mode": "tool_plan_completed",
-            "message": f"已完成临时工具计划执行：成功 {completed} 个，失败 {failed} 个，跳过 {skipped} 个。",
+            "message": self._trim(final_output.get("summary")) or f"已完成工具执行：成功 {completed} 个，失败 {failed} 个，跳过 {skipped} 个。",
             "items": step_items,
             "task_state": self._build_task_state(
                 runtime_trace=runtime_trace,
@@ -180,6 +180,8 @@ class ToolPlanRuntimeService:
                 "final_output": final_output,
                 "render_payload": render_payload,
             },
+            "final_output": final_output,
+            "render_payload": render_payload,
             "execution_plan": plan,
             "runtime_trace": runtime_trace,
             "runtime_feedback": runtime_feedback,
@@ -1082,7 +1084,7 @@ class ToolPlanRuntimeService:
         turn_id: int | None,
     ) -> Dict[str, Any]:
         objective = self._trim(execution_plan.get("objective")) or self._trim(user_text)
-        execution_agent = application_context.get("execution_agent") if isinstance(application_context.get("execution_agent"), dict) else {}
+        default_agent = application_context.get("default_agent") if isinstance(application_context.get("default_agent"), dict) else {}
         try:
             trace = self.runtime_execution_service.begin_artifact_run(
                 artifact_type="tool_plan",
@@ -1102,7 +1104,7 @@ class ToolPlanRuntimeService:
                     "context_summary": objective[:255],
                     "task_type": self._trim(execution_plan.get("plan_type")) or "tool_plan_run",
                     "goal": objective[:255],
-                    "assigned_agent": self._trim(execution_agent.get("agent_name")) or "tool_plan_runtime",
+                    "assigned_agent": self._trim(default_agent.get("agent_name")) or "tool_plan_runtime",
                 },
             )
             trace["turn_id"] = int(turn_id) if turn_id else None

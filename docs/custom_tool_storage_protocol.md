@@ -8,7 +8,7 @@
 
 动态模块可通过 `custom_tool_sdk.info/debug` 写入少量结构化执行证据。日志由沙箱输出通道单独收集，不属于工具公开输出；debug 测试界面展示核心中间指标，普通工具调用仍以业务结果为主。
 
-生命周期固定为 `draft -> active`。Coding 只能创建 draft；只有当前实现修订同时满足 `execution_ok`、`contract_ok`、`business_ok`，用户才能启用。
+生命周期只保留存储事实 `draft -> active`。Coding 创建 draft；真实技术执行和输出契约通过后，用户可以确认启用。业务逻辑是否符合需求由测试结果交给用户判断，不由系统设置业务门禁。
 
 可见性默认 `personal`，所有者存于 `owner`，可见性与发布证据存于 `source_manifest_json`。普通“启用”不改变可见性。`public` 必须由独立动作设置，且调用者必须具有 `custom_tool:publish` 权限；模型输出和普通确认按钮都不能发布。
 

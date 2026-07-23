@@ -5,7 +5,7 @@ from typing import Any, Dict, Optional
 
 import pymysql
 
-from src.utils.mysql_utils import StockInfoDbUtils
+from src.utils.system_db_utils import SystemDbUtils
 
 
 USER_TABLE = "aiia_user"
@@ -54,7 +54,7 @@ class UserSessionService:
             "user_type": "guest",
             "display_name": "Guest",
         }
-        db = StockInfoDbUtils()
+        db = SystemDbUtils()
         try:
             with db.conn.cursor() as cursor:
                 if not self._table_exists(cursor, USER_TABLE):
@@ -94,7 +94,7 @@ class UserSessionService:
         if not normalized_token or not normalized_user_id:
             return {"session_token": normalized_token, "user_id": normalized_user_id}
         expires_at = dt.datetime.now() + dt.timedelta(days=max(1, int(ttl_days or 30)))
-        db = StockInfoDbUtils()
+        db = SystemDbUtils()
         try:
             with db.conn.cursor() as cursor:
                 if not self._table_exists(cursor, SESSION_TABLE):

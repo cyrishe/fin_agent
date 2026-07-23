@@ -1,57 +1,115 @@
 from __future__ import annotations
 
 import json
+import re
 import time
 import uuid
 from typing import Any, Dict, Iterable, List, Mapping
+
+from src.services.design_narrative_service import compose_design_narrative
 
 
 def _trim(value: Any) -> str:
     return str(value or "").strip()
 
 
+class _StructuredJsonDeltaReader:
+    """Read complete objects from selected arrays in an incomplete JSON stream."""
+
+    def __init__(self) -> None:
+        self.buffer = ""
+        self.decoder = json.JSONDecoder()
+
+    def feed(self, chunk: str) -> None:
+        self.buffer += chunk
+
+    def objects(self, key: str) -> List[Dict[str, Any]]:
+        match = re.search(rf'"{re.escape(key)}"\s*:\s*\[', self.buffer)
+        if not match:
+            return []
+        cursor = match.end()
+        items: List[Dict[str, Any]] = []
+        while cursor < len(self.buffer):
+            while cursor < len(self.buffer) and self.buffer[cursor] in " \t\r\n,":
+                cursor += 1
+            if cursor >= len(self.buffer) or self.buffer[cursor] == "]":
+                break
+            try:
+                value, cursor = self.decoder.raw_decode(self.buffer, cursor)
+            except json.JSONDecodeError:
+                break
+            if isinstance(value, Mapping):
+                items.append(dict(value))
+        return items
+
+
 class LlmStreamBlockBuilder:
     """Normalize LLM/Codex runtime events into stable frontend render blocks."""
 
-    PROGRESS_STEPS = {
-        "design": [
-            ("understand", "理解核心目标"),
-            ("scope", "收敛功能范围"),
-            ("interface", "整理输入输出"),
-            ("rules", "形成判断规则"),
-            ("boundaries", "检查数据与边界"),
-            ("deliver", "生成可确认设计"),
-        ],
-        "coding": [
-            ("read_design", "读取已确认设计"),
-            ("plan", "规划实现方式"),
-            ("implement", "生成工具代码"),
-            ("test", "运行样例验证"),
-            ("review", "检查实现结果"),
-            ("deliver", "准备可运行产物"),
-        ],
+    STAGE_TITLES = {
+        "requirement": "需求确认",
+        "design": "方案设计",
+        "flowchart": "流程图",
+        "coding": "代码实现",
+        "test": "样例测试",
+        "view": "查看工具",
+        "runtime": "处理中",
     }
 
     def __init__(self, *, run_id: str = "") -> None:
         self.run_id = _trim(run_id) or uuid.uuid4().hex
         self.started_at = time.time()
         self.seq = 0
-        self.progress_positions: Dict[str, int] = {}
+        self.semantic_readers: Dict[str, _StructuredJsonDeltaReader] = {}
+        self.semantic_counts: Dict[str, Dict[str, int]] = {}
+        self.message_phases: Dict[str, str] = {}
+        self.coding_plan_items: List[Dict[str, Any]] = []
+        self.coding_milestones: set[str] = set()
 
     def event_to_blocks(self, event: Mapping[str, Any]) -> List[Dict[str, Any]]:
         source = _trim(event.get("source"))
         event_type = _trim(event.get("type"))
-        content = _trim(event.get("content"))
+        raw_content = str(event.get("content") or "")
+        content = _trim(raw_content)
         metadata = event.get("metadata") if isinstance(event.get("metadata"), Mapping) else {}
         stage = _trim(metadata.get("stage")) or self._infer_stage(event)
-        if not content and event_type not in {"turn_started", "turn_completed", "stage_start", "stage_result", "context_ready", "final"}:
+        if not content and event_type not in {"agent_delta", "turn_started", "turn_completed", "stage_start", "stage_result", "context_ready", "final"}:
             return []
 
-        if source == "codex" and event_type in {"reasoning_summary_delta", "plan_delta"}:
+        slow_agent_source = source in {"codex", "claude"}
+        if slow_agent_source and event_type == "event" and content == "item/started":
+            item = metadata.get("item") if isinstance(metadata.get("item"), Mapping) else {}
+            item_id = _trim(item.get("id"))
+            if item_id and _trim(item.get("type")) == "agentMessage":
+                self.message_phases[item_id] = _trim(item.get("phase"))
+            if stage == "coding":
+                milestone = self._coding_item_milestone(item)
+                if milestone is not None:
+                    key, summary = milestone
+                    if key not in self.coding_milestones:
+                        self.coding_milestones.add(key)
+                        return [self._coding_progress_update(summary)]
+            return []
+        if slow_agent_source and event_type in {"reasoning_summary_delta", "plan_delta"}:
             return [self._progress_block(stage=stage, event_type=event_type)]
-        if source == "codex" and event_type in {"agent_update", "item_completed"}:
+        if slow_agent_source and event_type == "item_completed":
+            phase = self._message_phase(metadata)
+            if stage == "coding" and phase in {"commentary", "progress"} and content:
+                return [self._coding_progress_update(content)]
             return [self._progress_block(stage=stage, event_type=event_type)]
-        if source == "codex" and event_type in {"agent_delta", "reasoning_delta", "event"}:
+        if slow_agent_source and event_type == "agent_update":
+            return [self._progress_block(stage=stage, event_type=event_type)]
+        if slow_agent_source and event_type == "agent_delta":
+            item_id = _trim(metadata.get("item_id"))
+            phase = self.message_phases.get(item_id, "") if item_id else ""
+            if phase and phase != "final_answer":
+                return []
+            return self._semantic_delta_blocks(
+                stage=stage,
+                chunk=raw_content,
+                stream_id=item_id or "default",
+            )
+        if slow_agent_source and event_type in {"reasoning_delta", "event"}:
             return []
         if source == "tool" and event_type in {"command_output", "mcp_progress"}:
             return [self._block(
@@ -65,70 +123,221 @@ class LlmStreamBlockBuilder:
         if source == "model" and event_type == "final":
             return self.final_to_blocks(event, stage=stage)
 
-        status_text = self._status_text(event_type, content)
-        blocks = [self._block(
-            block_id=f"{stage}_status",
-            block_type="status",
-            mode="replace",
-            title="执行状态",
-            content=status_text,
-            stage=stage,
-            data={"source": source, "event_type": event_type},
-        )] if status_text else []
+        if stage == "coding" and event_type == "context_ready":
+            raw_items = metadata.get("module_plan") if isinstance(metadata.get("module_plan"), list) else []
+            self.coding_plan_items = [dict(item) for item in raw_items if isinstance(item, Mapping)]
+            blocks = [self._progress_block(stage=stage, event_type=event_type)]
+            if self.coding_plan_items:
+                api_sources = [_trim(item) for item in metadata.get("api_sources") or [] if _trim(item)]
+                summary = "已准备模块化实现工作区"
+                if api_sources:
+                    summary += f"，并定位数据接口：{', '.join(api_sources)}"
+                blocks.append(self._coding_progress_update(summary))
+            return blocks
         if event_type in {"stage_start", "context_ready", "tool_call", "turn_started", "turn_completed", "stage_result", "error"}:
-            blocks.append(self._progress_block(stage=stage, event_type=event_type))
-        return blocks
+            return [self._progress_block(
+                stage=stage,
+                event_type=event_type,
+                failed=event_type == "error" or (event_type == "stage_result" and metadata.get("ok") is False),
+            )]
+        return []
 
-    def _progress_block(self, *, stage: str, event_type: str) -> Dict[str, Any]:
-        stage_name = stage if stage in self.PROGRESS_STEPS else "design"
-        steps = self.PROGRESS_STEPS[stage_name]
-        current = int(self.progress_positions.get(stage_name, 0))
-        complete = False
-        failed = event_type == "error"
-        if event_type == "stage_start":
-            current = 0
-        elif event_type == "context_ready":
-            current = max(current, 1)
-        elif event_type in {"tool_call", "turn_started"}:
-            current = max(current, 1)
-        elif event_type in {"reasoning_summary_delta", "plan_delta"}:
-            current = min(len(steps) - 1, max(2, current + 1))
-        elif event_type in {"agent_update", "item_completed"}:
-            current = max(current, len(steps) - 2)
-        elif event_type == "turn_completed":
-            current = len(steps) - 1
-        elif event_type == "stage_result":
-            current = len(steps) - 1
-            complete = True
-        self.progress_positions[stage_name] = current
-        status = "error" if failed else ("completed" if complete else "running")
-        items = []
-        for index, (step_id, title) in enumerate(steps):
-            item_status = "completed" if complete or index < current else ("running" if index == current else "pending")
-            if failed and index == current:
-                item_status = "error"
-            items.append({"id": step_id, "title": title, "status": item_status})
-        summary = (
-            "处理失败，请查看错误信息。"
-            if failed
-            else ("设计结果已形成。" if complete and stage_name == "design" else
-                  "实现结果已形成。" if complete else f"正在{steps[current][1]}…")
-        )
+    def _message_phase(self, metadata: Mapping[str, Any]) -> str:
+        item = metadata.get("item") if isinstance(metadata.get("item"), Mapping) else {}
+        item_id = _trim(item.get("id") or metadata.get("item_id"))
+        phase = _trim(item.get("phase") or metadata.get("phase"))
+        return phase or (self.message_phases.get(item_id, "") if item_id else "")
+
+    def _coding_progress_update(self, content: str) -> Dict[str, Any]:
+        summary = re.sub(r"\s+", " ", _trim(content))[:500]
         return self._block(
-            block_id=f"{stage_name}_live_progress",
+            block_id="coding_module_progress",
             block_type="workflow",
             mode="replace",
-            title="设计进展" if stage_name == "design" else "实现进展",
+            title="实现进展",
+            content=summary,
+            stage="coding",
+            data={
+                "role": "process",
+                "summary": summary,
+                "items": self.coding_plan_items,
+            },
+        )
+
+    @staticmethod
+    def _coding_item_milestone(item: Mapping[str, Any]) -> tuple[str, str] | None:
+        item_type = _trim(item.get("type"))
+        if item_type == "fileChange":
+            return "module_written", "核心模块已经写入，正在进行聚焦验证。"
+        if item_type != "commandExecution":
+            return None
+        command = _trim(item.get("command")).lower()
+        if any(token in command for token in ("py_compile", "pytest", "scratch/", "unittest")):
+            return "module_test", "正在运行模块编译和聚焦样例测试。"
+        if "api_catalog" in command or "task_context.json" in command:
+            return "api_context", "正在核对设计所需的数据接口和字段。"
+        return None
+
+    def _semantic_delta_blocks(self, *, stage: str, chunk: str, stream_id: str) -> List[Dict[str, Any]]:
+        """Turn complete semantic units into UI blocks without exposing raw JSON."""
+        if stage not in {"design", "coding"} or not chunk:
+            return []
+        reader_key = f"{stage}:{stream_id}"
+        reader = self.semantic_readers.setdefault(reader_key, _StructuredJsonDeltaReader())
+        reader.feed(chunk)
+        counts = self.semantic_counts.setdefault(reader_key, {})
+        if stage == "design":
+            return self._design_delta_blocks(reader, counts)
+        return self._coding_delta_blocks(reader, counts)
+
+    def _design_delta_blocks(
+        self,
+        reader: _StructuredJsonDeltaReader,
+        counts: Dict[str, int],
+    ) -> List[Dict[str, Any]]:
+        blocks: List[Dict[str, Any]] = []
+        questions = self._normalize_design_questions(reader.objects("questions"))
+        if len(questions) > counts.get("questions", 0):
+            counts["questions"] = len(questions)
+            blocks.append(self._block(
+                block_id="design_questions",
+                block_type="interaction",
+                mode="replace",
+                title="正在形成待确认项",
+                content="已完成的问题会先显示；全部设计完成后再统一提交。",
+                stage="design",
+                data={
+                    "interaction_id": "custom_tool.requirement_clarification.preview",
+                    "intent": "preview",
+                    "submission_mode": "none",
+                    "prompt": "已形成的待确认项",
+                    "questions": questions,
+                    "actions": [],
+                    "provisional": True,
+                },
+            ))
+
+        inputs = reader.objects("inputs")
+        outputs = reader.objects("outputs")
+        modules = reader.objects("modules")
+        steps = reader.objects("steps")
+        links = reader.objects("links")
+        rules = reader.objects("rules")
+        artifact_version = sum(map(len, (inputs, outputs, modules, steps, links, rules)))
+        if artifact_version > counts.get("artifact", 0):
+            counts["artifact"] = artifact_version
+            blocks.append(self._block(
+                block_id="design_artifact",
+                block_type="artifact",
+                mode="replace",
+                title="正在形成工具设计",
+                stage="design",
+                data={
+                    "artifact_type": "finance.tool_spec",
+                    "lifecycle": "generating",
+                    "summary": "完整的设计对象会边生成边补充，完成后进入统一确认。",
+                    "items": [
+                        {"label": "输入", "value": f"{len(inputs)} 个字段"},
+                        {"label": "输出", "value": f"{len(outputs)} 个字段"},
+                        {"label": "模块", "value": f"{len(modules)} 个"},
+                        {"label": "规则", "value": f"{len(rules)} 条"},
+                    ],
+                    "details": {
+                        "understanding": {},
+                        "inputs": inputs,
+                        "outputs": outputs,
+                        "modules": modules,
+                        "rules": rules,
+                        "flow": {"steps": steps, "links": links},
+                    },
+                    "provisional": True,
+                },
+            ))
+        return blocks
+
+    def _coding_delta_blocks(
+        self,
+        reader: _StructuredJsonDeltaReader,
+        counts: Dict[str, int],
+    ) -> List[Dict[str, Any]]:
+        modules = reader.objects("modules")
+        if len(modules) <= counts.get("modules", 0):
+            return []
+        counts["modules"] = len(modules)
+        return [self._block(
+            block_id="custom_tool_draft_summary",
+            block_type="code",
+            mode="replace",
+            title="正在生成核心模块",
+            stage="coding",
+            data={
+                "files": [
+                    {
+                        "id": _trim(item.get("module_id")) or f"module_{index + 1}",
+                        "name": _trim(item.get("module_id")) or f"module_{index + 1}",
+                        "language": _trim(item.get("language")) or "python",
+                        "content": str(item.get("source_code") or ""),
+                    }
+                    for index, item in enumerate(modules)
+                ],
+                "runtime": {"status": "generating"},
+                "provisional": True,
+            },
+        )]
+
+    def _progress_block(self, *, stage: str, event_type: str, failed: bool = False) -> Dict[str, Any]:
+        if stage == "direct":  # Render older persisted events with the current stage name.
+            stage = "view"
+        stage_name = stage if stage in self.STAGE_TITLES else "runtime"
+        failed = failed or event_type == "error"
+        complete = event_type == "stage_result" and not failed
+        status = "error" if failed else ("completed" if complete else "running")
+        summary = self._activity_text(stage_name, event_type, failed=failed)
+        return self._block(
+            block_id=f"{stage_name}_live_progress",
+            block_type="status",
+            mode="replace",
+            title=self.STAGE_TITLES[stage_name],
+            content=summary,
             stage=stage_name,
             data={
                 "role": "live_progress",
                 "stage": stage_name,
                 "status": status,
-                "current_step": steps[current][0],
+                "current_step": event_type,
                 "summary": summary,
-                "items": items,
             },
         )
+
+    @staticmethod
+    def _activity_text(stage: str, event_type: str, *, failed: bool) -> str:
+        if failed:
+            return "处理失败，请查看错误信息。"
+        completed = {
+            "requirement": "需求理解已形成。",
+            "design": "设计方案已形成。",
+            "flowchart": "流程图已形成。",
+            "coding": "代码实现已完成。",
+            "test": "样例运行已完成。",
+            "view": "已有内容已读取。",
+            "runtime": "处理已完成。",
+        }
+        if event_type == "stage_result":
+            return completed[stage]
+        activities = {
+            "requirement": "正在理解你的需求…",
+            "design": "正在整理实现方案…",
+            "flowchart": "正在绘制流程图…",
+            "coding": "正在实现并验证代码…",
+            "test": "正在运行真实样例…",
+            "view": "正在读取已有内容…",
+            "runtime": "正在处理…",
+        }
+        if event_type == "context_ready":
+            return "已准备好本次需要的上下文。"
+        if event_type in {"turn_completed", "item_completed", "agent_update"}:
+            return "正在整理本轮结果…"
+        return activities[stage]
 
     def final_to_blocks(self, final: Mapping[str, Any], *, stage: str = "") -> List[Dict[str, Any]]:
         stage_name = _trim(stage) or self._infer_stage(final)
@@ -187,21 +396,30 @@ class LlmStreamBlockBuilder:
         artifact_id = _trim(artifact_context.get("design_artifact_id"))
         artifact_revision = int(artifact_context.get("design_revision") or 0)
         message = _trim(final.get("message"))
+        notice = [_trim(item) for item in final.get("notice") or [] if _trim(item)]
         questions = self._normalize_design_questions(final.get("questions"))
         reviewable = status in {"review", "design_ready"}
         goal = _trim(understanding.get("goal"))
-        expected_result = _trim(understanding.get("expected_result"))
-        summary = message or goal or ("工具规格已经形成。" if reviewable else "还需要补充信息。")
-        if expected_result and expected_result != summary:
-            summary = f"{summary}\n预期结果：{expected_result}"
+        summary = message or compose_design_narrative(understanding, questions, design)
         blocks = [self._block(
             block_id=f"{stage}_final_summary",
             block_type="narrative",
             mode="replace",
-            title="设计结果" if reviewable else "需要补充信息",
+            title="",
             content=summary,
             stage=stage,
         )]
+
+        if stage == "requirement" and notice:
+            blocks.append(self._block(
+                block_id="requirement_notice",
+                block_type="narrative",
+                mode="replace",
+                title="将按以下方式处理",
+                content="\n".join(f"- {item}" for item in notice),
+                stage=stage,
+                data={"notice": notice},
+            ))
 
         if design:
             blocks.append(self._block(
@@ -226,15 +444,16 @@ class LlmStreamBlockBuilder:
                     ],
                     "details": {
                         "understanding": dict(understanding),
+                        "document": _trim(design.get("document")),
+                        "plan": _trim(design.get("plan")),
                         "inputs": [dict(item) for item in design.get("inputs") or [] if isinstance(item, Mapping)],
                         "outputs": [dict(item) for item in design.get("outputs") or [] if isinstance(item, Mapping)],
+                        "process": [dict(item) for item in design.get("process") or [] if isinstance(item, Mapping)],
                         "modules": [dict(item) for item in design.get("modules") or [] if isinstance(item, Mapping)],
                         "rules": [dict(item) for item in design.get("rules") or [] if isinstance(item, Mapping)],
                         "logic": [str(item) for item in design.get("logic") or [] if _trim(item)],
                         "flow": dict(design.get("flow")) if isinstance(design.get("flow"), Mapping) else {"steps": [], "links": []},
                         "data_requirements": [dict(item) for item in design.get("data_requirements") or [] if isinstance(item, Mapping)],
-                        "exceptions": [dict(item) for item in design.get("exceptions") or [] if isinstance(item, Mapping)],
-                        "acceptance": [dict(item) for item in design.get("acceptance") or [] if isinstance(item, Mapping)],
                         "existing_analysis": dict(existing_analysis),
                     },
                 },
@@ -245,16 +464,23 @@ class LlmStreamBlockBuilder:
                 block_id=f"{stage}_questions",
                 block_type="interaction",
                 mode="replace",
-                title="需要补充",
-                content="请在对话中补充以下信息。",
+                title="有几个关键点想和你确认",
+                content="这些选择会影响工具最终的计算或返回结果。",
                 stage=stage,
                 data={
                     "interaction_id": "custom_tool.requirement_clarification",
                     "intent": "provide_input",
                     "submission_mode": "conversation",
                     "prompt": "请选择常用答案，或直接在对话中补充。",
+                    "subject_revision": artifact_revision,
                     "questions": questions,
-                    "actions": [],
+                    "actions": [{
+                        "action_id": "custom_tool.submit_clarification",
+                        "label": "确定",
+                        "intent": "submit",
+                        "style": "primary",
+                        "expected_revision": artifact_revision,
+                    }],
                 },
             ))
         if reviewable:
@@ -275,8 +501,6 @@ class LlmStreamBlockBuilder:
                     "review": {
                         "assumptions": [str(item) for item in understanding.get("assumptions") or [] if _trim(item)],
                         "constraints": [str(item) for item in understanding.get("constraints") or [] if _trim(item)],
-                        "data_requirements": len(design.get("data_requirements") or []),
-                        "acceptance": len(design.get("acceptance") or []),
                     },
                     "actions": [
                         {
@@ -291,6 +515,7 @@ class LlmStreamBlockBuilder:
                             "label": "修改",
                             "intent": "edit",
                             "style": "default",
+                            "expected_revision": artifact_revision,
                         },
                     ],
                 },
@@ -305,28 +530,23 @@ class LlmStreamBlockBuilder:
                 question = _trim(item.get("question"))
                 if not question:
                     continue
+                candidates = [
+                    _trim(candidate)
+                    for candidate in item.get("candidate") or []
+                    if _trim(candidate)
+                ]
                 questions.append({
-                    "id": _trim(item.get("id")) or f"Q{index + 1}",
                     "question": question,
-                    "reason": _trim(item.get("reason")),
-                    "answer_type": _trim(item.get("answer_type")) or "text",
-                    "required": item.get("required") is True,
-                    "options": [dict(option) for option in item.get("options") or [] if isinstance(option, Mapping)],
-                    "allow_custom": item.get("allow_custom") is not False,
+                    "candidate": candidates,
                 })
                 continue
             text = _trim(item)
             if text:
                 questions.append({
-                    "id": f"Q{index + 1}",
                     "question": text,
-                    "reason": "",
-                    "answer_type": "text",
-                    "required": True,
-                    "options": [],
-                    "allow_custom": True,
+                    "candidate": [],
                 })
-        return questions[:5]
+        return questions
 
     def _coding_final_blocks(self, final: Mapping[str, Any], *, status: str, stage: str) -> List[Dict[str, Any]]:
         implementation = final.get("implementation") if isinstance(final.get("implementation"), Mapping) else {}
@@ -376,7 +596,10 @@ class LlmStreamBlockBuilder:
         tests = [item for item in final.get("tests") or [] if isinstance(item, Mapping)]
         risks = [str(item) for item in final.get("risks") or [] if _trim(item)]
         if tests or risks:
-            passed = sum(1 for item in tests if _trim(item.get("status")) in {"passed", "pass", "succeeded"})
+            passed = sum(
+                1 for item in tests
+                if _trim(item.get("status") or item.get("result")) in {"passed", "pass", "succeeded"}
+            )
             overall = "pass" if tests and passed == len(tests) and not risks else ("warn" if status == "code_ready" else "fail")
             blocks.append(self._block(
                 block_id=f"{stage}_assessment",
@@ -391,9 +614,9 @@ class LlmStreamBlockBuilder:
                     "details": {
                         "tests": [
                             {
-                                "name": _trim(item.get("name")),
-                                "status": _trim(item.get("status")),
-                                "summary": _trim(item.get("summary")),
+                                "name": _trim(item.get("name") or item.get("test_id")),
+                                "status": _trim(item.get("status") or item.get("result")),
+                                "summary": _trim(item.get("summary") or item.get("purpose")),
                             }
                             for item in tests
                         ]
@@ -459,21 +682,4 @@ class LlmStreamBlockBuilder:
         stage = _trim(metadata.get("stage"))
         if stage:
             return stage
-        status = _trim(event.get("status"))
-        if status in {"code_ready", "need_design_fix"}:
-            return "coding"
         return "design"
-
-    @staticmethod
-    def _status_text(event_type: str, content: str) -> str:
-        labels = {
-            "stage_start": "正在准备任务",
-            "context_ready": "需求上下文已整理",
-            "tool_call": "设计模型已启动",
-            "turn_started": "开始分析核心需求",
-            "turn_completed": "分析完成，正在校验结果",
-            "tool_result": "工具调用完成",
-            "stage_result": "结构化结果已校验",
-            "error": "处理失败",
-        }
-        return labels.get(event_type, "")

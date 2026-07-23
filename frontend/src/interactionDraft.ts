@@ -13,17 +13,14 @@ export function createInteractionDraft(data: UnknownRecord): InteractionDraft {
   const submitAction = list(data.actions).map(record).find((action) => String(action.intent || "") === "submit");
   list(data.questions).map(record).forEach((question, index) => {
     const questionId = String(question.id || `Q${index + 1}`);
-    const options = list(question.options).map(record);
-    const selected = options.find((option) => option.default === true)
-      || options.find((option) => option.recommended === true)
-      || options[0];
+    const candidates = list(question.candidate).map((item) => String(item)).filter(Boolean);
+    const selected = candidates[0];
     if (!selected) return;
-    const label = String(selected.label || selected.value || `选项 ${index + 1}`);
     answers[questionId] = {
       question_id: questionId,
       question: String(question.question || "待确认项"),
-      value: String(selected.value ?? selected.label ?? label),
-      label,
+      value: selected,
+      label: selected,
       mode: "option",
     };
   });
@@ -43,7 +40,12 @@ export function selectInteractionAnswer(
   option?: UnknownRecord,
   mode: "option" | "custom" = "option",
 ): InteractionDraft {
-  const questionId = String(question.id || "question");
+  const questionText = String(question.question || "待确认项");
+  const questionId = String(
+    question.id
+    || Object.entries(draft.answers).find(([, answer]) => answer.question === questionText)?.[0]
+    || "question",
+  );
   const label = mode === "custom" ? "告诉 Fin Agent 如何处理" : String(option?.label || option?.value || "");
   return {
     ...draft,
@@ -51,7 +53,7 @@ export function selectInteractionAnswer(
       ...draft.answers,
       [questionId]: {
         question_id: questionId,
-        question: String(question.question || "待确认项"),
+        question: questionText,
         value: mode === "custom" ? "" : String(option?.value ?? option?.label ?? ""),
         label,
         mode,
@@ -106,7 +108,10 @@ export function prepareClarificationSubmission(draft: InteractionDraft, composer
       action_id: draft.actionId,
       action: draft.action,
       expected_revision: draft.expectedRevision,
-      answers,
+      answers: answers.map((answer) => ({
+        question: answer.question,
+        answer: answer.value,
+      })),
     },
   };
 }

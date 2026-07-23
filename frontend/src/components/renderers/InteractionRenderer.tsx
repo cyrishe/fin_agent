@@ -59,8 +59,8 @@ export default function InteractionRenderer(props: Props) {
       {questions.map((question, index) => {
         const questionId = String(question.id || `Q${index + 1}`);
         const answer = draft.answers[questionId];
-        const options = list(question.options).map(record);
-        const allowCustom = question.allow_custom !== false;
+        const options = list(question.candidate).map((candidate) => ({ label: String(candidate), value: String(candidate) }));
+        const allowCustom = true;
         return <div className={`question-card ${answer ? "answered" : ""}`} key={questionId}>
           <div className="question-title"><strong>{String(question.question || "需要补充")}</strong>{question.required ? <em>必答</em> : null}{answer ? <span className="question-status"><Check size={12} />已选择</span> : null}</div>
           {Boolean(question.reason) && <p>{String(question.reason)}</p>}
@@ -79,7 +79,7 @@ export default function InteractionRenderer(props: Props) {
                   if (answer?.mode === "custom") props.onClearCustomAnswer(String(question.question || "待确认项"));
                   props.onDraftChange(selectInteractionAnswer(draft, question, option));
                 }}
-              ><span className="option-check">{selected ? <Check size={13} /> : null}</span><span className="option-copy"><b>{label}{option.recommended ? <small>推荐</small> : null}</b>{Boolean(option.description) && <p>{String(option.description)}</p>}</span></button>;
+              ><span className="option-check">{selected ? <Check size={13} /> : null}</span><span className="option-copy"><b>{label}</b></span></button>;
             })}
             {allowCustom && <button
               aria-pressed={answer?.mode === "custom"}

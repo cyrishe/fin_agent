@@ -23,7 +23,7 @@
       "thread_context": {
         "context_window": [
           {"round": 1, "role": "user", "text": "贵州茅台今天的开盘价是多少？"},
-          {"round": 1, "role": "assistant", "text": "已查询贵州茅台今天的开盘价。"}
+          {"round": 1, "role": "assistant", "text": "已查询贵州茅台今天的…"}
         ]
       },
       "expected": {
@@ -42,7 +42,7 @@
       "thread_context": {
         "context_window": [
           {"round": 1, "role": "user", "text": "贵州茅台今天的开盘价是多少？"},
-          {"round": 1, "role": "assistant", "text": "已查询贵州茅台今天的开盘价。"}
+          {"round": 1, "role": "assistant", "text": "已查询贵州茅台今天的…"}
         ]
       },
       "expected": {
@@ -54,11 +54,35 @@
       }
     },
     {
+      "case_id": "education_student_math_question",
+      "category": "happy_path",
+      "input": "初二学生怎么理解一次函数的斜率？",
+      "expected": {
+        "agent_name": "education_research_agent",
+        "turn_mode": "normal_qa",
+        "resolved_contains_all": ["一次函数", "斜率"],
+        "max_context_refs": 0,
+        "llm_policy": "required"
+      }
+    },
+    {
+      "case_id": "education_teacher_research_question",
+      "category": "happy_path",
+      "input": "请帮高中语文老师设计一节《赤壁赋》的公开课",
+      "expected": {
+        "agent_name": "education_research_agent",
+        "turn_mode": "normal_qa",
+        "resolved_contains_all": ["赤壁赋", "公开课"],
+        "max_context_refs": 0,
+        "llm_policy": "required"
+      }
+    },
+    {
       "case_id": "natural_language_system_tool_call",
       "category": "system_operation",
       "input": "运行一下stock_realtime_quote工具查询宁德时代",
       "expected": {
-        "agent_name": "default_assistant",
+        "agent_name": "investment_analyst",
         "turn_mode": "system_operation",
         "resolved_contains_all": ["stock_realtime_quote", "宁德时代"],
         "llm_policy": "required"
@@ -149,6 +173,25 @@
       }
     },
     {
+      "case_id": "active_tool_expand_test_until_match",
+      "category": "tool_context",
+      "input": "扫描一下股票列表，挨个执行，一直到出现一个满足条件的为止。",
+      "thread_context": {
+        "custom_tool_state": {
+          "tool_name": "volume_signal_screener",
+          "design_contract": {"display_name": "地量百日新低后首次倍阳选股"},
+          "implementation_revision": 1
+        }
+      },
+      "expected": {
+        "agent_name": "investment_analyst",
+        "turn_mode": "tool_development",
+        "resolved_contains_all": ["扫描", "满足条件"],
+        "context_ref_prefixes": ["custom_tool:"],
+        "llm_policy": "required"
+      }
+    },
+    {
       "case_id": "active_tool_switch_to_finance_question",
       "category": "boundary",
       "input": "宁德时代现在股价是多少？",
@@ -167,29 +210,98 @@
       }
     },
     {
+      "case_id": "active_tool_switch_to_maotai_close",
+      "category": "boundary",
+      "input": "今天茅台的收盘价是多少？",
+      "thread_context": {
+        "custom_tool_state": {
+          "tool_name": "golden_cross_30_60",
+          "status": "awaiting_design_confirmation",
+          "design_contract": {"display_name": "30/60日金叉判断"}
+        },
+        "context_window": [
+          {"round": 1, "role": "user", "text": "/custom_tool create 判断最近30或60个交易日是否出现金叉"},
+          {"round": 1, "role": "assistant", "text": "已经形成30/60日…"}
+        ]
+      },
+      "expected": {
+        "agent_name": "investment_analyst",
+        "turn_mode": "normal_qa",
+        "resolved_contains_all": ["茅台", "收盘价"],
+        "max_context_refs": 0,
+        "llm_policy": "required"
+      }
+    },
+    {
+      "case_id": "return_to_active_tool_after_finance_question",
+      "category": "context_resolution",
+      "input": "回到刚才的工具，把输入改成单只股票",
+      "thread_context": {
+        "custom_tool_state": {
+          "tool_name": "golden_cross_30_60",
+          "status": "awaiting_design_confirmation",
+          "design_contract": {"display_name": "30/60日金叉判断"}
+        },
+        "context_window": [
+          {"round": 1, "role": "user", "text": "/custom_tool create 判断最近30或60个交易日是否出现金叉"},
+          {"round": 1, "role": "assistant", "text": "已经形成30/60日…"},
+          {"round": 2, "role": "user", "text": "今天茅台的收盘价是多少？"},
+          {"round": 2, "role": "assistant", "text": "已返回贵州茅台今天的…"}
+        ]
+      },
+      "expected": {
+        "agent_name": "investment_analyst",
+        "turn_mode": "tool_development",
+        "resolved_contains_all": ["单只股票"],
+        "context_ref_prefixes": ["custom_tool:"],
+        "llm_policy": "required"
+      }
+    },
+    {
+      "case_id": "active_tool_confirm_design",
+      "category": "tool_context",
+      "input": "确认这个设计",
+      "thread_context": {
+        "custom_tool_state": {
+          "tool_name": "golden_cross_30_60",
+          "status": "awaiting_design_confirmation",
+          "design_contract": {"display_name": "30/60日金叉判断"}
+        }
+      },
+      "expected": {
+        "agent_name": "investment_analyst",
+        "turn_mode": "tool_development",
+        "resolved_contains_any_groups": [["确认", "设计"]],
+        "context_ref_prefixes": ["custom_tool:"],
+        "llm_policy": "required"
+      }
+    },
+    {
       "case_id": "system_slash_followup_open_second",
       "category": "context_resolution",
       "input": "打开第二个",
       "thread_context": {
         "context_window": [
           {"round": 1, "role": "user", "text": "/tools"},
-          {"round": 1, "role": "assistant", "text": "工具列表：1. stock_realtime_quote；2. stock_history_kline。"}
+          {"round": 1, "role": "assistant", "text": "工具列表：1. st…"}
         ]
       },
       "expected": {
-        "agent_name": "default_assistant",
+        "agent_name_in": ["default_assistant", "investment_analyst"],
         "turn_mode": "system_operation",
-        "resolved_contains_all": ["stock_history_kline"],
+        "resolved_contains_all": ["第二"],
         "context_ref_prefixes": ["turn:"],
         "llm_policy": "required"
       }
     },
     {
-      "case_id": "natural_language_tool_create_is_gated",
-      "category": "boundary",
-      "input": "帮我创建一个金叉判断工具",
+      "case_id": "natural_language_tool_create",
+      "category": "happy_path",
+      "input": "帮我创建一个选股工具，逻辑是最近20个交易日涨幅超过10%，且成交量放大。",
       "expected": {
-        "forbidden_turn_modes": ["tool_development"],
+        "agent_name": "investment_analyst",
+        "turn_mode": "tool_development",
+        "resolved_contains_all": ["选股工具"],
         "llm_policy": "required"
       }
     },

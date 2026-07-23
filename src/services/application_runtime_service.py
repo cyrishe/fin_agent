@@ -28,17 +28,14 @@ class ApplicationRuntimeService:
             raise ApplicationRuntimeError("application_name 不能为空")
         bundle = self.application_studio_service.load_application_bundle(normalized)
         config = (bundle.get("files") or {}).get("application_config") or {}
-        assistant_agent = self._resolve_assistant_agent(config)
-        execution_agent = self._resolve_execution_agent(config, assistant_agent)
+        default_agent = self._resolve_default_agent(config)
         workspace = self._build_workspace(config, normalized)
         return {
             "application_name": normalized,
             "display_name": self._trim(config.get("display_name")) or normalized,
             "application_config": config,
-            "assistant_agent": assistant_agent,
-            "execution_agent": execution_agent,
-            "available_agents": self._resolve_available_agents(config, assistant_agent, execution_agent),
-            "default_agent": execution_agent,
+            "available_agents": self._resolve_available_agents(config, default_agent),
+            "default_agent": default_agent,
             "workspace": workspace,
             "workspace_links": self._build_workspace_links(config, workspace),
             "result_workspace_routes": self._build_result_workspace_routes(config),
@@ -50,14 +47,14 @@ class ApplicationRuntimeService:
 
     def build_route_context(self, application_name: str) -> Dict[str, Any]:
         app_ctx = self.get_application_context(application_name)
-        execution_agent = app_ctx.get("execution_agent") if isinstance(app_ctx.get("execution_agent"), dict) else {}
-        if not execution_agent:
+        default_agent = app_ctx.get("default_agent") if isinstance(app_ctx.get("default_agent"), dict) else {}
+        if not default_agent:
             return {}
         return {
             "application_name": app_ctx.get("application_name"),
-            "agent_name": self._trim(execution_agent.get("agent_name")),
-            "allowed_skills": [self._trim(x) for x in execution_agent.get("skills", []) if self._trim(x)],
-            "allowed_tools": [self._trim(x) for x in execution_agent.get("tools", []) if self._trim(x)],
+            "agent_name": self._trim(default_agent.get("agent_name")),
+            "allowed_skills": [self._trim(x) for x in default_agent.get("skills", []) if self._trim(x)],
+            "allowed_tools": [self._trim(x) for x in default_agent.get("tools", []) if self._trim(x)],
         }
 
     def _resolve_agent_summary(self, agent_name: str) -> Optional[Dict[str, Any]]:
@@ -78,32 +75,19 @@ class ApplicationRuntimeService:
             "runtime_profile": agent_ctx.get("runtime_profile") or {},
         }
 
-    def _resolve_assistant_agent(self, application_config: Dict[str, Any]) -> Optional[Dict[str, Any]]:
-        assistant_agent_name = self._trim(application_config.get("assistant_agent"))
-        if assistant_agent_name:
-            return self._resolve_agent_summary(assistant_agent_name)
-        return None
-
-    def _resolve_execution_agent(
-        self,
-        application_config: Dict[str, Any],
-        assistant_agent: Optional[Dict[str, Any]] = None,
-    ) -> Optional[Dict[str, Any]]:
-        agent_names = [self._trim(x) for x in application_config.get("default_agents", []) if self._trim(x)]
-        if agent_names:
-            return self._resolve_agent_summary(agent_names[0])
-        return assistant_agent if isinstance(assistant_agent, dict) else None
+    def _resolve_default_agent(self, application_config: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+        agent_name = self._trim(application_config.get("default_agent"))
+        return self._resolve_agent_summary(agent_name) if agent_name else None
 
     def _resolve_available_agents(
         self,
         application_config: Dict[str, Any],
-        assistant_agent: Optional[Dict[str, Any]],
-        execution_agent: Optional[Dict[str, Any]],
+        default_agent: Optional[Dict[str, Any]],
     ) -> list[Dict[str, Any]]:
         names = [self._trim(x) for x in application_config.get("available_agents", []) if self._trim(x)]
         if not names:
             names = []
-            for item in (assistant_agent, execution_agent):
+            for item in (default_agent,):
                 agent_name = self._trim((item or {}).get("agent_name")) if isinstance(item, dict) else ""
                 if agent_name and agent_name not in names:
                     names.append(agent_name)

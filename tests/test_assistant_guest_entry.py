@@ -83,6 +83,28 @@ def test_react_thread_bootstrap_returns_active_thread_and_guest_cookies(monkeypa
     assert any(cookie.startswith("aiia_guest_session_token=gs_threads_test") for cookie in cookies)
 
 
+def test_existing_guest_cookies_do_not_repeat_session_database_writes(monkeypatch) -> None:
+    def unexpected_create(**_kwargs):
+        raise AssertionError("existing guest cookies should be read without another database write")
+
+    monkeypatch.setattr(web.user_session_service, "resolve_or_create_guest", unexpected_create)
+    client = web.app.test_client()
+    client.set_cookie(web.UserSessionService.GUEST_COOKIE_NAME, "guest_existing")
+    client.set_cookie("aiia_guest_session_token", "gs_existing")
+
+    with client.application.test_request_context(
+        "/api/assistant/threads",
+        headers={"Cookie": "aiia_guest_user_id=guest_existing; aiia_guest_session_token=gs_existing"},
+    ):
+        identity = web._resolve_current_guest_identity()
+
+    assert identity == {
+        "user_id": "guest_existing",
+        "user_type": "guest",
+        "session_token": "gs_existing",
+    }
+
+
 def test_thread_history_retains_react_renderable_legacy_payload(monkeypatch) -> None:
     monkeypatch.setattr(
         web,
@@ -95,10 +117,11 @@ def test_thread_history_retains_react_renderable_legacy_payload(monkeypatch) -> 
         lambda **_kwargs: {"thread_id": 23, "owner_type": "user", "owner_id": "guest_history_test"},
     )
     monkeypatch.setattr(web.runtime_conversation_service, "get_thread_context", lambda **_kwargs: {})
+    list_turn_calls = []
     monkeypatch.setattr(
         web.runtime_conversation_service,
         "list_turns",
-        lambda **_kwargs: [{
+        lambda **kwargs: list_turn_calls.append(kwargs) or [{
             "turn_id": 1,
             "output_payload": {
                 "mode": "tools_catalog",
@@ -117,6 +140,7 @@ def test_thread_history_retains_react_renderable_legacy_payload(monkeypatch) -> 
     assert output["items"] == [{"tool_name": "finance_data_query"}]
     assert output["workspace"] == {"url": "/tools"}
     assert "diagnostic_trace" not in output
+    assert list_turn_calls[0]["history_payload_only"] is True
 
 
 def test_assistant_sidebar_uses_compact_titles_without_rendering_message_content() -> None:

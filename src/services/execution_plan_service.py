@@ -58,10 +58,10 @@ class AgentRuntimePlanner:
         ctx = work_context if isinstance(work_context, dict) else {}
         app_ctx = application_context if isinstance(application_context, dict) else {}
         planner_agent = self._trim(
-            (app_ctx.get("execution_agent") or {}).get("agent_name")
-            if isinstance(app_ctx.get("execution_agent"), dict)
-            else ctx.get("execution_agent")
-        ) or "execution_agent"
+            (app_ctx.get("default_agent") or {}).get("agent_name")
+            if isinstance(app_ctx.get("default_agent"), dict)
+            else ctx.get("default_agent")
+        ) or "default_agent"
         capability_result = self.capability_search_service.find_for_agent_runtime(
             query=retrieval_query,
             tool_queries=[self._trim(item) for item in (tool_queries or []) if self._trim(item)],
@@ -378,7 +378,7 @@ class AgentRuntimePlanner:
                 ]
             )
             return items
-        return [{"step_id": "step_1", "depends_on": [], "type": "agent_route", "name": self._trim(target.get("name")) or "execution_agent", "status": "planned"}]
+        return [{"step_id": "step_1", "depends_on": [], "type": "agent_route", "name": self._trim(target.get("name")) or "default_agent", "status": "planned"}]
 
     def _build_tool_work_items(
         self,

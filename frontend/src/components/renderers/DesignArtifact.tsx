@@ -34,6 +34,8 @@ export default function DesignArtifact({ data, content }: { data: UnknownRecord;
   const constraints = list(understanding.constraints);
   const assumptions = list(understanding.assumptions);
   const rules = records(details.rules);
+  const document = String(details.document || "");
+  const plan = String(details.plan || "");
   const modules = records(details.modules || data.modules);
   const inputs = records(details.inputs);
   const outputs = records(details.outputs);
@@ -95,6 +97,8 @@ export default function DesignArtifact({ data, content }: { data: UnknownRecord;
       <summary><span><ChevronRight size={16} />查看完整设计细节</span><small>{inputs.length} 个输入 · {outputs.length} 个输出 · {modules.length} 个模块</small></summary>
       <div className="design-details-body">
         {summary && summary !== goal ? <p className="design-description">{summary}</p> : null}
+        {document ? <section><h4>设计方案</h4><p className="design-description" style={{ whiteSpace: "pre-wrap" }}>{document}</p></section> : null}
+        {plan ? <section><h4>实现方案</h4><p className="design-description" style={{ whiteSpace: "pre-wrap" }}>{plan}</p></section> : null}
         {inputs.length > 0 ? <section><h4>输入</h4><FieldGrid items={inputs} fallback="输入" /></section> : null}
         {outputs.length > 0 ? <section><h4>输出</h4><FieldGrid items={outputs} fallback="输出" /></section> : null}
         {modules.length > 0 ? <section><h4>内部模块</h4><div className="design-module-list">{modules.map((module, index) => (

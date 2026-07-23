@@ -10,6 +10,9 @@ interface Props {
   busy: boolean;
   focusRequest?: number;
   assets: InvocationAsset[];
+  selectedAsset: InvocationAsset | null;
+  onSelectAsset: (asset: InvocationAsset) => void;
+  onClearSelectedAsset: () => void;
   attachments: Attachment[];
   onFiles: (files: File[]) => void;
   onRemoveAttachment: (index: number) => void;
@@ -32,6 +35,23 @@ export default function Composer(props: Props) {
     description: asset.displayName === asset.name ? asset.description : `${asset.displayName}${asset.description ? ` · ${asset.description}` : ""}`,
   })), [props.assets]);
   const matching = useMemo(() => filterSuggestions(invocation, assetSuggestions), [invocation, assetSuggestions]);
+  const invocationFields = useMemo(() => {
+    const schema = props.selectedAsset?.inputSchema || {};
+    const properties = schema.properties && typeof schema.properties === "object" && !Array.isArray(schema.properties)
+      ? schema.properties as Record<string, unknown>
+      : {};
+    const required = new Set(Array.isArray(schema.required) ? schema.required.map(String) : []);
+    return Object.entries(properties).map(([name, raw]) => {
+      const definition = raw && typeof raw === "object" && !Array.isArray(raw) ? raw as Record<string, unknown> : {};
+      return {
+        name,
+        label: ["question", "request"].includes(name) ? "自然语言要求" : name,
+        required: required.has(name),
+        description: String(definition.description || definition.title || ""),
+        defaultValue: definition.default,
+      };
+    }).sort((left, right) => Number(right.required) - Number(left.required));
+  }, [props.selectedAsset]);
   const menuOpen = Boolean(invocation) && props.value !== dismissedValue && (matching.length > 0 || invocation?.query === "/" || invocation?.query === "$");
 
   useEffect(() => { setSelectedIndex(0); }, [invocation?.query]);
@@ -56,6 +76,10 @@ export default function Composer(props: Props) {
     if (!invocation) return;
     const completed = completeSuggestion(props.value, invocation, suggestion);
     props.onChange(completed.value);
+    if (suggestion.kind === "tool" || suggestion.kind === "skill") {
+      const asset = props.assets.find((item) => item.kind === suggestion.kind && `$${item.name}` === suggestion.value);
+      if (asset) props.onSelectAsset(asset);
+    }
     setDismissedValue(completed.value);
     window.requestAnimationFrame(() => {
       textRef.current?.focus();
@@ -85,6 +109,21 @@ export default function Composer(props: Props) {
       </div>}
       {props.attachments.length > 0 && <div className="attachment-preview">{props.attachments.map((attachment, index) => <div key={attachment.attachment_id || index}>{attachment.preview_url ? <img src={attachment.preview_url} alt={attachment.file_name || "附件"} /> : <span className="attachment-file"><Paperclip size={15} />{attachment.file_name || "附件"}</span>}<button type="button" onClick={() => props.onRemoveAttachment(index)} aria-label="移除附件"><X size={13} /></button></div>)}</div>}
       <div className={`composer ${focused ? "focused" : ""}`}>
+        {props.selectedAsset && <div className="invocation-guide">
+          <code>${props.selectedAsset.name}</code>
+          <div className="invocation-parameters">
+            {invocationFields.map((field) => <span key={field.name} className={field.required ? "required" : "optional"} title={field.description}>
+              {`<${field.label}${field.defaultValue !== undefined ? `=${String(field.defaultValue)}` : ""}>`}
+            </span>)}
+            {!invocationFields.length && <span className="ready">无需参数，可直接运行</span>}
+            {invocationFields.length > 0 && !invocationFields.some((field) => field.required) && <span className="ready">可直接运行</span>}
+          </div>
+          <button type="button" onClick={() => {
+            const prefix = `$${props.selectedAsset?.name || ""}`;
+            if (props.value.trimStart().startsWith(prefix)) props.onChange(props.value.trimStart().slice(prefix.length).trimStart());
+            props.onClearSelectedAsset();
+          }} aria-label="取消工具调用"><X size={13} /></button>
+        </div>}
         <textarea
           ref={textRef}
           value={props.value}
@@ -112,7 +151,7 @@ export default function Composer(props: Props) {
               setDismissedValue(props.value);
             }
           }}
-          placeholder="描述金融问题，输入 / 调用命令，或用 $ 选择工具与 Skill…"
+          placeholder={props.selectedAsset ? "直接用自然语言填写参数，也可以附加表格或文档批量执行…" : "描述金融问题，输入 / 调用命令，或用 $ 选择工具与 Skill…"}
           aria-label="消息输入"
           aria-controls={menuOpen ? menuId : undefined}
           aria-expanded={menuOpen}
@@ -123,7 +162,7 @@ export default function Composer(props: Props) {
             <button type="button" className="tool-button" onClick={() => fileRef.current?.click()} title="上传文档或表格"><Paperclip size={17} /><span>附件</span></button>
             <button type="button" className="tool-button" onClick={() => imageRef.current?.click()} title="上传图片"><ImagePlus size={17} /><span>图片</span></button>
           </div>
-          <button type="button" className="send-button" disabled={props.busy || (!props.value.trim() && !props.attachments.length)} onClick={props.onSend} aria-label="发送消息">{props.busy ? <LoaderCircle className="spin" size={18} /> : <ArrowUp size={19} />}</button>
+          <button type="button" className="send-button" disabled={props.busy || (!props.value.trim() && !props.attachments.length && !props.selectedAsset)} onClick={props.onSend} aria-label="发送消息">{props.busy ? <LoaderCircle className="spin" size={18} /> : <ArrowUp size={19} />}</button>
         </div>
       </div>
       <div className="composer-hint"><span><kbd>/</kbd> 命令</span><span><kbd>$</kbd> 工具与 Skill</span><span><kbd>Tab</kbd> 补全</span><span>Ctrl / ⌘ + Enter 发送</span></div>

@@ -90,8 +90,13 @@ export interface InteractionResponse {
   expected_revision: number;
   label?: string;
   subject_ref?: string;
-  answers?: InteractionAnswer[];
+  answers?: InteractionSubmittedAnswer[];
   feedback_text?: string;
+}
+
+export interface InteractionSubmittedAnswer {
+  question: string;
+  answer: string;
 }
 
 export interface InteractionAnswer {
@@ -123,4 +128,7 @@ export interface InvocationAsset {
   displayName: string;
   description: string;
   kind: "tool" | "skill";
+  inputSchema?: UnknownRecord;
+  sampleInput?: UnknownRecord;
+  requiresNaturalLanguage?: boolean;
 }

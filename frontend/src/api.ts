@@ -46,24 +46,66 @@ export async function loadThread(threadId: number): Promise<ThreadDetail> {
 }
 
 export async function loadInvocationAssets(): Promise<InvocationAsset[]> {
+  const loadCatalog = async (path: string) => {
+    const controller = new AbortController();
+    const timeout = window.setTimeout(() => controller.abort(), 2000);
+    try {
+      return await readJson<{ items?: UnknownRecord[] }>(await fetch(path, {
+        credentials: "include",
+        signal: controller.signal,
+      }));
+    } finally {
+      window.clearTimeout(timeout);
+    }
+  };
   const [tools, skills] = await Promise.all([
-    readJson<{ items?: UnknownRecord[] }>(await fetch("/api/tools/catalog", { credentials: "include" })),
-    readJson<{ items?: UnknownRecord[] }>(await fetch("/api/skills/catalog", { credentials: "include" })),
+    loadCatalog("/api/tools/catalog"),
+    loadCatalog("/api/skills/catalog").catch(() => ({ items: [] })),
   ]);
+  return mapInvocationAssets(tools.items, skills.items);
+}
+
+function mapInvocationAssets(toolItems: UnknownRecord[] = [], skillItems: UnknownRecord[] = []): InvocationAsset[] {
+  const record = (value: unknown): UnknownRecord => value && typeof value === "object" && !Array.isArray(value) ? value as UnknownRecord : {};
   return [
-    ...(tools.items || []).map((item) => ({
+    ...toolItems.map((item) => ({
       name: String(item.tool_name || item.name || ""),
       displayName: String(item.display_name || item.tool_name || item.name || ""),
       description: String(item.description || ""),
       kind: "tool" as const,
+      inputSchema: record(item.input_schema),
+      sampleInput: record(item.sample_input),
+      requiresNaturalLanguage: Boolean(item.requires_natural_language),
     })),
-    ...(skills.items || []).map((item) => ({
+    ...skillItems.map((item) => ({
       name: String(item.skill_name || item.name || ""),
       displayName: String(item.display_name || item.skill_name || item.name || ""),
       description: String(item.description || item.purpose || ""),
       kind: "skill" as const,
+      inputSchema: record(item.input_schema),
+      sampleInput: record(item.sample_input),
+      requiresNaturalLanguage: Boolean(item.requires_natural_language),
     })),
   ].filter((item) => item.name);
+}
+
+export async function loadInvocationTools(): Promise<InvocationAsset[]> {
+  const payload = await readJson<{ items?: UnknownRecord[] }>(await fetch("/api/tools/catalog", { credentials: "include" }));
+  return mapInvocationAssets(payload.items || [], []);
+}
+
+export async function loadInvocationSkills(): Promise<InvocationAsset[]> {
+  const controller = new AbortController();
+  const timeout = window.setTimeout(() => controller.abort(), 2000);
+  try {
+    const payload = await readJson<{ items?: UnknownRecord[] }>(await fetch("/api/skills/catalog", {
+      credentials: "include",
+      signal: controller.signal,
+    }));
+    return mapInvocationAssets([], payload.items || []);
+  } finally {
+    window.clearTimeout(timeout);
+  }
 }
 
 export async function resetThread(): Promise<void> {
@@ -77,6 +119,7 @@ export async function dispatchChat(input: {
   text: string;
   threadId: number | null;
   attachmentIds: string[];
+  selectedAsset?: Pick<InvocationAsset, "kind" | "name"> | null;
 }): Promise<UnknownRecord> {
   return readJson<UnknownRecord>(await fetch("/api/chat/dispatch", {
     method: "POST",
@@ -87,6 +130,7 @@ export async function dispatchChat(input: {
       thread_id: input.threadId,
       application_name: "investment_workbench",
       attachment_ids: input.attachmentIds,
+      selected_asset: input.selectedAsset || undefined,
     }),
   }));
 }
@@ -108,6 +152,8 @@ export async function startCustomToolStream(input: {
   text: string;
   threadId: number | null;
   interactionResponse?: InteractionResponse;
+  attachmentIds?: string[];
+  selectedAsset?: { kind: "tool" | "skill"; name: string } | null;
   onEvent: (event: StreamEvent) => void;
 }): Promise<void> {
   const started = await readJson<{ ok: boolean; run_id: string; stream_url: string }>(
@@ -119,6 +165,8 @@ export async function startCustomToolStream(input: {
         text: input.text,
         thread_id: input.threadId,
         application_name: "investment_workbench",
+        attachment_ids: input.attachmentIds || [],
+        selected_asset: input.selectedAsset || undefined,
         ...(input.interactionResponse ? { interaction_response: input.interactionResponse } : {}),
       }),
     }),

@@ -37,11 +37,22 @@ class SkillStudioService:
                 continue
             skill_name = skill_dir.name
             try:
-                bundle = self.load_skill_bundle(skill_name)
+                config_path = skill_dir / "skill.json"
+                skill_config = json.loads(config_path.read_text(encoding="utf-8")) if config_path.exists() else {}
             except Exception:
                 continue
-            files = bundle.get("files") or {}
-            skill_config = files.get("skill_config") or {}
+            input_schema = skill_config.get("input_schema") if isinstance(skill_config.get("input_schema"), dict) else {
+                "type": "object",
+                "required": ["question"],
+                "properties": {
+                    "question": {
+                        "type": "string",
+                        "description": "希望该 Skill 完成的自然语言任务",
+                    }
+                },
+            }
+            examples_dir = skill_dir / "examples"
+            retrieval_fields = CapabilitySearchService.build_skill_retrieval_fields(skill_config)
             rows.append(
                 {
                     "skill_name": skill_name,
@@ -62,8 +73,12 @@ class SkillStudioService:
                     "default_max_steps": int(skill_config.get("default_max_steps", 0) or 0),
                     "presentation_preference": str(skill_config.get("presentation_preference") or skill_config.get("expected_render_page_type") or "").strip(),
                     "expected_render_page_type": str(skill_config.get("expected_render_page_type") or "").strip(),
-                    "embedding_text": str(((bundle.get("meta") or {}).get("retrieval_profile") or {}).get("embedding_text") or "").strip(),
-                    "example_count": len(bundle.get("examples") or []),
+                    "embedding_text": CapabilitySearchService.build_skill_embedding_text(skill_config),
+                    "retrieval_profile": retrieval_fields,
+                    "example_count": len(list(examples_dir.glob("*.json"))) if examples_dir.exists() else 0,
+                    "input_schema": input_schema,
+                    "sample_input": skill_config.get("sample_input") if isinstance(skill_config.get("sample_input"), dict) else {},
+                    "requires_natural_language": "question" in (input_schema.get("required") or []),
                 }
             )
         return rows

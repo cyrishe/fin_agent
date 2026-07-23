@@ -2,19 +2,21 @@ from __future__ import annotations
 
 import pytest
 
-from src.services.assistant_interaction_preprocessor import AssistantInteractionPreprocessor
-from src.services.context_resolution_service import ContextResolutionService
+from src.services.assistant_interaction_preprocessor import (
+    AssistantInteractionPreprocessError,
+    AssistantInteractionPreprocessor,
+)
+from src.services.context_resolution_service import ContextResolutionError, ContextResolutionService
 from src.services.conversation_preprocess_service import ConversationPreprocessService
 
 
 APPLICATION_CONTEXT = {
     "application_name": "thought_experiment",
-    "assistant_agent": {"agent_name": "default_assistant"},
-    "execution_agent": {"agent_name": "investment_analyst"},
+    "default_agent": {"agent_name": "investment_analyst"},
     "available_agents": [
         {"agent_name": "default_assistant", "role": "fallback"},
         {"agent_name": "investment_analyst", "role": "finance"},
-        {"agent_name": "education_tutor", "role": "education"},
+        {"agent_name": "education_research_agent", "role": "education"},
     ],
 }
 
@@ -61,11 +63,11 @@ class _TopIntentStub:
         elif "运行一下行情工具" in text or ("打开" in text and "工具列表" in text):
             agent_name, turn_mode = "default_assistant", "system_operation"
         elif "流程图" in text:
-            agent_name, turn_mode = "default_assistant", "tool_development"
+            agent_name, turn_mode = "investment_analyst", "tool_development"
         elif "工具" in text:
             agent_name, turn_mode = "investment_analyst", "tool_development"
         elif "二次函数" in text:
-            agent_name, turn_mode = "education_tutor", "normal_qa"
+            agent_name, turn_mode = "education_research_agent", "normal_qa"
         else:
             agent_name, turn_mode = "investment_analyst", "normal_qa"
         return {
@@ -154,7 +156,7 @@ def test_top_intent_uses_one_llm_call_for_both_orthogonal_dimensions(monkeypatch
 
     def fake_chat(messages, enable_think=False):
         calls.append({"messages": messages, "enable_think": enable_think})
-        return {"agent_name": "education_tutor", "turn_mode": "normal_qa"}, {}
+        return {"agent_name": "education_research_agent", "turn_mode": "normal_qa"}, {}
 
     monkeypatch.setattr("src.services.assistant_interaction_preprocessor.chat_qwen_flash_json", fake_chat)
     result = AssistantInteractionPreprocessor().classify(
@@ -168,8 +170,137 @@ def test_top_intent_uses_one_llm_call_for_both_orthogonal_dimensions(monkeypatch
     )
 
     assert len(calls) == 1
-    assert result["agent_name"] == "education_tutor"
+    assert result["agent_name"] == "education_research_agent"
     assert result["turn_mode"] == "normal_qa"
+
+
+def test_top_intent_receives_compact_tool_facts_without_conversation_state(monkeypatch):
+    calls = []
+
+    def fake_chat(messages, enable_think=False):
+        calls.append(messages)
+        return {"agent_name": "investment_analyst", "turn_mode": "tool_development"}, {}
+
+    monkeypatch.setattr("src.services.assistant_interaction_preprocessor.chat_qwen_flash_json", fake_chat)
+    result = AssistantInteractionPreprocessor().classify(
+        user_text="继续修复这个工具",
+        thread_context={
+            "conversation_state": {"state": "suspended"},
+            "interaction_frame": {"interaction_mode": "resume_previous_task"},
+            "custom_tool_state": {
+                "status": "draft_needs_test",
+                "tool_name": "golden_cross_30_60",
+                "implementation_revision": 2,
+                "design_contract": {
+                    "display_name": "30/60 日金叉判断",
+                    "flow": {"mermaid": "flowchart TD"},
+                },
+            },
+        },
+        context_resolution={
+            "ori_question": "继续修复这个工具",
+            "resolved_question": "继续修复当前的 30/60 日金叉判断工具。",
+            "context_refs": ["custom_tool:golden_cross_30_60"],
+        },
+        application_context=APPLICATION_CONTEXT,
+    )
+
+    rendered = "\n".join(str(message.get("content") or "") for message in calls[0])
+    assert result["turn_mode"] == "tool_development"
+    assert "golden_cross_30_60" in rendered
+    assert "has_design" in rendered
+    assert "has_implementation" in rendered
+    assert "has_failed_test" in rendered
+    assert "conversation_state" not in rendered
+    assert "interaction_frame" not in rendered
+
+
+def test_tool_name_alone_does_not_advertise_code_or_tests() -> None:
+    context = AssistantInteractionPreprocessor()._build_active_context(
+        thread_context={
+            "custom_tool_state": {
+                "tool_name": "ct_design_only",
+                "design_contract": {
+                    "display_name": "仅完成设计的工具",
+                    "flow": {"mermaid": "flowchart TD"},
+                },
+            }
+        },
+        application_context=APPLICATION_CONTEXT,
+    )
+
+    assert context is not None
+    assert context["has_design"] is True
+    assert context["has_implementation"] is False
+    assert context["available_assets"] == ["design", "flow"]
+
+
+def test_context_resolution_llm_failure_is_reported_without_fallback(monkeypatch):
+    def fail(*args, **kwargs):
+        raise RuntimeError("maas unavailable")
+
+    monkeypatch.setattr("src.services.context_resolution_service.chat_qwen_flash_json", fail)
+
+    with pytest.raises(ContextResolutionError, match="maas unavailable"):
+        ContextResolutionService().resolve(
+            user_text="那么五粮液呢？",
+            context_window=[],
+            thread_state={},
+            preprocessing_signals={},
+            enable_llm=True,
+        )
+
+
+def test_context_resolution_protocol_error_is_reported_without_raw_text_fallback(monkeypatch):
+    monkeypatch.setattr(
+        "src.services.context_resolution_service.chat_qwen_flash_json",
+        lambda messages, enable_think=False: ({"context_refs": []}, {}),
+    )
+
+    with pytest.raises(ContextResolutionError, match="ori_question"):
+        ContextResolutionService().resolve(
+            user_text="那么五粮液呢？",
+            context_window=[],
+            thread_state={},
+            preprocessing_signals={},
+            enable_llm=True,
+        )
+
+
+def test_top_intent_llm_failure_is_reported_without_normal_qa_fallback(monkeypatch):
+    def fail(*args, **kwargs):
+        raise RuntimeError("router unavailable")
+
+    monkeypatch.setattr("src.services.assistant_interaction_preprocessor.chat_qwen_flash_json", fail)
+
+    with pytest.raises(AssistantInteractionPreprocessError, match="router unavailable"):
+        AssistantInteractionPreprocessor().classify(
+            user_text="宁德时代现在股价是多少？",
+            context_resolution={
+                "ori_question": "宁德时代现在股价是多少？",
+                "resolved_question": "宁德时代现在股价是多少？",
+                "context_refs": [],
+            },
+            application_context=APPLICATION_CONTEXT,
+        )
+
+
+def test_top_intent_protocol_error_is_reported_without_default_mode(monkeypatch):
+    monkeypatch.setattr(
+        "src.services.assistant_interaction_preprocessor.chat_qwen_flash_json",
+        lambda messages, enable_think=False: ({"agent_name": "investment_analyst"}, {}),
+    )
+
+    with pytest.raises(AssistantInteractionPreprocessError, match="turn_mode"):
+        AssistantInteractionPreprocessor().classify(
+            user_text="宁德时代现在股价是多少？",
+            context_resolution={
+                "ori_question": "宁德时代现在股价是多少？",
+                "resolved_question": "宁德时代现在股价是多少？",
+                "context_refs": [],
+            },
+            application_context=APPLICATION_CONTEXT,
+        )
 
 
 def test_context_resolution_runs_before_top_intent_and_supplies_resolved_question():
@@ -242,7 +373,7 @@ def test_available_agent_catalog_accepts_education_agent_without_code_enum():
         enable_llm=True,
     )
 
-    assert result["dispatch_plan"]["selected_agent"] == "education_tutor"
+    assert result["dispatch_plan"]["selected_agent"] == "education_research_agent"
     assert result["dispatch_plan"]["turn_mode"] == "normal_qa"
 
 
@@ -291,7 +422,7 @@ def test_slash_command_turn_mode_is_fully_rule_based(text, expected_mode):
     assert result["dispatch_plan"]["turn_mode"] == expected_mode
 
 
-def test_natural_language_cannot_enter_tool_development_without_active_workflow():
+def test_natural_language_uses_top_intent_result_without_hidden_override():
     service, _, _ = _service()
 
     result = service.preprocess(
@@ -301,9 +432,9 @@ def test_natural_language_cannot_enter_tool_development_without_active_workflow(
         enable_llm=True,
     )
 
-    assert result["interaction"]["turn_mode"] == "normal_qa"
-    assert result["dispatch_plan"]["turn_mode"] == "normal_qa"
-    assert result["dispatch_plan"]["entry"] != "custom_tool_flow"
+    assert result["interaction"]["turn_mode"] == "tool_development"
+    assert result["dispatch_plan"]["turn_mode"] == "tool_development"
+    assert result["dispatch_plan"]["entry"] == "custom_tool_flow"
 
 
 def test_natural_language_can_continue_a_previous_system_slash_operation():

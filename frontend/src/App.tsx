@@ -1,6 +1,6 @@
 import { Menu, MessageSquarePlus, PanelRight, Sparkles } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { dispatchChat, loadInvocationAssets, loadThread, loadThreads, resetThread, startCustomToolStream, uploadAttachments } from "./api";
+import { dispatchChat, loadInvocationSkills, loadInvocationTools, loadThread, loadThreads, resetThread, startCustomToolStream, uploadAttachments } from "./api";
 import Composer from "./components/Composer";
 import MessageItem from "./components/MessageItem";
 import RunPanel from "./components/RunPanel";
@@ -33,7 +33,7 @@ function hydrateMessages(turns: UnknownRecord[]): ChatMessage[] {
     if (assistantText || blocks.length) {
       const run: AgentRun | undefined = blocks.length ? {
         status: String(turn.status || "completed") === "failed" ? "error" : "done",
-        summary: assistantText || "任务已完成",
+        summary: assistantText || "本轮处理完成",
         artifacts: blocks.filter((block) => !isProcessBlock(block)),
         process: blocks.filter(isProcessBlock),
       } : undefined;
@@ -61,6 +61,7 @@ export default function App() {
   const [leftOpen, setLeftOpen] = useState(false);
   const [rightOpen, setRightOpen] = useState(false);
   const [invocationAssets, setInvocationAssets] = useState<InvocationAsset[]>([]);
+  const [selectedInvocationAsset, setSelectedInvocationAsset] = useState<InvocationAsset | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
 
   const latestRun = useMemo(() => [...messages].reverse().find((message) => message.run)?.run, [messages]);
@@ -92,7 +93,8 @@ export default function App() {
     })();
   }, [refreshThreads]);
   useEffect(() => {
-    void loadInvocationAssets().then(setInvocationAssets).catch(() => setInvocationAssets([]));
+    void loadInvocationTools().then(setInvocationAssets).catch(() => setInvocationAssets([]));
+    void loadInvocationSkills().then((skills) => setInvocationAssets((current) => [...current, ...skills])).catch(() => undefined);
   }, []);
   useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: busy ? "auto" : "smooth", block: "end" }); }, [messages.length, busy]);
 
@@ -107,6 +109,7 @@ export default function App() {
       setSelectedInteractions({});
       setSubmittedInteractions(new Set());
       setPendingFeedback(null);
+      setSelectedInvocationAsset(null);
       setLeftOpen(false);
     } catch (reason) { setError(reason instanceof Error ? reason.message : String(reason)); }
   };
@@ -121,6 +124,7 @@ export default function App() {
     setSubmittedInteractions(new Set());
     setPendingFeedback(null);
     setAttachments([]);
+    setSelectedInvocationAsset(null);
     setInput("");
     setLeftOpen(false);
   };
@@ -142,10 +146,18 @@ export default function App() {
     if (event.thread_id) setThreadId(Number(event.thread_id));
     const patch = asRecord(asRecord(event.result).thread_context_patch);
     if (Object.prototype.hasOwnProperty.call(patch, "custom_tool_state")) setCustomToolActive(Boolean(patch.custom_tool_state));
+    if (event.event === "done" && String(asRecord(event.result).mode || "") !== "asset_invocation_needs_input") {
+      setSelectedInvocationAsset(null);
+    }
   }, []);
 
-  const runStream = useCallback(async (text: string, assistantId: string, interactionResponse?: InteractionResponse) => {
-    await startCustomToolStream({ text, threadId, interactionResponse, onEvent: (event) => updateRun(assistantId, event) });
+  const runStream = useCallback(async (
+    text: string,
+    assistantId: string,
+    interactionResponse?: InteractionResponse,
+    invocation?: { attachmentIds?: string[]; selectedAsset?: { kind: "tool" | "skill"; name: string } | null },
+  ) => {
+    await startCustomToolStream({ text, threadId, interactionResponse, ...invocation, onEvent: (event) => updateRun(assistantId, event) });
     await refreshThreads();
   }, [refreshThreads, threadId, updateRun]);
 
@@ -221,10 +233,12 @@ export default function App() {
       return;
     }
     const text = input.trim();
-    if ((!text && !attachments.length) || busy) return;
-    const userMessage: ChatMessage = { id: id(), role: "user", content: text || `已发送 ${attachments.length} 个附件`, attachments, createdAt: Date.now() };
+    if ((!text && !attachments.length && !selectedInvocationAsset) || busy) return;
+    const invocationLabel = selectedInvocationAsset ? `$${selectedInvocationAsset.name}` : "";
+    const userMessage: ChatMessage = { id: id(), role: "user", content: text || invocationLabel || `已发送 ${attachments.length} 个附件`, attachments, createdAt: Date.now() };
     const assistantId = id();
-    const useStream = !attachments.length && (/^\/custom_tool\s+(create|edit)\b/i.test(text) || (customToolActive && !text.startsWith("/")));
+    const isAssetInvocation = Boolean(selectedInvocationAsset) || text.startsWith("$");
+    const useStream = isAssetInvocation || (!attachments.length && (/^\/custom_tool\s+(create|edit)\b/i.test(text) || (customToolActive && !text.startsWith("/"))));
     const assistantMessage: ChatMessage = { id: assistantId, role: "assistant", content: "", run: initialRun(useStream ? "正在连接 Agent" : "正在处理你的问题"), createdAt: Date.now() };
     const attachmentIds = attachments.map((item) => String(item.attachment_id || "")).filter(Boolean);
     setMessages((current) => [...current.filter((message) => message.id !== "intro" || current.length === 1), userMessage, assistantMessage]);
@@ -234,9 +248,17 @@ export default function App() {
     setBusy(true);
     try {
       if (useStream) {
-        await runStream(text, assistantId);
+        await runStream(text, assistantId, undefined, {
+          attachmentIds,
+          selectedAsset: selectedInvocationAsset ? { kind: selectedInvocationAsset.kind, name: selectedInvocationAsset.name } : null,
+        });
       } else {
-        const payload = await dispatchChat({ text, threadId, attachmentIds });
+        const payload = await dispatchChat({
+          text,
+          threadId,
+          attachmentIds,
+          selectedAsset: selectedInvocationAsset ? { kind: selectedInvocationAsset.kind, name: selectedInvocationAsset.name } : null,
+        });
         if (payload.thread_id) setThreadId(Number(payload.thread_id));
         const patch = asRecord(payload.thread_context_patch);
         if (Object.prototype.hasOwnProperty.call(patch, "custom_tool_state")) setCustomToolActive(Boolean(patch.custom_tool_state));
@@ -245,8 +267,9 @@ export default function App() {
           ...message,
           content: blocks.length ? "" : String(payload.message || "已处理。"),
           payload,
-          run: blocks.length ? { status: "done", summary: "任务已完成", artifacts: blocks.filter((block) => !isProcessBlock(block)), process: blocks.filter(isProcessBlock) } : undefined,
+          run: blocks.length ? { status: "done", summary: "本轮处理完成", artifacts: blocks.filter((block) => !isProcessBlock(block)), process: blocks.filter(isProcessBlock) } : undefined,
         } : message));
+        if (String(payload.mode || "") !== "asset_invocation_needs_input") setSelectedInvocationAsset(null);
         await refreshThreads();
         window.setTimeout(() => void refreshThreads(), 3000);
       }
@@ -295,7 +318,7 @@ export default function App() {
           />)}<div ref={bottomRef} /></div>
         </section>
         {error && <div className="global-error" role="alert">{error}<button type="button" onClick={() => setError("")}>关闭</button></div>}
-        <Composer value={input} onChange={setInput} onSend={() => void send()} busy={busy} focusRequest={composerFocusRequest} assets={invocationAssets} attachments={attachments} onFiles={(files) => void addFiles(files)} onRemoveAttachment={(index) => setAttachments((current) => current.filter((_, itemIndex) => itemIndex !== index))} />
+        <Composer value={input} onChange={setInput} onSend={() => void send()} busy={busy} focusRequest={composerFocusRequest} assets={invocationAssets} selectedAsset={selectedInvocationAsset} onSelectAsset={setSelectedInvocationAsset} onClearSelectedAsset={() => setSelectedInvocationAsset(null)} attachments={attachments} onFiles={(files) => void addFiles(files)} onRemoveAttachment={(index) => setAttachments((current) => current.filter((_, itemIndex) => itemIndex !== index))} />
       </main>
       <div className={`run-slot ${rightOpen ? "mobile-open" : ""}`}><RunPanel run={latestRun} onClose={() => setRightOpen(false)} /></div>
     </div>

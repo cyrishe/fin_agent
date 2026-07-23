@@ -37,11 +37,12 @@ class SessionVariableStoreService:
         task: str = "",
         runtime_ctx: Mapping[str, Any] | None = None,
         local_alias: str = "",
+        include_failed: bool = False,
     ) -> dict[str, Any] | None:
         normalized_session_id = self._safe_id(session_id, prefix="sess")
         if not normalized_session_id or not isinstance(result, Mapping):
             return None
-        if result.get("ok") is False:
+        if result.get("ok") is False and not include_failed:
             return None
 
         extracted = self._extract_payload(tool_name=tool_name, result=result)
@@ -72,10 +73,15 @@ class SessionVariableStoreService:
             "schema": extracted["schema"],
             "sample": extracted["sample"],
             "row_count": extracted.get("row_count"),
-            "status": "ok",
+            "status": "error" if result.get("ok") is False else "ok",
             "runtime": self._runtime_summary(runtime_ctx or {}),
             "created_at": self._now(),
+            "payload_file": f"{var_id}.data.json",
         }
+        (session_dir / manifest["payload_file"]).write_text(
+            json.dumps(dict(result), ensure_ascii=False, default=str, separators=(",", ":")),
+            encoding="utf-8",
+        )
         self._write_manifest(session_dir, var_id, manifest)
         index["variables"].append(self._index_item(manifest))
         self._write_index(session_dir, index)
@@ -94,6 +100,78 @@ class SessionVariableStoreService:
     def resolve_data_ref(self, data_ref: str) -> dict[str, Any]:
         session_id, var_id = self.parse_data_ref(data_ref)
         return self.read_manifest(session_id=session_id, var_id=var_id)
+
+    def load_data_ref(
+        self,
+        *,
+        session_id: str,
+        data_ref: str,
+        offset: int = 0,
+        limit: int = 50,
+    ) -> dict[str, Any]:
+        expected_session_id = self._safe_id(session_id, prefix="sess")
+        ref_session_id, _ = self.parse_data_ref(data_ref)
+        if not expected_session_id or ref_session_id != expected_session_id:
+            raise ValueError("data_ref does not belong to the current conversation")
+        manifest = self.resolve_data_ref(data_ref)
+        artifact_ref = str(manifest.get("artifact_ref") or "")
+        if not artifact_ref:
+            return {"manifest": self._public_summary(manifest), "data": None}
+        artifact = self.artifact_service.read_manifest(artifact_ref)
+        if artifact.get("kind") == "table":
+            start = max(0, int(offset or 0))
+            page_size = max(1, min(int(limit or 50), FileArtifactService.MAX_PREVIEW_ROWS))
+            total = int(manifest.get("row_count") or artifact.get("row_count") or 0)
+            stored_total = int(artifact.get("row_count") or 0)
+            if total > stored_total and start + page_size > stored_total:
+                payload_path = self._session_dir(ref_session_id) / str(manifest.get("payload_file") or "")
+                raw_result = json.loads(payload_path.read_text(encoding="utf-8"))
+                extracted = self._extract_payload(
+                    tool_name=str(manifest.get("tool_name") or ""),
+                    result=raw_result,
+                )
+                all_rows = extracted.get("rows") if isinstance(extracted.get("rows"), list) else []
+                rows = [dict(row) for row in all_rows[start:start + page_size] if isinstance(row, Mapping)]
+            else:
+                _, rows = self.artifact_service.read_table_rows(
+                    artifact_ref,
+                    offset=start,
+                    limit=page_size,
+                )
+            return {
+                "manifest": self._public_summary(manifest),
+                "page": {
+                    "offset": start,
+                    "limit": page_size,
+                    "returned": len(rows),
+                    "total": total,
+                    "has_more": start + len(rows) < total,
+                },
+                "rows": rows,
+            }
+        payload_file = str(manifest.get("payload_file") or "")
+        payload_path = self._session_dir(ref_session_id) / payload_file
+        if payload_file == f"{manifest.get('var_id')}.data.json" and payload_path.is_file():
+            text = payload_path.read_text(encoding="utf-8")
+        else:
+            _, text = self.artifact_service.read_document_text(
+                artifact_ref,
+                max_chars=FileArtifactService.MAX_DOCUMENT_CHARS,
+            )
+        start = max(0, int(offset or 0))
+        page_size = max(1, min(int(limit or 50), 5_000))
+        chunk = text[start:start + page_size]
+        return {
+            "manifest": self._public_summary(manifest),
+            "page": {
+                "offset": start,
+                "limit": page_size,
+                "returned": len(chunk),
+                "total": len(text),
+                "has_more": start + len(chunk) < len(text),
+            },
+            "text": chunk,
+        }
 
     def format_variables_for_prompt(self, *, session_id: str) -> str:
         rows = self.list_variables(session_id=session_id)
@@ -133,15 +211,23 @@ class SessionVariableStoreService:
 
     def _extract_payload(self, *, tool_name: str, result: Mapping[str, Any]) -> dict[str, Any]:
         if tool_name == "finance_data_query":
-            payload = result.get("data") if isinstance(result.get("data"), Mapping) else {}
+            payload = result.get("data") if isinstance(result.get("data"), Mapping) else result
             finance_result = payload.get("result") if isinstance(payload.get("result"), Mapping) else {}
-            data = finance_result.get("data") if isinstance(finance_result.get("data"), Mapping) else {}
-            rows = data.get("rows") if isinstance(data.get("rows"), list) else []
+            data = finance_result.get("data")
+            if isinstance(data, Mapping):
+                rows = data.get("rows") if isinstance(data.get("rows"), list) else []
+                row_count = self._int_or_none(data.get("row_count")) or len(rows)
+            elif isinstance(data, list):
+                rows = data
+                row_count = len(rows)
+            else:
+                rows = []
+                row_count = 0
             columns = self._normalize_columns(finance_result.get("columns"), rows=rows)
             return self._table_payload(
                 columns=columns,
                 rows=[row for row in rows if isinstance(row, Mapping)],
-                row_count=self._int_or_none(data.get("row_count")) or len(rows),
+                row_count=row_count,
                 local_alias=str(finance_result.get("name") or ""),
             )
 
@@ -407,6 +493,9 @@ class SessionVariableStoreService:
         if not safe:
             digest = hashlib.sha256(raw.encode("utf-8")).hexdigest()[:12]
             safe = f"{prefix}_{digest}"
+        elif safe != raw:
+            digest = hashlib.sha256(raw.encode("utf-8")).hexdigest()[:12]
+            safe = f"{safe[:60]}_{digest}"
         if len(safe) > 80:
             digest = hashlib.sha256(raw.encode("utf-8")).hexdigest()[:12]
             safe = f"{safe[:60]}_{digest}"

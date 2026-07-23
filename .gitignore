@@ -222,6 +222,12 @@ __marimo__/
 ._*
 
 # Local agent runtime state
+.vite/
+outputs/
+data/agent_runtime_context/
+data/agent_runtime_context_probe/
+data/agent_sessions/
+data/finance_cc_sessions/
 data/assistant_uploads/
 data/custom_tool_context/
 data/custom_tools/

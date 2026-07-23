@@ -13,33 +13,28 @@ const data = {
   subject_revision: 4,
   questions: [
     {
-      id: "Q1",
       question: "计算周期是什么？",
-      options: [
-        { value: "20d", label: "20 个交易日" },
-        { value: "30d", label: "30 个交易日", recommended: true },
-      ],
+      candidate: ["30 个交易日", "20 个交易日"],
     },
     {
-      id: "Q2",
       question: "金额口径如何处理？",
-      options: [{ value: "api", label: "按数据接口口径" }],
+      candidate: ["按数据接口口径"],
     },
   ],
 };
 
 describe("interaction draft", () => {
-  it("preselects recommended options and falls back to the first option", () => {
+  it("preselects the first candidate as the default", () => {
     const draft = createInteractionDraft(data);
-    expect(draft.answers.Q1).toMatchObject({ value: "30d", label: "30 个交易日", mode: "option" });
-    expect(draft.answers.Q2).toMatchObject({ value: "api", label: "按数据接口口径" });
+    expect(draft.answers.Q1).toMatchObject({ value: "30 个交易日", label: "30 个交易日", mode: "option" });
+    expect(draft.answers.Q2).toMatchObject({ value: "按数据接口口径", label: "按数据接口口径" });
   });
 
   it("keeps ordinary option selections in frontend state only", () => {
     const draft = createInteractionDraft(data);
     const question = data.questions[0];
-    const changed = selectInteractionAnswer(draft, question, question.options[0]);
-    expect(changed.answers.Q1.value).toBe("20d");
+    const changed = selectInteractionAnswer(draft, question, { value: "20 个交易日", label: "20 个交易日" });
+    expect(changed.answers.Q1.value).toBe("20 个交易日");
     expect(changed.answers.Q1.label).toBe("20 个交易日");
   });
 
@@ -71,9 +66,8 @@ describe("interaction draft", () => {
     const result = prepareClarificationSubmission(custom, "关于「金额口径如何处理？」，我希望：请由系统查询数据接口定义");
     expect(result.missing).toEqual([]);
     expect(result.response.answers?.[1]).toMatchObject({
-      question_id: "Q2",
-      value: "请由系统查询数据接口定义",
-      mode: "custom",
+      question: "金额口径如何处理？",
+      answer: "请由系统查询数据接口定义",
     });
   });
 });

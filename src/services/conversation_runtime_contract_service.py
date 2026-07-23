@@ -19,7 +19,6 @@ class ConversationRuntimeContractService:
                 "context_resolution",
                 "interaction_preprocess",
                 "conversation_task_finalization",
-                "conversation_state_update",
             ],
         },
         {
@@ -65,9 +64,6 @@ class ConversationRuntimeContractService:
         selected_agent: str,
         dispatch_plan: Dict[str, Any],
         execution_plan_preview: Dict[str, Any],
-        interaction_frame: Dict[str, Any],
-        conversation_state: Dict[str, Any],
-        context_write_policy: Dict[str, Any],
         thread_context_patch_preview: Dict[str, Any],
     ) -> Dict[str, Any]:
         node_results = [
@@ -127,24 +123,6 @@ class ConversationRuntimeContractService:
                 },
             ),
             self._node(
-                node="conversation_state_update",
-                status="completed",
-                output={
-                    "interaction_mode": self._trim(interaction_frame.get("interaction_mode")),
-                    "active_focus_type": self._trim(interaction_frame.get("active_focus_type")),
-                    "active_focus_id": self._trim(interaction_frame.get("active_focus_id")),
-                    "conversation_state": self._trim(conversation_state.get("state")),
-                    "has_write_policy": bool(context_write_policy),
-                },
-                trace={
-                    "source": "derived",
-                    "reason": self._trim(conversation_state.get("reason")) or "derived_from_interaction_frame_and_dispatch",
-                    "confidence": None,
-                    "input_refs": ["interaction_frame", "dispatch_plan", "execution_plan_preview"],
-                    "output_refs": ["conversation_state", "context_write_policy", "thread_context_patch_preview"],
-                },
-            ),
-            self._node(
                 node="dispatch_planning",
                 status="completed",
                 output={
@@ -200,7 +178,7 @@ class ConversationRuntimeContractService:
                     "source": "not_started_in_preprocess",
                     "reason": "final observation, presentation, and durable writeback happen after execution",
                     "confidence": None,
-                    "input_refs": ["runtime_result", "context_write_policy"],
+                    "input_refs": ["runtime_result"],
                     "output_refs": ["answer", "presentation_blocks", "thread_context_patch"],
                 },
             ),
@@ -209,7 +187,6 @@ class ConversationRuntimeContractService:
             "context_resolution",
             "interaction_preprocess",
             "conversation_task_finalization",
-            "conversation_state_update",
             "dispatch_planning",
             "agent_runtime_planning",
             "runtime_execute",

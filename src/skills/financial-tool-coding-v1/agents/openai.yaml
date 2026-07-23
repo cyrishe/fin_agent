@@ -1,4 +1,0 @@
-interface:
-  display_name: "金融工具动态实现"
-  short_description: "Build tested database-backed tool modules"
-  default_prompt: "根据已确认的金融工具设计生成数据库代码模块和测试方案。"

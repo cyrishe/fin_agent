@@ -1,92 +1,94 @@
+import json
 from pathlib import Path
 
 import pytest
 
-from src.services.agent_runtime_llm_planner_service import AgentRuntimeLLMPlannerService
-from src.services.assistant_dispatch_planner import AssistantDispatchPlanner
-from src.services.capability_search_service import CapabilitySearchService
+from src.services.custom_tool_context_bundle_service import CustomToolContextBundleService
 from src.services.custom_tool_service import (
     CustomToolAgentService,
-    CustomToolDesigner,
     CustomToolRuntimeService,
     CustomToolStoreService,
 )
-from src.services.custom_tool_context_bundle_service import CustomToolContextBundleService
-from src.services.codex_exec_skill_harness import CodexExecSkillHarness, CodexSdkSkillHarness
-from src.services.llm_stream_block_service import LlmStreamBlockBuilder
 from src.services.python_execution_runtime import PythonExecutionRuntime
-from src.services.tool_runtime_preflight_service import ToolRuntimePreflightService
-from src.tools import registry as tool_registry
 
 
-class _MomentumDesigner:
-    def design(self, requirement_text):
+class _Designer:
+    def design(self, requirement_text, context=None, event_sink=None):
         return {
-            "status": "ok",
-            "design": {
-                "manifest": {
-                    "tool_name": "ct_test_momentum",
-                    "display_name": "测试动量",
-                    "description": "测试用动量工具",
-                    "visibility": "personal",
-                    "capabilities": ["custom_tool", "momentum"],
-                    "implementation_logic": "按 value 降序输出。",
-                    "runtime": {"kind": "python_sandbox", "backend": "local_dev", "timeout_ms": 2000},
-                },
-                "input_schema": {
-                    "type": "object",
-                    "required": ["rows"],
-                    "properties": {
-                        "rows": {"type": "array"},
-                        "top_n": {"type": "integer"},
-                    },
-                    "additionalProperties": False,
-                },
-                "output_schema": {"type": "object", "properties": {"items": {"type": "array"}}},
-                "code": """
-def run(inputs: dict) -> dict:
-    rows = inputs.get("rows") or []
-    top_n = int(inputs.get("top_n") or 10)
-    items = sorted(rows, key=lambda item: item.get("value", 0), reverse=True)
-    return {"items": items[:top_n]}
-""",
-                "sample_input": {"top_n": 1, "rows": [{"code": "A", "value": 2}, {"code": "B", "value": 1}]},
-            },
-        }
-
-
-class _ContractDesigner:
-    def design(self, requirement_text, context=None):
-        return {
-            "status": "design_ready",
-            "message": "设计已生成",
+            "ok": True,
+            "message": "模块和流程已经形成。",
+            "understanding": {"goal": "计算数字之和"},
+            "questions": [],
             "design": {
                 "tool_name": "sum_values",
                 "display_name": "求和工具",
                 "description": "对输入数组求和。",
                 "inputs": [
-                    {"name": "values", "type": "array", "required": True, "description": "数字数组"},
+                    {
+                        "name": "values",
+                        "label": "数字数组",
+                        "type": "array",
+                        "required": True,
+                        "description": "待求和的数字。",
+                    }
                 ],
                 "outputs": [
-                    {"name": "total", "type": "number", "description": "求和结果"},
+                    {
+                        "name": "total",
+                        "label": "合计",
+                        "type": "number",
+                        "required": True,
+                        "description": "求和结果。",
+                    }
                 ],
-                "logic": ["读取 values", "计算求和", "返回 total"],
+                "process": [],
+                "modules": [],
+                "rules": [],
+                "data_requirements": [],
+                "exceptions": [],
+                "acceptance": [],
+                "flow": {"steps": [], "links": []},
             },
-            "events": [{"source": "model", "type": "analysis", "content": "设计可实现"}],
+            "existing_analysis": {},
+            "events": [],
         }
 
 
-class _ContractCoder:
-    def code(self, design, *, requirement_text="", context=None):
+class _Coder:
+    def __init__(self, *, failures=0):
+        self.failures = failures
+        self.contexts = []
+
+    def code(self, design, *, requirement_text="", context=None, event_sink=None):
+        self.contexts.append(dict(context or {}))
+        source = (
+            "def run(inputs: dict) -> dict:\n    return {'wrong': 1}\n"
+            if len(self.contexts) <= self.failures
+            else "def run(inputs: dict) -> dict:\n    return {'total': sum(inputs.get('values') or [])}\n"
+        )
         return {
-            "status": "code_ready",
-            "message": "代码已生成",
-            "events": [{"source": "model", "type": "code_plan", "content": "生成 run 入口"}],
+            "ok": True,
+            "message": "代码已生成。",
+            "events": [],
             "final": {
-                "source": "model",
-                "type": "final",
-                "status": "code_ready",
-                "message": "代码已生成",
+                "message": "代码已生成。",
+                "tool_contract": {
+                    "tool_name": "sum_values",
+                    "display_name": "求和工具",
+                    "description": "对输入数组求和。",
+                    "inputs": [{
+                        "name": "values",
+                        "type": "array",
+                        "required": True,
+                        "description": "待求和的数字。",
+                    }],
+                    "outputs": [{
+                        "name": "total",
+                        "type": "number",
+                        "required": True,
+                        "description": "求和结果。",
+                    }],
+                },
                 "implementation": {
                     "summary": "实现求和工具。",
                     "entry_module": "main",
@@ -95,46 +97,41 @@ class _ContractCoder:
                         "role": "动态执行入口",
                         "language": "python",
                         "entrypoint": "run",
-                        "functions": [{"name": "run", "responsibility": "计算并返回求和结果。"}],
-                        "source_code": """
-def run(inputs: dict) -> dict:
-    values = inputs.get("values") or []
-    return {"total": sum(values)}
-""",
+                        "functions": [{"name": "run", "responsibility": "计算求和。"}],
+                        "source_code": source,
                     }],
                 },
-                "tests": [{
-                    "test_id": "basic_sum",
-                    "category": "happy_path",
-                    "status": "proposed",
-                    "input_json": "{\"values\":[1,2,3]}",
-                    "expected_json": "{\"total\":6}",
-                    "purpose": "验证基础求和。",
-                }],
-                "sample_input_json": "{\"values\":[1,2,3]}",
-                "implementation_notes": ["使用 Python sum"],
-                "design_issues": [],
-                "risks": [],
+                "implementation_explanation": {
+                    "summary": "读取数组并返回合计。",
+                    "core_flow": ["读取 values", "计算合计", "返回 total"],
+                    "key_modules": ["run：动态执行入口"],
+                },
+                "implementation_review": {
+                    "conclusion": "matches",
+                    "requirement_alignment": ["实现求和目标"],
+                    "design_alignment": ["输入输出与设计一致"],
+                    "deviations": [],
+                },
+                "technical_summary": {
+                    "status": "complete",
+                    "conclusion": "代码正常执行。",
+                    "verified": ["动态入口可执行"],
+                    "unresolved": [],
+                },
+                "tests": [],
+                "sample_input_json": '{"values":[1,2,3]}',
+                "implementation_notes": [],
+                "issues": [],
             },
         }
 
 
-class _FailedCoder:
-    def code(self, design, *, requirement_text="", context=None):
-        return {
-            "status": "coding_failed",
-            "message": "实现未完成：结构化输出 Schema 不符合严格格式要求。 当前设计已保留，可以重试。",
-            "error": {
-                "code": "coding_schema_invalid",
-                "summary": "结构化输出 Schema 不符合严格格式要求。",
-            },
-            "events": [],
-        }
-
-
-class _CustomToolEmbeddingStub:
-    def score(self, query, documents):
-        return [1.0 if "个人求和工具" in str(document) else 0.0 for document in documents]
+def _runtime(store: CustomToolStoreService, tmp_path: Path) -> CustomToolRuntimeService:
+    return CustomToolRuntimeService(
+        store=store,
+        python_runtime=PythonExecutionRuntime(allow_unsafe_backends=True),
+        runtime_root=str(tmp_path / "runtime"),
+    )
 
 
 def _save_active_sum_tool(store: CustomToolStoreService, *, owner_id: str = "user_a") -> None:
@@ -143,634 +140,8 @@ def _save_active_sum_tool(store: CustomToolStoreService, *, owner_id: str = "use
             "manifest": {
                 "tool_name": "ct_personal_sum",
                 "display_name": "个人求和工具",
-                "description": "个人求和工具，计算输入数字之和。",
+                "description": "计算输入数字之和。",
                 "visibility": "personal",
-                "capabilities": ["custom_tool"],
-                "runtime": {"kind": "python_sandbox", "backend": "local_dev", "timeout_ms": 2000},
-            },
-            "input_schema": {
-                "type": "object",
-                "required": ["values"],
-                "properties": {"values": {"type": "array", "description": "数字数组"}},
-                "additionalProperties": False,
-            },
-            "output_schema": {
-                "type": "object",
-                "properties": {"total": {"type": "number", "description": "合计"}},
-            },
-            "code": "def run(inputs: dict) -> dict:\n    return {'total': sum(inputs.get('values') or [])}\n",
-        },
-        owner_id=owner_id,
-    )
-    store.record_test("ct_personal_sum", {"ok": True})
-    store.commit("ct_personal_sum", owner_ids=[owner_id])
-
-
-def test_default_custom_tool_designer_does_not_domain_match_momentum():
-    result = CustomToolDesigner().design("我想做一个个股动量工具")
-
-    assert result["status"] == "need_more_info"
-    assert "默认 designer 不做领域硬匹配" in result["message"]
-
-
-def test_active_custom_tool_reference_routes_without_pseudo_agent():
-    planner = AssistantDispatchPlanner()
-
-    result = planner.plan_free_chat(
-        text="确认实现",
-        attachments=[],
-        thread_context={
-            "custom_tool_state": {
-                "status": "awaiting_design_confirmation",
-                "tool_name": "ct_personal_sum",
-            },
-            "_custom_tool_owner_ids": ["user_a", "101"],
-        },
-        application_context={},
-    )
-
-    assert result["entry"] == "custom_tool_flow"
-    assert result["planning_scope"] == "top_level_dispatch"
-    assert result["selected_agent"] == "default_assistant"
-    assert result["turn_mode"] == "tool_development"
-    assert result["execution_plan"] == {}
-
-
-def test_published_custom_tool_is_retrievable_only_for_owner(tmp_path: Path):
-    store = CustomToolStoreService(root_dir=str(tmp_path / "custom_tools"))
-    _save_active_sum_tool(store)
-    service = CapabilitySearchService(
-        custom_tool_store_service=store,
-        embedding_service=_CustomToolEmbeddingStub(),
-    )
-
-    owner_result = service.find_for_agent_runtime(
-        query="使用个人求和工具",
-        work_context={"_custom_tool_owner_ids": ["user_a"]},
-        application_context={"execution_agent": {"tools": ["stock_realtime_quote"]}},
-        tool_top_k=16,
-    )
-    other_result = service.find_for_agent_runtime(
-        query="使用个人求和工具",
-        work_context={"_custom_tool_owner_ids": ["user_b"]},
-        application_context={"execution_agent": {"tools": ["stock_realtime_quote"]}},
-        tool_top_k=16,
-    )
-
-    owner_tool = next(item for item in owner_result["planner_tools"] if item["tool_name"] == "ct_personal_sum")
-    assert owner_tool["required_inputs"] == ["values"]
-    assert owner_tool["output_fields"] == ["data.total"]
-    assert "ct_personal_sum" not in [item["tool_name"] for item in other_result["planner_tools"]]
-
-
-def test_planner_loads_custom_tool_input_and_output_schema(tmp_path: Path):
-    store = CustomToolStoreService(root_dir=str(tmp_path / "custom_tools"))
-    _save_active_sum_tool(store)
-    planner = AgentRuntimeLLMPlannerService(custom_tool_store_service=store)
-
-    input_fields = planner._load_tool_input_schema_fields("ct_personal_sum")
-    output_fields = planner._load_tool_output_schema_fields("ct_personal_sum")
-
-    assert input_fields[0]["name"] == "values"
-    assert input_fields[0]["required"] is True
-    assert output_fields[0]["name"] == "data.total"
-
-
-def test_custom_tool_preflight_enforces_active_owner_and_schema(tmp_path: Path):
-    store = CustomToolStoreService(root_dir=str(tmp_path / "custom_tools"))
-    _save_active_sum_tool(store)
-    preflight = ToolRuntimePreflightService(custom_tool_store_service=store)
-
-    allowed = preflight.validate_tool_call(
-        tool_name="ct_personal_sum",
-        arguments={"values": [1, 2]},
-        custom_tool_owner_ids=["user_a"],
-    )
-    denied = preflight.validate_tool_call(
-        tool_name="ct_personal_sum",
-        arguments={"values": [1, 2]},
-        custom_tool_owner_ids=["user_b"],
-    )
-
-    assert allowed["ok"] is True
-    assert denied["ok"] is False
-    assert denied["reason"] == "custom_tool_unavailable"
-
-
-def test_custom_tool_registry_runtime_requires_active_owner(tmp_path: Path, monkeypatch):
-    store = CustomToolStoreService(root_dir=str(tmp_path / "custom_tools"))
-    runtime = CustomToolRuntimeService(
-        store=store,
-        python_runtime=PythonExecutionRuntime(allow_unsafe_backends=True),
-        runtime_root=str(tmp_path / "runtime"),
-    )
-    _save_active_sum_tool(store)
-    monkeypatch.setattr(tool_registry, "CustomToolStoreService", lambda: store)
-    monkeypatch.setattr(tool_registry, "CustomToolRuntimeService", lambda: runtime)
-
-    allowed = tool_registry.run_tool(
-        "ct_personal_sum",
-        {"values": [2, 3]},
-        runtime_ctx={"custom_tool_owner_ids": ["user_a"]},
-    )
-    denied = tool_registry.run_tool(
-        "ct_personal_sum",
-        {"values": [2, 3]},
-        runtime_ctx={"custom_tool_owner_ids": ["user_b"]},
-    )
-
-    assert allowed["ok"] is True
-    assert allowed["data"]["total"] == 5
-    assert denied["ok"] is False
-    assert denied["meta"]["failure_kind"] == "permission_or_lifecycle_error"
-
-
-def test_custom_tool_commit_rejects_other_owner(tmp_path: Path):
-    store = CustomToolStoreService(root_dir=str(tmp_path / "custom_tools"))
-    _save_active_sum_tool(store)
-
-    with pytest.raises(Exception, match="not visible"):
-        store.commit("ct_personal_sum", owner_ids=["user_b"])
-
-
-def test_custom_tool_publication_is_separate_from_activation(tmp_path: Path):
-    store = CustomToolStoreService(root_dir=str(tmp_path / "custom_tools"))
-    _save_active_sum_tool(store)
-
-    assert store.load("ct_personal_sum")["manifest"]["visibility"] == "personal"
-    with pytest.raises(Exception, match="custom_tool:publish permission"):
-        store.publish("ct_personal_sum", owner_ids=["user_a"], actor_id="admin")
-
-    published = store.publish(
-        "ct_personal_sum",
-        owner_ids=["user_a"],
-        actor_id="admin",
-        actor_scopes=["custom_tool:publish"],
-    )
-    assert published["manifest"]["visibility"] == "public"
-    assert published["manifest"]["published_by"] == "admin"
-
-
-def test_custom_tool_agent_create_confirm_test_commit_with_injected_designer(tmp_path: Path):
-    store = CustomToolStoreService(root_dir=str(tmp_path / "custom_tools"))
-    runtime = CustomToolRuntimeService(
-        store=store,
-        python_runtime=PythonExecutionRuntime(allow_unsafe_backends=True),
-        runtime_root=str(tmp_path / "runtime"),
-    )
-    agent = CustomToolAgentService(store=store, designer=_MomentumDesigner(), runtime=runtime)
-
-    design = agent.start_create("创建测试动量工具", owner_id="user_a")
-    assert design["state"]["status"] == "awaiting_design_confirmation"
-
-    drafted = agent.continue_flow("确认实现", state=design["state"], owner_id="user_a")
-    assert drafted["state"]["status"] == "draft_ready"
-    assert drafted["test_result"]["ok"] is True
-
-    call_result = agent.call(
-        "ct_test_momentum",
-        {"top_n": 1, "rows": [{"code": "A", "value": 3}, {"code": "B", "value": 5}]},
-    )
-    assert call_result["ok"] is True
-    assert call_result["data"]["items"][0]["code"] == "B"
-
-    committed = agent.commit("ct_test_momentum")
-    assert committed["manifest"]["status"] == "active"
-    assert store.list_tools()[0]["tool_name"] == "ct_test_momentum"
-
-
-def test_custom_tool_agent_design_contract_coding_commit_with_injected_coder(tmp_path: Path):
-    store = CustomToolStoreService(root_dir=str(tmp_path / "custom_tools"))
-    runtime = CustomToolRuntimeService(
-        store=store,
-        python_runtime=PythonExecutionRuntime(allow_unsafe_backends=True),
-        runtime_root=str(tmp_path / "runtime"),
-    )
-    agent = CustomToolAgentService(
-        store=store,
-        designer=_ContractDesigner(),
-        coder=_ContractCoder(),
-        runtime=runtime,
-        use_codex=False,
-    )
-
-    design = agent.start_create("创建求和工具", owner_id="user_a")
-    assert design["state"]["status"] == "awaiting_design_confirmation"
-    assert design["state"]["design_contract"]["tool_name"] == "sum_values"
-
-    drafted = agent.continue_flow_action(
-        "custom_tool.confirm_design",
-        state=design["state"],
-        expected_revision=design["state"]["design_revision"],
-        owner_id="user_a",
-    )
-    assert drafted["state"]["status"] == "draft_ready"
-    assert drafted["test_result"]["ok"] is True
-    assert drafted["test_result"]["data"]["total"] == 6
-
-    call_result = agent.call("ct_sum_values", {"values": [4, 5]})
-    assert call_result["ok"] is True
-    assert call_result["data"]["total"] == 9
-
-    activated = agent.continue_flow_action(
-        "custom_tool.activate_draft",
-        state=drafted["state"],
-        expected_revision=drafted["state"]["implementation_revision"],
-        owner_id="user_a",
-    )
-    assert activated["tool"]["manifest"]["status"] == "active"
-    assert activated["state"] == {}
-    assert activated["thread_context_patch"] == {"custom_tool_state": None}
-
-
-def test_custom_tool_structured_action_rejects_unknown_action_and_state() -> None:
-    agent = CustomToolAgentService(use_codex=False)
-
-    assert agent.interaction_user_text("custom_tool.confirm_design") == "确认并继续"
-    with pytest.raises(Exception, match="unknown custom tool action"):
-        agent.interaction_user_text("custom_tool.run_arbitrary_command")
-    with pytest.raises(Exception, match="is not allowed"):
-        agent.continue_flow_action(
-            "custom_tool.confirm_design",
-            state={"status": "collect_requirement"},
-            owner_id="user_a",
-        )
-
-
-def test_custom_tool_agent_propagates_safe_coding_failure_reason(tmp_path: Path) -> None:
-    store = CustomToolStoreService(root_dir=str(tmp_path / "custom_tools"))
-    agent = CustomToolAgentService(store=store, coder=_FailedCoder(), use_codex=False)
-    state = {
-        "status": "awaiting_design_confirmation",
-        "owner_id": "user_a",
-        "requirement_text": "创建求和工具",
-        "design_revision": 1,
-        "design_contract": {
-            "tool_name": "sum_values",
-            "display_name": "求和工具",
-            "inputs": [],
-            "outputs": [],
-        },
-    }
-
-    result = agent.continue_flow_action(
-        "custom_tool.confirm_design",
-        state=state,
-        expected_revision=1,
-        owner_id="user_a",
-    )
-
-    assert result["coding_status"] == "coding_failed"
-    assert result["coding_error"] == {
-        "code": "coding_schema_invalid",
-        "summary": "结构化输出 Schema 不符合严格格式要求。",
-    }
-    assert result["state"]["coding_error"] == result["coding_error"]
-
-
-def test_custom_tool_structured_action_rejects_stale_design_revision() -> None:
-    agent = CustomToolAgentService(use_codex=False)
-
-    with pytest.raises(Exception, match="design revision changed"):
-        agent.continue_flow_action(
-            "custom_tool.confirm_design",
-            state={"status": "awaiting_design_confirmation", "design_revision": 3},
-            expected_revision=2,
-            owner_id="user_a",
-        )
-
-
-def test_custom_tool_agent_sample_input_supports_sdk_json_string():
-    sample = CustomToolAgentService._sample_input({"sample_input_json": "{\"text\":\"abc\"}", "tests": []})
-
-    assert sample == {"text": "abc"}
-
-
-def test_business_error_payload_cannot_pass_tool_activation_gate(tmp_path: Path):
-    store = CustomToolStoreService(root_dir=str(tmp_path / "custom_tools"))
-    runtime = CustomToolRuntimeService(
-        store=store,
-        python_runtime=PythonExecutionRuntime(allow_unsafe_backends=True),
-        runtime_root=str(tmp_path / "runtime"),
-    )
-    agent = CustomToolAgentService(store=store, runtime=runtime, use_codex=False)
-    result = agent._save_test_and_return({
-        "manifest": {
-            "tool_name": "ct_business_error",
-            "display_name": "业务错误工具",
-            "description": "用于验证测试门禁。",
-            "visibility": "personal",
-            "runtime": {"backend": "local_dev", "timeout_ms": 2000},
-        },
-        "input_schema": {"type": "object", "properties": {}, "additionalProperties": False},
-        "output_schema": {
-            "type": "object",
-            "properties": {"error": {"type": "object"}},
-            "additionalProperties": False,
-        },
-        "code": "def run(inputs: dict) -> dict:\n    return {'error': {'code': 'DATA_QUERY_FAILED'}}\n",
-        "sample_input": {},
-        "proposed_tests": [],
-    }, owner_id="user_a")
-
-    assert result["test_result"]["ok"] is True
-    assert result["test_result"]["execution_ok"] is True
-    assert result["test_result"]["contract_ok"] is True
-    assert result["test_result"]["business_ok"] is False
-    assert result["test_result"]["gate_passed"] is False
-    assert result["state"]["status"] == "draft_needs_test"
-    with pytest.raises(Exception, match="must pass"):
-        store.commit("ct_business_error", owner_ids=["user_a"])
-
-
-def test_custom_tool_sdk_normalizes_nested_finance_provider_rows(tmp_path: Path):
-    store = CustomToolStoreService(root_dir=str(tmp_path / "custom_tools"))
-    store.save_draft({
-        "manifest": {
-            "tool_name": "ct_finance_envelope",
-            "display_name": "金融响应规范化",
-            "description": "验证 SDK 稳定响应。",
-            "visibility": "personal",
-            "runtime": {"backend": "local_dev", "timeout_ms": 2000},
-        },
-        "input_schema": {"type": "object", "properties": {}, "additionalProperties": False},
-        "output_schema": {
-            "type": "object",
-            "properties": {
-                "query_ok": {"type": "boolean"},
-                "row_count": {"type": "integer"},
-                "first_code": {"type": "string"},
-            },
-            "required": ["query_ok", "row_count", "first_code"],
-            "additionalProperties": False,
-        },
-        "code": (
-            "from custom_tool_sdk import finance_query\n"
-            "def run(inputs: dict) -> dict:\n"
-            "    result = finance_query('r1 = stock.quote() -> code')\n"
-            "    rows = result.get('data') or []\n"
-            "    return {'query_ok': result.get('ok') is True, 'row_count': len(rows), 'first_code': rows[0]['code']}\n"
-        ),
-    }, owner_id="user_a")
-    fixture = {
-        "protocol": "finance_data_tool.v1",
-        "validation": {"ok": True, "errors": [], "warnings": []},
-        "result": {
-            "columns": ["code"],
-            "data": {"status": "ok", "rows": [{"code": "600519.SH"}], "row_count": 1},
-        },
-    }
-    runtime = CustomToolRuntimeService(
-        store=store,
-        python_runtime=PythonExecutionRuntime(allow_unsafe_backends=True),
-        runtime_root=str(tmp_path / "runtime"),
-        finance_query_fixture=fixture,
-    )
-
-    result = runtime.run("ct_finance_envelope", {}, owner_ids=["user_a"], allow_inactive=True)
-
-    assert result["ok"] is True
-    assert result["data"] == {"query_ok": True, "row_count": 1, "first_code": "600519.SH"}
-
-
-def test_file_store_preserves_confirmed_design_for_runtime_api_allowlist(tmp_path: Path):
-    store = CustomToolStoreService(root_dir=str(tmp_path / "custom_tools"))
-    store.save_draft({
-        "manifest": {
-            "tool_name": "ct_design_contract",
-            "display_name": "设计契约持久化",
-            "description": "验证文件型测试存储与数据库存储一致。",
-            "visibility": "personal",
-        },
-        "input_schema": {"type": "object", "properties": {}, "additionalProperties": False},
-        "output_schema": {"type": "object", "properties": {}, "additionalProperties": False},
-        "code": "def run(inputs: dict) -> dict:\n    return {}\n",
-        "sample_input": {},
-        "modules": [{"module_id": "main", "entrypoint": "run"}],
-        "proposed_tests": [{"test_id": "smoke"}],
-        "design_contract": {"data_requirements": [{"source_ref": "stock.quote"}]},
-        "design_provenance": {"artifact_id": "design-1", "revision": 2},
-        "design_feedback_evidence": [{"feedback_id": "f1"}],
-    }, owner_id="user_a")
-
-    bundle = store.load_for_runtime(
-        "ct_design_contract",
-        owner_ids=["user_a"],
-        allow_inactive=True,
-    )
-
-    assert bundle["design_contract"] == {"data_requirements": [{"source_ref": "stock.quote"}]}
-    assert bundle["design_provenance"] == {"artifact_id": "design-1", "revision": 2}
-    assert bundle["design_feedback_evidence"] == [{"feedback_id": "f1"}]
-    assert bundle["modules"] == [{"module_id": "main", "entrypoint": "run"}]
-    assert bundle["proposed_tests"] == [{"test_id": "smoke"}]
-
-
-def test_custom_tool_finance_query_runs_through_host_bridge_without_secrets(tmp_path: Path, monkeypatch) -> None:
-    store = CustomToolStoreService(root_dir=str(tmp_path / "custom_tools"))
-    store.save_draft({
-        "manifest": {
-            "tool_name": "ct_finance_bridge",
-            "display_name": "宿主金融 API 桥",
-            "description": "验证沙箱只提交 API 请求。",
-            "visibility": "personal",
-            "runtime": {"backend": "local_dev", "timeout_ms": 2000},
-        },
-        "input_schema": {"type": "object", "properties": {}, "additionalProperties": False},
-        "output_schema": {
-            "type": "object",
-            "properties": {"value": {"type": "string"}},
-            "required": ["value"],
-            "additionalProperties": False,
-        },
-        "code": (
-            "from custom_tool_sdk import finance_query\n"
-            "def run(inputs: dict) -> dict:\n"
-            "    result = finance_query('r1 = stock.quote(filter = \\\"code = 600519.SH\\\") -> code')\n"
-            "    return {'value': (result.get('data') or [{}])[0].get('code', '')}\n"
-        ),
-        "design_contract": {
-            "data_requirements": [{"source_ref": "stock.quote"}],
-        },
-    }, owner_id="user_a")
-
-    def execute_request(self, *, request, previous_results=None):
-        assert request.startswith("r1 = stock.quote")
-        return {
-            "validation": {"ok": True, "errors": [], "warnings": []},
-            "result": {"columns": ["code"], "data": {"rows": [{"code": "600519.SH"}]}},
-        }
-
-    monkeypatch.setattr(
-        "src.services.finance_data_tool_runtime_service.FinanceDataToolRuntimeService.execute_request",
-        execute_request,
-    )
-    runtime = CustomToolRuntimeService(
-        store=store,
-        python_runtime=PythonExecutionRuntime(allow_unsafe_backends=True),
-        runtime_root=str(tmp_path / "runtime"),
-    )
-
-    result = runtime.run("ct_finance_bridge", {}, owner_ids=["user_a"], allow_inactive=True)
-
-    assert result["ok"] is True
-    assert result["data"] == {"value": "600519.SH"}
-    assert result["meta"]["diagnostics"]["finance_query_count"] == 1
-    assert result["meta"]["diagnostics"]["finance_bridge_rounds"] == 1
-    assert result["meta"]["diagnostics"]["attempt"] == 2
-
-
-def test_codex_exec_skill_harness_extracts_model_final_events():
-    harness = CodexExecSkillHarness()
-    text = """
-{"source":"model","type":"analysis","content":"阶段分析"}
-{"source":"model","type":"final","status":"design_ready","design":{"tool_name":"demo"}}
-"""
-    events = harness._extract_model_events(text)
-    final = harness._find_final(events)
-
-    assert events[0]["type"] == "analysis"
-    assert final["status"] == "design_ready"
-    assert final["design"]["tool_name"] == "demo"
-
-
-def test_codex_harness_uses_separate_idle_and_hard_timeouts():
-    harness = CodexExecSkillHarness(timeout_seconds=30, hard_timeout_seconds=600)
-
-    assert harness.timeout_seconds == 30
-    assert harness.hard_timeout_seconds == 600
-
-
-def test_custom_tool_state_context_omits_stream_payloads():
-    compact = CustomToolAgentService._clean_state_for_context(
-        {
-            "status": "awaiting_design_confirmation",
-            "tool_name": "demo",
-            "events": [{"type": "analysis", "content": "large"}],
-            "raw_stdout": "large",
-        }
-    )
-
-    assert compact == {"status": "awaiting_design_confirmation", "tool_name": "demo"}
-
-
-def test_codex_sdk_skill_harness_extracts_structured_final_json():
-    harness = CodexSdkSkillHarness()
-
-    final = harness._final_from_text('{"status":"design_ready","design":{"tool_name":"demo"}}')
-
-    assert final["source"] == "model"
-    assert final["type"] == "final"
-    assert final["status"] == "design_ready"
-    assert final["design"]["tool_name"] == "demo"
-
-
-def test_codex_sdk_skill_harness_normalizes_delta_notification():
-    class Payload:
-        delta = "阶段输出"
-
-    class Event:
-        method = "item/agentMessage/delta"
-        payload = Payload()
-
-    events = CodexSdkSkillHarness()._normalize_sdk_notification(Event())
-
-    assert events == [{"source": "codex", "type": "agent_delta", "content": "阶段输出"}]
-
-
-def test_codex_sdk_events_keep_the_active_stage_for_progress_rendering():
-    events = CodexSdkSkillHarness._attach_stage(
-        [{"source": "codex", "type": "reasoning_summary_delta", "content": "planning"}],
-        "coding",
-    )
-
-    assert events[0]["metadata"] == {"stage": "coding"}
-    block = LlmStreamBlockBuilder(run_id="coding_stage").event_to_blocks(events[0])[0]
-    assert block["block_id"] == "coding_live_progress"
-    assert block["title"] == "实现进展"
-
-
-def test_custom_tool_context_bundle_builds_api_catalog_files(tmp_path: Path):
-    catalog = tmp_path / "catalog.json"
-    catalog.write_text(
-        """
-{
-  "version": "test",
-  "api_class_patterns": {"basic_query": {"call_pattern": "r{id} = subject.dataview(...)"}},
-  "subjects": {
-    "stock": {
-      "_meta": {"desc": "股票主体", "rules": []},
-      "quote": {
-        "desc": "行情",
-        "fields": {"code": {"desc": "代码"}, "pct": {"desc": "涨跌幅"}},
-        "api": [{"api_name": "stock.quote", "api_class": "basic_query"}]
-      }
-    }
-  }
-}
-""",
-        encoding="utf-8",
-    )
-    service = CustomToolContextBundleService(catalog_path=str(catalog), root_dir=str(tmp_path / "context"))
-
-    bundle = service.build(stage="coding", user_request="测试", context={"x": 1}, run_id="case_a")
-
-    bundle_dir = Path(bundle["bundle_dir"])
-    assert (bundle_dir / "api_catalog" / "index.json").exists()
-    stock = (bundle_dir / "api_catalog" / "subjects" / "stock.json").read_text(encoding="utf-8")
-    assert "stock.quote" in stock
-    assert (bundle_dir / "custom_tool_sdk.md").exists()
-
-
-def test_custom_tool_runtime_injects_custom_tool_sdk(tmp_path: Path):
-    store = CustomToolStoreService(root_dir=str(tmp_path / "custom_tools"))
-    runtime = CustomToolRuntimeService(
-        store=store,
-        python_runtime=PythonExecutionRuntime(allow_unsafe_backends=True),
-        runtime_root=str(tmp_path / "runtime"),
-    )
-    store.save_draft(
-        {
-            "manifest": {
-                "tool_name": "ct_sdk_probe",
-                "display_name": "SDK 探针",
-                "description": "测试 SDK 注入",
-                "implementation_logic": "调用 custom_tool_sdk.web_search",
-                "runtime": {"kind": "python_sandbox", "backend": "local_dev", "timeout_ms": 2000},
-            },
-            "input_schema": {"type": "object", "properties": {}},
-            "output_schema": {"type": "object", "properties": {"ok": {"type": "boolean"}}},
-            "code": """
-def run(inputs: dict) -> dict:
-    from custom_tool_sdk import web_search
-    result = web_search("测试")
-    return {"sdk_ok": isinstance(result, dict), "search_ok": result.get("ok")}
-""",
-            "sample_input": {},
-        },
-        owner_id="user_a",
-    )
-
-    result = runtime.run("ct_sdk_probe", {})
-
-    assert result["ok"] is True
-    assert result["data"]["sdk_ok"] is True
-    assert result["data"]["search_ok"] is False
-
-
-def test_custom_tool_runtime_collects_structured_info_and_debug_logs(tmp_path: Path):
-    store = CustomToolStoreService(root_dir=str(tmp_path / "custom_tools"))
-    runtime = CustomToolRuntimeService(
-        store=store,
-        python_runtime=PythonExecutionRuntime(allow_unsafe_backends=True),
-        runtime_root=str(tmp_path / "runtime"),
-    )
-    store.save_draft(
-        {
-            "manifest": {
-                "tool_name": "ct_logged_sum",
-                "display_name": "带计算证据的求和工具",
-                "description": "验证核心中间指标日志。",
                 "runtime": {"kind": "python_sandbox", "backend": "local_dev", "timeout_ms": 2000},
             },
             "input_schema": {
@@ -783,70 +154,557 @@ def test_custom_tool_runtime_collects_structured_info_and_debug_logs(tmp_path: P
                 "type": "object",
                 "required": ["total"],
                 "properties": {"total": {"type": "number"}},
-                "additionalProperties": False,
             },
-            "code": """
-from custom_tool_sdk import debug, info
-
-def run(inputs: dict) -> dict:
-    values = inputs.get("values") or []
-    info("输入准备完成", {"count": len(values)})
-    total = sum(values)
-    debug("求和计算", {"values": values, "total": total})
-    return {"total": total}
-""",
+            "code": "def run(inputs: dict) -> dict:\n    return {'total': sum(inputs.get('values') or [])}\n",
         },
+        owner_id=owner_id,
+    )
+    store.record_test("ct_personal_sum", {"ok": True, "execution_ok": True})
+    store.commit("ct_personal_sum", owner_ids=[owner_id])
+
+
+def test_explicit_design_adapter_still_supports_existing_designer(tmp_path: Path) -> None:
+    service = CustomToolAgentService(
+        store=CustomToolStoreService(root_dir=str(tmp_path / "tools"), backend="filesystem"),
+        designer=_Designer(),
+        use_codex=False,
+    )
+
+    result = service.start_create(
+        "按已经明确的需求形成方案",
+        owner_id="user_a",
+        selected_skills=["financial-tool-design", "financial-tool-flowchart"],
+    )
+
+    assert result["state"]["design_contract"]["tool_name"] == "sum_values"
+    assert "status" not in result["state"]
+
+
+def test_design_confirmation_runs_codex_output_and_keeps_only_asset_facts(tmp_path: Path) -> None:
+    store = CustomToolStoreService(root_dir=str(tmp_path / "tools"), backend="filesystem")
+    service = CustomToolAgentService(
+        store=store,
+        designer=_Designer(),
+        coder=_Coder(),
+        runtime=_runtime(store, tmp_path),
+        use_codex=False,
+    )
+    design = service.start_create(
+        "形成求和工具方案",
+        owner_id="user_a",
+        selected_skills=["financial-tool-design", "financial-tool-flowchart"],
+    )
+
+    drafted = service.continue_flow_action(
+        "custom_tool.confirm_design",
+        state=design["state"],
+        expected_revision=design["state"]["design_revision"],
         owner_id="user_a",
     )
 
-    result = runtime.run("ct_logged_sum", {"values": [1, 2, 3]}, owner_ids=["user_a"], allow_inactive=True)
-
-    assert result["ok"] is True
-    assert result["data"] == {"total": 6}
-    assert "execution_logs" not in result["data"]
-    assert result["meta"]["execution_logs"] == [
-        {"level": "info", "message": "输入准备完成", "data": {"count": 3}},
-        {"level": "debug", "message": "求和计算", "data": {"values": [1, 2, 3], "total": 6}},
-    ]
-    assert result["meta"]["diagnostics"]["execution_log_count"] == 2
-
-
-def test_custom_tool_runtime_caps_execution_logs(tmp_path: Path):
-    store = CustomToolStoreService(root_dir=str(tmp_path / "custom_tools"))
-    runtime = CustomToolRuntimeService(
-        store=store,
-        python_runtime=PythonExecutionRuntime(allow_unsafe_backends=True),
-        runtime_root=str(tmp_path / "runtime"),
+    assert drafted["test_result"]["execution_ok"] is True
+    assert drafted["test_result"]["data"] == {"total": 6}
+    saved_bundle = store.load("sum_values")
+    assert saved_bundle["implementation_review"]["conclusion"] == "matches"
+    assert saved_bundle["implementation_explanation"]["core_flow"]
+    assert "status" not in drafted["state"]
+    activated = service.continue_flow_action(
+        "custom_tool.activate_draft",
+        state=drafted["state"],
+        expected_revision=drafted["state"]["implementation_revision"],
+        owner_id="user_a",
     )
+    assert activated["tool"]["manifest"]["status"] == "active"
+
+
+def test_coding_contract_builds_runtime_schema_from_natural_language_design(tmp_path: Path) -> None:
+    store = CustomToolStoreService(root_dir=str(tmp_path / "tools"), backend="filesystem")
+    service = CustomToolAgentService(store=store, use_codex=False)
+    final = _Coder().code({"document": "一份结构化自然语言设计文档。"})["final"]
+
+    bundle = service._bundle_from_coding_final(
+        {"document": "一份结构化自然语言设计文档。"},
+        final,
+    )
+
+    assert bundle["manifest"]["tool_name"] == "ct_sum_values"
+    assert bundle["manifest"]["implementation_logic"] == "一份结构化自然语言设计文档。"
+    assert bundle["input_schema"]["required"] == ["values"]
+    assert bundle["input_schema"]["properties"]["values"]["type"] == "array"
+    assert bundle["output_schema"]["required"] == ["total"]
+    assert bundle["output_schema"]["properties"]["total"]["type"] == "number"
+
+
+def test_coding_returns_real_failure_feedback_for_controller_driven_retry(tmp_path: Path) -> None:
+    store = CustomToolStoreService(root_dir=str(tmp_path / "tools"), backend="filesystem")
+    coder = _Coder(failures=1)
+    service = CustomToolAgentService(
+        store=store,
+        coder=coder,
+        runtime=_runtime(store, tmp_path),
+        use_codex=False,
+    )
+    state = {
+        "owner_id": "user_a",
+        "requirement_text": "创建求和工具",
+        "design_contract": _Designer().design("")["design"],
+    }
+
+    failed = service.implement_dynamic_tool(state=state, owner_id="user_a", instruction="实现当前设计")
+
+    assert failed["test_result"]["execution_ok"] is False
+    assert len(coder.contexts) == 1
+    repaired = service.implement_dynamic_tool(
+        state=failed["state"],
+        owner_id="user_a",
+        instruction="根据真实测试反馈修复",
+    )
+    assert repaired["test_result"]["execution_ok"] is True
+    assert len(coder.contexts) == 2
+    assert coder.contexts[1]["test_feedback"]["actual"] == {"wrong": 1}
+
+
+def test_unknown_ui_action_is_the_only_action_level_rejection() -> None:
+    service = CustomToolAgentService(use_codex=False)
+
+    with pytest.raises(Exception, match="unknown custom tool action"):
+        service.continue_flow_action("custom_tool.run_arbitrary_command", state={}, owner_id="user_a")
+
+
+def test_empty_business_result_is_a_successful_technical_execution(tmp_path: Path) -> None:
+    store = CustomToolStoreService(root_dir=str(tmp_path / "tools"), backend="filesystem")
     store.save_draft(
         {
             "manifest": {
-                "tool_name": "ct_log_cap",
-                "display_name": "日志上限测试",
-                "description": "验证调试日志不会刷屏。",
+                "tool_name": "empty_screen",
+                "display_name": "空结果筛选",
+                "description": "允许没有命中标的。",
+                "visibility": "personal",
                 "runtime": {"kind": "python_sandbox", "backend": "local_dev", "timeout_ms": 2000},
             },
             "input_schema": {"type": "object", "properties": {}, "additionalProperties": False},
             "output_schema": {
                 "type": "object",
-                "required": ["ok"],
-                "properties": {"ok": {"type": "boolean"}},
-                "additionalProperties": False,
+                "required": ["matches"],
+                "properties": {"matches": {"type": "array"}},
             },
-            "code": """
-from custom_tool_sdk import debug
-
-def run(inputs: dict) -> dict:
-    for index in range(80):
-        debug("计算步骤", {"index": index})
-    return {"ok": True}
-""",
+            "code": "def run(inputs: dict) -> dict:\n    return {'matches': []}\n",
         },
         owner_id="user_a",
     )
 
-    result = runtime.run("ct_log_cap", {}, owner_ids=["user_a"], allow_inactive=True)
+    result = _runtime(store, tmp_path).run(
+        "empty_screen",
+        {},
+        owner_ids=["user_a"],
+        allow_inactive=True,
+    )
 
     assert result["ok"] is True
-    assert len(result["meta"]["execution_logs"]) == 50
-    assert result["meta"]["execution_logs"][-1]["data"] == {"index": 49}
+    assert result["data"] == {"matches": []}
+
+
+def test_existing_tool_test_is_reviewed_and_can_request_another_turn(tmp_path: Path, monkeypatch) -> None:
+    class Tester:
+        def __init__(self):
+            self.contexts = []
+
+        def plan(self, request, *, context=None, event_sink=None):
+            self.contexts.append(dict(context or {}))
+            if len(self.contexts) == 1:
+                return {
+                    "ok": True,
+                    "message": "先执行一个典型输入。",
+                    "next_action": "run_tests",
+                    "assessment": "尚无真实运行证据。",
+                    "cases": [{"name": "典型输入", "purpose": "观察合计", "request": "计算 1、2、3 的合计"}],
+                    "presentation": {"headline": "测试中", "notes": []},
+                    "events": [],
+                }
+            return {
+                "ok": True,
+                "message": "实际结果已经足够说明工具行为。",
+                "next_action": "finish",
+                "assessment": "真实输出为 6，核心结果可观察。",
+                "cases": [],
+                "presentation": {"headline": "测试完成", "notes": ["业务结果由用户确认"]},
+                "events": [],
+            }
+
+    store = CustomToolStoreService(root_dir=str(tmp_path / "tools"), backend="filesystem")
+    _save_active_sum_tool(store)
+    tester = Tester()
+    service = CustomToolAgentService(
+        store=store,
+        tester=tester,
+        runtime=_runtime(store, tmp_path),
+        use_codex=False,
+    )
+    monkeypatch.setattr(
+        "src.services.asset_invocation_service.AssetInvocationService.plan",
+        lambda self, **kwargs: {"status": "ready", "calls": [{"values": [1, 2, 3]}]},
+    )
+
+    result = service._run_existing_test(
+        request="请找一个能说明结果的真实样例",
+        state={"tool_name": "ct_personal_sum", "owner_id": "user_a"},
+        owner_id="user_a",
+    )
+
+    assert len(tester.contexts) == 2
+    assert tester.contexts[1]["test_history"][0]["executions"][0]["actual"] == {"total": 6}
+    assert result["test_result"]["evidence_status"] == "sufficient"
+    assert result["test_result"]["assessment"] == "真实输出为 6，核心结果可观察。"
+    assert result["presentation"]["headline"] == "测试完成"
+
+
+def test_existing_tool_test_stops_at_configured_max_turns(tmp_path: Path, monkeypatch) -> None:
+    class Tester:
+        def __init__(self):
+            self.calls = 0
+
+        def plan(self, request, *, context=None, event_sink=None):
+            self.calls += 1
+            return {
+                "ok": True,
+                "message": "继续补充测试。",
+                "next_action": "run_tests",
+                "assessment": "还希望观察更多输入。",
+                "cases": [{"name": "补充输入", "purpose": "补充证据", "request": "再计算一次"}],
+                "presentation": {"headline": "测试中", "notes": []},
+                "events": [],
+            }
+
+    store = CustomToolStoreService(root_dir=str(tmp_path / "tools"), backend="filesystem")
+    _save_active_sum_tool(store)
+    tester = Tester()
+    service = CustomToolAgentService(
+        store=store,
+        tester=tester,
+        runtime=_runtime(store, tmp_path),
+        use_codex=False,
+    )
+    monkeypatch.setenv("CUSTOM_TOOL_TEST_MAX_TURNS", "2")
+    monkeypatch.setattr(
+        "src.services.asset_invocation_service.AssetInvocationService.plan",
+        lambda self, **kwargs: {"status": "ready", "calls": [{"values": [1, 2, 3]}]},
+    )
+
+    result = service._run_existing_test(
+        request="持续补充测试",
+        state={"tool_name": "ct_personal_sum", "owner_id": "user_a"},
+        owner_id="user_a",
+    )
+
+    assert tester.calls == 2
+    assert result["test_result"]["max_turns_reached"] is True
+    assert result["test_result"]["evidence_status"] == "inconclusive"
+    assert len(result["test_result"]["cases"]) == 2
+
+
+def test_runtime_accepts_catalog_api_without_using_design_as_an_allowlist() -> None:
+    allowed, error = CustomToolRuntimeService._finance_request_allowed(
+        'r1 = stock.basic_info(filter = "name = 贵州茅台") -> code, name',
+        {
+            "design_contract": {
+                "data_requirements": [{
+                    "source_ref": "api_catalog/subjects/stock.json#dataviews.quote",
+                    "fields": ["close"],
+                    "purpose": "读取行情",
+                }],
+            },
+        },
+    )
+
+    assert allowed is True
+    assert error == ""
+
+
+def test_runtime_rejects_api_missing_from_system_catalog() -> None:
+    allowed, error = CustomToolRuntimeService._finance_request_allowed(
+        "r1 = stock.not_a_real_api() -> value",
+        {},
+    )
+
+    assert allowed is False
+    assert "system API catalog" in error
+
+
+def test_stale_revision_is_rejected_without_a_workflow_state_gate() -> None:
+    service = CustomToolAgentService(use_codex=False)
+
+    with pytest.raises(Exception, match="design revision changed"):
+        service.continue_flow_action(
+            "custom_tool.confirm_design",
+            state={"design_revision": 3},
+            expected_revision=2,
+            owner_id="user_a",
+        )
+
+
+def test_file_store_enforces_owner_and_publication_permissions(tmp_path: Path) -> None:
+    store = CustomToolStoreService(root_dir=str(tmp_path / "tools"), backend="filesystem")
+    _save_active_sum_tool(store)
+
+    assert store.list_tools(owner_ids=["user_a"])[0]["tool_name"] == "ct_personal_sum"
+    assert store.list_tools(owner_ids=["user_b"]) == []
+    with pytest.raises(Exception, match="custom_tool:publish permission"):
+        store.publish("ct_personal_sum", owner_ids=["user_a"], actor_id="admin")
+
+
+def test_context_bundle_materializes_design_and_editable_modules_by_reference(tmp_path: Path) -> None:
+    service = CustomToolContextBundleService(
+        catalog_path=str(tmp_path / "missing.json"),
+        root_dir=str(tmp_path / "bundles"),
+    )
+    bundle = service.build(
+        stage="coding",
+        user_request="修复代码",
+        context={
+            "design": {"tool_name": "ct_demo"},
+            "current_implementation": {
+                "revision": 1,
+                "modules": [{"module_id": "main", "source_code": "def run(inputs):\n    return inputs\n"}],
+            },
+            "_workspace_identity": {"owner_id": "user_a"},
+        },
+    )
+
+    prompt_context = service.prompt_context(bundle, {})
+    assert prompt_context["design_ref"] == "design.json"
+    module_path = prompt_context["current_implementation"]["module_files"][0]
+    assert Path(bundle["bundle_dir"], module_path).is_file()
+    assert "source_code" not in Path(bundle["bundle_dir"], "task.json").read_text(encoding="utf-8")
+    assert Path(bundle["bundle_dir"], bundle["api_index"]).is_file()
+    assert Path(bundle["bundle_dir"], bundle["custom_tool_sdk"]).is_file()
+
+
+def test_first_coding_turn_gets_editable_module_focused_api_context_and_test_runtime(tmp_path: Path) -> None:
+    catalog_path = tmp_path / "catalog.json"
+    catalog_path.write_text(
+        json.dumps({
+            "version": "v1",
+            "api_class_patterns": {
+                "basic_query": {
+                    "call_pattern": "r{id} = {api_name}(filter, order, limit, realtime) -> field1",
+                    "examples": ["r1 = stock.quote(filter = \"code = 600519.SH\") -> code, close"],
+                }
+            },
+            "subjects": {
+                "stock": {
+                    "_meta": {"desc": "股票"},
+                    "quote": {
+                        "desc": "行情",
+                        "fields": {"code": ["代码"], "close": ["收盘价"]},
+                        "api": [{"api_name": "stock.quote", "api_class": "basic_query"}],
+                    },
+                }
+            },
+        }),
+        encoding="utf-8",
+    )
+    service = CustomToolContextBundleService(
+        catalog_path=str(catalog_path),
+        root_dir=str(tmp_path / "bundles"),
+    )
+    bundle = service.build(
+        stage="coding",
+        user_request="实现工具",
+        context={
+            "design": {
+                "tool_name": "ct_demo",
+                "modules": [{"name": "market_loader", "responsibility": "读取行情", "functions": []}],
+                "data_requirements": [{
+                    "topic": "A股日线行情",
+                    "purpose": "读取日线行情",
+                    "fields": ["code", "close"],
+                }],
+            },
+            "_workspace_identity": {"owner_id": "user_a"},
+        },
+    )
+
+    prompt_context = service.prompt_context(bundle, {})
+    module_path = prompt_context["current_implementation"]["module_files"][0]
+    assert bundle["coding_workspace"]["editable"] is True
+    assert bundle["coding_workspace"]["first_implementation"] is True
+    assert bundle["coding_workspace"]["module_plan_items"][0]["title"] == "核心实现模块"
+    task_api = json.loads(Path(bundle["bundle_dir"], bundle["api_task_context"]).read_text(encoding="utf-8"))
+    assert task_api["data_needs"] == [{
+        "topic": "A股日线行情",
+        "fields": ["code", "close"],
+        "purpose": "读取日线行情",
+    }]
+    assert task_api["sources"] == []
+    assert Path(bundle["bundle_dir"], module_path).is_file()
+    assert Path(bundle["bundle_dir"], "dev_runtime/custom_tool_sdk.py").is_file()
+    assert Path(bundle["bundle_dir"], "dev_runtime/test_support.py").is_file()
+    coding_guide = Path(bundle["bundle_dir"], "CODING_WORKSPACE.md").read_text(encoding="utf-8")
+    assert "Use this exact interpreter" in coding_guide
+    assert "PYTHONPYCACHEPREFIX=scratch/pycache" in coding_guide
+    assert "from test_support import load_module, install_rows" in coding_guide
+    assert "task_context.json` is the first reference for the Design's data needs" in coding_guide
+    assert Path(bundle["bundle_dir"], "scratch").is_dir()
+
+    Path(bundle["bundle_dir"], module_path).write_text(
+        "def run(inputs):\n    return {'close': 1}\n",
+        encoding="utf-8",
+    )
+    collected = service.collect_coding_result(bundle, {
+        "implementation": {
+            "summary": "实现完成",
+            "entry_module": "main",
+            "modules": [{
+                "module_id": "main",
+                "role": "入口",
+                "language": "python",
+                "entrypoint": "run",
+                "functions": [{"name": "run", "responsibility": "入口"}],
+                "source_code": "",
+            }],
+        }
+    })
+    assert "return {'close': 1}" in collected["implementation"]["modules"][0]["source_code"]
+
+
+def test_coding_session_reuses_workspace_and_preserves_partial_source(tmp_path: Path) -> None:
+    service = CustomToolContextBundleService(
+        catalog_path=str(tmp_path / "missing.json"),
+        root_dir=str(tmp_path / "bundles"),
+    )
+    context = {
+        "design": {"tool_name": "ct_demo", "modules": []},
+        "coding_feedback": "实现当前设计",
+        "_workspace_identity": {"owner_id": "user_a"},
+    }
+
+    first = service.build(
+        stage="coding",
+        user_request="实现",
+        context=context,
+        run_id="coding-session-1",
+    )
+    module_path = Path(first["bundle_dir"], first["coding_workspace"]["module_files"][0])
+    module_path.write_text("def run(inputs):\n    return {'partial': True}\n", encoding="utf-8")
+    second = service.build(
+        stage="coding",
+        user_request="根据反馈继续",
+        context={**context, "coding_feedback": "修复真实测试错误"},
+        run_id="coding-session-1",
+    )
+
+    assert second["bundle_dir"] == first["bundle_dir"]
+    assert "partial" in module_path.read_text(encoding="utf-8")
+
+
+def test_context_bundle_only_exposes_runtime_and_api_material_to_coding(tmp_path: Path) -> None:
+    catalog = tmp_path / "catalog.json"
+    catalog.write_text(
+        json.dumps({"version": "v1", "api_class_patterns": {}, "subjects": {}}),
+        encoding="utf-8",
+    )
+    service = CustomToolContextBundleService(
+        catalog_path=str(catalog),
+        root_dir=str(tmp_path / "bundles"),
+    )
+
+    bundle = service.build(stage="design", user_request="设计工具", context={})
+
+    assert "api_index" not in bundle
+    assert "request_patterns" not in bundle
+    assert "runtime_contract" not in bundle
+    assert "custom_tool_sdk" not in bundle
+    assert not Path(bundle["bundle_dir"], "api_catalog").exists()
+
+
+def test_context_state_cleanup_preserves_system_owned_feedback_history() -> None:
+    state = {
+        "feedback_ledger": [{"feedback_id": "f1", "text": "窗口改成 60 日"}],
+        "status": "awaiting_design_confirmation",
+        "events": [{"type": "raw"}],
+        "raw_stdout": "noise",
+    }
+
+    cleaned = CustomToolAgentService._clean_state_for_context(state)
+
+    assert cleaned["feedback_ledger"] == state["feedback_ledger"]
+    assert "status" not in cleaned
+    assert "events" not in cleaned
+    assert "raw_stdout" not in cleaned
+
+
+def test_context_bundle_recovers_revised_source_without_repeating_it_in_final_json(tmp_path: Path) -> None:
+    service = CustomToolContextBundleService(
+        catalog_path=str(tmp_path / "missing.json"),
+        root_dir=str(tmp_path / "bundles"),
+    )
+    bundle = service.build(
+        stage="coding",
+        user_request="只修改计算函数",
+        context={
+            "current_implementation": {
+                "revision": 1,
+                "modules": [{
+                    "module_id": "main",
+                    "role": "入口",
+                    "language": "python",
+                    "entrypoint": "run",
+                    "functions": [{"name": "run", "responsibility": "入口"}],
+                    "source_code": "def run(inputs):\n    return {'value': 1}\n",
+                }],
+            },
+        },
+    )
+    module_path = bundle["coding_workspace"]["module_files"][0]
+    Path(bundle["bundle_dir"], module_path).write_text(
+        "def run(inputs):\n    return {'value': 2}\n",
+        encoding="utf-8",
+    )
+
+    result = service.collect_coding_result(
+        bundle,
+        {
+            "implementation": {
+                "summary": "局部修改完成",
+                "entry_module": "main",
+                "modules": [{
+                    "module_id": "main",
+                    "role": "入口",
+                    "language": "python",
+                    "entrypoint": "run",
+                    "functions": [{"name": "run", "responsibility": "入口"}],
+                    "source_code": "",
+                }],
+            }
+        },
+    )
+
+    assert "'value': 2" in result["implementation"]["modules"][0]["source_code"]
+
+
+def test_runtime_exposes_objective_info_and_debug_logs(tmp_path: Path) -> None:
+    store = CustomToolStoreService(root_dir=str(tmp_path / "tools"), backend="filesystem")
+    store.save_draft(
+        {
+            "manifest": {
+                "tool_name": "ct_logs",
+                "display_name": "日志工具",
+                "description": "验证运行证据。",
+                "runtime": {"backend": "local_dev", "timeout_ms": 2000},
+            },
+            "input_schema": {"type": "object", "properties": {}},
+            "output_schema": {"type": "object", "properties": {"value": {"type": "number"}}},
+            "code": (
+                "def run(inputs: dict) -> dict:\n"
+                "    info('开始计算', {'rows': 1})\n"
+                "    debug('核心指标', {'value': 3})\n"
+                "    return {'value': 3}\n"
+            ),
+        },
+        owner_id="user_a",
+    )
+    result = _runtime(store, tmp_path).run("ct_logs", {}, owner_ids=["user_a"], allow_inactive=True)
+
+    assert result["ok"] is True
+    logs = result["meta"]["execution_logs"]
+    assert [item["level"] for item in logs] == ["info", "debug"]

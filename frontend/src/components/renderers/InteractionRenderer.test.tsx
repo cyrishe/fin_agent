@@ -8,11 +8,8 @@ const data = {
   subject_revision: 2,
   prompt: "请确认两个口径",
   questions: [{
-    id: "Q1",
     question: "观察窗口？",
-    required: true,
-    allow_custom: true,
-    options: [{ value: "30", label: "30 个交易日", recommended: true }, { value: "60", label: "60 个交易日" }],
+    candidate: ["30 个交易日", "60 个交易日"],
   }],
 };
 

@@ -32,6 +32,19 @@ describe("surface stream reducer", () => {
     expect(run.summary).toBe("正在确认数据口径");
   });
 
+  it("keeps live agent activity out of the formal conversation", () => {
+    const run = applyStreamEvent(initialRun(), {
+      event: "block",
+      block_id: "coding_live_progress",
+      block_type: "workflow",
+      title: "代码实现",
+      data: { role: "live_progress", summary: "正在实现并验证代码…" },
+    });
+
+    expect(run.process).toHaveLength(1);
+    expect(run.artifacts).toHaveLength(0);
+  });
+
   it("preserves completed artifacts when a later block arrives", () => {
     const first = applyStreamEvent(initialRun(), {
       event: "block",
@@ -81,6 +94,33 @@ describe("surface stream reducer", () => {
 
     expect(legacy[0].block_type).toBe("kline");
     expect(v1[0].block_type).toBe("narrative");
+  });
+
+  it("renders tool results stored under task_result for persisted conversations", () => {
+    const blocks = blocksFromPayload({
+      task_result: {
+        render_payload: {
+          sections: [{ blocks: [{ type: "table", title: "评价结果", data: { columns: ["status"], rows: [{ status: "normal" }] } }] }],
+        },
+      },
+    });
+
+    expect(blocks).toHaveLength(1);
+    expect(blocks[0].block_type).toBe("table");
+    expect(blocks[0].data?.rows).toEqual([{ status: "normal" }]);
+  });
+
+  it("keeps the invocation preview together with the executed tool result", () => {
+    const blocks = blocksFromPayload({
+      surface_blocks: [{ block_id: "asset_invocation_preview", block_type: "structured_text", content: "标的：贵州茅台（600519.SH）" }],
+      task_result: {
+        render_payload: {
+          sections: [{ blocks: [{ block_id: "result", type: "structured_text", data: { summary: "流动性稳定" } }] }],
+        },
+      },
+    });
+
+    expect(blocks.map((block) => block.block_id)).toEqual(["asset_invocation_preview", "result"]);
   });
 
   it("keeps legacy catalog results visible after moving to the React surface", () => {

@@ -3,7 +3,7 @@ from typing import Any, Dict, Optional
 
 import pymysql
 
-from src.utils.mysql_utils import StockInfoDbUtils
+from src.utils.system_db_utils import SystemDbUtils
 from src.services.user_session_service import USER_TABLE
 
 
@@ -12,6 +12,17 @@ TURN_TABLE = "aiia_runtime_turn"
 
 
 class RuntimeConversationService:
+    HISTORY_OUTPUT_KEYS = (
+        "mode",
+        "message",
+        "surface_blocks",
+        "render_blocks",
+        "render_payload",
+        "surface",
+        "items",
+        "workspace",
+        "task_state",
+    )
     HISTORY_OMIT_KEYS = {
         "events",
         "raw_events",
@@ -85,7 +96,7 @@ class RuntimeConversationService:
     ) -> int:
         if thread_id:
             return int(thread_id)
-        db = StockInfoDbUtils()
+        db = SystemDbUtils()
         try:
             with db.conn.cursor() as cursor:
                 cursor.execute(
@@ -121,7 +132,7 @@ class RuntimeConversationService:
         normalized_owner_id = self._trim(owner_id)
         if not normalized_owner_id:
             return []
-        db = StockInfoDbUtils()
+        db = SystemDbUtils()
         try:
             with db.conn.cursor() as cursor:
                 cursor.execute(
@@ -180,13 +191,14 @@ class RuntimeConversationService:
         finally:
             db.close_db()
 
-    def get_thread(self, *, thread_id: int) -> Dict[str, Any] | None:
-        db = StockInfoDbUtils()
+    def get_thread(self, *, thread_id: int, include_context: bool = False) -> Dict[str, Any] | None:
+        db = SystemDbUtils()
         try:
             with db.conn.cursor() as cursor:
+                context_select = ", metadata_json" if include_context else ""
                 cursor.execute(
                     f"""
-                    SELECT thread_id, title, owner_type, owner_id, status, created_at, updated_at, last_event_at
+                    SELECT thread_id, title, owner_type, owner_id, status, created_at, updated_at, last_event_at{context_select}
                     FROM {THREAD_TABLE}
                     WHERE thread_id = %s
                     """,
@@ -204,8 +216,8 @@ class RuntimeConversationService:
                     created_at,
                     updated_at,
                     last_event_at,
-                ) = row
-                return {
+                ) = row[:8]
+                result = {
                     "thread_id": int(row_thread_id),
                     "title": self._trim(title) or f"会话 {row_thread_id}",
                     "owner_type": self._trim(owner_type),
@@ -215,6 +227,11 @@ class RuntimeConversationService:
                     "updated_at": str(updated_at or ""),
                     "last_event_at": str(last_event_at or updated_at or created_at or ""),
                 }
+                if include_context:
+                    metadata = self._safe_json_dict(row[8] if len(row) > 8 else None)
+                    assistant_context = metadata.get("assistant_context")
+                    result["_thread_context"] = dict(assistant_context) if isinstance(assistant_context, dict) else {}
+                return result
         finally:
             db.close_db()
 
@@ -228,7 +245,7 @@ class RuntimeConversationService:
         normalized_title = self._trim(title)[:80]
         if not normalized_title:
             return False
-        db = StockInfoDbUtils()
+        db = SystemDbUtils()
         try:
             with db.conn.cursor() as cursor:
                 if self._trim(expected_title):
@@ -251,9 +268,23 @@ class RuntimeConversationService:
         finally:
             db.close_db()
 
-    def list_turns(self, *, thread_id: int, limit: int = 80, include_output_payload: bool = True) -> list[Dict[str, Any]]:
-        db = StockInfoDbUtils()
-        output_payload_select = "output_structured_json" if include_output_payload else "NULL AS output_structured_json"
+    def list_turns(
+        self,
+        *,
+        thread_id: int,
+        limit: int = 80,
+        include_output_payload: bool = True,
+        history_payload_only: bool = False,
+    ) -> list[Dict[str, Any]]:
+        db = SystemDbUtils()
+        if include_output_payload and history_payload_only:
+            fields = ",\n".join(
+                f"'{key}', JSON_EXTRACT(output_structured_json, '$.{key}')"
+                for key in self.HISTORY_OUTPUT_KEYS
+            )
+            output_payload_select = f"JSON_OBJECT({fields}) AS output_structured_json"
+        else:
+            output_payload_select = "output_structured_json" if include_output_payload else "NULL AS output_structured_json"
         try:
             with db.conn.cursor() as cursor:
                 cursor.execute(
@@ -289,6 +320,9 @@ class RuntimeConversationService:
                     started_at,
                     finished_at,
                 ) = row
+                output_payload = self._compact_history_payload(self._safe_json_dict(output_structured_json))
+                if history_payload_only and isinstance(output_payload, dict):
+                    output_payload = {key: value for key, value in output_payload.items() if value is not None}
                 items.append(
                     {
                         "turn_id": int(turn_id),
@@ -296,7 +330,7 @@ class RuntimeConversationService:
                         "user_input_text": self._trim(user_input_text),
                         "input_payload": self._safe_json_dict(input_structured_json),
                         "assistant_output_text": self._trim(assistant_output_text),
-                        "output_payload": self._compact_history_payload(self._safe_json_dict(output_structured_json)),
+                        "output_payload": output_payload,
                         "status": self._trim(status) or "",
                         "started_at": str(started_at or ""),
                         "finished_at": str(finished_at or ""),
@@ -307,7 +341,7 @@ class RuntimeConversationService:
             db.close_db()
 
     def get_thread_context(self, *, thread_id: int) -> Dict[str, Any]:
-        db = StockInfoDbUtils()
+        db = SystemDbUtils()
         try:
             with db.conn.cursor() as cursor:
                 cursor.execute(
@@ -324,7 +358,7 @@ class RuntimeConversationService:
             db.close_db()
 
     def get_context_window(self, *, thread_id: int, max_rounds: int = 5) -> list[Dict[str, Any]]:
-        db = StockInfoDbUtils()
+        db = SystemDbUtils()
         try:
             with db.conn.cursor() as cursor:
                 cursor.execute(
@@ -361,6 +395,7 @@ class RuntimeConversationService:
                 assistant_summary = self._trim(output_payload.get("answer_summary"))
                 assistant_message = assistant_summary or self._trim(assistant_text)
                 if assistant_message:
+                    assistant_message = self._context_answer_preview(assistant_message)
                     window.append(
                         {
                             "round": int(turn_no),
@@ -372,6 +407,13 @@ class RuntimeConversationService:
             return window
         finally:
             db.close_db()
+
+    @staticmethod
+    def _context_answer_preview(text: Any, max_chars: int = 10) -> str:
+        normalized = str(text or "").strip()
+        if len(normalized) <= max_chars:
+            return normalized
+        return normalized[:max_chars] + "…"
 
     def _normalize_context_attachments(self, attachments: Any) -> list[Dict[str, str]]:
         rows: list[Dict[str, str]] = []
@@ -413,7 +455,7 @@ class RuntimeConversationService:
         patch: Dict[str, Any],
     ) -> Dict[str, Any]:
         normalized_patch = patch if isinstance(patch, dict) else {}
-        db = StockInfoDbUtils()
+        db = SystemDbUtils()
         try:
             with db.conn.cursor() as cursor:
                 cursor.execute(
@@ -453,7 +495,7 @@ class RuntimeConversationService:
         user_input_text: str,
         input_payload: Dict[str, Any],
     ) -> int:
-        db = StockInfoDbUtils()
+        db = SystemDbUtils()
         try:
             with db.conn.cursor() as cursor:
                 cursor.execute(
@@ -502,7 +544,7 @@ class RuntimeConversationService:
         token_usage: Dict[str, Any] | None = None,
     ) -> None:
         normalized_usage = self._normalize_token_usage(token_usage)
-        db = StockInfoDbUtils()
+        db = SystemDbUtils()
         try:
             with db.conn.cursor() as cursor:
                 cursor.execute(

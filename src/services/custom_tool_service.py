@@ -6,47 +6,25 @@ import os
 import re
 from pathlib import Path
 import tempfile
+import uuid
 from typing import Any, Callable, Dict, List, Mapping, Optional
 
 from src.services.codex_exec_skill_harness import (
     CodexCustomToolCoder,
     CodexCustomToolDesigner,
-    CodexSdkSkillHarness,
+    CodexCustomToolTester,
 )
+from src.services.agent_providers import build_agent_skill_harness
 from src.services.python_execution_runtime import PythonExecutionRuntime
-from src.services.custom_tool_design_protocol_service import (
-    CustomToolDesignProtocolError,
-    CustomToolDesignProtocolService,
-)
+from src.services.custom_tool_design_protocol_service import CustomToolDesignProtocolService
+from src.services.design_narrative_service import compose_design_narrative
 
 
 class CustomToolError(ValueError):
     pass
 
 
-DESIGN_SCENARIO_CREATE_FIRST_ROUND = "create_first_round"
-DESIGN_SCENARIO_CREATE_REVISION_ROUND = "create_revision_round"
-DESIGN_SCENARIO_OPTIMIZE_EXISTING_TOOL = "optimize_existing_tool"
-DESIGN_SCENARIOS = {
-    DESIGN_SCENARIO_CREATE_FIRST_ROUND,
-    DESIGN_SCENARIO_CREATE_REVISION_ROUND,
-    DESIGN_SCENARIO_OPTIMIZE_EXISTING_TOOL,
-}
-DESIGN_POLICY_MINIMUM_CORE = {
-    "scope_mode": "minimum_viable_core",
-    "progressive_expansion": True,
-    "implicit_adjacent_features": False,
-    "first_round_budget": {
-        "required_questions": 3,
-        "modules": 3,
-        "rules": 5,
-        "outputs": 5,
-        "exceptions": 3,
-        "acceptance": 5,
-        "flow_steps": 7,
-    },
-}
-
+DEFAULT_MAX_TEST_TURNS = 4
 
 def _trim(value: Any) -> str:
     return str(value or "").strip()
@@ -117,6 +95,8 @@ class CustomToolStoreService:
             "sample_input": dict(design.get("sample_input") or {}),
             "modules": [dict(item) for item in design.get("modules") or [] if isinstance(item, Mapping)],
             "proposed_tests": [dict(item) for item in design.get("proposed_tests") or [] if isinstance(item, Mapping)],
+            "implementation_explanation": dict(design.get("implementation_explanation") or {}),
+            "implementation_review": dict(design.get("implementation_review") or {}),
             "design_contract": dict(design.get("design_contract") or {}),
             "design_provenance": dict(design.get("design_provenance") or {}),
             "design_feedback_evidence": [
@@ -147,6 +127,8 @@ class CustomToolStoreService:
             "modules": [dict(item) for item in spec.get("modules") or [] if isinstance(item, Mapping)],
             "sample_input": dict(spec.get("sample_input") or {}),
             "proposed_tests": [dict(item) for item in spec.get("proposed_tests") or [] if isinstance(item, Mapping)],
+            "implementation_explanation": dict(spec.get("implementation_explanation") or {}),
+            "implementation_review": dict(spec.get("implementation_review") or {}),
             "design_contract": dict(spec.get("design_contract") or {}),
             "design_provenance": dict(spec.get("design_provenance") or {}),
             "design_feedback_evidence": [
@@ -204,8 +186,8 @@ class CustomToolStoreService:
         bundle = self.load_for_runtime(tool_name, owner_ids=owner_ids, allow_inactive=True)
         manifest = dict(bundle["manifest"])
         last_test = manifest.get("last_test") if isinstance(manifest.get("last_test"), dict) else {}
-        if last_test.get("gate_passed") is not True:
-            raise CustomToolError("custom tool must pass call/smoke test before commit")
+        if last_test.get("execution_ok") is not True:
+            raise CustomToolError("custom tool must complete a technical run before commit")
         manifest["status"] = "active"
         root = self.tool_dir(manifest["tool_name"])
         root.joinpath("manifest.json").write_text(_json_text(manifest), encoding="utf-8")
@@ -220,8 +202,6 @@ class CustomToolStoreService:
             "ok": bool(result.get("ok")),
             "execution_ok": bool(result.get("execution_ok", result.get("ok"))),
             "contract_ok": bool(result.get("contract_ok", result.get("ok"))),
-            "business_ok": bool(result.get("business_ok", result.get("ok"))),
-            "gate_passed": bool(result.get("gate_passed", result.get("ok"))),
             "error": _trim(result.get("error")),
             "backend": _trim(((result.get("meta") or {}).get("diagnostics") or {}).get("backend")),
         }
@@ -248,8 +228,8 @@ class CustomToolStoreService:
             raise CustomToolError("public publication requires custom_tool:publish permission")
         bundle = self.load_for_runtime(tool_name, owner_ids=owner_ids, allow_inactive=False)
         manifest = dict(bundle["manifest"])
-        if (manifest.get("last_test") or {}).get("gate_passed") is not True:
-            raise CustomToolError("custom tool must pass the test gate before publication")
+        if (manifest.get("last_test") or {}).get("execution_ok") is not True:
+            raise CustomToolError("custom tool must complete a technical run before publication")
         manifest["visibility"] = "public"
         manifest["published_by"] = _trim(actor_id)
         root = self.tool_dir(manifest["tool_name"])
@@ -422,6 +402,7 @@ class CustomToolRuntimeService:
             return self._error(manifest["tool_name"], "output_json_error", str(exc), diagnostics=diagnostics)
         output_errors = self._validate_json_value(payload, bundle.get("output_schema") or {}, path="output")
         if output_errors:
+            diagnostics["actual_output"] = payload
             return self._error(
                 manifest["tool_name"],
                 "output_validation_error",
@@ -483,24 +464,20 @@ class CustomToolRuntimeService:
             })
         return logs
 
-    @staticmethod
-    def _finance_request_allowed(request: str, bundle: Mapping[str, Any]) -> tuple[bool, str]:
-        design = bundle.get("design_contract") if isinstance(bundle.get("design_contract"), Mapping) else {}
-        requirements = design.get("data_requirements") if isinstance(design.get("data_requirements"), list) else []
-        allowed_apis = {
-            _trim(item.get("source_ref"))
-            for item in requirements
-            if isinstance(item, Mapping) and _trim(item.get("source_ref"))
-        }
+    @classmethod
+    def _finance_request_allowed(cls, request: str, bundle: Mapping[str, Any]) -> tuple[bool, str]:
+        """Allow system Finance APIs; Design does not act as a runtime allowlist."""
         try:
+            from src.experiments.staged_data_protocol.phase2.catalog import resolve_api
             from src.experiments.staged_data_protocol.phase2.call_parser import parse_api_call
 
-            api_name = _trim(parse_api_call(request).api)
+            api_call = parse_api_call(request)
+            api_name = _trim(api_call.api)
+            if api_name and resolve_api(api_name):
+                return True, ""
         except Exception:
             return False, "finance query could not be parsed"
-        if allowed_apis and api_name not in allowed_apis:
-            return False, f"finance API {api_name or '-'} is outside the confirmed design"
-        return True, ""
+        return False, f"finance API {api_name or '-'} is not available in the system API catalog"
 
     @classmethod
     def _validate_json_value(cls, value: Any, schema: Mapping[str, Any], *, path: str) -> List[str]:
@@ -694,44 +671,97 @@ class CustomToolAgentService:
         store: Optional[CustomToolStoreService] = None,
         designer: Optional[CustomToolDesigner] = None,
         coder: Optional[Any] = None,
+        tester: Optional[Any] = None,
         runtime: Optional[CustomToolRuntimeService] = None,
         design_protocol: Optional[CustomToolDesignProtocolService] = None,
         use_codex: Optional[bool] = None,
+        agent_provider: str = "",
+        design_provider: str = "",
+        coding_provider: str = "",
+        design_complexity: str = "",
+        coding_complexity: str = "",
+        finance_cc_service: Optional[Any] = None,
     ) -> None:
         self.store = store or CustomToolStoreService()
-        codex_enabled = bool(use_codex) if use_codex is not None else _trim(os.environ.get("STOCK_AGENT_CUSTOM_TOOL_CODEX", "1")) not in {"0", "false", "False", "no"}
-        self.designer = designer or (self._default_codex_designer() if codex_enabled else CustomToolDesigner())
-        self.coder = coder or (self._default_codex_coder() if codex_enabled else None)
+        enabled_setting = os.environ.get("CUSTOM_TOOL_AGENT_ENABLED")
+        if enabled_setting is None:
+            enabled_setting = os.environ.get("STOCK_AGENT_CUSTOM_TOOL_CODEX", "1")
+        agent_enabled = bool(use_codex) if use_codex is not None else _trim(enabled_setting) not in {"0", "false", "False", "no"}
+        explicit_provider = _trim(agent_provider).lower()
+        legacy_provider = _trim(os.environ.get("CUSTOM_TOOL_AGENT_PROVIDER")).lower()
+        legacy_complexity = _trim(os.environ.get("CUSTOM_TOOL_AGENT_COMPLEXITY")).lower()
+        self.design_provider = _trim(
+            design_provider or explicit_provider or os.environ.get("CUSTOM_TOOL_DESIGN_PROVIDER") or legacy_provider or "claude"
+        ).lower()
+        self.coding_provider = _trim(
+            coding_provider or explicit_provider or os.environ.get("CUSTOM_TOOL_CODING_PROVIDER") or legacy_provider or "codex"
+        ).lower()
+        self.design_complexity = _trim(
+            design_complexity or os.environ.get("CUSTOM_TOOL_DESIGN_COMPLEXITY") or legacy_complexity or "fast"
+        ).lower()
+        self.coding_complexity = _trim(
+            coding_complexity or os.environ.get("CUSTOM_TOOL_CODING_COMPLEXITY") or legacy_complexity or "fastest"
+        ).lower()
+        self.agent_provider = explicit_provider or legacy_provider or self.design_provider
+        self.designer = designer or (self._default_agent_designer() if agent_enabled else CustomToolDesigner())
+        self.coder = coder or (self._default_agent_coder() if agent_enabled else None)
+        self.tester = tester or (self._default_agent_tester() if agent_enabled else None)
         self.runtime = runtime or CustomToolRuntimeService(store=self.store)
         self.design_protocol = design_protocol or CustomToolDesignProtocolService()
+        self.finance_cc_service = finance_cc_service
+
+    @property
+    def finance_cc_enabled(self) -> bool:
+        return (
+            self.finance_cc_service is not None
+            and _trim(os.environ.get("FINANCE_CC_TOOL_DEVELOPMENT_ENABLED")).lower() in {"1", "true", "yes", "on"}
+        )
+
+    def set_finance_cc_service(self, service: Any) -> None:
+        self.finance_cc_service = service
 
     @staticmethod
     def _clean_state_for_context(state: Mapping[str, Any] | None) -> Dict[str, Any]:
         source = dict(state or {})
-        for key in ("events", "coding_events", "raw", "last_message", "raw_stdout", "raw_stderr", "feedback_ledger"):
+        for key in ("status", "events", "coding_events", "raw", "last_message", "raw_stdout", "raw_stderr"):
             source.pop(key, None)
         return source
 
-    def _default_codex_harness(self) -> Any:
-        runner = _trim(os.environ.get("STOCK_AGENT_CUSTOM_TOOL_CODEX_RUNNER") or "sdk")
-        if runner == "exec":
-            return None
-        harness = CodexSdkSkillHarness(
-            cwd=".",
-            timeout_seconds=int(os.environ.get("STOCK_AGENT_CUSTOM_TOOL_CODEX_TIMEOUT_SECONDS") or 180),
-            hard_timeout_seconds=int(os.environ.get("STOCK_AGENT_CUSTOM_TOOL_CODEX_HARD_TIMEOUT_SECONDS") or 900),
-            model=_trim(os.environ.get("STOCK_AGENT_CUSTOM_TOOL_CODEX_MODEL")),
-            sandbox=_trim(os.environ.get("STOCK_AGENT_CUSTOM_TOOL_CODEX_SANDBOX") or "workspace-write"),
-        )
-        return harness if harness.available() else None
+    def _default_agent_harness(self, provider: str, complexity: str) -> Any:
+        from src.services.agent_providers import AgentCapabilityPolicy
 
-    def _default_codex_designer(self) -> CodexCustomToolDesigner:
-        harness = self._default_codex_harness()
+        runner = _trim(os.environ.get("STOCK_AGENT_CUSTOM_TOOL_CODEX_RUNNER") or "sdk")
+        if provider == "codex" and runner == "exec":
+            return None
+        harness = build_agent_skill_harness(
+            provider,
+            cwd=".",
+            complexity=complexity,
+            capabilities=AgentCapabilityPolicy(),
+        )
+        return harness if provider != "codex" or harness.available() else None
+
+    def _default_agent_designer(self) -> CodexCustomToolDesigner:
+        harness = self._default_agent_harness(self.design_provider, self.design_complexity)
         return CodexCustomToolDesigner(harness=harness) if harness is not None else CodexCustomToolDesigner()
 
-    def _default_codex_coder(self) -> CodexCustomToolCoder:
-        harness = self._default_codex_harness()
+    def _default_agent_coder(self) -> CodexCustomToolCoder:
+        harness = self._default_agent_harness(self.coding_provider, self.coding_complexity)
         return CodexCustomToolCoder(harness=harness) if harness is not None else CodexCustomToolCoder()
+
+    def _default_agent_tester(self) -> CodexCustomToolTester:
+        harness = self._default_agent_harness(self.design_provider, self.design_complexity)
+        return CodexCustomToolTester(harness=harness) if harness is not None else CodexCustomToolTester()
+
+    # Backward-compatible private helpers for existing tests and integrations.
+    def _default_codex_harness(self) -> Any:
+        return self._default_agent_harness(self.coding_provider, self.coding_complexity)
+
+    def _default_codex_designer(self) -> CodexCustomToolDesigner:
+        return self._default_agent_designer()
+
+    def _default_codex_coder(self) -> CodexCustomToolCoder:
+        return self._default_agent_coder()
 
     def start_create(
         self,
@@ -739,84 +769,100 @@ class CustomToolAgentService:
         *,
         owner_id: str = "",
         state: Optional[Mapping[str, Any]] = None,
-        design_scenario: str = DESIGN_SCENARIO_CREATE_FIRST_ROUND,
+        selected_skills: Optional[List[str]] = None,
+        turn_id: Optional[int] = None,
+        thread_id: Optional[int] = None,
+        event_sink: Optional[Callable[[Dict[str, Any]], None]] = None,
+    ) -> Dict[str, Any]:
+        """Enter the same LLM-planned tool workflow used by every later turn."""
+        if selected_skills is None:
+            return self.handle_turn(
+                requirement_text,
+                state=dict(state or {}),
+                owner_id=owner_id,
+                turn_id=turn_id,
+                thread_id=thread_id,
+                event_sink=event_sink,
+            )
+        return self._run_design_skills(
+            requirement_text,
+            owner_id=owner_id,
+            state=state,
+            selected_skills=selected_skills,
+            turn_id=turn_id,
+            event_sink=event_sink,
+        )
+
+    def _run_design_skills(
+        self,
+        requirement_text: str,
+        *,
+        owner_id: str = "",
+        state: Optional[Mapping[str, Any]] = None,
+        selected_skills: List[str],
         turn_id: Optional[int] = None,
         event_sink: Optional[Callable[[Dict[str, Any]], None]] = None,
     ) -> Dict[str, Any]:
         requirement = _trim(requirement_text)
         if not requirement:
             raise CustomToolError("创建工具时请先描述目标、输入、输出或核心规则。")
-        scenario = self._normalize_design_scenario(design_scenario)
-        prior_state = dict(state or {}) if scenario != DESIGN_SCENARIO_CREATE_FIRST_ROUND else {}
-        design_round = 1 if scenario == DESIGN_SCENARIO_CREATE_FIRST_ROUND else max(2, int(prior_state.get("design_round") or 1) + 1)
+        prior_state = dict(state or {})
+        design_round = max(1, int(prior_state.get("design_round") or 0) + 1)
         feedback_ledger = self.design_protocol.append_feedback(
             prior_state.get("feedback_ledger"),
             text=requirement,
             design_round=design_round,
             turn_id=turn_id,
-            kind="initial_requirement" if scenario == DESIGN_SCENARIO_CREATE_FIRST_ROUND else "feedback",
+            kind="initial_requirement" if not prior_state else "feedback",
         )
         design_result = self._call_designer(
             requirement,
             state=prior_state,
             owner_id=owner_id,
-            design_scenario=scenario,
-            design_round=design_round,
+            selected_skills=selected_skills,
+            turn_id=turn_id,
             event_sink=event_sink,
         )
-        status = _trim(design_result.get("status"))
-        if status == "ok":
-            return self._return_legacy_design(requirement, owner_id=owner_id, design=design_result["design"])
-        if _trim(design_result.get("protocol_mode")) == "revision_fields":
-            try:
-                merged = self.design_protocol.apply_revision(
-                    self.design_protocol.canonical_from_state(prior_state),
-                    design_result,
-                )
-            except CustomToolDesignProtocolError as exc:
-                raise CustomToolError(str(exc)) from exc
-            design_result = {
-                **design_result,
-                "status": merged["status"],
-                "understanding": merged["understanding"],
-                "questions": merged["questions"],
-                "design": merged["design"],
-                "existing_analysis": merged["existing_analysis"],
+        if not design_result.get("ok"):
+            return {
+                "message": _trim(design_result.get("message")) or "Design 调用失败，当前设计和实现均未改变。",
+                "design_status": "design_failed",
+                "error": design_result.get("error") or "design execution failed",
+                "events": design_result.get("events") or [],
+                "state": prior_state,
+                "thread_context_patch": {"custom_tool_state": prior_state},
             }
-        design_ready = status in {"review", "design_ready"}
+        if isinstance(design_result.get("design"), Mapping) and design_result.get("design", {}).get("code"):
+            return self._return_legacy_design(requirement, owner_id=owner_id, design=design_result["design"])
         understanding = design_result.get("understanding") if isinstance(design_result.get("understanding"), Mapping) else {}
         existing_analysis = design_result.get("existing_analysis") if isinstance(design_result.get("existing_analysis"), Mapping) else {}
-        if scenario == DESIGN_SCENARIO_CREATE_FIRST_ROUND:
-            existing_analysis = self._empty_existing_analysis()
         questions = design_result.get("questions") if isinstance(design_result.get("questions"), list) else []
         design = design_result.get("design") if isinstance(design_result.get("design"), Mapping) else {}
-        design_artifact = self._design_artifact_identity(design, state=prior_state)
+        design_ready = bool(design)
+        design_artifact = self._design_artifact_identity(design, state=prior_state) if design_ready else {}
         canonical_requirement = _trim(prior_state.get("requirement_text")) if prior_state else requirement
         if not canonical_requirement:
             canonical_requirement = requirement
         design_context = {
-            "scenario": scenario,
             "round": design_round,
-            "is_first_round": scenario == DESIGN_SCENARIO_CREATE_FIRST_ROUND,
+            "is_first_round": not bool(prior_state),
         }
         if not design_ready:
+            narration = compose_design_narrative(understanding, questions, design)
             next_state = {
-                "status": "collect_requirement",
                 "requirement_text": canonical_requirement,
                 "latest_feedback_text": requirement,
                 "feedback_ledger": feedback_ledger,
                 "owner_id": owner_id,
-                "design_scenario": scenario,
                 "design_round": design_round,
-                "partial_design": design,
                 "understanding": dict(understanding),
                 "questions": questions,
                 "existing_analysis": dict(existing_analysis),
                 **design_artifact,
             }
             return {
-                "message": design_result.get("message") or "请补充工具需求。",
-                "design_status": status or "clarification",
+                "message": design_result.get("message") or narration,
+                "design_status": "clarification",
                 "understanding": dict(understanding),
                 "questions": questions or design_result.get("missing") or [],
                 "design": design,
@@ -828,12 +874,10 @@ class CustomToolAgentService:
                 "thread_context_patch": {"custom_tool_state": next_state},
             }
         next_state = {
-            "status": "awaiting_design_confirmation",
             "requirement_text": canonical_requirement,
             "latest_feedback_text": requirement,
             "feedback_ledger": feedback_ledger,
             "owner_id": owner_id,
-            "design_scenario": scenario,
             "design_round": design_round,
             "design_contract": design,
             "understanding": dict(understanding),
@@ -843,15 +887,10 @@ class CustomToolAgentService:
         }
         tool_name = _trim(design.get("tool_name")) or "custom_tool"
         display_name = _trim(design.get("display_name")) or tool_name
-        message = (
-            f"已生成自定义工具设计：{tool_name} / {display_name}\n"
-            f"描述：{_trim(design.get('description'))}\n"
-            f"实现逻辑：{self._logic_text(design)}\n"
-            "回复“确认实现”后生成 draft；需要调整则直接说明修改点。"
-        )
+        message = design_result.get("message") or compose_design_narrative(understanding, questions, design)
         return {
             "message": message,
-            "design_status": status,
+            "design_status": "review",
             "understanding": dict(understanding),
             "state": next_state,
             "design": design,
@@ -862,55 +901,221 @@ class CustomToolAgentService:
             "thread_context_patch": {"custom_tool_state": next_state},
         }
 
-    def continue_flow(
+    def handle_turn(
         self,
         text: str,
         *,
         state: Mapping[str, Any],
+        ui_action: Optional[Mapping[str, Any]] = None,
         owner_id: str = "",
         turn_id: Optional[int] = None,
+        thread_id: Optional[int] = None,
         event_sink: Optional[Callable[[Dict[str, Any]], None]] = None,
     ) -> Dict[str, Any]:
-        status = _trim(state.get("status"))
+        """Plan and execute one natural-language turn in the financial-tool domain."""
         raw = _trim(text)
-        if status == "collect_requirement":
-            return self.start_create(
-                raw,
-                owner_id=owner_id or _trim(state.get("owner_id")),
-                state=state,
-                design_scenario=DESIGN_SCENARIO_CREATE_REVISION_ROUND,
-                turn_id=turn_id,
-                event_sink=event_sink,
-            )
-        if status == "awaiting_design_confirmation":
-            if raw in {"确认", "确认实现", "可以", "实现", "生成", "ok", "OK"}:
-                return self._confirm_and_code(state=state, owner_id=owner_id, event_sink=event_sink)
-            return self.start_create(
-                raw,
-                owner_id=owner_id or _trim(state.get("owner_id")),
-                state=state,
-                design_scenario=DESIGN_SCENARIO_CREATE_REVISION_ROUND,
-                turn_id=turn_id,
-                event_sink=event_sink,
-            )
-        if status in {"draft_ready", "draft_needs_test"}:
-            if not raw:
-                return {"message": "请说明需要修改的实现或测试问题。", "state": dict(state)}
-            revision_state = {
-                **self._clean_state_for_context(state),
-                "status": "awaiting_design_confirmation",
-                "coding_feedback": raw,
+        current_state = self._clean_state_for_context(state)
+        if not raw:
+            return {"message": "请说明本轮希望查看或调整的内容。", "state": current_state}
+        if not self.finance_cc_enabled:
+            return {
+                "message": "Finance CC 当前不可用，已有需求、设计和实现均未改变。",
+                "state": current_state,
+                "error": "Finance CC controller is unavailable",
+                "thread_context_patch": {"custom_tool_state": current_state},
             }
-            return self._confirm_and_code(state=revision_state, owner_id=owner_id, event_sink=event_sink)
-        if status == "coding_failed":
-            retry_state = {
-                **self._clean_state_for_context(state),
-                "status": "awaiting_design_confirmation",
-            }
-            if raw and raw not in {"重试", "重新生成", "再试一次", "确认", "确认实现"}:
-                retry_state["coding_feedback"] = raw
-            return self._confirm_and_code(state=retry_state, owner_id=owner_id, event_sink=event_sink)
-        return {"message": "当前没有进行中的自定义工具创建流程。", "state": {}}
+        return self._handle_finance_cc_turn(
+            raw,
+            state=current_state,
+            ui_action=ui_action,
+            owner_id=owner_id,
+            thread_id=thread_id,
+            turn_id=turn_id,
+            event_sink=event_sink,
+        )
+
+    def _handle_finance_cc_turn(
+        self,
+        text: str,
+        *,
+        state: Mapping[str, Any],
+        ui_action: Optional[Mapping[str, Any]],
+        owner_id: str,
+        thread_id: Optional[int],
+        turn_id: Optional[int],
+        event_sink: Optional[Callable[[Dict[str, Any]], None]],
+    ) -> Dict[str, Any]:
+        """Adapt one Finance CC result into the existing conversation contract."""
+        current_state = dict(state or {})
+        context = {
+            "selected_agent": "investment_analyst",
+            "turn_mode": "tool_development",
+            "entry": "custom_tool_flow",
+            "has_custom_tool_state": bool(current_state),
+            "custom_tool_state": current_state,
+            "custom_tool_name": _trim(current_state.get("tool_name")),
+            "ui_action": dict(ui_action or {}),
+        }
+        cc_result = self.finance_cc_service.run_turn(
+            thread_id=thread_id or 0,
+            turn_id=turn_id or "",
+            owner_id=owner_id,
+            user_text=text,
+            context=context,
+            event_sink=event_sink,
+        )
+        next_state = dict(current_state)
+        feedback_ledger = self.design_protocol.append_feedback(
+            next_state.get("feedback_ledger"),
+            text=text,
+            design_round=max(1, int(next_state.get("design_round") or 0) + 1),
+            turn_id=turn_id,
+            kind="initial_requirement" if not next_state else "feedback",
+        )
+        next_state["feedback_ledger"] = feedback_ledger
+        next_state["owner_id"] = owner_id or _trim(next_state.get("owner_id"))
+        next_state.setdefault("requirement_text", text)
+
+        design_status = ""
+        notice: List[str] = []
+        questions: List[Dict[str, Any]] = []
+        test_evidence: Dict[str, Any] = {}
+        for update in cc_result.get("artifact_updates") or []:
+            if not isinstance(update, Mapping):
+                continue
+            artifact_type = _trim(update.get("artifact_type"))
+            payload = update.get("payload") if isinstance(update.get("payload"), Mapping) else {}
+            if artifact_type == "requirement":
+                brief = _trim(payload.get("requirement_brief"))
+                if brief:
+                    next_state["requirement_brief"] = brief
+                    next_state.pop("understanding", None)
+                notice = [_trim(item) for item in payload.get("notice") or [] if _trim(item)]
+                questions = [dict(item) for item in payload.get("questions") or [] if isinstance(item, Mapping)]
+                if questions:
+                    next_state["notice"] = notice
+                    next_state["questions"] = questions
+                else:
+                    # The final requirement brief is the only design input.
+                    # Interaction details remain in the persisted turn, not the next stage state.
+                    next_state.pop("notice", None)
+                    next_state.pop("questions", None)
+                design_status = "clarification"
+            elif artifact_type == "design":
+                design_value = payload.get("design")
+                design = (
+                    {"document": _trim(design_value)}
+                    if isinstance(design_value, str) and _trim(design_value)
+                    else dict(design_value)
+                    if isinstance(design_value, Mapping)
+                    else {}
+                )
+                if design:
+                    next_state["design_contract"] = dict(design)
+                    next_state["tool_name"] = _trim(design.get("tool_name"))
+                    next_state.update(self._design_artifact_identity(design, state=next_state))
+                    design_status = "review"
+            elif artifact_type == "flow":
+                flow = payload.get("flow") if isinstance(payload.get("flow"), Mapping) else {}
+                design = dict(next_state.get("design_contract") or {})
+                if flow and design:
+                    design["flow"] = dict(flow)
+                    design["mermaid"] = _trim(payload.get("mermaid"))
+                    next_state["design_contract"] = design
+                    design_status = "review"
+            elif artifact_type == "test_evidence":
+                test_evidence = dict(payload)
+                design_status = "test"
+
+        implementation_runs = [
+            dict(item) for item in cc_result.get("implementation_runs") or [] if isinstance(item, Mapping)
+        ]
+        latest_implementation = implementation_runs[-1] if implementation_runs else {}
+        if isinstance(latest_implementation.get("state"), Mapping):
+            next_state.update(dict(latest_implementation.get("state") or {}))
+
+        interaction_requests = [
+            dict(item) for item in cc_result.get("interaction_requests") or [] if isinstance(item, Mapping)
+        ]
+        if interaction_requests and not questions:
+            questions = [
+                dict(item)
+                for request in interaction_requests
+                for item in request.get("questions") or []
+                if isinstance(item, Mapping)
+            ]
+            next_state["questions"] = questions
+
+        design = dict(next_state.get("design_contract") or {})
+        requirement_brief = _trim(next_state.get("requirement_brief"))
+        legacy_understanding = (
+            dict(next_state.get("understanding") or {})
+            if isinstance(next_state.get("understanding"), Mapping)
+            else {}
+        )
+        understanding = (
+            {"requirement_brief": requirement_brief}
+            if requirement_brief
+            else legacy_understanding
+        )
+        response = {
+            "message": _trim(cc_result.get("result")) or "本轮处理已完成。",
+            "state": next_state,
+            "thread_context_patch": {"custom_tool_state": next_state},
+            "design_status": design_status or ("review" if design else "clarification"),
+            "understanding": understanding,
+            "notice": notice,
+            "questions": questions,
+            "design": design,
+            "finance_cc": cc_result,
+        }
+        view_assets = [
+            {"type": _trim(item.get("asset_type")), "payload": item.get("payload")}
+            for item in cc_result.get("asset_reads") or []
+            if isinstance(item, Mapping)
+            and _trim(item.get("asset_type")) in {"design", "flow", "code", "tests", "tool_contract"}
+            and item.get("payload") is not None
+        ]
+        if view_assets:
+            response["view_assets"] = view_assets
+        if test_evidence:
+            response["test_evidence"] = test_evidence
+        if latest_implementation:
+            response["coding_status"] = _trim(latest_implementation.get("coding_status")) or (
+                "complete" if latest_implementation.get("ok") else "coding_failed"
+            )
+            response["coding_error"] = dict(latest_implementation.get("coding_error") or {})
+            response["test_result"] = dict(latest_implementation.get("test_result") or {})
+            response["tool"] = dict(latest_implementation.get("tool") or {})
+            response["implementation_meta"] = dict(latest_implementation.get("implementation_meta") or {})
+            response["implementation_explanation"] = dict(
+                latest_implementation.get("implementation_explanation") or {}
+            )
+            response["implementation_review"] = dict(
+                latest_implementation.get("implementation_review") or {}
+            )
+            response["coding_tests"] = [
+                dict(item)
+                for item in latest_implementation.get("coding_tests") or []
+                if isinstance(item, Mapping)
+            ]
+        if not cc_result.get("ok"):
+            error = _trim(cc_result.get("error")) or "Finance CC execution failed"
+            saved_types = [
+                _trim(item.get("artifact_type"))
+                for item in cc_result.get("artifact_updates") or []
+                if isinstance(item, Mapping) and _trim(item.get("artifact_type"))
+            ]
+            response["error"] = error
+            if saved_types:
+                response["message"] = (
+                    f"本轮已保存 {', '.join(dict.fromkeys(saved_types))}，但后续处理未完成；可以从当前结果继续。"
+                )
+            elif latest_implementation:
+                response["message"] = "本轮实现结果已经保存，但会话收尾未完成；可以从当前实现继续。"
+            else:
+                response["message"] = "本轮处理失败，已有业务资产未改变；本轮反馈已经记录，可以继续重试。"
+        return response
 
     def continue_flow_action(
         self,
@@ -924,10 +1129,9 @@ class CustomToolAgentService:
     ) -> Dict[str, Any]:
         """Resolve a trusted UI action without executing model-provided commands."""
         normalized_action = _trim(action_id)
-        status = _trim(state.get("status"))
-        if status == "awaiting_design_confirmation" and normalized_action == "custom_tool.confirm_design":
+        if normalized_action == "custom_tool.confirm_design":
             current_revision = int(state.get("design_revision") or 0)
-            if expected_revision is not None and int(expected_revision) != current_revision:
+            if expected_revision is not None and current_revision > 0 and int(expected_revision) != current_revision:
                 raise CustomToolError(
                     f"design revision changed: expected {int(expected_revision)}, current {current_revision}"
                 )
@@ -940,7 +1144,7 @@ class CustomToolAgentService:
                 kind="confirmation",
             )
             return self._confirm_and_code(state=confirmed_state, owner_id=owner_id, event_sink=event_sink)
-        if status == "draft_ready" and normalized_action == "custom_tool.activate_draft":
+        if normalized_action == "custom_tool.activate_draft":
             tool_name = _trim(state.get("tool_name"))
             if not tool_name:
                 raise CustomToolError("draft state does not include tool_name")
@@ -961,27 +1165,10 @@ class CustomToolAgentService:
                 },
                 "thread_context_patch": {"custom_tool_state": None},
             }
-        if status == "coding_failed" and normalized_action == "custom_tool.retry_coding":
-            retry_state = {
-                **self._clean_state_for_context(state),
-                "status": "awaiting_design_confirmation",
-            }
+        if normalized_action == "custom_tool.retry_coding":
+            retry_state = self._clean_state_for_context(state)
             return self._confirm_and_code(state=retry_state, owner_id=owner_id, event_sink=event_sink)
-        raise CustomToolError(
-            f"action {normalized_action or '-'} is not allowed while custom tool state is {status or '-'}"
-        )
-
-    @staticmethod
-    def interaction_user_text(action_id: str) -> str:
-        labels = {
-            "custom_tool.confirm_design": "确认并继续",
-            "custom_tool.activate_draft": "确认并启用",
-            "custom_tool.retry_coding": "重试实现",
-        }
-        normalized_action = _trim(action_id)
-        if normalized_action not in labels:
-            raise CustomToolError(f"unknown custom tool action: {normalized_action or '-'}")
-        return labels[normalized_action]
+        raise CustomToolError(f"unknown custom tool action: {normalized_action or '-'}")
 
     def call(
         self,
@@ -1006,55 +1193,45 @@ class CustomToolAgentService:
         *,
         state: Optional[Mapping[str, Any]],
         owner_id: str,
-        design_scenario: str,
-        design_round: int,
+        selected_skills: Optional[List[str]],
+        turn_id: Optional[int],
         event_sink: Optional[Callable[[Dict[str, Any]], None]],
     ) -> Dict[str, Any]:
         context: Dict[str, Any] = {
-            "owner_id": owner_id,
-            "design_scenario": design_scenario,
-            "design_round": design_round,
-            "design_policy": DESIGN_POLICY_MINIMUM_CORE,
+            "_workspace_identity": {
+                "owner_id": owner_id,
+                "turn_id": int(turn_id) if turn_id is not None else 0,
+            },
         }
-        if design_scenario == DESIGN_SCENARIO_CREATE_FIRST_ROUND:
-            context["state"] = {}
-        else:
-            canonical = self.design_protocol.canonical_from_state(state or {})
-            context.update({
-                "canonical_understanding": canonical["understanding"],
-                "canonical_design": canonical["design"],
-                "canonical_existing_analysis": canonical["existing_analysis"],
-                "canonical_revision": int((state or {}).get("design_revision") or 0),
-                "canonical_fingerprint": _trim((state or {}).get("design_fingerprint")),
-            })
+        if selected_skills:
+            context["selected_skills"] = list(dict.fromkeys(_trim(item) for item in selected_skills if _trim(item)))
+        prior = dict(state or {})
+        requirement_brief = _trim(prior.get("requirement_brief"))
+        if requirement_brief:
+            context["requirement_brief"] = requirement_brief
+        elif isinstance(prior.get("understanding"), Mapping) and prior.get("understanding"):
+            context["requirement_brief"] = dict(prior.get("understanding") or {})
+        current_design = (
+            prior.get("design_contract")
+            if isinstance(prior.get("design_contract"), Mapping)
+            else prior.get("partial_design")
+            if isinstance(prior.get("partial_design"), Mapping)
+            else {}
+        )
+        if current_design:
+            context["current_design"] = dict(current_design)
         try:
             return self.designer.design(requirement_text, context=context, event_sink=event_sink)
         except TypeError:
             return self.designer.design(requirement_text)
-
-    @staticmethod
-    def _normalize_design_scenario(value: Any) -> str:
-        scenario = _trim(value) or DESIGN_SCENARIO_CREATE_FIRST_ROUND
-        if scenario not in DESIGN_SCENARIOS:
-            raise CustomToolError(f"unsupported design scenario: {scenario}")
-        return scenario
-
-    @staticmethod
-    def _empty_existing_analysis() -> Dict[str, Any]:
-        return {
-            "analyzed": False,
-            "current_behavior": [],
-            "gaps": [],
-            "affected_areas": [],
-            "evidence": [],
-        }
 
     def _confirm_and_code(
         self,
         *,
         state: Mapping[str, Any],
         owner_id: str,
-        event_sink: Optional[Callable[[Dict[str, Any]], None]],
+        selected_skills: Optional[List[str]] = None,
+        event_sink: Optional[Callable[[Dict[str, Any]], None]] = None,
     ) -> Dict[str, Any]:
         actual_owner = owner_id or _trim(state.get("owner_id"))
         legacy_design = state.get("design") if isinstance(state.get("design"), Mapping) else {}
@@ -1062,21 +1239,38 @@ class CustomToolAgentService:
             return self._save_test_and_return(legacy_design, owner_id=actual_owner)
         design_contract = state.get("design_contract") if isinstance(state.get("design_contract"), Mapping) else {}
         if not design_contract:
-            next_state = {**self._clean_state_for_context(state), "status": "collect_requirement"}
+            next_state = self._clean_state_for_context(state)
             return {
                 "message": "当前设计稿为空，请补充需求后重新生成设计。",
                 "state": next_state,
                 "thread_context_patch": {"custom_tool_state": next_state},
             }
         if self.coder is None:
-            next_state = {**self._clean_state_for_context(state), "status": "awaiting_design_confirmation"}
+            next_state = self._clean_state_for_context(state)
             return {
-                "message": "当前未启用 Codex coding，请先配置 coding runner 或补充可执行代码。",
+                "message": "当前未启用 Agent coding，请先配置 coding runner 或补充可执行代码。",
                 "state": next_state,
                 "thread_context_patch": {"custom_tool_state": next_state},
             }
         try:
-            coding_context: Dict[str, Any] = {"state": self._clean_state_for_context(state)}
+            coding_context: Dict[str, Any] = {}
+            agent_runtime = (
+                dict(state.get("agent_runtime") or {})
+                if isinstance(state.get("agent_runtime"), Mapping)
+                else {}
+            )
+            agent_runtime.setdefault("session_id", uuid.uuid4().hex)
+            coding_context["_agent_runtime"] = agent_runtime
+            coding_feedback = _trim(state.get("coding_feedback"))
+            if coding_feedback:
+                coding_context["coding_feedback"] = coding_feedback
+            test_feedback = state.get("test_feedback")
+            if isinstance(test_feedback, Mapping) and test_feedback:
+                coding_context["test_feedback"] = dict(test_feedback)
+            if selected_skills:
+                coding_context["selected_skills"] = list(dict.fromkeys(
+                    _trim(item) for item in selected_skills if _trim(item)
+                ))
             current_tool_name = _trim(state.get("tool_name"))
             if current_tool_name and self.store.exists(current_tool_name):
                 current_bundle = self.store.load(current_tool_name)
@@ -1085,6 +1279,10 @@ class CustomToolAgentService:
                     "modules": [dict(item) for item in current_bundle.get("modules") or [] if isinstance(item, Mapping)],
                     "last_test": dict((current_bundle.get("manifest") or {}).get("last_test") or {}),
                 }
+            coding_context["_workspace_identity"] = {
+                "owner_id": actual_owner,
+                "tool_name": current_tool_name or _trim(design_contract.get("tool_name")),
+            }
             coding_result = self.coder.code(
                 design_contract,
                 requirement_text=_trim(state.get("requirement_text")),
@@ -1095,29 +1293,55 @@ class CustomToolAgentService:
             coding_result = self.coder.code(
                 design_contract,
                 requirement_text=_trim(state.get("requirement_text")),
-                context={"state": self._clean_state_for_context(state)},
+                context=coding_context,
             )
-        coding_status = _trim(coding_result.get("status"))
-        if coding_status != "code_ready":
-            retryable = coding_status == "coding_failed"
+        coding_raw = coding_result.get("raw") if isinstance(coding_result.get("raw"), Mapping) else {}
+        agent_runtime = (
+            dict(coding_result.get("agent_runtime") or {})
+            if isinstance(coding_result.get("agent_runtime"), Mapping)
+            else dict(coding_context.get("_agent_runtime") or {})
+        )
+        context_bundle = coding_raw.get("context_bundle") if isinstance(coding_raw.get("context_bundle"), Mapping) else {}
+        implementation_meta = {
+            "provider": self.coding_provider,
+            "complexity": self.coding_complexity,
+            "model": _trim(getattr(getattr(self.coder, "harness", None), "model", "")),
+            "reasoning_effort": _trim(
+                getattr(getattr(self.coder, "harness", None), "reasoning_effort", "")
+            ),
+            "session_id": _trim(agent_runtime.get("session_id")),
+            "provider_session_id": _trim(agent_runtime.get("provider_session_id")),
+            "duration_ms": int(coding_raw.get("duration_ms") or 0),
+            "context_bundle": {
+                key: context_bundle.get(key)
+                for key in (
+                    "bundle_id", "owner_scope", "bundle_dir", "api_index", "api_task_context",
+                    "api_sources", "runtime_contract", "custom_tool_sdk", "coding_guide", "coding_workspace",
+                )
+                if context_bundle.get(key)
+            },
+        }
+        if not coding_result.get("ok"):
             coding_error = coding_result.get("error") if isinstance(coding_result.get("error"), Mapping) else {}
             next_state = {
                 **self._clean_state_for_context(state),
-                "status": "coding_failed" if retryable else "awaiting_design_confirmation",
-                "coding_feedback": coding_result.get("message") or coding_result.get("final", {}).get("need_design_fix"),
+                "agent_runtime": agent_runtime,
+                "coding_feedback": coding_result.get("message"),
                 "coding_error": dict(coding_error),
             }
             return {
-                "message": coding_result.get("message") or "代码生成需要回到设计阶段确认。",
-                "coding_status": coding_status or "need_design_fix",
+                "message": coding_result.get("message") or "本次代码实现没有产生可执行模块。",
+                "coding_status": "coding_failed",
                 "coding_error": dict(coding_error),
                 "events": coding_result.get("events") or [],
+                "implementation_meta": implementation_meta,
                 "state": next_state,
                 "thread_context_patch": {"custom_tool_state": next_state},
             }
+        coding_final = coding_result.get("final") if isinstance(coding_result.get("final"), Mapping) else {}
         bundle_design = self._bundle_from_coding_final(
             design_contract,
-            coding_result.get("final") if isinstance(coding_result.get("final"), Mapping) else {},
+            coding_final,
         )
         bundle_design["requirement_text"] = _trim(state.get("requirement_text"))
         bundle_design["design_provenance"] = {
@@ -1128,15 +1352,266 @@ class CustomToolAgentService:
         bundle_design["design_feedback_evidence"] = [
             dict(item) for item in state.get("feedback_ledger") or [] if isinstance(item, Mapping)
         ]
-        return self._save_test_and_return(
+        result = self._save_test_and_return(
             bundle_design,
             owner_id=actual_owner,
             events=coding_result.get("events") or [],
         )
+        result["implementation_meta"] = implementation_meta
+        result["coding_status"] = "implemented"
+        result["implementation_review"] = (
+            dict(coding_final.get("implementation_review") or {})
+            if isinstance(coding_final.get("implementation_review"), Mapping)
+            else (
+                dict(coding_final.get("technical_summary") or {})
+                if isinstance(coding_final.get("technical_summary"), Mapping)
+                else {}
+            )
+        )
+        result["implementation_explanation"] = (
+            dict(coding_final.get("implementation_explanation") or {})
+            if isinstance(coding_final.get("implementation_explanation"), Mapping)
+            else {}
+        )
+        result["coding_tests"] = [
+            {
+                key: item.get(key)
+                for key in (
+                    "test_id", "purpose", "input_json", "actual_output_json",
+                    "result", "checks", "evidence", "error",
+                )
+            }
+            for item in coding_final.get("tests") or []
+            if isinstance(item, Mapping)
+        ]
+        # Preserve system-owned assets and feedback; no workflow status gates the next turn.
+        next_state = {
+            **self._clean_state_for_context(state),
+            **dict(result.get("state") or {}),
+            "agent_runtime": agent_runtime,
+        }
+        result["state"] = next_state
+        result["thread_context_patch"] = {"custom_tool_state": next_state}
+        return result
+
+    def implement_dynamic_tool(
+        self,
+        *,
+        state: Mapping[str, Any],
+        owner_id: str,
+        instruction: str = "",
+        event_sink: Optional[Callable[[Dict[str, Any]], None]] = None,
+    ) -> Dict[str, Any]:
+        """Let Codex implement, validate, and review one dynamic-tool revision."""
+        coding_state = self._clean_state_for_context(state)
+        if _trim(instruction):
+            coding_state["coding_feedback"] = _trim(instruction)
+        return self._confirm_and_code(
+            state=coding_state,
+            owner_id=owner_id,
+            event_sink=event_sink,
+        )
+
+    def _run_existing_test(
+        self,
+        *,
+        request: str,
+        state: Mapping[str, Any],
+        owner_id: str,
+        event_sink: Optional[Callable[[Dict[str, Any]], None]] = None,
+    ) -> Dict[str, Any]:
+        tool_name = _trim(state.get("tool_name"))
+        if not tool_name or not self.store.exists(tool_name):
+            return {
+                "message": "当前还没有可运行的工具实现。",
+                "state": dict(state),
+                "thread_context_patch": {"custom_tool_state": dict(state)},
+            }
+        from src.services.asset_invocation_service import AssetInvocationError, AssetInvocationService
+
+        bundle = self.store.load(tool_name)
+        if self.tester is None:
+            return {
+                "message": "当前未启用测试 Skill，工具实现未改变。",
+                "test_status": "failed",
+                "state": dict(state),
+                "thread_context_patch": {"custom_tool_state": dict(state)},
+            }
+        tool_contract = {
+            "manifest": dict(bundle.get("manifest") or {}),
+            "input_schema": dict(bundle.get("input_schema") or {}),
+            "output_schema": dict(bundle.get("output_schema") or {}),
+            "sample_input": dict(bundle.get("sample_input") or {}),
+        }
+        max_test_turns = max(1, int(os.environ.get("CUSTOM_TOOL_TEST_MAX_TURNS") or DEFAULT_MAX_TEST_TURNS))
+        invocation_service = AssetInvocationService(custom_tool_store=self.store)
+        cases: List[Dict[str, Any]] = []
+        invocations: List[Dict[str, Any]] = []
+        test_history: List[Dict[str, Any]] = []
+        all_events: List[Dict[str, Any]] = []
+        presentation: Dict[str, Any] = {}
+        assessment = ""
+        plan_message = ""
+        planning_error = ""
+        planning_feedback = ""
+        finished_by_skill = False
+        max_turns_reached = False
+        planner_turns = 0
+
+        for test_turn in range(1, max_test_turns + 1):
+            planner_turns = test_turn
+            test_plan = self.tester.plan(
+                request,
+                context={
+                    "tool_contract": tool_contract,
+                    "test_history": test_history,
+                    "test_turn": test_turn,
+                    "max_test_turns": max_test_turns,
+                    **({"planning_feedback": planning_feedback} if planning_feedback else {}),
+                    "_workspace_identity": {"owner_id": owner_id, "tool_name": tool_name},
+                },
+                event_sink=event_sink,
+            )
+            all_events.extend(test_plan.get("events") or [])
+            if not test_plan.get("ok"):
+                planning_error = _trim(test_plan.get("error") or test_plan.get("message")) or "测试样例规划失败"
+                planning_feedback = f"上一轮测试规划未产生可执行结果：{planning_error}。请根据现有真实记录重新规划。"
+                if test_turn < max_test_turns:
+                    continue
+                max_turns_reached = True
+                break
+
+            planning_error = ""
+            planning_feedback = ""
+            plan_message = _trim(test_plan.get("message")) or plan_message
+            assessment = _trim(test_plan.get("assessment")) or assessment
+            if isinstance(test_plan.get("presentation"), Mapping):
+                presentation = dict(test_plan.get("presentation") or {})
+            planned_cases = [dict(item) for item in test_plan.get("cases") or [] if isinstance(item, Mapping)]
+            next_action = _trim(test_plan.get("next_action"))
+            if next_action == "finish":
+                finished_by_skill = True
+                break
+            if not planned_cases:
+                planning_error = "测试 Skill 要求继续，但没有给出下一批测试样例"
+                planning_feedback = planning_error + "。请给出至少一个可执行 case，或在证据充分时结束。"
+                if test_turn < max_test_turns:
+                    continue
+                max_turns_reached = True
+                break
+
+            turn_cases: List[Dict[str, Any]] = []
+            for planned_index, planned_case in enumerate(planned_cases):
+                case_request = _trim(planned_case.get("request")) or request
+                test_id_prefix = f"interactive_{test_turn}_{planned_index + 1}"
+                try:
+                    invocation = invocation_service.plan(
+                        text=case_request,
+                        selected_asset={"kind": "tool", "name": tool_name},
+                        owner_ids=[owner_id] if owner_id else None,
+                        allow_inactive=True,
+                    )
+                except AssetInvocationError as exc:
+                    turn_cases.append({
+                        "test_id": test_id_prefix,
+                        "category": "interactive_run",
+                        "status": "failed",
+                        "input": {},
+                        "actual": {},
+                        "logs": [],
+                        "purpose": _trim(planned_case.get("purpose")) or case_request,
+                        "error": str(exc),
+                    })
+                    continue
+                invocations.append(invocation)
+                if invocation.get("status") != "ready":
+                    turn_cases.append({
+                        "test_id": test_id_prefix,
+                        "category": "interactive_run",
+                        "status": "failed",
+                        "input": {},
+                        "actual": {},
+                        "logs": [],
+                        "purpose": _trim(planned_case.get("purpose")) or case_request,
+                        "error": _trim(invocation.get("message")) or "测试输入不完整",
+                    })
+                    continue
+                for call_index, arguments in enumerate(invocation.get("calls") or []):
+                    if not isinstance(arguments, Mapping):
+                        continue
+                    run_result = self.runtime.run(
+                        tool_name,
+                        dict(arguments),
+                        owner_ids=[owner_id] if owner_id else None,
+                        allow_inactive=True,
+                    )
+                    logs = [
+                        dict(item)
+                        for item in ((run_result.get("meta") or {}).get("execution_logs") or [])
+                        if isinstance(item, Mapping)
+                    ]
+                    turn_cases.append({
+                        "test_id": f"{test_id_prefix}_{call_index + 1}",
+                        "category": "interactive_run",
+                        "status": "passed" if run_result.get("ok") else "failed",
+                        "input": dict(arguments),
+                        "actual": dict(run_result.get("data") or {}),
+                        "logs": logs,
+                        "purpose": _trim(planned_case.get("purpose")) or case_request,
+                        "error": _trim(run_result.get("error")),
+                    })
+            cases.extend(turn_cases)
+            test_history.append({
+                "turn": test_turn,
+                "planned_cases": planned_cases,
+                "executions": turn_cases,
+            })
+            if test_turn == max_test_turns:
+                max_turns_reached = True
+
+        execution_ok = bool(cases) and all(item["status"] == "passed" for item in cases)
+        evidence_status = "sufficient" if finished_by_skill and bool(cases) else "inconclusive"
+        technical_summary = f"{sum(item['status'] == 'passed' for item in cases)} / {len(cases)} 项技术运行成功"
+        summary_parts = [technical_summary]
+        if assessment:
+            summary_parts.append(assessment)
+        if max_turns_reached:
+            summary_parts.append(f"已达到最多 {max_test_turns} 轮测试，基于现有证据结束")
+        if planning_error:
+            summary_parts.append(planning_error)
+        test_result = {
+            "ok": execution_ok,
+            "execution_ok": execution_ok,
+            "contract_ok": execution_ok,
+            "evidence_status": evidence_status,
+            "assessment": assessment,
+            "test_turns": planner_turns,
+            "max_test_turns": max_test_turns,
+            "max_turns_reached": max_turns_reached,
+            "error": planning_error or ("" if execution_ok else next((item["error"] for item in cases if item["error"]), "工具运行失败")),
+            "cases": cases,
+            "summary": "；".join(summary_parts) + "；业务结果请用户确认",
+        }
+        saved = self.store.record_test(tool_name, test_result)
+        next_state = {
+            **self._clean_state_for_context(state),
+            "tool_name": tool_name,
+            "owner_id": owner_id or _trim(state.get("owner_id")),
+        }
+        return {
+            "message": "\n".join(item for item in [plan_message, test_result["summary"]] if item),
+            "test_status": "passed" if execution_ok else "failed",
+            "test_result": test_result,
+            "invocations": invocations,
+            "presentation": dict(presentation),
+            "events": all_events,
+            "tool": saved,
+            "state": next_state,
+            "thread_context_patch": {"custom_tool_state": next_state},
+        }
 
     def _return_legacy_design(self, requirement_text: str, *, owner_id: str, design: Mapping[str, Any]) -> Dict[str, Any]:
         next_state = {
-            "status": "awaiting_design_confirmation",
             "requirement_text": requirement_text,
             "owner_id": owner_id,
             "design": dict(design),
@@ -1169,53 +1644,57 @@ class CustomToolAgentService:
         expected = self._expected_for_sample(proposed_tests, sample_input)
         execution_ok = bool(test_result.get("ok"))
         contract_ok = execution_ok
-        business_ok = execution_ok and self._business_result_matches(
-            test_result.get("data") if isinstance(test_result.get("data"), Mapping) else {},
-            expected,
-        )
         test_result.update({
             "execution_ok": execution_ok,
             "contract_ok": contract_ok,
-            "business_ok": business_ok,
-            "gate_passed": execution_ok and contract_ok and business_ok,
         })
         execution_logs = [
             dict(item)
             for item in ((test_result.get("meta") or {}).get("execution_logs") or [])
             if isinstance(item, Mapping)
         ]
+        actual_output = test_result.get("data") if isinstance(test_result.get("data"), Mapping) else {}
+        if not actual_output:
+            diagnostics = (test_result.get("meta") or {}).get("diagnostics") or {}
+            if isinstance(diagnostics.get("actual_output"), Mapping):
+                actual_output = dict(diagnostics["actual_output"])
         test_result["cases"] = [{
             "test_id": "sample_smoke",
             "category": "happy_path",
-            "status": "passed" if test_result.get("gate_passed") else "failed",
+            "status": "passed" if execution_ok else "failed",
             "input": sample_input,
             "expected": expected or {"business_result": "no top-level error and no ok=false"},
-            "actual": dict(test_result.get("data") or {}),
+            "actual": dict(actual_output),
             "logs": execution_logs,
             "purpose": "验证动态加载、沙箱执行、输出 Schema 和样例业务预期。",
-            "error": _trim(test_result.get("error")) or ("业务结果未达到样例预期。" if not business_ok else ""),
+            "error": _trim(test_result.get("error")),
         }]
         test_result["proposed_cases"] = proposed_tests
-        test_result["summary"] = "1 / 1 项运行测试通过" if test_result.get("gate_passed") else "0 / 1 项运行测试通过"
+        test_result["summary"] = "1 / 1 项技术运行成功" if execution_ok else "0 / 1 项技术运行成功"
         saved = self.store.record_test(manifest["tool_name"], test_result)
-        next_status = "draft_ready" if test_result.get("gate_passed") else "draft_needs_test"
         next_state = {
-            "status": next_status,
             "tool_name": manifest["tool_name"],
             "owner_id": owner_id,
             "implementation_revision": int(manifest.get("current_revision") or 0),
             "requirement_text": _trim(design.get("requirement_text")),
             "design_contract": dict(design.get("design_contract") or {}),
         }
+        if not execution_ok:
+            next_state["test_feedback"] = self._test_feedback(
+                test_result,
+                sample_input=sample_input,
+                expected=expected,
+                execution_logs=execution_logs,
+            )
         return {
             "message": (
                 f"已生成 draft：{manifest['tool_name']}。\n"
-                f"样例测试：{'通过' if test_result.get('gate_passed') else '失败'}"
-                + (f"\n错误：{test_result.get('error') or '业务结果未达到样例预期'}" if not test_result.get("gate_passed") else "")
+                f"样例技术运行：{'成功' if execution_ok else '失败'}"
+                + (f"\n错误：{test_result.get('error') or '运行失败'}" if not execution_ok else "")
                 + (
-                    "\n确认可用后可在当前设计卡片中启用；启用后仍保持个人私有。"
-                    if test_result.get("gate_passed")
-                    else "\n请修订实现或测试输入；只有三道测试门禁全部通过后才能启用。"
+                    "\n以下实际结果和核心日志供你确认业务逻辑；确认后可启用。"
+                    if execution_ok
+                    else "\n实现和失败现场均已保存，可根据真实错误继续修改。"
                 )
             ),
             "state": next_state,
@@ -1226,9 +1705,34 @@ class CustomToolAgentService:
         }
 
     def _bundle_from_coding_final(self, design: Mapping[str, Any], final: Mapping[str, Any]) -> Dict[str, Any]:
-        tool_name = self.store.normalize_tool_name(design.get("tool_name"))
-        display_name = _trim(design.get("display_name")) or tool_name
-        description = _trim(design.get("description"))
+        tool_contract = (
+            dict(final.get("tool_contract") or {})
+            if isinstance(final.get("tool_contract"), Mapping)
+            else {}
+        )
+        tool_name = self.store.normalize_tool_name(
+            tool_contract.get("tool_name") or design.get("tool_name")
+        )
+        display_name = (
+            _trim(tool_contract.get("display_name"))
+            or _trim(design.get("display_name"))
+            or tool_name
+        )
+        description = _trim(tool_contract.get("description")) or _trim(design.get("description"))
+        input_fields = (
+            tool_contract.get("inputs")
+            if isinstance(tool_contract.get("inputs"), list)
+            else design.get("inputs")
+            if isinstance(design.get("inputs"), list)
+            else []
+        )
+        output_fields = (
+            tool_contract.get("outputs")
+            if isinstance(tool_contract.get("outputs"), list)
+            else design.get("outputs")
+            if isinstance(design.get("outputs"), list)
+            else []
+        )
         code = self._select_code(final)
         if not code:
             raise CustomToolError("coding final does not include python code")
@@ -1242,15 +1746,22 @@ class CustomToolAgentService:
                 "implementation_logic": self._logic_text(design) or _trim((final.get("implementation") or {}).get("summary")),
                 "runtime": {"kind": "python_sandbox", "backend": "local_dev", "timeout_ms": 30000},
             },
-            "input_schema": self._schema_from_fields(design.get("inputs") if isinstance(design.get("inputs"), list) else []),
-            "output_schema": self._schema_from_fields(
-                design.get("outputs") if isinstance(design.get("outputs"), list) else [],
-                require_all=True,
-            ),
+            "input_schema": self._schema_from_fields(input_fields),
+            "output_schema": self._schema_from_fields(output_fields),
             "code": code,
             "sample_input": self._sample_input(final),
             "modules": [dict(item) for item in ((final.get("implementation") or {}).get("modules") or []) if isinstance(item, Mapping)],
             "proposed_tests": [dict(item) for item in final.get("tests") or [] if isinstance(item, Mapping)],
+            "implementation_explanation": (
+                dict(final.get("implementation_explanation") or {})
+                if isinstance(final.get("implementation_explanation"), Mapping)
+                else {}
+            ),
+            "implementation_review": (
+                dict(final.get("implementation_review") or {})
+                if isinstance(final.get("implementation_review"), Mapping)
+                else {}
+            ),
             "design_contract": dict(design),
         }
 
@@ -1277,25 +1788,14 @@ class CustomToolAgentService:
                 return dict(expected_value or {})
         return {}
 
-    @classmethod
-    def _business_result_matches(cls, actual: Mapping[str, Any], expected: Mapping[str, Any]) -> bool:
-        if actual.get("ok") is False or actual.get("error") not in (None, "", {}, []):
-            return False
-        return cls._contains_expected(actual, expected)
-
-    @classmethod
-    def _contains_expected(cls, actual: Any, expected: Any) -> bool:
-        if isinstance(expected, Mapping):
-            return isinstance(actual, Mapping) and all(
-                key in actual and cls._contains_expected(actual[key], value)
-                for key, value in expected.items()
-            )
-        if isinstance(expected, list):
-            return isinstance(actual, list) and actual == expected
-        return actual == expected
-
     @staticmethod
     def _logic_text(design: Mapping[str, Any]) -> str:
+        document = _trim(design.get("document"))
+        if document:
+            return document
+        plan = _trim(design.get("plan"))
+        if plan:
+            return plan
         logic = design.get("logic")
         if isinstance(logic, list):
             return "\n".join(_trim(item) for item in logic if _trim(item))
@@ -1343,7 +1843,7 @@ class CustomToolAgentService:
         }
 
     @staticmethod
-    def _schema_from_fields(fields: List[Any], *, require_all: bool = False) -> Dict[str, Any]:
+    def _schema_from_fields(fields: List[Any]) -> Dict[str, Any]:
         properties: Dict[str, Any] = {}
         required: List[str] = []
         for item in fields:
@@ -1357,6 +1857,9 @@ class CustomToolAgentService:
             if json_type not in {"string", "number", "boolean", "array", "object", "integer"}:
                 json_type = "string"
             field_schema: Dict[str, Any] = {"type": json_type, "description": _trim(item.get("description"))}
+            label = _trim(item.get("label"))
+            if label:
+                field_schema["title"] = label
             raw_values = item.get("values") or []
             if json_type == "string":
                 values = [value for value in raw_values if isinstance(value, str)]
@@ -1371,12 +1874,37 @@ class CustomToolAgentService:
             if values:
                 field_schema["enum"] = values
             properties[name] = field_schema
-            if require_all or item.get("required") is True:
+            if item.get("required") is True:
                 required.append(name)
         schema: Dict[str, Any] = {"type": "object", "properties": properties, "additionalProperties": True}
         if required:
             schema["required"] = required
         return schema
+
+    @staticmethod
+    def _test_feedback(
+        test_result: Mapping[str, Any],
+        *,
+        sample_input: Mapping[str, Any],
+        expected: Mapping[str, Any],
+        execution_logs: List[Dict[str, Any]],
+    ) -> Dict[str, Any]:
+        """Keep the concrete failed-run evidence for the next Coding turn."""
+        actual = test_result.get("data") if isinstance(test_result.get("data"), Mapping) else {}
+        if not actual:
+            diagnostics = (test_result.get("meta") or {}).get("diagnostics") or {}
+            if isinstance(diagnostics.get("actual_output"), Mapping):
+                actual = dict(diagnostics["actual_output"])
+        return {
+            "summary": _trim(test_result.get("summary")) or "样例测试未通过",
+            "execution_ok": bool(test_result.get("execution_ok")),
+            "contract_ok": bool(test_result.get("contract_ok")),
+            "error": _trim(test_result.get("error")),
+            "input": dict(sample_input),
+            "expected": dict(expected),
+            "actual": dict(actual),
+            "logs": [dict(item) for item in execution_logs],
+        }
 
     @staticmethod
     def _select_code(final: Mapping[str, Any]) -> str:

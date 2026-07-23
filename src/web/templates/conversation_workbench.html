@@ -1994,7 +1994,6 @@
       applicationDisplayName: {{ application_display_name|tojson }},
       chatPlaceholder: {{ (chat_placeholder or "")|tojson }},
       assistantIntro: {{ (assistant_intro or "可以直接输入自然语言问题。")|tojson }},
-      assistantAgent: {{ (assistant_agent or {})|tojson }},
       defaultAgent: {{ (default_agent or {})|tojson }},
       guestUserId: {{ (guest_user_id or "")|tojson }},
       slashItems: [],
@@ -2317,7 +2316,7 @@
       if (item.job_id) lines.push(`<div><strong>job_id</strong>${escapeHtml(item.job_id)}</div>`);
       if (Array.isArray(item.skills) && item.skills.length) lines.push(`<div><strong>skills</strong>${escapeHtml(item.skills.join(", "))}</div>`);
       if (Array.isArray(item.tools) && item.tools.length) lines.push(`<div><strong>tools</strong>${escapeHtml(item.tools.join(", "))}</div>`);
-      if (Array.isArray(item.default_agents) && item.default_agents.length) lines.push(`<div><strong>default_agents</strong>${escapeHtml(item.default_agents.join(", "))}</div>`);
+      if (item.default_agent) lines.push(`<div><strong>default_agent</strong>${escapeHtml(item.default_agent)}</div>`);
       if (item.example_count) lines.push(`<div><strong>examples</strong>${escapeHtml(item.example_count)}</div>`);
       return lines;
     }
@@ -3964,7 +3963,6 @@
       state.applicationDisplayName = String(appCtx.display_name || state.applicationDisplayName || "").trim();
       state.chatPlaceholder = String(appCtx.chat_placeholder || state.chatPlaceholder || "").trim();
       state.assistantIntro = String(appCtx.assistant_intro || state.assistantIntro || "").trim();
-      state.assistantAgent = (appCtx.assistant_agent && typeof appCtx.assistant_agent === "object") ? appCtx.assistant_agent : {};
       state.defaultAgent = (appCtx.default_agent && typeof appCtx.default_agent === "object") ? appCtx.default_agent : {};
       document.title = state.applicationDisplayName || "Assistant";
       const globalTitle = document.getElementById("globalTitle");

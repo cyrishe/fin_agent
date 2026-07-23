@@ -4,40 +4,12 @@
   "version": "v1",
   "status": "active",
   "enabled": true,
-  "owner": "agents",
   "domain": "market",
   "role": "investment_analyst",
-  "capabilities": [
-    "analysis",
-    "skill_orchestration",
-    "tool_orchestration"
-  ],
-  "tags": [
-    "agent",
-    "investment",
-    "analysis"
-  ],
-  "keywords": [
-    "投资分析",
-    "市场分析",
-    "投研"
-  ],
   "responsibilities": [
-    "面向投研问题组织分析流程",
-    "在受控范围内选择合适的 skill 和 tool",
-    "输出结构化、可审计的结论"
+    "解决金融证券、股票、上市公司、行业、板块和指数相关问题",
+    "负责金融证券相关工具的构造、优化、修改和执行"
   ],
-  "context_policy": {
-    "prefer_thread_summary": true,
-    "include_recent_turns": 6,
-    "include_skill_metadata_only": true
-  },
-  "skill_policy": {
-    "mode": "strict"
-  },
-  "tool_policy": {
-    "mode": "strict"
-  },
   "skills": [
     "stock_deep_dive"
   ],
@@ -54,6 +26,5 @@
     "stock_industry_funds_flow",
     "financial_news_search",
     "equity_research_search"
-  ],
-  "handoff_agents": []
+  ]
 }

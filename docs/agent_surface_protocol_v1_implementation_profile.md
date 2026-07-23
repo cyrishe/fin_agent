@@ -48,7 +48,7 @@
 
 | 层 | 合同 | 负责内容 |
 |---|---|---|
-| Design Skill | `financial-tool-requirement-design-v3/schema.json` | `clarification/review`、需求理解、问题、完整设计快照、现有实现分析 |
+| Design Skill | `financial-tool-development/schema.json` | `clarification/review`、需求理解、问题、完整设计快照、现有实现分析 |
 | 业务工作流 | 后台状态机 | 收集需求、等待设计确认、实现、验证、等待提交、完成或失败 |
 | Agent Surface | `agent_surface.v1` | Narrative、Artifact、Workflow、Assessment、Interaction 及流式更新 |
 

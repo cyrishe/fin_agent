@@ -1,0 +1,136 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["message", "tool_contract", "implementation", "implementation_explanation", "implementation_review", "technical_summary", "tests", "sample_input_json", "implementation_notes", "issues"],
+  "properties": {
+    "message": {"type": "string"},
+    "tool_contract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["tool_name", "display_name", "description", "inputs", "outputs"],
+      "properties": {
+        "tool_name": {"type": "string"},
+        "display_name": {"type": "string"},
+        "description": {"type": "string"},
+        "inputs": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["name", "type", "required", "description"],
+            "properties": {
+              "name": {"type": "string"},
+              "type": {"type": "string", "enum": ["string", "integer", "number", "boolean", "array", "object"]},
+              "required": {"type": "boolean"},
+              "description": {"type": "string"}
+            }
+          }
+        },
+        "outputs": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["name", "type", "required", "description"],
+            "properties": {
+              "name": {"type": "string"},
+              "type": {"type": "string", "enum": ["string", "integer", "number", "boolean", "array", "object"]},
+              "required": {"type": "boolean"},
+              "description": {"type": "string"}
+            }
+          }
+        }
+      }
+    },
+    "implementation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["summary", "entry_module", "modules"],
+      "properties": {
+        "summary": {"type": "string"},
+        "entry_module": {"type": "string"},
+        "modules": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["module_id", "role", "language", "entrypoint", "functions", "source_code"],
+            "properties": {
+              "module_id": {"type": "string"},
+              "role": {"type": "string"},
+              "language": {"type": "string", "enum": ["python"]},
+              "entrypoint": {"type": "string", "enum": ["run"]},
+              "functions": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": ["name", "responsibility"],
+                  "properties": {
+                    "name": {"type": "string"},
+                    "responsibility": {"type": "string"}
+                  }
+                }
+              },
+              "source_code": {"type": "string", "description": "首次实现返回源码；修改已有工作区模块时可为空字符串，由系统回收文件内容。"}
+            }
+          }
+        }
+      }
+    },
+    "implementation_explanation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["summary", "core_flow", "key_modules"],
+      "properties": {
+        "summary": {"type": "string"},
+        "core_flow": {"type": "array", "items": {"type": "string"}},
+        "key_modules": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "implementation_review": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["conclusion", "requirement_alignment", "design_alignment", "deviations"],
+      "properties": {
+        "conclusion": {"type": "string", "enum": ["matches", "has_deviations", "blocked"]},
+        "requirement_alignment": {"type": "array", "items": {"type": "string"}},
+        "design_alignment": {"type": "array", "items": {"type": "string"}},
+        "deviations": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "technical_summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "conclusion", "verified", "unresolved"],
+      "properties": {
+        "status": {"type": "string", "enum": ["complete", "blocked"]},
+        "conclusion": {"type": "string"},
+        "verified": {"type": "array", "items": {"type": "string"}},
+        "unresolved": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "tests": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["test_id", "purpose", "input_json", "actual_output_json", "result", "checks", "evidence", "error"],
+        "properties": {
+          "test_id": {"type": "string"},
+          "purpose": {"type": "string"},
+          "input_json": {"type": "string"},
+          "actual_output_json": {"type": "string"},
+          "result": {"type": "string", "enum": ["passed", "failed", "not_run"]},
+          "checks": {"type": "array", "items": {"type": "string"}},
+          "evidence": {"type": "array", "items": {"type": "string"}},
+          "error": {"type": "string"}
+        }
+      }
+    },
+    "sample_input_json": {"type": "string"},
+    "implementation_notes": {"type": "array", "items": {"type": "string"}},
+    "issues": {"type": "array", "items": {"type": "string"}}
+  }
+}
