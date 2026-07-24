@@ -60,14 +60,13 @@ def test_finance_cc_design_and_flow_are_merged_without_action_mapping(monkeypatc
         "display_name": "金叉扫描",
         "description": "扫描近期金叉",
     }
-    flow = {"steps": [{"id": "start"}], "links": []}
     finance_cc = _FinanceCcStub(
         {
             "ok": True,
             "result": "方案和流程已经形成。",
             "artifact_updates": [
-                {"artifact_type": "design", "payload": {"summary": "方案", "design": design, "change_summary": []}},
-                {"artifact_type": "flow", "payload": {"summary": "流程", "flow": flow, "mermaid": "flowchart TD"}},
+                {"artifact_type": "design", "payload": {"design": design}},
+                {"artifact_type": "flow", "payload": {"mermaid": "flowchart TD"}},
             ],
             "interaction_requests": [],
         }
@@ -84,8 +83,48 @@ def test_finance_cc_design_and_flow_are_merged_without_action_mapping(monkeypatc
 
     assert result["design_status"] == "review"
     assert result["state"]["tool_name"] == "golden_cross_scan"
-    assert result["design"]["flow"] == flow
     assert result["design"]["mermaid"] == "flowchart TD"
+
+
+def test_finance_cc_requirement_and_design_in_same_turn_do_not_create_a_gate(monkeypatch) -> None:
+    monkeypatch.setenv("FINANCE_CC_TOOL_DEVELOPMENT_ENABLED", "1")
+    finance_cc = _FinanceCcStub(
+        {
+            "ok": True,
+            "result": "需求已经收敛，设计方案也已形成。",
+            "artifact_updates": [
+                {
+                    "artifact_type": "requirement",
+                    "payload": {
+                        "requirement_brief": "判断指定A股最近30或60日是否出现MA5上穿MA20。",
+                        "questions": [],
+                    },
+                },
+                {
+                    "artifact_type": "design",
+                    "payload": {
+                        "design": "## 流程\n读取日线，计算均线，识别金叉并返回日期。",
+                    },
+                },
+            ],
+            "interaction_requests": [],
+        }
+    )
+    service = CustomToolAgentService(use_codex=False, finance_cc_service=finance_cc)
+
+    result = service.handle_turn(
+        "按默认口径继续",
+        state={"requirement_text": "做一个金叉识别工具"},
+        owner_id="owner-1",
+        thread_id=20,
+        turn_id=26,
+    )
+
+    assert result["design_status"] == "review"
+    assert result["questions"] == []
+    assert result["state"]["requirement_brief"].startswith("判断指定A股")
+    assert "计算均线" in result["state"]["design_contract"]["document"]
+    assert "status" not in result["state"]
 
 
 def test_finance_cc_keeps_valid_artifact_when_turn_ends_with_runtime_error(monkeypatch) -> None:

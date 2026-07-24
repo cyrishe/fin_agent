@@ -62,9 +62,9 @@ class _Coder:
     def code(self, design, *, requirement_text="", context=None, event_sink=None):
         self.contexts.append(dict(context or {}))
         source = (
-            "def run(inputs: dict) -> dict:\n    return {'wrong': 1}\n"
+            "def run(inputs: dict) -> dict:\n    return {'wrong': 1, 'key_process_info': {'value_count': len(inputs.get('values') or [])}}\n"
             if len(self.contexts) <= self.failures
-            else "def run(inputs: dict) -> dict:\n    return {'total': sum(inputs.get('values') or [])}\n"
+            else "def run(inputs: dict) -> dict:\n    values = inputs.get('values') or []\n    return {'total': sum(values), 'key_process_info': {'value_count': len(values)}}\n"
         )
         return {
             "ok": True,
@@ -203,7 +203,10 @@ def test_design_confirmation_runs_codex_output_and_keeps_only_asset_facts(tmp_pa
     )
 
     assert drafted["test_result"]["execution_ok"] is True
-    assert drafted["test_result"]["data"] == {"total": 6}
+    assert drafted["test_result"]["data"] == {
+        "total": 6,
+        "key_process_info": {"value_count": 3},
+    }
     saved_bundle = store.load("sum_values")
     assert saved_bundle["implementation_review"]["conclusion"] == "matches"
     assert saved_bundle["implementation_explanation"]["core_flow"]
@@ -231,8 +234,9 @@ def test_coding_contract_builds_runtime_schema_from_natural_language_design(tmp_
     assert bundle["manifest"]["implementation_logic"] == "一份结构化自然语言设计文档。"
     assert bundle["input_schema"]["required"] == ["values"]
     assert bundle["input_schema"]["properties"]["values"]["type"] == "array"
-    assert bundle["output_schema"]["required"] == ["total"]
+    assert bundle["output_schema"]["required"] == ["total", "key_process_info"]
     assert bundle["output_schema"]["properties"]["total"]["type"] == "number"
+    assert bundle["output_schema"]["properties"]["key_process_info"]["type"] == "object"
 
 
 def test_coding_returns_real_failure_feedback_for_controller_driven_retry(tmp_path: Path) -> None:
@@ -261,7 +265,10 @@ def test_coding_returns_real_failure_feedback_for_controller_driven_retry(tmp_pa
     )
     assert repaired["test_result"]["execution_ok"] is True
     assert len(coder.contexts) == 2
-    assert coder.contexts[1]["test_feedback"]["actual"] == {"wrong": 1}
+    assert coder.contexts[1]["test_feedback"]["actual"] == {
+        "wrong": 1,
+        "key_process_info": {"value_count": 3},
+    }
 
 
 def test_unknown_ui_action_is_the_only_action_level_rejection() -> None:
@@ -539,32 +546,51 @@ def test_first_coding_turn_gets_editable_module_focused_api_context_and_test_run
     assert Path(bundle["bundle_dir"], module_path).is_file()
     assert Path(bundle["bundle_dir"], "dev_runtime/custom_tool_sdk.py").is_file()
     assert Path(bundle["bundle_dir"], "dev_runtime/test_support.py").is_file()
+    assert bundle["module_template"] == "DYNAMIC_TOOL_TEMPLATE.py"
+    template = Path(bundle["bundle_dir"], bundle["module_template"]).read_text(encoding="utf-8")
+    assert "def run(inputs: dict) -> dict:" in template
+    assert '"key_process_info"' in template
+    assert 'debug("key_process_info"' in template
     coding_guide = Path(bundle["bundle_dir"], "CODING_WORKSPACE.md").read_text(encoding="utf-8")
     assert "Use this exact interpreter" in coding_guide
     assert "PYTHONPYCACHEPREFIX=scratch/pycache" in coding_guide
     assert "from test_support import load_module, install_rows" in coding_guide
     assert "task_context.json` is the first reference for the Design's data needs" in coding_guide
     assert Path(bundle["bundle_dir"], "scratch").is_dir()
+    sdk_doc = Path(bundle["bundle_dir"], "custom_tool_sdk.md").read_text(encoding="utf-8")
+    assert 'filter = "code = 600519.SH and tradedate <= 2026-07-23"' in sdk_doc
+    assert "Do not add nested escaped quotes" in sdk_doc
 
     Path(bundle["bundle_dir"], module_path).write_text(
         "def run(inputs):\n    return {'close': 1}\n",
         encoding="utf-8",
     )
     collected = service.collect_coding_result(bundle, {
-        "implementation": {
-            "summary": "实现完成",
-            "entry_module": "main",
-            "modules": [{
-                "module_id": "main",
-                "role": "入口",
-                "language": "python",
-                "entrypoint": "run",
-                "functions": [{"name": "run", "responsibility": "入口"}],
-                "source_code": "",
-            }],
-        }
+        "message": "实现完成",
+        "implementation_summary": "读取行情并返回收盘价。",
+        "verification": "代表性样例运行成功，需求、设计和代码一致。",
+        "sample_input_json": "{\"code\":\"600519.SH\"}",
     })
     assert "return {'close': 1}" in collected["implementation"]["modules"][0]["source_code"]
+    assert collected["implementation_summary"] == "读取行情并返回收盘价。"
+
+
+def test_platform_normalizes_key_process_info_as_required_object() -> None:
+    fields = CustomToolAgentService._with_key_process_info_output([
+        {"name": "result", "type": "string", "required": True, "description": "结果"},
+        {
+            "name": "key_process_info",
+            "type": "string",
+            "required": False,
+            "description": "",
+        },
+    ])
+
+    key_process = next(item for item in fields if item["name"] == "key_process_info")
+    assert key_process["type"] == "object"
+    assert key_process["required"] is True
+    assert key_process["description"]
+    assert [item["name"] for item in fields].count("key_process_info") == 1
 
 
 def test_coding_session_reuses_workspace_and_preserves_partial_source(tmp_path: Path) -> None:

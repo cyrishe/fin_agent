@@ -12,18 +12,21 @@ IMPLEMENTATION_DIR = SKILL_DIR / "skills" / "financial-tool-implementation"
 CODING_PLAYBOOK = IMPLEMENTATION_DIR / "references" / "coding.md"
 
 
-def test_coding_skill_contract_uses_dynamic_modules_not_files() -> None:
+def test_coding_skill_contract_keeps_only_runtime_contract_and_natural_language_results() -> None:
     schema = json.loads((IMPLEMENTATION_DIR / "schema.json").read_text(encoding="utf-8"))
     properties = schema["properties"]
 
-    assert "files" not in properties
-    assert "implementation" in properties
-    modules_schema = properties["implementation"]["properties"]["modules"]
-    module_properties = modules_schema["items"]["properties"]
-    assert {"module_id", "entrypoint", "functions", "source_code"}.issubset(module_properties)
-    assert "maxItems" not in modules_schema
-    assert "pattern" not in module_properties["module_id"]
-    assert "maxItems" not in properties["tests"]
+    assert set(properties) == {
+        "message",
+        "tool_contract",
+        "implementation_summary",
+        "verification",
+        "sample_input_json",
+    }
+    assert properties["implementation_summary"]["type"] == "string"
+    assert properties["verification"]["type"] == "string"
+    assert "implementation" not in properties
+    assert "tests" not in properties
 
 
 def test_coding_skill_uses_api_contract_without_database_prerequisites() -> None:
@@ -42,9 +45,8 @@ def test_coding_skill_defines_dynamic_module_instead_of_user_file() -> None:
 
     assert "不是 `.py` 文件" in skill_text
     assert "动态执行" in skill_text
-    assert "系统保存并动态加载" in contract_text
-    assert "source_code" in contract_text
-    assert "不要在最终 JSON 中重复整份" in skill_text
+    assert "隔离工作区文件为唯一真源" in contract_text
+    assert "不在最终 JSON 中重复源码" in skill_text
 
 
 def test_coding_schema_is_compatible_with_strict_structured_output() -> None:
@@ -68,10 +70,6 @@ def test_coding_schema_is_compatible_with_strict_structured_output() -> None:
 
     inspect(schema)
     assert schema["properties"]["sample_input_json"]["type"] == "string"
-    test_properties = schema["properties"]["tests"]["items"]["properties"]
-    assert test_properties["input_json"]["type"] == "string"
-    assert test_properties["result"]["type"] == "string"
-    assert test_properties["error"]["type"] == "string"
 
 
 def test_coding_skill_sample_matches_schema() -> None:
@@ -92,56 +90,34 @@ def test_coding_skill_sample_matches_schema() -> None:
                 "type": "number",
                 "required": True,
                 "description": "合计值。",
+            }, {
+                "name": "key_process_info",
+                "type": "object",
+                "required": True,
+                "description": "解释结果的核心中间信息。",
             }],
         },
-        "implementation": {
-            "summary": "实现求和。",
-            "entry_module": "main",
-            "modules": [{
-                "module_id": "main",
-                "role": "动态执行入口",
-                "language": "python",
-                "entrypoint": "run",
-                "functions": [
-                    {"name": "sum_values", "responsibility": "计算合计。"},
-                    {"name": "run", "responsibility": "执行入口。"},
-                ],
-                "source_code": "def run(inputs: dict) -> dict:\n    return {'total': sum(inputs['values'])}\n",
-            }],
-        },
-        "implementation_explanation": {
-            "summary": "读取数字数组并返回合计。",
-            "core_flow": ["读取 values", "计算合计", "组装输出"],
-            "key_modules": ["run：动态入口与结果组装"],
-        },
-        "implementation_review": {
-            "conclusion": "matches",
-            "requirement_alignment": ["实现数字求和目标"],
-            "design_alignment": ["输入 values 与输出 total 保持一致"],
-            "deviations": [],
-        },
-        "technical_summary": {
-            "status": "complete",
-            "conclusion": "入口与样例技术运行通过。",
-            "verified": ["动态入口可加载", "样例输出可序列化"],
-            "unresolved": [],
-        },
-        "tests": [{
-            "test_id": "basic",
-            "input_json": "{\"values\":[1,2]}",
-            "actual_output_json": "{\"total\":3}",
-            "result": "passed",
-            "checks": ["run 返回 dict", "total 等于 3"],
-            "evidence": ["total=3"],
-            "error": "",
-            "purpose": "验证求和。",
-        }],
+        "implementation_summary": "读取数字数组，由 run 调用求和函数并返回 total。",
+        "verification": "实际运行 values=[1,2]，得到 total=3，key_process_info 记录输入数量；run 落实求和需求，需求、设计和代码一致。",
         "sample_input_json": "{\"values\":[1,2]}",
-        "implementation_notes": [],
-        "issues": [],
     }
 
     fastjsonschema.compile(json.loads((IMPLEMENTATION_DIR / "schema.json").read_text(encoding="utf-8")))(payload)
+
+
+def test_coding_skill_requires_compact_core_process_evidence_and_alignment_explanation() -> None:
+    skill_text = (IMPLEMENTATION_DIR / "SKILL.md").read_text(encoding="utf-8")
+    playbook_text = CODING_PLAYBOOK.read_text(encoding="utf-8")
+    contract_text = (
+        IMPLEMENTATION_DIR / "references" / "coding-output-contract.md"
+    ).read_text(encoding="utf-8")
+    combined = "\n".join((skill_text, playbook_text, contract_text))
+
+    assert "DYNAMIC_TOOL_TEMPLATE.py" in combined
+    assert "所有返回路径都必须包含 `key_process_info` 对象" in combined
+    assert "不机械堆砌无关字段" in combined
+    assert "需求 → Design → Code" in combined
+    assert "分别由哪些代码函数落实" in combined
 
 
 def test_coder_defaults_to_focused_implementation_skill_and_schema() -> None:
@@ -171,12 +147,21 @@ def test_coder_passes_confirmed_design_once_as_context() -> None:
     design = {"tool_name": "demo", "rules": [{"name": "核心规则"}]}
     coder = CodexCustomToolCoder(harness=harness)
 
-    coder.code(design, requirement_text="一段不应重复注入的原始需求")
+    coder.code(design, requirement_text="计算输入数字之和")
 
-    assert harness.kwargs["context"] == {"design": design}
+    assert harness.kwargs["context"] == {
+        "design": design,
+        "requirement_brief": "计算输入数字之和",
+    }
     assert "CONTEXT.design" in harness.kwargs["user_request"]
-    assert "一段不应重复注入的原始需求" not in harness.kwargs["user_request"]
+    assert "计算输入数字之和" not in harness.kwargs["user_request"]
     assert json.dumps(design, ensure_ascii=False) not in harness.kwargs["user_request"]
+
+
+def test_coder_rejects_only_unusable_sample_input_protocol() -> None:
+    assert CodexCustomToolCoder._sample_input_error('{"code":"600519.SH"}') == ""
+    assert CodexCustomToolCoder._sample_input_error("[]") == "代表性样例输入必须是 JSON 对象。"
+    assert CodexCustomToolCoder._sample_input_error("{broken") == "代表性样例输入不是合法 JSON。"
 
 
 def test_coder_distinguishes_runtime_failure_from_design_fix() -> None:

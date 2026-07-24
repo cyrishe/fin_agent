@@ -199,7 +199,9 @@ class AssistantInteractionPreprocessor:
         available_assets: List[str] = []
         if has_design:
             available_assets.append("design")
-            if isinstance(design.get("flow"), dict) and design.get("flow"):
+            if self._trim(design.get("mermaid")) or (
+                isinstance(design.get("flow"), dict) and design.get("flow")
+            ):
                 available_assets.append("flow")
         if has_implementation:
             available_assets.extend(["code", "tests"])

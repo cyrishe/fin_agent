@@ -65,8 +65,9 @@ def test_shadow_prompt_contains_only_current_turn_delta() -> None:
     assert "ignored_large_payload" not in prompt
 
 
-def test_requirement_only_mode_is_forwarded_to_runtime_tools(tmp_path: Path) -> None:
+def test_runtime_context_does_not_include_evaluation_stage_gate(tmp_path: Path, monkeypatch) -> None:
     calls = []
+    monkeypatch.setenv("FINANCE_CC_REQUIREMENT_ONLY", "1")
 
     def fake_runner(**kwargs):
         calls.append(kwargs)
@@ -74,7 +75,6 @@ def test_requirement_only_mode_is_forwarded_to_runtime_tools(tmp_path: Path) -> 
 
     service = FinanceClaudeSessionService(
         enabled=True,
-        requirement_only=True,
         root_dir=tmp_path / "sessions",
         log_path=tmp_path / "events.jsonl",
         turn_runner=fake_runner,
@@ -82,7 +82,7 @@ def test_requirement_only_mode_is_forwarded_to_runtime_tools(tmp_path: Path) -> 
 
     service.run_turn(thread_id=9, owner_id="owner-a", user_text="做一个选股工具")
 
-    assert calls[0]["tool_context"]["_finance_cc_requirement_only"] is True
+    assert "_finance_cc_requirement_only" not in calls[0]["tool_context"]
 
 
 def test_failed_session_rotates_before_next_turn_then_resumes(tmp_path: Path) -> None:

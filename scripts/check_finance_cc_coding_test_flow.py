@@ -24,6 +24,7 @@ def main() -> int:
     design = dict(fixture.get("design") or {})
     state = {
         "owner_id": "finance-cc-coding-test-probe",
+        "requirement_brief": str((fixture.get("understanding") or {}).get("goal") or ""),
         "requirement_text": str((fixture.get("understanding") or {}).get("goal") or ""),
         "understanding": dict(fixture.get("understanding") or {}),
         "design_contract": design,

@@ -81,7 +81,6 @@ class FinanceCcSystemTools:
         )
         working_state: Dict[str, Any] = dict(initial_state)
         runtime_scope = _trim(tool_context.get("_agent_runtime_scope"))
-        requirement_only = bool(tool_context.get("_finance_cc_requirement_only"))
         result_scope = runtime_scope or (_trim(owner_ids[0]) if owner_ids else "finance_cc")
         live_tool_context = {**dict(tool_context), "custom_tool_state": working_state}
         implementation_response: Optional[Dict[str, Any]] = None
@@ -153,25 +152,20 @@ class FinanceCcSystemTools:
                     working_state["tool_name"] = _trim(design.get("tool_name"))
                 return
             if artifact_type == "flow":
-                flow = payload.get("flow")
+                mermaid = _trim(payload.get("mermaid"))
                 design = dict(working_state.get("design_contract") or {})
-                if isinstance(flow, Mapping) and design:
-                    design["flow"] = dict(flow)
-                    design["mermaid"] = _trim(payload.get("mermaid"))
+                if mermaid and design:
+                    design["mermaid"] = mermaid
                     working_state["design_contract"] = design
 
-        artifact_payload_schema = (
-            self._artifact_schema("requirement")
-            if requirement_only
-            else {
-                "oneOf": [
-                    self._artifact_schema("requirement"),
-                    self._artifact_schema("design"),
-                    self._artifact_schema("flow"),
-                    self._artifact_schema("test_evidence"),
-                ]
-            }
-        )
+        artifact_payload_schema = {
+            "oneOf": [
+                self._artifact_schema("requirement"),
+                self._artifact_schema("design"),
+                self._artifact_schema("flow"),
+                self._artifact_schema("test_evidence"),
+            ]
+        }
 
         @tool(
             "finance_query",
@@ -316,15 +310,13 @@ class FinanceCcSystemTools:
                 "properties": {
                     "questions": {
                         "type": "array",
-                        "maxItems": 5,
                         "items": {
                             "type": "object",
                             "properties": {
-                                "question": {"type": "string", "minLength": 1, "maxLength": 500},
+                                "question": {"type": "string", "minLength": 1},
                                 "candidate": {
                                     "type": "array",
-                                    "maxItems": 6,
-                                    "items": {"type": "string", "minLength": 1, "maxLength": 300},
+                                    "items": {"type": "string", "minLength": 1},
                                 },
                             },
                             "required": ["question", "candidate"],
@@ -357,11 +349,7 @@ class FinanceCcSystemTools:
                 "properties": {
                     "artifact_type": {
                         "type": "string",
-                        "enum": (
-                            ["requirement"]
-                            if requirement_only
-                            else ["requirement", "design", "flow", "test_evidence"]
-                        ),
+                        "enum": ["requirement", "design", "flow", "test_evidence"],
                     },
                     "payload": artifact_payload_schema,
                 },
@@ -376,17 +364,6 @@ class FinanceCcSystemTools:
             payload = dict(args.get("payload") or {})
             call_record = {"tool": "save_finance_artifact", "artifact_type": artifact_type}
             tracker["calls"].append(call_record)
-            if requirement_only and artifact_type != "requirement":
-                call_record["ok"] = False
-                call_record["error"] = "requirement-only evaluation accepts only requirement artifacts"
-                return _tool_result(
-                    {
-                        "ok": False,
-                        "artifact_type": artifact_type,
-                        "error": call_record["error"],
-                    },
-                    is_error=True,
-                )
             try:
                 schema = self._artifact_schema(artifact_type)
                 fastjsonschema.validate(schema, payload)
@@ -564,8 +541,8 @@ class FinanceCcSystemTools:
             available_assets = []
             if working_state.get("design_contract"):
                 available_assets.append("design")
-                design_flow = (working_state.get("design_contract") or {}).get("flow")
-                if design_flow:
+                design = working_state.get("design_contract") or {}
+                if design.get("mermaid") or design.get("flow"):
                     available_assets.append("flow")
             if manifest:
                 available_assets.extend(["code", "tool_contract"])
@@ -589,19 +566,15 @@ class FinanceCcSystemTools:
             implementation_response = dict(tool_response)
             return _tool_result(tool_response, is_error=not bool(record["ok"]))
 
-        tools = (
-            [request_user_interaction, save_finance_artifact]
-            if requirement_only
-            else [
-                finance_query,
-                load_result,
-                read_finance_asset,
-                request_user_interaction,
-                save_finance_artifact,
-                run_dynamic_tool,
-                implement_dynamic_tool,
-            ]
-        )
+        tools = [
+            finance_query,
+            load_result,
+            read_finance_asset,
+            request_user_interaction,
+            save_finance_artifact,
+            run_dynamic_tool,
+            implement_dynamic_tool,
+        ]
         names = [f"mcp__finance__{item.name}" for item in tools]
         return tools, names, tracker
 
@@ -664,6 +637,8 @@ class FinanceCcSystemTools:
         if asset_type == "design":
             return dict(design)
         if asset_type == "flow":
+            if _trim(design.get("mermaid")):
+                return {"mermaid": _trim(design.get("mermaid"))}
             return dict(design.get("flow") or {}) if isinstance(design.get("flow"), Mapping) else {}
         resolved_tool_name = tool_name or _trim(state.get("tool_name")) or _trim(tool_context.get("custom_tool_name"))
         if not resolved_tool_name:

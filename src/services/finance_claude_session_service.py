@@ -35,16 +35,9 @@ class FinanceClaudeSessionService:
         max_workers: int = 2,
         turn_runner: Optional[Callable[..., Dict[str, Any]]] = None,
         system_tools: Any = None,
-        requirement_only: Optional[bool] = None,
     ) -> None:
         enabled_text = _trim(os.environ.get("FINANCE_CC_SHADOW_ENABLED")).lower()
         self.enabled = bool(enabled) if enabled is not None else enabled_text in {"1", "true", "yes", "on"}
-        requirement_only_text = _trim(os.environ.get("FINANCE_CC_REQUIREMENT_ONLY")).lower()
-        self.requirement_only = (
-            bool(requirement_only)
-            if requirement_only is not None
-            else requirement_only_text in {"1", "true", "yes", "on"}
-        )
         self.provider = _trim(provider or os.environ.get("FINANCE_CC_PROVIDER") or "dashscope").lower()
         self.model = _trim(model or os.environ.get("FINANCE_CC_MODEL") or "deepseek-v4-flash")
         self.root_dir = Path(root_dir)
@@ -113,7 +106,6 @@ class FinanceClaudeSessionService:
             prompt = self.build_user_prompt(user_text, context or {})
             runtime_tool_context = dict(context or {})
             runtime_tool_context["_agent_runtime_scope"] = key
-            runtime_tool_context["_finance_cc_requirement_only"] = self.requirement_only
             started_at = time.monotonic()
             try:
                 result = self._turn_runner(
@@ -285,14 +277,6 @@ class FinanceClaudeSessionService:
         if not provider_env.get("ANTHROPIC_AUTH_TOKEN") and not provider_env.get("ANTHROPIC_API_KEY"):
             raise RuntimeError(f"missing credential for Finance CC provider {self.provider}")
         system_prompt = self.system_prompt_path.read_text(encoding="utf-8")
-        requirement_only = bool(tool_context.get("_finance_cc_requirement_only"))
-        if requirement_only:
-            system_prompt += (
-                "\n\n## 当前评测范围\n\n"
-                "本轮只处理需求理解与确认。形成并保存 requirement；"
-                "若需要用户补充则发起交互，然后直接结束本轮。"
-                "不要进入模块与流程设计、流程图、代码实现、运行或测试。"
-            )
         mcp_servers: dict[str, Any] = {}
         allowed_tools: list[str] = []
         tracker: Dict[str, Any] = {
@@ -314,14 +298,11 @@ class FinanceClaudeSessionService:
             )
             mcp_servers["finance"] = create_sdk_mcp_server(name="finance", version="1.0.0", tools=tools)
         skill_root = Path("src/skills/financial-tool-development").resolve()
-        skill_names = ["fin-agent-financial-tools:financial-tool-requirement"]
-        if not requirement_only:
-            skill_names.extend(
-                [
-                    "fin-agent-financial-tools:financial-tool-design",
-                    "fin-agent-financial-tools:financial-tool-flowchart",
-                ]
-            )
+        skill_names = [
+            "fin-agent-financial-tools:financial-tool-requirement",
+            "fin-agent-financial-tools:financial-tool-design",
+            "fin-agent-financial-tools:financial-tool-flowchart",
+        ]
         options = ClaudeAgentOptions(
             tools=["Skill"],
             allowed_tools=["Skill", *allowed_tools],

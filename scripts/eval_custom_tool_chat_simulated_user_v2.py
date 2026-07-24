@@ -30,7 +30,7 @@ def _stage(payload: dict[str, Any]) -> str:
         return "coding"
     if state.get("design_contract"):
         return "design"
-    if state.get("understanding") or state.get("requirement_text"):
+    if state.get("requirement_brief") or state.get("understanding") or state.get("requirement_text"):
         return "requirement"
     return "normal"
 
@@ -178,9 +178,13 @@ def run_case(
             if test.get("execution_ok") is True:
                 review = compact.get("implementation_review") or {}
                 explanation = compact.get("implementation_explanation") or {}
-                coding_tests = compact.get("coding_tests") or []
+                test_evidence = compact.get("test") or {}
                 calls = compact.get("finance_cc_tool_calls") or []
-                evidence_complete = bool(review) and bool(explanation) and bool(coding_tests)
+                evidence_complete = (
+                    bool(review)
+                    and bool(explanation)
+                    and int(test_evidence.get("case_count") or 0) > 0
+                )
                 implementation_is_terminal = (
                     not coding_via_natural_language
                     or not calls
@@ -194,7 +198,7 @@ def run_case(
                 )
                 if not evidence_complete:
                     report["failure_reasons"].append(
-                        "缺少 implementation_review、implementation_explanation 或 coding_tests"
+                        "缺少实现说明、需求对齐说明或真实运行 case"
                     )
                 if not implementation_is_terminal:
                     report["failure_reasons"].append(

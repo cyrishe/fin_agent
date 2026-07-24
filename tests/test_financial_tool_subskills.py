@@ -40,7 +40,7 @@ def test_each_financial_tool_subskill_is_focused_and_loadable() -> None:
         schema_path = ROOT / "schema.json" if skill_name == "financial-tool-design" else skill_dir / "schema.json"
         schema = json.loads(schema_path.read_text(encoding="utf-8"))
         assert schema["type"] == "object"
-        if skill_name == "financial-tool-design":
+        if skill_name in {"financial-tool-requirement", "financial-tool-design"}:
             assert schema["additionalProperties"] is True
         else:
             assert schema["additionalProperties"] is False
@@ -63,11 +63,23 @@ def test_model_protocols_do_not_emit_workflow_status_or_business_gate() -> None:
 
 def test_requirement_questions_are_advisory_not_flow_gates() -> None:
     schema = json.loads((SUBSKILLS_ROOT / "financial-tool-requirement" / "schema.json").read_text(encoding="utf-8"))
+    assert schema["required"] == ["requirement_brief"]
+    assert schema["additionalProperties"] is True
     assert schema["properties"]["notice"]["items"]["type"] == "string"
     question = schema["properties"]["questions"]["items"]
+    assert question["additionalProperties"] is True
     assert "required" not in question["properties"]
     assert set(question["properties"]) == {"question", "candidate"}
     assert question["properties"]["candidate"]["minItems"] == 1
+
+
+def test_requirement_skill_keeps_implementation_details_out_of_the_requirement_asset() -> None:
+    text = (
+        SUBSKILLS_ROOT / "financial-tool-requirement" / "SKILL.md"
+    ).read_text(encoding="utf-8")
+
+    assert "不选择数据 API" in text
+    assert "代码结构或技术实现" in text
 
 
 def test_flowchart_is_independent_from_module_design() -> None:
@@ -75,7 +87,18 @@ def test_flowchart_is_independent_from_module_design() -> None:
     flow_schema = json.loads((SUBSKILLS_ROOT / "financial-tool-flowchart" / "schema.json").read_text(encoding="utf-8"))
 
     assert design_schema["properties"]["design"]["type"] == "string"
-    assert {"flow", "mermaid"} <= set(flow_schema["properties"])
+    assert set(flow_schema["properties"]) == {"mermaid"}
+    assert flow_schema["required"] == ["mermaid"]
+
+
+def test_requirement_and_design_schemas_keep_only_semantic_top_level_fields() -> None:
+    requirement = json.loads(
+        (SUBSKILLS_ROOT / "financial-tool-requirement" / "schema.json").read_text(encoding="utf-8")
+    )
+    design = json.loads((ROOT / "schema.json").read_text(encoding="utf-8"))
+
+    assert set(requirement["properties"]) == {"requirement_brief", "notice", "questions"}
+    assert set(design["properties"]) == {"design"}
 
 
 def test_implementation_and_test_keep_technical_facts_separate_from_user_judgement() -> None:
@@ -84,7 +107,20 @@ def test_implementation_and_test_keep_technical_facts_separate_from_user_judgeme
 
     assert "status" not in implementation["properties"]
     assert "tool_contract" in implementation["required"]
-    assert "issues" in implementation["properties"]
+    implementation_skill = (
+        SUBSKILLS_ROOT / "financial-tool-implementation" / "SKILL.md"
+    ).read_text(encoding="utf-8")
+    assert "key_process_info" in implementation_skill
+    assert "需求 → Design → Code" in implementation_skill
+    assert set(implementation["properties"]) == {
+        "message",
+        "tool_contract",
+        "implementation_summary",
+        "verification",
+        "sample_input_json",
+    }
+    assert implementation["properties"]["implementation_summary"]["type"] == "string"
+    assert implementation["properties"]["verification"]["type"] == "string"
     assert set(test_plan["required"]) == {"summary", "next_action", "assessment", "cases", "presentation"}
     assert test_plan["properties"]["next_action"]["enum"] == ["run_tests", "finish"]
     assert set(test_plan["properties"]["cases"]["items"]["required"]) == {"name", "purpose", "request"}

@@ -707,6 +707,36 @@ def test_coding_surface_uses_modules_test_and_activation_without_file_concepts()
     assert blocks[-1]["data"]["actions"][0]["action_id"] == "custom_tool.activate_draft"
 
 
+def test_coding_surface_shows_implementation_and_alignment_as_natural_language() -> None:
+    blocks = web._custom_tool_result_blocks(
+        {
+            "implementation_explanation": {
+                "summary": "实现了行情读取、信号计算和结果组装三个内部函数。",
+            },
+            "implementation_review": {
+                "summary": "代表性样例运行未报错，需求、设计与代码一致。",
+            },
+            "tool": {
+                "manifest": {
+                    "tool_name": "ct_demo",
+                    "display_name": "演示工具",
+                    "status": "draft",
+                    "current_revision": 1,
+                },
+            },
+        },
+        LlmStreamBlockBuilder(run_id="coding_narrative"),
+    )
+
+    assert [block["block_id"] for block in blocks[:2]] == [
+        "custom_tool_implementation_summary",
+        "custom_tool_implementation_alignment",
+    ]
+    assert blocks[0]["block_type"] == "narrative"
+    assert "三个内部函数" in blocks[0]["content"]
+    assert "需求、设计与代码一致" in blocks[1]["content"]
+
+
 def test_execution_failure_does_not_offer_activation() -> None:
     blocks = web._custom_tool_result_blocks(
         {

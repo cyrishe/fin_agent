@@ -28,7 +28,7 @@ export default function DesignArtifact({ data, content }: { data: UnknownRecord;
   const details = record(data.details);
   const understanding = record(details.understanding);
   const summary = String(data.summary || content || "");
-  const goal = String(understanding.goal || summary);
+  const goal = String(understanding.requirement_brief || understanding.goal || summary);
   const expected = String(understanding.expected_result || "");
   const confirmed = list(understanding.confirmed_requirements);
   const constraints = list(understanding.constraints);
@@ -42,9 +42,10 @@ export default function DesignArtifact({ data, content }: { data: UnknownRecord;
   const dataRequirements = records(details.data_requirements);
   const acceptance = list(details.acceptance);
   const flow = record(details.flow);
+  const mermaid = String(details.mermaid || "");
   const flowSteps = records(flow.steps);
   const flowLinks = records(flow.links);
-  const flowObject = flowSteps.length ? normalizeRenderObject({
+  const flowObject = (mermaid || flowSteps.length) ? normalizeRenderObject({
     block_id: "design_core_flow",
     block_type: "data",
     kind: "data",
@@ -53,6 +54,7 @@ export default function DesignArtifact({ data, content }: { data: UnknownRecord;
       shape: "graph",
       content_type: "application/vnd.fin-agent.graph+json",
       data: {
+        source: mermaid,
         nodes: flowSteps.map((step, index) => ({
           id: String(step.id || step.step_id || `step_${index + 1}`),
           label: String(step.name || step.title || step.label || `步骤 ${index + 1}`),

@@ -1332,7 +1332,8 @@ class CodexSdkSkillHarness(CodexExecSkillHarness):
         stage_guidance = ""
         if _trim(stage) == "coding":
             stage_guidance = (
-                "先读 CODING_WORKSPACE.md。若存在 api_catalog/task_context.json，先用它匹配当前设计需要的数据主题和字段；"
+                "先读 CODING_WORKSPACE.md；首次实现同时参考 DYNAMIC_TOOL_TEMPLATE.py。"
+                "若存在 api_catalog/task_context.json，先用它匹配当前设计需要的数据主题和字段；"
                 "只有信息不足时再查 index.json 和相关 subject。按 implementation/module_plan.json 中的逻辑函数组实现，"
                 "每完成一个内聚函数组就做一次聚焦编译或样例测试，并用一句自然语言说明完成内容和测试结果。"
                 "源码写入 CONTEXT.current_implementation.module_files；最终结构化结果保持简洁，不重复搬运工作区上下文。\n"
@@ -1710,12 +1711,13 @@ class CodexCustomToolDesigner:
             if not flowchart_result.get("ok"):
                 return self._failure(flowchart_result, events)
             flowchart_final = dict(flowchart_result.get("final") or {})
-            if isinstance(flowchart_final.get("flow"), Mapping):
-                design["flow"] = dict(flowchart_final.get("flow") or {})
+            mermaid = _trim(flowchart_final.get("mermaid"))
+            if mermaid:
+                design["mermaid"] = mermaid
         goal = _trim(understanding.get("goal"))
         return {
             "ok": True,
-            "message": _trim(final.get("summary")) or _trim(flowchart_final.get("summary")) or (
+            "message": (
                 f"{goal}的实现方案已形成，请检查后确认。" if goal else "实现方案已形成，请检查后确认。"
             ),
             "understanding": understanding,
@@ -1781,6 +1783,8 @@ class CodexCustomToolCoder:
         if provider_session_id:
             run_context["_provider_session_id"] = provider_session_id
         run_context["design"] = dict(design)
+        if _trim(requirement_text):
+            run_context["requirement_brief"] = _trim(requirement_text)
         result = self.harness.run_skill(
             skill_path=self.skill_path,
             output_schema_path=self.output_schema_path,
@@ -1805,8 +1809,25 @@ class CodexCustomToolCoder:
                 },
             }
         final = dict(result.get("final") or {})
-        modules = [item for item in ((final.get("implementation") or {}).get("modules") or []) if isinstance(item, Mapping)]
+        implementation = final.get("implementation") if isinstance(final.get("implementation"), Mapping) else {}
+        modules = [item for item in implementation.get("modules") or [] if isinstance(item, Mapping)]
         has_code = bool(modules and any(_trim(item.get("source_code")) for item in modules))
+        sample_input_error = self._sample_input_error(final.get("sample_input_json"))
+        if sample_input_error:
+            return {
+                "ok": False,
+                "message": f"实现未完成：{sample_input_error} 当前设计和工作区代码已保留，可以继续修正。",
+                "error": {
+                    "code": "coding_sample_input_invalid",
+                    "summary": sample_input_error,
+                },
+                "events": result.get("events") or [],
+                "raw": result,
+                "agent_runtime": {
+                    **agent_runtime,
+                    "provider_session_id": _trim(result.get("provider_session_id")) or provider_session_id,
+                },
+            }
         return {
             "ok": has_code,
             "message": _trim(final.get("message")) or ("代码已生成。" if has_code else "本次没有生成可执行模块。"),
@@ -1819,6 +1840,17 @@ class CodexCustomToolCoder:
                 "provider_session_id": _trim(result.get("provider_session_id")) or provider_session_id,
             },
         }
+
+    @staticmethod
+    def _sample_input_error(value: Any) -> str:
+        text = _trim(value)
+        try:
+            parsed = json.loads(text)
+        except (TypeError, json.JSONDecodeError):
+            return "代表性样例输入不是合法 JSON。"
+        if not isinstance(parsed, Mapping):
+            return "代表性样例输入必须是 JSON 对象。"
+        return ""
 
     @staticmethod
     def _failure_summary(error_detail: Any) -> Dict[str, str]:

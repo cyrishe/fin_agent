@@ -24,16 +24,24 @@ def main() -> int:
         store = CustomToolStoreService(root_dir=tmp)
         runtime = CustomToolRuntimeService(store=store)
         agent = CustomToolAgentService(store=store, runtime=runtime)
+        full_implementation_results = []
+
+        def implementation_runner(**kwargs):
+            result = agent.implement_dynamic_tool(**kwargs)
+            full_implementation_results.append(result)
+            return result
+
         system_tools = FinanceCcSystemTools(
             custom_tool_store=store,
             custom_tool_runtime=runtime,
-            implementation_runner=agent.implement_dynamic_tool,
+            implementation_runner=implementation_runner,
         )
         tools, _, tracker = system_tools.build_tools(
             owner_ids=["finance-cc-implementation-probe"],
             tool_context={
                 "custom_tool_state": {
                     "owner_id": "finance-cc-implementation-probe",
+                    "requirement_brief": str((fixture.get("understanding") or {}).get("goal") or ""),
                     "requirement_text": str((fixture.get("understanding") or {}).get("goal") or ""),
                     "understanding": dict(fixture.get("understanding") or {}),
                     "design_contract": design,
@@ -52,12 +60,20 @@ def main() -> int:
     meta = record.get("implementation_meta") if isinstance(record.get("implementation_meta"), dict) else {}
     bundle = meta.get("context_bundle") if isinstance(meta.get("context_bundle"), dict) else {}
     test_result = record.get("test_result") if isinstance(record.get("test_result"), dict) else {}
+    implementation_review = record.get("implementation_review") if isinstance(record.get("implementation_review"), dict) else {}
+    implementation_explanation = record.get("implementation_explanation") if isinstance(record.get("implementation_explanation"), dict) else {}
     evidence = {
         "ok": record.get("ok"),
         "message": record.get("message"),
         "tool": record.get("tool"),
         "test_summary": test_result.get("summary"),
         "test_execution_ok": test_result.get("execution_ok"),
+        "test_data": test_result.get("data"),
+        "test_logs": ((test_result.get("meta") or {}).get("execution_logs") if isinstance(test_result.get("meta"), dict) else []),
+        "test_diagnostics": ((test_result.get("meta") or {}).get("diagnostics") if isinstance(test_result.get("meta"), dict) else {}),
+        "full_test_result": (full_implementation_results[-1].get("test_result") if full_implementation_results else {}),
+        "implementation_review": implementation_review,
+        "implementation_explanation": implementation_explanation,
         "provider": meta.get("provider"),
         "complexity": meta.get("complexity"),
         "model": meta.get("model"),

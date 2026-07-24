@@ -1016,11 +1016,10 @@ class CustomToolAgentService:
                     next_state.update(self._design_artifact_identity(design, state=next_state))
                     design_status = "review"
             elif artifact_type == "flow":
-                flow = payload.get("flow") if isinstance(payload.get("flow"), Mapping) else {}
+                mermaid = _trim(payload.get("mermaid"))
                 design = dict(next_state.get("design_contract") or {})
-                if flow and design:
-                    design["flow"] = dict(flow)
-                    design["mermaid"] = _trim(payload.get("mermaid"))
+                if mermaid and design:
+                    design["mermaid"] = mermaid
                     next_state["design_contract"] = design
                     design_status = "review"
             elif artifact_type == "test_evidence":
@@ -1285,14 +1284,20 @@ class CustomToolAgentService:
             }
             coding_result = self.coder.code(
                 design_contract,
-                requirement_text=_trim(state.get("requirement_text")),
+                requirement_text=(
+                    _trim(state.get("requirement_brief"))
+                    or _trim(state.get("requirement_text"))
+                ),
                 context=coding_context,
                 event_sink=event_sink,
             )
         except TypeError:
             coding_result = self.coder.code(
                 design_contract,
-                requirement_text=_trim(state.get("requirement_text")),
+                requirement_text=(
+                    _trim(state.get("requirement_brief"))
+                    or _trim(state.get("requirement_text"))
+                ),
                 context=coding_context,
             )
         coding_raw = coding_result.get("raw") if isinstance(coding_result.get("raw"), Mapping) else {}
@@ -1316,7 +1321,8 @@ class CustomToolAgentService:
                 key: context_bundle.get(key)
                 for key in (
                     "bundle_id", "owner_scope", "bundle_dir", "api_index", "api_task_context",
-                    "api_sources", "runtime_contract", "custom_tool_sdk", "coding_guide", "coding_workspace",
+                    "api_sources", "runtime_contract", "custom_tool_sdk", "coding_guide",
+                    "module_template", "coding_workspace",
                 )
                 if context_bundle.get(key)
             },
@@ -1359,20 +1365,8 @@ class CustomToolAgentService:
         )
         result["implementation_meta"] = implementation_meta
         result["coding_status"] = "implemented"
-        result["implementation_review"] = (
-            dict(coding_final.get("implementation_review") or {})
-            if isinstance(coding_final.get("implementation_review"), Mapping)
-            else (
-                dict(coding_final.get("technical_summary") or {})
-                if isinstance(coding_final.get("technical_summary"), Mapping)
-                else {}
-            )
-        )
-        result["implementation_explanation"] = (
-            dict(coding_final.get("implementation_explanation") or {})
-            if isinstance(coding_final.get("implementation_explanation"), Mapping)
-            else {}
-        )
+        result["implementation_review"] = self._implementation_review(coding_final)
+        result["implementation_explanation"] = self._implementation_explanation(coding_final)
         result["coding_tests"] = [
             {
                 key: item.get(key)
@@ -1733,9 +1727,15 @@ class CustomToolAgentService:
             if isinstance(design.get("outputs"), list)
             else []
         )
+        output_fields = self._with_key_process_info_output(output_fields)
         code = self._select_code(final)
         if not code:
             raise CustomToolError("coding final does not include python code")
+        legacy_implementation = (
+            final.get("implementation")
+            if isinstance(final.get("implementation"), Mapping)
+            else {}
+        )
         return {
             "manifest": {
                 "tool_name": tool_name,
@@ -1743,27 +1743,68 @@ class CustomToolAgentService:
                 "description": description,
                 "visibility": "personal",
                 "capabilities": ["custom_tool"],
-                "implementation_logic": self._logic_text(design) or _trim((final.get("implementation") or {}).get("summary")),
+                "implementation_logic": (
+                    self._logic_text(design)
+                    or _trim(final.get("implementation_summary"))
+                    or _trim(legacy_implementation.get("summary"))
+                ),
                 "runtime": {"kind": "python_sandbox", "backend": "local_dev", "timeout_ms": 30000},
             },
             "input_schema": self._schema_from_fields(input_fields),
             "output_schema": self._schema_from_fields(output_fields),
             "code": code,
             "sample_input": self._sample_input(final),
-            "modules": [dict(item) for item in ((final.get("implementation") or {}).get("modules") or []) if isinstance(item, Mapping)],
+            "modules": [dict(item) for item in legacy_implementation.get("modules") or [] if isinstance(item, Mapping)],
             "proposed_tests": [dict(item) for item in final.get("tests") or [] if isinstance(item, Mapping)],
-            "implementation_explanation": (
-                dict(final.get("implementation_explanation") or {})
-                if isinstance(final.get("implementation_explanation"), Mapping)
-                else {}
-            ),
-            "implementation_review": (
-                dict(final.get("implementation_review") or {})
-                if isinstance(final.get("implementation_review"), Mapping)
-                else {}
-            ),
+            "implementation_explanation": self._implementation_explanation(final),
+            "implementation_review": self._implementation_review(final),
             "design_contract": dict(design),
         }
+
+    @staticmethod
+    def _with_key_process_info_output(fields: List[Any]) -> List[Dict[str, Any]]:
+        """Apply the one platform-wide explainability field without judging its business contents."""
+        normalized = [dict(item) for item in fields if isinstance(item, Mapping)]
+        for index, item in enumerate(normalized):
+            if _trim(item.get("name")) != "key_process_info":
+                continue
+            normalized[index] = {
+                **item,
+                "name": "key_process_info",
+                "type": "object",
+                "required": True,
+                "description": (
+                    _trim(item.get("description"))
+                    or "解释本次结果所需的核心中间指标、样本和判断条件。"
+                ),
+            }
+            return normalized
+        normalized.append({
+            "name": "key_process_info",
+            "type": "object",
+            "required": True,
+            "description": "解释本次结果所需的核心中间指标、样本和判断条件。",
+        })
+        return normalized
+
+    @staticmethod
+    def _implementation_explanation(final: Mapping[str, Any]) -> Dict[str, Any]:
+        legacy = final.get("implementation_explanation")
+        if isinstance(legacy, Mapping):
+            return dict(legacy)
+        summary = _trim(final.get("implementation_summary"))
+        return {"summary": summary} if summary else {}
+
+    @staticmethod
+    def _implementation_review(final: Mapping[str, Any]) -> Dict[str, Any]:
+        legacy = final.get("implementation_review")
+        if isinstance(legacy, Mapping):
+            return dict(legacy)
+        legacy = final.get("technical_summary")
+        if isinstance(legacy, Mapping):
+            return dict(legacy)
+        summary = _trim(final.get("verification"))
+        return {"summary": summary} if summary else {}
 
     @staticmethod
     def _expected_for_sample(tests: List[Dict[str, Any]], sample_input: Mapping[str, Any]) -> Dict[str, Any]:

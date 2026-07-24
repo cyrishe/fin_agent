@@ -452,7 +452,7 @@ class LlmStreamBlockBuilder:
                         "modules": [dict(item) for item in design.get("modules") or [] if isinstance(item, Mapping)],
                         "rules": [dict(item) for item in design.get("rules") or [] if isinstance(item, Mapping)],
                         "logic": [str(item) for item in design.get("logic") or [] if _trim(item)],
-                        "flow": dict(design.get("flow")) if isinstance(design.get("flow"), Mapping) else {"steps": [], "links": []},
+                        "mermaid": _trim(design.get("mermaid")),
                         "data_requirements": [dict(item) for item in design.get("data_requirements") or [] if isinstance(item, Mapping)],
                         "existing_analysis": dict(existing_analysis),
                     },
@@ -551,19 +551,33 @@ class LlmStreamBlockBuilder:
     def _coding_final_blocks(self, final: Mapping[str, Any], *, status: str, stage: str) -> List[Dict[str, Any]]:
         implementation = final.get("implementation") if isinstance(final.get("implementation"), Mapping) else {}
         modules = [item for item in implementation.get("modules") or [] if isinstance(item, Mapping)]
+        implementation_summary = (
+            _trim(final.get("implementation_summary"))
+            or _trim(implementation.get("summary"))
+        )
+        verification = _trim(final.get("verification"))
         blocks = [self._block(
             block_id=f"{stage}_final_summary",
             block_type="narrative",
             mode="replace",
-            title="实现结果" if status == "code_ready" else "需要回到设计",
+            title="实现结果",
             content="\n".join(
                 item for item in [
                     _trim(final.get("message")),
-                    _trim(implementation.get("summary")),
+                    implementation_summary,
                 ] if item
             ),
             stage=stage,
         )]
+        if verification:
+            blocks.append(self._block(
+                block_id=f"{stage}_alignment",
+                block_type="narrative",
+                mode="replace",
+                title="运行验证与需求对齐",
+                content=verification,
+                stage=stage,
+            ))
         if modules:
             blocks.append(self._block(
                 block_id=f"{stage}_artifact",
@@ -575,7 +589,7 @@ class LlmStreamBlockBuilder:
                     "artifact_type": "finance.custom_tool_implementation",
                     "lifecycle": "draft",
                     "version": "0.1",
-                    "summary": _trim(implementation.get("summary")) or f"已生成 {len(modules)} 个动态实现模块。",
+                    "summary": implementation_summary or f"已生成 {len(modules)} 个动态实现模块。",
                     "items": [
                         {"label": "实现模块", "value": f"{len(modules)} 个"},
                         {"label": "加载方式", "value": "数据库动态加载"},

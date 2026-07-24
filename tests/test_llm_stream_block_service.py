@@ -396,6 +396,25 @@ def test_coding_json_stream_emits_each_complete_module_as_one_code_preview() -> 
     assert blocks[0]["data"]["files"][0]["content"].endswith("return inputs\n")
 
 
+def test_coding_final_renders_natural_implementation_and_alignment_without_status_enum() -> None:
+    builder = LlmStreamBlockBuilder(run_id="run_coding_final")
+
+    blocks = builder.final_to_blocks({
+        "message": "工具实现已完成。",
+        "implementation_summary": "实现了数据读取、核心计算和结果组装三个内聚函数。",
+        "verification": "实际运行代表性样例未报错；需求、设计与代码一致。",
+        "sample_input_json": "{\"code\":\"600519.SH\"}",
+    }, stage="coding")
+
+    assert [block["block_id"] for block in blocks] == [
+        "coding_final_summary",
+        "coding_alignment",
+    ]
+    assert blocks[0]["title"] == "实现结果"
+    assert "三个内聚函数" in blocks[0]["content"]
+    assert blocks[1]["title"] == "运行验证与需求对齐"
+
+
 def test_runtime_events_become_user_facing_progress_without_raw_sdk_text() -> None:
     builder = LlmStreamBlockBuilder(run_id="run_progress")
 

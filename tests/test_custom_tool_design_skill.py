@@ -16,7 +16,6 @@ DESIGN_SCHEMA = SKILL_ROOT / "schema.json"
 
 def _valid_design_result() -> dict:
     return {
-        "summary": "模块和流程已形成。",
         "design": "## 输入\n指定股票。\n\n## 流程\n1. 读取日线价格。\n2. 计算金叉并返回信号。",
     }
 
@@ -42,6 +41,7 @@ def test_design_skill_only_defines_module_and_process_design() -> None:
     assert "结构化自然语言" in text
     assert "内部函数或模块" in text
     assert "未确定的格式、默认参数、边界处理和技术依赖不要自行定义" in text
+    assert "不读取或指定具体 API" in text
     assert "不要绘制流程图、生成源代码或执行测试" in text
     assert "design_scenario" not in text
     assert "need_design_fix" not in text
@@ -56,6 +56,7 @@ def test_design_schema_accepts_complete_design_without_workflow_status() -> None
     assert "questions" not in schema["properties"]
     assert "change_summary" not in schema["properties"]
     assert schema["properties"]["design"]["type"] == "string"
+    assert schema["required"] == ["design"]
 
 
 def test_structured_design_prompt_does_not_repeat_transport_or_api_catalog() -> None:
@@ -90,7 +91,6 @@ def test_designer_continues_to_design_when_requirement_has_no_questions() -> Non
                     "ok": True,
                     "events": [],
                     "final": {
-                        "summary": "金叉工具方案已形成。",
                         "design": "## 流程\n计算并返回金叉信号。",
                     },
                 }
@@ -98,7 +98,7 @@ def test_designer_continues_to_design_when_requirement_has_no_questions() -> Non
                 return {
                     "ok": True,
                     "events": [],
-                    "final": {"summary": "流程图已形成。", "flow": {"steps": [], "links": []}},
+                    "final": {"mermaid": "flowchart TD\nA[输入] --> B[输出]"},
                 }
             return {
                 "ok": True,

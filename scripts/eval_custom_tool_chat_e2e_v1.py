@@ -52,7 +52,11 @@ def _compact(payload: dict[str, Any]) -> dict[str, Any]:
         "ok": payload.get("ok", True),
         "message": _text(payload.get("message")),
         "tool_name": _text(state.get("tool_name")),
-        "has_requirement": bool(state.get("understanding") or state.get("requirement_text")),
+        "has_requirement": bool(
+            state.get("requirement_brief")
+            or state.get("understanding")
+            or state.get("requirement_text")
+        ),
         "has_design": isinstance(state.get("design_contract"), dict) and bool(state.get("design_contract")),
         "design_revision": state.get("design_revision"),
         "implementation_revision": state.get("implementation_revision"),
@@ -63,6 +67,10 @@ def _compact(payload: dict[str, Any]) -> dict[str, Any]:
             "execution_ok": test.get("execution_ok"),
             "summary": _text(test.get("summary")),
             "error": _text(test.get("error")),
+            "case_count": len([
+                item for item in test.get("cases") or []
+                if isinstance(item, dict)
+            ]),
             "auto_repair_attempts": test.get("auto_repair_attempts"),
         } if test else {},
         "implementation_review": review,

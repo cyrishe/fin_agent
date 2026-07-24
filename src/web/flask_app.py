@@ -762,12 +762,14 @@ def _custom_tool_result_blocks(result: dict, builder: LlmStreamBlockBuilder) -> 
             elif asset_type == "flow":
                 steps = [item for item in payload.get("steps") or [] if isinstance(item, dict)]
                 links = [item for item in payload.get("links") or [] if isinstance(item, dict)]
+                mermaid = str(payload.get("mermaid") or "").strip()
                 _add_many([builder.make_block(
                     block_id="custom_tool_view_flow",
                     block_type="flowchart",
                     title="当前流程",
                     stage="view",
                     data={
+                        "source": mermaid,
                         "nodes": [
                             {
                                 "id": str(item.get("id") or item.get("step_id") or f"step_{index + 1}"),
@@ -845,6 +847,22 @@ def _custom_tool_result_blocks(result: dict, builder: LlmStreamBlockBuilder) -> 
     tool = result.get("tool") if isinstance(result.get("tool"), dict) else {}
     manifest = tool.get("manifest") if isinstance(tool.get("manifest"), dict) else {}
     test_result = result.get("test_result") if isinstance(result.get("test_result"), dict) else {}
+    implementation_explanation = (
+        result.get("implementation_explanation")
+        if isinstance(result.get("implementation_explanation"), dict)
+        else {}
+    )
+    implementation_review = (
+        result.get("implementation_review")
+        if isinstance(result.get("implementation_review"), dict)
+        else {}
+    )
+    implementation_summary = str(implementation_explanation.get("summary") or "").strip()
+    alignment_summary = str(
+        implementation_review.get("summary")
+        or implementation_review.get("conclusion")
+        or ""
+    ).strip()
     coding_status = str(result.get("coding_status") or "").strip()
     if coding_status == "coding_failed":
         coding_error = result.get("coding_error") if isinstance(result.get("coding_error"), dict) else {}
@@ -888,6 +906,24 @@ def _custom_tool_result_blocks(result: dict, builder: LlmStreamBlockBuilder) -> 
             ),
         ])
     if manifest:
+        if implementation_summary:
+            _add_many([builder.make_block(
+                block_id="custom_tool_implementation_summary",
+                block_type="narrative",
+                mode="replace",
+                title="实现说明",
+                content=implementation_summary,
+                stage="coding",
+            )])
+        if alignment_summary:
+            _add_many([builder.make_block(
+                block_id="custom_tool_implementation_alignment",
+                block_type="narrative",
+                mode="replace",
+                title="需求与代码对齐",
+                content=alignment_summary,
+                stage="coding",
+            )])
         storage = tool.get("storage") if isinstance(tool.get("storage"), dict) else {}
         is_active = str(manifest.get("status") or "").strip() == "active"
         _add_many([builder.make_block(

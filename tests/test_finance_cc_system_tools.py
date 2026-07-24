@@ -37,7 +37,7 @@ class FakeDynamicRuntime:
         return {"tool": tool_name, "ok": True, "data": {"arguments": arguments}, "error": "", "meta": {}}
 
 
-def _tools(*, implementation_runner=None, runtime_context_adapter=None, runtime_scope="", requirement_only=False):
+def _tools(*, implementation_runner=None, runtime_context_adapter=None, runtime_scope=""):
     service = FinanceCcSystemTools(
         custom_tool_store=FakeStore(),
         custom_tool_runtime=FakeDynamicRuntime(),
@@ -50,7 +50,6 @@ def _tools(*, implementation_runner=None, runtime_context_adapter=None, runtime_
         owner_ids=["owner-1"],
         tool_context={
             "_agent_runtime_scope": runtime_scope,
-            "_finance_cc_requirement_only": requirement_only,
             "custom_tool_state": {
                 "tool_name": "demo_tool",
                 "requirement_text": "筛选股票",
@@ -61,13 +60,26 @@ def _tools(*, implementation_runner=None, runtime_context_adapter=None, runtime_
     return {item.name: item for item in tools}, names, tracker
 
 
-def test_requirement_only_mode_exposes_only_requirement_tools() -> None:
-    tools, names, _ = _tools(requirement_only=True)
+def test_finance_cc_always_exposes_the_full_domain_toolset() -> None:
+    tools, names, _ = _tools()
 
-    assert set(tools) == {"request_user_interaction", "save_finance_artifact"}
+    assert set(tools) == {
+        "finance_query",
+        "load_result",
+        "read_finance_asset",
+        "request_user_interaction",
+        "save_finance_artifact",
+        "run_dynamic_tool",
+        "implement_dynamic_tool",
+    }
     assert names == [
+        "mcp__finance__finance_query",
+        "mcp__finance__load_result",
+        "mcp__finance__read_finance_asset",
         "mcp__finance__request_user_interaction",
         "mcp__finance__save_finance_artifact",
+        "mcp__finance__run_dynamic_tool",
+        "mcp__finance__implement_dynamic_tool",
     ]
 
 
@@ -154,10 +166,8 @@ def test_finance_cc_user_interaction_is_recorded_without_guessing_answer() -> No
 def test_finance_cc_artifact_save_validates_existing_protocol() -> None:
     tools, _, tracker = _tools()
     payload = {
-        "summary": "做一个选股工具。",
         "requirement_brief": "筛选满足用户条件的股票，并返回候选股票列表。",
-        "notice": ["未指定市场时按A股处理。"],
-        "questions": [],
+        "narrative_hint": "可选的 SOFT 展示信息不应阻断保存。",
     }
 
     valid = asyncio.run(
@@ -244,8 +254,8 @@ def test_finance_cc_saved_design_is_visible_to_later_tools_in_same_turn() -> Non
 
     tools, _, _ = _tools(implementation_runner=implementation_runner)
     design_payload = {
-        "summary": "形成新工具方案。",
         "design": "## 新工具\n读取所需数据，计算结果并返回。",
+        "presentation_hint": "可选展示信息",
     }
 
     saved = asyncio.run(
@@ -262,6 +272,41 @@ def test_finance_cc_saved_design_is_visible_to_later_tools_in_same_turn() -> Non
     assert "读取所需数据" in viewed["content"][0]["text"]
     assert implemented.get("isError") is not True
     assert "读取所需数据" in calls[0]["state"]["design_contract"]["document"]
+
+
+def test_requirement_and_design_can_be_saved_continuously_in_one_turn() -> None:
+    tools, _, tracker = _tools()
+
+    requirement = asyncio.run(
+        tools["save_finance_artifact"].handler(
+            {
+                "artifact_type": "requirement",
+                "payload": {
+                    "requirement_brief": "读取指定股票日线数据，判断最近30或60个交易日是否出现MA5上穿MA20。",
+                    "questions": [],
+                },
+            }
+        )
+    )
+    design = asyncio.run(
+        tools["save_finance_artifact"].handler(
+            {
+                "artifact_type": "design",
+                "payload": {
+                    "design": "## 处理流程\n读取日线数据，计算MA5和MA20，识别上穿日期并返回结果。",
+                },
+            }
+        )
+    )
+    viewed = asyncio.run(tools["read_finance_asset"].handler({"asset_type": "design"}))
+
+    assert requirement.get("isError") is not True
+    assert design.get("isError") is not True
+    assert [item["artifact_type"] for item in tracker["artifact_updates"]] == [
+        "requirement",
+        "design",
+    ]
+    assert "识别上穿日期" in viewed["content"][0]["text"]
 
 
 def test_finance_cc_implementation_does_not_report_success_without_an_implementation() -> None:

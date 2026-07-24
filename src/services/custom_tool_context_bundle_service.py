@@ -143,6 +143,7 @@ class CustomToolContextBundleService:
                     "runtime_contract": "runtime_contract.md",
                     "custom_tool_sdk": "custom_tool_sdk.md",
                     "coding_guide": "CODING_WORKSPACE.md",
+                    "module_template": "DYNAMIC_TOOL_TEMPLATE.py",
                 })
             elif self.stock_universe_path.is_file():
                 stock_universe = bundle_dir / "test_data" / "stock_universe.tsv"
@@ -571,6 +572,69 @@ def install_rows(rows):
     )
 '''
         )
+        self._write_private(
+            bundle_dir / "DYNAMIC_TOOL_TEMPLATE.py",
+            '''"""Reference pattern for a Fin Agent dynamic tool.
+
+Copy the shape, then replace the example calculation and public fields with the
+current Design. This file is reference-only; implement in the module path named
+by CONTEXT.current_implementation.module_files.
+"""
+
+from custom_tool_sdk import debug, finance_query, info
+
+
+def _result(*, result: dict, key_process_info: dict) -> dict:
+    """Keep the public conclusion and its compact supporting facts together."""
+    return {**result, "key_process_info": dict(key_process_info)}
+
+
+def run(inputs: dict) -> dict:
+    stock_code = str(inputs.get("stock_code") or "").strip()
+    if not stock_code:
+        return _result(
+            result={"ok": False, "reason": "stock_code is required"},
+            key_process_info={"stage": "input_validation"},
+        )
+
+    info("data_query_started", {"stock_code": stock_code})
+    response = finance_query(
+        request=(
+            'r1 = stock.quote(filter = "code = '
+            + stock_code
+            + '", order = "tradedate desc", limit = 1) '
+            '-> code, tradedate, close'
+        )
+    )
+    rows = list(response.get("data") or []) if response.get("ok") else []
+    key_process_info = {
+        "stock_code": stock_code,
+        "sample_count": len(rows),
+        "query_ok": bool(response.get("ok")),
+    }
+    if rows:
+        key_process_info.update({
+            "as_of_date": rows[0].get("tradedate"),
+            "close": rows[0].get("close"),
+        })
+    debug("key_process_info", key_process_info)
+
+    if not response.get("ok"):
+        return _result(
+            result={"ok": False, "reason": str(response.get("error") or "finance query failed")},
+            key_process_info=key_process_info,
+        )
+    if not rows:
+        return _result(
+            result={"ok": True, "reason": "no matching data"},
+            key_process_info=key_process_info,
+        )
+    return _result(
+        result={"ok": True, "close": rows[0].get("close")},
+        key_process_info=key_process_info,
+    )
+'''
+        )
         python_executable = str(Path(sys.executable).resolve())
         self._write_private(
             bundle_dir / "CODING_WORKSPACE.md",
@@ -578,6 +642,7 @@ def install_rows(rows):
 
 - Edit only the module paths listed in `CONTEXT.current_implementation.module_files`.
 - `implementation/module_plan.json` describes logical function groups; keep one dynamic entry module.
+- On a first implementation, read `DYNAMIC_TOOL_TEMPLATE.py` and reuse its entrypoint, result assembly, and `key_process_info` pattern. The template itself is not an editable user module.
 - Put temporary focused tests under `scratch/`; they are never persisted as user assets.
 - Python interpreter: `{python_executable}`. Use this exact interpreter instead of `python` or the system `python3`.
 - For compilation use `PYTHONPYCACHEPREFIX=scratch/pycache {python_executable} -m py_compile <module>`.
@@ -638,6 +703,7 @@ def install_rows(rows):
 - Do not directly access database tables, raw provider modules, or network from generated tool code.
 - If finance data is needed, use `custom_tool_sdk.finance_query(request=...)`.
 - Use `custom_tool_sdk.info(message, data)` for stage/count summaries and `custom_tool_sdk.debug(message, data)` for the formula inputs and intermediate values that explain the result.
+- Every return path must include a `key_process_info` object. Its contents are the compact business facts needed to explain this tool's result, chosen from the current requirement and Design.
 - Keep these facts small and structured so the test result can show users how the conclusion was reached.
 """
 
@@ -655,8 +721,13 @@ def run(inputs: dict) -> dict:
     quote = finance_query(
         request='r1 = stock.quote(filter = "code = 600519.SH", order = "tradedate desc", limit = 1) -> code, name, tradedate, close, pct'
     )
-    debug("quote_selected", {"close": (quote.get("data") or [{}])[0].get("close")})
-    return {"quote": quote}
+    rows = quote.get("data") or []
+    key_process_info = {
+        "sample_count": len(rows),
+        "close": rows[0].get("close") if rows else None,
+    }
+    debug("key_process_info", key_process_info)
+    return {"quote": quote, "key_process_info": key_process_info}
 ```
 
 ## finance_query
@@ -664,6 +735,7 @@ def run(inputs: dict) -> dict:
 `finance_query(request: str) -> dict`
 
 Use the finance data protocol request string. The API catalog files describe available subjects, dataviews, fields, and request patterns.
+Build requests exactly like the catalog examples. The whole `filter` argument is a quoted string, while protocol values inside it are bare literals, for example `filter = "code = 600519.SH and tradedate <= 2026-07-23"`. Do not add nested escaped quotes around stock codes, dates, names, or other filter values.
 
 The injected SDK normalizes every successful query to this stable envelope:
 

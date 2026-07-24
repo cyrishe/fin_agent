@@ -37,8 +37,6 @@ class _Harness:
             }
         else:
             final = {
-                "summary": "流程图已生成。",
-                "flow": {"steps": [], "links": []},
                 "mermaid": "flowchart TD",
             }
         return {"ok": True, "events": [], "final": final}
@@ -128,7 +126,7 @@ def test_design_and_flowchart_execute_in_order_and_merge_as_assets() -> None:
 
     assert [call["stage"] for call in harness.calls] == ["design", "flowchart"]
     assert result["design"]["tool_name"] == "ct_golden_cross"
-    assert result["design"]["flow"] == {"steps": [], "links": []}
+    assert result["design"]["mermaid"] == "flowchart TD"
 
 
 def test_design_modification_context_is_materialized_as_file_reference(tmp_path: Path) -> None:
