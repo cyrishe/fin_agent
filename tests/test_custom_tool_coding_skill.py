@@ -4,7 +4,7 @@ import time
 
 import fastjsonschema
 
-from src.services.codex_exec_skill_harness import CodexCustomToolCoder, CodexSdkSkillHarness
+from src.services.codex_exec_skill_harness import CodexCustomToolCoder, CodexExecSkillHarness, CodexSdkSkillHarness
 
 
 SKILL_DIR = Path("src/skills/financial-tool-development")
@@ -17,14 +17,11 @@ def test_coding_skill_contract_keeps_only_runtime_contract_and_natural_language_
     properties = schema["properties"]
 
     assert set(properties) == {
-        "message",
         "tool_contract",
         "implementation_summary",
-        "verification",
-        "sample_input_json",
+        "execution_examples",
     }
     assert properties["implementation_summary"]["type"] == "string"
-    assert properties["verification"]["type"] == "string"
     assert "implementation" not in properties
     assert "tests" not in properties
 
@@ -32,21 +29,40 @@ def test_coding_skill_contract_keeps_only_runtime_contract_and_natural_language_
 def test_coding_skill_uses_api_contract_without_database_prerequisites() -> None:
     skill_text = (IMPLEMENTATION_DIR / "SKILL.md").read_text(encoding="utf-8") + CODING_PLAYBOOK.read_text(encoding="utf-8")
 
-    assert "CONTEXT.design" in skill_text
+    assert "Design" in skill_text
     assert "API Catalog" in skill_text
     assert "custom_tool_sdk.finance_query" in skill_text
-    assert "直接连接数据库" in skill_text
     assert "BUSINESS_DB_URL" not in skill_text
+
+
+def test_coding_prompt_always_contains_finance_api_call_contract() -> None:
+    prompt = CodexExecSkillHarness()._build_prompt(
+        skill_text="coding instructions",
+        user_request="实现动态工具",
+        context={"context_bundle": {"bundle_dir": "/tmp/bundle"}},
+        structured_output=True,
+        stage="coding",
+    )
+
+    assert "# REQUIRED FINANCE API CALL CONTRACT" in prompt
+    assert "request=..." not in prompt
+    assert "result_name" in prompt
+    assert "不使用 `r1/r2`" not in prompt
+    assert "## 五类通用 API" in prompt
+    assert "def run(inputs: dict) -> dict:" not in prompt
+    assert "api_catalog/subjects/<subject>/<dataview>.json" in prompt
+    assert "stock.quote.kd_minute_volumn_avg" not in prompt
+    assert 'tradedate = -1' not in prompt
 
 
 def test_coding_skill_defines_dynamic_module_instead_of_user_file() -> None:
     skill_text = (IMPLEMENTATION_DIR / "SKILL.md").read_text(encoding="utf-8") + CODING_PLAYBOOK.read_text(encoding="utf-8")
     contract_text = (IMPLEMENTATION_DIR / "references" / "coding-output-contract.md").read_text(encoding="utf-8")
 
-    assert "不是 `.py` 文件" in skill_text
+    assert "不是交付给用户的代码文件" in skill_text
     assert "动态执行" in skill_text
-    assert "隔离工作区文件为唯一真源" in contract_text
-    assert "不在最终 JSON 中重复源码" in skill_text
+    assert "外层系统从隔离工作区回收" in contract_text
+    assert "`code`" in contract_text
 
 
 def test_coding_schema_is_compatible_with_strict_structured_output() -> None:
@@ -69,12 +85,13 @@ def test_coding_schema_is_compatible_with_strict_structured_output() -> None:
                     inspect(item)
 
     inspect(schema)
-    assert schema["properties"]["sample_input_json"]["type"] == "string"
+    example = schema["properties"]["execution_examples"]["items"]["properties"]
+    assert example["input"]["type"] == "string"
+    assert example["output"]["type"] == "string"
 
 
 def test_coding_skill_sample_matches_schema() -> None:
     payload = {
-        "message": "实现草稿已生成，等待系统测试。",
         "tool_contract": {
             "tool_name": "sum_values",
             "display_name": "求和工具",
@@ -98,8 +115,10 @@ def test_coding_skill_sample_matches_schema() -> None:
             }],
         },
         "implementation_summary": "读取数字数组，由 run 调用求和函数并返回 total。",
-        "verification": "实际运行 values=[1,2]，得到 total=3，key_process_info 记录输入数量；run 落实求和需求，需求、设计和代码一致。",
-        "sample_input_json": "{\"values\":[1,2]}",
+        "execution_examples": [{
+            "input": "{\"values\":[1,2]}",
+            "output": "{\"total\":3,\"key_process_info\":{\"value_count\":2}}",
+        }],
     }
 
     fastjsonschema.compile(json.loads((IMPLEMENTATION_DIR / "schema.json").read_text(encoding="utf-8")))(payload)
@@ -114,10 +133,14 @@ def test_coding_skill_requires_compact_core_process_evidence_and_alignment_expla
     combined = "\n".join((skill_text, playbook_text, contract_text))
 
     assert "DYNAMIC_TOOL_TEMPLATE.py" in combined
-    assert "所有返回路径都必须包含 `key_process_info` 对象" in combined
-    assert "不机械堆砌无关字段" in combined
-    assert "需求 → Design → Code" in combined
-    assert "分别由哪些代码函数落实" in combined
+    assert "工具输出遵循 Design，并包含 `key_process_info`" in combined
+    assert "核心中间结构、指标名称和值" in combined
+    assert "静态检查" in combined
+    assert "输入、输出、核心逻辑与数据范围" in combined
+    assert "只有两项" in combined
+    assert "不判断策略是否有效" in combined
+    assert "当前 Coding 会话和同一工作区" in combined
+    assert "一次性输出最新版结果" in combined
 
 
 def test_coder_defaults_to_focused_implementation_skill_and_schema() -> None:
@@ -125,6 +148,18 @@ def test_coder_defaults_to_focused_implementation_skill_and_schema() -> None:
 
     assert coder.skill_path.endswith("skills/financial-tool-implementation/SKILL.md")
     assert coder.output_schema_path.endswith("skills/financial-tool-implementation/schema.json")
+    assert coder.harness.provider_name == "codex"
+
+
+def test_exec_harness_resolves_schema_before_switching_to_bundle_cwd() -> None:
+    harness = CodexExecSkillHarness(cwd=".")
+    schema = harness._resolve_output_schema_file(
+        skill_file=IMPLEMENTATION_DIR / "SKILL.md",
+        output_schema_path=str(IMPLEMENTATION_DIR / "schema.json"),
+    )
+
+    assert schema is not None
+    assert schema.is_absolute()
 
 
 def test_coder_passes_confirmed_design_once_as_context() -> None:
@@ -158,10 +193,17 @@ def test_coder_passes_confirmed_design_once_as_context() -> None:
     assert json.dumps(design, ensure_ascii=False) not in harness.kwargs["user_request"]
 
 
-def test_coder_rejects_only_unusable_sample_input_protocol() -> None:
-    assert CodexCustomToolCoder._sample_input_error('{"code":"600519.SH"}') == ""
-    assert CodexCustomToolCoder._sample_input_error("[]") == "代表性样例输入必须是 JSON 对象。"
-    assert CodexCustomToolCoder._sample_input_error("{broken") == "代表性样例输入不是合法 JSON。"
+def test_coder_rejects_only_unusable_execution_example_protocol() -> None:
+    valid = [{"input": '{"code":"600519.SH"}', "output": '{"result":true}'}]
+    assert CodexCustomToolCoder._execution_example_error(valid) == ""
+    assert (
+        CodexCustomToolCoder._execution_example_error([])
+        == "Coding 结果缺少真实执行样例。"
+    )
+    assert (
+        CodexCustomToolCoder._execution_example_error([{"input": "{broken", "output": "{}"}])
+        == "执行样例的 input 或 output 不是合法 JSON。"
+    )
 
 
 def test_coder_distinguishes_runtime_failure_from_design_fix() -> None:
@@ -188,6 +230,30 @@ def test_coder_summarizes_invalid_schema_without_exposing_raw_sdk_payload() -> N
     assert result == {
         "code": "coding_schema_invalid",
         "summary": "字段 source 缺少严格 Schema 所需的类型声明。",
+    }
+
+
+def test_coder_explains_turn_limit_and_last_permission_failure() -> None:
+    result = CodexCustomToolCoder._failure_summary(
+        "Claude structured output failed: error_max_turns; "
+        "tool permission denied: only isolated Python compile/test commands are allowed"
+    )
+
+    assert result == {
+        "code": "coding_turn_limit",
+        "summary": "Coding Agent 的测试命令超出隔离执行范围，因此在最大执行轮次内没有完成。",
+    }
+
+
+def test_coder_uses_terminal_failure_kind_before_recoverable_tool_denial() -> None:
+    result = CodexCustomToolCoder._failure_summary(
+        "tool permission denied: only isolated Python compile/test commands are allowed",
+        failure_kind="error_max_turns",
+    )
+
+    assert result == {
+        "code": "coding_turn_limit",
+        "summary": "Coding Agent 的测试命令超出隔离执行范围，因此在最大执行轮次内没有完成。",
     }
 
 

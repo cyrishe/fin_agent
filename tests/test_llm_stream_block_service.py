@@ -34,7 +34,7 @@ def test_requirement_stage_uses_interactive_confirmation_progress() -> None:
     assert "items" not in block["data"]
 
 
-def test_requirement_notice_is_displayed_without_becoming_an_interaction() -> None:
+def test_requirement_brief_notice_and_questions_form_one_confirmation_surface() -> None:
     builder = LlmStreamBlockBuilder(run_id="requirement_notice")
 
     blocks = builder.final_to_blocks({
@@ -50,17 +50,39 @@ def test_requirement_notice_is_displayed_without_becoming_an_interaction() -> No
 
     assert [block["block_id"] for block in blocks] == [
         "requirement_final_summary",
-        "requirement_notice",
-        "requirement_questions",
+        "requirement_review",
     ]
-    notice = blocks[1]
-    assert notice["block_type"] == "narrative"
-    assert notice["title"] == "将按以下方式处理"
-    assert notice["data"]["notice"] == [
+    assert blocks[0]["title"] == "需求理解"
+    assert blocks[0]["content"] == "扫描A股异动股票。"
+    review = blocks[1]
+    assert review["block_type"] == "interaction"
+    assert review["title"] == "确认需求"
+    assert review["data"]["notice"] == [
         "未指定市场时先按A股处理。",
         "异动先按单日涨幅超过5%处理。",
     ]
-    assert blocks[2]["block_type"] == "interaction"
+    assert review["data"]["questions"][0]["question"] == "结果需要按涨幅排序还是按成交额排序？"
+    assert review["data"]["actions"][0]["label"] == "确认需求"
+
+
+def test_requirement_without_questions_still_waits_for_confirmation() -> None:
+    builder = LlmStreamBlockBuilder(run_id="requirement_confirm")
+
+    blocks = builder.final_to_blocks({
+        "status": "clarification",
+        "message": "不要用这段重复 requirement。",
+        "understanding": {"requirement_brief": "**目标**：判断股票近期是否出现金叉。"},
+        "notice": ["未指定窗口时同时检查最近30和60个交易日。"],
+        "questions": [],
+    }, stage="requirement")
+
+    assert [block["block_id"] for block in blocks] == [
+        "requirement_final_summary",
+        "requirement_review",
+    ]
+    assert blocks[0]["content"] == "**目标**：判断股票近期是否出现金叉。"
+    assert blocks[1]["data"]["questions"] == []
+    assert blocks[1]["data"]["actions"][0]["action_id"] == "custom_tool.submit_clarification"
 
 
 def test_design_final_uses_conversation_core_blocks_without_complex_renderers() -> None:
@@ -105,7 +127,7 @@ def test_design_final_uses_conversation_core_blocks_without_complex_renderers() 
         stage="design",
     )
 
-    assert [block["block_type"] for block in blocks] == ["narrative", "artifact", "interaction"]
+    assert [block["block_type"] for block in blocks] == ["artifact", "interaction"]
     assert not {"table", "flowchart", "code", "action"} & {block["block_type"] for block in blocks}
 
     artifact = next(block for block in blocks if block["block_type"] == "artifact")

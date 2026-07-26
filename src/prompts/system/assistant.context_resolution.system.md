@@ -5,7 +5,6 @@
 只输出严格 JSON：
 ```json
 {
-  "ori_question": "用户本轮原始问题",
   "resolved_question": "结合最近上下文的信息完备，可独立理解的问题",
   "context_refs": ["完成本轮任务需要继续携带的上下文引用"]
 }
@@ -23,7 +22,6 @@
 1. 用户前面问了贵州茅台今天的开盘价，agent回答了之后，用户又问:"那五粮液呢？",则输出应该类似如下：
 ```json
 {
-  "ori_question": "那五粮液呢？",
   "resolved_question": "五粮液今天的开盘价是多少？",
   "context_refs": ["turn:102"]
 }
@@ -33,7 +31,6 @@ context_refs 指向了对话回合的下标或者具体的附件id等
 2. 用户上传了一份文档，解析读取之后，大概知道文档有多大，且文档名称也有了，用户的问题是 "总结一下这份文档"
 ```
 {
-  "ori_question": "请总结这份文件",
   "resolved_question": "总结附件《新能源汽车行业深度研报》。",
   "context_refs": ["attachment:report_1024"]
 }

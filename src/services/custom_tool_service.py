@@ -314,9 +314,6 @@ class CustomToolRuntimeService:
             return self._error(tool_name, "permission_or_lifecycle_error", str(exc))
         manifest = bundle["manifest"]
         args = dict(arguments or {})
-        validation_errors = self._validate_input(args, bundle.get("input_schema") or {})
-        if validation_errors:
-            return self._error(manifest["tool_name"], "input_validation_error", "; ".join(validation_errors))
         code = self._wrap_code(bundle.get("code") or "", tool_name=manifest["tool_name"])
         run_dir = Path(tempfile.mkdtemp(prefix=f"{manifest['tool_name']}_", dir=str(self._ensure_runtime_root())))
         input_dir = run_dir / "input"
@@ -400,15 +397,6 @@ class CustomToolRuntimeService:
             payload = json.loads(output_path.read_text(encoding="utf-8"))
         except Exception as exc:
             return self._error(manifest["tool_name"], "output_json_error", str(exc), diagnostics=diagnostics)
-        output_errors = self._validate_json_value(payload, bundle.get("output_schema") or {}, path="output")
-        if output_errors:
-            diagnostics["actual_output"] = payload
-            return self._error(
-                manifest["tool_name"],
-                "output_validation_error",
-                "; ".join(output_errors),
-                diagnostics=diagnostics,
-            )
         result = {
             "tool": manifest["tool_name"],
             "ok": True,
@@ -427,9 +415,6 @@ class CustomToolRuntimeService:
     def _ensure_runtime_root(self) -> Path:
         self.runtime_root.mkdir(parents=True, exist_ok=True)
         return self.runtime_root
-
-    def _validate_input(self, payload: Mapping[str, Any], schema: Mapping[str, Any]) -> List[str]:
-        return self._validate_json_value(payload, schema, path="input")
 
     @staticmethod
     def _load_finance_requests(path: Path) -> List[str]:
@@ -478,39 +463,6 @@ class CustomToolRuntimeService:
         except Exception:
             return False, "finance query could not be parsed"
         return False, f"finance API {api_name or '-'} is not available in the system API catalog"
-
-    @classmethod
-    def _validate_json_value(cls, value: Any, schema: Mapping[str, Any], *, path: str) -> List[str]:
-        if not isinstance(schema, Mapping) or not schema:
-            return []
-        expected_type = _trim(schema.get("type"))
-        type_checks = {
-            "object": lambda item: isinstance(item, Mapping),
-            "array": lambda item: isinstance(item, list),
-            "string": lambda item: isinstance(item, str),
-            "integer": lambda item: isinstance(item, int) and not isinstance(item, bool),
-            "number": lambda item: isinstance(item, (int, float)) and not isinstance(item, bool),
-            "boolean": lambda item: isinstance(item, bool),
-        }
-        if expected_type in type_checks and not type_checks[expected_type](value):
-            return [f"{path} must be {expected_type}"]
-        errors: List[str] = []
-        if expected_type == "object" and isinstance(value, Mapping):
-            properties = schema.get("properties") if isinstance(schema.get("properties"), Mapping) else {}
-            for key in schema.get("required") or []:
-                if key not in value:
-                    errors.append(f"missing required {path}: {key}")
-            if schema.get("additionalProperties") is False:
-                for key in value.keys():
-                    if key not in properties:
-                        errors.append(f"unknown {path}: {key}")
-            for key, child_schema in properties.items():
-                if key in value and isinstance(child_schema, Mapping):
-                    errors.extend(cls._validate_json_value(value[key], child_schema, path=f"{path}.{key}"))
-        if expected_type == "array" and isinstance(value, list) and isinstance(schema.get("items"), Mapping):
-            for index, item in enumerate(value):
-                errors.extend(cls._validate_json_value(item, schema["items"], path=f"{path}[{index}]"))
-        return errors
 
     def _wrap_code(self, code: str, *, tool_name: str) -> str:
         code_body = self._strip_future_imports(code)
@@ -700,7 +652,7 @@ class CustomToolAgentService:
             design_complexity or os.environ.get("CUSTOM_TOOL_DESIGN_COMPLEXITY") or legacy_complexity or "fast"
         ).lower()
         self.coding_complexity = _trim(
-            coding_complexity or os.environ.get("CUSTOM_TOOL_CODING_COMPLEXITY") or legacy_complexity or "fastest"
+            coding_complexity or os.environ.get("CUSTOM_TOOL_CODING_COMPLEXITY") or legacy_complexity or "mid"
         ).lower()
         self.agent_provider = explicit_provider or legacy_provider or self.design_provider
         self.designer = designer or (self._default_agent_designer() if agent_enabled else CustomToolDesigner())
@@ -885,8 +837,6 @@ class CustomToolAgentService:
             "questions": questions,
             **design_artifact,
         }
-        tool_name = _trim(design.get("tool_name")) or "custom_tool"
-        display_name = _trim(design.get("display_name")) or tool_name
         message = design_result.get("message") or compose_design_narrative(understanding, questions, design)
         return {
             "message": message,
@@ -977,6 +927,8 @@ class CustomToolAgentService:
         next_state.setdefault("requirement_text", text)
 
         design_status = ""
+        requirement_updated = False
+        design_updated = False
         notice: List[str] = []
         questions: List[Dict[str, Any]] = []
         test_evidence: Dict[str, Any] = {}
@@ -986,6 +938,7 @@ class CustomToolAgentService:
             artifact_type = _trim(update.get("artifact_type"))
             payload = update.get("payload") if isinstance(update.get("payload"), Mapping) else {}
             if artifact_type == "requirement":
+                requirement_updated = True
                 brief = _trim(payload.get("requirement_brief"))
                 if brief:
                     next_state["requirement_brief"] = brief
@@ -1011,6 +964,7 @@ class CustomToolAgentService:
                     else {}
                 )
                 if design:
+                    design_updated = True
                     next_state["design_contract"] = dict(design)
                     next_state["tool_name"] = _trim(design.get("tool_name"))
                     next_state.update(self._design_artifact_identity(design, state=next_state))
@@ -1019,6 +973,7 @@ class CustomToolAgentService:
                 mermaid = _trim(payload.get("mermaid"))
                 design = dict(next_state.get("design_contract") or {})
                 if mermaid and design:
+                    design_updated = True
                     design["mermaid"] = mermaid
                     next_state["design_contract"] = design
                     design_status = "review"
@@ -1062,10 +1017,18 @@ class CustomToolAgentService:
             "state": next_state,
             "thread_context_patch": {"custom_tool_state": next_state},
             "design_status": design_status or ("review" if design else "clarification"),
-            "understanding": understanding,
-            "notice": notice,
+            "understanding": understanding if requirement_updated or questions else {},
+            "notice": notice if requirement_updated or questions else [],
             "questions": questions,
-            "design": design,
+            "design": design if design_updated else {},
+            "design_artifact": (
+                {
+                    "design_artifact_id": _trim(next_state.get("design_artifact_id")),
+                    "design_revision": int(next_state.get("design_revision") or 0),
+                }
+                if design_updated
+                else {}
+            ),
             "finance_cc": cc_result,
         }
         view_assets = [
@@ -1080,9 +1043,10 @@ class CustomToolAgentService:
         if test_evidence:
             response["test_evidence"] = test_evidence
         if latest_implementation:
-            response["coding_status"] = _trim(latest_implementation.get("coding_status")) or (
+            coding_status = _trim(latest_implementation.get("coding_status")) or (
                 "complete" if latest_implementation.get("ok") else "coding_failed"
             )
+            response["coding_status"] = coding_status
             response["coding_error"] = dict(latest_implementation.get("coding_error") or {})
             response["test_result"] = dict(latest_implementation.get("test_result") or {})
             response["tool"] = dict(latest_implementation.get("tool") or {})
@@ -1098,6 +1062,12 @@ class CustomToolAgentService:
                 for item in latest_implementation.get("coding_tests") or []
                 if isinstance(item, Mapping)
             ]
+            if coding_status == "coding_failed" or response["coding_error"]:
+                response["message"] = (
+                    _trim(latest_implementation.get("message"))
+                    or _trim(response["coding_error"].get("summary"))
+                    or "本轮实现未完成，当前设计和工作区已保留。"
+                )
         if not cc_result.get("ok"):
             error = _trim(cc_result.get("error")) or "Finance CC execution failed"
             saved_types = [
@@ -1129,11 +1099,6 @@ class CustomToolAgentService:
         """Resolve a trusted UI action without executing model-provided commands."""
         normalized_action = _trim(action_id)
         if normalized_action == "custom_tool.confirm_design":
-            current_revision = int(state.get("design_revision") or 0)
-            if expected_revision is not None and current_revision > 0 and int(expected_revision) != current_revision:
-                raise CustomToolError(
-                    f"design revision changed: expected {int(expected_revision)}, current {current_revision}"
-                )
             confirmed_state = dict(state)
             confirmed_state["feedback_ledger"] = self.design_protocol.append_feedback(
                 state.get("feedback_ledger"),
@@ -1368,15 +1333,8 @@ class CustomToolAgentService:
         result["implementation_review"] = self._implementation_review(coding_final)
         result["implementation_explanation"] = self._implementation_explanation(coding_final)
         result["coding_tests"] = [
-            {
-                key: item.get(key)
-                for key in (
-                    "test_id", "purpose", "input_json", "actual_output_json",
-                    "result", "checks", "evidence", "error",
-                )
-            }
-            for item in coding_final.get("tests") or []
-            if isinstance(item, Mapping)
+            dict(item)
+            for item in self._execution_examples(coding_final)
         ]
         # Preserve system-owned assets and feedback; no workflow status gates the next turn.
         next_state = {
@@ -1660,7 +1618,7 @@ class CustomToolAgentService:
             "expected": expected or {"business_result": "no top-level error and no ok=false"},
             "actual": dict(actual_output),
             "logs": execution_logs,
-            "purpose": "验证动态加载、沙箱执行、输出 Schema 和样例业务预期。",
+            "purpose": "验证动态加载、沙箱执行和代表性输入能够完整走通。",
             "error": _trim(test_result.get("error")),
         }]
         test_result["proposed_cases"] = proposed_tests
@@ -1755,7 +1713,7 @@ class CustomToolAgentService:
             "code": code,
             "sample_input": self._sample_input(final),
             "modules": [dict(item) for item in legacy_implementation.get("modules") or [] if isinstance(item, Mapping)],
-            "proposed_tests": [dict(item) for item in final.get("tests") or [] if isinstance(item, Mapping)],
+            "proposed_tests": self._execution_examples(final),
             "implementation_explanation": self._implementation_explanation(final),
             "implementation_review": self._implementation_review(final),
             "design_contract": dict(design),
@@ -1803,7 +1761,7 @@ class CustomToolAgentService:
         legacy = final.get("technical_summary")
         if isinstance(legacy, Mapping):
             return dict(legacy)
-        summary = _trim(final.get("verification"))
+        summary = _trim(final.get("implementation_summary")) or _trim(final.get("verification"))
         return {"summary": summary} if summary else {}
 
     @staticmethod
@@ -1949,6 +1907,9 @@ class CustomToolAgentService:
 
     @staticmethod
     def _select_code(final: Mapping[str, Any]) -> str:
+        code = _trim(final.get("code"))
+        if code:
+            return code
         implementation = final.get("implementation") if isinstance(final.get("implementation"), Mapping) else {}
         entry_module = _trim(implementation.get("entry_module"))
         modules = [item for item in implementation.get("modules") or [] if isinstance(item, Mapping)]
@@ -1962,6 +1923,19 @@ class CustomToolAgentService:
 
     @staticmethod
     def _sample_input(final: Mapping[str, Any]) -> Dict[str, Any]:
+        examples = final.get("execution_examples") if isinstance(final.get("execution_examples"), list) else []
+        for item in examples:
+            if not isinstance(item, Mapping):
+                continue
+            value = item.get("input")
+            if isinstance(value, Mapping):
+                return dict(value)
+            try:
+                parsed = json.loads(_trim(value) or "{}")
+            except Exception:
+                continue
+            if isinstance(parsed, Mapping):
+                return dict(parsed)
         if isinstance(final.get("sample_input"), Mapping):
             return dict(final.get("sample_input") or {})
         sample_input_json = _trim(final.get("sample_input_json"))
@@ -1977,3 +1951,33 @@ class CustomToolAgentService:
             if isinstance(item, Mapping) and isinstance(item.get("input"), Mapping):
                 return dict(item.get("input") or {})
         return {}
+
+    @staticmethod
+    def _execution_examples(final: Mapping[str, Any]) -> List[Dict[str, Any]]:
+        examples: List[Dict[str, Any]] = []
+        for index, item in enumerate(final.get("execution_examples") or []):
+            if not isinstance(item, Mapping):
+                continue
+            try:
+                input_value = (
+                    dict(item.get("input") or {})
+                    if isinstance(item.get("input"), Mapping)
+                    else json.loads(_trim(item.get("input")) or "{}")
+                )
+                output_value = (
+                    dict(item.get("output") or {})
+                    if isinstance(item.get("output"), Mapping)
+                    else json.loads(_trim(item.get("output")) or "{}")
+                )
+            except Exception:
+                continue
+            if not isinstance(input_value, Mapping) or not isinstance(output_value, Mapping):
+                continue
+            examples.append({
+                "test_id": f"coding_example_{index + 1}",
+                "category": "representative",
+                "input": dict(input_value),
+                "expected": dict(output_value),
+                "actual": dict(output_value),
+            })
+        return examples

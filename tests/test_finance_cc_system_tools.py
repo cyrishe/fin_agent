@@ -127,6 +127,28 @@ def test_finance_cc_repeated_implementation_uses_adapter_owned_session(tmp_path)
     assert "agent_runtime" not in tracker["implementation_runs"][-1]["state"]
 
 
+def test_finance_cc_runner_exception_is_terminal_for_the_turn() -> None:
+    calls = []
+
+    def implementation_runner(**kwargs):
+        calls.append(kwargs)
+        raise RuntimeError("save failed")
+
+    tools, _, tracker = _tools(implementation_runner=implementation_runner)
+    first = asyncio.run(
+        tools["implement_dynamic_tool"].handler({"instruction": "实现当前设计"})
+    )
+    second = asyncio.run(
+        tools["implement_dynamic_tool"].handler({"instruction": "不要重复实现"})
+    )
+
+    assert first.get("isError") is True
+    assert second.get("isError") is True
+    assert len(calls) == 1
+    assert len(tracker["implementation_runs"]) == 1
+    assert "implementation_runtime_error" in first["content"][0]["text"]
+
+
 def test_finance_cc_system_tools_execute_existing_services() -> None:
     tools, names, tracker = _tools()
 

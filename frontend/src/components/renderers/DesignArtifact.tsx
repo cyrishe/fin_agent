@@ -1,6 +1,7 @@
 import { CheckCircle2, ChevronRight, GitBranch } from "lucide-react";
 import { normalizeRenderObject } from "../../rendering/normalize";
 import type { UnknownRecord } from "../../types";
+import MarkdownContent from "../MarkdownContent";
 import FlowRenderer from "./FlowRenderer";
 
 const record = (value: unknown): UnknownRecord => value && typeof value === "object" && !Array.isArray(value) ? value as UnknownRecord : {};
@@ -45,6 +46,10 @@ export default function DesignArtifact({ data, content }: { data: UnknownRecord;
   const mermaid = String(details.mermaid || "");
   const flowSteps = records(flow.steps);
   const flowLinks = records(flow.links);
+  const hasStructuredDetails = Boolean(
+    inputs.length || outputs.length || modules.length || constraints.length ||
+    assumptions.length || dataRequirements.length || acceptance.length || plan,
+  );
   const flowObject = (mermaid || flowSteps.length) ? normalizeRenderObject({
     block_id: "design_core_flow",
     block_type: "data",
@@ -71,16 +76,16 @@ export default function DesignArtifact({ data, content }: { data: UnknownRecord;
   }) : null;
 
   return <div className="design-artifact">
-    <section className="design-intent">
-      <span>需求理解</span>
-      <h3>{goal}</h3>
-      {expected && expected !== goal ? <p>{expected}</p> : null}
-      {confirmed.length > 0 ? <div className="confirmed-points">{confirmed.map((item, index) => (
-        <span key={index}><CheckCircle2 size={14} />{textOf(item)}</span>
-      ))}</div> : null}
-    </section>
+    {document ? <section className="design-document"><MarkdownContent content={document} /></section> : <section className="design-intent">
+        <span>需求理解</span>
+        <h3>{goal}</h3>
+        {expected && expected !== goal ? <p>{expected}</p> : null}
+        {confirmed.length > 0 ? <div className="confirmed-points">{confirmed.map((item, index) => (
+          <span key={index}><CheckCircle2 size={14} />{textOf(item)}</span>
+        ))}</div> : null}
+      </section>}
 
-    {rules.length > 0 ? <section className="design-core-section">
+    {!document && rules.length > 0 ? <section className="design-core-section">
       <div className="design-section-heading"><span>核心判断</span><small>请重点确认这些规则是否符合你的想法</small></div>
       <div className="design-rule-list">{rules.slice(0, 4).map((rule, index) => (
         <article key={String(rule.id || rule.name || index)}>
@@ -95,11 +100,10 @@ export default function DesignArtifact({ data, content }: { data: UnknownRecord;
       <FlowRenderer object={flowObject} />
     </section> : null}
 
-    <details className="design-details">
+    {hasStructuredDetails ? <details className="design-details">
       <summary><span><ChevronRight size={16} />查看完整设计细节</span><small>{inputs.length} 个输入 · {outputs.length} 个输出 · {modules.length} 个模块</small></summary>
       <div className="design-details-body">
         {summary && summary !== goal ? <p className="design-description">{summary}</p> : null}
-        {document ? <section><h4>设计方案</h4><p className="design-description" style={{ whiteSpace: "pre-wrap" }}>{document}</p></section> : null}
         {plan ? <section><h4>实现方案</h4><p className="design-description" style={{ whiteSpace: "pre-wrap" }}>{plan}</p></section> : null}
         {inputs.length > 0 ? <section><h4>输入</h4><FieldGrid items={inputs} fallback="输入" /></section> : null}
         {outputs.length > 0 ? <section><h4>输出</h4><FieldGrid items={outputs} fallback="输出" /></section> : null}
@@ -110,6 +114,6 @@ export default function DesignArtifact({ data, content }: { data: UnknownRecord;
         {dataRequirements.length > 0 ? <section><h4>数据依据</h4><ul>{dataRequirements.map((item, index) => <li key={index}><strong>{String(item.name || item.source_ref || `数据 ${index + 1}`)}</strong>：{String(item.purpose || item.description || "")}</li>)}</ul></section> : null}
         {acceptance.length > 0 ? <section><h4>验收场景</h4><ul>{acceptance.map((item, index) => <li key={index}>{textOf(item)}</li>)}</ul></section> : null}
       </div>
-    </details>
+    </details> : null}
   </div>;
 }

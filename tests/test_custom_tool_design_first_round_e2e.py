@@ -317,6 +317,28 @@ def test_view_assets_render_saved_code_and_flow_with_specialized_blocks() -> Non
     assert blocks[2]["data"]["nodes"][0]["label"] == "读取数据"
 
 
+def test_saved_view_assets_render_without_legacy_tool_turn_state() -> None:
+    blocks = web._custom_tool_result_blocks(
+        {
+            "message": "已读取当前工具代码。",
+            "view_assets": [{
+                "type": "code",
+                "payload": {
+                    "modules": [{
+                        "module_id": "main",
+                        "language": "python",
+                        "source_code": "def run(inputs):\n    return inputs\n",
+                    }],
+                },
+            }],
+        },
+        LlmStreamBlockBuilder(run_id="view_assets_without_state"),
+    )
+
+    assert [block["block_type"] for block in blocks] == ["markdown", "code"]
+    assert blocks[1]["block_id"] == "custom_tool_view_code"
+
+
 def test_requirement_confirmation_renders_before_design_exists() -> None:
     blocks = web._custom_tool_result_blocks(
         {
@@ -332,8 +354,10 @@ def test_requirement_confirmation_renders_before_design_exists() -> None:
         LlmStreamBlockBuilder(run_id="requirement_confirmation"),
     )
 
-    assert [block["block_type"] for block in blocks] == ["narrative"]
+    assert [block["block_type"] for block in blocks] == ["narrative", "interaction"]
     assert "按这个实现可以吗" in blocks[0]["content"]
+    assert blocks[1]["data"]["questions"] == []
+    assert blocks[1]["data"]["actions"][0]["label"] == "确认需求"
 
 
 def test_design_then_view_blocks_follow_declared_action_order() -> None:
@@ -416,6 +440,20 @@ def test_structured_clarification_is_submitted_as_text_with_ui_context(monkeypat
     assert agent.calls[0]["text"] == "关于「金额单位是什么？」，我的回答是：系统依据数据接口口径处理。\n关于「计算周期是什么？」，我的回答是：最近 20 个交易日。"
     assert agent.calls[0]["ui_action"]["action_id"] == "custom_tool.submit_clarification"
     assert conversations.completed[0]["output_payload"]["state"]["status"] == "awaiting_design_confirmation"
+
+
+def test_requirement_confirmation_without_questions_becomes_a_natural_user_turn() -> None:
+    text = web._custom_tool_interaction_text(
+        "",
+        {
+            "interaction_id": "custom_tool.requirement_clarification",
+            "action_id": "custom_tool.submit_clarification",
+            "action": "submit",
+            "answers": [],
+        },
+    )
+
+    assert text == "我确认当前需求理解，请继续形成设计方案。"
 
 
 def test_confirmation_button_with_text_uses_semantic_route_instead_of_action_shortcut(monkeypatch) -> None:
@@ -595,6 +633,77 @@ def test_custom_tool_stream_persists_failure_instead_of_leaving_turn_running(mon
     assert conversations.completed[0]["status"] == "failed"
     assert conversations.completed[0]["output_payload"]["error"] == "merged design is invalid"
     assert emitted[-1]["event"] == "error"
+
+
+def test_context_resolution_failure_is_returned_as_a_conversation_message(monkeypatch) -> None:
+    class FailingContextPlanner:
+        def plan_turn(self, **kwargs):
+            raise web.ContextResolutionError(
+                "上下文语义解析失败：模型连续两次没有返回可用协议",
+                user_message="我还没有整理好这轮上下文，当前选择已保留，请重新提交一次。",
+                technical_detail="invalid json",
+                raw_response='{\"resolved_question\":\"关于「\"前高\"」继续\"}',
+            )
+
+    conversations = _ConversationRuntimeStub()
+    emitted = []
+    monkeypatch.setattr(web, "application_runtime_service", _ApplicationRuntimeStub())
+    monkeypatch.setattr(web, "runtime_conversation_service", conversations)
+    monkeypatch.setattr(web, "assistant_dispatch_planner", FailingContextPlanner())
+
+    web._run_custom_tool_stream_payload(
+        {
+            "run_id": "context_resolution_failed",
+            "text": '关于「"前高"」，我的回答是：最近波段高点。',
+            "application_name": "investment_workbench",
+            "guest_identity": {"user_id": "user_a"},
+            "thread_id": 101,
+        },
+        emit=emitted.append,
+    )
+
+    assert len(conversations.completed) == 1
+    assert conversations.completed[0].get("status") != "failed"
+    assert "当前选择已保留" in conversations.completed[0]["assistant_output_text"]
+    assert emitted[-1]["event"] == "done"
+    assert all(item.get("event") != "error" for item in emitted)
+
+
+def test_regular_chat_context_resolution_failure_returns_http_200_message(monkeypatch) -> None:
+    conversations = _ConversationRuntimeStub()
+    monkeypatch.setattr(web, "application_runtime_service", _ApplicationRuntimeStub())
+    monkeypatch.setattr(web, "runtime_conversation_service", conversations)
+    monkeypatch.setattr(web.attachment_service, "list_attachments", lambda _: [])
+    monkeypatch.setattr(
+        web,
+        "_resolve_current_guest_identity",
+        lambda: {"user_id": "user_a", "session_token": "session"},
+    )
+    monkeypatch.setattr(
+        web,
+        "_build_chat_dispatch_payload",
+        lambda *args, **kwargs: (_ for _ in ()).throw(
+            web.ContextResolutionError(
+                "上下文语义解析失败",
+                user_message="我暂时没能整理好这轮上下文，请重新提交一次。",
+                technical_detail="invalid json",
+            )
+        ),
+    )
+
+    with web.app.test_request_context(
+        "/api/chat/dispatch",
+        method="POST",
+        json={"text": "继续", "thread_id": 101},
+    ):
+        response = web.api_chat_dispatch()
+
+    payload = response.get_json()
+    assert response.status_code == 200
+    assert payload["ok"] is True
+    assert payload["mode"] == "conversation"
+    assert "重新提交" in payload["message"]
+    assert conversations.completed[0].get("status") != "failed"
 
 
 def test_conversation_frontend_routes_finance_tool_spec_to_the_design_renderer() -> None:

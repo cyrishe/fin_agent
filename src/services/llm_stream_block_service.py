@@ -400,25 +400,55 @@ class LlmStreamBlockBuilder:
         questions = self._normalize_design_questions(final.get("questions"))
         reviewable = status in {"review", "design_ready"}
         goal = _trim(understanding.get("goal"))
-        summary = message or compose_design_narrative(understanding, questions, design)
-        blocks = [self._block(
-            block_id=f"{stage}_final_summary",
-            block_type="narrative",
-            mode="replace",
-            title="",
-            content=summary,
-            stage=stage,
-        )]
-
-        if stage == "requirement" and notice:
+        requirement_brief = _trim(understanding.get("requirement_brief"))
+        summary = (
+            requirement_brief
+            if stage == "requirement" and requirement_brief
+            else message or compose_design_narrative(understanding, questions, design)
+        )
+        blocks: List[Dict[str, Any]] = []
+        if not (stage == "design" and design and reviewable):
             blocks.append(self._block(
-                block_id="requirement_notice",
+                block_id=f"{stage}_final_summary",
                 block_type="narrative",
                 mode="replace",
-                title="将按以下方式处理",
-                content="\n".join(f"- {item}" for item in notice),
+                title="需求理解" if stage == "requirement" else "",
+                content=summary,
                 stage=stage,
-                data={"notice": notice},
+            ))
+
+        if stage == "requirement":
+            if questions and notice:
+                prompt = "我会按下面的理解继续；其中需要你决定的项目已默认选择第一项。"
+            elif questions:
+                prompt = "请确认下面的关键选择；每项已默认选择第一项。"
+            elif notice:
+                prompt = "下面是我准备采用的处理方式。确认后，我会继续形成设计方案。"
+            else:
+                prompt = "如果上述理解符合你的预期，确认后我会继续形成设计方案。"
+            blocks.append(self._block(
+                block_id="requirement_review",
+                block_type="interaction",
+                mode="replace",
+                title="确认需求",
+                content=prompt,
+                stage=stage,
+                data={
+                    "interaction_id": "custom_tool.requirement_clarification",
+                    "intent": "provide_input",
+                    "submission_mode": "conversation",
+                    "prompt": prompt,
+                    "subject_revision": artifact_revision,
+                    "notice": notice,
+                    "questions": questions,
+                    "actions": [{
+                        "action_id": "custom_tool.submit_clarification",
+                        "label": "确认需求",
+                        "intent": "submit",
+                        "style": "primary",
+                        "expected_revision": artifact_revision,
+                    }],
+                },
             ))
 
         if design:
@@ -426,7 +456,7 @@ class LlmStreamBlockBuilder:
                 block_id=f"{stage}_artifact",
                 block_type="artifact",
                 mode="replace",
-                title=_trim(design.get("display_name")) or "工具规格",
+                title=_trim(design.get("display_name")) or "设计方案",
                 stage=stage,
                 data={
                     "artifact_id": artifact_id,
@@ -459,7 +489,7 @@ class LlmStreamBlockBuilder:
                 },
             ))
 
-        if questions:
+        if questions and stage != "requirement":
             blocks.append(self._block(
                 block_id=f"{stage}_questions",
                 block_type="interaction",

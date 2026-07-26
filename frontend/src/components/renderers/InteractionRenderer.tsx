@@ -37,6 +37,7 @@ function feedbackPrompt(interactionId: string): string {
 }
 
 export default function InteractionRenderer(props: Props) {
+  const notices = list(props.data.notice).map(String).filter(Boolean);
   const questions = list(props.data.questions).map((item, index) => typeof item === "object" ? record(item) : { id: `Q${index + 1}`, question: String(item) });
   const actions = list(props.data.actions).map(record);
   const baseDraft = useMemo(() => createInteractionDraft(props.data), [props.data]);
@@ -56,6 +57,10 @@ export default function InteractionRenderer(props: Props) {
   return (
     <div className={`interaction-block${provisional ? " provisional" : ""}`}>
       <div className="interaction-prompt">{String(props.data.prompt || props.content || "请确认下一步")}</div>
+      {notices.length > 0 && <div className="interaction-notice">
+        <div className="interaction-notice-title">我会按这些理解继续</div>
+        <ul>{notices.map((notice, index) => <li key={index}>{notice}</li>)}</ul>
+      </div>}
       {questions.map((question, index) => {
         const questionId = String(question.id || `Q${index + 1}`);
         const answer = draft.answers[questionId];

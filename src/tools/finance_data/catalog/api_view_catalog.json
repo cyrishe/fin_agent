@@ -1,14 +1,14 @@
 {
-  "version": "2026-07-03-draft",
+  "version": "2026-07-24-draft",
   "api_class_patterns": {
     "basic_query": {
       "desc": "基础查询 API，用于按条件查询当前 dataview 的字段。",
       "call_pattern": "r{id} = {api_name}(filter, order, limit, realtime) -> field1, field2",
       "examples": [
         "r1 = stock.quote(filter = \"tradedate = -1 and amount > 1000000000\", order = \"amount desc\", limit = 10, realtime = 0) -> code, name, tradedate, close, pct, amount\nnote: -x 表示前 x 个交易日；tradedate = -1 表示上一个交易日。filter支持当前view支持的所有的field",
-        "r2 = stock.quote(filter = \"code = 600519.SH\") -> code, name, tradedate, close, pct\nnote: 可以省略未提及的条件,比如本次请求没有order limit realtime 等条件",
+        "r2 = stock.quote(filter = \"code = 600519.SH\", realtime = 2, limit = 1) -> code, name, tradedate, minute_index, open, close, high, low, pct, amount, volumn\nnote: stock.quote 的 realtime=2 表示09:30以后的最新一分钟K，即最新行情。",
         "r3 = index.quote(filter = \"code in r2.code and (pct > 1 or amount > 5000000000)\", order = \"pct desc\", limit = 10, realtime = 1) -> code, name, tradedate, pct, amount\nnote: filter 支持`and or in`等常见操作， 出现 or 时，or 条件必须用括号包住。同时 filter也支持引用前面步骤的结果作为条件; realtime=1表示当前是查询实时行情/资金/量价等信息，而 =0 则表示当前查询的是T-1历史天级别数据",
-        "r4 = stock.quote(order = \"pct desc\", limit = 5) -> code, name, tradedate, minute_index, close, pct \nnote: 输出字段可以是当前view的支持的field的字段，一般按照客户问题中的要求输出，当然有些核心业务字段，比如交易日、股票代码、股票名称等需要一同输出以保证信息完整可查"
+        "r4 = stock.quote(filter = \"code = 600519.SH\", order = \"minute_index asc\", limit = 240, realtime = 1) -> code, name, tradedate, minute_index, open, close, high, low, amount, volumn\nnote: stock.quote 的 realtime=1 表示查询从09:30开始的分钟K序列，盘前快照不返回。"
       ],
       "output_rule": "输出字段只能从当前 view.fields 中选择",
       "args": {
@@ -22,8 +22,8 @@
       },
       "rules": [
         "只能用定义的字段，不允许新造不存在的字段",
-        "realtime 是统一可选参数：1 表示实时/当前查询并为默认值；0 表示历史查询。",
-        "用户输入中，有明确历史日期、历史区间、上一个交易日或过去K日/近N天窗口结果时，设置 realtime=0；而提到`今天/今日/当前/此刻/实时/盘中/最新/分钟`等时间限定词，则设置 realtime=1"
+        "realtime 是统一可选参数；stock.quote 使用三态：0=历史日K，1=从09:30开始的分钟K序列，2=09:30以后的最新一分钟K（最新行情）。其他 API 按各自 dataview 说明使用。",
+        "对 stock.quote：明确历史日期、历史区间、上一个交易日或过去K日/近N天窗口时使用 realtime=0；需要从09:30开始的分钟K序列时使用 realtime=1；当前、此刻、实时、盘中最新或最新行情使用 realtime=2。盘前快照不作为分钟K返回。"
       ]
     },
     "kday_metric": {
@@ -174,7 +174,8 @@
       "rules": [
         "Use this API only when fixed APIs cannot express the requested quote calculation.",
         "task is concise natural language; do not write Python in the request.",
-        "fields lists quote fields needed by the calculation."
+        "fields lists quote fields needed by the calculation.",
+        "When realtime=1/2 uses minute data, the sequence starts at 09:30 and excludes pre-market snapshots."
       ]
     },
     "kday_margin_metric": {
@@ -227,7 +228,7 @@
       "call_pattern": "r{id} = stock.quote.agg(filter, agg, group_by, order, limit, realtime) -> agg_alias",
       "examples": [
         "r1 = stock.quote.agg(filter = \"minute_index = 785 and pct > 0\", agg = avg(stock.quote.pct)) -> avg_pct\nnote: 聚合固定在同一分钟横截面。",
-        "r2 = stock.quote.agg(filter = \"snapshot_slot = 13:05\", agg = sum(stock.quote.minute_amount)) -> total_minute_amount\nnote: minute_amount 是当前分钟成交额，由累计成交额减上一分钟累计成交额得到。",
+        "r2 = stock.quote.agg(filter = \"snapshot_slot = 13:05\", agg = sum(stock.quote.amount), realtime = 1) -> total_minute_amount\nnote: realtime=1 时 amount 是当前分钟成交额。",
         "r3 = stock.quote.agg(filter = \"pct > 5\", agg = count(stock.quote.code)) -> strong_count"
       ],
       "output_rule": "输出 group_by 字段和一个聚合结果别名字段；不需要分组时可以只输出别名字段。",
@@ -240,13 +241,14 @@
           "group_by",
           "order",
           "limit",
-          "realtime(0|1; default 1)"
+          "realtime(0|1|2; default 1)"
         ]
       },
       "rules": [
         "This API aggregates quote rows across stocks at one time point.",
         "agg format is method(metric), for example avg(stock.quote.pct), sum(stock.quote.minute_amount), count(stock.quote.code). Tuple format (avg, stock.quote.pct) is also accepted by code.",
-        "Use minute_amount/minute_volumn for current-minute turnover/volume; amount/volumn are cumulative values up to that minute.",
+        "For stock.quote realtime=1/2, amount/volumn are per-minute values; minute_amount/minute_volumn are compatibility aliases.",
+        "Minute rows start at 09:30; pre-market snapshots are excluded.",
         "One agg request computes one target; split multiple metrics into multiple steps."
       ],
       "methods": [
@@ -264,7 +266,7 @@
       "examples": [
         "r1 = stock.quote.kd_minute_amount_avg(k = 5, filter = \"code = 600519.SH\", order = \"value desc\", limit = 1) -> code, name, tradedate, minute_index, current_value, value as avg_minute_amount_5d, change_pct, window_count\nnote: value 是过去5个交易日同一分钟的 minute_amount 均值，current_value 是当前分钟实际成交额，change_pct 是相对均值变化百分比。",
         "r2 = stock.quote.kd_minute_amount_percentile(k = 10, filter = \"pct > 0\", order = \"value desc\", limit = 20) -> code, name, current_value, value as minute_amount_pctile_10d\nnote: percentile 表示当前分钟成交额在过去10个交易日同一分钟历史值中的分位，越接近1表示越放量。",
-        "r3 = stock.quote.kd_volumn_max(k = 5, filter = \"snapshot_slot = 13:05\", order = \"current_value desc\", limit = 10) -> code, name, current_value, value as max_cum_volume_5d\nnote: volumn 是截至该分钟累计成交量；如果要当前分钟实际成交量，用 minute_volumn。",
+        "r3 = stock.quote.kd_volumn_max(k = 5, filter = \"snapshot_slot = 13:05\", order = \"current_value desc\", limit = 10) -> code, name, current_value, value as max_minute_volume_5d\nnote: realtime=1/2 时 volumn 是该分钟成交量。",
         "r4 = stock.quote.kd_minute_volumn_avg(k = 10, filter = \"change_pct > 20\", order = \"change_pct desc\", limit = 20) -> code, name, current_value, value as avg_minute_volumn_10d, change_pct, window_count\nnote: 表示当前分钟成交量超过过去10个交易日同一分钟均值20%的股票。"
       ],
       "output_rule": "通常输出 code, name, tradedate, minute_index, current_value, value as alias, change_pct, window_count；value 的含义由方法决定：avg/max/min/median 为历史统计值，percentile 为当前值相对历史同分钟的分位；change_pct 表示 current_value 相对 value 的变化百分比。",
@@ -276,12 +278,13 @@
           "filter",
           "order",
           "limit",
-          "realtime(0|1; default 1)"
+          "realtime(0|1|2; default 1)"
         ]
       },
       "rules": [
         "API name format is stock.quote.kd_<field>_<method>.",
-        "Use minute_amount/minute_volumn for current-minute actual turnover/volume; amount/volumn are cumulative values up to that minute.",
+        "For stock.quote realtime=1/2, amount/volumn are per-minute values; minute_amount/minute_volumn are compatibility aliases.",
+        "Same-minute windows use minute rows from 09:30 onward and exclude pre-market snapshots.",
         "For 当前分钟成交量超过近N天均值20% questions, use method avg and filter change_pct > 20.",
         "percentile returns the percentile of current_value among previous K same-minute historical values."
       ],
@@ -332,7 +335,7 @@
         ]
       },
       "quote": {
-        "desc": "个股行情视图，用于查询股票价格、涨跌幅、成交量、成交额、换手、振幅，以及行情排序、筛选、横截面统计和近K日窗口指标。",
+        "desc": "个股行情视图。realtime=0 返回历史日K；realtime=1 返回从09:30开始的分钟K序列；realtime=2 仅返回09:30以后的最新一分钟K，即最新行情。盘前快照不返回。",
         "fields": {
           "code": [
             "股票代码",
@@ -354,20 +357,20 @@
             "前收盘价"
           ],
           "open": [
-            "当日开盘价（元）",
+            "开盘价（元；realtime=1/2 时为分钟开盘价，09:30取当日开盘价）",
             "开盘价"
           ],
           "close": [
-            "截至该分钟最新价（元）",
+            "收盘价（元；realtime=1/2 时为分钟收盘价）",
             "最新价",
             "收盘价"
           ],
           "high": [
-            "截至该分钟当日最高价（元）",
+            "最高价（元）",
             "最高价"
           ],
           "low": [
-            "截至该分钟当日最低价（元）",
+            "最低价（元）",
             "最低价"
           ],
           "avg_price": [
@@ -386,12 +389,12 @@
             "turn_ratio"
           ],
           "amount": [
-            "截至该分钟累计成交额（元）",
-            "累计成交额"
+            "成交额（元；realtime=1/2 时为分钟成交额）",
+            "成交额"
           ],
           "volumn": [
-            "累计成交量（历史日线：股；实时分钟快照：手，1手=100股）",
-            "累计成交量",
+            "成交量（realtime=0：股；realtime=1/2：手，1手=100股）",
+            "成交量",
             "volume"
           ],
           "amplitude": [
@@ -439,11 +442,11 @@
             "时刻"
           ],
           "minute_amount": [
-            "当前分钟成交额（元）",
+            "分钟成交额（元，amount 的兼容别名）",
             "分钟成交额"
           ],
           "minute_volumn": [
-            "当前分钟成交量（手，1手=100股）",
+            "分钟成交量（手，volumn 的兼容别名；1手=100股）",
             "分钟成交量",
             "minute_volume"
           ]
@@ -451,7 +454,7 @@
         "api": [
           {
             "api_name": "stock.quote",
-            "api_function": "查询个股行情明细，支持按股票、日期、价格、涨跌幅、成交量和成交额等条件筛选排序。",
+            "api_function": "查询个股行情：realtime=0 为历史日K，realtime=1 为从09:30开始的分钟K序列，realtime=2 为09:30以后的最新一分钟K（最新行情）；盘前快照不返回。",
             "api_class": "basic_query"
           },
           {
@@ -471,7 +474,11 @@
           }
         ],
         "rules": [
-          "行情相关问题统一优先使用 stock.quote；可表达最新行情、历史行情、横截面对比、排序筛选和K日窗口计算。"
+          "stock.quote 的 realtime=0 返回历史日K。",
+          "stock.quote 的 realtime=1 从09:30开始返回分钟K序列，盘前快照不返回。",
+          "09:30第一根分钟K的open取当日开盘价，amount/volumn取09:30时点累计值；后续分钟open取上一分钟close，amount/volumn取相邻分钟累计值之差。",
+          "stock.quote 的 realtime=2 仅返回09:30以后的最新一分钟K，即最新行情。",
+          "历史行情使用 realtime=0，从09:30开始的分钟K序列使用 realtime=1，当前或最新行情使用 realtime=2。"
         ],
         "kd": {
           "pct": [

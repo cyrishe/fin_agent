@@ -93,8 +93,8 @@ class FinanceCcSystemTools:
                     "ok": False,
                     "code": "implementation_turn_complete",
                     "message": (
-                        "Codex 已完成本轮实现、执行验证和静态检查。"
-                        "Finance CC 不再调用任何工具，请直接向用户总结 Codex 返回的实现事实。"
+                        "编码 Agent 已完成本轮实现、执行验证和静态检查。"
+                        "Finance CC 不再调用任何工具，请直接向用户总结编码 Agent 返回的实现事实。"
                     ),
                 },
                 is_error=True,
@@ -302,8 +302,8 @@ class FinanceCcSystemTools:
         @tool(
             "request_user_interaction",
             (
-                "Pause for user input only when a missing decision materially affects the result. "
-                "The first candidate is the default; the frontend always also allows a custom answer."
+                "Present the saved requirement for confirmation and pause for the user. Questions may be empty; "
+                "when present, the first candidate is the default and the frontend also allows a custom answer."
             ),
             {
                 "type": "object",
@@ -429,7 +429,7 @@ class FinanceCcSystemTools:
         @tool(
             "implement_dynamic_tool",
             (
-                "Implement or repair the active dynamic financial tool with Codex mid. The tool reads the saved design "
+                "Implement or repair the active dynamic financial tool with the configured coding Agent. The tool reads the saved design "
                 "and isolated Context Bundle itself; do not pass source code or the full design in this call."
             ),
             {
@@ -457,7 +457,7 @@ class FinanceCcSystemTools:
                 )
             if self.implementation_runner is None:
                 return _tool_result(
-                    {"ok": False, "error": "Codex implementation runner is unavailable."},
+                    {"ok": False, "error": "coding Agent implementation runner is unavailable."},
                     is_error=True,
                 )
             active_design = (
@@ -467,15 +467,27 @@ class FinanceCcSystemTools:
             )
             active_tool_name = _trim(working_state.get("tool_name") or active_design.get("tool_name"))
             delegated_role = f"tool_implementation:{active_tool_name or 'active_tool'}"
-            result = self.runtime_context_adapter.invoke(
-                scope_id=runtime_scope,
-                role=delegated_role,
-                runner=self.implementation_runner,
-                state=dict(working_state),
-                owner_id=owner_ids[0] if owner_ids else "",
-                instruction=instruction,
-                event_sink=event_sink,
-            )
+            try:
+                result = self.runtime_context_adapter.invoke(
+                    scope_id=runtime_scope,
+                    role=delegated_role,
+                    runner=self.implementation_runner,
+                    state=dict(working_state),
+                    owner_id=owner_ids[0] if owner_ids else "",
+                    instruction=instruction,
+                    event_sink=event_sink,
+                )
+            except Exception as exc:
+                implementation_response = {
+                    "ok": False,
+                    "message": f"代码实现未完成：{exc}",
+                    "coding_error": {
+                        "code": "implementation_runtime_error",
+                        "summary": str(exc),
+                    },
+                }
+                tracker["implementation_runs"].append(dict(implementation_response))
+                return _tool_result(implementation_response, is_error=True)
             tool = result.get("tool") if isinstance(result.get("tool"), Mapping) else {}
             manifest = tool.get("manifest") if isinstance(tool.get("manifest"), Mapping) else {}
             coding_status = _trim(result.get("coding_status"))
@@ -506,7 +518,7 @@ class FinanceCcSystemTools:
                 compact_execution_result(
                     tool_name=f"{resolved_tool_name or 'dynamic_tool'}:technical_validation",
                     result=test_result,
-                    task="Codex implementation validation",
+                    task="coding Agent implementation validation",
                 )
                 if test_result
                 else {}

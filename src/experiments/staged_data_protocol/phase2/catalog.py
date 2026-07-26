@@ -104,16 +104,16 @@ def intraday_quote_fields() -> Dict[str, Dict[str, List[str]]]:
         "snapshot_time": field("快照时间", "采样时间"),
         "snapshot_slot": field("分钟时点", "时刻"),
         "preclose": field("昨收价", "前收盘价"),
-        "open": field("当日开盘价", "开盘价"),
-        "close": field("截至该分钟最新价", "最新价", "收盘价"),
-        "high": field("截至该分钟当日最高价", "最高价"),
-        "low": field("截至该分钟当日最低价", "最低价"),
+        "open": field("分钟开盘价", "开盘价"),
+        "close": field("分钟收盘价", "最新价", "收盘价"),
+        "high": field("最高价"),
+        "low": field("最低价"),
         "differ": field("涨跌额"),
         "pct": field("涨跌幅", "涨幅"),
-        "amount": field("截至该分钟累计成交额", "累计成交额"),
-        "volumn": field("截至该分钟累计成交量", "累计成交量", "volume"),
-        "minute_amount": field("当前分钟成交额", "分钟成交额"),
-        "minute_volumn": field("当前分钟成交量", "分钟成交量", "minute_volume"),
+        "amount": field("分钟成交额", "成交额"),
+        "volumn": field("分钟成交量", "成交量", "volume"),
+        "minute_amount": field("分钟成交额", "amount"),
+        "minute_volumn": field("分钟成交量", "volume", "minute_volume"),
     }
 
 
@@ -476,9 +476,14 @@ FINANCE_CATALOG: Dict[str, Any] = {
                 },
                 "quote": {
                     "api": "stock.quote",
-                    "desc": "个股统一行情",
+                    "desc": "个股统一行情：realtime=0 返回历史日K，realtime=1 返回从09:30开始的分钟K序列，realtime=2 返回最新一分钟K（最新行情）",
                     "fields": unified_stock_quote_fields(),
                     "kd": unified_stock_quote_kd_methods(),
+                    "rules": [
+                        "realtime=0：历史日K。",
+                        "realtime=1：分钟K从09:30开始，盘前快照不返回；09:30的open取当日开盘价，amount/volumn取该时点累计值，后续分钟按上一分钟差分。",
+                        "realtime=2：仅返回09:30以后最新一分钟K，用作最新行情。",
+                    ],
                 },
                 "moneyflow": {
                     "api": "stock.moneyflow",

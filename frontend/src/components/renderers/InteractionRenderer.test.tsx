@@ -48,4 +48,35 @@ describe("InteractionRenderer", () => {
     expect(html).toContain("已在输入框中准备");
     expect(html).toContain("关于「观察窗口？」，我希望：");
   });
+
+  it("renders business defaults as a readable list without exposing protocol names", () => {
+    const html = renderToStaticMarkup(<InteractionRenderer
+      data={{ ...data, notice: ["按最新完整交易日处理", "默认覆盖全部 A 股"] }}
+      content=""
+      draft={createInteractionDraft(data)}
+      {...handlers}
+    />);
+
+    expect(html).toContain("我会按这些理解继续");
+    expect(html).toContain("<li>按最新完整交易日处理</li>");
+    expect(html).not.toContain(">notice<");
+  });
+
+  it("renders one confirmation action when no questions need answers", () => {
+    const confirmation = {
+      interaction_id: "custom_tool.requirement_clarification",
+      prompt: "如果上述理解符合你的预期，请确认。",
+      notice: [],
+      questions: [],
+      actions: [{
+        action_id: "custom_tool.submit_clarification",
+        label: "确认需求",
+        intent: "submit",
+        style: "primary",
+      }],
+    };
+    const html = renderToStaticMarkup(<InteractionRenderer data={confirmation} content="" {...handlers} />);
+
+    expect(html).toContain(">确认需求</button>");
+  });
 });

@@ -37,6 +37,7 @@ from src.services.custom_tool_run_trace_service import CustomToolRunTrace
 from src.services.finance_claude_session_service import FinanceClaudeSessionService
 from src.services.finance_cc_system_tools import FinanceCcSystemTools
 from src.services.conversation_title_service import ConversationTitleService
+from src.services.context_resolution_service import ContextResolutionError
 from src.services.llm_stream_block_service import LlmStreamBlockBuilder
 from src.services.runtime_conversation_service import RuntimeConversationService
 from src.services.skill_blueprint_service import SkillBlueprintError, SkillBlueprintService
@@ -732,6 +733,9 @@ def _custom_tool_result_blocks(result: dict, builder: LlmStreamBlockBuilder) -> 
         if str(item or "").strip()
     ]
     tool_turn_actions = ["view" if item == "direct" else item for item in tool_turn_actions]
+    available_view_assets = result.get("view_assets") or result.get("direct_assets") or []
+    if available_view_assets and "view" not in tool_turn_actions:
+        tool_turn_actions.append("view")
     view_block_count = 0
     if "view" in tool_turn_actions:
         view_answer = str(result.get("view_answer") or result.get("direct_answer") or result.get("message") or "").strip()
@@ -745,8 +749,7 @@ def _custom_tool_result_blocks(result: dict, builder: LlmStreamBlockBuilder) -> 
                 stage="view",
                 data={"role": "view_answer", "state_changed": False},
             )])
-        view_assets = result.get("view_assets") or result.get("direct_assets") or []
-        for asset in view_assets:
+        for asset in available_view_assets:
             if not isinstance(asset, dict):
                 continue
             asset_type = str(asset.get("type") or "").strip()
@@ -875,7 +878,7 @@ def _custom_tool_result_blocks(result: dict, builder: LlmStreamBlockBuilder) -> 
                 title="实现未完成",
                 data={
                     "overall": "fail",
-                    "summary": "Coding 服务本次未返回有效实现，已保留当前设计。",
+                    "summary": error_summary,
                     "issues": [error_summary],
                     "details": {
                         "error_code": str(coding_error.get("code") or "coding_runtime_failed"),
@@ -1043,7 +1046,7 @@ def _custom_tool_interaction_text(text: str, response: dict) -> str:
             lines.append(f"关于「{question}」，我的回答是：{value}。")
         if raw:
             lines.append(raw)
-        return "\n".join(lines)
+        return "\n".join(lines) or "我确认当前需求理解，请继续形成设计方案。"
     if raw:
         return raw
     if action_id in {"custom_tool.revise_design", "custom_tool.revise_implementation"}:
@@ -1350,6 +1353,60 @@ def _run_custom_tool_stream_payload(payload: dict, *, emit) -> None:
             "thread_id": thread_id,
             "turn_id": turn_id,
             "message": "任务已完成",
+            "result": result,
+        })
+    except ContextResolutionError as exc:
+        technical_detail = str(exc.technical_detail or exc)
+        app.logger.warning(
+            "context resolution failed after correction thread_id=%s detail=%s raw_response=%r",
+            thread_id,
+            technical_detail,
+            str(exc.raw_response or "")[:2000],
+        )
+        user_message = str(exc.user_message or "").strip()
+        if thread_id is not None and turn_id is None:
+            turn_id = runtime_conversation_service.create_turn(
+                thread_id=thread_id,
+                user_input_text=text,
+                input_payload=_to_json_safe({
+                    **payload,
+                    "text": text,
+                    "application_name": application_name,
+                }),
+            )
+        block = builder.make_block(
+            block_id="context_resolution_message",
+            block_type="markdown",
+            mode="replace",
+            content=user_message,
+            stage="conversation",
+            data={"role": "assistant_message"},
+        )
+        result = {
+            "mode": "conversation",
+            "message": user_message,
+            "surface_blocks": [block],
+            "diagnostic_trace": {
+                "run_id": builder.run_id,
+                "format": "timed_business_sections_text_v1",
+                "path": str(run_trace.path),
+            },
+        }
+        run_trace.finish(result, error=technical_detail)
+        if thread_id is not None and turn_id is not None:
+            runtime_conversation_service.complete_turn(
+                thread_id=thread_id,
+                turn_id=turn_id,
+                assistant_output_text=user_message,
+                output_payload=_to_json_safe(result),
+            )
+        emit(block)
+        emit({
+            "event": "done",
+            "run_id": builder.run_id,
+            "thread_id": thread_id,
+            "turn_id": turn_id,
+            "message": user_message,
             "result": result,
         })
     except Exception as exc:
@@ -3315,6 +3372,8 @@ def api_create_stock_deep_dive_job():
 
 @app.route("/api/chat/dispatch", methods=["POST"])
 def api_chat_dispatch():
+    thread_id = None
+    turn_id = None
     try:
         payload = _extract_request_payload()
         text = str(payload.get("text") or payload.get("message") or "").strip()
@@ -3456,6 +3515,41 @@ def api_chat_dispatch():
             samesite="Lax",
         )
         return response
+    except ContextResolutionError as exc:
+        technical_detail = str(exc.technical_detail or exc)
+        app.logger.warning(
+            "chat context resolution failed after correction thread_id=%s detail=%s raw_response=%r",
+            thread_id,
+            technical_detail,
+            str(exc.raw_response or "")[:2000],
+        )
+        user_message = str(exc.user_message or "").strip()
+        result = {
+            "mode": "conversation",
+            "message": user_message,
+            "surface_blocks": [{
+                "block_id": "context_resolution_message",
+                "block_type": "markdown",
+                "type": "markdown",
+                "mode": "replace",
+                "content": user_message,
+                "stage": "conversation",
+                "data": {"role": "assistant_message"},
+            }],
+        }
+        if thread_id is not None and turn_id is not None:
+            runtime_conversation_service.complete_turn(
+                thread_id=thread_id,
+                turn_id=turn_id,
+                assistant_output_text=user_message,
+                output_payload=_to_json_safe(result),
+            )
+        return jsonify(_to_json_safe({
+            "ok": True,
+            "thread_id": thread_id,
+            "turn_id": turn_id,
+            **result,
+        }))
     except ValueError as exc:
         return jsonify({"ok": False, "error": str(exc)}), 400
     except FileNotFoundError as exc:
@@ -3479,10 +3573,10 @@ def api_custom_tool_stream_start():
         if interaction_response and not str(interaction_response.get("action_id") or "").strip():
             return jsonify({"ok": False, "error": "interaction_response.action_id 不能为空"}), 400
         action_id = str(interaction_response.get("action_id") or "").strip()
-        revision_actions = {"custom_tool.confirm_design", "custom_tool.activate_draft"}
+        revision_actions = {"custom_tool.activate_draft"}
         expected_revision = interaction_response.get("expected_revision")
         if interaction_response and action_id in revision_actions and not isinstance(expected_revision, int):
-            return jsonify({"ok": False, "error": "确认设计或启用实现时 expected_revision 必须是整数"}), 400
+            return jsonify({"ok": False, "error": "启用实现时 expected_revision 必须是整数"}), 400
         if interaction_response and expected_revision is not None and not isinstance(expected_revision, int):
             return jsonify({"ok": False, "error": "interaction_response.expected_revision 必须是整数"}), 400
         guest_identity = _resolve_current_guest_identity()

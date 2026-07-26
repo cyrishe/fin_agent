@@ -13,6 +13,7 @@ from src.utils.mysql_utils import StockInfoDbUtils
 
 
 SNAPSHOT_TABLE = "aiia_stock_realtime_minute_snapshot"
+MINUTE_SESSION_START = "09:30:00"
 
 FIELD_SQL = {
     "code": "code",
@@ -69,44 +70,22 @@ FILTER_RE = re.compile(
 )
 
 
-def execute_intraday_quote_api(*, args: Mapping[str, Any], outputs: List[str]) -> Dict[str, Any]:
+def execute_intraday_quote_api(
+    *,
+    args: Mapping[str, Any],
+    outputs: List[str],
+    latest_only: bool = False,
+) -> Dict[str, Any]:
     columns = _requested_fields(outputs)
-    limit = _bounded_limit(args.get("limit"), default=100)
+    limit = _bounded_limit(args.get("limit"), default=100 if latest_only else 240)
     filters = _parse_filter(str(args.get("filter") or ""))
-    slot = _resolve_slot(filters=filters, aggregate=False)
+    slot = _resolve_slot(filters=filters, latest_only=latest_only)
+    source_where_sql, source_params = _snapshot_identity_where(filters)
     where_sql, params = _where_sql(filters=filters, slot=slot)
-    order_sql = _order_sql(str(args.get("order") or ""), default="tradedate DESC, minute_index DESC, code ASC")
+    default_order = "code ASC" if latest_only else "code ASC, minute_index ASC"
+    order_sql = _order_sql(str(args.get("order") or ""), default=default_order)
     sql = f"""
-        WITH base AS (
-            SELECT
-                s.stk_code AS code,
-                s.stk_name AS name,
-                s.trade_date AS tradedate,
-                s.minute_index AS minute_index,
-                TIME_FORMAT(s.snapshot_time, '%%H:%%i:%%s') AS minute_time,
-                s.snapshot_time AS snapshot_time,
-                s.snapshot_slot AS snapshot_slot,
-                s.preclose_price AS preclose,
-                s.open_price AS open,
-                s.latest_price AS close,
-                s.high_price AS high,
-                s.low_price AS low,
-                s.chg_value AS differ,
-                s.chg_ratio AS pct,
-                s.amount AS amount,
-                s.volume AS volumn,
-                GREATEST(s.amount - COALESCE(p.amount, 0), 0) AS minute_amount,
-                GREATEST(s.volume - COALESCE(p.volume, 0), 0) AS minute_volumn,
-                s.source AS source,
-                s.is_fallback AS is_fallback
-            FROM {SNAPSHOT_TABLE} s
-            LEFT JOIN {SNAPSHOT_TABLE} p
-              ON p.trade_date = s.trade_date
-             AND p.stk_code = s.stk_code
-             AND p.minute_index = s.minute_index - 1
-            WHERE s.trade_date = %s
-              AND s.stk_code REGEXP '^[0-9]{{6}}$'
-        )
+        {_minute_bar_cte(date_predicate="s.trade_date = %s", source_where_sql=source_where_sql)}
         SELECT {", ".join(f"`{column}`" for column in columns)}
         FROM base
         WHERE {where_sql}
@@ -116,7 +95,7 @@ def execute_intraday_quote_api(*, args: Mapping[str, Any], outputs: List[str]) -
     db = StockInfoDbUtils(database="kingdomai")
     try:
         with db.conn.cursor(pymysql.cursors.DictCursor) as cursor:
-            cursor.execute(sql, tuple([slot["trade_date"], *params, limit]))
+            cursor.execute(sql, tuple([slot["trade_date"], *source_params, *params, limit]))
             rows = [_normalize_row(row, columns) for row in cursor.fetchall()]
         return _result(
             status="ok",
@@ -124,7 +103,12 @@ def execute_intraday_quote_api(*, args: Mapping[str, Any], outputs: List[str]) -
             columns=columns,
             rows=rows,
             slot=slot,
-            sql_shape={"where": where_sql, "order": order_sql, "limit": limit},
+            sql_shape={
+                "realtime": 2 if latest_only else 1,
+                "where": where_sql,
+                "order": order_sql,
+                "limit": limit,
+            },
         )
     except Exception as exc:  # noqa: BLE001
         return _result(status="provider_error", args=args, columns=columns, rows=[], slot=slot, reason=str(exc))
@@ -132,9 +116,15 @@ def execute_intraday_quote_api(*, args: Mapping[str, Any], outputs: List[str]) -
         db.close_db()
 
 
-def execute_intraday_quote_agg_api(*, args: Mapping[str, Any], outputs: List[str]) -> Dict[str, Any]:
+def execute_intraday_quote_agg_api(
+    *,
+    args: Mapping[str, Any],
+    outputs: List[str],
+    latest_only: bool = False,
+) -> Dict[str, Any]:
     filters = _parse_filter(str(args.get("filter") or ""))
-    slot = _resolve_slot(filters=filters, aggregate=True)
+    slot = _resolve_slot(filters=filters, latest_only=latest_only)
+    source_where_sql, source_params = _snapshot_identity_where(filters)
     where_sql, params = _where_sql(filters=filters, slot=slot)
     spec = parse_agg_spec(args)
     metric = _metric_column(spec.metric)
@@ -152,36 +142,7 @@ def execute_intraday_quote_agg_api(*, args: Mapping[str, Any], outputs: List[str
     order_sql = _order_sql(str(args.get("order") or ""), default=f"`{alias}` DESC")
     limit = _bounded_limit(args.get("limit"), default=100)
     sql = f"""
-        WITH base AS (
-            SELECT
-                s.stk_code AS code,
-                s.stk_name AS name,
-                s.trade_date AS tradedate,
-                s.minute_index AS minute_index,
-                TIME_FORMAT(s.snapshot_time, '%%H:%%i:%%s') AS minute_time,
-                s.snapshot_time AS snapshot_time,
-                s.snapshot_slot AS snapshot_slot,
-                s.preclose_price AS preclose,
-                s.open_price AS open,
-                s.latest_price AS close,
-                s.high_price AS high,
-                s.low_price AS low,
-                s.chg_value AS differ,
-                s.chg_ratio AS pct,
-                s.amount AS amount,
-                s.volume AS volumn,
-                GREATEST(s.amount - COALESCE(p.amount, 0), 0) AS minute_amount,
-                GREATEST(s.volume - COALESCE(p.volume, 0), 0) AS minute_volumn,
-                s.source AS source,
-                s.is_fallback AS is_fallback
-            FROM {SNAPSHOT_TABLE} s
-            LEFT JOIN {SNAPSHOT_TABLE} p
-              ON p.trade_date = s.trade_date
-             AND p.stk_code = s.stk_code
-             AND p.minute_index = s.minute_index - 1
-            WHERE s.trade_date = %s
-              AND s.stk_code REGEXP '^[0-9]{{6}}$'
-        )
+        {_minute_bar_cte(date_predicate="s.trade_date = %s", source_where_sql=source_where_sql)}
         SELECT {", ".join(select_parts)}
         FROM base
         WHERE {where_sql}
@@ -192,7 +153,7 @@ def execute_intraday_quote_agg_api(*, args: Mapping[str, Any], outputs: List[str
     db = StockInfoDbUtils(database="kingdomai")
     try:
         with db.conn.cursor(pymysql.cursors.DictCursor) as cursor:
-            cursor.execute(sql, tuple([slot["trade_date"], *params, limit]))
+            cursor.execute(sql, tuple([slot["trade_date"], *source_params, *params, limit]))
             rows = [_normalize_row(row, columns) for row in cursor.fetchall()]
         return _result(
             status="ok",
@@ -200,7 +161,13 @@ def execute_intraday_quote_agg_api(*, args: Mapping[str, Any], outputs: List[str
             columns=columns,
             rows=rows,
             slot=slot,
-            sql_shape={"where": where_sql, "group_by": group_fields, "order": order_sql, "limit": limit},
+            sql_shape={
+                "realtime": 2 if latest_only else 1,
+                "where": where_sql,
+                "group_by": group_fields,
+                "order": order_sql,
+                "limit": limit,
+            },
         )
     except Exception as exc:  # noqa: BLE001
         return _result(status="provider_error", args=args, columns=columns, rows=[], slot=slot, reason=str(exc))
@@ -218,7 +185,7 @@ def execute_kd_intraday_quote_api(*, field: str, method: str, args: Mapping[str,
         return _result(status="provider_error", args=args, columns=columns, rows=[], slot={}, reason=f"unsupported method={method}")
 
     filters = _parse_filter(str(args.get("filter") or ""))
-    slot = _resolve_slot(filters=filters, aggregate=True)
+    slot = _resolve_slot(filters=filters, latest_only=True)
     k = _bounded_k(args.get("k"))
     history_dates = _history_trade_dates(anchor_date=str(slot.get("trade_date") or ""), k=k)
     if not history_dates:
@@ -279,7 +246,7 @@ def execute_kd_intraday_quote_api(*, field: str, method: str, args: Mapping[str,
     return payload
 
 
-def _resolve_slot(*, filters: List[Dict[str, str]], aggregate: bool) -> Dict[str, Any]:
+def _resolve_slot(*, filters: List[Dict[str, str]], latest_only: bool) -> Dict[str, Any]:
     requested_date = ""
     requested_minute = None
     requested_slot = ""
@@ -297,35 +264,56 @@ def _resolve_slot(*, filters: List[Dict[str, str]], aggregate: bool) -> Dict[str
         elif field_name == "snapshot_slot" and op in {"=", "=="}:
             requested_slot = value
 
+    source_where_sql, source_params = _snapshot_identity_where(filters)
+    source_filter = f" AND {source_where_sql}" if source_where_sql else ""
     db = StockInfoDbUtils(database="kingdomai")
     try:
         with db.conn.cursor(pymysql.cursors.DictCursor) as cursor:
             if requested_date:
                 trade_date = requested_date
             else:
-                cursor.execute(f"SELECT MAX(trade_date) AS trade_date FROM {SNAPSHOT_TABLE}")
+                cursor.execute(
+                    f"SELECT MAX(s.trade_date) AS trade_date FROM {SNAPSHOT_TABLE} s WHERE 1=1 {source_filter}",
+                    tuple(source_params),
+                )
                 trade_date = str((cursor.fetchone() or {}).get("trade_date") or "")
             if requested_minute is not None:
                 minute_index = requested_minute
             elif requested_slot:
                 cursor.execute(
                     f"""
-                    SELECT MAX(minute_index) AS minute_index
-                    FROM {SNAPSHOT_TABLE}
-                    WHERE trade_date = %s AND snapshot_slot = %s
+                    SELECT MAX(s.minute_index) AS minute_index
+                    FROM {SNAPSHOT_TABLE} s
+                    WHERE s.trade_date = %s
+                      AND s.snapshot_slot = %s
+                      AND TIME(s.snapshot_time) >= '{MINUTE_SESSION_START}'
+                      {source_filter}
                     """,
-                    (trade_date, requested_slot),
+                    tuple([trade_date, requested_slot, *source_params]),
+                )
+                minute_index = int((cursor.fetchone() or {}).get("minute_index") or 0)
+            elif latest_only:
+                cursor.execute(
+                    f"""
+                    SELECT MAX(s.minute_index) AS minute_index
+                    FROM {SNAPSHOT_TABLE} s
+                    WHERE s.trade_date = %s
+                      AND TIME(s.snapshot_time) >= '{MINUTE_SESSION_START}'
+                      {source_filter}
+                    """,
+                    tuple([trade_date, *source_params]),
                 )
                 minute_index = int((cursor.fetchone() or {}).get("minute_index") or 0)
             else:
-                cursor.execute(
-                    f"SELECT MAX(minute_index) AS minute_index FROM {SNAPSHOT_TABLE} WHERE trade_date = %s",
-                    (trade_date,),
-                )
-                minute_index = int((cursor.fetchone() or {}).get("minute_index") or 0)
+                minute_index = 0
     finally:
         db.close_db()
-    return {"trade_date": trade_date, "minute_index": minute_index, "snapshot_slot": requested_slot}
+    return {
+        "trade_date": trade_date,
+        "minute_index": minute_index,
+        "snapshot_slot": requested_slot,
+        "realtime": 2 if latest_only else 1,
+    }
 
 
 def _history_trade_dates(*, anchor_date: str, k: int) -> List[str]:
@@ -355,35 +343,10 @@ def _load_same_minute_rows(*, trade_dates: List[str], minute_index: int) -> List
         return []
     placeholders = ", ".join(["%s"] * len(trade_dates))
     sql = f"""
-        SELECT
-            s.stk_code AS code,
-            s.stk_name AS name,
-            s.trade_date AS tradedate,
-            s.minute_index AS minute_index,
-            TIME_FORMAT(s.snapshot_time, '%%H:%%i:%%s') AS minute_time,
-            s.snapshot_time AS snapshot_time,
-            s.snapshot_slot AS snapshot_slot,
-            s.preclose_price AS preclose,
-            s.open_price AS open,
-            s.latest_price AS close,
-            s.high_price AS high,
-            s.low_price AS low,
-            s.chg_value AS differ,
-            s.chg_ratio AS pct,
-            s.amount AS amount,
-            s.volume AS volumn,
-            GREATEST(s.amount - COALESCE(p.amount, 0), 0) AS minute_amount,
-            GREATEST(s.volume - COALESCE(p.volume, 0), 0) AS minute_volumn,
-            s.source AS source,
-            s.is_fallback AS is_fallback
-        FROM {SNAPSHOT_TABLE} s
-        LEFT JOIN {SNAPSHOT_TABLE} p
-          ON p.trade_date = s.trade_date
-         AND p.stk_code = s.stk_code
-         AND p.minute_index = s.minute_index - 1
-        WHERE s.trade_date IN ({placeholders})
-          AND s.minute_index = %s
-          AND s.stk_code REGEXP '^[0-9]{{6}}$'
+        {_minute_bar_cte(date_predicate=f"s.trade_date IN ({placeholders})")}
+        SELECT *
+        FROM base
+        WHERE minute_index = %s
     """
     db = StockInfoDbUtils(database="kingdomai")
     try:
@@ -392,6 +355,99 @@ def _load_same_minute_rows(*, trade_dates: List[str], minute_index: int) -> List
             return [_normalize_row(row, list(FIELD_SQL)) for row in cursor.fetchall()]
     finally:
         db.close_db()
+
+
+def _minute_bar_cte(*, date_predicate: str, source_where_sql: str = "") -> str:
+    source_filter = f" AND {source_where_sql}" if source_where_sql else ""
+    return f"""
+        WITH snapshots AS (
+            SELECT
+                s.stk_code AS code,
+                s.stk_name AS name,
+                s.trade_date AS tradedate,
+                s.minute_index AS minute_index,
+                TIME_FORMAT(s.snapshot_time, '%%H:%%i:%%s') AS minute_time,
+                s.snapshot_time AS snapshot_time,
+                s.snapshot_slot AS snapshot_slot,
+                s.preclose_price AS preclose,
+                s.open_price AS snapshot_open,
+                s.latest_price AS close,
+                s.high_price AS high,
+                s.low_price AS low,
+                s.chg_value AS differ,
+                s.chg_ratio AS pct,
+                s.amount AS cumulative_amount,
+                s.volume AS cumulative_volumn,
+                LAG(s.latest_price) OVER (
+                    PARTITION BY s.trade_date, s.stk_code
+                    ORDER BY s.minute_index
+                ) AS previous_close,
+                LAG(s.amount) OVER (
+                    PARTITION BY s.trade_date, s.stk_code
+                    ORDER BY s.minute_index
+                ) AS previous_amount,
+                LAG(s.volume) OVER (
+                    PARTITION BY s.trade_date, s.stk_code
+                    ORDER BY s.minute_index
+                ) AS previous_volumn,
+                s.source AS source,
+                s.is_fallback AS is_fallback
+            FROM {SNAPSHOT_TABLE} s
+            WHERE {date_predicate}
+              AND TIME(s.snapshot_time) >= '{MINUTE_SESSION_START}'
+              AND s.stk_code REGEXP '^[0-9]{{6}}$'
+              {source_filter}
+        ),
+        base AS (
+            SELECT
+                code,
+                name,
+                tradedate,
+                minute_index,
+                minute_time,
+                snapshot_time,
+                snapshot_slot,
+                preclose,
+                COALESCE(previous_close, snapshot_open, preclose) AS open,
+                close,
+                high,
+                low,
+                differ,
+                pct,
+                GREATEST(COALESCE(cumulative_amount, 0) - COALESCE(previous_amount, 0), 0) AS amount,
+                GREATEST(COALESCE(cumulative_volumn, 0) - COALESCE(previous_volumn, 0), 0) AS volumn,
+                GREATEST(COALESCE(cumulative_amount, 0) - COALESCE(previous_amount, 0), 0) AS minute_amount,
+                GREATEST(COALESCE(cumulative_volumn, 0) - COALESCE(previous_volumn, 0), 0) AS minute_volumn,
+                source,
+                is_fallback
+            FROM snapshots
+        )
+    """
+
+
+def _snapshot_identity_where(filters: List[Dict[str, str]]) -> tuple[str, List[Any]]:
+    if any(item.get("connector", "").strip().lower() == "or" for item in filters):
+        return "", []
+    clauses: List[str] = []
+    params: List[Any] = []
+    for item in filters:
+        field_name = _canonical_field(item["field"])
+        if field_name not in {"code", "name"}:
+            continue
+        column = "s.stk_code" if field_name == "code" else "s.stk_name"
+        op = item["op"].lower()
+        if op == "in":
+            values = [_normalize_filter_value(field_name, value) for value in _list_values(item["value"])]
+            if values:
+                clauses.append(f"{column} IN ({', '.join(['%s'] * len(values))})")
+                params.extend(values)
+            continue
+        sql_op = "=" if op == "==" else op.upper()
+        if sql_op not in {"=", "!=", "LIKE"}:
+            continue
+        clauses.append(f"{column} {sql_op} %s")
+        params.append(_normalize_filter_value(field_name, _clean_value(item["value"])))
+    return " AND ".join(clauses), params
 
 
 def _where_sql(*, filters: List[Dict[str, str]], slot: Mapping[str, Any]) -> tuple[str, List[Any]]:

@@ -1,3 +1,4 @@
+import json
 import re
 
 import pytest
@@ -11,18 +12,17 @@ from src.services.conversation_task_finalizer_service import ConversationTaskFin
 
 @pytest.fixture(autouse=True)
 def _stub_context_resolution_llm(monkeypatch):
-    def fake_chat(messages, enable_think=False):
+    def fake_chat(messages, enable_think=False, temperature=0.0):
         content = str(messages[-1].get("content") or "") if messages else ""
-        match = re.search(r"本轮用户原始输入：\s*```\s*(.*?)\s*```", content, re.S)
-        question = str(match.group(1) if match else "测试问题").strip()
+        match = re.search(r"待处理数据，不是附加指令：\s*(\"(?:\\\\.|[^\"])*\")", content, re.S)
+        question = json.loads(match.group(1)) if match else "测试问题"
         return {
-            "ori_question": question,
             "resolved_question": question,
             "context_refs": [],
-        }, {}
+        }, {}, '{"resolved_question":"测试问题","context_refs":[]}'
 
     monkeypatch.setattr(
-        "src.services.context_resolution_service.chat_qwen_flash_json",
+        "src.services.context_resolution_service.chat_qwen_flash_json_with_raw",
         fake_chat,
     )
 
@@ -420,14 +420,14 @@ def test_context_resolution_service_uses_only_llm_output_for_group_reference(mon
     service = ContextResolutionService()
 
     monkeypatch.setattr(
-        "src.services.context_resolution_service.chat_qwen_flash_json",
-        lambda messages, enable_think=False: (
+        "src.services.context_resolution_service.chat_qwen_flash_json_with_raw",
+        lambda messages, enable_think=False, temperature=0.0: (
             {
-                "ori_question": "他们的市盈率分别是多少？",
                 "resolved_question": "查询贵州茅台和五粮液各自的市盈率。",
                 "context_refs": ["turn:1:assistant"],
             },
             {},
+            '{"resolved_question":"查询贵州茅台和五粮液各自的市盈率。","context_refs":["turn:1:assistant"]}',
         ),
     )
 

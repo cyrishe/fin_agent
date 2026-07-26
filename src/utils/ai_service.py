@@ -437,6 +437,15 @@ def chat_qwen_flash_json(message_body, enable_think=False, temperature=0.7):
     )
 
 
+def chat_qwen_flash_json_with_raw(message_body, enable_think=False, temperature=0.0):
+    content, usage = _chat_with_flash_model(
+        message_body,
+        enable_think=enable_think,
+        temperature=temperature,
+    )
+    return extract_first_json(content, log_errors=False), usage, content
+
+
 def chat_qwen_flash_structured(message_body, enable_think=False, temperature=0.0):
     response = _create_llm_completion(
         message_body,

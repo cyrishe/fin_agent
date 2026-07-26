@@ -7,6 +7,7 @@ import pytest
 from src.services.finance_data_tool_catalog_service import FinanceDataToolCatalogService
 from src.services.finance_data_tool_runtime_service import FinanceDataToolRuntimeService
 from src.services.active_tool_registry_service import ActiveToolRegistryService
+from src.experiments.staged_data_protocol.phase2.call_parser import parse_api_call
 from src.tools.registry import run_tool
 
 
@@ -14,6 +15,16 @@ requires_kingdomai = pytest.mark.skipif(
     not os.getenv("KINGDOMAI_DB_PASSWORD"),
     reason="KINGDOMAI_DB_PASSWORD is required for the live provider integration test",
 )
+
+
+def test_finance_request_accepts_semantic_result_name_for_python_coding() -> None:
+    call = parse_api_call(
+        'daily_quotes = stock.quote(filter = "code = 600519.SH", realtime = 0) '
+        '-> code, tradedate, close'
+    )
+
+    assert call.result_id == "daily_quotes"
+    assert call.api == "stock.quote"
 
 
 def test_finance_data_catalog_builds_subject_dataview_function_tree() -> None:

@@ -3,16 +3,11 @@
   "type": "object",
   "additionalProperties": false,
   "required": [
-    "message",
     "tool_contract",
     "implementation_summary",
-    "verification",
-    "sample_input_json"
+    "execution_examples"
   ],
   "properties": {
-    "message": {
-      "type": "string"
-    },
     "tool_contract": {
       "type": "object",
       "additionalProperties": false,
@@ -36,71 +31,13 @@
         "inputs": {
           "type": "array",
           "items": {
-            "type": "object",
-            "additionalProperties": false,
-            "required": [
-              "name",
-              "type",
-              "required",
-              "description"
-            ],
-            "properties": {
-              "name": {
-                "type": "string"
-              },
-              "type": {
-                "type": "string",
-                "enum": [
-                  "string",
-                  "integer",
-                  "number",
-                  "boolean",
-                  "array",
-                  "object"
-                ]
-              },
-              "required": {
-                "type": "boolean"
-              },
-              "description": {
-                "type": "string"
-              }
-            }
+            "$ref": "#/$defs/field"
           }
         },
         "outputs": {
           "type": "array",
           "items": {
-            "type": "object",
-            "additionalProperties": false,
-            "required": [
-              "name",
-              "type",
-              "required",
-              "description"
-            ],
-            "properties": {
-              "name": {
-                "type": "string"
-              },
-              "type": {
-                "type": "string",
-                "enum": [
-                  "string",
-                  "integer",
-                  "number",
-                  "boolean",
-                  "array",
-                  "object"
-                ]
-              },
-              "required": {
-                "type": "boolean"
-              },
-              "description": {
-                "type": "string"
-              }
-            }
+            "$ref": "#/$defs/field"
           }
         }
       }
@@ -108,11 +45,59 @@
     "implementation_summary": {
       "type": "string"
     },
-    "verification": {
-      "type": "string"
-    },
-    "sample_input_json": {
-      "type": "string"
+    "execution_examples": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "input",
+          "output"
+        ],
+        "properties": {
+          "input": {
+            "type": "string"
+          },
+          "output": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "field": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "type",
+        "required",
+        "description"
+      ],
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "string",
+            "integer",
+            "number",
+            "boolean",
+            "array",
+            "object"
+          ]
+        },
+        "required": {
+          "type": "boolean"
+        },
+        "description": {
+          "type": "string"
+        }
+      }
     }
   }
 }

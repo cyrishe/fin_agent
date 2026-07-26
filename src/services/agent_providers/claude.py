@@ -16,6 +16,7 @@ from json_repair import loads as repair_json
 from src.services.agent_providers.skill_support import AgentSkillHarnessSupport
 from src.services.agent_providers.protocol import AgentEventCoalescer, normalize_agent_run_result
 from src.services.agent_providers.runtime_policy import AgentCapabilityPolicy, WebSearchPolicy
+from src.services.coding_execution_contract import coding_command_denial_reason
 from src.services.custom_tool_context_bundle_service import CustomToolContextBundleService
 
 
@@ -26,16 +27,6 @@ DEFAULT_CLAUDE_MODEL = "deepseek-v4-flash"
 _PROVIDERS = {"anthropic", "deepseek", "dashscope", "gateway"}
 _MUTATING_TOOLS = {"Edit", "Write", "NotebookEdit"}
 _READ_TOOLS = {"Read", "Glob", "Grep"}
-_SAFE_BASH_PREFIXES = (
-    "python -m py_compile ",
-    "python3 -m py_compile ",
-    "python -m pytest ",
-    "python3 -m pytest ",
-    "pytest ",
-)
-_UNSAFE_SHELL_TOKENS = ("&&", "||", ";", "|", ">", "<", "`", "$(", "${", "\n", "\r")
-
-
 def _trim(value: Any) -> str:
     return str(value or "").strip()
 
@@ -139,6 +130,7 @@ class ClaudeSdkSkillHarness(AgentSkillHarnessSupport):
             return self._failure_result(str(exc), session_id=session_id, stage=stage_name)
 
         run_context = dict(context or {})
+        resume_session_id = _trim(run_context.pop("_provider_session_id", ""))
         events: List[Dict[str, Any]] = []
         self._append_event(
             events,
@@ -201,6 +193,7 @@ class ClaudeSdkSkillHarness(AgentSkillHarnessSupport):
                 allowed_write_paths=allowed_write_paths,
                 skill_file=skill_file.resolve(),
                 allow_asset_reads=bool(prompt_context.get("design_ref")),
+                resume_session_id=resume_session_id,
                 event_sink=event_sink,
             )
         )
@@ -234,6 +227,7 @@ class ClaudeSdkSkillHarness(AgentSkillHarnessSupport):
         return normalize_agent_run_result({
             "ok": ok,
             "error": _trim(run_result.get("error")) or ("Claude did not return a structured result" if not final else ""),
+            "failure_kind": _trim(run_result.get("failure_kind")),
             "timeout": bool(run_result.get("timeout")),
             "timeout_kind": _trim(run_result.get("timeout_kind")),
             "timeout_after_seconds": int(run_result.get("timeout_after_seconds") or 0),
@@ -324,10 +318,12 @@ class ClaudeSdkSkillHarness(AgentSkillHarnessSupport):
         allow_writes: bool = True,
         skill_file: Optional[Path] = None,
         allow_asset_reads: bool = False,
+        resume_session_id: str = "",
     ) -> Dict[str, Any]:
         query_impl, options_cls = self._sdk_bindings()
         events: List[Dict[str, Any]] = []
         stderr_lines: List[str] = []
+        permission_denials: List[str] = []
         if not self._uses_native_structured_output():
             system_prompt = self._compatibility_output_prompt(system_prompt, output_schema)
         options = options_cls(**self._option_values(
@@ -339,8 +335,10 @@ class ClaudeSdkSkillHarness(AgentSkillHarnessSupport):
             allowed_write_paths=allowed_write_paths,
             allow_writes=allow_writes,
             stderr_lines=stderr_lines,
+            permission_denials=permission_denials,
             skill_file=skill_file,
             allow_asset_reads=allow_asset_reads,
+            resume_session_id=resume_session_id,
         ))
         self._append_event(
             events,
@@ -371,8 +369,12 @@ class ClaudeSdkSkillHarness(AgentSkillHarnessSupport):
         timeout_kind = ""
         timeout_after_seconds = 0
         error = ""
+        failure_kind = ""
         saw_result = False
-        stream_state: Dict[str, Any] = {"structured_indexes": set()}
+        stream_state: Dict[str, Any] = {
+            "structured_indexes": set(),
+            "seen_tool_use_ids": set(),
+        }
         event_coalescer = AgentEventCoalescer()
         try:
             while True:
@@ -430,6 +432,20 @@ class ClaudeSdkSkillHarness(AgentSkillHarnessSupport):
             error = f"claude sdk {timeout_kind} after {timeout_after_seconds}s"
         elif not saw_result and not error:
             error = "Claude provider stream ended without a result"
+        if permission_denials:
+            denial_event = {
+                "source": "harness",
+                "type": "tool_result",
+                "content": "tool permission denied",
+                "metadata": {
+                    "stage": stage,
+                    "provider": self.provider_name,
+                    "is_error": True,
+                    "reason": permission_denials[-1],
+                },
+            }
+            events.append(denial_event)
+            self._send_event(denial_event, event_sink)
         if error == "Claude structured output failed: missing_json_object" and last_message:
             recovery_event = {
                 "source": "harness",
@@ -466,10 +482,13 @@ class ClaudeSdkSkillHarness(AgentSkillHarnessSupport):
             }
             events.append(recovery_result)
             self._send_event(recovery_result, event_sink)
+        if error and permission_denials:
+            error = f"{error}; tool permission denied: {permission_denials[-1]}"
         return {
             "events": events,
             "final": final,
             "error": error,
+            "failure_kind": failure_kind,
             "timeout": timeout,
             "timeout_kind": timeout_kind,
             "timeout_after_seconds": timeout_after_seconds,
@@ -523,8 +542,10 @@ class ClaudeSdkSkillHarness(AgentSkillHarnessSupport):
         allowed_write_paths: frozenset[Path],
         allow_writes: bool,
         stderr_lines: List[str],
+        permission_denials: Optional[List[str]] = None,
         skill_file: Optional[Path] = None,
         allow_asset_reads: bool = False,
+        resume_session_id: str = "",
     ) -> Dict[str, Any]:
         coding = _trim(stage) == "coding" and allow_writes
         stage_name = _trim(stage)
@@ -573,6 +594,7 @@ class ClaudeSdkSkillHarness(AgentSkillHarnessSupport):
                 allowed_write_paths=allowed_write_paths,
                 allow_bash=coding,
                 cwd=cwd,
+                permission_denials=permission_denials,
             ),
             "sandbox": {
                 "enabled": coding,
@@ -583,6 +605,8 @@ class ClaudeSdkSkillHarness(AgentSkillHarnessSupport):
         }
         if self.max_budget_usd > 0:
             values["max_budget_usd"] = self.max_budget_usd
+        if _trim(resume_session_id):
+            values["resume"] = _trim(resume_session_id)
         if self.thinking:
             values["thinking"] = {"type": self.thinking}
         if self._uses_native_structured_output():
@@ -834,6 +858,7 @@ class ClaudeSdkSkillHarness(AgentSkillHarnessSupport):
         allowed_write_paths: frozenset[Path],
         allow_bash: bool,
         cwd: Path,
+        permission_denials: Optional[List[str]] = None,
     ) -> Dict[str, List[Any]]:
         try:
             from claude_agent_sdk import HookMatcher
@@ -856,6 +881,8 @@ class ClaudeSdkSkillHarness(AgentSkillHarnessSupport):
             )
             if not reason:
                 return {}
+            if permission_denials is not None and reason not in permission_denials:
+                permission_denials.append(reason)
             return {
                 "hookSpecificOutput": {
                     "hookEventName": "PreToolUse",
@@ -878,7 +905,10 @@ class ClaudeSdkSkillHarness(AgentSkillHarnessSupport):
     ) -> str:
         if tool_name in _MUTATING_TOOLS:
             path = ClaudeSdkSkillHarness._tool_path(tool_input, cwd=cwd)
-            return "" if path in allowed_write_paths else "write target is outside the editable module allowlist"
+            scratch_root = (cwd / "scratch").resolve()
+            if path in allowed_write_paths or path == scratch_root or path.is_relative_to(scratch_root):
+                return ""
+            return "write target is outside the editable modules and isolated scratch directory"
         if tool_name in _READ_TOOLS:
             if tool_name == "Glob":
                 pattern = _trim(tool_input.get("pattern"))
@@ -892,13 +922,13 @@ class ClaudeSdkSkillHarness(AgentSkillHarnessSupport):
             command = _trim(tool_input.get("command"))
             if not allow_bash:
                 return "shell execution is disabled for this stage"
-            if not command.startswith(_SAFE_BASH_PREFIXES) or any(token in command for token in _UNSAFE_SHELL_TOKENS):
-                return "only isolated Python compile/test commands are allowed"
-            if ".." in command or re.search(r"(?:^|\s)/(?!dev/null(?:\s|$))", command):
-                return "shell command may not address paths outside the run workspace"
             if tool_input.get("dangerouslyDisableSandbox"):
                 return "unsandboxed shell execution is disabled"
-            return ""
+            return coding_command_denial_reason(
+                command,
+                cwd=cwd,
+                allowed_module_paths=allowed_write_paths,
+            )
         return "tool is outside this stage's capability profile"
 
     @staticmethod
@@ -929,6 +959,7 @@ class ClaudeSdkSkillHarness(AgentSkillHarnessSupport):
         metadata = {"stage": stage, "provider": "claude"}
         state = stream_state if isinstance(stream_state, dict) else {}
         structured_indexes = state.setdefault("structured_indexes", set())
+        seen_tool_use_ids = state.setdefault("seen_tool_use_ids", set())
         if class_name == "StreamEvent":
             raw = getattr(message, "event", {})
             raw = raw if isinstance(raw, Mapping) else {}
@@ -950,7 +981,10 @@ class ClaudeSdkSkillHarness(AgentSkillHarnessSupport):
                 if _trim(block.get("type")) in {"tool_use", "server_tool_use"}:
                     if _trim(block.get("name")) == "StructuredOutput":
                         structured_indexes.add(index)
-                    return [{"source": "harness", "type": "tool_call", "content": _trim(block.get("name")) or "tool call", "metadata": {**metadata, "tool_use_id": _trim(block.get("id"))}}], None
+                    tool_use_id = _trim(block.get("id"))
+                    if tool_use_id:
+                        seen_tool_use_ids.add(tool_use_id)
+                    return [{"source": "harness", "type": "tool_call", "content": _trim(block.get("name")) or "tool call", "metadata": {**metadata, "tool_use_id": tool_use_id}}], None
             if event_type == "content_block_stop":
                 structured_indexes.discard(index)
             return [], None
@@ -965,7 +999,12 @@ class ClaudeSdkSkillHarness(AgentSkillHarnessSupport):
             events = []
             for block in getattr(message, "content", []) or []:
                 if type(block).__name__ == "ToolUseBlock":
-                    events.append({"source": "harness", "type": "tool_call", "content": _trim(getattr(block, "name", "")) or "tool call", "metadata": {**metadata, "tool_use_id": _trim(getattr(block, "id", ""))}})
+                    tool_use_id = _trim(getattr(block, "id", ""))
+                    if tool_use_id and tool_use_id in seen_tool_use_ids:
+                        continue
+                    if tool_use_id:
+                        seen_tool_use_ids.add(tool_use_id)
+                    events.append({"source": "harness", "type": "tool_call", "content": _trim(getattr(block, "name", "")) or "tool call", "metadata": {**metadata, "tool_use_id": tool_use_id}})
             return events, None
         if class_name == "UserMessage":
             events = []

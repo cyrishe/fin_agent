@@ -55,6 +55,8 @@ def _requirement_understanding(value: Any) -> Dict[str, Any]:
 class CodexExecSkillHarness:
     """Thin wrapper around `codex exec` for skill-driven custom-tool stages."""
 
+    provider_name = "codex"
+
     def __init__(
         self,
         *,
@@ -482,13 +484,24 @@ class CodexExecSkillHarness:
             )
         elif _trim(stage) == "coding":
             file_context = (
-                "如果任务需要金融数据工具能力，先读取资料包中的 api_catalog/index.json；再只读取相关 subject 文件。\n"
+                "如果任务需要金融数据工具能力，先读取资料包中的 api_catalog/CODING_GUIDE.md 和 index.json；"
+                "再通过 subject 索引只读取相关 dataview 文件。\n"
                 "生成动态代码时参考 custom_tool_sdk.md。\n"
             )
+        coding_api_contract = ""
+        if _trim(stage) == "coding":
+            contract_path = self.cwd / "src/prompts/codex/finance_api_call.system.md"
+            if contract_path.is_file():
+                coding_api_contract = (
+                    "# REQUIRED FINANCE API CALL CONTRACT\n"
+                    + contract_path.read_text(encoding="utf-8").strip()
+                    + "\n\n"
+                )
         return (
             "请严格按照下面的 SKILL 执行任务。\n"
             f"{workspace_instruction}"
             f"{output_instruction}\n"
+            f"{coding_api_contract}"
             "# AVAILABLE FILE CONTEXT\n"
             f"资料包目录：{bundle_dir}\n"
             f"{file_context}\n"
@@ -538,13 +551,13 @@ class CodexExecSkillHarness:
             if not schema_file.exists():
                 raise FileNotFoundError(f"output schema file not found: {schema_file}")
             self._load_output_schema(schema_file)
-            return schema_file
+            return schema_file.resolve()
 
         for filename in ("schema.json", "output_schema.json"):
             candidate = skill_file.parent / filename
             if candidate.exists():
                 self._load_output_schema(candidate)
-                return candidate
+                return candidate.resolve()
         return None
 
     @staticmethod
@@ -1332,11 +1345,8 @@ class CodexSdkSkillHarness(CodexExecSkillHarness):
         stage_guidance = ""
         if _trim(stage) == "coding":
             stage_guidance = (
-                "先读 CODING_WORKSPACE.md；首次实现同时参考 DYNAMIC_TOOL_TEMPLATE.py。"
-                "若存在 api_catalog/task_context.json，先用它匹配当前设计需要的数据主题和字段；"
-                "只有信息不足时再查 index.json 和相关 subject。按 implementation/module_plan.json 中的逻辑函数组实现，"
-                "每完成一个内聚函数组就做一次聚焦编译或样例测试，并用一句自然语言说明完成内容和测试结果。"
-                "源码写入 CONTEXT.current_implementation.module_files；最终结构化结果保持简洁，不重复搬运工作区上下文。\n"
+                "按 CODING_WORKSPACE.md 使用当前工作区；首次实现参考 DYNAMIC_TOOL_TEMPLATE.py。"
+                "按需读取需求、Design、反馈和 API Catalog，将源码写入指定模块文件。\n"
             )
         return (
             "执行随本轮输入启用的 Skill。\n"
@@ -1795,7 +1805,10 @@ class CodexCustomToolCoder:
             event_sink=event_sink,
         )
         if not result.get("ok"):
-            failure = self._failure_summary(result.get("error"))
+            failure = self._failure_summary(
+                result.get("error"),
+                failure_kind=result.get("failure_kind"),
+            )
             return {
                 "ok": False,
                 "message": f"实现未完成：{failure['summary']} 当前设计已保留，可以重试。",
@@ -1811,8 +1824,10 @@ class CodexCustomToolCoder:
         final = dict(result.get("final") or {})
         implementation = final.get("implementation") if isinstance(final.get("implementation"), Mapping) else {}
         modules = [item for item in implementation.get("modules") or [] if isinstance(item, Mapping)]
-        has_code = bool(modules and any(_trim(item.get("source_code")) for item in modules))
-        sample_input_error = self._sample_input_error(final.get("sample_input_json"))
+        has_code = bool(_trim(final.get("code"))) or bool(
+            modules and any(_trim(item.get("source_code")) for item in modules)
+        )
+        sample_input_error = self._execution_example_error(final.get("execution_examples"))
         if sample_input_error:
             return {
                 "ok": False,
@@ -1842,20 +1857,24 @@ class CodexCustomToolCoder:
         }
 
     @staticmethod
-    def _sample_input_error(value: Any) -> str:
-        text = _trim(value)
+    def _execution_example_error(value: Any) -> str:
+        examples = value if isinstance(value, list) else []
+        if not examples or not isinstance(examples[0], Mapping):
+            return "Coding 结果缺少真实执行样例。"
         try:
-            parsed = json.loads(text)
+            parsed_input = json.loads(_trim(examples[0].get("input")))
+            parsed_output = json.loads(_trim(examples[0].get("output")))
         except (TypeError, json.JSONDecodeError):
-            return "代表性样例输入不是合法 JSON。"
-        if not isinstance(parsed, Mapping):
-            return "代表性样例输入必须是 JSON 对象。"
+            return "执行样例的 input 或 output 不是合法 JSON。"
+        if not isinstance(parsed_input, Mapping) or not isinstance(parsed_output, Mapping):
+            return "执行样例的 input 和 output 必须是 JSON 对象。"
         return ""
 
     @staticmethod
-    def _failure_summary(error_detail: Any) -> Dict[str, str]:
+    def _failure_summary(error_detail: Any, *, failure_kind: Any = "") -> Dict[str, str]:
         text = _trim(error_detail)
-        lowered = text.lower()
+        kind = _trim(failure_kind).lower()
+        lowered = f"{kind} {text}".lower()
         if "invalid_json_schema" in lowered or "invalid schema for response_format" in lowered:
             field = ""
             marker = "in context=('properties', '"
@@ -1865,11 +1884,61 @@ class CodexCustomToolCoder:
             return {"code": "coding_schema_invalid", "summary": detail}
         if "authorizationrequired" in lowered or "oauth authorization required" in lowered or "re-authorization required" in lowered:
             return {"code": "coding_auth_required", "summary": "Agent 服务授权已失效，需要重新授权。"}
+        if "incorrect api key" in lowered or "invalid_api_key" in lowered or "error code: 401" in lowered:
+            return {"code": "coding_auth_failed", "summary": "Coding 模型鉴权失败，请检查当前服务凭证。"}
+        if "rate limit" in lowered or "error code: 429" in lowered:
+            return {"code": "coding_rate_limited", "summary": "Coding 模型服务触发限流，本次实现没有完成。"}
         if "timeout" in lowered:
             return {"code": "coding_timeout", "summary": "Coding 调用超时，未取得有效结果。"}
         if "stream disconnected" in lowered or "reconnecting" in lowered:
             return {"code": "coding_connection_failed", "summary": "Coding 连接中断，未取得有效结果。"}
-        return {"code": "coding_runtime_failed", "summary": "Coding 运行失败，未取得有效结果。"}
+        if "error_max_turns" in lowered:
+            permission_reason = ""
+            marker = "tool permission denied:"
+            if marker in lowered:
+                permission_reason = CodexCustomToolCoder._permission_failure_summary(
+                    lowered.split(marker, 1)[1].strip()
+                )
+            summary = (
+                f"Coding Agent 的{permission_reason}，因此在最大执行轮次内没有完成。"
+                if permission_reason
+                else "Coding Agent 达到本次最大执行轮次，尚未完成实现与验证。"
+            )
+            return {"code": "coding_turn_limit", "summary": summary}
+        if "tool permission denied:" in lowered:
+            reason = CodexCustomToolCoder._permission_failure_summary(
+                lowered.split("tool permission denied:", 1)[1].strip()
+            )
+            return {
+                "code": "coding_tool_permission_denied",
+                "summary": f"Coding Agent 的{reason or '工具调用被执行权限拒绝'}。",
+            }
+        if "missing_structured_output" in lowered or "did not return a structured result" in lowered:
+            return {
+                "code": "coding_output_missing",
+                "summary": "Coding Agent 已结束，但没有返回系统可接收的实现结果。",
+            }
+        safe_detail = re.sub(r"\s+", " ", text)[:240]
+        return {
+            "code": "coding_runtime_failed",
+            "summary": f"Coding 运行失败：{safe_detail}" if safe_detail else "Coding 运行失败，未返回错误详情。",
+        }
+
+    @staticmethod
+    def _permission_failure_summary(reason: str) -> str:
+        if "compile target is outside" in reason:
+            return "编译目标不在可编辑模块范围内"
+        if "focused test scripts must be stored under scratch" in reason:
+            return "测试脚本不在隔离测试目录内"
+        if "configured python interpreter" in reason:
+            return "Python 解释器不符合执行环境约定"
+        if "only isolated python compile/test commands" in reason:
+            return "测试命令超出隔离执行范围"
+        if "shell execution is disabled" in reason:
+            return "当前阶段未开放代码执行权限"
+        if "write target is outside" in reason:
+            return "写入位置不在可编辑模块或隔离测试目录内"
+        return "工具调用被执行权限拒绝"
 
 
 class CodexCustomToolTester:

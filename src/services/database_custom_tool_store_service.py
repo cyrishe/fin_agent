@@ -111,7 +111,15 @@ class DatabaseCustomToolStoreService:
                 )
                 row = cursor.fetchone()
                 if row and _trim(row.get("owner")) and normalized_owner and _trim(row.get("owner")) != normalized_owner:
-                    self._raise("custom tool is owned by another user")
+                    tool_name = self._owner_scoped_name(tool_name, normalized_owner)
+                    manifest["tool_name"] = tool_name
+                    cursor.execute(
+                        f"SELECT artifact_id, owner, current_revision_no, source_manifest_json FROM {ARTIFACT_TABLE} WHERE artifact_type='custom_tool' AND name=%s AND version='v1' LIMIT 1 FOR UPDATE",
+                        (tool_name,),
+                    )
+                    row = cursor.fetchone()
+                    if row and _trim(row.get("owner")) and _trim(row.get("owner")) != normalized_owner:
+                        self._raise("custom tool identity collision")
                 revision_no = int((row or {}).get("current_revision_no") or 0) + 1
                 manifest["current_revision"] = revision_no
                 source_meta = self._json_dict((row or {}).get("source_manifest_json"))
@@ -445,6 +453,11 @@ class DatabaseCustomToolStoreService:
         if raw and not raw.startswith("ct_"):
             raw = f"ct_{raw}"
         return raw[:64]
+
+    @staticmethod
+    def _owner_scoped_name(tool_name: str, owner_id: str) -> str:
+        suffix = hashlib.sha256(owner_id.encode("utf-8")).hexdigest()[:8]
+        return f"{tool_name[:55].rstrip('_')}_{suffix}"
 
     @staticmethod
     def _json_dict(value: Any) -> Dict[str, Any]:

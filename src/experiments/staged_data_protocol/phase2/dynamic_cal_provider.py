@@ -10,6 +10,10 @@ import numpy as np
 import pandas as pd
 import pymysql
 
+from src.experiments.staged_data_protocol.phase2.intraday_quote_provider import (
+    MINUTE_SESSION_START,
+    _minute_bar_cte,
+)
 from src.experiments.staged_data_protocol.phase2.quote_provider import (
     QUOTE_SOURCES,
     TRADE_CALENDAR_TABLE,
@@ -222,40 +226,10 @@ def _load_realtime_quote_window_rows(*, args: Mapping[str, Any], fields: List[st
     identity_sql, identity_params = _realtime_identity_where(args)
     select_sql = ", ".join(f"`{field}`" for field in fields)
     sql = f"""
-        WITH base AS (
-            SELECT
-                s.stk_code AS code,
-                s.stk_name AS name,
-                s.trade_date AS tradedate,
-                s.minute_index AS minute_index,
-                TIME_FORMAT(s.snapshot_time, '%%H:%%i:%%s') AS minute_time,
-                s.snapshot_time AS snapshot_time,
-                s.snapshot_slot AS snapshot_slot,
-                s.preclose_price AS preclose,
-                s.open_price AS open,
-                s.latest_price AS close,
-                s.high_price AS high,
-                s.low_price AS low,
-                s.chg_value AS differ,
-                s.chg_ratio AS pct,
-                s.amount AS amount,
-                s.volume AS volumn,
-                GREATEST(s.amount - COALESCE(p.amount, 0), 0) AS minute_amount,
-                GREATEST(s.volume - COALESCE(p.volume, 0), 0) AS minute_volumn,
-                s.source AS source,
-                s.is_fallback AS is_fallback
-            FROM {REALTIME_SNAPSHOT_TABLE} s
-            LEFT JOIN {REALTIME_SNAPSHOT_TABLE} p
-              ON p.trade_date = s.trade_date
-             AND p.stk_code = s.stk_code
-             AND p.minute_index = s.minute_index - 1
-            WHERE s.trade_date IN ({placeholders})
-              AND s.minute_index = %s
-              AND s.stk_code REGEXP '^[0-9]{{6}}$'
-        )
+        {_minute_bar_cte(date_predicate=f"s.trade_date IN ({placeholders})")}
         SELECT {select_sql}
         FROM base
-        WHERE 1=1 {identity_sql}
+        WHERE minute_index = %s {identity_sql}
         ORDER BY code ASC, tradedate ASC
         LIMIT %s
     """
@@ -300,12 +274,26 @@ def _realtime_slot(args: Mapping[str, Any]) -> Dict[str, Any]:
                 minute_index = requested_minute
             elif requested_slot:
                 cursor.execute(
-                    f"SELECT MAX(minute_index) AS minute_index FROM {REALTIME_SNAPSHOT_TABLE} WHERE trade_date = %s AND snapshot_slot = %s",
+                    f"""
+                    SELECT MAX(minute_index) AS minute_index
+                    FROM {REALTIME_SNAPSHOT_TABLE}
+                    WHERE trade_date = %s
+                      AND snapshot_slot = %s
+                      AND TIME(snapshot_time) >= '{MINUTE_SESSION_START}'
+                    """,
                     (trade_date, requested_slot),
                 )
                 minute_index = int((cursor.fetchone() or {}).get("minute_index") or 0)
             else:
-                cursor.execute(f"SELECT MAX(minute_index) AS minute_index FROM {REALTIME_SNAPSHOT_TABLE} WHERE trade_date = %s", (trade_date,))
+                cursor.execute(
+                    f"""
+                    SELECT MAX(minute_index) AS minute_index
+                    FROM {REALTIME_SNAPSHOT_TABLE}
+                    WHERE trade_date = %s
+                      AND TIME(snapshot_time) >= '{MINUTE_SESSION_START}'
+                    """,
+                    (trade_date,),
+                )
                 minute_index = int((cursor.fetchone() or {}).get("minute_index") or 0)
     finally:
         db.close_db()
@@ -507,7 +495,7 @@ def _is_realtime(args: Mapping[str, Any]) -> bool:
     if isinstance(raw, bool):
         return raw
     if isinstance(raw, (int, float)):
-        return int(raw) == 1
+        return int(raw) in {1, 2}
     text = str(raw).strip().lower()
     if text in {"0", "false", "no", "history", "historical"}:
         return False

@@ -123,10 +123,13 @@ export function blocksFromPayload(payload: UnknownRecord): SurfaceBlock[] {
       block_id: item.block_id || item.id || `history_${index}`,
       block_type: item.block_type || item.kind || item.type,
     } as StreamEvent));
+  const displayBlocks = normalized.some((block) => block.block_id === "design_artifact")
+    ? normalized.filter((block) => block.block_id !== "design_final_summary")
+    : normalized;
 
   const taskState = asRecord(payload.task_state);
   const steps = Array.isArray(taskState.steps) ? taskState.steps : [];
-  const processBlock = steps.length && !normalized.some(isProcessBlock)
+  const processBlock = steps.length && !displayBlocks.some(isProcessBlock)
     ? normalizeBlock({
       event: "block",
       block_id: "runtime_task_progress",
@@ -140,7 +143,7 @@ export function blocksFromPayload(payload: UnknownRecord): SurfaceBlock[] {
     })
     : null;
 
-  if (normalized.length) return processBlock ? [processBlock, ...normalized] : normalized;
+  if (displayBlocks.length) return processBlock ? [processBlock, ...displayBlocks] : displayBlocks;
 
   const items = Array.isArray(payload.items)
     ? payload.items.filter((item): item is UnknownRecord => Boolean(item && typeof item === "object"))

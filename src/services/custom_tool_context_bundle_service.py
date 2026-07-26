@@ -5,9 +5,14 @@ import hashlib
 import os
 from pathlib import Path
 import re
-import sys
 import uuid
 from typing import Any, Dict, Mapping
+
+from src.services.coding_execution_contract import (
+    compile_command,
+    focused_test_command,
+    python_executable,
+)
 
 
 def _trim(value: Any) -> str:
@@ -26,10 +31,12 @@ class CustomToolContextBundleService:
         *,
         catalog_path: str = "src/tools/finance_data/catalog/api_view_catalog.json",
         stock_universe_path: str = "stock_name.tsv",
+        coding_api_guide_path: str = "src/skills/financial-tool-development/skills/financial-tool-implementation/references/finance-api-coding-guide.md",
         root_dir: str = "data/custom_tool_context",
     ) -> None:
         self.catalog_path = Path(catalog_path)
         self.stock_universe_path = Path(stock_universe_path)
+        self.coding_api_guide_path = Path(coding_api_guide_path)
         self.root_dir = Path(root_dir)
 
     def build(
@@ -94,13 +101,40 @@ class CustomToolContextBundleService:
             for subject, subject_obj in sorted(subjects.items()):
                 if not isinstance(subject_obj, dict):
                     continue
-                subject_file = subject_dir / f"{subject}.json"
-                self._write_private(subject_file, self._compact_subject(subject, subject_obj))
+                subject_root = subject_dir / subject
+                dataview_rows = []
+                for dataview, dataview_obj in subject_obj.items():
+                    if str(dataview).startswith("_") or not isinstance(dataview_obj, Mapping):
+                        continue
+                    dataview_file = subject_root / f"{dataview}.json"
+                    dataview_doc = self._compact_dataview(
+                        subject=subject,
+                        dataview=str(dataview),
+                        definition=dataview_obj,
+                        patterns=patterns,
+                    )
+                    self._write_private(dataview_file, dataview_doc)
+                    dataview_rows.append({
+                        "dataview": dataview,
+                        "description": _trim(dataview_obj.get("desc")),
+                        "method_names": [
+                            _trim(method.get("name"))
+                            for method in dataview_doc.get("methods") or []
+                            if isinstance(method, Mapping) and _trim(method.get("name"))
+                        ],
+                        "file": str(dataview_file.relative_to(bundle_dir)),
+                    })
+                subject_file = subject_root / "index.json"
+                self._write_private(subject_file, {
+                    "subject": subject,
+                    "meta": subject_obj.get("_meta") or {},
+                    "dataviews": dataview_rows,
+                })
                 index_subjects.append({
                     "subject": subject,
                     "description": _trim((subject_obj.get("_meta") or {}).get("desc")),
                     "rules": (subject_obj.get("_meta") or {}).get("rules") or [],
-                    "dataviews": [key for key in subject_obj.keys() if not str(key).startswith("_")],
+                    "dataviews": dataview_rows,
                     "file": str(subject_file.relative_to(bundle_dir)),
                 })
             self._write_private(
@@ -110,7 +144,8 @@ class CustomToolContextBundleService:
                     "source_catalog": str(self.catalog_path),
                     "usage": [
                         "先读取本 index，按任务判断需要哪些 subject/dataview。",
-                        "只读取相关 subject 文件，不要全量读取所有 subject。",
+                        "读取相关 subject/index.json 定位 dataview 文件；不要全量读取所有 subject 或 dataview。",
+                        "每个 dataview 文件独立提供字段、具体方法、参数、返回规则和示例。",
                         (
                             "生成自定义工具代码时，优先调用 custom_tool_sdk.finance_query(request=...)，不要直接访问数据库或底层 provider。"
                             if coding_stage
@@ -120,12 +155,20 @@ class CustomToolContextBundleService:
                     "subjects": index_subjects,
                 },
             )
-            self._write_private(api_dir / "request_patterns.json", patterns)
-            public_bundle.update({
-                "api_index": str((api_dir / "index.json").relative_to(bundle_dir)),
-                "request_patterns": str((api_dir / "request_patterns.json").relative_to(bundle_dir)),
-            })
+            public_bundle["api_index"] = str((api_dir / "index.json").relative_to(bundle_dir))
+            if not coding_stage:
+                self._write_private(api_dir / "request_patterns.json", patterns)
+                public_bundle["request_patterns"] = str(
+                    (api_dir / "request_patterns.json").relative_to(bundle_dir)
+                )
             if coding_stage:
+                if self.coding_api_guide_path.is_file():
+                    coding_api_guide = api_dir / "CODING_GUIDE.md"
+                    self._write_private(
+                        coding_api_guide,
+                        self.coding_api_guide_path.read_text(encoding="utf-8"),
+                    )
+                    public_bundle["api_coding_guide"] = str(coding_api_guide.relative_to(bundle_dir))
                 task_api_context = self._task_api_context(raw_context, catalog)
                 if task_api_context.get("sources") or task_api_context.get("data_needs"):
                     task_api_path = api_dir / "task_context.json"
@@ -195,6 +238,10 @@ class CustomToolContextBundleService:
             "entry_module": _trim(implementation.get("entry_module")) or (merged_modules[0].get("module_id") if merged_modules else ""),
             "modules": merged_modules,
         }
+        for module in merged_modules:
+            if _trim(module.get("source_code")):
+                result["code"] = _trim(module.get("source_code"))
+                break
         return result
 
     def public_bundle(self, bundle: Mapping[str, Any]) -> Dict[str, Any]:
@@ -463,14 +510,13 @@ class CustomToolContextBundleService:
             if not subject or not dataview or not dataview_obj or (subject, dataview) in seen:
                 continue
             seen.add((subject, dataview))
-            compact = self._compact_subject(subject, {dataview: dataview_obj})
-            view = (compact.get("dataviews") or {}).get(dataview) or {}
+            view = self._compact_dataview(
+                subject=subject,
+                dataview=dataview,
+                definition=dataview_obj,
+                patterns=patterns,
+            )
             available_fields = set((view.get("fields") or {}).keys())
-            api_classes = list(dict.fromkeys(
-                _trim(api.get("api_class"))
-                for api in view.get("api") or []
-                if isinstance(api, Mapping) and _trim(api.get("api_class"))
-            ))
             sources.append({
                 "source_ref": source_ref or f"{subject}.{dataview}",
                 "purpose": purpose,
@@ -479,17 +525,17 @@ class CustomToolContextBundleService:
                 "unavailable_requested_fields": [field for field in requested_fields if field not in available_fields],
                 "subject": subject,
                 "dataview": dataview,
-                "definition": view,
-                "request_patterns": {
-                    name: patterns.get(name)
-                    for name in api_classes
-                    if isinstance(patterns.get(name), Mapping)
-                },
+                "asset": f"api_catalog/subjects/{subject}/{dataview}.json",
+                "method_names": [
+                    _trim(method.get("name"))
+                    for method in view.get("methods") or []
+                    if isinstance(method, Mapping) and _trim(method.get("name"))
+                ],
             })
         return {
             "usage": [
                 "data_needs 是设计说明的数据主题、字段和用途，不是 API 名称或 allowlist。",
-                "sources 只可能来自旧版本设计，作为优先参考；需要其他真实数据能力时再查 index.json。",
+                "sources 只提供优先检索的 dataview 资产路径，不复制完整 API 说明；需要其他数据能力时再查 index.json。",
                 "实际查询统一通过 custom_tool_sdk.finance_query(request=...)。",
                 "查询只使用 catalog 中真实存在的字段；不要为计算方便发明字段、别名或代理口径。",
             ],
@@ -498,8 +544,55 @@ class CustomToolContextBundleService:
         }
 
     @staticmethod
+    def _coding_api_pattern(value: Any) -> Dict[str, Any]:
+        pattern = value if isinstance(value, Mapping) else {}
+        call_pattern = _trim(pattern.get("call_pattern")).replace("r{id}", "{result_name}")
+        compact = {
+            key: (
+                CustomToolContextBundleService._coding_rules(pattern.get(key))
+                if key == "rules"
+                else pattern.get(key)
+            )
+            for key in ("desc", "args", "rules", "methods", "output_rule")
+            if pattern.get(key) not in (None, "", [], {})
+        }
+        if call_pattern:
+            compact["call_pattern"] = call_pattern
+        return compact
+
+    @staticmethod
+    def _coding_rules(value: Any) -> list[str]:
+        """Keep Coding assets semantic; do not expose the legacy BI step language."""
+        if not isinstance(value, list):
+            return []
+        rules: list[str] = []
+        for item in value:
+            text = _trim(item)
+            if not text:
+                continue
+            lower = text.lower()
+            if "agg" in lower and "column" in lower and "previous" in lower:
+                rules.append(
+                    "A previously computed per-stock result used for aggregation must include code or stock_code."
+                )
+                continue
+            if "previous per-stock result field like" in lower:
+                rules.append(
+                    "A metric may use a defined dataview field or a field from a previous per-stock result."
+                )
+                continue
+            rules.append(text)
+        return rules
+
+    @staticmethod
     def _parse_source_ref(source_ref: str) -> tuple[str, str]:
         text = _trim(source_ref)
+        dataview_file_match = re.search(
+            r"subjects/([^/]+)/([^/.#]+)\.json$",
+            text,
+        )
+        if dataview_file_match:
+            return dataview_file_match.group(1), dataview_file_match.group(2)
         catalog_match = re.search(r"subjects/([^/.#]+)\.json#dataviews\.([^/#]+)$", text)
         if catalog_match:
             return catalog_match.group(1), catalog_match.group(2)
@@ -581,7 +674,7 @@ current Design. This file is reference-only; implement in the module path named
 by CONTEXT.current_implementation.module_files.
 """
 
-from custom_tool_sdk import debug, finance_query, info
+from custom_tool_sdk import finance_query
 
 
 def _result(*, result: dict, key_process_info: dict) -> dict:
@@ -597,10 +690,9 @@ def run(inputs: dict) -> dict:
             key_process_info={"stage": "input_validation"},
         )
 
-    info("data_query_started", {"stock_code": stock_code})
     response = finance_query(
         request=(
-            'r1 = stock.quote(filter = "code = '
+            'latest_quote = stock.quote(filter = "code = '
             + stock_code
             + '", order = "tradedate desc", limit = 1) '
             '-> code, tradedate, close'
@@ -617,8 +709,6 @@ def run(inputs: dict) -> dict:
             "as_of_date": rows[0].get("tradedate"),
             "close": rows[0].get("close"),
         })
-    debug("key_process_info", key_process_info)
-
     if not response.get("ok"):
         return _result(
             result={"ok": False, "reason": str(response.get("error") or "finance query failed")},
@@ -635,41 +725,270 @@ def run(inputs: dict) -> dict:
     )
 '''
         )
-        python_executable = str(Path(sys.executable).resolve())
+        interpreter = python_executable()
         self._write_private(
             bundle_dir / "CODING_WORKSPACE.md",
             f"""# Coding workspace
 
 - Edit only the module paths listed in `CONTEXT.current_implementation.module_files`.
-- `implementation/module_plan.json` describes logical function groups; keep one dynamic entry module.
-- On a first implementation, read `DYNAMIC_TOOL_TEMPLATE.py` and reuse its entrypoint, result assembly, and `key_process_info` pattern. The template itself is not an editable user module.
+- On a first implementation, read `DYNAMIC_TOOL_TEMPLATE.py`; it is a reference, not an editable module.
 - Put temporary focused tests under `scratch/`; they are never persisted as user assets.
-- Python interpreter: `{python_executable}`. Use this exact interpreter instead of `python` or the system `python3`.
-- For compilation use `PYTHONPYCACHEPREFIX=scratch/pycache {python_executable} -m py_compile <module>`.
-- For focused tests use `PYTHONPATH=dev_runtime {python_executable} <test-or-script>` so `custom_tool_sdk` is available.
-- Focused tests may use `from test_support import load_module, install_rows` to load the entry file directly and install deterministic API rows. Build enough dated rows for the Design's minimum window; do not import the numeric module filename as a Python package.
-- `api_catalog/task_context.json` is the first reference for the Design's data needs. Match its topics and fields against `index.json`, then read only the relevant subject and request pattern. Do not treat it as an API allowlist.
-- Compile and test each cohesive function group before moving to the next one.
+- Python interpreter: `{interpreter}`. Use this exact interpreter instead of `python` or the system `python3`.
+- For compilation use `{compile_command("<module>")}`.
+- For focused tests use `{focused_test_command("<test-or-script>")}` so `custom_tool_sdk` is available.
+- Focused tests may use `from test_support import load_module, install_rows`.
+- Read `api_catalog/CODING_GUIDE.md` first. Use `task_context.json` when present, then follow the subject index to the relevant dataview files. Do not load the whole catalog or treat it as an API allowlist.
 """
         )
 
-    def _compact_subject(self, subject: str, subject_obj: Mapping[str, Any]) -> Dict[str, Any]:
+    def _compact_subject(
+        self,
+        subject: str,
+        subject_obj: Mapping[str, Any],
+        patterns: Mapping[str, Any] | None = None,
+    ) -> Dict[str, Any]:
+        api_patterns = patterns if isinstance(patterns, Mapping) else {}
         dataviews = {}
         for name, dataview in subject_obj.items():
             if str(name).startswith("_") or not isinstance(dataview, dict):
                 continue
-            dataviews[name] = {
-                "desc": dataview.get("desc") or dataview.get("description") or "",
-                "rules": dataview.get("rules") or [],
-                "fields": self._compact_fields(dataview.get("fields")),
-                "api": dataview.get("api") or [],
-                "kd": dataview.get("kd") if "kd" in dataview else None,
-            }
+            dataviews[name] = self._compact_dataview(
+                subject=subject,
+                dataview=str(name),
+                definition=dataview,
+                patterns=api_patterns,
+            )
         return {
             "subject": subject,
             "meta": subject_obj.get("_meta") or {},
             "dataviews": dataviews,
         }
+
+    def _compact_dataview(
+        self,
+        *,
+        subject: str,
+        dataview: str,
+        definition: Mapping[str, Any],
+        patterns: Mapping[str, Any],
+    ) -> Dict[str, Any]:
+        apis = definition.get("api") if isinstance(definition.get("api"), list) else []
+        return {
+            "subject": subject,
+            "dataview": dataview,
+            "description": definition.get("desc") or definition.get("description") or "",
+            "rules": self._coding_rules(definition.get("rules")),
+            "fields": self._compact_fields(definition.get("fields")),
+            "methods": [
+                self._subject_method(
+                    subject=subject,
+                    dataview=dataview,
+                    api=api,
+                    dataview_definition=definition,
+                    patterns=patterns,
+                )
+                for api in apis
+                if isinstance(api, Mapping)
+            ],
+            "kd": definition.get("kd") if "kd" in definition else None,
+            **(
+                {"computed": definition.get("computed")}
+                if definition.get("computed") not in (None, {}, [])
+                else {}
+            ),
+        }
+
+    def _subject_method(
+        self,
+        *,
+        subject: str,
+        dataview: str,
+        api: Mapping[str, Any],
+        dataview_definition: Mapping[str, Any],
+        patterns: Mapping[str, Any],
+    ) -> Dict[str, Any]:
+        api_name = _trim(api.get("api_name"))
+        api_class = _trim(api.get("api_class"))
+        raw_class_definition = (
+            patterns.get(api_class)
+            if isinstance(patterns.get(api_class), Mapping)
+            else {}
+        )
+        class_definition = self._coding_api_pattern(raw_class_definition)
+        call_pattern = _trim(class_definition.pop("call_pattern", ""))
+        if call_pattern:
+            call_pattern = (
+                call_pattern
+                .replace("{api_name}", api_name)
+                .replace("{subject}", subject)
+                .replace("{dataview}", dataview)
+            )
+        method = {
+            "name": api_name,
+            "description": _trim(api.get("api_function")),
+            "type": api_class,
+            **({"call": call_pattern} if call_pattern else {}),
+            **class_definition,
+            "examples": self._method_examples(
+                api=api,
+                api_class=api_class,
+                class_definition=raw_class_definition,
+                dataview_definition=dataview_definition,
+                dataview=dataview,
+            ),
+        }
+        kd = dataview_definition.get("kd")
+        if "<field>" in api_name and kd:
+            method["available_names"] = {
+                "pattern": api_name,
+                "field_methods": kd,
+            }
+        if (
+            subject == "stock"
+            and dataview == "quote"
+            and api_name == "stock.quote.kd_<field>_<method>"
+        ):
+            minute_fields = {
+                field: methods
+                for field, methods in (kd.items() if isinstance(kd, Mapping) else [])
+                if str(field).startswith("minute_")
+            }
+            same_minute = self._coding_api_pattern(
+                patterns.get("intraday_same_minute_kday_metric")
+            )
+            same_minute_call = _trim(same_minute.pop("call_pattern", ""))
+            if same_minute_call:
+                same_minute["call"] = same_minute_call.replace("r{id}", "{result_name}")
+            method["same_minute_variant"] = {
+                "fields": minute_fields,
+                **same_minute,
+            }
+        return method
+
+    def _method_examples(
+        self,
+        *,
+        api: Mapping[str, Any],
+        api_class: str,
+        class_definition: Mapping[str, Any],
+        dataview_definition: Mapping[str, Any],
+        dataview: str,
+    ) -> list[str]:
+        api_name = _trim(api.get("api_name"))
+        result_name = f"{self._safe_id(dataview) or 'query'}_rows"
+        candidates = []
+        explicit = api.get("examples")
+        if isinstance(explicit, list):
+            candidates.extend(explicit)
+        elif _trim(api.get("example")):
+            candidates.append(api.get("example"))
+        candidates.extend(class_definition.get("examples") or [])
+
+        examples: list[str] = []
+        for candidate in candidates:
+            normalized = self._coding_example(
+                candidate,
+                api_name=api_name,
+                result_name=result_name,
+            )
+            if normalized and normalized not in examples:
+                examples.append(normalized)
+            if len(examples) >= 3:
+                break
+        if examples:
+            return examples
+        return [
+            self._generated_method_example(
+                api_name=api_name,
+                api_class=api_class,
+                result_name=result_name,
+                dataview_definition=dataview_definition,
+            )
+        ]
+
+    @classmethod
+    def _coding_example(
+        cls,
+        value: Any,
+        *,
+        api_name: str,
+        result_name: str,
+    ) -> str:
+        text = _trim(value)
+        if not text:
+            return ""
+        request_line = next(
+            (line.strip() for line in text.splitlines() if line.strip() and not line.strip().startswith("note:")),
+            "",
+        )
+        match = re.match(r"r\d+\s*=\s*([A-Za-z0-9_.<>]+)\s*\(", request_line)
+        if not match or not cls._api_example_matches(api_name, match.group(1)):
+            return ""
+        normalized = re.sub(r"^r\d+\s*=", f"{result_name} =", text, count=1)
+        if re.search(r"\br\d+\.", normalized):
+            return ""
+        return normalized
+
+    @staticmethod
+    def _api_example_matches(api_pattern: str, example_api: str) -> bool:
+        escaped = re.escape(api_pattern)
+        escaped = escaped.replace(re.escape("<field>"), r"[A-Za-z0-9_]+")
+        escaped = escaped.replace(re.escape("<method>"), r"[A-Za-z0-9_]+")
+        return re.fullmatch(escaped, example_api) is not None
+
+    @staticmethod
+    def _generated_method_example(
+        *,
+        api_name: str,
+        api_class: str,
+        result_name: str,
+        dataview_definition: Mapping[str, Any],
+    ) -> str:
+        field_names = list(
+            (dataview_definition.get("fields") or {}).keys()
+            if isinstance(dataview_definition.get("fields"), Mapping)
+            else []
+        )
+        output_fields = ", ".join(field_names[:6]) or "field1, field2"
+        kd = dataview_definition.get("kd")
+        if api_class in {"kday_metric", "kday_margin_metric"}:
+            if isinstance(kd, Mapping) and kd:
+                field = str(next(iter(kd)))
+                supported = kd.get(field) or []
+                method = str(supported[0] if supported else "avg")
+            else:
+                field = str(kd[0]) if isinstance(kd, list) and kd else "field"
+                method = "percentile" if api_name.endswith("_percentile") else "avg"
+            concrete_api = api_name.replace("<field>", field).replace("<method>", method)
+            return (
+                f"{result_name} = {concrete_api}(k = 20, realtime = 0) "
+                f"-> code, name, value as {field}_{method}_20d"
+            )
+        if api_class == "constituent_aggregate":
+            group_fields = [
+                field for field in field_names if not field.startswith("stock_")
+            ][:2]
+            groups = ", ".join(group_fields) or "subject_code, subject_name"
+            return (
+                f"{result_name} = {api_name}("
+                f'agg = count(stock.quote.code), group_by = "{groups}", limit = 20'
+                f") -> {groups}, member_count"
+            )
+        if api_class == "intraday_cross_section_aggregate":
+            return (
+                f"{result_name} = {api_name}("
+                "agg = avg(stock.quote.pct), realtime = 2"
+                ") -> avg_pct"
+            )
+        if api_class == "dynamic_quote_cal":
+            return (
+                f"{result_name} = {api_name}("
+                'k = 20, fields = "code, name, tradedate, open, close", '
+                'task = "统计每只股票近20个交易日收盘价高于开盘价的天数", '
+                "realtime = 0"
+                ") -> code, name, close_gt_open_days"
+            )
+        return f"{result_name} = {api_name}(limit = 20) -> {output_fields}"
 
     @staticmethod
     def _compact_fields(fields: Any) -> Dict[str, Any]:
@@ -697,45 +1016,20 @@ def run(inputs: dict) -> dict:
     def _runtime_contract() -> str:
         return """# Custom Tool Runtime Contract
 
-- Python entrypoint: `run(inputs: dict) -> dict`.
-- Return value must be JSON serializable.
-- Do not read secrets.
-- Do not directly access database tables, raw provider modules, or network from generated tool code.
-- If finance data is needed, use `custom_tool_sdk.finance_query(request=...)`.
-- Use `custom_tool_sdk.info(message, data)` for stage/count summaries and `custom_tool_sdk.debug(message, data)` for the formula inputs and intermediate values that explain the result.
-- Every return path must include a `key_process_info` object. Its contents are the compact business facts needed to explain this tool's result, chosen from the current requirement and Design.
-- Keep these facts small and structured so the test result can show users how the conclusion was reached.
+- Entry point: `run(inputs: dict) -> dict`.
+- Return a JSON-serializable object containing `key_process_info`.
+- Read financial data through `custom_tool_sdk.finance_query`; do not access databases, providers, credentials, or the network directly.
 """
 
     @staticmethod
     def _sdk_doc() -> str:
         return """# custom_tool_sdk
 
-Generated custom-tool code can use these stable helpers:
-
-```python
-from custom_tool_sdk import debug, finance_query, info
-
-def run(inputs: dict) -> dict:
-    info("calculation_started", {"stock_code": inputs.get("stock_code")})
-    quote = finance_query(
-        request='r1 = stock.quote(filter = "code = 600519.SH", order = "tradedate desc", limit = 1) -> code, name, tradedate, close, pct'
-    )
-    rows = quote.get("data") or []
-    key_process_info = {
-        "sample_count": len(rows),
-        "close": rows[0].get("close") if rows else None,
-    }
-    debug("key_process_info", key_process_info)
-    return {"quote": quote, "key_process_info": key_process_info}
-```
-
-## finance_query
-
 `finance_query(request: str) -> dict`
 
-Use the finance data protocol request string. The API catalog files describe available subjects, dataviews, fields, and request patterns.
-Build requests exactly like the catalog examples. The whole `filter` argument is a quoted string, while protocol values inside it are bare literals, for example `filter = "code = 600519.SH and tradedate <= 2026-07-23"`. Do not add nested escaped quotes around stock codes, dates, names, or other filter values.
+Request format: `result_name = api_name(arguments) -> output_fields`.
+
+The whole `filter` argument is a quoted string. Values inside it are bare protocol literals, for example `filter = "code = 600519.SH and tradedate <= 2026-07-23"`.
 
 The injected SDK normalizes every successful query to this stable envelope:
 
@@ -749,12 +1043,6 @@ The injected SDK normalizes every successful query to this stable envelope:
 }
 ```
 
-Generated modules should read rows from `result["data"]` after checking `result["ok"]`. Provider-specific nesting remains internal to the SDK adapter.
-
-## info / debug
-
-- `info(message: str, data: dict | None = None)` records stage summaries and counts.
-- `debug(message: str, data: dict | None = None)` records the formula inputs and core intermediate metrics that explain the final result.
-- Keep records small and structured. Do not log secrets, raw provider envelopes, or full market-data rows.
+Check `result["ok"]`, then read rows from `result["data"]`.
 
 """

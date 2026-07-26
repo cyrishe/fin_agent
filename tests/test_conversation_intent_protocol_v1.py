@@ -239,7 +239,7 @@ def test_context_resolution_llm_failure_is_reported_without_fallback(monkeypatch
     def fail(*args, **kwargs):
         raise RuntimeError("maas unavailable")
 
-    monkeypatch.setattr("src.services.context_resolution_service.chat_qwen_flash_json", fail)
+    monkeypatch.setattr("src.services.context_resolution_service.chat_qwen_flash_json_with_raw", fail)
 
     with pytest.raises(ContextResolutionError, match="maas unavailable"):
         ContextResolutionService().resolve(
@@ -253,11 +253,11 @@ def test_context_resolution_llm_failure_is_reported_without_fallback(monkeypatch
 
 def test_context_resolution_protocol_error_is_reported_without_raw_text_fallback(monkeypatch):
     monkeypatch.setattr(
-        "src.services.context_resolution_service.chat_qwen_flash_json",
-        lambda messages, enable_think=False: ({"context_refs": []}, {}),
+        "src.services.context_resolution_service.chat_qwen_flash_json_with_raw",
+        lambda messages, enable_think=False, temperature=0.0: ({"context_refs": []}, {}, '{"context_refs": []}'),
     )
 
-    with pytest.raises(ContextResolutionError, match="ori_question"):
+    with pytest.raises(ContextResolutionError, match="连续两次"):
         ContextResolutionService().resolve(
             user_text="那么五粮液呢？",
             context_window=[],
@@ -265,6 +265,38 @@ def test_context_resolution_protocol_error_is_reported_without_raw_text_fallback
             preprocessing_signals={},
             enable_llm=True,
         )
+
+
+def test_context_resolution_retries_bad_json_and_keeps_original_text_in_system(monkeypatch):
+    calls = []
+
+    def fake_chat(messages, enable_think=False, temperature=0.0):
+        calls.append(messages)
+        if len(calls) == 1:
+            return None, {}, '{"resolved_question": "关于「"前高"」继续设计"}'
+        return {
+            "resolved_question": "采用已确认的前高定义，继续完成当前工具设计。",
+            "context_refs": ["custom_tool:current"],
+        }, {}, '{"resolved_question":"采用已确认的前高定义，继续完成当前工具设计。","context_refs":["custom_tool:current"]}'
+
+    monkeypatch.setattr(
+        "src.services.context_resolution_service.chat_qwen_flash_json_with_raw",
+        fake_chat,
+    )
+    original = '关于「"前高"如何定义？」，我的回答是：最近波段高点。'
+    result = ContextResolutionService().resolve(
+        user_text=original,
+        context_window=[],
+        thread_state={},
+        preprocessing_signals={},
+        enable_llm=True,
+    )
+
+    assert len(calls) == 2
+    assert result["ori_question"] == original
+    assert result["resolved_question"] == "采用已确认的前高定义，继续完成当前工具设计。"
+    rendered = "\n".join(str(item.get("content") or "") for item in calls[0])
+    assert '\\"前高\\"' in rendered
 
 
 def test_top_intent_llm_failure_is_reported_without_normal_qa_fallback(monkeypatch):

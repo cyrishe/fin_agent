@@ -1,13 +1,25 @@
 from __future__ import annotations
 
+import json
 from typing import Any, Dict, List, Optional
 
 from src.prompting.prompt_registry import get_prompt_registry
-from src.utils.ai_service import chat_qwen_flash_json
+from src.utils.ai_service import chat_qwen_flash_json_with_raw
 
 
 class ContextResolutionError(RuntimeError):
-    pass
+    def __init__(
+        self,
+        message: str,
+        *,
+        user_message: str = "",
+        technical_detail: str = "",
+        raw_response: str = "",
+    ) -> None:
+        super().__init__(message)
+        self.user_message = user_message or "我暂时没能整理好这轮对话的上下文，当前内容没有改变。请重新提交一次。"
+        self.technical_detail = technical_detail
+        self.raw_response = raw_response
 
 
 class ContextResolutionService:
@@ -45,34 +57,87 @@ class ContextResolutionService:
         signals = preprocessing_signals if isinstance(preprocessing_signals, dict) else {}
         state = thread_state if isinstance(thread_state, dict) else {}
         try:
-            messages = self.registry.render_messages(
+            base_messages = self.registry.render_messages(
                 "system.assistant.context_resolution",
                 {
-                    "raw_user_text": text,
+                    "raw_user_text_json": json.dumps(text, ensure_ascii=False),
                     "context_window": self._build_prompt_context_window(context_window or []),
                     "context_objects": self._build_prompt_context_objects(state, signals),
                 },
             )
-            payload, usage = chat_qwen_flash_json(messages, enable_think=False)
         except Exception as exc:
             raise ContextResolutionError(f"上下文语义解析失败：{exc}") from exc
-        if not isinstance(payload, dict):
-            raise ContextResolutionError("上下文语义解析失败：模型没有返回 JSON 对象")
-        normalized = self._normalize_payload(payload, original_question=text)
+
+        messages = list(base_messages)
+        usage: Any = {}
+        last_detail = ""
+        last_raw = ""
+        normalized: Dict[str, Any] | None = None
+        for attempt in range(2):
+            try:
+                payload, usage, raw_response = chat_qwen_flash_json_with_raw(
+                    messages,
+                    enable_think=False,
+                    temperature=0.0,
+                )
+            except Exception as exc:
+                last_detail = str(exc)
+                if attempt == 0:
+                    messages = self._repair_messages(base_messages, "", last_detail)
+                    continue
+                raise ContextResolutionError(
+                    f"上下文语义解析失败：{exc}",
+                    technical_detail=last_detail,
+                ) from exc
+            last_raw = self._trim(raw_response)
+            try:
+                if not isinstance(payload, dict):
+                    raise ContextResolutionError("模型没有返回 JSON 对象")
+                normalized = self._normalize_payload(payload, original_question=text)
+                break
+            except ContextResolutionError as exc:
+                last_detail = str(exc)
+                if attempt == 0:
+                    messages = self._repair_messages(base_messages, last_raw, last_detail)
+
+        if normalized is None:
+            raise ContextResolutionError(
+                "上下文语义解析失败：模型连续两次没有返回可用协议",
+                user_message="我在整理这轮上下文时连续两次没有得到可用结果，因此还没有进入下一步。当前需求和选择都已保留，请重新提交一次。",
+                technical_detail=last_detail,
+                raw_response=last_raw,
+            )
         normalized["source"] = "llm"
         normalized["llm_usage"] = usage if isinstance(usage, dict) else {
             "prompt_tokens": int(getattr(usage, "prompt_tokens", 0) or 0),
             "completion_tokens": int(getattr(usage, "completion_tokens", 0) or 0),
             "total_tokens": int(getattr(usage, "total_tokens", 0) or 0),
         }
-        normalized["messages"] = messages
+        normalized["messages"] = base_messages
         return normalized
 
+    @staticmethod
+    def _repair_messages(
+        base_messages: List[Dict[str, Any]],
+        raw_response: str,
+        error: str,
+    ) -> List[Dict[str, Any]]:
+        messages = [dict(item) for item in base_messages]
+        if raw_response:
+            messages.append({"role": "assistant", "content": raw_response})
+        messages.append(
+            {
+                "role": "user",
+                "content": (
+                    f"上一条响应无法按输出协议解析：{error}。"
+                    "请根据原始输入重新输出一个严格 JSON 对象，只包含 resolved_question 和 context_refs。"
+                ),
+            }
+        )
+        return messages
+
     def _normalize_payload(self, payload: Dict[str, Any], *, original_question: str = "") -> Dict[str, Any]:
-        ori_question = self._trim(payload.get("ori_question"))
         resolved_question = self._trim(payload.get("resolved_question"))
-        if not ori_question:
-            raise ContextResolutionError("上下文语义协议错误：ori_question 不能为空")
         if not resolved_question:
             raise ContextResolutionError("上下文语义协议错误：resolved_question 不能为空")
         if not isinstance(payload.get("context_refs"), list):
@@ -81,7 +146,7 @@ class ContextResolutionService:
         normalized_items = [self._legacy_item_from_ref(item) for item in context_refs]
         resolution_summary = self._build_resolution_summary(normalized_items)
         return {
-            "ori_question": ori_question,
+            "ori_question": self._trim(original_question),
             "resolved_question": resolved_question,
             "context_refs": context_refs,
             # Compatibility fields for the existing tracing and context UI.

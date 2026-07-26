@@ -44,8 +44,13 @@ def execute_api_call(call: ApiCall, previous_results: Mapping[str, ResultHandle]
     columns = [_output_column(item) for item in call.outputs]
     if resolved and resolved.get("type") == "base" and resolved.get("dataview") == "quote":
         subject = str(resolved.get("subject") or "")
-        if subject == "stock" and _quote_realtime(call.args, resolved):
-            data = execute_intraday_quote_api(args=call.args, outputs=call.outputs)
+        realtime_mode = _quote_realtime_mode(call.args, resolved)
+        if subject == "stock" and realtime_mode > 0:
+            data = execute_intraday_quote_api(
+                args=call.args,
+                outputs=call.outputs,
+                latest_only=realtime_mode == 2,
+            )
         else:
             data = execute_quote_api(subject=subject, args=call.args, outputs=call.outputs)
         return ResultHandle(
@@ -187,10 +192,12 @@ def execute_api_call(call: ApiCall, previous_results: Mapping[str, ResultHandle]
             data=data,
         )
     if resolved and resolved.get("type") == "agg" and resolved.get("subject") == "stock" and resolved.get("dataview") == "quote":
-        if _quote_realtime(call.args, resolved):
+        realtime_mode = _quote_realtime_mode(call.args, resolved)
+        if realtime_mode > 0:
             data = execute_intraday_quote_agg_api(
                 args=call.args,
                 outputs=call.outputs,
+                latest_only=realtime_mode == 2,
             )
         else:
             data = execute_quote_agg_api(
@@ -206,7 +213,7 @@ def execute_api_call(call: ApiCall, previous_results: Mapping[str, ResultHandle]
         )
     if resolved and resolved.get("type") == "kd" and resolved.get("dataview") == "quote":
         subject = str(resolved.get("subject") or "")
-        if subject == "stock" and _quote_realtime(call.args, resolved):
+        if subject == "stock" and _quote_realtime_mode(call.args, resolved) > 0:
             data = execute_kd_intraday_quote_api(
                 field=str(resolved.get("field") or ""),
                 method=str(resolved.get("method") or ""),
@@ -309,23 +316,27 @@ def _output_column(output: str) -> str:
     return text
 
 
-def _quote_realtime(args: Mapping[str, object], resolved: Mapping[str, object]) -> bool:
+def _quote_realtime_mode(args: Mapping[str, object], resolved: Mapping[str, object]) -> int:
     field = str(resolved.get("field") or "")
-    if field.startswith("minute_"):
-        return True
+    if field.startswith("minute_") and "realtime" not in args:
+        return 1
     if resolved.get("type") == "kd" and "realtime" not in args:
-        return False
+        return 0
     raw = args.get("realtime", resolved.get("default_realtime", 1))
     if raw in (None, ""):
-        return True
+        return int(resolved.get("default_realtime", 1) or 1)
     if isinstance(raw, bool):
-        return raw
+        return 2 if raw else 0
     if isinstance(raw, (int, float)):
-        return int(raw) == 1
+        return max(0, min(int(raw), 2))
     text = str(raw).strip().lower()
     if text in {"0", "false", "no", "history", "historical"}:
-        return False
-    return True
+        return 0
+    if text in {"2", "current", "latest", "realtime", "snapshot"}:
+        return 2
+    if text in {"1", "true", "yes", "minute", "intraday", "minute_kline"}:
+        return 1
+    return int(resolved.get("default_realtime", 1) or 1)
 
 
 def _materialize_call_refs(call: ApiCall, previous_results: Mapping[str, ResultHandle], *, skip_keys: set[str] | None = None) -> ApiCall:

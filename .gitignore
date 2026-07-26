@@ -220,6 +220,7 @@ __marimo__/
 # macOS metadata
 .DS_Store
 ._*
+*.swp
 
 # Local agent runtime state
 .vite/
@@ -230,6 +231,7 @@ data/agent_sessions/
 data/finance_cc_sessions/
 data/assistant_uploads/
 data/custom_tool_context/
+data/coding_skill_eval/
 data/custom_tools/
 data/runtime_custom_tools/
 data/runtime_traces/

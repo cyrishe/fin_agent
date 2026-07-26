@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+import subprocess
+import sys
 from typing import Any
 
 import pytest
@@ -281,13 +283,13 @@ def test_custom_tool_service_selects_claude_without_changing_business_wrappers(t
     assert isinstance(service.coder.harness, ClaudeSdkSkillHarness)
 
 
-def test_custom_tool_service_uses_fast_claude_for_design_and_mid_codex_for_coding(
+def test_custom_tool_service_uses_fast_claude_for_design_and_mid_claude_for_coding(
     tmp_path: Path,
     monkeypatch,
 ) -> None:
     monkeypatch.setenv("CUSTOM_TOOL_DESIGN_PROVIDER", "claude")
     monkeypatch.setenv("CUSTOM_TOOL_DESIGN_COMPLEXITY", "fast")
-    monkeypatch.setenv("CUSTOM_TOOL_CODING_PROVIDER", "codex")
+    monkeypatch.setenv("CUSTOM_TOOL_CODING_PROVIDER", "claude")
     monkeypatch.setenv("CUSTOM_TOOL_CODING_COMPLEXITY", "mid")
     service = CustomToolAgentService(
         store=CustomToolStoreService(root_dir=str(tmp_path / "tools"), backend="filesystem"),
@@ -296,10 +298,10 @@ def test_custom_tool_service_uses_fast_claude_for_design_and_mid_codex_for_codin
     assert isinstance(service.designer.harness, ClaudeSdkSkillHarness)
     assert service.designer.harness.complexity_level == "fast"
     assert service.designer.harness.model == "deepseek-v4-flash"
-    assert isinstance(service.coder.harness, CodexSdkSkillHarness)
+    assert isinstance(service.coder.harness, ClaudeSdkSkillHarness)
     assert service.coder.harness.complexity_level == "mid"
-    assert service.coder.harness.model == "gpt-5.6-terra"
-    assert service.coder.harness.reasoning_effort == "medium"
+    assert service.coder.harness.model == "deepseek-v4-pro"
+    assert service.coder.harness.effort == "medium"
 
 
 def test_claude_skill_run_uses_existing_skill_schema_and_final_contract(tmp_path: Path) -> None:
@@ -348,6 +350,7 @@ def test_claude_skill_run_uses_existing_skill_schema_and_final_contract(tmp_path
         skill_path=str(skill),
         output_schema_path=str(schema),
         user_request="build it",
+        context={"_provider_session_id": "claude_session_previous"},
         session_id="app_run_1",
         stage="design",
     )
@@ -364,6 +367,8 @@ def test_claude_skill_run_uses_existing_skill_schema_and_final_contract(tmp_path
     assert captured["options"].strict_mcp_config is True
     assert captured["options"].skills == []
     assert captured["options"].setting_sources == []
+    assert captured["options"].resume == "claude_session_previous"
+    assert "claude_session_previous" not in captured["prompt"]
     assert any(event.get("source") == "claude" and event.get("type") == "agent_delta" for event in result["events"])
     assert any(event.get("source") == "model" and event.get("type") == "final" for event in result["events"])
 
@@ -737,6 +742,14 @@ def test_claude_coding_permission_policy_limits_writes_and_shell(tmp_path: Path)
         allow_bash=True,
         cwd=cwd,
     ) == ""
+    assert ClaudeSdkSkillHarness._tool_denial_reason(
+        tool_name="Write",
+        tool_input={"file_path": str(cwd / "scratch/test_main.py")},
+        readable_roots=roots,
+        allowed_write_paths=allowed,
+        allow_bash=True,
+        cwd=cwd,
+    ) == ""
     assert "outside" in ClaudeSdkSkillHarness._tool_denial_reason(
         tool_name="Write",
         tool_input={"file_path": str(cwd / "extra.py")},
@@ -748,6 +761,32 @@ def test_claude_coding_permission_policy_limits_writes_and_shell(tmp_path: Path)
     assert ClaudeSdkSkillHarness._tool_denial_reason(
         tool_name="Bash",
         tool_input={"command": "python -m py_compile implementation/modules/main.py"},
+        readable_roots=roots,
+        allowed_write_paths=allowed,
+        allow_bash=True,
+        cwd=cwd,
+    ) == ""
+    assert ClaudeSdkSkillHarness._tool_denial_reason(
+        tool_name="Bash",
+        tool_input={
+            "command": (
+                "PYTHONPYCACHEPREFIX=scratch/pycache "
+                f"{Path(sys.executable).resolve()} -m py_compile implementation/modules/main.py"
+            )
+        },
+        readable_roots=roots,
+        allowed_write_paths=allowed,
+        allow_bash=True,
+        cwd=cwd,
+    ) == ""
+    assert ClaudeSdkSkillHarness._tool_denial_reason(
+        tool_name="Bash",
+        tool_input={
+            "command": (
+                "PYTHONPATH=dev_runtime "
+                f"{Path(sys.executable).resolve()} scratch/test_main.py"
+            )
+        },
         readable_roots=roots,
         allowed_write_paths=allowed,
         allow_bash=True,
@@ -769,6 +808,53 @@ def test_claude_coding_permission_policy_limits_writes_and_shell(tmp_path: Path)
         allow_bash=True,
         cwd=cwd,
     )
+
+
+def test_documented_coding_commands_are_allowed_and_execute_in_isolated_workspace(tmp_path: Path) -> None:
+    cwd = tmp_path.resolve()
+    module = cwd / "implementation/modules/main.py"
+    test_script = cwd / "scratch/test_main.py"
+    sdk_stub = cwd / "dev_runtime/custom_tool_sdk.py"
+    module.parent.mkdir(parents=True)
+    test_script.parent.mkdir()
+    sdk_stub.parent.mkdir()
+    module.write_text("def run(inputs):\n    return {'ok': True}\n", encoding="utf-8")
+    sdk_stub.write_text("VALUE = 1\n", encoding="utf-8")
+    test_script.write_text(
+        "from custom_tool_sdk import VALUE\nassert VALUE == 1\n",
+        encoding="utf-8",
+    )
+    allowed = frozenset({module.resolve()})
+    roots = (cwd,)
+    commands = [
+        (
+            "PYTHONPYCACHEPREFIX=scratch/pycache "
+            f"{Path(sys.executable).resolve()} -m py_compile implementation/modules/main.py"
+        ),
+        (
+            "PYTHONPATH=dev_runtime "
+            f"{Path(sys.executable).resolve()} scratch/test_main.py"
+        ),
+    ]
+
+    for command in commands:
+        assert ClaudeSdkSkillHarness._tool_denial_reason(
+            tool_name="Bash",
+            tool_input={"command": command},
+            readable_roots=roots,
+            allowed_write_paths=allowed,
+            allow_bash=True,
+            cwd=cwd,
+        ) == ""
+        completed = subprocess.run(
+            command,
+            cwd=cwd,
+            shell=True,
+            check=False,
+            capture_output=True,
+            text=True,
+        )
+        assert completed.returncode == 0, completed.stderr
 
 
 def test_dashscope_credentials_are_bound_to_anthropic_endpoint(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -857,3 +943,33 @@ def test_only_structured_output_tool_json_is_forwarded_as_semantic_delta() -> No
 
     assert hidden == []
     assert visible[0]["content"] == '{"status":"review"}'
+
+
+def test_streamed_tool_call_is_not_repeated_by_assistant_message() -> None:
+    state: dict[str, Any] = {}
+    streamed = _message(
+        "StreamEvent",
+        event={
+            "type": "content_block_start",
+            "index": 1,
+            "content_block": {"type": "tool_use", "id": "tool_1", "name": "Read"},
+        },
+    )
+    assistant = _message(
+        "AssistantMessage",
+        content=[_message("ToolUseBlock", id="tool_1", name="Read")],
+    )
+
+    first, _ = ClaudeSdkSkillHarness._normalize_message(
+        streamed,
+        stage="coding",
+        stream_state=state,
+    )
+    repeated, _ = ClaudeSdkSkillHarness._normalize_message(
+        assistant,
+        stage="coding",
+        stream_state=state,
+    )
+
+    assert len(first) == 1
+    assert repeated == []

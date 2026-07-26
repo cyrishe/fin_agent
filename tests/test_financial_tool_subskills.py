@@ -80,6 +80,8 @@ def test_requirement_skill_keeps_implementation_details_out_of_the_requirement_a
 
     assert "不选择数据 API" in text
     assert "代码结构或技术实现" in text
+    assert "数据来源、接口能力、K 线聚合、字段映射" in text
+    assert "界面仍会展示当前理解并请用户整体确认" in text
 
 
 def test_flowchart_is_independent_from_module_design() -> None:
@@ -111,16 +113,13 @@ def test_implementation_and_test_keep_technical_facts_separate_from_user_judgeme
         SUBSKILLS_ROOT / "financial-tool-implementation" / "SKILL.md"
     ).read_text(encoding="utf-8")
     assert "key_process_info" in implementation_skill
-    assert "需求 → Design → Code" in implementation_skill
+    assert "需求、Design 和代码" in implementation_skill
     assert set(implementation["properties"]) == {
-        "message",
         "tool_contract",
         "implementation_summary",
-        "verification",
-        "sample_input_json",
+        "execution_examples",
     }
     assert implementation["properties"]["implementation_summary"]["type"] == "string"
-    assert implementation["properties"]["verification"]["type"] == "string"
     assert set(test_plan["required"]) == {"summary", "next_action", "assessment", "cases", "presentation"}
     assert test_plan["properties"]["next_action"]["enum"] == ["run_tests", "finish"]
     assert set(test_plan["properties"]["cases"]["items"]["required"]) == {"name", "purpose", "request"}

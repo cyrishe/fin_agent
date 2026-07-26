@@ -1,4 +1,5 @@
 import json
+import re
 from pathlib import Path
 
 import pytest
@@ -239,7 +240,7 @@ def test_coding_contract_builds_runtime_schema_from_natural_language_design(tmp_
     assert bundle["output_schema"]["properties"]["key_process_info"]["type"] == "object"
 
 
-def test_coding_returns_real_failure_feedback_for_controller_driven_retry(tmp_path: Path) -> None:
+def test_runtime_does_not_reject_business_output_with_hard_schema_checks(tmp_path: Path) -> None:
     store = CustomToolStoreService(root_dir=str(tmp_path / "tools"), backend="filesystem")
     coder = _Coder(failures=1)
     service = CustomToolAgentService(
@@ -254,21 +255,15 @@ def test_coding_returns_real_failure_feedback_for_controller_driven_retry(tmp_pa
         "design_contract": _Designer().design("")["design"],
     }
 
-    failed = service.implement_dynamic_tool(state=state, owner_id="user_a", instruction="实现当前设计")
+    implemented = service.implement_dynamic_tool(state=state, owner_id="user_a", instruction="实现当前设计")
 
-    assert failed["test_result"]["execution_ok"] is False
-    assert len(coder.contexts) == 1
-    repaired = service.implement_dynamic_tool(
-        state=failed["state"],
-        owner_id="user_a",
-        instruction="根据真实测试反馈修复",
-    )
-    assert repaired["test_result"]["execution_ok"] is True
-    assert len(coder.contexts) == 2
-    assert coder.contexts[1]["test_feedback"]["actual"] == {
+    assert implemented["test_result"]["execution_ok"] is True
+    assert implemented["test_result"]["data"] == {
         "wrong": 1,
         "key_process_info": {"value_count": 3},
     }
+    assert "test_feedback" not in implemented["state"]
+    assert len(coder.contexts) == 1
 
 
 def test_unknown_ui_action_is_the_only_action_level_rejection() -> None:
@@ -309,6 +304,45 @@ def test_empty_business_result_is_a_successful_technical_execution(tmp_path: Pat
 
     assert result["ok"] is True
     assert result["data"] == {"matches": []}
+
+
+def test_runtime_allows_null_business_metrics_for_no_signal_result(tmp_path: Path) -> None:
+    store = CustomToolStoreService(root_dir=str(tmp_path / "tools"), backend="filesystem")
+    store.save_draft(
+        {
+            "manifest": {
+                "tool_name": "nullable_signal",
+                "display_name": "信号检测",
+                "description": "未发现信号时保留空指标。",
+                "runtime": {"kind": "python_sandbox", "backend": "local_dev", "timeout_ms": 2000},
+            },
+            "input_schema": {"type": "object", "properties": {}},
+            "output_schema": {
+                "type": "object",
+                "required": ["triggered", "ma20"],
+                "properties": {
+                    "triggered": {"type": "boolean"},
+                    "ma20": {"type": "number"},
+                },
+            },
+            "code": (
+                "def run(inputs: dict) -> dict:\n"
+                "    return {'triggered': False, 'ma20': None, "
+                "'key_process_info': {'reason': 'no signal'}}\n"
+            ),
+        },
+        owner_id="user_a",
+    )
+
+    result = _runtime(store, tmp_path).run(
+        "nullable_signal",
+        {},
+        owner_ids=["user_a"],
+        allow_inactive=True,
+    )
+
+    assert result["ok"] is True
+    assert result["data"]["ma20"] is None
 
 
 def test_existing_tool_test_is_reviewed_and_can_request_another_turn(tmp_path: Path, monkeypatch) -> None:
@@ -437,16 +471,20 @@ def test_runtime_rejects_api_missing_from_system_catalog() -> None:
     assert "system API catalog" in error
 
 
-def test_stale_revision_is_rejected_without_a_workflow_state_gate() -> None:
+def test_design_confirmation_uses_the_current_server_design() -> None:
     service = CustomToolAgentService(use_codex=False)
+    captured = {}
 
-    with pytest.raises(Exception, match="design revision changed"):
-        service.continue_flow_action(
-            "custom_tool.confirm_design",
-            state={"design_revision": 3},
-            expected_revision=2,
-            owner_id="user_a",
-        )
+    service._confirm_and_code = lambda **kwargs: captured.update(kwargs) or {"ok": True}  # type: ignore[method-assign]
+    result = service.continue_flow_action(
+        "custom_tool.confirm_design",
+        state={"design_revision": 3, "design_contract": {"document": "当前设计"}},
+        expected_revision=2,
+        owner_id="user_a",
+    )
+
+    assert result == {"ok": True}
+    assert captured["state"]["design_contract"]["document"] == "当前设计"
 
 
 def test_file_store_enforces_owner_and_publication_permissions(tmp_path: Path) -> None:
@@ -494,6 +532,11 @@ def test_first_coding_turn_gets_editable_module_focused_api_context_and_test_run
             "api_class_patterns": {
                 "basic_query": {
                     "call_pattern": "r{id} = {api_name}(filter, order, limit, realtime) -> field1",
+                    "args": {
+                        "required": [],
+                        "optional": ["filter", "order", "limit", "realtime"],
+                    },
+                    "output_rule": "输出字段来自当前 dataview。",
                     "examples": ["r1 = stock.quote(filter = \"code = 600519.SH\") -> code, close"],
                 }
             },
@@ -525,6 +568,7 @@ def test_first_coding_turn_gets_editable_module_focused_api_context_and_test_run
                     "topic": "A股日线行情",
                     "purpose": "读取日线行情",
                     "fields": ["code", "close"],
+                    "source_ref": "api_catalog/subjects/stock/quote.json",
                 }],
             },
             "_workspace_identity": {"owner_id": "user_a"},
@@ -542,36 +586,79 @@ def test_first_coding_turn_gets_editable_module_focused_api_context_and_test_run
         "fields": ["code", "close"],
         "purpose": "读取日线行情",
     }]
-    assert task_api["sources"] == []
+    assert task_api["sources"] == [{
+        "source_ref": "api_catalog/subjects/stock/quote.json",
+        "purpose": "读取日线行情",
+        "requested_fields": ["code", "close"],
+        "query_fields": ["code", "close"],
+        "unavailable_requested_fields": [],
+        "subject": "stock",
+        "dataview": "quote",
+        "asset": "api_catalog/subjects/stock/quote.json",
+        "method_names": ["stock.quote"],
+    }]
+    assert "definition" not in task_api["sources"][0]
+    assert "request_patterns" not in task_api["sources"][0]
     assert Path(bundle["bundle_dir"], module_path).is_file()
     assert Path(bundle["bundle_dir"], "dev_runtime/custom_tool_sdk.py").is_file()
     assert Path(bundle["bundle_dir"], "dev_runtime/test_support.py").is_file()
+    assert bundle["api_coding_guide"] == "api_catalog/CODING_GUIDE.md"
+    assert Path(bundle["bundle_dir"], bundle["api_coding_guide"]).is_file()
+    assert "request_patterns" not in bundle
+    assert not Path(bundle["bundle_dir"], "api_catalog/request_patterns.json").exists()
+    stock_index = json.loads(
+        Path(bundle["bundle_dir"], "api_catalog/subjects/stock/index.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    assert stock_index["dataviews"][0]["file"].startswith(
+        "api_catalog/subjects/stock/"
+    )
+    stock_subject = json.loads(
+        Path(bundle["bundle_dir"], "api_catalog/subjects/stock/quote.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    quote_method = stock_subject["methods"][0]
+    assert quote_method["name"] == "stock.quote"
+    assert quote_method["call"].startswith("{result_name} = stock.quote(")
+    assert quote_method["args"]["optional"] == ["filter", "order", "limit", "realtime"]
+    assert "output_rule" in quote_method
     assert bundle["module_template"] == "DYNAMIC_TOOL_TEMPLATE.py"
     template = Path(bundle["bundle_dir"], bundle["module_template"]).read_text(encoding="utf-8")
     assert "def run(inputs: dict) -> dict:" in template
     assert '"key_process_info"' in template
-    assert 'debug("key_process_info"' in template
+    assert 'debug("key_process_info"' not in template
+    assert "latest_quote = stock.quote" in template
+    assert "r1 = stock.quote" not in template
     coding_guide = Path(bundle["bundle_dir"], "CODING_WORKSPACE.md").read_text(encoding="utf-8")
     assert "Use this exact interpreter" in coding_guide
     assert "PYTHONPYCACHEPREFIX=scratch/pycache" in coding_guide
     assert "from test_support import load_module, install_rows" in coding_guide
-    assert "task_context.json` is the first reference for the Design's data needs" in coding_guide
+    assert "Read `api_catalog/CODING_GUIDE.md` first" in coding_guide
     assert Path(bundle["bundle_dir"], "scratch").is_dir()
     sdk_doc = Path(bundle["bundle_dir"], "custom_tool_sdk.md").read_text(encoding="utf-8")
     assert 'filter = "code = 600519.SH and tradedate <= 2026-07-23"' in sdk_doc
-    assert "Do not add nested escaped quotes" in sdk_doc
+    assert "Values inside it are bare protocol literals" in sdk_doc
+    coding_asset_text = "\n".join(
+        path.read_text(encoding="utf-8")
+        for path in Path(bundle["bundle_dir"], "api_catalog").rglob("*.json")
+    ) + "\n" + sdk_doc
+    assert not re.search(r"\br(?:[0-9]+|N)\b", coding_asset_text)
 
     Path(bundle["bundle_dir"], module_path).write_text(
         "def run(inputs):\n    return {'close': 1}\n",
         encoding="utf-8",
     )
     collected = service.collect_coding_result(bundle, {
-        "message": "实现完成",
         "implementation_summary": "读取行情并返回收盘价。",
-        "verification": "代表性样例运行成功，需求、设计和代码一致。",
-        "sample_input_json": "{\"code\":\"600519.SH\"}",
+        "execution_examples": [{
+            "input": "{\"code\":\"600519.SH\"}",
+            "output": "{\"close\":1,\"key_process_info\":{\"sample_count\":1}}",
+        }],
     })
     assert "return {'close': 1}" in collected["implementation"]["modules"][0]["source_code"]
+    assert "return {'close': 1}" in collected["code"]
     assert collected["implementation_summary"] == "读取行情并返回收盘价。"
 
 
@@ -641,6 +728,66 @@ def test_context_bundle_only_exposes_runtime_and_api_material_to_coding(tmp_path
     assert "runtime_contract" not in bundle
     assert "custom_tool_sdk" not in bundle
     assert not Path(bundle["bundle_dir"], "api_catalog").exists()
+
+
+def test_coding_subject_asset_expands_method_contracts(tmp_path: Path) -> None:
+    service = CustomToolContextBundleService(root_dir=str(tmp_path / "bundles"))
+
+    bundle = service.build(
+        stage="coding",
+        user_request="实现分钟成交量工具",
+        context={},
+    )
+
+    stock = json.loads(
+        Path(bundle["bundle_dir"], "api_catalog/subjects/stock/quote.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    methods = {
+        method["name"]: method
+        for method in stock["methods"]
+    }
+    quote = methods["stock.quote"]
+    assert quote["args"]["optional"] == ["filter", "order", "limit", "realtime"]
+    assert quote["call"].startswith("{result_name} = stock.quote(")
+    assert "只能从当前 view.fields" in quote["output_rule"]
+
+    kday = methods["stock.quote.kd_<field>_<method>"]
+    assert kday["available_names"]["field_methods"]["close"] == [
+        "max",
+        "min",
+        "avg",
+        "median",
+        "high",
+    ]
+    assert kday["same_minute_variant"]["fields"]["minute_volumn"] == [
+        "avg",
+        "max",
+        "min",
+        "median",
+        "percentile",
+    ]
+    assert "current_value" in kday["same_minute_variant"]["output_rule"]
+    for method in methods.values():
+        assert method["examples"], method["name"]
+        assert not any("r1 =" in example for example in method["examples"])
+
+    api_index = json.loads(
+        Path(bundle["bundle_dir"], "api_catalog/index.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    for subject in api_index["subjects"]:
+        for dataview in subject["dataviews"]:
+            asset = json.loads(
+                Path(bundle["bundle_dir"], dataview["file"]).read_text(
+                    encoding="utf-8"
+                )
+            )
+            assert asset["methods"], dataview["file"]
+            for method in asset["methods"]:
+                assert method["examples"], method["name"]
 
 
 def test_context_state_cleanup_preserves_system_owned_feedback_history() -> None:

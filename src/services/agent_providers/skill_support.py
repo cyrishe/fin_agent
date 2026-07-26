@@ -112,9 +112,7 @@ class AgentSkillHarnessSupport:
             file_context = "如果 CONTEXT 提供 design_ref，只按需读取该设计资产；不要读取运行时和代码资料。\n"
         elif _trim(stage) == "coding":
             file_context = (
-                "先读取 CONTEXT 中与本任务直接相关的引用文件；不要把资料包全部展开。\n"
-                "如果任务需要金融数据工具能力，读取 api_catalog/index.json，再只读取相关 subject 文件。\n"
-                "生成代码时参考 custom_tool_sdk.md。\n"
+                "按 CODING_WORKSPACE.md 读取本任务引用的需求、Design、代码、反馈和 API 资料。\n"
             )
         return (
             "请严格按照下面的 SKILL 执行任务。\n"

@@ -123,6 +123,21 @@ describe("surface stream reducer", () => {
     expect(blocks.map((block) => block.block_id)).toEqual(["asset_invocation_preview", "result"]);
   });
 
+  it("uses the design artifact as the single display source for persisted designs", () => {
+    const blocks = blocksFromPayload({
+      surface_blocks: [
+        { block_id: "design_final_summary", block_type: "narrative", content: "重复的完整设计" },
+        { block_id: "design_artifact", block_type: "artifact", data: { artifact_type: "finance.tool_spec" } },
+        { block_id: "design_design_review", block_type: "interaction" },
+      ],
+    });
+
+    expect(blocks.map((block) => block.block_id)).toEqual([
+      "design_artifact",
+      "design_design_review",
+    ]);
+  });
+
   it("keeps legacy catalog results visible after moving to the React surface", () => {
     const blocks = blocksFromPayload({
       mode: "tools_catalog",

@@ -80,7 +80,7 @@ def test_rule_only_eval_cases_never_call_context_or_intent_llm(monkeypatch, case
     def fail_if_called(*args, **kwargs):
         raise AssertionError("slash rule case must not call an LLM")
 
-    monkeypatch.setattr("src.services.context_resolution_service.chat_qwen_flash_json", fail_if_called)
+    monkeypatch.setattr("src.services.context_resolution_service.chat_qwen_flash_json_with_raw", fail_if_called)
     monkeypatch.setattr("src.services.assistant_interaction_preprocessor.chat_qwen_flash_json", fail_if_called)
     application_context = ApplicationRuntimeService().get_application_context("investment_workbench")
 
