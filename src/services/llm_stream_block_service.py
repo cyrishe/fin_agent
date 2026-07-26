@@ -367,14 +367,6 @@ class LlmStreamBlockBuilder:
             }:
                 continue
             data = item.get("data") if isinstance(item.get("data"), Mapping) else {}
-            data_json = _trim(item.get("data_json"))
-            if data_json and not data:
-                try:
-                    parsed = json.loads(data_json)
-                    if isinstance(parsed, Mapping):
-                        data = parsed
-                except Exception:
-                    data = {}
             blocks.append(self._block(
                 block_id=_trim(item.get("block_id")) or f"{stage}_render_{idx + 1}",
                 block_type=block_type,

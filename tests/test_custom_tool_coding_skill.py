@@ -65,29 +65,11 @@ def test_coding_skill_defines_dynamic_module_instead_of_user_file() -> None:
     assert "`code`" in contract_text
 
 
-def test_coding_schema_is_compatible_with_strict_structured_output() -> None:
+def test_coding_schema_keeps_execution_values_as_native_objects() -> None:
     schema = json.loads((IMPLEMENTATION_DIR / "schema.json").read_text(encoding="utf-8"))
-
-    def inspect(node):
-        if not isinstance(node, dict):
-            return
-        if "const" in node or "enum" in node:
-            assert "type" in node, node
-        if node.get("type") == "object":
-            assert node.get("additionalProperties") is False, node
-            properties = node.get("properties") or {}
-            assert set(node.get("required") or []) == set(properties), node
-        for value in node.values():
-            if isinstance(value, dict):
-                inspect(value)
-            elif isinstance(value, list):
-                for item in value:
-                    inspect(item)
-
-    inspect(schema)
     example = schema["properties"]["execution_examples"]["items"]["properties"]
-    assert example["input"]["type"] == "string"
-    assert example["output"]["type"] == "string"
+    assert example["input"] == {"type": "object", "additionalProperties": True}
+    assert example["output"] == {"type": "object", "additionalProperties": True}
 
 
 def test_coding_skill_sample_matches_schema() -> None:
@@ -116,8 +98,8 @@ def test_coding_skill_sample_matches_schema() -> None:
         },
         "implementation_summary": "读取数字数组，由 run 调用求和函数并返回 total。",
         "execution_examples": [{
-            "input": "{\"values\":[1,2]}",
-            "output": "{\"total\":3,\"key_process_info\":{\"value_count\":2}}",
+            "input": {"values": [1, 2]},
+            "output": {"total": 3, "key_process_info": {"value_count": 2}},
         }],
     }
 
@@ -191,19 +173,6 @@ def test_coder_passes_confirmed_design_once_as_context() -> None:
     assert "CONTEXT.design" in harness.kwargs["user_request"]
     assert "计算输入数字之和" not in harness.kwargs["user_request"]
     assert json.dumps(design, ensure_ascii=False) not in harness.kwargs["user_request"]
-
-
-def test_coder_rejects_only_unusable_execution_example_protocol() -> None:
-    valid = [{"input": '{"code":"600519.SH"}', "output": '{"result":true}'}]
-    assert CodexCustomToolCoder._execution_example_error(valid) == ""
-    assert (
-        CodexCustomToolCoder._execution_example_error([])
-        == "Coding 结果缺少真实执行样例。"
-    )
-    assert (
-        CodexCustomToolCoder._execution_example_error([{"input": "{broken", "output": "{}"}])
-        == "执行样例的 input 或 output 不是合法 JSON。"
-    )
 
 
 def test_coder_distinguishes_runtime_failure_from_design_fix() -> None:

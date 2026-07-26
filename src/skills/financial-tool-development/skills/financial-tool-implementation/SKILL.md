@@ -29,6 +29,6 @@ description: 根据需求、设计和真实反馈，实现或修改可动态执�
 
 - `code`：系统从模块文件回收的实际源码。
 - `implementation_summary`：简要说明实现内容、核心函数，以及需求、Design、代码一致性的证据和结论。
-- `execution_examples`：少量真实运行样例，每项以 JSON 文本保存工具 input 和完整 output；output 包含业务结果和 `key_process_info`。
+- `execution_examples`：少量真实运行的 input 和完整 output。
 
 系统注册工具还需要内部 `tool_contract`，只描述工具名称和公开输入输出。

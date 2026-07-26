@@ -1771,18 +1771,6 @@ class CustomToolAgentService:
                 continue
             input_value = item.get("input") if isinstance(item.get("input"), Mapping) else None
             expected_value = item.get("expected") if isinstance(item.get("expected"), Mapping) else None
-            if input_value is None:
-                try:
-                    parsed_input = json.loads(_trim(item.get("input_json")) or "{}")
-                    input_value = parsed_input if isinstance(parsed_input, Mapping) else None
-                except json.JSONDecodeError:
-                    input_value = None
-            if expected_value is None:
-                try:
-                    parsed_expected = json.loads(_trim(item.get("expected_json")) or "{}")
-                    expected_value = parsed_expected if isinstance(parsed_expected, Mapping) else None
-                except json.JSONDecodeError:
-                    expected_value = None
             if input_value is None or dict(input_value) == dict(sample_input):
                 return dict(expected_value or {})
         return {}
@@ -1930,22 +1918,8 @@ class CustomToolAgentService:
             value = item.get("input")
             if isinstance(value, Mapping):
                 return dict(value)
-            try:
-                parsed = json.loads(_trim(value) or "{}")
-            except Exception:
-                continue
-            if isinstance(parsed, Mapping):
-                return dict(parsed)
         if isinstance(final.get("sample_input"), Mapping):
             return dict(final.get("sample_input") or {})
-        sample_input_json = _trim(final.get("sample_input_json"))
-        if sample_input_json:
-            try:
-                parsed = json.loads(sample_input_json)
-                if isinstance(parsed, Mapping):
-                    return dict(parsed)
-            except Exception:
-                pass
         tests = final.get("tests") if isinstance(final.get("tests"), list) else []
         for item in tests:
             if isinstance(item, Mapping) and isinstance(item.get("input"), Mapping):
@@ -1958,19 +1932,8 @@ class CustomToolAgentService:
         for index, item in enumerate(final.get("execution_examples") or []):
             if not isinstance(item, Mapping):
                 continue
-            try:
-                input_value = (
-                    dict(item.get("input") or {})
-                    if isinstance(item.get("input"), Mapping)
-                    else json.loads(_trim(item.get("input")) or "{}")
-                )
-                output_value = (
-                    dict(item.get("output") or {})
-                    if isinstance(item.get("output"), Mapping)
-                    else json.loads(_trim(item.get("output")) or "{}")
-                )
-            except Exception:
-                continue
+            input_value = item.get("input")
+            output_value = item.get("output")
             if not isinstance(input_value, Mapping) or not isinstance(output_value, Mapping):
                 continue
             examples.append({

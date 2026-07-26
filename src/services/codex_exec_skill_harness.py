@@ -1367,37 +1367,6 @@ class CodexSdkSkillHarness(CodexExecSkillHarness):
             match = None
         return _trim(match.group(1)) if match else skill_file.parent.name
 
-    @staticmethod
-    def _render_block_schema() -> Dict[str, Any]:
-        return {
-            "type": "array",
-            "items": {
-                "type": "object",
-                "properties": {
-                    "block_id": {"type": "string"},
-                    "block_type": {"type": "string", "enum": ["markdown", "table", "bar_chart", "line_chart", "flowchart", "code", "action"]},
-                    "title": {"type": "string"},
-                    "content": {"type": "string"},
-                    "data_json": {"type": "string"},
-                    "actions": {
-                        "type": "array",
-                        "items": {
-                            "type": "object",
-                            "properties": {
-                                "id": {"type": "string"},
-                                "label": {"type": "string"},
-                                "command": {"type": "string"},
-                            },
-                            "required": ["id", "label", "command"],
-                            "additionalProperties": False,
-                        },
-                    },
-                },
-                "required": ["block_id", "block_type", "title", "content", "data_json", "actions"],
-                "additionalProperties": False,
-            },
-        }
-
     def _sdk_env(self) -> Dict[str, str]:
         if self.auth_mode != "access_token":
             return {}
@@ -1827,22 +1796,6 @@ class CodexCustomToolCoder:
         has_code = bool(_trim(final.get("code"))) or bool(
             modules and any(_trim(item.get("source_code")) for item in modules)
         )
-        sample_input_error = self._execution_example_error(final.get("execution_examples"))
-        if sample_input_error:
-            return {
-                "ok": False,
-                "message": f"实现未完成：{sample_input_error} 当前设计和工作区代码已保留，可以继续修正。",
-                "error": {
-                    "code": "coding_sample_input_invalid",
-                    "summary": sample_input_error,
-                },
-                "events": result.get("events") or [],
-                "raw": result,
-                "agent_runtime": {
-                    **agent_runtime,
-                    "provider_session_id": _trim(result.get("provider_session_id")) or provider_session_id,
-                },
-            }
         return {
             "ok": has_code,
             "message": _trim(final.get("message")) or ("代码已生成。" if has_code else "本次没有生成可执行模块。"),
@@ -1855,20 +1808,6 @@ class CodexCustomToolCoder:
                 "provider_session_id": _trim(result.get("provider_session_id")) or provider_session_id,
             },
         }
-
-    @staticmethod
-    def _execution_example_error(value: Any) -> str:
-        examples = value if isinstance(value, list) else []
-        if not examples or not isinstance(examples[0], Mapping):
-            return "Coding 结果缺少真实执行样例。"
-        try:
-            parsed_input = json.loads(_trim(examples[0].get("input")))
-            parsed_output = json.loads(_trim(examples[0].get("output")))
-        except (TypeError, json.JSONDecodeError):
-            return "执行样例的 input 或 output 不是合法 JSON。"
-        if not isinstance(parsed_input, Mapping) or not isinstance(parsed_output, Mapping):
-            return "执行样例的 input 和 output 必须是 JSON 对象。"
-        return ""
 
     @staticmethod
     def _failure_summary(error_detail: Any, *, failure_kind: Any = "") -> Dict[str, str]:

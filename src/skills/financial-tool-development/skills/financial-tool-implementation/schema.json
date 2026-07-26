@@ -57,10 +57,12 @@
         ],
         "properties": {
           "input": {
-            "type": "string"
+            "type": "object",
+            "additionalProperties": true
           },
           "output": {
-            "type": "string"
+            "type": "object",
+            "additionalProperties": true
           }
         }
       }

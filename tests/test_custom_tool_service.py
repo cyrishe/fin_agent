@@ -120,7 +120,13 @@ class _Coder:
                     "unresolved": [],
                 },
                 "tests": [],
-                "sample_input_json": '{"values":[1,2,3]}',
+                "execution_examples": [{
+                    "input": {"values": [1, 2, 3]},
+                    "output": {
+                        "total": 6,
+                        "key_process_info": {"value_count": 3},
+                    },
+                }],
                 "implementation_notes": [],
                 "issues": [],
             },
@@ -653,8 +659,8 @@ def test_first_coding_turn_gets_editable_module_focused_api_context_and_test_run
     collected = service.collect_coding_result(bundle, {
         "implementation_summary": "读取行情并返回收盘价。",
         "execution_examples": [{
-            "input": "{\"code\":\"600519.SH\"}",
-            "output": "{\"close\":1,\"key_process_info\":{\"sample_count\":1}}",
+            "input": {"code": "600519.SH"},
+            "output": {"close": 1, "key_process_info": {"sample_count": 1}},
         }],
     })
     assert "return {'close': 1}" in collected["implementation"]["modules"][0]["source_code"]
@@ -678,6 +684,26 @@ def test_platform_normalizes_key_process_info_as_required_object() -> None:
     assert key_process["required"] is True
     assert key_process["description"]
     assert [item["name"] for item in fields].count("key_process_info") == 1
+
+
+def test_coding_execution_examples_are_consumed_as_native_values() -> None:
+    native = {
+        "execution_examples": [{
+            "input": {"code": "600519.SH"},
+            "output": {"close": 1},
+        }],
+    }
+    encoded = {
+        "execution_examples": [{
+            "input": '{"code":"600519.SH"}',
+            "output": '{"close":1}',
+        }],
+    }
+
+    assert CustomToolAgentService._sample_input(native) == {"code": "600519.SH"}
+    assert CustomToolAgentService._execution_examples(native)[0]["expected"] == {"close": 1}
+    assert CustomToolAgentService._sample_input(encoded) == {}
+    assert CustomToolAgentService._execution_examples(encoded) == []
 
 
 def test_coding_session_reuses_workspace_and_preserves_partial_source(tmp_path: Path) -> None:
