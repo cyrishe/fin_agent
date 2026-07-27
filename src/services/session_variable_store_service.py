@@ -173,6 +173,26 @@ class SessionVariableStoreService:
             "text": chunk,
         }
 
+    def load_registered_result(
+        self,
+        *,
+        session_id: str,
+        data_ref: str,
+    ) -> dict[str, Any]:
+        """Load the original registered tool result for internal runtime recovery."""
+        expected_session_id = self._safe_id(session_id, prefix="sess")
+        ref_session_id, _ = self.parse_data_ref(data_ref)
+        if not expected_session_id or ref_session_id != expected_session_id:
+            raise ValueError("data_ref does not belong to the current conversation")
+        manifest = self.resolve_data_ref(data_ref)
+        payload_path = self._session_dir(ref_session_id) / str(manifest.get("payload_file") or "")
+        if not payload_path.is_file():
+            raise FileNotFoundError("registered tool result is unavailable")
+        payload = json.loads(payload_path.read_text(encoding="utf-8"))
+        if not isinstance(payload, dict):
+            raise ValueError("registered tool result must be an object")
+        return payload
+
     def format_variables_for_prompt(self, *, session_id: str) -> str:
         rows = self.list_variables(session_id=session_id)
         blocks: list[str] = []
@@ -231,7 +251,17 @@ class SessionVariableStoreService:
                 local_alias=str(finance_result.get("name") or ""),
             )
 
-        data = result.get("data") if isinstance(result.get("data"), Mapping) else {}
+        raw_data = result.get("data")
+        if isinstance(raw_data, list) and all(
+            isinstance(row, Mapping) for row in raw_data
+        ):
+            rows = [dict(row) for row in raw_data]
+            return self._table_payload(
+                columns=self._normalize_columns(None, rows=rows),
+                rows=rows,
+                row_count=len(rows),
+            )
+        data = raw_data if isinstance(raw_data, Mapping) else {}
         table = self._find_table(data)
         if table:
             return table

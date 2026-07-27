@@ -176,6 +176,34 @@ def test_live_client_is_reused_for_followup_turns(tmp_path: Path, monkeypatch) -
         service.close()
 
 
+def test_agent_profile_is_loaded_once_into_the_cc_harness(
+    tmp_path: Path,
+    monkeypatch,
+) -> None:
+    prompt_path = tmp_path / "system.md"
+    prompt_path.write_text("金融专业问答", encoding="utf-8")
+    service = _pooled_service(
+        tmp_path,
+        monkeypatch,
+        system_prompt_path=prompt_path,
+        skill_names=[],
+    )
+    try:
+        service.run_turn(
+            thread_id=7,
+            owner_id="owner-a",
+            user_text="贵州茅台收盘价",
+            context={"_agent_system_prompt": "Investment Analyst 原有角色提示"},
+        )
+
+        options = FakeClaudeClient.instances[0].options
+        assert "金融专业问答" in options.system_prompt
+        assert "Investment Analyst 原有角色提示" in options.system_prompt
+        assert options.skills == []
+    finally:
+        service.close()
+
+
 def test_live_client_pool_isolates_conversations(tmp_path: Path, monkeypatch) -> None:
     service = _pooled_service(tmp_path, monkeypatch, max_live_clients=2)
     try:

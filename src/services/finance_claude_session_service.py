@@ -48,6 +48,13 @@ class FinanceClaudeSessionService:
         max_live_clients: Optional[int] = None,
         turn_runner: Optional[Callable[..., Dict[str, Any]]] = None,
         system_tools: Any = None,
+        system_prompt_path: str | Path | None = None,
+        skill_root: str | Path | None = None,
+        skill_names: Optional[list[str]] = None,
+        runtime_scope_prefix: str = "",
+        max_turns: Optional[int] = None,
+        system_context_paths: Optional[list[str | Path]] = None,
+        effort: str = "",
     ) -> None:
         enabled_text = _trim(os.environ.get("FINANCE_CC_SHADOW_ENABLED")).lower()
         self.enabled = bool(enabled) if enabled is not None else enabled_text in {"1", "true", "yes", "on"}
@@ -55,7 +62,23 @@ class FinanceClaudeSessionService:
         self.model = _trim(model or os.environ.get("FINANCE_CC_MODEL") or "deepseek-v4-flash")
         self.root_dir = Path(root_dir)
         self.log_path = Path(log_path)
-        self.system_prompt_path = Path("src/prompts/finance_cc/main.system.md")
+        self.system_prompt_path = Path(system_prompt_path or "src/prompts/finance_cc/main.system.md")
+        self.skill_root = Path(skill_root or "src/skills/financial-tool-development")
+        self.skill_names = tuple(
+            skill_names
+            if skill_names is not None
+            else [
+                "fin-agent-financial-tools:financial-tool-requirement",
+                "fin-agent-financial-tools:financial-tool-design",
+                "fin-agent-financial-tools:financial-tool-flowchart",
+            ]
+        )
+        self.runtime_scope_prefix = _trim(runtime_scope_prefix)
+        self.max_turns = max(2, int(max_turns)) if max_turns is not None else None
+        self.system_context_paths = tuple(
+            Path(item) for item in (system_context_paths or [])
+        )
+        self.effort = _trim(effort)
         self._turn_runner = turn_runner or self._run_client_turn
         self.system_tools = system_tools
         self._executor = ThreadPoolExecutor(max_workers=max(1, int(max_workers)), thread_name_prefix="finance-cc-shadow")
@@ -139,7 +162,9 @@ class FinanceClaudeSessionService:
             resumed = bool(marker.get("resumable", bool(marker))) and bool(_trim(marker.get("session_id")))
             prompt = self.build_user_prompt(user_text, context or {})
             runtime_tool_context = dict(context or {})
-            runtime_tool_context["_agent_runtime_scope"] = key
+            runtime_tool_context["_agent_runtime_scope"] = (
+                f"{self.runtime_scope_prefix}:{key}" if self.runtime_scope_prefix else key
+            )
             started_at = time.monotonic()
             try:
                 result = self._turn_runner(
@@ -194,6 +219,7 @@ class FinanceClaudeSessionService:
                         dict(item) for item in result.get("result_refs") or [] if isinstance(item, Mapping)
                     ],
                 }
+                record["ok"] = not bool(record["error"])
             except Exception as exc:
                 next_generation = generation + 1
                 marker_path.write_text(
@@ -218,6 +244,7 @@ class FinanceClaudeSessionService:
                     "text_delta_count": 0,
                     "result": "",
                     "error": f"{type(exc).__name__}: {str(exc)[:400]}",
+                    "ok": False,
                 }
             self._append_record(record)
             return record
@@ -408,9 +435,24 @@ class FinanceClaudeSessionService:
     ) -> Dict[str, Any]:
         from claude_agent_sdk import ClaudeAgentOptions, ClaudeSDKClient
 
-        system_prompt = self.system_prompt_path.read_text(encoding="utf-8")
-        effort = _trim(os.environ.get("FINANCE_CC_EFFORT") or "low")
-        max_turns = max(2, int(os.environ.get("FINANCE_CC_MAX_TURNS") or 12))
+        system_prompt_parts = [
+            self.system_prompt_path.read_text(encoding="utf-8").strip()
+        ]
+        for context_path in self.system_context_paths:
+            system_prompt_parts.append(
+                context_path.read_text(encoding="utf-8").strip()
+            )
+        agent_system_prompt = _trim(tool_context.get("_agent_system_prompt"))
+        if agent_system_prompt:
+            system_prompt_parts.append(agent_system_prompt)
+        system_prompt = "\n\n".join(
+            item for item in system_prompt_parts if item
+        )
+        effort = self.effort or _trim(os.environ.get("FINANCE_CC_EFFORT") or "low")
+        max_turns = self.max_turns or max(
+            2,
+            int(os.environ.get("FINANCE_CC_MAX_TURNS") or 12),
+        )
         options_fingerprint = hashlib.sha256(
             "\0".join(
                 [
@@ -419,6 +461,13 @@ class FinanceClaudeSessionService:
                     effort,
                     str(max_turns),
                     "tools" if self.system_tools is not None else "no-tools",
+                    str(self.skill_root),
+                    *self.skill_names,
+                    *[
+                        _trim(item)
+                        for item in tool_context.get("allowed_agent_tools") or []
+                        if _trim(item)
+                    ],
                     system_prompt,
                 ]
             ).encode("utf-8")
@@ -452,9 +501,14 @@ class FinanceClaudeSessionService:
             tracker = self._empty_tracker()
             if self.system_tools is not None:
                 from claude_agent_sdk import create_sdk_mcp_server
-                from src.services.finance_cc_system_tools import FinanceCcToolRuntime
 
-                tool_runtime = FinanceCcToolRuntime()
+                runtime_factory = getattr(self.system_tools, "create_runtime", None)
+                if callable(runtime_factory):
+                    tool_runtime = runtime_factory()
+                else:
+                    from src.services.finance_cc_system_tools import FinanceCcToolRuntime
+
+                    tool_runtime = FinanceCcToolRuntime()
                 tools, allowed_tools, tracker = self.system_tools.build_tools(
                     owner_ids=[owner_id] if owner_id else [],
                     tool_context=tool_context,
@@ -462,10 +516,10 @@ class FinanceClaudeSessionService:
                     runtime=tool_runtime,
                 )
                 mcp_servers["finance"] = create_sdk_mcp_server(name="finance", version="1.0.0", tools=tools)
-            skill_root = Path("src/skills/financial-tool-development").resolve()
+            skill_root = self.skill_root.resolve()
             options = ClaudeAgentOptions(
-                tools=["Skill"],
-                allowed_tools=["Skill", *allowed_tools],
+                tools=["Skill"] if self.skill_names else [],
+                allowed_tools=["Skill", *allowed_tools] if self.skill_names else allowed_tools,
                 disallowed_tools=[
                     "Bash", "Edit", "Write", "Read", "Glob", "Grep", "WebFetch", "WebSearch",
                     "Agent", "Task", "AskUserQuestion", "NotebookEdit",
@@ -475,12 +529,8 @@ class FinanceClaudeSessionService:
                 strict_mcp_config=bool(mcp_servers),
                 permission_mode="dontAsk",
                 setting_sources=[],
-                plugins=[{"type": "local", "path": str(skill_root)}],
-                skills=[
-                    "fin-agent-financial-tools:financial-tool-requirement",
-                    "fin-agent-financial-tools:financial-tool-design",
-                    "fin-agent-financial-tools:financial-tool-flowchart",
-                ],
+                plugins=[{"type": "local", "path": str(skill_root)}] if self.skill_names else [],
+                skills=list(self.skill_names),
                 cwd=str(session_dir),
                 include_partial_messages=True,
                 max_turns=max_turns,
@@ -526,13 +576,13 @@ class FinanceClaudeSessionService:
             "stream_event_count": 0,
             "text_delta_count": 0,
             "client_reused": reused_live_client,
-            "tool_calls": tracker["calls"],
-            "interaction_requests": tracker["interaction_requests"],
-            "artifact_updates": tracker["artifact_updates"],
-            "asset_reads": tracker["asset_reads"],
-            "dynamic_runs": tracker["dynamic_runs"],
-            "implementation_runs": tracker["implementation_runs"],
-            "result_refs": tracker["result_refs"],
+            "tool_calls": tracker.get("calls", []),
+            "interaction_requests": tracker.get("interaction_requests", []),
+            "artifact_updates": tracker.get("artifact_updates", []),
+            "asset_reads": tracker.get("asset_reads", []),
+            "dynamic_runs": tracker.get("dynamic_runs", []),
+            "implementation_runs": tracker.get("implementation_runs", []),
+            "result_refs": tracker.get("result_refs", []),
             "agent_tool_names": [],
             "skill_results": [],
         }
@@ -614,6 +664,8 @@ class FinanceClaudeSessionService:
                             or _trim(getattr(message, "subtype", "")) != "success"
                         )
                         evidence["error"] = evidence["result"] if sdk_failed else ""
+                if not _trim(evidence["result"]) and not _trim(evidence["error"]):
+                    evidence["error"] = "Finance CC completed without a final response"
         except TimeoutError:
             evidence["error"] = f"Finance CC turn timed out after {timeout_seconds}s"
             await self._discard_live_client(session_id, expected=entry)

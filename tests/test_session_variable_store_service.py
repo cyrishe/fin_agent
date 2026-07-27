@@ -73,6 +73,37 @@ def test_runtime_execution_attaches_session_variable_for_table_result(tmp_path: 
     assert store.list_variables(session_id="conv-table")[0]["data_ref"] == "session://conv-table/vars/v1"
 
 
+def test_generic_list_result_is_pageable_as_a_table(tmp_path: Path) -> None:
+    store = SessionVariableStoreService(data_root=tmp_path / "data")
+    rows = [
+        {"title": f"新闻 {index}", "published_at": f"2026-07-{20 + index:02d}"}
+        for index in range(1, 6)
+    ]
+
+    variable = store.register_tool_result(
+        session_id="conv-news",
+        tool_name="financial_news_search",
+        result={"ok": True, "data": rows},
+    )
+    loaded = store.load_data_ref(
+        session_id="conv-news",
+        data_ref=variable["data_ref"],
+        offset=2,
+        limit=2,
+    )
+
+    assert variable["data_type"] == "table"
+    assert variable["row_count"] == 5
+    assert loaded["page"] == {
+        "offset": 2,
+        "limit": 2,
+        "returned": 2,
+        "total": 5,
+        "has_more": True,
+    }
+    assert [row["title"] for row in loaded["rows"]] == ["新闻 3", "新闻 4"]
+
+
 def test_runtime_session_variable_registration_failure_does_not_fail_tool() -> None:
     class FailingStore:
         def register_tool_result(self, **kwargs):  # noqa: ANN001, ANN003 - tiny test double.

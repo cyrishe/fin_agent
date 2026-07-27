@@ -37,6 +37,7 @@ from src.services.custom_tool_service import (
 from src.services.custom_tool_run_trace_service import CustomToolRunTrace
 from src.services.finance_claude_session_service import FinanceClaudeSessionService
 from src.services.finance_cc_system_tools import FinanceCcSystemTools
+from src.scenarios.financial_qa import FinancialQaCcService
 from src.services.conversation_title_service import ConversationTitleService
 from src.services.context_resolution_service import ContextResolutionError
 from src.services.llm_stream_block_service import LlmStreamBlockBuilder
@@ -71,7 +72,12 @@ application_runtime_service = ApplicationRuntimeService()
 application_workbench_service = ApplicationWorkbenchService(
     application_runtime_service=application_runtime_service,
 )
-assistant_dispatch_planner = AssistantDispatchPlanner()
+financial_qa_cc_service = FinancialQaCcService()
+assistant_dispatch_planner = AssistantDispatchPlanner(
+    agent_owned_runtime_names=(
+        {"investment_analyst"} if financial_qa_cc_service.enabled else set()
+    )
+)
 user_session_service = UserSessionService()
 attachment_service = AttachmentService()
 vision_intake_service = VisionIntakeService(attachment_service=attachment_service)
@@ -186,6 +192,8 @@ def _submit_finance_cc_shadow(
 ) -> None:
     shadow_enabled = str(os.environ.get("FINANCE_CC_SHADOW_ENABLED") or "").strip().lower() in {"1", "true", "yes", "on"}
     if not shadow_enabled or not finance_cc_shadow_service.enabled or not str(user_text or "").strip():
+        return
+    if financial_qa_cc_service.accepts(dispatch_plan=dispatch_plan):
         return
     default_agent = application_context.get("default_agent") if isinstance(application_context.get("default_agent"), dict) else {}
     selected_agent = str(dispatch_plan.get("selected_agent") or default_agent.get("agent_name") or "").strip()
@@ -1327,6 +1335,7 @@ def _run_custom_tool_stream_payload(payload: dict, *, emit) -> None:
                     attachments=[],
                     thread_id=thread_id,
                     turn_id=turn_id,
+                    owner_id=owner_id,
                     precomputed_plan=dispatch_plan,
                 )
             else:
@@ -1589,6 +1598,7 @@ def _build_chat_dispatch_payload(
     attachments: list[dict] | None = None,
     thread_id: int | None = None,
     turn_id: int | None = None,
+    owner_id: str = "",
     precomputed_plan: dict | None = None,
 ) -> dict:
     parsed = _parse_chat_command(text)
@@ -1705,6 +1715,28 @@ def _build_chat_dispatch_payload(
                     },
                 ),
             })
+        if financial_qa_cc_service.accepts(
+            dispatch_plan=plan,
+            attachments=attachments,
+        ):
+            result = financial_qa_cc_service.answer(
+                thread_id=thread_id or "",
+                turn_id=turn_id or "",
+                owner_id=owner_id,
+                user_text=raw,
+                dispatch_plan=plan,
+                application_context=application_context,
+            )
+            result = _apply_application_workspace_orchestration(
+                result,
+                application_context,
+            )
+            result["dispatch_plan"] = plan
+            result["thread_context_patch"] = _merge_thread_context_patches(
+                continuity_patch_preview,
+                {},
+            )
+            return _attach_planning_state(result)
         if plan_entry == "skill_refine":
             if not (active_skill_name or active_skill_canonical_name):
                 plan_entry = "agent_route"
@@ -3500,6 +3532,7 @@ def api_chat_dispatch():
                 attachments=attachments,
                 thread_id=thread_id,
                 turn_id=turn_id,
+                owner_id=str(guest_identity.get("user_id") or ""),
             )
         dispatch_plan_payload = result.get("dispatch_plan") if isinstance(result.get("dispatch_plan"), dict) else {}
         _submit_finance_cc_shadow(

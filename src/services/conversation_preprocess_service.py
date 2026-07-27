@@ -27,6 +27,7 @@ class ConversationPreprocessService:
         mainline_contract_service: Optional[ConversationMainlineContractService] = None,
         system_command_service: Optional[SystemCommandService] = None,
         context_resolution_service: Optional[ContextResolutionService] = None,
+        agent_owned_runtime_names: Optional[set[str]] = None,
     ) -> None:
         self.interaction_preprocessor = interaction_preprocessor or AssistantInteractionPreprocessor()
         self.agent_runtime_planner = agent_runtime_planner or execution_plan_service or AgentRuntimePlanner()
@@ -38,6 +39,11 @@ class ConversationPreprocessService:
             prompt_context_compiler=None,
         )
         self.system_command_service = system_command_service or SystemCommandService()
+        self.agent_owned_runtime_names = {
+            self._trim(item)
+            for item in (agent_owned_runtime_names or set())
+            if self._trim(item)
+        }
 
     @staticmethod
     def _trim(value: Any) -> str:
@@ -905,6 +911,11 @@ class ConversationPreprocessService:
             return {}
         if capability_family not in {"business_analysis", "visual_analysis", "visual_followup", "agent_route"}:
             return {}
+        if self._trim(selected_agent) in self.agent_owned_runtime_names:
+            return self.agent_runtime_planner.build_agent_route_plan(
+                target_agent=self._trim(selected_agent),
+                reason="selected_agent_owns_normal_qa_runtime",
+            )
         if self._trim(selected_agent) and self._trim(selected_agent) != self._trim(work_context.get("default_agent")):
             return self.agent_runtime_planner.build_agent_route_plan(
                 target_agent=self._trim(selected_agent),

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Optional, Set
 
 from src.services.conversation_preprocess_service import ConversationPreprocessService
 from src.services.top_level_shortcut_service import TopLevelShortcutService
@@ -12,8 +12,11 @@ class AssistantDispatchPlanner:
         *,
         preprocess_service: Optional[ConversationPreprocessService] = None,
         shortcut_service: Optional[TopLevelShortcutService] = None,
+        agent_owned_runtime_names: Optional[Set[str]] = None,
     ) -> None:
-        self.preprocess_service = preprocess_service or ConversationPreprocessService()
+        self.preprocess_service = preprocess_service or ConversationPreprocessService(
+            agent_owned_runtime_names=agent_owned_runtime_names,
+        )
         self.shortcut_service = shortcut_service or TopLevelShortcutService()
 
     @staticmethod
