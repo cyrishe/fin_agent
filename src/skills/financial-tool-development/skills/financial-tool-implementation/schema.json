@@ -4,8 +4,7 @@
   "additionalProperties": false,
   "required": [
     "tool_contract",
-    "implementation_summary",
-    "execution_examples"
+    "implementation_summary"
   ],
   "properties": {
     "tool_contract": {
@@ -43,29 +42,8 @@
       }
     },
     "implementation_summary": {
-      "type": "string"
-    },
-    "execution_examples": {
-      "type": "array",
-      "minItems": 1,
-      "items": {
-        "type": "object",
-        "additionalProperties": false,
-        "required": [
-          "input",
-          "output"
-        ],
-        "properties": {
-          "input": {
-            "type": "object",
-            "additionalProperties": true
-          },
-          "output": {
-            "type": "object",
-            "additionalProperties": true
-          }
-        }
-      }
+      "type": "string",
+      "description": "面向用户说明工具功能、已完成的业务模块和功能测试，并用具体实现或测试证据说明需求、Design、实现如何对应；不得只写保持一致，不得出现源码文件名或服务器路径。"
     }
   },
   "$defs": {

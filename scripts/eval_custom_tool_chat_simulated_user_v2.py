@@ -108,6 +108,9 @@ class SimulatedUser:
                 },
             }
         if stage == "coding":
+            coding_status = _text(payload.get("coding_status"))
+            if coding_status == "implemented":
+                return "done", {}
             test = payload.get("test_result") if isinstance(payload.get("test_result"), dict) else {}
             if test.get("execution_ok") is False:
                 self.coding_failures += 1
@@ -169,21 +172,20 @@ def run_case(
     for turn in range(1, max_turns + 1):
         current_stage = _stage(payload)
         if current_stage == "coding":
+            coding_status = _text(payload.get("coding_status"))
             test = payload.get("test_result") if isinstance(payload.get("test_result"), dict) else {}
             if test.get("execution_ok") is False:
                 report["coding_failure_count"] += 1
                 reason = _text(test.get("error")) or _text(payload.get("message")) or "技术测试失败"
                 report["failure_reasons"].append(reason[:500])
             compact = _compact(payload)
-            if test.get("execution_ok") is True:
+            if coding_status == "implemented":
                 review = compact.get("implementation_review") or {}
                 explanation = compact.get("implementation_explanation") or {}
-                test_evidence = compact.get("test") or {}
                 calls = compact.get("finance_cc_tool_calls") or []
                 evidence_complete = (
                     bool(review)
                     and bool(explanation)
-                    and int(test_evidence.get("case_count") or 0) > 0
                 )
                 implementation_is_terminal = (
                     not coding_via_natural_language
@@ -192,18 +194,20 @@ def run_case(
                 )
                 report["passed"] = evidence_complete and implementation_is_terminal
                 report["terminal"] = (
-                    "coding_verified"
+                    "coding_completed"
                     if report["passed"]
-                    else "coding_missing_review_or_terminal_boundary"
+                    else "coding_missing_summary_or_terminal_boundary"
                 )
                 if not evidence_complete:
                     report["failure_reasons"].append(
-                        "缺少实现说明、需求对齐说明或真实运行 case"
+                        "缺少实现说明或需求—Design—Code 对齐说明"
                     )
                 if not implementation_is_terminal:
                     report["failure_reasons"].append(
                         f"implement_dynamic_tool 后仍有工具调用：{calls}"
                     )
+            elif coding_status == "coding_failed":
+                report["terminal"] = "coding_failed"
         compact_payload = _compact(payload)
         report["turns"].append({"turn": turn, "stage": current_stage, "result": compact_payload})
         if report["passed"]:

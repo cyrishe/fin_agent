@@ -10,6 +10,7 @@ import DesignArtifact from "./renderers/DesignArtifact";
 import FlowRenderer from "./renderers/FlowRenderer";
 import MetricStrip from "./renderers/MetricStrip";
 import InteractionRenderer from "./renderers/InteractionRenderer";
+import JsonBlock from "./JsonBlock";
 
 const ChartBlock = lazy(() => import("./ChartBlock"));
 const FinanceChart = lazy(() => import("./renderers/FinanceChart"));
@@ -34,6 +35,28 @@ const list = (value: unknown): unknown[] => Array.isArray(value) ? value : [];
 
 function Workflow({ data }: { data: UnknownRecord }) {
   const items = list(data.items).map(record);
+  if (String(data.role || "") === "conversation_progress") {
+    const status = String(data.status || "running");
+    return (
+      <div className={`coding-progress ${status}`}>
+        <div className="coding-progress-head">
+          <span className={status === "running" ? "spinner" : ""}>
+            {status === "completed" ? <CheckCircle2 size={16} /> : status === "error" ? <AlertCircle size={16} /> : null}
+          </span>
+          <strong>{status === "completed" ? "实现与验证已完成" : status === "error" ? "实现遇到问题" : "正在实现工具"}</strong>
+        </div>
+        <div className="coding-progress-list">
+          {items.map((item, index) => {
+            const itemStatus = String(item.status || (index === items.length - 1 ? status : "completed"));
+            return <div className={`coding-progress-item ${itemStatus}`} key={String(item.id || index)}>
+              <span>{itemStatus === "completed" ? <CheckCircle2 size={14} /> : itemStatus === "error" ? <AlertCircle size={14} /> : <span className="pulse-dot" />}</span>
+              <MarkdownContent content={String(item.summary || item.title || "")} />
+            </div>;
+          })}
+        </div>
+      </div>
+    );
+  }
   const currentIndex = items.findIndex((item) => item.status === "running");
   return (
     <div className="workflow-block">
@@ -131,7 +154,18 @@ function Assessment({ data, content }: { data: UnknownRecord; content: string })
       {tests.length > 0 && <div className="assessment-tests">{tests.map((test, index) => {
         const testStatus = String(test.status || "unknown");
         const logs = list(test.logs).map(record);
-        return <article className={testStatus} key={String(test.name || index)}><div><strong>{String(test.name || `样例 ${index + 1}`)}</strong><span>{testStatus}</span></div>{test.summary ? <p>{String(test.summary)}</p> : null}{(test.input || test.actual || logs.length) ? <details><summary>查看输入、结果与关键日志</summary>{test.input ? <div><b>输入</b><pre>{JSON.stringify(test.input, null, 2)}</pre></div> : null}{test.actual ? <div><b>实际结果</b><pre>{JSON.stringify(test.actual, null, 2)}</pre></div> : null}{logs.length ? <div><b>关键日志</b><ul>{logs.map((log, logIndex) => <li key={logIndex}>{String(log.message || JSON.stringify(log))}</li>)}</ul></div> : null}</details> : null}</article>;
+        const actual = record(test.actual);
+        const keyProcessInfo = record(test.key_process_info || actual.key_process_info);
+        const businessResult = Object.fromEntries(Object.entries(actual).filter(([key]) => key !== "key_process_info"));
+        return <article className={testStatus} key={String(test.name || index)}>
+          <div><strong>{String(test.name || `样例 ${index + 1}`)}</strong><span>{testStatus}</span></div>
+          {test.summary ? <p>{String(test.summary)}</p> : null}
+          {Object.keys(keyProcessInfo).length > 0 ? <div className="key-process-info">
+            <b>核心过程信息</b>
+            <div className="key-process-grid">{Object.entries(keyProcessInfo).map(([key, value]) => <div key={key}><span>{key.replaceAll("_", " ")}</span>{value && typeof value === "object" ? <JsonBlock value={value} title="" compact /> : <strong>{String(value ?? "—")}</strong>}</div>)}</div>
+          </div> : null}
+          {(test.input || Object.keys(businessResult).length || logs.length) ? <details><summary>查看测试输入、完整结果与日志</summary>{test.input ? <JsonBlock value={test.input} title="输入" compact /> : null}{Object.keys(businessResult).length ? <JsonBlock value={businessResult} title="业务结果" compact /> : null}{logs.length ? <div><b>关键日志</b><ul>{logs.map((log, logIndex) => <li key={logIndex}>{log.message ? String(log.message) : <JsonBlock value={log} title={`日志 ${logIndex + 1}`} compact />}</li>)}</ul></div> : null}</details> : null}
+        </article>;
       })}</div>}
     </div>
   );
@@ -177,7 +211,7 @@ export default function BlockRenderer(props: Props) {
     const resources = Array.isArray(data.resources) ? data.resources.map(record) : [];
     content = <div className="resource-list">{resources.length ? resources.map((resource, index) => <div key={String(resource.resource_id || index)}><div><strong>{String(resource.title || `资源 ${index + 1}`)}</strong><span>{String(resource.relation || resource.mime_type || "")}</span></div>{resource.uri ? <code>{String(resource.uri)}</code> : null}</div>) : <div className="empty-block">暂无可展示资源</div>}</div>;
   } else if (renderer === "fallback.structured") {
-    content = <pre className="structured-fallback">{JSON.stringify(data, null, 2)}</pre>;
+    content = <JsonBlock value={data} title="结构化数据" />;
   }
 
   const stage = String(block.stage || record(block.data).stage || record(block.meta).stage || "");

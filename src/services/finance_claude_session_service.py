@@ -3,6 +3,7 @@ from __future__ import annotations
 import asyncio
 from concurrent.futures import Future, ThreadPoolExecutor
 from contextlib import contextmanager
+from dataclasses import dataclass
 from datetime import datetime, timezone
 import fcntl
 import hashlib
@@ -21,6 +22,16 @@ def _trim(value: Any) -> str:
     return str(value or "").strip()
 
 
+@dataclass
+class _LiveClaudeClient:
+    client: Any
+    tool_runtime: Any
+    options_fingerprint: str
+    last_used: float
+    busy: bool = False
+    eviction_handle: Any = None
+
+
 class FinanceClaudeSessionService:
     """Run a provider-backed Finance CC conversation without owning routing or DB state."""
 
@@ -33,6 +44,8 @@ class FinanceClaudeSessionService:
         root_dir: str | Path = "data/finance_cc_sessions",
         log_path: str | Path = "outputs/finance_cc_shadow/events.jsonl",
         max_workers: int = 2,
+        client_idle_seconds: Optional[float] = None,
+        max_live_clients: Optional[int] = None,
         turn_runner: Optional[Callable[..., Dict[str, Any]]] = None,
         system_tools: Any = None,
     ) -> None:
@@ -51,6 +64,27 @@ class FinanceClaudeSessionService:
         self._log_lock = threading.Lock()
         self._futures_guard = threading.Lock()
         self._futures: set[Future] = set()
+        self.client_idle_seconds = max(
+            0.05,
+            float(
+                client_idle_seconds
+                if client_idle_seconds is not None
+                else os.environ.get("FINANCE_CC_CLIENT_IDLE_SECONDS") or 300
+            ),
+        )
+        self.max_live_clients = max(
+            1,
+            int(
+                max_live_clients
+                if max_live_clients is not None
+                else os.environ.get("FINANCE_CC_MAX_LIVE_CLIENTS") or max(1, int(max_workers))
+            ),
+        )
+        self._runtime_guard = threading.Lock()
+        self._runtime_ready = threading.Event()
+        self._runtime_loop: Optional[asyncio.AbstractEventLoop] = None
+        self._runtime_thread: Optional[threading.Thread] = None
+        self._live_clients: dict[str, _LiveClaudeClient] = {}
 
     def submit(
         self,
@@ -117,38 +151,27 @@ class FinanceClaudeSessionService:
                     tool_context=runtime_tool_context,
                     event_sink=event_sink,
                 )
-                ok = bool(result.get("ok"))
-                if ok:
-                    marker_path.write_text(
-                        json.dumps(
-                            {"session_id": session_id, "generation": generation, "resumable": True},
-                            ensure_ascii=False,
-                        ),
-                        encoding="utf-8",
-                    )
-                else:
-                    next_generation = generation + 1
-                    marker_path.write_text(
-                        json.dumps(
-                            {
-                                "session_id": self._session_id(key, generation=next_generation),
-                                "generation": next_generation,
-                                "resumable": False,
-                            },
-                            ensure_ascii=False,
-                        ),
-                        encoding="utf-8",
-                    )
+                # The SDK session owns its history. A completed SDK turn remains
+                # resumable even when its textual result reports an error; that
+                # feedback belongs to the next LLM turn rather than a Python
+                # branch which discards the conversation.
+                marker_path.write_text(
+                    json.dumps(
+                        {"session_id": session_id, "generation": generation, "resumable": True},
+                        ensure_ascii=False,
+                    ),
+                    encoding="utf-8",
+                )
                 record = {
                     "timestamp": datetime.now(timezone.utc).isoformat(),
                     "thread_id": str(thread_id),
                     "turn_id": str(turn_id or ""),
                     "session_id": session_id,
                     "resumed": resumed,
-                    "ok": ok,
                     "duration_ms": round((time.monotonic() - started_at) * 1_000),
                     "stream_event_count": int(result.get("stream_event_count") or 0),
                     "text_delta_count": int(result.get("text_delta_count") or 0),
+                    "client_reused": bool(result.get("client_reused")),
                     "result": _trim(result.get("result"))[:2_000],
                     "error": _trim(result.get("error"))[:500],
                     "tool_calls": [dict(item) for item in result.get("tool_calls") or [] if isinstance(item, Mapping)],
@@ -190,7 +213,6 @@ class FinanceClaudeSessionService:
                     "turn_id": str(turn_id or ""),
                     "session_id": session_id,
                     "resumed": resumed,
-                    "ok": False,
                     "duration_ms": round((time.monotonic() - started_at) * 1_000),
                     "stream_event_count": 0,
                     "text_delta_count": 0,
@@ -225,6 +247,128 @@ class FinanceClaudeSessionService:
                 results.append(dict(value))
         return results
 
+    def close(self) -> None:
+        loop = self._runtime_loop
+        thread = self._runtime_thread
+        if loop is not None and loop.is_running():
+            try:
+                future = asyncio.run_coroutine_threadsafe(self._close_live_clients(), loop)
+                future.result(timeout=10)
+            except Exception:
+                pass
+            loop.call_soon_threadsafe(loop.stop)
+        if thread is not None and thread.is_alive() and thread is not threading.current_thread():
+            thread.join(timeout=5)
+        self._executor.shutdown(wait=False, cancel_futures=True)
+
+    def _ensure_runtime_loop(self) -> asyncio.AbstractEventLoop:
+        with self._runtime_guard:
+            if (
+                self._runtime_loop is not None
+                and self._runtime_loop.is_running()
+                and self._runtime_thread is not None
+                and self._runtime_thread.is_alive()
+            ):
+                return self._runtime_loop
+            self._runtime_ready.clear()
+
+            def run_loop() -> None:
+                loop = asyncio.new_event_loop()
+                asyncio.set_event_loop(loop)
+                self._runtime_loop = loop
+                self._runtime_ready.set()
+                loop.run_forever()
+                loop.close()
+
+            self._runtime_thread = threading.Thread(
+                target=run_loop,
+                name="finance-cc-client-runtime",
+                daemon=True,
+            )
+            self._runtime_thread.start()
+        if not self._runtime_ready.wait(timeout=5):
+            raise RuntimeError("Finance CC client runtime did not start")
+        if self._runtime_loop is None:
+            raise RuntimeError("Finance CC client runtime is unavailable")
+        return self._runtime_loop
+
+    @staticmethod
+    def _empty_tracker() -> Dict[str, Any]:
+        return {
+            "calls": [],
+            "interaction_requests": [],
+            "artifact_updates": [],
+            "asset_reads": [],
+            "dynamic_runs": [],
+            "implementation_runs": [],
+            "result_refs": [],
+        }
+
+    async def _make_pool_room(self) -> None:
+        while len(self._live_clients) >= self.max_live_clients:
+            candidates = [
+                (session_id, entry)
+                for session_id, entry in self._live_clients.items()
+                if not entry.busy
+            ]
+            if not candidates:
+                return
+            session_id, entry = min(candidates, key=lambda item: item[1].last_used)
+            await self._discard_live_client(session_id, expected=entry)
+
+    async def _discard_live_client(
+        self,
+        session_id: str,
+        *,
+        expected: Optional[_LiveClaudeClient] = None,
+    ) -> None:
+        entry = self._live_clients.get(session_id)
+        if entry is None or (expected is not None and entry is not expected):
+            return
+        self._live_clients.pop(session_id, None)
+        if entry.eviction_handle is not None:
+            entry.eviction_handle.cancel()
+            entry.eviction_handle = None
+        try:
+            await asyncio.wait_for(entry.client.disconnect(), timeout=5)
+        except Exception:
+            pass
+
+    def _schedule_idle_eviction(self, session_id: str, entry: _LiveClaudeClient) -> None:
+        expected_last_used = entry.last_used
+        loop = asyncio.get_running_loop()
+
+        def expire() -> None:
+            asyncio.create_task(
+                self._expire_idle_client(
+                    session_id,
+                    entry=entry,
+                    expected_last_used=expected_last_used,
+                )
+            )
+
+        entry.eviction_handle = loop.call_later(self.client_idle_seconds, expire)
+
+    async def _expire_idle_client(
+        self,
+        session_id: str,
+        *,
+        entry: _LiveClaudeClient,
+        expected_last_used: float,
+    ) -> None:
+        current = self._live_clients.get(session_id)
+        if (
+            current is not entry
+            or current.busy
+            or current.last_used != expected_last_used
+        ):
+            return
+        await self._discard_live_client(session_id, expected=entry)
+
+    async def _close_live_clients(self) -> None:
+        for session_id, entry in list(self._live_clients.items()):
+            await self._discard_live_client(session_id, expected=entry)
+
     def _run_client_turn(
         self,
         *,
@@ -236,7 +380,8 @@ class FinanceClaudeSessionService:
         tool_context: Mapping[str, Any],
         event_sink: Optional[Callable[[Dict[str, Any]], None]],
     ) -> Dict[str, Any]:
-        return asyncio.run(
+        loop = self._ensure_runtime_loop()
+        future = asyncio.run_coroutine_threadsafe(
             self._run_client_turn_async(
                 prompt=prompt,
                 session_id=session_id,
@@ -245,8 +390,10 @@ class FinanceClaudeSessionService:
                 owner_id=owner_id,
                 tool_context=tool_context,
                 event_sink=event_sink,
-            )
+            ),
+            loop,
         )
+        return future.result()
 
     async def _run_client_turn_async(
         self,
@@ -261,77 +408,124 @@ class FinanceClaudeSessionService:
     ) -> Dict[str, Any]:
         from claude_agent_sdk import ClaudeAgentOptions, ClaudeSDKClient
 
-        provider_env = ClaudeSdkSkillHarness(
-            provider=self.provider,
-            model=self.model,
-            query_impl=lambda **_: None,
-        ).provider_env()
-        provider_env.update(
-            {
-                "CLAUDE_CONFIG_DIR": str(session_dir / "claude"),
-                "CLAUDE_CODE_DISABLE_AUTO_MEMORY": "1",
-                "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "1",
-                "CLAUDE_CODE_SUBPROCESS_ENV_SCRUB": "1",
-            }
-        )
-        if not provider_env.get("ANTHROPIC_AUTH_TOKEN") and not provider_env.get("ANTHROPIC_API_KEY"):
-            raise RuntimeError(f"missing credential for Finance CC provider {self.provider}")
         system_prompt = self.system_prompt_path.read_text(encoding="utf-8")
-        mcp_servers: dict[str, Any] = {}
-        allowed_tools: list[str] = []
-        tracker: Dict[str, Any] = {
-            "calls": [],
-            "interaction_requests": [],
-            "artifact_updates": [],
-            "asset_reads": [],
-            "dynamic_runs": [],
-            "implementation_runs": [],
-            "result_refs": [],
-        }
-        if self.system_tools is not None:
-            from claude_agent_sdk import create_sdk_mcp_server
-
-            tools, allowed_tools, tracker = self.system_tools.build_tools(
-                owner_ids=[owner_id] if owner_id else [],
-                tool_context=tool_context,
-                event_sink=event_sink,
+        effort = _trim(os.environ.get("FINANCE_CC_EFFORT") or "low")
+        max_turns = max(2, int(os.environ.get("FINANCE_CC_MAX_TURNS") or 12))
+        options_fingerprint = hashlib.sha256(
+            "\0".join(
+                [
+                    self.provider,
+                    self.model,
+                    effort,
+                    str(max_turns),
+                    "tools" if self.system_tools is not None else "no-tools",
+                    system_prompt,
+                ]
+            ).encode("utf-8")
+        ).hexdigest()
+        entry = self._live_clients.get(session_id)
+        if entry is not None and entry.options_fingerprint != options_fingerprint:
+            await self._discard_live_client(session_id, expected=entry)
+            entry = None
+            resume = True
+        reused_live_client = entry is not None
+        if entry is None:
+            await self._make_pool_room()
+            provider_env = ClaudeSdkSkillHarness(
+                provider=self.provider,
+                model=self.model,
+                query_impl=lambda **_: None,
+            ).provider_env()
+            provider_env.update(
+                {
+                    "CLAUDE_CONFIG_DIR": str(session_dir / "claude"),
+                    "CLAUDE_CODE_DISABLE_AUTO_MEMORY": "1",
+                    "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "1",
+                    "CLAUDE_CODE_SUBPROCESS_ENV_SCRUB": "1",
+                }
             )
-            mcp_servers["finance"] = create_sdk_mcp_server(name="finance", version="1.0.0", tools=tools)
-        skill_root = Path("src/skills/financial-tool-development").resolve()
-        skill_names = [
-            "fin-agent-financial-tools:financial-tool-requirement",
-            "fin-agent-financial-tools:financial-tool-design",
-            "fin-agent-financial-tools:financial-tool-flowchart",
-        ]
-        options = ClaudeAgentOptions(
-            tools=["Skill"],
-            allowed_tools=["Skill", *allowed_tools],
-            disallowed_tools=[
-                "Bash", "Edit", "Write", "Read", "Glob", "Grep", "WebFetch", "WebSearch",
-                "Agent", "Task", "AskUserQuestion", "NotebookEdit",
-            ],
-            system_prompt=system_prompt,
-            mcp_servers=mcp_servers,
-            strict_mcp_config=bool(mcp_servers),
-            permission_mode="dontAsk",
-            setting_sources=[],
-            plugins=[{"type": "local", "path": str(skill_root)}],
-            skills=skill_names,
-            cwd=str(session_dir),
-            include_partial_messages=True,
-            max_turns=max(2, int(os.environ.get("FINANCE_CC_MAX_TURNS") or 12)),
-            model=self.model,
-            effort=_trim(os.environ.get("FINANCE_CC_EFFORT") or "low"),
-            resume=session_id if resume else None,
-            session_id=None if resume else session_id,
-            env=provider_env,
-        )
+            if not provider_env.get("ANTHROPIC_AUTH_TOKEN") and not provider_env.get("ANTHROPIC_API_KEY"):
+                raise RuntimeError(f"missing credential for Finance CC provider {self.provider}")
+            mcp_servers: dict[str, Any] = {}
+            allowed_tools: list[str] = []
+            tool_runtime = None
+            tracker = self._empty_tracker()
+            if self.system_tools is not None:
+                from claude_agent_sdk import create_sdk_mcp_server
+                from src.services.finance_cc_system_tools import FinanceCcToolRuntime
+
+                tool_runtime = FinanceCcToolRuntime()
+                tools, allowed_tools, tracker = self.system_tools.build_tools(
+                    owner_ids=[owner_id] if owner_id else [],
+                    tool_context=tool_context,
+                    event_sink=event_sink,
+                    runtime=tool_runtime,
+                )
+                mcp_servers["finance"] = create_sdk_mcp_server(name="finance", version="1.0.0", tools=tools)
+            skill_root = Path("src/skills/financial-tool-development").resolve()
+            options = ClaudeAgentOptions(
+                tools=["Skill"],
+                allowed_tools=["Skill", *allowed_tools],
+                disallowed_tools=[
+                    "Bash", "Edit", "Write", "Read", "Glob", "Grep", "WebFetch", "WebSearch",
+                    "Agent", "Task", "AskUserQuestion", "NotebookEdit",
+                ],
+                system_prompt=system_prompt,
+                mcp_servers=mcp_servers,
+                strict_mcp_config=bool(mcp_servers),
+                permission_mode="dontAsk",
+                setting_sources=[],
+                plugins=[{"type": "local", "path": str(skill_root)}],
+                skills=[
+                    "fin-agent-financial-tools:financial-tool-requirement",
+                    "fin-agent-financial-tools:financial-tool-design",
+                    "fin-agent-financial-tools:financial-tool-flowchart",
+                ],
+                cwd=str(session_dir),
+                include_partial_messages=True,
+                max_turns=max_turns,
+                model=self.model,
+                effort=effort,
+                resume=session_id if resume else None,
+                session_id=None if resume else session_id,
+                env=provider_env,
+            )
+            client = ClaudeSDKClient(options=options)
+            try:
+                await client.connect()
+            except Exception:
+                try:
+                    await client.disconnect()
+                except Exception:
+                    pass
+                raise
+            entry = _LiveClaudeClient(
+                client=client,
+                tool_runtime=tool_runtime,
+                options_fingerprint=options_fingerprint,
+                last_used=time.monotonic(),
+            )
+            self._live_clients[session_id] = entry
+        else:
+            tracker = (
+                entry.tool_runtime.begin_turn(
+                    owner_ids=[owner_id] if owner_id else [],
+                    tool_context=tool_context,
+                    event_sink=event_sink,
+                )
+                if entry.tool_runtime is not None
+                else self._empty_tracker()
+            )
+        if entry.eviction_handle is not None:
+            entry.eviction_handle.cancel()
+            entry.eviction_handle = None
+        entry.busy = True
         evidence: Dict[str, Any] = {
-            "ok": False,
             "result": "",
             "error": "ClaudeSDKClient stream ended without ResultMessage",
             "stream_event_count": 0,
             "text_delta_count": 0,
+            "client_reused": reused_live_client,
             "tool_calls": tracker["calls"],
             "interaction_requests": tracker["interaction_requests"],
             "artifact_updates": tracker["artifact_updates"],
@@ -356,81 +550,89 @@ class FinanceClaudeSessionService:
         timeout_seconds = max(30, int(os.environ.get(timeout_env) or timeout_default))
         try:
             async with asyncio.timeout(timeout_seconds):
-                async with ClaudeSDKClient(options=options) as client:
-                    await client.query(prompt)
-                    async for message in client.receive_response():
-                        class_name = type(message).__name__
-                        if class_name == "StreamEvent":
-                            evidence["stream_event_count"] += 1
-                            event = getattr(message, "event", None)
-                            event = event if isinstance(event, dict) else {}
-                            if event.get("type") == "content_block_delta":
-                                delta = event.get("delta") if isinstance(event.get("delta"), dict) else {}
-                                if delta.get("type") == "text_delta" and delta.get("text"):
-                                    evidence["text_delta_count"] += 1
-                                    now = time.monotonic()
-                                    if now - last_progress_at >= 0.8:
-                                        last_progress_at = now
-                                        self._send_event(
-                                            event_sink,
-                                            {
-                                                "source": "claude",
-                                                "type": "reasoning_summary_delta",
-                                                "content": "Finance CC is working",
-                                                "metadata": {"stage": active_stage},
-                                            },
-                                        )
-                        if class_name == "AssistantMessage":
-                            for block in getattr(message, "content", None) or []:
-                                if type(block).__name__ == "ToolUseBlock":
-                                    name = _trim(getattr(block, "name", ""))
-                                    tool_input = getattr(block, "input", None)
-                                    tool_input = tool_input if isinstance(tool_input, Mapping) else {}
-                                    active_stage = self._stage_for_tool(name, tool_input)
-                                    tool_use_id = _trim(getattr(block, "id", ""))
-                                    if tool_use_id and name:
-                                        tool_names_by_id[tool_use_id] = name
-                                    if name and name not in evidence["agent_tool_names"]:
-                                        evidence["agent_tool_names"].append(name)
+                await entry.client.query(prompt)
+                async for message in entry.client.receive_response():
+                    class_name = type(message).__name__
+                    if class_name == "StreamEvent":
+                        evidence["stream_event_count"] += 1
+                        event = getattr(message, "event", None)
+                        event = event if isinstance(event, dict) else {}
+                        if event.get("type") == "content_block_delta":
+                            delta = event.get("delta") if isinstance(event.get("delta"), dict) else {}
+                            if delta.get("type") == "text_delta" and delta.get("text"):
+                                evidence["text_delta_count"] += 1
+                                now = time.monotonic()
+                                if now - last_progress_at >= 0.8:
+                                    last_progress_at = now
                                     self._send_event(
                                         event_sink,
                                         {
                                             "source": "claude",
-                                            "type": "tool_call",
-                                            "content": name or "Finance CC tool",
-                                            "metadata": {"stage": active_stage, "tool": name},
+                                            "type": "reasoning_summary_delta",
+                                            "content": "Finance CC is working",
+                                            "metadata": {"stage": active_stage},
                                         },
                                     )
-                        if class_name == "UserMessage":
-                            for block in getattr(message, "content", None) or []:
-                                if type(block).__name__ != "ToolResultBlock":
-                                    continue
-                                tool_name = tool_names_by_id.get(_trim(getattr(block, "tool_use_id", "")), "")
-                                if tool_name != "Skill":
-                                    continue
-                                content = getattr(block, "content", "")
-                                if isinstance(content, list):
-                                    content = json.dumps(content, ensure_ascii=False, default=str)
-                                skill_result = _trim(content)
-                                if skill_result:
-                                    evidence["skill_results"].append(skill_result[:5_000])
-                        if class_name == "ResultMessage":
-                            evidence["ok"] = (
-                                not bool(getattr(message, "is_error", False))
-                                and _trim(getattr(message, "subtype", "")) == "success"
-                            )
-                            evidence["result"] = _trim(getattr(message, "result", ""))
-                            evidence["error"] = "" if evidence["ok"] else evidence["result"]
+                    if class_name == "AssistantMessage":
+                        for block in getattr(message, "content", None) or []:
+                            if type(block).__name__ == "ToolUseBlock":
+                                name = _trim(getattr(block, "name", ""))
+                                tool_input = getattr(block, "input", None)
+                                tool_input = tool_input if isinstance(tool_input, Mapping) else {}
+                                active_stage = self._stage_for_tool(name, tool_input)
+                                tool_use_id = _trim(getattr(block, "id", ""))
+                                if tool_use_id and name:
+                                    tool_names_by_id[tool_use_id] = name
+                                if name and name not in evidence["agent_tool_names"]:
+                                    evidence["agent_tool_names"].append(name)
+                                self._send_event(
+                                    event_sink,
+                                    {
+                                        "source": "claude",
+                                        "type": "tool_call",
+                                        "content": name or "Finance CC tool",
+                                        "metadata": {"stage": active_stage, "tool": name},
+                                    },
+                                )
+                    if class_name == "UserMessage":
+                        for block in getattr(message, "content", None) or []:
+                            if type(block).__name__ != "ToolResultBlock":
+                                continue
+                            tool_name = tool_names_by_id.get(_trim(getattr(block, "tool_use_id", "")), "")
+                            if tool_name != "Skill":
+                                continue
+                            content = getattr(block, "content", "")
+                            if isinstance(content, list):
+                                content = json.dumps(content, ensure_ascii=False, default=str)
+                            skill_result = _trim(content)
+                            if skill_result:
+                                evidence["skill_results"].append(skill_result[:5_000])
+                    if class_name == "ResultMessage":
+                        evidence["result"] = _trim(getattr(message, "result", ""))
+                        sdk_failed = (
+                            bool(getattr(message, "is_error", False))
+                            or _trim(getattr(message, "subtype", "")) != "success"
+                        )
+                        evidence["error"] = evidence["result"] if sdk_failed else ""
         except TimeoutError:
-            evidence["ok"] = False
             evidence["error"] = f"Finance CC turn timed out after {timeout_seconds}s"
+            await self._discard_live_client(session_id, expected=entry)
+        except Exception:
+            await self._discard_live_client(session_id, expected=entry)
+            raise
+        finally:
+            entry.busy = False
+            entry.last_used = time.monotonic()
+            if self._live_clients.get(session_id) is entry:
+                self._schedule_idle_eviction(session_id, entry)
+        has_transport_error = bool(_trim(evidence["error"]))
         self._send_event(
             event_sink,
             {
                 "source": "claude",
-                "type": "stage_result" if evidence["ok"] else "error",
-                "content": "Finance CC completed" if evidence["ok"] else evidence["error"],
-                "metadata": {"stage": active_stage, "ok": evidence["ok"]},
+                "type": "error" if has_transport_error else "stage_result",
+                "content": evidence["error"] if has_transport_error else "Finance CC completed",
+                "metadata": {"stage": active_stage},
             },
         )
         return evidence

@@ -1,6 +1,6 @@
 import asyncio
 
-from src.services.finance_cc_system_tools import FinanceCcSystemTools
+from src.services.finance_cc_system_tools import FinanceCcSystemTools, FinanceCcToolRuntime
 from src.services.session_variable_store_service import SessionVariableStoreService
 
 
@@ -125,9 +125,72 @@ def test_finance_cc_repeated_implementation_uses_adapter_owned_session(tmp_path)
     assert received_sessions[0]["session_id"] == received_sessions[1]["session_id"]
     assert received_sessions[1]["provider_session_id"] == "codex-provider-session"
     assert "agent_runtime" not in tracker["implementation_runs"][-1]["state"]
+    assert adapter.read(
+        scope_id="owner-a/thread-7",
+        role="tool_implementation",
+    )["provider_session_id"] == "codex-provider-session"
+    assert adapter.read(
+        scope_id="owner-a/thread-7",
+        role="tool_implementation:demo_tool",
+    ) == {}
 
 
-def test_finance_cc_runner_exception_is_terminal_for_the_turn() -> None:
+def test_long_lived_tool_runtime_refreshes_turn_state_and_event_sink(tmp_path) -> None:
+    from src.services.agent_providers.runtime_context import AgentRuntimeContextAdapter
+
+    calls = []
+    first_events = []
+    second_events = []
+
+    def implementation_runner(**kwargs):
+        calls.append(kwargs)
+        kwargs["event_sink"]({"type": "coding_progress", "content": kwargs["state"]["tool_name"]})
+        return {
+            "message": "done",
+            "state": dict(kwargs["state"]),
+            "tool": {"manifest": {"tool_name": kwargs["state"]["tool_name"]}},
+        }
+
+    service = FinanceCcSystemTools(
+        custom_tool_store=FakeStore(),
+        custom_tool_runtime=FakeDynamicRuntime(),
+        finance_runtime=FakeFinanceRuntime(),
+        finance_catalog=FakeFinanceCatalog(),
+        implementation_runner=implementation_runner,
+        runtime_context_adapter=AgentRuntimeContextAdapter(tmp_path),
+    )
+    runtime = FinanceCcToolRuntime()
+    tools, _, first_tracker = service.build_tools(
+        owner_ids=["owner-1"],
+        tool_context={
+            "_agent_runtime_scope": "owner-a/thread-7",
+            "custom_tool_state": {"tool_name": "first_name", "design_contract": {"document": "v1"}},
+        },
+        event_sink=first_events.append,
+        runtime=runtime,
+    )
+    tools = {item.name: item for item in tools}
+    asyncio.run(tools["implement_dynamic_tool"].handler({"instruction": "first"}))
+
+    second_tracker = runtime.begin_turn(
+        owner_ids=["owner-1"],
+        tool_context={
+            "_agent_runtime_scope": "owner-a/thread-7",
+            "custom_tool_state": {"tool_name": "renamed_tool", "design_contract": {"document": "v2"}},
+        },
+        event_sink=second_events.append,
+    )
+    asyncio.run(tools["implement_dynamic_tool"].handler({"instruction": "second"}))
+
+    assert calls[0]["state"]["tool_name"] == "first_name"
+    assert calls[1]["state"]["tool_name"] == "renamed_tool"
+    assert first_events[-1]["content"] == "first_name"
+    assert second_events[-1]["content"] == "renamed_tool"
+    assert len(first_tracker["implementation_runs"]) == 1
+    assert len(second_tracker["implementation_runs"]) == 1
+
+
+def test_finance_cc_runner_exception_is_recorded_as_feedback_for_the_turn() -> None:
     calls = []
 
     def implementation_runner(**kwargs):
@@ -142,8 +205,8 @@ def test_finance_cc_runner_exception_is_terminal_for_the_turn() -> None:
         tools["implement_dynamic_tool"].handler({"instruction": "不要重复实现"})
     )
 
-    assert first.get("isError") is True
-    assert second.get("isError") is True
+    assert "isError" not in first
+    assert "isError" not in second
     assert len(calls) == 1
     assert len(tracker["implementation_runs"]) == 1
     assert "implementation_runtime_error" in first["content"][0]["text"]
@@ -200,7 +263,8 @@ def test_finance_cc_artifact_save_validates_existing_protocol() -> None:
     )
 
     assert valid.get("isError") is not True
-    assert invalid.get("isError") is True
+    assert "isError" not in invalid
+    assert "artifact validation failed" in invalid["content"][0]["text"]
     assert tracker["artifact_updates"] == [{"artifact_type": "requirement", "payload": payload}]
 
 
@@ -252,12 +316,12 @@ def test_finance_cc_implementation_tool_delegates_saved_state_to_codex_runner() 
     assert result.get("isError") is not True
     assert calls[0]["owner_id"] == "owner-1"
     assert calls[0]["state"]["design_contract"]["tool_name"] == "demo_tool"
-    assert tracker["implementation_runs"][0]["test_result"]["result_ref"]
+    assert tracker["implementation_runs"][0]["test_result"]["execution_ok"] is True
     assert result.get("isError") is not True
     assert "business_ok" not in result["content"][0]["text"]
     assert "gate_passed" not in result["content"][0]["text"]
-    assert '"tool_name": "demo_tool"' in result["content"][0]["text"]
-    assert '"revision": 1' in result["content"][0]["text"]
+    assert "tool_name" not in result["content"][0]["text"]
+    assert "revision" not in result["content"][0]["text"]
     assert "代码和样例技术测试已完成" in result["content"][0]["text"]
     assert "code" not in tracker["implementation_runs"][0]["tool"]
 
@@ -353,8 +417,9 @@ def test_finance_cc_implementation_does_not_report_success_without_an_implementa
         )
     )
 
-    assert result.get("isError") is True
-    assert tracker["implementation_runs"][0]["ok"] is False
+    assert "isError" not in result
+    assert "当前设计稿为空" in result["content"][0]["text"]
+    assert not tracker["implementation_runs"][0]["tool"]
 
 
 def test_finance_cc_execution_results_are_compact_and_loadable_by_conversation(tmp_path) -> None:
@@ -407,7 +472,8 @@ def test_finance_cc_execution_results_are_compact_and_loadable_by_conversation(t
             {"result_ref": result_ref}
         )
     )
-    assert denied.get("isError") is True
+    assert "isError" not in denied
+    assert "does not belong to the current conversation" in denied["content"][0]["text"]
 
 
 def test_finance_cc_saved_implementation_is_success_even_when_smoke_test_failed() -> None:
@@ -437,12 +503,13 @@ def test_finance_cc_saved_implementation_is_success_even_when_smoke_test_failed(
     )
 
     assert result.get("isError") is not True
-    assert tracker["implementation_runs"][0]["ok"] is True
-    assert '"execution_ok": false' in result["content"][0]["text"]
-    assert '"tool_name": "demo_tool"' in result["content"][0]["text"]
+    assert tracker["implementation_runs"][0]["coding_status"] == "implemented"
+    assert tracker["implementation_runs"][0]["test_result"]["execution_ok"] is False
+    assert "execution_ok" not in result["content"][0]["text"]
+    assert "tool_name" not in result["content"][0]["text"]
 
 
-def test_finance_cc_has_no_tool_capability_after_codex_implementation() -> None:
+def test_finance_cc_can_read_or_run_assets_after_codex_implementation() -> None:
     def implementation_runner(**kwargs):
         return {
             "message": "实现、验证和静态检查已完成。",
@@ -468,17 +535,19 @@ def test_finance_cc_has_no_tool_capability_after_codex_implementation() -> None:
         tools["implement_dynamic_tool"].handler({"instruction": "实现当前设计"})
     )
     assert implemented.get("isError") is not True
-    assert "implementation_review" in implemented["content"][0]["text"]
-    assert "implementation_explanation" in implemented["content"][0]["text"]
+    assert "implementation_review" not in implemented["content"][0]["text"]
+    assert "implementation_explanation" not in implemented["content"][0]["text"]
 
-    blocked_calls = [
+    followup_calls = [
         asyncio.run(tools["implement_dynamic_tool"].handler({"instruction": "再检查一次"})),
         asyncio.run(tools["read_finance_asset"].handler({"asset_type": "code"})),
         asyncio.run(tools["run_dynamic_tool"].handler({"tool_name": "demo_tool", "arguments": {}})),
         asyncio.run(tools["finance_query"].handler({"request": "r1 = stock.quote(...)"})),
     ]
 
-    assert all(item.get("isError") is True for item in blocked_calls)
-    assert all("implementation_turn_complete" in item["content"][0]["text"] for item in blocked_calls)
+    assert "implementation_turn_complete" in followup_calls[0]["content"][0]["text"]
+    assert "def run" in followup_calls[1]["content"][0]["text"]
+    assert "arguments" in followup_calls[2]["content"][0]["text"]
+    assert "close" in followup_calls[3]["content"][0]["text"]
     assert len(tracker["implementation_runs"]) == 1
-    assert not tracker["dynamic_runs"]
+    assert len(tracker["dynamic_runs"]) == 1

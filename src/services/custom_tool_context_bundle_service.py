@@ -73,13 +73,22 @@ class CustomToolContextBundleService:
             context=raw_context,
         )
         coding_module_records = list(coding_workspace.pop("_module_records", []))
+        # The model receives the current requirement in the prompt.  Keep the
+        # task file as an asset index instead of copying the same business text
+        # into a second context channel.  Design and implementation facts are
+        # already addressable through their referenced files.
+        task_context = {
+            key: value
+            for key, value in prompt_context.items()
+            if key not in {"requirement_brief", "current_implementation"}
+        }
         self._write_private(
             bundle_dir / "task.json",
             {
                 "stage": stage_name,
                 "run_id": _trim(run_id),
                 "user_request": user_request,
-                "context": prompt_context,
+                "context": task_context,
             },
         )
         public_bundle = {
@@ -187,6 +196,7 @@ class CustomToolContextBundleService:
                     "custom_tool_sdk": "custom_tool_sdk.md",
                     "coding_guide": "CODING_WORKSPACE.md",
                     "module_template": "DYNAMIC_TOOL_TEMPLATE.py",
+                    "coding_evidence": "scratch/test_evidence.json",
                 })
             elif self.stock_universe_path.is_file():
                 stock_universe = bundle_dir / "test_data" / "stock_universe.tsv"
@@ -242,6 +252,37 @@ class CustomToolContextBundleService:
             if _trim(module.get("source_code")):
                 result["code"] = _trim(module.get("source_code"))
                 break
+        evidence_path = bundle_dir / "scratch" / "test_evidence.json"
+        try:
+            evidence = json.loads(evidence_path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            evidence = {}
+        if isinstance(evidence, Mapping):
+            normalized_cases = []
+            raw_cases = evidence.get("cases") if isinstance(evidence.get("cases"), list) else [evidence]
+            for item in raw_cases:
+                if not isinstance(item, Mapping) or not isinstance(item.get("input"), Mapping):
+                    continue
+                actual = next(
+                    (
+                        item.get(key)
+                        for key in ("actual", "raw_output", "raw_tool_output", "output")
+                        if isinstance(item.get(key), Mapping)
+                    ),
+                    None,
+                )
+                if not isinstance(actual, Mapping):
+                    continue
+                normalized_cases.append({
+                    "input": dict(item["input"]),
+                    "actual": dict(actual),
+                    "status": _trim(item.get("status") or evidence.get("result") or "passed"),
+                })
+            if normalized_cases:
+                result["coding_test_evidence"] = {
+                    "cases": normalized_cases,
+                    "summary": _trim(evidence.get("result")),
+                }
         return result
 
     def public_bundle(self, bundle: Mapping[str, Any]) -> Dict[str, Any]:
@@ -607,6 +648,10 @@ class CustomToolContextBundleService:
         self._restrict_directory(scratch_dir)
         self._restrict_directory(dev_runtime_dir)
         self._write_private(
+            scratch_dir / "test_evidence.json",
+            {"input": {}, "actual": {}},
+        )
+        self._write_private(
             dev_runtime_dir / "custom_tool_sdk.py",
             '''"""Local test double for isolated Coding checks only."""
 
@@ -733,6 +778,7 @@ def run(inputs: dict) -> dict:
 - Edit only the module paths listed in `CONTEXT.current_implementation.module_files`.
 - On a first implementation, read `DYNAMIC_TOOL_TEMPLATE.py`; it is a reference, not an editable module.
 - Put temporary focused tests under `scratch/`; they are never persisted as user assets.
+- After a representative focused test, write its exact input and raw tool output to `scratch/test_evidence.json`; the system persists that evidence separately.
 - Python interpreter: `{interpreter}`. Use this exact interpreter instead of `python` or the system `python3`.
 - For compilation use `{compile_command("<module>")}`.
 - For focused tests use `{focused_test_command("<test-or-script>")}` so `custom_tool_sdk` is available.

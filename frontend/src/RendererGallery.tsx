@@ -25,6 +25,17 @@ const intraday = Array.from({ length: 48 }, (_, index) => ({
 
 const blocks: SurfaceBlock[] = [
   {
+    block_id: "gallery-coding-progress", block_type: "workflow", title: "实现进展", stage: "coding",
+    data: {
+      role: "conversation_progress", status: "running", summary: "金叉判断已完成，正在运行代表性样例。",
+      items: [
+        { id: "update_1", summary: "已确认使用完整交易日日线计算 MA5 与 MA20。", status: "completed" },
+        { id: "update_2", summary: "金叉窗口判断已完成，已覆盖 30 日和 60 日两种观察范围。", status: "completed" },
+        { id: "update_3", summary: "正在运行代表性样例并记录均线值与信号日期。", status: "running" },
+      ],
+    },
+  },
+  {
     block_id: "gallery-design", block_type: "artifact", kind: "artifact", title: "近30/60日金叉判断",
     semantic: "finance.tool_spec", payload: {
       artifact_type: "finance.tool_spec", lifecycle: "reviewable", revision: 2,

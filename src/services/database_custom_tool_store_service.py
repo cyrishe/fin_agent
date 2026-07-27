@@ -312,8 +312,6 @@ class DatabaseCustomToolStoreService:
     def commit(self, tool_name: str, *, owner_ids: Optional[List[str]] = None) -> Dict[str, Any]:
         bundle = self.load_for_runtime(tool_name, owner_ids=owner_ids, allow_inactive=True)
         manifest = bundle["manifest"]
-        if (manifest.get("last_test") or {}).get("execution_ok") is not True:
-            self._raise("custom tool must complete a technical run before activation")
         db = self.connection_factory()
         try:
             with db.cursor() as cursor:

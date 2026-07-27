@@ -60,6 +60,7 @@ def _compact(payload: dict[str, Any]) -> dict[str, Any]:
         "has_design": isinstance(state.get("design_contract"), dict) and bool(state.get("design_contract")),
         "design_revision": state.get("design_revision"),
         "implementation_revision": state.get("implementation_revision"),
+        "coding_status": _text(payload.get("coding_status")),
         "dispatch_entry": _text(plan.get("entry")),
         "turn_action": _text(turn.get("action")),
         "surface_blocks": _surface_ids(payload),
@@ -90,6 +91,7 @@ class ChatE2E:
         self.base_url = base_url.rstrip("/")
         self.timeout = timeout
         self.session = requests.Session()
+        self.session.trust_env = False
         self.thread_id: int | None = None
 
     def dispatch(self, text: str) -> dict[str, Any]:
@@ -107,15 +109,47 @@ class ChatE2E:
         self._remember_thread(payload)
         return payload
 
-    def interaction(self, response_payload: dict[str, Any]) -> dict[str, Any]:
+    @staticmethod
+    def _available_interaction(response_payload: dict[str, Any]) -> dict[str, Any]:
+        for block in response_payload.get("surface_blocks") or []:
+            if not isinstance(block, dict):
+                continue
+            data = block.get("data") if isinstance(block.get("data"), dict) else {}
+            interaction_id = _text(data.get("interaction_id"))
+            for action in data.get("actions") or []:
+                if not isinstance(action, dict) or not _text(action.get("action_id")):
+                    continue
+                return {
+                    "interaction_id": interaction_id,
+                    "action_id": _text(action.get("action_id")),
+                    "action": _text(action.get("intent")) or "accept",
+                    "expected_revision": action.get("expected_revision"),
+                    "label": _text(action.get("label")) or "确认当前内容",
+                }
+        return {}
+
+    def interaction(
+        self,
+        response_payload: dict[str, Any],
+        interaction_response: dict[str, Any] | None = None,
+    ) -> dict[str, Any]:
         state = _state(response_payload)
-        interaction_response = {
-            "interaction_id": "custom_tool.design_review",
-            "action_id": "custom_tool.confirm_design",
-            "action": "accept",
-            "expected_revision": int(state.get("design_revision") or 1),
-            "label": "确认设计并开始实现",
-        }
+        live_interaction = self._available_interaction(response_payload)
+        requested = dict(interaction_response or {})
+        if live_interaction:
+            interaction_response = live_interaction
+        elif state.get("design_contract"):
+            interaction_response = {
+                "interaction_id": "custom_tool.design_review",
+                "action_id": "custom_tool.confirm_design",
+                "action": "accept",
+                "expected_revision": int(state.get("design_revision") or 1),
+                "label": "确认设计并开始实现",
+            }
+        elif requested:
+            interaction_response = requested
+        else:
+            raise RuntimeError("当前响应没有可提交的交互动作")
         started = self.session.post(
             f"{self.base_url}/api/custom_tool/stream/start",
             json={
@@ -264,16 +298,26 @@ def run(
             if state:
                 last_custom_payload = payload
             test = payload.get("test_result") if isinstance(payload.get("test_result"), dict) else {}
+            coding_status = _text(payload.get("coding_status"))
             auto_repairs = test.get("auto_repair_attempts")
             if isinstance(auto_repairs, int) and auto_repairs > 0:
                 report["terminal"] = "coding_internal_auto_repair"
                 report["final"] = _compact(payload)
                 report["error"] = "Coding 测试曾失败并触发了系统自动修复；按测试约定终止该条。"
                 break
-            if test.get("execution_ok") is True and not pending:
+            if coding_status == "implemented" and not pending:
                 report["passed"] = True
-                report["terminal"] = "coding_test_passed"
+                report["terminal"] = "coding_completed"
                 report["final"] = _compact(payload)
+                break
+            if coding_status == "coding_failed":
+                report["terminal"] = "coding_failed"
+                report["final"] = _compact(payload)
+                report["error"] = (
+                    _text((payload.get("coding_error") or {}).get("summary"))
+                    or _text(payload.get("message"))
+                    or "Coding 未完成"
+                )
                 break
             if test and test.get("execution_ok") is False:
                 report["terminal"] = "coding_test_failed"
@@ -287,7 +331,14 @@ def run(
                 started = time.perf_counter()
                 try:
                     if action == "button_confirm":
-                        payload = client.interaction(payload)
+                        payload = client.interaction(
+                            payload,
+                            interaction_response=(
+                                dict(followup.get("interaction") or {})
+                                if isinstance(followup.get("interaction"), dict)
+                                else None
+                            ),
+                        )
                     else:
                         payload = client.dispatch(input_text)
                     report["turns"].append({

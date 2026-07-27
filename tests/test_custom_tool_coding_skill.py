@@ -19,7 +19,6 @@ def test_coding_skill_contract_keeps_only_runtime_contract_and_natural_language_
     assert set(properties) == {
         "tool_contract",
         "implementation_summary",
-        "execution_examples",
     }
     assert properties["implementation_summary"]["type"] == "string"
     assert "implementation" not in properties
@@ -65,11 +64,10 @@ def test_coding_skill_defines_dynamic_module_instead_of_user_file() -> None:
     assert "`code`" in contract_text
 
 
-def test_coding_schema_keeps_execution_values_as_native_objects() -> None:
+def test_coding_schema_does_not_require_display_only_execution_examples() -> None:
     schema = json.loads((IMPLEMENTATION_DIR / "schema.json").read_text(encoding="utf-8"))
-    example = schema["properties"]["execution_examples"]["items"]["properties"]
-    assert example["input"] == {"type": "object", "additionalProperties": True}
-    assert example["output"] == {"type": "object", "additionalProperties": True}
+    assert "execution_examples" not in schema["properties"]
+    assert "execution_examples" not in schema["required"]
 
 
 def test_coding_skill_sample_matches_schema() -> None:
@@ -97,10 +95,6 @@ def test_coding_skill_sample_matches_schema() -> None:
             }],
         },
         "implementation_summary": "读取数字数组，由 run 调用求和函数并返回 total。",
-        "execution_examples": [{
-            "input": {"values": [1, 2]},
-            "output": {"total": 3, "key_process_info": {"value_count": 2}},
-        }],
     }
 
     fastjsonschema.compile(json.loads((IMPLEMENTATION_DIR / "schema.json").read_text(encoding="utf-8")))(payload)

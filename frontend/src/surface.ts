@@ -10,6 +10,7 @@ export function isProcessBlock(block: SurfaceBlock): boolean {
   const type = String(block.block_type || "");
   const id = String(block.block_id || "");
   const role = String(asRecord(block.data).role || "");
+  if (role === "conversation_progress") return false;
   return type === "status" || role === "process" || role === "live_progress" ||
     id.includes("_thinking") || id.includes("_assistant") || id.includes("_tool_output");
 }

@@ -207,7 +207,7 @@ def test_finance_cc_keeps_valid_artifact_when_turn_ends_with_runtime_error(monke
         turn_id=25,
     )
 
-    assert result["error"] == "max turns reached"
+    assert result["diagnostic_warning"] == "max turns reached"
     assert result["state"]["requirement_brief"] == "从A股中筛选股票并返回股票列表。"
     assert "requirement" in result["message"]
     assert "notice" not in result["state"]

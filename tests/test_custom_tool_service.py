@@ -227,6 +227,97 @@ def test_design_confirmation_runs_codex_output_and_keeps_only_asset_facts(tmp_pa
     assert activated["tool"]["manifest"]["status"] == "active"
 
 
+def test_missing_execution_examples_never_blocks_or_retries_coding(tmp_path: Path) -> None:
+    class _CoderWithoutExamples(_Coder):
+        def code(self, design, *, requirement_text="", context=None, event_sink=None):
+            result = super().code(
+                design,
+                requirement_text=requirement_text,
+                context=context,
+                event_sink=event_sink,
+            )
+            result["final"].pop("execution_examples", None)
+            return result
+
+    store = CustomToolStoreService(root_dir=str(tmp_path / "tools"), backend="filesystem")
+    coder = _CoderWithoutExamples()
+    service = CustomToolAgentService(
+        store=store,
+        coder=coder,
+        runtime=_runtime(store, tmp_path),
+        use_codex=False,
+    )
+    state = {
+        "owner_id": "user_a",
+        "requirement_text": "创建求和工具",
+        "design_contract": _Designer().design("")["design"],
+    }
+
+    implemented = service.implement_dynamic_tool(
+        state=state,
+        owner_id="user_a",
+        instruction="实现当前设计",
+    )
+
+    assert implemented["coding_status"] == "implemented"
+    assert "test_result" not in implemented
+    assert implemented["coding_tests"] == []
+    assert len(coder.contexts) == 1
+    assert store.load("sum_values")["manifest"]["status"] == "draft"
+    activated = service.continue_flow_action(
+        "custom_tool.activate_draft",
+        state=implemented["state"],
+        expected_revision=implemented["state"]["implementation_revision"],
+        owner_id="user_a",
+    )
+    assert activated["tool"]["manifest"]["status"] == "active"
+
+
+def test_coding_harness_evidence_is_saved_without_changing_final_schema(tmp_path: Path) -> None:
+    class _CoderWithHarnessEvidence(_Coder):
+        def code(self, design, *, requirement_text="", context=None, event_sink=None):
+            result = super().code(
+                design,
+                requirement_text=requirement_text,
+                context=context,
+                event_sink=event_sink,
+            )
+            result["final"].pop("execution_examples", None)
+            result["events"] = [{
+                "source": "harness",
+                "type": "tool_result",
+                "content": (
+                    'ok\nCUSTOM_TOOL_TEST_EVIDENCE={"input":{"values":[1,2,3]},'
+                    '"actual":{"total":6,"key_process_info":{"value_count":3}}}'
+                ),
+            }]
+            return result
+
+    store = CustomToolStoreService(root_dir=str(tmp_path / "tools"), backend="filesystem")
+    service = CustomToolAgentService(
+        store=store,
+        coder=_CoderWithHarnessEvidence(),
+        runtime=_runtime(store, tmp_path),
+        use_codex=False,
+    )
+    implemented = service.implement_dynamic_tool(
+        state={
+            "owner_id": "user_a",
+            "requirement_text": "创建求和工具",
+            "design_contract": _Designer().design("")["design"],
+        },
+        owner_id="user_a",
+        instruction="实现当前设计",
+    )
+
+    assert implemented["coding_status"] == "implemented"
+    assert implemented["test_result"]["evidence_source"] == "coding_harness"
+    assert implemented["test_result"]["cases"][0]["input"] == {"values": [1, 2, 3]}
+    assert implemented["test_result"]["cases"][0]["actual"]["key_process_info"] == {
+        "value_count": 3,
+    }
+
+
 def test_coding_contract_builds_runtime_schema_from_natural_language_design(tmp_path: Path) -> None:
     store = CustomToolStoreService(root_dir=str(tmp_path / "tools"), backend="filesystem")
     service = CustomToolAgentService(store=store, use_codex=False)
@@ -642,7 +733,9 @@ def test_first_coding_turn_gets_editable_module_focused_api_context_and_test_run
     assert "PYTHONPYCACHEPREFIX=scratch/pycache" in coding_guide
     assert "from test_support import load_module, install_rows" in coding_guide
     assert "Read `api_catalog/CODING_GUIDE.md` first" in coding_guide
+    assert "scratch/test_evidence.json" in coding_guide
     assert Path(bundle["bundle_dir"], "scratch").is_dir()
+    assert bundle["coding_evidence"] == "scratch/test_evidence.json"
     sdk_doc = Path(bundle["bundle_dir"], "custom_tool_sdk.md").read_text(encoding="utf-8")
     assert 'filter = "code = 600519.SH and tradedate <= 2026-07-23"' in sdk_doc
     assert "Values inside it are bare protocol literals" in sdk_doc
@@ -656,6 +749,19 @@ def test_first_coding_turn_gets_editable_module_focused_api_context_and_test_run
         "def run(inputs):\n    return {'close': 1}\n",
         encoding="utf-8",
     )
+    Path(bundle["bundle_dir"], bundle["coding_evidence"]).write_text(
+        json.dumps({
+            "result": "passed",
+            "cases": [{
+                "input": {"code": "600519.SH"},
+                "raw_output": {
+                    "close": 1,
+                    "key_process_info": {"sample_count": 1},
+                },
+            }],
+        }),
+        encoding="utf-8",
+    )
     collected = service.collect_coding_result(bundle, {
         "implementation_summary": "读取行情并返回收盘价。",
         "execution_examples": [{
@@ -666,6 +772,26 @@ def test_first_coding_turn_gets_editable_module_focused_api_context_and_test_run
     assert "return {'close': 1}" in collected["implementation"]["modules"][0]["source_code"]
     assert "return {'close': 1}" in collected["code"]
     assert collected["implementation_summary"] == "读取行情并返回收盘价。"
+    assert collected["coding_test_evidence"]["cases"][0]["actual"]["key_process_info"] == {
+        "sample_count": 1,
+    }
+
+    Path(bundle["bundle_dir"], bundle["coding_evidence"]).write_text(
+        json.dumps({
+            "test": "代表性功能测试",
+            "input": {"code": "600519.SH"},
+            "raw_tool_output": {
+                "close": 2,
+                "key_process_info": {"sample_count": 2},
+            },
+        }),
+        encoding="utf-8",
+    )
+    collected_alias = service.collect_coding_result(bundle, {})
+    assert collected_alias["coding_test_evidence"]["cases"][0]["actual"] == {
+        "close": 2,
+        "key_process_info": {"sample_count": 2},
+    }
 
 
 def test_platform_normalizes_key_process_info_as_required_object() -> None:
@@ -686,7 +812,7 @@ def test_platform_normalizes_key_process_info_as_required_object() -> None:
     assert [item["name"] for item in fields].count("key_process_info") == 1
 
 
-def test_coding_execution_examples_are_consumed_as_native_values() -> None:
+def test_coding_execution_examples_are_best_effort_display_data() -> None:
     native = {
         "execution_examples": [{
             "input": {"code": "600519.SH"},
@@ -704,6 +830,9 @@ def test_coding_execution_examples_are_consumed_as_native_values() -> None:
     assert CustomToolAgentService._execution_examples(native)[0]["expected"] == {"close": 1}
     assert CustomToolAgentService._sample_input(encoded) == {}
     assert CustomToolAgentService._execution_examples(encoded) == []
+    assert CustomToolAgentService._sample_input({"execution_examples": "{broken"}) == {}
+    assert CustomToolAgentService._execution_examples({"execution_examples": "{broken"}) == []
+    assert CustomToolAgentService._execution_examples({}) == []
 
 
 def test_coding_session_reuses_workspace_and_preserves_partial_source(tmp_path: Path) -> None:

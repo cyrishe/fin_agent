@@ -117,7 +117,6 @@ def test_implementation_and_test_keep_technical_facts_separate_from_user_judgeme
     assert set(implementation["properties"]) == {
         "tool_contract",
         "implementation_summary",
-        "execution_examples",
     }
     assert implementation["properties"]["implementation_summary"]["type"] == "string"
     assert set(test_plan["required"]) == {"summary", "next_action", "assessment", "cases", "presentation"}

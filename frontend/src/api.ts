@@ -46,23 +46,11 @@ export async function loadThread(threadId: number): Promise<ThreadDetail> {
 }
 
 export async function loadInvocationAssets(): Promise<InvocationAsset[]> {
-  const loadCatalog = async (path: string) => {
-    const controller = new AbortController();
-    const timeout = window.setTimeout(() => controller.abort(), 2000);
-    try {
-      return await readJson<{ items?: UnknownRecord[] }>(await fetch(path, {
-        credentials: "include",
-        signal: controller.signal,
-      }));
-    } finally {
-      window.clearTimeout(timeout);
-    }
-  };
   const [tools, skills] = await Promise.all([
-    loadCatalog("/api/tools/catalog"),
-    loadCatalog("/api/skills/catalog").catch(() => ({ items: [] })),
+    loadInvocationTools(),
+    loadInvocationSkills().catch(() => []),
   ]);
-  return mapInvocationAssets(tools.items, skills.items);
+  return [...tools, ...skills];
 }
 
 function mapInvocationAssets(toolItems: UnknownRecord[] = [], skillItems: UnknownRecord[] = []): InvocationAsset[] {

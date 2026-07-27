@@ -1,3 +1,5 @@
+import json
+
 from src.services.llm_stream_block_service import LlmStreamBlockBuilder
 
 
@@ -313,9 +315,10 @@ def test_high_frequency_sdk_deltas_only_emit_complete_semantic_units() -> None:
     summary = builder.event_to_blocks({"source": "codex", "type": "reasoning_summary_delta", "content": "正在核对金融口径"})
     assert len(summary) == 1
     assert summary[0]["block_type"] == "status"
-    assert summary[0]["block_id"] == "design_live_progress"
-    assert summary[0]["data"]["role"] == "live_progress"
-    assert "正在核对金融口径" not in str(summary[0])
+    assert summary[0]["block_id"] == "design_reasoning_summary_delta"
+    assert summary[0]["data"]["role"] == "process"
+    assert summary[0]["data"]["format"] == "markdown"
+    assert summary[0]["content"] == "正在核对金融口径"
 
 
 def test_failed_stage_result_is_not_rendered_as_completed() -> None:
@@ -484,9 +487,7 @@ def test_coding_context_and_codex_commentary_become_module_progress() -> None:
             ],
         },
     })
-    assert [block["block_id"] for block in blocks] == ["coding_live_progress", "coding_module_progress"]
-    assert "stock.quote" in blocks[1]["data"]["summary"]
-    assert len(blocks[1]["data"]["items"]) == 2
+    assert [block["block_id"] for block in blocks] == ["coding_live_progress"]
 
     builder.event_to_blocks({
         "source": "codex",
@@ -504,6 +505,7 @@ def test_coding_context_and_codex_commentary_become_module_progress() -> None:
         "metadata": {"stage": "coding", "item": {"id": "progress_1", "phase": "commentary"}},
     })
     assert update[0]["block_id"] == "coding_module_progress"
+    assert update[0]["data"]["role"] == "conversation_progress"
     assert update[0]["data"]["summary"] == "数据读取函数已经完成，并通过两组聚焦样例。"
     assert "raw" not in str(update[0])
 
@@ -520,7 +522,8 @@ def test_coding_context_and_codex_commentary_become_module_progress() -> None:
             },
         },
     })
-    assert api_progress[0]["data"]["summary"] == "正在核对设计所需的数据接口和字段。"
+    assert api_progress[0]["data"]["summary"] == "正在定位所需的数据接口与运行约定。"
+    assert api_progress[0]["data"]["role"] == "process"
 
     write_progress = builder.event_to_blocks({
         "source": "codex",
@@ -528,7 +531,7 @@ def test_coding_context_and_codex_commentary_become_module_progress() -> None:
         "content": "item/started",
         "metadata": {"stage": "coding", "item": {"id": "edit_1", "type": "fileChange"}},
     })
-    assert write_progress[0]["data"]["summary"] == "核心模块已经写入，正在进行聚焦验证。"
+    assert write_progress[0]["data"]["summary"] == "正在写入本轮工具实现。"
 
     test_progress = builder.event_to_blocks({
         "source": "codex",
@@ -543,4 +546,101 @@ def test_coding_context_and_codex_commentary_become_module_progress() -> None:
             },
         },
     })
-    assert test_progress[0]["data"]["summary"] == "正在运行模块编译和聚焦样例测试。"
+    assert test_progress[0]["data"]["summary"] == "正在检查动态模块能否加载并运行。"
+
+
+def test_coding_progress_extracts_human_summary_from_structured_commentary() -> None:
+    builder = LlmStreamBlockBuilder(run_id="run_coding_structured_progress")
+
+    update = builder.event_to_blocks({
+        "source": "codex",
+        "type": "item_completed",
+        "content": json.dumps({
+            "tool_contract": {"tool_name": "golden_cross"},
+            "implementation_summary": "金叉窗口判断已完成，正在接入日线行情。",
+        }, ensure_ascii=False),
+        "metadata": {"stage": "coding", "item": {"id": "progress_1", "phase": "commentary"}},
+    })
+
+    assert update[0]["data"]["summary"] == "金叉窗口判断已完成，正在接入日线行情。"
+    assert "tool_contract" not in str(update[0])
+
+
+def test_structured_commentary_streams_only_the_human_summary_into_main_conversation() -> None:
+    builder = LlmStreamBlockBuilder(run_id="run_coding_commentary_stream")
+    builder.event_to_blocks({
+        "source": "codex",
+        "type": "event",
+        "content": "item/started",
+        "metadata": {
+            "stage": "coding",
+            "item": {"id": "progress_1", "type": "agentMessage", "phase": "commentary"},
+        },
+    })
+
+    first = builder.event_to_blocks({
+        "source": "codex",
+        "type": "agent_delta",
+        "content": '{"tool_contract":{"tool_name":"golden_cross"},"implementation_summary":"正在实现均线',
+        "metadata": {"stage": "coding", "item_id": "progress_1"},
+    })
+    second = builder.event_to_blocks({
+        "source": "codex",
+        "type": "agent_delta",
+        "content": '计算模块。"}',
+        "metadata": {"stage": "coding", "item_id": "progress_1"},
+    })
+
+    assert first[0]["block_id"] == "coding_module_progress"
+    assert first[0]["data"]["items"][-1]["summary"] == "正在实现均线"
+    assert first[0]["data"]["streaming"] is True
+    assert second[0]["data"]["items"][-1]["summary"] == "正在实现均线计算模块。"
+    assert second[0]["data"]["items"][-1]["status"] == "completed"
+    assert "tool_contract" not in str(first + second)
+
+
+def test_requirement_and_design_documents_stream_as_markdown_and_reuse_final_block_ids() -> None:
+    requirement_builder = LlmStreamBlockBuilder(run_id="run_requirement_stream")
+    requirement = requirement_builder.event_to_blocks({
+        "source": "claude",
+        "type": "agent_delta",
+        "content": '{"requirement_brief":"## 目标\\n识别近期金叉',
+        "metadata": {"stage": "requirement"},
+    })
+    assert requirement[0]["block_id"] == "requirement_final_summary"
+    assert requirement[0]["content"] == "## 目标\n识别近期金叉"
+    assert requirement[0]["data"]["provisional"] is True
+
+    design_builder = LlmStreamBlockBuilder(run_id="run_design_stream")
+    design = design_builder.event_to_blocks({
+        "source": "claude",
+        "type": "agent_delta",
+        "content": '{"document":"## 处理流程\\n1. 读取行情\\n2. 计算均线"}',
+        "metadata": {"stage": "design"},
+    })
+    assert design[0]["block_id"] == "design_artifact"
+    assert design[0]["content"].startswith("## 处理流程")
+    assert design[0]["data"]["format"] == "markdown"
+    assert design[0]["data"]["provisional"] is False
+
+
+def test_json_command_output_is_kept_as_structured_process_data() -> None:
+    builder = LlmStreamBlockBuilder(run_id="run_structured_output")
+
+    first = builder.event_to_blocks({
+        "source": "tool",
+        "type": "command_output",
+        "content": '{"ok":true,',
+        "metadata": {"stage": "coding"},
+    })
+    complete = builder.event_to_blocks({
+        "source": "tool",
+        "type": "command_output",
+        "content": '"count":2}',
+        "metadata": {"stage": "coding"},
+    })
+
+    assert first == []
+    assert complete[0]["data"]["format"] == "json"
+    assert complete[0]["data"]["value"] == {"ok": True, "count": 2}
+    assert complete[0]["data"]["role"] == "process"

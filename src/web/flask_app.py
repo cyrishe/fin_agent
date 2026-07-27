@@ -3,6 +3,7 @@ import datetime as dt
 import json
 import os
 import queue
+import re
 import threading
 import time
 import uuid
@@ -711,6 +712,34 @@ def _sse_payload(payload: dict) -> str:
     return f"data: {json.dumps(_to_json_safe(payload), ensure_ascii=False)}\n\n"
 
 
+def _user_facing_implementation_summary(value: object) -> str:
+    text = str(value or "").strip()
+    text = re.sub(r"\[[^\]]+\.py\]\([^)]*\)", "核心实现模块", text)
+    text = re.sub(r"(?:/Volumes|/Users|/private|/tmp)/\S+", "内部实现模块", text)
+    text = re.sub(r"\b\d+_[A-Za-z0-9_.-]+\.py\b", "核心实现模块", text)
+    return text
+
+
+def _schema_fields_for_display(schema: object) -> list[dict]:
+    if not isinstance(schema, dict):
+        return []
+    properties = schema.get("properties") if isinstance(schema.get("properties"), dict) else {}
+    required = {
+        str(item)
+        for item in (schema.get("required") if isinstance(schema.get("required"), list) else [])
+    }
+    return [
+        {
+            "name": str(name),
+            "type": str(spec.get("type") or ""),
+            "required": str(name) in required,
+            "description": str(spec.get("description") or ""),
+        }
+        for name, spec in properties.items()
+        if isinstance(spec, dict)
+    ]
+
+
 def _custom_tool_result_blocks(result: dict, builder: LlmStreamBlockBuilder) -> list[dict]:
     blocks: list[dict] = []
     seen: set[str] = set()
@@ -860,7 +889,9 @@ def _custom_tool_result_blocks(result: dict, builder: LlmStreamBlockBuilder) -> 
         if isinstance(result.get("implementation_review"), dict)
         else {}
     )
-    implementation_summary = str(implementation_explanation.get("summary") or "").strip()
+    implementation_summary = _user_facing_implementation_summary(
+        implementation_explanation.get("summary")
+    )
     alignment_summary = str(
         implementation_review.get("summary")
         or implementation_review.get("conclusion")
@@ -909,26 +940,22 @@ def _custom_tool_result_blocks(result: dict, builder: LlmStreamBlockBuilder) -> 
             ),
         ])
     if manifest:
-        if implementation_summary:
-            _add_many([builder.make_block(
-                block_id="custom_tool_implementation_summary",
-                block_type="narrative",
-                mode="replace",
-                title="实现说明",
-                content=implementation_summary,
-                stage="coding",
-            )])
-        if alignment_summary:
-            _add_many([builder.make_block(
-                block_id="custom_tool_implementation_alignment",
-                block_type="narrative",
-                mode="replace",
-                title="需求与代码对齐",
-                content=alignment_summary,
-                stage="coding",
-            )])
         storage = tool.get("storage") if isinstance(tool.get("storage"), dict) else {}
         is_active = str(manifest.get("status") or "").strip() == "active"
+        input_fields = _schema_fields_for_display(tool.get("input_schema"))
+        output_fields = _schema_fields_for_display(tool.get("output_schema"))
+        logical_modules = [
+            {
+                "name": str(item.get("title") or item.get("name") or item.get("module_id") or ""),
+                "description": str(item.get("description") or item.get("responsibility") or item.get("role") or ""),
+            }
+            for item in (tool.get("modules") or [])
+            if isinstance(item, dict)
+            and (
+                str(item.get("module_id") or "").strip().lower() not in {"", "main"}
+                or str(item.get("role") or item.get("responsibility") or "").strip()
+            )
+        ]
         _add_many([builder.make_block(
             block_id="custom_tool_draft_summary",
             block_type="artifact",
@@ -940,24 +967,36 @@ def _custom_tool_result_blocks(result: dict, builder: LlmStreamBlockBuilder) -> 
                 "version": str(manifest.get("current_revision") or "0.1"),
                 "summary": str(manifest.get("description") or "").strip(),
                 "items": [
-                    {"label": "工具标识", "value": manifest.get("tool_name")},
                     {"label": "当前状态", "value": "已启用" if is_active else "待确认"},
-                    {"label": "加载方式", "value": "数据库动态加载" if storage.get("kind") == "database_code_module" else "动态加载"},
+                    {"label": "版本", "value": manifest.get("current_revision") or "0.1"},
+                    {"label": "运行方式", "value": "动态加载" if storage else "动态执行"},
                 ],
                 "details": {
-                    "modules": [
-                        {
-                            "module_id": str(item.get("module_id") or ""),
-                            "role": str(item.get("role") or ""),
-                            "entrypoint": str(item.get("entrypoint") or "run"),
-                        }
-                        for item in (tool.get("modules") or [])
-                        if isinstance(item, dict)
-                    ]
+                    "inputs": input_fields,
+                    "outputs": output_fields,
+                    "modules": logical_modules,
                 },
             },
             stage="coding",
         )])
+        if implementation_summary:
+            _add_many([builder.make_block(
+                block_id="custom_tool_implementation_summary",
+                block_type="narrative",
+                mode="replace",
+                title="实现与验证说明",
+                content=implementation_summary,
+                stage="coding",
+            )])
+        if alignment_summary and alignment_summary != implementation_summary:
+            _add_many([builder.make_block(
+                block_id="custom_tool_implementation_alignment",
+                block_type="narrative",
+                mode="replace",
+                title="需求、设计与实现对照",
+                content=alignment_summary,
+                stage="coding",
+            )])
         if test_result:
             cases = [item for item in test_result.get("cases") or [] if isinstance(item, dict)]
             execution_ok = test_result.get("execution_ok") is True
@@ -979,6 +1018,12 @@ def _custom_tool_result_blocks(result: dict, builder: LlmStreamBlockBuilder) -> 
                                 "input": item.get("input") if isinstance(item.get("input"), dict) else {},
                                 "expected": item.get("expected") if isinstance(item.get("expected"), dict) else {},
                                 "actual": item.get("actual") if isinstance(item.get("actual"), dict) else {},
+                                "key_process_info": (
+                                    item.get("actual", {}).get("key_process_info")
+                                    if isinstance(item.get("actual"), dict)
+                                    and isinstance(item.get("actual", {}).get("key_process_info"), dict)
+                                    else {}
+                                ),
                                 "logs": [dict(log) for log in (item.get("logs") or []) if isinstance(log, dict)],
                             }
                             for item in cases
@@ -987,40 +1032,40 @@ def _custom_tool_result_blocks(result: dict, builder: LlmStreamBlockBuilder) -> 
                 },
                 stage="coding",
             )])
-            if execution_ok and not is_active:
-                revision = int(manifest.get("current_revision") or 0)
-                _add_many([builder.make_block(
-                    block_id="custom_tool_coding_review",
-                    block_type="interaction",
-                    mode="replace",
-                    title="确认实现",
-                    content="测试已通过。确认后启用当前版本；如果结果不符合预期，直接在对话中说明修改点。",
-                    data={
-                        "interaction_id": "custom_tool.coding_review",
-                        "intent": "confirm",
-                        "submission_mode": "action",
-                        "prompt": "是否启用这个动态工具版本？",
-                        "subject_ref": str(manifest.get("tool_name") or ""),
-                        "subject_revision": revision,
-                        "actions": [
-                            {
-                                "action_id": "custom_tool.activate_draft",
-                                "label": "确认并启用",
-                                "intent": "accept",
-                                "style": "primary",
-                                "expected_revision": revision,
-                            },
-                            {
-                                "action_id": "custom_tool.revise_implementation",
-                                "label": "继续修改",
-                                "intent": "edit",
-                                "style": "default",
-                                "expected_revision": revision,
-                            },
-                        ],
-                    },
-                    stage="coding",
-                )])
+        if not is_active and coding_status == "implemented":
+            revision = int(manifest.get("current_revision") or 0)
+            _add_many([builder.make_block(
+                block_id="custom_tool_coding_review",
+                block_type="interaction",
+                mode="replace",
+                title="确认实现",
+                content="实现和 Coding 检查结果已保存。确认后启用当前版本；如果不符合预期，直接说明修改点。",
+                data={
+                    "interaction_id": "custom_tool.coding_review",
+                    "intent": "confirm",
+                    "submission_mode": "action",
+                    "prompt": "是否启用这个动态工具版本？",
+                    "subject_ref": str(manifest.get("tool_name") or ""),
+                    "subject_revision": revision,
+                    "actions": [
+                        {
+                            "action_id": "custom_tool.activate_draft",
+                            "label": "确认并启用",
+                            "intent": "accept",
+                            "style": "primary",
+                            "expected_revision": revision,
+                        },
+                        {
+                            "action_id": "custom_tool.revise_implementation",
+                            "label": "继续修改",
+                            "intent": "edit",
+                            "style": "default",
+                            "expected_revision": revision,
+                        },
+                    ],
+                },
+                stage="coding",
+            )])
     work_positions = [
         tool_turn_actions.index(action)
         for action in ("design", "coding")
@@ -1204,14 +1249,25 @@ def _run_custom_tool_stream_payload(payload: dict, *, emit) -> None:
                     event_sink=event_sink,
                 )
             elif shortcut_handler == "custom_tool.action" and action_id == "custom_tool.confirm_design":
-                result = custom_tool_agent_service.continue_flow_action(
-                    action_id,
-                    state=active_state,
-                    expected_revision=expected_revision,
-                    owner_id=owner_id,
-                    turn_id=turn_id,
-                    event_sink=event_sink,
-                )
+                if isinstance(active_state.get("design_contract"), dict) and active_state.get("design_contract"):
+                    result = custom_tool_agent_service.continue_flow_action(
+                        action_id,
+                        state=active_state,
+                        expected_revision=expected_revision,
+                        owner_id=owner_id,
+                        turn_id=turn_id,
+                        event_sink=event_sink,
+                    )
+                else:
+                    result = custom_tool_agent_service.handle_turn(
+                        "我确认当前需求理解，请继续形成设计方案。",
+                        state=active_state,
+                        ui_action=interaction_response,
+                        owner_id=owner_id,
+                        thread_id=thread_id,
+                        turn_id=turn_id,
+                        event_sink=event_sink,
+                    )
             elif shortcut_handler == "custom_tool.action" and custom_tool_agent_service.finance_cc_enabled:
                 result = custom_tool_agent_service.handle_turn(
                     text or str(interaction_response.get("label") or action_id or "确认当前内容").strip(),

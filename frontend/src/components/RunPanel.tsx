@@ -1,8 +1,22 @@
 import { Activity, CheckCircle2, ChevronRight, Circle, Clock3, PanelRightClose, Terminal, XCircle } from "lucide-react";
 import type { AgentRun, SurfaceBlock } from "../types";
+import JsonBlock from "./JsonBlock";
+import MarkdownContent from "./MarkdownContent";
 
 function processLabel(block: SurfaceBlock): string {
   return String(block.data?.summary || block.data?.message || block.content || block.title || "Agent 正在处理");
+}
+
+function ProcessDetail({ block }: { block: SurfaceBlock }) {
+  const format = String(block.data?.format || "");
+  const value = block.data?.value;
+  if (format === "json" && value != null) {
+    return <JsonBlock value={value} title="结构化结果" collapsible compact />;
+  }
+  if (format === "markdown") {
+    return <div className="process-markdown"><MarkdownContent content={String(block.content || block.data?.summary || "")} /></div>;
+  }
+  return null;
 }
 
 export default function RunPanel({ run, onClose }: { run?: AgentRun; onClose?: () => void }) {
@@ -16,7 +30,7 @@ export default function RunPanel({ run, onClose }: { run?: AgentRun; onClose?: (
         </div>
         <div className="run-section-label">实时步骤</div>
         <div className="process-list">
-          {run.process.length ? run.process.map((block, index) => <div className="process-item" key={block.block_id}><div className="process-icon">{index === run.process.length - 1 && run.status === "running" ? <span className="spinner" /> : <CheckCircle2 size={15} />}</div><div><strong>{block.title || `步骤 ${index + 1}`}</strong><p>{processLabel(block)}</p></div></div>) : <div className="process-item muted"><Circle size={14} /><p>正在等待第一个运行事件…</p></div>}
+          {run.process.length ? run.process.map((block, index) => <div className="process-item" key={block.block_id}><div className="process-icon">{index === run.process.length - 1 && run.status === "running" ? <span className="spinner" /> : <CheckCircle2 size={15} />}</div><div><strong>{block.title || `步骤 ${index + 1}`}</strong>{String(block.data?.format || "") !== "markdown" && <p>{processLabel(block)}</p>}<ProcessDetail block={block} /></div></div>) : <div className="process-item muted"><Circle size={14} /><p>正在等待第一个运行事件…</p></div>}
         </div>
         <div className="run-section-label">本轮产物</div>
         <div className="artifact-index">{run.artifacts.length ? run.artifacts.map((block) => <div key={block.block_id}><span>{block.title || block.block_type}</span><ChevronRight size={14} /></div>) : <p>产物生成后会显示在主对话中</p>}</div>

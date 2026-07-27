@@ -537,6 +537,9 @@ def test_confirmation_button_without_text_enters_coding_directly(monkeypatch) ->
 
     agent = DirectAgent()
     conversations = _ConversationRuntimeStub()
+    conversations.context["custom_tool_state"]["design_contract"] = {
+        "document": "## 当前设计\n实现核心计算并返回结果。"
+    }
     monkeypatch.setattr(web, "custom_tool_agent_service", agent)
     monkeypatch.setattr(web, "application_runtime_service", _ApplicationRuntimeStub())
     monkeypatch.setattr(web, "runtime_conversation_service", conversations)
@@ -561,6 +564,64 @@ def test_confirmation_button_without_text_enters_coding_directly(monkeypatch) ->
 
     assert agent.actions[0]["action_id"] == "custom_tool.confirm_design"
     assert agent.actions[0]["expected_revision"] == 4
+
+
+def test_stale_design_confirmation_continues_requirement_instead_of_coding(monkeypatch) -> None:
+    class ShortcutPlanner(_ToolDevelopmentDispatchPlannerStub):
+        def plan_turn(self, **kwargs):
+            return {
+                **super().plan_turn(**kwargs),
+                "shortcut": {"handler": "custom_tool.action"},
+            }
+
+    class RecoveryAgent:
+        finance_cc_enabled = True
+
+        def __init__(self):
+            self.calls = []
+
+        def continue_flow_action(self, *args, **kwargs):
+            raise AssertionError("an empty design must never enter Coding")
+
+        def handle_turn(self, text, **kwargs):
+            self.calls.append({"text": text, **kwargs})
+            state = {
+                **dict(kwargs["state"]),
+                "design_contract": {"document": "## 当前设计\n实现核心计算并返回结果。"},
+            }
+            return {
+                "message": "设计方案已形成。",
+                "state": state,
+                "design": dict(state["design_contract"]),
+                "thread_context_patch": {"custom_tool_state": state},
+            }
+
+    agent = RecoveryAgent()
+    conversations = _ConversationRuntimeStub()
+    monkeypatch.setattr(web, "custom_tool_agent_service", agent)
+    monkeypatch.setattr(web, "application_runtime_service", _ApplicationRuntimeStub())
+    monkeypatch.setattr(web, "runtime_conversation_service", conversations)
+    monkeypatch.setattr(web, "assistant_dispatch_planner", ShortcutPlanner())
+
+    web._run_custom_tool_stream_payload(
+        {
+            "run_id": "stale_confirm_design",
+            "text": "",
+            "interaction_response": {
+                "interaction_id": "custom_tool.design_review",
+                "action_id": "custom_tool.confirm_design",
+                "action": "accept",
+                "expected_revision": 4,
+            },
+            "application_name": "investment_workbench",
+            "guest_identity": {"user_id": "user_a"},
+            "thread_id": 101,
+        },
+        emit=lambda event: None,
+    )
+
+    assert agent.calls[0]["text"] == "我确认当前需求理解，请继续形成设计方案。"
+    assert conversations.context["custom_tool_state"]["design_contract"]
 
 
 def test_structured_coding_feedback_is_submitted_as_text_with_ui_context(monkeypatch) -> None:
@@ -747,6 +808,7 @@ def test_conversation_frontend_uses_one_unified_shell_and_keeps_design_inside_me
 def test_coding_surface_uses_modules_test_and_activation_without_file_concepts() -> None:
     blocks = web._custom_tool_result_blocks(
         {
+            "coding_status": "implemented",
             "tool": {
                 "manifest": {
                     "tool_name": "ct_demo",
@@ -805,7 +867,7 @@ def test_coding_surface_uses_modules_test_and_activation_without_file_concepts()
 
     assert [block["block_type"] for block in blocks] == ["artifact", "assessment", "interaction"]
     artifact = blocks[0]
-    assert {"label": "加载方式", "value": "数据库动态加载"} in artifact["data"]["items"]
+    assert {"label": "运行方式", "value": "动态加载"} in artifact["data"]["items"]
     assert "files" not in artifact["data"]["details"]
     test_case = blocks[1]["data"]["details"]["tests"][0]
     assert test_case["input"]["stock_codes"] == ["600519.SH"]
@@ -820,7 +882,7 @@ def test_coding_surface_shows_implementation_and_alignment_as_natural_language()
     blocks = web._custom_tool_result_blocks(
         {
             "implementation_explanation": {
-                "summary": "实现了行情读取、信号计算和结果组装三个内部函数。",
+                "summary": "已完成 [001_custom_tool.py](/Volumes/ext/fin_agent/private/001_custom_tool.py)。实现了行情读取、信号计算和结果组装三个内部函数。",
             },
             "implementation_review": {
                 "summary": "代表性样例运行未报错，需求、设计与代码一致。",
@@ -837,13 +899,38 @@ def test_coding_surface_shows_implementation_and_alignment_as_natural_language()
         LlmStreamBlockBuilder(run_id="coding_narrative"),
     )
 
-    assert [block["block_id"] for block in blocks[:2]] == [
+    assert [block["block_id"] for block in blocks[:3]] == [
+        "custom_tool_draft_summary",
         "custom_tool_implementation_summary",
         "custom_tool_implementation_alignment",
     ]
-    assert blocks[0]["block_type"] == "narrative"
-    assert "三个内部函数" in blocks[0]["content"]
-    assert "需求、设计与代码一致" in blocks[1]["content"]
+    assert blocks[1]["block_type"] == "narrative"
+    assert "三个内部函数" in blocks[1]["content"]
+    assert "001_custom_tool.py" not in blocks[1]["content"]
+    assert "/Volumes" not in blocks[1]["content"]
+    assert "需求、设计与代码一致" in blocks[2]["content"]
+
+
+def test_coding_surface_does_not_repeat_identical_summary_as_alignment() -> None:
+    summary = "实现了行情读取和信号计算；测试输出包含关键过程指标。"
+    blocks = web._custom_tool_result_blocks(
+        {
+            "implementation_explanation": {"summary": summary},
+            "implementation_review": {"summary": summary},
+            "tool": {
+                "manifest": {
+                    "tool_name": "ct_demo",
+                    "display_name": "演示工具",
+                    "status": "draft",
+                    "current_revision": 1,
+                },
+            },
+        },
+        LlmStreamBlockBuilder(run_id="coding_no_duplicate"),
+    )
+
+    assert [block["block_id"] for block in blocks].count("custom_tool_implementation_summary") == 1
+    assert all(block["block_id"] != "custom_tool_implementation_alignment" for block in blocks)
 
 
 def test_execution_failure_does_not_offer_activation() -> None:
@@ -864,6 +951,28 @@ def test_execution_failure_does_not_offer_activation() -> None:
 
     assert [block["block_type"] for block in blocks] == ["artifact", "assessment"]
     assert blocks[1]["data"]["overall"] == "fail"
+
+
+def test_completed_coding_can_be_confirmed_without_display_examples() -> None:
+    blocks = web._custom_tool_result_blocks(
+        {
+            "coding_status": "implemented",
+            "tool": {
+                "manifest": {
+                    "tool_name": "ct_demo",
+                    "display_name": "演示工具",
+                    "status": "draft",
+                    "current_revision": 1,
+                },
+            },
+            "implementation_explanation": {"summary": "核心实现已经完成。"},
+            "implementation_review": {"summary": "需求、Design 与代码一致。"},
+        },
+        LlmStreamBlockBuilder(run_id="coding_without_display_examples"),
+    )
+
+    assert [block["block_id"] for block in blocks][-1] == "custom_tool_coding_review"
+    assert all(block["block_id"] != "custom_tool_test_result" for block in blocks)
 
 
 def test_coding_failure_surface_keeps_design_and_offers_retry() -> None:

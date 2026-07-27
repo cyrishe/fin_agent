@@ -32,7 +32,7 @@ describe("surface stream reducer", () => {
     expect(run.summary).toBe("正在确认数据口径");
   });
 
-  it("keeps live agent activity out of the formal conversation", () => {
+  it("keeps generic live agent activity out of the formal conversation", () => {
     const run = applyStreamEvent(initialRun(), {
       event: "block",
       block_id: "coding_live_progress",
@@ -43,6 +43,25 @@ describe("surface stream reducer", () => {
 
     expect(run.process).toHaveLength(1);
     expect(run.artifacts).toHaveLength(0);
+  });
+
+  it("shows user-facing coding progress in the conversation", () => {
+    const run = applyStreamEvent(initialRun(), {
+      event: "block",
+      block_id: "coding_module_progress",
+      block_type: "workflow",
+      title: "实现进展",
+      data: {
+        role: "conversation_progress",
+        status: "running",
+        summary: "正在实现 MACD 金叉判断。",
+        items: [{ id: "update_1", summary: "正在实现 MACD 金叉判断。", status: "running" }],
+      },
+    });
+
+    expect(run.process).toHaveLength(0);
+    expect(run.artifacts).toHaveLength(1);
+    expect(run.artifacts[0].block_id).toBe("coding_module_progress");
   });
 
   it("preserves completed artifacts when a later block arrives", () => {

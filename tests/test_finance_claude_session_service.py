@@ -1,5 +1,9 @@
 from pathlib import Path
+import time
 
+import claude_agent_sdk
+
+from src.services.agent_providers.claude import ClaudeSdkSkillHarness
 from src.services.finance_claude_session_service import FinanceClaudeSessionService
 
 
@@ -85,12 +89,12 @@ def test_runtime_context_does_not_include_evaluation_stage_gate(tmp_path: Path, 
     assert "_finance_cc_requirement_only" not in calls[0]["tool_context"]
 
 
-def test_failed_session_rotates_before_next_turn_then_resumes(tmp_path: Path) -> None:
+def test_turn_feedback_does_not_rotate_the_cc_session(tmp_path: Path) -> None:
     calls = []
 
     def fake_runner(**kwargs):
         calls.append(kwargs)
-        return {"ok": len(calls) > 1, "result": "ok" if len(calls) > 1 else "failed", "error": "failed"}
+        return {"result": "ok" if len(calls) > 1 else "failed", "error": "failed"}
 
     service = FinanceClaudeSessionService(
         enabled=True,
@@ -98,12 +102,103 @@ def test_failed_session_rotates_before_next_turn_then_resumes(tmp_path: Path) ->
         log_path=tmp_path / "events.jsonl",
         turn_runner=fake_runner,
     )
-    failed = service.run_turn(thread_id=8, owner_id="owner-a", user_text="first")
-    recovered = service.run_turn(thread_id=8, owner_id="owner-a", user_text="second")
+    first = service.run_turn(thread_id=8, owner_id="owner-a", user_text="first")
+    followup = service.run_turn(thread_id=8, owner_id="owner-a", user_text="second")
     resumed = service.run_turn(thread_id=8, owner_id="owner-a", user_text="third")
 
-    assert failed["ok"] is False
-    assert recovered["resumed"] is False
-    assert recovered["session_id"] != failed["session_id"]
+    assert first["error"] == "failed"
+    assert followup["resumed"] is True
+    assert followup["session_id"] == first["session_id"]
     assert resumed["resumed"] is True
-    assert resumed["session_id"] == recovered["session_id"]
+    assert resumed["session_id"] == followup["session_id"]
+
+
+class ResultMessage:
+    def __init__(self, result: str = "ok") -> None:
+        self.result = result
+        self.is_error = False
+        self.subtype = "success"
+
+
+class FakeClaudeClient:
+    instances = []
+
+    def __init__(self, options) -> None:
+        self.options = options
+        self.prompts = []
+        self.connect_count = 0
+        self.disconnect_count = 0
+        self.__class__.instances.append(self)
+
+    async def connect(self) -> None:
+        self.connect_count += 1
+
+    async def disconnect(self) -> None:
+        self.disconnect_count += 1
+
+    async def query(self, prompt: str) -> None:
+        self.prompts.append(prompt)
+
+    async def receive_response(self):
+        yield ResultMessage()
+
+
+def _pooled_service(tmp_path: Path, monkeypatch, **kwargs) -> FinanceClaudeSessionService:
+    FakeClaudeClient.instances = []
+    monkeypatch.setattr(claude_agent_sdk, "ClaudeSDKClient", FakeClaudeClient)
+    monkeypatch.setattr(
+        ClaudeSdkSkillHarness,
+        "provider_env",
+        lambda self: {"ANTHROPIC_AUTH_TOKEN": "test-token"},
+    )
+    return FinanceClaudeSessionService(
+        enabled=True,
+        root_dir=tmp_path / "sessions",
+        log_path=tmp_path / "events.jsonl",
+        **kwargs,
+    )
+
+
+def test_live_client_is_reused_for_followup_turns(tmp_path: Path, monkeypatch) -> None:
+    service = _pooled_service(tmp_path, monkeypatch)
+    try:
+        first = service.run_turn(thread_id=7, owner_id="owner-a", user_text="first")
+        second = service.run_turn(thread_id=7, owner_id="owner-a", user_text="second")
+
+        assert first["resumed"] is False
+        assert second["resumed"] is True
+        assert first["client_reused"] is False
+        assert second["client_reused"] is True
+        assert len(FakeClaudeClient.instances) == 1
+        assert FakeClaudeClient.instances[0].connect_count == 1
+        assert len(FakeClaudeClient.instances[0].prompts) == 2
+    finally:
+        service.close()
+
+
+def test_live_client_pool_isolates_conversations(tmp_path: Path, monkeypatch) -> None:
+    service = _pooled_service(tmp_path, monkeypatch, max_live_clients=2)
+    try:
+        service.run_turn(thread_id=7, owner_id="owner-a", user_text="first")
+        service.run_turn(thread_id=8, owner_id="owner-a", user_text="other")
+
+        assert len(FakeClaudeClient.instances) == 2
+        assert all(len(client.prompts) == 1 for client in FakeClaudeClient.instances)
+    finally:
+        service.close()
+
+
+def test_idle_client_is_released_and_later_resumed(tmp_path: Path, monkeypatch) -> None:
+    service = _pooled_service(tmp_path, monkeypatch, client_idle_seconds=0.05)
+    try:
+        first = service.run_turn(thread_id=7, owner_id="owner-a", user_text="first")
+        time.sleep(0.15)
+        assert FakeClaudeClient.instances[0].disconnect_count == 1
+
+        second = service.run_turn(thread_id=7, owner_id="owner-a", user_text="second")
+        assert second["session_id"] == first["session_id"]
+        assert second["resumed"] is True
+        assert len(FakeClaudeClient.instances) == 2
+        assert FakeClaudeClient.instances[1].options.resume == first["session_id"]
+    finally:
+        service.close()

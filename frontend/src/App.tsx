@@ -1,6 +1,6 @@
 import { Menu, MessageSquarePlus, PanelRight, Sparkles } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { dispatchChat, loadInvocationSkills, loadInvocationTools, loadThread, loadThreads, resetThread, startCustomToolStream, uploadAttachments } from "./api";
+import { dispatchChat, loadInvocationAssets, loadThread, loadThreads, resetThread, startCustomToolStream, uploadAttachments } from "./api";
 import Composer from "./components/Composer";
 import MessageItem from "./components/MessageItem";
 import RunPanel from "./components/RunPanel";
@@ -65,6 +65,19 @@ export default function App() {
   const bottomRef = useRef<HTMLDivElement>(null);
 
   const latestRun = useMemo(() => [...messages].reverse().find((message) => message.run)?.run, [messages]);
+  const latestRunSignal = useMemo(() => {
+    if (!latestRun) return "";
+    const latestArtifact = latestRun.artifacts.at(-1);
+    const latestProcess = latestRun.process.at(-1);
+    return [
+      latestRun.status,
+      latestRun.summary,
+      latestArtifact?.block_id,
+      String(asRecord(latestArtifact?.data).summary || latestArtifact?.content || ""),
+      latestProcess?.block_id,
+      String(asRecord(latestProcess?.data).summary || latestProcess?.content || ""),
+    ].join("|");
+  }, [latestRun]);
   const activeThread = threads.find((thread) => thread.thread_id === threadId);
 
   const refreshThreads = useCallback(async () => {
@@ -75,6 +88,13 @@ export default function App() {
     } catch (reason) {
       setError(reason instanceof Error ? reason.message : String(reason));
       return null;
+    }
+  }, []);
+  const refreshInvocationAssets = useCallback(async () => {
+    try {
+      setInvocationAssets(await loadInvocationAssets());
+    } catch {
+      // Keep the last usable catalog when a background refresh fails.
     }
   }, []);
 
@@ -92,11 +112,11 @@ export default function App() {
       }
     })();
   }, [refreshThreads]);
-  useEffect(() => {
-    void loadInvocationTools().then(setInvocationAssets).catch(() => setInvocationAssets([]));
-    void loadInvocationSkills().then((skills) => setInvocationAssets((current) => [...current, ...skills])).catch(() => undefined);
-  }, []);
+  useEffect(() => { void refreshInvocationAssets(); }, [refreshInvocationAssets]);
   useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: busy ? "auto" : "smooth", block: "end" }); }, [messages.length, busy]);
+  useEffect(() => {
+    if (busy) bottomRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
+  }, [busy, latestRunSignal]);
 
   const selectThread = async (selectedId: number) => {
     setError("");
@@ -159,7 +179,8 @@ export default function App() {
   ) => {
     await startCustomToolStream({ text, threadId, interactionResponse, ...invocation, onEvent: (event) => updateRun(assistantId, event) });
     await refreshThreads();
-  }, [refreshThreads, threadId, updateRun]);
+    void refreshInvocationAssets();
+  }, [refreshInvocationAssets, refreshThreads, threadId, updateRun]);
 
   const interact = async (response: InteractionResponse, label: string, key: string, text = "") => {
     if (busy) return;
