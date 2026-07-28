@@ -11,6 +11,10 @@ from src.experiments.staged_data_protocol.phase2.models import ApiCall, ResultHa
 REF_RE = re.compile(r"\b(r\d+)\.([A-Za-z_]\w*)\b")
 PREVIOUS_METRIC_RE = re.compile(r"^(r\d+)\.([A-Za-z_]\w*)$")
 KD_METHOD_TOKEN_RE = re.compile(r"^[A-Za-z_]\w*$")
+FILTER_REF_PREFIX_RE = re.compile(
+    r"\b[A-Za-z_]\w*\s+in\s*$",
+    flags=re.IGNORECASE,
+)
 
 
 def validate_call(call: ApiCall, previous_results: Mapping[str, ResultHandle]) -> ValidationResult:
@@ -74,10 +78,21 @@ def _validate_common_args(call: ApiCall, errors: list[str]) -> None:
 
 
 def _validate_refs(call: ApiCall, previous_results: Mapping[str, ResultHandle], errors: list[str]) -> None:
-    for value in call.args.values():
+    for key, value in call.args.items():
         if not isinstance(value, str):
             continue
-        for result_name, column in REF_RE.findall(value):
+        ref_matches = list(REF_RE.finditer(value))
+        if key == "filter":
+            for match in ref_matches:
+                result_name, column = match.groups()
+                ref = f"{result_name}.{column}"
+                if not FILTER_REF_PREFIX_RE.search(value[: match.start()]):
+                    errors.append(
+                        "REF_ERROR: filter result references must be bound as "
+                        f"`field in {ref}`, not used as a bare filter"
+                    )
+        for match in ref_matches:
+            result_name, column = match.groups()
             handle = previous_results.get(result_name)
             if not handle:
                 errors.append(f"REF_ERROR: unknown result={result_name}")

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import copy
 import json
 from pathlib import Path
 import sys
@@ -20,6 +21,47 @@ from src.experiments.staged_data_protocol.phase2.call_validator import validate_
 from src.services.application_runtime_service import ApplicationRuntimeService
 from src.services.session_variable_store_service import SessionVariableStoreService
 from src.skill_runtime.tool_adapter import ToolAdapter
+
+_INTERNAL_PROGRESS_MARKERS = (
+    "selection_applied",
+    "sample_complete",
+    "working_set",
+    "闭环判断",
+    "mcp__finance__",
+)
+
+
+def _progress_quality(events: list[dict[str, Any]]) -> dict[str, Any]:
+    visible = [
+        event
+        for event in events
+        if event.get("metadata", {}).get("user_visible") is not False
+        and str(event.get("content") or "").strip()
+    ]
+    meaningful = [
+        event
+        for event in visible
+        if str(event.get("metadata", {}).get("progress_id") or "").strip()
+    ]
+    leaks = [
+        event
+        for event in visible
+        if any(
+            marker in str(event.get("content") or "")
+            for marker in _INTERNAL_PROGRESS_MARKERS
+        )
+    ]
+    return {
+        "visible_progress_count": len(visible),
+        "meaningful_progress_count": len(meaningful),
+        "internal_leak_count": len(leaks),
+        "first_visible_progress_ms": (
+            visible[0]["elapsed_ms"] if visible else None
+        ),
+        "first_meaningful_progress_ms": (
+            meaningful[0]["elapsed_ms"] if meaningful else None
+        ),
+    }
 
 
 class _FixtureFinanceRuntime:
@@ -53,7 +95,6 @@ class _FixtureFinanceRuntime:
             payload["result"] = None
             return payload
         columns = [self._column_name(item) for item in call.outputs]
-        entity = self._entity(request)
         if "999999" in request or "测试" in request:
             rows = []
         elif call.api == "plate.basic_info":
@@ -96,7 +137,8 @@ class _FixtureFinanceRuntime:
             ]
         else:
             rows = [
-                {column: self._value(column, entity=entity) for column in columns}
+                {column: self._value(column, entity=item) for column in columns}
+                for item in self._entities(request)
             ]
         payload["result"] = {
             "name": call.result_id,
@@ -116,20 +158,19 @@ class _FixtureFinanceRuntime:
         return text.rsplit(".", 1)[-1].strip()
 
     @staticmethod
-    def _entity(request: str) -> dict[str, str]:
+    def _entities(request: str) -> list[dict[str, str]]:
         if "plate." in request:
-            return {"code": "885001", "name": "机器人"}
-        for token, code, name in (
-            ("000858", "000858.SZ", "五粮液"),
-            ("五粮液", "000858.SZ", "五粮液"),
-            ("300750", "300750.SZ", "宁德时代"),
-            ("宁德时代", "300750.SZ", "宁德时代"),
-            ("002594", "002594.SZ", "比亚迪"),
-            ("比亚迪", "002594.SZ", "比亚迪"),
+            return [{"code": "885001", "name": "机器人"}]
+        entities: list[dict[str, str]] = []
+        for code, name, tokens in (
+            ("600519.SH", "贵州茅台", ("600519", "贵州茅台", "茅台")),
+            ("000858.SZ", "五粮液", ("000858", "五粮液")),
+            ("300750.SZ", "宁德时代", ("300750", "宁德时代")),
+            ("002594.SZ", "比亚迪", ("002594", "比亚迪")),
         ):
-            if token in request:
-                return {"code": code, "name": name}
-        return {"code": "600519.SH", "name": "贵州茅台"}
+            if any(token in request for token in tokens):
+                entities.append({"code": code, "name": name})
+        return entities or [{"code": "600519.SH", "name": "贵州茅台"}]
 
     @staticmethod
     def _value(column: str, *, entity: Mapping[str, str]) -> Any:
@@ -156,7 +197,11 @@ class _FixtureFinanceRuntime:
             "pe": 23.5,
             "pb": 7.2,
         }
-        return values.get(column, 1.0)
+        # A fixture may be deterministic, but it must not manufacture a numeric
+        # fact for a field it does not model.  Keep the missing value explicit so
+        # the Agent is evaluated on the available evidence rather than on a
+        # plausible-looking placeholder.
+        return values.get(column)
 
 
 class _FixtureAgentToolAdapter:
@@ -180,6 +225,28 @@ class _FixtureAgentToolAdapter:
                 }
             ],
         }
+
+
+def _scope_application_context(
+    application_context: Mapping[str, Any],
+    *,
+    tool_scope: str,
+) -> dict[str, Any]:
+    scoped = copy.deepcopy(dict(application_context))
+    if tool_scope != "finance_query_only":
+        return scoped
+    candidates = [
+        scoped.get("default_agent"),
+        *(scoped.get("available_agents") or []),
+    ]
+    for agent in candidates:
+        if not isinstance(agent, dict):
+            continue
+        agent["tools"] = []
+        runtime_profile = agent.get("runtime_profile")
+        if isinstance(runtime_profile, dict):
+            runtime_profile["tools"] = []
+    return scoped
 
 
 def _args() -> argparse.Namespace:
@@ -223,8 +290,12 @@ def main() -> int:
     if args.fixture:
         tool_kwargs["finance_runtime"] = _FixtureFinanceRuntime()
         tool_kwargs["tool_adapter"] = _FixtureAgentToolAdapter()
-    application_context = ApplicationRuntimeService().get_application_context(
-        "investment_workbench"
+    tool_scope = str(dataset.get("tool_scope") or "product").strip()
+    application_context = _scope_application_context(
+        ApplicationRuntimeService().get_application_context(
+            "investment_workbench"
+        ),
+        tool_scope=tool_scope,
     )
     service = FinancialQaCcService(
         enabled=True,
@@ -240,6 +311,22 @@ def main() -> int:
             all_calls = []
             for turn_index, question in enumerate(case.get("turns") or [], start=1):
                 started = time.monotonic()
+                progress_events: list[dict[str, Any]] = []
+
+                def capture_progress(event: Mapping[str, Any]) -> None:
+                    if not isinstance(event, Mapping):
+                        return
+                    progress_events.append(
+                        {
+                            "elapsed_ms": round(
+                                (time.monotonic() - started) * 1_000
+                            ),
+                            "type": str(event.get("type") or ""),
+                            "content": str(event.get("content") or ""),
+                            "metadata": dict(event.get("metadata") or {}),
+                        }
+                    )
+
                 result = service.answer(
                     thread_id=f"eval-{case_id}",
                     turn_id=turn_index,
@@ -255,8 +342,10 @@ def main() -> int:
                         },
                     },
                     application_context=application_context,
+                    event_sink=capture_progress,
                 )
                 evidence = result.get("financial_qa") or {}
+                progress_quality = _progress_quality(progress_events)
                 calls = [
                     dict(item)
                     for item in evidence.get("tool_calls") or []
@@ -273,6 +362,20 @@ def main() -> int:
                         "agent_tool_names": evidence.get("agent_tool_names") or [],
                         "skill_results": evidence.get("skill_results") or [],
                         "result_refs": evidence.get("result_refs") or [],
+                        "has_intermediate_progress": bool(progress_events),
+                        "first_progress_ms": (
+                            progress_events[0]["elapsed_ms"]
+                            if progress_events
+                            else None
+                        ),
+                        "progress_event_count": len(progress_events),
+                        **progress_quality,
+                        "progress_events": progress_events,
+                        "surface_block_types": [
+                            str(item.get("block_type") or item.get("kind") or "")
+                            for item in result.get("surface_blocks") or []
+                            if isinstance(item, Mapping)
+                        ],
                     }
                 )
             used_query = any(item.get("tool") == "finance_query" for item in all_calls)
@@ -299,6 +402,17 @@ def main() -> int:
                         and (not case.get("expects_finance_query") or has_results)
                         and has_answers
                         and not forbidden
+                        and all(
+                            int(item.get("internal_leak_count") or 0) == 0
+                            for item in turns
+                        )
+                        and (
+                            not case.get("expects_finance_query")
+                            or all(
+                                int(item.get("meaningful_progress_count") or 0) > 0
+                                for item in turns
+                            )
+                        )
                         and all(not str(item.get("error") or "").strip() for item in turns)
                     ),
                     "focus": case.get("focus") or [],
@@ -310,6 +424,7 @@ def main() -> int:
 
     report = {
         "dataset": dataset.get("version"),
+        "tool_scope": tool_scope,
         "passed": sum(1 for item in rows if item["passed"]),
         "total": len(rows),
         "cases": rows,

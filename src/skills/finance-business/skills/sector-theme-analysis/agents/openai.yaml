@@ -1,0 +1,4 @@
+interface:
+  display_name: "行业与主题分析"
+  short_description: "分析行业主题表现、内部结构、持续性、主要驱动与代表公司"
+  default_prompt: "Use $sector-theme-analysis to analyze this sector or market theme."

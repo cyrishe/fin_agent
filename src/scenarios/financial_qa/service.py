@@ -5,8 +5,12 @@ import os
 from pathlib import Path
 from typing import Any, Dict, Mapping, Optional
 
+from src.scenarios.financial_qa.business_skills import FinanceBusinessSkillCatalog
+from src.scenarios.financial_qa.presentation import FinancialQaPresentationService
 from src.scenarios.financial_qa.tools import FinanceDataQueryCcTools
 from src.services.finance_claude_session_service import FinanceClaudeSessionService
+
+_SUPPLEMENTARY_AGENT_TOOLS = frozenset({"financial_news_search"})
 
 
 def _trim(value: Any) -> str:
@@ -46,6 +50,8 @@ class FinancialQaCcService:
         enabled: Optional[bool] = None,
         session_service: Optional[FinanceClaudeSessionService] = None,
         system_tools: Optional[FinanceDataQueryCcTools] = None,
+        business_skill_catalog: Optional[FinanceBusinessSkillCatalog] = None,
+        presentation_service: Optional[FinancialQaPresentationService] = None,
         root_dir: str | Path = "data/financial_qa_cc_sessions",
         log_path: str | Path = "outputs/financial_qa_cc/events.jsonl",
     ) -> None:
@@ -56,6 +62,12 @@ class FinancialQaCcService:
             else enabled_text in {"1", "true", "yes", "on"}
         )
         self.system_tools = system_tools or FinanceDataQueryCcTools()
+        self.business_skill_catalog = (
+            business_skill_catalog or FinanceBusinessSkillCatalog()
+        )
+        self.presentation_service = (
+            presentation_service or FinancialQaPresentationService()
+        )
         qa_max_turns = max(
             4,
             int(os.environ.get("FINANCE_CC_FINANCIAL_QA_MAX_TURNS") or 24),
@@ -66,11 +78,12 @@ class FinancialQaCcService:
             log_path=log_path,
             system_tools=self.system_tools,
             system_prompt_path="src/scenarios/financial_qa/system.md",
-            skill_root="src",
-            skill_names=["fin-agent-skills:stock-deep-dive"],
+            skill_root=self.business_skill_catalog.root,
+            skill_names=self.business_skill_catalog.qualified_skill_names(),
             runtime_scope_prefix="financial_qa",
             max_turns=qa_max_turns,
             system_context_paths=[
+                "src/scenarios/financial_qa/finance_api_protocol.md",
                 "src/scenarios/financial_qa/data_query.md"
             ],
             effort=_trim(
@@ -151,8 +164,23 @@ class FinancialQaCcService:
                 or selected_agent.get("tools")
                 or []
             )
-            if _trim(item)
+            if _trim(item) in _SUPPLEMENTARY_AGENT_TOOLS
         ]
+        raw_allowed_skills = (
+            runtime_profile.get("skills")
+            if isinstance(runtime_profile.get("skills"), list)
+            else selected_agent.get("skills")
+            if isinstance(selected_agent.get("skills"), list)
+            else None
+        )
+        allowed_finance_skills = (
+            [_trim(item) for item in raw_allowed_skills if _trim(item)]
+            if isinstance(raw_allowed_skills, list)
+            else None
+        )
+        skill_routing_summary = self.business_skill_catalog.routing_summary(
+            allowed_skill_ids=allowed_finance_skills,
+        )
         record = self.session_service.run_turn(
             thread_id=thread_id,
             turn_id=turn_id,
@@ -163,6 +191,13 @@ class FinancialQaCcService:
                 "turn_mode": "normal_qa",
                 "entry": _trim(dispatch_plan.get("entry")) or "agent_route",
                 "allowed_agent_tools": allowed_agent_tools,
+                **(
+                    {"allowed_finance_skills": allowed_finance_skills}
+                    if allowed_finance_skills is not None
+                    else {}
+                ),
+                "_resolved_question": resolved_question,
+                "_finance_skill_catalog_prompt": skill_routing_summary,
                 "_agent_system_prompt": _agent_harness_context(runtime_profile),
             },
             event_sink=event_sink,
@@ -176,10 +211,12 @@ class FinancialQaCcService:
         message = _trim(record.get("result")) or (
             f"金融专业问答暂时未完成：{error}" if error else "金融专业问答暂时没有返回内容。"
         )
+        surface_blocks = self.presentation_service.build(message, result_refs)
         return {
             "mode": "financial_qa_cc",
             "message": message,
             "items": [],
+            "surface_blocks": surface_blocks,
             "financial_qa": {
                 "session_id": _trim(record.get("session_id")),
                 "resumed": bool(record.get("resumed")),
@@ -198,6 +235,11 @@ class FinancialQaCcService:
                     _trim(item)
                     for item in record.get("skill_results") or []
                     if _trim(item)
+                ],
+                "skill_entries": [
+                    dict(item)
+                    for item in record.get("skill_entries") or []
+                    if isinstance(item, Mapping)
                 ],
                 "result_refs": result_refs,
                 "error": error,

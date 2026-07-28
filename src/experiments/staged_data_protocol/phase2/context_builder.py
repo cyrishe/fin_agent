@@ -104,6 +104,10 @@ def build_context_sections(
         "- fields:",
         _code_block(_format_fields(view.get("fields"))),
     ]
+    value_domains = view.get("value_domains")
+    if isinstance(value_domains, Mapping):
+        current_dataview.append("- value_domains:")
+        current_dataview.append(_indent(_code_block(json.dumps(value_domains, ensure_ascii=False)), "  "))
     subject_rules = _meta_list(subject_meta, "rules")
     if subject_rules:
         current_dataview.append("- subject_rules:")

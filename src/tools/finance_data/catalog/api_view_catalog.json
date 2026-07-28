@@ -46,13 +46,14 @@
           "filter",
           "order",
           "limit",
-          "realtime(0|1; default 1)"
+          "realtime(0|1; daily K default 0; same-minute K default 1)"
         ]
       },
       "rules": [
         "API name format is {subject}.{dataview}.kd_<field>_<method>.",
         "field must be listed in current dataview.kd.",
         "method must be listed in api_class_patterns.kday_metric.methods unless the dataview defines a special method.",
+        "日级近 K 个交易日窗口使用 realtime=0；只有明确的同一分钟 K 日比较使用对应分钟 K API 的 realtime=1。",
         "Output usually uses code, name, value as alias."
       ],
       "methods": [
@@ -146,6 +147,31 @@
       "rules": [
         "Use fields from the current financial dataview.",
         "Computed fields follow current dataview.computed naming rules."
+      ]
+    },
+    "report_query": {
+      "desc": "研报结构化查询 API，用于查询个股研报的评级、核心观点、风险、目标价和预测指标。",
+      "call_pattern": "r{id} = stock.report(filter, order, limit) -> field1, field2",
+      "examples": [
+        "r1 = stock.report(filter = \"code = 300750.SZ and report_date >= 2026-01-01 and report_date <= 2026-07-28\", order = \"report_date desc\", limit = 10) -> code, name, report_date, institution, rating, investment_highlights, risk_warnings",
+        "r2 = stock.report(filter = \"code = 300750.SZ and metric_code = eps and forecast_year >= 2026\", order = \"forecast_year asc\", limit = 20) -> report_id, code, report_date, metric_name, forecast_year, metric_value, unit, value_type\nnote: metric_code/metric_name/forecast_year/metric_value 触发指标级查询。",
+        "r3 = stock.report(filter = \"code in r1.code and report_date >= 2025-01-01\", order = \"report_date desc\", limit = 20) -> report_id, code, report_date, rating, target_price_lower, target_price_upper"
+      ],
+      "output_rule": "输出字段只能从当前 report dataview.fields 中选择。报告字段返回研报级记录；指标字段返回指标级记录；混合字段按研报ID关联。",
+      "args": {
+        "required": [],
+        "optional": [
+          "filter",
+          "order",
+          "limit"
+        ]
+      },
+      "rules": [
+        "数据源固定为 REPORT_DB_URL 指向数据库中的 chatbi_report_v 和 chatbi_metric_v 两个视图。",
+        "report_date/report_period 表示研报发布日期，不是财务报表报告期；时间段用 >= 和 <= 两个条件表达。",
+        "包含 metric_code、metric_name、forecast_year、value_type、metric_value 等字段时使用指标级结果；其他情况使用研报级结果。",
+        "目标价使用 target_price_lower 和 target_price_upper，不依据底层视图中文别名的字面顺序。",
+        "不使用 realtime 或交易日偏移语义，研报日期是自然日/发布时间。"
       ]
     },
     "dynamic_quote_cal": {
@@ -1014,7 +1040,7 @@
             "api_class": "financial_query"
           }
         ],
-        "computed": {
+      "computed": {
           "suffixes": [
             "yoy",
             "qoq"
@@ -1051,6 +1077,67 @@
           ],
           "desc": "支持按基础财务字段生成同比和环比类派生指标；派生值单位为%，增长3.5%记为3.5。"
         }
+      },
+      "report": {
+        "desc": "个股研报结构化数据：报告信息、评级、核心观点、风险、目标价和研报预测指标。",
+        "fields": {
+          "report_id": ["研报ID", "报告ID", "report_id"],
+          "code": ["股票代码", "证券代码", "code"],
+          "name": ["股票名称", "证券名称", "name"],
+          "institution": ["研究机构", "机构", "institution"],
+          "analyst": ["研究员", "分析师", "analyst"],
+          "report_date": ["报告发布日期", "发布日期", "报告期", "report_date", "report_period"],
+          "rating": ["评级", "投资评级", "rating"],
+          "rating_change": ["评级变动", "变动", "rating_change"],
+          "change_reason": ["变动原因", "change_reason"],
+          "investment_highlights": ["投资要点", "核心观点", "investment_highlights"],
+          "risk_warnings": ["风险提示", "风险", "risk_warnings"],
+          "target_price_lower": ["目标价下限", "预测最低价", "target_price_lower", "target_low"],
+          "target_price_upper": ["目标价上限", "预测最高价", "target_price_upper", "target_high"],
+          "metric_code": ["指标编码", "metric_code"],
+          "metric_name": ["指标名称", "metric_name"],
+          "forecast_year": ["预测年份", "预测年度", "forecast_year"],
+          "value_type": ["数值类型", "实际/预测", "value_type"],
+          "metric_value": ["指标数值", "预测值", "value", "metric_value"],
+          "unit": ["单位", "单位名称", "unit"],
+          "source_locator": ["来源定位", "source_locator"],
+          "created_at": ["抽取时间", "created_at"]
+        },
+        "value_domains": {
+          "metric_code": {
+            "eps": "每股收益",
+            "np_parent": "归母净利润",
+            "np_parent_growth": "归母净利润增长率",
+            "pb": "市净率",
+            "pe": "市盈率",
+            "revenue": "营业收入",
+            "revenue_growth": "营业收入增长率",
+            "roe": "净资产收益率"
+          },
+          "value_type": {
+            "forecast": "预测值",
+            "actual": "实际值"
+          }
+        },
+        "api": [
+          {
+            "api_name": "stock.report",
+            "api_function": "查询个股在报告日期范围内的研报结构化信息和预测指标。",
+            "api_class": "report_query"
+          }
+        ],
+        "rules": [
+          "只查询 REPORT_DB_URL 指向数据库中的 chatbi_report_v 和 chatbi_metric_v 两个视图。",
+          "报告字段查询返回研报级记录；包含 metric_code、metric_name、forecast_year 或 metric_value 时返回指标级记录。",
+          "同一请求同时使用报告字段和指标字段时，按研报ID关联两个视图。",
+          "code 同时接受 6 位代码和 CODE.EXCHANGE；provider 会按研报视图的 6 位代码格式归一化。",
+          "metric_code 只能使用 value_domains 中的 8 个标准编码；不要臆造指标编码。metric_name 使用对应的标准中文名。",
+          "用户问预测值时必须加入 value_type = forecast；用户问历史实际值时使用 value_type = actual。",
+          "用户指定预测年份时，必须在 filter 中加入 forecast_year 条件，不能只返回全部年度指标后再自行挑选。",
+          "report_date/report_period 是研报发布日期，不是财务报表报告期；按日期范围使用 >= 和 <= 两个边界条件。",
+          "目标价字段按语义返回 target_price_lower 和 target_price_upper；不要直接使用底层视图的中文别名判断上下限。",
+          "需要完整返回符合条件的研报或指标记录时使用 limit = -1；若返回行数达到 limit，不得表述为全部数据。"
+        ]
       },
       "margin": {
         "desc": "融资融券视图，查询个股融资余额、融资买入/偿还、融资净买入、融券余额/余量、两融余额和融资余额占流通市值比例。",

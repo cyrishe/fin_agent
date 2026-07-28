@@ -1,6 +1,6 @@
 import { Menu, MessageSquarePlus, PanelRight, Sparkles } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { dispatchChat, loadInvocationAssets, loadThread, loadThreads, resetThread, startCustomToolStream, uploadAttachments } from "./api";
+import { dispatchChat, loadInvocationAssets, loadThread, loadThreads, resetThread, startChatStream, startCustomToolStream, uploadAttachments } from "./api";
 import Composer from "./components/Composer";
 import MessageItem from "./components/MessageItem";
 import RunPanel from "./components/RunPanel";
@@ -50,7 +50,7 @@ export default function App() {
   const [input, setInput] = useState("");
   const [query, setQuery] = useState("");
   const [busy, setBusy] = useState(false);
-  const [customToolActive, setCustomToolActive] = useState(false);
+  const [, setCustomToolActive] = useState(false);
   const [attachments, setAttachments] = useState<Attachment[]>([]);
   const [interactionDrafts, setInteractionDrafts] = useState<Record<string, InteractionDraft>>({});
   const [selectedInteractions, setSelectedInteractions] = useState<Record<string, string>>({});
@@ -176,8 +176,10 @@ export default function App() {
     assistantId: string,
     interactionResponse?: InteractionResponse,
     invocation?: { attachmentIds?: string[]; selectedAsset?: { kind: "tool" | "skill"; name: string } | null },
+    streamKind: "chat" | "custom_tool" = "custom_tool",
   ) => {
-    await startCustomToolStream({ text, threadId, interactionResponse, ...invocation, onEvent: (event) => updateRun(assistantId, event) });
+    const startStream = streamKind === "chat" ? startChatStream : startCustomToolStream;
+    await startStream({ text, threadId, interactionResponse, ...invocation, onEvent: (event) => updateRun(assistantId, event) });
     await refreshThreads();
     void refreshInvocationAssets();
   }, [refreshInvocationAssets, refreshThreads, threadId, updateRun]);
@@ -259,7 +261,7 @@ export default function App() {
     const userMessage: ChatMessage = { id: id(), role: "user", content: text || invocationLabel || `已发送 ${attachments.length} 个附件`, attachments, createdAt: Date.now() };
     const assistantId = id();
     const isAssetInvocation = Boolean(selectedInvocationAsset) || text.startsWith("$");
-    const useStream = isAssetInvocation || (!attachments.length && (/^\/custom_tool\s+(create|edit)\b/i.test(text) || (customToolActive && !text.startsWith("/"))));
+    const useStream = isAssetInvocation || !attachments.length;
     const assistantMessage: ChatMessage = { id: assistantId, role: "assistant", content: "", run: initialRun(useStream ? "正在连接 Agent" : "正在处理你的问题"), createdAt: Date.now() };
     const attachmentIds = attachments.map((item) => String(item.attachment_id || "")).filter(Boolean);
     setMessages((current) => [...current.filter((message) => message.id !== "intro" || current.length === 1), userMessage, assistantMessage]);
@@ -272,7 +274,7 @@ export default function App() {
         await runStream(text, assistantId, undefined, {
           attachmentIds,
           selectedAsset: selectedInvocationAsset ? { kind: selectedInvocationAsset.kind, name: selectedInvocationAsset.name } : null,
-        });
+        }, "chat");
       } else {
         const payload = await dispatchChat({
           text,

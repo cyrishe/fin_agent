@@ -114,6 +114,8 @@ class LlmStreamBlockBuilder:
         content = _trim(raw_content)
         metadata = event.get("metadata") if isinstance(event.get("metadata"), Mapping) else {}
         stage = _trim(metadata.get("stage")) or self._infer_stage(event)
+        if metadata.get("user_visible") is False:
+            return []
         if not content and event_type not in {"agent_delta", "turn_started", "turn_completed", "stage_start", "stage_result", "context_ready", "final"}:
             return []
 
@@ -139,6 +141,7 @@ class LlmStreamBlockBuilder:
                     stage=stage,
                     event_type=event_type,
                     content=content,
+                    metadata=metadata,
                 )]
             return [self._progress_block(stage=stage, event_type=event_type)]
         if slow_agent_source and event_type == "item_completed":
@@ -195,11 +198,33 @@ class LlmStreamBlockBuilder:
             return blocks
         return []
 
-    def _process_summary_block(self, *, stage: str, event_type: str, content: str) -> Dict[str, Any]:
+    def _process_summary_block(
+        self,
+        *,
+        stage: str,
+        event_type: str,
+        content: str,
+        metadata: Mapping[str, Any] | None = None,
+    ) -> Dict[str, Any]:
+        metadata = metadata if isinstance(metadata, Mapping) else {}
         stage_name = stage if stage in self.STAGE_TITLES else "runtime"
-        title = "当前计划" if event_type == "plan_delta" else "当前分析"
+        progress_id = re.sub(
+            r"[^a-zA-Z0-9_-]+",
+            "_",
+            _trim(metadata.get("progress_id")),
+        ).strip("_")
+        status = _trim(metadata.get("status"))
+        if status not in {"running", "completed", "error"}:
+            status = "running"
+        title = _trim(metadata.get("title")) or (
+            "当前计划" if event_type == "plan_delta" else "当前分析"
+        )
         return self._block(
-            block_id=f"{stage_name}_{event_type}",
+            block_id=(
+                f"{stage_name}_{progress_id}"
+                if progress_id
+                else f"{stage_name}_{event_type}"
+            ),
             block_type="status",
             mode="replace",
             title=title,
@@ -208,9 +233,10 @@ class LlmStreamBlockBuilder:
             data={
                 "role": "process",
                 "stage": stage_name,
-                "status": "running",
+                "status": status,
+                "current_step": event_type,
                 "format": "markdown",
-                "summary": "正在更新分析摘要…",
+                "summary": content,
             },
         )
 

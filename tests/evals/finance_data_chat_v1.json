@@ -1,6 +1,7 @@
 {
   "version": "v1",
   "description": "investment_analyst normal_qa 下由 Financial QA CC 自然调用金融数据查询的代表性问题。",
+  "tool_scope": "finance_query_only",
   "cases": [
     {
       "id": "realtime_quote",

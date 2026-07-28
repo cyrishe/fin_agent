@@ -1,0 +1,4 @@
+interface:
+  display_name: "市场概览"
+  short_description: "基于指数、宽度、成交与行业结构解释证券市场整体环境"
+  default_prompt: "Use $market-overview to explain the current market environment with evidence."

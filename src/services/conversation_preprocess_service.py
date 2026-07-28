@@ -268,7 +268,6 @@ class ConversationPreprocessService:
         llm_usage = self._merge_llm_usage(
             interaction.get("llm_usage") if isinstance(interaction, dict) else None,
             context_resolution.get("llm_usage") if isinstance(context_resolution, dict) else None,
-            normalized_request.get("llm_usage") if isinstance(normalized_request, dict) else None,
             execution_plan_preview.get("llm_usage") if isinstance(execution_plan_preview, dict) else None,
         )
         return {

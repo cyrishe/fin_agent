@@ -18,6 +18,8 @@ from src.services.agent_providers import build_agent_skill_harness
 from src.services.python_execution_runtime import PythonExecutionRuntime
 from src.services.custom_tool_design_protocol_service import CustomToolDesignProtocolService
 from src.services.design_narrative_service import compose_design_narrative
+from src.experiments.staged_data_protocol.phase2.trade_date_resolver import TradeDateResolver
+from src.services.finance_data_tool_runtime_service import FinanceDataToolRuntimeService
 
 
 class CustomToolError(ValueError):
@@ -363,9 +365,9 @@ class CustomToolRuntimeService:
                 if not allowed:
                     return self._error(manifest["tool_name"], "finance_query_denied", denial)
                 try:
-                    from src.services.finance_data_tool_runtime_service import FinanceDataToolRuntimeService
-
-                    finance_responses[request] = FinanceDataToolRuntimeService().execute_request(request=request)
+                    finance_responses[request] = FinanceDataToolRuntimeService(
+                        trade_date_resolver=TradeDateResolver()
+                    ).execute_request(request=request)
                 except Exception:
                     finance_bridge_errors.append("finance API execution failed")
                     finance_responses[request] = {

@@ -154,6 +154,68 @@ def test_active_custom_tool_stream_can_route_a_new_finance_question_outside_tool
     assert conversations.context["custom_tool_state"]["status"] == "awaiting_design_confirmation"
 
 
+def test_chat_stream_routes_normal_qa_without_custom_tool_and_persists_public_progress(monkeypatch) -> None:
+    conversations = _ConversationRuntimeStub()
+    conversations.context = {}
+    emitted = []
+    dispatch_calls = []
+
+    def dispatch(*args, **kwargs):
+        dispatch_calls.append({"args": args, **kwargs})
+        kwargs["event_sink"]({
+            "source": "claude",
+            "type": "reasoning_summary_delta",
+            "content": "已取得 2 条融资记录。",
+            "metadata": {
+                "stage": "runtime",
+                "progress_id": "finance_query_step_1",
+                "title": "数据查询 1/1",
+                "status": "completed",
+            },
+        })
+        return {
+            "mode": "financial_qa_cc",
+            "message": "两只股票的融资数据已返回。",
+            "thread_context_patch": {},
+            "surface_blocks": [{
+                "block_id": "financial_qa_answer",
+                "block_type": "narrative",
+                "content": "两只股票的融资数据已返回。",
+            }],
+        }
+
+    monkeypatch.setattr(web, "application_runtime_service", _ApplicationRuntimeStub())
+    monkeypatch.setattr(web, "runtime_conversation_service", conversations)
+    monkeypatch.setattr(web, "assistant_dispatch_planner", _NormalFinanceDispatchPlannerStub())
+    monkeypatch.setattr(web, "_build_chat_dispatch_payload", dispatch)
+
+    web._run_custom_tool_stream_payload(
+        {
+            "run_id": "normal_qa_stream",
+            "text": "比较宁德时代和比亚迪最新融资余额",
+            "application_name": "investment_workbench",
+            "guest_identity": {"user_id": "user_a"},
+            "thread_id": 101,
+            "stream_kind": "chat",
+        },
+        emit=emitted.append,
+    )
+
+    assert len(dispatch_calls) == 1
+    assert callable(dispatch_calls[0]["event_sink"])
+    assert any(
+        item.get("block_id") == "runtime_finance_query_step_1"
+        and item.get("data", {}).get("status") == "completed"
+        for item in emitted
+    )
+    assert emitted[-1]["event"] == "done"
+    persisted_blocks = conversations.completed[0]["output_payload"]["surface_blocks"]
+    assert [block["block_id"] for block in persisted_blocks] == [
+        "runtime_finance_query_step_1",
+        "financial_qa_answer",
+    ]
+
+
 def test_active_tool_can_switch_to_finance_and_then_resume_design(monkeypatch) -> None:
     class SequencePlanner:
         def plan_turn(self, *, text, **kwargs):

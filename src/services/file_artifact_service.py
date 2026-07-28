@@ -327,7 +327,7 @@ class FileArtifactService:
     def infer_column_type(values: list[Any]) -> str:
         non_empty = [value for value in values if value not in (None, "")]
         if not non_empty:
-            return "string"
+            return "unknown"
         if all(isinstance(value, bool) for value in non_empty):
             return "boolean"
         if all(isinstance(value, int) and not isinstance(value, bool) for value in non_empty):

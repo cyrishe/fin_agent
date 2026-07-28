@@ -136,16 +136,21 @@ export async function uploadAttachments(files: File[]): Promise<Attachment[]> {
   return payload.items || [];
 }
 
-export async function startCustomToolStream(input: {
+type AgentStreamInput = {
   text: string;
   threadId: number | null;
   interactionResponse?: InteractionResponse;
   attachmentIds?: string[];
   selectedAsset?: { kind: "tool" | "skill"; name: string } | null;
   onEvent: (event: StreamEvent) => void;
-}): Promise<void> {
+};
+
+async function startAgentStream(
+  endpoint: "/api/chat/stream/start" | "/api/custom_tool/stream/start",
+  input: AgentStreamInput,
+): Promise<void> {
   const started = await readJson<{ ok: boolean; run_id: string; stream_url: string }>(
-    await fetch("/api/custom_tool/stream/start", {
+    await fetch(endpoint, {
       method: "POST",
       credentials: "include",
       headers: { "Content-Type": "application/json" },
@@ -186,4 +191,12 @@ export async function startCustomToolStream(input: {
     };
     source.onerror = () => finish(new Error("Agent 流连接中断"));
   });
+}
+
+export async function startChatStream(input: AgentStreamInput): Promise<void> {
+  return startAgentStream("/api/chat/stream/start", input);
+}
+
+export async function startCustomToolStream(input: AgentStreamInput): Promise<void> {
+  return startAgentStream("/api/custom_tool/stream/start", input);
 }

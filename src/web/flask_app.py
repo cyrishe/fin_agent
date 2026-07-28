@@ -1131,6 +1131,7 @@ def _run_custom_tool_stream_payload(payload: dict, *, emit) -> None:
     run_trace = CustomToolRunTrace(run_id=builder.run_id)
     run_trace.snapshot("incoming_request", payload, section="request")
     raw_events: list[dict] = []
+    public_progress_blocks: dict[str, dict] = {}
     thread_id = None
     turn_id = None
     raw_event_count = 0
@@ -1158,6 +1159,11 @@ def _run_custom_tool_stream_payload(payload: dict, *, emit) -> None:
         if str(event.get("source") or "") == "model" and str(event.get("type") or "") == "final":
             return
         for block in builder.event_to_blocks(event):
+            block_data = block.get("data") if isinstance(block.get("data"), dict) else {}
+            if str(block_data.get("role") or "") in {"process", "live_progress"}:
+                block_id = str(block.get("block_id") or "").strip()
+                if block_id:
+                    public_progress_blocks[block_id] = dict(block)
             emit(block)
 
     try:
@@ -1337,6 +1343,7 @@ def _run_custom_tool_stream_payload(payload: dict, *, emit) -> None:
                     turn_id=turn_id,
                     owner_id=owner_id,
                     precomputed_plan=dispatch_plan,
+                    event_sink=event_sink,
                 )
             else:
                 result = custom_tool_agent_service.handle_turn(
@@ -1364,7 +1371,18 @@ def _run_custom_tool_stream_payload(payload: dict, *, emit) -> None:
                 event_sink=event_sink,
             )
         else:
-            raise ValueError("当前没有可流式执行的 custom_tool 流程。")
+            routed_outside_custom_tool = True
+            result = _build_chat_dispatch_payload(
+                text,
+                application_context=app_ctx,
+                thread_context=thread_context,
+                attachments=[],
+                thread_id=thread_id,
+                turn_id=turn_id,
+                owner_id=owner_id,
+                precomputed_plan=dispatch_plan,
+                event_sink=event_sink,
+            )
 
         if not routed_outside_custom_tool:
             result.setdefault("mode", "custom_tool_flow")
@@ -1396,7 +1414,14 @@ def _run_custom_tool_stream_payload(payload: dict, *, emit) -> None:
             runtime_conversation_service.update_thread_context(thread_id=thread_id, patch=result["thread_context_patch"])
         assistant_message = str(result.get("message") or "已处理。").strip()
         final_events = (
-            [dict(item) for item in result.get("surface_blocks") or [] if isinstance(item, dict)]
+            [
+                *public_progress_blocks.values(),
+                *[
+                    dict(item)
+                    for item in result.get("surface_blocks") or []
+                    if isinstance(item, dict)
+                ],
+            ]
             if routed_outside_custom_tool
             else _custom_tool_result_blocks(result, builder)
         )
@@ -1600,6 +1625,7 @@ def _build_chat_dispatch_payload(
     turn_id: int | None = None,
     owner_id: str = "",
     precomputed_plan: dict | None = None,
+    event_sink=None,
 ) -> dict:
     parsed = _parse_chat_command(text)
     raw = parsed.get("raw") or ""
@@ -1726,6 +1752,7 @@ def _build_chat_dispatch_payload(
                 user_text=raw,
                 dispatch_plan=plan,
                 application_context=application_context,
+                event_sink=event_sink,
             )
             result = _apply_application_workspace_orchestration(
                 result,
@@ -3649,6 +3676,7 @@ def api_chat_dispatch():
         return jsonify({"ok": False, "error": f"对话分发失败: {exc}"}), 500
 
 
+@app.route("/api/chat/stream/start", methods=["POST"])
 @app.route("/api/custom_tool/stream/start", methods=["POST"])
 def api_custom_tool_stream_start():
     try:
@@ -3680,12 +3708,22 @@ def api_custom_tool_stream_start():
             "application_name": str(payload.get("application_name") or "investment_workbench").strip() or "investment_workbench",
             "guest_identity": guest_identity,
             "cookie_thread_id": request.cookies.get(UserSessionService.THREAD_COOKIE_NAME, ""),
+            "stream_kind": (
+                "chat"
+                if request.path.rstrip("/").endswith("/api/chat/stream/start")
+                else "custom_tool"
+            ),
         }
         custom_tool_stream_requests[run_id] = stored_payload
+        stream_namespace = (
+            "chat"
+            if stored_payload["stream_kind"] == "chat"
+            else "custom_tool"
+        )
         response = jsonify(_to_json_safe({
             "ok": True,
             "run_id": run_id,
-            "stream_url": _with_script_root(f"/api/custom_tool/stream/{run_id}"),
+            "stream_url": _with_script_root(f"/api/{stream_namespace}/stream/{run_id}"),
         }))
         response.set_cookie(
             UserSessionService.GUEST_COOKIE_NAME,
@@ -3705,6 +3743,7 @@ def api_custom_tool_stream_start():
         return jsonify({"ok": False, "error": f"创建流式任务失败: {exc}"}), 500
 
 
+@app.route("/api/chat/stream/<run_id>", methods=["GET"])
 @app.route("/api/custom_tool/stream/<run_id>", methods=["GET"])
 def api_custom_tool_stream(run_id: str):
     payload = custom_tool_stream_requests.pop(str(run_id or "").strip(), None)
@@ -3733,7 +3772,13 @@ def api_custom_tool_stream(run_id: str):
         yield _sse_payload({
             "event": "run_started",
             "run_id": payload.get("run_id"),
-            "message": "正在解析本次工具调用。" if is_asset_invocation else "智能体开始处理自定义工具任务。",
+            "message": (
+                "正在解析本次工具调用。"
+                if is_asset_invocation
+                else "正在理解你的问题。"
+                if str(payload.get("stream_kind") or "") == "chat"
+                else "智能体开始处理自定义工具任务。"
+            ),
         })
         while True:
             item = event_queue.get()

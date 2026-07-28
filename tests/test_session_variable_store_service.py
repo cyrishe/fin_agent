@@ -46,6 +46,36 @@ def test_session_variable_store_registers_finance_table_result(tmp_path: Path) -
     assert "## v1" in store.format_variables_for_prompt(session_id="conv-1")
 
 
+def test_session_variable_store_does_not_claim_a_type_for_all_null_column(
+    tmp_path: Path,
+) -> None:
+    store = SessionVariableStoreService(data_root=tmp_path / "data")
+    result = {
+        "ok": True,
+        "result": {
+            "name": "r1",
+            "api": "stock.quote.kd_pct_sum",
+            "columns": ["code", "pct_5d_sum"],
+            "data": {
+                "rows": [{"code": "600519.SH", "pct_5d_sum": None}],
+                "row_count": 1,
+            },
+        },
+    }
+
+    variable = store.register_tool_result(
+        session_id="conv-null",
+        tool_name="finance_data_query",
+        result=result,
+    )
+
+    assert variable is not None
+    assert variable["schema"]["columns"] == [
+        {"name": "code", "type": "string"},
+        {"name": "pct_5d_sum", "type": "unknown"},
+    ]
+
+
 def test_runtime_execution_attaches_session_variable_for_table_result(tmp_path: Path) -> None:
     store = SessionVariableStoreService(data_root=tmp_path / "data")
     runtime = RuntimeExecutionService(session_variable_store=store)

@@ -1,0 +1,4 @@
+interface:
+  display_name: "个股研究"
+  short_description: "综合研究股票经营、财务、估值、市场表现、催化剂与主要风险"
+  default_prompt: "Use $stock-research to analyze this stock with current system data."

@@ -19,6 +19,13 @@ function ProcessDetail({ block }: { block: SurfaceBlock }) {
   return null;
 }
 
+function ProcessIcon({ block }: { block: SurfaceBlock }) {
+  const status = String(block.data?.status || "completed");
+  if (status === "running") return <span className="spinner" />;
+  if (status === "error") return <XCircle size={15} />;
+  return <CheckCircle2 size={15} />;
+}
+
 export default function RunPanel({ run, onClose }: { run?: AgentRun; onClose?: () => void }) {
   return (
     <aside className="run-panel">
@@ -30,7 +37,7 @@ export default function RunPanel({ run, onClose }: { run?: AgentRun; onClose?: (
         </div>
         <div className="run-section-label">实时步骤</div>
         <div className="process-list">
-          {run.process.length ? run.process.map((block, index) => <div className="process-item" key={block.block_id}><div className="process-icon">{index === run.process.length - 1 && run.status === "running" ? <span className="spinner" /> : <CheckCircle2 size={15} />}</div><div><strong>{block.title || `步骤 ${index + 1}`}</strong>{String(block.data?.format || "") !== "markdown" && <p>{processLabel(block)}</p>}<ProcessDetail block={block} /></div></div>) : <div className="process-item muted"><Circle size={14} /><p>正在等待第一个运行事件…</p></div>}
+          {run.process.length ? run.process.map((block, index) => <div className={`process-item ${String(block.data?.status || "")}`} key={block.block_id}><div className="process-icon"><ProcessIcon block={block} /></div><div><strong>{block.title || `步骤 ${index + 1}`}</strong>{String(block.data?.format || "") !== "markdown" && <p>{processLabel(block)}</p>}<ProcessDetail block={block} /></div></div>) : <div className="process-item muted"><Circle size={14} /><p>正在等待第一个运行事件…</p></div>}
         </div>
         <div className="run-section-label">本轮产物</div>
         <div className="artifact-index">{run.artifacts.length ? run.artifacts.map((block) => <div key={block.block_id}><span>{block.title || block.block_type}</span><ChevronRight size={14} /></div>) : <p>产物生成后会显示在主对话中</p>}</div>

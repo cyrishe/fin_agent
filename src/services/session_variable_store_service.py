@@ -454,7 +454,17 @@ class SessionVariableStoreService:
         return self.root / session_id
 
     def _runtime_summary(self, runtime_ctx: Mapping[str, Any]) -> dict[str, Any]:
-        keys = ["conversation_id", "session_id", "thread_id", "task_id", "turn_id", "goal", "source_type"]
+        keys = [
+            "conversation_id",
+            "session_id",
+            "thread_id",
+            "task_id",
+            "turn_id",
+            "goal",
+            "api",
+            "depends_on",
+            "source_type",
+        ]
         return {key: runtime_ctx.get(key) for key in keys if runtime_ctx.get(key) not in (None, "")}
 
     def _generated_source(self, *, tool_name: str, var_id: str) -> dict[str, Any]:

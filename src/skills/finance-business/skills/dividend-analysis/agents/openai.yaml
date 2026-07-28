@@ -1,0 +1,4 @@
+interface:
+  display_name: "分红质量分析"
+  short_description: "分析个股分红记录、股息水平、现金流支撑和未来可持续性"
+  default_prompt: "Use $dividend-analysis to assess this stock dividend quality and sustainability."

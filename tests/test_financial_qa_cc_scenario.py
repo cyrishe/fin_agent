@@ -133,6 +133,8 @@ def test_financial_qa_exposes_only_read_only_data_tools(tmp_path: Path) -> None:
         "mcp__finance__load_finance_result",
     }
     assert all("implement" not in name and "codex" not in name for name in names)
+    assert tools["finance_query"].input_schema["required"] == ["steps"]
+    assert tools["finance_query"].input_schema["properties"]["steps"]["minItems"] == 1
 
 
 def test_configured_agent_tools_are_registered_in_the_same_cc_harness(
@@ -200,6 +202,9 @@ def test_configured_agent_tools_are_registered_in_the_same_cc_harness(
         ("financial_news_search", {"query": "贵州茅台"})
     ]
     assert "mcp__finance__financial_news_search" in names
+    assert "Preparing identifiers or inputs is appropriate only when" in tool_map[
+        "financial_news_search"
+    ].description
     assert result["sample"]["rows"][0]["title"] == "贵州茅台发布公告"
     assert tracker["result_refs"][0]["tool"] == "financial_news_search"
 
@@ -236,23 +241,52 @@ def test_catalog_is_loaded_progressively(tmp_path: Path) -> None:
     ]
 
 
+def test_catalog_routing_index_exposes_direct_subject_dataview_choices(
+    tmp_path: Path,
+) -> None:
+    service, _, _, _, _, _ = _tools(tmp_path)
+
+    assert service._catalog_routing_index() == "- stock: quote, margin"
+
+
+def test_financial_qa_loads_global_api_protocol_before_dataview_guidance() -> None:
+    service = FinancialQaCcService(enabled=True)
+
+    paths = list(service.session_service.system_context_paths)
+    assert paths == [
+        Path("src/scenarios/financial_qa/finance_api_protocol.md"),
+        Path("src/scenarios/financial_qa/data_query.md"),
+    ]
+    protocol = paths[0].read_text(encoding="utf-8")
+    assert "## 五类通用 API" in protocol
+    assert "### 4. 成分股聚合" in protocol
+    assert "subject.constitution.agg" in protocol
+    assert "身份列" in protocol
+    assert "rN.column" in protocol
+
+
 def test_queries_keep_dependency_handles_and_results_are_pageable(tmp_path: Path) -> None:
     service, runtime, tool_runtime, tools, _, tracker = _tools(tmp_path)
 
-    first = _payload(
+    flow = _payload(
         asyncio.run(
             tools["finance_query"].handler(
-                {"request": "r1 = stock.quote(filter='贵州茅台') -> stock_code, stock_name, close"}
+                {
+                    "steps": [
+                        {
+                            "goal": "取得贵州茅台的名称和收盘价",
+                            "request": "result = stock.quote(filter='贵州茅台') -> stock_code, stock_name, close",
+                        },
+                        {
+                            "goal": "使用第一步对象范围再次取得收盘价",
+                            "request": "result = stock.quote(filter=\"code in step1.stock_code\") -> stock_code, close",
+                        },
+                    ]
+                }
             )
         )
     )
-    second = _payload(
-        asyncio.run(
-            tools["finance_query"].handler(
-                {"request": "r2 = stock.quote(filter=r1.stock_code) -> stock_code, close"}
-            )
-        )
-    )
+    first, second = flow["steps"]
     loaded = _payload(
         asyncio.run(
             tools["load_finance_result"].handler(
@@ -263,9 +297,20 @@ def test_queries_keep_dependency_handles_and_results_are_pageable(tmp_path: Path
 
     assert runtime.calls[0]["previous"] == []
     assert runtime.calls[1]["previous"] == ["r1"]
+    assert runtime.calls[0]["request"].startswith("r1 =")
+    assert runtime.calls[1]["request"].startswith("r2 =")
+    assert "code in r1.stock_code" in runtime.calls[1]["request"]
     assert set(tool_runtime.result_handles) == {"r1", "r2"}
     assert first["row_count"] == 1
     assert second["result_name"] == "r2"
+    assert first["goal"] == "取得贵州茅台的名称和收盘价"
+    assert flow["next_result_name"] == "r3"
+    assert flow["working_set"][0]["goal"] == "取得贵州茅台的名称和收盘价"
+    assert flow["working_set"][0]["selection_applied"] == {
+        "filter": "贵州茅台",
+    }
+    assert flow["working_set"][0]["columns"][0]["populated_count"] == 1
+    assert flow["working_set"][1]["depends_on"] == ["r1"]
     assert loaded["rows"][0]["stock_name"] == "贵州茅台"
     assert len(tracker["result_refs"]) == 2
 
@@ -275,6 +320,189 @@ def test_queries_keep_dependency_handles_and_results_are_pageable(tmp_path: Path
         tool_context={"_agent_runtime_scope": "financial_qa:owner-a/thread-7"},
     )
     assert set(restored.result_handles) == {"r1", "r2"}
+    assert restored.result_handles["r1"].task == "取得贵州茅台的名称和收盘价"
+    assert restored.working_set()[0]["selection_applied"] == {
+        "filter": "贵州茅台",
+    }
+    assert restored.working_set()[1]["depends_on"] == ["r1"]
+    assert '"result_name": "r1"' in restored.current_context_prompt()
+
+    restored_tools, _, _ = service.build_tools(
+        owner_ids=["owner-a"],
+        tool_context={"_agent_runtime_scope": "financial_qa:owner-a/thread-7"},
+        runtime=restored,
+    )
+    restored_query_tool = next(
+        item for item in restored_tools if item.name == "finance_query"
+    )
+    assert "tool description as mutable runtime state" in restored_query_tool.description
+    assert '"result_name": "r1"' not in restored_query_tool.description
+    assert "取得贵州茅台的名称和收盘价" not in restored_query_tool.description
+
+
+def test_query_result_names_are_system_assigned_and_progress_is_observable(
+    tmp_path: Path,
+) -> None:
+    runtime = _Runtime()
+    result_store = SessionVariableStoreService(data_root=tmp_path / "data")
+    service = FinanceDataQueryCcTools(
+        finance_runtime=runtime,
+        finance_catalog=_Catalog(),
+        result_store=result_store,
+    )
+    events = []
+    tools, _, tracker = service.build_tools(
+        owner_ids=["owner-a"],
+        tool_context={"_agent_runtime_scope": "financial_qa:owner-a/thread-8"},
+        event_sink=events.append,
+    )
+    tool_map = {item.name: item for item in tools}
+
+    first = _payload(
+        asyncio.run(
+            tool_map["finance_query"].handler(
+                {
+                    "goal": "取得第一组行情",
+                    "request": "r1 = stock.quote(filter='贵州茅台') -> stock_code, stock_name, close",
+                }
+            )
+        )
+    )
+    second = _payload(
+        asyncio.run(
+            tool_map["finance_query"].handler(
+                {
+                    "goal": "取得第二组行情",
+                    "request": "r1 = stock.quote(filter=\"code in r1.stock_code\") -> stock_code, close",
+                }
+            )
+        )
+    )
+
+    assert first["result_name"] == "r1"
+    assert second["result_name"] == "r2"
+    assert runtime.calls[1]["request"].startswith("r2 =")
+    assert tracker["calls"][1]["submitted_request"].startswith("r1 =")
+    assert tracker["calls"][1]["assigned_result_name"] == "r2"
+    assert any(
+        event["content"] == "正在查询：取得第一组行情"
+        and event["metadata"]["progress_id"] == "finance_query_step_1"
+        and event["metadata"]["status"] == "running"
+        for event in events
+    )
+    assert any(
+        event["content"] == "已完成：取得第一组行情，取得 1 条记录。"
+        and event["metadata"]["progress_id"] == "finance_query_step_1"
+        and event["metadata"]["status"] == "completed"
+        for event in events
+    )
+    visible_progress = "\n".join(str(event.get("content") or "") for event in events)
+    assert "selection_applied" not in visible_progress
+    assert "sample_complete" not in visible_progress
+    assert "闭环判断" not in visible_progress
+
+
+def test_working_set_distinguishes_available_identity_from_null_metric(
+    tmp_path: Path,
+) -> None:
+    class _NullMetricRuntime(_Runtime):
+        def execute_request(self, *, request, previous_results=None):
+            result = super().execute_request(
+                request=request,
+                previous_results=previous_results,
+            )
+            result["result"]["data"]["rows"][0]["close"] = None
+            return result
+
+    runtime = _NullMetricRuntime()
+    service = FinanceDataQueryCcTools(
+        finance_runtime=runtime,
+        finance_catalog=_Catalog(),
+        result_store=SessionVariableStoreService(data_root=tmp_path / "data"),
+    )
+    tools, _, _ = service.build_tools(
+        owner_ids=["owner-a"],
+        tool_context={"_agent_runtime_scope": "financial_qa:owner-a/thread-null"},
+    )
+    tool_map = {item.name: item for item in tools}
+
+    result = _payload(
+        asyncio.run(
+            tool_map["finance_query"].handler(
+                {
+                    "steps": [
+                        {
+                            "goal": "取得目标股票身份和收盘价",
+                            "request": "result = stock.quote(filter='贵州茅台') -> stock_code, stock_name, close",
+                        },
+                        {
+                            "goal": "继续使用第一步的股票范围查询",
+                            "request": "result = stock.quote(filter=\"code in step1.stock_code\") -> stock_code, stock_name, close",
+                        },
+                    ]
+                }
+            )
+        )
+    )
+    columns = {
+        item["name"]: item["populated_count"]
+        for item in result["working_set"][0]["columns"]
+    }
+
+    assert columns == {
+        "stock_code": 1,
+        "stock_name": 1,
+        "close": 0,
+    }
+    assert result["working_set"][0]["sample_complete"] is True
+    assert result["steps"][0]["step_evidence"]["available_refs"] == [
+        "r1.stock_code",
+        "r1.stock_name",
+    ]
+    assert result["steps"][0]["step_evidence"]["execution_completed"] is True
+    assert result["steps"][0]["step_evidence"]["populated_columns"] == [
+        "stock_code",
+        "stock_name",
+    ]
+    assert result["steps"][0]["step_evidence"]["unavailable_columns"] == ["close"]
+    assert "保留身份范围并如实回答缺值" in result["steps"][0]["step_evidence"]["guidance"]
+    assert len(runtime.calls) == 2
+    assert "code in r1.stock_code" in runtime.calls[1]["request"]
+
+
+def test_finance_flow_stops_at_invalid_forward_reference_and_keeps_prior_result(
+    tmp_path: Path,
+) -> None:
+    service, runtime, _, tools, _, tracker = _tools(tmp_path)
+
+    result = _payload(
+        asyncio.run(
+            tools["finance_query"].handler(
+                {
+                    "steps": [
+                        {
+                            "goal": "取得第一步行情",
+                            "request": "result = stock.quote(filter='贵州茅台') -> stock_code, close",
+                        },
+                        {
+                            "goal": "错误引用尚未执行的第三步",
+                            "request": "result = stock.quote(filter=step3.stock_code) -> stock_code, close",
+                        },
+                        {
+                            "goal": "本步不应执行",
+                            "request": "result = stock.quote(filter=\"code in step1.stock_code\") -> stock_code, close",
+                        },
+                    ]
+                }
+            )
+        )
+    )
+
+    assert result["failed_step"] == 2
+    assert "FLOW_REF_ERROR" in result["error"]
+    assert len(runtime.calls) == 1
+    assert [item["result_name"] for item in tracker["result_refs"]] == ["r1"]
+    assert result["working_set"][0]["goal"] == "取得第一步行情"
 
 
 def test_validation_failure_is_returned_for_cc_repair_and_not_registered(
@@ -285,7 +513,10 @@ def test_validation_failure_is_returned_for_cc_repair_and_not_registered(
     failed = _payload(
         asyncio.run(
             tools["finance_query"].handler(
-                {"request": "r1 = stock.quote(...) -> invalid"}
+                    {
+                        "goal": "取得一个无效字段",
+                        "request": "result = stock.quote(filter='贵州茅台') -> invalid",
+                    }
             )
         )
     )
@@ -298,13 +529,156 @@ def test_validation_failure_is_returned_for_cc_repair_and_not_registered(
     ) == []
 
 
+def test_provider_failure_stops_flow_and_is_not_registered(tmp_path: Path) -> None:
+    class _ProviderFailureRuntime(_Runtime):
+        def execute_request(self, *, request, previous_results=None):
+            self.calls.append(
+                {
+                    "request": request,
+                    "previous": sorted(dict(previous_results or {})),
+                }
+            )
+            return {
+                "protocol": "finance_data_tool.v1",
+                "request": request,
+                "validation": {"ok": True, "errors": [], "warnings": []},
+                "execution": {
+                    "ok": False,
+                    "status": "provider_error",
+                    "reason": "database unavailable",
+                },
+                "result": {
+                    "name": "r1",
+                    "api": "stock.quote",
+                    "columns": ["stock_code", "close"],
+                    "data": {
+                        "status": "provider_error",
+                        "reason": "database unavailable",
+                        "rows": [],
+                    },
+                },
+            }
+
+    runtime = _ProviderFailureRuntime()
+    service = FinanceDataQueryCcTools(
+        finance_runtime=runtime,
+        finance_catalog=_Catalog(),
+        result_store=SessionVariableStoreService(data_root=tmp_path / "data"),
+    )
+    tool_runtime = service.create_runtime()
+    tools, _, tracker = service.build_tools(
+        owner_ids=["owner-a"],
+        tool_context={"_agent_runtime_scope": "financial_qa:owner-a/thread-provider-error"},
+        runtime=tool_runtime,
+    )
+    result = _payload(
+        asyncio.run(
+            next(item for item in tools if item.name == "finance_query").handler(
+                {
+                    "steps": [
+                        {
+                            "goal": "取得行情",
+                            "request": "result = stock.quote(filter='贵州茅台') -> stock_code, close",
+                        }
+                    ]
+                }
+            )
+        )
+    )
+
+    assert result["failed_step"] == 1
+    assert result["execution"]["status"] == "provider_error"
+    assert tracker["result_refs"] == []
+    assert tool_runtime.result_handles == {}
+    assert service.result_store.list_variables(
+        session_id="financial_qa:owner-a/thread-provider-error"
+    ) == []
+
+
+def test_restore_ignores_legacy_provider_failure_marked_as_ok(
+    tmp_path: Path,
+) -> None:
+    result_store = SessionVariableStoreService(data_root=tmp_path / "data")
+    scope = "financial_qa:owner-a/legacy-provider-error"
+    variable = result_store.register_tool_result(
+        session_id=scope,
+        tool_name="finance_data_query",
+        task="旧失败查询",
+        local_alias="r1",
+        result={
+            "protocol": "finance_data_tool.v1",
+            "validation": {"ok": True, "errors": [], "warnings": []},
+            "result": {
+                "name": "r1",
+                "api": "stock.quote",
+                "columns": ["stock_code", "close"],
+                "data": {
+                    "status": "provider_error",
+                    "reason": "legacy database error",
+                    "rows": [],
+                },
+            },
+        },
+    )
+    assert variable is not None
+    assert variable["status"] == "ok"
+
+    service = FinanceDataQueryCcTools(
+        finance_runtime=_Runtime(),
+        finance_catalog=_Catalog(),
+        result_store=result_store,
+    )
+    restored = service.create_runtime()
+    restored.begin_turn(
+        owner_ids=["owner-a"],
+        tool_context={"_agent_runtime_scope": scope},
+    )
+
+    assert restored.result_handles == {}
+    assert restored.working_set() == []
+
+
+def test_registration_failure_does_not_leave_in_memory_result(
+    tmp_path: Path,
+    monkeypatch,
+) -> None:
+    service, _, tool_runtime, tools, _, tracker = _tools(tmp_path)
+    monkeypatch.setattr(
+        service.result_store,
+        "register_tool_result",
+        lambda **kwargs: None,
+    )
+
+    result = _payload(
+        asyncio.run(
+            tools["finance_query"].handler(
+                {
+                    "steps": [
+                        {
+                            "goal": "取得行情",
+                            "request": "result = stock.quote(filter='贵州茅台') -> stock_code, close",
+                        }
+                    ]
+                }
+            )
+        )
+    )
+
+    assert result["error"] == "query result could not be registered"
+    assert tracker["result_refs"] == []
+    assert tool_runtime.result_handles == {}
+
+
 def test_long_lived_query_tools_record_calls_on_the_current_turn(
     tmp_path: Path,
 ) -> None:
     _, _, tool_runtime, tools, _, first_tracker = _tools(tmp_path)
     asyncio.run(
         tools["finance_query"].handler(
-            {"request": "r1 = stock.quote(...) -> stock_code, close"}
+            {
+                "goal": "取得第一步行情",
+                "request": "result = stock.quote(filter='贵州茅台') -> stock_code, close",
+            }
         )
     )
     second_tracker = tool_runtime.begin_turn(
@@ -313,7 +687,10 @@ def test_long_lived_query_tools_record_calls_on_the_current_turn(
     )
     asyncio.run(
         tools["finance_query"].handler(
-            {"request": "r2 = stock.quote(filter=r1.stock_code) -> stock_code, close"}
+            {
+                "goal": "取得第二步行情",
+                "request": "result = stock.quote(filter=\"code in r1.stock_code\") -> stock_code, close",
+            }
         )
     )
 
@@ -379,9 +756,19 @@ def test_financial_qa_service_uses_resolved_question_and_normal_qa_only() -> Non
         dispatch_plan=plan,
         application_context={
             "default_agent": {
-                "tools": ["financial_news_search"],
+                "tools": [
+                    "financial_news_search",
+                    "stock_realtime_quote",
+                ],
                 "runtime_profile": {
-                    "tools": ["financial_news_search"],
+                    "tools": [
+                        "financial_news_search",
+                        "stock_realtime_quote",
+                    ],
+                    "skills": [
+                        "stock-research",
+                        "earnings-analysis",
+                    ],
                     "sections": [
                         {
                             "section": "soul",
@@ -406,6 +793,19 @@ def test_financial_qa_service_uses_resolved_question_and_normal_qa_only() -> Non
     assert session.calls[0]["context"]["allowed_agent_tools"] == [
         "financial_news_search"
     ]
+    assert session.calls[0]["context"]["allowed_finance_skills"] == [
+        "stock-research",
+        "earnings-analysis",
+    ]
+    assert session.calls[0]["context"]["_resolved_question"] == (
+        "贵州茅台最近交易日的收盘价是多少？"
+    )
+    assert "stock-research" in session.calls[0]["context"][
+        "_finance_skill_catalog_prompt"
+    ]
+    assert "factor-analysis" not in session.calls[0]["context"][
+        "_finance_skill_catalog_prompt"
+    ]
     assert session.calls[0]["context"]["_agent_system_prompt"] == (
         "Investment Analyst 原有角色提示"
     )
@@ -414,6 +814,8 @@ def test_financial_qa_service_uses_resolved_question_and_normal_qa_only() -> Non
     ]
     assert result["mode"] == "financial_qa_cc"
     assert result["financial_qa"]["tool_calls"] == [{"tool": "finance_query"}]
+    assert result["surface_blocks"][0]["block_id"] == "financial_qa_answer"
+    assert result["surface_blocks"][0]["content"] == result["message"]
 
 
 class _ExplodingPlanner:
@@ -450,17 +852,38 @@ def test_financial_qa_prompt_and_manual_keep_business_specific_rules() -> None:
     root = Path("src/scenarios/financial_qa")
     prompt = (root / "system.md").read_text(encoding="utf-8")
     manual = (root / "data_query.md").read_text(encoding="utf-8")
-    deep_dive = Path("src/skills/stock_deep_dive/SKILL.md").read_text(
-        encoding="utf-8"
-    )
+    business_root = Path("src/skills/finance-business/skills")
+    business_skills = {
+        path.parent.name: path.read_text(encoding="utf-8")
+        for path in business_root.glob("*/SKILL.md")
+    }
 
     assert "没有查询结果时不编造数值" in prompt
     assert "constitution" in manual
     assert "margin" in manual
     assert "rN.column" in manual
-    assert "name: stock-deep-dive" in deep_dive
-    assert "finance_query" in deep_dive
-    assert "Codex" not in prompt + manual + deep_dive
+    assert "同一个事实只选择一条证据路径" in manual
+    assert "对象、指标、时间、关系/聚合" in prompt
+    assert "只修正能够明确指出的语义偏差" in prompt
+    assert "不为了提高 Skill 覆盖率强行加载" in prompt
+    assert "不形成持续的 `active_skill` 状态" in prompt
+    assert "不要用新闻搜索替代当前不存在的原始研报能力" in prompt
+    assert set(business_skills) == {
+        "market-overview",
+        "sector-theme-analysis",
+        "stock-research",
+        "stock-screening",
+        "earnings-analysis",
+        "factor-analysis",
+        "valuation-analysis",
+        "financial-quality-analysis",
+        "stock-comparison",
+        "technical-structure-analysis",
+        "dividend-analysis",
+    }
+    assert all(f"name: {name}" in text for name, text in business_skills.items())
+    assert all("finance_query" not in text for text in business_skills.values())
+    assert "Codex" not in prompt + manual + "".join(business_skills.values())
 
 
 def test_chat_dispatch_hands_investment_normal_qa_directly_to_financial_cc(

@@ -1,0 +1,4 @@
+interface:
+  display_name: "业绩分析"
+  short_description: "分析财报与业绩变化，解释经营质量、核心原因及后续影响"
+  default_prompt: "Use $earnings-analysis to analyze the latest reported performance of this company."

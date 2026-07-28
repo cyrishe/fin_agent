@@ -4,6 +4,7 @@ import re
 from typing import Any, Dict, Iterable, Mapping, Optional
 
 from src.services.finance_data_tool_runtime_service import FinanceDataToolRuntimeService
+from src.experiments.staged_data_protocol.phase2.trade_date_resolver import TradeDateResolver
 
 
 class StockIdentityResolverService:
@@ -14,7 +15,9 @@ class StockIdentityResolverService:
     _EXCHANGES = ("SH", "SZ", "BJ")
 
     def __init__(self, runtime: Optional[FinanceDataToolRuntimeService] = None) -> None:
-        self.runtime = runtime or FinanceDataToolRuntimeService()
+        self.runtime = runtime or FinanceDataToolRuntimeService(
+            trade_date_resolver=TradeDateResolver()
+        )
 
     def resolve(self, value: Any) -> Optional[Dict[str, str]]:
         query = str(value or "").strip()
@@ -57,6 +60,9 @@ class StockIdentityResolverService:
             request=f'r1 = stock.basic_info(filter = "{field} = {safe_value}", limit = 5) -> code, name'
         )
         if not bool((payload.get("validation") or {}).get("ok")):
+            return []
+        execution = payload.get("execution")
+        if isinstance(execution, Mapping) and not bool(execution.get("ok")):
             return []
         result = payload.get("result") if isinstance(payload.get("result"), Mapping) else {}
         data = result.get("data") if isinstance(result.get("data"), Mapping) else {}

@@ -10,6 +10,7 @@ from src.services.custom_tool_service import CustomToolRuntimeService, CustomToo
 from src.services.agent_providers.runtime_context import AgentRuntimeContextAdapter
 from src.services.finance_data_tool_catalog_service import FinanceDataToolCatalogService
 from src.services.finance_data_tool_runtime_service import FinanceDataToolRuntimeService
+from src.experiments.staged_data_protocol.phase2.trade_date_resolver import TradeDateResolver
 from src.services.session_variable_store_service import SessionVariableStoreService
 
 
@@ -102,7 +103,9 @@ class FinanceCcSystemTools:
     ) -> None:
         self.custom_tool_store = custom_tool_store or CustomToolStoreService()
         self.custom_tool_runtime = custom_tool_runtime or CustomToolRuntimeService(store=self.custom_tool_store)
-        self.finance_runtime = finance_runtime or FinanceDataToolRuntimeService()
+        self.finance_runtime = finance_runtime or FinanceDataToolRuntimeService(
+            trade_date_resolver=TradeDateResolver()
+        )
         self.finance_catalog = finance_catalog or FinanceDataToolCatalogService()
         self.implementation_runner = implementation_runner
         self.runtime_context_adapter = runtime_context_adapter or AgentRuntimeContextAdapter()
@@ -151,8 +154,17 @@ class FinanceCcSystemTools:
             )
             if not variable:
                 return dict(result)
+            execution = (
+                result.get("execution")
+                if isinstance(result.get("execution"), Mapping)
+                else {}
+            )
+            message = _trim(result.get("message") or result.get("error"))
+            if not message and execution and not bool(execution.get("ok")):
+                message = _trim(execution.get("reason") or execution.get("status"))
             summary = {
-                "message": _trim(result.get("message") or result.get("error")),
+                "message": message,
+                "status": variable.get("status"),
                 "source_tool": tool_name,
                 "result_name": variable.get("local_alias"),
                 "result_ref": variable.get("data_ref"),
@@ -161,6 +173,8 @@ class FinanceCcSystemTools:
                 "schema": variable.get("schema"),
                 "sample": variable.get("sample"),
             }
+            if execution:
+                summary["execution"] = dict(execution)
             tool_runtime.tracker["result_refs"].append(dict(summary))
             return summary
 

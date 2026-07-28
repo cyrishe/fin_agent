@@ -22,6 +22,24 @@ def _trim(value: Any) -> str:
     return str(value or "").strip()
 
 
+def _canonical_skill_id(value: Any) -> str:
+    normalized = _trim(value)
+    return normalized.rsplit(":", 1)[-1] if normalized else ""
+
+
+def _append_runtime_context(prompt: str, runtime: Any) -> str:
+    builder = getattr(runtime, "current_context_prompt", None)
+    if not callable(builder):
+        return prompt
+    try:
+        context = _trim(builder())
+    except Exception:
+        return prompt
+    if not context:
+        return prompt
+    return f"{prompt}\n\n[系统提供的当前运行时索引]\n{context}"
+
+
 @dataclass
 class _LiveClaudeClient:
     client: Any
@@ -203,6 +221,11 @@ class FinanceClaudeSessionService:
                     "agent_tool_names": [_trim(item) for item in result.get("agent_tool_names") or [] if _trim(item)],
                     "skill_results": [
                         _trim(item)[:5_000] for item in result.get("skill_results") or [] if _trim(item)
+                    ],
+                    "skill_entries": [
+                        dict(item)
+                        for item in result.get("skill_entries") or []
+                        if isinstance(item, Mapping)
                     ],
                     "interaction_requests": [
                         dict(item) for item in result.get("interaction_requests") or [] if isinstance(item, Mapping)
@@ -445,6 +468,20 @@ class FinanceClaudeSessionService:
         agent_system_prompt = _trim(tool_context.get("_agent_system_prompt"))
         if agent_system_prompt:
             system_prompt_parts.append(agent_system_prompt)
+        finance_skill_catalog_prompt = _trim(
+            tool_context.get("_finance_skill_catalog_prompt")
+        )
+        if finance_skill_catalog_prompt:
+            system_prompt_parts.append(
+                "\n".join(
+                    [
+                        "[当前可用的金融业务 Skill 摘要]",
+                        "这些摘要用于本轮语义选择；匹配专业任务时先加载 Skill，"
+                        "单一事实查询或概念解释不强行加载。",
+                        finance_skill_catalog_prompt,
+                    ]
+                )
+            )
         system_prompt = "\n\n".join(
             item for item in system_prompt_parts if item
         )
@@ -453,6 +490,7 @@ class FinanceClaudeSessionService:
             2,
             int(os.environ.get("FINANCE_CC_MAX_TURNS") or 12),
         )
+        effective_skill_names = self._effective_skill_names(tool_context)
         options_fingerprint = hashlib.sha256(
             "\0".join(
                 [
@@ -462,7 +500,7 @@ class FinanceClaudeSessionService:
                     str(max_turns),
                     "tools" if self.system_tools is not None else "no-tools",
                     str(self.skill_root),
-                    *self.skill_names,
+                    *effective_skill_names,
                     *[
                         _trim(item)
                         for item in tool_context.get("allowed_agent_tools") or []
@@ -518,8 +556,8 @@ class FinanceClaudeSessionService:
                 mcp_servers["finance"] = create_sdk_mcp_server(name="finance", version="1.0.0", tools=tools)
             skill_root = self.skill_root.resolve()
             options = ClaudeAgentOptions(
-                tools=["Skill"] if self.skill_names else [],
-                allowed_tools=["Skill", *allowed_tools] if self.skill_names else allowed_tools,
+                tools=["Skill"] if effective_skill_names else [],
+                allowed_tools=["Skill", *allowed_tools] if effective_skill_names else allowed_tools,
                 disallowed_tools=[
                     "Bash", "Edit", "Write", "Read", "Glob", "Grep", "WebFetch", "WebSearch",
                     "Agent", "Task", "AskUserQuestion", "NotebookEdit",
@@ -529,8 +567,8 @@ class FinanceClaudeSessionService:
                 strict_mcp_config=bool(mcp_servers),
                 permission_mode="dontAsk",
                 setting_sources=[],
-                plugins=[{"type": "local", "path": str(skill_root)}] if self.skill_names else [],
-                skills=list(self.skill_names),
+                plugins=[{"type": "local", "path": str(skill_root)}] if effective_skill_names else [],
+                skills=list(effective_skill_names),
                 cwd=str(session_dir),
                 include_partial_messages=True,
                 max_turns=max_turns,
@@ -566,6 +604,7 @@ class FinanceClaudeSessionService:
                 if entry.tool_runtime is not None
                 else self._empty_tracker()
             )
+        prompt = _append_runtime_context(prompt, entry.tool_runtime)
         if entry.eviction_handle is not None:
             entry.eviction_handle.cancel()
             entry.eviction_handle = None
@@ -585,13 +624,34 @@ class FinanceClaudeSessionService:
             "result_refs": tracker.get("result_refs", []),
             "agent_tool_names": [],
             "skill_results": [],
+            "skill_entries": [],
         }
         tool_names_by_id: dict[str, str] = {}
+        public_tool_progress: dict[str, tuple[str, str]] = {}
         active_stage = "runtime"
-        last_progress_at = 0.0
+        understanding_completed = False
         self._send_event(
             event_sink,
-            {"source": "claude", "type": "stage_start", "content": "Finance CC started", "metadata": {"stage": active_stage}},
+            {
+                "source": "claude",
+                "type": "stage_start",
+                "content": "Finance CC started",
+                "metadata": {"stage": active_stage, "user_visible": False},
+            },
+        )
+        self._send_event(
+            event_sink,
+            {
+                "source": "claude",
+                "type": "reasoning_summary_delta",
+                "content": "正在理解问题，并确认其中的对象、时间与金融口径。",
+                "metadata": {
+                    "stage": active_stage,
+                    "progress_id": "finance_understanding",
+                    "title": "问题理解",
+                    "status": "running",
+                },
+            },
         )
         state = tool_context.get("custom_tool_state") if isinstance(tool_context.get("custom_tool_state"), Mapping) else {}
         has_confirmed_design = isinstance(state.get("design_contract"), Mapping) and bool(state.get("design_contract"))
@@ -611,18 +671,6 @@ class FinanceClaudeSessionService:
                             delta = event.get("delta") if isinstance(event.get("delta"), dict) else {}
                             if delta.get("type") == "text_delta" and delta.get("text"):
                                 evidence["text_delta_count"] += 1
-                                now = time.monotonic()
-                                if now - last_progress_at >= 0.8:
-                                    last_progress_at = now
-                                    self._send_event(
-                                        event_sink,
-                                        {
-                                            "source": "claude",
-                                            "type": "reasoning_summary_delta",
-                                            "content": "Finance CC is working",
-                                            "metadata": {"stage": active_stage},
-                                        },
-                                    )
                     if class_name == "AssistantMessage":
                         for block in getattr(message, "content", None) or []:
                             if type(block).__name__ == "ToolUseBlock":
@@ -631,17 +679,94 @@ class FinanceClaudeSessionService:
                                 tool_input = tool_input if isinstance(tool_input, Mapping) else {}
                                 active_stage = self._stage_for_tool(name, tool_input)
                                 tool_use_id = _trim(getattr(block, "id", ""))
+                                if not understanding_completed:
+                                    understanding_completed = True
+                                    self._send_event(
+                                        event_sink,
+                                        {
+                                            "source": "claude",
+                                            "type": "reasoning_summary_delta",
+                                            "content": "已明确本题的对象与口径，开始获取所需证据。",
+                                            "metadata": {
+                                                "stage": active_stage,
+                                                "progress_id": "finance_understanding",
+                                                "title": "问题理解",
+                                                "status": "completed",
+                                            },
+                                        },
+                                    )
                                 if tool_use_id and name:
                                     tool_names_by_id[tool_use_id] = name
                                 if name and name not in evidence["agent_tool_names"]:
                                     evidence["agent_tool_names"].append(name)
+                                if name == "Skill":
+                                    qualified_skill = next(
+                                        (
+                                            _trim(value)
+                                            for key, value in tool_input.items()
+                                            if _trim(key).lower()
+                                            in {"skill", "skill_id", "skill_name", "name"}
+                                            and _trim(value)
+                                        ),
+                                        "",
+                                    )
+                                    if not qualified_skill:
+                                        qualified_skill = next(
+                                            (
+                                                _trim(value)
+                                                for value in tool_input.values()
+                                                if isinstance(value, str)
+                                                and ":" in _trim(value)
+                                            ),
+                                            "",
+                                        )
+                                    evidence["skill_entries"].append(
+                                        {
+                                            "skill_id": _canonical_skill_id(
+                                                qualified_skill
+                                            ),
+                                            "qualified_skill": qualified_skill,
+                                        }
+                                    )
+                                    if tool_use_id:
+                                        public_tool_progress[tool_use_id] = (
+                                            "专业分析方法",
+                                            "正在加载与问题匹配的专业分析方法。",
+                                        )
+                                elif name in {"financial_news_search"} and tool_use_id:
+                                    public_tool_progress[tool_use_id] = (
+                                        "补充信息",
+                                        "正在检索与问题直接相关的公开金融信息。",
+                                    )
+                                if tool_use_id in public_tool_progress:
+                                    progress_title, progress_content = public_tool_progress[
+                                        tool_use_id
+                                    ]
+                                    self._send_event(
+                                        event_sink,
+                                        {
+                                            "source": "claude",
+                                            "type": "reasoning_summary_delta",
+                                            "content": progress_content,
+                                            "metadata": {
+                                                "stage": active_stage,
+                                                "progress_id": f"finance_tool_{tool_use_id}",
+                                                "title": progress_title,
+                                                "status": "running",
+                                            },
+                                        },
+                                    )
                                 self._send_event(
                                     event_sink,
                                     {
                                         "source": "claude",
                                         "type": "tool_call",
                                         "content": name or "Finance CC tool",
-                                        "metadata": {"stage": active_stage, "tool": name},
+                                        "metadata": {
+                                            "stage": active_stage,
+                                            "tool": name,
+                                            "user_visible": False,
+                                        },
                                     },
                                 )
                     if class_name == "UserMessage":
@@ -649,6 +774,27 @@ class FinanceClaudeSessionService:
                             if type(block).__name__ != "ToolResultBlock":
                                 continue
                             tool_name = tool_names_by_id.get(_trim(getattr(block, "tool_use_id", "")), "")
+                            tool_use_id = _trim(getattr(block, "tool_use_id", ""))
+                            if tool_use_id in public_tool_progress:
+                                progress_title, _ = public_tool_progress[tool_use_id]
+                                self._send_event(
+                                    event_sink,
+                                    {
+                                        "source": "claude",
+                                        "type": "reasoning_summary_delta",
+                                        "content": (
+                                            "专业分析方法已就绪。"
+                                            if tool_name == "Skill"
+                                            else "相关公开金融信息已返回。"
+                                        ),
+                                        "metadata": {
+                                            "stage": active_stage,
+                                            "progress_id": f"finance_tool_{tool_use_id}",
+                                            "title": progress_title,
+                                            "status": "completed",
+                                        },
+                                    },
+                                )
                             if tool_name != "Skill":
                                 continue
                             content = getattr(block, "content", "")
@@ -678,22 +824,75 @@ class FinanceClaudeSessionService:
             if self._live_clients.get(session_id) is entry:
                 self._schedule_idle_eviction(session_id, entry)
         has_transport_error = bool(_trim(evidence["error"]))
+        if not understanding_completed:
+            self._send_event(
+                event_sink,
+                {
+                    "source": "claude",
+                    "type": "reasoning_summary_delta",
+                    "content": "已完成问题理解；本题无需额外数据查询。",
+                    "metadata": {
+                        "stage": active_stage,
+                        "progress_id": "finance_understanding",
+                        "title": "问题理解",
+                        "status": "completed",
+                    },
+                },
+            )
+        self._send_event(
+            event_sink,
+            {
+                "source": "claude",
+                "type": "reasoning_summary_delta",
+                "content": (
+                    "本轮金融问答未能完成。"
+                    if has_transport_error
+                    else "证据与回答已整理完成。"
+                ),
+                "metadata": {
+                    "stage": active_stage,
+                    "progress_id": "finance_synthesis",
+                    "title": "回答整理",
+                    "status": "error" if has_transport_error else "completed",
+                },
+            },
+        )
         self._send_event(
             event_sink,
             {
                 "source": "claude",
                 "type": "error" if has_transport_error else "stage_result",
                 "content": evidence["error"] if has_transport_error else "Finance CC completed",
-                "metadata": {"stage": active_stage},
+                "metadata": {"stage": active_stage, "user_visible": False},
             },
         )
         return evidence
+
+    def _effective_skill_names(
+        self,
+        tool_context: Mapping[str, Any],
+    ) -> tuple[str, ...]:
+        raw_allowed = tool_context.get("allowed_finance_skills")
+        if not isinstance(raw_allowed, list):
+            return self.skill_names
+        allowed = {
+            _canonical_skill_id(item)
+            for item in raw_allowed
+            if _canonical_skill_id(item)
+        }
+        return tuple(
+            name
+            for name in self.skill_names
+            if _canonical_skill_id(name) in allowed
+        )
 
     @staticmethod
     def _stage_for_tool(name: str, tool_input: Mapping[str, Any]) -> str:
         normalized = _trim(name).lower()
         if normalized == "skill":
             skill_text = json.dumps(dict(tool_input), ensure_ascii=False).lower()
+            if "fin-agent-finance-business:" in skill_text:
+                return "runtime"
             if "requirement" in skill_text:
                 return "requirement"
             if "flowchart" in skill_text:

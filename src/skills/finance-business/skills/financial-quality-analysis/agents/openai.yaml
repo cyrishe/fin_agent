@@ -1,0 +1,4 @@
+interface:
+  display_name: "财务质量分析"
+  short_description: "分析盈利能力、现金流质量、资产负债和营运效率的变化"
+  default_prompt: "Use $financial-quality-analysis to assess this company financial quality."

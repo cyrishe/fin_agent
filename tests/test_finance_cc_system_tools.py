@@ -476,6 +476,60 @@ def test_finance_cc_execution_results_are_compact_and_loadable_by_conversation(t
     assert "does not belong to the current conversation" in denied["content"][0]["text"]
 
 
+def test_finance_cc_compact_result_preserves_provider_failure(tmp_path) -> None:
+    class FailedFinanceRuntime:
+        def execute_request(self, *, request):
+            return {
+                "protocol": "finance_data_tool.v1",
+                "request": request,
+                "ok": False,
+                "validation": {"ok": True, "errors": [], "warnings": []},
+                "execution": {
+                    "ok": False,
+                    "status": "provider_error",
+                    "reason": "database unavailable",
+                },
+                "result": {
+                    "name": "r1",
+                    "api": "stock.quote",
+                    "columns": ["code", "close"],
+                    "data": {
+                        "status": "provider_error",
+                        "reason": "database unavailable",
+                        "rows": [],
+                    },
+                },
+            }
+
+    service = FinanceCcSystemTools(
+        custom_tool_store=FakeStore(),
+        custom_tool_runtime=FakeDynamicRuntime(),
+        finance_runtime=FailedFinanceRuntime(),
+        finance_catalog=FakeFinanceCatalog(),
+        result_store=SessionVariableStoreService(data_root=tmp_path / "data"),
+    )
+    tools, _, tracker = service.build_tools(
+        owner_ids=["owner-1"],
+        tool_context={
+            "_agent_runtime_scope": "owner-a/thread-provider-error",
+            "custom_tool_state": {},
+        },
+    )
+    tool_map = {item.name: item for item in tools}
+
+    result = asyncio.run(
+        tool_map["finance_query"].handler(
+            {"request": "r1 = stock.quote(...)"}
+        )
+    )
+    text = result["content"][0]["text"]
+
+    assert '"status": "error"' in text
+    assert '"status": "provider_error"' in text
+    assert "database unavailable" in text
+    assert tracker["result_refs"][0]["status"] == "error"
+
+
 def test_finance_cc_saved_implementation_is_success_even_when_smoke_test_failed() -> None:
     def implementation_runner(**kwargs):
         return {

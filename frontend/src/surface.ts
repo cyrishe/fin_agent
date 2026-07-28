@@ -56,7 +56,11 @@ export function applyStreamEvent(run: AgentRun, event: StreamEvent): AgentRun {
     if (isProcessBlock(block)) {
       return {
         ...run,
-        summary: block.block_type === "status" && block.content ? block.content : run.summary,
+        summary: run.status === "done"
+          ? run.summary
+          : block.block_type === "status" && block.content
+            ? block.content
+            : run.summary,
         process: mergeBlock(run.process, block),
       };
     }
@@ -146,11 +150,24 @@ export function blocksFromPayload(payload: UnknownRecord): SurfaceBlock[] {
 
   if (displayBlocks.length) return processBlock ? [processBlock, ...displayBlocks] : displayBlocks;
 
+  const message = String(payload.message || "").trim();
+  const messageBlock = message
+    ? normalizeBlock({
+      event: "block",
+      block_id: "legacy_result_summary",
+      block_type: "narrative",
+      content: message,
+    })
+    : null;
   const items = Array.isArray(payload.items)
     ? payload.items.filter((item): item is UnknownRecord => Boolean(item && typeof item === "object"))
     : [];
-  if (!items.length) return processBlock ? [processBlock] : [];
-  const message = String(payload.message || "").trim();
+  if (!items.length) {
+    return [
+      ...(processBlock ? [processBlock] : []),
+      ...(messageBlock ? [messageBlock] : []),
+    ];
+  }
   const workspace = asRecord(payload.workspace);
   const resources = items.map((item, index) => ({
     resource_id: String(item.tool_name || item.skill_name || item.agent_name || item.application_name || item.name || index),
@@ -159,12 +176,7 @@ export function blocksFromPayload(payload: UnknownRecord): SurfaceBlock[] {
     uri: String(item.workspace_url || workspace.url || ""),
   }));
   const legacyBlocks: SurfaceBlock[] = [];
-  if (message) legacyBlocks.push(normalizeBlock({
-    event: "block",
-    block_id: "legacy_result_summary",
-    block_type: "narrative",
-    content: message,
-  }));
+  if (messageBlock) legacyBlocks.push(messageBlock);
   legacyBlocks.push(normalizeBlock({
     event: "block",
     block_id: "legacy_result_items",

@@ -32,6 +32,21 @@ describe("surface stream reducer", () => {
     expect(run.summary).toBe("正在确认数据口径");
   });
 
+  it("does not replace the completed run summary when persisted progress is merged", () => {
+    const done = applyStreamEvent(initialRun(), { event: "done" });
+    const merged = applyStreamEvent(done, {
+      event: "block",
+      block_id: "runtime_finance_synthesis",
+      block_type: "status",
+      content: "证据与回答已整理完成。",
+      data: { role: "process", status: "completed" },
+    });
+
+    expect(merged.status).toBe("done");
+    expect(merged.summary).toBe("本轮处理完成");
+    expect(merged.process).toHaveLength(1);
+  });
+
   it("keeps generic live agent activity out of the formal conversation", () => {
     const run = applyStreamEvent(initialRun(), {
       event: "block",
@@ -182,5 +197,24 @@ describe("surface stream reducer", () => {
 
     expect(isProcessBlock(blocks[0])).toBe(true);
     expect(blocks[1].block_id).toBe("answer");
+  });
+
+  it("keeps a plain assistant answer visible when task state only adds process blocks", () => {
+    const blocks = blocksFromPayload({
+      mode: "financial_qa_cc",
+      message: "贵州茅台今日上涨 2.35%。",
+      items: [],
+      task_state: {
+        job: { result_summary: "已完成行情查询" },
+        steps: [{ id: "query", title: "查询行情", status: "completed" }],
+      },
+    });
+
+    expect(isProcessBlock(blocks[0])).toBe(true);
+    expect(blocks[1]).toEqual(expect.objectContaining({
+      block_id: "legacy_result_summary",
+      block_type: "narrative",
+      content: "贵州茅台今日上涨 2.35%。",
+    }));
   });
 });

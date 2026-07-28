@@ -174,6 +174,49 @@ def test_top_intent_uses_one_llm_call_for_both_orthogonal_dimensions(monkeypatch
     assert result["turn_mode"] == "normal_qa"
 
 
+def test_preprocess_does_not_count_context_resolution_usage_twice():
+    service, context, intent = _service()
+    original_resolve = context.resolve
+    original_classify = intent.classify
+
+    def resolve_with_usage(**kwargs):
+        result = original_resolve(**kwargs)
+        result["llm_usage"] = {
+            "prompt_tokens": 100,
+            "completion_tokens": 10,
+            "total_tokens": 110,
+            "call_count": 1,
+        }
+        return result
+
+    def classify_with_usage(**kwargs):
+        result = original_classify(**kwargs)
+        result["llm_usage"] = {
+            "prompt_tokens": 200,
+            "completion_tokens": 20,
+            "total_tokens": 220,
+            "call_count": 1,
+        }
+        return result
+
+    context.resolve = resolve_with_usage
+    intent.classify = classify_with_usage
+
+    result = service.preprocess(
+        text="贵州茅台今天的行情是什么？",
+        application_context=APPLICATION_CONTEXT,
+        enable_llm=True,
+    )
+
+    assert result["normalized_request"]["llm_usage"]["total_tokens"] == 110
+    assert result["llm_usage"] == {
+        "prompt_tokens": 300,
+        "completion_tokens": 30,
+        "total_tokens": 330,
+        "call_count": 2,
+    }
+
+
 def test_top_intent_receives_compact_tool_facts_without_conversation_state(monkeypatch):
     calls = []
 

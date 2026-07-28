@@ -4,7 +4,10 @@ import time
 import claude_agent_sdk
 
 from src.services.agent_providers.claude import ClaudeSdkSkillHarness
-from src.services.finance_claude_session_service import FinanceClaudeSessionService
+from src.services.finance_claude_session_service import (
+    FinanceClaudeSessionService,
+    _append_runtime_context,
+)
 
 
 def test_shadow_service_preserves_session_and_isolates_owner_threads(tmp_path: Path) -> None:
@@ -67,6 +70,19 @@ def test_shadow_prompt_contains_only_current_turn_delta() -> None:
     assert "agent_route" not in prompt
     assert "自定义工具开发现场" not in prompt
     assert "ignored_large_payload" not in prompt
+
+
+def test_runtime_index_is_appended_without_replacing_current_turn() -> None:
+    class _Runtime:
+        @staticmethod
+        def current_context_prompt():
+            return '{"results": [{"result_name": "r1"}]}'
+
+    prompt = _append_runtime_context("那五粮液呢？", _Runtime())
+
+    assert prompt.startswith("那五粮液呢？")
+    assert "[系统提供的当前运行时索引]" in prompt
+    assert '"result_name": "r1"' in prompt
 
 
 def test_runtime_context_does_not_include_evaluation_stage_gate(tmp_path: Path, monkeypatch) -> None:
@@ -202,6 +218,150 @@ def test_agent_profile_is_loaded_once_into_the_cc_harness(
         assert options.skills == []
     finally:
         service.close()
+
+
+def test_finance_skill_catalog_summary_is_last_in_system_context(
+    tmp_path: Path,
+    monkeypatch,
+) -> None:
+    prompt_path = tmp_path / "system.md"
+    prompt_path.write_text("金融专业问答", encoding="utf-8")
+    service = _pooled_service(
+        tmp_path,
+        monkeypatch,
+        system_prompt_path=prompt_path,
+        skill_names=["finance:test"],
+    )
+    try:
+        service.run_turn(
+            thread_id=7,
+            owner_id="owner-a",
+            user_text="比较动量因子",
+            context={
+                "_agent_system_prompt": "Investment Analyst",
+                "_finance_skill_catalog_prompt": (
+                    "- factor-analysis: 计算、比较或解释因子"
+                ),
+            },
+        )
+
+        system_prompt = FakeClaudeClient.instances[0].options.system_prompt
+        assert system_prompt.endswith(
+            "- factor-analysis: 计算、比较或解释因子"
+        )
+        assert "[当前可用的金融业务 Skill 摘要]" in system_prompt
+    finally:
+        service.close()
+
+
+def test_finance_skill_allowlist_limits_native_skill_tools(
+    tmp_path: Path,
+    monkeypatch,
+) -> None:
+    prompt_path = tmp_path / "system.md"
+    prompt_path.write_text("金融专业问答", encoding="utf-8")
+    service = _pooled_service(
+        tmp_path,
+        monkeypatch,
+        system_prompt_path=prompt_path,
+        skill_root=tmp_path,
+        skill_names=[
+            "fin-agent-finance-business:market-overview",
+            "fin-agent-finance-business:stock-research",
+        ],
+    )
+    try:
+        service.run_turn(
+            thread_id=7,
+            owner_id="owner-a",
+            user_text="全面分析宁德时代",
+            context={"allowed_finance_skills": ["stock-research"]},
+        )
+
+        options = FakeClaudeClient.instances[0].options
+        assert options.skills == [
+            "fin-agent-finance-business:stock-research"
+        ]
+        assert "Skill" in options.allowed_tools
+    finally:
+        service.close()
+
+
+def test_native_finance_skill_entry_records_exact_skill_id(
+    tmp_path: Path,
+    monkeypatch,
+) -> None:
+    class ToolUseBlock:
+        id = "skill-use-1"
+        name = "Skill"
+        input = {
+            "skill": "fin-agent-finance-business:earnings-analysis",
+        }
+
+    class AssistantMessage:
+        content = [ToolUseBlock()]
+
+    class SkillClient(FakeClaudeClient):
+        async def receive_response(self):
+            yield AssistantMessage()
+            yield ResultMessage("已按财报分析方法完成。")
+
+    prompt_path = tmp_path / "system.md"
+    prompt_path.write_text("金融专业问答", encoding="utf-8")
+    FakeClaudeClient.instances = []
+    SkillClient.instances = []
+    monkeypatch.setattr(claude_agent_sdk, "ClaudeSDKClient", SkillClient)
+    monkeypatch.setattr(
+        ClaudeSdkSkillHarness,
+        "provider_env",
+        lambda self: {"ANTHROPIC_AUTH_TOKEN": "test-token"},
+    )
+    service = FinanceClaudeSessionService(
+        enabled=True,
+        root_dir=tmp_path / "sessions",
+        log_path=tmp_path / "events.jsonl",
+        system_prompt_path=prompt_path,
+        skill_root=tmp_path,
+        skill_names=[
+            "fin-agent-finance-business:earnings-analysis",
+        ],
+    )
+    try:
+        result = service.run_turn(
+            thread_id=8,
+            owner_id="owner-a",
+            user_text="分析贵州茅台年报的增长质量",
+            context={
+                "allowed_finance_skills": ["earnings-analysis"],
+            },
+        )
+
+        assert result["skill_entries"] == [
+            {
+                "skill_id": "earnings-analysis",
+                "qualified_skill": (
+                    "fin-agent-finance-business:earnings-analysis"
+                ),
+            }
+        ]
+        assert result["agent_tool_names"] == ["Skill"]
+    finally:
+        service.close()
+
+
+def test_native_finance_business_skill_reports_runtime_progress() -> None:
+    assert FinanceClaudeSessionService._stage_for_tool(
+        "Skill",
+        {
+            "skill": "fin-agent-finance-business:stock-research",
+        },
+    ) == "runtime"
+    assert FinanceClaudeSessionService._stage_for_tool(
+        "Skill",
+        {
+            "skill": "custom-tool-workflow:requirement",
+        },
+    ) == "requirement"
 
 
 def test_live_client_pool_isolates_conversations(tmp_path: Path, monkeypatch) -> None:

@@ -321,6 +321,43 @@ def test_high_frequency_sdk_deltas_only_emit_complete_semantic_units() -> None:
     assert summary[0]["content"] == "正在核对金融口径"
 
 
+def test_public_progress_metadata_creates_stable_replaceable_milestones() -> None:
+    builder = LlmStreamBlockBuilder(run_id="run_finance_progress")
+    running = builder.event_to_blocks({
+        "source": "claude",
+        "type": "reasoning_summary_delta",
+        "content": "正在查询融资余额。",
+        "metadata": {
+            "stage": "runtime",
+            "progress_id": "finance_query_step_1",
+            "title": "数据查询 1/1",
+            "status": "running",
+        },
+    })
+    completed = builder.event_to_blocks({
+        "source": "claude",
+        "type": "reasoning_summary_delta",
+        "content": "融资余额已返回 2 条记录。",
+        "metadata": {
+            "stage": "runtime",
+            "progress_id": "finance_query_step_1",
+            "title": "数据查询 1/1",
+            "status": "completed",
+        },
+    })
+
+    assert running[0]["block_id"] == completed[0]["block_id"] == "runtime_finance_query_step_1"
+    assert completed[0]["mode"] == "replace"
+    assert completed[0]["data"]["status"] == "completed"
+    assert completed[0]["data"]["summary"] == "融资余额已返回 2 条记录。"
+    assert builder.event_to_blocks({
+        "source": "claude",
+        "type": "tool_call",
+        "content": "mcp__finance__finance_query",
+        "metadata": {"stage": "runtime", "user_visible": False},
+    }) == []
+
+
 def test_failed_stage_result_is_not_rendered_as_completed() -> None:
     builder = LlmStreamBlockBuilder(run_id="run_failed")
 

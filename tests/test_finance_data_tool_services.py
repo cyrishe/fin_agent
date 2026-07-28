@@ -8,6 +8,7 @@ from src.services.finance_data_tool_catalog_service import FinanceDataToolCatalo
 from src.services.finance_data_tool_runtime_service import FinanceDataToolRuntimeService
 from src.services.active_tool_registry_service import ActiveToolRegistryService
 from src.experiments.staged_data_protocol.phase2.call_parser import parse_api_call
+from src.experiments.staged_data_protocol.phase2.models import ResultHandle
 from src.tools.registry import run_tool
 
 
@@ -101,8 +102,307 @@ def test_finance_data_runtime_returns_validation_error_without_execution() -> No
     )
 
     assert result["validation"]["ok"] is False
+    assert result["ok"] is False
     assert result["result"] is None
     assert any("OUTPUT_ERROR" in item for item in result["validation"]["errors"])
+
+
+def test_finance_data_runtime_exposes_provider_failure(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    import src.services.finance_data_tool_runtime_service as runtime_module
+
+    monkeypatch.setattr(
+        runtime_module,
+        "execute_api_call",
+        lambda call, previous_results: ResultHandle(
+            name=call.result_id,
+            api=call.api,
+            columns=["code", "close"],
+            data={
+                "status": "provider_error",
+                "reason": "database unavailable",
+                "rows": [],
+            },
+        ),
+    )
+
+    result = FinanceDataToolRuntimeService().execute_request(
+        request='r1 = stock.quote(filter = "code = 600519.SH", realtime = 0) -> code, close'
+    )
+
+    assert result["validation"]["ok"] is True
+    assert result["ok"] is False
+    assert result["execution"] == {
+        "ok": False,
+        "status": "provider_error",
+        "reason": "database unavailable",
+    }
+
+
+def test_finance_data_runtime_structures_provider_exception(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    import src.services.finance_data_tool_runtime_service as runtime_module
+
+    def raise_provider_exception(call, previous_results):
+        raise RuntimeError("connection setup failed")
+
+    monkeypatch.setattr(
+        runtime_module,
+        "execute_api_call",
+        raise_provider_exception,
+    )
+
+    result = FinanceDataToolRuntimeService().execute_request(
+        request='r1 = stock.quote(filter = "code = 600519.SH", realtime = 0) -> code, close'
+    )
+
+    assert result["ok"] is False
+    assert result["execution"] == {
+        "ok": False,
+        "status": "provider_exception",
+        "reason": "connection setup failed",
+    }
+    assert result["result"] is None
+
+
+def test_finance_data_runtime_rejects_bare_filter_result_reference() -> None:
+    previous = {
+        "r1": ResultHandle(
+            name="r1",
+            api="stock.quote",
+            columns=["code"],
+            data={"status": "ok", "rows": [{"code": "600519.SH"}]},
+        )
+    }
+
+    result = FinanceDataToolRuntimeService().execute_request(
+        request="r2 = stock.quote(filter = r1.code, realtime = 0) -> code, close",
+        previous_results=previous,
+    )
+
+    assert result["validation"]["ok"] is False
+    assert result["ok"] is False
+    assert any("bare filter" in item for item in result["validation"]["errors"])
+
+
+def test_filter_reference_validation_checks_each_occurrence() -> None:
+    previous = {
+        "r1": ResultHandle(
+            name="r1",
+            api="stock.quote",
+            columns=["code"],
+            data={"status": "ok", "rows": [{"code": "600519.SH"}]},
+        )
+    }
+
+    result = FinanceDataToolRuntimeService().execute_request(
+        request=(
+            'r2 = stock.quote(filter = "code in r1.code and name = r1.code", '
+            "realtime = 0) -> code, close"
+        ),
+        previous_results=previous,
+    )
+
+    assert result["validation"]["ok"] is False
+    assert any("bare filter" in item for item in result["validation"]["errors"])
+
+
+def test_finance_data_runtime_short_circuits_empty_upstream_reference() -> None:
+    previous = {
+        "r1": ResultHandle(
+            name="r1",
+            api="stock.quote",
+            columns=["code"],
+            data={"status": "ok", "rows": [], "row_count": 0},
+        )
+    }
+
+    result = FinanceDataToolRuntimeService().execute_request(
+        request='r2 = stock.quote(filter = "code in r1.code", realtime = 0) -> code, close',
+        previous_results=previous,
+    )
+
+    assert result["validation"]["ok"] is True
+    assert result["ok"] is True
+    assert result["execution"]["ok"] is True
+    assert result["result"]["data"]["row_count"] == 0
+    assert result["result"]["data"]["empty_references"] == ["r1.code"]
+
+
+def test_aggregate_result_reference_is_not_materialized(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    import src.experiments.staged_data_protocol.phase2.api_runner as runner
+
+    captured = {}
+
+    def fake_aggregate(*, subject, args, outputs, previous_results):
+        captured.update(
+            {
+                "subject": subject,
+                "args": dict(args),
+                "outputs": list(outputs),
+                "previous": sorted(previous_results),
+            }
+        )
+        return {
+            "status": "ok",
+            "columns": ["plate_code", "plate_name", "average_metric"],
+            "rows": [],
+            "row_count": 0,
+        }
+
+    monkeypatch.setattr(
+        runner,
+        "execute_constitution_agg_api",
+        fake_aggregate,
+    )
+    previous = {
+        "r1": ResultHandle(
+            name="r1",
+            api="stock.quote",
+            columns=["code", "plate_code", "metric"],
+            data={
+                "status": "ok",
+                "rows": [
+                    {
+                        "code": "600519.SH",
+                        "plate_code": "885001",
+                        "metric": 2.5,
+                    }
+                ],
+            },
+        )
+    }
+    call = parse_api_call(
+        'r2 = plate.constitution.agg(filter = "plate_code in r1.plate_code", '
+        'agg = avg(r1.metric), group_by = "plate_code, plate_name", realtime = 0) '
+        "-> plate_code, plate_name, average_metric"
+    )
+
+    runner.execute_api_call(call, previous)
+
+    assert captured["args"]["filter"] == "plate_code in [885001]"
+    assert captured["args"]["agg"] == "avg(r1.metric)"
+
+
+def test_empty_reference_in_or_filter_fails_closed_before_provider(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    import src.experiments.staged_data_protocol.phase2.api_runner as runner
+
+    provider_called = False
+
+    def fake_quote(*, subject, args, outputs):
+        nonlocal provider_called
+        provider_called = True
+        return {
+            "status": "ok",
+            "columns": ["code", "close"],
+            "rows": [{"code": "600519.SH", "close": 1500.0}],
+            "row_count": 1,
+        }
+
+    monkeypatch.setattr(runner, "execute_quote_api", fake_quote)
+    previous = {
+        "r1": ResultHandle(
+            name="r1",
+            api="stock.quote",
+            columns=["code"],
+            data={"status": "ok", "rows": [], "row_count": 0},
+        ),
+        "r2": ResultHandle(
+            name="r2",
+            api="stock.quote",
+            columns=["code"],
+            data={"status": "ok", "rows": [{"code": "600519.SH"}]},
+        ),
+    }
+    call = parse_api_call(
+        'r3 = stock.quote(filter = "(code in r1.code or code in r2.code) and pct > 0", '
+        "realtime = 0) -> code, close"
+    )
+
+    result = runner.execute_api_call(call, previous)
+
+    assert provider_called is False
+    assert result.data["status"] == "filter_reference_resolution_error"
+    assert "alternative branch" in result.data["reason"]
+    assert result.data["empty_references"] == ["r1.code"]
+
+
+def test_required_empty_reference_short_circuits_before_nested_or() -> None:
+    previous = {
+        "r1": ResultHandle(
+            name="r1",
+            api="stock.quote",
+            columns=["code"],
+            data={"status": "ok", "rows": [], "row_count": 0},
+        )
+    }
+
+    result = FinanceDataToolRuntimeService().execute_request(
+        request=(
+            'r2 = stock.quote(filter = "code in r1.code and '
+            '(pct > 1 or amount > 5000000000)", realtime = 0) '
+            "-> code, close"
+        ),
+        previous_results=previous,
+    )
+
+    assert result["ok"] is True
+    assert result["result"]["data"]["row_count"] == 0
+    assert result["result"]["data"]["empty_references"] == ["r1.code"]
+
+
+def test_unparseable_empty_reference_filter_fails_closed(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    import src.experiments.staged_data_protocol.phase2.api_runner as runner
+
+    provider_called = False
+
+    def fake_quote(*, subject, args, outputs):
+        nonlocal provider_called
+        provider_called = True
+        return {
+            "status": "ok",
+            "columns": ["code", "close"],
+            "rows": [{"code": "600519.SH", "close": 1500.0}],
+            "row_count": 1,
+        }
+
+    monkeypatch.setattr(runner, "execute_quote_api", fake_quote)
+    previous = {
+        "r1": ResultHandle(
+            name="r1",
+            api="stock.quote",
+            columns=["code"],
+            data={"status": "ok", "rows": [], "row_count": 0},
+        )
+    }
+
+    result = FinanceDataToolRuntimeService().execute_request(
+        request=(
+            'r2 = stock.quote(filter = "code in r1.code '
+            'AND(pct > 1 OR amount > 5000000000)", realtime = 0) '
+            "-> code, close"
+        ),
+        previous_results=previous,
+    )
+
+    assert provider_called is False
+    assert result["ok"] is False
+    assert result["execution"] == {
+        "ok": False,
+        "status": "filter_reference_resolution_error",
+        "reason": (
+            "filter boolean structure could not be resolved safely after "
+            "an upstream reference returned no values"
+        ),
+    }
 
 
 @requires_kingdomai

@@ -1,0 +1,4 @@
+interface:
+  display_name: "自然语言选股"
+  short_description: "把自然语言投资偏好转为可执行筛选，并解释候选及命中依据"
+  default_prompt: "Use $stock-screening to screen stocks from my natural-language criteria."

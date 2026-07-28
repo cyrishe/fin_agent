@@ -1,0 +1,4 @@
+interface:
+  display_name: "个股估值分析"
+  short_description: "结合历史估值、经营特征和同业比较判断股票估值状态与风险"
+  default_prompt: "Use $valuation-analysis to assess this stock valuation with comparable evidence."

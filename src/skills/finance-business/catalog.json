@@ -1,0 +1,71 @@
+{
+  "version": "v1",
+  "skills": [
+    {
+      "id": "market-overview",
+      "category": "market-and-sector",
+      "path": "skills/market-overview",
+      "description": "综合分析大盘环境、涨跌宽度、成交、风格和风险偏好时使用；单个指数或市场指标的事实查询不使用。"
+    },
+    {
+      "id": "sector-theme-analysis",
+      "category": "market-and-sector",
+      "path": "skills/sector-theme-analysis",
+      "description": "分析行业、概念或主题的表现驱动、内部结构、持续性和代表公司时使用；只查板块涨跌幅或成分股不使用。"
+    },
+    {
+      "id": "stock-research",
+      "category": "equity-research",
+      "path": "skills/stock-research",
+      "description": "对一只或少量股票做行情、基本面、估值、事件和风险的综合研究时使用；单个价格、财务或研报字段查询不使用。"
+    },
+    {
+      "id": "earnings-analysis",
+      "category": "equity-research",
+      "path": "skills/earnings-analysis",
+      "description": "分析业绩预告、定期报告或财报中的变化、增长质量、现金流和经营趋势时使用；只查询一个财务数值不使用。"
+    },
+    {
+      "id": "stock-screening",
+      "category": "screening-and-factor",
+      "path": "skills/stock-screening",
+      "description": "把自然语言条件转化为一次选股、执行并解释候选结果时使用；创建或修改可复用选股工具属于工具开发，不使用本 Skill。"
+    },
+    {
+      "id": "factor-analysis",
+      "category": "screening-and-factor",
+      "path": "skills/factor-analysis",
+      "description": "计算、比较或解释因子及其样本差异时使用；只查询现成行情字段或创建新因子工具不使用。"
+    },
+    {
+      "id": "valuation-analysis",
+      "category": "equity-research",
+      "path": "skills/valuation-analysis",
+      "description": "分析单只股票当前估值、历史位置、同业差异和隐含经营预期；只查询一个估值数值不使用。"
+    },
+    {
+      "id": "financial-quality-analysis",
+      "category": "equity-research",
+      "path": "skills/financial-quality-analysis",
+      "description": "分析单只公司的盈利能力、现金流质量、资产负债、营运效率和财务风险。"
+    },
+    {
+      "id": "stock-comparison",
+      "category": "equity-research",
+      "path": "skills/stock-comparison",
+      "description": "使用一致口径比较多只股票的业务、成长、财务质量、估值、市场表现和风险。"
+    },
+    {
+      "id": "technical-structure-analysis",
+      "category": "equity-research",
+      "path": "skills/technical-structure-analysis",
+      "description": "分析单只股票的趋势、关键位置、量价关系、波动和技术信号之间的相互印证。"
+    },
+    {
+      "id": "dividend-analysis",
+      "category": "equity-research",
+      "path": "skills/dividend-analysis",
+      "description": "分析单只股票的分红记录、股息水平、利润与现金流支撑以及分红可持续性。"
+    }
+  ]
+}
