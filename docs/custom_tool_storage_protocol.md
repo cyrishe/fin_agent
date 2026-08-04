@@ -3,7 +3,7 @@
 自定义工具没有用户可见文件。系统把它作为动态运行时资产保存：
 
 - `aiia_runtime_artifact`：稳定工具身份、所有者、生命周期和当前修订号。
-- `aiia_runtime_artifact_revision`：每次 Coding 产生的不可变实现快照；`spec_json` 保存数据库模块、确认的 Design、Design 版本指纹、系统反馈证据、拟执行测试和样例输入。
+- `aiia_runtime_artifact_revision`：每次 Coding 产生的不可变实现快照；`spec_json` 保存数据库模块、确认的 Design、Design 版本指纹、系统反馈证据、拟执行测试和样例输入。策略修订还可保存系统校验后的 `strategy_runtime_profile` 和 `selection_output_profile`，它们不属于用户公开输入。
 - `aiia_custom_tool_test_run`：每次实际测试的输入、输出和三道门禁证据。
 
 动态模块可通过 `custom_tool_sdk.info/debug` 写入少量结构化执行证据。日志由沙箱输出通道单独收集，不属于工具公开输出；debug 测试界面展示核心中间指标，普通工具调用仍以业务结果为主。

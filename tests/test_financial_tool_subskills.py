@@ -91,6 +91,7 @@ def test_flowchart_is_independent_from_module_design() -> None:
     assert design_schema["properties"]["design"]["type"] == "string"
     assert set(flow_schema["properties"]) == {"mermaid"}
     assert flow_schema["required"] == ["mermaid"]
+    assert "flowchart|graph" in flow_schema["properties"]["mermaid"]["pattern"]
 
 
 def test_requirement_and_design_schemas_keep_only_semantic_top_level_fields() -> None:
@@ -100,7 +101,17 @@ def test_requirement_and_design_schemas_keep_only_semantic_top_level_fields() ->
     design = json.loads((ROOT / "schema.json").read_text(encoding="utf-8"))
 
     assert set(requirement["properties"]) == {"requirement_brief", "notice", "questions"}
-    assert set(design["properties"]) == {"design"}
+    assert set(design["properties"]) == {"design", "finance_tool_profile"}
+    assert design["required"] == ["design"]
+    assert design["additionalProperties"] is True
+    profile = design["properties"]["finance_tool_profile"]
+    assert profile["additionalProperties"] is False
+    assert set(profile["required"]) == {
+        "protocol",
+        "family",
+        "execution_shape",
+        "output_semantic",
+    }
 
 
 def test_implementation_and_test_keep_technical_facts_separate_from_user_judgement() -> None:
@@ -117,9 +128,43 @@ def test_implementation_and_test_keep_technical_facts_separate_from_user_judgeme
     assert set(implementation["properties"]) == {
         "tool_contract",
         "implementation_summary",
+        "finance_tool_profile",
+        "strategy_runtime_profile",
+        "selection_output_profile",
     }
     assert implementation["properties"]["implementation_summary"]["type"] == "string"
     assert set(test_plan["required"]) == {"summary", "next_action", "assessment", "cases", "presentation"}
     assert test_plan["properties"]["next_action"]["enum"] == ["run_tests", "finish"]
     assert set(test_plan["properties"]["cases"]["items"]["required"]) == {"name", "purpose", "request"}
     assert "execution_ok" not in test_plan["properties"]["cases"]["items"]["properties"]
+
+
+def test_financial_tool_family_is_semantic_and_action_stays_non_executable() -> None:
+    requirement = (
+        SUBSKILLS_ROOT / "financial-tool-requirement" / "SKILL.md"
+    ).read_text(encoding="utf-8")
+    design = (
+        SUBSKILLS_ROOT / "financial-tool-design" / "SKILL.md"
+    ).read_text(encoding="utf-8")
+    implementation = (
+        SUBSKILLS_ROOT / "financial-tool-implementation" / "SKILL.md"
+    ).read_text(encoding="utf-8")
+    edit_planning = (
+        SUBSKILLS_ROOT / "financial-tool-edit-planning" / "SKILL.md"
+    ).read_text(encoding="utf-8")
+    edit_implementation = (
+        SUBSKILLS_ROOT / "financial-tool-edit-implementation" / "SKILL.md"
+    ).read_text(encoding="utf-8")
+
+    assert "不要让用户机械选择工具类型" in requirement
+    assert "最终输出承担的业务职责" in requirement
+    assert "评分计算本身不代表策略" in design
+    assert "大盘强度指标是 `analytics + aggregate_context + metric`" in design
+    assert '"execution_shape": "aggregate_context"' in design
+    assert '"output_semantic": "metric"' in design
+    assert "不得进入 Coding" in design
+    assert "只有 `finance_tool_profile.family=strategy`" in implementation
+    assert "不得生成、测试或声称执行下单" in implementation
+    assert "动作工具只能回到 Design" in edit_planning
+    assert "`local_patch` 必须保持当前 `finance_tool_profile`" in edit_planning
+    assert "不得加入下单、撤单、调仓等外部副作用" in edit_implementation

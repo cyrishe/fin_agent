@@ -1,4 +1,4 @@
 interface:
-  display_name: "个股研究"
-  short_description: "综合研究股票经营、财务、估值、市场表现、催化剂与主要风险"
-  default_prompt: "Use $stock-research to analyze this stock with current system data."
+  display_name: "个股深度研究"
+  short_description: "按行业、公司阶段、事件状态和用户目标自适应组织个股研究"
+  default_prompt: "使用 $stock-research 结合系统最新数据，对这只股票做有证据、可证伪的自适应深度研究。"

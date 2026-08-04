@@ -19,6 +19,7 @@ const list = (value: unknown): unknown[] => Array.isArray(value) ? value : [];
 interface Props {
   data: UnknownRecord;
   content: string;
+  interactionInstanceKey?: string;
   draft?: InteractionDraft;
   selectedActionId?: string;
   disabled?: boolean;
@@ -42,10 +43,13 @@ export default function InteractionRenderer(props: Props) {
   const actions = list(props.data.actions).map(record);
   const baseDraft = useMemo(() => createInteractionDraft(props.data), [props.data]);
   const draft = props.draft || baseDraft;
-  const key = interactionKey(props.data);
+  const key = props.interactionInstanceKey || interactionKey(props.data);
   const interactionId = String(props.data.interaction_id || "");
   const provisional = props.data.provisional === true;
   const controlsDisabled = Boolean(props.disabled || provisional);
+  const actionDisabledReasons = actions
+    .filter((action) => action.disabled === true && action.disabled_reason)
+    .map((action) => String(action.disabled_reason));
 
   useEffect(() => {
     if (!provisional && questions.length && !props.draft) props.onDraftChange(baseDraft);
@@ -120,17 +124,21 @@ export default function InteractionRenderer(props: Props) {
           subject_ref: String(props.data.subject_ref || ""),
         };
         const isEdit = intent === "edit";
+        const actionDisabled = Boolean(props.disabled || action.disabled === true);
         return <button
           aria-pressed={selected}
+          aria-disabled={actionDisabled}
           className={`${action.style === "primary" ? "primary" : ""} ${selected ? "selected" : ""}`}
-          disabled={props.disabled}
+          disabled={actionDisabled}
           key={actionId}
+          title={action.disabled_reason ? String(action.disabled_reason) : undefined}
           type="button"
           onClick={() => isEdit
             ? props.onRequestFeedback({ key, prompt: feedbackPrompt(interactionId), label, response })
             : props.onAction(response, label, key)}
         >{selected ? <Check size={14} /> : null}{isEdit ? "告诉 Fin Agent 如何处理" : label}{selected ? <span>已选择</span> : null}</button>;
       })}</div>}
+      {!questions.length && actionDisabledReasons.length > 0 && <p className="interaction-disabled-reason" role="status">{actionDisabledReasons[0]}</p>}
       {!questions.length && actions.some((action) => String(action.intent || "") === "edit" && props.selectedActionId === String(action.action_id || "")) && <div className="interaction-submit-row feedback-submit"><span>请在下方输入框填写意见后提交</span><button className="primary" type="button" disabled={props.disabled} onClick={props.onSubmitFeedback}>确定</button></div>}
     </div>
   );

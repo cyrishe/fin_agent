@@ -4,6 +4,10 @@
   "additionalProperties": false,
   "required": ["mermaid"],
   "properties": {
-    "mermaid": {"type": "string", "minLength": 1}
+    "mermaid": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^\\s*(flowchart|graph)\\s+"
+    }
   }
 }

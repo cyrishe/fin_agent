@@ -126,15 +126,239 @@ def test_financial_qa_exposes_only_read_only_data_tools(tmp_path: Path) -> None:
         "read_finance_catalog",
         "finance_query",
         "load_finance_result",
+        "run_backtest",
     }
     assert set(names) == {
         "mcp__finance__read_finance_catalog",
         "mcp__finance__finance_query",
         "mcp__finance__load_finance_result",
+        "mcp__finance__run_backtest",
     }
     assert all("implement" not in name and "codex" not in name for name in names)
     assert tools["finance_query"].input_schema["required"] == ["steps"]
     assert tools["finance_query"].input_schema["properties"]["steps"]["minItems"] == 1
+
+
+def test_run_backtest_tool_registers_compact_result_for_direct_holdings(
+    tmp_path: Path,
+) -> None:
+    class _Backtest:
+        def __init__(self):
+            self.calls = []
+
+        def run(self, payload):
+            self.calls.append(payload)
+            return {
+                "ok": True,
+                "backtest_type": "fixed_basket",
+                "strategy": {"name": "买入并持有", "allocation": "equal_weight"},
+                "period": {"actual_start": "2025-01-02", "actual_end": "2025-06-30"},
+                "stocks": [{"code": "600519.SH"}, {"code": "000858.SZ"}],
+                "summary": {"total_return": 0.12, "max_drawdown": -0.08},
+                "warnings": [],
+            }
+
+    backtest = _Backtest()
+    result_store = SessionVariableStoreService(data_root=tmp_path / "data")
+    service = FinanceDataQueryCcTools(
+        finance_runtime=_Runtime(),
+        finance_catalog=_Catalog(),
+        result_store=result_store,
+        backtest_service=backtest,
+    )
+    tools, _, tracker = service.build_tools(
+        owner_ids=["owner-a"],
+        tool_context={"_agent_runtime_scope": "financial_qa:owner-a/thread-backtest"},
+    )
+    tool_by_name = {item.name: item for item in tools}
+
+    result = _payload(
+        asyncio.run(
+            tool_by_name["run_backtest"].handler(
+                {
+                    "holdings": [{"stock": "贵州茅台"}, {"stock": "五粮液"}],
+                    "start_date": "2025-01-01",
+                    "end_date": "2025-06-30",
+                }
+            )
+        )
+    )
+
+    assert result["ok"] is True
+    assert result["stock_count"] == 2
+    assert result["result_ref"].startswith("session://")
+    assert backtest.calls[0]["holdings"] == [
+        {"stock": "贵州茅台"},
+        {"stock": "五粮液"},
+    ]
+    assert tracker["result_refs"][0]["semantic"] == "finance.backtest"
+
+
+def test_run_backtest_tool_reads_only_server_supplied_attachment_rows(
+    tmp_path: Path,
+) -> None:
+    class _Backtest:
+        def __init__(self):
+            self.calls = []
+
+        def run(self, payload):
+            self.calls.append(payload)
+            return {
+                "ok": True,
+                "backtest_type": "fixed_basket",
+                "strategy": {"name": "买入并持有"},
+                "period": {},
+                "stocks": [{"code": "600519.SH"}],
+                "summary": {},
+                "warnings": [],
+            }
+
+    backtest = _Backtest()
+    service = FinanceDataQueryCcTools(
+        finance_runtime=_Runtime(),
+        finance_catalog=_Catalog(),
+        result_store=SessionVariableStoreService(data_root=tmp_path / "data"),
+        backtest_service=backtest,
+    )
+    tools, _, _ = service.build_tools(
+        owner_ids=["owner-a"],
+        tool_context={
+            "_agent_runtime_scope": "financial_qa:owner-a/thread-attachment",
+            "_backtest_attachments": [
+                {
+                    "attachment_id": "att-owned",
+                    "parsed": {
+                        "header": ["股票", "权重"],
+                        "rows": [["贵州茅台", 0.6]],
+                    },
+                }
+            ],
+        },
+    )
+    result = _payload(
+        asyncio.run(
+            {item.name: item for item in tools}["run_backtest"].handler(
+                {
+                    "attachment_source": {
+                        "attachment_id": "att-owned",
+                        "stock_column": "股票",
+                        "weight_column": "权重",
+                    },
+                    "start_date": "2025-01-01",
+                    "end_date": "2025-06-30",
+                }
+            )
+        )
+    )
+
+    assert result["ok"] is True
+    assert backtest.calls[0]["holdings"] == [{"stock": "贵州茅台", "weight": 0.6}]
+
+    rejected = _payload(
+        asyncio.run(
+            {item.name: item for item in tools}["run_backtest"].handler(
+                {
+                    "attachment_source": {
+                        "attachment_id": "att-foreign",
+                        "stock_column": "股票",
+                    },
+                    "start_date": "2025-01-01",
+                    "end_date": "2025-06-30",
+                }
+            )
+        )
+    )
+    assert rejected["ok"] is False
+    assert "附件来源不存在" in rejected["error"]
+
+
+def test_skill_references_are_loaded_from_the_bound_snapshot_only_after_skill_activation(
+    tmp_path: Path,
+) -> None:
+    class _BusinessSkillCatalog:
+        def __init__(self):
+            self.calls = []
+
+        def load_reference(
+            self,
+            skill_id,
+            reference,
+            *,
+            allowed_skill_ids=None,
+            expected_revision="",
+        ):
+            self.calls.append(
+                (skill_id, reference, allowed_skill_ids, expected_revision)
+            )
+            return {
+                "skill_id": skill_id,
+                "reference": reference,
+                "revision": expected_revision,
+                "content_hash": "abc123",
+                "content": "consumer lens",
+            }
+
+    catalog = _BusinessSkillCatalog()
+    service = FinanceDataQueryCcTools(
+        finance_runtime=_Runtime(),
+        finance_catalog=_Catalog(),
+        result_store=SessionVariableStoreService(data_root=tmp_path / "data"),
+        business_skill_catalog=catalog,
+    )
+    runtime = service.create_runtime()
+    tools, names, tracker = service.build_tools(
+        owner_ids=["owner-a"],
+        tool_context={
+            "_agent_runtime_scope": "financial_qa:owner-a/thread-skill-ref",
+            "allowed_finance_skills": ["stock-research"],
+            "_finance_skill_catalog_revision": "revision-1",
+        },
+        runtime=runtime,
+    )
+    tool_map = {item.name: item for item in tools}
+
+    blocked = _payload(
+        asyncio.run(
+            tool_map["read_finance_skill_reference"].handler(
+                {
+                    "skill_id": "fin-agent-finance-business:stock-research",
+                    "reference": "references/industry-lenses.md",
+                }
+            )
+        )
+    )
+    runtime.activate_skill("stock-research")
+    loaded = _payload(
+        asyncio.run(
+            tool_map["read_finance_skill_reference"].handler(
+                {
+                    "skill_id": "fin-agent-finance-business:stock-research",
+                    "reference": "references/industry-lenses.md",
+                }
+            )
+        )
+    )
+
+    assert "mcp__finance__read_finance_skill_reference" in names
+    assert "先加载对应" in blocked["error"]
+    assert loaded["content"] == "consumer lens"
+    assert catalog.calls == [
+        (
+            "stock-research",
+            "references/industry-lenses.md",
+            ["stock-research"],
+            "revision-1",
+        )
+    ]
+    assert [item["tool"] for item in tracker["calls"]] == [
+        "read_finance_skill_reference",
+        "read_finance_skill_reference",
+    ]
+    assert tracker["calls"][-1]["requested_skill_id"] == (
+        "fin-agent-finance-business:stock-research"
+    )
+    assert tracker["calls"][-1]["content_hash"] == "abc123"
+    assert "content" not in tracker["calls"][-1]
 
 
 def test_configured_agent_tools_are_registered_in_the_same_cc_harness(
@@ -181,12 +405,14 @@ def test_configured_agent_tools_are_registered_in_the_same_cc_harness(
         result_store=result_store,
         tool_adapter=adapter,
     )
+    runtime = service.create_runtime()
     tools, names, tracker = service.build_tools(
         owner_ids=["owner-a"],
         tool_context={
             "_agent_runtime_scope": "financial_qa:owner-a/thread-7",
             "allowed_agent_tools": ["financial_news_search"],
         },
+        runtime=runtime,
     )
     tool_map = {item.name: item for item in tools}
 
@@ -207,6 +433,44 @@ def test_configured_agent_tools_are_registered_in_the_same_cc_harness(
     ].description
     assert result["sample"]["rows"][0]["title"] == "贵州茅台发布公告"
     assert tracker["result_refs"][0]["tool"] == "financial_news_search"
+
+    blocked_context = {
+        "_agent_runtime_scope": "financial_qa:owner-a/thread-7",
+        "allowed_agent_tools": ["financial_news_search"],
+        "skill_tool_access": {"earnings-analysis": []},
+    }
+    runtime.begin_turn(owner_ids=["owner-a"], tool_context=blocked_context)
+    runtime.activate_skill("earnings-analysis")
+    blocked = _payload(
+        asyncio.run(
+            tool_map["financial_news_search"].handler(
+                {"query": "贵州茅台"}
+            )
+        )
+    )
+    assert blocked["ok"] is False
+    assert blocked["error"] == "当前 Skill 未声明可使用该补充工具。"
+    assert adapter.calls == [
+        ("financial_news_search", {"query": "贵州茅台"})
+    ]
+
+    allowed_context = {
+        **blocked_context,
+        "skill_tool_access": {
+            "stock-research": ["financial_news_search"],
+        },
+    }
+    runtime.begin_turn(owner_ids=["owner-a"], tool_context=allowed_context)
+    runtime.activate_skill("stock-research")
+    allowed = _payload(
+        asyncio.run(
+            tool_map["financial_news_search"].handler(
+                {"query": "贵州茅台"}
+            )
+        )
+    )
+    assert allowed["sample"]["rows"][0]["title"] == "贵州茅台发布公告"
+    assert len(adapter.calls) == 2
 
 
 def test_catalog_is_loaded_progressively(tmp_path: Path) -> None:
@@ -263,6 +527,30 @@ def test_financial_qa_loads_global_api_protocol_before_dataview_guidance() -> No
     assert "subject.constitution.agg" in protocol
     assert "身份列" in protocol
     assert "rN.column" in protocol
+
+
+def test_financial_qa_runtime_accepts_an_authorized_skill_subset() -> None:
+    service = FinancialQaCcService(enabled=True)
+    try:
+        context = service._runtime_context(
+            application_context={
+                "default_agent": {
+                    "runtime_profile": {
+                        "skills": ["stock-research", "earnings-analysis"],
+                    }
+                }
+            }
+        )
+
+        options = service.session_service._runtime_options(context)
+
+        assert options["effective_skill_names"] == (
+            "fin-agent-finance-business:stock-research",
+            "fin-agent-finance-business:earnings-analysis",
+        )
+        assert options["skill_revision"] == service.business_skill_catalog.revision
+    finally:
+        service.close()
 
 
 def test_queries_keep_dependency_handles_and_results_are_pageable(tmp_path: Path) -> None:
@@ -718,6 +1006,58 @@ class _Session:
         return None
 
 
+def test_stock_research_result_declares_pdf_export_without_an_extra_model_step() -> None:
+    class _StockResearchSession(_Session):
+        def run_turn(self, **kwargs):
+            result = super().run_turn(**kwargs)
+            result["skill_entries"] = [{
+                "skill_id": "stock-research",
+                "qualified_skill": "fin-agent-finance-business:stock-research",
+            }]
+            return result
+
+    session = _StockResearchSession()
+    service = FinancialQaCcService(enabled=True, session_service=session)
+    result = service.answer(
+        thread_id=7,
+        turn_id=8,
+        owner_id="owner-a",
+        user_text="深度分析贵州茅台",
+        dispatch_plan={
+            "selected_agent": "investment_analyst",
+            "turn_mode": "normal_qa",
+            "entry": "agent_route",
+            "semantic_turn": {"resolved_question": "深度分析贵州茅台"},
+        },
+    )
+
+    assert result["report_export"] == {
+        "pdf": True,
+        "label": "下载 PDF",
+        "title": "个股深度研究报告",
+    }
+    assert len(session.calls) == 1
+
+
+def test_non_stock_research_result_does_not_declare_pdf_export() -> None:
+    session = _Session()
+    service = FinancialQaCcService(enabled=True, session_service=session)
+    result = service.answer(
+        thread_id=7,
+        turn_id=8,
+        owner_id="owner-a",
+        user_text="贵州茅台收盘价",
+        dispatch_plan={
+            "selected_agent": "investment_analyst",
+            "turn_mode": "normal_qa",
+            "entry": "agent_route",
+            "semantic_turn": {"resolved_question": "贵州茅台收盘价"},
+        },
+    )
+
+    assert "report_export" not in result
+
+
 def test_financial_qa_service_uses_resolved_question_and_normal_qa_only() -> None:
     session = _Session()
     service = FinancialQaCcService(
@@ -746,6 +1086,14 @@ def test_financial_qa_service_uses_resolved_question_and_normal_qa_only() -> Non
     )
     assert not service.accepts(
         dispatch_plan={**plan, "entry": "planned_run"}
+    )
+    assert service.accepts(
+        dispatch_plan=plan,
+        attachments=[{"attachment_id": "att-table", "kind": "table"}],
+    )
+    assert not service.accepts(
+        dispatch_plan=plan,
+        attachments=[{"attachment_id": "att-image", "kind": "image"}],
     )
 
     result = service.answer(
@@ -797,6 +1145,10 @@ def test_financial_qa_service_uses_resolved_question_and_normal_qa_only() -> Non
         "stock-research",
         "earnings-analysis",
     ]
+    assert session.calls[0]["context"]["skill_tool_access"] == {
+        "stock-research": ["financial_news_search"],
+        "earnings-analysis": [],
+    }
     assert session.calls[0]["context"]["_resolved_question"] == (
         "贵州茅台最近交易日的收盘价是多少？"
     )
@@ -805,6 +1157,20 @@ def test_financial_qa_service_uses_resolved_question_and_normal_qa_only() -> Non
     ]
     assert "factor-analysis" not in session.calls[0]["context"][
         "_finance_skill_catalog_prompt"
+    ]
+    assert len(
+        session.calls[0]["context"]["_finance_skill_catalog_revision"]
+    ) == 64
+    pinned_binding = session.calls[0]["context"][
+        "_finance_skill_runtime_binding"
+    ]
+    assert pinned_binding["revision"] == session.calls[0]["context"][
+        "_finance_skill_catalog_revision"
+    ]
+    assert Path(pinned_binding["runtime_root"]).is_dir()
+    assert pinned_binding["skill_names"] == [
+        "fin-agent-finance-business:stock-research",
+        "fin-agent-finance-business:earnings-analysis",
     ]
     assert session.calls[0]["context"]["_agent_system_prompt"] == (
         "Investment Analyst 原有角色提示"
@@ -816,6 +1182,55 @@ def test_financial_qa_service_uses_resolved_question_and_normal_qa_only() -> Non
     assert result["financial_qa"]["tool_calls"] == [{"tool": "finance_query"}]
     assert result["surface_blocks"][0]["block_id"] == "financial_qa_answer"
     assert result["surface_blocks"][0]["content"] == result["message"]
+
+
+def test_financial_qa_passes_authenticated_table_data_to_backtest_tool_context() -> None:
+    class _InputResolver:
+        def inspect(self, attachments):
+            assert attachments == [{"attachment_id": "att-owned", "kind": "table"}]
+            return {
+                "attachments": [
+                    {
+                        "attachment_id": "att-owned",
+                        "kind": "table",
+                        "parsed": {"header": ["股票"], "rows": [["贵州茅台"]]},
+                    }
+                ],
+                "prompt_attachments": [
+                    {
+                        "attachment_id": "att-owned",
+                        "kind": "table",
+                        "parsed": {"header": ["股票"], "rows": [["贵州茅台"]]},
+                    }
+                ],
+            }
+
+    session = _Session()
+    service = FinancialQaCcService(
+        enabled=True,
+        session_service=session,
+        input_resolver=_InputResolver(),
+    )
+    plan = {
+        "selected_agent": "investment_analyst",
+        "turn_mode": "normal_qa",
+        "entry": "agent_route",
+        "semantic_turn": {"resolved_question": "回测附件里的股票"},
+    }
+
+    service.answer(
+        thread_id=7,
+        turn_id=9,
+        owner_id="owner-a",
+        user_text="回测附件里的股票",
+        dispatch_plan=plan,
+        attachments=[{"attachment_id": "att-owned", "kind": "table"}],
+    )
+
+    call = session.calls[0]
+    assert call["context"]["_backtest_attachments"][0]["attachment_id"] == "att-owned"
+    assert "不可信的用户数据" in call["user_text"]
+    assert "贵州茅台" in call["user_text"]
 
 
 class _ExplodingPlanner:

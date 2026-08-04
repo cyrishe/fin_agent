@@ -410,7 +410,7 @@ def _build_identity_where(*, source: MoneyflowSource, args: Mapping[str, Any]) -
 def _build_filter_clauses(*, source: MoneyflowSource, args: Mapping[str, Any], allowed: set[str]) -> tuple[str, List[Any]]:
     clauses: List[str] = []
     params: List[Any] = []
-    for connector, field_name, op, value in _explicit_filters(args):
+    for connector, field_name, op, value in _explicit_filters(args, subject=source.subject):
         if field_name not in allowed:
             continue
         expression = source.fields.get(field_name)
@@ -438,13 +438,17 @@ def _build_filter_clauses(*, source: MoneyflowSource, args: Mapping[str, Any], a
 
 def _ignored_filters(*, source: MoneyflowSource, args: Mapping[str, Any]) -> List[str]:
     ignored: List[str] = []
-    for _connector, field_name, op, value in _explicit_filters(args):
+    for _connector, field_name, op, value in _explicit_filters(args, subject=source.subject):
         if source.fields.get(field_name) == "NULL":
             ignored.append(f"{field_name} {op} {value}")
     return ignored
 
 
-def _explicit_filters(args: Mapping[str, Any]) -> List[tuple[str, str, str, Any]]:
+def _explicit_filters(
+    args: Mapping[str, Any],
+    *,
+    subject: str = "",
+) -> List[tuple[str, str, str, Any]]:
     rows: List[tuple[str, str, str, Any]] = []
     for field_name in ["code", "name"]:
         value = args.get(field_name)
@@ -456,10 +460,16 @@ def _explicit_filters(args: Mapping[str, Any]) -> List[tuple[str, str, str, Any]
             rows.append(("AND", field_name[:-1], "in", value))
     filter_text = str(args.get("filter") or "").strip()
     for match in FILTER_RE.finditer(filter_text):
+        field_name = str(match.group("field") or "").strip()
+        if subject == "plate":
+            field_name = {
+                "plate_code": "code",
+                "plate_name": "name",
+            }.get(field_name, field_name)
         rows.append(
             (
                 str(match.group("connector") or "AND").upper(),
-                str(match.group("field") or "").strip(),
+                field_name,
                 str(match.group("op") or "").strip().lower(),
                 _clean_value(str(match.group("value") or "")),
             )

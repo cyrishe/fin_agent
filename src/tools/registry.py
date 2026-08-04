@@ -352,10 +352,27 @@ def run_tool(
         module_path, func_name = TOOL_REGISTRY[tool_name].split(":", 1)
         module = import_module(module_path)
         func = getattr(module, func_name)
-    normalized_args = _normalize_tool_args(args)
+    normalized_args = dict(_normalize_tool_args(args))
+    # Runtime metadata is an internal, out-of-band contract.  Never trust an
+    # `_runtime` object supplied as an ordinary tool argument; otherwise a
+    # caller could forge the tracking-owner marker and bypass the registry's
+    # invocation lifecycle.
+    normalized_args.pop("_runtime", None)
+    trusted_runtime_ctx = dict(runtime_ctx or {})
+    if trusted_runtime_ctx:
+        normalized_args["_runtime"] = trusted_runtime_ctx
     contract_normalized = normalize_tool_args_for_definition(tool_name, normalized_args)
+    execution_args = (
+        contract_normalized.get("arguments")
+        if isinstance(contract_normalized.get("arguments"), dict)
+        else normalized_args
+    )
+    if str(trusted_runtime_ctx.get("_execution_tracking_owner") or "").strip():
+        clean_args = dict(execution_args)
+        clean_args.pop("_runtime", None)
+        return func(clean_args)
     return _runtime_execution_service.execute_tool(
         tool_name=tool_name,
-        args=contract_normalized.get("arguments") if isinstance(contract_normalized.get("arguments"), dict) else normalized_args,
+        args=execution_args,
         executor=func,
     )

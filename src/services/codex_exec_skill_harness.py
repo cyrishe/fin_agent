@@ -1,7 +1,8 @@
 from __future__ import annotations
 
-import json
+import copy
 import hashlib
+import json
 import os
 from pathlib import Path
 import queue
@@ -50,6 +51,10 @@ def _requirement_understanding(value: Any) -> Dict[str, Any]:
         return dict(value)
     brief = _trim(value)
     return {"requirement_brief": brief} if brief else {}
+
+
+def _is_coding_stage(value: Any) -> bool:
+    return _trim(value) in {"coding", "edit_coding"}
 
 
 class CodexExecSkillHarness:
@@ -258,7 +263,7 @@ class CodexExecSkillHarness:
         events = stage_events + process_events
         events.extend(self._extract_model_events(last_message))
         final = self._final_from_text(last_message) or self._find_final(events)
-        if final and stage_name == "coding":
+        if final and _is_coding_stage(stage_name):
             final = self._collect_coding_result(bundle, final)
         if final and not self._find_final(events):
             self._append_event(
@@ -481,6 +486,16 @@ class CodexExecSkillHarness:
         if _trim(stage) == "design":
             file_context = (
                 "如果 CONTEXT 提供 design_ref，只按需读取该设计资产；不要读取 API Catalog 或实现资料。\n"
+            )
+        elif _trim(stage) == "edit_plan":
+            file_context = (
+                "先按需读取 CONTEXT.design_ref 中的完整现有 Design，再与 existing_manifest 和 "
+                "existing_schema 做语义比较；不要读取 API Catalog 或实现源码。\n"
+            )
+        elif _trim(stage) == "edit_coding":
+            file_context = (
+                "只读取 CONTEXT.design_ref、current_implementation.manifest_ref、列出的现有模块文件和 "
+                "implementation_instruction；不要读取 API Catalog 或无关资料。\n"
             )
         elif _trim(stage) == "coding":
             file_context = (
@@ -1024,7 +1039,7 @@ class CodexSdkSkillHarness(CodexExecSkillHarness):
 
         events.extend(self._extract_model_events(final_response))
         final = self._final_from_text(final_response) or self._find_final(events)
-        if final and stage_name == "coding":
+        if final and _is_coding_stage(stage_name):
             final = self._collect_coding_result(bundle, final)
         if final and not self._find_final(events):
             self._append_event(
@@ -1348,6 +1363,17 @@ class CodexSdkSkillHarness(CodexExecSkillHarness):
                 "按 CODING_WORKSPACE.md 使用当前工作区；首次实现参考 DYNAMIC_TOOL_TEMPLATE.py。"
                 "按需读取需求、Design、反馈和 API Catalog，将源码写入指定模块文件。\n"
             )
+        elif _trim(stage) == "edit_plan":
+            stage_guidance = (
+                "先读取 CONTEXT.design_ref 中的完整现有 Design，再与 existing_manifest 和 "
+                "existing_schema 做语义比较；只形成一次性 EditPlan，不读取实现源码。\n"
+            )
+        elif _trim(stage) == "edit_coding":
+            stage_guidance = (
+                "按 CODING_WORKSPACE.md 只修改 current_implementation.module_files 中与 "
+                "implementation_instruction 直接相关的现有代码；不读取 API Catalog，不重做 Design，"
+                "用本地合成正反例验证。\n"
+            )
         return (
             "执行随本轮输入启用的 Skill。\n"
             f"资料包目录：{_trim(bundle.get('bundle_dir'))}\n"
@@ -1536,6 +1562,326 @@ class CodexSdkSkillHarness(CodexExecSkillHarness):
         }
 
 
+class CodexCustomToolEditPlanner:
+    """One-shot semantic router for editing an existing custom tool.
+
+    The model decides whether the requested business change is local.  This
+    wrapper only enforces invariants that must not be left to the model:
+    public-contract edits never take the local path, and every Design change
+    must be an exact replacement that applies once to the current asset.
+    """
+
+    _ASSET_ORDER = ("metadata", "design", "implementation", "contract")
+
+    def __init__(
+        self,
+        *,
+        harness: Optional[CodexExecSkillHarness] = None,
+        skill_path: str = "src/skills/financial-tool-development/skills/financial-tool-edit-planning/SKILL.md",
+        output_schema_path: str = "src/skills/financial-tool-development/skills/financial-tool-edit-planning/schema.json",
+    ) -> None:
+        self.harness = harness or CodexExecSkillHarness(cwd=".")
+        self.skill_path = skill_path
+        self.output_schema_path = output_schema_path
+
+    def plan(
+        self,
+        user_request: str,
+        *,
+        manifest: Mapping[str, Any],
+        design: Mapping[str, Any] | str,
+        schema: Mapping[str, Any],
+        context: Optional[Mapping[str, Any]] = None,
+        run_id: str = "",
+        event_sink: Optional[Callable[[Dict[str, Any]], None]] = None,
+    ) -> Dict[str, Any]:
+        request = _trim(user_request)
+        if not request:
+            return self._failure("编辑要求不能为空。")
+        if not isinstance(manifest, Mapping) or not isinstance(schema, Mapping):
+            return self._failure("现有工具 manifest 或 Schema 无法读取。")
+        design_asset = self._design_asset(design)
+        if design_asset is None:
+            return self._failure("现有工具 Design 无法读取。")
+
+        run_context = dict(context or {})
+        # These are system-resolved assets.  Caller-supplied context cannot
+        # replace them with a different tool while the planner is running.
+        run_context.update({
+            "existing_manifest": dict(manifest),
+            "current_design": design_asset,
+            "existing_schema": dict(schema),
+        })
+        result = self.harness.run_skill(
+            skill_path=self.skill_path,
+            output_schema_path=self.output_schema_path,
+            user_request=request,
+            context=run_context,
+            session_id=_trim(run_id),
+            stage="edit_plan",
+            event_sink=event_sink,
+        )
+        if not result.get("ok"):
+            return self._failure(
+                result.get("error") or "EditPlan 未能生成。",
+                events=result.get("events") or [],
+                raw=result,
+            )
+
+        final = dict(result.get("final") or {})
+        normalized = self._normalize_plan(final, design)
+        normalized.update({
+            "events": result.get("events") or [],
+            "raw": result,
+        })
+        return normalized
+
+    @classmethod
+    def apply_design_replacements(
+        cls,
+        design: Mapping[str, Any] | str,
+        replacements: Iterable[Mapping[str, Any]],
+    ) -> Dict[str, Any] | str:
+        """Apply replacements only when each `before` occurs exactly once.
+
+        The operation returns a deep copy and never mutates the saved Design.
+        A caller can therefore build a candidate revision before persisting it.
+        """
+
+        if not isinstance(design, (Mapping, str)):
+            raise ValueError("Design must be an object or string.")
+        current: Any = copy.deepcopy(dict(design) if isinstance(design, Mapping) else design)
+        for index, item in enumerate(replacements):
+            if not isinstance(item, Mapping):
+                raise ValueError(f"Design replacement {index + 1} is not an object.")
+            before = item.get("before")
+            after = item.get("after")
+            if not isinstance(before, str) or not before:
+                raise ValueError(f"Design replacement {index + 1} has no exact before text.")
+            if not isinstance(after, str):
+                raise ValueError(f"Design replacement {index + 1} has invalid after text.")
+            if before == after:
+                raise ValueError(f"Design replacement {index + 1} does not change the Design.")
+            candidate, occurrence_count = cls._replace_in_strings(current, before, after)
+            if occurrence_count != 1:
+                raise ValueError(
+                    f"Design replacement {index + 1} matched {occurrence_count} locations; expected exactly one."
+                )
+            current = candidate
+        return current
+
+    @classmethod
+    def _normalize_plan(
+        cls,
+        final: Mapping[str, Any],
+        design: Mapping[str, Any] | str,
+    ) -> Dict[str, Any]:
+        route = _trim(final.get("route"))
+        impact_summary = _trim(final.get("impact_summary"))
+        raw_assets = final.get("affected_assets")
+        raw_asset_names = [
+            _trim(item)
+            for item in raw_assets
+            if _trim(item)
+        ] if isinstance(raw_assets, list) else []
+        assets = [
+            name for name in cls._ASSET_ORDER if name in raw_asset_names
+        ]
+        unknown_assets = [
+            name for name in raw_asset_names if name not in cls._ASSET_ORDER
+        ]
+        metadata_value = final.get("metadata_patch")
+        metadata_value = metadata_value if isinstance(metadata_value, Mapping) else {}
+        metadata_patch = {
+            "display_name": cls._optional_text(metadata_value.get("display_name")),
+            "description": cls._optional_text(metadata_value.get("description")),
+        }
+        raw_replacements = final.get("design_replacements")
+        replacements = [
+            {
+                "before": item.get("before"),
+                "after": item.get("after"),
+                "reason": _trim(item.get("reason")),
+            }
+            for item in raw_replacements or []
+            if isinstance(item, Mapping)
+        ] if isinstance(raw_replacements, list) else []
+        implementation_instruction = _trim(final.get("implementation_instruction"))
+
+        if route not in {"local_patch", "full_revision"}:
+            return cls._invalid_output("EditPlan 缺少有效 route。")
+        if not impact_summary:
+            return cls._invalid_output("EditPlan 缺少影响说明。")
+        if not assets or unknown_assets or len(raw_asset_names) != len(set(raw_asset_names)):
+            return cls._fallback_full_revision(
+                assets=assets,
+                impact_summary=impact_summary,
+                reason="受影响资产列表不完整或包含未知资产。",
+            )
+
+        if route == "full_revision":
+            return {
+                "ok": True,
+                "route": "full_revision",
+                "affected_assets": assets,
+                "impact_summary": impact_summary,
+                "metadata_patch": {"display_name": None, "description": None},
+                "design_replacements": [],
+                "implementation_instruction": "",
+            }
+
+        metadata_changed = any(value is not None for value in metadata_patch.values())
+        if "contract" in assets:
+            return cls._fallback_full_revision(
+                assets=assets,
+                impact_summary=impact_summary,
+                reason="公开契约变化不能使用局部补丁。",
+            )
+        if ("metadata" in assets) != metadata_changed:
+            return cls._fallback_full_revision(
+                assets=assets,
+                impact_summary=impact_summary,
+                reason="元数据影响范围与 metadata_patch 不一致。",
+            )
+        if ("design" in assets) != bool(replacements):
+            return cls._fallback_full_revision(
+                assets=assets,
+                impact_summary=impact_summary,
+                reason="Design 影响范围与精确替换列表不一致。",
+            )
+        if assets == ["metadata"] and metadata_changed and not replacements:
+            # Metadata is system-owned and complete in metadata_patch.  A
+            # model may still write explanatory no-op prose in the Coding
+            # field; it must never turn a display-only edit into a Coding run.
+            return {
+                "ok": True,
+                "route": "local_patch",
+                "affected_assets": assets,
+                "impact_summary": impact_summary,
+                "metadata_patch": metadata_patch,
+                "design_replacements": [],
+                "implementation_instruction": "",
+            }
+        if ("implementation" in assets) != bool(implementation_instruction):
+            return cls._fallback_full_revision(
+                assets=assets,
+                impact_summary=impact_summary,
+                reason="实现影响范围与 Coding 指令不一致。",
+            )
+        if replacements:
+            try:
+                cls.apply_design_replacements(design, replacements)
+            except ValueError as exc:
+                return cls._fallback_full_revision(
+                    assets=assets,
+                    impact_summary=impact_summary,
+                    reason=str(exc),
+                )
+        return {
+            "ok": True,
+            "route": "local_patch",
+            "affected_assets": assets,
+            "impact_summary": impact_summary,
+            "metadata_patch": metadata_patch,
+            "design_replacements": replacements,
+            "implementation_instruction": implementation_instruction,
+        }
+
+    @classmethod
+    def _fallback_full_revision(
+        cls,
+        *,
+        assets: Iterable[str],
+        impact_summary: str,
+        reason: str,
+    ) -> Dict[str, Any]:
+        normalized_assets = [name for name in cls._ASSET_ORDER if name in set(assets)]
+        if not normalized_assets:
+            normalized_assets = ["design", "implementation"]
+        return {
+            "ok": True,
+            "route": "full_revision",
+            "affected_assets": normalized_assets,
+            "impact_summary": impact_summary,
+            "metadata_patch": {"display_name": None, "description": None},
+            "design_replacements": [],
+            "implementation_instruction": "",
+            "fallback_reason": _trim(reason),
+        }
+
+    @staticmethod
+    def _invalid_output(error: str) -> Dict[str, Any]:
+        return {
+            "ok": False,
+            "error": {
+                "code": "edit_plan_output_invalid",
+                "summary": _trim(error) or "EditPlan 输出无法解析。",
+            },
+        }
+
+    @staticmethod
+    def _failure(
+        error: Any,
+        *,
+        events: Optional[Iterable[Mapping[str, Any]]] = None,
+        raw: Optional[Mapping[str, Any]] = None,
+    ) -> Dict[str, Any]:
+        return {
+            "ok": False,
+            "error": {
+                "code": "edit_plan_failed",
+                "summary": _trim(error) or "EditPlan 未能生成。",
+            },
+            "events": [dict(item) for item in events or [] if isinstance(item, Mapping)],
+            "raw": dict(raw or {}),
+        }
+
+    @staticmethod
+    def _design_asset(design: Mapping[str, Any] | str) -> Optional[Dict[str, Any]]:
+        if isinstance(design, Mapping):
+            return copy.deepcopy(dict(design))
+        if isinstance(design, str) and _trim(design):
+            return {"document": design}
+        return None
+
+    @staticmethod
+    def _optional_text(value: Any) -> Optional[str]:
+        if value is None:
+            return None
+        return _trim(value) or None
+
+    @classmethod
+    def _replace_in_strings(cls, value: Any, before: str, after: str) -> tuple[Any, int]:
+        if isinstance(value, str):
+            count = value.count(before)
+            return value.replace(before, after), count
+        if isinstance(value, Mapping):
+            result: Dict[Any, Any] = {}
+            count = 0
+            for key, item in value.items():
+                replaced, item_count = cls._replace_in_strings(item, before, after)
+                result[key] = replaced
+                count += item_count
+            return result, count
+        if isinstance(value, list):
+            result_list = []
+            count = 0
+            for item in value:
+                replaced, item_count = cls._replace_in_strings(item, before, after)
+                result_list.append(replaced)
+                count += item_count
+            return result_list, count
+        if isinstance(value, tuple):
+            result_items = []
+            count = 0
+            for item in value:
+                replaced, item_count = cls._replace_in_strings(item, before, after)
+                result_items.append(replaced)
+                count += item_count
+            return tuple(result_items), count
+        return value, 0
+
+
 class CodexCustomToolDesigner:
     def __init__(
         self,
@@ -1672,6 +2018,11 @@ class CodexCustomToolDesigner:
             if isinstance(design_value, Mapping)
             else {}
         )
+        finance_tool_profile = final.get("finance_tool_profile")
+        if isinstance(finance_tool_profile, Mapping):
+            design["finance_tool_profile"] = copy.deepcopy(
+                dict(finance_tool_profile)
+            )
         if run_flowchart and not design:
             return self._failure({"error": "流程图生成前没有可读取的模块与流程设计。"}, events)
         flowchart_final: Dict[str, Any] = {}
@@ -1878,6 +2229,223 @@ class CodexCustomToolCoder:
         if "write target is outside" in reason:
             return "写入位置不在可编辑模块或隔离测试目录内"
         return "工具调用被执行权限拒绝"
+
+
+class CodexCustomToolEditCoder(CodexCustomToolCoder):
+    """Focused Coding adapter for a planner-approved local implementation edit."""
+
+    default_complexity = "fastest"
+
+    def __init__(
+        self,
+        *,
+        harness: Optional[CodexExecSkillHarness] = None,
+        skill_path: str = "src/skills/financial-tool-development/skills/financial-tool-edit-implementation/SKILL.md",
+        output_schema_path: str = "src/skills/financial-tool-development/skills/financial-tool-implementation/schema.json",
+    ) -> None:
+        super().__init__(
+            harness=harness,
+            skill_path=skill_path,
+            output_schema_path=output_schema_path,
+        )
+
+    def code(
+        self,
+        design: Mapping[str, Any],
+        *,
+        implementation_instruction: str = "",
+        requirement_text: str = "",
+        context: Optional[Mapping[str, Any]] = None,
+        event_sink: Optional[Callable[[Dict[str, Any]], None]] = None,
+    ) -> Dict[str, Any]:
+        del requirement_text  # A local edit is governed by the EditPlan, not the original free-form request.
+        source_context = dict(context or {})
+        instruction = _trim(
+            implementation_instruction
+            or source_context.get("implementation_instruction")
+            or source_context.get("coding_feedback")
+        )
+        current_implementation = source_context.get("current_implementation")
+        current_implementation = (
+            dict(current_implementation)
+            if isinstance(current_implementation, Mapping)
+            else {}
+        )
+        current_modules = [
+            dict(item)
+            for item in current_implementation.get("modules") or []
+            if isinstance(item, Mapping) and isinstance(item.get("source_code"), str)
+        ]
+        if not instruction:
+            return self._local_failure(
+                "edit_coding_instruction_missing",
+                "局部 EditPlan 没有提供实现修改指令。",
+            )
+        if not isinstance(design, Mapping) or not design:
+            return self._local_failure(
+                "edit_coding_design_missing",
+                "局部 Coding 没有取得修订后的完整 Design。",
+            )
+        if not current_modules or not any(_trim(item.get("source_code")) for item in current_modules):
+            return self._local_failure(
+                "edit_coding_implementation_missing",
+                "局部 Coding 只能修改已有实现，但当前没有可读取的模块源码。",
+            )
+
+        agent_runtime_value = source_context.get("_agent_runtime")
+        agent_runtime = (
+            dict(agent_runtime_value)
+            if isinstance(agent_runtime_value, Mapping)
+            else {}
+        )
+        workspace_identity = source_context.get("_workspace_identity")
+        run_context: Dict[str, Any] = {
+            "design": dict(design),
+            "current_implementation": {
+                **current_implementation,
+                "modules": current_modules,
+            },
+            "implementation_instruction": instruction,
+        }
+        provider_session_id = _trim(agent_runtime.get("provider_session_id"))
+        if provider_session_id:
+            run_context["_provider_session_id"] = provider_session_id
+        if isinstance(workspace_identity, Mapping):
+            run_context["_workspace_identity"] = dict(workspace_identity)
+
+        result = self.harness.run_skill(
+            skill_path=self.skill_path,
+            output_schema_path=self.output_schema_path,
+            user_request="请严格按 CONTEXT.implementation_instruction 局部修改现有实现并完成合成正反例验证。",
+            context=run_context,
+            session_id=_trim(agent_runtime.get("session_id")),
+            stage="edit_coding",
+            event_sink=event_sink,
+        )
+        provider_session_id = _trim(result.get("provider_session_id")) or provider_session_id
+        next_agent_runtime = {
+            **agent_runtime,
+            "provider_session_id": provider_session_id,
+        }
+        if not result.get("ok"):
+            failure = self._failure_summary(
+                result.get("error"),
+                failure_kind=result.get("failure_kind"),
+            )
+            return {
+                "ok": False,
+                "message": f"局部实现未完成：{failure['summary']} 原实现保持不变。",
+                "error": failure,
+                "error_detail": result.get("error") or "",
+                "events": result.get("events") or [],
+                "raw": result,
+                "agent_runtime": next_agent_runtime,
+            }
+
+        final = dict(result.get("final") or {})
+        implementation = (
+            dict(final.get("implementation"))
+            if isinstance(final.get("implementation"), Mapping)
+            else {}
+        )
+        edited_modules = [
+            dict(item)
+            for item in implementation.get("modules") or []
+            if isinstance(item, Mapping) and isinstance(item.get("source_code"), str)
+        ]
+        if not edited_modules:
+            return self._local_result_failure(
+                code="edit_coding_output_empty",
+                summary="局部 Coding 没有回收出可执行模块。",
+                result=result,
+                agent_runtime=next_agent_runtime,
+            )
+        if not self._modules_changed(current_modules, edited_modules):
+            return self._local_result_failure(
+                code="edit_coding_no_change",
+                summary="局部 Coding 完成后源码没有发生变化。",
+                result=result,
+                agent_runtime=next_agent_runtime,
+            )
+
+        expected_tool_name = _trim(design.get("tool_name"))
+        tool_contract = final.get("tool_contract")
+        tool_contract = tool_contract if isinstance(tool_contract, Mapping) else {}
+        # Identity is a system-owned fact.  The model's duplicated
+        # tool_contract is explanatory output and must not be able to rename
+        # the selected tool or reject an otherwise valid local patch.
+        if expected_tool_name:
+            final["tool_contract"] = {
+                **dict(tool_contract),
+                "tool_name": expected_tool_name,
+            }
+
+        evidence = final.get("coding_test_evidence")
+        evidence = evidence if isinstance(evidence, Mapping) else {}
+        evidence_cases = [
+            dict(item)
+            for item in evidence.get("cases") or []
+            if isinstance(item, Mapping)
+            and isinstance(item.get("input"), Mapping)
+            and isinstance(item.get("actual"), Mapping)
+        ]
+        if not evidence_cases:
+            return self._local_result_failure(
+                code="edit_coding_evidence_missing",
+                summary="局部 Coding 没有留下可回收的合成验证证据。",
+                result=result,
+                agent_runtime=next_agent_runtime,
+            )
+        return {
+            "ok": True,
+            "message": _trim(final.get("message")) or "局部代码修改和合成正反例验证已完成。",
+            "final": final,
+            "events": result.get("events") or [],
+            "raw": result,
+            "agent_runtime": next_agent_runtime,
+        }
+
+    @staticmethod
+    def _modules_changed(
+        before_modules: Iterable[Mapping[str, Any]],
+        after_modules: Iterable[Mapping[str, Any]],
+    ) -> bool:
+        def sources(items: Iterable[Mapping[str, Any]]) -> Dict[str, str]:
+            result: Dict[str, str] = {}
+            for index, item in enumerate(items):
+                module_id = _trim(item.get("module_id")) or f"module_{index + 1}"
+                result[module_id] = str(item.get("source_code") or "")
+            return result
+
+        return sources(before_modules) != sources(after_modules)
+
+    @staticmethod
+    def _local_failure(code: str, summary: str) -> Dict[str, Any]:
+        return {
+            "ok": False,
+            "message": f"局部实现未开始：{summary}",
+            "error": {"code": code, "summary": summary},
+            "events": [],
+            "raw": {},
+            "agent_runtime": {},
+        }
+
+    @staticmethod
+    def _local_result_failure(
+        *,
+        code: str,
+        summary: str,
+        result: Mapping[str, Any],
+        agent_runtime: Mapping[str, Any],
+    ) -> Dict[str, Any]:
+        return {
+            "ok": False,
+            "message": f"局部实现未完成：{summary} 原实现保持不变。",
+            "error": {"code": code, "summary": summary},
+            "events": result.get("events") or [],
+            "raw": dict(result),
+            "agent_runtime": dict(agent_runtime),
+        }
 
 
 class CodexCustomToolTester:

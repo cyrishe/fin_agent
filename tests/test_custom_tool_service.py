@@ -7,6 +7,7 @@ import pytest
 from src.services.custom_tool_context_bundle_service import CustomToolContextBundleService
 from src.services.custom_tool_service import (
     CustomToolAgentService,
+    CustomToolError,
     CustomToolRuntimeService,
     CustomToolStoreService,
 )
@@ -49,6 +50,7 @@ class _Designer:
                 "exceptions": [],
                 "acceptance": [],
                 "flow": {"steps": [], "links": []},
+                "mermaid": "flowchart TD\nA[输入数字数组] --> B[求和] --> C[返回合计]",
             },
             "existing_analysis": {},
             "events": [],
@@ -168,6 +170,52 @@ def _save_active_sum_tool(store: CustomToolStoreService, *, owner_id: str = "use
     )
     store.record_test("ct_personal_sum", {"ok": True, "execution_ok": True})
     store.commit("ct_personal_sum", owner_ids=[owner_id])
+
+
+def test_start_edit_loads_the_selected_owned_tool_as_authoritative_state(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    store = CustomToolStoreService(root_dir=str(tmp_path / "tools"), backend="filesystem")
+    _save_active_sum_tool(store, owner_id="user_a")
+    service = CustomToolAgentService(store=store, use_codex=False)
+    captured = {}
+
+    def fake_start_create(requirement_text, **kwargs):
+        captured["requirement_text"] = requirement_text
+        captured.update(kwargs)
+        return {"ok": True, "state": kwargs["state"]}
+
+    monkeypatch.setattr(service, "start_create", fake_start_create)
+
+    result = service.start_edit(
+        "ct_personal_sum",
+        "把输入为空时的提示写清楚",
+        owner_id="user_a",
+        thread_id=12,
+        turn_id=34,
+    )
+
+    assert result["ok"] is True
+    assert captured["requirement_text"] == "把输入为空时的提示写清楚"
+    assert captured["state"]["tool_name"] == "ct_personal_sum"
+    assert captured["state"]["design_contract"]["tool_name"] == "ct_personal_sum"
+    assert captured["state"]["confirmed_requirement_revision"] == captured["state"]["requirement_revision"]
+    assert captured["thread_id"] == 12
+    assert captured["turn_id"] == 34
+
+
+def test_start_edit_rejects_a_different_users_personal_tool(tmp_path: Path) -> None:
+    store = CustomToolStoreService(root_dir=str(tmp_path / "tools"), backend="filesystem")
+    _save_active_sum_tool(store, owner_id="user_a")
+    service = CustomToolAgentService(store=store, use_codex=False)
+
+    with pytest.raises(CustomToolError):
+        service.start_edit(
+            "ct_personal_sum",
+            "修改输出",
+            owner_id="user_b",
+        )
 
 
 def test_explicit_design_adapter_still_supports_existing_designer(tmp_path: Path) -> None:
@@ -311,11 +359,52 @@ def test_coding_harness_evidence_is_saved_without_changing_final_schema(tmp_path
     )
 
     assert implemented["coding_status"] == "implemented"
-    assert implemented["test_result"]["evidence_source"] == "coding_harness"
+    assert implemented["test_result"]["evidence_source"] == "production_runtime"
     assert implemented["test_result"]["cases"][0]["input"] == {"values": [1, 2, 3]}
     assert implemented["test_result"]["cases"][0]["actual"]["key_process_info"] == {
         "value_count": 3,
     }
+
+
+def test_runtime_wrapper_does_not_shadow_tool_module_helpers(tmp_path: Path) -> None:
+    store = CustomToolStoreService(
+        root_dir=str(tmp_path / "tools"),
+        backend="filesystem",
+    )
+    store.save_draft(
+        {
+            "manifest": {
+                "tool_name": "ct_runtime_namespace",
+                "display_name": "运行命名空间测试",
+                "description": "验证工具内部名称不受运行包装器污染。",
+                "visibility": "personal",
+                "runtime": {
+                    "kind": "python_sandbox",
+                    "backend": "local_dev",
+                    "timeout_ms": 2000,
+                },
+            },
+            "input_schema": {"type": "object"},
+            "output_schema": {"type": "object"},
+            "code": (
+                "def _inputs(value):\n"
+                "    return {'received': value}\n\n"
+                "def run(inputs):\n"
+                "    return {'value': _inputs(inputs), 'key_process_info': {}}\n"
+            ),
+        },
+        owner_id="user_a",
+    )
+
+    result = _runtime(store, tmp_path).run(
+        "ct_runtime_namespace",
+        {"code": "600519.SH"},
+        owner_ids=["user_a"],
+        allow_inactive=True,
+    )
+
+    assert result["ok"] is True
+    assert result["data"]["value"] == {"received": {"code": "600519.SH"}}
 
 
 def test_coding_contract_builds_runtime_schema_from_natural_language_design(tmp_path: Path) -> None:
@@ -568,20 +657,74 @@ def test_runtime_rejects_api_missing_from_system_catalog() -> None:
     assert "system API catalog" in error
 
 
-def test_design_confirmation_uses_the_current_server_design() -> None:
+def test_stale_design_confirmation_is_rejected() -> None:
+    service = CustomToolAgentService(use_codex=False)
+
+    with pytest.raises(CustomToolError, match="design revision changed"):
+        service.continue_flow_action(
+            "custom_tool.confirm_design",
+            state={
+                "design_revision": 3,
+                "design_contract": {"document": "当前设计"},
+            },
+            expected_revision=2,
+            owner_id="user_a",
+        )
+
+
+def test_matching_design_confirmation_uses_the_current_server_design() -> None:
     service = CustomToolAgentService(use_codex=False)
     captured = {}
 
     service._confirm_and_code = lambda **kwargs: captured.update(kwargs) or {"ok": True}  # type: ignore[method-assign]
     result = service.continue_flow_action(
         "custom_tool.confirm_design",
-        state={"design_revision": 3, "design_contract": {"document": "当前设计"}},
-        expected_revision=2,
+        state={
+            "design_revision": 3,
+            "design_contract": {
+                "document": "当前设计",
+                "mermaid": "flowchart TD\nA --> B",
+            },
+        },
+        expected_revision=3,
         owner_id="user_a",
     )
 
     assert result == {"ok": True}
     assert captured["state"]["design_contract"]["document"] == "当前设计"
+
+
+def test_matching_design_confirmation_rejects_a_missing_flow_artifact() -> None:
+    service = CustomToolAgentService(use_codex=False)
+
+    with pytest.raises(CustomToolError, match="flow artifact is missing"):
+        service.continue_flow_action(
+            "custom_tool.confirm_design",
+            state={
+                "design_revision": 3,
+                "design_contract": {"document": "当前设计"},
+            },
+            expected_revision=3,
+            owner_id="user_a",
+        )
+
+
+def test_flow_diagram_is_derived_and_does_not_change_design_revision() -> None:
+    base = {
+        "document": "## 规则\n涨幅超过 5% 时命中。",
+        "mermaid": "flowchart TD\nA --> B{涨幅 > 5%?}",
+    }
+    first = CustomToolAgentService._design_artifact_identity(base, state={})
+    revised_flow = CustomToolAgentService._design_artifact_identity(
+        {
+            **base,
+            "mermaid": "flowchart TD\nA[读取涨幅] --> B{涨幅 > 5%?}\nB -- 是 --> C[命中]",
+        },
+        state=first,
+    )
+
+    assert revised_flow["design_revision"] == first["design_revision"]
+    assert revised_flow["design_fingerprint"] == first["design_fingerprint"]
 
 
 def test_file_store_enforces_owner_and_publication_permissions(tmp_path: Path) -> None:
@@ -792,6 +935,35 @@ def test_first_coding_turn_gets_editable_module_focused_api_context_and_test_run
         "close": 2,
         "key_process_info": {"sample_count": 2},
     }
+
+    Path(bundle["bundle_dir"], bundle["coding_evidence"]).write_text(
+        json.dumps({
+            "tool_inputs": [
+                {"market_data": {"volume": [100, 91]}},
+                {"market_data": {"volume": [100, 93]}},
+            ],
+            "raw_tool_outputs": [
+                {"ok": True, "results": []},
+                {"ok": True, "results": [{"code": "000001.SZ"}]},
+            ],
+        }),
+        encoding="utf-8",
+    )
+    collected_parallel_cases = service.collect_coding_result(bundle, {})
+    parallel_cases = collected_parallel_cases["coding_test_evidence"]["cases"]
+    assert len(parallel_cases) == 2
+    assert parallel_cases[0]["input"]["market_data"]["volume"] == [100, 91]
+    assert parallel_cases[1]["actual"]["results"][0]["code"] == "000001.SZ"
+
+    Path(bundle["bundle_dir"], bundle["coding_evidence"]).write_text(
+        json.dumps({
+            "tool_inputs": [{"case": 1}, {"case": 2}],
+            "raw_tool_outputs": [{"ok": True}],
+        }),
+        encoding="utf-8",
+    )
+    ambiguous_parallel_cases = service.collect_coding_result(bundle, {})
+    assert "coding_test_evidence" not in ambiguous_parallel_cases
 
 
 def test_platform_normalizes_key_process_info_as_required_object() -> None:

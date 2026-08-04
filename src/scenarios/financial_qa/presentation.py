@@ -77,12 +77,20 @@ class FinancialQaPresentationService:
         self,
         message: str,
         result_refs: Sequence[Mapping[str, Any]] | None,
+        *,
+        thread_id: int | None = None,
     ) -> list[dict[str, Any]]:
         evidence_blocks: list[dict[str, Any]] = []
         for index, result_ref in enumerate(result_refs or [], start=1):
             if not isinstance(result_ref, Mapping):
                 continue
-            evidence_blocks.extend(self._evidence_blocks(result_ref, index=index))
+            evidence_blocks.extend(
+                self._evidence_blocks(
+                    result_ref,
+                    index=index,
+                    thread_id=thread_id,
+                )
+            )
         narrative = self._display_narrative(
             str(message or ""),
             has_structured_evidence=bool(evidence_blocks),
@@ -108,8 +116,6 @@ class FinancialQaPresentationService:
                 and cls._looks_like_table_separator(lines[index + 1])
             ):
                 while kept and not kept[-1].strip():
-                    kept.pop()
-                if kept and re.match(r"^\s{0,3}#{1,6}\s+", kept[-1]):
                     kept.pop()
                 while index < len(lines) and cls._looks_like_table_row(lines[index]):
                     index += 1
@@ -150,6 +156,7 @@ class FinancialQaPresentationService:
         result_ref: Mapping[str, Any],
         *,
         index: int,
+        thread_id: int | None = None,
     ) -> list[dict[str, Any]]:
         columns, column_specs = self._columns(result_ref)
         rows = self._rows(result_ref)
@@ -158,6 +165,7 @@ class FinancialQaPresentationService:
 
         api = _trim(result_ref.get("api"))
         goal = _trim(result_ref.get("goal"))
+        display_title = _trim(result_ref.get("display_title"))
         catalog_specs = self._catalog_column_specs(api)
         column_specs = {
             name: {
@@ -195,6 +203,14 @@ class FinancialQaPresentationService:
         if candles:
             intraday = self._is_intraday(api, columns)
             semantic = "finance.intraday" if intraday else "finance.ohlcv"
+            title = self._evidence_title(
+                api=api,
+                rows=rows,
+                columns=columns,
+                display_title=display_title,
+                goal=goal,
+                kind="intraday" if intraday else "trend",
+            )
             return [
                 {
                     "block_id": f"financial_qa_evidence_{index}_trend",
@@ -202,7 +218,7 @@ class FinancialQaPresentationService:
                     "kind": "data",
                     "semantic": semantic,
                     "mode": "replace",
-                    "title": goal or "价格走势",
+                    "title": title,
                     "payload": {
                         "shape": "timeseries",
                         "content_type": semantic,
@@ -222,6 +238,14 @@ class FinancialQaPresentationService:
             row = self._row_mapping(rows[0], columns)
             items = self._metric_items(row, columns, column_specs)
             if items:
+                title = self._evidence_title(
+                    api=api,
+                    rows=rows,
+                    columns=columns,
+                    display_title=display_title,
+                    goal=goal,
+                    kind="metrics",
+                )
                 return [
                     {
                         "block_id": f"financial_qa_evidence_{index}_metrics",
@@ -229,7 +253,7 @@ class FinancialQaPresentationService:
                         "kind": "data",
                         "semantic": self._metrics_semantic(api),
                         "mode": "replace",
-                        "title": goal or "关键数据",
+                        "title": title,
                         "payload": {
                             "shape": "record",
                             "content_type": "finance.metrics",
@@ -244,6 +268,26 @@ class FinancialQaPresentationService:
                     }
                 ]
 
+        title = self._evidence_title(
+            api=api,
+            rows=rows,
+            columns=columns,
+            display_title=display_title,
+            goal=goal,
+            kind="records",
+        )
+        data_ref = _trim(result_ref.get("result_ref"))
+        paging = {
+            "page_size": 10,
+            "returned_row_count": row_count,
+        }
+        if thread_id and data_ref.startswith("session://"):
+            paging.update(
+                {
+                    "thread_id": int(thread_id),
+                    "data_ref": data_ref,
+                }
+            )
         return [
             {
                 "block_id": f"financial_qa_evidence_{index}_table",
@@ -251,7 +295,7 @@ class FinancialQaPresentationService:
                 "kind": "data",
                 "semantic": self._records_semantic(api),
                 "mode": "replace",
-                "title": goal or "数据证据",
+                "title": title,
                 "payload": {
                     "shape": "records",
                     "content_type": self._records_semantic(api),
@@ -280,6 +324,7 @@ class FinancialQaPresentationService:
                         },
                         "rows": deepcopy(rows),
                         "row_count": row_count,
+                        **paging,
                     },
                 },
                 "presentation_hint": {
@@ -290,6 +335,44 @@ class FinancialQaPresentationService:
                 "meta": meta,
             }
         ]
+
+    @classmethod
+    def _evidence_title(
+        cls,
+        *,
+        api: str,
+        rows: Sequence[Any],
+        columns: Sequence[str],
+        display_title: str,
+        goal: str,
+        kind: str,
+    ) -> str:
+        row = cls._row_mapping(rows[0], columns) if rows else {}
+        entity = _trim(
+            row.get("name")
+            or row.get("stock_name")
+            or row.get("security_name")
+        )
+        if display_title:
+            return f"{entity} · {display_title}" if entity else display_title
+        if api == "stock.quote":
+            suffix = {
+                "metrics": "行情快照",
+                "intraday": "分时走势",
+                "trend": "价格走势",
+                "records": "行情数据",
+            }.get(kind, "行情数据")
+            return f"{entity} · {suffix}" if entity else suffix
+        if api == "stock.margin":
+            return "融资融券数据"
+        if api == "stock.report":
+            return f"{entity} · 研报数据" if entity else "研报数据"
+        return goal or {
+            "metrics": "关键数据",
+            "intraday": "分时走势",
+            "trend": "价格走势",
+            "records": "数据证据",
+        }.get(kind, "数据证据")
 
     @staticmethod
     def _columns(

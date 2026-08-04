@@ -867,6 +867,10 @@ def test_dashscope_credentials_are_bound_to_anthropic_endpoint(monkeypatch: pyte
     assert provider_env["ANTHROPIC_BASE_URL"] == DASHSCOPE_ANTHROPIC_BASE_URL
     assert provider_env["ANTHROPIC_AUTH_TOKEN"] == "dashscope-secret"
     assert provider_env["ANTHROPIC_MODEL"] == "deepseek-v4-flash"
+    assert Path(provider_env["NODE_EXTRA_CA_CERTS"]).is_file()
+    assert Path(provider_env["NODE_EXTRA_CA_CERTS"]).name == (
+        "globalsign-root-r46.pem"
+    )
     assert "DASHSCOPE_API_KEY" not in provider_env
 
     with pytest.raises(ValueError, match="may only use"):
@@ -888,6 +892,27 @@ def test_dashscope_credentials_are_bound_to_anthropic_endpoint(monkeypatch: pyte
         query_impl=lambda **kwargs: None,
     )
     assert singapore.base_url.endswith("/apps/anthropic")
+
+
+def test_dashscope_ca_bundle_can_be_overridden(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    custom_bundle = tmp_path / "custom-ca.pem"
+    custom_bundle.write_text("test certificate bundle", encoding="utf-8")
+    monkeypatch.setenv("DASHSCOPE_API_KEY", "dashscope-secret")
+    monkeypatch.setenv(
+        "DASHSCOPE_ANTHROPIC_CA_BUNDLE",
+        str(custom_bundle),
+    )
+
+    provider_env = ClaudeSdkSkillHarness(
+        provider="dashscope",
+        model="deepseek-v4-flash",
+        query_impl=lambda **kwargs: None,
+    ).provider_env()
+
+    assert provider_env["NODE_EXTRA_CA_CERTS"] == str(custom_bundle.resolve())
 
 
 def test_deepseek_credentials_are_bound_to_official_anthropic_endpoint(monkeypatch: pytest.MonkeyPatch) -> None:

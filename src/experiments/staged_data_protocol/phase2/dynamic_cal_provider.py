@@ -61,6 +61,38 @@ REALTIME_ONLY_FIELDS = {
     "source",
     "is_fallback",
 }
+HISTORICAL_RAW_ONLY_ARG = "_host_historical_raw_only"
+HISTORICAL_RAW_STOCK_FIELDS = frozenset(
+    {
+        "code",
+        "tradedate",
+        "preclose",
+        "open",
+        "high",
+        "low",
+        "close",
+        "avg_price",
+        "differ",
+        "pct",
+        "turn_ratio",
+        "volumn",
+        "amount",
+        "amplitude",
+        "is_limit_price",
+    }
+)
+HISTORICAL_DEFAULT_STOCK_FIELDS = (
+    "code",
+    "tradedate",
+    "open",
+    "high",
+    "low",
+    "close",
+    "pct",
+    "turn_ratio",
+    "volumn",
+    "amount",
+)
 REALTIME_QUOTE_SOURCE = QuoteSource(
     subject="stock",
     table=REALTIME_SNAPSHOT_TABLE,
@@ -457,13 +489,27 @@ def _apply_order(df: pd.DataFrame, order_text: str) -> pd.DataFrame:
 
 def _dynamic_fields(*, source: QuoteSource, args: Mapping[str, Any]) -> List[str]:
     requested = _field_list(args.get("fields"))
+    historical_raw_only = (
+        source.subject == "stock"
+        and args.get(HISTORICAL_RAW_ONLY_ARG) is True
+    )
+    if historical_raw_only:
+        requested = [
+            field for field in requested if field in HISTORICAL_RAW_STOCK_FIELDS
+        ]
     fields = [field for field in requested if field in source.fields]
     if "code" not in fields and "code" in source.fields:
         fields.insert(0, "code")
-    if "name" not in fields and "name" in source.fields:
+    if not historical_raw_only and "name" not in fields and "name" in source.fields:
         fields.insert(1 if fields and fields[0] == "code" else 0, "name")
     if fields:
         return fields
+    if historical_raw_only:
+        return [
+            field
+            for field in HISTORICAL_DEFAULT_STOCK_FIELDS
+            if field in source.fields
+        ]
     return [field for field in ["code", "name", "tradedate", "open", "close", "high", "low", "pct", "amount", "volumn"] if field in source.fields]
 
 

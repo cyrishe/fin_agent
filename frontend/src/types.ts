@@ -1,5 +1,16 @@
 export type UnknownRecord = Record<string, unknown>;
 
+export interface AuthUser {
+  user_id: string;
+  display_name: string;
+  mobile_masked: string;
+}
+
+export interface AuthSession {
+  authenticated: boolean;
+  user: AuthUser | null;
+}
+
 export interface Attachment {
   attachment_id?: string;
   file_name?: string;
@@ -33,6 +44,15 @@ export interface AgentRun {
   summary: string;
   artifacts: SurfaceBlock[];
   process: SurfaceBlock[];
+  startedAt?: number;
+  finishedAt?: number;
+  durationMs?: number;
+  tokenUsage?: {
+    promptTokens: number;
+    completionTokens: number;
+    totalTokens: number;
+  };
+  modelName?: string;
 }
 
 export interface ChatMessage {
@@ -42,6 +62,8 @@ export interface ChatMessage {
   attachments?: Attachment[];
   run?: AgentRun;
   payload?: UnknownRecord;
+  threadId?: number;
+  turnId?: number;
   createdAt: number;
 }
 
@@ -81,6 +103,7 @@ export interface StreamEvent extends UnknownRecord {
   data?: UnknownRecord;
   result?: UnknownRecord;
   thread_id?: number;
+  turn_id?: number;
 }
 
 export interface InteractionResponse {
@@ -123,12 +146,80 @@ export interface InteractionFeedbackRequest {
   response: InteractionResponse;
 }
 
+export interface InvocationInputField {
+  name: string;
+  label: string;
+  description: string;
+  type?: string;
+  required: boolean;
+  defaultValue?: unknown;
+}
+
 export interface InvocationAsset {
+  ref: string;
   name: string;
   displayName: string;
+  summary: string;
   description: string;
   kind: "tool" | "skill";
+  invocation: string;
+  inputFields: InvocationInputField[];
+  aliases: string[];
+  tags: string[];
+  customTool: boolean;
+  editable?: boolean;
+  version?: string;
+  revision?: number;
   inputSchema?: UnknownRecord;
   sampleInput?: UnknownRecord;
   requiresNaturalLanguage?: boolean;
+}
+
+export interface ScheduledTaskStep {
+  step_id: string;
+  type: "tool" | "skill";
+  target_ref: {
+    kind: "tool" | "skill";
+    name: string;
+    version?: string;
+    revision?: number;
+  };
+  inputs: UnknownRecord;
+  depends_on: string[];
+}
+
+export interface ScheduledTaskDraft {
+  requirement_brief: string;
+  trigger: {
+    cron: string;
+    timezone: string;
+  };
+  execution_plan: {
+    steps: ScheduledTaskStep[];
+  };
+  next_run_at?: string | null;
+  preview?: UnknownRecord;
+  compile_source?: string;
+  llm_usage?: UnknownRecord;
+}
+
+export interface ScheduledTask extends ScheduledTaskDraft {
+  schedule_id: string;
+  enabled: boolean;
+  revision_no: number;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface ScheduledTaskRun {
+  run_id: string;
+  schedule_id: string;
+  schedule_revision_no: number;
+  status: string;
+  result?: UnknownRecord | null;
+  error_text?: string;
+  scheduled_for?: string | null;
+  started_at?: string | null;
+  finished_at?: string | null;
+  created_at?: string | null;
 }

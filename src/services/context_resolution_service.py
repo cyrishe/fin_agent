@@ -56,13 +56,35 @@ class ContextResolutionService:
             }
         signals = preprocessing_signals if isinstance(preprocessing_signals, dict) else {}
         state = thread_state if isinstance(thread_state, dict) else {}
+        prompt_context_window = self._build_prompt_context_window(context_window or [])
+        prompt_context_objects = self._build_prompt_context_objects(state, signals)
+        if not self._has_resolution_context(
+            prompt_context_window=prompt_context_window,
+            prompt_context_objects=prompt_context_objects,
+            thread_state=state,
+            preprocessing_signals=signals,
+            interaction_result=interaction_result,
+        ):
+            # With no prior semantic asset there is nothing for a context model
+            # to resolve.  Preserve the user's text and let the top-level LLM
+            # make the Agent/turn-mode decision once.
+            return {
+                "ori_question": text,
+                "resolved_question": text,
+                "context_refs": [],
+                "analize": "",
+                "resolved_items": [],
+                "resolution_summary": "",
+                "source": "no_context",
+                "llm_usage": {},
+            }
         try:
             base_messages = self.registry.render_messages(
                 "system.assistant.context_resolution",
                 {
                     "raw_user_text_json": json.dumps(text, ensure_ascii=False),
-                    "context_window": self._build_prompt_context_window(context_window or []),
-                    "context_objects": self._build_prompt_context_objects(state, signals),
+                    "context_window": prompt_context_window,
+                    "context_objects": prompt_context_objects,
                 },
             )
         except Exception as exc:
@@ -115,6 +137,35 @@ class ContextResolutionService:
         }
         normalized["messages"] = base_messages
         return normalized
+
+    def _has_resolution_context(
+        self,
+        *,
+        prompt_context_window: List[Dict[str, Any]],
+        prompt_context_objects: List[Dict[str, str]],
+        thread_state: Dict[str, Any],
+        preprocessing_signals: Dict[str, Any],
+        interaction_result: Optional[Dict[str, Any]],
+    ) -> bool:
+        if prompt_context_window or prompt_context_objects or interaction_result:
+            return True
+        for key in (
+            "reference_memory",
+            "recent_attachments",
+            "active_workflow",
+        ):
+            if thread_state.get(key):
+                return True
+        for key in ("recent_result_subject", "thread_summary"):
+            if self._trim(thread_state.get(key)):
+                return True
+        if bool(preprocessing_signals.get("needs_reference_resolution")):
+            return True
+        if preprocessing_signals.get("resolved_references"):
+            return True
+        if self._trim(preprocessing_signals.get("recent_result_subject")):
+            return True
+        return False
 
     @staticmethod
     def _repair_messages(

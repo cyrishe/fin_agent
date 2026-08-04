@@ -107,7 +107,7 @@ export default function FinanceChart({ object, mode }: { object: RenderObject; m
       <label><input type="checkbox" checked={showVolume} onChange={(event) => setShowVolume(event.target.checked)} />成交量</label>
     </div>
     <StockChart options={{
-      chart: { backgroundColor: "transparent", height: 390, spacing: [10, 8, 8, 4] },
+      chart: { backgroundColor: "transparent", height: 330, spacing: [8, 8, 6, 4] },
       title: { text: undefined },
       credits: { enabled: false },
       navigator: { enabled: labels.length > 80 },

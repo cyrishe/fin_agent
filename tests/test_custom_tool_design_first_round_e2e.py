@@ -796,7 +796,11 @@ def test_regular_chat_context_resolution_failure_returns_http_200_message(monkey
     conversations = _ConversationRuntimeStub()
     monkeypatch.setattr(web, "application_runtime_service", _ApplicationRuntimeStub())
     monkeypatch.setattr(web, "runtime_conversation_service", conversations)
-    monkeypatch.setattr(web.attachment_service, "list_attachments", lambda _: [])
+    monkeypatch.setattr(
+        web.attachment_service,
+        "list_attachments",
+        lambda *_args, **_kwargs: [],
+    )
     monkeypatch.setattr(
         web,
         "_resolve_current_guest_identity",
@@ -929,7 +933,14 @@ def test_coding_surface_uses_modules_test_and_activation_without_file_concepts()
 
     assert [block["block_type"] for block in blocks] == ["artifact", "assessment", "interaction"]
     artifact = blocks[0]
-    assert {"label": "运行方式", "value": "动态加载"} in artifact["data"]["items"]
+    assert {"label": "工具 ID", "value": "ct_demo"} in artifact["data"]["items"]
+    assert {"label": "调用引用", "value": "$ct_demo"} in artifact["data"]["items"]
+    assert artifact["data"]["asset_ref"]["name"] == "ct_demo"
+    assert artifact["data"]["details"]["runtime"] == "数据库动态加载，按一次性沙箱任务执行。"
+    assert artifact["data"]["details"]["verification"] == {
+        "status": "passed",
+        "summary": "1 / 1 项运行测试通过",
+    }
     assert "files" not in artifact["data"]["details"]
     test_case = blocks[1]["data"]["details"]["tests"][0]
     assert test_case["input"]["stock_codes"] == ["600519.SH"]
@@ -971,6 +982,131 @@ def test_coding_surface_shows_implementation_and_alignment_as_natural_language()
     assert "001_custom_tool.py" not in blocks[1]["content"]
     assert "/Volumes" not in blocks[1]["content"]
     assert "需求、设计与代码一致" in blocks[2]["content"]
+
+
+def test_coding_surface_reuses_design_flow_and_derives_strategy_compatibility() -> None:
+    mermaid = (
+        "flowchart TD\n"
+        "A[系统注入点时股票范围] --> B[计算20日指标]\n"
+        "B --> C{综合评分 >= 80?}\n"
+        "C -->|是| D[进入有序候选集]\n"
+        "C -->|否| E[排除]"
+    )
+    blocks = web._custom_tool_result_blocks(
+        {
+            "test_result": {
+                "execution_ok": True,
+                "summary": "1 / 1 项技术运行成功",
+            },
+            "tool": {
+                "manifest": {
+                    "tool_name": "ct_rank_selector",
+                    "display_name": "横截面评分策略",
+                    "status": "draft",
+                    "current_revision": 1,
+                    "capabilities": ["custom_tool", "strategy"],
+                },
+                "input_schema": {
+                    "type": "object",
+                    "properties": {
+                        "universe": {
+                            "type": "array",
+                            "items": {"type": "string"},
+                        },
+                    },
+                },
+                "output_schema": {
+                    "type": "object",
+                    "properties": {
+                        "selected_stocks": {"type": "array"},
+                        "as_of_date": {"type": "string"},
+                    },
+                },
+                "design_contract": {"mermaid": mermaid},
+                "strategy_runtime_profile": {
+                    "protocol": "strategy_runtime_profile.v1",
+                    "binding": {"field": "universe"},
+                    "required_history_sessions": 20,
+                    "default_run_sessions": 100,
+                    "default_universe_ref": {"type": "all_a_share"},
+                    "market_code": "CN_A",
+                },
+                "selection_output_profile": {
+                    "candidate_path": "data.selected_stocks",
+                    "symbol_field": "stock_code",
+                    "output_date_path": "data.as_of_date",
+                },
+            },
+        },
+        LlmStreamBlockBuilder(run_id="strategy_coding_surface"),
+    )
+
+    artifact = next(
+        block for block in blocks if block["block_id"] == "custom_tool_draft_summary"
+    )
+    details = artifact["data"]["details"]
+    assert details["design_flow"] == {"mermaid": mermaid}
+    assert details["verification"] == {
+        "status": "passed",
+        "summary": "1 / 1 项技术运行成功",
+    }
+    assert details["strategy_runtime_profile"]["binding"] == {"field": "universe"}
+    assert details["strategy_compatibility"]["strategy_wrapper_ready"] is True
+    assert (
+        details["strategy_compatibility"]["portfolio_backtest_contract_ready"]
+        is True
+    )
+    assert "point-in-time" in details["strategy_compatibility"]["summary"]
+
+
+def test_coding_surface_marks_inconsistent_strategy_output_contract() -> None:
+    blocks = web._custom_tool_result_blocks(
+        {
+            "tool": {
+                "manifest": {
+                    "tool_name": "ct_invalid_selector",
+                    "display_name": "待修正策略",
+                    "status": "draft",
+                    "current_revision": 1,
+                },
+                "input_schema": {
+                    "type": "object",
+                    "properties": {
+                        "universe": {
+                            "type": "array",
+                            "items": {"type": "string"},
+                        },
+                    },
+                },
+                "output_schema": {
+                    "type": "object",
+                    "properties": {"data": {"type": "object"}},
+                },
+                "strategy_runtime_profile": {
+                    "protocol": "strategy_runtime_profile.v1",
+                    "binding": {"field": "universe"},
+                    "required_history_sessions": 20,
+                    "default_run_sessions": 100,
+                    "default_universe_ref": {"type": "all_a_share"},
+                    "market_code": "CN_A",
+                },
+                "selection_output_profile": {
+                    "candidate_path": "missing.selected_stocks",
+                    "symbol_field": "stock_code",
+                    "output_date_path": "missing.as_of_date",
+                },
+            },
+        },
+        LlmStreamBlockBuilder(run_id="invalid_strategy_coding_surface"),
+    )
+
+    artifact = next(
+        block for block in blocks if block["block_id"] == "custom_tool_draft_summary"
+    )
+    compatibility = artifact["data"]["details"]["strategy_compatibility"]
+    assert compatibility["strategy_wrapper_ready"] is False
+    assert compatibility["portfolio_backtest_contract_ready"] is False
+    assert "candidate_path root is absent" in compatibility["summary"]
 
 
 def test_coding_surface_does_not_repeat_identical_summary_as_alignment() -> None:
@@ -1055,3 +1191,178 @@ def test_coding_failure_surface_keeps_design_and_offers_retry() -> None:
     assert blocks[0]["data"]["details"]["error_code"] == "coding_schema_invalid"
     assert blocks[-1]["data"]["interaction_id"] == "custom_tool.coding_failure"
     assert blocks[-1]["data"]["actions"][0]["action_id"] == "custom_tool.retry_coding"
+
+
+def test_design_transport_failure_has_tool_specific_surface_and_retry() -> None:
+    blocks = web._custom_tool_result_blocks(
+        {
+            "message": (
+                "已进入自定义工具创建，但工具设计服务本轮未及时返回。"
+                "你的需求已经保留，可以直接重试当前阶段。"
+            ),
+            "error": "Finance CC first response timed out after 45s",
+            "state": {
+                "requirement_text": "创建一个金叉工具",
+                "feedback_ledger": [{"text": "创建一个金叉工具"}],
+            },
+        },
+        LlmStreamBlockBuilder(run_id="design_timeout"),
+    )
+
+    assert [block["block_type"] for block in blocks] == [
+        "assessment",
+        "interaction",
+    ]
+    assert blocks[0]["title"] == "工具设计暂时未完成"
+    assert blocks[0]["data"]["details"]["failure_kind"] == "timeout"
+    assert "金融问答" not in blocks[0]["data"]["summary"]
+    assert blocks[1]["data"]["interaction_id"] == "custom_tool.design_failure"
+    assert (
+        blocks[1]["data"]["actions"][0]["action_id"]
+        == "custom_tool.retry_design"
+    )
+
+
+def test_custom_tool_stream_persists_progress_when_design_transport_fails(
+    monkeypatch,
+) -> None:
+    class FailureAgent:
+        def start_create(self, text, **kwargs):
+            kwargs["event_sink"]({
+                "source": "claude",
+                "type": "reasoning_summary_delta",
+                "content": "已进入自定义工具创建，正在梳理目标和规则。",
+                "metadata": {
+                    "stage": "requirement",
+                    "progress_id": "custom_tool_understanding",
+                    "title": "工具需求与设计",
+                    "status": "running",
+                },
+            })
+            kwargs["event_sink"]({
+                "source": "claude",
+                "type": "reasoning_summary_delta",
+                "content": "工具设计服务未及时返回；你的需求已经保留。",
+                "metadata": {
+                    "stage": "requirement",
+                    "progress_id": "custom_tool_understanding",
+                    "title": "工具需求与设计",
+                    "status": "error",
+                },
+            })
+            return {
+                "message": (
+                    "已进入自定义工具创建，但工具设计服务本轮未及时返回。"
+                    "你的需求已经保留，可以直接重试当前阶段。"
+                ),
+                "error": "Finance CC first response timed out after 45s",
+                "state": {
+                    "requirement_text": text,
+                    "feedback_ledger": [{"text": text}],
+                },
+            }
+
+    conversations = _ConversationRuntimeStub()
+    conversations.context = {}
+    emitted = []
+    monkeypatch.setattr(web, "application_runtime_service", _ApplicationRuntimeStub())
+    monkeypatch.setattr(web, "runtime_conversation_service", conversations)
+    monkeypatch.setattr(
+        web,
+        "assistant_dispatch_planner",
+        _ToolDevelopmentDispatchPlannerStub(),
+    )
+    monkeypatch.setattr(web, "custom_tool_agent_service", FailureAgent())
+
+    web._run_custom_tool_stream_payload(
+        {
+            "run_id": "failed_custom_tool_progress",
+            "text": "/custom_tool create 创建一个金叉工具",
+            "application_name": "investment_workbench",
+            "guest_identity": {"user_id": "user_a"},
+            "thread_id": 101,
+        },
+        emit=emitted.append,
+    )
+
+    persisted = conversations.completed[0]["output_payload"]["surface_blocks"]
+    process = [
+        block
+        for block in persisted
+        if block.get("data", {}).get("role") == "process"
+    ]
+    assert len(process) == 1
+    assert process[0]["block_id"] == "requirement_custom_tool_understanding"
+    assert process[0]["data"]["status"] == "error"
+    assert any(
+        block.get("block_id") == "custom_tool_design_failure"
+        for block in persisted
+    )
+    assert any(
+        block.get("block_id") == "custom_tool_design_retry"
+        for block in persisted
+    )
+
+
+def test_terminal_surface_cannot_keep_a_running_process_block() -> None:
+    settled = web._settle_terminal_progress_blocks([
+        {
+            "block_id": "design_custom_tool_understanding",
+            "block_type": "status",
+            "data": {
+                "role": "process",
+                "status": "running",
+                "summary": "正在形成设计。",
+            },
+        },
+        {
+            "block_id": "design_artifact",
+            "block_type": "artifact",
+            "data": {"status": "running"},
+        },
+    ])
+
+    assert settled[0]["data"]["status"] == "completed"
+    assert settled[1]["data"]["status"] == "running"
+
+
+def test_startup_prewarms_custom_tool_controller(monkeypatch) -> None:
+    class DisabledFinancialQa:
+        enabled = False
+
+    class ToolController:
+        enabled = True
+
+        def __init__(self):
+            self.calls = []
+
+        def prewarm(self, **kwargs):
+            self.calls.append(kwargs)
+            return {"warm_clients": 2}
+
+    class CustomToolAgent:
+        finance_cc_enabled = True
+
+        @staticmethod
+        def finance_cc_runtime_context():
+            return {
+                "turn_mode": "tool_development",
+                "entry": "custom_tool_flow",
+            }
+
+    controller = ToolController()
+    monkeypatch.setattr(web, "financial_qa_cc_service", DisabledFinancialQa())
+    monkeypatch.setattr(web, "finance_cc_shadow_service", controller)
+    monkeypatch.setattr(web, "custom_tool_agent_service", CustomToolAgent())
+    monkeypatch.setenv("FINANCE_CC_WARM_POOL_TIMEOUT_SECONDS", "7")
+
+    statuses = web._prewarm_agent_pools()
+
+    assert statuses == {"custom_tool": {"warm_clients": 2}}
+    assert controller.calls == [{
+        "context": {
+            "turn_mode": "tool_development",
+            "entry": "custom_tool_flow",
+        },
+        "timeout": 7.0,
+    }]

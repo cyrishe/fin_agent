@@ -1,6 +1,8 @@
 ---
 name: market-overview
 description: 综合分析大盘环境、涨跌宽度、成交、风格和风险偏好时使用；单个指数或市场指标的事实查询不使用。
+allowed-tools:
+  - mcp__finance__financial_news_search
 ---
 
 # 角色与任务

@@ -4,6 +4,7 @@ import {
   customAnswerPrompt,
   prepareClarificationSubmission,
   removeComposerPrompt,
+  scopedInteractionKey,
   selectInteractionAnswer,
   upsertComposerPrompt,
 } from "./interactionDraft";
@@ -24,6 +25,15 @@ const data = {
 };
 
 describe("interaction draft", () => {
+  it("keeps repeated review cards isolated by their message scope", () => {
+    const review = { interaction_id: "custom_tool.design_review", subject_revision: 1 };
+    const previous = scopedInteractionKey(review, "turn-1085:design_review");
+    const current = scopedInteractionKey(review, "turn-1086:design_review");
+
+    expect(previous).toBe("turn-1085:design_review:custom_tool.design_review:1");
+    expect(current).not.toBe(previous);
+  });
+
   it("preselects the first candidate as the default", () => {
     const draft = createInteractionDraft(data);
     expect(draft.answers.Q1).toMatchObject({ value: "30 个交易日", label: "30 个交易日", mode: "option" });

@@ -480,7 +480,7 @@ def _build_where(*, source: QuoteSource, args: Mapping[str, Any]) -> tuple[str, 
     elif not _identity_time_series_request(source=source, args=args):
         clauses.append(f"{source.fields['tradedate']} = (SELECT MAX(trade_date) FROM {source.table})")
 
-    filters = _explicit_filters(args)
+    filters = _explicit_filters(args, subject=source.subject)
     filter_clauses: List[str] = []
     filter_params: List[Any] = []
     for connector, field_name, op, value in filters:
@@ -510,7 +510,7 @@ def _build_where(*, source: QuoteSource, args: Mapping[str, Any]) -> tuple[str, 
 def _build_identity_where(*, source: QuoteSource, args: Mapping[str, Any]) -> tuple[str, List[Any]]:
     clauses: List[str] = []
     params: List[Any] = []
-    for connector, field_name, op, value in _explicit_filters(args):
+    for connector, field_name, op, value in _explicit_filters(args, subject=source.subject):
         if field_name not in {"code", "name"}:
             continue
         expression = source.fields.get(field_name)
@@ -539,13 +539,17 @@ def _identity_time_series_request(*, source: QuoteSource, args: Mapping[str, Any
     order = str(args.get("order") or "").lower()
     if "tradedate" not in order and "trade_date" not in order:
         return False
-    for _connector, field_name, op, _value in _explicit_filters(args):
+    for _connector, field_name, op, _value in _explicit_filters(args, subject=source.subject):
         if field_name in {"code", "name"} and op in {"=", "==", "in"} and field_name in source.fields:
             return True
     return False
 
 
-def _explicit_filters(args: Mapping[str, Any]) -> List[tuple[str, str, str, Any]]:
+def _explicit_filters(
+    args: Mapping[str, Any],
+    *,
+    subject: str = "",
+) -> List[tuple[str, str, str, Any]]:
     rows: List[tuple[str, str, str, Any]] = []
     for field_name in ["code", "name"]:
         value = args.get(field_name)
@@ -559,6 +563,11 @@ def _explicit_filters(args: Mapping[str, Any]) -> List[tuple[str, str, str, Any]
     for match in FILTER_RE.finditer(filter_text):
         connector = str(match.group("connector") or "AND").upper()
         field_name = str(match.group("field") or "").strip()
+        if subject == "plate":
+            field_name = {
+                "plate_code": "code",
+                "plate_name": "name",
+            }.get(field_name, field_name)
         op = str(match.group("op") or "").strip().lower()
         value = _clean_value(str(match.group("value") or ""))
         rows.append((connector, field_name, op, value))

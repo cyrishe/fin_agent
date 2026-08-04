@@ -1,7 +1,7 @@
 import { CheckCircle2, ChevronRight, GitBranch } from "lucide-react";
-import { normalizeRenderObject } from "../../rendering/normalize";
 import type { UnknownRecord } from "../../types";
 import MarkdownContent from "../MarkdownContent";
+import { authoritativeFlowObject } from "./AuthoritativeFlow";
 import FlowRenderer from "./FlowRenderer";
 
 const record = (value: unknown): UnknownRecord => value && typeof value === "object" && !Array.isArray(value) ? value as UnknownRecord : {};
@@ -16,6 +16,47 @@ function textOf(value: unknown): string {
   return String(item.description || item.responsibility || item.summary || item.expression || item.rule || item.name || "");
 }
 
+function leadText(value: unknown): string {
+  const lines = String(value || "")
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter((line) => line && !line.startsWith("#") && !line.startsWith("```") && !line.startsWith("|") && !/^[-*]\s/.test(line));
+  const lead = String(lines[0] || value || "")
+    .replace(/\*\*|__|`/g, "")
+    .replace(/\[([^\]]+)\]\([^\)]+\)/g, "$1")
+    .trim();
+  return lead.length > 220 ? `${lead.slice(0, 217)}…` : lead;
+}
+
+function financeProfileLabel(profile: UnknownRecord): string {
+  const family = ({
+    information: "信息工具",
+    analytics: "分析工具",
+    strategy: "策略工具",
+    action: "动作工具",
+  } as Record<string, string>)[String(profile.family || "").trim().toLowerCase()] || "";
+  const shape = ({
+    aggregate_context: "整体分析",
+    entity_local: "单实体独立",
+    cross_sectional: "横截面比较",
+    portfolio_stateful: "组合状态",
+  } as Record<string, string>)[String(profile.execution_shape || "").trim().toLowerCase()] || "";
+  const output = ({
+    facts: "客观事实",
+    metric: "指标值",
+    series: "时间序列",
+    assessment: "评估结论",
+    ranked_selection: "排名筛选",
+    signal: "投资信号",
+    portfolio_target: "目标组合",
+    action_receipt: "动作回执",
+  } as Record<string, string>)[String(profile.output_semantic || "").trim().toLowerCase()] || "";
+  const parts = [family, shape, output].filter(Boolean);
+  if (parts.length > 1) return parts.join(" · ");
+  const summary = String(profile.summary || "").trim();
+  return summary.startsWith(family) ? summary : [family, summary].filter(Boolean).join(" · ");
+}
+
 function FieldGrid({ items, fallback }: { items: UnknownRecord[]; fallback: string }) {
   return <div className="design-field-grid">{items.map((item, index) => (
     <article key={String(item.name || item.field || item.id || index)}>
@@ -27,10 +68,14 @@ function FieldGrid({ items, fallback }: { items: UnknownRecord[]; fallback: stri
 
 export default function DesignArtifact({ data, content }: { data: UnknownRecord; content: string }) {
   const details = record(data.details);
+  const financeProfile = record(details.finance_tool_profile || data.finance_tool_profile);
+  const financeProfileText = financeProfileLabel(financeProfile);
+  const plannedAction = String(financeProfile.family || "").trim().toLowerCase() === "action"
+    && String(financeProfile.execution_policy || "").trim().toLowerCase() === "planned_non_executable";
   const understanding = record(details.understanding);
   const summary = String(data.summary || content || "");
-  const goal = String(understanding.requirement_brief || understanding.goal || summary);
-  const expected = String(understanding.expected_result || "");
+  const goal = leadText(understanding.requirement_brief || understanding.goal || summary || details.document);
+  const expected = leadText(understanding.expected_result || "");
   const confirmed = list(understanding.confirmed_requirements);
   const constraints = list(understanding.constraints);
   const assumptions = list(understanding.assumptions);
@@ -44,48 +89,25 @@ export default function DesignArtifact({ data, content }: { data: UnknownRecord;
   const acceptance = list(details.acceptance);
   const flow = record(details.flow);
   const mermaid = String(details.mermaid || "");
-  const flowSteps = records(flow.steps);
-  const flowLinks = records(flow.links);
   const hasStructuredDetails = Boolean(
     inputs.length || outputs.length || modules.length || constraints.length ||
-    assumptions.length || dataRequirements.length || acceptance.length || plan,
+    assumptions.length || dataRequirements.length || acceptance.length || plan || document,
   );
-  const flowObject = (mermaid || flowSteps.length) ? normalizeRenderObject({
-    block_id: "design_core_flow",
-    block_type: "data",
-    kind: "data",
-    semantic: "finance.tool_design_workflow",
-    payload: {
-      shape: "graph",
-      content_type: "application/vnd.fin-agent.graph+json",
-      data: {
-        source: mermaid,
-        nodes: flowSteps.map((step, index) => ({
-          id: String(step.id || step.step_id || `step_${index + 1}`),
-          label: String(step.name || step.title || step.label || `步骤 ${index + 1}`),
-          detail: String(step.description || step.detail || ""),
-          status: String(step.type || "process"),
-        })),
-        edges: flowLinks.map((link) => ({
-          from: String(link.from || link.source || ""),
-          to: String(link.to || link.target || ""),
-          label: String(link.label || link.condition || ""),
-        })),
-      },
-    },
-  }) : null;
+  const flowObject = authoritativeFlowObject({ id: "design_core_flow", mermaid, flow });
 
   return <div className="design-artifact">
-    {document ? <section className="design-document"><MarkdownContent content={document} /></section> : <section className="design-intent">
-        <span>需求理解</span>
-        <h3>{goal}</h3>
+    <section className="design-intent">
+        <span>需求与目标</span>
+        <h3>{goal || "工具设计方案"}</h3>
         {expected && expected !== goal ? <p>{expected}</p> : null}
+        {financeProfileText ? <div className="finance-tool-profile" aria-label="金融工具画像"><span>{financeProfileText}</span></div> : null}
+        {plannedAction ? <p className="design-action-boundary" role="status">仅设计，未开放实现</p> : null}
         {confirmed.length > 0 ? <div className="confirmed-points">{confirmed.map((item, index) => (
           <span key={index}><CheckCircle2 size={14} />{textOf(item)}</span>
         ))}</div> : null}
-      </section>}
+      </section>
 
-    {!document && rules.length > 0 ? <section className="design-core-section">
+    {rules.length > 0 ? <section className="design-core-section">
       <div className="design-section-heading"><span>核心判断</span><small>请重点确认这些规则是否符合你的想法</small></div>
       <div className="design-rule-list">{rules.slice(0, 4).map((rule, index) => (
         <article key={String(rule.id || rule.name || index)}>
@@ -93,16 +115,20 @@ export default function DesignArtifact({ data, content }: { data: UnknownRecord;
           <div><strong>{String(rule.name || `规则 ${index + 1}`)}</strong><p>{String(rule.logic || rule.description || "")}</p></div>
         </article>
       ))}</div>
+      {rules.length > 4 ? <p className="design-more-note">其余 {rules.length - 4} 条规则可在完整设计中查看。</p> : null}
     </section> : null}
 
-    {flowObject ? <section className="design-core-section design-flow-section">
-      <div className="design-section-heading"><span><GitBranch size={15} />处理流程</span><small>从输入到结果的主链路</small></div>
-      <FlowRenderer object={flowObject} />
-    </section> : null}
+    <section className={`design-core-section design-flow-section${flowObject ? "" : " missing"}`}>
+      <div className="design-section-heading"><span><GitBranch size={15} />核心流程</span><small>展示关键判断、分支条件与阈值</small></div>
+      {flowObject
+        ? <FlowRenderer object={flowObject} />
+        : <div className="design-flow-missing" role="status"><GitBranch size={18} /><div><strong>流程图尚未生成</strong><p>当前设计缺少必须的主流程，不应进入确认或编码。</p></div></div>}
+    </section>
 
     {hasStructuredDetails ? <details className="design-details">
-      <summary><span><ChevronRight size={16} />查看完整设计细节</span><small>{inputs.length} 个输入 · {outputs.length} 个输出 · {modules.length} 个模块</small></summary>
+      <summary><span><ChevronRight size={16} />查看完整设计细节</span><small>{inputs.length || outputs.length || modules.length ? `${inputs.length} 个输入 · ${outputs.length} 个输出 · ${modules.length} 个模块` : "完整规格、规则与数据口径"}</small></summary>
       <div className="design-details-body">
+        {document ? <section className="design-document"><MarkdownContent content={document} /></section> : null}
         {summary && summary !== goal ? <p className="design-description">{summary}</p> : null}
         {plan ? <section><h4>实现方案</h4><p className="design-description" style={{ whiteSpace: "pre-wrap" }}>{plan}</p></section> : null}
         {inputs.length > 0 ? <section><h4>输入</h4><FieldGrid items={inputs} fallback="输入" /></section> : null}

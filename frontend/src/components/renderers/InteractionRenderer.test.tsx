@@ -78,5 +78,31 @@ describe("InteractionRenderer", () => {
     const html = renderToStaticMarkup(<InteractionRenderer data={confirmation} content="" {...handlers} />);
 
     expect(html).toContain(">确认需求</button>");
+    expect(html).toContain('type="button"');
+    expect(html).not.toContain('disabled=""');
+  });
+
+  it("keeps a blocked activation visible, explained and non-interactive", () => {
+    const html = renderToStaticMarkup(<InteractionRenderer data={{
+      interaction_id: "custom_tool.coding_review",
+      subject_ref: "ct_demo",
+      subject_revision: 2,
+      prompt: "候选版本验证未通过。",
+      actions: [{
+        action_id: "custom_tool.activate_draft",
+        label: "启用候选版本",
+        intent: "accept",
+        style: "primary",
+        expected_revision: 2,
+        disabled: true,
+        disabled_reason: "候选版本验证未通过，修正后才能启用。",
+      }],
+    }} content="" {...handlers} />);
+
+    expect(html).toContain("启用候选版本");
+    expect(html).toContain('type="button"');
+    expect(html).toContain('disabled=""');
+    expect(html).toContain('aria-disabled="true"');
+    expect(html).toContain("候选版本验证未通过，修正后才能启用。");
   });
 });

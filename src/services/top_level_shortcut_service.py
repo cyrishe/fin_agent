@@ -20,6 +20,9 @@ class TopLevelShortcutService:
         ("custom_tool.coding_failure", "custom_tool.retry_coding", "accept"): {
             "handler": "custom_tool.action",
         },
+        ("custom_tool.design_failure", "custom_tool.retry_design", "accept"): {
+            "handler": "custom_tool.action",
+        },
     }
 
     @staticmethod

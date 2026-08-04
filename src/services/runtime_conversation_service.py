@@ -11,6 +11,10 @@ THREAD_TABLE = "aiia_runtime_thread"
 TURN_TABLE = "aiia_runtime_turn"
 
 
+class RuntimeConversationAccessError(PermissionError):
+    """Raised when a caller tries to reuse a thread it does not own."""
+
+
 class RuntimeConversationService:
     HISTORY_OUTPUT_KEYS = (
         "mode",
@@ -22,6 +26,7 @@ class RuntimeConversationService:
         "items",
         "workspace",
         "task_state",
+        "report_export",
     )
     HISTORY_OMIT_KEYS = {
         "events",
@@ -95,7 +100,31 @@ class RuntimeConversationService:
         context_summary: str = "",
     ) -> int:
         if thread_id:
-            return int(thread_id)
+            normalized_owner_type = self._trim(owner_type) or "system"
+            normalized_owner_id = self._trim(owner_id) or "conversation_workbench"
+            db = SystemDbUtils()
+            try:
+                with db.conn.cursor() as cursor:
+                    cursor.execute(
+                        f"""
+                        SELECT owner_type, owner_id
+                        FROM {THREAD_TABLE}
+                        WHERE thread_id = %s
+                        """,
+                        (int(thread_id),),
+                    )
+                    row = cursor.fetchone()
+                if (
+                    not row
+                    or self._trim(row[0]) != normalized_owner_type
+                    or self._trim(row[1]) != normalized_owner_id
+                ):
+                    # Use one response for missing and foreign IDs so this
+                    # check does not become a thread-enumeration oracle.
+                    raise RuntimeConversationAccessError("无权访问该 thread")
+                return int(thread_id)
+            finally:
+                db.close_db()
         db = SystemDbUtils()
         try:
             with db.conn.cursor() as cursor:
@@ -298,7 +327,9 @@ class RuntimeConversationService:
                       {output_payload_select},
                       status,
                       started_at,
-                      finished_at
+                      finished_at,
+                      model_name,
+                      token_usage_json
                     FROM {TURN_TABLE}
                     WHERE thread_id = %s
                     ORDER BY turn_no ASC
@@ -319,6 +350,8 @@ class RuntimeConversationService:
                     status,
                     started_at,
                     finished_at,
+                    model_name,
+                    token_usage_json,
                 ) = row
                 output_payload = self._compact_history_payload(self._safe_json_dict(output_structured_json))
                 if history_payload_only and isinstance(output_payload, dict):
@@ -334,9 +367,84 @@ class RuntimeConversationService:
                         "status": self._trim(status) or "",
                         "started_at": str(started_at or ""),
                         "finished_at": str(finished_at or ""),
+                        "model_name": self._trim(model_name),
+                        "token_usage": self._normalize_token_usage(
+                            self._safe_json_dict(token_usage_json)
+                        ),
                     }
                 )
             return items
+        finally:
+            db.close_db()
+
+    def get_turn(
+        self,
+        *,
+        thread_id: int,
+        turn_id: int,
+        include_output_payload: bool = True,
+    ) -> Optional[Dict[str, Any]]:
+        db = SystemDbUtils()
+        output_payload_select = (
+            "output_structured_json"
+            if include_output_payload
+            else "NULL AS output_structured_json"
+        )
+        try:
+            with db.conn.cursor() as cursor:
+                cursor.execute(
+                    f"""
+                    SELECT
+                      turn_id,
+                      turn_no,
+                      user_input_text,
+                      input_structured_json,
+                      assistant_output_text,
+                      {output_payload_select},
+                      status,
+                      started_at,
+                      finished_at,
+                      model_name,
+                      token_usage_json
+                    FROM {TURN_TABLE}
+                    WHERE thread_id = %s AND turn_id = %s
+                    LIMIT 1
+                    """,
+                    (int(thread_id), int(turn_id)),
+                )
+                row = cursor.fetchone()
+            if not row:
+                return None
+            (
+                resolved_turn_id,
+                turn_no,
+                user_input_text,
+                input_structured_json,
+                assistant_output_text,
+                output_structured_json,
+                status,
+                started_at,
+                finished_at,
+                model_name,
+                token_usage_json,
+            ) = row
+            return {
+                "turn_id": int(resolved_turn_id),
+                "turn_no": int(turn_no),
+                "user_input_text": self._trim(user_input_text),
+                "input_payload": self._safe_json_dict(input_structured_json),
+                "assistant_output_text": self._trim(assistant_output_text),
+                "output_payload": self._compact_history_payload(
+                    self._safe_json_dict(output_structured_json)
+                ),
+                "status": self._trim(status) or "",
+                "started_at": str(started_at or ""),
+                "finished_at": str(finished_at or ""),
+                "model_name": self._trim(model_name),
+                "token_usage": self._normalize_token_usage(
+                    self._safe_json_dict(token_usage_json)
+                ),
+            }
         finally:
             db.close_db()
 
@@ -409,8 +517,12 @@ class RuntimeConversationService:
             db.close_db()
 
     @staticmethod
-    def _context_answer_preview(text: Any, max_chars: int = 10) -> str:
-        normalized = str(text or "").strip()
+    def _context_answer_preview(text: Any, max_chars: int = 360) -> str:
+        # Context resolution needs enough semantic evidence to resolve natural
+        # follow-ups such as “和五日前比呢” or “第二个呢”.  Keep a bounded
+        # narrative preview instead of either the full result table or the old
+        # ten-character fragment.
+        normalized = " ".join(str(text or "").strip().split())
         if len(normalized) <= max_chars:
             return normalized
         return normalized[:max_chars] + "…"
@@ -494,6 +606,7 @@ class RuntimeConversationService:
         thread_id: int,
         user_input_text: str,
         input_payload: Dict[str, Any],
+        started_at: Any = None,
     ) -> int:
         db = SystemDbUtils()
         try:
@@ -509,13 +622,14 @@ class RuntimeConversationService:
                     INSERT INTO {TURN_TABLE} (
                       thread_id, turn_no, user_input_text, input_structured_json,
                       status, started_at
-                    ) VALUES (%s, %s, %s, %s, 'running', NOW())
+                    ) VALUES (%s, %s, %s, %s, 'running', COALESCE(%s, NOW()))
                     """,
                     (
                         int(thread_id),
                         turn_no,
                         self._trim(user_input_text),
                         self._json_text(input_payload),
+                        self._trim(started_at) or None,
                     ),
                 )
                 turn_id = int(cursor.lastrowid)
@@ -542,8 +656,9 @@ class RuntimeConversationService:
         status: str = "completed",
         model_name: str = "",
         token_usage: Dict[str, Any] | None = None,
-    ) -> None:
+    ) -> Dict[str, Any]:
         normalized_usage = self._normalize_token_usage(token_usage)
+        turn_meta: Dict[str, Any] = {}
         db = SystemDbUtils()
         try:
             with db.conn.cursor() as cursor:
@@ -568,6 +683,45 @@ class RuntimeConversationService:
                         int(turn_id),
                     ),
                 )
+                cursor.execute(
+                    f"SELECT started_at, finished_at FROM {TURN_TABLE} WHERE turn_id = %s",
+                    (int(turn_id),),
+                )
+                time_row = cursor.fetchone()
+                if time_row:
+                    started_at, finished_at = time_row
+                    duration_ms = None
+                    if (
+                        hasattr(started_at, "__sub__")
+                        and finished_at is not None
+                    ):
+                        try:
+                            duration_ms = max(
+                                0,
+                                round(
+                                    (finished_at - started_at).total_seconds()
+                                    * 1_000
+                                ),
+                            )
+                        except (AttributeError, TypeError, ValueError):
+                            duration_ms = None
+                    turn_meta = {
+                        "started_at": (
+                            started_at.isoformat()
+                            if hasattr(started_at, "isoformat")
+                            else str(started_at or "")
+                        ),
+                        "finished_at": (
+                            finished_at.isoformat()
+                            if hasattr(finished_at, "isoformat")
+                            else str(finished_at or "")
+                        ),
+                        **(
+                            {"duration_ms": duration_ms}
+                            if duration_ms is not None
+                            else {}
+                        ),
+                    }
                 cursor.execute(
                     f"SELECT owner_type, owner_id, metadata_json FROM {THREAD_TABLE} WHERE thread_id = %s",
                     (int(thread_id),),
@@ -622,5 +776,6 @@ class RuntimeConversationService:
                         (self._json_text(profile), owner_id),
                     )
             db.conn.commit()
+            return turn_meta
         finally:
             db.close_db()

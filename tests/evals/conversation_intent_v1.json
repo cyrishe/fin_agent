@@ -336,6 +336,61 @@
         "max_context_refs": 0,
         "llm_policy": "required"
       }
+    },
+    {
+      "case_id": "finance_hot_event_metadata",
+      "category": "boundary",
+      "input": "查询沉默天数最长但历史反复出现的热点事件。",
+      "expected": {
+        "agent_name": "investment_analyst",
+        "turn_mode": "normal_qa",
+        "resolved_contains_all": ["热点事件"],
+        "llm_policy": "required"
+      }
+    },
+    {
+      "case_id": "finance_hot_event_ranking",
+      "category": "boundary",
+      "input": "今天热度最高的热点事件前20名。",
+      "expected": {
+        "agent_name": "investment_analyst",
+        "turn_mode": "normal_qa",
+        "resolved_contains_all": ["热点事件", "前20名"],
+        "llm_policy": "required"
+      }
+    },
+    {
+      "case_id": "finance_stock_screening_is_business_result",
+      "category": "boundary",
+      "input": "筛选PE_TTM低于15且PB低于1.5的股票。",
+      "expected": {
+        "agent_name": "investment_analyst",
+        "turn_mode": "normal_qa",
+        "resolved_contains_all": ["PE_TTM", "股票"],
+        "llm_policy": "required"
+      }
+    },
+    {
+      "case_id": "finance_business_list_is_not_system_catalog",
+      "category": "boundary",
+      "input": "查询所有板块代码和板块名称。",
+      "expected": {
+        "agent_name": "investment_analyst",
+        "turn_mode": "normal_qa",
+        "resolved_contains_all": ["板块代码", "板块名称"],
+        "llm_policy": "required"
+      }
+    },
+    {
+      "case_id": "general_social_hot_events_remain_fallback",
+      "category": "boundary",
+      "input": "今天有哪些社会民生热点新闻？",
+      "expected": {
+        "agent_name": "default_assistant",
+        "turn_mode": "normal_qa",
+        "resolved_contains_all": ["社会民生", "热点新闻"],
+        "llm_policy": "required"
+      }
     }
   ]
 }

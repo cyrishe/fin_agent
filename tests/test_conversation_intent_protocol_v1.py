@@ -1,5 +1,8 @@
 from __future__ import annotations
 
+import json
+from pathlib import Path
+
 import pytest
 
 from src.services.assistant_interaction_preprocessor import (
@@ -174,6 +177,59 @@ def test_top_intent_uses_one_llm_call_for_both_orthogonal_dimensions(monkeypatch
     assert result["turn_mode"] == "normal_qa"
 
 
+def test_top_intent_prompt_exposes_complete_soft_routing_context(monkeypatch):
+    captured = []
+    application_config = json.loads(
+        Path("src/applications/investment_workbench/application.json").read_text(encoding="utf-8")
+    )
+    agent_configs = {
+        name: json.loads(Path(f"src/agents/{name}/agent.json").read_text(encoding="utf-8"))
+        for name in ("default_assistant", "investment_analyst")
+    }
+    application_context = {
+        "application_name": application_config["name"],
+        "display_name": application_config["display_name"],
+        "application_config": application_config,
+        "default_agent": {
+            "agent_name": application_config["default_agent"],
+        },
+        "available_agents": [
+            {
+                "agent_name": name,
+                "display_name": config["display_name"],
+                "role": config["role"],
+                "config": config,
+            }
+            for name, config in agent_configs.items()
+        ],
+    }
+
+    def fake_chat(messages, enable_think=False):
+        captured.extend(messages)
+        return {"agent_name": "investment_analyst", "turn_mode": "normal_qa"}, {}
+
+    monkeypatch.setattr("src.services.assistant_interaction_preprocessor.chat_qwen_flash_json", fake_chat)
+    AssistantInteractionPreprocessor().classify(
+        user_text="查询今天活跃的热点事件",
+        context_resolution={
+            "ori_question": "查询今天活跃的热点事件",
+            "resolved_question": "查询今天活跃的热点事件",
+            "context_refs": [],
+        },
+        application_context=application_context,
+    )
+
+    rendered = "\n".join(str(item.get("content") or "") for item in captured)
+    assert "市场热点事件与热点概念" in rendered
+    assert "基金与ETF" in rendered
+    assert "债券与可转债" in rendered
+    assert "最低优先级兜底" in rendered
+    assert "用户直接想得到什么" in rendered
+    assert "内部选择并调用一个或多个 Tool/Skill" in rendered
+    assert "'domain': 'market'" in rendered or '"domain": "market"' in rendered
+    assert "investment_analyst" in rendered
+
+
 def test_preprocess_does_not_count_context_resolution_usage_twice():
     service, context, intent = _service()
     original_resolve = context.resolve
@@ -287,7 +343,10 @@ def test_context_resolution_llm_failure_is_reported_without_fallback(monkeypatch
     with pytest.raises(ContextResolutionError, match="maas unavailable"):
         ContextResolutionService().resolve(
             user_text="那么五粮液呢？",
-            context_window=[],
+            context_window=[
+                {"round": 1, "role": "user", "text": "查询贵州茅台昨日开盘价"},
+                {"round": 1, "role": "assistant", "text": "已返回贵州茅台结果"},
+            ],
             thread_state={},
             preprocessing_signals={},
             enable_llm=True,
@@ -303,7 +362,10 @@ def test_context_resolution_protocol_error_is_reported_without_raw_text_fallback
     with pytest.raises(ContextResolutionError, match="连续两次"):
         ContextResolutionService().resolve(
             user_text="那么五粮液呢？",
-            context_window=[],
+            context_window=[
+                {"round": 1, "role": "user", "text": "查询贵州茅台昨日开盘价"},
+                {"round": 1, "role": "assistant", "text": "已返回贵州茅台结果"},
+            ],
             thread_state={},
             preprocessing_signals={},
             enable_llm=True,
@@ -330,7 +392,15 @@ def test_context_resolution_retries_bad_json_and_keeps_original_text_in_system(m
     result = ContextResolutionService().resolve(
         user_text=original,
         context_window=[],
-        thread_state={},
+        thread_state={
+            "active_workflow": {"type": "custom_tool_authoring"},
+            "context_objects": [
+                {
+                    "context_ref": "custom_tool:current",
+                    "summary": "当前工具设计",
+                }
+            ],
+        },
         preprocessing_signals={},
         enable_llm=True,
     )

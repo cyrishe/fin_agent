@@ -78,13 +78,13 @@ BASE_INFO_SOURCES: Dict[str, BaseInfoSource] = {
 }
 
 
-OP_SQL = {"=": "=", "==": "=", "!=": "!=", ">": ">", ">=": ">=", "<": "<", "<=": "<="}
+OP_SQL = {"=": "=", "==": "=", "!=": "!=", ">": ">", ">=": ">=", "<": "<", "<=": "<=", "like": "LIKE"}
 FILTER_RE = re.compile(
     r"(?:(?P<connector>\band\b|\bor\b)\s+)?"
     r"(?P<field>[A-Za-z_]\w*)\s*"
-    r"(?P<op>in|=|==|!=|>=|<=|>|<)\s*"
+    r"(?P<op>in|like|=|==|!=|>=|<=|>|<)\s*"
     r"(?P<value>\[[^\]]+\]|\([^)]+\)|[^,;]+?)"
-    r"(?=\s+(?:and|or)\s+[A-Za-z_]\w*\s*(?:in|=|==|!=|>=|<=|>|<)|[,;]|$)",
+    r"(?=\s+(?:and|or)\s+[A-Za-z_]\w*\s*(?:in|like|=|==|!=|>=|<=|>|<)|[,;]|$)",
     flags=re.IGNORECASE,
 )
 
@@ -98,7 +98,22 @@ def execute_base_info_api(*, subject: str, args: Mapping[str, Any], outputs: Lis
     if not columns:
         columns = list(source.fields)[:2]
     ignored_filters = _ignored_filters(source=source, args=args)
-    where_sql, params = _build_where(source=source, args=args)
+    raw_filter = str(args.get("filter") or "").strip()
+    filter_sql, params = _build_filter_clauses(source=source, args=args)
+    if raw_filter and not filter_sql:
+        return {
+            "status": "invalid_filter",
+            "api": f"{subject}.basic_info",
+            "subject": subject,
+            "provider": "kingdomai_base_info",
+            "source_tables": list(source.source_tables),
+            "arguments": dict(args),
+            "columns": columns,
+            "rows": [],
+            "ignored_filters": [raw_filter],
+            "reason": "filter was not parsed; supported operators are =, !=, >, >=, <, <=, in, like",
+        }
+    where_sql = filter_sql or "1=1"
     order_sql = _build_order(source=source, args=args)
     limit = _bounded_limit(args.get("limit"))
     select_sql = ", ".join(f"{source.fields[column]} AS `{column}`" for column in columns)
@@ -195,10 +210,42 @@ def _build_filter_clauses(*, source: BaseInfoSource, args: Mapping[str, Any]) ->
                 continue
             clauses.append(f"{source.fields[field]} IN ({', '.join(['%s'] * len(values))})")
             params.extend(values)
+        elif op == "like":
+            clauses.append(f"{source.fields[field]} LIKE %s")
+            params.append(value)
         else:
+            equivalent_values = _equivalent_filter_values(
+                source=source,
+                field_name=field,
+                value=value,
+            )
+            if len(equivalent_values) > 1 and op in {"=", "=="}:
+                placeholders = " OR ".join(
+                    [f"{source.fields[field]} = %s"] * len(equivalent_values)
+                )
+                clauses.append(f"({placeholders})")
+                params.extend(equivalent_values)
+                continue
             clauses.append(f"{source.fields[field]} {OP_SQL[op]} %s")
             params.append(value)
     return " ".join(clauses), params
+
+
+def _equivalent_filter_values(
+    *,
+    source: BaseInfoSource,
+    field_name: str,
+    value: Any,
+) -> List[Any]:
+    text = str(value or "").strip()
+    if (
+        source.subject == "plate"
+        and field_name == "plate_name"
+        and text.endswith("板块")
+        and len(text) > 2
+    ):
+        return [value, text.removesuffix("板块")]
+    return [value]
 
 
 def _ignored_filters(*, source: BaseInfoSource, args: Mapping[str, Any]) -> List[str]:

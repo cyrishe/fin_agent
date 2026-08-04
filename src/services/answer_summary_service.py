@@ -7,6 +7,8 @@ from src.utils.ai_service import chat_qwen_flash_json
 
 
 class AnswerSummaryService:
+    FALLBACK_SUMMARY_MAX_CHARS = 360
+
     def __init__(self) -> None:
         self.registry = get_prompt_registry()
 
@@ -67,15 +69,28 @@ class AnswerSummaryService:
         final_output = task_result.get("final_output") if isinstance(task_result.get("final_output"), dict) else {}
         final_summary = self._trim(final_output.get("summary"))
         if final_summary:
-            return "本轮围绕用户问题给出结果总结与结论说明。完成度：回答已完成。"
+            return (
+                f"{self._semantic_preview(final_summary)} "
+                "完成度：回答已完成。"
+            )
+        if assistant_output_text:
+            return (
+                f"{self._semantic_preview(assistant_output_text)} "
+                "完成度：回答已结束。"
+            )
         mode = self._trim(output_payload.get("mode"))
         if mode == "tool_plan_completed":
             return "本轮已完成任务规划、工具执行与结果汇总。完成度：执行已结束。"
         planning_state = output_payload.get("planning_task_state") if isinstance(output_payload.get("planning_task_state"), dict) else {}
         if isinstance(planning_state.get("steps"), list) and planning_state.get("steps"):
             return "本轮已完成问题理解与任务整理，并生成了后续执行方案。完成度：规划已结束。"
-        if assistant_output_text:
-            return "本轮已给出回答。完成度：回答已结束。"
         if raw_user_text:
             return "本轮已处理用户问题。完成度：处理已结束。"
         return ""
+
+    @classmethod
+    def _semantic_preview(cls, text: Any) -> str:
+        normalized = " ".join(cls._trim(text).split())
+        if len(normalized) <= cls.FALLBACK_SUMMARY_MAX_CHARS:
+            return normalized
+        return normalized[: cls.FALLBACK_SUMMARY_MAX_CHARS].rstrip() + "…"

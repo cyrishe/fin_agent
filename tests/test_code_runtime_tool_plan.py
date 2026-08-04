@@ -197,3 +197,51 @@ def test_tool_plan_runtime_turns_retention_error_into_feedback(monkeypatch):
     assert result["runtime_feedback"]["reason_code"] == "execution_failed"
     runtime_execute = {item["node"]: item for item in result["runtime_node_results"]}["runtime_execute"]
     assert runtime_execute["feedback"]["to_node"] == "runtime_execute"
+
+
+def test_tool_plan_runtime_preserves_custom_tool_runtime_failure_kind(monkeypatch):
+    def fake_run_tool(tool_name, args, runtime_ctx=None):
+        return {
+            "tool": tool_name,
+            "ok": False,
+            "data": {},
+            "error": "TypeError: object is not callable",
+            "meta": {
+                "custom_tool": True,
+                "failure_kind": "runtime_error",
+            },
+        }
+
+    monkeypatch.setattr(
+        "src.services.tool_plan_runtime_service.run_tool",
+        fake_run_tool,
+    )
+    service = ToolPlanRuntimeService(enable_tool_preflight=False)
+    monkeypatch.setattr(
+        service,
+        "_build_final_output",
+        lambda **kwargs: ({"summary": "failed", "facts": [], "risks": []}, None),
+    )
+    monkeypatch.setattr(
+        service,
+        "_build_render_payload",
+        lambda **kwargs: {"sections": [], "reference_materials": []},
+    )
+
+    result = service.execute_for_assistant(
+        execution_plan={
+            "objective": "执行自定义工具",
+            "plan_type": "tool_plan_run",
+            "work_items": [
+                {
+                    "step_id": "step_1",
+                    "type": "tool",
+                    "name": "ct_example",
+                }
+            ],
+        },
+        user_text="$ct_example",
+    )
+
+    assert result["items"][0]["failure_kind"] == "runtime_error"
+    assert result["items"][0]["feedback"]["reason_code"] == "execution_failed"

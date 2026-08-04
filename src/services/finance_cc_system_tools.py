@@ -195,10 +195,18 @@ class FinanceCcSystemTools:
             if artifact_type == "design":
                 design = payload.get("design")
                 if isinstance(design, str) and _trim(design):
-                    working_state["design_contract"] = {"document": _trim(design)}
+                    design_contract: dict[str, Any] = {"document": _trim(design)}
                 elif isinstance(design, Mapping) and design:
-                    working_state["design_contract"] = dict(design)
-                    working_state["tool_name"] = _trim(design.get("tool_name"))
+                    design_contract = dict(design)
+                else:
+                    return
+                finance_tool_profile = payload.get("finance_tool_profile")
+                if isinstance(finance_tool_profile, Mapping) and finance_tool_profile:
+                    design_contract["finance_tool_profile"] = dict(
+                        finance_tool_profile
+                    )
+                working_state["design_contract"] = design_contract
+                working_state["tool_name"] = _trim(design_contract.get("tool_name"))
                 return
             if artifact_type == "flow":
                 mermaid = _trim(payload.get("mermaid"))
@@ -408,13 +416,31 @@ class FinanceCcSystemTools:
                 return _tool_result(
                     {"artifact_type": artifact_type, "error": f"artifact validation failed: {exc}"},
                 )
+            if artifact_type == "flow" and not isinstance(
+                tool_runtime.working_state.get("design_contract"), Mapping
+            ):
+                call_record["error"] = "flow requires a saved design"
+                return _tool_result(
+                    {
+                        "artifact_type": artifact_type,
+                        "error": "flow requires a saved design artifact in the current tool conversation",
+                    },
+                )
             tool_runtime.tracker["artifact_updates"].append({"artifact_type": artifact_type, "payload": payload})
             apply_artifact_to_working_state(artifact_type, payload)
+            message = "Artifact recorded."
+            if artifact_type == "design":
+                message = (
+                    "Design draft recorded. Before presenting it for confirmation or starting Coding, "
+                    "run financial-tool-flowchart on this saved design and save the resulting flow artifact."
+                )
+            elif artifact_type == "flow":
+                message = "Flow recorded. The current design is now complete for user review."
             return _tool_result(
                 {
                     "artifact_type": artifact_type,
                     "tool_name": _trim(tool_runtime.working_state.get("tool_name")),
-                    "message": "Artifact recorded.",
+                    "message": message,
                 }
             )
 
@@ -478,6 +504,35 @@ class FinanceCcSystemTools:
         async def implement_dynamic_tool(args: dict[str, Any]) -> dict[str, Any]:
             instruction = _trim(args.get("instruction"))
             tool_runtime.tracker["calls"].append({"tool": "implement_dynamic_tool", "instruction": instruction[:500]})
+            design_contract = (
+                tool_runtime.working_state.get("design_contract")
+                if isinstance(tool_runtime.working_state.get("design_contract"), Mapping)
+                else {}
+            )
+            if not _trim(design_contract.get("mermaid")):
+                return _tool_result(
+                    {
+                        "error": "current design is not reviewable because its flow artifact is missing",
+                        "message": (
+                            "先基于已保存的设计生成并保存流程图，再进入 Coding。"
+                        ),
+                    },
+                )
+            finance_tool_profile = (
+                design_contract.get("finance_tool_profile")
+                if isinstance(design_contract.get("finance_tool_profile"), Mapping)
+                else {}
+            )
+            if _trim(finance_tool_profile.get("family")).lower() == "action":
+                return _tool_result(
+                    {
+                        "error": "action finance Tools are design-only",
+                        "message": (
+                            "当前方案属于高风险外部动作工具；本系统只保存和展示设计，"
+                            "不会进入 Coding、注册或执行。"
+                        ),
+                    },
+                )
             if tool_runtime.implementation_response is not None:
                 return implementation_terminal_result() or _tool_result(
                     {"code": "implementation_turn_complete"},
@@ -528,13 +583,48 @@ class FinanceCcSystemTools:
                 for item in result.get("coding_tests") or []
                 if isinstance(item, Mapping)
             ]
+            safe_tool: dict[str, Any] = {}
+            if manifest:
+                safe_tool = {
+                    "manifest": dict(manifest),
+                    "input_schema": dict(tool.get("input_schema") or {}),
+                    "output_schema": dict(tool.get("output_schema") or {}),
+                    "modules": [
+                        {
+                            key: item.get(key)
+                            for key in (
+                                "module_id",
+                                "language",
+                                "entrypoint",
+                                "role",
+                                "responsibility",
+                            )
+                            if item.get(key) not in (None, "")
+                        }
+                        for item in tool.get("modules") or []
+                        if isinstance(item, Mapping)
+                    ],
+                    "design_contract": dict(tool.get("design_contract") or {}),
+                    "finance_tool_profile": dict(
+                        tool.get("finance_tool_profile") or {}
+                    ),
+                    "strategy_runtime_profile": dict(
+                        tool.get("strategy_runtime_profile") or {}
+                    ),
+                    "selection_output_profile": dict(
+                        tool.get("selection_output_profile") or {}
+                    ),
+                    "storage": dict(tool.get("storage") or {}),
+                }
             record = {
                 "message": _trim(result.get("message")),
                 "coding_status": coding_status,
                 "coding_error": dict(result.get("coding_error") or {}) if isinstance(result.get("coding_error"), Mapping) else {},
                 "test_result": test_result,
                 "state": final_state,
-                "tool": {"manifest": dict(manifest)} if manifest else {},
+                # Keep the saved, source-free revision contract available to the
+                # renderer.  The LLM still receives only the terminal message.
+                "tool": safe_tool,
                 "implementation_review": implementation_review,
                 "implementation_explanation": implementation_explanation,
                 "coding_tests": coding_tests,
@@ -653,5 +743,14 @@ class FinanceCcSystemTools:
                 "input_schema": dict(bundle.get("input_schema") or {}),
                 "output_schema": dict(bundle.get("output_schema") or {}),
                 "sample_input": dict(bundle.get("sample_input") or {}),
+                "finance_tool_profile": dict(
+                    bundle.get("finance_tool_profile") or {}
+                ),
+                "strategy_runtime_profile": dict(
+                    bundle.get("strategy_runtime_profile") or {}
+                ),
+                "selection_output_profile": dict(
+                    bundle.get("selection_output_profile") or {}
+                ),
             }
         raise ValueError(f"unsupported asset_type: {asset_type or '-'}")

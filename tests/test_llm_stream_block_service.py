@@ -3,6 +3,44 @@ import json
 from src.services.llm_stream_block_service import LlmStreamBlockBuilder
 
 
+def test_edit_plan_stage_explains_the_fast_path_instead_of_generic_processing() -> None:
+    builder = LlmStreamBlockBuilder(run_id="edit_plan_turn")
+
+    started = builder.event_to_blocks({
+        "source": "harness",
+        "type": "stage_start",
+        "content": "edit plan turn",
+        "metadata": {"stage": "edit_plan"},
+    })[-1]
+    completed = builder.event_to_blocks({
+        "source": "harness",
+        "type": "stage_result",
+        "content": "edit plan completed",
+        "metadata": {"stage": "edit_plan", "ok": True},
+    })[-1]
+
+    assert started["block_id"] == "edit_plan_live_progress"
+    assert started["title"] == "修改范围"
+    assert started["content"] == "正在对照当前版本确定最小修改范围…"
+    assert completed["data"]["status"] == "completed"
+    assert completed["content"] == "修改范围已确定。"
+
+
+def test_edit_coding_reuses_the_existing_coding_progress_surface() -> None:
+    builder = LlmStreamBlockBuilder(run_id="edit_coding_turn")
+
+    block = builder.event_to_blocks({
+        "source": "harness",
+        "type": "stage_start",
+        "content": "edit coding turn",
+        "metadata": {"stage": "edit_coding"},
+    })[-1]
+
+    assert block["block_id"] == "coding_live_progress"
+    assert block["title"] == "代码实现"
+    assert block["content"] == "正在实现并验证代码…"
+
+
 def test_view_stage_does_not_render_as_design_progress() -> None:
     builder = LlmStreamBlockBuilder(run_id="view_turn")
 
@@ -48,6 +86,10 @@ def test_requirement_brief_notice_and_questions_form_one_confirmation_surface() 
             "question": "结果需要按涨幅排序还是按成交额排序？",
             "candidate": ["按涨幅排序", "按成交额排序"],
         }],
+        "requirement_artifact": {
+            "requirement_artifact_id": "finance_tool_requirement_flow_1",
+            "requirement_revision": 3,
+        },
     }, stage="requirement")
 
     assert [block["block_id"] for block in blocks] == [
@@ -65,6 +107,9 @@ def test_requirement_brief_notice_and_questions_form_one_confirmation_surface() 
     ]
     assert review["data"]["questions"][0]["question"] == "结果需要按涨幅排序还是按成交额排序？"
     assert review["data"]["actions"][0]["label"] == "确认需求"
+    assert review["data"]["subject_ref"] == "finance_tool_requirement_flow_1"
+    assert review["data"]["subject_revision"] == 3
+    assert review["data"]["actions"][0]["expected_revision"] == 3
 
 
 def test_requirement_without_questions_still_waits_for_confirmation() -> None:
@@ -76,6 +121,10 @@ def test_requirement_without_questions_still_waits_for_confirmation() -> None:
         "understanding": {"requirement_brief": "**目标**：判断股票近期是否出现金叉。"},
         "notice": ["未指定窗口时同时检查最近30和60个交易日。"],
         "questions": [],
+        "requirement_artifact": {
+            "requirement_artifact_id": "finance_tool_requirement_flow_2",
+            "requirement_revision": 1,
+        },
     }, stage="requirement")
 
     assert [block["block_id"] for block in blocks] == [
@@ -85,6 +134,7 @@ def test_requirement_without_questions_still_waits_for_confirmation() -> None:
     assert blocks[0]["content"] == "**目标**：判断股票近期是否出现金叉。"
     assert blocks[1]["data"]["questions"] == []
     assert blocks[1]["data"]["actions"][0]["action_id"] == "custom_tool.submit_clarification"
+    assert blocks[1]["data"]["actions"][0]["expected_revision"] == 1
 
 
 def test_design_final_uses_conversation_core_blocks_without_complex_renderers() -> None:
@@ -110,6 +160,7 @@ def test_design_final_uses_conversation_core_blocks_without_complex_renderers() 
                 "modules": [{"name": "趋势", "responsibility": "判断方向", "depends_on": ["行情"]}],
                 "rules": [{"name": "趋势规则", "logic": "收盘价高于 MA20", "parameters": ["20日"], "on_missing_data": "数据不足"}],
                 "flow": {"steps": [], "links": []},
+                "mermaid": "flowchart TD\nA[读取日线] --> B{收盘价 > MA20?}\nB -- 是 --> C[趋势向上]\nB -- 否 --> D[趋势非向上]",
                 "data_requirements": [{"name": "日线", "fields": ["close"], "frequency": "1d", "purpose": "计算趋势", "source_ref": "stock_daily_kline_query", "availability": "verified", "fallback": "数据不足"}],
                 "exceptions": [],
                 "acceptance": [{"scenario": "价格高于均线", "expected": "输出满足"}],
@@ -149,6 +200,66 @@ def test_design_final_uses_conversation_core_blocks_without_complex_renderers() 
     assert interaction["data"]["actions"][0]["expected_revision"] == 2
     assert [action["intent"] for action in interaction["data"]["actions"]] == ["accept", "edit"]
     assert all("command" not in action for action in interaction["data"]["actions"])
+
+
+def test_design_without_flow_never_exposes_a_confirmation_action() -> None:
+    builder = LlmStreamBlockBuilder(run_id="design_without_flow")
+
+    blocks = builder.final_to_blocks(
+        {
+            "status": "review",
+            "message": "设计正文已生成。",
+            "design": {
+                "document": "## 规则\n涨幅超过 5% 时命中。",
+            },
+            "design_artifact": {
+                "design_artifact_id": "finance_tool_spec_demo",
+                "design_revision": 1,
+            },
+        },
+        stage="design",
+    )
+
+    assert any(block["block_type"] == "artifact" for block in blocks)
+    assert all(
+        block.get("data", {}).get("interaction_id")
+        != "custom_tool.design_review"
+        for block in blocks
+    )
+    artifact = next(block for block in blocks if block["block_type"] == "artifact")
+    assert artifact["data"]["lifecycle"] == "draft"
+
+
+def test_action_design_is_reviewable_but_has_no_confirm_to_code_action() -> None:
+    builder = LlmStreamBlockBuilder(run_id="action_design_only")
+
+    blocks = builder.final_to_blocks(
+        {
+            "status": "review",
+            "message": "动作方案已完成。",
+            "design": {
+                "document": "## 动作边界\n只设计订单确认与审计流程。",
+                "mermaid": "flowchart TD\nA[订单草案] --> B[人工确认]",
+                "finance_tool_profile": {
+                    "protocol": "finance_tool_profile.v1",
+                    "family": "action",
+                    "execution_shape": "portfolio_stateful",
+                    "output_semantic": "action_receipt",
+                },
+            },
+            "design_artifact": {
+                "design_artifact_id": "finance_tool_spec_order_plan",
+                "design_revision": 1,
+            },
+        },
+        stage="design",
+    )
+
+    assert [block["block_type"] for block in blocks] == ["artifact"]
+    profile = blocks[0]["data"]["details"]["finance_tool_profile"]
+    assert profile["family"] == "action"
+    assert profile["execution_policy"] == "planned_non_executable"
+    assert "custom_tool.confirm_design" not in str(blocks)
 
 
 def test_design_clarification_keeps_structured_questions_for_ui() -> None:

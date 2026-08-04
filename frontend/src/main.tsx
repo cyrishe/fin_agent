@@ -1,19 +1,28 @@
-import { StrictMode } from "react";
+import { lazy, StrictMode, Suspense } from "react";
 import { createRoot } from "react-dom/client";
-import App from "./App";
-import BacktestPrototype from "./BacktestPrototype";
-import RendererGallery from "./RendererGallery";
+import LandingPage from "./LandingPage";
 import "./styles.css";
 
-const pathname = window.location.pathname;
-const Root = pathname.endsWith("/renderers")
-  ? RendererGallery
-  : pathname.endsWith("/backtests")
-    ? BacktestPrototype
-    : App;
+const App = lazy(() => import("./App"));
+const AuthPage = lazy(() => import("./AuthPage"));
+const BacktestPrototype = lazy(() => import("./BacktestPrototype"));
+const RendererGallery = lazy(() => import("./RendererGallery"));
+
+const pathname = window.location.pathname.replace(/\/+$/, "") || "/";
+const Root = pathname === "/"
+  ? LandingPage
+  : pathname === "/login" || pathname === "/register"
+    ? AuthPage
+    : pathname.endsWith("/renderers")
+      ? RendererGallery
+      : pathname.endsWith("/backtests")
+        ? BacktestPrototype
+        : App;
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <Root />
+    <Suspense fallback={<div role="status" aria-live="polite">正在打开 Fin Agent…</div>}>
+      <Root />
+    </Suspense>
   </StrictMode>,
 );

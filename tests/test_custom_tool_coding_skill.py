@@ -19,6 +19,9 @@ def test_coding_skill_contract_keeps_only_runtime_contract_and_natural_language_
     assert set(properties) == {
         "tool_contract",
         "implementation_summary",
+        "finance_tool_profile",
+        "strategy_runtime_profile",
+        "selection_output_profile",
     }
     assert properties["implementation_summary"]["type"] == "string"
     assert "implementation" not in properties
@@ -98,6 +101,56 @@ def test_coding_skill_sample_matches_schema() -> None:
     }
 
     fastjsonschema.compile(json.loads((IMPLEMENTATION_DIR / "schema.json").read_text(encoding="utf-8")))(payload)
+
+
+def test_coding_profile_keeps_family_small_and_old_payload_compatible() -> None:
+    schema = json.loads((IMPLEMENTATION_DIR / "schema.json").read_text(encoding="utf-8"))
+    validate = fastjsonschema.compile(schema)
+    base = {
+        "tool_contract": {
+            "tool_name": "market_strength",
+            "display_name": "大盘强度",
+            "description": "计算大盘强度指标。",
+            "inputs": [],
+            "outputs": [],
+        },
+        "implementation_summary": "计算并验证大盘强度指标。",
+    }
+
+    validate(base)
+    validate({
+        **base,
+        "finance_tool_profile": {
+            "protocol": "finance_tool_profile.v1",
+            "family": "analytics",
+            "execution_shape": "aggregate_context",
+            "output_semantic": "metric",
+            "summary": "计算大盘强度，不输出投资决策。",
+        },
+    })
+    assert schema["properties"]["finance_tool_profile"]["properties"]["family"]["enum"] == [
+        "information",
+        "analytics",
+        "strategy",
+        "action",
+    ]
+    assert schema["properties"]["finance_tool_profile"]["properties"]["execution_shape"]["enum"] == [
+        "aggregate_context",
+        "entity_local",
+        "cross_sectional",
+        "portfolio_stateful",
+    ]
+    assert schema["properties"]["finance_tool_profile"]["properties"]["output_semantic"]["enum"] == [
+        "facts",
+        "metric",
+        "series",
+        "assessment",
+        "ranked_selection",
+        "signal",
+        "portfolio_target",
+        "action_receipt",
+    ]
+    assert "finance_tool_profile" not in schema["required"]
 
 
 def test_coding_skill_requires_compact_core_process_evidence_and_alignment_explanation() -> None:

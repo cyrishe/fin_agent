@@ -86,6 +86,7 @@ class LlmStreamBlockBuilder:
     """Normalize LLM/Codex runtime events into stable frontend render blocks."""
 
     STAGE_TITLES = {
+        "edit_plan": "修改范围",
         "requirement": "需求确认",
         "design": "方案设计",
         "flowchart": "流程图",
@@ -114,6 +115,8 @@ class LlmStreamBlockBuilder:
         content = _trim(raw_content)
         metadata = event.get("metadata") if isinstance(event.get("metadata"), Mapping) else {}
         stage = _trim(metadata.get("stage")) or self._infer_stage(event)
+        if stage == "edit_coding":
+            stage = "coding"
         if metadata.get("user_visible") is False:
             return []
         if not content and event_type not in {"agent_delta", "turn_started", "turn_completed", "stage_start", "stage_result", "context_ready", "final"}:
@@ -233,6 +236,7 @@ class LlmStreamBlockBuilder:
             data={
                 "role": "process",
                 "stage": stage_name,
+                "progress_id": progress_id,
                 "status": status,
                 "current_step": event_type,
                 "format": "markdown",
@@ -643,6 +647,7 @@ class LlmStreamBlockBuilder:
         if failed:
             return "处理失败，请查看错误信息。"
         completed = {
+            "edit_plan": "修改范围已确定。",
             "requirement": "需求理解已形成。",
             "design": "设计方案已形成。",
             "flowchart": "流程图已形成。",
@@ -654,6 +659,7 @@ class LlmStreamBlockBuilder:
         if event_type == "stage_result":
             return completed[stage]
         activities = {
+            "edit_plan": "正在对照当前版本确定最小修改范围…",
             "requirement": "正在理解你的需求…",
             "design": "正在整理实现方案…",
             "flowchart": "正在绘制流程图…",
@@ -716,10 +722,41 @@ class LlmStreamBlockBuilder:
         artifact_context = final.get("design_artifact") if isinstance(final.get("design_artifact"), Mapping) else {}
         artifact_id = _trim(artifact_context.get("design_artifact_id"))
         artifact_revision = int(artifact_context.get("design_revision") or 0)
+        requirement_artifact_context = (
+            final.get("requirement_artifact")
+            if isinstance(final.get("requirement_artifact"), Mapping)
+            else {}
+        )
+        requirement_artifact_id = _trim(
+            requirement_artifact_context.get("requirement_artifact_id")
+        )
+        requirement_revision = int(
+            requirement_artifact_context.get("requirement_revision") or 0
+        )
+        clarification_artifact_id = requirement_artifact_id or artifact_id
+        clarification_revision = requirement_revision or artifact_revision
         message = _trim(final.get("message"))
         notice = [_trim(item) for item in final.get("notice") or [] if _trim(item)]
         questions = self._normalize_design_questions(final.get("questions"))
-        reviewable = status in {"review", "design_ready"}
+        finance_tool_profile = (
+            dict(design.get("finance_tool_profile") or {})
+            if isinstance(design.get("finance_tool_profile"), Mapping)
+            else {}
+        )
+        planned_action = (
+            _trim(finance_tool_profile.get("family")).lower() == "action"
+        )
+        if planned_action:
+            # This is a system-owned execution boundary, not a permission
+            # requested from or granted by the model.
+            finance_tool_profile["execution_policy"] = "planned_non_executable"
+        # A design body without its derived flow is still a draft. Keep this
+        # check at the rendering boundary as well as in the workflow service so
+        # a stale or alternate caller cannot surface a confirm action early.
+        reviewable = (
+            status in {"review", "design_ready"}
+            and bool(_trim(design.get("mermaid")))
+        )
         goal = _trim(understanding.get("goal"))
         requirement_brief = _trim(understanding.get("requirement_brief"))
         summary = (
@@ -759,7 +796,8 @@ class LlmStreamBlockBuilder:
                     "intent": "provide_input",
                     "submission_mode": "conversation",
                     "prompt": prompt,
-                    "subject_revision": artifact_revision,
+                    "subject_ref": clarification_artifact_id,
+                    "subject_revision": clarification_revision,
                     "notice": notice,
                     "questions": questions,
                     "actions": [{
@@ -767,7 +805,7 @@ class LlmStreamBlockBuilder:
                         "label": "确认需求",
                         "intent": "submit",
                         "style": "primary",
-                        "expected_revision": artifact_revision,
+                        "expected_revision": clarification_revision,
                     }],
                 },
             ))
@@ -806,6 +844,7 @@ class LlmStreamBlockBuilder:
                         "mermaid": _trim(design.get("mermaid")),
                         "data_requirements": [dict(item) for item in design.get("data_requirements") or [] if isinstance(item, Mapping)],
                         "existing_analysis": dict(existing_analysis),
+                        "finance_tool_profile": finance_tool_profile,
                     },
                 },
             ))
@@ -823,18 +862,19 @@ class LlmStreamBlockBuilder:
                     "intent": "provide_input",
                     "submission_mode": "conversation",
                     "prompt": "请选择常用答案，或直接在对话中补充。",
-                    "subject_revision": artifact_revision,
+                    "subject_ref": clarification_artifact_id,
+                    "subject_revision": clarification_revision,
                     "questions": questions,
                     "actions": [{
                         "action_id": "custom_tool.submit_clarification",
                         "label": "确定",
                         "intent": "submit",
                         "style": "primary",
-                        "expected_revision": artifact_revision,
+                        "expected_revision": clarification_revision,
                     }],
                 },
             ))
-        if reviewable:
+        if reviewable and not planned_action:
             blocks.append(self._block(
                 block_id=f"{stage}_design_review",
                 block_type="interaction",

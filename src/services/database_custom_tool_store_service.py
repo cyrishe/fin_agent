@@ -7,6 +7,10 @@ from typing import Any, Callable, Dict, List, Mapping, Optional
 import pymysql
 
 from src.utils.system_db_utils import connect_system_db
+from src.services.finance_tool_profile_service import (
+    FinanceToolProfileError,
+    FinanceToolProfileService,
+)
 
 
 ARTIFACT_TABLE = "aiia_runtime_artifact"
@@ -16,6 +20,18 @@ TEST_RUN_TABLE = "aiia_custom_tool_test_run"
 
 def _trim(value: Any) -> str:
     return str(value or "").strip()
+
+
+def _revision_companions(value: Mapping[str, Any]) -> Dict[str, Any]:
+    return {
+        key: dict(value[key])
+        for key in (
+            "finance_tool_profile",
+            "strategy_runtime_profile",
+            "selection_output_profile",
+        )
+        if isinstance(value.get(key), Mapping) and value.get(key)
+    }
 
 
 class DatabaseCustomToolStoreService:
@@ -61,6 +77,7 @@ class DatabaseCustomToolStoreService:
             db.close()
 
     def save_draft(self, design: Mapping[str, Any], *, owner_id: str = "") -> Dict[str, Any]:
+        design = self._normalized_executable_revision(design)
         manifest = dict(design.get("manifest") or {})
         tool_name = self._normalize_name(manifest.get("tool_name"))
         code = _trim(design.get("code"))
@@ -101,6 +118,7 @@ class DatabaseCustomToolStoreService:
             "design_contract": dict(design.get("design_contract") or {}),
             "design_provenance": dict(design.get("design_provenance") or {}),
             "design_feedback_evidence": [dict(item) for item in design.get("design_feedback_evidence") or [] if isinstance(item, Mapping)],
+            **_revision_companions(design),
         }
         db = self.connection_factory()
         try:
@@ -212,6 +230,138 @@ class DatabaseCustomToolStoreService:
             db.close()
         return self.load(tool_name)
 
+    def save_candidate_revision(
+        self,
+        design: Mapping[str, Any],
+        *,
+        owner_id: str = "",
+        tool_name: str = "",
+    ) -> Dict[str, Any]:
+        """Persist an immutable edit candidate without changing the active revision."""
+        design = self._normalized_executable_revision(design)
+        manifest = dict(design.get("manifest") or {})
+        manifest_name = self._normalize_name(manifest.get("tool_name"))
+        target_name = self._normalize_name(tool_name) or manifest_name
+        code = _trim(design.get("code"))
+        if not target_name:
+            self._raise("manifest.tool_name is required")
+        if manifest_name and manifest_name != target_name:
+            self._raise("candidate custom tool identity changed")
+        if not code:
+            self._raise("code module source is required")
+        normalized_owner = _trim(owner_id)
+        code_hash = hashlib.sha256(code.encode("utf-8")).hexdigest()
+        schema_payload = {
+            "input": dict(design.get("input_schema") or {}),
+            "output": dict(design.get("output_schema") or {}),
+        }
+        supplied_modules = [
+            dict(item)
+            for item in design.get("modules") or []
+            if isinstance(item, Mapping)
+        ]
+        implementation_payload = {
+            "implementation": {
+                "kind": "database_code_module",
+                "entry_module": _trim(
+                    (supplied_modules[0] if supplied_modules else {}).get("module_id")
+                )
+                or "main",
+                "modules": supplied_modules
+                or [
+                    {
+                        "module_id": "main",
+                        "language": "python",
+                        "entrypoint": "run",
+                        "source_code": code,
+                    }
+                ],
+            },
+            "sample_input": dict(design.get("sample_input") or {}),
+            "proposed_tests": [
+                dict(item)
+                for item in design.get("proposed_tests") or []
+                if isinstance(item, Mapping)
+            ],
+            "implementation_explanation": dict(
+                design.get("implementation_explanation") or {}
+            ),
+            "implementation_review": dict(design.get("implementation_review") or {}),
+            "design_contract": dict(design.get("design_contract") or {}),
+            "design_provenance": dict(design.get("design_provenance") or {}),
+            "design_feedback_evidence": [
+                dict(item)
+                for item in design.get("design_feedback_evidence") or []
+                if isinstance(item, Mapping)
+            ],
+            **_revision_companions(design),
+        }
+        db = self.connection_factory()
+        try:
+            with db.cursor() as cursor:
+                cursor.execute(
+                    f"SELECT * FROM {ARTIFACT_TABLE} WHERE artifact_type='custom_tool' AND name=%s AND version='v1' LIMIT 1 FOR UPDATE",
+                    (target_name,),
+                )
+                artifact = cursor.fetchone()
+                if not artifact:
+                    self._raise(f"custom tool not found: {target_name}")
+                self._assert_owner(artifact, normalized_owner)
+                cursor.execute(
+                    f"SELECT COALESCE(MAX(revision_no), 0) AS max_revision_no FROM {REVISION_TABLE} WHERE artifact_id=%s",
+                    (int(artifact["artifact_id"]),),
+                )
+                max_row = cursor.fetchone() or {}
+                revision_no = int(max_row.get("max_revision_no") or 0) + 1
+                manifest.update(
+                    {
+                        "tool_name": target_name,
+                        "status": "draft",
+                        "owner_id": _trim(artifact.get("owner")),
+                        "visibility": _trim(manifest.get("visibility"))
+                        or _trim(
+                            self._json_dict(artifact.get("source_manifest_json")).get(
+                                "visibility"
+                            )
+                        )
+                        or "personal",
+                        "storage_kind": "database_code_module",
+                        "current_revision": revision_no,
+                        "active_revision": int(
+                            artifact.get("current_revision_no") or 0
+                        ),
+                        "base_revision": int(
+                            artifact.get("current_revision_no") or 0
+                        ),
+                        "code_hash": code_hash,
+                    }
+                )
+                cursor.execute(
+                    f"""
+                    INSERT INTO {REVISION_TABLE} (
+                      artifact_id, revision_no, source_type, definition_json, schema_json,
+                      spec_json, markdown_text, content_hash, change_summary, created_by
+                    ) VALUES (%s, %s, 'agent_edit_candidate', %s, %s, %s, '', %s, %s, %s)
+                    """,
+                    (
+                        int(artifact["artifact_id"]),
+                        revision_no,
+                        json.dumps(manifest, ensure_ascii=False),
+                        json.dumps(schema_payload, ensure_ascii=False),
+                        json.dumps(implementation_payload, ensure_ascii=False),
+                        code_hash,
+                        f"edit candidate revision {revision_no}",
+                        normalized_owner or "system",
+                    ),
+                )
+            db.commit()
+        except Exception:
+            db.rollback()
+            raise
+        finally:
+            db.close()
+        return self.load_revision(target_name, revision_no)
+
     def load(self, tool_name: str) -> Dict[str, Any]:
         name = self._normalize_name(tool_name)
         db = self.connection_factory()
@@ -231,48 +381,163 @@ class DatabaseCustomToolStoreService:
                 revision = cursor.fetchone()
                 if not revision:
                     self._raise(f"custom tool revision not found: {name}")
-            manifest = self._json_dict(revision.get("definition_json"))
-            schemas = self._json_dict(revision.get("schema_json"))
-            spec = self._json_dict(revision.get("spec_json"))
-            source_meta = self._json_dict(artifact.get("source_manifest_json"))
-            manifest.update({
-                "tool_name": name,
-                "status": _trim(artifact.get("status")) or "draft",
-                "owner_id": _trim(artifact.get("owner")),
-                "current_revision": int(artifact.get("current_revision_no") or 0),
-                "storage_kind": "database_code_module",
-                "last_test": source_meta.get("last_test") if isinstance(source_meta.get("last_test"), Mapping) else {},
-                "visibility": _trim(source_meta.get("visibility")) or _trim(manifest.get("visibility")) or "personal",
-            })
-            modules = ((spec.get("implementation") or {}).get("modules") or []) if isinstance(spec.get("implementation"), Mapping) else []
-            entry_module = _trim((spec.get("implementation") or {}).get("entry_module")) if isinstance(spec.get("implementation"), Mapping) else ""
-            source_code = ""
-            for module in modules:
-                if isinstance(module, Mapping) and (_trim(module.get("module_id")) == entry_module or not source_code):
-                    source_code = _trim(module.get("source_code"))
-                    if _trim(module.get("module_id")) == entry_module:
-                        break
-            return {
-                "manifest": manifest,
-                "input_schema": dict(schemas.get("input") or {}),
-                "output_schema": dict(schemas.get("output") or {}),
-                "code": source_code,
-                "modules": [dict(item) for item in modules if isinstance(item, Mapping)],
-                "sample_input": dict(spec.get("sample_input") or {}),
-                "proposed_tests": [dict(item) for item in spec.get("proposed_tests") or [] if isinstance(item, Mapping)],
-                "implementation_explanation": dict(spec.get("implementation_explanation") or {}),
-                "implementation_review": dict(spec.get("implementation_review") or {}),
-                "design_contract": dict(spec.get("design_contract") or {}),
-                "design_provenance": dict(spec.get("design_provenance") or {}),
-                "design_feedback_evidence": [dict(item) for item in spec.get("design_feedback_evidence") or [] if isinstance(item, Mapping)],
-                "storage": {
-                    "kind": "database_code_module",
-                    "artifact_id": int(artifact["artifact_id"]),
-                    "revision_id": int(revision["revision_id"]),
-                },
-            }
+            return self._bundle_from_rows(artifact, revision, is_active=True)
         finally:
             db.close()
+
+    def load_revision(self, tool_name: str, revision_no: int) -> Dict[str, Any]:
+        name = self._normalize_name(tool_name)
+        requested_revision = int(revision_no or 0)
+        if requested_revision < 1:
+            self._raise("revision_no must be a positive integer")
+        db = self.connection_factory()
+        try:
+            with db.cursor() as cursor:
+                cursor.execute(
+                    f"SELECT * FROM {ARTIFACT_TABLE} WHERE artifact_type='custom_tool' AND name=%s AND version='v1' LIMIT 1",
+                    (name,),
+                )
+                artifact = cursor.fetchone()
+                if not artifact:
+                    self._raise(f"custom tool not found: {name}")
+                cursor.execute(
+                    f"SELECT * FROM {REVISION_TABLE} WHERE artifact_id=%s AND revision_no=%s LIMIT 1",
+                    (int(artifact["artifact_id"]), requested_revision),
+                )
+                revision = cursor.fetchone()
+                if not revision:
+                    self._raise(
+                        f"custom tool revision not found: {name}@{requested_revision}"
+                    )
+            return self._bundle_from_rows(
+                artifact,
+                revision,
+                is_active=requested_revision
+                == int(artifact.get("current_revision_no") or 0),
+            )
+        finally:
+            db.close()
+
+    def activate_revision(
+        self,
+        tool_name: str,
+        candidate_revision: int,
+        *,
+        expected_active_revision: int,
+        owner_id: str,
+    ) -> Dict[str, Any]:
+        """Atomically move the active pointer after ownership and stale checks."""
+        name = self._normalize_name(tool_name)
+        candidate_no = int(candidate_revision or 0)
+        expected_active = int(expected_active_revision or 0)
+        if candidate_no < 1:
+            self._raise("candidate_revision must be a positive integer")
+        db = self.connection_factory()
+        try:
+            with db.cursor() as cursor:
+                cursor.execute(
+                    f"SELECT * FROM {ARTIFACT_TABLE} WHERE artifact_type='custom_tool' AND name=%s AND version='v1' LIMIT 1 FOR UPDATE",
+                    (name,),
+                )
+                artifact = cursor.fetchone()
+                if not artifact:
+                    self._raise(f"custom tool not found: {name}")
+                self._assert_owner(artifact, _trim(owner_id))
+                current_revision = int(artifact.get("current_revision_no") or 0)
+                if current_revision != expected_active:
+                    self._raise(
+                        "active custom tool revision changed: "
+                        f"expected {expected_active}, current {current_revision}"
+                    )
+                cursor.execute(
+                    f"SELECT * FROM {REVISION_TABLE} WHERE artifact_id=%s AND revision_no=%s LIMIT 1",
+                    (int(artifact["artifact_id"]), candidate_no),
+                )
+                revision = cursor.fetchone()
+                if not revision:
+                    self._raise(
+                        f"custom tool revision not found: {name}@{candidate_no}"
+                    )
+                self._normalized_executable_revision(
+                    self._bundle_from_rows(
+                        artifact,
+                        revision,
+                        is_active=False,
+                    )
+                )
+                manifest = self._json_dict(revision.get("definition_json"))
+                if self._normalize_name(manifest.get("tool_name")) != name:
+                    self._raise("candidate custom tool identity changed")
+                candidate_base = int(manifest.get("base_revision") or 0)
+                if candidate_base and candidate_base != expected_active:
+                    self._raise(
+                        "candidate custom tool base revision changed: "
+                        f"expected {candidate_base}, current {expected_active}"
+                    )
+                code_hash = _trim(revision.get("content_hash")) or _trim(
+                    manifest.get("code_hash")
+                )
+                source_meta = self._json_dict(artifact.get("source_manifest_json"))
+                source_meta.update(
+                    {
+                        "storage_kind": "database_code_module",
+                        "visibility": _trim(manifest.get("visibility"))
+                        or _trim(source_meta.get("visibility"))
+                        or "personal",
+                        "runtime": dict(manifest.get("runtime") or {}),
+                        "code_hash": code_hash,
+                    }
+                )
+                candidate_last_test = manifest.get("last_test")
+                if isinstance(candidate_last_test, Mapping):
+                    source_meta["last_test"] = dict(candidate_last_test)
+                else:
+                    source_meta.pop("last_test", None)
+                retrieval_text = "\n".join(
+                    filter(
+                        None,
+                        [
+                            name,
+                            _trim(manifest.get("display_name")),
+                            _trim(manifest.get("description")),
+                        ],
+                    )
+                )
+                cursor.execute(
+                    f"""
+                    UPDATE {ARTIFACT_TABLE}
+                    SET status='active', enabled=1, display_name=%s, description=%s,
+                        capabilities_json=%s, implementation_kind='database_code_module',
+                        implementation_target=%s, source_manifest_json=%s,
+                        retrieval_text=%s, current_revision_no=%s,
+                        sync_status='synced', updated_by=%s, updated_at=NOW()
+                    WHERE artifact_id=%s AND current_revision_no=%s
+                    """,
+                    (
+                        _trim(manifest.get("display_name")) or name,
+                        _trim(manifest.get("description")),
+                        json.dumps(
+                            manifest.get("capabilities") or ["custom_tool"],
+                            ensure_ascii=False,
+                        ),
+                        f"artifact_revision:{candidate_no}",
+                        json.dumps(source_meta, ensure_ascii=False),
+                        retrieval_text,
+                        candidate_no,
+                        _trim(owner_id) or "system",
+                        int(artifact["artifact_id"]),
+                        expected_active,
+                    ),
+                )
+                if int(getattr(cursor, "rowcount", 1) or 0) != 1:
+                    self._raise("active custom tool revision changed during activation")
+            db.commit()
+        except Exception:
+            db.rollback()
+            raise
+        finally:
+            db.close()
+        return self.load(name)
 
     def list_tools(self, *, include_inactive: bool = False, owner_ids: Optional[List[str]] = None) -> List[Dict[str, Any]]:
         try:
@@ -310,7 +575,11 @@ class DatabaseCustomToolStoreService:
         return bundle
 
     def commit(self, tool_name: str, *, owner_ids: Optional[List[str]] = None) -> Dict[str, Any]:
-        bundle = self.load_for_runtime(tool_name, owner_ids=owner_ids, allow_inactive=True)
+        bundle = self._normalized_executable_revision(
+            self.load_for_runtime(
+                tool_name, owner_ids=owner_ids, allow_inactive=True
+            )
+        )
         manifest = bundle["manifest"]
         db = self.connection_factory()
         try:
@@ -413,7 +682,11 @@ class DatabaseCustomToolStoreService:
     ) -> Dict[str, Any]:
         if "custom_tool:publish" not in {_trim(item) for item in actor_scopes or []}:
             self._raise("public publication requires custom_tool:publish permission")
-        bundle = self.load_for_runtime(tool_name, owner_ids=owner_ids, allow_inactive=False)
+        bundle = self._normalized_executable_revision(
+            self.load_for_runtime(
+                tool_name, owner_ids=owner_ids, allow_inactive=False
+            )
+        )
         manifest = bundle["manifest"]
         if (manifest.get("last_test") or {}).get("execution_ok") is not True:
             self._raise("custom tool must complete a technical run before publication")
@@ -456,6 +729,113 @@ class DatabaseCustomToolStoreService:
     def _owner_scoped_name(tool_name: str, owner_id: str) -> str:
         suffix = hashlib.sha256(owner_id.encode("utf-8")).hexdigest()[:8]
         return f"{tool_name[:55].rstrip('_')}_{suffix}"
+
+    def _assert_owner(self, artifact: Mapping[str, Any], owner_id: str) -> None:
+        stored_owner = _trim(artifact.get("owner"))
+        if stored_owner != _trim(owner_id):
+            self._raise("custom tool is not owned by current user")
+
+    def _bundle_from_rows(
+        self,
+        artifact: Mapping[str, Any],
+        revision: Mapping[str, Any],
+        *,
+        is_active: bool,
+    ) -> Dict[str, Any]:
+        manifest = self._json_dict(revision.get("definition_json"))
+        schemas = self._json_dict(revision.get("schema_json"))
+        spec = self._json_dict(revision.get("spec_json"))
+        source_meta = self._json_dict(artifact.get("source_manifest_json"))
+        revision_no = int(revision.get("revision_no") or 0)
+        active_revision = int(artifact.get("current_revision_no") or 0)
+        candidate_last_test = manifest.get("last_test")
+        manifest.update(
+            {
+                "tool_name": _trim(artifact.get("name")),
+                "status": (
+                    _trim(artifact.get("status")) or "draft"
+                    if is_active
+                    else "draft"
+                ),
+                "owner_id": _trim(artifact.get("owner")),
+                "current_revision": revision_no,
+                "active_revision": active_revision,
+                "storage_kind": "database_code_module",
+                "last_test": (
+                    source_meta.get("last_test")
+                    if is_active and isinstance(source_meta.get("last_test"), Mapping)
+                    else candidate_last_test
+                    if isinstance(candidate_last_test, Mapping)
+                    else {}
+                ),
+                "visibility": _trim(source_meta.get("visibility"))
+                or _trim(manifest.get("visibility"))
+                or "personal",
+            }
+        )
+        implementation = spec.get("implementation")
+        implementation = implementation if isinstance(implementation, Mapping) else {}
+        modules = implementation.get("modules") or []
+        entry_module = _trim(implementation.get("entry_module"))
+        source_code = ""
+        for module in modules:
+            if isinstance(module, Mapping) and (
+                _trim(module.get("module_id")) == entry_module or not source_code
+            ):
+                source_code = _trim(module.get("source_code"))
+                if _trim(module.get("module_id")) == entry_module:
+                    break
+        return {
+            "manifest": manifest,
+            "input_schema": dict(schemas.get("input") or {}),
+            "output_schema": dict(schemas.get("output") or {}),
+            "code": source_code,
+            "modules": [dict(item) for item in modules if isinstance(item, Mapping)],
+            "sample_input": dict(spec.get("sample_input") or {}),
+            "proposed_tests": [
+                dict(item)
+                for item in spec.get("proposed_tests") or []
+                if isinstance(item, Mapping)
+            ],
+            "implementation_explanation": dict(
+                spec.get("implementation_explanation") or {}
+            ),
+            "implementation_review": dict(spec.get("implementation_review") or {}),
+            "design_contract": dict(spec.get("design_contract") or {}),
+            "design_provenance": dict(spec.get("design_provenance") or {}),
+            "design_feedback_evidence": [
+                dict(item)
+                for item in spec.get("design_feedback_evidence") or []
+                if isinstance(item, Mapping)
+            ],
+            **_revision_companions(spec),
+            "storage": {
+                "kind": "database_code_module",
+                "artifact_id": int(artifact["artifact_id"]),
+                "revision_id": int(revision["revision_id"]),
+                "is_active": is_active,
+            },
+        }
+
+    def _normalized_executable_revision(
+        self, value: Mapping[str, Any]
+    ) -> Dict[str, Any]:
+        result = dict(value)
+        try:
+            profile = FinanceToolProfileService().normalize(
+                result.get("finance_tool_profile"),
+                strategy_runtime_profile=result.get("strategy_runtime_profile"),
+                selection_output_profile=result.get("selection_output_profile"),
+            )
+            FinanceToolProfileService.assert_implementation_allowed(profile)
+        except FinanceToolProfileError as exc:
+            self._raise(str(exc))
+            raise AssertionError("unreachable") from exc
+        if profile is None:
+            result.pop("finance_tool_profile", None)
+        else:
+            result["finance_tool_profile"] = profile
+        return result
 
     @staticmethod
     def _json_dict(value: Any) -> Dict[str, Any]:

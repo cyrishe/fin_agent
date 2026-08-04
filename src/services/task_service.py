@@ -78,6 +78,10 @@ class AsyncTaskService:
         normalized_skill = str(skill_name or "").strip()
         if not normalized_skill:
             raise ValueError("skill_name 不能为空")
+        # Reject retired compiled Skills before capacity checks, persistence,
+        # or worker submission.  SkillRunner repeats the same check at the
+        # execution boundary so queued work cannot bypass a later retirement.
+        self.runner.require_active_skill(normalized_skill)
         normalized_source_type = self._normalize_source_type(source_type)
         job_id = f"job_{uuid.uuid4().hex[:24]}"
         runtime_trace: Dict[str, Any] = {}

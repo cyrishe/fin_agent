@@ -639,6 +639,11 @@ class ToolPlanRuntimeService:
                 "assigned_agent": "tool_plan_runtime",
                 "source_type": "assistant_planned_runtime" if self._trim(runtime_trace.get("plan_type")) == "planned_run" else "assistant_tool_plan_run",
                 "custom_tool_owner_ids": custom_tool_owner_ids,
+                # ToolPlanRuntimeService owns the invocation lifecycle for this
+                # path.  The registry still resolves and invokes the tool, but
+                # must not create a second invocation/event pair for the same
+                # physical call.
+                "_execution_tracking_owner": "tool_plan_runtime",
             }
             if dropped_fields:
                 self._append_runtime_event(
@@ -719,6 +724,11 @@ class ToolPlanRuntimeService:
                 "retention": {},
                 "named_outputs": {},
             }
+        result_meta = (
+            (result or {}).get("meta")
+            if isinstance((result or {}).get("meta"), dict)
+            else {}
+        )
         return {
             "step_id": step_id,
             "depends_on": depends_on,
@@ -726,6 +736,9 @@ class ToolPlanRuntimeService:
             "status": "completed" if bool((result or {}).get("ok")) else "failed",
             "reason": "ok" if bool((result or {}).get("ok")) else "tool_failed",
             "error": self._trim((result or {}).get("error")),
+            "failure_kind": self._trim(
+                result_meta.get("failure_kind")
+            ),
             "plan": effective_plan,
             "result": result if isinstance(result, dict) else {},
             "retention": retention,

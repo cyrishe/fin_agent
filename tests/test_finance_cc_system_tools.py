@@ -53,7 +53,10 @@ def _tools(*, implementation_runner=None, runtime_context_adapter=None, runtime_
             "custom_tool_state": {
                 "tool_name": "demo_tool",
                 "requirement_text": "筛选股票",
-                "design_contract": {"tool_name": "demo_tool", "flow": {"steps": []}},
+                "design_contract": {
+                    "tool_name": "demo_tool",
+                    "mermaid": "flowchart TD\nA[输入] --> B[输出]",
+                },
             }
         },
     )
@@ -163,8 +166,14 @@ def test_long_lived_tool_runtime_refreshes_turn_state_and_event_sink(tmp_path) -
     tools, _, first_tracker = service.build_tools(
         owner_ids=["owner-1"],
         tool_context={
-            "_agent_runtime_scope": "owner-a/thread-7",
-            "custom_tool_state": {"tool_name": "first_name", "design_contract": {"document": "v1"}},
+                "_agent_runtime_scope": "owner-a/thread-7",
+                "custom_tool_state": {
+                    "tool_name": "first_name",
+                    "design_contract": {
+                        "document": "v1",
+                        "mermaid": "flowchart TD\nA --> B",
+                    },
+                },
         },
         event_sink=first_events.append,
         runtime=runtime,
@@ -175,8 +184,14 @@ def test_long_lived_tool_runtime_refreshes_turn_state_and_event_sink(tmp_path) -
     second_tracker = runtime.begin_turn(
         owner_ids=["owner-1"],
         tool_context={
-            "_agent_runtime_scope": "owner-a/thread-7",
-            "custom_tool_state": {"tool_name": "renamed_tool", "design_contract": {"document": "v2"}},
+                "_agent_runtime_scope": "owner-a/thread-7",
+                "custom_tool_state": {
+                    "tool_name": "renamed_tool",
+                    "design_contract": {
+                        "document": "v2",
+                        "mermaid": "flowchart TD\nA --> C",
+                    },
+                },
         },
         event_sink=second_events.append,
     )
@@ -304,7 +319,47 @@ def test_finance_cc_implementation_tool_delegates_saved_state_to_codex_runner() 
                 "gate_passed": False,
                 "summary": "1 / 1 项技术运行成功",
             },
-            "tool": {"manifest": {"tool_name": "demo_tool", "current_revision": 1}, "code": "hidden"},
+            "tool": {
+                "manifest": {"tool_name": "demo_tool", "current_revision": 1},
+                "input_schema": {
+                    "type": "object",
+                    "properties": {
+                        "universe": {
+                            "type": "array",
+                            "items": {"type": "string"},
+                        },
+                    },
+                },
+                "output_schema": {
+                    "type": "object",
+                    "properties": {"data": {"type": "object"}},
+                },
+                "design_contract": {
+                    "mermaid": "flowchart TD\nA[输入股票范围] --> B{评分 >= 80?}\nB -->|是| C[入选]",
+                },
+                "strategy_runtime_profile": {
+                    "protocol": "strategy_runtime_profile.v1",
+                    "binding": {"field": "universe"},
+                    "required_history_sessions": 20,
+                    "default_run_sessions": 100,
+                    "default_universe_ref": {"type": "all_a_share"},
+                    "market_code": "CN_A",
+                },
+                "selection_output_profile": {
+                    "candidate_path": "data.selected_stocks",
+                    "symbol_field": "stock_code",
+                    "output_date_path": "data.as_of_date",
+                },
+                "modules": [
+                    {
+                        "module_id": "strategy_core",
+                        "entrypoint": "run",
+                        "responsibility": "执行点时选股判断。",
+                        "source_code": "secret",
+                    },
+                ],
+                "code": "hidden",
+            },
         }
 
     tools, names, tracker = _tools(implementation_runner=implementation_runner)
@@ -323,7 +378,15 @@ def test_finance_cc_implementation_tool_delegates_saved_state_to_codex_runner() 
     assert "tool_name" not in result["content"][0]["text"]
     assert "revision" not in result["content"][0]["text"]
     assert "代码和样例技术测试已完成" in result["content"][0]["text"]
-    assert "code" not in tracker["implementation_runs"][0]["tool"]
+    tracked_tool = tracker["implementation_runs"][0]["tool"]
+    assert "code" not in tracked_tool
+    assert tracked_tool["design_contract"]["mermaid"].startswith("flowchart TD")
+    assert tracked_tool["strategy_runtime_profile"]["binding"] == {"field": "universe"}
+    assert tracked_tool["selection_output_profile"]["symbol_field"] == "stock_code"
+    assert tracked_tool["input_schema"]["properties"]["universe"]["items"] == {
+        "type": "string"
+    }
+    assert "source_code" not in tracked_tool["modules"][0]
 
 
 def test_finance_cc_saved_design_is_visible_to_later_tools_in_same_turn() -> None:
@@ -349,15 +412,78 @@ def test_finance_cc_saved_design_is_visible_to_later_tools_in_same_turn() -> Non
             {"artifact_type": "design", "payload": design_payload}
         )
     )
+    flow = asyncio.run(
+        tools["save_finance_artifact"].handler(
+            {
+                "artifact_type": "flow",
+                "payload": {"mermaid": "flowchart TD\nA[读取数据] --> B[返回结果]"},
+            }
+        )
+    )
     viewed = asyncio.run(tools["read_finance_asset"].handler({"asset_type": "design"}))
     implemented = asyncio.run(
         tools["implement_dynamic_tool"].handler({"instruction": "按刚保存的设计实现"})
     )
 
     assert saved.get("isError") is not True
+    assert flow.get("isError") is not True
     assert "读取所需数据" in viewed["content"][0]["text"]
     assert implemented.get("isError") is not True
     assert "读取所需数据" in calls[0]["state"]["design_contract"]["document"]
+
+
+def test_action_design_is_saved_but_never_reaches_implementation_runner() -> None:
+    calls = []
+    service = FinanceCcSystemTools(
+        custom_tool_store=FakeStore(),
+        custom_tool_runtime=FakeDynamicRuntime(),
+        finance_runtime=FakeFinanceRuntime(),
+        finance_catalog=FakeFinanceCatalog(),
+        implementation_runner=lambda **kwargs: calls.append(kwargs) or {},
+    )
+    built, _, _ = service.build_tools(
+        owner_ids=["owner-1"],
+        tool_context={"custom_tool_state": {}},
+    )
+    tools = {item.name: item for item in built}
+    profile = {
+        "protocol": "finance_tool_profile.v1",
+        "family": "action",
+        "execution_shape": "portfolio_stateful",
+        "output_semantic": "action_receipt",
+        "summary": "设计受控下单流程。",
+    }
+
+    saved = asyncio.run(
+        tools["save_finance_artifact"].handler(
+            {
+                "artifact_type": "design",
+                "payload": {
+                    "design": "## 动作设计\n形成订单草案并等待人工确认。",
+                    "finance_tool_profile": profile,
+                },
+            }
+        )
+    )
+    asyncio.run(
+        tools["save_finance_artifact"].handler(
+            {
+                "artifact_type": "flow",
+                "payload": {"mermaid": "flowchart TD\nA[订单草案] --> B[人工确认]"},
+            }
+        )
+    )
+    viewed = asyncio.run(
+        tools["read_finance_asset"].handler({"asset_type": "design"})
+    )
+    implemented = asyncio.run(
+        tools["implement_dynamic_tool"].handler({"instruction": "实现并注册"})
+    )
+
+    assert saved.get("isError") is not True
+    assert '"family": "action"' in viewed["content"][0]["text"]
+    assert "只保存和展示设计" in implemented["content"][0]["text"]
+    assert calls == []
 
 
 def test_requirement_and_design_can_be_saved_continuously_in_one_turn() -> None:
@@ -395,6 +521,60 @@ def test_requirement_and_design_can_be_saved_continuously_in_one_turn() -> None:
     assert "识别上穿日期" in viewed["content"][0]["text"]
 
 
+def test_flow_requires_a_saved_design_in_the_same_tool_conversation() -> None:
+    runtime = FinanceCcToolRuntime()
+    service = FinanceCcSystemTools(
+        custom_tool_store=FakeStore(),
+        custom_tool_runtime=FakeDynamicRuntime(),
+        finance_runtime=FakeFinanceRuntime(),
+        finance_catalog=FakeFinanceCatalog(),
+    )
+    built, _, tracker = service.build_tools(
+        owner_ids=["owner-1"],
+        tool_context={"custom_tool_state": {}},
+        runtime=runtime,
+    )
+    save = {item.name: item for item in built}["save_finance_artifact"]
+
+    result = asyncio.run(
+        save.handler(
+            {
+                "artifact_type": "flow",
+                "payload": {"mermaid": "flowchart TD\nA --> B"},
+            }
+        )
+    )
+
+    assert "flow requires a saved design" in result["content"][0]["text"]
+    assert tracker["artifact_updates"] == []
+
+
+def test_implementation_waits_until_the_saved_design_has_a_flow() -> None:
+    calls = []
+    service = FinanceCcSystemTools(
+        custom_tool_store=FakeStore(),
+        custom_tool_runtime=FakeDynamicRuntime(),
+        finance_runtime=FakeFinanceRuntime(),
+        finance_catalog=FakeFinanceCatalog(),
+        implementation_runner=lambda **kwargs: calls.append(kwargs) or {},
+    )
+    built, _, tracker = service.build_tools(
+        owner_ids=["owner-1"],
+        tool_context={
+            "custom_tool_state": {
+                "design_contract": {"document": "## 设计\n计算并返回结果。"},
+            }
+        },
+    )
+    implement = {item.name: item for item in built}["implement_dynamic_tool"]
+
+    result = asyncio.run(implement.handler({"instruction": "直接实现"}))
+
+    assert "先基于已保存的设计生成并保存流程图" in result["content"][0]["text"]
+    assert calls == []
+    assert tracker["implementation_runs"] == []
+
+
 def test_finance_cc_implementation_does_not_report_success_without_an_implementation() -> None:
     service = FinanceCcSystemTools(
         custom_tool_store=FakeStore(),
@@ -408,7 +588,14 @@ def test_finance_cc_implementation_does_not_report_success_without_an_implementa
     )
     tools, _, tracker = service.build_tools(
         owner_ids=["owner-1"],
-        tool_context={"custom_tool_state": {}},
+        tool_context={
+            "custom_tool_state": {
+                "design_contract": {
+                    "document": "## 设计\n计算并返回结果。",
+                    "mermaid": "flowchart TD\nA --> B",
+                },
+            }
+        },
     )
 
     result = asyncio.run(

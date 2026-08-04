@@ -53,4 +53,26 @@ describe("RunPanel", () => {
     expect(html).toContain("process-item error");
     expect(html).not.toContain('class="spinner"');
   });
+
+  it("settles stale historical progress and renders results as navigation buttons", () => {
+    const html = renderToStaticMarkup(<RunPanel onArtifactSelect={() => undefined} run={{
+      status: "done",
+      summary: "本轮处理完成",
+      artifacts: [
+        { block_id: "design_artifact", block_type: "artifact", title: "设计方案" },
+        { block_id: "design_review", block_type: "interaction", title: "确认设计", data: { actions: [{ action_id: "confirm" }] } },
+      ],
+      process: [
+        { block_id: "design_custom_tool_understanding", block_type: "status", title: "工具需求与设计", data: { role: "process", status: "running", summary: "正在形成设计。" } },
+        { block_id: "runtime_custom_tool_understanding", block_type: "status", title: "工具需求与设计", data: { role: "process", status: "completed", summary: "设计已经形成。" } },
+      ],
+    }} />);
+
+    expect(html).toContain("等待你的确认");
+    expect(html).toContain("结果与下一步");
+    expect(html.match(/工具需求与设计/g)).toHaveLength(1);
+    expect(html).not.toContain('class="spinner"');
+    expect(html).toContain('<button type="button" aria-label="定位到设计方案"');
+    expect(html).toContain("待确认");
+  });
 });

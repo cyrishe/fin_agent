@@ -2769,7 +2769,11 @@
     "plate": {
       "_meta": {
         "desc": "板块主体，用于板块基础信息、行情、资金流、估值、成分股和成分股聚合查询。",
-        "rules": []
+        "rules": [
+          "中文板块名称先通过 plate.basic_info 定位：完整名称优先使用 plate_name = 名称；只有名称不完整或不确定时，才使用 plate_name like '%关键词%'。",
+          "定位成功后，板块行情、资金流和近 K 日指标优先使用返回的 plate_code 作为 code 条件，不要在下游数据查询中重复模糊搜索名称。",
+          "LIKE 只用于 plate.basic_info 的 plate_name 名称定位；不得假设其他板块 dataview 也支持模糊查询。"
+        ]
       },
       "basic_info": {
         "desc": "板块基础信息视图，用于查询板块名称、代码、类别和简介等描述性信息。",

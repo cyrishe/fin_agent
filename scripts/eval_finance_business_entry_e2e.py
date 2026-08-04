@@ -105,10 +105,13 @@ def main() -> int:
         log_path=runtime_root / "events.jsonl",
         system_tools=system_tools,
         system_prompt_path="src/scenarios/financial_qa/system.md",
-        skill_root=skill_catalog.root,
+        skill_root=skill_catalog.runtime_root,
         skill_names=skill_catalog.qualified_skill_names(),
+        skill_snapshot_provider=skill_catalog.runtime_binding,
+        skill_snapshot_validator=skill_catalog.validate_runtime_binding,
         runtime_scope_prefix="financial_qa_entry_eval",
         max_turns=max(2, int(args.max_turns)),
+        warm_pool_size=0,
         system_context_paths=[
             "src/scenarios/financial_qa/finance_api_protocol.md",
             "src/scenarios/financial_qa/data_query.md",
@@ -175,7 +178,7 @@ def main() -> int:
                     )
 
                 result = service.answer(
-                    thread_id=f"finance-business-entry-{case_id}",
+                    thread_id=index,
                     turn_id=1,
                     owner_id="finance-business-entry-eval",
                     user_text=question,

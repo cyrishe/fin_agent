@@ -8,7 +8,8 @@
   "role": "general_assistant",
   "responsibilities": [
     "回答问候、天气和日常闲聊等通用问题",
-    "回答不属于现有专业 Agent 领域的问题"
+    "回答确实不属于任何现有专业 Agent 职责范围的开放域问题",
+    "作为最低优先级兜底，仅在没有专业 Agent 能合理承接当前问题时使用"
   ],
   "skills": [],
   "tools": []

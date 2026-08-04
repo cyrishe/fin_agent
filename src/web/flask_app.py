@@ -41,17 +41,30 @@ from src.scenarios.financial_qa import FinancialQaCcService
 from src.services.conversation_title_service import ConversationTitleService
 from src.services.context_resolution_service import ContextResolutionError
 from src.services.llm_stream_block_service import LlmStreamBlockBuilder
-from src.services.runtime_conversation_service import RuntimeConversationService
+from src.services.phone_account_service import PhoneAccountService
+from src.services.runtime_conversation_service import (
+    RuntimeConversationAccessError,
+    RuntimeConversationService,
+)
 from src.services.skill_blueprint_service import SkillBlueprintError, SkillBlueprintService
+from src.services.skill_hub_catalog_service import SkillHubCatalogService
 from src.services.skill_studio_service import SkillStudioError, SkillStudioService
+from src.services.strategy_revision_contract_service import (
+    StrategyRevisionContractService,
+)
+from src.services.scheduled_task_service import ScheduledTaskService
 from src.services.system_command_service import SystemCommandService
 from src.services.task_service import AsyncTaskService, TaskCapacityError
 from src.services.tool_plan_runtime_service import ToolPlanRuntimeService
 from src.services.tool_studio_service import ToolStudioError, ToolStudioService
-from src.services.user_session_service import UserSessionService
+from src.services.user_session_service import UserSessionService, UserSessionStorageError
 from src.services.vision_intake_service import VisionIntakeService, VisionIntakeServiceError
 from src.skill_runtime import SkillRunner
 from src.tools.simple_web_tool import search_simple_web
+from src.web.auth_routes import create_auth_blueprint
+from src.web.assistant_result_routes import create_assistant_result_blueprint
+from src.web.backtest_routes import create_backtest_blueprint
+from src.web.scheduled_task_routes import create_scheduled_task_blueprint
 
 
 app = Flask(__name__, static_folder="static", static_url_path="/static")
@@ -59,6 +72,20 @@ REACT_FRONTEND_DIST_DIR = Path(
     os.environ.get("FIN_AGENT_FRONTEND_DIST")
     or Path(__file__).resolve().parents[2] / "frontend" / "dist"
 ).resolve()
+
+
+@app.errorhandler(UserSessionStorageError)
+def _identity_storage_unavailable(_exc):
+    app.logger.warning("identity storage is temporarily unavailable")
+    if request.path.startswith("/api/"):
+        return jsonify(
+            {
+                "ok": False,
+                "code": "identity_storage_unavailable",
+                "error": "账户服务暂时不可用，请稍后重试。",
+            }
+        ), 503
+    return Response("账户服务暂时不可用，请稍后重试。", status=503, mimetype="text/plain")
 
 stock_deep_dive_runner = SkillRunner()
 async_task_service = AsyncTaskService()
@@ -73,12 +100,17 @@ application_workbench_service = ApplicationWorkbenchService(
     application_runtime_service=application_runtime_service,
 )
 financial_qa_cc_service = FinancialQaCcService()
+skill_hub_catalog_service = SkillHubCatalogService(
+    business_catalog=financial_qa_cc_service.business_skill_catalog,
+    legacy_skill_studio=skill_studio_service,
+)
 assistant_dispatch_planner = AssistantDispatchPlanner(
     agent_owned_runtime_names=(
         {"investment_analyst"} if financial_qa_cc_service.enabled else set()
     )
 )
 user_session_service = UserSessionService()
+phone_account_service = PhoneAccountService(user_sessions=user_session_service)
 attachment_service = AttachmentService()
 vision_intake_service = VisionIntakeService(attachment_service=attachment_service)
 tool_plan_runtime_service = ToolPlanRuntimeService()
@@ -102,6 +134,7 @@ asset_invocation_service = AssetInvocationService(
     custom_tool_store=custom_tool_agent_service.store,
     attachment_service=attachment_service,
 )
+scheduled_task_service = ScheduledTaskService()
 custom_tool_stream_requests: dict[str, dict] = {}
 agent_execution_service = AgentExecutionService(
     application_runtime_service=application_runtime_service,
@@ -113,42 +146,116 @@ agent_direct_response_service = AgentDirectResponseService()
 
 @app.route("/", methods=["GET"])
 def root_entry():
+    if (REACT_FRONTEND_DIST_DIR / "index.html").is_file():
+        return send_from_directory(REACT_FRONTEND_DIST_DIR, "index.html")
     return redirect("/assistant")
 
 
+def _resolve_current_member_identity() -> dict | None:
+    session_token = str(
+        request.cookies.get(UserSessionService.MEMBER_SESSION_COOKIE_NAME, "")
+        or ""
+    ).strip()
+    if not session_token:
+        return None
+    try:
+        return user_session_service.resolve_member_session(session_token=session_token)
+    except UserSessionStorageError as exc:
+        app.logger.warning("member session resolution failed: %s", type(exc).__name__)
+        raise
+
+
 def _resolve_current_guest_identity() -> dict:
+    member_identity = _resolve_current_member_identity()
+    if member_identity:
+        return member_identity
     cookie_user_id = str(request.cookies.get(UserSessionService.GUEST_COOKIE_NAME, "") or "").strip()
-    cookie_session_token = str(request.cookies.get("aiia_guest_session_token", "") or "").strip()
+    cookie_session_token = str(
+        request.cookies.get(UserSessionService.GUEST_SESSION_COOKIE_NAME, "")
+        or ""
+    ).strip()
     if cookie_user_id and cookie_session_token:
-        return {
-            "user_id": cookie_user_id,
-            "user_type": "guest",
-            "session_token": cookie_session_token,
-        }
+        identity = user_session_service.resolve_guest_session(
+            user_id=cookie_user_id,
+            session_token=cookie_session_token,
+        )
+        if identity:
+            return identity
     return user_session_service.resolve_or_create_guest(
-        cookie_user_id=cookie_user_id,
-        cookie_session_token=cookie_session_token,
+        cookie_user_id="",
+        cookie_session_token="",
         user_agent=request.headers.get("User-Agent", ""),
         remote_addr=request.headers.get("X-Forwarded-For", "") or request.remote_addr or "",
     )
 
 
+app.register_blueprint(
+    create_scheduled_task_blueprint(
+        service=scheduled_task_service,
+        identity_resolver=_resolve_current_guest_identity,
+    )
+)
+app.register_blueprint(
+    create_auth_blueprint(
+        service=phone_account_service,
+        member_identity_resolver=_resolve_current_member_identity,
+    )
+)
+app.register_blueprint(create_backtest_blueprint())
+app.register_blueprint(
+    create_assistant_result_blueprint(
+        conversation_service=runtime_conversation_service,
+        identity_resolver=_resolve_current_guest_identity,
+    )
+)
+
+
+def _cookie_secure() -> bool:
+    configured = str(os.environ.get("FIN_AGENT_COOKIE_SECURE") or "").strip().lower()
+    if configured:
+        return configured in {"1", "true", "yes", "on"}
+    return bool(request.is_secure)
+
+
+def _apply_identity_cookies(response: Response, identity: dict) -> Response:
+    session_token = str(identity.get("session_token") or "")
+    if str(identity.get("user_type") or "") == "member":
+        response.set_cookie(
+            UserSessionService.MEMBER_SESSION_COOKIE_NAME,
+            session_token,
+            max_age=60 * 60 * 24 * 30,
+            secure=_cookie_secure(),
+            samesite="Lax",
+            httponly=True,
+            path="/",
+        )
+        return response
+    response.delete_cookie(UserSessionService.MEMBER_SESSION_COOKIE_NAME, path="/")
+    response.set_cookie(
+        UserSessionService.GUEST_COOKIE_NAME,
+        str(identity.get("user_id") or ""),
+        max_age=60 * 60 * 24 * 180,
+        secure=_cookie_secure(),
+        samesite="Lax",
+        httponly=True,
+        path="/",
+    )
+    response.set_cookie(
+        UserSessionService.GUEST_SESSION_COOKIE_NAME,
+        session_token,
+        max_age=60 * 60 * 24 * 30,
+        secure=_cookie_secure(),
+        samesite="Lax",
+        httponly=True,
+        path="/",
+    )
+    return response
+
+
 def _make_guest_session_response(target_url: str, *, clear_thread: bool = False):
     guest_identity = _resolve_current_guest_identity()
     response = make_response(redirect(target_url))
-    response.set_cookie(
-        UserSessionService.GUEST_COOKIE_NAME,
-        str(guest_identity.get("user_id") or ""),
-        max_age=60 * 60 * 24 * 180,
-        samesite="Lax",
-    )
-    response.set_cookie(
-        "aiia_guest_session_token",
-        str(guest_identity.get("session_token") or ""),
-        max_age=60 * 60 * 24 * 30,
-        samesite="Lax",
-        httponly=True,
-    )
+    _apply_identity_cookies(response, guest_identity)
     if clear_thread:
         response.delete_cookie(UserSessionService.THREAD_COOKIE_NAME)
     return response
@@ -588,6 +695,45 @@ def _merge_llm_usage(*usages: dict | None) -> dict:
     return merged
 
 
+def _turn_meta(request_received_at: object = None) -> dict:
+    finished_at = datetime.datetime.now()
+    if isinstance(request_received_at, datetime.datetime):
+        started_at = request_received_at
+    else:
+        try:
+            started_at = datetime.datetime.fromisoformat(
+                str(request_received_at or "").strip()
+            )
+        except (TypeError, ValueError):
+            started_at = finished_at
+    return {
+        "started_at": started_at.isoformat(timespec="milliseconds"),
+        "finished_at": finished_at.isoformat(timespec="milliseconds"),
+        "duration_ms": max(
+            0,
+            round((finished_at - started_at).total_seconds() * 1_000),
+        ),
+    }
+
+
+def _attach_answer_summary(
+    result: dict,
+    *,
+    raw_user_text: str,
+    assistant_message: str,
+) -> None:
+    """Give sync and stream turns the same bounded semantic history asset."""
+    summary_result = answer_summary_service.summarize(
+        raw_user_text=str(raw_user_text or "").strip(),
+        assistant_output_text=str(assistant_message or "").strip(),
+        output_payload=result,
+        enable_llm=False,
+    )
+    summary = str(summary_result.get("answer_summary") or "").strip()
+    if summary:
+        result["answer_summary"] = summary
+
+
 def _recent_image_attachment_ids(thread_context: dict | None = None) -> list[str]:
     ctx = thread_context if isinstance(thread_context, dict) else {}
     raw_items = ctx.get("last_image_attachment_ids")
@@ -880,9 +1026,63 @@ def _custom_tool_result_blocks(result: dict, builder: LlmStreamBlockBuilder) -> 
             "questions": questions,
             "design": design,
             "design_artifact": result.get("design_artifact") if isinstance(result.get("design_artifact"), dict) else {},
+            "requirement_artifact": (
+                result.get("requirement_artifact")
+                if isinstance(result.get("requirement_artifact"), dict)
+                else {}
+            ),
             "design_context": result.get("design_context") if isinstance(result.get("design_context"), dict) else {},
             "existing_analysis": result.get("existing_analysis") if isinstance(result.get("existing_analysis"), dict) else {},
         }, stage=result_stage))
+
+    transport_error = str(result.get("error") or "").strip()
+    if transport_error:
+        state = result.get("state") if isinstance(result.get("state"), dict) else {}
+        failure_stage = "design" if design or state.get("design_contract") else "requirement"
+        is_timeout = "timed out" in transport_error.lower()
+        summary = str(result.get("message") or "").strip() or (
+            "工具设计服务本轮未及时返回；你的需求已经保留，可以直接重试当前阶段。"
+            if is_timeout
+            else "工具设计服务本轮没有完成；你的需求已经保留，可以直接重试当前阶段。"
+        )
+        _add_many([
+            builder.make_block(
+                block_id="custom_tool_design_failure",
+                block_type="assessment",
+                mode="replace",
+                title="工具设计暂时未完成",
+                data={
+                    "overall": "fail",
+                    "summary": summary,
+                    "issues": [summary],
+                    "details": {
+                        "failure_kind": "timeout" if is_timeout else "runtime_error",
+                        "trace_id": str((result.get("diagnostic_trace") or {}).get("run_id") or ""),
+                    },
+                },
+                stage=failure_stage,
+            ),
+            builder.make_block(
+                block_id="custom_tool_design_retry",
+                block_type="interaction",
+                mode="replace",
+                title="继续当前工具创建",
+                content="无需重新提交需求。系统会使用本轮已经保存的原始描述，重新执行未完成的需求理解或设计阶段。",
+                data={
+                    "interaction_id": "custom_tool.design_failure",
+                    "intent": "retry",
+                    "submission_mode": "action",
+                    "prompt": "是否重试当前工具设计阶段？",
+                    "actions": [{
+                        "action_id": "custom_tool.retry_design",
+                        "label": "重试当前阶段",
+                        "intent": "accept",
+                        "style": "primary",
+                    }],
+                },
+                stage=failure_stage,
+            ),
+        ])
 
     tool = result.get("tool") if isinstance(result.get("tool"), dict) else {}
     manifest = tool.get("manifest") if isinstance(tool.get("manifest"), dict) else {}
@@ -906,6 +1106,7 @@ def _custom_tool_result_blocks(result: dict, builder: LlmStreamBlockBuilder) -> 
         or ""
     ).strip()
     coding_status = str(result.get("coding_status") or "").strip()
+    edit_summary = result.get("edit_summary") if isinstance(result.get("edit_summary"), dict) else {}
     if coding_status == "coding_failed":
         coding_error = result.get("coding_error") if isinstance(result.get("coding_error"), dict) else {}
         error_summary = str(coding_error.get("summary") or "本次没有取得有效实现结果。").strip()
@@ -950,8 +1151,67 @@ def _custom_tool_result_blocks(result: dict, builder: LlmStreamBlockBuilder) -> 
     if manifest:
         storage = tool.get("storage") if isinstance(tool.get("storage"), dict) else {}
         is_active = str(manifest.get("status") or "").strip() == "active"
+        tool_name = str(manifest.get("tool_name") or "").strip()
+        display_name = str(manifest.get("display_name") or tool_name or "工具草稿").strip()
+        description = str(manifest.get("description") or "").strip()
+        invocation_ref = f"${tool_name}" if tool_name else ""
         input_fields = _schema_fields_for_display(tool.get("input_schema"))
         output_fields = _schema_fields_for_display(tool.get("output_schema"))
+        design_contract = (
+            tool.get("design_contract")
+            if isinstance(tool.get("design_contract"), dict)
+            else {}
+        )
+        finance_tool_profile = (
+            dict(tool.get("finance_tool_profile") or {})
+            if isinstance(tool.get("finance_tool_profile"), dict)
+            else {}
+        )
+        if str(finance_tool_profile.get("family") or "").strip().lower() == "action":
+            finance_tool_profile["execution_policy"] = "planned_non_executable"
+        strategy_runtime_profile = (
+            tool.get("strategy_runtime_profile")
+            if isinstance(tool.get("strategy_runtime_profile"), dict)
+            else {}
+        )
+        selection_output_profile = (
+            tool.get("selection_output_profile")
+            if isinstance(tool.get("selection_output_profile"), dict)
+            else {}
+        )
+        strategy_compatibility = {}
+        if strategy_runtime_profile:
+            try:
+                strategy_compatibility = StrategyRevisionContractService().assess(
+                    runtime_profile=strategy_runtime_profile,
+                    selection_output_profile=selection_output_profile,
+                    input_schema=(
+                        tool.get("input_schema")
+                        if isinstance(tool.get("input_schema"), dict)
+                        else {}
+                    ),
+                    output_schema=(
+                        tool.get("output_schema")
+                        if isinstance(tool.get("output_schema"), dict)
+                        else {}
+                    ),
+                )
+            except ValueError as exc:
+                strategy_compatibility = {
+                    "strategy_wrapper_ready": False,
+                    "portfolio_backtest_contract_ready": False,
+                    "summary": f"策略运行契约需要修正：{exc}",
+                }
+        verification = {}
+        if test_result:
+            verification = {
+                "status": (
+                    "passed"
+                    if test_result.get("execution_ok", test_result.get("ok")) is True
+                    else "failed"
+                ),
+                "summary": str(test_result.get("summary") or "").strip(),
+            }
         logical_modules = [
             {
                 "name": str(item.get("title") or item.get("name") or item.get("module_id") or ""),
@@ -968,21 +1228,46 @@ def _custom_tool_result_blocks(result: dict, builder: LlmStreamBlockBuilder) -> 
             block_id="custom_tool_draft_summary",
             block_type="artifact",
             mode="replace",
-            title=str(manifest.get("display_name") or "工具草稿"),
+            title=display_name,
             data={
                 "artifact_type": "finance.custom_tool_implementation",
                 "lifecycle": "active" if is_active else "draft",
                 "version": str(manifest.get("current_revision") or "0.1"),
-                "summary": str(manifest.get("description") or "").strip(),
+                "summary": description,
+                "asset_ref": {
+                    "kind": "tool",
+                    "name": tool_name,
+                    "display_name": display_name,
+                    "description": description,
+                    "revision": int(manifest.get("current_revision") or 0),
+                },
                 "items": [
+                    {"label": "工具名称", "value": display_name},
+                    {"label": "工具 ID", "value": tool_name or "—"},
+                    {"label": "调用引用", "value": invocation_ref or "—"},
                     {"label": "当前状态", "value": "已启用" if is_active else "待确认"},
                     {"label": "版本", "value": manifest.get("current_revision") or "0.1"},
-                    {"label": "运行方式", "value": "动态加载" if storage else "动态执行"},
                 ],
                 "details": {
                     "inputs": input_fields,
                     "outputs": output_fields,
                     "modules": logical_modules,
+                    "runtime": (
+                        "系统解析交易日与标的范围，并按策略绑定方式有界调度；策略核心只执行一次业务判断。"
+                        if strategy_runtime_profile
+                        else "数据库动态加载，按一次性沙箱任务执行。"
+                        if storage
+                        else "按一次性动态任务执行。"
+                    ),
+                    "design_flow": (
+                        {"mermaid": str(design_contract.get("mermaid") or "").strip()}
+                        if str(design_contract.get("mermaid") or "").strip()
+                        else {}
+                    ),
+                    "verification": verification,
+                    "finance_tool_profile": finance_tool_profile,
+                    "strategy_runtime_profile": strategy_runtime_profile,
+                    "strategy_compatibility": strategy_compatibility,
                 },
             },
             stage="coding",
@@ -1040,14 +1325,24 @@ def _custom_tool_result_blocks(result: dict, builder: LlmStreamBlockBuilder) -> 
                 },
                 stage="coding",
             )])
-        if not is_active and coding_status == "implemented":
+        candidate_can_activate = (
+            not edit_summary or test_result.get("execution_ok") is True
+        )
+        if not is_active and coding_status == "implemented" and candidate_can_activate:
             revision = int(manifest.get("current_revision") or 0)
+            is_edit_candidate = bool(edit_summary)
             _add_many([builder.make_block(
                 block_id="custom_tool_coding_review",
                 block_type="interaction",
                 mode="replace",
-                title="确认实现",
-                content="实现和 Coding 检查结果已保存。确认后启用当前版本；如果不符合预期，直接说明修改点。",
+                title="确认候选修改" if is_edit_candidate else "确认实现",
+                content=(
+                    f"候选版本 {revision} 已验证，当前仍使用版本 "
+                    f"{edit_summary.get('base_revision')}。确认后才会切换；"
+                    "如果不符合预期，直接说明修改点。"
+                    if is_edit_candidate
+                    else "实现和 Coding 检查结果已保存。确认后启用当前版本；如果不符合预期，直接说明修改点。"
+                ),
                 data={
                     "interaction_id": "custom_tool.coding_review",
                     "intent": "confirm",
@@ -1058,7 +1353,7 @@ def _custom_tool_result_blocks(result: dict, builder: LlmStreamBlockBuilder) -> 
                     "actions": [
                         {
                             "action_id": "custom_tool.activate_draft",
-                            "label": "确认并启用",
+                            "label": "启用候选版本" if is_edit_candidate else "确认并启用",
                             "intent": "accept",
                             "style": "primary",
                             "expected_revision": revision,
@@ -1110,6 +1405,26 @@ def _custom_tool_interaction_text(text: str, response: dict) -> str:
 def _resolved_dispatch_question(dispatch_plan: dict, fallback: str) -> str:
     resolution = dispatch_plan.get("context_resolution") if isinstance(dispatch_plan.get("context_resolution"), dict) else {}
     return str(resolution.get("resolved_question") or fallback or "").strip()
+
+
+def _settle_terminal_progress_blocks(blocks: list[dict], *, failed: bool = False) -> list[dict]:
+    """A terminal turn must not persist a child process as still running."""
+    settled: list[dict] = []
+    for item in blocks:
+        block = dict(item)
+        data = dict(block.get("data")) if isinstance(block.get("data"), dict) else {}
+        role = str(data.get("role") or "").strip()
+        status = str(data.get("status") or "").strip().lower()
+        if role in {"process", "live_progress"} and status in {
+            "running",
+            "loading",
+            "in_progress",
+            "verifying",
+        }:
+            data["status"] = "error" if failed else "completed"
+            block["data"] = data
+        settled.append(block)
+    return settled
 
 
 def _run_custom_tool_stream_payload(payload: dict, *, emit) -> None:
@@ -1230,6 +1545,7 @@ def _run_custom_tool_stream_payload(payload: dict, *, emit) -> None:
                 "text": text,
                 "application_name": application_name,
             }),
+            started_at=payload.get("request_received_at"),
         )
         if not requested_thread_id:
             _schedule_thread_title(
@@ -1316,19 +1632,28 @@ def _run_custom_tool_stream_payload(payload: dict, *, emit) -> None:
                     event_sink=event_sink,
                 )
             elif sub_action == "edit":
-                edit_text = _custom_tool_arg_text(rest_args)
-                if not edit_text:
-                    raise ValueError("请使用 /custom_tool edit <修改要求>")
-                if not active_state:
-                    active_state = {"owner_id": owner_id, "requirement_text": ""}
-                result = custom_tool_agent_service.start_create(
-                    edit_text,
-                    state=active_state,
-                    owner_id=owner_id,
-                    thread_id=thread_id,
-                    turn_id=turn_id,
-                    event_sink=event_sink,
-                )
+                selected_tool = str(rest_args[0] if rest_args else "").strip()
+                if selected_tool.lower().startswith("ct_"):
+                    result = custom_tool_agent_service.start_edit(
+                        selected_tool,
+                        _custom_tool_arg_text(rest_args[1:]),
+                        owner_id=owner_id,
+                        owner_ids=owner_ids,
+                        thread_id=thread_id,
+                        turn_id=turn_id,
+                        event_sink=event_sink,
+                    )
+                elif active_state:
+                    result = custom_tool_agent_service.start_create(
+                        _custom_tool_arg_text(rest_args),
+                        state=active_state,
+                        owner_id=owner_id,
+                        thread_id=thread_id,
+                        turn_id=turn_id,
+                        event_sink=event_sink,
+                    )
+                else:
+                    raise ValueError("请使用 /custom_tool edit 并先选择要修改的个人工具。")
             else:
                 raise ValueError("流式 custom_tool 仅支持 create/edit 和进行中流程的继续。")
         elif active_state:
@@ -1413,6 +1738,7 @@ def _run_custom_tool_stream_payload(payload: dict, *, emit) -> None:
         if result["thread_context_patch"]:
             runtime_conversation_service.update_thread_context(thread_id=thread_id, patch=result["thread_context_patch"])
         assistant_message = str(result.get("message") or "已处理。").strip()
+        result_blocks = _custom_tool_result_blocks(result, builder)
         final_events = (
             [
                 *public_progress_blocks.values(),
@@ -1423,17 +1749,29 @@ def _run_custom_tool_stream_payload(payload: dict, *, emit) -> None:
                 ],
             ]
             if routed_outside_custom_tool
-            else _custom_tool_result_blocks(result, builder)
+            else [
+                *public_progress_blocks.values(),
+                *result_blocks,
+            ]
+        )
+        final_events = _settle_terminal_progress_blocks(
+            final_events,
+            failed=bool(str(result.get("error") or "").strip()),
         )
         result["surface_blocks"] = final_events
-        runtime_conversation_service.complete_turn(
+        _attach_answer_summary(
+            result,
+            raw_user_text=text,
+            assistant_message=assistant_message,
+        )
+        result["turn_meta"] = runtime_conversation_service.complete_turn(
             thread_id=thread_id,
             turn_id=turn_id,
             assistant_output_text=assistant_message,
             output_payload=_to_json_safe(result),
             model_name=str(result.get("model_name") or "").strip(),
             token_usage=result.get("llm_usage") if isinstance(result.get("llm_usage"), dict) else None,
-        )
+        ) or _turn_meta(payload.get("request_received_at"))
         run_trace.finish(result)
         for block in final_events:
             emit(block)
@@ -1463,6 +1801,7 @@ def _run_custom_tool_stream_payload(payload: dict, *, emit) -> None:
                     "text": text,
                     "application_name": application_name,
                 }),
+                started_at=payload.get("request_received_at"),
             )
         block = builder.make_block(
             block_id="context_resolution_message",
@@ -1516,6 +1855,28 @@ def _run_custom_tool_stream_payload(payload: dict, *, emit) -> None:
         })
 
 
+def _asset_invocation_user_display_text(text: str, selected_asset: dict | None) -> str:
+    """Keep the selected asset visible in persisted conversation history."""
+    user_text = str(text or "").strip()
+    selected = selected_asset if isinstance(selected_asset, dict) else {}
+    asset_name = str(selected.get("name") or "").strip()
+    if not asset_name:
+        raw_ref = str(selected.get("ref") or "").strip()
+        if ":" in raw_ref:
+            asset_name = raw_ref.split(":", 1)[1].strip()
+    if not asset_name:
+        return user_text
+    invocation_ref = f"${asset_name}"
+    reference_pattern = re.compile(
+        rf"(?<!\S)\$(?:(?:tool|skill):)?{re.escape(asset_name)}"
+        rf"(?=\s|$|[，,。；;！？!?])",
+        flags=re.IGNORECASE,
+    )
+    if reference_pattern.search(user_text):
+        return user_text
+    return " ".join(item for item in (invocation_ref, user_text) if item)
+
+
 def _run_asset_invocation_stream_payload(payload: dict, *, emit) -> None:
     run_id = str(payload.get("run_id") or "").strip()
     text = str(payload.get("text") or "").strip()
@@ -1526,7 +1887,11 @@ def _run_asset_invocation_stream_payload(payload: dict, *, emit) -> None:
     thread_id = None
     turn_id = None
     try:
-        attachments = attachment_service.list_attachments(attachment_ids)
+        attachments = attachment_service.list_attachments(
+            attachment_ids,
+            owner_id=str(guest_identity.get("user_id") or ""),
+            require_all=True,
+        )
         app_ctx = application_runtime_service.get_application_context(application_name)
         requested_thread_id = (
             int(payload.get("thread_id"))
@@ -1552,11 +1917,12 @@ def _run_asset_invocation_stream_payload(payload: dict, *, emit) -> None:
                 thread_id=thread_id,
             ),
         }
-        display_text = text or f"${str(selected_asset.get('name') or '').strip()}"
+        display_text = _asset_invocation_user_display_text(text, selected_asset)
         turn_id = runtime_conversation_service.create_turn(
             thread_id=thread_id,
             user_input_text=display_text,
             input_payload=_to_json_safe({**payload, "attachments": attachments}),
+            started_at=payload.get("request_received_at"),
         )
         if not requested_thread_id:
             _schedule_thread_title(
@@ -1584,14 +1950,19 @@ def _run_asset_invocation_stream_payload(payload: dict, *, emit) -> None:
             turn_id=turn_id,
         )
         assistant_message = str(result.get("message") or "已处理。").strip()
-        runtime_conversation_service.complete_turn(
+        _attach_answer_summary(
+            result,
+            raw_user_text=display_text,
+            assistant_message=assistant_message,
+        )
+        result["turn_meta"] = runtime_conversation_service.complete_turn(
             thread_id=thread_id,
             turn_id=turn_id,
             assistant_output_text=assistant_message,
             output_payload=_to_json_safe(result),
             model_name=str(result.get("model_name") or "").strip(),
             token_usage=result.get("llm_usage") if isinstance(result.get("llm_usage"), dict) else None,
-        )
+        ) or _turn_meta(payload.get("request_received_at"))
         for block in result.get("surface_blocks") or []:
             if isinstance(block, dict) and str(block.get("block_id") or "") != "asset_invocation_preview":
                 emit({"event": "block", **block})
@@ -1707,7 +2078,10 @@ def _build_chat_dispatch_payload(
                 )
                 return _attach_planning_state(result)
             recent_attachment_ids = _recent_image_attachment_ids(thread_context)
-            recent_attachments = attachment_service.list_attachments(recent_attachment_ids)
+            recent_attachments = attachment_service.list_attachments(
+                recent_attachment_ids,
+                owner_id=owner_id or None,
+            )
             if recent_attachments:
                 result = vision_intake_service.analyze_for_assistant(
                     attachments=recent_attachments,
@@ -1752,6 +2126,7 @@ def _build_chat_dispatch_payload(
                 user_text=raw,
                 dispatch_plan=plan,
                 application_context=application_context,
+                attachments=attachments,
                 event_sink=event_sink,
             )
             result = _apply_application_workspace_orchestration(
@@ -1870,15 +2245,15 @@ def _build_chat_dispatch_payload(
         if plan_entry == "catalog_browse":
             mode = str(plan.get("browse_mode") or "").strip()
             if mode == "skills_catalog":
-                items = skill_studio_service.list_skills()
+                items = skill_hub_catalog_service.list_skills()
                 result = _apply_application_workspace_orchestration({
                     "mode": "skills_catalog",
                     "message": f"当前共有 {len(items)} 个 skills。",
                     "items": items,
                     "workspace": {
                         "type": "skills_catalog",
-                        "title": "Skill Studio",
-                        "url": _with_script_root("/skills/studio"),
+                        "title": "Skill Hub",
+                        "url": _with_script_root("/skills"),
                     },
                 }, application_context)
                 result["dispatch_plan"] = plan
@@ -2133,18 +2508,26 @@ def _build_chat_dispatch_payload(
                 turn_id=turn_id,
             )
         elif sub_action == "edit":
-            edit_text = _custom_tool_arg_text(rest_args)
-            if not edit_text:
-                raise ValueError("请使用 /custom_tool edit <修改要求>")
-            if not active_state:
-                active_state = {"owner_id": owner_id, "requirement_text": ""}
-            result = custom_tool_agent_service.start_create(
-                edit_text,
-                state=active_state,
-                owner_id=owner_id,
-                thread_id=thread_id,
-                turn_id=turn_id,
-            )
+            selected_tool = str(rest_args[0] if rest_args else "").strip()
+            if selected_tool.lower().startswith("ct_"):
+                result = custom_tool_agent_service.start_edit(
+                    selected_tool,
+                    _custom_tool_arg_text(rest_args[1:]),
+                    owner_id=owner_id,
+                    owner_ids=owner_ids,
+                    thread_id=thread_id,
+                    turn_id=turn_id,
+                )
+            elif active_state:
+                result = custom_tool_agent_service.start_create(
+                    _custom_tool_arg_text(rest_args),
+                    state=active_state,
+                    owner_id=owner_id,
+                    thread_id=thread_id,
+                    turn_id=turn_id,
+                )
+            else:
+                raise ValueError("请使用 /custom_tool edit 并先选择要修改的个人工具。")
         elif sub_action == "call":
             tool_name, call_args = _parse_custom_tool_json_arg(_custom_tool_arg_text(rest_args))
             if not tool_name:
@@ -2211,15 +2594,15 @@ def _build_chat_dispatch_payload(
         return _apply_application_workspace_orchestration(result, application_context)
 
     if command_action == "catalog_skills":
-        items = skill_studio_service.list_skills()
+        items = skill_hub_catalog_service.list_skills()
         return _apply_application_workspace_orchestration({
             "mode": "skills_catalog",
             "message": f"当前共有 {len(items)} 个 skills。",
             "items": items,
             "workspace": {
                 "type": "skills_catalog",
-                "title": "Skill Studio",
-                "url": _with_script_root("/skills/studio"),
+                "title": "Skill Hub",
+                "url": _with_script_root("/skills"),
             },
         }, application_context)
 
@@ -2607,13 +2990,44 @@ def _build_asset_invocation_payload(
 
 def _asset_invocation_preview_block(invocation: dict) -> dict:
     preview = invocation.get("preview") if isinstance(invocation.get("preview"), dict) else {}
+    target = preview.get("target") if isinstance(preview.get("target"), dict) else {}
+    contract = invocation.get("contract") if isinstance(invocation.get("contract"), dict) else {}
+    kind = str(target.get("kind") or contract.get("kind") or "").strip()
+    name = str(target.get("name") or contract.get("name") or "").strip()
+    display_name = str(
+        target.get("display_name")
+        or contract.get("display_name")
+        or name
+        or "本次调用"
+    ).strip()
+    summary = str(target.get("summary") or contract.get("description") or "").strip()
+    invocation_ref = str(target.get("invocation") or (f"${name}" if name else "")).strip()
     return {
         "event": "block",
         "block_id": "asset_invocation_preview",
-        "block_type": "structured_text",
+        "block_type": "artifact",
         "title": "本次调用",
         "content": str(preview.get("message") or invocation.get("message") or "正在准备调用。").strip(),
-        "data": preview,
+        "data": {
+            "artifact_type": "finance.asset_invocation",
+            "summary": summary or str(preview.get("message") or "").strip(),
+            "asset_ref": {
+                "kind": kind,
+                "name": name,
+                "display_name": display_name,
+                "description": summary,
+            },
+            "items": [
+                {"label": "名称", "value": display_name},
+                {"label": "调用引用", "value": invocation_ref or "—"},
+                {"label": "类型", "value": "工具" if kind == "tool" else "Skill" if kind == "skill" else "资产"},
+                {"label": "执行项", "value": int(preview.get("call_count") or 0) or 1},
+            ],
+            "details": {
+                "entities": preview.get("entities") if isinstance(preview.get("entities"), list) else [],
+                "message": str(preview.get("message") or "").strip(),
+            },
+        },
     }
 
 
@@ -2628,17 +3042,47 @@ def _execute_asset_invocation_payload(
 ) -> dict:
     if invocation.get("status") != "ready":
         message = str(invocation.get("message") or "还需要补充调用参数。").strip()
+        resolution = invocation.get("resolution") if isinstance(invocation.get("resolution"), dict) else {}
+        candidates = [
+            item
+            for item in (
+                resolution.get("candidates")
+                if isinstance(resolution.get("candidates"), list)
+                else invocation.get("candidates")
+                if isinstance(invocation.get("candidates"), list)
+                else []
+            )
+            if isinstance(item, dict)
+        ]
+        surface_blocks = [
+            {
+                "block_id": "asset_invocation_needs_input",
+                "block_type": "narrative",
+                "content": message,
+            }
+        ]
+        if candidates:
+            surface_blocks.append({
+                "block_id": "asset_invocation_candidates",
+                "block_type": "resource",
+                "title": "可选的工具与 Skill",
+                "data": {
+                    "resources": [
+                        {
+                            "resource_id": str(item.get("ref") or f"{item.get('kind')}:{item.get('name')}"),
+                            "title": str(item.get("display_name") or item.get("name") or "候选资产"),
+                            "relation": str(item.get("summary") or item.get("description") or ""),
+                            "uri": str(item.get("invocation") or (f"${item.get('name')}" if item.get("name") else "")),
+                        }
+                        for item in candidates
+                    ],
+                },
+            })
         return {
             "mode": "asset_invocation_needs_input",
             "message": message,
             "asset_invocation": invocation,
-            "surface_blocks": [
-                {
-                    "block_id": "asset_invocation_needs_input",
-                    "block_type": "narrative",
-                    "content": message,
-                }
-            ],
+            "surface_blocks": surface_blocks,
             "llm_usage": invocation.get("llm_usage") or {},
         }
 
@@ -2742,6 +3186,16 @@ def _submit_generic_skill_job(skill_name: str, args: dict) -> dict:
             input_payload = _build_stock_deep_dive_input(args)
         else:
             raise ValueError("input_payload 必须是对象")
+    elif skill_name == "stock_deep_dive":
+        normalized = _build_stock_deep_dive_input({**args, **input_payload})
+        input_payload = {
+            **normalized,
+            **input_payload,
+            "context": {
+                **normalized["context"],
+                **(input_payload.get("context") if isinstance(input_payload.get("context"), dict) else {}),
+            },
+        }
     route_snapshot = args.get("route_snapshot")
     if not isinstance(route_snapshot, dict):
         route_snapshot = None
@@ -3137,7 +3591,7 @@ def skills_catalog_page():
     return render_template(
         "skills_catalog.html",
         page_title="Skills",
-        api_skill_catalog_url=_with_script_root("/api/skills/catalog"),
+        api_skill_catalog_url=_with_script_root("/api/skill-hub"),
         api_skill_base_url=_with_script_root("/api/skills"),
         skill_studio_base_url=_with_script_root("/skills/studio"),
     )
@@ -3240,6 +3694,15 @@ def tool_studio_page(tool_name: str = ""):
 
 @app.route("/login", methods=["GET"])
 @app.route("/login/", methods=["GET"])
+@app.route("/register", methods=["GET"])
+@app.route("/register/", methods=["GET"])
+def phone_auth_entry_page():
+    if (REACT_FRONTEND_DIST_DIR / "index.html").is_file():
+        return send_from_directory(REACT_FRONTEND_DIST_DIR, "index.html")
+    return redirect(_with_script_root("/login/legacy"))
+
+
+@app.route("/login/legacy", methods=["GET"])
 def login_entry_page():
     guest_identity = _resolve_current_guest_identity()
     guest_user_id = str(guest_identity.get("user_id") or "").strip()
@@ -3300,19 +3763,7 @@ def conversation_workbench_page():
     if (REACT_FRONTEND_DIST_DIR / "index.html").is_file():
         guest_identity = _resolve_current_guest_identity()
         response = make_response(send_from_directory(REACT_FRONTEND_DIST_DIR, "index.html"))
-        response.set_cookie(
-            UserSessionService.GUEST_COOKIE_NAME,
-            str(guest_identity.get("user_id") or ""),
-            max_age=60 * 60 * 24 * 180,
-            samesite="Lax",
-        )
-        response.set_cookie(
-            "aiia_guest_session_token",
-            str(guest_identity.get("session_token") or ""),
-            max_age=60 * 60 * 24 * 30,
-            samesite="Lax",
-            httponly=True,
-        )
+        _apply_identity_cookies(response, guest_identity)
         return response
     return _legacy_conversation_workbench_page()
 
@@ -3366,19 +3817,7 @@ def _legacy_conversation_workbench_page():
         initial_thread_id=initial_thread_id,
         guest_user_id=guest_identity.get("user_id") or "",
     ))
-    response.set_cookie(
-        UserSessionService.GUEST_COOKIE_NAME,
-        str(guest_identity.get("user_id") or ""),
-        max_age=60 * 60 * 24 * 180,
-        samesite="Lax",
-    )
-    response.set_cookie(
-        "aiia_guest_session_token",
-        str(guest_identity.get("session_token") or ""),
-        max_age=60 * 60 * 24 * 30,
-        samesite="Lax",
-        httponly=True,
-    )
+    _apply_identity_cookies(response, guest_identity)
     if initial_thread_id:
         response.set_cookie(
             UserSessionService.THREAD_COOKIE_NAME,
@@ -3489,17 +3928,22 @@ def api_create_stock_deep_dive_job():
 def api_chat_dispatch():
     thread_id = None
     turn_id = None
+    request_received_at = datetime.datetime.now()
     try:
         payload = _extract_request_payload()
         text = str(payload.get("text") or payload.get("message") or "").strip()
         attachment_ids = payload.get("attachment_ids")
         if not isinstance(attachment_ids, list):
             attachment_ids = []
-        attachments = attachment_service.list_attachments(attachment_ids)
+        guest_identity = _resolve_current_guest_identity()
+        attachments = attachment_service.list_attachments(
+            attachment_ids,
+            owner_id=str(guest_identity.get("user_id") or ""),
+            require_all=True,
+        )
         selected_asset = payload.get("selected_asset") if isinstance(payload.get("selected_asset"), dict) else {}
         if not text and not attachments and not selected_asset:
             return jsonify({"ok": False, "error": "text、attachments 和 selected_asset 不能同时为空"}), 400
-        guest_identity = _resolve_current_guest_identity()
         application_name = str(payload.get("application_name") or "investment_workbench").strip() or "investment_workbench"
         app_ctx = application_runtime_service.get_application_context(application_name)
         initial_thread_title = str(app_ctx.get("display_name") or application_name)
@@ -3532,8 +3976,13 @@ def api_chat_dispatch():
         }
         turn_id = runtime_conversation_service.create_turn(
             thread_id=thread_id,
-            user_input_text=text or (f"${str(selected_asset.get('name') or '').strip()}" if selected_asset else f"[attachment:{len(attachments)}]"),
+            user_input_text=(
+                _asset_invocation_user_display_text(text, selected_asset)
+                if selected_asset
+                else text or f"[attachment:{len(attachments)}]"
+            ),
             input_payload=_to_json_safe({**payload, "application_name": application_name, "attachments": attachments}),
+            started_at=request_received_at,
         )
         if not requested_thread_id:
             _schedule_thread_title(
@@ -3541,7 +3990,7 @@ def api_chat_dispatch():
                 user_text=text or f"分析 {len(attachments)} 个图片附件",
                 expected_title=initial_thread_title,
             )
-        if selected_asset or text.startswith("$"):
+        if asset_invocation_service.has_explicit_invocation(text=text, selected_asset=selected_asset):
             result = _build_asset_invocation_payload(
                 text,
                 selected_asset=selected_asset,
@@ -3593,37 +4042,21 @@ def api_chat_dispatch():
                 patch=thread_context_patch,
             )
         assistant_message = str(result.get("message") or "已处理。").strip()
-        answer_summary_result = answer_summary_service.summarize(
+        _attach_answer_summary(
+            result,
             raw_user_text=text or f"[attachment:{len(attachments)}]",
-            assistant_output_text=assistant_message,
-            output_payload=result,
-            enable_llm=False,
+            assistant_message=assistant_message,
         )
-        answer_summary = str(answer_summary_result.get("answer_summary") or "").strip()
-        if answer_summary:
-            result["answer_summary"] = answer_summary
-        runtime_conversation_service.complete_turn(
+        result["turn_meta"] = runtime_conversation_service.complete_turn(
             thread_id=thread_id,
             turn_id=turn_id,
             assistant_output_text=assistant_message,
             output_payload=_to_json_safe(result),
             model_name=str(result.get("model_name") or "").strip(),
             token_usage=result.get("llm_usage") if isinstance(result.get("llm_usage"), dict) else None,
-        )
+        ) or _turn_meta(request_received_at)
         response = jsonify(_to_json_safe({"ok": True, "thread_id": thread_id, "turn_id": turn_id, **result}))
-        response.set_cookie(
-            UserSessionService.GUEST_COOKIE_NAME,
-            str(guest_identity.get("user_id") or ""),
-            max_age=60 * 60 * 24 * 180,
-            samesite="Lax",
-        )
-        response.set_cookie(
-            "aiia_guest_session_token",
-            str(guest_identity.get("session_token") or ""),
-            max_age=60 * 60 * 24 * 30,
-            samesite="Lax",
-            httponly=True,
-        )
+        _apply_identity_cookies(response, guest_identity)
         response.set_cookie(
             UserSessionService.THREAD_COOKIE_NAME,
             str(thread_id),
@@ -3631,6 +4064,8 @@ def api_chat_dispatch():
             samesite="Lax",
         )
         return response
+    except RuntimeConversationAccessError as exc:
+        return jsonify({"ok": False, "error": str(exc)}), 403
     except ContextResolutionError as exc:
         technical_detail = str(exc.technical_detail or exc)
         app.logger.warning(
@@ -3672,6 +4107,8 @@ def api_chat_dispatch():
         return jsonify({"ok": False, "error": str(exc)}), 404
     except VisionIntakeServiceError as exc:
         return jsonify({"ok": False, "error": str(exc)}), 400
+    except UserSessionStorageError:
+        raise
     except Exception as exc:
         return jsonify({"ok": False, "error": f"对话分发失败: {exc}"}), 500
 
@@ -3680,6 +4117,7 @@ def api_chat_dispatch():
 @app.route("/api/custom_tool/stream/start", methods=["POST"])
 def api_custom_tool_stream_start():
     try:
+        request_received_at = datetime.datetime.now()
         payload = _extract_request_payload()
         text = str(payload.get("text") or payload.get("message") or "").strip()
         interaction_response = payload.get("interaction_response") if isinstance(payload.get("interaction_response"), dict) else {}
@@ -3708,6 +4146,9 @@ def api_custom_tool_stream_start():
             "application_name": str(payload.get("application_name") or "investment_workbench").strip() or "investment_workbench",
             "guest_identity": guest_identity,
             "cookie_thread_id": request.cookies.get(UserSessionService.THREAD_COOKIE_NAME, ""),
+            "request_received_at": request_received_at.isoformat(
+                timespec="milliseconds"
+            ),
             "stream_kind": (
                 "chat"
                 if request.path.rstrip("/").endswith("/api/chat/stream/start")
@@ -3725,20 +4166,10 @@ def api_custom_tool_stream_start():
             "run_id": run_id,
             "stream_url": _with_script_root(f"/api/{stream_namespace}/stream/{run_id}"),
         }))
-        response.set_cookie(
-            UserSessionService.GUEST_COOKIE_NAME,
-            str(guest_identity.get("user_id") or ""),
-            max_age=60 * 60 * 24 * 180,
-            samesite="Lax",
-        )
-        response.set_cookie(
-            "aiia_guest_session_token",
-            str(guest_identity.get("session_token") or ""),
-            max_age=60 * 60 * 24 * 30,
-            samesite="Lax",
-            httponly=True,
-        )
+        _apply_identity_cookies(response, guest_identity)
         return response
+    except UserSessionStorageError:
+        raise
     except Exception as exc:
         return jsonify({"ok": False, "error": f"创建流式任务失败: {exc}"}), 500
 
@@ -3758,7 +4189,10 @@ def api_custom_tool_stream(run_id: str):
 
     def worker() -> None:
         try:
-            if payload.get("selected_asset") or str(payload.get("text") or "").lstrip().startswith("$"):
+            if asset_invocation_service.has_explicit_invocation(
+                text=str(payload.get("text") or ""),
+                selected_asset=payload.get("selected_asset") if isinstance(payload.get("selected_asset"), dict) else {},
+            ):
                 _run_asset_invocation_stream_payload(payload, emit=emit)
             else:
                 _run_custom_tool_stream_payload(payload, emit=emit)
@@ -3768,14 +4202,17 @@ def api_custom_tool_stream(run_id: str):
     threading.Thread(target=worker, daemon=True).start()
 
     def generate():
-        is_asset_invocation = bool(payload.get("selected_asset")) or str(payload.get("text") or "").lstrip().startswith("$")
+        is_asset_invocation = asset_invocation_service.has_explicit_invocation(
+            text=str(payload.get("text") or ""),
+            selected_asset=payload.get("selected_asset") if isinstance(payload.get("selected_asset"), dict) else {},
+        )
         yield _sse_payload({
             "event": "run_started",
             "run_id": payload.get("run_id"),
             "message": (
                 "正在解析本次工具调用。"
                 if is_asset_invocation
-                else "正在理解你的问题。"
+                else "请求已接收，正在匹配处理流程。"
                 if str(payload.get("stream_kind") or "") == "chat"
                 else "智能体开始处理自定义工具任务。"
             ),
@@ -3808,22 +4245,12 @@ def api_attachment_upload():
             for upload in uploads
         ]
         response = jsonify(_to_json_safe({"ok": True, "items": items}))
-        response.set_cookie(
-            UserSessionService.GUEST_COOKIE_NAME,
-            str(guest_identity.get("user_id") or ""),
-            max_age=60 * 60 * 24 * 180,
-            samesite="Lax",
-        )
-        response.set_cookie(
-            "aiia_guest_session_token",
-            str(guest_identity.get("session_token") or ""),
-            max_age=60 * 60 * 24 * 30,
-            samesite="Lax",
-            httponly=True,
-        )
+        _apply_identity_cookies(response, guest_identity)
         return response
     except AttachmentServiceError as exc:
         return jsonify({"ok": False, "error": str(exc)}), 400
+    except UserSessionStorageError:
+        raise
     except Exception as exc:
         return jsonify({"ok": False, "error": f"附件上传失败: {exc}"}), 500
 
@@ -3854,20 +4281,10 @@ def api_assistant_threads():
             "items": items,
             "active_thread_id": active_thread_id or None,
         }))
-        response.set_cookie(
-            UserSessionService.GUEST_COOKIE_NAME,
-            str(guest_identity.get("user_id") or ""),
-            max_age=60 * 60 * 24 * 180,
-            samesite="Lax",
-        )
-        response.set_cookie(
-            "aiia_guest_session_token",
-            str(guest_identity.get("session_token") or ""),
-            max_age=60 * 60 * 24 * 30,
-            samesite="Lax",
-            httponly=True,
-        )
+        _apply_identity_cookies(response, guest_identity)
         return response
+    except UserSessionStorageError:
+        raise
     except Exception as exc:
         return jsonify({"ok": False, "error": f"读取会话列表失败: {exc}"}), 500
 
@@ -3908,6 +4325,7 @@ def api_assistant_thread_detail(thread_id: int):
                     "items",
                     "workspace",
                     "task_state",
+                    "report_export",
                 )
                 if key in output_payload
             }
@@ -3926,6 +4344,8 @@ def api_assistant_thread_detail(thread_id: int):
             samesite="Lax",
         )
         return response
+    except UserSessionStorageError:
+        raise
     except Exception as exc:
         return jsonify({"ok": False, "error": f"读取 thread 详情失败: {exc}"}), 500
 
@@ -3936,6 +4356,53 @@ def api_skill_catalog():
         return jsonify(_to_json_safe({"ok": True, "items": skill_studio_service.list_skills()}))
     except Exception as exc:
         return jsonify({"ok": False, "error": f"获取 skills 目录失败: {exc}"}), 500
+
+
+@app.route("/api/skill-hub", methods=["GET"])
+def api_skill_hub():
+    """Return the unified read-only discovery catalog.
+
+    `/api/skills/catalog` remains the legacy Studio compatibility endpoint so
+    CC-native methods cannot accidentally enter old edit or execution paths.
+    """
+
+    try:
+        catalog = skill_hub_catalog_service.catalog()
+        return jsonify(_to_json_safe({"ok": True, **catalog}))
+    except Exception as exc:
+        return jsonify({"ok": False, "error": f"获取 Skill Hub 失败: {exc}"}), 500
+
+
+@app.route("/api/assets/invocable", methods=["GET"])
+def api_invocable_asset_catalog():
+    """Return the small, owner-scoped contract used by `$` completion."""
+    try:
+        guest_identity = _resolve_current_guest_identity()
+        owner_id = str(guest_identity.get("user_id") or "").strip()
+        thread_id = UserSessionService._safe_int(
+            str(request.cookies.get(UserSessionService.THREAD_COOKIE_NAME) or "")
+        )
+        owner_ids = _custom_tool_owner_ids(
+            user_id=owner_id,
+            thread_id=thread_id,
+        )
+        query = str(request.args.get("q") or request.args.get("query") or "").strip()
+        kind = str(request.args.get("kind") or "").strip().lower()
+        raw_limit = str(request.args.get("limit") or "").strip()
+        limit = min(50, max(1, int(raw_limit))) if raw_limit else None
+        items = asset_invocation_service.list_invocable_assets(
+            owner_ids=owner_ids or None,
+            query=query,
+            kind=kind,
+            limit=limit,
+        )
+        return jsonify(_to_json_safe({"ok": True, "items": items}))
+    except AssetInvocationError as exc:
+        return jsonify({"ok": False, "error": str(exc)}), 400
+    except UserSessionStorageError:
+        raise
+    except Exception as exc:
+        return jsonify({"ok": False, "error": f"获取可调用资产失败: {exc}"}), 500
 
 
 @app.route("/api/skills/generate_blueprint", methods=["POST"])
@@ -4380,6 +4847,8 @@ def api_tool_catalog():
             )
             known_names.add(tool_name)
         return jsonify(_to_json_safe({"ok": True, "items": items}))
+    except UserSessionStorageError:
+        raise
     except Exception as exc:
         return jsonify({"ok": False, "error": f"获取 tool 目录失败: {exc}"}), 500
 
@@ -5083,9 +5552,50 @@ def api_report_protocol_stock_demo():
     return jsonify(_to_json_safe(payload))
 
 
+def _prewarm_agent_pools() -> dict[str, dict]:
+    statuses: dict[str, dict] = {}
+    timeout = float(os.environ.get("FINANCE_CC_WARM_POOL_TIMEOUT_SECONDS") or 30)
+    application_context = None
+    if financial_qa_cc_service.enabled:
+        try:
+            application_context = application_runtime_service.get_application_context(
+                "investment_workbench"
+            )
+            statuses["financial_qa"] = financial_qa_cc_service.prewarm(
+                application_context=application_context,
+                timeout=timeout,
+            )
+            app.logger.info(
+                "Financial QA CC warm pool ready: %s",
+                statuses["financial_qa"],
+            )
+        except Exception as exc:
+            app.logger.warning(
+                "Financial QA CC warm pool failed to initialize: %s",
+                exc,
+            )
+    if finance_cc_shadow_service.enabled and custom_tool_agent_service.finance_cc_enabled:
+        try:
+            statuses["custom_tool"] = finance_cc_shadow_service.prewarm(
+                context=custom_tool_agent_service.finance_cc_runtime_context(),
+                timeout=timeout,
+            )
+            app.logger.info(
+                "Custom tool CC warm pool ready: %s",
+                statuses["custom_tool"],
+            )
+        except Exception as exc:
+            app.logger.warning(
+                "Custom tool CC warm pool failed to initialize: %s",
+                exc,
+            )
+    return statuses
+
+
 def run_server():
     port = int(os.environ.get("FIN_AGENT_PORT") or 22053)
     use_reloader = str(os.environ.get("FIN_AGENT_FLASK_RELOADER") or "").strip().lower() in {"1", "true", "yes"}
+    _prewarm_agent_pools()
     app.run(debug=True, host="0.0.0.0", port=port, use_reloader=use_reloader)
 
 

@@ -7,15 +7,23 @@ from typing import Any, Callable, Dict, List, Mapping, Optional
 
 from src.experiments.staged_data_protocol.phase2.models import ResultHandle
 from src.experiments.staged_data_protocol.phase2.trade_date_resolver import TradeDateResolver
+from src.backtest import BacktestError
 from src.scenarios.financial_qa.result_registry import FinanceResultRegistry
+from src.services.backtest_run_service import BacktestRunService
 from src.services.finance_data_tool_catalog_service import FinanceDataToolCatalogService
 from src.services.finance_data_tool_runtime_service import FinanceDataToolRuntimeService
+from src.services.invocation_input_resolver_service import InvocationInputResolverService
 from src.services.session_variable_store_service import SessionVariableStoreService
 from src.skill_runtime.tool_adapter import ToolAdapter
 
 
 def _trim(value: Any) -> str:
     return str(value or "").strip()
+
+
+def _canonical_skill_id(value: Any) -> str:
+    normalized = _trim(value)
+    return normalized.rsplit(":", 1)[-1] if normalized else ""
 
 
 def _tool_result(payload: Mapping[str, Any]) -> Dict[str, Any]:
@@ -95,6 +103,7 @@ class FinanceDataQueryToolRuntime:
             "calls": [],
             "catalog_reads": [],
             "result_refs": [],
+            "active_skill_ids": [],
             "restored_result_names": sorted(self.result_handles),
             "interaction_requests": [],
             "artifact_updates": [],
@@ -103,6 +112,34 @@ class FinanceDataQueryToolRuntime:
             "implementation_runs": [],
         }
         return self.tracker
+
+    def activate_skill(self, skill_id: str) -> None:
+        normalized = _trim(skill_id)
+        active = self.tracker.get("active_skill_ids")
+        if not normalized or not isinstance(active, list) or normalized in active:
+            return
+        active.append(normalized)
+
+    def configured_tool_allowed(self, tool_name: str) -> bool:
+        """Keep direct Agent tools available, but scope Skill turns to native grants."""
+
+        access = self.tool_context.get("skill_tool_access")
+        if not isinstance(access, Mapping):
+            return True
+        active = self.tracker.get("active_skill_ids")
+        if not isinstance(active, list) or not active:
+            return True
+        normalized_tool = _trim(tool_name)
+        return any(
+            normalized_tool
+            in {
+                _trim(item)
+                for item in access.get(_trim(skill_id), [])
+                if _trim(item)
+            }
+            for skill_id in active
+            if isinstance(access.get(_trim(skill_id), []), list)
+        )
 
     @property
     def runtime_scope(self) -> str:
@@ -272,6 +309,9 @@ class FinanceDataQueryCcTools:
         finance_catalog: Optional[FinanceDataToolCatalogService] = None,
         result_store: Optional[SessionVariableStoreService] = None,
         tool_adapter: Optional[ToolAdapter] = None,
+        business_skill_catalog: Any = None,
+        backtest_service: Optional[BacktestRunService] = None,
+        input_resolver: Optional[InvocationInputResolverService] = None,
     ) -> None:
         self.finance_runtime = finance_runtime or FinanceDataToolRuntimeService(
             trade_date_resolver=TradeDateResolver()
@@ -279,6 +319,14 @@ class FinanceDataQueryCcTools:
         self.finance_catalog = finance_catalog or FinanceDataToolCatalogService()
         self.result_store = result_store or SessionVariableStoreService()
         self.tool_adapter = tool_adapter or ToolAdapter()
+        self.business_skill_catalog = business_skill_catalog
+        self.backtest_service = backtest_service or BacktestRunService()
+        self.input_resolver = input_resolver or InvocationInputResolverService()
+
+    def bind_business_skill_catalog(self, catalog: Any) -> None:
+        """Bind the immutable business-Skill snapshot used by this CC."""
+
+        self.business_skill_catalog = catalog
 
     def create_runtime(self) -> FinanceDataQueryToolRuntime:
         return FinanceDataQueryToolRuntime(result_store=self.result_store)
@@ -791,7 +839,265 @@ class FinanceDataQueryCcTools:
             except Exception as exc:
                 return _tool_result({"result_ref": result_ref, "error": str(exc)})
 
-        tools = [read_finance_catalog, finance_query, load_finance_result]
+        @tool(
+            "run_backtest",
+            (
+                "Run the simple historical backtest for a fixed basket of A-share stocks. Use it when the user "
+                "asks to observe how a supplied stock list performed over a date range. The default is equal-weight "
+                "buy once and hold; if the user supplied weights, pass every stock's weight. Stocks may come either "
+                "from direct holdings or from one authenticated table attachment already shown in the conversation. "
+                "Do not invent a strategy, rebalance frequency, attachment id, file path, or missing weight."
+            ),
+            {
+                "type": "object",
+                "properties": {
+                    "holdings": {
+                        "type": "array",
+                        "maxItems": 10,
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "stock": {"type": "string", "minLength": 1, "maxLength": 100},
+                                "weight": {"type": "number", "exclusiveMinimum": 0, "maximum": 1},
+                            },
+                            "required": ["stock"],
+                            "additionalProperties": False,
+                        },
+                    },
+                    "attachment_source": {
+                        "type": "object",
+                        "properties": {
+                            "attachment_id": {"type": "string", "minLength": 1, "maxLength": 200},
+                            "table_index": {"type": "integer", "minimum": 0},
+                            "stock_column": {"type": ["string", "integer"]},
+                            "weight_column": {"type": ["string", "integer"]},
+                        },
+                        "required": ["attachment_id", "stock_column"],
+                        "additionalProperties": False,
+                    },
+                    "start_date": {"type": "string", "format": "date"},
+                    "end_date": {"type": "string", "format": "date"},
+                    "initial_cash": {"type": "number", "exclusiveMinimum": 0},
+                },
+                "required": ["start_date", "end_date"],
+                "additionalProperties": False,
+            },
+        )
+        async def run_backtest(args: dict[str, Any]) -> dict[str, Any]:
+            call_record: Dict[str, Any] = {
+                "tool": "run_backtest",
+                "start_date": _trim(args.get("start_date")),
+                "end_date": _trim(args.get("end_date")),
+            }
+            tool_runtime.tracker["calls"].append(call_record)
+            direct_holdings = args.get("holdings") if isinstance(args.get("holdings"), list) else []
+            attachment_source = (
+                args.get("attachment_source")
+                if isinstance(args.get("attachment_source"), Mapping)
+                else {}
+            )
+            if bool(direct_holdings) == bool(attachment_source):
+                return _tool_result(
+                    {"ok": False, "error": "请在直接股票列表和附件来源中选择一种输入方式。"}
+                )
+            try:
+                holdings: list[dict[str, Any]]
+                if attachment_source:
+                    columns: Dict[str, Any] = {
+                        "stock": attachment_source.get("stock_column")
+                    }
+                    if attachment_source.get("weight_column") not in (None, ""):
+                        columns["weight"] = attachment_source.get("weight_column")
+                    records = self.input_resolver.materialize_records(
+                        attachment_source,
+                        [
+                            dict(item)
+                            for item in tool_runtime.tool_context.get("_backtest_attachments") or []
+                            if isinstance(item, Mapping)
+                        ],
+                        columns,
+                    )
+                    holdings = [
+                        {
+                            "stock": row.get("stock"),
+                            **({"weight": row.get("weight")} if "weight" in row else {}),
+                        }
+                        for row in records
+                        if _trim(row.get("stock"))
+                    ]
+                    call_record["attachment_id"] = _trim(
+                        attachment_source.get("attachment_id")
+                    )
+                else:
+                    holdings = [dict(item) for item in direct_holdings if isinstance(item, Mapping)]
+                call_record["stock_count"] = len(holdings)
+                tool_runtime.emit_progress(
+                    f"正在回测 {len(holdings)} 只股票的买入并持有组合。",
+                    progress_id="run_backtest",
+                    title="组合回测",
+                )
+                result = await asyncio.to_thread(
+                    self.backtest_service.run,
+                    {
+                        "holdings": holdings,
+                        "start_date": args.get("start_date"),
+                        "end_date": args.get("end_date"),
+                        "initial_cash": args.get("initial_cash"),
+                    },
+                )
+                variable = self.result_store.register_tool_result(
+                    session_id=tool_runtime.result_scope,
+                    tool_name="backtest_run",
+                    result={"ok": True, "data": result},
+                    task=(
+                        f"回测 {len(holdings)} 只股票，"
+                        f"{_trim(args.get('start_date'))} 至 {_trim(args.get('end_date'))}"
+                    ),
+                    runtime_ctx={"conversation_id": tool_runtime.runtime_scope},
+                )
+                summary = result.get("summary") if isinstance(result.get("summary"), Mapping) else {}
+                period = result.get("period") if isinstance(result.get("period"), Mapping) else {}
+                compact = {
+                    "ok": True,
+                    "backtest_type": result.get("backtest_type"),
+                    "strategy": result.get("strategy"),
+                    "period": period,
+                    "stock_count": len(result.get("stocks") or []),
+                    "summary": summary,
+                    "warnings": list(result.get("warnings") or [])[:5],
+                    "result_ref": variable.get("data_ref") if variable else "",
+                }
+                if variable:
+                    result_ref = {
+                        "tool": "backtest_run",
+                        "result_ref": variable.get("data_ref"),
+                        "data_type": variable.get("data_type"),
+                        "row_count": variable.get("row_count"),
+                        "schema": variable.get("schema"),
+                        "sample": variable.get("sample"),
+                        "semantic": "finance.backtest",
+                    }
+                    tool_runtime.tracker["result_refs"].append(result_ref)
+                    call_record["result_ref"] = variable.get("data_ref")
+                tool_runtime.emit_progress(
+                    "组合回测已完成。",
+                    progress_id="run_backtest",
+                    title="组合回测",
+                    status="completed",
+                )
+                return _tool_result(compact)
+            except BacktestError as exc:
+                call_record["error"] = exc.code
+                tool_runtime.emit_progress(
+                    "组合回测未完成，请检查股票、权重和日期。",
+                    progress_id="run_backtest",
+                    title="组合回测",
+                    status="error",
+                )
+                return _tool_result(
+                    {"ok": False, "error_code": exc.code, "error": exc.message, "details": exc.details}
+                )
+            except Exception as exc:
+                call_record["error"] = str(exc)[:1000]
+                return _tool_result({"ok": False, "error": str(exc)})
+
+        tools = [read_finance_catalog, finance_query, load_finance_result, run_backtest]
+        if self.business_skill_catalog is not None:
+            @tool(
+                "read_finance_skill_reference",
+                (
+                    "Load one progressive reference explicitly linked by an already loaded Finance business Skill. "
+                    "Use the exact skill_id and references/... path from that Skill. This reads only the immutable "
+                    "in-memory Skill snapshot; it is not a general filesystem search tool. Load the parent Skill "
+                    "first, and read only references that materially change the current analysis."
+                ),
+                {
+                    "type": "object",
+                    "properties": {
+                        "skill_id": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 100,
+                        },
+                        "reference": {
+                            "type": "string",
+                            "pattern": "^references/[A-Za-z0-9_.\\-/]+$",
+                            "maxLength": 240,
+                        },
+                    },
+                    "required": ["skill_id", "reference"],
+                    "additionalProperties": False,
+                },
+            )
+            async def read_finance_skill_reference(
+                args: dict[str, Any],
+            ) -> dict[str, Any]:
+                requested_skill_id = _trim(args.get("skill_id"))
+                skill_id = _canonical_skill_id(requested_skill_id)
+                reference = _trim(args.get("reference"))
+                call_record = {
+                    "tool": "read_finance_skill_reference",
+                    "skill_id": skill_id,
+                    "requested_skill_id": requested_skill_id,
+                    "reference": reference,
+                }
+                tool_runtime.tracker["calls"].append(call_record)
+                active_skill_ids = {
+                    _trim(item)
+                    for item in tool_runtime.tracker.get("active_skill_ids") or []
+                    if _trim(item)
+                }
+                if skill_id not in active_skill_ids:
+                    call_record["error"] = "parent_skill_not_loaded"
+                    return _tool_result(
+                        {
+                            "skill_id": skill_id,
+                            "reference": reference,
+                            "error": "请先加载对应的业务 Skill，再读取其参考。",
+                        }
+                    )
+                raw_allowed = tool_runtime.tool_context.get(
+                    "allowed_finance_skills"
+                )
+                expected_revision = _trim(
+                    tool_runtime.tool_context.get(
+                        "_finance_skill_catalog_revision"
+                    )
+                )
+                allowed_skill_ids = (
+                    [
+                        _trim(item)
+                        for item in raw_allowed
+                        if _trim(item)
+                    ]
+                    if isinstance(raw_allowed, list)
+                    else None
+                )
+                payload = self.business_skill_catalog.load_reference(
+                    skill_id,
+                    reference,
+                    allowed_skill_ids=allowed_skill_ids,
+                    expected_revision=expected_revision,
+                )
+                if _trim(payload.get("error")):
+                    call_record["error"] = _trim(payload.get("error"))[:500]
+                    call_record["status"] = "error"
+                else:
+                    call_record.update(
+                        {
+                            "status": "completed",
+                            "catalog_revision": _trim(
+                                payload.get("revision")
+                            ),
+                            "content_hash": _trim(
+                                payload.get("content_hash")
+                            ),
+                            "size": len(str(payload.get("content") or "")),
+                        }
+                    )
+                return _tool_result(payload)
+
+            tools.append(read_finance_skill_reference)
         configured_tool_names = [
             _trim(item)
             for item in tool_context.get("allowed_agent_tools") or []
@@ -836,6 +1142,15 @@ class FinanceDataQueryCcTools:
                     "arguments": dict(args or {}),
                 }
                 tool_runtime.tracker["calls"].append(call_record)
+                if not tool_runtime.configured_tool_allowed(_tool_name):
+                    call_record["error"] = "active_skill_tool_not_allowed"
+                    return _tool_result(
+                        {
+                            "tool": _tool_name,
+                            "ok": False,
+                            "error": "当前 Skill 未声明可使用该补充工具。",
+                        }
+                    )
                 try:
                     raw_result = await asyncio.to_thread(
                         self.tool_adapter.execute,

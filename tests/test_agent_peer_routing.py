@@ -41,7 +41,7 @@ class _ContextDb:
         return None
 
 
-def test_context_window_keeps_full_question_and_ten_character_answer_preview(monkeypatch):
+def test_context_window_keeps_semantic_answer_preview_for_followups(monkeypatch):
     monkeypatch.setattr(runtime_module, "SystemDbUtils", _ContextDb)
 
     window = runtime_module.RuntimeConversationService().get_context_window(thread_id=1, max_rounds=5)
@@ -49,7 +49,7 @@ def test_context_window_keeps_full_question_and_ten_character_answer_preview(mon
     assert window[0]["role"] == "user"
     assert window[0]["text"] == "初二学生怎么理解一次函数的斜率？"
     assert window[1]["role"] == "assistant"
-    assert window[1]["text"] == "这是一段超过十个汉字…"
+    assert window[1]["text"] == "这是一段超过十个汉字的完整回答，不应全部进入上下文。"
 
 
 def test_application_exposes_three_peer_agents_and_one_default():

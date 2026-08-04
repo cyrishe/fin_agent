@@ -8,6 +8,11 @@ export function interactionKey(data: UnknownRecord): string {
   return `${String(data.interaction_id || "interaction")}:${revision}`;
 }
 
+export function scopedInteractionKey(data: UnknownRecord, scope = ""): string {
+  const logicalKey = interactionKey(data);
+  return scope ? `${scope}:${logicalKey}` : logicalKey;
+}
+
 export function createInteractionDraft(data: UnknownRecord): InteractionDraft {
   const answers: Record<string, InteractionAnswer> = {};
   const submitAction = list(data.actions).map(record).find((action) => String(action.intent || "") === "submit");

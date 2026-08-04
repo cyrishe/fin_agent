@@ -455,6 +455,29 @@ def test_context_resolution_service_uses_only_llm_output_for_group_reference(mon
     assert resolved["context_refs"] == ["turn:1:assistant"]
 
 
+def test_context_resolution_skips_llm_when_there_is_no_prior_context(monkeypatch):
+    monkeypatch.setattr(
+        "src.services.context_resolution_service.chat_qwen_flash_json_with_raw",
+        lambda *_args, **_kwargs: (_ for _ in ()).throw(
+            AssertionError("first turn has no context to resolve")
+        ),
+    )
+
+    resolved = ContextResolutionService().resolve(
+        user_text="贵州茅台今天的行情是什么？",
+        context_window=[],
+        thread_state={},
+        preprocessing_signals={},
+        interaction_result={},
+        enable_llm=True,
+    )
+
+    assert resolved["source"] == "no_context"
+    assert resolved["resolved_question"] == "贵州茅台今天的行情是什么？"
+    assert resolved["context_refs"] == []
+    assert resolved["llm_usage"] == {}
+
+
 def test_conversation_task_finalizer_normalizes_payload_shape_without_business_split():
     service = ConversationTaskFinalizerService()
 
@@ -487,7 +510,27 @@ def test_answer_summary_service_fallback_returns_goal_and_completion():
     )
 
     assert result["source"] == "fallback"
+    assert "两只股票的新闻已汇总" in result["answer_summary"]
     assert "完成度" in result["answer_summary"]
+
+
+def test_answer_summary_fallback_preserves_object_date_and_value_without_llm():
+    service = AnswerSummaryService()
+
+    result = service.summarize(
+        raw_user_text="贵州茅台现在的股价是多少？",
+        assistant_output_text=(
+            "贵州茅台（600519.SH）最新价为 1,338 元，数据日期为 "
+            "2026-07-31；五个交易日前收盘价为 1,274.76 元。"
+        ),
+        output_payload={"mode": "financial_qa_cc"},
+        enable_llm=False,
+    )
+
+    assert result["source"] == "fallback"
+    assert "贵州茅台（600519.SH）" in result["answer_summary"]
+    assert "2026-07-31" in result["answer_summary"]
+    assert "1,274.76" in result["answer_summary"]
 
 
 def test_conversation_preprocess_selects_default_assistant_for_general_business_query():

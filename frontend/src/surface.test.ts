@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { applyStreamEvent, blocksFromPayload, initialRun, isProcessBlock, mergeBlock } from "./surface";
+import { applyStreamEvent, blocksFromPayload, initialRun, isProcessBlock, mergeBlock, reconcileBlockOrder, settleProcessBlocks } from "./surface";
+import type { UnknownRecord } from "./types";
 
 describe("surface stream reducer", () => {
   it("appends only to the addressed block", () => {
@@ -17,6 +18,65 @@ describe("surface stream reducer", () => {
     expect(next[0]).toBe(blocks[0]);
     expect(next[1].content).toBe("第一段第二段");
     expect(next).toHaveLength(2);
+  });
+
+  it("reconciles streamed arrival order with the authoritative final Surface order", () => {
+    const streamed = [
+      { block_id: "progress", block_type: "workflow", data: { role: "conversation_progress" } },
+      { block_id: "activation", block_type: "interaction" },
+      { block_id: "edit_summary", block_type: "artifact" },
+    ];
+    const finalSurface = [
+      { block_id: "edit_summary", block_type: "artifact" },
+      { block_id: "progress", block_type: "workflow", data: { role: "conversation_progress" } },
+      { block_id: "activation", block_type: "interaction" },
+    ];
+
+    expect(reconcileBlockOrder(streamed, finalSurface).map((block) => block.block_id)).toEqual([
+      "edit_summary",
+      "progress",
+      "activation",
+    ]);
+  });
+
+  it("lets the final Surface replace stale stream state and removes provisional extras", () => {
+    const streamed = [
+      { block_id: "understanding", block_type: "status", data: { status: "running", summary: "处理中" } },
+      { block_id: "provisional", block_type: "status", data: { status: "running" } },
+    ];
+    const finalSurface = [
+      { block_id: "understanding", block_type: "status", data: { status: "completed", summary: "已完成" } },
+    ];
+
+    expect(reconcileBlockOrder(streamed, finalSurface)).toEqual([
+      expect.objectContaining({
+        block_id: "understanding",
+        data: expect.objectContaining({ status: "completed", summary: "已完成" }),
+      }),
+    ]);
+  });
+
+  it("settles and compacts the same logical process after its stage changes", () => {
+    const process = settleProcessBlocks([
+      {
+        block_id: "design_custom_tool_understanding",
+        block_type: "status",
+        title: "工具需求与设计",
+        data: { role: "process", status: "running" },
+      },
+      {
+        block_id: "runtime_custom_tool_understanding",
+        block_type: "status",
+        title: "工具需求与设计",
+        data: { role: "process", status: "completed" },
+      },
+    ], "done");
+
+    expect(process).toHaveLength(1);
+    expect(process[0]).toEqual(expect.objectContaining({
+      block_id: "runtime_custom_tool_understanding",
+      data: expect.objectContaining({ status: "completed" }),
+    }));
   });
 
   it("keeps process blocks out of formal artifacts", () => {
@@ -45,6 +105,19 @@ describe("surface stream reducer", () => {
     expect(merged.status).toBe("done");
     expect(merged.summary).toBe("本轮处理完成");
     expect(merged.process).toHaveLength(1);
+  });
+
+  it("does not leave a running child behind after the run finishes", () => {
+    const running = applyStreamEvent(initialRun(), {
+      event: "block",
+      block_id: "design_custom_tool_understanding",
+      block_type: "status",
+      data: { role: "process", status: "running" },
+    });
+    const done = applyStreamEvent(running, { event: "done" });
+
+    expect(done.status).toBe("done");
+    expect(done.process[0].data?.status).toBe("completed");
   });
 
   it("keeps generic live agent activity out of the formal conversation", () => {
@@ -186,6 +259,23 @@ describe("surface stream reducer", () => {
     ]);
   });
 
+  it("keeps same-name Skill Hub rows distinct by their catalog identity", () => {
+    const blocks = blocksFromPayload({
+      mode: "skills_catalog",
+      items: [
+        { catalog_id: "skill:business_method:research", skill_name: "research", skill_type: "business_method" },
+        { catalog_id: "skill:legacy_compiled:research", skill_name: "research", skill_type: "legacy_compiled" },
+      ],
+      workspace: { title: "Skill Hub", url: "/skills" },
+    });
+    const resources = blocks[0].data?.resources as UnknownRecord[];
+
+    expect(resources.map((item) => item.resource_id)).toEqual([
+      "skill:business_method:research",
+      "skill:legacy_compiled:research",
+    ]);
+  });
+
   it("moves task-state steps to the process panel instead of the formal answer", () => {
     const blocks = blocksFromPayload({
       surface_blocks: [{ block_id: "answer", block_type: "narrative", content: "查询完成" }],
@@ -216,5 +306,143 @@ describe("surface stream reducer", () => {
       block_type: "narrative",
       content: "贵州茅台今日上涨 2.35%。",
     }));
+  });
+
+  it("adapts an edit summary into one result artifact and the existing draft activation action", () => {
+    const blocks = blocksFromPayload({
+      edit_summary: {
+        tool_name: "ct_market_buy_decision",
+        display_name: "大盘状态与买入决策",
+        route: "local_patch",
+        impact_summary: "调整成交额过滤口径。",
+        base_revision: 3,
+        candidate_revision: 4,
+        affected_assets: ["成交额过滤模块"],
+        changes: [{ field: "成交额阈值", before: "5000 万", after: "1 亿" }],
+        verification: { status: "passed", summary: "样例通过", cases: [] },
+      },
+    });
+
+    expect(blocks.map((block) => block.block_id)).toEqual([
+      "custom_tool_edit_summary",
+      "custom_tool_edit_activation",
+    ]);
+    expect(blocks[0].data).toEqual(expect.objectContaining({
+      artifact_type: "finance.custom_tool_edit",
+      tool_name: "ct_market_buy_decision",
+      candidate_revision: 4,
+    }));
+    expect(blocks[1].data).toEqual(expect.objectContaining({
+      interaction_id: "custom_tool.coding_review",
+      subject_ref: "ct_market_buy_decision",
+      subject_revision: 4,
+      actions: [expect.objectContaining({
+        action_id: "custom_tool.activate_draft",
+        expected_revision: 4,
+        disabled: false,
+      })],
+    }));
+  });
+
+  it("keeps activation visible but disabled while verification is running or failed", () => {
+    for (const status of ["running", "failed"]) {
+      const blocks = blocksFromPayload({
+        task_result: {
+          edit_summary: {
+            tool_name: "ct_demo",
+            base_revision: 1,
+            candidate_revision: 2,
+            verification: { status, cases: [] },
+          },
+        },
+      });
+      const action = (blocks[1].data?.actions as UnknownRecord[])[0];
+
+      expect(action.action_id).toBe("custom_tool.activate_draft");
+      expect(action.disabled).toBe(true);
+      expect(String(action.disabled_reason)).toContain(status === "running" ? "仍在验证" : "未通过");
+    }
+  });
+
+  it("does not duplicate edit blocks already supplied by the backend surface", () => {
+    const blocks = blocksFromPayload({
+      edit_summary: {
+        tool_name: "ct_demo",
+        base_revision: 1,
+        candidate_revision: 2,
+        verification: { status: "passed" },
+      },
+      surface_blocks: [
+        {
+          block_id: "backend_edit",
+          block_type: "artifact",
+          data: { artifact_type: "finance.custom_tool_edit", tool_name: "ct_demo" },
+        },
+        {
+          block_id: "backend_activation",
+          block_type: "interaction",
+          data: { actions: [{ action_id: "custom_tool.activate_draft" }] },
+        },
+      ],
+    });
+
+    expect(blocks.map((block) => block.block_id)).toEqual(["backend_edit", "backend_activation"]);
+  });
+
+  it("puts the edit summary before the backend activation and keeps that action authoritative", () => {
+    const blocks = blocksFromPayload({
+      edit_summary: {
+        tool_name: "ct_demo",
+        display_name: "演示工具",
+        route: "local_patch",
+        base_revision: 3,
+        candidate_revision: 4,
+        verification: { status: "passed", cases: [] },
+      },
+      surface_blocks: [
+        { block_id: "custom_tool_draft_summary", block_type: "artifact", data: { artifact_type: "finance.custom_tool_implementation" } },
+        { block_id: "custom_tool_test_result", block_type: "assessment", data: { overall: "pass" } },
+        {
+          block_id: "custom_tool_coding_review",
+          block_type: "interaction",
+          data: {
+            subject_ref: "ct_demo",
+            subject_revision: 4,
+            actions: [{ action_id: "custom_tool.activate_draft", expected_revision: 4 }],
+          },
+        },
+      ],
+    });
+
+    expect(blocks.map((block) => block.block_id)).toEqual([
+      "custom_tool_edit_summary",
+      "custom_tool_draft_summary",
+      "custom_tool_test_result",
+      "custom_tool_coding_review",
+    ]);
+    const activationActions = blocks.flatMap((block) => Array.isArray(block.data?.actions) ? block.data.actions : []) as UnknownRecord[];
+    expect(activationActions.filter((action) => action.action_id === "custom_tool.activate_draft")).toHaveLength(1);
+  });
+
+  it("does not invent an activation when a failed backend Surface deliberately omits it", () => {
+    const blocks = blocksFromPayload({
+      edit_summary: {
+        tool_name: "ct_demo",
+        base_revision: 3,
+        candidate_revision: 4,
+        verification: { status: "failed", summary: "构造样本验证失败", cases: [] },
+      },
+      surface_blocks: [
+        { block_id: "custom_tool_draft_summary", block_type: "artifact", data: { artifact_type: "finance.custom_tool_implementation" } },
+        { block_id: "custom_tool_test_result", block_type: "assessment", data: { overall: "fail" } },
+      ],
+    });
+
+    expect(blocks.map((block) => block.block_id)).toEqual([
+      "custom_tool_edit_summary",
+      "custom_tool_draft_summary",
+      "custom_tool_test_result",
+    ]);
+    expect(blocks.some((block) => block.block_type === "interaction")).toBe(false);
   });
 });

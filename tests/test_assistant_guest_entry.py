@@ -1,6 +1,33 @@
 from pathlib import Path
+import datetime
 
+from src.services.user_session_service import UserSessionStorageError
+from src.services.runtime_conversation_service import RuntimeConversationAccessError
 from src.web import flask_app as web
+
+
+def test_guest_user_ids_are_random_not_browser_fingerprints() -> None:
+    first = web.UserSessionService.build_guest_user_id(
+        user_agent="same-browser",
+        remote_addr="127.0.0.1",
+    )
+    second = web.UserSessionService.build_guest_user_id(
+        user_agent="same-browser",
+        remote_addr="127.0.0.1",
+    )
+
+    assert first.startswith("guest_")
+    assert second.startswith("guest_")
+    assert first != second
+
+
+def test_turn_meta_measures_from_request_entry_instead_of_internal_turn_start() -> None:
+    started_at = datetime.datetime.now() - datetime.timedelta(seconds=3.25)
+
+    meta = web._turn_meta(started_at)
+
+    assert meta["started_at"].startswith(started_at.strftime("%Y-%m-%dT%H:%M:%S"))
+    assert 3_200 <= meta["duration_ms"] <= 3_500
 
 
 def test_assistant_transparently_bootstraps_default_guest_without_login(monkeypatch, tmp_path) -> None:
@@ -83,11 +110,20 @@ def test_react_thread_bootstrap_returns_active_thread_and_guest_cookies(monkeypa
     assert any(cookie.startswith("aiia_guest_session_token=gs_threads_test") for cookie in cookies)
 
 
-def test_existing_guest_cookies_do_not_repeat_session_database_writes(monkeypatch) -> None:
+def test_existing_guest_cookies_are_reused_only_after_server_validation(monkeypatch) -> None:
     def unexpected_create(**_kwargs):
         raise AssertionError("existing guest cookies should be read without another database write")
 
     monkeypatch.setattr(web.user_session_service, "resolve_or_create_guest", unexpected_create)
+    monkeypatch.setattr(
+        web.user_session_service,
+        "resolve_guest_session",
+        lambda **kwargs: {
+            "user_id": kwargs["user_id"],
+            "user_type": "guest",
+            "session_token": kwargs["session_token"],
+        },
+    )
     client = web.app.test_client()
     client.set_cookie(web.UserSessionService.GUEST_COOKIE_NAME, "guest_existing")
     client.set_cookie("aiia_guest_session_token", "gs_existing")
@@ -103,6 +139,57 @@ def test_existing_guest_cookies_do_not_repeat_session_database_writes(monkeypatc
         "user_type": "guest",
         "session_token": "gs_existing",
     }
+
+
+def test_forged_guest_cookies_are_replaced_with_a_new_server_session(monkeypatch) -> None:
+    monkeypatch.setattr(web.user_session_service, "resolve_guest_session", lambda **_kwargs: None)
+    monkeypatch.setattr(
+        web.user_session_service,
+        "resolve_or_create_guest",
+        lambda **kwargs: {
+            "user_id": "guest_replacement",
+            "user_type": "guest",
+            "session_token": "gs_replacement",
+            "received_cookie_user_id": kwargs["cookie_user_id"],
+            "received_cookie_session_token": kwargs["cookie_session_token"],
+        },
+    )
+    client = web.app.test_client()
+    client.set_cookie(web.UserSessionService.GUEST_COOKIE_NAME, "guest_forged")
+    client.set_cookie(web.UserSessionService.GUEST_SESSION_COOKIE_NAME, "gs_forged")
+
+    with client.application.test_request_context(
+        "/api/assistant/threads",
+        headers={"Cookie": "aiia_guest_user_id=guest_forged; aiia_guest_session_token=gs_forged"},
+    ):
+        identity = web._resolve_current_guest_identity()
+
+    assert identity["user_id"] == "guest_replacement"
+    assert identity["received_cookie_user_id"] == ""
+    assert identity["received_cookie_session_token"] == ""
+
+
+def test_member_storage_failure_never_falls_back_to_guest(monkeypatch) -> None:
+    def unavailable_member_session(**_kwargs):
+        raise UserSessionStorageError("database unavailable")
+
+    monkeypatch.setattr(
+        web.user_session_service,
+        "resolve_member_session",
+        unavailable_member_session,
+    )
+
+    def unexpected_guest(**_kwargs):
+        raise AssertionError("member requests must fail closed, not become guest")
+
+    monkeypatch.setattr(web.user_session_service, "resolve_or_create_guest", unexpected_guest)
+    client = web.app.test_client()
+    client.set_cookie(web.UserSessionService.MEMBER_SESSION_COOKIE_NAME, "ms_existing")
+
+    response = client.get("/api/assistant/threads")
+
+    assert response.status_code == 503
+    assert response.get_json()["code"] == "identity_storage_unavailable"
 
 
 def test_thread_history_retains_react_renderable_legacy_payload(monkeypatch) -> None:
@@ -141,6 +228,49 @@ def test_thread_history_retains_react_renderable_legacy_payload(monkeypatch) -> 
     assert output["workspace"] == {"url": "/tools"}
     assert "diagnostic_trace" not in output
     assert list_turn_calls[0]["history_payload_only"] is True
+
+
+def test_chat_dispatch_rejects_foreign_thread_before_creating_turn(monkeypatch) -> None:
+    monkeypatch.setattr(
+        web,
+        "_resolve_current_guest_identity",
+        lambda: {
+            "user_id": "guest_b",
+            "user_type": "guest",
+            "session_token": "gs_b",
+        },
+    )
+    monkeypatch.setattr(
+        web.attachment_service,
+        "list_attachments",
+        lambda *_args, **_kwargs: [],
+    )
+
+    def reject_foreign_thread(**kwargs):
+        assert kwargs["thread_id"] == 7
+        assert kwargs["owner_id"] == "guest_b"
+        raise RuntimeConversationAccessError("无权访问该 thread")
+
+    monkeypatch.setattr(
+        web.runtime_conversation_service,
+        "ensure_thread",
+        reject_foreign_thread,
+    )
+    monkeypatch.setattr(
+        web.runtime_conversation_service,
+        "create_turn",
+        lambda **_kwargs: (_ for _ in ()).throw(
+            AssertionError("foreign thread must fail before create_turn")
+        ),
+    )
+
+    response = web.app.test_client().post(
+        "/api/chat/dispatch",
+        json={"text": "贵州茅台现在多少钱？", "thread_id": 7},
+    )
+
+    assert response.status_code == 403
+    assert response.get_json() == {"ok": False, "error": "无权访问该 thread"}
 
 
 def test_assistant_sidebar_uses_compact_titles_without_rendering_message_content() -> None:

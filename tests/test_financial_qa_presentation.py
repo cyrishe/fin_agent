@@ -127,6 +127,42 @@ def test_multiple_margin_rows_become_one_ordered_table_without_value_changes():
     }
 
 
+def test_partial_table_keeps_only_sample_rows_and_exposes_paging_locator():
+    service = FinancialQaPresentationService()
+    rows = [
+        {"code": "603259.SH", "name": "药明康德", "large_net": 410616601.27},
+        {"code": "002415.SZ", "name": "海康威视", "large_net": 276686423.19},
+        {"code": "603993.SH", "name": "洛阳钼业", "large_net": 256838129.35},
+    ]
+
+    blocks = service.build(
+        "已返回按大单净额排序的前 50 条。",
+        [
+            {
+                "api": "stock.moneyflow",
+                "row_count": 50,
+                "sample_complete": False,
+                "result_ref": "session://financial_qa_example/vars/v20",
+                "schema": _schema(
+                    ("code", "string"),
+                    ("name", "string"),
+                    ("large_net", "number"),
+                ),
+                "sample": {"rows": rows},
+            }
+        ],
+        thread_id=2640,
+    )
+
+    table_data = blocks[1]["payload"]["data"]
+    assert table_data["rows"] == rows
+    assert table_data["row_count"] == 50
+    assert table_data["returned_row_count"] == 50
+    assert table_data["page_size"] == 10
+    assert table_data["thread_id"] == 2640
+    assert table_data["data_ref"] == "session://financial_qa_example/vars/v20"
+
+
 def test_report_record_stays_a_table_and_preserves_null_and_long_text():
     service = FinancialQaPresentationService()
     report_row = {
@@ -303,7 +339,7 @@ def test_empty_or_invalid_evidence_keeps_only_the_narrative():
     ]
 
 
-def test_structured_evidence_removes_duplicate_markdown_table_but_keeps_explanation():
+def test_structured_evidence_removes_duplicate_markdown_table_but_keeps_section():
     service = FinancialQaPresentationService()
     message = """## 融资数据对比
 
@@ -334,5 +370,5 @@ def test_structured_evidence_removes_duplicate_markdown_table_but_keeps_explanat
     )
 
     assert "|" not in blocks[0]["content"]
-    assert "融资数据对比" not in blocks[0]["content"]
+    assert "## 融资数据对比" in blocks[0]["content"]
     assert "比亚迪融资情绪相对更强" in blocks[0]["content"]

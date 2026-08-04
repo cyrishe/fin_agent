@@ -24,6 +24,13 @@ sentence-transformers==3.0.1
 Flask==3.1.2
 fastapi==0.115.2
 starlette==0.40.0
+PyMySQL>=1.1.0,<2.0.0
+
+# 手机号短信持有权验证与可选姓名二要素认证（provider=aliyun 时使用）
+alibabacloud_dysmsapi20170525==4.6.0
+alibabacloud_dypnsapi20170525==2.0.0
+alibabacloud_cloudauth20190307==3.13.1
+alibabacloud-tea-openapi==0.4.4
 
 # -----------------------------
 # Agent / 大模型调用
@@ -55,3 +62,5 @@ schedule==1.2.0  # 如果需要 python-schedule 做定时任务
 tqdm==4.65.0  # 进度条显示
 openpyxl==3.1.5  # 读取 xlsx 文件
 python-docx==1.1.2  # 读取 docx 文件
+reportlab>=4.2.0,<5.0.0  # 金融研究报告 PDF 导出
+pypdf>=5.0.0,<7.0.0  # PDF 导出测试与结构校验

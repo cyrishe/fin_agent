@@ -48,7 +48,7 @@ class CustomToolContextBundleService:
         run_id: str = "",
     ) -> Dict[str, Any]:
         stage_name = _trim(stage).lower()
-        coding_stage = stage_name == "coding"
+        coding_stage = stage_name in {"coding", "edit_coding"}
         data_catalog_stage = stage_name in {"coding", "test"}
         raw_context = dict(context or {})
         identity = raw_context.pop("_workspace_identity", None)
@@ -202,6 +202,16 @@ class CustomToolContextBundleService:
                 stock_universe = bundle_dir / "test_data" / "stock_universe.tsv"
                 self._write_private(stock_universe, self.stock_universe_path.read_text(encoding="utf-8"))
                 public_bundle["stock_universe"] = str(stock_universe.relative_to(bundle_dir))
+        if coding_stage and not data_catalog_stage:
+            self._write_private(bundle_dir / "runtime_contract.md", self._runtime_contract())
+            self._write_private(bundle_dir / "custom_tool_sdk.md", self._sdk_doc())
+            self._materialize_coding_support(bundle_dir)
+            public_bundle.update({
+                "runtime_contract": "runtime_contract.md",
+                "custom_tool_sdk": "custom_tool_sdk.md",
+                "coding_guide": "CODING_WORKSPACE.md",
+                "coding_evidence": "scratch/test_evidence.json",
+            })
         return {
             **public_bundle,
             "_prompt_context": prompt_context,
@@ -259,7 +269,7 @@ class CustomToolContextBundleService:
             evidence = {}
         if isinstance(evidence, Mapping):
             normalized_cases = []
-            raw_cases = evidence.get("cases") if isinstance(evidence.get("cases"), list) else [evidence]
+            raw_cases = self._coding_evidence_cases(evidence)
             for item in raw_cases:
                 if not isinstance(item, Mapping) or not isinstance(item.get("input"), Mapping):
                     continue
@@ -284,6 +294,40 @@ class CustomToolContextBundleService:
                     "summary": _trim(evidence.get("result")),
                 }
         return result
+
+    @staticmethod
+    def _coding_evidence_cases(evidence: Mapping[str, Any]) -> list[Mapping[str, Any]]:
+        """Normalize only unambiguous variants of the focused-test envelope."""
+        if isinstance(evidence.get("cases"), list):
+            return [item for item in evidence["cases"] if isinstance(item, Mapping)]
+        if isinstance(evidence.get("input"), Mapping):
+            return [evidence]
+        inputs = next(
+            (
+                evidence.get(key)
+                for key in ("inputs", "tool_inputs", "test_inputs")
+                if isinstance(evidence.get(key), list)
+            ),
+            None,
+        )
+        outputs = next(
+            (
+                evidence.get(key)
+                for key in ("actuals", "raw_tool_outputs", "tool_outputs", "outputs")
+                if isinstance(evidence.get(key), list)
+            ),
+            None,
+        )
+        if not isinstance(inputs, list) or not isinstance(outputs, list):
+            return []
+        if not inputs or len(inputs) != len(outputs):
+            return []
+        if not all(isinstance(item, Mapping) for item in [*inputs, *outputs]):
+            return []
+        return [
+            {"input": dict(input_value), "actual": dict(output_value)}
+            for input_value, output_value in zip(inputs, outputs)
+        ]
 
     def public_bundle(self, bundle: Mapping[str, Any]) -> Dict[str, Any]:
         return {str(key): value for key, value in bundle.items() if not str(key).startswith("_")}
@@ -325,7 +369,7 @@ class CustomToolContextBundleService:
                 self._write_private(history_path, list(value))
                 prompt_context["test_history_ref"] = str(history_path.relative_to(bundle_dir))
                 continue
-            if key == "current_implementation" and isinstance(value, Mapping) and stage_name == "coding":
+            if key == "current_implementation" and isinstance(value, Mapping) and stage_name in {"coding", "edit_coding"}:
                 workspace = self._materialize_implementation(bundle_dir=bundle_dir, implementation=value)
                 coding_workspace = workspace
                 prompt_context["current_implementation"] = {
@@ -346,7 +390,7 @@ class CustomToolContextBundleService:
                 "module_plan_ref": coding_workspace.get("module_plan"),
                 "last_test_ref": "",
             }
-        elif stage_name == "coding" and coding_workspace.get("module_files") and design:
+        elif stage_name in {"coding", "edit_coding"} and coding_workspace.get("module_files") and design:
             module_plan_path = bundle_dir / "implementation" / "module_plan.json"
             self._write_private(module_plan_path, self._module_plan_payload(design))
             coding_workspace["module_plan"] = str(module_plan_path.relative_to(bundle_dir))

@@ -25,6 +25,13 @@ class SkillStudioService:
         self.argument_planner = ToolArgumentPlanner()
 
     def list_skills(self) -> List[Dict[str, Any]]:
+        """Compatibility alias for the legacy compiled-Skill catalog."""
+
+        return self.list_compiled_skills()
+
+    def list_compiled_skills(self) -> List[Dict[str, Any]]:
+        """List only bundles executable by the legacy SkillRunner."""
+
         rows: List[Dict[str, Any]] = []
         if not self.skills_root.exists():
             return rows
@@ -35,11 +42,22 @@ class SkillStudioService:
                 continue
             if skill_dir.name.endswith("__refine_draft"):
                 continue
+            config_path = skill_dir / "skill.json"
+            skill_md_path = skill_dir / "SKILL.md"
+            schema_path = skill_dir / "schema.json"
+            if (
+                not config_path.is_file()
+                or not skill_md_path.is_file()
+                or not schema_path.is_file()
+            ):
+                continue
             skill_name = skill_dir.name
             try:
-                config_path = skill_dir / "skill.json"
-                skill_config = json.loads(config_path.read_text(encoding="utf-8")) if config_path.exists() else {}
+                skill_config = json.loads(config_path.read_text(encoding="utf-8"))
+                output_schema = json.loads(schema_path.read_text(encoding="utf-8"))
             except Exception:
+                continue
+            if not isinstance(skill_config, dict) or not isinstance(output_schema, dict):
                 continue
             input_schema = skill_config.get("input_schema") if isinstance(skill_config.get("input_schema"), dict) else {
                 "type": "object",

@@ -17,7 +17,7 @@
       "id": "stock-research",
       "category": "equity-research",
       "path": "skills/stock-research",
-      "description": "对一只或少量股票做行情、基本面、估值、事件和风险的综合研究时使用；单个价格、财务或研报字段查询不使用。"
+      "description": "对一只或少量股票做自适应深度研究、投资逻辑复盘或持仓诊断时使用；会结合行业经济模型、公司阶段、热点与事件状态选择财务、估值、市场和风险证据。单个价格、财务或研报字段查询不使用。"
     },
     {
       "id": "earnings-analysis",

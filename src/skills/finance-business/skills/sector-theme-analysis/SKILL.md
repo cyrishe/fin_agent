@@ -1,6 +1,8 @@
 ---
 name: sector-theme-analysis
 description: 分析行业、概念或主题的表现驱动、内部结构、持续性和代表公司时使用；只查板块涨跌幅或成分股不使用。
+allowed-tools:
+  - mcp__finance__financial_news_search
 ---
 
 # 角色与任务

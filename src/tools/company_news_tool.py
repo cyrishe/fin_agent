@@ -190,6 +190,21 @@ class CompanyNewsTool:
                     keep_days_override=max(0, int(keep_days)),
                 )
                 normalized_items = [self._normalize_item(item) for item in raw_items]
+                search_errors = getattr(crawler, "last_search_errors", {})
+                selected_site_count = len(getattr(crawler, "sites", []) or [])
+                if (
+                    not normalized_items
+                    and isinstance(search_errors, dict)
+                    and search_errors
+                    and len(search_errors) >= selected_site_count > 0
+                ):
+                    details = "; ".join(
+                        f"{name}: {str(error).strip()}"
+                        for name, error in search_errors.items()
+                    )
+                    raise RuntimeError(
+                        f"金融新闻检索站点全部执行失败：{details}"
+                    )
 
             normalized_items = self._dedupe_items(normalized_items)
             history_records = self._build_history_records(actual_query, normalized_items)

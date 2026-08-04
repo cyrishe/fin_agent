@@ -1,12 +1,14 @@
 import json
 from pathlib import Path
 
+import pytest
+
 from src.services.codex_exec_skill_harness import (
     CodexCustomToolDesigner,
     CodexExecSkillHarness,
     _SKILL_EXECUTION_DEVELOPER_INSTRUCTIONS,
 )
-from src.skill_runtime.schema_validator import SchemaValidator
+from src.skill_runtime.schema_validator import SchemaValidationError, SchemaValidator
 
 
 SKILL_ROOT = Path("src/skills/financial-tool-development")
@@ -59,6 +61,29 @@ def test_design_schema_accepts_complete_design_without_workflow_status() -> None
     assert schema["required"] == ["design"]
 
 
+def test_design_schema_accepts_optional_strict_finance_tool_profile() -> None:
+    schema = json.loads(DESIGN_SCHEMA.read_text(encoding="utf-8"))
+    payload = {
+        **_valid_design_result(),
+        "finance_tool_profile": {
+            "protocol": "finance_tool_profile.v1",
+            "family": "analytics",
+            "execution_shape": "aggregate_context",
+            "output_semantic": "metric",
+            "summary": "计算大盘强度指标。",
+        },
+    }
+
+    SchemaValidator().validate(payload, schema)
+    profile = schema["properties"]["finance_tool_profile"]
+    assert profile["additionalProperties"] is False
+    assert "finance_tool_profile" not in schema["required"]
+
+    payload["finance_tool_profile"]["internal_runtime_state"] = "leak"
+    with pytest.raises(SchemaValidationError, match="unexpected field"):
+        SchemaValidator().validate(payload, schema)
+
+
 def test_structured_design_prompt_does_not_repeat_transport_or_api_catalog() -> None:
     prompt = CodexExecSkillHarness()._build_prompt(
         skill_text="design instructions",
@@ -92,6 +117,13 @@ def test_designer_continues_to_design_when_requirement_has_no_questions() -> Non
                     "events": [],
                     "final": {
                         "design": "## 流程\n计算并返回金叉信号。",
+                        "finance_tool_profile": {
+                            "protocol": "finance_tool_profile.v1",
+                            "family": "strategy",
+                            "execution_shape": "entity_local",
+                            "output_semantic": "signal",
+                            "summary": "逐股识别金叉信号。",
+                        },
                     },
                 }
             if stage == "flowchart":
@@ -116,6 +148,13 @@ def test_designer_continues_to_design_when_requirement_has_no_questions() -> Non
     assert harness.stages == ["requirement", "design", "flowchart"]
     assert result["ok"] is True
     assert "金叉信号" in result["design"]["document"]
+    assert result["design"]["finance_tool_profile"] == {
+        "protocol": "finance_tool_profile.v1",
+        "family": "strategy",
+        "execution_shape": "entity_local",
+        "output_semantic": "signal",
+        "summary": "逐股识别金叉信号。",
+    }
 
 
 def test_designer_surfaces_provider_failure_without_business_fallback() -> None:

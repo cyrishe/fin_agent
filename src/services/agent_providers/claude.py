@@ -22,6 +22,12 @@ from src.services.custom_tool_context_bundle_service import CustomToolContextBun
 
 DEEPSEEK_ANTHROPIC_BASE_URL = "https://api.deepseek.com/anthropic"
 DASHSCOPE_ANTHROPIC_BASE_URL = "https://dashscope.aliyuncs.com/apps/anthropic"
+_DASHSCOPE_ROOT_R46_CA = (
+    Path(__file__).resolve().parents[3]
+    / "config"
+    / "certs"
+    / "globalsign-root-r46.pem"
+)
 DEFAULT_CLAUDE_PROVIDER = "deepseek"
 DEFAULT_CLAUDE_MODEL = "deepseek-v4-flash"
 _PROVIDERS = {"anthropic", "deepseek", "dashscope", "gateway"}
@@ -790,6 +796,23 @@ class ClaudeSdkSkillHarness(AgentSkillHarnessSupport):
             )
             if token:
                 env["ANTHROPIC_AUTH_TOKEN"] = token
+            # DashScope moved its public TLS chain to GlobalSign Root R46.
+            # Some bundled Claude CLI builds have not refreshed that trust
+            # anchor yet. Append the public root instead of disabling TLS.
+            ca_bundle = _trim(
+                os.environ.get("DASHSCOPE_ANTHROPIC_CA_BUNDLE")
+                or os.environ.get("NODE_EXTRA_CA_CERTS")
+            )
+            if not ca_bundle and _DASHSCOPE_ROOT_R46_CA.is_file():
+                ca_bundle = str(_DASHSCOPE_ROOT_R46_CA)
+            if ca_bundle:
+                ca_path = Path(ca_bundle).expanduser()
+                if not ca_path.is_file():
+                    raise ValueError(
+                        "DashScope Anthropic CA bundle does not exist: "
+                        f"{ca_path}"
+                    )
+                env["NODE_EXTRA_CA_CERTS"] = str(ca_path.resolve())
         else:
             api_key = _trim(os.environ.get("ANTHROPIC_API_KEY"))
             auth_token = _trim(os.environ.get("CLAUDE_AUTH_TOKEN"))

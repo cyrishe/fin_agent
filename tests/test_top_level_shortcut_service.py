@@ -34,6 +34,22 @@ def test_empty_text_confirmation_uses_top_level_shortcut() -> None:
     assert plan["shortcut"]["handler"] == "custom_tool.action"
 
 
+def test_design_failure_retry_uses_custom_tool_shortcut() -> None:
+    plan = TopLevelShortcutService().resolve(
+        text="",
+        interaction_response={
+            "interaction_id": "custom_tool.design_failure",
+            "action_id": "custom_tool.retry_design",
+            "action": "accept",
+        },
+        application_context={"default_agent": {"agent_name": "investment_analyst"}},
+    )
+
+    assert plan["entry"] == "custom_tool_flow"
+    assert plan["turn_mode"] == "tool_development"
+    assert plan["shortcut"]["handler"] == "custom_tool.action"
+
+
 def test_confirmation_with_text_is_not_a_shortcut() -> None:
     plan = TopLevelShortcutService().resolve(
         text="先不要实现，把窗口改成 60 个交易日",

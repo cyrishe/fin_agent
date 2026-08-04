@@ -2,14 +2,17 @@ import { AlertCircle, CheckCircle2, Circle, Clock3, PlayCircle } from "lucide-re
 import { lazy, Suspense } from "react";
 import { chooseRenderer } from "../rendering/registry";
 import { normalizeRenderObject } from "../rendering/normalize";
+import { scopedInteractionKey } from "../interactionDraft";
 import type { InteractionDraft, InteractionFeedbackRequest, InteractionResponse, SurfaceBlock, UnknownRecord } from "../types";
 import DataTable from "./DataTable";
 import MarkdownContent from "./MarkdownContent";
 import CodeArtifact from "./renderers/CodeArtifact";
 import DesignArtifact from "./renderers/DesignArtifact";
+import EditSummaryArtifact from "./renderers/EditSummaryArtifact";
 import FlowRenderer from "./renderers/FlowRenderer";
 import MetricStrip from "./renderers/MetricStrip";
 import InteractionRenderer from "./renderers/InteractionRenderer";
+import ToolIdentityArtifact, { type ToolIdentitySelection } from "./renderers/ToolIdentityArtifact";
 import JsonBlock from "./JsonBlock";
 
 const ChartBlock = lazy(() => import("./ChartBlock"));
@@ -17,6 +20,7 @@ const FinanceChart = lazy(() => import("./renderers/FinanceChart"));
 
 interface Props {
   block: SurfaceBlock;
+  interactionScope?: string;
   interactionDrafts?: Record<string, InteractionDraft>;
   selectedInteractions?: Record<string, string>;
   submittedInteractions?: Set<string>;
@@ -28,6 +32,7 @@ interface Props {
   onInteraction?: (response: InteractionResponse, label: string, key: string) => void;
   onRequestFeedback?: (request: InteractionFeedbackRequest) => void;
   onSubmitFeedback?: () => void;
+  onUseAsset?: (asset: ToolIdentitySelection) => void;
 }
 
 const record = (value: unknown): UnknownRecord => value && typeof value === "object" && !Array.isArray(value) ? value as UnknownRecord : {};
@@ -176,6 +181,7 @@ export default function BlockRenderer(props: Props) {
   const object = normalizeRenderObject(block);
   const renderer = chooseRenderer(object);
   const data = object.payload;
+  const artifactType = String(data.artifact_type || "");
   let content = <MarkdownContent content={object.text || block.content || String(data.summary || "")} />;
 
   if (renderer === "artifact.code") content = <CodeArtifact object={object} />;
@@ -186,15 +192,28 @@ export default function BlockRenderer(props: Props) {
   else if (renderer === "finance.intraday") content = <Suspense fallback={<div className="block-skeleton">正在加载分时图…</div>}><FinanceChart object={object} mode="intraday" /></Suspense>;
   else if (renderer === "diagram.flow" || renderer === "diagram.hierarchy") content = <FlowRenderer object={object} />;
   else if (renderer === "workflow.steps") content = block.block_type === "status" ? <div className="status-line"><Clock3 size={15} />{block.content || String(data.summary || "处理中")}</div> : <Workflow data={data} />;
-  else if (renderer === "artifact.spec") content = String(data.artifact_type || "") === "finance.tool_spec"
-    ? <DesignArtifact data={record(data.content || data)} content={block.content || String(data.change_summary || "")} />
-    : <Artifact data={record(data.content || data)} content={block.content || String(data.change_summary || "")} />;
+  else if (renderer === "artifact.spec") {
+    if (artifactType === "finance.tool_spec") {
+      content = <DesignArtifact data={record(data.content || data)} content={block.content || String(data.change_summary || "")} />;
+    } else if (artifactType === "finance.custom_tool_implementation") {
+      content = <ToolIdentityArtifact data={data} onUseAsset={props.onUseAsset} />;
+    } else if (artifactType === "finance.custom_tool_edit") {
+      content = <EditSummaryArtifact data={record(data.edit_summary || data.content || data)} />;
+    } else {
+      content = <Artifact data={record(data.content || data)} content={block.content || String(data.change_summary || "")} />;
+    }
+  }
   else if (renderer === "assessment.review") content = <Assessment data={data} content={block.content || ""} />;
   else if (renderer === "interaction.form") {
-    const key = `${String(data.interaction_id || "interaction")}:${Number(data.subject_revision ?? data.expected_revision ?? 0)}`;
+    // A business revision can legitimately produce more than one review card
+    // (for example when only a derived flow diagram is regenerated). Keep the
+    // UI choice state scoped to the message/block instance instead of treating
+    // the business revision as a globally unique interaction instance.
+    const key = scopedInteractionKey(data, props.interactionScope);
     content = <InteractionRenderer
       data={data}
       content={block.content || ""}
+      interactionInstanceKey={key}
       draft={props.interactionDrafts?.[key]}
       selectedActionId={props.selectedInteractions?.[key]}
       disabled={props.disabled || props.submittedInteractions?.has(key)}
@@ -215,9 +234,10 @@ export default function BlockRenderer(props: Props) {
   }
 
   const stage = String(block.stage || record(block.data).stage || record(block.meta).stage || "");
+  const hideSurfaceTitle = ["finance.custom_tool_implementation", "finance.custom_tool_edit"].includes(artifactType);
   return (
-    <section className={`surface-block block-${object.kind} renderer-${renderer.replaceAll(".", "-")}${stage ? ` stage-${stage}` : ""}`} data-block-id={block.block_id} data-renderer={renderer}>
-      {block.title && <div className="surface-title">{block.title}</div>}
+    <section className={`surface-block block-${object.kind} renderer-${renderer.replaceAll(".", "-")}${stage ? ` stage-${stage}` : ""}`} data-block-id={block.block_id} data-renderer={renderer} tabIndex={-1}>
+      {block.title && !hideSurfaceTitle && <div className="surface-title">{block.title}</div>}
       {content}
     </section>
   );

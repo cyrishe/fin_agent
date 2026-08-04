@@ -33,6 +33,7 @@ class AssistantInteractionPreprocessor:
         if not text:
             raise AssistantInteractionPreprocessError("顶层意图识别失败：本轮自然语言输入为空")
         available_agents = self._build_available_agents(application_context)
+        application_background = self._build_application_background(application_context)
         active_context = self._build_active_context(
             thread_context=thread_context,
             application_context=application_context,
@@ -47,6 +48,7 @@ class AssistantInteractionPreprocessor:
                         "context_refs": resolution.get("context_refs") if isinstance(resolution.get("context_refs"), list) else [],
                     },
                     "available_agents": available_agents,
+                    "application_background": application_background,
                     "active_context": active_context if active_context is not None else "null",
                 },
             )
@@ -170,6 +172,20 @@ class AssistantInteractionPreprocessor:
                 }
             )
         return normalized
+
+    def _build_application_background(
+        self,
+        application_context: Optional[Dict[str, Any]],
+    ) -> Dict[str, str]:
+        app = application_context if isinstance(application_context, dict) else {}
+        config = app.get("application_config") if isinstance(app.get("application_config"), dict) else {}
+        default_agent = app.get("default_agent") if isinstance(app.get("default_agent"), dict) else {}
+        return {
+            "application_name": self._trim(app.get("application_name") or config.get("name")),
+            "display_name": self._trim(app.get("display_name") or config.get("display_name")),
+            "domain": self._trim(config.get("domain") or app.get("domain")),
+            "preferred_agent": self._trim(default_agent.get("agent_name") or default_agent.get("name")),
+        }
 
     def _build_active_context(
         self,

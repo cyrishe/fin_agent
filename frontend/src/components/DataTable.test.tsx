@@ -24,7 +24,7 @@ describe("DataTable", () => {
     expect(html).toContain("融资余额");
     expect(html).toContain("2026-07-27");
     expect(html).toContain("91.23亿元");
-    expect(html).toContain("显示 1 / 共 2 行");
+    expect(html).toContain("预览 1 / 已返回 2 行");
     expect(html).not.toContain(">financing_balance<");
   });
 
@@ -39,5 +39,36 @@ describe("DataTable", () => {
     expect(html).toContain('class="table-cell-detail"');
     expect(html).toContain("<summary>");
     expect(html).toContain(longText);
+  });
+
+  it("uses ten-row pages for complete local result sets", () => {
+    const html = renderToStaticMarkup(<DataTable data={{
+      columns: ["name"],
+      rows: Array.from({ length: 15 }, (_, index) => ({ name: `股票${index + 1}` })),
+      row_count: 15,
+    }} />);
+
+    expect(html).toContain("股票10");
+    expect(html).not.toContain("股票11");
+    expect(html).toContain("第 1 / 2 页");
+    expect(html).toContain('aria-label="下一页"');
+  });
+
+  it("exposes remote pagination controls without pretending the sample is complete", () => {
+    const html = renderToStaticMarkup(<DataTable data={{
+      columns: ["name"],
+      rows: [{ name: "药明康德" }, { name: "海康威视" }, { name: "洛阳钼业" }],
+      row_count: 50,
+      returned_row_count: 50,
+      page_size: 10,
+      thread_id: 2640,
+      data_ref: "session://example/vars/v1",
+    }} />);
+
+    expect(html).toContain("第 1 / 5 页");
+    expect(html).toContain("当前 3 行");
+    expect(html).toContain("已返回 50 行");
+    expect(html).toContain('aria-label="下一页"');
+    expect(html).not.toContain("共 50 行");
   });
 });
