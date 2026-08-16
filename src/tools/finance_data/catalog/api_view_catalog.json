@@ -1,14 +1,12 @@
 {
-  "version": "2026-07-24-draft",
+  "version": "2026-08-06-stock-batch-quote-v4",
   "api_class_patterns": {
     "basic_query": {
       "desc": "基础查询 API，用于按条件查询当前 dataview 的字段。",
       "call_pattern": "r{id} = {api_name}(filter, order, limit, realtime) -> field1, field2",
       "examples": [
-        "r1 = stock.quote(filter = \"tradedate = -1 and amount > 1000000000\", order = \"amount desc\", limit = 10, realtime = 0) -> code, name, tradedate, close, pct, amount\nnote: -x 表示前 x 个交易日；tradedate = -1 表示上一个交易日。filter支持当前view支持的所有的field",
-        "r2 = stock.quote(filter = \"code = 600519.SH\", realtime = 2, limit = 1) -> code, name, tradedate, minute_index, open, close, high, low, pct, amount, volumn\nnote: stock.quote 的 realtime=2 表示09:30以后的最新一分钟K，即最新行情。",
-        "r3 = index.quote(filter = \"code in r2.code and (pct > 1 or amount > 5000000000)\", order = \"pct desc\", limit = 10, realtime = 1) -> code, name, tradedate, pct, amount\nnote: filter 支持`and or in`等常见操作， 出现 or 时，or 条件必须用括号包住。同时 filter也支持引用前面步骤的结果作为条件; realtime=1表示当前是查询实时行情/资金/量价等信息，而 =0 则表示当前查询的是T-1历史天级别数据",
-        "r4 = stock.quote(filter = \"code = 600519.SH\", order = \"minute_index asc\", limit = 240, realtime = 1) -> code, name, tradedate, minute_index, open, close, high, low, amount, volumn\nnote: stock.quote 的 realtime=1 表示查询从09:30开始的分钟K序列，盘前快照不返回。"
+        "r1 = fund.quote(filter = \"code = 510300.SH\", order = \"tradedate desc\", limit = 10, realtime = 0) -> code, name, tradedate, close, pct, amount",
+        "r2 = index.quote(filter = \"code = 000300.SH\", limit = 1, realtime = 1) -> code, name, tradedate, close, pct, amount"
       ],
       "output_rule": "输出字段只能从当前 view.fields 中选择",
       "args": {
@@ -22,15 +20,87 @@
       },
       "rules": [
         "只能用定义的字段，不允许新造不存在的字段",
-        "realtime 是统一可选参数；stock.quote 使用三态：0=历史日K，1=从09:30开始的分钟K序列，2=09:30以后的最新一分钟K（最新行情）。其他 API 按各自 dataview 说明使用。",
-        "对 stock.quote：明确历史日期、历史区间、上一个交易日或过去K日/近N天窗口时使用 realtime=0；需要从09:30开始的分钟K序列时使用 realtime=1；当前、此刻、实时、盘中最新或最新行情使用 realtime=2。盘前快照不作为分钟K返回。"
+        "realtime 是普通 dataview 的可选时间参数；具体含义以各自 dataview 说明为准。"
+      ]
+    },
+    "stock_quote_query": {
+      "desc": "个股统一行情查询 API。",
+      "call_pattern": "r{id} = stock.quote(codes, names, filter, order, limit, mode, period, count) -> field1, field2",
+      "examples": [
+        "r1 = stock.quote(codes = $stock_codes, order = \"tradedate desc\", mode = 0, count = 10) -> code, name, tradedate, open, close, high, low, pct, amount, volumn\nnote: mode=0 查询每只股票截至上一交易日的最近10根日K；$stock_codes 通过 SDK bindings 传入。",
+        "r2 = stock.quote(filter = \"code = 600320.SH\", mode = 1, period = 60, count = 30) -> code, name, tradedate, bar_start_time, bar_end_time, open, high, low, close, amount, volumn, is_finalized\nnote: 返回源表真实的最近30根60分钟K；不重采样、不按日期拆查。is_finalized 标明最新一根是否已收盘。",
+        "r3 = stock.quote(codes = $stock_codes, mode = 1, period = 5, count = 48) -> code, name, bar_end_time, open, high, low, close, amount, volumn\nnote: period 只支持1/3/5/10/15/30/60，count表示每只股票返回的最近K线根数；$stock_codes 通过 SDK bindings 传入。",
+        "r4 = stock.quote(codes = $stock_codes, mode = 2) -> code, name, tradedate, snapshot_time, open, high, low, close, pct, amount, volumn\nnote: mode=2 对每只股票分别返回最新的当日1d运行K，即当前行情及截至该快照的当日累计成交。显式列表默认完整覆盖，不需要用户计算全局 limit。"
+      ],
+      "output_rule": "输出字段只能从 stock.quote.fields 中选择。",
+      "args": {
+        "required": [],
+        "optional": [
+          "filter",
+          "codes(array<string>)",
+          "names(array<string>)",
+          "order",
+          "limit(-1 or positive integer; -1 means all matching rows within the safety ceiling)",
+          "mode(0|1|2; default 0)",
+          "period(1|3|5|10|15|30|60; mode=1 only)",
+          "count(mode=0: 1..5000 rows per code; mode=1: 1..1000 bars per code)"
+        ]
+      },
+      "rules": [
+        "mode=0 查询截至上一交易日的日K；count 表示每只股票返回的最近日K根数。",
+        "mode=1 查询分钟K序列；使用 period=1/3/5/10/15/30/60 指定源表真实周期、count 指定每只股票最近返回的根数；省略时默认为 period=1、count=240。",
+        "分钟K由源表按固定交易时段直接产出。工具只按 kline_type 和 period_minutes 读取，不重采样、不做成交量额差分，也不让模型按日期拆查或循环拼接。",
+        "分钟K默认按根数查询；如需指定历史范围，可在 filter 中使用 tradedate = / >= / <= 日期。最新一根可能尚未收盘，使用 is_finalized、source_bar_count 与 bar_start_time/bar_end_time 判断其完成状态；不要把未完成K当成已收盘K。",
+        "mode=1 的 open/high/low/close/amount/volumn 都是该真实周期K线的字段；amount/volumn 是该根K线区间值。",
+        "显式 tradedate 仍可用于历史复盘，但不是分钟K的默认输入方式。",
+        "mode=2 查询实时行情，对每只股票分别返回最新当日1d运行K；不得用一组股票的全局快照过滤所有标的。",
+        "用户询问今天的价格、收盘价、涨跌幅或当前行情时，直接使用 mode=2。",
+        "用户明确查询某个日期的分钟走势或分钟明细时使用 mode=1。",
+        "mode=2 返回当前当日运行K：open/high/low/close 是截至快照的当日行情，amount/volumn 是截至快照的当日累计成交；不是历史日K的最终收盘。",
+        "不能根据 mode=2 的单行结果推断全天价格路径；需要分钟走势时使用 mode=1。",
+        "批量标的使用 codes/names 一次查询；在自定义工具中用 SDK bindings 传入列表，不逐标的调用 finance_query。",
+        "省略 limit 时普通宽查询使用安全默认值；limit=-1 表示显式返回全部匹配行，但仍受可配置硬安全上限保护，超过上限会明确报错而不会静默截断。",
+        "只使用 mode，不使用 realtime。"
+      ]
+    },
+    "stock_quote_kday_metric": {
+      "desc": "个股行情 K 日窗口或同分钟窗口指标 API。",
+      "call_pattern": "r{id} = stock.quote.kd_<field>_<method>(k, filter, order, limit, mode) -> code, name, value as alias",
+      "examples": [
+        "r1 = stock.quote.kd_pct_sum(k = 5, filter = \"code = 600519.SH\", mode = 0) -> code, name, value as pct_5d",
+        "r2 = stock.quote.kd_minute_volumn_avg(k = 10, filter = \"change_pct > 20\", order = \"change_pct desc\", limit = 20, mode = 1) -> code, name, current_value, value as avg_minute_volumn_10d, change_pct, window_count"
+      ],
+      "output_rule": "日K窗口通常输出 code, name, value as alias；同分钟窗口可以输出 current_value、change_pct 和 window_count。",
+      "args": {
+        "required": [
+          "k"
+        ],
+        "optional": [
+          "filter",
+          "order",
+          "limit",
+          "mode(0|1|2; daily default 0; minute fields default 1)"
+        ]
+      },
+      "rules": [
+        "field 和 method 必须来自 stock.quote.kd。",
+        "截至上一交易日的日K窗口使用 mode=0；同分钟窗口使用 mode=1。",
+        "只使用 mode，不使用 realtime。"
+      ],
+      "methods": [
+        "sum",
+        "max",
+        "min",
+        "avg",
+        "median",
+        "percentile"
       ]
     },
     "kday_metric": {
       "desc": "K 日窗口指标 API，用于对行情、资金或估值字段做近 K 个交易日窗口计算。",
       "call_pattern": "r{id} = {api_name}(k, filter, order, limit, realtime) -> code, name, value as alias",
       "examples": [
-        "r2 = stock.quote.kd_pct_sum(k = 5, filter = \"code in r1.code\", order = \"value desc\", limit = 3, realtime = 0) -> code, name, value as pct_5d\nnote:表示查询第一步返回的股票的最近五日的总涨幅,并取最高的三条",
+        "r2 = index.quote.kd_pct_sum(k = 5, filter = \"code in r1.code\", order = \"value desc\", limit = 3, realtime = 0) -> code, name, value as pct_5d",
         "r3 = plate.moneyflow.kd_main_net_avg(k = 5, as_of = -1, filter = \"plate_code in r2.plate_code\", order = \"value desc\", limit = 10, realtime = 0) -> code, name, value as avg_main_net_5d\nnote: as_of 是 K 日窗口参考交易日，不是普通行过滤条件；as_of = -1 表示以上一个交易日作为窗口参考日。",
         "r4 = index.quote.kd_close_high(k = 20, filter = \"code = 000300.SH\", realtime = 0) -> code, name, value as high_close_20d\nnote: k 是该类 API 的必填参数；如果请求没有要求排序或取前几，则省略 order 和 limit。",
         "r5 = stock.pricevalue.kd_pe_percentile(k = 750, filter = \"code = 600519.SH\", realtime = 0) -> code, name, value as pe_percentile_3y\nnote: 估值百分位默认按当前最新交易日往前计算；用户说1年/3年/5年时，将 k 写成 250/750/1250。",
@@ -69,7 +139,7 @@
       "call_pattern": "r{id} = {api_name}(filter, order, limit, realtime) -> {subject_code_field}, {subject_name_field}, stock_code, stock_name",
       "examples": [
         "r1 = index.constitution(filter = \"index_name = 沪深300\", order = \"stock_code asc\", limit = 100) -> index_code, index_name, stock_code, stock_name, weight",
-        "r2 = plate.constitution(filter = \"stock_code in r1.code\") -> plate_code, plate_name, stock_code, stock_name\nnote: 如果请求没有要求排序或取前几，则省略 order 和 limit。",
+        "r2 = plate.constitution(filter = \"plate_name = CPO\", order = \"stock_code asc\", limit = -1) -> plate_code, plate_name, stock_code, stock_name\nnote: 完整研究范围使用 limit=-1；安全上限只防止异常返回，超过时明确报错，不静默截断。",
         "r3 = industry.constitution(filter = \"industry_name = 银行 and stock_code in r1.code\", order = \"stock_code asc\", limit = -1) -> industry_code, industry_name, stock_code, stock_name"
       ],
       "output_rule": "输出字段只能从当前 view.fields 中选择。",
@@ -84,7 +154,9 @@
       },
       "rules": [
         "Use this API to query the relation between a subject and its stock constituents.",
-        "Output fields must come from the current constitution dataview."
+        "Output fields must come from the current constitution dataview.",
+        "完整成分列表或后续研究范围必须使用 limit=-1；只有用户明确要求预览或前N项时才使用正整数 limit。",
+        "limit=-1 仍受可配置硬安全上限保护；超过上限必须明确报错，不得静默截断。"
       ]
     },
     "constituent_aggregate": {
@@ -174,14 +246,32 @@
         "不使用 realtime 或交易日偏移语义，研报日期是自然日/发布时间。"
       ]
     },
+    "news_query": {
+      "desc": "个股新闻查询 API，用于从当前配置的新闻索引中查询公司相关新闻。",
+      "call_pattern": "r{id} = stock.news(filter, order, limit) -> field1, field2",
+      "examples": [
+        "r1 = stock.news(filter = \"code = 600519.SH and publish_time >= 2026-07-01 and publish_time <= 2026-08-04\", order = \"publish_time desc\", limit = 10) -> code, name, publish_time, source, title, url, snippet",
+        "r2 = stock.news(filter = \"name = 贵州茅台 and keyword = 业绩\", order = \"publish_time desc\", limit = 10) -> name, publish_time, source, title, url, snippet"
+      ],
+      "output_rule": "输出字段只能从 stock.news.fields 中选择；coverage=internal_news 时只表示内部新闻索引覆盖。",
+      "args": {
+        "required": ["filter"],
+        "optional": ["order", "limit"]
+      },
+      "rules": [
+        "filter 必须包含 code、name、query 或 keyword 之一。",
+        "publish_time 是自然日发布时间，不使用交易日偏移。",
+        "正常0条结果不是接口失败；仅 provider_error 表示搜索服务异常。"
+      ]
+    },
     "dynamic_quote_cal": {
       "desc": "行情动态计算 API，用于处理固定行情方法无法直接表达的复杂筛选、区间统计、组合条件和自定义指标计算。",
-      "call_pattern": "r{id} = stock.quote.dynamic_cal(k, filter, fields, task, order, limit, realtime) -> code, name, calculated_field1, calculated_field2",
+      "call_pattern": "r{id} = stock.quote.dynamic_cal(k, filter, fields, task, order, limit, mode) -> code, name, calculated_field1, calculated_field2",
       "examples": [
-        "r1 = stock.quote.dynamic_cal(k = 20, filter = \"all\", fields = \"code, name, tradedate, open, close\", task = \"统计每只股票近20个交易日收盘价高于开盘价的天数，并保留天数大于15的股票\", order = \"close_gt_open_days desc\", limit = -1, realtime = 0) -> code, name, close_gt_open_days",
-        "r2 = stock.quote.dynamic_cal(k = 20, filter = \"all\", fields = \"code, name, tradedate, open, close, high, low\", task = \"统计每只股票近20个交易日收盘价高于开盘价的天数和十字星天数\", order = \"close_gt_open_days desc\", limit = 20, realtime = 0) -> code, name, close_gt_open_days, doji_days",
-        "r3 = stock.quote.dynamic_cal(k = 20, fields = \"code, name, tradedate, open, close\", task = \"统计每只股票近20个交易日收盘价高于开盘价的天数\", realtime = 0) -> code, name, close_gt_open_days\nnote: 如果请求没有原始数据筛选、排序或取前几要求，则省略 filter、order 和 limit；task 仍然必填。",
-        "r4 = stock.quote.dynamic_cal(k = 10, fields = \"code, name, tradedate, minute_index, minute_volumn\", task = \"计算当前分钟成交量相对过去10个交易日同分钟均值的增长百分比，并筛选增长超过20%的股票\", order = \"growth_pct desc\", limit = -1) -> code, name, minute_volumn, avg_minute_volumn_10d, growth_pct"
+        "r1 = stock.quote.dynamic_cal(k = 20, filter = \"all\", fields = \"code, name, tradedate, open, close\", task = \"统计每只股票近20个交易日收盘价高于开盘价的天数，并保留天数大于15的股票\", order = \"close_gt_open_days desc\", limit = -1, mode = 0) -> code, name, close_gt_open_days",
+        "r2 = stock.quote.dynamic_cal(k = 20, filter = \"all\", fields = \"code, name, tradedate, open, close, high, low\", task = \"统计每只股票近20个交易日收盘价高于开盘价的天数和十字星天数\", order = \"close_gt_open_days desc\", limit = 20, mode = 0) -> code, name, close_gt_open_days, doji_days",
+        "r3 = stock.quote.dynamic_cal(k = 20, fields = \"code, name, tradedate, open, close\", task = \"统计每只股票近20个交易日收盘价高于开盘价的天数\", mode = 0) -> code, name, close_gt_open_days\nnote: 如果请求没有原始数据筛选、排序或取前几要求，则省略 filter、order 和 limit；task 仍然必填。",
+        "r4 = stock.quote.dynamic_cal(k = 10, fields = \"code, name, tradedate, minute_index, minute_volumn\", task = \"计算当前分钟成交量相对过去10个交易日同分钟均值的增长百分比，并筛选增长超过20%的股票\", order = \"growth_pct desc\", limit = -1, mode = 1) -> code, name, minute_volumn, avg_minute_volumn_10d, growth_pct"
       ],
       "output_rule": "fields 只列取数所需 quote 字段；task 用精炼自然语言描述计算规则；输出列可以包含 quote 原始字段和 dynamic_cal 新生成的计算字段；dynamic_cal 输出计算字段名，不使用 value as alias。",
       "args": {
@@ -194,14 +284,15 @@
           "fields",
           "order",
           "limit",
-          "realtime(0|1; default 1)"
+          "mode(0|1|2; default 0)"
         ]
       },
       "rules": [
         "Use this API only when fixed APIs cannot express the requested quote calculation.",
         "task is concise natural language; do not write Python in the request.",
         "fields lists quote fields needed by the calculation.",
-        "When realtime=1/2 uses minute data, the sequence starts at 09:30 and excludes pre-market snapshots."
+        "mode=0 uses day K through the previous trading day; mode=1/2 uses minute data from 09:30.",
+        "Only use mode; do not use realtime."
       ]
     },
     "kday_margin_metric": {
@@ -251,10 +342,10 @@
     },
     "intraday_cross_section_aggregate": {
       "desc": "行情横截面聚合 API，用于对一组标的的行情字段做 avg/sum/max/min/median/count 等聚合；一次请求只计算一个聚合目标。",
-      "call_pattern": "r{id} = stock.quote.agg(filter, agg, group_by, order, limit, realtime) -> agg_alias",
+      "call_pattern": "r{id} = stock.quote.agg(filter, agg, group_by, order, limit, mode) -> agg_alias",
       "examples": [
         "r1 = stock.quote.agg(filter = \"minute_index = 785 and pct > 0\", agg = avg(stock.quote.pct)) -> avg_pct\nnote: 聚合固定在同一分钟横截面。",
-        "r2 = stock.quote.agg(filter = \"snapshot_slot = 13:05\", agg = sum(stock.quote.amount), realtime = 1) -> total_minute_amount\nnote: realtime=1 时 amount 是当前分钟成交额。",
+        "r2 = stock.quote.agg(filter = \"snapshot_slot = 13:05\", agg = sum(stock.quote.amount), mode = 1) -> total_minute_amount\nnote: mode=1 时 amount 是当前分钟成交额。",
         "r3 = stock.quote.agg(filter = \"pct > 5\", agg = count(stock.quote.code)) -> strong_count"
       ],
       "output_rule": "输出 group_by 字段和一个聚合结果别名字段；不需要分组时可以只输出别名字段。",
@@ -267,13 +358,13 @@
           "group_by",
           "order",
           "limit",
-          "realtime(0|1|2; default 1)"
+          "mode(0|1|2; default 0)"
         ]
       },
       "rules": [
         "This API aggregates quote rows across stocks at one time point.",
         "agg format is method(metric), for example avg(stock.quote.pct), sum(stock.quote.minute_amount), count(stock.quote.code). Tuple format (avg, stock.quote.pct) is also accepted by code.",
-        "For stock.quote realtime=1/2, amount/volumn are per-minute values; minute_amount/minute_volumn are compatibility aliases.",
+        "For stock.quote mode=1, amount/volumn are native 1m interval values; mode=2 uses the current daily running bar, whose amount/volumn are cumulative for the day. minute_amount/minute_volumn remain compatibility aliases for mode=1.",
         "Minute rows start at 09:30; pre-market snapshots are excluded.",
         "One agg request computes one target; split multiple metrics into multiple steps."
       ],
@@ -288,11 +379,11 @@
     },
     "intraday_same_minute_kday_metric": {
       "desc": "行情 K 日同分钟指标 API，用于比较当前分钟成交量、成交额等与近 K 个交易日同一时刻的水平。",
-      "call_pattern": "r{id} = stock.quote.kd_<field>_<method>(k, filter, order, limit, realtime) -> code, name, current_value, value as alias, window_count",
+      "call_pattern": "r{id} = stock.quote.kd_<field>_<method>(k, filter, order, limit, mode) -> code, name, current_value, value as alias, window_count",
       "examples": [
         "r1 = stock.quote.kd_minute_amount_avg(k = 5, filter = \"code = 600519.SH\", order = \"value desc\", limit = 1) -> code, name, tradedate, minute_index, current_value, value as avg_minute_amount_5d, change_pct, window_count\nnote: value 是过去5个交易日同一分钟的 minute_amount 均值，current_value 是当前分钟实际成交额，change_pct 是相对均值变化百分比。",
         "r2 = stock.quote.kd_minute_amount_percentile(k = 10, filter = \"pct > 0\", order = \"value desc\", limit = 20) -> code, name, current_value, value as minute_amount_pctile_10d\nnote: percentile 表示当前分钟成交额在过去10个交易日同一分钟历史值中的分位，越接近1表示越放量。",
-        "r3 = stock.quote.kd_volumn_max(k = 5, filter = \"snapshot_slot = 13:05\", order = \"current_value desc\", limit = 10) -> code, name, current_value, value as max_minute_volume_5d\nnote: realtime=1/2 时 volumn 是该分钟成交量。",
+        "r3 = stock.quote.kd_volumn_max(k = 5, filter = \"snapshot_slot = 13:05\", order = \"current_value desc\", limit = 10, mode = 1) -> code, name, current_value, value as max_minute_volume_5d\nnote: 同分钟K日比较使用 mode=1，volumn 是原生1分钟区间成交量。",
         "r4 = stock.quote.kd_minute_volumn_avg(k = 10, filter = \"change_pct > 20\", order = \"change_pct desc\", limit = 20) -> code, name, current_value, value as avg_minute_volumn_10d, change_pct, window_count\nnote: 表示当前分钟成交量超过过去10个交易日同一分钟均值20%的股票。"
       ],
       "output_rule": "通常输出 code, name, tradedate, minute_index, current_value, value as alias, change_pct, window_count；value 的含义由方法决定：avg/max/min/median 为历史统计值，percentile 为当前值相对历史同分钟的分位；change_pct 表示 current_value 相对 value 的变化百分比。",
@@ -304,12 +395,12 @@
           "filter",
           "order",
           "limit",
-          "realtime(0|1|2; default 1)"
+          "mode(0|1|2; default 1)"
         ]
       },
       "rules": [
         "API name format is stock.quote.kd_<field>_<method>.",
-        "For stock.quote realtime=1/2, amount/volumn are per-minute values; minute_amount/minute_volumn are compatibility aliases.",
+        "For same-minute quote windows, amount/volumn are native 1m interval values; minute_amount/minute_volumn are compatibility aliases.",
         "Same-minute windows use minute rows from 09:30 onward and exclude pre-market snapshots.",
         "For 当前分钟成交量超过近N天均值20% questions, use method avg and filter change_pct > 20.",
         "percentile returns the percentile of current_value among previous K same-minute historical values."
@@ -361,7 +452,7 @@
         ]
       },
       "quote": {
-        "desc": "个股行情视图。realtime=0 返回历史日K；realtime=1 返回从09:30开始的分钟K序列；realtime=2 仅返回09:30以后的最新一分钟K，即最新行情。盘前快照不返回。",
+        "desc": "个股行情视图。mode=0 返回截至上一交易日的日K；mode=1 按period和count返回源表真实的1/3/5/10/15/30/60分钟K；mode=2返回最新当日1d运行K。",
         "fields": {
           "code": [
             "股票代码",
@@ -383,20 +474,20 @@
             "前收盘价"
           ],
           "open": [
-            "开盘价（元；realtime=1/2 时为分钟开盘价，09:30取当日开盘价）",
+            "开盘价（元；mode=1时为该真实分钟K开盘价，mode=2时为当前当日开盘价）",
             "开盘价"
           ],
           "close": [
-            "收盘价（元；realtime=1/2 时为分钟收盘价）",
+            "收盘价（元；mode=1时为分钟K收盘价，mode=2时为当前最新价）",
             "最新价",
             "收盘价"
           ],
           "high": [
-            "最高价（元）",
+            "最高价（元；mode=1时为真实分钟K最高价，mode=2时为截至当前的日内最高价）",
             "最高价"
           ],
           "low": [
-            "最低价（元）",
+            "最低价（元；mode=1时为真实分钟K最低价，mode=2时为截至当前的日内最低价）",
             "最低价"
           ],
           "avg_price": [
@@ -415,11 +506,11 @@
             "turn_ratio"
           ],
           "amount": [
-            "成交额（元；realtime=1/2 时为分钟成交额）",
+            "成交额（元；mode=1时为该分钟K区间成交额，mode=2时为截至快照的当日累计成交额）",
             "成交额"
           ],
           "volumn": [
-            "成交量（realtime=0：股；realtime=1/2：手，1手=100股）",
+            "成交量（mode=0：股；mode=1：该分钟K区间成交量；mode=2：截至快照的当日累计成交量）",
             "成交量",
             "volume"
           ],
@@ -467,6 +558,30 @@
             "分钟时点",
             "时刻"
           ],
+          "bar_start_time": [
+            "K线开始时间",
+            "bar_start_time"
+          ],
+          "bar_end_time": [
+            "K线结束时间",
+            "bar_end_time"
+          ],
+          "kline_type": [
+            "K线周期类型",
+            "kline_type"
+          ],
+          "period_minutes": [
+            "K线周期分钟数",
+            "period_minutes"
+          ],
+          "is_finalized": [
+            "K线是否已完成",
+            "is_finalized"
+          ],
+          "source_bar_count": [
+            "源K线数量",
+            "source_bar_count"
+          ],
           "minute_amount": [
             "分钟成交额（元，amount 的兼容别名）",
             "分钟成交额"
@@ -480,13 +595,13 @@
         "api": [
           {
             "api_name": "stock.quote",
-            "api_function": "查询个股行情：realtime=0 为历史日K，realtime=1 为从09:30开始的分钟K序列，realtime=2 为09:30以后的最新一分钟K（最新行情）；盘前快照不返回。",
-            "api_class": "basic_query"
+            "api_function": "查询个股行情：mode=0为截至上一交易日的日K，mode=1按period和count返回源表真实的1/3/5/10/15/30/60分钟K，mode=2为最新当日1d运行K。",
+            "api_class": "stock_quote_query"
           },
           {
             "api_name": "stock.quote.kd_<field>_<method>",
             "api_function": "计算个股近K日行情窗口指标，例如累计涨幅、均值、最高值、最低值、中位数和同时间点对比。",
-            "api_class": "kday_metric"
+            "api_class": "stock_quote_kday_metric"
           },
           {
             "api_name": "stock.quote.agg",
@@ -500,11 +615,11 @@
           }
         ],
         "rules": [
-          "stock.quote 的 realtime=0 返回历史日K。",
-          "stock.quote 的 realtime=1 从09:30开始返回分钟K序列，盘前快照不返回。",
-          "09:30第一根分钟K的open取当日开盘价，amount/volumn取09:30时点累计值；后续分钟open取上一分钟close，amount/volumn取相邻分钟累计值之差。",
-          "stock.quote 的 realtime=2 仅返回09:30以后的最新一分钟K，即最新行情。",
-          "历史行情使用 realtime=0，从09:30开始的分钟K序列使用 realtime=1，当前或最新行情使用 realtime=2。"
+          "stock.quote 的 mode=0 返回截至上一交易日的日K，count表示每只股票返回的最近根数。",
+          "stock.quote 的 mode=1 使用period=1/3/5/10/15/30/60与count=根数；分钟K由源表直接产出，不由模型拆日期、循环或临时计算。",
+          "分钟K的 amount/volumn 是该根真实K线的区间值。最新一根可通过 is_finalized、source_bar_count、bar_start_time 和 bar_end_time 判断是否完成。",
+          "stock.quote 的 mode=2 返回最新当日1d运行K，即实时行情与截至快照的当日累计成交。",
+          "截至上一交易日的日K使用 mode=0，分钟K序列使用 mode=1，实时行情使用 mode=2；不要使用 realtime。"
         ],
         "kd": {
           "pct": [
@@ -1040,6 +1155,11 @@
             "api_class": "financial_query"
           }
         ],
+        "rules": [
+          "不传report_date/report_period/start/end且filter中也没有报告期条件时，只查询数据源全局最新报告期；order和limit不会扩展为历史报告期。",
+          "查询单只股票最新财务状况或多期比较时，应显式传start和end，或在filter中给出report_period范围，再按report_period倒序和limit取所需期间。",
+          "同一份多期查询能够支持比较时，不按报告期拆成多次单行查询。"
+        ],
       "computed": {
           "suffixes": [
             "yoy",
@@ -1137,6 +1257,35 @@
           "report_date/report_period 是研报发布日期，不是财务报表报告期；按日期范围使用 >= 和 <= 两个边界条件。",
           "目标价字段按语义返回 target_price_lower 和 target_price_upper；不要直接使用底层视图的中文别名判断上下限。",
           "需要完整返回符合条件的研报或指标记录时使用 limit = -1；若返回行数达到 limit，不得表述为全部数据。"
+        ]
+      },
+      "news": {
+        "desc": "个股新闻视图，按股票、关键词与自然日时间范围查询当前配置的新闻索引。",
+        "fields": {
+          "code": ["股票代码", "证券代码", "code"],
+          "name": ["股票名称", "证券名称", "name"],
+          "publish_time": ["发布时间", "发布日期", "publish_time"],
+          "source": ["新闻来源", "来源", "source"],
+          "title": ["新闻标题", "标题", "title"],
+          "url": ["新闻链接", "链接", "url"],
+          "snippet": ["新闻摘要", "摘要", "snippet"],
+          "category": ["新闻分类", "分类", "category"],
+          "score": ["检索相关度", "相关度", "score"],
+          "document_id": ["新闻文档ID", "document_id"]
+        },
+        "api": [
+          {
+            "api_name": "stock.news",
+            "api_function": "查询指定个股、关键词和自然日时间范围内的新闻。",
+            "api_class": "news_query"
+          }
+        ],
+        "rules": [
+          "filter 必须包含 code、name、query 或 keyword 之一；个股问题优先使用 code 或 name。",
+          "publish_time 是自然日发布时间，不使用交易日偏移；时间范围使用 >= 和 <=。",
+          "order 可用 publish_time desc/asc；不传时按相关度和发布时间综合排序。",
+          "正常返回0条表示索引内未检索到证据，不重试；provider_error 才表示搜索服务失败。",
+          "coverage=internal_news 表示当前只覆盖内部新闻索引，不得表述为完整互联网搜索。"
         ]
       },
       "margin": {
@@ -2004,6 +2153,8 @@
         ],
         "rules": [
           "基础明细查询使用 stock.margin，通过 filter/order/limit 表达筛选、排序和取前N。",
+          "不传date/start/end时，stock.margin只查询数据源最新交易日；order和limit不会把它扩展为历史序列。",
+          "查询融资融券历史明细时同时传start和end，再用order和limit控制返回顺序与条数。",
           "K 日窗口方法使用 stock.margin.kd_<field>_<method>；常见 method 从 sum/avg/max/min/median/change/pct_change 中按用户语义直译选择。",
           "问近K日合计/均值/最大/最小/中位数/变化/变化率时，分别使用 sum/avg/max/min/median/change/pct_change。",
           "融资余额、两融余额等余额类指标也按用户字面要求选择方法，不在此处做业务裁判。"
@@ -2770,9 +2921,9 @@
       "_meta": {
         "desc": "板块主体，用于板块基础信息、行情、资金流、估值、成分股和成分股聚合查询。",
         "rules": [
-          "中文板块名称先通过 plate.basic_info 定位：完整名称优先使用 plate_name = 名称；只有名称不完整或不确定时，才使用 plate_name like '%关键词%'。",
+          "中文板块名称先通过 plate.basic_info 定位并优先使用 plate_name = 名称。精确名称无结果时，basic_info 会在工具内部做一次受控包含候选解析：唯一候选直接返回，多候选返回歧义诊断；不要先由模型自行扩大 LIKE 范围。",
           "定位成功后，板块行情、资金流和近 K 日指标优先使用返回的 plate_code 作为 code 条件，不要在下游数据查询中重复模糊搜索名称。",
-          "LIKE 只用于 plate.basic_info 的 plate_name 名称定位；不得假设其他板块 dataview 也支持模糊查询。"
+          "LIKE 只用于用户明确要求名称包含匹配的 plate.basic_info 查询；不得因零行自动增加百分号，也不得假设其他板块 dataview 支持模糊查询。"
         ]
       },
       "basic_info": {

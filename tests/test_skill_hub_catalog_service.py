@@ -45,6 +45,23 @@ def _write_business_skill(root: Path, *, name: str) -> None:
         ),
         encoding="utf-8",
     )
+    (skill_dir / "agents").mkdir()
+    (skill_dir / "agents" / "openai.yaml").write_text(
+        "\n".join(
+            [
+                "interface:",
+                '  display_name: "Test Research"',
+                '  short_description: "Readable research method"',
+                '  default_prompt: "Use this research method."',
+            ]
+        ),
+        encoding="utf-8",
+    )
+    (skill_dir / "references").mkdir()
+    (skill_dir / "references" / "method.md").write_text(
+        "# Test Method\n\nReference details.\n",
+        encoding="utf-8",
+    )
 
 
 def _write_legacy_skill(
@@ -129,13 +146,14 @@ def test_hub_keeps_discovery_unified_and_execution_semantics_separate(
     assert business["invocation_mode"] == "finance_cc_preference"
     assert business["invocation_enabled"] is False
     assert business["editable"] is False
-    assert business["workspace_url"] == "/skills"
+    assert business["display_name"] == "Test Research"
+    assert business["workspace_url"].startswith("/skills/studio/stock-research")
     assert business["tools"] == ["mcp__finance__financial_news_search"]
     assert legacy["invocation_mode"] == "legacy_runner"
     assert legacy["invocation_enabled"] is True
     assert legacy["catalog_id"] == "skill:legacy_compiled:stock-research"
     assert legacy["editable"] is False
-    assert legacy["workspace_url"] == "/skills"
+    assert legacy["workspace_url"].startswith("/skills/studio/stock-research")
     assert draft["invocation_enabled"] is False
     assert hidden["invocation_enabled"] is False
     assert [
@@ -146,6 +164,26 @@ def test_hub_keeps_discovery_unified_and_execution_semantics_separate(
         "internal-research",
         shared_name,
     ]
+
+    detail = service.detail(
+        shared_name,
+        catalog_id="skill:business_method:stock-research",
+    )
+    assert detail is not None
+    assert detail["display_name"] == "Test Research"
+    assert detail["detail_available"] is True
+    assert detail["controls"] == {
+        "execution_budget": "standard",
+        "supplemental_tools": ["mcp__finance__financial_news_search"],
+        "web_search_enabled": False,
+    }
+    assert detail["references"][0]["title"] == "Test Method"
+    reference = service.load_business_reference(
+        shared_name,
+        "references/method.md",
+        expected_revision=detail["revision"],
+    )
+    assert reference["content"] == "# Test Method\n\nReference details.\n"
 
 
 def test_hub_business_rows_follow_only_explicit_snapshot_reload(
@@ -223,6 +261,48 @@ def test_skill_hub_api_uses_read_only_unified_catalog(monkeypatch) -> None:
     ]
 
 
+def test_skill_hub_detail_api_is_read_only_and_reference_is_revision_bound(
+    monkeypatch,
+) -> None:
+    from src.web import flask_app as web
+
+    monkeypatch.setattr(
+        web.skill_hub_catalog_service,
+        "detail",
+        lambda skill_name, catalog_id="": {
+            "skill_id": skill_name,
+            "catalog_id": catalog_id,
+            "skill_type": "business_method",
+            "skill_markdown": "# Method",
+        },
+    )
+    monkeypatch.setattr(
+        web.skill_hub_catalog_service,
+        "load_business_reference",
+        lambda skill_name, reference_path, expected_revision="": {
+            "skill_id": skill_name,
+            "reference": reference_path,
+            "revision": expected_revision,
+            "content": "# Reference",
+        },
+    )
+
+    client = web.app.test_client()
+    detail = client.get(
+        "/api/skill-hub/stock-research"
+        "?catalog_id=skill%3Abusiness_method%3Astock-research"
+    )
+    reference = client.get(
+        "/api/skill-hub/stock-research/references/references/method.md"
+        "?revision=r1"
+    )
+
+    assert detail.status_code == 200
+    assert detail.get_json()["skill"]["skill_markdown"] == "# Method"
+    assert reference.status_code == 200
+    assert reference.get_json()["content"] == "# Reference"
+
+
 def test_chat_skill_catalog_paths_use_the_hub_without_changing_execution(
     monkeypatch,
 ) -> None:
@@ -269,3 +349,11 @@ def test_public_hub_renders_catalog_values_as_text_nodes() -> None:
     assert "innerHTML" not in template
     assert "textContent" in template
     assert "replaceChildren" in template
+
+    studio = Path("src/web/templates/skill_studio_v2.html").read_text(
+        encoding="utf-8"
+    )
+    assert "innerHTML" not in studio
+    assert "textContent" in studio
+    assert "fin_agent.pending_prompt" in studio
+    assert "candidate" in studio

@@ -206,7 +206,9 @@ class FinanceCcSystemTools:
                         finance_tool_profile
                     )
                 working_state["design_contract"] = design_contract
-                working_state["tool_name"] = _trim(design_contract.get("tool_name"))
+                design_tool_name = _trim(design_contract.get("tool_name"))
+                if design_tool_name:
+                    working_state["tool_name"] = design_tool_name
                 return
             if artifact_type == "flow":
                 mermaid = _trim(payload.get("mermaid"))

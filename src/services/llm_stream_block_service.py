@@ -186,6 +186,8 @@ class LlmStreamBlockBuilder:
 
         if stage == "coding" and event_type == "context_ready":
             return [self._progress_block(stage=stage, event_type=event_type)]
+        if stage == "coding" and event_type == "contract_repair" and content:
+            return [self._coding_progress_update(content, status="running")]
         if event_type in {"stage_start", "context_ready", "tool_call", "turn_started", "turn_completed", "stage_result", "error"}:
             blocks = [self._progress_block(
                 stage=stage,

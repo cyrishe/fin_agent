@@ -8,7 +8,7 @@ import {
   removeInvocation,
   type ComposerSuggestion,
 } from "../composerSuggestions";
-import type { Attachment, InvocationAsset } from "../types";
+import type { Attachment, InvocationAsset, ResearchMode } from "../types";
 
 interface Props {
   value: string;
@@ -23,7 +23,19 @@ interface Props {
   attachments: Attachment[];
   onFiles: (files: File[]) => void;
   onRemoveAttachment: (index: number) => void;
+  researchMode: ResearchMode;
+  onResearchModeChange: (mode: ResearchMode) => void;
 }
+
+const researchModes: Array<{
+  value: ResearchMode;
+  label: string;
+  description: string;
+}> = [
+  { value: "fast", label: "快速", description: "聚焦核心结论和最少必要证据" },
+  { value: "auto", label: "智能", description: "由业务 Skill 判断本题需要的分析深度" },
+  { value: "deep", label: "深度", description: "扩展关键证据、反证和验证点" },
+];
 
 export default function Composer(props: Props) {
   const fileRef = useRef<HTMLInputElement>(null);
@@ -235,6 +247,17 @@ export default function Composer(props: Props) {
           <div>
             <button type="button" className="tool-button" onClick={() => fileRef.current?.click()} title="上传文档或表格"><Paperclip size={17} /><span>附件</span></button>
             <button type="button" className="tool-button" onClick={() => imageRef.current?.click()} title="上传图片"><ImagePlus size={17} /><span>图片</span></button>
+          </div>
+          <div className="research-mode-control" role="group" aria-label="分析模式">
+            {researchModes.map((mode) => <button
+              key={mode.value}
+              type="button"
+              className={props.researchMode === mode.value ? "active" : ""}
+              aria-pressed={props.researchMode === mode.value}
+              disabled={props.busy}
+              title={mode.description}
+              onClick={() => props.onResearchModeChange(mode.value)}
+            >{mode.label}</button>)}
           </div>
           <button type="button" className="send-button" disabled={props.busy || (!props.value.trim() && !props.attachments.length && !props.selectedAsset)} onClick={props.onSend} aria-label="发送消息">{props.busy ? <LoaderCircle className="spin" size={18} /> : <ArrowUp size={19} />}</button>
         </div>

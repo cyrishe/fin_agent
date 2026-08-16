@@ -495,7 +495,8 @@ class CodexExecSkillHarness:
         elif _trim(stage) == "edit_coding":
             file_context = (
                 "只读取 CONTEXT.design_ref、current_implementation.manifest_ref、列出的现有模块文件和 "
-                "implementation_instruction；不要读取 API Catalog 或无关资料。\n"
+                "implementation_instruction；若存在 CONTEXT.api_dependency_ref，只有本次修改涉及数据读取时才读取。"
+                "不要扫描完整 API Catalog 或无关资料。\n"
             )
         elif _trim(stage) == "coding":
             file_context = (
@@ -1371,7 +1372,8 @@ class CodexSdkSkillHarness(CodexExecSkillHarness):
         elif _trim(stage) == "edit_coding":
             stage_guidance = (
                 "按 CODING_WORKSPACE.md 只修改 current_implementation.module_files 中与 "
-                "implementation_instruction 直接相关的现有代码；不读取 API Catalog，不重做 Design，"
+                "implementation_instruction 直接相关的现有代码；涉及已有金融数据调用时按 "
+                "api_dependency_ref 的窄契约修改，不扫描完整 API Catalog，不重做 Design，"
                 "用本地合成正反例验证。\n"
             )
         return (
@@ -2167,6 +2169,17 @@ class CodexCustomToolCoder:
         lowered = f"{kind} {text}".lower()
         if "invalid_json_schema" in lowered or "invalid schema for response_format" in lowered:
             field = ""
+            missing_required = re.search(
+                r"\bmissing\s+['\"]([^'\"]+)['\"]",
+                text,
+                flags=re.IGNORECASE,
+            )
+            if missing_required:
+                field = _trim(missing_required.group(1))
+                return {
+                    "code": "coding_schema_invalid",
+                    "summary": f"字段 {field} 未包含在严格 Schema 的 required 声明中。",
+                }
             marker = "in context=('properties', '"
             if marker in lowered:
                 field = lowered.split(marker, 1)[1].split("'", 1)[0].strip()

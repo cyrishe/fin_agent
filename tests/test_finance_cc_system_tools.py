@@ -404,7 +404,6 @@ def test_finance_cc_saved_design_is_visible_to_later_tools_in_same_turn() -> Non
     tools, _, _ = _tools(implementation_runner=implementation_runner)
     design_payload = {
         "design": "## 新工具\n读取所需数据，计算结果并返回。",
-        "presentation_hint": "可选展示信息",
     }
 
     saved = asyncio.run(
@@ -425,14 +424,15 @@ def test_finance_cc_saved_design_is_visible_to_later_tools_in_same_turn() -> Non
         tools["implement_dynamic_tool"].handler({"instruction": "按刚保存的设计实现"})
     )
 
-    assert saved.get("isError") is not True
-    assert flow.get("isError") is not True
+    assert "error" not in saved["content"][0]["text"]
+    assert "error" not in flow["content"][0]["text"]
     assert "读取所需数据" in viewed["content"][0]["text"]
-    assert implemented.get("isError") is not True
+    assert "error" not in implemented["content"][0]["text"]
+    assert '"tool_name": "demo_tool"' in saved["content"][0]["text"]
     assert "读取所需数据" in calls[0]["state"]["design_contract"]["document"]
 
 
-def test_action_design_is_saved_but_never_reaches_implementation_runner() -> None:
+def test_legacy_profile_design_is_rejected_and_never_reaches_implementation_runner() -> None:
     calls = []
     service = FinanceCcSystemTools(
         custom_tool_store=FakeStore(),
@@ -465,24 +465,12 @@ def test_action_design_is_saved_but_never_reaches_implementation_runner() -> Non
             }
         )
     )
-    asyncio.run(
-        tools["save_finance_artifact"].handler(
-            {
-                "artifact_type": "flow",
-                "payload": {"mermaid": "flowchart TD\nA[订单草案] --> B[人工确认]"},
-            }
-        )
-    )
-    viewed = asyncio.run(
-        tools["read_finance_asset"].handler({"asset_type": "design"})
-    )
     implemented = asyncio.run(
         tools["implement_dynamic_tool"].handler({"instruction": "实现并注册"})
     )
 
-    assert saved.get("isError") is not True
-    assert '"family": "action"' in viewed["content"][0]["text"]
-    assert "只保存和展示设计" in implemented["content"][0]["text"]
+    assert "artifact validation failed" in saved["content"][0]["text"]
+    assert "design" in implemented["content"][0]["text"].lower()
     assert calls == []
 
 

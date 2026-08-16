@@ -1,4 +1,4 @@
 interface:
   display_name: "行业与主题分析"
-  short_description: "分析行业主题表现、内部结构、持续性、主要驱动与代表公司"
-  default_prompt: "Use $sector-theme-analysis to analyze this sector or market theme."
+  short_description: "分析行业主题的参与度、内部分化、事件传导与持续条件"
+  default_prompt: "Use $sector-theme-analysis to assess this sector or theme structure, drivers, and persistence."

@@ -73,6 +73,18 @@ class CustomToolContextBundleService:
             context=raw_context,
         )
         coding_module_records = list(coding_workspace.pop("_module_records", []))
+        edit_dependency_context: Dict[str, Any] = {}
+        if stage_name == "edit_coding":
+            edit_dependency_context = self._edit_api_dependencies(
+                raw_context,
+                self._load_catalog(),
+            )
+            if edit_dependency_context.get("dependencies"):
+                dependency_path = bundle_dir / "api_dependencies.json"
+                self._write_private(dependency_path, edit_dependency_context)
+                prompt_context["api_dependency_ref"] = str(
+                    dependency_path.relative_to(bundle_dir)
+                )
         # The model receives the current requirement in the prompt.  Keep the
         # task file as an asset index instead of copying the same business text
         # into a second context channel.  Design and implementation facts are
@@ -156,7 +168,7 @@ class CustomToolContextBundleService:
                         "读取相关 subject/index.json 定位 dataview 文件；不要全量读取所有 subject 或 dataview。",
                         "每个 dataview 文件独立提供字段、具体方法、参数、返回规则和示例。",
                         (
-                            "生成自定义工具代码时，优先调用 custom_tool_sdk.finance_query(request=...)，不要直接访问数据库或底层 provider。"
+                            "生成自定义工具代码时，调用 custom_tool_sdk.finance_query(request=..., bindings=...)；列表目标通过 bindings 批量传入，不要直接访问数据库或底层 provider。"
                             if coding_stage
                             else "测试规划可据此了解系统能够提供的股票、指数、行业、板块、基金、债券等真实输入范围。"
                         ),
@@ -212,6 +224,8 @@ class CustomToolContextBundleService:
                 "coding_guide": "CODING_WORKSPACE.md",
                 "coding_evidence": "scratch/test_evidence.json",
             })
+            if edit_dependency_context.get("dependencies"):
+                public_bundle["api_dependencies"] = "api_dependencies.json"
         return {
             **public_bundle,
             "_prompt_context": prompt_context,
@@ -621,11 +635,49 @@ class CustomToolContextBundleService:
             "usage": [
                 "data_needs 是设计说明的数据主题、字段和用途，不是 API 名称或 allowlist。",
                 "sources 只提供优先检索的 dataview 资产路径，不复制完整 API 说明；需要其他数据能力时再查 index.json。",
-                "实际查询统一通过 custom_tool_sdk.finance_query(request=...)。",
+                "实际查询统一通过 custom_tool_sdk.finance_query；列表目标使用 bindings 批量传入。",
                 "查询只使用 catalog 中真实存在的字段；不要为计算方便发明字段、别名或代理口径。",
             ],
             "data_needs": data_needs,
             "sources": sources,
+        }
+
+    def _edit_api_dependencies(
+        self,
+        context: Mapping[str, Any],
+        catalog: Mapping[str, Any],
+    ) -> Dict[str, Any]:
+        """Materialize only formal API contracts already referenced by an edited asset."""
+        implementation = context.get("current_implementation")
+        implementation = implementation if isinstance(implementation, Mapping) else {}
+        source = "\n".join(
+            _trim(module.get("source_code"))
+            for module in implementation.get("modules") or []
+            if isinstance(module, Mapping) and _trim(module.get("source_code"))
+        )
+        subjects = catalog.get("subjects") if isinstance(catalog.get("subjects"), Mapping) else {}
+        patterns = catalog.get("api_class_patterns") if isinstance(catalog.get("api_class_patterns"), Mapping) else {}
+        dependencies: list[Dict[str, Any]] = []
+        for subject, dataview in sorted(set(re.findall(r"\b([a-z][a-z0-9_]*)\.([a-z][a-z0-9_]*)\b", source))):
+            subject_obj = subjects.get(subject) if isinstance(subjects.get(subject), Mapping) else {}
+            definition = subject_obj.get(dataview) if isinstance(subject_obj.get(dataview), Mapping) else None
+            if not definition:
+                continue
+            dependencies.append(
+                self._compact_dataview(
+                    subject=subject,
+                    dataview=dataview,
+                    definition=definition,
+                    patterns=patterns,
+                )
+            )
+        return {
+            "usage": [
+                "这里只列出当前实现已经依赖的金融 API 契约，不是完整 API Catalog。",
+                "仅当本次 EditPlan 涉及数据读取方式时按此契约修改；否则保持现有查询不变。",
+                "不得扩展到未列出的新数据能力；需要新数据源时返回完整 Design。",
+            ],
+            "dependencies": dependencies,
         }
 
     @staticmethod
@@ -691,10 +743,15 @@ class CustomToolContextBundleService:
         dev_runtime_dir.mkdir(parents=True, exist_ok=True)
         self._restrict_directory(scratch_dir)
         self._restrict_directory(dev_runtime_dir)
-        self._write_private(
-            scratch_dir / "test_evidence.json",
-            {"input": {}, "actual": {}},
-        )
+        evidence_path = scratch_dir / "test_evidence.json"
+        # A repair turn reuses the same Coding workspace.  Its purpose may be
+        # limited to fixing companion metadata, so keep the last real focused
+        # test unless the model explicitly replaces it after another run.
+        if not evidence_path.exists():
+            self._write_private(
+                evidence_path,
+                {"input": {}, "actual": {}},
+            )
         self._write_private(
             dev_runtime_dir / "custom_tool_sdk.py",
             '''"""Local test double for isolated Coding checks only."""
@@ -708,10 +765,13 @@ def set_finance_query_handler(handler):
     _handler = handler
 
 
-def finance_query(request: str):
+def finance_query(request: str, bindings=None):
     if _handler is None:
         raise RuntimeError("set a finance query handler in the focused test")
-    return _handler(request)
+    try:
+        return _handler(request, bindings)
+    except TypeError:
+        return _handler(request)
 
 
 def info(message: str, data=None):
@@ -750,7 +810,7 @@ def install_rows(rows):
     data = list(rows)
     columns = list(data[0].keys()) if data else []
     set_finance_query_handler(
-        lambda request: {"ok": True, "error": "", "columns": columns, "data": data, "rows": data}
+        lambda request, bindings=None: {"ok": True, "error": "", "columns": columns, "data": data, "rows": data}
     )
 '''
         )
@@ -772,44 +832,58 @@ def _result(*, result: dict, key_process_info: dict) -> dict:
 
 
 def run(inputs: dict) -> dict:
-    stock_code = str(inputs.get("stock_code") or "").strip()
-    if not stock_code:
+    stock_codes = list(dict.fromkeys(
+        str(item or "").strip()
+        for item in (inputs.get("stock_codes") or [])
+        if str(item or "").strip()
+    ))
+    if not stock_codes:
         return _result(
-            result={"ok": False, "reason": "stock_code is required"},
+            result={"ok": False, "reason": "stock_codes is required", "results": []},
             key_process_info={"stage": "input_validation"},
         )
 
     response = finance_query(
         request=(
-            'latest_quote = stock.quote(filter = "code = '
-            + stock_code
-            + '", order = "tradedate desc", limit = 1) '
+            'latest_quote = stock.quote(codes = $stock_codes, mode = 0, count = 1) '
             '-> code, tradedate, close'
-        )
+        ),
+        bindings={"stock_codes": stock_codes},
     )
     rows = list(response.get("data") or []) if response.get("ok") else []
+    rows_by_code = {str(row.get("code") or ""): row for row in rows}
     key_process_info = {
-        "stock_code": stock_code,
+        "target_count": len(stock_codes),
         "sample_count": len(rows),
         "query_ok": bool(response.get("ok")),
     }
-    if rows:
-        key_process_info.update({
-            "as_of_date": rows[0].get("tradedate"),
-            "close": rows[0].get("close"),
-        })
     if not response.get("ok"):
         return _result(
-            result={"ok": False, "reason": str(response.get("error") or "finance query failed")},
+            result={
+                "ok": False,
+                "reason": str(response.get("error") or "finance query failed"),
+                "results": [],
+            },
             key_process_info=key_process_info,
         )
-    if not rows:
-        return _result(
-            result={"ok": True, "reason": "no matching data"},
-            key_process_info=key_process_info,
-        )
+    results = []
+    for stock_code in stock_codes:
+        row = rows_by_code.get(stock_code)
+        if row is None:
+            results.append({
+                "stock_code": stock_code,
+                "ok": False,
+                "reason": "no matching data",
+            })
+            continue
+        results.append({
+            "stock_code": stock_code,
+            "ok": True,
+            "as_of_date": row.get("tradedate"),
+            "close": row.get("close"),
+        })
     return _result(
-        result={"ok": True, "close": rows[0].get("close")},
+        result={"ok": True, "results": results},
         key_process_info=key_process_info,
     )
 '''
@@ -1050,8 +1124,9 @@ def run(inputs: dict) -> dict:
                 field = str(kd[0]) if isinstance(kd, list) and kd else "field"
                 method = "percentile" if api_name.endswith("_percentile") else "avg"
             concrete_api = api_name.replace("<field>", field).replace("<method>", method)
+            time_arg = "mode = 0" if concrete_api.startswith("stock.quote") else "realtime = 0"
             return (
-                f"{result_name} = {concrete_api}(k = 20, realtime = 0) "
+                f"{result_name} = {concrete_api}(k = 20, {time_arg}) "
                 f"-> code, name, value as {field}_{method}_20d"
             )
         if api_class == "constituent_aggregate":
@@ -1067,7 +1142,7 @@ def run(inputs: dict) -> dict:
         if api_class == "intraday_cross_section_aggregate":
             return (
                 f"{result_name} = {api_name}("
-                "agg = avg(stock.quote.pct), realtime = 2"
+                "agg = avg(stock.quote.pct), mode = 2"
                 ") -> avg_pct"
             )
         if api_class == "dynamic_quote_cal":
@@ -1075,7 +1150,7 @@ def run(inputs: dict) -> dict:
                 f"{result_name} = {api_name}("
                 'k = 20, fields = "code, name, tradedate, open, close", '
                 'task = "统计每只股票近20个交易日收盘价高于开盘价的天数", '
-                "realtime = 0"
+                "mode = 0"
                 ") -> code, name, close_gt_open_days"
             )
         return f"{result_name} = {api_name}(limit = 20) -> {output_fields}"
@@ -1115,9 +1190,15 @@ def run(inputs: dict) -> dict:
     def _sdk_doc() -> str:
         return """# custom_tool_sdk
 
-`finance_query(request: str) -> dict`
+`finance_query(request: str, bindings: dict | None = None) -> dict`
+
+`info(message: str, data: dict | None = None) -> None` emits a concise business progress update. Use 2–4 updates for a long batch run; do not log once per target.
 
 Request format: `result_name = api_name(arguments) -> output_fields`.
+
+Large target lists must be passed out of band: write an exact placeholder such as `codes = $stock_codes` in the request and pass `bindings={"stock_codes": stock_codes}`. Do not interpolate target lists into `filter` or call `finance_query` once per target.
+
+The 4,000-character guard applies only to the internal `request` DSL above; it is not a user chat-input limit, and serialized `bindings` do not consume that budget. Bindings are separately protected by the runtime contract (at most 16 keys, 10,000 scalar items, and 1 MiB serialized data per query).
 
 The whole `filter` argument is a quoted string. Values inside it are bare protocol literals, for example `filter = "code = 600519.SH and tradedate <= 2026-07-23"`.
 

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import re
+from datetime import date
 from typing import Mapping
 
 from src.experiments.staged_data_protocol.phase2.agg_protocol import AGG_METHODS, metric_column, parse_agg_spec
@@ -13,6 +14,10 @@ PREVIOUS_METRIC_RE = re.compile(r"^(r\d+)\.([A-Za-z_]\w*)$")
 KD_METHOD_TOKEN_RE = re.compile(r"^[A-Za-z_]\w*$")
 FILTER_REF_PREFIX_RE = re.compile(
     r"\b[A-Za-z_]\w*\s+in\s*$",
+    flags=re.IGNORECASE,
+)
+EXACT_TRADE_DATE_RE = re.compile(
+    r"\b(?:tradedate|trade_date|date)\s*(?:=|==)\s*['\"]?(\d{4}-\d{2}-\d{2})['\"]?",
     flags=re.IGNORECASE,
 )
 
@@ -44,6 +49,8 @@ def validate_call(call: ApiCall, previous_results: Mapping[str, ResultHandle]) -
         if k is not None and (not isinstance(k, int) or k <= 0):
             errors.append("ARG_ERROR: dynamic_cal k must be a positive integer when provided")
         _validate_dynamic_fields(call, view, errors)
+    if resolved.get("subject") == "stock" and resolved.get("dataview") == "quote":
+        _validate_stock_quote_mode(call, errors)
     _validate_common_args(call, errors)
     _validate_refs(call, previous_results, errors)
     _validate_outputs(call, resolved, errors)
@@ -69,12 +76,116 @@ def _allows_kd_fallback(resolved: Mapping[str, object]) -> bool:
 def _validate_common_args(call: ApiCall, errors: list[str]) -> None:
     if "limit" in call.args and not isinstance(call.args.get("limit"), int):
         errors.append(f"ARG_ERROR: limit must be an integer, got={call.args.get('limit')}")
+    elif "limit" in call.args and (
+        isinstance(call.args.get("limit"), bool)
+        or int(call.args.get("limit")) == 0
+        or int(call.args.get("limit")) < -1
+    ):
+        errors.append("ARG_ERROR: limit must be -1 or a positive integer")
     for key, value in call.args.items():
         if not isinstance(value, str):
             continue
         lowered = value.lower()
         if re.search(r"\bselect\b.+\bfrom\s+r\d+\b", lowered):
             errors.append(f"REF_ERROR: {key} must use rN.column refs, not SQL subquery refs")
+
+
+def _validate_stock_quote_mode(call: ApiCall, errors: list[str]) -> None:
+    mode = _stock_quote_effective_mode(call.args)
+    if mode is None:
+        errors.append("ARG_ERROR: stock.quote mode must be one of 0, 1, 2")
+        return
+    if mode == 0:
+        exact_date = _stock_quote_exact_date(call.args)
+        if exact_date is not None and exact_date >= date.today():
+            errors.append(
+                "ARG_ERROR: stock.quote mode=0 only returns day K through the "
+                "previous trading day; use mode=2 for today's "
+                "latest quote or mode=1 for today's minute K"
+            )
+        if "period" in call.args:
+            errors.append("ARG_ERROR: stock.quote period is only valid with mode=1 minute K")
+        if "count" in call.args:
+            count = call.args.get("count")
+            if (
+                not isinstance(count, int)
+                or isinstance(count, bool)
+                or count <= 0
+                or count > 5000
+            ):
+                errors.append(
+                    "ARG_ERROR: stock.quote day K count must be an integer "
+                    "between 1 and 5000 per code"
+                )
+    elif mode == 1:
+        period = _parse_minute_period(call.args.get("period", 1))
+        if period not in {1, 3, 5, 10, 15, 30, 60}:
+            errors.append(
+                "ARG_ERROR: stock.quote minute K period must be one of "
+                "1, 3, 5, 10, 15, 30, 60"
+            )
+        count = call.args.get("count", 100)
+        if not isinstance(count, int) or isinstance(count, bool) or count <= 0 or count > 1000:
+            errors.append("ARG_ERROR: stock.quote minute K count must be an integer between 1 and 1000")
+    elif "period" in call.args or "count" in call.args:
+        errors.append(
+            "ARG_ERROR: stock.quote period/count are not valid with mode=2 latest quote"
+        )
+
+
+def _parse_minute_period(value: object) -> int | None:
+    if isinstance(value, bool):
+        return None
+    text = str(value if value not in (None, "") else 1).strip().lower()
+    if text.endswith("m"):
+        text = text[:-1]
+    try:
+        return int(text)
+    except ValueError:
+        return None
+
+
+def _stock_quote_effective_mode(args: Mapping[str, object]) -> int | None:
+    has_public_mode = "mode" in args
+    raw = args.get("mode", args.get("realtime", 0))
+    if raw in (None, ""):
+        return 0
+    if isinstance(raw, bool):
+        if has_public_mode:
+            return None
+        return 2 if raw else 0
+    if isinstance(raw, int):
+        return raw if raw in {0, 1, 2} else None
+    text = str(raw).strip().lower()
+    if text in {"0", "false", "no", "history", "historical"}:
+        return 0
+    if text in {"1", "true", "yes", "minute", "intraday", "minute_kline"}:
+        return 1
+    if text in {"2", "current", "latest", "realtime", "snapshot"}:
+        return 2
+    return None
+
+
+def _stock_quote_exact_date(args: Mapping[str, object]) -> date | None:
+    for key in ("tradedate", "trade_date", "date"):
+        parsed = _parse_iso_date(args.get(key))
+        if parsed is not None:
+            return parsed
+    filter_text = str(args.get("filter") or "")
+    match = EXACT_TRADE_DATE_RE.search(filter_text)
+    if not match:
+        return None
+    return _parse_iso_date(match.group(1))
+
+
+def _parse_iso_date(value: object) -> date | None:
+    text = str(value or "").strip().strip("\"'")
+    if not text:
+        return None
+    try:
+        return date.fromisoformat(text)
+    except ValueError:
+        return None
 
 
 def _validate_refs(call: ApiCall, previous_results: Mapping[str, ResultHandle], errors: list[str]) -> None:

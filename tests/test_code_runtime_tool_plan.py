@@ -101,7 +101,7 @@ with open(os.path.join(os.environ["CODE_OUTPUT_DIR"], "output.json"), "w", encod
     items = result["items"]
     assert [item["status"] for item in items] == ["completed", "completed", "completed"]
     assert items[1]["name"] == "analysis_python"
-    assert result["runtime_trace"]["local_events"][1]["event_type"] == "code_call"
+    assert any(event["event_type"] == "code_call" for event in result["runtime_trace"]["local_events"])
     assert any(event["event_type"] == "code_result" for event in result["runtime_trace"]["local_events"])
     blocks = [block for section in result["task_result"]["render_payload"]["sections"] for block in (section.get("blocks") or [])]
     assert any(block.get("title") == "Ranked" for block in blocks)

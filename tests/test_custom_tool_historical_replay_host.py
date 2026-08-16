@@ -155,7 +155,7 @@ def test_historical_finance_runtime_injects_cutoff_and_security_scope(monkeypatc
     assert result["ok"] is True
     assert len(captured) == 1
     assert captured[0].args["as_of"] == "2026-07-25"
-    assert captured[0].args["realtime"] == 0
+    assert captured[0].args["mode"] == 0
     assert captured[0].args["codes"] == ["600001", "000002"]
     assert captured[0].args[HISTORICAL_RAW_ONLY_ARG] is True
     assert "name" not in captured[0].args["fields"].split(", ")

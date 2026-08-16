@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import Any, Mapping
 
 from src.backtest import BacktestError
+from src.services.backtest_benchmark_service import BacktestBenchmarkService
 from src.services.buy_and_hold_backtest_service import BuyAndHoldBacktestService
 
 
@@ -13,8 +14,10 @@ class BacktestRunService:
         self,
         *,
         buy_and_hold_service: BuyAndHoldBacktestService | None = None,
+        benchmark_service: BacktestBenchmarkService | None = None,
     ) -> None:
         self.buy_and_hold_service = buy_and_hold_service or BuyAndHoldBacktestService()
+        self.benchmark_service = benchmark_service or BacktestBenchmarkService()
 
     def run(self, request_payload: Mapping[str, Any]) -> dict[str, Any]:
         holdings = request_payload.get("holdings")
@@ -53,8 +56,18 @@ class BacktestRunService:
             **({"weights": weights} if all(supplied) else {}),
         }
         result = self.buy_and_hold_service.run(payload)
+        comparison = self.benchmark_service.analyze(
+            result,
+            primary_subject=str(request_payload.get("benchmark") or "").strip(),
+            context_benchmarks=(
+                request_payload.get("context_benchmarks")
+                if isinstance(request_payload.get("context_benchmarks"), list)
+                else []
+            ),
+        )
         return {
             "ok": True,
             "backtest_type": "fixed_basket",
             **result,
+            "comparison": comparison,
         }

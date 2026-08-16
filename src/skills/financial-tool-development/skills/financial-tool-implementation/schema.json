@@ -44,126 +44,6 @@
     "implementation_summary": {
       "type": "string",
       "description": "面向用户说明工具功能、已完成的业务模块和功能测试，并用具体实现或测试证据说明需求、Design、实现如何对应；不得只写保持一致，不得出现源码文件名或服务器路径。"
-    },
-    "finance_tool_profile": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": [
-        "protocol",
-        "family",
-        "execution_shape",
-        "output_semantic"
-      ],
-      "properties": {
-        "protocol": {
-          "type": "string",
-          "enum": [
-            "finance_tool_profile.v1"
-          ]
-        },
-        "family": {
-          "type": "string",
-          "enum": [
-            "information",
-            "analytics",
-            "strategy",
-            "action"
-          ]
-        },
-        "execution_shape": {
-          "type": "string",
-          "enum": [
-            "aggregate_context",
-            "entity_local",
-            "cross_sectional",
-            "portfolio_stateful"
-          ]
-        },
-        "output_semantic": {
-          "type": "string",
-          "enum": [
-            "facts",
-            "metric",
-            "series",
-            "assessment",
-            "ranked_selection",
-            "signal",
-            "portfolio_target",
-            "action_receipt"
-          ]
-        },
-        "summary": {
-          "type": "string"
-        }
-      }
-    },
-    "strategy_runtime_profile": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": [
-        "protocol",
-        "binding",
-        "required_history_sessions",
-        "default_run_sessions",
-        "default_universe_ref",
-        "market_code"
-      ],
-      "properties": {
-        "protocol": {
-          "type": "string",
-          "enum": [
-            "strategy_runtime_profile.v1"
-          ]
-        },
-        "binding": {
-          "type": "object",
-          "additionalProperties": false,
-          "required": [
-            "field"
-          ],
-          "properties": {
-            "field": {
-              "type": "string"
-            }
-          }
-        },
-        "required_history_sessions": {
-          "type": "integer",
-          "minimum": 0
-        },
-        "default_run_sessions": {
-          "type": "integer",
-          "minimum": 1
-        },
-        "default_universe_ref": {
-          "type": "object"
-        },
-        "market_code": {
-          "type": "string"
-        }
-      }
-    },
-    "selection_output_profile": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": [
-        "candidate_path",
-        "symbol_field",
-        "output_date_path"
-      ],
-      "properties": {
-        "candidate_path": {
-          "type": "string",
-          "description": "Path in the host result envelope, normally data.<public output field>."
-        },
-        "symbol_field": {
-          "type": "string"
-        },
-        "output_date_path": {
-          "type": "string",
-          "description": "Path to the actual data cutoff date in the host result envelope."
-        }
-      }
     }
   },
   "$defs": {
@@ -174,7 +54,8 @@
         "name",
         "type",
         "required",
-        "description"
+        "description",
+        "items_type"
       ],
       "properties": {
         "name": {
@@ -198,13 +79,17 @@
           "type": "string"
         },
         "items_type": {
-          "type": "string",
+          "type": [
+            "string",
+            "null"
+          ],
           "enum": [
             "string",
             "integer",
             "number",
             "boolean",
-            "object"
+            "object",
+            null
           ]
         }
       }

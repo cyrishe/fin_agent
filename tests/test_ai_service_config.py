@@ -13,11 +13,18 @@ def test_ai_service_loads_repo_env_before_client_initialization() -> None:
         "from src.utils.ai_service import llm_config_summary; "
         "s=llm_config_summary(); "
         "assert s['key_present'] is True; "
-        "assert s['key_source'] in {'LLM_API_KEY', 'LLM_KEY', 'DASHSCOPE_API_KEY'}; "
-        "assert 'dashscope.aliyuncs.com/compatible-mode/v1' in s['endpoint']"
+        "assert s['key_source'] in {'LLM_API_KEY', 'LLM_KEY', 'DEEPSEEK_API_KEY', 'DASHSCOPE_API_KEY'}; "
+        "assert 'api.deepseek.com' in s['endpoint']"
     )
     env = os.environ.copy()
-    for name in ("LLM_API_KEY", "LLM_KEY", "DASHSCOPE_API_KEY", "LLM_ENDPOINT", "LLM_BASE_URL"):
+    for name in (
+        "LLM_API_KEY",
+        "LLM_KEY",
+        "DEEPSEEK_API_KEY",
+        "DASHSCOPE_API_KEY",
+        "LLM_ENDPOINT",
+        "LLM_BASE_URL",
+    ):
         env.pop(name, None)
     result = subprocess.run(
         [sys.executable, "-c", code],

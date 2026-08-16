@@ -458,6 +458,41 @@ class AgentRuntimeLLMPlannerService:
                 "llm_usage": {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0},
             }
 
+        fallback_plan = self._call_fallback_planner(
+            text=objective,
+            recall_query=retrieval_query,
+            tool_queries=[self._trim(item) for item in (tool_queries or []) if self._trim(item)],
+            work_context=ctx,
+            application_context=app_ctx,
+            enable_llm=enable_llm,
+        )
+        normalized_fallback_plan = self._normalize_execution_plan(
+            payload={},
+            fallback_plan=fallback_plan,
+            agent_context=agent_context,
+            analysis_affordances=analysis_affordances,
+            planner_question_contract=planner_question_contract,
+        )
+        return {
+            "ok": True,
+            "source": "planner_empty_fallback",
+            "planner_prompt_key": "system.agent_runtime.planner",
+            "capability_result": capability_result,
+            "structured_task": structured_task,
+            "task_mode_result": task_mode_result,
+            "subject_result": subject_result,
+            "thinking_mode_result": thinking_mode_result,
+            "deep_plan_preview": deep_plan_preview,
+            "prompt_context_sections": prompt_context_sections,
+            "execution_plan": normalized_fallback_plan,
+            "planner_question_contract": planner_question_contract,
+            "clarification_needed": bool(normalized_fallback_plan.get("clarification_needed")),
+            "clarification_questions": normalized_fallback_plan.get("clarification_questions")
+            if isinstance(normalized_fallback_plan.get("clarification_questions"), list)
+            else [],
+            "llm_usage": {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0},
+        }
+
     def _apply_tool_rerank(
         self,
         *,
@@ -515,36 +550,6 @@ class AgentRuntimeLLMPlannerService:
                 ],
             }
         return filtered
-        fallback_plan = self._call_fallback_planner(
-            text=objective,
-            recall_query=retrieval_query,
-            tool_queries=[self._trim(item) for item in (tool_queries or []) if self._trim(item)],
-            work_context=ctx,
-            application_context=app_ctx,
-            enable_llm=enable_llm,
-        )
-        normalized_fallback_plan = self._normalize_execution_plan(
-                payload={},
-                fallback_plan=fallback_plan,
-                agent_context=agent_context,
-                analysis_affordances=analysis_affordances,
-            )
-        return {
-            "ok": True,
-            "source": "planner_empty_fallback",
-            "planner_prompt_key": "system.agent_runtime.planner",
-            "capability_result": capability_result,
-            "structured_task": structured_task,
-            "task_mode_result": task_mode_result,
-            "subject_result": subject_result,
-            "thinking_mode_result": thinking_mode_result,
-            "deep_plan_preview": deep_plan_preview,
-            "prompt_context_sections": prompt_context_sections,
-            "execution_plan": normalized_fallback_plan,
-            "clarification_needed": bool(normalized_fallback_plan.get("clarification_needed")),
-            "clarification_questions": normalized_fallback_plan.get("clarification_questions") if isinstance(normalized_fallback_plan.get("clarification_questions"), list) else [],
-            "llm_usage": {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0},
-        }
 
     def _run_high_level_planner(
         self,

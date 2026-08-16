@@ -182,6 +182,12 @@ def test_database_candidate_does_not_move_pointer_until_atomic_activation() -> N
             "input_schema": {"type": "object"},
             "output_schema": {"type": "object"},
             "code": "def run(inputs): return {'limit': 5}",
+            "modules": [{
+                "module_id": "main",
+                "language": "python",
+                "entrypoint": "run",
+                "source_code": "def run(inputs): return {'limit': 10}",
+            }],
         },
         owner_id="user_a",
         tool_name="ct_threshold",
@@ -192,6 +198,8 @@ def test_database_candidate_does_not_move_pointer_until_atomic_activation() -> N
     assert candidate["manifest"]["current_revision"] == 2
     assert candidate["manifest"]["active_revision"] == 1
     assert candidate["storage"]["is_active"] is False
+    assert "'limit': 5" in candidate["code"]
+    assert "'limit': 5" in candidate["modules"][0]["source_code"]
 
     activated = store.activate_revision(
         "ct_threshold",

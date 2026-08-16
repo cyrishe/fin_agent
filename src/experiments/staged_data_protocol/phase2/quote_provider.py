@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import re
+import os
 from dataclasses import dataclass
 from datetime import date, datetime
 from decimal import Decimal
@@ -14,6 +15,9 @@ from src.utils.mysql_utils import StockInfoDbUtils
 
 TRADE_CALENDAR_TABLE = "aiia_trade_calendar"
 DEFAULT_MARKET_CODE = "CN_A"
+DEFAULT_QUOTE_LIMIT = 100
+DEFAULT_QUOTE_HARD_ROW_LIMIT = 500_000
+MAX_DAILY_COUNT_PER_CODE = 5_000
 
 
 @dataclass(frozen=True)
@@ -190,17 +194,56 @@ def execute_quote_api(*, subject: str, args: Mapping[str, Any], outputs: List[st
             mocked_fields=_mocked_fields(source=source, columns=requested_fields),
         )
 
-    limit = _bounded_limit(args.get("limit"))
+    count_per_code = _daily_count_per_code(args.get("count"))
+    limit_policy = _base_query_limit(args, count_per_code=count_per_code)
+    if limit_policy["error"]:
+        return _standard_result(
+            status="result_too_large",
+            source=source,
+            args=args,
+            columns=requested_fields,
+            rows=[],
+            reason=str(limit_policy["error"]),
+            mocked_fields=_mocked_fields(source=source, columns=requested_fields),
+        )
     where_sql, params = _build_where(source=source, args=args)
     order_sql = _build_order(source=source, args=args)
-    sql = _build_sql(source=source, fields=requested_fields, where_sql=where_sql, order_sql=order_sql)
-    params.append(limit)
+    if count_per_code is not None:
+        sql = _build_per_entity_sql(
+            source=source,
+            fields=requested_fields,
+            where_sql=where_sql,
+            args=args,
+        )
+        params.extend([count_per_code, limit_policy["fetch_limit"]])
+    else:
+        sql = _build_sql(
+            source=source,
+            fields=requested_fields,
+            where_sql=where_sql,
+            order_sql=order_sql,
+        )
+        params.append(limit_policy["fetch_limit"])
 
     db = StockInfoDbUtils(database="kingdomai")
     try:
         with db.conn.cursor(pymysql.cursors.DictCursor) as cursor:
             cursor.execute(sql, tuple(params))
-            raw_rows = cursor.fetchall()
+            raw_rows = list(cursor.fetchall())
+        if limit_policy["detect_overflow"] and len(raw_rows) > limit_policy["hard_limit"]:
+            return _standard_result(
+                status="result_too_large",
+                source=source,
+                args=args,
+                columns=requested_fields,
+                rows=[],
+                reason=(
+                    "matching daily K rows exceed the safety limit "
+                    f"({limit_policy['hard_limit']}); narrow the date range or raise "
+                    "FIN_AGENT_QUOTE_HARD_ROW_LIMIT for an authorized bulk run"
+                ),
+                mocked_fields=_mocked_fields(source=source, columns=requested_fields),
+            )
         rows = [_normalize_row(row, requested_fields) for row in raw_rows]
         return _standard_result(
             status="ok",
@@ -208,7 +251,15 @@ def execute_quote_api(*, subject: str, args: Mapping[str, Any], outputs: List[st
             args=args,
             columns=requested_fields,
             rows=rows,
-            sql_shape=_sql_shape(where_sql=where_sql, order_sql=order_sql, limit=limit),
+            sql_shape={
+                **_sql_shape(
+                    where_sql=where_sql,
+                    order_sql=order_sql,
+                    limit=limit_policy["business_limit"],
+                ),
+                "count_per_code": count_per_code,
+                "hard_row_limit": limit_policy["hard_limit"],
+            },
             mocked_fields=_mocked_fields(source=source, columns=requested_fields),
         )
     except Exception as exc:  # noqa: BLE001 - experiment boundary should return structured failures.
@@ -448,6 +499,85 @@ def _bounded_limit(value: Any) -> int:
     return max(1, min(parsed, 500))
 
 
+def _daily_count_per_code(value: Any) -> int | None:
+    if value in (None, ""):
+        return None
+    try:
+        parsed = int(value)
+    except (TypeError, ValueError):
+        return None
+    if parsed <= 0:
+        return None
+    return parsed
+
+
+def _quote_hard_row_limit() -> int:
+    try:
+        parsed = int(
+            os.environ.get(
+                "FIN_AGENT_QUOTE_HARD_ROW_LIMIT",
+                DEFAULT_QUOTE_HARD_ROW_LIMIT,
+            )
+        )
+    except (TypeError, ValueError):
+        parsed = DEFAULT_QUOTE_HARD_ROW_LIMIT
+    return max(1_000, parsed)
+
+
+def _base_query_limit(
+    args: Mapping[str, Any],
+    *,
+    count_per_code: int | None,
+) -> Dict[str, Any]:
+    hard_limit = _quote_hard_row_limit()
+    has_limit = "limit" in args and args.get("limit") not in (None, "")
+    try:
+        requested = int(args.get("limit")) if has_limit else None
+    except (TypeError, ValueError):
+        requested = None
+    explicit_full = requested == -1
+    if requested is not None and requested < -1:
+        return {
+            "error": "limit must be -1 or a positive integer",
+            "hard_limit": hard_limit,
+        }
+    if requested is not None and requested > hard_limit:
+        return {
+            "error": (
+                f"requested limit {requested} exceeds the safety limit {hard_limit}; "
+                "use limit=-1 for an explicit full query and configure a larger "
+                "FIN_AGENT_QUOTE_HARD_ROW_LIMIT only for an authorized bulk run"
+            ),
+            "hard_limit": hard_limit,
+        }
+    if requested is not None and requested > 0:
+        return {
+            "error": "",
+            "business_limit": requested,
+            "fetch_limit": requested,
+            "hard_limit": hard_limit,
+            "detect_overflow": False,
+            "explicit_full": False,
+        }
+    if explicit_full or count_per_code is not None:
+        return {
+            "error": "",
+            "business_limit": -1 if explicit_full else None,
+            "fetch_limit": hard_limit + 1,
+            "hard_limit": hard_limit,
+            "detect_overflow": True,
+            "explicit_full": explicit_full,
+        }
+    return {
+        "error": "",
+        "business_limit": DEFAULT_QUOTE_LIMIT,
+        "fetch_limit": DEFAULT_QUOTE_LIMIT,
+        "hard_limit": hard_limit,
+        "detect_overflow": False,
+        "explicit_full": False,
+    }
+
+
 def _bounded_k(value: Any) -> int:
     try:
         parsed = int(value)
@@ -468,6 +598,10 @@ def _calendar_as_of(args: Mapping[str, Any]) -> str:
 def _build_where(*, source: QuoteSource, args: Mapping[str, Any]) -> tuple[str, List[Any]]:
     clauses: List[str] = []
     params: List[Any] = []
+    current_date = date.today().isoformat()
+    if source.subject == "stock":
+        clauses.append(f"{source.fields['tradedate']} < %s")
+        params.append(current_date)
     start = str(args.get("start") or args.get("start_date") or "").strip()
     end = str(args.get("end") or args.get("end_date") or "").strip()
     exact_date = str(args.get("date") or args.get("tradedate") or "").strip()
@@ -478,7 +612,14 @@ def _build_where(*, source: QuoteSource, args: Mapping[str, Any]) -> tuple[str, 
         clauses.append(f"{source.fields['tradedate']} BETWEEN %s AND %s")
         params.extend(sorted([start, end]))
     elif not _identity_time_series_request(source=source, args=args):
-        clauses.append(f"{source.fields['tradedate']} = (SELECT MAX(trade_date) FROM {source.table})")
+        if source.subject == "stock":
+            clauses.append(
+                f"{source.fields['tradedate']} = "
+                f"(SELECT MAX(trade_date) FROM {source.table} WHERE trade_date < %s)"
+            )
+            params.append(current_date)
+        else:
+            clauses.append(f"{source.fields['tradedate']} = (SELECT MAX(trade_date) FROM {source.table})")
 
     filters = _explicit_filters(args, subject=source.subject)
     filter_clauses: List[str] = []
@@ -534,6 +675,8 @@ def _build_identity_where(*, source: QuoteSource, args: Mapping[str, Any]) -> tu
 
 
 def _identity_time_series_request(*, source: QuoteSource, args: Mapping[str, Any]) -> bool:
+    if _daily_count_per_code(args.get("count")) is not None:
+        return True
     if _bounded_limit(args.get("limit")) <= 1:
         return False
     order = str(args.get("order") or "").lower()
@@ -617,6 +760,46 @@ def _build_sql(*, source: QuoteSource, fields: List[str], where_sql: str, order_
         LEFT JOIN {source.base_table} b ON {source.join_on}
         WHERE {where_sql}
         ORDER BY {order_sql}
+        LIMIT %s
+    """
+
+
+def _build_per_entity_sql(
+    *,
+    source: QuoteSource,
+    fields: List[str],
+    where_sql: str,
+    args: Mapping[str, Any],
+) -> str:
+    select_sql = ", ".join(
+        f"{source.fields[field]} AS `{field}`" for field in fields
+    )
+    raw_order = str(args.get("order") or "").strip()
+    order_tokens = re.split(r"\s+", raw_order, maxsplit=1) if raw_order else []
+    order_field = order_tokens[0] if order_tokens else "code"
+    order_direction = "ASC" if not order_tokens else (
+        "ASC"
+        if len(order_tokens) > 1 and order_tokens[1].lower().startswith("asc")
+        else "DESC"
+    )
+    order_expression = source.fields.get(order_field, source.fields["code"])
+    return f"""
+        SELECT {", ".join(f"`{field}`" for field in fields)}
+        FROM (
+            SELECT
+                {select_sql},
+                ROW_NUMBER() OVER (
+                    PARTITION BY {source.fields['code']}
+                    ORDER BY {source.fields['tradedate']} DESC
+                ) AS `__entity_row`,
+                {order_expression} AS `__order_value`,
+                {source.fields['tradedate']} AS `__trade_date_sort`
+            FROM {source.table} q
+            LEFT JOIN {source.base_table} b ON {source.join_on}
+            WHERE {where_sql}
+        ) ranked
+        WHERE `__entity_row` <= %s
+        ORDER BY `__order_value` {order_direction}, `__trade_date_sort` DESC
         LIMIT %s
     """
 

@@ -349,8 +349,8 @@ def test_finance_catalog_context_exposes_verified_field_units():
         result_id="r2",
     )
 
-    assert "amount: 成交额（元；realtime=1/2 时为分钟成交额）" in quote_sections["current_dataview"]
-    assert "volumn: 成交量（realtime=0：股；realtime=1/2：手，1手=100股）" in quote_sections["current_dataview"]
+    assert "amount: 成交额（元；mode=1时为该分钟K区间成交额，mode=2时为截至快照的当日累计成交额）" in quote_sections["current_dataview"]
+    assert "volumn: 成交量（mode=0：股；mode=1：该分钟K区间成交量；mode=2：截至快照的当日累计成交量）" in quote_sections["current_dataview"]
     assert "pct: 涨跌幅（%，3.5%记为3.5）" in quote_sections["current_dataview"]
     assert "discount: 折价额（元，单位净值-收盘价）" in fund_sections["current_dataview"]
     assert "unit_total: 基金份额（份）" in fund_sections["current_dataview"]

@@ -128,6 +128,28 @@ def test_activate_revision_switches_complete_bundle_after_optimistic_check(
     assert result["data"] == {"accepted": False}
 
 
+def test_filesystem_candidate_keeps_entry_module_equal_to_authoritative_code(
+    tmp_path: Path,
+) -> None:
+    store = _active_store(tmp_path)
+    design = _design(5)
+    design["modules"] = [{
+        "module_id": "main",
+        "language": "python",
+        "entrypoint": "run",
+        "source_code": "def run(inputs): return {'accepted': True}",
+    }]
+
+    candidate = store.save_candidate_revision(
+        design,
+        owner_id=OWNER_ID,
+        tool_name=TOOL_NAME,
+    )
+
+    assert "<= 5" in candidate["code"]
+    assert "<= 5" in candidate["modules"][0]["source_code"]
+
+
 def test_active_load_follows_manifest_pointer_during_file_switch(tmp_path: Path) -> None:
     store = _active_store(tmp_path)
     candidate = store.save_candidate_revision(

@@ -86,6 +86,31 @@ def _normalized_executable_revision(value: Mapping[str, Any]) -> Dict[str, Any]:
     return result
 
 
+def _synchronized_modules(design: Mapping[str, Any]) -> List[Dict[str, Any]]:
+    modules = [
+        dict(item)
+        for item in design.get("modules") or []
+        if isinstance(item, Mapping)
+    ]
+    code = _trim(design.get("code"))
+    if not modules:
+        return (
+            [
+                {
+                    "module_id": "main",
+                    "language": "python",
+                    "entrypoint": "run",
+                    "source_code": code,
+                }
+            ]
+            if code
+            else []
+        )
+    if code:
+        modules[0]["source_code"] = code
+    return modules
+
+
 class CustomToolStoreService:
     def __init__(self, *, root_dir: Optional[str] = None, backend: str = "") -> None:
         storage_backend = _trim(backend or os.environ.get("FIN_AGENT_CUSTOM_TOOL_STORAGE") or "database").lower()
@@ -146,7 +171,7 @@ class CustomToolStoreService:
         root.joinpath("output_schema.json").write_text(_json_text(design.get("output_schema") or {}), encoding="utf-8")
         spec = {
             "sample_input": dict(design.get("sample_input") or {}),
-            "modules": [dict(item) for item in design.get("modules") or [] if isinstance(item, Mapping)],
+            "modules": _synchronized_modules(design),
             "proposed_tests": [dict(item) for item in design.get("proposed_tests") or [] if isinstance(item, Mapping)],
             "implementation_explanation": dict(design.get("implementation_explanation") or {}),
             "implementation_review": dict(design.get("implementation_review") or {}),
@@ -611,11 +636,7 @@ class CustomToolStoreService:
     def _filesystem_spec(design: Mapping[str, Any]) -> Dict[str, Any]:
         return {
             "sample_input": dict(design.get("sample_input") or {}),
-            "modules": [
-                dict(item)
-                for item in design.get("modules") or []
-                if isinstance(item, Mapping)
-            ],
+            "modules": _synchronized_modules(design),
             "proposed_tests": [
                 dict(item)
                 for item in design.get("proposed_tests") or []
@@ -734,6 +755,7 @@ class CustomToolRuntimeService:
         *,
         owner_ids: Optional[List[str]] = None,
         allow_inactive: bool = True,
+        progress_sink: Optional[Callable[[Dict[str, Any]], None]] = None,
     ) -> Dict[str, Any]:
         try:
             bundle = self.store.load_for_runtime(
@@ -746,6 +768,57 @@ class CustomToolRuntimeService:
         return self._run_loaded_bundle(
             bundle=bundle,
             arguments=arguments,
+            progress_sink=progress_sink,
+        )
+
+    def run_revision(
+        self,
+        tool_name: str,
+        revision_no: int,
+        arguments: Mapping[str, Any] | None = None,
+        *,
+        owner_ids: Optional[List[str]] = None,
+        progress_sink: Optional[Callable[[Dict[str, Any]], None]] = None,
+    ) -> Dict[str, Any]:
+        """Run one immutable revision for an owner-scoped interactive test.
+
+        Candidate revisions must be testable before activation.  Loading the
+        tool by name alone can resolve to the currently active revision, so the
+        test workbench uses this explicit revision boundary.
+        """
+
+        requested_revision = int(revision_no or 0)
+        if requested_revision < 1:
+            return self._error(
+                tool_name,
+                "invalid_revision",
+                "revision_no must be a positive integer",
+            )
+        try:
+            bundle = self.store.load_revision(tool_name, requested_revision)
+        except CustomToolError as exc:
+            return self._error(
+                tool_name,
+                "permission_or_lifecycle_error",
+                str(exc),
+            )
+        manifest = (
+            bundle.get("manifest")
+            if isinstance(bundle.get("manifest"), Mapping)
+            else {}
+        )
+        if owner_ids is not None and _trim(manifest.get("visibility")) == "personal":
+            allowed = {_trim(item) for item in owner_ids if _trim(item)}
+            if _trim(manifest.get("owner_id")) not in allowed:
+                return self._error(
+                    tool_name,
+                    "permission_or_lifecycle_error",
+                    "custom tool is not visible to current user",
+                )
+        return self._run_loaded_bundle(
+            bundle=bundle,
+            arguments=arguments,
+            progress_sink=progress_sink,
         )
 
     def run_loaded_bundle(
@@ -822,6 +895,7 @@ class CustomToolRuntimeService:
         effective_as_of: dt.date | str | None = None,
         allowed_symbols: Sequence[str] = (),
         runtime_backend: str = "",
+        progress_sink: Optional[Callable[[Dict[str, Any]], None]] = None,
     ) -> Dict[str, Any]:
         manifest_value = bundle.get("manifest") if isinstance(bundle, Mapping) else {}
         if not isinstance(manifest_value, Mapping):
@@ -857,6 +931,7 @@ class CustomToolRuntimeService:
         finance_responses: Dict[str, Any] = {}
         finance_bridge_rounds = 0
         finance_bridge_errors: List[str] = []
+        emitted_execution_logs: set[str] = set()
         for attempt in range(1, self.max_finance_queries + 2):
             for child in output_dir.iterdir():
                 if child.is_file():
@@ -872,8 +947,24 @@ class CustomToolRuntimeService:
                 profile=profile,
                 attempt=attempt,
             )
+            attempt_logs = self._load_execution_logs(
+                output_dir / "execution_logs.jsonl"
+            )
+            if callable(progress_sink):
+                for log in attempt_logs:
+                    log_key = json.dumps(log, ensure_ascii=False, sort_keys=True)
+                    if log_key in emitted_execution_logs:
+                        continue
+                    emitted_execution_logs.add(log_key)
+                    try:
+                        progress_sink(dict(log))
+                    except Exception:
+                        # UI streaming is advisory and must not affect execution.
+                        pass
             pending_requests = self._load_finance_requests(output_dir / "finance_requests.json")
-            unresolved = [request for request in pending_requests if request not in finance_responses]
+            unresolved = [
+                item for item in pending_requests if item["key"] not in finance_responses
+            ]
             if not unresolved:
                 break
             if len(finance_responses) + len(unresolved) > self.max_finance_queries:
@@ -883,7 +974,10 @@ class CustomToolRuntimeService:
                     f"custom tool exceeded finance query limit ({self.max_finance_queries})",
                 )
             finance_bridge_rounds += 1
-            for request in unresolved:
+            for item in unresolved:
+                request = item["request"]
+                bindings = item["bindings"]
+                request_key = item["key"]
                 if len(request) > 4000:
                     return self._error(manifest["tool_name"], "finance_query_invalid", "finance query is too long")
                 allowed, denial = self._finance_request_allowed(request, bundle)
@@ -892,15 +986,17 @@ class CustomToolRuntimeService:
                 try:
                     if effective_as_of is None:
                         finance_response = self.finance_runtime.execute_request(
-                            request=request
+                            request=request,
+                            bindings=bindings,
                         )
                     else:
                         finance_response = self.finance_runtime.execute_historical_request(
                             request=request,
                             effective_as_of=effective_as_of,
                             allowed_symbols=list(allowed_symbols),
+                            bindings=bindings,
                         )
-                    finance_responses[request] = finance_response
+                    finance_responses[request_key] = finance_response
                     if effective_as_of is not None and finance_response.get("ok") is not True:
                         execution = (
                             finance_response.get("execution")
@@ -922,7 +1018,7 @@ class CustomToolRuntimeService:
                             "historical_finance_query_failed",
                             "historical finance API execution failed",
                         )
-                    finance_responses[request] = {
+                    finance_responses[request_key] = {
                         "ok": False,
                         "error": "finance API execution failed",
                         "data": [],
@@ -996,14 +1092,48 @@ class CustomToolRuntimeService:
         return self.runtime_root
 
     @staticmethod
-    def _load_finance_requests(path: Path) -> List[str]:
+    def _load_finance_requests(path: Path) -> List[Dict[str, Any]]:
         if not path.exists():
             return []
         try:
             payload = json.loads(path.read_text(encoding="utf-8"))
         except Exception:
             return []
-        return [str(item).strip() for item in payload if isinstance(item, str) and str(item).strip()] if isinstance(payload, list) else []
+        if not isinstance(payload, list):
+            return []
+        requests: List[Dict[str, Any]] = []
+        seen: set[str] = set()
+        for item in payload:
+            if isinstance(item, str):
+                request = item.strip()
+                bindings: Dict[str, Any] = {}
+            elif isinstance(item, Mapping):
+                request = _trim(item.get("request"))
+                raw_bindings = item.get("bindings")
+                bindings = dict(raw_bindings) if isinstance(raw_bindings, Mapping) else {}
+            else:
+                continue
+            if not request:
+                continue
+            key = CustomToolRuntimeService._finance_request_key(
+                request=request,
+                bindings=bindings,
+            )
+            if key in seen:
+                continue
+            seen.add(key)
+            requests.append({"key": key, "request": request, "bindings": bindings})
+        return requests
+
+    @staticmethod
+    def _finance_request_key(*, request: str, bindings: Mapping[str, Any]) -> str:
+        canonical = json.dumps(
+            {"request": str(request or "").strip(), "bindings": dict(bindings)},
+            ensure_ascii=False,
+            sort_keys=True,
+            separators=(",", ":"),
+        )
+        return hashlib.sha256(canonical.encode("utf-8")).hexdigest()
 
     @staticmethod
     def _load_execution_logs(path: Path) -> List[Dict[str, Any]]:
@@ -1050,13 +1180,22 @@ class CustomToolRuntimeService:
             f"_raw = json.loads({fixture_json!r})"
             if fixture_json
             else """request_text = str(request or \"\").strip()
+    binding_values = dict(bindings or {}) if isinstance(bindings, dict) else {}
+    request_key = hashlib.sha256(
+        json.dumps(
+            {\"request\": request_text, \"bindings\": binding_values},
+            ensure_ascii=False,
+            sort_keys=True,
+            separators=(\",\", \":\"),
+        ).encode(\"utf-8\")
+    ).hexdigest()
     try:
         with open(os.path.join(os.environ[\"CODE_INPUT_DIR\"], \"finance_responses.json\"), \"r\", encoding=\"utf-8\") as cache_file:
             response_cache = json.load(cache_file)
     except Exception:
         response_cache = {}
-    if isinstance(response_cache, dict) and request_text in response_cache:
-        _raw = response_cache[request_text]
+    if isinstance(response_cache, dict) and request_key in response_cache:
+        _raw = response_cache[request_key]
     else:
         request_path = os.path.join(os.environ[\"CODE_OUTPUT_DIR\"], \"finance_requests.json\")
         try:
@@ -1066,18 +1205,24 @@ class CustomToolRuntimeService:
             requests = []
         if not isinstance(requests, list):
             requests = []
-        if request_text and request_text not in requests:
-            requests.append(request_text)
+        request_record = {\"request\": request_text, \"bindings\": binding_values}
+        if request_text and request_record not in requests:
+            requests.append(request_record)
         with open(request_path, \"w\", encoding=\"utf-8\") as request_file:
             json.dump(requests, request_file, ensure_ascii=False)
-        _raw = {\"ok\": False, \"error\": \"finance query pending host execution\", \"data\": []}"""
+        raise _FinanceQueryPending(\"finance query pending host execution\")"""
         )
         return f'''from __future__ import annotations
 
 import json
+import hashlib
 import os
 import types
 import sys
+
+
+class _FinanceQueryPending(RuntimeError):
+    pass
 
 
 def _normalize_finance_query_result(raw: object) -> dict:
@@ -1110,7 +1255,7 @@ def _normalize_finance_query_result(raw: object) -> dict:
     return normalized
 
 
-def finance_query(request: str) -> dict:
+def finance_query(request: str, bindings: dict | None = None) -> dict:
     {fixture_branch}
     return _normalize_finance_query_result(_raw)
 
@@ -1178,9 +1323,13 @@ if not callable(_custom_tool_entrypoint):
 
 with open(os.environ["CODE_INPUT_JSON"], "r", encoding="utf-8") as _runtime_input_file:
     _runtime_inputs = json.load(_runtime_input_file)
-_runtime_output = _custom_tool_entrypoint(_runtime_inputs)
-with open(os.path.join(os.environ["CODE_OUTPUT_DIR"], "output.json"), "w", encoding="utf-8") as _runtime_output_file:
-    json.dump(_runtime_output, _runtime_output_file, ensure_ascii=False)
+try:
+    _runtime_output = _custom_tool_entrypoint(_runtime_inputs)
+except _FinanceQueryPending:
+    _runtime_output = None
+if _runtime_output is not None:
+    with open(os.path.join(os.environ["CODE_OUTPUT_DIR"], "output.json"), "w", encoding="utf-8") as _runtime_output_file:
+        json.dump(_runtime_output, _runtime_output_file, ensure_ascii=False)
 '''
 
     @staticmethod
@@ -2392,6 +2541,93 @@ class CustomToolAgentService:
         except TypeError:
             return self.designer.design(requirement_text)
 
+    def _call_coder(
+        self,
+        coder: Any,
+        design_contract: Mapping[str, Any],
+        *,
+        requirement_text: str,
+        coding_context: Mapping[str, Any],
+        event_sink: Optional[Callable[[Dict[str, Any]], None]],
+    ) -> Dict[str, Any]:
+        try:
+            return coder.code(
+                design_contract,
+                requirement_text=requirement_text,
+                context=dict(coding_context),
+                event_sink=event_sink,
+            )
+        except TypeError:
+            return coder.code(
+                design_contract,
+                requirement_text=requirement_text,
+                context=dict(coding_context),
+            )
+
+    def _coding_implementation_meta(
+        self,
+        *,
+        coder: Any,
+        coding_results: Sequence[Mapping[str, Any]],
+        agent_runtime: Mapping[str, Any],
+        is_local_edit: bool,
+    ) -> Dict[str, Any]:
+        raw_results = [
+            item.get("raw") if isinstance(item.get("raw"), Mapping) else {}
+            for item in coding_results
+        ]
+        context_bundle: Mapping[str, Any] = {}
+        for raw in reversed(raw_results):
+            candidate = raw.get("context_bundle")
+            if isinstance(candidate, Mapping) and candidate:
+                context_bundle = candidate
+                break
+        return {
+            "provider": self.coding_provider,
+            "complexity": self.edit_coding_complexity if is_local_edit else self.coding_complexity,
+            "model": _trim(getattr(getattr(coder, "harness", None), "model", "")),
+            "reasoning_effort": _trim(
+                getattr(getattr(coder, "harness", None), "reasoning_effort", "")
+            ),
+            "session_id": _trim(agent_runtime.get("session_id")),
+            "provider_session_id": _trim(agent_runtime.get("provider_session_id")),
+            "duration_ms": sum(int(raw.get("duration_ms") or 0) for raw in raw_results),
+            "contract_repair_attempted": len(coding_results) > 1,
+            "context_bundle": {
+                key: context_bundle.get(key)
+                for key in (
+                    "bundle_id", "owner_scope", "bundle_dir", "api_index", "api_task_context",
+                    "api_sources", "api_dependencies", "runtime_contract", "custom_tool_sdk", "coding_guide",
+                    "module_template", "coding_workspace",
+                )
+                if context_bundle.get(key)
+            },
+        }
+
+    @staticmethod
+    def _strategy_contract_repair_feedback(error: str) -> str:
+        return (
+            "系统在保存前发现本轮公开输出与策略伴随契约不一致："
+            f"{_trim(error)}\n"
+            "请继续使用当前 Coding 工作区修正实现并重新做聚焦验证。"
+            "selection_output_profile 只能映射本轮 tool_contract.outputs 中真实存在的公开输出；"
+            "candidate_path 指向完整候选数组，output_date_path 为空或指向一个唯一标量日期。"
+            "所有路径只用点分隔字段，禁止 [0] 等数组下标；如果需要核对日期，"
+            "即使候选为空，run 也必须返回可解析的顶层日期字段。Host 结果信封前缀由系统统一处理。"
+            "完成后只提交修正后的最终结果。"
+        )
+
+    @staticmethod
+    def _combined_coding_events(
+        coding_results: Sequence[Mapping[str, Any]],
+    ) -> List[Dict[str, Any]]:
+        return [
+            dict(event)
+            for result in coding_results
+            for event in result.get("events") or []
+            if isinstance(event, Mapping)
+        ]
+
     def _confirm_and_code(
         self,
         *,
@@ -2449,148 +2685,181 @@ class CustomToolAgentService:
                 "state": next_state,
                 "thread_context_patch": {"custom_tool_state": next_state},
             }
-        try:
-            coding_context: Dict[str, Any] = {}
-            agent_runtime = (
-                dict(state.get("agent_runtime") or {})
-                if isinstance(state.get("agent_runtime"), Mapping)
+        coding_context: Dict[str, Any] = {}
+        agent_runtime = (
+            dict(state.get("agent_runtime") or {})
+            if isinstance(state.get("agent_runtime"), Mapping)
+            else {}
+        )
+        agent_runtime.setdefault("session_id", uuid.uuid4().hex)
+        coding_context["_agent_runtime"] = agent_runtime
+        coding_feedback = _trim(state.get("coding_feedback"))
+        if not coding_feedback and is_local_edit:
+            coding_feedback = _trim(edit_plan.get("implementation_instruction"))
+        if coding_feedback:
+            coding_context["coding_feedback"] = coding_feedback
+        test_feedback = state.get("test_feedback")
+        if isinstance(test_feedback, Mapping) and test_feedback:
+            coding_context["test_feedback"] = dict(test_feedback)
+        if selected_skills:
+            coding_context["selected_skills"] = list(dict.fromkeys(
+                _trim(item) for item in selected_skills if _trim(item)
+            ))
+        current_tool_name = _trim(state.get("tool_name"))
+        if current_tool_name and self.store.exists(current_tool_name):
+            current_bundle = self.store.load(current_tool_name)
+            coding_context["current_implementation"] = {
+                "revision": int((current_bundle.get("manifest") or {}).get("current_revision") or 0),
+                "modules": [dict(item) for item in current_bundle.get("modules") or [] if isinstance(item, Mapping)],
+                "last_test": dict((current_bundle.get("manifest") or {}).get("last_test") or {}),
+            }
+        coding_context["_workspace_identity"] = {
+            "owner_id": actual_owner,
+            "tool_name": current_tool_name or _trim(design_contract.get("tool_name")),
+        }
+        requirement_text = (
+            _trim(state.get("requirement_brief"))
+            or _trim(state.get("requirement_text"))
+        )
+        preserved_edit_revision: Mapping[str, Any] | None = None
+        if isinstance(state.get("edit_target"), Mapping):
+            edit_plan = (
+                state.get("edit_plan")
+                if isinstance(state.get("edit_plan"), Mapping)
                 else {}
             )
-            agent_runtime.setdefault("session_id", uuid.uuid4().hex)
-            coding_context["_agent_runtime"] = agent_runtime
-            coding_feedback = _trim(state.get("coding_feedback"))
-            if not coding_feedback and is_local_edit:
-                coding_feedback = _trim(edit_plan.get("implementation_instruction"))
-            if coding_feedback:
-                coding_context["coding_feedback"] = coding_feedback
-            test_feedback = state.get("test_feedback")
-            if isinstance(test_feedback, Mapping) and test_feedback:
-                coding_context["test_feedback"] = dict(test_feedback)
-            if selected_skills:
-                coding_context["selected_skills"] = list(dict.fromkeys(
-                    _trim(item) for item in selected_skills if _trim(item)
-                ))
-            current_tool_name = _trim(state.get("tool_name"))
-            if current_tool_name and self.store.exists(current_tool_name):
-                current_bundle = self.store.load(current_tool_name)
-                coding_context["current_implementation"] = {
-                    "revision": int((current_bundle.get("manifest") or {}).get("current_revision") or 0),
-                    "modules": [dict(item) for item in current_bundle.get("modules") or [] if isinstance(item, Mapping)],
-                    "last_test": dict((current_bundle.get("manifest") or {}).get("last_test") or {}),
-                }
-            coding_context["_workspace_identity"] = {
-                "owner_id": actual_owner,
-                "tool_name": current_tool_name or _trim(design_contract.get("tool_name")),
-            }
-            coding_result = active_coder.code(
+            if _trim(edit_plan.get("route")) == "local_patch":
+                preserved_edit_revision = self._assert_edit_base_current(
+                    state,
+                    owner_id=actual_owner,
+                )
+        coding_results: List[Dict[str, Any]] = []
+        bundle_design: Dict[str, Any] | None = None
+        coding_result: Dict[str, Any] = {}
+        for attempt in range(2):
+            coding_result = self._call_coder(
+                active_coder,
                 design_contract,
-                requirement_text=(
-                    _trim(state.get("requirement_brief"))
-                    or _trim(state.get("requirement_text"))
-                ),
-                context=coding_context,
+                requirement_text=requirement_text,
+                coding_context=coding_context,
                 event_sink=event_sink,
             )
-        except TypeError:
-            coding_result = active_coder.code(
-                design_contract,
-                requirement_text=(
-                    _trim(state.get("requirement_brief"))
-                    or _trim(state.get("requirement_text"))
-                ),
-                context=coding_context,
+            coding_results.append(coding_result)
+            agent_runtime = (
+                dict(coding_result.get("agent_runtime") or {})
+                if isinstance(coding_result.get("agent_runtime"), Mapping)
+                else dict(coding_context.get("_agent_runtime") or {})
             )
-        coding_raw = coding_result.get("raw") if isinstance(coding_result.get("raw"), Mapping) else {}
-        agent_runtime = (
-            dict(coding_result.get("agent_runtime") or {})
-            if isinstance(coding_result.get("agent_runtime"), Mapping)
-            else dict(coding_context.get("_agent_runtime") or {})
-        )
-        context_bundle = coding_raw.get("context_bundle") if isinstance(coding_raw.get("context_bundle"), Mapping) else {}
-        implementation_meta = {
-            "provider": self.coding_provider,
-            "complexity": self.edit_coding_complexity if is_local_edit else self.coding_complexity,
-            "model": _trim(getattr(getattr(active_coder, "harness", None), "model", "")),
-            "reasoning_effort": _trim(
-                getattr(getattr(active_coder, "harness", None), "reasoning_effort", "")
-            ),
-            "session_id": _trim(agent_runtime.get("session_id")),
-            "provider_session_id": _trim(agent_runtime.get("provider_session_id")),
-            "duration_ms": int(coding_raw.get("duration_ms") or 0),
-            "context_bundle": {
-                key: context_bundle.get(key)
-                for key in (
-                    "bundle_id", "owner_scope", "bundle_dir", "api_index", "api_task_context",
-                    "api_sources", "runtime_contract", "custom_tool_sdk", "coding_guide",
-                    "module_template", "coding_workspace",
+            coding_context["_agent_runtime"] = agent_runtime
+            implementation_meta = self._coding_implementation_meta(
+                coder=active_coder,
+                coding_results=coding_results,
+                agent_runtime=agent_runtime,
+                is_local_edit=is_local_edit,
+            )
+            if not coding_result.get("ok"):
+                coding_error = coding_result.get("error") if isinstance(coding_result.get("error"), Mapping) else {}
+                next_state = {
+                    **self._clean_state_for_context(state),
+                    "agent_runtime": agent_runtime,
+                    "coding_feedback": coding_result.get("message"),
+                    "coding_error": dict(coding_error),
+                }
+                return {
+                    "message": coding_result.get("message") or "本次代码实现没有产生可执行模块。",
+                    "coding_status": "coding_failed",
+                    "coding_error": dict(coding_error),
+                    "events": self._combined_coding_events(coding_results),
+                    "implementation_meta": implementation_meta,
+                    "state": next_state,
+                    "thread_context_patch": {"custom_tool_state": next_state},
+                }
+            coding_final = coding_result.get("final") if isinstance(coding_result.get("final"), Mapping) else {}
+            try:
+                bundle_design = self._bundle_from_coding_final(
+                    design_contract,
+                    coding_final,
+                    preserved_revision=preserved_edit_revision,
                 )
-                if context_bundle.get(key)
-            },
-        }
-        if not coding_result.get("ok"):
-            coding_error = coding_result.get("error") if isinstance(coding_result.get("error"), Mapping) else {}
-            next_state = {
-                **self._clean_state_for_context(state),
-                "agent_runtime": agent_runtime,
-                "coding_feedback": coding_result.get("message"),
-                "coding_error": dict(coding_error),
-            }
-            return {
-                "message": coding_result.get("message") or "本次代码实现没有产生可执行模块。",
-                "coding_status": "coding_failed",
-                "coding_error": dict(coding_error),
-                "events": coding_result.get("events") or [],
-                "implementation_meta": implementation_meta,
-                "state": next_state,
-                "thread_context_patch": {"custom_tool_state": next_state},
-            }
-        coding_final = coding_result.get("final") if isinstance(coding_result.get("final"), Mapping) else {}
-        try:
-            bundle_design = self._bundle_from_coding_final(
-                design_contract,
-                coding_final,
-            )
-        except CustomToolFinanceProfileError as exc:
-            next_state = {
-                **self._clean_state_for_context(state),
-                "agent_runtime": agent_runtime,
-                "coding_feedback": str(exc),
-                "coding_error": {
-                    "code": "finance_tool_profile_invalid",
-                    "summary": str(exc),
-                },
-            }
-            return {
-                "message": (
-                    "实现已生成，但金融工具画像与运行契约不一致，"
-                    "请在当前 Coding 会话中修正后重试。"
-                ),
-                "coding_status": "coding_failed",
-                "coding_error": dict(next_state["coding_error"]),
-                "events": coding_result.get("events") or [],
-                "implementation_meta": implementation_meta,
-                "state": next_state,
-                "thread_context_patch": {"custom_tool_state": next_state},
-            }
-        except CustomToolError as exc:
-            next_state = {
-                **self._clean_state_for_context(state),
-                "agent_runtime": agent_runtime,
-                "coding_feedback": str(exc),
-                "coding_error": {
-                    "code": "strategy_contract_invalid",
-                    "summary": str(exc),
-                },
-            }
-            return {
-                "message": "实现已生成，但策略运行契约无法安全执行，请在当前 Coding 会话中修正后重试。",
-                "coding_status": "coding_failed",
-                "coding_error": dict(next_state["coding_error"]),
-                "events": coding_result.get("events") or [],
-                "implementation_meta": implementation_meta,
-                "state": next_state,
-                "thread_context_patch": {"custom_tool_state": next_state},
-            }
+                break
+            except CustomToolStrategyContractError as exc:
+                if attempt == 0:
+                    feedback = self._strategy_contract_repair_feedback(str(exc))
+                    coding_context["coding_feedback"] = feedback
+                    repair_event = {
+                        "source": "system",
+                        "type": "contract_repair",
+                        "content": "公开输出与策略运行映射不一致，正在当前 Coding 会话中自动修正并复测。",
+                        "metadata": {"stage": "coding", "status": "running"},
+                    }
+                    coding_result.setdefault("events", []).append(repair_event)
+                    if event_sink is not None:
+                        try:
+                            event_sink(dict(repair_event))
+                        except Exception:
+                            pass
+                    continue
+                next_state = {
+                    **self._clean_state_for_context(state),
+                    "agent_runtime": agent_runtime,
+                    "coding_feedback": str(exc),
+                    "coding_error": {
+                        "code": "strategy_contract_invalid",
+                        "summary": str(exc),
+                    },
+                }
+                return {
+                    "message": "实现已生成，但自动修正后策略运行契约仍无法安全执行，可以继续重试当前 Coding。",
+                    "coding_status": "coding_failed",
+                    "coding_error": dict(next_state["coding_error"]),
+                    "events": self._combined_coding_events(coding_results),
+                    "implementation_meta": implementation_meta,
+                    "state": next_state,
+                    "thread_context_patch": {"custom_tool_state": next_state},
+                }
+            except CustomToolFinanceProfileError as exc:
+                next_state = {
+                    **self._clean_state_for_context(state),
+                    "agent_runtime": agent_runtime,
+                    "coding_feedback": str(exc),
+                    "coding_error": {
+                        "code": "finance_tool_profile_invalid",
+                        "summary": str(exc),
+                    },
+                }
+                return {
+                    "message": (
+                        "实现已生成，但金融工具画像与运行契约不一致，"
+                        "请在当前 Coding 会话中修正后重试。"
+                    ),
+                    "coding_status": "coding_failed",
+                    "coding_error": dict(next_state["coding_error"]),
+                    "events": self._combined_coding_events(coding_results),
+                    "implementation_meta": implementation_meta,
+                    "state": next_state,
+                    "thread_context_patch": {"custom_tool_state": next_state},
+                }
+            except CustomToolError as exc:
+                next_state = {
+                    **self._clean_state_for_context(state),
+                    "agent_runtime": agent_runtime,
+                    "coding_feedback": str(exc),
+                    "coding_error": {
+                        "code": "coding_bundle_invalid",
+                        "summary": str(exc),
+                    },
+                }
+                return {
+                    "message": "实现已生成，但无法形成可执行工具包，请在当前 Coding 会话中修正后重试。",
+                    "coding_status": "coding_failed",
+                    "coding_error": dict(next_state["coding_error"]),
+                    "events": self._combined_coding_events(coding_results),
+                    "implementation_meta": implementation_meta,
+                    "state": next_state,
+                    "thread_context_patch": {"custom_tool_state": next_state},
+                }
+        if bundle_design is None:
+            raise CustomToolError("coding did not produce an executable bundle")
         if isinstance(state.get("edit_target"), Mapping):
             bundle_design = self._lock_edit_candidate_bundle(
                 bundle_design,
@@ -2606,11 +2875,7 @@ class CustomToolAgentService:
         bundle_design["design_feedback_evidence"] = [
             dict(item) for item in state.get("feedback_ledger") or [] if isinstance(item, Mapping)
         ]
-        coding_events = [
-            dict(item)
-            for item in coding_result.get("events") or []
-            if isinstance(item, Mapping)
-        ]
+        coding_events = self._combined_coding_events(coding_results)
         result = self._save_test_and_return(
             bundle_design,
             owner_id=actual_owner,
@@ -3483,7 +3748,13 @@ class CustomToolAgentService:
             "thread_context_patch": {"custom_tool_state": next_state},
         }
 
-    def _bundle_from_coding_final(self, design: Mapping[str, Any], final: Mapping[str, Any]) -> Dict[str, Any]:
+    def _bundle_from_coding_final(
+        self,
+        design: Mapping[str, Any],
+        final: Mapping[str, Any],
+        *,
+        preserved_revision: Mapping[str, Any] | None = None,
+    ) -> Dict[str, Any]:
         tool_contract = (
             dict(final.get("tool_contract") or {})
             if isinstance(final.get("tool_contract"), Mapping)
@@ -3515,25 +3786,80 @@ class CustomToolAgentService:
         output_fields = self._with_key_process_info_output(output_fields)
         input_schema = self._schema_from_fields(input_fields)
         output_schema = self._schema_from_fields(output_fields)
+        preserved_revision = (
+            preserved_revision
+            if isinstance(preserved_revision, Mapping)
+            else {}
+        )
+        runtime_profile = final.get("strategy_runtime_profile")
+        if not isinstance(runtime_profile, Mapping) or not runtime_profile:
+            runtime_profile = preserved_revision.get("strategy_runtime_profile")
+        selection_output_profile = final.get("selection_output_profile")
+        if (
+            not isinstance(selection_output_profile, Mapping)
+            or not selection_output_profile
+        ):
+            selection_output_profile = preserved_revision.get(
+                "selection_output_profile"
+            )
+        contract_input_schema = (
+            preserved_revision.get("input_schema")
+            if preserved_revision
+            else input_schema
+        )
+        contract_output_schema = (
+            preserved_revision.get("output_schema")
+            if preserved_revision
+            else output_schema
+        )
+        strategy_contract_service = StrategyRevisionContractService()
         try:
-            strategy_contracts = StrategyRevisionContractService().normalize(
-                runtime_profile=final.get("strategy_runtime_profile"),
-                selection_output_profile=final.get("selection_output_profile"),
-                input_schema=input_schema,
-                output_schema=output_schema,
+            strategy_contracts = strategy_contract_service.normalize(
+                runtime_profile=runtime_profile,
+                selection_output_profile=selection_output_profile,
+                input_schema=(
+                    contract_input_schema
+                    if isinstance(contract_input_schema, Mapping)
+                    else input_schema
+                ),
+                output_schema=(
+                    contract_output_schema
+                    if isinstance(contract_output_schema, Mapping)
+                    else output_schema
+                ),
             )
         except StrategyRevisionContractError as exc:
-            raise CustomToolStrategyContractError(
-                f"invalid strategy revision contract: {exc}"
-            ) from exc
+            if preserved_revision:
+                raise CustomToolStrategyContractError(
+                    f"invalid strategy revision contract: {exc}"
+                ) from exc
+            # Strategy replay/backtest companions are optional capabilities of
+            # an otherwise executable Custom Tool.  Keep a valid runtime
+            # companion when only the optional selection mapping is malformed;
+            # otherwise omit both and let the direct Tool remain usable.
+            try:
+                strategy_contracts = strategy_contract_service.normalize(
+                    runtime_profile=runtime_profile,
+                    selection_output_profile=None,
+                    input_schema=input_schema,
+                    output_schema=output_schema,
+                )
+            except StrategyRevisionContractError:
+                strategy_contracts = strategy_contract_service.normalize(
+                    runtime_profile=None,
+                    selection_output_profile=None,
+                    input_schema=input_schema,
+                    output_schema=output_schema,
+                )
         strategy_bundle_fields = strategy_contracts.to_bundle_fields()
         design_finance_profile = design.get("finance_tool_profile")
-        raw_finance_profile = (
-            design_finance_profile
-            if isinstance(design_finance_profile, Mapping)
-            and design_finance_profile
-            else final.get("finance_tool_profile")
-        )
+        final_finance_profile = final.get("finance_tool_profile")
+        if isinstance(design_finance_profile, Mapping) and design_finance_profile:
+            raw_finance_profile = design_finance_profile
+        elif isinstance(final_finance_profile, Mapping) and final_finance_profile:
+            raw_finance_profile = final_finance_profile
+        else:
+            raw_finance_profile = preserved_revision.get("finance_tool_profile")
         try:
             finance_tool_profile = FinanceToolProfileService().normalize(
                 raw_finance_profile,
@@ -3548,9 +3874,24 @@ class CustomToolAgentService:
                 finance_tool_profile
             )
         except FinanceToolProfileError as exc:
-            raise CustomToolFinanceProfileError(
-                f"invalid finance Tool profile: {exc}"
-            ) from exc
+            if preserved_revision or _trim(
+                (raw_finance_profile or {}).get("family")
+                if isinstance(raw_finance_profile, Mapping)
+                else ""
+            ).lower() == "action":
+                raise CustomToolFinanceProfileError(
+                    f"invalid finance Tool profile: {exc}"
+                ) from exc
+            # A contradictory optional strategy companion must not prevent a
+            # valid direct Tool from being saved.  Drop that capability and
+            # retain the independently valid semantic profile when possible.
+            strategy_bundle_fields = {}
+            try:
+                finance_tool_profile = FinanceToolProfileService().normalize(
+                    raw_finance_profile,
+                )
+            except FinanceToolProfileError:
+                finance_tool_profile = None
         code = self._select_code(final)
         if not code:
             raise CustomToolError("coding final does not include python code")

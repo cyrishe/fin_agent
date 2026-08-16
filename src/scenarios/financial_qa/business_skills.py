@@ -12,7 +12,7 @@ import yaml
 
 
 _ALLOWED_COMPANION_DIRS = frozenset({"agents", "assets", "examples"})
-_SNAPSHOT_FORMAT_VERSION = 3
+_SNAPSHOT_FORMAT_VERSION = 4
 
 
 def _trim(value: Any) -> str:
@@ -43,6 +43,7 @@ class _FinanceBusinessSkillSnapshot:
     method_content: bytes
     content_hash: str
     allowed_tools: tuple[str, ...]
+    execution_budget: str
     references: tuple[_FinanceSkillReferenceSnapshot, ...]
     companion_files: tuple[_FinanceSkillCompanionSnapshot, ...]
 
@@ -106,6 +107,7 @@ class FinanceBusinessSkillCatalog:
                     "_method": skill.method,
                     "_content_hash": skill.content_hash,
                     "_allowed_tools": list(skill.allowed_tools),
+                    "execution_budget": skill.execution_budget,
                     "_reference_index": [
                         {
                             "path": reference.path,
@@ -276,6 +278,7 @@ class FinanceBusinessSkillCatalog:
                     "id": skill.skill_id,
                     "content_hash": skill.content_hash,
                     "allowed_tools": list(skill.allowed_tools),
+                    "execution_budget": skill.execution_budget,
                     "reference_index": [
                         {
                             "path": reference.path,
@@ -377,6 +380,10 @@ class FinanceBusinessSkillCatalog:
                 skill.skill_id: list(skill.allowed_tools)
                 for skill in skills
             },
+            "execution_budget_by_skill": {
+                skill.skill_id: skill.execution_budget
+                for skill in skills
+            },
         }
 
     def discovery_snapshot(self) -> Dict[str, Any]:
@@ -392,9 +399,90 @@ class FinanceBusinessSkillCatalog:
                     "path": skill.relative_path,
                     "description": skill.description,
                     "allowed_tools": list(skill.allowed_tools),
+                    "execution_budget": skill.execution_budget,
                 }
                 for skill in snapshot.skills
             ],
+        }
+
+    def studio_detail(self, skill_id: str) -> Dict[str, Any] | None:
+        """Return a read-only Studio projection from the immutable snapshot.
+
+        This is a presentation read model, not a second Skill contract.  Runtime
+        loading continues to use ``load`` and ``load_reference`` so the Studio
+        cannot change execution semantics or grant tools.
+        """
+
+        normalized = _trim(skill_id)
+        skill = next(
+            (item for item in self._snapshot.skills if item.skill_id == normalized),
+            None,
+        )
+        if skill is None:
+            return None
+
+        interface: Mapping[str, Any] = {}
+        interface_file = next(
+            (
+                item
+                for item in skill.companion_files
+                if item.path == "agents/openai.yaml"
+            ),
+            None,
+        )
+        if interface_file is not None:
+            try:
+                payload = yaml.safe_load(interface_file.content.decode("utf-8"))
+                raw_interface = (
+                    payload.get("interface")
+                    if isinstance(payload, Mapping)
+                    else None
+                )
+                if isinstance(raw_interface, Mapping):
+                    interface = raw_interface
+            except (UnicodeDecodeError, yaml.YAMLError):
+                interface = {}
+
+        references: list[Dict[str, Any]] = []
+        for reference in skill.references:
+            title = Path(reference.path).stem.replace("-", " ")
+            try:
+                for line in reference.content.decode("utf-8").splitlines():
+                    if line.startswith("# ") and line[2:].strip():
+                        title = line[2:].strip()
+                        break
+            except UnicodeDecodeError:
+                pass
+            references.append(
+                {
+                    "path": reference.path,
+                    "title": title,
+                    "content_hash": reference.content_hash,
+                }
+            )
+
+        allowed_tools = list(skill.allowed_tools)
+        return {
+            "skill_id": skill.skill_id,
+            "display_name": _trim(interface.get("display_name")) or skill.skill_id,
+            "short_description": (
+                _trim(interface.get("short_description")) or skill.description
+            ),
+            "default_prompt": _trim(interface.get("default_prompt")),
+            "description": skill.description,
+            "category": skill.category,
+            "skill_markdown": skill.method,
+            "content_hash": skill.content_hash,
+            "revision": self._snapshot.revision,
+            "references": references,
+            "controls": {
+                "execution_budget": skill.execution_budget,
+                "supplemental_tools": allowed_tools,
+                "web_search_enabled": any(
+                    tool.endswith("general_search")
+                    for tool in allowed_tools
+                ),
+            },
         }
 
     def reload(self) -> Dict[str, Any]:
@@ -446,6 +534,18 @@ class FinanceBusinessSkillCatalog:
 
         return {
             entry["id"]: list(entry.get("_allowed_tools") or [])
+            for entry in self.entries(allowed_skill_ids=allowed_skill_ids)
+        }
+
+    def execution_budget_by_skill(
+        self,
+        *,
+        allowed_skill_ids: Optional[Iterable[str]] = None,
+    ) -> Dict[str, str]:
+        """Return the published runtime budget class for each Skill."""
+
+        return {
+            entry["id"]: _trim(entry.get("execution_budget")) or "standard"
             for entry in self.entries(allowed_skill_ids=allowed_skill_ids)
         }
 
@@ -509,6 +609,7 @@ class FinanceBusinessSkillCatalog:
                     method_content=method_content,
                     content_hash=self._content_hash(method_content),
                     allowed_tools=tuple(self._allowed_tools(frontmatter)),
+                    execution_budget=self._execution_budget(frontmatter),
                     references=self._reference_index(skill_file.parent),
                     companion_files=self._companion_index(skill_file.parent),
                 )
@@ -541,6 +642,7 @@ class FinanceBusinessSkillCatalog:
                     "description": skill.description,
                     "content_hash": skill.content_hash,
                     "allowed_tools": list(skill.allowed_tools),
+                    "execution_budget": skill.execution_budget,
                     "references": [
                         {
                             "path": reference.path,
@@ -923,3 +1025,10 @@ class FinanceBusinessSkillCatalog:
             seen.add(tool_name)
             normalized.append(tool_name)
         return normalized
+
+    @staticmethod
+    def _execution_budget(frontmatter: Mapping[str, Any]) -> str:
+        value = _trim(frontmatter.get("execution-budget")).lower() or "standard"
+        if value not in {"standard", "long"}:
+            raise RuntimeError("Finance Skill execution-budget must be standard or long")
+        return value

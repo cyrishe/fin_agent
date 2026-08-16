@@ -32,7 +32,7 @@ def test_each_financial_tool_subskill_is_focused_and_loadable() -> None:
         metadata = (skill_dir / "agents" / "openai.yaml").read_text(encoding="utf-8")
 
         assert f"name: {skill_name}" in skill_text
-        assert "## 专业背景" in skill_text
+        assert skill_text.count("## ") >= 3
         assert "TODO" not in skill_text
         assert "外层总控" not in skill_text
         assert "allow_implicit_invocation: false" in metadata
@@ -40,8 +40,10 @@ def test_each_financial_tool_subskill_is_focused_and_loadable() -> None:
         schema_path = ROOT / "schema.json" if skill_name == "financial-tool-design" else skill_dir / "schema.json"
         schema = json.loads(schema_path.read_text(encoding="utf-8"))
         assert schema["type"] == "object"
-        if skill_name in {"financial-tool-requirement", "financial-tool-design"}:
+        if skill_name == "financial-tool-requirement":
             assert schema["additionalProperties"] is True
+        elif skill_name == "financial-tool-design":
+            assert schema["additionalProperties"] is False
         else:
             assert schema["additionalProperties"] is False
         fastjsonschema.compile(schema)
@@ -101,17 +103,9 @@ def test_requirement_and_design_schemas_keep_only_semantic_top_level_fields() ->
     design = json.loads((ROOT / "schema.json").read_text(encoding="utf-8"))
 
     assert set(requirement["properties"]) == {"requirement_brief", "notice", "questions"}
-    assert set(design["properties"]) == {"design", "finance_tool_profile"}
+    assert set(design["properties"]) == {"design"}
     assert design["required"] == ["design"]
-    assert design["additionalProperties"] is True
-    profile = design["properties"]["finance_tool_profile"]
-    assert profile["additionalProperties"] is False
-    assert set(profile["required"]) == {
-        "protocol",
-        "family",
-        "execution_shape",
-        "output_semantic",
-    }
+    assert design["additionalProperties"] is False
 
 
 def test_implementation_and_test_keep_technical_facts_separate_from_user_judgement() -> None:
@@ -128,9 +122,6 @@ def test_implementation_and_test_keep_technical_facts_separate_from_user_judgeme
     assert set(implementation["properties"]) == {
         "tool_contract",
         "implementation_summary",
-        "finance_tool_profile",
-        "strategy_runtime_profile",
-        "selection_output_profile",
     }
     assert implementation["properties"]["implementation_summary"]["type"] == "string"
     assert set(test_plan["required"]) == {"summary", "next_action", "assessment", "cases", "presentation"}
@@ -139,7 +130,7 @@ def test_implementation_and_test_keep_technical_facts_separate_from_user_judgeme
     assert "execution_ok" not in test_plan["properties"]["cases"]["items"]["properties"]
 
 
-def test_financial_tool_family_is_semantic_and_action_stays_non_executable() -> None:
+def test_design_and_coding_keep_the_mainline_free_of_runtime_profiles() -> None:
     requirement = (
         SUBSKILLS_ROOT / "financial-tool-requirement" / "SKILL.md"
     ).read_text(encoding="utf-8")
@@ -149,22 +140,26 @@ def test_financial_tool_family_is_semantic_and_action_stays_non_executable() -> 
     implementation = (
         SUBSKILLS_ROOT / "financial-tool-implementation" / "SKILL.md"
     ).read_text(encoding="utf-8")
-    edit_planning = (
-        SUBSKILLS_ROOT / "financial-tool-edit-planning" / "SKILL.md"
-    ).read_text(encoding="utf-8")
-    edit_implementation = (
-        SUBSKILLS_ROOT / "financial-tool-edit-implementation" / "SKILL.md"
-    ).read_text(encoding="utf-8")
+    assert "不需要追问用户选择“单个还是批量”" in requirement
+    assert "公开输入默认使用一个 `array<string>` 列表" in design
+    assert "单个目标就是单元素列表" in design
+    assert "一次查询完整目标列表" in implementation
+    assert "同一种数据的查询次数不应随着目标数量增长" in implementation
 
-    assert "不要让用户机械选择工具类型" in requirement
-    assert "最终输出承担的业务职责" in requirement
-    assert "评分计算本身不代表策略" in design
-    assert "大盘强度指标是 `analytics + aggregate_context + metric`" in design
-    assert '"execution_shape": "aggregate_context"' in design
-    assert '"output_semantic": "metric"' in design
-    assert "不得进入 Coding" in design
-    assert "只有 `finance_tool_profile.family=strategy`" in implementation
-    assert "不得生成、测试或声称执行下单" in implementation
-    assert "动作工具只能回到 Design" in edit_planning
-    assert "`local_patch` 必须保持当前 `finance_tool_profile`" in edit_planning
-    assert "不得加入下单、撤单、调仓等外部副作用" in edit_implementation
+
+def test_edit_skills_do_not_reintroduce_optional_runtime_profiles_as_rules() -> None:
+    skill_names = [
+        "financial-tool-edit-planning",
+        "financial-tool-edit-implementation",
+        "financial-tool-flowchart",
+    ]
+    text = "\n".join(
+        (SUBSKILLS_ROOT / skill_name / "SKILL.md").read_text(encoding="utf-8")
+        for skill_name in skill_names
+    )
+
+    assert "finance_tool_profile" not in text
+    assert "strategy_runtime_profile" not in text
+    assert "selection_output_profile" not in text
+    assert "Strategy Wrapper" not in text
+    assert "运行伴随契约" not in text

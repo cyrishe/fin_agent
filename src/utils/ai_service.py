@@ -42,12 +42,18 @@ client_next = OpenAI(
 
 
 llm_client = OpenAI(
-    api_key=os.getenv("LLM_API_KEY") or os.getenv("LLM_KEY") or os.getenv("DASHSCOPE_API_KEY") or "not-configured",
+    api_key=(
+        os.getenv("LLM_API_KEY")
+        or os.getenv("LLM_KEY")
+        or os.getenv("DEEPSEEK_API_KEY")
+        or os.getenv("DASHSCOPE_API_KEY")
+        or "not-configured"
+    ),
     base_url=(
         os.getenv("LLM_BASE_URL")
         or os.getenv("LLM_ENDPOINT")
         or os.getenv("DASHSCOPE_BASE_URL")
-        or "https://dashscope.aliyuncs.com/compatible-mode/v1"
+        or "https://api.deepseek.com/v1"
     ),
     timeout=float(os.getenv("LLM_CLIENT_TIMEOUT_SECONDS", "45")),
     max_retries=int(os.getenv("LLM_CLIENT_MAX_RETRIES", "1")),
@@ -56,8 +62,8 @@ llm_client = OpenAI(
 # Backward-compatible alias. Old call sites still reference a "deepseek" client.
 deepseek_client = llm_client
 
-DEFAULT_CHAT_MODEL = os.getenv("LLM_DEFAULT_MODEL", "deepseek-v4-flash")
-DEFAULT_FLASH_MODEL = os.getenv("LLM_FLASH_MODEL", "deepseek-v4-flash")
+DEFAULT_CHAT_MODEL = os.getenv("LLM_DEFAULT_MODEL", "deepseek-chat")
+DEFAULT_FLASH_MODEL = os.getenv("LLM_FLASH_MODEL", "deepseek-chat")
 DEFAULT_REASONING_MODEL = os.getenv("LLM_REASONING_MODEL", DEFAULT_CHAT_MODEL)
 DEFAULT_EMBEDDING_MODEL = os.getenv("LLM_EMBEDDING_MODEL", "text-embedding-v4")
 DEFAULT_ENABLE_THINKING = os.getenv("LLM_DEFAULT_ENABLE_THINKING", "false").lower() == "true"
@@ -68,7 +74,7 @@ DEFAULT_LONG_CONTEXT_MAX_TOKENS = int(os.getenv("LLM_LONG_CONTEXT_MAX_TOKENS", "
 def llm_config_summary() -> dict:
     """Return safe provider metadata without exposing credentials."""
     key_source = ""
-    for name in ("LLM_API_KEY", "LLM_KEY", "DASHSCOPE_API_KEY"):
+    for name in ("LLM_API_KEY", "LLM_KEY", "DEEPSEEK_API_KEY", "DASHSCOPE_API_KEY"):
         if os.getenv(name):
             key_source = name
             break
@@ -77,7 +83,7 @@ def llm_config_summary() -> dict:
             os.getenv("LLM_BASE_URL")
             or os.getenv("LLM_ENDPOINT")
             or os.getenv("DASHSCOPE_BASE_URL")
-            or "https://dashscope.aliyuncs.com/compatible-mode/v1"
+            or "https://api.deepseek.com/v1"
         ),
         "key_source": key_source,
         "key_present": bool(key_source),

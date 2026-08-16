@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+import src.experiments.staged_data_protocol.phase2.base_info_provider as base_info_provider
 from src.experiments.staged_data_protocol.phase2.base_info_provider import (
     BASE_INFO_SOURCES,
     _build_filter_clauses,
@@ -66,6 +67,92 @@ def test_unparsed_basic_info_filter_fails_before_database_query() -> None:
     assert result["status"] == "invalid_filter"
     assert result["rows"] == []
     assert "filter was not parsed" in result["reason"]
+
+
+class _FakeCursor:
+    def __init__(self, result_sets):
+        self.result_sets = list(result_sets)
+        self.calls = []
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *_args):
+        return False
+
+    def execute(self, sql, params):
+        self.calls.append((sql, params))
+
+    def fetchall(self):
+        return self.result_sets.pop(0)
+
+
+class _FakeDb:
+    def __init__(self, result_sets):
+        self.cursor_instance = _FakeCursor(result_sets)
+        self.conn = self
+
+    def cursor(self, *_args, **_kwargs):
+        return self.cursor_instance
+
+    def close_db(self):
+        return None
+
+
+def test_unique_contains_candidate_is_resolved_inside_basic_info_tool(
+    monkeypatch,
+) -> None:
+    fake_db = _FakeDb(
+        [
+            [],
+            [{"plate_code": "884003", "plate_name": "光模块"}],
+        ]
+    )
+    monkeypatch.setattr(base_info_provider, "StockInfoDbUtils", lambda **_kwargs: fake_db)
+
+    result = execute_base_info_api(
+        subject="plate",
+        args={"filter": "plate_name = 光模", "limit": 5},
+        outputs=["plate_code", "plate_name"],
+    )
+
+    assert result["rows"] == [{"plate_code": "884003", "plate_name": "光模块"}]
+    assert result["name_resolution"] == {
+        "status": "resolved",
+        "method": "unique_contains",
+        "requested": "光模",
+        "resolved": {"plate_code": "884003", "plate_name": "光模块"},
+    }
+    assert "LOCATE" in fake_db.cursor_instance.calls[1][0]
+    assert fake_db.cursor_instance.calls[1][1] == ("光模", 20)
+
+
+def test_multiple_contains_candidates_remain_explicitly_ambiguous(
+    monkeypatch,
+) -> None:
+    fake_db = _FakeDb(
+        [
+            [],
+            [
+                {"plate_code": "A", "plate_name": "光模块"},
+                {"plate_code": "B", "plate_name": "高速光模块"},
+            ],
+        ]
+    )
+    monkeypatch.setattr(base_info_provider, "StockInfoDbUtils", lambda **_kwargs: fake_db)
+
+    result = execute_base_info_api(
+        subject="plate",
+        args={"filter": "plate_name = 光"},
+        outputs=["plate_code", "plate_name"],
+    )
+
+    assert result["rows"] == []
+    assert result["name_resolution"]["status"] == "ambiguous"
+    assert [
+        item["plate_code"]
+        for item in result["name_resolution"]["candidates"]
+    ] == ["A", "B"]
 
 
 def test_plate_catalog_teaches_name_resolution_before_data_query() -> None:

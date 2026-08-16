@@ -6,6 +6,9 @@ from typing import Any, Dict, List, Mapping, Optional
 
 from src.services.attachment_service import AttachmentService
 from src.services.file_io_tool_service import FileIoToolService
+from src.services.finance_universe_input_resolver_service import (
+    FinanceUniverseInputResolverService,
+)
 
 
 class InvocationInputError(ValueError):
@@ -20,9 +23,13 @@ class InvocationInputResolverService:
         *,
         attachment_service: Optional[AttachmentService] = None,
         file_io_service: Optional[FileIoToolService] = None,
+        finance_universe_resolver: Optional[FinanceUniverseInputResolverService] = None,
     ) -> None:
         self.attachment_service = attachment_service or AttachmentService()
         self.file_io_service = file_io_service or FileIoToolService()
+        self.finance_universe_resolver = (
+            finance_universe_resolver or FinanceUniverseInputResolverService()
+        )
 
     @staticmethod
     def _trim(value: Any) -> str:
@@ -50,10 +57,19 @@ class InvocationInputResolverService:
         source: Mapping[str, Any],
         attachments: List[Dict[str, Any]],
     ) -> List[Any]:
+        return list(self.materialize_with_evidence(source, attachments).get("items") or [])
+
+    def materialize_with_evidence(
+        self,
+        source: Mapping[str, Any],
+        attachments: List[Dict[str, Any]],
+    ) -> Dict[str, Any]:
+        source_kind = self._trim(source.get("kind")).lower()
+        if source_kind == "finance_universe":
+            return self.finance_universe_resolver.resolve(source)
         attachment_id = self._trim(source.get("attachment_id"))
-        column = source.get("column")
-        if not attachment_id or self._is_missing(column):
-            return []
+        if not attachment_id:
+            return {"status": "none", "items": []}
         attachment = next(
             (
                 item
@@ -65,6 +81,27 @@ class InvocationInputResolverService:
         if not isinstance(attachment, Mapping):
             raise InvocationInputError(f"附件来源不存在：{attachment_id}")
         parsed = attachment.get("parsed") if isinstance(attachment.get("parsed"), Mapping) else {}
+        if source_kind == "attachment_lines":
+            values: List[Any] = []
+            seen: set[str] = set()
+            for value in parsed.get("document_lines") or []:
+                normalized = self._trim(value)
+                if not normalized or normalized in seen:
+                    continue
+                seen.add(normalized)
+                values.append(normalized)
+            return {
+                "status": "ready",
+                "items": values,
+                "member_count": len(values),
+                "evidence": {
+                    "kind": "attachment_lines",
+                    "attachment_id": attachment_id,
+                },
+            }
+        column = source.get("column")
+        if self._is_missing(column):
+            return {"status": "none", "items": []}
         table_index = int(source.get("table_index") or 0)
         tables: List[tuple[List[Any], List[Any]]] = []
         header = list(parsed.get("header") or [])
@@ -98,7 +135,17 @@ class InvocationInputResolverService:
                 continue
             seen.add(key)
             values.append(value)
-        return values
+        return {
+            "status": "ready",
+            "items": values,
+            "member_count": len(values),
+            "evidence": {
+                "kind": "attachment",
+                "attachment_id": attachment_id,
+                "table_index": table_index,
+                "column": column,
+            },
+        }
 
     def materialize_records(
         self,
@@ -168,7 +215,7 @@ class InvocationInputResolverService:
                     read_args = {
                         "action": "read",
                         "max_preview_rows": 5000,
-                        "max_chars": 10000,
+                        "max_chars": 200000,
                         "_data_root": str(self.attachment_service.data_root),
                     }
                     if Path(file_path).suffix.lower() in {".doc", ".docx"}:
@@ -193,11 +240,17 @@ class InvocationInputResolverService:
             parsed = attachment.get("parsed") if isinstance(attachment.get("parsed"), Mapping) else {}
             if parsed:
                 rows = list(parsed.get("rows") or [])
+                prompt_parsed = {
+                    key: value
+                    for key, value in parsed.items()
+                    if key != "document_lines"
+                }
                 item["parsed"] = {
-                    **dict(parsed),
+                    **prompt_parsed,
                     "rows": rows[:20],
                     "row_count": len(rows),
                     "preview_truncated": len(rows) > 20,
+                    "preview_text": self._trim(parsed.get("preview_text"))[:10000],
                 }
             if attachment.get("parse_error"):
                 item["parse_error"] = self._trim(attachment.get("parse_error"))
@@ -228,12 +281,20 @@ class InvocationInputResolverService:
         data = result.get("data") if isinstance(result.get("data"), Mapping) else {}
         content = data.get("data") if isinstance(data.get("data"), Mapping) else {}
         document = content.get("document") if isinstance(content.get("document"), Mapping) else {}
+        document_text = str(document.get("preview_text") or "")
+        document_lines = [
+            line.strip()
+            for line in document_text.splitlines()
+            if line.strip()
+        ]
         return {
             "ok": bool(result.get("ok")),
             "file_type": self._trim(data.get("file_type")),
             "header": list(content.get("header") or [])[:100],
             "rows": list(content.get("rows") or [])[:5000],
-            "preview_text": self._trim(document.get("preview_text"))[:10000],
+            "preview_text": document_text[:10000].strip(),
+            "document_lines": document_lines,
+            "document_line_count": int(document.get("line_count") or len(document_lines)),
             "table_preview": list(document.get("table_preview") or []),
             "error": self._trim(result.get("error")),
         }

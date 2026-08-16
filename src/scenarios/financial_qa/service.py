@@ -6,15 +6,17 @@ from pathlib import Path
 from typing import Any, Dict, Mapping, Optional
 
 from src.scenarios.financial_qa.business_skills import FinanceBusinessSkillCatalog
-from src.scenarios.financial_qa.companion_evidence import (
-    FinancialQaCompanionEvidenceService,
-)
 from src.scenarios.financial_qa.presentation import FinancialQaPresentationService
+from src.scenarios.financial_qa.research_mode import (
+    normalize_research_mode,
+    research_mode_metadata,
+    research_mode_prompt,
+)
 from src.scenarios.financial_qa.tools import FinanceDataQueryCcTools
 from src.services.finance_claude_session_service import FinanceClaudeSessionService
 from src.services.invocation_input_resolver_service import InvocationInputResolverService
 
-_SUPPLEMENTARY_AGENT_TOOLS = frozenset({"financial_news_search"})
+_SUPPLEMENTARY_AGENT_TOOLS = frozenset({"financial_news_search", "general_search"})
 _FINANCE_MCP_TOOL_PREFIX = "mcp__finance__"
 
 
@@ -64,9 +66,6 @@ class FinancialQaCcService:
         system_tools: Optional[FinanceDataQueryCcTools] = None,
         business_skill_catalog: Optional[FinanceBusinessSkillCatalog] = None,
         presentation_service: Optional[FinancialQaPresentationService] = None,
-        companion_evidence_service: Optional[
-            FinancialQaCompanionEvidenceService
-        ] = None,
         input_resolver: Optional[InvocationInputResolverService] = None,
         root_dir: str | Path = "data/financial_qa_cc_sessions",
         log_path: str | Path = "outputs/financial_qa_cc/events.jsonl",
@@ -90,12 +89,6 @@ class FinancialQaCcService:
             bind_skill_catalog(self.business_skill_catalog)
         self.presentation_service = (
             presentation_service or FinancialQaPresentationService()
-        )
-        self.companion_evidence_service = (
-            companion_evidence_service
-            or FinancialQaCompanionEvidenceService(
-                finance_runtime=self.system_tools.finance_runtime
-            )
         )
         self.input_resolver = input_resolver or InvocationInputResolverService()
         qa_max_turns = max(
@@ -155,6 +148,7 @@ class FinancialQaCcService:
         selected_agent_name: str = "investment_analyst",
         entry: str = "agent_route",
         resolved_question: str = "",
+        research_mode: str = "auto",
     ) -> Dict[str, Any]:
         app_context = (
             application_context
@@ -232,12 +226,22 @@ class FinancialQaCcService:
             ]
             for skill_id, native_allowed_tools in native_tool_access.items()
         }
+        skill_execution_budget = (
+            business_skill_snapshot.get("execution_budget_by_skill")
+            if isinstance(
+                business_skill_snapshot.get("execution_budget_by_skill"),
+                Mapping,
+            )
+            else {}
+        )
+        normalized_research_mode = normalize_research_mode(research_mode)
         return {
             "selected_agent": "investment_analyst",
             "turn_mode": "normal_qa",
             "entry": _trim(entry) or "agent_route",
             "allowed_agent_tools": allowed_agent_tools,
             "skill_tool_access": skill_tool_access,
+            "_finance_skill_execution_budget": dict(skill_execution_budget),
             **(
                 {"allowed_finance_skills": allowed_finance_skills}
                 if allowed_finance_skills is not None
@@ -250,6 +254,10 @@ class FinancialQaCcService:
             ),
             "_finance_skill_catalog_prompt": skill_routing_summary,
             "_finance_skill_catalog_revision": business_skill_snapshot["revision"],
+            "_finance_research_mode": normalized_research_mode,
+            "_finance_research_mode_prompt": research_mode_prompt(
+                normalized_research_mode
+            ),
             "_finance_skill_runtime_binding": {
                 "revision": business_skill_snapshot["revision"],
                 "runtime_root": str(business_skill_snapshot["runtime_root"]),
@@ -282,6 +290,7 @@ class FinancialQaCcService:
         application_context: Optional[Mapping[str, Any]] = None,
         attachments: Optional[list[dict[str, Any]]] = None,
         event_sink: Any = None,
+        research_mode: str = "auto",
     ) -> Dict[str, Any]:
         semantic_turn = (
             dispatch_plan.get("semantic_turn")
@@ -298,6 +307,7 @@ class FinancialQaCcService:
             selected_agent_name=_trim(dispatch_plan.get("selected_agent")),
             entry=_trim(dispatch_plan.get("entry")),
             resolved_question=resolved_question,
+            research_mode=research_mode,
         )
         model_question = resolved_question
         if attachments:
@@ -340,30 +350,11 @@ class FinancialQaCcService:
         message = _trim(record.get("result")) or (
             f"金融专业问答暂时未完成：{error}" if error else "金融专业问答暂时没有返回内容。"
         )
-        companion_refs = self.companion_evidence_service.build(result_refs)
         surface_blocks = self.presentation_service.build(
             message,
-            [*result_refs, *companion_refs],
+            result_refs,
             thread_id=thread_id,
         )
-        if companion_refs:
-            surface_blocks.insert(
-                1,
-                {
-                    "block_id": "financial_qa_market_context_progress",
-                    "block_type": "status",
-                    "kind": "status",
-                    "semantic": "agent.process",
-                    "mode": "replace",
-                    "title": "行情上下文",
-                    "content": "已基于同一股票补充最近 22 个交易日的日 K 数据。",
-                    "data": {
-                        "role": "process",
-                        "status": "completed",
-                        "summary": "已基于同一股票补充最近 22 个交易日的日 K 数据。",
-                    },
-                },
-            )
         skill_entries = [
             dict(item)
             for item in record.get("skill_entries") or []
@@ -411,6 +402,7 @@ class FinancialQaCcService:
                 "error": error,
             },
             "result_refs": result_refs,
+            "research_mode": research_mode_metadata(research_mode),
             **(
                 {
                     "report_export": {

@@ -14,7 +14,7 @@
   ],
   "defaults": {},
   "identity": {
-    "description": "查询公司、行业、板块、主题或事件相关的金融新闻。",
+    "description": "兼容查询公司、行业、板块、主题或事件相关新闻；新个股查询优先使用 stock.news。",
     "display_name": "金融新闻查询",
     "domain": "news",
     "owner": "tools"
@@ -31,7 +31,7 @@
       "data_retrieval",
       "news_or_research_retrieval"
     ],
-    "side_effect_level": "write"
+    "side_effect_level": "none"
   },
   "name": "financial_news_search",
   "post_process": {
@@ -89,15 +89,15 @@
     ]
   },
   "runtime_hints": {
-    "cost_class": "medium",
-    "latency_class": "slow",
+    "cost_class": "low",
+    "latency_class": "medium",
     "supports_async_submit": false,
     "supports_stream": false
   },
   "safety": {
     "network": true,
-    "persistence": true,
-    "side_effect": "optional_persistence"
+    "persistence": false,
+    "side_effect": "none"
   },
   "schemas": {
     "input": {

@@ -61,7 +61,12 @@ class RuntimeConversationService:
 
     @classmethod
     def _compact_history_payload(cls, value: Any, *, depth: int = 0) -> Any:
-        if depth > 8:
+        # Surface protocols naturally nest page -> sections -> blocks -> data
+        # -> items/rows -> cells.  A limit of eight erased metric labels and
+        # table values during history replay even though the payload itself was
+        # already restricted to HISTORY_OUTPUT_KEYS.  Keep a defensive ceiling
+        # without truncating valid renderer data.
+        if depth > 16:
             return None
         if isinstance(value, dict):
             compact: Dict[str, Any] = {}

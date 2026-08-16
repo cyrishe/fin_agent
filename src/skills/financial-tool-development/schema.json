@@ -1,52 +1,9 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "type": "object",
-  "additionalProperties": true,
+  "additionalProperties": false,
   "required": ["design"],
   "properties": {
-    "design": {"type": "string", "minLength": 1},
-    "finance_tool_profile": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": [
-        "protocol",
-        "family",
-        "execution_shape",
-        "output_semantic"
-      ],
-      "properties": {
-        "protocol": {
-          "type": "string",
-          "enum": ["finance_tool_profile.v1"]
-        },
-        "family": {
-          "type": "string",
-          "enum": ["information", "analytics", "strategy", "action"]
-        },
-        "execution_shape": {
-          "type": "string",
-          "enum": [
-            "aggregate_context",
-            "entity_local",
-            "cross_sectional",
-            "portfolio_stateful"
-          ]
-        },
-        "output_semantic": {
-          "type": "string",
-          "enum": [
-            "facts",
-            "metric",
-            "series",
-            "assessment",
-            "ranked_selection",
-            "signal",
-            "portfolio_target",
-            "action_receipt"
-          ]
-        },
-        "summary": {"type": "string"}
-      }
-    }
+    "design": {"type": "string", "minLength": 1}
   }
 }

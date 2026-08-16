@@ -1,0 +1,84 @@
+{
+  "auth": "public",
+  "availability": {
+    "lifecycle": "active",
+    "retrieval_mode": "retrievable",
+    "visibility": "visible"
+  },
+  "capabilities": [
+    "search",
+    "news_search",
+    "external_evidence"
+  ],
+  "defaults": {
+    "limit": 10
+  },
+  "identity": {
+    "description": "通过部署时配置的搜索服务查询外部资料；当前覆盖内部新闻库，未来可切换其他搜索 API。",
+    "display_name": "资料搜索",
+    "domain": "search",
+    "owner": "tools"
+  },
+  "invocation_example": "general_search(query=\"白酒消费政策\", limit=10)",
+  "match_contract": {
+    "request_families": ["data_access"],
+    "work_item_types": ["tool"],
+    "capability_classes": ["data_retrieval", "news_or_research_retrieval"],
+    "side_effect_level": "none"
+  },
+  "name": "general_search",
+  "profiles": {
+    "real": {
+      "enabled": true,
+      "implementation": {
+        "kind": "python_callable",
+        "target": "src.tools.general_search_tool:run"
+      }
+    }
+  },
+  "retention": {
+    "drop_default": ["data[*].snippet"],
+    "high_value_for_reasoning": ["data"],
+    "high_value_for_render": ["data"],
+    "recommended_reducers": {"data": "summarize_news_list"},
+    "usually_too_large_for_prompt": ["data[*].snippet"]
+  },
+  "runtime_hints": {
+    "cost_class": "low",
+    "latency_class": "medium",
+    "supports_async_submit": false,
+    "supports_stream": false
+  },
+  "safety": {
+    "network": true,
+    "persistence": false,
+    "side_effect": "none"
+  },
+  "schemas": {
+    "input": {
+      "$id": "general_search.input.schema.json",
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "query": {"type": "string", "minLength": 1, "description": "检索词"},
+        "limit": {"type": "integer", "minimum": 1, "maximum": 50, "default": 10},
+        "start_time": {"type": "string", "description": "可选的开始时间"},
+        "end_time": {"type": "string", "description": "可选的结束时间"},
+        "category_scope": {"type": "array", "items": {"type": "string"}},
+        "source_scope": {"type": "array", "items": {"type": "string"}}
+      },
+      "required": ["query"],
+      "type": "object"
+    },
+    "output": {"$ref": "src/tools/schemas/general_search.schema.json"}
+  },
+  "status": "active",
+  "tags": ["search", "news", "evidence"],
+  "tests": {
+    "golden_cases": [],
+    "sample_inputs": [{"arguments": {"query": "白酒行业"}, "name": "default_general_search"}]
+  },
+  "version": "v1",
+  "subject_tags": ["general", "stock", "plate", "index"],
+  "tool_priority": 1
+}

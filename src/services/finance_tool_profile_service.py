@@ -43,8 +43,9 @@ def _trim(value: Any) -> str:
 class FinanceToolProfile:
     """Small canonical business portrait for one immutable Tool revision.
 
-    This profile is descriptive.  It is deliberately not an authorization,
-    dispatch, batching, strategy-runtime, or backtest contract.
+    The execution shape records whether business results are independent or
+    collection-dependent. It is not an authorization, concurrency-limit,
+    strategy-runtime, or backtest contract.
     """
 
     family: str
@@ -129,11 +130,6 @@ class FinanceToolProfileService:
             raise FinanceToolProfileError(
                 "strategy_runtime_profile requires finance Tool family=strategy"
             )
-        if normalized.family == "strategy" and not has_runtime:
-            raise FinanceToolProfileError(
-                "finance Tool family=strategy requires strategy_runtime_profile"
-            )
-
         payload = normalized.to_dict()
         if has_selection:
             # A SelectionOutputProfile is executable evidence that this

@@ -85,6 +85,12 @@ class SelectionOutputProfile:
                 "invalid_selection_profile",
                 "candidate_path must be a non-empty dot path",
             )
+        if "[" in candidate_path or "]" in candidate_path:
+            raise BacktestError(
+                "invalid_selection_profile",
+                "candidate_path uses dot-separated object fields only; "
+                "array indexes are not supported",
+            )
         if not symbol_field or "." in symbol_field or symbol_field == "*":
             raise BacktestError(
                 "invalid_selection_profile",
@@ -94,6 +100,12 @@ class SelectionOutputProfile:
             raise BacktestError(
                 "invalid_selection_profile",
                 "output_date_path must be an empty value or a dot path",
+            )
+        if "[" in output_date_path or "]" in output_date_path:
+            raise BacktestError(
+                "invalid_selection_profile",
+                "output_date_path must resolve to one scalar date without "
+                "array indexes",
             )
         object.__setattr__(self, "candidate_path", candidate_path)
         object.__setattr__(self, "symbol_field", symbol_field)

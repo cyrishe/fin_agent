@@ -132,6 +132,13 @@ _CODEX_PROFILES = {
 }
 
 _DEEPSEEK_CLAUDE_PROFILES = {
+    AgentComplexityLevel.FASTEST: ("deepseek-chat", "low", 4, "disabled"),
+    AgentComplexityLevel.FAST: ("deepseek-chat", "high", 20, ""),
+    AgentComplexityLevel.MID: ("deepseek-chat", "medium", 20, ""),
+    AgentComplexityLevel.HIGH: ("deepseek-reasoner", "high", 32, ""),
+}
+
+_DASHSCOPE_CLAUDE_PROFILES = {
     AgentComplexityLevel.FASTEST: ("deepseek-v4-flash", "low", 4, "disabled"),
     AgentComplexityLevel.FAST: ("deepseek-v4-flash", "high", 20, ""),
     AgentComplexityLevel.MID: ("deepseek-v4-pro", "medium", 20, ""),
@@ -164,7 +171,12 @@ def resolve_agent_profile(
         return ResolvedAgentProfile(normalized_level, normalized_provider, model, effort, max_turns)
     if normalized_provider == "claude":
         transport = str(claude_transport_provider or "deepseek").strip().lower()
-        profiles = _DEEPSEEK_CLAUDE_PROFILES if transport in {"dashscope", "deepseek"} else _ANTHROPIC_CLAUDE_PROFILES
+        if transport == "deepseek":
+            profiles = _DEEPSEEK_CLAUDE_PROFILES
+        elif transport == "dashscope":
+            profiles = _DASHSCOPE_CLAUDE_PROFILES
+        else:
+            profiles = _ANTHROPIC_CLAUDE_PROFILES
         model, effort, max_turns, thinking = profiles[normalized_level]
         return ResolvedAgentProfile(normalized_level, normalized_provider, model, effort, max_turns, thinking)
     raise ValueError(f"unsupported agent provider: {normalized_provider or '-'}")

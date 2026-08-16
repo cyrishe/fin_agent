@@ -34,6 +34,7 @@ TOOL_REGISTRY: Dict[str, str] = {
     "stock_protocol_data_query": "src.tools.stock_protocol_data_query_tool:run",
     "security_universe_query": "src.tools.security_universe_query_tool:run",
     "financial_news_search": "src.tools.company_news_tool:run",
+    "general_search": "src.tools.general_search_tool:run",
     "market_realtime_breadth": "src.tools.market_snapshot_tools:run_market_realtime_breadth",
     "market_history_amount": "src.tools.market_snapshot_tools:run_market_history_amount",
     "market_minute_amount_series": "src.tools.market_snapshot_tools:run_market_minute_amount_series",
@@ -342,6 +343,9 @@ def run_tool(
                 normalized_args,
                 owner_ids=owner_ids,
                 allow_inactive=False,
+                progress_sink=(runtime_ctx or {}).get("_progress_sink")
+                if callable((runtime_ctx or {}).get("_progress_sink"))
+                else None,
             )
         raise KeyError(f"unknown tool: {tool_name}")
     if not is_remote_http and is_tool_definition_disabled(tool_name):

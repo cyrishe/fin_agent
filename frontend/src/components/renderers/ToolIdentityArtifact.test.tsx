@@ -49,6 +49,66 @@ describe("ToolIdentityArtifact", () => {
     expect(html).not.toContain("立即使用");
   });
 
+  it("shows a schema-driven interactive test workbench for the immutable revision", () => {
+    const html = renderToStaticMarkup(<ToolIdentityArtifact
+      data={{
+        lifecycle: "draft",
+        version: "3",
+        asset_ref: {
+          kind: "tool",
+          name: "ct_batch_quality",
+          display_name: "批量质量评价",
+          revision: 3,
+        },
+        details: {
+          input_schema: {
+            type: "object",
+            required: ["stock_codes"],
+            properties: {
+              stock_codes: {
+                type: "array",
+                title: "股票列表",
+                description: "待评价的股票代码。",
+                items: { type: "string" },
+              },
+              threshold: { type: "number", title: "阈值" },
+            },
+          },
+          sample_input: { stock_codes: ["600519.SH"], threshold: 0.8 },
+        },
+      }}
+    />);
+
+    expect(html).toContain("交互测试台");
+    expect(html).toContain("固定测试候选版本 3");
+    expect(html).toContain("股票列表");
+    expect(html).toContain("600519.SH");
+    expect(html).toContain("运行这个测试用例");
+  });
+
+  it("keeps a JSON test surface for open input schemas without declared fields", () => {
+    const html = renderToStaticMarkup(<ToolIdentityArtifact
+      data={{
+        lifecycle: "draft",
+        summary: "运行开放参数工具。",
+        asset_ref: {
+          kind: "tool",
+          name: "ct_open_payload",
+          display_name: "开放参数工具",
+          revision: 2,
+        },
+        details: {
+          input_schema: { type: "object", additionalProperties: true },
+          sample_input: { query: "测试" },
+        },
+      }}
+    />);
+
+    expect(html).toContain("交互测试台");
+    expect(html).toContain("测试输入 JSON");
+    expect(html).toContain("&quot;query&quot;: &quot;测试&quot;");
+  });
+
   it("reuses the authoritative Design flow and summarizes implementation evidence", () => {
     const html = renderToStaticMarkup(<ToolIdentityArtifact
       data={{

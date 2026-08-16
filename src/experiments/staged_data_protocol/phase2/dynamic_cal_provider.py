@@ -535,9 +535,9 @@ def _is_realtime(args: Mapping[str, Any]) -> bool:
     requested_fields = {field.strip() for field in _field_list(args.get("fields"))}
     if requested_fields & REALTIME_ONLY_FIELDS:
         return True
-    raw = args.get("realtime", 1)
+    raw = args.get("mode", args.get("realtime", 0))
     if raw in (None, ""):
-        return True
+        return False
     if isinstance(raw, bool):
         return raw
     if isinstance(raw, (int, float)):

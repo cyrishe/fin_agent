@@ -9,7 +9,7 @@ import re
 from typing import Iterable
 
 from reportlab.lib import colors
-from reportlab.lib.enums import TA_CENTER, TA_LEFT
+from reportlab.lib.enums import TA_LEFT
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
 from reportlab.lib.units import mm
@@ -18,7 +18,6 @@ from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.platypus import (
     BaseDocTemplate,
     Frame,
-    KeepTogether,
     PageTemplate,
     Paragraph,
     Spacer,
@@ -121,6 +120,32 @@ class FinancialReportPdfService:
         if buffer:
             yield " ".join(buffer)
 
+    @staticmethod
+    def _normalized_title(value: str) -> str:
+        return re.sub(r"[*_`]", "", str(value or "")).strip()
+
+    @classmethod
+    def _report_body_lines(cls, report_text: str, title: str) -> list[str]:
+        """Return the canonical report body without duplicated title/preamble.
+
+        The persisted answer remains untouched for auditability.  A matching H1 is
+        the stable boundary between agent execution chatter and the user-facing
+        report, so the PDF starts after it even when the model leaked a short
+        synthesis preamble before the heading.
+        """
+
+        lines = str(report_text or "").replace("\r\n", "\n").split("\n")
+        expected_title = cls._normalized_title(title)
+        for index, line in enumerate(lines):
+            heading = _MARKDOWN_HEADING.match(line)
+            if (
+                heading
+                and len(heading.group(1)) == 1
+                and cls._normalized_title(heading.group(2)) == expected_title
+            ):
+                return lines[index + 1 :]
+        return lines
+
     def _styles(self) -> dict[str, ParagraphStyle]:
         base = getSampleStyleSheet()
         return {
@@ -202,6 +227,7 @@ class FinancialReportPdfService:
                     textColor=colors.HexColor("#153C50"),
                     spaceBefore={1: 15, 2: 13, 3: 10, 4: 8}[level],
                     spaceAfter=6,
+                    keepWithNext=True,
                     wordWrap="CJK",
                 )
                 for level in range(1, 5)
@@ -274,19 +300,7 @@ class FinancialReportPdfService:
                 ]
             )
 
-        lines = str(value.report_text).replace("\r\n", "\n").split("\n")
-        for index, line in enumerate(lines):
-            if not line.strip():
-                continue
-            first_heading = _MARKDOWN_HEADING.match(line)
-            if (
-                first_heading
-                and len(first_heading.group(1)) == 1
-                and re.sub(r"[*_`]", "", first_heading.group(2)).strip()
-                == re.sub(r"[*_`]", "", str(value.title or "")).strip()
-            ):
-                lines.pop(index)
-            break
+        lines = self._report_body_lines(value.report_text, value.title)
         cursor = 0
         paragraph_buffer: list[str] = []
 
@@ -332,9 +346,7 @@ class FinancialReportPdfService:
                 flush_paragraphs()
                 level = min(4, len(heading.group(1)))
                 story.append(
-                    KeepTogether(
-                        [Paragraph(self._inline_markup(heading.group(2)), styles[f"h{level}"])]
-                    )
+                    Paragraph(self._inline_markup(heading.group(2)), styles[f"h{level}"])
                 )
             elif list_item:
                 flush_paragraphs()

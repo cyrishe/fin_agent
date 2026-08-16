@@ -28,6 +28,54 @@ def test_finance_request_accepts_semantic_result_name_for_python_coding() -> Non
     assert call.api == "stock.quote"
 
 
+def test_finance_runtime_resolves_large_target_list_from_structured_binding(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    import src.services.finance_data_tool_runtime_service as runtime_module
+
+    captured = {}
+
+    def fake_execute(call, previous_results):
+        captured["args"] = call.args
+        return ResultHandle(
+            name=call.result_id,
+            api=call.api,
+            columns=["code", "close"],
+            data={"status": "ok", "rows": [], "row_count": 0},
+        )
+
+    monkeypatch.setattr(runtime_module, "execute_api_call", fake_execute)
+    stock_codes = [f"{index:06d}.SZ" for index in range(5_000)]
+
+    result = FinanceDataToolRuntimeService().execute_request(
+        request=(
+            "quotes = stock.quote(codes = $stock_codes, mode = 0, count = 3) "
+            "-> code, close"
+        ),
+        bindings={"stock_codes": stock_codes},
+    )
+
+    assert result["ok"] is True
+    assert captured["args"]["codes"] == stock_codes
+    assert captured["args"]["count"] == 3
+    assert len(result["request"]) < 200
+
+
+def test_finance_runtime_rejects_missing_or_unused_binding() -> None:
+    service = FinanceDataToolRuntimeService()
+
+    with pytest.raises(ValueError, match="missing finance query binding"):
+        service.execute_request(
+            request="r1 = stock.quote(codes = $stock_codes, mode = 0) -> code"
+        )
+
+    with pytest.raises(ValueError, match="unused finance query bindings"):
+        service.execute_request(
+            request="r1 = stock.quote(mode = 0) -> code",
+            bindings={"stock_codes": ["600519.SH"]},
+        )
+
+
 def test_finance_data_catalog_builds_subject_dataview_function_tree() -> None:
     catalog = FinanceDataToolCatalogService().build_tree()
 
@@ -138,6 +186,35 @@ def test_finance_data_runtime_exposes_provider_failure(
         "status": "provider_error",
         "reason": "database unavailable",
     }
+
+
+def test_finance_data_runtime_hides_provider_sql_shape(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    import src.services.finance_data_tool_runtime_service as runtime_module
+
+    monkeypatch.setattr(
+        runtime_module,
+        "execute_api_call",
+        lambda call, previous_results: ResultHandle(
+            name=call.result_id,
+            api=call.api,
+            columns=["code", "close"],
+            data={
+                "status": "ok",
+                "rows": [{"code": "600519.SH", "close": 1800.0}],
+                "row_count": 1,
+                "sql_shape": {"where": "q.trade_date < %s"},
+            },
+        ),
+    )
+
+    result = FinanceDataToolRuntimeService().execute_request(
+        request='r1 = stock.quote(filter = "code = 600519.SH", mode = 0) -> code, close'
+    )
+
+    assert result["ok"] is True
+    assert "sql_shape" not in result["result"]["data"]
 
 
 def test_finance_data_runtime_structures_provider_exception(

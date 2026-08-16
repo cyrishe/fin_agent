@@ -34,6 +34,33 @@ def _revision_companions(value: Mapping[str, Any]) -> Dict[str, Any]:
     }
 
 
+def _implementation_modules(
+    design: Mapping[str, Any],
+    *,
+    code: str,
+) -> tuple[str, List[Dict[str, Any]]]:
+    """Keep the public code field and the executable entry module identical."""
+
+    modules = [
+        dict(item)
+        for item in design.get("modules") or []
+        if isinstance(item, Mapping)
+    ]
+    if not modules:
+        modules = [
+            {
+                "module_id": "main",
+                "language": "python",
+                "entrypoint": "run",
+                "source_code": code,
+            }
+        ]
+    entry_module = _trim(modules[0].get("module_id")) or "main"
+    modules[0]["module_id"] = entry_module
+    modules[0]["source_code"] = code
+    return entry_module, modules
+
+
 class DatabaseCustomToolStoreService:
     """Persist dynamic custom-tool modules in the runtime artifact registry."""
 
@@ -99,17 +126,15 @@ class DatabaseCustomToolStoreService:
             "input": dict(design.get("input_schema") or {}),
             "output": dict(design.get("output_schema") or {}),
         }
-        supplied_modules = [dict(item) for item in design.get("modules") or [] if isinstance(item, Mapping)]
+        entry_module, supplied_modules = _implementation_modules(
+            design,
+            code=code,
+        )
         implementation_payload = {
             "implementation": {
                 "kind": "database_code_module",
-                "entry_module": _trim((supplied_modules[0] if supplied_modules else {}).get("module_id")) or "main",
-                "modules": supplied_modules or [{
-                    "module_id": "main",
-                    "language": "python",
-                    "entrypoint": "run",
-                    "source_code": code,
-                }],
+                "entry_module": entry_module,
+                "modules": supplied_modules,
             },
             "sample_input": dict(design.get("sample_input") or {}),
             "proposed_tests": [dict(item) for item in design.get("proposed_tests") or [] if isinstance(item, Mapping)],
@@ -255,27 +280,15 @@ class DatabaseCustomToolStoreService:
             "input": dict(design.get("input_schema") or {}),
             "output": dict(design.get("output_schema") or {}),
         }
-        supplied_modules = [
-            dict(item)
-            for item in design.get("modules") or []
-            if isinstance(item, Mapping)
-        ]
+        entry_module, supplied_modules = _implementation_modules(
+            design,
+            code=code,
+        )
         implementation_payload = {
             "implementation": {
                 "kind": "database_code_module",
-                "entry_module": _trim(
-                    (supplied_modules[0] if supplied_modules else {}).get("module_id")
-                )
-                or "main",
-                "modules": supplied_modules
-                or [
-                    {
-                        "module_id": "main",
-                        "language": "python",
-                        "entrypoint": "run",
-                        "source_code": code,
-                    }
-                ],
+                "entry_module": entry_module,
+                "modules": supplied_modules,
             },
             "sample_input": dict(design.get("sample_input") or {}),
             "proposed_tests": [

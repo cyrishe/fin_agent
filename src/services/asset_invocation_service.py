@@ -236,6 +236,11 @@ class AssetInvocationService:
             if isinstance(contract.get("finance_tool_profile"), Mapping)
             else {}
         )
+        strategy_runtime_profile = (
+            dict(contract.get("strategy_runtime_profile") or {})
+            if isinstance(contract.get("strategy_runtime_profile"), Mapping)
+            else {}
+        )
         search_parts = [
             name,
             display_name,
@@ -271,6 +276,8 @@ class AssetInvocationService:
         }
         if finance_tool_profile:
             asset["finance_tool_profile"] = finance_tool_profile
+        if strategy_runtime_profile:
+            asset["strategy_runtime_profile"] = strategy_runtime_profile
         if "editable" in contract:
             asset["editable"] = bool(contract.get("editable"))
         return asset
@@ -294,6 +301,7 @@ class AssetInvocationService:
                 "version",
                 "revision",
                 "finance_tool_profile",
+                "strategy_runtime_profile",
             )
             if key in asset
         }
@@ -388,6 +396,11 @@ class AssetInvocationService:
                 if isinstance(bundle.get("finance_tool_profile"), Mapping)
                 else {}
             )
+            strategy_runtime_profile = (
+                dict(bundle.get("strategy_runtime_profile") or {})
+                if isinstance(bundle.get("strategy_runtime_profile"), Mapping)
+                else {}
+            )
             if self._trim(finance_tool_profile.get("family")).lower() == "action":
                 # Action assets are currently design-only and must not appear
                 # in the invocable Tool/Skill picker.
@@ -423,6 +436,7 @@ class AssetInvocationService:
                 "version": self._trim(loaded_manifest.get("version")) or "v1",
                 "revision": int(loaded_manifest.get("current_revision") or 0),
                 "finance_tool_profile": finance_tool_profile,
+                "strategy_runtime_profile": strategy_runtime_profile,
             }
             keywords = [
                 *[self._trim(item) for item in (loaded_manifest.get("keywords") or []) if self._trim(item)],
@@ -836,7 +850,6 @@ class AssetInvocationService:
         attachment_payload = input_bundle["attachments"]
         attachment_prompt_payload = input_bundle["prompt_attachments"]
         properties = self._schema_properties(contract.get("input_schema"))
-        required = self._schema_required(contract.get("input_schema"))
 
         if not properties and not user_request and not attachment_payload:
             model_payload: Dict[str, Any] = {
@@ -872,18 +885,51 @@ class AssetInvocationService:
         items = execution.get("items") if isinstance(execution.get("items"), list) else []
         item_argument = self._trim(execution.get("item_argument"))
         source = execution.get("source") if isinstance(execution.get("source"), Mapping) else {}
+        entity_list_argument = self._entity_local_list_argument(
+            contract,
+            preferred=item_argument,
+        )
+        if entity_list_argument and not items:
+            direct_targets = arguments.get(entity_list_argument)
+            if isinstance(direct_targets, list) and direct_targets:
+                items = list(direct_targets)
+                mode = "single"
+                item_argument = entity_list_argument
         try:
-            source_items = self.input_resolver.materialize(source, attachment_payload)
+            source_resolution = self.input_resolver.materialize_with_evidence(
+                source,
+                attachment_payload,
+            )
         except InvocationInputError as exc:
             raise AssetInvocationError(str(exc)) from exc
+        source_items = (
+            list(source_resolution.get("items") or [])
+            if isinstance(source_resolution, Mapping)
+            else []
+        )
+        runtime_profile = (
+            contract.get("strategy_runtime_profile")
+            if isinstance(contract.get("strategy_runtime_profile"), Mapping)
+            else {}
+        )
+        binding = (
+            runtime_profile.get("binding")
+            if isinstance(runtime_profile.get("binding"), Mapping)
+            else {}
+        )
+        strategy_item_argument = self._trim(binding.get("field"))
+        runtime_item_argument = strategy_item_argument or entity_list_argument
         if source_items:
             items = source_items
+            if runtime_item_argument:
+                item_argument = runtime_item_argument
         mode, arguments, items = self._align_execution_with_schema(
             mode=mode,
             arguments=arguments,
             item_argument=item_argument,
             items=items,
             input_schema=contract.get("input_schema") if isinstance(contract.get("input_schema"), dict) else {},
+            map_array_items=False,
         )
         normalized_calls, missing_required = self._normalize_calls(
             target=target,
@@ -892,16 +938,58 @@ class AssetInvocationService:
             mode=mode,
             item_argument=item_argument,
             items=items,
+            custom_tool=bool(contract.get("custom_tool")),
         )
+        raw_entities = model_payload.get("entities")
+        source_is_finance_universe = self._trim(source.get("kind")).lower() == "finance_universe"
+        if source_is_finance_universe and source_items and runtime_item_argument and isinstance(raw_entities, list):
+            raw_entities = [
+                item
+                for item in raw_entities
+                if not isinstance(item, Mapping)
+                or self._trim(item.get("argument")) != runtime_item_argument
+            ]
         resolved_entities, unresolved_entities = self._resolve_entities(
             normalized_calls,
-            model_payload.get("entities"),
+            raw_entities,
         )
+        if source_is_finance_universe and source_items and runtime_item_argument:
+            source_records = (
+                source_resolution.get("records")
+                if isinstance(source_resolution.get("records"), list)
+                else []
+            )
+            resolved_entities.extend(
+                {
+                    "kind": "stock",
+                    "query": self._trim(item.get("name") or item.get("code")),
+                    "code": self._trim(item.get("code")).upper(),
+                    "name": self._trim(item.get("name")),
+                    "argument": runtime_item_argument,
+                }
+                for item in source_records
+                if isinstance(item, Mapping) and self._trim(item.get("code"))
+            )
         model_missing = [self._trim(item) for item in (model_payload.get("missing_required") or []) if self._trim(item)]
+        if source_items and runtime_item_argument:
+            model_missing = [
+                item for item in model_missing if item != runtime_item_argument
+            ]
         missing_required = list(dict.fromkeys([*model_missing, *missing_required]))
-        status = "needs_input" if missing_required or unresolved_entities or not normalized_calls else "ready"
+        source_status = self._trim(source_resolution.get("status")).lower()
+        source_message = self._trim(source_resolution.get("message"))
+        status = (
+            "needs_input"
+            if source_status in {"needs_input", "needs_selection", "failed"}
+            or missing_required
+            or unresolved_entities
+            or not normalized_calls
+            else "ready"
+        )
         message = (
-            "还需要补充：" + "、".join(missing_required)
+            source_message
+            if source_status in {"needs_input", "needs_selection", "failed"}
+            else "还需要补充：" + "、".join(missing_required)
             if missing_required
             else "未能确认股票标的：" + "、".join(unresolved_entities) + "。请补充准确的公司全称或股票代码。"
             if unresolved_entities
@@ -924,6 +1012,18 @@ class AssetInvocationService:
                 "items": items,
                 "source": dict(source),
                 "item_count": item_count,
+            },
+            "source_resolution": {
+                key: source_resolution.get(key)
+                for key in (
+                    "status",
+                    "message",
+                    "member_count",
+                    "resolved_subject",
+                    "evidence",
+                    "candidates",
+                )
+                if source_resolution.get(key) not in (None, "", [], {})
             },
             "calls": normalized_calls,
             "resolved_entities": resolved_entities,
@@ -955,11 +1055,31 @@ class AssetInvocationService:
                 if label and label not in labels:
                     labels.append(label)
             if labels:
-                lines.append("标的：" + "、".join(labels))
+                visible = labels[:6]
+                suffix = f" 等 {len(labels)} 只" if len(labels) > len(visible) else ""
+                lines.append("标的：" + "、".join(visible) + suffix)
+        source_resolution = (
+            invocation.get("source_resolution")
+            if isinstance(invocation.get("source_resolution"), Mapping)
+            else {}
+        )
+        resolved_subject = (
+            source_resolution.get("resolved_subject")
+            if isinstance(source_resolution.get("resolved_subject"), Mapping)
+            else {}
+        )
+        if resolved_subject:
+            subject_name = self._trim(resolved_subject.get("name"))
+            member_count = int(source_resolution.get("member_count") or 0)
+            if subject_name:
+                lines.append(
+                    f"股票池：{subject_name}"
+                    + (f"，共 {member_count} 只" if member_count else "")
+                )
         if len(calls) > 1:
-            lines.append(f"执行方式：逐项运行，共 {len(calls)} 项")
+            lines.append(f"扫描范围：共 {len(calls)} 个目标")
         elif calls and int((invocation.get("execution") or {}).get("item_count") or 0) > 1:
-            lines.append(f"执行方式：批量运行，共 {invocation['execution']['item_count']} 项")
+            lines.append(f"研究范围：共 {invocation['execution']['item_count']} 个目标")
         if calls:
             argument_lines = []
             for name, value in calls[0].items():
@@ -976,7 +1096,7 @@ class AssetInvocationService:
                 "name": self._trim(item.get("name")),
                 "display_code": self._trim(item.get("code")).split(".", 1)[0],
             }
-            for item in entities
+            for item in entities[:20]
         ]
         return {
             "target": {"kind": self._trim(target.get("kind")), "name": self._trim(target.get("name")), "display_name": display_name},
@@ -1048,6 +1168,11 @@ class AssetInvocationService:
                 if isinstance(bundle.get("finance_tool_profile"), Mapping)
                 else {}
             )
+            strategy_runtime_profile = (
+                dict(bundle.get("strategy_runtime_profile") or {})
+                if isinstance(bundle.get("strategy_runtime_profile"), Mapping)
+                else {}
+            )
             if self._trim(finance_tool_profile.get("family")).lower() == "action":
                 raise AssetInvocationError(
                     f"Tool 当前仅有设计方案，不能调用：{name}"
@@ -1079,6 +1204,7 @@ class AssetInvocationService:
                 "version": self._trim(manifest.get("version")) or "v1",
                 "revision": int(manifest.get("current_revision") or 0),
                 "finance_tool_profile": finance_tool_profile,
+                "strategy_runtime_profile": strategy_runtime_profile,
             }
         path = self.tool_definitions_dir / f"{name}.tool.json"
         if not path.exists():
@@ -1164,6 +1290,7 @@ class AssetInvocationService:
         item_argument: str,
         items: List[Any],
         input_schema: Dict[str, Any],
+        map_array_items: bool = False,
     ) -> tuple[str, Dict[str, Any], List[Any]]:
         if not item_argument or not items:
             return mode, arguments, items
@@ -1173,6 +1300,8 @@ class AssetInvocationService:
         if self._trim(definition.get("type")).lower() == "array" and all(
             not isinstance(item, Mapping) for item in normalized_items
         ):
+            if map_array_items:
+                return "map", arguments, normalized_items
             return "single", {**arguments, item_argument: normalized_items}, normalized_items
         return "map", arguments, normalized_items
 
@@ -1223,14 +1352,27 @@ class AssetInvocationService:
         mode: str,
         item_argument: str,
         items: List[Any],
+        custom_tool: bool = False,
     ) -> tuple[List[Dict[str, Any]], List[str]]:
         raw_calls: List[Dict[str, Any]] = []
         if mode == "map" and items:
+            properties = self._schema_properties(input_schema)
+            item_definition = (
+                properties.get(item_argument)
+                if isinstance(properties.get(item_argument), Mapping)
+                else {}
+            )
+            item_argument_is_array = (
+                self._trim(item_definition.get("type")).lower() == "array"
+            )
             for item in items:
                 if isinstance(item, Mapping):
                     raw_calls.append({**arguments, **dict(item)})
                 elif item_argument:
-                    raw_calls.append({**arguments, item_argument: item})
+                    raw_calls.append({
+                        **arguments,
+                        item_argument: [item] if item_argument_is_array else item,
+                    })
         else:
             raw_calls = [dict(arguments)]
         if target.get("kind") == "skill":
@@ -1240,6 +1382,29 @@ class AssetInvocationService:
             if not raw_calls:
                 missing.extend(self._schema_required(input_schema))
             return raw_calls, list(dict.fromkeys(missing))
+        if custom_tool:
+            properties = self._schema_properties(input_schema)
+            normalized_calls = []
+            missing: List[str] = []
+            for call in raw_calls:
+                normalized_call = (
+                    {
+                        name: call[name]
+                        for name in properties
+                        if name in call
+                    }
+                    if properties
+                    else dict(call)
+                )
+                for name, definition in properties.items():
+                    field = definition if isinstance(definition, Mapping) else {}
+                    if name not in normalized_call and "default" in field:
+                        normalized_call[name] = field.get("default")
+                normalized_calls.append(normalized_call)
+                missing.extend(self._missing_required(normalized_call, input_schema))
+            if not raw_calls:
+                missing.extend(self._schema_required(input_schema))
+            return normalized_calls, list(dict.fromkeys(missing))
         normalized_calls: List[Dict[str, Any]] = []
         missing: List[str] = []
         from src.tools.registry import normalize_tool_args_for_definition
@@ -1298,6 +1463,62 @@ class AssetInvocationService:
     @staticmethod
     def _schema_properties(schema: Any) -> Dict[str, Any]:
         return dict(schema.get("properties") or {}) if isinstance(schema, Mapping) and isinstance(schema.get("properties"), Mapping) else {}
+
+    def _entity_local_list_argument(
+        self,
+        contract: Mapping[str, Any],
+        *,
+        preferred: str = "",
+    ) -> str:
+        profile = (
+            contract.get("finance_tool_profile")
+            if isinstance(contract.get("finance_tool_profile"), Mapping)
+            else {}
+        )
+        if self._trim(profile.get("execution_shape")).lower() != "entity_local":
+            return ""
+        schema = (
+            contract.get("input_schema")
+            if isinstance(contract.get("input_schema"), Mapping)
+            else {}
+        )
+        properties = self._schema_properties(schema)
+
+        def is_string_array(name: str) -> bool:
+            definition = properties.get(name)
+            if not isinstance(definition, Mapping):
+                return False
+            if self._trim(definition.get("type")).lower() != "array":
+                return False
+            items = definition.get("items") if isinstance(definition.get("items"), Mapping) else {}
+            return self._trim(items.get("type")).lower() == "string"
+
+        runtime_profile = (
+            contract.get("strategy_runtime_profile")
+            if isinstance(contract.get("strategy_runtime_profile"), Mapping)
+            else {}
+        )
+        binding = (
+            runtime_profile.get("binding")
+            if isinstance(runtime_profile.get("binding"), Mapping)
+            else {}
+        )
+        for candidate in (
+            self._trim(binding.get("field")),
+            self._trim(preferred),
+        ):
+            if candidate and is_string_array(candidate):
+                return candidate
+        candidates = [
+            self._trim(name)
+            for name in properties
+            if is_string_array(self._trim(name))
+        ]
+        if len(candidates) == 1:
+            return candidates[0]
+        required = set(self._schema_required(schema))
+        required_candidates = [name for name in candidates if name in required]
+        return required_candidates[0] if len(required_candidates) == 1 else ""
 
     def _schema_required(self, schema: Any) -> List[str]:
         return [self._trim(item) for item in ((schema.get("required") or []) if isinstance(schema, Mapping) else []) if self._trim(item)]

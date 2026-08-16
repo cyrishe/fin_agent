@@ -179,9 +179,9 @@
         const node = document.createElement("div");
         node.className = "card";
 
-        if (isLegacy && isEditable) {
+        if (item.workspace_url) {
           const titleLink = textElement("a", "title", title);
-          titleLink.href = `${resolvedSkillStudioBaseUrl}/${encodeURIComponent(item.skill_name || "")}`;
+          titleLink.href = resolveUrl(String(item.workspace_url));
           node.appendChild(titleLink);
         } else {
           node.appendChild(textElement("div", "title", title));
@@ -230,13 +230,18 @@
           });
           actions.append(lifecycleButton, retrievalButton);
         } else {
+          if (item.workspace_url) {
+            const detailLink = textElement("a", "btn", "查看方法");
+            detailLink.href = resolveUrl(String(item.workspace_url));
+            actions.appendChild(detailLink);
+          }
           actions.appendChild(
             textElement(
               "span",
               "muted",
               isLegacy
-                ? "历史兼容资产；统一 Hub 当前只读。"
-                : "由 Finance CC 按专业问题选择；显式调用入口尚未开放。",
+                ? "历史兼容资产；新 Studio 只展示目录身份。"
+                : "可查看已发布方法；由 Finance CC 按专业问题选择。",
             )
           );
         }

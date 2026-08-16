@@ -37,6 +37,11 @@ interface Props {
 
 const record = (value: unknown): UnknownRecord => value && typeof value === "object" && !Array.isArray(value) ? value as UnknownRecord : {};
 const list = (value: unknown): unknown[] => Array.isArray(value) ? value : [];
+const resourceHref = (value: unknown): string => {
+  const href = String(value || "").trim();
+  const internal = href.startsWith("/") && !href.startsWith("//");
+  return internal || href.startsWith("https://") || href.startsWith("http://") ? href : "";
+};
 
 function Workflow({ data }: { data: UnknownRecord }) {
   const items = list(data.items).map(record);
@@ -228,7 +233,10 @@ export default function BlockRenderer(props: Props) {
   }
   else if (renderer === "resource.list") {
     const resources = Array.isArray(data.resources) ? data.resources.map(record) : [];
-    content = <div className="resource-list">{resources.length ? resources.map((resource, index) => <div key={String(resource.resource_id || index)}><div><strong>{String(resource.title || `资源 ${index + 1}`)}</strong><span>{String(resource.relation || resource.mime_type || "")}</span></div>{resource.uri ? <code>{String(resource.uri)}</code> : null}</div>) : <div className="empty-block">暂无可展示资源</div>}</div>;
+    content = <div className="resource-list">{resources.length ? resources.map((resource, index) => {
+      const href = resourceHref(resource.uri);
+      return <div key={String(resource.resource_id || index)}><div><strong>{String(resource.title || `资源 ${index + 1}`)}</strong><span>{String(resource.relation || resource.mime_type || "")}</span></div>{href ? <a className="resource-link" href={href}>查看</a> : resource.uri ? <code>{String(resource.uri)}</code> : null}</div>;
+    }) : <div className="empty-block">暂无可展示资源</div>}</div>;
   } else if (renderer === "fallback.structured") {
     content = <JsonBlock value={data} title="结构化数据" />;
   }

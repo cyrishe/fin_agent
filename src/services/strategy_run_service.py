@@ -856,13 +856,18 @@ class PreparedStrategyRun:
 
 
 class StrategyInvocationAdapter:
-    """Compile a resolved universe into calls without changing strategy logic."""
+    """Compile a resolved universe into schema-valid calls without changing business logic.
+
+    Native array bindings receive the complete resolved universe in one call.
+    Scalar legacy bindings remain ordered one-target calls for compatibility.
+    """
 
     def prepare(
         self,
         plan: ResolvedStrategyRunPlan,
         *,
         input_schema: Mapping[str, Any] | None = None,
+        execution_shape: str = "",
     ) -> PreparedStrategyRun:
         schema = self._input_schema(input_schema or {})
         arguments = _json_mapping(plan.parameters)
@@ -915,7 +920,7 @@ class StrategyInvocationAdapter:
                 field_name=field_name,
             )
             arguments[field_name] = list(plan.universe.members)
-            invocations: tuple[StrategyInvocation, ...] = (
+            invocations = (
                 StrategyInvocation(
                     index=0, subjects=plan.universe.members, arguments=arguments
                 ),
@@ -1040,7 +1045,7 @@ class StrategyAssetInvoker:
 
 
 class StrategyRunExecutor:
-    """Bounded parallel dispatch for independent per-entity strategy calls."""
+    """Dispatch prepared calls; bounded parallelism only serves legacy multi-call plans."""
 
     def __init__(
         self,

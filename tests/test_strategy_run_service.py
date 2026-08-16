@@ -338,6 +338,39 @@ def test_array_entity_binding_requires_string_items() -> None:
     assert caught.value.code == "unsupported_entity_binding"
 
 
+def test_entity_local_array_binding_receives_complete_universe_once() -> None:
+    sessions = _business_days(dt.date(2026, 7, 20), 10)
+    profile = StrategyRuntimeProfile(
+        entity_argument="stock_codes", default_run_sessions=3
+    )
+    plan, _ = _resolve(
+        sessions,
+        scope={"targets": ["600519.SH", "000858.SZ"]},
+        profile=profile,
+    )
+
+    prepared = StrategyInvocationAdapter().prepare(
+        plan,
+        input_schema={
+            "type": "object",
+            "properties": {
+                "stock_codes": {
+                    "type": "array",
+                    "items": {"type": "string"},
+                }
+            },
+        },
+        execution_shape="entity_local",
+    )
+
+    assert [item.subjects for item in prepared.invocations] == [
+        ("600519.SH", "000858.SZ"),
+    ]
+    assert [item.arguments["stock_codes"] for item in prepared.invocations] == [
+        ("600519.SH", "000858.SZ"),
+    ]
+
+
 class _RecordingInvoker:
     def __init__(self, *, failures=(), require_parallel=False):
         self.failures = set(failures)

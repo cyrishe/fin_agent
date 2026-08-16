@@ -3,6 +3,7 @@ from pathlib import Path
 import time
 
 import fastjsonschema
+import pytest
 
 from src.services.codex_exec_skill_harness import CodexCustomToolCoder, CodexExecSkillHarness, CodexSdkSkillHarness
 
@@ -19,9 +20,6 @@ def test_coding_skill_contract_keeps_only_runtime_contract_and_natural_language_
     assert set(properties) == {
         "tool_contract",
         "implementation_summary",
-        "finance_tool_profile",
-        "strategy_runtime_profile",
-        "selection_output_profile",
     }
     assert properties["implementation_summary"]["type"] == "string"
     assert "implementation" not in properties
@@ -84,17 +82,20 @@ def test_coding_skill_sample_matches_schema() -> None:
                 "type": "array",
                 "required": True,
                 "description": "待求和的数字数组。",
+                "items_type": "number",
             }],
             "outputs": [{
                 "name": "total",
                 "type": "number",
                 "required": True,
                 "description": "合计值。",
+                "items_type": None,
             }, {
                 "name": "key_process_info",
                 "type": "object",
                 "required": True,
                 "description": "解释结果的核心中间信息。",
+                "items_type": None,
             }],
         },
         "implementation_summary": "读取数字数组，由 run 调用求和函数并返回 total。",
@@ -103,7 +104,7 @@ def test_coding_skill_sample_matches_schema() -> None:
     fastjsonschema.compile(json.loads((IMPLEMENTATION_DIR / "schema.json").read_text(encoding="utf-8")))(payload)
 
 
-def test_coding_profile_keeps_family_small_and_old_payload_compatible() -> None:
+def test_coding_schema_rejects_extra_runtime_state() -> None:
     schema = json.loads((IMPLEMENTATION_DIR / "schema.json").read_text(encoding="utf-8"))
     validate = fastjsonschema.compile(schema)
     base = {
@@ -118,39 +119,38 @@ def test_coding_profile_keeps_family_small_and_old_payload_compatible() -> None:
     }
 
     validate(base)
-    validate({
-        **base,
-        "finance_tool_profile": {
-            "protocol": "finance_tool_profile.v1",
-            "family": "analytics",
-            "execution_shape": "aggregate_context",
-            "output_semantic": "metric",
-            "summary": "计算大盘强度，不输出投资决策。",
-        },
-    })
-    assert schema["properties"]["finance_tool_profile"]["properties"]["family"]["enum"] == [
-        "information",
-        "analytics",
-        "strategy",
-        "action",
-    ]
-    assert schema["properties"]["finance_tool_profile"]["properties"]["execution_shape"]["enum"] == [
-        "aggregate_context",
-        "entity_local",
-        "cross_sectional",
-        "portfolio_stateful",
-    ]
-    assert schema["properties"]["finance_tool_profile"]["properties"]["output_semantic"]["enum"] == [
-        "facts",
-        "metric",
-        "series",
-        "assessment",
-        "ranked_selection",
-        "signal",
-        "portfolio_target",
-        "action_receipt",
-    ]
-    assert "finance_tool_profile" not in schema["required"]
+    with pytest.raises(fastjsonschema.JsonSchemaValueException):
+        validate({**base, "strategy_runtime_profile": {"binding": "stock_codes"}})
+    assert set(schema["required"]) == set(schema["properties"])
+
+
+def test_coding_schema_satisfies_strict_object_requirements_recursively() -> None:
+    schema = json.loads((IMPLEMENTATION_DIR / "schema.json").read_text(encoding="utf-8"))
+    issues = []
+
+    def inspect(node, path="$"):
+        if not isinstance(node, dict):
+            return
+        node_type = node.get("type")
+        is_object = node_type == "object" or (
+            isinstance(node_type, list) and "object" in node_type
+        )
+        properties = node.get("properties")
+        if is_object and isinstance(properties, dict):
+            if node.get("additionalProperties") is not False:
+                issues.append(f"{path}: additionalProperties must be false")
+            if set(node.get("required") or []) != set(properties):
+                issues.append(f"{path}: required must include every property")
+        for key, value in node.items():
+            if isinstance(value, dict):
+                inspect(value, f"{path}.{key}")
+            elif isinstance(value, list):
+                for index, item in enumerate(value):
+                    inspect(item, f"{path}.{key}[{index}]")
+
+    inspect(schema)
+
+    assert issues == []
 
 
 def test_coding_skill_requires_compact_core_process_evidence_and_alignment_explanation() -> None:
@@ -162,14 +162,29 @@ def test_coding_skill_requires_compact_core_process_evidence_and_alignment_expla
     combined = "\n".join((skill_text, playbook_text, contract_text))
 
     assert "DYNAMIC_TOOL_TEMPLATE.py" in combined
-    assert "工具输出遵循 Design，并包含 `key_process_info`" in combined
-    assert "核心中间结构、指标名称和值" in combined
+    assert "包含 `key_process_info`" in combined
     assert "静态检查" in combined
-    assert "输入、输出、核心逻辑与数据范围" in combined
+    assert "输入、输出、核心逻辑和数据范围" in combined
     assert "只有两项" in combined
     assert "不判断策略是否有效" in combined
     assert "当前 Coding 会话和同一工作区" in combined
-    assert "一次性输出最新版结果" in combined
+    assert "只输出一次最新版" in combined
+
+
+def test_coding_skill_batches_entity_data_and_keeps_calculation_simple() -> None:
+    skill_text = (IMPLEMENTATION_DIR / "SKILL.md").read_text(encoding="utf-8")
+    contract_text = (
+        IMPLEMENTATION_DIR / "references" / "coding-output-contract.md"
+    ).read_text(encoding="utf-8")
+    combined = "\n".join((skill_text, contract_text))
+
+    assert "Coding 保持这一个列表输入" in combined
+    assert "简单循环调用“单目标计算函数”" in combined
+    assert "同一种数据的查询次数不应随着目标数量增长" in combined
+    assert "一次查询完整目标列表" in combined
+    assert "没有必要再增加线程池、异步调度或分片" in combined
+    assert "完整集合才能排名或归一化" in combined
+    assert "一次批量查询" in combined
 
 
 def test_coder_defaults_to_focused_implementation_skill_and_schema() -> None:
@@ -246,6 +261,20 @@ def test_coder_summarizes_invalid_schema_without_exposing_raw_sdk_payload() -> N
     assert result == {
         "code": "coding_schema_invalid",
         "summary": "字段 source 缺少严格 Schema 所需的类型声明。",
+    }
+
+
+def test_coder_reports_missing_required_field_from_provider_error() -> None:
+    detail = (
+        "invalid_json_schema: In context=(), 'required' is required to include "
+        "every key in properties. Missing 'items_type'."
+    )
+
+    result = CodexCustomToolCoder._failure_summary(detail)
+
+    assert result == {
+        "code": "coding_schema_invalid",
+        "summary": "字段 items_type 未包含在严格 Schema 的 required 声明中。",
     }
 
 

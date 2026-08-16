@@ -8,12 +8,90 @@ from werkzeug.datastructures import FileStorage
 from src.services.attachment_service import AttachmentService
 from src.services.asset_invocation_service import AssetInvocationError, AssetInvocationService
 from src.services.file_io_tool_service import FileIoToolService
+from src.services.invocation_input_resolver_service import InvocationInputResolverService
 from src.services.skill_studio_service import SkillStudioService
 
 
 class FakeStore:
     def exists(self, _name):
         return False
+
+
+class FakeStrategyStore:
+    def exists(self, name):
+        return name == "strategy_tool"
+
+    def load_for_runtime(self, name, **_kwargs):
+        assert name == "strategy_tool"
+        return {
+            "manifest": {
+                "tool_name": name,
+                "display_name": "单股策略",
+                "description": "逐股判断信号。",
+                "status": "active",
+                "current_revision": 2,
+                "capabilities": ["custom_tool", "strategy"],
+            },
+            "input_schema": {
+                "type": "object",
+                "required": ["stock_code"],
+                "properties": {"stock_code": {"type": "string"}},
+            },
+            "design_contract": {},
+            "finance_tool_profile": {
+                "protocol": "finance_tool_profile.v1",
+                "family": "strategy",
+                "execution_shape": "entity_local",
+                "output_semantic": "signal",
+            },
+            "strategy_runtime_profile": {
+                "protocol": "strategy_runtime_profile.v1",
+                "binding": {"field": "stock_code"},
+                "required_history_sessions": 10,
+                "default_run_sessions": 1,
+                "default_universe_ref": {},
+                "market_code": "CN",
+            },
+        }
+
+
+class FakeEntityListStore:
+    def __init__(self, execution_shape="entity_local"):
+        self.execution_shape = execution_shape
+
+    def exists(self, name):
+        return name == "entity_list_tool"
+
+    def load_for_runtime(self, name, **_kwargs):
+        assert name == "entity_list_tool"
+        return {
+            "manifest": {
+                "tool_name": name,
+                "display_name": "多目标质量诊断",
+                "description": "对目标列表中的每只股票独立诊断。",
+                "status": "active",
+                "current_revision": 1,
+                "capabilities": ["custom_tool"],
+            },
+            "input_schema": {
+                "type": "object",
+                "required": ["stock_codes"],
+                "properties": {
+                    "stock_codes": {
+                        "type": "array",
+                        "items": {"type": "string"},
+                    },
+                    "window": {"type": "integer", "default": 20},
+                },
+            },
+            "design_contract": {},
+            "finance_tool_profile": {
+                "protocol": "finance_tool_profile.v1",
+                "family": "analytics",
+                "execution_shape": self.execution_shape,
+                "output_semantic": "assessment",
+            },
+        }
 
 
 def write_tool(tmp_path, name, schema):
@@ -395,6 +473,77 @@ def test_array_tool_receives_one_call_from_the_same_attachment_source(tmp_path):
     assert len(service.build_tool_execution_plan(result)["work_items"]) == 1
 
 
+def test_entity_local_array_contract_receives_one_complete_target_list(tmp_path):
+    def llm(_messages, **_kwargs):
+        return {
+            "status": "ready",
+            "arguments": {
+                "stock_codes": ["贵州茅台", "五粮液"],
+                "window": 30,
+            },
+            "execution": {
+                "mode": "single",
+                "item_argument": "",
+                "items": [],
+                "source": {},
+            },
+            "entities": [{"kind": "stock", "argument": "stock_codes"}],
+            "missing_required": [],
+            "reason": "按同一规则诊断两只股票。",
+        }, {}
+
+    service = AssetInvocationService(
+        custom_tool_store=FakeEntityListStore(),
+        tool_definitions_dir=str(tmp_path / "definitions"),
+        skills_root=str(tmp_path / "skills"),
+        llm_chat=llm,
+        stock_identity_resolver=stock_resolver(),
+    )
+
+    result = service.plan(text="$entity_list_tool 诊断贵州茅台和五粮液")
+
+    assert result["status"] == "ready"
+    assert result["execution"]["mode"] == "single"
+    assert result["calls"] == [
+        {"stock_codes": ["600519.SH", "000858.SZ"], "window": 30},
+    ]
+    assert "研究范围：共 2 个目标" in result["preview"]["message"]
+    assert len(service.build_tool_execution_plan(result)["work_items"]) == 1
+
+
+def test_cross_sectional_array_contract_keeps_the_complete_universe_in_one_call(tmp_path):
+    def llm(_messages, **_kwargs):
+        return {
+            "status": "ready",
+            "arguments": {"stock_codes": ["600519.SH", "000858.SZ"]},
+            "execution": {
+                "mode": "single",
+                "item_argument": "",
+                "items": [],
+                "source": {},
+            },
+            "entities": [],
+            "missing_required": [],
+            "reason": "在完整集合中横向比较。",
+        }, {}
+
+    service = AssetInvocationService(
+        custom_tool_store=FakeEntityListStore(execution_shape="cross_sectional"),
+        tool_definitions_dir=str(tmp_path / "definitions"),
+        skills_root=str(tmp_path / "skills"),
+        llm_chat=llm,
+    )
+
+    result = service.plan(text="$entity_list_tool 横向比较两只股票")
+
+    assert result["execution"]["mode"] == "single"
+    assert result["calls"] == [{
+        "stock_codes": ["600519.SH", "000858.SZ"],
+        "window": 20,
+    }]
+    assert len(service.build_tool_execution_plan(result)["work_items"]) == 1
+
+
 def test_table_source_materializes_rows_that_are_not_sent_to_the_model(tmp_path):
     attachment_service = AttachmentService(data_root=tmp_path / "data")
     values = [f"公司{index:02d}" for index in range(1, 26)]
@@ -501,10 +650,70 @@ def test_txt_upload_and_docx_table_are_available_to_the_invocation_compiler(tmp_
 
     assert text_attachment["kind"] == "document"
     assert result["calls"] == [{"stock": "600519.SH"}, {"stock": "000858.SZ"}]
-    rendered_prompt = json.dumps(seen_messages[0], ensure_ascii=False)
+    rendered_prompt = "\n".join(
+        str(message.get("content") or "")
+        for message in seen_messages[0]
+    )
     assert "贵州茅台" in rendered_prompt
     assert "五粮液" in rendered_prompt
     assert "table_preview" in rendered_prompt
+
+
+def test_plain_text_line_source_materializes_full_file_without_copying_it_into_prompt(tmp_path, monkeypatch):
+    attachment_service = AttachmentService(data_root=tmp_path / "data")
+    stock_codes = [f"{index:06d}.SZ" for index in range(1, 1501)]
+    attachment = upload_text(
+        attachment_service,
+        file_name="stocks.txt",
+        content=("\n".join(stock_codes) + "\n").encode("utf-8"),
+        mime_type="text/plain",
+    )
+    seen_messages = []
+
+    def llm(messages, **_kwargs):
+        seen_messages.append(messages)
+        return {
+            "status": "ready",
+            "arguments": {},
+            "execution": {
+                "mode": "map",
+                "item_argument": "stock_code",
+                "items": [],
+                "source": {
+                    "kind": "attachment_lines",
+                    "attachment_id": attachment["attachment_id"],
+                },
+            },
+            "entities": [],
+            "missing_required": [],
+            "reason": "从纯文本逐行读取标的",
+        }, {}
+
+    service = AssetInvocationService(
+        custom_tool_store=FakeStrategyStore(),
+        tool_definitions_dir=str(tmp_path / "definitions"),
+        skills_root=str(tmp_path / "skills"),
+        llm_chat=llm,
+        attachment_service=attachment_service,
+        file_io_service=FileIoToolService(),
+    )
+    monkeypatch.setattr(
+        "src.tools.registry.normalize_tool_args_for_definition",
+        lambda *_args, **_kwargs: pytest.fail("loaded custom contract must be reused"),
+    )
+
+    result = service.plan(text="$strategy_tool 处理附件中的全部股票", attachments=[attachment])
+
+    rendered_prompt = "\n".join(
+        str(message.get("content") or "")
+        for message in seen_messages[0]
+    )
+    assert '"document_line_count": 1500' in rendered_prompt
+    assert '"document_lines"' not in rendered_prompt
+    assert result["status"] == "ready"
+    assert result["execution"]["item_count"] == 1500
+    assert result["calls"][0] == {"stock_code": "000001.SZ"}
+    assert result["calls"][-1] == {"stock_code": "001500.SZ"}
 
 
 def test_reports_only_real_missing_required_fields(tmp_path):
@@ -666,6 +875,146 @@ def test_single_stock_skill_contract_maps_multiple_companies_without_changing_th
         {"focus": "资金与风险", "code": "000858.SZ"},
     ]
     assert result["execution"]["mode"] == "map"
+
+
+def test_strategy_wrapper_resolves_finance_universe_without_changing_tool_schema(tmp_path):
+    class UniverseResolver:
+        def resolve(self, source):
+            assert source == {
+                "kind": "finance_universe",
+                "subject_type": "plate",
+                "query": "CPO板块",
+            }
+            return {
+                "status": "ready",
+                "message": "已解析CPO的2只成分股。",
+                "items": ["300502.SZ", "300308.SZ"],
+                "records": [
+                    {"code": "300502.SZ", "name": "新易盛"},
+                    {"code": "300308.SZ", "name": "中际旭创"},
+                ],
+                "member_count": 2,
+                "resolved_subject": {
+                    "code": "883643",
+                    "name": "CPO",
+                    "subject_type": "plate",
+                },
+                "evidence": {
+                    "identity_api": "plate.basic_info",
+                    "membership_api": "plate.constitution",
+                },
+            }
+
+    def llm(messages, **_kwargs):
+        rendered = json.dumps(messages, ensure_ascii=False)
+        assert "strategy_runtime_profile" in rendered
+        assert "stock_code" in rendered
+        return {
+            "status": "ready",
+            "arguments": {},
+            "execution": {
+                "mode": "map",
+                "item_argument": "stock_code",
+                "items": [],
+                "source": {
+                    "kind": "finance_universe",
+                    "subject_type": "plate",
+                    "query": "CPO板块",
+                },
+            },
+            "entities": [{"kind": "stock", "argument": "stock_code"}],
+            "missing_required": ["stock_code"],
+            "reason": "先解析板块成分，再逐股运行。",
+        }, {}
+
+    input_resolver = InvocationInputResolverService(
+        finance_universe_resolver=UniverseResolver()
+    )
+    service = AssetInvocationService(
+        custom_tool_store=FakeStrategyStore(),
+        tool_definitions_dir=str(tmp_path / "definitions"),
+        skills_root=str(tmp_path / "skills"),
+        llm_chat=llm,
+        input_resolver=input_resolver,
+    )
+
+    result = service.plan(text="$strategy_tool 扫描一下CPO板块的个股")
+
+    assert result["status"] == "ready"
+    assert result["missing_required"] == []
+    assert result["calls"] == [
+        {"stock_code": "300502.SZ"},
+        {"stock_code": "300308.SZ"},
+    ]
+    assert result["source_resolution"]["resolved_subject"]["name"] == "CPO"
+    assert "股票池：CPO，共 2 只" in result["preview"]["message"]
+    assert len(service.build_tool_execution_plan(result)["work_items"]) == 2
+
+
+def test_entity_local_list_tool_resolves_plate_and_injects_one_complete_list(tmp_path):
+    class UniverseResolver:
+        def resolve(self, source):
+            assert source == {
+                "kind": "finance_universe",
+                "subject_type": "plate",
+                "query": "CPO板块",
+            }
+            return {
+                "status": "ready",
+                "message": "已解析CPO的2只成分股。",
+                "items": ["300502.SZ", "300308.SZ"],
+                "records": [
+                    {"code": "300502.SZ", "name": "新易盛"},
+                    {"code": "300308.SZ", "name": "中际旭创"},
+                ],
+                "member_count": 2,
+                "resolved_subject": {
+                    "code": "883643",
+                    "name": "CPO",
+                    "subject_type": "plate",
+                },
+                "evidence": {},
+            }
+
+    def llm(_messages, **_kwargs):
+        return {
+            "status": "ready",
+            "arguments": {"window": 30},
+            "execution": {
+                "mode": "map",
+                "item_argument": "stock_codes",
+                "items": [],
+                "source": {
+                    "kind": "finance_universe",
+                    "subject_type": "plate",
+                    "query": "CPO板块",
+                },
+            },
+            "entities": [{"kind": "stock", "argument": "stock_codes"}],
+            "missing_required": ["stock_codes"],
+            "reason": "解析板块后逐目标诊断。",
+        }, {}
+
+    service = AssetInvocationService(
+        custom_tool_store=FakeEntityListStore(),
+        tool_definitions_dir=str(tmp_path / "definitions"),
+        skills_root=str(tmp_path / "skills"),
+        llm_chat=llm,
+        input_resolver=InvocationInputResolverService(
+            finance_universe_resolver=UniverseResolver()
+        ),
+    )
+
+    result = service.plan(text="$entity_list_tool 扫描一下CPO板块的个股")
+
+    assert result["status"] == "ready"
+    assert result["missing_required"] == []
+    assert result["calls"] == [
+        {"stock_codes": ["300502.SZ", "300308.SZ"], "window": 30},
+    ]
+    assert result["source_resolution"]["member_count"] == 2
+    assert result["execution"]["mode"] == "single"
+    assert len(service.build_tool_execution_plan(result)["work_items"]) == 1
 
 
 def test_resolves_stock_entity_and_builds_visible_preview(tmp_path):

@@ -124,6 +124,27 @@ def test_native_ranked_strategy_contract_is_canonical_and_assessed() -> None:
     }
 
 
+def test_entity_local_array_strategy_is_assessed_as_independent_dispatch() -> None:
+    service = StrategyRevisionContractService()
+
+    assessment = service.assess(
+        runtime_profile=_runtime_profile(),
+        selection_output_profile=None,
+        input_schema=_array_schema(),
+        execution_shape="entity_local",
+    )
+
+    assert assessment == {
+        "strategy_wrapper_ready": True,
+        "portfolio_backtest_contract_ready": False,
+        "execution_shape": "independent_entities",
+        "summary": (
+            "逐股独立策略可由 Wrapper 有界并行运行；当前输出不能直接作为"
+            "共享组合的每日排名。"
+        ),
+    }
+
+
 def test_scalar_strategy_cannot_claim_native_portfolio_backtest_output() -> None:
     with pytest.raises(
         StrategyRevisionContractError,
@@ -153,6 +174,55 @@ def test_selection_profile_must_start_from_a_declared_output() -> None:
                 "properties": {"result": {"type": "object"}},
             },
         )
+
+
+def test_selection_output_date_path_rejects_array_index_with_actionable_error() -> None:
+    profile = {
+        **_selection_profile(),
+        "output_date_path": "data.selected_stocks[0].as_of_date",
+    }
+
+    with pytest.raises(
+        StrategyRevisionContractError,
+        match="one scalar date without array indexes",
+    ):
+        StrategyRevisionContractService().normalize(
+            runtime_profile=_runtime_profile(),
+            selection_output_profile=profile,
+            input_schema=_array_schema(),
+            output_schema={
+                "type": "object",
+                "properties": {
+                    "selected_stocks": {"type": "array"},
+                    "as_of_date": {"type": "string"},
+                },
+            },
+        )
+
+
+def test_selection_profile_paths_are_canonicalized_to_the_host_data_envelope() -> None:
+    contracts = StrategyRevisionContractService().normalize(
+        runtime_profile=_runtime_profile(),
+        selection_output_profile={
+            "candidate_path": "selected_stocks",
+            "symbol_field": "stock_code",
+            "output_date_path": "as_of_date",
+        },
+        input_schema=_array_schema(),
+        output_schema={
+            "type": "object",
+            "properties": {
+                "selected_stocks": {"type": "array"},
+                "as_of_date": {"type": "string"},
+            },
+        },
+    )
+
+    assert contracts.selection_output_profile == {
+        "candidate_path": "data.selected_stocks",
+        "symbol_field": "stock_code",
+        "output_date_path": "data.as_of_date",
+    }
 
 
 def test_coding_bundle_derives_strategy_capability_and_array_item_schema(
@@ -245,6 +315,47 @@ def test_strategy_companions_are_revision_scoped_and_local_patch_preserves_them(
     assert store.load("ct_rank_selector")["manifest"]["current_revision"] == 1
 
 
+def test_local_edit_build_inherits_system_owned_strategy_companions_before_validation(
+    tmp_path,
+) -> None:
+    store = CustomToolStoreService(root_dir=str(tmp_path))
+    service = CustomToolAgentService(store=store, use_codex=False)
+    finance_profile = {
+        "protocol": "finance_tool_profile.v1",
+        "family": "strategy",
+        "execution_shape": "cross_sectional",
+        "output_semantic": "ranked_selection",
+        "summary": "按点时股票池生成有序选股结果。",
+    }
+    active_bundle = service._bundle_from_coding_final(
+        {
+            "tool_name": "ct_rank_selector",
+            "document": "按因子横截面排序。",
+            "finance_tool_profile": finance_profile,
+        },
+        _bundle(),
+    )
+    active = store.save_draft(active_bundle, owner_id="owner-a")
+    local_edit_final = _bundle()
+    local_edit_final.pop("strategy_runtime_profile")
+    local_edit_final.pop("selection_output_profile")
+
+    candidate = service._bundle_from_coding_final(
+        {
+            "tool_name": "ct_rank_selector",
+            "document": "仅修改分钟K数据读取方式。",
+            "finance_tool_profile": finance_profile,
+        },
+        local_edit_final,
+        preserved_revision=active,
+    )
+
+    assert candidate["strategy_runtime_profile"] == _runtime_profile()
+    assert candidate["selection_output_profile"] == _selection_profile()
+    assert candidate["finance_tool_profile"]["family"] == "strategy"
+    assert candidate["manifest"]["capabilities"] == ["custom_tool", "strategy"]
+
+
 def test_full_redesign_does_not_inherit_stale_strategy_companions(tmp_path) -> None:
     store = CustomToolStoreService(root_dir=str(tmp_path))
     service = CustomToolAgentService(store=store, use_codex=False)
@@ -279,16 +390,13 @@ def test_full_redesign_does_not_inherit_stale_strategy_companions(tmp_path) -> N
     assert candidate["manifest"]["capabilities"] == ["custom_tool"]
 
 
-def test_coding_output_schema_accepts_strategy_metadata_and_legacy_payload() -> None:
+def test_coding_output_schema_keeps_only_tool_contract_and_summary() -> None:
     schema = json.loads(
         Path(
             "src/skills/financial-tool-development/skills/financial-tool-implementation/schema.json"
         ).read_text(encoding="utf-8")
     )
     validate = fastjsonschema.compile(schema)
-    strategy_payload = _bundle()
-    strategy_payload.pop("code")
-    validate(strategy_payload)
     validate(
         {
             "tool_contract": {
@@ -301,9 +409,10 @@ def test_coding_output_schema_accepts_strategy_metadata_and_legacy_payload() -> 
             "implementation_summary": "普通工具仍保持原输出。",
         }
     )
+    assert set(schema["properties"]) == {"tool_contract", "implementation_summary"}
 
 
-def test_requirement_design_and_coding_share_the_strategy_wrapper_boundary() -> None:
+def test_requirement_design_and_coding_share_the_entity_list_runtime_boundary() -> None:
     root = Path("src/skills/financial-tool-development/skills")
     requirement = (root / "financial-tool-requirement" / "SKILL.md").read_text(
         encoding="utf-8"
@@ -315,10 +424,10 @@ def test_requirement_design_and_coding_share_the_strategy_wrapper_boundary() -> 
         encoding="utf-8"
     )
 
-    assert "不询问“单只股票 / 股票列表 / 全市场”" in requirement
-    assert "横截面/组合共同判断" in requirement
-    assert "不询问或设计 `single/list/market`" in design
-    assert "单次快照判断 + 外围调度" in design
-    assert "strategy_runtime_profile.v1" in coding
-    assert "逐股 `string` 策略" in coding
-    assert "不得输出该字段" in coding
+    assert "不需要追问用户选择“单个还是批量”" in requirement
+    assert "完整集合共同参与计算" in requirement
+    assert "公开输入默认使用一个 `array<string>` 列表" in design
+    assert "不要在方案或流程图中描述遍历、线程、并发、分片" in design
+    assert "Coding 保持这一个列表输入" in coding
+    assert "同一种数据的查询次数不应随着目标数量增长" in coding
+    assert "没有必要再增加线程池、异步调度或分片" in coding

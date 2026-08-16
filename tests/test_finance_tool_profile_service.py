@@ -54,15 +54,19 @@ def test_analytics_profile_is_canonical_but_does_not_create_capability() -> None
     assert "capabilities" not in normalized
 
 
-def test_strategy_profile_must_match_runtime_companion() -> None:
+def test_strategy_profile_does_not_require_optional_runtime_companion() -> None:
     strategy_profile = {
         "family": "strategy",
         "execution_shape": "cross_sectional",
         "output_semantic": "signal",
     }
 
-    with pytest.raises(FinanceToolProfileError, match="requires strategy_runtime"):
-        FinanceToolProfileService().normalize(strategy_profile)
+    normalized = FinanceToolProfileService().normalize(strategy_profile)
+    assert normalized["family"] == "strategy"
+    assert normalized["output_semantic"] == "signal"
+
+
+def test_runtime_companion_requires_strategy_profile() -> None:
     with pytest.raises(FinanceToolProfileError, match="family=strategy"):
         FinanceToolProfileService().normalize(
             ANALYTICS_PROFILE,

@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from copy import deepcopy
-from typing import Any, Dict, List, Mapping
+from typing import Any, Dict, List
 
 
 DATAVIEW_ALIASES = {
@@ -103,6 +103,12 @@ def intraday_quote_fields() -> Dict[str, Dict[str, List[str]]]:
         "minute_time": field("分钟时间", "时间"),
         "snapshot_time": field("快照时间", "采样时间"),
         "snapshot_slot": field("分钟时点", "时刻"),
+        "bar_start_time": field("K线开始时间", "bar_start_time"),
+        "bar_end_time": field("K线结束时间", "bar_end_time"),
+        "kline_type": field("K线周期类型", "kline_type"),
+        "period_minutes": field("K线周期分钟数", "period_minutes"),
+        "is_finalized": field("K线是否已完成", "is_finalized"),
+        "source_bar_count": field("源K线数量", "source_bar_count"),
         "preclose": field("昨收价", "前收盘价"),
         "open": field("分钟开盘价", "开盘价"),
         "close": field("分钟收盘价", "最新价", "收盘价"),
@@ -476,13 +482,19 @@ FINANCE_CATALOG: Dict[str, Any] = {
                 },
                 "quote": {
                     "api": "stock.quote",
-                    "desc": "个股统一行情：realtime=0 返回历史日K，realtime=1 返回从09:30开始的分钟K序列，realtime=2 返回最新一分钟K（最新行情）",
+                    "desc": "个股统一行情：mode=0 返回截至上一交易日的日K；mode=1 按 period=1/3/5/10/15/30/60 和 count=根数返回源表真实分钟K；mode=2 返回最新当日1d运行K（实时行情）",
                     "fields": unified_stock_quote_fields(),
                     "kd": unified_stock_quote_kd_methods(),
                     "rules": [
-                        "realtime=0：历史日K。",
-                        "realtime=1：分钟K从09:30开始，盘前快照不返回；09:30的open取当日开盘价，amount/volumn取该时点累计值，后续分钟按上一分钟差分。",
-                        "realtime=2：仅返回09:30以后最新一分钟K，用作最新行情。",
+                        "mode=0：截至上一交易日的日K；count 表示每只股票返回的最近根数。",
+                        "mode=1：分钟K使用 period=1/3/5/10/15/30/60 和 count=根数（默认1分钟、240根）；周期由源表直接产出，不要求模型按日期拆查、重采样或临时计算。",
+                        "最新分钟K可能未完成；is_finalized、source_bar_count、bar_start_time/bar_end_time 用于说明它的真实完成状态。",
+                        "mode=1 的 open/high/low/close/amount/volumn 都是该根真实分钟K的字段，其中 amount/volumn 是该区间值。",
+                        "mode=2：对每只股票分别返回最新当日1d运行K，用作实时行情。",
+                        "今天的价格、收盘价、涨跌幅或当前行情直接使用mode=2；指定日期的分钟走势或分钟明细使用mode=1。",
+                        "mode=2的open/high/low/close是截至快照的当日行情，amount/volumn是当日累计成交；不能根据单行结果推断全天价格路径。",
+                        "批量标的通过 codes/names 一次传入；自定义工具使用 SDK bindings 传列表，不逐标的查询。",
+                        "limit=-1 表示显式返回全部匹配行，但仍受可配置硬安全上限保护；超过上限明确报错，不静默截断。",
                     ],
                 },
                 "moneyflow": {
@@ -496,6 +508,11 @@ FINANCE_CATALOG: Dict[str, Any] = {
                     "desc": "个股融资融券数据",
                     "fields": margin_fields(),
                     "kd": margin_kd_methods(),
+                    "rules": [
+                        "不传date/start/end时，stock.margin只查询数据源最新交易日；order和limit不会把它扩展为历史序列。",
+                        "查询融资融券历史明细时同时传start和end，再用order和limit控制返回顺序与条数。",
+                        "近K日变化、变化率或汇总也可使用stock.margin.kd_<field>_<method>。",
+                    ],
                 },
                 "shareholder": {
                     "api": "stock.shareholder",
@@ -643,9 +660,13 @@ FINANCE_CATALOG: Dict[str, Any] = {
                         ],
                         "desc": "Computed output/filter/order fields use <base_field>_yoy or <base_field>_qoq.",
                     },
+                    "rules": [
+                        "不传report_date/report_period/start/end且filter中也没有报告期条件时，只查询数据源全局最新报告期；order和limit不会扩展为历史报告期。",
+                        "查询单只股票最新财务状况或多期比较时，应显式传start和end，或在filter中给出report_period范围，再按report_period倒序和limit取所需期间。",
+                        "同一份多期查询能够支持比较时，不按报告期拆成多次单行查询。",
+                    ],
                 },
                 "report": {
-                    "api": "stock.report",
                     "desc": "个股研报结构化数据：报告信息、评级、核心观点、风险、目标价和研报预测指标。报告日期按研报发布日期查询；预测值使用 metric_* 字段。",
                     "fields": {
                         "report_id": field("研报ID", "报告ID", "report_id"),
@@ -706,6 +727,35 @@ FINANCE_CATALOG: Dict[str, Any] = {
                         "需要完整返回符合条件的研报或指标记录时使用 limit = -1；若返回行数达到 limit，不得表述为全部数据。",
                     ],
                 },
+                "news": {
+                    "desc": "个股新闻检索：按股票名称/代码、自然日时间范围和关键词查询内部新闻索引。",
+                    "fields": {
+                        "code": field("股票代码", "证券代码", "code"),
+                        "name": field("股票名称", "证券名称", "name"),
+                        "publish_time": field("发布时间", "发布日期", "publish_time"),
+                        "source": field("新闻来源", "来源", "source"),
+                        "title": field("新闻标题", "标题", "title"),
+                        "url": field("新闻链接", "链接", "url"),
+                        "snippet": field("新闻摘要", "摘要", "snippet"),
+                        "category": field("新闻分类", "分类", "category"),
+                        "score": field("检索相关度", "相关度", "score"),
+                        "document_id": field("新闻文档ID", "document_id"),
+                    },
+                    "api": [
+                        {
+                            "api_name": "stock.news",
+                            "api_function": "查询指定个股、关键词和自然日时间范围内的新闻。",
+                            "api_class": "news_query",
+                        }
+                    ],
+                    "rules": [
+                        "filter 必须包含 code、name、query 或 keyword 之一；个股问题优先使用 code 或 name。",
+                        "publish_time 是自然日发布时间，不使用交易日偏移；时间范围使用 >= 和 <=。",
+                        "order 可用 publish_time desc/asc；不传时按相关度和发布时间综合排序。",
+                        "正常返回0条表示索引内未检索到证据，不重试；provider_error 才表示搜索服务失败。",
+                        "coverage=internal_news 表示当前只覆盖内部新闻索引，不得表述为完整互联网搜索。",
+                    ],
+                },
             },
         },
         "index": {
@@ -738,7 +788,15 @@ FINANCE_CATALOG: Dict[str, Any] = {
                         "float_mv": field("流通市值"),
                     },
                 },
-                "constitution": {"api": "index.constitution", "desc": "指数成分股", "fields": constitution_fields("index")},
+                "constitution": {
+                    "api": "index.constitution",
+                    "desc": "指数成分股",
+                    "fields": constitution_fields("index"),
+                    "rules": [
+                        "完整成分列表或后续研究范围使用limit=-1；只有明确预览或前N项时使用正整数limit。",
+                        "显式全量仍受可配置安全上限保护；超过时明确报错，不静默截断。",
+                    ],
+                },
             },
         },
         "industry": {
@@ -755,7 +813,15 @@ FINANCE_CATALOG: Dict[str, Any] = {
                         "level3_industry_name": field("三级行业名称"),
                     },
                 },
-                "constitution": {"api": "industry.constitution", "desc": "行业成分股和成分股维度聚合", "fields": industry_constitution_fields()},
+                "constitution": {
+                    "api": "industry.constitution",
+                    "desc": "行业成分股和成分股维度聚合",
+                    "fields": industry_constitution_fields(),
+                    "rules": [
+                        "完整成分列表或后续研究范围使用limit=-1；只有明确预览或前N项时使用正整数limit。",
+                        "显式全量仍受可配置安全上限保护；超过时明确报错，不静默截断。",
+                    ],
+                },
             },
         },
         "plate": {
@@ -780,7 +846,15 @@ FINANCE_CATALOG: Dict[str, Any] = {
                         "ps_lyr": field("静态市销率"),
                     },
                 },
-                "constitution": {"api": "plate.constitution", "desc": "板块成分股和成分股维度聚合", "fields": constitution_fields("plate")},
+                "constitution": {
+                    "api": "plate.constitution",
+                    "desc": "板块成分股和成分股维度聚合",
+                    "fields": constitution_fields("plate"),
+                    "rules": [
+                        "完整成分列表或后续研究范围使用limit=-1；只有明确预览或前N项时使用正整数limit。",
+                        "显式全量仍受可配置安全上限保护；超过时明确报错，不静默截断。",
+                    ],
+                },
             },
         },
         "fund": {
@@ -874,12 +948,14 @@ def normalize_dataview_for_subject(subject: str, dataview: str) -> str:
     return value
 
 
-def default_realtime_for_stock_dataview(dataview: str) -> int:
+def default_mode_for_stock_dataview(dataview: str) -> int:
     value = str(dataview or "").strip()
     normalized = DATAVIEW_ALIASES.get(value, value)
     if value in HISTORY_STOCK_DATAVIEW_NAMES or normalized in HISTORY_STOCK_DATAVIEW_NAMES:
         return 0
-    return 1
+    if value in REALTIME_STOCK_DATAVIEW_NAMES:
+        return 1
+    return 0
 
 
 def get_dataview(subject: str, dataview: str) -> Dict[str, Any] | None:
@@ -903,16 +979,16 @@ def resolve_api(api: str) -> Dict[str, Any] | None:
     subject = parts[0]
     raw_dataview = parts[1]
     dataview = normalize_dataview_for_subject(subject, raw_dataview)
-    default_realtime = default_realtime_for_stock_dataview(raw_dataview) if subject == "stock" and dataview == "quote" else 1
+    default_mode = default_mode_for_stock_dataview(raw_dataview) if subject == "stock" and dataview == "quote" else 0
     view = get_dataview(subject, dataview)
     if not view:
         return None
     if len(parts) == 2:
-        return {"type": "base", "subject": subject, "dataview": dataview, "view": view, "default_realtime": default_realtime}
+        return {"type": "base", "subject": subject, "dataview": dataview, "view": view, "default_mode": default_mode}
     if len(parts) == 3 and parts[2] == "agg" and (dataview == "constitution" or (subject == "stock" and dataview == "quote")):
-        return {"type": "agg", "subject": subject, "dataview": dataview, "view": view, "default_realtime": default_realtime}
+        return {"type": "agg", "subject": subject, "dataview": dataview, "view": view, "default_mode": default_mode}
     if len(parts) == 3 and parts[2] == "dynamic_cal" and dataview == "quote":
-        return {"type": "dynamic_cal", "subject": subject, "dataview": dataview, "view": view, "default_realtime": default_realtime}
+        return {"type": "dynamic_cal", "subject": subject, "dataview": dataview, "view": view, "default_mode": default_mode}
     if len(parts) == 3 and parts[2].startswith("kd_"):
         metric = parts[2][3:]
         if metric.endswith("_pct_change"):
@@ -926,7 +1002,7 @@ def resolve_api(api: str) -> Dict[str, Any] | None:
             "field": field_name,
             "method": method,
             "view": view,
-            "default_realtime": default_realtime,
+            "default_mode": default_mode,
         }
     return None
 

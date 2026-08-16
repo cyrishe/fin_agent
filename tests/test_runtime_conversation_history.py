@@ -84,6 +84,42 @@ def test_history_query_projects_only_renderable_output_fields(monkeypatch) -> No
     assert _HistoryDb.latest.closed is True
 
 
+def test_history_compaction_preserves_nested_metric_and_table_cells() -> None:
+    payload = {
+        "render_payload": {
+            "sections": [{
+                "blocks": [
+                    {
+                        "type": "metric_strip",
+                        "data": {
+                            "items": [
+                                {"label": "计划执行", "value": 2},
+                                {"label": "成功返回", "value": 2},
+                            ]
+                        },
+                    },
+                    {
+                        "type": "table",
+                        "data": {
+                            "columns": ["结果", "数量"],
+                            "rows": [{"结果": "数据不足", "数量": 1}],
+                        },
+                    },
+                ]
+            }]
+        }
+    }
+
+    compacted = runtime_module.RuntimeConversationService._compact_history_payload(payload)
+
+    blocks = compacted["render_payload"]["sections"][0]["blocks"]
+    assert blocks[0]["data"]["items"] == [
+        {"label": "计划执行", "value": 2},
+        {"label": "成功返回", "value": 2},
+    ]
+    assert blocks[1]["data"]["rows"] == [{"结果": "数据不足", "数量": 1}]
+
+
 def test_thread_query_can_return_context_without_a_second_connection(monkeypatch) -> None:
     class ThreadCursor(_HistoryCursor):
         def fetchone(self):

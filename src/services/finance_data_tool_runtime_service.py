@@ -44,6 +44,10 @@ class FinanceDataToolRuntimeService:
             "is_fallback",
         }
     )
+    MAX_BINDING_KEYS = 16
+    MAX_BINDING_ITEMS = 10_000
+    MAX_BINDING_BYTES = 1_000_000
+    BINDING_REF_RE = re.compile(r"^\$([A-Za-z_]\w*)$")
 
     def __init__(self, *, trade_date_resolver: TradeDateResolver | None = None) -> None:
         self.trade_date_resolver = trade_date_resolver
@@ -52,10 +56,12 @@ class FinanceDataToolRuntimeService:
         self,
         *,
         request: str,
+        bindings: Mapping[str, Any] | None = None,
         previous_results: Mapping[str, ResultHandle] | None = None,
     ) -> Dict[str, Any]:
         return self._execute_request(
             request=request,
+            bindings=bindings,
             previous_results=previous_results,
         )
 
@@ -65,6 +71,7 @@ class FinanceDataToolRuntimeService:
         request: str,
         effective_as_of: dt.date | str,
         allowed_symbols: list[str] | tuple[str, ...],
+        bindings: Mapping[str, Any] | None = None,
         previous_results: Mapping[str, ResultHandle] | None = None,
     ) -> Dict[str, Any]:
         """Execute one narrowly supported query under a trusted replay cutoff.
@@ -77,6 +84,7 @@ class FinanceDataToolRuntimeService:
         symbols = self._symbols(allowed_symbols)
         return self._execute_request(
             request=request,
+            bindings=bindings,
             previous_results=previous_results,
             historical_cutoff=cutoff,
             historical_symbols=symbols,
@@ -86,6 +94,7 @@ class FinanceDataToolRuntimeService:
         self,
         *,
         request: str,
+        bindings: Mapping[str, Any] | None = None,
         previous_results: Mapping[str, ResultHandle] | None = None,
         historical_cutoff: dt.date | None = None,
         historical_symbols: tuple[str, ...] = (),
@@ -95,7 +104,7 @@ class FinanceDataToolRuntimeService:
             raise ValueError("request is required")
 
         handles = dict(previous_results or {})
-        call = parse_api_call(request_text)
+        call = self._bind_call(parse_api_call(request_text), bindings)
         validation = validate_call(call, handles)
         payload: Dict[str, Any] = {
             "protocol": self.PROTOCOL,
@@ -131,7 +140,7 @@ class FinanceDataToolRuntimeService:
                     cutoff=historical_cutoff,
                     symbols=historical_symbols,
                 )
-            if self._explicit_realtime(call.args.get("realtime")):
+            if self._explicit_intraday_mode(call.args):
                 return self._historical_denial(
                     payload,
                     status="historical_realtime_denied",
@@ -227,6 +236,85 @@ class FinanceDataToolRuntimeService:
         return payload
 
     @classmethod
+    def _bind_call(cls, call: Any, bindings: Mapping[str, Any] | None) -> Any:
+        """Resolve exact ``$name`` arguments without expanding the DSL string."""
+
+        from src.experiments.staged_data_protocol.phase2.models import ApiCall
+
+        normalized = cls._normalize_bindings(bindings)
+        referenced: set[str] = set()
+        args: Dict[str, Any] = {}
+        for key, value in call.args.items():
+            match = cls.BINDING_REF_RE.fullmatch(value) if isinstance(value, str) else None
+            if not match:
+                args[key] = value
+                continue
+            binding_name = match.group(1)
+            if binding_name not in normalized:
+                raise ValueError(f"missing finance query binding: {binding_name}")
+            referenced.add(binding_name)
+            args[key] = normalized[binding_name]
+        unused = sorted(set(normalized) - referenced)
+        if unused:
+            raise ValueError(f"unused finance query bindings: {', '.join(unused)}")
+        return ApiCall(
+            result_id=call.result_id,
+            api=call.api,
+            args=args,
+            outputs=list(call.outputs),
+            raw=call.raw,
+        )
+
+    @classmethod
+    def _normalize_bindings(
+        cls,
+        bindings: Mapping[str, Any] | None,
+    ) -> Dict[str, Any]:
+        if bindings is None:
+            return {}
+        if not isinstance(bindings, Mapping):
+            raise ValueError("finance query bindings must be an object")
+        if len(bindings) > cls.MAX_BINDING_KEYS:
+            raise ValueError(
+                f"finance query bindings exceed key limit ({cls.MAX_BINDING_KEYS})"
+            )
+        normalized: Dict[str, Any] = {}
+        total_items = 0
+        for raw_name, raw_value in bindings.items():
+            name = str(raw_name or "").strip()
+            if not re.fullmatch(r"[A-Za-z_]\w*", name):
+                raise ValueError(f"invalid finance query binding name: {name or '-'}")
+            if isinstance(raw_value, (list, tuple)):
+                values = [cls._binding_scalar(item, name=name) for item in raw_value]
+                total_items += len(values)
+                normalized[name] = values
+            else:
+                total_items += 1
+                normalized[name] = cls._binding_scalar(raw_value, name=name)
+        if total_items > cls.MAX_BINDING_ITEMS:
+            raise ValueError(
+                f"finance query bindings exceed item limit ({cls.MAX_BINDING_ITEMS})"
+            )
+        encoded = json.dumps(
+            normalized,
+            ensure_ascii=False,
+            separators=(",", ":"),
+        ).encode("utf-8")
+        if len(encoded) > cls.MAX_BINDING_BYTES:
+            raise ValueError(
+                f"finance query bindings exceed byte limit ({cls.MAX_BINDING_BYTES})"
+            )
+        return normalized
+
+    @staticmethod
+    def _binding_scalar(value: Any, *, name: str) -> Any:
+        if value is None or isinstance(value, (str, int, float, bool)):
+            return value
+        raise ValueError(
+            f"finance query binding {name} must contain JSON scalar values"
+        )
+
+    @classmethod
     def _historical_call(
         cls,
         call: Any,
@@ -245,7 +333,8 @@ class FinanceDataToolRuntimeService:
         # The provider's calendar window is exclusive on `as_of`; D + 1 day
         # therefore means raw market rows are bounded by D, including D itself.
         args["as_of"] = (cutoff + dt.timedelta(days=1)).isoformat()
-        args["realtime"] = 0
+        args.pop("realtime", None)
+        args["mode"] = 0
         args["codes"] = scoped_codes or ["__historical_scope_empty__"]
         requested_fields = cls._field_names(args.get("fields"))
         args["fields"] = ", ".join(
@@ -403,6 +492,12 @@ class FinanceDataToolRuntimeService:
             "historical",
         }
 
+    @classmethod
+    def _explicit_intraday_mode(cls, args: Mapping[str, Any]) -> bool:
+        if args.get("mode") not in (None, ""):
+            return cls._explicit_realtime(args.get("mode"))
+        return cls._explicit_realtime(args.get("realtime"))
+
     @staticmethod
     def _future_result_dates(
         result: Mapping[str, Any],
@@ -439,11 +534,18 @@ class FinanceDataToolRuntimeService:
 
     @staticmethod
     def _result_payload(result: ResultHandle) -> Dict[str, Any]:
+        data = result.data
+        if isinstance(data, Mapping):
+            data = {
+                key: value
+                for key, value in data.items()
+                if key != "sql_shape"
+            }
         return {
             "name": result.name,
             "api": result.api,
             "columns": result.columns,
-            "data": result.data,
+            "data": data,
             "step_id": result.step_id,
             "task": result.task,
         }

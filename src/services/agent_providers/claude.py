@@ -29,7 +29,7 @@ _DASHSCOPE_ROOT_R46_CA = (
     / "globalsign-root-r46.pem"
 )
 DEFAULT_CLAUDE_PROVIDER = "deepseek"
-DEFAULT_CLAUDE_MODEL = "deepseek-v4-flash"
+DEFAULT_CLAUDE_MODEL = "deepseek-chat"
 _PROVIDERS = {"anthropic", "deepseek", "dashscope", "gateway"}
 _MUTATING_TOOLS = {"Edit", "Write", "NotebookEdit"}
 _READ_TOOLS = {"Read", "Glob", "Grep"}
@@ -831,7 +831,7 @@ class ClaudeSdkSkillHarness(AgentSkillHarnessSupport):
         return env
 
     def _resolve_base_url(self, configured: str) -> str:
-        supplied = _trim(configured or os.environ.get("CLAUDE_BASE_URL"))
+        supplied = _trim(configured)
         expected = {
             "deepseek": DEEPSEEK_ANTHROPIC_BASE_URL,
         }.get(self.provider, "")
@@ -844,6 +844,8 @@ class ClaudeSdkSkillHarness(AgentSkillHarnessSupport):
             if not self._is_trusted_dashscope_endpoint(endpoint):
                 raise ValueError("dashscope credentials require an official Alibaba Cloud Anthropic endpoint")
             return endpoint.rstrip("/")
+        if self.provider in {"anthropic", "gateway"} and not supplied:
+            supplied = _trim(os.environ.get("CLAUDE_BASE_URL"))
         if self.provider == "gateway" and not supplied:
             raise ValueError("CLAUDE_BASE_URL is required for gateway provider")
         return supplied.rstrip("/")

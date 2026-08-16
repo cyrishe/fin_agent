@@ -41,12 +41,24 @@ def test_design_skill_only_defines_module_and_process_design() -> None:
     text = DESIGN_SKILL.read_text(encoding="utf-8")
 
     assert "结构化自然语言" in text
-    assert "内部函数或模块" in text
+    assert "函数或模块" in text
     assert "未确定的格式、默认参数、边界处理和技术依赖不要自行定义" in text
     assert "不读取或指定具体 API" in text
-    assert "不要绘制流程图、生成源代码或执行测试" in text
+    assert "不绘制流程图、不生成源码、不执行测试" in text
     assert "design_scenario" not in text
     assert "need_design_fix" not in text
+
+
+def test_design_skill_explains_list_inputs_without_runtime_details() -> None:
+    text = DESIGN_SKILL.read_text(encoding="utf-8")
+
+    assert "公开输入默认使用一个 `array<string>` 列表" in text
+    assert "单个目标就是单元素列表" in text
+    assert "多个目标则可以由实现一次批量取数" in text
+    assert "仍围绕“一个目标如何得到结果”" in text
+    assert "不要在方案或流程图中描述遍历、线程、并发、分片" in text
+    assert "完整集合共同参与计算" in text
+    assert "不机械增加列表" in text
 
 
 def test_design_schema_accepts_complete_design_without_workflow_status() -> None:
@@ -61,25 +73,9 @@ def test_design_schema_accepts_complete_design_without_workflow_status() -> None
     assert schema["required"] == ["design"]
 
 
-def test_design_schema_accepts_optional_strict_finance_tool_profile() -> None:
+def test_design_schema_rejects_extra_runtime_state() -> None:
     schema = json.loads(DESIGN_SCHEMA.read_text(encoding="utf-8"))
-    payload = {
-        **_valid_design_result(),
-        "finance_tool_profile": {
-            "protocol": "finance_tool_profile.v1",
-            "family": "analytics",
-            "execution_shape": "aggregate_context",
-            "output_semantic": "metric",
-            "summary": "计算大盘强度指标。",
-        },
-    }
-
-    SchemaValidator().validate(payload, schema)
-    profile = schema["properties"]["finance_tool_profile"]
-    assert profile["additionalProperties"] is False
-    assert "finance_tool_profile" not in schema["required"]
-
-    payload["finance_tool_profile"]["internal_runtime_state"] = "leak"
+    payload = {**_valid_design_result(), "finance_tool_profile": {"family": "strategy"}}
     with pytest.raises(SchemaValidationError, match="unexpected field"):
         SchemaValidator().validate(payload, schema)
 
@@ -117,13 +113,6 @@ def test_designer_continues_to_design_when_requirement_has_no_questions() -> Non
                     "events": [],
                     "final": {
                         "design": "## 流程\n计算并返回金叉信号。",
-                        "finance_tool_profile": {
-                            "protocol": "finance_tool_profile.v1",
-                            "family": "strategy",
-                            "execution_shape": "entity_local",
-                            "output_semantic": "signal",
-                            "summary": "逐股识别金叉信号。",
-                        },
                     },
                 }
             if stage == "flowchart":
@@ -148,13 +137,7 @@ def test_designer_continues_to_design_when_requirement_has_no_questions() -> Non
     assert harness.stages == ["requirement", "design", "flowchart"]
     assert result["ok"] is True
     assert "金叉信号" in result["design"]["document"]
-    assert result["design"]["finance_tool_profile"] == {
-        "protocol": "finance_tool_profile.v1",
-        "family": "strategy",
-        "execution_shape": "entity_local",
-        "output_semantic": "signal",
-        "summary": "逐股识别金叉信号。",
-    }
+    assert "finance_tool_profile" not in result["design"]
 
 
 def test_designer_surfaces_provider_failure_without_business_fallback() -> None:

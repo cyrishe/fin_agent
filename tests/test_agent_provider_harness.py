@@ -79,13 +79,16 @@ def test_four_complexity_levels_resolve_to_provider_specific_models() -> None:
     assert resolve_agent_profile("codex", "high").model == "gpt-5.6-sol"
     assert resolve_agent_profile("codex", "high").reasoning_effort == "high"
 
-    assert resolve_agent_profile("claude", "fastest").model == "deepseek-v4-flash"
+    assert resolve_agent_profile("claude", "fastest").model == "deepseek-chat"
     assert resolve_agent_profile("claude", "fastest").thinking == "disabled"
     assert resolve_agent_profile("claude", "fast").reasoning_effort == "high"
-    assert resolve_agent_profile("claude", "mid").model == "deepseek-v4-pro"
+    assert resolve_agent_profile("claude", "mid").model == "deepseek-chat"
     assert resolve_agent_profile("claude", "mid").reasoning_effort == "medium"
-    assert resolve_agent_profile("claude", "high").model == "deepseek-v4-pro"
+    assert resolve_agent_profile("claude", "high").model == "deepseek-reasoner"
     assert resolve_agent_profile("claude", "high").reasoning_effort == "high"
+    assert resolve_agent_profile(
+        "claude", "mid", claude_transport_provider="dashscope"
+    ).model == "deepseek-v4-pro"
 
 
 def test_factory_applies_profile_without_changing_capability_defaults(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -192,7 +195,7 @@ def test_provider_delta_events_are_coalesced_but_keep_stream_boundaries() -> Non
     assert [item["type"] for item in boundary] == ["turn_completed"]
 
 
-def test_claude_defaults_to_official_deepseek_v4_flash(monkeypatch: pytest.MonkeyPatch) -> None:
+def test_claude_defaults_to_official_deepseek_chat(monkeypatch: pytest.MonkeyPatch) -> None:
     for name in (
         "CLAUDE_PROVIDER",
         "CLAUDE_MODEL",
@@ -204,9 +207,9 @@ def test_claude_defaults_to_official_deepseek_v4_flash(monkeypatch: pytest.Monke
     harness = ClaudeSdkSkillHarness(query_impl=lambda **kwargs: None)
 
     assert DEFAULT_CLAUDE_PROVIDER == "deepseek"
-    assert DEFAULT_CLAUDE_MODEL == "deepseek-v4-flash"
+    assert DEFAULT_CLAUDE_MODEL == "deepseek-chat"
     assert harness.provider == "deepseek"
-    assert harness.model == "deepseek-v4-flash"
+    assert harness.model == "deepseek-chat"
     assert harness.base_url == DEEPSEEK_ANTHROPIC_BASE_URL
 
 
@@ -297,10 +300,10 @@ def test_custom_tool_service_uses_fast_claude_for_design_and_mid_claude_for_codi
 
     assert isinstance(service.designer.harness, ClaudeSdkSkillHarness)
     assert service.designer.harness.complexity_level == "fast"
-    assert service.designer.harness.model == "deepseek-v4-flash"
+    assert service.designer.harness.model == "deepseek-chat"
     assert isinstance(service.coder.harness, ClaudeSdkSkillHarness)
     assert service.coder.harness.complexity_level == "mid"
-    assert service.coder.harness.model == "deepseek-v4-pro"
+    assert service.coder.harness.model == "deepseek-chat"
     assert service.coder.harness.effort == "medium"
 
 

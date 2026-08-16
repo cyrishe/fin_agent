@@ -120,6 +120,11 @@ FILTER_RE = re.compile(
     r"(?=\s+(?:and|or)\s+[A-Za-z_]\w*\s*(?:in|=|==|!=|>=|<=|>|<)|[,;]|$)",
     flags=re.IGNORECASE,
 )
+GROUPED_OR_RE = re.compile(r"\((?P<body>[^()]+)\)")
+GROUPED_OR_TERM_RE = re.compile(
+    r"(?P<field>[A-Za-z_]\w*)\s*=\s*(?P<value>[^,;()]+?)",
+    flags=re.IGNORECASE,
+)
 
 
 def execute_financial_3_table_api(*, subject: str, args: Mapping[str, Any], outputs: List[str]) -> Dict[str, Any]:
@@ -286,6 +291,7 @@ def _candidate_limit(output_limit: int) -> int:
 def _build_where(*, source: FinancialSource, args: Mapping[str, Any]) -> tuple[str, List[Any]]:
     clauses: List[str] = []
     params: List[Any] = []
+    explicit_filters = _explicit_filters(source=source, args=args)
     report_date = str(args.get("report_date") or args.get("report_period") or args.get("date") or "").strip()
     start = str(args.get("start") or args.get("start_date") or "").strip()
     end = str(args.get("end") or args.get("end_date") or "").strip()
@@ -296,22 +302,32 @@ def _build_where(*, source: FinancialSource, args: Mapping[str, Any]) -> tuple[s
     elif start and end:
         clauses.append("i.report_period BETWEEN %s AND %s")
         params.extend(sorted([start, end]))
-    else:
+    elif not any(field_name in {"report_date", "report_period"} for _, field_name, _, _ in explicit_filters):
         clauses.append("i.report_period = (SELECT MAX(report_period) FROM kcrp_stock_income)")
     clauses.append("i.statement_type = %s")
     params.append(statement_type)
 
-    filter_sql, filter_params = _build_filter_clauses(source=source, args=args)
+    filter_sql, filter_params = _build_filter_clauses(
+        source=source,
+        args=args,
+        explicit_filters=explicit_filters,
+    )
     if filter_sql:
         clauses.append(filter_sql)
         params.extend(filter_params)
     return " AND ".join(clauses), params
 
 
-def _build_filter_clauses(*, source: FinancialSource, args: Mapping[str, Any]) -> tuple[str, List[Any]]:
+def _build_filter_clauses(
+    *,
+    source: FinancialSource,
+    args: Mapping[str, Any],
+    explicit_filters: List[tuple[str, str, str, Any]] | None = None,
+) -> tuple[str, List[Any]]:
     clauses: List[str] = []
     params: List[Any] = []
-    for connector, field_name, op, value in _explicit_filters(source=source, args=args):
+    filters = explicit_filters if explicit_filters is not None else _explicit_filters(source=source, args=args)
+    for connector, field_name, op, value in filters:
         if _computed_base(field_name):
             continue
         expression = source.fields.get(field_name)
@@ -355,7 +371,7 @@ def _explicit_filters(*, source: FinancialSource, args: Mapping[str, Any]) -> Li
         value = args.get(plural)
         if value not in (None, "") and field_name in source.fields:
             rows.append(("AND", field_name, "in", value))
-    filter_text = str(args.get("filter") or "").strip()
+    filter_text = _normalize_grouped_same_field_or(str(args.get("filter") or "").strip())
     for match in FILTER_RE.finditer(filter_text):
         rows.append(
             (
@@ -366,6 +382,33 @@ def _explicit_filters(*, source: FinancialSource, args: Mapping[str, Any]) -> Li
             )
         )
     return rows
+
+
+def _normalize_grouped_same_field_or(filter_text: str) -> str:
+    """Collapse ``(field = a or field = b)`` to an equivalent IN predicate.
+
+    The lightweight provider parser intentionally supports a small filter
+    grammar.  Normalizing same-field OR groups preserves their boolean scope
+    without teaching the provider a second, partial SQL expression parser.
+    Groups containing different fields or operators are left untouched.
+    """
+
+    def replace(match: re.Match[str]) -> str:
+        body = str(match.group("body") or "").strip()
+        parts = re.split(r"\s+or\s+", body, flags=re.IGNORECASE)
+        if len(parts) < 2:
+            return match.group(0)
+        terms = [GROUPED_OR_TERM_RE.fullmatch(part.strip()) for part in parts]
+        if any(term is None for term in terms):
+            return match.group(0)
+        field_names = {str(term.group("field") or "").lower() for term in terms if term is not None}
+        if len(field_names) != 1:
+            return match.group(0)
+        field_name = str(terms[0].group("field") or "")
+        values = ", ".join(str(term.group("value") or "").strip() for term in terms if term is not None)
+        return f"{field_name} in [{values}]"
+
+    return GROUPED_OR_RE.sub(replace, str(filter_text or ""))
 
 
 def _clean_value(value: str) -> Any:

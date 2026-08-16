@@ -36,6 +36,7 @@
     "stock_history_funds_flow",
     "stock_industry_funds_flow",
     "financial_news_search",
+    "general_search",
     "equity_research_search"
   ]
 }

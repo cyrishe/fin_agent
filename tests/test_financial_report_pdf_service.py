@@ -38,3 +38,34 @@ def test_financial_report_pdf_renders_chinese_markdown_and_table() -> None:
     reader = PdfReader(BytesIO(content))
     assert len(reader.pages) >= 1
     assert reader.metadata.title == "贵州茅台深度研究"
+
+
+def test_financial_report_pdf_uses_matching_h1_as_body_boundary() -> None:
+    report = """证据已经齐备，现在开始综合报告。
+
+---
+
+# 贵州茅台深度研究
+
+## 核心判断
+
+这是应当保留的正式报告正文。
+"""
+    content = FinancialReportPdfService().render(
+        PdfReportInput(
+            title="贵州茅台深度研究",
+            report_text=report,
+        )
+    )
+
+    extracted = "\n".join(
+        page.extract_text() or "" for page in PdfReader(BytesIO(content)).pages
+    )
+    assert extracted.count("贵州茅台深度研究") == 1
+    assert "这是应当保留的正式报告正文" in extracted
+    assert "证据已经齐备" not in extracted
+
+
+def test_financial_report_pdf_headings_stay_with_following_content() -> None:
+    styles = FinancialReportPdfService()._styles()
+    assert all(styles[f"h{level}"].keepWithNext for level in range(1, 5))

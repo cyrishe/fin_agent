@@ -1,4 +1,4 @@
 interface:
   display_name: "个股对比"
-  short_description: "用一致口径比较多只股票的经营、财务、估值、市场表现和风险"
-  default_prompt: "Use $stock-comparison to compare these stocks on decision-relevant metrics."
+  short_description: "围绕同一决策问题比较多只股票的关键差异、代价与条件"
+  default_prompt: "Use $stock-comparison to compare these stocks on consistent evidence and decision-relevant tradeoffs."

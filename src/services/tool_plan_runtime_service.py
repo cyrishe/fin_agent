@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from copy import deepcopy
-from concurrent.futures import ThreadPoolExecutor, as_completed
+from concurrent.futures import FIRST_COMPLETED, ThreadPoolExecutor, as_completed, wait
 import os
 import re
 from typing import Any, Dict, List, Optional
@@ -31,6 +31,7 @@ class ToolPlanRuntimeService:
         tool_runtime_preflight_service: Optional[ToolRuntimePreflightService] = None,
         runtime_feedback_service: Optional[RuntimeFeedbackService] = None,
         enable_tool_preflight: bool = True,
+        max_parallel_tools: Optional[int] = None,
     ) -> None:
         self.tool_argument_planner = tool_argument_planner
         self.runtime_execution_service = runtime_execution_service or RuntimeExecutionService()
@@ -41,6 +42,16 @@ class ToolPlanRuntimeService:
         self.tool_runtime_preflight_service = tool_runtime_preflight_service or ToolRuntimePreflightService()
         self.runtime_feedback_service = runtime_feedback_service or RuntimeFeedbackService()
         self.enable_tool_preflight = bool(enable_tool_preflight)
+        configured_parallelism = (
+            max_parallel_tools
+            if max_parallel_tools is not None
+            else os.getenv("FIN_AGENT_TOOL_PARALLELISM", "8")
+        )
+        try:
+            parallelism = int(configured_parallelism)
+        except (TypeError, ValueError):
+            parallelism = 8
+        self.max_parallel_tools = max(1, min(parallelism, 16))
 
     @staticmethod
     def _trim(value: Any) -> str:
@@ -59,6 +70,7 @@ class ToolPlanRuntimeService:
         thread_context: dict | None = None,
         thread_id: int | None = None,
         turn_id: int | None = None,
+        event_sink=None,
     ) -> dict[str, Any]:
         plan = self._normalize_runtime_plan(execution_plan if isinstance(execution_plan, dict) else {})
         app_ctx = application_context if isinstance(application_context, dict) else {}
@@ -70,6 +82,11 @@ class ToolPlanRuntimeService:
             thread_id=thread_id,
             turn_id=turn_id,
         )
+        if callable(event_sink):
+            # The sink exists only for the active HTTP stream. Keep it on the
+            # in-memory trace while the work is running, then remove it before
+            # the trace becomes part of the persisted/public result.
+            runtime_trace["_event_sink"] = event_sink
         runtime_steps = [
             dict(item)
             for item in (plan.get("work_items") or [])
@@ -77,7 +94,13 @@ class ToolPlanRuntimeService:
         ]
         if not runtime_steps:
             runtime_steps = self._select_tool_steps(plan)
-        tool_names = [self._trim(step.get("name")) for step in runtime_steps if self._trim(step.get("name"))]
+        tool_names = list(dict.fromkeys(
+            self._trim(step.get("name"))
+            for step in runtime_steps
+            if self._trim(step.get("name"))
+        ))
+        if len(runtime_steps) > 1:
+            runtime_trace["_aggregate_progress_total"] = len(runtime_steps)
         step_runs: List[Dict[str, Any]] = []
         tool_runs: List[Dict[str, Any]] = []
         step_items: List[Dict[str, Any]] = []
@@ -92,6 +115,7 @@ class ToolPlanRuntimeService:
             payload={
                 "objective": self._trim(plan.get("objective")) or self._trim(user_text),
                 "selected_tools": tool_names,
+                "work_item_count": len(runtime_steps),
                 "selected_path": (plan.get("selected_path") if isinstance(plan.get("selected_path"), dict) else {}),
             },
         )
@@ -150,6 +174,8 @@ class ToolPlanRuntimeService:
                 "selected_tools": tool_names,
             },
         )
+        runtime_trace.pop("_event_sink", None)
+        runtime_trace.pop("_aggregate_progress_total", None)
         try:
             self.runtime_execution_service.finish_task(
                 thread_id=int(runtime_trace.get("thread_id")) if runtime_trace.get("thread_id") else None,
@@ -169,7 +195,10 @@ class ToolPlanRuntimeService:
         )
         return {
             "mode": "tool_plan_completed",
-            "message": self._trim(final_output.get("summary")) or f"已完成工具执行：成功 {completed} 个，失败 {failed} 个，跳过 {skipped} 个。",
+            "message": self._assistant_message(
+                final_output,
+                fallback=f"已完成工具执行：成功 {completed} 个，失败 {failed} 个，跳过 {skipped} 个。",
+            ),
             "items": step_items,
             "task_state": self._build_task_state(
                 runtime_trace=runtime_trace,
@@ -193,6 +222,32 @@ class ToolPlanRuntimeService:
             "llm_usage": llm_usage or {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0},
         }
 
+    def _assistant_message(
+        self,
+        final_output: Dict[str, Any],
+        *,
+        fallback: str,
+    ) -> str:
+        """Keep the verified coverage summary and add CC-selected business facts."""
+        summary = self._trim(final_output.get("summary")) or self._trim(fallback)
+        fact_lines: List[str] = []
+        for item in final_output.get("facts") or []:
+            if not isinstance(item, dict):
+                continue
+            detail = self._trim(item.get("detail") or item.get("text"))
+            if not detail or detail in summary or detail in fact_lines:
+                continue
+            fact_lines.append(detail[:320])
+            if len(fact_lines) >= 3:
+                break
+        if not fact_lines:
+            return summary
+        return "\n".join([
+            summary,
+            "关键发现：",
+            *[f"- {detail}" for detail in fact_lines],
+        ])
+
     def _execute_runtime_steps_with_scheduler(
         self,
         *,
@@ -212,6 +267,39 @@ class ToolPlanRuntimeService:
         ]
         ordered_results: List[tuple[Dict[str, Any], Dict[str, Any]]] = []
         terminal_step_ids = terminal_step_ids if terminal_step_ids is not None else set()
+        progress_total = len(runtime_steps)
+        progress_completed = 0
+        progress_succeeded = 0
+        progress_failed = 0
+
+        def report_progress(run_record: Dict[str, Any]) -> None:
+            nonlocal progress_completed, progress_succeeded, progress_failed
+            progress_completed += 1
+            status = self._trim(run_record.get("status"))
+            if status == "completed":
+                progress_succeeded += 1
+            elif status in {"failed", "skipped"}:
+                progress_failed += 1
+            if progress_total <= 1:
+                return
+            interval = max(1, progress_total // 50)
+            if (
+                progress_completed not in {1, progress_total}
+                and progress_completed % interval != 0
+            ):
+                return
+            self._append_runtime_event(
+                runtime_trace=runtime_trace,
+                event_type="tool_batch_progress",
+                actor_type="runtime",
+                actor_id="bounded_tool_scheduler",
+                payload={
+                    "completed": progress_completed,
+                    "total": progress_total,
+                    "succeeded": progress_succeeded,
+                    "failed": progress_failed,
+                },
+            )
 
         while pending:
             ready_batch: List[tuple[int, Dict[str, Any]]] = []
@@ -260,9 +348,17 @@ class ToolPlanRuntimeService:
             batch_results: List[tuple[int, Dict[str, Any], Dict[str, Any]]] = []
 
             if len(parallel_batch) > 1:
-                with ThreadPoolExecutor(max_workers=min(4, len(parallel_batch))) as executor:
-                    future_map = {
-                        executor.submit(
+                workers = min(self.max_parallel_tools, len(parallel_batch))
+                with ThreadPoolExecutor(max_workers=workers) as executor:
+                    pending_items = iter(parallel_batch)
+                    future_map = {}
+
+                    def submit_next() -> bool:
+                        try:
+                            index, step = next(pending_items)
+                        except StopIteration:
+                            return False
+                        future = executor.submit(
                             self._execute_runtime_step,
                             step=step,
                             step_type=self._trim(step.get("type")) or "tool",
@@ -274,52 +370,55 @@ class ToolPlanRuntimeService:
                             completed_step_ids=completed_step_ids,
                             terminal_step_ids=terminal_step_ids,
                             step_outputs=step_outputs,
-                        ): (index, step)
-                        for index, step in parallel_batch
-                    }
-                    for future in as_completed(future_map):
-                        index, step = future_map[future]
-                        batch_results.append((index, step, future.result()))
+                        )
+                        future_map[future] = (index, step)
+                        return True
+
+                    for _ in range(workers):
+                        submit_next()
+                    while future_map:
+                        completed_futures, _ = wait(
+                            tuple(future_map),
+                            return_when=FIRST_COMPLETED,
+                        )
+                        for future in completed_futures:
+                            index, step = future_map.pop(future)
+                            run_record = future.result()
+                            batch_results.append((index, step, run_record))
+                            report_progress(run_record)
+                            submit_next()
             else:
                 for index, step in parallel_batch:
-                    batch_results.append(
-                        (
-                            index,
-                            step,
-                            self._execute_runtime_step(
-                                step=step,
-                                step_type=self._trim(step.get("type")) or "tool",
-                                execution_mode=self._trim(step.get("execution_mode")),
-                                user_text=user_text,
-                                thread_context=thread_context,
-                                runtime_trace=runtime_trace,
-                                shared_outputs=shared_outputs,
-                                completed_step_ids=completed_step_ids,
-                                terminal_step_ids=terminal_step_ids,
-                                step_outputs=step_outputs,
-                            ),
-                        )
+                    run_record = self._execute_runtime_step(
+                        step=step,
+                        step_type=self._trim(step.get("type")) or "tool",
+                        execution_mode=self._trim(step.get("execution_mode")),
+                        user_text=user_text,
+                        thread_context=thread_context,
+                        runtime_trace=runtime_trace,
+                        shared_outputs=shared_outputs,
+                        completed_step_ids=completed_step_ids,
+                        terminal_step_ids=terminal_step_ids,
+                        step_outputs=step_outputs,
                     )
+                    batch_results.append((index, step, run_record))
+                    report_progress(run_record)
 
             for index, step in sequential_batch:
-                batch_results.append(
-                    (
-                        index,
-                        step,
-                        self._execute_runtime_step(
-                            step=step,
-                            step_type=self._trim(step.get("type")) or "tool",
-                            execution_mode=self._trim(step.get("execution_mode")),
-                            user_text=user_text,
-                            thread_context=thread_context,
-                            runtime_trace=runtime_trace,
-                            shared_outputs=shared_outputs,
-                            completed_step_ids=completed_step_ids,
-                            terminal_step_ids=terminal_step_ids,
-                            step_outputs=step_outputs,
-                        ),
-                    )
+                run_record = self._execute_runtime_step(
+                    step=step,
+                    step_type=self._trim(step.get("type")) or "tool",
+                    execution_mode=self._trim(step.get("execution_mode")),
+                    user_text=user_text,
+                    thread_context=thread_context,
+                    runtime_trace=runtime_trace,
+                    shared_outputs=shared_outputs,
+                    completed_step_ids=completed_step_ids,
+                    terminal_step_ids=terminal_step_ids,
+                    step_outputs=step_outputs,
                 )
+                batch_results.append((index, step, run_record))
+                report_progress(run_record)
 
             for _, step, run_record in sorted(batch_results, key=lambda item: item[0]):
                 ordered_results.append((step, run_record))
@@ -585,6 +684,7 @@ class ToolPlanRuntimeService:
             "dropped_arguments": dropped_fields,
             "defaults_applied_by_schema": used_defaults,
         }
+        batch_input = self._batch_input_summary(normalized_tool_args)
         custom_tool_owner_ids = [
             self._trim(item)
             for item in (thread_context.get("_custom_tool_owner_ids") or [])
@@ -629,6 +729,26 @@ class ToolPlanRuntimeService:
                 }
         try:
             tool_args = dict(normalized_tool_args)
+
+            def stream_tool_progress(log: Dict[str, Any]) -> None:
+                self._append_runtime_event(
+                    runtime_trace=runtime_trace,
+                    event_type="tool_progress",
+                    actor_type="tool",
+                    actor_id=tool_name,
+                    payload={
+                        "step_id": step_id,
+                        "tool_name": tool_name,
+                        "display_name": self._runtime_step_display_name(step=step),
+                        "level": self._trim(log.get("level")) or "info",
+                        "message": self._trim(log.get("message")),
+                        "data": dict(log.get("data") or {})
+                        if isinstance(log.get("data"), dict)
+                        else {},
+                        "status": "running",
+                    },
+                )
+
             tool_args["_runtime"] = {
                 "thread_id": runtime_trace.get("thread_id"),
                 "task_id": runtime_trace.get("task_id"),
@@ -639,6 +759,7 @@ class ToolPlanRuntimeService:
                 "assigned_agent": "tool_plan_runtime",
                 "source_type": "assistant_planned_runtime" if self._trim(runtime_trace.get("plan_type")) == "planned_run" else "assistant_tool_plan_run",
                 "custom_tool_owner_ids": custom_tool_owner_ids,
+                "_progress_sink": stream_tool_progress,
                 # ToolPlanRuntimeService owns the invocation lifecycle for this
                 # path.  The registry still resolves and invokes the tool, but
                 # must not create a second invocation/event pair for the same
@@ -660,6 +781,19 @@ class ToolPlanRuntimeService:
                         "resolved_inputs": {"dropped_fields": dropped_fields, "used_defaults": used_defaults},
                     },
                 )
+            self._append_runtime_event(
+                runtime_trace=runtime_trace,
+                event_type="tool_call",
+                actor_type="tool",
+                actor_id=tool_name,
+                payload={
+                    "step_id": step_id,
+                    "tool_name": tool_name,
+                    "display_name": self._runtime_step_display_name(step=step),
+                    "status": "running",
+                    "batch_input": batch_input,
+                },
+            )
             result = self.runtime_execution_service.execute_tool(
                 tool_name=tool_name,
                 args=tool_args,
@@ -729,12 +863,31 @@ class ToolPlanRuntimeService:
             if isinstance((result or {}).get("meta"), dict)
             else {}
         )
+        batch_evidence = self._batch_result_evidence(
+            batch_input=batch_input,
+            result=result if isinstance(result, dict) else {},
+        )
+        result_ok = bool((result or {}).get("ok"))
+        self._append_runtime_event(
+            runtime_trace=runtime_trace,
+            event_type="tool_result",
+            actor_type="tool",
+            actor_id=tool_name,
+            payload={
+                "step_id": step_id,
+                "tool_name": tool_name,
+                "display_name": self._runtime_step_display_name(step=step),
+                "status": "completed" if result_ok else "failed",
+                "ok": result_ok,
+                "batch_evidence": batch_evidence,
+            },
+        )
         return {
             "step_id": step_id,
             "depends_on": depends_on,
             "tool_name": tool_name,
-            "status": "completed" if bool((result or {}).get("ok")) else "failed",
-            "reason": "ok" if bool((result or {}).get("ok")) else "tool_failed",
+            "status": "completed" if result_ok else "failed",
+            "reason": "ok" if result_ok else "tool_failed",
             "error": self._trim((result or {}).get("error")),
             "failure_kind": self._trim(
                 result_meta.get("failure_kind")
@@ -743,6 +896,7 @@ class ToolPlanRuntimeService:
             "result": result if isinstance(result, dict) else {},
             "retention": retention,
             "named_outputs": {},
+            "batch_evidence": batch_evidence,
         }
 
     def _execute_runtime_step(
@@ -981,7 +1135,47 @@ class ToolPlanRuntimeService:
         loop_items = self._infer_foreach_items(step=step, shared_outputs=shared_outputs, step_outputs=step_outputs)
         child_runs: List[Dict[str, Any]] = []
         prompt_contexts: List[Dict[str, Any]] = []
-        for index, loop_item in enumerate(loop_items, start=1):
+        if len(loop_items) > 1:
+            runtime_trace["_aggregate_progress_total"] = max(
+                int(runtime_trace.get("_aggregate_progress_total") or 0),
+                len(loop_items),
+            )
+
+        progress_completed = 0
+        progress_succeeded = 0
+        progress_failed = 0
+
+        def report_foreach_progress(run_record: Dict[str, Any]) -> None:
+            nonlocal progress_completed, progress_succeeded, progress_failed
+            progress_completed += 1
+            status = self._trim(run_record.get("status"))
+            if status == "completed":
+                progress_succeeded += 1
+            else:
+                progress_failed += 1
+            total = len(loop_items)
+            if total <= 1:
+                return
+            interval = max(1, total // 50)
+            if (
+                progress_completed not in {1, total}
+                and progress_completed % interval != 0
+            ):
+                return
+            self._append_runtime_event(
+                runtime_trace=runtime_trace,
+                event_type="tool_batch_progress",
+                actor_type="runtime",
+                actor_id="bounded_foreach_scheduler",
+                payload={
+                    "completed": progress_completed,
+                    "total": total,
+                    "succeeded": progress_succeeded,
+                    "failed": progress_failed,
+                },
+            )
+
+        def execute_item(index: int, loop_item: Any) -> Dict[str, Any]:
             resolved_inputs = self._resolve_step_inputs(
                 step=step,
                 shared_outputs=shared_outputs,
@@ -989,7 +1183,7 @@ class ToolPlanRuntimeService:
                 loop_item=loop_item,
                 loop_index=index - 1,
             )
-            child_run = self._execute_single_tool(
+            return self._execute_single_tool(
                 step={
                     **step,
                     "step_id": f"{step_id}.{index}",
@@ -1005,7 +1199,46 @@ class ToolPlanRuntimeService:
                 step_outputs=step_outputs,
                 resolved_inputs_override=resolved_inputs,
             )
-            child_runs.append(child_run)
+
+        if len(loop_items) <= 1:
+            child_runs = [
+                execute_item(index, loop_item)
+                for index, loop_item in enumerate(loop_items, start=1)
+            ]
+            for child_run in child_runs:
+                report_foreach_progress(child_run)
+        else:
+            ordered_children: List[Optional[Dict[str, Any]]] = [None] * len(loop_items)
+            workers = min(self.max_parallel_tools, len(loop_items))
+            with ThreadPoolExecutor(max_workers=workers) as executor:
+                pending_items = iter(enumerate(loop_items, start=1))
+                future_map = {}
+
+                def submit_next() -> bool:
+                    try:
+                        index, loop_item = next(pending_items)
+                    except StopIteration:
+                        return False
+                    future = executor.submit(execute_item, index, loop_item)
+                    future_map[future] = index - 1
+                    return True
+
+                for _ in range(workers):
+                    submit_next()
+                while future_map:
+                    completed_futures, _ = wait(
+                        tuple(future_map),
+                        return_when=FIRST_COMPLETED,
+                    )
+                    for future in completed_futures:
+                        output_index = future_map.pop(future)
+                        child_run = future.result()
+                        ordered_children[output_index] = child_run
+                        report_foreach_progress(child_run)
+                        submit_next()
+            child_runs = [item for item in ordered_children if isinstance(item, dict)]
+
+        for loop_item, child_run in zip(loop_items, child_runs):
             retention = child_run.get("retention") if isinstance(child_run.get("retention"), dict) else {}
             prompt_context = retention.get("prompt_context") if isinstance(retention.get("prompt_context"), dict) else {}
             if prompt_context:
@@ -1144,8 +1377,15 @@ class ToolPlanRuntimeService:
         actor_id: str,
         payload: dict,
     ) -> None:
+        aggregate_progress = int(
+            runtime_trace.get("_aggregate_progress_total") or 0
+        ) > 1
+        compacted_item_event = aggregate_progress and event_type in {
+            "tool_call",
+            "tool_result",
+        }
         local_events = runtime_trace.get("local_events")
-        if isinstance(local_events, list):
+        if isinstance(local_events, list) and not compacted_item_event:
             local_events.append(
                 {
                     "event_type": self._trim(event_type),
@@ -1154,6 +1394,13 @@ class ToolPlanRuntimeService:
                     "payload": dict(payload or {}),
                 }
             )
+        event_sink = runtime_trace.get("_event_sink")
+        if callable(event_sink) and not compacted_item_event:
+            try:
+                event_sink(self._runtime_progress_block(event_type=event_type, payload=payload))
+            except Exception:
+                # A disconnected browser must not change the actual execution.
+                pass
         thread_id = runtime_trace.get("thread_id")
         if not thread_id:
             return
@@ -1169,6 +1416,96 @@ class ToolPlanRuntimeService:
             )
         except Exception:
             return
+
+    def _runtime_progress_block(self, *, event_type: str, payload: Dict[str, Any]) -> Dict[str, Any]:
+        step_id = self._trim(payload.get("step_id"))
+        if event_type in {"tool_plan_started", "tool_batch_progress", "tool_plan_completed"}:
+            progress_id = "runtime_plan"
+        elif step_id:
+            progress_id = f"runtime_{step_id}"
+        else:
+            progress_id = f"runtime_{event_type}"
+        data = {
+            "role": "process",
+            "progress_id": progress_id,
+            "status": self._event_status(event_type=event_type, payload=payload),
+            "event_type": event_type,
+        }
+        if event_type == "tool_progress" and isinstance(payload.get("data"), dict):
+            data["details"] = dict(payload.get("data") or {})
+        return {
+            "event": "block",
+            "block_id": progress_id,
+            "block_type": "status",
+            "mode": "replace",
+            "title": self._event_title(event_type=event_type, payload=payload),
+            "content": self._event_message(event_type=event_type, payload=payload),
+            "data": data,
+        }
+
+    def _batch_input_summary(self, arguments: Dict[str, Any]) -> Dict[str, Any]:
+        preferred_fields = {"universe", "codes", "stocks", "stock_codes", "symbols", "items"}
+        for key, value in arguments.items():
+            if not isinstance(value, (list, tuple, set)):
+                continue
+            count = len(value)
+            if count <= 1:
+                continue
+            return {
+                "field": self._trim(key),
+                "item_count": count,
+                "preferred_field": self._trim(key) in preferred_fields,
+            }
+        return {}
+
+    def _batch_result_evidence(self, *, batch_input: Dict[str, Any], result: Dict[str, Any]) -> Dict[str, Any]:
+        item_count = int(batch_input.get("item_count") or 0)
+        if item_count <= 1:
+            return {}
+        data = result.get("data") if isinstance(result.get("data"), dict) else {}
+        results = data.get("results") if isinstance(data.get("results"), list) else None
+        key_process_info = (
+            data.get("key_process_info")
+            if isinstance(data.get("key_process_info"), dict)
+            else {}
+        )
+        declared_target_count = int(key_process_info.get("target_count") or 0)
+        if results is not None:
+            output_count = len([item for item in results if isinstance(item, dict)])
+            if output_count == item_count and declared_target_count in {0, item_count}:
+                return {
+                    "status": "verified",
+                    "input_count": item_count,
+                    "output_count": output_count,
+                }
+            return {
+                "status": "returned",
+                "input_count": item_count,
+                "output_count": output_count,
+                "declared_target_count": declared_target_count,
+                "message": (
+                    f"批量输入 {item_count} 项，工具返回 {output_count} 条逐目标结果。"
+                ),
+            }
+        non_empty_keys = [
+            self._trim(key)
+            for key, value in data.items()
+            if value not in (None, "", [], {})
+        ]
+        if non_empty_keys:
+            return {
+                "status": "returned",
+                "input_count": item_count,
+                "output_keys": non_empty_keys[:12],
+            }
+        return {
+            "status": "unverified",
+            "input_count": item_count,
+            "message": (
+                f"批量输入包含 {item_count} 项，但工具没有返回任何可展示的结果、"
+                "汇总或过程信息，无法确认逐项覆盖和信号结论。"
+            ),
+        }
 
     def _build_runtime_item(self, run_record: Dict[str, Any]) -> Dict[str, Any]:
         plan = run_record.get("plan") if isinstance(run_record.get("plan"), dict) else {}
@@ -1234,7 +1571,7 @@ class ToolPlanRuntimeService:
     def _event_stage(self, *, event_type: str) -> str:
         if event_type in {"tool_plan_started", "tool_argument_planned", "tool_blocked", "tool_skipped"}:
             return "planning"
-        if event_type in {"tool_call", "tool_result", "tool_runtime_error", "code_call", "code_result", "code_retry", "code_runtime_error"}:
+        if event_type in {"tool_call", "tool_progress", "tool_result", "tool_batch_progress", "tool_runtime_error", "code_call", "code_result", "code_retry", "code_runtime_error"}:
             return "executing"
         if event_type == "tool_plan_completed":
             return "completed"
@@ -1247,6 +1584,8 @@ class ToolPlanRuntimeService:
             return "生成执行计划"
         if event_type == "tool_plan_completed":
             return "执行完成"
+        if event_type == "tool_batch_progress":
+            return "批量研究进度"
         if event_type == "tool_argument_planned":
             return f"规划参数：{tool_name or 'tool'}"
         if event_type == "tool_blocked":
@@ -1255,6 +1594,8 @@ class ToolPlanRuntimeService:
             return f"跳过工具：{tool_name or 'tool'}"
         if event_type == "tool_call":
             return f"执行工具：{display_name or tool_name or 'tool'}"
+        if event_type == "tool_progress":
+            return f"执行进度：{display_name or tool_name or 'tool'}"
         if event_type == "tool_result":
             return f"工具结果：{display_name or tool_name or 'tool'}"
         if event_type == "tool_runtime_error":
@@ -1272,12 +1613,26 @@ class ToolPlanRuntimeService:
     def _event_message(self, *, event_type: str, payload: Dict[str, Any]) -> str:
         if event_type == "tool_plan_started":
             selected_tools = payload.get("selected_tools") if isinstance(payload.get("selected_tools"), list) else []
-            return f"候选工具：{', '.join([self._trim(x) for x in selected_tools if self._trim(x)])}"
+            tools_text = ", ".join([self._trim(x) for x in selected_tools if self._trim(x)])
+            item_count = int(payload.get("work_item_count") or 0)
+            return (
+                f"准备使用：{tools_text or '已选工具'}"
+                + (f"；研究目标 {item_count} 项。" if item_count > 1 else "。")
+            )
         if event_type == "tool_plan_completed":
             return (
                 f"成功 {int(payload.get('completed_tools') or 0)} 个，"
                 f"失败 {int(payload.get('failed_tools') or 0)} 个，"
                 f"跳过 {int(payload.get('skipped_tools') or 0)} 个。"
+            )
+        if event_type == "tool_batch_progress":
+            completed = int(payload.get("completed") or 0)
+            total = int(payload.get("total") or 0)
+            succeeded = int(payload.get("succeeded") or 0)
+            failed = int(payload.get("failed") or 0)
+            return (
+                f"已完成 {completed}/{total} 项，成功 {succeeded} 项"
+                + (f"，异常 {failed} 项。" if failed else "。")
             )
         if event_type == "tool_argument_planned":
             missing = payload.get("missing_arguments") if isinstance(payload.get("missing_arguments"), list) else []
@@ -1293,7 +1648,18 @@ class ToolPlanRuntimeService:
             if missing:
                 return f"{reason}；缺少参数：{', '.join([self._trim(x) for x in missing if self._trim(x)])}"
             return reason
+        if event_type == "tool_call":
+            batch_input = payload.get("batch_input") if isinstance(payload.get("batch_input"), dict) else {}
+            item_count = int(batch_input.get("item_count") or 0)
+            if item_count > 1:
+                return f"已提交 {item_count} 个标的，正在批量执行。"
+            return "工具正在执行。"
+        if event_type == "tool_progress":
+            return self._trim(payload.get("message")) or "工具正在处理。"
         if event_type == "tool_result":
+            batch_evidence = payload.get("batch_evidence") if isinstance(payload.get("batch_evidence"), dict) else {}
+            if self._trim(batch_evidence.get("status")) == "unverified":
+                return self._trim(batch_evidence.get("message")) or "工具已返回，但批量覆盖信息无法核验。"
             status = "成功" if bool(payload.get("ok", True)) else "失败"
             return f"{status}"
         if event_type == "tool_runtime_error":
@@ -1311,12 +1677,20 @@ class ToolPlanRuntimeService:
         return ""
 
     def _event_status(self, *, event_type: str, payload: Dict[str, Any]) -> str:
+        if event_type in {"tool_call", "tool_progress"}:
+            return "running"
         if event_type in {"tool_result", "code_result"}:
             return "completed" if bool(payload.get("ok", True)) else "failed"
         if event_type in {"tool_runtime_error", "code_runtime_error"}:
             return "failed"
         if event_type == "code_retry":
             return "running"
+        if event_type == "tool_batch_progress":
+            return (
+                "completed"
+                if int(payload.get("completed") or 0) >= int(payload.get("total") or 0) > 0
+                else "running"
+            )
         if event_type == "tool_skipped":
             return "skipped"
         if event_type == "tool_blocked":
@@ -1981,18 +2355,34 @@ class ToolPlanRuntimeService:
         objective: str,
         tool_runs: List[Dict[str, Any]],
     ) -> tuple[Dict[str, Any], Optional[Dict[str, int]]]:
+        overview_by_tool = {
+            self._trim(item.get("tool_name")): item
+            for item in self._repeated_tool_run_summaries(tool_runs)
+            if self._trim(item.get("tool_name"))
+        }
         summarized_tools = []
+        overview_emitted: set[str] = set()
         for item in tool_runs:
             retention = item.get("retention") if isinstance(item.get("retention"), dict) else {}
             prompt_context = retention.get("prompt_context") if isinstance(retention.get("prompt_context"), dict) else {}
+            tool_name = self._trim(item.get("tool_name"))
+            result_overview = (
+                overview_by_tool.get(tool_name, {})
+                if tool_name and tool_name not in overview_emitted
+                else {}
+            )
+            if tool_name:
+                overview_emitted.add(tool_name)
             summarized_tools.append(
                 {
-                    "tool_name": self._trim(item.get("tool_name")),
+                    "tool_name": tool_name,
                     "status": self._trim(item.get("status")),
                     "reason": self._trim(item.get("reason")),
                     "error": self._trim(item.get("error")),
                     "arguments": ((item.get("plan") or {}) if isinstance(item.get("plan"), dict) else {}).get("arguments") or {},
                     "prompt_context": prompt_context,
+                    "batch_evidence": item.get("batch_evidence") if isinstance(item.get("batch_evidence"), dict) else {},
+                    "result_overview": result_overview,
                 }
             )
         try:
@@ -2040,9 +2430,21 @@ class ToolPlanRuntimeService:
                     "type": "coverage",
                     "description": f"有 {len(failed)} 个工具未成功执行，结果基于当前已获取证据生成。",
                 })
+        unverified_batch_messages = self._unverified_batch_messages(tool_runs)
+        repeated_run_summaries = self._repeated_tool_run_summaries(tool_runs)
+        risks.extend(
+            {"type": "coverage", "description": message}
+            for message in unverified_batch_messages
+        )
         return {
-            "summary": self._trim(payload.get("summary")) or "已完成临时工具计划执行。",
-            "facts": facts,
+            "summary": (
+                "工具调用已完成，但未返回可核验的批量覆盖或信号明细；"
+                "无法确认所有输入标的均已扫描，也不能据此下结论为全量无信号。"
+                if unverified_batch_messages
+                else self._repeated_run_summary_text(repeated_run_summaries)
+                or self._trim(payload.get("summary")) or "已完成临时工具计划执行。"
+            ),
+            "facts": [] if unverified_batch_messages else facts,
             "risks": risks,
         }
 
@@ -2080,11 +2482,344 @@ class ToolPlanRuntimeService:
                 "type": "tool_skip",
                 "description": f"有 {len(skipped)} 个工具因参数不足或未接入参数规划而被跳过。",
             })
+        unverified_batch_messages = self._unverified_batch_messages(tool_runs)
+        repeated_run_summaries = self._repeated_tool_run_summaries(tool_runs)
+        risks.extend(
+            {"type": "coverage", "description": message}
+            for message in unverified_batch_messages
+        )
         return {
-            "summary": f"已基于 {len(completed)} 个已完成工具的结果生成任务总结。",
+            "summary": (
+                "工具调用已完成，但未返回可核验的批量覆盖或信号明细；"
+                "无法确认所有输入标的均已扫描，也不能据此下结论为全量无信号。"
+                if unverified_batch_messages
+                else self._repeated_run_summary_text(repeated_run_summaries)
+                or f"已基于 {len(completed)} 个已完成工具的结果生成任务总结。"
+            ),
             "facts": facts,
             "risks": risks,
         }
+
+    def _unverified_batch_messages(self, tool_runs: List[Dict[str, Any]]) -> List[str]:
+        messages: List[str] = []
+        for run_record in tool_runs:
+            evidence = run_record.get("batch_evidence") if isinstance(run_record.get("batch_evidence"), dict) else {}
+            if self._trim(evidence.get("status")) != "unverified":
+                continue
+            message = self._trim(evidence.get("message"))
+            if message:
+                messages.append(message)
+        return messages
+
+    def _repeated_tool_run_summaries(self, tool_runs: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+        grouped: Dict[str, List[Dict[str, Any]]] = {}
+        for run_record in tool_runs:
+            tool_name = self._trim(run_record.get("tool_name"))
+            if tool_name:
+                grouped.setdefault(tool_name, []).append(run_record)
+        summaries: List[Dict[str, Any]] = []
+        for tool_name, runs in grouped.items():
+            batch_input_count = max(
+                [
+                    int(
+                        (
+                            item.get("batch_evidence")
+                            if isinstance(item.get("batch_evidence"), dict)
+                            else {}
+                        ).get("input_count")
+                        or 0
+                    )
+                    for item in runs
+                    if self._trim(
+                        (
+                            item.get("batch_evidence")
+                            if isinstance(item.get("batch_evidence"), dict)
+                            else {}
+                        ).get("status")
+                    )
+                    in {"verified", "returned"}
+                ]
+                or [0]
+            )
+            if len(runs) <= 1 and batch_input_count <= 1:
+                continue
+            completed = [item for item in runs if self._trim(item.get("status")) == "completed"]
+            failed = [item for item in runs if self._trim(item.get("status")) == "failed"]
+            skipped = [item for item in runs if self._trim(item.get("status")) == "skipped"]
+            signal_values: List[bool] = []
+            reason_counts: Dict[str, int] = {}
+            exception_rows: List[Dict[str, Any]] = []
+            near_match_rows: List[Dict[str, Any]] = []
+            covered_results = 0
+            missing_result_count = 0
+            insufficient_result_count = 0
+            for item in [*failed, *skipped]:
+                plan = item.get("plan") if isinstance(item.get("plan"), dict) else {}
+                arguments = plan.get("arguments") if isinstance(plan.get("arguments"), dict) else {}
+                target = self._target_from_arguments(arguments)
+                if target and len(exception_rows) < 30:
+                    exception_rows.append({
+                        "研究目标": target,
+                        "结果": self._trim(item.get("error") or item.get("reason")) or "未返回结果",
+                        "数据量": None,
+                    })
+            for item in completed:
+                result = item.get("result") if isinstance(item.get("result"), dict) else {}
+                data = result.get("data") if isinstance(result.get("data"), dict) else {}
+                records = self._per_target_result_records(data)
+                if not records:
+                    missing_result_count += 1
+                    plan = item.get("plan") if isinstance(item.get("plan"), dict) else {}
+                    arguments = plan.get("arguments") if isinstance(plan.get("arguments"), dict) else {}
+                    target = self._target_from_arguments(arguments)
+                    if target and len(exception_rows) < 30:
+                        exception_rows.append({
+                            "研究目标": target,
+                            "结果": "未返回逐目标结果",
+                            "数据量": None,
+                        })
+                    continue
+                covered_results += len(records)
+                for record in records:
+                    key_process_info = (
+                        record.get("key_process_info")
+                        if isinstance(record.get("key_process_info"), dict)
+                        else data.get("key_process_info")
+                        if isinstance(data.get("key_process_info"), dict)
+                        else {}
+                    )
+                    signal = self._result_signal_value(record)
+                    if signal is not None:
+                        signal_values.append(signal)
+                    reason = self._result_reason(record)
+                    if reason:
+                        reason_counts[reason] = reason_counts.get(reason, 0) + 1
+                    is_insufficient = self._is_insufficient_result_record(
+                        record,
+                        reason=reason,
+                    )
+                    if is_insufficient:
+                        insufficient_result_count += 1
+                    is_exception = is_insufficient or signal is True
+                    if is_exception and len(exception_rows) < 30:
+                        exception_rows.append({
+                            "研究目标": self._result_target(record, key_process_info),
+                            "结果": "触发信号" if signal is True else reason or "需核验",
+                            "数据量": self._result_data_count(record, key_process_info),
+                        })
+                    failed_condition_count = self._failed_condition_count(
+                        record,
+                        key_process_info,
+                    )
+                    if (
+                        signal is not True
+                        and failed_condition_count is not None
+                        and not is_insufficient
+                    ):
+                        near_match_rows.append({
+                            "研究目标": self._result_target(record, key_process_info),
+                            "通过条件": self._condition_pass_count(
+                                record,
+                                key_process_info,
+                                failed_condition_count=failed_condition_count,
+                            ),
+                            "未满足条件": failed_condition_count,
+                            "最新价": self._latest_result_value(
+                                record,
+                                key_process_info,
+                            ),
+                            "原因": reason or "未触发信号",
+                        })
+            near_match_rows.sort(
+                key=lambda row: (
+                    int(row.get("未满足条件") or 0),
+                    -int(row.get("通过条件") or 0),
+                    self._trim(row.get("研究目标")),
+                )
+            )
+            summaries.append({
+                "tool_name": tool_name,
+                "input_count": batch_input_count,
+                "planned": len(runs),
+                "completed": len(completed),
+                "failed": len(failed),
+                "skipped": len(skipped),
+                "signal_available": bool(signal_values),
+                "signal_count": sum(signal_values),
+                "reason_counts": reason_counts,
+                "exception_rows": exception_rows,
+                "near_match_rows": near_match_rows[:20],
+                "covered_results": covered_results,
+                "missing_result_count": missing_result_count,
+                "insufficient_result_count": insufficient_result_count,
+            })
+        return summaries
+
+    @staticmethod
+    def _per_target_result_records(data: Dict[str, Any]) -> List[Dict[str, Any]]:
+        results = data.get("results")
+        if isinstance(results, list):
+            return [dict(item) for item in results if isinstance(item, dict)]
+        return [data] if data else []
+
+    def _target_from_arguments(self, arguments: Dict[str, Any]) -> str:
+        for key in (
+            "stock_codes", "fund_codes", "plate_names", "industry_names",
+            "targets", "symbols", "stocks", "codes",
+            "stock", "stock_code", "fund_code", "code", "target",
+        ):
+            value = arguments.get(key)
+            if isinstance(value, list) and value:
+                return self._trim(value[0])
+            if self._trim(value):
+                return self._trim(value)
+        return ""
+
+    def _result_target(self, record: Dict[str, Any], key_process_info: Dict[str, Any]) -> str:
+        for source in (record, key_process_info):
+            for key in (
+                "target", "stock_code", "fund_code", "plate_name",
+                "industry_name", "symbol", "code", "name",
+            ):
+                if self._trim(source.get(key)):
+                    return self._trim(source.get(key))
+        return "—"
+
+    def _result_reason(self, record: Dict[str, Any]) -> str:
+        for key in ("reason", "reasons", "message", "status"):
+            value = record.get(key)
+            if isinstance(value, list):
+                parts = [self._trim(item) for item in value if self._trim(item)]
+                if parts:
+                    return "；".join(parts)
+            elif isinstance(value, dict):
+                text = self._trim(
+                    value.get("summary")
+                    or value.get("message")
+                    or value.get("reason")
+                )
+                if text:
+                    return text
+            elif self._trim(value):
+                return self._trim(value)
+        return ""
+
+    @staticmethod
+    def _result_signal_value(record: Dict[str, Any]) -> Optional[bool]:
+        for key in ("entry_signal", "signal", "matched", "selected"):
+            if key not in record:
+                continue
+            value = record.get(key)
+            if isinstance(value, bool):
+                return value
+            if isinstance(value, (int, float)) and value in {0, 1}:
+                return bool(value)
+        return None
+
+    def _is_insufficient_result(self, reason: str) -> bool:
+        normalized = self._trim(reason).lower()
+        return any(
+            marker in normalized
+            for marker in (
+                "insufficient",
+                "数据不足",
+                "样本不足",
+                "缺少数据",
+                "k线不足",
+                "bar不足",
+                "记录不足",
+                "不可用",
+            )
+        )
+
+    def _is_insufficient_result_record(
+        self,
+        record: Dict[str, Any],
+        *,
+        reason: str,
+    ) -> bool:
+        if self._is_insufficient_result(reason):
+            return True
+        return any(
+            self._is_insufficient_result(self._trim(record.get(key)))
+            for key in ("data_status", "status", "availability")
+        )
+
+    @staticmethod
+    def _result_data_count(record: Dict[str, Any], key_process_info: Dict[str, Any]) -> Any:
+        for source in (record, key_process_info):
+            for key in (
+                "data_count", "observation_count", "record_count",
+                "sample_count", "candle_count", "bar_count", "row_count",
+            ):
+                if source.get(key) is not None:
+                    return source.get(key)
+        return None
+
+    @staticmethod
+    def _failed_condition_count(
+        record: Dict[str, Any],
+        key_process_info: Dict[str, Any],
+    ) -> Optional[int]:
+        for source in (record, key_process_info):
+            value = source.get("failed_condition_count")
+            if isinstance(value, (int, float)) and not isinstance(value, bool):
+                return max(0, int(value))
+            failed = source.get("failed_conditions")
+            if isinstance(failed, list):
+                return len(failed)
+        return None
+
+    @staticmethod
+    def _condition_pass_count(
+        record: Dict[str, Any],
+        key_process_info: Dict[str, Any],
+        *,
+        failed_condition_count: int,
+    ) -> Optional[int]:
+        for source in (record, key_process_info):
+            value = source.get("condition_pass_count")
+            if isinstance(value, (int, float)) and not isinstance(value, bool):
+                return max(0, int(value))
+        return None
+
+    @staticmethod
+    def _latest_result_value(
+        record: Dict[str, Any],
+        key_process_info: Dict[str, Any],
+    ) -> Any:
+        for source in (record, key_process_info):
+            for key in ("latest_close", "close", "latest_price", "current_price"):
+                if source.get(key) is not None:
+                    return source.get(key)
+        return None
+
+    def _repeated_run_summary_text(self, summaries: List[Dict[str, Any]]) -> str:
+        if len(summaries) != 1:
+            return ""
+        summary = summaries[0]
+        input_count = int(summary.get("input_count") or 0)
+        covered_results = int(summary.get("covered_results") or 0)
+        if input_count > 1:
+            text = f"已扫描 {input_count} 个目标，返回 {covered_results} 条逐目标结果"
+        else:
+            text = (
+                f"共计划运行 {int(summary.get('planned') or 0)} 项，"
+                f"成功返回 {int(summary.get('completed') or 0)} 项"
+            )
+        failed = int(summary.get("failed") or 0)
+        skipped = int(summary.get("skipped") or 0)
+        if failed or skipped:
+            text += f"，未返回 {failed + skipped} 项"
+        if summary.get("signal_available"):
+            text += f"；触发信号 {int(summary.get('signal_count') or 0)} 项"
+        insufficient = int(summary.get("insufficient_result_count") or 0)
+        if insufficient:
+            text += f"，其中 {insufficient} 项数据不足"
+        missing_results = int(summary.get("missing_result_count") or 0)
+        if missing_results:
+            text += f"，另有 {missing_results} 项缺少逐目标结果"
+        return text + "。"
 
     def _build_render_payload(
         self,
@@ -2109,8 +2844,18 @@ class ToolPlanRuntimeService:
                 ],
             }
         )
+        repeated_summaries = self._repeated_tool_run_summaries(tool_runs)
+        sections.extend(self._repeated_tool_summary_sections(repeated_summaries))
+        repeated_tool_names = {
+            self._trim(summary.get("tool_name"))
+            for summary in repeated_summaries
+            if self._trim(summary.get("tool_name"))
+            and int(summary.get("planned") or 0) > 1
+        }
         for run_record in tool_runs:
             if self._trim(run_record.get("status")) != "completed":
+                continue
+            if self._trim(run_record.get("tool_name")) in repeated_tool_names:
                 continue
             rendered_sections = self._build_tool_render_sections(run_record)
             sections.extend(rendered_sections)
@@ -2133,10 +2878,85 @@ class ToolPlanRuntimeService:
             "presentation_contract": presentation_contract,
         }
 
+    def _repeated_tool_summary_sections(self, summaries: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+        sections: List[Dict[str, Any]] = []
+        for summary in summaries:
+            tool_name = self._trim(summary.get("tool_name")) or "tool"
+            metric_items = [
+                {"label": "计划执行", "value": int(summary.get("planned") or 0)},
+                {"label": "成功返回", "value": int(summary.get("completed") or 0)},
+            ]
+            covered_results = int(summary.get("covered_results") or 0)
+            input_count = int(summary.get("input_count") or 0)
+            if input_count > 1:
+                metric_items = [
+                    {"label": "研究目标", "value": input_count},
+                    {"label": "返回结果", "value": covered_results},
+                ]
+            elif covered_results != int(summary.get("completed") or 0):
+                metric_items.append({"label": "有效结果", "value": covered_results})
+            failed_or_skipped = int(summary.get("failed") or 0) + int(summary.get("skipped") or 0)
+            if failed_or_skipped:
+                metric_items.append({"label": "未返回", "value": failed_or_skipped})
+            if summary.get("signal_available"):
+                metric_items.append({"label": "触发信号", "value": int(summary.get("signal_count") or 0)})
+            insufficient = int(summary.get("insufficient_result_count") or 0)
+            if insufficient:
+                metric_items.append({"label": "数据不足", "value": insufficient})
+            blocks: List[Dict[str, Any]] = [{
+                "block_id": f"{tool_name}_batch_overview",
+                "type": "metric_strip",
+                "title": "扫描概览",
+                "data": {"items": metric_items},
+            }]
+            reason_counts = summary.get("reason_counts") if isinstance(summary.get("reason_counts"), dict) else {}
+            if reason_counts:
+                blocks.append({
+                    "block_id": f"{tool_name}_reason_distribution",
+                    "type": "table",
+                    "title": "结果分布",
+                    "data": {
+                        "columns": ["结果", "数量"],
+                        "rows": [
+                            {"结果": reason, "数量": count}
+                            for reason, count in sorted(reason_counts.items(), key=lambda item: (-item[1], item[0]))
+                        ],
+                    },
+                })
+            exception_rows = summary.get("exception_rows") if isinstance(summary.get("exception_rows"), list) else []
+            if exception_rows:
+                blocks.append({
+                    "block_id": f"{tool_name}_exceptions",
+                    "type": "table",
+                    "title": "需要关注的标的",
+                    "data": {
+                        "columns": ["研究目标", "结果", "数据量"],
+                        "rows": exception_rows,
+                    },
+                })
+            near_match_rows = summary.get("near_match_rows") if isinstance(summary.get("near_match_rows"), list) else []
+            if near_match_rows:
+                blocks.append({
+                    "block_id": f"{tool_name}_near_matches",
+                    "type": "table",
+                    "title": "接近条件的标的",
+                    "data": {
+                        "columns": ["研究目标", "通过条件", "未满足条件", "最新价", "原因"],
+                        "rows": near_match_rows,
+                    },
+                })
+            sections.append({
+                "section_id": f"tool_{tool_name}_batch_summary",
+                "title": tool_name,
+                "blocks": blocks,
+            })
+        return sections
+
     def _build_tool_render_sections(self, run_record: Dict[str, Any]) -> List[Dict[str, Any]]:
+        evidence_sections = self._build_batch_evidence_sections(run_record)
         direct_sections = self._build_sections_from_render_blocks(run_record)
         if direct_sections:
-            return direct_sections
+            return [*evidence_sections, *direct_sections]
 
         retention = run_record.get("retention") if isinstance(run_record.get("retention"), dict) else {}
         render_artifacts = retention.get("render_artifacts") if isinstance(retention.get("render_artifacts"), dict) else {}
@@ -2169,21 +2989,44 @@ class ToolPlanRuntimeService:
                 "reasoning": prompt_context.get("reasoning") if isinstance(prompt_context.get("reasoning"), dict) else {},
                 "compressed": prompt_context.get("compressed") if isinstance(prompt_context.get("compressed"), dict) else {},
             }
-            sections.append(
-                {
-                    "section_id": f"tool_{tool_name}_summary",
-                    "title": tool_name,
-                    "blocks": [
-                        {
-                            "block_id": f"{tool_name}_summary",
-                            "type": "structured_text",
-                            "title": tool_name,
-                            "data": summary_data,
-                        }
-                    ],
-                }
-            )
-        return sections
+            if summary_data["reasoning"] or summary_data["compressed"]:
+                sections.append(
+                    {
+                        "section_id": f"tool_{tool_name}_summary",
+                        "title": tool_name,
+                        "blocks": [
+                            {
+                                "block_id": f"{tool_name}_summary",
+                                "type": "structured_text",
+                                "title": tool_name,
+                                "data": summary_data,
+                            }
+                        ],
+                    }
+                )
+        return [*evidence_sections, *sections]
+
+    def _build_batch_evidence_sections(self, run_record: Dict[str, Any]) -> List[Dict[str, Any]]:
+        evidence = run_record.get("batch_evidence") if isinstance(run_record.get("batch_evidence"), dict) else {}
+        if self._trim(evidence.get("status")) != "unverified":
+            return []
+        tool_name = self._trim(run_record.get("tool_name")) or "tool"
+        return [{
+            "section_id": f"tool_{tool_name}_coverage",
+            "title": "结果核验",
+            "blocks": [{
+                "block_id": f"{tool_name}_coverage_warning",
+                "type": "assessment",
+                "title": "批量扫描结果待核验",
+                "data": {
+                    "overall": "warn",
+                    "summary": self._trim(evidence.get("message")),
+                    "issues": [{
+                        "summary": "本次调用只证明工具返回成功，不证明每个输入标的都完成了数据获取、计算和结果输出。",
+                    }],
+                },
+            }],
+        }]
 
     def _build_sections_from_render_blocks(self, run_record: Dict[str, Any]) -> List[Dict[str, Any]]:
         result = run_record.get("result") if isinstance(run_record.get("result"), dict) else {}
@@ -2227,6 +3070,8 @@ class ToolPlanRuntimeService:
         render_preference: Optional[Dict[str, Any]] = None,
     ) -> Optional[Dict[str, Any]]:
         title = self._humanize_path(path)
+        if value in (None, "", [], {}):
+            return None
         preferred_type = self._trim((render_preference or {}).get("render_type")) or "auto"
         if preferred_type != "auto":
             forced = self._build_block_from_preference(

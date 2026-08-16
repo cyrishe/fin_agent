@@ -149,10 +149,12 @@ describe("invocable asset API", () => {
     });
 
     const options = fetchMock.mock.calls[0]?.[1] as RequestInit;
-    expect(JSON.parse(String(options.body)).selected_asset).toEqual({
+    const requestBody = JSON.parse(String(options.body));
+    expect(requestBody.selected_asset).toEqual({
       ref: "tool:ct_market_buy_decision",
       kind: "tool",
       name: "ct_market_buy_decision",
     });
+    expect(requestBody.research_mode).toBe("auto");
   });
 });

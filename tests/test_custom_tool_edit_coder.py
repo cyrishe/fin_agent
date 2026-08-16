@@ -254,6 +254,52 @@ def test_edit_coding_bundle_reuses_workspace_without_materializing_api_catalog(t
     assert (bundle_dir / "dev_runtime" / "test_support.py").is_file()
 
 
+def test_edit_coding_exposes_only_existing_finance_api_dependencies(tmp_path: Path) -> None:
+    catalog_path = tmp_path / "catalog.json"
+    catalog_path.write_text(
+        '''{
+          "api_class_patterns": {"stock_quote_query": {"args": {"mode": "0/1/2", "period": "1/5/15/60", "count": "根数"}}},
+          "subjects": {"stock": {"quote": {
+            "desc": "行情",
+            "fields": {"code": ["代码"], "close": ["收盘价"]},
+            "rules": ["mode=1 使用 period 和 count。"],
+            "api": [{"api_name": "stock.quote", "api_function": "查询行情", "api_class": "stock_quote_query"}]
+          }, "margin": {
+            "desc": "融资融券", "fields": {}, "api": []
+          }}}
+        }''',
+        encoding="utf-8",
+    )
+    implementation = _implementation(
+        'def run(inputs):\n    return finance_query(request="stock.quote(mode = 1)")\n'
+    )
+    service = CustomToolContextBundleService(
+        catalog_path=str(catalog_path),
+        root_dir=str(tmp_path / "bundles"),
+    )
+
+    bundle = service.build(
+        stage="edit_coding",
+        user_request="按新的分钟K参数修改",
+        context={
+            "design": _design(),
+            "current_implementation": implementation,
+            "implementation_instruction": "改为直接取得60分钟K。",
+            "_workspace_identity": {"owner_id": "u1"},
+        },
+        run_id="edit-api-dependency-1",
+    )
+
+    bundle_dir = Path(bundle["bundle_dir"])
+    prompt_context = service.prompt_context(bundle, {})
+    dependencies = __import__("json").loads(
+        (bundle_dir / prompt_context["api_dependency_ref"]).read_text(encoding="utf-8")
+    )
+    assert not (bundle_dir / "api_catalog").exists()
+    assert [item["dataview"] for item in dependencies["dependencies"]] == ["quote"]
+    assert dependencies["dependencies"][0]["methods"][0]["args"]["period"] == "1/5/15/60"
+
+
 def test_edit_coding_prompt_omits_full_api_research_contract() -> None:
     prompt = CodexExecSkillHarness()._build_prompt(
         skill_text="local edit coding instructions",
@@ -269,7 +315,7 @@ def test_edit_coding_prompt_omits_full_api_research_contract() -> None:
     )
 
     assert "implementation_instruction" in prompt
-    assert "不要读取 API Catalog" in prompt
+    assert "不要扫描完整 API Catalog" in prompt
     assert "# REQUIRED FINANCE API CALL CONTRACT" not in prompt
     assert "api_catalog/CODING_GUIDE.md" not in prompt
 
@@ -278,6 +324,6 @@ def test_edit_implementation_skill_requires_minimal_change_and_synthetic_proof()
     text = SKILL_PATH.read_text(encoding="utf-8")
 
     assert "不得重新理解需求、重做 Design" in text
-    assert "不要扫描仓库或读取 API Catalog" in text
+    assert "不要扫描仓库或完整 API Catalog" in text
     assert "至少包含一个满足修订后规则的样例和一个不满足的样例" in text
     assert "不得顺手重构" in text

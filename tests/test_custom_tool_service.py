@@ -143,6 +143,98 @@ def _runtime(store: CustomToolStoreService, tmp_path: Path) -> CustomToolRuntime
     )
 
 
+def test_custom_tool_finance_bridge_passes_target_list_as_structured_binding(
+    tmp_path: Path,
+) -> None:
+    class RecordingFinanceRuntime:
+        def __init__(self):
+            self.calls = []
+
+        def execute_request(self, *, request, bindings=None, **_kwargs):
+            self.calls.append({"request": request, "bindings": bindings})
+            rows = [
+                {"code": code, "close": index + 1.0}
+                for index, code in enumerate((bindings or {}).get("stock_codes") or [])
+            ]
+            return {
+                "ok": True,
+                "validation": {"ok": True, "errors": []},
+                "result": {
+                    "columns": ["code", "close"],
+                    "data": {"status": "ok", "rows": rows},
+                },
+            }
+
+    finance_runtime = RecordingFinanceRuntime()
+    runtime = CustomToolRuntimeService(
+        python_runtime=PythonExecutionRuntime(allow_unsafe_backends=True),
+        runtime_root=str(tmp_path / "runtime"),
+        finance_runtime=finance_runtime,
+    )
+    bundle = {
+        "manifest": {
+            "tool_name": "ct_batch_quotes",
+            "display_name": "批量行情",
+            "runtime": {
+                "kind": "python_sandbox",
+                "backend": "local_dev",
+                "timeout_ms": 2000,
+            },
+        },
+        "code": '''from custom_tool_sdk import finance_query, info
+
+def run(inputs):
+    stock_codes = list(inputs.get("stock_codes") or [])
+    info("开始批量取数", {"target_count": len(stock_codes)})
+    response = finance_query(
+        request="quotes = stock.quote(codes = $stock_codes, mode = 0, count = 1) -> code, close",
+        bindings={"stock_codes": stock_codes},
+    )
+    info("批量取数完成", {"row_count": len(response.get("data") or [])})
+    return {
+        "query_ok": response.get("ok"),
+        "rows": response.get("data") or [],
+        "key_process_info": {"target_count": len(stock_codes)},
+    }
+''',
+    }
+    stock_codes = [f"{index:06d}.SZ" for index in range(2_000)]
+    progress = []
+
+    result = runtime._run_loaded_bundle(
+        bundle=bundle,
+        arguments={"stock_codes": stock_codes},
+        progress_sink=progress.append,
+    )
+
+    assert result["ok"] is True
+    assert result["data"]["query_ok"] is True
+    assert len(result["data"]["rows"]) == 2_000
+    assert len(finance_runtime.calls) == 1
+    assert finance_runtime.calls[0]["bindings"] == {"stock_codes": stock_codes}
+    assert len(finance_runtime.calls[0]["request"]) < 120
+    assert result["meta"]["diagnostics"]["finance_query_count"] == 1
+    assert [item["message"] for item in progress] == [
+        "开始批量取数",
+        "批量取数完成",
+    ]
+
+
+def test_finance_bridge_cache_key_includes_bindings() -> None:
+    request = "r1 = stock.quote(codes = $stock_codes, mode = 0) -> code"
+
+    first = CustomToolRuntimeService._finance_request_key(
+        request=request,
+        bindings={"stock_codes": ["600519.SH"]},
+    )
+    second = CustomToolRuntimeService._finance_request_key(
+        request=request,
+        bindings={"stock_codes": ["000858.SZ"]},
+    )
+
+    assert first != second
+
+
 def _save_active_sum_tool(store: CustomToolStoreService, *, owner_id: str = "user_a") -> None:
     store.save_draft(
         {
@@ -273,6 +365,272 @@ def test_design_confirmation_runs_codex_output_and_keeps_only_asset_facts(tmp_pa
         owner_id="user_a",
     )
     assert activated["tool"]["manifest"]["status"] == "active"
+
+
+def test_invalid_optional_selection_mapping_does_not_block_direct_tool(
+    tmp_path: Path,
+) -> None:
+    class _RepairingStrategyCoder:
+        def __init__(self):
+            self.contexts = []
+
+        def code(self, design, *, requirement_text="", context=None, event_sink=None):
+            current_context = dict(context or {})
+            self.contexts.append(current_context)
+            repaired = len(self.contexts) == 2
+            outputs = [
+                {
+                    "name": "candidates",
+                    "type": "array",
+                    "required": True,
+                    "description": "有序候选。",
+                    "items_type": "object",
+                },
+            ]
+            if repaired:
+                outputs.append({
+                    "name": "as_of_date",
+                    "type": "string",
+                    "required": True,
+                    "description": "数据截止日。",
+                    "items_type": None,
+                })
+            code = (
+                "def run(inputs):\n"
+                "    return {'candidates': [], "
+                + ("'as_of_date': '2026-08-05', " if repaired else "")
+                + "'key_process_info': {'target_count': len(inputs.get('stock_codes') or [])}}\n"
+            )
+            runtime = dict(current_context.get("_agent_runtime") or {})
+            runtime["provider_session_id"] = "provider-session-1"
+            return {
+                "ok": True,
+                "message": "代码已生成。",
+                "events": [],
+                "agent_runtime": runtime,
+                "raw": {"duration_ms": 10},
+                "final": {
+                    "tool_contract": {
+                        "tool_name": "ct_repair_selector",
+                        "display_name": "契约修复选股",
+                        "description": "验证策略伴随契约自动修复。",
+                        "inputs": [{
+                            "name": "stock_codes",
+                            "type": "array",
+                            "required": True,
+                            "description": "股票范围。",
+                            "items_type": "string",
+                        }],
+                        "outputs": outputs,
+                    },
+                    "implementation": {
+                        "entry_module": "main",
+                        "modules": [{
+                            "module_id": "main",
+                            "source_code": code,
+                        }],
+                    },
+                    "implementation_summary": "完成候选计算和契约修复验证。",
+                    "finance_tool_profile": {
+                        "protocol": "finance_tool_profile.v1",
+                        "family": "strategy",
+                        "execution_shape": "cross_sectional",
+                        "output_semantic": "ranked_selection",
+                        "summary": "输出有序候选。",
+                    },
+                    "strategy_runtime_profile": {
+                        "protocol": "strategy_runtime_profile.v1",
+                        "binding": {"field": "stock_codes"},
+                        "required_history_sessions": 20,
+                        "default_run_sessions": 1,
+                        "default_universe_ref": None,
+                        "market_code": "CN",
+                    },
+                    "selection_output_profile": {
+                        "candidate_path": "data.candidates",
+                        "symbol_field": "stock_code",
+                        "output_date_path": (
+                            "data.as_of_date"
+                            if repaired
+                            else "data.candidates[0].as_of_date"
+                        ),
+                    },
+                    "execution_examples": [{
+                        "input": {"stock_codes": ["600519.SH"]},
+                        "output": {
+                            "candidates": [],
+                            **({"as_of_date": "2026-08-05"} if repaired else {}),
+                            "key_process_info": {"target_count": 1},
+                        },
+                    }],
+                },
+            }
+
+    store = CustomToolStoreService(
+        root_dir=str(tmp_path / "tools"),
+        backend="filesystem",
+    )
+    coder = _RepairingStrategyCoder()
+    service = CustomToolAgentService(
+        store=store,
+        coder=coder,
+        runtime=_runtime(store, tmp_path),
+        use_codex=False,
+    )
+    visible_events = []
+
+    result = service.implement_dynamic_tool(
+        state={
+            "owner_id": "user_a",
+            "requirement_text": "创建横截面选股策略",
+            "design_contract": {
+                "tool_name": "ct_repair_selector",
+                "document": "对股票列表进行横截面筛选。",
+            },
+        },
+        owner_id="user_a",
+        event_sink=visible_events.append,
+    )
+
+    assert result["coding_status"] == "implemented"
+    assert result["test_result"]["execution_ok"] is True
+    assert result["implementation_meta"]["contract_repair_attempted"] is False
+    assert result["implementation_meta"]["duration_ms"] == 10
+    assert len(coder.contexts) == 1
+    assert not any(event.get("type") == "contract_repair" for event in visible_events)
+    saved = store.load("ct_repair_selector")
+    assert saved["strategy_runtime_profile"]["binding"] == {
+        "field": "stock_codes",
+    }
+    assert "selection_output_profile" not in saved
+    assert "as_of_date" not in saved["output_schema"]["properties"]
+
+
+def test_strategy_profile_without_optional_runtime_companion_does_not_block(
+    tmp_path: Path,
+) -> None:
+    class _RepairingFinanceProfileCoder:
+        def __init__(self):
+            self.contexts = []
+
+        def code(self, design, *, requirement_text="", context=None, event_sink=None):
+            current_context = dict(context or {})
+            self.contexts.append(current_context)
+            repaired = len(self.contexts) == 2
+            runtime = dict(current_context.get("_agent_runtime") or {})
+            runtime["provider_session_id"] = "provider-session-finance-profile"
+            return {
+                "ok": True,
+                "message": "代码已生成。",
+                "events": [],
+                "agent_runtime": runtime,
+                "raw": {"duration_ms": 12},
+                "final": {
+                    "tool_contract": {
+                        "tool_name": "ct_repair_signal_profile",
+                        "display_name": "策略画像修复信号",
+                        "description": "验证策略运行画像自动修复。",
+                        "inputs": [{
+                            "name": "stock_codes",
+                            "type": "array",
+                            "required": True,
+                            "description": "股票范围。",
+                            "items_type": "string",
+                        }],
+                        "outputs": [{
+                            "name": "signals",
+                            "type": "array",
+                            "required": True,
+                            "description": "逐股信号。",
+                            "items_type": "object",
+                        }],
+                    },
+                    "implementation": {
+                        "entry_module": "main",
+                        "modules": [{
+                            "module_id": "main",
+                            "source_code": (
+                                "def run(inputs):\n"
+                                "    return {'signals': [], 'key_process_info': "
+                                "{'target_count': len(inputs.get('stock_codes') or [])}}\n"
+                            ),
+                        }],
+                    },
+                    "implementation_summary": "完成逐股信号计算。",
+                    "finance_tool_profile": {
+                        "protocol": "finance_tool_profile.v1",
+                        "family": "strategy",
+                        "execution_shape": "entity_local",
+                        "output_semantic": "signal",
+                        "summary": "输出逐股信号。",
+                    },
+                    "strategy_runtime_profile": (
+                        {
+                            "protocol": "strategy_runtime_profile.v1",
+                            "binding": {"field": "stock_codes"},
+                            "required_history_sessions": 20,
+                            "default_run_sessions": 1,
+                            "default_universe_ref": None,
+                            "market_code": "CN",
+                        }
+                        if repaired
+                        else None
+                    ),
+                    "selection_output_profile": None,
+                    "execution_examples": [{
+                        "input": {"stock_codes": ["600519.SH"]},
+                        "output": {
+                            "signals": [],
+                            "key_process_info": {"target_count": 1},
+                        },
+                    }],
+                },
+            }
+
+    store = CustomToolStoreService(
+        root_dir=str(tmp_path / "tools"),
+        backend="filesystem",
+    )
+    coder = _RepairingFinanceProfileCoder()
+    service = CustomToolAgentService(
+        store=store,
+        coder=coder,
+        runtime=_runtime(store, tmp_path),
+        use_codex=False,
+    )
+    visible_events = []
+
+    result = service.implement_dynamic_tool(
+        state={
+            "owner_id": "user_a",
+            "requirement_text": "创建逐股信号策略",
+            "design_contract": {
+                "tool_name": "ct_repair_signal_profile",
+                "document": "对股票列表逐目标计算买入信号。",
+                "finance_tool_profile": {
+                    "protocol": "finance_tool_profile.v1",
+                    "family": "strategy",
+                    "execution_shape": "entity_local",
+                    "output_semantic": "signal",
+                    "summary": "输出逐股信号。",
+                },
+            },
+        },
+        owner_id="user_a",
+        event_sink=visible_events.append,
+    )
+
+    assert result["coding_status"] == "implemented"
+    assert result["test_result"]["execution_ok"] is True
+    assert result["implementation_meta"]["contract_repair_attempted"] is False
+    assert result["implementation_meta"]["duration_ms"] == 12
+    assert len(coder.contexts) == 1
+    assert not any(event.get("type") == "contract_repair" for event in visible_events)
+    saved = store.load("ct_repair_signal_profile")
+    assert saved["finance_tool_profile"]["family"] == "strategy"
+    assert saved["manifest"]["capabilities"] == ["custom_tool"]
+    assert "strategy_runtime_profile" not in saved
+    assert "selection_output_profile" not in saved
 
 
 def test_missing_execution_examples_never_blocks_or_retries_coding(tmp_path: Path) -> None:
@@ -1076,9 +1434,18 @@ def test_coding_subject_asset_expands_method_contracts(tmp_path: Path) -> None:
         for method in stock["methods"]
     }
     quote = methods["stock.quote"]
-    assert quote["args"]["optional"] == ["filter", "order", "limit", "realtime"]
+    assert quote["args"]["optional"] == [
+        "filter",
+        "codes(array<string>)",
+        "names(array<string>)",
+        "order",
+        "limit(-1 or positive integer; -1 means all matching rows within the safety ceiling)",
+        "mode(0|1|2; default 0)",
+        "period(1|3|5|10|15|30|60; mode=1 only)",
+        "count(mode=0: 1..5000 rows per code; mode=1: 1..1000 bars per code)",
+    ]
     assert quote["call"].startswith("{result_name} = stock.quote(")
-    assert "只能从当前 view.fields" in quote["output_rule"]
+    assert "只能从 stock.quote.fields" in quote["output_rule"]
 
     kday = methods["stock.quote.kd_<field>_<method>"]
     assert kday["available_names"]["field_methods"]["close"] == [
@@ -1180,6 +1547,40 @@ def test_context_bundle_recovers_revised_source_without_repeating_it_in_final_js
     )
 
     assert "'value': 2" in result["implementation"]["modules"][0]["source_code"]
+
+
+def test_context_bundle_repair_turn_preserves_existing_focused_test_evidence(
+    tmp_path: Path,
+) -> None:
+    service = CustomToolContextBundleService(
+        catalog_path=str(tmp_path / "missing.json"),
+        root_dir=str(tmp_path / "bundles"),
+    )
+    first = service.build(
+        stage="coding",
+        user_request="首次实现",
+        context={"_workspace_identity": {"owner_id": "user_a"}},
+        run_id="same-coding-session",
+    )
+    evidence_path = Path(first["bundle_dir"], first["coding_evidence"])
+    evidence = {
+        "input": {"stock_codes": ["600519.SH"]},
+        "actual": {
+            "candidates": [],
+            "key_process_info": {"target_count": 1},
+        },
+    }
+    evidence_path.write_text(json.dumps(evidence), encoding="utf-8")
+
+    repaired = service.build(
+        stage="coding",
+        user_request="修正输出映射",
+        context={"_workspace_identity": {"owner_id": "user_a"}},
+        run_id="same-coding-session",
+    )
+
+    assert repaired["bundle_dir"] == first["bundle_dir"]
+    assert json.loads(evidence_path.read_text(encoding="utf-8")) == evidence
 
 
 def test_runtime_exposes_objective_info_and_debug_logs(tmp_path: Path) -> None:

@@ -131,6 +131,42 @@ Agent tools ∩ Skill allowed-tools ∩ Runtime available tools ∩ owner/policy
 
 更新 `skill-arch.md`：补充 legacy 退役图、显式调用语义、revision 发布、tenant 权限、可调度边界、评测门，以及 Skill 与 Strategy/Backtest 的 point-in-time 依赖。
 
+## SK-P1-09 Skill 组合与结果依赖语义
+
+当前 Finance CC 可以在同一轮加载零个、一个或少量并列 `business_method`，并在同一个会话、working set 和证据空间中综合使用；“Sibling Skill”只是方法之间的自然语言关系，不是运行时层级。Skill 本身不执行另一个 Skill，也没有可被其他 Skill 消费的独立结构化返回值。
+
+预研与验收：
+
+- 区分“方法组合”和“结果依赖”：前者由 CC 动态加载多个 Skill；后者若需要固定前置结果、严格顺序和机器消费，应进入 Workflow / Tool Plan，而不是增加通用 `depends_on_skill`。
+- authored Skill 只引用稳定业务能力或相关方法语义，不要求用户维护内部 Skill ID；Registry / Control Compiler 负责解析当前可用方法。
+- 若未来引入独立研究 worker，其输出必须作为带 revision、as-of、evidence refs 的 Artifact 交给总控；明确这是 Agent/Workflow 编排，不伪装成 Skill-to-Skill 调用。
+- 增加多个 Skill 同轮加载、权限并集、重复方法去重、冲突指令、证据共享和无硬依赖时可跳过的评测。
+
+## SK-P1-10 自然语言生成 Progressive References
+
+目标：用户通过 Chat 或 Skill Studio 描述专业经验时，Creator 能按复杂度生成一个精简 `SKILL.md` 和零到少量按需 reference，而不是要求用户自行设计目录或把全部说明塞进主文件。
+
+预研与验收：
+
+- 简单 Skill 默认只生成 `SKILL.md`；只有存在行业变体、长方法说明、模板、证据口径或反复复用资料时才拆 reference。
+- Creator 先形成资源计划，再生成 candidate revision；reference 必须由 `SKILL.md` 直接链接并说明读取条件，禁止深层引用链和孤儿文件。
+- 系统校验路径 containment、文件数量和大小预算、链接完整性、重复内容、脚本禁用、来源与权限；质量问题以 warning / eval 呈现，不用字段化协议阻断自然表达。
+- 测试覆盖简单无需 reference、中等 1–2 份、复杂 3–5 份、自然语言增删/合并 reference、旧 reference 保持、candidate vs active 和实际按需加载率。
+- 用 with/without reference 的真实任务对比结论质量、token、延迟和无效读取；只有证明专业增益且没有明显上下文膨胀才发布。
+
+## SK-P2-11 2C 多租户 Skill / Reference Artifact Store
+
+结论方向：Agent Skills 的目录结构保留为可移植、可导入导出的包格式和必要的 CC Runtime 适配层；生产权威不应是共享工作目录。用户 Skill、reference、API catalog/reference 和其他运行时方法资产应由租户化持久层管理，并在发布时编译成不可变 snapshot。
+
+预研与验收：
+
+- DB 保存 skill identity、owner、visibility、revision、active pointer、manifest、hash、权限与审计；较大正文和附件评估使用对象存储，DB 保存引用与完整性 hash。
+- 多实例通过 revision/event 原子切换进程内 Registry Snapshot；请求热路径不扫描文件、不按用户目录 grep、不依赖本机 mtime。
+- 模型通过受控的 `skill_id / revision / resource_id` Loader 读取内存或对象内容，不接触任意文件路径；每个 session 固定 snapshot revision。
+- 若 CC/SDK 仍要求文件目录，只在发布/会话启动时物化内容寻址、只读、租户隔离的临时 bundle；它是缓存和兼容层，不是事实来源。
+- API reference、Tool catalog 和系统参考同样采用“权威 revision → 编译索引/目录切片 → 内存 snapshot → 受控读取”，避免每轮系统 IO；系统 seed 可以随发布包提供，但运行时仍绑定明确 hash。
+- 验证跨租户隔离、并发发布、回滚、多实例一致性、缓存失效、进程重启恢复、孤立 blob 回收、对象存储失败降级及热路径零文件扫描。
+
 ## 顺序
 
 ```text
@@ -139,6 +175,9 @@ SK-P0-01 API/路径授权
   → SK-P1-03 发布与 Snapshot
   → SK-P1-04 Reference Loader
   → SK-P1-05 统一发现
+  → SK-P1-09 组合与依赖语义
+  → SK-P1-10 自然语言 References
   → SK-P1-06 迁移重复 Skill
   → SK-P1-07 Eval Gate
+  → SK-P2-11 多租户 Artifact Store
 ```

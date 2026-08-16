@@ -75,6 +75,55 @@ def test_single_quote_preserves_narrative_and_uses_real_values_as_metrics():
     )
 
 
+def test_mode_two_quote_labels_minute_fields_without_changing_values():
+    service = FinancialQaPresentationService()
+    blocks = service.build(
+        "贵州茅台最新价为1328.77元。",
+        [
+            {
+                "api": "stock.quote",
+                "goal": "查询实时行情",
+                "row_count": 1,
+                "sample_complete": True,
+                "schema": _schema(
+                    ("code", "string"),
+                    ("open", "number"),
+                    ("close", "number"),
+                    ("amount", "number"),
+                    ("volumn", "number"),
+                ),
+                "sample": {
+                    "rows": [
+                        {
+                            "code": "600519",
+                            "open": 1328.77,
+                            "close": 1328.77,
+                            "amount": 0.0,
+                            "volumn": 0.0,
+                        }
+                    ]
+                },
+                "step_evidence": {"selection_applied": {"mode": 2}},
+            }
+        ],
+    )
+
+    items = blocks[1]["payload"]["data"]["items"]
+    labels = {item["id"]: item["label"] for item in items}
+    assert labels == {
+        "close": "最新价",
+        "amount": "最新分钟成交额",
+        "open": "最新分钟开盘价",
+        "volumn": "最新分钟成交量",
+    }
+    assert {item["id"]: item["value"] for item in items} == {
+        "close": 1328.77,
+        "amount": 0.0,
+        "open": 1328.77,
+        "volumn": 0.0,
+    }
+
+
 def test_multiple_margin_rows_become_one_ordered_table_without_value_changes():
     service = FinancialQaPresentationService()
     rows = [
@@ -308,6 +357,53 @@ def test_partial_ohlc_rows_fall_back_to_table_instead_of_fabricating_chart():
     assert blocks[1]["payload"]["data"]["rows"] == rows
 
 
+def test_same_source_and_as_of_metric_results_merge_into_one_card():
+    service = FinancialQaPresentationService()
+    base = {
+        "api": "stock.margin",
+        "row_count": 1,
+        "sample_complete": True,
+        "schema": _schema(
+            ("code", "string"),
+            ("name", "string"),
+            ("tradedate", "string"),
+            ("financing_balance", "number"),
+        ),
+        "sample": {
+            "rows": [{
+                "code": "600519",
+                "name": "贵州茅台",
+                "tradedate": "2026-08-03",
+                "financing_balance": 17_322_453_412,
+            }]
+        },
+    }
+    supplement = {
+        **base,
+        "schema": _schema(
+            ("code", "string"),
+            ("name", "string"),
+            ("tradedate", "string"),
+            ("financing_net_buy", "number"),
+        ),
+        "sample": {
+            "rows": [{
+                "code": "600519",
+                "name": "贵州茅台",
+                "tradedate": "2026-08-03",
+                "financing_net_buy": -90_120_000,
+            }]
+        },
+    }
+
+    blocks = service.build("融资余额为173.22亿元。", [base, supplement])
+
+    assert len(blocks) == 2
+    assert [
+        item["id"] for item in blocks[1]["payload"]["data"]["items"]
+    ] == ["financing_balance", "financing_net_buy"]
+
+
 def test_empty_or_invalid_evidence_keeps_only_the_narrative():
     service = FinancialQaPresentationService()
     message = "当前条件下没有查到记录。"
@@ -372,3 +468,39 @@ def test_structured_evidence_removes_duplicate_markdown_table_but_keeps_section(
     assert "|" not in blocks[0]["content"]
     assert "## 融资数据对比" in blocks[0]["content"]
     assert "比亚迪融资情绪相对更强" in blocks[0]["content"]
+
+
+def test_backtest_result_renders_benchmark_metrics_and_normalized_curve():
+    service = FinancialQaPresentationService()
+    blocks = service.build(
+        "组合跑赢了默认基准。",
+        [
+            {
+                "semantic": "finance.backtest",
+                "backtest_presentation": {
+                    "metrics": [
+                        {"label": "组合收益", "value": 12.0, "unit": "%"},
+                        {"label": "沪深300收益", "value": 8.0, "unit": "%"},
+                        {"label": "超额收益", "value": 4.0, "unit": "%"},
+                    ],
+                    "chart": {
+                        "x_axis": ["2026-01-05", "2026-01-06"],
+                        "series": [
+                            {"name": "组合", "data": [100.0, 112.0]},
+                            {"name": "沪深300", "data": [100.0, 108.0]},
+                        ],
+                    },
+                },
+            }
+        ],
+    )
+
+    assert [block["semantic"] for block in blocks] == [
+        "finance.answer",
+        "finance.backtest.metrics",
+        "finance.backtest.performance",
+    ]
+    assert blocks[1]["payload"]["data"]["items"][2]["value"] == 4.0
+    assert blocks[2]["payload"]["shape"] == "timeseries"
+    assert blocks[2]["presentation_hint"]["preferred_renderer"] == "data.line"
+    assert blocks[2]["payload"]["data"]["series"][1]["name"] == "沪深300"

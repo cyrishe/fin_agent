@@ -3,6 +3,7 @@ import type {
   AuthSession,
   InteractionResponse,
   InvocationAsset,
+  ResearchMode,
   ScheduledTask,
   ScheduledTaskDraft,
   ScheduledTaskRun,
@@ -393,6 +394,7 @@ export async function dispatchChat(input: {
   threadId: number | null;
   attachmentIds: string[];
   selectedAsset?: Pick<InvocationAsset, "kind" | "name"> & { ref?: string } | null;
+  researchMode?: ResearchMode;
 }): Promise<UnknownRecord> {
   return readJson<UnknownRecord>(await fetch("/api/chat/dispatch", {
     method: "POST",
@@ -404,6 +406,7 @@ export async function dispatchChat(input: {
       application_name: "investment_workbench",
       attachment_ids: input.attachmentIds,
       selected_asset: input.selectedAsset || undefined,
+      research_mode: input.researchMode || "auto",
     }),
   }));
 }
@@ -427,6 +430,7 @@ type AgentStreamInput = {
   interactionResponse?: InteractionResponse;
   attachmentIds?: string[];
   selectedAsset?: { ref?: string; kind: "tool" | "skill"; name: string } | null;
+  researchMode?: ResearchMode;
   onEvent: (event: StreamEvent) => void;
 };
 
@@ -445,6 +449,7 @@ async function startAgentStream(
         application_name: "investment_workbench",
         attachment_ids: input.attachmentIds || [],
         selected_asset: input.selectedAsset || undefined,
+        research_mode: input.researchMode || "auto",
         ...(input.interactionResponse ? { interaction_response: input.interactionResponse } : {}),
       }),
     }),
@@ -484,6 +489,40 @@ export async function startChatStream(input: AgentStreamInput): Promise<void> {
 
 export async function startCustomToolStream(input: AgentStreamInput): Promise<void> {
   return startAgentStream("/api/custom_tool/stream/start", input);
+}
+
+export interface CustomToolInteractiveTest {
+  run_id: string;
+  tool_name: string;
+  display_name: string;
+  revision: number;
+  status: "passed" | "failed" | string;
+  elapsed_ms: number;
+  input: UnknownRecord;
+  contract: UnknownRecord;
+  process: UnknownRecord[];
+  result: UnknownRecord;
+  error: string;
+  diagnostics: UnknownRecord;
+}
+
+export async function runCustomToolInteractiveTest(input: {
+  toolName: string;
+  revision: number;
+  arguments: UnknownRecord;
+}): Promise<CustomToolInteractiveTest> {
+  const payload = await readJson<{ ok: boolean; test: CustomToolInteractiveTest }>(
+    await fetch(`/api/custom-tools/${encodeURIComponent(input.toolName)}/test`, {
+      method: "POST",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        revision: input.revision,
+        arguments: input.arguments,
+      }),
+    }),
+  );
+  return payload.test;
 }
 
 export async function previewScheduledTask(instruction: string): Promise<ScheduledTaskDraft> {

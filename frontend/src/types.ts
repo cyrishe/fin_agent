@@ -1,5 +1,7 @@
 export type UnknownRecord = Record<string, unknown>;
 
+export type ResearchMode = "fast" | "auto" | "deep";
+
 export interface AuthUser {
   user_id: string;
   display_name: string;

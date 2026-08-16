@@ -50,7 +50,7 @@ class FinanceResultRegistry:
         "filter",
         "order",
         "limit",
-        "realtime",
+        "mode",
         "agg",
         "group_by",
     )

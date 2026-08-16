@@ -88,6 +88,29 @@ const blocks: SurfaceBlock[] = [
     block_id: "gallery-code", block_type: "artifact", kind: "artifact", title: "Artifact · 代码与运行状态",
     semantic: "finance.tool_implementation", payload: { artifact_id: "demo-code", artifact_type: "finance.tool_code", lifecycle: "reviewable", version: "3", content_type: "text/x-python", content: { files: [{ name: "golden_cross", language: "python", status: "created", content: "def detect_golden_cross(close: list[float]) -> dict:\n    ma5 = moving_average(close, 5)\n    ma10 = moving_average(close, 10)\n    crossed = ma5[-2] <= ma10[-2] and ma5[-1] > ma10[-1]\n    return {\"matched\": crossed, \"ma5\": ma5[-1], \"ma10\": ma10[-1]}" }, { name: "validators", language: "python", status: "updated", content: "def validate_window(value: int) -> int:\n    if value not in (30, 60):\n        raise ValueError(\"window must be 30 or 60\")\n    return value" }] }, runtime: { status: "succeeded", duration_ms: 184, logs: [{ level: "info", message: "加载 60 个交易日日线数据" }, { level: "info", message: "完成 MA5 / MA10 计算" }], stdout: "result: matched=true, cross_date=2026-07-10", tests: [{ name: "最近30日出现金叉", status: "passed", duration_ms: 72, summary: "返回 matched=true" }, { name: "数据不足时拒绝计算", status: "passed", duration_ms: 18, summary: "返回明确的数据不足错误" }] } },
   },
+  {
+    block_id: "gallery-custom-tool-test", block_type: "artifact", kind: "artifact", title: "Artifact · 工具交互测试台",
+    semantic: "finance.custom_tool_implementation", payload: {
+      artifact_type: "finance.custom_tool_implementation", lifecycle: "draft", version: "3",
+      summary: "批量读取股票数据并评价盈利质量。",
+      asset_ref: { kind: "tool", name: "ct_quality_demo", display_name: "盈利质量评价", description: "比较利润、现金流和应收账款。", revision: 3 },
+      details: {
+        verification: { status: "passed", summary: "生成样例已通过" },
+        runtime: "数据库动态加载，按一次性沙箱任务执行。",
+        input_schema: {
+          type: "object", required: ["stock_codes"], additionalProperties: false,
+          properties: {
+            stock_codes: { type: "array", title: "股票列表", description: "每行输入一个股票代码。", items: { type: "string" } },
+            report_date: { type: "string", format: "date", title: "报告期", description: "可选完整财年末日期。" },
+            threshold: { type: "number", title: "现金转化阈值", description: "默认 0.8。", default: 0.8 },
+          },
+        },
+        sample_input: { stock_codes: ["600519.SH", "000858.SZ"], report_date: "2025-12-31", threshold: 0.8 },
+        inputs: [{ name: "stock_codes", required: true, description: "待评价的股票代码列表" }],
+        outputs: [{ name: "results", description: "逐股评价结果" }],
+      },
+    },
+  },
 ];
 
 export default function RendererGallery() {

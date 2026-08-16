@@ -17,8 +17,8 @@ description: 按已确认的局部 EditPlan 修改已有金融工具实现，并
 
 ## 执行方法
 
-1. 读取 Design、实现 manifest 和列出的现有模块，用 `rg` 或 `sed` 精确定位相关规则；不要扫描仓库或读取 API Catalog。
-2. 对照 `implementation_instruction` 做最小代码修改。保持其他阈值、计算、查询、函数边界、返回字段和异常处理原样。
+1. 读取 Design、实现 manifest 和列出的现有模块，用 `rg` 或 `sed` 精确定位相关规则；不要扫描仓库或完整 API Catalog。如果 `CONTEXT.api_dependency_ref` 存在，且本次指令确实修改数据读取方式，则读取其中当前实现已依赖 API 的窄契约。
+2. 对照 `implementation_instruction` 做最小代码修改。保持其他阈值、计算、查询、函数边界、返回字段和异常处理原样。若本次确实修改列表目标的数据读取，遵守标准 Coding 约定：同一数据主题用结构化 bindings 批量查询一次，查询放在逐目标计算之外，不引入工具内并发。
 3. 使用 `CODING_WORKSPACE.md` 中的固定命令编译修改后的模块。
 4. 在 `scratch/` 编写一个最小聚焦测试并执行：
    - 优先用本地构造数据和 `dev_runtime/test_support.py` 替代真实市场扫描；
@@ -37,7 +37,6 @@ description: 按已确认的局部 EditPlan 修改已有金融工具实现，并
 ```
 
 6. 如果现有实现、修订后 Design 和指令互相矛盾，或者完成修改必须新增公开契约、业务数据范围或核心流程，不要扩张修改范围；保留原实现并说明无法完成局部补丁。
-7. 局部实现不得改变 `finance_tool_profile`、Strategy Wrapper 或回测伴随契约，也不得加入下单、撤单、调仓等外部副作用；遇到这类要求应停止局部 Coding，并要求回到完整 Design。
 
 ## 最终输出
 

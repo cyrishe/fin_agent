@@ -137,6 +137,9 @@ def test_financial_qa_exposes_only_read_only_data_tools(tmp_path: Path) -> None:
     assert all("implement" not in name and "codex" not in name for name in names)
     assert tools["finance_query"].input_schema["required"] == ["steps"]
     assert tools["finance_query"].input_schema["properties"]["steps"]["minItems"] == 1
+    backtest_schema = tools["run_backtest"].input_schema["properties"]
+    assert "benchmark" in backtest_schema
+    assert backtest_schema["context_benchmarks"]["maxItems"] == 2
 
 
 def test_run_backtest_tool_registers_compact_result_for_direct_holdings(
@@ -155,6 +158,25 @@ def test_run_backtest_tool_registers_compact_result_for_direct_holdings(
                 "period": {"actual_start": "2025-01-02", "actual_end": "2025-06-30"},
                 "stocks": [{"code": "600519.SH"}, {"code": "000858.SZ"}],
                 "summary": {"total_return": 0.12, "max_drawdown": -0.08},
+                "comparison": {
+                    "primary_benchmark": {
+                        "subject": "沪深300",
+                        "code": "000300.SH",
+                        "name": "沪深300",
+                        "source": "default",
+                        "period": {
+                            "actual_start": "2025-01-02",
+                            "actual_end": "2025-06-30",
+                        },
+                    },
+                    "summary": {
+                        "portfolio_total_return": 0.12,
+                        "benchmark_total_return": 0.08,
+                        "excess_return": 0.04,
+                    },
+                    "contextual_benchmarks": [],
+                    "warnings": [],
+                },
                 "warnings": [],
             }
 
@@ -186,6 +208,8 @@ def test_run_backtest_tool_registers_compact_result_for_direct_holdings(
 
     assert result["ok"] is True
     assert result["stock_count"] == 2
+    assert result["benchmark_comparison"]["primary_benchmark"]["name"] == "沪深300"
+    assert result["benchmark_comparison"]["summary"]["excess_return"] == 0.04
     assert result["result_ref"].startswith("session://")
     assert backtest.calls[0]["holdings"] == [
         {"stock": "贵州茅台"},
@@ -811,6 +835,10 @@ def test_validation_failure_is_returned_for_cc_repair_and_not_registered(
 
     assert failed["validation"]["ok"] is False
     assert "made_up_field" in failed["validation"]["errors"][0]
+    assert failed["recovery"]["category"] == "request_invalid"
+    assert failed["recovery"]["retryable"] is True
+    assert failed["recovery"]["owner"] == "cc"
+    assert failed["recovery"]["max_retries"] == 1
     assert tracker["result_refs"] == []
     assert service.result_store.list_variables(
         session_id="financial_qa:owner-a/thread-7"
@@ -876,11 +904,120 @@ def test_provider_failure_stops_flow_and_is_not_registered(tmp_path: Path) -> No
 
     assert result["failed_step"] == 1
     assert result["execution"]["status"] == "provider_error"
+    assert result["recovery"]["category"] == "provider_failure"
+    assert result["recovery"]["retryable"] is False
+    assert result["recovery"]["automatic_retries_used"] == 1
+    assert len(runtime.calls) == 2
     assert tracker["result_refs"] == []
     assert tool_runtime.result_handles == {}
     assert service.result_store.list_variables(
         session_id="financial_qa:owner-a/thread-provider-error"
     ) == []
+
+
+def test_provider_failure_is_retried_by_harness_without_another_cc_turn(
+    tmp_path: Path,
+) -> None:
+    class _TransientProviderRuntime(_Runtime):
+        def execute_request(self, *, request, previous_results=None):
+            if not self.calls:
+                self.calls.append(
+                    {
+                        "request": request,
+                        "previous": sorted(dict(previous_results or {})),
+                    }
+                )
+                return {
+                    "protocol": "finance_data_tool.v1",
+                    "request": request,
+                    "validation": {"ok": True, "errors": [], "warnings": []},
+                    "execution": {
+                        "ok": False,
+                        "status": "provider_exception",
+                        "reason": "temporary connection reset",
+                    },
+                    "result": None,
+                }
+            return super().execute_request(
+                request=request,
+                previous_results=previous_results,
+            )
+
+    runtime = _TransientProviderRuntime()
+    service = FinanceDataQueryCcTools(
+        finance_runtime=runtime,
+        finance_catalog=_Catalog(),
+        result_store=SessionVariableStoreService(data_root=tmp_path / "data"),
+    )
+    tools, _, tracker = service.build_tools(
+        owner_ids=["owner-a"],
+        tool_context={"_agent_runtime_scope": "financial_qa:owner-a/transient"},
+    )
+
+    result = _payload(
+        asyncio.run(
+            next(item for item in tools if item.name == "finance_query").handler(
+                {
+                    "steps": [
+                        {
+                            "goal": "取得行情",
+                            "request": "result = stock.quote(filter='贵州茅台') -> stock_code, close",
+                        }
+                    ]
+                }
+            )
+        )
+    )
+
+    assert result["ok"] is True
+    assert result["provider_retry_count"] == 1
+    assert tracker["calls"][0]["provider_retry_count"] == 1
+    assert len(runtime.calls) == 2
+
+
+def test_runtime_exception_is_retried_once_before_becoming_a_cc_result(
+    tmp_path: Path,
+) -> None:
+    class _RaisedOnceRuntime(_Runtime):
+        def execute_request(self, *, request, previous_results=None):
+            if not self.calls:
+                self.calls.append({"request": request, "raised": True})
+                raise ConnectionError("temporary transport failure")
+            return super().execute_request(
+                request=request,
+                previous_results=previous_results,
+            )
+
+    runtime = _RaisedOnceRuntime()
+    service = FinanceDataQueryCcTools(
+        finance_runtime=runtime,
+        finance_catalog=_Catalog(),
+        result_store=SessionVariableStoreService(data_root=tmp_path / "data"),
+    )
+    tools, _, tracker = service.build_tools(
+        owner_ids=["owner-a"],
+        tool_context={"_agent_runtime_scope": "financial_qa:owner-a/raised-once"},
+    )
+
+    result = _payload(
+        asyncio.run(
+            next(item for item in tools if item.name == "finance_query").handler(
+                {
+                    "steps": [
+                        {
+                            "goal": "取得行情",
+                            "request": "result = stock.quote(filter='贵州茅台') -> stock_code, close",
+                        }
+                    ]
+                }
+            )
+        )
+    )
+
+    assert result["ok"] is True
+    assert result["provider_retry_count"] == 1
+    assert tracker["calls"][0]["provider_retry_count"] == 1
+    assert len(runtime.calls) == 2
 
 
 def test_restore_ignores_legacy_provider_failure_marked_as_ok(
@@ -1106,11 +1243,13 @@ def test_financial_qa_service_uses_resolved_question_and_normal_qa_only() -> Non
             "default_agent": {
                 "tools": [
                     "financial_news_search",
+                    "general_search",
                     "stock_realtime_quote",
                 ],
                 "runtime_profile": {
                     "tools": [
                         "financial_news_search",
+                        "general_search",
                         "stock_realtime_quote",
                     ],
                     "skills": [
@@ -1139,14 +1278,15 @@ def test_financial_qa_service_uses_resolved_question_and_normal_qa_only() -> Non
     assert session.calls[0]["user_text"] == "贵州茅台最近交易日的收盘价是多少？"
     assert "context_window" not in session.calls[0]["context"]
     assert session.calls[0]["context"]["allowed_agent_tools"] == [
-        "financial_news_search"
+        "financial_news_search",
+        "general_search",
     ]
     assert session.calls[0]["context"]["allowed_finance_skills"] == [
         "stock-research",
         "earnings-analysis",
     ]
     assert session.calls[0]["context"]["skill_tool_access"] == {
-        "stock-research": ["financial_news_search"],
+        "stock-research": ["general_search"],
         "earnings-analysis": [],
     }
     assert session.calls[0]["context"]["_resolved_question"] == (
@@ -1282,7 +1422,36 @@ def test_financial_qa_prompt_and_manual_keep_business_specific_rules() -> None:
     assert "只修正能够明确指出的语义偏差" in prompt
     assert "不为了提高 Skill 覆盖率强行加载" in prompt
     assert "不形成持续的 `active_skill` 状态" in prompt
-    assert "不要用新闻搜索替代当前不存在的原始研报能力" in prompt
+    assert "不要用新闻替代结构化行情、财务或研报事实" in prompt
+    assert "服务端默认使用沪深300" in prompt
+    assert "不根据回测结果事后挑选" in prompt
+    assert "展示感知的数据组织" in prompt
+    assert "不是固定的 API 映射" in prompt
+    assert "简单事实问答至多补充一份" in prompt
+    assert "直接结果只有一个时点或一个报告期" in prompt
+    assert "另一条普通单点记录" in prompt
+    assert "直接事实使用 `stock.quote mode=2`" in prompt
+    assert "必须做一次展示增强检查" in prompt
+    assert "需要走势时再请求 `mode=1` 分钟K" in prompt
+    assert "既没有两个原始可比观测" in prompt
+    assert "每个具体事实都必须能落到本轮实际返回的字段" in prompt
+    assert "不补写现金储备、零有息负债" in prompt
+    catalog = json.loads(
+        Path("src/tools/finance_data/catalog/api_view_catalog.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    margin_rules = catalog["subjects"]["stock"]["margin"]["rules"]
+    assert any("order和limit不会把它扩展为历史序列" in rule for rule in margin_rules)
+    assert any("同时传start和end" in rule for rule in margin_rules)
+    financial_rules = catalog["subjects"]["stock"]["financial_3_table"]["rules"]
+    assert any("只查询数据源全局最新报告期" in rule for rule in financial_rules)
+    assert any("不按报告期拆成多次单行查询" in rule for rule in financial_rules)
+    assert "不输出前端组件名或 `render_payload`" in prompt
+    assert "不按 API 名称硬编码" in manual
+    assert "系统会按真实结果形状生成指标、表格或时间序列展示" in manual
+    assert "查询历史明细必须同时传 `start` 和 `end`" in manual
+    assert "首次请求就显式给出合理的报告期范围" in manual
     assert set(business_skills) == {
         "market-overview",
         "sector-theme-analysis",
@@ -1349,11 +1518,13 @@ def test_chat_dispatch_hands_investment_normal_qa_directly_to_financial_cc(
         turn_id=8,
         owner_id="owner-a",
         precomputed_plan=plan,
+        research_mode="deep",
     )
 
     assert result["mode"] == "financial_qa_cc"
     assert calls[0]["owner_id"] == "owner-a"
     assert calls[0]["dispatch_plan"] == plan
+    assert calls[0]["research_mode"] == "deep"
 
 
 def test_chat_dispatch_keeps_an_existing_planned_run_outside_financial_cc(

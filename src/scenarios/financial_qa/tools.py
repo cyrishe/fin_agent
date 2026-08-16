@@ -9,6 +9,10 @@ from src.experiments.staged_data_protocol.phase2.models import ResultHandle
 from src.experiments.staged_data_protocol.phase2.trade_date_resolver import TradeDateResolver
 from src.backtest import BacktestError
 from src.scenarios.financial_qa.result_registry import FinanceResultRegistry
+from src.scenarios.financial_qa.query_recovery import (
+    provider_retry_allowed,
+    query_recovery,
+)
 from src.services.backtest_run_service import BacktestRunService
 from src.services.finance_data_tool_catalog_service import FinanceDataToolCatalogService
 from src.services.finance_data_tool_runtime_service import FinanceDataToolRuntimeService
@@ -34,6 +38,86 @@ def _tool_result(payload: Mapping[str, Any]) -> Dict[str, Any]:
                 "text": json.dumps(dict(payload), ensure_ascii=False, default=str),
             }
         ]
+    }
+
+
+def _backtest_presentation(comparison: Mapping[str, Any]) -> Dict[str, Any]:
+    raw_series = [
+        item
+        for item in comparison.get("series") or []
+        if isinstance(item, Mapping)
+        and isinstance(item.get("normalized_curve"), list)
+        and item.get("normalized_curve")
+    ]
+    date_sets = [
+        {
+            _trim(point.get("date"))
+            for point in item.get("normalized_curve") or []
+            if isinstance(point, Mapping) and _trim(point.get("date"))
+        }
+        for item in raw_series
+    ]
+    common_dates = sorted(set.intersection(*date_sets)) if date_sets else []
+    if len(common_dates) > 500:
+        step = max(1, len(common_dates) // 499)
+        sampled_dates = common_dates[::step]
+        if sampled_dates[-1] != common_dates[-1]:
+            sampled_dates.append(common_dates[-1])
+        common_dates = sampled_dates[:500]
+    chart_series = []
+    for item in raw_series:
+        values = {
+            _trim(point.get("date")): point.get("value")
+            for point in item.get("normalized_curve") or []
+            if isinstance(point, Mapping)
+        }
+        chart_series.append(
+            {
+                "name": _trim(item.get("name")) or _trim(item.get("series_id")),
+                "data": [values[date] for date in common_dates],
+            }
+        )
+    summary = (
+        comparison.get("summary")
+        if isinstance(comparison.get("summary"), Mapping)
+        else {}
+    )
+    primary = (
+        comparison.get("primary_benchmark")
+        if isinstance(comparison.get("primary_benchmark"), Mapping)
+        else {}
+    )
+
+    def percent_item(key: str, label: str) -> Dict[str, Any] | None:
+        value = summary.get(key)
+        if not isinstance(value, (int, float)):
+            return None
+        return {"label": label, "value": round(float(value) * 100, 2), "unit": "%"}
+
+    metric_items = [
+        percent_item("portfolio_total_return", "组合收益"),
+        percent_item(
+            "benchmark_total_return",
+            f"{_trim(primary.get('name')) or '基准'}收益",
+        ),
+        percent_item("excess_return", "超额收益"),
+        percent_item("portfolio_max_drawdown", "组合最大回撤"),
+        percent_item("benchmark_max_drawdown", "基准最大回撤"),
+    ]
+    information_ratio = summary.get("information_ratio")
+    if isinstance(information_ratio, (int, float)):
+        metric_items.append(
+            {
+                "label": "信息比率",
+                "value": round(float(information_ratio), 2),
+            }
+        )
+    return {
+        "metrics": [item for item in metric_items if item is not None],
+        "chart": {
+            "x_axis": common_dates,
+            "series": chart_series,
+        },
     }
 
 
@@ -438,7 +522,12 @@ class FinanceDataQueryCcTools:
             "finance_query",
             (
                 "Execute one minimal financial-data flow. Before calling: (1) list every business fact explicitly "
-                "requested by the user; (2) include one step for every fact whose API can already be selected, including "
+                "requested by the user and at most one small related data goal for a simple fact question. Unless the user "
+                "requests a number-only answer, a one-point or one-period result must get one comparable context goal when "
+                "the catalog supports it and that context can support a concrete explanation. Before the final answer, explicitly "
+                "check this requirement. Comparable means at least two observations (normally 5-20) or at least "
+                "two meaningful components; another one-row query or another time mode for the same fact is duplicate "
+                "confirmation, not context; (2) include one step for every goal whose API can already be selected, including "
                 "symbolic dependencies whose actual values need not be inspected; (3) require every filter predicate "
                 "to come from an explicit user constraint, a catalog requirement, or an upstream identity scope. "
                 "Ordering or ranking never implies an extra positive, non-null, or threshold filter. Each step has one "
@@ -448,9 +537,14 @@ class FinanceDataQueryCcTools:
                 "goals, server-applied selection, lineage, and column coverage. After execution use this decision gate: "
                 "(A) validation or provider failure: repair only the failed step; (B) a concrete mismatch between goal "
                 "and API, selection_applied, outputs, or time: correct only that mismatch; (C) otherwise the step is "
-                "complete, so continue to a different goal or answer. Server-applied filter/order/limit and available "
+                "complete, so continue to a genuinely different explanatory goal or answer. A related goal must support "
+                "a concrete sentence in the final answer; choose trend, period comparison, composition, peer comparison, "
+                "or no supplement from the current semantics rather than from a fixed API mapping. Server-applied "
+                "filter/order/limit and available "
                 "identity refs remain valid even when a projected metric is null. Nulls, zero rows, or returned subsets "
-                "must not trigger another API, realtime mode, or tool for the same fact. step_evidence and the compact "
+                "must not trigger another API, time mode, or tool for the same fact. Follow the returned recovery object: "
+                "provider failures are retried once by the harness, request-invalid errors may be repaired once from the "
+                "loaded catalog, and ambiguous identities may only use tool-supplied candidates. step_evidence and the compact "
                 "working set are authoritative execution facts and contain no hidden full-table data. The live "
                 "working set is supplied in the turn context and refreshed in every finance_query response; do not "
                 "treat a tool description as mutable runtime state."
@@ -561,11 +655,44 @@ class FinanceDataQueryCcTools:
                         progress_id=f"finance_query_step_{step_number}",
                         title=f"数据查询 {step_number}/{len(steps)}",
                     )
-                    result = await asyncio.to_thread(
-                        self.finance_runtime.execute_request,
-                        request=request,
-                        previous_results=dict(tool_runtime.result_handles),
-                    )
+                    provider_retries_used = 0
+                    try:
+                        result = await asyncio.to_thread(
+                            self.finance_runtime.execute_request,
+                            request=request,
+                            previous_results=dict(tool_runtime.result_handles),
+                        )
+                    except Exception:
+                        provider_retries_used = 1
+                        call_record["provider_retry_count"] = provider_retries_used
+                        tool_runtime.emit_progress(
+                            "数据源暂未完成本步查询，正在使用原请求自动重试一次。",
+                            progress_id=f"finance_query_step_{step_number}",
+                            title=f"数据查询 {step_number}/{len(steps)}",
+                        )
+                        result = await asyncio.to_thread(
+                            self.finance_runtime.execute_request,
+                            request=request,
+                            previous_results=dict(tool_runtime.result_handles),
+                        )
+                    while provider_retry_allowed(
+                        result.get("execution")
+                        if isinstance(result, Mapping)
+                        else {},
+                        retries_used=provider_retries_used,
+                    ):
+                        provider_retries_used += 1
+                        call_record["provider_retry_count"] = provider_retries_used
+                        tool_runtime.emit_progress(
+                            "数据源暂未完成本步查询，正在使用原请求自动重试一次。",
+                            progress_id=f"finance_query_step_{step_number}",
+                            title=f"数据查询 {step_number}/{len(steps)}",
+                        )
+                        result = await asyncio.to_thread(
+                            self.finance_runtime.execute_request,
+                            request=request,
+                            previous_results=dict(tool_runtime.result_handles),
+                        )
                 except Exception as exc:
                     call_record["error"] = str(exc)[:1_000]
                     tool_runtime.emit_progress(
@@ -607,6 +734,7 @@ class FinanceDataQueryCcTools:
                             "goal": goal,
                             "request": request,
                             "validation": dict(validation),
+                            "recovery": query_recovery(validation=validation),
                             "completed_steps": step_summaries,
                             "next_result_name": expected_result_name,
                             "working_set": tool_runtime.working_set(),
@@ -651,6 +779,10 @@ class FinanceDataQueryCcTools:
                             "goal": goal,
                             "request": request,
                             "execution": dict(execution),
+                            "recovery": query_recovery(
+                                execution=execution,
+                                provider_retries_used=provider_retries_used,
+                            ),
                             "completed_steps": step_summaries,
                             "next_result_name": expected_result_name,
                             "working_set": tool_runtime.working_set(),
@@ -777,6 +909,20 @@ class FinanceDataQueryCcTools:
                         *date_warnings,
                     ],
                 }
+                recovery = query_recovery(
+                    validation=validation,
+                    execution=execution,
+                    result_data=(
+                        result_payload.get("data")
+                        if isinstance(result_payload.get("data"), Mapping)
+                        else {}
+                    ),
+                    provider_retries_used=provider_retries_used,
+                )
+                if recovery is not None:
+                    summary["recovery"] = recovery
+                if provider_retries_used:
+                    summary["provider_retry_count"] = provider_retries_used
                 step_summaries.append(summary)
                 tool_runtime.tracker["result_refs"].append(dict(summary))
                 call_record["result_name"] = variable.get("local_alias")
@@ -846,7 +992,11 @@ class FinanceDataQueryCcTools:
                 "asks to observe how a supplied stock list performed over a date range. The default is equal-weight "
                 "buy once and hold; if the user supplied weights, pass every stock's weight. Stocks may come either "
                 "from direct holdings or from one authenticated table attachment already shown in the conversation. "
-                "Do not invent a strategy, rebalance frequency, attachment id, file path, or missing weight."
+                "The server automatically compares against CSI 300 when benchmark is omitted. Set benchmark only "
+                "when the user explicitly names a primary benchmark. Before seeing performance, you may add at most "
+                "two context_benchmarks when the holdings have a clear board, size, or industry concentration and a "
+                "real matching index is known; include a short holding-based reason and omit them when uncertain. "
+                "Do not invent a strategy, rebalance frequency, index, attachment id, file path, or missing weight."
             ),
             {
                 "type": "object",
@@ -878,6 +1028,38 @@ class FinanceDataQueryCcTools:
                     "start_date": {"type": "string", "format": "date"},
                     "end_date": {"type": "string", "format": "date"},
                     "initial_cash": {"type": "number", "exclusiveMinimum": 0},
+                    "benchmark": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 100,
+                        "description": (
+                            "Optional user-specified primary index name or code. Omit to use 沪深300."
+                        ),
+                    },
+                    "context_benchmarks": {
+                        "type": "array",
+                        "maxItems": 2,
+                        "description": (
+                            "Optional additional indices selected from clear holding characteristics before execution."
+                        ),
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "subject": {
+                                    "type": "string",
+                                    "minLength": 1,
+                                    "maxLength": 100,
+                                },
+                                "reason": {
+                                    "type": "string",
+                                    "minLength": 1,
+                                    "maxLength": 300,
+                                },
+                            },
+                            "required": ["subject", "reason"],
+                            "additionalProperties": False,
+                        },
+                    },
                 },
                 "required": ["start_date", "end_date"],
                 "additionalProperties": False,
@@ -888,6 +1070,7 @@ class FinanceDataQueryCcTools:
                 "tool": "run_backtest",
                 "start_date": _trim(args.get("start_date")),
                 "end_date": _trim(args.get("end_date")),
+                "benchmark": _trim(args.get("benchmark")) or "沪深300",
             }
             tool_runtime.tracker["calls"].append(call_record)
             direct_holdings = args.get("holdings") if isinstance(args.get("holdings"), list) else []
@@ -943,6 +1126,16 @@ class FinanceDataQueryCcTools:
                         "start_date": args.get("start_date"),
                         "end_date": args.get("end_date"),
                         "initial_cash": args.get("initial_cash"),
+                        "benchmark": args.get("benchmark"),
+                        "context_benchmarks": (
+                            [
+                                dict(item)
+                                for item in args.get("context_benchmarks") or []
+                                if isinstance(item, Mapping)
+                            ]
+                            if isinstance(args.get("context_benchmarks"), list)
+                            else []
+                        ),
                     },
                 )
                 variable = self.result_store.register_tool_result(
@@ -957,6 +1150,16 @@ class FinanceDataQueryCcTools:
                 )
                 summary = result.get("summary") if isinstance(result.get("summary"), Mapping) else {}
                 period = result.get("period") if isinstance(result.get("period"), Mapping) else {}
+                comparison = (
+                    result.get("comparison")
+                    if isinstance(result.get("comparison"), Mapping)
+                    else {}
+                )
+                primary_benchmark = (
+                    comparison.get("primary_benchmark")
+                    if isinstance(comparison.get("primary_benchmark"), Mapping)
+                    else {}
+                )
                 compact = {
                     "ok": True,
                     "backtest_type": result.get("backtest_type"),
@@ -964,6 +1167,31 @@ class FinanceDataQueryCcTools:
                     "period": period,
                     "stock_count": len(result.get("stocks") or []),
                     "summary": summary,
+                    "benchmark_comparison": {
+                        "primary_benchmark": {
+                            key: primary_benchmark.get(key)
+                            for key in (
+                                "subject",
+                                "code",
+                                "name",
+                                "source",
+                                "reason",
+                                "period",
+                            )
+                            if primary_benchmark.get(key) not in (None, "")
+                        },
+                        "summary": dict(comparison.get("summary") or {}),
+                        "contextual_benchmarks": [
+                            {
+                                key: item.get(key)
+                                for key in ("subject", "code", "name", "reason", "period")
+                                if item.get(key) not in (None, "")
+                            }
+                            for item in comparison.get("contextual_benchmarks") or []
+                            if isinstance(item, Mapping)
+                        ],
+                        "warnings": list(comparison.get("warnings") or [])[:5],
+                    },
                     "warnings": list(result.get("warnings") or [])[:5],
                     "result_ref": variable.get("data_ref") if variable else "",
                 }
@@ -976,6 +1204,7 @@ class FinanceDataQueryCcTools:
                         "schema": variable.get("schema"),
                         "sample": variable.get("sample"),
                         "semantic": "finance.backtest",
+                        "backtest_presentation": _backtest_presentation(comparison),
                     }
                     tool_runtime.tracker["result_refs"].append(result_ref)
                     call_record["result_ref"] = variable.get("data_ref")

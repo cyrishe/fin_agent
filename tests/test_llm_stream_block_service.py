@@ -41,6 +41,21 @@ def test_edit_coding_reuses_the_existing_coding_progress_surface() -> None:
     assert block["content"] == "正在实现并验证代码…"
 
 
+def test_coding_contract_repair_is_visible_on_the_existing_progress_surface() -> None:
+    builder = LlmStreamBlockBuilder(run_id="coding_contract_repair")
+
+    block = builder.event_to_blocks({
+        "source": "system",
+        "type": "contract_repair",
+        "content": "公开输出与策略运行映射不一致，正在自动修正并复测。",
+        "metadata": {"stage": "coding", "status": "running"},
+    })[-1]
+
+    assert block["block_id"] == "coding_module_progress"
+    assert block["data"]["status"] == "running"
+    assert "自动修正并复测" in block["content"]
+
+
 def test_view_stage_does_not_render_as_design_progress() -> None:
     builder = LlmStreamBlockBuilder(run_id="view_turn")
 

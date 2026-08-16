@@ -78,6 +78,15 @@ BASE_INFO_SOURCES: Dict[str, BaseInfoSource] = {
 }
 
 
+_IDENTITY_NAME_FIELDS = {
+    "stock": "name",
+    "index": "name",
+    "plate": "plate_name",
+    "fund": "name",
+    "bond": "name",
+}
+
+
 OP_SQL = {"=": "=", "==": "=", "!=": "!=", ">": ">", ">=": ">=", "<": "<", "<=": "<=", "like": "LIKE"}
 FILTER_RE = re.compile(
     r"(?:(?P<connector>\band\b|\bor\b)\s+)?"
@@ -127,12 +136,60 @@ def execute_base_info_api(*, subject: str, args: Mapping[str, Any], outputs: Lis
     params.append(limit)
 
     db = StockInfoDbUtils(database="kingdomai")
+    name_resolution: Dict[str, Any] | None = None
     try:
         with db.conn.cursor(pymysql.cursors.DictCursor) as cursor:
             cursor.execute(sql, tuple(params))
             raw_rows = cursor.fetchall()
+            exact_name = _exact_name_lookup(source=source, args=args)
+            if not raw_rows and exact_name is not None:
+                field_name, requested_name = exact_name
+                candidate_columns = list(source.fields)
+                candidate_select = ", ".join(
+                    f"{source.fields[column]} AS `{column}`"
+                    for column in candidate_columns
+                )
+                candidate_sql = f"""
+                    SELECT {candidate_select}
+                    FROM {source.table_sql}
+                    WHERE LOCATE(%s, {source.fields[field_name]}) > 0
+                    ORDER BY {order_sql}
+                    LIMIT %s
+                """
+                cursor.execute(candidate_sql, (requested_name, 20))
+                candidates = _dedupe_identity_rows(
+                    source=source,
+                    rows=cursor.fetchall(),
+                )
+                public_candidates = [
+                    _normalize_row(row, candidate_columns)
+                    for row in candidates[:6]
+                ]
+                if len(candidates) == 1:
+                    raw_rows = candidates
+                    name_resolution = {
+                        "status": "resolved",
+                        "method": "unique_contains",
+                        "requested": requested_name,
+                        "resolved": public_candidates[0],
+                    }
+                elif candidates:
+                    name_resolution = {
+                        "status": "ambiguous",
+                        "method": "contains_candidates",
+                        "requested": requested_name,
+                        "candidate_count": len(candidates),
+                        "candidates": public_candidates,
+                    }
+                else:
+                    name_resolution = {
+                        "status": "not_found",
+                        "method": "contains_candidates",
+                        "requested": requested_name,
+                        "candidates": [],
+                    }
         rows = [_normalize_row(row, columns) for row in raw_rows]
-        return {
+        result = {
             "status": "ok",
             "api": f"{subject}.basic_info",
             "subject": subject,
@@ -144,6 +201,9 @@ def execute_base_info_api(*, subject: str, args: Mapping[str, Any], outputs: Lis
             "ignored_filters": ignored_filters,
             "sql_shape": {"where": where_sql, "order": order_sql, "limit": limit},
         }
+        if name_resolution is not None:
+            result["name_resolution"] = name_resolution
+        return result
     except Exception as exc:  # noqa: BLE001 - experiment boundary should return structured failures.
         return {
             "status": "provider_error",
@@ -246,6 +306,56 @@ def _equivalent_filter_values(
     ):
         return [value, text.removesuffix("板块")]
     return [value]
+
+
+def _exact_name_lookup(
+    *,
+    source: BaseInfoSource,
+    args: Mapping[str, Any],
+) -> tuple[str, str] | None:
+    """Return a single literal identity-name equality suitable for fallback.
+
+    Compound predicates, LIKE requests and wildcard-like user input remain
+    untouched. The provider only broadens a plain identity lookup and therefore
+    never weakens a business filter silently.
+    """
+
+    expected_field = _IDENTITY_NAME_FIELDS.get(source.subject)
+    raw_filter = str(args.get("filter") or "").strip()
+    if not expected_field or not raw_filter:
+        return None
+    matches = list(FILTER_RE.finditer(raw_filter))
+    if len(matches) != 1:
+        return None
+    match = matches[0]
+    if match.group("field") != expected_field or match.group("op").lower() not in {"=", "=="}:
+        return None
+    value = str(_clean_value(match.group("value")) or "").strip()
+    if not value or any(token in value for token in ("%", "_")):
+        return None
+    if source.subject == "plate" and value.endswith("板块") and len(value) > 2:
+        value = value.removesuffix("板块").strip()
+    return (expected_field, value) if value else None
+
+
+def _dedupe_identity_rows(
+    *,
+    source: BaseInfoSource,
+    rows: List[Mapping[str, Any]],
+) -> List[Mapping[str, Any]]:
+    identity_fields = [
+        field_name
+        for field_name in source.fields
+        if field_name == "code" or field_name.endswith("_code")
+    ]
+    identity_fields.append(_IDENTITY_NAME_FIELDS.get(source.subject, ""))
+    identity_fields = [item for item in identity_fields if item]
+    unique: Dict[tuple[Any, ...], Mapping[str, Any]] = {}
+    for row in rows:
+        key = tuple(row.get(field_name) for field_name in identity_fields)
+        if key not in unique:
+            unique[key] = row
+    return list(unique.values())
 
 
 def _ignored_filters(*, source: BaseInfoSource, args: Mapping[str, Any]) -> List[str]:

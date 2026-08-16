@@ -93,8 +93,17 @@ def test_finance_business_catalog_is_the_runtime_skill_source() -> None:
     ]
     assert all(item["description"] for item in entries)
     assert all(
-        set(item) == {"id", "category", "path", "description"}
+        set(item)
+        == {"id", "category", "path", "description", "execution_budget"}
         for item in entries
+    )
+    assert next(
+        item for item in entries if item["id"] == "stock-research"
+    )["execution_budget"] == "long"
+    assert all(
+        item["execution_budget"] == "standard"
+        for item in entries
+        if item["id"] != "stock-research"
     )
 
 
@@ -144,6 +153,20 @@ def test_finance_business_catalog_skips_unavailable_or_unauthorized_skills(
     assert catalog.qualified_skill_names(
         allowed_skill_ids=["missing"]
     ) == []
+
+
+def test_catalog_rejects_an_unknown_execution_budget(tmp_path: Path) -> None:
+    root, skill_path, _ = _build_snapshot_fixture(tmp_path)
+    skill_path.write_text(
+        skill_path.read_text(encoding="utf-8").replace(
+            "allowed-tools:\n",
+            "execution-budget: unlimited\nallowed-tools:\n",
+        ),
+        encoding="utf-8",
+    )
+
+    with pytest.raises(RuntimeError, match="execution-budget"):
+        FinanceBusinessSkillCatalog(root=root, snapshot_root=tmp_path / "runtime")
 
 
 def test_catalog_request_path_uses_only_the_immutable_snapshot(
@@ -235,6 +258,7 @@ def test_catalog_reference_lookup_is_exact_and_permission_scoped(
         "allowed_tools_by_skill": {
             "test-research": ["mcp__finance__financial_news_search"]
         },
+        "execution_budget_by_skill": {"test-research": "standard"},
     }
 
 

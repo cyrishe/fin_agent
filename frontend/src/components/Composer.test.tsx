@@ -37,6 +37,8 @@ const baseProps = {
   onRemoveAttachment: vi.fn(),
   onSelectAsset: vi.fn(),
   onClearSelectedAsset: vi.fn(),
+  researchMode: "auto" as const,
+  onResearchModeChange: vi.fn(),
 };
 
 describe("Composer asset identity", () => {
@@ -67,5 +69,14 @@ describe("Composer asset identity", () => {
     expect(html).toContain("大盘状态与买入决策");
     expect(html).toContain("ct_market_buy_decision");
     expect(html).toContain("根据大盘和个股 K 线输出可买或不可买。");
+  });
+
+  it("renders quick, intelligent and deep analysis modes with intelligent selected by default", () => {
+    const html = renderToStaticMarkup(<Composer {...baseProps} selectedAsset={null} />);
+    expect(html).toContain('aria-label="分析模式"');
+    expect(html).toContain('title="聚焦核心结论和最少必要证据"');
+    expect(html).toContain('title="由业务 Skill 判断本题需要的分析深度"');
+    expect(html).toContain('title="扩展关键证据、反证和验证点"');
+    expect(html).toContain('class="active" aria-pressed="true"');
   });
 });

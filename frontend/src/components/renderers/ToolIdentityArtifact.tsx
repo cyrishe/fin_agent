@@ -3,6 +3,7 @@ import { useState } from "react";
 import type { UnknownRecord } from "../../types";
 import CodeBlock from "../CodeBlock";
 import { authoritativeFlowObject } from "./AuthoritativeFlow";
+import CustomToolTestWorkbench from "./CustomToolTestWorkbench";
 import FlowRenderer from "./FlowRenderer";
 
 const record = (value: unknown): UnknownRecord => value && typeof value === "object" && !Array.isArray(value)
@@ -173,6 +174,9 @@ export default function ToolIdentityArtifact({
     || (showStrategyCompatibility && strategyCompatibilityText),
   );
   const [copied, setCopied] = useState(false);
+  const inputSchema = record(details.input_schema);
+  const sampleInput = record(details.sample_input);
+  const revision = Number(asset.revision || data.version || 0);
 
   const copyInvocation = async () => {
     const copyValue = plannedAction ? name : invocation;
@@ -235,6 +239,14 @@ export default function ToolIdentityArtifact({
         </article> : null}
       </div>
     </section> : null}
+
+    {!plannedAction ? <CustomToolTestWorkbench
+      toolName={name}
+      displayName={displayName}
+      revision={revision}
+      inputSchema={inputSchema}
+      sampleInput={sampleInput}
+    /> : null}
 
     {flowObject ? <section className="implementation-flow-section">
       <div className="implementation-section-heading"><div><GitBranch size={16} /><h4>已确认的设计主流程</h4></div><small>沿用 Design 权威版本，不从代码重新推导</small></div>

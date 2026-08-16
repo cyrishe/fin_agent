@@ -15,6 +15,7 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from src.scenarios.financial_qa.business_skills import FinanceBusinessSkillCatalog  # noqa: E402
+from src.scenarios.financial_qa.research_mode import normalize_research_mode  # noqa: E402
 from src.scenarios.financial_qa.service import FinancialQaCcService  # noqa: E402
 from src.scenarios.financial_qa.tools import FinanceDataQueryCcTools  # noqa: E402
 from src.services.application_runtime_service import ApplicationRuntimeService  # noqa: E402
@@ -92,6 +93,53 @@ def _steps(events: list[dict[str, Any]]) -> list[dict[str, Any]]:
             }
         )
     return rows
+
+
+def _tool_metrics(tool_calls: list[dict[str, Any]]) -> dict[str, int]:
+    finance_queries = [
+        item for item in tool_calls if str(item.get("tool") or "") == "finance_query"
+    ]
+    return {
+        "catalog_read_count": sum(
+            1
+            for item in tool_calls
+            if str(item.get("tool") or "") == "read_finance_catalog"
+        ),
+        "reference_read_count": sum(
+            1
+            for item in tool_calls
+            if str(item.get("tool") or "") == "read_finance_skill_reference"
+        ),
+        "finance_query_count": len(finance_queries),
+        "zero_row_query_count": sum(
+            1
+            for item in finance_queries
+            if "row_count" in item and int(item.get("row_count") or 0) == 0
+        ),
+        "validation_error_query_count": sum(
+            1 for item in finance_queries if item.get("validation_errors")
+        ),
+        "result_load_count": sum(
+            1
+            for item in tool_calls
+            if str(item.get("tool") or "") == "load_finance_result"
+        ),
+        "supplemental_tool_count": sum(
+            1
+            for item in tool_calls
+            if str(item.get("tool") or "")
+            not in {
+                "read_finance_catalog",
+                "read_finance_skill_reference",
+                "finance_query",
+                "load_finance_result",
+            }
+        ),
+    }
+
+
+def _case_research_mode(case: Mapping[str, Any]) -> str:
+    return normalize_research_mode(case.get("research_mode"))
 
 
 def _write_report(path: Path, report: Mapping[str, Any]) -> None:
@@ -174,6 +222,7 @@ def main() -> int:
             case_id = str(case.get("id") or f"case-{index}")
             question = str(case.get("question") or "").strip()
             expected_skill_id = str(case.get("expected_skill_id") or "").strip()
+            research_mode = _case_research_mode(case)
             started = time.monotonic()
             events: list[dict[str, Any]] = []
             print(f"[{index}/{len(cases)}] {case_id}: start", flush=True)
@@ -181,6 +230,18 @@ def main() -> int:
                 "id": case_id,
                 "question": question,
                 "expected_skill_id": expected_skill_id,
+                "requested_research_mode": research_mode,
+                "research_depth": str(case.get("research_depth") or ""),
+                "review_criteria": [
+                    str(item)
+                    for item in case.get("review_criteria") or []
+                    if str(item).strip()
+                ],
+                "anti_patterns": [
+                    str(item)
+                    for item in case.get("anti_patterns") or []
+                    if str(item).strip()
+                ],
                 "started_at": _now_iso(),
             }
             try:
@@ -217,6 +278,7 @@ def main() -> int:
                     user_text=question,
                     dispatch_plan=plan,
                     application_context=application_context,
+                    research_mode=research_mode,
                     event_sink=capture,
                 )
                 evidence = (
@@ -239,6 +301,11 @@ def main() -> int:
                     for item in skill_entries
                     if str(item.get("skill_id") or "").strip()
                 ]
+                skill_match = (
+                    expected_skill_id in actual_skill_ids
+                    if expected_skill_id
+                    else not actual_skill_ids
+                )
                 row.update(
                     {
                         "session_id": str(evidence.get("session_id") or ""),
@@ -246,12 +313,15 @@ def main() -> int:
                         "finance_cc_duration_ms": int(
                             evidence.get("duration_ms") or 0
                         ),
+                        "turn_timeout_seconds": int(
+                            evidence.get("turn_timeout_seconds") or 0
+                        ),
                         "first_progress_ms": (
                             events[0]["elapsed_ms"] if events else None
                         ),
                         "actual_skill_ids": actual_skill_ids,
                         "skill_entries": skill_entries,
-                        "skill_match": expected_skill_id in actual_skill_ids,
+                        "skill_match": skill_match,
                         "tool_calls": tool_calls,
                         "tool_names": [
                             str(item.get("tool") or "")
@@ -259,11 +329,17 @@ def main() -> int:
                             if str(item.get("tool") or "")
                         ],
                         "tool_call_count": len(tool_calls),
+                        "tool_metrics": _tool_metrics(tool_calls),
                         "result_refs": [
                             dict(item)
                             for item in evidence.get("result_refs") or []
                             if isinstance(item, Mapping)
                         ],
+                        "research_mode": (
+                            dict(result.get("research_mode") or {})
+                            if isinstance(result.get("research_mode"), Mapping)
+                            else {}
+                        ),
                         "answer": str(result.get("message") or ""),
                         "error": str(evidence.get("error") or ""),
                     }

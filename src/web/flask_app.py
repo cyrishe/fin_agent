@@ -4,6 +4,7 @@ import json
 import os
 import queue
 import re
+import tempfile
 import threading
 import time
 import uuid
@@ -15,6 +16,7 @@ from pathlib import Path
 from urllib.parse import quote, urlencode
 
 import pandas as pd
+import fastjsonschema
 from dotenv import load_dotenv
 from flask import Flask, Response, has_request_context, jsonify, make_response, redirect, render_template, request, send_from_directory
 
@@ -33,11 +35,13 @@ from src.services.asset_invocation_service import AssetInvocationError, AssetInv
 from src.services.custom_tool_service import (
     CustomToolAgentService,
     CustomToolError,
+    CustomToolRuntimeService,
 )
 from src.services.custom_tool_run_trace_service import CustomToolRunTrace
 from src.services.finance_claude_session_service import FinanceClaudeSessionService
 from src.services.finance_cc_system_tools import FinanceCcSystemTools
 from src.scenarios.financial_qa import FinancialQaCcService
+from src.scenarios.financial_qa.research_mode import normalize_research_mode
 from src.services.conversation_title_service import ConversationTitleService
 from src.services.context_resolution_service import ContextResolutionError
 from src.services.llm_stream_block_service import LlmStreamBlockBuilder
@@ -47,6 +51,16 @@ from src.services.runtime_conversation_service import (
     RuntimeConversationService,
 )
 from src.services.skill_blueprint_service import SkillBlueprintError, SkillBlueprintService
+from src.services.skill_authoring_service import (
+    SkillAuthoringError,
+    SkillAuthoringService,
+    SkillCapabilityDiscoveryService,
+)
+from src.services.skill_candidate_store_service import (
+    SkillCandidateConflictError,
+    SkillCandidateNotFoundError,
+    SkillCandidateStoreError,
+)
 from src.services.skill_hub_catalog_service import SkillHubCatalogService
 from src.services.skill_studio_service import SkillStudioError, SkillStudioService
 from src.services.strategy_revision_contract_service import (
@@ -103,6 +117,11 @@ financial_qa_cc_service = FinancialQaCcService()
 skill_hub_catalog_service = SkillHubCatalogService(
     business_catalog=financial_qa_cc_service.business_skill_catalog,
     legacy_skill_studio=skill_studio_service,
+)
+skill_authoring_service = SkillAuthoringService(
+    discovery_service=SkillCapabilityDiscoveryService(
+        business_catalog=financial_qa_cc_service.business_skill_catalog,
+    ),
 )
 assistant_dispatch_planner = AssistantDispatchPlanner(
     agent_owned_runtime_names=(
@@ -1185,6 +1204,7 @@ def _custom_tool_result_blocks(result: dict, builder: LlmStreamBlockBuilder) -> 
                 strategy_compatibility = StrategyRevisionContractService().assess(
                     runtime_profile=strategy_runtime_profile,
                     selection_output_profile=selection_output_profile,
+                    execution_shape=str(finance_tool_profile.get("execution_shape") or ""),
                     input_schema=(
                         tool.get("input_schema")
                         if isinstance(tool.get("input_schema"), dict)
@@ -1251,6 +1271,26 @@ def _custom_tool_result_blocks(result: dict, builder: LlmStreamBlockBuilder) -> 
                 "details": {
                     "inputs": input_fields,
                     "outputs": output_fields,
+                    "input_schema": (
+                        dict(tool.get("input_schema") or {})
+                        if isinstance(tool.get("input_schema"), dict)
+                        else {}
+                    ),
+                    "output_schema": (
+                        dict(tool.get("output_schema") or {})
+                        if isinstance(tool.get("output_schema"), dict)
+                        else {}
+                    ),
+                    "sample_input": (
+                        dict(tool.get("sample_input") or {})
+                        if isinstance(tool.get("sample_input"), dict)
+                        else {}
+                    ),
+                    "proposed_tests": [
+                        dict(item)
+                        for item in (tool.get("proposed_tests") or [])
+                        if isinstance(item, dict)
+                    ],
                     "modules": logical_modules,
                     "runtime": (
                         "系统解析交易日与标的范围，并按策略绑定方式有界调度；策略核心只执行一次业务判断。"
@@ -1440,6 +1480,7 @@ def _run_custom_tool_stream_payload(payload: dict, *, emit) -> None:
         raise CustomToolError("请先填写本轮反馈")
     direct_interaction = bool(interaction_response and not text)
     application_name = str(payload.get("application_name") or "investment_workbench").strip() or "investment_workbench"
+    research_mode = normalize_research_mode(payload.get("research_mode"))
     thread_id_payload = payload.get("thread_id")
     guest_identity = payload.get("guest_identity") if isinstance(payload.get("guest_identity"), dict) else {}
     builder = LlmStreamBlockBuilder(run_id=str(payload.get("run_id") or ""))
@@ -1669,6 +1710,7 @@ def _run_custom_tool_stream_payload(payload: dict, *, emit) -> None:
                     owner_id=owner_id,
                     precomputed_plan=dispatch_plan,
                     event_sink=event_sink,
+                    research_mode=research_mode,
                 )
             else:
                 result = custom_tool_agent_service.handle_turn(
@@ -1707,6 +1749,7 @@ def _run_custom_tool_stream_payload(payload: dict, *, emit) -> None:
                 owner_id=owner_id,
                 precomputed_plan=dispatch_plan,
                 event_sink=event_sink,
+                research_mode=research_mode,
             )
 
         if not routed_outside_custom_tool:
@@ -1948,6 +1991,7 @@ def _run_asset_invocation_stream_payload(payload: dict, *, emit) -> None:
             thread_context=thread_context,
             thread_id=thread_id,
             turn_id=turn_id,
+            event_sink=emit,
         )
         assistant_message = str(result.get("message") or "已处理。").strip()
         _attach_answer_summary(
@@ -1997,6 +2041,7 @@ def _build_chat_dispatch_payload(
     owner_id: str = "",
     precomputed_plan: dict | None = None,
     event_sink=None,
+    research_mode: str = "auto",
 ) -> dict:
     parsed = _parse_chat_command(text)
     raw = parsed.get("raw") or ""
@@ -2128,6 +2173,7 @@ def _build_chat_dispatch_payload(
                 application_context=application_context,
                 attachments=attachments,
                 event_sink=event_sink,
+                research_mode=normalize_research_mode(research_mode),
             )
             result = _apply_application_workspace_orchestration(
                 result,
@@ -3039,6 +3085,7 @@ def _execute_asset_invocation_payload(
     thread_context: dict,
     thread_id: int | None,
     turn_id: int | None,
+    event_sink=None,
 ) -> dict:
     if invocation.get("status") != "ready":
         message = str(invocation.get("message") or "还需要补充调用参数。").strip()
@@ -3096,6 +3143,7 @@ def _execute_asset_invocation_payload(
             thread_context=thread_context,
             thread_id=thread_id,
             turn_id=turn_id,
+            event_sink=event_sink,
         )
         result = _apply_application_workspace_orchestration(result, application_context)
         result["asset_invocation"] = invocation
@@ -3576,8 +3624,26 @@ def stock_deep_dive_task_view(job_id):
 @app.route("/skills/studio/<skill_name>", methods=["GET"])
 def skill_studio_page(skill_name: str = ""):
     return render_template(
-        "skill_studio.html",
+        "skill_studio_v2.html",
         page_title="Skill Studio",
+        initial_skill_name=str(skill_name or "").strip(),
+        initial_catalog_id=str(request.args.get("catalog_id") or "").strip(),
+        api_catalog_url=_with_script_root("/api/skill-hub"),
+        api_detail_base_url=_with_script_root("/api/skill-hub"),
+        api_candidate_base_url=_with_script_root("/api/skill-hub/candidates"),
+        assistant_url=_with_script_root("/assistant"),
+    )
+
+
+@app.route("/skills/legacy-studio", methods=["GET"])
+@app.route("/skills/legacy-studio/", methods=["GET"])
+@app.route("/skills/legacy-studio/<skill_name>", methods=["GET"])
+def legacy_skill_studio_page(skill_name: str = ""):
+    """Compatibility editor for bundles still owned by the legacy SkillRunner."""
+
+    return render_template(
+        "skill_studio.html",
+        page_title="Legacy Skill Studio",
         initial_skill_name=str(skill_name or "").strip(),
         api_catalog_url=_with_script_root("/api/skills/catalog"),
         api_bundle_base_url=_with_script_root("/api/skills"),
@@ -3931,6 +3997,7 @@ def api_chat_dispatch():
     request_received_at = datetime.datetime.now()
     try:
         payload = _extract_request_payload()
+        research_mode = normalize_research_mode(payload.get("research_mode"))
         text = str(payload.get("text") or payload.get("message") or "").strip()
         attachment_ids = payload.get("attachment_ids")
         if not isinstance(attachment_ids, list):
@@ -4009,6 +4076,7 @@ def api_chat_dispatch():
                 thread_id=thread_id,
                 turn_id=turn_id,
                 owner_id=str(guest_identity.get("user_id") or ""),
+                research_mode=research_mode,
             )
         dispatch_plan_payload = result.get("dispatch_plan") if isinstance(result.get("dispatch_plan"), dict) else {}
         _submit_finance_cc_shadow(
@@ -4119,6 +4187,7 @@ def api_custom_tool_stream_start():
     try:
         request_received_at = datetime.datetime.now()
         payload = _extract_request_payload()
+        research_mode = normalize_research_mode(payload.get("research_mode"))
         text = str(payload.get("text") or payload.get("message") or "").strip()
         interaction_response = payload.get("interaction_response") if isinstance(payload.get("interaction_response"), dict) else {}
         selected_asset = payload.get("selected_asset") if isinstance(payload.get("selected_asset"), dict) else {}
@@ -4144,6 +4213,7 @@ def api_custom_tool_stream_start():
             "attachment_ids": attachment_ids,
             "thread_id": payload.get("thread_id"),
             "application_name": str(payload.get("application_name") or "investment_workbench").strip() or "investment_workbench",
+            "research_mode": research_mode,
             "guest_identity": guest_identity,
             "cookie_thread_id": request.cookies.get(UserSessionService.THREAD_COOKIE_NAME, ""),
             "request_received_at": request_received_at.isoformat(
@@ -4168,6 +4238,8 @@ def api_custom_tool_stream_start():
         }))
         _apply_identity_cookies(response, guest_identity)
         return response
+    except ValueError as exc:
+        return jsonify({"ok": False, "error": str(exc)}), 400
     except UserSessionStorageError:
         raise
     except Exception as exc:
@@ -4373,6 +4445,207 @@ def api_skill_hub():
         return jsonify({"ok": False, "error": f"获取 Skill Hub 失败: {exc}"}), 500
 
 
+def _skill_candidate_summary(candidate: dict) -> dict:
+    control = candidate.get("control_manifest") if isinstance(candidate.get("control_manifest"), dict) else {}
+    return {
+        key: candidate.get(key)
+        for key in (
+            "skill_id",
+            "display_name",
+            "description",
+            "revision_no",
+            "base_revision_no",
+            "active_revision_no",
+            "candidate_revision_no",
+            "content_hash",
+            "change_summary",
+            "created_at",
+            "published",
+        )
+    } | {
+        "tool_count": len(control.get("tool_connections") or []),
+        "related_skill_count": len(control.get("related_skills") or []),
+        "workflow_step_count": len(control.get("workflow_steps") or []),
+    }
+
+
+def _skill_authoring_error(exc: Exception):
+    if isinstance(exc, SkillCandidateNotFoundError):
+        return jsonify({"ok": False, "code": "skill_candidate_not_found", "error": str(exc)}), 404
+    if isinstance(exc, SkillCandidateConflictError):
+        return jsonify({"ok": False, "code": "skill_candidate_conflict", "error": str(exc)}), 409
+    if isinstance(exc, SkillAuthoringError):
+        status = 409 if exc.code == "skill_authoring_busy" else 400
+        if exc.code == "skill_authoring_provider_unavailable":
+            status = 503
+        elif exc.code in {"skill_authoring_provider_failed", "invalid_skill_authoring_output"}:
+            status = 502
+        return jsonify({"ok": False, "code": exc.code, "error": str(exc)}), status
+    if isinstance(exc, SkillCandidateStoreError):
+        return jsonify(
+            {
+                "ok": False,
+                "code": "skill_candidate_storage_unavailable",
+                "error": "Skill 候选存储暂时不可用。",
+            }
+        ), 503
+    app.logger.exception("Skill authoring request failed")
+    return jsonify(
+        {
+            "ok": False,
+            "code": "skill_authoring_failed",
+            "error": "Skill 候选处理失败，请稍后重试。",
+        }
+    ), 500
+
+
+@app.route("/api/skill-hub/candidates", methods=["GET"])
+def api_skill_candidates():
+    try:
+        identity = _resolve_current_guest_identity()
+        owner_id = str(identity.get("user_id") or "").strip()
+        raw_limit = str(request.args.get("limit") or "20").strip()
+        if not raw_limit.isdigit():
+            raise SkillAuthoringError(
+                "limit 必须是正整数。",
+                code="invalid_skill_authoring_request",
+            )
+        candidates = skill_authoring_service.list_candidates(
+            owner_id=owner_id,
+            limit=min(50, max(1, int(raw_limit))),
+        )
+        response = jsonify(
+            _to_json_safe(
+                {
+                    "ok": True,
+                    "items": [_skill_candidate_summary(item) for item in candidates],
+                }
+            )
+        )
+        _apply_identity_cookies(response, identity)
+        return response
+    except UserSessionStorageError:
+        raise
+    except Exception as exc:
+        return _skill_authoring_error(exc)
+
+
+@app.route("/api/skill-hub/candidates", methods=["POST"])
+def api_create_skill_candidate():
+    try:
+        if not request.is_json:
+            raise SkillAuthoringError(
+                "请求必须使用 application/json。",
+                code="invalid_skill_authoring_request",
+            )
+        identity = _resolve_current_guest_identity()
+        owner_id = str(identity.get("user_id") or "").strip()
+        payload = _extract_request_payload()
+        candidate = skill_authoring_service.create_candidate(
+            requirement=str(payload.get("requirement") or ""),
+            owner_id=owner_id,
+        )
+        response = jsonify(_to_json_safe({"ok": True, "candidate": candidate}))
+        _apply_identity_cookies(response, identity)
+        return response, 201
+    except UserSessionStorageError:
+        raise
+    except Exception as exc:
+        return _skill_authoring_error(exc)
+
+
+@app.route(
+    "/api/skill-hub/candidates/<skill_id>/revisions",
+    methods=["POST"],
+)
+def api_revise_skill_candidate(skill_id):
+    try:
+        if not request.is_json:
+            raise SkillAuthoringError(
+                "请求必须使用 application/json。",
+                code="invalid_skill_authoring_request",
+            )
+        identity = _resolve_current_guest_identity()
+        owner_id = str(identity.get("user_id") or "").strip()
+        payload = _extract_request_payload()
+        raw_base_revision = payload.get("base_revision_no")
+        try:
+            base_revision_no = int(raw_base_revision or 0)
+        except (TypeError, ValueError) as exc:
+            raise SkillAuthoringError(
+                "base_revision_no 必须是正整数。",
+                code="invalid_skill_authoring_request",
+            ) from exc
+        candidate = skill_authoring_service.revise_candidate(
+            skill_id=str(skill_id or "").strip(),
+            feedback=str(payload.get("feedback") or ""),
+            base_revision_no=base_revision_no,
+            owner_id=owner_id,
+        )
+        response = jsonify(_to_json_safe({"ok": True, "candidate": candidate}))
+        _apply_identity_cookies(response, identity)
+        return response, 201
+    except UserSessionStorageError:
+        raise
+    except Exception as exc:
+        return _skill_authoring_error(exc)
+
+
+@app.route(
+    "/api/skill-hub/candidates/<skill_id>/revisions/<int:revision_no>",
+    methods=["GET"],
+)
+def api_skill_candidate_revision(skill_id, revision_no):
+    try:
+        identity = _resolve_current_guest_identity()
+        owner_id = str(identity.get("user_id") or "").strip()
+        candidate = skill_authoring_service.load_candidate(
+            skill_id=str(skill_id or "").strip(),
+            revision_no=int(revision_no),
+            owner_id=owner_id,
+        )
+        response = jsonify(_to_json_safe({"ok": True, "candidate": candidate}))
+        _apply_identity_cookies(response, identity)
+        return response
+    except UserSessionStorageError:
+        raise
+    except Exception as exc:
+        return _skill_authoring_error(exc)
+
+
+@app.route("/api/skill-hub/<skill_name>", methods=["GET"])
+def api_skill_hub_detail(skill_name):
+    try:
+        detail = skill_hub_catalog_service.detail(
+            str(skill_name or "").strip(),
+            catalog_id=str(request.args.get("catalog_id") or "").strip(),
+        )
+        if detail is None:
+            return jsonify({"ok": False, "error": "Skill 不存在或当前不可查看。"}), 404
+        return jsonify(_to_json_safe({"ok": True, "skill": detail}))
+    except Exception as exc:
+        return jsonify({"ok": False, "error": f"获取 Skill 详情失败: {exc}"}), 500
+
+
+@app.route(
+    "/api/skill-hub/<skill_name>/references/<path:reference_path>",
+    methods=["GET"],
+)
+def api_skill_hub_reference(skill_name, reference_path):
+    try:
+        result = skill_hub_catalog_service.load_business_reference(
+            str(skill_name or "").strip(),
+            str(reference_path or "").strip(),
+            expected_revision=str(request.args.get("revision") or "").strip(),
+        )
+        if result.get("error"):
+            status = 409 if "快照已更新" in str(result.get("error")) else 404
+            return jsonify(_to_json_safe({"ok": False, **result})), status
+        return jsonify(_to_json_safe({"ok": True, **result}))
+    except Exception as exc:
+        return jsonify({"ok": False, "error": f"获取 Skill 参考失败: {exc}"}), 500
+
+
 @app.route("/api/assets/invocable", methods=["GET"])
 def api_invocable_asset_catalog():
     """Return the small, owner-scoped contract used by `$` completion."""
@@ -4403,6 +4676,219 @@ def api_invocable_asset_catalog():
         raise
     except Exception as exc:
         return jsonify({"ok": False, "error": f"获取可调用资产失败: {exc}"}), 500
+
+
+def _custom_tool_test_validation_error(
+    schema: dict,
+    value: dict,
+    *,
+    subject: str,
+) -> dict | None:
+    if not schema:
+        return None
+    try:
+        fastjsonschema.validate(schema, value)
+        return None
+    except fastjsonschema.JsonSchemaValueException as exc:
+        path = ".".join(str(item) for item in (getattr(exc, "path", None) or []))
+        rule = str(getattr(exc, "rule", None) or "schema").strip()
+        return {
+            "code": f"{subject}_schema_mismatch",
+            "message": f"{path or subject} 不符合 {rule} 约束。",
+            "path": path or subject,
+            "rule": rule,
+        }
+
+
+@app.route("/api/custom-tools/<tool_name>/test", methods=["POST"])
+def api_test_custom_tool_revision(tool_name):
+    """Run one owner-scoped immutable custom-tool revision without activating it."""
+
+    started_at = time.perf_counter()
+    try:
+        payload = _extract_request_payload()
+        arguments = payload.get("arguments")
+        if not isinstance(arguments, dict):
+            return jsonify({
+                "ok": False,
+                "code": "invalid_test_arguments",
+                "error": "arguments 必须是 JSON 对象。",
+            }), 400
+        raw_revision = payload.get("revision")
+        try:
+            revision = int(raw_revision or 0)
+        except (TypeError, ValueError):
+            revision = 0
+        if revision < 1:
+            return jsonify({
+                "ok": False,
+                "code": "invalid_test_revision",
+                "error": "revision 必须是正整数。",
+            }), 400
+
+        identity = _resolve_current_guest_identity()
+        owner_id = str(identity.get("user_id") or "").strip()
+        thread_id = UserSessionService._safe_int(
+            str(request.cookies.get(UserSessionService.THREAD_COOKIE_NAME) or "")
+        )
+        owner_ids = _custom_tool_owner_ids(
+            user_id=owner_id,
+            thread_id=thread_id,
+        )
+        bundle = custom_tool_agent_service.store.load_revision(
+            str(tool_name or "").strip(),
+            revision,
+        )
+        manifest = (
+            bundle.get("manifest")
+            if isinstance(bundle.get("manifest"), dict)
+            else {}
+        )
+        if str(manifest.get("visibility") or "").strip() == "personal":
+            allowed = {str(item or "").strip() for item in owner_ids if str(item or "").strip()}
+            if str(manifest.get("owner_id") or "").strip() not in allowed:
+                return jsonify({
+                    "ok": False,
+                    "code": "custom_tool_test_forbidden",
+                    "error": "当前用户无权测试这个工具版本。",
+                }), 403
+
+        input_schema = (
+            bundle.get("input_schema")
+            if isinstance(bundle.get("input_schema"), dict)
+            else {}
+        )
+        input_error = _custom_tool_test_validation_error(
+            input_schema,
+            arguments,
+            subject="arguments",
+        )
+        if input_error:
+            return jsonify({
+                "ok": False,
+                **input_error,
+                "error": input_error["message"],
+            }), 400
+
+        process_events = [{
+            "sequence": 1,
+            "stage": "validation",
+            "level": "info",
+            "message": "输入已通过工具 Schema 校验。",
+            "data": {"revision": revision},
+        }]
+
+        def collect_progress(event: dict) -> None:
+            process_events.append({
+                "sequence": len(process_events) + 1,
+                "stage": "runtime",
+                **CustomToolRunTrace._redact(dict(event or {})),
+            })
+
+        base_runtime = custom_tool_agent_service.runtime
+        with tempfile.TemporaryDirectory(prefix="custom_tool_workbench_") as runtime_root:
+            test_runtime = CustomToolRuntimeService(
+                store=custom_tool_agent_service.store,
+                python_runtime=base_runtime.python_runtime,
+                runtime_root=runtime_root,
+                max_finance_queries=base_runtime.max_finance_queries,
+                finance_runtime=base_runtime.finance_runtime,
+            )
+            runtime_result = test_runtime.run_revision(
+                str(tool_name or "").strip(),
+                revision,
+                arguments,
+                owner_ids=owner_ids,
+                progress_sink=collect_progress,
+            )
+
+        runtime_ok = runtime_result.get("ok") is True
+        business_result = (
+            runtime_result.get("data")
+            if isinstance(runtime_result.get("data"), dict)
+            else {}
+        )
+        business_ok = runtime_ok and business_result.get("ok") is not False
+        output_schema = (
+            bundle.get("output_schema")
+            if isinstance(bundle.get("output_schema"), dict)
+            else {}
+        )
+        output_error = (
+            _custom_tool_test_validation_error(
+                output_schema,
+                business_result,
+                subject="result",
+            )
+            if runtime_ok and output_schema
+            else None
+        )
+        output_valid = None if not output_schema or not runtime_ok else output_error is None
+        passed = runtime_ok and business_ok and output_error is None
+        diagnostics = (
+            (runtime_result.get("meta") or {}).get("diagnostics")
+            if isinstance(runtime_result.get("meta"), dict)
+            and isinstance((runtime_result.get("meta") or {}).get("diagnostics"), dict)
+            else {}
+        )
+        elapsed_ms = int((time.perf_counter() - started_at) * 1000)
+        process_events.append({
+            "sequence": len(process_events) + 1,
+            "stage": "result",
+            "level": "info" if passed else "error",
+            "message": "测试执行完成。" if passed else "测试执行完成，但存在失败项。",
+            "data": {
+                "runtime_ok": runtime_ok,
+                "business_ok": business_ok,
+                "output_valid": output_valid,
+                "elapsed_ms": elapsed_ms,
+            },
+        })
+        test_payload = {
+            "run_id": f"ct_test_{uuid.uuid4().hex}",
+            "tool_name": str(manifest.get("tool_name") or tool_name).strip(),
+            "display_name": str(manifest.get("display_name") or tool_name).strip(),
+            "revision": revision,
+            "status": "passed" if passed else "failed",
+            "elapsed_ms": elapsed_ms,
+            "input": dict(arguments),
+            "contract": {
+                "input_valid": True,
+                "runtime_ok": runtime_ok,
+                "business_ok": business_ok,
+                "output_valid": output_valid,
+                "output_error": output_error or {},
+            },
+            "process": process_events,
+            "result": business_result,
+            "error": str(runtime_result.get("error") or "").strip(),
+            "diagnostics": diagnostics,
+        }
+        return jsonify(_to_json_safe({
+            "ok": True,
+            "test": CustomToolRunTrace._redact(test_payload),
+        }))
+    except fastjsonschema.JsonSchemaException:
+        return jsonify({
+            "ok": False,
+            "code": "invalid_custom_tool_schema",
+            "error": "工具 Schema 无法用于测试，请先修正工具协议。",
+        }), 500
+    except CustomToolError as exc:
+        return jsonify({
+            "ok": False,
+            "code": "custom_tool_test_unavailable",
+            "error": str(exc),
+        }), 404
+    except UserSessionStorageError:
+        raise
+    except Exception:
+        app.logger.exception("custom tool interactive test failed")
+        return jsonify({
+            "ok": False,
+            "code": "custom_tool_test_failed",
+            "error": "测试执行失败，请稍后重试。",
+        }), 500
 
 
 @app.route("/api/skills/generate_blueprint", methods=["POST"])

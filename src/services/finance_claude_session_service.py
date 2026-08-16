@@ -116,8 +116,8 @@ class FinanceClaudeSessionService:
     ) -> None:
         enabled_text = _trim(os.environ.get("FINANCE_CC_SHADOW_ENABLED")).lower()
         self.enabled = bool(enabled) if enabled is not None else enabled_text in {"1", "true", "yes", "on"}
-        self.provider = _trim(provider or os.environ.get("FINANCE_CC_PROVIDER") or "dashscope").lower()
-        self.model = _trim(model or os.environ.get("FINANCE_CC_MODEL") or "deepseek-v4-flash")
+        self.provider = _trim(provider or os.environ.get("FINANCE_CC_PROVIDER") or "deepseek").lower()
+        self.model = _trim(model or os.environ.get("FINANCE_CC_MODEL") or "deepseek-chat")
         self.root_dir = Path(root_dir)
         self.log_path = Path(log_path)
         self.system_prompt_path = Path(system_prompt_path or "src/prompts/finance_cc/main.system.md")
@@ -330,6 +330,9 @@ class FinanceClaudeSessionService:
                         result.get("api_retry_count") or 0
                     ),
                     "api_error_status": result.get("api_error_status"),
+                    "turn_timeout_seconds": int(
+                        result.get("turn_timeout_seconds") or 0
+                    ),
                     "provider_transport": (
                         dict(result.get("provider_transport") or {})
                         if isinstance(result.get("provider_transport"), Mapping)
@@ -401,6 +404,13 @@ class FinanceClaudeSessionService:
     @staticmethod
     def build_user_prompt(user_text: str, context: Mapping[str, Any]) -> str:
         lines = [f"用户当前的问题是：\n{_trim(user_text)}"]
+        research_mode_prompt = _trim(
+            context.get("_finance_research_mode_prompt")
+        )
+        if research_mode_prompt:
+            lines.append(
+                "[系统记录的本轮研究模式]\n" + research_mode_prompt
+            )
         ui_action = context.get("ui_action") if isinstance(context.get("ui_action"), Mapping) else {}
         action_label = _trim(ui_action.get("label") or ui_action.get("action_id"))
         if action_label:
@@ -633,11 +643,21 @@ class FinanceClaudeSessionService:
             or _trim(tool_context.get("entry")) == "custom_tool_flow"
         )
         if not is_tool_development:
+            research_mode = _trim(
+                tool_context.get("_finance_research_mode")
+            ).lower()
+            running = (
+                "已按快速回答处理，正在确认最关键的对象、时间和证据。"
+                if research_mode == "fast"
+                else "已进入深度研究，正在明确核心命题并规划最小充分证据。"
+                if research_mode == "deep"
+                else "正在理解问题，并由业务 Skill 判断适合本题的分析深度与证据范围。"
+            )
             return {
                 "stage": "runtime",
                 "progress_id": "finance_understanding",
                 "title": "问题理解",
-                "running": "正在理解问题，并确认其中的对象、时间与金融口径。",
+                "running": running,
                 "ready": "已明确本题的对象与口径，开始获取所需证据。",
                 "completed": "已完成问题理解；本题无需额外数据查询。",
                 "failed": "金融问答服务未及时返回，本轮没有产生新的查询结果。",
@@ -673,6 +693,41 @@ class FinanceClaudeSessionService:
             "result_completed": "本轮工具需求或设计结果已经整理完成。",
             "result_failed": "本轮工具设计未能完成，已有需求和业务资产保持不变。",
         }
+
+    @staticmethod
+    def _turn_timeout_seconds(
+        tool_context: Mapping[str, Any],
+        *,
+        activated_skill_id: str = "",
+    ) -> int:
+        state = (
+            tool_context.get("custom_tool_state")
+            if isinstance(tool_context.get("custom_tool_state"), Mapping)
+            else {}
+        )
+        has_confirmed_design = (
+            isinstance(state.get("design_contract"), Mapping)
+            and bool(state.get("design_contract"))
+        )
+        budget_by_skill = (
+            tool_context.get("_finance_skill_execution_budget")
+            if isinstance(
+                tool_context.get("_finance_skill_execution_budget"),
+                Mapping,
+            )
+            else {}
+        )
+        skill_budget = _trim(
+            budget_by_skill.get(_trim(activated_skill_id))
+        ).lower()
+        use_long_budget = has_confirmed_design or skill_budget == "long"
+        timeout_env = (
+            "FINANCE_CC_LONG_TURN_TIMEOUT_SECONDS"
+            if use_long_budget
+            else "FINANCE_CC_TURN_TIMEOUT_SECONDS"
+        )
+        timeout_default = 900 if use_long_budget else 180
+        return max(30, int(os.environ.get(timeout_env) or timeout_default))
 
     def initial_progress_event(
         self,
@@ -1246,13 +1301,12 @@ class FinanceClaudeSessionService:
                 event_sink,
                 self.initial_progress_event(tool_context),
             )
-        state = tool_context.get("custom_tool_state") if isinstance(tool_context.get("custom_tool_state"), Mapping) else {}
-        has_confirmed_design = isinstance(state.get("design_contract"), Mapping) and bool(state.get("design_contract"))
-        timeout_env = "FINANCE_CC_LONG_TURN_TIMEOUT_SECONDS" if has_confirmed_design else "FINANCE_CC_TURN_TIMEOUT_SECONDS"
-        timeout_default = 900 if has_confirmed_design else 180
-        timeout_seconds = max(30, int(os.environ.get(timeout_env) or timeout_default))
+        timeout_seconds = self._turn_timeout_seconds(tool_context)
+        timeout_started_at = asyncio.get_running_loop().time()
+        timeout_scope = asyncio.timeout(timeout_seconds)
+        evidence["turn_timeout_seconds"] = timeout_seconds
         try:
-            async with asyncio.timeout(timeout_seconds):
+            async with timeout_scope:
                 async for message in self._response_messages(
                     entry.client,
                     prompt=prompt,
@@ -1326,6 +1380,16 @@ class FinanceClaudeSessionService:
                                             "",
                                         )
                                     skill_id = _canonical_skill_id(qualified_skill)
+                                    skill_timeout_seconds = self._turn_timeout_seconds(
+                                        tool_context,
+                                        activated_skill_id=skill_id,
+                                    )
+                                    if skill_timeout_seconds > timeout_seconds:
+                                        timeout_seconds = skill_timeout_seconds
+                                        evidence["turn_timeout_seconds"] = timeout_seconds
+                                        timeout_scope.reschedule(
+                                            timeout_started_at + timeout_seconds
+                                        )
                                     evidence["skill_entries"].append(
                                         {
                                             "skill_id": skill_id,
@@ -1349,7 +1413,7 @@ class FinanceClaudeSessionService:
                                             "专业分析方法",
                                             "正在加载与问题匹配的专业分析方法。",
                                         )
-                                elif name in {"financial_news_search"} and tool_use_id:
+                                elif name in {"financial_news_search", "general_search"} and tool_use_id:
                                     public_tool_progress[tool_use_id] = (
                                         "补充信息",
                                         "正在检索与问题直接相关的公开金融信息。",

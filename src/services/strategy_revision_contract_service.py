@@ -112,11 +112,21 @@ class StrategyRevisionContractService:
             except ValueError as exc:
                 message = getattr(exc, "message", "") or str(exc)
                 raise StrategyRevisionContractError(message) from exc
-            canonical_selection = selection.to_dict()
             self._validate_selection_roots(
                 selection=selection,
                 output_schema=output_schema or {},
             )
+            # The Custom Tool host owns the stable `{ok, data, ...}` result
+            # envelope.  Models only need to identify public business fields;
+            # accept either notation and persist one executable canonical form.
+            selection = SelectionOutputProfile(
+                candidate_path=self._host_result_path(selection.candidate_path),
+                symbol_field=selection.symbol_field,
+                output_date_path=self._host_result_path(
+                    selection.output_date_path
+                ),
+            )
+            canonical_selection = selection.to_dict()
 
         return StrategyRevisionContracts(
             runtime_profile=canonical_runtime,
@@ -130,6 +140,7 @@ class StrategyRevisionContractService:
         selection_output_profile: Any,
         input_schema: Mapping[str, Any] | None,
         output_schema: Mapping[str, Any] | None = None,
+        execution_shape: str = "",
     ) -> dict[str, Any]:
         """Return derived UX facts; no additional lifecycle state is stored."""
 
@@ -146,7 +157,8 @@ class StrategyRevisionContractService:
             profile=profile,
             input_schema=input_schema or {},
         )
-        native_universe = binding_type in {"", "array"}
+        independent_entities = _trim(execution_shape).lower() == "entity_local"
+        native_universe = binding_type in {"", "array"} and not independent_entities
         backtest_contract_ready = bool(
             native_universe and contracts.selection_output_profile
         )
@@ -155,7 +167,7 @@ class StrategyRevisionContractService:
                 "已具备一次性点时选股结果契约；历史回放仍需运行主机完成权限、"
                 "固定修订号和 point-in-time 预检。"
             )
-        elif binding_type == "string":
+        elif binding_type == "string" or independent_entities:
             summary = (
                 "逐股独立策略可由 Wrapper 有界并行运行；当前输出不能直接作为"
                 "共享组合的每日排名。"
@@ -169,7 +181,9 @@ class StrategyRevisionContractService:
             "strategy_wrapper_ready": True,
             "portfolio_backtest_contract_ready": backtest_contract_ready,
             "execution_shape": (
-                "independent_entities" if binding_type == "string" else "native_universe"
+                "independent_entities"
+                if binding_type == "string" or independent_entities
+                else "native_universe"
             ),
             "summary": summary,
         }
@@ -245,6 +259,13 @@ class StrategyRevisionContractService:
                 raise StrategyRevisionContractError(
                     f"{field_name} root is absent from the public output schema: {root}"
                 )
+
+    @staticmethod
+    def _host_result_path(path: str) -> str:
+        normalized = _trim(path)
+        if not normalized or normalized == "data" or normalized.startswith("data."):
+            return normalized
+        return f"data.{normalized}"
 
 
 __all__ = [

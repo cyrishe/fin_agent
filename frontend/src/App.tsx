@@ -8,7 +8,7 @@ import ScheduledTasksPanel from "./components/ScheduledTasksPanel";
 import Sidebar from "./components/Sidebar";
 import { applyStreamEvent, blocksFromPayload, initialRun, isProcessBlock, reconcileBlockOrder, settleProcessBlocks } from "./surface";
 import { customAnswerPrompt, prepareClarificationSubmission, readFeedbackValue, removeComposerPrompt, upsertComposerPrompt } from "./interactionDraft";
-import type { AgentRun, Attachment, AuthUser, ChatMessage, InteractionDraft, InteractionFeedbackRequest, InteractionResponse, InvocationAsset, StreamEvent, ThreadSummary, UnknownRecord } from "./types";
+import type { AgentRun, Attachment, AuthUser, ChatMessage, InteractionDraft, InteractionFeedbackRequest, InteractionResponse, InvocationAsset, ResearchMode, StreamEvent, ThreadSummary, UnknownRecord } from "./types";
 
 const intro: ChatMessage = {
   id: "intro",
@@ -90,6 +90,7 @@ export default function App() {
   const [scheduleOpen, setScheduleOpen] = useState(false);
   const [invocationAssets, setInvocationAssets] = useState<InvocationAsset[]>([]);
   const [selectedInvocationAsset, setSelectedInvocationAsset] = useState<InvocationAsset | null>(null);
+  const [researchMode, setResearchMode] = useState<ResearchMode>("auto");
   const [authUser, setAuthUser] = useState<AuthUser | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
 
@@ -260,10 +261,10 @@ export default function App() {
     streamKind: "chat" | "custom_tool" = "custom_tool",
   ) => {
     const startStream = streamKind === "chat" ? startChatStream : startCustomToolStream;
-    await startStream({ text, threadId, interactionResponse, ...invocation, onEvent: (event) => updateRun(assistantId, event) });
+    await startStream({ text, threadId, interactionResponse, researchMode, ...invocation, onEvent: (event) => updateRun(assistantId, event) });
     await refreshThreads();
     void refreshInvocationAssets();
-  }, [refreshInvocationAssets, refreshThreads, threadId, updateRun]);
+  }, [refreshInvocationAssets, refreshThreads, researchMode, threadId, updateRun]);
 
   const interact = async (response: InteractionResponse, label: string, key: string, text = "") => {
     if (busy) return;
@@ -376,6 +377,7 @@ export default function App() {
             kind: selectedInvocationAsset.kind,
             name: selectedInvocationAsset.name,
           } : null,
+          researchMode,
         });
         if (payload.thread_id) setThreadId(Number(payload.thread_id));
         const patch = asRecord(payload.thread_context_patch);
@@ -510,7 +512,7 @@ export default function App() {
               />)}<div ref={bottomRef} /></div>
             </section>
             {error && <div className="global-error" role="alert">{error}<button type="button" onClick={() => setError("")}>关闭</button></div>}
-            <Composer value={input} onChange={setInput} onSend={() => void send()} busy={busy} focusRequest={composerFocusRequest} assets={invocationAssets} selectedAsset={selectedInvocationAsset} onSelectAsset={setSelectedInvocationAsset} onClearSelectedAsset={() => setSelectedInvocationAsset(null)} attachments={attachments} onFiles={(files) => void addFiles(files)} onRemoveAttachment={(index) => setAttachments((current) => current.filter((_, itemIndex) => itemIndex !== index))} />
+            <Composer value={input} onChange={setInput} onSend={() => void send()} busy={busy} focusRequest={composerFocusRequest} assets={invocationAssets} selectedAsset={selectedInvocationAsset} onSelectAsset={setSelectedInvocationAsset} onClearSelectedAsset={() => setSelectedInvocationAsset(null)} attachments={attachments} onFiles={(files) => void addFiles(files)} onRemoveAttachment={(index) => setAttachments((current) => current.filter((_, itemIndex) => itemIndex !== index))} researchMode={researchMode} onResearchModeChange={setResearchMode} />
           </>
         )}
       </main>

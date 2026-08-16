@@ -91,11 +91,70 @@ class FinancialQaPresentationService:
                     thread_id=thread_id,
                 )
             )
+        evidence_blocks = self._merge_compatible_metric_blocks(evidence_blocks)
         narrative = self._display_narrative(
             str(message or ""),
             has_structured_evidence=bool(evidence_blocks),
         )
         return [self._narrative_block(narrative), *evidence_blocks]
+
+    def _merge_compatible_metric_blocks(
+        self,
+        blocks: Sequence[Mapping[str, Any]],
+    ) -> list[dict[str, Any]]:
+        """Combine duplicate metric cards for the same source and as-of point."""
+
+        merged: list[dict[str, Any]] = []
+        metric_index: dict[tuple[str, str, str, str], int] = {}
+        for raw_block in blocks:
+            block = deepcopy(dict(raw_block))
+            payload = block.get("payload") if isinstance(block.get("payload"), Mapping) else {}
+            data = payload.get("data") if isinstance(payload.get("data"), Mapping) else {}
+            items = data.get("items") if isinstance(data.get("items"), list) else []
+            context = (
+                block.get("domain_context")
+                if isinstance(block.get("domain_context"), Mapping)
+                else {}
+            )
+            if payload.get("shape") != "record" or not items:
+                merged.append(block)
+                continue
+            key = (
+                _trim(block.get("semantic")),
+                _trim(block.get("title")),
+                _trim(context.get("source")),
+                _trim(context.get("as_of")),
+            )
+            if not all(key) or key not in metric_index:
+                metric_index[key] = len(merged)
+                merged.append(block)
+                continue
+            target = merged[metric_index[key]]
+            target_payload = target.get("payload")
+            if not isinstance(target_payload, dict):
+                continue
+            target_data = target_payload.get("data")
+            if not isinstance(target_data, dict):
+                continue
+            target_items = target_data.get("items")
+            if not isinstance(target_items, list):
+                continue
+            seen = {
+                _trim(item.get("id"))
+                for item in target_items
+                if isinstance(item, Mapping) and _trim(item.get("id"))
+            }
+            for item in items:
+                if not isinstance(item, Mapping):
+                    continue
+                item_id = _trim(item.get("id"))
+                if not item_id or item_id in seen:
+                    continue
+                target_items.append(deepcopy(dict(item)))
+                seen.add(item_id)
+                if len(target_items) >= self.max_metrics:
+                    break
+        return merged
 
     @classmethod
     def _display_narrative(
@@ -158,6 +217,10 @@ class FinancialQaPresentationService:
         index: int,
         thread_id: int | None = None,
     ) -> list[dict[str, Any]]:
+        if _trim(result_ref.get("semantic")) == "finance.backtest":
+            backtest_blocks = self._backtest_blocks(result_ref, index=index)
+            if backtest_blocks:
+                return backtest_blocks
         columns, column_specs = self._columns(result_ref)
         rows = self._rows(result_ref)
         if not rows:
@@ -185,13 +248,25 @@ class FinancialQaPresentationService:
         )
         if (
             api == "stock.quote"
-            and selection.get("realtime") == 2
+            and selection.get("mode") == 2
             and "close" in column_specs
         ):
             column_specs["close"] = {
                 **dict(column_specs["close"]),
                 "label": "最新价",
             }
+        if api == "stock.quote" and selection.get("mode") == 2:
+            mode_two_labels = {
+                "open": "最新分钟开盘价",
+                "amount": "最新分钟成交额",
+                "volumn": "最新分钟成交量",
+            }
+            for column, label in mode_two_labels.items():
+                if column in column_specs:
+                    column_specs[column] = {
+                        **dict(column_specs[column]),
+                        "label": label,
+                    }
         row_count = self._row_count(result_ref, rows)
         meta = self._meta(
             row_count=row_count,
@@ -335,6 +410,84 @@ class FinancialQaPresentationService:
                 "meta": meta,
             }
         ]
+
+    @staticmethod
+    def _backtest_blocks(
+        result_ref: Mapping[str, Any],
+        *,
+        index: int,
+    ) -> list[dict[str, Any]]:
+        presentation = (
+            result_ref.get("backtest_presentation")
+            if isinstance(result_ref.get("backtest_presentation"), Mapping)
+            else {}
+        )
+        metrics = [
+            dict(item)
+            for item in presentation.get("metrics") or []
+            if isinstance(item, Mapping)
+        ]
+        chart = (
+            presentation.get("chart")
+            if isinstance(presentation.get("chart"), Mapping)
+            else {}
+        )
+        chart_series = [
+            dict(item)
+            for item in chart.get("series") or []
+            if isinstance(item, Mapping) and item.get("data")
+        ]
+        blocks: list[dict[str, Any]] = []
+        if metrics:
+            blocks.append(
+                {
+                    "block_id": f"financial_qa_evidence_{index}_backtest_metrics",
+                    "block_type": "data",
+                    "kind": "data",
+                    "semantic": "finance.backtest.metrics",
+                    "mode": "replace",
+                    "title": "回测与基准",
+                    "payload": {
+                        "shape": "record",
+                        "content_type": "finance.backtest.metrics",
+                        "data": {"items": metrics},
+                    },
+                    "presentation_hint": {
+                        "preferred_renderer": "data.metrics",
+                        "density": "compact",
+                    },
+                }
+            )
+        if chart_series:
+            blocks.append(
+                {
+                    "block_id": f"financial_qa_evidence_{index}_backtest_chart",
+                    "block_type": "data",
+                    "kind": "data",
+                    "semantic": "finance.backtest.performance",
+                    "mode": "replace",
+                    "title": "组合与基准走势（起点 100）",
+                    "payload": {
+                        "shape": "timeseries",
+                        "content_type": "finance.backtest.performance",
+                        "data": {
+                            "x_axis": list(chart.get("x_axis") or []),
+                            "series": chart_series,
+                        },
+                    },
+                    "presentation_hint": {
+                        "preferred_renderer": "data.line",
+                        "chart_type": "line_chart",
+                    },
+                    "domain_context": {
+                        "namespace": "finance.backtest",
+                        "markets": ["CN_A"],
+                        "unit": "normalized_index",
+                        "frequency": "daily",
+                    },
+                }
+            )
+        return blocks
 
     @classmethod
     def _evidence_title(
