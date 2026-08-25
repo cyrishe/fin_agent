@@ -145,6 +145,8 @@ React Composer
 
 主框架关注统一输入、超时、取消、错误、usage 和事件；Provider 的模型名、URL、原始事件形态不能泄漏成前端或业务协议。
 
+Codex SDK 的认证也封装在该适配层：`STOCK_AGENT_CODEX_AUTH_MODE=auto` 时，存在 `CODEX_CRS_API_KEY` 就使用服务端 CRS provider，否则复用本机 ChatGPT 订阅登录。显式 `subscription` 或 `crs_api_key` 的优先级高于自动检测。CRS 模式在 session 隔离的 `CODEX_HOME/config.toml` 中只保存 provider、URL、模型和 `env_key` 名称，真实 Key 始终通过进程环境传入。
+
 ### 5.6 会话、上下文和持久化
 
 - `src/services/runtime_conversation_service.py`
@@ -274,4 +276,3 @@ lsof -nP -iTCP:22054 -sTCP:LISTEN
 5. 先复现和定位主线根因，再做最小修改；禁止用关键词、状态或 Validator 堆补丁。
 6. 至少运行相关协议测试；涉及共享入口、上下文、SSE、持久化或 Renderer 时运行全量回归。
 7. 报告中分开说明：已验证事实、推断、外部依赖阻塞和仍未解决的问题。
-

@@ -40,6 +40,8 @@ result = harness.run_skill(
 
 生产主线用 `CUSTOM_TOOL_AGENT_PROVIDER=codex|claude` 切换，并可用 `fastest|fast|mid|high` 四级 profile 统一选择模型与推理强度。Web Search 与 MCP 是独立 capability 参数，不随 profile 隐式开启。两者共享同一份 Skill、上下文资料包和业务 Output Schema；provider 的事件、权限、凭据和超时只在 adapter 内处理。Claude provider 默认通过 DashScope Anthropic 入口使用 `deepseek-v4-flash`，配置见 [.env.example](.env.example)，完整映射与边界见 [Claude Agent SDK 主线接入](docs/claude_agent_sdk_integration.md)。
 
+Codex SDK 支持本地订阅与服务端 CRS API Key 两种运行方式。默认 `STOCK_AGENT_CODEX_AUTH_MODE=auto`：当 `CODEX_CRS_API_KEY` 非空时使用 CRS，否则复用本机 ChatGPT 订阅登录。也可以显式设置 `subscription` 或 `crs_api_key`，显式模式优先于自动检测。CRS 模式为每个 Agent session 生成隔离的 `CODEX_HOME/config.toml`，Key 只通过环境变量传入，不写进配置文件；部署字段见 [.env.example](.env.example)。
+
 ## Run
 
 ```bash

@@ -37,6 +37,8 @@ _CODING_WORKSPACE_DEVELOPER_INSTRUCTIONS = (
     "and may create temporary focused tests only under scratch/. Do not modify any other file."
 )
 
+_FIN_AGENT_CODEX_CONFIG_MARKER = "# Managed by Fin Agent Codex runtime."
+
 
 def _trim(value: Any) -> str:
     return str(value or "").strip()
@@ -868,6 +870,9 @@ class CodexSdkSkillHarness(CodexExecSkillHarness):
 
             sdk_sandbox = self._sdk_sandbox(Sandbox)
             sdk_env, isolated_home = self._sdk_runtime_env(session_id=session_id)
+            runtime_model = self._runtime_model()
+            runtime_reasoning_effort = self._runtime_reasoning_effort()
+            runtime_auth_mode = self._resolved_auth_mode()
             codex_bin = shutil.which(self.codex_bin)
             config = CodexConfig(
                 codex_bin=codex_bin,
@@ -889,8 +894,9 @@ class CodexSdkSkillHarness(CodexExecSkillHarness):
                         "codex_bin": codex_bin or "<sdk-pinned>",
                         "output_schema_path": str(output_schema_file or "<built-in>"),
                         "complexity": self.complexity_level,
-                        "model": self.model,
-                        "reasoning_effort": self.reasoning_effort,
+                        "model": runtime_model,
+                        "reasoning_effort": runtime_reasoning_effort,
+                        "auth_mode": runtime_auth_mode,
                         "resumed": bool(provider_session_id),
                         "web_search": self.capabilities.web_search.value if self.capabilities else "inherited",
                         "mcp_server_count": len(self.capabilities.mcp_servers) if self.capabilities else -1,
@@ -905,7 +911,7 @@ class CodexSdkSkillHarness(CodexExecSkillHarness):
                         provider_session_id,
                         approval_mode=ApprovalMode.deny_all,
                         cwd=str(execution_cwd),
-                        model=self.model or None,
+                        model=runtime_model or None,
                         sandbox=sdk_sandbox,
                     )
                 else:
@@ -913,7 +919,7 @@ class CodexSdkSkillHarness(CodexExecSkillHarness):
                         approval_mode=ApprovalMode.deny_all,
                         cwd=str(execution_cwd),
                         developer_instructions=self._developer_instructions(public_bundle),
-                        model=self.model or None,
+                        model=runtime_model or None,
                         sandbox=sdk_sandbox,
                     )
                 active_provider_session_id = _trim(getattr(thread, "id", "")) or provider_session_id
@@ -928,13 +934,13 @@ class CodexSdkSkillHarness(CodexExecSkillHarness):
                 )
                 turn_options = {
                     "approval_mode": ApprovalMode.deny_all,
-                    "effort": ReasoningEffort(self.reasoning_effort),
-                    "model": self.model or None,
+                    "effort": ReasoningEffort(runtime_reasoning_effort),
+                    "model": runtime_model or None,
                     "output_schema": output_schema,
                     "personality": Personality.pragmatic,
                     "sandbox": sdk_sandbox,
                 }
-                if self._supports_reasoning_summary():
+                if self._supports_reasoning_summary(runtime_model):
                     turn_options["summary"] = ReasoningSummary.model_validate("concise")
                 turn = thread.turn(
                     turn_input,
@@ -1122,6 +1128,9 @@ class CodexSdkSkillHarness(CodexExecSkillHarness):
             sdk_sandbox = self._sdk_sandbox(Sandbox)
             codex_bin = shutil.which(self.codex_bin)
             sdk_env, isolated_home = self._sdk_runtime_env()
+            runtime_model = self._runtime_model()
+            runtime_reasoning_effort = self._runtime_reasoning_effort()
+            runtime_auth_mode = self._resolved_auth_mode()
             config = CodexConfig(
                 codex_bin=codex_bin,
                 config_overrides=self._codex_config_overrides(),
@@ -1136,8 +1145,9 @@ class CodexSdkSkillHarness(CodexExecSkillHarness):
                     "content": "codex sdk direct turn running",
                     "metadata": {
                         "stage": stage,
-                        "model": self.model or "default",
-                        "reasoning_effort": self.reasoning_effort,
+                        "model": runtime_model or "default",
+                        "reasoning_effort": runtime_reasoning_effort,
+                        "auth_mode": runtime_auth_mode,
                         "sandbox": self.sandbox,
                         "complexity": self.complexity_level,
                         "web_search": self.capabilities.web_search.value if self.capabilities else "inherited",
@@ -1153,18 +1163,18 @@ class CodexSdkSkillHarness(CodexExecSkillHarness):
                     cwd=str(self.cwd),
                     developer_instructions=developer_instructions,
                     ephemeral=True,
-                    model=self.model or None,
+                    model=runtime_model or None,
                     sandbox=sdk_sandbox,
                 )
                 turn_options = {
                     "approval_mode": ApprovalMode.deny_all,
-                    "effort": ReasoningEffort(self.reasoning_effort),
-                    "model": self.model or None,
+                    "effort": ReasoningEffort(runtime_reasoning_effort),
+                    "model": runtime_model or None,
                     "output_schema": dict(output_schema),
                     "personality": Personality.pragmatic,
                     "sandbox": sdk_sandbox,
                 }
-                if self._supports_reasoning_summary():
+                if self._supports_reasoning_summary(runtime_model):
                     turn_options["summary"] = ReasoningSummary.model_validate("concise")
                 turn = thread.turn(prompt, **turn_options)
                 turn_result = turn.run()
@@ -1266,10 +1276,60 @@ class CodexSdkSkillHarness(CodexExecSkillHarness):
                 overrides.append(f"mcp_servers.{name}.{key}={self._toml_value(value)}")
         return tuple(overrides)
 
-    def _supports_reasoning_summary(self) -> bool:
+    def _supports_reasoning_summary(self, model: str = "") -> bool:
         # The model capability is provider metadata, not a business routing
         # rule.  Spark rejects the parameter at request validation time.
-        return self.model != "gpt-5.3-codex-spark"
+        return _trim(model or self.model) != "gpt-5.3-codex-spark"
+
+    def _resolved_auth_mode(self) -> str:
+        """Resolve deployment auth without leaking it into business protocol."""
+        configured = self.auth_mode.lower().replace("-", "_")
+        aliases = {
+            "chatgpt": "subscription",
+            "crs": "crs_api_key",
+            "server": "crs_api_key",
+        }
+        configured = aliases.get(configured, configured)
+        if configured == "auto":
+            return "crs_api_key" if _trim(os.environ.get("CODEX_CRS_API_KEY")) else "subscription"
+        if configured not in {"subscription", "crs_api_key", "api_key", "access_token"}:
+            raise ValueError(f"unsupported Codex auth mode: {configured or '-'}")
+        return configured
+
+    def _runtime_model(self) -> str:
+        if self._resolved_auth_mode() == "crs_api_key":
+            return _trim(os.environ.get("CODEX_CRS_MODEL")) or self.model or "gpt-5-codex"
+        return self.model
+
+    def _runtime_reasoning_effort(self) -> str:
+        if self._resolved_auth_mode() == "crs_api_key":
+            return _trim(os.environ.get("CODEX_CRS_REASONING_EFFORT")) or self.reasoning_effort
+        return self.reasoning_effort
+
+    def _crs_config_text(self) -> str:
+        base_url = _trim(os.environ.get("CODEX_CRS_BASE_URL")) or "https://proxy.kingdomai.com/openai"
+        return (
+            f"{_FIN_AGENT_CODEX_CONFIG_MARKER}\n"
+            'model_provider = "crs"\n'
+            f"model = {self._toml_value(self._runtime_model())}\n"
+            f"model_reasoning_effort = {self._toml_value(self._runtime_reasoning_effort())}\n\n"
+            '[history]\n'
+            'persistence = "none"\n\n'
+            '[model_providers.crs]\n'
+            'name = "crs"\n'
+            f"base_url = {self._toml_value(base_url)}\n"
+            'wire_api = "responses"\n'
+            'env_key = "CODEX_CRS_API_KEY"\n'
+        )
+
+    @staticmethod
+    def _remove_managed_config(config_file: Path) -> None:
+        try:
+            content = config_file.read_text(encoding="utf-8")
+        except FileNotFoundError:
+            return
+        if content.startswith(_FIN_AGENT_CODEX_CONFIG_MARKER):
+            config_file.unlink()
 
     def _sdk_runtime_env(
         self,
@@ -1277,8 +1337,9 @@ class CodexSdkSkillHarness(CodexExecSkillHarness):
         session_id: str = "",
     ) -> tuple[Dict[str, str], Optional[tempfile.TemporaryDirectory[str]]]:
         """Isolate explicit capability runs from global Codex plugins and MCPs."""
+        auth_mode = self._resolved_auth_mode()
         env = self._sdk_env()
-        if self.capabilities is None:
+        if self.capabilities is None and auth_mode != "crs_api_key":
             return env, None
         configured_home = _trim(os.environ.get("CODEX_HOME"))
         source_home = Path(configured_home).expanduser() if configured_home else Path.home() / ".codex"
@@ -1298,9 +1359,23 @@ class CodexSdkSkillHarness(CodexExecSkillHarness):
         else:
             isolated_home = tempfile.TemporaryDirectory(prefix="fin-agent-codex-")
             isolated_path = Path(isolated_home.name)
+        config_file = isolated_path / "config.toml"
+        if auth_mode == "crs_api_key":
+            config_text = self._crs_config_text()
+            if not config_file.exists() or config_file.read_text(encoding="utf-8") != config_text:
+                config_file.write_text(config_text, encoding="utf-8")
+                try:
+                    config_file.chmod(0o600)
+                except OSError:
+                    pass
+        else:
+            self._remove_managed_config(config_file)
+
         auth_file = source_home / "auth.json"
         isolated_auth = isolated_path / "auth.json"
-        if auth_file.is_file() and not isolated_auth.exists():
+        if auth_mode != "subscription" and isolated_auth.is_symlink():
+            isolated_auth.unlink()
+        if auth_mode == "subscription" and auth_file.is_file() and not isolated_auth.exists():
             isolated_auth.symlink_to(auth_file.resolve())
         env["CODEX_HOME"] = str(isolated_path.resolve())
         return env, isolated_home
@@ -1396,13 +1471,19 @@ class CodexSdkSkillHarness(CodexExecSkillHarness):
         return _trim(match.group(1)) if match else skill_file.parent.name
 
     def _sdk_env(self) -> Dict[str, str]:
-        if self.auth_mode != "access_token":
-            return {}
-        token = _trim(os.environ.get("CODEX_ACCESS_TOKEN"))
-        return {"CODEX_ACCESS_TOKEN": token} if token else {}
+        auth_mode = self._resolved_auth_mode()
+        if auth_mode == "access_token":
+            token = _trim(os.environ.get("CODEX_ACCESS_TOKEN"))
+            return {"CODEX_ACCESS_TOKEN": token} if token else {}
+        if auth_mode == "crs_api_key":
+            api_key = _trim(os.environ.get("CODEX_CRS_API_KEY"))
+            if not api_key:
+                raise RuntimeError("CODEX_CRS_API_KEY is required when Codex auth mode is crs_api_key")
+            return {"CODEX_CRS_API_KEY": api_key}
+        return {}
 
     def _apply_auth(self, codex: Any) -> None:
-        if self.auth_mode != "api_key":
+        if self._resolved_auth_mode() != "api_key":
             return
         api_key = _trim(os.environ.get("CODEX_API_KEY") or os.environ.get("OPENAI_API_KEY"))
         if api_key:
