@@ -4,6 +4,7 @@ import json
 from pathlib import Path
 import subprocess
 import sys
+import tomllib
 from typing import Any
 
 import pytest
@@ -729,6 +730,117 @@ def test_codex_named_session_reuses_one_persistent_isolated_home(
     assert isolated_path.is_dir()
     assert (isolated_path / "auth.json").resolve() == auth_file.resolve()
     assert not (isolated_path / "config.toml").exists()
+
+
+def test_codex_auto_auth_uses_crs_key_and_writes_secret_free_provider_config(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    source_home = tmp_path / "source-codex-home"
+    source_home.mkdir()
+    (source_home / "auth.json").write_text("{}", encoding="utf-8")
+    monkeypatch.setenv("CODEX_HOME", str(source_home))
+    monkeypatch.setenv("CODEX_CRS_API_KEY", "crs-test-key")
+    monkeypatch.setenv("CODEX_CRS_BASE_URL", "https://proxy.kingdomai.com/openai")
+    monkeypatch.setenv("CODEX_CRS_MODEL", "gpt-5-codex")
+    monkeypatch.setenv("CODEX_CRS_REASONING_EFFORT", "high")
+
+    harness = CodexSdkSkillHarness(
+        model="subscription-model",
+        reasoning_effort="medium",
+        capabilities=AgentCapabilityPolicy(),
+    )
+    env, isolated_home = harness._sdk_runtime_env()
+    try:
+        isolated_path = Path(env["CODEX_HOME"])
+        config_file = isolated_path / "config.toml"
+        config_text = config_file.read_text(encoding="utf-8")
+        config = tomllib.loads(config_text)
+
+        assert harness._resolved_auth_mode() == "crs_api_key"
+        assert env["CODEX_CRS_API_KEY"] == "crs-test-key"
+        assert config["model_provider"] == "crs"
+        assert config["model"] == "gpt-5-codex"
+        assert config["model_reasoning_effort"] == "high"
+        assert config["history"]["persistence"] == "none"
+        assert config["model_providers"]["crs"] == {
+            "name": "crs",
+            "base_url": "https://proxy.kingdomai.com/openai",
+            "wire_api": "responses",
+            "env_key": "CODEX_CRS_API_KEY",
+        }
+        assert "crs-test-key" not in config_text
+        assert not (isolated_path / "auth.json").exists()
+    finally:
+        assert isolated_home is not None
+        isolated_home.cleanup()
+
+
+def test_codex_explicit_subscription_wins_over_present_crs_key(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    source_home = tmp_path / "source-codex-home"
+    source_home.mkdir()
+    auth_file = source_home / "auth.json"
+    auth_file.write_text("{}", encoding="utf-8")
+    monkeypatch.setenv("CODEX_HOME", str(source_home))
+    monkeypatch.setenv("CODEX_CRS_API_KEY", "crs-test-key")
+    harness = CodexSdkSkillHarness(
+        auth_mode="subscription",
+        capabilities=AgentCapabilityPolicy(),
+    )
+
+    env, isolated_home = harness._sdk_runtime_env()
+    try:
+        isolated_path = Path(env["CODEX_HOME"])
+        assert harness._resolved_auth_mode() == "subscription"
+        assert "CODEX_CRS_API_KEY" not in env
+        assert not (isolated_path / "config.toml").exists()
+        assert (isolated_path / "auth.json").resolve() == auth_file.resolve()
+    finally:
+        assert isolated_home is not None
+        isolated_home.cleanup()
+
+
+def test_codex_explicit_crs_mode_requires_key(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.delenv("CODEX_CRS_API_KEY", raising=False)
+    harness = CodexSdkSkillHarness(
+        auth_mode="crs_api_key",
+        capabilities=AgentCapabilityPolicy(),
+    )
+
+    with pytest.raises(RuntimeError, match="CODEX_CRS_API_KEY is required"):
+        harness._sdk_runtime_env()
+
+
+def test_codex_persistent_session_can_switch_from_crs_back_to_subscription(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    source_home = tmp_path / "source-codex-home"
+    source_home.mkdir()
+    auth_file = source_home / "auth.json"
+    auth_file.write_text("{}", encoding="utf-8")
+    session_root = tmp_path / "agent-sessions"
+    monkeypatch.setenv("CODEX_HOME", str(source_home))
+    monkeypatch.setenv("CUSTOM_TOOL_AGENT_SESSION_ROOT", str(session_root))
+    monkeypatch.setenv("CODEX_CRS_API_KEY", "crs-test-key")
+    harness = CodexSdkSkillHarness(capabilities=AgentCapabilityPolicy())
+
+    crs_env, crs_temp = harness._sdk_runtime_env(session_id="switchable-session")
+    isolated_path = Path(crs_env["CODEX_HOME"])
+    assert crs_temp is None
+    assert (isolated_path / "config.toml").exists()
+    assert not (isolated_path / "auth.json").exists()
+
+    monkeypatch.delenv("CODEX_CRS_API_KEY")
+    subscription_env, subscription_temp = harness._sdk_runtime_env(session_id="switchable-session")
+
+    assert subscription_temp is None
+    assert subscription_env["CODEX_HOME"] == crs_env["CODEX_HOME"]
+    assert not (isolated_path / "config.toml").exists()
+    assert (isolated_path / "auth.json").resolve() == auth_file.resolve()
 
 
 def test_claude_coding_permission_policy_limits_writes_and_shell(tmp_path: Path) -> None:

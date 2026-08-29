@@ -1,581 +1,356 @@
-# Fin Agent 金融业务 Skill 架构方案
+# Fin Agent Skill 体系：工作上下文、架构与核心目标
 
-> 本文只设计金融、股票、证券场景的业务 Skill。现有金融业务 Skill 视为不存在，从零规划。
+> 状态：当前工作基线与后续交接文档
 >
-> 需求理解、方案设计、流程图、Coding、测试等自定义工具开发能力属于系统 Skill，继续保留，但不纳入本文的金融业务 Skill 分类。
+> 更新日期：2026-08-19
+>
+> 对应基线提交：`a255a92`
 
-## 1. 建设目标
+## 1. 文档目的
 
-金融业务 Skill 用来完成用户能够直接识别的专业任务，例如：
+Fin Agent 已将开发拆分为四个相对独立的方向：
 
-- 分析一只股票；
-- 复盘市场和风格；
-- 根据自然语言条件选股；
-- 分析财报、估值、行业或事件；
-- 解释因子和策略表现。
+1. 主框架：CC/Codex 串联、理解、问答、上下文和前后端交互；
+2. Tool：自定义工具开发流程、工具能力和执行效率；
+3. Skill：Skill 定义、创建、优化、测试、发布、管理及 Skill Studio；
+4. 回测：回测体系和回测工具。
 
-业务 Skill 不应成为 API 使用说明、固定状态机或一组数据字段的包装。它应向 Agent 提供模型本身不稳定具备的专业方法、工具使用方式和结果质量要求。
+本文只承接第三项。它用于在切换任务或上下文后快速恢复 Skill 体系的共同认识，不重复记录完整调研过程，也不替代更详细的设计文档。
 
-整体遵循 Fin Agent 的 `SOFT → HARD → SOFT`：
+## 2. 核心目标
+
+Skill 体系的产品目标是：
+
+> 让普通用户只用自然语言描述一套专业方法，系统就能帮助其形成可审阅、可修改、可测试、可发布和可持续优化的 CC-native Skill；运行时由 Finance CC 按需选择和组合 Skill，并在真实 Tool、权限和证据边界内完成任务。
+
+一个完整 Skill 可以包含：
+
+- 作为语义主体的 `SKILL.md`；
+- 零到少量按需读取的 `references/`；
+- 系统解析出的 Tool 能力连接；
+- 相关专业方法或并列 Skill 的发现提示；
+- 由方法结构派生的工作程序图；
+- 与具体 revision 绑定的测试、发布和运行证据。
+
+用户不需要理解 Tool ID、MCP 名称、Skill 内部 ID、JSON Schema 或发布协议。
+
+## 3. 总体原则
+
+### 3.1 SOFT → HARD → SOFT
 
 ```text
-用户问题、上下文和反馈
-        ↓ SOFT
-选择适合的业务 Skill，并理解本轮真正任务
-        ↓
-调用确定性 Tool / Data API，保存必要事实和证据
-        ↓ HARD
-基于业务方法分析、解释并组织结果
-        ↓ SOFT
-自然、清晰、可追溯的金融回答
+用户目标、经验、案例和反馈（SOFT）
+  → CC 理解并形成专业方法（SOFT）
+  → 系统解析身份、revision、能力、权限和资源（HARD）
+  → Finance CC 按当前问题动态执行（SOFT）
+  → 自然语言结论、证据和场景化展示（SOFT）
 ```
 
-HARD 只用于可靠执行和保存必要事实，不用来限制自然对话：
+系统只固化跨模块衔接所必需的事实，不把专业方法拆成大型 JSON，不为了展示增加状态枚举，也不要求模型重复输出系统已经保存的 owner、revision、hash 和发布状态。
 
-- 可以稳定记录：`skill_id`、证券标识、时间范围、数据截至时间、工具调用和证据引用。
-- 不为业务表达增加 `success`、`is_error`、固定阶段状态或复杂枚举。
-- 不因为少了某个展示字段而中断任务。
-- Skill 的正式输出以结构化自然语言为主，不要求输出多层 JSON。
+### 3.2 新旧 Skill 完全隔离
 
-## 2. 调研结论
+- 新体系：`SKILL.md` 为主体，由 Finance CC 选择和执行，类型为 `business_method`。
+- 旧体系：`skill.json + schema.json + SkillRunner`，仅保留历史兼容，类型为 `legacy_compiled`。
+- 新 Studio、自然语言创建和未来发布都不得继续扩展 Legacy 执行器。
 
-### 2.1 Anthropic Financial Services
+### 3.3 Finance CC 是唯一业务组合者
 
-[anthropics/financial-services](https://github.com/anthropics/financial-services) 是目前最完整的官方金融 Skill 参考。它按照金融工作任务组织能力，而不是按照底层 API 分类，主要覆盖：
+- Finance CC 可以在同一轮选择零个、一个或少量并列 Skill。
+- Skill 不直接执行另一个 Skill，也不形成隐藏的父子调用链。
+- 相关 Skill 只表示“可能有帮助的专业方法”，不表示运行依赖或权限授权。
+- 若后续步骤必须精确消费前序结构化结果，应使用 Workflow、Tool Plan 或带 revision/evidence 的 Artifact 交接。
 
-- Equity Research：业绩分析、业绩预览、首次覆盖、研究模型更新、投资逻辑跟踪、催化剂日历；
-- Financial Analysis：可比公司、DCF、LBO、三张表、竞争分析；
-- Investment Banking、Private Equity、Wealth Management、Fund Administration 等机构场景。
+## 4. Skill、Tool、Reference 与 Workflow 的边界
 
-最值得借鉴的设计是：
+| 能力 | 承载内容 | 执行责任 |
+| --- | --- | --- |
+| 普通问答 | 单一事实、概念解释、简单比较 | Finance CC 直接回答或调用少量 Tool |
+| Skill | 可复用的专业判断方法、适用边界、证据要求和质量标准 | Finance CC 动态选择、跳过、重排和综合 |
+| Reference | 较长框架、行业变体、模板、来源政策和专业资料 | 已加载 Skill 在必要时渐进读取 |
+| Tool | 确定性查询、转换、计算或动作 | Runtime 按系统权限执行 |
+| Workflow / Tool Plan | 固定顺序、严格依赖、机器结果交接 | 系统编排器执行 |
+| Artifact | 可寻址、带 revision/as-of/evidence 的中间结果 | Agent 或 Workflow 跨阶段传递 |
+| System Skill | Tool 需求、设计、Coding、测试等平台构建能力 | 系统操作主线使用 |
 
-1. Agent 负责理解用户和组织完整任务；
-2. Skill 保存某项金融工作的专业方法；
-3. Connector / Tool 负责获取数据或执行确定性操作；
-4. 一个 Agent 只加载当前需要的 Skill 和资料。
+判断是否应该创建 Skill：
 
-部分 Skill 很长，并混入大量机构模板和美国市场假设，不适合直接复制。
+- 仅查询字段或执行公式：使用 Tool；
+- 仅是一条短原则：写入现有 Skill；
+- 长方法或行业变体：作为 Reference；
+- 高频、边界清楚、可独立触发和评测的专业任务：晋级为 Skill；
+- 有严格依赖和机器交接：使用 Workflow。
 
-### 2.2 OctagonAI Skills
+## 5. 三种资产视图
 
-[OctagonAI/skills](https://github.com/OctagonAI/skills) 将股票分析拆成行情、分析师预期、财务报表、电话会、SEC 文件、行业和估值等细分能力，并使用 Master Skill 组织叶子 Skill。
+### 5.1 Authoring Candidate
 
-可以借鉴：
+用户和 CC 共同创建、修改的不可变候选 revision，包含：
 
-- 对财报、电话会和监管文件的细分分析方法；
-- 总任务与专业方法之间的分层；
-- 针对同类资料形成稳定分析视角。
+- 完整 `SKILL.md`；
+- 可选 Reference 资源；
+- 自然语言能力意图；
+- 可选工作程序纲要；
+- 用户需求、反馈和变更摘要。
 
-不宜照搬：
+Candidate 不是 Active Skill。创建或修改 Candidate 不应获得运行权限，也不能影响线上会话。
 
-- 很多叶子 Skill 实际只是单个 Tool 的调用手册；
-- 过细拆分会让 Skill 选择、上下文和组合成本上升；
-- “查一个数据”不应该独立成为业务 Skill。
+### 5.2 Portable Bundle
 
-### 2.3 Claude Trading Skills
-
-[tradermonty/claude-trading-skills](https://github.com/tradermonty/claude-trading-skills) 提供了较完整的交易研究分类：
-
-- market-regime；
-- screening / opportunity；
-- trade-planning；
-- strategy-research；
-- performance / memory；
-- meta。
-
-其 `skills-index.yaml` 为 Skill 记录类别、输入输出、时间范围、依赖和工作流，适合参考 Skill Registry 的建设。
-
-可以借鉴分类和发现机制，但不应复制其中大量策略假设、付费数据依赖和硬编码交易规则。Registry 只服务于发现、加载和观察，不应演变成业务状态机。
-
-### 2.4 LangAlpha
-
-[ginlix-ai/LangAlpha](https://github.com/ginlix-ai/LangAlpha) 更值得借鉴运行架构：
-
-- 先给 Agent 简短的工具和 Skill 摘要；
-- Skill 被选中后才加载完整说明；
-- 大型金融资料进入 workspace，由 Agent 按需检索；
-- 批量数据通过代码处理，不直接塞入模型上下文。
-
-这与 Fin Agent 已有的 API Catalog、Context Bundle 和动态执行方式契合。业务 Skill 应说明“需要什么信息和如何分析”，具体 API 文档继续作为可检索资产，不复制进每个 Skill。
-
-### 2.5 A 股社区项目
-
-[HKUDS/Vibe-Trading](https://github.com/HKUDS/Vibe-Trading) 提供了 A 股 T+1、涨跌停、资金流和市场制度等参考；[simonlin1212/a-stock-data](https://github.com/simonlin1212/a-stock-data) 展示了 A 股数据能力封装。
-
-这些项目适合补充中国市场术语和数据需求，但社区规则必须经过本地数据协议和金融口径验证。数据查询封装仍应归类为 Tool，而不是业务 Skill。
-
-## 3. Skill、Tool 与系统 Skill 的边界
-
-### 3.1 Tool
-
-Tool 是确定性能力，输入相同且数据时点相同，结果应基本一致。
-
-例如：
-
-- 查询证券代码；
-- 获取日线、分钟线、财务报表、估值和资金流；
-- 执行已发布的动态工具；
-- 加载报告或历史中间结果；
-- 计算确定公式。
-
-`stock.quote` 是 Tool，不是业务 Skill。
-
-### 3.2 金融业务 Skill
-
-业务 Skill 负责需要语义理解、专业方法和综合判断的任务。
-
-例如：
-
-- 判断一只公司的基本面和估值是否匹配；
-- 解释市场为什么走强或走弱；
-- 将自然语言条件转化为合理的选股分析；
-- 对财报变化、催化剂和风险进行综合判断。
-
-Skill 可以调用多个 Tool，但 Tool 不主动调用 Skill。一次任务需要多个 Skill 时，由 Agent 总控选择和组织，不让 Skill 之间形成隐藏调用链。
-
-### 3.3 系统 Skill
-
-系统 Skill 负责 Fin Agent 自身的构建能力：
-
-- 金融工具需求理解与确认；
-- 模块和流程设计；
-- 流程图生成；
-- 动态模块 Coding；
-- 功能运行与静态对齐测试。
-
-它们保留在独立的 `financial-tool-development` 体系中。诸如 `financial-requirement`、`financial-test-planning` 的能力不能出现在普通金融业务 Skill 目录，也不能被普通金融问答误触发。
-
-## 4. 推荐的业务 Skill 分类
-
-分类依据是“用户希望完成的任务”，不是数据来源，也不是页面展示形式。
-
-### 4.1 市场与行业
-
-#### `market-overview`
-
-回答大盘、市场环境、风格、宽度、成交和风险偏好的综合问题。
-
-核心步骤：
-
-1. 明确市场、日期和用户关注的维度；
-2. 获取主要指数、涨跌分布、成交、风格和必要的资金数据；
-3. 区分市场事实、主要驱动和推断；
-4. 给出简洁结论、核心证据、分化和风险。
-
-#### `sector-theme-analysis`
-
-分析行业、概念或主题的表现、驱动、内部结构和代表公司。
-
-核心步骤：
-
-1. 确认行业或主题的业务边界；
-2. 分析整体表现、持续性和内部宽度；
-3. 识别领涨、补涨、分化和可能驱动；
-4. 给出代表公司、证据与需要继续观察的变量。
-
-### 4.2 个股研究
-
-#### `stock-research`
-
-对单只或少量股票进行综合研究。它是宽口径任务，不替代更专业的财报、估值或事件 Skill。
-
-核心步骤：
-
-1. 通过系统 Tool 确认证券身份；
-2. 理解用户真正关心的问题；
-3. 选择必要的行情、财务、估值、行业和事件信息；
-4. 形成核心判断、证据、反面信息和待观察事项；
-5. 明确数据时点以及事实与推断的边界。
-
-#### `earnings-analysis`
-
-分析业绩预告、定期报告或已公布财报。
-
-核心步骤：
-
-1. 确认报告期、对比基准和材料范围；
-2. 识别收入、利润、现金流、利润率和关键经营指标变化；
-3. 区分一次性因素与经营趋势；
-4. 分析超预期、低于预期或结构变化；
-5. 给出主要结论、证据、风险和后续观察点。
-
-#### `valuation-analysis`
-
-分析当前估值、历史位置和可比公司差异。
-
-核心步骤：
-
-1. 明确估值对象和适用方法；
-2. 获取价格、盈利、资产、成长和可比数据；
-3. 选择适合业务特征的估值视角；
-4. 解释估值差异背后的基本面原因；
-5. 输出估值判断、关键假设和敏感因素，不伪造精确目标价。
-
-#### `thesis-and-catalyst`
-
-形成或更新投资逻辑、催化剂与反证条件。
-
-核心步骤：
-
-1. 归纳当前投资逻辑；
-2. 提取支持证据和核心假设；
-3. 识别催化剂、时间窗口和潜在反证；
-4. 使用新事实更新原有判断；
-5. 保留哪些判断已被验证、削弱或仍待观察。
-
-### 4.3 选股、因子与策略研究
-
-#### `stock-screening`
-
-将用户的自然语言条件转化为选股过程，并解释候选结果。
-
-核心步骤：
-
-1. 理解用户真正想寻找的公司特征；
-2. 将条件整理为必要筛选、偏好条件和排序依据；
-3. 只对真正影响结果的歧义进行确认；
-4. 调用数据 Tool 或已发布动态工具执行；
-5. 展示候选、命中依据、未命中原因和数据时点。
-
-该 Skill 负责完成一次选股任务；如果用户要求创建可反复使用的新工具，应切到系统级自定义工具开发流程。
-
-#### `factor-analysis`
-
-计算、解释或比较因子，不负责开发新的动态工具。
-
-核心步骤：
-
-1. 明确因子含义、对象、时间范围和比较方式；
-2. 获取计算所需的数据；
-3. 计算因子及少量关键中间指标；
-4. 检查样本、缺失值和可比性；
-5. 解释结果代表什么、不代表什么。
-
-#### `strategy-analysis`
-
-分析已有规则或策略的逻辑、触发结果和典型案例。
-
-核心步骤：
-
-1. 理解策略目标和已有规则；
-2. 识别关键条件、依赖数据和适用环境；
-3. 执行已有策略或使用历史数据检查表现；
-4. 展示触发过程、核心指标和反例；
-5. 区分代码能否运行与策略是否有效。
-
-策略开发或修改进入系统 Skill；策略运行、解释和研究留在业务 Skill。
-
-### 4.4 文档研究
-
-#### `financial-document-analysis`
-
-分析研报、公告、财报、招股书、电话会或用户上传的金融材料。
-
-核心步骤：
-
-1. 确认用户关注的问题和材料范围；
-2. 从文档资产按需检索相关章节，不把全文塞入上下文；
-3. 提取事实、管理层表述、变化和风险；
-4. 必要时使用数据 Tool 做外部核对；
-5. 输出带来源定位的结论。
-
-首版可以用一个统一 Skill，等真实使用证明电话会、监管文件或研报需要明显不同的方法时再拆分。
-
-### 4.5 暂缓建设
-
-以下能力等产品范围和数据成熟后再决定：
-
-- 组合诊断与风险暴露；
-- 自动调仓建议；
-- 交易执行与订单管理；
-- 复杂回测研究；
-- 交易复盘和长期记忆；
-- 投行、PE、财富管理等机构工作流。
-
-不因为参考项目存在这些 Skill 就提前建设。
-
-## 5. 推荐目录结构
-
-```text
-src/skills/
-├── financial-tool-development/       # 现有系统 Skill，保持独立
-└── finance-business/                 # 新建的金融业务 Skill 根目录
-    ├── catalog.json                  # 发现和加载所需的最小注册信息
-    └── skills/
-        ├── market-overview/
-        │   ├── SKILL.md
-        │   ├── agents/openai.yaml
-        │   └── references/
-        ├── sector-theme-analysis/
-        ├── stock-research/
-        ├── earnings-analysis/
-        ├── valuation-analysis/
-        ├── thesis-and-catalyst/
-        ├── stock-screening/
-        ├── factor-analysis/
-        ├── strategy-analysis/
-        └── financial-document-analysis/
-```
-
-不按 `market/`、`research/` 再增加一层物理目录。分类保存在 Catalog 中即可，避免发现和加载路径过深。
-
-每个 Skill 只创建实际需要的文件：
+用于审阅、导入导出和兼容 CC 的目录形式：
 
 ```text
 skill-name/
 ├── SKILL.md
-├── agents/openai.yaml
-└── references/       # 只有存在专用方法或资料时才创建
+├── agents/openai.yaml       # 可选 UI 元数据
+└── references/              # 按需存在
 ```
 
-- 不创建 Skill 自己的 README、设计记录和变更日志。
-- 确定性、重复执行的计算优先成为平台 Tool；只有确有必要时才在 Skill 中增加 `scripts/`。
-- 平台 API 文档继续由统一 API Catalog 管理，不复制到 Skill。
-- 金融方法、特定口径和输出示例可以进入 `references/`，由 Skill 明确何时读取。
+第一版用户 Skill 不允许携带任意 Python、Shell 或其他可执行脚本。确定性代码进入自定义 Tool 体系。
 
-## 6. 单个 Skill 的内容规范
+### 5.3 Published Runtime Snapshot
 
-### 6.1 Frontmatter
+系统在显式发布时生成的不可变运行快照，保存或绑定：
 
-只保留标准字段：
+- `skill_id / revision / content_hash`；
+- 已解析 Tool 和相关能力引用；
+- supplemental permission grants；
+- Resource manifest、resource ID 和 hash；
+- owner、visibility、active pointer 和审计；
+- Registry revision 与会话固定的运行目录。
 
-```yaml
----
-name: stock-research
-description: 对一只或少量股票进行行情、基本面、估值、行业与风险的综合研究。用户要求分析、评价、比较某只股票，或询问其投资逻辑和主要风险时使用。
----
+Runtime Snapshot 是执行和授权事实；Portable Bundle 是可移植表达，二者不能混为同一权威来源。
+
+## 6. 两个平面
+
+```mermaid
+flowchart LR
+    U["用户自然语言目标和反馈"] --> A["Skill Authoring CC"]
+    A --> C["不可变 Candidate Revision"]
+    C --> E["Revision-bound Eval"]
+    E --> P["显式 Publish"]
+    P --> R["Tenant Skill Registry Snapshot"]
+    R --> F["Finance CC 动态选择和组合"]
+    F --> T["受控 Tool 与 Reference Loader"]
+    T --> O["自然语言结果、Evidence 与 Trace"]
+
+    H["Skill Hub / Studio"] --> C
+    H --> E
+    H --> P
 ```
 
-`description` 是主要触发依据，需要同时说明“做什么”和“什么问题应使用”，不要另外维护一套关键词规则。
+### 6.1 Authoring / Control Plane
 
-### 6.2 SKILL.md 正文
+负责自然语言创建、资源规划、能力发现、候选修订、测试、发布、回滚、归属、权限和审计。
 
-推荐控制在以下结构：
+### 6.2 Runtime Plane
 
-```markdown
-# 角色与任务
+负责会话固定 Snapshot、Skill 发现与加载、Reference 渐进读取、Tool 权限交集、working set、Evidence、Trace 和最终回答。
 
-用一段话说明专业角色、业务任务和结果目标。
+请求热路径不扫描 Skill 工作目录，不根据本机 `mtime` 判断版本，也不把 frontmatter 的 `allowed-tools` 当作真正系统授权。
 
-## 工作方法
+## 7. 当前已实现的能力
 
-用 4～6 个自然步骤说明如何完成任务。步骤表达业务方法，
-不是系统状态，也不要求每次机械地全部展示。
+### 7.1 CC-native Runtime
 
-## 工具与证据
+- `src/skills/finance-business/` 已有 11 个金融业务 Skill。
+- `FinanceBusinessSkillCatalog` 在启动或显式 reload 时编译不可变、内容寻址、只读 Snapshot。
+- Finance CC 的 Skill 子集、正文、Reference、revision 和 Tool grant 来自同一 turn snapshot。
+- `read_finance_skill_reference` 要求父 Skill 已加载、路径精确、当前用户有权访问且 revision 一致。
+- 新 `/api/skill-hub` 与 `/skills/studio` 展示 CC-native 方法；Legacy Studio 独立在 `/skills/legacy-studio`。
 
-说明应优先使用系统 Tool 获取哪些事实、如何处理时间口径、
-缺失数据和事实与推断的边界。
+### 7.2 Candidate Authoring
 
-## 回答要求
+- Studio 可以用自然语言创建私有 CC-native Candidate。
+- 可以继续用自然语言反馈生成下一不可变 revision。
+- Authoring 会读取当前已发布 Skill 和 Active Tool Registry，过滤未知能力。
+- 系统生成稳定 ASCII `skill_id`、内容 hash、能力解析结果和 Mermaid 图。
+- Candidate Store 使用 owner scope、不可变 revision 和 `base_revision_no` CAS。
+- 新建 Candidate 保持 `current_revision_no = 0`、`published = false`，不会自动激活。
 
-说明用户最终应看到的结论、证据、风险和必要限制。
-以自然语言为主，不定义复杂 Output Schema。
+### 7.3 已验证范围
 
-## 按需参考
-
-明确什么情况下读取 references 中的具体文件。
-```
-
-### 6.3 Skill 内部交互原则
-
-- 信息足够时直接完成任务，不为了展示流程而提问。
-- 缺少的信息可以用可靠默认值处理时，简要告知并继续。
-- 只有缺失信息会改变任务方向或使结果失去意义时才询问。
-- 用户反馈由 Agent 和对话上下文承接，Skill 不维护自己的状态机。
-- 用户中途换到普通金融问题，由顶层 Agent 正常路由；返回后仍可继续原任务。
-- Skill 选择不完全准确但仍可合理完成任务时，继续向目标推进，不因分类边界拒绝。
-
-### 6.4 输出原则
-
-普通金融业务 Skill 默认输出结构化自然语言：
-
-1. 先回答用户真正的问题；
-2. 给出少量最重要的证据和指标；
-3. 说明风险、反面信息或数据限制；
-4. 标注数据截至时间；
-5. 需要继续研究时，给出自然的下一步。
-
-表格、图表和卡片是 Renderer 对自然结果的表达，不反向要求 Skill 输出复杂 JSON。只有确定性 Tool 调用参数和可寻址证据使用稳定协议。
-
-## 7. Catalog 的最小设计
-
-Catalog 只用于发现 Skill、展示和加载，不决定对话能否继续。
-
-建议首版字段：
-
-```json
-{
-  "id": "stock-research",
-  "category": "equity-research",
-  "path": "skills/stock-research",
-  "description": "对一只或少量股票进行综合研究"
-}
-```
-
-字段用途：
-
-- `id`：稳定寻址；
-- `category`：目录展示和管理；
-- `path`：加载 Skill；
-- `description`：发现与语义选择；
-
-Catalog 不记录“数据充分”“部分缺失”或平台能力标签。每个 Skill 在
-`## 数据需求` 中用自然语言说明完成分析所需的核心证据、按问题补充的证据、
-增强证据和数据边界；当前系统真实可用的数据及调用方式由动态 API Catalog
-提供，Finance CC 在运行时完成匹配。Skill 不绑定具体 subject、dataview 或 API 名。
-
-暂不加入 `required_capabilities`、`maturity`、`difficulty`、`timeframe`、
-固定工作流、前置 Skill、后置 Skill、成功状态和大量输入输出字段。
-未来只有出现真实消费方时才扩展。
-
-## 8. Agent 如何使用业务 Skill
-
-推荐由 Finance CC 主会话承担自然语言总控：
-
-1. 顶层模块完成上下文指代消解，并确定进入 Finance Agent；
-2. Finance Agent 根据当前问题和 Catalog 描述选择零个、一个或少量业务 Skill；
-3. Skill 被选中后加载 `SKILL.md`；
-4. Agent 按需读取该 Skill 的 references，并调用系统 Tool；
-5. Agent 综合事实和专业方法，直接向用户回答；
-6. 系统保存工具调用、证据和必要资产，不让 Skill 重复输出系统事实。
-
-没有合适 Skill 时，Finance Agent 可以使用已有金融 Tool 正常回答，不为覆盖率强行选择 Skill。
-
-多 Skill 任务由 Agent 组织，例如“分析贵州茅台并与五粮液比较估值”可以复用股票研究和估值方法，但系统不预设固定 Skill 流程，也不让一个 Skill 隐式调用另一个 Skill。
-
-## 9. 第一阶段建设范围
-
-建议首批只建设六个 Skill：
-
-1. `market-overview`
-2. `stock-research`
-3. `stock-screening`
-4. `factor-analysis`
-5. `earnings-analysis`
-6. `sector-theme-analysis`
-
-它们覆盖当前 Fin Agent 的主要业务：
-
-- 常规金融问答；
-- 大盘、行业和个股分析；
-- 选股策略平台；
-- 因子计算和解释；
-- 财报与基本面研究。
-
-第二批优先补充高频个股任务：
-
-1. `valuation-analysis`
-2. `financial-quality-analysis`
-3. `stock-comparison`
-4. `technical-structure-analysis`
-5. `dividend-analysis`
-
-投资逻辑跟踪、策略研究和金融文档分析继续根据真实使用补充。
-
-不一次创建全部目录和空 Skill。每完成一个 Skill，就用真实问题验证后再建设下一个。
-
-## 10. 建设与验证方法
-
-### 10.1 建设前
-
-只盘点平台现有 Tool、API Catalog 和数据覆盖，不参考现有金融业务 Skill 的内容：
-
-- 当前能稳定取得哪些数据；
-- 数据时间范围和更新频率；
-- 哪些数据已有确定性 Tool；
-- 哪些业务任务存在真实数据缺口。
-
-Skill 不能凭模型记忆弥补证券代码、行情、财务或其他可查事实。
-
-### 10.2 单 Skill 验证
-
-每个 Skill 准备 5～10 个真实问题，至少覆盖：
-
-- 明确任务；
-- 信息较模糊但可以合理继续；
-- 真正需要用户补充的信息；
-- 多轮追问或修改关注点；
-- 数据不足；
-- 与相邻 Skill 容易混淆的问题。
-
-重点观察：
-
-1. 是否进入合理的 Skill；
-2. 即使选择不是最优，是否仍向用户目标推进；
-3. 是否调用正确 Tool 获取事实；
-4. 是否存在无依据结论；
-5. 输出是否简洁、有证据且真正回答问题。
-
-### 10.3 集成验证
-
-分别进行：
-
-- 单步测试：顶层路由和 Skill 选择；
-- 分阶段测试：单独验证一个业务 Skill 的执行；
-- 全链路拟真测试：根据 Agent 每轮真实返回继续对话，包括追问、切换话题和回到原任务。
-
-效果问题记录后优化 Skill；只有真实的协议、工具或主线功能问题才修改系统层。
-
-## 11. 推荐决策
-
-Fin Agent 不应建设一个数量庞大、每个数据查询都对应 Skill 的目录，也不应把所有金融能力塞进一个万能 Skill。
-
-最推荐的方案是：
-
-1. 系统 Skill 与金融业务 Skill 完全分层；
-2. 业务 Skill 按用户任务分类；
-3. 首批只建设六个高频 Skill；
-4. 每个 Skill 保持短小，以业务方法和结果要求为核心；
-5. 数据 API 作为可检索平台资产，确定性能力保留为 Tool；
-6. Finance Agent 以自然语言选择和组合 Skill，不建立固定 Skill 状态机；
-7. 用真实对话决定后续拆分，而不是预先穷举金融业务。
-
-判断一项能力是否值得成为独立 Skill 时，只问五个问题：
-
-1. 用户是否会把它作为独立任务提出？
-2. 是否需要多个步骤、数据源或专业判断？
-3. 是否存在相对稳定的金融工作方法？
-4. 是否能形成独立且可评价的业务结果？
-5. 是否与已有 Skill 有清晰不同的任务目标？
-
-多数答案为否时，它应当是 Tool、reference 或现有 Skill 的一个分析步骤，而不是新的 Skill。
-
-## 12. 首批实际落地
-
-目前已经按本文规范建立十一项业务 Skill，其中个股相关能力占主要部分：
-
-| Skill | 公开方法基础 | 当前数据适配 |
-| --- | --- | --- |
-| `market-overview` | TraderMonty 的市场环境分析，以及 Anthropic 的金融研究分层 | `index.quote`、指数成分聚合、`industry`、`plate.quote`、`plate.moneyflow` 可支持指数、宽度、行业和资金结构 |
-| `stock-research` | Anthropic Equity Research、TraderMonty US Stock Analysis | `stock.basic_info`、`quote`、`financial_3_table`、`pricevalue`、`moneyflow`、`report` 等可支持综合研究 |
-| `stock-screening` | Anthropic Idea Generation | 股票各 dataview 的筛选、排序、窗口方法以及行业、板块成分能力可支持自然语言选股 |
-| `earnings-analysis` | Anthropic Earnings Analysis | `financial_3_table`、`performance_notice`、`business_segment`、`report` 可支持报告期、业绩质量和业务结构分析 |
-| `sector-theme-analysis` | Anthropic Sector Overview | 行业、板块、成分和资金数据可支持内部结构、分化和代表公司分析 |
-| `factor-analysis` | Anthropic Idea Generation 的因子视角 | 行情、财务和确定性计算能力可支持因子计算与解释 |
-| `valuation-analysis` | Anthropic Comps Analysis 与 DCF Model | `pricevalue`、行情和财务数据可支持历史、同业和隐含预期分析 |
-| `financial-quality-analysis` | Octagon Financial Health 与 Financial Metrics | 三张表字段可支持盈利、现金流、负债、营运和效率分析 |
-| `stock-comparison` | Anthropic Comps Analysis 与 Competitive Analysis | 行业成分、个股行情、财务和估值可支持一致口径比较 |
-| `technical-structure-analysis` | TraderMonty Technical Analyst | 日线、分钟线和窗口计算可支持趋势、关键位置与量价分析 |
-| `dividend-analysis` | TraderMonty Dividend Skills | `corporate_action`、行情和财务数据可支持股息与可持续性分析 |
-
-实际文件位于：
+当前 focused regression：
 
 ```text
-src/skills/finance-business/
-├── catalog.json
-└── skills/
-    ├── market-overview/
-    ├── stock-research/
-    ├── stock-screening/
-    ├── earnings-analysis/
-    ├── sector-theme-analysis/
-    ├── factor-analysis/
-    ├── valuation-analysis/
-    ├── financial-quality-analysis/
-    ├── stock-comparison/
-    ├── technical-structure-analysis/
-    └── dividend-analysis/
+28 passed
 ```
 
-每项 Skill 均使用简短的 `SKILL.md` 定义任务和工作方法，将详细金融方法及公开实现依据放在 `references/method.md`，不复制具体 API 名称，不增加 `skill.json` 或业务输出 Schema。这样可以在数据平台变化时保持业务方法稳定，只由金融数据工具和 API Catalog 适配实际访问。
+覆盖 Candidate Authoring、Skill Hub 和 Finance Business Skill Catalog。它不代表真实 MySQL 写入、Candidate 运行、发布和激活已经端到端验证。
+
+## 8. 当前尚未闭环的部分
+
+现在是“两段可用能力尚未连通”：
+```text
+系统 Skill Runtime 已可用
+          ╳ 尚未连通
+用户 Skill Candidate Authoring 已可用
+```
+
+仍缺少：
+
+- Chat 主线中的启发式 Skill 创建会话；
+- Candidate 多文件 Reference 创建、编辑和保存；
+- Candidate-bound 测试和 with/without Skill 对比；
+- Publish Compiler 和原子 Active Pointer；
+- 用户 Skill 进入授权 Registry Snapshot；
+- 运行时 session pinning、回滚和历史追溯的完整闭环；
+- workspace/public 分享和更完整的多租户策略；
+- 跨实例发布事件、配额、限流和对象存储规模化能力；
+- 真实数据库写入与全链路运行 smoke。
+
+## 9. 已识别的核心问题
+
+### 9.1 Authoring 仍暴露内部 ID
+
+当前模型输出精确 `tool:<tool_name>` 和 `skill:<skill_id>`。目标应改为：模型表达稳定业务能力和相关方法语义，Compiler 解析真实 Tool/Skill ID、revision、availability 和 permission grant。
+
+### 9.2 所有 Skill 被强制为 2–10 步单链
+
+当前 schema 强制有序步骤，程序图也画成连续单链，容易把 Skill 固化成伪 Workflow。目标是让 `program_outline` 可选；原则型、检查表型 Skill 不必强行产生步骤。程序图只作解释性投影。
+
+### 9.3 Related Skill 容易被误解为子 Skill 调用
+
+目标语义应是 `related_method_candidates`：仅用于 Authoring 发现和 Runtime 检索提示，不自动加载、不自动扩权、不形成发布依赖。
+
+### 9.4 Reference 数量不应成为模板
+
+简单 Skill 可以没有 Reference，复杂 Skill 可以按需要拥有多份。验收重点是直接链接、读取条件、来源权限、重复和孤儿检测，以及真实专业增益、token、延迟和读取率，而不是固定数量。
+
+### 9.5 Search 能力名称与覆盖范围可能不一致
+
+`general_search` 不应直接被解释为开放 Web Search。能力目录需同时表达 capability、provider、coverage 和 availability；外部内容永远不能改变系统权限。
+
+### 9.6 文档状态存在漂移
+
+部分任务文档仍把已经实现的 Reference Loader 和 Candidate Authoring 标记为未实现。后续开发必须以代码、测试和真实运行证据为准，并同步维护“已实现 / 部分实现 / 未实现”矩阵。
+
+## 10. Skill Authoring Contract v1.1 目标草案
+
+模型只贡献本轮 SOFT 内容：
+
+```text
+skill_markdown
+capability_intents[]          # 业务能力语义，不是 Tool ID
+related_method_intents[]      # 相关专业方法语义，不是运行依赖
+program_outline[]             # 可选的解释性程序纲要
+resource_plan[]               # 可选 Reference 计划
+change_summary
+```
+
+系统持有 HARD 事实：
+
+```text
+skill_id / owner / visibility
+revision / base_revision / active_revision
+resolved_tool_refs / resolved_skill_refs
+effective_grants / unavailable_reasons
+resource_id / path / hash / size / source / auth
+content_hash / registry_revision
+eval evidence / publish audit / rollback history
+```
+
+只有 `skill_id`、revision、权限、资源身份和真正需要 Trace 寻址的锚点进入机器协议。专业步骤标题、说明、读取条件和最终回答要求继续保留为自然语言。
+
+## 11. Reference 目标规则
+
+- Creator 先形成资源计划，再生成 Candidate。
+- 简单方法默认只有 `SKILL.md`。
+- 只有长方法、行业变体、模板、证据口径或反复复用资料才拆 Reference。
+- 每个 Reference 必须由 `SKILL.md` 直接链接并说明何时读取。
+- 禁止深层引用链和孤儿资源。
+- Runtime 只允许已加载 Skill 读取当前 revision allowlist 内的资源。
+- 系统硬校验 containment、身份、大小、hash、权限和脚本禁用。
+- 专业质量、内容重复和是否值得拆分优先作为 warning 或 Eval，不用复杂字段阻断自然表达。
+
+## 12. Eval 与发布原则
+
+### 12.1 硬校验
+
+只阻止会确定性破坏执行、安全、身份或数据的错误，例如：
+
+- `SKILL.md` 无法解析或身份变化；
+- owner、base revision 或权限不合法；
+- Resource 越界、hash 不一致或携带禁用脚本；
+- 未注册能力申请、越权 Tool 或 Snapshot 编译失败。
+
+### 12.2 质量评测
+
+至少覆盖：
+
+- should trigger / should not trigger / 歧义；
+- Candidate vs Active；
+- with Skill vs without Skill；
+- Tool 权限、必要证据和失败降级；
+- Reference 是否被真正按需读取；
+- 最终回答是否为空、事实是否正确、专业增益是否明显；
+- latency、token、Tool 调用数和 Reference 读取率。
+
+A/B 必须固定同一 provider、model、Tool 环境和数据时点，不能把模型差异误判为 Skill 增益。
+
+### 12.3 发布
+
+- Candidate 永远不自动激活。
+- Publish 必须携带 `expected_active_revision` 并原子切换 Active Pointer。
+- 新会话使用新 Snapshot；已有会话默认继续固定原 revision，除非用户明确选择更新。
+- 回滚是重新指向已验证历史 revision，不修改历史内容。
+- 个人 Skill 可带质量 warning 发布；系统和共享 Skill 使用更严格 Eval Gate，但运行协议相同。
+
+## 13. 后续实施顺序
+
+### P0：冻结 Contract 和修正文档状态
+
+- 确认 Authoring Contract v1.1；
+- 将内部 Tool/Skill ID 从模型语义输出降为 Compiler 结果；
+- 将程序纲要改为可选；
+- 更新已实现/未实现矩阵。
+
+### P1：交互式 Authoring
+
+- 接入 Chat `system_operation`；
+- 先判断用户真正需要 Skill、Tool、Workflow 还是 Backtest；
+- 只在会改变资产类型或核心方法时追问；
+- Chat 与 Studio 操作同一 Candidate revision 流。
+
+### P2：Candidate References
+
+- 实现 `resource_plan → reference generation → immutable storage`；
+- Studio 展示原始 `SKILL.md`、Reference、能力解析和派生程序图；
+- 复用现有受控 Reference Loader 的权限与 revision 规则。
+
+### P3：Candidate-bound Eval
+
+- 固定 revision 执行触发、权限、结果和对比评测；
+- 保存真实 final answer、Trace、Evidence、成本和延迟；
+- 支持失败 Case 回灌下一 revision。
+
+### P4：Publish 与 Runtime 闭环
+
+- owner 校验、CAS Active Pointer、不可变包编译；
+- 用户 Skill 进入授权 Registry Snapshot；
+- session pinning、发布事件、回滚和历史追溯。
+
+### P5：分享与规模化
+
+- personal/workspace/public；
+- 跨实例一致性、限流、配额、对象存储和孤立资源回收；
+- 继续优化 Studio 交互，但不扩张核心业务协议。
+
+## 14. 下一任务的建议起点
+
+优先完成“Skill Authoring Contract v1.1 + Candidate References 的最小纵切面”，暂不先做复杂 Studio UI。
+
+第一步应重新核对并统一以下文件：
+
+- `docs/skill_system_v2_architecture.md`
+- `docs/skill_authoring_candidate_v1.md`
+- `docs/development_tasks/skill_system.md`
+- `src/skills/skill-system/skills/skill-authoring/SKILL.md`
+- `src/skills/skill-system/skills/skill-authoring/schema.json`
+- `src/services/skill_authoring_service.py`
+- `src/services/skill_candidate_store_service.py`
+- `src/scenarios/financial_qa/business_skills.py`
+- `src/scenarios/financial_qa/tools.py`
+- `src/web/templates/skill_studio_v2.html`
+
+实施时继续坚持：语义交给 SOFT，衔接交给 HARD；Skill 不变成 Mini-Agent，程序图不变成固定 DAG，模型建议不等于系统授权，Candidate 不等于已发布或运行成功。
