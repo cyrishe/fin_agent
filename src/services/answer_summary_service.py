@@ -78,6 +78,31 @@ class AnswerSummaryService:
                 f"{self._semantic_preview(assistant_output_text)} "
                 "完成度：回答已结束。"
             )
+        if bool(output_payload.get("data_only")):
+            data = (
+                output_payload.get("data")
+                if isinstance(output_payload.get("data"), dict)
+                else {}
+            )
+            results = data.get("results") if isinstance(data.get("results"), list) else []
+            result_summaries: list[str] = []
+            for item in results[:4]:
+                if not isinstance(item, dict):
+                    continue
+                label = self._trim(item.get("goal") or item.get("api")) or "数据结果"
+                row_count = item.get("row_count")
+                count_text = (
+                    f"{row_count} 行"
+                    if isinstance(row_count, int) and not isinstance(row_count, bool)
+                    else ""
+                )
+                result_summaries.append(
+                    "，".join(part for part in (label, count_text) if part)
+                )
+            if result_summaries:
+                return self._semantic_preview(
+                    f"仅取数完成：{'；'.join(result_summaries)}。完成度：数据查询已结束。"
+                )
         mode = self._trim(output_payload.get("mode"))
         if mode == "tool_plan_completed":
             return "本轮已完成任务规划、工具执行与结果汇总。完成度：执行已结束。"

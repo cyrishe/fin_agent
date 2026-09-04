@@ -840,7 +840,11 @@ class ClaudeSdkSkillHarness(AgentSkillHarnessSupport):
         if expected:
             return expected
         if self.provider == "dashscope":
-            endpoint = supplied or DASHSCOPE_ANTHROPIC_BASE_URL
+            endpoint = (
+                supplied
+                or _trim(os.environ.get("DASHSCOPE_ANTHROPIC_BASE_URL"))
+                or DASHSCOPE_ANTHROPIC_BASE_URL
+            )
             if not self._is_trusted_dashscope_endpoint(endpoint):
                 raise ValueError("dashscope credentials require an official Alibaba Cloud Anthropic endpoint")
             return endpoint.rstrip("/")

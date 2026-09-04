@@ -122,7 +122,7 @@ class LlmStreamBlockBuilder:
         if not content and event_type not in {"agent_delta", "turn_started", "turn_completed", "stage_start", "stage_result", "context_ready", "final"}:
             return []
 
-        slow_agent_source = source in {"codex", "claude"}
+        slow_agent_source = source in {"codex", "claude", "deepseek_harness"}
         if slow_agent_source and event_type == "event" and content == "item/started":
             item = metadata.get("item") if isinstance(metadata.get("item"), Mapping) else {}
             item_id = _trim(item.get("id"))

@@ -1467,11 +1467,23 @@ def test_coding_subject_asset_expands_method_contracts(tmp_path: Path) -> None:
         assert method["examples"], method["name"]
         assert not any("r1 =" in example for example in method["examples"])
 
+    margin = json.loads(
+        Path(bundle["bundle_dir"], "api_catalog/subjects/stock/margin.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    margin_methods = {method["name"]: method for method in margin["methods"]}
+    assert "历史明细" in "".join(margin_methods["stock.margin"]["guidance"])
+    assert "K 日窗口" in "".join(
+        margin_methods["stock.margin.kd_<field>_<method>"]["guidance"]
+    )
+
     api_index = json.loads(
         Path(bundle["bundle_dir"], "api_catalog/index.json").read_text(
             encoding="utf-8"
         )
     )
+    assert all("rules" not in subject for subject in api_index["subjects"])
     for subject in api_index["subjects"]:
         for dataview in subject["dataviews"]:
             asset = json.loads(
@@ -1482,6 +1494,32 @@ def test_coding_subject_asset_expands_method_contracts(tmp_path: Path) -> None:
             assert asset["methods"], dataview["file"]
             for method in asset["methods"]:
                 assert method["examples"], method["name"]
+
+    plate = json.loads(
+        Path(
+            bundle["bundle_dir"],
+            "api_catalog/subjects/plate/basic_info.json",
+        ).read_text(encoding="utf-8")
+    )
+    assert any(
+        "plate_name = 名称" in rule for rule in plate["subject_guidance"]
+    )
+
+
+def test_context_bundle_default_catalog_is_independent_of_process_cwd(
+    tmp_path: Path,
+    monkeypatch,
+) -> None:
+    monkeypatch.chdir(tmp_path)
+    service = CustomToolContextBundleService(root_dir=str(tmp_path / "bundles"))
+
+    bundle = service.build(stage="coding", user_request="实现行情工具", context={})
+    api_index = json.loads(
+        Path(bundle["bundle_dir"], bundle["api_index"]).read_text(encoding="utf-8")
+    )
+
+    assert Path(api_index["source_catalog"]).is_absolute()
+    assert {item["subject"] for item in api_index["subjects"]} >= {"stock", "fund"}
 
 
 def test_context_state_cleanup_preserves_system_owned_feedback_history() -> None:

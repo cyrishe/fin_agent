@@ -87,6 +87,25 @@ def test_finance_data_catalog_builds_subject_dataview_function_tree() -> None:
     assert "quote" in stock_views
     assert any(item["api_name"] == "stock.margin" for item in stock_views["margin"]["functions"])
     assert any(item["api_class"] == "kday_margin_metric" for item in stock_views["margin"]["functions"])
+    assert {"report", "report_metric"} <= set(stock_views)
+    assert {item["api_name"] for item in stock_views["report"]["functions"]} == {
+        "stock.report",
+        "stock.report.agg",
+    }
+    assert {
+        item["api_name"] for item in stock_views["report_metric"]["functions"]
+    } == {"stock.report_metric", "stock.report_metric.agg"}
+    assert stock_views["report"]["aggregate_fields"]["report_id"] == ["count"]
+    assert set(stock_views["report_metric"]["value_domains"]["metric_code"]) == {
+        "eps",
+        "np_parent",
+        "np_parent_growth",
+        "pb",
+        "pe",
+        "revenue",
+        "revenue_growth",
+        "roe",
+    }
 
     hot_event_views = {item["name"]: item for item in subjects["hot_event"]["dataviews"]}
     assert {"base_info", "state", "member"} <= set(hot_event_views)
@@ -129,6 +148,11 @@ def test_finance_data_catalog_saves_single_dataview_node(tmp_path: Path) -> None
     assert [item["name"] for item in saved["fields"]] == ["code", "name"]
     raw = json.loads(catalog_path.read_text(encoding="utf-8"))
     assert raw["subjects"]["stock"]["margin"]["desc"] == "updated margin desc"
+    assert "route_summary" not in raw["subjects"]["stock"]["margin"]
+    assert saved["route_summary"] == saved["desc"]
+    assert "历史明细" in "".join(
+        raw["subjects"]["stock"]["margin"]["api"][0]["guidance"]
+    )
 
 
 @requires_kingdomai

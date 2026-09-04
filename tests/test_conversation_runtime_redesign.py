@@ -533,6 +533,40 @@ def test_answer_summary_fallback_preserves_object_date_and_value_without_llm():
     assert "1,274.76" in result["answer_summary"]
 
 
+def test_answer_summary_fallback_keeps_data_only_context_bounded_and_semantic():
+    service = AnswerSummaryService()
+
+    result = service.summarize(
+        raw_user_text="只取宁德时代和阳光电源最近交易日收盘价",
+        assistant_output_text="",
+        output_payload={
+            "mode": "financial_qa_dsh",
+            "data_only": True,
+            "data": {
+                "format": "row-dict",
+                "results": [
+                    {
+                        "goal": "取得两只股票最近交易日收盘价",
+                        "api": "stock.quote",
+                        "row_count": 2,
+                        "rows": [
+                            {"name": "阳光电源", "close": 89.33},
+                            {"name": "宁德时代", "close": 358.10},
+                        ],
+                    }
+                ],
+            },
+        },
+        enable_llm=False,
+    )
+
+    assert result["source"] == "fallback"
+    assert "取得两只股票最近交易日收盘价" in result["answer_summary"]
+    assert "2 行" in result["answer_summary"]
+    assert "89.33" not in result["answer_summary"]
+    assert len(result["answer_summary"]) <= service.FALLBACK_SUMMARY_MAX_CHARS
+
+
 def test_conversation_preprocess_selects_default_assistant_for_general_business_query():
     service = ConversationPreprocessService(
         interaction_preprocessor=_StubGeneralBusinessInteractionPreprocessor(),

@@ -14,7 +14,7 @@
   ],
   "defaults": {},
   "identity": {
-    "description": "兼容查询公司、行业、板块、主题或事件相关新闻；新个股查询优先使用 stock.news。",
+    "description": "兼容查询公司、行业、板块、主题或事件相关新闻；新查询统一使用 general_search。",
     "display_name": "金融新闻查询",
     "domain": "news",
     "owner": "tools"

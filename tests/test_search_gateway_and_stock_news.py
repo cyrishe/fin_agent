@@ -172,7 +172,7 @@ def test_gateway_provider_is_selected_by_config_without_changing_call_contract()
     assert result["coverage"] == "web"
 
 
-def test_stock_news_runs_through_finance_api_and_preserves_identity(monkeypatch):
+def test_legacy_stock_news_provider_preserves_identity(monkeypatch):
     class _Gateway:
         def search(self, **kwargs):
             assert kwargs["query"] == "贵州茅台 600519.SH"
@@ -198,22 +198,18 @@ def test_stock_news_runs_through_finance_api_and_preserves_identity(monkeypatch)
             }
 
     monkeypatch.setattr(news_provider, "SearchGatewayService", _Gateway)
-    call = ApiCall(
-        result_id="r1",
-        api="stock.news",
+    result = news_provider.execute_stock_news_api(
         args={
             "filter": "code = 600519.SH and publish_time >= 2026-07-01",
             "order": "publish_time desc",
             "limit": 10,
         },
         outputs=["code", "name", "publish_time", "source", "title", "url"],
-        raw="",
     )
-    result = execute_api_call(call)
 
-    assert result.data["status"] == "ok"
-    assert result.data["coverage"] == "internal_news"
-    assert result.data["rows"] == [
+    assert result["status"] == "ok"
+    assert result["coverage"] == "internal_news"
+    assert result["rows"] == [
         {
             "code": "600519.SH",
             "name": "贵州茅台",
@@ -223,6 +219,20 @@ def test_stock_news_runs_through_finance_api_and_preserves_identity(monkeypatch)
             "url": "https://example.test/a1",
         }
     ]
+
+
+def test_stock_news_is_not_a_public_finance_catalog_api():
+    call = ApiCall(
+        result_id="r1",
+        api="stock.news",
+        args={"filter": "code = 600519.SH", "limit": 10},
+        outputs=["title", "url"],
+        raw="",
+    )
+
+    result = execute_api_call(call)
+
+    assert result.data["status"] == "prepared"
 
 
 def test_stock_news_requires_a_search_subject():

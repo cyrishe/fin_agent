@@ -193,6 +193,50 @@ class SessionVariableStoreService:
             raise ValueError("registered tool result must be an object")
         return payload
 
+    def materialize_data_ref(
+        self,
+        *,
+        session_id: str,
+        data_ref: str,
+    ) -> dict[str, Any]:
+        """Return the complete normalized value behind an internal data ref.
+
+        This projection is intended for an API response or another server-side
+        consumer. Agent prompts must continue to use the bounded manifest and
+        sample returned by ``format_variables_for_prompt``/``load_data_ref``.
+        """
+
+        expected_session_id = self._safe_id(session_id, prefix="sess")
+        ref_session_id, _ = self.parse_data_ref(data_ref)
+        if not expected_session_id or ref_session_id != expected_session_id:
+            raise ValueError("data_ref does not belong to the current conversation")
+        manifest = self.resolve_data_ref(data_ref)
+        registered = self.load_registered_result(
+            session_id=session_id,
+            data_ref=data_ref,
+        )
+        extracted = self._extract_payload(
+            tool_name=str(manifest.get("tool_name") or ""),
+            result=registered,
+        )
+        data_type = str(extracted.get("data_type") or manifest.get("data_type") or "")
+        response: dict[str, Any] = {
+            "manifest": self._public_summary(manifest),
+            "data_type": data_type,
+        }
+        if data_type == "table":
+            response["rows"] = [
+                dict(row)
+                for row in extracted.get("rows") or []
+                if isinstance(row, Mapping)
+            ]
+            response["row_count"] = extracted.get("row_count")
+        elif data_type == "document":
+            response["text"] = str(extracted.get("text") or "")
+        else:
+            response["value"] = dict(extracted.get("object") or {})
+        return response
+
     def format_variables_for_prompt(self, *, session_id: str) -> str:
         rows = self.list_variables(session_id=session_id)
         blocks: list[str] = []

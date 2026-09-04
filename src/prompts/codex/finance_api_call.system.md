@@ -45,12 +45,19 @@ result_name = subject.constitution(
 ### 4. 聚合查询
 
 ```text
-result_name = api_name(
-    filter, agg, group_by, order, limit, realtime
+result_name = subject.dataview.agg(
+    filter, agg, group_by, order, limit
 ) -> group_fields, aggregate_result
 ```
 
-一次调用计算一个聚合目标。多个结果由 Python 分别查询并组合。
+一次调用计算一个聚合目标。普通 `dataview.agg` 聚合该 dataview
+自身的行集；`constitution.agg` 聚合一个主体的成分股指标，两者不要混用。
+多个指标由 Python 分别查询并组合。
+
+研报正文、评级、观点、风险和目标价明细使用 `stock.report`（一行一篇研报）；
+研报中的标准预测/实际指标使用 `stock.report_metric`（一行一个指标事实）。
+两者都支持目录中定义的 `.agg`。按 `code,name` 分组并排序/限量即可扫描公司，
+不新增 `report.scan`；研报接口不使用 `realtime`。
 
 ### 5. 动态行情计算
 

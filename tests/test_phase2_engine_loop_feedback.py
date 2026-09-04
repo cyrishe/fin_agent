@@ -321,6 +321,12 @@ def test_margin_context_exposes_base_and_kday_api():
 
     assert "`stock.margin`" in sections["available_apis"]
     assert "`stock.margin.kd_<field>_<method>`" in sections["available_apis"]
+    assert "r1 = stock.margin(" in sections["available_apis"]
+    assert "r1 = stock.margin.kd_financing_net_buy_sum(" in sections["available_apis"]
+    assert "operation_guidance" in sections["available_apis"]
+    assert "查询融资融券历史明细时同时传start和end" in sections["available_apis"]
+    assert "K 日窗口方法使用 stock.margin.kd_<field>_<method>" in sections["available_apis"]
+    assert "fund.quote" not in sections["available_apis"]
     assert "financing_balance: sum, avg, max, min, median, change, pct_change" in sections["current_dataview"]
     assert "financing_balance: 融资余额（元）" in sections["current_dataview"]
 
