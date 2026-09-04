@@ -155,6 +155,9 @@ def create_app(
         ).split(",")
         if item.strip()
     ]
+    root_path = str(os.environ.get("FINANCE_API_ROOT_PATH") or "").strip()
+    if root_path:
+        root_path = "/" + root_path.strip("/")
 
     mcp = FastMCP(
         "fin-agent-finance",
@@ -280,6 +283,7 @@ def create_app(
             "Independent financial question-answering and structured-data service. "
             "Query endpoints and the MCP transport require an API key."
         ),
+        root_path=root_path,
         lifespan=lifespan,
     )
 
@@ -345,8 +349,9 @@ def create_app(
         return await call_next(request)
 
     @app.get("/", include_in_schema=False)
-    async def root() -> RedirectResponse:
-        return RedirectResponse(url="/data-map")
+    async def root(request: Request) -> RedirectResponse:
+        public_root = str(request.scope.get("root_path") or "").rstrip("/")
+        return RedirectResponse(url=f"{public_root}/data-map")
 
     @app.get("/health", tags=["system"])
     async def health() -> dict[str, Any]:

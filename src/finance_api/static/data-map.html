@@ -110,9 +110,9 @@
       <p id="catalog-meta">正在读取当前数据目录……</p>
     </div>
     <nav aria-label="API文档">
-      <a href="/docs">交互式 API 文档</a>
-      <a href="/openapi.json">OpenAPI JSON</a>
-      <a href="/data-map/catalog.json">Catalog JSON</a>
+      <a href="docs">交互式 API 文档</a>
+      <a href="openapi.json">OpenAPI JSON</a>
+      <a href="data-map/catalog.json">Catalog JSON</a>
     </nav>
   </header>
   <main>
@@ -337,7 +337,7 @@
 
       async function initialize() {
         try {
-          const response = await fetch('/data-map/catalog.json');
+          const response = await fetch('data-map/catalog.json');
           if (!response.ok) throw new Error(`HTTP ${response.status}`);
           const catalog = await response.json();
           metaElement.textContent = `${catalog.subject_count} 类数据主体 · ${catalog.dataview_count} 个业务视图 · Catalog ${catalog.version}`;

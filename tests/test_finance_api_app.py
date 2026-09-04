@@ -73,6 +73,22 @@ def test_public_health_catalog_and_data_map() -> None:
         assert "data-action=\"expand\"" in page.text
 
 
+def test_reverse_proxy_root_path_is_reflected_in_redirects_and_docs(monkeypatch) -> None:
+    monkeypatch.setenv("FINANCE_API_ROOT_PATH", "/finance/")
+    client, _ = _client()
+    with client:
+        root = client.get("/", follow_redirects=False)
+        assert root.status_code == 307
+        assert root.headers["location"] == "/finance/data-map"
+
+        schema = client.get("/openapi.json").json()
+        assert schema["servers"] == [{"url": "/finance"}]
+
+        page = client.get("/data-map")
+        assert 'href="docs"' in page.text
+        assert "fetch('data-map/catalog.json')" in page.text
+
+
 def test_protected_rest_query_and_answer_modes() -> None:
     client, gateway = _client()
     with client:

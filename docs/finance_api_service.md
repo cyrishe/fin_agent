@@ -93,6 +93,10 @@ python -m src.finance_api.app
 一个 Uvicorn worker；横向扩容时增加容器或 systemd 实例，不在同一实例中复制多套
 DSH worker pool。
 
+如果 Nginx 在 `/finance/` 之类的子路径发布服务并在转发时去掉前缀，设置
+`FINANCE_API_ROOT_PATH=/finance`。OpenAPI、重定向和数据体系页面会保留此外部前缀；
+内部路由仍保持 `/health`、`/mcp` 和 `/v1/...`，无需复制一套接口。
+
 ### 8C/16GB、10 个同时请求
 
 建议起始配置：
