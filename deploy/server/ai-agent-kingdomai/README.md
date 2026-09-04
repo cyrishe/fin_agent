@@ -86,7 +86,7 @@ diff -u \
 确认后由有 sudo 权限的用户执行：
 
 ```bash
-nginx -t -c \
+sudo nginx -t -c \
   /home/che/cyris/fin_agent/deploy/server/ai-agent-kingdomai/nginx-candidate-test.conf
 sudo cp /home/che/cyris/fin_agent_deploy/nginx/ngx.conf.candidate \
   /etc/nginx/conf.d/ngx.conf
