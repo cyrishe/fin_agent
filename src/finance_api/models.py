@@ -2,12 +2,13 @@ from __future__ import annotations
 
 from typing import Any, Literal
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 
 FinanceResponseMode = Literal["data", "summary", "both"]
 FinanceRuntime = Literal["cc", "dsh"]
 FinanceResearchMode = Literal["fast", "auto", "deep"]
+FinanceExecutionMode = Literal["standard", "fast"]
 
 
 class FinanceQueryRequest(BaseModel):
@@ -37,6 +38,13 @@ class FinanceQueryRequest(BaseModel):
         default="fast",
         description="Answer depth for summary generation. It does not change the underlying data contract.",
     )
+    execution_mode: FinanceExecutionMode = Field(
+        default="standard",
+        description=(
+            "DSH orchestration policy. fast performs only API discovery, call generation, "
+            "and return, without agentic inspection, repair, retry, or result paging."
+        ),
+    )
     conversation_id: str | None = Field(
         default=None,
         min_length=1,
@@ -61,6 +69,12 @@ class FinanceQueryRequest(BaseModel):
             raise ValueError("query must not be blank")
         return normalized
 
+    @model_validator(mode="after")
+    def validate_execution_runtime(self) -> "FinanceQueryRequest":
+        if self.runtime == "cc" and self.execution_mode == "fast":
+            raise ValueError("execution_mode=fast 当前仅支持 runtime=dsh")
+        return self
+
 
 class FinanceAnswerRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
@@ -68,6 +82,7 @@ class FinanceAnswerRequest(BaseModel):
     query: str = Field(min_length=1, max_length=4_000)
     runtime: FinanceRuntime | None = None
     research_mode: FinanceResearchMode = "fast"
+    execution_mode: FinanceExecutionMode = "standard"
     conversation_id: str | None = Field(
         default=None,
         min_length=1,
@@ -88,16 +103,32 @@ class FinanceAnswerRequest(BaseModel):
             raise ValueError("query must not be blank")
         return normalized
 
+    @model_validator(mode="after")
+    def validate_execution_runtime(self) -> "FinanceAnswerRequest":
+        if self.runtime == "cc" and self.execution_mode == "fast":
+            raise ValueError("execution_mode=fast 当前仅支持 runtime=dsh")
+        return self
+
 
 class FinanceApiError(BaseModel):
     code: str
     message: str
 
 
+class FinanceDataSource(BaseModel):
+    """Business-facing provenance for one executed data goal."""
+
+    label: str
+    data_object: str
+    data_type: str
+    description: str = ""
+    query_goal: str
+    row_count: int = 0
+
+
 class FinanceResultPage(BaseModel):
     result_name: str
     goal: str
-    api: str
     data_type: str = "table"
     schema_: dict[str, Any] = Field(default_factory=dict, alias="schema")
     row_count: int = 0
@@ -124,7 +155,6 @@ class FinanceExecutionMetadata(BaseModel):
     total_rows: int = 0
     returned_rows: int = 0
     truncated: bool = False
-    apis: list[str] = Field(default_factory=list)
 
 
 class FinanceQueryResponse(BaseModel):
@@ -135,7 +165,9 @@ class FinanceQueryResponse(BaseModel):
     query: str
     response_mode: FinanceResponseMode
     runtime: FinanceRuntime
+    execution_mode: FinanceExecutionMode = "standard"
     conversation_id: str | None = None
+    data_sources: list[FinanceDataSource] = Field(default_factory=list)
     summary: str | None = None
     data: FinanceDataPayload | None = None
     execution: FinanceExecutionMetadata

@@ -5,8 +5,10 @@ import json
 import threading
 import time
 from concurrent.futures import ThreadPoolExecutor
+from datetime import datetime
 from pathlib import Path
 from types import SimpleNamespace
+from zoneinfo import ZoneInfo
 
 import pytest
 
@@ -68,6 +70,18 @@ def test_financial_runtime_is_explicit_and_defaults_to_cc() -> None:
         normalize_financial_qa_runtime("auto")
 
 
+def test_web_chat_runtime_uses_configured_default_and_keeps_request_override(
+    monkeypatch,
+) -> None:
+    from src.web import flask_app as web
+
+    monkeypatch.setenv("FINANCE_CHAT_DEFAULT_RUNTIME", "dsh")
+
+    assert web._normalize_chat_financial_qa_runtime(None) == "dsh"
+    assert web._normalize_chat_financial_qa_runtime("") == "dsh"
+    assert web._normalize_chat_financial_qa_runtime("cc") == "cc"
+
+
 def test_dsh_reasoning_effort_defaults_low_and_validates_env(
     monkeypatch, tmp_path: Path
 ) -> None:
@@ -95,7 +109,7 @@ def test_dsh_reasoning_effort_defaults_low_and_validates_env(
         )
 
 
-def test_dsh_uses_server_specific_key_and_endpoint_before_legacy_env(
+def test_dsh_uses_canonical_llm_model_route(
     monkeypatch, tmp_path: Path
 ) -> None:
     captured: list[dict] = []
@@ -106,11 +120,18 @@ def test_dsh_uses_server_specific_key_and_endpoint_before_legacy_env(
 
     monkeypatch.setenv("DEEPSEEK_API_KEY", "personal-key")
     monkeypatch.setenv("DEEPSEEK_BASE_URL", "https://personal.example/v1")
-    monkeypatch.setenv("FINANCE_DSH_API_KEY", "server-key")
+    monkeypatch.setenv("FINANCE_DSH_API_KEY", "obsolete-runtime-key")
     monkeypatch.setenv(
         "FINANCE_DSH_BASE_URL",
+        "https://obsolete-runtime.example/v1",
+    )
+    monkeypatch.setenv("FINANCE_DSH_MODEL", "obsolete-runtime-model")
+    monkeypatch.setenv("LLM_API_KEY", "server-key")
+    monkeypatch.setenv(
+        "LLM_BASE_URL",
         "https://dashscope.aliyuncs.com/compatible-mode/v1",
     )
+    monkeypatch.setenv("LLM_DEFAULT_MODEL", "server-model")
     service = FinanceDeepSeekHarnessSessionService(
         enabled=False,
         root_dir=tmp_path / "runtime",
@@ -124,6 +145,25 @@ def test_dsh_uses_server_specific_key_and_endpoint_before_legacy_env(
     assert captured[0]["base_url"] == (
         "https://dashscope.aliyuncs.com/compatible-mode/v1"
     )
+    assert captured[0]["model"] == "server-model"
+
+
+def test_dsh_prompt_injects_the_current_business_date(tmp_path: Path) -> None:
+    service = FinanceDeepSeekHarnessSessionService(
+        enabled=False,
+        root_dir=tmp_path / "runtime",
+        worker_count=1,
+    )
+
+    prompt = service._prompt(
+        "查询最近三个月的研报",
+        runtime_context={},
+        working_set="",
+    )
+
+    today = datetime.now(ZoneInfo("Asia/Shanghai")).date().isoformat()
+    assert f"当前日期为 {today}（Asia/Shanghai）" in prompt
+    assert "以此日期计算" in prompt
 
 
 def test_dsh_loop_observability_reads_stable_message_prompt_and_token_cap() -> None:
@@ -210,12 +250,16 @@ def test_financial_qa_service_delegates_only_the_selected_runtime() -> None:
         user_text="茅台收盘价",
         dispatch_plan=_plan(),
         runtime="dsh",
+        execution_mode="fast",
     )
 
     assert not cc.calls
     assert len(dsh.calls) == 1
     assert result["mode"] == "financial_qa_dsh"
     assert result["financial_qa"]["runtime"] == "dsh"
+    assert result["financial_qa"]["execution_mode"] == "fast"
+    assert result["execution_mode"] == "fast"
+    assert dsh.calls[0]["context"]["_finance_execution_mode"] == "fast"
     assert result["financial_qa"]["loop_policy"]["request_count"] == 3
     assert result["financial_qa"]["prompt_assets"]["stage_policy"]["sha256"] == (
         "stage-revision"
@@ -315,6 +359,54 @@ def test_financial_qa_returns_full_row_dict_data_and_can_suppress_summary(
         for block in data_only["surface_blocks"]
     )
     assert session.calls[-1]["context"]["_finance_data_only"] is True
+
+
+def test_all_zero_results_use_a_grounded_boundary_summary() -> None:
+    class _ZeroSession(_Session):
+        def run_turn(self, **kwargs):
+            self.calls.append(kwargs)
+            return {
+                "session_id": "zero-session",
+                "result": (
+                    "模型自行补写了公司背景、其他年份数字和未查询来源建议。"
+                ),
+                "error": "",
+                "result_refs": [
+                    {
+                        "result_name": "r1",
+                        "goal": "查询目标公司指定期间的出货量",
+                        "api": "stock.report",
+                        "result_ref": "session://zero-session/vars/v1",
+                        "data_type": "table",
+                        "row_count": 0,
+                        "schema": {"columns": []},
+                        "sample": {"rows": []},
+                        "sample_complete": True,
+                    }
+                ],
+            }
+
+    service = FinancialQaCcService(
+        enabled=True,
+        session_service=_Session("cc"),
+        dsh_session_service=_ZeroSession("dsh"),
+    )
+    result = service.answer(
+        thread_id=7,
+        turn_id=8,
+        owner_id="owner-a",
+        user_text="目标公司该期间出货量是多少？",
+        dispatch_plan=_plan(),
+        runtime="dsh",
+    )
+
+    assert result["summary"] == (
+        "本次已查询：查询目标公司指定期间的出货量。"
+        "当前数据范围与查询条件下返回 0 条记录，"
+        "因此无法从现有结果给出所问数值。"
+    )
+    assert "公司背景" not in result["summary"]
+    assert "未查询来源" not in result["summary"]
 
 
 def test_dsh_mcp_bridge_exposes_only_financial_data_query_tools(tmp_path: Path) -> None:
@@ -555,6 +647,7 @@ def test_dsh_trace_uses_the_revision_pinned_when_tools_were_built(
 
 def test_dsh_session_reuses_worker_and_projects_trace(tmp_path: Path) -> None:
     created: list[object] = []
+    observed_contexts: list[dict] = []
 
     class _Harness:
         def __init__(self, **kwargs) -> None:
@@ -566,6 +659,7 @@ def test_dsh_session_reuses_worker_and_projects_trace(tmp_path: Path) -> None:
             context_path = Path(self.kwargs["env"]["FIN_AGENT_DSH_CONTEXT_PATH"])
             trace_path = Path(self.kwargs["env"]["FIN_AGENT_DSH_TRACE_PATH"])
             context = json.loads(context_path.read_text(encoding="utf-8"))
+            observed_contexts.append(context)
             trace_path.write_text(
                 json.dumps(
                     {
@@ -626,6 +720,7 @@ def test_dsh_session_reuses_worker_and_projects_trace(tmp_path: Path) -> None:
         turn_id=1,
         owner_id="owner-a",
         user_text="贵州茅台最近收盘价",
+        context={"_finance_execution_mode": "fast"},
     )
     second = service.run_turn(
         thread_id=7,
@@ -636,7 +731,11 @@ def test_dsh_session_reuses_worker_and_projects_trace(tmp_path: Path) -> None:
 
     assert len(created) == 1
     assert first["resumed"] is False
+    assert first["execution_mode"] == "fast"
     assert second["resumed"] is True
+    assert second["execution_mode"] == "standard"
+    assert observed_contexts[0]["tool_context"]["_finance_execution_mode"] == "fast"
+    assert observed_contexts[1]["tool_context"]["_finance_execution_mode"] == "standard"
     assert first["tool_calls"][0]["api"] == "stock.quote"
     assert first["result_refs"][0]["result_ref"] == "session://dsh/vars/v1"
     assert first["llm_usage"] == {
@@ -669,6 +768,161 @@ def test_dsh_session_reuses_worker_and_projects_trace(tmp_path: Path) -> None:
     assert created[0].kwargs["reasoning_effort"] == "low"
     service.close()
     assert created[0].closed is True
+
+
+def test_dsh_progress_uses_business_sources_and_real_query_counts(
+    tmp_path: Path,
+) -> None:
+    class _Harness:
+        def __init__(self, **kwargs) -> None:
+            self.kwargs = kwargs
+
+        def run(self, prompt, *, session_id, on_notification):
+            context = json.loads(
+                Path(self.kwargs["env"]["FIN_AGENT_DSH_CONTEXT_PATH"])
+                .read_text(encoding="utf-8")
+            )
+
+            def notify(event):
+                on_notification(
+                    SimpleNamespace(
+                        method="session.event",
+                        payload={"event": event},
+                    )
+                )
+
+            notify(
+                {
+                    "type": "tool/call",
+                    "data": {
+                        "callId": "catalog-1",
+                        "name": "mcp__finance__read_finance_catalog",
+                        "arguments": json.dumps(
+                            {
+                                "subject": "stock",
+                                "dataview": "report_metric",
+                                "operation": "query",
+                            }
+                        ),
+                    },
+                }
+            )
+            notify(
+                {
+                    "type": "tool/result",
+                    "data": {
+                        "message": {
+                            "source": {"callId": "catalog-1"},
+                            "content": [
+                                {
+                                    "type": "tool-result",
+                                    "content": [
+                                        {
+                                            "type": "text",
+                                            "text": json.dumps(
+                                                {
+                                                    "mode": "dataview",
+                                                    "dataview": {"name": "report_metric"},
+                                                }
+                                            ),
+                                        }
+                                    ],
+                                }
+                            ],
+                        }
+                    },
+                }
+            )
+            query_args = {
+                "steps": [
+                    {
+                        "goal": "查询宁德时代 2027 年归母净利润预测",
+                        "request": "r1 = stock.report_metric(filter = x) -> code, metric_value",
+                    }
+                ]
+            }
+            notify(
+                {
+                    "type": "tool/call",
+                    "data": {
+                        "callId": "query-1",
+                        "name": "mcp__finance__finance_query",
+                        "arguments": json.dumps(query_args),
+                    },
+                }
+            )
+            query_result = {
+                "ok": True,
+                "goal": query_args["steps"][0]["goal"],
+                "api": "stock.report_metric",
+                "result_ref": "session://progress/vars/v1",
+                "row_count": 4,
+                "sample_complete": True,
+            }
+            notify(
+                {
+                    "type": "tool/result",
+                    "data": {
+                        "message": {
+                            "source": {"callId": "query-1"},
+                            "content": [
+                                {
+                                    "type": "tool-result",
+                                    "content": [
+                                        {
+                                            "type": "text",
+                                            "text": json.dumps(query_result),
+                                        }
+                                    ],
+                                }
+                            ],
+                        }
+                    },
+                }
+            )
+            Path(self.kwargs["env"]["FIN_AGENT_DSH_TRACE_PATH"]).write_text(
+                json.dumps(
+                    {
+                        "revision": context["revision"],
+                        "tracker": {
+                            "calls": [],
+                            "result_refs": [query_result],
+                        },
+                    }
+                ),
+                encoding="utf-8",
+            )
+            return SimpleNamespace(
+                final_response="查询完成。",
+                finish_reason="completed",
+                events=[],
+            )
+
+        def close(self) -> None:
+            return None
+
+    events: list[dict] = []
+    service = FinanceDeepSeekHarnessSessionService(
+        enabled=True,
+        root_dir=tmp_path / "runtime",
+        log_path=tmp_path / "events.jsonl",
+        worker_count=1,
+        harness_factory=_Harness,
+    )
+    service.run_turn(
+        thread_id=7,
+        turn_id=1,
+        owner_id="owner-a",
+        user_text="宁德时代 2027 年归母净利润预测",
+        event_sink=events.append,
+    )
+
+    titles = [event["metadata"]["title"] for event in events]
+    contents = [event["content"] for event in events]
+    assert "确认股票 · 研报预测指标" in titles
+    assert "查询股票 · 研报预测指标" in titles
+    assert any("取得 4 条记录" in content for content in contents)
+    assert all("dataview" not in content and "stock.report" not in content for content in contents)
 
 
 def test_dsh_runs_ten_independent_sessions_concurrently_without_context_leakage(
@@ -766,9 +1020,10 @@ def test_dsh_runs_ten_independent_sessions_concurrently_without_context_leakage(
         == scope.removeprefix("financial_qa_dsh:")
         for _prompt, session_id, scope in observed
     )
-    assert {item["result"] for item in records} == {
-        f"answer:query-{index}" for index in range(10)
-    }
+    assert {
+        item["result"].split("\n\n[系统日期]", 1)[0]
+        for item in records
+    } == {f"answer:query-{index}" for index in range(10)}
     service.close()
 
 
@@ -901,11 +1156,13 @@ def test_chat_runtime_parameter_is_forwarded_only_for_dsh(monkeypatch) -> None:
         owner_id="owner-a",
         precomputed_plan=_plan(),
         financial_qa_runtime="dsh",
+        financial_qa_execution_mode="fast",
     )
 
     assert result["mode"] == "financial_qa_dsh"
     assert calls[0][1]["runtime"] == "dsh"
     assert calls[1][1]["runtime"] == "dsh"
+    assert calls[1][1]["execution_mode"] == "fast"
 
 
 def test_chat_api_rejects_unknown_financial_runtime_before_work() -> None:

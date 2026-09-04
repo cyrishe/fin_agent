@@ -1,3 +1,5 @@
+import { readFileSync } from 'node:fs'
+
 /**
  * DSH-only loop policy for Fin Agent's bounded financial-data query scenario.
  *
@@ -27,8 +29,19 @@ const DEFAULT_BUDGETS = Object.freeze({
   final: Object.freeze({ reasoningEffort: 'off', maxTokens: 2048 }),
 })
 
+const DEFAULT_RESULT_PROJECTION = Object.freeze({
+  enabled: true,
+  queryMaxRows: 5,
+  queryCellMaxChars: 480,
+  queryTotalMaxChars: 6000,
+  detailMaxRows: 10,
+  detailCellMaxChars: 2400,
+  detailTotalMaxChars: 16000,
+})
+
 const DEFAULT_CONFIG = Object.freeze({
   enabled: true,
+  executionMode: 'standard',
   // Keep the three generic tool schemas stable for DeepSeek KV-cache reuse and
   // enforce the active business stage with Harness' monotonic tool guard.  API
   // catalog chapters remain progressively disclosed by the catalog tool.
@@ -41,19 +54,31 @@ const DEFAULT_CONFIG = Object.freeze({
   maxRequiredStageSteers: 1,
   businessHint: '',
   budgets: DEFAULT_BUDGETS,
+  resultProjection: DEFAULT_RESULT_PROJECTION,
 })
+
+const EXECUTION_MODES = new Set(['standard', 'fast'])
 
 const STAGE_PROMPTS = Object.freeze({
   catalog:
     '只做目录定位。具体数据请求必须一次传入明确的 subject + dataview + operation；operation 严格按 read_finance_catalog 参数中的统一规则选择。仅当主体、视图或 operation 确实无法判断时，才读上层目录或完整视图。研报中的观点、布局、竞争格局、催化、技术储备、估值逻辑、机构差异或风险选 stock.report；只有 EPS、收入、归母净利润及增速、PE/PB/ROE 等标准年度预测值选 stock.report_metric；实际披露财务数值才选 financial_3_table。若答案明确需要两个 operation，在同一步并行读取，不要串行试探。不要在本阶段回答数据值。',
   query:
-    '目录字段与口径已经就绪。把用户明确要求的事实以及至多一个确有解释价值的比较目标，合并到一次最小 finance_query flow；不要拆成多次试探查询。若已有结果只完成证券身份解析，必须引用其 rN.code/name 在本次查询实际业务事实。',
+    '目录字段与口径已经就绪。只把用户明确要求的事实和完成其计算不可缺少的依赖合并到一次最小 finance_query flow；不要为了丰富回答额外添加比较目标，也不要拆成多次试探查询。调用前逐条对照已加载 dataview 的 rules 自检每个 request，重点核对默认查询范围、时间口径以及 order/limit 是否真的会取得目标数据；不满足时先修正再调用。若已有结果只完成证券身份解析，必须引用其 rN.code/name 在本次查询实际业务事实。',
   repair:
     '上一查询未成功。这是唯一一次修复机会：只修正工具结果明确指出的失败步骤和口径，不改目标、不换 API 追值，也不要重复完全相同的参数。',
   details:
     '查询已经成功。仅当现有 sample 不足以写出用户要求的答案时调用 load_finance_result 读取最少的必要明细页，并优先只取当前结论需要的列；否则立即输出最终中文答案。不得输出思考过程、工具复盘或再次查询。',
   final:
-    '工具阶段已经结束。不要再尝试调用工具；严格根据已有成功结果、空值、零行或错误事实，立即给出简洁中文最终答案。不得输出思考过程、工具复盘或回答草稿。',
+    '工具阶段已经结束。不要再尝试调用工具；严格根据已有成功结果、空值、零行或错误事实，立即给出简洁且全文中文的最终答案。任何数据口径必须沿用已加载目录和结果中的明确表述，未返回的口径不可自行补写。若现有证据只证明目标字段未提供，只陈述该数据边界、已查范围和不能给出数值的结论；不得搬运结果中与问题无关的数值，也不得推荐本轮未执行的数据来源。零行只表示当前查询条件没有匹配记录；不得用模型记忆补写公司背景、披露习惯、可能原因、替代来源或任何未查询事实。不得输出思考过程、工具复盘或回答草稿。',
+})
+
+const FAST_STAGE_PROMPTS = Object.freeze({
+  catalog:
+    '快速模式：这是唯一一次目录定位。直接选择完成用户取数所需的明确 subject + dataview + operation；若需要多个彼此独立的数据视图，在本阶段并行读取。不要读取上层目录、不要试探、不要回答数据值。',
+  query:
+    '快速模式：目录已经就绪，这是唯一一次调用生成阶段。直接生成完成用户明确取数目标所需的最小 finance_query；多个独立数据请求可在本阶段并行发出。不要先做身份预查询、不要解释、不要预留后续修复。',
+  final:
+    '快速模式：工具阶段已经结束。不得检查、重试、翻页或再调用工具；直接根据已有成功结果、空值、零行或错误事实返回简洁且全文中文的答案。目标字段未提供时只陈述数据边界，不引用无关数值或未查询来源；零行时不得用模型记忆补写原因、背景或替代事实。',
 })
 
 const REASONING_EFFORTS = new Set(['off', 'low', 'high', 'max'])
@@ -78,6 +103,29 @@ function budget(raw, fallback, label) {
   }
 }
 
+function resultProjection(raw) {
+  const value = raw !== null && typeof raw === 'object' && !Array.isArray(raw) ? raw : {}
+  return {
+    enabled: value.enabled === undefined
+      ? DEFAULT_RESULT_PROJECTION.enabled
+      : value.enabled === true || String(value.enabled).toLowerCase() === 'true',
+    queryMaxRows: positiveInteger(value.queryMaxRows, DEFAULT_RESULT_PROJECTION.queryMaxRows, 'resultProjection.queryMaxRows'),
+    queryCellMaxChars: positiveInteger(value.queryCellMaxChars, DEFAULT_RESULT_PROJECTION.queryCellMaxChars, 'resultProjection.queryCellMaxChars'),
+    queryTotalMaxChars: positiveInteger(value.queryTotalMaxChars, DEFAULT_RESULT_PROJECTION.queryTotalMaxChars, 'resultProjection.queryTotalMaxChars'),
+    detailMaxRows: positiveInteger(value.detailMaxRows, DEFAULT_RESULT_PROJECTION.detailMaxRows, 'resultProjection.detailMaxRows'),
+    detailCellMaxChars: positiveInteger(value.detailCellMaxChars, DEFAULT_RESULT_PROJECTION.detailCellMaxChars, 'resultProjection.detailCellMaxChars'),
+    detailTotalMaxChars: positiveInteger(value.detailTotalMaxChars, DEFAULT_RESULT_PROJECTION.detailTotalMaxChars, 'resultProjection.detailTotalMaxChars'),
+  }
+}
+
+function executionMode(value, fallback = DEFAULT_CONFIG.executionMode) {
+  const normalized = String(value ?? fallback).trim().toLowerCase()
+  if (!EXECUTION_MODES.has(normalized)) {
+    throw new Error('finance-loop-policy: executionMode must be standard or fast')
+  }
+  return normalized
+}
+
 export function resolveConfig(input = {}) {
   let supplied = input
   if (typeof input.configJson === 'string' && input.configJson.trim()) {
@@ -96,6 +144,7 @@ export function resolveConfig(input = {}) {
     enabled: supplied.enabled === undefined
       ? DEFAULT_CONFIG.enabled
       : supplied.enabled === true || String(supplied.enabled).toLowerCase() === 'true',
+    executionMode: executionMode(supplied.executionMode),
     preserveRequestPrefix: supplied.preserveRequestPrefix === undefined
       ? DEFAULT_CONFIG.preserveRequestPrefix
       : supplied.preserveRequestPrefix === true
@@ -137,7 +186,26 @@ export function resolveConfig(input = {}) {
         budget(rawBudgets[stage], fallback, stage),
       ]),
     ),
+    resultProjection: resultProjection(supplied.resultProjection),
   }
+}
+
+function currentExecutionMode(config) {
+  const contextPath = String(process.env.FIN_AGENT_DSH_CONTEXT_PATH ?? '').trim()
+  if (!contextPath) return config.executionMode
+  let payload
+  try {
+    payload = JSON.parse(readFileSync(contextPath, 'utf8'))
+  } catch {
+    return config.executionMode
+  }
+  const toolContext = payload !== null
+    && typeof payload === 'object'
+    && payload.tool_context !== null
+    && typeof payload.tool_context === 'object'
+    ? payload.tool_context
+    : {}
+  return executionMode(toolContext._finance_execution_mode, config.executionMode)
 }
 
 function stableValue(value) {
@@ -184,6 +252,122 @@ function parseToolResult(event) {
   return { failed, payload, text }
 }
 
+function cloneJson(value) {
+  return JSON.parse(JSON.stringify(value))
+}
+
+function projectRows(rows, { maxRows, maxCellChars, totalMaxChars }) {
+  if (!Array.isArray(rows)) return { rows, changed: false, shortenedFields: [] }
+  let remaining = totalMaxChars
+  let changed = rows.length > maxRows
+  const shortenedFields = new Set()
+  const selectedRows = rows.length > maxRows
+    ? [
+        ...rows.slice(0, Math.ceil(maxRows / 2)),
+        ...rows.slice(rows.length - Math.floor(maxRows / 2)),
+      ]
+    : rows
+  const projected = selectedRows.map(row => {
+    if (row === null || typeof row !== 'object') return row
+    const entries = Array.isArray(row)
+      ? row.map((value, index) => [String(index), value])
+      : Object.entries(row)
+    const next = Array.isArray(row) ? [] : {}
+    for (const [key, raw] of entries) {
+      let value = raw
+      if (typeof raw === 'string') {
+        const allowed = Math.max(0, Math.min(maxCellChars, remaining))
+        if (raw.length > allowed) {
+          value = `${raw.slice(0, allowed)}…`
+          changed = true
+          shortenedFields.add(key)
+        }
+        remaining = Math.max(0, remaining - Math.min(raw.length, allowed))
+      }
+      if (Array.isArray(next)) next.push(value)
+      else next[key] = value
+    }
+    return next
+  })
+  return { rows: projected, changed, shortenedFields: [...shortenedFields] }
+}
+
+function projectQueryPayload(payload, config) {
+  const projected = cloneJson(payload)
+  const items = Array.isArray(projected.steps) ? projected.steps : [projected]
+  for (const item of items) {
+    if (item === null || typeof item !== 'object' || Array.isArray(item)) continue
+    const sample = item.sample
+    if (sample === null || typeof sample !== 'object' || !Array.isArray(sample.rows)) continue
+    const result = projectRows(sample.rows, {
+      maxRows: config.queryMaxRows,
+      maxCellChars: config.queryCellMaxChars,
+      totalMaxChars: config.queryTotalMaxChars,
+    })
+    if (!result.changed) continue
+    sample.rows = result.rows
+    item.sample_complete = false
+    item.result_projection = {
+      model_rows: result.rows.length,
+      source_rows: Number(item.row_count ?? sample.rows.length),
+      shortened_fields: result.shortenedFields,
+      complete: false,
+      guidance: '完整结果仍保存在 result_ref；仅在回答确有需要时按列读取必要明细。',
+    }
+  }
+  return projected
+}
+
+function projectDetailPayload(payload, config) {
+  const projected = cloneJson(payload)
+  if (Array.isArray(projected.rows)) {
+    const result = projectRows(projected.rows, {
+      maxRows: config.detailMaxRows,
+      maxCellChars: config.detailCellMaxChars,
+      totalMaxChars: config.detailTotalMaxChars,
+    })
+    if (result.changed) {
+      projected.rows = result.rows
+      projected.result_projection = {
+        model_rows: result.rows.length,
+        shortened_fields: result.shortenedFields,
+        complete: false,
+        guidance: '这是面向模型的有界明细；原始行仍保存在 result_ref。',
+      }
+    }
+  } else if (typeof projected.text === 'string' && projected.text.length > config.detailTotalMaxChars) {
+    projected.text = `${projected.text.slice(0, config.detailTotalMaxChars)}…`
+    projected.result_projection = {
+      complete: false,
+      guidance: '这是面向模型的有界文本；原始内容仍保存在 result_ref。',
+    }
+  }
+  return projected
+}
+
+function projectedContent(content, kind, config) {
+  if (!Array.isArray(content)) return undefined
+  let replaced = false
+  const next = content.map(block => {
+    if (replaced || block?.type !== 'text') return block
+    let payload
+    try {
+      payload = JSON.parse(String(block.text ?? ''))
+    } catch {
+      return block
+    }
+    if (payload === null || typeof payload !== 'object' || Array.isArray(payload)) return block
+    const projected = kind === 'query'
+      ? projectQueryPayload(payload, config)
+      : projectDetailPayload(payload, config)
+    const text = JSON.stringify(projected)
+    if (text === String(block.text ?? '')) return block
+    replaced = true
+    return { ...block, text }
+  })
+  return replaced ? next : undefined
+}
+
 function catalogIsReady(payload) {
   return payload !== null && typeof payload === 'object' && payload.mode === 'dataview'
 }
@@ -227,9 +411,11 @@ function queryIsDataOnly(payload) {
 }
 
 function promptFor(state, config) {
-  const base = STAGE_PROMPTS[state.stage] ?? STAGE_PROMPTS.final
+  const prompts = state.executionMode === 'fast' ? FAST_STAGE_PROMPTS : STAGE_PROMPTS
+  const base = prompts[state.stage] ?? prompts.final
   const marker = `[FINANCE_LOOP stage=${state.stage} reason=${state.reason}]`
-  return [marker, base, config.businessHint].filter(Boolean).join('\n')
+  const mode = `[FINANCE_EXECUTION mode=${state.executionMode}]`
+  return [marker, mode, base, config.businessHint].filter(Boolean).join('\n')
 }
 
 function stageTools(state, tools) {
@@ -249,8 +435,9 @@ function stageAllows(state, kind) {
   return false
 }
 
-function resetTurn(state, turn) {
+function resetTurn(state, turn, config) {
   state.turn = turn
+  state.executionMode = currentExecutionMode(config)
   state.stage = 'catalog'
   state.reason = 'turn_started'
   state.catalogAttempts = 0
@@ -283,6 +470,12 @@ function updateAfterStep(state, step, config) {
     const outcomes = catalog.map(call => state.results.get(call.callId)).filter(Boolean)
     const allReady = outcomes.length === catalog.length
       && outcomes.every(outcome => !outcome.failed && catalogIsReady(outcome.payload))
+    if (state.executionMode === 'fast') {
+      state.stage = allReady ? 'query' : 'final'
+      state.reason = allReady ? 'fast_dataview_ready' : 'fast_catalog_failed'
+      state.requiredAction = allReady
+      return
+    }
     if (allReady) {
       state.stage = 'query'
       state.reason = 'dataview_ready'
@@ -304,6 +497,18 @@ function updateAfterStep(state, step, config) {
     const outcomes = queries.map(call => state.results.get(call.callId)).filter(Boolean)
     const failures = outcomes.filter(outcome => !querySucceeded(outcome.payload, outcome.failed))
     const success = outcomes.find(outcome => querySucceeded(outcome.payload, outcome.failed))
+    if (state.executionMode === 'fast') {
+      state.dataOnlyComplete = outcomes.some(
+        outcome => querySucceeded(outcome.payload, outcome.failed)
+          && (queryCompletesDataOnly(outcome.payload) || queryIsDataOnly(outcome.payload)),
+      )
+      state.stage = 'final'
+      state.reason = failures.length > 0 || success === undefined
+        ? 'fast_query_failed'
+        : 'fast_query_complete'
+      state.requiredAction = false
+      return
+    }
     // Parallel query calls may contain both useful evidence and one invalid
     // request.  A success must not hide that repairable failure.
     if (failures.length > 0) {
@@ -430,6 +635,7 @@ export function apply(ctx, input = {}) {
     const tools = resolveToolNames(agent)
     const state = {
       turn: 0,
+      executionMode: currentExecutionMode(config),
       stage: 'catalog',
       reason: 'agent_created',
       catalogAttempts: 0,
@@ -492,9 +698,41 @@ export function apply(ctx, input = {}) {
       return undefined
     })
 
+    // In fast data-only requests, the successful query result is itself the
+    // response.  Harness' native terminal-result marker closes the turn at the
+    // tool boundary, so no empty narrative step is proposed merely to reject it.
+    agent.ctx.on('tools/execute', async (exec, next) => {
+      if (state.executionMode === 'fast' && toolKind(exec.name, tools) === 'query') {
+        // The marker must be set through ToolRunContext before the body creates
+        // its canonical success result.  Adding a field to a wrapper result is
+        // intentionally discarded by Harness normalization.
+        exec.concludeTurn()
+      }
+      return next()
+    })
+
+    // Keep the durable result_ref and tracker untouched while bounding only
+    // the text copied into the next model request.  This is a DSH-native
+    // post-execute projection, so Chat/API callers still receive the full rows.
+    agent.ctx.on('tools/post-execute', async (exec, result, next) => {
+      const decision = await next()
+      if (!config.resultProjection.enabled || decision.kind !== 'accept'
+        || Object.hasOwn(decision, 'value')) return decision
+      const kind = toolKind(exec.name, tools)
+      if (kind !== 'query' && kind !== 'details') return decision
+      const content = decision.content ?? result.content
+      const projected = projectedContent(content, kind, config.resultProjection)
+      if (projected === undefined) return decision
+      return {
+        kind: 'accept',
+        content: projected,
+        ...(decision.additionalContexts ? { additionalContexts: decision.additionalContexts } : {}),
+      }
+    })
+
     agent.ctx.on('agent/pre-step', async ({ turn }, next) => {
       if (state.turn !== turn) {
-        resetTurn(state, turn)
+        resetTurn(state, turn, config)
         applyRestriction()
       }
       if (state.dataOnlyComplete) return { kind: 'reject' }
@@ -527,6 +765,7 @@ export function apply(ctx, input = {}) {
     // was omitted.  Bound this per stage/reason so it cannot create a free loop.
     agent.ctx.on('agent/turn-stopping', ({ agent: subject, turn }) => {
       if (turn !== state.turn) return
+      if (state.executionMode === 'fast') return
       const needsRequiredAction = state.requiredAction
       const needsFinalAnswer = state.stage === 'final'
         && !state.finalAnswerAttempted
@@ -543,7 +782,7 @@ export function apply(ctx, input = {}) {
 
     agent.ctx.on('session/event', (_session, event) => {
       if (event.type === 'turn/start') {
-        resetTurn(state, event.data.turn)
+        resetTurn(state, event.data.turn, config)
         applyRestriction()
         return
       }

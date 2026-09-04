@@ -71,6 +71,16 @@ function fixture(config = {}) {
     guard: exec => guard(exec),
     event: event => agentListeners.get('session/event')({}, event),
     request: base => agentListeners.get('agent/request')({}, async () => base),
+    execute: async (exec, result) => {
+      let concluded = false
+      const output = await agentListeners.get('tools/execute')(
+        { ...exec, concludeTurn: () => { concluded = true } },
+        async () => result,
+      )
+      return concluded && output.isError !== true
+        ? { ...output, concludesTurn: true }
+        : output
+    },
     preStep: ({ turn = 1, step }) => agentListeners.get('agent/pre-step')(
       { turn, step },
       async () => ({ kind: 'enter', messages: [] }),
@@ -92,10 +102,91 @@ test('resolves defaults and rejects invalid stage budgets', () => {
   assert.equal(config.maxRequiredStageSteers, 1)
   assert.equal(config.budgets.catalog.reasoningEffort, 'low')
   assert.equal(config.budgets.final.reasoningEffort, 'off')
+  assert.equal(config.resultProjection.enabled, true)
+  assert.equal(config.resultProjection.queryMaxRows, 5)
   assert.throws(
     () => resolveConfig({ budgets: { final: { maxTokens: 0 } } }),
     /budgets\.final\.maxTokens/,
   )
+})
+
+test('projects long query evidence only for the next model request', async () => {
+  const runtime = fixture({
+    resultProjection: {
+      queryMaxRows: 2,
+      queryCellMaxChars: 12,
+      queryTotalMaxChars: 30,
+    },
+  })
+  const original = {
+    ok: true,
+    api: 'stock.report',
+    result_ref: 'session://r1',
+    row_count: 3,
+    sample_complete: true,
+    sample: {
+      rows: [
+        { title: '第一篇研报', investment_highlights: '这是很长的第一篇研报投资要点内容' },
+        { title: '第二篇研报', investment_highlights: '这是很长的第二篇研报投资要点内容' },
+        { title: '第三篇研报', investment_highlights: '这是很长的第三篇研报投资要点内容' },
+      ],
+    },
+  }
+  const result = await runtime.post(
+    { name: NAMES.query, arguments: {} },
+    { isError: false, content: [{ type: 'text', text: JSON.stringify(original) }] },
+  )
+  const projected = JSON.parse(result.content[0].text)
+
+  assert.equal(projected.sample.rows.length, 2)
+  assert.equal(projected.sample.rows[0].title, '第一篇研报')
+  assert.equal(projected.sample.rows[1].title, '第三篇研报')
+  assert.equal(projected.sample_complete, false)
+  assert.equal(projected.result_ref, original.result_ref)
+  assert.equal(projected.row_count, 3)
+  assert.equal(projected.result_projection.complete, false)
+  assert.ok(projected.result_projection.shortened_fields.includes('investment_highlights'))
+  assert.equal(original.sample.rows.length, 3)
+  assert.equal(original.sample_complete, true)
+})
+
+test('bounded detail projection keeps both ends of an ordered result', async () => {
+  const runtime = fixture({
+    resultProjection: {
+      detailMaxRows: 4,
+      detailCellMaxChars: 100,
+      detailTotalMaxChars: 1000,
+    },
+  })
+  const result = await runtime.post(
+    { name: NAMES.details, arguments: {} },
+    {
+      isError: false,
+      content: [{
+        type: 'text',
+        text: JSON.stringify({ rows: Array.from({ length: 11 }, (_, index) => ({ index })) }),
+      }],
+    },
+  )
+  const projected = JSON.parse(result.content[0].text)
+
+  assert.deepEqual(projected.rows.map(row => row.index), [0, 1, 9, 10])
+  assert.equal(projected.result_projection.complete, false)
+})
+
+test('leaves compact numeric query evidence byte-for-byte unchanged', async () => {
+  const runtime = fixture()
+  const text = JSON.stringify({
+    ok: true,
+    row_count: 2,
+    sample_complete: true,
+    sample: { rows: [{ close: 10.2 }, { close: 10.5 }] },
+  })
+  const result = await runtime.post(
+    { name: NAMES.query, arguments: {} },
+    { isError: false, content: [{ type: 'text', text }] },
+  )
+  assert.equal(result.content[0].text, text)
 })
 
 test('keeps the legacy opt JSON surface backward compatible', () => {
@@ -283,6 +374,92 @@ test('narrows catalog to query to final and applies per-stage request budgets', 
   assert.deepEqual(runtime.restrictions.at(-1).allow, [])
   assert.match(runtime.prompt(), /stage=final/)
   assert.equal((await runtime.request({})).reasoningEffort, 'off')
+})
+
+test('fast mode performs one catalog stage, one query stage, then returns without repair or paging', () => {
+  const runtime = fixture({ executionMode: 'fast' })
+  runtime.event({ type: 'turn/start', data: { turn: 1 } })
+  assert.match(runtime.prompt(), /FINANCE_EXECUTION mode=fast/)
+
+  runtime.event({
+    type: 'tool/call',
+    data: { turn: 1, step: 1, callId: 'catalog-1', name: NAMES.catalog },
+  })
+  runtime.event(resultEvent({
+    step: 1,
+    callId: 'catalog-1',
+    payload: { mode: 'dataview', dataview: { name: 'report_metric' } },
+  }))
+  runtime.event({ type: 'step/end', data: { turn: 1, step: 1 } })
+  assert.deepEqual(runtime.restrictions.at(-1).allow, [NAMES.query])
+  assert.match(runtime.prompt(), /reason=fast_dataview_ready/)
+
+  runtime.event({
+    type: 'tool/call',
+    data: { turn: 1, step: 2, callId: 'query-1', name: NAMES.query },
+  })
+  runtime.event(resultEvent({
+    step: 2,
+    callId: 'query-1',
+    payload: {
+      ok: true,
+      api: 'stock.basic_info',
+      result_ref: 'session://r1',
+      sample_complete: false,
+    },
+  }))
+  runtime.event({ type: 'step/end', data: { turn: 1, step: 2 } })
+
+  assert.deepEqual(runtime.restrictions.at(-1).allow, [])
+  assert.match(runtime.prompt(), /reason=fast_query_complete/)
+  runtime.stopping()
+  assert.equal(runtime.steered.length, 0)
+})
+
+test('fast mode returns after a failed catalog stage instead of narrowing or steering', () => {
+  const runtime = fixture({ executionMode: 'fast' })
+  runtime.event({ type: 'turn/start', data: { turn: 1 } })
+  runtime.event({
+    type: 'tool/call',
+    data: { turn: 1, step: 1, callId: 'catalog-1', name: NAMES.catalog },
+  })
+  runtime.event(resultEvent({
+    step: 1,
+    callId: 'catalog-1',
+    payload: { error: 'route unavailable' },
+    isError: true,
+  }))
+  runtime.event({ type: 'step/end', data: { turn: 1, step: 1 } })
+
+  assert.deepEqual(runtime.restrictions.at(-1).allow, [])
+  assert.match(runtime.prompt(), /reason=fast_catalog_failed/)
+  runtime.stopping()
+  assert.equal(runtime.steered.length, 0)
+})
+
+test('fast data-only mode concludes natively at the successful query result', async () => {
+  const runtime = fixture({ executionMode: 'fast' })
+  runtime.event({ type: 'turn/start', data: { turn: 1 } })
+  runtime.event({
+    type: 'tool/call',
+    data: { turn: 1, step: 1, callId: 'catalog-1', name: NAMES.catalog },
+  })
+  runtime.event(resultEvent({
+    step: 1,
+    callId: 'catalog-1',
+    payload: { mode: 'dataview', dataview: { name: 'quote' } },
+  }))
+  runtime.event({ type: 'step/end', data: { turn: 1, step: 1 } })
+
+  const result = await runtime.execute(
+    { name: NAMES.query, arguments: {} },
+    {
+      isError: false,
+      value: { ok: true, data_only_mode: true, data_only_complete: true },
+      content: [],
+    },
+  )
+  assert.equal(result.concludesTurn, true)
 })
 
 test('data-only query completes without a narrative model step', async () => {

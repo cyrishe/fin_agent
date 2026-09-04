@@ -50,7 +50,8 @@ FINANCE_TOOL_DESCRIPTION = (
     "查询 Fin Agent 的结构化金融证券数据。适用于股票、指数、行业、板块、基金、债券和市场热点，"
     "以及行情、资金流、估值、财务三表、业绩预告、业务分部、股东、质押、公司行动、指数/行业/"
     "板块成分、研报观点和研报年度预测指标等问题。输入自然语言问题；response_mode=data 返回"
-    "结构化原始数据，summary 返回基于数据的中文结论，both 同时返回两者。"
+    "结构化原始数据，summary 返回基于数据的中文结论，both 同时返回两者。返回中的 data_sources "
+    "会用公开业务名称说明实际查询的数据对象、数据类型、查询目标和记录数，便于核验与溯源。"
 )
 
 
@@ -217,6 +218,15 @@ def create_app(
             Literal["fast", "auto", "deep"],
             Field(description="Summary depth; does not change the data contract."),
         ] = "fast",
+        execution_mode: Annotated[
+            Literal["standard", "fast"],
+            Field(
+                description=(
+                    "DSH execution policy. fast limits the agent to API discovery, "
+                    "call generation, and return without inspection or retry."
+                )
+            ),
+        ] = "standard",
         conversation_id: Annotated[
             str | None,
             Field(
@@ -240,6 +250,7 @@ def create_app(
                 response_mode=response_mode,
                 runtime=runtime,
                 research_mode=research_mode,
+                execution_mode=execution_mode,
                 conversation_id=conversation_id,
                 max_rows=max_rows,
             ),
@@ -369,6 +380,12 @@ def create_app(
             (_STATIC_DIR / "data-map.html").read_text(encoding="utf-8")
         )
 
+    @app.get("/mcp-guide", response_class=HTMLResponse, include_in_schema=False)
+    async def mcp_guide() -> HTMLResponse:
+        return HTMLResponse(
+            (_STATIC_DIR / "mcp-guide.html").read_text(encoding="utf-8")
+        )
+
     @app.get("/data-map/catalog.json", include_in_schema=False)
     async def public_data_map_catalog() -> dict[str, Any]:
         return _catalog_projection(catalog_service)
@@ -434,6 +451,7 @@ def create_app(
             response_mode="both" if payload.include_data else "summary",
             runtime=payload.runtime,
             research_mode=payload.research_mode,
+            execution_mode=payload.execution_mode,
             conversation_id=payload.conversation_id,
             max_rows=payload.max_rows,
         )

@@ -28,6 +28,7 @@ class _Gateway:
                 "query": request.query,
                 "response_mode": request.response_mode,
                 "runtime": request.runtime or "dsh",
+                "execution_mode": request.execution_mode,
                 "conversation_id": request.conversation_id,
                 "summary": "测试摘要" if include_summary else None,
                 "data": {"format": "row-dict", "results": []} if include_data else None,
@@ -71,6 +72,14 @@ def test_public_health_catalog_and_data_map() -> None:
         assert page.status_code == 200
         assert "Fin Agent 数据体系" in page.text
         assert "data-action=\"expand\"" in page.text
+        assert 'href="mcp-guide"' in page.text
+
+        guide = client.get("/mcp-guide")
+        assert guide.status_code == 200
+        assert "Fin Agent MCP 使用说明" in guide.text
+        assert "finance_data_query" in guide.text
+        assert "Authorization: Bearer" in guide.text
+        assert "不调用通用 Web Search" in guide.text
 
 
 def test_reverse_proxy_root_path_is_reflected_in_redirects_and_docs(monkeypatch) -> None:
@@ -86,7 +95,12 @@ def test_reverse_proxy_root_path_is_reflected_in_redirects_and_docs(monkeypatch)
 
         page = client.get("/data-map")
         assert 'href="docs"' in page.text
+        assert 'href="mcp-guide"' in page.text
         assert "fetch('data-map/catalog.json')" in page.text
+
+        guide = client.get("/mcp-guide")
+        assert 'href="data-map"' in guide.text
+        assert 'href="docs"' in guide.text
 
 
 def test_protected_rest_query_and_answer_modes() -> None:
@@ -130,8 +144,18 @@ def test_tool_discovery_exposes_schema_and_mcp_location() -> None:
             "summary",
             "both",
         ]
+        assert tool["inputSchema"]["properties"]["execution_mode"]["enum"] == [
+            "standard",
+            "fast",
+        ]
         assert tool["mcp"]["path"] == "/mcp"
         assert tool["annotations"]["readOnlyHint"] is True
+        output_properties = tool["outputSchema"]["properties"]
+        assert "data_sources" in output_properties
+        result_schema = tool["outputSchema"]["$defs"]["FinanceResultPage"]
+        assert "api" not in result_schema["properties"]
+        execution_schema = tool["outputSchema"]["$defs"]["FinanceExecutionMetadata"]
+        assert "apis" not in execution_schema["properties"]
 
 
 def test_mcp_streamable_http_requires_key_and_calls_same_gateway() -> None:

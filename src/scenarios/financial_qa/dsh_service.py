@@ -16,6 +16,7 @@ from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Callable, Mapping, Optional
+from zoneinfo import ZoneInfo
 
 from src.scenarios.financial_qa.tools import FinanceDataQueryCcTools
 
@@ -38,6 +39,15 @@ _DEFAULT_LOOP_POLICY_CONFIG: dict[str, Any] = {
         "repair": {"reasoningEffort": "low", "maxTokens": 3072},
         "details": {"reasoningEffort": "off", "maxTokens": 2048},
         "final": {"reasoningEffort": "off", "maxTokens": 2048},
+    },
+    "resultProjection": {
+        "enabled": True,
+        "queryMaxRows": 5,
+        "queryCellMaxChars": 480,
+        "queryTotalMaxChars": 6000,
+        "detailMaxRows": 10,
+        "detailCellMaxChars": 2400,
+        "detailTotalMaxChars": 16000,
     },
 }
 
@@ -75,6 +85,9 @@ def _merge_loop_policy_config(
             key: dict(value)
             for key, value in _DEFAULT_LOOP_POLICY_CONFIG["budgets"].items()
         },
+        "resultProjection": dict(
+            _DEFAULT_LOOP_POLICY_CONFIG["resultProjection"]
+        ),
     }
     env_value = _trim(os.environ.get("FINANCE_DSH_LOOP_POLICY_CONFIG"))
     layers: list[Mapping[str, Any]] = []
@@ -92,13 +105,22 @@ def _merge_loop_policy_config(
         layers.append(supplied)
     for layer in layers:
         budgets = layer.get("budgets")
-        config.update({key: value for key, value in layer.items() if key != "budgets"})
+        result_projection = layer.get("resultProjection")
+        config.update(
+            {
+                key: value
+                for key, value in layer.items()
+                if key not in {"budgets", "resultProjection"}
+            }
+        )
         if isinstance(budgets, Mapping):
             for stage, value in budgets.items():
                 if isinstance(value, Mapping):
                     current = dict(config["budgets"].get(str(stage), {}))
                     current.update(dict(value))
                     config["budgets"][str(stage)] = current
+        if isinstance(result_projection, Mapping):
+            config["resultProjection"].update(dict(result_projection))
     return config
 
 
@@ -137,6 +159,35 @@ def _json_arguments(value: Any) -> dict[str, Any]:
     except json.JSONDecodeError:
         return {}
     return dict(payload) if isinstance(payload, Mapping) else {}
+
+
+def _request_api_name(request: Any) -> str:
+    match = re.search(
+        r"=\s*([A-Za-z_]\w*(?:\.[A-Za-z_]\w*)+)\s*\(",
+        _trim(request),
+    )
+    return match.group(1) if match else ""
+
+
+def _notification_tool_payload(data: Mapping[str, Any]) -> dict[str, Any]:
+    message = data.get("message") if isinstance(data.get("message"), Mapping) else {}
+    for outer in message.get("content") or []:
+        if not isinstance(outer, Mapping) or outer.get("type") != "tool-result":
+            continue
+        for inner in outer.get("content") or []:
+            if not isinstance(inner, Mapping) or inner.get("type") != "text":
+                continue
+            try:
+                payload = json.loads(_trim(inner.get("text")))
+            except json.JSONDecodeError:
+                continue
+            if isinstance(payload, Mapping):
+                return dict(payload)
+    return {}
+
+
+def _public_goal(value: Any) -> str:
+    return re.sub(r"\s+", " ", _trim(value))[:160]
 
 
 def _load_sdk_class() -> type[Any]:
@@ -477,20 +528,12 @@ class FinanceDeepSeekHarnessSessionService:
         self.provider = _trim(
             os.environ.get("FINANCE_DSH_PROVIDER") or "deepseek-official"
         )
-        self.model = _trim(
-            os.environ.get("FINANCE_DSH_MODEL") or "deepseek-v4-flash"
-        )
-        # Dedicated variables keep the server runtime independent from a
-        # developer's personal DeepSeek environment. Legacy DEEPSEEK_* values
-        # remain a compatibility fallback for existing deployments.
-        self.base_url = _trim(
-            os.environ.get("FINANCE_DSH_BASE_URL")
-            or os.environ.get("DEEPSEEK_BASE_URL")
-        )
-        self.api_key = _trim(
-            os.environ.get("FINANCE_DSH_API_KEY")
-            or os.environ.get("DEEPSEEK_API_KEY")
-        )
+        # DSH and the base-model client share one canonical OpenAI-compatible
+        # model route. Runtime-specific settings below only tune Harness
+        # execution; they must not introduce a second credential or endpoint.
+        self.model = _trim(os.environ.get("LLM_DEFAULT_MODEL"))
+        self.base_url = _trim(os.environ.get("LLM_BASE_URL"))
+        self.api_key = _trim(os.environ.get("LLM_API_KEY"))
         self.reasoning_effort = _reasoning_effort(
             os.environ.get("FINANCE_DSH_REASONING_EFFORT")
         )
@@ -562,7 +605,7 @@ class FinanceDeepSeekHarnessSessionService:
             path = (
                 Path(installed).resolve()
                 if installed
-                else self.repo_root / "scripts" / "dsh_source_runtime.py"
+                else self.repo_root / "scripts" / "dsh_source_runtime.sh"
             )
         if not path.is_file():
             raise RuntimeError(
@@ -711,7 +754,16 @@ class FinanceDeepSeekHarnessSessionService:
         runtime_context: Mapping[str, Any],
         working_set: str,
     ) -> str:
-        sections = [_trim(user_text)]
+        current_date = datetime.now(ZoneInfo("Asia/Shanghai")).date().isoformat()
+        sections = [
+            _trim(user_text),
+            (
+                "[系统日期]\n"
+                f"当前日期为 {current_date}（Asia/Shanghai）。"
+                "用户使用今天、最近、近N日/月/年等相对时间时，以此日期计算；"
+                "不得依赖模型训练时间或自行假定其他当前日期。"
+            ),
+        ]
         if bool(runtime_context.get("_finance_data_only")):
             sections.append(
                 "[系统记录的本轮输出模式]\n"
@@ -761,9 +813,38 @@ class FinanceDeepSeekHarnessSessionService:
         isolated_request = bool((context or {}).get("_finance_isolated_request"))
         session_id = f"financial-qa-{key}"
         runtime_scope = f"financial_qa_dsh:{key}"
+        projection_config = self.loop_policy_config.get("resultProjection")
+        model_sample_rows = 0
+        detail_default_limit = 10
+        if (
+            isinstance(projection_config, Mapping)
+            and projection_config.get("enabled") is not False
+        ):
+            try:
+                model_sample_rows = max(
+                    0,
+                    min(10, int(projection_config.get("queryMaxRows") or 0)),
+                )
+            except (TypeError, ValueError):
+                model_sample_rows = 0
+            try:
+                detail_default_limit = max(
+                    10,
+                    min(
+                        50,
+                        int(projection_config.get("detailMaxRows") or 10) * 2,
+                    ),
+                )
+            except (TypeError, ValueError):
+                detail_default_limit = 10
         tool_context = {
             "_agent_runtime_scope": runtime_scope,
             "_finance_data_only": bool((context or {}).get("_finance_data_only")),
+            "_finance_execution_mode": _trim(
+                (context or {}).get("_finance_execution_mode") or "standard"
+            ),
+            "_finance_model_sample_rows": model_sample_rows,
+            "_finance_detail_default_limit": detail_default_limit,
         }
         host_runtime = self.system_tools.create_runtime()
         host_runtime.begin_turn(
@@ -805,6 +886,42 @@ class FinanceDeepSeekHarnessSessionService:
                 worker.harness = self._create_harness(worker)
                 worker.catalog_revision = catalog_revision
             call_names: dict[str, str] = {}
+            call_progress: dict[str, list[dict[str, str]]] = {}
+            result_sources: dict[str, str] = {}
+            analysis_completed = False
+
+            def public_source_label(
+                *,
+                api: str = "",
+                subject: str = "",
+                dataview: str = "",
+            ) -> str:
+                source = self.system_tools.finance_catalog.get_public_data_source(
+                    api=api,
+                    subject=subject,
+                    dataview=dataview,
+                )
+                return _trim(source.get("label"))
+
+            def complete_analysis(source_labels: list[str]) -> None:
+                nonlocal analysis_completed
+                if analysis_completed:
+                    return
+                analysis_completed = True
+                unique = list(dict.fromkeys(label for label in source_labels if label))
+                target = "、".join(unique[:3])
+                content = (
+                    f"已识别查询对象和数据范围，准备处理{target}。"
+                    if target
+                    else "已完成问题拆解，开始确认所需金融数据。"
+                )
+                self._emit(
+                    event_sink,
+                    content,
+                    progress_id=f"dsh_turn_{turn_id}",
+                    title="识别查询范围",
+                    status="completed",
+                )
 
             def on_notification(notification: Any) -> None:
                 if getattr(notification, "method", "") != "session.event":
@@ -818,26 +935,154 @@ class FinanceDeepSeekHarnessSessionService:
                 if event_type == "tool/call":
                     call_id = _trim(data.get("callId"))
                     name = _trim(data.get("name"))
+                    args = _json_arguments(data.get("arguments"))
                     call_names[call_id] = name
                     if name.endswith("read_finance_catalog"):
-                        self._emit(event_sink, "正在确认数据字段与口径。", progress_id=call_id, title="数据口径", status="running")
+                        label = public_source_label(
+                            subject=_trim(args.get("subject")),
+                            dataview=_trim(args.get("dataview")),
+                        )
+                        complete_analysis([label])
+                        title = f"确认{label}" if label else "确认数据范围"
+                        content = (
+                            f"正在确认{label}的字段、时间范围和查询口径。"
+                            if label
+                            else "正在确认本题所需的数据范围与口径。"
+                        )
+                        call_progress[call_id] = [
+                            {"progress_id": call_id, "title": title, "label": label}
+                        ]
+                        self._emit(event_sink, content, progress_id=call_id, title=title, status="running")
                     elif name.endswith("finance_query"):
-                        self._emit(event_sink, "正在执行金融数据查询。", progress_id=call_id, title="数据查询", status="running")
+                        steps = [
+                            item for item in args.get("steps") or []
+                            if isinstance(item, Mapping)
+                        ]
+                        if not steps:
+                            steps = [args]
+                        progress_items: list[dict[str, str]] = []
+                        labels: list[str] = []
+                        for index, step in enumerate(steps, start=1):
+                            label = public_source_label(
+                                api=_request_api_name(step.get("request"))
+                            )
+                            labels.append(label)
+                            suffix = f" {index}/{len(steps)}" if len(steps) > 1 else ""
+                            title = f"查询{label or '金融数据'}{suffix}"
+                            goal = _public_goal(step.get("goal")) or "执行金融数据查询"
+                            progress_id = f"{call_id}_{index}"
+                            progress_items.append(
+                                {
+                                    "progress_id": progress_id,
+                                    "title": title,
+                                    "label": label,
+                                    "goal": goal,
+                                }
+                            )
+                            self._emit(
+                                event_sink,
+                                f"正在查询：{goal}",
+                                progress_id=progress_id,
+                                title=title,
+                                status="running",
+                            )
+                        complete_analysis(labels)
+                        call_progress[call_id] = progress_items
                     elif name.endswith("load_finance_result"):
-                        self._emit(event_sink, "正在读取必要的结果明细。", progress_id=call_id, title="结果明细", status="running")
+                        data_ref = _trim(args.get("result_ref"))
+                        label = result_sources.get(data_ref, "")
+                        columns = [
+                            _trim(item) for item in args.get("columns") or []
+                            if _trim(item)
+                        ]
+                        title = f"读取{label or '结果'}明细"
+                        content = (
+                            f"正在读取回答所需的明细字段（{len(columns)} 个）。"
+                            if columns
+                            else "正在读取回答所需的结果明细。"
+                        )
+                        call_progress[call_id] = [
+                            {"progress_id": call_id, "title": title, "label": label}
+                        ]
+                        self._emit(event_sink, content, progress_id=call_id, title=title, status="running")
                 elif event_type == "tool/result":
                     message = data.get("message")
                     source = message.get("source") if isinstance(message, Mapping) else {}
                     call_id = _trim(source.get("callId")) if isinstance(source, Mapping) else ""
                     name = call_names.get(call_id, "")
-                    title = "数据查询" if name.endswith("finance_query") else "数据口径"
-                    self._emit(event_sink, "本步数据处理已完成。", progress_id=call_id, title=title, status="completed")
+                    payload = _notification_tool_payload(data)
+                    progress_items = call_progress.get(call_id) or [
+                        {"progress_id": call_id, "title": "金融数据处理", "label": ""}
+                    ]
+                    failed = bool(payload.get("error")) or payload.get("ok") is False
+                    if name.endswith("read_finance_catalog"):
+                        item = progress_items[0]
+                        label = item.get("label", "")
+                        content = (
+                            f"已确认{label}的可用字段、时间范围和查询口径。"
+                            if label and not failed
+                            else "当前数据范围与口径确认未完成。"
+                            if failed
+                            else "已确认本题所需的数据范围与口径。"
+                        )
+                        self._emit(
+                            event_sink,
+                            content,
+                            progress_id=item["progress_id"],
+                            title=item["title"],
+                            status="error" if failed else "completed",
+                        )
+                    elif name.endswith("finance_query"):
+                        summaries = (
+                            [item for item in payload.get("steps") or [] if isinstance(item, Mapping)]
+                            if isinstance(payload.get("steps"), list)
+                            else [payload]
+                        )
+                        for index, item in enumerate(progress_items):
+                            summary = summaries[index] if index < len(summaries) else {}
+                            label = item.get("label", "") or public_source_label(
+                                api=_trim(summary.get("api"))
+                            )
+                            data_ref = _trim(summary.get("result_ref"))
+                            if data_ref and label:
+                                result_sources[data_ref] = label
+                            row_count = int(summary.get("row_count") or 0)
+                            goal = item.get("goal", "金融数据查询")
+                            content = (
+                                f"已查询：{goal}，取得 {row_count} 条记录。"
+                                if row_count
+                                else f"已查询：{goal}，当前条件下为 0 条记录。"
+                                if not failed
+                                else f"查询未完成：{goal}。"
+                            )
+                            self._emit(
+                                event_sink,
+                                content,
+                                progress_id=item["progress_id"],
+                                title=item["title"],
+                                status="error" if failed else "completed",
+                            )
+                    else:
+                        item = progress_items[0]
+                        rows = payload.get("rows") if isinstance(payload.get("rows"), list) else []
+                        content = (
+                            f"已读取 {len(rows)} 条必要明细。"
+                            if not failed
+                            else "结果明细读取未完成。"
+                        )
+                        self._emit(
+                            event_sink,
+                            content,
+                            progress_id=item["progress_id"],
+                            title=item["title"],
+                            status="error" if failed else "completed",
+                        )
 
             self._emit(
                 event_sink,
                 "正在理解问题并规划最小数据查询。",
                 progress_id=f"dsh_turn_{turn_id}",
-                title="金融数据分析",
+                title="识别查询范围",
                 status="running",
             )
             try:
@@ -891,6 +1136,7 @@ class FinanceDeepSeekHarnessSessionService:
                     "worker_index": worker.index,
                     "queue_wait_ms": queue_wait_ms,
                     "isolated_request": isolated_request,
+                    "execution_mode": tool_context["_finance_execution_mode"],
                     "resumed": resumed,
                     "duration_ms": round((time.monotonic() - started) * 1000),
                     "result": final_response,
@@ -971,6 +1217,7 @@ class FinanceDeepSeekHarnessSessionService:
                     },
                     "prompt_assets": dict(self.prompt_assets),
                     "runtime": "dsh",
+                    "execution_mode": tool_context["_finance_execution_mode"],
                 }
             self._append_record(record)
             return record

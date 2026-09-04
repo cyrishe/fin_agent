@@ -89,6 +89,7 @@ def test_single_quote_preserves_narrative_and_uses_real_values_as_metrics():
         block.get("semantic") not in {"finance.ohlcv", "finance.intraday"}
         for block in blocks
     )
+    assert blocks[1]["domain_context"]["source"] == "股票 · 行情"
 
 
 def test_mode_two_quote_labels_minute_fields_without_changing_values():
@@ -226,6 +227,28 @@ def test_partial_table_keeps_only_sample_rows_and_exposes_paging_locator():
     assert table_data["page_size"] == 10
     assert table_data["thread_id"] == 2640
     assert table_data["data_ref"] == "session://financial_qa_example/vars/v20"
+
+
+def test_external_string_session_id_does_not_become_a_ui_paging_thread_id():
+    service = FinancialQaPresentationService()
+    blocks = service.build(
+        "返回结构化结果。",
+        [
+            {
+                "api": "stock.moneyflow",
+                "row_count": 50,
+                "sample_complete": False,
+                "result_ref": "session://financial_qa_api/vars/v1",
+                "schema": _schema(("code", "string")),
+                "sample": {"rows": [{"code": "600519.SH"}]},
+            }
+        ],
+        thread_id="finance-api-request-id",
+    )
+
+    table_data = blocks[1]["payload"]["data"]
+    assert "thread_id" not in table_data
+    assert "data_ref" not in table_data
 
 
 def test_report_record_stays_a_table_and_preserves_null_and_long_text():
@@ -420,7 +443,7 @@ def test_same_source_and_as_of_metric_results_merge_into_one_card():
     ] == ["financing_balance", "financing_net_buy"]
 
 
-def test_empty_or_invalid_evidence_keeps_only_the_narrative():
+def test_empty_evidence_keeps_business_source_and_zero_row_trace():
     service = FinancialQaPresentationService()
     message = "当前条件下没有查到记录。"
 
@@ -438,17 +461,13 @@ def test_empty_or_invalid_evidence_keeps_only_the_narrative():
         ],
     )
 
-    assert blocks == [
-        {
-            "block_id": "financial_qa_answer",
-            "block_type": "narrative",
-            "kind": "narrative",
-            "semantic": "finance.answer",
-            "mode": "replace",
-            "content": message,
-            "payload": {"format": "markdown", "text": message},
-        }
+    assert [item["block_id"] for item in blocks] == [
+        "financial_qa_answer",
+        "financial_qa_evidence_1_empty",
     ]
+    assert blocks[1]["title"] == "查询研报"
+    assert blocks[1]["payload"]["data"]["row_count"] == 0
+    assert blocks[1]["domain_context"]["source"] == "股票 · 研报明细"
 
 
 def test_structured_evidence_removes_duplicate_markdown_table_but_keeps_section():

@@ -275,8 +275,38 @@ def test_production_catalog_is_the_runtime_source_and_examples_are_operation_exa
     raw = service.load_raw_catalog()
 
     assert raw == load_catalog_source()
+    financial_view = raw["subjects"]["stock"]["financial_3_table"]
+    assert set(financial_view["value_domains"]["statement_type"]) == {
+        "HB",
+        "HBTZ",
+        "HBDJ",
+        "HBTZDJ",
+        "MGS",
+        "MGSTZ",
+        "MGSDJ",
+        "MGSTZDJ",
+    }
+    financial_query = service.get_model_dataview(
+        "stock", "financial_3_table", "query"
+    )
+    assert financial_query["value_domains"] == financial_view["value_domains"]
+    assert "不表示年报" in financial_query["fields"]["statement_type"]["desc"]
+    assert any(
+        "report_period in (2022-12-31" in example
+        for example in financial_query["functions"][0]["examples"]
+    )
     assert "news" not in raw["subjects"]["stock"]
     assert resolve_api("stock.news") is None
+    assert service.get_public_data_source(api="stock.report") == {
+        "data_object": "股票",
+        "data_type": "研报明细",
+        "label": "股票 · 研报明细",
+        "description": raw["subjects"]["stock"]["report"]["desc"],
+    }
+    assert service.get_public_data_source(
+        subject="industry",
+        dataview="constitution",
+    )["label"] == "行业 · 成分股"
     operation_count = 0
     for subject, subject_cfg in raw["subjects"].items():
         for dataview, view in subject_cfg.items():
@@ -457,3 +487,13 @@ def test_legacy_stage1_routing_uses_the_complete_description(
 
     assert "quote: 股票行情数据；覆盖历史、分钟与当前行情。" in routing
     assert "不应使用的旧摘要" not in routing
+
+
+def test_financial_trend_rule_forbids_mixing_cumulative_and_single_quarter() -> None:
+    view = FinanceDataToolCatalogService().get_model_dataview(
+        "stock", "financial_3_table", "query"
+    )
+
+    rules = "\n".join(view["rules"])
+    assert "默认HB是年初至报告期累计值" in rules
+    assert "不得把不同季度的累计值称为单季值" in rules

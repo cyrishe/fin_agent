@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Fin Agent MCP 使用说明</title>
+  <style>
+    :root {
+      color-scheme: light dark;
+      --bg: light-dark(#f5f6f2, #111513);
+      --panel: light-dark(#ffffff, #18201c);
+      --ink: light-dark(#17201b, #edf4ef);
+      --muted: light-dark(#68726c, #a9b6ae);
+      --line: light-dark(#dce2dd, #354139);
+      --accent: light-dark(#186449, #72d6aa);
+      --code: light-dark(#edf2ee, #101713);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: var(--bg);
+      font: 15px/1.65 ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    header, main { width: min(980px, calc(100% - 36px)); margin: 0 auto; }
+    header {
+      padding: 42px 0 24px;
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 24px;
+    }
+    h1 { margin: 0; font-size: clamp(27px, 4vw, 40px); letter-spacing: -.035em; }
+    header p, .lead { margin: 8px 0 0; color: var(--muted); }
+    nav { display: flex; flex-wrap: wrap; gap: 15px; }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; text-underline-offset: 3px; }
+    main { padding-bottom: 56px; }
+    .hero, section {
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: var(--panel);
+      box-shadow: 0 10px 32px rgba(10, 30, 20, .05);
+    }
+    .hero { padding: 24px; margin-bottom: 18px; }
+    .endpoint {
+      margin-top: 18px;
+      padding: 14px 16px;
+      border-radius: 12px;
+      background: var(--code);
+      overflow-wrap: anywhere;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    }
+    .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+    section { padding: 22px 24px; }
+    section.wide { grid-column: 1 / -1; }
+    h2 { margin: 0 0 13px; font-size: 18px; }
+    h3 { margin: 20px 0 8px; font-size: 15px; }
+    ul { margin: 0; padding-left: 20px; }
+    li + li { margin-top: 6px; }
+    code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+    pre {
+      margin: 12px 0 0;
+      padding: 16px;
+      overflow-x: auto;
+      border-radius: 12px;
+      background: var(--code);
+      font: 13px/1.65 ui-monospace, SFMono-Regular, Menlo, monospace;
+    }
+    table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    th, td { padding: 10px 8px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
+    th { color: var(--muted); font-weight: 600; }
+    .note { margin: 14px 0 0; color: var(--muted); }
+    @media (max-width: 720px) {
+      header { align-items: start; flex-direction: column; }
+      .grid { grid-template-columns: 1fr; }
+      section.wide { grid-column: auto; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div>
+      <h1>Fin Agent MCP 使用说明</h1>
+      <p>把 Fin Agent 的结构化金融数据查询能力接入支持 MCP 的客户端或智能体。</p>
+    </div>
+    <nav aria-label="相关资源">
+      <a href="data-map">数据说明</a>
+      <a href="docs">API 文档</a>
+      <a href="openapi.json">OpenAPI</a>
+    </nav>
+  </header>
+  <main>
+    <div class="hero">
+      <strong>连接地址</strong>
+      <div class="endpoint">https://ai-agent.kingdomai.com/fin_agent/mcp</div>
+      <p class="lead">传输协议为 MCP Streamable HTTP。所有请求都需要 API Key，推荐使用 <code>Authorization: Bearer &lt;FINANCE_API_KEY&gt;</code> 请求头。</p>
+    </div>
+
+    <div class="grid">
+      <section>
+        <h2>可用工具</h2>
+        <p><code>finance_data_query</code></p>
+        <ul>
+          <li>输入自然语言金融问题。</li>
+          <li>覆盖行情、财务、估值、资金流、研报等结构化数据。</li>
+          <li>这是封闭数据查询能力，不调用通用 Web Search。</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2>鉴权方式</h2>
+        <p>二选一即可：</p>
+        <pre>Authorization: Bearer &lt;FINANCE_API_KEY&gt;
+X-API-Key: &lt;FINANCE_API_KEY&gt;</pre>
+        <p class="note">请通过客户端的密钥或环境变量配置保存 Key，不要写入公开代码仓库。</p>
+      </section>
+
+      <section class="wide">
+        <h2>调用参数</h2>
+        <table>
+          <thead><tr><th>参数</th><th>是否必需</th><th>说明</th></tr></thead>
+          <tbody>
+            <tr><td><code>query</code></td><td>是</td><td>自然语言金融数据问题。</td></tr>
+            <tr><td><code>response_mode</code></td><td>否</td><td><code>data</code> 返回原始行数据，<code>summary</code> 返回结论，<code>both</code> 同时返回；默认 <code>both</code>。</td></tr>
+            <tr><td><code>runtime</code></td><td>否</td><td><code>cc</code> 或 <code>dsh</code>；不填写时使用服务端默认值。</td></tr>
+            <tr><td><code>research_mode</code></td><td>否</td><td><code>fast</code>、<code>auto</code> 或 <code>deep</code>，控制摘要分析深度；默认 <code>fast</code>。</td></tr>
+            <tr><td><code>execution_mode</code></td><td>否</td><td><code>standard</code> 或 <code>fast</code>；DSH 的快速执行模式省略检查与重试。</td></tr>
+            <tr><td><code>conversation_id</code></td><td>否</td><td>调用方提供的稳定会话标识；独立查询可不填写。</td></tr>
+            <tr><td><code>max_rows</code></td><td>否</td><td>每个结果集最多返回 1–100 行，默认 100。</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section class="wide">
+        <h2>Python 快速示例</h2>
+        <pre>import asyncio
+import os
+
+from mcp import ClientSession
+from mcp.client.streamable_http import streamablehttp_client
+
+MCP_URL = "https://ai-agent.kingdomai.com/fin_agent/mcp"
+HEADERS = {"Authorization": f"Bearer {os.environ['FINANCE_API_KEY']}"}
+
+async def main():
+    async with streamablehttp_client(MCP_URL, headers=HEADERS) as (read, write, _):
+        async with ClientSession(read, write) as session:
+            await session.initialize()
+            result = await session.call_tool(
+                "finance_data_query",
+                arguments={
+                    "query": "海尔智家近四年的营业收入和归母净利润走势如何？",
+                    "response_mode": "both",
+                    "runtime": "dsh",
+                },
+            )
+            print(result.structuredContent)
+
+asyncio.run(main())</pre>
+        <p class="note">返回值包含 <code>data_sources</code>、结构化结果、摘要和执行元数据。<code>data_sources</code> 使用“股票 · 研报明细”“行业 · 成分股”等公开业务名称，列出每个查询目标及实际记录数，便于核验查询逻辑；不会暴露内部目录路由标识。只需要裸数据时，将 <code>response_mode</code> 设为 <code>data</code>。</p>
+      </section>
+    </div>
+  </main>
+</body>
+</html>

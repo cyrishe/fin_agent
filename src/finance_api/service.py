@@ -13,6 +13,9 @@ import anyio
 from src.finance_api.models import FinanceQueryRequest, FinanceQueryResponse
 from src.scenarios.financial_qa import FinancialQaCcService
 from src.scenarios.financial_qa.runtime import normalize_financial_qa_runtime
+from src.services.finance_data_tool_catalog_service import (
+    FinanceDataToolCatalogService,
+)
 
 
 def _trim(value: Any) -> str:
@@ -28,6 +31,7 @@ class FinanceApiGateway:
         engine: FinancialQaCcService | None = None,
         default_runtime: str | None = None,
         max_concurrency: int | None = None,
+        catalog: FinanceDataToolCatalogService | None = None,
     ) -> None:
         self.engine = engine or FinancialQaCcService()
         self.default_runtime = normalize_financial_qa_runtime(
@@ -43,6 +47,7 @@ class FinanceApiGateway:
                 else os.environ.get("FINANCE_API_MAX_CONCURRENCY") or 10
             ),
         )
+        self.catalog = catalog or FinanceDataToolCatalogService()
         self._semaphore: asyncio.Semaphore | None = None
 
     async def execute(
@@ -92,6 +97,7 @@ class FinanceApiGateway:
                 },
             },
             research_mode=request.research_mode,
+            execution_mode=request.execution_mode,
             runtime=runtime,
             data_only=request.response_mode == "data",
             isolated_request=public_conversation_id is None,
@@ -106,8 +112,8 @@ class FinanceApiGateway:
             conversation_id=public_conversation_id,
         )
 
-    @staticmethod
     def _public_response(
+        self,
         raw: Mapping[str, Any],
         *,
         request: FinanceQueryRequest,
@@ -137,7 +143,6 @@ class FinanceApiGateway:
                 {
                     "result_name": _trim(item.get("result_name")),
                     "goal": _trim(item.get("goal")),
-                    "api": _trim(item.get("api")),
                     "data_type": _trim(item.get("data_type")) or "table",
                     "schema": (
                         dict(item.get("schema"))
@@ -158,6 +163,15 @@ class FinanceApiGateway:
             for item in finance_meta.get("result_refs") or []
             if isinstance(item, Mapping)
         ]
+        source_metadata = [
+            dict(item)
+            for item in raw_data.get("results") or []
+            if isinstance(item, Mapping)
+        ] or [
+            dict(item)
+            for item in finance_meta.get("result_refs") or []
+            if isinstance(item, Mapping)
+        ]
         total_rows = sum(
             int(item.get("row_count") or 0)
             for item in result_metadata
@@ -167,13 +181,19 @@ class FinanceApiGateway:
             if include_data
             else 0
         )
-        api_names = list(
-            dict.fromkeys(
-                _trim(item.get("api"))
-                for item in result_metadata
-                if _trim(item.get("api"))
+        data_sources: list[dict[str, Any]] = []
+        for item in source_metadata:
+            api = _trim(item.get("api"))
+            public_source = self.catalog.get_public_data_source(api=api)
+            if not public_source:
+                continue
+            data_sources.append(
+                {
+                    **public_source,
+                    "query_goal": _trim(item.get("goal")) or "金融数据查询",
+                    "row_count": int(item.get("row_count") or 0),
+                }
             )
-        )
         return FinanceQueryResponse.model_validate(
             {
                 "id": request_id,
@@ -182,7 +202,9 @@ class FinanceApiGateway:
                 "query": request.query,
                 "response_mode": request.response_mode,
                 "runtime": runtime,
+                "execution_mode": request.execution_mode,
                 "conversation_id": conversation_id,
+                "data_sources": data_sources,
                 "summary": summary if include_summary and summary else None,
                 "data": (
                     {"format": "row-dict", "results": projected_results}
@@ -204,7 +226,6 @@ class FinanceApiGateway:
                         if include_data
                         else False
                     ),
-                    "apis": api_names,
                 },
                 "error": (
                     {"code": "finance_query_failed", "message": error_text}

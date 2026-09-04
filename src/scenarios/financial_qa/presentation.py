@@ -221,14 +221,15 @@ class FinancialQaPresentationService:
             backtest_blocks = self._backtest_blocks(result_ref, index=index)
             if backtest_blocks:
                 return backtest_blocks
-        columns, column_specs = self._columns(result_ref)
-        rows = self._rows(result_ref)
-        if not rows:
-            return []
-
         api = _trim(result_ref.get("api"))
         goal = _trim(result_ref.get("goal"))
         display_title = _trim(result_ref.get("display_title"))
+        public_source = self.catalog.get_public_data_source(api=api)
+        if not api and not public_source:
+            return []
+        source_label = _trim(public_source.get("label")) or "金融数据"
+        columns, column_specs = self._columns(result_ref)
+        rows = self._rows(result_ref)
         catalog_specs = self._catalog_column_specs(
             api,
             catalog_revision=_trim(
@@ -278,7 +279,38 @@ class FinancialQaPresentationService:
             sample_rows=len(rows),
             sample_complete=bool(result_ref.get("sample_complete")),
         )
-        domain_context = self._domain_context(api, rows, columns)
+        domain_context = self._domain_context(
+            api,
+            rows,
+            columns,
+            source_label=source_label,
+        )
+        if not rows:
+            return [
+                {
+                    "block_id": f"financial_qa_evidence_{index}_empty",
+                    "block_type": "data",
+                    "kind": "data",
+                    "semantic": self._records_semantic(api),
+                    "mode": "replace",
+                    "title": goal or source_label,
+                    "payload": {
+                        "shape": "records",
+                        "content_type": self._records_semantic(api),
+                        "data": {
+                            "columns": columns,
+                            "rows": [],
+                            "row_count": 0,
+                        },
+                    },
+                    "presentation_hint": {
+                        "preferred_renderer": "data.table",
+                        "density": "compact",
+                    },
+                    "domain_context": domain_context,
+                    "meta": meta,
+                }
+            ]
         candles = self._candles(rows, columns)
         if candles:
             intraday = self._is_intraday(api, columns)
@@ -361,10 +393,11 @@ class FinancialQaPresentationService:
             "page_size": 10,
             "returned_row_count": row_count,
         }
-        if thread_id and data_ref.startswith("session://"):
+        normalized_thread_id = _trim(thread_id)
+        if normalized_thread_id.isdigit() and data_ref.startswith("session://"):
             paging.update(
                 {
-                    "thread_id": int(thread_id),
+                    "thread_id": int(normalized_thread_id),
                     "data_ref": data_ref,
                 }
             )
@@ -685,10 +718,12 @@ class FinancialQaPresentationService:
         api: str,
         rows: Sequence[Any],
         columns: Sequence[str],
+        *,
+        source_label: str = "",
     ) -> dict[str, Any]:
         context: dict[str, Any] = {}
-        if api:
-            context["source"] = api
+        if source_label:
+            context["source"] = source_label
         if not rows:
             return context
         row = cls._row_mapping(rows[-1], columns)

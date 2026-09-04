@@ -395,7 +395,6 @@ def test_skill_references_are_loaded_from_the_bound_snapshot_only_after_skill_ac
             )
         )
     )
-
     assert "mcp__finance__read_finance_skill_reference" in names
     assert "先加载对应" in blocked["error"]
     assert loaded["content"] == "consumer lens"
@@ -751,6 +750,16 @@ def test_queries_keep_dependency_handles_and_results_are_pageable(tmp_path: Path
             )
         )
     )
+    loaded_by_result_name = _payload(
+        asyncio.run(
+            tools["load_finance_result"].handler(
+                {
+                    "result_ref": "r1",
+                    "columns": ["stock_name"],
+                }
+            )
+        )
+    )
 
     assert runtime.calls[0]["previous"] == []
     assert runtime.calls[1]["previous"] == ["r1"]
@@ -774,6 +783,7 @@ def test_queries_keep_dependency_handles_and_results_are_pageable(tmp_path: Path
     assert second["depends_on"] == ["r1"]
     assert loaded["rows"] == [{"stock_name": "贵州茅台"}]
     assert loaded["columns"] == ["stock_name"]
+    assert loaded_by_result_name["rows"] == [{"stock_name": "贵州茅台"}]
     assert "manifest" not in loaded
     assert len(tracker["result_refs"]) == 2
     legacy_model_payload = {
@@ -927,6 +937,120 @@ def test_query_result_names_are_system_assigned_and_progress_is_observable(
     assert "selection_applied" not in visible_progress
     assert "sample_complete" not in visible_progress
     assert "闭环判断" not in visible_progress
+
+
+def test_dsh_model_sample_can_cover_a_small_complete_result(tmp_path: Path) -> None:
+    class _FiveRowRuntime(_Runtime):
+        def execute_request(self, *, request, previous_results=None):
+            result = super().execute_request(
+                request=request,
+                previous_results=previous_results,
+            )
+            result["result"]["data"] = {
+                "rows": [
+                    {
+                        "stock_code": "600519.SH",
+                        "stock_name": "贵州茅台",
+                        "close": 1500.0 + index,
+                    }
+                    for index in range(5)
+                ],
+                "row_count": 5,
+            }
+            return result
+
+    service = FinanceDataQueryCcTools(
+        finance_runtime=_FiveRowRuntime(),
+        finance_catalog=_Catalog(),
+        result_store=SessionVariableStoreService(data_root=tmp_path / "data"),
+    )
+    tools, _, tracker = service.build_tools(
+        owner_ids=["owner-a"],
+        tool_context={
+            "_agent_runtime_scope": "financial_qa_dsh:owner-a/thread-five",
+            "_finance_model_sample_rows": 5,
+        },
+    )
+    result = _payload(
+        asyncio.run(
+            {item.name: item for item in tools}["finance_query"].handler(
+                {
+                    "goal": "取得最近五日行情",
+                    "request": (
+                        "r1 = stock.quote(filter='贵州茅台', count=5) "
+                        "-> stock_code, stock_name, close"
+                    ),
+                }
+            )
+        )
+    )
+
+    assert len(result["sample"]["rows"]) == 5
+    assert result["sample_complete"] is True
+    assert result["step_evidence"]["sample_complete"] is True
+    # The turn tracker preserves the same evidence used for this answer.
+    assert len(tracker["result_refs"][0]["sample"]["rows"]) == 5
+
+
+def test_dsh_detail_default_can_cover_a_small_multi_period_result(
+    tmp_path: Path,
+) -> None:
+    class _ElevenRowRuntime(_Runtime):
+        def execute_request(self, *, request, previous_results=None):
+            result = super().execute_request(
+                request=request,
+                previous_results=previous_results,
+            )
+            result["result"]["data"] = {
+                "rows": [
+                    {
+                        "stock_code": "600519.SH",
+                        "stock_name": "贵州茅台",
+                        "close": 1500.0 + index,
+                    }
+                    for index in range(11)
+                ],
+                "row_count": 11,
+            }
+            return result
+
+    service = FinanceDataQueryCcTools(
+        finance_runtime=_ElevenRowRuntime(),
+        finance_catalog=_Catalog(),
+        result_store=SessionVariableStoreService(data_root=tmp_path / "data"),
+    )
+    tools, _, _ = service.build_tools(
+        owner_ids=["owner-a"],
+        tool_context={
+            "_agent_runtime_scope": "financial_qa_dsh:owner-a/thread-eleven",
+            "_finance_detail_default_limit": 20,
+        },
+    )
+    tool_map = {item.name: item for item in tools}
+    result = _payload(
+        asyncio.run(
+            tool_map["finance_query"].handler(
+                {
+                    "goal": "取得多期行情",
+                    "request": (
+                        "r1 = stock.quote(filter='贵州茅台', count=11) "
+                        "-> stock_code, stock_name, close"
+                    ),
+                }
+            )
+        )
+    )
+    loaded = _payload(
+        asyncio.run(
+            tool_map["load_finance_result"].handler(
+                {"result_ref": result["result_name"]}
+            )
+        )
+    )
+
+    assert len(loaded["rows"]) == 11
+    assert loaded["page"]["limit"] == 20
+    assert loaded["page"]["has_more"] is False
 
 
 def test_working_set_distinguishes_available_identity_from_null_metric(
@@ -1748,6 +1872,42 @@ def test_chat_dispatch_hands_investment_normal_qa_directly_to_financial_cc(
     assert calls[0]["dispatch_plan"] == plan
     assert calls[0]["research_mode"] == "deep"
     assert calls[0]["data_only"] is True
+
+
+def test_disabled_financial_cc_fails_closed_without_generic_tool_fallback(
+    monkeypatch,
+) -> None:
+    from src.web import flask_app as web
+
+    class _DisabledPrimary:
+        enabled = False
+
+        @staticmethod
+        def accepts(**_kwargs):
+            return False
+
+    class _GenericRuntime:
+        @staticmethod
+        def execute_for_assistant(**_kwargs):
+            raise AssertionError("financial QA must not fall back to generic tools")
+
+    monkeypatch.setattr(web, "financial_qa_cc_service", _DisabledPrimary())
+    monkeypatch.setattr(web, "tool_plan_runtime_service", _GenericRuntime())
+    plan = {
+        "selected_agent": "investment_analyst",
+        "turn_mode": "normal_qa",
+        "entry": "agent_route",
+    }
+
+    result = web._build_chat_dispatch_payload(
+        "查询贵州茅台财务数据",
+        application_context={},
+        thread_context={},
+        precomputed_plan=plan,
+    )
+
+    assert result["mode"] == "financial_qa_unavailable"
+    assert "不会回落到通用搜索工具" in result["message"]
 
 
 def test_financial_raw_rows_are_not_duplicated_in_persisted_chat_payload() -> None:

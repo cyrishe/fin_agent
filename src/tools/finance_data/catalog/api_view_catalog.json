@@ -411,12 +411,14 @@
   "subjects": {
     "stock": {
       "_meta": {
+        "public_name": "股票",
         "desc": "股票主体，用于上市公司及股票相关的基础信息、行情、资金流、估值、财务、股东、两融、研报和研报指标查询。",
         "rules": [
           "When the user asks about a specific company or stock, prefer stock as subject."
         ]
       },
       "basic_info": {
+        "public_name": "基础信息",
         "desc": "股票基础信息视图，用于查询公司名称、股票代码、所属行业、上市信息、公司简介和主营业务等描述性信息。",
         "fields": {
           "code": [
@@ -449,6 +451,7 @@
         ]
       },
       "quote": {
+        "public_name": "行情",
         "desc": "个股行情视图，覆盖截至上一交易日的历史日K、固定周期分钟K与最新当日行情。",
         "fields": {
           "code": [
@@ -695,6 +698,7 @@
         }
       },
       "moneyflow": {
+        "public_name": "资金流",
         "desc": "个股资金流视图，用于查询资金流入、流出和净流入，区分主力、散户、超大单、大单、中单和小单。",
         "fields": {
           "code": [
@@ -810,6 +814,7 @@
         }
       },
       "pricevalue": {
+        "public_name": "估值",
         "desc": "个股估值视图，用于查询市值、市盈率、市净率、市销率、PE、PB、PS 等估值指标。",
         "fields": {
           "code": [
@@ -1011,6 +1016,7 @@
         }
       },
       "financial_3_table": {
+        "public_name": "财务三表与财务指标",
         "desc": "个股财务三表及常用财务指标视图，一行对应公司一个报告期的实际披露口径，覆盖收入利润、资产负债、现金流、费用、每股收益和财务比率，适合查询最新财务数值、多期变化及财务质量分析所需的基础数据。",
         "fields": {
           "code": [
@@ -1038,10 +1044,13 @@
             "披露日期",
             "ann_date"
           ],
-          "statement_type": [
-            "报表类型",
-            "statement_type"
-          ],
+          "statement_type": {
+            "aliases": [
+              "报表口径",
+              "statement_type"
+            ],
+            "desc": "底层合并/母公司、调整前后及累计/单季口径代码，不表示年报、半年报或季报；普通实际财务查询省略该条件，系统默认 HB。"
+          },
           "currency": [
             "货币代码",
             "币种",
@@ -1238,13 +1247,25 @@
             "asset_turnover"
           ]
         },
+        "value_domains": {
+          "statement_type": {
+            "HB": "合并报表、调整前、累计口径（普通查询默认）",
+            "HBTZ": "合并报表、调整后、累计口径",
+            "HBDJ": "合并报表、调整前、单季口径",
+            "HBTZDJ": "合并报表、调整后、单季口径",
+            "MGS": "母公司报表、调整前、累计口径",
+            "MGSTZ": "母公司报表、调整后、累计口径",
+            "MGSDJ": "母公司报表、调整前、单季口径",
+            "MGSTZDJ": "母公司报表、调整后、单季口径"
+          }
+        },
         "api": [
           {
             "api_name": "stock.financial_3_table",
             "api_function": "查询个股财务三张表字段和常用财务指标。",
             "api_class": "financial_query",
             "examples": [
-              "r1 = stock.financial_3_table(filter = \"code = 000001.SZ and report_period = 2025-12-31\", order = \"report_date desc\", limit = 1) -> code, name, report_date, revenue, net_profit, roe\nnote: 财务报告期写在 filter 中，例如 report_period = 2025-12-31。",
+              "r1 = stock.financial_3_table(filter = \"code = 000001.SZ and report_period in (2022-12-31, 2023-12-31, 2024-12-31, 2025-12-31)\", order = \"report_period asc\", limit = 4) -> code, name, report_period, revenue, revenue_yoy\nnote: 年度数据用各年的12月31日报告期筛选；statement_type不是年报/季报频率，普通查询应省略并使用默认HB。",
               "r2 = stock.financial_3_table(filter = \"revenue_yoy > 20 and statement_type = HB\", order = \"revenue_yoy desc\", limit = 20) -> code, name, report_date, revenue, revenue_yoy",
               "r3 = stock.financial_3_table(filter = \"code in r1.code and report_period >= 2024-01-01\", order = \"report_date desc\", limit = 8) -> code, name, report_date, revenue, profit, total_assets\nnote: -x 交易日语义不用于 report_period。",
               "r4 = stock.financial_3_table(filter = \"code in r1.code\") -> code, name, report_date, revenue, net_profit\nnote: 如果请求没有要求排序或取前几，则省略 order 和 limit。"
@@ -1254,6 +1275,9 @@
         "rules": [
           "不传report_date/report_period/start/end且filter中也没有报告期条件时，只查询数据源全局最新报告期；order和limit不会扩展为历史报告期。",
           "查询单只股票最新财务状况或多期比较时，应显式传start和end，或在filter中给出report_period范围，再按report_period倒序和limit取所需期间。",
+          "年报、半年报、季报由report_period识别：年度数据筛选每年12月31日，半年数据筛选6月30日；不得把年报、半年报、季报等中文频率写入statement_type。",
+          "statement_type只表示合并/母公司、调整前后及累计/单季口径；用户没有明确要求这些口径时省略该条件，使用默认HB。",
+          "多期走势或增长比较必须保持可比的报告频率和statement_type口径；默认HB是年初至报告期累计值，不得把不同季度的累计值称为单季值或直接作环比，跨年比较应筛选相同报告期频率，或明确查询yoy/qoq派生字段或单季口径。",
           "同一份多期查询能够支持比较时，不按报告期拆成多次单行查询。"
         ],
         "computed": {
@@ -1295,6 +1319,7 @@
         }
       },
       "report": {
+        "public_name": "研报明细",
         "desc": "研报明细，一行对应一篇研报，覆盖机构、分析师、发布日期、评级与变动、目标价、投资要点、风险及来源，适合查询机构观点与覆盖情况，以及研报文字中涉及的业绩驱动、竞争格局、市场份额、竞争优势、战略和展望。",
         "fields": {
           "report_id": [
@@ -1470,6 +1495,7 @@
         ]
       },
       "report_metric": {
+        "public_name": "研报预测指标",
         "desc": "研报标准年度指标明细，一行对应一篇研报的一个指标、年份和值类型，当前覆盖EPS、归母净利润及增速、营业收入及增速、PE、PB和ROE，适合查询特定机构的年度预测值、实际值及多机构统计。",
         "fields": {
           "report_id": [
@@ -1641,6 +1667,7 @@
         ]
       },
       "margin": {
+        "public_name": "融资融券",
         "desc": "融资融券视图，查询个股融资余额、融资买入/偿还、融资净买入、融券余额/余量、两融余额和融资余额占流通市值比例。",
         "fields": {
           "code": [
@@ -2530,6 +2557,7 @@
         }
       },
       "shareholder": {
+        "public_name": "股东",
         "desc": "个股股东视图，查询股东户数、前十大股东、第一大股东和流通股东明细。",
         "fields": {
           "code": [
@@ -2619,6 +2647,7 @@
         ]
       },
       "pledge": {
+        "public_name": "股权质押",
         "desc": "个股股权质押视图，查询质押比例、质押/解押明细和冻结明细。",
         "fields": {
           "code": [
@@ -2729,6 +2758,7 @@
         ]
       },
       "corporate_action": {
+        "public_name": "股本事件",
         "desc": "个股股本事件视图，查询分红送转、增发、配股、限售解禁和 IPO 等事项。",
         "fields": {
           "code": [
@@ -2932,6 +2962,7 @@
         ]
       },
       "performance_notice": {
+        "public_name": "业绩预告",
         "desc": "个股业绩预告视图，查询预增、预减、扭亏、续亏以及净利润/收入上下限。",
         "fields": {
           "code": [
@@ -3028,6 +3059,7 @@
         ]
       },
       "business_segment": {
+        "public_name": "业务分部与客户供应商",
         "desc": "个股业务分部与客户供应商视图，一行对应公司某报告期的产品或地区分部，或一名前五大客户/供应商，覆盖分部收入、成本、利润、毛利率、收入占比与增速，适合查询主营构成、分部经营变化和客户供应商集中度。",
         "fields": {
           "code": [
@@ -3136,10 +3168,12 @@
     },
     "index": {
       "_meta": {
+        "public_name": "指数",
         "desc": "指数主体，用于指数基础信息、行情、估值、成分股和成分股聚合查询。",
         "rules": []
       },
       "basic_info": {
+        "public_name": "基础信息",
         "desc": "指数基础信息视图，用于查询指数名称、代码、类型和简介等描述性信息。",
         "fields": {
           "code": [
@@ -3163,6 +3197,7 @@
         ]
       },
       "quote": {
+        "public_name": "行情",
         "desc": "指数行情视图，用于查询指数价格、涨跌幅、成交量、成交额和近 K 日行情指标。",
         "fields": {
           "code": [
@@ -3280,6 +3315,7 @@
         }
       },
       "pricevalue": {
+        "public_name": "估值",
         "desc": "指数估值视图，用于查询指数估值、市值或净值相关指标。",
         "fields": {
           "code": [
@@ -3351,6 +3387,7 @@
         ]
       },
       "constitution": {
+        "public_name": "成分股",
         "desc": "指数成分关系视图，用于查询指数与成分股的对应关系，以及按指数统计成分股指标。",
         "fields": {
           "index_code": [
@@ -3403,10 +3440,12 @@
     },
     "industry": {
       "_meta": {
+        "public_name": "行业",
         "desc": "行业主体，用于行业基础信息、成分股和成分股聚合查询。",
         "rules": []
       },
       "basic_info": {
+        "public_name": "基础信息",
         "desc": "行业基础信息视图，用于查询行业名称、代码、级别和层级关系等描述性信息。",
         "fields": {
           "industry_code": [
@@ -3441,6 +3480,7 @@
         ]
       },
       "constitution": {
+        "public_name": "成分股",
         "desc": "行业成分关系视图，用于查询行业与成分股的对应关系，以及按行业聚合成分股行情、资金、估值、财务等指标。",
         "fields": {
           "industry_code": [
@@ -3513,6 +3553,7 @@
     },
     "plate": {
       "_meta": {
+        "public_name": "板块",
         "desc": "板块主体，用于板块基础信息、行情、资金流、估值、成分股和成分股聚合查询。",
         "rules": [
           "中文板块名称先通过 plate.basic_info 定位并优先使用 plate_name = 名称。精确名称无结果时，basic_info 会在工具内部做一次受控包含候选解析：唯一候选直接返回，多候选返回歧义诊断；不要先由模型自行扩大 LIKE 范围。",
@@ -3521,6 +3562,7 @@
         ]
       },
       "basic_info": {
+        "public_name": "基础信息",
         "desc": "板块基础信息视图，用于查询板块名称、代码、类别和简介等描述性信息。",
         "fields": {
           "plate_code": [
@@ -3542,6 +3584,7 @@
         ]
       },
       "quote": {
+        "public_name": "行情",
         "desc": "板块行情视图，用于查询板块价格、涨跌幅、成交量、成交额和近 K 日行情指标。",
         "fields": {
           "code": [
@@ -3658,6 +3701,7 @@
         }
       },
       "moneyflow": {
+        "public_name": "资金流",
         "desc": "板块资金流视图，用于查询板块资金流入、流出、净流入和近 K 日资金流指标。",
         "fields": {
           "code": [
@@ -3773,6 +3817,7 @@
         }
       },
       "pricevalue": {
+        "public_name": "估值",
         "desc": "板块估值视图，用于查询板块估值、市值或净值相关指标。",
         "fields": {
           "code": [
@@ -3835,6 +3880,7 @@
         ]
       },
       "constitution": {
+        "public_name": "成分股",
         "desc": "板块成分关系视图，用于查询板块与成分股的对应关系，以及按板块统计成分股指标。",
         "fields": {
           "plate_code": [
@@ -3887,10 +3933,12 @@
     },
     "fund": {
       "_meta": {
+        "public_name": "基金",
         "desc": "基金主体，用于基金基础信息和基金行情查询。",
         "rules": []
       },
       "basic_info": {
+        "public_name": "基础信息",
         "desc": "基金基础信息视图，用于查询基金名称、代码、类型、管理人和简介等描述性信息。",
         "fields": {
           "code": [
@@ -3915,6 +3963,7 @@
         ]
       },
       "quote": {
+        "public_name": "行情",
         "desc": "基金行情视图，用于查询基金价格、涨跌幅、成交量、成交额和近 K 日行情指标。",
         "fields": {
           "code": [
@@ -4056,10 +4105,12 @@
     },
     "bond": {
       "_meta": {
+        "public_name": "债券",
         "desc": "债券主体，用于债券基础信息和债券行情查询。",
         "rules": []
       },
       "basic_info": {
+        "public_name": "基础信息",
         "desc": "债券基础信息视图，用于查询债券名称、代码、类型、发行人和期限等描述性信息。",
         "fields": {
           "code": [
@@ -4084,6 +4135,7 @@
         ]
       },
       "quote": {
+        "public_name": "行情",
         "desc": "债券行情视图，用于查询债券价格、涨跌幅、成交量、成交额和近 K 日行情指标。",
         "fields": {
           "code": [
@@ -4194,10 +4246,12 @@
     },
     "hot_event": {
       "_meta": {
+        "public_name": "市场热点",
         "desc": "热点事件/热点概念主体，用于查询短期市场热点、热度状态、触发事件和关联成分股。",
         "rules": []
       },
       "base_info": {
+        "public_name": "热点信息",
         "desc": "热点事件/概念基础信息视图，用于查询首次触发、最近触发、激活次数、沉寂天数、核心事件和关联公司数量。",
         "fields": {
           "event_id": [
@@ -4266,6 +4320,7 @@
         ]
       },
       "state": {
+        "public_name": "热度走势",
         "desc": "热点事件/概念状态视图，用于查询当前热度、热度变化、趋势方向和市场强弱对比。",
         "fields": {
           "event_id": [
@@ -4331,6 +4386,7 @@
         ]
       },
       "member": {
+        "public_name": "关联股票",
         "desc": "热点事件/概念成分股视图，用于查询热点关联股票，或用股票反查相关热点。",
         "fields": {
           "event_id": [

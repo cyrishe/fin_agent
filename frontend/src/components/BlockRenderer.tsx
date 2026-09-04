@@ -11,6 +11,7 @@ import DesignArtifact from "./renderers/DesignArtifact";
 import EditSummaryArtifact from "./renderers/EditSummaryArtifact";
 import FlowRenderer from "./renderers/FlowRenderer";
 import MetricStrip from "./renderers/MetricStrip";
+import RenderMeta from "./renderers/RenderMeta";
 import InteractionRenderer from "./renderers/InteractionRenderer";
 import ToolIdentityArtifact, { type ToolIdentitySelection } from "./renderers/ToolIdentityArtifact";
 import JsonBlock from "./JsonBlock";
@@ -247,6 +248,7 @@ export default function BlockRenderer(props: Props) {
     <section className={`surface-block block-${object.kind} renderer-${renderer.replaceAll(".", "-")}${stage ? ` stage-${stage}` : ""}`} data-block-id={block.block_id} data-renderer={renderer} tabIndex={-1}>
       {block.title && !hideSurfaceTitle && <div className="surface-title">{block.title}</div>}
       {content}
+      {object.kind === "data" && !["finance.kline", "finance.intraday"].includes(renderer) && <RenderMeta object={object} />}
     </section>
   );
 }

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import re
 from copy import deepcopy
 from dataclasses import dataclass
 from hashlib import sha256
@@ -13,6 +14,7 @@ from src.experiments.staged_data_protocol.phase2.catalog import (
     CATALOG_PATH,
     operation_examples,
     operation_for_api_pattern,
+    resolve_api,
     validate_catalog_source,
 )
 
@@ -183,6 +185,65 @@ class FinanceDataToolCatalogService:
         return _thaw_catalog_value(
             snapshot.tree["subjects"][subject_index]["dataviews"][dataview_index]
         )
+
+    def get_public_data_source(
+        self,
+        *,
+        api: str = "",
+        subject: str = "",
+        dataview: str = "",
+    ) -> Dict[str, str]:
+        """Project one internal catalog route into stable business vocabulary.
+
+        The internal subject/dataview/API identifiers remain available to the
+        executor and trace only.  Public Chat/API/MCP surfaces consume this
+        projection, whose labels live in the same authoritative catalog as the
+        capability description.
+        """
+
+        normalized_api = self._trim(api)
+        normalized_subject = self._trim(subject)
+        normalized_dataview = self._trim(dataview)
+        if normalized_api and not (normalized_subject and normalized_dataview):
+            resolved = resolve_api(normalized_api)
+            if isinstance(resolved, Mapping):
+                normalized_subject = self._trim(resolved.get("subject"))
+                normalized_dataview = self._trim(resolved.get("dataview"))
+        if not normalized_subject or not normalized_dataview:
+            return {}
+        try:
+            subject_row = self.get_subject(normalized_subject)
+            dataview_row = self.get_dataview(
+                normalized_subject,
+                normalized_dataview,
+            )
+        except (FinanceDataToolCatalogError, KeyError):
+            return {}
+        object_name = self._trim(subject_row.get("public_name"))
+        data_type = self._trim(dataview_row.get("public_name"))
+        if not object_name:
+            object_name = self._public_name_from_description(
+                subject_row.get("desc"),
+                suffix="主体",
+            )
+        if not data_type:
+            data_type = self._public_name_from_description(
+                dataview_row.get("desc"),
+                suffix="视图",
+            )
+        if not object_name or not data_type:
+            return {}
+        return {
+            "data_object": object_name,
+            "data_type": data_type,
+            "label": f"{object_name} · {data_type}",
+            "description": self._trim(dataview_row.get("desc")),
+        }
+
+    @classmethod
+    def _public_name_from_description(cls, value: Any, *, suffix: str) -> str:
+        phrase = re.split(r"[，。；]", cls._trim(value), maxsplit=1)[0]
+        return phrase.removesuffix(suffix).strip()
 
     def get_model_dataview(
         self,
@@ -480,6 +541,7 @@ class FinanceDataToolCatalogService:
             dataviews.append(self._build_dataview_row(str(dataview_name), dataview_cfg, api_classes))
         return {
             "name": subject_name,
+            "public_name": self._trim(meta.get("public_name")),
             "desc": self._trim(meta.get("desc")),
             "rules": [self._trim(item) for item in (meta.get("rules") or []) if self._trim(item)],
             "dataviews": dataviews,
@@ -502,6 +564,7 @@ class FinanceDataToolCatalogService:
         description = self._trim(dataview_cfg.get("desc"))
         return {
             "name": dataview_name,
+            "public_name": self._trim(dataview_cfg.get("public_name")),
             "desc": description,
             # Backward-compatible projection only. ``desc`` is the sole
             # persisted capability description and therefore the sole truth.
@@ -589,11 +652,14 @@ class FinanceDataToolCatalogService:
 
     def _subject_meta_from_node(self, node: Mapping[str, Any]) -> Dict[str, Any]:
         return {
+            "public_name": self._trim(node.get("public_name")),
             "desc": self._trim(node.get("desc")),
             "rules": [self._trim(item) for item in (node.get("rules") or []) if self._trim(item)],
         }
 
     def _apply_dataview_node(self, dataview_cfg: Dict[str, Any], node: Mapping[str, Any]) -> None:
+        if "public_name" in node:
+            dataview_cfg["public_name"] = self._trim(node.get("public_name"))
         description = self._trim(node.get("desc"))
         if not description and "desc" not in node:
             # Accept the former field as an input alias without persisting a

@@ -70,6 +70,7 @@ def test_gateway_data_mode_returns_rows_without_summary_and_caps_output() -> Non
             FinanceQueryRequest(
                 query="贵州茅台最近行情",
                 response_mode="data",
+                execution_mode="fast",
                 max_rows=2,
                 conversation_id="conversation-1",
             ),
@@ -78,12 +79,19 @@ def test_gateway_data_mode_returns_rows_without_summary_and_caps_output() -> Non
     )
 
     assert response.ok is True
+    assert response.execution_mode == "fast"
     assert response.summary is None
     assert response.data is not None
     assert response.data.results[0].rows == [{"close": 1}, {"close": 2}]
+    assert response.data_sources[0].label == "股票 · 行情"
+    assert response.data_sources[0].data_object == "股票"
+    assert response.data_sources[0].data_type == "行情"
+    assert response.data_sources[0].query_goal == "查询行情"
+    assert response.data_sources[0].row_count == 3
     assert response.data.results[0].truncated is True
     assert response.execution.truncated is True
     assert engine.calls[0]["data_only"] is True
+    assert engine.calls[0]["execution_mode"] == "fast"
     assert engine.calls[0]["isolated_request"] is False
     assert engine.calls[0]["include_response_data"] is True
     assert engine.calls[0]["response_data_max_rows"] == 2
@@ -122,7 +130,8 @@ def test_gateway_summary_mode_omits_structured_rows_and_isolates_principals() ->
     assert first.execution.result_count == 1
     assert first.execution.total_rows == 3
     assert first.execution.returned_rows == 0
-    assert first.execution.apis == ["stock.quote"]
+    assert [item.label for item in first.data_sources] == ["股票 · 行情"]
+    assert "stock.quote" not in first.model_dump_json()
     assert engine.calls[0]["data_only"] is False
     assert engine.calls[0]["include_response_data"] is False
     assert engine.calls[0]["response_data_max_rows"] == 100

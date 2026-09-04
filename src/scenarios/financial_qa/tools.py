@@ -26,6 +26,27 @@ def _trim(value: Any) -> str:
     return str(value or "").strip()
 
 
+def _request_api_name(request: Any) -> str:
+    match = re.search(
+        r"=\s*([A-Za-z_]\w*(?:\.[A-Za-z_]\w*)+)\s*\(",
+        _trim(request),
+    )
+    return match.group(1) if match else ""
+
+
+def _query_progress_title(label: str, step: int, total: int) -> str:
+    base = f"查询{label}" if label else "查询金融数据"
+    return f"{base} {step}/{total}" if total > 1 else base
+
+
+def _result_rows(handle: ResultHandle) -> list[dict[str, Any]]:
+    data = handle.data
+    rows = data.get("rows") if isinstance(data, Mapping) else data
+    if not isinstance(rows, list):
+        return []
+    return [dict(item) for item in rows if isinstance(item, Mapping)]
+
+
 _OPERATION_SELECTION_DESCRIPTION = (
     "Always provide operation for a concrete data request. Choose by the "
     "requested output granularity, not by words such as compare, "
@@ -388,6 +409,19 @@ class FinanceDataQueryToolRuntime:
             metadata_by_name=self.result_metadata,
         )
 
+    def resolve_result_ref(self, value: Any) -> str:
+        """Resolve either a durable ref or the current working-set alias."""
+
+        candidate = _trim(value)
+        if candidate.startswith(SessionVariableStoreService.REF_PREFIX):
+            return candidate
+        metadata = self.result_metadata.get(candidate)
+        if isinstance(metadata, Mapping):
+            resolved = _trim(metadata.get("result_ref"))
+            if resolved:
+                return resolved
+        return candidate
+
     def current_context_prompt(self) -> str:
         if not self.result_handles:
             return ""
@@ -500,6 +534,45 @@ class FinanceDataQueryCcTools:
 
     def create_runtime(self) -> FinanceDataQueryToolRuntime:
         return FinanceDataQueryToolRuntime(result_store=self.result_store)
+
+    def _public_source(
+        self,
+        *,
+        api: str = "",
+        subject: str = "",
+        dataview: str = "",
+    ) -> dict[str, str]:
+        resolver = getattr(self.finance_catalog, "get_public_data_source", None)
+        if callable(resolver):
+            try:
+                value = resolver(api=api, subject=subject, dataview=dataview)
+                return dict(value) if isinstance(value, Mapping) else {}
+            except (KeyError, ValueError):
+                return {}
+        if api and "." in api:
+            subject, dataview = api.split(".", 2)[:2]
+        try:
+            subject_node = self.finance_catalog.get_subject(subject) if subject else {}
+            dataview_node = (
+                self.finance_catalog.get_dataview(subject, dataview)
+                if subject and dataview
+                else {}
+            )
+        except (KeyError, ValueError):
+            return {}
+        subject_label = _trim(
+            subject_node.get("public_name") or subject_node.get("desc") or subject
+        )
+        dataview_label = _trim(
+            dataview_node.get("public_name")
+            or dataview_node.get("desc")
+            or dataview
+        )
+        return {
+            "label": " · ".join(
+                item for item in (subject_label, dataview_label) if item
+            )
+        }
 
     def build_tools(
         self,
@@ -637,29 +710,29 @@ class FinanceDataQueryCcTools:
                 )
                 catalog_index = len(tool_runtime.tracker["catalog_reads"])
                 if payload["mode"] == "dataview":
-                    dataview_payload = (
-                        payload.get("dataview")
-                        if isinstance(payload.get("dataview"), Mapping)
-                        else {}
+                    public_source = self._public_source(
+                        subject=subject,
+                        dataview=dataview,
                     )
-                    description = (
-                        _trim(dataview_payload.get("desc"))
-                        .split("。", 1)[0]
-                    )
-                    description = re.split(r"[，：]", description, maxsplit=1)[0]
+                    source_label = _trim(public_source.get("label"))
                     progress_text = (
-                        f"已定位{description}，并确认了可用字段与时间口径。"
-                        if description
+                        f"已确认{source_label}的可用字段、时间范围和查询口径。"
+                        if source_label
                         else "已确认本题所需数据的字段与时间口径。"
+                    )
+                    progress_title = (
+                        f"确认{source_label}" if source_label else "确认数据范围"
                     )
                 elif payload["mode"] == "subject":
                     progress_text = "已确认该金融主体可查询的数据范围。"
+                    progress_title = "确认查询对象"
                 else:
                     progress_text = "已读取金融数据目录，正在定位本题所需数据。"
+                    progress_title = "确认数据范围"
                 tool_runtime.emit_progress(
                     progress_text,
                     progress_id=f"finance_catalog_{catalog_index}",
-                    title="数据口径",
+                    title=progress_title,
                     status="completed",
                 )
                 return _tool_result(payload)
@@ -667,7 +740,7 @@ class FinanceDataQueryCcTools:
                 tool_runtime.emit_progress(
                     "暂时无法确认本题所需的数据口径。",
                     progress_id=f"finance_catalog_{len(tool_runtime.tracker['catalog_reads']) + 1}",
-                    title="数据口径",
+                    title="确认数据范围",
                     status="error",
                 )
                 return _tool_result(
@@ -682,12 +755,9 @@ class FinanceDataQueryCcTools:
         @tool(
             "finance_query",
             (
-                "Execute one minimal financial-data flow. Before calling: (1) list every business fact explicitly "
-                "requested by the user and at most one small related data goal for a simple fact question. Unless the user "
-                "requests a number-only answer, a one-point or one-period result must get one comparable context goal when "
-                "the catalog supports it and that context can support a concrete explanation. Before the final answer, explicitly "
-                "check this requirement. Comparable means at least two observations (normally 5-20) or at least "
-                "two meaningful components; another one-row query or another time mode for the same fact is duplicate "
+                "Execute one minimal financial-data flow. Before calling, list every business fact explicitly "
+                "requested by the user. Do not add an unrelated comparison or explanatory query merely to enrich the answer; "
+                "retrieve extra data only when the user's requested calculation cannot be completed without it. "
                 "confirmation, not context; (2) include one step for every goal whose API can already be selected, including "
                 "symbolic dependencies whose actual values need not be inspected; (3) require every filter predicate "
                 "to come from an explicit user constraint, a catalog requirement, or an upstream identity scope. "
@@ -837,10 +907,19 @@ class FinanceDataQueryCcTools:
                     call_record["request"] = request[:500]
                     if submitted_result_name != expected_result_name:
                         call_record["assigned_result_name"] = expected_result_name
+                    public_source = self._public_source(
+                        api=_request_api_name(request)
+                    )
+                    source_label = _trim(public_source.get("label"))
+                    progress_title = _query_progress_title(
+                        source_label,
+                        step_number,
+                        len(steps),
+                    )
                     tool_runtime.emit_progress(
                         f"正在查询：{goal}",
                         progress_id=f"finance_query_step_{step_number}",
-                        title=f"数据查询 {step_number}/{len(steps)}",
+                        title=progress_title,
                     )
                     provider_retries_used = 0
                     try:
@@ -855,7 +934,7 @@ class FinanceDataQueryCcTools:
                         tool_runtime.emit_progress(
                             "数据源暂未完成本步查询，正在使用原请求自动重试一次。",
                             progress_id=f"finance_query_step_{step_number}",
-                            title=f"数据查询 {step_number}/{len(steps)}",
+                            title=progress_title,
                         )
                         result = await asyncio.to_thread(
                             self.finance_runtime.execute_request,
@@ -873,7 +952,7 @@ class FinanceDataQueryCcTools:
                         tool_runtime.emit_progress(
                             "数据源暂未完成本步查询，正在使用原请求自动重试一次。",
                             progress_id=f"finance_query_step_{step_number}",
-                            title=f"数据查询 {step_number}/{len(steps)}",
+                            title=progress_title,
                         )
                         result = await asyncio.to_thread(
                             self.finance_runtime.execute_request,
@@ -898,7 +977,7 @@ class FinanceDataQueryCcTools:
                     tool_runtime.emit_progress(
                         "当前查询未完成，已保留此前取得的有效结果。",
                         progress_id=f"finance_query_step_{step_number}",
-                        title=f"数据查询 {step_number}/{len(steps)}",
+                        title=progress_title,
                         status="error",
                     )
                     return _tool_result(
@@ -924,7 +1003,7 @@ class FinanceDataQueryCcTools:
                     tool_runtime.emit_progress(
                         f"第 {step_number} 步的数据请求与目录口径不一致，正在修正。",
                         progress_id=f"finance_query_step_{step_number}",
-                        title=f"数据查询 {step_number}/{len(steps)}",
+                        title=progress_title,
                         status="error",
                     )
                     return _tool_result(
@@ -968,7 +1047,7 @@ class FinanceDataQueryCcTools:
                     tool_runtime.emit_progress(
                         f"第 {step_number} 步的数据源查询未完成。",
                         progress_id=f"finance_query_step_{step_number}",
-                        title=f"数据查询 {step_number}/{len(steps)}",
+                        title=progress_title,
                         status="error",
                     )
                     return _tool_result(
@@ -1009,7 +1088,7 @@ class FinanceDataQueryCcTools:
                     tool_runtime.emit_progress(
                         "当前查询返回了不可用的结果引用。",
                         progress_id=f"finance_query_step_{step_number}",
-                        title=f"数据查询 {step_number}/{len(steps)}",
+                        title=progress_title,
                         status="error",
                     )
                     return _tool_result(
@@ -1079,6 +1158,40 @@ class FinanceDataQueryCcTools:
                     ),
                     {},
                 )
+                model_sample = (
+                    dict(variable.get("sample"))
+                    if isinstance(variable.get("sample"), Mapping)
+                    else {}
+                )
+                try:
+                    model_sample_rows = max(
+                        0,
+                        min(
+                            10,
+                            int(
+                                tool_runtime.tool_context.get(
+                                    "_finance_model_sample_rows"
+                                )
+                                or 0
+                            ),
+                        ),
+                    )
+                except (TypeError, ValueError):
+                    model_sample_rows = 0
+                result_rows = _result_rows(handle)
+                row_count = int(variable.get("row_count") or len(result_rows))
+                if (
+                    model_sample_rows
+                    and row_count <= model_sample_rows
+                    and len(result_rows) >= row_count
+                ):
+                    model_sample = {"rows": result_rows[:model_sample_rows]}
+                model_sample_rows_value = (
+                    model_sample.get("rows")
+                    if isinstance(model_sample.get("rows"), list)
+                    else []
+                )
+                model_sample_complete = row_count <= len(model_sample_rows_value)
                 call = (
                     result.get("call")
                     if isinstance(result.get("call"), Mapping)
@@ -1093,8 +1206,10 @@ class FinanceDataQueryCcTools:
                     call_args = tool_runtime.result_registry.selection_from_request(
                         request
                     )
+                evidence_entry = dict(current_entry)
+                evidence_entry["sample_complete"] = model_sample_complete
                 step_evidence = tool_runtime.result_registry.step_evidence(
-                    current_entry,
+                    evidence_entry,
                     call_args=call_args,
                 )
                 summary = {
@@ -1110,8 +1225,8 @@ class FinanceDataQueryCcTools:
                     "depends_on": dependencies,
                     "step_evidence": step_evidence,
                     "schema": variable.get("schema"),
-                    "sample": variable.get("sample"),
-                    "sample_complete": bool(current_entry.get("sample_complete")),
+                    "sample": model_sample,
+                    "sample_complete": model_sample_complete,
                     "warnings": [
                         *[
                             _trim(item)
@@ -1149,7 +1264,7 @@ class FinanceDataQueryCcTools:
                 tool_runtime.emit_progress(
                     result_summary,
                     progress_id=f"finance_query_step_{step_number}",
-                    title=f"数据查询 {step_number}/{len(steps)}",
+                    title=progress_title,
                     status="completed",
                 )
 
@@ -1198,16 +1313,40 @@ class FinanceDataQueryCcTools:
             },
         )
         async def load_finance_result(args: dict[str, Any]) -> dict[str, Any]:
-            result_ref = _trim(args.get("result_ref"))
+            requested_ref = _trim(args.get("result_ref"))
+            result_ref = tool_runtime.resolve_result_ref(requested_ref)
             tool_runtime.tracker["calls"].append(
-                {"tool": "load_finance_result", "result_ref": result_ref}
+                {
+                    "tool": "load_finance_result",
+                    "result_ref": result_ref,
+                    **(
+                        {"result_name": requested_ref}
+                        if requested_ref and requested_ref != result_ref
+                        else {}
+                    ),
+                }
             )
             try:
+                try:
+                    default_limit = max(
+                        1,
+                        min(
+                            50,
+                            int(
+                                tool_runtime.tool_context.get(
+                                    "_finance_detail_default_limit"
+                                )
+                                or 10
+                            ),
+                        ),
+                    )
+                except (TypeError, ValueError):
+                    default_limit = 10
                 payload = self.result_store.load_data_ref(
                     session_id=tool_runtime.result_scope,
                     data_ref=result_ref,
                     offset=int(args.get("offset") or 0),
-                    limit=int(args.get("limit") or 10),
+                    limit=int(args.get("limit") or default_limit),
                 )
                 raw_columns = (
                     args.get("columns")

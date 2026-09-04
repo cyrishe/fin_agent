@@ -15,6 +15,10 @@ from src.scenarios.financial_qa.research_mode import (
     research_mode_metadata,
     research_mode_prompt,
 )
+from src.scenarios.financial_qa.execution_mode import (
+    FINANCIAL_QA_EXECUTION_MODE_FAST,
+    normalize_financial_qa_execution_mode,
+)
 from src.scenarios.financial_qa.tools import FinanceDataQueryCcTools
 from src.scenarios.financial_qa.runtime import (
     FINANCIAL_QA_RUNTIME_CC,
@@ -40,6 +44,29 @@ def _configured_tool_name(value: Any) -> str:
     if normalized.startswith(_FINANCE_MCP_TOOL_PREFIX):
         return normalized[len(_FINANCE_MCP_TOOL_PREFIX):]
     return normalized
+
+
+def _all_zero_result_summary(result_refs: list[dict[str, Any]]) -> str:
+    if not result_refs or any(item.get("row_count") is None for item in result_refs):
+        return ""
+    try:
+        if any(int(item.get("row_count")) != 0 for item in result_refs):
+            return ""
+    except (TypeError, ValueError):
+        return ""
+    goals = list(
+        dict.fromkeys(
+            _trim(item.get("goal"))
+            for item in result_refs
+            if _trim(item.get("goal"))
+        )
+    )
+    scope = "；".join(goals[:2])
+    prefix = f"本次已查询：{scope}。" if scope else "本次查询已完成。"
+    return (
+        f"{prefix}当前数据范围与查询条件下返回 0 条记录，"
+        "因此无法从现有结果给出所问数值。"
+    )
 
 
 def _agent_harness_context(runtime_profile: Mapping[str, Any]) -> str:
@@ -412,12 +439,21 @@ class FinancialQaCcService:
         event_sink: Any = None,
         research_mode: str = "auto",
         runtime: str = FINANCIAL_QA_RUNTIME_CC,
+        execution_mode: str = "standard",
         data_only: bool = False,
         isolated_request: bool = False,
         include_response_data: bool = True,
         response_data_max_rows: int | None = None,
     ) -> Dict[str, Any]:
         selected_runtime = normalize_financial_qa_runtime(runtime)
+        normalized_execution_mode = normalize_financial_qa_execution_mode(
+            execution_mode
+        )
+        if (
+            normalized_execution_mode == FINANCIAL_QA_EXECUTION_MODE_FAST
+            and selected_runtime != FINANCIAL_QA_RUNTIME_DSH
+        ):
+            raise ValueError("execution_mode=fast 当前仅支持 runtime=dsh")
         semantic_turn = (
             dispatch_plan.get("semantic_turn")
             if isinstance(dispatch_plan.get("semantic_turn"), Mapping)
@@ -436,6 +472,7 @@ class FinancialQaCcService:
             research_mode=research_mode,
         )
         runtime_context["_finance_data_only"] = bool(data_only)
+        runtime_context["_finance_execution_mode"] = normalized_execution_mode
         runtime_context["_finance_isolated_request"] = bool(isolated_request)
         model_question = resolved_question
         if attachments:
@@ -483,6 +520,10 @@ class FinancialQaCcService:
         generated_message = _trim(record.get("result")) or (
             f"金融专业问答暂时未完成：{error}" if error else "金融专业问答暂时没有返回内容。"
         )
+        if not error:
+            generated_message = (
+                _all_zero_result_summary(result_refs) or generated_message
+            )
         message = "" if data_only and not error and result_refs else generated_message
         summary = message
         surface_blocks = self.presentation_service.build(
@@ -533,6 +574,7 @@ class FinancialQaCcService:
             "surface_blocks": surface_blocks,
             "financial_qa": {
                 "runtime": selected_runtime,
+                "execution_mode": normalized_execution_mode,
                 "reasoning_effort": _trim(record.get("reasoning_effort")),
                 "session_id": _trim(record.get("session_id")),
                 "resumed": bool(record.get("resumed")),
@@ -592,6 +634,7 @@ class FinancialQaCcService:
             },
             "result_refs": result_refs,
             "research_mode": research_mode_metadata(research_mode),
+            "execution_mode": normalized_execution_mode,
             **(
                 {
                     "report_export": {
