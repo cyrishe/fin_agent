@@ -23,6 +23,10 @@ def test_finance_api_key_auth_supports_bearer_and_header() -> None:
 def test_finance_api_key_auth_fails_closed() -> None:
     with pytest.raises(ValueError, match="not configured"):
         FinanceApiKeyAuth.from_env({})
+    with pytest.raises(ValueError, match="deployment placeholder"):
+        FinanceApiKeyAuth(
+            {"client-a": "CHANGE_ME_GENERATE_AT_LEAST_24_RANDOM_CHARACTERS"}
+        )
 
     auth = FinanceApiKeyAuth({"client-a": KEY})
     with pytest.raises(FinanceApiAuthError) as missing:

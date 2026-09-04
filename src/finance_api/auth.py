@@ -48,6 +48,10 @@ class FinanceApiKeyAuth:
                 raise ValueError(
                     f"finance API key for principal={principal} must contain at least 24 characters"
                 )
+            if key.upper().startswith("CHANGE_ME"):
+                raise ValueError(
+                    f"finance API key for principal={principal} is still a deployment placeholder"
+                )
             normalized[principal] = hashlib.sha256(key.encode("utf-8")).digest()
         if not normalized:
             raise ValueError(
