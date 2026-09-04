@@ -24,7 +24,7 @@ MCP  /mcp               ┘                         ├─> CC
 安装依赖并配置 `.env`：
 
 ```bash
-python -m pip install -r requirements.txt
+python -m pip install -r requirements-finance-api.txt
 
 FINANCE_API_KEY='使用密码管理器生成的至少24位随机Key'
 FINANCE_API_KEY_ID='internal'
