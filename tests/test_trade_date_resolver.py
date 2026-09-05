@@ -74,6 +74,34 @@ def test_relative_offset_uses_calendar_sequence() -> None:
     assert resolved.warnings == []
 
 
+def test_unquoted_iso_date_in_filter_is_consumed_as_one_literal() -> None:
+    call = parse_api_call(
+        'r1 = stock.quote(filter = "code = 600519.SH and tradedate = 2026-07-24", '
+        "mode = 0) -> code, tradedate, close"
+    )
+
+    resolved = _resolver().resolve(call)
+
+    assert resolved.call.args["filter"] == (
+        "code = 600519.SH and tradedate = '2026-07-24'"
+    )
+    assert resolved.warnings == []
+
+
+def test_double_equals_trade_date_operator_is_preserved() -> None:
+    call = parse_api_call(
+        'r1 = stock.quote(filter = "code == 600519.SH and '
+        'tradedate == 2026-07-24", mode = 0) -> code, tradedate, close'
+    )
+
+    resolved = _resolver().resolve(call)
+
+    assert resolved.call.args["filter"] == (
+        "code == 600519.SH and tradedate == '2026-07-24'"
+    )
+    assert resolved.warnings == []
+
+
 def test_range_endpoints_are_each_floored_to_trade_days() -> None:
     call = parse_api_call(
         'r1 = stock.quote(start = "2026-07-21", end = "2026-07-26", realtime = 0) '

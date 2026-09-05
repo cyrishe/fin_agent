@@ -4,10 +4,12 @@ import datetime as dt
 import hashlib
 import json
 import re
+import time
 from typing import Any, Dict, Mapping
 
 from src.experiments.staged_data_protocol.phase2.api_runner import execute_api_call
 from src.experiments.staged_data_protocol.phase2.call_parser import parse_api_call
+from src.experiments.staged_data_protocol.phase2.call_structure import structure_call
 from src.experiments.staged_data_protocol.phase2.call_validator import validate_call
 from src.experiments.staged_data_protocol.phase2.dynamic_cal_provider import (
     HISTORICAL_DEFAULT_STOCK_FIELDS,
@@ -103,12 +105,15 @@ class FinanceDataToolRuntimeService:
         if not request_text:
             raise ValueError("request is required")
 
+        static_started = time.monotonic()
         handles = dict(previous_results or {})
         call = self._bind_call(parse_api_call(request_text), bindings)
         validation = validate_call(call, handles)
+        static_duration_ms = round((time.monotonic() - static_started) * 1_000, 3)
         payload: Dict[str, Any] = {
             "protocol": self.PROTOCOL,
             "request": call.raw,
+            "structured_call": structure_call(call),
             "call": {
                 "result_id": call.result_id,
                 "api": call.api,
@@ -119,6 +124,10 @@ class FinanceDataToolRuntimeService:
                 "ok": validation.ok,
                 "errors": validation.errors,
                 "warnings": validation.warnings,
+            },
+            "timings": {
+                "static_validation_ms": static_duration_ms,
+                "api_execution_ms": 0.0,
             },
         }
         if not validation.ok:
@@ -196,6 +205,7 @@ class FinanceDataToolRuntimeService:
                 payload["result"] = None
                 return payload
 
+        api_started = time.monotonic()
         try:
             if self.trade_date_resolver is None:
                 result = execute_api_call(call, handles)
@@ -205,6 +215,10 @@ class FinanceDataToolRuntimeService:
                     handles,
                 )
         except Exception as exc:
+            payload["timings"]["api_execution_ms"] = round(
+                (time.monotonic() - api_started) * 1_000,
+                3,
+            )
             payload["ok"] = False
             payload["execution"] = {
                 "ok": False,
@@ -213,6 +227,10 @@ class FinanceDataToolRuntimeService:
             }
             payload["result"] = None
             return payload
+        payload["timings"]["api_execution_ms"] = round(
+            (time.monotonic() - api_started) * 1_000,
+            3,
+        )
         payload["result"] = self._result_payload(result)
         payload["execution"] = self._execution_payload(result)
         if historical_cutoff is not None:

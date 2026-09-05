@@ -8,6 +8,10 @@ import re
 import uuid
 from typing import Any, Dict, Mapping
 
+from src.experiments.staged_data_protocol.phase2.catalog import (
+    CATALOG_PATH,
+    load_catalog_source,
+)
 from src.services.coding_execution_contract import (
     compile_command,
     focused_test_command,
@@ -29,7 +33,7 @@ class CustomToolContextBundleService:
     def __init__(
         self,
         *,
-        catalog_path: str = "src/tools/finance_data/catalog/api_view_catalog.json",
+        catalog_path: str = str(CATALOG_PATH),
         stock_universe_path: str = "stock_name.tsv",
         coding_api_guide_path: str = "src/skills/financial-tool-development/skills/financial-tool-implementation/references/finance-api-coding-guide.md",
         root_dir: str = "data/custom_tool_context",
@@ -122,6 +126,12 @@ class CustomToolContextBundleService:
             for subject, subject_obj in sorted(subjects.items()):
                 if not isinstance(subject_obj, dict):
                     continue
+                subject_meta = (
+                    subject_obj.get("_meta")
+                    if isinstance(subject_obj.get("_meta"), Mapping)
+                    else {}
+                )
+                subject_guidance = self._coding_rules(subject_meta.get("rules"))
                 subject_root = subject_dir / subject
                 dataview_rows = []
                 for dataview, dataview_obj in subject_obj.items():
@@ -134,6 +144,8 @@ class CustomToolContextBundleService:
                         definition=dataview_obj,
                         patterns=patterns,
                     )
+                    if subject_guidance:
+                        dataview_doc["subject_guidance"] = subject_guidance
                     self._write_private(dataview_file, dataview_doc)
                     dataview_rows.append({
                         "dataview": dataview,
@@ -148,13 +160,12 @@ class CustomToolContextBundleService:
                 subject_file = subject_root / "index.json"
                 self._write_private(subject_file, {
                     "subject": subject,
-                    "meta": subject_obj.get("_meta") or {},
+                    "description": _trim(subject_meta.get("desc")),
                     "dataviews": dataview_rows,
                 })
                 index_subjects.append({
                     "subject": subject,
-                    "description": _trim((subject_obj.get("_meta") or {}).get("desc")),
-                    "rules": (subject_obj.get("_meta") or {}).get("rules") or [],
+                    "description": _trim(subject_meta.get("desc")),
                     "dataviews": dataview_rows,
                     "file": str(subject_file.relative_to(bundle_dir)),
                 })
@@ -575,6 +586,8 @@ class CustomToolContextBundleService:
             pass
 
     def _load_catalog(self) -> Dict[str, Any]:
+        if self.catalog_path.resolve() == CATALOG_PATH.resolve():
+            return load_catalog_source()
         if not self.catalog_path.exists():
             return {"version": "", "api_class_patterns": {}, "subjects": {}}
         return json.loads(self.catalog_path.read_text(encoding="utf-8"))
@@ -987,12 +1000,14 @@ def run(inputs: dict) -> dict:
                 .replace("{subject}", subject)
                 .replace("{dataview}", dataview)
             )
+        operation_guidance = self._coding_rules(api.get("guidance"))
         method = {
             "name": api_name,
             "description": _trim(api.get("api_function")),
             "type": api_class,
             **({"call": call_pattern} if call_pattern else {}),
             **class_definition,
+            **({"guidance": operation_guidance} if operation_guidance else {}),
             "examples": self._method_examples(
                 api=api,
                 api_class=api_class,

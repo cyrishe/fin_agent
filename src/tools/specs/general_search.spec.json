@@ -7,7 +7,7 @@
   "input_guidance": {
     "notes": [
       "当前 provider 的 coverage 会随结果返回；internal_news 不代表完整互联网。",
-      "个股新闻优先使用 finance_query 的 stock.news，普通背景资料再使用本工具。"
+      "公司、行业、政策、事件和主题新闻统一由本工具查询，不进入金融数据 catalog。"
     ],
     "optional_fields": ["limit", "start_time", "end_time", "category_scope", "source_scope"],
     "required_fields": ["query"]

@@ -69,6 +69,17 @@ def test_unparsed_basic_info_filter_fails_before_database_query() -> None:
     assert "filter was not parsed" in result["reason"]
 
 
+def test_basic_info_noop_filters_compile_to_a_real_noop_clause() -> None:
+    for filter_text in ("all", "none", "true", "*", "1=1", "1 = 1"):
+        sql, params = _build_filter_clauses(
+            source=BASE_INFO_SOURCES["plate"],
+            args={"filter": filter_text},
+        )
+
+        assert sql == "1=1"
+        assert params == []
+
+
 class _FakeCursor:
     def __init__(self, result_sets):
         self.result_sets = list(result_sets)
@@ -173,7 +184,6 @@ def test_plate_catalog_teaches_name_resolution_before_data_query() -> None:
 
 
 def test_plate_name_resolution_rules_reach_the_step_context() -> None:
-    context_builder._prompt_catalog.cache_clear()
     sections = context_builder.build_context_sections(
         step=Step(
             step_id="S1",

@@ -458,7 +458,7 @@ def _normalize_result_df(df: pd.DataFrame, *, output_columns: List[str], args: M
 
 def _apply_value_filters(df: pd.DataFrame, filter_text: str) -> pd.DataFrame:
     rows = df
-    for op, value in re.findall(r"\bvalue\s*(>=|<=|>|<|=|==|!=)\s*(-?\d+(?:\.\d+)?)", filter_text, flags=re.IGNORECASE):
+    for op, value in re.findall(r"\bvalue\s*(>=|<=|>|<|==|=|!=)\s*(-?\d+(?:\.\d+)?)", filter_text, flags=re.IGNORECASE):
         number = float(value)
         if op in {"=", "=="}:
             rows = rows[rows["value"] == number]
@@ -551,7 +551,7 @@ def _is_realtime(args: Mapping[str, Any]) -> bool:
 def _simple_filter_items(filter_text: str) -> List[tuple[str, str, str]]:
     rows: List[tuple[str, str, str]] = []
     for match in re.finditer(
-        r"(?P<field>[A-Za-z_]\w*)\s*(?P<op>in|=|==|!=|>=|<=|>|<)\s*(?P<value>\[[^\]]+\]|\([^)]+\)|[^,;]+?)(?=\s+(?:and|or)\s+[A-Za-z_]\w*\s*(?:in|=|==|!=|>=|<=|>|<)|[,;]|$)",
+        r"(?P<field>[A-Za-z_]\w*)\s*(?P<op>in|==|=|!=|>=|<=|>|<)\s*(?P<value>\[[^\]]+\]|\([^)]+\)|[^,;]+?)(?=\s+(?:and|or)\s+[A-Za-z_]\w*\s*(?:in|==|=|!=|>=|<=|>|<)|[,;]|$)",
         str(filter_text or ""),
         flags=re.IGNORECASE,
     ):

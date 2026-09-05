@@ -42,6 +42,7 @@ from src.services.finance_claude_session_service import FinanceClaudeSessionServ
 from src.services.finance_cc_system_tools import FinanceCcSystemTools
 from src.scenarios.financial_qa import FinancialQaCcService
 from src.scenarios.financial_qa.research_mode import normalize_research_mode
+from src.scenarios.financial_qa.runtime import normalize_financial_qa_runtime
 from src.services.conversation_title_service import ConversationTitleService
 from src.services.context_resolution_service import ContextResolutionError
 from src.services.llm_stream_block_service import LlmStreamBlockBuilder
@@ -1481,6 +1482,10 @@ def _run_custom_tool_stream_payload(payload: dict, *, emit) -> None:
     direct_interaction = bool(interaction_response and not text)
     application_name = str(payload.get("application_name") or "investment_workbench").strip() or "investment_workbench"
     research_mode = normalize_research_mode(payload.get("research_mode"))
+    financial_qa_runtime = normalize_financial_qa_runtime(
+        payload.get("financial_qa_runtime")
+    )
+    data_only = _parse_bool_flag(payload.get("data_only"), default=False)
     thread_id_payload = payload.get("thread_id")
     guest_identity = payload.get("guest_identity") if isinstance(payload.get("guest_identity"), dict) else {}
     builder = LlmStreamBlockBuilder(run_id=str(payload.get("run_id") or ""))
@@ -1594,15 +1599,16 @@ def _run_custom_tool_stream_payload(payload: dict, *, emit) -> None:
                 user_text=text,
                 expected_title=initial_thread_title,
             )
-        _submit_finance_cc_shadow(
-            thread_id=thread_id,
-            turn_id=turn_id,
-            owner_id=owner_ids[0] if owner_ids else "",
-            user_text=_resolved_dispatch_question(dispatch_plan, text),
-            dispatch_plan=dispatch_plan,
-            application_context=app_ctx,
-            thread_context=thread_context,
-        )
+        if not data_only:
+            _submit_finance_cc_shadow(
+                thread_id=thread_id,
+                turn_id=turn_id,
+                owner_id=owner_ids[0] if owner_ids else "",
+                user_text=_resolved_dispatch_question(dispatch_plan, text),
+                dispatch_plan=dispatch_plan,
+                application_context=app_ctx,
+                thread_context=thread_context,
+            )
         parsed = _parse_chat_command(text)
         owner_id = owner_ids[0] if owner_ids else ""
         routed_outside_custom_tool = False
@@ -1711,6 +1717,8 @@ def _run_custom_tool_stream_payload(payload: dict, *, emit) -> None:
                     precomputed_plan=dispatch_plan,
                     event_sink=event_sink,
                     research_mode=research_mode,
+                    financial_qa_runtime=financial_qa_runtime,
+                    data_only=data_only,
                 )
             else:
                 result = custom_tool_agent_service.handle_turn(
@@ -1750,6 +1758,8 @@ def _run_custom_tool_stream_payload(payload: dict, *, emit) -> None:
                 precomputed_plan=dispatch_plan,
                 event_sink=event_sink,
                 research_mode=research_mode,
+                financial_qa_runtime=financial_qa_runtime,
+                data_only=data_only,
             )
 
         if not routed_outside_custom_tool:
@@ -1780,7 +1790,10 @@ def _run_custom_tool_stream_payload(payload: dict, *, emit) -> None:
             result["thread_context_patch"] = _custom_tool_context_patch(result.get("state") if isinstance(result.get("state"), dict) else {})
         if result["thread_context_patch"]:
             runtime_conversation_service.update_thread_context(thread_id=thread_id, patch=result["thread_context_patch"])
-        assistant_message = str(result.get("message") or "已处理。").strip()
+        assistant_message = str(
+            result.get("message")
+            or ("" if result.get("data_only") else "已处理。")
+        ).strip()
         result_blocks = _custom_tool_result_blocks(result, builder)
         final_events = (
             [
@@ -1811,7 +1824,7 @@ def _run_custom_tool_stream_payload(payload: dict, *, emit) -> None:
             thread_id=thread_id,
             turn_id=turn_id,
             assistant_output_text=assistant_message,
-            output_payload=_to_json_safe(result),
+            output_payload=_persistable_output_payload(result),
             model_name=str(result.get("model_name") or "").strip(),
             token_usage=result.get("llm_usage") if isinstance(result.get("llm_usage"), dict) else None,
         ) or _turn_meta(payload.get("request_received_at"))
@@ -2042,6 +2055,8 @@ def _build_chat_dispatch_payload(
     precomputed_plan: dict | None = None,
     event_sink=None,
     research_mode: str = "auto",
+    financial_qa_runtime: str = "cc",
+    data_only: bool = False,
 ) -> dict:
     parsed = _parse_chat_command(text)
     raw = parsed.get("raw") or ""
@@ -2160,20 +2175,38 @@ def _build_chat_dispatch_payload(
                     },
                 ),
             })
-        if financial_qa_cc_service.accepts(
-            dispatch_plan=plan,
-            attachments=attachments,
-        ):
-            result = financial_qa_cc_service.answer(
-                thread_id=thread_id or "",
-                turn_id=turn_id or "",
-                owner_id=owner_id,
-                user_text=raw,
+        selected_financial_runtime = normalize_financial_qa_runtime(
+            financial_qa_runtime
+        )
+        accepts_financial_qa = (
+            financial_qa_cc_service.accepts(
                 dispatch_plan=plan,
-                application_context=application_context,
                 attachments=attachments,
-                event_sink=event_sink,
-                research_mode=normalize_research_mode(research_mode),
+                runtime=selected_financial_runtime,
+            )
+            if selected_financial_runtime != "cc"
+            else financial_qa_cc_service.accepts(
+                dispatch_plan=plan,
+                attachments=attachments,
+            )
+        )
+        if accepts_financial_qa:
+            answer_kwargs = {
+                "thread_id": thread_id or "",
+                "turn_id": turn_id or "",
+                "owner_id": owner_id,
+                "user_text": raw,
+                "dispatch_plan": plan,
+                "application_context": application_context,
+                "attachments": attachments,
+                "event_sink": event_sink,
+                "research_mode": normalize_research_mode(research_mode),
+                "data_only": bool(data_only),
+            }
+            if selected_financial_runtime != "cc":
+                answer_kwargs["runtime"] = selected_financial_runtime
+            result = financial_qa_cc_service.answer(
+                **answer_kwargs,
             )
             result = _apply_application_workspace_orchestration(
                 result,
@@ -3579,6 +3612,26 @@ def _to_json_safe(obj):
     return obj
 
 
+def _persistable_output_payload(result: dict) -> dict:
+    """Persist finance response metadata without duplicating full result rows."""
+
+    payload = _to_json_safe(result)
+    if not isinstance(payload, dict):
+        return {}
+    data = payload.get("data")
+    if not isinstance(data, dict) or data.get("format") != "row-dict":
+        return payload
+    raw_results = data.get("results")
+    if not isinstance(raw_results, list):
+        return payload
+    data["results"] = [
+        {key: value for key, value in item.items() if key != "rows"}
+        for item in raw_results
+        if isinstance(item, dict)
+    ]
+    return payload
+
+
 @app.route("/stock_deep_dive", methods=["GET"])
 @app.route("/skills/stock_deep_dive", methods=["GET"])
 def stock_deep_dive_page():
@@ -3998,6 +4051,10 @@ def api_chat_dispatch():
     try:
         payload = _extract_request_payload()
         research_mode = normalize_research_mode(payload.get("research_mode"))
+        financial_qa_runtime = normalize_financial_qa_runtime(
+            payload.get("financial_qa_runtime")
+        )
+        data_only = _parse_bool_flag(payload.get("data_only"), default=False)
         text = str(payload.get("text") or payload.get("message") or "").strip()
         attachment_ids = payload.get("attachment_ids")
         if not isinstance(attachment_ids, list):
@@ -4077,17 +4134,20 @@ def api_chat_dispatch():
                 turn_id=turn_id,
                 owner_id=str(guest_identity.get("user_id") or ""),
                 research_mode=research_mode,
+                financial_qa_runtime=financial_qa_runtime,
+                data_only=data_only,
             )
         dispatch_plan_payload = result.get("dispatch_plan") if isinstance(result.get("dispatch_plan"), dict) else {}
-        _submit_finance_cc_shadow(
-            thread_id=thread_id,
-            turn_id=turn_id,
-            owner_id=str(guest_identity.get("user_id") or ""),
-            user_text=text,
-            dispatch_plan=dispatch_plan_payload,
-            application_context=app_ctx,
-            thread_context=thread_context,
-        )
+        if not data_only:
+            _submit_finance_cc_shadow(
+                thread_id=thread_id,
+                turn_id=turn_id,
+                owner_id=str(guest_identity.get("user_id") or ""),
+                user_text=text,
+                dispatch_plan=dispatch_plan_payload,
+                application_context=app_ctx,
+                thread_context=thread_context,
+            )
         merged_llm_usage = _merge_llm_usage(
             result.get("llm_usage") if isinstance(result.get("llm_usage"), dict) else None,
             dispatch_plan_payload.get("llm_usage") if isinstance(dispatch_plan_payload.get("llm_usage"), dict) else None,
@@ -4109,7 +4169,10 @@ def api_chat_dispatch():
                 thread_id=thread_id,
                 patch=thread_context_patch,
             )
-        assistant_message = str(result.get("message") or "已处理。").strip()
+        assistant_message = str(
+            result.get("message")
+            or ("" if result.get("data_only") else "已处理。")
+        ).strip()
         _attach_answer_summary(
             result,
             raw_user_text=text or f"[attachment:{len(attachments)}]",
@@ -4119,7 +4182,7 @@ def api_chat_dispatch():
             thread_id=thread_id,
             turn_id=turn_id,
             assistant_output_text=assistant_message,
-            output_payload=_to_json_safe(result),
+            output_payload=_persistable_output_payload(result),
             model_name=str(result.get("model_name") or "").strip(),
             token_usage=result.get("llm_usage") if isinstance(result.get("llm_usage"), dict) else None,
         ) or _turn_meta(request_received_at)
@@ -4188,6 +4251,10 @@ def api_custom_tool_stream_start():
         request_received_at = datetime.datetime.now()
         payload = _extract_request_payload()
         research_mode = normalize_research_mode(payload.get("research_mode"))
+        financial_qa_runtime = normalize_financial_qa_runtime(
+            payload.get("financial_qa_runtime")
+        )
+        data_only = _parse_bool_flag(payload.get("data_only"), default=False)
         text = str(payload.get("text") or payload.get("message") or "").strip()
         interaction_response = payload.get("interaction_response") if isinstance(payload.get("interaction_response"), dict) else {}
         selected_asset = payload.get("selected_asset") if isinstance(payload.get("selected_asset"), dict) else {}
@@ -4214,6 +4281,8 @@ def api_custom_tool_stream_start():
             "thread_id": payload.get("thread_id"),
             "application_name": str(payload.get("application_name") or "investment_workbench").strip() or "investment_workbench",
             "research_mode": research_mode,
+            "financial_qa_runtime": financial_qa_runtime,
+            "data_only": data_only,
             "guest_identity": guest_identity,
             "cookie_thread_id": request.cookies.get(UserSessionService.THREAD_COOKIE_NAME, ""),
             "request_received_at": request_received_at.isoformat(

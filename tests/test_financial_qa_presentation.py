@@ -14,6 +14,22 @@ def _schema(*columns: tuple[str, str]) -> dict:
     }
 
 
+def test_presentation_does_not_relabel_results_with_a_newer_catalog() -> None:
+    class _ChangedCatalog:
+        def catalog_revision(self) -> str:
+            return "catalog-b"
+
+        def get_dataview(self, subject: str, dataview: str):
+            raise AssertionError("a mismatched catalog must not be read")
+
+    service = FinancialQaPresentationService(catalog=_ChangedCatalog())
+
+    assert service._catalog_column_specs(
+        "stock.quote",
+        catalog_revision="catalog-a",
+    ) == {}
+
+
 def test_single_quote_preserves_narrative_and_uses_real_values_as_metrics():
     service = FinancialQaPresentationService()
     message = "贵州茅台最新报 1319.81 元，涨幅 2.35%。"

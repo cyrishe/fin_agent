@@ -74,6 +74,7 @@ class _LiveClaudeClient:
     options_fingerprint: str
     session_dir: Path
     last_used: float
+    finance_catalog_revision: str = ""
     busy: bool = False
     prewarmed: bool = False
     turn_count: int = 0
@@ -323,8 +324,17 @@ class FinanceClaudeSessionService:
                     "duration_ms": round((time.monotonic() - started_at) * 1_000),
                     "stream_event_count": int(result.get("stream_event_count") or 0),
                     "text_delta_count": int(result.get("text_delta_count") or 0),
+                    "assistant_message_count": int(
+                        result.get("assistant_message_count") or 0
+                    ),
+                    "tool_result_message_count": int(
+                        result.get("tool_result_message_count") or 0
+                    ),
                     "client_reused": bool(result.get("client_reused")),
                     "client_prewarmed": bool(result.get("client_prewarmed")),
+                    "finance_catalog_revision": _trim(
+                        result.get("finance_catalog_revision")
+                    ),
                     "failure_kind": _trim(result.get("failure_kind")),
                     "api_retry_count": int(
                         result.get("api_retry_count") or 0
@@ -404,6 +414,13 @@ class FinanceClaudeSessionService:
     @staticmethod
     def build_user_prompt(user_text: str, context: Mapping[str, Any]) -> str:
         lines = [f"用户当前的问题是：\n{_trim(user_text)}"]
+        if bool(context.get("_finance_data_only")):
+            lines.append(
+                "[系统记录的本轮输出模式]\n"
+                "仅取数：只查询用户明确要求的原始数据，不添加解释性补充目标；"
+                "按 finance_query.data_request_complete 参数说明声明最终取数 flow；"
+                "完成后无需生成自然语言回答。"
+            )
         research_mode_prompt = _trim(
             context.get("_finance_research_mode_prompt")
         )
@@ -869,6 +886,12 @@ class FinanceClaudeSessionService:
                     "skill_names": list(configured_skill_names),
                 }
             )
+        finance_catalog_revision = ""
+        if self.system_tools is not None:
+            finance_catalog = getattr(self.system_tools, "finance_catalog", None)
+            revision_reader = getattr(finance_catalog, "catalog_revision", None)
+            if callable(revision_reader):
+                finance_catalog_revision = _trim(revision_reader())
         fingerprint = hashlib.sha256(
             "\0".join(
                 [
@@ -879,6 +902,7 @@ class FinanceClaudeSessionService:
                     "tools" if self.system_tools is not None else "no-tools",
                     str(effective_skill_root),
                     skill_revision,
+                    finance_catalog_revision,
                     *effective_skill_names,
                     *[
                         _trim(item)
@@ -900,6 +924,7 @@ class FinanceClaudeSessionService:
             "max_turns": max_turns,
             "skill_root": effective_skill_root,
             "skill_revision": skill_revision,
+            "finance_catalog_revision": finance_catalog_revision,
             "effective_skill_names": effective_skill_names,
             "fingerprint": fingerprint,
         }
@@ -967,6 +992,7 @@ class FinanceClaudeSessionService:
         )
         if not provider_env.get("ANTHROPIC_AUTH_TOKEN") and not provider_env.get("ANTHROPIC_API_KEY"):
             raise RuntimeError(f"missing credential for Finance CC provider {self.provider}")
+        effective_options = dict(options)
         mcp_servers: dict[str, Any] = {}
         allowed_tools: list[str] = []
         tool_runtime = None
@@ -985,12 +1011,30 @@ class FinanceClaudeSessionService:
                 event_sink=None,
                 runtime=tool_runtime,
             )
+            pinned_catalog_revision = _trim(
+                tracker.get("finance_catalog_revision")
+            )
+            expected_catalog_revision = _trim(
+                effective_options.get("finance_catalog_revision")
+            )
+            if (
+                pinned_catalog_revision
+                and pinned_catalog_revision != expected_catalog_revision
+            ):
+                refreshed_options = self._runtime_options(tool_context)
+                if _trim(
+                    refreshed_options.get("finance_catalog_revision")
+                ) != pinned_catalog_revision:
+                    raise RuntimeError(
+                        "finance catalog changed while creating the CC client"
+                    )
+                effective_options = refreshed_options
             mcp_servers["finance"] = create_sdk_mcp_server(
                 name="finance",
                 version="1.0.0",
                 tools=tools,
             )
-        effective_skill_names = list(options["effective_skill_names"])
+        effective_skill_names = list(effective_options["effective_skill_names"])
         agent_options = ClaudeAgentOptions(
             tools=["Skill"] if effective_skill_names else [],
             allowed_tools=["Skill", *allowed_tools] if effective_skill_names else allowed_tools,
@@ -998,7 +1042,7 @@ class FinanceClaudeSessionService:
                 "Bash", "Edit", "Write", "Read", "Glob", "Grep", "WebFetch", "WebSearch",
                 "Agent", "Task", "AskUserQuestion", "NotebookEdit",
             ],
-            system_prompt=str(options["system_prompt"]),
+            system_prompt=str(effective_options["system_prompt"]),
             mcp_servers=mcp_servers,
             strict_mcp_config=bool(mcp_servers),
             permission_mode="dontAsk",
@@ -1006,7 +1050,7 @@ class FinanceClaudeSessionService:
             plugins=[
                 {
                     "type": "local",
-                    "path": str(Path(options["skill_root"]).resolve()),
+                    "path": str(Path(effective_options["skill_root"]).resolve()),
                 }
             ]
             if effective_skill_names
@@ -1014,9 +1058,9 @@ class FinanceClaudeSessionService:
             skills=effective_skill_names,
             cwd=str(session_dir),
             include_partial_messages=True,
-            max_turns=int(options["max_turns"]),
+            max_turns=int(effective_options["max_turns"]),
             model=self.model,
-            effort=str(options["effort"]),
+            effort=str(effective_options["effort"]),
             resume=session_id if resume else None,
             session_id=None if resume else session_id,
             env=provider_env,
@@ -1034,9 +1078,12 @@ class FinanceClaudeSessionService:
             _LiveClaudeClient(
                 client=client,
                 tool_runtime=tool_runtime,
-                options_fingerprint=str(options["fingerprint"]),
+                options_fingerprint=str(effective_options["fingerprint"]),
                 session_dir=session_dir,
                 last_used=time.monotonic(),
+                finance_catalog_revision=_trim(
+                    tracker.get("finance_catalog_revision")
+                ),
                 prewarmed=prewarmed,
             ),
             tracker,
@@ -1266,8 +1313,11 @@ class FinanceClaudeSessionService:
             "api_error_status": None,
             "stream_event_count": 0,
             "text_delta_count": 0,
+            "assistant_message_count": 0,
+            "tool_result_message_count": 0,
             "client_reused": reused_live_client,
             "client_prewarmed": client_prewarmed,
+            "finance_catalog_revision": entry.finance_catalog_revision,
             "tool_calls": tracker.get("calls", []),
             "interaction_requests": tracker.get("interaction_requests", []),
             "artifact_updates": tracker.get("artifact_updates", []),
@@ -1331,6 +1381,7 @@ class FinanceClaudeSessionService:
                             if delta.get("type") == "text_delta" and delta.get("text"):
                                 evidence["text_delta_count"] += 1
                     if class_name == "AssistantMessage":
+                        evidence["assistant_message_count"] += 1
                         for block in getattr(message, "content", None) or []:
                             if type(block).__name__ == "ToolUseBlock":
                                 name = _trim(getattr(block, "name", ""))
@@ -1453,6 +1504,7 @@ class FinanceClaudeSessionService:
                         for block in getattr(message, "content", None) or []:
                             if type(block).__name__ != "ToolResultBlock":
                                 continue
+                            evidence["tool_result_message_count"] += 1
                             tool_name = tool_names_by_id.get(_trim(getattr(block, "tool_use_id", "")), "")
                             tool_use_id = _trim(getattr(block, "tool_use_id", ""))
                             if tool_use_id in public_tool_progress:

@@ -24,6 +24,7 @@ sentence-transformers==3.0.1
 Flask==3.1.2
 fastapi==0.115.2
 starlette==0.40.0
+uvicorn>=0.32.0,<1.0.0
 PyMySQL>=1.1.0,<2.0.0
 
 # 手机号短信持有权验证与可选姓名二要素认证（provider=aliyun 时使用）
@@ -37,6 +38,8 @@ alibabacloud-tea-openapi==0.4.4
 openai==1.60.2
 openai-codex==0.1.0b3
 claude-agent-sdk==0.2.123
+# Direct dependency: the independent finance service exposes Streamable HTTP MCP.
+mcp>=1.29.0,<2.0.0
 # Claude SDK 的 MCP 依赖未限制 sse-starlette 上界；固定与当前 FastAPI/Starlette 兼容的版本。
 sse-starlette==2.1.3
 

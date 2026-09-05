@@ -91,9 +91,9 @@ OP_SQL = {"=": "=", "==": "=", "!=": "!=", ">": ">", ">=": ">=", "<": "<", "<=":
 FILTER_RE = re.compile(
     r"(?:(?P<connector>\band\b|\bor\b)\s+)?"
     r"(?P<field>[A-Za-z_]\w*)\s*"
-    r"(?P<op>in|like|=|==|!=|>=|<=|>|<)\s*"
+    r"(?P<op>in|like|==|=|!=|>=|<=|>|<)\s*"
     r"(?P<value>\[[^\]]+\]|\([^)]+\)|[^,;]+?)"
-    r"(?=\s+(?:and|or)\s+[A-Za-z_]\w*\s*(?:in|like|=|==|!=|>=|<=|>|<)|[,;]|$)",
+    r"(?=\s+(?:and|or)\s+[A-Za-z_]\w*\s*(?:in|like|==|=|!=|>=|<=|>|<)|[,;]|$)",
     flags=re.IGNORECASE,
 )
 
@@ -250,6 +250,10 @@ def _build_filter_clauses(*, source: BaseInfoSource, args: Mapping[str, Any]) ->
     raw_filter = str(args.get("filter") or "").strip()
     if not raw_filter:
         return "", []
+    if raw_filter.lower() in {"all", "none", "true", "*"} or re.fullmatch(
+        r"1\s*=\s*1", raw_filter
+    ):
+        return "1=1", []
     clauses: list[str] = []
     params: list[Any] = []
     for match in FILTER_RE.finditer(raw_filter):

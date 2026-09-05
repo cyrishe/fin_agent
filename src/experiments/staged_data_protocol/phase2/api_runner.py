@@ -21,11 +21,14 @@ from src.experiments.staged_data_protocol.phase2.intraday_quote_provider import 
 )
 from src.experiments.staged_data_protocol.phase2.margin_provider import execute_kd_margin_api, execute_margin_api
 from src.experiments.staged_data_protocol.phase2.moneyflow_provider import execute_kd_moneyflow_api, execute_moneyflow_api
-from src.experiments.staged_data_protocol.phase2.news_provider import execute_stock_news_api
 from src.experiments.staged_data_protocol.phase2.models import ApiCall, ResultHandle
 from src.experiments.staged_data_protocol.phase2.pricevalue_provider import execute_kd_pricevalue_api, execute_pricevalue_api
 from src.experiments.staged_data_protocol.phase2.quote_provider import execute_kd_quote_api, execute_quote_agg_api, execute_quote_api
-from src.experiments.staged_data_protocol.phase2.report_provider import execute_report_api
+from src.experiments.staged_data_protocol.phase2.report_provider import (
+    execute_report_agg_api,
+    execute_report_api,
+    execute_report_metric_api,
+)
 from src.experiments.staged_data_protocol.phase2.stock_corporate_provider import execute_stock_corporate_api
 
 
@@ -33,10 +36,10 @@ REF_RE = re.compile(r"\b(r\d+)\.([A-Za-z_]\w*)\b")
 EMPTY_REF_VALUE = "__fin_agent_empty_reference__"
 FILTER_ATOM_RE = re.compile(
     r"\b[A-Za-z_]\w*(?:\.[A-Za-z_]\w*)*\s*"
-    r"(?:in|=|==|!=|>=|<=|>|<)\s*"
+    r"(?:in|==|=|!=|>=|<=|>|<)\s*"
     r"(?:\[[^\]]*\]|\([^)]*\)|[^()]+?)"
     r"(?="
-    r"\s+(?:and|or)\s+\(*\s*[A-Za-z_]\w*(?:\.[A-Za-z_]\w*)*\s*(?:in|=|==|!=|>=|<=|>|<)"
+    r"\s+(?:and|or)\s+\(*\s*[A-Za-z_]\w*(?:\.[A-Za-z_]\w*)*\s*(?:in|==|=|!=|>=|<=|>|<)"
     r"|\s*\)"
     r"|[,;]"
     r"|$"
@@ -279,8 +282,8 @@ def execute_api_call(call: ApiCall, previous_results: Mapping[str, ResultHandle]
             columns=data.get("columns", columns),
             data=data,
         )
-    if resolved and resolved.get("type") == "base" and resolved.get("subject") == "stock" and resolved.get("dataview") == "news":
-        data = execute_stock_news_api(
+    if resolved and resolved.get("type") == "base" and resolved.get("subject") == "stock" and resolved.get("dataview") == "report_metric":
+        data = execute_report_metric_api(
             args=call.args,
             outputs=call.outputs,
         )
@@ -317,6 +320,18 @@ def execute_api_call(call: ApiCall, previous_results: Mapping[str, ResultHandle]
                 args=call.args,
                 outputs=call.outputs,
             )
+        return ResultHandle(
+            name=call.result_id,
+            api=call.api,
+            columns=data.get("columns", columns),
+            data=data,
+        )
+    if resolved and resolved.get("type") == "agg" and resolved.get("subject") == "stock" and resolved.get("dataview") in {"report", "report_metric"}:
+        data = execute_report_agg_api(
+            dataview=str(resolved.get("dataview") or ""),
+            args=call.args,
+            outputs=call.outputs,
+        )
         return ResultHandle(
             name=call.result_id,
             api=call.api,

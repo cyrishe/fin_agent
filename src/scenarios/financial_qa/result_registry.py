@@ -222,9 +222,11 @@ class FinanceResultRegistry:
         sample_complete = bool(entry.get("sample_complete"))
         if row_count == 0:
             guidance = (
-                "闭环判断：执行成功并返回零行。若上方 API、selection_applied、输出字段"
-                "和时间与 goal 一致，本步已经完成，直接如实回答零行；不得放宽、换 API、"
-                "切实时模式或拆分对象。只有能明确说出 goal 与请求的具体偏差时才修正。"
+                "闭环判断：执行成功且返回零行，这是正常的完成状态，不是需要追到非空的错误。"
+                "先核对上方 API、selection_applied、输出字段和时间是否忠实覆盖 goal：若覆盖，"
+                "直接如实回答当前条件下无结果，不改变任何条件；不得放宽筛选、替换对象、换 API、"
+                "换时间模式或拆分查询。只有能明确指出请求与 goal 的具体语义偏差时，才可在保留"
+                "用户原约束的前提下修正该偏差一次。"
             )
         elif unavailable:
             guidance = (

@@ -290,6 +290,93 @@ def test_finance_skill_snapshot_revision_changes_runtime_fingerprint(
         service.close()
 
 
+def test_finance_catalog_revision_changes_runtime_fingerprint(
+    tmp_path: Path,
+    monkeypatch,
+) -> None:
+    class _Catalog:
+        revision = "catalog-a"
+
+        def catalog_revision(self) -> str:
+            return self.revision
+
+    class _SystemTools:
+        def __init__(self) -> None:
+            self.finance_catalog = _Catalog()
+
+    system_tools = _SystemTools()
+    service = _pooled_service(
+        tmp_path,
+        monkeypatch,
+        skill_names=[],
+        system_tools=system_tools,
+    )
+    try:
+        first = service._runtime_options({})
+        unchanged = service._runtime_options({})
+        system_tools.finance_catalog.revision = "catalog-b"
+        changed = service._runtime_options({})
+
+        assert first["finance_catalog_revision"] == "catalog-a"
+        assert first["fingerprint"] == unchanged["fingerprint"]
+        assert changed["finance_catalog_revision"] == "catalog-b"
+        assert first["fingerprint"] != changed["fingerprint"]
+    finally:
+        service.close()
+
+
+def test_cc_client_refreshes_options_to_the_revision_pinned_by_tools(
+    tmp_path: Path,
+    monkeypatch,
+) -> None:
+    class _Catalog:
+        revision = "catalog-a"
+
+        def catalog_revision(self) -> str:
+            return self.revision
+
+    class _SystemTools:
+        def __init__(self) -> None:
+            self.finance_catalog = _Catalog()
+
+        @staticmethod
+        def create_runtime():
+            return None
+
+        def build_tools(self, **_kwargs):
+            self.finance_catalog.revision = "catalog-b"
+            return [], [], {"finance_catalog_revision": "catalog-b"}
+
+    system_tools = _SystemTools()
+    service = _pooled_service(
+        tmp_path,
+        monkeypatch,
+        skill_names=[],
+        system_tools=system_tools,
+    )
+    try:
+        stale_options = service._runtime_options({})
+        entry, tracker = asyncio.run(
+            service._create_live_client(
+                session_id="catalog-race",
+                session_dir=tmp_path / "client",
+                owner_id="owner-a",
+                tool_context={},
+                options=stale_options,
+                resume=False,
+                prewarmed=False,
+            )
+        )
+
+        assert stale_options["finance_catalog_revision"] == "catalog-a"
+        assert tracker["finance_catalog_revision"] == "catalog-b"
+        assert entry.finance_catalog_revision == "catalog-b"
+        assert entry.options_fingerprint == service._runtime_options({})["fingerprint"]
+        asyncio.run(entry.client.disconnect())
+    finally:
+        service.close()
+
+
 def test_finance_skill_snapshot_provider_switches_root_and_visible_skills(
     tmp_path: Path,
     monkeypatch,

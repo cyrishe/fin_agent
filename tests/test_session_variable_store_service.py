@@ -46,6 +46,39 @@ def test_session_variable_store_registers_finance_table_result(tmp_path: Path) -
     assert "## v1" in store.format_variables_for_prompt(session_id="conv-1")
 
 
+def test_session_variable_store_materializes_all_rows_without_prompt_expansion(
+    tmp_path: Path,
+) -> None:
+    store = SessionVariableStoreService(data_root=tmp_path / "data")
+    rows = [{"code": f"00000{index}.SZ", "value": index} for index in range(1, 7)]
+    variable = store.register_tool_result(
+        session_id="conv-full",
+        tool_name="finance_data_query",
+        result={
+            "ok": True,
+            "result": {
+                "name": "r1",
+                "api": "stock.quote",
+                "columns": ["code", "value"],
+                "data": {"rows": rows, "row_count": len(rows)},
+            },
+        },
+    )
+
+    assert variable is not None
+    assert len(variable["sample"]["rows"]) == store.MAX_SAMPLE_ROWS
+    assert "000006.SZ" not in store.format_variables_for_prompt(
+        session_id="conv-full"
+    )
+    materialized = store.materialize_data_ref(
+        session_id="conv-full",
+        data_ref=variable["data_ref"],
+    )
+    assert materialized["data_type"] == "table"
+    assert materialized["row_count"] == 6
+    assert materialized["rows"] == rows
+
+
 def test_session_variable_store_does_not_claim_a_type_for_all_null_column(
     tmp_path: Path,
 ) -> None:

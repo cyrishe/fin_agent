@@ -1313,6 +1313,8 @@ class CodexSdkSkillHarness(CodexExecSkillHarness):
             'model_provider = "crs"\n'
             f"model = {self._toml_value(self._runtime_model())}\n"
             f"model_reasoning_effort = {self._toml_value(self._runtime_reasoning_effort())}\n\n"
+            'disable_response_storage = true\n'
+            'preferred_auth_method = "apikey"\n\n'
             '[history]\n'
             'persistence = "none"\n\n'
             '[model_providers.crs]\n'

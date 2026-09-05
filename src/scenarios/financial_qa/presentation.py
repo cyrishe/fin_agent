@@ -229,7 +229,12 @@ class FinancialQaPresentationService:
         api = _trim(result_ref.get("api"))
         goal = _trim(result_ref.get("goal"))
         display_title = _trim(result_ref.get("display_title"))
-        catalog_specs = self._catalog_column_specs(api)
+        catalog_specs = self._catalog_column_specs(
+            api,
+            catalog_revision=_trim(
+                result_ref.get("finance_catalog_revision")
+            ),
+        )
         column_specs = {
             name: {
                 **dict(catalog_specs.get(name, {})),
@@ -518,8 +523,10 @@ class FinancialQaPresentationService:
             return f"{entity} · {suffix}" if entity else suffix
         if api == "stock.margin":
             return "融资融券数据"
-        if api == "stock.report":
+        if api in {"stock.report", "stock.report.agg"}:
             return f"{entity} · 研报数据" if entity else "研报数据"
+        if api in {"stock.report_metric", "stock.report_metric.agg"}:
+            return f"{entity} · 研报指标" if entity else "研报指标"
         return goal or {
             "metrics": "关键数据",
             "intraday": "分时走势",
@@ -615,7 +622,16 @@ class FinancialQaPresentationService:
     def _catalog_column_specs(
         self,
         api: str,
+        *,
+        catalog_revision: str = "",
     ) -> dict[str, Mapping[str, Any]]:
+        revision_reader = getattr(self.catalog, "catalog_revision", None)
+        if (
+            catalog_revision
+            and callable(revision_reader)
+            and _trim(revision_reader()) != catalog_revision
+        ):
+            return {}
         parts = [part for part in api.split(".") if part]
         if len(parts) < 2:
             return {}

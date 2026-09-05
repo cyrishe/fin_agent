@@ -232,8 +232,8 @@ def search_company_news(
 ) -> Dict[str, Any]:
     if not str(query or "").strip():
         raise ValueError("query 不能为空")
-    # Compatibility entry only. New financial QA should use stock.news through
-    # finance_query. Deliberately do not fall back to browser crawling here:
+    # Compatibility entry only. New financial QA should use general_search.
+    # Deliberately do not fall back to browser crawling here:
     # provider failure and a legitimate zero-result search must stay distinct.
     start_time = ""
     if int(keep_days or 0) > 0:

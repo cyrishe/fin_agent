@@ -395,6 +395,7 @@ export async function dispatchChat(input: {
   attachmentIds: string[];
   selectedAsset?: Pick<InvocationAsset, "kind" | "name"> & { ref?: string } | null;
   researchMode?: ResearchMode;
+  dataOnly?: boolean;
 }): Promise<UnknownRecord> {
   return readJson<UnknownRecord>(await fetch("/api/chat/dispatch", {
     method: "POST",
@@ -407,6 +408,7 @@ export async function dispatchChat(input: {
       attachment_ids: input.attachmentIds,
       selected_asset: input.selectedAsset || undefined,
       research_mode: input.researchMode || "auto",
+      ...(input.dataOnly === undefined ? {} : { data_only: input.dataOnly }),
     }),
   }));
 }
@@ -431,6 +433,7 @@ type AgentStreamInput = {
   attachmentIds?: string[];
   selectedAsset?: { ref?: string; kind: "tool" | "skill"; name: string } | null;
   researchMode?: ResearchMode;
+  dataOnly?: boolean;
   onEvent: (event: StreamEvent) => void;
 };
 
@@ -450,6 +453,7 @@ async function startAgentStream(
         attachment_ids: input.attachmentIds || [],
         selected_asset: input.selectedAsset || undefined,
         research_mode: input.researchMode || "auto",
+        ...(input.dataOnly === undefined ? {} : { data_only: input.dataOnly }),
         ...(input.interactionResponse ? { interaction_response: input.interactionResponse } : {}),
       }),
     }),

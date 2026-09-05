@@ -62,6 +62,6 @@
     "usually_too_large_for_prompt": []
   },
   "output_schema": "src/tools/schemas/financial_news_search.schema.json",
-  "purpose": "通过可配置搜索 provider 兼容查询金融新闻；个股新闻优先使用 finance_query 的 stock.news。",
+  "purpose": "通过可配置搜索 provider 兼容查询金融新闻；新查询统一使用 general_search。",
   "tool_name": "financial_news_search"
 }

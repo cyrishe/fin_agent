@@ -51,6 +51,21 @@ FIN_AGENT_PORT=22053 python -m src.web.flask_app
 
 浏览器访问 `http://127.0.0.1:22053`。真实 LLM、数据库和搜索能力使用本机环境变量配置；源仓库的 `.env` 与运行时数据未迁移。
 
+独立金融数据服务使用同一套 Catalog、Provider、静态校验和 CC/DSH
+运行时，但不经过通用聊天路由：
+
+```bash
+FINANCE_API_KEY='replace-with-a-random-key-at-least-24-characters' \
+FINANCE_DSH_FINANCIAL_QA_ENABLED=1 \
+python -m src.finance_api.app
+```
+
+默认监听 `http://0.0.0.0:22100`。数据体系页面位于 `/data-map`，
+OpenAPI 文档位于 `/docs`，REST 查询入口为 `/v1/finance/query`，
+MCP Streamable HTTP 入口为 `/mcp`。部署和调用说明见
+[独立金融数据 API](docs/finance_api_service.md)，服务器凭证可从
+[部署环境模板](deploy/finance-api/.env.example) 开始填写。
+
 迁移来源和边界见 [MIGRATION.md](MIGRATION.md)。
 定时任务建表、API 与 worker 启动方式见 [docs/scheduled_task_runtime.md](docs/scheduled_task_runtime.md)。
 公开主页、手机号唯一账户、阿里云短信持有权验证、可选实名增强与建表方式见 [docs/phone_account_auth.md](docs/phone_account_auth.md)。

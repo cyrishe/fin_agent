@@ -433,6 +433,7 @@ def _run_case(
     selected_count: int,
     base_url: str,
     timeout_seconds: float,
+    financial_qa_runtime: str,
     identity_cookies: Mapping[str, str],
     writer: IncrementalWriter,
 ) -> dict[str, Any]:
@@ -482,6 +483,7 @@ def _run_case(
                 "text": question,
                 "application_name": "investment_workbench",
                 "attachment_ids": [],
+                "financial_qa_runtime": financial_qa_runtime,
             },
             timeout=(10.0, min(max(timeout_seconds, 10.0), 60.0)),
         )
@@ -602,6 +604,14 @@ def _run_case(
     financial_qa = _mapping(done_result.get("financial_qa"))
     dispatch_plan = _mapping(done_result.get("dispatch_plan"))
     llm_usage = _mapping(done_result.get("llm_usage"))
+    financial_qa_error = _text(financial_qa.get("error"))
+    if not error and financial_qa_error:
+        error = {
+            "category": "runtime_error",
+            "type": "FinancialQaRuntimeError",
+            "message": financial_qa_error,
+            "http_status": http_status,
+        }
     result: dict[str, Any] = {
         "case_id": case_id,
         "ordinal": ordinal,
@@ -742,6 +752,7 @@ def run(args: argparse.Namespace) -> int:
             "limit": args.limit,
             "concurrency": args.concurrency,
             "timeout_seconds": args.timeout,
+            "financial_qa_runtime": args.financial_qa_runtime,
             "resume": bool(args.resume),
         },
         "isolation": (
@@ -783,6 +794,7 @@ def run(args: argparse.Namespace) -> int:
                 selected_count=len(cases),
                 base_url=args.base_url,
                 timeout_seconds=args.timeout,
+                financial_qa_runtime=args.financial_qa_runtime,
                 identity_cookies=identity_cookies,
                 writer=writer,
             )
@@ -820,6 +832,12 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--limit", type=int, default=None)
     parser.add_argument("--offset", type=int, default=0)
     parser.add_argument("--concurrency", type=int, default=1)
+    parser.add_argument(
+        "--financial-qa-runtime",
+        choices=("cc", "dsh"),
+        default="cc",
+        help="Financial-QA execution path requested from the Chat API.",
+    )
     parser.add_argument(
         "--resume",
         action="store_true",

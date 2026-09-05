@@ -16,8 +16,8 @@ _DATE_FIELDS = {"date", "tradedate", "trade_date", "start", "end", "start_date",
 _DATE_VALUE_RE = re.compile(r"^(?:\d{4}[-/]\d{1,2}[-/]\d{1,2}|\d{8}|-?\d+|latest|current|today)$", re.IGNORECASE)
 _FILTER_DATE_RE = re.compile(
     r"(?P<field>\btradedate\b|\btrade_date\b)\s*"
-    r"(?P<op>=|==|<=|>=|<|>)\s*"
-    r"(?P<value>'[^']+'|\"[^\"]+\"|-?\d+|\d{4}[-/]\d{1,2}[-/]\d{1,2}|\d{8})",
+    r"(?P<op>==|=|<=|>=|<|>)\s*"
+    r"(?P<value>'[^']+'|\"[^\"]+\"|\d{4}[-/]\d{1,2}[-/]\d{1,2}|\d{8}|-?\d+)",
     re.IGNORECASE,
 )
 

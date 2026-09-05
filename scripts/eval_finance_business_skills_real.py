@@ -30,9 +30,12 @@ def _args() -> argparse.Namespace:
         "--dataset",
         default="tests/evals/finance_business_skills_real_v1.json",
     )
+    parser.add_argument("--questions-file", default="")
     parser.add_argument("--case", action="append", default=[])
     parser.add_argument("--limit", type=int, default=0)
+    parser.add_argument("--offset", type=int, default=0)
     parser.add_argument("--max-turns", type=int, default=24)
+    parser.add_argument("--effort", default="medium")
     parser.add_argument(
         "--output",
         default="outputs/financial_qa_cc/finance_business_skills_real_v1.json",
@@ -54,6 +57,8 @@ def _event_row(event: Mapping[str, Any], *, started: float) -> dict[str, Any]:
         "stage": str(metadata.get("stage") or ""),
         "title": str(metadata.get("title") or ""),
         "status": str(metadata.get("status") or ""),
+        "tool": str(metadata.get("tool") or ""),
+        "progress_id": str(metadata.get("progress_id") or ""),
     }
 
 
@@ -153,7 +158,23 @@ def _write_report(path: Path, report: Mapping[str, Any]) -> None:
 def main() -> int:
     args = _args()
     load_dotenv(ROOT / ".env", override=False)
-    dataset = json.loads((ROOT / args.dataset).read_text(encoding="utf-8"))
+    if args.questions_file:
+        questions_path = Path(args.questions_file).expanduser()
+        questions = [
+            line.strip()
+            for line in questions_path.read_text(encoding="utf-8").splitlines()
+            if line.strip()
+        ]
+        dataset = {
+            "version": "report_queries_low12_20260831",
+            "description": "研报评测问题全链路 CC 回归",
+            "cases": [
+                {"id": f"RPT{index:03d}", "question": question}
+                for index, question in enumerate(questions, start=1)
+            ],
+        }
+    else:
+        dataset = json.loads((ROOT / args.dataset).read_text(encoding="utf-8"))
     selected_ids = {str(item) for item in args.case}
     cases = [
         dict(item)
@@ -161,6 +182,8 @@ def main() -> int:
         if isinstance(item, Mapping)
         and (not selected_ids or str(item.get("id") or "") in selected_ids)
     ]
+    if args.offset > 0:
+        cases = cases[args.offset :]
     if args.limit > 0:
         cases = cases[: args.limit]
 
@@ -194,7 +217,7 @@ def main() -> int:
             "src/scenarios/financial_qa/finance_api_protocol.md",
             "src/scenarios/financial_qa/data_query.md",
         ],
-        effort="medium",
+        effort=str(args.effort or "medium").strip(),
     )
     service = FinancialQaCcService(
         enabled=True,
@@ -213,6 +236,7 @@ def main() -> int:
         "description": dataset.get("description"),
         "started_at": _now_iso(),
         "max_turns": max(4, int(args.max_turns)),
+        "effort": str(args.effort or "medium").strip(),
         "runtime_mode": "real_finance_cc_and_real_finance_data",
         "cases": [],
     }
@@ -312,6 +336,12 @@ def main() -> int:
                         "resumed": bool(evidence.get("resumed")),
                         "finance_cc_duration_ms": int(
                             evidence.get("duration_ms") or 0
+                        ),
+                        "assistant_message_count": int(
+                            evidence.get("assistant_message_count") or 0
+                        ),
+                        "tool_result_message_count": int(
+                            evidence.get("tool_result_message_count") or 0
                         ),
                         "turn_timeout_seconds": int(
                             evidence.get("turn_timeout_seconds") or 0

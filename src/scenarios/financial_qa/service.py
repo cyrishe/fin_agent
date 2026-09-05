@@ -6,6 +6,9 @@ from pathlib import Path
 from typing import Any, Dict, Mapping, Optional
 
 from src.scenarios.financial_qa.business_skills import FinanceBusinessSkillCatalog
+from src.scenarios.financial_qa.dsh_service import (
+    FinanceDeepSeekHarnessSessionService,
+)
 from src.scenarios.financial_qa.presentation import FinancialQaPresentationService
 from src.scenarios.financial_qa.research_mode import (
     normalize_research_mode,
@@ -13,10 +16,18 @@ from src.scenarios.financial_qa.research_mode import (
     research_mode_prompt,
 )
 from src.scenarios.financial_qa.tools import FinanceDataQueryCcTools
+from src.scenarios.financial_qa.runtime import (
+    FINANCIAL_QA_RUNTIME_CC,
+    FINANCIAL_QA_RUNTIME_DSH,
+    normalize_financial_qa_runtime,
+)
 from src.services.finance_claude_session_service import FinanceClaudeSessionService
 from src.services.invocation_input_resolver_service import InvocationInputResolverService
 
-_SUPPLEMENTARY_AGENT_TOOLS = frozenset({"financial_news_search", "general_search"})
+# Financial QA is deliberately limited to the structured finance-data surface.
+# News and general web search belong to a separate search scenario and must not
+# leak into either the CC tool list or skill-granted tools here.
+_SUPPLEMENTARY_AGENT_TOOLS = frozenset()
 _FINANCE_MCP_TOOL_PREFIX = "mcp__finance__"
 
 
@@ -63,6 +74,7 @@ class FinancialQaCcService:
         *,
         enabled: Optional[bool] = None,
         session_service: Optional[FinanceClaudeSessionService] = None,
+        dsh_session_service: Optional[FinanceDeepSeekHarnessSessionService] = None,
         system_tools: Optional[FinanceDataQueryCcTools] = None,
         business_skill_catalog: Optional[FinanceBusinessSkillCatalog] = None,
         presentation_service: Optional[FinancialQaPresentationService] = None,
@@ -87,8 +99,14 @@ class FinancialQaCcService:
         )
         if callable(bind_skill_catalog):
             bind_skill_catalog(self.business_skill_catalog)
+        shared_finance_catalog = getattr(
+            self.system_tools,
+            "finance_catalog",
+            None,
+        )
         self.presentation_service = (
-            presentation_service or FinancialQaPresentationService()
+            presentation_service
+            or FinancialQaPresentationService(catalog=shared_finance_catalog)
         )
         self.input_resolver = input_resolver or InvocationInputResolverService()
         qa_max_turns = max(
@@ -117,6 +135,10 @@ class FinancialQaCcService:
                 os.environ.get("FINANCE_CC_FINANCIAL_QA_EFFORT") or "medium"
             ),
         )
+        self.dsh_session_service = (
+            dsh_session_service
+            or FinanceDeepSeekHarnessSessionService(system_tools=self.system_tools)
+        )
 
     def _business_skill_runtime_snapshot(self) -> Dict[str, Any]:
         return self.business_skill_catalog.runtime_binding()
@@ -126,8 +148,13 @@ class FinancialQaCcService:
         *,
         dispatch_plan: Mapping[str, Any],
         attachments: Optional[list[dict[str, Any]]] = None,
+        runtime: str = FINANCIAL_QA_RUNTIME_CC,
     ) -> bool:
-        if not self.enabled:
+        selected_runtime = normalize_financial_qa_runtime(runtime)
+        if (
+            selected_runtime == FINANCIAL_QA_RUNTIME_CC
+            and not self.enabled
+        ):
             return False
         if attachments and any(
             _trim(item.get("kind")) != "table"
@@ -266,6 +293,99 @@ class FinancialQaCcService:
             "_agent_system_prompt": _agent_harness_context(runtime_profile),
         }
 
+    def _response_data(
+        self,
+        result_refs: list[dict[str, Any]],
+        *,
+        max_rows: int | None = None,
+    ) -> dict[str, Any]:
+        """Materialize current-turn table results outside the model context."""
+
+        store = self.system_tools.result_store
+        results: list[dict[str, Any]] = []
+        for result_ref in result_refs:
+            data_ref = _trim(result_ref.get("result_ref"))
+            sample = (
+                result_ref.get("sample")
+                if isinstance(result_ref.get("sample"), Mapping)
+                else {}
+            )
+            sample_rows = [
+                dict(row)
+                for row in sample.get("rows") or []
+                if isinstance(row, Mapping)
+            ]
+            rows = sample_rows
+            complete = bool(result_ref.get("sample_complete"))
+            if data_ref:
+                try:
+                    session_id, _ = store.parse_data_ref(data_ref)
+                    if max_rows is not None:
+                        materialized = store.load_data_ref(
+                            session_id=session_id,
+                            data_ref=data_ref,
+                            offset=0,
+                            limit=max_rows,
+                        )
+                        rows = [
+                            dict(row)
+                            for row in materialized.get("rows") or []
+                            if isinstance(row, Mapping)
+                        ]
+                        page = (
+                            materialized.get("page")
+                            if isinstance(materialized.get("page"), Mapping)
+                            else {}
+                        )
+                        complete = not bool(page.get("has_more"))
+                    else:
+                        materialized = store.materialize_data_ref(
+                            session_id=session_id,
+                            data_ref=data_ref,
+                        )
+                        if _trim(materialized.get("data_type")) == "table":
+                            rows = [
+                                dict(row)
+                                for row in materialized.get("rows") or []
+                                if isinstance(row, Mapping)
+                            ]
+                            materialized_count = materialized.get("row_count")
+                            expected_count = (
+                                int(materialized_count)
+                                if isinstance(materialized_count, int)
+                                and not isinstance(materialized_count, bool)
+                                else int(result_ref.get("row_count") or len(rows))
+                            )
+                            complete = len(rows) >= expected_count
+                except (FileNotFoundError, OSError, ValueError):
+                    # Keep the bounded in-turn sample and its completeness bit.
+                    # A missing persisted artifact must not erase valid evidence.
+                    pass
+            row_count = result_ref.get("row_count")
+            if not isinstance(row_count, int) or isinstance(row_count, bool):
+                row_count = len(rows)
+            results.append(
+                {
+                    "result_name": _trim(result_ref.get("result_name")),
+                    "goal": _trim(result_ref.get("goal")),
+                    "api": _trim(result_ref.get("api")),
+                    "result_ref": data_ref,
+                    "data_type": _trim(result_ref.get("data_type")) or "table",
+                    "schema": (
+                        dict(result_ref.get("schema"))
+                        if isinstance(result_ref.get("schema"), Mapping)
+                        else {}
+                    ),
+                    "row_count": row_count,
+                    "rows_complete": complete,
+                    "rows": rows,
+                }
+            )
+        return {
+            "format": "row-dict",
+            "results": results,
+        }
+
     def prewarm(
         self,
         *,
@@ -291,7 +411,13 @@ class FinancialQaCcService:
         attachments: Optional[list[dict[str, Any]]] = None,
         event_sink: Any = None,
         research_mode: str = "auto",
+        runtime: str = FINANCIAL_QA_RUNTIME_CC,
+        data_only: bool = False,
+        isolated_request: bool = False,
+        include_response_data: bool = True,
+        response_data_max_rows: int | None = None,
     ) -> Dict[str, Any]:
+        selected_runtime = normalize_financial_qa_runtime(runtime)
         semantic_turn = (
             dispatch_plan.get("semantic_turn")
             if isinstance(dispatch_plan.get("semantic_turn"), Mapping)
@@ -309,6 +435,8 @@ class FinancialQaCcService:
             resolved_question=resolved_question,
             research_mode=research_mode,
         )
+        runtime_context["_finance_data_only"] = bool(data_only)
+        runtime_context["_finance_isolated_request"] = bool(isolated_request)
         model_question = resolved_question
         if attachments:
             inspection = self.input_resolver.inspect(attachments)
@@ -333,7 +461,12 @@ class FinancialQaCcService:
                     ),
                 ]
             )
-        record = self.session_service.run_turn(
+        session_service = (
+            self.dsh_session_service
+            if selected_runtime == FINANCIAL_QA_RUNTIME_DSH
+            else self.session_service
+        )
+        record = session_service.run_turn(
             thread_id=thread_id,
             turn_id=turn_id,
             owner_id=owner_id,
@@ -347,14 +480,22 @@ class FinancialQaCcService:
             if isinstance(item, Mapping)
         ]
         error = _trim(record.get("error"))
-        message = _trim(record.get("result")) or (
+        generated_message = _trim(record.get("result")) or (
             f"金融专业问答暂时未完成：{error}" if error else "金融专业问答暂时没有返回内容。"
         )
+        message = "" if data_only and not error and result_refs else generated_message
+        summary = message
         surface_blocks = self.presentation_service.build(
             message,
             result_refs,
             thread_id=thread_id,
         )
+        if data_only and not error:
+            surface_blocks = [
+                block
+                for block in surface_blocks
+                if _trim(block.get("semantic")) != "finance.answer"
+            ]
         skill_entries = [
             dict(item)
             for item in record.get("skill_entries") or []
@@ -366,8 +507,22 @@ class FinancialQaCcService:
             for item in skill_entries
         )
         return {
-            "mode": "financial_qa_cc",
+            "mode": (
+                "financial_qa_dsh"
+                if selected_runtime == FINANCIAL_QA_RUNTIME_DSH
+                else "financial_qa_cc"
+            ),
             "message": message,
+            "summary": summary,
+            "data_only": bool(data_only),
+            "data": (
+                self._response_data(
+                    result_refs,
+                    max_rows=response_data_max_rows,
+                )
+                if include_response_data
+                else {"format": "row-dict", "results": []}
+            ),
             "model_name": _trim(record.get("model_name")),
             "llm_usage": (
                 dict(record.get("llm_usage"))
@@ -377,11 +532,28 @@ class FinancialQaCcService:
             "items": [],
             "surface_blocks": surface_blocks,
             "financial_qa": {
+                "runtime": selected_runtime,
+                "reasoning_effort": _trim(record.get("reasoning_effort")),
                 "session_id": _trim(record.get("session_id")),
                 "resumed": bool(record.get("resumed")),
                 "duration_ms": int(record.get("duration_ms") or 0),
+                "worker_index": (
+                    int(record["worker_index"])
+                    if record.get("worker_index") is not None
+                    else None
+                ),
+                "queue_wait_ms": int(record.get("queue_wait_ms") or 0),
+                "assistant_message_count": int(
+                    record.get("assistant_message_count") or 0
+                ),
+                "tool_result_message_count": int(
+                    record.get("tool_result_message_count") or 0
+                ),
                 "client_reused": bool(record.get("client_reused")),
                 "client_prewarmed": bool(record.get("client_prewarmed")),
+                "data_only_complete": bool(record.get("data_only_complete")),
+                "data_only_early_stop": bool(record.get("data_only_early_stop")),
+                "isolated_request": bool(record.get("isolated_request")),
                 "tool_calls": [
                     dict(item)
                     for item in record.get("tool_calls") or []
@@ -399,6 +571,23 @@ class FinancialQaCcService:
                 ],
                 "skill_entries": skill_entries,
                 "result_refs": result_refs,
+                "llm_step_usages": [
+                    dict(item)
+                    for item in record.get("llm_step_usages") or []
+                    if isinstance(item, Mapping)
+                ],
+                # DSH policy/debug evidence stays in the observability branch;
+                # it is not mixed into the user-facing financial answer.
+                "loop_policy": (
+                    dict(record.get("loop_policy"))
+                    if isinstance(record.get("loop_policy"), Mapping)
+                    else {}
+                ),
+                "prompt_assets": (
+                    dict(record.get("prompt_assets"))
+                    if isinstance(record.get("prompt_assets"), Mapping)
+                    else {}
+                ),
                 "error": error,
             },
             "result_refs": result_refs,
@@ -418,3 +607,4 @@ class FinancialQaCcService:
 
     def close(self) -> None:
         self.session_service.close()
+        self.dsh_session_service.close()

@@ -762,6 +762,8 @@ def test_codex_auto_auth_uses_crs_key_and_writes_secret_free_provider_config(
         assert config["model_provider"] == "crs"
         assert config["model"] == "gpt-5-codex"
         assert config["model_reasoning_effort"] == "high"
+        assert config["disable_response_storage"] is True
+        assert config["preferred_auth_method"] == "apikey"
         assert config["history"]["persistence"] == "none"
         assert config["model_providers"]["crs"] == {
             "name": "crs",
@@ -987,6 +989,17 @@ def test_dashscope_credentials_are_bound_to_anthropic_endpoint(monkeypatch: pyte
         "globalsign-root-r46.pem"
     )
     assert "DASHSCOPE_API_KEY" not in provider_env
+
+    monkeypatch.setenv(
+        "DASHSCOPE_ANTHROPIC_BASE_URL",
+        "https://workspace.ap-southeast-1.maas.aliyuncs.com/apps/anthropic",
+    )
+    regional = ClaudeSdkSkillHarness(
+        provider="dashscope",
+        model="deepseek-v4-flash",
+        query_impl=lambda **kwargs: None,
+    )
+    assert regional.base_url.startswith("https://workspace.ap-southeast-1.maas.aliyuncs.com")
 
     with pytest.raises(ValueError, match="may only use"):
         ClaudeSdkSkillHarness(

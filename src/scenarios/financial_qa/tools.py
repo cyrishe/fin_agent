@@ -3,6 +3,7 @@ from __future__ import annotations
 import asyncio
 import json
 import re
+from pathlib import Path
 from typing import Any, Callable, Dict, List, Mapping, Optional
 
 from src.experiments.staged_data_protocol.phase2.models import ResultHandle
@@ -25,6 +26,24 @@ def _trim(value: Any) -> str:
     return str(value or "").strip()
 
 
+_OPERATION_SELECTION_DESCRIPTION = (
+    "Always provide operation for a concrete data request. Choose by the "
+    "requested output granularity, not by words such as compare, "
+    "comparison, change, rank, or Top N. query preserves one row per object, "
+    "period, or source record, so direct comparisons, rankings, and Top N are "
+    "normally query; when no row-reducing statistic is explicitly requested, "
+    "default to query. aggregate is only for an explicitly requested reduction "
+    "of multiple rows to grouped statistics such as average, median, maximum, "
+    "minimum, sum, or count. Asking which object is highest/lowest remains "
+    "query with order/limit; asking for the maximum/minimum value itself is "
+    "aggregate. window is for an explicitly requested fixed-K-period derived "
+    "metric; compute is for a requested calculation not covered by a catalog "
+    "query, aggregate, or window operation. Omit operation only when the "
+    "operation itself is genuinely ambiguous and the full dataview is needed "
+    "to resolve it."
+)
+
+
 def _canonical_skill_id(value: Any) -> str:
     normalized = _trim(value)
     return normalized.rsplit(":", 1)[-1] if normalized else ""
@@ -39,6 +58,60 @@ def _tool_result(payload: Mapping[str, Any]) -> Dict[str, Any]:
             }
         ]
     }
+
+
+def _model_step_summary(summary: Mapping[str, Any]) -> Dict[str, Any]:
+    """Project one persisted query summary to the smaller model-facing contract.
+
+    The tracker keeps the richer record for presentation and observability.  The
+    model already has the submitted request in its tool call and the stable
+    recovery rules in the tool instructions, so neither needs to be repeated in
+    every successful tool result.
+    """
+
+    evidence = (
+        summary.get("step_evidence")
+        if isinstance(summary.get("step_evidence"), Mapping)
+        else {}
+    )
+    compact_evidence = {
+        key: evidence.get(key)
+        for key in (
+            "execution_completed",
+            "selection_applied",
+            "populated_columns",
+            "available_refs",
+            "unavailable_columns",
+            "sample_complete",
+            "guidance",
+        )
+        if evidence.get(key) not in (None, "", [], {})
+    }
+    projected: Dict[str, Any] = {}
+    for key in (
+        "flow_step",
+        "goal",
+        "api",
+        "result_name",
+        "result_ref",
+        "data_type",
+        "row_count",
+        "depends_on",
+        "schema",
+        "sample",
+        "sample_complete",
+        "warnings",
+        "recovery",
+        "provider_retry_count",
+    ):
+        value = summary.get(key)
+        if value not in (None, "", [], {}):
+            projected[key] = value
+        elif key in {"row_count", "sample_complete"}:
+            projected[key] = value
+    if compact_evidence:
+        projected["step_evidence"] = compact_evidence
+    return projected
 
 
 def _backtest_presentation(comparison: Mapping[str, Any]) -> Dict[str, Any]:
@@ -169,6 +242,7 @@ class FinanceDataQueryToolRuntime:
         self.result_metadata: Dict[str, Dict[str, Any]] = {}
         self.result_registry = FinanceResultRegistry()
         self._restored_scope = ""
+        self.finance_catalog_revision = ""
         self.tracker: Dict[str, Any] = {}
         self.begin_turn(owner_ids=[], tool_context={})
 
@@ -184,6 +258,7 @@ class FinanceDataQueryToolRuntime:
         self.event_sink = event_sink
         self._restore_results()
         self.tracker = {
+            "finance_catalog_revision": self.finance_catalog_revision,
             "calls": [],
             "catalog_reads": [],
             "result_refs": [],
@@ -397,6 +472,17 @@ class FinanceDataQueryCcTools:
         backtest_service: Optional[BacktestRunService] = None,
         input_resolver: Optional[InvocationInputResolverService] = None,
     ) -> None:
+        if finance_catalog is not None and finance_runtime is None:
+            supplied_path = Path(
+                str(getattr(finance_catalog, "catalog_path", ""))
+            ).resolve()
+            canonical_path = Path(
+                FinanceDataToolCatalogService.DEFAULT_CATALOG_PATH
+            ).resolve()
+            if supplied_path != canonical_path:
+                raise ValueError(
+                    "a custom finance catalog requires a matching finance runtime"
+                )
         self.finance_runtime = finance_runtime or FinanceDataToolRuntimeService(
             trade_date_resolver=TradeDateResolver()
         )
@@ -431,13 +517,52 @@ class FinanceDataQueryCcTools:
             tool_context=tool_context,
             event_sink=event_sink,
         )
-        routing_index = self._catalog_routing_index()
+        catalog_revision_reader = getattr(
+            self.finance_catalog,
+            "catalog_revision",
+            None,
+        )
+        routing_index = ""
+        pinned_catalog_revision = ""
+        for _ in range(3):
+            before_revision = (
+                _trim(catalog_revision_reader())
+                if callable(catalog_revision_reader)
+                else ""
+            )
+            routing_index = self._catalog_routing_index()
+            after_revision = (
+                _trim(catalog_revision_reader())
+                if callable(catalog_revision_reader)
+                else ""
+            )
+            if before_revision == after_revision:
+                pinned_catalog_revision = after_revision
+                break
+        else:
+            raise RuntimeError(
+                "finance catalog changed repeatedly while building agent tools"
+            )
+        tool_runtime.finance_catalog_revision = pinned_catalog_revision
+        tracker["finance_catalog_revision"] = pinned_catalog_revision
+
+        def assert_catalog_revision() -> None:
+            if not pinned_catalog_revision or not callable(catalog_revision_reader):
+                return
+            if _trim(catalog_revision_reader()) != pinned_catalog_revision:
+                raise RuntimeError(
+                    "finance catalog changed during the active agent turn"
+                )
+
         @tool(
             "read_finance_catalog",
             (
                 "Read Fin Agent's finance data catalog. Infer the subject and dataview from the user's request "
                 "using the routing index below, then call this tool once with both subject and dataview to obtain "
-                "the complete executable fields, methods, rules, and examples for that view. Do not routinely read "
+                "the executable fields and rules for that view. For every concrete data request, pass "
+                "operation=query, aggregate, window, or compute "
+                "according to the operation parameter description so only that operation's "
+                "contract and examples are loaded. Do not routinely read "
                 "the empty index or a subject summary first. Use a subject-only or empty read only when the request "
                 "is genuinely ambiguous and the routing index cannot resolve it.\n\n"
                 f"Current routing index:\n{routing_index}"
@@ -447,6 +572,11 @@ class FinanceDataQueryCcTools:
                 "properties": {
                     "subject": {"type": "string", "maxLength": 100},
                     "dataview": {"type": "string", "maxLength": 100},
+                    "operation": {
+                        "type": "string",
+                        "enum": ["query", "aggregate", "window", "compute"],
+                        "description": _OPERATION_SELECTION_DESCRIPTION,
+                    },
                 },
                 "additionalProperties": False,
             },
@@ -454,17 +584,37 @@ class FinanceDataQueryCcTools:
         async def read_finance_catalog(args: dict[str, Any]) -> dict[str, Any]:
             subject = _trim(args.get("subject"))
             dataview = _trim(args.get("dataview"))
+            operation = _trim(args.get("operation"))
             tool_runtime.tracker["calls"].append(
-                {"tool": "read_finance_catalog", "subject": subject, "dataview": dataview}
+                {
+                    "tool": "read_finance_catalog",
+                    "subject": subject,
+                    "dataview": dataview,
+                    "operation": operation,
+                }
             )
             try:
+                assert_catalog_revision()
                 if dataview and not subject:
                     raise ValueError("subject is required when dataview is provided")
+                if operation and not (subject and dataview):
+                    raise ValueError(
+                        "subject and dataview are required when operation is provided"
+                    )
                 if subject and dataview:
+                    model_dataview = getattr(
+                        self.finance_catalog,
+                        "get_model_dataview",
+                        None,
+                    )
                     payload = {
                         "mode": "dataview",
                         "subject": subject,
-                        "dataview": self.finance_catalog.get_dataview(subject, dataview),
+                        "dataview": (
+                            model_dataview(subject, dataview, operation)
+                            if callable(model_dataview)
+                            else self.finance_catalog.get_dataview(subject, dataview)
+                        ),
                     }
                 elif subject:
                     payload = {
@@ -476,8 +626,14 @@ class FinanceDataQueryCcTools:
                         "mode": "index",
                         "subjects": self._catalog_index(),
                     }
+                assert_catalog_revision()
                 tool_runtime.tracker["catalog_reads"].append(
-                    {"subject": subject, "dataview": dataview, "mode": payload["mode"]}
+                    {
+                        "subject": subject,
+                        "dataview": dataview,
+                        "operation": operation,
+                        "mode": payload["mode"],
+                    }
                 )
                 catalog_index = len(tool_runtime.tracker["catalog_reads"])
                 if payload["mode"] == "dataview":
@@ -515,7 +671,12 @@ class FinanceDataQueryCcTools:
                     status="error",
                 )
                 return _tool_result(
-                    {"subject": subject, "dataview": dataview, "error": str(exc)}
+                    {
+                        "subject": subject,
+                        "dataview": dataview,
+                        "operation": operation,
+                        "error": str(exc),
+                    }
                 )
 
         @tool(
@@ -545,9 +706,10 @@ class FinanceDataQueryCcTools:
                 "must not trigger another API, time mode, or tool for the same fact. Follow the returned recovery object: "
                 "provider failures are retried once by the harness, request-invalid errors may be repaired once from the "
                 "loaded catalog, and ambiguous identities may only use tool-supplied candidates. step_evidence and the compact "
-                "working set are authoritative execution facts and contain no hidden full-table data. The live "
-                "working set is supplied in the turn context and refreshed in every finance_query response; do not "
-                "treat a tool description as mutable runtime state."
+                "working set are authoritative execution facts and contain no hidden full-table data. The full "
+                "working-set index is server-owned and supplied once at the start of a user turn. Each finance_query "
+                "response returns only newly completed step summaries; reuse their rN references during the current "
+                "turn and do not expect prior results to be repeated in later tool responses."
             ),
             {
                 "type": "object",
@@ -580,13 +742,25 @@ class FinanceDataQueryCcTools:
                             "required": ["goal", "request"],
                             "additionalProperties": False,
                         },
-                    }
+                    },
+                    "data_request_complete": {
+                        "type": "boolean",
+                        "description": (
+                            "Only use in system-declared data-only mode. Set true only when this "
+                            "flow contains every raw-data goal requested for the turn; set false "
+                            "when a later query must be selected after inspecting these results."
+                        ),
+                    },
                 },
                 "required": ["steps"],
                 "additionalProperties": False,
             },
         )
         async def finance_query(args: dict[str, Any]) -> dict[str, Any]:
+            try:
+                assert_catalog_revision()
+            except Exception as exc:
+                return _tool_result({"error": str(exc)})
             raw_steps = (
                 args.get("steps")
                 if isinstance(args.get("steps"), list)
@@ -607,12 +781,22 @@ class FinanceDataQueryCcTools:
                     {
                         "error": "steps must contain at least one financial data step",
                         "next_result_name": tool_runtime.next_result_name,
-                        "working_set": tool_runtime.working_set(),
                     }
                 )
             completed_steps: Dict[int, str] = {}
             step_summaries: list[Dict[str, Any]] = []
             for step_number, step in enumerate(steps, start=1):
+                try:
+                    assert_catalog_revision()
+                except Exception as exc:
+                    return _tool_result(
+                        {
+                            "error": str(exc),
+                            "failed_step": step_number,
+                            "completed_steps": step_summaries,
+                            "next_result_name": tool_runtime.next_result_name,
+                        }
+                    )
                 goal = _trim(step.get("goal"))
                 submitted_request = _trim(step.get("request"))
                 expected_result_name = tool_runtime.next_result_name
@@ -624,6 +808,10 @@ class FinanceDataQueryCcTools:
                     "submitted_request": submitted_request[:500],
                     "expected_result_name": expected_result_name,
                 }
+                if bool(tool_runtime.tool_context.get("_finance_data_only")):
+                    call_record["data_request_complete"] = bool(
+                        args.get("data_request_complete")
+                    )
                 tool_runtime.tracker["calls"].append(call_record)
                 if not goal or not submitted_request:
                     call_record["error"] = "goal and request are required"
@@ -633,7 +821,6 @@ class FinanceDataQueryCcTools:
                             "failed_step": step_number,
                             "completed_steps": step_summaries,
                             "next_result_name": expected_result_name,
-                            "working_set": tool_runtime.working_set(),
                         }
                     )
                 try:
@@ -693,6 +880,19 @@ class FinanceDataQueryCcTools:
                             request=request,
                             previous_results=dict(tool_runtime.result_handles),
                         )
+                    timings = (
+                        result.get("timings")
+                        if isinstance(result, Mapping)
+                        and isinstance(result.get("timings"), Mapping)
+                        else {}
+                    )
+                    call_record["static_validation_ms"] = float(
+                        timings.get("static_validation_ms") or 0
+                    )
+                    call_record["api_execution_ms"] = float(
+                        timings.get("api_execution_ms") or 0
+                    )
+                    assert_catalog_revision()
                 except Exception as exc:
                     call_record["error"] = str(exc)[:1_000]
                     tool_runtime.emit_progress(
@@ -707,7 +907,6 @@ class FinanceDataQueryCcTools:
                             "failed_step": step_number,
                             "completed_steps": step_summaries,
                             "next_result_name": expected_result_name,
-                            "working_set": tool_runtime.working_set(),
                         }
                     )
 
@@ -737,7 +936,6 @@ class FinanceDataQueryCcTools:
                             "recovery": query_recovery(validation=validation),
                             "completed_steps": step_summaries,
                             "next_result_name": expected_result_name,
-                            "working_set": tool_runtime.working_set(),
                         }
                     )
 
@@ -785,7 +983,6 @@ class FinanceDataQueryCcTools:
                             ),
                             "completed_steps": step_summaries,
                             "next_result_name": expected_result_name,
-                            "working_set": tool_runtime.working_set(),
                         }
                     )
 
@@ -821,10 +1018,21 @@ class FinanceDataQueryCcTools:
                             "failed_step": step_number,
                             "completed_steps": step_summaries,
                             "next_result_name": expected_result_name,
-                            "working_set": tool_runtime.working_set(),
                         }
                     )
                 dependencies = tool_runtime.result_registry.dependencies(request)
+                try:
+                    assert_catalog_revision()
+                except Exception as exc:
+                    call_record["error"] = str(exc)[:1_000]
+                    return _tool_result(
+                        {
+                            "error": str(exc),
+                            "failed_step": step_number,
+                            "completed_steps": step_summaries,
+                            "next_result_name": expected_result_name,
+                        }
+                    )
                 variable = self.result_store.register_tool_result(
                     session_id=tool_runtime.result_scope,
                     tool_name="finance_data_query",
@@ -845,7 +1053,6 @@ class FinanceDataQueryCcTools:
                             "failed_step": step_number,
                             "completed_steps": step_summaries,
                             "next_result_name": tool_runtime.next_result_name,
-                            "working_set": tool_runtime.working_set(),
                         }
                     )
                 remembered = tool_runtime.remember(
@@ -861,7 +1068,6 @@ class FinanceDataQueryCcTools:
                             "failed_step": step_number,
                             "completed_steps": step_summaries,
                             "next_result_name": expected_result_name,
-                            "working_set": tool_runtime.working_set(),
                         }
                     )
                 working_set = tool_runtime.working_set()
@@ -883,6 +1089,10 @@ class FinanceDataQueryCcTools:
                     if isinstance(call.get("args"), Mapping)
                     else {}
                 )
+                if not call_args:
+                    call_args = tool_runtime.result_registry.selection_from_request(
+                        request
+                    )
                 step_evidence = tool_runtime.result_registry.step_evidence(
                     current_entry,
                     call_args=call_args,
@@ -892,10 +1102,12 @@ class FinanceDataQueryCcTools:
                     "goal": goal,
                     "request": request,
                     "api": handle.api,
+                    "finance_catalog_revision": pinned_catalog_revision,
                     "result_name": variable.get("local_alias"),
                     "result_ref": variable.get("data_ref"),
                     "data_type": variable.get("data_type"),
                     "row_count": variable.get("row_count"),
+                    "depends_on": dependencies,
                     "step_evidence": step_evidence,
                     "schema": variable.get("schema"),
                     "sample": variable.get("sample"),
@@ -923,7 +1135,7 @@ class FinanceDataQueryCcTools:
                     summary["recovery"] = recovery
                 if provider_retries_used:
                     summary["provider_retry_count"] = provider_retries_used
-                step_summaries.append(summary)
+                step_summaries.append(_model_step_summary(summary))
                 tool_runtime.tracker["result_refs"].append(dict(summary))
                 call_record["result_name"] = variable.get("local_alias")
                 call_record["row_count"] = variable.get("row_count")
@@ -943,27 +1155,43 @@ class FinanceDataQueryCcTools:
 
             response: Dict[str, Any] = {
                 "ok": True,
-                "steps": step_summaries,
                 "next_result_name": tool_runtime.next_result_name,
-                "working_set": tool_runtime.working_set(),
             }
+            if bool(tool_runtime.tool_context.get("_finance_data_only")):
+                # The explicit completion handshake prevents an optimized
+                # harness from stopping after an intermediate adaptive query.
+                # Full rows remain server-owned and are projected only after
+                # the agent turn.
+                response["data_only_mode"] = True
+                response["data_only_complete"] = bool(
+                    args.get("data_request_complete")
+                )
             if len(step_summaries) == 1:
                 response.update(step_summaries[0])
+            else:
+                response["steps"] = step_summaries
             return _tool_result(response)
 
         @tool(
             "load_finance_result",
             (
-                "Load one page from a prior query or configured-tool result_ref in the current conversation. Use only when "
+                "Load one small page from a prior query or configured-tool result_ref in the current conversation. Use only when "
                 "the compact schema and sample are insufficient for the answer or a later query. Never call this when "
-                "the producing step says sample_complete=true; that sample already contains every result row."
+                "the producing step says sample_complete=true; that sample already contains every result row. Request only "
+                "the columns needed for the current sentence or dependent query; omitted metadata remains available through "
+                "the original result summary."
             ),
             {
                 "type": "object",
                 "properties": {
                     "result_ref": {"type": "string", "minLength": 1, "maxLength": 200},
                     "offset": {"type": "integer", "minimum": 0},
-                    "limit": {"type": "integer", "minimum": 1, "maximum": 100},
+                    "limit": {"type": "integer", "minimum": 1, "maximum": 50},
+                    "columns": {
+                        "type": "array",
+                        "maxItems": 20,
+                        "items": {"type": "string", "minLength": 1, "maxLength": 100},
+                    },
                 },
                 "required": ["result_ref"],
                 "additionalProperties": False,
@@ -979,9 +1207,42 @@ class FinanceDataQueryCcTools:
                     session_id=tool_runtime.result_scope,
                     data_ref=result_ref,
                     offset=int(args.get("offset") or 0),
-                    limit=int(args.get("limit") or 50),
+                    limit=int(args.get("limit") or 10),
                 )
-                return _tool_result({"result_ref": result_ref, **payload})
+                raw_columns = (
+                    args.get("columns")
+                    if isinstance(args.get("columns"), list)
+                    else []
+                )
+                columns = [
+                    _trim(item)
+                    for item in raw_columns
+                    if _trim(item)
+                ]
+                result_payload: Dict[str, Any] = {"result_ref": result_ref}
+                page = payload.get("page")
+                if isinstance(page, Mapping):
+                    result_payload["page"] = dict(page)
+                rows = payload.get("rows")
+                if isinstance(rows, list):
+                    result_payload["rows"] = [
+                        {
+                            key: row.get(key)
+                            for key in columns
+                            if key in row
+                        }
+                        if columns and isinstance(row, Mapping)
+                        else dict(row)
+                        for row in rows
+                        if isinstance(row, Mapping)
+                    ]
+                    if columns:
+                        result_payload["columns"] = columns
+                elif "text" in payload:
+                    result_payload["text"] = payload.get("text")
+                elif payload.get("data") is not None:
+                    result_payload["data"] = payload.get("data")
+                return _tool_result(result_payload)
             except Exception as exc:
                 return _tool_result({"result_ref": result_ref, "error": str(exc)})
 
@@ -1430,7 +1691,6 @@ class FinanceDataQueryCcTools:
             {
                 "name": row.get("name"),
                 "desc": row.get("desc"),
-                "rules": row.get("rules") or [],
                 "dataviews": [
                     {
                         "name": item.get("name"),
@@ -1452,12 +1712,24 @@ class FinanceDataQueryCcTools:
             subject = _trim(row.get("name"))
             if not subject:
                 continue
-            dataviews = [
-                _trim(item.get("name"))
-                for item in row.get("dataviews") or []
-                if isinstance(item, Mapping) and _trim(item.get("name"))
-            ]
-            lines.append(f"- {subject}: {', '.join(dataviews)}")
+            subject_description = _trim(row.get("desc"))
+            dataviews: list[str] = []
+            for item in row.get("dataviews") or []:
+                if not isinstance(item, Mapping):
+                    continue
+                name = _trim(item.get("name"))
+                if not name:
+                    continue
+                description = _trim(item.get("desc"))
+                dataviews.append(
+                    f"{name}（{description}）" if description else name
+                )
+            subject_route = (
+                f"{subject}（{subject_description}）"
+                if subject_description
+                else subject
+            )
+            lines.append(f"- {subject_route}: {', '.join(dataviews)}")
         return "\n".join(lines)
 
     def _subject_summary(self, subject: str) -> dict[str, Any]:
@@ -1465,12 +1737,10 @@ class FinanceDataQueryCcTools:
         return {
             "name": row.get("name"),
             "desc": row.get("desc"),
-            "rules": row.get("rules") or [],
-            "dataviews": [
-                {
-                    "name": item.get("name"),
-                    "desc": item.get("desc"),
-                    "rules": item.get("rules") or [],
+                "dataviews": [
+                    {
+                        "name": item.get("name"),
+                        "desc": item.get("desc"),
                 }
                 for item in row.get("dataviews") or []
                 if isinstance(item, Mapping)
