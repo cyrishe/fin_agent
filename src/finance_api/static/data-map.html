@@ -1,0 +1,376 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Fin Agent 数据体系</title>
+  <style>
+    :root {
+      color-scheme: light dark;
+      --bg: light-dark(#f7f8fb, #111318);
+      --surface: light-dark(#ffffff, #1a1d24);
+      --text: light-dark(#172033, #edf1f7);
+      --muted: light-dark(#667085, #aab3c2);
+      --line: light-dark(#d9deea, #3b4250);
+      --primary: light-dark(#3457d5, #7f9cff);
+      --c1: light-dark(#d97706, #f3b54a);
+      --c2: light-dark(#2563eb, #6ea0ff);
+      --c3: light-dark(#16865f, #4fd1a1);
+      --c4: light-dark(#7c3aed, #aa83ff);
+      --c5: light-dark(#c2415d, #ff7891);
+      --c6: light-dark(#0f8795, #52c7d4);
+      --c7: light-dark(#667085, #aab3c2);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", sans-serif;
+    }
+    header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 20px;
+      padding: 22px 28px 12px;
+      flex-wrap: wrap;
+    }
+    h1 { margin: 0 0 5px; font-size: 22px; font-weight: 650; }
+    p { margin: 0; color: var(--muted); font-size: 14px; }
+    nav { display: flex; gap: 14px; flex-wrap: wrap; }
+    nav a { color: var(--primary); text-decoration: none; font-size: 14px; }
+    main { padding: 0 20px 22px; }
+    .toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 10px 8px;
+      flex-wrap: wrap;
+    }
+    .legend, .controls { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .legend span { color: var(--muted); font-size: 13px; }
+    .dot { width: 9px; height: 9px; border-radius: 50%; display: inline-block; }
+    button {
+      appearance: none;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: var(--surface);
+      color: var(--text);
+      padding: 7px 10px;
+      font: inherit;
+      font-size: 13px;
+      cursor: pointer;
+    }
+    button:hover { border-color: var(--primary); }
+    button:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+    #map {
+      height: min(76vh, 760px);
+      min-height: 520px;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      overflow: hidden;
+      position: relative;
+    }
+    #map svg { width: 100%; height: 100%; display: block; touch-action: none; }
+    .link { fill: none; stroke: var(--line); stroke-width: 1.25px; }
+    .node { cursor: pointer; }
+    .node circle { stroke: var(--surface); stroke-width: 2px; }
+    .node text {
+      fill: var(--text);
+      font-size: 12px;
+      paint-order: stroke;
+      stroke: var(--surface);
+      stroke-width: 3px;
+      stroke-linejoin: round;
+    }
+    .node.depth-0 text, .node.depth-1 text { font-weight: 650; }
+    .node.depth-4 text { fill: var(--muted); }
+    #status {
+      min-height: 25px;
+      padding: 9px 8px 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+    #error { color: light-dark(#b42318, #ff8b83); }
+    @media (max-width: 600px) {
+      header { padding: 18px 16px 8px; }
+      main { padding: 0 8px 14px; }
+      #map { min-height: 500px; height: 72vh; }
+      button { min-height: 42px; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div>
+      <h1>Fin Agent 数据体系</h1>
+      <p id="catalog-meta">正在读取当前数据目录……</p>
+    </div>
+    <nav aria-label="API文档">
+      <a href="docs">交互式 API 文档</a>
+      <a href="openapi.json">OpenAPI JSON</a>
+      <a href="data-map/catalog.json">Catalog JSON</a>
+    </nav>
+  </header>
+  <main>
+    <div class="toolbar">
+      <div class="legend" aria-label="层级说明">
+        <span><i class="dot" style="background:var(--primary)"></i> 中心</span>
+        <span><i class="dot" style="background:var(--c2)"></i> 数据主体</span>
+        <span>主体 → 业务域 → dataview → 数据范围</span>
+      </div>
+      <div class="controls" aria-label="图形控制">
+        <button type="button" data-action="collapse">收起到主体</button>
+        <button type="button" data-action="expand">展开全部</button>
+        <button type="button" data-action="zoom-out" aria-label="缩小">−</button>
+        <button type="button" data-action="zoom-in" aria-label="放大">＋</button>
+        <button type="button" data-action="center">居中</button>
+      </div>
+    </div>
+    <div id="map" aria-label="可展开和缩放的金融数据体系图"></div>
+    <div id="status" aria-live="polite">点击任意主体开始查看。</div>
+    <div id="error" role="alert"></div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+  <script>
+    (() => {
+      const groups = {
+        stock: [
+          ['基础资料', ['basic_info']],
+          ['市场交易', ['quote', 'moneyflow', 'pricevalue', 'margin']],
+          ['财务经营', ['financial_3_table', 'performance_notice', 'business_segment']],
+          ['股权与公司行动', ['shareholder', 'pledge', 'corporate_action']],
+          ['机构研究', ['report', 'report_metric']],
+        ],
+        index: [
+          ['基础资料', ['basic_info']],
+          ['市场数据', ['quote', 'pricevalue']],
+          ['成分关系', ['constitution']],
+        ],
+        industry: [
+          ['行业分类', ['basic_info']],
+          ['成分关系', ['constitution']],
+        ],
+        plate: [
+          ['基础资料', ['basic_info']],
+          ['市场交易', ['quote', 'moneyflow', 'pricevalue']],
+          ['成分关系', ['constitution']],
+        ],
+        hot_event: [
+          ['事件资料', ['base_info']],
+          ['热度状态', ['state']],
+          ['关联股票', ['member']],
+        ],
+        fund: [
+          ['基础资料', ['basic_info']],
+          ['市场行情', ['quote']],
+        ],
+        bond: [
+          ['基础资料', ['basic_info']],
+          ['市场行情', ['quote']],
+        ],
+      };
+      const subjectLabels = {
+        stock: '股票 stock', index: '指数 index', industry: '行业 industry',
+        plate: '板块 plate', hot_event: '热点 hot_event', fund: '基金 fund', bond: '债券 bond',
+      };
+      const colors = ['var(--c1)', 'var(--c2)', 'var(--c3)', 'var(--c4)', 'var(--c5)', 'var(--c6)', 'var(--c7)'];
+      const mapElement = document.getElementById('map');
+      const statusElement = document.getElementById('status');
+      const errorElement = document.getElementById('error');
+      const metaElement = document.getElementById('catalog-meta');
+      let hierarchy;
+      let svg;
+      let viewport;
+      let linksLayer;
+      let nodesLayer;
+      let zoom;
+      let width = 900;
+      let height = 650;
+      let radius = 230;
+
+      function compactDescription(text) {
+        const first = String(text || '').split('。')[0];
+        return first.replace(/^.+?用于查询/, '').replace(/^.+?覆盖/, '').slice(0, 38) || '数据字段以 Catalog 为准';
+      }
+
+      function buildTree(catalog) {
+        return {
+          name: '金融数据',
+          children: catalog.subjects.map(subject => {
+            const views = new Map(subject.dataviews.map(view => [view.name, view]));
+            const configured = groups[subject.name] || [['业务数据', subject.dataviews.map(view => view.name)]];
+            const used = new Set(configured.flatMap(item => item[1]));
+            const missing = subject.dataviews.map(view => view.name).filter(name => !used.has(name));
+            const effective = missing.length ? [...configured, ['其他', missing]] : configured;
+            return {
+              name: subjectLabels[subject.name] || subject.name,
+              subject: subject.name,
+              children: effective.map(([groupName, names]) => ({
+                name: groupName,
+                children: names.filter(name => views.has(name)).map(name => {
+                  const view = views.get(name);
+                  const operations = view.operations.length ? ` · ${view.operations.join('/')}` : '';
+                  return {
+                    name: `${name}${operations}`,
+                    children: [{ name: compactDescription(view.description) }],
+                  };
+                }),
+              })).filter(group => group.children.length),
+            };
+          }),
+        };
+      }
+
+      function collapse(node) {
+        if (!node.children) return;
+        node._children = node.children;
+        node._children.forEach(collapse);
+        node.children = null;
+      }
+
+      function expand(node) {
+        if (node._children) {
+          node.children = node._children;
+          node._children = null;
+        }
+        (node.children || []).forEach(expand);
+      }
+
+      function collapseToSubjects() {
+        hierarchy.children.forEach(subject => {
+          expand(subject);
+          collapse(subject);
+        });
+      }
+
+      function subjectIndex(node) {
+        let current = node;
+        while (current.depth > 1) current = current.parent;
+        return current.depth === 1 ? current.parent.children.indexOf(current) : 0;
+      }
+
+      function radialPoint(angle, distance) {
+        return [distance * Math.cos(angle - Math.PI / 2), distance * Math.sin(angle - Math.PI / 2)];
+      }
+
+      function nodePath(node) {
+        return node.ancestors().reverse().map(item => item.data.name).join(' › ');
+      }
+
+      function center(animated = true) {
+        const transform = d3.zoomIdentity.translate(width / 2, height / 2).scale(0.9);
+        (animated ? svg.transition().duration(300) : svg).call(zoom.transform, transform);
+      }
+
+      function update(source = hierarchy) {
+        const visible = hierarchy.descendants();
+        const maxDepth = Math.max(1, d3.max(visible, node => node.depth));
+        d3.tree().size([Math.PI * 2, radius]).separation(
+          (a, b) => (a.parent === b.parent ? 1 : 1.2) / Math.max(1, a.depth),
+        )(hierarchy);
+        visible.forEach(node => { node.y = node.depth * radius / maxDepth; });
+
+        linksLayer.selectAll('path.link')
+          .data(hierarchy.links(), link => nodePath(link.target))
+          .join(
+            enter => enter.append('path').attr('class', 'link')
+              .attr('d', d3.linkRadial().angle(() => source.x0 || 0).radius(() => source.y0 || 0)),
+            current => current,
+            exit => exit.remove(),
+          )
+          .transition().duration(260)
+          .attr('d', d3.linkRadial().angle(node => node.x).radius(node => node.y));
+
+        const nodes = nodesLayer.selectAll('g.node').data(visible, nodePath);
+        const entered = nodes.enter().append('g')
+          .attr('class', node => `node depth-${node.depth}`)
+          .on('click', (event, node) => {
+            event.stopPropagation();
+            if (node.children) {
+              node._children = node.children;
+              node.children = null;
+            } else if (node._children) {
+              node.children = node._children;
+              node._children = null;
+            }
+            statusElement.textContent = nodePath(node);
+            update(node);
+          });
+        entered.append('circle');
+        entered.append('text').attr('dy', '0.32em');
+
+        const merged = entered.merge(nodes).attr('class', node => `node depth-${node.depth}`);
+        merged.select('circle')
+          .attr('r', node => [11, 8, 6, 5, 3.5][node.depth] || 3.5)
+          .style('fill', node => node.depth === 0 ? 'var(--primary)' : colors[subjectIndex(node) % colors.length])
+          .style('fill-opacity', node => node._children ? 1 : node.children ? 0.76 : 0.42);
+        merged.select('text')
+          .text(node => node.data.name)
+          .attr('text-anchor', node => node.depth === 0 ? 'middle' : node.x < Math.PI ? 'start' : 'end')
+          .attr('x', node => node.depth === 0 ? 0 : node.x < Math.PI ? 10 : -10)
+          .attr('y', node => node.depth === 0 ? -18 : 0)
+          .attr('transform', node => node.depth > 0 && node.x >= Math.PI ? 'rotate(180)' : null);
+        merged.transition().duration(260).attr('transform', node => {
+          const [x, y] = radialPoint(node.x, node.y);
+          return node.depth === 0
+            ? `translate(${x},${y})`
+            : `translate(${x},${y}) rotate(${node.x * 180 / Math.PI - 90})`;
+        });
+        nodes.exit().remove();
+        hierarchy.each(node => { node.x0 = node.x; node.y0 = node.y; });
+      }
+
+      function resize() {
+        const bounds = mapElement.getBoundingClientRect();
+        width = Math.max(320, bounds.width);
+        height = Math.max(500, bounds.height);
+        radius = Math.max(150, Math.min(width, height) / 2 - (width < 580 ? 65 : 90));
+        svg.attr('viewBox', `0 0 ${width} ${height}`);
+        update(hierarchy);
+        center(false);
+      }
+
+      async function initialize() {
+        try {
+          const response = await fetch('data-map/catalog.json');
+          if (!response.ok) throw new Error(`HTTP ${response.status}`);
+          const catalog = await response.json();
+          metaElement.textContent = `${catalog.subject_count} 类数据主体 · ${catalog.dataview_count} 个业务视图 · Catalog ${catalog.version}`;
+          hierarchy = d3.hierarchy(buildTree(catalog));
+          collapseToSubjects();
+          svg = d3.select(mapElement).append('svg');
+          viewport = svg.append('g');
+          linksLayer = viewport.append('g');
+          nodesLayer = viewport.append('g');
+          zoom = d3.zoom().scaleExtent([0.42, 3.5]).on('zoom', event => viewport.attr('transform', event.transform));
+          svg.call(zoom);
+
+          document.querySelector('[data-action="collapse"]').addEventListener('click', () => {
+            collapseToSubjects(); update(hierarchy); center();
+            statusElement.textContent = '已收起：显示全部数据主体。';
+          });
+          document.querySelector('[data-action="expand"]').addEventListener('click', () => {
+            expand(hierarchy); update(hierarchy); center();
+            statusElement.textContent = '已展开：显示全部业务域、dataview 与数据范围。';
+          });
+          document.querySelector('[data-action="zoom-in"]').addEventListener('click', () => svg.transition().duration(180).call(zoom.scaleBy, 1.25));
+          document.querySelector('[data-action="zoom-out"]').addEventListener('click', () => svg.transition().duration(180).call(zoom.scaleBy, 0.8));
+          document.querySelector('[data-action="center"]').addEventListener('click', () => center());
+          new ResizeObserver(resize).observe(mapElement);
+          resize();
+        } catch (error) {
+          metaElement.textContent = '数据目录暂时不可用';
+          errorElement.textContent = `无法读取 Catalog：${error.message}`;
+        }
+      }
+
+      initialize();
+    })();
+  </script>
+</body>
+</html>

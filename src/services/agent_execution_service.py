@@ -39,10 +39,9 @@ class AgentExecutionService:
             **self.application_runtime_service.build_route_context(normalized_application),
             **incoming_context,
         }
-        assistant_agent = app_ctx.get("assistant_agent") if isinstance(app_ctx.get("assistant_agent"), dict) else {}
-        execution_agent = app_ctx.get("execution_agent") if isinstance(app_ctx.get("execution_agent"), dict) else {}
+        default_agent = app_ctx.get("default_agent") if isinstance(app_ctx.get("default_agent"), dict) else {}
         selected_agent_name = self._trim(incoming_context.get("agent_name") or incoming_context.get("selected_agent"))
-        agent_name = selected_agent_name or self._trim(execution_agent.get("agent_name"))
+        agent_name = selected_agent_name or self._trim(default_agent.get("agent_name"))
         selected_agent = self._resolve_selected_agent(app_ctx, agent_name)
         if selected_agent:
             route_context["agent_name"] = self._trim(selected_agent.get("agent_name"))
@@ -51,8 +50,7 @@ class AgentExecutionService:
         return {
             "application_name": normalized_application,
             "application_context": app_ctx,
-            "assistant_agent": assistant_agent,
-            "execution_agent": execution_agent,
+            "default_agent": default_agent,
             "route_context": route_context,
             "agent_name": agent_name,
             "agent_runtime_profile": (
@@ -71,12 +69,9 @@ class AgentExecutionService:
                 continue
             if self._trim(item.get("agent_name")) == normalized:
                 return item
-        execution_agent = app_ctx.get("execution_agent") if isinstance(app_ctx.get("execution_agent"), dict) else {}
-        if self._trim(execution_agent.get("agent_name")) == normalized:
-            return execution_agent
-        assistant_agent = app_ctx.get("assistant_agent") if isinstance(app_ctx.get("assistant_agent"), dict) else {}
-        if self._trim(assistant_agent.get("agent_name")) == normalized:
-            return assistant_agent
+        default_agent = app_ctx.get("default_agent") if isinstance(app_ctx.get("default_agent"), dict) else {}
+        if self._trim(default_agent.get("agent_name")) == normalized:
+            return default_agent
         return {}
 
     def preview_route(

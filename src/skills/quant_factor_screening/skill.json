@@ -1,8 +1,8 @@
 {
   "skill_name": "quant_factor_screening",
   "availability": {
-    "lifecycle": "active",
-    "retrieval_mode": "retrievable"
+    "lifecycle": "retired",
+    "retrieval_mode": "direct_only"
   },
   "purpose": "自然语言量化与消息面选股，生成 factor plan，调用 provider 准备数据，并通过 code runtime 输出可审计候选筛选结果。",
   "best_for": [

@@ -4,42 +4,25 @@
   "version": "v1",
   "status": "active",
   "enabled": true,
-  "owner": "agents",
   "domain": "market",
   "role": "investment_analyst",
-  "capabilities": [
-    "analysis",
-    "skill_orchestration",
-    "tool_orchestration"
-  ],
-  "tags": [
-    "agent",
-    "investment",
-    "analysis"
-  ],
-  "keywords": [
-    "投资分析",
-    "市场分析",
-    "投研"
-  ],
   "responsibilities": [
-    "面向投研问题组织分析流程",
-    "在受控范围内选择合适的 skill 和 tool",
-    "输出结构化、可审计的结论"
+    "解决金融市场和证券投资相关问题，覆盖股票与上市公司、基金与ETF、债券与可转债、指数、行业、板块与主题、市场热点事件与热点概念",
+    "查询和分析行情、资金流、估值、财务、研报与事件数据，并完成金融标的筛选、排名、统计、对比和聚合",
+    "负责金融证券相关 Tool 与 Skill 的设计、创建、优化、修改、测试和明确调用"
   ],
-  "context_policy": {
-    "prefer_thread_summary": true,
-    "include_recent_turns": 6,
-    "include_skill_metadata_only": true
-  },
-  "skill_policy": {
-    "mode": "strict"
-  },
-  "tool_policy": {
-    "mode": "strict"
-  },
   "skills": [
-    "stock_deep_dive"
+    "market-overview",
+    "sector-theme-analysis",
+    "stock-research",
+    "earnings-analysis",
+    "stock-screening",
+    "factor-analysis",
+    "valuation-analysis",
+    "financial-quality-analysis",
+    "stock-comparison",
+    "technical-structure-analysis",
+    "dividend-analysis"
   ],
   "tools": [
     "个股动量排名",
@@ -53,7 +36,7 @@
     "stock_history_funds_flow",
     "stock_industry_funds_flow",
     "financial_news_search",
+    "general_search",
     "equity_research_search"
-  ],
-  "handoff_agents": []
+  ]
 }

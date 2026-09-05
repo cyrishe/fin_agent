@@ -1,0 +1,321 @@
+{
+  "sites": [
+    {
+      "name": "jiuyangongshe_search",
+      "enabled": true,
+      "search_url_template": "https://www.jiuyangongshe.com/search/new?k={keyword}&type=1",
+      "keyword_mode": "raw",
+      "allowed_domains": [
+        "www.jiuyangongshe.com",
+        "jiuyangongshe.com"
+      ],
+      "result_css_selectors": [
+        ".community-bar a[href^='/a/']",
+        ".search-box_container a[href^='/a/']",
+        "a[href^='/a/']"
+      ],
+      "result_link_patterns": [
+        "https?://www\\.jiuyangongshe\\.com/a/[a-zA-Z0-9]+"
+      ],
+      "result_item_selector": ".community-bar li",
+      "result_item_link_selector": "div.html-text a[href^='/a/']",
+      "result_item_time_selector": "div.fs13-ash",
+      "search_result_keep_days": 3,
+      "article_content_selectors": [
+        ".detail-container .text-box.fsDetail",
+        ".detail-container .text-box.text-justify",
+        ".detail-container .text-box",
+        ".detail-container section"
+      ],
+      "article_remove_selectors": [
+        "script",
+        "style",
+        "iframe",
+        ".comment-content",
+        ".jc-header",
+        ".handle-box"
+      ],
+      "follow_css_selectors": [
+        "a[href^='/a/']",
+        ".community-bar a[href]"
+      ],
+      "follow_link_patterns": [
+        "https?://www\\.jiuyangongshe\\.com/a/[a-zA-Z0-9]+"
+      ],
+      "max_results_per_site": 60,
+      "max_follow_links_per_page": 8,
+      "search_wait_seconds": 2.5,
+      "article_wait_seconds": 2.0,
+      "search_scroll_times": 6,
+      "search_scroll_pause": 1.0,
+      "use_nuxt_article_id_fallback": true
+    },
+    {
+      "name": "10jqka_stockpage_news",
+      "enabled": true,
+      "search_url_template": "https://stockpage.10jqka.com.cn/{raw_keyword}/",
+      "keyword_mode": "stock_code_6",
+      "allowed_domains": [
+        "stockpage.10jqka.com.cn",
+        "stock.10jqka.com.cn",
+        "field.10jqka.com.cn",
+        "fund.10jqka.com.cn"
+      ],
+      "result_css_selectors": [
+        "#xwgg ul.news_list a[href]",
+        "#xwgg .news_title a[href]"
+      ],
+      "result_link_patterns": [
+        "https?://(?:stock|field|fund)\\.10jqka\\.com\\.cn/\\d{8}/c\\d+\\.shtml"
+      ],
+      "article_content_selectors": [
+        ".main-text",
+        "#main-content",
+        ".article-content",
+        ".content",
+        "article"
+      ],
+      "article_remove_selectors": [
+        "script",
+        "style",
+        ".advert",
+        ".ad",
+        "iframe"
+      ],
+      "follow_css_selectors": [
+        "a[href]"
+      ],
+      "follow_link_patterns": [
+        "https?://(?:stock|field|fund)\\.10jqka\\.com\\.cn/\\d{8}/c\\d+\\.shtml"
+      ],
+      "max_results_per_site": 20,
+      "max_follow_links_per_page": 8,
+      "search_wait_seconds": 2.5,
+      "article_wait_seconds": 2.0
+    },
+    {
+      "name": "10jqka_stockpage_report",
+      "enabled": true,
+      "search_url_template": "https://search.10jqka.com.cn/unifiedwap/search/result?w={raw_keyword}&querytype=report",
+      "keyword_mode": "stock_code_6",
+      "allowed_domains": [
+        "search.10jqka.com.cn",
+        "www.iwencai.com",
+        "iwencai.com"
+      ],
+      "result_css_selectors": [
+        "a[href*='/unifiedwap/infodetail'][href*='querytype=report']",
+        "a[href*='querytype=report'][href*='uid=']"
+      ],
+      "result_link_patterns": [
+        "https?://(?:search\\.10jqka\\.com\\.cn|(?:www\\.)?iwencai\\.com)/unifiedwap/infodetail\\?[^#]*querytype=report"
+      ],
+      "article_content_selectors": [
+        ".report-content-wrapper",
+        ".report-content",
+        ".report-detail-content",
+        ".detail-content",
+        ".article-content",
+        ".content",
+        "article",
+        "main"
+      ],
+      "article_remove_selectors": [
+        "script",
+        "style",
+        ".advert",
+        ".ad",
+        "iframe"
+      ],
+      "follow_css_selectors": [
+        "a[href]"
+      ],
+      "follow_link_patterns": [
+        "https?://(?:search\\.10jqka\\.com\\.cn|(?:www\\.)?iwencai\\.com)/unifiedwap/infodetail\\?[^#]*querytype=report"
+      ],
+      "max_results_per_site": 20,
+      "max_follow_links_per_page": 2,
+      "search_wait_seconds": 3.0,
+      "article_wait_seconds": 3.0,
+      "search_scroll_times": 3,
+      "search_scroll_pause": 1.0
+    },
+    {
+      "name": "eastmoney",
+      "enabled": true,
+      "search_url_template": "https://so.eastmoney.com/web/s?keyword={keyword}",
+      "keyword_mode": "raw",
+      "allowed_domains": [
+        "eastmoney.com",
+        "finance.eastmoney.com",
+        "stock.eastmoney.com"
+      ],
+      "result_css_selectors": [
+        "a[href]"
+      ],
+      "result_link_patterns": [
+        "https?://finance\\.eastmoney\\.com/a/\\d+\\.html",
+        "https?://stock\\.eastmoney\\.com/a/\\d+\\.html"
+      ],
+      "article_content_selectors": [
+        "#ContentBody",
+        ".Body",
+        ".news-content",
+        ".content"
+      ],
+      "article_remove_selectors": [
+        "script",
+        "style",
+        ".advert",
+        ".ad",
+        "iframe"
+      ],
+      "follow_css_selectors": [
+        "a[href]"
+      ],
+      "follow_link_patterns": [
+        "https?://finance\\.eastmoney\\.com/a/\\d+\\.html",
+        "https?://stock\\.eastmoney\\.com/a/\\d+\\.html"
+      ],
+      "max_results_per_site": 10,
+      "max_follow_links_per_page": 5,
+      "search_wait_seconds": 2.5,
+      "article_wait_seconds": 2.0
+    },
+    {
+      "name": "stcn",
+      "enabled": true,
+      "search_url_template": "https://stcn.com/article/search.html?search_type=news&keyword={keyword}&uncertainty=1&sorter=time",
+      "keyword_mode": "raw",
+      "allowed_domains": [
+        "stcn.com",
+        "www.stcn.com"
+      ],
+      "result_css_selectors": [
+        ".list-page-tab-content.active ul.list a[href^='/article/detail/']",
+        "ul.list a[href^='/article/detail/']"
+      ],
+      "result_link_patterns": [
+        "https?://(?:www\\.)?stcn\\.com/article/detail/\\d+\\.html"
+      ],
+      "result_item_selector": ".list-page-tab-content.active ul.list > li",
+      "result_item_link_selector": ".tt a[href^='/article/detail/']",
+      "result_item_time_selector": ".info span:last-child",
+      "search_result_keep_days": 3,
+      "article_content_selectors": [
+        ".article-content",
+        ".detail-content",
+        ".content",
+        "article",
+        "main"
+      ],
+      "article_remove_selectors": [
+        "script",
+        "style",
+        ".advert",
+        ".ad",
+        "iframe"
+      ],
+      "follow_css_selectors": [
+        "a[href^='/article/detail/']"
+      ],
+      "follow_link_patterns": [
+        "https?://(?:www\\.)?stcn\\.com/article/detail/\\d+\\.html"
+      ],
+      "max_results_per_site": 30,
+      "max_follow_links_per_page": 8,
+      "search_wait_seconds": 2.5,
+      "article_wait_seconds": 2.0,
+      "search_scroll_times": 2,
+      "search_scroll_pause": 0.8
+    },
+    {
+      "name": "cnstock",
+      "enabled": true,
+      "search_url_template": "https://news.cnstock.com/news,bwkx-{keyword}.htm",
+      "keyword_mode": "raw",
+      "allowed_domains": [
+        "cnstock.com",
+        "news.cnstock.com"
+      ],
+      "result_css_selectors": [
+        "a[href]"
+      ],
+      "result_link_patterns": [
+        "https?://news\\.cnstock\\.com/news,bwkx-\\d+\\.htm",
+        "https?://news\\.cnstock\\.com/news,yw-\\d+\\.htm"
+      ],
+      "article_content_selectors": [
+        ".content",
+        ".newsContent",
+        ".detail-content"
+      ],
+      "article_remove_selectors": [
+        "script",
+        "style",
+        ".advert",
+        ".ad",
+        "iframe"
+      ],
+      "follow_css_selectors": [
+        "a[href]"
+      ],
+      "follow_link_patterns": [
+        "https?://news\\.cnstock\\.com/news,bwkx-\\d+\\.htm",
+        "https?://news\\.cnstock\\.com/news,yw-\\d+\\.htm"
+      ],
+      "max_results_per_site": 10,
+      "max_follow_links_per_page": 5,
+      "search_wait_seconds": 2.5,
+      "article_wait_seconds": 2.0
+    },
+    {
+      "name": "cnstock_search",
+      "enabled": true,
+      "search_url_template": "https://www.cnstock.com/searchResult?word={keyword}",
+      "keyword_mode": "raw",
+      "allowed_domains": [
+        "www.cnstock.com",
+        "cnstock.com"
+      ],
+      "result_css_selectors": [
+        "a.index_itemWrapper__viZfn[href^='/commonDetail/']",
+        "a[href^='/commonDetail/']"
+      ],
+      "result_link_patterns": [
+        "https?://www\\.cnstock\\.com/commonDetail/\\d+"
+      ],
+      "result_item_selector": "",
+      "result_item_link_selector": "",
+      "result_item_time_selector": "",
+      "search_result_keep_days": 0,
+      "article_content_selectors": [
+        ".detail-content",
+        ".article-content",
+        ".news-content",
+        ".content",
+        "article",
+        "main"
+      ],
+      "article_remove_selectors": [
+        "script",
+        "style",
+        "iframe",
+        ".advert",
+        ".ad"
+      ],
+      "follow_css_selectors": [
+        "a[href^='/commonDetail/']"
+      ],
+      "follow_link_patterns": [
+        "https?://www\\.cnstock\\.com/commonDetail/\\d+"
+      ],
+      "max_results_per_site": 30,
+      "max_follow_links_per_page": 8,
+      "search_wait_seconds": 2.5,
+      "article_wait_seconds": 2.0,
+      "search_scroll_times": 4,
+      "search_scroll_pause": 0.8
+    }
+  ]
+}

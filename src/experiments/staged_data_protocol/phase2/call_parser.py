@@ -7,7 +7,7 @@ from src.experiments.staged_data_protocol.phase2.models import ApiCall
 
 
 CALL_RE = re.compile(
-    r"^\s*(r\d+)\s*=\s*([A-Za-z_][\w]*(?:\.[A-Za-z_][\w]*){1,3})\s*\((.*)\)\s*->\s*(.+?)\s*$",
+    r"^\s*([A-Za-z_]\w*)\s*=\s*([A-Za-z_][\w]*(?:\.[A-Za-z_][\w]*){1,3})\s*\((.*)\)\s*->\s*(.+?)\s*$",
     flags=re.DOTALL,
 )
 

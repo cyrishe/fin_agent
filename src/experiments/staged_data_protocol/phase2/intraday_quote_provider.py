@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 import re
 from datetime import date, datetime
 from decimal import Decimal
@@ -13,6 +14,13 @@ from src.utils.mysql_utils import StockInfoDbUtils
 
 
 SNAPSHOT_TABLE = "aiia_stock_realtime_minute_snapshot"
+# Kept as a shared session bound for same-minute comparison paths.
+MINUTE_SESSION_START = "09:30:00"
+MINUTE_SESSION_END = "15:00:00"
+SUPPORTED_MINUTE_PERIODS = {1, 3, 5, 10, 15, 30, 60}
+DEFAULT_LATEST_QUOTE_LIMIT = 100
+DEFAULT_LATEST_QUOTE_HARD_LIMIT = 10_000
+DEFAULT_INTRADAY_HARD_ROW_LIMIT = 500_000
 
 FIELD_SQL = {
     "code": "code",
@@ -23,6 +31,12 @@ FIELD_SQL = {
     "minute_time": "minute_time",
     "snapshot_time": "snapshot_time",
     "snapshot_slot": "snapshot_slot",
+    "bar_start_time": "bar_start_time",
+    "bar_end_time": "bar_end_time",
+    "kline_type": "kline_type",
+    "period_minutes": "period_minutes",
+    "source_bar_count": "source_bar_count",
+    "is_finalized": "is_finalized",
     "preclose": "preclose",
     "open": "open",
     "close": "close",
@@ -54,6 +68,8 @@ NUMERIC_FIELDS = {
     "volumn",
     "minute_amount",
     "minute_volumn",
+    "period_minutes",
+    "source_bar_count",
 }
 
 AGG_METHODS = {"sum", "avg", "max", "min", "median", "count"}
@@ -62,79 +78,209 @@ KD_METHODS = {"sum", "avg", "max", "min", "median", "count", "percentile"}
 FILTER_RE = re.compile(
     r"(?:(?P<connector>\band\b|\bor\b)\s+)?"
     r"(?P<field>[A-Za-z_]\w*)\s*"
-    r"(?P<op>in|like|=|==|!=|>=|<=|>|<)\s*"
+    r"(?P<op>in|like|==|=|!=|>=|<=|>|<)\s*"
     r"(?P<value>\[[^\]]+\]|\([^)]+\)|[^,;]+?)"
-    r"(?=\s+(?:and|or)\s+[A-Za-z_]\w*\s*(?:in|like|=|==|!=|>=|<=|>|<)|[,;]|$)",
+    r"(?=\s+(?:and|or)\s+[A-Za-z_]\w*\s*(?:in|like|==|=|!=|>=|<=|>|<)|[,;]|$)",
     flags=re.IGNORECASE,
 )
 
 
-def execute_intraday_quote_api(*, args: Mapping[str, Any], outputs: List[str]) -> Dict[str, Any]:
+def execute_intraday_quote_api(
+    *,
+    args: Mapping[str, Any],
+    outputs: List[str],
+    latest_only: bool = False,
+) -> Dict[str, Any]:
+    return (
+        _execute_latest_daily_quote_per_code(args=args, outputs=outputs)
+        if latest_only
+        else _execute_stored_minute_bars(args=args, outputs=outputs)
+    )
+
+
+def _execute_stored_minute_bars(*, args: Mapping[str, Any], outputs: List[str]) -> Dict[str, Any]:
+    """Read the source system's fixed-period bars directly, without resampling."""
     columns = _requested_fields(outputs)
-    limit = _bounded_limit(args.get("limit"), default=100)
-    filters = _parse_filter(str(args.get("filter") or ""))
-    slot = _resolve_slot(filters=filters, aggregate=False)
-    where_sql, params = _where_sql(filters=filters, slot=slot)
-    order_sql = _order_sql(str(args.get("order") or ""), default="tradedate DESC, minute_index DESC, code ASC")
+    period = _minute_period(args.get("period"))
+    count = _minute_bar_count(args.get("count"), fallback=args.get("limit", 240))
+    if period not in SUPPORTED_MINUTE_PERIODS:
+        return _result(
+            status="provider_error",
+            args=args,
+            columns=columns,
+            rows=[],
+            slot={"mode": 1},
+            reason=f"period must be one of {sorted(SUPPORTED_MINUTE_PERIODS)}",
+        )
+
+    filters = _filters_from_args(args)
+    slot = {
+        "mode": 1,
+        "period": period,
+        "count": count,
+    }
+    source_where_sql, source_params = _snapshot_identity_where(filters)
+    date_sql, date_params = _trade_date_predicate(filters)
+    where_sql, where_params = _where_sql(filters=filters, slot={})
+    order_sql = _order_sql(str(args.get("order") or ""), default="code ASC, tradedate ASC, bar_end_time ASC")
+    hard_row_limit = _intraday_hard_row_limit()
     sql = f"""
-        WITH base AS (
+        {_stored_bar_cte(
+            kline_type=f"{period}m",
+            period_minutes=period,
+            source_where_sql=source_where_sql,
+            date_sql=date_sql,
+        )},
+        recent AS (
             SELECT
-                s.stk_code AS code,
-                s.stk_name AS name,
-                s.trade_date AS tradedate,
-                s.minute_index AS minute_index,
-                TIME_FORMAT(s.snapshot_time, '%%H:%%i:%%s') AS minute_time,
-                s.snapshot_time AS snapshot_time,
-                s.snapshot_slot AS snapshot_slot,
-                s.preclose_price AS preclose,
-                s.open_price AS open,
-                s.latest_price AS close,
-                s.high_price AS high,
-                s.low_price AS low,
-                s.chg_value AS differ,
-                s.chg_ratio AS pct,
-                s.amount AS amount,
-                s.volume AS volumn,
-                GREATEST(s.amount - COALESCE(p.amount, 0), 0) AS minute_amount,
-                GREATEST(s.volume - COALESCE(p.volume, 0), 0) AS minute_volumn,
-                s.source AS source,
-                s.is_fallback AS is_fallback
-            FROM {SNAPSHOT_TABLE} s
-            LEFT JOIN {SNAPSHOT_TABLE} p
-              ON p.trade_date = s.trade_date
-             AND p.stk_code = s.stk_code
-             AND p.minute_index = s.minute_index - 1
-            WHERE s.trade_date = %s
-              AND s.stk_code REGEXP '^[0-9]{{6}}$'
+                base.*,
+                ROW_NUMBER() OVER (
+                    PARTITION BY code
+                    ORDER BY tradedate DESC, bar_end_time DESC, snapshot_time DESC
+                ) AS recent_row
+            FROM base
         )
         SELECT {", ".join(f"`{column}`" for column in columns)}
-        FROM base
-        WHERE {where_sql}
+        FROM recent
+        WHERE recent_row <= %s
+          AND {where_sql}
         ORDER BY {order_sql}
         LIMIT %s
     """
     db = StockInfoDbUtils(database="kingdomai")
     try:
         with db.conn.cursor(pymysql.cursors.DictCursor) as cursor:
-            cursor.execute(sql, tuple([slot["trade_date"], *params, limit]))
-            rows = [_normalize_row(row, columns) for row in cursor.fetchall()]
+            cursor.execute(
+                sql,
+                tuple([*source_params, *date_params, count, *where_params, hard_row_limit + 1]),
+            )
+            bars = [dict(row) for row in cursor.fetchall()]
+    except Exception as exc:  # noqa: BLE001
+        return _result(status="provider_error", args=args, columns=columns, rows=[], slot=slot, reason=str(exc))
+    finally:
+        db.close_db()
+    if len(bars) > hard_row_limit:
         return _result(
-            status="ok",
+            status="result_too_large",
             args=args,
             columns=columns,
-            rows=rows,
+            rows=[],
             slot=slot,
-            sql_shape={"where": where_sql, "order": order_sql, "limit": limit},
+            reason=(
+                "matching minute K rows exceed the safety limit "
+                f"({hard_row_limit}); reduce count or the target list, or raise "
+                "FIN_AGENT_INTRADAY_HARD_ROW_LIMIT for an authorized bulk run"
+            ),
         )
+    if "limit" in args and "count" in args:
+        bars = bars[: _bounded_limit(args.get("limit"), default=len(bars) or 1)]
+    rows = [_normalize_row(row, columns) for row in bars]
+    returned_dates = [row.get("tradedate") for row in bars if row.get("tradedate")]
+    if returned_dates:
+        slot["latest_trade_date"] = str(max(returned_dates))
+    return _result(
+        status="ok",
+        args=args,
+        columns=columns,
+        rows=rows,
+        slot=slot,
+        sql_shape={
+            "mode": 1,
+            "period": period,
+            "count_per_code": count,
+            "source": "stored_fixed_period_kline",
+            "where": where_sql,
+            "order": order_sql,
+            "hard_row_limit": hard_row_limit,
+        },
+    )
+
+
+def _execute_latest_daily_quote_per_code(*, args: Mapping[str, Any], outputs: List[str]) -> Dict[str, Any]:
+    """Return each security's latest daily snapshot, the authoritative current quote."""
+    columns = _requested_fields(outputs)
+    filters = _filters_from_args(args)
+    slot: Dict[str, Any] = {"mode": 2, "kline_type": "1d"}
+    limit_policy = _latest_quote_limit_policy(args=args, filters=filters)
+    if limit_policy["error"]:
+        return _result(status="result_too_large", args=args, columns=columns, rows=[], slot=slot, reason=str(limit_policy["error"]))
+
+    source_where_sql, source_params = _snapshot_identity_where(filters)
+    date_sql, date_params = _trade_date_predicate(filters)
+    where_sql, where_params = _where_sql(filters=filters, slot={})
+    order_sql = _order_sql(str(args.get("order") or ""), default="code ASC")
+    sql = f"""
+        {_stored_bar_cte(
+            kline_type="1d",
+            period_minutes=1440,
+            source_where_sql=source_where_sql,
+            date_sql=date_sql,
+        )},
+        latest_by_code AS (
+            SELECT
+                base.*,
+                ROW_NUMBER() OVER (
+                    PARTITION BY code
+                    ORDER BY tradedate DESC, snapshot_time DESC, bar_end_time DESC
+                ) AS latest_row
+            FROM base
+        )
+        SELECT {", ".join(f"`{column}`" for column in columns)}
+        FROM latest_by_code
+        WHERE latest_row = 1
+          AND {where_sql}
+        ORDER BY {order_sql}
+        LIMIT %s
+    """
+    db = StockInfoDbUtils(database="kingdomai")
+    try:
+        with db.conn.cursor(pymysql.cursors.DictCursor) as cursor:
+            cursor.execute(sql, tuple([*source_params, *date_params, *where_params, int(limit_policy["fetch_limit"])]))
+            raw_rows = list(cursor.fetchall())
     except Exception as exc:  # noqa: BLE001
         return _result(status="provider_error", args=args, columns=columns, rows=[], slot=slot, reason=str(exc))
     finally:
         db.close_db()
 
+    if limit_policy["detect_overflow"] and len(raw_rows) > int(limit_policy["hard_limit"]):
+        return _result(
+            status="result_too_large",
+            args=args,
+            columns=columns,
+            rows=[],
+            slot=slot,
+            reason=f"matching latest quotes exceed the safety limit ({limit_policy['hard_limit']})",
+        )
+    returned_dates = [row.get("tradedate") for row in raw_rows if row.get("tradedate")]
+    if returned_dates:
+        slot["latest_trade_date"] = str(max(returned_dates))
+    return _result(
+        status="ok",
+        args=args,
+        columns=columns,
+        rows=[_normalize_row(row, columns) for row in raw_rows],
+        slot=slot,
+        sql_shape={
+            "mode": 2,
+            "selection": "latest_daily_bar_per_code",
+            "source": "stored_1d_snapshot",
+            "where": where_sql,
+            "order": order_sql,
+            "limit": limit_policy["business_limit"],
+            "hard_row_limit": limit_policy["hard_limit"],
+        },
+    )
 
-def execute_intraday_quote_agg_api(*, args: Mapping[str, Any], outputs: List[str]) -> Dict[str, Any]:
-    filters = _parse_filter(str(args.get("filter") or ""))
-    slot = _resolve_slot(filters=filters, aggregate=True)
+
+def execute_intraday_quote_agg_api(
+    *,
+    args: Mapping[str, Any],
+    outputs: List[str],
+    latest_only: bool = False,
+) -> Dict[str, Any]:
+    filters = _filters_from_args(args)
+    slot = _resolve_slot(filters=filters, latest_only=False)
+    source_where_sql, source_params = _snapshot_identity_where(filters)
     where_sql, params = _where_sql(filters=filters, slot=slot)
     spec = parse_agg_spec(args)
     metric = _metric_column(spec.metric)
@@ -151,37 +297,20 @@ def execute_intraday_quote_agg_api(*, args: Mapping[str, Any], outputs: List[str
     select_parts.append(f"{_agg_sql(agg, metric)} AS `{alias}`")
     order_sql = _order_sql(str(args.get("order") or ""), default=f"`{alias}` DESC")
     limit = _bounded_limit(args.get("limit"), default=100)
-    sql = f"""
-        WITH base AS (
-            SELECT
-                s.stk_code AS code,
-                s.stk_name AS name,
-                s.trade_date AS tradedate,
-                s.minute_index AS minute_index,
-                TIME_FORMAT(s.snapshot_time, '%%H:%%i:%%s') AS minute_time,
-                s.snapshot_time AS snapshot_time,
-                s.snapshot_slot AS snapshot_slot,
-                s.preclose_price AS preclose,
-                s.open_price AS open,
-                s.latest_price AS close,
-                s.high_price AS high,
-                s.low_price AS low,
-                s.chg_value AS differ,
-                s.chg_ratio AS pct,
-                s.amount AS amount,
-                s.volume AS volumn,
-                GREATEST(s.amount - COALESCE(p.amount, 0), 0) AS minute_amount,
-                GREATEST(s.volume - COALESCE(p.volume, 0), 0) AS minute_volumn,
-                s.source AS source,
-                s.is_fallback AS is_fallback
-            FROM {SNAPSHOT_TABLE} s
-            LEFT JOIN {SNAPSHOT_TABLE} p
-              ON p.trade_date = s.trade_date
-             AND p.stk_code = s.stk_code
-             AND p.minute_index = s.minute_index - 1
-            WHERE s.trade_date = %s
-              AND s.stk_code REGEXP '^[0-9]{{6}}$'
+    if latest_only:
+        date_sql, date_params = _trade_date_predicate(filters)
+        base_cte = _stored_bar_cte(
+            kline_type="1d",
+            period_minutes=1440,
+            source_where_sql=source_where_sql,
+            date_sql=date_sql,
         )
+        query_params = [*source_params, *date_params, *params, limit]
+    else:
+        base_cte = _minute_bar_cte(date_predicate="s.trade_date = %s", source_where_sql=source_where_sql)
+        query_params = [slot["trade_date"], *source_params, *params, limit]
+    sql = f"""
+        {base_cte}
         SELECT {", ".join(select_parts)}
         FROM base
         WHERE {where_sql}
@@ -192,7 +321,7 @@ def execute_intraday_quote_agg_api(*, args: Mapping[str, Any], outputs: List[str
     db = StockInfoDbUtils(database="kingdomai")
     try:
         with db.conn.cursor(pymysql.cursors.DictCursor) as cursor:
-            cursor.execute(sql, tuple([slot["trade_date"], *params, limit]))
+            cursor.execute(sql, tuple(query_params))
             rows = [_normalize_row(row, columns) for row in cursor.fetchall()]
         return _result(
             status="ok",
@@ -200,7 +329,14 @@ def execute_intraday_quote_agg_api(*, args: Mapping[str, Any], outputs: List[str
             columns=columns,
             rows=rows,
             slot=slot,
-            sql_shape={"where": where_sql, "group_by": group_fields, "order": order_sql, "limit": limit},
+            sql_shape={
+                "mode": 2 if latest_only else 1,
+                "source": "stored_1d_snapshot" if latest_only else "stored_1m_kline",
+                "where": where_sql,
+                "group_by": group_fields,
+                "order": order_sql,
+                "limit": limit,
+            },
         )
     except Exception as exc:  # noqa: BLE001
         return _result(status="provider_error", args=args, columns=columns, rows=[], slot=slot, reason=str(exc))
@@ -217,8 +353,8 @@ def execute_kd_intraday_quote_api(*, field: str, method: str, args: Mapping[str,
     if method not in KD_METHODS:
         return _result(status="provider_error", args=args, columns=columns, rows=[], slot={}, reason=f"unsupported method={method}")
 
-    filters = _parse_filter(str(args.get("filter") or ""))
-    slot = _resolve_slot(filters=filters, aggregate=True)
+    filters = _filters_from_args(args)
+    slot = _resolve_slot(filters=filters, latest_only=True)
     k = _bounded_k(args.get("k"))
     history_dates = _history_trade_dates(anchor_date=str(slot.get("trade_date") or ""), k=k)
     if not history_dates:
@@ -279,7 +415,7 @@ def execute_kd_intraday_quote_api(*, field: str, method: str, args: Mapping[str,
     return payload
 
 
-def _resolve_slot(*, filters: List[Dict[str, str]], aggregate: bool) -> Dict[str, Any]:
+def _resolve_slot(*, filters: List[Dict[str, str]], latest_only: bool) -> Dict[str, Any]:
     requested_date = ""
     requested_minute = None
     requested_slot = ""
@@ -297,35 +433,64 @@ def _resolve_slot(*, filters: List[Dict[str, str]], aggregate: bool) -> Dict[str
         elif field_name == "snapshot_slot" and op in {"=", "=="}:
             requested_slot = value
 
+    source_where_sql, source_params = _snapshot_identity_where(filters)
+    source_filter = f" AND {source_where_sql}" if source_where_sql else ""
     db = StockInfoDbUtils(database="kingdomai")
     try:
         with db.conn.cursor(pymysql.cursors.DictCursor) as cursor:
             if requested_date:
                 trade_date = requested_date
             else:
-                cursor.execute(f"SELECT MAX(trade_date) AS trade_date FROM {SNAPSHOT_TABLE}")
+                cursor.execute(
+                    f"""
+                    SELECT MAX(s.trade_date) AS trade_date
+                    FROM {SNAPSHOT_TABLE} s
+                    WHERE s.kline_type = '1m'
+                      AND s.period_minutes = 1
+                      {source_filter}
+                    """,
+                    tuple(source_params),
+                )
                 trade_date = str((cursor.fetchone() or {}).get("trade_date") or "")
             if requested_minute is not None:
                 minute_index = requested_minute
             elif requested_slot:
                 cursor.execute(
                     f"""
-                    SELECT MAX(minute_index) AS minute_index
-                    FROM {SNAPSHOT_TABLE}
-                    WHERE trade_date = %s AND snapshot_slot = %s
+                    SELECT MAX(s.minute_index) AS minute_index
+                    FROM {SNAPSHOT_TABLE} s
+                    WHERE s.trade_date = %s
+                      AND s.kline_type = '1m'
+                      AND s.period_minutes = 1
+                      AND s.snapshot_slot = %s
+                      {source_filter}
                     """,
-                    (trade_date, requested_slot),
+                    tuple([trade_date, requested_slot, *source_params]),
+                )
+                minute_index = int((cursor.fetchone() or {}).get("minute_index") or 0)
+            elif latest_only:
+                cursor.execute(
+                    f"""
+                    SELECT MAX(s.minute_index) AS minute_index
+                    FROM {SNAPSHOT_TABLE} s
+                    WHERE s.trade_date = %s
+                      AND s.kline_type = '1m'
+                      AND s.period_minutes = 1
+                      {source_filter}
+                    """,
+                    tuple([trade_date, *source_params]),
                 )
                 minute_index = int((cursor.fetchone() or {}).get("minute_index") or 0)
             else:
-                cursor.execute(
-                    f"SELECT MAX(minute_index) AS minute_index FROM {SNAPSHOT_TABLE} WHERE trade_date = %s",
-                    (trade_date,),
-                )
-                minute_index = int((cursor.fetchone() or {}).get("minute_index") or 0)
+                minute_index = 0
     finally:
         db.close_db()
-    return {"trade_date": trade_date, "minute_index": minute_index, "snapshot_slot": requested_slot}
+    return {
+        "trade_date": trade_date,
+        "minute_index": minute_index,
+        "snapshot_slot": requested_slot,
+        "mode": 2 if latest_only else 1,
+    }
 
 
 def _history_trade_dates(*, anchor_date: str, k: int) -> List[str]:
@@ -339,6 +504,8 @@ def _history_trade_dates(*, anchor_date: str, k: int) -> List[str]:
                 SELECT trade_date
                 FROM {SNAPSHOT_TABLE}
                 WHERE trade_date < %s
+                  AND kline_type = '1m'
+                  AND period_minutes = 1
                 GROUP BY trade_date
                 ORDER BY trade_date DESC
                 LIMIT %s
@@ -355,35 +522,10 @@ def _load_same_minute_rows(*, trade_dates: List[str], minute_index: int) -> List
         return []
     placeholders = ", ".join(["%s"] * len(trade_dates))
     sql = f"""
-        SELECT
-            s.stk_code AS code,
-            s.stk_name AS name,
-            s.trade_date AS tradedate,
-            s.minute_index AS minute_index,
-            TIME_FORMAT(s.snapshot_time, '%%H:%%i:%%s') AS minute_time,
-            s.snapshot_time AS snapshot_time,
-            s.snapshot_slot AS snapshot_slot,
-            s.preclose_price AS preclose,
-            s.open_price AS open,
-            s.latest_price AS close,
-            s.high_price AS high,
-            s.low_price AS low,
-            s.chg_value AS differ,
-            s.chg_ratio AS pct,
-            s.amount AS amount,
-            s.volume AS volumn,
-            GREATEST(s.amount - COALESCE(p.amount, 0), 0) AS minute_amount,
-            GREATEST(s.volume - COALESCE(p.volume, 0), 0) AS minute_volumn,
-            s.source AS source,
-            s.is_fallback AS is_fallback
-        FROM {SNAPSHOT_TABLE} s
-        LEFT JOIN {SNAPSHOT_TABLE} p
-          ON p.trade_date = s.trade_date
-         AND p.stk_code = s.stk_code
-         AND p.minute_index = s.minute_index - 1
-        WHERE s.trade_date IN ({placeholders})
-          AND s.minute_index = %s
-          AND s.stk_code REGEXP '^[0-9]{{6}}$'
+        {_minute_bar_cte(date_predicate=f"s.trade_date IN ({placeholders})")}
+        SELECT *
+        FROM base
+        WHERE minute_index = %s
     """
     db = StockInfoDbUtils(database="kingdomai")
     try:
@@ -392,6 +534,157 @@ def _load_same_minute_rows(*, trade_dates: List[str], minute_index: int) -> List
             return [_normalize_row(row, list(FIELD_SQL)) for row in cursor.fetchall()]
     finally:
         db.close_db()
+
+
+def _minute_bar_cte(*, date_predicate: str, source_where_sql: str = "") -> str:
+    """One-minute source bars for same-minute historical comparisons.
+
+    The snapshot table now stores native fixed-period bars.  This CTE is kept
+    solely for the same-minute KD/dynamic paths, which require the native 1m
+    sequence; it must never derive bars by differencing a daily snapshot.
+    """
+    source_filter = f" AND {source_where_sql}" if source_where_sql else ""
+    return f"""
+        WITH base AS (
+            SELECT
+                s.stk_code AS code,
+                s.stk_name AS name,
+                s.trade_date AS tradedate,
+                s.minute_index AS minute_index,
+                TIME_FORMAT(s.bar_end_time, '%%H:%%i:%%s') AS minute_time,
+                s.snapshot_time AS snapshot_time,
+                s.snapshot_slot AS snapshot_slot,
+                s.preclose_price AS preclose,
+                s.open_price AS open,
+                s.latest_price AS close,
+                s.high_price AS high,
+                s.low_price AS low,
+                s.chg_value AS differ,
+                s.chg_ratio AS pct,
+                s.amount AS amount,
+                s.volume AS volumn,
+                s.amount AS minute_amount,
+                s.volume AS minute_volumn,
+                s.source AS source,
+                s.is_fallback AS is_fallback,
+                s.is_finalized AS is_finalized,
+                s.source_bar_count AS source_bar_count,
+                s.bar_start_time AS bar_start_time,
+                s.bar_end_time AS bar_end_time,
+                s.kline_type AS kline_type,
+                s.period_minutes AS period_minutes
+            FROM {SNAPSHOT_TABLE} s
+            WHERE {date_predicate}
+              AND s.kline_type = '1m'
+              AND s.period_minutes = 1
+              AND s.stk_code REGEXP '^[0-9]{{6}}$'
+              {source_filter}
+        )
+    """
+
+
+def _stored_bar_cte(
+    *,
+    kline_type: str,
+    period_minutes: int,
+    source_where_sql: str = "",
+    date_sql: str = "",
+) -> str:
+    """Project native fixed-period source rows into the stable quote fields."""
+    source_filter = f" AND {source_where_sql}" if source_where_sql else ""
+    requested_date_filter = f" AND {date_sql}" if date_sql else ""
+    return f"""
+        WITH base AS (
+            SELECT
+                s.stk_code AS code,
+                s.stk_name AS name,
+                s.trade_date AS tradedate,
+                s.minute_index AS minute_index,
+                TIME_FORMAT(s.bar_end_time, '%%H:%%i:%%s') AS minute_time,
+                s.snapshot_time AS snapshot_time,
+                s.snapshot_slot AS snapshot_slot,
+                s.preclose_price AS preclose,
+                s.open_price AS open,
+                s.latest_price AS close,
+                s.high_price AS high,
+                s.low_price AS low,
+                s.chg_value AS differ,
+                s.chg_ratio AS pct,
+                s.amount AS amount,
+                s.volume AS volumn,
+                s.amount AS minute_amount,
+                s.volume AS minute_volumn,
+                s.source AS source,
+                s.is_fallback AS is_fallback,
+                s.is_finalized AS is_finalized,
+                s.source_bar_count AS source_bar_count,
+                s.bar_start_time AS bar_start_time,
+                s.bar_end_time AS bar_end_time,
+                s.kline_type AS kline_type,
+                s.period_minutes AS period_minutes
+            FROM {SNAPSHOT_TABLE} s
+            WHERE s.kline_type = '{kline_type}'
+              AND s.period_minutes = {int(period_minutes)}
+              AND s.stk_code REGEXP '^[0-9]{{6}}$'
+              {source_filter}
+              {requested_date_filter}
+        )
+    """
+
+
+def _trade_date_predicate(filters: Iterable[Mapping[str, str]]) -> tuple[str, List[Any]]:
+    """Push an unambiguous trade-date filter into the native K-line read.
+
+    Date filtering must happen before the per-code `count` window is selected;
+    otherwise a request such as `tradedate >= 2026-08-01` could be truncated by
+    newer bars before its requested range is evaluated.
+    """
+    items = list(filters)
+    if any(str(item.get("connector") or "").strip().lower() == "or" for item in items):
+        return "", []
+    clauses: List[str] = []
+    params: List[Any] = []
+    for item in items:
+        if _canonical_field(item.get("field")) != "tradedate":
+            continue
+        op = str(item.get("op") or "").lower()
+        sql_op = "=" if op == "==" else op.upper()
+        if op == "in":
+            values = [value[:10] for value in _list_values(str(item.get("value") or "")) if re.fullmatch(r"\d{4}-\d{2}-\d{2}", value[:10])]
+            if values:
+                clauses.append(f"s.trade_date IN ({', '.join(['%s'] * len(values))})")
+                params.extend(values)
+            continue
+        value = _clean_value(str(item.get("value") or ""))[:10]
+        if sql_op in {"=", "!=", ">", ">=", "<", "<=", "LIKE"} and re.fullmatch(r"\d{4}-\d{2}-\d{2}", value):
+            clauses.append(f"s.trade_date {sql_op} %s")
+            params.append(value)
+    return (" AND ".join(clauses), params)
+
+
+def _snapshot_identity_where(filters: List[Dict[str, str]]) -> tuple[str, List[Any]]:
+    if any(item.get("connector", "").strip().lower() == "or" for item in filters):
+        return "", []
+    clauses: List[str] = []
+    params: List[Any] = []
+    for item in filters:
+        field_name = _canonical_field(item["field"])
+        if field_name not in {"code", "name"}:
+            continue
+        column = "s.stk_code" if field_name == "code" else "s.stk_name"
+        op = item["op"].lower()
+        if op == "in":
+            values = [_normalize_filter_value(field_name, value) for value in _list_values(item["value"])]
+            if values:
+                clauses.append(f"{column} IN ({', '.join(['%s'] * len(values))})")
+                params.extend(values)
+            continue
+        sql_op = "=" if op == "==" else op.upper()
+        if sql_op not in {"=", "!=", "LIKE"}:
+            continue
+        clauses.append(f"{column} {sql_op} %s")
+        params.append(_normalize_filter_value(field_name, _clean_value(item["value"])))
+    return " AND ".join(clauses), params
 
 
 def _where_sql(*, filters: List[Dict[str, str]], slot: Mapping[str, Any]) -> tuple[str, List[Any]]:
@@ -434,6 +727,36 @@ def _parse_filter(filter_text: str) -> List[Dict[str, str]]:
         }
         for match in FILTER_RE.finditer(str(filter_text or ""))
     ]
+
+
+def _filters_from_args(args: Mapping[str, Any]) -> List[Dict[str, str]]:
+    filters: List[Dict[str, str]] = []
+    for field_name in ("code", "name"):
+        value = args.get(field_name)
+        if value not in (None, ""):
+            filters.append(
+                {
+                    "connector": "AND",
+                    "field": field_name,
+                    "op": "=",
+                    "value": str(value),
+                }
+            )
+    for field_name in ("codes", "names"):
+        value = args.get(field_name)
+        if value in (None, ""):
+            continue
+        values = list(value) if isinstance(value, (list, tuple, set)) else [value]
+        filters.append(
+            {
+                "connector": "AND",
+                "field": field_name[:-1],
+                "op": "in",
+                "value": ",".join(str(item) for item in values if str(item).strip()),
+            }
+        )
+    filters.extend(_parse_filter(str(args.get("filter") or "")))
+    return filters
 
 
 def _requested_fields(outputs: Iterable[str]) -> List[str]:
@@ -691,6 +1014,137 @@ def _bounded_limit(value: Any, *, default: int) -> int:
     if parsed < 0:
         return 10000
     return max(1, min(parsed, 10000))
+
+
+def _latest_quote_hard_limit() -> int:
+    try:
+        configured = int(
+            os.getenv(
+                "FIN_AGENT_LATEST_QUOTE_HARD_LIMIT",
+                str(DEFAULT_LATEST_QUOTE_HARD_LIMIT),
+            )
+        )
+    except (TypeError, ValueError):
+        configured = DEFAULT_LATEST_QUOTE_HARD_LIMIT
+    return max(DEFAULT_LATEST_QUOTE_LIMIT, configured)
+
+
+def _intraday_hard_row_limit() -> int:
+    try:
+        configured = int(
+            os.getenv(
+                "FIN_AGENT_INTRADAY_HARD_ROW_LIMIT",
+                str(DEFAULT_INTRADAY_HARD_ROW_LIMIT),
+            )
+        )
+    except (TypeError, ValueError):
+        configured = DEFAULT_INTRADAY_HARD_ROW_LIMIT
+    return max(10_000, configured)
+
+
+def _latest_quote_limit_policy(
+    *,
+    args: Mapping[str, Any],
+    filters: List[Dict[str, str]],
+) -> Dict[str, Any]:
+    hard_limit = _latest_quote_hard_limit()
+    has_limit = "limit" in args and args.get("limit") not in (None, "")
+    try:
+        requested = int(args.get("limit")) if has_limit else None
+    except (TypeError, ValueError):
+        requested = None
+    if requested is not None and requested < -1:
+        return {
+            "error": "limit must be -1 or a positive integer",
+            "hard_limit": hard_limit,
+        }
+    if requested == 0:
+        return {
+            "error": "limit must be -1 or a positive integer",
+            "hard_limit": hard_limit,
+        }
+    if requested is not None and requested > hard_limit:
+        return {
+            "error": (
+                f"requested limit {requested} exceeds the safety limit {hard_limit}; "
+                "use limit=-1 for explicit full results and configure a larger "
+                "FIN_AGENT_LATEST_QUOTE_HARD_LIMIT only for an authorized bulk run"
+            ),
+            "hard_limit": hard_limit,
+        }
+    if requested == -1:
+        return {
+            "error": "",
+            "business_limit": -1,
+            "fetch_limit": hard_limit + 1,
+            "hard_limit": hard_limit,
+            "detect_overflow": True,
+        }
+    if requested is not None:
+        return {
+            "error": "",
+            "business_limit": requested,
+            "fetch_limit": requested,
+            "hard_limit": hard_limit,
+            "detect_overflow": False,
+        }
+
+    explicit_target_count = _identity_filter_count(filters)
+    if explicit_target_count > hard_limit:
+        return {
+            "error": (
+                f"explicit target list contains {explicit_target_count} securities, "
+                f"above the safety limit {hard_limit}"
+            ),
+            "hard_limit": hard_limit,
+        }
+    business_limit = explicit_target_count or DEFAULT_LATEST_QUOTE_LIMIT
+    return {
+        "error": "",
+        "business_limit": business_limit,
+        "fetch_limit": business_limit,
+        "hard_limit": hard_limit,
+        "detect_overflow": False,
+    }
+
+
+def _identity_filter_count(filters: List[Dict[str, str]]) -> int:
+    identities: set[tuple[str, str]] = set()
+    for item in filters:
+        field_name = _canonical_field(item.get("field"))
+        if field_name not in {"code", "name"}:
+            continue
+        op = str(item.get("op") or "").lower()
+        if op == "in":
+            values = _list_values(str(item.get("value") or ""))
+        elif op in {"=", "=="}:
+            values = [_clean_value(str(item.get("value") or ""))]
+        else:
+            continue
+        for value in values:
+            normalized = _normalize_filter_value(field_name, value)
+            if str(normalized).strip():
+                identities.add((field_name, str(normalized)))
+    return len(identities)
+
+
+def _minute_period(value: Any) -> int:
+    text = str(value if value not in (None, "") else 1).strip().lower()
+    if text.endswith("m"):
+        text = text[:-1]
+    try:
+        return int(text)
+    except (TypeError, ValueError):
+        return 0
+
+
+def _minute_bar_count(value: Any, *, fallback: Any = None) -> int:
+    raw = value if value not in (None, "") else fallback
+    try:
+        parsed = int(raw)
+    except (TypeError, ValueError):
+        parsed = 100
+    return max(1, min(parsed, 1000))
 
 
 def _bounded_k(value: Any) -> int:

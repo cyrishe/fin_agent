@@ -1,0 +1,6 @@
+interface:
+  display_name: "金融工具业务设计"
+  short_description: "将确认需求整理为公开契约、单目标规则与可实现模块"
+  default_prompt: "使用 $financial-tool-design 将已确认的金融工具需求整理为可实现的业务设计。"
+policy:
+  allow_implicit_invocation: false

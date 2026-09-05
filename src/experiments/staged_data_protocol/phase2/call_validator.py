@@ -1,16 +1,33 @@
 from __future__ import annotations
 
 import re
+from datetime import date
 from typing import Mapping
 
 from src.experiments.staged_data_protocol.phase2.agg_protocol import AGG_METHODS, metric_column, parse_agg_spec
 from src.experiments.staged_data_protocol.phase2.catalog import resolve_api
+from src.experiments.staged_data_protocol.phase2.call_structure import (
+    runtime_field_contract,
+    validate_call_structure,
+)
 from src.experiments.staged_data_protocol.phase2.models import ApiCall, ResultHandle, ValidationResult
 
 
 REF_RE = re.compile(r"\b(r\d+)\.([A-Za-z_]\w*)\b")
 PREVIOUS_METRIC_RE = re.compile(r"^(r\d+)\.([A-Za-z_]\w*)$")
 KD_METHOD_TOKEN_RE = re.compile(r"^[A-Za-z_]\w*$")
+FILTER_REF_PREFIX_RE = re.compile(
+    r"\b[A-Za-z_]\w*\s+in\s*$",
+    flags=re.IGNORECASE,
+)
+EXACT_TRADE_DATE_RE = re.compile(
+    r"\b(?:tradedate|trade_date|date)\s*(?:==|=)\s*['\"]?(\d{4}-\d{2}-\d{2})['\"]?",
+    flags=re.IGNORECASE,
+)
+OUTPUT_ALIAS_RE = re.compile(
+    r"^(?P<expression>.+?)\s+as\s+(?P<alias>[A-Za-z_]\w*)$",
+    flags=re.IGNORECASE | re.DOTALL,
+)
 
 
 def validate_call(call: ApiCall, previous_results: Mapping[str, ResultHandle]) -> ValidationResult:
@@ -40,6 +57,9 @@ def validate_call(call: ApiCall, previous_results: Mapping[str, ResultHandle]) -
         if k is not None and (not isinstance(k, int) or k <= 0):
             errors.append("ARG_ERROR: dynamic_cal k must be a positive integer when provided")
         _validate_dynamic_fields(call, view, errors)
+    if resolved.get("subject") == "stock" and resolved.get("dataview") == "quote":
+        _validate_stock_quote_mode(call, errors)
+    errors.extend(validate_call_structure(call, previous_results))
     _validate_common_args(call, errors)
     _validate_refs(call, previous_results, errors)
     _validate_outputs(call, resolved, errors)
@@ -65,6 +85,12 @@ def _allows_kd_fallback(resolved: Mapping[str, object]) -> bool:
 def _validate_common_args(call: ApiCall, errors: list[str]) -> None:
     if "limit" in call.args and not isinstance(call.args.get("limit"), int):
         errors.append(f"ARG_ERROR: limit must be an integer, got={call.args.get('limit')}")
+    elif "limit" in call.args and (
+        isinstance(call.args.get("limit"), bool)
+        or int(call.args.get("limit")) == 0
+        or int(call.args.get("limit")) < -1
+    ):
+        errors.append("ARG_ERROR: limit must be -1 or a positive integer")
     for key, value in call.args.items():
         if not isinstance(value, str):
             continue
@@ -73,11 +99,132 @@ def _validate_common_args(call: ApiCall, errors: list[str]) -> None:
             errors.append(f"REF_ERROR: {key} must use rN.column refs, not SQL subquery refs")
 
 
+def _validate_stock_quote_mode(call: ApiCall, errors: list[str]) -> None:
+    mode = _stock_quote_effective_mode(call.args)
+    if mode is None:
+        errors.append("ARG_ERROR: stock.quote mode must be one of 0, 1, 2")
+        return
+    if mode == 0:
+        exact_date = _stock_quote_exact_date(call.args)
+        if exact_date is not None and exact_date >= date.today():
+            errors.append(
+                "ARG_ERROR: stock.quote mode=0 only returns day K through the "
+                "previous trading day; use mode=2 for today's "
+                "latest quote or mode=1 for today's minute K"
+            )
+        if "period" in call.args:
+            errors.append("ARG_ERROR: stock.quote period is only valid with mode=1 minute K")
+        if "count" in call.args:
+            count = call.args.get("count")
+            if (
+                not isinstance(count, int)
+                or isinstance(count, bool)
+                or count <= 0
+                or count > 5000
+            ):
+                errors.append(
+                    "ARG_ERROR: stock.quote day K count must be an integer "
+                    "between 1 and 5000 per code"
+                )
+    elif mode == 1:
+        period = _parse_minute_period(call.args.get("period", 1))
+        if period not in {1, 3, 5, 10, 15, 30, 60}:
+            errors.append(
+                "ARG_ERROR: stock.quote minute K period must be one of "
+                "1, 3, 5, 10, 15, 30, 60"
+            )
+        count = call.args.get("count", 100)
+        if not isinstance(count, int) or isinstance(count, bool) or count <= 0 or count > 1000:
+            errors.append("ARG_ERROR: stock.quote minute K count must be an integer between 1 and 1000")
+    elif "period" in call.args or "count" in call.args:
+        errors.append(
+            "ARG_ERROR: stock.quote period/count are not valid with mode=2 latest quote"
+        )
+    resolved = resolve_api(call.api)
+    source_fields = runtime_field_contract(call, usage="source")
+    if (
+        resolved
+        and resolved.get("type") == "kd"
+        and source_fields is not None
+        and str(resolved.get("field") or "") not in source_fields
+    ):
+        errors.append(
+            f"API_ERROR: field={resolved.get('field')} is not available in "
+            f"stock.quote mode={mode}; available={sorted(source_fields)}"
+        )
+
+
+def _parse_minute_period(value: object) -> int | None:
+    if isinstance(value, bool):
+        return None
+    text = str(value if value not in (None, "") else 1).strip().lower()
+    if text.endswith("m"):
+        text = text[:-1]
+    try:
+        return int(text)
+    except ValueError:
+        return None
+
+
+def _stock_quote_effective_mode(args: Mapping[str, object]) -> int | None:
+    has_public_mode = "mode" in args
+    raw = args.get("mode", args.get("realtime", 0))
+    if raw in (None, ""):
+        return 0
+    if isinstance(raw, bool):
+        if has_public_mode:
+            return None
+        return 2 if raw else 0
+    if isinstance(raw, int):
+        return raw if raw in {0, 1, 2} else None
+    text = str(raw).strip().lower()
+    if text in {"0", "false", "no", "history", "historical"}:
+        return 0
+    if text in {"1", "true", "yes", "minute", "intraday", "minute_kline"}:
+        return 1
+    if text in {"2", "current", "latest", "realtime", "snapshot"}:
+        return 2
+    return None
+
+
+def _stock_quote_exact_date(args: Mapping[str, object]) -> date | None:
+    for key in ("tradedate", "trade_date", "date"):
+        parsed = _parse_iso_date(args.get(key))
+        if parsed is not None:
+            return parsed
+    filter_text = str(args.get("filter") or "")
+    match = EXACT_TRADE_DATE_RE.search(filter_text)
+    if not match:
+        return None
+    return _parse_iso_date(match.group(1))
+
+
+def _parse_iso_date(value: object) -> date | None:
+    text = str(value or "").strip().strip("\"'")
+    if not text:
+        return None
+    try:
+        return date.fromisoformat(text)
+    except ValueError:
+        return None
+
+
 def _validate_refs(call: ApiCall, previous_results: Mapping[str, ResultHandle], errors: list[str]) -> None:
-    for value in call.args.values():
+    for key, value in call.args.items():
         if not isinstance(value, str):
             continue
-        for result_name, column in REF_RE.findall(value):
+        ref_matches = list(REF_RE.finditer(value))
+        if key == "filter":
+            for match in ref_matches:
+                result_name, column = match.groups()
+                ref = f"{result_name}.{column}"
+                if not FILTER_REF_PREFIX_RE.search(value[: match.start()]):
+                    errors.append(
+                        "REF_ERROR: filter result references must be bound as "
+                        f"`field in {ref}`, not used as a bare filter"
+                    )
+        for match in ref_matches:
+            result_name, column = match.groups()
             handle = previous_results.get(result_name)
             if not handle:
                 errors.append(f"REF_ERROR: unknown result={result_name}")
@@ -97,13 +244,24 @@ def _validate_outputs(call: ApiCall, resolved: Mapping[str, object], errors: lis
     if resolved["type"] == "dynamic_cal":
         _validate_dynamic_outputs(call, fields, errors)
         return
-    if resolved["type"] == "kd":
-        allowed = fields | {"value", "k", "start_date", "end_date", "tradedate", "window_count", "start_value", "current_value"}
-        if resolved.get("subject") == "stock" and resolved.get("dataview") == "quote":
-            allowed |= {"change_ratio", "change_pct"}
-    else:
-        allowed = fields
+    runtime_allowed = runtime_field_contract(call, usage="output")
+    allowed = set(runtime_allowed) if runtime_allowed is not None else fields
     for output in call.outputs:
+        text = str(output or "").strip()
+        alias_match = OUTPUT_ALIAS_RE.fullmatch(text)
+        expression = alias_match.group("expression").strip() if alias_match else text
+        if "(" in expression or ")" in expression:
+            errors.append(
+                f"OUTPUT_ERROR: function expression={expression} is only valid "
+                "for aggregate APIs"
+            )
+            continue
+        if alias_match and resolved["type"] != "kd":
+            errors.append(
+                f"OUTPUT_ERROR: alias={alias_match.group('alias')} is not supported "
+                f"by api={call.api}"
+            )
+            continue
         token = _output_base_token(output)
         if token and token not in allowed and not _is_allowed_computed_field(token, view):  # type: ignore[arg-type]
             errors.append(f"OUTPUT_ERROR: field={token} not in api={call.api}; available={sorted(allowed)}")
@@ -111,8 +269,9 @@ def _validate_outputs(call: ApiCall, resolved: Mapping[str, object], errors: lis
 
 def _output_base_token(output: str) -> str:
     text = str(output or "").strip()
-    if " as " in text:
-        text = text.split(" as ", 1)[0].strip()
+    alias_match = OUTPUT_ALIAS_RE.fullmatch(text)
+    if alias_match:
+        text = alias_match.group("expression").strip()
     if "(" in text and ")" in text:
         return ""
     if "." in text:
@@ -149,11 +308,25 @@ def _validate_agg_args(
             errors.append(f"API_ERROR: agg={agg} unsupported for metric={metric}")
     else:
         if dataview == "quote" and metric_column(metric) in set((view.get("fields") or {}).keys()):
-            pass
+            source_fields = runtime_field_contract(call, usage="source")
+            if source_fields is not None and metric_column(metric) not in source_fields:
+                errors.append(
+                    f"API_ERROR: metric={metric} is not available for the "
+                    f"selected stock.quote mode; available={sorted(source_fields)}"
+                )
         elif not _is_supported_source_metric(metric):
             errors.append(f"API_ERROR: metric={metric} unsupported")
         if agg not in AGG_METHODS:
             errors.append(f"API_ERROR: agg={agg} unsupported for metric={metric}")
+        aggregate_fields = view.get("aggregate_fields")
+        if isinstance(aggregate_fields, Mapping):
+            field_name = metric_column(metric)
+            methods = aggregate_fields.get(field_name)
+            if not isinstance(methods, list) or agg not in set(methods):
+                errors.append(
+                    f"API_ERROR: agg={agg} unsupported for metric={metric}; "
+                    f"available={aggregate_fields}"
+                )
     if dataview == "constitution":
         _validate_group_by(call, view, errors)
     elif str(call.args.get("group_by") or "").strip():
@@ -185,7 +358,13 @@ def _validate_group_by(call: ApiCall, view: Mapping[str, object], errors: list[s
 
 
 def _validate_optional_group_by(call: ApiCall, view: Mapping[str, object], errors: list[str], *, dataview: str) -> None:
-    fields = set((view.get("fields") or {}).keys()) if isinstance(view, Mapping) else set()
+    runtime_fields = runtime_field_contract(call, usage="source")
+    if runtime_fields is not None:
+        fields = set(runtime_fields)
+    elif isinstance(view, Mapping):
+        fields = set((view.get("fields") or {}).keys())
+    else:
+        fields = set()
     for field_name in _field_list(call.args.get("group_by")):
         if field_name not in fields:
             errors.append(f"ARG_ERROR: group_by field={field_name} not in {dataview} fields; available={sorted(fields)}")
@@ -194,31 +373,47 @@ def _validate_optional_group_by(call: ApiCall, view: Mapping[str, object], error
 def _validate_agg_outputs(call: ApiCall, fields: set[str], errors: list[str]) -> None:
     spec = parse_agg_spec(call.args)
     metric_name = metric_column(spec.metric)
-    aggregate_seen = False
-    alias_seen = False
+    group_fields = set(_field_list(call.args.get("group_by")))
+    emitted_group_fields: set[str] = set()
+    aggregate_outputs = 0
     for output in call.outputs:
         text = str(output or "").strip()
-        aggregate = re.fullmatch(r"([A-Za-z_]\w*)\(([^)]+)\)(?:\s+as\s+([A-Za-z_]\w*))?", text)
+        aggregate = re.fullmatch(
+            r"([A-Za-z_]\w*)\(([^)]+)\)(?:\s+as\s+([A-Za-z_]\w*))?",
+            text,
+            flags=re.IGNORECASE,
+        )
         if aggregate:
-            aggregate_seen = True
+            aggregate_outputs += 1
             output_agg, output_metric, alias = aggregate.groups()
-            if output_agg != spec.method:
+            if output_agg.lower() != spec.method.lower():
                 errors.append(f"OUTPUT_ERROR: aggregate output uses {output_agg}, expected {spec.method}")
-            if metric_name and output_metric.strip() != metric_name:
+            if metric_name and metric_column(output_metric.strip()) != metric_name:
                 errors.append(f"OUTPUT_ERROR: aggregate output metric={output_metric.strip()} expected {metric_name}")
             if not alias:
                 errors.append("OUTPUT_ERROR: aggregate output must use a clear alias")
             continue
         token = _output_base_token(text)
-        if token and token in fields:
+        if token in group_fields:
+            emitted_group_fields.add(token)
             continue
         if token and re.fullmatch(r"[A-Za-z_]\w*", token):
-            alias_seen = True
+            aggregate_outputs += 1
             continue
-        if token:
-            errors.append(f"OUTPUT_ERROR: field={token} not in constitution fields; available={sorted(fields)}")
-    if not aggregate_seen and not alias_seen:
-        errors.append("OUTPUT_ERROR: agg output must include an aggregate expression or one alias field")
+        errors.append(
+            f"OUTPUT_ERROR: aggregate output={text or '<empty>'} must be a "
+            "group field, one alias, or an aggregate expression"
+        )
+    missing_groups = sorted(group_fields - emitted_group_fields)
+    if missing_groups:
+        errors.append(
+            f"OUTPUT_ERROR: agg output is missing group_by fields={missing_groups}"
+        )
+    if aggregate_outputs != 1:
+        errors.append(
+            "OUTPUT_ERROR: agg output must declare exactly one aggregate result; "
+            f"found={aggregate_outputs}"
+        )
 
 
 def _validate_dynamic_fields(call: ApiCall, view: Mapping[str, object], errors: list[str]) -> None:
@@ -240,6 +435,20 @@ def _field_list(raw_fields: object) -> list[str]:
 def _validate_dynamic_outputs(call: ApiCall, base_fields: set[str], errors: list[str]) -> None:
     allowed_runtime = base_fields | {"value", "k", "end_date", "tradedate", "window_count"}
     for output in call.outputs:
+        text = str(output or "").strip()
+        if "(" in text or ")" in text:
+            errors.append(
+                f"OUTPUT_ERROR: function expression={text} is only valid for "
+                "aggregate APIs"
+            )
+            continue
+        alias_match = OUTPUT_ALIAS_RE.fullmatch(text)
+        if alias_match:
+            errors.append(
+                f"OUTPUT_ERROR: alias={alias_match.group('alias')} is not "
+                f"supported by api={call.api}"
+            )
+            continue
         token = _output_base_token(output)
         if not token:
             continue

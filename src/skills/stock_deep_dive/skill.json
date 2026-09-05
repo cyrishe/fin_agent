@@ -26,10 +26,42 @@
   "enable_think": false,
   "skill_name": "stock_deep_dive",
   "availability": {
-    "lifecycle": "active",
+    "lifecycle": "retired",
     "retrieval_mode": "direct_only"
   },
   "purpose": "针对单只股票输出一份投顾式深度分析，覆盖行情、资金、研报、新闻催化和风险观察。",
+  "input_schema": {
+    "type": "object",
+    "required": [
+      "code"
+    ],
+    "properties": {
+      "code": {
+        "type": "string",
+        "title": "股票",
+        "description": "单只股票的标准证券代码；公司名称由调用编排层解析为代码。"
+      },
+      "name": {
+        "type": "string",
+        "title": "公司名称"
+      },
+      "question": {
+        "type": "string",
+        "title": "分析要求"
+      },
+      "focus": {
+        "type": "string",
+        "title": "分析重点",
+        "default": "全面分析"
+      },
+      "as_of_date": {
+        "type": "string",
+        "title": "分析日期",
+        "description": "格式 YYYY-MM-DD；为空时使用当前日期。"
+      }
+    },
+    "additionalProperties": false
+  },
   "best_for": [
     "单只股票深度分析",
     "代表股逻辑梳理",

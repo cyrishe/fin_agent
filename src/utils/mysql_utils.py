@@ -1,7 +1,7 @@
 # src/utils/mysql_utils.py
 import pymysql
 import datetime
-from urllib.parse import urlparse
+from urllib.parse import unquote, urlparse
 import pandas as pd
 from pymysql.constants import FIELD_TYPE
 from pymysql.converters import conversions
@@ -110,11 +110,26 @@ class MySQLUtils:
                  connect_timeout=30,  # 延长连接超时时间
                  read_timeout=60 ,     # 延长查询超时时间
                  port=3312):
-        self.host = host
-        self.user = user
-        self.password = password if password is not None else os.getenv("STOCK_AGENT_DB_PASSWORD", "")
-        self.database = database
-        self.port = port
+        resolved_host = host
+        resolved_user = user
+        resolved_password = password if password is not None else os.getenv("STOCK_AGENT_DB_PASSWORD", "")
+        resolved_database = database
+        resolved_port = port
+        platform_url = str(os.getenv("PLATFORM_DB_URL") or "").strip()
+        if password is None and not resolved_password and platform_url:
+            parsed = urlparse(platform_url.replace("mysql+pymysql://", "mysql://", 1))
+            url_database = (parsed.path or "/").lstrip("/")
+            if parsed.scheme == "mysql" and parsed.hostname and url_database == database:
+                resolved_host = parsed.hostname
+                resolved_user = unquote(parsed.username or resolved_user)
+                resolved_password = unquote(parsed.password or "")
+                resolved_database = url_database
+                resolved_port = parsed.port or port
+        self.host = resolved_host
+        self.user = resolved_user
+        self.password = resolved_password
+        self.database = resolved_database
+        self.port = resolved_port
         self.conn = None
         self.connect_db()
 
@@ -2313,23 +2328,72 @@ class StockInfoDbUtils:
     """
 
     def __init__(self,
-                 host="47.113.122.220",
-                 user="creditrisk",
+                 host=None,
+                 user=None,
                  password=None,
                  database="kingdomai",
                  connect_timeout=30,  # 延长连接超时时间
                  read_timeout=60 ,     # 延长查询超时时间
-                 port=3306):
+                 port=None):
 
         self.conv = conversions.copy()
         # 覆盖DECIMAL类型转换规则
         self.conv[FIELD_TYPE.DECIMAL] = float
         self.conv[FIELD_TYPE.NEWDECIMAL] = float
-        self.host = host
-        self.user = user
-        self.password = password if password is not None else os.getenv("KINGDOMAI_DB_PASSWORD", "")
-        self.database = database
-        self.port = port
+        configured_host = str(os.getenv("KINGDOMAI_DB_HOST") or "").strip()
+        configured_user = str(os.getenv("KINGDOMAI_DB_USER") or "").strip()
+        configured_password = str(os.getenv("KINGDOMAI_DB_PASSWORD") or "")
+        configured_port = str(os.getenv("KINGDOMAI_DB_PORT") or "").strip()
+        try:
+            environment_port = int(configured_port) if configured_port else None
+        except ValueError:
+            environment_port = None
+        resolved_host = host or configured_host or "127.0.0.1"
+        resolved_user = user or configured_user
+        resolved_password = password if password is not None else configured_password
+        resolved_database = database
+        resolved_port = port or environment_port or 3306
+        credential_source_name = str(
+            os.getenv("KINGDOMAI_DB_CREDENTIAL_SOURCE") or ""
+        ).strip()
+        credential_source_url = (
+            str(os.getenv(credential_source_name) or "").strip()
+            if re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*", credential_source_name)
+            else ""
+        )
+        configured_database_url = str(os.getenv("KINGDOMAI_DB_URL") or "").strip()
+        database_url = (
+            configured_database_url
+            or credential_source_url
+            or str(os.getenv("BUSINESS_DB_URL") or "").strip()
+        )
+        if database_url:
+            parsed = urlparse(database_url.replace("mysql+pymysql://", "mysql://", 1))
+            url_database = (parsed.path or "/").lstrip("/")
+            supplies_credentials_only = bool(
+                credential_source_url
+                and not configured_database_url
+                and database_url == credential_source_url
+            )
+            if (
+                parsed.scheme == "mysql"
+                and parsed.hostname
+                and (url_database == database or supplies_credentials_only)
+            ):
+                if host is None and not configured_host:
+                    resolved_host = parsed.hostname
+                if user is None and not configured_user:
+                    resolved_user = unquote(parsed.username or resolved_user)
+                if password is None and not configured_password:
+                    resolved_password = unquote(parsed.password or "")
+                resolved_database = database
+                if port is None and environment_port is None:
+                    resolved_port = parsed.port or 3306
+        self.host = resolved_host
+        self.user = resolved_user
+        self.password = resolved_password
+        self.database = resolved_database
+        self.port = resolved_port
         self.conn = None
         self.connect_db()
 
@@ -3556,7 +3620,7 @@ class StockInfoDbUtils:
 #     print("test stock detail.")
 #     # 源库：kingdomai
 #     src = StockInfoDbUtils(
-#         host="47.113.122.220",
+#         host="<configured-host>",
 #         user="creditrisk",
 #         database="kingdomai",
 #         port=3306

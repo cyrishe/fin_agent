@@ -5,9 +5,10 @@ from typing import Any, Dict, List, Optional
 
 import pymysql
 
+from src.skill_runtime.availability import legacy_skill_is_active
 from src.services.capability_search_service import CapabilitySearchService
 from src.tools.registry import TOOL_REGISTRY
-from src.utils.mysql_utils import StockInfoDbUtils
+from src.utils.system_db_utils import SystemDbUtils
 
 
 ARTIFACT_TABLE = "aiia_runtime_artifact"
@@ -158,7 +159,7 @@ class RuntimeArtifactService:
         }
 
     def _upsert_artifact(self, payload: Dict[str, Any]) -> Dict[str, Any]:
-        db = StockInfoDbUtils()
+        db = SystemDbUtils()
         try:
             with db.conn.cursor(pymysql.cursors.DictCursor) as cursor:
                 cursor.execute(
@@ -323,7 +324,7 @@ class RuntimeArtifactService:
             db.close_db()
 
     def _replace_edges(self, *, artifact_id: int, edge_names: List[str]) -> None:
-        db = StockInfoDbUtils()
+        db = SystemDbUtils()
         try:
             with db.conn.cursor() as cursor:
                 cursor.execute(
@@ -403,7 +404,6 @@ class RuntimeArtifactService:
             if part
         )
         content_hash = self._content_hash(definition_text, schema_text, spec_text, markdown_text)
-
         result = self._upsert_artifact(
             {
                 "artifact_type": "tool",
@@ -477,13 +477,26 @@ class RuntimeArtifactService:
             if part
         )
         content_hash = self._content_hash(definition_text, schema_text, spec_text, markdown_text)
+        source_status = self._trim(config_obj.get("status")) or "active"
+        lifecycle = self._trim(
+            (
+                config_obj.get("availability")
+                if isinstance(config_obj.get("availability"), dict)
+                else {}
+            ).get("lifecycle")
+        ).lower() or "active"
+        artifact_status = (
+            "deprecated"
+            if source_status == "active" and lifecycle != "active"
+            else source_status
+        )
 
         result = self._upsert_artifact(
             {
                 "artifact_type": "skill",
                 "name": normalized,
                 "version": "v1",
-                "status": self._trim(config_obj.get("status")) or "active",
+                "status": artifact_status,
                 "display_name": normalized,
                 "description": self._trim(config_obj.get("purpose")) or self._trim(config_obj.get("description")) or self._infer_skill_description(markdown_text),
                 "owner": self._trim(config_obj.get("owner")) or "skills",
@@ -492,7 +505,7 @@ class RuntimeArtifactService:
                 "tags_json": json.dumps(config_obj.get("tags", []), ensure_ascii=False),
                 "keywords_json": json.dumps([], ensure_ascii=False),
                 "side_effect_level": "none",
-                "enabled": 1,
+                "enabled": 1 if legacy_skill_is_active(config_obj) else 0,
                 "implementation_kind": "skill_bundle",
                 "implementation_target": str(skill_dir),
                 "source_manifest_json": json.dumps(
@@ -556,7 +569,7 @@ class RuntimeArtifactService:
                 self._trim(config_obj.get("display_name")),
                 description,
                 markdown_text,
-                "\n".join(str(x) for x in config_obj.get("default_agents", []) if self._trim(x)),
+                self._trim(config_obj.get("default_agent")),
                 "\n".join(str(x) for x in config_obj.get("default_skills", []) if self._trim(x)),
                 "\n".join(str(x) for x in config_obj.get("default_tools", []) if self._trim(x)),
             ]
@@ -606,7 +619,7 @@ class RuntimeArtifactService:
             edge_names=[
                 self._trim(name)
                 for name in (
-                    list(config_obj.get("default_agents", []) or [])
+                    [config_obj.get("default_agent")]
                     + list(config_obj.get("default_skills", []) or [])
                     + list(config_obj.get("default_tools", []) or [])
                 )

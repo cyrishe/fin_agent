@@ -1,19 +1,14 @@
 from __future__ import annotations
 import json
 import re
-from functools import lru_cache
-from pathlib import Path
 from typing import Any, Iterable, Mapping
 
+from src.experiments.staged_data_protocol.phase2.catalog import catalog_source
 from src.experiments.staged_data_protocol.phase2.models import ResultHandle, Step
 
 
-PROMPT_CATALOG_PATH = Path("src/tools/finance_data/catalog/api_view_catalog.json")
-
-
-@lru_cache(maxsize=1)
-def _prompt_catalog() -> dict[str, Any]:
-    return json.loads(PROMPT_CATALOG_PATH.read_text(encoding="utf-8"))
+def _prompt_catalog() -> Mapping[str, Any]:
+    return catalog_source()
 
 
 def _api_class_patterns() -> Mapping[str, Any]:
@@ -104,6 +99,26 @@ def build_context_sections(
         "- fields:",
         _code_block(_format_fields(view.get("fields"))),
     ]
+    value_domains = view.get("value_domains")
+    if isinstance(value_domains, Mapping):
+        current_dataview.append("- value_domains:")
+        current_dataview.append(
+            _indent(
+                _code_block(json.dumps(_plain_value(value_domains), ensure_ascii=False)),
+                "  ",
+            )
+        )
+    aggregate_fields = view.get("aggregate_fields")
+    if isinstance(aggregate_fields, Mapping):
+        current_dataview.append("- aggregate_fields:")
+        current_dataview.append(
+            _indent(
+                _code_block(
+                    json.dumps(_plain_value(aggregate_fields), ensure_ascii=False)
+                ),
+                "  ",
+            )
+        )
     subject_rules = _meta_list(subject_meta, "rules")
     if subject_rules:
         current_dataview.append("- subject_rules:")
@@ -113,7 +128,12 @@ def build_context_sections(
     computed = view.get("computed")
     if isinstance(computed, Mapping):
         current_dataview.append("- computed:")
-        current_dataview.append(_indent(_code_block(json.dumps(computed, ensure_ascii=False)), "  "))
+        current_dataview.append(
+            _indent(
+                _code_block(json.dumps(_plain_value(computed), ensure_ascii=False)),
+                "  ",
+            )
+        )
     api_lines: list[str] = []
     for row in _api_entries(step, view):
         if api_lines:
@@ -121,6 +141,17 @@ def build_context_sections(
         api_lines.append(f"## `{row['api_name']}`")
         api_lines.append(f"- api_class: `{row['api_class']}`")
         api_lines.append(f"- api_function: {row['api_function']}")
+        examples = row.get("examples") or []
+        if examples:
+            api_lines.append("- exact_examples:")
+            for example in examples:
+                request, notes = _split_example_notes(str(example))
+                api_lines.append(_indent(_code_block(request), "  "))
+                api_lines.extend(f"  - note: {note}" for note in notes)
+        guidance = row.get("guidance") or []
+        if guidance:
+            api_lines.append("- operation_guidance:")
+            api_lines.extend(f"  - {item}" for item in guidance)
     return {
         "current_step": _code_block(f"{step.step_id} | {step.subject} | {step.dataview} | {step.condition_desc}"),
         "request_types": "\n".join(request_type_lines) if request_type_lines else "none",
@@ -217,7 +248,7 @@ def _format_api_class(class_name: str, *, include_metrics: bool = True) -> list[
     if methods:
         rows.append(f"- methods: {', '.join(str(item) for item in methods)}")
     rules = cfg.get("rules")
-    if isinstance(rules, list) and rules:
+    if isinstance(rules, (list, tuple)) and rules:
         rows.append("- rules:")
         rows.extend(f"  - {item}" for item in rules)
     return rows
@@ -240,7 +271,7 @@ def _format_supported_metrics(api_classes: list[str]) -> str:
 def _format_kd_methods(kd: Any) -> str:
     if isinstance(kd, Mapping):
         return "; ".join(f"{field}: {', '.join(str(method) for method in methods)}" for field, methods in kd.items())
-    if isinstance(kd, list):
+    if isinstance(kd, (list, tuple)):
         return ", ".join(str(item) for item in kd)
     return str(kd or "")
 
@@ -318,8 +349,8 @@ def _split_example_notes(example: str) -> tuple[str, list[str]]:
     return " ".join(request_lines), notes
 
 
-def _api_entries(step: Step, view: Mapping[str, Any]) -> list[dict[str, str]]:
-    rows: list[dict[str, str]] = []
+def _api_entries(step: Step, view: Mapping[str, Any]) -> list[dict[str, Any]]:
+    rows: list[dict[str, Any]] = []
     for item in view.get("api") or []:
         if not isinstance(item, Mapping):
             continue
@@ -328,6 +359,16 @@ def _api_entries(step: Step, view: Mapping[str, Any]) -> list[dict[str, str]]:
                 "api_name": str(item.get("api_name") or "").strip(),
                 "api_function": str(item.get("api_function") or "").strip(),
                 "api_class": str(item.get("api_class") or "").strip(),
+                "examples": [
+                    str(example).strip()
+                    for example in item.get("examples") or []
+                    if str(example).strip()
+                ],
+                "guidance": [
+                    str(rule).strip()
+                    for rule in item.get("guidance") or []
+                    if str(rule).strip()
+                ],
             }
         )
     return [row for row in rows if row["api_name"] and row["api_class"]]
@@ -338,7 +379,7 @@ def _format_fields(fields: Any) -> str:
         return ""
     rows: list[str] = []
     for field_name, aliases in fields.items():
-        if isinstance(aliases, list) and aliases:
+        if isinstance(aliases, (list, tuple)) and aliases:
             rows.append(f"{field_name}: {', '.join(str(item) for item in aliases)}")
         else:
             rows.append(str(field_name))
@@ -368,9 +409,17 @@ def _meta_list(meta: Any, key: str) -> list[str]:
     if not isinstance(meta, Mapping):
         return []
     value = meta.get(key)
-    if not isinstance(value, list):
+    if not isinstance(value, (list, tuple)):
         return []
     return [str(item) for item in value if str(item).strip()]
+
+
+def _plain_value(value: Any) -> Any:
+    if isinstance(value, Mapping):
+        return {str(key): _plain_value(item) for key, item in value.items()}
+    if isinstance(value, (list, tuple)):
+        return [_plain_value(item) for item in value]
+    return value
 
 
 def _result_status(handle: ResultHandle) -> str:

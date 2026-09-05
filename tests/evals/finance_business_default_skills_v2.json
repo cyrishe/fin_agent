@@ -1,0 +1,144 @@
+{
+  "version": "finance_business_default_skills_v2",
+  "description": "验证此前引入的十个默认金融业务 Skill 的独立入口、普通查询边界、相邻 Skill 边界以及 Tool/Strategy 分流；不评测 stock-research 本体。",
+  "cases": [
+    {
+      "id": "market_overview_trigger",
+      "question": "复盘最近一个完整交易日的A股整体环境，结合主要指数、成交、涨跌宽度和大小盘分化说明当前风险偏好。",
+      "expected_cc_entry": "skill",
+      "expected_skill_id": "market-overview"
+    },
+    {
+      "id": "market_overview_single_metric",
+      "question": "上证指数最近一个交易日收盘点位是多少？",
+      "expected_cc_entry": "finance_query",
+      "expected_skill_id": ""
+    },
+    {
+      "id": "sector_theme_trigger",
+      "question": "分析机器人板块近20日的整体强弱、参与宽度、领涨分化和持续条件。",
+      "expected_cc_entry": "skill",
+      "expected_skill_id": "sector-theme-analysis"
+    },
+    {
+      "id": "sector_theme_constituents_only",
+      "question": "机器人概念当前有哪些成分股？",
+      "expected_cc_entry": "finance_query",
+      "expected_skill_id": ""
+    },
+    {
+      "id": "earnings_analysis_trigger",
+      "question": "分析贵州茅台最近一期年报带来了哪些新增变化，收入利润、利润率、现金流和一次性因素如何影响原有判断？",
+      "expected_cc_entry": "skill",
+      "expected_skill_id": "earnings-analysis"
+    },
+    {
+      "id": "earnings_analysis_single_value",
+      "question": "贵州茅台最近一期年报营业收入是多少？",
+      "expected_cc_entry": "finance_query",
+      "expected_skill_id": ""
+    },
+    {
+      "id": "earnings_vs_financial_quality",
+      "question": "分析海天味业最近五年的利润现金含量、应收存货和负债结构是否持续健康。",
+      "expected_cc_entry": "skill",
+      "expected_skill_id": "financial-quality-analysis"
+    },
+    {
+      "id": "stock_screening_trigger",
+      "question": "在沪深300中筛选近60日走强、PE低于30倍且最新ROE为正的股票，并解释每只候选为什么满足全部条件。",
+      "expected_cc_entry": "skill",
+      "expected_skill_id": "stock-screening"
+    },
+    {
+      "id": "stock_screening_tool_development",
+      "question": "创建一个以后可以定时运行和回测的低估值高质量选股工具。",
+      "expected_cc_entry": "outside_financial_qa",
+      "expected_skill_id": ""
+    },
+    {
+      "id": "factor_analysis_trigger",
+      "question": "研究沪深300的60日动量因子，解释因子定义、横截面头尾差异、行业偏移和主要局限。",
+      "expected_cc_entry": "skill",
+      "expected_skill_id": "factor-analysis"
+    },
+    {
+      "id": "factor_analysis_field_query",
+      "question": "查询宁德时代最近60日涨跌幅。",
+      "expected_cc_entry": "finance_query",
+      "expected_skill_id": ""
+    },
+    {
+      "id": "factor_analysis_strategy_development",
+      "question": "帮我实现并回测一个月度动量因子选股策略。",
+      "expected_cc_entry": "outside_financial_qa",
+      "expected_skill_id": ""
+    },
+    {
+      "id": "valuation_analysis_trigger",
+      "question": "判断美的集团当前估值是否有基本面支撑，结合历史位置、同业差异和隐含增长预期给出条件化判断。",
+      "expected_cc_entry": "skill",
+      "expected_skill_id": "valuation-analysis"
+    },
+    {
+      "id": "valuation_analysis_single_value",
+      "question": "美的集团最新PE TTM是多少？",
+      "expected_cc_entry": "finance_query",
+      "expected_skill_id": ""
+    },
+    {
+      "id": "valuation_vs_stock_research",
+      "question": "全面研究美的集团的商业模式、财务质量、估值、行业地位、催化和风险。",
+      "expected_cc_entry": "skill",
+      "expected_skill_id": "stock-research"
+    },
+    {
+      "id": "financial_quality_trigger",
+      "question": "评估海天味业近五年的盈利持续性、现金转化、应收存货、负债结构和最重要财务背离。",
+      "expected_cc_entry": "skill",
+      "expected_skill_id": "financial-quality-analysis"
+    },
+    {
+      "id": "financial_quality_vs_earnings",
+      "question": "海天味业刚发布的年报相比上期发生了什么变化，这一期的增长质量如何？",
+      "expected_cc_entry": "skill",
+      "expected_skill_id": "earnings-analysis"
+    },
+    {
+      "id": "stock_comparison_trigger",
+      "question": "用一致口径比较贵州茅台和五粮液的成长、现金流质量、估值与风险，说明各自优势、代价和适用条件。",
+      "expected_cc_entry": "skill",
+      "expected_skill_id": "stock-comparison"
+    },
+    {
+      "id": "stock_comparison_single_metric",
+      "question": "比较贵州茅台和五粮液最新PE谁更高。",
+      "expected_cc_entry": "finance_query",
+      "expected_skill_id": ""
+    },
+    {
+      "id": "technical_structure_trigger",
+      "question": "分析宁德时代近120个交易日的趋势、高低点、量价、关键区域和技术结构失效条件。",
+      "expected_cc_entry": "skill",
+      "expected_skill_id": "technical-structure-analysis"
+    },
+    {
+      "id": "technical_structure_single_indicator",
+      "question": "宁德时代最新20日均线是多少？",
+      "expected_cc_entry": "finance_query",
+      "expected_skill_id": ""
+    },
+    {
+      "id": "dividend_analysis_trigger",
+      "question": "评估中国神华近五年的现金分红连续性、当前股息水平、利润现金流支撑和最大可持续性风险。",
+      "expected_cc_entry": "skill",
+      "expected_skill_id": "dividend-analysis"
+    },
+    {
+      "id": "dividend_analysis_single_record",
+      "question": "中国神华最近一次除权日和每股现金分红是多少？",
+      "expected_cc_entry": "finance_query",
+      "expected_skill_id": ""
+    }
+  ]
+}

@@ -1,0 +1,649 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ page_title or "Skill Studio" }}</title>
+  <style>
+    :root {
+      --bg: #eef2f6;
+      --panel: #ffffff;
+      --panel-soft: #f7f9fb;
+      --line: #dce3e9;
+      --text: #17242d;
+      --muted: #657683;
+      --accent: #1e6a79;
+      --accent-soft: #e5f3f5;
+      --good: #25724a;
+      --warn: #9a651b;
+      --shadow: 0 18px 45px rgba(28, 52, 68, .08);
+      --sans: "PingFang SC", "Noto Sans SC", "Helvetica Neue", sans-serif;
+      --mono: "SFMono-Regular", Menlo, Consolas, monospace;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; color: var(--text); font-family: var(--sans); background: radial-gradient(circle at 92% 4%, rgba(61, 157, 172, .13), transparent 28%), var(--bg); }
+    button, input, textarea { font: inherit; }
+    button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visible, summary:focus-visible { outline: 3px solid rgba(30, 106, 121, .24); outline-offset: 2px; }
+    .shell { min-height: 100vh; display: grid; grid-template-columns: 310px minmax(0, 1fr); }
+    .sidebar { position: sticky; top: 0; height: 100vh; overflow: auto; padding: 24px 18px; border-right: 1px solid var(--line); background: rgba(249, 251, 252, .92); backdrop-filter: blur(18px); }
+    .brand { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 6px; }
+    .brand strong { font-size: 21px; }
+    .preview-badge { color: var(--accent); background: var(--accent-soft); border-radius: 999px; padding: 5px 9px; font-size: 11px; font-weight: 700; }
+    .sidebar-copy { margin: 0 0 16px; color: var(--muted); font-size: 13px; line-height: 1.55; }
+    .search { width: 100%; border: 1px solid var(--line); border-radius: 12px; background: #fff; padding: 10px 12px; color: var(--text); }
+    .skill-list { display: grid; gap: 8px; margin-top: 14px; }
+    .sidebar-section { margin: 22px 0 8px; color: var(--muted); font-size: 11px; font-weight: 750; letter-spacing: .08em; text-transform: uppercase; }
+    .skill-item { width: 100%; text-align: left; border: 1px solid transparent; border-radius: 14px; background: transparent; padding: 12px; cursor: pointer; color: var(--text); }
+    .skill-item:hover { background: #fff; border-color: var(--line); }
+    .skill-item.active { background: var(--panel); border-color: rgba(30, 106, 121, .35); box-shadow: 0 8px 24px rgba(28, 52, 68, .07); }
+    .skill-item strong, .skill-item span { display: block; }
+    .skill-item span { color: var(--muted); margin-top: 5px; font-size: 11px; line-height: 1.4; }
+    .main { width: min(1160px, 100%); margin: 0 auto; padding: 28px; display: grid; gap: 18px; }
+    .panel, .hero { border: 1px solid var(--line); border-radius: 20px; background: var(--panel); box-shadow: var(--shadow); }
+    .hero { padding: 24px; }
+    .hero-top { display: flex; justify-content: space-between; gap: 18px; align-items: flex-start; }
+    .eyebrow { color: var(--accent); font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+    h1 { margin: 7px 0 8px; font-size: clamp(28px, 4vw, 38px); letter-spacing: -.03em; }
+    .lead { max-width: 780px; margin: 0; color: var(--muted); line-height: 1.7; }
+    .actions { display: flex; flex-wrap: wrap; gap: 9px; justify-content: flex-end; }
+    .btn { border: 1px solid var(--line); border-radius: 12px; background: #fff; color: var(--text); padding: 10px 13px; font-weight: 650; cursor: pointer; text-decoration: none; white-space: nowrap; }
+    .btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+    .btn:disabled { cursor: not-allowed; opacity: .5; }
+    .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px; }
+    .chip { border: 1px solid var(--line); border-radius: 999px; background: var(--panel-soft); color: var(--muted); padding: 6px 10px; font-size: 12px; }
+    .chip.good { color: var(--good); background: #edf8f1; border-color: #d5eadc; }
+    .panel { padding: 20px; }
+    .panel-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 15px; }
+    .panel h2 { margin: 0; font-size: 19px; }
+    .panel-subtitle { margin: 5px 0 0; color: var(--muted); font-size: 13px; line-height: 1.5; }
+    .fact-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+    .fact { border: 1px solid var(--line); border-radius: 14px; background: var(--panel-soft); padding: 13px; }
+    .fact span, .fact strong { display: block; }
+    .fact span { color: var(--muted); font-size: 11px; }
+    .fact strong { margin-top: 7px; font-size: 14px; line-height: 1.45; overflow-wrap: anywhere; }
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+    .flow { display: grid; gap: 10px; }
+    .flow-step { display: grid; grid-template-columns: 28px 1fr; gap: 10px; align-items: start; }
+    .flow-step b { width: 28px; height: 28px; display: grid; place-items: center; border-radius: 50%; color: var(--accent); background: var(--accent-soft); font-size: 12px; }
+    .flow-step strong { display: block; font-size: 14px; }
+    .flow-step p { margin: 4px 0 0; color: var(--muted); font-size: 12px; line-height: 1.5; }
+    .markdown { color: #253740; line-height: 1.75; }
+    .markdown h1, .markdown h2, .markdown h3 { letter-spacing: normal; margin: 22px 0 9px; }
+    .markdown h1 { font-size: 24px; }.markdown h2 { font-size: 19px; }.markdown h3 { font-size: 16px; }
+    .markdown p { margin: 8px 0; }.markdown ul { margin: 8px 0; padding-left: 22px; }
+    .markdown pre { overflow: auto; padding: 13px; border-radius: 12px; background: #17242d; color: #edf5f7; font: 12px/1.6 var(--mono); }
+    .reference-list { display: grid; gap: 10px; }
+    .reference { border: 1px solid var(--line); border-radius: 14px; background: var(--panel-soft); overflow: hidden; }
+    .reference summary { cursor: pointer; padding: 13px 14px; font-weight: 650; }
+    .reference-body { padding: 0 14px 14px; border-top: 1px solid var(--line); background: #fff; }
+    .state-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+    .state-card { border: 1px dashed #c9d4dc; border-radius: 14px; padding: 14px; background: #fbfcfd; }
+    .state-card strong { display: block; }.state-card span { display: block; color: var(--muted); font-size: 12px; line-height: 1.5; margin-top: 7px; }
+    .callout { border: 1px solid #edd7b3; border-radius: 14px; padding: 13px 14px; color: #73501b; background: #fff8ea; line-height: 1.55; font-size: 13px; }
+    .status { display: none; padding: 12px 14px; border-radius: 13px; color: #8a2e2e; background: #fff0f0; border: 1px solid #f0d2d2; white-space: pre-wrap; }
+    .status.show { display: block; }
+    .authoring-grid { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px; align-items: end; }
+    .field { display: grid; gap: 7px; }
+    .field label { font-size: 13px; font-weight: 700; }
+    .field small { color: var(--muted); line-height: 1.5; }
+    textarea { width: 100%; min-height: 116px; resize: vertical; border: 1px solid var(--line); border-radius: 14px; padding: 12px 13px; color: var(--text); background: #fff; line-height: 1.6; }
+    .authoring-state { min-height: 20px; margin: 10px 0 0; color: var(--muted); font-size: 13px; }
+    .candidate-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 14px; }
+    .candidate-head h2 { margin: 4px 0 7px; font-size: 26px; }
+    .candidate-head p { margin: 0; color: var(--muted); line-height: 1.6; }
+    .binding-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .binding-list { display: grid; gap: 8px; }
+    .binding-card { border: 1px solid var(--line); border-radius: 12px; padding: 11px 12px; background: var(--panel-soft); }
+    .binding-card strong, .binding-card span { display: block; }
+    .binding-card span { margin-top: 5px; color: var(--muted); font-size: 12px; line-height: 1.5; }
+    .program-flow { display: flex; gap: 8px; align-items: stretch; overflow-x: auto; padding-bottom: 5px; }
+    .program-step { flex: 0 0 190px; border: 1px solid rgba(30, 106, 121, .28); border-radius: 14px; padding: 12px; background: var(--accent-soft); }
+    .program-step b, .program-step span { display: block; }
+    .program-step b { font-size: 13px; }.program-step span { margin-top: 6px; color: var(--muted); font-size: 11px; line-height: 1.45; }
+    .program-arrow { display: grid; place-items: center; color: var(--accent); font-weight: 800; }
+    .raw-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .raw-code { min-height: 230px; max-height: 520px; overflow: auto; margin: 0; padding: 14px; border-radius: 14px; background: #17242d; color: #edf5f7; font: 12px/1.55 var(--mono); white-space: pre-wrap; overflow-wrap: anywhere; }
+    .feedback-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px; align-items: end; margin-top: 16px; }
+    .empty { padding: 42px; text-align: center; color: var(--muted); }
+    .hidden { display: none !important; }
+    @media (max-width: 980px) { .shell { grid-template-columns: 1fr; }.sidebar { position: static; height: auto; border-right: 0; border-bottom: 1px solid var(--line); }.skill-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }.fact-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }.hero-top, .two-col, .raw-grid, .binding-grid { grid-template-columns: 1fr; display: grid; }.actions { justify-content: flex-start; } }
+    @media (max-width: 620px) {
+      .main { padding: 14px; }
+      .sidebar { padding: 18px 14px 14px; }
+      .skill-list { display: flex; overflow-x: auto; gap: 8px; padding-bottom: 5px; scroll-snap-type: x proximity; }
+      .skill-item { flex: 0 0 210px; scroll-snap-align: start; }
+      .fact-grid, .state-grid { grid-template-columns: 1fr; }
+      .authoring-grid, .feedback-row { grid-template-columns: 1fr; }
+      .hero, .panel { border-radius: 16px; }
+      .hero { padding: 18px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <aside class="sidebar">
+      <div class="brand"><strong>Skill Studio</strong><span class="preview-badge">Preview</span></div>
+      <p class="sidebar-copy">创建新的 CC-native Skill 候选，并查看 Finance CC 当前真正可用的方法。候选不会自动发布。</p>
+      <div class="sidebar-section">我的候选</div>
+      <div id="candidateList" class="skill-list" aria-live="polite"></div>
+      <div class="sidebar-section">已发布方法</div>
+      <input id="skillSearch" class="search" type="search" placeholder="搜索名称、用途或分类" aria-label="搜索 Skill">
+      <div id="skillList" class="skill-list" aria-live="polite"></div>
+    </aside>
+
+    <main class="main">
+      <div id="status" class="status" role="alert"></div>
+      <section class="panel" aria-labelledby="authoringTitle">
+        <div class="panel-head">
+          <div>
+            <h2 id="authoringTitle">用自然语言构建 Skill</h2>
+            <p class="panel-subtitle">描述目标与处理流程；CC 会结合当前真实 Tool 和已发布 Skill 生成一个私有 candidate revision。</p>
+          </div>
+        </div>
+        <div class="authoring-grid">
+          <div class="field">
+            <label for="skillRequirement">你想让这个 Skill 如何工作？</label>
+            <textarea id="skillRequirement" maxlength="12000" placeholder="例如：我想做一个个股分析 Skill。先确认公司和时间范围，再获取行情、财务、估值和新闻证据，最后输出核心结论、风险与需要继续验证的问题。"></textarea>
+            <small>不必指定 Tool 或子 Skill；系统只会从当前注册表中选择真实可用的能力。</small>
+          </div>
+          <button id="createCandidateBtn" class="btn primary" type="button">生成候选</button>
+        </div>
+        <p id="authoringState" class="authoring-state" aria-live="polite"></p>
+      </section>
+
+      <div id="candidateDetail" class="hidden">
+        <section class="hero">
+          <div class="candidate-head">
+            <div>
+              <div class="eyebrow">Private CC-native candidate</div>
+              <h2 id="candidateDisplayName">Skill candidate</h2>
+              <p id="candidateDescription"></p>
+            </div>
+            <div id="candidateChips" class="chips"></div>
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-head"><div><h2>工作程序图</h2><p class="panel-subtitle">图由候选的有序步骤和能力绑定派生，不是另一套需要手工维护的协议。</p></div></div>
+          <div id="candidateProgramFlow" class="program-flow"></div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-head"><div><h2>能力接入</h2><p class="panel-subtitle">模型负责建议；系统只保留当前本地注册表中可解析的 Tool 和相关 Skill。</p></div></div>
+          <div class="binding-grid">
+            <div><h3>Tools</h3><div id="candidateTools" class="binding-list"></div></div>
+            <div><h3>相关 Skills</h3><div id="candidateSkills" class="binding-list"></div></div>
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-head"><div><h2>原始候选资产</h2><p class="panel-subtitle">当前 Studio 先直接展示完整 SKILL.md 和 Mermaid 源码，后续再优化编辑体验。</p></div></div>
+          <div class="raw-grid">
+            <div class="field"><strong>SKILL.md</strong><pre id="candidateMarkdownRaw" class="raw-code" tabindex="0" aria-label="SKILL.md 原始内容"></pre></div>
+            <div class="field"><strong>flowchart.mmd</strong><pre id="candidateFlowRaw" class="raw-code" tabindex="0" aria-label="Mermaid 流程图原始内容"></pre></div>
+          </div>
+          <div class="feedback-row">
+            <div class="field">
+              <label for="candidateFeedback">继续用自然语言修改</label>
+              <textarea id="candidateFeedback" maxlength="8000" placeholder="例如：把估值放到财务质量之后；新闻只看近 30 天；最后增加反方证据。"></textarea>
+            </div>
+            <button id="reviseCandidateBtn" class="btn primary" type="button">生成新 revision</button>
+          </div>
+          <p id="revisionState" class="authoring-state" aria-live="polite"></p>
+        </section>
+      </div>
+
+      <div id="empty" class="panel empty">正在读取 Skill Hub…</div>
+      <div id="detail" class="hidden">
+        <section class="hero">
+          <div class="hero-top">
+            <div>
+              <div id="skillType" class="eyebrow">CC-native business method</div>
+              <h1 id="displayName">Skill</h1>
+              <p id="description" class="lead"></p>
+            </div>
+            <div class="actions">
+              <button id="copyPromptBtn" class="btn" type="button">复制对话提示</button>
+              <button id="chatBtn" class="btn primary" type="button">带入对话</button>
+            </div>
+          </div>
+          <div id="heroChips" class="chips"></div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-head"><div><h2>方法定位</h2><p class="panel-subtitle">先看它解决什么问题，再决定是否展开完整方法。</p></div></div>
+          <div id="factGrid" class="fact-grid"></div>
+        </section>
+
+        <section class="two-col">
+          <article class="panel">
+            <div class="panel-head"><div><h2>在对话中的工作方式</h2><p class="panel-subtitle">Skill 提供专业方法，Finance CC 仍持有会话、Tool 与最终表达。</p></div></div>
+            <div class="flow">
+              <div class="flow-step"><b>1</b><div><strong>识别专业任务</strong><p>普通事实查询不强行加载；专业多步骤问题才选择 Skill。</p></div></div>
+              <div class="flow-step"><b>2</b><div><strong>加载自然语言方法</strong><p>先加载 SKILL.md，只在需要时展开 reference。</p></div></div>
+              <div class="flow-step"><b>3</b><div><strong>受控调用 Tool</strong><p>金融数据和计算仍由正式 Tool 完成，Skill 不自行制造数值。</p></div></div>
+              <div class="flow-step"><b>4</b><div><strong>智能呈现结果</strong><p>对话中展示核心结论、证据与下一步，详细方法留在 Studio。</p></div></div>
+            </div>
+          </article>
+          <article class="panel">
+            <div class="panel-head"><div><h2>运行控制</h2><p class="panel-subtitle">这些是发布快照的派生视图，不是另一套 Skill DSL。</p></div></div>
+            <div id="controlGrid" class="fact-grid"></div>
+          </article>
+        </section>
+
+        <section id="legacyNotice" class="callout hidden"></section>
+
+        <section id="methodPanel" class="panel">
+          <div class="panel-head"><div><h2>自然语言方法</h2><p class="panel-subtitle">这是 CC 实际加载的 SKILL.md；系统没有把业务表达拆成固定输出字段。</p></div></div>
+          <div id="methodBody" class="markdown"></div>
+        </section>
+
+        <section id="referencePanel" class="panel">
+          <div class="panel-head"><div><h2>渐进式参考资料</h2><p class="panel-subtitle">只有展开某一项时才读取内容，避免把所有专业资料塞进每次对话。</p></div></div>
+          <div id="referenceList" class="reference-list"></div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-head"><div><h2>创建、测试与发布</h2><p class="panel-subtitle">当前纵切面先解决“用户能看见、看懂、带入对话”。</p></div></div>
+          <div class="state-grid">
+            <div class="state-card"><strong>自然语言创建</strong><span>待接入 `/create_skill` 与 Skill Creator，会生成 candidate，而不是直接覆盖 active。</span></div>
+            <div class="state-card"><strong>测试与对比</strong><span>待绑定 revision 运行测试，并比较 with-skill / without-skill 的质量、成本与延迟。</span></div>
+            <div class="state-card"><strong>发布与回滚</strong><span>待 active/candidate 持久化完成后开放；当前页面不会假装已经支持写入。</span></div>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    const initialSkillName = {{ initial_skill_name|tojson }};
+    const initialCatalogId = {{ initial_catalog_id|tojson }};
+    const apiCatalogUrl = {{ api_catalog_url|tojson }};
+    const apiDetailBaseUrl = {{ api_detail_base_url|tojson }};
+    const apiCandidateBaseUrl = {{ api_candidate_base_url|tojson }};
+    const assistantUrl = {{ assistant_url|tojson }};
+    const appRoot = (() => {
+      const marker = "/skills";
+      const index = window.location.pathname.indexOf(marker);
+      return index >= 0 ? window.location.pathname.slice(0, index) : "";
+    })();
+    const resolveUrl = (value) => {
+      const url = String(value || "");
+      if (!url || /^https?:\/\//.test(url)) return url;
+      if (url.startsWith(appRoot + "/")) return url;
+      return `${appRoot}/${url.replace(/^\/+/, "")}`;
+    };
+    const state = { items: [], candidates: [], selected: null, detail: null, currentCandidate: null };
+
+    function setStatus(message) {
+      const node = document.getElementById("status");
+      node.textContent = String(message || "");
+      node.classList.toggle("show", Boolean(message));
+    }
+
+    async function fetchJson(url, options) {
+      const response = await fetch(url, options || {});
+      const text = await response.text();
+      let payload = null;
+      try { payload = text ? JSON.parse(text) : {}; } catch (_) { throw new Error(`接口未返回 JSON：${response.status}`); }
+      if (!response.ok || payload.ok === false) throw new Error(payload.error || `HTTP ${response.status}`);
+      return payload;
+    }
+
+    function appendText(parent, tag, value, className) {
+      const node = document.createElement(tag);
+      if (className) node.className = className;
+      node.textContent = String(value ?? "");
+      parent.appendChild(node);
+      return node;
+    }
+
+    function renderMarkdown(root, markdown) {
+      root.replaceChildren();
+      const lines = String(markdown || "").replace(/\r\n/g, "\n").split("\n");
+      let list = null;
+      let code = null;
+      for (const raw of lines) {
+        const line = raw.trimEnd();
+        if (line.startsWith("```")) {
+          if (code) { root.appendChild(code); code = null; } else { code = document.createElement("pre"); }
+          list = null;
+          continue;
+        }
+        if (code) { code.textContent += `${raw}\n`; continue; }
+        if (!line.trim()) { list = null; continue; }
+        const heading = line.match(/^(#{1,3})\s+(.+)$/);
+        if (heading) { list = null; appendText(root, `h${heading[1].length}`, heading[2]); continue; }
+        const bullet = line.match(/^[-*+]\s+(.+)$/);
+        if (bullet) {
+          if (!list) { list = document.createElement("ul"); root.appendChild(list); }
+          appendText(list, "li", bullet[1]);
+          continue;
+        }
+        list = null;
+        appendText(root, "p", line);
+      }
+      if (code) root.appendChild(code);
+    }
+
+    function chip(root, value, good) {
+      appendText(root, "span", value, `chip${good ? " good" : ""}`);
+    }
+
+    function fact(root, label, value) {
+      const node = document.createElement("div");
+      node.className = "fact";
+      appendText(node, "span", label);
+      appendText(node, "strong", value || "—");
+      root.appendChild(node);
+    }
+
+    function filteredItems() {
+      const query = String(document.getElementById("skillSearch").value || "").trim().toLowerCase();
+      if (!query) return state.items;
+      return state.items.filter((item) => [item.display_name, item.skill_name, item.purpose, item.category].join(" ").toLowerCase().includes(query));
+    }
+
+    function renderSkillList() {
+      const root = document.getElementById("skillList");
+      root.replaceChildren();
+      for (const item of filteredItems()) {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = `skill-item${state.selected && state.selected.catalog_id === item.catalog_id ? " active" : ""}`;
+        appendText(button, "strong", item.display_name || item.skill_name);
+        appendText(button, "span", item.skill_type === "business_method" ? "Finance CC 专业方法" : "历史 compiled Skill");
+        button.addEventListener("click", () => loadDetail(item));
+        root.appendChild(button);
+      }
+      if (!root.children.length) appendText(root, "div", "没有匹配的 Skill", "sidebar-copy");
+    }
+
+    function candidateSummary(candidate) {
+      const control = candidate?.control_manifest || {};
+      return {
+        skill_id: candidate.skill_id,
+        display_name: candidate.display_name,
+        description: candidate.description,
+        revision_no: candidate.revision_no,
+        candidate_revision_no: candidate.candidate_revision_no || candidate.revision_no,
+        change_summary: candidate.change_summary,
+        created_at: candidate.created_at,
+        tool_count: Array.isArray(control.tool_connections) ? control.tool_connections.length : candidate.tool_count || 0,
+        related_skill_count: Array.isArray(control.related_skills) ? control.related_skills.length : candidate.related_skill_count || 0,
+        workflow_step_count: Array.isArray(control.workflow_steps) ? control.workflow_steps.length : candidate.workflow_step_count || 0,
+      };
+    }
+
+    function renderCandidateList() {
+      const root = document.getElementById("candidateList");
+      root.replaceChildren();
+      for (const item of state.candidates) {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = `skill-item${state.currentCandidate?.skill_id === item.skill_id ? " active" : ""}`;
+        appendText(button, "strong", item.display_name || item.skill_id);
+        appendText(button, "span", `candidate r${item.candidate_revision_no || item.revision_no || 1} · ${item.tool_count || 0} Tools`);
+        button.addEventListener("click", () => loadCandidate(item));
+        root.appendChild(button);
+      }
+      if (!root.children.length) appendText(root, "div", "还没有私有候选", "sidebar-copy");
+    }
+
+    function renderBindings(rootId, items, idField, emptyText) {
+      const root = document.getElementById(rootId);
+      root.replaceChildren();
+      for (const item of items || []) {
+        const card = document.createElement("div");
+        card.className = "binding-card";
+        appendText(card, "strong", item[idField] || "—");
+        appendText(card, "span", item.purpose || "已解析的候选能力");
+        root.appendChild(card);
+      }
+      if (!root.children.length) appendText(root, "div", emptyText, "sidebar-copy");
+    }
+
+    function renderCandidate(candidate) {
+      state.currentCandidate = candidate;
+      state.selected = null;
+      state.detail = null;
+      document.getElementById("empty").classList.add("hidden");
+      document.getElementById("detail").classList.add("hidden");
+      document.getElementById("candidateDetail").classList.remove("hidden");
+      document.getElementById("candidateDisplayName").textContent = String(candidate.display_name || candidate.skill_id || "Skill candidate");
+      document.getElementById("candidateDescription").textContent = String(candidate.description || "");
+      const chips = document.getElementById("candidateChips");
+      chips.replaceChildren();
+      chip(chips, `revision ${candidate.revision_no || 1}`, true);
+      chip(chips, candidate.published ? "published" : "candidate only");
+      chip(chips, String(candidate.content_hash || "").slice(0, 10) || "no hash");
+
+      const control = candidate.control_manifest || {};
+      renderBindings("candidateTools", control.tool_connections || [], "tool_name", "这个候选不需要额外 Tool。 ");
+      renderBindings("candidateSkills", control.related_skills || [], "skill_id", "没有组合其他已发布 Skill。 ");
+
+      const flowRoot = document.getElementById("candidateProgramFlow");
+      flowRoot.replaceChildren();
+      const steps = Array.isArray(control.workflow_steps) ? control.workflow_steps : [];
+      steps.forEach((step, index) => {
+        if (index) appendText(flowRoot, "div", "→", "program-arrow");
+        const node = document.createElement("div");
+        node.className = "program-step";
+        appendText(node, "b", `${index + 1}. ${step.title || step.id || "步骤"}`);
+        appendText(node, "span", step.instruction || "");
+        if (Array.isArray(step.uses) && step.uses.length) appendText(node, "span", step.uses.join(" · "));
+        flowRoot.appendChild(node);
+      });
+      if (!steps.length) appendText(flowRoot, "div", "候选暂无工作步骤。", "sidebar-copy");
+      document.getElementById("candidateMarkdownRaw").textContent = String(candidate.skill_markdown || "");
+      document.getElementById("candidateFlowRaw").textContent = String(candidate.flowchart?.source || "");
+      document.getElementById("candidateFeedback").value = "";
+      document.getElementById("revisionState").textContent = String(candidate.change_summary || "");
+      renderCandidateList();
+      renderSkillList();
+    }
+
+    async function loadCandidate(item) {
+      setStatus("");
+      try {
+        const revision = item.candidate_revision_no || item.revision_no || 1;
+        const url = `${resolveUrl(apiCandidateBaseUrl)}/${encodeURIComponent(item.skill_id)}/revisions/${encodeURIComponent(revision)}`;
+        const payload = await fetchJson(url);
+        renderCandidate(payload.candidate || {});
+        document.getElementById("candidateDetail").scrollIntoView({ behavior: "smooth", block: "start" });
+      } catch (error) {
+        setStatus(String(error.message || error));
+      }
+    }
+
+    function renderReferences(detail) {
+      const panel = document.getElementById("referencePanel");
+      const root = document.getElementById("referenceList");
+      root.replaceChildren();
+      const references = Array.isArray(detail.references) ? detail.references : [];
+      panel.classList.toggle("hidden", !references.length);
+      for (const reference of references) {
+        const details = document.createElement("details");
+        details.className = "reference";
+        const summary = document.createElement("summary");
+        summary.textContent = String(reference.title || reference.path || "参考资料");
+        const body = document.createElement("div");
+        body.className = "reference-body markdown";
+        appendText(body, "p", "展开后加载…");
+        let loaded = false;
+        details.append(summary, body);
+        details.addEventListener("toggle", async () => {
+          if (!details.open || loaded) return;
+          loaded = true;
+          try {
+            const path = String(reference.path || "").split("/").map(encodeURIComponent).join("/");
+            const url = `${resolveUrl(apiDetailBaseUrl)}/${encodeURIComponent(detail.skill_id)}/references/${path}?revision=${encodeURIComponent(detail.revision || "")}`;
+            const payload = await fetchJson(url);
+            renderMarkdown(body, payload.content || "");
+          } catch (error) {
+            body.replaceChildren();
+            appendText(body, "p", String(error.message || error));
+          }
+        });
+        root.appendChild(details);
+      }
+    }
+
+    function renderDetail(detail) {
+      state.detail = detail;
+      state.currentCandidate = null;
+      document.getElementById("empty").classList.add("hidden");
+      document.getElementById("candidateDetail").classList.add("hidden");
+      document.getElementById("detail").classList.remove("hidden");
+      document.getElementById("displayName").textContent = String(detail.display_name || detail.skill_name || "Skill");
+      document.getElementById("description").textContent = String(detail.description || detail.purpose || "");
+      document.getElementById("skillType").textContent = detail.skill_type === "business_method" ? "CC-native business method" : "Legacy compiled Skill";
+
+      const chips = document.getElementById("heroChips");
+      chips.replaceChildren();
+      chip(chips, detail.category || "未分类");
+      chip(chips, detail.owner || "system");
+      chip(chips, detail.availability?.lifecycle || "active", true);
+      chip(chips, detail.editable ? "可编辑" : "只读快照");
+
+      const facts = document.getElementById("factGrid");
+      facts.replaceChildren();
+      fact(facts, "Skill ID", detail.skill_id || detail.skill_name);
+      fact(facts, "选择方式", detail.invocation_mode === "finance_cc_preference" ? "Finance CC 语义选择" : detail.invocation_mode);
+      fact(facts, "当前修订", String(detail.revision || detail.snapshot_revision || "兼容资产").slice(0, 12));
+      fact(facts, "参考资料", `${Array.isArray(detail.references) ? detail.references.length : 0} 份`);
+
+      const controls = detail.controls || {};
+      const controlGrid = document.getElementById("controlGrid");
+      controlGrid.replaceChildren();
+      fact(controlGrid, "执行预算", controls.execution_budget || "由运行时决定");
+      fact(controlGrid, "Web Search", controls.web_search_enabled ? "允许按需使用" : "未申请补充权限");
+      fact(controlGrid, "补充 Tool", `${Array.isArray(controls.supplemental_tools) ? controls.supplemental_tools.length : 0} 个`);
+      fact(controlGrid, "最终控制", "Finance CC");
+
+      const legacy = detail.skill_type !== "business_method";
+      document.getElementById("legacyNotice").classList.toggle("hidden", !legacy);
+      document.getElementById("legacyNotice").textContent = String(detail.migration_note || "");
+      document.getElementById("methodPanel").classList.toggle("hidden", legacy || !detail.skill_markdown);
+      document.getElementById("chatBtn").disabled = legacy;
+      document.getElementById("copyPromptBtn").disabled = legacy;
+      renderMarkdown(document.getElementById("methodBody"), detail.skill_markdown || "");
+      renderReferences(detail);
+      renderCandidateList();
+    }
+
+    async function loadDetail(item) {
+      setStatus("");
+      state.selected = item;
+      renderSkillList();
+      const url = `${resolveUrl(apiDetailBaseUrl)}/${encodeURIComponent(item.skill_name)}?catalog_id=${encodeURIComponent(item.catalog_id || "")}`;
+      try {
+        const payload = await fetchJson(url);
+        renderDetail(payload.skill || {});
+        const next = `${appRoot}/skills/studio/${encodeURIComponent(item.skill_name)}?catalog_id=${encodeURIComponent(item.catalog_id || "")}`;
+        window.history.replaceState({}, "", next);
+      } catch (error) {
+        setStatus(String(error.message || error));
+      }
+    }
+
+    function dialoguePrompt() {
+      const detail = state.detail || {};
+      const displayName = detail.display_name || detail.skill_name || "该 Skill";
+      return `请按照“${displayName}”这一专业方法，围绕我的问题进行分析：`;
+    }
+
+    document.getElementById("skillSearch").addEventListener("input", renderSkillList);
+    document.getElementById("copyPromptBtn").addEventListener("click", async () => {
+      try { await navigator.clipboard.writeText(dialoguePrompt()); } catch (_) { setStatus("浏览器未允许复制，请使用“带入对话”。"); }
+    });
+    document.getElementById("chatBtn").addEventListener("click", () => {
+      window.sessionStorage.setItem("fin_agent.pending_prompt", dialoguePrompt());
+      window.location.href = resolveUrl(assistantUrl);
+    });
+
+    document.getElementById("createCandidateBtn").addEventListener("click", async () => {
+      const button = document.getElementById("createCandidateBtn");
+      const stateNode = document.getElementById("authoringState");
+      const requirement = String(document.getElementById("skillRequirement").value || "").trim();
+      if (!requirement) {
+        stateNode.textContent = "请先描述 Skill 的目标和处理流程。";
+        return;
+      }
+      button.disabled = true;
+      stateNode.textContent = "CC 正在理解方法、匹配本地能力并生成候选…";
+      setStatus("");
+      try {
+        const payload = await fetchJson(resolveUrl(apiCandidateBaseUrl), {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ requirement }),
+        });
+        const candidate = payload.candidate || {};
+        state.candidates = [candidateSummary(candidate), ...state.candidates.filter((item) => item.skill_id !== candidate.skill_id)];
+        stateNode.textContent = `已生成 ${candidate.skill_id || "Skill"} revision ${candidate.revision_no || 1}，尚未发布。`;
+        renderCandidate(candidate);
+      } catch (error) {
+        stateNode.textContent = "";
+        setStatus(String(error.message || error));
+      } finally {
+        button.disabled = false;
+      }
+    });
+
+    document.getElementById("reviseCandidateBtn").addEventListener("click", async () => {
+      const candidate = state.currentCandidate;
+      const button = document.getElementById("reviseCandidateBtn");
+      const stateNode = document.getElementById("revisionState");
+      const feedback = String(document.getElementById("candidateFeedback").value || "").trim();
+      if (!candidate || !candidate.skill_id) return;
+      if (!feedback) {
+        stateNode.textContent = "请先写下这次希望修改的内容。";
+        return;
+      }
+      button.disabled = true;
+      stateNode.textContent = "CC 正在基于当前 revision 生成一次增量修改…";
+      setStatus("");
+      try {
+        const url = `${resolveUrl(apiCandidateBaseUrl)}/${encodeURIComponent(candidate.skill_id)}/revisions`;
+        const payload = await fetchJson(url, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ feedback, base_revision_no: candidate.revision_no }),
+        });
+        const revised = payload.candidate || {};
+        state.candidates = [candidateSummary(revised), ...state.candidates.filter((item) => item.skill_id !== revised.skill_id)];
+        renderCandidate(revised);
+        stateNode.textContent = `已生成 revision ${revised.revision_no}，旧 revision 保持不变。`;
+      } catch (error) {
+        stateNode.textContent = "";
+        setStatus(String(error.message || error));
+      } finally {
+        button.disabled = false;
+      }
+    });
+
+    async function start() {
+      const [payload, candidatePayload] = await Promise.all([
+        fetchJson(resolveUrl(apiCatalogUrl)),
+        fetchJson(resolveUrl(apiCandidateBaseUrl)).catch((error) => {
+          document.getElementById("authoringState").textContent = `候选列表暂不可用：${String(error.message || error)}`;
+          return { items: [] };
+        }),
+      ]);
+      state.items = Array.isArray(payload.items) ? payload.items : [];
+      state.candidates = Array.isArray(candidatePayload.items) ? candidatePayload.items : [];
+      renderCandidateList();
+      renderSkillList();
+      const selected = state.items.find((item) => item.catalog_id === initialCatalogId)
+        || state.items.find((item) => item.skill_name === initialSkillName && item.skill_type === "business_method")
+        || state.items.find((item) => item.skill_type === "business_method")
+        || state.items[0];
+      if (selected) await loadDetail(selected);
+      else document.getElementById("empty").textContent = "Skill Hub 当前为空。";
+    }
+
+    start().catch((error) => setStatus(String(error.message || error)));
+  </script>
+</body>
+</html>

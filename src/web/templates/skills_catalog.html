@@ -89,10 +89,7 @@
     <section class="hero">
       <div>
         <h1>Skills</h1>
-        <p>列表页直接控制在用/下线和是否参与搜索。点击 skill 名称进入 studio，查看和修改全部字段。</p>
-      </div>
-      <div class="toolbar">
-        <a id="studioLink" class="btn" href="#">打开 Skill Studio</a>
+        <p>统一查看 Finance CC 专业方法与历史 compiled Skill。两类 Skill 的执行路径保持隔离；当前页面只承担发现，不把 CC 方法送入旧 Runner。</p>
       </div>
     </section>
 
@@ -150,41 +147,105 @@
       await loadCatalog();
     }
 
+    function textElement(tagName, className, value) {
+      const element = document.createElement(tagName);
+      if (className) element.className = className;
+      element.textContent = String(value ?? "");
+      return element;
+    }
+
+    function switchButton(action, enabled, label) {
+      const button = document.createElement("button");
+      button.className = `switch ${enabled ? "on" : ""}`;
+      button.dataset.action = action;
+      button.type = "button";
+      button.appendChild(textElement("span", "switch-track", ""));
+      button.appendChild(textElement("span", "switch-label", label));
+      return button;
+    }
+
     function render(items) {
       currentItems = items || [];
       const root = document.getElementById("skillGrid");
-      root.innerHTML = "";
+      root.replaceChildren();
       for (const item of currentItems) {
         const availability = item.availability || {};
         const lifecycle = String(availability.lifecycle || "active");
         const retrievalMode = String(availability.retrieval_mode || "retrievable");
+        const skillType = String(item.skill_type || "legacy_compiled");
+        const isLegacy = skillType === "legacy_compiled";
+        const isEditable = Boolean(item.editable);
+        const title = String(item.display_name || item.skill_name || "-");
         const node = document.createElement("div");
         node.className = "card";
-        node.innerHTML = `
-          <a class="title" href="${resolvedSkillStudioBaseUrl}/${encodeURIComponent(item.skill_name || "")}">${String(item.skill_name || "-")}</a>
-          <div class="muted">${String(item.purpose || item.description || "")}</div>
-          <div class="chips">
-            <div class="chip">${String(item.owner || "system")}</div>
-            <div class="chip">${String(item.auth || "public")}</div>
-            <div class="chip">${String(item.tool_mode || "strict")}</div>
-            <div class="chip">${String((item.tools || []).length)} tools</div>
-            <div class="chip">${String(item.example_count || 0)} examples</div>
-          </div>
-          <div class="actions">
-            <button class="switch ${lifecycle === "active" ? "on" : ""}" data-action="lifecycle" type="button"><span class="switch-track"></span><span class="switch-label">${lifecycle === "active" ? "在用" : "下线"}</span></button>
-            <button class="switch ${retrievalMode === "retrievable" ? "on" : ""}" data-action="retrieval" type="button"><span class="switch-track"></span><span class="switch-label">${retrievalMode === "retrievable" ? "参与搜索" : "不参与搜索"}</span></button>
-          </div>
-        `;
-        node.querySelector('[data-action="lifecycle"]').addEventListener("click", async (e) => {
-          e.preventDefault();
-          const next = lifecycle === "active" ? "retired" : "active";
-          try { await updateAvailability(item.skill_name, { lifecycle: next }); } catch (err) { setStatus(String(err.message || err)); }
-        });
-        node.querySelector('[data-action="retrieval"]').addEventListener("click", async (e) => {
-          e.preventDefault();
-          const next = retrievalMode === "retrievable" ? "direct_only" : "retrievable";
-          try { await updateAvailability(item.skill_name, { retrieval_mode: next }); } catch (err) { setStatus(String(err.message || err)); }
-        });
+
+        if (item.workspace_url) {
+          const titleLink = textElement("a", "title", title);
+          titleLink.href = resolveUrl(String(item.workspace_url));
+          node.appendChild(titleLink);
+        } else {
+          node.appendChild(textElement("div", "title", title));
+        }
+        node.appendChild(
+          textElement("div", "muted", item.purpose || item.description || "")
+        );
+
+        const chips = document.createElement("div");
+        chips.className = "chips";
+        for (const value of [
+          skillType,
+          item.invocation_mode || "-",
+          item.owner || "system",
+          item.auth || "public",
+          item.tool_mode || "strict",
+          `${(item.tools || []).length} tools`,
+          `${item.example_count || 0} examples`,
+        ]) {
+          chips.appendChild(textElement("div", "chip", value));
+        }
+        node.appendChild(chips);
+
+        const actions = document.createElement("div");
+        actions.className = "actions";
+        if (isLegacy && isEditable) {
+          const lifecycleButton = switchButton(
+            "lifecycle",
+            lifecycle === "active",
+            lifecycle === "active" ? "在用" : "下线",
+          );
+          const retrievalButton = switchButton(
+            "retrieval",
+            retrievalMode === "retrievable",
+            retrievalMode === "retrievable" ? "参与搜索" : "不参与搜索",
+          );
+          lifecycleButton.addEventListener("click", async (e) => {
+            e.preventDefault();
+            const next = lifecycle === "active" ? "retired" : "active";
+            try { await updateAvailability(item.skill_name, { lifecycle: next }); } catch (err) { setStatus(String(err.message || err)); }
+          });
+          retrievalButton.addEventListener("click", async (e) => {
+            e.preventDefault();
+            const next = retrievalMode === "retrievable" ? "direct_only" : "retrievable";
+            try { await updateAvailability(item.skill_name, { retrieval_mode: next }); } catch (err) { setStatus(String(err.message || err)); }
+          });
+          actions.append(lifecycleButton, retrievalButton);
+        } else {
+          if (item.workspace_url) {
+            const detailLink = textElement("a", "btn", "查看方法");
+            detailLink.href = resolveUrl(String(item.workspace_url));
+            actions.appendChild(detailLink);
+          }
+          actions.appendChild(
+            textElement(
+              "span",
+              "muted",
+              isLegacy
+                ? "历史兼容资产；新 Studio 只展示目录身份。"
+                : "可查看已发布方法；由 Finance CC 按专业问题选择。",
+            )
+          );
+        }
+        node.appendChild(actions);
         root.appendChild(node);
       }
     }
@@ -194,7 +255,6 @@
       render(payload.items || []);
     }
 
-    document.getElementById("studioLink").href = resolvedSkillStudioBaseUrl;
     loadCatalog().catch((err) => setStatus(String(err.message || err)));
   </script>
 </body>

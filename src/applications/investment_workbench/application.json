@@ -23,14 +23,11 @@
     "市场分析",
     "任务"
   ],
-  "assistant_agent": "default_assistant",
-  "default_agents": [
-    "investment_analyst"
-  ],
+  "default_agent": "investment_analyst",
   "available_agents": [
     "default_assistant",
     "investment_analyst",
-    "system_agent"
+    "education_research_agent"
   ],
   "default_skills": [],
   "default_tools": [],

@@ -1,0 +1,4 @@
+interface:
+  display_name: "个股对比"
+  short_description: "围绕同一决策问题比较多只股票的关键差异、代价与条件"
+  default_prompt: "Use $stock-comparison to compare these stocks on consistent evidence and decision-relevant tradeoffs."

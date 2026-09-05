@@ -321,7 +321,45 @@ def test_margin_context_exposes_base_and_kday_api():
 
     assert "`stock.margin`" in sections["available_apis"]
     assert "`stock.margin.kd_<field>_<method>`" in sections["available_apis"]
+    assert "r1 = stock.margin(" in sections["available_apis"]
+    assert "r1 = stock.margin.kd_financing_net_buy_sum(" in sections["available_apis"]
+    assert "operation_guidance" in sections["available_apis"]
+    assert "查询融资融券历史明细时同时传start和end" in sections["available_apis"]
+    assert "K 日窗口方法使用 stock.margin.kd_<field>_<method>" in sections["available_apis"]
+    assert "fund.quote" not in sections["available_apis"]
     assert "financing_balance: sum, avg, max, min, median, change, pct_change" in sections["current_dataview"]
+    assert "financing_balance: 融资余额（元）" in sections["current_dataview"]
+
+
+def test_finance_catalog_context_exposes_verified_field_units():
+    quote_sections = context_builder.build_context_sections(
+        step=Step(
+            step_id="S1",
+            subject="stock",
+            dataview="quote",
+            condition_desc="查询成交额和成交量",
+            raw="S1 | stock | quote | 查询成交额和成交量",
+        ),
+        previous_results={},
+        result_id="r1",
+    )
+    fund_sections = context_builder.build_context_sections(
+        step=Step(
+            step_id="S2",
+            subject="fund",
+            dataview="quote",
+            condition_desc="查询基金折价和份额",
+            raw="S2 | fund | quote | 查询基金折价和份额",
+        ),
+        previous_results={},
+        result_id="r2",
+    )
+
+    assert "amount: 成交额（元；mode=1时为该分钟K区间成交额，mode=2时为截至快照的当日累计成交额）" in quote_sections["current_dataview"]
+    assert "volumn: 成交量（mode=0：股；mode=1：该分钟K区间成交量；mode=2：截至快照的当日累计成交量）" in quote_sections["current_dataview"]
+    assert "pct: 涨跌幅（%，3.5%记为3.5）" in quote_sections["current_dataview"]
+    assert "discount: 折价额（元，单位净值-收盘价）" in fund_sections["current_dataview"]
+    assert "unit_total: 基金份额（份）" in fund_sections["current_dataview"]
 
 
 def test_aggregation_step_can_see_run_result_handles():

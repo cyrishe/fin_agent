@@ -1,0 +1,73 @@
+{
+  "version": "v1",
+  "description": "investment_analyst normal_qa 下由 Financial QA CC 自然调用金融数据查询的代表性问题。",
+  "tool_scope": "finance_query_only",
+  "cases": [
+    {
+      "id": "realtime_quote",
+      "turns": ["宁德时代现在的价格、开盘价、最高价、最低价和成交额分别是多少？"],
+      "expects_finance_query": true,
+      "focus": ["stock.quote", "实时行情", "时间与单位"]
+    },
+    {
+      "id": "maotai_open_close",
+      "turns": ["贵州茅台最近一个交易日的开盘价和收盘价是多少？"],
+      "expects_finance_query": true,
+      "focus": ["stock.quote", "最近交易日"]
+    },
+    {
+      "id": "quote_window_metrics",
+      "turns": ["贵州茅台最新收盘价和涨跌幅是多少？再给我最近5个交易日累计涨幅和最近10个交易日的最高收盘价。"],
+      "expects_finance_query": true,
+      "focus": ["stock.quote", "固定K日方法", "多步查询"]
+    },
+    {
+      "id": "margin_balance",
+      "turns": ["比较宁德时代和比亚迪最新的融资余额、融资净买入额，并注明数据日期和单位。"],
+      "expects_finance_query": true,
+      "focus": ["stock.margin", "比较"]
+    },
+    {
+      "id": "raised_funds",
+      "turns": ["查询宁德时代最近一次增发中的募集资金总额，并说明公告日期。"],
+      "expects_finance_query": true,
+      "focus": ["stock.corporate_action", "增发募资额不等于融资余额"]
+    },
+    {
+      "id": "valuation_compare",
+      "turns": ["比较贵州茅台和五粮液最新的市盈率和市净率。"],
+      "expects_finance_query": true,
+      "focus": ["stock.pricevalue", "比较"]
+    },
+    {
+      "id": "entity_followup",
+      "turns": [
+        "贵州茅台最近一个交易日的开盘价是多少？",
+        "那五粮液呢？"
+      ],
+      "expects_finance_query": true,
+      "focus": ["会话实体承接", "stock.quote"]
+    },
+    {
+      "id": "ordinal_followup",
+      "turns": [
+        "先比较宁德时代和比亚迪最新的收盘价。",
+        "第二个公司的融资余额呢？"
+      ],
+      "expects_finance_query": true,
+      "focus": ["序数指代", "stock.margin"]
+    },
+    {
+      "id": "cross_result_dependency",
+      "turns": ["找出最近5个交易日涨幅最高的3个板块，并给出每个板块成分股今天的总成交额。"],
+      "expects_finance_query": true,
+      "focus": ["plate.quote", "plate.constitution", "rN.column"]
+    },
+    {
+      "id": "empty_result",
+      "turns": ["查询一个不存在的证券“测试股份999999”的最近交易日收盘价。"],
+      "expects_finance_query": true,
+      "focus": ["零行结果", "不编造"]
+    }
+  ]
+}

@@ -1,0 +1,6 @@
+interface:
+  display_name: "金融工具测试执行"
+  short_description: "规划、审阅并迭代真实测试，组织核心证据供确认"
+  default_prompt: "使用 $financial-tool-test-execution 规划并审阅当前金融工具的真实测试，证据不足时继续补充。"
+policy:
+  allow_implicit_invocation: false

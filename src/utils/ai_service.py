@@ -6,6 +6,14 @@ from fastapi import FastAPI, HTTPException
 from starlette.responses import StreamingResponse
 import asyncio
 from pathlib import Path
+from dotenv import load_dotenv
+
+
+# Load the repository configuration before constructing any provider client.
+# Flask used to do this in its entrypoint, which made standalone services and
+# eval scripts silently fall back to ``not-configured`` credentials.
+REPO_ROOT = Path(__file__).resolve().parents[2]
+load_dotenv(REPO_ROOT / ".env", override=False)
 
 client_alibaba = OpenAI(
     api_key=os.getenv("DASHSCOPE_API_KEY") or "not-configured",
@@ -34,8 +42,19 @@ client_next = OpenAI(
 
 
 llm_client = OpenAI(
-    api_key=os.getenv("LLM_API_KEY") or os.getenv("DASHSCOPE_API_KEY") or "not-configured",
-    base_url=os.getenv("LLM_BASE_URL", os.getenv("DASHSCOPE_BASE_URL", "https://dashscope.aliyuncs.com/compatible-mode/v1")),
+    api_key=(
+        os.getenv("LLM_API_KEY")
+        or os.getenv("LLM_KEY")
+        or os.getenv("DEEPSEEK_API_KEY")
+        or os.getenv("DASHSCOPE_API_KEY")
+        or "not-configured"
+    ),
+    base_url=(
+        os.getenv("LLM_BASE_URL")
+        or os.getenv("LLM_ENDPOINT")
+        or os.getenv("DASHSCOPE_BASE_URL")
+        or "https://api.deepseek.com/v1"
+    ),
     timeout=float(os.getenv("LLM_CLIENT_TIMEOUT_SECONDS", "45")),
     max_retries=int(os.getenv("LLM_CLIENT_MAX_RETRIES", "1")),
 )
@@ -43,13 +62,34 @@ llm_client = OpenAI(
 # Backward-compatible alias. Old call sites still reference a "deepseek" client.
 deepseek_client = llm_client
 
-DEFAULT_CHAT_MODEL = os.getenv("LLM_DEFAULT_MODEL", "deepseek-v4-flash")
-DEFAULT_FLASH_MODEL = os.getenv("LLM_FLASH_MODEL", "deepseek-v4-flash")
+DEFAULT_CHAT_MODEL = os.getenv("LLM_DEFAULT_MODEL", "deepseek-chat")
+DEFAULT_FLASH_MODEL = os.getenv("LLM_FLASH_MODEL", "deepseek-chat")
 DEFAULT_REASONING_MODEL = os.getenv("LLM_REASONING_MODEL", DEFAULT_CHAT_MODEL)
 DEFAULT_EMBEDDING_MODEL = os.getenv("LLM_EMBEDDING_MODEL", "text-embedding-v4")
 DEFAULT_ENABLE_THINKING = os.getenv("LLM_DEFAULT_ENABLE_THINKING", "false").lower() == "true"
 DEFAULT_MAX_TOKENS = int(os.getenv("LLM_DEFAULT_MAX_TOKENS", "8192"))
 DEFAULT_LONG_CONTEXT_MAX_TOKENS = int(os.getenv("LLM_LONG_CONTEXT_MAX_TOKENS", "40960"))
+
+
+def llm_config_summary() -> dict:
+    """Return safe provider metadata without exposing credentials."""
+    key_source = ""
+    for name in ("LLM_API_KEY", "LLM_KEY", "DEEPSEEK_API_KEY", "DASHSCOPE_API_KEY"):
+        if os.getenv(name):
+            key_source = name
+            break
+    return {
+        "endpoint": (
+            os.getenv("LLM_BASE_URL")
+            or os.getenv("LLM_ENDPOINT")
+            or os.getenv("DASHSCOPE_BASE_URL")
+            or "https://api.deepseek.com/v1"
+        ),
+        "key_source": key_source,
+        "key_present": bool(key_source),
+        "key_length": len(os.getenv(key_source, "")) if key_source else 0,
+        "model": DEFAULT_FLASH_MODEL,
+    }
 
 
 def _extract_message_text(message):
@@ -236,10 +276,17 @@ def _chat_with_flash_model(
     return _extract_message_text(response.choices[0].message.content), response.usage
 
 
-def _chat_json_with_flash_model(message_body, *, max_tokens=None, enable_think=None):
+def _chat_json_with_flash_model(
+    message_body,
+    *,
+    max_tokens=None,
+    enable_think=None,
+    temperature=0.7,
+):
     content, usage = _chat_with_flash_model(
         message_body,
         max_tokens=max_tokens,
+        temperature=temperature,
         enable_think=enable_think,
     )
     ret_json = extract_first_json(content)
@@ -388,11 +435,32 @@ def chat_qwen_flash(message_body, enable_think=False):
     return _chat_with_flash_model(message_body, enable_think=enable_think)
 
 
-def chat_qwen_flash_json(message_body, enable_think=False):
+def chat_qwen_flash_json(message_body, enable_think=False, temperature=0.7):
     return _chat_json_with_flash_model(
         message_body,
         enable_think=enable_think,
+        temperature=temperature,
     )
+
+
+def chat_qwen_flash_json_with_raw(message_body, enable_think=False, temperature=0.0):
+    content, usage = _chat_with_flash_model(
+        message_body,
+        enable_think=enable_think,
+        temperature=temperature,
+    )
+    return extract_first_json(content, log_errors=False), usage, content
+
+
+def chat_qwen_flash_structured(message_body, enable_think=False, temperature=0.0):
+    response = _create_llm_completion(
+        message_body,
+        model=DEFAULT_FLASH_MODEL,
+        temperature=temperature,
+        response_format={"type": "json_object"},
+        enable_think=enable_think,
+    )
+    return _extract_message_text(response.choices[0].message.content), response.usage
 
 
 def chat_qwen_multimodal(

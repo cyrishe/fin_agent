@@ -1,0 +1,29 @@
+{
+  "best_for": [
+    "补充内部结构化金融数据以外的新闻和背景资料。",
+    "查询行业、政策、事件或主题的近期公开资料。"
+  ],
+  "display_name": "资料搜索",
+  "input_guidance": {
+    "notes": [
+      "当前 provider 的 coverage 会随结果返回；internal_news 不代表完整互联网。",
+      "公司、行业、政策、事件和主题新闻统一由本工具查询，不进入金融数据 catalog。"
+    ],
+    "optional_fields": ["limit", "start_time", "end_time", "category_scope", "source_scope"],
+    "required_fields": ["query"]
+  },
+  "input_schema": "src/tools/definitions/general_search.tool.json#/schemas/input",
+  "invocation_example": "general_search(query=\"白酒消费政策\", limit=10)",
+  "name": "general_search",
+  "output_guidance": {
+    "drop_default": ["data.[].snippet"],
+    "field_policies": {},
+    "high_value_for_reasoning": ["data"],
+    "high_value_for_render": ["data"],
+    "recommended_reducers": {"data": "summarize_news_list"},
+    "usually_too_large_for_prompt": ["data.[].snippet"]
+  },
+  "output_schema": "src/tools/schemas/general_search.schema.json",
+  "purpose": "通过可配置 provider 查询外部资料。",
+  "tool_name": "general_search"
+}
