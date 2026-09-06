@@ -26,9 +26,16 @@ def _resolved_llm_base_url() -> str:
     )
 
 
-def _resolved_llm_key_source(base_url: str) -> str:
+def is_dashscope_endpoint(base_url: str) -> bool:
+    """Recognize both shared DashScope and workspace-specific Aliyun MaaS URLs."""
     host = (urlparse(base_url).hostname or "").lower()
-    if "dashscope" in host and host.endswith("aliyuncs.com"):
+    return host.endswith(".aliyuncs.com") and (
+        "dashscope" in host or host.endswith(".maas.aliyuncs.com")
+    )
+
+
+def _resolved_llm_key_source(base_url: str) -> str:
+    if is_dashscope_endpoint(base_url):
         return "DASHSCOPE_API_KEY" if os.getenv("DASHSCOPE_API_KEY") else "LLM_API_KEY"
     for name in ("LLM_API_KEY", "LLM_KEY", "DEEPSEEK_API_KEY"):
         if os.getenv(name):

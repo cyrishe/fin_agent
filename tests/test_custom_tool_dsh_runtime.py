@@ -18,6 +18,16 @@ from src.services.custom_tool_service import CustomToolAgentService
 from src.services.finance_cc_system_tools import FinanceCcSystemTools
 
 
+@pytest.mark.parametrize("service_type", [CustomToolIntentDshRouter, CustomToolDeepSeekHarnessSessionService])
+def test_maas_workspace_endpoint_is_accepted(service_type, tmp_path, monkeypatch):
+    endpoint = "https://ws-test.cn-beijing.maas.aliyuncs.com/compatible-mode/v1"
+    monkeypatch.delenv("FINANCE_DSH_CUSTOM_TOOL_BASE_URL", raising=False)
+    monkeypatch.setenv("DASHSCOPE_BASE_URL", endpoint)
+    service = service_type(enabled=False, root_dir=tmp_path / "runtime")
+    assert service.base_url == endpoint
+    service.close()
+
+
 def _payload(result: dict) -> dict:
     return json.loads(result["content"][0]["text"])
 

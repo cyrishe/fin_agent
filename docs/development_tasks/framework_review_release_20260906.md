@@ -17,6 +17,7 @@
 | 路由开关与附件 | 禁用 intent router 时走原预处理；带附件输入保留原多模态入口，不被仅支持文本的 router 截断。 |
 | 用量汇总 | 非工具意图的路由调用仍计入 planning usage；同步 Chat 汇总不再重复加已经包含的 preprocess usage。不是对全链路 usage 完整性的声明。 |
 | 配置兼容 | 恢复显式 `LLM_ENDPOINT` 的兼容读取；API 文档示例统一为 Astra low。 |
+| 服务器 MaaS endpoint | 真实服务器使用工作空间专属 `*.maas.aliyuncs.com`；修正只认可 `dashscope` 主机名的检查，两种阿里云端点共用正确 Key 来源。新增兼容与域名边界测试。 |
 | 干净克隆可启动 | 将 DSH 启动脚本的可执行位纳入 Git，避免只在原机器可执行。 |
 | 测试与当前协议 | Profile 测试先记录技术验证再启用；Skill 文案断言同步当前术语。 |
 | 单元测试隔离 | 代码步骤/绑定测试不再调用真实总结模型。原失败由模型把两行排序样例判断为“覆盖不足”引起；未针对该样例修改业务判断。 |
@@ -29,6 +30,8 @@
 - Node：自定义工具与金融查询两套 loop policy：**27 passed**。
 - 前端：Vitest **111 passed**；TypeScript 与 Vite production build 通过。构建仍有大 chunk 提示，不影响本次构建成功。
 - `git diff --check` 通过。
+
+服务器首次兼容回归发现上述 MaaS 域名问题，已在刷新服务前修复。配置初始化测试改为隔离的模拟 `.env`，不再依赖开发者本机私钥配置。
 
 跳过的测试及 `manual/integration` 未被上述数字覆盖。前作者的真实 DSH 样本停在 Codex 交接前，不能算完整 Chat/SSE→Codex→候选→验证端到端通过；完整链路与 P50/P95 效果评测仍应继续。
 

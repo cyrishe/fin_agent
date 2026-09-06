@@ -3,6 +3,7 @@ import subprocess
 import sys
 from pathlib import Path
 from types import SimpleNamespace
+import pytest
 
 from src.utils import ai_service
 
@@ -10,6 +11,12 @@ from src.utils import ai_service
 def test_ai_service_loads_repo_env_before_client_initialization() -> None:
     repo_root = Path(__file__).resolve().parents[1]
     code = (
+        "import os, dotenv\n"
+        "def load_env(path, override=False):\n"
+        f"    assert str(path) == {str(repo_root / '.env')!r}\n"
+        "    assert override is False\n"
+        "    os.environ.update(DASHSCOPE_API_KEY='test-key', LLM_BASE_URL='https://dashscope.aliyuncs.com/compatible-mode/v1')\n"
+        "dotenv.load_dotenv = load_env\n"
         "from src.utils.ai_service import llm_config_summary; "
         "s=llm_config_summary(); "
         "assert s['key_present'] is True; "
@@ -37,15 +44,22 @@ def test_ai_service_loads_repo_env_before_client_initialization() -> None:
     assert result.returncode == 0, result.stderr or result.stdout
 
 
-def test_dashscope_route_never_selects_personal_deepseek_key(monkeypatch) -> None:
+@pytest.mark.parametrize("endpoint", [
+    "https://dashscope.aliyuncs.com/compatible-mode/v1",
+    "https://ws-test.cn-beijing.maas.aliyuncs.com/compatible-mode/v1",
+])
+def test_dashscope_route_never_selects_personal_deepseek_key(monkeypatch, endpoint) -> None:
     monkeypatch.setenv("DASHSCOPE_API_KEY", "maas-key")
     monkeypatch.setenv("LLM_KEY", "personal-key")
 
-    source = ai_service._resolved_llm_key_source(
-        "https://dashscope.aliyuncs.com/compatible-mode/v1"
-    )
+    source = ai_service._resolved_llm_key_source(endpoint)
 
     assert source == "DASHSCOPE_API_KEY"
+
+
+@pytest.mark.parametrize("endpoint", ["https://api.deepseek.com/v1", "https://dashscope.evilaliyuncs.com/v1"])
+def test_non_aliyun_endpoints_are_not_classified_as_dashscope(endpoint):
+    assert not ai_service.is_dashscope_endpoint(endpoint)
 
 
 def test_legacy_explicit_llm_endpoint_remains_compatible(monkeypatch):

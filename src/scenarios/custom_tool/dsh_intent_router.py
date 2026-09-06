@@ -5,8 +5,8 @@ import json
 import os
 from pathlib import Path
 from typing import Any, Callable, Mapping, Optional
-from urllib.parse import urlparse
 import uuid
+from src.utils.ai_service import is_dashscope_endpoint
 
 from src.scenarios.financial_qa.dsh_service import (
     FinanceDeepSeekHarnessSessionService,
@@ -114,8 +114,7 @@ class CustomToolIntentDshRouter(FinanceDeepSeekHarnessSessionService):
             or "https://dashscope.aliyuncs.com/compatible-mode/v1"
         )
         self.api_key = _trim(os.environ.get("DASHSCOPE_API_KEY"))
-        host = (urlparse(self.base_url).hostname or "").lower()
-        if "dashscope" not in host or not host.endswith("aliyuncs.com"):
+        if not is_dashscope_endpoint(self.base_url):
             raise ValueError(
                 "自定义工具入口 DSH 必须连接阿里云 DashScope MaaS"
             )

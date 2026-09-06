@@ -7,8 +7,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 import time
 from typing import Any, Callable, Mapping, Optional
-from urllib.parse import urlparse
 import uuid
+from src.utils.ai_service import is_dashscope_endpoint
 
 from src.scenarios.financial_qa.dsh_service import (
     FinanceDeepSeekHarnessSessionService,
@@ -286,8 +286,7 @@ class CustomToolDeepSeekHarnessSessionService(
         }
 
     def _assert_dashscope_route(self) -> None:
-        host = (urlparse(self.base_url).hostname or "").lower()
-        if "dashscope" not in host or not host.endswith("aliyuncs.com"):
+        if not is_dashscope_endpoint(self.base_url):
             raise ValueError(
                 "自定义工具 DSH 必须连接阿里云 DashScope MaaS，"
                 "请设置 DASHSCOPE_BASE_URL"
