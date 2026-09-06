@@ -1249,3 +1249,20 @@ def test_chat_api_rejects_unknown_financial_runtime_before_work() -> None:
     assert stream.status_code == 400
     assert "cc 或 dsh" in dispatch.get_json()["error"]
     assert "cc 或 dsh" in stream.get_json()["error"]
+
+
+def test_execution_timing_steps_uses_server_boundaries_and_omits_reasoning():
+    from src.scenarios.financial_qa.dsh_service import _execution_timing_steps
+    events = [
+        {"type": "step/start", "time": 100, "data": {"turn": 1, "step": 1}},
+        {"type": "assistant/message", "time": 180, "data": {"turn": 1, "step": 1, "message": {"content": "secret reasoning"}, "usage": {"inputTokens": 10, "cacheReadTokens": 5, "outputTokens": 2}}},
+        {"type": "tool/call", "time": 190, "data": {"turn": 1, "step": 1, "callId": "c1", "name": "mcp__finance__finance_query", "arguments": {"steps": [{"goal": "行情", "request": "stock.quote()"}], "secret": "hidden"}}},
+        {"type": "tool/result", "time": 215, "data": {"message": {"source": {"callId": "c1"}}}},
+        {"type": "assistant/message", "data": {"turn": 1, "step": 2}},
+    ]
+    spans = _execution_timing_steps(events)
+    assert spans[0]["duration_ms"] == 80
+    assert spans[0]["usage"]["context_tokens"] == 15
+    assert spans[1]["duration_ms"] == 25
+    assert spans[2]["duration_ms"] is None and spans[2]["usage"] is None
+    assert "secret" not in str(spans) and "hidden" not in str(spans)

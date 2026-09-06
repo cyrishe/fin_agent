@@ -123,6 +123,7 @@ X-API-Key: &lt;FINANCE_API_KEY&gt;</pre>
           <tbody>
             <tr><td><code>query</code></td><td>是</td><td>自然语言金融数据问题。</td></tr>
             <tr><td><code>response_mode</code></td><td>否</td><td><code>data</code> 返回原始行数据，<code>summary</code> 返回结论，<code>both</code> 同时返回；默认 <code>both</code>。</td></tr>
+            <tr><td><code>detail</code></td><td>否</td><td>默认 <code>false</code>；设为 <code>true</code> 附带模型轮数、每步 Token、耗时、API 请求与静态检查/重试记录，不改变查询行为。DSH 提供逐步事件耗时，其他运行时未采集的项留空。</td></tr>
             <tr><td><code>runtime</code></td><td>否</td><td><code>cc</code> 或 <code>dsh</code>；不填写时使用服务端默认值。</td></tr>
             <tr><td><code>research_mode</code></td><td>否</td><td><code>fast</code>、<code>auto</code> 或 <code>deep</code>，控制摘要分析深度；默认 <code>fast</code>。</td></tr>
             <tr><td><code>execution_mode</code></td><td>否</td><td><code>standard</code> 或 <code>fast</code>；DSH 的快速执行模式省略检查与重试。</td></tr>

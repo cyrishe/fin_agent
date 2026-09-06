@@ -1318,6 +1318,8 @@ def test_provider_failure_is_retried_by_harness_without_another_cc_turn(
     assert result["ok"] is True
     assert result["provider_retry_count"] == 1
     assert tracker["calls"][0]["provider_retry_count"] == 1
+    assert len(tracker["calls"][0]["attempts"]) == 2
+    assert all(item["duration_ms"] >= 0 for item in tracker["calls"][0]["attempts"])
     assert len(runtime.calls) == 2
 
 

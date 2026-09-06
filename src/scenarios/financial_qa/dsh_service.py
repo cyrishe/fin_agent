@@ -246,6 +246,59 @@ def _llm_step_usages(events: list[dict[str, Any]]) -> list[dict[str, int]]:
     return steps
 
 
+def _execution_timing_steps(events: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Server event intervals, without model reasoning text or request headers."""
+    starts = {}
+    tools = {}
+    steps = []
+    request_index = 0
+    def duration(start, end):
+        if not isinstance(start, (int, float)) or not isinstance(end, (int, float)) or end < start:
+            return None
+        return round(end - start, 3)
+    for event in events:
+        data = _event_data(event)
+        key = (data.get("turn"), data.get("step"))
+        timestamp = event.get("time")
+        kind = event.get("type")
+        if kind == "step/start":
+            starts[key] = timestamp
+        elif kind == "assistant/message":
+            request_index += 1
+            usages = _llm_step_usages([event])
+            usage = dict(usages[0]) if usages else None
+            if usage:
+                usage.pop("request_index", None)
+                usage["total_tokens"] = usage["context_tokens"] + usage["output_tokens"]
+            steps.append({"kind": "llm", "request_index": request_index,
+                "turn": data.get("turn"), "step": data.get("step"),
+                "duration_ms": duration(starts.get(key), timestamp),
+                "timing_basis": "step/start to assistant/message (includes request preparation and model response)",
+                "usage": usage})
+        elif kind == "tool/call":
+            name = _short_tool_name(data.get("name"))
+            args = _json_arguments(data.get("arguments"))
+            # Only finance protocol inputs, never arbitrary harness arguments.
+            allowed = {k: args[k] for k in ("subject", "dataview", "operation", "goal", "request", "data_request_complete") if k in args}
+            if name == "finance_query" and isinstance(args.get("steps"), list):
+                allowed["steps"] = [{k: item[k] for k in ("goal", "request") if k in item}
+                    for item in args["steps"] if isinstance(item, Mapping)]
+            span = {"kind": "tool", "tool": name, "turn": data.get("turn"),
+                "step": data.get("step"), "call_id": _trim(data.get("callId")),
+                "duration_ms": None, "timing_basis": "tool/call to tool/result",
+                "arguments": allowed}
+            tools[span["call_id"]] = (timestamp, span)
+            steps.append(span)
+        elif kind == "tool/result":
+            message = data.get("message")
+            source = message.get("source") if isinstance(message, Mapping) else {}
+            call_id = _trim(source.get("callId")) if isinstance(source, Mapping) else ""
+            if call_id in tools:
+                start, span = tools[call_id]
+                span["duration_ms"] = duration(start, timestamp)
+    return steps
+
+
 def _usage(
     steps: list[dict[str, int]],
 ) -> dict[str, int | float]:
@@ -1184,6 +1237,7 @@ class FinanceDeepSeekHarnessSessionService:
                     "result_refs": result_refs,
                     "llm_usage": _usage(llm_step_usages),
                     "llm_step_usages": llm_step_usages,
+                    "execution_steps": _execution_timing_steps(events),
                     "model_name": _model_name(events, self.model),
                     "reasoning_effort": self.reasoning_effort,
                     "loop_policy": _loop_policy_observability(

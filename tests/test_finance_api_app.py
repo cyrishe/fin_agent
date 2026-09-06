@@ -208,6 +208,7 @@ def test_mcp_streamable_http_requires_key_and_calls_same_gateway() -> None:
                     "arguments": {
                         "query": "贵州茅台行情",
                         "response_mode": "data",
+                        "detail": True,
                     },
                 },
             },
@@ -217,3 +218,41 @@ def test_mcp_streamable_http_requires_key_and_calls_same_gateway() -> None:
         assert result["isError"] is False
         assert result["structuredContent"]["response_mode"] == "data"
         assert gateway.calls[-1][1] == "client-a"
+        assert gateway.calls[-1][0].detail is True
+
+
+def test_rest_detail_flag_and_invalid_structure():
+    client, gateway = _client()
+    with client:
+        headers = {"X-API-Key": KEY}
+        result = client.post("/v1/finance/query", headers=headers,
+            json={"query": "贵州茅台行情", "response_mode": "data", "detail": True})
+        assert result.status_code == 200
+        assert gateway.calls[-1][0].detail is True
+        assert client.post("/v1/finance/query", headers=headers,
+            json={"query": "行情", "detail": {"invalid": True}}).status_code == 422
+        result = client.post("/v1/finance/answer", headers=headers,
+            json={"query": "贵州茅台行情", "detail": True})
+        assert result.status_code == 200
+        assert gateway.calls[-1][0].detail is True
+
+
+def test_failed_mcp_and_rest_keep_detail_evidence():
+    from src.finance_api.models import FinanceApiError
+    class FailedGateway(_Gateway):
+        async def execute(self, request, **kwargs):
+            response = await super().execute(request, **kwargs)
+            response.ok = False
+            response.error = FinanceApiError(code="finance_query_failed", message="invalid field")
+            response.detail = {"turns": 2} if request.detail else None
+            return response
+    app = create_app(auth=FinanceApiKeyAuth({"client-a": KEY}), gateway=FailedGateway())
+    with TestClient(app) as client:
+        headers = {"X-API-Key": KEY, "Accept": "application/json, text/event-stream"}
+        body = {"query": "行情", "response_mode": "data", "detail": True}
+        rest = client.post("/v1/finance/query", headers=headers, json=body)
+        assert rest.status_code == 502 and rest.json()["detail"]["turns"] == 2
+        mcp = client.post("/mcp", headers=headers, json={"jsonrpc":"2.0", "id":1, "method":"tools/call", "params":{"name":"finance_data_query", "arguments":body}})
+        result = mcp.json()["result"]
+        assert result["isError"] is True
+        assert result["structuredContent"]["detail"]["turns"] == 2

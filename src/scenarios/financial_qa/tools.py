@@ -3,6 +3,7 @@ from __future__ import annotations
 import asyncio
 import json
 import re
+import time
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Mapping, Optional
 
@@ -925,12 +926,27 @@ class FinanceDataQueryCcTools:
                     allow_provider_retry = (
                         tool_runtime.tool_context.get("_finance_execution_mode") != "fast"
                     )
+                    async def execute_attempt():
+                        attempt = {"attempt": len(call_record.setdefault("attempts", [])) + 1}
+                        call_record["attempts"].append(attempt)
+                        started = time.monotonic()
+                        try:
+                            value = await asyncio.to_thread(
+                                self.finance_runtime.execute_request,
+                                request=request,
+                                previous_results=dict(tool_runtime.result_handles),
+                            )
+                            timing = value.get("timings") if isinstance(value, Mapping) else None
+                            if isinstance(timing, Mapping):
+                                attempt.update({k: timing[k] for k in ("static_validation_ms", "api_execution_ms") if k in timing})
+                            return value
+                        except Exception:
+                            attempt["raised_exception"] = True
+                            raise
+                        finally:
+                            attempt["duration_ms"] = round((time.monotonic() - started) * 1000, 3)
                     try:
-                        result = await asyncio.to_thread(
-                            self.finance_runtime.execute_request,
-                            request=request,
-                            previous_results=dict(tool_runtime.result_handles),
-                        )
+                        result = await execute_attempt()
                     except Exception:
                         if not allow_provider_retry:
                             raise
@@ -941,11 +957,7 @@ class FinanceDataQueryCcTools:
                             progress_id=f"finance_query_step_{step_number}",
                             title=progress_title,
                         )
-                        result = await asyncio.to_thread(
-                            self.finance_runtime.execute_request,
-                            request=request,
-                            previous_results=dict(tool_runtime.result_handles),
-                        )
+                        result = await execute_attempt()
                     while allow_provider_retry and provider_retry_allowed(
                         result.get("execution")
                         if isinstance(result, Mapping)
@@ -959,11 +971,7 @@ class FinanceDataQueryCcTools:
                             progress_id=f"finance_query_step_{step_number}",
                             title=progress_title,
                         )
-                        result = await asyncio.to_thread(
-                            self.finance_runtime.execute_request,
-                            request=request,
-                            previous_results=dict(tool_runtime.result_handles),
-                        )
+                        result = await execute_attempt()
                     timings = (
                         result.get("timings")
                         if isinstance(result, Mapping)

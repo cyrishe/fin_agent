@@ -618,6 +618,7 @@ class FinancialQaCcService:
                     for item in record.get("llm_step_usages") or []
                     if isinstance(item, Mapping)
                 ],
+                "execution_steps": [dict(item) for item in record.get("execution_steps") or [] if isinstance(item, Mapping)],
                 # DSH policy/debug evidence stays in the observability branch;
                 # it is not mixed into the user-facing financial answer.
                 "loop_policy": (

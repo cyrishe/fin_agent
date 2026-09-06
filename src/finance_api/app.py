@@ -16,7 +16,7 @@ from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
 from fastapi.security import APIKeyHeader, HTTPAuthorizationCredentials, HTTPBearer
 from mcp.server.fastmcp import FastMCP
 from mcp.server.transport_security import TransportSecuritySettings
-from mcp.types import ToolAnnotations
+from mcp.types import ToolAnnotations, CallToolResult, TextContent
 from pydantic import Field
 
 from src.finance_api.auth import (
@@ -54,6 +54,7 @@ FINANCE_TOOL_DESCRIPTION = (
     "板块成分、研报观点和研报年度预测指标等问题。输入自然语言问题；response_mode=data 返回"
     "结构化原始数据，summary 返回基于数据的中文结论，both 同时返回两者。返回中的 data_sources "
     "会用公开业务名称说明实际查询的数据对象、数据类型、查询目标和记录数，便于核验与溯源。"
+    "detail=true 另附轮数、逐步 Token、耗时与查询检查记录。"
 )
 
 
@@ -242,6 +243,7 @@ def create_app(
             int,
             Field(ge=1, le=100, description="Maximum returned rows per result."),
         ] = 100,
+        detail: Annotated[bool, Field(description="Include turns, per-step token usage, timings and query validation evidence. No change to execution behavior.")] = False,
     ) -> FinanceQueryResponse:
         principal = _CURRENT_PRINCIPAL.get()
         if principal is None:
@@ -255,11 +257,18 @@ def create_app(
                 execution_mode=execution_mode,
                 conversation_id=conversation_id,
                 max_rows=max_rows,
+                detail=detail,
             ),
             principal_id=principal.principal_id,
             request_channel="mcp",
         )
         if not response.ok:
+            if detail:
+                # MCP supports an explicit error envelope with the same typed
+                # structured payload, preserving evidence for failed queries.
+                return CallToolResult(isError=True,
+                    content=[TextContent(type="text", text=response.model_dump_json(by_alias=True))],
+                    structuredContent=response.model_dump(mode="json", by_alias=True))
             raise RuntimeError(
                 response.error.message if response.error else "finance query failed"
             )
@@ -488,6 +497,7 @@ def create_app(
             execution_mode=payload.execution_mode,
             conversation_id=payload.conversation_id,
             max_rows=payload.max_rows,
+            detail=payload.detail,
         )
         try:
             response = await current_gateway().execute(

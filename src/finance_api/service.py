@@ -4,6 +4,7 @@ import asyncio
 import hashlib
 import os
 import uuid
+import time
 from datetime import datetime, timezone
 from functools import partial
 from typing import Any, Mapping
@@ -16,7 +17,7 @@ from src.scenarios.financial_qa.runtime import normalize_financial_qa_runtime
 from src.services.finance_data_tool_catalog_service import (
     FinanceDataToolCatalogService,
 )
-from src.services.request_usage_service import record_request
+from src.services.request_usage_service import record_request, total_tokens
 
 
 def _trim(value: Any) -> str:
@@ -60,10 +61,11 @@ class FinanceApiGateway:
         principal_id: str,
         request_channel: str = "http_api",
     ) -> FinanceQueryResponse:
+        started = time.monotonic()
         if self._semaphore is None:
             self._semaphore = asyncio.Semaphore(self.max_concurrency)
         async with self._semaphore:
-            return await anyio.to_thread.run_sync(
+            response = await anyio.to_thread.run_sync(
                 partial(
                     self._execute_sync,
                     request=request,
@@ -71,6 +73,9 @@ class FinanceApiGateway:
                     request_channel=request_channel,
                 )
             )
+            if response.detail is not None:
+                response.detail["request_duration_ms"] = round((time.monotonic() - started) * 1000, 3)
+            return response
 
     def _execute_sync(
         self,
@@ -249,6 +254,7 @@ class FinanceApiGateway:
                         else False
                     ),
                 },
+                "detail": self._detail(raw, finance_meta) if request.detail else None,
                 "error": (
                     {"code": "finance_query_failed", "message": error_text}
                     if error_text
@@ -256,6 +262,31 @@ class FinanceApiGateway:
                 ),
             }
         )
+
+    @staticmethod
+    def _detail(raw, meta):
+        fields = {"tool", "subject", "dataview", "operation", "api", "goal", "request",
+            "submitted_request", "flow_step", "flow_size", "row_count", "static_validation_ms",
+            "api_execution_ms", "validation_errors", "error", "execution_error", "provider_retry_count", "attempts"}
+        calls = [{k: v for k, v in call.items() if k in fields}
+            for call in meta.get("tool_calls") or [] if isinstance(call, Mapping)]
+        steps = [dict(s) for s in meta.get("execution_steps") or [] if isinstance(s, Mapping)]
+        usage = raw.get("llm_usage")
+        usage_fields = {"prompt_tokens", "completion_tokens", "total_tokens", "cache_read_tokens",
+            "cumulative_context_tokens", "reasoning_tokens", "accounting_total_tokens"}
+        projected_usage = {k:v for k,v in (usage or {}).items() if k in usage_fields}
+        if projected_usage:
+            projected_usage["total_tokens"] = total_tokens(usage)
+        return {
+            "turns": meta.get("assistant_message_count"),
+            "turns_definition": "Number of model response messages, not user conversations or tool calls.",
+            "usage": projected_usage,
+            "total_tokens": total_tokens(usage),
+            "steps": steps,
+            "tool_calls": calls,
+            "llm_step_usages": meta.get("llm_step_usages") or [],
+            "note": "Timings use server event boundaries, not separate reasoning-only time. Missing timing/usage is unknown. Tool spans include transport and handling; api_execution_ms is the provider execution measurement, not pure SQL time. Tool/API timings may overlap and must not be added to request duration.",
+        }
 
     def close(self) -> None:
         self.engine.close()

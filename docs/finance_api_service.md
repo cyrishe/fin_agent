@@ -21,6 +21,25 @@ MCP  /mcp               ┘                         ├─> CC
 
 ## 启动
 
+### 纯数据与执行明细
+
+REST `POST /v1/finance/query` 与 MCP `finance_data_query` 共用以下参数：
+
+```json
+{"query":"查询贵州茅台最近五个交易日的收盘价","response_mode":"data","detail":true}
+```
+
+`response_mode=data` 不生成分析摘要；`detail` 默认 false，不返回调试明细。
+开启后返回 `detail.turns`（模型响应次数）、`total_tokens`（包含已上报缓存输入）、
+`steps`（DSH 模型及工具事件耗时）、`tool_calls`（目录选择、API 串、静态错误及各次执行尝试）、
+`request_duration_ms`（网关侧含排队的总耗时）。不改变正常查询、校验与重试策略。
+DSH 模型步骤耗时包含请求准备和完整响应，不代表纯思考时间；工具、API 的耗时存在包含关系，不重复相加。
+未采集的耗时留 null；CC 可返回已有逐步 Token 与接口执行记录，但无 DSH 事件计时。
+失败时 REST 的 502 响应与 MCP 的 isError 结构化结果仍保留已取得的 detail。
+原始提示词、模型思考文本、密钥、会话存储引用不作为 detail 输出。
+
+### 进程配置
+
 安装依赖并配置 `.env`：
 
 ```bash

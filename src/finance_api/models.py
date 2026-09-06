@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Any, Literal
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator, model_serializer
 
 
 FinanceResponseMode = Literal["data", "summary", "both"]
@@ -13,6 +13,7 @@ FinanceExecutionMode = Literal["standard", "fast"]
 
 class FinanceQueryRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
+    detail: bool = Field(default=False, description="Include execution steps, turns, token usage and timing diagnostics; does not change query behavior.")
 
     query: str = Field(
         min_length=1,
@@ -78,6 +79,7 @@ class FinanceQueryRequest(BaseModel):
 
 class FinanceAnswerRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
+    detail: bool = Field(default=False, description="Include execution diagnostics without changing answer behavior.")
 
     query: str = Field(min_length=1, max_length=4_000)
     runtime: FinanceRuntime | None = None
@@ -172,3 +174,11 @@ class FinanceQueryResponse(BaseModel):
     data: FinanceDataPayload | None = None
     execution: FinanceExecutionMetadata
     error: FinanceApiError | None = None
+    detail: dict[str, Any] | None = None
+
+    @model_serializer(mode="wrap")
+    def serialize_response(self, handler):
+        payload = handler(self)
+        if self.detail is None:
+            payload.pop("detail", None)
+        return payload

@@ -146,6 +146,32 @@ def test_gateway_close_closes_shared_execution_core() -> None:
     assert engine.closed is True
 
 
+def test_detail_is_opt_in_and_does_not_change_engine_request():
+    class DetailedEngine(_Engine):
+        def answer(self, **kwargs):
+            raw = super().answer(**kwargs)
+            raw["llm_usage"] = {"cumulative_context_tokens": 120, "completion_tokens": 30, "secret": "not_public"}
+            raw["financial_qa"].update(assistant_message_count=2,
+                execution_steps=[{"kind": "llm", "duration_ms": 100, "usage": {"output_tokens": 30}}],
+                prompt_assets={"system_prompt": "not_public"})
+            raw["financial_qa"]["tool_calls"] = [{"tool": "finance_query", "api": "stock.quote", "api_execution_ms": 12,
+                "request": "stock.quote()", "result_ref": "not_public", "attempts": [{"duration_ms": 15}]}]
+            return raw
+    engine = DetailedEngine()
+    gateway = FinanceApiGateway(engine=engine)
+    plain = asyncio.run(gateway.execute(FinanceQueryRequest(query="行情", response_mode="data"), principal_id="a"))
+    rich = asyncio.run(gateway.execute(FinanceQueryRequest(query="行情", response_mode="data", detail=True), principal_id="a"))
+    assert "detail" not in plain.model_dump()
+    assert "detail" not in plain.model_dump_json()
+    assert rich.detail["turns"] == 2
+    assert rich.detail["total_tokens"] == 150
+    assert rich.detail["request_duration_ms"] >= 0
+    assert rich.detail["tool_calls"][0]["api_execution_ms"] == 12
+    assert "not_public" not in rich.model_dump_json()
+    assert rich.summary is None
+    assert all(call["data_only"] for call in engine.calls)
+
+
 def test_gateway_admits_ten_isolated_requests_concurrently() -> None:
     class _ConcurrentEngine(_Engine):
         def __init__(self) -> None:
