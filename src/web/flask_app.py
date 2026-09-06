@@ -41,6 +41,9 @@ from src.services.custom_tool_run_trace_service import CustomToolRunTrace
 from src.services.finance_claude_session_service import FinanceClaudeSessionService
 from src.services.finance_cc_system_tools import FinanceCcSystemTools
 from src.scenarios.financial_qa import FinancialQaCcService
+from src.scenarios.financial_qa.execution_mode import (
+    normalize_financial_qa_execution_mode,
+)
 from src.scenarios.financial_qa.research_mode import normalize_research_mode
 from src.scenarios.financial_qa.runtime import normalize_financial_qa_runtime
 from src.services.conversation_title_service import ConversationTitleService
@@ -87,6 +90,9 @@ REACT_FRONTEND_DIST_DIR = Path(
     os.environ.get("FIN_AGENT_FRONTEND_DIST")
     or Path(__file__).resolve().parents[2] / "frontend" / "dist"
 ).resolve()
+FINANCE_API_STATIC_DIR = (
+    Path(__file__).resolve().parents[1] / "finance_api" / "static"
+).resolve()
 
 
 @app.errorhandler(UserSessionStorageError)
@@ -125,9 +131,10 @@ skill_authoring_service = SkillAuthoringService(
     ),
 )
 assistant_dispatch_planner = AssistantDispatchPlanner(
-    agent_owned_runtime_names=(
-        {"investment_analyst"} if financial_qa_cc_service.enabled else set()
-    )
+    # Runtime availability must not change semantic ownership.  Otherwise a
+    # missing deployment flag turns finance questions into a generic tool plan
+    # and can silently leak them to open-web search.
+    agent_owned_runtime_names={"investment_analyst"}
 )
 user_session_service = UserSessionService()
 phone_account_service = PhoneAccountService(user_sessions=user_session_service)
@@ -166,9 +173,37 @@ agent_direct_response_service = AgentDirectResponseService()
 
 @app.route("/", methods=["GET"])
 def root_entry():
+    if request.cookies.get(UserSessionService.MEMBER_SESSION_COOKIE_NAME):
+        try:
+            if _resolve_current_member_identity():
+                return redirect(_with_script_root("/assistant"))
+        except UserSessionStorageError:
+            app.logger.warning("member session resolution failed while opening home")
     if (REACT_FRONTEND_DIST_DIR / "index.html").is_file():
         return send_from_directory(REACT_FRONTEND_DIST_DIR, "index.html")
-    return redirect("/assistant")
+    return redirect(_with_script_root("/assistant"))
+
+
+@app.route("/assets/<path:frontend_path>", methods=["GET"])
+def react_frontend_asset(frontend_path: str):
+    asset_root = (REACT_FRONTEND_DIST_DIR / "assets").resolve()
+    requested = (asset_root / str(frontend_path or "")).resolve()
+    if requested.is_file() and requested.is_relative_to(asset_root):
+        return send_from_directory(asset_root, str(frontend_path))
+    return ("", 404)
+
+
+@app.route("/favicon.svg", methods=["GET"])
+def react_frontend_favicon():
+    if (REACT_FRONTEND_DIST_DIR / "favicon.svg").is_file():
+        return send_from_directory(REACT_FRONTEND_DIST_DIR, "favicon.svg")
+    return ("", 404)
+
+
+@app.route("/mcp-guide", methods=["GET"])
+def finance_mcp_guide_page():
+    """Public fallback when Nginx routes product pages to the Web process."""
+    return send_from_directory(FINANCE_API_STATIC_DIR, "mcp-guide.html")
 
 
 def _resolve_current_member_identity() -> dict | None:
@@ -286,6 +321,15 @@ def _parse_bool_flag(value: str, default: bool = False) -> bool:
     if not text:
         return bool(default)
     return text not in {"0", "false", "no", "off"}
+
+
+def _normalize_chat_financial_qa_runtime(value) -> str:
+    """Resolve the Web chat default while preserving explicit request routing."""
+    explicit = str(value or "").strip()
+    configured_default = str(
+        os.environ.get("FINANCE_CHAT_DEFAULT_RUNTIME") or "cc"
+    ).strip()
+    return normalize_financial_qa_runtime(explicit or configured_default)
 
 
 def _schedule_thread_title(*, thread_id: int, user_text: str, expected_title: str) -> None:
@@ -1030,11 +1074,18 @@ def _custom_tool_result_blocks(result: dict, builder: LlmStreamBlockBuilder) -> 
                 )])
         view_block_count = len(blocks)
 
+    result_tool = result.get("tool") if isinstance(result.get("tool"), dict) else {}
+    result_manifest = (
+        result_tool.get("manifest")
+        if isinstance(result_tool.get("manifest"), dict)
+        else {}
+    )
+    implementation_asset_ready = bool(result_manifest)
     design = result.get("design") if isinstance(result.get("design"), dict) else {}
     understanding = result.get("understanding") if isinstance(result.get("understanding"), dict) else {}
     notice = result.get("notice") if isinstance(result.get("notice"), list) else []
     questions = result.get("questions") if isinstance(result.get("questions"), list) else []
-    if design or understanding or notice or questions:
+    if (design or understanding or notice or questions) and not implementation_asset_ready:
         result_stage = "design" if design else "requirement"
         _add_many(builder.final_to_blocks({
             "source": "model",
@@ -1053,6 +1104,7 @@ def _custom_tool_result_blocks(result: dict, builder: LlmStreamBlockBuilder) -> 
             ),
             "design_context": result.get("design_context") if isinstance(result.get("design_context"), dict) else {},
             "existing_analysis": result.get("existing_analysis") if isinstance(result.get("existing_analysis"), dict) else {},
+            "skip_design_review": result.get("skip_design_review") is True,
         }, stage=result_stage))
 
     transport_error = str(result.get("error") or "").strip()
@@ -1104,8 +1156,8 @@ def _custom_tool_result_blocks(result: dict, builder: LlmStreamBlockBuilder) -> 
             ),
         ])
 
-    tool = result.get("tool") if isinstance(result.get("tool"), dict) else {}
-    manifest = tool.get("manifest") if isinstance(tool.get("manifest"), dict) else {}
+    tool = result_tool
+    manifest = result_manifest
     test_result = result.get("test_result") if isinstance(result.get("test_result"), dict) else {}
     implementation_explanation = (
         result.get("implementation_explanation")
@@ -1253,6 +1305,7 @@ def _custom_tool_result_blocks(result: dict, builder: LlmStreamBlockBuilder) -> 
             data={
                 "artifact_type": "finance.custom_tool_implementation",
                 "lifecycle": "active" if is_active else "draft",
+                "visibility": str(manifest.get("visibility") or "personal"),
                 "version": str(manifest.get("current_revision") or "0.1"),
                 "summary": description,
                 "asset_ref": {
@@ -1305,6 +1358,8 @@ def _custom_tool_result_blocks(result: dict, builder: LlmStreamBlockBuilder) -> 
                         if str(design_contract.get("mermaid") or "").strip()
                         else {}
                     ),
+                    "design_document": str(design_contract.get("document") or "").strip(),
+                    "visibility": str(manifest.get("visibility") or "personal"),
                     "verification": verification,
                     "finance_tool_profile": finance_tool_profile,
                     "strategy_runtime_profile": strategy_runtime_profile,
@@ -1482,8 +1537,11 @@ def _run_custom_tool_stream_payload(payload: dict, *, emit) -> None:
     direct_interaction = bool(interaction_response and not text)
     application_name = str(payload.get("application_name") or "investment_workbench").strip() or "investment_workbench"
     research_mode = normalize_research_mode(payload.get("research_mode"))
-    financial_qa_runtime = normalize_financial_qa_runtime(
+    financial_qa_runtime = _normalize_chat_financial_qa_runtime(
         payload.get("financial_qa_runtime")
+    )
+    financial_qa_execution_mode = normalize_financial_qa_execution_mode(
+        payload.get("financial_qa_execution_mode")
     )
     data_only = _parse_bool_flag(payload.get("data_only"), default=False)
     thread_id_payload = payload.get("thread_id")
@@ -1718,6 +1776,7 @@ def _run_custom_tool_stream_payload(payload: dict, *, emit) -> None:
                     event_sink=event_sink,
                     research_mode=research_mode,
                     financial_qa_runtime=financial_qa_runtime,
+                    financial_qa_execution_mode=financial_qa_execution_mode,
                     data_only=data_only,
                 )
             else:
@@ -1759,6 +1818,7 @@ def _run_custom_tool_stream_payload(payload: dict, *, emit) -> None:
                 event_sink=event_sink,
                 research_mode=research_mode,
                 financial_qa_runtime=financial_qa_runtime,
+                financial_qa_execution_mode=financial_qa_execution_mode,
                 data_only=data_only,
             )
 
@@ -2056,6 +2116,7 @@ def _build_chat_dispatch_payload(
     event_sink=None,
     research_mode: str = "auto",
     financial_qa_runtime: str = "cc",
+    financial_qa_execution_mode: str = "standard",
     data_only: bool = False,
 ) -> dict:
     parsed = _parse_chat_command(text)
@@ -2201,6 +2262,9 @@ def _build_chat_dispatch_payload(
                 "attachments": attachments,
                 "event_sink": event_sink,
                 "research_mode": normalize_research_mode(research_mode),
+                "execution_mode": normalize_financial_qa_execution_mode(
+                    financial_qa_execution_mode
+                ),
                 "data_only": bool(data_only),
             }
             if selected_financial_runtime != "cc":
@@ -2216,6 +2280,31 @@ def _build_chat_dispatch_payload(
             result["thread_context_patch"] = _merge_thread_context_patches(
                 continuity_patch_preview,
                 {},
+            )
+            return _attach_planning_state(result)
+        if (
+            selected_financial_runtime == "cc"
+            and not financial_qa_cc_service.enabled
+            and str(plan.get("selected_agent") or "").strip()
+            == "investment_analyst"
+            and str(plan.get("turn_mode") or "").strip() == "normal_qa"
+            and plan_entry == "agent_route"
+        ):
+            result = _apply_application_workspace_orchestration(
+                {
+                    "mode": "financial_qa_unavailable",
+                    "message": (
+                        "金融问答 CC 运行时未启用；本次请求已停止，"
+                        "不会回落到通用搜索工具。"
+                    ),
+                    "items": [],
+                    "dispatch_plan": plan,
+                    "thread_context_patch": _merge_thread_context_patches(
+                        continuity_patch_preview,
+                        {},
+                    ),
+                },
+                application_context,
             )
             return _attach_planning_state(result)
         if plan_entry == "skill_refine":
@@ -4051,8 +4140,11 @@ def api_chat_dispatch():
     try:
         payload = _extract_request_payload()
         research_mode = normalize_research_mode(payload.get("research_mode"))
-        financial_qa_runtime = normalize_financial_qa_runtime(
+        financial_qa_runtime = _normalize_chat_financial_qa_runtime(
             payload.get("financial_qa_runtime")
+        )
+        financial_qa_execution_mode = normalize_financial_qa_execution_mode(
+            payload.get("financial_qa_execution_mode")
         )
         data_only = _parse_bool_flag(payload.get("data_only"), default=False)
         text = str(payload.get("text") or payload.get("message") or "").strip()
@@ -4135,6 +4227,7 @@ def api_chat_dispatch():
                 owner_id=str(guest_identity.get("user_id") or ""),
                 research_mode=research_mode,
                 financial_qa_runtime=financial_qa_runtime,
+                financial_qa_execution_mode=financial_qa_execution_mode,
                 data_only=data_only,
             )
         dispatch_plan_payload = result.get("dispatch_plan") if isinstance(result.get("dispatch_plan"), dict) else {}
@@ -4251,8 +4344,11 @@ def api_custom_tool_stream_start():
         request_received_at = datetime.datetime.now()
         payload = _extract_request_payload()
         research_mode = normalize_research_mode(payload.get("research_mode"))
-        financial_qa_runtime = normalize_financial_qa_runtime(
+        financial_qa_runtime = _normalize_chat_financial_qa_runtime(
             payload.get("financial_qa_runtime")
+        )
+        financial_qa_execution_mode = normalize_financial_qa_execution_mode(
+            payload.get("financial_qa_execution_mode")
         )
         data_only = _parse_bool_flag(payload.get("data_only"), default=False)
         text = str(payload.get("text") or payload.get("message") or "").strip()
@@ -4282,6 +4378,7 @@ def api_custom_tool_stream_start():
             "application_name": str(payload.get("application_name") or "investment_workbench").strip() or "investment_workbench",
             "research_mode": research_mode,
             "financial_qa_runtime": financial_qa_runtime,
+            "financial_qa_execution_mode": financial_qa_execution_mode,
             "data_only": data_only,
             "guest_identity": guest_identity,
             "cookie_thread_id": request.cookies.get(UserSessionService.THREAD_COOKIE_NAME, ""),

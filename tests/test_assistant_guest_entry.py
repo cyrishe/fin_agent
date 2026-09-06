@@ -87,6 +87,21 @@ def test_assistant_uses_react_build_when_available(monkeypatch, tmp_path) -> Non
     assert any(cookie.startswith("aiia_guest_user_id=guest_react_test") for cookie in page.headers.getlist("Set-Cookie"))
 
 
+def test_mcp_guide_is_publicly_available_from_web_fallback(monkeypatch, tmp_path) -> None:
+    static_dir = tmp_path / "finance-static"
+    static_dir.mkdir()
+    (static_dir / "mcp-guide.html").write_text(
+        "<h1>Fin Agent MCP 使用说明</h1>",
+        encoding="utf-8",
+    )
+    monkeypatch.setattr(web, "FINANCE_API_STATIC_DIR", static_dir)
+
+    response = web.app.test_client().get("/mcp-guide")
+
+    assert response.status_code == 200
+    assert "Fin Agent MCP 使用说明" in response.get_data(as_text=True)
+
+
 def test_react_thread_bootstrap_returns_active_thread_and_guest_cookies(monkeypatch) -> None:
     monkeypatch.setattr(
         web,

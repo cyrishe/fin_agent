@@ -434,6 +434,7 @@ def _run_case(
     base_url: str,
     timeout_seconds: float,
     financial_qa_runtime: str,
+    financial_qa_execution_mode: str,
     identity_cookies: Mapping[str, str],
     writer: IncrementalWriter,
 ) -> dict[str, Any]:
@@ -484,6 +485,7 @@ def _run_case(
                 "application_name": "investment_workbench",
                 "attachment_ids": [],
                 "financial_qa_runtime": financial_qa_runtime,
+                "financial_qa_execution_mode": financial_qa_execution_mode,
             },
             timeout=(10.0, min(max(timeout_seconds, 10.0), 60.0)),
         )
@@ -753,6 +755,7 @@ def run(args: argparse.Namespace) -> int:
             "concurrency": args.concurrency,
             "timeout_seconds": args.timeout,
             "financial_qa_runtime": args.financial_qa_runtime,
+            "financial_qa_execution_mode": args.financial_qa_execution_mode,
             "resume": bool(args.resume),
         },
         "isolation": (
@@ -795,6 +798,7 @@ def run(args: argparse.Namespace) -> int:
                 base_url=args.base_url,
                 timeout_seconds=args.timeout,
                 financial_qa_runtime=args.financial_qa_runtime,
+                financial_qa_execution_mode=args.financial_qa_execution_mode,
                 identity_cookies=identity_cookies,
                 writer=writer,
             )
@@ -839,6 +843,12 @@ def build_parser() -> argparse.ArgumentParser:
         help="Financial-QA execution path requested from the Chat API.",
     )
     parser.add_argument(
+        "--financial-qa-execution-mode",
+        choices=("standard", "fast"),
+        default="standard",
+        help="DSH loop policy; fast performs discovery, query generation, and return only.",
+    )
+    parser.add_argument(
         "--resume",
         action="store_true",
         help="Skip case ids already present in the output snapshot/JSONL.",
@@ -858,6 +868,11 @@ def main() -> int:
         raise SystemExit("--concurrency must be at least 1")
     if args.timeout <= 0:
         raise SystemExit("--timeout must be positive")
+    if (
+        args.financial_qa_execution_mode == "fast"
+        and args.financial_qa_runtime != "dsh"
+    ):
+        raise SystemExit("--financial-qa-execution-mode=fast requires --financial-qa-runtime=dsh")
     return run(args)
 
 
