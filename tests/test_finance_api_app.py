@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from fastapi.testclient import TestClient
+import pytest
 
 from src.finance_api.app import create_app
 from src.finance_api.auth import FinanceApiKeyAuth
@@ -8,6 +9,14 @@ from src.finance_api.models import FinanceQueryResponse
 
 
 KEY = "test-finance-api-key-1234567890"
+
+
+@pytest.fixture(autouse=True)
+def isolate_test_http_hosts(monkeypatch):
+    # Production DNS-rebinding protection must not be weakened for TestClient.
+    monkeypatch.setenv("FINANCE_API_ALLOWED_HOSTS", "testserver,127.0.0.1:*,localhost:*")
+    monkeypatch.setenv("FINANCE_API_ALLOWED_ORIGINS", "")
+    monkeypatch.setenv("FINANCE_API_ROOT_PATH", "")
 
 
 class _Gateway:
