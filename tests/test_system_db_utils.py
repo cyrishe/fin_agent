@@ -49,3 +49,18 @@ def test_system_db_utils_fails_without_system_url(monkeypatch) -> None:
 
     with pytest.raises(RuntimeError, match="SYSTEM_DB_URL is required"):
         system_db_utils.system_db_connection_kwargs()
+
+
+@pytest.mark.parametrize("database", ["stock_agent", "kingdomai", "STOCK_AGENT", "stock%5Fagent"])
+def test_system_storage_rejects_business_schema(database):
+    with pytest.raises(RuntimeError, match="isolated system schema"):
+        system_db_utils.system_db_connection_kwargs(raw_url=f"mysql://test:password@127.0.0.1/{database}")
+
+
+@pytest.mark.parametrize("database", ["aiia_system", "aiia", "system_test"])
+def test_system_schema_can_share_the_business_mysql_account(database):
+    config = system_db_utils.system_db_connection_kwargs(
+        raw_url=f"mysql+pymysql://shared_user:secret@47.94.1.2:3312/{database}"
+    )
+    assert config["database"] == database
+    assert config["user"] == "shared_user"

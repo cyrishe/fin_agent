@@ -14,9 +14,14 @@ def system_db_connection_kwargs(*, raw_url: Optional[str] = None) -> dict[str, A
     if not value:
         raise RuntimeError("SYSTEM_DB_URL is required for system storage")
     parsed = urlparse(value.replace("mysql+pymysql://", "mysql://", 1))
-    database = (parsed.path or "/").lstrip("/")
+    database = unquote((parsed.path or "/").lstrip("/"))
     if parsed.scheme != "mysql" or not parsed.hostname or not database:
         raise RuntimeError("SYSTEM_DB_URL must be a MySQL URL with a database name")
+    if database.casefold() in {"stock_agent", "kingdomai"}:
+        raise RuntimeError(
+            "SYSTEM_DB_URL must use an isolated system schema such as aiia_system, "
+            "not the stock_agent or kingdomai business schema"
+        )
     query = parse_qs(parsed.query)
     return {
         "host": parsed.hostname,
