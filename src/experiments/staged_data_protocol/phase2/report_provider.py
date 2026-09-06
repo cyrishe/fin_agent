@@ -21,6 +21,7 @@ from src.experiments.staged_data_protocol.phase2.call_structure import (
     parse_order,
 )
 from src.utils.mysql_utils import StockInfoDbUtils
+from src.experiments.staged_data_protocol.phase2.recent_scan import chronological_recent_where, fetch_recent_first
 
 
 REPORT_TABLE = "reports"
@@ -294,7 +295,12 @@ def _execute_base_query(
         f"WHERE {where_sql} ORDER BY {order_sql} LIMIT %s"
     )
     params.append(int(limit_policy["fetch_limit"]))
-    raw_result = _run_query(sql=sql, params=params)
+    recent_where = chronological_recent_where(args=args, where_sql=where_sql,
+        order_sql=order_sql, date_expression='r.publish_at')
+    recent_sql = (f'SELECT {select_sql} FROM {source.from_sql} '
+                  f'WHERE {recent_where} ORDER BY {order_sql} LIMIT %s') if recent_where else None
+    raw_result = _run_query(sql=sql, params=params, recent_sql=recent_sql,
+                            required_rows=int(limit_policy['fetch_limit']))
     if raw_result["error"]:
         return _result(
             status="provider_error",
@@ -320,6 +326,7 @@ def _execute_base_query(
             "order": order_sql,
             "limit": -1 if limit_policy["explicit_full"] else int(limit_policy["fetch_limit"]),
             "hard_row_limit": int(limit_policy["hard_limit"]),
+            "recent_scan": raw_result.get("recent_scan", {}),
         },
     )
 
@@ -486,7 +493,7 @@ def _connect_report_db() -> StockInfoDbUtils:
     return StockInfoDbUtils(database="kingdomai")
 
 
-def _run_query(*, sql: str, params: List[Any]) -> Dict[str, Any]:
+def _run_query(*, sql: str, params: List[Any], recent_sql=None, required_rows=0) -> Dict[str, Any]:
     try:
         db = _connect_report_db()
     except Exception as exc:  # noqa: BLE001 - provider boundary returns a stable error.
@@ -494,8 +501,10 @@ def _run_query(*, sql: str, params: List[Any]) -> Dict[str, Any]:
     connection = getattr(db, "conn", db)
     try:
         with connection.cursor(pymysql.cursors.DictCursor) as cursor:
-            cursor.execute(sql, tuple(params))
-            return {"rows": list(cursor.fetchall()), "error": ""}
+            evidence = {}
+            rows = fetch_recent_first(cursor, sql=sql, params=params, recent_sql=recent_sql,
+                                      required_rows=required_rows, evidence=evidence)
+            return {"rows": rows, "error": "", "recent_scan": evidence}
     except Exception as exc:  # noqa: BLE001 - provider boundary returns a stable error.
         return {"rows": [], "error": str(exc)}
     finally:

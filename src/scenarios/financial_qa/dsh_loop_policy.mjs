@@ -193,7 +193,7 @@ export function resolveConfig(input = {}) {
   }
 }
 
-function currentToolContext() {
+function currentRuntimeContext() {
   const contextPath = String(process.env.FIN_AGENT_DSH_CONTEXT_PATH ?? '').trim()
   if (!contextPath) return {}
   let payload
@@ -202,6 +202,11 @@ function currentToolContext() {
   } catch {
     return {}
   }
+  return payload !== null && typeof payload === 'object' ? payload : {}
+}
+
+function currentToolContext() {
+  const payload = currentRuntimeContext()
   const toolContext = payload !== null
     && typeof payload === 'object'
     && payload.tool_context !== null
@@ -387,6 +392,53 @@ function catalogIsReady(payload) {
   return payload !== null && typeof payload === 'object' && payload.mode === 'dataview'
 }
 
+// Derive reuse eligibility from the actual model-visible tool history, not a
+// second catalog or a worker-global cache. Compacted-away or old-revision packs
+// cannot authorize reuse. This also works when Harness resumes a cold session.
+function reusableCatalogApis(agent, tools) {
+  const revision = currentRuntimeContext().finance_catalog_revision
+  if (!revision) return []
+  const catalogCalls = new Set()
+  const apis = new Set()
+  for (const message of agent.session?.deriveMessages() ?? []) {
+    for (const block of message.content ?? []) {
+      if (message.role === 'assistant' && block.type === 'tool-call' && block.name === tools.catalog) {
+        catalogCalls.add(block.id)
+      }
+      if (message.source?.kind !== 'tool' || block.type !== 'tool-result'
+        || block.isError || !catalogCalls.has(block.toolCallId)) continue
+      for (const content of block.content ?? []) {
+        if (content.type !== 'text') continue
+        let payload
+        try { payload = JSON.parse(content.text) } catch { continue }
+        if (!catalogIsReady(payload) || payload.catalog_revision !== revision) continue
+        for (const fn of payload.dataview?.functions ?? []) {
+          if (typeof fn.api_name === 'string') apis.add(fn.api_name)
+        }
+      }
+    }
+  }
+  return [...apis]
+}
+
+function canReuseCatalog(state, args) {
+  if (state.stage !== 'catalog' || state.reusableApis.length === 0) return false
+  if (typeof args === 'string') {
+    try { args = JSON.parse(args) } catch { return false }
+  }
+  const steps = Array.isArray(args?.steps) ? args.steps : [args]
+  return steps.length > 0 && steps.every(step => {
+    // Read only the invocation target; the existing Python protocol parser and
+    // validator remain authoritative for arguments, fields and method validity.
+    const target = /^\s*(?:[A-Za-z_]\w*\s*=\s*)?([A-Za-z_]\w*(?:\.[A-Za-z_]\w*)+)\s*\(/.exec(step?.request ?? '')?.[1]
+    return target && state.reusableApis.some(api => {
+      const pattern = api.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+        .replace(/<\w+>/g, '[A-Za-z_][A-Za-z_0-9]*')
+      return new RegExp(`^${pattern}$`).test(target)
+    })
+  })
+}
+
 function querySucceeded(payload, failed) {
   return !failed && payload !== null && typeof payload === 'object' && payload.ok === true
 }
@@ -427,7 +479,9 @@ function queryIsDataOnly(payload) {
 
 function promptFor(state, config) {
   const prompts = state.executionMode === 'fast' ? FAST_STAGE_PROMPTS : STAGE_PROMPTS
-  const base = prompts[state.stage] ?? prompts.final
+  const base = state.stage === 'catalog' && state.reusableApis.length > 0
+    ? '按本轮问题继承或更新对象、指标、时间和输出粒度。本会话仍可见且版本有效的目录可直接复用并调用 finance_query；需要未加载的视图或 operation 时，先用 read_finance_catalog 精确加载。复用的是目录，不是旧查询结果；不要把上一轮日期、标的或条件强加给本轮。'
+    : prompts[state.stage] ?? prompts.final
   const marker = `[FINANCE_LOOP stage=${state.stage} reason=${state.reason}]`
   const mode = `[FINANCE_EXECUTION mode=${state.executionMode}]`
   return [marker, mode, base, config.businessHint].filter(Boolean).join('\n')
@@ -435,7 +489,7 @@ function promptFor(state, config) {
 
 function stageTools(state, tools) {
   switch (state.stage) {
-    case 'catalog': return [tools.catalog]
+    case 'catalog': return state.reusableApis.length > 0 ? [tools.catalog, tools.query] : [tools.catalog]
     case 'query':
     case 'repair': return [tools.query]
     case 'details': return [tools.details]
@@ -443,20 +497,22 @@ function stageTools(state, tools) {
   }
 }
 
-function stageAllows(state, kind) {
-  if (state.stage === 'catalog') return kind === 'catalog'
+function stageAllows(state, kind, args) {
+  if (state.stage === 'catalog') return kind === 'catalog' || (kind === 'query' && canReuseCatalog(state, args))
   if (state.stage === 'query' || state.stage === 'repair') return kind === 'query'
   if (state.stage === 'details') return kind === 'details'
   return false
 }
 
-function resetTurn(state, turn, config) {
+function resetTurn(state, turn, config, agent, tools) {
   state.turn = turn
   const toolContext = currentToolContext()
   state.executionMode = executionMode(toolContext._finance_execution_mode, config.executionMode)
   state.dataOnlyRequested = toolContext._finance_data_only === true
   state.stage = 'catalog'
   state.reason = 'turn_started'
+  // Fast mode's explicit one-catalog/one-query contract remains unchanged.
+  state.reusableApis = state.executionMode === 'standard' ? reusableCatalogApis(agent, tools) : []
   state.catalogAttempts = 0
   state.queryAttempts = 0
   state.queryFailures = 0
@@ -483,6 +539,7 @@ function updateAfterStep(state, step, config) {
   if (calls.length === 0) return
 
   const catalog = calls.filter(call => call.kind === 'catalog')
+  const queries = calls.filter(call => call.kind === 'query')
   if (catalog.length > 0) {
     const outcomes = catalog.map(call => state.results.get(call.callId)).filter(Boolean)
     const allReady = outcomes.length === catalog.length
@@ -506,10 +563,12 @@ function updateAfterStep(state, step, config) {
       state.reason = 'catalog_attempt_limit'
       state.requiredAction = false
     }
-    return
+    // A resumed turn may fetch a known view while loading another independent
+    // view in parallel. Preserve query failures and don't conclude before the
+    // newly loaded view has been queried.
+    if (!allReady || queries.length === 0) return
   }
 
-  const queries = calls.filter(call => call.kind === 'query')
   if (queries.length > 0) {
     const outcomes = queries.map(call => state.results.get(call.callId)).filter(Boolean)
     const failures = outcomes.filter(outcome => !querySucceeded(outcome.payload, outcome.failed))
@@ -543,7 +602,11 @@ function updateAfterStep(state, step, config) {
         state.requiredAction = false
       }
     } else if (success !== undefined) {
-      if (queryCompletesDataOnly(success.payload)) {
+      if (catalog.length > 0) {
+        state.stage = 'query'
+        state.reason = 'dataview_ready'
+        state.requiredAction = true
+      } else if (queryCompletesDataOnly(success.payload)) {
         state.dataOnlyComplete = true
         state.stage = 'final'
         state.reason = 'data_only_complete'
@@ -592,6 +655,9 @@ function updateAfterStep(state, step, config) {
 
 function requiredActionPrompt(state, tools) {
   if (state.stage === 'catalog') {
+    if (state.reusableApis.length > 0) {
+      return `本轮尚未取得数据。已有有效目录可直接调用 ${tools.query}；需要新视图或 operation 时先调用 ${tools.catalog}。`
+    }
     return `本阶段尚未完成目录路由。请立即调用当前唯一可见的 ${tools.catalog}；具体请求一次提交 subject、dataview、operation，不要输出文字答案。`
   }
   if (state.stage === 'query' || state.stage === 'repair') {
@@ -657,6 +723,7 @@ export function apply(ctx, input = {}) {
       dataOnlyRequested: toolContext._finance_data_only === true,
       stage: 'catalog',
       reason: 'agent_created',
+      reusableApis: [],
       catalogAttempts: 0,
       queryAttempts: 0,
       queryFailures: 0,
@@ -701,7 +768,7 @@ export function apply(ctx, input = {}) {
     agent.ctx.tools.guard(exec => {
       const kind = toolKind(exec.name, tools)
       if (kind === 'unknown') return undefined
-      if (config.preserveRequestPrefix && !stageAllows(state, kind)) {
+      if (!stageAllows(state, kind, exec.arguments)) {
         return `金融查询策略拒绝当前阶段调用 ${exec.name}；请遵循上一工具结果末尾的阶段指引。`
       }
       if (kind === 'catalog') {
@@ -736,9 +803,22 @@ export function apply(ctx, input = {}) {
     // post-execute projection, so Chat/API callers still receive the full rows.
     agent.ctx.on('tools/post-execute', async (exec, result, next) => {
       const decision = await next()
-      if (!config.resultProjection.enabled || decision.kind !== 'accept'
+      if (decision.kind !== 'accept'
         || Object.hasOwn(decision, 'value')) return decision
       const kind = toolKind(exec.name, tools)
+      if (kind === 'catalog' && !result.isError) {
+        const revision = currentRuntimeContext().finance_catalog_revision
+        const content = (decision.content ?? result.content ?? []).map(block => {
+          if (block.type !== 'text' || !revision) return block
+          let payload
+          try { payload = JSON.parse(block.text) } catch { return block }
+          return catalogIsReady(payload)
+            ? { ...block, text: JSON.stringify({ ...payload, catalog_revision: revision }) }
+            : block
+        })
+        return { ...decision, content }
+      }
+      if (!config.resultProjection.enabled) return decision
       if (kind !== 'query' && kind !== 'details') return decision
       const content = decision.content ?? result.content
       const projected = projectedContent(content, kind, config.resultProjection)
@@ -752,7 +832,7 @@ export function apply(ctx, input = {}) {
 
     agent.ctx.on('agent/pre-step', async ({ turn }, next) => {
       if (state.turn !== turn) {
-        resetTurn(state, turn, config)
+        resetTurn(state, turn, config, agent, tools)
         applyRestriction()
       }
       if (state.dataOnlyComplete) return { kind: 'reject' }
@@ -778,7 +858,11 @@ export function apply(ctx, input = {}) {
       return {
         ...proposed,
         reasoningEffort: selected.reasoningEffort,
-        maxTokens: selected.maxTokens,
+        // A resumed routing step can now produce a complete query flow. Keep
+        // routing reasoning, but don't truncate it at the smaller route budget.
+        maxTokens: state.stage === 'catalog' && state.reusableApis.length > 0
+          ? Math.max(selected.maxTokens, config.budgets.query.maxTokens)
+          : selected.maxTokens,
       }
     })
 
@@ -804,7 +888,7 @@ export function apply(ctx, input = {}) {
 
     agent.ctx.on('session/event', (_session, event) => {
       if (event.type === 'turn/start') {
-        resetTurn(state, event.data.turn, config)
+        resetTurn(state, event.data.turn, config, agent, tools)
         applyRestriction()
         return
       }
@@ -815,9 +899,9 @@ export function apply(ctx, input = {}) {
           step: event.data.step,
           name: event.data.name,
           kind,
-          allowedAtCall: stageAllows(state, kind),
+          allowedAtCall: stageAllows(state, kind, event.data.arguments),
         })
-        if (stageAllows(state, kind)) {
+        if (stageAllows(state, kind, event.data.arguments)) {
           state.requiredAction = false
           if (kind === 'catalog') state.catalogAttempts += 1
           if (kind === 'query') state.queryAttempts += 1

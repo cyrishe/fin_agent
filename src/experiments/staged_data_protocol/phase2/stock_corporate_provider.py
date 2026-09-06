@@ -9,6 +9,7 @@ from typing import Any, Dict, List, Mapping
 import pymysql
 
 from src.utils.mysql_utils import StockInfoDbUtils
+from src.experiments.staged_data_protocol.phase2.recent_scan import chronological_recent_where, fetch_recent_first
 
 
 @dataclass(frozen=True)
@@ -406,11 +407,20 @@ def execute_stock_corporate_api(*, dataview: str, args: Mapping[str, Any], outpu
     sql = _build_sql(view=view, query_columns=query_columns, columns=columns, where_sql=where_sql, order_sql=order_sql)
     params.append(limit)
 
+    date_field = view.default_date_field
+    recent_where = chronological_recent_where(args=args, where_sql=where_sql,
+        order_sql=order_sql, date_expression=f'u.`{date_field}`',
+        date_fields=[field for field in view.fields if field.endswith('_date')],
+        enabled_by_default=True)
+    recent_sql = _build_sql(view=view, query_columns=query_columns, columns=columns,
+        where_sql=recent_where, order_sql=order_sql) if recent_where else None
+    scan_evidence = {}
+
     db = StockInfoDbUtils(database="kingdomai")
     try:
         with db.conn.cursor(pymysql.cursors.DictCursor) as cursor:
-            cursor.execute(sql, tuple(params))
-            raw_rows = cursor.fetchall()
+            raw_rows = fetch_recent_first(cursor, sql=sql, params=params,
+                recent_sql=recent_sql, required_rows=limit, evidence=scan_evidence)
         rows = [_normalize_row(row, columns) for row in raw_rows]
         return _standard_result(
             status="ok",
@@ -419,7 +429,7 @@ def execute_stock_corporate_api(*, dataview: str, args: Mapping[str, Any], outpu
             columns=columns,
             rows=rows,
             source_tables=[source.table for source in view.sources],
-            sql_shape={"where": where_sql, "order": order_sql, "limit": limit},
+            sql_shape={"where": where_sql, "order": order_sql, "limit": limit, "recent_scan": scan_evidence},
         )
     except Exception as exc:  # noqa: BLE001 - experiment boundary should return structured failures.
         return _standard_result(
@@ -609,13 +619,17 @@ def _default_order_sql(view: StockCorporateView) -> str:
 def _build_sql(*, view: StockCorporateView, query_columns: List[str], columns: List[str], where_sql: str, order_sql: str) -> str:
     union_sql = "\nUNION ALL\n".join(_source_select_sql(source=source, columns=query_columns) for source in view.sources)
     select_sql = ", ".join(f"u.`{column}` AS `{column}`" for column in columns)
+    # Dates tie across union sources and within reports. Preserve business
+    # ordering, then make LIMIT deterministic for the observable row values.
+    # Binary comparison also disambiguates case/accent-insensitive collations.
+    tie_order = ", ".join(f"BINARY u.`{column}` ASC" for column in columns)
     return f"""
         SELECT {select_sql}
         FROM (
             {union_sql}
         ) u
         WHERE {where_sql}
-        ORDER BY {order_sql}
+        ORDER BY {order_sql}, {tie_order}
         LIMIT %s
     """
 

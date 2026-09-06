@@ -1,0 +1,159 @@
+"""Isolated real-HTTP MCP regression: source questions, data only, no replay.
+
+Run from an isolated checkout. Credentials stay in memory; only the reporting
+counter is disabled, not the financial gateway or model/tool execution path.
+"""
+from __future__ import annotations
+
+import argparse
+import concurrent.futures as futures
+from datetime import datetime, timezone
+import hashlib
+import json
+import os
+from pathlib import Path
+import secrets
+import socket
+import sys
+import threading
+import time
+
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT))
+
+PILOT = ['RTEF001', 'RTE003', 'RTEF164', 'RTEF194', 'RTEF037', 'RTE016']
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--env-file', type=Path, required=True)
+    parser.add_argument('--output-dir', type=Path, required=True)
+    parser.add_argument('--revision', required=True)
+    parser.add_argument('--full', action='store_true')
+    parser.add_argument('--case-ids', nargs='*')
+    parser.add_argument('--concurrency', type=int, default=3)
+    args = parser.parse_args()
+    from dotenv import load_dotenv
+    load_dotenv(args.env_file)
+    # The gateway is unchanged; isolate listeners, worker/session files and
+    # reporting counters from the production service and its usage statistics.
+    os.environ['FINANCE_API_ROOT_PATH'] = ''
+    os.environ['FINANCE_API_ALLOWED_HOSTS'] = '127.0.0.1:*,localhost:*'
+    os.environ['FINANCE_STATUS_ENABLED'] = '0'
+    os.environ['FINANCE_DSH_BIN'] = str(ROOT / 'scripts/dsh_source_runtime.sh')
+    os.environ['FINANCE_DSH_SDK_SOURCE'] = str(Path(os.environ['FINANCE_DSH_SOURCE_ROOT']) / 'python/sdk/src')
+    os.environ['FINANCE_DSH_WORKERS'] = str(args.concurrency)
+    os.environ['FINANCE_DSH_FINANCIAL_QA_ENABLED'] = '1'
+    os.environ['FINANCE_DSH_TURN_TIMEOUT_SECONDS'] = '150'
+    os.chdir(ROOT)
+    import httpx
+    import uvicorn
+    from scripts.eval_finance_rest_detail import load_cases, payload_problems
+    from src.finance_api.app import create_app
+    from src.finance_api.auth import FinanceApiKeyAuth
+    from src.finance_api.service import FinanceApiGateway
+
+    cases = [c for c in load_cases() if c['case_id'].startswith('RTE')]
+    by_id = {c['case_id']: c for c in cases}
+    assert len(cases) == len(by_id) == 184
+    selected = args.case_ids or (list(by_id) if args.full else PILOT)
+    folder = args.output_dir.resolve()
+    folder.mkdir(parents=True, exist_ok=True)
+    pending = [by_id[cid] for cid in selected if not (folder / f'{cid}.json').exists()]
+    key = secrets.token_urlsafe(32)
+    gateway = FinanceApiGateway(usage_recorder=lambda **_: None)
+    app = create_app(auth=FinanceApiKeyAuth({'report-eval': key}), gateway=gateway)
+    sock = socket.socket()
+    sock.bind(('127.0.0.1', 0))
+    port = sock.getsockname()[1]
+    server = uvicorn.Server(uvicorn.Config(app, log_level='error', access_log=False))
+    thread = threading.Thread(target=server.run, kwargs={'sockets': [sock]}, daemon=True)
+    thread.start()
+    try:
+        deadline = time.monotonic() + 30
+        while not server.started:
+            if not thread.is_alive() or time.monotonic() > deadline:
+                raise RuntimeError('Isolated MCP listener did not start')
+            threading.Event().wait(.05)
+        warm = gateway.prewarm()
+        manifest = {'revision': args.revision, 'model': os.environ.get('LLM_DEFAULT_MODEL'),
+            'runtime': 'dsh', 'execution_mode': 'standard', 'response_mode': 'data',
+            'case_count': len(selected), 'concurrency': args.concurrency,
+            'transport': 'real HTTP MCP on isolated loopback listener',
+            'usage_counter': 'disabled for benchmark', 'prewarm': warm,
+            'policy_sha256': hashlib.sha256((ROOT / 'src/scenarios/financial_qa/dsh_loop_policy.mjs').read_bytes()).hexdigest(),
+            'created_at': datetime.now(timezone.utc).isoformat()}
+        (folder / 'run_manifest.json').write_text(json.dumps(manifest, ensure_ascii=False, indent=2))
+        print(json.dumps({'ready': True, 'pending': len(pending), 'prewarm': warm}, ensure_ascii=False), flush=True)
+
+        def run(case):
+            request = {'query': case['question'], 'response_mode': 'data', 'runtime': 'dsh',
+                       'execution_mode': 'standard', 'detail': True, 'max_rows': 2}
+            started = time.monotonic()
+            try:
+                with httpx.Client(timeout=180, headers={'X-API-Key': key,
+                    'Accept': 'application/json, text/event-stream'}) as client:
+                    response = client.post(f'http://127.0.0.1:{port}/mcp', json={'jsonrpc': '2.0',
+                        'id': case['case_id'], 'method': 'tools/call',
+                        'params': {'name': 'finance_data_query', 'arguments': request}})
+                    wire = response.json()
+                payload = wire.get('result', {}).get('structuredContent', {})
+                problems = payload_problems(payload, response.status_code)
+                if wire.get('error') or wire.get('result', {}).get('isError'):
+                    problems.append('mcp_error')
+                if payload.get('response_mode') != 'data' or payload.get('runtime') != 'dsh':
+                    problems.append('wrong_execution_mode')
+                for page in (payload.get('data') or {}).get('results', []):
+                    if page['rows_returned'] != len(page['rows']) or len(page['rows']) > 2:
+                        problems.append('invalid_data_page')
+                result = {'case': case, 'request': request, 'transport': 'mcp',
+                    'http_status': response.status_code, 'response': payload,
+                    'problems': sorted(set(problems)), 'revision': args.revision}
+            except Exception as exc:
+                result = {'case': case, 'request': request, 'transport': 'mcp',
+                          'problems': ['transport_error'], 'error_type': type(exc).__name__}
+            result['client_elapsed_ms'] = round((time.monotonic() - started) * 1000, 3)
+            result['finished_at'] = datetime.now(timezone.utc).isoformat()
+            with (folder / f"{case['case_id']}.json").open('x') as out:
+                json.dump(result, out, ensure_ascii=False, indent=2)
+            return result
+
+        iterator = iter(pending)
+        completed = failed = 0
+        stopped = False
+        with futures.ThreadPoolExecutor(max_workers=args.concurrency) as pool:
+            active = {pool.submit(run, c) for c in [next(iterator, None) for _ in range(args.concurrency)] if c}
+            while active:
+                done, active = futures.wait(active, return_when=futures.FIRST_COMPLETED)
+                for future in done:
+                    result = future.result()
+                    completed += 1
+                    failed += bool(result['problems'])
+                    payload = result.get('response', {})
+                    detail = payload.get('detail') or {}
+                    print(json.dumps({'case_id': result['case']['case_id'], 'ok': payload.get('ok'),
+                        'seconds': round(result['client_elapsed_ms']/1000, 2), 'turns': detail.get('turns'),
+                        'tokens': detail.get('total_tokens'), 'rows': payload.get('execution', {}).get('total_rows'),
+                        'problems': result['problems']}, ensure_ascii=False), flush=True)
+                    if 'transport_error' in result['problems'] or 'unexpected_generated_summary' in result['problems']:
+                        stopped = True
+                    if result['client_elapsed_ms'] > 120000 or (completed >= 10 and failed / completed > .2):
+                        stopped = True
+                if not stopped:
+                    for _ in done:
+                        case = next(iterator, None)
+                        if case:
+                            active.add(pool.submit(run, case))
+        print(json.dumps({'completed': completed, 'failed': failed, 'stopped': stopped}), flush=True)
+        if stopped:
+            raise SystemExit(2)
+    finally:
+        server.should_exit = True
+        thread.join(timeout=10)
+        gateway.close()
+        sock.close()
+        # No temporary key was persisted; dropping the process revokes access.
+
+
+if __name__ == '__main__':
+    main()

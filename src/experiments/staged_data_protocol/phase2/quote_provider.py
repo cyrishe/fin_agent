@@ -11,6 +11,9 @@ import pymysql
 
 from src.experiments.staged_data_protocol.phase2.agg_protocol import AGG_METHODS, output_alias, parse_agg_spec
 from src.utils.mysql_utils import StockInfoDbUtils
+from src.experiments.staged_data_protocol.phase2.recent_scan import (
+    chronological_recent_where, fetch_recent_first, recent_predicate,
+)
 
 
 TRADE_CALENDAR_TABLE = "aiia_trade_calendar"
@@ -215,6 +218,8 @@ def execute_quote_api(*, subject: str, args: Mapping[str, Any], outputs: List[st
             where_sql=where_sql,
             args=args,
         )
+        _, scope_params = _count_identity_scope(source=source, args=args)
+        params = [*scope_params, *params]
         params.extend([count_per_code, limit_policy["fetch_limit"]])
     else:
         sql = _build_sql(
@@ -225,11 +230,39 @@ def execute_quote_api(*, subject: str, args: Mapping[str, Any], outputs: List[st
         )
         params.append(limit_policy["fetch_limit"])
 
+    recent_sql = None
+    required_codes = []
+    scan_evidence = {}
+    if count_per_code is not None:
+        filters = _explicit_filters(args, subject=subject)
+        if not any(connector == 'OR' for connector, *_ in filters):
+            for _, field, op, value in filters:
+                if field == 'code' and op in {'=', '==', 'in'}:
+                    required_codes.extend(_list_value(value) if op == 'in' else [value])
+        required_codes = list(dict.fromkeys(str(code) for code in required_codes))
+        # The stock template already does bounded index reads; the other
+        # sources still rank history. Enable the probe for that costly shape.
+        predicate = recent_predicate(args=args, date_expression=source.fields['tradedate'],
+                                     enabled_by_default=source.subject != 'stock')
+        # A global LIMIT can hide a deficient security. Only accept a probe
+        # when the complete explicit universe fits before the output limit.
+        if predicate and required_codes and limit_policy['fetch_limit'] >= len(required_codes) * count_per_code:
+            recent_sql = _build_per_entity_sql(source=source,
+                fields=list(dict.fromkeys([*requested_fields, 'code'])),
+                where_sql=f'({where_sql}) AND {predicate}', args=args)
+    elif _identity_time_series_request(source=source, args=args):
+        recent_where = chronological_recent_where(args=args, where_sql=where_sql,
+            order_sql=order_sql, date_expression=source.fields['tradedate'])
+        if recent_where:
+            recent_sql = _build_sql(source=source, fields=requested_fields,
+                where_sql=recent_where, order_sql=order_sql)
     db = StockInfoDbUtils(database="kingdomai")
     try:
         with db.conn.cursor(pymysql.cursors.DictCursor) as cursor:
-            cursor.execute(sql, tuple(params))
-            raw_rows = list(cursor.fetchall())
+            raw_rows = fetch_recent_first(cursor, sql=sql, params=params,
+                recent_sql=recent_sql, required_rows=limit_policy['fetch_limit'],
+                required_codes=required_codes if count_per_code else (),
+                per_code=count_per_code or 0, evidence=scan_evidence)
         if limit_policy["detect_overflow"] and len(raw_rows) > limit_policy["hard_limit"]:
             return _standard_result(
                 status="result_too_large",
@@ -259,6 +292,7 @@ def execute_quote_api(*, subject: str, args: Mapping[str, Any], outputs: List[st
                 ),
                 "count_per_code": count_per_code,
                 "hard_row_limit": limit_policy["hard_limit"],
+                "recent_scan": scan_evidence,
             },
             mocked_fields=_mocked_fields(source=source, columns=requested_fields),
         )
@@ -598,6 +632,11 @@ def _calendar_as_of(args: Mapping[str, Any]) -> str:
 def _build_where(*, source: QuoteSource, args: Mapping[str, Any]) -> tuple[str, List[Any]]:
     clauses: List[str] = []
     params: List[Any] = []
+    filters = _explicit_filters(args, subject=source.subject)
+    has_date_filter = any(
+        source.fields.get(field_name) == source.fields['tradedate']
+        for _connector, field_name, _op, _value in filters
+    )
     current_date = date.today().isoformat()
     if source.subject == "stock":
         clauses.append(f"{source.fields['tradedate']} < %s")
@@ -611,7 +650,7 @@ def _build_where(*, source: QuoteSource, args: Mapping[str, Any]) -> tuple[str, 
     elif start and end:
         clauses.append(f"{source.fields['tradedate']} BETWEEN %s AND %s")
         params.extend(sorted([start, end]))
-    elif not _identity_time_series_request(source=source, args=args):
+    elif not has_date_filter and not _identity_time_series_request(source=source, args=args):
         if source.subject == "stock":
             clauses.append(
                 f"{source.fields['tradedate']} = "
@@ -621,7 +660,6 @@ def _build_where(*, source: QuoteSource, args: Mapping[str, Any]) -> tuple[str, 
         else:
             clauses.append(f"{source.fields['tradedate']} = (SELECT MAX(trade_date) FROM {source.table})")
 
-    filters = _explicit_filters(args, subject=source.subject)
     filter_clauses: List[str] = []
     filter_params: List[Any] = []
     for connector, field_name, op, value in filters:
@@ -783,6 +821,34 @@ def _build_per_entity_sql(
         else "DESC"
     )
     order_expression = source.fields.get(order_field, source.fields["code"])
+    if source.subject == "stock":
+        # count is per security. Rank-after-full-scan needlessly sorts the entire
+        # price history even for count=1; use bounded code/date index reads.
+        projected = f"{select_sql}, {order_expression} AS `__order_value`, {source.fields['tradedate']} AS `__trade_date_sort`"
+        single_code = _single_count_code(source=source, args=args)
+        scope_sql, _ = _count_identity_scope(source=source, args=args)
+        bounded = f"""
+            SELECT {projected}
+            FROM {source.table} q
+            LEFT JOIN {source.base_table} b ON {source.join_on}
+            WHERE {where_sql}
+            {'' if single_code else 'AND q.stk_code = identities.stk_code'}
+            ORDER BY q.stk_code DESC, q.trade_date DESC
+            LIMIT %s
+        """
+        identities = f"SELECT DISTINCT q.stk_code FROM {source.table} q"
+        if scope_sql:
+            identities += f" LEFT JOIN {source.base_table} b ON {source.join_on} WHERE 1=1 {scope_sql}"
+        recent = f"({bounded}) recent" if single_code else f"""
+            ({identities}) identities
+            JOIN LATERAL ({bounded}) recent ON TRUE
+        """
+        return f"""
+            SELECT {', '.join(f'recent.`{field}`' for field in fields)}
+            FROM {recent}
+            ORDER BY `__order_value` {order_direction}, `__trade_date_sort` DESC
+            LIMIT %s
+        """
     return f"""
         SELECT {", ".join(f"`{field}`" for field in fields)}
         FROM (
@@ -802,6 +868,24 @@ def _build_per_entity_sql(
         ORDER BY `__order_value` {order_direction}, `__trade_date_sort` DESC
         LIMIT %s
     """
+
+
+def _single_count_code(*, source: QuoteSource, args: Mapping[str, Any]) -> bool:
+    filters = _explicit_filters(args, subject=source.subject)
+    return not any(c == "OR" for c, *_ in filters) and any(
+        field == "code" and (op in {"=", "=="} or (op == "in" and len(_list_value(value)) == 1))
+        for _connector, field, op, value in filters
+    )
+
+
+def _count_identity_scope(*, source: QuoteSource, args: Mapping[str, Any]) -> tuple[str, List[Any]]:
+    if source.subject != "stock" or _single_count_code(source=source, args=args):
+        return "", []
+    # A conjunction's identity subset can narrow the driving keys. An OR must
+    # retain all identities, since its other branch may match another security.
+    if any(c == "OR" for c, *_ in _explicit_filters(args, subject=source.subject)):
+        return "", []
+    return _build_identity_where(source=source, args=args)
 
 
 def _build_kd_aggregate_sql(*, source: QuoteSource, field: str, method: str, identity_sql: str) -> str:

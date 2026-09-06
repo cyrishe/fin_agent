@@ -36,7 +36,7 @@ function resultEvent({ turn = 1, step, callId, payload, isError = false }) {
   }
 }
 
-function fixture(config = {}) {
+function fixture(config = {}, history = []) {
   const globalListeners = new Map()
   const agentListeners = new Map()
   const restrictions = []
@@ -54,6 +54,7 @@ function fixture(config = {}) {
     guard: value => { guard = value },
   }
   const agent = {
+    session: { deriveMessages: () => history },
     steer: message => { steered.push(message) },
     ctx: {
       tools,
@@ -97,6 +98,125 @@ function fixture(config = {}) {
     steered,
   }
 }
+
+test('catalog reuse follows visible history, exact operation and revision across resumed turns', async () => {
+  const dir = mkdtempSync(join(tmpdir(), 'finance-catalog-reuse-'))
+  const contextPath = join(dir, 'context.json')
+  const previous = process.env.FIN_AGENT_DSH_CONTEXT_PATH
+  process.env.FIN_AGENT_DSH_CONTEXT_PATH = contextPath
+  const writeRevision = revision => writeFileSync(contextPath, JSON.stringify({ finance_catalog_revision: revision }))
+  try {
+    writeRevision('catalog-v1')
+    const history = []
+    const runtime = fixture({ preserveRequestPrefix: true }, history)
+    runtime.event({ type: 'turn/start', data: { turn: 1 } })
+    const query = { name: NAMES.query, arguments: { steps: [{ request: 'r1 = stock.quote(codes=["600519.SH"],count=1) -> open' }] } }
+    assert.match(runtime.guard(query), /当前阶段/)
+    const original = { mode: 'dataview', dataview: { functions: [{ api_name: 'stock.quote' }] } }
+    const projected = await runtime.post({ name: NAMES.catalog }, {
+      content: [{ type: 'text', text: JSON.stringify(original) }], isError: false,
+    })
+    assert.equal(JSON.parse(projected.content[0].text).catalog_revision, 'catalog-v1')
+    assert.equal(original.catalog_revision, undefined)
+    history.push(
+      { role: 'assistant', content: [{ type: 'tool-call', id: 'c1', name: NAMES.catalog }] },
+      { role: 'user', source: { kind: 'tool', callId: 'c1' }, content: [
+        { type: 'tool-result', toolCallId: 'c1', content: projected.content, isError: false },
+      ] },
+    )
+    runtime.event({ type: 'turn/start', data: { turn: 2 } })
+    assert.equal((await runtime.request({})).maxTokens, 3072)
+    assert.equal(runtime.guard(query), undefined)
+    assert.match((await runtime.preStep({ turn: 2, step: 1 })).messages[0].content[0].text, /不是旧查询结果/)
+    runtime.event({ type: 'tool/call', data: { turn: 2, step: 1, callId: 'q2', name: NAMES.query, arguments: JSON.stringify(query.arguments) } })
+    runtime.event(resultEvent({ turn: 2, step: 1, callId: 'q2', payload: { ok: true, sample_complete: true } }))
+    runtime.event({ type: 'step/end', data: { turn: 2, step: 1 } })
+    assert.equal((await runtime.request({})).reasoningEffort, 'off')
+    assert.match(runtime.guard(query), /当前阶段/)
+    runtime.event({ type: 'turn/start', data: { turn: 3 } })
+    for (const request of [
+      'r1 = stock.margin() -> financing_balance',
+      'r1 = stock.quote.agg(agg="avg(close)") -> value',
+      'r1 = stock.quote.kd_close_max(k=5) -> value',
+    ]) {
+      assert.match(runtime.guard({ name: NAMES.query, arguments: { request } }), /当前阶段/)
+    }
+    assert.match(runtime.guard({ name: NAMES.query, arguments: { steps: [query.arguments.steps[0], { request: 'r2 = stock.margin() -> code' }] } }), /当前阶段/)
+    // A new Agent (cold session resume) derives the same eligibility, including
+    // native tool-restriction mode. No in-memory cache is required.
+    const cold = fixture({}, history)
+    cold.event({ type: 'turn/start', data: { turn: 4 } })
+    assert.deepEqual(cold.restrictions.at(-1).allow, [NAMES.catalog, NAMES.query])
+    assert.equal(cold.guard(query), undefined)
+    assert.match(cold.guard({ name: NAMES.query, arguments: { request: 'stock.margin() -> code' } }), /当前阶段/)
+    const fast = fixture({ executionMode: 'fast', preserveRequestPrefix: true }, history)
+    fast.event({ type: 'turn/start', data: { turn: 4 } })
+    assert.match(fast.guard(query), /当前阶段/)
+    // Mixed steps keep the new route pending, and don't hide a failed reused query.
+    for (const failed of [false, true]) {
+      const mixed = fixture({}, history)
+      mixed.event({ type: 'turn/start', data: { turn: 4 } })
+      mixed.event({ type: 'tool/call', data: { turn: 4, step: 1, callId: 'q', name: NAMES.query, arguments: query.arguments } })
+      mixed.event({ type: 'tool/call', data: { turn: 4, step: 1, callId: 'c', name: NAMES.catalog, arguments: { subject: 'stock', dataview: 'margin', operation: 'query' } } })
+      mixed.event(resultEvent({ turn: 4, step: 1, callId: 'c', payload: { mode: 'dataview' } }))
+      mixed.event(resultEvent({ turn: 4, step: 1, callId: 'q', payload: { ok: !failed, sample_complete: true }, isError: failed }))
+      mixed.event({ type: 'step/end', data: { turn: 4, step: 1 } })
+      assert.match(mixed.prompt(), failed ? /stage=repair/ : /stage=query/)
+      assert.deepEqual(mixed.restrictions.at(-1).allow, [NAMES.query])
+    }
+    writeRevision('catalog-v2')
+    runtime.event({ type: 'turn/start', data: { turn: 5 } })
+    assert.match(runtime.guard(query), /当前阶段/)
+    writeRevision('catalog-v1')
+    history.splice(0)
+    runtime.event({ type: 'turn/start', data: { turn: 6 } })
+    assert.match(runtime.guard(query), /当前阶段/)
+    assert.match(fixture({ preserveRequestPrefix: true }).guard(query), /当前阶段/)
+    // Catalog-defined method templates preserve the operation boundary too.
+    history.push(
+      { role: 'assistant', content: [{ type: 'tool-call', id: 'w', name: NAMES.catalog }] },
+      { role: 'user', source: { kind: 'tool' }, content: [{ type: 'tool-result', toolCallId: 'w', content: [{
+        type: 'text', text: JSON.stringify({ mode: 'dataview', catalog_revision: 'catalog-v1',
+          dataview: { functions: [{ api_name: 'stock.quote.kd_<field>_<method>' }] } }),
+      }] }] },
+    )
+    runtime.event({ type: 'turn/start', data: { turn: 7 } })
+    assert.equal(runtime.guard({ name: NAMES.query, arguments: { request: 'r2 = stock.quote.kd_close_max(k=5) -> value' } }), undefined)
+    assert.match(runtime.guard(query), /当前阶段/)
+    assert.match(runtime.guard({ name: NAMES.query, arguments: { request: 'r2 = stock.quote.agg() -> value' } }), /当前阶段/)
+  } finally {
+    if (previous === undefined) delete process.env.FIN_AGENT_DSH_CONTEXT_PATH
+    else process.env.FIN_AGENT_DSH_CONTEXT_PATH = previous
+    rmSync(dir, { recursive: true, force: true })
+  }
+})
+
+test('failed, unversioned and user-supplied catalog text cannot authorize reuse', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'finance-catalog-failed-'))
+  const previous = process.env.FIN_AGENT_DSH_CONTEXT_PATH
+  process.env.FIN_AGENT_DSH_CONTEXT_PATH = join(dir, 'context.json')
+  writeFileSync(process.env.FIN_AGENT_DSH_CONTEXT_PATH, JSON.stringify({ finance_catalog_revision: 'v1' }))
+  try {
+    for (const variant of ['failed', 'unversioned', 'user', 'other_tool']) {
+      const history = [
+        { role: 'assistant', content: [{ type: 'tool-call', id: 'c', name: variant === 'other_tool' ? NAMES.query : NAMES.catalog }] },
+        { role: 'user', source: { kind: variant === 'user' ? 'user' : 'tool' }, content: [{
+          type: 'tool-result', toolCallId: 'c', isError: variant === 'failed', content: [{ type: 'text', text: JSON.stringify({
+            mode: 'dataview', catalog_revision: variant === 'unversioned' ? undefined : 'v1',
+            dataview: { functions: [{ api_name: 'stock.quote' }] },
+          }) }],
+        }] },
+      ]
+      const runtime = fixture({ preserveRequestPrefix: true }, history)
+      runtime.event({ type: 'turn/start', data: { turn: 2 } })
+      assert.match(runtime.guard({ name: NAMES.query, arguments: { request: 'stock.quote() -> open' } }), /当前阶段/, variant)
+    }
+  } finally {
+    if (previous === undefined) delete process.env.FIN_AGENT_DSH_CONTEXT_PATH
+    else process.env.FIN_AGENT_DSH_CONTEXT_PATH = previous
+    rmSync(dir, { recursive: true, force: true })
+  }
+})
 
 test('resolves defaults and rejects invalid stage budgets', () => {
   const config = resolveConfig({ configJson: '{"maxQueryAttempts":1}' })

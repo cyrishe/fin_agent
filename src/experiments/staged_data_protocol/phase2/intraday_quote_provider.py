@@ -10,6 +10,7 @@ from typing import Any, Dict, Iterable, List, Mapping
 import pymysql
 
 from src.experiments.staged_data_protocol.phase2.agg_protocol import output_alias, parse_agg_spec
+from src.experiments.staged_data_protocol.phase2.recent_scan import recent_predicate, fetch_recent_first
 from src.utils.mysql_utils import StockInfoDbUtils
 
 
@@ -102,7 +103,7 @@ def _execute_stored_minute_bars(*, args: Mapping[str, Any], outputs: List[str]) 
     """Read the source system's fixed-period bars directly, without resampling."""
     columns = _requested_fields(outputs)
     period = _minute_period(args.get("period"))
-    count = _minute_bar_count(args.get("count"), fallback=args.get("limit", 240))
+    count = _minute_bar_count(args.get("count"), fallback=240)
     if period not in SUPPORTED_MINUTE_PERIODS:
         return _result(
             status="provider_error",
@@ -124,37 +125,60 @@ def _execute_stored_minute_bars(*, args: Mapping[str, Any], outputs: List[str]) 
     where_sql, where_params = _where_sql(filters=filters, slot={})
     order_sql = _order_sql(str(args.get("order") or ""), default="code ASC, tradedate ASC, bar_end_time ASC")
     hard_row_limit = _intraday_hard_row_limit()
-    sql = f"""
-        {_stored_bar_cte(
-            kline_type=f"{period}m",
-            period_minutes=period,
-            source_where_sql=source_where_sql,
-            date_sql=date_sql,
-        )},
-        recent AS (
-            SELECT
-                base.*,
-                ROW_NUMBER() OVER (
-                    PARTITION BY code
-                    ORDER BY tradedate DESC, bar_end_time DESC, snapshot_time DESC
-                ) AS recent_row
+    requested_limit = int(args.get("limit") or -1)
+    if requested_limit > hard_row_limit:
+        return _result(status="result_too_large", args=args, columns=columns, rows=[], slot=slot,
+                       reason=f"requested limit exceeds the safety limit ({hard_row_limit})")
+    fetch_limit = requested_limit if requested_limit > 0 else hard_row_limit + 1
+    required_codes = []
+    if not any(item.get("connector", "").lower() == "or" for item in filters):
+        for item in filters:
+            if _canonical_field(item["field"]) == "code" and item["op"].lower() in {"=", "==", "in"}:
+                values = _list_values(item["value"]) if item["op"].lower() == "in" else [_clean_value(item["value"])]
+                required_codes.extend(_normalize_filter_value("code", value) for value in values)
+    required_codes = list(dict.fromkeys(required_codes))
+    predicate = recent_predicate(args=args, date_expression="s.trade_date",
+                                 date_fields=("bar_start_time", "bar_end_time"))
+    if not required_codes or fetch_limit < len(required_codes) * count or date_sql:
+        predicate = None
+    query_columns = list(dict.fromkeys([*columns, "code"])) if predicate else columns
+    identities_sql = (
+        "SELECT DISTINCT code AS stk_code FROM base" if source_where_sql else
+        f"SELECT DISTINCT stk_code FROM {SNAPSHOT_TABLE} WHERE stk_code REGEXP '^[0-9]{{6}}$'"
+    )
+    selected_sql = f""", selected_bars AS (
+        SELECT recent.*
+        FROM ({identities_sql}) identities
+        JOIN LATERAL (
+            SELECT code, kline_type, tradedate, bar_end_time
             FROM base
+            WHERE code = identities.stk_code
+            ORDER BY code DESC, kline_type DESC, tradedate DESC, bar_end_time DESC
+            LIMIT %s
+        ) selected ON TRUE
+        JOIN base recent ON recent.code = selected.code
+            AND recent.kline_type = selected.kline_type
+            AND recent.tradedate = selected.tradedate
+            AND recent.bar_end_time = selected.bar_end_time
         )
-        SELECT {", ".join(f"`{column}`" for column in columns)}
-        FROM recent
-        WHERE recent_row <= %s
-          AND {where_sql}
+        SELECT {", ".join(f"`{column}`" for column in query_columns)}
+        FROM selected_bars
+        WHERE {where_sql}
         ORDER BY {order_sql}
         LIMIT %s
     """
+    sql = _stored_bar_cte(kline_type=f"{period}m", period_minutes=period,
+                           source_where_sql=source_where_sql, date_sql=date_sql) + selected_sql
+    recent_sql = (_stored_bar_cte(kline_type=f"{period}m", period_minutes=period,
+                    source_where_sql=source_where_sql, date_sql=predicate) + selected_sql) if predicate else None
+    scan_evidence = {}
     db = StockInfoDbUtils(database="kingdomai")
     try:
         with db.conn.cursor(pymysql.cursors.DictCursor) as cursor:
-            cursor.execute(
-                sql,
-                tuple([*source_params, *date_params, count, *where_params, hard_row_limit + 1]),
-            )
-            bars = [dict(row) for row in cursor.fetchall()]
+            bars = fetch_recent_first(cursor, sql=sql,
+                params=[*source_params, *date_params, count, *where_params, fetch_limit],
+                recent_sql=recent_sql, required_codes=required_codes, per_code=count,
+                evidence=scan_evidence)
     except Exception as exc:  # noqa: BLE001
         return _result(status="provider_error", args=args, columns=columns, rows=[], slot=slot, reason=str(exc))
     finally:
@@ -172,8 +196,6 @@ def _execute_stored_minute_bars(*, args: Mapping[str, Any], outputs: List[str]) 
                 "FIN_AGENT_INTRADAY_HARD_ROW_LIMIT for an authorized bulk run"
             ),
         )
-    if "limit" in args and "count" in args:
-        bars = bars[: _bounded_limit(args.get("limit"), default=len(bars) or 1)]
     rows = [_normalize_row(row, columns) for row in bars]
     returned_dates = [row.get("tradedate") for row in bars if row.get("tradedate")]
     if returned_dates:
@@ -189,6 +211,7 @@ def _execute_stored_minute_bars(*, args: Mapping[str, Any], outputs: List[str]) 
             "period": period,
             "count_per_code": count,
             "source": "stored_fixed_period_kline",
+            "recent_scan": scan_evidence,
             "where": where_sql,
             "order": order_sql,
             "hard_row_limit": hard_row_limit,

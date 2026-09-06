@@ -24,10 +24,12 @@ CREATE TABLE IF NOT EXISTS aiia_trade_calendar (
     market_code VARCHAR(16) NOT NULL COMMENT 'Existing application market identifier: CN_A',
     calendar_date DATE NOT NULL,
     is_trade_day TINYINT UNSIGNED NOT NULL COMMENT '1=open, 0=weekend or exchange holiday',
+    trade_seq INT UNSIGNED NULL COMMENT 'Chronological trading-day sequence per market; closed days are NULL',
     source_url VARCHAR(512) NULL COMMENT 'Official annual schedule',
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (market_code, calendar_date),
-    KEY idx_market_open_date (market_code, is_trade_day, calendar_date)
+    KEY idx_market_open_date (market_code, is_trade_day, calendar_date),
+    KEY idx_market_open_seq (market_code, is_trade_day, trade_seq)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Exchange trading calendar; only verified years'
 """
 
@@ -45,6 +47,7 @@ def seed(db):
     rows = calendar_rows()
     with db.conn.cursor() as cursor:
         cursor.execute(DDL)
+        ensure_sequence_schema(cursor)
     # DDL commits in MySQL. Inserts and read-back verification form one transaction.
     db.conn.begin()
     try:
@@ -59,11 +62,47 @@ def seed(db):
             cursor.execute("SELECT calendar_date,is_trade_day FROM aiia_trade_calendar WHERE market_code=%s AND calendar_date BETWEEN %s AND %s ORDER BY calendar_date", ("CN_A", rows[0][1], rows[-1][1]))
             if list(cursor.fetchall()) != [(r[1],r[2]) for r in rows]:
                 raise ValueError("Calendar read-back verification failed")
+            fill_trade_sequence(cursor)
         db.conn.commit()
     except Exception:
         db.conn.rollback()
         raise
     return len(missing)
+
+
+def ensure_sequence_schema(cursor):
+    """Add the existing KD-provider contract to calendars created by older seeders."""
+    cursor.execute("SHOW COLUMNS FROM aiia_trade_calendar LIKE 'trade_seq'")
+    if not cursor.fetchone():
+        cursor.execute("ALTER TABLE aiia_trade_calendar ADD COLUMN trade_seq INT UNSIGNED NULL COMMENT 'Chronological trading-day sequence per market; closed days are NULL'")
+    cursor.execute("SHOW INDEX FROM aiia_trade_calendar WHERE Key_name='idx_market_open_seq'")
+    if not cursor.fetchone():
+        cursor.execute("ALTER TABLE aiia_trade_calendar ADD INDEX idx_market_open_seq (market_code,is_trade_day,trade_seq)")
+
+
+def sequence_updates(rows):
+    counters = {}
+    updates = []
+    for market, day, opened, existing in sorted(rows, key=lambda r: (r[0], r[1])):
+        if opened:
+            counters[market] = counters.get(market, 0) + 1
+            expected = counters[market]
+        else:
+            expected = None
+        if expected != existing:
+            updates.append((expected, market, day))
+    return updates
+
+
+def fill_trade_sequence(cursor):
+    cursor.execute("SELECT market_code,calendar_date,is_trade_day,trade_seq FROM aiia_trade_calendar ORDER BY market_code,calendar_date FOR UPDATE")
+    updates = sequence_updates(cursor.fetchall())
+    if updates:
+        cursor.executemany("UPDATE aiia_trade_calendar SET trade_seq=%s WHERE market_code=%s AND calendar_date=%s", updates)
+    cursor.execute("SELECT market_code,calendar_date,is_trade_day,trade_seq FROM aiia_trade_calendar ORDER BY market_code,calendar_date")
+    if sequence_updates(cursor.fetchall()):
+        raise ValueError("Trading-day sequence verification failed")
+    return len(updates)
 
 
 def main():
