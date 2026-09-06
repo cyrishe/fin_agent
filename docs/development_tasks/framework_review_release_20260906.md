@@ -27,15 +27,27 @@
 
 ## 自动回归
 
-- Python：`pytest tests --ignore=tests/manual --ignore=tests/integration -q --disable-warnings --maxfail=5`：**1212 passed，27 skipped**，约 132 秒。
+- 最终 Python 全量：`pytest tests --ignore=tests/manual --ignore=tests/integration -q --disable-warnings --maxfail=3`：**1219 passed，27 skipped**，约 124 秒。
 - Node：自定义工具与金融查询两套 loop policy：**27 passed**。
 - 前端：Vitest **111 passed**；TypeScript 与 Vite production build 通过。构建仍有大 chunk 提示，不影响本次构建成功。
 - `git diff --check` 通过。
 
-服务器首次兼容回归发现上述 MaaS 域名问题，已在刷新服务前修复。配置初始化测试改为隔离的模拟 `.env`，不再依赖开发者本机私钥配置。
+服务器首次兼容回归发现上述 MaaS 域名问题，已在刷新服务前修复。配置初始化测试改为隔离的模拟 `.env`，不再依赖开发者本机 API Key 配置。
 
 跳过的测试及 `manual/integration` 未被上述数字覆盖。前作者的真实 DSH 样本停在 Codex 交接前，不能算完整 Chat/SSE→Codex→候选→验证端到端通过；完整链路与 P50/P95 效果评测仍应继续。
 
 ## 服务器发布边界
 
 服务器现有工作区包含已部署但未提交的补丁。发布先留存补丁、受影响文件和前端构建，再以旧基线做三方核对，逐项处理重叠改动；不覆盖 `.env`、运行数据或已有日志。更新后检查 Python 3.10 兼容性、DSH policy、服务入口和真实路由。数据库迁移与 nginx 特权配置不夹带执行。
+
+## 实际发布结果
+
+- 代码发布至 GitHub、Codeup 和服务器同一分支；服务器仅保留原有文件可执行位差异，源码内容与提交一致。
+- 服务器 Python 3.10 聚焦回归 90 项通过；启动器补丁聚焦 21 项通过；Node policy 27 项通过。
+- MaaS 真实意图路由：工具创建/普通行情两个请求均正确，各 1 次模型调用，分别约 2.44/1.32 秒。
+- 真实 API：带 Key 查询贵州茅台近五个交易日收盘价，`ok=true`、返回完整 5 行，约 15.04 秒；未授权请求返回 401。
+- 首页、JS/CSS、数据图、MCP 指南均 HTTP 200；内置浏览器确认首页主体和导航已渲染。
+- Financial API 已重启，Web 代码已 HUP 热重载；`.env` 与发布前备份哈希一致。
+- 备份与操作说明：服务器 `/home/che/cyris/fin_agent_deploy/review-20260906/`。其中备份包含原 `.env`，目录权限 700，不应分享或提交。
+
+**待用户操作**：`sudo systemctl restart fin-agent-web.service`。Gunicorn HUP 不重新读取 systemd EnvironmentFile；主进程仍持有旧 `CODEX_CRS_MODEL`，而 `.env` 已是 Astra low。当前用户无免密 sudo，未擅自修改权限或改用其他进程取代该 systemd 服务。
