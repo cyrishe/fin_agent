@@ -29,11 +29,11 @@
 ## 系统库
 
 2026-09-06核查：本地和服务器均连接 `47.112.132.214:3306/aiia_system`，
-并非旧kingdomai。用户随后明确要求迁至 `47.94.1.2:3312/aiia_system`，旧库保留不动。
+并非旧kingdomai。**最新决定：迁至 `47.94.1.2:3312/stock_agent`，复用现有 cubeyz 账号，旧库保留不动。**
 源库21张InnoDB表，无触发器、存储过程或数据库事件。
 
-迁移脚本：`scripts/migrate_system_database.py --apply`。
-仅从旧库执行只读一致性快照查询；目标库必须不存在或完全为空，拒绝覆盖已有表。
+迁移脚本：`scripts/migrate_system_database.py --apply --writers-stopped`。
+仅从旧库执行只读一致性快照查询；允许目标库中存在其他项目的表，但拒绝覆盖本次待迁入的任何同名表。
 保留原始建表语句、主键、自增值和记录，分批复制；每表按主键排序计算 SHA256 并回读核对行数及摘要。
 脚本不负责自动停服或切换连接，必须先暂停本地/服务器所有系统库写入。
 迁移日志只包含表名、数量、内容摘要，不含业务记录与凭据。
@@ -46,32 +46,34 @@ Web以systemd管理，旧环境会留在运行进程中，修改.env后必须真
 
 回退时恢复旧配置并重启。**一旦新库接收新请求，回退前需处理新增数据，不能直接切回旧库而丢失新记录。**
 
-### 独立系统库准备结果（2026-09-06）
+### 当前预检结果与切换步骤（2026-09-06）
 
 当前 Fin Agent 的本地、服务器配置及服务器进程仍指向旧 `aiia_system`。
 新 MySQL 使用 `cubeyz` 账号访问 `kingdomai` / `stock_agent`；系统库也复用此账号，
-但库名必须单独使用 `aiia_system`。连接器现在拒绝把两个业务库作为系统库。
+目前直接使用 `stock_agent`，不创建新账号、不改密码。连接器仍必须显式配置 `SYSTEM_DB_URL`，
+不自动回退到 `PLATFORM_DB_URL` 或其他业务连接；此前禁止 stock_agent 的检查已按用户最新决定撤销。
 
-已实际尝试 `--prepare`，MySQL 返回 **1044 Access denied for user cubeyz@% to database aiia_system**。
-因此新库尚未创建，数据未复制，`.env` 和运行连接未切换。先授权再停服，避免无谓停机。
+先前创建独立 `aiia_system` 被 MySQL 1044 拒绝，该方案已取消。
+新的 stock_agent 只读预检已通过：源库 21 张表；新增 3 张应用表；没有待迁入命名空间或外键约束冲突。
+迁移尚待所有旧库写入进程停止，预检本身没有复制数据，也没有切换 `.env`。
 
-隔离连接、空目标库保护、用量、工具存储、定时任务与环境示例相关测试共 40 项通过。
+连接解析、目标表保护、重命名、用量、工具存储、定时任务与环境示例相关测试共 42 项通过。
+完整后端回归（排除 manual、integration 目录）：1231 项通过、27 项跳过。
 
-DBA 在 **47.94.1.2:3312** 执行：`docs/sql/create_aiia_system_database.sql`。
-该 SQL 仅创建独立 schema，并给既有账号授予该 schema 的读写/建表/索引权限；不改密码，不授权其他库。
+**不再需要 DBA 执行建库/授权 SQL。** `docs/sql/create_aiia_system_database.sql` 仅保留为旧方案历史，不应按当前方案执行。
 
 随后按顺序操作：
 
-1. 在项目根目录运行 `.venv/bin/python scripts/migrate_system_database.py --prepare`，验证账号能访问空库。此步骤不切连接、不复制数据，可在运行中执行。
+1. 在项目根目录运行 `.venv/bin/python scripts/migrate_system_database.py --prepare`，检查源库和 stock_agent 的命名空间。默认无参数也是只读预检。
 2. 暂停所有旧系统库写入端，包括服务器 Web/Financial API、本地 Web/API、可能的定时 worker 和测试进程。Web 使用 `sudo systemctl stop fin-agent-web.service`；其余按原启动方式正常停止。
-3. 运行 `.venv/bin/python scripts/migrate_system_database.py --apply`，确认每表行数和 SHA256 回读一致。以当前源库为准，预计复制 21 张表，再补 3 张现有代码需要的新表。
-4. 安全备份两端 `.env`，仅将 `SYSTEM_DB_URL` 改为新 MySQL 地址、同一 `cubeyz` 账号密码和 `/aiia_system`。密码须 URL 编码，不打印到终端、不提交 Git。
-5. 在启动前验证 `SELECT DATABASE()` 为 `aiia_system`，核对用户、会话、工具资产、修订与调度表以及用量接口；完整重启所有写入端，不能用 HUP 代替环境重载。
+3. 运行 `.venv/bin/python scripts/migrate_system_database.py --apply --writers-stopped`，确认每表行数和 SHA256 回读一致。以当前源库为准，预计复制 21 张表，再补 3 张现有代码需要的新表。
+4. 安全备份两端 `.env`，仅将 `SYSTEM_DB_URL` 改为新 MySQL 地址、同一 `cubeyz` 账号密码和 `/stock_agent`。当前 `PLATFORM_DB_URL` 已是这个连接，可安全复用其值。不要提前切换连接或将密码打印/提交 Git。
+5. 在启动前验证 `SELECT DATABASE()` 为 `stock_agent`，核对用户、会话、工具资产、修订与调度表以及用量接口；完整重启所有写入端，不能用 HUP 代替环境重载。
 
-迁移失败会保留目标现场，脚本拒绝覆盖非空库；不要自行删除旧库或直接反复执行复制。
+迁移失败会保留目标现场，脚本拒绝覆盖已存在的目标系统表；不要删除 stock_agent、旧库或直接反复执行复制。
 
 ### 不按 aiia_ 前缀混搬
 
 - `kingdomai.aiia_stock_realtime_minute_snapshot*` 和 `aiia_trade_calendar` 是金融业务数据，留在 `kingdomai`。
-- `stock_agent.aiia_simple_bi_*` 属于另一套 BI 系统，本仓库无引用；是否一起迁移需单独确认并检查该项目配置，不随 Fin Agent 自动搬动。
-- 旧 `aiia_system` 中的历史表（包括 `leader_risk_state`）随源库保留复制；不与 `stock_agent` 的同名表合并或覆盖。
+- `stock_agent.aiia_simple_bi_*` 属于另一套 BI 系统，本仓库无引用，继续保持原样。
+- 旧 `leader_risk_state` 在本项目无代码引用，复制为 `stock_agent.aiia_legacy_leader_risk_state`；已有 `stock_agent.leader_risk_state` 不覆盖、不合并。

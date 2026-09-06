@@ -1,5 +1,10 @@
 # ai-agent.kingdomai.com 部署说明
 
+> **现网操作以 [RELEASE_20260906.md](RELEASE_20260906.md) 为准**：Web 为 22056，
+> Financial REST/MCP 为 22054，公网前缀为 `/fin_agent/`。下文 `/finance/` 是最初安装草案，
+> 不要直接覆盖现网 `.env` 或 nginx。系统表最新决定迁入新 MySQL 的 stock_agent，
+> 必须先停写、迁移校验和切连接，再完整重启；不能只做 HUP。
+
 部署目录为 `/home/che/cyris/fin_agent`，进程只监听 `127.0.0.1:22054`，
 Nginx 对外发布到：
 

@@ -1,3 +1,5 @@
+-- SUPERSEDED: current deployment uses stock_agent; do not run for this migration.
+-- Historical separate-schema option, retained for reference only.
 -- Run by a DBA on 47.94.1.2:3312, not by the application account.
 -- Reuse the existing cubeyz@% account; do not create a user or change its password.
 -- This grants rights only on the dedicated Fin Agent system schema.

@@ -8,7 +8,7 @@ import pymysql
 
 
 def system_db_connection_kwargs(*, raw_url: Optional[str] = None) -> dict[str, Any]:
-    """Parse the isolated system database URL without a business-DB fallback."""
+    """Parse the explicit system URL without an implicit business-DB fallback."""
 
     value = str(raw_url if raw_url is not None else os.getenv("SYSTEM_DB_URL") or "").strip()
     if not value:
@@ -17,11 +17,6 @@ def system_db_connection_kwargs(*, raw_url: Optional[str] = None) -> dict[str, A
     database = unquote((parsed.path or "/").lstrip("/"))
     if parsed.scheme != "mysql" or not parsed.hostname or not database:
         raise RuntimeError("SYSTEM_DB_URL must be a MySQL URL with a database name")
-    if database.casefold() in {"stock_agent", "kingdomai"}:
-        raise RuntimeError(
-            "SYSTEM_DB_URL must use an isolated system schema such as aiia_system, "
-            "not the stock_agent or kingdomai business schema"
-        )
     query = parse_qs(parsed.query)
     return {
         "host": parsed.hostname,
