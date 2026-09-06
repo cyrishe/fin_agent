@@ -35,7 +35,8 @@ _DEFAULT_LOOP_POLICY_CONFIG: dict[str, Any] = {
     "businessHint": "",
     "budgets": {
         "catalog": {"reasoningEffort": "low", "maxTokens": 1536},
-        "query": {"reasoningEffort": "low", "maxTokens": 3072},
+        "query": {"reasoningEffort": "off", "maxTokens": 3072},
+        "fast_query": {"reasoningEffort": "low", "maxTokens": 3072},
         "repair": {"reasoningEffort": "low", "maxTokens": 3072},
         "details": {"reasoningEffort": "off", "maxTokens": 2048},
         "final": {"reasoningEffort": "off", "maxTokens": 2048},
@@ -119,6 +120,10 @@ def _merge_loop_policy_config(
                     current = dict(config["budgets"].get(str(stage), {}))
                     current.update(dict(value))
                     config["budgets"][str(stage)] = current
+            # Old configs used query for both modes. Preserve explicit tuning;
+            # only the new default distinguishes no-repair fast queries.
+            if isinstance(budgets.get("query"), Mapping) and "fast_query" not in budgets:
+                config["budgets"]["fast_query"].update(dict(budgets["query"]))
         if isinstance(result_projection, Mapping):
             config["resultProjection"].update(dict(result_projection))
     return config
@@ -815,15 +820,19 @@ class FinanceDeepSeekHarnessSessionService:
         runtime_scope = f"financial_qa_dsh:{key}"
         projection_config = self.loop_policy_config.get("resultProjection")
         model_sample_rows = 0
+        model_sample_max_chars = 0
         detail_default_limit = 10
         if (
             isinstance(projection_config, Mapping)
             and projection_config.get("enabled") is not False
         ):
             try:
-                model_sample_rows = max(
-                    0,
-                    min(10, int(projection_config.get("queryMaxRows") or 0)),
+                # A small complete table is cheaper than another detail turn.
+                # queryMaxRows still bounds previews when the full table does
+                # not fit; the complete-table path has a separate safety cap.
+                model_sample_rows = 50
+                model_sample_max_chars = max(
+                    1, int(projection_config.get("queryTotalMaxChars") or 6000)
                 )
             except (TypeError, ValueError):
                 model_sample_rows = 0
@@ -844,6 +853,7 @@ class FinanceDeepSeekHarnessSessionService:
                 (context or {}).get("_finance_execution_mode") or "standard"
             ),
             "_finance_model_sample_rows": model_sample_rows,
+            "_finance_model_sample_max_chars": model_sample_max_chars,
             "_finance_detail_default_limit": detail_default_limit,
         }
         host_runtime = self.system_tools.create_runtime()
@@ -1123,6 +1133,20 @@ class FinanceDeepSeekHarnessSessionService:
                     and not data_only_early_stop
                 ):
                     error = f"DeepSeek Harness turn ended with {finish_reason}"
+                # A terminal tool result can contain a query error, especially
+                # in no-repair fast mode. "completed" is a lifecycle outcome,
+                # not evidence that the database query succeeded.
+                if not error and not result_refs:
+                    for call in tool_calls:
+                        if call.get("tool") != "finance_query":
+                            continue
+                        failure = (
+                            _trim(call.get("error") or call.get("execution_error"))
+                            or "; ".join(str(item) for item in call.get("validation_errors") or [])
+                        )
+                        if failure:
+                            error = f"Financial query failed: {failure}"
+                            break
                 final_response = (
                     "" if data_only_has_results else _trim(result.final_response)
                 )

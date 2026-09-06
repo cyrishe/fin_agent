@@ -19,11 +19,14 @@ const TOOL_SUFFIXES = Object.freeze({
 })
 
 const DEFAULT_BUDGETS = Object.freeze({
-  // Semantic routing and DSL construction keep low reasoning.  Once evidence
-  // exists, DeepSeek's supported `off` mode reserves the budget for visible
-  // detail selection and the final answer instead of another long thought.
+  // Keep reasoning for semantic routing and repair. Once the exact catalog
+  // contract is loaded, query construction uses the supported `off` mode;
+  // the normal validation/repair lifecycle is unchanged.
   catalog: Object.freeze({ reasoningEffort: 'low', maxTokens: 1536 }),
-  query: Object.freeze({ reasoningEffort: 'low', maxTokens: 3072 }),
+  query: Object.freeze({ reasoningEffort: 'off', maxTokens: 3072 }),
+  // Fast mode has no repair opportunity; retain its previous query budget.
+  // This is a budget profile, not an additional lifecycle stage.
+  fast_query: Object.freeze({ reasoningEffort: 'low', maxTokens: 3072 }),
   repair: Object.freeze({ reasoningEffort: 'low', maxTokens: 3072 }),
   details: Object.freeze({ reasoningEffort: 'off', maxTokens: 2048 }),
   final: Object.freeze({ reasoningEffort: 'off', maxTokens: 2048 }),
@@ -183,21 +186,21 @@ export function resolveConfig(input = {}) {
     budgets: Object.fromEntries(
       Object.entries(DEFAULT_BUDGETS).map(([stage, fallback]) => [
         stage,
-        budget(rawBudgets[stage], fallback, stage),
+        budget(rawBudgets[stage] ?? (stage === 'fast_query' ? rawBudgets.query : undefined), fallback, stage),
       ]),
     ),
     resultProjection: resultProjection(supplied.resultProjection),
   }
 }
 
-function currentExecutionMode(config) {
+function currentToolContext() {
   const contextPath = String(process.env.FIN_AGENT_DSH_CONTEXT_PATH ?? '').trim()
-  if (!contextPath) return config.executionMode
+  if (!contextPath) return {}
   let payload
   try {
     payload = JSON.parse(readFileSync(contextPath, 'utf8'))
   } catch {
-    return config.executionMode
+    return {}
   }
   const toolContext = payload !== null
     && typeof payload === 'object'
@@ -205,7 +208,7 @@ function currentExecutionMode(config) {
     && typeof payload.tool_context === 'object'
     ? payload.tool_context
     : {}
-  return executionMode(toolContext._finance_execution_mode, config.executionMode)
+  return toolContext
 }
 
 function stableValue(value) {
@@ -258,17 +261,20 @@ function cloneJson(value) {
 
 function projectRows(rows, { maxRows, maxCellChars, totalMaxChars }) {
   if (!Array.isArray(rows)) return { rows, changed: false, shortenedFields: [] }
-  let remaining = totalMaxChars
-  let changed = rows.length > maxRows
+  // Row count alone is not a context budget. Keep small complete tables,
+  // including all selected string fields, without another detail round-trip.
+  if (rows.length <= 50 && JSON.stringify(rows).length <= totalMaxChars) {
+    return { rows, changed: false, shortenedFields: [] }
+  }
   const shortenedFields = new Set()
-  const selectedRows = rows.length > maxRows
-    ? [
-        ...rows.slice(0, Math.ceil(maxRows / 2)),
-        ...rows.slice(rows.length - Math.floor(maxRows / 2)),
-      ]
-    : rows
-  const projected = selectedRows.map(row => {
-    if (row === null || typeof row !== 'object') return row
+  const projected = []
+  // A visible page is contiguous: head+tail sampling cannot be paged reliably.
+  for (const row of rows.slice(0, maxRows)) {
+    if (row === null || typeof row !== 'object') {
+      if (JSON.stringify([...projected, row]).length > totalMaxChars) break
+      projected.push(row)
+      continue
+    }
     const entries = Array.isArray(row)
       ? row.map((value, index) => [String(index), value])
       : Object.entries(row)
@@ -276,25 +282,25 @@ function projectRows(rows, { maxRows, maxCellChars, totalMaxChars }) {
     for (const [key, raw] of entries) {
       let value = raw
       if (typeof raw === 'string') {
-        const allowed = Math.max(0, Math.min(maxCellChars, remaining))
-        if (raw.length > allowed) {
-          value = `${raw.slice(0, allowed)}…`
-          changed = true
+        if (raw.length > maxCellChars) {
+          value = `${raw.slice(0, maxCellChars)}…`
           shortenedFields.add(key)
         }
-        remaining = Math.max(0, remaining - Math.min(raw.length, allowed))
       }
       if (Array.isArray(next)) next.push(value)
       else next[key] = value
     }
-    return next
-  })
-  return { rows: projected, changed, shortenedFields: [...shortenedFields] }
+    // Count keys, numbers and structure too, not just string cell values.
+    if (JSON.stringify([...projected, next]).length > totalMaxChars) break
+    projected.push(next)
+  }
+  return { rows: projected, changed: true, shortenedFields: [...shortenedFields] }
 }
 
 function projectQueryPayload(payload, config) {
   const projected = cloneJson(payload)
   const items = Array.isArray(projected.steps) ? projected.steps : [projected]
+  let remaining = config.queryTotalMaxChars
   for (const item of items) {
     if (item === null || typeof item !== 'object' || Array.isArray(item)) continue
     const sample = item.sample
@@ -302,11 +308,15 @@ function projectQueryPayload(payload, config) {
     const result = projectRows(sample.rows, {
       maxRows: config.queryMaxRows,
       maxCellChars: config.queryCellMaxChars,
-      totalMaxChars: config.queryTotalMaxChars,
+      totalMaxChars: remaining,
     })
+    remaining = Math.max(0, remaining - JSON.stringify(result.rows).length)
     if (!result.changed) continue
     sample.rows = result.rows
     item.sample_complete = false
+    if (item.step_evidence && typeof item.step_evidence === 'object') {
+      item.step_evidence.sample_complete = false
+    }
     item.result_projection = {
       model_rows: result.rows.length,
       source_rows: Number(item.row_count ?? sample.rows.length),
@@ -328,11 +338,16 @@ function projectDetailPayload(payload, config) {
     })
     if (result.changed) {
       projected.rows = result.rows
+      if (projected.page && typeof projected.page === 'object') {
+        const offset = Number(projected.page.offset ?? 0)
+        projected.page.returned = result.rows.length
+        projected.page.has_more = offset + result.rows.length < Number(projected.page.total ?? 0)
+      }
       projected.result_projection = {
         model_rows: result.rows.length,
         shortened_fields: result.shortenedFields,
         complete: false,
-        guidance: '这是面向模型的有界明细；原始行仍保存在 result_ref。',
+        guidance: '这是连续的有界明细；page 描述实际可见行，shortened_fields 中的字段仅为摘要，不代表全文。原始行保存在 result_ref。',
       }
     }
   } else if (typeof projected.text === 'string' && projected.text.length > config.detailTotalMaxChars) {
@@ -437,7 +452,9 @@ function stageAllows(state, kind) {
 
 function resetTurn(state, turn, config) {
   state.turn = turn
-  state.executionMode = currentExecutionMode(config)
+  const toolContext = currentToolContext()
+  state.executionMode = executionMode(toolContext._finance_execution_mode, config.executionMode)
+  state.dataOnlyRequested = toolContext._finance_data_only === true
   state.stage = 'catalog'
   state.reason = 'turn_started'
   state.catalogAttempts = 0
@@ -633,9 +650,11 @@ export function apply(ctx, input = {}) {
 
   ctx.on('agent/created', ({ agent }) => {
     const tools = resolveToolNames(agent)
+    const toolContext = currentToolContext()
     const state = {
       turn: 0,
-      executionMode: currentExecutionMode(config),
+      executionMode: executionMode(toolContext._finance_execution_mode, config.executionMode),
+      dataOnlyRequested: toolContext._finance_data_only === true,
       stage: 'catalog',
       reason: 'agent_created',
       catalogAttempts: 0,
@@ -702,7 +721,8 @@ export function apply(ctx, input = {}) {
     // response.  Harness' native terminal-result marker closes the turn at the
     // tool boundary, so no empty narrative step is proposed merely to reject it.
     agent.ctx.on('tools/execute', async (exec, next) => {
-      if (state.executionMode === 'fast' && toolKind(exec.name, tools) === 'query') {
+      if (state.executionMode === 'fast' && state.dataOnlyRequested
+        && toolKind(exec.name, tools) === 'query') {
         // The marker must be set through ToolRunContext before the body creates
         // its canonical success result.  Adding a field to a wrapper result is
         // intentionally discarded by Harness normalization.
@@ -752,7 +772,9 @@ export function apply(ctx, input = {}) {
 
     agent.ctx.on('agent/request', async (_payload, next) => {
       const proposed = await next()
-      const selected = config.budgets[state.stage] ?? config.budgets.final
+      const budgetKey = state.executionMode === 'fast' && state.stage === 'query'
+        ? 'fast_query' : state.stage
+      const selected = config.budgets[budgetKey] ?? config.budgets.final
       return {
         ...proposed,
         reasoningEffort: selected.reasoningEffort,

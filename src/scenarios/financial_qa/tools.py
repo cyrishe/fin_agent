@@ -922,6 +922,9 @@ class FinanceDataQueryCcTools:
                         title=progress_title,
                     )
                     provider_retries_used = 0
+                    allow_provider_retry = (
+                        tool_runtime.tool_context.get("_finance_execution_mode") != "fast"
+                    )
                     try:
                         result = await asyncio.to_thread(
                             self.finance_runtime.execute_request,
@@ -929,6 +932,8 @@ class FinanceDataQueryCcTools:
                             previous_results=dict(tool_runtime.result_handles),
                         )
                     except Exception:
+                        if not allow_provider_retry:
+                            raise
                         provider_retries_used = 1
                         call_record["provider_retry_count"] = provider_retries_used
                         tool_runtime.emit_progress(
@@ -941,7 +946,7 @@ class FinanceDataQueryCcTools:
                             request=request,
                             previous_results=dict(tool_runtime.result_handles),
                         )
-                    while provider_retry_allowed(
+                    while allow_provider_retry and provider_retry_allowed(
                         result.get("execution")
                         if isinstance(result, Mapping)
                         else {},
@@ -1167,7 +1172,7 @@ class FinanceDataQueryCcTools:
                     model_sample_rows = max(
                         0,
                         min(
-                            10,
+                            50,
                             int(
                                 tool_runtime.tool_context.get(
                                     "_finance_model_sample_rows"
@@ -1178,12 +1183,26 @@ class FinanceDataQueryCcTools:
                     )
                 except (TypeError, ValueError):
                     model_sample_rows = 0
+                try:
+                    model_sample_max_chars = max(
+                        0,
+                        int(tool_runtime.tool_context.get("_finance_model_sample_max_chars") or 0),
+                    )
+                except (TypeError, ValueError):
+                    model_sample_max_chars = 0
                 result_rows = _result_rows(handle)
                 row_count = int(variable.get("row_count") or len(result_rows))
                 if (
                     model_sample_rows
                     and row_count <= model_sample_rows
                     and len(result_rows) >= row_count
+                    and (
+                        not model_sample_max_chars
+                        or len(json.dumps(
+                            result_rows, ensure_ascii=False, separators=(",", ":"), default=str,
+                        ))
+                        <= model_sample_max_chars
+                    )
                 ):
                     model_sample = {"rows": result_rows[:model_sample_rows]}
                 model_sample_rows_value = (

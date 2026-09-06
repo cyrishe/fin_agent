@@ -1,5 +1,8 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
+import { mkdtempSync, writeFileSync, rmSync } from 'node:fs'
+import { tmpdir } from 'node:os'
+import { join } from 'node:path'
 
 import {
   apply,
@@ -101,6 +104,9 @@ test('resolves defaults and rejects invalid stage budgets', () => {
   assert.equal(config.preserveRequestPrefix, true)
   assert.equal(config.maxRequiredStageSteers, 1)
   assert.equal(config.budgets.catalog.reasoningEffort, 'low')
+  assert.equal(config.budgets.query.reasoningEffort, 'off')
+  assert.equal(config.budgets.fast_query.reasoningEffort, 'low')
+  assert.equal(config.budgets.repair.reasoningEffort, 'low')
   assert.equal(config.budgets.final.reasoningEffort, 'off')
   assert.equal(config.resultProjection.enabled, true)
   assert.equal(config.resultProjection.queryMaxRows, 5)
@@ -115,7 +121,7 @@ test('projects long query evidence only for the next model request', async () =>
     resultProjection: {
       queryMaxRows: 2,
       queryCellMaxChars: 12,
-      queryTotalMaxChars: 30,
+      queryTotalMaxChars: 145,
     },
   })
   const original = {
@@ -124,11 +130,12 @@ test('projects long query evidence only for the next model request', async () =>
     result_ref: 'session://r1',
     row_count: 3,
     sample_complete: true,
+    step_evidence: { sample_complete: true, guidance: '只根据已返回事实回答。' },
     sample: {
       rows: [
-        { title: '第一篇研报', investment_highlights: '这是很长的第一篇研报投资要点内容' },
-        { title: '第二篇研报', investment_highlights: '这是很长的第二篇研报投资要点内容' },
-        { title: '第三篇研报', investment_highlights: '这是很长的第三篇研报投资要点内容' },
+        { title: '第一篇研报', investment_highlights: '第一篇投资要点'.repeat(20) },
+        { title: '第二篇研报', investment_highlights: '第二篇投资要点'.repeat(20) },
+        { title: '第三篇研报', investment_highlights: '第三篇投资要点'.repeat(20) },
       ],
     },
   }
@@ -140,8 +147,10 @@ test('projects long query evidence only for the next model request', async () =>
 
   assert.equal(projected.sample.rows.length, 2)
   assert.equal(projected.sample.rows[0].title, '第一篇研报')
-  assert.equal(projected.sample.rows[1].title, '第三篇研报')
+  assert.equal(projected.sample.rows[1].title, '第二篇研报')
   assert.equal(projected.sample_complete, false)
+  assert.equal(projected.step_evidence.sample_complete, false)
+  assert.ok(JSON.stringify(projected.sample.rows).length <= 145)
   assert.equal(projected.result_ref, original.result_ref)
   assert.equal(projected.row_count, 3)
   assert.equal(projected.result_projection.complete, false)
@@ -150,7 +159,7 @@ test('projects long query evidence only for the next model request', async () =>
   assert.equal(original.sample_complete, true)
 })
 
-test('bounded detail projection keeps both ends of an ordered result', async () => {
+test('small detail tables remain complete despite the preview row limit', async () => {
   const runtime = fixture({
     resultProjection: {
       detailMaxRows: 4,
@@ -170,8 +179,24 @@ test('bounded detail projection keeps both ends of an ordered result', async () 
   )
   const projected = JSON.parse(result.content[0].text)
 
-  assert.deepEqual(projected.rows.map(row => row.index), [0, 1, 9, 10])
-  assert.equal(projected.result_projection.complete, false)
+  assert.deepEqual(projected.rows.map(row => row.index), Array.from({ length: 11 }, (_, i) => i))
+  assert.equal(projected.result_projection, undefined)
+})
+
+test('large detail pages are contiguous and page metadata matches visible rows', async () => {
+  const runtime = fixture({ resultProjection: { detailMaxRows: 4, detailTotalMaxChars: 200 } })
+  const original = {
+    page: { offset: 7, returned: 20, total: 27, has_more: false },
+    rows: Array.from({ length: 20 }, (_, index) => ({ index: index + 7, title: '研报'.repeat(10) })),
+  }
+  const result = await runtime.post({ name: NAMES.details }, {
+    content: [{ type: 'text', text: JSON.stringify(original) }],
+  })
+  const projected = JSON.parse(result.content[0].text)
+  assert.deepEqual(projected.rows.map(row => row.index), [7, 8, 9, 10])
+  assert.equal(projected.page.returned, 4)
+  assert.equal(projected.page.has_more, true)
+  assert.equal(original.page.returned, 20)
 })
 
 test('leaves compact numeric query evidence byte-for-byte unchanged', async () => {
@@ -213,6 +238,8 @@ test('keeps the legacy opt JSON surface backward compatible', () => {
   assert.equal(legacy.maxCatalogAttempts, 3)
   assert.equal(legacy.businessHint, 'legacy business hint')
   assert.equal(legacy.budgets.details.reasoningEffort, 'low')
+  assert.equal(legacy.budgets.query.reasoningEffort, 'low')
+  assert.equal(legacy.budgets.fast_query.reasoningEffort, 'low')
   assert.equal(legacy.budgets.final.maxTokens, 3072)
   assert.equal(legacy.maxRequiredStageSteers, 1)
 })
@@ -357,7 +384,7 @@ test('narrows catalog to query to final and applies per-stage request budgets', 
   assert.deepEqual(await runtime.request({ provider: 'p', model: 'm' }), {
     provider: 'p',
     model: 'm',
-    reasoningEffort: 'low',
+    reasoningEffort: 'off',
     maxTokens: 3072,
   })
 
@@ -376,7 +403,7 @@ test('narrows catalog to query to final and applies per-stage request budgets', 
   assert.equal((await runtime.request({})).reasoningEffort, 'off')
 })
 
-test('fast mode performs one catalog stage, one query stage, then returns without repair or paging', () => {
+test('fast mode performs one catalog stage, one query stage, then returns without repair or paging', async () => {
   const runtime = fixture({ executionMode: 'fast' })
   runtime.event({ type: 'turn/start', data: { turn: 1 } })
   assert.match(runtime.prompt(), /FINANCE_EXECUTION mode=fast/)
@@ -393,6 +420,7 @@ test('fast mode performs one catalog stage, one query stage, then returns withou
   runtime.event({ type: 'step/end', data: { turn: 1, step: 1 } })
   assert.deepEqual(runtime.restrictions.at(-1).allow, [NAMES.query])
   assert.match(runtime.prompt(), /reason=fast_dataview_ready/)
+  assert.equal((await runtime.request({})).reasoningEffort, 'low')
 
   runtime.event({
     type: 'tool/call',
@@ -437,7 +465,16 @@ test('fast mode returns after a failed catalog stage instead of narrowing or ste
   assert.equal(runtime.steered.length, 0)
 })
 
-test('fast data-only mode concludes natively at the successful query result', async () => {
+test('fast data-only mode concludes natively at the successful query result', async t => {
+  const dir = mkdtempSync(join(tmpdir(), 'finance-policy-'))
+  const previous = process.env.FIN_AGENT_DSH_CONTEXT_PATH
+  process.env.FIN_AGENT_DSH_CONTEXT_PATH = join(dir, 'context.json')
+  writeFileSync(process.env.FIN_AGENT_DSH_CONTEXT_PATH, JSON.stringify({ tool_context: { _finance_data_only: true } }))
+  t.after(() => {
+    if (previous === undefined) delete process.env.FIN_AGENT_DSH_CONTEXT_PATH
+    else process.env.FIN_AGENT_DSH_CONTEXT_PATH = previous
+    rmSync(dir, { recursive: true })
+  })
   const runtime = fixture({ executionMode: 'fast' })
   runtime.event({ type: 'turn/start', data: { turn: 1 } })
   runtime.event({
@@ -460,6 +497,13 @@ test('fast data-only mode concludes natively at the successful query result', as
     },
   )
   assert.equal(result.concludesTurn, true)
+})
+
+test('fast mode with summary must retain its final model step', async () => {
+  const runtime = fixture({ executionMode: 'fast' })
+  runtime.event({ type: 'turn/start', data: { turn: 1 } })
+  const result = await runtime.execute({ name: NAMES.query }, { isError: false, content: [] })
+  assert.equal(result.concludesTurn, undefined)
 })
 
 test('data-only query completes without a narrative model step', async () => {

@@ -63,6 +63,33 @@ def _cc_payload(result: dict) -> dict:
     return json.loads(result["content"][0]["text"])
 
 
+def test_mcp_wire_preserves_complete_unicode_catalog_and_structured_content():
+    from mcp import types
+    from src.scenarios.financial_qa.dsh_mcp_server import create_server
+
+    payload = {"mode": "dataview", "描述": "研报、行情与财务", "fields": ["中文字段"],
+               "example": "r1 = stock.quote(filter='贵州茅台') -> close"}
+
+    class Bridge:
+        def list_tools(self):
+            return [types.Tool(name="read_finance_catalog", inputSchema={"type": "object"})]
+
+        async def call_tool(self, name, arguments):
+            return payload
+
+    server = create_server(Bridge())
+    result = asyncio.run(server.request_handlers[types.CallToolRequest](
+        types.CallToolRequest(method="tools/call", params=types.CallToolRequestParams(
+            name="read_finance_catalog", arguments={},
+        ))
+    )).root
+    assert result.isError is False
+    assert result.structuredContent == payload
+    assert json.loads(result.content[0].text) == payload
+    assert "\\u" not in result.content[0].text
+    assert result.content[0].text == json.dumps(payload, ensure_ascii=False, separators=(",", ":"))
+
+
 def test_financial_runtime_is_explicit_and_defaults_to_cc() -> None:
     assert normalize_financial_qa_runtime(None) == "cc"
     assert normalize_financial_qa_runtime("DSH") == "dsh"
@@ -93,6 +120,15 @@ def test_dsh_reasoning_effort_defaults_low_and_validates_env(
     )
     assert default_service.reasoning_effort == "low"
     assert default_service.worker_count == 10
+    assert default_service.loop_policy_config["budgets"]["catalog"]["reasoningEffort"] == "low"
+    assert default_service.loop_policy_config["budgets"]["query"]["reasoningEffort"] == "off"
+    assert default_service.loop_policy_config["budgets"]["repair"]["reasoningEffort"] == "low"
+    override = FinanceDeepSeekHarnessSessionService(
+        enabled=False, root_dir=tmp_path / "override",
+        loop_policy_config={"budgets": {"query": {"reasoningEffort": "low"}}},
+    )
+    assert override.loop_policy_config["budgets"]["query"]["reasoningEffort"] == "low"
+    assert override.loop_policy_config["budgets"]["fast_query"]["reasoningEffort"] == "low"
 
     monkeypatch.setenv("FINANCE_DSH_REASONING_EFFORT", "high")
     high_service = FinanceDeepSeekHarnessSessionService(
@@ -643,6 +679,37 @@ def test_dsh_trace_uses_the_revision_pinned_when_tools_were_built(
             {"subject": "stock", "dataview": "quote"},
         )
     ) == {"error": "finance catalog changed during the active agent turn"}
+
+
+def test_terminal_query_failure_is_not_reported_as_empty_success(tmp_path):
+    class Harness:
+        def __init__(self, **kwargs):
+            self.env = kwargs["env"]
+
+        def run(self, prompt, *, session_id, on_notification):
+            context = json.loads(Path(self.env["FIN_AGENT_DSH_CONTEXT_PATH"]).read_text())
+            Path(self.env["FIN_AGENT_DSH_TRACE_PATH"]).write_text(json.dumps({
+                "revision": context["revision"],
+                "tracker": {"calls": [{"tool": "finance_query", "error": "missing finance query binding: stock_codes"}],
+                            "result_refs": []},
+            }))
+            return SimpleNamespace(events=[], finish_reason="completed", final_response="")
+
+        def close(self):
+            pass
+
+    service = FinanceDeepSeekHarnessSessionService(
+        enabled=True, root_dir=tmp_path / "runtime", log_path=tmp_path / "events.jsonl",
+        worker_count=1, harness_factory=Harness,
+    )
+    try:
+        result = service.run_turn(thread_id=1, owner_id="test", user_text="查询行情",
+                                  context={"_finance_execution_mode": "fast", "_finance_data_only": True})
+        assert "missing finance query binding" in result["error"]
+        assert result["result_refs"] == []
+        assert result["data_only_complete"] is False
+    finally:
+        service.close()
 
 
 def test_dsh_session_reuses_worker_and_projects_trace(tmp_path: Path) -> None:

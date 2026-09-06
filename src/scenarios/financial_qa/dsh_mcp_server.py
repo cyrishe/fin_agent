@@ -228,8 +228,17 @@ def create_server(bridge: FinanceDshMcpBridge) -> Server:
     async def call_tool(
         name: str,
         arguments: dict[str, Any] | None,
-    ) -> dict[str, Any]:
-        return await bridge.call_tool(name, arguments)
+    ) -> types.CallToolResult:
+        payload = await bridge.call_tool(name, arguments)
+        # Returning a dict lets the MCP SDK pretty-print and ASCII-escape it.
+        # Keep the entire catalog intact, in the encoding the model consumes.
+        return types.CallToolResult(
+            content=[types.TextContent(
+                type="text",
+                text=json.dumps(payload, ensure_ascii=False, separators=(",", ":")),
+            )],
+            structuredContent=payload,
+        )
 
     return server
 

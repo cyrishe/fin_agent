@@ -1,6 +1,7 @@
 import asyncio
 import json
 from pathlib import Path
+import pytest
 
 from src.scenarios.financial_qa.result_registry import FinanceResultRegistry
 from src.scenarios.financial_qa.service import FinancialQaCcService
@@ -939,7 +940,8 @@ def test_query_result_names_are_system_assigned_and_progress_is_observable(
     assert "闭环判断" not in visible_progress
 
 
-def test_dsh_model_sample_can_cover_a_small_complete_result(tmp_path: Path) -> None:
+@pytest.mark.parametrize("count,budget,expected", [(5, 6000, 5), (31, 6000, 31), (31, 150, 3)])
+def test_dsh_model_sample_can_cover_a_small_complete_result(tmp_path: Path, count, budget, expected) -> None:
     class _FiveRowRuntime(_Runtime):
         def execute_request(self, *, request, previous_results=None):
             result = super().execute_request(
@@ -953,9 +955,9 @@ def test_dsh_model_sample_can_cover_a_small_complete_result(tmp_path: Path) -> N
                         "stock_name": "贵州茅台",
                         "close": 1500.0 + index,
                     }
-                    for index in range(5)
+                    for index in range(count)
                 ],
-                "row_count": 5,
+                "row_count": count,
             }
             return result
 
@@ -968,7 +970,8 @@ def test_dsh_model_sample_can_cover_a_small_complete_result(tmp_path: Path) -> N
         owner_ids=["owner-a"],
         tool_context={
             "_agent_runtime_scope": "financial_qa_dsh:owner-a/thread-five",
-            "_finance_model_sample_rows": 5,
+            "_finance_model_sample_rows": 50,
+            "_finance_model_sample_max_chars": budget,
         },
     )
     result = _payload(
@@ -985,11 +988,11 @@ def test_dsh_model_sample_can_cover_a_small_complete_result(tmp_path: Path) -> N
         )
     )
 
-    assert len(result["sample"]["rows"]) == 5
-    assert result["sample_complete"] is True
-    assert result["step_evidence"]["sample_complete"] is True
+    assert len(result["sample"]["rows"]) == expected
+    assert result["sample_complete"] is (expected == count)
+    assert result["step_evidence"]["sample_complete"] is (expected == count)
     # The turn tracker preserves the same evidence used for this answer.
-    assert len(tracker["result_refs"][0]["sample"]["rows"]) == 5
+    assert len(tracker["result_refs"][0]["sample"]["rows"]) == expected
 
 
 def test_dsh_detail_default_can_cover_a_small_multi_period_result(
@@ -1361,6 +1364,36 @@ def test_runtime_exception_is_retried_once_before_becoming_a_cc_result(
     assert result["provider_retry_count"] == 1
     assert tracker["calls"][0]["provider_retry_count"] == 1
     assert len(runtime.calls) == 2
+
+
+@pytest.mark.parametrize("raised", [False, True])
+def test_fast_mode_does_not_retry_provider_failures(tmp_path, raised):
+    class FailingRuntime(_Runtime):
+        def execute_request(self, *, request, previous_results=None):
+            self.calls.append({"request": request})
+            if raised:
+                raise ConnectionError("temporary transport failure")
+            return {
+                "validation": {"ok": True},
+                "execution": {"ok": False, "status": "provider_exception", "reason": "temporary failure"},
+                "result": None,
+            }
+
+    runtime = FailingRuntime()
+    service = FinanceDataQueryCcTools(
+        finance_runtime=runtime, finance_catalog=_Catalog(),
+        result_store=SessionVariableStoreService(data_root=tmp_path / "data"),
+    )
+    tools, _, tracker = service.build_tools(owner_ids=["owner-a"], tool_context={
+        "_agent_runtime_scope": "financial_qa:owner-a/fast-failure", "_finance_execution_mode": "fast",
+    })
+    result = _payload(asyncio.run(next(t for t in tools if t.name == "finance_query").handler({
+        "goal": "取得行情", "request": "result = stock.quote(filter='贵州茅台') -> stock_code, close",
+    })))
+    assert result.get("ok") is not True
+    assert result["failed_step"] == 1
+    assert len(runtime.calls) == 1
+    assert tracker["result_refs"] == []
 
 
 def test_restore_ignores_legacy_provider_failure_marked_as_ok(

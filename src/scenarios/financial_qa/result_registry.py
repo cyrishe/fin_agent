@@ -243,8 +243,8 @@ class FinanceResultRegistry:
                 "若上方 API、selection_applied、输出字段和时间与 goal 一致，本步已经完成，"
                 "进入不同目标或回答；只有具体语义偏差才允许修正。"
             )
-        if sample_complete:
-            guidance += " sample_complete=true，禁止再分页加载。"
+        # Completeness is a fact in the adjacent field, not a second assertion
+        # embedded in prose: a runtime may project the model-visible sample.
         return {
             "execution_completed": True,
             "selection_applied": selection,
