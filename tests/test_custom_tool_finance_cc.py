@@ -54,14 +54,15 @@ def _confirmed_requirement_state(
     return state
 
 
-def test_finance_cc_waits_for_requirement_confirmation_before_design() -> None:
+def test_finance_cc_self_resolves_clear_requirement_and_skips_design_confirmation() -> None:
     prompt = (ROOT / "src/prompts/finance_cc/main.system.md").read_text(encoding="utf-8")
 
-    assert "即使没有需要补充的问题，也在这里停下" in prompt
+    assert "不要把本可通过专业常识、合理默认或可逆实现决定的问题重新抛给用户" in prompt
+    assert "若 `questions` 为空，不调用交互工具、不停下来确认" in prompt
     assert "不读取数据目录，不决定数据获取、聚合或代码实现方式" in prompt
-    assert "不要向用户说 `notice`、`questions` 等协议字段名" in prompt
-    assert "流程图不再是可选项" in prompt
-    assert "只有两份资产都保存成功" in prompt
+    assert "必须紧接着调用流程图 Skill" in prompt
+    assert "Design 和流程图是版本化内部资产，不是新的用户确认关卡" in prompt
+    assert "在同一轮直接调用 `implement_dynamic_tool`" in prompt
     assert "没有已保存的 `flow` 时不得进入 Coding" in prompt
 
 
@@ -156,7 +157,7 @@ def test_each_new_start_create_allocates_a_distinct_system_flow_id(
     )
 
 
-def test_design_only_provider_output_falls_back_to_user_requirement_review(
+def test_design_only_provider_output_falls_back_without_fake_confirmation(
     monkeypatch,
 ) -> None:
     monkeypatch.setenv("FINANCE_CC_TOOL_DEVELOPMENT_ENABLED", "1")
@@ -192,15 +193,10 @@ def test_design_only_provider_output_falls_back_to_user_requirement_review(
     )
     assert [block["block_id"] for block in blocks] == [
         "requirement_final_summary",
-        "requirement_review",
     ]
-    assert (
-        blocks[1]["data"]["actions"][0]["expected_revision"]
-        == 1
-    )
 
 
-def test_text_only_first_turn_still_creates_requirement_review(
+def test_text_only_first_turn_preserves_requirement_without_fake_confirmation(
     monkeypatch,
 ) -> None:
     monkeypatch.setenv("FINANCE_CC_TOOL_DEVELOPMENT_ENABLED", "1")
@@ -234,8 +230,9 @@ def test_text_only_first_turn_still_creates_requirement_review(
         {**result, "status": result["design_status"]},
         stage="requirement",
     )
-    assert blocks[-1]["block_id"] == "requirement_review"
-    assert blocks[-1]["data"]["actions"][0]["expected_revision"] == 1
+    assert [block["block_id"] for block in blocks] == [
+        "requirement_final_summary",
+    ]
 
 
 def test_finance_cc_design_and_flow_are_merged_without_action_mapping(monkeypatch) -> None:
@@ -269,7 +266,7 @@ def test_finance_cc_design_and_flow_are_merged_without_action_mapping(monkeypatc
         turn_id=24,
     )
 
-    assert result["design_status"] == "review"
+    assert result["design_status"] == "design_ready"
     assert result["state"]["tool_name"] == "golden_cross_scan"
     assert result["design"]["mermaid"] == "flowchart TD"
     assert result["design_artifact"]["design_revision"] == 1
@@ -306,7 +303,7 @@ def test_confirmed_design_without_flow_stays_a_non_reviewable_draft(monkeypatch)
     assert result["design_status"] == "design_draft"
     assert result["design"] == {}
     assert result["design_artifact"] == {}
-    assert "流程图尚未完成" in result["message"]
+    assert "流程资产尚未完成" in result["message"]
     assert "design_contract" in result["state"]
     assert "mermaid" not in result["state"]["design_contract"]
 
@@ -345,13 +342,13 @@ def test_finance_cc_natural_language_design_renders_once_with_current_revision(m
         stage="design",
     )
 
-    assert [block["block_type"] for block in blocks] == ["artifact", "interaction"]
+    assert [block["block_type"] for block in blocks] == ["artifact"]
     assert blocks[0]["data"]["details"]["document"].startswith("## 工具概述")
     assert blocks[0]["data"]["details"]["mermaid"] == "flowchart TD\nA --> B"
-    assert blocks[1]["data"]["actions"][0]["expected_revision"] == 1
+    assert result["skip_design_review"] is True
 
 
-def test_finance_cc_requirement_and_design_in_same_turn_stops_for_confirmation(monkeypatch) -> None:
+def test_finance_cc_requirement_design_and_flow_continue_without_confirmation(monkeypatch) -> None:
     monkeypatch.setenv("FINANCE_CC_TOOL_DEVELOPMENT_ENABLED", "1")
     finance_cc = _FinanceCcStub(
         {
@@ -371,6 +368,12 @@ def test_finance_cc_requirement_and_design_in_same_turn_stops_for_confirmation(m
                         "design": "## 流程\n读取日线，计算均线，识别金叉并返回日期。",
                     },
                 },
+                {
+                    "artifact_type": "flow",
+                    "payload": {
+                        "mermaid": "flowchart TD\nA[读取日线] --> B[计算均线] --> C[返回结果]",
+                    },
+                },
             ],
             "interaction_requests": [],
         }
@@ -385,17 +388,167 @@ def test_finance_cc_requirement_and_design_in_same_turn_stops_for_confirmation(m
         turn_id=26,
     )
 
-    assert result["design_status"] == "clarification"
+    assert result["design_status"] == "design_ready"
     assert result["questions"] == []
     assert result["state"]["requirement_brief"].startswith("判断指定A股")
     assert result["state"]["requirement_revision"] == 1
-    assert result["state"].get("confirmed_requirement_revision", 0) == 0
-    assert "design_contract" not in result["state"]
-    assert result["design"] == {}
-    assert result["design_artifact"] == {}
+    assert result["state"]["confirmed_requirement_revision"] == 1
+    assert result["state"]["design_contract"]["mermaid"].startswith("flowchart TD")
+    assert result["design"]["document"].startswith("## 流程")
+    assert result["design_artifact"]["design_revision"] == 1
     assert result["requirement_artifact"]["requirement_revision"] == 1
-    assert "请先确认需求" in result["message"]
+    assert "请先确认需求" not in result["message"]
+    assert result["skip_design_review"] is True
     assert "status" not in result["state"]
+
+
+def test_clear_requirement_can_reach_implementation_and_verification_in_one_turn(
+    monkeypatch,
+) -> None:
+    monkeypatch.setenv("FINANCE_CC_TOOL_DEVELOPMENT_ENABLED", "1")
+    finance_cc = _FinanceCcStub(
+        {
+            "ok": True,
+            "result": "需求、逻辑和实现已经完成。",
+            "artifact_updates": [
+                {
+                    "artifact_type": "requirement",
+                    "payload": {
+                        "requirement_brief": "判断指定A股最近60个交易日是否出现MA5上穿MA20。",
+                        "notice": ["使用后复权日线和最近完整交易日。"],
+                        "questions": [],
+                    },
+                },
+                {
+                    "artifact_type": "design",
+                    "payload": {
+                        "design": "## 判断逻辑\n读取日线并计算MA5、MA20，返回最近一次金叉日期。",
+                    },
+                },
+                {
+                    "artifact_type": "flow",
+                    "payload": {
+                        "mermaid": "flowchart TD\nA[读取60日日线] --> B[计算MA5和MA20] --> C{发生上穿?}",
+                    },
+                },
+            ],
+            "interaction_requests": [],
+            "implementation_runs": [
+                {
+                    "ok": True,
+                    "message": "代码和3个代表性样例的技术验证已经完成。",
+                    "coding_status": "implemented",
+                    "state": {
+                        "tool_name": "ma_golden_cross",
+                        "implementation_revision": 1,
+                    },
+                    "test_result": {
+                        "execution_ok": True,
+                        "summary": "3 / 3 项代表性样例技术运行成功",
+                        "cases": [
+                            {"name": "存在金叉", "status": "passed"},
+                            {"name": "不存在金叉", "status": "passed"},
+                            {"name": "数据不足", "status": "passed"},
+                        ],
+                    },
+                    "tool": {
+                        "manifest": {
+                            "tool_name": "ma_golden_cross",
+                            "display_name": "均线金叉识别",
+                            "current_revision": 1,
+                            "visibility": "personal",
+                        },
+                        "design_contract": {
+                            "document": "## 判断逻辑\n读取日线并计算均线。",
+                            "mermaid": "flowchart TD\nA --> B --> C",
+                        },
+                    },
+                },
+            ],
+        }
+    )
+    service = CustomToolAgentService(use_codex=False, finance_cc_service=finance_cc)
+
+    result = service.start_create(
+        "做一个60日均线金叉识别工具",
+        owner_id="owner-1",
+        thread_id=20,
+    )
+
+    assert result["questions"] == []
+    assert result["state"]["confirmed_requirement_revision"] == 1
+    assert result["state"]["design_contract"]["mermaid"].startswith("flowchart TD")
+    assert result["coding_status"] == "implemented"
+    assert result["test_result"]["execution_ok"] is True
+    assert len(result["test_result"]["cases"]) == 3
+    assert result["tool"]["manifest"]["visibility"] == "personal"
+    assert result["message"].startswith("代码和3个代表性样例")
+
+
+def test_dsh_flow_boundary_returns_to_parent_codex_implementation() -> None:
+    orchestrator = _FinanceCcStub(
+        {
+            "ok": True,
+            "runtime": "dsh_opt",
+            "result": "需求、设计和流程资产已经形成。",
+            "artifact_updates": [
+                {
+                    "artifact_type": "requirement",
+                    "payload": {
+                        "requirement_brief": "判断指定A股是否出现MA5上穿MA20。",
+                        "questions": [],
+                    },
+                },
+                {
+                    "artifact_type": "design",
+                    "payload": {"design": "## 判断逻辑\n计算MA5和MA20。"},
+                },
+                {
+                    "artifact_type": "flow",
+                    "payload": {"mermaid": "flowchart TD\nA --> B"},
+                },
+            ],
+            "interaction_requests": [],
+            "implementation_runs": [],
+            "implementation_requested": True,
+        }
+    )
+    orchestrator.enabled = True
+    service = CustomToolAgentService(
+        use_codex=False,
+        orchestrator_service=orchestrator,
+    )
+    coding_calls = []
+
+    def implement(**kwargs):
+        coding_calls.append(kwargs)
+        return {
+            "ok": True,
+            "message": "Codex 实现与验证已完成。",
+            "coding_status": "implemented",
+            "state": {
+                **dict(kwargs["state"]),
+                "tool_name": "ma_cross",
+                "implementation_revision": 1,
+            },
+            "test_result": {"execution_ok": True, "cases": []},
+            "tool": {"manifest": {"tool_name": "ma_cross"}},
+        }
+
+    service.implement_dynamic_tool = implement
+    result = service.start_create(
+        "做一个均线金叉工具",
+        owner_id="owner-1",
+        thread_id=30,
+    )
+
+    assert len(coding_calls) == 1
+    assert coding_calls[0]["state"]["design_contract"]["mermaid"].startswith(
+        "flowchart TD"
+    )
+    assert result["coding_status"] == "implemented"
+    assert result["message"] == "Codex 实现与验证已完成。"
+    assert result["agent_orchestrator"]["runtime"] == "dsh_opt"
 
 
 def test_requirement_submission_confirms_resulting_revision_before_design(
@@ -451,7 +604,7 @@ def test_requirement_submission_confirms_resulting_revision_before_design(
         turn_id=27,
     )
 
-    assert result["design_status"] == "review"
+    assert result["design_status"] == "design_ready"
     assert result["state"]["requirement_revision"] == 2
     assert result["state"]["confirmed_requirement_revision"] == 2
     assert "读取60日日线" in result["state"]["design_contract"]["document"]
@@ -507,7 +660,7 @@ def test_finance_cc_design_profile_survives_artifact_merge_and_flow(
         turn_id=28,
     )
 
-    assert result["design_status"] == "review"
+    assert result["design_status"] == "design_ready"
     assert result["state"]["design_contract"]["finance_tool_profile"] == profile
     assert result["design"]["finance_tool_profile"] == profile
     assert result["design"]["mermaid"].startswith("flowchart TD")

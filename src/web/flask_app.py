@@ -40,6 +40,12 @@ from src.services.custom_tool_service import (
 from src.services.custom_tool_run_trace_service import CustomToolRunTrace
 from src.services.finance_claude_session_service import FinanceClaudeSessionService
 from src.services.finance_cc_system_tools import FinanceCcSystemTools
+from src.scenarios.custom_tool.dsh_service import (
+    CustomToolDeepSeekHarnessSessionService,
+)
+from src.scenarios.custom_tool.dsh_intent_router import (
+    CustomToolIntentDshRouter,
+)
 from src.scenarios.financial_qa import FinancialQaCcService
 from src.scenarios.financial_qa.execution_mode import (
     normalize_financial_qa_execution_mode,
@@ -130,11 +136,30 @@ skill_authoring_service = SkillAuthoringService(
         business_catalog=financial_qa_cc_service.business_skill_catalog,
     ),
 )
+custom_tool_orchestrator_name = str(
+    os.environ.get("CUSTOM_TOOL_ORCHESTRATOR") or "dsh_opt"
+).strip().lower()
+if custom_tool_orchestrator_name not in {"dsh_opt", "cc"}:
+    raise ValueError("CUSTOM_TOOL_ORCHESTRATOR 仅支持 dsh_opt 或 cc")
+custom_tool_intent_router = CustomToolIntentDshRouter(
+    enabled=(
+        custom_tool_orchestrator_name == "dsh_opt"
+        and str(
+            os.environ.get("FINANCE_DSH_CUSTOM_TOOL_INTENT_ENABLED") or "1"
+        ).strip().lower()
+        in {"1", "true", "yes", "on"}
+    )
+)
 assistant_dispatch_planner = AssistantDispatchPlanner(
     # Runtime availability must not change semantic ownership.  Otherwise a
     # missing deployment flag turns finance questions into a generic tool plan
     # and can silently leak them to open-web search.
-    agent_owned_runtime_names={"investment_analyst"}
+    agent_owned_runtime_names={"investment_analyst"},
+    custom_tool_router=(
+        custom_tool_intent_router
+        if custom_tool_orchestrator_name == "dsh_opt"
+        else None
+    ),
 )
 user_session_service = UserSessionService()
 phone_account_service = PhoneAccountService(user_sessions=user_session_service)
@@ -146,9 +171,10 @@ answer_summary_service = AnswerSummaryService()
 conversation_title_service = ConversationTitleService()
 custom_tool_agent_service = CustomToolAgentService()
 finance_cc_shadow_service = FinanceClaudeSessionService(
-    enabled=any(
-        str(os.environ.get(name) or "").strip().lower() in {"1", "true", "yes", "on"}
-        for name in ("FINANCE_CC_SHADOW_ENABLED", "FINANCE_CC_TOOL_DEVELOPMENT_ENABLED")
+    enabled=(
+        custom_tool_orchestrator_name == "cc"
+        or str(os.environ.get("FINANCE_CC_SHADOW_ENABLED") or "").strip().lower()
+        in {"1", "true", "yes", "on"}
     ),
     system_tools=FinanceCcSystemTools(
         custom_tool_store=custom_tool_agent_service.store,
@@ -156,7 +182,27 @@ finance_cc_shadow_service = FinanceClaudeSessionService(
         implementation_runner=custom_tool_agent_service.implement_dynamic_tool,
     )
 )
-custom_tool_agent_service.set_finance_cc_service(finance_cc_shadow_service)
+custom_tool_dsh_service = CustomToolDeepSeekHarnessSessionService(
+    enabled=(
+        custom_tool_orchestrator_name == "dsh_opt"
+        and str(
+            os.environ.get("FINANCE_DSH_CUSTOM_TOOL_ENABLED") or "1"
+        ).strip().lower()
+        in {"1", "true", "yes", "on"}
+    ),
+    system_tools=FinanceCcSystemTools(
+        custom_tool_store=custom_tool_agent_service.store,
+        custom_tool_runtime=custom_tool_agent_service.runtime,
+    ),
+)
+custom_tool_orchestrator_service = (
+    custom_tool_dsh_service
+    if custom_tool_orchestrator_name == "dsh_opt"
+    else finance_cc_shadow_service
+)
+custom_tool_agent_service.set_orchestrator_service(
+    custom_tool_orchestrator_service
+)
 asset_invocation_service = AssetInvocationService(
     custom_tool_store=custom_tool_agent_service.store,
     attachment_service=attachment_service,
@@ -332,14 +378,23 @@ def _normalize_chat_financial_qa_runtime(value) -> str:
     return normalize_financial_qa_runtime(explicit or configured_default)
 
 
-def _schedule_thread_title(*, thread_id: int, user_text: str, expected_title: str) -> None:
+def _schedule_thread_title(
+    *,
+    thread_id: int,
+    user_text: str,
+    expected_title: str,
+    enable_llm: bool = True,
+) -> None:
     normalized_text = str(user_text or "").strip()
     if not thread_id or not normalized_text:
         return
 
     def worker() -> None:
         try:
-            result = conversation_title_service.generate(user_text=normalized_text)
+            result = conversation_title_service.generate(
+                user_text=normalized_text,
+                enable_llm=enable_llm,
+            )
             runtime_conversation_service.update_thread_title(
                 thread_id=int(thread_id),
                 title=str(result.get("title") or "").strip(),
@@ -370,10 +425,7 @@ def _submit_finance_cc_shadow(
     selected_agent = str(dispatch_plan.get("selected_agent") or default_agent.get("agent_name") or "").strip()
     if selected_agent != "investment_analyst":
         return
-    tool_development_enabled = str(os.environ.get("FINANCE_CC_TOOL_DEVELOPMENT_ENABLED") or "").strip().lower() in {
-        "1", "true", "yes", "on"
-    }
-    if tool_development_enabled and str(dispatch_plan.get("entry") or "").strip() == "custom_tool_flow":
+    if str(dispatch_plan.get("entry") or "").strip() == "custom_tool_flow":
         return
     finance_cc_shadow_service.submit(
         thread_id=thread_id,
@@ -1323,7 +1375,7 @@ def _custom_tool_result_blocks(result: dict, builder: LlmStreamBlockBuilder) -> 
                     {"label": "工具名称", "value": display_name},
                     {"label": "工具 ID", "value": tool_name or "—"},
                     {"label": "调用引用", "value": invocation_ref or "—"},
-                    {"label": "当前状态", "value": "已启用" if is_active else "待确认"},
+                    {"label": "当前状态", "value": "已启用" if is_active else "候选版本"},
                     {"label": "版本", "value": manifest.get("current_revision") or "0.1"},
                 ],
                 "details": {
@@ -1410,6 +1462,7 @@ def _custom_tool_result_blocks(result: dict, builder: LlmStreamBlockBuilder) -> 
                                 "summary": str(item.get("purpose") or item.get("error") or ""),
                                 "input": item.get("input") if isinstance(item.get("input"), dict) else {},
                                 "expected": item.get("expected") if isinstance(item.get("expected"), dict) else {},
+                                "expected_basis": str(item.get("expected_basis") or "").strip(),
                                 "actual": item.get("actual") if isinstance(item.get("actual"), dict) else {},
                                 "key_process_info": (
                                     item.get("actual", {}).get("key_process_info")
@@ -1425,9 +1478,7 @@ def _custom_tool_result_blocks(result: dict, builder: LlmStreamBlockBuilder) -> 
                 },
                 stage="coding",
             )])
-        candidate_can_activate = (
-            not edit_summary or test_result.get("execution_ok") is True
-        )
+        candidate_can_activate = test_result.get("execution_ok") is True
         if not is_active and coding_status == "implemented" and candidate_can_activate:
             revision = int(manifest.get("current_revision") or 0)
             is_edit_candidate = bool(edit_summary)
@@ -1435,7 +1486,7 @@ def _custom_tool_result_blocks(result: dict, builder: LlmStreamBlockBuilder) -> 
                 block_id="custom_tool_coding_review",
                 block_type="interaction",
                 mode="replace",
-                title="确认候选修改" if is_edit_candidate else "确认实现",
+                title="候选修改已就绪" if is_edit_candidate else "工具候选已就绪",
                 content=(
                     f"候选版本 {revision} 已验证，当前仍使用版本 "
                     f"{edit_summary.get('base_revision')}。确认后才会切换；"
@@ -1453,7 +1504,7 @@ def _custom_tool_result_blocks(result: dict, builder: LlmStreamBlockBuilder) -> 
                     "actions": [
                         {
                             "action_id": "custom_tool.activate_draft",
-                            "label": "启用候选版本" if is_edit_candidate else "确认并启用",
+                            "label": "启用候选版本" if is_edit_candidate else "启用这个工具",
                             "intent": "accept",
                             "style": "primary",
                             "expected_revision": revision,
@@ -1466,6 +1517,36 @@ def _custom_tool_result_blocks(result: dict, builder: LlmStreamBlockBuilder) -> 
                             "expected_revision": revision,
                         },
                     ],
+                },
+                stage="coding",
+            )])
+        elif not is_active and coding_status == "implemented":
+            verification_summary = str(
+                test_result.get("summary")
+                or "当前候选没有取得可用于启用的技术验证证据。"
+            ).strip()
+            _add_many([builder.make_block(
+                block_id="custom_tool_verification_retry",
+                block_type="interaction",
+                mode="replace",
+                title="验证尚未完成",
+                content=(
+                    f"{verification_summary} 当前候选已保留，但不会提供启用动作；"
+                    "可以继续修复并重新构造样例验证。"
+                ),
+                data={
+                    "interaction_id": "custom_tool.verification_retry",
+                    "intent": "retry",
+                    "submission_mode": "action",
+                    "prompt": "是否继续修复并重新验证当前候选？",
+                    "subject_ref": str(manifest.get("tool_name") or ""),
+                    "subject_revision": int(manifest.get("current_revision") or 0),
+                    "actions": [{
+                        "action_id": "custom_tool.retry_coding",
+                        "label": "继续修复并复测",
+                        "intent": "accept",
+                        "style": "primary",
+                    }],
                 },
                 stage="coding",
             )])
@@ -1494,7 +1575,7 @@ def _custom_tool_interaction_text(text: str, response: dict) -> str:
             lines.append(f"关于「{question}」，我的回答是：{value}。")
         if raw:
             lines.append(raw)
-        return "\n".join(lines) or "我确认当前需求理解，请继续形成设计方案。"
+        return "\n".join(lines) or "关键问题已经补充，请继续完成设计、实现和验证。"
     if raw:
         return raw
     if action_id in {"custom_tool.revise_design", "custom_tool.revise_implementation"}:
@@ -1660,6 +1741,10 @@ def _run_custom_tool_stream_payload(payload: dict, *, emit) -> None:
                 thread_id=thread_id,
                 user_text=text,
                 expected_title=initial_thread_title,
+                enable_llm=(
+                    str(dispatch_plan.get("entry") or "").strip()
+                    != "custom_tool_flow"
+                ),
             )
         if not data_only:
             _submit_finance_cc_shadow(
@@ -1699,7 +1784,7 @@ def _run_custom_tool_stream_payload(payload: dict, *, emit) -> None:
                     )
                 else:
                     result = custom_tool_agent_service.handle_turn(
-                        "我确认当前需求理解，请继续形成设计方案。",
+                        "关键问题已经补充，请继续完成设计、实现和验证。",
                         state=active_state,
                         ui_action=interaction_response,
                         owner_id=owner_id,
@@ -1707,7 +1792,7 @@ def _run_custom_tool_stream_payload(payload: dict, *, emit) -> None:
                         turn_id=turn_id,
                         event_sink=event_sink,
                     )
-            elif shortcut_handler == "custom_tool.action" and custom_tool_agent_service.finance_cc_enabled:
+            elif shortcut_handler == "custom_tool.action" and custom_tool_agent_service.orchestrator_enabled:
                 result = custom_tool_agent_service.handle_turn(
                     text or str(interaction_response.get("label") or action_id or "确认当前内容").strip(),
                     state=active_state,
@@ -4204,12 +4289,6 @@ def api_chat_dispatch():
             input_payload=_to_json_safe({**payload, "application_name": application_name, "attachments": attachments}),
             started_at=request_received_at,
         )
-        if not requested_thread_id:
-            _schedule_thread_title(
-                thread_id=thread_id,
-                user_text=text or f"分析 {len(attachments)} 个图片附件",
-                expected_title=initial_thread_title,
-            )
         if asset_invocation_service.has_explicit_invocation(text=text, selected_asset=selected_asset):
             result = _build_asset_invocation_payload(
                 text,
@@ -4235,6 +4314,16 @@ def api_chat_dispatch():
                 data_only=data_only,
             )
         dispatch_plan_payload = result.get("dispatch_plan") if isinstance(result.get("dispatch_plan"), dict) else {}
+        if not requested_thread_id:
+            _schedule_thread_title(
+                thread_id=thread_id,
+                user_text=text or f"分析 {len(attachments)} 个图片附件",
+                expected_title=initial_thread_title,
+                enable_llm=(
+                    str(dispatch_plan_payload.get("entry") or "").strip()
+                    != "custom_tool_flow"
+                ),
+            )
         if not data_only:
             _submit_finance_cc_shadow(
                 thread_id=thread_id,
@@ -4248,15 +4337,6 @@ def api_chat_dispatch():
         merged_llm_usage = _merge_llm_usage(
             result.get("llm_usage") if isinstance(result.get("llm_usage"), dict) else None,
             dispatch_plan_payload.get("llm_usage") if isinstance(dispatch_plan_payload.get("llm_usage"), dict) else None,
-            (
-                (
-                    dispatch_plan_payload.get("preprocess_result")
-                    if isinstance(dispatch_plan_payload.get("preprocess_result"), dict)
-                    else {}
-                ).get("llm_usage")
-                if isinstance(dispatch_plan_payload, dict)
-                else None
-            ),
         )
         if any(int(merged_llm_usage.get(key, 0) or 0) > 0 for key in ("prompt_tokens", "completion_tokens", "total_tokens", "call_count")):
             result["llm_usage"] = merged_llm_usage
@@ -6230,19 +6310,38 @@ def _prewarm_agent_pools() -> dict[str, dict]:
                 "Financial QA CC warm pool failed to initialize: %s",
                 exc,
             )
-    if finance_cc_shadow_service.enabled and custom_tool_agent_service.finance_cc_enabled:
+    orchestrator_enabled = bool(
+        getattr(
+            custom_tool_agent_service,
+            "orchestrator_enabled",
+            getattr(custom_tool_agent_service, "finance_cc_enabled", False),
+        )
+    )
+    if orchestrator_enabled:
         try:
-            statuses["custom_tool"] = finance_cc_shadow_service.prewarm(
-                context=custom_tool_agent_service.finance_cc_runtime_context(),
-                timeout=timeout,
+            legacy_cc_controller = not hasattr(
+                custom_tool_agent_service,
+                "orchestrator_enabled",
             )
+            if custom_tool_orchestrator_name == "dsh_opt" and not legacy_cc_controller:
+                statuses["custom_tool_intent"] = custom_tool_intent_router.prewarm(
+                    timeout=timeout,
+                )
+                statuses["custom_tool"] = custom_tool_dsh_service.prewarm(
+                    timeout=timeout,
+                )
+            else:
+                statuses["custom_tool"] = finance_cc_shadow_service.prewarm(
+                    context=custom_tool_agent_service.finance_cc_runtime_context(),
+                    timeout=timeout,
+                )
             app.logger.info(
-                "Custom tool CC warm pool ready: %s",
+                "Custom tool orchestrator warm pool ready: %s",
                 statuses["custom_tool"],
             )
         except Exception as exc:
             app.logger.warning(
-                "Custom tool CC warm pool failed to initialize: %s",
+                "Custom tool orchestrator warm pool failed to initialize: %s",
                 exc,
             )
     return statuses

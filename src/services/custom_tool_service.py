@@ -4,6 +4,7 @@ from contextlib import contextmanager
 import datetime as dt
 import hashlib
 import json
+import math
 import os
 import re
 from pathlib import Path
@@ -563,6 +564,10 @@ class CustomToolStoreService:
             )
         )
         manifest = dict(bundle["manifest"])
+        if (manifest.get("last_test") or {}).get("execution_ok") is not True:
+            raise CustomToolError(
+                "custom tool must complete technical verification before activation"
+            )
         manifest["status"] = "active"
         root = self.tool_dir(manifest["tool_name"])
         root.joinpath("manifest.json").write_text(_json_text(manifest), encoding="utf-8")
@@ -1372,6 +1377,7 @@ class CustomToolAgentService:
         coding_complexity: str = "",
         edit_plan_complexity: str = "",
         edit_coding_complexity: str = "",
+        orchestrator_service: Optional[Any] = None,
         finance_cc_service: Optional[Any] = None,
     ) -> None:
         self.store = store or CustomToolStoreService()
@@ -1383,7 +1389,11 @@ class CustomToolAgentService:
         legacy_provider = _trim(os.environ.get("CUSTOM_TOOL_AGENT_PROVIDER")).lower()
         legacy_complexity = _trim(os.environ.get("CUSTOM_TOOL_AGENT_COMPLEXITY")).lower()
         self.design_provider = _trim(
-            design_provider or explicit_provider or os.environ.get("CUSTOM_TOOL_DESIGN_PROVIDER") or legacy_provider or "claude"
+            design_provider
+            or explicit_provider
+            or os.environ.get("CUSTOM_TOOL_DESIGN_PROVIDER")
+            or legacy_provider
+            or "codex"
         ).lower()
         self.coding_provider = _trim(
             coding_provider or explicit_provider or os.environ.get("CUSTOM_TOOL_CODING_PROVIDER") or legacy_provider or "codex"
@@ -1416,17 +1426,35 @@ class CustomToolAgentService:
         self.tester = tester or (self._default_agent_tester() if agent_enabled else None)
         self.runtime = runtime or CustomToolRuntimeService(store=self.store)
         self.design_protocol = design_protocol or CustomToolDesignProtocolService()
-        self.finance_cc_service = finance_cc_service
+        # ``finance_cc_service`` remains a compatibility alias for tests and
+        # rollback deployments. New custom-tool traffic is provider-neutral
+        # here and is routed to the configured DSH Opt orchestrator by Flask.
+        self.orchestrator_service = orchestrator_service or finance_cc_service
+        self.finance_cc_service = self.orchestrator_service
+
+    @property
+    def orchestrator_enabled(self) -> bool:
+        if self.orchestrator_service is None:
+            return False
+        enabled = getattr(self.orchestrator_service, "enabled", None)
+        if enabled is not None:
+            return bool(enabled)
+        # Legacy injected controllers did not expose an enabled property.
+        return _trim(
+            os.environ.get("FINANCE_CC_TOOL_DEVELOPMENT_ENABLED") or "1"
+        ).lower() in {"1", "true", "yes", "on"}
 
     @property
     def finance_cc_enabled(self) -> bool:
-        return (
-            self.finance_cc_service is not None
-            and _trim(os.environ.get("FINANCE_CC_TOOL_DEVELOPMENT_ENABLED")).lower() in {"1", "true", "yes", "on"}
-        )
+        """Backward-compatible alias for the provider-neutral controller."""
+        return self.orchestrator_enabled
+
+    def set_orchestrator_service(self, service: Any) -> None:
+        self.orchestrator_service = service
+        self.finance_cc_service = service
 
     def set_finance_cc_service(self, service: Any) -> None:
-        self.finance_cc_service = service
+        self.set_orchestrator_service(service)
 
     @staticmethod
     def finance_cc_runtime_context(
@@ -1931,11 +1959,11 @@ class CustomToolAgentService:
         )
         if not raw:
             return {"message": "请说明本轮希望查看或调整的内容。", "state": current_state}
-        if not self.finance_cc_enabled:
+        if not self.orchestrator_enabled:
             return {
-                "message": "Finance CC 当前不可用，已有需求、设计和实现均未改变。",
+                "message": "自定义工具编排服务当前不可用，已有需求、设计和实现均未改变。",
                 "state": current_state,
-                "error": "Finance CC controller is unavailable",
+                "error": "custom-tool orchestrator is unavailable",
                 "thread_context_patch": {"custom_tool_state": current_state},
             }
         return self._handle_finance_cc_turn(
@@ -2005,7 +2033,7 @@ class CustomToolAgentService:
             else text
         )
         progress_event_factory = getattr(
-            self.finance_cc_service,
+            self.orchestrator_service,
             "initial_progress_event",
             None,
         )
@@ -2015,7 +2043,7 @@ class CustomToolAgentService:
             # it can be emitted before session locking/client acquisition. Tell
             # the CC runtime not to publish the same progress node again.
             context["_initial_progress_emitted"] = True
-        cc_result = self.finance_cc_service.run_turn(
+        cc_result = self.orchestrator_service.run_turn(
             thread_id=thread_id or 0,
             turn_id=turn_id or "",
             owner_id=owner_id,
@@ -2050,6 +2078,7 @@ class CustomToolAgentService:
 
         design_status = ""
         requirement_updated = False
+        requirement_saved_by_agent = False
         design_updated = False
         notice: List[str] = []
         questions: List[Dict[str, Any]] = []
@@ -2059,13 +2088,24 @@ class CustomToolAgentService:
             for update in cc_result.get("artifact_updates") or []
             if isinstance(update, Mapping)
         ]
+        interaction_requests = [
+            dict(item)
+            for item in cc_result.get("interaction_requests") or []
+            if isinstance(item, Mapping)
+        ]
+        requested_questions = [
+            dict(item)
+            for request in interaction_requests
+            for item in request.get("questions") or []
+            if isinstance(item, Mapping)
+        ]
         accepted_artifact_types: List[str] = []
         blocked_design_artifact = False
         incomplete_design_artifact = False
 
         # Requirement is the authoritative input to every later artifact.
-        # Apply it first so tool-call ordering cannot let a design bypass the
-        # confirmation boundary.
+        # Apply it first so tool-call ordering cannot let a design bypass an
+        # unresolved question or use a stale requirement revision.
         for update in artifact_updates:
             artifact_type = _trim(update.get("artifact_type"))
             if artifact_type != "requirement":
@@ -2076,6 +2116,7 @@ class CustomToolAgentService:
                 else {}
             )
             requirement_updated = True
+            requirement_saved_by_agent = True
             brief = _trim(payload.get("requirement_brief"))
             if brief:
                 previous_fingerprint = _trim(
@@ -2111,6 +2152,8 @@ class CustomToolAgentService:
                 for item in payload.get("questions") or []
                 if isinstance(item, Mapping)
             ]
+            if not questions and requested_questions:
+                questions = requested_questions
             if questions:
                 next_state["notice"] = notice
                 next_state["questions"] = questions
@@ -2124,8 +2167,8 @@ class CustomToolAgentService:
 
         # The first provider turn may return only narrative/interaction text or
         # incorrectly jump straight to design. Preserve the user's own wording
-        # as the reviewable requirement asset so every new flow has a concrete
-        # confirmation surface without inventing any business semantics.
+        # as a recoverable requirement asset without pretending that the Agent
+        # has already resolved its business semantics.
         if (
             needs_initial_requirement_asset
             and int(next_state.get("requirement_revision") or 0) < 1
@@ -2145,12 +2188,20 @@ class CustomToolAgentService:
                 requirement_updated = True
                 design_status = "clarification"
 
-        # Submitting the trusted requirement surface confirms the semantic
-        # asset represented by the submitted brief plus the user's answers.
-        # If CC canonicalizes those answers into a new brief in this same turn,
-        # that resulting revision is the one the action confirms.
-        if (
-            requirement_confirmation_submitted
+        if not questions and requested_questions:
+            questions = requested_questions
+            next_state["questions"] = questions
+
+        # A requirement with no unresolved questions is complete because the
+        # finance Agent has already applied domain knowledge and explicit
+        # defaults.  It is an internal design input, not another mandatory
+        # user-approval gate.  A submitted clarification confirms the newly
+        # canonicalized revision by the same rule: only when no question
+        # remains.
+        if questions:
+            next_state.pop("confirmed_requirement_revision", None)
+        elif (
+            requirement_saved_by_agent
             and int(next_state.get("requirement_revision") or 0) > 0
         ):
             next_state["confirmed_requirement_revision"] = int(
@@ -2245,7 +2296,7 @@ class CustomToolAgentService:
                     self._design_artifact_identity(design, state=next_state)
                 )
                 design_updated = True
-                design_status = "review"
+                design_status = "design_ready"
             elif design:
                 incomplete_design_artifact = True
                 design_status = "design_draft"
@@ -2253,20 +2304,28 @@ class CustomToolAgentService:
         implementation_runs = [
             dict(item) for item in cc_result.get("implementation_runs") or [] if isinstance(item, Mapping)
         ]
+        if (
+            bool(cc_result.get("implementation_requested"))
+            and design_updated
+            and not questions
+            and not implementation_runs
+        ):
+            # DSH ends at the saved flow boundary. Coding stays in the parent
+            # process so the existing Codex harness, version store, tests and
+            # stream events remain the only implementation authority.
+            implementation_runs = [
+                self.implement_dynamic_tool(
+                    state=next_state,
+                    owner_id=owner_id,
+                    event_sink=event_sink,
+                )
+            ]
         latest_implementation = implementation_runs[-1] if implementation_runs else {}
         if isinstance(latest_implementation.get("state"), Mapping):
             next_state.update(dict(latest_implementation.get("state") or {}))
 
-        interaction_requests = [
-            dict(item) for item in cc_result.get("interaction_requests") or [] if isinstance(item, Mapping)
-        ]
         if interaction_requests and not questions:
-            questions = [
-                dict(item)
-                for request in interaction_requests
-                for item in request.get("questions") or []
-                if isinstance(item, Mapping)
-            ]
+            questions = requested_questions
             next_state["questions"] = questions
 
         design = dict(next_state.get("design_contract") or {})
@@ -2283,18 +2342,22 @@ class CustomToolAgentService:
         )
         response_message = _trim(cc_result.get("result")) or "本轮处理已完成。"
         if blocked_design_artifact:
-            response_message = "我已整理当前需求；请先确认需求，再继续形成设计方案。"
+            response_message = (
+                "我已保存当前需求，但仍有会改变核心结果的问题需要明确；"
+                "解决后会自动继续设计、实现和验证。"
+            )
         elif incomplete_design_artifact:
             response_message = (
-                "设计正文已经保存，但流程图尚未完成；当前方案不会进入确认或 Coding。"
-                "请继续生成并保存流程图。"
+                "设计正文已经保存，但流程资产尚未完成，因此尚未进入 Coding。"
+                "可以直接重试未完成的流程生成。"
             )
         response = {
             "message": response_message,
             "state": next_state,
             "thread_context_patch": {"custom_tool_state": next_state},
+            "skip_design_review": True,
             "design_status": design_status or (
-                "review"
+                "design_ready"
                 if design and _trim(design.get("mermaid"))
                 else "design_draft"
                 if design
@@ -2329,6 +2392,7 @@ class CustomToolAgentService:
                 else {}
             ),
             "finance_cc": cc_result,
+            "agent_orchestrator": cc_result,
         }
         view_assets = [
             {"type": _trim(item.get("asset_type")), "payload": item.get("payload")}
@@ -3602,16 +3666,47 @@ class CustomToolAgentService:
                 if not isinstance(actual, Mapping):
                     continue
                 case_status = _trim(item.get("status") or "passed").lower()
+                expected = (
+                    dict(item.get("expected") or {})
+                    if isinstance(item.get("expected"), Mapping)
+                    else {}
+                )
+                expectation_matches = (
+                    not expected
+                    or self._expected_matches_actual(expected, actual)
+                )
+                normalized_status = (
+                    "failed"
+                    if case_status in {"fail", "failed", "error"}
+                    or not expectation_matches
+                    else "passed"
+                )
                 evidence_cases.append({
-                    "test_id": f"coding_functional_test_{len(evidence_cases) + 1}",
+                    "test_id": (
+                        _trim(item.get("test_id"))
+                        or _trim(item.get("name"))
+                        or f"coding_functional_test_{len(evidence_cases) + 1}"
+                    ),
                     "category": "representative",
-                    "status": case_status,
+                    "status": normalized_status,
                     "input": dict(item["input"]),
-                    "expected": {},
+                    "expected": expected,
                     "actual": dict(actual),
                     "logs": [],
-                    "purpose": "展示 Coding 阶段实际运行的代表性功能测试。",
-                    "error": "",
+                    "purpose": (
+                        _trim(item.get("purpose"))
+                        or _trim(item.get("name"))
+                        or "核对 Coding 阶段实际运行的代表性功能样例。"
+                    ),
+                    "expected_basis": _trim(item.get("expected_basis")),
+                    "error": (
+                        _trim(item.get("error"))
+                        or (
+                            "实际结果与独立预期不一致。"
+                            if not expectation_matches
+                            else ""
+                        )
+                    ),
                 })
         if not sample_input and evidence_cases:
             coding_evidence_ok = all(
@@ -3626,11 +3721,20 @@ class CustomToolAgentService:
                 allow_inactive=True,
             )
             runtime_ok = self._runtime_business_ok(runtime_result)
-            execution_ok = coding_evidence_ok and runtime_ok
             runtime_actual = (
                 dict(runtime_result.get("data") or {})
                 if isinstance(runtime_result.get("data"), Mapping)
                 else {}
+            )
+            expected = dict(evidence_cases[0].get("expected") or {})
+            runtime_expectation_ok = (
+                not expected
+                or self._expected_matches_actual(expected, runtime_actual)
+            )
+            execution_ok = (
+                coding_evidence_ok
+                and runtime_ok
+                and runtime_expectation_ok
             )
             runtime_case = {
                 **evidence_cases[0],
@@ -3643,22 +3747,48 @@ class CustomToolAgentService:
                     for item in ((runtime_result.get("meta") or {}).get("execution_logs") or [])
                     if isinstance(item, Mapping)
                 ],
-                "purpose": "使用正式运行包装器验证动态加载、沙箱执行和代表性输入。",
-                "error": _trim(runtime_result.get("error")),
+                "purpose": (
+                    _trim(evidence_cases[0].get("purpose"))
+                    or "使用正式运行包装器验证动态加载、沙箱执行和代表性输入。"
+                ),
+                "error": (
+                    _trim(runtime_result.get("error"))
+                    or (
+                        "正式运行结果与独立预期不一致。"
+                        if not runtime_expectation_ok
+                        else ""
+                    )
+                ),
             }
+            displayed_cases = [runtime_case, *evidence_cases[1:]]
+            passed_count = sum(
+                item.get("status") == "passed" for item in displayed_cases
+            )
             test_result = {
                 **runtime_result,
                 "ok": execution_ok,
                 "execution_ok": execution_ok,
                 "contract_ok": execution_ok,
                 "data": runtime_actual,
-                "cases": [runtime_case],
+                "cases": displayed_cases,
                 "coding_cases": evidence_cases,
                 "proposed_cases": proposed_tests,
                 "summary": (
-                    "正式运行兼容性验证通过"
+                    f"正式运行兼容性验证通过；{passed_count} / {len(displayed_cases)} 项代表性样例符合预期"
                     if execution_ok
                     else "正式运行兼容性验证失败"
+                ),
+                "error": (
+                    _trim(runtime_result.get("error"))
+                    or next(
+                        (
+                            _trim(item.get("error"))
+                            for item in displayed_cases
+                            if item.get("status") == "failed"
+                            and _trim(item.get("error"))
+                        ),
+                        "" if execution_ok else "代表性样例验证未通过。",
+                    )
                 ),
                 "evidence_source": "production_runtime",
             }
@@ -3692,8 +3822,31 @@ class CustomToolAgentService:
             owner_ids=[owner_id] if owner_id else None,
             allow_inactive=True,
         )
-        expected = self._expected_for_sample(proposed_tests, sample_input)
-        execution_ok = self._runtime_business_ok(test_result)
+        matching_evidence = next(
+            (
+                item
+                for item in evidence_cases
+                if dict(item.get("input") or {}) == dict(sample_input)
+            ),
+            {},
+        )
+        expected = (
+            dict(matching_evidence.get("expected") or {})
+            if isinstance(matching_evidence.get("expected"), Mapping)
+            else self._expected_for_sample(proposed_tests, sample_input)
+        )
+        evidence_ok = all(
+            item.get("status") == "passed" for item in evidence_cases
+        )
+        runtime_expectation_ok = (
+            not expected
+            or self._expected_matches_actual(expected, test_result.get("data"))
+        )
+        execution_ok = (
+            self._runtime_business_ok(test_result)
+            and evidence_ok
+            and runtime_expectation_ok
+        )
         contract_ok = execution_ok
         test_result.update({
             "execution_ok": execution_ok,
@@ -3709,7 +3862,7 @@ class CustomToolAgentService:
             diagnostics = (test_result.get("meta") or {}).get("diagnostics") or {}
             if isinstance(diagnostics.get("actual_output"), Mapping):
                 actual_output = dict(diagnostics["actual_output"])
-        test_result["cases"] = [{
+        runtime_case = {
             "test_id": "sample_smoke",
             "category": "happy_path",
             "status": "passed" if execution_ok else "failed",
@@ -3717,11 +3870,47 @@ class CustomToolAgentService:
             "expected": expected or {"business_result": "no top-level error and no ok=false"},
             "actual": dict(actual_output),
             "logs": execution_logs,
-            "purpose": "验证动态加载、沙箱执行和代表性输入能够完整走通。",
-            "error": _trim(test_result.get("error")),
-        }]
+            "purpose": (
+                _trim(matching_evidence.get("purpose"))
+                or "验证动态加载、沙箱执行和代表性输入能够完整走通。"
+            ),
+            "expected_basis": _trim(matching_evidence.get("expected_basis")),
+            "error": (
+                _trim(test_result.get("error"))
+                or (
+                    "正式运行结果与独立预期不一致。"
+                    if not runtime_expectation_ok
+                    else ""
+                )
+            ),
+        }
+        other_evidence_cases = [
+            item
+            for item in evidence_cases
+            if dict(item.get("input") or {}) != dict(sample_input)
+        ]
+        displayed_cases = [runtime_case, *other_evidence_cases]
+        test_result["cases"] = displayed_cases
+        test_result["coding_cases"] = evidence_cases
         test_result["proposed_cases"] = proposed_tests
-        test_result["summary"] = "1 / 1 项技术运行成功" if execution_ok else "0 / 1 项技术运行成功"
+        passed_count = sum(
+            item.get("status") == "passed" for item in displayed_cases
+        )
+        test_result["summary"] = (
+            f"{passed_count} / {len(displayed_cases)} 项代表性样例技术运行成功"
+            if execution_ok
+            else f"{passed_count} / {len(displayed_cases)} 项代表性样例中存在失败"
+        )
+        if not execution_ok and not _trim(test_result.get("error")):
+            test_result["error"] = next(
+                (
+                    _trim(item.get("error"))
+                    for item in displayed_cases
+                    if item.get("status") == "failed"
+                    and _trim(item.get("error"))
+                ),
+                "代表性样例验证未通过。",
+            )
         saved = self.store.record_test(manifest["tool_name"], test_result)
         if not execution_ok:
             next_state["test_feedback"] = self._test_feedback(
@@ -3993,6 +4182,46 @@ class CustomToolAgentService:
             if input_value is None or dict(input_value) == dict(sample_input):
                 return dict(expected_value or {})
         return {}
+
+    @staticmethod
+    def _expected_matches_actual(expected: Any, actual: Any) -> bool:
+        """Compare an independently declared expectation as a partial result."""
+        if isinstance(expected, Mapping):
+            if not isinstance(actual, Mapping):
+                return False
+            return all(
+                key in actual
+                and CustomToolAgentService._expected_matches_actual(
+                    expected_value,
+                    actual[key],
+                )
+                for key, expected_value in expected.items()
+            )
+        if isinstance(expected, list):
+            return (
+                isinstance(actual, list)
+                and len(expected) == len(actual)
+                and all(
+                    CustomToolAgentService._expected_matches_actual(
+                        expected_value,
+                        actual_value,
+                    )
+                    for expected_value, actual_value in zip(expected, actual)
+                )
+            )
+        if (
+            isinstance(expected, (int, float))
+            and not isinstance(expected, bool)
+            and isinstance(actual, (int, float))
+            and not isinstance(actual, bool)
+        ):
+            return math.isclose(
+                float(expected),
+                float(actual),
+                rel_tol=1e-9,
+                abs_tol=1e-9,
+            )
+        return expected == actual
 
     @staticmethod
     def _logic_text(design: Mapping[str, Any]) -> str:

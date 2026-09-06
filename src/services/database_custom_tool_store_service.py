@@ -594,6 +594,10 @@ class DatabaseCustomToolStoreService:
             )
         )
         manifest = bundle["manifest"]
+        if (manifest.get("last_test") or {}).get("execution_ok") is not True:
+            self._raise(
+                "custom tool must complete technical verification before activation"
+            )
         db = self.connection_factory()
         try:
             with db.cursor() as cursor:

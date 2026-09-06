@@ -22,6 +22,7 @@ sentence-transformers==3.0.1
 # -----------------------------
 # Web 服务
 Flask==3.1.2
+gunicorn==23.0.0
 fastapi==0.115.2
 starlette==0.40.0
 uvicorn>=0.32.0,<1.0.0
@@ -36,7 +37,7 @@ alibabacloud-tea-openapi==0.4.4
 # -----------------------------
 # Agent / 大模型调用
 openai==1.60.2
-openai-codex==0.1.0b3
+openai-codex==0.147.0
 claude-agent-sdk==0.2.123
 # Direct dependency: the independent finance service exposes Streamable HTTP MCP.
 mcp>=1.29.0,<2.0.0

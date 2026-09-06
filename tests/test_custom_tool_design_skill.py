@@ -42,7 +42,8 @@ def test_design_skill_only_defines_module_and_process_design() -> None:
 
     assert "结构化自然语言" in text
     assert "函数或模块" in text
-    assert "未确定的格式、默认参数、边界处理和技术依赖不要自行定义" in text
+    assert "采用简单、常用且可解释的方案" in text
+    assert "真正会改变业务结论" in text
     assert "不读取或指定具体 API" in text
     assert "不绘制流程图、不生成源码、不执行测试" in text
     assert "design_scenario" not in text

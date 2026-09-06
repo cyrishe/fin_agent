@@ -15,7 +15,7 @@ def test_conversation_title_uses_flash_llm_and_normalizes_result() -> None:
 
     assert result["title"] == "A股放量突破工具设计"
     assert result["source"] == "llm"
-    assert result["model_name"] == "deepseek-chat"
+    assert result["model_name"] == "deepseek-v4-flash-0731"
     assert calls[0]["enable_think"] is False
     assert "/custom_tool create" in calls[0]["messages"][1]["content"]
 
@@ -31,8 +31,25 @@ def test_conversation_title_falls_back_without_blocking_when_llm_fails() -> None
     assert result == {
         "title": "帮我做一个市场情绪温度计",
         "source": "fallback",
-        "model_name": "deepseek-chat",
+        "model_name": "deepseek-v4-flash-0731",
     }
+
+
+def test_custom_tool_title_can_skip_an_extra_model_call() -> None:
+    calls = []
+
+    def fake_llm(*args, **kwargs):
+        calls.append((args, kwargs))
+        return {"title": "不应调用"}, {}
+
+    result = ConversationTitleService(llm_call=fake_llm).generate(
+        user_text="创建一个均线金叉提醒工具",
+        enable_llm=False,
+    )
+
+    assert result["source"] == "fallback"
+    assert result["title"] == "创建一个均线金叉提醒工具"
+    assert calls == []
 
 
 class _Cursor:

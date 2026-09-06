@@ -15,10 +15,20 @@ Coding 阶段稳定保存和展示：
 
 Coding 按 Design 中必要的逻辑模块组推进；每组完成后写入动态模块并编译、做聚焦功能测试，再用一句自然语言报告真实的业务模块或指标名称、完成能力和测试动作。中间不输出最终协议、源码、文件名或服务器路径，也不等待用户逐段确认。
 
-至少保留一个代表性功能测试，并将实际证据写入 `scratch/test_evidence.json`：
+按工具逻辑保留能区分正确与错误实现的最小充分样例，通常包括正例、反例和一个适用的边界/数据不足场景。将实际证据写入 `scratch/test_evidence.json`：
 
 ```json
-{"cases": [{"input": {}, "actual": {}}]}
+{
+  "cases": [{
+    "name": "样例名称",
+    "purpose": "核对哪项规则",
+    "input": {},
+    "expected": {},
+    "expected_basis": "Requirement、Design、可手算推导或独立参考口径",
+    "actual": {},
+    "status": "passed"
+  }]
+}
 ```
 
-`actual` 直接使用工具原始返回并包含 `key_process_info`。该证据由系统直接回收和展示，不由外层模型重写；缺失时不阻断 Coding。
+`expected` 必须在查看实际输出前从业务口径独立得到，不得复制 `actual`；`actual` 直接使用工具原始返回并包含 `key_process_info`。该证据由系统直接回收和展示，不由外层模型重写；缺失时不阻断 Coding，但必须明确验证证据不完整。功能样例只证明工具按既定口径运行，不证明信号或策略具有投资收益。

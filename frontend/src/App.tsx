@@ -1,6 +1,7 @@
 import { Menu, MessageSquarePlus, PanelRight, Sparkles } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { dispatchChat, loadAuthSession, loadInvocationAssets, loadThread, loadThreads, logoutAccount, resetThread, startChatStream, startCustomToolStream, uploadAttachments } from "./api";
+import { appPath } from "./appPath";
 import Composer from "./components/Composer";
 import MessageItem from "./components/MessageItem";
 import RunPanel from "./components/RunPanel";
@@ -13,7 +14,7 @@ import type { AgentRun, Attachment, AuthUser, ChatMessage, InteractionDraft, Int
 const intro: ChatMessage = {
   id: "intro",
   role: "assistant",
-  content: "你好，我是 **Fin Agent**。你可以直接描述金融问题，也可以使用 `/custom_tool create` 创建个人金融工具。",
+  content: "你好，我是 **Fin Agent**。你可以直接询问上市公司、行情、财务、估值、资金流或研报数据，我会基于真实数据继续比较和分析。",
   createdAt: Date.now(),
 };
 
@@ -443,7 +444,7 @@ export default function App() {
   const logout = async () => {
     try {
       await logoutAccount();
-      window.location.assign("/");
+      window.location.assign(appPath("/"));
     } catch (reason) {
       setError(reason instanceof Error ? reason.message : "退出登录失败，请稍后重试。");
     }

@@ -46,7 +46,7 @@ def test_verified_edit_candidate_offers_candidate_activation() -> None:
     )
 
     interaction = next(block for block in blocks if block["block_type"] == "interaction")
-    assert interaction["title"] == "确认候选修改"
+    assert interaction["title"] == "候选修改已就绪"
     assert "当前仍使用版本 3" in interaction["content"]
     assert interaction["data"]["actions"][0]["label"] == "启用候选版本"
     assert interaction["data"]["actions"][0]["expected_revision"] == 4
@@ -58,6 +58,14 @@ def test_failed_edit_candidate_never_offers_backend_activation() -> None:
         LlmStreamBlockBuilder(run_id="failed_edit_candidate"),
     )
 
-    assert all(block["block_type"] != "interaction" for block in blocks)
+    interactions = [
+        block for block in blocks if block["block_type"] == "interaction"
+    ]
+    assert len(interactions) == 1
+    assert interactions[0]["block_id"] == "custom_tool_verification_retry"
+    assert all(
+        action["action_id"] != "custom_tool.activate_draft"
+        for action in interactions[0]["data"]["actions"]
+    )
     assessment = next(block for block in blocks if block["block_type"] == "assessment")
     assert assessment["data"]["overall"] == "fail"

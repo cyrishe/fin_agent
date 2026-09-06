@@ -57,6 +57,10 @@ def _active_store(tmp_path: Path) -> CustomToolStoreService:
         backend="filesystem",
     )
     store.save_draft(_design(10), owner_id=OWNER_ID)
+    store.record_test(
+        TOOL_NAME,
+        {"ok": True, "execution_ok": True, "contract_ok": True},
+    )
     store.commit(TOOL_NAME, owner_ids=[OWNER_ID])
     return store
 

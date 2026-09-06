@@ -1,4 +1,5 @@
 import { CalendarClock, LogOut, MessageSquarePlus, PanelLeftClose, Search, Sparkles } from "lucide-react";
+import { appPath } from "../appPath";
 import type { AuthUser, ThreadSummary } from "../types";
 
 interface Props {
@@ -55,7 +56,7 @@ export default function Sidebar(props: Props) {
             <button type="button" onClick={props.onLogout} aria-label="退出登录" title="退出登录"><LogOut size={14} /></button>
           </>
         ) : (
-          <a href="/register">访客模式 · 注册独立账户</a>
+          <a href={appPath("/register")}>访客模式 · 注册独立账户</a>
         )}
       </div>
     </aside>

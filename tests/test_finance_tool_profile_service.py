@@ -321,6 +321,7 @@ def test_local_patch_preserves_profile_but_full_revision_does_not(
         root_dir=str(tmp_path / "tools"), backend="filesystem"
     )
     active = store.save_draft(_bundle(profile=ANALYTICS_PROFILE), owner_id="user_a")
+    store.record_test("ct_market_strength", {"execution_ok": True})
     store.commit("ct_market_strength", owner_ids=["user_a"])
     service = CustomToolAgentService(store=store, use_codex=False)
     target = {

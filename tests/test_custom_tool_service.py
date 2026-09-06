@@ -633,7 +633,7 @@ def test_strategy_profile_without_optional_runtime_companion_does_not_block(
     assert "selection_output_profile" not in saved
 
 
-def test_missing_execution_examples_never_blocks_or_retries_coding(tmp_path: Path) -> None:
+def test_missing_execution_examples_keeps_draft_inactive(tmp_path: Path) -> None:
     class _CoderWithoutExamples(_Coder):
         def code(self, design, *, requirement_text="", context=None, event_sink=None):
             result = super().code(
@@ -670,13 +670,13 @@ def test_missing_execution_examples_never_blocks_or_retries_coding(tmp_path: Pat
     assert implemented["coding_tests"] == []
     assert len(coder.contexts) == 1
     assert store.load("sum_values")["manifest"]["status"] == "draft"
-    activated = service.continue_flow_action(
-        "custom_tool.activate_draft",
-        state=implemented["state"],
-        expected_revision=implemented["state"]["implementation_revision"],
-        owner_id="user_a",
-    )
-    assert activated["tool"]["manifest"]["status"] == "active"
+    with pytest.raises(CustomToolError, match="technical verification"):
+        service.continue_flow_action(
+            "custom_tool.activate_draft",
+            state=implemented["state"],
+            expected_revision=implemented["state"]["implementation_revision"],
+            owner_id="user_a",
+        )
 
 
 def test_coding_harness_evidence_is_saved_without_changing_final_schema(tmp_path: Path) -> None:
@@ -722,6 +722,153 @@ def test_coding_harness_evidence_is_saved_without_changing_final_schema(tmp_path
     assert implemented["test_result"]["cases"][0]["actual"]["key_process_info"] == {
         "value_count": 3,
     }
+
+
+def test_coding_keeps_a_minimal_sufficient_set_of_validation_cases(tmp_path: Path) -> None:
+    class _CoderWithValidationSet(_Coder):
+        def code(self, design, *, requirement_text="", context=None, event_sink=None):
+            result = super().code(
+                design,
+                requirement_text=requirement_text,
+                context=context,
+                event_sink=event_sink,
+            )
+            result["final"].pop("execution_examples", None)
+            result["final"]["coding_test_evidence"] = {
+                "cases": [
+                    {
+                        "name": "正例",
+                        "purpose": "核对正常求和",
+                        "input": {"values": [1, 2, 3]},
+                        "expected": {"total": 6},
+                        "expected_basis": "独立手算 1+2+3",
+                        "actual": {
+                            "total": 6,
+                            "key_process_info": {"value_count": 3},
+                        },
+                        "status": "passed",
+                    },
+                    {
+                        "name": "反例",
+                        "purpose": "核对负数不会被丢弃",
+                        "input": {"values": [-2, 1]},
+                        "expected": {"total": -1},
+                        "expected_basis": "独立手算 -2+1",
+                        "actual": {
+                            "total": -1,
+                            "key_process_info": {"value_count": 2},
+                        },
+                        "status": "passed",
+                    },
+                    {
+                        "name": "边界",
+                        "purpose": "核对空数组",
+                        "input": {"values": []},
+                        "expected": {"total": 0},
+                        "expected_basis": "空集合求和定义",
+                        "actual": {
+                            "total": 0,
+                            "key_process_info": {"value_count": 0},
+                        },
+                        "status": "passed",
+                    },
+                ],
+            }
+            return result
+
+    store = CustomToolStoreService(
+        root_dir=str(tmp_path / "tools"),
+        backend="filesystem",
+    )
+    service = CustomToolAgentService(
+        store=store,
+        coder=_CoderWithValidationSet(),
+        runtime=_runtime(store, tmp_path),
+        use_codex=False,
+    )
+
+    implemented = service.implement_dynamic_tool(
+        state={
+            "owner_id": "user_a",
+            "requirement_text": "创建求和工具",
+            "design_contract": _Designer().design("")["design"],
+        },
+        owner_id="user_a",
+        instruction="实现并自行验证当前设计",
+    )
+
+    cases = implemented["test_result"]["cases"]
+    assert implemented["test_result"]["execution_ok"] is True
+    assert len(cases) == 3
+    assert [item["purpose"] for item in cases] == [
+        "核对正常求和",
+        "核对负数不会被丢弃",
+        "核对空数组",
+    ]
+    assert cases[0]["expected"] == {"total": 6}
+    assert cases[0]["actual"]["key_process_info"] == {"value_count": 3}
+    assert cases[0]["expected_basis"] == "独立手算 1+2+3"
+    assert implemented["test_result"]["summary"].startswith(
+        "正式运行兼容性验证通过；3 / 3"
+    )
+
+
+def test_coding_detects_a_declared_expectation_mismatch(tmp_path: Path) -> None:
+    class _CoderWithWrongExpectation(_Coder):
+        def code(self, design, *, requirement_text="", context=None, event_sink=None):
+            result = super().code(
+                design,
+                requirement_text=requirement_text,
+                context=context,
+                event_sink=event_sink,
+            )
+            result["final"].pop("execution_examples", None)
+            result["final"]["coding_test_evidence"] = {
+                "cases": [{
+                    "name": "错误预期对照",
+                    "purpose": "确认系统不会把 expected 与 actual 不一致写成通过",
+                    "input": {"values": [1, 2, 3]},
+                    "expected": {"total": 7},
+                    "expected_basis": "独立断言",
+                    "actual": {
+                        "total": 6,
+                        "key_process_info": {"value_count": 3},
+                    },
+                    "status": "passed",
+                }],
+            }
+            return result
+
+    store = CustomToolStoreService(
+        root_dir=str(tmp_path / "tools"),
+        backend="filesystem",
+    )
+    service = CustomToolAgentService(
+        store=store,
+        coder=_CoderWithWrongExpectation(),
+        runtime=_runtime(store, tmp_path),
+        use_codex=False,
+    )
+
+    implemented = service.implement_dynamic_tool(
+        state={
+            "owner_id": "user_a",
+            "requirement_text": "创建求和工具",
+            "design_contract": _Designer().design("")["design"],
+        },
+        owner_id="user_a",
+    )
+
+    assert implemented["test_result"]["execution_ok"] is False
+    assert implemented["test_result"]["cases"][0]["status"] == "failed"
+    assert "独立预期不一致" in implemented["test_result"]["cases"][0]["error"]
+    with pytest.raises(CustomToolError, match="technical verification"):
+        service.continue_flow_action(
+            "custom_tool.activate_draft",
+            state=implemented["state"],
+            expected_revision=implemented["state"]["implementation_revision"],
+            owner_id="user_a",
+        )
 
 
 def test_runtime_wrapper_does_not_shadow_tool_module_helpers(tmp_path: Path) -> None:
@@ -1254,7 +1401,11 @@ def test_first_coding_turn_gets_editable_module_focused_api_context_and_test_run
         json.dumps({
             "result": "passed",
             "cases": [{
+                "name": "正常行情",
+                "purpose": "核对收盘价透传",
                 "input": {"code": "600519.SH"},
+                "expected": {"close": 1},
+                "expected_basis": "固定测试行情",
                 "raw_output": {
                     "close": 1,
                     "key_process_info": {"sample_count": 1},
@@ -1276,6 +1427,9 @@ def test_first_coding_turn_gets_editable_module_focused_api_context_and_test_run
     assert collected["coding_test_evidence"]["cases"][0]["actual"]["key_process_info"] == {
         "sample_count": 1,
     }
+    assert collected["coding_test_evidence"]["cases"][0]["expected"] == {"close": 1}
+    assert collected["coding_test_evidence"]["cases"][0]["expected_basis"] == "固定测试行情"
+    assert collected["coding_test_evidence"]["cases"][0]["purpose"] == "核对收盘价透传"
 
     Path(bundle["bundle_dir"], bundle["coding_evidence"]).write_text(
         json.dumps({

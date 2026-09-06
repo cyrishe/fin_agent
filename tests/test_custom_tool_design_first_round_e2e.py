@@ -401,7 +401,7 @@ def test_saved_view_assets_render_without_legacy_tool_turn_state() -> None:
     assert blocks[1]["block_id"] == "custom_tool_view_code"
 
 
-def test_requirement_confirmation_renders_before_design_exists() -> None:
+def test_clear_requirement_does_not_render_confirmation_before_design_exists() -> None:
     blocks = web._custom_tool_result_blocks(
         {
             "message": "我理解为识别最近30个交易日内的金叉，按这个实现可以吗？",
@@ -416,10 +416,8 @@ def test_requirement_confirmation_renders_before_design_exists() -> None:
         LlmStreamBlockBuilder(run_id="requirement_confirmation"),
     )
 
-    assert [block["block_type"] for block in blocks] == ["narrative", "interaction"]
+    assert [block["block_type"] for block in blocks] == ["narrative"]
     assert "按这个实现可以吗" in blocks[0]["content"]
-    assert blocks[1]["data"]["questions"] == []
-    assert blocks[1]["data"]["actions"][0]["label"] == "确认需求"
 
 
 def test_design_then_view_blocks_follow_declared_action_order() -> None:
@@ -504,7 +502,7 @@ def test_structured_clarification_is_submitted_as_text_with_ui_context(monkeypat
     assert conversations.completed[0]["output_payload"]["state"]["status"] == "awaiting_design_confirmation"
 
 
-def test_requirement_confirmation_without_questions_becomes_a_natural_user_turn() -> None:
+def test_legacy_empty_requirement_submission_continues_the_full_flow() -> None:
     text = web._custom_tool_interaction_text(
         "",
         {
@@ -515,7 +513,7 @@ def test_requirement_confirmation_without_questions_becomes_a_natural_user_turn(
         },
     )
 
-    assert text == "我确认当前需求理解，请继续形成设计方案。"
+    assert text == "关键问题已经补充，请继续完成设计、实现和验证。"
 
 
 def test_confirmation_button_with_text_uses_semantic_route_instead_of_action_shortcut(monkeypatch) -> None:
@@ -682,7 +680,7 @@ def test_stale_design_confirmation_continues_requirement_instead_of_coding(monke
         emit=lambda event: None,
     )
 
-    assert agent.calls[0]["text"] == "我确认当前需求理解，请继续形成设计方案。"
+    assert agent.calls[0]["text"] == "关键问题已经补充，请继续完成设计、实现和验证。"
     assert conversations.context["custom_tool_state"]["design_contract"]
 
 
@@ -1134,6 +1132,7 @@ def test_coding_surface_does_not_repeat_identical_summary_as_alignment() -> None
 def test_execution_failure_does_not_offer_activation() -> None:
     blocks = web._custom_tool_result_blocks(
         {
+            "coding_status": "implemented",
             "tool": {
                 "manifest": {"tool_name": "ct_demo", "display_name": "演示工具", "status": "draft", "current_revision": 1},
             },
@@ -1147,11 +1146,17 @@ def test_execution_failure_does_not_offer_activation() -> None:
         LlmStreamBlockBuilder(run_id="coding_gate_failed"),
     )
 
-    assert [block["block_type"] for block in blocks] == ["artifact", "assessment"]
+    assert [block["block_type"] for block in blocks] == [
+        "artifact",
+        "assessment",
+        "interaction",
+    ]
     assert blocks[1]["data"]["overall"] == "fail"
+    assert blocks[-1]["block_id"] == "custom_tool_verification_retry"
+    assert blocks[-1]["data"]["actions"][0]["action_id"] == "custom_tool.retry_coding"
 
 
-def test_completed_coding_can_be_confirmed_without_display_examples() -> None:
+def test_completed_coding_without_validation_cannot_be_activated() -> None:
     blocks = web._custom_tool_result_blocks(
         {
             "coding_status": "implemented",
@@ -1169,7 +1174,8 @@ def test_completed_coding_can_be_confirmed_without_display_examples() -> None:
         LlmStreamBlockBuilder(run_id="coding_without_display_examples"),
     )
 
-    assert [block["block_id"] for block in blocks][-1] == "custom_tool_coding_review"
+    assert [block["block_id"] for block in blocks][-1] == "custom_tool_verification_retry"
+    assert blocks[-1]["data"]["actions"][0]["label"] == "继续修复并复测"
     assert all(block["block_id"] != "custom_tool_test_result" for block in blocks)
 
 

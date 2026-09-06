@@ -720,7 +720,7 @@ class CodexSdkSkillHarness(CodexExecSkillHarness):
         timeout_seconds: int = 180,
         hard_timeout_seconds: int = 0,
         model: str = "",
-        reasoning_effort: str = "medium",
+        reasoning_effort: str = "low",
         sandbox: str = "workspace-write",
         auth_mode: str = "",
         complexity_level: str = "",
@@ -728,7 +728,7 @@ class CodexSdkSkillHarness(CodexExecSkillHarness):
         context_bundle_service: Optional[CustomToolContextBundleService] = None,
     ) -> None:
         super().__init__(
-            codex_bin="codex",
+            codex_bin=_trim(os.environ.get("STOCK_AGENT_CODEX_BIN")) or "codex",
             cwd=cwd,
             timeout_seconds=timeout_seconds,
             hard_timeout_seconds=hard_timeout_seconds,
@@ -737,7 +737,7 @@ class CodexSdkSkillHarness(CodexExecSkillHarness):
             context_bundle_service=context_bundle_service,
         )
         self.auth_mode = _trim(auth_mode or os.environ.get("STOCK_AGENT_CODEX_AUTH_MODE") or "auto")
-        self.reasoning_effort = _trim(reasoning_effort) or "medium"
+        self.reasoning_effort = _trim(reasoning_effort) or "low"
         self.complexity_level = _trim(complexity_level).lower()
         self.capabilities = capabilities
 
@@ -1298,7 +1298,7 @@ class CodexSdkSkillHarness(CodexExecSkillHarness):
 
     def _runtime_model(self) -> str:
         if self._resolved_auth_mode() == "crs_api_key":
-            return _trim(os.environ.get("CODEX_CRS_MODEL")) or self.model or "gpt-5-codex"
+            return _trim(os.environ.get("CODEX_CRS_MODEL")) or self.model or "gpt-6-astra"
         return self.model
 
     def _runtime_reasoning_effort(self) -> str:

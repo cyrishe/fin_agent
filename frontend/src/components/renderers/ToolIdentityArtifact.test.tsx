@@ -45,7 +45,8 @@ describe("ToolIdentityArtifact", () => {
     />);
 
     expect(html).toContain("$ct_demo");
-    expect(html).toContain("待确认");
+    expect(html).toContain("候选版本");
+    expect(html).toContain("仅本人可见");
     expect(html).not.toContain("立即使用");
   });
 
@@ -132,6 +133,7 @@ describe("ToolIdentityArtifact", () => {
             execution_shape: "per_instrument",
             summary: "支持逐标的运行，可接入日频选股回测。",
           },
+          design_document: "## 逻辑依据\n以1.5倍成交量为放量阈值。",
           design_flow: {
             mermaid: "flowchart LR\n  A[读取行情] --> B{成交量比 >= 1.5}\n  B -->|是| C[命中]",
           },
@@ -143,8 +145,10 @@ describe("ToolIdentityArtifact", () => {
     expect(html).toContain("2 个");
     expect(html).toContain("3 项代表性样例通过");
     expect(html).toContain("运行可用 · 回测契约已声明");
-    expect(html).toContain("已确认的设计主流程");
-    expect(html).toContain("沿用 Design 权威版本，不从代码重新推导");
+    expect(html).toContain("技术验证完成");
+    expect(html).toContain("已保存的业务主流程");
+    expect(html).toContain("与当前候选修订一起资产化保留");
+    expect(html).toContain("查看当前完整逻辑与设计依据");
     expect(html).toContain("正在绘制流程图");
   });
 

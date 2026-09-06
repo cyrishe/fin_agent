@@ -7,6 +7,7 @@ from starlette.responses import StreamingResponse
 import asyncio
 from pathlib import Path
 from dotenv import load_dotenv
+from urllib.parse import urlparse
 
 
 # Load the repository configuration before constructing any provider client.
@@ -14,6 +15,29 @@ from dotenv import load_dotenv
 # eval scripts silently fall back to ``not-configured`` credentials.
 REPO_ROOT = Path(__file__).resolve().parents[2]
 load_dotenv(REPO_ROOT / ".env", override=False)
+
+
+def _resolved_llm_base_url() -> str:
+    return (
+        os.getenv("LLM_BASE_URL")
+        or os.getenv("LLM_ENDPOINT")
+        or os.getenv("DASHSCOPE_BASE_URL")
+        or "https://dashscope.aliyuncs.com/compatible-mode/v1"
+    )
+
+
+def _resolved_llm_key_source(base_url: str) -> str:
+    host = (urlparse(base_url).hostname or "").lower()
+    if "dashscope" in host and host.endswith("aliyuncs.com"):
+        return "DASHSCOPE_API_KEY" if os.getenv("DASHSCOPE_API_KEY") else "LLM_API_KEY"
+    for name in ("LLM_API_KEY", "LLM_KEY", "DEEPSEEK_API_KEY"):
+        if os.getenv(name):
+            return name
+    return ""
+
+
+_SHARED_LLM_BASE_URL = _resolved_llm_base_url()
+_SHARED_LLM_KEY_SOURCE = _resolved_llm_key_source(_SHARED_LLM_BASE_URL)
 
 client_alibaba = OpenAI(
     api_key=os.getenv("DASHSCOPE_API_KEY") or "not-configured",
@@ -42,19 +66,8 @@ client_next = OpenAI(
 
 
 llm_client = OpenAI(
-    api_key=(
-        os.getenv("LLM_API_KEY")
-        or os.getenv("LLM_KEY")
-        or os.getenv("DEEPSEEK_API_KEY")
-        or os.getenv("DASHSCOPE_API_KEY")
-        or "not-configured"
-    ),
-    base_url=(
-        os.getenv("LLM_BASE_URL")
-        or os.getenv("LLM_ENDPOINT")
-        or os.getenv("DASHSCOPE_BASE_URL")
-        or "https://api.deepseek.com/v1"
-    ),
+    api_key=os.getenv(_SHARED_LLM_KEY_SOURCE) or "not-configured",
+    base_url=_SHARED_LLM_BASE_URL,
     timeout=float(os.getenv("LLM_CLIENT_TIMEOUT_SECONDS", "45")),
     max_retries=int(os.getenv("LLM_CLIENT_MAX_RETRIES", "1")),
 )
@@ -62,9 +75,11 @@ llm_client = OpenAI(
 # Backward-compatible alias. Old call sites still reference a "deepseek" client.
 deepseek_client = llm_client
 
-DEFAULT_CHAT_MODEL = os.getenv("LLM_DEFAULT_MODEL", "deepseek-chat")
-DEFAULT_FLASH_MODEL = os.getenv("LLM_FLASH_MODEL", "deepseek-chat")
-DEFAULT_REASONING_MODEL = os.getenv("LLM_REASONING_MODEL", DEFAULT_CHAT_MODEL)
+DEFAULT_CHAT_MODEL = os.getenv("LLM_DEFAULT_MODEL") or "deepseek-v4-flash-0731"
+# Model tiers share one canonical deployment model unless an operator makes an
+# explicit override.  Reasoning effort and token budgets remain independent.
+DEFAULT_FLASH_MODEL = os.getenv("LLM_FLASH_MODEL") or DEFAULT_CHAT_MODEL
+DEFAULT_REASONING_MODEL = os.getenv("LLM_REASONING_MODEL") or DEFAULT_CHAT_MODEL
 DEFAULT_EMBEDDING_MODEL = os.getenv("LLM_EMBEDDING_MODEL", "text-embedding-v4")
 DEFAULT_ENABLE_THINKING = os.getenv("LLM_DEFAULT_ENABLE_THINKING", "false").lower() == "true"
 DEFAULT_MAX_TOKENS = int(os.getenv("LLM_DEFAULT_MAX_TOKENS", "8192"))
@@ -73,18 +88,10 @@ DEFAULT_LONG_CONTEXT_MAX_TOKENS = int(os.getenv("LLM_LONG_CONTEXT_MAX_TOKENS", "
 
 def llm_config_summary() -> dict:
     """Return safe provider metadata without exposing credentials."""
-    key_source = ""
-    for name in ("LLM_API_KEY", "LLM_KEY", "DEEPSEEK_API_KEY", "DASHSCOPE_API_KEY"):
-        if os.getenv(name):
-            key_source = name
-            break
+    endpoint = _resolved_llm_base_url()
+    key_source = _resolved_llm_key_source(endpoint)
     return {
-        "endpoint": (
-            os.getenv("LLM_BASE_URL")
-            or os.getenv("LLM_ENDPOINT")
-            or os.getenv("DASHSCOPE_BASE_URL")
-            or "https://api.deepseek.com/v1"
-        ),
+        "endpoint": endpoint,
         "key_source": key_source,
         "key_present": bool(key_source),
         "key_length": len(os.getenv(key_source, "")) if key_source else 0,

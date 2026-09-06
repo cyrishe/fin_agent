@@ -4,9 +4,10 @@ import react from "@vitejs/plugin-react";
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, ".", "");
   const backend = env.VITE_API_TARGET || "http://127.0.0.1:22053";
+  const publicBase = env.VITE_PUBLIC_BASE_PATH || (mode === "production" ? "/fin_agent/" : "/");
 
   return {
-    base: mode === "development" ? "/" : "/assistant/",
+    base: publicBase,
     plugins: [react()],
     server: {
       proxy: {

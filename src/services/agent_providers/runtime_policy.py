@@ -132,17 +132,17 @@ _CODEX_PROFILES = {
 }
 
 _DEEPSEEK_CLAUDE_PROFILES = {
-    AgentComplexityLevel.FASTEST: ("deepseek-chat", "low", 4, "disabled"),
-    AgentComplexityLevel.FAST: ("deepseek-chat", "high", 20, ""),
-    AgentComplexityLevel.MID: ("deepseek-chat", "medium", 20, ""),
-    AgentComplexityLevel.HIGH: ("deepseek-reasoner", "high", 32, ""),
+    AgentComplexityLevel.FASTEST: ("deepseek-v4-flash-0731", "low", 4, "disabled"),
+    AgentComplexityLevel.FAST: ("deepseek-v4-flash-0731", "high", 20, ""),
+    AgentComplexityLevel.MID: ("deepseek-v4-flash-0731", "medium", 20, ""),
+    AgentComplexityLevel.HIGH: ("deepseek-v4-flash-0731", "high", 32, ""),
 }
 
 _DASHSCOPE_CLAUDE_PROFILES = {
-    AgentComplexityLevel.FASTEST: ("deepseek-v4-flash", "low", 4, "disabled"),
-    AgentComplexityLevel.FAST: ("deepseek-v4-flash", "high", 20, ""),
-    AgentComplexityLevel.MID: ("deepseek-v4-pro", "medium", 20, ""),
-    AgentComplexityLevel.HIGH: ("deepseek-v4-pro", "high", 32, ""),
+    AgentComplexityLevel.FASTEST: ("deepseek-v4-flash-0731", "low", 4, "disabled"),
+    AgentComplexityLevel.FAST: ("deepseek-v4-flash-0731", "high", 20, ""),
+    AgentComplexityLevel.MID: ("deepseek-v4-flash-0731", "medium", 20, ""),
+    AgentComplexityLevel.HIGH: ("deepseek-v4-flash-0731", "high", 32, ""),
 }
 
 _ANTHROPIC_CLAUDE_PROFILES = {

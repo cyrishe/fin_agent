@@ -54,6 +54,10 @@ FINANCE_API_HOST=127.0.0.1
 FINANCE_API_PORT=22054
 FINANCE_API_ROOT_PATH=/finance
 FINANCE_API_ALLOWED_HOSTS=ai-agent.kingdomai.com,ai-agent.kingdomai.com:443,127.0.0.1:*
+FINANCE_CHAT_DEFAULT_RUNTIME=dsh
+FINANCE_CC_FINANCIAL_QA_ENABLED=1
+FINANCE_CC_SUBPROCESS_ENV_SCRUB=1
+FINANCE_DSH_FINANCIAL_QA_ENABLED=1
 FINANCE_DSH_SOURCE_ROOT=/home/che/cyris/deepseek-harness
 FINANCE_DSH_SDK_SOURCE=/home/che/cyris/deepseek-harness/python/sdk/src
 FINANCE_DSH_NODE_BIN=/home/che/cyris/runtime/node-v22.19.0-linux-x64/bin/node
@@ -62,15 +66,23 @@ FINANCE_DSH_NODE_BIN=/home/che/cyris/runtime/node-v22.19.0-linux-x64/bin/node
 必须替换的凭据：
 
 - `FINANCE_API_KEYS_JSON`：服务访问 key，可用 `openssl rand -hex 32` 生成。
-- `KINGDOMAI_DB_URL`：金融数据库连接串。
-- `FINANCE_DSH_API_KEY` / `FINANCE_DSH_BASE_URL` / `FINANCE_DSH_MODEL`：
-  DeepSeek 官方或百炼兼容入口。
+- `SYSTEM_DB_URL`：对话、用户、任务和运行态数据使用的系统数据库连接串。
+- `KINGDOMAI_DB_URL`：金融数据库连接串；不得与系统数据库混用。
+- `LLM_API_KEY` / `LLM_BASE_URL` / `LLM_DEFAULT_MODEL`：统一的基础模型入口，
+  金融 DSH 直接使用这一组配置。
 - `CODEX_CRS_API_KEY`：服务器 Codex runtime 的 CRS/KingdomAI key。
 - `DASHSCOPE_API_KEY`：百炼 OpenAI 兼容入口。
-- `LLM_API_KEY` / `LLM_BASE_URL` / `LLM_DEFAULT_MODEL`：基础模型入口。
 
 `STOCK_AGENT_CODEX_AUTH_MODE=crs_api_key` 会强制 Codex 使用显式 API key；缺 key
 会直接报错，不会回退到个人 ChatGPT 订阅。
+
+网页对话未显式传 `financial_qa_runtime` 时使用 `FINANCE_CHAT_DEFAULT_RUNTIME`；显式传入
+`cc` 或 `dsh` 仍可逐请求覆盖。上述两个金融 QA 开关都必须启用。开关在 Web/Finance API
+进程启动时读取，修改后必须重启对应服务。
+
+CC 的子进程环境隔离默认开启，Linux 服务器应安装 `bubblewrap`。若暂时无法安装，可设
+`FINANCE_CC_SUBPROCESS_ENV_SCRUB=0`；金融 QA 路径仍禁止 Bash、文件、网页和子 Agent
+工具。安装 `bubblewrap` 后把该值恢复为 `1` 即可，不需要修改代码。
 
 ## 4. 安装 Nginx 配置
 

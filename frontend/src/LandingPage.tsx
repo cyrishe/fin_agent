@@ -16,6 +16,7 @@ import {
   Workflow,
 } from "lucide-react";
 import { type FormEvent, type KeyboardEvent, useRef, useState } from "react";
+import { appPath } from "./appPath";
 import "./landing.css";
 
 export const PENDING_PROMPT_STORAGE_KEY = "fin_agent.pending_prompt";
@@ -28,7 +29,7 @@ export function continueToRegistration(
   const normalizedPrompt = prompt.trim();
   if (!normalizedPrompt) return false;
   storage.setItem(PENDING_PROMPT_STORAGE_KEY, normalizedPrompt);
-  navigate("/register");
+  navigate(appPath("/register"));
   return true;
 }
 
@@ -263,7 +264,7 @@ export default function LandingPage() {
       <a className="landing-skip-link" href="#landing-main">跳到主要内容</a>
 
       <header className="landing-header">
-        <a className="landing-brand" href="/" aria-label="Fin Agent 首页">
+        <a className="landing-brand" href={appPath("/")} aria-label="Fin Agent 首页">
           <span className="landing-brand-mark" aria-hidden="true">
             <Activity size={20} strokeWidth={1.9} />
           </span>
@@ -280,8 +281,8 @@ export default function LandingPage() {
         </nav>
 
         <div className="landing-header-actions">
-          <a className="landing-login-link" href="/login">登录</a>
-          <a className="landing-register-link" href="/register">
+          <a className="landing-login-link" href={appPath("/login")}>登录</a>
+          <a className="landing-register-link" href={appPath("/register")}>
             免费注册
             <ArrowRight size={16} aria-hidden="true" />
           </a>
@@ -518,7 +519,7 @@ export default function LandingPage() {
               金融问题中的日期、数据口径、执行假设和缺失信息都会影响结论。
               Fin Agent 把这些关键事实留在结果旁边，让用户能够理解、追问和修订。
             </p>
-            <a href="/register">
+            <a href={appPath("/register")}>
               从第一个问题开始
               <ArrowRight size={16} aria-hidden="true" />
             </a>
@@ -542,7 +543,7 @@ export default function LandingPage() {
           <Activity size={24} aria-hidden="true" />
           <h2 id="landing-cta-title">从第一个金融问题开始。</h2>
           <p>不必先学习复杂菜单。说清楚你想了解什么，Fin Agent 会和你一起推进。</p>
-          <a href="/register">
+          <a href={appPath("/register")}>
             免费注册
             <ArrowRight size={17} aria-hidden="true" />
           </a>
@@ -550,11 +551,15 @@ export default function LandingPage() {
       </main>
 
       <footer className="landing-footer">
-        <a className="landing-brand landing-footer-brand" href="/" aria-label="Fin Agent 首页">
+        <a className="landing-brand landing-footer-brand" href={appPath("/")} aria-label="Fin Agent 首页">
           <span className="landing-brand-mark" aria-hidden="true"><Activity size={17} /></span>
           <strong>Fin Agent</strong>
         </a>
-        <p>金融数据查询、策略研究与个人 Skill 工作台</p>
+        <nav className="landing-footer-resources" aria-label="数据与开发者资源">
+          <a href={appPath("/data-map")}>数据说明</a>
+          <a href={appPath("/mcp-guide")}>MCP 接入</a>
+          <a href={appPath("/docs")}>API 文档</a>
+        </nav>
         <small>页面示例不构成投资建议；投资决策请结合自身情况独立判断。</small>
       </footer>
     </div>

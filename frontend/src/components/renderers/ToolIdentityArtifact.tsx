@@ -2,6 +2,7 @@ import { AlertCircle, Check, CheckCircle2, Copy, FileCode2, GitBranch, Layers3, 
 import { useState } from "react";
 import type { UnknownRecord } from "../../types";
 import CodeBlock from "../CodeBlock";
+import MarkdownContent from "../MarkdownContent";
 import { authoritativeFlowObject } from "./AuthoritativeFlow";
 import CustomToolTestWorkbench from "./CustomToolTestWorkbench";
 import FlowRenderer from "./FlowRenderer";
@@ -99,6 +100,7 @@ export default function ToolIdentityArtifact({
   const description = String(asset.description || data.summary || "");
   const invocation = name ? `$${name}` : "";
   const active = String(data.lifecycle || "") === "active";
+  const visibility = String(data.visibility || details.visibility || "personal").trim().toLowerCase();
   const modules = list(details.modules);
   const files = list(details.files || data.files);
   const verification = record(details.verification || data.verification);
@@ -162,6 +164,7 @@ export default function ToolIdentityArtifact({
             ? "待验证"
             : text(compatibilityStatus) || (strategyProfile ? "运行契约待完善" : "兼容性说明");
   const designFlow = details.design_flow || details.authoritative_design_flow || data.design_flow;
+  const designDocument = String(details.design_document || "").trim();
   const flowObject = authoritativeFlowObject({
     id: `implementation_design_flow_${name || "draft"}`,
     mermaid: details.design_mermaid || details.mermaid,
@@ -196,12 +199,13 @@ export default function ToolIdentityArtifact({
       <div className="tool-identity-copy">
         <div className="tool-identity-status">
           <span className={plannedAction ? "planned" : active ? "active" : "draft"}>
-            {plannedAction ? "仅设计" : active ? "已启用" : "待确认"}
+            {plannedAction ? "仅设计" : active ? "已启用" : "候选版本"}
           </span>
           <small>版本 {String(data.version || asset.revision || "—")}</small>
+          <small>{visibility === "public" ? "公开可见" : "仅本人可见"}</small>
         </div>
         <h3>{displayName}</h3>
-        <p>{description || "按照已确认的金融需求执行自定义分析。"}</p>
+        <p>{description || "按照已收敛的金融需求执行自定义分析。"}</p>
         {financeProfileLabel ? <div className="finance-tool-profile" aria-label="金融工具画像">
           <span>{financeProfileLabel}</span>
         </div> : null}
@@ -229,8 +233,8 @@ export default function ToolIdentityArtifact({
       <div className="implementation-overview-grid">
         {modules.length ? <article><span><Layers3 size={14} />核心模块</span><strong>{modules.length} 个</strong><p>职责拆分见下方实现细节。</p></article> : null}
         {verificationTone !== "unknown" ? <article className={`verification-${verificationTone}`}>
-          <span>{verificationTone === "pass" ? <CheckCircle2 size={14} /> : <AlertCircle size={14} />}验证状态</span>
-          <strong>{verificationTone === "pass" ? "已通过" : verificationTone === "fail" ? "未通过" : "进行中"}</strong>
+          <span>{verificationTone === "pass" ? <CheckCircle2 size={14} /> : <AlertCircle size={14} />}验证范围</span>
+          <strong>{verificationTone === "pass" ? "技术验证完成" : verificationTone === "fail" ? "技术验证未通过" : "验证中"}</strong>
           <p>{text(verification) || "详细证据见本轮验证结果。"}</p>
         </article> : null}
         {runtimeText ? <article><span><ShieldCheck size={14} />运行边界</span><strong>由系统托管</strong><p>{runtimeText}</p></article> : null}
@@ -240,6 +244,16 @@ export default function ToolIdentityArtifact({
       </div>
     </section> : null}
 
+    {flowObject ? <section className="implementation-flow-section">
+      <div className="implementation-section-heading"><div><GitBranch size={16} /><h4>已保存的业务主流程</h4></div><small>与当前候选修订一起资产化保留</small></div>
+      <FlowRenderer object={flowObject} />
+    </section> : null}
+
+    {designDocument ? <details className="tool-logic-details">
+      <summary>查看当前完整逻辑与设计依据</summary>
+      <div className="tool-logic-document"><MarkdownContent content={designDocument} /></div>
+    </details> : null}
+
     {!plannedAction ? <CustomToolTestWorkbench
       toolName={name}
       displayName={displayName}
@@ -247,11 +261,6 @@ export default function ToolIdentityArtifact({
       inputSchema={inputSchema}
       sampleInput={sampleInput}
     /> : null}
-
-    {flowObject ? <section className="implementation-flow-section">
-      <div className="implementation-section-heading"><div><GitBranch size={16} /><h4>已确认的设计主流程</h4></div><small>沿用 Design 权威版本，不从代码重新推导</small></div>
-      <FlowRenderer object={flowObject} />
-    </section> : null}
 
     <details className="tool-contract-details">
       <summary>查看输入、输出、模块与代码</summary>

@@ -13,8 +13,8 @@ def test_ai_service_loads_repo_env_before_client_initialization() -> None:
         "from src.utils.ai_service import llm_config_summary; "
         "s=llm_config_summary(); "
         "assert s['key_present'] is True; "
-        "assert s['key_source'] in {'LLM_API_KEY', 'LLM_KEY', 'DEEPSEEK_API_KEY', 'DASHSCOPE_API_KEY'}; "
-        "assert 'api.deepseek.com' in s['endpoint']"
+        "assert s['key_source'] == 'DASHSCOPE_API_KEY'; "
+        "assert 'dashscope.aliyuncs.com' in s['endpoint']"
     )
     env = os.environ.copy()
     for name in (
@@ -35,6 +35,23 @@ def test_ai_service_loads_repo_env_before_client_initialization() -> None:
         check=False,
     )
     assert result.returncode == 0, result.stderr or result.stdout
+
+
+def test_dashscope_route_never_selects_personal_deepseek_key(monkeypatch) -> None:
+    monkeypatch.setenv("DASHSCOPE_API_KEY", "maas-key")
+    monkeypatch.setenv("LLM_KEY", "personal-key")
+
+    source = ai_service._resolved_llm_key_source(
+        "https://dashscope.aliyuncs.com/compatible-mode/v1"
+    )
+
+    assert source == "DASHSCOPE_API_KEY"
+
+
+def test_legacy_explicit_llm_endpoint_remains_compatible(monkeypatch):
+    monkeypatch.delenv("LLM_BASE_URL", raising=False)
+    monkeypatch.setenv("LLM_ENDPOINT", "https://example.test/v1")
+    assert ai_service._resolved_llm_base_url() == "https://example.test/v1"
 
 
 def test_flash_structured_request_uses_json_response_format(monkeypatch) -> None:

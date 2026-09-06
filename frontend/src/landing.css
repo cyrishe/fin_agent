@@ -1202,10 +1202,22 @@
   box-shadow: 2px 2px 0 rgba(23, 26, 29, .9);
 }
 
-.landing-footer p {
+.landing-footer-resources {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.landing-footer-resources a {
   color: #777975;
   font-size: 10px;
-  text-align: center;
+  text-decoration: none;
+}
+
+.landing-footer-resources a:hover {
+  color: var(--landing-ink);
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 
 .landing-footer > small {

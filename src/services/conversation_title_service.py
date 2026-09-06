@@ -22,10 +22,15 @@ class ConversationTitleService:
     def _trim(value: Any) -> str:
         return str(value or "").strip()
 
-    def generate(self, *, user_text: str) -> Dict[str, Any]:
+    def generate(
+        self,
+        *,
+        user_text: str,
+        enable_llm: bool = True,
+    ) -> Dict[str, Any]:
         text = self._trim(user_text)
         fallback = self._fallback_title(text)
-        if not text:
+        if not text or not enable_llm:
             return {"title": fallback, "source": "fallback", "model_name": DEFAULT_FLASH_MODEL}
         messages = [
             {

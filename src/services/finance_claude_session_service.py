@@ -89,6 +89,50 @@ class _FinanceCcFirstResponseTimeout(TimeoutError):
     """The provider accepted the turn but produced no stream message in time."""
 
 
+class _AsyncDeadline:
+    """Small reschedulable timeout compatible with Python 3.10+."""
+
+    def __init__(self, when: float) -> None:
+        self._when = float(when)
+        self._task: asyncio.Task[Any] | None = None
+        self._handle: asyncio.TimerHandle | None = None
+        self._expired = False
+
+    async def __aenter__(self) -> "_AsyncDeadline":
+        self._task = asyncio.current_task()
+        if self._task is None:
+            raise RuntimeError("async deadline requires a running task")
+        self._schedule()
+        return self
+
+    async def __aexit__(self, exc_type: Any, exc: Any, traceback: Any) -> bool:
+        if self._handle is not None:
+            self._handle.cancel()
+            self._handle = None
+        if exc_type is asyncio.CancelledError and self._expired:
+            raise TimeoutError from exc
+        return False
+
+    def reschedule(self, when: float) -> None:
+        self._when = float(when)
+        self._expired = False
+        if self._handle is not None:
+            self._handle.cancel()
+            self._handle = None
+        if self._task is not None:
+            self._schedule()
+
+    def _schedule(self) -> None:
+        loop = asyncio.get_running_loop()
+        delay = max(0.0, self._when - loop.time())
+        self._handle = loop.call_later(delay, self._cancel_task)
+
+    def _cancel_task(self) -> None:
+        self._expired = True
+        if self._task is not None:
+            self._task.cancel()
+
+
 class FinanceClaudeSessionService:
     """Run a provider-backed Finance CC conversation without owning routing or DB state."""
 
@@ -121,8 +165,18 @@ class FinanceClaudeSessionService:
     ) -> None:
         enabled_text = _trim(os.environ.get("FINANCE_CC_SHADOW_ENABLED")).lower()
         self.enabled = bool(enabled) if enabled is not None else enabled_text in {"1", "true", "yes", "on"}
-        self.provider = _trim(provider or os.environ.get("FINANCE_CC_PROVIDER") or "deepseek").lower()
-        self.model = _trim(model or os.environ.get("FINANCE_CC_MODEL") or "deepseek-chat")
+        self.provider = _trim(
+            provider
+            or os.environ.get("FINANCE_CC_PROVIDER")
+            or os.environ.get("CLAUDE_PROVIDER")
+            or "dashscope"
+        ).lower()
+        self.model = _trim(
+            model
+            or os.environ.get("FINANCE_CC_MODEL")
+            or os.environ.get("LLM_DEFAULT_MODEL")
+            or "deepseek-v4-flash-0731"
+        )
         self.root_dir = Path(root_dir)
         self.log_path = Path(log_path)
         self.system_prompt_path = Path(system_prompt_path or "src/prompts/finance_cc/main.system.md")
@@ -806,17 +860,29 @@ class FinanceClaudeSessionService:
         first_response_timeout_seconds: float,
     ):
         iterator = None
+        loop = asyncio.get_running_loop()
+        deadline = loop.time() + first_response_timeout_seconds
+
+        async def before_deadline(awaitable: Any) -> Any:
+            remaining = deadline - loop.time()
+            if remaining <= 0:
+                raise TimeoutError
+            return await asyncio.wait_for(awaitable, timeout=remaining)
+
         try:
-            async with asyncio.timeout(first_response_timeout_seconds):
-                await client.query(prompt)
-                iterator = client.receive_response().__aiter__()
-                async for message in iterator:
-                    yield message
-                    if FinanceClaudeSessionService._is_meaningful_response_message(
-                        message
-                    ):
-                        break
-        except TimeoutError as exc:
+            await before_deadline(client.query(prompt))
+            iterator = client.receive_response().__aiter__()
+            while True:
+                try:
+                    message = await before_deadline(iterator.__anext__())
+                except StopAsyncIteration:
+                    return
+                yield message
+                if FinanceClaudeSessionService._is_meaningful_response_message(
+                    message
+                ):
+                    break
+        except (asyncio.TimeoutError, TimeoutError) as exc:
             raise _FinanceCcFirstResponseTimeout from exc
         if iterator is None:
             return
@@ -981,7 +1047,15 @@ class FinanceClaudeSessionService:
                 "CLAUDE_CONFIG_DIR": str(session_dir / "claude"),
                 "CLAUDE_CODE_DISABLE_AUTO_MEMORY": "1",
                 "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "1",
-                "CLAUDE_CODE_SUBPROCESS_ENV_SCRUB": "1",
+                "CLAUDE_CODE_SUBPROCESS_ENV_SCRUB": (
+                    "0"
+                    if _trim(
+                        os.environ.get("FINANCE_CC_SUBPROCESS_ENV_SCRUB")
+                        or "1"
+                    ).lower()
+                    in {"0", "false", "no", "off"}
+                    else "1"
+                ),
                 "CLAUDE_CODE_MAX_RETRIES": str(
                     max(
                         0,
@@ -1357,7 +1431,7 @@ class FinanceClaudeSessionService:
             )
         timeout_seconds = self._turn_timeout_seconds(tool_context)
         timeout_started_at = asyncio.get_running_loop().time()
-        timeout_scope = asyncio.timeout(timeout_seconds)
+        timeout_scope = _AsyncDeadline(timeout_started_at + timeout_seconds)
         evidence["turn_timeout_seconds"] = timeout_seconds
         try:
             async with timeout_scope:

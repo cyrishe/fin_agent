@@ -40,17 +40,18 @@ cp deploy/finance-api/.env.example .env
 chmod 600 .env
 ```
 
-该模板把三类模型凭证分开：金融 DSH 使用 `FINANCE_DSH_*`，Codex CRS 使用
-`CODEX_CRS_*`，百炼通用/Claude 入口使用 `DASHSCOPE_*`。因此服务器不会隐式拿到开发者
-个人的 DeepSeek Key 或 Codex 订阅状态。
+该模板以 `LLM_API_KEY` / `LLM_BASE_URL` / `LLM_DEFAULT_MODEL` 作为金融 DSH
+和基础模型调用的唯一 OpenAI-compatible 入口；Codex CRS 与 Claude SDK 因协议不同，
+仍分别使用各自的适配配置。服务器不会隐式拿到开发者个人凭据或 Codex 订阅状态。
 
 服务器必须显式使用：
 
 ```dotenv
 STOCK_AGENT_CODEX_AUTH_MODE=crs_api_key
 CODEX_CRS_API_KEY=...
-FINANCE_DSH_API_KEY=...
-FINANCE_DSH_BASE_URL=https://api.deepseek.com
+LLM_API_KEY=...
+LLM_BASE_URL=https://dashscope.aliyuncs.com/compatible-mode/v1
+LLM_DEFAULT_MODEL=...
 DASHSCOPE_API_KEY=...
 DASHSCOPE_BASE_URL=https://dashscope.aliyuncs.com/compatible-mode/v1
 DASHSCOPE_ANTHROPIC_BASE_URL=https://dashscope.aliyuncs.com/apps/anthropic
@@ -61,8 +62,8 @@ Codex adapter 会在每个隔离 session 的 `CODEX_HOME` 自动生成以下结�
 
 ```toml
 model_provider = "crs"
-model = "gpt-5-codex"
-model_reasoning_effort = "high"
+model = "gpt-6-astra"
+model_reasoning_effort = "low"
 disable_response_storage = true
 preferred_auth_method = "apikey"
 
@@ -199,6 +200,7 @@ curl -X POST 'https://finance-api.example.com/v1/finance/query' \
     "response_mode": "both",
     "runtime": "dsh",
     "research_mode": "fast",
+    "execution_mode": "fast",
     "conversation_id": "portfolio-session-001",
     "max_rows": 100
   }'
@@ -211,6 +213,16 @@ curl -X POST 'https://finance-api.example.com/v1/finance/query' \
 | `data` | 返回结构化数据；数据取齐后跳过最终自然语言生成 | 程序、量化流程、后续分析 Agent |
 | `summary` | 返回基于工具证据生成的中文回答，不返回行数据 | 问答界面 |
 | `both` | 同时返回中文回答和结构化数据 | 需要展示证据的应用 |
+
+`execution_mode` 与回答深度 `research_mode` 相互独立：
+
+| 值 | DSH 执行行为 |
+|---|---|
+| `standard` | 分阶段执行，允许受限的检查、修复和必要明细读取 |
+| `fast` | 仅执行“定位 API → 生成并执行调用 → 返回”；不检查、不修复、不重试、不翻页 |
+
+`execution_mode=fast` 当前只接受 `runtime=dsh`。当 `response_mode=data` 时，成功的
+查询结果会直接结束 DSH turn；`summary` 或 `both` 仍有一次最终回答生成。
 
 `max_rows` 是每个结果在 HTTP 响应中的最大行数，范围 `1..100`。`row_count` 保留完整
 结果数量，`truncated=true` 表示当前响应只包含前一页。该参数只控制对外传输，不改变
@@ -227,6 +239,7 @@ curl -X POST 'https://finance-api.example.com/v1/finance/query' \
   "query": "...",
   "response_mode": "both",
   "runtime": "dsh",
+  "execution_mode": "fast",
   "conversation_id": "portfolio-session-001",
   "summary": "...",
   "data": {

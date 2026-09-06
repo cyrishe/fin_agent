@@ -28,8 +28,8 @@ _DASHSCOPE_ROOT_R46_CA = (
     / "certs"
     / "globalsign-root-r46.pem"
 )
-DEFAULT_CLAUDE_PROVIDER = "deepseek"
-DEFAULT_CLAUDE_MODEL = "deepseek-chat"
+DEFAULT_CLAUDE_PROVIDER = "dashscope"
+DEFAULT_CLAUDE_MODEL = "deepseek-v4-flash-0731"
 _PROVIDERS = {"anthropic", "deepseek", "dashscope", "gateway"}
 _MUTATING_TOOLS = {"Edit", "Write", "NotebookEdit"}
 _READ_TOOLS = {"Read", "Glob", "Grep"}

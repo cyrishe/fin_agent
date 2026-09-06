@@ -87,7 +87,7 @@ class LlmStreamBlockBuilder:
 
     STAGE_TITLES = {
         "edit_plan": "修改范围",
-        "requirement": "需求确认",
+        "requirement": "需求理解",
         "design": "方案设计",
         "flowchart": "流程图",
         "coding": "代码实现",
@@ -748,6 +748,7 @@ class LlmStreamBlockBuilder:
         planned_action = (
             _trim(finance_tool_profile.get("family")).lower() == "action"
         )
+        skip_design_review = final.get("skip_design_review") is True
         if planned_action:
             # This is a system-owned execution boundary, not a permission
             # requested from or granted by the model.
@@ -779,38 +780,37 @@ class LlmStreamBlockBuilder:
 
         if stage == "requirement":
             if questions and notice:
-                prompt = "我会按下面的理解继续；其中需要你决定的项目已默认选择第一项。"
+                prompt = "我已经自行收敛其余需求；下面的问题会实质改变工具结果，需要你决定。"
             elif questions:
-                prompt = "请确认下面的关键选择；每项已默认选择第一项。"
-            elif notice:
-                prompt = "下面是我准备采用的处理方式。确认后，我会继续形成设计方案。"
+                prompt = "下面的问题会实质改变工具结果，需要你决定；也可以直接说明自己的口径。"
             else:
-                prompt = "如果上述理解符合你的预期，确认后我会继续形成设计方案。"
-            blocks.append(self._block(
-                block_id="requirement_review",
-                block_type="interaction",
-                mode="replace",
-                title="确认需求",
-                content=prompt,
-                stage=stage,
-                data={
-                    "interaction_id": "custom_tool.requirement_clarification",
-                    "intent": "provide_input",
-                    "submission_mode": "conversation",
-                    "prompt": prompt,
-                    "subject_ref": clarification_artifact_id,
-                    "subject_revision": clarification_revision,
-                    "notice": notice,
-                    "questions": questions,
-                    "actions": [{
-                        "action_id": "custom_tool.submit_clarification",
-                        "label": "确认需求",
-                        "intent": "submit",
-                        "style": "primary",
-                        "expected_revision": clarification_revision,
-                    }],
-                },
-            ))
+                prompt = ""
+            if questions:
+                blocks.append(self._block(
+                    block_id="requirement_review",
+                    block_type="interaction",
+                    mode="replace",
+                    title="需要明确一个关键问题",
+                    content=prompt,
+                    stage=stage,
+                    data={
+                        "interaction_id": "custom_tool.requirement_clarification",
+                        "intent": "provide_input",
+                        "submission_mode": "conversation",
+                        "prompt": prompt,
+                        "subject_ref": clarification_artifact_id,
+                        "subject_revision": clarification_revision,
+                        "notice": notice,
+                        "questions": questions,
+                        "actions": [{
+                            "action_id": "custom_tool.submit_clarification",
+                            "label": "提交并继续实现",
+                            "intent": "submit",
+                            "style": "primary",
+                            "expected_revision": clarification_revision,
+                        }],
+                    },
+                ))
 
         if design:
             blocks.append(self._block(
@@ -876,7 +876,7 @@ class LlmStreamBlockBuilder:
                     }],
                 },
             ))
-        if reviewable and not planned_action:
+        if reviewable and not planned_action and not skip_design_review:
             blocks.append(self._block(
                 block_id=f"{stage}_design_review",
                 block_type="interaction",

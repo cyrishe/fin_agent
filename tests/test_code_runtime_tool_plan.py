@@ -18,6 +18,11 @@ def test_conversation_preprocess_strips_code_hint_and_marks_context(monkeypatch)
 
 
 def test_tool_plan_runtime_executes_code_step_and_downstream_binding(monkeypatch, tmp_path):
+    # This tests execution/binding, not a live model's assessment of a tiny fixture.
+    monkeypatch.setattr(
+        "src.services.tool_plan_runtime_service.chat_qwen_json",
+        lambda *args, **kwargs: ({"summary": "已按 score 降序排序。", "facts": [], "risks": []}, {}),
+    )
     def fake_run_tool(tool_name, args, runtime_ctx=None):
         return {
             "tool": tool_name,

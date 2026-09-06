@@ -166,7 +166,10 @@ def test_coding_skill_requires_compact_core_process_evidence_and_alignment_expla
     assert "静态检查" in combined
     assert "输入、输出、核心逻辑和数据范围" in combined
     assert "只有两项" in combined
-    assert "不判断策略是否有效" in combined
+    assert "不证明信号或策略具有投资收益" in combined
+    assert "最小充分样例" in combined
+    assert "expected_basis" in combined
+    assert "不能复制运行后的 `actual` 充当预期" in combined
     assert "当前 Coding 会话和同一工作区" in combined
     assert "只输出一次最新版" in combined
 

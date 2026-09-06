@@ -1,4 +1,5 @@
 import { Download, FileText } from "lucide-react";
+import { appPath } from "../appPath";
 import type { UnknownRecord } from "../types";
 
 const asRecord = (value: unknown): UnknownRecord => value && typeof value === "object" && !Array.isArray(value)
@@ -14,7 +15,7 @@ export function reportPdfUrl(threadId: number, turnId: number): string {
     thread_id: String(threadId),
     turn_id: String(turnId),
   });
-  return `/api/assistant/results/report.pdf?${query.toString()}`;
+  return appPath(`/api/assistant/results/report.pdf?${query.toString()}`);
 }
 
 export default function ReportExportButton({ payload, threadId, turnId }: {

@@ -21,6 +21,10 @@ describe("LandingPage", () => {
     expect(html).toContain("回测与策略管理");
     expect(html).toContain("强大的 Skill 平台");
     expect(html).toContain("页面示例不构成投资建议");
+    expect(html).toContain("数据说明");
+    expect(html).toContain("MCP 接入");
+    expect(html).toContain('href="/data-map"');
+    expect(html).toContain('href="/mcp-guide"');
   });
 
   it("persists a normalized prompt before navigating to registration", () => {

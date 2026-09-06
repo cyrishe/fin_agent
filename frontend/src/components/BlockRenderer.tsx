@@ -165,17 +165,25 @@ function Assessment({ data, content }: { data: UnknownRecord; content: string })
       {tests.length > 0 && <div className="assessment-tests">{tests.map((test, index) => {
         const testStatus = String(test.status || "unknown");
         const logs = list(test.logs).map(record);
+        const expected = record(test.expected);
         const actual = record(test.actual);
         const keyProcessInfo = record(test.key_process_info || actual.key_process_info);
         const businessResult = Object.fromEntries(Object.entries(actual).filter(([key]) => key !== "key_process_info"));
+        const hasExpected = Object.keys(expected).length > 0;
+        const expectedBasis = String(test.expected_basis || "").trim();
         return <article className={testStatus} key={String(test.name || index)}>
           <div><strong>{String(test.name || `样例 ${index + 1}`)}</strong><span>{testStatus}</span></div>
           {test.summary ? <p>{String(test.summary)}</p> : null}
+          {expectedBasis ? <p className="assessment-expected-basis"><b>预期依据</b>{expectedBasis}</p> : null}
+          {hasExpected ? <div className="assessment-comparison" aria-label="预期与实际对照">
+            <JsonBlock value={expected} title="独立预期" compact />
+            <JsonBlock value={businessResult} title="实际结果" compact />
+          </div> : null}
           {Object.keys(keyProcessInfo).length > 0 ? <div className="key-process-info">
             <b>核心过程信息</b>
             <div className="key-process-grid">{Object.entries(keyProcessInfo).map(([key, value]) => <div key={key}><span>{key.replaceAll("_", " ")}</span>{value && typeof value === "object" ? <JsonBlock value={value} title="" compact /> : <strong>{String(value ?? "—")}</strong>}</div>)}</div>
           </div> : null}
-          {(test.input || Object.keys(businessResult).length || logs.length) ? <details><summary>查看测试输入、完整结果与日志</summary>{test.input ? <JsonBlock value={test.input} title="输入" compact /> : null}{Object.keys(businessResult).length ? <JsonBlock value={businessResult} title="业务结果" compact /> : null}{logs.length ? <div><b>关键日志</b><ul>{logs.map((log, logIndex) => <li key={logIndex}>{log.message ? String(log.message) : <JsonBlock value={log} title={`日志 ${logIndex + 1}`} compact />}</li>)}</ul></div> : null}</details> : null}
+          {(test.input || (!hasExpected && Object.keys(businessResult).length) || logs.length) ? <details><summary>查看测试输入、完整结果与日志</summary>{test.input ? <JsonBlock value={test.input} title="输入" compact /> : null}{!hasExpected && Object.keys(businessResult).length ? <JsonBlock value={businessResult} title="业务结果" compact /> : null}{logs.length ? <div><b>关键日志</b><ul>{logs.map((log, logIndex) => <li key={logIndex}>{log.message ? String(log.message) : <JsonBlock value={log} title={`日志 ${logIndex + 1}`} compact />}</li>)}</ul></div> : null}</details> : null}
         </article>;
       })}</div>}
     </div>

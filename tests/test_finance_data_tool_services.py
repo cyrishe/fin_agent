@@ -95,6 +95,22 @@ def test_finance_data_catalog_builds_subject_dataview_function_tree() -> None:
     assert {
         item["api_name"] for item in stock_views["report_metric"]["functions"]
     } == {"stock.report_metric", "stock.report_metric.agg"}
+    financial_view = stock_views["financial_3_table"]
+    assert financial_view["value_domains"]["statement_type"] == {
+        "HB": "合并报表、调整前、累计口径（普通查询默认）",
+        "HBTZ": "合并报表、调整后、累计口径",
+        "HBDJ": "合并报表、调整前、单季口径",
+        "HBTZDJ": "合并报表、调整后、单季口径",
+        "MGS": "母公司报表、调整前、累计口径",
+        "MGSTZ": "母公司报表、调整后、累计口径",
+        "MGSDJ": "母公司报表、调整前、单季口径",
+        "MGSTZDJ": "母公司报表、调整后、单季口径",
+    }
+    statement_type = next(
+        field for field in financial_view["fields"] if field["name"] == "statement_type"
+    )
+    assert "不表示年报" in statement_type["desc"]
+    assert any("年度数据筛选每年12月31日" in rule for rule in financial_view["rules"])
     assert stock_views["report"]["aggregate_fields"]["report_id"] == ["count"]
     assert set(stock_views["report_metric"]["value_domains"]["metric_code"]) == {
         "eps",

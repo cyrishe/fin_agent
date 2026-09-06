@@ -13,6 +13,7 @@ import type {
   ThreadSummary,
   UnknownRecord,
 } from "./types";
+import { appPath } from "./appPath";
 
 async function readJson<T>(response: Response): Promise<T> {
   const body = await response.text();
@@ -40,7 +41,7 @@ export async function loadAuthSession(): Promise<AuthSession> {
     ok: boolean;
     authenticated?: boolean;
     user?: AuthSession["user"];
-  }>(await fetch("/api/auth/session", { credentials: "include" }));
+  }>(await fetch(appPath("/api/auth/session"), { credentials: "include" }));
   return {
     authenticated: Boolean(payload.authenticated),
     user: payload.user || null,
@@ -55,7 +56,7 @@ export async function loadAuthConfig(): Promise<{
   possession_available: boolean;
   identity_match_required: boolean;
 }> {
-  return readJson(await fetch("/api/auth/config", { credentials: "include" }));
+  return readJson(await fetch(appPath("/api/auth/config"), { credentials: "include" }));
 }
 
 export async function requestRegistrationCode(input: {
@@ -72,7 +73,7 @@ export async function requestRegistrationCode(input: {
     mobile_masked: string;
     expires_in_seconds: number;
     resend_after_seconds: number;
-  }>(await fetch("/api/auth/registration-code", {
+  }>(await fetch(appPath("/api/auth/registration-code"), {
     method: "POST",
     credentials: "include",
     headers: { "Content-Type": "application/json" },
@@ -98,7 +99,7 @@ export async function registerPhoneAccount(input: {
     ok: boolean;
     authenticated: boolean;
     user: AuthSession["user"];
-  }>(await fetch("/api/auth/register", {
+  }>(await fetch(appPath("/api/auth/register"), {
     method: "POST",
     credentials: "include",
     headers: { "Content-Type": "application/json" },
@@ -122,7 +123,7 @@ export async function loginPhoneAccount(input: {
     ok: boolean;
     authenticated: boolean;
     user: AuthSession["user"];
-  }>(await fetch("/api/auth/login", {
+  }>(await fetch(appPath("/api/auth/login"), {
     method: "POST",
     credentials: "include",
     headers: { "Content-Type": "application/json" },
@@ -135,7 +136,7 @@ export async function loginPhoneAccount(input: {
 }
 
 export async function logoutAccount(): Promise<void> {
-  await readJson(await fetch("/api/auth/logout", {
+  await readJson(await fetch(appPath("/api/auth/logout"), {
     method: "POST",
     credentials: "include",
     headers: { "Content-Type": "application/json" },
@@ -145,7 +146,7 @@ export async function logoutAccount(): Promise<void> {
 
 export async function loadThreads(): Promise<ThreadListResult> {
   const payload = await readJson<{ ok: boolean; items: ThreadSummary[]; active_thread_id?: number | null }>(
-    await fetch("/api/assistant/threads", { credentials: "include" }),
+    await fetch(appPath("/api/assistant/threads"), { credentials: "include" }),
   );
   return {
     items: Array.isArray(payload.items) ? payload.items : [],
@@ -155,7 +156,7 @@ export async function loadThreads(): Promise<ThreadListResult> {
 
 export async function loadThread(threadId: number): Promise<ThreadDetail> {
   return readJson<ThreadDetail>(
-    await fetch(`/api/assistant/threads/${encodeURIComponent(threadId)}`, {
+    await fetch(appPath(`/api/assistant/threads/${encodeURIComponent(threadId)}`), {
       credentials: "include",
     }),
   );
@@ -190,7 +191,7 @@ export async function loadResultPage(input: {
       total?: number;
       has_more?: boolean;
     };
-  }>(await fetch(`/api/assistant/results/page?${query.toString()}`, {
+  }>(await fetch(appPath(`/api/assistant/results/page?${query.toString()}`), {
     credentials: "include",
   }));
   const page = payload.page || {};
@@ -334,7 +335,7 @@ function mapInvocationAssets(
 }
 
 async function loadUnifiedInvocationAssets(): Promise<InvocationAsset[] | null> {
-  const response = await fetch("/api/assets/invocable", { credentials: "include" });
+  const response = await fetch(appPath("/api/assets/invocable"), { credentials: "include" });
   if ([404, 405].includes(response.status)) return null;
   const payload = await readJson<{ items?: UnknownRecord[]; assets?: UnknownRecord[] }>(response);
   const items = Array.isArray(payload.items)
@@ -364,7 +365,7 @@ export async function loadInvocationAssets(): Promise<InvocationAsset[]> {
 }
 
 export async function loadInvocationTools(): Promise<InvocationAsset[]> {
-  const payload = await readJson<{ items?: UnknownRecord[] }>(await fetch("/api/tools/catalog", { credentials: "include" }));
+  const payload = await readJson<{ items?: UnknownRecord[] }>(await fetch(appPath("/api/tools/catalog"), { credentials: "include" }));
   return mapInvocationAssets(payload.items || [], "tool");
 }
 
@@ -372,7 +373,7 @@ export async function loadInvocationSkills(): Promise<InvocationAsset[]> {
   const controller = new AbortController();
   const timeout = globalThis.setTimeout(() => controller.abort(), 2000);
   try {
-    const payload = await readJson<{ items?: UnknownRecord[] }>(await fetch("/api/skills/catalog", {
+    const payload = await readJson<{ items?: UnknownRecord[] }>(await fetch(appPath("/api/skills/catalog"), {
       credentials: "include",
       signal: controller.signal,
     }));
@@ -383,7 +384,7 @@ export async function loadInvocationSkills(): Promise<InvocationAsset[]> {
 }
 
 export async function resetThread(): Promise<void> {
-  await readJson(await fetch("/api/assistant/thread/reset", {
+  await readJson(await fetch(appPath("/api/assistant/thread/reset"), {
     method: "POST",
     credentials: "include",
   }));
@@ -397,7 +398,7 @@ export async function dispatchChat(input: {
   researchMode?: ResearchMode;
   dataOnly?: boolean;
 }): Promise<UnknownRecord> {
-  return readJson<UnknownRecord>(await fetch("/api/chat/dispatch", {
+  return readJson<UnknownRecord>(await fetch(appPath("/api/chat/dispatch"), {
     method: "POST",
     credentials: "include",
     headers: { "Content-Type": "application/json" },
@@ -417,7 +418,7 @@ export async function uploadAttachments(files: File[]): Promise<Attachment[]> {
   const body = new FormData();
   files.forEach((file) => body.append("files", file));
   const payload = await readJson<{ ok: boolean; items: Attachment[] }>(
-    await fetch("/api/attachments/upload", {
+    await fetch(appPath("/api/attachments/upload"), {
       method: "POST",
       credentials: "include",
       body,
@@ -442,7 +443,7 @@ async function startAgentStream(
   input: AgentStreamInput,
 ): Promise<void> {
   const started = await readJson<{ ok: boolean; run_id: string; stream_url: string }>(
-    await fetch(endpoint, {
+    await fetch(appPath(endpoint), {
       method: "POST",
       credentials: "include",
       headers: { "Content-Type": "application/json" },
@@ -460,7 +461,7 @@ async function startAgentStream(
   );
 
   await new Promise<void>((resolve, reject) => {
-    const source = new EventSource(started.stream_url, { withCredentials: true });
+    const source = new EventSource(appPath(started.stream_url), { withCredentials: true });
     let settled = false;
     const finish = (error?: Error) => {
       if (settled) return;
@@ -516,7 +517,7 @@ export async function runCustomToolInteractiveTest(input: {
   arguments: UnknownRecord;
 }): Promise<CustomToolInteractiveTest> {
   const payload = await readJson<{ ok: boolean; test: CustomToolInteractiveTest }>(
-    await fetch(`/api/custom-tools/${encodeURIComponent(input.toolName)}/test`, {
+    await fetch(appPath(`/api/custom-tools/${encodeURIComponent(input.toolName)}/test`), {
       method: "POST",
       credentials: "include",
       headers: { "Content-Type": "application/json" },
@@ -531,7 +532,7 @@ export async function runCustomToolInteractiveTest(input: {
 
 export async function previewScheduledTask(instruction: string): Promise<ScheduledTaskDraft> {
   const payload = await readJson<{ ok: boolean; preview: ScheduledTaskDraft }>(
-    await fetch("/api/schedules/preview", {
+    await fetch(appPath("/api/schedules/preview"), {
       method: "POST",
       credentials: "include",
       headers: { "Content-Type": "application/json" },
@@ -547,7 +548,7 @@ export async function createScheduledTask(input: {
   idempotencyKey: string;
 }): Promise<ScheduledTask> {
   const payload = await readJson<{ ok: boolean; schedule: ScheduledTask }>(
-    await fetch("/api/schedules", {
+    await fetch(appPath("/api/schedules"), {
       method: "POST",
       credentials: "include",
       headers: {
@@ -562,7 +563,7 @@ export async function createScheduledTask(input: {
 
 export async function loadScheduledTasks(): Promise<ScheduledTask[]> {
   const payload = await readJson<{ ok: boolean; schedules?: ScheduledTask[] }>(
-    await fetch("/api/schedules", { credentials: "include" }),
+    await fetch(appPath("/api/schedules"), { credentials: "include" }),
   );
   return Array.isArray(payload.schedules) ? payload.schedules : [];
 }
@@ -572,7 +573,7 @@ export async function updateScheduledTask(
   input: { enabled: boolean },
 ): Promise<ScheduledTask> {
   const payload = await readJson<{ ok: boolean; schedule: ScheduledTask }>(
-    await fetch(`/api/schedules/${encodeURIComponent(scheduleId)}`, {
+    await fetch(appPath(`/api/schedules/${encodeURIComponent(scheduleId)}`), {
       method: "PATCH",
       credentials: "include",
       headers: { "Content-Type": "application/json" },
@@ -584,7 +585,7 @@ export async function updateScheduledTask(
 
 export async function runScheduledTask(scheduleId: string): Promise<ScheduledTaskRun> {
   const payload = await readJson<{ ok: boolean; run: ScheduledTaskRun }>(
-    await fetch(`/api/schedules/${encodeURIComponent(scheduleId)}/run`, {
+    await fetch(appPath(`/api/schedules/${encodeURIComponent(scheduleId)}/run`), {
       method: "POST",
       credentials: "include",
       headers: { "Content-Type": "application/json" },
@@ -599,7 +600,7 @@ export async function loadScheduledTaskRuns(
   limit = 50,
 ): Promise<ScheduledTaskRun[]> {
   const payload = await readJson<{ ok: boolean; runs?: ScheduledTaskRun[] }>(
-    await fetch(`/api/schedules/${encodeURIComponent(scheduleId)}/runs?limit=${limit}`, {
+    await fetch(appPath(`/api/schedules/${encodeURIComponent(scheduleId)}/runs?limit=${limit}`), {
       credentials: "include",
     }),
   );

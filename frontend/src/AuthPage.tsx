@@ -17,6 +17,7 @@ import {
   requestRegistrationCode,
   registerPhoneAccount,
 } from "./api";
+import { appPath, stripAppBase } from "./appPath";
 import "./auth.css";
 
 const PENDING_PROMPT_KEY = "fin_agent.pending_prompt";
@@ -31,7 +32,7 @@ type AuthConfig = Awaited<ReturnType<typeof loadAuthConfig>>;
 
 function initialMode(): AuthMode {
   if (typeof window === "undefined") return "register";
-  return window.location.pathname.startsWith("/login") ? "login" : "register";
+  return stripAppBase(window.location.pathname).startsWith("/login") ? "login" : "register";
 }
 
 export default function AuthPage({ modeOverride }: Props) {
@@ -66,7 +67,7 @@ export default function AuthPage({ modeOverride }: Props) {
       .then((session) => {
         if (!active) return;
         if (session.authenticated && typeof window !== "undefined") {
-          window.location.replace("/assistant");
+          window.location.replace(appPath("/assistant"));
           return;
         }
         setChecking(false);
@@ -176,7 +177,7 @@ export default function AuthPage({ modeOverride }: Props) {
       } else {
         await loginPhoneAccount({ mobile, password });
       }
-      if (typeof window !== "undefined") window.location.assign("/assistant");
+      if (typeof window !== "undefined") window.location.assign(appPath("/assistant"));
     } catch (reason) {
       setError(reason instanceof Error ? reason.message : String(reason));
     } finally {
@@ -188,7 +189,7 @@ export default function AuthPage({ modeOverride }: Props) {
     <main className="auth-page">
       <div className="auth-orbit auth-orbit-one" aria-hidden="true" />
       <div className="auth-orbit auth-orbit-two" aria-hidden="true" />
-      <a className="auth-brand" href="/" aria-label="返回 Fin Agent 首页">
+      <a className="auth-brand" href={appPath("/")} aria-label="返回 Fin Agent 首页">
         <span><Activity size={18} /></span>
         <strong>Fin Agent</strong><small>Financial Intelligence</small>
       </a>
@@ -412,11 +413,11 @@ export default function AuthPage({ modeOverride }: Props) {
 
         <div className="auth-switch">
           {isRegister ? "已经有账户？" : "第一次使用 Fin Agent？"}
-          <a href={isRegister ? "/login" : "/register"}>
+          <a href={appPath(isRegister ? "/login" : "/register")}>
             {isRegister ? "直接登录" : "免费注册"}
           </a>
         </div>
-        <a className="auth-guest" href="/assistant">先以访客身份体验</a>
+        <a className="auth-guest" href={appPath("/assistant")}>先以访客身份体验</a>
         <p className="auth-footnote">
           {isRegister
             ? <>

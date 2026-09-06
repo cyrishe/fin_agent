@@ -118,7 +118,7 @@ def test_implementation_and_test_keep_technical_facts_separate_from_user_judgeme
         SUBSKILLS_ROOT / "financial-tool-implementation" / "SKILL.md"
     ).read_text(encoding="utf-8")
     assert "key_process_info" in implementation_skill
-    assert "需求、Design 和代码" in implementation_skill
+    assert "Requirement、Design 和代码" in implementation_skill
     assert set(implementation["properties"]) == {
         "tool_contract",
         "implementation_summary",

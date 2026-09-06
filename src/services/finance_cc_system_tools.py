@@ -185,6 +185,9 @@ class FinanceCcSystemTools:
                 if brief:
                     working_state["requirement_brief"] = brief
                     working_state.pop("understanding", None)
+                    # A newly canonicalized requirement must not reuse a
+                    # design from the previous requirement revision.
+                    working_state.pop("design_contract", None)
                 notice = payload.get("notice")
                 if isinstance(notice, list):
                     working_state["notice"] = [_trim(item) for item in notice if _trim(item)]
@@ -352,8 +355,9 @@ class FinanceCcSystemTools:
         @tool(
             "request_user_interaction",
             (
-                "Present the saved requirement for confirmation and pause for the user. Questions may be empty; "
-                "when present, the first candidate is the default and the frontend also allows a custom answer."
+                "Present only unresolved requirement questions that genuinely block a meaningful implementation, "
+                "then pause for the user. Never call this tool with an empty questions list. The first candidate "
+                "is the common choice and the frontend also allows a custom answer."
             ),
             {
                 "type": "object",
@@ -382,6 +386,11 @@ class FinanceCcSystemTools:
             request = {
                 "questions": [dict(item) for item in args.get("questions") or [] if isinstance(item, Mapping)],
             }
+            if not request["questions"]:
+                return _tool_result({
+                    "error": "interaction requires at least one unresolved question",
+                    "message": "No interaction was created; continue directly to design and implementation.",
+                })
             tool_runtime.tracker["calls"].append({"tool": "request_user_interaction"})
             tool_runtime.tracker["interaction_requests"].append(request)
             return _tool_result({"message": "Interaction request recorded. Stop this turn and wait for the user."})
@@ -433,11 +442,14 @@ class FinanceCcSystemTools:
             message = "Artifact recorded."
             if artifact_type == "design":
                 message = (
-                    "Design draft recorded. Before presenting it for confirmation or starting Coding, "
+                    "Design asset recorded. Before starting Coding, "
                     "run financial-tool-flowchart on this saved design and save the resulting flow artifact."
                 )
             elif artifact_type == "flow":
-                message = "Flow recorded. The current design is now complete for user review."
+                message = (
+                    "Flow asset recorded. The internal design is complete; continue directly to implementation "
+                    "unless the user explicitly requested design only."
+                )
             return _tool_result(
                 {
                     "artifact_type": artifact_type,
@@ -486,7 +498,7 @@ class FinanceCcSystemTools:
         @tool(
             "implement_dynamic_tool",
             (
-                "Implement or repair the active dynamic financial tool with the configured coding Agent. The tool reads the saved design "
+                "Implement or repair the current dynamic financial tool candidate with the configured coding Agent. The tool reads the saved design "
                 "and isolated Context Bundle itself; do not pass source code or the full design in this call."
             ),
             {
@@ -506,6 +518,20 @@ class FinanceCcSystemTools:
         async def implement_dynamic_tool(args: dict[str, Any]) -> dict[str, Any]:
             instruction = _trim(args.get("instruction"))
             tool_runtime.tracker["calls"].append({"tool": "implement_dynamic_tool", "instruction": instruction[:500]})
+            unresolved_questions = [
+                dict(item)
+                for item in tool_runtime.working_state.get("questions") or []
+                if isinstance(item, Mapping)
+            ]
+            if unresolved_questions:
+                return _tool_result(
+                    {
+                        "error": "requirement still has unresolved questions",
+                        "message": (
+                            "先等待用户回答会改变核心结果的问题；问题解决后再继续设计、实现和验证。"
+                        ),
+                    },
+                )
             design_contract = (
                 tool_runtime.working_state.get("design_contract")
                 if isinstance(tool_runtime.working_state.get("design_contract"), Mapping)

@@ -12,7 +12,7 @@ uvicorn>=0.32.0,<1.0.0
 PyMySQL>=1.1.0,<2.0.0
 
 openai==1.60.2
-openai-codex==0.1.0b3
+openai-codex==0.147.0
 claude-agent-sdk==0.2.123
 mcp>=1.29.0,<2.0.0
 sse-starlette==2.1.3

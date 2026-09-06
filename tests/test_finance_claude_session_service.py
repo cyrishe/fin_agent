@@ -619,6 +619,29 @@ def test_dashscope_loopback_bridge_is_never_sent_through_inherited_proxy(
         service.close()
 
 
+def test_finance_cc_subprocess_env_scrub_can_be_disabled_when_bwrap_is_unavailable(
+    tmp_path: Path,
+    monkeypatch,
+) -> None:
+    monkeypatch.setenv("FINANCE_CC_SUBPROCESS_ENV_SCRUB", "off")
+    service = _pooled_service(tmp_path, monkeypatch)
+    try:
+        result = service.run_turn(
+            thread_id=61,
+            owner_id="owner-a",
+            user_text="test",
+        )
+
+        assert result["ok"] is True
+        assert (
+            FakeClaudeClient.instances[0]
+            .options.env["CLAUDE_CODE_SUBPROCESS_ENV_SCRUB"]
+            == "0"
+        )
+    finally:
+        service.close()
+
+
 def test_live_client_is_reused_for_followup_turns(tmp_path: Path, monkeypatch) -> None:
     service = _pooled_service(tmp_path, monkeypatch)
     try:

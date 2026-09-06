@@ -43,3 +43,38 @@ describe("resource list renderer", () => {
     expect(html).toContain("//example.com/phishing");
   });
 });
+
+describe("validation evidence renderer", () => {
+  it("shows the expectation basis, expected value, actual value, and key metrics", () => {
+    const html = renderToStaticMarkup(<BlockRenderer block={{
+      block_id: "custom_tool_test_result",
+      block_type: "assessment",
+      data: {
+        overall: "pass",
+        summary: "3 / 3 项代表性样例技术运行成功",
+        details: {
+          tests: [{
+            name: "边界样例",
+            status: "passed",
+            summary: "核对阈值等于 1.5 时的判断",
+            input: { volume: 150, average_volume: 100 },
+            expected: { matched: true },
+            expected_basis: "按已保存规则手算：150 / 100 = 1.5",
+            actual: {
+              matched: true,
+              key_process_info: { volume_ratio: 1.5, threshold: 1.5 },
+            },
+          }],
+        },
+      },
+    }} />);
+
+    expect(html).toContain("预期依据");
+    expect(html).toContain("按已保存规则手算");
+    expect(html).toContain("独立预期");
+    expect(html).toContain("实际结果");
+    expect(html).toContain("核心过程信息");
+    expect(html).toContain("volume ratio");
+    expect(html).toContain("threshold");
+  });
+});

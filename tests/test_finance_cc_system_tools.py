@@ -263,6 +263,19 @@ def test_finance_cc_user_interaction_is_recorded_without_guessing_answer() -> No
     assert tracker["interaction_requests"][0]["questions"][0]["candidate"][0] == "30日"
 
 
+def test_finance_cc_empty_interaction_is_suppressed_and_flow_can_continue() -> None:
+    tools, _, tracker = _tools()
+
+    result = asyncio.run(
+        tools["request_user_interaction"].handler({"questions": []})
+    )
+
+    assert result.get("isError") is not True
+    assert "No interaction was created" in result["content"][0]["text"]
+    assert tracker["interaction_requests"] == []
+    assert tracker["calls"] == []
+
+
 def test_finance_cc_artifact_save_validates_existing_protocol() -> None:
     tools, _, tracker = _tools()
     payload = {
@@ -430,6 +443,69 @@ def test_finance_cc_saved_design_is_visible_to_later_tools_in_same_turn() -> Non
     assert "error" not in implemented["content"][0]["text"]
     assert '"tool_name": "demo_tool"' in saved["content"][0]["text"]
     assert "读取所需数据" in calls[0]["state"]["design_contract"]["document"]
+
+
+def test_unresolved_requirement_never_reaches_implementation_runner() -> None:
+    calls = []
+
+    def implementation_runner(**kwargs):
+        calls.append(kwargs)
+        return {}
+
+    tools, _, tracker = _tools(implementation_runner=implementation_runner)
+    requirement = asyncio.run(
+        tools["save_finance_artifact"].handler(
+            {
+                "artifact_type": "requirement",
+                "payload": {
+                    "requirement_brief": "计算用户所说的收益率，但当前无法确定收益方向。",
+                    "questions": [{
+                        "question": "收益率是价格涨幅还是持仓收益？",
+                        "candidate": ["价格涨幅", "持仓收益"],
+                    }],
+                },
+            }
+        )
+    )
+    implemented = asyncio.run(
+        tools["implement_dynamic_tool"].handler(
+            {"instruction": "不要等待，直接按旧设计实现"}
+        )
+    )
+
+    assert requirement.get("isError") is not True
+    assert "unresolved questions" in implemented["content"][0]["text"]
+    assert calls == []
+    assert tracker["implementation_runs"] == []
+
+
+def test_new_requirement_invalidates_a_previous_design_before_coding() -> None:
+    calls = []
+
+    def implementation_runner(**kwargs):
+        calls.append(kwargs)
+        return {}
+
+    tools, _, _ = _tools(implementation_runner=implementation_runner)
+    asyncio.run(
+        tools["save_finance_artifact"].handler(
+            {
+                "artifact_type": "requirement",
+                "payload": {
+                    "requirement_brief": "把旧工具改为计算60日均线金叉。",
+                    "questions": [],
+                },
+            }
+        )
+    )
+    implemented = asyncio.run(
+        tools["implement_dynamic_tool"].handler(
+            {"instruction": "使用之前保存的旧设计直接实现"}
+        )
+    )
+
+    assert "flow artifact is missing" in implemented["content"][0]["text"]
+    assert calls == []
 
 
 def test_legacy_profile_design_is_rejected_and_never_reaches_implementation_runner() -> None:

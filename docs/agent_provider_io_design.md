@@ -5,11 +5,14 @@
 
 ## 1. 目标与当前边界
 
-本设计统一 Codex 与 Claude 在 Fin Agent 中的业务输入、业务结果和用户交互，但不强行统一两家 SDK 的原始事件。
+本设计统一 DSH、Codex 与兼容回滚用的 Claude/CC 在 Fin Agent 中的业务输入、业务结果和用户交互，但不强行统一各运行时的原始事件。
 
 当前主线约束：
 
-- 编排层分别通过 `CUSTOM_TOOL_DESIGN_PROVIDER` 和 `CUSTOM_TOOL_CODING_PROVIDER` 选择执行适配器；当前默认由 Claude + DeepSeek V4 Flash 承担需求、设计和测试规划，由 Codex `mid` 承担代码实现；
+- 自定义工具主编排由 `CUSTOM_TOOL_ORCHESTRATOR=dsh_opt` 选择 DSH-opt；Requirement/Design/Flow 使用同一套既有 Skill，flow 保存后由父进程调用 Codex 完成实现与验证；
+- 自然语言入口先由轻量 DSH intent router 判断是否属于自定义工具并恢复必要指代；命中后不再调用旧的直接 LLM 上下文/意图预处理；
+- 两个 DSH 运行时都对阿里云 DashScope MaaS fail-closed，只使用 `DASHSCOPE_API_KEY` 和 DS V4 Flash，不回退到个人 DeepSeek 官方配置；
+- `CUSTOM_TOOL_DESIGN_PROVIDER=codex` 继续用于局部编辑规划和测试样例规划，`CUSTOM_TOOL_CODING_PROVIDER=codex` 用于代码实现；CC 只由显式 `CUSTOM_TOOL_ORCHESTRATOR=cc` 恢复；
 - 不增加自动 failover；provider 失败按真实错误返回，避免一次业务执行被隐式重复；
 - 不用 provider 选择扩张业务状态或 Skill Schema；
 - provider、模型、thinking、tool call 等实现细节对用户和上层业务透明。
@@ -19,7 +22,7 @@
 ```text
 用户 SOFT 输入
   -> 系统持有的最小执行上下文 HARD
-  -> Codex / Claude adapter
+  -> DSH Opt 编排 / Codex 实现 adapter
   -> 现有业务 Skill Schema HARD
   -> Surface Block SOFT 输出
 ```
@@ -52,7 +55,7 @@
 - MCP server、credential 或工具白名单；
 - run 状态、owner、revision 的最终判定值。
 
-这些都属于系统执行策略或系统事实，不应让用户知道当前由 Codex 还是 Claude 处理。
+这些都属于系统执行策略或系统事实，不应让用户知道当前由 DSH、Codex 还是兼容回滚 provider 处理。
 
 ### 2.2 系统执行输入
 
@@ -103,7 +106,7 @@
 2. 将按钮答案转换为第一人称语义，与用户原文合并；不使用关键词猜测动作。
 3. 由工具内 Skill planner 根据自然语言和已有资产选择需求、设计、流程图、实现、测试或查看资产；用户不能直接指定 provider。
 4. 系统解析 Skill、Context Bundle、Output Schema 和运行策略。
-5. adapter 将同一份输入翻译为 Codex 或 Claude SDK 参数。
+5. adapter 将同一份输入翻译为 DSH 或 Codex 参数；CC 回滚路径保持兼容。
 
 不增加 `provider + stage + action` 的组合状态机。用户在按钮旁输入了文字时，文字仍走正常语义路由；按钮只是精确的上下文信号。
 
@@ -125,11 +128,11 @@ Provider Final
 
 三层职责必须分开：
 
-1. **Provider Raw Event**：Codex 的 plan/reasoning/command/MCP 事件与 Claude 的 thinking/content/tool/result 事件各自保留，不作为稳定业务合同。
-2. **业务最终结果**：两个 provider 都必须通过当前 Skill Output Schema；模型只输出本轮业务贡献，状态、revision 和归属由系统补齐。
+1. **Provider Raw Event**：DSH、Codex 和回滚用 CC 的原生事件各自保留，不作为稳定业务合同。
+2. **业务最终结果**：各 provider 都必须通过当前 Skill Output Schema 或受控系统工具；模型只输出本轮业务贡献，状态、revision 和归属由系统补齐。
 3. **用户输出**：统一为现有 `narrative / artifact / workflow / assessment / interaction` 五类 Surface Block。
 
-因此不需要让 Codex 和 Claude 输出完全相同的中间 JSON，也不需要为两者各写一套业务 Skill。共享 Skill 和 Schema 即可；provider adapter 只处理 SDK 参数、事件读取和最终结果提取。
+因此不需要让 DSH、Codex 和 CC 输出完全相同的中间 JSON，也不需要为它们各写一套业务 Skill。共享 Skill 和 Schema 即可；provider adapter 只处理运行参数、事件读取和最终结果提取。
 
 ### 3.2 两家事件的统一投影
 
@@ -143,7 +146,7 @@ Provider Final
 | final/result | 本轮业务结果完成 | Schema 校验后生成最终五类 Surface Block |
 | timeout/rate limit/error | 执行受阻 | 用户看到可行动的简短说明；provider 细节和堆栈进入 trace |
 
-`source=codex/claude`、provider session id、token usage 和原始事件名只属于诊断信息。前端不应通过这些字段决定业务渲染。
+`source=dsh/codex/claude`、provider session id、token usage 和原始事件名只属于诊断信息。前端不应通过这些字段决定业务渲染。
 
 ### 3.3 中间过程展示原则
 
@@ -157,7 +160,7 @@ Provider Final
 
 以下内容默认不直接展示：
 
-- Codex reasoning、Claude thinking 和内部 plan 原文；
+- DSH/Codex reasoning、Claude thinking 和内部 plan 原文；
 - 完整 prompt、Context Bundle 和工具参数；
 - 流式生成中的完整源代码；
 - 原始 shell 输出、MCP payload、异常堆栈和 credential；
@@ -167,7 +170,7 @@ Coding 阶段应展示“正在处理哪些模块、完成了什么验证、当�
 
 ## 4. 用户交互：以业务检查点跨 provider 恢复
 
-Codex 与 Claude 的 SDK resume/session 机制不同，不把 provider resume id 提升为业务协议。所有需要用户输入的场景都使用应用层检查点：
+DSH、Codex 与 CC 的 resume/session 机制不同，不把 provider resume id 提升为业务协议。所有需要用户输入的场景都使用应用层检查点：
 
 ```text
 Agent 返回 clarification / review / blocked result
@@ -182,8 +185,9 @@ Agent 返回 clarification / review / blocked result
 | 检查点 | 触发条件 | 用户动作 |
 |---|---|---|
 | 需求澄清 | 缺失信息会实质改变目标或结果 | 回答问题，也可直接用自然语言改写需求 |
-| 设计确认 | 已形成完整、可实现的设计快照 | 确认或提出修改 |
 | 实现/验证阻塞 | 权限、真实依赖或关键验证无法继续 | 补充信息、授权受控重试或结束 |
+
+Design 与 flow 仍是带 revision 的权威资产，但不再是默认用户检查点。DSH 在 flow 工具结果处结束，系统直接进入 Codex；用户之后可从候选工具卡查看或提出修改。
 
 普通低风险选择不应反复打断用户。模型可以流式形成问题预览，但只有系统保存了稳定问题和 revision 后，`interaction` 才可提交。
 
@@ -215,9 +219,9 @@ View 场景通常只需要“读取已有资产 -> 展示或解释”，不重�
 
 ## 7. 验收标准
 
-1. 上层请求和用户界面不含 provider 专用字段，切换 Codex/Claude 不需要修改业务调用方。
-2. 相同 Skill、Context Bundle 和 Output Schema 可由两个 provider 使用，不维护双份业务提示词或 Skill。
-3. 两家 provider 的最终结果通过同一 Schema，系统状态、revision 和身份事实不由模型决定。
+1. 上层请求和用户界面不含 provider 专用字段，切换 DSH/Codex/CC 不需要修改业务调用方。
+2. 相同 Skill、Context Bundle 和 Output Schema 可跨 provider 使用，不维护重复的业务提示词或 Skill。
+3. 各 provider 的最终结果通过同一 Schema 或受控系统工具，系统状态、revision 和身份事实不由模型决定。
 4. 用户可看到阶段、稳定局部产物、验证摘要和可行动问题，但看不到私有思考链、provider 名称和原始日志。
 5. 所有需要用户响应的流程都通过持久化 Artifact + revision + interaction block 跨 turn 继续，不依赖 provider session 恢复。
 6. 不新增业务状态机、Design/Coding Schema 或金融业务 validator。

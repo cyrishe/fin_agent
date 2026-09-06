@@ -80,16 +80,16 @@ def test_four_complexity_levels_resolve_to_provider_specific_models() -> None:
     assert resolve_agent_profile("codex", "high").model == "gpt-5.6-sol"
     assert resolve_agent_profile("codex", "high").reasoning_effort == "high"
 
-    assert resolve_agent_profile("claude", "fastest").model == "deepseek-chat"
+    assert resolve_agent_profile("claude", "fastest").model == "deepseek-v4-flash-0731"
     assert resolve_agent_profile("claude", "fastest").thinking == "disabled"
     assert resolve_agent_profile("claude", "fast").reasoning_effort == "high"
-    assert resolve_agent_profile("claude", "mid").model == "deepseek-chat"
+    assert resolve_agent_profile("claude", "mid").model == "deepseek-v4-flash-0731"
     assert resolve_agent_profile("claude", "mid").reasoning_effort == "medium"
-    assert resolve_agent_profile("claude", "high").model == "deepseek-reasoner"
+    assert resolve_agent_profile("claude", "high").model == "deepseek-v4-flash-0731"
     assert resolve_agent_profile("claude", "high").reasoning_effort == "high"
     assert resolve_agent_profile(
         "claude", "mid", claude_transport_provider="dashscope"
-    ).model == "deepseek-v4-pro"
+    ).model == "deepseek-v4-flash-0731"
 
 
 def test_factory_applies_profile_without_changing_capability_defaults(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -111,7 +111,7 @@ def test_factory_applies_profile_without_changing_capability_defaults(monkeypatc
     assert codex.reasoning_effort == "low"
     assert codex.complexity_level == "fastest"
     assert codex.capabilities is None
-    assert claude.model == "deepseek-v4-pro"
+    assert claude.model == "deepseek-v4-flash-0731"
     assert claude.effort == "medium"
     assert claude.max_turns == 20
     assert claude.complexity_level == "mid"
@@ -196,7 +196,7 @@ def test_provider_delta_events_are_coalesced_but_keep_stream_boundaries() -> Non
     assert [item["type"] for item in boundary] == ["turn_completed"]
 
 
-def test_claude_defaults_to_official_deepseek_chat(monkeypatch: pytest.MonkeyPatch) -> None:
+def test_claude_defaults_to_dashscope_v4_flash(monkeypatch: pytest.MonkeyPatch) -> None:
     for name in (
         "CLAUDE_PROVIDER",
         "CLAUDE_MODEL",
@@ -207,11 +207,11 @@ def test_claude_defaults_to_official_deepseek_chat(monkeypatch: pytest.MonkeyPat
 
     harness = ClaudeSdkSkillHarness(query_impl=lambda **kwargs: None)
 
-    assert DEFAULT_CLAUDE_PROVIDER == "deepseek"
-    assert DEFAULT_CLAUDE_MODEL == "deepseek-chat"
-    assert harness.provider == "deepseek"
-    assert harness.model == "deepseek-chat"
-    assert harness.base_url == DEEPSEEK_ANTHROPIC_BASE_URL
+    assert DEFAULT_CLAUDE_PROVIDER == "dashscope"
+    assert DEFAULT_CLAUDE_MODEL == "deepseek-v4-flash-0731"
+    assert harness.provider == "dashscope"
+    assert harness.model == "deepseek-v4-flash-0731"
+    assert harness.base_url == DASHSCOPE_ANTHROPIC_BASE_URL
 
 
 def test_claude_and_codex_prepare_the_same_business_prompt() -> None:
@@ -301,10 +301,10 @@ def test_custom_tool_service_uses_fast_claude_for_design_and_mid_claude_for_codi
 
     assert isinstance(service.designer.harness, ClaudeSdkSkillHarness)
     assert service.designer.harness.complexity_level == "fast"
-    assert service.designer.harness.model == "deepseek-chat"
+    assert service.designer.harness.model == "deepseek-v4-flash-0731"
     assert isinstance(service.coder.harness, ClaudeSdkSkillHarness)
     assert service.coder.harness.complexity_level == "mid"
-    assert service.coder.harness.model == "deepseek-chat"
+    assert service.coder.harness.model == "deepseek-v4-flash-0731"
     assert service.coder.harness.effort == "medium"
 
 
@@ -742,7 +742,7 @@ def test_codex_auto_auth_uses_crs_key_and_writes_secret_free_provider_config(
     monkeypatch.setenv("CODEX_HOME", str(source_home))
     monkeypatch.setenv("CODEX_CRS_API_KEY", "crs-test-key")
     monkeypatch.setenv("CODEX_CRS_BASE_URL", "https://proxy.kingdomai.com/openai")
-    monkeypatch.setenv("CODEX_CRS_MODEL", "gpt-5-codex")
+    monkeypatch.setenv("CODEX_CRS_MODEL", "gpt-5.6-terra")
     monkeypatch.setenv("CODEX_CRS_REASONING_EFFORT", "high")
 
     harness = CodexSdkSkillHarness(
@@ -760,7 +760,7 @@ def test_codex_auto_auth_uses_crs_key_and_writes_secret_free_provider_config(
         assert harness._resolved_auth_mode() == "crs_api_key"
         assert env["CODEX_CRS_API_KEY"] == "crs-test-key"
         assert config["model_provider"] == "crs"
-        assert config["model"] == "gpt-5-codex"
+        assert config["model"] == "gpt-5.6-terra"
         assert config["model_reasoning_effort"] == "high"
         assert config["disable_response_storage"] is True
         assert config["preferred_auth_method"] == "apikey"

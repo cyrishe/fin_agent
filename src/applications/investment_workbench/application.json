@@ -151,26 +151,26 @@
   ],
   "quick_actions": [
     {
-      "title": "新建 Skill",
-      "description": "通过模板先生成 skill 骨架，再进入 Skill Studio 调整。",
-      "prompt": "/new-skill my_new_skill"
+      "title": "公司数据",
+      "description": "查询上市公司的财务指标和经营趋势。",
+      "prompt": "海尔智家近四年的营业收入和归母净利润走势如何？"
     },
     {
-      "title": "需求生成 Skill 草稿",
-      "description": "先根据自然语言生成 skill 骨架，再进入 Skill Studio 精修。",
-      "prompt": "/draft-skill momentum_review_draft 根据动量榜和资金流，输出一份简洁的市场复盘。"
+      "title": "研报预测",
+      "description": "汇总机构观点和未来盈利预测。",
+      "prompt": "汇总主要机构对中际旭创未来两年的盈利预测。"
     },
     {
-      "title": "优化已有 Skill",
-      "description": "基于已有 skill 生成一份优化 draft，再进入 Skill Studio 调整。",
-      "prompt": "/refine-skill stock_deep_dive 加强对资金流和风险部分的分析，输出更简洁。"
+      "title": "横向比较",
+      "description": "比较多家公司的核心指标和估值。",
+      "prompt": "比较贵州茅台和五粮液最近一期的盈利能力与估值。"
     },
     {
-      "title": "自由对话",
-      "description": "自然语言先走 route，再决定是否进入 skill 或 task。",
-      "prompt": "请分析今天的动量榜，并告诉我下一步应该看哪个 skill 或 tool。"
+      "title": "市场筛选",
+      "description": "按行情、资金流等条件发现候选公司。",
+      "prompt": "找出近20个交易日涨幅居前且主力资金净流入的A股公司。"
     }
   ],
-  "chat_placeholder": "输入自由问题，或使用 /applications /agents /skills /tools /tasks /new-skill xxx",
-  "assistant_intro": "可以先试：/applications、/agents、/skills、/tools、/tasks、/new-skill my_new_skill、/draft-skill xxx 需求描述，或者直接输入自然语言问题。"
+  "chat_placeholder": "输入金融问题，例如公司财务、行情、估值、资金流或研报数据",
+  "assistant_intro": "你好，我是 Fin Agent。你可以直接询问上市公司、行情、财务、估值、资金流和研报数据，我会先取得真实数据，再给出可核查的结论。"
 }

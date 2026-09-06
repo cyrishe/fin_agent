@@ -56,7 +56,9 @@ def build_agent_skill_harness(
             hard_timeout_seconds=int(os.environ.get("STOCK_AGENT_CUSTOM_TOOL_CLAUDE_HARD_TIMEOUT_SECONDS") or 1800),
             model=_trim(
                 os.environ.get("STOCK_AGENT_CUSTOM_TOOL_CLAUDE_MODEL")
-                or (profile.model if profile else os.environ.get("CLAUDE_MODEL"))
+                or os.environ.get("CLAUDE_MODEL")
+                or os.environ.get("LLM_DEFAULT_MODEL")
+                or (profile.model if profile else "")
             ),
             effort=_trim(
                 os.environ.get("STOCK_AGENT_CUSTOM_TOOL_CLAUDE_EFFORT")

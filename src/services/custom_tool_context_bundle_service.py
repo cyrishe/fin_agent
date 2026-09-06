@@ -308,10 +308,20 @@ class CustomToolContextBundleService:
                 )
                 if not isinstance(actual, Mapping):
                     continue
+                expected = (
+                    dict(item.get("expected") or {})
+                    if isinstance(item.get("expected"), Mapping)
+                    else {}
+                )
                 normalized_cases.append({
+                    "name": _trim(item.get("name")),
+                    "purpose": _trim(item.get("purpose")),
                     "input": dict(item["input"]),
+                    "expected": expected,
+                    "expected_basis": _trim(item.get("expected_basis")),
                     "actual": dict(actual),
                     "status": _trim(item.get("status") or evidence.get("result") or "passed"),
+                    "error": _trim(item.get("error")),
                 })
             if normalized_cases:
                 result["coding_test_evidence"] = {

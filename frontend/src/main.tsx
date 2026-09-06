@@ -1,6 +1,7 @@
 import { lazy, StrictMode, Suspense } from "react";
 import { createRoot } from "react-dom/client";
 import LandingPage from "./LandingPage";
+import { stripAppBase } from "./appPath";
 import "./styles.css";
 
 const App = lazy(() => import("./App"));
@@ -8,7 +9,7 @@ const AuthPage = lazy(() => import("./AuthPage"));
 const BacktestPrototype = lazy(() => import("./BacktestPrototype"));
 const RendererGallery = lazy(() => import("./RendererGallery"));
 
-const pathname = window.location.pathname.replace(/\/+$/, "") || "/";
+const pathname = stripAppBase(window.location.pathname);
 const Root = pathname === "/"
   ? LandingPage
   : pathname === "/login" || pathname === "/register"

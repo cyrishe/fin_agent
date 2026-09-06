@@ -71,7 +71,7 @@ def test_view_stage_does_not_render_as_design_progress() -> None:
     assert block["data"]["stage"] == "view"
 
 
-def test_requirement_stage_uses_interactive_confirmation_progress() -> None:
+def test_requirement_stage_uses_understanding_progress() -> None:
     builder = LlmStreamBlockBuilder(run_id="requirement_turn")
 
     block = builder.event_to_blocks({
@@ -82,14 +82,14 @@ def test_requirement_stage_uses_interactive_confirmation_progress() -> None:
     })[-1]
 
     assert block["block_id"] == "requirement_live_progress"
-    assert block["title"] == "需求确认"
+    assert block["title"] == "需求理解"
     assert block["data"]["stage"] == "requirement"
     assert block["block_type"] == "status"
     assert block["content"] == "正在理解你的需求…"
     assert "items" not in block["data"]
 
 
-def test_requirement_brief_notice_and_questions_form_one_confirmation_surface() -> None:
+def test_requirement_brief_notice_and_blocking_questions_form_one_interaction_surface() -> None:
     builder = LlmStreamBlockBuilder(run_id="requirement_notice")
 
     blocks = builder.final_to_blocks({
@@ -115,19 +115,19 @@ def test_requirement_brief_notice_and_questions_form_one_confirmation_surface() 
     assert blocks[0]["content"] == "扫描A股异动股票。"
     review = blocks[1]
     assert review["block_type"] == "interaction"
-    assert review["title"] == "确认需求"
+    assert review["title"] == "需要明确一个关键问题"
     assert review["data"]["notice"] == [
         "未指定市场时先按A股处理。",
         "异动先按单日涨幅超过5%处理。",
     ]
     assert review["data"]["questions"][0]["question"] == "结果需要按涨幅排序还是按成交额排序？"
-    assert review["data"]["actions"][0]["label"] == "确认需求"
+    assert review["data"]["actions"][0]["label"] == "提交并继续实现"
     assert review["data"]["subject_ref"] == "finance_tool_requirement_flow_1"
     assert review["data"]["subject_revision"] == 3
     assert review["data"]["actions"][0]["expected_revision"] == 3
 
 
-def test_requirement_without_questions_still_waits_for_confirmation() -> None:
+def test_requirement_without_questions_does_not_render_confirmation() -> None:
     builder = LlmStreamBlockBuilder(run_id="requirement_confirm")
 
     blocks = builder.final_to_blocks({
@@ -142,14 +142,8 @@ def test_requirement_without_questions_still_waits_for_confirmation() -> None:
         },
     }, stage="requirement")
 
-    assert [block["block_id"] for block in blocks] == [
-        "requirement_final_summary",
-        "requirement_review",
-    ]
+    assert [block["block_id"] for block in blocks] == ["requirement_final_summary"]
     assert blocks[0]["content"] == "**目标**：判断股票近期是否出现金叉。"
-    assert blocks[1]["data"]["questions"] == []
-    assert blocks[1]["data"]["actions"][0]["action_id"] == "custom_tool.submit_clarification"
-    assert blocks[1]["data"]["actions"][0]["expected_revision"] == 1
 
 
 def test_design_final_uses_conversation_core_blocks_without_complex_renderers() -> None:
