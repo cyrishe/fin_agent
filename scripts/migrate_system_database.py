@@ -9,6 +9,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import re
 from pathlib import Path
 import sys
 
@@ -32,6 +33,13 @@ def target_table_name(name):
     return name
 
 
+def target_constraint_name(table, name):
+    result = f"aiia_legacy_{name}" if table == "leader_risk_state" else name
+    if len(result) > 64:
+        raise RuntimeError(f"Destination constraint name exceeds MySQL limit: {table}")
+    return result
+
+
 def prepare_destination(cursor, source_tables, constraint_names=()):
     """Check our table namespace only; never modify unrelated shared-schema data."""
     cursor.execute("SELECT DATABASE()")
@@ -42,16 +50,18 @@ def prepare_destination(cursor, source_tables, constraint_names=()):
     conflicts = {row[0] for row in cursor.fetchall()} & targets
     if conflicts:
         raise RuntimeError("Destination contains migration tables; refusing overwrite: " + ", ".join(sorted(conflicts)))
-    cursor.execute("SELECT CONSTRAINT_NAME FROM information_schema.TABLE_CONSTRAINTS WHERE CONSTRAINT_SCHEMA=DATABASE() AND CONSTRAINT_TYPE='FOREIGN KEY'")
+    cursor.execute("SELECT CONSTRAINT_NAME FROM information_schema.TABLE_CONSTRAINTS WHERE CONSTRAINT_SCHEMA=DATABASE() AND CONSTRAINT_TYPE IN ('FOREIGN KEY', 'CHECK')")
     if {row[0] for row in cursor.fetchall()} & set(constraint_names):
-        raise RuntimeError("Destination foreign-key names conflict")
+        raise RuntimeError("Destination foreign-key/check constraint names conflict")
 
 
 def renamed_ddl(ddl, source_table):
     old = f"CREATE TABLE `{source_table}`"
     if not ddl.startswith(old):
         raise RuntimeError(f"Unexpected SHOW CREATE TABLE: {source_table}")
-    return f"CREATE TABLE `{target_table_name(source_table)}`" + ddl[len(old):]
+    renamed = f"CREATE TABLE `{target_table_name(source_table)}`" + ddl[len(old):]
+    return re.sub(r"(?m)^  CONSTRAINT `([^`]+)`", lambda match:
+        f"  CONSTRAINT `{target_constraint_name(source_table, match[1])}`", renamed)
 
 
 def digest_row(row):
@@ -86,8 +96,8 @@ def migrate(*, prepare_only=True):
                 c.execute(f"SELECT COUNT(*) FROM information_schema.{kind} WHERE {field}=DATABASE()")
                 if c.fetchone()[0]:
                     raise RuntimeError(f"Source {kind} require a separate migration review")
-            c.execute("SELECT CONSTRAINT_NAME FROM information_schema.TABLE_CONSTRAINTS WHERE CONSTRAINT_SCHEMA=DATABASE() AND CONSTRAINT_TYPE='FOREIGN KEY'")
-            constraints = [r[0] for r in c.fetchall()] + ["fk_scheduled_run_schedule"]
+            c.execute("SELECT TABLE_NAME,CONSTRAINT_NAME FROM information_schema.TABLE_CONSTRAINTS WHERE CONSTRAINT_SCHEMA=DATABASE() AND CONSTRAINT_TYPE IN ('FOREIGN KEY', 'CHECK')")
+            constraints = [target_constraint_name(*r) for r in c.fetchall()] + ["fk_scheduled_run_schedule"]
             # Audit every table before any destination writes.
             definitions = {}
             for table in tables:

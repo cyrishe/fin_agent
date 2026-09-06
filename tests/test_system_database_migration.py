@@ -1,6 +1,6 @@
 import pytest
 
-from scripts.migrate_system_database import prepare_destination, renamed_ddl, target_table_name
+from scripts.migrate_system_database import prepare_destination, renamed_ddl, target_table_name, target_constraint_name
 
 
 class Cursor:
@@ -48,3 +48,20 @@ def test_legacy_name_mapping_changes_only_create_table_name():
     assert target_table_name("aiia_user") == "aiia_user"
     with pytest.raises(RuntimeError, match="Unreviewed"):
         target_table_name("unrelated_table")
+
+
+def test_legacy_check_constraints_have_their_own_schema_namespace():
+    ddl = "CREATE TABLE `leader_risk_state` (\n  `revision` int,\n  CONSTRAINT `chk_leader_risk_revision` CHECK ((`revision` >= 1))\n) COMMENT='chk_leader_risk_revision'"
+    result = renamed_ddl(ddl, "leader_risk_state")
+    assert "CONSTRAINT `aiia_legacy_chk_leader_risk_revision` CHECK ((`revision` >= 1))" in result
+    assert result.endswith("COMMENT='chk_leader_risk_revision'")
+    assert target_constraint_name("aiia_user_credential", "fk_user") == "fk_user"
+    with pytest.raises(RuntimeError, match="MySQL limit"):
+        target_constraint_name("leader_risk_state", "c" * 64)
+
+
+def test_prepare_checks_check_constraints_not_only_foreign_keys():
+    cursor = Cursor(constraints=["aiia_legacy_chk_leader_risk_revision"])
+    with pytest.raises(RuntimeError, match="constraint names conflict"):
+        prepare_destination(cursor, ["leader_risk_state"], ["aiia_legacy_chk_leader_risk_revision"])
+    assert "'CHECK'" in cursor.calls[-1][0]
