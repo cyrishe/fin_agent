@@ -22,6 +22,15 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 PILOT = ['RTEF001', 'RTE003', 'RTEF164', 'RTEF194', 'RTEF037', 'RTE016']
+REPORT_SOURCES = (
+    'outputs/financial_qa_mainland_eval_20260902/cases_mainland_supported.json',
+    'outputs/financial_qa_mainland_full_increment_20260903/cases_increment_no_news.json',
+)
+
+
+def load_report_cases(root=ROOT):
+    return [{**case, 'source_file': source} for source in REPORT_SOURCES
+            for case in json.loads((root / source).read_text())['cases']]
 
 
 def main():
@@ -48,12 +57,12 @@ def main():
     os.chdir(ROOT)
     import httpx
     import uvicorn
-    from scripts.eval_finance_rest_detail import load_cases, payload_problems
+    from scripts.eval_finance_rest_detail import payload_problems
     from src.finance_api.app import create_app
     from src.finance_api.auth import FinanceApiKeyAuth
     from src.finance_api.service import FinanceApiGateway
 
-    cases = [c for c in load_cases() if c['case_id'].startswith('RTE')]
+    cases = load_report_cases()
     by_id = {c['case_id']: c for c in cases}
     assert len(cases) == len(by_id) == 184
     selected = args.case_ids or (list(by_id) if args.full else PILOT)
