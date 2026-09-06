@@ -188,6 +188,15 @@ def test_mcp_streamable_http_requires_key_and_calls_same_gateway() -> None:
         )
         assert unauthorized.status_code == 401
 
+        for path in ('/mcp', '/mcp/'):
+            for headers in ({}, {'X-API-Key': 'wrong-key'}, {'Authorization': 'Bearer wrong-key'}):
+                denied = client.post(path, headers=headers, json={
+                    'jsonrpc': '2.0', 'id': 'denied', 'method': 'tools/call',
+                    'params': {'name': 'finance_data_query', 'arguments': {'query': '贵州茅台行情'}},
+                })
+                assert denied.status_code == 401
+        assert gateway.calls == []
+
         headers = {
             "Authorization": f"Bearer {KEY}",
             "Accept": "application/json, text/event-stream",

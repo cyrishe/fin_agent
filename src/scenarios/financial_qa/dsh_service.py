@@ -830,7 +830,7 @@ class FinanceDeepSeekHarnessSessionService:
                 "完成后无需生成自然语言回答。"
             )
         mode_prompt = _trim(runtime_context.get("_finance_research_mode_prompt"))
-        if mode_prompt:
+        if mode_prompt and not runtime_context.get("_finance_data_only"):
             sections.append(f"[本轮回答要求]\n{mode_prompt}")
         if working_set:
             sections.append(f"[系统持有的当前金融结果索引]\n{working_set}")
@@ -867,8 +867,10 @@ class FinanceDeepSeekHarnessSessionService:
             raise RuntimeError(
                 "DSH 金融查询路径未启用；请设置 FINANCE_DSH_FINANCIAL_QA_ENABLED=1"
             )
-        key = self._key(thread_id=thread_id, owner_id=owner_id)
         isolated_request = bool((context or {}).get("_finance_isolated_request"))
+        # Worker/client reuse is not session reuse. Enforce the isolation flag
+        # here as well, including callers that reuse their external thread id.
+        key = uuid.uuid4().hex if isolated_request else self._key(thread_id=thread_id, owner_id=owner_id)
         session_id = f"financial-qa-{key}"
         runtime_scope = f"financial_qa_dsh:{key}"
         projection_config = self.loop_policy_config.get("resultProjection")
@@ -1186,6 +1188,10 @@ class FinanceDeepSeekHarnessSessionService:
                     and not data_only_early_stop
                 ):
                     error = f"DeepSeek Harness turn ended with {finish_reason}"
+                if (not error and data_only_has_results
+                    and tool_context["_finance_execution_mode"] == "standard"
+                    and tracker.get("data_only_complete") is False):
+                    error = "金融取数尚未声明完成，已停止执行并保留已取得的数据。"
                 # A terminal tool result can contain a query error, especially
                 # in no-repair fast mode. "completed" is a lifecycle outcome,
                 # not evidence that the database query succeeded.
@@ -1248,6 +1254,7 @@ class FinanceDeepSeekHarnessSessionService:
                     "runtime": "dsh",
                     "data_only_complete": bool(
                         data_only_has_results
+                        and not error
                         and finish_reason in {"completed", "blocked"}
                     ),
                     "data_only_early_stop": data_only_early_stop,

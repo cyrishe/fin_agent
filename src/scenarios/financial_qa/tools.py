@@ -817,9 +817,10 @@ class FinanceDataQueryCcTools:
                     "data_request_complete": {
                         "type": "boolean",
                         "description": (
-                            "Only use in system-declared data-only mode. Set true only when this "
-                            "flow contains every raw-data goal requested for the turn; set false "
-                            "when a later query must be selected after inspecting these results."
+                            "Required in system-declared data-only mode. Set true when this flow "
+                            "supplies all requested source datasets (including valid empty results). "
+                            "Returning source text does not require reading it to compose an answer. "
+                            "Set false only when these results are needed to select a subsequent data query."
                         ),
                     },
                 },
@@ -828,6 +829,10 @@ class FinanceDataQueryCcTools:
             },
         )
         async def finance_query(args: dict[str, Any]) -> dict[str, Any]:
+            if tool_runtime.tool_context.get("_finance_data_only"):
+                # Completion is a successful flow outcome, not merely the
+                # presence of earlier rows or the caller's proposed boolean.
+                tool_runtime.tracker["data_only_complete"] = False
             try:
                 assert_catalog_revision()
             except Exception as exc:
@@ -1308,6 +1313,7 @@ class FinanceDataQueryCcTools:
                 response["data_only_complete"] = bool(
                     args.get("data_request_complete")
                 )
+                tool_runtime.tracker["data_only_complete"] = response["data_only_complete"]
             if len(step_summaries) == 1:
                 response.update(step_summaries[0])
             else:

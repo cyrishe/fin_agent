@@ -94,6 +94,9 @@ function fixture(config = {}, history = []) {
       result,
       async () => ({ kind: 'accept', content: result.content }),
     ),
+    assemble: assembly => agentListeners.get('system-prompt/assemble')(
+      assembly, {}, async () => assembly,
+    ),
     stopping: (turn = 1) => agentListeners.get('agent/turn-stopping')({ agent, turn }),
     steered,
   }
@@ -692,8 +695,94 @@ test('data-only intermediate query keeps one follow-up query available', () => {
   }))
   runtime.event({ type: 'step/end', data: { turn: 1, step: 2 } })
 
-  assert.deepEqual(runtime.restrictions.at(-1).allow, [NAMES.query])
+  assert.deepEqual(runtime.restrictions.at(-1).allow, [NAMES.catalog, NAMES.query, NAMES.details])
   assert.match(runtime.prompt(), /reason=data_only_followup_allowed/)
+  assert.match(runtime.prompt(), /已有数据集/)
+  runtime.stopping()
+  assert.equal(runtime.steered.length, 0)
+})
+
+function dataOnlyFixture(t, config = {}) {
+  const dir = mkdtempSync(join(tmpdir(), 'finance-data-mode-'))
+  const previous = process.env.FIN_AGENT_DSH_CONTEXT_PATH
+  const contextPath = join(dir, 'context.json')
+  process.env.FIN_AGENT_DSH_CONTEXT_PATH = contextPath
+  writeFileSync(contextPath, JSON.stringify({ tool_context: { _finance_data_only: true } }))
+  t.after(() => {
+    if (previous === undefined) delete process.env.FIN_AGENT_DSH_CONTEXT_PATH
+    else process.env.FIN_AGENT_DSH_CONTEXT_PATH = previous
+    rmSync(dir, { recursive: true })
+  })
+  return { runtime: fixture(config), contextPath }
+}
+
+function toolStep(runtime, step, entries) {
+  for (const [i, { kind, payload, isError }] of entries.entries()) {
+    const callId = `${step}-${i}`
+    runtime.event({ type: 'tool/call', data: { turn: 1, step, callId, name: NAMES[kind] } })
+    runtime.event(resultEvent({ step, callId, payload, isError }))
+  }
+  runtime.event({ type: 'step/end', data: { turn: 1, step } })
+}
+
+test('native assembly requires completion only for data mode without mutating cached schemas', async t => {
+  const { runtime, contextPath } = dataOnlyFixture(t)
+  const original = { sections: [], contexts: [], tools: [{ name: NAMES.query,
+    parameters: { type: 'object', properties: { steps: {}, data_request_complete: { type: 'boolean' } }, required: ['steps'] },
+  }] }
+  const assembled = await runtime.assemble(original)
+  assert.deepEqual(assembled.tools[0].parameters.required, ['steps', 'data_request_complete'])
+  assert.deepEqual(original.tools[0].parameters.required, ['steps'])
+  writeFileSync(contextPath, JSON.stringify({ tool_context: { _finance_data_only: false } }))
+  runtime.event({ type: 'turn/start', data: { turn: 2 } })
+  assert.equal(await runtime.assemble(original), original)
+})
+
+test('data-only adaptive flow can read results and load another view before completing', async t => {
+  const { runtime } = dataOnlyFixture(t)
+  runtime.event({ type: 'turn/start', data: { turn: 1 } })
+  toolStep(runtime, 1, [{ kind: 'catalog', payload: { mode: 'dataview', dataview: { name: 'constitution' } } }])
+  toolStep(runtime, 2, [{ kind: 'query', payload: { ok: true, api: 'plate.constitution', data_only_mode: true,
+    data_only_complete: false, result_ref: 'r1', sample_complete: false } }])
+  assert.equal(runtime.guard({ name: NAMES.details, arguments: { result_ref: 'r1' } }), undefined)
+  runtime.stopping()
+  assert.equal(runtime.steered.length, 0)
+  toolStep(runtime, 3, [{ kind: 'details', payload: { rows: [{ code: '000001.SZ' }] } }])
+  assert.equal(runtime.guard({ name: NAMES.catalog, arguments: { subject: 'stock', dataview: 'quote', operation: 'query' } }), undefined)
+  toolStep(runtime, 4, [{ kind: 'catalog', payload: { mode: 'dataview', dataview: { name: 'quote' } } }])
+  runtime.stopping()
+  assert.match(runtime.steered[0].content[0].text, /已有数据集/)
+  assert.doesNotMatch(runtime.steered[0].content[0].text, /尚未取得数据/)
+  toolStep(runtime, 5, [{ kind: 'query', payload: { ok: true, data_only_mode: true, data_only_complete: true, row_count: 0 } }])
+  assert.deepEqual(await runtime.preStep({ step: 6 }), { kind: 'reject' })
+  const count = runtime.steered.length
+  runtime.stopping()
+  assert.equal(runtime.steered.length, count)
+})
+
+test('one complete parallel result cannot hide another incomplete data flow', async t => {
+  const { runtime } = dataOnlyFixture(t)
+  runtime.event({ type: 'turn/start', data: { turn: 1 } })
+  toolStep(runtime, 1, [{ kind: 'catalog', payload: { mode: 'dataview', dataview: { name: 'report' } } }])
+  toolStep(runtime, 2, [true, false].map(complete => ({ kind: 'query', payload: {
+    ok: true, data_only_mode: true, data_only_complete: complete,
+  } })))
+  assert.equal((await runtime.preStep({ step: 3 })).kind, 'enter')
+  toolStep(runtime, 3, [{ kind: 'query', payload: { ok: true, data_only_mode: true, data_only_complete: true } }])
+  assert.deepEqual(await runtime.preStep({ step: 4 }), { kind: 'reject' })
+})
+
+test('unfinished data-only flow respects the query budget and never forces an answer', async t => {
+  const { runtime } = dataOnlyFixture(t, { maxQueryAttempts: 2 })
+  runtime.event({ type: 'turn/start', data: { turn: 1 } })
+  toolStep(runtime, 1, [{ kind: 'catalog', payload: { mode: 'dataview', dataview: { name: 'report' } } }])
+  for (const step of [2, 3]) toolStep(runtime, step, [{ kind: 'query', payload: {
+    ok: true, data_only_mode: true, data_only_complete: false,
+  } }])
+  assert.match(runtime.prompt(), /query_attempt_limit/)
+  assert.deepEqual(await runtime.preStep({ step: 4 }), { kind: 'reject' })
+  runtime.stopping()
+  assert.equal(runtime.steered.length, 0)
 })
 
 test('allows one query repair, then stops, and guards exact duplicates', () => {

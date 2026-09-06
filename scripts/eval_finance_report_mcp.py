@@ -40,7 +40,9 @@ def main():
     parser.add_argument('--revision', required=True)
     parser.add_argument('--full', action='store_true')
     parser.add_argument('--case-ids', nargs='*')
+    parser.add_argument('--cases-file', type=Path, help='Optional small protocol regression set with a cases array.')
     parser.add_argument('--concurrency', type=int, default=3)
+    parser.add_argument('--conversation-id', help='Optional explicit context continuity. Omit for the independent benchmark.')
     args = parser.parse_args()
     from dotenv import load_dotenv
     load_dotenv(args.env_file)
@@ -62,10 +64,13 @@ def main():
     from src.finance_api.auth import FinanceApiKeyAuth
     from src.finance_api.service import FinanceApiGateway
 
-    cases = load_report_cases()
+    cases = (json.loads(args.cases_file.read_text())['cases']
+             if args.cases_file else load_report_cases())
     by_id = {c['case_id']: c for c in cases}
-    assert len(cases) == len(by_id) == 184
-    selected = args.case_ids or (list(by_id) if args.full else PILOT)
+    assert len(cases) == len(by_id) and cases
+    if not args.cases_file:
+        assert len(cases) == 184
+    selected = args.case_ids or (list(by_id) if args.full or args.cases_file else PILOT)
     folder = args.output_dir.resolve()
     folder.mkdir(parents=True, exist_ok=True)
     pending = [by_id[cid] for cid in selected if not (folder / f'{cid}.json').exists()]
@@ -84,12 +89,31 @@ def main():
             if not thread.is_alive() or time.monotonic() > deadline:
                 raise RuntimeError('Isolated MCP listener did not start')
             threading.Event().wait(.05)
+        # Exercise the real authentication middleware before any paid query.
+        auth_checks = {}
+        with httpx.Client(timeout=10) as client:
+            probe = {'jsonrpc': '2.0', 'id': 'auth-check', 'method': 'tools/call',
+                     'params': {'name': 'finance_data_query',
+                                'arguments': {'query': '认证边界检查'}}}
+            for label, headers in [('missing_key', {}), ('invalid_key', {'X-API-Key': 'invalid-evaluation-key'})]:
+                response = client.post(f'http://127.0.0.1:{port}/mcp', json=probe, headers=headers)
+                auth_checks[label] = response.status_code
+                if response.status_code != 401:
+                    raise RuntimeError(f'MCP authentication preflight failed: {label}')
+            response = client.post(f'http://127.0.0.1:{port}/mcp',
+                headers={'X-API-Key': key, 'Accept': 'application/json, text/event-stream'},
+                json={'jsonrpc': '2.0', 'id': 'auth-check', 'method': 'tools/list', 'params': {}})
+            auth_checks['valid_key'] = response.status_code
+            if response.status_code != 200 or not response.json().get('result', {}).get('tools'):
+                raise RuntimeError('MCP authentication preflight failed: valid_key')
         warm = gateway.prewarm()
         manifest = {'revision': args.revision, 'model': os.environ.get('LLM_DEFAULT_MODEL'),
             'runtime': 'dsh', 'execution_mode': 'standard', 'response_mode': 'data',
             'case_count': len(selected), 'concurrency': args.concurrency,
             'transport': 'real HTTP MCP on isolated loopback listener',
+            'conversation_id_supplied': args.conversation_id,
             'usage_counter': 'disabled for benchmark', 'prewarm': warm,
+            'authentication_checks': auth_checks,
             'policy_sha256': hashlib.sha256((ROOT / 'src/scenarios/financial_qa/dsh_loop_policy.mjs').read_bytes()).hexdigest(),
             'created_at': datetime.now(timezone.utc).isoformat()}
         (folder / 'run_manifest.json').write_text(json.dumps(manifest, ensure_ascii=False, indent=2))
@@ -98,6 +122,8 @@ def main():
         def run(case):
             request = {'query': case['question'], 'response_mode': 'data', 'runtime': 'dsh',
                        'execution_mode': 'standard', 'detail': True, 'max_rows': 2}
+            if args.conversation_id:
+                request['conversation_id'] = args.conversation_id
             started = time.monotonic()
             try:
                 with httpx.Client(timeout=180, headers={'X-API-Key': key,
@@ -112,6 +138,8 @@ def main():
                     problems.append('mcp_error')
                 if payload.get('response_mode') != 'data' or payload.get('runtime') != 'dsh':
                     problems.append('wrong_execution_mode')
+                if payload.get('conversation_id') != args.conversation_id:
+                    problems.append('unexpected_conversation_id')
                 for page in (payload.get('data') or {}).get('results', []):
                     if page['rows_returned'] != len(page['rows']) or len(page['rows']) > 2:
                         problems.append('invalid_data_page')

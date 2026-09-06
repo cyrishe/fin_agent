@@ -477,11 +477,23 @@ function queryIsDataOnly(payload) {
     && payload.data_only_mode === true
 }
 
+function hasDataOnlyResults(state) {
+  return state.executionMode === 'standard' && [...state.results.values()].some(
+    outcome => querySucceeded(outcome.payload, outcome.failed) && queryIsDataOnly(outcome.payload),
+  )
+}
+
 function promptFor(state, config) {
   const prompts = state.executionMode === 'fast' ? FAST_STAGE_PROMPTS : STAGE_PROMPTS
-  const base = state.stage === 'catalog' && state.reusableApis.length > 0
+  let base = state.stage === 'catalog' && state.reusableApis.length > 0
     ? '按本轮问题继承或更新对象、指标、时间和输出粒度。本会话仍可见且版本有效的目录可直接复用并调用 finance_query；需要未加载的视图或 operation 时，先用 read_finance_catalog 精确加载。复用的是目录，不是旧查询结果；不要把上一轮日期、标的或条件强加给本轮。'
     : prompts[state.stage] ?? prompts.final
+  if (state.dataOnlyRequested || hasDataOnlyResults(state)) {
+    if (state.stage === 'query' && hasDataOnlyResults(state)) {
+      base = '已有数据集保存在本轮结果中。只有尚未完成的取数目标依赖这些结果时，才读取必要明细、加载下一目录或补查；不要为撰写答案阅读全文或重复取数。没有后续数据依赖时结束本轮，不生成自然语言回答。'
+    }
+    base += '\n仅数据模式：原始数据由系统返回，不生成自然语言回答。在 finance_query 中明确声明 data_request_complete；本 flow 已包含全部取数目标时为 true，确有后续数据依赖时为 false。'
+  }
   const marker = `[FINANCE_LOOP stage=${state.stage} reason=${state.reason}]`
   const mode = `[FINANCE_EXECUTION mode=${state.executionMode}]`
   return [marker, mode, base, config.businessHint].filter(Boolean).join('\n')
@@ -490,7 +502,7 @@ function promptFor(state, config) {
 function stageTools(state, tools) {
   switch (state.stage) {
     case 'catalog': return state.reusableApis.length > 0 ? [tools.catalog, tools.query] : [tools.catalog]
-    case 'query':
+    case 'query': return hasDataOnlyResults(state) ? [tools.catalog, tools.query, tools.details] : [tools.query]
     case 'repair': return [tools.query]
     case 'details': return [tools.details]
     default: return []
@@ -499,6 +511,7 @@ function stageTools(state, tools) {
 
 function stageAllows(state, kind, args) {
   if (state.stage === 'catalog') return kind === 'catalog' || (kind === 'query' && canReuseCatalog(state, args))
+  if (state.stage === 'query' && hasDataOnlyResults(state)) return ['catalog', 'query', 'details'].includes(kind)
   if (state.stage === 'query' || state.stage === 'repair') return kind === 'query'
   if (state.stage === 'details') return kind === 'details'
   return false
@@ -606,7 +619,7 @@ function updateAfterStep(state, step, config) {
         state.stage = 'query'
         state.reason = 'dataview_ready'
         state.requiredAction = true
-      } else if (queryCompletesDataOnly(success.payload)) {
+      } else if (outcomes.length === queries.length && outcomes.every(outcome => queryCompletesDataOnly(outcome.payload))) {
         state.dataOnlyComplete = true
         state.stage = 'final'
         state.reason = 'data_only_complete'
@@ -616,9 +629,12 @@ function updateAfterStep(state, step, config) {
         state.reason = 'identity_scope_ready'
         state.requiredAction = true
       } else if (queryIsDataOnly(success.payload)) {
-        state.stage = 'query'
-        state.reason = 'data_only_followup_allowed'
-        state.requiredAction = true
+        const exhausted = state.queryAttempts >= config.maxQueryAttempts
+        state.stage = exhausted ? 'final' : 'query'
+        state.reason = exhausted ? 'query_attempt_limit' : 'data_only_followup_allowed'
+        // A successful result is not an omitted query. Do not force another
+        // DB call merely because the model is done or declines more analysis.
+        state.requiredAction = false
       } else {
         state.stage = queryNeedsDetails(success.payload) ? 'details' : 'final'
         state.reason = state.stage === 'details'
@@ -636,7 +652,11 @@ function updateAfterStep(state, step, config) {
 
   const loads = calls.filter(call => call.kind === 'details')
   if (loads.length > 0) {
-    if (state.loadAttempts < config.maxLoadAttempts) {
+    if (hasDataOnlyResults(state)) {
+      state.stage = 'query'
+      state.reason = 'data_only_followup_allowed'
+      state.requiredAction = false
+    } else if (state.loadAttempts < config.maxLoadAttempts) {
       state.stage = 'details'
       state.reason = 'detail_page_loaded'
       state.requiredAction = false
@@ -654,6 +674,9 @@ function updateAfterStep(state, step, config) {
 }
 
 function requiredActionPrompt(state, tools) {
+  if (hasDataOnlyResults(state)) {
+    return '已有数据集。仅完成新加载目录对应的未完成取数目标，或修复实际失败的步骤；不要重复已有查询，不要生成答案。'
+  }
   if (state.stage === 'catalog') {
     if (state.reusableApis.length > 0) {
       return `本轮尚未取得数据。已有有效目录可直接调用 ${tools.query}；需要新视图或 operation 时先调用 ${tools.catalog}。`
@@ -750,6 +773,24 @@ export function apply(ctx, input = {}) {
       state.visibleKey = key
     }
 
+    // DSH's logged, agent-scoped assembly seam changes the model-facing
+    // contract without mutating the cached/global MCP tool definitions.
+    // Prewarmed workers may alternate between Chat and data-only API calls.
+    agent.ctx.on('system-prompt/assemble', async (_assembly, _context, next) => {
+      const assembly = await next()
+      if (!state.dataOnlyRequested) return assembly
+      return {
+        ...assembly,
+        tools: assembly.tools.map(schema => schema.name === tools.query ? {
+          ...schema,
+          parameters: {
+            ...schema.parameters,
+            required: [...new Set([...(schema.parameters.required ?? []), 'data_request_complete'])],
+          },
+        } : schema),
+      }
+    })
+
     if (!config.preserveRequestPrefix) {
       applyRestriction()
       agent.ctx.systemPrompt.section({
@@ -771,6 +812,10 @@ export function apply(ctx, input = {}) {
       if (!stageAllows(state, kind, exec.arguments)) {
         return `金融查询策略拒绝当前阶段调用 ${exec.name}；请遵循上一工具结果末尾的阶段指引。`
       }
+      if (hasDataOnlyResults(state) && (
+        (kind === 'details' && state.loadAttempts >= config.maxLoadAttempts)
+        || (kind === 'catalog' && state.catalogAttempts >= config.maxCatalogAttempts)
+      )) return '本轮该类读取次数已达上限；请使用已有数据继续必要取数，不要重复读取。'
       if (kind === 'catalog') {
         const routeError = concreteCatalogRouteError(exec.arguments)
         if (routeError) return routeError
@@ -835,7 +880,7 @@ export function apply(ctx, input = {}) {
         resetTurn(state, turn, config, agent, tools)
         applyRestriction()
       }
-      if (state.dataOnlyComplete) return { kind: 'reject' }
+      if (state.dataOnlyComplete || (state.dataOnlyRequested && state.stage === 'final')) return { kind: 'reject' }
       const downstream = await next()
       if (downstream.kind !== 'enter' || !config.preserveRequestPrefix) return downstream
       const key = `${state.stage}:${state.reason}`
@@ -874,6 +919,7 @@ export function apply(ctx, input = {}) {
       if (state.executionMode === 'fast') return
       const needsRequiredAction = state.requiredAction
       const needsFinalAnswer = state.stage === 'final'
+        && !state.dataOnlyRequested
         && !state.finalAnswerAttempted
         && !state.dataOnlyComplete
       if (!needsRequiredAction && !needsFinalAnswer) return

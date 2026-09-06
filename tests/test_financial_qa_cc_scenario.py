@@ -869,6 +869,11 @@ def test_data_only_query_marks_server_owned_result_as_terminal(
     assert payload["data_only_mode"] is True
     assert payload["data_only_complete"] is True
     assert tracker["result_refs"][0]["result_ref"].startswith("session://")
+    assert tracker["data_only_complete"] is True
+    # A failed later flow must not inherit completion from the earlier one.
+    failed = _payload(asyncio.run(finance_query.handler({"steps": [], "data_request_complete": True})))
+    assert "error" in failed
+    assert tracker["data_only_complete"] is False
 
 
 def test_query_result_names_are_system_assigned_and_progress_is_observable(

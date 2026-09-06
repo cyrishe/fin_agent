@@ -55,6 +55,7 @@ FINANCE_TOOL_DESCRIPTION = (
     "结构化原始数据，summary 返回基于数据的中文结论，both 同时返回两者。返回中的 data_sources "
     "会用公开业务名称说明实际查询的数据对象、数据类型、查询目标和记录数，便于核验与溯源。"
     "detail=true 另附轮数、逐步 Token、耗时与查询检查记录。"
+    "默认每次调用独立；仅显式传入 conversation_id 时续接该用户的会话上下文。"
 )
 
 
@@ -236,7 +237,7 @@ def create_app(
                 min_length=1,
                 max_length=128,
                 pattern=r"^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
-                description="Stable caller-owned identifier for multi-turn context.",
+                description="Stable caller-owned identifier for multi-turn context. Omit for an independent query.",
             ),
         ] = None,
         max_rows: Annotated[

@@ -201,6 +201,13 @@ def test_dsh_prompt_injects_the_current_business_date(tmp_path: Path) -> None:
     assert f"当前日期为 {today}（Asia/Shanghai）" in prompt
     assert "以此日期计算" in prompt
 
+    mode_context = {"_finance_data_only": True, "_finance_research_mode_prompt": "生成详细回答并解释"}
+    data_prompt = service._prompt("查询行情", runtime_context=mode_context, working_set="")
+    assert "仅取数" in data_prompt
+    assert "生成详细回答并解释" not in data_prompt
+    mode_context["_finance_data_only"] = False
+    assert "生成详细回答并解释" in service._prompt("查询行情", runtime_context=mode_context, working_set="")
+
 
 def test_dsh_loop_observability_reads_stable_message_prompt_and_token_cap() -> None:
     marker = (
@@ -712,6 +719,36 @@ def test_terminal_query_failure_is_not_reported_as_empty_success(tmp_path):
         service.close()
 
 
+def test_unfinished_data_flow_preserves_rows_but_is_not_reported_complete(tmp_path):
+    class Harness:
+        def __init__(self, **kwargs):
+            self.env = kwargs["env"]
+
+        def run(self, prompt, *, session_id, on_notification):
+            context = json.loads(Path(self.env["FIN_AGENT_DSH_CONTEXT_PATH"]).read_text())
+            Path(self.env["FIN_AGENT_DSH_TRACE_PATH"]).write_text(json.dumps({
+                "revision": context["revision"],
+                "tracker": {"data_only_complete": False,
+                            "calls": [{"tool": "finance_query", "data_request_complete": False}],
+                            "result_refs": [{"api": "stock.report", "row_count": 3, "result_ref": "r1"}]},
+            }))
+            return SimpleNamespace(events=[], finish_reason="blocked", final_response="")
+
+        def close(self):
+            pass
+
+    service = FinanceDeepSeekHarnessSessionService(enabled=True, root_dir=tmp_path / "runtime",
+        log_path=tmp_path / "events.jsonl", worker_count=1, harness_factory=Harness)
+    try:
+        result = service.run_turn(thread_id=1, owner_id="test", user_text="查询两组数据",
+            context={"_finance_data_only": True})
+        assert "尚未声明完成" in result["error"]
+        assert result["result_refs"][0]["row_count"] == 3
+        assert result["data_only_complete"] is False
+    finally:
+        service.close()
+
+
 def test_dsh_session_reuses_worker_and_projects_trace(tmp_path: Path) -> None:
     created: list[object] = []
     observed_contexts: list[dict] = []
@@ -1065,7 +1102,7 @@ def test_dsh_runs_ten_independent_sessions_concurrently_without_context_leakage(
         records = list(
             executor.map(
                 lambda index: service.run_turn(
-                    thread_id=f"request-{index}",
+                    thread_id="same-external-thread",
                     turn_id=index,
                     owner_id="api-client",
                     user_text=f"query-{index}",

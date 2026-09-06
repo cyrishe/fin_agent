@@ -93,6 +93,7 @@ def test_gateway_data_mode_returns_rows_without_summary_and_caps_output() -> Non
     assert engine.calls[0]["data_only"] is True
     assert engine.calls[0]["execution_mode"] == "fast"
     assert engine.calls[0]["isolated_request"] is False
+    assert response.conversation_id == "conversation-1"
     assert engine.calls[0]["include_response_data"] is True
     assert engine.calls[0]["response_data_max_rows"] == 2
     assert engine.calls[0]["runtime"] == "dsh"
@@ -218,3 +219,24 @@ def test_gateway_admits_ten_isolated_requests_concurrently() -> None:
     assert len({item["turn_id"] for item in engine.calls}) == 10
     assert all(item["isolated_request"] is True for item in engine.calls)
     assert all(response.conversation_id is None for response in responses)
+
+
+def test_context_is_independent_by_default_and_explicit_id_opts_into_continuity():
+    engine = _Engine()
+    gateway = FinanceApiGateway(engine=engine)
+
+    async def run():
+        for channel in ("mcp", "http_api"):
+            for conversation_id in (None, None, "shared", "shared"):
+                response = await gateway.execute(
+                    FinanceQueryRequest(query="查询行情", conversation_id=conversation_id, response_mode="data"),
+                    principal_id="same-user", request_channel=channel,
+                )
+                assert response.conversation_id == conversation_id
+
+    asyncio.run(run())
+    independent = [c for c in engine.calls if c["isolated_request"]]
+    continued = [c for c in engine.calls if not c["isolated_request"]]
+    assert len(independent) == len(continued) == 4
+    assert len({c["thread_id"] for c in independent}) == 4
+    assert len({c["thread_id"] for c in continued}) == 1
