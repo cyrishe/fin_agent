@@ -30,6 +30,7 @@ from src.finance_api.models import (
     FinanceQueryResponse,
 )
 from src.finance_api.service import FinanceApiGateway
+from src.finance_api.data_status import DataStatusMonitor
 from src.services.finance_data_tool_catalog_service import (
     FinanceDataToolCatalogService,
 )
@@ -263,6 +264,7 @@ def create_app(
         return response
 
     mcp_http_app = mcp.streamable_http_app()
+    data_monitor = DataStatusMonitor()
 
     @asynccontextmanager
     async def lifespan(_app: FastAPI):
@@ -281,9 +283,18 @@ def create_app(
             except Exception as exc:  # startup remains observable and retryable
                 logger.warning("Finance DSH prewarm failed: %s", exc)
         async with mcp.session_manager.run():
+            monitor_task = None
+            if owns_gateway and os.environ.get("FINANCE_STATUS_ENABLED", "1") == "1":
+                monitor_task = asyncio.create_task(data_monitor.run())
             try:
                 yield
             finally:
+                if monitor_task:
+                    monitor_task.cancel()
+                    try:
+                        await monitor_task
+                    except asyncio.CancelledError:
+                        pass
                 if owns_gateway and gateway_holder["value"] is not None:
                     gateway_holder["value"].close()
 
@@ -379,6 +390,15 @@ def create_app(
         return HTMLResponse(
             (_STATIC_DIR / "data-map.html").read_text(encoding="utf-8")
         )
+
+    @app.get("/status", response_class=HTMLResponse, include_in_schema=False)
+    async def data_status_page() -> HTMLResponse:
+        return HTMLResponse((_STATIC_DIR / "status.html").read_text(encoding="utf-8"))
+
+    @app.get("/status/data", tags=["system"])
+    async def data_status_snapshot() -> dict[str, Any]:
+        # Requests only read the cached observation; visitors cannot trigger SQL.
+        return data_monitor.current()
 
     @app.get("/mcp-guide", response_class=HTMLResponse, include_in_schema=False)
     async def mcp_guide() -> HTMLResponse:
