@@ -663,6 +663,8 @@ class RuntimeConversationService:
         token_usage: Dict[str, Any] | None = None,
     ) -> Dict[str, Any]:
         normalized_usage = self._normalize_token_usage(token_usage)
+        from src.services.request_usage_service import total_tokens
+        normalized_usage["accounting_total_tokens"] = total_tokens(token_usage)
         turn_meta: Dict[str, Any] = {}
         db = SystemDbUtils()
         try:

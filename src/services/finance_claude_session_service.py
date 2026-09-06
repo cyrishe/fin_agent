@@ -46,12 +46,16 @@ def _normalize_llm_usage(value: Any) -> Dict[str, int]:
         source.get("total_tokens")
         or prompt_tokens + completion_tokens
     )
-    return {
+    result = {
         "prompt_tokens": prompt_tokens,
         "completion_tokens": completion_tokens,
         "total_tokens": total_tokens,
         "call_count": 1 if total_tokens > 0 else 0,
     }
+    if not source or any(k in source for k in ("cache_read_input_tokens", "cache_creation_input_tokens", "accounting_total_tokens")):
+        from src.services.request_usage_service import total_tokens as accounting_total
+        result["accounting_total_tokens"] = accounting_total(source)
+    return result
 
 
 def _append_runtime_context(prompt: str, runtime: Any) -> str:

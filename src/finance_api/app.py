@@ -31,6 +31,7 @@ from src.finance_api.models import (
 )
 from src.finance_api.service import FinanceApiGateway
 from src.finance_api.data_status import DataStatusMonitor
+from src.services.request_usage_service import DailyUsageService
 from src.services.finance_data_tool_catalog_service import (
     FinanceDataToolCatalogService,
 )
@@ -256,6 +257,7 @@ def create_app(
                 max_rows=max_rows,
             ),
             principal_id=principal.principal_id,
+            request_channel="mcp",
         )
         if not response.ok:
             raise RuntimeError(
@@ -265,6 +267,7 @@ def create_app(
 
     mcp_http_app = mcp.streamable_http_app()
     data_monitor = DataStatusMonitor()
+    daily_usage = DailyUsageService()
 
     @asynccontextmanager
     async def lifespan(_app: FastAPI):
@@ -415,6 +418,17 @@ def create_app(
         _principal: FinanceApiPrincipal = Depends(require_principal),
     ) -> dict[str, Any]:
         return _catalog_projection(catalog_service)
+
+    @app.get("/v1/usage/daily", tags=["system"])
+    async def usage_daily(days: int = 30,
+                          _principal: FinanceApiPrincipal = Depends(require_principal)):
+        if not 1 <= days <= 90:
+            raise HTTPException(status_code=422, detail="days must be between 1 and 90")
+        try:
+            return await asyncio.to_thread(daily_usage.daily, days)
+        except Exception:
+            logger.exception("Daily usage statistics unavailable")
+            raise HTTPException(status_code=503, detail="Usage statistics unavailable")
 
     @app.get("/v1/tools", tags=["tools"])
     async def list_tools(

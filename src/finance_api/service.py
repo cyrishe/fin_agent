@@ -16,6 +16,7 @@ from src.scenarios.financial_qa.runtime import normalize_financial_qa_runtime
 from src.services.finance_data_tool_catalog_service import (
     FinanceDataToolCatalogService,
 )
+from src.services.request_usage_service import record_request
 
 
 def _trim(value: Any) -> str:
@@ -32,8 +33,10 @@ class FinanceApiGateway:
         default_runtime: str | None = None,
         max_concurrency: int | None = None,
         catalog: FinanceDataToolCatalogService | None = None,
+        usage_recorder=None,
     ) -> None:
         self.engine = engine or FinancialQaCcService()
+        self.usage_recorder = usage_recorder or (record_request if engine is None else None)
         self.default_runtime = normalize_financial_qa_runtime(
             default_runtime
             or os.environ.get("FINANCE_API_DEFAULT_RUNTIME")
@@ -55,6 +58,7 @@ class FinanceApiGateway:
         request: FinanceQueryRequest,
         *,
         principal_id: str,
+        request_channel: str = "http_api",
     ) -> FinanceQueryResponse:
         if self._semaphore is None:
             self._semaphore = asyncio.Semaphore(self.max_concurrency)
@@ -64,6 +68,7 @@ class FinanceApiGateway:
                     self._execute_sync,
                     request=request,
                     principal_id=principal_id,
+                    request_channel=request_channel,
                 )
             )
 
@@ -72,6 +77,7 @@ class FinanceApiGateway:
         *,
         request: FinanceQueryRequest,
         principal_id: str,
+        request_channel: str = "http_api",
     ) -> FinanceQueryResponse:
         request_id = f"fq_{uuid.uuid4().hex}"
         runtime = normalize_financial_qa_runtime(
@@ -82,6 +88,18 @@ class FinanceApiGateway:
         scope_digest = hashlib.sha256(
             f"{principal_id}:{scope_value}".encode("utf-8")
         ).hexdigest()[:32]
+        try:
+            return self._answer_accounted(request=request, principal_id=principal_id,
+                request_id=request_id, runtime=runtime, public_conversation_id=public_conversation_id,
+                scope_digest=scope_digest, request_channel=request_channel)
+        except Exception:
+            # If execution never returned usage, preserve request count with NULL tokens.
+            if self.usage_recorder:
+                self.usage_recorder(request_id=request_id, channel=request_channel, usage=None, succeeded=False)
+            raise
+
+    def _answer_accounted(self, *, request, principal_id, request_id, runtime,
+                          public_conversation_id, scope_digest, request_channel):
         raw = self.engine.answer(
             thread_id=f"finance-api-{scope_digest}",
             turn_id=request_id,
@@ -104,13 +122,17 @@ class FinanceApiGateway:
             include_response_data=request.response_mode in {"data", "both"},
             response_data_max_rows=request.max_rows,
         )
-        return self._public_response(
+        response = self._public_response(
             raw,
             request=request,
             request_id=request_id,
             runtime=runtime,
             conversation_id=public_conversation_id,
         )
+        if self.usage_recorder:
+            self.usage_recorder(request_id=request_id, channel=request_channel,
+                usage=raw.get("llm_usage"), succeeded=response.ok)
+        return response
 
     def _public_response(
         self,

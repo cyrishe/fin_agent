@@ -733,8 +733,10 @@ def _merge_thread_context_patches(*patches: dict | None) -> dict:
 
 
 def _normalize_llm_usage(value: dict | None) -> dict:
+    from src.services.request_usage_service import total_tokens
     source = value if isinstance(value, dict) else {}
     return {
+        "accounting_total_tokens": total_tokens(source),
         "prompt_tokens": int(source.get("prompt_tokens", 0) or 0),
         "completion_tokens": int(source.get("completion_tokens", 0) or 0),
         "total_tokens": int(source.get("total_tokens", 0) or 0),
@@ -756,6 +758,8 @@ def _merge_llm_usage(*usages: dict | None) -> dict:
         merged["completion_tokens"] += normalized["completion_tokens"]
         merged["total_tokens"] += normalized["total_tokens"]
         merged["call_count"] += normalized["call_count"]
+    totals = [_normalize_llm_usage(u)["accounting_total_tokens"] for u in usages]
+    merged["accounting_total_tokens"] = sum(v for v in totals if v is not None) if any(v is not None for v in totals) else None
     return merged
 
 

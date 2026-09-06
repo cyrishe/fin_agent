@@ -16,7 +16,8 @@ class _Gateway:
     def __init__(self) -> None:
         self.calls: list[tuple[object, str]] = []
 
-    async def execute(self, request, *, principal_id: str):
+    async def execute(self, request, *, principal_id: str, request_channel: str = "http_api"):
+        self.last_channel = request_channel
         self.calls.append((request, principal_id))
         include_summary = request.response_mode in {"summary", "both"}
         include_data = request.response_mode in {"data", "both"}
@@ -76,6 +77,8 @@ def test_public_health_catalog_and_data_map() -> None:
         assert status_page.status_code == 200
         assert "金融数据状态" in status_page.text
         assert client.get("/status/data").status_code == 200
+        assert client.get("/v1/usage/daily").status_code == 401
+        assert client.get("/v1/usage/daily?days=1000",headers={"X-API-Key":KEY}).status_code == 422
         assert 'href="mcp-guide"' in page.text
 
         guide = client.get("/mcp-guide")
