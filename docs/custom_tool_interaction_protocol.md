@@ -1,5 +1,8 @@
 # Custom Tool 交互协议
 
+Requirement 阶段的内容组织、局部选择题和自然语言修正规则见
+[自定义工具 Requirement 交互设计](./custom_tool_requirement_interaction_design_20260818.md)。
+
 所有输入统一由以下三部分组成：
 
 ```json
