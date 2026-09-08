@@ -17,10 +17,11 @@ def test_research_mode_defaults_to_skill_owned_intelligent_analysis() -> None:
         "decision_owner": "skill",
     }
     prompt = research_mode_prompt("auto")
+    assert "本轮未指定研究深度" in prompt
+    assert "用户选择了" not in prompt
     assert "采用本轮选定的方法" in prompt
     assert "用户明确的交付要求优先" in prompt
     assert "用户完整语义" in prompt
-    assert "用户明确的交付要求优先" in prompt
     assert "决定有效深度" in prompt
 
 
