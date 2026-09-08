@@ -563,6 +563,7 @@ def test_dsh_mcp_bridge_exposes_financial_data_and_skill_read_tools(tmp_path: Pa
         "load_finance_result",
         "read_finance_skill",
         "read_finance_skill_reference",
+        "resolve_security",
     }
     result = asyncio.run(
         bridge.call_tool(

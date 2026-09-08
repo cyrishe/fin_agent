@@ -17,7 +17,7 @@ from src.scenarios.financial_qa.empty_result import empty_result_context
 
 _EXPOSED_TOOLS = frozenset(
     {"read_finance_catalog", "finance_query", "load_finance_result",
-     "read_finance_skill", "read_finance_skill_reference"}
+     "read_finance_skill", "read_finance_skill_reference", "resolve_security"}
 )
 _REQUIRED_TOOLS = frozenset(
     {"read_finance_catalog", "finance_query", "load_finance_result"}

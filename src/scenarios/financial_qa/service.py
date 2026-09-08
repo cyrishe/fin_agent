@@ -283,6 +283,9 @@ class FinancialQaCcService:
         skill_routing_summary = _trim(
             business_skill_snapshot.get("routing_summary")
         )
+        if skill_routing_summary:
+            selection_guide = Path(__file__).with_name("skill_selection.md").read_text(encoding="utf-8").strip()
+            skill_routing_summary = f"{selection_guide}\n\n## 可选方法\n\n{skill_routing_summary}"
         native_tool_access = (
             business_skill_snapshot.get("allowed_tools_by_skill")
             if isinstance(

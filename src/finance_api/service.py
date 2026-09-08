@@ -266,6 +266,7 @@ class FinanceApiGateway:
     @staticmethod
     def _detail(raw, meta):
         fields = {"tool", "subject", "dataview", "operation", "api", "goal", "request",
+            "skill_id", "skill_ids", "reference", "identifiers", "duration_ms",
             "submitted_request", "flow_step", "flow_size", "row_count", "static_validation_ms",
             "api_execution_ms", "validation_errors", "error", "execution_error", "provider_retry_count", "attempts"}
         calls = [{k: v for k, v in call.items() if k in fields}

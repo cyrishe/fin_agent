@@ -1,6 +1,6 @@
 ---
 name: sector-theme-analysis
-description: 综合分析行业、概念或主题的整体表现、内部参与度、分化、事件传导和持续性。
+description: 分析行业、板块、概念或主题的表现与驱动，适用于板块强弱、热点持续性、领涨与落后公司、事件影响和主题受益关系等问题。结合行情、成交、成分股参与度及业务证据，判断内部分化、催化传导和持续条件。
 allowed-tools:
   - mcp__finance__general_search
 ---

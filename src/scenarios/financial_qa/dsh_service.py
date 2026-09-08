@@ -284,7 +284,7 @@ def _execution_timing_steps(events: list[dict[str, Any]]) -> list[dict[str, Any]
             name = _short_tool_name(data.get("name"))
             args = _json_arguments(data.get("arguments"))
             # Only finance protocol inputs, never arbitrary harness arguments.
-            allowed = {k: args[k] for k in ("subject", "dataview", "operation", "goal", "request", "data_request_complete", "skill_id", "reference") if k in args}
+            allowed = {k: args[k] for k in ("subject", "dataview", "operation", "goal", "request", "data_request_complete", "skill_id", "skill_ids", "reference", "identifiers", "result_ref", "offset", "limit", "columns") if k in args}
             if name == "finance_query" and isinstance(args.get("steps"), list):
                 allowed["steps"] = [{k: item[k] for k in ("goal", "request") if k in item}
                     for item in args["steps"] if isinstance(item, Mapping)]
@@ -301,6 +301,9 @@ def _execution_timing_steps(events: list[dict[str, Any]]) -> list[dict[str, Any]
             if call_id in tools:
                 start, span = tools[call_id]
                 span["duration_ms"] = duration(start, timestamp)
+                blocks = message.get("content") or []
+                payload = _notification_tool_payload(data)
+                span["is_error"] = any(isinstance(block, Mapping) and block.get("isError") is True for block in blocks) or payload.get("ok") is False or bool(payload.get("error"))
     return steps
 
 
@@ -832,7 +835,7 @@ class FinanceDeepSeekHarnessSessionService:
         if bool(runtime_context.get("_finance_data_only")):
             sections.append(
                 "[系统记录的本轮输出模式]\n"
-                "仅取数：取得本题所需原始数据，按 finance_query.data_request_complete 声明完成，由系统交付结果。"
+                "仅取数：取得本题所需原始数据，由系统交付结果。"
             )
         skill_catalog = _trim(runtime_context.get("_finance_skill_catalog_prompt"))
         if skill_catalog:

@@ -1,6 +1,6 @@
 ---
 name: market-overview
-description: 综合判断证券市场或大盘在指定时点的指数表现、涨跌宽度、成交、风格分化和风险偏好。
+description: 分析证券市场或大盘的整体环境，适用于市场复盘、大盘强弱、行情参与度、风格分化和风险偏好等问题。结合指定时点或区间的指数、涨跌宽度、成交及板块表现，解释市场结构、主要分歧和后续观察点。
 allowed-tools:
   - mcp__finance__general_search
 ---

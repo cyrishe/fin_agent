@@ -88,8 +88,11 @@ def test_dsh_prompt_discloses_catalog_and_selected_method_but_keeps_references_l
     assert "LAZY_REFERENCE_CONTENT" not in prompt
     assert "先用 read_finance_skill 读取这些 Skill" not in prompt
     assert "平台权限与本轮用户目标保持不变" in prompt
-    assert "优先使用适用的业务 Skill" in service.system_prompt
-    assert "没有合适 Skill，或 Skill 只覆盖部分问题" in service.system_prompt
+    assert "选择合适的方法与数据" in service.system_prompt
+    assert "按实际缺口补充方法或数据" in service.system_prompt
+    assert "方法选择" in service.system_prompt
+    for name in ("read_finance_catalog", "finance_query", "load_finance_result", "resolve_security"):
+        assert name not in service.system_prompt
 
     context["_finance_data_only"] = True
     context["_finance_research_mode_prompt"] = "不应进入仅数据模式的分析指令"
@@ -97,6 +100,7 @@ def test_dsh_prompt_discloses_catalog_and_selected_method_but_keeps_references_l
     assert "仅取数" in data_prompt
     assert context["_finance_explicit_skill_prompt"] in data_prompt
     assert context["_finance_research_mode_prompt"] not in data_prompt
+    assert "finance_query" not in data_prompt
 
 
 def test_dsh_mcp_reads_current_turn_snapshot_after_worker_reuse(tmp_path):

@@ -1,6 +1,6 @@
 ---
 name: stock-deep-dive
-description: 对单只股票做覆盖行情、资金、研报、新闻催化和风险观察的专业深度分析。
+description: 围绕单只股票形成行情、资金、研报观点、新闻催化与风险的结构化深度分析，适用于个股投资逻辑梳理、代表股研究和异动后的驱动复盘。
 ---
 
 # Stock Deep Dive Skill

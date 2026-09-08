@@ -21,6 +21,7 @@ from src.services.finance_data_tool_catalog_service import FinanceDataToolCatalo
 from src.services.finance_data_tool_runtime_service import FinanceDataToolRuntimeService
 from src.services.invocation_input_resolver_service import InvocationInputResolverService
 from src.services.session_variable_store_service import SessionVariableStoreService
+from src.services.security_identity_service import SecurityIdentityService
 from src.skill_runtime.tool_adapter import ToolAdapter
 
 
@@ -500,6 +501,7 @@ class FinanceDataQueryCcTools:
         business_skill_catalog: Any = None,
         backtest_service: Optional[BacktestRunService] = None,
         input_resolver: Optional[InvocationInputResolverService] = None,
+        security_identity: Optional[SecurityIdentityService] = None,
     ) -> None:
         if finance_catalog is not None and finance_runtime is None:
             supplied_path = Path(
@@ -521,6 +523,7 @@ class FinanceDataQueryCcTools:
         self.business_skill_catalog = business_skill_catalog
         self.backtest_service = backtest_service or BacktestRunService()
         self.input_resolver = input_resolver or InvocationInputResolverService()
+        self.security_identity = security_identity or SecurityIdentityService()
 
     def bind_business_skill_catalog(self, catalog: Any) -> None:
         """Bind the immutable business-Skill snapshot used by this CC."""
@@ -1634,13 +1637,39 @@ class FinanceDataQueryCcTools:
                 call_record["error"] = str(exc)[:1000]
                 return _tool_result({"ok": False, "error": str(exc)})
 
-        tools = [read_finance_catalog, finance_query, load_finance_result, run_backtest]
+        @tool(
+            "resolve_security",
+            "按股票名称或代码取得标准代码、名称和交易市场，支持批量。需要确认对象身份时调用；"
+            "已有标识或当前数据接口可直接按名称查询时可直接取数。多候选结合问题确认，零候选保留覆盖边界。",
+            {"type": "object", "properties": {"identifiers": {
+                "type": "array", "minItems": 1, "maxItems": 20,
+                "items": {"type": "string", "minLength": 1, "maxLength": 100}}},
+             "required": ["identifiers"], "additionalProperties": False},
+        )
+        async def resolve_security(args: dict[str, Any]) -> dict[str, Any]:
+            call = {"tool": "resolve_security", "identifiers": args.get("identifiers")}
+            tool_runtime.tracker["calls"].append(call)
+            started = time.monotonic()
+            try:
+                payload = await asyncio.to_thread(self.security_identity.resolve, args.get("identifiers"))
+                call["row_count"] = sum(len(item["candidates"]) for item in payload["items"])
+                return _tool_result(payload)
+            except ValueError as exc:
+                call["error"] = str(exc)
+                return _tool_result({"ok": False, "error": str(exc)})
+            except Exception as exc:
+                call["error"] = type(exc).__name__
+                return _tool_result({"ok": False, "error": "证券身份数据源暂未完成查询。"})
+            finally:
+                call["duration_ms"] = round((time.monotonic() - started) * 1000, 3)
+
+        tools = [read_finance_catalog, finance_query, load_finance_result, resolve_security, run_backtest]
         fallback_snapshot = (
             self.business_skill_catalog.method_snapshot()
             if self.business_skill_catalog is not None else {"revision": "", "skills": {}}
         )
 
-        def available_method(skill_id: str) -> tuple[Mapping[str, Any], str]:
+        def method_snapshot() -> Mapping[str, Any]:
             snapshot = tool_runtime.tool_context.get("_finance_skill_snapshot", fallback_snapshot)
             if not isinstance(snapshot, Mapping):
                 raise ValueError("本轮业务 Skill 快照不可用。")
@@ -1648,6 +1677,11 @@ class FinanceDataQueryCcTools:
             expected = _trim(tool_runtime.tool_context.get("_finance_skill_catalog_revision"))
             if expected and expected != revision:
                 raise ValueError("本轮业务 Skill 快照不一致，请使用同一修订。")
+            return snapshot
+
+        def available_method(skill_id: str) -> tuple[Mapping[str, Any], str]:
+            snapshot = method_snapshot()
+            revision = _trim(snapshot.get("revision"))
             allowed = tool_runtime.tool_context.get("allowed_finance_skills")
             methods = snapshot.get("skills") or {}
             if (isinstance(allowed, list) and skill_id not in allowed) or skill_id not in methods:
@@ -1656,12 +1690,16 @@ class FinanceDataQueryCcTools:
 
         @tool(
             "read_finance_skill",
-            "按当前授权目录中的 skill_id 加载业务方法。匹配问题时优先读取方法，再据其指导取数和分析；"
-            "已加载方法可直接复用，没有匹配或覆盖不全时可使用数据工具与通用能力继续处理。",
+            "按本轮方法选择规则提交 skill_ids。工具与通用能力已足够时传空列表；"
+            "需要专业方法时传最贴合的 Skill ID 并加载正文，后续可按实际缺口补充。兼容单个 skill_id。",
             {
                 "type": "object",
-                "properties": {"skill_id": {"type": "string", "minLength": 1, "maxLength": 100}},
-                "required": ["skill_id"],
+                "properties": {
+                    "skill_id": {"type": "string", "minLength": 1, "maxLength": 100},
+                    "skill_ids": {"type": "array", "maxItems": 12,
+                                  "items": {"type": "string", "minLength": 1, "maxLength": 100}},
+                },
+                "anyOf": [{"required": ["skill_id"]}, {"required": ["skill_ids"]}],
                 "additionalProperties": False,
             },
         )
@@ -1670,6 +1708,26 @@ class FinanceDataQueryCcTools:
             call_record = {"tool": "read_finance_skill", "skill_id": skill_id}
             tool_runtime.tracker["calls"].append(call_record)
             try:
+                if "skill_ids" in args:
+                    ids = args["skill_ids"]
+                    if (not isinstance(ids, list) or len(ids) > 12
+                            or any(not isinstance(v, str) or not v.strip() or len(v) > 100 for v in ids)):
+                        raise ValueError("skill_ids 需要由当前目录中的 Skill ID 构成的列表。")
+                    ids = list(dict.fromkeys([*([skill_id] if skill_id else []),
+                                              *(_canonical_skill_id(v) for v in ids)]))
+                    snapshot = method_snapshot()
+                    selected = [(sid, *available_method(sid)) for sid in ids]
+                    skills = []
+                    for sid, method, revision in selected:
+                        tool_runtime.record_method_load(sid, method, revision)
+                        skills.append({"skill_id": sid, "method": method.get("method", ""),
+                                       "description": method.get("description", ""),
+                                       "content_hash": method.get("content_hash", "")})
+                    call_record.update({"skill_ids": ids, "status": "completed",
+                                        "catalog_revision": snapshot.get("revision", "")})
+                    return _tool_result({"skills": skills, "revision": snapshot.get("revision", ""),
+                        "guidance": "按选定方法处理当前问题；证据充分时直接交付，需要取数时加载相应执行包。"
+                            if skills else "已选择通用路径；按本题所需范围使用工具或已有证据完成任务。"})
                 method, revision = available_method(skill_id)
                 tool_runtime.record_method_load(skill_id, method, revision)
                 call_record.update({"status": "completed", "catalog_revision": revision,

@@ -154,6 +154,7 @@ def test_financial_qa_exposes_only_read_only_data_tools(tmp_path: Path) -> None:
         "run_backtest",
         "read_finance_skill",
         "read_finance_skill_reference",
+        "resolve_security",
     }
     assert set(names) == {
         "mcp__finance__read_finance_catalog",
@@ -162,6 +163,7 @@ def test_financial_qa_exposes_only_read_only_data_tools(tmp_path: Path) -> None:
         "mcp__finance__run_backtest",
         "mcp__finance__read_finance_skill",
         "mcp__finance__read_finance_skill_reference",
+        "mcp__finance__resolve_security",
     }
     assert all("implement" not in name and "codex" not in name for name in names)
     assert tools["finance_query"].input_schema["required"] == ["steps"]

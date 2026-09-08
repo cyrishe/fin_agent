@@ -1,4 +1,4 @@
 interface:
-  display_name: "个股深度研究"
-  short_description: "根据行业、成长阶段与证据动态选路，结合研报和同业形成可验证研究"
-  default_prompt: "使用 $stock-research 分析这家公司，根据查到的业务、财务和市场预期选择方法，必要时结合研报与同业，说明结论和改变判断的条件。"
+  display_name: "个股分析"
+  short_description: "围绕单只股票，按需结合基本面、量价资金、研报、热点、行业宏观与同业分析"
+  default_prompt: "使用 $stock-research 分析这只股票，根据我的关注点和查询结果选择相关视角与专业方法，说明判断、依据和后续验证条件。"

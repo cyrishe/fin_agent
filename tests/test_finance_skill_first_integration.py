@@ -81,6 +81,38 @@ def test_private_and_application_restrictions_are_enforced_before_prompt(hub):
     assert list(context["_finance_skill_snapshot"]["skills"]) == ["equity-report-analysis"]
 
 
+def test_two_method_scope_filters_directory_and_loading_without_deleting_registry(hub, tmp_path):
+    agent = service(hub)
+    allowed = ["stock-research", "equity-report-analysis"]
+    context = agent._runtime_context(application_context={"default_agent": {"skills": allowed}},
+        owner_id="alice")
+    assert set(context["_finance_skill_snapshot"]["skills"]) == set(allowed)
+    assert "sector-theme-analysis" not in context["_finance_skill_catalog_prompt"]
+    tools = FinanceDataQueryCcTools(result_store=SessionVariableStoreService(data_root=tmp_path / "results"))
+    definitions, _, tracker = tools.build_tools(owner_ids=["alice"], tool_context=context)
+    read = next(item for item in definitions if item.name == "read_finance_skill")
+    rejected = asyncio.run(read.handler({"skill_ids": ["sector-theme-analysis"]}))
+    assert "error" in json.loads(rejected["content"][0]["text"])
+    assert tracker["active_skill_ids"] == []
+    accepted = asyncio.run(read.handler({"skill_ids": allowed}))
+    assert {item["skill_id"] for item in json.loads(accepted["content"][0]["text"])["skills"]} == set(allowed)
+    # Selection scope is per application/turn, not a destructive registry edit.
+    assert "sector-theme-analysis" in agent._runtime_context(application_context={}, owner_id="alice")["_finance_skill_snapshot"]["skills"]
+
+
+def test_method_choice_rule_is_shared_generic_and_absent_when_no_methods(hub):
+    from pathlib import Path
+    agent = service(hub)
+    context = agent._runtime_context(application_context={}, owner_id="alice")
+    rule = Path("src/scenarios/financial_qa/skill_selection.md").read_text().strip()
+    assert context["_finance_skill_catalog_prompt"].count(rule) == 1
+    assert "选择空集" in rule and "当前缺口" in rule
+    for skill_id in context["_finance_skill_snapshot"]["skills"]:
+        assert skill_id not in rule
+    empty = agent._runtime_context(application_context={"default_agent": {"skills": []}}, owner_id="alice")
+    assert empty["_finance_skill_catalog_prompt"] == ""
+
+
 def test_public_visibility_does_not_change_author_or_private_reference_identity(hub):
     hub.set_visibility("personal-report", owner_id="alice", visibility="public", expected_active_revision=1)
     agent = service(hub)

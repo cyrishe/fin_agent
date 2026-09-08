@@ -916,8 +916,7 @@ class FinanceClaudeSessionService:
                 "\n".join(
                     [
                         "[当前可用的金融业务 Skill 摘要]",
-                        "先按问题语义选择匹配的 Skill，优先加载其方法指导，再按需要取数。"
-                        "没有匹配或方法仅部分覆盖时，使用授权工具和通用能力补足。"
+                        "按以下方法选择规则处理本轮问题。"
                         "可使用原生 Skill 或 read_finance_skill 加载，已显式加载的方法无需重复读取。",
                         finance_skill_catalog_prompt,
                     ]

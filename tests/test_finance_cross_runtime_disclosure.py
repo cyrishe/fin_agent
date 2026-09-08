@@ -155,12 +155,13 @@ def test_full_inventory_and_shared_tool_schemas(catalog_adapters):
     assert set(op for _, _, op in _OPERATIONS) == set(_OPERATION_TYPES)
     dsh_tools = {item.name: item for item in catalog_adapters.bridge.list_tools()}
     assert set(dsh_tools) == {"read_finance_catalog", "finance_query", "load_finance_result",
-                              "read_finance_skill", "read_finance_skill_reference"}
+                              "read_finance_skill", "read_finance_skill_reference", "resolve_security"}
     for name, definition in dsh_tools.items():
         assert definition.description == catalog_adapters.cc[name].description
         assert definition.inputSchema == catalog_adapters.cc[name].input_schema
     operation_schema = dsh_tools["read_finance_catalog"].inputSchema["properties"]["operation"]
     assert set(operation_schema["enum"]) == set(_OPERATION_TYPES)
+    assert "operation" not in dsh_tools["read_finance_catalog"].inputSchema.get("required", [])
 
 
 def test_index_is_navigation_not_all_method_contracts(catalog_adapters):
@@ -221,6 +222,8 @@ def test_all_operation_packs_keep_only_relevant_metadata_and_real_api_bindings(
     for key in selected.keys() & _METADATA:
         assert selected[key] == full[key]
     assert set(selected["fields"]) == set(full["fields"])
+    if any("filter" in values for values in function["args"].values() if isinstance(values, list)):
+        assert selected["filter_syntax"] == full["filter_syntax"]
     if operation != "query":
         assert all("modes" not in field for field in selected["fields"].values())
 
@@ -237,6 +240,22 @@ def test_all_operation_packs_keep_only_relevant_metadata_and_real_api_bindings(
     assert function["api_name"].startswith(f"{subject}.{view}")
     assert resolved["operation"] == operation
     assert resolved["type"] == _OPERATION_TYPES[operation]
+
+
+def test_listing_date_is_disclosed_and_valid_for_filter_and_output(catalog_adapters):
+    from src.experiments.staged_data_protocol.phase2.call_parser import parse_api_call
+    from src.experiments.staged_data_protocol.phase2.call_validator import validate_call
+    from src.experiments.staged_data_protocol.phase2.base_info_provider import BASE_INFO_SOURCES
+
+    pack = catalog_adapters.catalog({"subject": "stock", "dataview": "basic_info", "operation": "query"})
+    fields = pack["dataview"]["fields"]
+    assert set(fields) == {"code", "name", "industry", "listed_date"}
+    assert "上市日期" in json.dumps(fields["listed_date"], ensure_ascii=False)
+    assert BASE_INFO_SOURCES["stock"].fields["listed_date"] == "b.list_date"
+    request = 'r1 = stock.basic_info.query(filter="listed_date >= \'2025-01-01\'", limit=10) -> code, name, listed_date'
+    assert validate_call(parse_api_call(request), previous_results={}).ok
+    # Do not silently reinterpret a guessed public field as a DB column.
+    assert not validate_call(parse_api_call(request.replace("listed_date", "list_date")), previous_results={}).ok
 
 
 @pytest.mark.parametrize("subject,view", _RELATIONS)

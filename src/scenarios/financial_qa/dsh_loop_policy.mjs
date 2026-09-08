@@ -18,6 +18,7 @@ const TOOL_SUFFIXES = Object.freeze({
   details: 'load_finance_result',
   skill: 'read_finance_skill',
   reference: 'read_finance_skill_reference',
+  identity: 'resolve_security',
 })
 
 const DEFAULT_BUDGETS = Object.freeze({
@@ -69,7 +70,7 @@ const STAGE_PROMPTS = Object.freeze({
   catalog:
     '当前任务是目录定位。根据路由摘要与方法定义，一次提交明确的 subject + dataview + operation；需要的独立目录可并行读取。定位有歧义时读取对应概览。',
   query:
-    '目录已经就绪。按已加载契约构造 finance_query，将当前可确定的取数目标与依赖合并成一个最小 flow；已有身份结果通过结果列引用传给后续步骤。',
+    '按已加载契约构造 finance_query；新增方法先加载对应执行包。将已确定的取数目标与依赖合并成一个最小 flow。',
   repair:
     '上一查询未成功，本阶段可修复一次。依据返回的 recovery 与已加载契约修正失败步骤，保留用户目标和已成功结果。',
   details:
@@ -407,6 +408,7 @@ function projectedContent(content, kind, config) {
 
 function catalogIsReady(payload) {
   return payload !== null && typeof payload === 'object' && payload.mode === 'dataview'
+    && payload.dataview?.functions?.some(fn => typeof fn.api_name === 'string' && fn.api_name.length > 0) === true
 }
 
 // Derive reuse eligibility from the actual model-visible tool history, not a
@@ -438,24 +440,32 @@ function reusableCatalogApis(agent, tools) {
   return [...apis]
 }
 
-function canReuseCatalog(state, args) {
-  if (state.stage !== 'catalog' || state.reusableApis.length === 0) return false
+function requestTargets(args) {
   if (typeof args === 'string') {
-    try { args = JSON.parse(args) } catch { return false }
+    try { args = JSON.parse(args) } catch { return [] }
   }
   const steps = Array.isArray(args?.steps) ? args.steps : [args]
-  return steps.length > 0 && steps.every(step => {
+  return steps.map(step => {
     // Read only the invocation target; the existing Python protocol parser and
     // validator remain authoritative for arguments, fields and method validity.
     const target = /^\s*(?:[A-Za-z_]\w*\s*=\s*)?([A-Za-z_]\w*(?:\.[A-Za-z_]\w*)+)\s*\(/.exec(step?.request ?? '')?.[1]
-    return target && state.reusableApis.some(api => {
-      const candidate = api.endsWith('.query') && target.split('.').length === 2
-        ? `${target}.query` : target
-      const pattern = api.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-        .replace(/<\w+>/g, '[A-Za-z_][A-Za-z_0-9]*')
-      return new RegExp(`^${pattern}$`).test(candidate)
-    })
-  })
+    return target
+  }).filter(Boolean)
+}
+
+function missingCatalogApis(state, args) {
+  return requestTargets(args).filter(target => !state.reusableApis.some(api => {
+    const candidate = api.endsWith('.query') && target.split('.').length === 2
+      ? `${target}.query` : target
+    const pattern = api.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+      .replace(/<\w+>/g, '[A-Za-z_][A-Za-z_0-9]*')
+    return new RegExp(`^${pattern}$`).test(candidate)
+  }))
+}
+
+function canReuseCatalog(state, args) {
+  return state.stage === 'catalog' && state.reusableApis.length > 0
+    && requestTargets(args).length > 0 && missingCatalogApis(state, args).length === 0
 }
 
 function querySucceeded(payload, failed) {
@@ -538,6 +548,9 @@ function emptyResultHandoff(state, config) {
 }
 
 function promptFor(state, config) {
+  if (!state.methodReady) {
+    return `[FINANCE_LOOP stage=catalog reason=${state.reason}]\n[FINANCE_EXECUTION mode=${state.executionMode}]\n本步按本轮方法选择规则，用 read_finance_skill 的 skill_ids 提交选择；空列表表示通用路径。选择结果返回后，再规划后续动作。`
+  }
   const prompts = state.executionMode === 'fast' ? FAST_STAGE_PROMPTS : STAGE_PROMPTS
   let base = state.stage === 'catalog' && state.reusableApis.length > 0
     ? '按本轮问题更新对象、指标、时间与结果粒度。仍可见且版本有效的目录可以复用，按本轮条件调用 finance_query；需要新视图或方法时用 read_finance_catalog 加载对应契约。'
@@ -563,6 +576,7 @@ function promptFor(state, config) {
 }
 
 function stageTools(state, tools) {
+  if (!state.methodReady) return [tools.skill].filter(Boolean)
   const methods = state.stage === 'final' && state.dataOnlyRequested
     ? [] : [tools.skill, tools.reference].filter(Boolean)
   let allowed
@@ -576,11 +590,14 @@ function stageTools(state, tools) {
       ? [tools.catalog, tools.query, tools.details] : [tools.details]; break
     default: allowed = []
   }
+  if (tools.identity && ['catalog', 'query', 'repair', 'details'].includes(state.stage)) allowed.push(tools.identity)
   return [...methods, ...allowed]
 }
 
 function stageAllows(state, kind, args) {
+  if (!state.methodReady) return kind === 'skill'
   if (kind === 'skill' || kind === 'reference') return state.stage !== 'final' || !state.dataOnlyRequested
+  if (kind === 'identity') return ['catalog', 'query', 'repair', 'details'].includes(state.stage)
   if (state.stage === 'catalog') return kind === 'catalog' || (kind === 'query' && canReuseCatalog(state, args))
   if (state.executionMode === 'standard' && skillGuidedAnswer(state) && ['query', 'details'].includes(state.stage)) return ['catalog', 'query', 'details'].includes(kind)
   if (state.stage === 'query' && hasDataOnlyResults(state)) return ['catalog', 'query', 'details'].includes(kind)
@@ -596,6 +613,8 @@ function resetTurn(state, turn, config, agent, tools) {
   state.executionMode = executionMode(toolContext._finance_execution_mode, config.executionMode)
   state.dataOnlyRequested = toolContext._finance_data_only === true
   state.skillCatalogAvailable = hasSkillCatalog(toolContext)
+  state.methodReady = !state.skillCatalogAvailable
+    || Boolean(String(toolContext._finance_explicit_skill_prompt ?? '').trim())
   state.stage = 'catalog'
   state.reason = 'turn_started'
   // Fast mode's explicit one-catalog/one-query contract remains unchanged.
@@ -617,8 +636,24 @@ function resetTurn(state, turn, config, agent, tools) {
 function updateAfterStep(state, step, config) {
   const stepCalls = [...state.calls.values()].filter(call => call.step === step)
   const calls = stepCalls.filter(call => call.allowedAtCall)
+  const methodLoaded = calls.some(call => {
+    if (call.kind !== 'skill') return false
+    const result = state.results.get(call.callId)
+    const payload = result?.payload
+    return !result?.failed && !payload?.error
+      && (typeof payload?.method === 'string' || Array.isArray(payload?.skills))
+  })
+  if (methodLoaded) state.methodReady = true
+  const missing = stepCalls.flatMap(call => call.missingApis ?? [])
+  if (missing.length > 0) {
+    state.stage = state.stage === 'repair' ? 'repair' : 'catalog'
+    state.reason = 'method_contract_needed'
+    state.requiredAction = true
+    // Missing context is a catalog action, not a failed provider query.
+    // Process any successful catalog reads in this step below.
+  }
   if (stepCalls.length > 0 && calls.length === 0) {
-    state.reason = state.stage === 'final'
+    if (missing.length === 0) state.reason = state.stage === 'final'
       ? 'disallowed_tool_after_completion'
       : 'disallowed_tool_for_stage'
     return
@@ -689,6 +724,10 @@ function updateAfterStep(state, step, config) {
           : 'query_repair_limit'
         state.requiredAction = false
       }
+    } else if (missing.length > 0) {
+      state.stage = 'catalog'
+      state.reason = 'method_contract_needed'
+      state.requiredAction = true
     } else if (success !== undefined) {
       if (catalog.length > 0) {
         state.stage = 'query'
@@ -744,7 +783,7 @@ function updateAfterStep(state, step, config) {
     return
   }
 
-  if (calls.every(call => call.kind === 'skill' || call.kind === 'reference')) {
+  if (calls.every(call => ['skill', 'reference', 'identity'].includes(call.kind))) {
     // Method reads do not consume query attempts or complete the data stage.
     // A method can also answer a supplied-evidence question without a DB call.
     if (!state.dataOnlyRequested) state.requiredAction = false
@@ -757,6 +796,7 @@ function updateAfterStep(state, step, config) {
 }
 
 function requiredActionPrompt(state, tools) {
+  if (!state.methodReady) return '本步用 read_finance_skill 的 skill_ids 提交方法选择；空列表表示通用路径。'
   if (hasDataOnlyResults(state)) {
     return '本轮已有数据集。继续完成新加载目录对应的取数目标，或按 recovery 修复失败步骤；由系统交付原始结果。'
   }
@@ -805,7 +845,7 @@ function resolveToolNames(agent) {
   const resolved = {}
   for (const [kind, suffix] of Object.entries(TOOL_SUFFIXES)) {
     const matches = names.filter(candidate => candidate === suffix || candidate.endsWith(`__${suffix}`))
-    if (matches.length === 0 && (kind === 'skill' || kind === 'reference')) continue
+    if (matches.length === 0 && ['skill', 'reference', 'identity'].includes(kind)) continue
     if (matches.length !== 1) {
       throw new Error(
         `finance-loop-policy: expected exactly one visible tool ending in ${suffix}; found ${matches.join(', ') || '(none)'}`,
@@ -829,6 +869,7 @@ export function apply(ctx, input = {}) {
       executionMode: executionMode(toolContext._finance_execution_mode, config.executionMode),
       dataOnlyRequested: toolContext._finance_data_only === true,
       skillCatalogAvailable: hasSkillCatalog(toolContext),
+      methodReady: !hasSkillCatalog(toolContext) || Boolean(String(toolContext._finance_explicit_skill_prompt ?? '').trim()),
       stage: 'catalog',
       reason: 'agent_created',
       reusableApis: [],
@@ -849,7 +890,12 @@ export function apply(ctx, input = {}) {
     }
 
     const applyRestriction = () => {
-      if (config.preserveRequestPrefix) return
+      if (config.preserveRequestPrefix && state.methodReady) {
+        state.liftRestriction?.()
+        state.liftRestriction = undefined
+        state.visibleKey = ''
+        return
+      }
       const allow = stageTools(state, tools)
       const key = allow.join('\n')
       if (key === state.visibleKey && state.liftRestriction !== undefined) return
@@ -894,7 +940,12 @@ export function apply(ctx, input = {}) {
     agent.ctx.tools.guard(exec => {
       const kind = toolKind(exec.name, tools)
       if (kind === 'unknown') return undefined
+      if (state.methodReady && kind === 'query' && state.stage !== 'final') {
+        const missing = missingCatalogApis(state, exec.arguments)
+        if (missing.length) return `当前阶段先用 read_finance_catalog 读取这些方法的执行包：${[...new Set(missing)].join('、')}。包内包含参数和字段；加载后提交原查询流。`
+      }
       if (!stageAllows(state, kind, exec.arguments)) {
+        if (!state.methodReady) return '本步先提交方法选择；read_finance_skill 的 skill_ids 可以为空。结果返回后，再继续所需工具。'
         return `金融查询策略拒绝当前阶段调用 ${exec.name}；请遵循上一工具结果末尾的阶段指引。`
       }
       // Harness emits tool/call before prepare/guard; these counters already
@@ -967,6 +1018,9 @@ export function apply(ctx, input = {}) {
         resetTurn(state, turn, config, agent, tools)
         applyRestriction()
       }
+      // Snapshot only contracts already visible before this model generation.
+      // A parallel catalog result cannot authorize a call generated beside it.
+      state.reusableApis = reusableCatalogApis(agent, tools)
       if (state.dataOnlyComplete || (state.dataOnlyRequested && state.stage === 'final')) return { kind: 'reject' }
       const downstream = await next()
       if (downstream.kind !== 'enter') return downstream
@@ -996,6 +1050,7 @@ export function apply(ctx, input = {}) {
 
     agent.ctx.on('agent/request', async (_payload, next) => {
       const proposed = await next()
+      state.reusableApis = reusableCatalogApis(agent, tools)
       const budgetKey = state.executionMode === 'fast' && state.stage === 'query'
         ? 'fast_query' : state.stage
       const selected = config.budgets[budgetKey] ?? config.budgets.final
@@ -1041,14 +1096,18 @@ export function apply(ctx, input = {}) {
       }
       if (event.type === 'tool/call' && event.data.turn === state.turn) {
         const kind = toolKind(event.data.name, tools)
+        const missingApis = kind === 'query' && state.methodReady && state.stage !== 'final'
+          ? missingCatalogApis(state, event.data.arguments) : []
+        const allowed = stageAllows(state, kind, event.data.arguments) && missingApis.length === 0
         state.calls.set(event.data.callId, {
           callId: event.data.callId,
           step: event.data.step,
           name: event.data.name,
           kind,
-          allowedAtCall: stageAllows(state, kind, event.data.arguments),
+          allowedAtCall: allowed,
+          missingApis,
         })
-        if (stageAllows(state, kind, event.data.arguments)) {
+        if (allowed) {
           if (!state.dataOnlyRequested || !['skill', 'reference'].includes(kind)) state.requiredAction = false
           if (kind === 'catalog') state.catalogAttempts += 1
           if (kind === 'query') state.queryAttempts += 1

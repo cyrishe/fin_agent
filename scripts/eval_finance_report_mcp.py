@@ -47,6 +47,8 @@ def main():
     parser.add_argument('--max-rows', type=int, default=2)
     parser.add_argument('--preflight-only', action='store_true', help='Verify auth, workers and cleanup without model queries.')
     parser.add_argument('--conversation-id', help='Optional explicit context continuity. Omit for the independent benchmark.')
+    parser.add_argument('--allowed-skills', nargs='*', default=None,
+                        help='Use the existing application Skill allowlist for this isolated run; omit for the default registry.')
     args = parser.parse_args()
     from dotenv import load_dotenv
     load_dotenv(args.env_file)
@@ -100,8 +102,21 @@ def main():
         enabled=True, system_tools=query_tools, worker_count=args.concurrency,
         root_dir=folder / 'runtime', log_path=folder / 'events.jsonl',
         harness_factory=RecordedHarness)
-    engine = FinancialQaCcService(enabled=True, system_tools=query_tools,
+    class EvaluationEngine(FinancialQaCcService):
+        def _runtime_context(self, **kwargs):
+            # Exercise the normal application policy, without changing the
+            # shared registry, production config or the model's question.
+            if args.allowed_skills is not None:
+                kwargs['application_context'] = {'default_agent': {
+                    'name': 'investment_analyst', 'skills': args.allowed_skills}}
+            return super()._runtime_context(**kwargs)
+
+    engine = EvaluationEngine(enabled=True, system_tools=query_tools,
         session_service=SimpleNamespace(close=lambda: None), dsh_session_service=dsh)
+    if args.allowed_skills is not None:
+        available = {item['id'] for item in engine.business_skill_catalog.entries()}
+        if set(args.allowed_skills) - available:
+            parser.error('allowed-skills contains an unregistered system Skill')
     gateway = FinanceApiGateway(engine=engine, usage_recorder=lambda **_: None)
     app = create_app(auth=FinanceApiKeyAuth({'report-eval': key}), gateway=gateway)
     sock = socket.socket()
@@ -142,6 +157,8 @@ def main():
             'preflight_only': args.preflight_only,
             'transport': 'real HTTP MCP on isolated loopback listener',
             'conversation_id_supplied': args.conversation_id,
+            'allowed_skills': args.allowed_skills,
+            'skill_catalog_revision': engine.business_skill_catalog.revision,
             'usage_counter': 'disabled for benchmark', 'prewarm': warm,
             'authentication_checks': auth_checks,
             'policy_sha256': hashlib.sha256((ROOT / 'src/scenarios/financial_qa/dsh_loop_policy.mjs').read_bytes()).hexdigest(),

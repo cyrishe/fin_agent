@@ -49,8 +49,8 @@ def test_default_skill_catalog_and_frontmatter_share_one_trigger_description() -
         metadata = _frontmatter(_skill_text(item["id"]))
         assert metadata["name"] == item["id"]
         assert metadata["description"] == item["description"]
-        assert "时使用" in metadata["description"]
-        assert "不使用" in metadata["description"]
+        assert "适用于" in metadata["description"]
+        assert "不使用" not in metadata["description"]
         assert set(metadata) <= {"name", "description", "allowed-tools"}
 
 
