@@ -11,19 +11,6 @@
     "查询和分析行情、资金流、估值、财务、研报与事件数据，并完成金融标的筛选、排名、统计、对比和聚合",
     "负责金融证券相关 Tool 与 Skill 的设计、创建、优化、修改、测试和明确调用"
   ],
-  "skills": [
-    "market-overview",
-    "sector-theme-analysis",
-    "stock-research",
-    "earnings-analysis",
-    "stock-screening",
-    "factor-analysis",
-    "valuation-analysis",
-    "financial-quality-analysis",
-    "stock-comparison",
-    "technical-structure-analysis",
-    "dividend-analysis"
-  ],
   "tools": [
     "个股动量排名",
     "market_realtime_breadth",

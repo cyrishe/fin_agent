@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from src.experiments.staged_data_protocol.phase2 import python_filter as pf
+
 import json
 import os
 import re
@@ -538,6 +540,14 @@ def _requested_fields(*, source: ReportSource, outputs: List[str]) -> List[str]:
 
 
 def _build_filter(*, source: ReportSource, args: Mapping[str, Any]) -> tuple[str, List[Any]]:
+    tree = pf.condition(args)
+    if tree is not None:
+        def leaf(p):
+            field = FIELD_ALIASES.get(p["field"], p["field"])
+            if p["operator"] in {"contains", "not in"}:
+                return pf.compile_predicate({**p, "field": field}, source.fields)
+            return _compile_filter(expression=p, source=source)
+        return pf.compile_tree(tree, source.fields, leaf)
     raw = str(args.get("filter") or "").strip()
     expression = parse_filter_expression(raw)
     if not expression:

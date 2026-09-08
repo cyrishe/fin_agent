@@ -82,12 +82,12 @@ def test_public_health_catalog_and_data_map() -> None:
         assert page.status_code == 200
         assert "Fin Agent 数据体系" in page.text
         assert "data-action=\"expand\"" in page.text
-        status_page = client.get("/status")
-        assert status_page.status_code == 200
-        assert "金融数据状态" in status_page.text
-        assert client.get("/status/data").status_code == 200
+        status_page = client.get("/status", follow_redirects=False)
+        assert status_page.status_code == 303
+        assert status_page.headers["location"].endswith("/login")
+        assert client.get("/status/data").status_code == 401
         assert client.get("/v1/usage/daily").status_code == 401
-        assert client.get("/v1/usage/daily?days=1000",headers={"X-API-Key":KEY}).status_code == 422
+        assert client.get("/v1/usage/daily?days=1000",headers={"X-API-Key":KEY}).status_code == 401
         assert 'href="mcp-guide"' in page.text
 
         guide = client.get("/mcp-guide")

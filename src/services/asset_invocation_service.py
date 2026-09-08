@@ -59,6 +59,7 @@ class AssetInvocationService:
         skills_root: str = "src/skills",
         llm_chat: Optional[Callable[..., Any]] = None,
         stock_identity_resolver: Optional[StockIdentityResolverService] = None,
+        business_catalog_provider: Optional[Callable[..., Any]] = None,
     ) -> None:
         if custom_tool_store is None:
             from src.services.custom_tool_service import CustomToolStoreService
@@ -76,6 +77,7 @@ class AssetInvocationService:
         self.llm_chat = llm_chat or chat_qwen_flash_json
         self.stock_identity_resolver = stock_identity_resolver or StockIdentityResolverService()
         self.registry = get_prompt_registry()
+        self.business_catalog_provider = business_catalog_provider
 
     @staticmethod
     def _trim(value: Any) -> str:
@@ -144,12 +146,14 @@ class AssetInvocationService:
         text: str,
         selected_asset: Mapping[str, Any] | None = None,
         owner_ids: Optional[List[str]] = None,
+        business_owner_id: str = "",
         allow_inactive: bool = False,
     ) -> Dict[str, str]:
         resolution = self._resolve_invocation_target(
             text=text,
             selected_asset=selected_asset,
             owner_ids=owner_ids,
+            business_owner_id=business_owner_id,
             allow_inactive=allow_inactive,
         )
         if resolution.get("status") == "none":
@@ -280,6 +284,9 @@ class AssetInvocationService:
             asset["strategy_runtime_profile"] = strategy_runtime_profile
         if "editable" in contract:
             asset["editable"] = bool(contract.get("editable"))
+        for key in ("skill_type", "scope", "owner", "visibility", "active_revision_no"):
+            if key in contract:
+                asset[key] = contract[key]
         return asset
 
     @staticmethod
@@ -302,6 +309,11 @@ class AssetInvocationService:
                 "revision",
                 "finance_tool_profile",
                 "strategy_runtime_profile",
+                "skill_type",
+                "scope",
+                "owner",
+                "visibility",
+                "active_revision_no",
             )
             if key in asset
         }
@@ -501,8 +513,13 @@ class AssetInvocationService:
         *,
         owner_ids: Optional[List[str]],
         allow_inactive: bool,
+        business_owner_id: str = "",
     ) -> List[Dict[str, Any]]:
         rows = [
+            *[
+                self._asset_from_contract(contract)
+                for contract in self._business_skill_contracts(owner_ids=[business_owner_id])
+            ],
             *self._list_static_tool_assets(),
             *self._list_custom_tool_assets(
                 owner_ids=owner_ids,
@@ -518,7 +535,7 @@ class AssetInvocationService:
         return sorted(
             unique.values(),
             key=lambda item: (
-                0 if self._trim(item.get("kind")) == "tool" else 1,
+                0 if item.get("skill_type") == "business_method" else 1 if self._trim(item.get("kind")) == "tool" else 2,
                 self._normalize_lookup_text(item.get("display_name")),
                 self._normalize_lookup_text(item.get("name")),
             ),
@@ -553,6 +570,7 @@ class AssetInvocationService:
         self,
         *,
         owner_ids: Optional[List[str]] = None,
+        business_owner_id: str = "",
         query: str = "",
         kind: str = "",
         limit: Optional[int] = None,
@@ -563,6 +581,7 @@ class AssetInvocationService:
             raise AssetInvocationError(f"不支持的资产类型：{normalized_kind}")
         rows = self._collect_invocable_assets(
             owner_ids=owner_ids,
+            business_owner_id=business_owner_id,
             allow_inactive=allow_inactive,
         )
         if normalized_kind:
@@ -591,11 +610,13 @@ class AssetInvocationService:
         query: str,
         *,
         owner_ids: Optional[List[str]] = None,
+        business_owner_id: str = "",
         kind: str = "",
         limit: int = 8,
     ) -> List[Dict[str, Any]]:
         return self.list_invocable_assets(
             owner_ids=owner_ids,
+            business_owner_id=business_owner_id,
             query=query,
             kind=kind,
             limit=limit,
@@ -608,6 +629,7 @@ class AssetInvocationService:
         kind: str,
         owner_ids: Optional[List[str]],
         allow_inactive: bool,
+        business_owner_id: str = "",
     ) -> List[Dict[str, Any]]:
         kinds = [kind] if kind in {"tool", "skill"} else ["tool", "skill"]
         rows: List[Dict[str, Any]] = []
@@ -617,6 +639,7 @@ class AssetInvocationService:
                     kind=candidate_kind,
                     name=name,
                     owner_ids=owner_ids,
+                    business_owner_id=business_owner_id,
                     allow_inactive=allow_inactive,
                 )
             except (AssetInvocationError, FileNotFoundError, ValueError):
@@ -631,10 +654,12 @@ class AssetInvocationService:
         kind: str,
         owner_ids: Optional[List[str]],
         allow_inactive: bool,
+        business_owner_id: str = "",
     ) -> Dict[str, Any]:
         normalized_name = self._normalize_lookup_text(name)
         catalog = self.list_invocable_assets(
             owner_ids=owner_ids,
+            business_owner_id=business_owner_id,
             kind=kind,
             allow_inactive=allow_inactive,
         )
@@ -654,6 +679,7 @@ class AssetInvocationService:
                 name=name,
                 kind=kind,
                 owner_ids=owner_ids,
+                business_owner_id=business_owner_id,
                 allow_inactive=allow_inactive,
             )
         if len(exact) == 1:
@@ -678,6 +704,7 @@ class AssetInvocationService:
         candidates = self.query_invocable_assets(
             name,
             owner_ids=owner_ids,
+            business_owner_id=business_owner_id,
             kind=kind,
             limit=5,
         )
@@ -699,6 +726,7 @@ class AssetInvocationService:
         selected_asset: Mapping[str, Any] | None,
         owner_ids: Optional[List[str]],
         allow_inactive: bool,
+        business_owner_id: str = "",
     ) -> Dict[str, Any]:
         selected_reference = self._selected_reference(selected_asset)
         text_reference = self._text_reference(text)
@@ -710,6 +738,7 @@ class AssetInvocationService:
                 name=selected_reference["name"],
                 kind=selected_reference.get("kind") or "",
                 owner_ids=owner_ids,
+                business_owner_id=business_owner_id,
                 allow_inactive=allow_inactive,
             )
             if selected_reference
@@ -720,6 +749,7 @@ class AssetInvocationService:
                 name=self._trim(text_reference.get("name")),
                 kind=self._trim(text_reference.get("kind")).lower(),
                 owner_ids=owner_ids,
+                business_owner_id=business_owner_id,
                 allow_inactive=allow_inactive,
             )
             if text_reference
@@ -804,6 +834,7 @@ class AssetInvocationService:
         kind: str,
         name: str,
         owner_ids: Optional[List[str]] = None,
+        business_owner_id: str = "",
         allow_inactive: bool = False,
     ) -> Dict[str, Any]:
         normalized_kind = self._trim(kind).lower()
@@ -815,6 +846,13 @@ class AssetInvocationService:
                 allow_inactive=allow_inactive,
             )
         if normalized_kind == "skill":
+            business = next(
+                (item for item in self._business_skill_contracts(owner_ids=[business_owner_id])
+                 if item["name"] == normalized_name),
+                None,
+            )
+            if business is not None:
+                return business
             return self._load_skill_contract(normalized_name)
         raise AssetInvocationError(f"不支持的资产类型：{normalized_kind or '-'}")
 
@@ -826,12 +864,14 @@ class AssetInvocationService:
         attachments: Optional[List[Dict[str, Any]]] = None,
         thread_context: Optional[Dict[str, Any]] = None,
         owner_ids: Optional[List[str]] = None,
+        business_owner_id: str = "",
         allow_inactive: bool = False,
     ) -> Dict[str, Any]:
         resolution = self._resolve_invocation_target(
             text=text,
             selected_asset=selected_asset,
             owner_ids=owner_ids,
+            business_owner_id=business_owner_id,
             allow_inactive=allow_inactive,
         )
         if resolution.get("status") == "none":
@@ -843,9 +883,29 @@ class AssetInvocationService:
             kind=target["kind"],
             name=target["name"],
             owner_ids=owner_ids,
+            business_owner_id=business_owner_id,
             allow_inactive=allow_inactive,
         )
         user_request = self.strip_invocation_prefix(text, target_name=target["name"])
+        if contract.get("skill_type") == "business_method":
+            # A method keeps the user's semantic request in the Finance Agent.
+            # It has no executable parameter schema or legacy SkillRunner job.
+            invocation = {
+                "version": "v1",
+                "status": "ready",
+                "target": target,
+                "user_request": user_request,
+                "arguments": {"question": user_request},
+                "execution": {"mode": "single", "item_count": 1},
+                "calls": [{"question": user_request}],
+                "missing_required": [],
+                "message": f"正在使用「{contract['display_name']}」处理当前问题。",
+                "contract": contract,
+                "attachments": list(attachments or []),
+                "llm_usage": self._normalize_usage(None),
+            }
+            invocation["preview"] = self.build_preview(invocation)
+            return invocation
         input_bundle = self.input_resolver.inspect(attachments or [])
         attachment_payload = input_bundle["attachments"]
         attachment_prompt_payload = input_bundle["prompt_attachments"]
@@ -1239,6 +1299,29 @@ class AssetInvocationService:
             "version": self._trim(definition.get("version")) or "v1",
             "revision": int(definition.get("revision") or 0),
         }
+
+    def _business_skill_contracts(self, *, owner_ids: Optional[List[str]]) -> List[Dict[str, Any]]:
+        if self.business_catalog_provider is None:
+            return []
+        catalog = self.business_catalog_provider(owner_ids=owner_ids or ())
+        contracts = []
+        for entry in catalog.public_entries():
+            name = self._trim(entry.get("id"))
+            detail = catalog.studio_detail(name) or {}
+            contracts.append({
+                "kind": "skill",
+                "skill_type": "business_method",
+                "name": name,
+                "display_name": self._trim(detail.get("display_name")) or name,
+                "description": self._trim(entry.get("description")),
+                "input_schema": {"type": "object", "properties": {
+                    "question": {"type": "string", "title": "自然语言要求"},
+                }},
+                "requires_natural_language": True,
+                "tags": [self._trim(entry.get("category"))],
+                **{key: detail[key] for key in ("scope", "owner", "visibility", "active_revision_no") if key in detail},
+            })
+        return contracts
 
     def _load_skill_contract(self, name: str) -> Dict[str, Any]:
         skill_dir = self.skills_root / name

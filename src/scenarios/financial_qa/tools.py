@@ -4,10 +4,11 @@ import asyncio
 import json
 import re
 import time
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 from typing import Any, Callable, Dict, List, Mapping, Optional
 
 from src.experiments.staged_data_protocol.phase2.models import ResultHandle
+from src.experiments.staged_data_protocol.phase2.catalog import OPERATION_DESCRIPTIONS
 from src.experiments.staged_data_protocol.phase2.trade_date_resolver import TradeDateResolver
 from src.backtest import BacktestError
 from src.scenarios.financial_qa.result_registry import FinanceResultRegistry
@@ -48,22 +49,9 @@ def _result_rows(handle: ResultHandle) -> list[dict[str, Any]]:
     return [dict(item) for item in rows if isinstance(item, Mapping)]
 
 
-_OPERATION_SELECTION_DESCRIPTION = (
-    "Always provide operation for a concrete data request. Choose by the "
-    "requested output granularity, not by words such as compare, "
-    "comparison, change, rank, or Top N. query preserves one row per object, "
-    "period, or source record, so direct comparisons, rankings, and Top N are "
-    "normally query; when no row-reducing statistic is explicitly requested, "
-    "default to query. aggregate is only for an explicitly requested reduction "
-    "of multiple rows to grouped statistics such as average, median, maximum, "
-    "minimum, sum, or count. Asking which object is highest/lowest remains "
-    "query with order/limit; asking for the maximum/minimum value itself is "
-    "aggregate. window is for an explicitly requested fixed-K-period derived "
-    "metric; compute is for a requested calculation not covered by a catalog "
-    "query, aggregate, or window operation. Omit operation only when the "
-    "operation itself is genuinely ambiguous and the full dataview is needed "
-    "to resolve it."
-)
+_OPERATION_SELECTION_DESCRIPTION = "\n".join(
+    f"{name}: {description}" for name, description in OPERATION_DESCRIPTIONS.items()
+) + "\n按本次所需数据形态选择；省略时查看该视图的全部方法。"
 
 
 def _canonical_skill_id(value: Any) -> str:
@@ -285,6 +273,8 @@ class FinanceDataQueryToolRuntime:
             "catalog_reads": [],
             "result_refs": [],
             "active_skill_ids": [],
+            "skill_entries": [],
+            "skill_results": [],
             "restored_result_names": sorted(self.result_handles),
             "interaction_requests": [],
             "artifact_updates": [],
@@ -292,7 +282,24 @@ class FinanceDataQueryToolRuntime:
             "dynamic_runs": [],
             "implementation_runs": [],
         }
+        snapshot = self.tool_context.get("_finance_skill_snapshot")
+        if isinstance(snapshot, Mapping):
+            methods = snapshot.get("skills") or {}
+            for skill_id in self.tool_context.get("_finance_explicit_skill_ids") or []:
+                if skill_id in methods:
+                    self.record_method_load(skill_id, methods[skill_id], snapshot["revision"])
         return self.tracker
+
+    def record_method_load(self, skill_id: str, method: Mapping[str, Any], revision: str) -> None:
+        self.activate_skill(skill_id)
+        if any(item.get("skill_id") == skill_id for item in self.tracker["skill_entries"]):
+            return
+        self.tracker["skill_entries"].append({
+            "skill_id": skill_id,
+            "revision": revision,
+            "content_hash": _trim(method.get("content_hash")),
+        })
+        self.tracker["skill_results"].append(_trim(method.get("method"))[:5000])
 
     def activate_skill(self, skill_id: str) -> None:
         normalized = _trim(skill_id)
@@ -302,25 +309,12 @@ class FinanceDataQueryToolRuntime:
         active.append(normalized)
 
     def configured_tool_allowed(self, tool_name: str) -> bool:
-        """Keep direct Agent tools available, but scope Skill turns to native grants."""
+        """Methods guide tool choice; only the caller's runtime grants authorize it."""
 
-        access = self.tool_context.get("skill_tool_access")
-        if not isinstance(access, Mapping):
-            return True
-        active = self.tracker.get("active_skill_ids")
-        if not isinstance(active, list) or not active:
-            return True
-        normalized_tool = _trim(tool_name)
-        return any(
-            normalized_tool
-            in {
-                _trim(item)
-                for item in access.get(_trim(skill_id), [])
-                if _trim(item)
-            }
-            for skill_id in active
-            if isinstance(access.get(_trim(skill_id), []), list)
-        )
+        return _trim(tool_name) in {
+            _trim(item) for item in self.tool_context.get("allowed_agent_tools") or []
+            if _trim(item)
+        }
 
     @property
     def runtime_scope(self) -> str:
@@ -631,15 +625,10 @@ class FinanceDataQueryCcTools:
         @tool(
             "read_finance_catalog",
             (
-                "Read Fin Agent's finance data catalog. Infer the subject and dataview from the user's request "
-                "using the routing index below, then call this tool once with both subject and dataview to obtain "
-                "the executable fields and rules for that view. For every concrete data request, pass "
-                "operation=query, aggregate, window, or compute "
-                "according to the operation parameter description so only that operation's "
-                "contract and examples are loaded. Do not routinely read "
-                "the empty index or a subject summary first. Use a subject-only or empty read only when the request "
-                "is genuinely ambiguous and the routing index cannot resolve it.\n\n"
-                f"Current routing index:\n{routing_index}"
+                "读取金融数据调用目录。subject 定位对象，dataview 定位数据，operation 选择方法类别。"
+                "范围索引列出各视图可选的 operation；选定后返回该方法的完整调用、参数、字段和示例。"
+                "subject-only 或空参数可用于浏览上层目录。\n\n"
+                f"数据范围索引：\n{routing_index}"
             ),
             {
                 "type": "object",
@@ -648,7 +637,7 @@ class FinanceDataQueryCcTools:
                     "dataview": {"type": "string", "maxLength": 100},
                     "operation": {
                         "type": "string",
-                        "enum": ["query", "aggregate", "window", "compute"],
+                        "enum": list(OPERATION_DESCRIPTIONS),
                         "description": _OPERATION_SELECTION_DESCRIPTION,
                     },
                 },
@@ -756,31 +745,14 @@ class FinanceDataQueryCcTools:
         @tool(
             "finance_query",
             (
-                "Execute one minimal financial-data flow. Before calling, list every business fact explicitly "
-                "requested by the user. Do not add an unrelated comparison or explanatory query merely to enrich the answer; "
-                "retrieve extra data only when the user's requested calculation cannot be completed without it. "
-                "confirmation, not context; (2) include one step for every goal whose API can already be selected, including "
-                "symbolic dependencies whose actual values need not be inspected; (3) require every filter predicate "
-                "to come from an explicit user constraint, a catalog requirement, or an upstream identity scope. "
-                "Ordering or ranking never implies an extra positive, non-null, or threshold filter. Each step has one "
-                "natural-language goal and exactly one read-only DSL request. Use `step1.column`, `step2.column`, and "
-                "so on within this flow; use existing rN.column across flows. Stop early only when the next API truly "
-                "cannot be selected without inspecting returned values. The system assigns every formal rN and saves "
-                "goals, server-applied selection, lineage, and column coverage. After execution use this decision gate: "
-                "(A) validation or provider failure: repair only the failed step; (B) a concrete mismatch between goal "
-                "and API, selection_applied, outputs, or time: correct only that mismatch; (C) otherwise the step is "
-                "complete, so continue to a genuinely different explanatory goal or answer. A related goal must support "
-                "a concrete sentence in the final answer; choose trend, period comparison, composition, peer comparison, "
-                "or no supplement from the current semantics rather than from a fixed API mapping. Server-applied "
-                "filter/order/limit and available "
-                "identity refs remain valid even when a projected metric is null. Nulls, zero rows, or returned subsets "
-                "must not trigger another API, time mode, or tool for the same fact. Follow the returned recovery object: "
-                "provider failures are retried once by the harness, request-invalid errors may be repaired once from the "
-                "loaded catalog, and ambiguous identities may only use tool-supplied candidates. step_evidence and the compact "
-                "working set are authoritative execution facts and contain no hidden full-table data. The full "
-                "working-set index is server-owned and supplied once at the start of a user turn. Each finance_query "
-                "response returns only newly completed step summaries; reuse their rN references during the current "
-                "turn and do not expect prior results to be repeated in later tool responses."
+                "执行金融数据查询流。围绕本轮数据目标，把已确定的查询及其依赖放入同一个 steps；"
+                "需要观察返回值才能决定的后续查询留到下一次。\n"
+                "每步包含业务目标 goal 和一条目录定义的只读 request：result = api_name(arguments) -> fields。"
+                "筛选范围由用户条件、目录口径和上游对象集合确定。\n"
+                "流内用 stepN.column 引用前一步的列集合，跨流用 rN.column；集合条件为 field in stepN.column，"
+                "标量条件使用已读取的具体值。系统分配正式 rN 并保存取数范围、来源和列覆盖。\n"
+                "响应提供本次新增结果与执行证据。复用成功步骤；失败按 recovery 处理，"
+                "口径错误依据目录和执行事实修正。零行和空字段按返回状态作为数据缺口保留。"
             ),
             {
                 "type": "object",
@@ -806,7 +778,7 @@ class FinanceDataQueryCcTools:
                                     "maxLength": 4_000,
                                     "description": (
                                         "Exactly one executable DSL request. Use `result = ...` on the left. "
-                                        "A later step may reference an earlier one as step1.column."
+                                        "A later step may filter by an earlier column set as `field in step1.column`."
                                     ),
                                 },
                             },
@@ -817,10 +789,9 @@ class FinanceDataQueryCcTools:
                     "data_request_complete": {
                         "type": "boolean",
                         "description": (
-                            "Required in system-declared data-only mode. Set true when this flow "
-                            "supplies all requested source datasets (including valid empty results). "
-                            "Returning source text does not require reading it to compose an answer. "
-                            "Set false only when these results are needed to select a subsequent data query."
+                            "仅数据模式必填，也适用于带摘要的查询。"
+                            "本 flow 覆盖全部取数目标（含有效空结果）时为 true；"
+                            "尚有依赖返回值的后续取数目标时为 false。原始文本也是可交付的数据。"
                         ),
                     },
                 },
@@ -899,6 +870,7 @@ class FinanceDataQueryCcTools:
                             "next_result_name": expected_result_name,
                         }
                     )
+                progress_title = _query_progress_title("", step_number, len(steps))
                 try:
                     flow_request = tool_runtime.result_registry.resolve_flow_refs(
                         submitted_request,
@@ -1304,6 +1276,8 @@ class FinanceDataQueryCcTools:
                 "ok": True,
                 "next_result_name": tool_runtime.next_result_name,
             }
+            if isinstance(args.get("data_request_complete"), bool):
+                response["data_request_complete"] = args["data_request_complete"]
             if bool(tool_runtime.tool_context.get("_finance_data_only")):
                 # The explicit completion handshake prevents an optimized
                 # harness from stopping after an intermediate adaptive query.
@@ -1323,11 +1297,8 @@ class FinanceDataQueryCcTools:
         @tool(
             "load_finance_result",
             (
-                "Load one small page from a prior query or configured-tool result_ref in the current conversation. Use only when "
-                "the compact schema and sample are insufficient for the answer or a later query. Never call this when "
-                "the producing step says sample_complete=true; that sample already contains every result row. Request only "
-                "the columns needed for the current sentence or dependent query; omitted metadata remains available through "
-                "the original result summary."
+                "按 result_ref 读取本会话已保存结果的一页数据，选择本次分析或后续查询所需的列。"
+                "sample_complete=true 表示摘要样例已包含全部记录，可直接使用；其余结果按需分页读取。"
             ),
             {
                 "type": "object",
@@ -1664,102 +1635,141 @@ class FinanceDataQueryCcTools:
                 return _tool_result({"ok": False, "error": str(exc)})
 
         tools = [read_finance_catalog, finance_query, load_finance_result, run_backtest]
-        if self.business_skill_catalog is not None:
-            @tool(
-                "read_finance_skill_reference",
-                (
-                    "Load one progressive reference explicitly linked by an already loaded Finance business Skill. "
-                    "Use the exact skill_id and references/... path from that Skill. This reads only the immutable "
-                    "in-memory Skill snapshot; it is not a general filesystem search tool. Load the parent Skill "
-                    "first, and read only references that materially change the current analysis."
-                ),
-                {
-                    "type": "object",
-                    "properties": {
-                        "skill_id": {
-                            "type": "string",
-                            "minLength": 1,
-                            "maxLength": 100,
-                        },
-                        "reference": {
-                            "type": "string",
-                            "pattern": "^references/[A-Za-z0-9_.\\-/]+$",
-                            "maxLength": 240,
-                        },
-                    },
-                    "required": ["skill_id", "reference"],
-                    "additionalProperties": False,
-                },
-            )
-            async def read_finance_skill_reference(
-                args: dict[str, Any],
-            ) -> dict[str, Any]:
-                requested_skill_id = _trim(args.get("skill_id"))
-                skill_id = _canonical_skill_id(requested_skill_id)
-                reference = _trim(args.get("reference"))
-                call_record = {
-                    "tool": "read_finance_skill_reference",
-                    "skill_id": skill_id,
-                    "requested_skill_id": requested_skill_id,
-                    "reference": reference,
-                }
-                tool_runtime.tracker["calls"].append(call_record)
-                active_skill_ids = {
-                    _trim(item)
-                    for item in tool_runtime.tracker.get("active_skill_ids") or []
-                    if _trim(item)
-                }
-                if skill_id not in active_skill_ids:
-                    call_record["error"] = "parent_skill_not_loaded"
-                    return _tool_result(
-                        {
-                            "skill_id": skill_id,
-                            "reference": reference,
-                            "error": "请先加载对应的业务 Skill，再读取其参考。",
-                        }
-                    )
-                raw_allowed = tool_runtime.tool_context.get(
-                    "allowed_finance_skills"
-                )
-                expected_revision = _trim(
-                    tool_runtime.tool_context.get(
-                        "_finance_skill_catalog_revision"
-                    )
-                )
-                allowed_skill_ids = (
-                    [
-                        _trim(item)
-                        for item in raw_allowed
-                        if _trim(item)
-                    ]
-                    if isinstance(raw_allowed, list)
-                    else None
-                )
-                payload = self.business_skill_catalog.load_reference(
-                    skill_id,
-                    reference,
-                    allowed_skill_ids=allowed_skill_ids,
-                    expected_revision=expected_revision,
-                )
-                if _trim(payload.get("error")):
-                    call_record["error"] = _trim(payload.get("error"))[:500]
-                    call_record["status"] = "error"
-                else:
-                    call_record.update(
-                        {
-                            "status": "completed",
-                            "catalog_revision": _trim(
-                                payload.get("revision")
-                            ),
-                            "content_hash": _trim(
-                                payload.get("content_hash")
-                            ),
-                            "size": len(str(payload.get("content") or "")),
-                        }
-                    )
-                return _tool_result(payload)
+        fallback_snapshot = (
+            self.business_skill_catalog.method_snapshot()
+            if self.business_skill_catalog is not None else {"revision": "", "skills": {}}
+        )
 
-            tools.append(read_finance_skill_reference)
+        def available_method(skill_id: str) -> tuple[Mapping[str, Any], str]:
+            snapshot = tool_runtime.tool_context.get("_finance_skill_snapshot", fallback_snapshot)
+            if not isinstance(snapshot, Mapping):
+                raise ValueError("本轮业务 Skill 快照不可用。")
+            revision = _trim(snapshot.get("revision"))
+            expected = _trim(tool_runtime.tool_context.get("_finance_skill_catalog_revision"))
+            if expected and expected != revision:
+                raise ValueError("本轮业务 Skill 快照不一致，请使用同一修订。")
+            allowed = tool_runtime.tool_context.get("allowed_finance_skills")
+            methods = snapshot.get("skills") or {}
+            if (isinstance(allowed, list) and skill_id not in allowed) or skill_id not in methods:
+                raise ValueError("该业务 Skill 未注册、未授权或当前不可用。")
+            return methods[skill_id], revision
+
+        @tool(
+            "read_finance_skill",
+            "按当前授权目录中的 skill_id 加载业务方法。匹配问题时优先读取方法，再据其指导取数和分析；"
+            "已加载方法可直接复用，没有匹配或覆盖不全时可使用数据工具与通用能力继续处理。",
+            {
+                "type": "object",
+                "properties": {"skill_id": {"type": "string", "minLength": 1, "maxLength": 100}},
+                "required": ["skill_id"],
+                "additionalProperties": False,
+            },
+        )
+        async def read_finance_skill(args: dict[str, Any]) -> dict[str, Any]:
+            skill_id = _canonical_skill_id(args.get("skill_id"))
+            call_record = {"tool": "read_finance_skill", "skill_id": skill_id}
+            tool_runtime.tracker["calls"].append(call_record)
+            try:
+                method, revision = available_method(skill_id)
+                tool_runtime.record_method_load(skill_id, method, revision)
+                call_record.update({"status": "completed", "catalog_revision": revision,
+                                    "content_hash": method.get("content_hash", "")})
+                return _tool_result({
+                    "skill_id": skill_id, "revision": revision,
+                    "description": method.get("description", ""),
+                    "method": method.get("method", ""),
+                    "content_hash": method.get("content_hash", ""),
+                })
+            except ValueError as exc:
+                call_record.update({"status": "error", "error": str(exc)})
+                return _tool_result({"skill_id": skill_id, "error": str(exc)})
+
+        tools.append(read_finance_skill)
+        @tool(
+            "read_finance_skill_reference",
+            (
+                "Load one progressive reference explicitly linked by an already loaded Finance business Skill. "
+                "Use the exact skill_id and references/... path from that Skill. This reads only the immutable "
+                "in-memory Skill snapshot; it is not a general filesystem search tool. Load the parent Skill "
+                "first, and read only references that materially change the current analysis."
+            ),
+            {
+                "type": "object",
+                "properties": {
+                    "skill_id": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 100,
+                    },
+                    "reference": {
+                        "type": "string",
+                        "pattern": "^references/[A-Za-z0-9_.\\-/]+$",
+                        "maxLength": 240,
+                    },
+                },
+                "required": ["skill_id", "reference"],
+                "additionalProperties": False,
+            },
+        )
+        async def read_finance_skill_reference(
+            args: dict[str, Any],
+        ) -> dict[str, Any]:
+            requested_skill_id = _trim(args.get("skill_id"))
+            skill_id = _canonical_skill_id(requested_skill_id)
+            reference = _trim(args.get("reference"))
+            call_record = {
+                "tool": "read_finance_skill_reference",
+                "skill_id": skill_id,
+                "requested_skill_id": requested_skill_id,
+                "reference": reference,
+            }
+            tool_runtime.tracker["calls"].append(call_record)
+            active_skill_ids = {
+                _trim(item)
+                for item in tool_runtime.tracker.get("active_skill_ids") or []
+                if _trim(item)
+            }
+            if skill_id not in active_skill_ids:
+                call_record["error"] = "parent_skill_not_loaded"
+                return _tool_result(
+                    {
+                        "skill_id": skill_id,
+                        "reference": reference,
+                        "error": "请先加载对应的业务 Skill，再读取其参考。",
+                    }
+                )
+            try:
+                method, revision = available_method(skill_id)
+                path = PurePosixPath(reference)
+                if path.is_absolute() or ".." in path.parts or not path.parts or path.parts[0] != "references":
+                    raise ValueError("业务 Skill 参考路径无效。")
+                resource = (method.get("references") or {}).get(path.as_posix())
+                if not isinstance(resource, Mapping):
+                    raise ValueError("该参考未包含在本轮业务 Skill 快照中。")
+                payload = {"skill_id": skill_id, "reference": path.as_posix(),
+                           "revision": revision, "content": resource.get("content", ""),
+                           "content_hash": resource.get("content_hash", "")}
+            except ValueError as exc:
+                payload = {"skill_id": skill_id, "reference": reference, "error": str(exc)}
+            if _trim(payload.get("error")):
+                call_record["error"] = _trim(payload.get("error"))[:500]
+                call_record["status"] = "error"
+            else:
+                call_record.update(
+                    {
+                        "status": "completed",
+                        "catalog_revision": _trim(
+                            payload.get("revision")
+                        ),
+                        "content_hash": _trim(
+                            payload.get("content_hash")
+                        ),
+                        "size": len(str(payload.get("content") or "")),
+                    }
+                )
+            return _tool_result(payload)
+
+        tools.append(read_finance_skill_reference)
         configured_tool_names = [
             _trim(item)
             for item in tool_context.get("allowed_agent_tools") or []
@@ -1780,11 +1790,7 @@ class FinanceDataQueryCcTools:
                 [
                     description,
                     (
-                        "Choose this path only when its documented output directly covers a distinct unresolved user "
-                        "goal. Do not call it merely as a preflight before finance_query or in addition to "
-                        "finance_query for the same fact. Preparing identifiers or inputs is appropriate only when "
-                        "that preparation is this tool's documented purpose. A second tool is appropriate only for "
-                        "a different user-required evidence type."
+                        "根据本工具声明的数据范围处理尚未完成的数据目标，复用本轮已取得的结果。"
                     ),
                 ]
             )
@@ -1805,12 +1811,12 @@ class FinanceDataQueryCcTools:
                 }
                 tool_runtime.tracker["calls"].append(call_record)
                 if not tool_runtime.configured_tool_allowed(_tool_name):
-                    call_record["error"] = "active_skill_tool_not_allowed"
+                    call_record["error"] = "caller_tool_not_allowed"
                     return _tool_result(
                         {
                             "tool": _tool_name,
                             "ok": False,
-                            "error": "当前 Skill 未声明可使用该补充工具。",
+                            "error": "当前用户或运行策略未授权该补充工具。",
                         }
                     )
                 try:
@@ -1867,6 +1873,7 @@ class FinanceDataQueryCcTools:
                     {
                         "name": item.get("name"),
                         "desc": item.get("desc"),
+                        "operations": self._view_operations(item),
                     }
                     for item in row.get("dataviews") or []
                     if isinstance(item, Mapping)
@@ -1885,7 +1892,9 @@ class FinanceDataQueryCcTools:
             if not subject:
                 continue
             subject_description = _trim(row.get("desc"))
-            dataviews: list[str] = []
+            # Subject is the visual parent, not another copy of all its views.
+            label = _trim(row.get("public_name")) or subject_description
+            lines.append(f"- {subject}（{label}）" if label else f"- {subject}")
             for item in row.get("dataviews") or []:
                 if not isinstance(item, Mapping):
                     continue
@@ -1893,26 +1902,29 @@ class FinanceDataQueryCcTools:
                 if not name:
                     continue
                 description = _trim(item.get("desc"))
-                dataviews.append(
-                    f"{name}（{description}）" if description else name
-                )
-            subject_route = (
-                f"{subject}（{subject_description}）"
-                if subject_description
-                else subject
-            )
-            lines.append(f"- {subject_route}: {', '.join(dataviews)}")
+                operations = "/".join(self._view_operations(item))
+                suffix = f" [{operations}]" if operations else ""
+                lines.append(f"  - {name}{suffix}：{description}")
         return "\n".join(lines)
+
+    @staticmethod
+    def _view_operations(view: Mapping[str, Any]) -> list[str]:
+        return list(dict.fromkeys(
+            _trim(function.get("operation"))
+            for function in view.get("functions") or []
+            if isinstance(function, Mapping) and _trim(function.get("operation"))
+        ))
 
     def _subject_summary(self, subject: str) -> dict[str, Any]:
         row = self.finance_catalog.get_subject(subject)
         return {
             "name": row.get("name"),
             "desc": row.get("desc"),
-                "dataviews": [
-                    {
-                        "name": item.get("name"),
-                        "desc": item.get("desc"),
+            "dataviews": [
+                {
+                    "name": item.get("name"),
+                    "desc": item.get("desc"),
+                    "operations": self._view_operations(item),
                 }
                 for item in row.get("dataviews") or []
                 if isinstance(item, Mapping)

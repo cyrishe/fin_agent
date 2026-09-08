@@ -262,6 +262,18 @@ def test_candidate_store_enforces_owner_scope() -> None:
         )
 
 
+def test_candidate_revision_preserves_existing_reference_assets() -> None:
+    service = _service()
+    first = service.create_candidate(requirement="创建个股研报方法。", owner_id="user-1")
+    second = service.store.save_revision({**first, "revision_no": 2,
+        "references": {"references/comparison.md": "比较同机构、同预测年度与口径。"}},
+        owner_id="user-1", expected_base_revision=1)
+    revised = service.revise_candidate(skill_id=first["skill_id"],
+        feedback="让结论更加简洁。", base_revision_no=2, owner_id="user-1")
+    assert revised["references"] == second["references"]
+    assert service.store.load_revision(first["skill_id"], 2, owner_id="user-1")["references"] == second["references"]
+
+
 class _CandidateDatabase:
     def __init__(self) -> None:
         self.artifact = None
@@ -359,6 +371,7 @@ def test_database_candidate_keeps_active_pointer_empty_on_create() -> None:
         requirement="做一个个股分析 Skill。",
         owner_id="user-1",
     )
+    candidate["references"] = {"references/method.md": "仅比较可比预测口径。"}
 
     persisted = store.create_candidate(candidate, owner_id="user-1")
 
@@ -367,6 +380,7 @@ def test_database_candidate_keeps_active_pointer_empty_on_create() -> None:
     assert persisted["revision_no"] == 1
     assert persisted["active_revision_no"] == 0
     assert persisted["published"] is False
+    assert persisted["references"] == candidate["references"]
     with pytest.raises(SkillCandidateNotFoundError):
         store.load_revision(candidate["skill_id"], 1, owner_id="user-2")
 
@@ -477,10 +491,20 @@ def test_skill_candidate_api_contract_and_json_boundary(monkeypatch) -> None:
             return {**candidate, "revision_no": 2, "candidate_revision_no": 2}
 
     monkeypatch.setattr(web, "skill_authoring_service", _ApiService())
+    member_identity = {
+        "user_id": "member-1",
+        "user_type": "member",
+        "session_token": "token",
+    }
+    monkeypatch.setattr(
+        web,
+        "_resolve_current_member_identity",
+        lambda: member_identity,
+    )
     monkeypatch.setattr(
         web,
         "_resolve_current_guest_identity",
-        lambda: {"user_id": "guest-1", "user_type": "guest", "session_token": "token"},
+        lambda: member_identity,
     )
     client = web.app.test_client()
 
@@ -496,9 +520,9 @@ def test_skill_candidate_api_contract_and_json_boundary(monkeypatch) -> None:
 
     assert create.status_code == 201
     assert create.get_json()["candidate"]["skill_id"] == candidate["skill_id"]
-    assert calls["create"]["owner_id"] == "guest-1"
+    assert calls["create"]["owner_id"] == "member-1"
     assert listing.status_code == 200
     assert listing.get_json()["items"][0]["tool_count"] == 0
-    assert calls["list"] == {"owner_id": "guest-1", "limit": 5}
+    assert calls["list"] == {"owner_id": "member-1", "limit": 5}
     assert wrong_content_type.status_code == 400
     assert wrong_content_type.get_json()["code"] == "invalid_skill_authoring_request"

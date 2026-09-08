@@ -3,6 +3,7 @@ import json
 from pathlib import Path
 import pytest
 
+from src.experiments.staged_data_protocol.phase2.catalog import OPERATION_DESCRIPTIONS
 from src.scenarios.financial_qa.result_registry import FinanceResultRegistry
 from src.scenarios.financial_qa.service import FinancialQaCcService
 from src.scenarios.financial_qa.tools import FinanceDataQueryCcTools
@@ -29,9 +30,11 @@ def test_zero_row_guidance_treats_matching_empty_result_as_complete() -> None:
     )
 
     assert evidence["execution_completed"] is True
-    assert "正常的完成状态" in evidence["guidance"]
-    assert "不改变任何条件" in evidence["guidance"]
-    assert "具体语义偏差" in evidence["guidance"]
+    assert "本步按空结果完成" in evidence["guidance"]
+    assert "保留已执行的对象、时间和筛选条件" in evidence["guidance"]
+    assert evidence["selection_applied"] == {"filter": "name = 贵州茅台"}
+    assert evidence["populated_columns"] == []
+    assert evidence["sample_complete"] is True
 
 
 class _Catalog:
@@ -149,24 +152,35 @@ def test_financial_qa_exposes_only_read_only_data_tools(tmp_path: Path) -> None:
         "finance_query",
         "load_finance_result",
         "run_backtest",
+        "read_finance_skill",
+        "read_finance_skill_reference",
     }
     assert set(names) == {
         "mcp__finance__read_finance_catalog",
         "mcp__finance__finance_query",
         "mcp__finance__load_finance_result",
         "mcp__finance__run_backtest",
+        "mcp__finance__read_finance_skill",
+        "mcp__finance__read_finance_skill_reference",
     }
     assert all("implement" not in name and "codex" not in name for name in names)
     assert tools["finance_query"].input_schema["required"] == ["steps"]
     assert "data_request_complete" in tools["finance_query"].input_schema["properties"]
-    operation_description = tools["read_finance_catalog"].input_schema[
+    operation_schema = tools["read_finance_catalog"].input_schema[
         "properties"
-    ]["operation"]["description"]
-    assert "Always provide operation for a concrete data request" in operation_description
-    assert "output granularity" in operation_description
-    assert "direct comparisons" in operation_description
-    assert "which object is highest/lowest remains query" in operation_description
-    assert "maximum/minimum value itself is aggregate" in operation_description
+    ]["operation"]
+    assert operation_schema["enum"] == list(OPERATION_DESCRIPTIONS)
+    assert set(operation_schema["enum"]) == {
+        "query", "window", "constitution", "aggregate", "compute",
+    }
+    for operation, description in OPERATION_DESCRIPTIONS.items():
+        assert f"{operation}: {description}" in operation_schema["description"]
+    relation = FinanceDataToolCatalogService().get_model_dataview(
+        "plate", "constitution", "constitution"
+    )
+    assert relation["selected_operation"] == "constitution"
+    assert relation["functions"][0]["api_name"] == "plate.constitution"
+    assert relation["functions"][0]["operation"] == "constitution"
     assert tools["finance_query"].input_schema["properties"]["steps"]["minItems"] == 1
     load_schema = tools["load_finance_result"].input_schema["properties"]
     assert load_schema["limit"]["maximum"] == 50
@@ -337,23 +351,18 @@ def test_skill_references_are_loaded_from_the_bound_snapshot_only_after_skill_ac
         def __init__(self):
             self.calls = []
 
-        def load_reference(
-            self,
-            skill_id,
-            reference,
-            *,
-            allowed_skill_ids=None,
-            expected_revision="",
-        ):
-            self.calls.append(
-                (skill_id, reference, allowed_skill_ids, expected_revision)
-            )
+        def method_snapshot(self):
+            self.calls.append("snapshot")
             return {
-                "skill_id": skill_id,
-                "reference": reference,
-                "revision": expected_revision,
-                "content_hash": "abc123",
-                "content": "consumer lens",
+                "revision": "revision-1",
+                "skills": {"stock-research": {
+                    "method": "stock method", "description": "Stock research",
+                    "content_hash": "method-hash", "references": {
+                        "references/industry-lenses.md": {
+                            "content": "consumer lens", "content_hash": "abc123",
+                        },
+                    },
+                }},
             }
 
     catalog = _BusinessSkillCatalog()
@@ -399,14 +408,9 @@ def test_skill_references_are_loaded_from_the_bound_snapshot_only_after_skill_ac
     assert "mcp__finance__read_finance_skill_reference" in names
     assert "先加载对应" in blocked["error"]
     assert loaded["content"] == "consumer lens"
-    assert catalog.calls == [
-        (
-            "stock-research",
-            "references/industry-lenses.md",
-            ["stock-research"],
-            "revision-1",
-        )
-    ]
+    assert catalog.calls == ["snapshot"]
+    assert loaded["revision"] == "revision-1"
+    assert loaded["content_hash"] == "abc123"
     assert [item["tool"] for item in tracker["calls"]] == [
         "read_finance_skill_reference",
         "read_finance_skill_reference",
@@ -485,7 +489,7 @@ def test_configured_agent_tools_are_registered_in_the_same_cc_harness(
         ("financial_news_search", {"query": "贵州茅台"})
     ]
     assert "mcp__finance__financial_news_search" in names
-    assert "Preparing identifiers or inputs is appropriate only when" in tool_map[
+    assert "复用本轮已取得的结果" in tool_map[
         "financial_news_search"
     ].description
     assert result["sample"]["rows"][0]["title"] == "贵州茅台发布公告"
@@ -493,8 +497,8 @@ def test_configured_agent_tools_are_registered_in_the_same_cc_harness(
 
     blocked_context = {
         "_agent_runtime_scope": "financial_qa:owner-a/thread-7",
-        "allowed_agent_tools": ["financial_news_search"],
-        "skill_tool_access": {"earnings-analysis": []},
+        "allowed_agent_tools": [],
+        "skill_tool_access": {"earnings-analysis": ["financial_news_search"]},
     }
     runtime.begin_turn(owner_ids=["owner-a"], tool_context=blocked_context)
     runtime.activate_skill("earnings-analysis")
@@ -506,16 +510,15 @@ def test_configured_agent_tools_are_registered_in_the_same_cc_harness(
         )
     )
     assert blocked["ok"] is False
-    assert blocked["error"] == "当前 Skill 未声明可使用该补充工具。"
+    assert blocked["error"] == "当前用户或运行策略未授权该补充工具。"
     assert adapter.calls == [
         ("financial_news_search", {"query": "贵州茅台"})
     ]
 
     allowed_context = {
         **blocked_context,
-        "skill_tool_access": {
-            "stock-research": ["financial_news_search"],
-        },
+        "allowed_agent_tools": ["financial_news_search"],
+        "skill_tool_access": {"stock-research": []},
     }
     runtime.begin_turn(owner_ids=["owner-a"], tool_context=allowed_context)
     runtime.activate_skill("stock-research")
@@ -549,8 +552,8 @@ def test_catalog_is_loaded_progressively(tmp_path: Path) -> None:
 
     assert index["mode"] == "index"
     assert index["subjects"][0]["dataviews"] == [
-        {"name": "quote", "desc": "行情"},
-        {"name": "margin", "desc": "融资融券"},
+        {"name": "quote", "desc": "行情", "operations": []},
+        {"name": "margin", "desc": "融资融券", "operations": []},
     ]
     assert "fields" not in index["subjects"][0]["dataviews"][0]
     assert subject["mode"] == "subject"
@@ -568,7 +571,7 @@ def test_catalog_routing_index_exposes_direct_subject_dataview_choices(
     service, _, _, _, _, _ = _tools(tmp_path)
 
     assert service._catalog_routing_index() == (
-        "- stock（股票）: quote（行情）, margin（融资融券）"
+        "- stock（股票）\n  - quote：行情\n  - margin：融资融券"
     )
 
 
@@ -590,7 +593,7 @@ def test_catalog_routing_uses_description_as_the_single_source(
     )
 
     routing = service._catalog_routing_index()
-    assert "quote（个股历史、分钟与当前行情，以及价格和成交数据。）" in routing
+    assert "quote：个股历史、分钟与当前行情，以及价格和成交数据。" in routing
     assert "不应使用的旧摘要" not in routing
 
 
@@ -604,10 +607,11 @@ def test_catalog_routing_hides_subject_execution_guidance_until_view_selected() 
 
     assert "plate_name = 名称" not in routing
     assert "LIKE" not in routing
-    assert any(
-        "plate_name = 名称" in rule
-        for rule in selected["subject_guidance"]
-    )
+    raw_subject = service.finance_catalog.load_raw_catalog()["subjects"]["plate"]
+    assert raw_subject["_meta"]["rules"] == []
+    assert not selected.get("subject_guidance")
+    assert selected["functions"][0]["api_name"] == "plate.basic_info"
+    assert selected["rules"] == raw_subject["basic_info"]["rules"]
 
 
 def test_catalog_revision_change_is_rejected_inside_an_active_tool_set(
@@ -660,6 +664,8 @@ def test_catalog_tool_uses_compact_view_without_changing_full_catalog_api(
     )
     read_catalog = next(item for item in built if item.name == "read_finance_catalog")
 
+    assert "operation" not in read_catalog.input_schema.get("required", [])
+
     payload = _payload(
         asyncio.run(
             read_catalog.handler({"subject": "stock", "dataview": "quote"})
@@ -668,11 +674,21 @@ def test_catalog_tool_uses_compact_view_without_changing_full_catalog_api(
 
     model_view = payload["dataview"]
     full_view = catalog.get_dataview("stock", "quote")
+    assert payload["mode"] == "dataview"
+    assert "selected_operation" not in model_view
+    assert {method["operation"] for method in model_view["functions"]} == {
+        "query", "window", "aggregate", "compute",
+    }
     assert isinstance(model_view["fields"], dict)
     assert set(model_view["fields"]) == {
         field["name"] for field in full_view["fields"]
     }
-    assert "api_classes" in model_view
+    assert "api_classes" not in model_view
+    assert model_view["functions"]
+    for method in model_view["functions"]:
+        assert {"api_name", "operation", "request_pattern", "args"} <= set(method)
+        assert "api_class" not in method
+    assert model_view["functions"][0]["api_name"] == "stock.quote"
     assert "field_count" not in model_view
     assert isinstance(full_view["fields"], list)
 
@@ -826,8 +842,8 @@ def test_queries_keep_dependency_handles_and_results_are_pageable(tmp_path: Path
     restored_query_tool = next(
         item for item in restored_tools if item.name == "finance_query"
     )
-    assert "supplied once at the start of a user turn" in restored_query_tool.description
-    assert "newly completed step summaries" in restored_query_tool.description
+    assert "复用成功步骤" in restored_query_tool.description
+    assert "响应提供本次新增结果与执行证据" in restored_query_tool.description
     assert '"result_name": "r1"' not in restored_query_tool.description
     assert "取得贵州茅台的名称和收盘价" not in restored_query_tool.description
 
@@ -921,7 +937,7 @@ def test_query_result_names_are_system_assigned_and_progress_is_observable(
     assert "working_set" not in first
     assert "request" not in first
     assert first["step_evidence"]["execution_completed"] is True
-    assert "闭环判断" in first["step_evidence"]["guidance"]
+    assert "本步已完成" in first["step_evidence"]["guidance"]
     assert tracker["result_refs"][0]["request"].startswith("r1 =")
     assert "guidance" in tracker["result_refs"][0]["step_evidence"]
     assert runtime.calls[1]["request"].startswith("r2 =")
@@ -1127,7 +1143,8 @@ def test_working_set_distinguishes_available_identity_from_null_metric(
         "stock_name",
     ]
     assert result["steps"][0]["step_evidence"]["unavailable_columns"] == ["close"]
-    assert "如实回答缺值" in result["steps"][0]["step_evidence"]["guidance"]
+    assert "在本次结果中缺值" in result["steps"][0]["step_evidence"]["guidance"]
+    assert "保留可用身份范围与实际缺口" in result["steps"][0]["step_evidence"]["guidance"]
     assert len(runtime.calls) == 2
     assert "code in r1.stock_code" in runtime.calls[1]["request"]
 
@@ -1166,6 +1183,21 @@ def test_finance_flow_stops_at_invalid_forward_reference_and_keeps_prior_result(
     assert [item["result_name"] for item in tracker["result_refs"]] == ["r1"]
     assert "working_set" not in result
     assert result["completed_steps"][0]["goal"] == "取得第一步行情"
+
+
+def test_first_step_reference_error_returns_original_error_without_progress_crash(tmp_path: Path) -> None:
+    _, runtime, _, tools, _, tracker = _tools(tmp_path)
+    failed = _payload(asyncio.run(tools["finance_query"].handler({
+        "steps": [{
+            "goal": "取得已有公司行情",
+            "request": 'result = stock.quote(filter="code in step2.code") -> code, close',
+        }],
+    })))
+    assert failed["failed_step"] == 1
+    assert "FLOW_REF_ERROR" in failed["error"]
+    assert "progress_title" not in failed["error"]
+    assert runtime.calls == []
+    assert tracker["result_refs"] == []
 
 
 def test_validation_failure_is_returned_for_cc_repair_and_not_registered(
@@ -1787,61 +1819,44 @@ def test_financial_qa_prompt_keeps_business_rules_and_manual_stays_generic() -> 
     root = Path("src/scenarios/financial_qa")
     prompt = (root / "system.md").read_text(encoding="utf-8")
     manual = (root / "data_query.md").read_text(encoding="utf-8")
+    protocol = (root / "finance_api_protocol.md").read_text(encoding="utf-8")
     business_root = Path("src/skills/finance-business/skills")
     business_skills = {
         path.parent.name: path.read_text(encoding="utf-8")
         for path in business_root.glob("*/SKILL.md")
     }
 
-    assert "没有查询结果时不编造数值" in prompt
-    assert "rN.column" in manual
-    assert "同一个事实只选择一条证据路径" in manual
-    assert "对象、指标、时间、关系/聚合" in prompt
-    assert "执行证据与恢复提示" in prompt
-    assert "明确事实查询直接使用金融数据查询" in prompt
-    assert "不形成持续的 `active_skill` 状态" in prompt
+    assert "具体金融事实通过金融数据工具取得" in prompt
+    assert "对象、指标、时间与结果粒度" in prompt
+    assert "有匹配方法时优先加载" in prompt
+    assert "只覆盖部分问题" in prompt
+    assert "通用分析能力补足" in prompt
     assert "general_search" not in prompt
     assert "financial_news_search" not in prompt
-    assert "服务端默认使用沪深300" in prompt
-    assert "不根据回测结果事后挑选" in prompt
+    assert "服务端默认沪深300" in prompt
+    assert "依据回测前已知的持仓特征" in prompt
     assert "展示感知的数据组织" in prompt
-    assert "不是固定的 API 映射" in prompt
-    assert "简单事实问答至多补充一份" in prompt
-    assert "直接结果只有一个时点或一个报告期" in prompt
-    assert "另一条普通单点记录" in prompt
-    assert "必须做一次展示增强检查" in prompt
-    assert "具体模式完全遵循选中 execution pack" in prompt
-    assert "既没有两个原始可比观测" in prompt
-    assert "每个具体事实都必须能落到本轮实际返回的字段" in prompt
-    assert "不补写现金储备、零有息负债" in prompt
-    catalog = json.loads(
-        Path("src/tools/finance_data/catalog/api_view_catalog.json").read_text(
-            encoding="utf-8"
-        )
-    )
-    margin_functions = catalog["subjects"]["stock"]["margin"]["api"]
-    margin_query_guidance = margin_functions[0]["guidance"]
-    margin_window_guidance = margin_functions[1]["guidance"]
-    assert any(
-        "order和limit不会把它扩展为历史序列" in rule
-        for rule in margin_query_guidance
-    )
-    assert any("同时传start和end" in rule for rule in margin_query_guidance)
-    assert any("K 日窗口方法" in rule for rule in margin_window_guidance)
-    financial_rules = catalog["subjects"]["stock"]["financial_3_table"]["rules"]
-    assert any("只查询数据源全局最新报告期" in rule for rule in financial_rules)
-    assert any("不按报告期拆成多次单行查询" in rule for rule in financial_rules)
-    assert "不输出前端组件名或 `render_payload`" in prompt
-    assert "具体调用协议的唯一真源" in manual
-    assert "初始 subject/dataview 路由只依据" in manual
-    assert "`request_pattern` 和精确 examples" in manual
-    assert "stock." not in manual
-    assert "mode=" not in manual
+    assert "可组织一份直接相关的补充数据" in prompt
+    assert "仅取数和极简回答按用户指定范围交付" in prompt
+    assert "真实可比的观测或正式窗口指标" in prompt
+    assert "系统根据实际结果生成卡片、图表与明细表" in prompt
+    assert "rN.column" in protocol
+    assert "stepN.column" in protocol
+    assert "data_request_complete=true" in protocol
+    assert "五类方法的用途由 `read_finance_catalog` 统一说明" in protocol
+    assert "金融公式、窗口与数据源适配由工具实现" in protocol
+    assert "sample_complete=true" in manual
+    assert "本步按空结果完成" in manual
+    assert "实际状态" in prompt
+    assert "恢复以工具返回的执行证据为准" in prompt
+    assert "stock." not in prompt + manual + protocol
+    assert "mode=" not in prompt + manual + protocol
     assert set(business_skills) == {
         "market-overview",
         "sector-theme-analysis",
         "stock-research",
         "stock-screening",
+        "equity-report-analysis",
         "earnings-analysis",
         "factor-analysis",
         "valuation-analysis",
@@ -1852,7 +1867,7 @@ def test_financial_qa_prompt_keeps_business_rules_and_manual_stays_generic() -> 
     }
     assert all(f"name: {name}" in text for name, text in business_skills.items())
     assert all("finance_query" not in text for text in business_skills.values())
-    assert "Codex" not in prompt + manual + "".join(business_skills.values())
+    assert "Codex" not in prompt + manual + protocol + "".join(business_skills.values())
 
 
 def test_chat_dispatch_hands_investment_normal_qa_directly_to_financial_cc(

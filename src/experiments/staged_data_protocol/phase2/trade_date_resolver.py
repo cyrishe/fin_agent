@@ -6,6 +6,7 @@ from datetime import date, datetime
 from typing import Any, Callable, Dict, List, Mapping, Sequence, Tuple
 
 from src.experiments.staged_data_protocol.phase2.models import ApiCall
+from src.experiments.staged_data_protocol.phase2 import python_filter as pf
 from src.utils.mysql_utils import StockInfoDbUtils
 
 
@@ -108,7 +109,24 @@ class TradeDateResolver:
                 adjustments.append(adjustment)
 
         filter_text = str(normalized.get("filter") or "")
-        if filter_text:
+        expression = pf.condition(normalized)
+        if expression is not None:
+            def resolve_predicate(p):
+                if p["field"] not in {"tradedate", "trade_date"}:
+                    return p
+                values = p["value"] if isinstance(p["value"], list) else [p["value"]]
+                resolved_values = []
+                for value in values:
+                    if not self._is_date_value(value):
+                        resolved_values.append(value)
+                        continue
+                    resolved, adjustment = self._resolve_value(value, field=f"filter.{p['field']}", anchor=anchor, trade_days=trade_days)
+                    resolved_values.append(resolved)
+                    if adjustment is not None:
+                        adjustments.append(adjustment)
+                return {**p, "value": resolved_values if isinstance(p["value"], list) else resolved_values[0]}
+            normalized["_filter_expression"] = pf.map_predicates(expression, resolve_predicate)
+        elif filter_text:
             normalized_filter = self._rewrite_filter(
                 filter_text,
                 anchor=anchor,
@@ -131,7 +149,14 @@ class TradeDateResolver:
     def _collect_candidates(self, args: Mapping[str, Any]) -> List[str]:
         values = [str(args[key]).strip() for key in _DATE_FIELDS if key in args and args[key] not in (None, "")]
         filter_text = str(args.get("filter") or "")
-        values.extend(match.group("value").strip("'\"") for match in _FILTER_DATE_RE.finditer(filter_text))
+        expression = pf.condition(args)
+        if expression is not None:
+            for p in pf.predicates(expression):
+                if p["field"] in {"tradedate", "trade_date"}:
+                    items = p["value"] if isinstance(p["value"], list) else [p["value"]]
+                    values.extend(str(item) for item in items)
+        else:
+            values.extend(match.group("value").strip("'\"") for match in _FILTER_DATE_RE.finditer(filter_text))
         return [item for item in values if self._is_date_value(item)]
 
     def _anchor_date(self, args: Mapping[str, Any]) -> date:

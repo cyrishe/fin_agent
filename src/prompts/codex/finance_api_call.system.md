@@ -1,83 +1,26 @@
 # 金融 API 调用方式
 
-每次查询固定使用：
+代码通过 `custom_tool_sdk.finance_query(request=request_text)` 执行查询，顶层 `ok` 表示执行结果，顶层 `data` 提供数据行。
 
 ```text
 result_name = api_name(arguments) -> output_fields
 ```
 
-代码通过 `custom_tool_sdk.finance_query(request=request_text)` 执行查询。返回后先检查顶层 `ok`，数据行读取顶层 `data`。
-
 ## 五类通用 API
 
-### 1. 基础查询
+| 方法 | 用途 | 共同形态 |
+|---|---|---|
+| 基础查询 | 返回匹配的数据明细 | `subject.dataview(...)` |
+| K 日指标 | 按对象计算指定窗口的已定义指标 | `subject.dataview.kd_<field>_<method>(...)` |
+| 成分关系 | 返回主体与成分证券的关系 | `subject.constitution(...)`，精确入口以目录为准 |
+| 聚合查询 | 对当前行集或成分证券指标分组统计 | `subject.dataview.agg(...)` |
+| 动态行情计算 | 执行自然语言描述的自定义行情计算 | `stock.quote.dynamic_cal(...)` |
 
-行情、资金、估值、财务、基础信息等普通 dataview 均使用：
+上表描述共同形态。实际调用使用当前目录给出的精确入口、参数和输出字段；窗口字段与方法组合、聚合目标和自然语言计算任务均按所选方法的定义表达。金融窗口、公式和数据源适配由数据工具实现。
 
-```text
-result_name = subject.dataview(filter, order, limit, realtime) -> fields
-```
+## 查找与执行契约
 
-参数没有需要时可以省略。输出字段必须来自当前 dataview。
-
-### 2. K 日指标
-
-API 名称按 Catalog 中的字段—方法组合动态形成：
-
-```text
-result_name = subject.dataview.kd_<field>_<method>(
-    k, filter, order, limit, realtime
-) -> code, name, value as alias
-```
-
-`k` 必填；`field` 和 `method` 必须来自当前 dataview 的定义。
-
-### 3. 成分关系
-
-```text
-result_name = subject.constitution(
-    filter, order, limit, realtime
-) -> subject_code, subject_name, stock_code, stock_name
-```
-
-实际标识字段以当前 constitution dataview 为准。
-
-### 4. 聚合查询
-
-```text
-result_name = subject.dataview.agg(
-    filter, agg, group_by, order, limit
-) -> group_fields, aggregate_result
-```
-
-一次调用计算一个聚合目标。普通 `dataview.agg` 聚合该 dataview
-自身的行集；`constitution.agg` 聚合一个主体的成分股指标，两者不要混用。
-多个指标由 Python 分别查询并组合。
-
-研报正文、评级、观点、风险和目标价明细使用 `stock.report`（一行一篇研报）；
-研报中的标准预测/实际指标使用 `stock.report_metric`（一行一个指标事实）。
-两者都支持目录中定义的 `.agg`。按 `code,name` 分组并排序/限量即可扫描公司，
-不新增 `report.scan`；研报接口不使用 `realtime`。
-
-### 5. 动态行情计算
-
-固定查询和 K 日指标无法表达复杂行情计算时使用：
-
-```text
-result_name = stock.quote.dynamic_cal(
-    k, filter, fields, task, order, limit, realtime
-) -> code, name, calculated_fields
-```
-
-`task` 用精炼自然语言描述计算目标，`fields` 只列所需的真实行情字段。
-
-## 查找具体 API
-
-以上只说明 API 的共同形态。具体名称、字段、参数、规则和示例从 Catalog 查找：
-
-1. 读取 `api_catalog/index.json` 定位 subject。
-2. 读取 `api_catalog/subjects/<subject>/index.json` 定位 dataview。
-3. 只打开相关的 `api_catalog/subjects/<subject>/<dataview>.json`。
-4. 使用其中 `methods[].call`、`methods[].args`、`methods[].rules` 和 `methods[].examples`。
-
-不要读取 provider 源码猜接口。
+1. 从 `api_catalog/index.json` 定位 subject，再从对应 subject 索引定位所需 dataview。
+2. 读取 `api_catalog/subjects/<subject>/<dataview>.json` 中当前方法的完整契约：用途、调用格式、参数、字段、特殊口径与示例。
+3. 使用 `methods[].call`、`methods[].args` 和相应规则构造请求。时间模式、默认值和字段作用域以当前方法为准。
+4. 多目标按依赖组合查询，复用已取得的数据。输出保留支持后续计算的身份、时间与单位。

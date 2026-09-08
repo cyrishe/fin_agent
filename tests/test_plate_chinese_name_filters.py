@@ -166,7 +166,7 @@ def test_multiple_contains_candidates_remain_explicitly_ambiguous(
     ] == ["A", "B"]
 
 
-def test_plate_catalog_teaches_name_resolution_before_data_query() -> None:
+def test_plate_identity_rules_belong_to_basic_info() -> None:
     catalog_path = (
         Path(__file__).parents[1]
         / "src"
@@ -176,14 +176,13 @@ def test_plate_catalog_teaches_name_resolution_before_data_query() -> None:
         / "api_view_catalog.json"
     )
     catalog = json.loads(catalog_path.read_text(encoding="utf-8"))
-    rules = catalog["subjects"]["plate"]["_meta"]["rules"]
+    rules = catalog["subjects"]["plate"]["basic_info"]["rules"]
+    assert any("plate_name" in rule and "plate_code" in rule for rule in rules)
+    assert any("候选" in rule for rule in rules)
+    assert catalog["subjects"]["plate"]["_meta"]["rules"] == []
 
-    assert any("plate.basic_info" in rule and "plate_name" in rule for rule in rules)
-    assert any("plate_code" in rule and "下游" in rule for rule in rules)
-    assert any("LIKE" in rule and "不得假设" in rule for rule in rules)
 
-
-def test_plate_name_resolution_rules_reach_the_step_context() -> None:
+def test_plate_moneyflow_context_contains_its_own_contract() -> None:
     sections = context_builder.build_context_sections(
         step=Step(
             step_id="S1",
@@ -196,5 +195,7 @@ def test_plate_name_resolution_rules_reach_the_step_context() -> None:
         result_id="r1",
     )
 
-    assert "先通过 plate.basic_info 定位" in sections["current_dataview"]
-    assert "优先使用返回的 plate_code 作为 code 条件" in sections["current_dataview"]
+    current = sections["current_dataview"]
+    assert '"subject": "plate"' in current and '"name": "moneyflow"' in current
+    assert '"code"' in current and '"main_net"' in current
+    assert "先通过 plate.basic_info 定位" not in current

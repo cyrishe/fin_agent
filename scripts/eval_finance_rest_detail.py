@@ -19,6 +19,7 @@ ROOT = Path(__file__).resolve().parents[1]
 SOURCES = [
     "outputs/d4f10504-8df6-435e-9316-3d89b5fd1015/source_cases.json",
     "outputs/financial_qa_mainland_eval_20260902/cases_mainland_supported.json",
+    "outputs/financial_qa_mainland_full_increment_20260903/cases_increment_no_news.json",
 ]
 # Existing questions, covering seven subjects, financial statements and both report views.
 PILOT_IDS = ["BUS028", "BUS009", "BUS176", "BUS192", "BUS151", "BUS119", "BUS085", "BUS214", "RTE007", "RTE016"]
@@ -77,6 +78,7 @@ def main():
     parser.add_argument("--full", action="store_true", help="Only after reviewing the pilot")
     parser.add_argument("--case-ids", help="Subset of existing IDs for incremental manual review")
     parser.add_argument("--timeout", type=float, default=240)
+    parser.add_argument("--record-query-errors", action="store_true", help="Keep application query failures as outcomes; still stop on transport or incomplete detail")
     args = parser.parse_args()
     values = dotenv_values(args.env_file)
     key = os.getenv("FINANCE_API_KEY") or values.get("FINANCE_API_KEY")
@@ -95,7 +97,7 @@ def main():
             path = args.output_dir / (case["case_id"] + ".json")
             if path.exists():
                 previous = json.loads(path.read_text())
-                if previous.get("problems"):
+                if blocking_problems(previous, args.record_query_errors):
                     raise SystemExit(f"Prior failed case {case['case_id']} requires review; not continuing")
                 continue
             transport = "mcp" if case["case_id"].startswith("RTE") else "api"
@@ -111,8 +113,15 @@ def main():
                 "http_status":result.get("http_status"), "turns":response.get("detail",{}).get("turns"),
                 "tokens":response.get("detail",{}).get("total_tokens"), "rows":response.get("execution",{}).get("total_rows"),
                 "client_elapsed_ms":result.get("client_elapsed_ms"), "problems":result["problems"]}, ensure_ascii=False), flush=True)
-            if result["problems"]:
+            if blocking_problems(result, args.record_query_errors):
                 raise SystemExit(2)
+
+
+def blocking_problems(result, record_query_errors=False):
+    problems = list(result.get("problems", []))
+    if record_query_errors and result.get("http_status") in (200, 502) and (result.get("response", {}).get("error") or {}).get("code") == "finance_query_failed":
+        problems = [p for p in problems if p != "request_failed"]
+    return problems
 
 
 if __name__ == "__main__":

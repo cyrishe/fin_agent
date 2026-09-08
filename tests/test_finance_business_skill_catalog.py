@@ -11,6 +11,7 @@ EXPECTED_SKILLS = [
     "market-overview",
     "sector-theme-analysis",
     "stock-research",
+    "equity-report-analysis",
     "earnings-analysis",
     "stock-screening",
     "factor-analysis",
@@ -20,6 +21,20 @@ EXPECTED_SKILLS = [
     "technical-structure-analysis",
     "dividend-analysis",
 ]
+
+
+def test_business_skill_entry_descriptions_match_their_frontmatter() -> None:
+    root = Path("src/skills/finance-business")
+    catalog = json.loads((root / "catalog.json").read_text(encoding="utf-8"))
+    for entry in catalog["skills"]:
+        text = (root / entry["path"] / "SKILL.md").read_text(encoding="utf-8")
+        frontmatter = text.split("---", 2)[1]
+        description = next(
+            line.removeprefix("description: ")
+            for line in frontmatter.splitlines()
+            if line.startswith("description: ")
+        )
+        assert description == entry["description"], entry["id"]
 
 
 def _build_snapshot_fixture(tmp_path: Path) -> tuple[Path, Path, Path]:
@@ -94,7 +109,8 @@ def test_finance_business_catalog_is_the_runtime_skill_source() -> None:
     assert all(item["description"] for item in entries)
     assert all(
         set(item)
-        == {"id", "category", "path", "description", "execution_budget"}
+        == {"id", "category", "path", "description", "execution_budget",
+            "owner", "visibility", "active_revision_no"}
         for item in entries
     )
     assert next(
@@ -451,12 +467,12 @@ def test_frontmatter_identity_mismatch_does_not_replace_active_snapshot(
     assert catalog.runtime_binding() == initial_binding
 
 
-def test_investment_agent_uses_catalog_ids_as_allowlist() -> None:
+def test_investment_agent_discovers_authorized_catalog_without_a_static_allowlist() -> None:
     context = AgentRuntimeService().get_agent_context("investment_analyst")
     runtime_profile = context["runtime_profile"]
 
-    assert runtime_profile["skills"] == EXPECTED_SKILLS
-    assert "stock_deep_dive" not in runtime_profile["skills"]
+    assert "skills" not in context["config"]
+    assert "skills" not in runtime_profile
 
 
 def test_business_skills_keep_method_soft_and_final_control_with_cc() -> None:
@@ -465,8 +481,8 @@ def test_business_skills_keep_method_soft_and_final_control_with_cc() -> None:
     for skill_id in EXPECTED_SKILLS:
         text = (root / skill_id / "SKILL.md").read_text(encoding="utf-8")
         assert f"name: {skill_id}" in text
-        assert "## 数据需求" in text
-        assert "## 回答要求" in text
+        # Methods may choose their own useful section structure; no output schema.
+        assert len(text.split("---", 2)[-1].strip()) > 100
         assert "success" not in text
         assert "active_skill" not in text
         assert "Output Schema" not in text

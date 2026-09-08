@@ -1,0 +1,37 @@
+# Changelog
+
+## 2026-09-08 — Skill 注册体系与金融数据协议整合
+
+### Skill 体系
+
+- 新增 `equity-report-analysis`（个股研报解读），按需读取共识分歧、预测估值、观点修订、事件敏感性等 7 份参考资料。
+- 系统、公开及本人已启用的个人 Skill 共用授权目录；详情、引用、显式 `$` 调用与 Studio 入口使用一致的身份范围。
+- Skill 启用与可见性分别管理，保留版本及归属检查；Agent 未配置 allowlist 时使用授权目录，显式空列表仍表示禁用。
+- 金融问答接入 Skill 正文与参考资料渐进加载，Skill 不授予额外工具权限。数据 API principal 不自动取得网页用户的个人 Skill。
+
+### 主框架与数据工具
+
+- 按 subject → dataview → operation 组织目录与执行包；沿用 7 个主体、31 个视图、47 个方法、5 类操作，精简重复和反向提示。
+- 成分关系明确归类为 constitution；修正热点成分模板、融资融券日期参数说明及窗口 as_of 说明。研报明细说明与聚合说明分开。
+- Python 风格筛选表达式由受控解析器转为参数化查询，保留兼容输入；文本匹配统一为字面包含。模型不编写 SQL。
+- 实时个股行情内部切换行情接口，保持外部协议；合并日线／分钟查询、交易日历与日期扫描的既有修复。
+- Web、API、诊断实例各自持有 DSH worker 上下文，避免共享目录覆盖；保留查询失败和过程用量证据。
+- 已完成的全零结果可省去会被固定回复覆盖的模型生成；减少无订阅者时的展示处理及日志编码开销，保留原始审计数据。
+- 合并管理员统计访问、访客三次额度、临时 API token 与 Codex Skill 单一输入路径修复。
+- 封存的 CC 重建基准保持独立，不随 DSH 优化更新。
+
+### 验证与已知限制
+
+- 本次整合：239 项 Skill／运行时／权限 Python 测试通过；数据协议扩大回归最终 455 通过、2 跳过。初次发现 3 个过期提示词断言，已按当前分层契约更新，而非恢复冗余提示。
+- DSH Node 策略 39 项通过，前端调用资产测试 5 项通过；TypeScript 检查与生产构建通过（存在大 chunk 提示）。
+- `MISSING_CREDENTIAL` 根因：本地测试只有 `DASHSCOPE_API_KEY`，DSH 要求 `LLM_API_KEY`、`LLM_BASE_URL`、`LLM_DEFAULT_MODEL` 配套。`.env.example` 已明确说明；不增加隐式供应商回退，不提交或复制个人密钥。
+- 使用正确的临时进程凭据补测茅台机构共识题：53.412 秒，实际调用了 Skill、两份参考资料、研报查询与结果读取，凭据错误消失；最终 `max-tokens`（配置 8192），完整分析仍未通过。此次不以提高预算掩盖问题，不声称研报问答已完成质量验收。
+- 目录 12 题同题对照并非总体提速证明：模型调用 57→54，但总耗时 389.37→480.77 秒；当日板块聚合范围、空值补查与最终分析延迟仍待优化。
+
+详细记录见 `docs/development_tasks/skill_first_registry_implementation_20260908.md`、`finance_catalog_prompt_refinement_20260908.md`、`financial_qa_dsh_lossless_termination_20260908.md`。
+
+### 部署
+
+- 更新既有 `/home/che/cyris/fin_agent`；先备份服务器工作区及前端产物，保留 `.env`、运行数据与日志。本次不修改 nginx 或迁移数据库。
+- 服务器已有规范 `LLM_API_KEY`；本地配置缺失不意味着服务器缺失。实际供应商可用性与完整问答效果须区分。
+- 代码和前端同步后需重启 `fin-agent-web.service`、`fin-agent-finance-api.service`。部署账号没有免密 sudo 时由管理员执行重启。

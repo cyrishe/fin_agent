@@ -30,10 +30,12 @@ def main() -> None:
     parser.add_argument("--env-file", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--cases", default=",".join(key for key, _ in CASES))
+    parser.add_argument("--cases-file", type=Path, help="JSON list of {id, question}; used without rewriting questions")
     parser.add_argument("--repeat", type=int, default=1)
     parser.add_argument("--execution-mode", choices=["standard", "fast"], default="standard")
     parser.add_argument("--data-only", action="store_true")
     parser.add_argument("--query-reasoning", choices=["low", "off"])
+    parser.add_argument("--empty-result-early-stop", action=argparse.BooleanOptionalAction, default=None)
     args = parser.parse_args()
     root = Path(__file__).resolve().parents[1]
     sys.path.insert(0, str(root))
@@ -48,11 +50,15 @@ def main() -> None:
     output = args.output.resolve()
     output.mkdir(parents=True, exist_ok=True)
     tools = FinanceDataQueryCcTools()
+    policy = {}
+    if args.query_reasoning:
+        policy["budgets"] = {"query": {"reasoningEffort": args.query_reasoning}}
+    if args.empty_result_early_stop is not None:
+        policy["emptyResultEarlyStop"] = args.empty_result_early_stop
     dsh = FinanceDeepSeekHarnessSessionService(
         enabled=True, system_tools=tools, worker_count=1,
         root_dir=output / "runtime", log_path=output / "events.jsonl",
-        loop_policy_config=({"budgets": {"query": {"reasoningEffort": args.query_reasoning}}}
-                            if args.query_reasoning else None),
+        loop_policy_config=policy or None,
     )
     # CC is deliberately not instantiated in this DSH-only replay.
     service = FinancialQaCcService(
@@ -60,11 +66,13 @@ def main() -> None:
         dsh_session_service=dsh,
     )
     selected = set(args.cases.split(","))
+    cases = (
+        [(item["id"], item["question"]) for item in json.loads(args.cases_file.read_text(encoding="utf-8"))]
+        if args.cases_file else [(key, question) for key, question in CASES if key in selected]
+    )
     try:
         for repeat in range(args.repeat):
-            for case_id, question in CASES:
-                if case_id not in selected:
-                    continue
+            for case_id, question in cases:
                 request_id = uuid.uuid4().hex
                 started = time.monotonic()
                 response = service.answer(

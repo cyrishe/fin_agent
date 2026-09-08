@@ -9,12 +9,55 @@ import pytest
 
 from src.experiments.staged_data_protocol.phase2.call_parser import parse_api_call
 from src.experiments.staged_data_protocol.phase2.call_structure import (
+    CallStructureError,
+    parse_filter_expression,
     structure_call,
     validate_call_structure,
 )
 from src.experiments.staged_data_protocol.phase2.call_validator import validate_call
 from src.experiments.staged_data_protocol.phase2.models import ResultHandle
 from src.services.finance_data_tool_runtime_service import FinanceDataToolRuntimeService
+
+
+@pytest.mark.parametrize("field", ["rating_change", "institution", "income", "trading_like_flag"])
+@pytest.mark.parametrize("tail", ["contains '下调'", "not null", "is not null", "between 1 and 2"])
+def test_invalid_word_operators_cannot_split_identifiers(field, tail):
+    with pytest.raises(CallStructureError) as exc:
+        parse_filter_expression(f"{field} {tail}")
+    assert f"field={field}" in str(exc.value)
+    assert "field=rat not in" not in str(exc.value)
+
+
+@pytest.mark.parametrize(("text", "field", "operator", "value"), [
+    ("rating_change = 下调", "rating_change", "=", "下调"),
+    ("rating_change LIKE '%下调%'", "rating_change", "like", "%下调%"),
+    ("institution like '中金'", "institution", "like", "中金"),
+    ("income>=10", "income", ">=", 10),
+    ("trading_like_flag==1", "trading_like_flag", "==", 1),
+    ("code in[1,2]", "code", "in", [1, 2]),
+    ("code IN (1,2)", "code", "in", [1, 2]),
+    ("rating_change != null", "rating_change", "!=", None),
+    ("code not in [1,2]", "code", "not in", [1, 2]),
+])
+def test_operator_tokens_preserve_supported_compatibility(text, field, operator, value):
+    assert parse_filter_expression(text) == {"field": field, "operator": operator, "value": value}
+
+
+def test_invalid_report_predicate_never_reaches_provider(monkeypatch):
+    import src.services.finance_data_tool_runtime_service as runtime_module
+    from src.experiments.staged_data_protocol.phase2.catalog import catalog_source
+
+    def must_not_execute(*args, **kwargs):
+        pytest.fail("An invalid predicate must not become a broader DB query")
+
+    monkeypatch.setattr(runtime_module, "execute_api_call", must_not_execute)
+    result = FinanceDataToolRuntimeService().execute_request(
+        request='r1 = stock.report(filter = "name = 安井食品 and rating_change contains 下调") -> name, rating_change'
+    )
+    assert result["validation"]["ok"] is False
+    errors = " ".join(result["validation"]["errors"])
+    assert "field=rating_change near=contains" in errors
+    assert catalog_source()["filter_syntax"] in errors
 
 
 def test_existing_api_string_is_compiled_without_rewriting_it() -> None:

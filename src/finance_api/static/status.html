@@ -10,8 +10,8 @@
 <div id="groups"></div>
 <section><h2>系统每日用量</h2>
 <div style="padding:18px">
-<p>一次完整对话请求或 MCP 工具调用计一次；Token 汇总请求内部用量。此区域需 API Key，不在浏览器持久保存。</p>
-<div class="toolbar"><input id="usage-key" type="password" autocomplete="off" placeholder="输入 API Key" aria-label="用量统计 API Key"><select id="usage-days" aria-label="统计天数"><option value="7">近7天</option><option value="30" selected>近30天</option><option value="90">近90天</option></select><button id="usage-load">读取统计</button></div>
+<p>一次完整对话请求或 MCP 工具调用计一次；Token 汇总请求内部用量。仅管理员可查看。</p>
+<div class="toolbar"><select id="usage-days" aria-label="统计天数"><option value="7">近7天</option><option value="30" selected>近30天</option><option value="90">近90天</option></select><button id="usage-load">读取统计</button></div>
 <p id="usage-note">尚未加载。均值按已返回用量的完整请求计算，用量缺失不当作0。</p>
 <div id="usage-table" class="scroll"></div>
 </div></section>
@@ -25,8 +25,8 @@ for(const id of ['search','group','only'])$(id).addEventListener('input',render)
 $('usage-load').onclick=async()=>{
   $('usage-note').textContent='读取中…';
   try {
-    const r=await fetch('v1/usage/daily?days='+$('usage-days').value,{headers:{'X-API-Key':$('usage-key').value},cache:'no-store'});
-    if(!r.ok)throw Error(r.status===401?'API Key 无效或未填写':'统计暂不可用（'+r.status+'）');
+    const r=await fetch('v1/usage/daily?days='+$('usage-days').value,{credentials:'same-origin',cache:'no-store'});
+    if(!r.ok)throw Error(r.status===401?'请先登录管理员账号':r.status===403?'仅管理员可查看':'统计暂不可用（'+r.status+'）');
     const result=await r.json();
     $('usage-note').textContent=result.note+' 外部请求采集起点：'+(result.collection_started_at||'未建立')+'；含历史缺口时系统总量显示—，已记录量单独列出。';
     const table=el('table'),head=el('tr');
@@ -40,4 +40,5 @@ $('usage-load').onclick=async()=>{
     table.append(body);$('usage-table').replaceChildren(table);
   }catch(e){$('usage-note').textContent=e.message;$('usage-table').replaceChildren();}
 };
+$('usage-load').click();
 </script></body></html>

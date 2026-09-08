@@ -1,6 +1,6 @@
 ---
 name: market-overview
-description: 综合判断某个证券市场或大盘在指定时点的指数表现、涨跌宽度、成交、风格分化和风险偏好时使用；只查询单个指数、单项市场指标、某条新闻或单只股票时不使用。
+description: 综合判断证券市场或大盘在指定时点的指数表现、涨跌宽度、成交、风格分化和风险偏好。
 allowed-tools:
   - mcp__finance__general_search
 ---

@@ -334,6 +334,9 @@ class SkillAuthoringService:
                 discovery=discovery,
                 run_meta=run_meta,
             )
+            # References are immutable revision assets owned by the system;
+            # this text-only authoring turn contributes a new main method.
+            candidate["references"] = dict(base_candidate.get("references") or {})
             return self.store.save_revision(
                 candidate,
                 owner_id=owner,
@@ -395,7 +398,7 @@ class SkillAuthoringService:
                 "Only use exact tool:<tool_name> and skill:<skill_id> values from capability_catalog.",
                 "SKILL.md frontmatter name must be lowercase ASCII kebab-case; "
                 "use the user's language in headings and body.",
-                "The candidate contains only SKILL.md; do not reference files that are not included.",
+                "Only reference files included in existing_candidate.references; do not invent files.",
                 "Do not claim execution, testing, publication, or permission approval.",
             ],
         }
@@ -405,6 +408,7 @@ class SkillAuthoringService:
                 "revision_no": int(base_candidate.get("revision_no") or 0),
                 "skill_markdown": _trim(base_candidate.get("skill_markdown")),
                 "control_manifest": dict(base_candidate.get("control_manifest") or {}),
+                "references": dict(base_candidate.get("references") or {}),
             }
         previous_output: Dict[str, Any] = {}
         repair_error = ""

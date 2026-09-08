@@ -4,7 +4,8 @@ import json
 import re
 from typing import Any, Dict, Mapping
 
-from src.experiments.staged_data_protocol.phase2.call_parser import parse_api_call
+from src.experiments.staged_data_protocol.phase2.call_parser import parse_api_call, rewrite_argument_text
+from src.experiments.staged_data_protocol.phase2 import python_filter as pf
 from src.experiments.staged_data_protocol.phase2.models import ResultHandle
 
 
@@ -96,6 +97,17 @@ class FinanceResultRegistry:
 
     @staticmethod
     def dependencies(request: str) -> list[str]:
+        try:
+            call = parse_api_call(request)
+            tree = pf.condition(call.args)
+        except ValueError:
+            tree = None
+        if tree is not None:
+            refs = {p["value"]["result"] for p in pf.predicates(tree) if isinstance(p.get("value"), dict)}
+            for key, value in call.args.items():
+                if key != "filter" and isinstance(value, str):
+                    refs.update(name for name, _ in _RESULT_REF_RE.findall(value))
+            return sorted(refs, key=FinanceResultRegistry._sort_key)
         return sorted(
             {result_name for result_name, _ in _RESULT_REF_RE.findall(request)},
             key=FinanceResultRegistry._sort_key,
@@ -116,7 +128,28 @@ class FinanceResultRegistry:
                 )
             return f"{result_name}.{match.group(2)}"
 
-        return _FLOW_REF_RE.sub(replace, request)
+        call = parse_api_call(request)
+        try:
+            tree = pf.condition(call.args)
+        except pf.FilterSyntaxError:
+            tree = None  # Runtime validation owns malformed/legacy conditions.
+        if tree is None:
+            return _FLOW_REF_RE.sub(replace, request)
+        def resolve(p):
+            ref = p.get("value")
+            if isinstance(ref, dict) and ref["result"].startswith("step"):
+                step_number = int(ref["result"][4:])
+                name = _trim(completed_steps.get(step_number))
+                if not name:
+                    raise ValueError(f"FLOW_REF_ERROR: step{step_number} is not a completed earlier step")
+                return {**p, "value": {**ref, "result": name}}
+            return p
+        bound = pf.map_predicates(tree, resolve)
+        def transform(key, value):
+            if key == "filter":
+                return json.dumps(pf.to_source(bound), ensure_ascii=False) if bound != tree else value
+            return _FLOW_REF_RE.sub(replace, value)
+        return rewrite_argument_text(request, transform)
 
     def entries(
         self,
@@ -222,26 +255,20 @@ class FinanceResultRegistry:
         sample_complete = bool(entry.get("sample_complete"))
         if row_count == 0:
             guidance = (
-                "闭环判断：执行成功且返回零行，这是正常的完成状态，不是需要追到非空的错误。"
-                "先核对上方 API、selection_applied、输出字段和时间是否忠实覆盖 goal：若覆盖，"
-                "直接如实回答当前条件下无结果，不改变任何条件；不得放宽筛选、替换对象、换 API、"
-                "换时间模式或拆分查询。只有能明确指出请求与 goal 的具体语义偏差时，才可在保留"
-                "用户原约束的前提下修正该偏差一次。"
+                "执行成功，当前查询条件下未匹配记录；本步按空结果完成。"
+                "保留已执行的对象、时间和筛选条件，如实说明已查范围与零行事实。"
             )
         elif unavailable:
             guidance = (
-                f"闭环判断：执行成功并返回 {row_count} 行；"
+                f"执行成功并返回 {row_count} 行；"
                 f"有值列 {', '.join(available) or '无'} 可直接使用，"
-                f"无值列 {', '.join(unavailable)} 就是当前数据源未提供。"
-                "若上方 API、selection_applied、输出字段和时间与 goal 一致，本步已经完成："
-                "保留身份范围并如实回答缺值，不换 API、切实时模式、放宽条件或查询原始明细。"
-                "只有能明确说出 goal 与请求的具体偏差时才修正。"
+                f"无值列 {', '.join(unavailable)} 在本次结果中缺值。"
+                "本步按返回结果完成，保留可用身份范围与实际缺口，继续尚未完成的目标或组织回答。"
             )
         else:
             guidance = (
-                f"闭环判断：执行成功并返回 {row_count} 行，所请求列均有值。"
-                "若上方 API、selection_applied、输出字段和时间与 goal 一致，本步已经完成，"
-                "进入不同目标或回答；只有具体语义偏差才允许修正。"
+                f"执行成功并返回 {row_count} 行，所请求列均有值。"
+                "本步已完成；使用本结果继续尚未完成的目标，取数目标完成时组织回答。"
             )
         # Completeness is a fact in the adjacent field, not a second assertion
         # embedded in prose: a runtime may project the model-visible sample.

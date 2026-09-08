@@ -12,10 +12,64 @@ from src.experiments.staged_data_protocol.phase2.catalog import (
     catalog_source,
     load_catalog_source,
     resolve_api,
+    concrete_call_pattern,
+    OPERATION_TYPES,
 )
 from src.experiments.staged_data_protocol.phrase1_stage import (
     build_subject_dataview_context,
 )
+
+
+def test_filter_syntax_has_one_source_and_loads_only_with_execution_catalog():
+    service = FinanceDataToolCatalogService()
+    syntax = catalog_source()["filter_syntax"]
+    for view in ("report", "report_metric"):
+        for operation in ("query", "aggregate"):
+            model = service.get_model_dataview("stock", view, operation=operation)
+            assert model["filter_syntax"] == syntax
+            assert json.dumps(model, ensure_ascii=False).count(syntax) == 1
+    assert "filter_syntax" not in json.dumps(service.get_subject("stock"), ensure_ascii=False)
+
+
+def test_model_catalog_uses_one_fuzzy_match_without_prefix_suffix_guidance():
+    service = FinanceDataToolCatalogService()
+    for subject, views in catalog_source()['subjects'].items():
+        for view in views:
+            if view.startswith('_'):
+                continue
+            model = service.get_model_dataview(subject, view)
+            text = json.dumps(model, ensure_ascii=False)
+            assert 'startswith' not in text and 'endswith' not in text
+    syntax = catalog_source()['filter_syntax']
+    assert "'文本' in field" in syntax
+    assert 'like' not in syntax
+    finance = service.get_model_dataview('stock', 'financial_3_table', operation='query')
+    text = json.dumps(finance, ensure_ascii=False)
+    assert '年度数据筛选每年12月31日' not in text
+    assert '年度数据用各年的12月31日' not in text
+
+
+def test_legacy_step_context_loads_same_filter_syntax():
+    from src.experiments.staged_data_protocol.phase2.context_builder import build_context_sections
+    from src.experiments.staged_data_protocol.phase2.models import Step
+    sections = build_context_sections(
+        step=Step(step_id="S1", subject="stock", dataview="report", condition_desc="评级", raw="研报"),
+        previous_results={},
+    )
+    assert catalog_source()["filter_syntax"] in sections["current_dataview"]
+
+
+def test_report_metric_detail_guidance_stays_with_detail_operation():
+    service = FinanceDataToolCatalogService()
+    detail = service.get_model_dataview("stock", "report_metric", operation="query")
+    aggregate = service.get_model_dataview("stock", "report_metric", operation="aggregate")
+
+    assert [item["api_name"] for item in detail["functions"]] == ["stock.report_metric"]
+    assert [item["api_name"] for item in aggregate["functions"]] == ["stock.report_metric.agg"]
+    assert "原始" in detail["functions"][0]["api_function"]
+    assert "明细对比" not in json.dumps(aggregate["functions"], ensure_ascii=False)
+    assert "仍使用明细查询" not in json.dumps(aggregate["functions"], ensure_ascii=False)
+    assert aggregate["available_operations"]["query"] == "stock.report_metric"
 
 
 def _catalog_payload(*, desc: str = "行情视图") -> Dict[str, Any]:
@@ -68,6 +122,17 @@ def _catalog_payload(*, desc: str = "行情视图") -> Dict[str, Any]:
 
 def _write_catalog(path: Path, payload: Dict[str, Any]) -> None:
     path.write_text(json.dumps(payload, ensure_ascii=False), encoding="utf-8")
+
+
+@pytest.mark.parametrize("argument, expected", [("filter", True), ("prefilter", False)])
+def test_filter_syntax_requires_exact_declared_argument(tmp_path, argument, expected):
+    payload = _catalog_payload()
+    payload["filter_syntax"] = "catalog-owned syntax"
+    payload["api_class_patterns"]["shared_query"]["args"]["optional"] = [argument]
+    path = tmp_path / "catalog.json"
+    _write_catalog(path, payload)
+    model = FinanceDataToolCatalogService(catalog_path=str(path)).get_model_dataview("stock", "quote")
+    assert ("filter_syntax" in model) is expected
 
 
 def _without_empty_values(value: Any) -> Any:
@@ -164,7 +229,7 @@ def test_catalog_snapshot_preserves_legacy_tree_subject_and_dataview_shapes(
     }
 
 
-def test_model_dataview_deduplicates_contracts_without_losing_semantics(
+def test_model_dataview_assembles_complete_contracts_without_losing_semantics(
     tmp_path: Path,
 ) -> None:
     catalog_path = tmp_path / "catalog.json"
@@ -188,30 +253,18 @@ def test_model_dataview_deduplicates_contracts_without_losing_semantics(
         model_field = model["fields"][field["name"]]
         assert model_field.get("aliases", []) == field["aliases"]
         assert model_field.get("desc", "") == field["desc"]
-    assert model["functions"] == [
-        {
-            "api_name": "stock.quote",
-            "api_function": "查询行情",
-            "api_class": "shared_query",
-            "operation": "query",
-            "examples": ["r1 = stock.quote(filter = code = 1) -> code, close"],
-        },
-        {
-            "api_name": "stock.quote.agg",
-            "api_function": "聚合行情",
-            "api_class": "shared_query",
-            "operation": "aggregate",
-        },
-    ]
-    assert list(model["api_classes"]) == ["shared_query"]
-    assert model["api_classes"]["shared_query"] == {
-        "desc": "共享查询合约",
-        "request_pattern": "r{id} = {api_name}(filter) -> fields",
-        "methods": ["sum", "mean"],
-        "args": {"optional": ["filter"]},
-        "rules": ["只能使用目录字段"],
-        "output_rule": "输出字段必须来自当前视图",
-    }
+    assert [function["operation"] for function in model["functions"]] == ["query", "aggregate"]
+    assert "api_classes" not in model
+    for actual, source in zip(model["functions"], full["functions"]):
+        assert actual["api_name"] == source["api_name"]
+        assert actual["api_function"] == source["api_function"]
+        assert "api_class" not in actual
+        assert actual["request_pattern"] == f"r{{id}} = {actual['api_name']}(filter=...) -> fields"
+        assert actual["args"] == {"optional": ["filter"]}
+        assert actual["methods"] == ["sum", "mean"]
+        assert actual["rules"] == ["只能使用目录字段"]
+        assert actual["output_rule"] == "输出字段必须来自当前视图"
+    assert model["functions"][0]["examples"] == ["r1 = stock.quote(filter = code = 1) -> code, close"]
     for key in ("kd", "computed", "aggregate_fields", "value_domains"):
         assert model[key] == full[key]
     assert "field_count" not in model
@@ -238,34 +291,27 @@ def test_model_dataview_is_smaller_for_representative_real_views(
     assert set(model["fields"]) == {field["name"] for field in full["fields"]}
     assert model.get("rules", []) == full["rules"]
     assert model.get("examples", []) == full["examples"]
-    assert model["functions"] == [
-        {
-            key: function[key]
-            for key in (
-                "api_name",
-                "api_function",
-                "api_class",
-                "operation",
-                "examples",
-            )
-            if function.get(key)
-        }
-        for function in full["functions"]
-    ]
-    for function in full["functions"]:
-        contract = model["api_classes"][function["api_class"]]
-        assert contract.get("request_pattern", "") == function["request_pattern"]
-        assert contract.get("methods", []) == function["methods"]
+    assert "api_classes" not in model
+    for function, contract in zip(full["functions"], model["functions"]):
+        assert contract["api_name"] == function["api_name"]
+        assert contract["operation"] == function["operation"]
+        assert contract["request_pattern"] == concrete_call_pattern(function["api_name"], function["request_pattern"])
+        if contract["operation"] == "window":
+            assert "methods" not in contract
+            assert model["kd"] == full["kd"]
+        else:
+            assert contract.get("methods", []) == function["methods"]
         assert contract.get("args", {}) == _without_empty_values(function["args"])
         assert contract.get("rules", []) == function["rules"]
         assert contract.get("output_rule", "") == function["output_rule"]
-        assert "examples" not in contract
         assert model["functions"][full["functions"].index(function)].get(
             "examples", []
-        ) == function["examples"]
+        ) == [e.split("\nnote:", 1)[0].strip() for e in function["examples"]]
     for key in ("kd", "computed", "aggregate_fields", "value_domains"):
         assert model.get(key, {}) == full[key]
-    full_size = len(json.dumps(full, ensure_ascii=False))
+    # Compare the same information: the historical editor/tree shape predates
+    # the catalog-owned syntax now required in executable model packs.
+    full_size = len(json.dumps({**full, "filter_syntax": model.get("filter_syntax")}, ensure_ascii=False))
     model_size = len(json.dumps(model, ensure_ascii=False))
     assert model_size <= full_size * (1 - minimum_reduction)
 
@@ -290,9 +336,9 @@ def test_production_catalog_is_the_runtime_source_and_examples_are_operation_exa
         "stock", "financial_3_table", "query"
     )
     assert financial_query["value_domains"] == financial_view["value_domains"]
-    assert "不表示年报" in financial_query["fields"]["statement_type"]["desc"]
+    assert "累计/单季" in financial_query["fields"]["statement_type"]["desc"]
     assert any(
-        "report_period in (2022-12-31" in example
+        "report_period in ['2022-12-31'" in example
         for example in financial_query["functions"][0]["examples"]
     )
     assert "news" not in raw["subjects"]["stock"]
@@ -346,17 +392,19 @@ def test_production_catalog_is_the_runtime_source_and_examples_are_operation_exa
                 assert [item["api_name"] for item in projection["functions"]] == [
                     functions[0]["api_name"]
                 ]
-                assert set(projection["api_classes"]) == {
-                    projection["functions"][0]["api_class"]
-                }
-                assert projection["functions"][0]["examples"] == functions[0]["examples"]
-                assert projection["functions"][0].get("guidance", []) == functions[0].get(
-                    "guidance", []
-                )
-                assert all(
-                    "examples" not in contract
-                    for contract in projection.get("api_classes", {}).values()
-                )
+                contract = projection["functions"][0]
+                source_class = raw["api_class_patterns"][functions[0]["api_class"]]
+                assert "api_classes" not in projection and "api_class" not in contract
+                assert contract["request_pattern"] == concrete_call_pattern(contract["api_name"], source_class["call_pattern"])
+                assert contract.get("args", {}) == _without_empty_values(source_class["args"])
+                assert projection["functions"][0]["examples"] == [
+                    e.split("\nnote:", 1)[0].strip() for e in functions[0]["examples"]
+                ]
+                guidance = projection["functions"][0].get("guidance", [])
+                assert guidance[:len(functions[0].get("guidance", []))] == functions[0].get("guidance", [])
+                for index, example in enumerate(functions[0]["examples"], 1):
+                    if "\nnote:" in example:
+                        assert f"示例 {index}：{example.split(chr(10) + 'note:', 1)[1].strip()}" in guidance
                 assert "examples" not in projection
                 if operation != "window":
                     assert "kd" not in projection
@@ -384,19 +432,15 @@ def test_operation_projection_does_not_mix_sibling_execution_guidance() -> None:
         "stock", "report_metric", "aggregate"
     )
 
-    assert "历史明细" in "".join(margin_query["functions"][0]["guidance"])
+    assert "历史区间" in "".join(margin_query["functions"][0]["rules"])
     assert "K 日窗口" not in json.dumps(margin_query, ensure_ascii=False)
-    assert "K 日窗口" in "".join(margin_window["functions"][0]["guidance"])
+    assert "K 日窗口" in margin_window["functions"][0]["api_function"]
     assert "历史明细" not in json.dumps(margin_window, ensure_ascii=False)
-    assert "latest 不是聚合方法" in "".join(
-        report_query["functions"][0]["guidance"]
-    )
-    assert "latest 不是聚合方法" not in json.dumps(
-        report_aggregate, ensure_ascii=False
-    )
+    assert report_query["functions"][0]["api_name"] == "stock.report"
+    assert report_aggregate["functions"][0]["api_name"] == "stock.report.agg"
     assert "聚合 metric_value" not in json.dumps(metric_query, ensure_ascii=False)
     assert "聚合 metric_value" in "".join(
-        metric_aggregate["functions"][0]["guidance"]
+        metric_aggregate["functions"][0]["rules"]
     )
     for operation in ("window", "aggregate", "compute"):
         quote = service.get_model_dataview("stock", "quote", operation)
@@ -405,19 +449,11 @@ def test_operation_projection_does_not_mix_sibling_execution_guidance() -> None:
         assert "period=1/3/5/10/15/30/60与count=根数" not in serialized
 
 
-def test_selected_dataview_pack_inherits_subject_guidance() -> None:
-    plate = FinanceDataToolCatalogService().get_model_dataview(
-        "plate", "basic_info", "query"
-    )
-
-    assert any(
-        "plate_name = 名称" in rule
-        for rule in plate["subject_guidance"]
-    )
-    assert any(
-        "不得因零行自动增加百分号" in rule
-        for rule in plate["subject_guidance"]
-    )
+def test_selected_dataview_pack_preserves_declared_subject_guidance(tmp_path: Path) -> None:
+    catalog_path = tmp_path / "catalog.json"
+    _write_catalog(catalog_path, _catalog_payload())
+    model = FinanceDataToolCatalogService(catalog_path=str(catalog_path)).get_model_dataview("stock", "quote", "query")
+    assert model["subject_guidance"] == ["股票规则"]
 
 
 def test_runtime_catalog_source_is_recursively_immutable() -> None:
@@ -489,11 +525,75 @@ def test_legacy_stage1_routing_uses_the_complete_description(
     assert "不应使用的旧摘要" not in routing
 
 
-def test_financial_trend_rule_forbids_mixing_cumulative_and_single_quarter() -> None:
+def test_financial_period_and_statement_granularity_are_defined() -> None:
     view = FinanceDataToolCatalogService().get_model_dataview(
         "stock", "financial_3_table", "query"
     )
 
     rules = "\n".join(view["rules"])
-    assert "默认HB是年初至报告期累计值" in rules
-    assert "不得把不同季度的累计值称为单季值" in rules
+    assert "statement_type=HB" in rules and "年初至报告期累计" in rules
+    assert "累计口径" in view["value_domains"]["statement_type"]["HB"]
+    assert "单季口径" in view["value_domains"]["statement_type"]["HBDJ"]
+
+
+@pytest.mark.parametrize("subject", ["index", "industry", "plate"])
+def test_constitution_is_distinct_with_legacy_query_compatibility(subject: str) -> None:
+    service = FinanceDataToolCatalogService()
+    model = service.get_model_dataview(subject, "constitution", "constitution")
+    assert model == service.get_model_dataview(subject, "constitution", "query")
+    assert model["selected_operation"] == "constitution"
+    assert model["available_operations"] == {"constitution": f"{subject}.constitution", "aggregate": f"{subject}.constitution.agg"}
+    assert model["functions"][0]["api_name"] == f"{subject}.constitution"
+    assert f"{subject}_code" in model["functions"][0]["request_pattern"]
+    assert "{subject_code_field}" not in json.dumps(model)
+    resolved = resolve_api(f"{subject}.constitution")
+    assert resolved["type"] == "base" and resolved["operation"] == "constitution"
+    assert resolve_api(f"{subject}.constitution.agg")["operation"] == "aggregate"
+
+
+def test_invalid_operation_still_rejected_and_quote_modes_match_execution() -> None:
+    from src.experiments.staged_data_protocol.phase2.call_structure import stock_quote_provider_fields
+    from src.services.finance_data_tool_catalog_service import FinanceDataToolCatalogError
+
+    assert OPERATION_TYPES == {"query", "constitution", "aggregate", "window", "compute"}
+    service = FinanceDataToolCatalogService()
+    for operation in ("constitution", "missing"):
+        with pytest.raises(FinanceDataToolCatalogError):
+            service.get_model_dataview("stock", "quote", operation)
+    quote = service.get_model_dataview("stock", "quote", "query")
+    for mode in (0, 1, 2):
+        declared = {name for name, field in quote["fields"].items() if mode in field["modes"]}
+        assert declared == set(quote["fields"]) & stock_quote_provider_fields(mode=mode)
+    window = service.get_model_dataview("stock", "quote", "window")
+    assert all("modes" not in field for field in window["fields"].values())
+
+
+def test_quote_examples_execute_with_the_agent_tool_argument_contract() -> None:
+    import ast
+    from src.experiments.staged_data_protocol.phase2.call_parser import parse_api_call
+    from src.experiments.staged_data_protocol.phase2.call_structure import validate_call_structure
+
+    view = FinanceDataToolCatalogService().get_model_dataview("stock", "quote", "query")
+    for example in view["functions"][0]["examples"]:
+        call = parse_api_call(example)
+        assert validate_call_structure(call, previous_results={}) == []
+        # Agent flows pass requests and previous result refs, not SDK bindings.
+        if "codes" in call.args:
+            assert isinstance(ast.literal_eval(call.args["codes"]), list)
+
+
+def test_coding_pack_preserves_operation_and_field_domains(tmp_path: Path) -> None:
+    from src.services.custom_tool_context_bundle_service import CustomToolContextBundleService
+
+    service = CustomToolContextBundleService(root_dir=str(tmp_path))
+    raw = load_catalog_source()
+    for subject, name in [("stock", "report_metric"), ("plate", "constitution")]:
+        source = raw["subjects"][subject][name]
+        pack = service._compact_dataview(subject=subject, dataview=name, definition=source, patterns=raw["api_class_patterns"])
+        assert pack["filter_syntax"] == raw["filter_syntax"]
+        for key in ("aggregate_fields", "value_domains"):
+            assert pack.get(key, {}) == source.get(key, {})
+        for method in pack["methods"]:
+            assert method["operation"] == resolve_api(method["name"])["operation"]
+            assert "{api_name}" not in method["call"]
+            assert "filter=..." in method["call"]

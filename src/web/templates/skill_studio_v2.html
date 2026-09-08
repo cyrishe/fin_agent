@@ -126,7 +126,7 @@
       <p class="sidebar-copy">创建新的 CC-native Skill 候选，并查看 Finance CC 当前真正可用的方法。候选不会自动发布。</p>
       <div class="sidebar-section">我的候选</div>
       <div id="candidateList" class="skill-list" aria-live="polite"></div>
-      <div class="sidebar-section">已发布方法</div>
+      <div class="sidebar-section">可用方法 · system / public / private</div>
       <input id="skillSearch" class="search" type="search" placeholder="搜索名称、用途或分类" aria-label="搜索 Skill">
       <div id="skillList" class="skill-list" aria-live="polite"></div>
     </aside>
@@ -161,6 +161,11 @@
             </div>
             <div id="candidateChips" class="chips"></div>
           </div>
+          <div class="actions">
+            <button id="activateCandidateBtn" class="btn primary" type="button">启用当前候选</button>
+            <button id="candidateVisibilityBtn" class="btn" type="button" disabled>公开当前启用版本</button>
+          </div>
+          <p id="activationState" class="authoring-state" aria-live="polite">启用后可在当前账户通过 $ 调用；公开分享独立设置。</p>
         </section>
 
         <section class="panel">
@@ -248,7 +253,7 @@
           <div class="state-grid">
             <div class="state-card"><strong>自然语言创建</strong><span>待接入 `/create_skill` 与 Skill Creator，会生成 candidate，而不是直接覆盖 active。</span></div>
             <div class="state-card"><strong>测试与对比</strong><span>待绑定 revision 运行测试，并比较 with-skill / without-skill 的质量、成本与延迟。</span></div>
-            <div class="state-card"><strong>发布与回滚</strong><span>待 active/candidate 持久化完成后开放；当前页面不会假装已经支持写入。</span></div>
+            <div class="state-card"><strong>启用与分享</strong><span>在“我的候选”中启用版本，再选择 private 或 public。启用不会自动公开。</span></div>
           </div>
         </section>
       </div>
@@ -367,6 +372,8 @@
         description: candidate.description,
         revision_no: candidate.revision_no,
         candidate_revision_no: candidate.candidate_revision_no || candidate.revision_no,
+        active_revision_no: candidate.active_revision_no || 0,
+        visibility: candidate.visibility || "private",
         change_summary: candidate.change_summary,
         created_at: candidate.created_at,
         tool_count: Array.isArray(control.tool_connections) ? control.tool_connections.length : candidate.tool_count || 0,
@@ -415,8 +422,12 @@
       const chips = document.getElementById("candidateChips");
       chips.replaceChildren();
       chip(chips, `revision ${candidate.revision_no || 1}`, true);
-      chip(chips, candidate.published ? "published" : "candidate only");
+      chip(chips, candidate.active_revision_no ? `active r${candidate.active_revision_no}` : "尚未启用");
+      chip(chips, candidate.visibility || "private");
       chip(chips, String(candidate.content_hash || "").slice(0, 10) || "no hash");
+      document.getElementById("activateCandidateBtn").disabled = Number(candidate.active_revision_no) === Number(candidate.revision_no);
+      document.getElementById("candidateVisibilityBtn").disabled = !candidate.active_revision_no;
+      document.getElementById("candidateVisibilityBtn").textContent = candidate.visibility === "public" ? "设为仅自己可用" : "公开当前启用版本";
 
       const control = candidate.control_manifest || {};
       renderBindings("candidateTools", control.tool_connections || [], "tool_name", "这个候选不需要额外 Tool。 ");
@@ -503,13 +514,14 @@
       chips.replaceChildren();
       chip(chips, detail.category || "未分类");
       chip(chips, detail.owner || "system");
+      chip(chips, detail.scope || (detail.owner === "system" ? "system" : detail.visibility || "private"));
       chip(chips, detail.availability?.lifecycle || "active", true);
       chip(chips, detail.editable ? "可编辑" : "只读快照");
 
       const facts = document.getElementById("factGrid");
       facts.replaceChildren();
       fact(facts, "Skill ID", detail.skill_id || detail.skill_name);
-      fact(facts, "选择方式", detail.invocation_mode === "finance_cc_preference" ? "Finance CC 语义选择" : detail.invocation_mode);
+      fact(facts, "选择方式", detail.skill_type === "business_method" ? "Agent 自动选择 / $ 显式调用" : detail.invocation_mode);
       fact(facts, "当前修订", String(detail.revision || detail.snapshot_revision || "兼容资产").slice(0, 12));
       fact(facts, "参考资料", `${Array.isArray(detail.references) ? detail.references.length : 0} 份`);
 
@@ -549,9 +561,40 @@
 
     function dialoguePrompt() {
       const detail = state.detail || {};
-      const displayName = detail.display_name || detail.skill_name || "该 Skill";
-      return `请按照“${displayName}”这一专业方法，围绕我的问题进行分析：`;
+      return `$${detail.skill_id || detail.skill_name} `;
     }
+
+    async function updateCandidateAvailability(action) {
+      const candidate = state.currentCandidate;
+      if (!candidate?.skill_id) return;
+      const button = document.getElementById(action === "activate" ? "activateCandidateBtn" : "candidateVisibilityBtn");
+      const stateNode = document.getElementById("activationState");
+      button.disabled = true;
+      try {
+        const body = { expected_active_revision: Number(candidate.active_revision_no || 0) };
+        if (action === "activate") body.expected_candidate_revision = Number(candidate.revision_no);
+        else body.visibility = candidate.visibility === "public" ? "private" : "public";
+        const payload = await fetchJson(`${resolveUrl(apiCandidateBaseUrl)}/${encodeURIComponent(candidate.skill_id)}/${action}`, {
+          method: action === "activate" ? "POST" : "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body),
+        });
+        const updated = payload.candidate || {};
+        renderCandidate(updated);
+        state.candidates = [candidateSummary(updated), ...state.candidates.filter((item) => item.skill_id !== updated.skill_id)];
+        const catalog = await fetchJson(resolveUrl(apiCatalogUrl));
+        state.items = catalog.items || [];
+        renderCandidateList();
+        renderSkillList();
+        stateNode.textContent = `active r${updated.active_revision_no} · ${updated.visibility || "private"}，可通过 $${updated.skill_id} 使用。`;
+      } catch (error) {
+        stateNode.textContent = String(error.message || error);
+        button.disabled = false;
+      }
+    }
+
+    document.getElementById("activateCandidateBtn").addEventListener("click", () => updateCandidateAvailability("activate"));
+    document.getElementById("candidateVisibilityBtn").addEventListener("click", () => updateCandidateAvailability("visibility"));
 
     document.getElementById("skillSearch").addEventListener("input", renderSkillList);
     document.getElementById("copyPromptBtn").addEventListener("click", async () => {

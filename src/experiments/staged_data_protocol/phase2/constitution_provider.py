@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from src.experiments.staged_data_protocol.phase2 import python_filter as pf
+
 import os
 import re
 import statistics
@@ -311,6 +313,11 @@ def execute_constitution_agg_api(
                 rows=[],
                 reason=f"previous result has no rows: {result_name}",
             )
+        if pf.condition(args) is not None:
+            tree = pf.condition(args)
+            pf.require_separable(tree, [set(source.fields), set(metric_handle.columns)])
+            metric_tree = pf.project(tree, set(metric_handle.columns))
+            metric_rows = [row for row in metric_rows if pf.evaluate(metric_tree, row)]
     else:
         result_name = agg_spec.metric
         stock_codes = _unique([_code_key(row.get("stock_code")) for row in constitution_rows if isinstance(row, Mapping)])
@@ -522,6 +529,8 @@ def _query_financial_metric_rows(*, source: Any, field_name: str, args: Mapping[
     if report_date:
         date_sql = "i.report_period = %s"
         date_params: list[Any] = [report_date]
+    elif any(f in {"report_date", "report_period"} for _, f, _, _ in _metric_explicit_filters(args)):
+        date_sql, date_params = "1=1", []
     else:
         date_sql = "i.report_period = (SELECT MAX(report_period) FROM kcrp_stock_income)"
         date_params = []
@@ -559,7 +568,7 @@ def _metric_market_where(*, source: Any, args: Mapping[str, Any], stock_codes: l
     if exact_date:
         clauses.append(f"{source.fields['tradedate']} = %s")
         params.append(exact_date)
-    else:
+    elif not any(source.fields.get(f) == source.fields['tradedate'] for _, f, _, _ in _metric_explicit_filters(args)):
         clauses.append(f"{source.fields['tradedate']} = (SELECT MAX(trade_date) FROM {source.table})")
     code_sql, code_params = _code_in_sql(source.fields["code"], stock_codes)
     clauses.append(code_sql)
@@ -572,6 +581,8 @@ def _metric_market_where(*, source: Any, args: Mapping[str, Any], stock_codes: l
 
 
 def _metric_filter_clauses(*, fields: Mapping[str, str], args: Mapping[str, Any], allowed: set[str]) -> tuple[str, list[Any]]:
+    if pf.condition(args) is not None:
+        return pf.sql_filter(args, fields, allowed=allowed)
     clauses: list[str] = []
     params: list[Any] = []
     for connector, field_name, op, value in _metric_explicit_filters(args):
@@ -596,6 +607,8 @@ def _metric_filter_clauses(*, fields: Mapping[str, str], args: Mapping[str, Any]
 
 
 def _metric_explicit_filters(args: Mapping[str, Any]) -> list[tuple[str, str, str, Any]]:
+    if pf.condition(args) is not None:
+        return pf.leaf_items(args)
     rows: list[tuple[str, str, str, Any]] = []
     filter_text = str(args.get("filter") or "").strip()
     for match in FILTER_RE.finditer(filter_text):
@@ -713,7 +726,7 @@ def _output_token(output: str) -> str:
 
 
 def _has_unresolved_ref(args: Mapping[str, Any]) -> bool:
-    return any(isinstance(value, str) and re.search(r"\br\d+\.", value) for value in args.values())
+    return pf.has_unresolved_refs(args)
 
 
 def _constitution_hard_row_limit() -> int:
@@ -820,6 +833,17 @@ def _build_where(*, source: ConstitutionSource, args: Mapping[str, Any]) -> tupl
 
 
 def _build_filter_clauses(*, source: ConstitutionSource, args: Mapping[str, Any]) -> tuple[str, List[Any]]:
+    if pf.condition(args) is not None:
+        def leaf(p):
+            field, op, value = p["field"], p["operator"], p["value"]
+            if source.subject == "industry" and field in {"industry_code", "industry_name"} and op in {"=", "==", "in"}:
+                return _industry_filter_sql(field_name=field, op=op, value=value)
+            values = _equivalent_filter_values(source=source, field_name=field, value=value)
+            if op in {"=", "=="} and len(values) > 1:
+                p = {**p, "operator": "in", "value": values}
+            return pf.compile_predicate(p, source.fields)
+        return pf.and_sql(_build_filter_clauses(source=source, args=pf.without_filter(args)),
+                          pf.sql_filter(args, source.fields, allowed=set(source.fields), leaf=leaf))
     clauses: List[str] = []
     params: List[Any] = []
     for connector, field_name, op, value in _explicit_filters(source=source, args=args):
@@ -900,6 +924,8 @@ def _ignored_filters(*, source: ConstitutionSource, args: Mapping[str, Any]) -> 
 
 
 def _explicit_filters(*, source: ConstitutionSource, args: Mapping[str, Any]) -> List[tuple[str, str, str, Any]]:
+    if pf.condition(args) is not None:
+        return _explicit_filters(source=source, args=pf.without_filter(args)) + pf.leaf_items(args)
     rows: List[tuple[str, str, str, Any]] = []
     for raw_field in source.fields:
         value = args.get(raw_field)

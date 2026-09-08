@@ -157,4 +157,14 @@ describe("invocable asset API", () => {
     });
     expect(requestBody.research_mode).toBe("auto");
   });
+
+  it("keeps authorized private business methods returned by the unified catalog", async () => {
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(jsonResponse({ ok: true, items: [{
+      ref: "skill:my-report-method", kind: "skill", name: "my-report-method",
+      skill_type: "business_method", auth: "private", invocation_enabled: true,
+    }] })));
+    await expect(loadInvocationAssets()).resolves.toEqual([
+      expect.objectContaining({ ref: "skill:my-report-method", invocation: "$my-report-method" }),
+    ]);
+  });
 });

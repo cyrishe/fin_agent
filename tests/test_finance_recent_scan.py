@@ -176,7 +176,7 @@ def test_explicit_daily_range_is_unchanged_by_probe_switch(monkeypatch):
     assert result['sql_shape']['recent_scan'] == {}
 
 
-@pytest.mark.parametrize('subject, expected_probe', [('stock', False), ('index', True), ('fund', True), ('bond', True), ('plate', True)])
+@pytest.mark.parametrize('subject, expected_probe', [('stock', False), ('index', False), ('fund', False), ('bond', False), ('plate', False)])
 def test_default_quote_probe_follows_physical_template(monkeypatch, subject, expected_probe):
     from src.experiments.staged_data_protocol.phase2 import quote_provider as q
     monkeypatch.delenv('FIN_AGENT_RECENT_SCAN_ENABLED')

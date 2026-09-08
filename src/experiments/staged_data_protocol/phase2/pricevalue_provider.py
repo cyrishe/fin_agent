@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from src.experiments.staged_data_protocol.phase2 import python_filter as pf
+
 import re
 from dataclasses import dataclass
 from datetime import date, datetime
@@ -329,7 +331,7 @@ def _output_token(output: str) -> str:
 
 
 def _has_unresolved_ref(args: Mapping[str, Any]) -> bool:
-    return any(isinstance(value, str) and re.search(r"\br\d+\.", value) for value in args.values())
+    return pf.has_unresolved_refs(args)
 
 
 def _bounded_limit(value: Any) -> int:
@@ -399,6 +401,11 @@ def _build_where(*, source: PricevalueSource, args: Mapping[str, Any]) -> tuple[
 
 
 def _build_identity_where(*, source: PricevalueSource, args: Mapping[str, Any]) -> tuple[str, List[Any]]:
+    if pf.condition(args) is not None:
+        direct = _build_identity_where(source=source, args=pf.without_filter(args))
+        sql, params = pf.and_sql((direct[0].removeprefix("AND "), direct[1]),
+                                pf.sql_filter(args, source.fields, allowed={"code", "name"}))
+        return (f"AND ({sql})" if sql else ""), params
     clauses: List[str] = []
     params: List[Any] = []
     for connector, field_name, op, value in _explicit_filters(source=source, args=args):
@@ -425,6 +432,9 @@ def _build_identity_where(*, source: PricevalueSource, args: Mapping[str, Any]) 
 
 
 def _build_filter_clauses(*, source: PricevalueSource, args: Mapping[str, Any]) -> tuple[str, List[Any]]:
+    if pf.condition(args) is not None:
+        return pf.and_sql(_build_filter_clauses(source=source, args=pf.without_filter(args)),
+                          pf.sql_filter(args, source.fields, allowed=set(source.fields)))
     clauses: List[str] = []
     params: List[Any] = []
     for connector, field_name, op, value in _explicit_filters(source=source, args=args):
@@ -458,6 +468,8 @@ def _ignored_filters(*, source: PricevalueSource, args: Mapping[str, Any]) -> Li
 
 
 def _explicit_filters(*, source: PricevalueSource, args: Mapping[str, Any]) -> List[tuple[str, str, str, Any]]:
+    if pf.condition(args) is not None:
+        return _explicit_filters(source=source, args=pf.without_filter(args)) + pf.leaf_items(args)
     rows: List[tuple[str, str, str, Any]] = []
     for field_name in source.fields:
         value = args.get(field_name)
@@ -709,6 +721,9 @@ def _normalize_kd_metric_row(row: Mapping[str, Any], *, source: PricevalueSource
 
 
 def _filter_kd_rows(rows: List[Dict[str, Any]], *, args: Mapping[str, Any], field: str) -> List[Dict[str, Any]]:
+    tree = pf.condition(args)
+    if tree is not None:
+        return [row for row in rows if pf.evaluate(tree, row)]
     allowed = {"value", "k", "end_date", "tradedate", "current_value", field}
     filters = [item for item in _explicit_filters(source=_filter_source(allowed), args=args) if item[1] in allowed]
     result = rows

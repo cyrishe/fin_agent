@@ -12,6 +12,8 @@ from typing import Any, Dict, List, Mapping, Optional, Sequence
 
 from src.experiments.staged_data_protocol.phase2.catalog import (
     CATALOG_PATH,
+    OPERATION_TYPES,
+    concrete_call_pattern,
     operation_examples,
     operation_for_api_pattern,
     resolve_api,
@@ -251,11 +253,10 @@ class FinanceDataToolCatalogService:
         dataview: str,
         operation: str = "",
     ) -> Dict[str, Any]:
-        """Return one model-facing dataview without repeated API-class contracts.
+        """Assemble complete method contracts from the shared catalog templates.
 
-        The full catalog/tree APIs intentionally keep their historical shape for
-        editors and renderers. This projection only removes empty/count values and
-        moves shared API-class details behind references from ``functions``.
+        Editors retain the source/template shape. Models receive the selected
+        method's signature, parameters, output and conventions together.
         """
 
         normalized_subject = self._trim(subject)
@@ -274,10 +275,25 @@ class FinanceDataToolCatalogService:
         normalized_operation = self._trim(operation)
         if not normalized_operation:
             return model
-        if normalized_operation not in {"query", "aggregate", "window", "compute"}:
+        # Navigation is not an execution contract. Keep exact sibling entry
+        # names visible when expanding only one operation's detailed contract.
+        model["available_operations"] = {
+            self._trim(item.get("operation")): self._trim(item.get("api_name"))
+            for item in model.get("functions") or []
+            if self._trim(item.get("operation")) and self._trim(item.get("api_name"))
+        }
+        if normalized_operation not in OPERATION_TYPES:
             raise FinanceDataToolCatalogError(
                 f"unsupported finance catalog operation: {normalized_operation}"
             )
+        # Old catalog callers selected relationship details as query. Preserve
+        # that input while advertising the business category constitution.
+        if (
+            normalized_operation == "query"
+            and "query" not in model["available_operations"]
+            and "constitution" in model["available_operations"]
+        ):
+            normalized_operation = "constitution"
         functions = [
             item
             for item in model.get("functions") or []
@@ -296,19 +312,13 @@ class FinanceDataToolCatalogService:
                 f"operation={normalized_operation} is not available for "
                 f"{normalized_subject}.{normalized_view}; available={available}"
             )
-        api_classes = {
-            self._trim(item.get("api_class"))
-            for item in functions
-            if self._trim(item.get("api_class"))
-        }
         model["functions"] = functions
-        model["api_classes"] = {
-            name: value
-            for name, value in (model.get("api_classes") or {}).items()
-            if name in api_classes
-        }
+        if normalized_operation != "query":
+            for field in model.get("fields", {}).values():
+                field.pop("modes", None)
         operation_metadata = {
             "query": {"computed", "value_domains"},
+            "constitution": {"value_domains"},
             "aggregate": {"aggregate_fields", "value_domains"},
             "window": {"kd", "value_domains"},
             "compute": {"computed", "value_domains"},
@@ -382,6 +392,7 @@ class FinanceDataToolCatalogService:
                         dataview_cfg,
                         api_classes,
                         subject_guidance=subject_meta.get("rules"),
+                        filter_syntax=payload.get("filter_syntax"),
                     )
 
             snapshot = _CatalogSnapshot(
@@ -428,6 +439,7 @@ class FinanceDataToolCatalogService:
         api_classes: Mapping[str, Any],
         *,
         subject_guidance: Any = None,
+        filter_syntax: Any = None,
     ) -> Dict[str, Any]:
         row: Dict[str, Any] = {"name": dataview_name}
         self._put_model_value(row, "subject_guidance", subject_guidance)
@@ -453,7 +465,6 @@ class FinanceDataToolCatalogService:
         row["fields"] = model_fields
 
         functions: List[Dict[str, Any]] = []
-        referenced_api_classes: List[str] = []
         apis = dataview_cfg.get("api") if isinstance(dataview_cfg.get("api"), list) else []
         for api_row in apis:
             if not isinstance(api_row, Mapping):
@@ -462,7 +473,6 @@ class FinanceDataToolCatalogService:
             self._put_model_value(function, "api_name", self._trim(api_row.get("api_name")))
             self._put_model_value(function, "api_function", self._trim(api_row.get("api_function")))
             api_class = self._trim(api_row.get("api_class"))
-            self._put_model_value(function, "api_class", api_class)
             self._put_model_value(
                 function,
                 "operation",
@@ -473,29 +483,61 @@ class FinanceDataToolCatalogService:
                 if isinstance(api_classes.get(api_class), Mapping)
                 else {}
             )
+            # Resolve the template once here, not in the model's reasoning.
+            self._put_model_value(
+                function,
+                "request_pattern",
+                concrete_call_pattern(
+                    self._trim(api_row.get("api_name")),
+                    self._trim(class_cfg.get("call_pattern")),
+                ),
+            )
+            self._put_model_value(function, "args", class_cfg.get("args"))
+            self._put_model_value(function, "output_rule", class_cfg.get("output_rule"))
+            # Window combinations are already declared by the dataview's kd
+            # map. A template-wide method list can contradict a concrete API
+            # (e.g. pricevalue supports percentile, not the generic sum/avg).
+            if function.get("operation") != "window":
+                self._put_model_value(function, "methods", class_cfg.get("methods"))
+            self._put_model_value(function, "rules", class_cfg.get("rules"))
+            examples = self._function_examples(api_row, class_cfg)
+            # Catalog annotations explain an example; they are not DSL output
+            # fields. Keep editable source intact, separate them at disclosure.
+            requests = []
+            guidance = list(api_row.get("guidance") or [])
+            for index, example in enumerate(examples, 1):
+                request, separator, note = example.partition("\nnote:")
+                requests.append(request.strip())
+                if separator and note.strip():
+                    guidance.append(f"示例 {index}：{note.strip()}")
             self._put_model_value(
                 function,
                 "examples",
-                self._function_examples(api_row, class_cfg),
+                requests,
             )
-            self._put_model_value(function, "guidance", api_row.get("guidance"))
+            self._put_model_value(function, "guidance", guidance)
             functions.append(function)
-            if api_class and api_class not in referenced_api_classes:
-                referenced_api_classes.append(api_class)
         row["functions"] = functions
+        if any(
+            function.get("api_name") == "stock.quote"
+            and any(str(arg).split("(", 1)[0] == "mode" for arg in function.get("args", {}).get("optional", []))
+            for function in functions
+        ):
+            from src.experiments.staged_data_protocol.phase2.call_structure import (
+                stock_quote_provider_fields,
+            )
 
-        contracts: Dict[str, Dict[str, Any]] = {}
-        for api_class in referenced_api_classes:
-            cfg = api_classes.get(api_class) if isinstance(api_classes.get(api_class), Mapping) else {}
-            contract: Dict[str, Any] = {}
-            self._put_model_value(contract, "desc", self._trim(cfg.get("desc")))
-            self._put_model_value(contract, "request_pattern", self._trim(cfg.get("call_pattern")))
-            self._put_model_value(contract, "methods", cfg.get("methods"))
-            self._put_model_value(contract, "args", cfg.get("args"))
-            self._put_model_value(contract, "rules", cfg.get("rules"))
-            self._put_model_value(contract, "output_rule", self._trim(cfg.get("output_rule")))
-            contracts[api_class] = contract
-        self._put_model_value(row, "api_classes", contracts)
+            mode_fields = {mode: stock_quote_provider_fields(mode=mode) for mode in (0, 1, 2)}
+            for name, field in model_fields.items():
+                field["modes"] = [mode for mode, names in mode_fields.items() if name in names]
+        if any(
+            arg == "filter"
+            for cfg in functions
+            for args in (cfg.get("args") or {}).values()
+            if isinstance(args, (list, tuple))
+            for arg in args
+        ):
+            self._put_model_value(row, "filter_syntax", filter_syntax)
 
         for key in ("kd", "computed", "aggregate_fields", "value_domains"):
             self._put_model_value(row, key, dataview_cfg.get(key))

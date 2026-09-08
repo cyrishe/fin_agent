@@ -668,7 +668,7 @@ class RuntimeArtifactService:
                 description,
                 markdown_text,
                 "\n".join(str(x) for x in config_obj.get("responsibilities", []) if self._trim(x)),
-                "\n".join(str(x) for x in config_obj.get("skills", []) if self._trim(x)),
+                "\n".join(str(x) for x in (config_obj.get("skills") or []) if self._trim(x)),
                 "\n".join(str(x) for x in config_obj.get("tools", []) if self._trim(x)),
                 "\n".join(str(x) for x in config_obj.get("handoff_agents", []) if self._trim(x)),
             ]

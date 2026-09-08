@@ -21,6 +21,11 @@ MCP  /mcp               ┘                         ├─> CC
 
 ## 启动
 
+### MCP评测与临时凭证
+
+通用MCP查询评测、并发、data/both模式、Excel导出及默认4小时临时token签发，见
+[MCP评测操作说明](finance_mcp_evaluation.md)。长期API key仍兼容；临时token需要加载新的认证实现。
+
 ### 纯数据与执行明细
 
 REST `POST /v1/finance/query` 与 MCP `finance_data_query` 共用以下参数：

@@ -802,7 +802,11 @@ def test_regular_chat_context_resolution_failure_returns_http_200_message(monkey
     monkeypatch.setattr(
         web,
         "_resolve_current_guest_identity",
-        lambda: {"user_id": "user_a", "session_token": "session"},
+        lambda: {
+            "user_id": "user_a",
+            "user_type": "member",
+            "session_token": "session",
+        },
     )
     monkeypatch.setattr(
         web,

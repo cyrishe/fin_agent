@@ -17,11 +17,11 @@ def test_research_mode_defaults_to_skill_owned_intelligent_analysis() -> None:
         "decision_owner": "skill",
     }
     prompt = research_mode_prompt("auto")
-    assert "由匹配的业务 Skill" in prompt
+    assert "优先依据匹配的业务 Skill" in prompt
+    assert "未匹配或覆盖不足" in prompt
     assert "用户完整语义" in prompt
-    assert "深度分析、完整研究报告" in prompt
-    assert "不是根据孤立关键词机械分类" in prompt
-    assert "不要新增独立分类轮次" in prompt
+    assert "用户明确的交付要求优先" in prompt
+    assert "决定有效深度" in prompt
 
 
 def test_explicit_research_modes_are_user_owned_hard_constraints() -> None:

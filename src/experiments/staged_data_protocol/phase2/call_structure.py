@@ -10,12 +10,16 @@ from src.experiments.staged_data_protocol.phase2.catalog import (
 )
 from src.experiments.staged_data_protocol.phase2.intraday_quote_provider import FIELD_SQL
 from src.experiments.staged_data_protocol.phase2.quote_provider import QUOTE_SOURCES
+from src.experiments.staged_data_protocol.phase2.realtime_quote_provider import FIELDS as REALTIME_QUOTE_FIELDS
 from src.experiments.staged_data_protocol.phase2.models import ApiCall, ResultHandle
+from src.experiments.staged_data_protocol.phase2.python_filter import parse_python_filter, FilterSyntaxError, require_separable
 
 
 FILTER_ATOM_RE = re.compile(
     r"^(?P<field>[A-Za-z_]\w*)\s*"
-    r"(?P<op>not\s+in|in|like|==|!=|>=|<=|=|>|<)\s*"
+    # Word operators must be tokens, never substrings of an identifier.
+    # Otherwise backtracking can turn `rating_change ...` into `rat in ...`.
+    r"(?P<op>\b(?:not\s+in|in|like)\b|==|!=|>=|<=|=|>|<)\s*"
     r"(?P<value>.+)$",
     flags=re.IGNORECASE | re.DOTALL,
 )
@@ -94,12 +98,18 @@ def _catalog() -> dict[str, Any]:
     return dict(catalog_source())
 
 
-def _stock_quote_fields(*, intraday: bool) -> set[str]:
-    declared = set(
-        catalog_source()["subjects"]["stock"]["quote"]["fields"]
-    )
-    provider_fields = set(FIELD_SQL) if intraday else set(QUOTE_SOURCES["stock"].fields)
-    return provider_fields & declared
+def stock_quote_provider_fields(*, mode: int) -> set[str]:
+    """Fields implemented by each mode, shared by disclosure and validation."""
+    if mode == 2:
+        return set(REALTIME_QUOTE_FIELDS)
+    if mode == 1:
+        return set(FIELD_SQL)
+    return set(QUOTE_SOURCES["stock"].fields)
+
+
+def _stock_quote_fields(*, mode: int) -> set[str]:
+    declared = set(catalog_source()["subjects"]["stock"]["quote"]["fields"])
+    return stock_quote_provider_fields(mode=mode) & declared
 
 
 def structure_call(call: ApiCall) -> dict[str, Any]:
@@ -203,6 +213,11 @@ def validate_call_structure(
     except CallStructureError as exc:
         errors.append(f"FILTER_ERROR: {exc}")
     else:
+        if matched.get("api_class") == "constituent_aggregate" and expression is not None and parse_python_filter(filter_raw) is not None:
+            try:
+                require_separable(expression, [fields, _metric_fields(call, previous_results)])
+            except FilterSyntaxError as exc:
+                errors.append(f"FILTER_ERROR: {exc}")
         predicates = list(_predicates(expression))
         for predicate in predicates:
             field = str(predicate.get("field") or "")
@@ -218,7 +233,7 @@ def validate_call_structure(
                     f"FILTER_ERROR: field={field} not in api={call.api}; "
                     f"available={sorted(filter_fields)}"
                 )
-            if operator == "not in":
+            if operator == "not in" and parse_python_filter(filter_raw) is None:
                 errors.append(
                     "FILTER_ERROR: operator=not in is not supported by finance Providers"
                 )
@@ -279,8 +294,10 @@ def runtime_field_contract(call: ApiCall, *, usage: str) -> set[str] | None:
     resolved_type = str(matched.get("resolved_type") or "")
 
     if subject == "stock" and dataview == "quote":
+        quote_mode = _effective_quote_mode(call.args, matched)
         quote_fields = _stock_quote_fields(
-            intraday=_effective_quote_mode(call.args, matched) > 0,
+            # Window/compute paths retain their existing stored-data contract.
+            mode=1 if resolved_type not in {"base", "agg"} and quote_mode > 0 else quote_mode,
         )
         if usage == "source" or resolved_type == "base":
             return set(quote_fields)
@@ -325,7 +342,11 @@ def parse_filter_expression(text: str) -> dict[str, Any] | None:
         or NOOP_FILTER_RE.fullmatch(raw)
     ):
         return None
-    return _parse_filter_node(raw)
+    try:
+        python_tree = parse_python_filter(raw)
+    except FilterSyntaxError as exc:
+        raise CallStructureError(str(exc)) from exc
+    return python_tree if python_tree is not None else _parse_filter_node(raw)
 
 
 def parse_order(text: str) -> list[dict[str, str]]:
@@ -356,7 +377,18 @@ def _parse_filter_node(text: str) -> dict[str, Any]:
             return {connective: [_parse_filter_node(item) for item in parts]}
     match = FILTER_ATOM_RE.fullmatch(raw)
     if not match:
-        raise CallStructureError(f"cannot parse filter expression={raw}")
+        head = re.match(r"^(?P<field>[A-Za-z_]\w*)\s+(?P<tail>.+)$", raw)
+        location = (
+            f" for field={head.group('field')} near={head.group('tail').split()[0]}"
+            if head else ""
+        )
+        # The same catalog-owned syntax is shown in the execution pack and
+        # error recovery. Do not invent a second model-facing protocol here.
+        syntax = str(catalog_source().get("filter_syntax") or "").strip()
+        raise CallStructureError(
+            f"cannot parse filter expression={raw}{location}"
+            + (f"; {syntax}" if syntax else "")
+        )
     field = match.group("field")
     operator = re.sub(r"\s+", " ", match.group("op").lower())
     value_text = match.group("value").strip()

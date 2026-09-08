@@ -18,6 +18,22 @@ from mcp.server.fastmcp import FastMCP
 from mcp.server.transport_security import TransportSecuritySettings
 from mcp.types import ToolAnnotations, CallToolResult, TextContent
 from pydantic import Field
+from src.services.user_session_service import UserSessionService, UserSessionStorageError
+
+
+async def require_admin_session(request: Request) -> dict:
+    token = request.cookies.get(UserSessionService.MEMBER_SESSION_COOKIE_NAME, "")
+    if not token:
+        raise HTTPException(status_code=401, detail="请先登录管理员账号")
+    try:
+        identity = await asyncio.to_thread(UserSessionService().resolve_member_session, session_token=token)
+    except UserSessionStorageError:
+        raise HTTPException(status_code=503, detail="账户服务暂时不可用")
+    if not identity:
+        raise HTTPException(status_code=401, detail="登录已失效，请重新登录")
+    if identity.get("user_type") != "admin":
+        raise HTTPException(status_code=403, detail="仅管理员可以查看系统统计")
+    return identity
 
 from src.finance_api.auth import (
     FinanceApiAuthError,
@@ -405,11 +421,17 @@ def create_app(
         )
 
     @app.get("/status", response_class=HTMLResponse, include_in_schema=False)
-    async def data_status_page() -> HTMLResponse:
-        return HTMLResponse((_STATIC_DIR / "status.html").read_text(encoding="utf-8"))
+    async def data_status_page(request: Request) -> HTMLResponse:
+        try:
+            await require_admin_session(request)
+        except HTTPException as exc:
+            if exc.status_code == 401:
+                return RedirectResponse(str(request.scope.get("root_path", "")) + "/login", status_code=303)
+            raise
+        return HTMLResponse((_STATIC_DIR / "status.html").read_text(encoding="utf-8"), headers={"Cache-Control": "no-store, private"})
 
     @app.get("/status/data", tags=["system"])
-    async def data_status_snapshot() -> dict[str, Any]:
+    async def data_status_snapshot(_admin: dict = Depends(require_admin_session)) -> dict[str, Any]:
         # Requests only read the cached observation; visitors cannot trigger SQL.
         return data_monitor.current()
 
@@ -431,7 +453,7 @@ def create_app(
 
     @app.get("/v1/usage/daily", tags=["system"])
     async def usage_daily(days: int = 30,
-                          _principal: FinanceApiPrincipal = Depends(require_principal)):
+                          _admin: dict = Depends(require_admin_session)):
         if not 1 <= days <= 90:
             raise HTTPException(status_code=422, detail="days must be between 1 and 90")
         try:

@@ -144,7 +144,7 @@ def test_hub_keeps_discovery_unified_and_execution_semantics_separate(
     business, draft, hidden, legacy = catalog["items"]
     assert business["catalog_id"] == "skill:business_method:stock-research"
     assert business["invocation_mode"] == "finance_cc_preference"
-    assert business["invocation_enabled"] is False
+    assert business["invocation_enabled"] is True
     assert business["editable"] is False
     assert business["display_name"] == "Test Research"
     assert business["workspace_url"].startswith("/skills/studio/stock-research")
@@ -220,10 +220,12 @@ def test_hub_business_rows_follow_only_explicit_snapshot_reload(
 def test_skill_hub_api_uses_read_only_unified_catalog(monkeypatch) -> None:
     from src.web import flask_app as web
 
+    monkeypatch.setattr(web, "_resolve_current_guest_identity", lambda: {"user_id": "owner-test"})
+
     monkeypatch.setattr(
         web.skill_hub_catalog_service,
         "catalog",
-        lambda: {
+        lambda **kwargs: {
             "revision": "r1",
             "business_revision": "b1",
             "items": [
@@ -266,10 +268,12 @@ def test_skill_hub_detail_api_is_read_only_and_reference_is_revision_bound(
 ) -> None:
     from src.web import flask_app as web
 
+    monkeypatch.setattr(web, "_resolve_current_guest_identity", lambda: {"user_id": "owner-test"})
+
     monkeypatch.setattr(
         web.skill_hub_catalog_service,
         "detail",
-        lambda skill_name, catalog_id="": {
+        lambda skill_name, catalog_id="", owner_ids=(): {
             "skill_id": skill_name,
             "catalog_id": catalog_id,
             "skill_type": "business_method",
@@ -279,7 +283,7 @@ def test_skill_hub_detail_api_is_read_only_and_reference_is_revision_bound(
     monkeypatch.setattr(
         web.skill_hub_catalog_service,
         "load_business_reference",
-        lambda skill_name, reference_path, expected_revision="": {
+        lambda skill_name, reference_path, expected_revision="", owner_ids=(): {
             "skill_id": skill_name,
             "reference": reference_path,
             "revision": expected_revision,
@@ -320,7 +324,7 @@ def test_chat_skill_catalog_paths_use_the_hub_without_changing_execution(
     monkeypatch.setattr(
         web.skill_hub_catalog_service,
         "list_skills",
-        lambda: list(hub_items),
+        lambda **kwargs: list(hub_items),
     )
 
     command_result = web._build_chat_dispatch_payload("/skills")

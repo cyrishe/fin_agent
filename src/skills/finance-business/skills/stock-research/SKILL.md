@@ -1,6 +1,6 @@
 ---
 name: stock-research
-description: 对一只或少量股票做自适应深度研究、投资逻辑复盘、观点更新或持仓诊断时使用；围绕公司类型、价值驱动、财务质量、估值预期、事件催化和最强反证形成可证伪结论。单个价格、单项财务指标、单篇研报或简单走势查询不使用。
+description: 对一只或少量股票开展自适应深度研究、投资逻辑复盘、观点更新或持仓诊断，围绕价值驱动、财务质量、估值预期、催化与反证形成可证伪结论。
 allowed-tools:
   - mcp__finance__general_search
 execution-budget: long

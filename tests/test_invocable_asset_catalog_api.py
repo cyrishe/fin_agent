@@ -26,6 +26,7 @@ def test_invocable_asset_catalog_is_owner_scoped_and_searchable(monkeypatch) -> 
     assert response.get_json()["items"][0]["ref"] == "tool:ct_market_buy_decision"
     assert captured == {
         "owner_ids": ["user-42"],
+        "business_owner_id": "user-42",
         "query": "大盘",
         "kind": "tool",
         "limit": 8,

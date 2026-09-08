@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from src.experiments.staged_data_protocol.phase2 import python_filter as pf
+
 import ast
 import json
 import re
@@ -353,6 +355,15 @@ def _realtime_history_dates(*, anchor_date: str, k: int) -> List[str]:
 
 
 def _realtime_identity_where(args: Mapping[str, Any]) -> tuple[str, List[Any]]:
+    tree = pf.condition(args)
+    if tree is not None:
+        def normalize(p):
+            if p["field"] == "code" and p["operator"] in {"=", "==", "in"}:
+                p["value"] = [_code6(v) for v in p["value"]] if isinstance(p["value"], list) else _code6(p["value"])
+            return p
+        tree = pf.map_predicates(tree, normalize)
+        sql, params = pf.compile_tree(pf.project(tree, {"code", "name"}), {"code": "`code`", "name": "`name`"})
+        return (f"AND ({sql})" if sql else ""), params
     clauses: List[str] = []
     params: List[Any] = []
     for field_name, op, value in _simple_filter_items(str(args.get("filter") or "")):
@@ -441,7 +452,14 @@ def _validate_code_ast(code: str) -> List[str]:
 
 def _normalize_result_df(df: pd.DataFrame, *, output_columns: List[str], args: Mapping[str, Any]) -> pd.DataFrame:
     rows = df.copy()
-    if "value" in rows.columns:
+    if pf.condition(args) is not None:
+        tree = pf.condition(args)
+        # Identity selection is applied by the input query. A result may omit
+        # those columns, but dropping one side of a mixed OR is never valid.
+        pf.require_separable(tree, [{"code", "name"}, set(rows.columns)])
+        tree = pf.project(tree, set(rows.columns))
+        rows = rows.loc[[pf.evaluate(tree, row) for row in rows.to_dict("records")]]
+    elif "value" in rows.columns:
         rows = _apply_value_filters(rows, str(args.get("filter") or ""))
     rows = _apply_order(rows, str(args.get("order") or ""))
     limit = _bounded_output_limit(args.get("limit"))
@@ -549,6 +567,9 @@ def _is_realtime(args: Mapping[str, Any]) -> bool:
 
 
 def _simple_filter_items(filter_text: str) -> List[tuple[str, str, str]]:
+    tree = pf.parse_python_filter(filter_text)
+    if tree is not None:
+        return [(p["field"], p["operator"], str(p["value"])) for p in pf.predicates(tree)]
     rows: List[tuple[str, str, str]] = []
     for match in re.finditer(
         r"(?P<field>[A-Za-z_]\w*)\s*(?P<op>in|==|=|!=|>=|<=|>|<)\s*(?P<value>\[[^\]]+\]|\([^)]+\)|[^,;]+?)(?=\s+(?:and|or)\s+[A-Za-z_]\w*\s*(?:in|==|=|!=|>=|<=|>|<)|[,;]|$)",

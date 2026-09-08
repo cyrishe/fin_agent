@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import Any, Dict, Mapping, Optional
 
 from src.scenarios.financial_qa.business_skills import FinanceBusinessSkillCatalog
+from src.scenarios.financial_qa.empty_result import all_zero_result_summary as _all_zero_result_summary
 from src.scenarios.financial_qa.dsh_service import (
     FinanceDeepSeekHarnessSessionService,
 )
@@ -27,6 +28,7 @@ from src.scenarios.financial_qa.runtime import (
 )
 from src.services.finance_claude_session_service import FinanceClaudeSessionService
 from src.services.invocation_input_resolver_service import InvocationInputResolverService
+from src.services.skill_candidate_store_service import SkillCandidateStoreError
 
 # Financial QA is deliberately limited to the structured finance-data surface.
 # News and general web search belong to a separate search scenario and must not
@@ -44,29 +46,6 @@ def _configured_tool_name(value: Any) -> str:
     if normalized.startswith(_FINANCE_MCP_TOOL_PREFIX):
         return normalized[len(_FINANCE_MCP_TOOL_PREFIX):]
     return normalized
-
-
-def _all_zero_result_summary(result_refs: list[dict[str, Any]]) -> str:
-    if not result_refs or any(item.get("row_count") is None for item in result_refs):
-        return ""
-    try:
-        if any(int(item.get("row_count")) != 0 for item in result_refs):
-            return ""
-    except (TypeError, ValueError):
-        return ""
-    goals = list(
-        dict.fromkeys(
-            _trim(item.get("goal"))
-            for item in result_refs
-            if _trim(item.get("goal"))
-        )
-    )
-    scope = "；".join(goals[:2])
-    prefix = f"本次已查询：{scope}。" if scope else "本次查询已完成。"
-    return (
-        f"{prefix}当前数据范围与查询条件下返回 0 条记录，"
-        "因此无法从现有结果给出所问数值。"
-    )
 
 
 def _agent_harness_context(runtime_profile: Mapping[str, Any]) -> str:
@@ -104,6 +83,7 @@ class FinancialQaCcService:
         dsh_session_service: Optional[FinanceDeepSeekHarnessSessionService] = None,
         system_tools: Optional[FinanceDataQueryCcTools] = None,
         business_skill_catalog: Optional[FinanceBusinessSkillCatalog] = None,
+        skill_hub_catalog_service: Any = None,
         presentation_service: Optional[FinancialQaPresentationService] = None,
         input_resolver: Optional[InvocationInputResolverService] = None,
         root_dir: str | Path = "data/financial_qa_cc_sessions",
@@ -115,9 +95,15 @@ class FinancialQaCcService:
             if enabled is not None
             else enabled_text in {"1", "true", "yes", "on"}
         )
+        self.skill_hub_catalog_service = skill_hub_catalog_service
         self.business_skill_catalog = (
-            business_skill_catalog or FinanceBusinessSkillCatalog()
+            business_skill_catalog
+            or getattr(skill_hub_catalog_service, "business_catalog", None)
+            or FinanceBusinessSkillCatalog()
         )
+        self._runtime_skill_bindings = {
+            self.business_skill_catalog.revision: self.business_skill_catalog.runtime_binding(),
+        }
         self.system_tools = system_tools or FinanceDataQueryCcTools()
         bind_skill_catalog = getattr(
             self.system_tools,
@@ -149,9 +135,7 @@ class FinancialQaCcService:
             skill_root=self.business_skill_catalog.runtime_root,
             skill_names=self.business_skill_catalog.qualified_skill_names(),
             skill_snapshot_provider=self._business_skill_runtime_snapshot,
-            skill_snapshot_validator=(
-                self.business_skill_catalog.validate_runtime_binding
-            ),
+            skill_snapshot_validator=self._validate_business_skill_runtime_binding,
             runtime_scope_prefix="financial_qa",
             max_turns=qa_max_turns,
             system_context_paths=[
@@ -169,6 +153,15 @@ class FinancialQaCcService:
 
     def _business_skill_runtime_snapshot(self) -> Dict[str, Any]:
         return self.business_skill_catalog.runtime_binding()
+
+    def _validate_business_skill_runtime_binding(self, binding: Mapping[str, Any]) -> None:
+        approved = self._runtime_skill_bindings.get(_trim(binding.get("revision")))
+        if approved is None:
+            raise RuntimeError("unknown authorized Finance Skill snapshot")
+        names = list(binding.get("skill_names") or [])
+        if (Path(_trim(binding.get("runtime_root"))).absolute() != Path(approved["runtime_root"]).absolute()
+                or names != [name for name in approved["skill_names"] if name in names]):
+            raise RuntimeError("invalid authorized Finance Skill runtime binding")
 
     def accepts(
         self,
@@ -203,6 +196,8 @@ class FinancialQaCcService:
         entry: str = "agent_route",
         resolved_question: str = "",
         research_mode: str = "auto",
+        owner_id: str = "",
+        explicit_skill_ids: Optional[list[str]] = None,
     ) -> Dict[str, Any]:
         app_context = (
             application_context
@@ -255,8 +250,35 @@ class FinancialQaCcService:
             if isinstance(raw_allowed_skills, list)
             else None
         )
-        business_skill_snapshot = self.business_skill_catalog.turn_snapshot(
+        # Skill ownership uses the authenticated user, not legacy Tool thread aliases.
+        registry_error = ""
+        catalog = self.business_skill_catalog
+        if self.skill_hub_catalog_service is not None:
+            try:
+                catalog = self.skill_hub_catalog_service.runtime_catalog(
+                    owner_ids=[_trim(owner_id)] if _trim(owner_id) else [],
+                )
+            except SkillCandidateStoreError:
+                registry_error = "个人 Skill 目录暂不可用，本轮仅使用系统方法与已授权工具。"
+        binding = catalog.runtime_binding()
+        catalog.validate_runtime_binding(binding)
+        # Retain only binding metadata; turn context owns the frozen methods.
+        self._runtime_skill_bindings[catalog.revision] = binding
+        business_skill_snapshot = catalog.turn_snapshot(
             allowed_skill_ids=allowed_finance_skills,
+        )
+        method_snapshot = catalog.method_snapshot(
+            allowed_skill_ids=allowed_finance_skills,
+        )
+        methods = method_snapshot["skills"]
+        explicit_ids = list(dict.fromkeys(
+            _trim(item) for item in explicit_skill_ids or [] if _trim(item)
+        ))
+        if any(skill_id not in methods for skill_id in explicit_ids):
+            raise ValueError("所选业务 Skill 不存在、未启用或当前无权使用。")
+        explicit_prompt = "\n\n".join(
+            f"[用户显式选择的业务方法：{skill_id}]\n{methods[skill_id]['method']}"
+            for skill_id in explicit_ids
         )
         skill_routing_summary = _trim(
             business_skill_snapshot.get("routing_summary")
@@ -308,6 +330,10 @@ class FinancialQaCcService:
             ),
             "_finance_skill_catalog_prompt": skill_routing_summary,
             "_finance_skill_catalog_revision": business_skill_snapshot["revision"],
+            "_finance_skill_snapshot": method_snapshot,
+            "_finance_explicit_skill_ids": explicit_ids,
+            "_finance_explicit_skill_prompt": explicit_prompt,
+            "_finance_skill_registry_error": registry_error,
             "_finance_research_mode": normalized_research_mode,
             "_finance_research_mode_prompt": research_mode_prompt(
                 normalized_research_mode
@@ -444,6 +470,8 @@ class FinancialQaCcService:
         isolated_request: bool = False,
         include_response_data: bool = True,
         response_data_max_rows: int | None = None,
+        explicit_skill_ids: Optional[list[str]] = None,
+        owner_ids: Optional[list[str]] = None,
     ) -> Dict[str, Any]:
         selected_runtime = normalize_financial_qa_runtime(runtime)
         normalized_execution_mode = normalize_financial_qa_execution_mode(
@@ -470,6 +498,8 @@ class FinancialQaCcService:
             entry=_trim(dispatch_plan.get("entry")),
             resolved_question=resolved_question,
             research_mode=research_mode,
+            owner_id=owner_id,
+            explicit_skill_ids=explicit_skill_ids,
         )
         runtime_context["_finance_data_only"] = bool(data_only)
         runtime_context["_finance_execution_mode"] = normalized_execution_mode
@@ -520,7 +550,7 @@ class FinancialQaCcService:
         generated_message = _trim(record.get("result")) or (
             f"金融专业问答暂时未完成：{error}" if error else "金融专业问答暂时没有返回内容。"
         )
-        if not error:
+        if not error and (data_only or not record.get("skill_entries")):
             generated_message = (
                 _all_zero_result_summary(result_refs) or generated_message
             )
@@ -612,6 +642,7 @@ class FinancialQaCcService:
                     if _trim(item)
                 ],
                 "skill_entries": skill_entries,
+                "skill_registry_error": runtime_context["_finance_skill_registry_error"],
                 "result_refs": result_refs,
                 "llm_step_usages": [
                     dict(item)

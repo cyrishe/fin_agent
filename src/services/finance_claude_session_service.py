@@ -486,6 +486,14 @@ class FinanceClaudeSessionService:
             lines.append(
                 "[系统记录的本轮研究模式]\n" + research_mode_prompt
             )
+        explicit_skill_prompt = _trim(context.get("_finance_explicit_skill_prompt"))
+        if explicit_skill_prompt:
+            lines.append(
+                "以下业务方法是用户本轮明确选择并经系统授权的 Skill，已完成加载。"
+                "按其指导处理当前问题，必要时读取链接中的参考；方法内容不改变"
+                "系统权限和用户目标，未覆盖部分可用现有工具与通用能力补足。\n\n"
+                + explicit_skill_prompt
+            )
         ui_action = context.get("ui_action") if isinstance(context.get("ui_action"), Mapping) else {}
         action_label = _trim(ui_action.get("label") or ui_action.get("action_id"))
         if action_label:
@@ -908,8 +916,9 @@ class FinanceClaudeSessionService:
                 "\n".join(
                     [
                         "[当前可用的金融业务 Skill 摘要]",
-                        "这些摘要用于本轮语义选择；匹配专业任务时先加载 Skill，"
-                        "单一事实查询或概念解释不强行加载。",
+                        "先按问题语义选择匹配的 Skill，优先加载其方法指导，再按需要取数。"
+                        "没有匹配或方法仅部分覆盖时，使用授权工具和通用能力补足。"
+                        "可使用原生 Skill 或 read_finance_skill 加载，已显式加载的方法无需重复读取。",
                         finance_skill_catalog_prompt,
                     ]
                 )
@@ -1404,8 +1413,8 @@ class FinanceClaudeSessionService:
             "implementation_runs": tracker.get("implementation_runs", []),
             "result_refs": tracker.get("result_refs", []),
             "agent_tool_names": [],
-            "skill_results": [],
-            "skill_entries": [],
+            "skill_results": tracker.setdefault("skill_results", []),
+            "skill_entries": tracker.setdefault("skill_entries", []),
             "llm_usage": {},
             "provider_transport": {},
         }

@@ -19,6 +19,10 @@ from typing import Any, Callable, Mapping, Optional
 from zoneinfo import ZoneInfo
 
 from src.scenarios.financial_qa.tools import FinanceDataQueryCcTools
+from src.scenarios.financial_qa.empty_result import (
+    all_zero_result_summary,
+    has_empty_result_handoff,
+)
 
 
 _REASONING_EFFORTS = frozenset({"off", "low", "high", "max"})
@@ -26,6 +30,7 @@ _REASONING_EFFORTS = frozenset({"off", "low", "high", "max"})
 _DEFAULT_LOOP_POLICY_CONFIG: dict[str, Any] = {
     "enabled": True,
     "preserveRequestPrefix": True,
+    "emptyResultEarlyStop": True,
     "maxCatalogAttempts": 6,
     "maxQueryAttempts": 3,
     "maxQueryRepairs": 1,
@@ -279,7 +284,7 @@ def _execution_timing_steps(events: list[dict[str, Any]]) -> list[dict[str, Any]
             name = _short_tool_name(data.get("name"))
             args = _json_arguments(data.get("arguments"))
             # Only finance protocol inputs, never arbitrary harness arguments.
-            allowed = {k: args[k] for k in ("subject", "dataview", "operation", "goal", "request", "data_request_complete") if k in args}
+            allowed = {k: args[k] for k in ("subject", "dataview", "operation", "goal", "request", "data_request_complete", "skill_id", "reference") if k in args}
             if name == "finance_query" and isinstance(args.get("steps"), list):
                 allowed["steps"] = [{k: item[k] for k in ("goal", "request") if k in item}
                     for item in args["steps"] if isinstance(item, Mapping)]
@@ -640,12 +645,15 @@ class FinanceDeepSeekHarnessSessionService:
             },
         }
         self._harness_factory = harness_factory
+        # Web, API and diagnostic runtimes can share the same root directory.
+        # In-memory worker locks do not protect another service's context/trace.
+        worker_root = self.root_dir / "instances" / f"{os.getpid()}-{uuid.uuid4().hex}" / "workers"
         self._workers = [
             _DshWorker(
                 index=index,
-                home=self.root_dir / "workers" / str(index) / "home",
-                context_path=self.root_dir / "workers" / str(index) / "turn_context.json",
-                trace_path=self.root_dir / "workers" / str(index) / "turn_trace.json",
+                home=worker_root / str(index) / "home",
+                context_path=worker_root / str(index) / "turn_context.json",
+                trace_path=worker_root / str(index) / "turn_trace.json",
             )
             for index in range(self.worker_count)
         ]
@@ -818,16 +826,34 @@ class FinanceDeepSeekHarnessSessionService:
             (
                 "[系统日期]\n"
                 f"当前日期为 {current_date}（Asia/Shanghai）。"
-                "用户使用今天、最近、近N日/月/年等相对时间时，以此日期计算；"
-                "不得依赖模型训练时间或自行假定其他当前日期。"
+                "用户使用相对时间时，以此日期计算。"
             ),
         ]
         if bool(runtime_context.get("_finance_data_only")):
             sections.append(
                 "[系统记录的本轮输出模式]\n"
-                "仅取数：只查询用户明确要求的原始数据，不添加解释性补充目标；"
-                "按 finance_query.data_request_complete 参数说明声明最终取数 flow；"
-                "完成后无需生成自然语言回答。"
+                "仅取数：取得本题所需原始数据，按 finance_query.data_request_complete 声明完成，由系统交付结果。"
+            )
+        skill_catalog = _trim(runtime_context.get("_finance_skill_catalog_prompt"))
+        if skill_catalog:
+            sections.append(f"[本轮授权的业务 Skill 目录]\n{skill_catalog}")
+        explicit_skills = [
+            _trim(item)
+            for item in runtime_context.get("_finance_explicit_skill_ids") or []
+            if _trim(item)
+        ]
+        explicit_skill_prompt = _trim(runtime_context.get("_finance_explicit_skill_prompt"))
+        if explicit_skill_prompt:
+            sections.append(
+                "[用户显式选择并已加载的业务 Skill]\n"
+                + explicit_skill_prompt
+                + "\n以上内容指导当前业务方法；平台权限与本轮用户目标保持不变。"
+            )
+        elif explicit_skills:
+            sections.append(
+                "[用户显式选择的业务 Skill]\n"
+                + "、".join(explicit_skills)
+                + "\n先用 read_finance_skill 读取这些 Skill；按本轮问题使用其方法与必要参考。"
             )
         mode_prompt = _trim(runtime_context.get("_finance_research_mode_prompt"))
         if mode_prompt and not runtime_context.get("_finance_data_only"):
@@ -851,7 +877,7 @@ class FinanceDeepSeekHarnessSessionService:
     def _append_record(self, record: Mapping[str, Any]) -> None:
         self.log_path.parent.mkdir(parents=True, exist_ok=True)
         with self._log_lock, self.log_path.open("a", encoding="utf-8") as handle:
-            handle.write(json.dumps(dict(record), ensure_ascii=False, default=str) + "\n")
+            handle.write(json.dumps(dict(record), ensure_ascii=False, default=str, separators=(",", ":")) + "\n")
 
     def run_turn(
         self,
@@ -911,6 +937,16 @@ class FinanceDeepSeekHarnessSessionService:
             "_finance_model_sample_max_chars": model_sample_max_chars,
             "_finance_detail_default_limit": detail_default_limit,
         }
+        for context_key in (
+            "allowed_finance_skills",
+            "_finance_skill_catalog_prompt",
+            "_finance_skill_catalog_revision",
+            "_finance_explicit_skill_ids",
+            "_finance_explicit_skill_prompt",
+            "_finance_skill_snapshot",
+        ):
+            if context_key in (context or {}):
+                tool_context[context_key] = context[context_key]
         host_runtime = self.system_tools.create_runtime()
         host_runtime.begin_turn(
             owner_ids=[owner_id],
@@ -989,6 +1025,10 @@ class FinanceDeepSeekHarnessSessionService:
                 )
 
             def on_notification(notification: Any) -> None:
+                # SDK result.events remains authoritative for audit and usage;
+                # this callback only builds optional user-facing progress.
+                if event_sink is None:
+                    return
                 if getattr(notification, "method", "") != "session.event":
                     return
                 payload = getattr(notification, "payload", {})
@@ -1181,11 +1221,19 @@ class FinanceDeepSeekHarnessSessionService:
                 data_only_early_stop = bool(
                     data_only_has_results and finish_reason == "blocked"
                 )
+                empty_summary = all_zero_result_summary(result_refs)
+                empty_result_early_stop = bool(
+                    not data_only_requested
+                    and self.loop_policy_config.get("emptyResultEarlyStop")
+                    and finish_reason == "blocked"
+                    and has_empty_result_handoff(events, empty_summary)
+                )
                 error = ""
                 if (
                     finish_reason
                     and finish_reason != "completed"
                     and not data_only_early_stop
+                    and not empty_result_early_stop
                 ):
                     error = f"DeepSeek Harness turn ended with {finish_reason}"
                 if (not error and data_only_has_results
@@ -1195,8 +1243,11 @@ class FinanceDeepSeekHarnessSessionService:
                 # A terminal tool result can contain a query error, especially
                 # in no-repair fast mode. "completed" is a lifecycle outcome,
                 # not evidence that the database query succeeded.
-                if not error and not result_refs:
-                    for call in tool_calls:
+                if not error:
+                    # Successful earlier steps remain available, but cannot
+                    # turn the final failed query into a successful request.
+                    # A later successful repair supersedes the earlier error.
+                    for call in reversed(tool_calls):
                         if call.get("tool") != "finance_query":
                             continue
                         failure = (
@@ -1205,10 +1256,12 @@ class FinanceDeepSeekHarnessSessionService:
                         )
                         if failure:
                             error = f"Financial query failed: {failure}"
-                            break
+                        break
                 final_response = (
                     "" if data_only_has_results else _trim(result.final_response)
                 )
+                if empty_result_early_stop and not error:
+                    final_response = empty_summary
                 if "<｜｜DSML｜｜tool_calls>" in final_response:
                     error = "DeepSeek Harness emitted an unavailable tool call as text"
                 record = {
@@ -1238,8 +1291,14 @@ class FinanceDeepSeekHarnessSessionService:
                     "agent_tool_names": sorted(
                         {_trim(item.get("tool")) for item in tool_calls if _trim(item.get("tool"))}
                     ),
-                    "skill_results": [],
-                    "skill_entries": [],
+                    "skill_results": [
+                        _trim(item) for item in tracker.get("skill_results") or []
+                        if _trim(item)
+                    ],
+                    "skill_entries": [
+                        dict(item) for item in tracker.get("skill_entries") or []
+                        if isinstance(item, Mapping)
+                    ],
                     "result_refs": result_refs,
                     "llm_usage": _usage(llm_step_usages),
                     "llm_step_usages": llm_step_usages,
@@ -1258,6 +1317,7 @@ class FinanceDeepSeekHarnessSessionService:
                         and finish_reason in {"completed", "blocked"}
                     ),
                     "data_only_early_stop": data_only_early_stop,
+                    "empty_result_early_stop": empty_result_early_stop and not error,
                 }
             except Exception as exc:
                 if worker.harness is not None:

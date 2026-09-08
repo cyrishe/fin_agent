@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import re
 import shutil
 import tempfile
 from dataclasses import dataclass
@@ -46,6 +47,9 @@ class _FinanceBusinessSkillSnapshot:
     execution_budget: str
     references: tuple[_FinanceSkillReferenceSnapshot, ...]
     companion_files: tuple[_FinanceSkillCompanionSnapshot, ...]
+    owner: str = "system"
+    visibility: str = "public"
+    active_revision_no: int = 0
 
 
 @dataclass(frozen=True)
@@ -108,6 +112,9 @@ class FinanceBusinessSkillCatalog:
                     "_content_hash": skill.content_hash,
                     "_allowed_tools": list(skill.allowed_tools),
                     "execution_budget": skill.execution_budget,
+                    "owner": skill.owner,
+                    "visibility": skill.visibility,
+                    "active_revision_no": skill.active_revision_no,
                     "_reference_index": [
                         {
                             "path": reference.path,
@@ -279,6 +286,9 @@ class FinanceBusinessSkillCatalog:
                     "content_hash": skill.content_hash,
                     "allowed_tools": list(skill.allowed_tools),
                     "execution_budget": skill.execution_budget,
+                    "owner": skill.owner,
+                    "visibility": skill.visibility,
+                    "active_revision_no": skill.active_revision_no,
                     "reference_index": [
                         {
                             "path": reference.path,
@@ -400,9 +410,38 @@ class FinanceBusinessSkillCatalog:
                     "description": skill.description,
                     "allowed_tools": list(skill.allowed_tools),
                     "execution_budget": skill.execution_budget,
+                    "owner": skill.owner,
+                    "visibility": skill.visibility,
+                    "active_revision_no": skill.active_revision_no,
                 }
                 for skill in snapshot.skills
             ],
+        }
+
+    def method_snapshot(
+        self, *, allowed_skill_ids: Optional[Iterable[str]] = None,
+    ) -> Dict[str, Any]:
+        """Freeze authorized method/reference text for one internal runtime turn."""
+
+        allowed = None if allowed_skill_ids is None else set(allowed_skill_ids)
+        return {
+            "revision": self._snapshot.revision,
+            "skills": {
+                skill.skill_id: {
+                    "description": skill.description,
+                    "method": skill.method,
+                    "content_hash": skill.content_hash,
+                    "references": {
+                        reference.path: {
+                            "content": reference.content.decode("utf-8"),
+                            "content_hash": reference.content_hash,
+                        }
+                        for reference in skill.references
+                    },
+                }
+                for skill in self._snapshot.skills
+                if allowed is None or skill.skill_id in allowed
+            },
         }
 
     def studio_detail(self, skill_id: str) -> Dict[str, Any] | None:
@@ -471,6 +510,10 @@ class FinanceBusinessSkillCatalog:
             "default_prompt": _trim(interface.get("default_prompt")),
             "description": skill.description,
             "category": skill.category,
+            "owner": skill.owner,
+            "visibility": skill.visibility,
+            "active_revision_no": skill.active_revision_no,
+            "scope": "system" if skill.owner == "system" else skill.visibility,
             "skill_markdown": skill.method,
             "content_hash": skill.content_hash,
             "revision": self._snapshot.revision,
@@ -491,6 +534,76 @@ class FinanceBusinessSkillCatalog:
         snapshot = self._compile_snapshot()
         self._snapshot = snapshot
         return self.snapshot_metadata()
+
+    def with_active_skills(
+        self, records: Iterable[Mapping[str, Any]],
+    ) -> "FinanceBusinessSkillCatalog":
+        """Compile an already-authorized registry view into the same CC snapshot.
+
+        The registry owns visibility and active pointers. Method text cannot
+        grant tools, override a system identity, or supply executable files.
+        """
+
+        records = list(records)
+        if not records:
+            return self
+        result = object.__new__(type(self))
+        result.root = self.root
+        result.catalog_path = self.catalog_path
+        result.snapshot_root = self.snapshot_root
+        result._validated_runtime_bindings = {}
+        skills = list(self._snapshot.skills)
+        identities = {skill.skill_id for skill in skills}
+        for record in sorted(records, key=lambda item: _trim(item.get("skill_id"))):
+            skill_id = _trim(record.get("skill_id"))
+            if not re.fullmatch(r"[a-z0-9]+(?:-[a-z0-9]+)*", skill_id):
+                raise RuntimeError("invalid registered Finance Skill identity")
+            if skill_id in identities:
+                raise RuntimeError("registered Finance Skill identity conflicts with system catalog")
+            identities.add(skill_id)
+            markdown = _trim(record.get("skill_markdown"))
+            frontmatter = dict(self._frontmatter(markdown))
+            if _trim(frontmatter.get("name")) != skill_id or not _trim(frontmatter.get("description")):
+                raise RuntimeError("invalid registered Finance Skill frontmatter")
+            # Native CC plugins also see this text, so strip author-supplied
+            # grants from the materialized method as well as the routing map.
+            frontmatter = {key: frontmatter[key] for key in
+                ("name", "description", "execution-budget") if key in frontmatter}
+            marker = markdown.find("\n---\n", 4)
+            content = ("---\n" + yaml.safe_dump(frontmatter, allow_unicode=True, sort_keys=False)
+                       + "---\n" + markdown[marker + 5:]).encode("utf-8")
+            references = []
+            for path, text in sorted(dict(record.get("references") or {}).items()):
+                normalized = _trim(path).replace("\\", "/")
+                pure = PurePosixPath(normalized)
+                if (pure.is_absolute() or ".." in pure.parts or len(pure.parts) < 2
+                        or pure.parts[0] != "references" or normalized != pure.as_posix()):
+                    raise RuntimeError("invalid registered Finance Skill reference path")
+                reference_content = str(text).encode("utf-8")
+                references.append(_FinanceSkillReferenceSnapshot(
+                    path=normalized, content_hash=self._content_hash(reference_content),
+                    content=reference_content,
+                ))
+            interface = yaml.safe_dump({"interface": {"display_name":
+                _trim(record.get("display_name")) or skill_id}}, allow_unicode=True).encode("utf-8")
+            skills.append(_FinanceBusinessSkillSnapshot(
+                skill_id=skill_id, category="personal", relative_path=f"skills/{skill_id}",
+                description=_trim(frontmatter["description"]), method=content.decode("utf-8").strip(),
+                method_content=content, content_hash=self._content_hash(content), allowed_tools=(),
+                execution_budget=self._execution_budget(frontmatter), references=tuple(references),
+                companion_files=(_FinanceSkillCompanionSnapshot("agents/openai.yaml",
+                    self._content_hash(interface), interface),),
+                owner=_trim(record.get("owner_id")), visibility=_trim(record.get("visibility")) or "private",
+                active_revision_no=int(record.get("active_revision_no") or 0),
+            ))
+        catalog_content = json.dumps({"skills": [{"id": skill.skill_id, "category": skill.category,
+            "path": skill.relative_path, "description": skill.description} for skill in skills]},
+            ensure_ascii=False, sort_keys=True).encode("utf-8")
+        result._snapshot = result._assemble_snapshot(
+            plugin_name=self._snapshot.plugin_name, plugin_manifest=self._snapshot.plugin_manifest,
+            catalog_content=catalog_content, skills=skills,
+        )
+        return result
 
     def routing_summary(
         self,
@@ -614,6 +727,15 @@ class FinanceBusinessSkillCatalog:
                     companion_files=self._companion_index(skill_file.parent),
                 )
             )
+        return self._assemble_snapshot(
+            plugin_name=plugin_name, plugin_manifest=plugin_manifest,
+            catalog_content=catalog_content, skills=skills,
+        )
+
+    def _assemble_snapshot(
+        self, *, plugin_name: str, plugin_manifest: bytes,
+        catalog_content: bytes, skills: list[_FinanceBusinessSkillSnapshot],
+    ) -> _FinanceBusinessCatalogSnapshot:
         file_hashes = {
             ".claude-plugin/plugin.json": self._content_hash(plugin_manifest),
             "catalog.json": self._content_hash(catalog_content),
@@ -643,6 +765,9 @@ class FinanceBusinessSkillCatalog:
                     "content_hash": skill.content_hash,
                     "allowed_tools": list(skill.allowed_tools),
                     "execution_budget": skill.execution_budget,
+                    "owner": skill.owner,
+                    "visibility": skill.visibility,
+                    "active_revision_no": skill.active_revision_no,
                     "references": [
                         {
                             "path": reference.path,

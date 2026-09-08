@@ -251,6 +251,28 @@ def test_report_metric_provider_preserves_boolean_filter_structure(monkeypatch) 
     assert db.cursor_obj.params[:-1] == ("eps", "roe", "forecast")
 
 
+@pytest.mark.parametrize("predicate", ["rating_change contains 下调", "rating_change not null"])
+def test_invalid_word_operator_never_becomes_unfiltered_report_query(monkeypatch, predicate):
+    def must_not_connect():
+        pytest.fail("Invalid filter must be rejected before connecting to DB")
+    monkeypatch.setattr(provider, "_connect_report_db", must_not_connect)
+    result = provider.execute_report_api(args={"filter": f"name = 安井食品 and {predicate}"}, outputs=["name", "rating_change"])
+    assert result["status"] == "unsupported"
+    assert result["rows"] == []
+
+
+def test_report_like_keeps_company_dates_and_rating_predicate(monkeypatch):
+    db = _Db([])
+    monkeypatch.setattr(provider, "_connect_report_db", lambda: db)
+    result = provider.execute_report_api(args={
+        "filter": "name = 安井食品 and report_date >= 2026-06-06 and report_date <= 2026-09-06 and rating_change like 下调",
+        "order": "report_date desc", "limit": 20,
+    }, outputs=["name", "rating_change"])
+    assert result["status"] == "ok"
+    assert "r.rating_change LIKE %s" in db.cursor_obj.sql
+    assert db.cursor_obj.params[:-1] == ("安井食品", "2026-06-06", "2026-09-06", "%下调%")
+
+
 def test_report_metric_provider_rejects_unknown_metric_code_before_query(monkeypatch) -> None:
     monkeypatch.setattr(
         provider,

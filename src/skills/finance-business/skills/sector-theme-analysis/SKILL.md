@@ -1,6 +1,6 @@
 ---
 name: sector-theme-analysis
-description: 综合分析行业、概念或主题在指定时点的整体表现、内部参与度、分化、事件传导和持续性时使用；只查板块涨跌幅、成分股名单、单家公司或单条新闻时不使用。
+description: 综合分析行业、概念或主题的整体表现、内部参与度、分化、事件传导和持续性。
 allowed-tools:
   - mcp__finance__general_search
 ---

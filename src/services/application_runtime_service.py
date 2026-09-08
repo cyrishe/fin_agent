@@ -53,7 +53,8 @@ class ApplicationRuntimeService:
         return {
             "application_name": app_ctx.get("application_name"),
             "agent_name": self._trim(default_agent.get("agent_name")),
-            "allowed_skills": [self._trim(x) for x in default_agent.get("skills", []) if self._trim(x)],
+            **({"allowed_skills": list(default_agent["skills"])}
+               if isinstance(default_agent.get("skills"), list) else {}),
             "allowed_tools": [self._trim(x) for x in default_agent.get("tools", []) if self._trim(x)],
         }
 
@@ -63,16 +64,19 @@ class ApplicationRuntimeService:
             return None
         agent_ctx = self.agent_runtime_service.get_agent_context(normalized)
         config = agent_ctx.get("config") if isinstance(agent_ctx.get("config"), dict) else {}
+        runtime_profile = agent_ctx.get("runtime_profile") or {}
+        skill_allowlist = runtime_profile.get("skills", config.get("skills"))
         return {
             "agent_name": normalized,
             "display_name": self._trim(config.get("display_name")) or normalized,
             "role": self._trim(config.get("role")),
             "persona": self._trim(config.get("persona")),
-            "skills": [self._trim(x) for x in config.get("skills", []) if self._trim(x)],
+            **({"skills": [self._trim(item) for item in skill_allowlist if self._trim(item)]}
+               if isinstance(skill_allowlist, list) else {}),
             "tools": [self._trim(x) for x in config.get("tools", []) if self._trim(x)],
             "handoff_agents": [self._trim(x) for x in config.get("handoff_agents", []) if self._trim(x)],
             "config": config,
-            "runtime_profile": agent_ctx.get("runtime_profile") or {},
+            "runtime_profile": runtime_profile,
         }
 
     def _resolve_default_agent(self, application_config: Dict[str, Any]) -> Optional[Dict[str, Any]]:

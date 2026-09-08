@@ -16,6 +16,8 @@ const TOOL_SUFFIXES = Object.freeze({
   catalog: 'read_finance_catalog',
   query: 'finance_query',
   details: 'load_finance_result',
+  skill: 'read_finance_skill',
+  reference: 'read_finance_skill_reference',
 })
 
 const DEFAULT_BUDGETS = Object.freeze({
@@ -49,6 +51,7 @@ const DEFAULT_CONFIG = Object.freeze({
   // enforce the active business stage with Harness' monotonic tool guard.  API
   // catalog chapters remain progressively disclosed by the catalog tool.
   preserveRequestPrefix: true,
+  emptyResultEarlyStop: true,
   maxCatalogAttempts: 6,
   maxQueryAttempts: 3,
   maxQueryRepairs: 1,
@@ -64,24 +67,24 @@ const EXECUTION_MODES = new Set(['standard', 'fast'])
 
 const STAGE_PROMPTS = Object.freeze({
   catalog:
-    '只做目录定位。具体数据请求必须一次传入明确的 subject + dataview + operation；operation 严格按 read_finance_catalog 参数中的统一规则选择。仅当主体、视图或 operation 确实无法判断时，才读上层目录或完整视图。研报中的观点、布局、竞争格局、催化、技术储备、估值逻辑、机构差异或风险选 stock.report；只有 EPS、收入、归母净利润及增速、PE/PB/ROE 等标准年度预测值选 stock.report_metric；实际披露财务数值才选 financial_3_table。若答案明确需要两个 operation，在同一步并行读取，不要串行试探。不要在本阶段回答数据值。',
+    '当前任务是目录定位。根据路由摘要与方法定义，一次提交明确的 subject + dataview + operation；需要的独立目录可并行读取。定位有歧义时读取对应概览。',
   query:
-    '目录字段与口径已经就绪。只把用户明确要求的事实和完成其计算不可缺少的依赖合并到一次最小 finance_query flow；不要为了丰富回答额外添加比较目标，也不要拆成多次试探查询。调用前逐条对照已加载 dataview 的 rules 自检每个 request，重点核对默认查询范围、时间口径以及 order/limit 是否真的会取得目标数据；不满足时先修正再调用。若已有结果只完成证券身份解析，必须引用其 rN.code/name 在本次查询实际业务事实。',
+    '目录已经就绪。按已加载契约构造 finance_query，将当前可确定的取数目标与依赖合并成一个最小 flow；已有身份结果通过结果列引用传给后续步骤。',
   repair:
-    '上一查询未成功。这是唯一一次修复机会：只修正工具结果明确指出的失败步骤和口径，不改目标、不换 API 追值，也不要重复完全相同的参数。',
+    '上一查询未成功，本阶段可修复一次。依据返回的 recovery 与已加载契约修正失败步骤，保留用户目标和已成功结果。',
   details:
-    '查询已经成功。仅当现有 sample 不足以写出用户要求的答案时调用 load_finance_result 读取最少的必要明细页，并优先只取当前结论需要的列；否则立即输出最终中文答案。不得输出思考过程、工具复盘或再次查询。',
+    '查询已经成功。现有样例足以回答时直接完成；答案需要样例之外的内容时，用 load_finance_result 按必要列读取明细后完成。',
   final:
-    '工具阶段已经结束。不要再尝试调用工具；严格根据已有成功结果、空值、零行或错误事实，立即给出简洁且全文中文的最终答案。任何数据口径必须沿用已加载目录和结果中的明确表述，未返回的口径不可自行补写。若现有证据只证明目标字段未提供，只陈述该数据边界、已查范围和不能给出数值的结论；不得搬运结果中与问题无关的数值，也不得推荐本轮未执行的数据来源。零行只表示当前查询条件没有匹配记录；不得用模型记忆补写公司背景、披露习惯、可能原因、替代来源或任何未查询事实。不得输出思考过程、工具复盘或回答草稿。',
+    '工具阶段已经结束。依据已有结果与执行证据，用简洁中文给出最终答案。数据不足时交代已查范围、实际缺口及尚待确定的结论；零行如实说明当前条件未匹配记录。',
 })
 
 const FAST_STAGE_PROMPTS = Object.freeze({
   catalog:
-    '快速模式：这是唯一一次目录定位。直接选择完成用户取数所需的明确 subject + dataview + operation；若需要多个彼此独立的数据视图，在本阶段并行读取。不要读取上层目录、不要试探、不要回答数据值。',
+    '快速模式：本阶段提供一次目录定位。根据路由摘要直接提交明确的 subject + dataview + operation，需要多个独立目录时并行读取。',
   query:
-    '快速模式：目录已经就绪，这是唯一一次调用生成阶段。直接生成完成用户明确取数目标所需的最小 finance_query；多个独立数据请求可在本阶段并行发出。不要先做身份预查询、不要解释、不要预留后续修复。',
+    '快速模式：本阶段提供一次查询生成。按已加载契约将取数目标和已知依赖合并为最小 finance_query；独立请求可并行发出，随后依据结果完成。',
   final:
-    '快速模式：工具阶段已经结束。不得检查、重试、翻页或再调用工具；直接根据已有成功结果、空值、零行或错误事实返回简洁且全文中文的答案。目标字段未提供时只陈述数据边界，不引用无关数值或未查询来源；零行时不得用模型记忆补写原因、背景或替代事实。',
+    '快速模式：工具阶段已经结束。依据已有结果与执行证据，用简洁中文直接回答；数据不足时说明已查范围与实际缺口，零行按当前条件未匹配记录说明。',
 })
 
 const REASONING_EFFORTS = new Set(['off', 'low', 'high', 'max'])
@@ -152,6 +155,10 @@ export function resolveConfig(input = {}) {
       ? DEFAULT_CONFIG.preserveRequestPrefix
       : supplied.preserveRequestPrefix === true
         || String(supplied.preserveRequestPrefix).toLowerCase() === 'true',
+    emptyResultEarlyStop: supplied.emptyResultEarlyStop === undefined
+      ? DEFAULT_CONFIG.emptyResultEarlyStop
+      : supplied.emptyResultEarlyStop === true
+        || String(supplied.emptyResultEarlyStop).toLowerCase() === 'true',
     maxCatalogAttempts: positiveInteger(
       supplied.maxCatalogAttempts,
       DEFAULT_CONFIG.maxCatalogAttempts,
@@ -214,6 +221,16 @@ function currentToolContext() {
     ? payload.tool_context
     : {}
   return toolContext
+}
+
+function hasSkillCatalog(context) {
+  return Boolean(String(context._finance_skill_catalog_prompt ?? '').trim())
+}
+
+function skillGuidedAnswer(state) {
+  // Availability permits composition; it does not decide whether a Skill
+  // matches the question. Uncovered questions retain generic analysis too.
+  return state.skillCatalogAvailable && !state.dataOnlyRequested
 }
 
 function stableValue(value) {
@@ -352,7 +369,7 @@ function projectDetailPayload(payload, config) {
         model_rows: result.rows.length,
         shortened_fields: result.shortenedFields,
         complete: false,
-        guidance: '这是连续的有界明细；page 描述实际可见行，shortened_fields 中的字段仅为摘要，不代表全文。原始行保存在 result_ref。',
+        guidance: 'page 描述本页连续明细，shortened_fields 列出已缩略字段；完整原始行保存在 result_ref。',
       }
     }
   } else if (typeof projected.text === 'string' && projected.text.length > config.detailTotalMaxChars) {
@@ -457,12 +474,9 @@ function queryNeedsDetails(payload) {
 }
 
 function queryIsPreparatory(payload) {
-  const completed = summaries(payload).filter(
-    item => item !== null && typeof item === 'object',
-  )
-  return completed.length > 0 && completed.every(
-    item => typeof item.api === 'string' && item.api.endsWith('.basic_info'),
-  )
+  // Completion belongs to the question, not the selected API name. A basic
+  // information query may itself be the entire user request.
+  return payload?.data_request_complete === false
 }
 
 function queryCompletesDataOnly(payload) {
@@ -483,16 +497,66 @@ function hasDataOnlyResults(state) {
   )
 }
 
+function emptyResultHandoff(state, config) {
+  if (!config.emptyResultEarlyStop || state.dataOnlyRequested
+    || skillGuidedAnswer(state)
+    || state.stage !== 'final' || state.requiredAction || state.finalAnswerAttempted) return
+  const calls = [...state.calls.values()]
+  const queries = calls.filter(call => call.kind === 'query')
+  if (queries.length === 0) return
+  // No failed/missing call, no partial flow, and no implicit completion. The
+  // normal loop still owns routing, repair, dependencies and the final boundary.
+  if (calls.some(call => {
+    const outcome = state.results.get(call.callId)
+    return !call.allowedAtCall || !outcome || outcome.failed
+      || (call.kind === 'catalog' && !catalogIsReady(outcome.payload))
+      || (call.kind === 'query' && !querySucceeded(outcome.payload, outcome.failed))
+  })) return
+  const lastStep = Math.max(...queries.map(call => call.step))
+  if (queries.filter(call => call.step === lastStep).some(call =>
+    state.results.get(call.callId).payload.data_request_complete !== true)) return
+  if (queries.some(call => {
+    const rows = summaries(state.results.get(call.callId).payload)
+    return rows.length === 0 || rows.some(item => item?.row_count !== 0 || !item.result_ref)
+  })) return
+  let trace
+  try {
+    trace = JSON.parse(readFileSync(process.env.FIN_AGENT_DSH_TRACE_PATH, 'utf8'))
+  } catch { return }
+  const context = currentRuntimeContext()
+  if (!context.revision || trace.revision !== context.revision
+    || trace.finance_catalog_revision !== context.finance_catalog_revision) return
+  const message = trace.empty_result_context
+  if (message?.role !== 'user' || message.source?.kind !== 'plugin'
+    || message.source.plugin !== 'fin-agent:empty-result'
+    || typeof message.id !== 'string' || !message.id
+    || message.content?.length !== 1 || message.content[0].type !== 'text'
+    || typeof message.content[0].text !== 'string' || !message.content[0].text) return
+  return message
+}
+
 function promptFor(state, config) {
   const prompts = state.executionMode === 'fast' ? FAST_STAGE_PROMPTS : STAGE_PROMPTS
   let base = state.stage === 'catalog' && state.reusableApis.length > 0
-    ? '按本轮问题继承或更新对象、指标、时间和输出粒度。本会话仍可见且版本有效的目录可直接复用并调用 finance_query；需要未加载的视图或 operation 时，先用 read_finance_catalog 精确加载。复用的是目录，不是旧查询结果；不要把上一轮日期、标的或条件强加给本轮。'
+    ? '按本轮问题更新对象、指标、时间与结果粒度。仍可见且版本有效的目录可以复用，按本轮条件调用 finance_query；需要新视图或方法时用 read_finance_catalog 加载对应契约。'
     : prompts[state.stage] ?? prompts.final
+  if (skillGuidedAnswer(state)) {
+    if (state.stage === 'catalog') {
+      base = '依据授权 Skill 目录选择适用方法，读取尚未加载的正文，再定位所需数据目录。其余数据目标通过金融目录取数，并结合通用分析完成。'
+      if (state.executionMode === 'fast') base += '\n快速模式仅提供一次数据目录定位和一次查询生成，按方法合并必要取数目标。'
+    } else if (['query', 'details'].includes(state.stage)) {
+      base = state.executionMode === 'fast'
+        ? FAST_STAGE_PROMPTS.query + '已加载 Skill 指导取数范围，必要参考可以按需读取。'
+        : '按已读取的 Skill 与参考综合已有证据。证据足够时直接回答；需要补充方法时按需读取参考，需要补充数据时加载对应目录、查询或读取必要明细。取数完成与分析完成分别判断，剩余调用受本轮预算约束。'
+    } else if (state.stage === 'final') {
+      base = '本轮取数预算已结束。可按需读取 Skill 及其参考，依据已有结果完成分析与回答，交代证据缺口与推断条件。'
+    }
+  }
   if (state.dataOnlyRequested || hasDataOnlyResults(state)) {
     if (state.stage === 'query' && hasDataOnlyResults(state)) {
-      base = '已有数据集保存在本轮结果中。只有尚未完成的取数目标依赖这些结果时，才读取必要明细、加载下一目录或补查；不要为撰写答案阅读全文或重复取数。没有后续数据依赖时结束本轮，不生成自然语言回答。'
+      base = '本轮已有数据集。依赖这些结果的取数目标尚未完成时，读取必要明细、加载对应目录并继续；取数目标完成后结束本轮，由系统交付结果。'
     }
-    base += '\n仅数据模式：原始数据由系统返回，不生成自然语言回答。在 finance_query 中明确声明 data_request_complete；本 flow 已包含全部取数目标时为 true，确有后续数据依赖时为 false。'
+    base += '\n仅数据模式：按 finance_query 的 data_request_complete 定义声明完成，由系统交付结果。'
   }
   const marker = `[FINANCE_LOOP stage=${state.stage} reason=${state.reason}]`
   const mode = `[FINANCE_EXECUTION mode=${state.executionMode}]`
@@ -500,18 +564,28 @@ function promptFor(state, config) {
 }
 
 function stageTools(state, tools) {
+  const methods = state.stage === 'final' && state.dataOnlyRequested
+    ? [] : [tools.skill, tools.reference].filter(Boolean)
+  let allowed
   switch (state.stage) {
-    case 'catalog': return state.reusableApis.length > 0 ? [tools.catalog, tools.query] : [tools.catalog]
-    case 'query': return hasDataOnlyResults(state) ? [tools.catalog, tools.query, tools.details] : [tools.query]
-    case 'repair': return [tools.query]
-    case 'details': return [tools.details]
-    default: return []
+    case 'catalog': allowed = state.reusableApis.length > 0 ? [tools.catalog, tools.query] : [tools.catalog]; break
+    case 'query': allowed = hasDataOnlyResults(state) || (state.executionMode === 'standard' && skillGuidedAnswer(state))
+      ? [tools.catalog, tools.query, tools.details]
+      : state.executionMode === 'standard' ? [tools.catalog, tools.query] : [tools.query]; break
+    case 'repair': allowed = [tools.catalog, tools.query]; break
+    case 'details': allowed = state.executionMode === 'standard' && skillGuidedAnswer(state)
+      ? [tools.catalog, tools.query, tools.details] : [tools.details]; break
+    default: allowed = []
   }
+  return [...methods, ...allowed]
 }
 
 function stageAllows(state, kind, args) {
+  if (kind === 'skill' || kind === 'reference') return state.stage !== 'final' || !state.dataOnlyRequested
   if (state.stage === 'catalog') return kind === 'catalog' || (kind === 'query' && canReuseCatalog(state, args))
+  if (state.executionMode === 'standard' && skillGuidedAnswer(state) && ['query', 'details'].includes(state.stage)) return ['catalog', 'query', 'details'].includes(kind)
   if (state.stage === 'query' && hasDataOnlyResults(state)) return ['catalog', 'query', 'details'].includes(kind)
+  if (state.executionMode === 'standard' && ['query', 'repair'].includes(state.stage) && kind === 'catalog') return true
   if (state.stage === 'query' || state.stage === 'repair') return kind === 'query'
   if (state.stage === 'details') return kind === 'details'
   return false
@@ -522,6 +596,7 @@ function resetTurn(state, turn, config, agent, tools) {
   const toolContext = currentToolContext()
   state.executionMode = executionMode(toolContext._finance_execution_mode, config.executionMode)
   state.dataOnlyRequested = toolContext._finance_data_only === true
+  state.skillCatalogAvailable = hasSkillCatalog(toolContext)
   state.stage = 'catalog'
   state.reason = 'turn_started'
   // Fast mode's explicit one-catalog/one-query contract remains unchanged.
@@ -554,6 +629,7 @@ function updateAfterStep(state, step, config) {
   const catalog = calls.filter(call => call.kind === 'catalog')
   const queries = calls.filter(call => call.kind === 'query')
   if (catalog.length > 0) {
+    const repairing = state.stage === 'repair'
     const outcomes = catalog.map(call => state.results.get(call.callId)).filter(Boolean)
     const allReady = outcomes.length === catalog.length
       && outcomes.every(outcome => !outcome.failed && catalogIsReady(outcome.payload))
@@ -564,11 +640,11 @@ function updateAfterStep(state, step, config) {
       return
     }
     if (allReady) {
-      state.stage = 'query'
+      state.stage = repairing ? 'repair' : 'query'
       state.reason = 'dataview_ready'
       state.requiredAction = true
     } else if (state.catalogAttempts < config.maxCatalogAttempts) {
-      state.stage = 'catalog'
+      state.stage = repairing ? 'repair' : 'catalog'
       state.reason = 'catalog_needs_narrowing'
       state.requiredAction = true
     } else {
@@ -636,7 +712,8 @@ function updateAfterStep(state, step, config) {
         // DB call merely because the model is done or declines more analysis.
         state.requiredAction = false
       } else {
-        state.stage = queryNeedsDetails(success.payload) ? 'details' : 'final'
+        state.stage = queryNeedsDetails(success.payload) ? 'details'
+          : skillGuidedAnswer(state) && state.queryAttempts < config.maxQueryAttempts ? 'query' : 'final'
         state.reason = state.stage === 'details'
           ? 'query_success_sample_incomplete'
           : 'query_success_sample_complete'
@@ -668,6 +745,13 @@ function updateAfterStep(state, step, config) {
     return
   }
 
+  if (calls.every(call => call.kind === 'skill' || call.kind === 'reference')) {
+    // Method reads do not consume query attempts or complete the data stage.
+    // A method can also answer a supplied-evidence question without a DB call.
+    if (!state.dataOnlyRequested) state.requiredAction = false
+    return
+  }
+
   state.stage = 'final'
   state.reason = 'unknown_tool_stopped'
   state.requiredAction = false
@@ -675,16 +759,16 @@ function updateAfterStep(state, step, config) {
 
 function requiredActionPrompt(state, tools) {
   if (hasDataOnlyResults(state)) {
-    return '已有数据集。仅完成新加载目录对应的未完成取数目标，或修复实际失败的步骤；不要重复已有查询，不要生成答案。'
+    return '本轮已有数据集。继续完成新加载目录对应的取数目标，或按 recovery 修复失败步骤；由系统交付原始结果。'
   }
   if (state.stage === 'catalog') {
     if (state.reusableApis.length > 0) {
       return `本轮尚未取得数据。已有有效目录可直接调用 ${tools.query}；需要新视图或 operation 时先调用 ${tools.catalog}。`
     }
-    return `本阶段尚未完成目录路由。请立即调用当前唯一可见的 ${tools.catalog}；具体请求一次提交 subject、dataview、operation，不要输出文字答案。`
+    return `本阶段需要完成目录路由。调用 ${tools.catalog}，一次提交明确的 subject、dataview、operation。`
   }
   if (state.stage === 'query' || state.stage === 'repair') {
-    return `目录已经确定，但本阶段尚未取得数据。请立即调用当前唯一可见的 ${tools.query}；不要在查询前分析或回答。`
+    return `本阶段需要取得数据。按已加载契约调用 ${tools.query}；所需目录可用 ${tools.catalog} 补齐。`
   }
   if (state.stage === 'final') return STAGE_PROMPTS.final
   return ''
@@ -708,8 +792,8 @@ function concreteCatalogRouteError(args) {
   const subject = String(args.subject ?? '').trim()
   const dataview = String(args.dataview ?? '').trim()
   const operation = String(args.operation ?? '').trim()
-  if (dataview && (!subject || !operation)) {
-    return '具体金融目录读取必须同时提交 subject、dataview 和 operation；请先按当前路由摘要补全三元组。'
+  if (dataview && !subject) {
+    return '读取 dataview 时需要同时提供 subject。'
   }
   if (operation && (!subject || !dataview)) {
     return 'operation 只能与明确的 subject 和 dataview 一起提交。'
@@ -722,6 +806,7 @@ function resolveToolNames(agent) {
   const resolved = {}
   for (const [kind, suffix] of Object.entries(TOOL_SUFFIXES)) {
     const matches = names.filter(candidate => candidate === suffix || candidate.endsWith(`__${suffix}`))
+    if (matches.length === 0 && (kind === 'skill' || kind === 'reference')) continue
     if (matches.length !== 1) {
       throw new Error(
         `finance-loop-policy: expected exactly one visible tool ending in ${suffix}; found ${matches.join(', ') || '(none)'}`,
@@ -744,6 +829,7 @@ export function apply(ctx, input = {}) {
       turn: 0,
       executionMode: executionMode(toolContext._finance_execution_mode, config.executionMode),
       dataOnlyRequested: toolContext._finance_data_only === true,
+      skillCatalogAvailable: hasSkillCatalog(toolContext),
       stage: 'catalog',
       reason: 'agent_created',
       reusableApis: [],
@@ -812,10 +898,10 @@ export function apply(ctx, input = {}) {
       if (!stageAllows(state, kind, exec.arguments)) {
         return `金融查询策略拒绝当前阶段调用 ${exec.name}；请遵循上一工具结果末尾的阶段指引。`
       }
-      if (hasDataOnlyResults(state) && (
-        (kind === 'details' && state.loadAttempts >= config.maxLoadAttempts)
-        || (kind === 'catalog' && state.catalogAttempts >= config.maxCatalogAttempts)
-      )) return '本轮该类读取次数已达上限；请使用已有数据继续必要取数，不要重复读取。'
+      if ((kind === 'catalog' && state.catalogAttempts >= config.maxCatalogAttempts)
+        || (kind === 'query' && state.queryAttempts >= config.maxQueryAttempts)
+        || ((hasDataOnlyResults(state) || skillGuidedAnswer(state)) && kind === 'details' && state.loadAttempts >= config.maxLoadAttempts)
+      ) return '本轮该类读取次数已达上限；请使用已有数据与当前可用工具完成剩余目标。'
       if (kind === 'catalog') {
         const routeError = concreteCatalogRouteError(exec.arguments)
         if (routeError) return routeError
@@ -882,7 +968,19 @@ export function apply(ctx, input = {}) {
       }
       if (state.dataOnlyComplete || (state.dataOnlyRequested && state.stage === 'final')) return { kind: 'reject' }
       const downstream = await next()
-      if (downstream.kind !== 'enter' || !config.preserveRequestPrefix) return downstream
+      if (downstream.kind !== 'enter') return downstream
+      if (downstream.messages.length === 0) {
+        const message = emptyResultHandoff(state, config)
+        if (message) {
+          // Keep continuation history faithful without pretending this fixed
+          // response was model-generated. Native pre-step rejection spends no
+          // LLM call; the host recognizes only this logged, exact handoff.
+          agent.session.append('user/message', message, { surfaceOp: 'append' })
+          state.finalAnswerAttempted = true
+          return { kind: 'reject' }
+        }
+      }
+      if (!config.preserveRequestPrefix) return downstream
       const key = `${state.stage}:${state.reason}`
       if (state.lastInjectedStage === key) return downstream
       state.lastInjectedStage = key
@@ -900,12 +998,14 @@ export function apply(ctx, input = {}) {
       const budgetKey = state.executionMode === 'fast' && state.stage === 'query'
         ? 'fast_query' : state.stage
       const selected = config.budgets[budgetKey] ?? config.budgets.final
+      const analyzing = skillGuidedAnswer(state) && !state.requiredAction
       return {
         ...proposed,
-        reasoningEffort: selected.reasoningEffort,
+        reasoningEffort: analyzing && selected.reasoningEffort === 'off'
+          ? config.budgets.catalog.reasoningEffort : selected.reasoningEffort,
         // A resumed routing step can now produce a complete query flow. Keep
         // routing reasoning, but don't truncate it at the smaller route budget.
-        maxTokens: state.stage === 'catalog' && state.reusableApis.length > 0
+        maxTokens: analyzing || (state.stage === 'catalog' && state.reusableApis.length > 0)
           ? Math.max(selected.maxTokens, config.budgets.query.maxTokens)
           : selected.maxTokens,
       }
@@ -948,7 +1048,7 @@ export function apply(ctx, input = {}) {
           allowedAtCall: stageAllows(state, kind, event.data.arguments),
         })
         if (stageAllows(state, kind, event.data.arguments)) {
-          state.requiredAction = false
+          if (!state.dataOnlyRequested || !['skill', 'reference'].includes(kind)) state.requiredAction = false
           if (kind === 'catalog') state.catalogAttempts += 1
           if (kind === 'query') state.queryAttempts += 1
           if (kind === 'details') state.loadAttempts += 1

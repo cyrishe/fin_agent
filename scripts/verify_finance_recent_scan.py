@@ -55,10 +55,17 @@ def main():
         ('index_20', q.execute_quote_api, {'subject': 'index', 'args': {'codes': ['000300.SH'], 'count': 20}, 'outputs': ['code', 'tradedate', 'close']}),
         ('fund_20', q.execute_quote_api, {'subject': 'fund', 'args': {'codes': ['510300.SH'], 'count': 20}, 'outputs': ['code', 'tradedate', 'close']}),
         ('fund_250', q.execute_quote_api, {'subject': 'fund', 'args': {'codes': ['510300.SH'], 'count': 250}, 'outputs': ['code', 'tradedate', 'close']}),
+        ('bond_20', q.execute_quote_api, {'subject': 'bond', 'args': {'codes': ['113050.SH'], 'count': 20}, 'outputs': ['code', 'tradedate', 'close']}),
+        ('plate_20', q.execute_quote_api, {'subject': 'plate', 'args': {'codes': ['882003'], 'count': 20}, 'outputs': ['code', 'tradedate', 'close']}),
         ('minute_20', minute.execute_intraday_quote_api, {'args': {'mode': 1, 'period': 60, 'count': 20, 'filter': 'code = 600519.SH'}, 'outputs': ['code', 'tradedate', 'bar_end_time', 'close']}),
         ('minute_multi', minute.execute_intraday_quote_api, {'args': {'mode': 1, 'period': 60, 'count': 20, 'filter': 'code in (600519.SH,300750.SZ)'}, 'outputs': ['code', 'tradedate', 'bar_end_time', 'close']}),
         ('business_segment', corp.execute_stock_corporate_api, {'dataview': 'business_segment', 'args': {'filter': 'code = 300750.SZ', 'limit': 5}, 'outputs': ['code', 'report_period', 'project_name', 'segment_sales']}),
     ]
+    for view, definition in corp.STOCK_CORPORATE_VIEWS.items():
+        if view != 'business_segment':
+            cases.append((view, corp.execute_stock_corporate_api,
+                {'dataview': view, 'args': {'filter': 'code = 300750.SZ', 'limit': 5},
+                 'outputs': ['code', definition.default_date_field]}))
     report = {'comparisons': [], 'note': 'Read-only; same SQL/index baseline; full ordered rows compared, not just row count.'}
     for name, fn, kwargs in cases:
         if args.cases and name not in args.cases:

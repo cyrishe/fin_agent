@@ -17,7 +17,7 @@ from src.experiments.staged_data_protocol.phase2.models import ApiCall
 
 @pytest.mark.parametrize(
     ("mode", "expected_provider", "expected_latest_only"),
-    [(0, "daily", None), (1, "minute", False), (2, "minute", True)],
+    [(0, "daily", None), (1, "minute", False), (2, "realtime", None)],
 )
 def test_stock_quote_routes_modes(
     monkeypatch: pytest.MonkeyPatch,
@@ -35,8 +35,13 @@ def test_stock_quote_routes_modes(
         calls.append(("minute", latest_only))
         return {"status": "ok", "columns": ["code"], "rows": []}
 
+    def fake_realtime(*, args, outputs):
+        calls.append(("realtime", None))
+        return {"status": "ok", "columns": ["code"], "rows": []}
+
     monkeypatch.setattr(api_runner, "execute_quote_api", fake_daily)
     monkeypatch.setattr(api_runner, "execute_intraday_quote_api", fake_minute)
+    monkeypatch.setattr(api_runner, "execute_realtime_quote_api", fake_realtime)
 
     result = api_runner.execute_api_call(ApiCall("r1", "stock.quote", {"mode": mode}, ["code"], ""))
 

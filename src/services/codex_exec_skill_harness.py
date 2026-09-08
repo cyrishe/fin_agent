@@ -865,7 +865,7 @@ class CodexSdkSkillHarness(CodexExecSkillHarness):
         event_coalescer = AgentEventCoalescer()
 
         try:
-            from openai_codex import ApprovalMode, Codex, CodexConfig, Sandbox, SkillInput, TextInput
+            from openai_codex import ApprovalMode, Codex, CodexConfig, Sandbox, TextInput
             from openai_codex.types import Personality, ReasoningEffort, ReasoningSummary
 
             sdk_sandbox = self._sdk_sandbox(Sandbox)
@@ -923,14 +923,10 @@ class CodexSdkSkillHarness(CodexExecSkillHarness):
                         sandbox=sdk_sandbox,
                     )
                 active_provider_session_id = _trim(getattr(thread, "id", "")) or provider_session_id
-                skill_name = self._skill_name(skill_file)
                 turn_input = (
                     [TextInput(text=self._build_sdk_resume_prompt(user_request=user_request, context=prompt_context))]
                     if provider_session_id
-                    else [
-                        SkillInput(name=skill_name, path=str(skill_file.resolve())),
-                        TextInput(text=prompt),
-                    ]
+                    else [TextInput(text=prompt)]
                 )
                 turn_options = {
                     "approval_mode": ApprovalMode.deny_all,
@@ -1453,11 +1449,21 @@ class CodexSdkSkillHarness(CodexExecSkillHarness):
                 "api_dependency_ref 的窄契约修改，不扫描完整 API Catalog，不重做 Design，"
                 "用本地合成正反例验证。\n"
             )
+        skill_resources = ""
+        if _trim(skill_root):
+            skill_resources = (
+                "# SKILL RESOURCES\n"
+                f"Skill 目录：{_trim(skill_root)}\n"
+                "SKILL 中的相对文件引用均从该目录解析；只读取当前任务明确需要的文件。\n\n"
+            )
         return (
-            "执行随本轮输入启用的 Skill。\n"
+            "请严格按照下面的 SKILL 执行任务。\n"
             f"资料包目录：{_trim(bundle.get('bundle_dir'))}\n"
             "按需使用 rg/sed 读取 CONTEXT 引用的资产和 API Catalog；不要展开无关文件。\n\n"
             f"{stage_guidance}\n"
+            "# SKILL\n"
+            f"{skill_text}\n\n"
+            f"{skill_resources}"
             "# CONTEXT\n"
             f"{_json_text(dict(context))}\n\n"
             "# USER REQUEST\n"

@@ -3,6 +3,12 @@ from types import SimpleNamespace
 from src.web import flask_app as web
 
 
+def _authenticate_member(monkeypatch) -> None:
+    identity = {"user_id": "user-42", "user_type": "member"}
+    monkeypatch.setattr(web, "_resolve_current_member_identity", lambda: identity)
+    monkeypatch.setattr(web, "_resolve_current_guest_identity", lambda: identity)
+
+
 def _bundle(*, owner_id: str = "user-42") -> dict:
     return {
         "manifest": {
@@ -34,6 +40,7 @@ def _bundle(*, owner_id: str = "user-42") -> dict:
 
 
 def test_custom_tool_test_runs_exact_revision_and_returns_process(monkeypatch) -> None:
+    _authenticate_member(monkeypatch)
     captured = {}
 
     class Store:
@@ -77,8 +84,6 @@ def test_custom_tool_test_runs_exact_revision_and_returns_process(monkeypatch) -
         SimpleNamespace(store=Store(), runtime=Runtime()),
     )
     monkeypatch.setattr(web, "CustomToolRuntimeService", TestRuntime)
-    monkeypatch.setattr(web, "_resolve_current_guest_identity", lambda: {"user_id": "user-42"})
-
     response = web.app.test_client().post(
         "/api/custom-tools/ct_demo/test",
         json={"revision": 3, "arguments": {"stock_codes": ["600519.SH"]}},
@@ -106,6 +111,8 @@ def test_custom_tool_test_runs_exact_revision_and_returns_process(monkeypatch) -
 
 
 def test_custom_tool_test_rejects_invalid_input_before_execution(monkeypatch) -> None:
+    _authenticate_member(monkeypatch)
+
     class Store:
         def load_revision(self, _tool_name, _revision):
             return _bundle()
@@ -115,8 +122,6 @@ def test_custom_tool_test_rejects_invalid_input_before_execution(monkeypatch) ->
         "custom_tool_agent_service",
         SimpleNamespace(store=Store(), runtime=SimpleNamespace()),
     )
-    monkeypatch.setattr(web, "_resolve_current_guest_identity", lambda: {"user_id": "user-42"})
-
     response = web.app.test_client().post(
         "/api/custom-tools/ct_demo/test",
         json={"revision": 3, "arguments": {"stock_codes": []}},
@@ -127,6 +132,8 @@ def test_custom_tool_test_rejects_invalid_input_before_execution(monkeypatch) ->
 
 
 def test_custom_tool_test_enforces_owner_scope(monkeypatch) -> None:
+    _authenticate_member(monkeypatch)
+
     class Store:
         def load_revision(self, _tool_name, _revision):
             return _bundle(owner_id="another-user")
@@ -136,8 +143,6 @@ def test_custom_tool_test_enforces_owner_scope(monkeypatch) -> None:
         "custom_tool_agent_service",
         SimpleNamespace(store=Store(), runtime=SimpleNamespace()),
     )
-    monkeypatch.setattr(web, "_resolve_current_guest_identity", lambda: {"user_id": "user-42"})
-
     response = web.app.test_client().post(
         "/api/custom-tools/ct_demo/test",
         json={"revision": 3, "arguments": {"stock_codes": ["600519.SH"]}},

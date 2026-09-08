@@ -273,7 +273,7 @@ function mapInvocationAsset(
     status !== "active" ||
     lifecycle !== "active" ||
     visibility === "hidden" ||
-    (kind === "skill" && auth !== "public")
+    (kind === "skill" && auth !== "public" && item.skill_type !== "business_method")
   ) return null;
   const name = String(
     item.name ||

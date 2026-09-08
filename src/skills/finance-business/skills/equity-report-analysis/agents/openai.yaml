@@ -1,0 +1,4 @@
+interface:
+  display_name: "个股研报解读"
+  short_description: "检索个股研报与机构预测，分析观点分歧、预期修订、专题证据和事件影响"
+  default_prompt: "请用 $equity-report-analysis 分析目标公司的机构观点、主要分歧和依据。"

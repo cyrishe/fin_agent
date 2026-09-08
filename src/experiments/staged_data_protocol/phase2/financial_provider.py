@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from src.experiments.staged_data_protocol.phase2 import python_filter as pf
+
 import re
 from dataclasses import dataclass
 from datetime import date, datetime
@@ -160,6 +162,10 @@ def execute_financial_3_table_api(*, subject: str, args: Mapping[str, Any], outp
     where_sql, params = _build_where(source=source, args=args)
     order_sql = _build_order(source=source, args=args)
     query_columns = _query_columns(columns=columns, computed_columns=computed_columns)
+    filter_columns = []
+    if pf.condition(args) is not None and post_process:
+        filter_columns = [p["field"] for p in pf.predicates(pf.condition(args)) if p["field"] in source.fields]
+        query_columns = list(dict.fromkeys([*query_columns, *filter_columns]))
     sql = _build_sql(source=source, columns=query_columns, where_sql=where_sql, order_sql=order_sql)
     params.append(sql_limit)
 
@@ -171,6 +177,7 @@ def execute_financial_3_table_api(*, subject: str, args: Mapping[str, Any], outp
             if computed_columns:
                 _attach_computed_fields(cursor=cursor, rows=raw_rows, args=args, computed_columns=computed_columns)
         processing_columns = _processing_columns(columns=columns, computed_columns=computed_columns)
+        processing_columns = list(dict.fromkeys([*processing_columns, *filter_columns]))
         rows = [_normalize_row(row, processing_columns) for row in raw_rows]
         rows = _filter_post_rows(source=source, args=args, rows=rows)
         rows = _sort_post_rows(args=args, rows=rows)
@@ -271,7 +278,7 @@ def _output_token(output: str) -> str:
 
 
 def _has_unresolved_ref(args: Mapping[str, Any]) -> bool:
-    return any(isinstance(value, str) and re.search(r"\br\d+\.", value) for value in args.values())
+    return pf.has_unresolved_refs(args)
 
 
 def _bounded_limit(value: Any) -> int:
@@ -324,6 +331,9 @@ def _build_filter_clauses(
     args: Mapping[str, Any],
     explicit_filters: List[tuple[str, str, str, Any]] | None = None,
 ) -> tuple[str, List[Any]]:
+    if pf.condition(args) is not None:
+        return pf.and_sql(_build_filter_clauses(source=source, args=pf.without_filter(args)),
+                          pf.sql_filter(args, source.fields, allowed=set(source.fields)))
     clauses: List[str] = []
     params: List[Any] = []
     filters = explicit_filters if explicit_filters is not None else _explicit_filters(source=source, args=args)
@@ -362,6 +372,8 @@ def _ignored_filters(*, source: FinancialSource, args: Mapping[str, Any]) -> Lis
 
 
 def _explicit_filters(*, source: FinancialSource, args: Mapping[str, Any]) -> List[tuple[str, str, str, Any]]:
+    if pf.condition(args) is not None:
+        return _explicit_filters(source=source, args=pf.without_filter(args)) + pf.leaf_items(args)
     rows: List[tuple[str, str, str, Any]] = []
     for field_name in source.fields:
         value = args.get(field_name)
@@ -599,6 +611,9 @@ def _computed_columns_for_request(*, source: FinancialSource, args: Mapping[str,
 
 
 def _filter_post_rows(*, source: FinancialSource, args: Mapping[str, Any], rows: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    tree = pf.condition(args)
+    if tree is not None:
+        return [row for row in rows if pf.evaluate(tree, row)] if _computed_filter_fields(source=source, args=args) else rows
     result = rows
     for _connector, field_name, op, value in _explicit_filters(source=source, args=args):
         if not _computed_base(field_name):

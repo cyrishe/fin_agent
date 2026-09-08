@@ -45,7 +45,13 @@ class AgentExecutionService:
         selected_agent = self._resolve_selected_agent(app_ctx, agent_name)
         if selected_agent:
             route_context["agent_name"] = self._trim(selected_agent.get("agent_name"))
-            route_context["allowed_skills"] = [self._trim(x) for x in selected_agent.get("skills", []) if self._trim(x)]
+            selected_skills = selected_agent.get("skills")
+            incoming_skills = incoming_context.get("allowed_skills")
+            if isinstance(selected_skills, list):
+                route_context["allowed_skills"] = [self._trim(x) for x in selected_skills
+                    if self._trim(x) and (not isinstance(incoming_skills, list) or self._trim(x) in incoming_skills)]
+            elif not isinstance(incoming_skills, list):
+                route_context.pop("allowed_skills", None)
             route_context["allowed_tools"] = [self._trim(x) for x in selected_agent.get("tools", []) if self._trim(x)]
         return {
             "application_name": normalized_application,

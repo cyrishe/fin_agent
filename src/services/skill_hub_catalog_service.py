@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import json
-from typing import Any, Dict, Mapping, Optional
+from typing import Any, Dict, Iterable, Mapping, Optional
 from urllib.parse import quote
 
 from src.scenarios.financial_qa.business_skills import (
@@ -10,6 +10,10 @@ from src.scenarios.financial_qa.business_skills import (
 )
 from src.services.asset_invocation_service import AssetInvocationService
 from src.services.skill_studio_service import SkillStudioService
+from src.services.skill_candidate_store_service import (
+    DatabaseSkillCandidateStoreService,
+    SkillCandidateConflictError,
+)
 
 
 def _trim(value: Any) -> str:
@@ -17,26 +21,41 @@ def _trim(value: Any) -> str:
 
 
 class SkillHubCatalogService:
-    """Read-only discovery adapter across CC-native and legacy Skills.
-
-    This service deliberately does not decide execution.  Finance business
-    methods remain inside Finance CC, while compiled Skills remain behind the
-    legacy runner until their explicit routing semantics are migrated.
-    """
+    """One authorized active Skill view for Hub, explicit use, and Finance CC."""
 
     def __init__(
         self,
         *,
         business_catalog: Optional[FinanceBusinessSkillCatalog] = None,
         legacy_skill_studio: Optional[SkillStudioService] = None,
+        candidate_store: Any = None,
     ) -> None:
         self.business_catalog = business_catalog or FinanceBusinessSkillCatalog()
         self.legacy_skill_studio = legacy_skill_studio or SkillStudioService()
+        self._candidate_store = candidate_store
+        self._registry_injected = candidate_store is not None
 
-    def catalog(self) -> Dict[str, Any]:
-        business_snapshot = self.business_catalog.discovery_snapshot()
+    @property
+    def candidate_store(self):
+        if self._candidate_store is None:
+            self._candidate_store = DatabaseSkillCandidateStoreService()
+        return self._candidate_store
+
+    def runtime_catalog(self, *, owner_ids: Iterable[str] = ()) -> FinanceBusinessSkillCatalog:
+        owners = tuple(sorted({_trim(item) for item in owner_ids if _trim(item)}))
+        # Anonymous/default startup is system-only. Authenticated requests (and
+        # injected offline stores) include public and the caller's private Skills.
+        if not owners and not self._registry_injected:
+            return self.business_catalog
+        records = self.candidate_store.list_available(owner_ids=owners)
+        return self.business_catalog.with_active_skills(records)
+
+    def catalog(self, *, owner_ids: Iterable[str] = ()) -> Dict[str, Any]:
+        owners = tuple(owner_ids)
+        catalog = self.runtime_catalog(owner_ids=owners)
+        business_snapshot = catalog.discovery_snapshot()
         items = [
-            *self._business_method_items(business_snapshot),
+            *self._business_method_items(business_snapshot, catalog=catalog, owner_ids=owners),
             *self._legacy_compiled_items(),
         ]
         revision_payload = {
@@ -57,12 +76,13 @@ class SkillHubCatalogService:
             "items": items,
         }
 
-    def list_skills(self) -> list[Dict[str, Any]]:
-        return list(self.catalog()["items"])
+    def list_skills(self, *, owner_ids: Iterable[str] = ()) -> list[Dict[str, Any]]:
+        return list(self.catalog(owner_ids=owner_ids)["items"])
 
     def _business_method_items(
         self,
         snapshot: Mapping[str, Any],
+        *, catalog: FinanceBusinessSkillCatalog, owner_ids: Iterable[str] = (),
     ) -> list[Dict[str, Any]]:
         revision = _trim(snapshot.get("revision"))
         rows: list[Dict[str, Any]] = []
@@ -72,7 +92,9 @@ class SkillHubCatalogService:
             skill_id = _trim(entry.get("id"))
             if not skill_id:
                 continue
-            detail = self.business_catalog.studio_detail(skill_id) or {}
+            detail = catalog.studio_detail(skill_id) or {}
+            owner = _trim(detail.get("owner")) or "system"
+            visibility = _trim(detail.get("visibility")) or "public"
             catalog_id = f"skill:business_method:{skill_id}"
             rows.append(
                 {
@@ -86,9 +108,7 @@ class SkillHubCatalogService:
                     "category": entry.get("category") or "",
                     "skill_type": "business_method",
                     "invocation_mode": "finance_cc_preference",
-                    # Explicit `$business_method` routing is a separate mainline
-                    # slice.  Do not advertise it as runnable before that exists.
-                    "invocation_enabled": False,
+                    "invocation_enabled": True,
                     "editable": False,
                     "source": "finance_business_snapshot",
                     "workspace_url": (
@@ -96,8 +116,11 @@ class SkillHubCatalogService:
                         f"?catalog_id={quote(catalog_id, safe='')}"
                     ),
                     "snapshot_revision": revision,
-                    "owner": "system",
-                    "auth": "public",
+                    "owner": owner,
+                    "auth": visibility,
+                    "scope": "system" if owner == "system" else visibility,
+                    "active_revision_no": int(detail.get("active_revision_no") or 0),
+                    "owned": owner != "system" and owner in owner_ids,
                     "availability": {
                         "lifecycle": "active",
                         "retrieval_mode": "retrievable",
@@ -166,14 +189,18 @@ class SkillHubCatalogService:
         skill_name: str,
         *,
         catalog_id: str = "",
+        owner_ids: Iterable[str] = (),
     ) -> Dict[str, Any] | None:
-        """Return one public, read-only Studio detail projection."""
+        """Return detail only from the caller's active authorized snapshot."""
 
         normalized_name = _trim(skill_name)
         normalized_catalog_id = _trim(catalog_id)
+        owners = tuple(owner_ids)
+        catalog = self.runtime_catalog(owner_ids=owners)
         matches = [
             item
-            for item in self.list_skills()
+            for item in [*self._business_method_items(catalog.discovery_snapshot(), catalog=catalog,
+                owner_ids=owners), *self._legacy_compiled_items()]
             if _trim(item.get("skill_name")) == normalized_name
         ]
         if normalized_catalog_id:
@@ -202,7 +229,7 @@ class SkillHubCatalogService:
                 ),
             }
 
-        detail = self.business_catalog.studio_detail(normalized_name)
+        detail = catalog.studio_detail(normalized_name)
         if detail is None:
             return None
         return {
@@ -221,16 +248,35 @@ class SkillHubCatalogService:
         reference_path: str,
         *,
         expected_revision: str = "",
+        owner_ids: Iterable[str] = (),
     ) -> Dict[str, Any]:
         normalized_name = _trim(skill_name)
-        if self.business_catalog.studio_detail(normalized_name) is None:
+        catalog = self.runtime_catalog(owner_ids=owner_ids)
+        if catalog.studio_detail(normalized_name) is None:
             return {
                 "skill_id": normalized_name,
                 "reference": _trim(reference_path),
                 "error": "该 CC-native Skill 不存在或当前不可查看。",
             }
-        return self.business_catalog.load_reference(
+        return catalog.load_reference(
             normalized_name,
             reference_path,
             expected_revision=expected_revision,
         )
+
+    def activate_candidate(self, skill_id: str, *, owner_id: str,
+        expected_candidate_revision: int, expected_active_revision: int) -> Dict[str, Any]:
+        candidate = self.candidate_store.load_latest(skill_id, owner_id=owner_id)
+        if int(candidate["candidate_revision_no"]) != int(expected_candidate_revision):
+            raise SkillCandidateConflictError("Skill candidate revision changed")
+        # Validate the exact immutable revision before moving its active pointer.
+        self.business_catalog.with_active_skills([{**candidate,
+            "active_revision_no": int(expected_candidate_revision)}])
+        return self.candidate_store.activate_candidate(skill_id, owner_id=owner_id,
+            expected_candidate_revision=expected_candidate_revision,
+            expected_active_revision=expected_active_revision)
+
+    def set_visibility(self, skill_id: str, *, owner_id: str, visibility: str,
+        expected_active_revision: int) -> Dict[str, Any]:
+        return self.candidate_store.set_visibility(skill_id, owner_id=owner_id,
+            visibility=visibility, expected_active_revision=expected_active_revision)

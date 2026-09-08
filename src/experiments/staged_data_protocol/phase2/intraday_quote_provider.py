@@ -1,5 +1,14 @@
 from __future__ import annotations
 
+from src.experiments.staged_data_protocol.phase2 import python_filter as pf
+
+
+class _ConditionFilters(list):
+    """Keep the executable tree alongside legacy metadata consumers."""
+    def __init__(self, items, expression):
+        super().__init__(items)
+        self.expression = expression
+
 import os
 import re
 from datetime import date, datetime
@@ -9,7 +18,7 @@ from typing import Any, Dict, Iterable, List, Mapping
 
 import pymysql
 
-from src.experiments.staged_data_protocol.phase2.agg_protocol import output_alias, parse_agg_spec
+from src.experiments.staged_data_protocol.phase2.agg_protocol import median_query, output_alias, parse_agg_spec
 from src.experiments.staged_data_protocol.phase2.recent_scan import recent_predicate, fetch_recent_first
 from src.utils.mysql_utils import StockInfoDbUtils
 
@@ -317,7 +326,8 @@ def execute_intraday_quote_agg_api(
     columns = [*group_fields, alias]
     select_parts = [f"`{field}`" for field in group_fields]
     group_sql = f"GROUP BY {', '.join(f'`{field}`' for field in group_fields)}" if group_fields else ""
-    select_parts.append(f"{_agg_sql(agg, metric)} AS `{alias}`")
+    select_parts.append(f"`{metric}` AS __metric_value" if agg == "median"
+                        else f"{_agg_sql(agg, metric)} AS `{alias}`")
     order_sql = _order_sql(str(args.get("order") or ""), default=f"`{alias}` DESC")
     limit = _bounded_limit(args.get("limit"), default=100)
     if latest_only:
@@ -333,14 +343,14 @@ def execute_intraday_quote_agg_api(
         base_cte = _minute_bar_cte(date_predicate="s.trade_date = %s", source_where_sql=source_where_sql)
         query_params = [slot["trade_date"], *source_params, *params, limit]
     sql = f"""
-        {base_cte}
         SELECT {", ".join(select_parts)}
         FROM base
         WHERE {where_sql}
-        {group_sql}
-        ORDER BY {order_sql}
-        LIMIT %s
+        {group_sql if agg != 'median' else ''}
     """
+    if agg == "median":
+        sql = median_query(sql, group_fields=group_fields, alias=alias)
+    sql = f"{base_cte}\n{sql}\nORDER BY {order_sql} LIMIT %s"
     db = StockInfoDbUtils(database="kingdomai")
     try:
         with db.conn.cursor(pymysql.cursors.DictCursor) as cursor:
@@ -662,6 +672,8 @@ def _trade_date_predicate(filters: Iterable[Mapping[str, str]]) -> tuple[str, Li
     otherwise a request such as `tradedate >= 2026-08-01` could be truncated by
     newer bars before its requested range is evaluated.
     """
+    if isinstance(filters, _ConditionFilters):
+        return pf.compile_tree(pf.project(filters.expression, {"tradedate"}), {"tradedate": "s.trade_date"})
     items = list(filters)
     if any(str(item.get("connector") or "").strip().lower() == "or" for item in items):
         return "", []
@@ -686,6 +698,8 @@ def _trade_date_predicate(filters: Iterable[Mapping[str, str]]) -> tuple[str, Li
 
 
 def _snapshot_identity_where(filters: List[Dict[str, str]]) -> tuple[str, List[Any]]:
+    if isinstance(filters, _ConditionFilters):
+        return pf.compile_tree(pf.project(filters.expression, {"code", "name"}), {"code": "s.stk_code", "name": "s.stk_name"})
     if any(item.get("connector", "").strip().lower() == "or" for item in filters):
         return "", []
     clauses: List[str] = []
@@ -711,6 +725,11 @@ def _snapshot_identity_where(filters: List[Dict[str, str]]) -> tuple[str, List[A
 
 
 def _where_sql(*, filters: List[Dict[str, str]], slot: Mapping[str, Any]) -> tuple[str, List[Any]]:
+    if isinstance(filters, _ConditionFilters):
+        sql, params = pf.compile_tree(pf.project(filters.expression, set(FIELD_SQL)), {f: f"`{f}`" for f in FIELD_SQL})
+        if int(slot.get("minute_index") or 0) > 0:
+            sql, params = pf.and_sql(("minute_index = %s", [int(slot["minute_index"])]), (sql, params))
+        return sql or "1=1", params
     clauses: List[str] = []
     params: List[Any] = []
     if int(slot.get("minute_index") or 0) > 0:
@@ -753,6 +772,23 @@ def _parse_filter(filter_text: str) -> List[Dict[str, str]]:
 
 
 def _filters_from_args(args: Mapping[str, Any]) -> List[Dict[str, str]]:
+    tree = pf.condition(args)
+    if tree is not None:
+        direct = _filters_from_args(pf.without_filter(args))
+        def normalize(p):
+            field = _canonical_field(p["field"])
+            value = p["value"]
+            if p["operator"] != "contains" and value is not None:
+                value = [_normalize_filter_value(field, str(v)) for v in value] if isinstance(value, list) else _normalize_filter_value(field, str(value))
+            return {**p, "field": field, "value": value}
+        tree = pf.map_predicates(tree, normalize)
+        direct_tree = [{"field": p["field"], "operator": p["op"], "value": [_normalize_filter_value(p["field"], v) for v in _list_values(p["value"])] if p["op"] == "in" else _normalize_filter_value(p["field"], p["value"])} for p in direct]
+        if direct_tree:
+            tree = {"and": [*direct_tree, tree]}
+        # These items only feed existing slot/count metadata; SQL and matching
+        # consume expression directly and never flatten boolean execution.
+        items = [{"connector": "OR" if pf.has_or(tree) else "AND", "field": p["field"], "op": p["operator"], "value": repr(p["value"])} for p in pf.predicates(tree)]
+        return _ConditionFilters(items, tree)
     filters: List[Dict[str, str]] = []
     for field_name in ("code", "name"):
         value = args.get(field_name)
@@ -836,8 +872,7 @@ def _agg_sql(agg: str, metric: str) -> str:
     if agg == "count":
         return "COUNT(*)"
     if agg == "median":
-        # MySQL 5.7-compatible fallback: provider will rarely need grouped median.
-        return f"AVG(`{metric}`)"
+        raise ValueError("median requires ranked rows, not a scalar aggregate")
     return f"{agg.upper()}(`{metric}`)"
 
 
@@ -887,14 +922,21 @@ def _normalize_filter_value(field_name: str, value: str) -> Any:
 
 
 def _matches_base_filters(row: Mapping[str, Any], filters: List[Dict[str, str]]) -> bool:
+    if isinstance(filters, _ConditionFilters):
+        fields = set(row) - {"tradedate", "minute_index", "snapshot_slot", "value", "current_value", "window_count", "change_pct", "change_ratio"}
+        return pf.evaluate(pf.project(filters.expression, fields), row)
     return _matches_filters(row, [item for item in filters if _canonical_field(item["field"]) not in {"tradedate", "minute_index", "snapshot_slot", "value", "current_value", "window_count"}])
 
 
 def _matches_result_filters(row: Mapping[str, Any], filters: List[Dict[str, str]]) -> bool:
+    if isinstance(filters, _ConditionFilters):
+        return pf.evaluate(pf.project(filters.expression, set(row)), row)
     return _matches_filters(row, [item for item in filters if _canonical_field(item["field"]) in {"value", "current_value", "change_ratio", "change_pct", "window_count"}])
 
 
 def _matches_filters(row: Mapping[str, Any], filters: List[Dict[str, str]]) -> bool:
+    if isinstance(filters, _ConditionFilters):
+        return pf.evaluate(pf.project(filters.expression, set(row)), row)
     result = True
     for item in filters:
         field_name = _canonical_field(item["field"])

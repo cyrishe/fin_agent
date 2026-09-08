@@ -3,6 +3,8 @@ from __future__ import annotations
 from copy import deepcopy
 import datetime as dt
 import json
+import hashlib
+from pathlib import PurePosixPath
 import threading
 from typing import Any, Callable, Dict, List, Mapping, Optional
 
@@ -312,6 +314,104 @@ class DatabaseSkillCandidateStoreService:
         finally:
             db.close()
 
+    def list_available(self, *, owner_ids=()) -> List[Dict[str, Any]]:
+        """Read only authorized active revisions; never expose draft bodies."""
+
+        owners = sorted({_trim(item) for item in owner_ids if _trim(item)})
+        owner_clause = " OR owner IN (" + ",".join(["%s"] * len(owners)) + ")" if owners else ""
+        db = self._open_db()
+        try:
+            with db.cursor() as cursor:
+                cursor.execute(
+                    f"""SELECT * FROM {ARTIFACT_TABLE}
+                    WHERE artifact_type=%s AND version='v1' AND enabled=1
+                      AND current_revision_no > 0
+                      AND (JSON_UNQUOTE(JSON_EXTRACT(source_manifest_json, '$.visibility'))='public'{owner_clause})
+                    ORDER BY artifact_id""",
+                    (SKILL_ARTIFACT_TYPE, *owners),
+                )
+                records = []
+                for artifact in list(cursor.fetchall() or []):
+                    manifest = self._json_dict(artifact.get("source_manifest_json"))
+                    # Recheck before reading revision content, including in
+                    # offline adapters whose SQL evaluation may be incomplete.
+                    if not self._is_available(artifact, manifest, owners):
+                        continue
+                    revision = self._load_revision_row(cursor, artifact_id=int(artifact["artifact_id"]),
+                        revision_no=int(artifact["current_revision_no"]))
+                    records.append(self._candidate_from_rows(artifact, revision))
+                return records
+        except SkillCandidateStoreError:
+            raise
+        except Exception as exc:
+            raise SkillCandidateStoreError("Skill candidate storage is unavailable") from exc
+        finally:
+            db.close()
+
+    @staticmethod
+    def _is_available(artifact, manifest, owners) -> bool:
+        return bool(int(artifact.get("enabled") or 0) and int(artifact.get("current_revision_no") or 0) > 0
+            and (manifest.get("visibility") == "public" or _trim(artifact.get("owner")) in owners))
+
+    def activate_candidate(self, skill_id: str, *, owner_id: str,
+        expected_candidate_revision: int, expected_active_revision: int) -> Dict[str, Any]:
+        return self._update_activation(skill_id, owner_id=owner_id,
+            expected_active_revision=expected_active_revision,
+            expected_candidate_revision=expected_candidate_revision)
+
+    def set_visibility(self, skill_id: str, *, owner_id: str, visibility: str,
+        expected_active_revision: int) -> Dict[str, Any]:
+        if visibility not in {"private", "public"}:
+            raise SkillCandidateStoreError("visibility must be private or public")
+        return self._update_activation(skill_id, owner_id=owner_id,
+            expected_active_revision=expected_active_revision, visibility=visibility)
+
+    def _update_activation(self, skill_id: str, *, owner_id: str,
+        expected_active_revision: int, expected_candidate_revision: Optional[int] = None,
+        visibility: str = "") -> Dict[str, Any]:
+        owner = self._require_owner(owner_id)
+        db = self._open_db()
+        try:
+            with db.cursor() as cursor:
+                cursor.execute(f"""SELECT * FROM {ARTIFACT_TABLE}
+                    WHERE artifact_type=%s AND name=%s AND version='v1' AND owner=%s
+                    LIMIT 1 FOR UPDATE""", (SKILL_ARTIFACT_TYPE, _trim(skill_id), owner))
+                artifact = cursor.fetchone()
+                if not artifact:
+                    raise SkillCandidateNotFoundError("Skill candidate does not exist or is not owned by this user")
+                manifest = self._json_dict(artifact.get("source_manifest_json"))
+                active = int(artifact.get("current_revision_no") or 0)
+                candidate = int(manifest.get("candidate_revision_no") or 0)
+                if active != int(expected_active_revision):
+                    raise SkillCandidateConflictError("Skill active revision changed")
+                if expected_candidate_revision is not None:
+                    if candidate < 1 or candidate != int(expected_candidate_revision):
+                        raise SkillCandidateConflictError("Skill candidate revision changed")
+                    active = candidate
+                elif active < 1:
+                    raise SkillCandidateConflictError("Activate a Skill before sharing it")
+                revision = self._load_revision_row(cursor, artifact_id=int(artifact["artifact_id"]), revision_no=active)
+                manifest["active_revision_no"] = active
+                if visibility:
+                    manifest["visibility"] = visibility
+                cursor.execute(f"""UPDATE {ARTIFACT_TABLE}
+                    SET current_revision_no=%s, enabled=1, status='active',
+                        source_manifest_json=%s, updated_by=%s, updated_at=NOW()
+                    WHERE artifact_id=%s""",
+                    (active, json.dumps(manifest, ensure_ascii=False), owner, int(artifact["artifact_id"])))
+                artifact = {**artifact, "current_revision_no": active, "enabled": 1,
+                    "source_manifest_json": manifest}
+            db.commit()
+            return self._candidate_from_rows(artifact, revision)
+        except SkillCandidateStoreError:
+            db.rollback()
+            raise
+        except Exception as exc:
+            db.rollback()
+            raise SkillCandidateStoreError("Skill candidate storage is unavailable") from exc
+        finally:
+            db.close()
+
     @staticmethod
     def _require_owner(value: Any) -> str:
         owner = _trim(value)
@@ -353,12 +453,36 @@ class DatabaseSkillCandidateStoreService:
         payload["control_manifest"] = dict(payload.get("control_manifest") or {})
         payload["flowchart"] = dict(payload.get("flowchart") or {})
         payload["authoring_evidence"] = dict(payload.get("authoring_evidence") or {})
+        payload["references"] = cls._normalize_references(payload.get("references"))
+        if payload["references"]:
+            payload["content_hash"] = hashlib.sha256(json.dumps({
+                "skill_markdown": payload["skill_markdown"],
+                "control_manifest": payload["control_manifest"],
+                "references": payload["references"],
+            }, ensure_ascii=False, sort_keys=True).encode("utf-8")).hexdigest()
         payload["resolution_notes"] = [
             _trim(item)
             for item in payload.get("resolution_notes") or []
             if _trim(item)
         ]
         return payload
+
+    @staticmethod
+    def _normalize_references(value: Any) -> Dict[str, str]:
+        if value is None:
+            return {}
+        if not isinstance(value, Mapping):
+            raise SkillCandidateStoreError("Skill references must map paths to UTF-8 text")
+        references = {}
+        for raw_path, content in value.items():
+            path = _trim(raw_path).replace("\\", "/")
+            pure = PurePosixPath(path)
+            if (pure.is_absolute() or ".." in pure.parts or len(pure.parts) < 2
+                    or pure.parts[0] != "references" or path != pure.as_posix()
+                    or not isinstance(content, str)):
+                raise SkillCandidateStoreError("Invalid Skill reference path or content")
+            references[path] = content
+        return references
 
     @classmethod
     def _insert_revision(
@@ -376,6 +500,7 @@ class DatabaseSkillCandidateStoreService:
             "base_revision_no": int(candidate.get("base_revision_no") or 0),
             "control_manifest": dict(candidate.get("control_manifest") or {}),
             "flowchart": dict(candidate.get("flowchart") or {}),
+            "references": dict(candidate.get("references") or {}),
         }
         authoring_spec = {
             "requirement": candidate.get("requirement") or "",
@@ -475,6 +600,7 @@ class DatabaseSkillCandidateStoreService:
             "skill_markdown": _trim(revision.get("markdown_text")),
             "control_manifest": dict(definition.get("control_manifest") or {}),
             "flowchart": dict(definition.get("flowchart") or {}),
+            "references": dict(definition.get("references") or {}),
             "requirement": _trim(spec.get("requirement")),
             "feedback": _trim(spec.get("feedback")),
             "change_summary": _trim(revision.get("change_summary")),
@@ -482,7 +608,10 @@ class DatabaseSkillCandidateStoreService:
             "authoring_evidence": dict(spec.get("authoring_evidence") or {}),
             "resolution_notes": list(spec.get("resolution_notes") or []),
             "created_at": created_at or "",
-            "published": False,
+            "visibility": _trim(source_manifest.get("visibility")) or "private",
+            "enabled": bool(int(artifact.get("enabled") or 0)),
+            "published": bool(int(artifact.get("enabled") or 0)
+                and int(artifact.get("current_revision_no") or 0) == int(revision.get("revision_no") or 0)),
         }
 
     @staticmethod
@@ -526,9 +655,9 @@ class InMemorySkillCandidateStoreService:
         *,
         owner_id: str,
     ) -> Dict[str, Any]:
-        payload = deepcopy(dict(candidate))
+        payload = DatabaseSkillCandidateStoreService._normalize_candidate(candidate, expected_revision=1)
         skill_id = _trim(payload.get("skill_id"))
-        owner = _trim(owner_id)
+        owner = DatabaseSkillCandidateStoreService._require_owner(owner_id)
         with self._lock:
             if not skill_id or skill_id in self._records:
                 raise SkillCandidateConflictError("Skill candidate identity already exists")
@@ -538,6 +667,8 @@ class InMemorySkillCandidateStoreService:
                     "candidate_revision_no": 1,
                     "active_revision_no": 0,
                     "published": False,
+                    "visibility": "private",
+                    "enabled": False,
                     "created_at": dt.datetime.now(dt.timezone.utc).isoformat(),
                 }
             )
@@ -551,7 +682,8 @@ class InMemorySkillCandidateStoreService:
         owner_id: str,
         expected_base_revision: int,
     ) -> Dict[str, Any]:
-        payload = deepcopy(dict(candidate))
+        payload = DatabaseSkillCandidateStoreService._normalize_candidate(
+            candidate, expected_revision=int(expected_base_revision) + 1)
         skill_id = _trim(payload.get("skill_id"))
         with self._lock:
             revisions = self._records.get(skill_id)
@@ -571,12 +703,16 @@ class InMemorySkillCandidateStoreService:
                 {
                     "owner_id": _trim(owner_id),
                     "candidate_revision_no": revision_no,
-                    "active_revision_no": 0,
+                    "active_revision_no": revisions[current].get("active_revision_no", 0),
                     "published": False,
+                    "visibility": revisions[current].get("visibility", "private"),
+                    "enabled": revisions[current].get("enabled", False),
                     "created_at": dt.datetime.now(dt.timezone.utc).isoformat(),
                 }
             )
             revisions[revision_no] = payload
+            for record in revisions.values():
+                record["candidate_revision_no"] = revision_no
         return deepcopy(payload)
 
     def load_latest(self, skill_id: str, *, owner_id: str) -> Dict[str, Any]:
@@ -621,3 +757,49 @@ class InMemorySkillCandidateStoreService:
                 "Skill candidate does not exist or is not owned by this user"
             )
         return revisions
+
+    def list_available(self, *, owner_ids=()) -> List[Dict[str, Any]]:
+        owners = {_trim(owner) for owner in owner_ids if _trim(owner)}
+        with self._lock:
+            rows = []
+            for revisions in self._records.values():
+                latest = revisions[max(revisions)]
+                active = int(latest.get("active_revision_no") or 0)
+                if (active and latest.get("enabled") and
+                        (latest.get("visibility") == "public" or latest.get("owner_id") in owners)):
+                    rows.append(deepcopy(revisions[active]))
+            return rows
+
+    def activate_candidate(self, skill_id: str, *, owner_id: str,
+        expected_candidate_revision: int, expected_active_revision: int) -> Dict[str, Any]:
+        return self._update_activation(skill_id, owner_id=owner_id,
+            expected_active_revision=expected_active_revision,
+            expected_candidate_revision=expected_candidate_revision)
+
+    def set_visibility(self, skill_id: str, *, owner_id: str, visibility: str,
+        expected_active_revision: int) -> Dict[str, Any]:
+        if visibility not in {"public", "private"}:
+            raise SkillCandidateStoreError("visibility must be private or public")
+        return self._update_activation(skill_id, owner_id=owner_id,
+            expected_active_revision=expected_active_revision, visibility=visibility)
+
+    def _update_activation(self, skill_id: str, *, owner_id: str,
+        expected_active_revision: int, expected_candidate_revision: Optional[int] = None,
+        visibility: str = "") -> Dict[str, Any]:
+        with self._lock:
+            revisions = self._owned(skill_id, owner_id)
+            latest = revisions[max(revisions)]
+            active = int(latest.get("active_revision_no") or 0)
+            if active != int(expected_active_revision):
+                raise SkillCandidateConflictError("Skill active revision changed")
+            if expected_candidate_revision is not None:
+                if int(expected_candidate_revision) != max(revisions):
+                    raise SkillCandidateConflictError("Skill candidate revision changed")
+                active = max(revisions)
+            elif active < 1:
+                raise SkillCandidateConflictError("Activate a Skill before sharing it")
+            for revision_no, record in revisions.items():
+                record.update(active_revision_no=active, published=revision_no == active, enabled=True)
+                if visibility:
+                    record["visibility"] = visibility
+            return deepcopy(revisions[active])

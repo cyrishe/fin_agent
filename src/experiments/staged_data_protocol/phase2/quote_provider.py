@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from src.experiments.staged_data_protocol.phase2 import python_filter as pf
+
 import re
 import os
 from dataclasses import dataclass
@@ -9,7 +11,7 @@ from typing import Any, Dict, List, Mapping
 
 import pymysql
 
-from src.experiments.staged_data_protocol.phase2.agg_protocol import AGG_METHODS, output_alias, parse_agg_spec
+from src.experiments.staged_data_protocol.phase2.agg_protocol import AGG_METHODS, median_query, output_alias, parse_agg_spec
 from src.utils.mysql_utils import StockInfoDbUtils
 from src.experiments.staged_data_protocol.phase2.recent_scan import (
     chronological_recent_where, fetch_recent_first, recent_predicate,
@@ -240,10 +242,9 @@ def execute_quote_api(*, subject: str, args: Mapping[str, Any], outputs: List[st
                 if field == 'code' and op in {'=', '==', 'in'}:
                     required_codes.extend(_list_value(value) if op == 'in' else [value])
         required_codes = list(dict.fromkeys(str(code) for code in required_codes))
-        # The stock template already does bounded index reads; the other
-        # sources still rank history. Enable the probe for that costly shape.
-        predicate = recent_predicate(args=args, date_expression=source.fields['tradedate'],
-                                     enabled_by_default=source.subject != 'stock')
+        # All quote subjects now use bounded code/date reads. A forced probe
+        # remains available for A/B checks, but is not needed for this shape.
+        predicate = recent_predicate(args=args, date_expression=source.fields['tradedate'])
         # A global LIMIT can hide a deficient security. Only accept a probe
         # when the complete explicit universe fits before the output limit.
         if predicate and required_codes and limit_policy['fetch_limit'] >= len(required_codes) * count_per_code:
@@ -327,7 +328,8 @@ def execute_quote_agg_api(*, subject: str, args: Mapping[str, Any], outputs: Lis
     alias = _aggregate_alias(outputs, default=f"{agg}_{metric}", group_fields=group_fields)
     columns = [*group_fields, alias]
     select_parts = [f"{source.fields[field]} AS `{field}`" for field in group_fields]
-    select_parts.append(f"{_agg_sql(source=source, agg=agg, metric=metric)} AS `{alias}`")
+    select_parts.append(f"{source.fields[metric]} AS __metric_value" if agg == "median"
+                        else f"{_agg_sql(source=source, agg=agg, metric=metric)} AS `{alias}`")
     group_sql = f"GROUP BY {', '.join(source.fields[field] for field in group_fields)}" if group_fields else ""
     where_sql, params = _build_where(source=source, args=args)
     order_sql = _agg_order(str(args.get("order") or ""), alias=alias)
@@ -337,10 +339,11 @@ def execute_quote_agg_api(*, subject: str, args: Mapping[str, Any], outputs: Lis
         FROM {source.table} q
         LEFT JOIN {source.base_table} b ON {source.join_on}
         WHERE {where_sql}
-        {group_sql}
-        ORDER BY {order_sql}
-        LIMIT %s
+        {group_sql if agg != 'median' else ''}
     """
+    if agg == "median":
+        sql = median_query(sql, group_fields=group_fields, alias=alias)
+    sql += f" ORDER BY {order_sql} LIMIT %s"
     params.append(limit)
 
     db = StockInfoDbUtils(database="kingdomai")
@@ -493,7 +496,7 @@ def _agg_sql(*, source: QuoteSource, agg: str, metric: str) -> str:
     if agg == "count":
         return "COUNT(*)"
     if agg == "median":
-        return f"AVG({source.fields[metric]})"
+        raise ValueError("median requires ranked rows, not a scalar aggregate")
     return f"{agg.upper()}({source.fields[metric]})"
 
 
@@ -520,7 +523,7 @@ def _output_token(output: str) -> str:
 
 
 def _has_unresolved_ref(args: Mapping[str, Any]) -> bool:
-    return any(isinstance(value, str) and re.search(r"\br\d+\.", value) for value in args.values())
+    return pf.has_unresolved_refs(args)
 
 
 def _bounded_limit(value: Any) -> int:
@@ -662,7 +665,8 @@ def _build_where(*, source: QuoteSource, args: Mapping[str, Any]) -> tuple[str, 
 
     filter_clauses: List[str] = []
     filter_params: List[Any] = []
-    for connector, field_name, op, value in filters:
+    python_tree = pf.condition(args)
+    for connector, field_name, op, value in (filters if python_tree is None else []):
         expression = source.fields.get(field_name)
         if not expression:
             continue
@@ -683,10 +687,26 @@ def _build_where(*, source: QuoteSource, args: Mapping[str, Any]) -> tuple[str, 
         clauses.append(f"({' '.join(filter_clauses)})")
         params.extend(filter_params)
 
+    if python_tree is not None:
+        # Dates/default windows use metadata; execution compiles the tree once.
+        direct_args = pf.without_filter(args)
+        direct_items = _explicit_filters(direct_args, subject=source.subject)
+        direct_tree = {"and": [{"field": f, "operator": op, "value": _list_value(v) if op == "in" else v} for _, f, op, v in direct_items]} if direct_items else None
+        aliases = {"plate_code": "code", "plate_name": "name"} if source.subject == "plate" else {}
+        sql, values = pf.and_sql(pf.compile_tree(direct_tree, source.fields), pf.sql_filter(args, source.fields, aliases=aliases))
+        if sql:
+            clauses.append(f"({sql})")
+            params.extend(values)
+
     return " AND ".join(clauses), params
 
 
 def _build_identity_where(*, source: QuoteSource, args: Mapping[str, Any]) -> tuple[str, List[Any]]:
+    if pf.condition(args) is not None:
+        direct = _build_identity_where(source=source, args=pf.without_filter(args))
+        direct = (direct[0].removeprefix("AND "), direct[1])
+        sql, params = pf.and_sql(direct, pf.sql_filter(args, source.fields, allowed={"code", "name"}))
+        return (f"AND ({sql})" if sql else ""), params
     clauses: List[str] = []
     params: List[Any] = []
     for connector, field_name, op, value in _explicit_filters(args, subject=source.subject):
@@ -731,6 +751,9 @@ def _explicit_filters(
     *,
     subject: str = "",
 ) -> List[tuple[str, str, str, Any]]:
+    if pf.condition(args) is not None:
+        aliases = {"plate_code": "code", "plate_name": "name"} if subject == "plate" else {}
+        return _explicit_filters(pf.without_filter(args), subject=subject) + pf.leaf_items(args, aliases)
     rows: List[tuple[str, str, str, Any]] = []
     for field_name in ["code", "name"]:
         value = args.get(field_name)
@@ -821,50 +844,61 @@ def _build_per_entity_sql(
         else "DESC"
     )
     order_expression = source.fields.get(order_field, source.fields["code"])
-    if source.subject == "stock":
-        # count is per security. Rank-after-full-scan needlessly sorts the entire
-        # price history even for count=1; use bounded code/date index reads.
-        projected = f"{select_sql}, {order_expression} AS `__order_value`, {source.fields['tradedate']} AS `__trade_date_sort`"
-        single_code = _single_count_code(source=source, args=args)
-        scope_sql, _ = _count_identity_scope(source=source, args=args)
-        bounded = f"""
-            SELECT {projected}
-            FROM {source.table} q
-            LEFT JOIN {source.base_table} b ON {source.join_on}
-            WHERE {where_sql}
-            {'' if single_code else 'AND q.stk_code = identities.stk_code'}
-            ORDER BY q.stk_code DESC, q.trade_date DESC
-            LIMIT %s
-        """
-        identities = f"SELECT DISTINCT q.stk_code FROM {source.table} q"
-        if scope_sql:
-            identities += f" LEFT JOIN {source.base_table} b ON {source.join_on} WHERE 1=1 {scope_sql}"
-        recent = f"({bounded}) recent" if single_code else f"""
-            ({identities}) identities
-            JOIN LATERAL ({bounded}) recent ON TRUE
-        """
+    single_code = _single_count_code(source=source, args=args)
+    scope_sql, _ = _count_identity_scope(source=source, args=args)
+    filters = _explicit_filters(args, subject=source.subject)
+    explicit_dates = (args.get('date') or args.get('tradedate')
+                      or ((args.get('start') or args.get('start_date')) and
+                          (args.get('end') or args.get('end_date')))
+                      or any(source.fields.get(field) == source.fields['tradedate']
+                             for _, field, _, _ in filters))
+    if explicit_dates and not single_code and not scope_sql:
+        # A market-wide explicit time slice is already bounded by the date-first
+        # primary key. Rank that slice once, not one index lookup per security.
         return f"""
-            SELECT {', '.join(f'recent.`{field}`' for field in fields)}
-            FROM {recent}
+            SELECT {', '.join(f'`{field}`' for field in fields)}
+            FROM (
+                SELECT {select_sql},
+                    ROW_NUMBER() OVER (
+                        PARTITION BY {source.fields['code']}
+                        ORDER BY {source.fields['tradedate']} DESC
+                    ) AS `__entity_row`,
+                    {order_expression} AS `__order_value`,
+                    {source.fields['tradedate']} AS `__trade_date_sort`
+                FROM {source.table} q
+                LEFT JOIN {source.base_table} b ON {source.join_on}
+                WHERE {where_sql}
+            ) ranked
+            WHERE `__entity_row` <= %s
             ORDER BY `__order_value` {order_direction}, `__trade_date_sort` DESC
             LIMIT %s
         """
+    # count is per security for every subject. Read at most N matching rows
+    # from each code/date index, then apply the existing global order/limit.
+    # Column expressions are owned by the source registry, never by the LLM.
+    code_expression = source.fields['code']
+    code_column = code_expression.split('.')[-1]
+    date_expression = source.fields['tradedate']
+    projected = f"{select_sql}, {order_expression} AS `__order_value`, {date_expression} AS `__trade_date_sort`"
+    bounded = f"""
+        SELECT {projected}
+        FROM {source.table} q
+        LEFT JOIN {source.base_table} b ON {source.join_on}
+        WHERE ({where_sql})
+        {'' if single_code else f'AND {code_expression} = identities.{code_column}'}
+        ORDER BY {code_expression} DESC, {date_expression} DESC
+        LIMIT %s
+    """
+    identities = f"SELECT DISTINCT {code_expression} FROM {source.table} q"
+    if scope_sql:
+        identities += f" LEFT JOIN {source.base_table} b ON {source.join_on} WHERE 1=1 {scope_sql}"
+    recent = f"({bounded}) recent" if single_code else f"""
+        ({identities}) identities
+        JOIN LATERAL ({bounded}) recent ON TRUE
+    """
     return f"""
-        SELECT {", ".join(f"`{field}`" for field in fields)}
-        FROM (
-            SELECT
-                {select_sql},
-                ROW_NUMBER() OVER (
-                    PARTITION BY {source.fields['code']}
-                    ORDER BY {source.fields['tradedate']} DESC
-                ) AS `__entity_row`,
-                {order_expression} AS `__order_value`,
-                {source.fields['tradedate']} AS `__trade_date_sort`
-            FROM {source.table} q
-            LEFT JOIN {source.base_table} b ON {source.join_on}
-            WHERE {where_sql}
-        ) ranked
-        WHERE `__entity_row` <= %s
+        SELECT {', '.join(f'recent.`{field}`' for field in fields)}
+        FROM {recent}
         ORDER BY `__order_value` {order_direction}, `__trade_date_sort` DESC
         LIMIT %s
     """
@@ -879,11 +913,15 @@ def _single_count_code(*, source: QuoteSource, args: Mapping[str, Any]) -> bool:
 
 
 def _count_identity_scope(*, source: QuoteSource, args: Mapping[str, Any]) -> tuple[str, List[Any]]:
-    if source.subject != "stock" or _single_count_code(source=source, args=args):
+    if _single_count_code(source=source, args=args):
         return "", []
-    # A conjunction's identity subset can narrow the driving keys. An OR must
-    # retain all identities, since its other branch may match another security.
-    if any(c == "OR" for c, *_ in _explicit_filters(args, subject=source.subject)):
+    # An identity-only expression can be pushed down intact, including OR.
+    # For a mixed OR, extracting just identity terms would drop valid rows.
+    filters = _explicit_filters(args, subject=source.subject)
+    identity_only = all(field in {'code', 'name'} and op in {'=', '==', 'in'}
+                        and (op != 'in' or bool(_list_value(value)))
+                        for _, field, op, value in filters)
+    if any(c == "OR" for c, *_ in filters) and not identity_only:
         return "", []
     return _build_identity_where(source=source, args=args)
 
@@ -1097,6 +1135,9 @@ def _normalize_kd_metric_row(
 
 
 def _filter_kd_rows(rows: List[Dict[str, Any]], *, args: Mapping[str, Any]) -> List[Dict[str, Any]]:
+    tree = pf.condition(args)
+    if tree is not None:
+        return [row for row in rows if pf.evaluate(tree, row)]
     filters = [item for item in _explicit_filters(args) if item[1] in {"value", "k", "end_date", "tradedate"}]
     if not filters:
         return rows

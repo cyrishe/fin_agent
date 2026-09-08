@@ -53,6 +53,10 @@ def test_coding_prompt_always_contains_finance_api_call_contract() -> None:
     assert "api_catalog/subjects/<subject>/<dataview>.json" in prompt
     assert "stock.quote.kd_minute_volumn_avg" not in prompt
     assert 'tradedate = -1' not in prompt
+    assert "成分关系" in prompt
+    assert "subject.constitution(...)" in prompt
+    assert "时间模式、默认值和字段作用域以当前方法为准" in prompt
+    assert "filter, order, limit, realtime" not in prompt
 
 
 def test_coding_skill_defines_dynamic_module_instead_of_user_file() -> None:
@@ -503,6 +507,10 @@ def test_sdk_resumes_provider_thread_with_minimal_followup_prompt(tmp_path, monk
     assert first["provider_session_id"] == "provider-thread-1"
     assert second["provider_session_id"] == "provider-thread-1"
     assert [item["kind"] for item in calls if item["kind"] != "turn"] == ["start", "resume"]
+    first_turn_input = [item for item in calls if item["kind"] == "turn"][0]["input"]
+    assert len(first_turn_input) == 1
+    assert "# SKILL" in first_turn_input[0].text
+    assert "Return a final object." in first_turn_input[0].text
     second_turn_input = [item for item in calls if item["kind"] == "turn"][1]["input"]
     assert len(second_turn_input) == 1
     assert "根据真实错误只修复相关函数" in second_turn_input[0].text

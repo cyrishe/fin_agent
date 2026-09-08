@@ -34,6 +34,32 @@ class UserSessionService:
     MEMBER_SESSION_COOKIE_NAME = "aiia_member_session_token"
     THREAD_COOKIE_NAME = "aiia_assistant_thread_id"
 
+    def consume_guest_question(self, *, user_id: str) -> bool:
+        """Atomically reserve one of a guest's three lifetime requests."""
+        db = None
+        try:
+            db = SystemDbUtils()
+            with db.conn.cursor() as cursor:
+                cursor.execute(
+                    f"""UPDATE {USER_TABLE}
+                    SET profile_json = JSON_SET(COALESCE(profile_json, JSON_OBJECT()),
+                        '$.guest_questions_used',
+                        COALESCE(JSON_EXTRACT(profile_json, '$.guest_questions_used'), 0) + 1)
+                    WHERE user_id = %s AND user_type = 'guest' AND status = 'active'
+                      AND COALESCE(JSON_EXTRACT(profile_json, '$.guest_questions_used'), 0) < 3""",
+                    (self._trim(user_id),),
+                )
+                accepted = cursor.rowcount == 1
+            db.conn.commit()
+            return accepted
+        except Exception:
+            if db is not None:
+                db.conn.rollback()
+            raise UserSessionStorageError("访客试用额度暂时无法读取，请稍后重试") from None
+        finally:
+            if db is not None:
+                db.close_db()
+
     @staticmethod
     def _trim(value: Any) -> str:
         return str(value or "").strip()

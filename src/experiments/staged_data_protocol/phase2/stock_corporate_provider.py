@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from src.experiments.staged_data_protocol.phase2 import python_filter as pf
+
 import re
 from dataclasses import dataclass
 from datetime import date, datetime
@@ -484,7 +486,7 @@ def _normalize_field(field_name: str) -> str:
 
 
 def _has_unresolved_ref(args: Mapping[str, Any]) -> bool:
-    return any(isinstance(value, str) and re.search(r"\br\d+\.", value) for value in args.values())
+    return pf.has_unresolved_refs(args)
 
 
 def _bounded_limit(value: Any) -> int:
@@ -518,6 +520,9 @@ def _build_where(*, view: StockCorporateView, args: Mapping[str, Any]) -> tuple[
 
 
 def _build_filter_clauses(*, view: StockCorporateView, args: Mapping[str, Any]) -> tuple[str, List[Any]]:
+    if pf.condition(args) is not None:
+        return pf.and_sql(_build_filter_clauses(view=view, args=pf.without_filter(args)),
+                          pf.sql_filter(args, {f: f"u.`{f}`" for f in view.fields}, aliases=FIELD_ALIASES))
     clauses: List[str] = []
     params: List[Any] = []
     for connector, raw_field, op, value in _explicit_filters(args):
@@ -543,6 +548,8 @@ def _build_filter_clauses(*, view: StockCorporateView, args: Mapping[str, Any]) 
 
 
 def _explicit_filters(args: Mapping[str, Any]) -> List[tuple[str, str, str, Any]]:
+    if pf.condition(args) is not None:
+        return _explicit_filters(pf.without_filter(args)) + pf.leaf_items(args, FIELD_ALIASES)
     rows: List[tuple[str, str, str, Any]] = []
     for field_name in ["code", "name", "source"]:
         value = args.get(field_name)

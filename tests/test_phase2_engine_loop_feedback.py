@@ -1,9 +1,19 @@
+import json
+
 from src.experiments.staged_data_protocol.phase2 import constitution_provider, context_builder, engine
 from src.experiments.staged_data_protocol.phase2.api_runner import execute_api_call
 from src.experiments.staged_data_protocol.phase2.call_parser import parse_api_call
 from src.experiments.staged_data_protocol.phase2.call_validator import validate_call
-from src.experiments.staged_data_protocol.phase2.catalog import resolve_api
+from src.experiments.staged_data_protocol.phase2.catalog import catalog_source, resolve_api
 from src.experiments.staged_data_protocol.phase2.models import ApiCall, ResultHandle, Step
+from src.services.finance_data_tool_catalog_service import FinanceDataToolCatalogService
+
+
+def _json_context_blocks(section: str) -> list[dict]:
+    return [
+        json.loads(part.split("\n```", 1)[0])
+        for part in section.split("```text\n")[1:]
+    ]
 
 
 def test_parse_phase2_response_accepts_ok_request_string():
@@ -257,8 +267,9 @@ def test_phase1_repair_prompt_injects_previous_subject_dataview_catalog():
     subject_section = prompt.split("# subject and data_views", 1)[1]
     assert "## `industry`" in subject_section
     assert "`constitution` (used in previous steps)" in subject_section
-    assert "按行业聚合成分股" in subject_section
-    assert "估值" in subject_section
+    industry = catalog_source()["subjects"]["industry"]
+    assert industry["constitution"]["desc"] in subject_section
+    assert all(field in subject_section for field in industry["constitution"]["fields"])
     assert "## `stock`" not in subject_section
     assert "按行业统计A股PE中位数和PB中位数。" in prompt
     assert "# Original Question" in prompt
@@ -323,12 +334,20 @@ def test_margin_context_exposes_base_and_kday_api():
     assert "`stock.margin.kd_<field>_<method>`" in sections["available_apis"]
     assert "r1 = stock.margin(" in sections["available_apis"]
     assert "r1 = stock.margin.kd_financing_net_buy_sum(" in sections["available_apis"]
-    assert "operation_guidance" in sections["available_apis"]
-    assert "查询融资融券历史明细时同时传start和end" in sections["available_apis"]
-    assert "K 日窗口方法使用 stock.margin.kd_<field>_<method>" in sections["available_apis"]
-    assert "fund.quote" not in sections["available_apis"]
-    assert "financing_balance: sum, avg, max, min, median, change, pct_change" in sections["current_dataview"]
-    assert "financing_balance: 融资余额（元）" in sections["current_dataview"]
+    functions = _json_context_blocks(sections["available_apis"])
+    model = FinanceDataToolCatalogService().get_model_dataview("stock", "margin")
+    assert functions == model["functions"]
+    by_name = {row["api_name"]: row for row in functions}
+    assert set(by_name) == {"stock.margin", "stock.margin.kd_<field>_<method>"}
+    assert any("历史区间" in rule and "start/end" in rule for rule in by_name["stock.margin"]["rules"])
+    window = by_name["stock.margin.kd_<field>_<method>"]
+    assert window["operation"] == "window"
+    assert window["args"]["required"] == ["k"]
+    assert window["rules"] == list(catalog_source()["api_class_patterns"]["kday_margin_metric"]["rules"])
+    assert any("pct_change=" in rule and "sum 为窗口值之和" in rule for rule in window["rules"])
+    view = _json_context_blocks(sections["current_dataview"])[0]
+    assert view["kd"]["financing_balance"] == ["sum", "avg", "max", "min", "median", "change", "pct_change"]
+    assert "融资余额（元）" in view["fields"]["financing_balance"]["aliases"]
 
 
 def test_finance_catalog_context_exposes_verified_field_units():
@@ -355,11 +374,19 @@ def test_finance_catalog_context_exposes_verified_field_units():
         result_id="r2",
     )
 
-    assert "amount: 成交额（元；mode=1时为该分钟K区间成交额，mode=2时为截至快照的当日累计成交额）" in quote_sections["current_dataview"]
-    assert "volumn: 成交量（mode=0：股；mode=1：该分钟K区间成交量；mode=2：截至快照的当日累计成交量）" in quote_sections["current_dataview"]
-    assert "pct: 涨跌幅（%，3.5%记为3.5）" in quote_sections["current_dataview"]
-    assert "discount: 折价额（元，单位净值-收盘价）" in fund_sections["current_dataview"]
-    assert "unit_total: 基金份额（份）" in fund_sections["current_dataview"]
+    quote = _json_context_blocks(quote_sections["current_dataview"])[0]
+    fund = _json_context_blocks(fund_sections["current_dataview"])[0]
+    assert "成交额（元）" in quote["fields"]["amount"]["aliases"]
+    assert "成交量（日 K 为股）" in quote["fields"]["volumn"]["aliases"]
+    assert "涨跌幅（%，3.5%记为3.5）" in quote["fields"]["pct"]["aliases"]
+    assert "折价额（元，单位净值-收盘价）" in fund["fields"]["discount"]["aliases"]
+    assert "基金份额（份）" in fund["fields"]["unit_total"]["aliases"]
+    functions = _json_context_blocks(quote_sections["available_apis"])
+    quote_query = next(row for row in functions if row["api_name"] == "stock.quote")
+    source_rules = catalog_source()["api_class_patterns"]["stock_quote_query"]["rules"]
+    assert quote_query["rules"] == list(source_rules)
+    assert any("mode=1" in rule and "区间值" in rule for rule in quote_query["rules"])
+    assert any("mode=2" in rule and "当日累计值" in rule for rule in quote_query["rules"])
 
 
 def test_aggregation_step_can_see_run_result_handles():

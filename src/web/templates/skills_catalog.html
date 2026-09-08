@@ -196,7 +196,7 @@
           skillType,
           item.invocation_mode || "-",
           item.owner || "system",
-          item.auth || "public",
+          item.scope || (item.owner === "system" ? "system" : item.visibility || item.auth || "private"),
           item.tool_mode || "strict",
           `${(item.tools || []).length} tools`,
           `${item.example_count || 0} examples`,
@@ -241,7 +241,7 @@
               "muted",
               isLegacy
                 ? "历史兼容资产；新 Studio 只展示目录身份。"
-                : "可查看已发布方法；由 Finance CC 按专业问题选择。",
+                : `Agent 可自动选择，也可通过 $${item.skill_name} 调用。`,
             )
           );
         }

@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from src.experiments.staged_data_protocol.phase2 import python_filter as pf
+
 import re
 from datetime import date
 from typing import Mapping
@@ -211,6 +213,25 @@ def _parse_iso_date(value: object) -> date | None:
 
 def _validate_refs(call: ApiCall, previous_results: Mapping[str, ResultHandle], errors: list[str]) -> None:
     for key, value in call.args.items():
+        if key == "filter":
+            try:
+                tree = pf.condition(call.args)
+            except pf.FilterSyntaxError:
+                continue  # Structural validation supplies the parse error.
+            if tree is not None:
+                for p in pf.predicates(tree):
+                    ref = p.get("value")
+                    if not isinstance(ref, dict):
+                        continue
+                    result_name, column = ref["result"], ref["field"]
+                    if p["operator"] not in {"in", "not in"}:
+                        errors.append(f"REF_ERROR: result columns are sets; use field in {result_name}.{column}. Keep the original comparison meaning; scalar comparisons require actual values.")
+                    handle = previous_results.get(result_name)
+                    if handle is None:
+                        errors.append(f"REF_ERROR: unknown result={result_name}")
+                    elif column not in handle.columns:
+                        errors.append(f"COLUMN_ERROR: {result_name} has no column={column}; available={handle.columns}")
+                continue
         if not isinstance(value, str):
             continue
         ref_matches = list(REF_RE.finditer(value))
@@ -221,7 +242,9 @@ def _validate_refs(call: ApiCall, previous_results: Mapping[str, ResultHandle], 
                 if not FILTER_REF_PREFIX_RE.search(value[: match.start()]):
                     errors.append(
                         "REF_ERROR: filter result references must be bound as "
-                        f"`field in {ref}`, not used as a bare filter"
+                        f"`field in {ref}`. A result column is a set, not a scalar; "
+                        "for scalar comparisons read the result and use its actual value. "
+                        "Keep the original comparison meaning."
                     )
         for match in ref_matches:
             result_name, column = match.groups()

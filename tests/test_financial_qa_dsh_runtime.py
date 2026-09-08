@@ -452,7 +452,94 @@ def test_all_zero_results_use_a_grounded_boundary_summary() -> None:
     assert "未查询来源" not in result["summary"]
 
 
-def test_dsh_mcp_bridge_exposes_only_financial_data_query_tools(tmp_path: Path) -> None:
+@pytest.mark.parametrize("scenario", ["valid", "no-handoff", "nonzero", "wrong-source", "wrong-text", "error", "cancelled", "disabled"])
+def test_empty_result_early_stop_requires_a_matching_logged_host_response(tmp_path, scenario):
+    from src.scenarios.financial_qa.empty_result import empty_result_context
+
+    refs = [{"goal": "查询目标公司研报", "row_count": 0, "result_ref": "r1"}]
+    message = empty_result_context(refs)
+    assert message is not None
+    if scenario == "wrong-source":
+        message["source"] = {"kind": "user"}
+    if scenario == "wrong-text":
+        message["content"][0]["text"] = "旧会话的回答"
+    if scenario == "nonzero":
+        refs[0]["row_count"] = 1
+
+    class Harness:
+        def __init__(self, **kwargs):
+            self.env = kwargs["env"]
+
+        def run(self, prompt, *, session_id, on_notification):
+            context = json.loads(Path(self.env["FIN_AGENT_DSH_CONTEXT_PATH"]).read_text())
+            call = {"tool": "finance_query", "row_count": 0}
+            if scenario == "error":
+                call["error"] = "query failed"
+            Path(self.env["FIN_AGENT_DSH_TRACE_PATH"]).write_text(json.dumps({
+                "revision": context["revision"], "tracker": {"calls": [call], "result_refs": refs},
+            }))
+            return SimpleNamespace(
+                events=[] if scenario == "no-handoff" else [{"type": "user/message", "data": message}],
+                finish_reason="cancelled" if scenario == "cancelled" else "blocked", final_response="",
+            )
+
+        def close(self):
+            pass
+
+    service = FinanceDeepSeekHarnessSessionService(
+        enabled=True, root_dir=tmp_path / "runtime", log_path=tmp_path / "events.jsonl",
+        worker_count=1, harness_factory=Harness,
+        loop_policy_config={"emptyResultEarlyStop": scenario != "disabled"},
+    )
+    try:
+        result = service.run_turn(thread_id="independent", owner_id="test", user_text="查询研报")
+        assert result["empty_result_early_stop"] is (scenario == "valid")
+        if scenario == "valid":
+            assert result["error"] == ""
+            assert result["result"] == message["content"][0]["text"]
+            assert result["llm_step_usages"] == []
+        else:
+            assert result["error"]
+    finally:
+        service.close()
+
+
+def test_no_progress_subscriber_skips_rendering_but_preserves_audit(tmp_path, monkeypatch):
+    from src.scenarios.financial_qa import dsh_service as module
+
+    event = {"type": "tool/result", "data": {"message": {"source": {"callId": "q1"}}}}
+
+    def unexpected_render(*args, **kwargs):
+        raise AssertionError("No progress subscriber should require result parsing")
+
+    monkeypatch.setattr(module, "_notification_tool_payload", unexpected_render)
+
+    class Harness:
+        def __init__(self, **kwargs):
+            pass
+
+        def run(self, prompt, *, session_id, on_notification):
+            on_notification(SimpleNamespace(method="session.event", payload={"event": event}))
+            return SimpleNamespace(events=[event], finish_reason="completed", final_response="answer")
+
+        def close(self):
+            pass
+
+    service = FinanceDeepSeekHarnessSessionService(
+        enabled=True, root_dir=tmp_path / "runtime", log_path=tmp_path / "events.jsonl",
+        worker_count=1, harness_factory=Harness,
+    )
+    try:
+        result = service.run_turn(thread_id=1, owner_id="test", user_text="查询研报")
+        assert result["error"] == ""
+        assert result["result"] == "answer"
+        assert result["tool_result_message_count"] == 1
+        assert json.loads(service.log_path.read_text())["tool_result_message_count"] == 1
+    finally:
+        service.close()
+
+
+def test_dsh_mcp_bridge_exposes_financial_data_and_skill_read_tools(tmp_path: Path) -> None:
     context_path = tmp_path / "context.json"
     trace_path = tmp_path / "trace.json"
     context_path.write_text(
@@ -474,6 +561,8 @@ def test_dsh_mcp_bridge_exposes_only_financial_data_query_tools(tmp_path: Path) 
         "read_finance_catalog",
         "finance_query",
         "load_finance_result",
+        "read_finance_skill",
+        "read_finance_skill_reference",
     }
     result = asyncio.run(
         bridge.call_tool(
@@ -523,6 +612,8 @@ def test_cc_and_dsh_share_the_exact_finance_catalog_contract(tmp_path: Path) -> 
         {},
         {"subject": "stock"},
         {"subject": "stock", "dataview": "quote"},
+        {"subject": "stock", "dataview": "report", "operation": "query"},
+        {"subject": "stock", "dataview": "report", "operation": "aggregate"},
         {
             "subject": "stock",
             "dataview": "quote",
@@ -540,6 +631,32 @@ def test_cc_and_dsh_share_the_exact_finance_catalog_contract(tmp_path: Path) -> 
             bridge.call_tool("read_finance_catalog", arguments)
         )
         assert dsh_result == cc_result
+
+
+@pytest.mark.parametrize("predicate", ["rating_change contains 下调", "rating_change not null"])
+def test_cc_and_dsh_reject_invalid_filter_without_broadening(tmp_path, monkeypatch, predicate):
+    import src.services.finance_data_tool_runtime_service as runtime_module
+    from src.experiments.staged_data_protocol.phase2.catalog import catalog_source
+
+    def must_not_execute(*args, **kwargs):
+        pytest.fail("Neither adapter may execute a partially parsed filter")
+
+    monkeypatch.setattr(runtime_module, "execute_api_call", must_not_execute)
+    context_path = tmp_path / "context.json"
+    context_path.write_text(json.dumps({"revision": "filter-parity", "owner_ids": ["test"],
+                                      "tool_context": {"_agent_runtime_scope": "dsh:filter-parity"}}))
+    system_tools = FinanceDataQueryCcTools(result_store=SessionVariableStoreService(data_root=tmp_path / "data"))
+    cc_tools, _, _ = system_tools.build_tools(owner_ids=["test"], tool_context={"_agent_runtime_scope": "cc:filter-parity"})
+    cc_query = next(t for t in cc_tools if t.name == "finance_query")
+    bridge = FinanceDshMcpBridge(context_path=context_path, trace_path=tmp_path / "trace.json", system_tools=system_tools)
+    arguments = {"steps": [{"goal": "保留指定的评级条件", "request": f'result = stock.report(filter = "name = 安井食品 and {predicate}") -> name, rating_change'}]}
+    cc_result = _cc_payload(asyncio.run(cc_query.handler(arguments)))
+    dsh_result = asyncio.run(bridge.call_tool("finance_query", arguments))
+    assert cc_result == dsh_result
+    assert not cc_result["validation"]["ok"]
+    assert "field=rating_change" in str(cc_result["validation"]["errors"])
+    assert catalog_source()["filter_syntax"] in cc_result["validation"]["errors"][0]
+    assert predicate in cc_result["request"]
 
 
 def test_cc_and_dsh_share_finance_query_and_result_load_payloads(
@@ -688,7 +805,9 @@ def test_dsh_trace_uses_the_revision_pinned_when_tools_were_built(
     ) == {"error": "finance catalog changed during the active agent turn"}
 
 
-def test_terminal_query_failure_is_not_reported_as_empty_success(tmp_path):
+@pytest.mark.parametrize("has_earlier_rows", [False, True])
+@pytest.mark.parametrize("repaired", [False, True])
+def test_terminal_query_failure_is_not_reported_as_empty_success(tmp_path, has_earlier_rows, repaired):
     class Harness:
         def __init__(self, **kwargs):
             self.env = kwargs["env"]
@@ -697,8 +816,9 @@ def test_terminal_query_failure_is_not_reported_as_empty_success(tmp_path):
             context = json.loads(Path(self.env["FIN_AGENT_DSH_CONTEXT_PATH"]).read_text())
             Path(self.env["FIN_AGENT_DSH_TRACE_PATH"]).write_text(json.dumps({
                 "revision": context["revision"],
-                "tracker": {"calls": [{"tool": "finance_query", "error": "missing finance query binding: stock_codes"}],
-                            "result_refs": []},
+                "tracker": {"calls": [{"tool": "finance_query", "error": "missing finance query binding: stock_codes"}]
+                                      + ([{"tool": "finance_query", "row_count": 3}] if repaired else []),
+                            "result_refs": [{"result_ref": "r1", "row_count": 3}] if has_earlier_rows or repaired else []},
             }))
             return SimpleNamespace(events=[], finish_reason="completed", final_response="")
 
@@ -712,9 +832,13 @@ def test_terminal_query_failure_is_not_reported_as_empty_success(tmp_path):
     try:
         result = service.run_turn(thread_id=1, owner_id="test", user_text="查询行情",
                                   context={"_finance_execution_mode": "fast", "_finance_data_only": True})
-        assert "missing finance query binding" in result["error"]
-        assert result["result_refs"] == []
-        assert result["data_only_complete"] is False
+        if repaired:
+            assert result["error"] == ""
+            assert result["data_only_complete"] is True
+        else:
+            assert "missing finance query binding" in result["error"]
+            assert result["data_only_complete"] is False
+        assert bool(result["result_refs"]) is (has_earlier_rows or repaired)
     finally:
         service.close()
 

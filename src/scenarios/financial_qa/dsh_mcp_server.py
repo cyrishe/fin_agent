@@ -12,9 +12,14 @@ from mcp.server.models import InitializationOptions
 from mcp.server.stdio import stdio_server
 
 from src.scenarios.financial_qa.tools import FinanceDataQueryCcTools
+from src.scenarios.financial_qa.empty_result import empty_result_context
 
 
 _EXPOSED_TOOLS = frozenset(
+    {"read_finance_catalog", "finance_query", "load_finance_result",
+     "read_finance_skill", "read_finance_skill_reference"}
+)
+_REQUIRED_TOOLS = frozenset(
     {"read_finance_catalog", "finance_query", "load_finance_result"}
 )
 
@@ -30,7 +35,7 @@ def _atomic_write(path: Path, payload: Mapping[str, Any]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     temporary = path.with_suffix(f"{path.suffix}.tmp")
     temporary.write_text(
-        json.dumps(dict(payload), ensure_ascii=False, default=str),
+        json.dumps(dict(payload), ensure_ascii=False, default=str, separators=(",", ":")),
         encoding="utf-8",
     )
     temporary.replace(path)
@@ -93,7 +98,7 @@ class FinanceDshMcpBridge:
             for item in tools
             if item.name in _EXPOSED_TOOLS
         }
-        missing = sorted(_EXPOSED_TOOLS - set(rebuilt_tools))
+        missing = sorted(_REQUIRED_TOOLS - set(rebuilt_tools))
         if missing:
             raise RuntimeError(f"missing finance MCP tools: {', '.join(missing)}")
         pinned_catalog_revision = str(
@@ -178,6 +183,9 @@ class FinanceDshMcpBridge:
                 "finance_catalog_revision": self._catalog_revision_value,
                 "runtime_scope": self.tool_runtime.runtime_scope,
                 "tracker": self.tracker,
+                # Not exposed in MCP tool content or output schema. The DSH
+                # final boundary may publish this exact system-owned response.
+                "empty_result_context": empty_result_context(self.tracker.get("result_refs") or []),
             },
         )
 

@@ -8,6 +8,7 @@ from src.services.finance_data_tool_catalog_service import FinanceDataToolCatalo
 from src.services.finance_data_tool_runtime_service import FinanceDataToolRuntimeService
 from src.services.active_tool_registry_service import ActiveToolRegistryService
 from src.experiments.staged_data_protocol.phase2.call_parser import parse_api_call
+from src.experiments.staged_data_protocol.phase2.financial_provider import DEFAULT_STATEMENT_TYPE
 from src.experiments.staged_data_protocol.phase2.models import ResultHandle
 from src.tools.registry import run_tool
 
@@ -109,8 +110,13 @@ def test_finance_data_catalog_builds_subject_dataview_function_tree() -> None:
     statement_type = next(
         field for field in financial_view["fields"] if field["name"] == "statement_type"
     )
-    assert "不表示年报" in statement_type["desc"]
-    assert any("年度数据筛选每年12月31日" in rule for rule in financial_view["rules"])
+    assert "合并/母公司" in statement_type["desc"]
+    assert "累计/单季" in statement_type["desc"]
+    assert f"默认 {DEFAULT_STATEMENT_TYPE}" in statement_type["desc"]
+    assert any(
+        f"statement_type={DEFAULT_STATEMENT_TYPE}" in rule and "累计口径" in rule
+        for rule in financial_view["rules"]
+    )
     assert stock_views["report"]["aggregate_fields"]["report_id"] == ["count"]
     assert set(stock_views["report_metric"]["value_domains"]["metric_code"]) == {
         "eps",
@@ -166,9 +172,8 @@ def test_finance_data_catalog_saves_single_dataview_node(tmp_path: Path) -> None
     assert raw["subjects"]["stock"]["margin"]["desc"] == "updated margin desc"
     assert "route_summary" not in raw["subjects"]["stock"]["margin"]
     assert saved["route_summary"] == saved["desc"]
-    assert "历史明细" in "".join(
-        raw["subjects"]["stock"]["margin"]["api"][0]["guidance"]
-    )
+    # Editing the function label preserves its existing executable examples.
+    assert "start = 2026-08-01" in raw["subjects"]["stock"]["margin"]["api"][0]["examples"][0]
 
 
 @requires_kingdomai
@@ -301,7 +306,7 @@ def test_finance_data_runtime_rejects_bare_filter_result_reference() -> None:
 
     assert result["validation"]["ok"] is False
     assert result["ok"] is False
-    assert any("bare filter" in item for item in result["validation"]["errors"])
+    assert any("result column is a set" in item for item in result["validation"]["errors"])
 
 
 def test_filter_reference_validation_checks_each_occurrence() -> None:
@@ -323,7 +328,7 @@ def test_filter_reference_validation_checks_each_occurrence() -> None:
     )
 
     assert result["validation"]["ok"] is False
-    assert any("bare filter" in item for item in result["validation"]["errors"])
+    assert any("result column is a set" in item for item in result["validation"]["errors"])
 
 
 def test_finance_data_runtime_short_circuits_empty_upstream_reference() -> None:
@@ -401,11 +406,12 @@ def test_aggregate_result_reference_is_not_materialized(
 
     runner.execute_api_call(call, previous)
 
-    assert captured["args"]["filter"] == "plate_code in [885001]"
+    assert captured["args"]["filter"] == "plate_code in r1.plate_code"
+    assert captured["args"]["_filter_expression"]["value"] == ["885001"]
     assert captured["args"]["agg"] == "avg(r1.metric)"
 
 
-def test_empty_reference_in_or_filter_fails_closed_before_provider(
+def test_empty_reference_in_or_filter_preserves_alternative_branch(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     import src.experiments.staged_data_protocol.phase2.api_runner as runner
@@ -415,6 +421,10 @@ def test_empty_reference_in_or_filter_fails_closed_before_provider(
     def fake_quote(*, subject, args, outputs):
         nonlocal provider_called
         provider_called = True
+        from src.experiments.staged_data_protocol.phase2 import python_filter as pf
+        tree = pf.condition(args)
+        assert pf.evaluate(tree, {"code": "600519.SH", "pct": 2})
+        assert not pf.evaluate(tree, {"code": "000001.SZ", "pct": 2})
         return {
             "status": "ok",
             "columns": ["code", "close"],
@@ -444,10 +454,9 @@ def test_empty_reference_in_or_filter_fails_closed_before_provider(
 
     result = runner.execute_api_call(call, previous)
 
-    assert provider_called is False
-    assert result.data["status"] == "filter_reference_resolution_error"
-    assert "alternative branch" in result.data["reason"]
-    assert result.data["empty_references"] == ["r1.code"]
+    assert provider_called is True
+    assert result.data["status"] == "ok"
+    assert result.data["row_count"] == 1
 
 
 def test_required_empty_reference_short_circuits_before_nested_or() -> None:

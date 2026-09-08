@@ -8,6 +8,8 @@ import re
 from dataclasses import dataclass
 from typing import Mapping
 
+from src.finance_api.access_tokens import DEFAULT_TTL_SECONDS, PREFIX, issue_token, signing_key, verify_token
+
 
 _PRINCIPAL_RE = re.compile(r"[A-Za-z0-9][A-Za-z0-9_.-]{0,63}")
 
@@ -30,12 +32,14 @@ class FinanceApiPrincipal:
 class FinanceApiKeyAuth:
     """Constant-time API-key verifier backed by environment configuration.
 
-    Keys are hashed as soon as configuration is parsed.  The raw values are not
-    retained on the service object and must never be written to logs or traces.
+    Keys are hashed as soon as configuration is parsed; a purpose-specific HMAC
+    key is also derived for expiring credentials. Raw API keys are not retained
+    on the service object and must never be written to logs or traces.
     """
 
     def __init__(self, keys: Mapping[str, str]) -> None:
         normalized: dict[str, bytes] = {}
+        token_keys: dict[str, bytes] = {}
         for raw_principal, raw_key in keys.items():
             principal = str(raw_principal or "").strip()
             key = str(raw_key or "").strip()
@@ -53,12 +57,23 @@ class FinanceApiKeyAuth:
                     f"finance API key for principal={principal} is still a deployment placeholder"
                 )
             normalized[principal] = hashlib.sha256(key.encode("utf-8")).digest()
+            token_keys[principal] = signing_key(key)
         if not normalized:
             raise ValueError(
                 "finance API key is not configured; set FINANCE_API_KEYS_JSON "
                 "or FINANCE_API_KEY"
             )
         self._digests = normalized
+        self._token_keys = token_keys
+
+    def issue_temporary_token(
+        self, principal_id: str | None = None, *, ttl_seconds: int = DEFAULT_TTL_SECONDS,
+    ) -> dict:
+        if principal_id is None and len(self._token_keys) == 1:
+            principal_id = next(iter(self._token_keys))
+        if principal_id not in self._token_keys:
+            raise ValueError("Select an existing API key principal with --principal.")
+        return issue_token(principal_id, self._token_keys[principal_id], ttl_seconds)
 
     @classmethod
     def from_env(cls, env: Mapping[str, str] | None = None) -> FinanceApiKeyAuth:
@@ -103,6 +118,13 @@ class FinanceApiKeyAuth:
         for principal, expected_digest in self._digests.items():
             if hmac.compare_digest(supplied_digest, expected_digest):
                 matched = principal
+        if not matched and supplied.startswith(PREFIX + "."):
+            try:
+                matched = verify_token(supplied, self._token_keys)
+            except ValueError:
+                raise FinanceApiAuthError(
+                    "invalid_access_token", "The temporary access token is invalid or expired.",
+                ) from None
         if not matched:
             raise FinanceApiAuthError(
                 "invalid_api_key",

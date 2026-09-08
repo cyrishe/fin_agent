@@ -66,9 +66,17 @@ REALTIME_STOCK_DATAVIEW_NAMES = {
 }
 
 HISTORY_STOCK_DATAVIEW_NAMES = {"history_quote"}
-OPERATION_TYPES = frozenset({"query", "aggregate", "window", "compute"})
+OPERATION_DESCRIPTIONS = {
+    "query": "明细查询：按条件筛选、排序并返回数据记录。",
+    "window": "窗口指标：按对象计算指定 K 期的已定义指标。",
+    "constitution": "成分关系：返回指数、行业、板块或热点与关联证券的对应关系。",
+    "aggregate": "聚合查询：按分组统计数据；成分聚合统计所属证券的指标。",
+    "compute": "动态计算：用自然语言描述自定义行情计算。",
+}
+OPERATION_TYPES = frozenset(OPERATION_DESCRIPTIONS)
 RUNTIME_TYPES = {
     "query": "base",
+    "constitution": "base",
     "aggregate": "agg",
     "window": "kd",
     "compute": "dynamic_cal",
@@ -270,7 +278,35 @@ def operation_for_api_pattern(api_name: str) -> str:
         return "aggregate"
     if method.startswith("kd_"):
         return "window"
+    if len(parts) == 2 and (parts[1] == "constitution" or api_name == "hot_event.member"):
+        return "constitution"
     return "query"
+
+
+def concrete_call_pattern(api_name: str, template: str) -> str:
+    """Expand a documentation signature using the existing keyword-arg DSL."""
+    parts = api_name.split(".")
+    subject = parts[0]
+    dataview = parts[1] if len(parts) > 1 else ""
+    values = {
+        "api_name": api_name,
+        "subject": subject,
+        "dataview": dataview,
+        "subject_code_field": f"{subject}_code",
+        "subject_name_field": f"{subject}_name",
+    }
+    pattern = template
+    for key, value in values.items():
+        pattern = pattern.replace("{" + key + "}", value)
+    prefix, opening, rest = pattern.partition("(")
+    arguments, closing, suffix = rest.partition(")")
+    if opening and closing:
+        parameters = ", ".join(
+            f"{name.strip()}=..." if "=" not in name else name.strip()
+            for name in arguments.split(",") if name.strip()
+        )
+        pattern = f"{prefix}({parameters}){suffix}"
+    return pattern
 
 
 def _normalize_api_dataview(api: str) -> str:

@@ -36,16 +36,17 @@ function resultEvent({ turn = 1, step, callId, payload, isError = false }) {
   }
 }
 
-function fixture(config = {}, history = []) {
+function fixture(config = {}, history = [], toolNames = NAMES) {
   const globalListeners = new Map()
   const agentListeners = new Map()
   const restrictions = []
   let guard
   let prompt
   const steered = []
+  const appended = []
 
   const tools = {
-    schemas: () => Object.values(NAMES).map(name => ({ name })),
+    schemas: () => Object.values(toolNames).map(name => ({ name })),
     restrict: ({ allow }) => {
       const record = { allow: [...allow], lifted: false }
       restrictions.push(record)
@@ -54,7 +55,13 @@ function fixture(config = {}, history = []) {
     guard: value => { guard = value },
   }
   const agent = {
-    session: { deriveMessages: () => history },
+    session: {
+      deriveMessages: () => history,
+      append: (type, data, options) => {
+        appended.push({ type, data, ...options })
+        if (type === 'user/message') history.push(data)
+      },
+    },
     steer: message => { steered.push(message) },
     ctx: {
       tools,
@@ -85,9 +92,9 @@ function fixture(config = {}, history = []) {
         ? { ...output, concludesTurn: true }
         : output
     },
-    preStep: ({ turn = 1, step }) => agentListeners.get('agent/pre-step')(
+    preStep: ({ turn = 1, step, messages = [] }) => agentListeners.get('agent/pre-step')(
       { turn, step },
-      async () => ({ kind: 'enter', messages: [] }),
+      async () => ({ kind: 'enter', messages }),
     ),
     post: (exec, result) => agentListeners.get('tools/post-execute')(
       exec,
@@ -99,8 +106,130 @@ function fixture(config = {}, history = []) {
     ),
     stopping: (turn = 1) => agentListeners.get('agent/turn-stopping')({ agent, turn }),
     steered,
+    appended,
   }
 }
+
+test('stage prompts use catalog routing and preserve the current action boundary', () => {
+  const runtime = fixture()
+  assert.match(runtime.prompt(), /当前任务是目录定位/)
+  assert.match(runtime.prompt(), /subject \+ dataview \+ operation/)
+  assert.doesNotMatch(runtime.prompt(), /stock\.report|financial_3_table|EPS|竞争格局/)
+
+  const fast = fixture({ executionMode: 'fast' })
+  assert.match(fast.prompt(), /一次目录定位/)
+  assert.doesNotMatch(fast.prompt(), /stock\.report|financial_3_table/)
+})
+
+test('empty final response uses the exact host handoff only after explicit complete success', async () => {
+  const dir = mkdtempSync(join(tmpdir(), 'finance-empty-final-'))
+  const contextPath = join(dir, 'context.json')
+  const tracePath = join(dir, 'trace.json')
+  const oldContext = process.env.FIN_AGENT_DSH_CONTEXT_PATH
+  const oldTrace = process.env.FIN_AGENT_DSH_TRACE_PATH
+  process.env.FIN_AGENT_DSH_CONTEXT_PATH = contextPath
+  process.env.FIN_AGENT_DSH_TRACE_PATH = tracePath
+  const message = {
+    id: 'host-answer-1', role: 'user',
+    source: { kind: 'plugin', plugin: 'fin-agent:empty-result' },
+    content: [{ type: 'text', text: '本次查询已完成。当前条件下返回 0 条记录。' }],
+  }
+  try {
+    for (const scenario of [
+      'complete', 'multiple-empty', 'fast', 'non-prefix', 'disabled', 'legacy',
+      'unfinished', 'mixed-rows', 'missing-count', 'failed', 'stale-trace',
+      'stale-catalog', 'missing-trace', 'pending-input', 'data-only',
+    ]) {
+      writeFileSync(contextPath, JSON.stringify({
+        revision: 'turn-a', finance_catalog_revision: 'catalog-a',
+        tool_context: { _finance_data_only: scenario === 'data-only' },
+      }))
+      writeFileSync(tracePath, JSON.stringify({
+        revision: scenario === 'stale-trace' ? 'turn-old' : 'turn-a',
+        finance_catalog_revision: scenario === 'stale-catalog' ? 'catalog-old' : 'catalog-a',
+        empty_result_context: scenario === 'missing-trace' ? null : message,
+      }))
+      const history = []
+      const runtime = fixture({
+        preserveRequestPrefix: scenario !== 'non-prefix',
+        executionMode: scenario === 'fast' ? 'fast' : 'standard',
+        emptyResultEarlyStop: scenario !== 'disabled',
+      }, history)
+      const call = (step, id, name, payload) => {
+        runtime.event({ type: 'tool/call', data: { turn: 1, step, callId: id, name } })
+        runtime.event(resultEvent({ step, callId: id, payload }))
+        runtime.event({ type: 'step/end', data: { turn: 1, step } })
+      }
+      runtime.event({ type: 'turn/start', data: { turn: 1 } })
+      call(1, 'catalog', NAMES.catalog, { mode: 'dataview' })
+      const row = { row_count: 0, result_ref: 'session://test/vars/v1', sample_complete: true }
+      const payload = {
+        ok: scenario !== 'failed', ...row,
+        ...(scenario === 'legacy' ? {} : { data_request_complete: scenario !== 'unfinished' }),
+      }
+      if (scenario === 'multiple-empty') payload.steps = [row, { ...row, result_ref: 'r2' }]
+      if (scenario === 'mixed-rows') payload.steps = [row, { ...row, row_count: 1 }]
+      if (scenario === 'missing-count') delete payload.row_count
+      call(2, 'query', NAMES.query, payload)
+      const stopped = ['complete', 'multiple-empty', 'fast', 'non-prefix'].includes(scenario)
+      const decision = await runtime.preStep({
+        step: 3, messages: scenario === 'pending-input' ? [{ role: 'user', content: [] }] : [],
+      })
+      // Existing data-only termination is preserved, without a narrative.
+      assert.equal(decision.kind, stopped || scenario === 'data-only' ? 'reject' : 'enter', scenario)
+      assert.equal(runtime.appended.length, stopped ? 1 : 0, scenario)
+      if (stopped) {
+        assert.deepEqual(runtime.appended[0], { type: 'user/message', data: message, surfaceOp: 'append' })
+        assert.deepEqual(history.at(-1), message)
+        runtime.stopping()
+        assert.equal(runtime.steered.length, 0)
+        assert.equal((await runtime.preStep({ step: 3 })).kind, 'enter')
+        assert.equal(runtime.appended.length, 1)
+        // A following turn does not inherit completion from the prior turn.
+        runtime.event({ type: 'turn/start', data: { turn: 2 } })
+        assert.equal((await runtime.preStep({ turn: 2, step: 1 })).kind, 'enter')
+      }
+    }
+  } finally {
+    if (oldContext === undefined) delete process.env.FIN_AGENT_DSH_CONTEXT_PATH
+    else process.env.FIN_AGENT_DSH_CONTEXT_PATH = oldContext
+    if (oldTrace === undefined) delete process.env.FIN_AGENT_DSH_TRACE_PATH
+    else process.env.FIN_AGENT_DSH_TRACE_PATH = oldTrace
+    rmSync(dir, { recursive: true, force: true })
+  }
+})
+
+test('standard composite flows may complete catalog loading and repair without resetting the retry budget', () => {
+  const runtime = fixture({ maxCatalogAttempts: 3 })
+  const call = (step, id, name, payload) => {
+    runtime.event({ type: 'tool/call', data: { turn: 1, step, callId: id, name } })
+    runtime.event(resultEvent({ step, callId: id, payload }))
+    runtime.event({ type: 'step/end', data: { turn: 1, step } })
+  }
+  runtime.event({ type: 'turn/start', data: { turn: 1 } })
+  call(1, 'first-view', NAMES.catalog, { mode: 'dataview' })
+  const catalog = view => ({ name: NAMES.catalog, arguments: { subject: 'plate', dataview: view, operation: 'query' } })
+  assert.equal(runtime.guard(catalog('constitution')), undefined)
+  call(2, 'dependent-view', NAMES.catalog, { mode: 'dataview' })
+  call(3, 'query-failed', NAMES.query, { ok: false })
+  assert.match(runtime.prompt(), /stage=repair/)
+  assert.equal(runtime.guard(catalog('basic_info')), undefined)
+  call(4, 'repair-view', NAMES.catalog, { mode: 'dataview' })
+  assert.match(runtime.prompt(), /stage=repair/)
+  assert.match(runtime.guard(catalog('quote')), /上限/)
+  call(5, 'repair-failed', NAMES.query, { ok: false })
+  assert.match(runtime.prompt(), /stage=final/)
+  assert.match(runtime.guard(catalog('quote')), /当前阶段/)
+})
+
+test('fast mode retains the explicit one-catalog-stage contract', () => {
+  const runtime = fixture({ executionMode: 'fast' })
+  runtime.event({ type: 'turn/start', data: { turn: 1 } })
+  runtime.event({ type: 'tool/call', data: { turn: 1, step: 1, callId: 'c1', name: NAMES.catalog } })
+  runtime.event(resultEvent({ step: 1, callId: 'c1', payload: { mode: 'dataview' } }))
+  runtime.event({ type: 'step/end', data: { turn: 1, step: 1 } })
+  assert.match(runtime.guard({ name: NAMES.catalog, arguments: { subject: 'stock', dataview: 'quote', operation: 'query' } }), /当前阶段/)
+})
 
 test('catalog reuse follows visible history, exact operation and revision across resumed turns', async () => {
   const dir = mkdtempSync(join(tmpdir(), 'finance-catalog-reuse-'))
@@ -130,7 +259,7 @@ test('catalog reuse follows visible history, exact operation and revision across
     runtime.event({ type: 'turn/start', data: { turn: 2 } })
     assert.equal((await runtime.request({})).maxTokens, 3072)
     assert.equal(runtime.guard(query), undefined)
-    assert.match((await runtime.preStep({ turn: 2, step: 1 })).messages[0].content[0].text, /不是旧查询结果/)
+    assert.match((await runtime.preStep({ turn: 2, step: 1 })).messages[0].content[0].text, /按本轮条件调用 finance_query/)
     runtime.event({ type: 'tool/call', data: { turn: 2, step: 1, callId: 'q2', name: NAMES.query, arguments: JSON.stringify(query.arguments) } })
     runtime.event(resultEvent({ turn: 2, step: 1, callId: 'q2', payload: { ok: true, sample_complete: true } }))
     runtime.event({ type: 'step/end', data: { turn: 2, step: 1 } })
@@ -165,7 +294,7 @@ test('catalog reuse follows visible history, exact operation and revision across
       mixed.event(resultEvent({ turn: 4, step: 1, callId: 'q', payload: { ok: !failed, sample_complete: true }, isError: failed }))
       mixed.event({ type: 'step/end', data: { turn: 4, step: 1 } })
       assert.match(mixed.prompt(), failed ? /stage=repair/ : /stage=query/)
-      assert.deepEqual(mixed.restrictions.at(-1).allow, [NAMES.query])
+      assert.deepEqual(mixed.restrictions.at(-1).allow, [NAMES.catalog, NAMES.query])
     }
     writeRevision('catalog-v2')
     runtime.event({ type: 'turn/start', data: { turn: 5 } })
@@ -442,26 +571,52 @@ test('steers one final-answer step only when query evidence has no answer step y
   assert.equal(runtime.steered.length, 1)
 })
 
-test('requires operation for a concrete catalog route while retaining ambiguity reads', () => {
+test('catalog guard accepts optional operation and requires its subject/view scope', () => {
+  for (const executionMode of ['standard', 'fast']) {
+    const runtime = fixture({ executionMode })
+    for (const args of [
+      {},
+      { subject: 'stock' },
+      { subject: 'stock', dataview: 'report_metric' },
+      { subject: 'stock', dataview: 'report_metric', operation: 'query' },
+      { subject: 'plate', dataview: 'constitution', operation: 'constitution' },
+    ]) {
+      assert.equal(runtime.guard({ name: NAMES.catalog, arguments: args }), undefined)
+    }
+    for (const args of [
+      { dataview: 'report_metric' },
+      { dataview: 'report_metric', operation: 'query' },
+      { operation: 'query' },
+      { subject: 'stock', operation: 'query' },
+    ]) {
+      assert.match(runtime.guard({ name: NAMES.catalog, arguments: args }), /subject/)
+    }
+  }
+})
+
+test('three parallel full-view reads reach query without catalog retries', () => {
   const runtime = fixture()
-  assert.match(
-    runtime.guard({
-      name: NAMES.catalog,
-      arguments: { subject: 'stock', dataview: 'report_metric' },
-    }),
-    /subject、dataview 和 operation/,
-  )
-  assert.equal(
-    runtime.guard({
-      name: NAMES.catalog,
-      arguments: { subject: 'stock', dataview: 'report_metric', operation: 'query' },
-    }),
-    undefined,
-  )
-  assert.equal(
-    runtime.guard({ name: NAMES.catalog, arguments: { subject: 'stock' } }),
-    undefined,
-  )
+  runtime.event({ type: 'turn/start', data: { turn: 1 } })
+  for (const [index, dataview] of ['quote', 'moneyflow', 'report'].entries()) {
+    const args = { subject: 'stock', dataview }
+    const callId = `full-view-${index}`
+    assert.equal(runtime.guard({ name: NAMES.catalog, arguments: args }), undefined)
+    runtime.event({ type: 'tool/call', data: {
+      turn: 1, step: 1, callId, name: NAMES.catalog, arguments: JSON.stringify(args),
+    } })
+    runtime.event(resultEvent({ step: 1, callId, payload: {
+      mode: 'dataview', subject: 'stock', dataview: {
+        name: dataview, functions: [
+          { api_name: `stock.${dataview}`, operation: 'query' },
+          { api_name: `stock.${dataview}.agg`, operation: 'aggregate' },
+        ],
+      },
+    } }))
+  }
+  runtime.event({ type: 'step/end', data: { turn: 1, step: 1 } })
+  assert.match(runtime.prompt(), /stage=query reason=dataview_ready/)
+  assert.equal(runtime.guard({ name: NAMES.query, arguments: { steps: [] } }), undefined)
+  assert.equal(runtime.steered.length, 0)
 })
 
 test('stable-prefix mode keeps all schemas visible, guards the stage, and uses stage budgets', async () => {
@@ -502,7 +657,7 @@ test('narrows catalog to query to final and applies per-stage request budgets', 
     payload: { mode: 'dataview', dataview: { name: 'quote' } },
   }))
   runtime.event({ type: 'step/end', data: { turn: 1, step: 1 } })
-  assert.deepEqual(runtime.restrictions.at(-1).allow, [NAMES.query])
+  assert.deepEqual(runtime.restrictions.at(-1).allow, [NAMES.catalog, NAMES.query])
   assert.match(runtime.prompt(), /stage=query/)
   assert.deepEqual(await runtime.request({ provider: 'p', model: 'm' }), {
     provider: 'p',
@@ -813,7 +968,7 @@ test('allows one query repair, then stops, and guards exact duplicates', () => {
     payload: { error: 'invalid request' },
   }))
   runtime.event({ type: 'step/end', data: { turn: 1, step: 2 } })
-  assert.deepEqual(runtime.restrictions.at(-1).allow, [NAMES.query])
+  assert.deepEqual(runtime.restrictions.at(-1).allow, [NAMES.catalog, NAMES.query])
   assert.match(runtime.prompt(), /stage=repair/)
 
   runtime.event({
@@ -858,7 +1013,7 @@ test('a parallel success does not hide a repairable query failure', () => {
   }))
   runtime.event({ type: 'step/end', data: { turn: 1, step: 2 } })
 
-  assert.deepEqual(runtime.restrictions.at(-1).allow, [NAMES.query])
+  assert.deepEqual(runtime.restrictions.at(-1).allow, [NAMES.catalog, NAMES.query])
   assert.match(runtime.prompt(), /stage=repair/)
 })
 
@@ -905,10 +1060,10 @@ test('keeps querying after identity-only preparation and permits at most two det
   runtime.event(resultEvent({
     step: 2,
     callId: 'identity-1',
-    payload: { ok: true, api: 'stock.basic_info', sample_complete: true },
+    payload: { ok: true, api: 'stock.basic_info', sample_complete: true, data_request_complete: false },
   }))
   runtime.event({ type: 'step/end', data: { turn: 1, step: 2 } })
-  assert.deepEqual(runtime.restrictions.at(-1).allow, [NAMES.query])
+  assert.deepEqual(runtime.restrictions.at(-1).allow, [NAMES.catalog, NAMES.query])
   assert.match(runtime.prompt(), /reason=identity_scope_ready/)
 
   runtime.event({
@@ -934,4 +1089,147 @@ test('keeps querying after identity-only preparation and permits at most two det
   assert.deepEqual(runtime.restrictions.at(-2).allow, [NAMES.details])
   assert.deepEqual(runtime.restrictions.at(-1).allow, [])
   assert.match(runtime.prompt(), /reason=detail_attempt_limit/)
+})
+
+test('basic information can be the final data goal, including empty results', () => {
+  for (const complete of [undefined, true]) {
+    const runtime = fixture()
+    runtime.event({ type: 'turn/start', data: { turn: 1 } })
+    runtime.event({ type: 'tool/call', data: { turn: 1, step: 1, callId: 'c1', name: NAMES.catalog } })
+    runtime.event(resultEvent({ step: 1, callId: 'c1', payload: { mode: 'dataview' } }))
+    runtime.event({ type: 'step/end', data: { turn: 1, step: 1 } })
+    runtime.event({ type: 'tool/call', data: { turn: 1, step: 2, callId: 'q1', name: NAMES.query } })
+    runtime.event(resultEvent({ step: 2, callId: 'q1', payload: {
+      ok: true, api: 'fund.basic_info', row_count: 0, sample_complete: true,
+      ...(complete === undefined ? {} : { data_request_complete: complete }),
+    } }))
+    runtime.event({ type: 'step/end', data: { turn: 1, step: 2 } })
+    assert.match(runtime.prompt(), /stage=final/)
+    runtime.stopping()
+    assert.equal(runtime.steered.length, 1) // Final answer only, never another data query.
+    assert.match(runtime.steered[0].content[0].text, /最终答案/)
+  }
+})
+
+const SKILL_NAMES = {
+  ...NAMES,
+  skill: 'mcp__finance__read_finance_skill',
+  reference: 'mcp__finance__read_finance_skill_reference',
+}
+
+async function withSkillContext(context, body) {
+  const dir = mkdtempSync(join(tmpdir(), 'finance-skill-loop-'))
+  const contextPath = join(dir, 'context.json')
+  const previous = process.env.FIN_AGENT_DSH_CONTEXT_PATH
+  process.env.FIN_AGENT_DSH_CONTEXT_PATH = contextPath
+  writeFileSync(contextPath, JSON.stringify({
+    revision: 'skill-turn',
+    tool_context: {
+      _finance_skill_catalog_prompt: 'equity-report-analysis: 个股研报观点与证据分析',
+      ...context,
+    },
+  }))
+  try {
+    return await body(contextPath)
+  } finally {
+    if (previous === undefined) delete process.env.FIN_AGENT_DSH_CONTEXT_PATH
+    else process.env.FIN_AGENT_DSH_CONTEXT_PATH = previous
+    rmSync(dir, { recursive: true, force: true })
+  }
+}
+
+function completeCall(runtime, step, id, name, payload, args = {}) {
+  runtime.event({ type: 'tool/call', data: { turn: 1, step, callId: id, name, arguments: args } })
+  runtime.event(resultEvent({ step, callId: id, payload }))
+  runtime.event({ type: 'step/end', data: { turn: 1, step } })
+}
+
+test('Skill-first permits optional methods and evidence-led followup without a forced match', async () => {
+  await withSkillContext({}, async () => {
+    const runtime = fixture({}, [], SKILL_NAMES)
+    runtime.event({ type: 'turn/start', data: { turn: 1 } })
+    assert.match(runtime.prompt(), /依据授权 Skill 目录选择适用方法/)
+    assert.equal(runtime.guard({ name: SKILL_NAMES.skill, arguments: { skill_id: 'equity-report-analysis' } }), undefined)
+    // A missing Skill match does not prevent direct catalog fallback.
+    assert.equal(runtime.guard({ name: NAMES.catalog, arguments: { subject: 'stock', dataview: 'report' } }), undefined)
+    completeCall(runtime, 1, 'method', SKILL_NAMES.skill, { skill_id: 'equity-report-analysis', method: '使用证据对比' })
+    assert.match(runtime.prompt(), /stage=catalog/)
+    runtime.stopping()
+    assert.equal(runtime.steered.length, 0) // Supplied-evidence questions may already be answerable.
+    completeCall(runtime, 2, 'catalog', NAMES.catalog, { mode: 'dataview' })
+    completeCall(runtime, 3, 'data', NAMES.query, { ok: true, sample_complete: true, data_request_complete: true })
+    assert.match(runtime.prompt(), /stage=query/)
+    assert.equal((await runtime.preStep({ step: 4 })).kind, 'enter')
+    assert.equal(runtime.guard({ name: SKILL_NAMES.reference, arguments: { skill_id: 'equity-report-analysis', reference: 'references/consensus.md' } }), undefined)
+    completeCall(runtime, 4, 'reference', SKILL_NAMES.reference, { content: '对齐样本' })
+    assert.match(runtime.prompt(), /stage=query/)
+    assert.equal(runtime.guard({ name: NAMES.catalog, arguments: { subject: 'stock', dataview: 'report_metric' } }), undefined)
+    assert.equal((await runtime.request({})).reasoningEffort, 'low')
+    runtime.stopping()
+    assert.equal(runtime.steered.length, 0) // Follow-up retrieval is optional, not mandatory.
+  })
+})
+
+test('Skill methods remain readable after data budget exhaustion without reopening queries', async () => {
+  await withSkillContext({}, async () => {
+    const runtime = fixture({ maxQueryAttempts: 1 }, [], SKILL_NAMES)
+    runtime.event({ type: 'turn/start', data: { turn: 1 } })
+    completeCall(runtime, 1, 'catalog', NAMES.catalog, { mode: 'dataview' })
+    completeCall(runtime, 2, 'query', NAMES.query, { ok: true, sample_complete: true })
+    assert.match(runtime.prompt(), /stage=final/)
+    assert.equal(runtime.guard({ name: SKILL_NAMES.reference, arguments: { skill_id: 'equity-report-analysis', reference: 'references/event.md' } }), undefined)
+    assert.match(runtime.guard({ name: NAMES.query, arguments: {} }), /当前阶段/)
+    completeCall(runtime, 3, 'reference', SKILL_NAMES.reference, { content: '对照假设' })
+    assert.match(runtime.prompt(), /stage=final/)
+    assert.equal((await runtime.preStep({ step: 4 })).kind, 'enter')
+  })
+})
+
+test('an unmatched complex question can extend evidence without activating a Skill', async () => {
+  await withSkillContext({}, async () => {
+    const runtime = fixture({}, [], SKILL_NAMES)
+    runtime.event({ type: 'turn/start', data: { turn: 1 } })
+    completeCall(runtime, 1, 'catalog-1', NAMES.catalog, { mode: 'dataview' })
+    completeCall(runtime, 2, 'query-1', NAMES.query, { ok: true, sample_complete: true, data_request_complete: true })
+    assert.match(runtime.prompt(), /stage=query/)
+    assert.equal(runtime.guard({ name: NAMES.catalog, arguments: { subject: 'stock', dataview: 'quote', operation: 'query' } }), undefined)
+    completeCall(runtime, 3, 'catalog-2', NAMES.catalog, { mode: 'dataview' })
+    completeCall(runtime, 4, 'query-2', NAMES.query, { ok: true, sample_complete: true })
+    assert.equal((await runtime.preStep({ step: 5 })).kind, 'enter')
+    runtime.stopping()
+    assert.equal(runtime.steered.length, 0) // Answer from sufficient evidence; no forced method or query.
+  })
+})
+
+test('Skill data-only calls preserve required retrieval and terminal raw-data delivery', async () => {
+  await withSkillContext({ _finance_data_only: true }, async () => {
+    const runtime = fixture({}, [], SKILL_NAMES)
+    runtime.event({ type: 'turn/start', data: { turn: 1 } })
+    completeCall(runtime, 1, 'method', SKILL_NAMES.skill, { method: '预测值口径' })
+    assert.match(runtime.prompt(), /stage=catalog/)
+    runtime.stopping()
+    assert.equal(runtime.steered.length, 1)
+    completeCall(runtime, 2, 'catalog', NAMES.catalog, { mode: 'dataview' })
+    completeCall(runtime, 3, 'query', NAMES.query, { ok: true, data_only_mode: true, data_only_complete: true })
+    assert.match(runtime.prompt(), /stage=final/)
+    assert.equal((await runtime.preStep({ step: 4 })).kind, 'reject')
+    assert.match(runtime.guard({ name: SKILL_NAMES.reference, arguments: {} }), /当前阶段/)
+  })
+})
+
+test('reused Skill workers reset scope and fast mode keeps its one-query budget', async () => {
+  await withSkillContext({}, async contextPath => {
+    const runtime = fixture({ executionMode: 'fast' }, [], SKILL_NAMES)
+    runtime.event({ type: 'turn/start', data: { turn: 1 } })
+    completeCall(runtime, 1, 'catalog', NAMES.catalog, { mode: 'dataview' })
+    assert.match(runtime.guard({ name: NAMES.catalog, arguments: { subject: 'stock', dataview: 'report_metric' } }), /当前阶段/)
+    completeCall(runtime, 2, 'query', NAMES.query, { ok: true, sample_complete: true })
+    assert.match(runtime.prompt(), /stage=final/)
+    assert.equal(runtime.guard({ name: SKILL_NAMES.reference, arguments: { reference: 'references/topic.md' } }), undefined)
+    assert.match(runtime.guard({ name: NAMES.query, arguments: {} }), /当前阶段/)
+    writeFileSync(contextPath, JSON.stringify({ tool_context: { _finance_data_only: true } }))
+    runtime.event({ type: 'turn/start', data: { turn: 2 } })
+    assert.match(runtime.prompt(), /一次目录定位/)
+    assert.doesNotMatch(runtime.prompt(), /命中或用户显式指定/)
+  })
 })

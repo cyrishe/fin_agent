@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from src.experiments.staged_data_protocol.phase2 import python_filter as pf
+
 import re
 from dataclasses import dataclass
 from datetime import date, datetime
@@ -247,6 +249,13 @@ def _build_where(*, source: BaseInfoSource, args: Mapping[str, Any]) -> tuple[st
 
 
 def _build_filter_clauses(*, source: BaseInfoSource, args: Mapping[str, Any]) -> tuple[str, list[Any]]:
+    if pf.condition(args) is not None:
+        def leaf(p):
+            values = _equivalent_filter_values(source=source, field_name=p["field"], value=p["value"])
+            if p["operator"] in {"=", "=="} and len(values) > 1:
+                p = {**p, "operator": "in", "value": values}
+            return pf.compile_predicate(p, source.fields)
+        return pf.sql_filter(args, source.fields, leaf=leaf)
     raw_filter = str(args.get("filter") or "").strip()
     if not raw_filter:
         return "", []
@@ -326,6 +335,16 @@ def _exact_name_lookup(
 
     expected_field = _IDENTITY_NAME_FIELDS.get(source.subject)
     raw_filter = str(args.get("filter") or "").strip()
+    tree = pf.condition(args)
+    if tree is not None:
+        if tree.get("field") == expected_field and tree.get("operator") in {"=", "=="} and isinstance(tree.get("value"), str):
+            value = tree["value"].strip()
+            if not value or any(token in value for token in ("%", "_")):
+                return None
+            if source.subject == "plate" and value.endswith("板块") and len(value) > 2:
+                value = value.removesuffix("板块").strip()
+            return expected_field, value
+        return None
     if not expected_field or not raw_filter:
         return None
     matches = list(FILTER_RE.finditer(raw_filter))

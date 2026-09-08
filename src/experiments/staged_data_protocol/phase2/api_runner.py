@@ -22,6 +22,7 @@ from src.experiments.staged_data_protocol.phase2.intraday_quote_provider import 
 from src.experiments.staged_data_protocol.phase2.margin_provider import execute_kd_margin_api, execute_margin_api
 from src.experiments.staged_data_protocol.phase2.moneyflow_provider import execute_kd_moneyflow_api, execute_moneyflow_api
 from src.experiments.staged_data_protocol.phase2.models import ApiCall, ResultHandle
+from src.experiments.staged_data_protocol.phase2.python_filter import condition, bind_references, certainly_empty, predicates, map_predicates
 from src.experiments.staged_data_protocol.phase2.pricevalue_provider import execute_kd_pricevalue_api, execute_pricevalue_api
 from src.experiments.staged_data_protocol.phase2.quote_provider import execute_kd_quote_api, execute_quote_agg_api, execute_quote_api
 from src.experiments.staged_data_protocol.phase2.report_provider import (
@@ -29,6 +30,7 @@ from src.experiments.staged_data_protocol.phase2.report_provider import (
     execute_report_api,
     execute_report_metric_api,
 )
+from src.experiments.staged_data_protocol.phase2.realtime_quote_provider import execute_realtime_quote_api
 from src.experiments.staged_data_protocol.phase2.stock_corporate_provider import execute_stock_corporate_api
 
 
@@ -58,14 +60,33 @@ def execute_api_call(call: ApiCall, previous_results: Mapping[str, ResultHandle]
     """
 
     previous_results = previous_results or {}
+    expression = condition(call.args)
+    if expression is not None:
+        # Bind the tree, never interpolate result values into expression text.
+        call = replace(call, args={**call.args, "_filter_expression": bind_references(expression, previous_results)})
     resolved = resolve_api(call.api)
+    if expression is not None and resolved and resolved.get("subject") == "plate" and resolved.get("dataview") in {"quote", "moneyflow", "pricevalue"}:
+        aliases = {"plate_code": "code", "plate_name": "name"}
+        call.args["_filter_expression"] = map_predicates(call.args["_filter_expression"], lambda p: {**p, "field": aliases.get(p["field"], p["field"])})
     columns = [_output_column(item) for item in call.outputs]
+    if expression is not None and certainly_empty(call.args["_filter_expression"]):
+        refs = [f"{p['value']['result']}.{p['value']['field']}" for p in predicates(expression) if isinstance(p.get("value"), dict)]
+        return ResultHandle(name=call.result_id, api=call.api, columns=columns, data={
+            "status": "ok", "api": call.api, "arguments": call.args, "columns": columns,
+            "rows": [], "row_count": 0, "empty_references": sorted(set(refs)),
+            "reason": "dependent query skipped because its filter is false after reference binding",
+        })
     skipped_ref_args = (
         {"metric", "agg"}
         if resolved and resolved.get("type") == "agg"
         else set()
     )
+    if expression is not None:
+        skipped_ref_args.update({"filter", "_filter_expression"})
     empty_refs_by_arg = _empty_reference_values_by_arg(call, previous_results)
+    if expression is not None:
+        empty_refs_by_arg.pop("filter", None)
+        empty_refs_by_arg.pop("_filter_expression", None)
     filter_text = str(call.args.get("filter") or "")
     filter_resolution = (
         _filter_truth_with_empty_refs(
@@ -138,11 +159,12 @@ def execute_api_call(call: ApiCall, previous_results: Mapping[str, ResultHandle]
     if resolved and resolved.get("type") == "base" and resolved.get("dataview") == "quote":
         subject = str(resolved.get("subject") or "")
         quote_mode = _stock_quote_mode(call.args, resolved)
-        if subject == "stock" and quote_mode > 0:
+        if subject == "stock" and quote_mode == 2:
+            data = execute_realtime_quote_api(args=call.args, outputs=call.outputs)
+        elif subject == "stock" and quote_mode == 1:
             data = execute_intraday_quote_api(
                 args=call.args,
                 outputs=call.outputs,
-                latest_only=quote_mode == 2,
             )
         else:
             data = execute_quote_api(subject=subject, args=call.args, outputs=call.outputs)
@@ -308,11 +330,12 @@ def execute_api_call(call: ApiCall, previous_results: Mapping[str, ResultHandle]
         )
     if resolved and resolved.get("type") == "agg" and resolved.get("subject") == "stock" and resolved.get("dataview") == "quote":
         quote_mode = _stock_quote_mode(call.args, resolved)
-        if quote_mode > 0:
+        if quote_mode == 2:
+            data = execute_realtime_quote_api(args=call.args, outputs=call.outputs, aggregate=True)
+        elif quote_mode == 1:
             data = execute_intraday_quote_agg_api(
                 args=call.args,
                 outputs=call.outputs,
-                latest_only=quote_mode == 2,
             )
         else:
             data = execute_quote_agg_api(

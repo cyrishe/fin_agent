@@ -11,6 +11,8 @@ from typing import Any, Dict, Mapping
 from src.experiments.staged_data_protocol.phase2.catalog import (
     CATALOG_PATH,
     load_catalog_source,
+    concrete_call_pattern,
+    operation_for_api_pattern,
 )
 from src.services.coding_execution_contract import (
     compile_command,
@@ -722,24 +724,13 @@ class CustomToolContextBundleService:
 
     @staticmethod
     def _coding_rules(value: Any) -> list[str]:
-        """Keep Coding assets semantic; do not expose the legacy BI step language."""
+        """Preserve the authoritative catalog wording in Coding assets."""
         if not isinstance(value, list):
             return []
         rules: list[str] = []
         for item in value:
             text = _trim(item)
             if not text:
-                continue
-            lower = text.lower()
-            if "agg" in lower and "column" in lower and "previous" in lower:
-                rules.append(
-                    "A previously computed per-stock result used for aggregation must include code or stock_code."
-                )
-                continue
-            if "previous per-stock result field like" in lower:
-                rules.append(
-                    "A metric may use a defined dataview field or a field from a previous per-stock result."
-                )
                 continue
             rules.append(text)
         return rules
@@ -960,12 +951,23 @@ def run(inputs: dict) -> dict:
         patterns: Mapping[str, Any],
     ) -> Dict[str, Any]:
         apis = definition.get("api") if isinstance(definition.get("api"), list) else []
+        filter_syntax = self._load_catalog().get("filter_syntax")
         return {
             "subject": subject,
             "dataview": dataview,
             "description": definition.get("desc") or definition.get("description") or "",
             "rules": self._coding_rules(definition.get("rules")),
             "fields": self._compact_fields(definition.get("fields")),
+            **{
+                key: definition[key]
+                for key in ("value_domains", "aggregate_fields")
+                if definition.get(key)
+            },
+            **(
+                {"filter_syntax": filter_syntax}
+                if filter_syntax
+                else {}
+            ),
             "methods": [
                 self._subject_method(
                     subject=subject,
@@ -1004,17 +1006,13 @@ def run(inputs: dict) -> dict:
         class_definition = self._coding_api_pattern(raw_class_definition)
         call_pattern = _trim(class_definition.pop("call_pattern", ""))
         if call_pattern:
-            call_pattern = (
-                call_pattern
-                .replace("{api_name}", api_name)
-                .replace("{subject}", subject)
-                .replace("{dataview}", dataview)
-            )
+            call_pattern = concrete_call_pattern(api_name, call_pattern)
         operation_guidance = self._coding_rules(api.get("guidance"))
         method = {
             "name": api_name,
             "description": _trim(api.get("api_function")),
             "type": api_class,
+            "operation": operation_for_api_pattern(api_name),
             **({"call": call_pattern} if call_pattern else {}),
             **class_definition,
             **({"guidance": operation_guidance} if operation_guidance else {}),

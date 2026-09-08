@@ -126,10 +126,11 @@ application_runtime_service = ApplicationRuntimeService()
 application_workbench_service = ApplicationWorkbenchService(
     application_runtime_service=application_runtime_service,
 )
-financial_qa_cc_service = FinancialQaCcService()
 skill_hub_catalog_service = SkillHubCatalogService(
-    business_catalog=financial_qa_cc_service.business_skill_catalog,
     legacy_skill_studio=skill_studio_service,
+)
+financial_qa_cc_service = FinancialQaCcService(
+    skill_hub_catalog_service=skill_hub_catalog_service,
 )
 skill_authoring_service = SkillAuthoringService(
     discovery_service=SkillCapabilityDiscoveryService(
@@ -206,6 +207,7 @@ custom_tool_agent_service.set_orchestrator_service(
 asset_invocation_service = AssetInvocationService(
     custom_tool_store=custom_tool_agent_service.store,
     attachment_service=attachment_service,
+    business_catalog_provider=skill_hub_catalog_service.runtime_catalog,
 )
 scheduled_task_service = ScheduledTaskService()
 custom_tool_stream_requests: dict[str, dict] = {}
@@ -296,6 +298,28 @@ app.register_blueprint(
         identity_resolver=_resolve_current_guest_identity,
     )
 )
+
+
+@app.before_request
+def _restrict_guest_execution():
+    # Guests enter execution through the quota-controlled conversation routes.
+    if not request.path.startswith("/api/") or request.path.startswith("/api/auth/"):
+        return None
+    allowed = {"/api/chat/dispatch", "/api/chat/stream/start", "/api/custom_tool/stream/start",
+               "/api/attachments/upload", "/api/assistant/thread/reset"}
+    if (request.method in {"POST", "PUT", "PATCH", "DELETE"} and request.path not in allowed) or request.path == "/api/tools/simple_web_debug":
+        if not _resolve_current_member_identity():
+            return jsonify({"ok": False, "code": "login_required", "error": "请注册或登录后使用此功能。"}), 403
+
+
+def _guest_question_denial(identity: dict):
+    if identity.get("user_type") in {"member", "admin"}:
+        return None
+    if user_session_service.consume_guest_question(user_id=str(identity.get("user_id") or "")):
+        return None
+    response = jsonify({"ok": False, "code": "guest_question_limit", "error": "访客的 3 次免费提问已用完，请注册或登录后继续。", "login_url": _with_script_root("/login")})
+    response.status_code = 403
+    return _apply_identity_cookies(response, identity)
 app.register_blueprint(
     create_auth_blueprint(
         service=phone_account_service,
@@ -320,7 +344,7 @@ def _cookie_secure() -> bool:
 
 def _apply_identity_cookies(response: Response, identity: dict) -> Response:
     session_token = str(identity.get("session_token") or "")
-    if str(identity.get("user_type") or "") == "member":
+    if str(identity.get("user_type") or "") in {"member", "admin"}:
         response.set_cookie(
             UserSessionService.MEMBER_SESSION_COOKIE_NAME,
             session_token,
@@ -2141,6 +2165,7 @@ def _run_asset_invocation_stream_payload(payload: dict, *, emit) -> None:
             attachments=attachments,
             thread_context=thread_context,
             owner_ids=_custom_tool_owner_ids(thread_context=thread_context, thread_id=thread_id),
+            business_owner_id=str(guest_identity.get("user_id") or ""),
         )
         if not invocation:
             raise AssetInvocationError("没有选择可调用的 Tool 或 Skill")
@@ -2154,6 +2179,11 @@ def _run_asset_invocation_stream_payload(payload: dict, *, emit) -> None:
             thread_id=thread_id,
             turn_id=turn_id,
             event_sink=emit,
+            owner_id=str(guest_identity.get("user_id") or ""),
+            research_mode=str(payload.get("research_mode") or "auto"),
+            financial_qa_runtime=_normalize_chat_financial_qa_runtime(payload.get("financial_qa_runtime")),
+            financial_qa_execution_mode=str(payload.get("financial_qa_execution_mode") or "standard"),
+            data_only=bool(payload.get("data_only")),
         )
         assistant_message = str(result.get("message") or "已处理。").strip()
         _attach_answer_summary(
@@ -2356,6 +2386,7 @@ def _build_chat_dispatch_payload(
                 ),
                 "data_only": bool(data_only),
             }
+            answer_kwargs["owner_ids"] = [owner_id] if owner_id else []
             if selected_financial_runtime != "cc":
                 answer_kwargs["runtime"] = selected_financial_runtime
             result = financial_qa_cc_service.answer(
@@ -2502,7 +2533,7 @@ def _build_chat_dispatch_payload(
         if plan_entry == "catalog_browse":
             mode = str(plan.get("browse_mode") or "").strip()
             if mode == "skills_catalog":
-                items = skill_hub_catalog_service.list_skills()
+                items = skill_hub_catalog_service.list_skills(owner_ids=[owner_id] if owner_id else [])
                 result = _apply_application_workspace_orchestration({
                     "mode": "skills_catalog",
                     "message": f"当前共有 {len(items)} 个 skills。",
@@ -2851,7 +2882,7 @@ def _build_chat_dispatch_payload(
         return _apply_application_workspace_orchestration(result, application_context)
 
     if command_action == "catalog_skills":
-        items = skill_hub_catalog_service.list_skills()
+        items = skill_hub_catalog_service.list_skills(owner_ids=[owner_id] if owner_id else [])
         return _apply_application_workspace_orchestration({
             "mode": "skills_catalog",
             "message": f"当前共有 {len(items)} 个 skills。",
@@ -3222,6 +3253,11 @@ def _build_asset_invocation_payload(
     attachments: list[dict] | None = None,
     thread_id: int | None = None,
     turn_id: int | None = None,
+    owner_id: str = "",
+    research_mode: str = "auto",
+    financial_qa_runtime: str = "",
+    financial_qa_execution_mode: str = "standard",
+    data_only: bool = False,
 ) -> dict:
     application_context = application_context if isinstance(application_context, dict) else {}
     thread_context = thread_context if isinstance(thread_context, dict) else {}
@@ -3232,6 +3268,7 @@ def _build_asset_invocation_payload(
         attachments=attachments,
         thread_context=thread_context,
         owner_ids=_custom_tool_owner_ids(thread_context=thread_context, thread_id=thread_id),
+        business_owner_id=owner_id,
     )
     if not invocation:
         raise AssetInvocationError("没有选择可调用的 Tool 或 Skill")
@@ -3242,6 +3279,11 @@ def _build_asset_invocation_payload(
         thread_context=thread_context,
         thread_id=thread_id,
         turn_id=turn_id,
+        owner_id=owner_id,
+        research_mode=research_mode,
+        financial_qa_runtime=financial_qa_runtime,
+        financial_qa_execution_mode=financial_qa_execution_mode,
+        data_only=data_only,
     )
 
 
@@ -3297,6 +3339,11 @@ def _execute_asset_invocation_payload(
     thread_id: int | None,
     turn_id: int | None,
     event_sink=None,
+    owner_id: str = "",
+    research_mode: str = "auto",
+    financial_qa_runtime: str = "",
+    financial_qa_execution_mode: str = "standard",
+    data_only: bool = False,
 ) -> dict:
     if invocation.get("status") != "ready":
         message = str(invocation.get("message") or "还需要补充调用参数。").strip()
@@ -3369,6 +3416,28 @@ def _execute_asset_invocation_payload(
         return result
 
     skill_name = str(target.get("name") or "").strip()
+    contract = invocation.get("contract") if isinstance(invocation.get("contract"), dict) else {}
+    if contract.get("skill_type") == "business_method":
+        result = financial_qa_cc_service.answer(
+            thread_id=thread_id or "",
+            turn_id=turn_id or "",
+            owner_id=owner_id,
+            owner_ids=[owner_id] if owner_id else [],
+            explicit_skill_ids=[skill_name],
+            user_text=str(invocation.get("user_request") or "").strip() or f"请使用 {skill_name}，结合当前会话确认需要处理的问题。",
+            dispatch_plan={"entry": "agent_route", "selected_agent": "investment_analyst", "turn_mode": "normal_qa"},
+            application_context=application_context,
+            attachments=list(invocation.get("attachments") or []),
+            event_sink=event_sink,
+            research_mode=normalize_research_mode(research_mode),
+            runtime=_normalize_chat_financial_qa_runtime(financial_qa_runtime),
+            execution_mode=normalize_financial_qa_execution_mode(financial_qa_execution_mode),
+            data_only=bool(data_only),
+        )
+        result = _apply_application_workspace_orchestration(result, application_context)
+        result["asset_invocation"] = invocation
+        result["surface_blocks"] = [_asset_invocation_preview_block(invocation), *result.get("surface_blocks", [])]
+        return result
     jobs = [
         _submit_generic_skill_job(
             skill_name,
@@ -4264,6 +4333,9 @@ def api_chat_dispatch():
             owner_id=str(guest_identity.get("user_id") or ""),
             context_summary=f"{application_name} 会话",
         )
+        denial = _guest_question_denial(guest_identity)
+        if denial is not None:
+            return denial
         thread_context = runtime_conversation_service.get_thread_context(thread_id=thread_id)
         context_window = runtime_conversation_service.get_context_window(thread_id=thread_id, max_rounds=5)
         if context_window:
@@ -4298,6 +4370,11 @@ def api_chat_dispatch():
                 attachments=attachments,
                 thread_id=thread_id,
                 turn_id=turn_id,
+                owner_id=str(guest_identity.get("user_id") or ""),
+                research_mode=research_mode,
+                financial_qa_runtime=financial_qa_runtime,
+                financial_qa_execution_mode=financial_qa_execution_mode,
+                data_only=data_only,
             )
         else:
             result = _build_chat_dispatch_payload(
@@ -4452,6 +4529,9 @@ def api_custom_tool_stream_start():
             return jsonify({"ok": False, "error": "interaction_response.expected_revision 必须是整数"}), 400
         guest_identity = _resolve_current_guest_identity()
         run_id = uuid.uuid4().hex
+        denial = _guest_question_denial(guest_identity)
+        if denial is not None:
+            return denial
         stored_payload = {
             "run_id": run_id,
             "text": text,
@@ -4689,7 +4769,8 @@ def api_skill_hub():
     """
 
     try:
-        catalog = skill_hub_catalog_service.catalog()
+        identity = _resolve_current_guest_identity()
+        catalog = skill_hub_catalog_service.catalog(owner_ids=[str(identity.get("user_id") or "")])
         return jsonify(_to_json_safe({"ok": True, **catalog}))
     except Exception as exc:
         return jsonify({"ok": False, "error": f"获取 Skill Hub 失败: {exc}"}), 500
@@ -4711,6 +4792,7 @@ def _skill_candidate_summary(candidate: dict) -> dict:
             "change_summary",
             "created_at",
             "published",
+            "visibility",
         )
     } | {
         "tool_count": len(control.get("tool_connections") or []),
@@ -4866,9 +4948,11 @@ def api_skill_candidate_revision(skill_id, revision_no):
 @app.route("/api/skill-hub/<skill_name>", methods=["GET"])
 def api_skill_hub_detail(skill_name):
     try:
+        identity = _resolve_current_guest_identity()
         detail = skill_hub_catalog_service.detail(
             str(skill_name or "").strip(),
             catalog_id=str(request.args.get("catalog_id") or "").strip(),
+            owner_ids=[str(identity.get("user_id") or "")],
         )
         if detail is None:
             return jsonify({"ok": False, "error": "Skill 不存在或当前不可查看。"}), 404
@@ -4877,16 +4961,64 @@ def api_skill_hub_detail(skill_name):
         return jsonify({"ok": False, "error": f"获取 Skill 详情失败: {exc}"}), 500
 
 
+def _skill_revision_argument(payload: dict, name: str, *, allow_zero: bool = False) -> int:
+    value = payload.get(name)
+    if isinstance(value, bool) or not isinstance(value, int) or value < (0 if allow_zero else 1):
+        raise SkillAuthoringError(f"{name} 必须是{'非负' if allow_zero else '正'}整数。", code="invalid_skill_authoring_request")
+    return value
+
+
+@app.route("/api/skill-hub/candidates/<skill_id>/activate", methods=["POST"])
+def api_activate_business_skill(skill_id):
+    try:
+        identity = _resolve_current_member_identity()
+        if not identity:
+            return jsonify({"ok": False, "code": "login_required", "error": "请登录后启用 Skill。"}), 403
+        payload = _extract_request_payload()
+        candidate = skill_hub_catalog_service.activate_candidate(
+            skill_id,
+            owner_id=str(identity.get("user_id") or ""),
+            expected_candidate_revision=_skill_revision_argument(payload, "expected_candidate_revision"),
+            expected_active_revision=_skill_revision_argument(payload, "expected_active_revision", allow_zero=True),
+        )
+        return jsonify(_to_json_safe({"ok": True, "candidate": candidate}))
+    except Exception as exc:
+        return _skill_authoring_error(exc)
+
+
+@app.route("/api/skill-hub/candidates/<skill_id>/visibility", methods=["PATCH"])
+def api_set_business_skill_visibility(skill_id):
+    try:
+        identity = _resolve_current_member_identity()
+        if not identity:
+            return jsonify({"ok": False, "code": "login_required", "error": "请登录后修改 Skill 可见性。"}), 403
+        payload = _extract_request_payload()
+        visibility = str(payload.get("visibility") or "").strip()
+        if visibility not in {"public", "private"}:
+            raise SkillAuthoringError("visibility 只能是 public 或 private。", code="invalid_skill_authoring_request")
+        candidate = skill_hub_catalog_service.set_visibility(
+            skill_id,
+            owner_id=str(identity.get("user_id") or ""),
+            visibility=visibility,
+            expected_active_revision=_skill_revision_argument(payload, "expected_active_revision"),
+        )
+        return jsonify(_to_json_safe({"ok": True, "candidate": candidate}))
+    except Exception as exc:
+        return _skill_authoring_error(exc)
+
+
 @app.route(
     "/api/skill-hub/<skill_name>/references/<path:reference_path>",
     methods=["GET"],
 )
 def api_skill_hub_reference(skill_name, reference_path):
     try:
+        identity = _resolve_current_guest_identity()
         result = skill_hub_catalog_service.load_business_reference(
             str(skill_name or "").strip(),
             str(reference_path or "").strip(),
             expected_revision=str(request.args.get("revision") or "").strip(),
+            owner_ids=[str(identity.get("user_id") or "")],
         )
         if result.get("error"):
             status = 409 if "快照已更新" in str(result.get("error")) else 404
@@ -4915,6 +5047,7 @@ def api_invocable_asset_catalog():
         limit = min(50, max(1, int(raw_limit))) if raw_limit else None
         items = asset_invocation_service.list_invocable_assets(
             owner_ids=owner_ids or None,
+            business_owner_id=owner_id,
             query=query,
             kind=kind,
             limit=limit,

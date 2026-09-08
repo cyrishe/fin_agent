@@ -93,7 +93,7 @@ def _json_payload() -> Dict[str, Any]:
 
 
 def _public_user(identity: Optional[Dict[str, Any]]) -> Optional[Dict[str, str]]:
-    if not identity or str(identity.get("user_type") or "") != "member":
+    if not identity or str(identity.get("user_type") or "") not in {"member", "admin"}:
         return None
     return {
         "user_id": str(identity.get("user_id") or ""),
