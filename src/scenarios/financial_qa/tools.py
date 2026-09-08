@@ -625,6 +625,11 @@ class FinanceDataQueryCcTools:
                     "finance catalog changed during the active agent turn"
                 )
 
+        directory_subjects = self.finance_catalog.build_tree().get("subjects") or []
+        subject_ids = [_trim(row.get("name")) for row in directory_subjects if isinstance(row, Mapping) and _trim(row.get("name"))]
+        view_ids = sorted({_trim(view.get("name")) for row in directory_subjects if isinstance(row, Mapping)
+                           for view in row.get("dataviews") or [] if isinstance(view, Mapping) and _trim(view.get("name"))})
+
         @tool(
             "read_finance_catalog",
             (
@@ -636,8 +641,10 @@ class FinanceDataQueryCcTools:
             {
                 "type": "object",
                 "properties": {
-                    "subject": {"type": "string", "maxLength": 100},
-                    "dataview": {"type": "string", "maxLength": 100},
+                    "subject": {"type": "string", "maxLength": 100, "enum": ["", *subject_ids],
+                                "description": "数据范围索引中的主体类别标识。省略或空字符串表示浏览总目录。"},
+                    "dataview": {"type": "string", "maxLength": 100, "enum": ["", *view_ids],
+                                 "description": "当前主体下的数据视图标识，取自数据范围索引。省略或空字符串表示浏览主体。"},
                     "operation": {
                         "type": "string",
                         "enum": list(OPERATION_DESCRIPTIONS),

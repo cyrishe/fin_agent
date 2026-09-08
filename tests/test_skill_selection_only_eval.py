@@ -56,6 +56,18 @@ def test_native_catalog_alternative_is_generic_but_never_a_skill_hit(case):
     assert score(generic, value, allow_catalog=True)["invalid_calls"] == ["invalid_catalog_arguments"]
 
 
+def test_selection_does_not_hide_invalid_native_catalog_arguments():
+    generic = {"primary": None, "acceptable": [], "expected_generic": True}
+    value = response([], name="mcp__finance__read_finance_catalog")
+    call = value["choices"][0]["message"]["tool_calls"][0]["function"]
+    call["arguments"] = '{"subject":"a company"}'
+    schemas = {call["name"]:{"type":"object", "properties":{"subject":{"enum":["stock","index"]}}}}
+    result = score(generic,value,allow_catalog=True,tool_schemas=schemas)
+    assert not result["primary_hit"] and result["invalid_calls"]
+    call["arguments"] = '{"subject":"stock"}'
+    assert score(generic,value,allow_catalog=True,tool_schemas=schemas)["primary_hit"]
+
+
 def test_replay_preserves_model_contract_and_only_returns_selection(monkeypatch):
     import requests
     monkeypatch.setenv("LLM_BASE_URL", "https://example.invalid/v1")

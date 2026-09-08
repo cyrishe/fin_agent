@@ -147,13 +147,22 @@ def replay_request(captured):
     return body, response.json()
 
 
-def score(case, response, *, allow_catalog=False):
+def score(case, response, *, allow_catalog=False, tool_schemas=None):
     choice = (response.get("choices") or [{}])[0]
     message = choice.get("message") or {}
     selected, calls, invalid = [], message.get("tool_calls") or [], []
     catalog_calls = []
     for call in calls:
         function = call.get("function") or {}
+        if tool_schemas is not None:
+            from jsonschema import Draft7Validator
+            schema = tool_schemas.get(function.get("name"))
+            try:
+                arguments = json.loads(function.get("arguments", "{}"))
+                if schema is None or not Draft7Validator(schema).is_valid(arguments):
+                    invalid.append("tool_schema_violation:" + function.get("name", "unknown"))
+            except (ValueError, TypeError):
+                invalid.append("tool_schema_violation:" + function.get("name", "unknown"))
         if allow_catalog and function.get("name", "").endswith("read_finance_catalog"):
             try:
                 args = json.loads(function.get("arguments", "{}"))
@@ -229,7 +238,8 @@ def main():
             save(directory / "request.json", request)
             save(directory / "response.json", response)
             catalog_visible = any((t.get("function") or {}).get("name", "").endswith("read_finance_catalog") for t in request.get("tools", []))
-            result = {"id": case["id"], **score(case, response, allow_catalog=catalog_visible), "usage": response.get("usage"), "model_elapsed_ms": model_elapsed_ms}
+            schemas = {t["function"]["name"]:t["function"]["parameters"] for t in request.get("tools", []) if "function" in t}
+            result = {"id": case["id"], **score(case, response, allow_catalog=catalog_visible, tool_schemas=schemas), "usage": response.get("usage"), "model_elapsed_ms": model_elapsed_ms}
             nodes += [{"node": "model_selection", "status": "completed"}, {"node": "tool_dispatch", "status": "not_executed"}]
         except Exception as exc:
             result = {"id": case["id"], "error_type": type(exc).__name__}

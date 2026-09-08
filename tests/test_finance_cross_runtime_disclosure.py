@@ -162,6 +162,10 @@ def test_full_inventory_and_shared_tool_schemas(catalog_adapters):
     operation_schema = dsh_tools["read_finance_catalog"].inputSchema["properties"]["operation"]
     assert set(operation_schema["enum"]) == set(_OPERATION_TYPES)
     assert "operation" not in dsh_tools["read_finance_catalog"].inputSchema.get("required", [])
+    properties = dsh_tools["read_finance_catalog"].inputSchema["properties"]
+    assert "stock" in properties["subject"]["enum"] and "" in properties["subject"]["enum"]
+    assert "basic_info" in properties["dataview"]["enum"] and "" in properties["dataview"]["enum"]
+    assert "目录" in properties["subject"]["description"]
 
 
 def test_index_is_navigation_not_all_method_contracts(catalog_adapters):
