@@ -208,25 +208,38 @@ test('a dataview label without executable methods never opens execution', async 
   } }), /stock.report.query/)
 })
 
-test('Skill selection precedes catalog access in stable-prefix mode, including no-match fallback', async () => {
+test('discovery offers methods and data; empty method selection remains compatible', async () => {
   await withSkillContext({}, async () => {
     for (const payload of [{ skills: [] }, { skills: [{ skill_id: 'equity-report-analysis', method: '按证据分析' }] }]) {
       const runtime = fixture({ preserveRequestPrefix: true }, [], SKILL_NAMES)
       runtime.event({ type: 'turn/start', data: { turn: 1 } })
-      assert.deepEqual(runtime.restrictions.at(-1).allow, [SKILL_NAMES.skill])
+      assert.deepEqual(runtime.restrictions.at(-1).allow, [SKILL_NAMES.skill, NAMES.catalog])
       const opening = await runtime.preStep({ step: 1 })
       assert.match(opening.messages[0].content[0].text, /stage=catalog reason=turn_started/)
-      assert.match(runtime.guard({ name: NAMES.catalog, arguments: {} }), /先提交方法选择/)
-      assert.match(runtime.guard({ name: SKILL_NAMES.reference, arguments: {} }), /先提交方法选择/)
+      assert.equal(runtime.guard({ name: NAMES.catalog, arguments: {} }), undefined)
+      assert.match(runtime.guard({ name: SKILL_NAMES.reference, arguments: {} }), /先读取方法或数据执行包/)
       runtime.event({ type: 'tool/call', data: { turn: 1, step: 1, callId: 's', name: SKILL_NAMES.skill, arguments: { skill_ids: [] } } })
       runtime.event(resultEvent({ step: 1, callId: 's', payload }))
-      assert.match(runtime.guard({ name: NAMES.catalog, arguments: {} }), /先提交方法选择/)
+      assert.match(runtime.guard({ name: NAMES.query, arguments: {} }), /先读取方法或数据执行包/)
       runtime.event({ type: 'step/end', data: { turn: 1, step: 1 } })
       assert.equal(runtime.restrictions.at(-1).lifted, true)
-      assert.equal(runtime.guard({ name: NAMES.catalog, arguments: {} }), undefined)
+      assert.equal(runtime.guard({ name: NAMES.catalog, arguments: { subject: 'stock' } }), undefined)
       runtime.stopping()
       assert.equal(runtime.steered.length, 0)
     }
+  })
+})
+
+test('generic discovery needs no empty Skill handshake and still waits for a leaf contract', async () => {
+  await withSkillContext({}, async () => {
+    const runtime = fixture({ preserveRequestPrefix: true }, [], SKILL_NAMES)
+    runtime.event({ type: 'turn/start', data: { turn: 1 } })
+    completeCall(runtime, 1, 'overview', NAMES.catalog, { mode: 'subject' })
+    assert.equal(runtime.restrictions.at(-1).lifted, true)
+    assert.match((await runtime.preStep({ step: 2 })).messages[0].content[0].text, /stage=catalog/)
+    assert.match(runtime.guard({ name: NAMES.query, arguments: { request: 'stock.quote.query() -> close' } }), /执行包/)
+    // Professional methods remain available after choosing the generic path.
+    assert.equal(runtime.guard({ name: SKILL_NAMES.skill, arguments: { skill_id: 'equity-report-analysis' } }), undefined)
   })
 })
 
@@ -1359,7 +1372,7 @@ test('Skill-first permits optional methods and evidence-led followup without a f
     runtime.event({ type: 'turn/start', data: { turn: 1 } })
     assert.match(runtime.prompt(), /方法选择规则/)
     assert.equal(runtime.guard({ name: SKILL_NAMES.skill, arguments: { skill_id: 'equity-report-analysis' } }), undefined)
-    assert.match(runtime.guard({ name: NAMES.catalog, arguments: { subject: 'stock', dataview: 'report' } }), /先提交方法选择/)
+    assert.equal(runtime.guard({ name: NAMES.catalog, arguments: { subject: 'stock', dataview: 'report' } }), undefined)
     completeCall(runtime, 1, 'method', SKILL_NAMES.skill, { skill_id: 'equity-report-analysis', method: '使用证据对比' })
     assert.match(runtime.prompt(), /stage=catalog/)
     runtime.stopping()

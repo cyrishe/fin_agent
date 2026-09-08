@@ -549,7 +549,7 @@ function emptyResultHandoff(state, config) {
 
 function promptFor(state, config) {
   if (!state.methodReady) {
-    return `[FINANCE_LOOP stage=catalog reason=${state.reason}]\n[FINANCE_EXECUTION mode=${state.executionMode}]\n本步按本轮方法选择规则，用 read_finance_skill 的 skill_ids 提交选择；空列表表示通用路径。选择结果返回后，再规划后续动作。`
+    return `[FINANCE_LOOP stage=catalog reason=${state.reason}]\n[FINANCE_EXECUTION mode=${state.executionMode}]\n先按本轮方法选择规则判断：需要专业方法时用 read_finance_skill 加载；直接取数时用 read_finance_catalog 定位数据执行包。依据返回内容继续。`
   }
   const prompts = state.executionMode === 'fast' ? FAST_STAGE_PROMPTS : STAGE_PROMPTS
   let base = state.stage === 'catalog' && state.reusableApis.length > 0
@@ -576,7 +576,7 @@ function promptFor(state, config) {
 }
 
 function stageTools(state, tools) {
-  if (!state.methodReady) return [tools.skill].filter(Boolean)
+  if (!state.methodReady) return [tools.skill, tools.catalog].filter(Boolean)
   const methods = state.stage === 'final' && state.dataOnlyRequested
     ? [] : [tools.skill, tools.reference].filter(Boolean)
   let allowed
@@ -595,7 +595,7 @@ function stageTools(state, tools) {
 }
 
 function stageAllows(state, kind, args) {
-  if (!state.methodReady) return kind === 'skill'
+  if (!state.methodReady) return kind === 'skill' || kind === 'catalog'
   if (kind === 'skill' || kind === 'reference') return state.stage !== 'final' || !state.dataOnlyRequested
   if (kind === 'identity') return ['catalog', 'query', 'repair', 'details'].includes(state.stage)
   if (state.stage === 'catalog') return kind === 'catalog' || (kind === 'query' && canReuseCatalog(state, args))
@@ -643,7 +643,9 @@ function updateAfterStep(state, step, config) {
     return !result?.failed && !payload?.error
       && (typeof payload?.method === 'string' || Array.isArray(payload?.skills))
   })
-  if (methodLoaded) state.methodReady = true
+  // Choosing data discovery is itself the generic path. No empty Skill call
+  // is required before it; normal catalog readiness still governs execution.
+  if (methodLoaded || calls.some(call => call.kind === 'catalog' && state.results.has(call.callId))) state.methodReady = true
   const missing = stepCalls.flatMap(call => call.missingApis ?? [])
   if (missing.length > 0) {
     state.stage = state.stage === 'repair' ? 'repair' : 'catalog'
@@ -796,7 +798,7 @@ function updateAfterStep(state, step, config) {
 }
 
 function requiredActionPrompt(state, tools) {
-  if (!state.methodReady) return '本步用 read_finance_skill 的 skill_ids 提交方法选择；空列表表示通用路径。'
+  if (!state.methodReady) return '按本轮目标加载所需专业方法，或直接通过 read_finance_catalog 定位数据执行包。'
   if (hasDataOnlyResults(state)) {
     return '本轮已有数据集。继续完成新加载目录对应的取数目标，或按 recovery 修复失败步骤；由系统交付原始结果。'
   }
@@ -945,7 +947,7 @@ export function apply(ctx, input = {}) {
         if (missing.length) return `当前阶段先用 read_finance_catalog 读取这些方法的执行包：${[...new Set(missing)].join('、')}。包内包含参数和字段；加载后提交原查询流。`
       }
       if (!stageAllows(state, kind, exec.arguments)) {
-        if (!state.methodReady) return '本步先提交方法选择；read_finance_skill 的 skill_ids 可以为空。结果返回后，再继续所需工具。'
+        if (!state.methodReady) return '本步先读取方法或数据执行包；依据返回内容继续所需工具。'
         return `金融查询策略拒绝当前阶段调用 ${exec.name}；请遵循上一工具结果末尾的阶段指引。`
       }
       // Harness emits tool/call before prepare/guard; these counters already

@@ -44,6 +44,18 @@ def test_malformed_arguments_are_scored_without_execution(case):
     assert score(case, value)["invalid_calls"] == ["invalid_skill_arguments"]
 
 
+def test_native_catalog_alternative_is_generic_but_never_a_skill_hit(case):
+    value = response([], name="mcp__finance__read_finance_catalog")
+    call = value["choices"][0]["message"]["tool_calls"][0]["function"]
+    call["arguments"] = json.dumps({"subject": "stock", "dataview": "quote", "operation": "query"})
+    generic = {"primary": None, "acceptable": [], "expected_generic": True}
+    assert not score(generic, value)["primary_hit"]  # Original Skill-only scorer unchanged.
+    assert score(generic, value, allow_catalog=True)["primary_hit"]
+    assert not score(case, value, allow_catalog=True)["primary_hit"]
+    call["arguments"] = "[]"
+    assert score(generic, value, allow_catalog=True)["invalid_calls"] == ["invalid_catalog_arguments"]
+
+
 def test_replay_preserves_model_contract_and_only_returns_selection(monkeypatch):
     import requests
     monkeypatch.setenv("LLM_BASE_URL", "https://example.invalid/v1")

@@ -147,12 +147,22 @@ def replay_request(captured):
     return body, response.json()
 
 
-def score(case, response):
+def score(case, response, *, allow_catalog=False):
     choice = (response.get("choices") or [{}])[0]
     message = choice.get("message") or {}
     selected, calls, invalid = [], message.get("tool_calls") or [], []
+    catalog_calls = []
     for call in calls:
         function = call.get("function") or {}
+        if allow_catalog and function.get("name", "").endswith("read_finance_catalog"):
+            try:
+                args = json.loads(function.get("arguments", "{}"))
+                if not isinstance(args, dict) or set(args) - {"subject", "dataview", "operation"}:
+                    raise ValueError("invalid catalog arguments")
+                catalog_calls.append(args)
+            except (ValueError, TypeError):
+                invalid.append("invalid_catalog_arguments")
+            continue
         if not function.get("name", "").endswith("read_finance_skill"):
             invalid.append(function.get("name", "unknown"))
             continue
@@ -168,7 +178,7 @@ def score(case, response):
     valid = bool(calls) and not invalid and choice.get("finish_reason") == "tool_calls"
     primary_hit = valid and (not selected if case["expected_generic"] else case["primary"] in selected)
     acceptable = valid and all(x in case["acceptable"] for x in selected) and (bool(selected) or case["expected_generic"])
-    return {"selected": selected, "primary_hit": primary_hit, "acceptable_selection": acceptable,
+    return {"selected": selected, "catalog_calls": catalog_calls, "primary_hit": primary_hit, "acceptable_selection": acceptable,
             "invalid_calls": invalid, "finish_reason": choice.get("finish_reason"), "tool_calls": calls}
 
 
@@ -202,7 +212,7 @@ def main():
                 "catalog": catalog.public_entries(), "cases": cases,
                 "model": os.environ["LLM_DEFAULT_MODEL"], "model_host": urlsplit(os.environ["LLM_BASE_URL"]).hostname,
                 "scope": "Real FinancialQaCcService + DSH initial request capture; real model first-generation replay; no dispatcher, HTTP chat, personal Skills, or business tool execution",
-                "scorer": "Predeclared primary inclusion and all-selected-IDs acceptable; original data-route gold is not Skill-route gold; no repeated stability estimate"}
+                "scorer": "v2: predeclared primary inclusion; direct catalog discovery or empty method selection is a generic path. Tool names must be present in the captured native first-step schema. Original raw scores are preserved; no repeated stability estimate"}
     save(out / "manifest.json", manifest)
     results = []
     for case in cases:
@@ -218,7 +228,8 @@ def main():
             model_elapsed_ms = round((time.monotonic() - model_started) * 1000)
             save(directory / "request.json", request)
             save(directory / "response.json", response)
-            result = {"id": case["id"], **score(case, response), "usage": response.get("usage"), "model_elapsed_ms": model_elapsed_ms}
+            catalog_visible = any((t.get("function") or {}).get("name", "").endswith("read_finance_catalog") for t in request.get("tools", []))
+            result = {"id": case["id"], **score(case, response, allow_catalog=catalog_visible), "usage": response.get("usage"), "model_elapsed_ms": model_elapsed_ms}
             nodes += [{"node": "model_selection", "status": "completed"}, {"node": "tool_dispatch", "status": "not_executed"}]
         except Exception as exc:
             result = {"id": case["id"], "error_type": type(exc).__name__}
