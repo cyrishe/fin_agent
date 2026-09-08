@@ -221,7 +221,10 @@ class FinancialQaPresentationService:
             backtest_blocks = self._backtest_blocks(result_ref, index=index)
             if backtest_blocks:
                 return backtest_blocks
-        api = _trim(result_ref.get("api"))
+        # Presentation describes the data view; query's explicit invocation
+        # suffix does not change its chart, labels or evidence shape. The
+        # original result reference and execution trace retain the exact API.
+        api = _trim(result_ref.get("api")).removesuffix(".query")
         goal = _trim(result_ref.get("goal"))
         display_title = _trim(result_ref.get("display_title"))
         public_source = self.catalog.get_public_data_source(api=api)

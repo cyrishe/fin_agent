@@ -53,8 +53,8 @@ def test_runtime_and_static_report_catalogs_keep_four_apis_in_sync() -> None:
     )
     static_views = payload["subjects"]["stock"]
     expected = {
-        "report": {"stock.report", "stock.report.agg"},
-        "report_metric": {"stock.report_metric", "stock.report_metric.agg"},
+        "report": {"stock.report.query", "stock.report.agg"},
+        "report_metric": {"stock.report_metric.query", "stock.report_metric.agg"},
     }
     for dataview, api_names in expected.items():
         assert {item["api_name"] for item in static_views[dataview]["api"]} == api_names

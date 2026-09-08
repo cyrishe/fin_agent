@@ -366,7 +366,7 @@ def _format_static_validation_error(error: str, *, call: Mapping[str, Any] | Non
     if match:
         return (
             f"{prefix}: The response is not a valid API request string. "
-            "Return exactly one string like `rN = subject.dataview(args) -> field1, field2` in `res`."
+            "Return exactly one string like `rN = api_name(arguments) -> field1, field2` in `res`."
         )
 
     match = re.search(r"^API_ERROR:\s*unsupported api=(.+)$", text)

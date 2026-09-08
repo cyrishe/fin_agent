@@ -48,13 +48,14 @@ def test_coding_prompt_always_contains_finance_api_call_contract() -> None:
     assert "request=..." not in prompt
     assert "result_name" in prompt
     assert "不使用 `r1/r2`" not in prompt
-    assert "## 五类通用 API" in prompt
+    assert "## 通用 API 方法" in prompt
     assert "def run(inputs: dict) -> dict:" not in prompt
     assert "api_catalog/subjects/<subject>/<dataview>.json" in prompt
     assert "stock.quote.kd_minute_volumn_avg" not in prompt
     assert 'tradedate = -1' not in prompt
     assert "成分关系" in prompt
-    assert "subject.constitution(...)" in prompt
+    assert "subject.dataview.query(...)" in prompt
+    assert "`constitution` 是成分关系 dataview" in prompt
     assert "时间模式、默认值和字段作用域以当前方法为准" in prompt
     assert "filter, order, limit, realtime" not in prompt
 

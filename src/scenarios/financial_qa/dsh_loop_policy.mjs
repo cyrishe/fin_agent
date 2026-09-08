@@ -449,9 +449,11 @@ function canReuseCatalog(state, args) {
     // validator remain authoritative for arguments, fields and method validity.
     const target = /^\s*(?:[A-Za-z_]\w*\s*=\s*)?([A-Za-z_]\w*(?:\.[A-Za-z_]\w*)+)\s*\(/.exec(step?.request ?? '')?.[1]
     return target && state.reusableApis.some(api => {
+      const candidate = api.endsWith('.query') && target.split('.').length === 2
+        ? `${target}.query` : target
       const pattern = api.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
         .replace(/<\w+>/g, '[A-Za-z_][A-Za-z_0-9]*')
-      return new RegExp(`^${pattern}$`).test(target)
+      return new RegExp(`^${pattern}$`).test(candidate)
     })
   })
 }
@@ -542,12 +544,9 @@ function promptFor(state, config) {
     : prompts[state.stage] ?? prompts.final
   if (skillGuidedAnswer(state)) {
     if (state.stage === 'catalog') {
-      base = '依据授权 Skill 目录选择适用方法，读取尚未加载的正文，再定位所需数据目录。其余数据目标通过金融目录取数，并结合通用分析完成。'
-      if (state.executionMode === 'fast') base += '\n快速模式仅提供一次数据目录定位和一次查询生成，按方法合并必要取数目标。'
+      base += '\n按需读取适用 Skill 与参考，确定取证范围和分析方法。'
     } else if (['query', 'details'].includes(state.stage)) {
-      base = state.executionMode === 'fast'
-        ? FAST_STAGE_PROMPTS.query + '已加载 Skill 指导取数范围，必要参考可以按需读取。'
-        : '按已读取的 Skill 与参考综合已有证据。证据足够时直接回答；需要补充方法时按需读取参考，需要补充数据时加载对应目录、查询或读取必要明细。取数完成与分析完成分别判断，剩余调用受本轮预算约束。'
+      base += '\n结合适用 Skill 与已有证据完成分析；需要新数据时加载对应执行包。'
     } else if (state.stage === 'final') {
       base = '本轮取数预算已结束。可按需读取 Skill 及其参考，依据已有结果完成分析与回答，交代证据缺口与推断条件。'
     }
@@ -898,9 +897,11 @@ export function apply(ctx, input = {}) {
       if (!stageAllows(state, kind, exec.arguments)) {
         return `金融查询策略拒绝当前阶段调用 ${exec.name}；请遵循上一工具结果末尾的阶段指引。`
       }
-      if ((kind === 'catalog' && state.catalogAttempts >= config.maxCatalogAttempts)
-        || (kind === 'query' && state.queryAttempts >= config.maxQueryAttempts)
-        || ((hasDataOnlyResults(state) || skillGuidedAnswer(state)) && kind === 'details' && state.loadAttempts >= config.maxLoadAttempts)
+      // Harness emits tool/call before prepare/guard; these counters already
+      // include this attempt. Admit the last budgeted call, reject the next.
+      if ((kind === 'catalog' && state.catalogAttempts > config.maxCatalogAttempts)
+        || (kind === 'query' && state.queryAttempts > config.maxQueryAttempts)
+        || ((hasDataOnlyResults(state) || skillGuidedAnswer(state)) && kind === 'details' && state.loadAttempts > config.maxLoadAttempts)
       ) return '本轮该类读取次数已达上限；请使用已有数据与当前可用工具完成剩余目标。'
       if (kind === 'catalog') {
         const routeError = concreteCatalogRouteError(exec.arguments)

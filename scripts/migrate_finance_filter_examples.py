@@ -15,7 +15,7 @@ from src.experiments.staged_data_protocol.phase2 import python_filter as pf
 PATH = ROOT / 'src/tools/finance_data/catalog/api_view_catalog.json'
 old = PATH.read_text()
 data = json.loads(old)
-if data.get('version') in {'2026-09-07-python-filter-v1', '2026-09-07-python-filter-v2'}:
+if data.get('version') in {'2026-09-07-python-filter-v1', '2026-09-07-python-filter-v2', '2026-09-08-filter-contains-v3', '2026-09-08-explicit-query-v4', '2026-09-08-unified-operations-v5'}:
     print('Catalog examples are already migrated; no changes.', file=sys.stderr)
     sys.exit(0)
 data['version'] = '2026-09-07-python-filter-v1'

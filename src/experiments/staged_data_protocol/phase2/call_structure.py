@@ -4,8 +4,8 @@ import re
 from typing import Any, Iterable, Mapping
 
 from src.experiments.staged_data_protocol.phase2.catalog import (
+    _api_pattern_matches,
     catalog_source,
-    normalize_dataview_for_subject,
     resolve_api,
 )
 from src.experiments.staged_data_protocol.phase2.intraday_quote_provider import FIELD_SQL
@@ -614,27 +614,6 @@ def _match_catalog_function(api: str) -> dict[str, Any] | None:
         matched["method"] = str(resolved.get("method") or "")
         matched["default_mode"] = resolved.get("default_mode", 0)
     return matched
-
-
-def _api_pattern_matches(pattern: str, api: str) -> bool:
-    return _api_pattern_expression(pattern, api) or _api_pattern_expression(
-        _normalize_api_dataview(pattern),
-        _normalize_api_dataview(api),
-    )
-
-
-def _api_pattern_expression(pattern: str, api: str) -> bool:
-    expression = re.escape(pattern)
-    expression = expression.replace(re.escape("<field>"), r"[A-Za-z_]\w*")
-    expression = expression.replace(re.escape("<method>"), r"[A-Za-z_]\w*")
-    return bool(re.fullmatch(expression, api))
-
-
-def _normalize_api_dataview(api: str) -> str:
-    parts = str(api or "").split(".")
-    if len(parts) >= 2:
-        parts[1] = normalize_dataview_for_subject(parts[0], parts[1])
-    return ".".join(parts)
 
 
 def _argument_contract(api_class: Mapping[str, Any]) -> tuple[set[str], set[str]]:

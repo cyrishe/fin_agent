@@ -31,17 +31,17 @@ def test_window_combinations_have_one_source_for_all_subjects():
 
 def test_hot_event_relation_uses_real_entry_fields_and_row_limit():
     service = FinanceDataToolCatalogService()
-    pack = service.get_model_dataview("hot_event", "member", "constitution")
-    assert pack == service.get_model_dataview("hot_event", "member", "query")
+    pack = service.get_model_dataview("hot_event", "member", "query")
+    assert pack == service.get_model_dataview("hot_event", "member", "constitution")
     fn = pack["functions"][0]
     text = json.dumps(pack, ensure_ascii=False)
-    assert fn["api_name"] == "hot_event.member"
+    assert fn["api_name"] == "hot_event.member.query"
     assert "hot_event_code" not in text and "hot_event_name" not in text
     assert "limit=-1" not in text
     assert "最多 500" in text
     assert resolve_api("hot_event.member")["type"] == "base"
     assert validate_call(parse_api_call(fn["examples"][0]), previous_results={}).ok
-    assert resolve_api("hot_event.member.query") is None
+    assert resolve_api("hot_event.member.query") == resolve_api("hot_event.member")
 
 
 @pytest.mark.parametrize("view", ["report", "report_metric"])
@@ -57,7 +57,7 @@ def test_navigation_lists_available_operations_without_execution_details():
     tools = FinanceDataQueryCcTools()
     routing = tools._catalog_routing_index()
     assert "  - report [query/aggregate]：" in routing
-    assert "  - member [constitution]：" in routing
+    assert "  - member [query]：" in routing
     assert "  - quote [query/window/aggregate/compute]：" in routing
     assert "request_pattern" not in routing and "filter=" not in routing
 

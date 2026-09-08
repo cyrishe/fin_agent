@@ -1,6 +1,6 @@
 {
-  "version": "2026-09-07-python-filter-v2",
-  "filter_syntax": "filter 使用 Python 风格的条件表达式：字符串加引号，比较条件用 and/or 与括号组合。文本模糊匹配用 '文本' in field，表示字面包含；集合筛选用 field in 列表或已有结果列。字段以所选 API 的定义为准。",
+  "version": "2026-09-08-unified-operations-v5",
+  "filter_syntax": "filter 为条件表达式字符串，支持以下写法：比较 == != > >= < <=；组合 and/or 与括号；文本包含 field.contains('文本')（单个文本字面量，大小写敏感）；集合 field in [...] / field not in [...]，列表也可用 rN.column 或 stepN.column；空值 field is None / field is not None。字段取自当前方法，值使用带引号的文本、数字、True/False 或 None。",
   "api_class_patterns": {
     "basic_query": {
       "desc": "按条件查询当前业务域的逐条数据。",
@@ -19,7 +19,7 @@
     },
     "stock_quote_query": {
       "desc": "按股票查询日 K、分钟 K 或实时快照。",
-      "call_pattern": "r{id} = stock.quote(codes, names, filter, order, limit, mode, period, count) -> field1, field2",
+      "call_pattern": "r{id} = stock.quote.query(codes, names, filter, order, limit, mode, period, count) -> field1, field2",
       "output_rule": "输出当前模式定义的行情字段。",
       "args": {
         "required": [],
@@ -165,7 +165,7 @@
     },
     "report_query": {
       "desc": "查询逐篇研报的评级、目标价、观点、风险和来源。",
-      "call_pattern": "r{id} = stock.report(filter, order, limit) -> field1, field2",
+      "call_pattern": "r{id} = stock.report.query(filter, order, limit) -> field1, field2",
       "output_rule": "每行一篇研报；输出当前研报字段。",
       "args": {
         "required": [],
@@ -207,7 +207,7 @@
     },
     "report_metric_query": {
       "desc": "查询逐机构、逐公司、逐年度的研报标准指标事实。",
-      "call_pattern": "r{id} = stock.report_metric(filter, order, limit) -> field1, field2",
+      "call_pattern": "r{id} = stock.report_metric.query(filter, order, limit) -> field1, field2",
       "output_rule": "每行一个研报指标事实；输出当前指标字段。",
       "args": {
         "required": [],
@@ -276,9 +276,19 @@
       "output_rule": "每行一只股票在一个交易日的两融数据。",
       "args": {
         "required": [],
-        "optional": ["filter", "date(YYYY-MM-DD)", "start(YYYY-MM-DD)", "end(YYYY-MM-DD)", "order", "limit", "realtime"]
+        "optional": [
+          "filter",
+          "date(YYYY-MM-DD)",
+          "start(YYYY-MM-DD)",
+          "end(YYYY-MM-DD)",
+          "order",
+          "limit",
+          "realtime"
+        ]
       },
-      "rules": ["默认查询最新可用交易日；date 选择单日，start/end 成对选择历史区间。"]
+      "rules": [
+        "默认查询最新可用交易日；date 选择单日，start/end 成对选择历史区间。"
+      ]
     },
     "kday_margin_metric": {
       "desc": "按股票计算融资融券字段的 K 日窗口统计、变化或变化率。",
@@ -384,7 +394,7 @@
       },
       "basic_info": {
         "public_name": "基础信息",
-        "desc": "股票代码、名称、行业、上市信息、公司简介与主营业务。",
+        "desc": "股票代码、名称、行业与上市日期。",
         "fields": {
           "code": [
             "股票代码",
@@ -406,11 +416,11 @@
         },
         "api": [
           {
-            "api_name": "stock.basic_info",
+            "api_name": "stock.basic_info.query",
             "api_function": "查询个股基础身份信息。",
             "api_class": "basic_query",
             "examples": [
-              "r1 = stock.basic_info(filter = \"name == '贵州茅台'\", limit = 1) -> code, name, industry, listed_date"
+              "r1 = stock.basic_info.query(filter = \"name == '贵州茅台'\", limit = 1) -> code, name, industry, listed_date"
             ]
           }
         ]
@@ -559,13 +569,13 @@
         },
         "api": [
           {
-            "api_name": "stock.quote",
+            "api_name": "stock.quote.query",
             "api_function": "按股票返回日 K、指定周期分钟 K 或最新行情快照。",
             "api_class": "stock_quote_query",
             "examples": [
-              "r1 = stock.quote(codes = ['600519.SH', '000001.SZ'], order = \"tradedate desc\", mode = 0, count = 10) -> code, name, tradedate, open, close, high, low, pct, amount, volumn",
-              "r2 = stock.quote(filter = \"code == '600320.SH'\", mode = 1, period = 60, count = 30) -> code, name, tradedate, bar_start_time, bar_end_time, open, high, low, close, amount, volumn, is_finalized",
-              "r4 = stock.quote(codes = ['600519.SH', '000001.SZ'], mode = 2) -> code, name, tradedate, snapshot_time, open, high, low, close, pct, amount, volumn"
+              "r1 = stock.quote.query(codes = ['600519.SH', '000001.SZ'], order = \"tradedate desc\", mode = 0, count = 10) -> code, name, tradedate, open, close, high, low, pct, amount, volumn",
+              "r2 = stock.quote.query(filter = \"code == '600320.SH'\", mode = 1, period = 60, count = 30) -> code, name, tradedate, bar_start_time, bar_end_time, open, high, low, close, amount, volumn, is_finalized",
+              "r4 = stock.quote.query(codes = ['600519.SH', '000001.SZ'], mode = 2) -> code, name, tradedate, snapshot_time, open, high, low, close, pct, amount, volumn"
             ]
           },
           {
@@ -737,11 +747,11 @@
         },
         "api": [
           {
-            "api_name": "stock.moneyflow",
+            "api_name": "stock.moneyflow.query",
             "api_function": "查询个股基础资金流向数据。",
             "api_class": "basic_query",
             "examples": [
-              "r1 = stock.moneyflow(filter = \"(code == '600519.SH') and (tradedate >= '2026-08-01')\", order = \"tradedate desc\", limit = 20) -> code, name, tradedate, main_buy, main_sell, main_net, main_ratio"
+              "r1 = stock.moneyflow.query(filter = \"(code == '600519.SH') and (tradedate >= '2026-08-01')\", order = \"tradedate desc\", limit = 20) -> code, name, tradedate, main_buy, main_sell, main_net, main_ratio"
             ]
           },
           {
@@ -886,11 +896,11 @@
         },
         "api": [
           {
-            "api_name": "stock.pricevalue",
+            "api_name": "stock.pricevalue.query",
             "api_function": "查询个股估值、市值或净值相关数据。",
             "api_class": "basic_query",
             "examples": [
-              "r1 = stock.pricevalue(filter = \"code == '600519.SH'\", order = \"tradedate desc\", limit = 1, realtime = 0) -> code, name, tradedate, pe_ttm, pb, market_value"
+              "r1 = stock.pricevalue.query(filter = \"code == '600519.SH'\", order = \"tradedate desc\", limit = 1, realtime = 0) -> code, name, tradedate, pe_ttm, pb, market_value"
             ]
           },
           {
@@ -1221,12 +1231,12 @@
         },
         "api": [
           {
-            "api_name": "stock.financial_3_table",
+            "api_name": "stock.financial_3_table.query",
             "api_function": "查询个股财务三张表字段和常用财务指标。",
             "api_class": "financial_query",
             "examples": [
-              "r1 = stock.financial_3_table(filter = \"(code == '000001.SZ') and (report_period in ['2022-12-31', '2023-12-31', '2024-12-31', '2025-12-31'])\", order = \"report_period asc\", limit = 4) -> code, name, report_period, revenue, revenue_yoy",
-              "r2 = stock.financial_3_table(filter = \"(revenue_yoy > 20) and (statement_type == 'HB')\", order = \"revenue_yoy desc\", limit = 20) -> code, name, report_date, revenue, revenue_yoy"
+              "r1 = stock.financial_3_table.query(filter = \"(code == '000001.SZ') and (report_period in ['2022-12-31', '2023-12-31', '2024-12-31', '2025-12-31'])\", order = \"report_period asc\", limit = 4) -> code, name, report_period, revenue, revenue_yoy",
+              "r2 = stock.financial_3_table.query(filter = \"(revenue_yoy > 20) and (statement_type == 'HB')\", order = \"revenue_yoy desc\", limit = 20) -> code, name, report_date, revenue, revenue_yoy"
             ]
           }
         ],
@@ -1274,7 +1284,7 @@
       },
       "report": {
         "public_name": "研报明细",
-        "desc": "逐篇机构研报的评级与变动、目标价、观点、风险和来源；观点文字覆盖业绩驱动、催化因素、竞争格局与市场份额、竞争优势、战略及展望。",
+        "desc": "逐篇机构研报的评级与变动、目标价、核心观点、风险和来源；核心观点提供增长催化、业绩驱动、竞争格局与市场份额、竞争优势及战略展望的分析依据。",
         "fields": {
           "report_id": [
             "研报ID",
@@ -1333,10 +1343,13 @@
             "评级变动原因",
             "变动原因"
           ],
-          "investment_highlights": [
-            "投资要点",
-            "核心观点"
-          ],
+          "investment_highlights": {
+            "aliases": [
+              "投资要点",
+              "核心观点"
+            ],
+            "desc": "机构投资逻辑与判断依据，包括增长催化、竞争优势和经营展望。"
+          },
           "risk_warnings": [
             "风险提示",
             "风险"
@@ -1417,13 +1430,15 @@
         },
         "api": [
           {
-            "api_name": "stock.report",
-            "api_function": "查询逐篇研报的评级、目标价、观点、风险与来源。",
+            "api_name": "stock.report.query",
+            "api_function": "查询逐篇研报的评级、目标价、核心观点、风险与来源；investment_highlights 提供机构判断的理由与催化因素。",
             "api_class": "report_query",
-            "guidance": ["limit=-1 返回全部匹配研报，受安全上限保护，超限返回错误。"],
+            "guidance": [
+              "limit=-1 返回全部匹配研报，受安全上限保护，超限返回错误。"
+            ],
             "examples": [
-              "r1 = stock.report(filter = \"(code == '300750.SZ') and (report_date >= '2026-01-01') and (report_date <= '2026-07-28')\", order = \"report_date desc\", limit = 10) -> code, name, report_date, institution, rating, investment_highlights, risk_warnings",
-              "r2 = stock.report(filter = \"(code in r1.code) and (report_date >= '2025-01-01')\", order = \"report_date desc\", limit = 20) -> report_id, code, name, title, report_date, institution, analysts, rating, target_price_lower, target_price_upper"
+              "r1 = stock.report.query(filter = \"(code == '300750.SZ') and (report_date >= '2026-01-01') and (report_date <= '2026-07-28')\", order = \"report_date desc\", limit = 10) -> code, name, report_date, institution, rating, investment_highlights, risk_warnings",
+              "r2 = stock.report.query(filter = \"(code in r1.code) and (report_date >= '2025-01-01')\", order = \"report_date desc\", limit = 20) -> report_id, code, name, title, report_date, institution, analysts, rating, target_price_lower, target_price_upper"
             ]
           },
           {
@@ -1580,13 +1595,15 @@
         },
         "api": [
           {
-            "api_name": "stock.report_metric",
+            "api_name": "stock.report_metric.query",
             "api_function": "查询逐机构、逐公司、逐年度的原始指标值，供明细对比与排序。",
             "api_class": "report_metric_query",
-            "guidance": ["limit=-1 返回全部匹配指标事实，受安全上限保护，超限返回错误。"],
+            "guidance": [
+              "limit=-1 返回全部匹配指标事实，受安全上限保护，超限返回错误。"
+            ],
             "examples": [
-              "r1 = stock.report_metric(filter = \"(code == '300750.SZ') and (metric_code == 'eps') and (value_type == 'forecast') and (forecast_year >= 2026)\", order = \"forecast_year asc, report_date desc\", limit = 50) -> report_id, code, name, report_date, institution, metric_code, metric_name, forecast_year, metric_value, unit, source_locator",
-              "r2 = stock.report_metric(filter = \"(institution == '中金公司') and (name == '海尔智家') and (metric_code == 'np_parent') and (forecast_year == 2027) and (value_type == 'forecast')\", order = \"report_date desc\", limit = 10) -> report_id, code, name, institution, report_date, forecast_year, metric_value, unit, reliable, source_locator"
+              "r1 = stock.report_metric.query(filter = \"(code == '300750.SZ') and (metric_code == 'eps') and (value_type == 'forecast') and (forecast_year >= 2026)\", order = \"forecast_year asc, report_date desc\", limit = 50) -> report_id, code, name, report_date, institution, metric_code, metric_name, forecast_year, metric_value, unit, source_locator",
+              "r2 = stock.report_metric.query(filter = \"(institution == '中金公司') and (name == '海尔智家') and (metric_code == 'np_parent') and (forecast_year == 2027) and (value_type == 'forecast')\", order = \"report_date desc\", limit = 10) -> report_id, code, name, institution, report_date, forecast_year, metric_value, unit, reliable, source_locator"
             ]
           },
           {
@@ -1662,11 +1679,11 @@
         },
         "api": [
           {
-            "api_name": "stock.margin",
+            "api_name": "stock.margin.query",
             "api_function": "查询个股融资融券基础明细数据。",
             "api_class": "margin_query",
             "examples": [
-              "r1 = stock.margin(filter = \"code == '600519.SH'\", start = 2026-08-01, end = 2026-08-31, order = \"tradedate desc\", limit = 20) -> code, name, tradedate, financing_balance, financing_net_buy, securities_lending_balance, margin_balance"
+              "r1 = stock.margin.query(filter = \"code == '600519.SH'\", start = 2026-08-01, end = 2026-08-31, order = \"tradedate desc\", limit = 20) -> code, name, tradedate, financing_balance, financing_net_buy, securities_lending_balance, margin_balance"
             ]
           },
           {
@@ -2557,11 +2574,11 @@
         },
         "api": [
           {
-            "api_name": "stock.shareholder",
+            "api_name": "stock.shareholder.query",
             "api_function": "查询个股股东户数、前十大股东、第一大股东和前十大流通股东等股东明细。",
             "api_class": "basic_query",
             "examples": [
-              "r1 = stock.shareholder(filter = \"(code == '600519.SH') and (source == 'holdertop')\", order = \"end_date desc, holder_rank asc\", limit = 10) -> code, name, end_date, holder_rank, holder_name, holder_quantity, holder_pct"
+              "r1 = stock.shareholder.query(filter = \"(code == '600519.SH') and (source == 'holdertop')\", order = \"end_date desc, holder_rank asc\", limit = 10) -> code, name, end_date, holder_rank, holder_name, holder_quantity, holder_pct"
             ]
           }
         ],
@@ -2674,11 +2691,11 @@
         },
         "api": [
           {
-            "api_name": "stock.pledge",
+            "api_name": "stock.pledge.query",
             "api_function": "查询个股质押比例、质押/解押明细、冻结和股东累计质押等股权质押信息。",
             "api_class": "basic_query",
             "examples": [
-              "r1 = stock.pledge(filter = \"(code == '600519.SH') and (source == 'pledgeratio')\", order = \"end_date desc\", limit = 1) -> code, name, end_date, pledge_ratio, pledge_ratio_comp, total_pledge_shr"
+              "r1 = stock.pledge.query(filter = \"(code == '600519.SH') and (source == 'pledgeratio')\", order = \"end_date desc\", limit = 1) -> code, name, end_date, pledge_ratio, pledge_ratio_comp, total_pledge_shr"
             ]
           }
         ],
@@ -2883,11 +2900,11 @@
         },
         "api": [
           {
-            "api_name": "stock.corporate_action",
+            "api_name": "stock.corporate_action.query",
             "api_function": "查询个股分红送转、增发、配股、限售解禁和 IPO 等股本事件。",
             "api_class": "basic_query",
             "examples": [
-              "r1 = stock.corporate_action(filter = \"(code == '600519.SH') and (source == 'dividend')\", order = \"ann_date desc\", limit = 10) -> code, name, ann_date, record_date, ex_date, div_cash_pre_tax, div_bonus_rate, div_progress"
+              "r1 = stock.corporate_action.query(filter = \"(code == '600519.SH') and (source == 'dividend')\", order = \"ann_date desc\", limit = 10) -> code, name, ann_date, record_date, ex_date, div_cash_pre_tax, div_bonus_rate, div_progress"
             ]
           }
         ],
@@ -2987,11 +3004,11 @@
         },
         "api": [
           {
-            "api_name": "stock.performance_notice",
+            "api_name": "stock.performance_notice.query",
             "api_function": "查询个股业绩预告类型、摘要、变动原因和净利润/收入预测区间。",
             "api_class": "basic_query",
             "examples": [
-              "r1 = stock.performance_notice(filter = \"code == '600519.SH'\", order = \"ann_date desc\", limit = 5) -> code, name, ann_date, report_period, performance_type, net_profit_lower, net_profit_upper, performance_reason"
+              "r1 = stock.performance_notice.query(filter = \"code == '600519.SH'\", order = \"ann_date desc\", limit = 5) -> code, name, ann_date, report_period, performance_type, net_profit_lower, net_profit_upper, performance_reason"
             ]
           }
         ],
@@ -3092,11 +3109,11 @@
         },
         "api": [
           {
-            "api_name": "stock.business_segment",
+            "api_name": "stock.business_segment.query",
             "api_function": "查询个股主营业务分部、产品/地区收入成本利润和前五大客户供应商。",
             "api_class": "basic_query",
             "examples": [
-              "r1 = stock.business_segment(filter = \"(code == '600519.SH') and (source == 'salessegment')\", order = \"report_period desc, segment_sales desc\", limit = 20) -> code, name, report_period, segment_type, project_name, segment_sales, segment_profit, gross_profit_margin, pct_segment_sales"
+              "r1 = stock.business_segment.query(filter = \"(code == '600519.SH') and (source == 'salessegment')\", order = \"report_period desc, segment_sales desc\", limit = 20) -> code, name, report_period, segment_type, project_name, segment_sales, segment_profit, gross_profit_margin, pct_segment_sales"
             ]
           }
         ],
@@ -3132,11 +3149,11 @@
         },
         "api": [
           {
-            "api_name": "index.basic_info",
+            "api_name": "index.basic_info.query",
             "api_function": "查询指数基础身份信息。",
             "api_class": "basic_query",
             "examples": [
-              "r1 = index.basic_info(filter = \"name == '沪深300'\", limit = 1) -> code, name"
+              "r1 = index.basic_info.query(filter = \"name == '沪深300'\", limit = 1) -> code, name"
             ]
           }
         ]
@@ -3211,11 +3228,11 @@
         },
         "api": [
           {
-            "api_name": "index.quote",
+            "api_name": "index.quote.query",
             "api_function": "查询指数基础行情数据。",
             "api_class": "basic_query",
             "examples": [
-              "r2 = index.quote(filter = \"code == '000300.SH'\", limit = 1, realtime = 1) -> code, name, tradedate, close, pct, amount"
+              "r2 = index.quote.query(filter = \"code == '000300.SH'\", limit = 1, realtime = 1) -> code, name, tradedate, close, pct, amount"
             ]
           },
           {
@@ -3325,11 +3342,11 @@
         },
         "api": [
           {
-            "api_name": "index.pricevalue",
+            "api_name": "index.pricevalue.query",
             "api_function": "查询指数估值、市值或净值相关数据。",
             "api_class": "basic_query",
             "examples": [
-              "r1 = index.pricevalue(filter = \"code == '000300.SH'\", order = \"tradedate desc\", limit = 1, realtime = 0) -> code, name, tradedate, pe_ttm, pb, market_value"
+              "r1 = index.pricevalue.query(filter = \"code == '000300.SH'\", order = \"tradedate desc\", limit = 1, realtime = 0) -> code, name, tradedate, pe_ttm, pb, market_value"
             ]
           }
         ]
@@ -3368,11 +3385,11 @@
         },
         "api": [
           {
-            "api_name": "index.constitution",
+            "api_name": "index.constitution.query",
             "api_function": "查询指数与成分股之间的对应关系。",
             "api_class": "constituent_query",
             "examples": [
-              "r1 = index.constitution(filter = \"index_name == '沪深300'\", order = \"stock_code asc\", limit = 100) -> index_code, index_name, stock_code, stock_name, weight"
+              "r1 = index.constitution.query(filter = \"index_name == '沪深300'\", order = \"stock_code asc\", limit = 100) -> index_code, index_name, stock_code, stock_name, weight"
             ]
           },
           {
@@ -3418,11 +3435,11 @@
         },
         "api": [
           {
-            "api_name": "industry.basic_info",
+            "api_name": "industry.basic_info.query",
             "api_function": "查询行业基础信息。",
             "api_class": "basic_query",
             "examples": [
-              "r1 = industry.basic_info(filter = \"industry_name == '半导体'\", limit = 20) -> industry_code, industry_name, level, level1_industry_name, level2_industry_name"
+              "r1 = industry.basic_info.query(filter = \"industry_name == '半导体'\", limit = 20) -> industry_code, industry_name, level, level1_industry_name, level2_industry_name"
             ]
           }
         ]
@@ -3480,11 +3497,11 @@
         },
         "api": [
           {
-            "api_name": "industry.constitution",
+            "api_name": "industry.constitution.query",
             "api_function": "查询行业与成分股之间的对应关系。",
             "api_class": "constituent_query",
             "examples": [
-              "r3 = industry.constitution(filter = \"(industry_name == '银行') and (stock_code in r1.code)\", order = \"stock_code asc\", limit = -1) -> industry_code, industry_name, stock_code, stock_name"
+              "r3 = industry.constitution.query(filter = \"(industry_name == '银行') and (stock_code in r1.code)\", order = \"stock_code asc\", limit = -1) -> industry_code, industry_name, stock_code, stock_name"
             ]
           },
           {
@@ -3518,11 +3535,11 @@
         },
         "api": [
           {
-            "api_name": "plate.basic_info",
+            "api_name": "plate.basic_info.query",
             "api_function": "查询板块基础身份信息。",
             "api_class": "basic_query",
             "examples": [
-              "r1 = plate.basic_info(filter = \"plate_name == '人工智能'\", limit = 10) -> plate_code, plate_name"
+              "r1 = plate.basic_info.query(filter = \"plate_name == '人工智能'\", limit = 10) -> plate_code, plate_name"
             ]
           }
         ],
@@ -3600,11 +3617,11 @@
         },
         "api": [
           {
-            "api_name": "plate.quote",
+            "api_name": "plate.quote.query",
             "api_function": "查询板块基础行情数据。",
             "api_class": "basic_query",
             "examples": [
-              "r1 = plate.quote(filter = \"name == '人工智能'\", order = \"tradedate desc\", limit = 10, realtime = 0) -> code, name, tradedate, close, pct, amount"
+              "r1 = plate.quote.query(filter = \"name == '人工智能'\", order = \"tradedate desc\", limit = 10, realtime = 0) -> code, name, tradedate, close, pct, amount"
             ]
           },
           {
@@ -3733,11 +3750,11 @@
         },
         "api": [
           {
-            "api_name": "plate.moneyflow",
+            "api_name": "plate.moneyflow.query",
             "api_function": "查询板块基础资金流向数据。",
             "api_class": "basic_query",
             "examples": [
-              "r1 = plate.moneyflow(filter = \"name == '人工智能'\", order = \"tradedate desc\", limit = 10, realtime = 0) -> code, name, tradedate, main_net, main_ratio"
+              "r1 = plate.moneyflow.query(filter = \"name == '人工智能'\", order = \"tradedate desc\", limit = 10, realtime = 0) -> code, name, tradedate, main_net, main_ratio"
             ]
           },
           {
@@ -3820,11 +3837,11 @@
         },
         "api": [
           {
-            "api_name": "plate.pricevalue",
+            "api_name": "plate.pricevalue.query",
             "api_function": "查询板块估值、市值或净值相关数据。",
             "api_class": "basic_query",
             "examples": [
-              "r1 = plate.pricevalue(filter = \"name == '人工智能'\", order = \"tradedate desc\", limit = 1, realtime = 0) -> code, name, tradedate, pe_ttm, pb"
+              "r1 = plate.pricevalue.query(filter = \"name == '人工智能'\", order = \"tradedate desc\", limit = 1, realtime = 0) -> code, name, tradedate, pe_ttm, pb"
             ]
           }
         ]
@@ -3863,11 +3880,11 @@
         },
         "api": [
           {
-            "api_name": "plate.constitution",
+            "api_name": "plate.constitution.query",
             "api_function": "查询板块与成分股之间的对应关系。",
             "api_class": "constituent_query",
             "examples": [
-              "r2 = plate.constitution(filter = \"plate_name == 'CPO'\", order = \"stock_code asc\", limit = -1) -> plate_code, plate_name, stock_code, stock_name"
+              "r2 = plate.constitution.query(filter = \"plate_name == 'CPO'\", order = \"stock_code asc\", limit = -1) -> plate_code, plate_name, stock_code, stock_name"
             ]
           },
           {
@@ -3903,11 +3920,11 @@
         },
         "api": [
           {
-            "api_name": "fund.basic_info",
+            "api_name": "fund.basic_info.query",
             "api_function": "查询基金基础身份信息。",
             "api_class": "basic_query",
             "examples": [
-              "r1 = fund.basic_info(filter = \"code == '510300.SH'\", limit = 1) -> code, name, full_name"
+              "r1 = fund.basic_info.query(filter = \"code == '510300.SH'\", limit = 1) -> code, name, full_name"
             ]
           }
         ]
@@ -3998,11 +4015,11 @@
         },
         "api": [
           {
-            "api_name": "fund.quote",
+            "api_name": "fund.quote.query",
             "api_function": "查询基金基础行情数据。",
             "api_class": "basic_query",
             "examples": [
-              "r1 = fund.quote(filter = \"code == '510300.SH'\", order = \"tradedate desc\", limit = 10, realtime = 0) -> code, name, tradedate, close, pct, amount"
+              "r1 = fund.quote.query(filter = \"code == '510300.SH'\", order = \"tradedate desc\", limit = 10, realtime = 0) -> code, name, tradedate, close, pct, amount"
             ]
           },
           {
@@ -4078,11 +4095,11 @@
         },
         "api": [
           {
-            "api_name": "bond.basic_info",
+            "api_name": "bond.basic_info.query",
             "api_function": "查询债券基础身份信息。",
             "api_class": "basic_query",
             "examples": [
-              "r1 = bond.basic_info(filter = \"code == '113684.SH'\", limit = 1) -> code, name, issuer"
+              "r1 = bond.basic_info.query(filter = \"code == '113684.SH'\", limit = 1) -> code, name, issuer"
             ]
           }
         ]
@@ -4149,11 +4166,11 @@
         },
         "api": [
           {
-            "api_name": "bond.quote",
+            "api_name": "bond.quote.query",
             "api_function": "查询债券基础行情数据。",
             "api_class": "basic_query",
             "examples": [
-              "r1 = bond.quote(filter = \"code == '113684.SH'\", order = \"tradedate desc\", limit = 10, realtime = 0) -> code, name, tradedate, close, pct, amount"
+              "r1 = bond.quote.query(filter = \"code == '113684.SH'\", order = \"tradedate desc\", limit = 10, realtime = 0) -> code, name, tradedate, close, pct, amount"
             ]
           },
           {
@@ -4266,11 +4283,11 @@
         },
         "api": [
           {
-            "api_name": "hot_event.base_info",
+            "api_name": "hot_event.base_info.query",
             "api_function": "查询热点事件/概念基础信息。",
             "api_class": "basic_query",
             "examples": [
-              "r1 = hot_event.base_info(filter = \"event == '算力'\", order = \"latest_trigger_date desc\", limit = 10) -> event_id, event, latest_trigger_date, is_active, loop_times, company_num, core_event_desc"
+              "r1 = hot_event.base_info.query(filter = \"event == '算力'\", order = \"latest_trigger_date desc\", limit = 10) -> event_id, event, latest_trigger_date, is_active, loop_times, company_num, core_event_desc"
             ]
           }
         ]
@@ -4332,11 +4349,11 @@
         },
         "api": [
           {
-            "api_name": "hot_event.state",
+            "api_name": "hot_event.state.query",
             "api_function": "查询热点事件/概念热度、状态和变化。",
             "api_class": "basic_query",
             "examples": [
-              "r1 = hot_event.state(filter = \"event == '算力'\", order = \"tradedate desc, state_time desc\", limit = 20) -> event_id, event, tradedate, state_time, heat_score, change_label, company_num"
+              "r1 = hot_event.state.query(filter = \"event == '算力'\", order = \"tradedate desc, state_time desc\", limit = 20) -> event_id, event, tradedate, state_time, heat_score, change_label, company_num"
             ]
           }
         ]
@@ -4392,12 +4409,14 @@
         },
         "api": [
           {
-            "api_name": "hot_event.member",
+            "api_name": "hot_event.member.query",
             "api_function": "查询热点事件/概念与成分股之间的对应关系。",
             "api_class": "basic_query",
-            "guidance": ["每行一条热点与股票的关联；limit 默认 100，最多 500 条。"],
+            "guidance": [
+              "每行一条热点与股票的关联；limit 默认 100，最多 500 条。"
+            ],
             "examples": [
-              "r1 = hot_event.member(filter = \"event == '算力'\", order = \"tradedate desc\", limit = 50) -> event_id, event, tradedate, stock_code, stock_name, company_event, is_leader"
+              "r1 = hot_event.member.query(filter = \"event == '算力'\", order = \"tradedate desc\", limit = 50) -> event_id, event, tradedate, stock_code, stock_name, company_event, is_leader"
             ]
           }
         ]

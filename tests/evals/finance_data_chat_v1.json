@@ -64,6 +64,18 @@
       "focus": ["plate.quote", "plate.constitution", "rN.column"]
     },
     {
+      "id": "report_bullish_reasons_mainland",
+      "turns": ["看多比亚迪的机构主要理由是什么？"],
+      "expects_finance_query": true,
+      "focus": ["stock.report", "评级与核心观点", "合法零行作为数据缺口，不作为协议失败"]
+    },
+    {
+      "id": "report_non_mainland_coverage",
+      "turns": ["看多蔚来汽车的机构主要理由是什么？"],
+      "expects_finance_query": true,
+      "focus": ["stock.report", "非A股数据覆盖对照", "按实际返回判断覆盖，合法零行视为取数通过"]
+    },
+    {
       "id": "empty_result",
       "turns": ["查询一个不存在的证券“测试股份999999”的最近交易日收盘价。"],
       "expects_finance_query": true,

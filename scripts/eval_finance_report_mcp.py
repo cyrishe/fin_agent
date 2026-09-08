@@ -42,6 +42,8 @@ def main():
     parser.add_argument('--case-ids', nargs='*')
     parser.add_argument('--cases-file', type=Path, help='Optional small protocol regression set with a cases array.')
     parser.add_argument('--concurrency', type=int, default=3)
+    parser.add_argument('--response-mode', choices=['data', 'both'], default='data')
+    parser.add_argument('--max-rows', type=int, default=2)
     parser.add_argument('--conversation-id', help='Optional explicit context continuity. Omit for the independent benchmark.')
     args = parser.parse_args()
     from dotenv import load_dotenv
@@ -63,6 +65,9 @@ def main():
     from src.finance_api.app import create_app
     from src.finance_api.auth import FinanceApiKeyAuth
     from src.finance_api.service import FinanceApiGateway
+    from src.scenarios.financial_qa.service import FinancialQaCcService
+    from src.scenarios.financial_qa.dsh_service import FinanceDeepSeekHarnessSessionService, _load_sdk_class
+    from src.scenarios.financial_qa.tools import FinanceDataQueryCcTools
 
     cases = (json.loads(args.cases_file.read_text())['cases']
              if args.cases_file else load_report_cases())
@@ -75,7 +80,27 @@ def main():
     folder.mkdir(parents=True, exist_ok=True)
     pending = [by_id[cid] for cid in selected if not (folder / f'{cid}.json').exists()]
     key = secrets.token_urlsafe(32)
-    gateway = FinanceApiGateway(usage_recorder=lambda **_: None)
+    class RecordedHarness:
+        def __init__(self, **kwargs):
+            self.inner = _load_sdk_class()(**kwargs)
+
+        def run(self, *positional, **kwargs):
+            result = self.inner.run(*positional, **kwargs)
+            path = folder / ('native_' + str(kwargs.get('session_id')) + '.json')
+            path.write_text(json.dumps(list(result.events), ensure_ascii=False, indent=2, default=str))
+            return result
+
+        def __getattr__(self, name):
+            return getattr(self.inner, name)
+
+    query_tools = FinanceDataQueryCcTools()
+    dsh = FinanceDeepSeekHarnessSessionService(
+        enabled=True, system_tools=query_tools, worker_count=args.concurrency,
+        root_dir=folder / 'runtime', log_path=folder / 'events.jsonl',
+        harness_factory=RecordedHarness)
+    engine = FinancialQaCcService(enabled=True, system_tools=query_tools,
+        session_service=object(), dsh_session_service=dsh)
+    gateway = FinanceApiGateway(engine=engine, usage_recorder=lambda **_: None)
     app = create_app(auth=FinanceApiKeyAuth({'report-eval': key}), gateway=gateway)
     sock = socket.socket()
     sock.bind(('127.0.0.1', 0))
@@ -107,8 +132,10 @@ def main():
             if response.status_code != 200 or not response.json().get('result', {}).get('tools'):
                 raise RuntimeError('MCP authentication preflight failed: valid_key')
         warm = gateway.prewarm()
-        manifest = {'revision': args.revision, 'model': os.environ.get('LLM_DEFAULT_MODEL'),
-            'runtime': 'dsh', 'execution_mode': 'standard', 'response_mode': 'data',
+        manifest = {'revision': args.revision, 'model': dsh.model, 'provider': dsh.provider,
+            'reasoning_effort': dsh.reasoning_effort, 'loop_policy': dsh.loop_policy_config,
+            'runtime': 'dsh', 'execution_mode': 'standard', 'response_mode': args.response_mode,
+            'research_mode': 'fast', 'max_rows': args.max_rows,
             'case_count': len(selected), 'concurrency': args.concurrency,
             'transport': 'real HTTP MCP on isolated loopback listener',
             'conversation_id_supplied': args.conversation_id,
@@ -120,8 +147,9 @@ def main():
         print(json.dumps({'ready': True, 'pending': len(pending), 'prewarm': warm}, ensure_ascii=False), flush=True)
 
         def run(case):
-            request = {'query': case['question'], 'response_mode': 'data', 'runtime': 'dsh',
-                       'execution_mode': 'standard', 'detail': True, 'max_rows': 2}
+            request = {'query': case['question'], 'response_mode': args.response_mode, 'runtime': 'dsh',
+                       'execution_mode': 'standard', 'research_mode': 'fast',
+                       'detail': True, 'max_rows': args.max_rows}
             if args.conversation_id:
                 request['conversation_id'] = args.conversation_id
             started = time.monotonic()
@@ -133,15 +161,19 @@ def main():
                         'params': {'name': 'finance_data_query', 'arguments': request}})
                     wire = response.json()
                 payload = wire.get('result', {}).get('structuredContent', {})
-                problems = payload_problems(payload, response.status_code)
+                problems = payload_problems({**payload, 'summary': None}, response.status_code)
+                if args.response_mode == 'both' and not payload.get('summary'):
+                    problems.append('missing_summary')
+                if args.response_mode == 'data' and payload.get('summary'):
+                    problems.append('unexpected_generated_summary')
                 if wire.get('error') or wire.get('result', {}).get('isError'):
                     problems.append('mcp_error')
-                if payload.get('response_mode') != 'data' or payload.get('runtime') != 'dsh':
+                if payload.get('response_mode') != args.response_mode or payload.get('runtime') != 'dsh':
                     problems.append('wrong_execution_mode')
                 if payload.get('conversation_id') != args.conversation_id:
                     problems.append('unexpected_conversation_id')
                 for page in (payload.get('data') or {}).get('results', []):
-                    if page['rows_returned'] != len(page['rows']) or len(page['rows']) > 2:
+                    if page['rows_returned'] != len(page['rows']) or len(page['rows']) > args.max_rows:
                         problems.append('invalid_data_page')
                 result = {'case': case, 'request': request, 'transport': 'mcp',
                     'http_status': response.status_code, 'response': payload,

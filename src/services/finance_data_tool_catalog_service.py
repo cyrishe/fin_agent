@@ -275,6 +275,10 @@ class FinanceDataToolCatalogService:
         normalized_operation = self._trim(operation)
         if not normalized_operation:
             return model
+        # Compatibility for older Python catalog callers. Relationship data
+        # now uses the same query operation as every other dataview.
+        if normalized_operation == "constitution":
+            normalized_operation = "query"
         # Navigation is not an execution contract. Keep exact sibling entry
         # names visible when expanding only one operation's detailed contract.
         model["available_operations"] = {
@@ -286,14 +290,6 @@ class FinanceDataToolCatalogService:
             raise FinanceDataToolCatalogError(
                 f"unsupported finance catalog operation: {normalized_operation}"
             )
-        # Old catalog callers selected relationship details as query. Preserve
-        # that input while advertising the business category constitution.
-        if (
-            normalized_operation == "query"
-            and "query" not in model["available_operations"]
-            and "constitution" in model["available_operations"]
-        ):
-            normalized_operation = "constitution"
         functions = [
             item
             for item in model.get("functions") or []
@@ -318,7 +314,6 @@ class FinanceDataToolCatalogService:
                 field.pop("modes", None)
         operation_metadata = {
             "query": {"computed", "value_domains"},
-            "constitution": {"value_domains"},
             "aggregate": {"aggregate_fields", "value_domains"},
             "window": {"kd", "value_domains"},
             "compute": {"computed", "value_domains"},
@@ -519,7 +514,8 @@ class FinanceDataToolCatalogService:
             functions.append(function)
         row["functions"] = functions
         if any(
-            function.get("api_name") == "stock.quote"
+            function.get("operation") == "query"
+            and str(function.get("api_name", "")).removesuffix(".query") == "stock.quote"
             and any(str(arg).split("(", 1)[0] == "mode" for arg in function.get("args", {}).get("optional", []))
             for function in functions
         ):
@@ -758,6 +754,10 @@ class FinanceDataToolCatalogService:
             api_name = self._trim(item.get("api_name"))
             if not api_name:
                 continue
+            if len(api_name.split(".")) == 2 and f"{api_name}.query" in (existing or {}):
+                # An older editor may submit the former invocation spelling.
+                # Keep the existing canonical method and its examples intact.
+                api_name = f"{api_name}.query"
             row: Dict[str, Any] = {
                 "api_name": api_name,
                 "api_function": self._trim(item.get("api_function")),

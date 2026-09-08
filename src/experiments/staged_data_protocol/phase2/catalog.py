@@ -69,14 +69,12 @@ HISTORY_STOCK_DATAVIEW_NAMES = {"history_quote"}
 OPERATION_DESCRIPTIONS = {
     "query": "明细查询：按条件筛选、排序并返回数据记录。",
     "window": "窗口指标：按对象计算指定 K 期的已定义指标。",
-    "constitution": "成分关系：返回指数、行业、板块或热点与关联证券的对应关系。",
-    "aggregate": "聚合查询：按分组统计数据；成分聚合统计所属证券的指标。",
+    "aggregate": "聚合查询：按分组统计数据。",
     "compute": "动态计算：用自然语言描述自定义行情计算。",
 }
 OPERATION_TYPES = frozenset(OPERATION_DESCRIPTIONS)
 RUNTIME_TYPES = {
     "query": "base",
-    "constitution": "base",
     "aggregate": "agg",
     "window": "kd",
     "compute": "dynamic_cal",
@@ -254,6 +252,10 @@ def _example_api(example: str) -> str:
 def _api_pattern_matches(pattern: str, api: str) -> bool:
     if not pattern or not api:
         return False
+    # Explicit query is the catalog contract. The former two-part spelling is
+    # an input alias of that same method, not a separate runtime operation.
+    if pattern.endswith(".query") and len(api.split(".")) == 2:
+        api = f"{api}.query"
     return _api_pattern_expression(pattern, api) or _api_pattern_expression(
         _normalize_api_dataview(pattern),
         _normalize_api_dataview(api),
@@ -278,8 +280,6 @@ def operation_for_api_pattern(api_name: str) -> str:
         return "aggregate"
     if method.startswith("kd_"):
         return "window"
-    if len(parts) == 2 and (parts[1] == "constitution" or api_name == "hot_event.member"):
-        return "constitution"
     return "query"
 
 

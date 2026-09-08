@@ -23,12 +23,39 @@ from src.experiments.staged_data_protocol.phrase1_stage import (
 def test_filter_syntax_has_one_source_and_loads_only_with_execution_catalog():
     service = FinanceDataToolCatalogService()
     syntax = catalog_source()["filter_syntax"]
-    for view in ("report", "report_metric"):
-        for operation in ("query", "aggregate"):
-            model = service.get_model_dataview("stock", view, operation=operation)
-            assert model["filter_syntax"] == syntax
-            assert json.dumps(model, ensure_ascii=False).count(syntax) == 1
+    for subject, views in catalog_source()["subjects"].items():
+        for view in views:
+            if view.startswith('_'):
+                continue
+            for function in service.get_model_dataview(subject, view)["functions"]:
+                model = service.get_model_dataview(subject, view, operation=function["operation"])
+                if "filter_syntax" not in model:
+                    continue
+                assert model["filter_syntax"] == syntax
+                assert json.dumps(model, ensure_ascii=False).count(syntax) == 1
+    for subject, view, operation in [
+        ("stock", "basic_info", "query"), ("fund", "basic_info", "query"),
+        ("stock", "quote", "window"), ("plate", "constitution", "constitution"),
+        ("industry", "constitution", "aggregate"), ("stock", "report", "aggregate"),
+    ]:
+        model = service.get_model_dataview(subject, view, operation=operation)
+        assert model["filter_syntax"] == syntax
     assert "filter_syntax" not in json.dumps(service.get_subject("stock"), ensure_ascii=False)
+    assert "Python 风格" not in syntax
+    for operator in ("==", "!=", ">=", "<=", "and/or", "field.contains('文本')", "not in", "is None", "is not None"):
+        assert operator in syntax
+
+
+def test_report_catalyst_guidance_is_local_to_opinions_and_basic_scope_matches_fields():
+    service = FinanceDataToolCatalogService()
+    report = service.get_model_dataview("stock", "report", "query")
+    assert "核心观点" in report["desc"] and "催化" in report["desc"]
+    assert "催化" in report["fields"]["investment_highlights"]["desc"]
+    assert "investment_highlights" in report["functions"][0]["api_function"]
+    assert "核心观点" in report["fields"]["investment_highlights"]["aliases"]
+    basic = service.get_model_dataview("stock", "basic_info", "query")
+    assert set(basic["fields"]) == {"code", "name", "industry", "listed_date"}
+    assert basic["desc"] == "股票代码、名称、行业与上市日期。"
 
 
 def test_model_catalog_uses_one_fuzzy_match_without_prefix_suffix_guidance():
@@ -41,7 +68,8 @@ def test_model_catalog_uses_one_fuzzy_match_without_prefix_suffix_guidance():
             text = json.dumps(model, ensure_ascii=False)
             assert 'startswith' not in text and 'endswith' not in text
     syntax = catalog_source()['filter_syntax']
-    assert "'文本' in field" in syntax
+    assert "field.contains('文本')" in syntax
+    assert "'文本' in field" not in syntax
     assert 'like' not in syntax
     finance = service.get_model_dataview('stock', 'financial_3_table', operation='query')
     text = json.dumps(finance, ensure_ascii=False)
@@ -64,12 +92,12 @@ def test_report_metric_detail_guidance_stays_with_detail_operation():
     detail = service.get_model_dataview("stock", "report_metric", operation="query")
     aggregate = service.get_model_dataview("stock", "report_metric", operation="aggregate")
 
-    assert [item["api_name"] for item in detail["functions"]] == ["stock.report_metric"]
+    assert [item["api_name"] for item in detail["functions"]] == ["stock.report_metric.query"]
     assert [item["api_name"] for item in aggregate["functions"]] == ["stock.report_metric.agg"]
     assert "原始" in detail["functions"][0]["api_function"]
     assert "明细对比" not in json.dumps(aggregate["functions"], ensure_ascii=False)
     assert "仍使用明细查询" not in json.dumps(aggregate["functions"], ensure_ascii=False)
-    assert aggregate["available_operations"]["query"] == "stock.report_metric"
+    assert aggregate["available_operations"]["query"] == "stock.report_metric.query"
 
 
 def _catalog_payload(*, desc: str = "行情视图") -> Dict[str, Any]:
@@ -436,7 +464,7 @@ def test_operation_projection_does_not_mix_sibling_execution_guidance() -> None:
     assert "K 日窗口" not in json.dumps(margin_query, ensure_ascii=False)
     assert "K 日窗口" in margin_window["functions"][0]["api_function"]
     assert "历史明细" not in json.dumps(margin_window, ensure_ascii=False)
-    assert report_query["functions"][0]["api_name"] == "stock.report"
+    assert report_query["functions"][0]["api_name"] == "stock.report.query"
     assert report_aggregate["functions"][0]["api_name"] == "stock.report.agg"
     assert "聚合 metric_value" not in json.dumps(metric_query, ensure_ascii=False)
     assert "聚合 metric_value" in "".join(
@@ -537,17 +565,18 @@ def test_financial_period_and_statement_granularity_are_defined() -> None:
 
 
 @pytest.mark.parametrize("subject", ["index", "industry", "plate"])
-def test_constitution_is_distinct_with_legacy_query_compatibility(subject: str) -> None:
+def test_constitution_is_a_dataview_with_query_and_aggregate(subject: str) -> None:
     service = FinanceDataToolCatalogService()
     model = service.get_model_dataview(subject, "constitution", "constitution")
     assert model == service.get_model_dataview(subject, "constitution", "query")
-    assert model["selected_operation"] == "constitution"
-    assert model["available_operations"] == {"constitution": f"{subject}.constitution", "aggregate": f"{subject}.constitution.agg"}
-    assert model["functions"][0]["api_name"] == f"{subject}.constitution"
+    assert model["selected_operation"] == "query"
+    assert model["available_operations"] == {"query": f"{subject}.constitution.query", "aggregate": f"{subject}.constitution.agg"}
+    assert model["functions"][0]["api_name"] == f"{subject}.constitution.query"
     assert f"{subject}_code" in model["functions"][0]["request_pattern"]
     assert "{subject_code_field}" not in json.dumps(model)
     resolved = resolve_api(f"{subject}.constitution")
-    assert resolved["type"] == "base" and resolved["operation"] == "constitution"
+    assert resolved["type"] == "base" and resolved["operation"] == "query"
+    assert resolved == resolve_api(f"{subject}.constitution.query")
     assert resolve_api(f"{subject}.constitution.agg")["operation"] == "aggregate"
 
 
@@ -555,9 +584,9 @@ def test_invalid_operation_still_rejected_and_quote_modes_match_execution() -> N
     from src.experiments.staged_data_protocol.phase2.call_structure import stock_quote_provider_fields
     from src.services.finance_data_tool_catalog_service import FinanceDataToolCatalogError
 
-    assert OPERATION_TYPES == {"query", "constitution", "aggregate", "window", "compute"}
+    assert OPERATION_TYPES == {"query", "aggregate", "window", "compute"}
     service = FinanceDataToolCatalogService()
-    for operation in ("constitution", "missing"):
+    for operation in ("missing",):
         with pytest.raises(FinanceDataToolCatalogError):
             service.get_model_dataview("stock", "quote", operation)
     quote = service.get_model_dataview("stock", "quote", "query")

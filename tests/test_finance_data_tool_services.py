@@ -86,16 +86,16 @@ def test_finance_data_catalog_builds_subject_dataview_function_tree() -> None:
     stock_views = {item["name"]: item for item in subjects["stock"]["dataviews"]}
     assert "margin" in stock_views
     assert "quote" in stock_views
-    assert any(item["api_name"] == "stock.margin" for item in stock_views["margin"]["functions"])
+    assert any(item["api_name"] == "stock.margin.query" for item in stock_views["margin"]["functions"])
     assert any(item["api_class"] == "kday_margin_metric" for item in stock_views["margin"]["functions"])
     assert {"report", "report_metric"} <= set(stock_views)
     assert {item["api_name"] for item in stock_views["report"]["functions"]} == {
-        "stock.report",
+        "stock.report.query",
         "stock.report.agg",
     }
     assert {
         item["api_name"] for item in stock_views["report_metric"]["functions"]
-    } == {"stock.report_metric", "stock.report_metric.agg"}
+    } == {"stock.report_metric.query", "stock.report_metric.agg"}
     financial_view = stock_views["financial_3_table"]
     assert financial_view["value_domains"]["statement_type"] == {
         "HB": "合并报表、调整前、累计口径（普通查询默认）",
@@ -173,6 +173,7 @@ def test_finance_data_catalog_saves_single_dataview_node(tmp_path: Path) -> None
     assert "route_summary" not in raw["subjects"]["stock"]["margin"]
     assert saved["route_summary"] == saved["desc"]
     # Editing the function label preserves its existing executable examples.
+    assert raw["subjects"]["stock"]["margin"]["api"][0]["api_name"] == "stock.margin.query"
     assert "start = 2026-08-01" in raw["subjects"]["stock"]["margin"]["api"][0]["examples"][0]
 
 

@@ -1,4 +1,4 @@
-"""Restricted Python conditions; never execute model-authored Python.
+"""Finite filter expressions parsed as AST; never execute model-authored code.
 
 The parsed tree is shared by validation, reference binding and providers. SQL
 identifiers come only from provider mappings; values are always parameters.
@@ -46,6 +46,16 @@ def _node(node: ast.AST) -> dict[str, Any]:
         raise FilterSyntaxError("a result column is a set; use field in rN.column, not a bare filter reference")
     if isinstance(node, ast.BoolOp):
         return {"and" if isinstance(node.op, ast.And) else "or": [_node(item) for item in node.values]}
+    if isinstance(node, ast.Call):
+        # A single protocol spelling, not general Python method dispatch.
+        if not (
+            isinstance(node.func, ast.Attribute) and node.func.attr == "contains"
+            and isinstance(node.func.value, ast.Name)
+            and len(node.args) == 1 and not node.keywords
+            and isinstance(node.args[0], ast.Constant) and isinstance(node.args[0].value, str)
+        ):
+            raise FilterSyntaxError("text matching uses field.contains('text') with one quoted text argument")
+        return {"field": _field(node.func.value), "operator": "contains", "value": node.args[0].value}
     if isinstance(node, ast.Compare):
         if len(node.ops) > 1:
             return {"and": [_node(ast.Compare(left=left, ops=[op], comparators=[right]))
@@ -63,7 +73,7 @@ def _node(node: ast.AST) -> dict[str, Any]:
         return {"field": field, "operator": operator, "value": value}
     if isinstance(node, ast.Constant) and isinstance(node.value, bool):
         return {"constant": node.value}
-    raise FilterSyntaxError("filter accepts comparisons, and/or and membership conditions")
+    raise FilterSyntaxError("filter accepts comparisons, and/or, field.contains('text') and membership conditions")
 
 
 @lru_cache(maxsize=512)
@@ -268,7 +278,7 @@ def and_sql(left: tuple[str, list[Any]], right: tuple[str, list[Any]]) -> tuple[
 
 
 def to_source(tree: Mapping[str, Any] | None) -> str:
-    """Canonical Python expression for editable catalog examples/flow bindings."""
+    """Canonical filter expression for editable catalog examples/flow bindings."""
     if tree is None:
         return "True"
     for op in ("and", "or"):
@@ -279,7 +289,7 @@ def to_source(tree: Mapping[str, Any] | None) -> str:
     field, op, value = tree["field"], tree["operator"], tree["value"]
     literal = f"{value['result']}.{value['field']}" if isinstance(value, dict) else repr(value)
     if op == "contains":
-        return f"{literal} in {field}"
+        return f"{field}.contains({literal})"
     if value is None and op in {"=", "==", "!="}:
         return f"{field} is {'not ' if op == '!=' else ''}None"
     return f"{field} {'==' if op == '=' else op} {literal}"

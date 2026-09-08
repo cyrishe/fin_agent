@@ -626,7 +626,7 @@ class FinanceDataQueryCcTools:
             "read_finance_catalog",
             (
                 "读取金融数据调用目录。subject 定位对象，dataview 定位数据，operation 选择方法类别。"
-                "范围索引列出各视图可选的 operation；选定后返回该方法的完整调用、参数、字段和示例。"
+                "operation 用于选择执行包；调用使用包内的 api_name、request_pattern、参数和字段。"
                 "subject-only 或空参数可用于浏览上层目录。\n\n"
                 f"数据范围索引：\n{routing_index}"
             ),

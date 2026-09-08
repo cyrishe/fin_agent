@@ -171,16 +171,16 @@ def test_financial_qa_exposes_only_read_only_data_tools(tmp_path: Path) -> None:
     ]["operation"]
     assert operation_schema["enum"] == list(OPERATION_DESCRIPTIONS)
     assert set(operation_schema["enum"]) == {
-        "query", "window", "constitution", "aggregate", "compute",
+        "query", "window", "aggregate", "compute",
     }
     for operation, description in OPERATION_DESCRIPTIONS.items():
         assert f"{operation}: {description}" in operation_schema["description"]
     relation = FinanceDataToolCatalogService().get_model_dataview(
         "plate", "constitution", "constitution"
     )
-    assert relation["selected_operation"] == "constitution"
-    assert relation["functions"][0]["api_name"] == "plate.constitution"
-    assert relation["functions"][0]["operation"] == "constitution"
+    assert relation["selected_operation"] == "query"
+    assert relation["functions"][0]["api_name"] == "plate.constitution.query"
+    assert relation["functions"][0]["operation"] == "query"
     assert tools["finance_query"].input_schema["properties"]["steps"]["minItems"] == 1
     load_schema = tools["load_finance_result"].input_schema["properties"]
     assert load_schema["limit"]["maximum"] == 50
@@ -610,7 +610,7 @@ def test_catalog_routing_hides_subject_execution_guidance_until_view_selected() 
     raw_subject = service.finance_catalog.load_raw_catalog()["subjects"]["plate"]
     assert raw_subject["_meta"]["rules"] == []
     assert not selected.get("subject_guidance")
-    assert selected["functions"][0]["api_name"] == "plate.basic_info"
+    assert selected["functions"][0]["api_name"] == "plate.basic_info.query"
     assert selected["rules"] == raw_subject["basic_info"]["rules"]
 
 
@@ -688,7 +688,7 @@ def test_catalog_tool_uses_compact_view_without_changing_full_catalog_api(
     for method in model_view["functions"]:
         assert {"api_name", "operation", "request_pattern", "args"} <= set(method)
         assert "api_class" not in method
-    assert model_view["functions"][0]["api_name"] == "stock.quote"
+    assert model_view["functions"][0]["api_name"] == "stock.quote.query"
     assert "field_count" not in model_view
     assert isinstance(full_view["fields"], list)
 
@@ -1843,7 +1843,7 @@ def test_financial_qa_prompt_keeps_business_rules_and_manual_stays_generic() -> 
     assert "rN.column" in protocol
     assert "stepN.column" in protocol
     assert "data_request_complete=true" in protocol
-    assert "五类方法的用途由 `read_finance_catalog` 统一说明" in protocol
+    assert "方法的用途由 `read_finance_catalog` 统一说明" in protocol
     assert "金融公式、窗口与数据源适配由工具实现" in protocol
     assert "sample_complete=true" in manual
     assert "本步按空结果完成" in manual

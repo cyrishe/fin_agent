@@ -11,7 +11,7 @@
 
 ## 目录与执行
 
-- `subject` 定对象，`dataview` 定数据，`operation` 选方法；具体范围和五类方法以 `read_finance_catalog` 的统一目录说明为准。
+- `subject` 定对象，`dataview` 定数据，`operation` 选方法；具体范围和方法类别以 `read_finance_catalog` 的统一目录说明为准。
 - 明确的数据请求一次读取对应执行包，按其中的精确 API 入口、调用格式、参数和字段构造请求。金融公式与数据源适配由工具负责。
 - `finance_query` 说明查询组合与结果引用，当前阶段指引说明可执行动作。取数完成后，普通问答综合回答；仅数据模式由系统交付原始结果。
 

@@ -30,7 +30,8 @@ def test_presentation_does_not_relabel_results_with_a_newer_catalog() -> None:
     ) == {}
 
 
-def test_single_quote_preserves_narrative_and_uses_real_values_as_metrics():
+@pytest.mark.parametrize("api", ["stock.quote", "stock.quote.query"])
+def test_single_quote_preserves_narrative_and_uses_real_values_as_metrics(api):
     service = FinancialQaPresentationService()
     message = "贵州茅台最新报 1319.81 元，涨幅 2.35%。"
 
@@ -38,7 +39,7 @@ def test_single_quote_preserves_narrative_and_uses_real_values_as_metrics():
         message,
         [
             {
-                "api": "stock.quote",
+                "api": api,
                 "goal": "查询贵州茅台最新行情",
                 "row_count": 1,
                 "sample_complete": True,
@@ -78,7 +79,7 @@ def test_single_quote_preserves_narrative_and_uses_real_values_as_metrics():
     assert blocks[1]["semantic"] == "finance.quote.metrics"
     assert blocks[1]["payload"]["shape"] == "record"
     assert blocks[1]["payload"]["data"]["items"] == [
-        {"id": "close", "label": "收盘价", "value": 1319.81, "unit": "元"},
+        {"id": "close", "label": "收盘价/最新价", "value": 1319.81, "unit": "元"},
         {"id": "pct", "label": "涨跌幅", "value": 2.350523, "unit": "%"},
         {"id": "amount", "label": "成交额", "value": 355687656.0, "unit": "元"},
         {"id": "open", "label": "开盘价", "value": 1319.28, "unit": "元"},
@@ -251,7 +252,8 @@ def test_external_string_session_id_does_not_become_a_ui_paging_thread_id():
     assert "data_ref" not in table_data
 
 
-def test_report_record_stays_a_table_and_preserves_null_and_long_text():
+@pytest.mark.parametrize("api", ["stock.report", "stock.report.query"])
+def test_report_record_stays_a_table_and_preserves_null_and_long_text(api):
     service = FinancialQaPresentationService()
     report_row = {
         "code": "688981",
@@ -267,7 +269,7 @@ def test_report_record_stays_a_table_and_preserves_null_and_long_text():
         "近半年当前数据源收录 1 份研报。",
         [
             {
-                "api": "stock.report",
+                "api": api,
                 "goal": "查询中芯国际最近半年的研报",
                 "row_count": 1,
                 "schema": _schema(

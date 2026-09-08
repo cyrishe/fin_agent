@@ -34,15 +34,14 @@ _OPERATIONS = [
     for subject, view in _VIEWS
     for function in _CATALOG.get_model_dataview(subject, view)["functions"]
 ]
-_RELATIONS = [(subject, view) for subject, view, op in _OPERATIONS if op == "constitution"]
+_RELATIONS = [(subject, view) for subject, view in _VIEWS if view in {"constitution", "member"}]
 _OPERATION_TYPES = {
-    "query": "base", "window": "kd", "constitution": "base",
+    "query": "base", "window": "kd",
     "aggregate": "agg", "compute": "dynamic_cal",
 }
 _METADATA = {"kd", "computed", "aggregate_fields", "value_domains"}
 _METADATA_BY_OPERATION = {
     "query": {"computed", "value_domains"},
-    "constitution": {"value_domains"},
     "aggregate": {"aggregate_fields", "value_domains"},
     "window": {"kd", "value_domains"},
     "compute": {"computed", "value_domains"},
@@ -241,14 +240,14 @@ def test_all_operation_packs_keep_only_relevant_metadata_and_real_api_bindings(
 
 
 @pytest.mark.parametrize("subject,view", _RELATIONS)
-def test_legacy_query_selection_still_loads_constitution(catalog_adapters, subject, view):
-    legacy = catalog_adapters.catalog({"subject": subject, "dataview": view, "operation": "query"})
-    current = catalog_adapters.catalog({"subject": subject, "dataview": view, "operation": "constitution"})
-    assert legacy == current
-    assert current["dataview"]["selected_operation"] == "constitution"
+def test_relation_view_uses_the_same_query_selection(catalog_adapters, subject, view):
+    full = catalog_adapters.catalog({"subject": subject, "dataview": view})
+    current = catalog_adapters.catalog({"subject": subject, "dataview": view, "operation": "query"})
+    assert current["dataview"]["functions"][0] in full["dataview"]["functions"]
+    assert current["dataview"]["selected_operation"] == "query"
     api = current["dataview"]["functions"][0]["api_name"]
     assert resolve_api(api)["type"] == "base"
-    assert not api.endswith(".query")
+    assert api == f"{subject}.{view}.query"
 
 
 @pytest.mark.parametrize("arguments", [
@@ -264,17 +263,19 @@ def test_structurally_incomplete_or_unavailable_selection_has_same_error(catalog
 @pytest.mark.parametrize("operation,api,provider,request_text", [
     ("query", "stock.basic_info", "execute_base_info_api",
      'result = stock.basic_info(filter="name == \'贵州茅台\'", limit=1) -> code, name'),
+    ("query", "stock.basic_info.query", "execute_base_info_api",
+     'result = stock.basic_info.query(filter="name == \'贵州茅台\'", limit=1) -> code, name'),
     ("window", "stock.quote.kd_close_avg", "execute_kd_quote_api",
      'result = stock.quote.kd_close_avg(k=5, filter="code == \'600519.SH\'", mode=0) -> code, name, value as avg_close'),
-    ("constitution", "plate.constitution", "execute_constitution_api",
-     'result = plate.constitution(filter="plate_name == \'测试板块\'", limit=-1) -> plate_code, plate_name, stock_code, stock_name'),
+    ("query", "plate.constitution.query", "execute_constitution_api",
+     'result = plate.constitution.query(filter="plate_name == \'测试板块\'", limit=-1) -> plate_code, plate_name, stock_code, stock_name'),
     ("aggregate", "stock.quote.agg", "execute_quote_agg_api",
      'result = stock.quote.agg(filter="pct > 5", agg=count(stock.quote.code), mode=0) -> total_count'),
     ("compute", "stock.quote.dynamic_cal", "execute_dynamic_quote_api",
      'result = stock.quote.dynamic_cal(k=20, filter="code == \'600519.SH\'", fields="code, name, tradedate, open, close", '
      'task="统计每只股票近20个交易日收盘价高于开盘价的天数", mode=0) -> code, name, close_gt_open_days'),
 ])
-def test_five_operations_validate_route_execute_and_load_equally(
+def test_four_operations_validate_route_execute_and_load_equally(
     query_adapters, provider_calls, operation, api, provider, request_text,
 ):
     subject, view = api.split(".")[:2]
@@ -300,8 +301,8 @@ def test_five_operations_validate_route_execute_and_load_equally(
 
 def test_intra_flow_reference_materialization_matches_between_runtimes(query_adapters, provider_calls):
     arguments = {"steps": [
-        {"goal": "确认股票身份", "request": 'result = stock.basic_info(filter="name == \'贵州茅台\'") -> code, name'},
-        {"goal": "读取该股票行情", "request": 'result = stock.quote(filter="code in step1.code", count=1, mode=0) -> code, close'},
+        {"goal": "确认股票身份", "request": 'result = stock.basic_info.query(filter="name == \'贵州茅台\'") -> code, name'},
+        {"goal": "读取该股票行情", "request": 'result = stock.quote.query(filter="code in step1.code", count=1, mode=0) -> code, close'},
     ]}
     results = [query_adapters.call(runtime, "finance_query", arguments) for runtime in ("cc", "dsh")]
     assert all(result.get("ok") is True for result in results), results

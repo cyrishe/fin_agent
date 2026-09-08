@@ -4,9 +4,10 @@
 
 ## 分层读取
 
-- `subject` 定义对象，`dataview` 定义数据，`operation` 选择方法。五类方法的用途由 `read_finance_catalog` 统一说明。
+- `subject` 定义对象，`dataview` 定义数据，`operation` 选择方法。方法的用途由 `read_finance_catalog` 统一说明。
 - 根据路由摘要定位，明确时一次提交 `subject + dataview + operation`，取得当前方法的完整执行包；定位有歧义时读取对应概览。
 - 执行包将用途、精确入口、调用格式、参数、字段、特殊口径和示例组装在一起。请求使用其中的 `api_name` 与 `request_pattern`，字段和参数以本包声明为准。
+- 明细入口为 `subject.dataview.query(...)`，聚合为 `.agg(...)`，窗口为 `.kd_<field>_<method>(...)`，动态计算为 `.dynamic_cal(...)`。`constitution` 是成分关系 dataview，同样使用 `.query(...)`、`.agg(...)`。
 
 ## 组合执行
 

@@ -216,6 +216,8 @@ test('standard composite flows may complete catalog loading and repair without r
   assert.equal(runtime.guard(catalog('basic_info')), undefined)
   call(4, 'repair-view', NAMES.catalog, { mode: 'dataview' })
   assert.match(runtime.prompt(), /stage=repair/)
+  // The native scheduler publishes this attempted call before running guards.
+  runtime.event({ type: 'tool/call', data: { turn: 1, step: 5, callId: 'over-budget-view', name: NAMES.catalog } })
   assert.match(runtime.guard(catalog('quote')), /上限/)
   call(5, 'repair-failed', NAMES.query, { ok: false })
   assert.match(runtime.prompt(), /stage=final/)
@@ -244,7 +246,7 @@ test('catalog reuse follows visible history, exact operation and revision across
     runtime.event({ type: 'turn/start', data: { turn: 1 } })
     const query = { name: NAMES.query, arguments: { steps: [{ request: 'r1 = stock.quote(codes=["600519.SH"],count=1) -> open' }] } }
     assert.match(runtime.guard(query), /当前阶段/)
-    const original = { mode: 'dataview', dataview: { functions: [{ api_name: 'stock.quote' }] } }
+    const original = { mode: 'dataview', dataview: { functions: [{ api_name: 'stock.quote.query' }] } }
     const projected = await runtime.post({ name: NAMES.catalog }, {
       content: [{ type: 'text', text: JSON.stringify(original) }], isError: false,
     })
@@ -259,6 +261,9 @@ test('catalog reuse follows visible history, exact operation and revision across
     runtime.event({ type: 'turn/start', data: { turn: 2 } })
     assert.equal((await runtime.request({})).maxTokens, 3072)
     assert.equal(runtime.guard(query), undefined)
+    assert.equal(runtime.guard({ name: NAMES.query, arguments: { steps: [{
+      request: 'r1 = stock.quote.query(codes=["600519.SH"],count=1) -> open',
+    }] } }), undefined)
     assert.match((await runtime.preStep({ turn: 2, step: 1 })).messages[0].content[0].text, /按本轮条件调用 finance_query/)
     runtime.event({ type: 'tool/call', data: { turn: 2, step: 1, callId: 'q2', name: NAMES.query, arguments: JSON.stringify(query.arguments) } })
     runtime.event(resultEvent({ turn: 2, step: 1, callId: 'q2', payload: { ok: true, sample_complete: true } }))
@@ -579,7 +584,7 @@ test('catalog guard accepts optional operation and requires its subject/view sco
       { subject: 'stock' },
       { subject: 'stock', dataview: 'report_metric' },
       { subject: 'stock', dataview: 'report_metric', operation: 'query' },
-      { subject: 'plate', dataview: 'constitution', operation: 'constitution' },
+      { subject: 'plate', dataview: 'constitution', operation: 'query' },
     ]) {
       assert.equal(runtime.guard({ name: NAMES.catalog, arguments: args }), undefined)
     }
@@ -880,6 +885,55 @@ function toolStep(runtime, step, entries) {
   runtime.event({ type: 'step/end', data: { turn: 1, step } })
 }
 
+test('native call-before-guard order admits every budgeted call and rejects excess calls', () => {
+  for (const preserveRequestPrefix of [false, true]) {
+    for (const kind of ['catalog', 'query', 'details']) {
+      const runtime = fixture({ preserveRequestPrefix, maxCatalogAttempts: 2, maxQueryAttempts: 2, maxLoadAttempts: 2 })
+      runtime.event({ type: 'turn/start', data: { turn: 1 } })
+      if (kind !== 'catalog') toolStep(runtime, 1, [{ kind: 'catalog', payload: { mode: 'dataview' } }])
+      if (kind === 'details') toolStep(runtime, 2, [{ kind: 'query', payload: {
+        ok: true, data_only_mode: true, data_only_complete: false, sample_complete: false, result_ref: 'r1',
+      } }])
+      // Multiple calls may occur before step/end. Exercise the budget guard
+      // itself, not only the final-stage transition after a completed step.
+      for (const attempt of [1, 2, 3]) {
+        const args = kind === 'catalog'
+          ? { subject: 'stock', dataview: ['report', 'report_metric', 'basic_info'][attempt - 1], operation: 'query' }
+          : kind === 'details' ? { result_ref: 'r1', offset: attempt * 5 }
+            : { steps: [{ goal: '查询身份信息', request: `result = stock.basic_info(limit=${attempt}) -> code` }] }
+        runtime.event({ type: 'tool/call', data: {
+          turn: 1, step: 3, callId: `${kind}-${attempt}`, name: NAMES[kind], arguments: JSON.stringify(args),
+        } })
+        const denied = runtime.guard({ name: NAMES[kind], arguments: args })
+        if (attempt <= 2) assert.equal(denied, undefined, `${kind} attempt ${attempt}`)
+        else assert.match(denied, /上限/, kind)
+      }
+    }
+  }
+})
+
+test('native repair on the third query executes and accepts a valid empty result', () => {
+  const runtime = fixture({ maxQueryAttempts: 3, maxQueryRepairs: 1 })
+  runtime.event({ type: 'turn/start', data: { turn: 1 } })
+  toolStep(runtime, 1, [{ kind: 'catalog', payload: { mode: 'dataview' } }])
+  const payloads = [
+    { ok: true, data_request_complete: false, sample_complete: true },
+    { validation: { ok: false }, recovery: { retryable: true, max_retries: 1 } },
+    { ok: true, row_count: 0, sample_complete: true },
+  ]
+  for (const [i, payload] of payloads.entries()) {
+    const step = i + 2, callId = `query-${i}`
+    const args = { steps: [{ goal: '查询身份信息', request: `result = stock.basic_info(limit=${i + 1}) -> code` }] }
+    runtime.event({ type: 'tool/call', data: { turn: 1, step, callId, name: NAMES.query, arguments: JSON.stringify(args) } })
+    assert.equal(runtime.guard({ name: NAMES.query, arguments: args }), undefined)
+    runtime.event(resultEvent({ step, callId, payload }))
+    runtime.event({ type: 'step/end', data: { turn: 1, step } })
+    if (i === 1) assert.match(runtime.prompt(), /query_repair_allowed/)
+  }
+  assert.match(runtime.prompt(), /stage=final/)
+  assert.doesNotMatch(runtime.prompt(), /query_repair_limit/)
+})
+
 test('native assembly requires completion only for data mode without mutating cached schemas', async t => {
   const { runtime, contextPath } = dataOnlyFixture(t)
   const original = { sections: [], contexts: [], tools: [{ name: NAMES.query,
@@ -1148,7 +1202,8 @@ test('Skill-first permits optional methods and evidence-led followup without a f
   await withSkillContext({}, async () => {
     const runtime = fixture({}, [], SKILL_NAMES)
     runtime.event({ type: 'turn/start', data: { turn: 1 } })
-    assert.match(runtime.prompt(), /依据授权 Skill 目录选择适用方法/)
+    assert.match(runtime.prompt(), /subject \+ dataview \+ operation/)
+    assert.match(runtime.prompt(), /按需读取适用 Skill/)
     assert.equal(runtime.guard({ name: SKILL_NAMES.skill, arguments: { skill_id: 'equity-report-analysis' } }), undefined)
     // A missing Skill match does not prevent direct catalog fallback.
     assert.equal(runtime.guard({ name: NAMES.catalog, arguments: { subject: 'stock', dataview: 'report' } }), undefined)
@@ -1157,6 +1212,8 @@ test('Skill-first permits optional methods and evidence-led followup without a f
     runtime.stopping()
     assert.equal(runtime.steered.length, 0) // Supplied-evidence questions may already be answerable.
     completeCall(runtime, 2, 'catalog', NAMES.catalog, { mode: 'dataview' })
+    assert.match(runtime.prompt(), /按已加载契约构造 finance_query/)
+    assert.match(runtime.prompt(), /结合适用 Skill/)
     completeCall(runtime, 3, 'data', NAMES.query, { ok: true, sample_complete: true, data_request_complete: true })
     assert.match(runtime.prompt(), /stage=query/)
     assert.equal((await runtime.preStep({ step: 4 })).kind, 'enter')

@@ -15,6 +15,8 @@ def call(api, expression, outputs="code, name", extra=""):
 
 
 @pytest.mark.parametrize("expression,operator,value", [
+    ("name.contains('债券')", "contains", "债券"),
+    ('name.contains("O\'Reilly, A and B (集团)")', "contains", "O'Reilly, A and B (集团)"),
     ("'债券' in name", "contains", "债券"),
     ('name == "O\'Reilly, A and B (集团)"', "==", "O'Reilly, A and B (集团)"),
     ('name is None', "==", None),
@@ -30,6 +32,23 @@ def test_python_conditions_preserve_literals(expression, operator, value):
     assert validate_call(parsed, {}).ok
 
 
+@pytest.mark.parametrize("expression,expected_sql,expected_params", [
+    ("pct == 10", "pct = %s", [10]),
+    ("pct != 10", "pct != %s", [10]),
+    ("pct > -5", "pct > %s", [-5]),
+    ("pct >= 0", "pct >= %s", [0]),
+    ("pct < 5.5", "pct < %s", [5.5]),
+    ("pct <= 10", "pct <= %s", [10]),
+    ("reliable == True", "reliable = %s", [True]),
+    ("reliable == False", "reliable = %s", [False]),
+    ("pct is None", "pct IS NULL", []),
+    ("pct is not None", "pct IS NOT NULL", []),
+])
+def test_documented_scalar_operators_have_deterministic_sql(expression, expected_sql, expected_params):
+    tree = pf.parse_python_filter(expression)
+    assert pf.compile_tree(tree, {"pct": "pct", "reliable": "reliable"}) == (expected_sql, expected_params)
+
+
 @pytest.mark.parametrize("expression", [
     '__import__("os").system("id")', 'name.lower() == "x"',
     'name.__class__', '(lambda: True)()', '[x for x in name]',
@@ -39,6 +58,25 @@ def test_python_conditions_preserve_literals(expression, operator, value):
 def test_no_arbitrary_python_execution(expression):
     with pytest.raises(pf.FilterSyntaxError):
         pf.parse_python_filter(expression)
+
+
+@pytest.mark.parametrize('expression', [
+    'name.contains()', 'name.contains(1)', 'name.contains(None)',
+    'name.contains("a", "b")', 'name.contains(text="a")',
+    'name.contains(["a"])', 'name.contains(*["a"])',
+    'name.contains(r1.name)', 'name.lower().contains("a")',
+    'r1.name.contains("a")', 'contains(name, "a")',
+])
+def test_contains_is_one_finite_protocol_form(expression):
+    with pytest.raises(pf.FilterSyntaxError):
+        pf.parse_python_filter(expression)
+    assert not validate_call(call('fund.basic_info', expression), {}).ok
+
+
+def test_contains_field_is_checked_against_the_selected_method():
+    result = validate_call(call('fund.basic_info', 'unknown_field.contains("债券")'), {})
+    assert not result.ok
+    assert any('unknown_field' in error for error in result.errors)
 
 
 @pytest.mark.parametrize('api,expression', [
@@ -56,8 +94,10 @@ def test_removed_string_methods_are_not_part_of_filter_protocol(api, expression)
 
 @pytest.mark.parametrize('name', ['债券ETF', '甲债券乙', '甲债券'])
 def test_fuzzy_match_is_literal_contains_anywhere(name):
-    tree = pf.parse_python_filter("'债券' in name")
+    tree = pf.parse_python_filter("name.contains('债券')")
+    assert tree == pf.parse_python_filter("'债券' in name")  # Historical input compatibility.
     assert pf.evaluate(tree, {'name': name})
+    assert pf.to_source(tree) == "name.contains('债券')"
     assert pf.parse_python_filter(pf.to_source(tree)) == tree
     sql, params = pf.compile_tree(tree, {'name': 'name'})
     assert 'LIKE BINARY %s' in sql
@@ -74,7 +114,7 @@ def test_legacy_still_parses(expression):
 
 def test_pattern_characters_and_sql_injection_are_literal_parameters():
     literal = "50%_!\\' OR 1=1 --"
-    tree = pf.parse_python_filter(f"{literal!r} in name")
+    tree = pf.parse_python_filter(f"name.contains({literal!r})")
     sql, params = pf.compile_tree(tree, {"name": "name"})
     assert literal not in sql
     assert params == ["%50!%!_!!\\' OR 1=1 --%"]
@@ -82,7 +122,7 @@ def test_pattern_characters_and_sql_injection_are_literal_parameters():
 
 
 def test_grouping_matches_sql_and_result_stage():
-    expression = "('中金' in name or '债券' in name) and (value > 10 or value < -5)"
+    expression = "(name.contains('中金') or name.contains('债券')) and (value > 10 or value < -5)"
     tree = pf.parse_python_filter(expression)
     rows = [dict(name=n, value=v) for n in ['中金基金', '债券ETF', '其他'] for v in [-8, 0, 12]]
     sql, params = pf.compile_tree(tree, {'name': 'name', 'value': 'value'})
@@ -121,11 +161,37 @@ def test_window_result_filters_preserve_or(module):
     assert provider._filter_kd_rows(rows, args={'filter': 'value > 10 or value < -5'}, **kwargs) == [rows[0], rows[2]]
 
 
+@pytest.mark.parametrize("module", ['quote', 'moneyflow', 'margin', 'pricevalue'])
+def test_window_contains_combines_with_set_and_numeric_conditions(module):
+    import importlib
+    provider = importlib.import_module(f'src.experiments.staged_data_protocol.phase2.{module}_provider')
+    rows = [
+        {'code': '600000.SH', 'name': '浦发银行', 'value': 12},
+        {'code': '000001.SZ', 'name': '平安银行', 'value': -8},
+        {'code': '601318.SH', 'name': '中国平安', 'value': 15},
+    ]
+    expression = "name.contains('银行') and code in ['600000.SH', '000001.SZ'] and value > 0"
+    kwargs = {'field': 'pe'} if module == 'pricevalue' else {}
+    assert provider._filter_kd_rows(rows, args={'filter': expression}, **kwargs) == [rows[0]]
+
+
+@pytest.mark.parametrize('api,expression,outputs,extra', [
+    ('stock.report', "institution.contains('中金')", 'code, institution, investment_highlights', ''),
+    ('stock.report_metric', "institution.contains('中金') and metric_code == 'eps'", 'code, forecast_year, metric_value', ''),
+    ('stock.quote.kd_pct_sum', "name.contains('银行') and value > 0", 'code, name, value', ', k=5'),
+    ('plate.constitution', "plate_name.contains('新能源')", 'plate_code, stock_code', ''),
+    ('plate.constitution.agg', "plate_name.contains('新能源') and pct > 0", 'plate_code, average', ', agg=avg(stock.quote.pct), group_by="plate_code"'),
+])
+def test_contains_reaches_each_existing_method_contract(api, expression, outputs, extra):
+    result = validate_call(call(api, expression, outputs, extra), {})
+    assert result.ok, result.errors
+
+
 def test_basic_and_segment_use_same_contains_sql():
     from src.experiments.staged_data_protocol.phase2 import base_info_provider as b, stock_corporate_provider as c
-    base = b._build_filter_clauses(source=b.BASE_INFO_SOURCES['fund'], args={'filter': "'债券' in name"})
+    base = b._build_filter_clauses(source=b.BASE_INFO_SOURCES['fund'], args={'filter': "name.contains('债券')"})
     views = c.STOCK_CORPORATE_VIEWS
-    segment = c._build_filter_clauses(view=views['business_segment'], args={'filter': "'新能源' in project_name"})
+    segment = c._build_filter_clauses(view=views['business_segment'], args={'filter': "project_name.contains('新能源')"})
     assert base[1] == ['%债券%']
     assert segment[1] == ['%新能源%']
     assert "ESCAPE '!'" in base[0] and "ESCAPE '!'" in segment[0]
@@ -140,7 +206,7 @@ def test_window_special_formula_unchanged():
 
 def test_aggregate_filter_uses_tree_without_touching_metric():
     from src.experiments.staged_data_protocol.phase2 import quote_provider as q
-    parsed = call('stock.quote.agg', "('中' in name or code == '600519.SH') and pct > 0", 'market_code, average', ', agg = avg(stock.quote.pct), group_by = "market_code"')
+    parsed = call('stock.quote.agg', "(name.contains('中') or code == '600519.SH') and pct > 0", 'market_code, average', ', agg = avg(stock.quote.pct), group_by = "market_code"')
     sql, params = q._build_where(source=q.QUOTE_SOURCES['stock'], args=parsed.args)
     assert ' OR ' in sql and '%s' in sql
     assert '%中%' in params and 0 in params
@@ -177,7 +243,7 @@ def test_report_aggregation_contains_does_not_change_aggregate_sql(monkeypatch):
     from tests.test_report_provider import _Db
     db = _Db([])
     monkeypatch.setattr(r, '_connect_report_db', lambda: db)
-    result = r.execute_report_agg_api(dataview='report', args={'filter': "'中金' in institution and report_date >= '2026-01-01'", 'agg': 'count(report_id)', 'group_by': 'code,name'}, outputs=['code', 'name', 'count(report_id) as reports'])
+    result = r.execute_report_agg_api(dataview='report', args={'filter': "institution.contains('中金') and report_date >= '2026-01-01'", 'agg': 'count(report_id)', 'group_by': 'code,name'}, outputs=['code', 'name', 'count(report_id) as reports'])
     assert result['status'] == 'ok'
 
 
@@ -201,6 +267,18 @@ def test_flow_binding_does_not_rewrite_literal_reference_text():
     terms = list(pf.predicates(tree))
     assert terms[0]['value'] == {'result': 'r3', 'field': 'code'}
     assert terms[1]['value'] == 'step2.name and r9.code'
+    assert FinanceResultRegistry.dependencies(resolved) == ['r3']
+
+
+def test_contains_and_set_references_keep_one_tree_through_flow_binding():
+    from src.scenarios.financial_qa.result_registry import FinanceResultRegistry
+    source = call('fund.basic_info', "code in step1.code and name.contains('step2.name')").raw
+    resolved = FinanceResultRegistry.resolve_flow_refs(source, completed_steps={1: 'r3'})
+    terms = list(pf.predicates(pf.condition(parse_api_call(resolved).args)))
+    assert terms == [
+        {'field': 'code', 'operator': 'in', 'value': {'result': 'r3', 'field': 'code'}},
+        {'field': 'name', 'operator': 'contains', 'value': 'step2.name'},
+    ]
     assert FinanceResultRegistry.dependencies(resolved) == ['r3']
 
 
