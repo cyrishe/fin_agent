@@ -17,6 +17,7 @@ import socket
 import sys
 import threading
 import time
+from types import SimpleNamespace
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
@@ -44,6 +45,7 @@ def main():
     parser.add_argument('--concurrency', type=int, default=3)
     parser.add_argument('--response-mode', choices=['data', 'both'], default='data')
     parser.add_argument('--max-rows', type=int, default=2)
+    parser.add_argument('--preflight-only', action='store_true', help='Verify auth, workers and cleanup without model queries.')
     parser.add_argument('--conversation-id', help='Optional explicit context continuity. Omit for the independent benchmark.')
     args = parser.parse_args()
     from dotenv import load_dotenv
@@ -99,7 +101,7 @@ def main():
         root_dir=folder / 'runtime', log_path=folder / 'events.jsonl',
         harness_factory=RecordedHarness)
     engine = FinancialQaCcService(enabled=True, system_tools=query_tools,
-        session_service=object(), dsh_session_service=dsh)
+        session_service=SimpleNamespace(close=lambda: None), dsh_session_service=dsh)
     gateway = FinanceApiGateway(engine=engine, usage_recorder=lambda **_: None)
     app = create_app(auth=FinanceApiKeyAuth({'report-eval': key}), gateway=gateway)
     sock = socket.socket()
@@ -137,6 +139,7 @@ def main():
             'runtime': 'dsh', 'execution_mode': 'standard', 'response_mode': args.response_mode,
             'research_mode': 'fast', 'max_rows': args.max_rows,
             'case_count': len(selected), 'concurrency': args.concurrency,
+            'preflight_only': args.preflight_only,
             'transport': 'real HTTP MCP on isolated loopback listener',
             'conversation_id_supplied': args.conversation_id,
             'usage_counter': 'disabled for benchmark', 'prewarm': warm,
@@ -145,6 +148,8 @@ def main():
             'created_at': datetime.now(timezone.utc).isoformat()}
         (folder / 'run_manifest.json').write_text(json.dumps(manifest, ensure_ascii=False, indent=2))
         print(json.dumps({'ready': True, 'pending': len(pending), 'prewarm': warm}, ensure_ascii=False), flush=True)
+        if args.preflight_only:
+            return
 
         def run(case):
             request = {'query': case['question'], 'response_mode': args.response_mode, 'runtime': 'dsh',
