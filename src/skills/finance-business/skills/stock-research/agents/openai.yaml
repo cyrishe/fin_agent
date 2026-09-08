@@ -1,4 +1,4 @@
 interface:
   display_name: "个股深度研究"
-  short_description: "围绕价值驱动、预期差与反证形成可证伪个股研究"
-  default_prompt: "使用 $stock-research 结合最新可用证据，对这只股票形成有时点、有反证、可继续验证的深度研究。"
+  short_description: "根据行业、成长阶段与证据动态选路，结合研报和同业形成可验证研究"
+  default_prompt: "使用 $stock-research 分析这家公司，根据查到的业务、财务和市场预期选择方法，必要时结合研报与同业，说明结论和改变判断的条件。"

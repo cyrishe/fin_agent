@@ -17,6 +17,20 @@
 
 新闻多不等于催化强。低关注度也不自动是负面；关注经营是否安静改善、估值/现金回报是否形成不对称，以及什么披露可能触发预期修正。
 
+## 热度改变研究问题，不决定基本面结论
+
+先区分用户称它热门、系统热点记录、媒体/研报覆盖和行情活跃度，各自反映的不是同一件事。使用公司自身历史和相关行业作背景；没有数据则称关注度未核实，不把热点表零行解释为冷门。
+
+| 当前证据组合 | 优先解释什么 |
+| --- | --- |
+| 关注和价格上升，经营/订单也有直接改善 | 增长能持续多久、利润如何兑现、价格是否要求更强业绩 |
+| 关注和价格上升，仅有概念或远期计划 | 真实业务暴露、商业化里程碑及预期落空；不自动称泡沫或确定受益 |
+| 关注较低但现金/资本回报改善 | 改善是否持续、折价是否合理、潜在价值释放与流动性限制 |
+| 价格下跌且基本面恶化 | 周期性回撤与永久损伤、生存约束、旧逻辑是否失效；跌幅不证明便宜 |
+| 价格下跌而经营证据稳定 | 估值、行业环境与原先预期变化；仍保留尚未观测的风险，不直接归因“错杀” |
+
+热度本身不自动开启全部技术/资金工具；只有短期交易结构影响用户问题才组合相应方法。成交放大、单项资金流或集中度只是代理证据，没有充分持仓与交易资料时不能声称量化了市场拥挤程度。
+
 ## 建立预期栈
 
 不要把以下信息混成“一致预期”：
@@ -47,3 +61,4 @@
 
 - [Anthropic Catalyst Calendar](https://github.com/anthropics/financial-services/tree/main/plugins/vertical-plugins/equity-research/skills/catalyst-calendar)
 - [Anthropic Thesis Tracker](https://raw.githubusercontent.com/anthropics/financial-services/main/plugins/vertical-plugins/equity-research/skills/thesis-tracker/SKILL.md)
+- [McKinsey: The CEO’s Guide to Corporate Finance](https://www.mckinsey.com/capabilities/strategy-and-corporate-finance/our-insights/the-ceos-guide-to-corporate-finance)：经营表现与市场预期变化不同，热度分支是本系统的应用设计。

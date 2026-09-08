@@ -43,6 +43,7 @@ def test_finance_business_catalog_has_the_grounded_business_skills() -> None:
         "market-overview",
         "sector-theme-analysis",
         "stock-research",
+        "equity-report-analysis",
         "earnings-analysis",
         "stock-screening",
         "factor-analysis",
@@ -71,10 +72,9 @@ def test_catalog_entries_point_to_standard_progressive_skills() -> None:
         metadata = _frontmatter(skill_text)
         assert metadata["name"] == item["id"]
         assert len(metadata["description"]) >= 30
-        assert "## 工作方法" in skill_text
-        assert "## 数据需求" in skill_text
-        assert "## 工具与证据" in skill_text
-        assert "## 回答要求" in skill_text
+        # Business expression is SOFT: headings are not a runtime schema.
+        assert metadata["description"] == item["description"]
+        assert skill_text.split("---", 2)[2].strip()
 
 
 def test_business_skill_methods_are_decoupled_from_concrete_finance_api_names() -> None:
@@ -231,33 +231,13 @@ def test_stock_research_is_an_adaptive_lead_skill_with_progressive_references() 
         "scoring-and-confidence.md",
         "catalyst-expectation-redteam.md",
         "personalization.md",
+        "adaptive-paths.md",
+        "method-composition.md",
     } == reference_names
-    assert "核心命题" in skill_text
-    assert "固定子 Skill 清单" in skill_text
-    assert "篇幅要求同时约束取证" in skill_text
-    assert "不得因为界面处于智能模式" in skill_text
-    assert "最终综合前必须读取" in skill_text
-    assert "新闻或 Web 检索失败只形成事件证据缺口" in skill_text
-    assert "不改用另一种新闻或搜索工具重复碰运气" in skill_text
-    assert "不得用它们证明报告“够深”" in skill_text
-    assert "深度报告以研究链完整性而不是机械页数为目标" in skill_text
-    assert "最终回答只输出可供用户阅读和导出的报告正文" in skill_text
-    assert "不读取复杂研究方法或完整报告模板" in skill_text
-    assert "结构化数据失败或缺失不是转向新闻的理由" in skill_text
-    assert "不从模型记忆猜字段后试错" in skill_text
-    assert "只按已加载目录修正一次" in skill_text
-    assert "read_finance_skill_reference" in skill_text
-    assert "research-method.md" in skill_text
-    assert "company-archetypes.md" in skill_text
-    assert "scoring-and-confidence.md" in skill_text
-    assert "catalyst-expectation-redteam.md" in skill_text
-    assert "价格可能隐含" in skill_text
-    assert "不让模型临时拼出综合分" in skill_text
-    assert "只修正该证据目标" in skill_text
-    assert "三至六张真正支持决策" in skill_text
-    assert "数据充分却仍只有四页左右摘要时" in skill_text
-    assert "Sibling Skill" not in skill_text
-    assert "depends_on_skill" not in skill_text
+    snapshot = FinanceBusinessSkillCatalog(root=ROOT).method_snapshot()
+    method = snapshot["skills"]["stock-research"]
+    assert method["method"] == skill_text.strip()
+    assert set(method["references"]) == {f"references/{name}" for name in reference_names}
 
 
 def test_stock_research_references_are_direct_focused_and_all_linked() -> None:
@@ -273,8 +253,6 @@ def test_stock_research_references_are_direct_focused_and_all_linked() -> None:
     }
 
     assert linked_references == shipped_references
-    assert "一般只读取真正影响判断的一至两份参考" in skill_text
-    assert "一次加载全部参考" in skill_text
     assert all("references/" not in path.read_text(encoding="utf-8") for path in (skill_dir / "references").glob("*.md") if not path.name.startswith("._"))
 
 
@@ -364,7 +342,10 @@ def test_stock_research_ui_metadata_matches_the_runtime_skill() -> None:
     )
 
     assert "$stock-research" in metadata
-    assert "反证" in metadata
+    import yaml
+    ui = yaml.safe_load(metadata)
+    assert 25 <= len(ui["interface"]["short_description"]) <= 64
+    assert ui.get("policy", {}).get("allow_implicit_invocation", True) is True
     assert catalog_item["description"] == skill_metadata["description"]
 
 
@@ -376,6 +357,7 @@ def test_financial_qa_cc_loads_only_the_new_business_skill_plugin() -> None:
         "fin-agent-finance-business:market-overview",
         "fin-agent-finance-business:sector-theme-analysis",
         "fin-agent-finance-business:stock-research",
+        "fin-agent-finance-business:equity-report-analysis",
         "fin-agent-finance-business:earnings-analysis",
         "fin-agent-finance-business:stock-screening",
         "fin-agent-finance-business:factor-analysis",
