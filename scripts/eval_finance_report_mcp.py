@@ -18,6 +18,7 @@ import sys
 import threading
 import time
 from types import SimpleNamespace
+from urllib.parse import urlsplit
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
@@ -150,6 +151,7 @@ def main():
                 raise RuntimeError('MCP authentication preflight failed: valid_key')
         warm = gateway.prewarm()
         manifest = {'revision': args.revision, 'model': dsh.model, 'provider': dsh.provider,
+            'model_host': urlsplit(dsh.base_url).hostname,
             'reasoning_effort': dsh.reasoning_effort, 'loop_policy': dsh.loop_policy_config,
             'runtime': 'dsh', 'execution_mode': 'standard', 'response_mode': args.response_mode,
             'research_mode': 'fast', 'max_rows': args.max_rows,
