@@ -92,11 +92,9 @@ class FinancialQaPresentationService:
                 )
             )
         evidence_blocks = self._merge_compatible_metric_blocks(evidence_blocks)
-        narrative = self._display_narrative(
-            str(message or ""),
-            has_structured_evidence=bool(evidence_blocks),
-        )
-        return [self._narrative_block(narrative), *evidence_blocks]
+        # Analysis tables can contain comparisons/derived conclusions absent
+        # from raw evidence. Preserve the answer; the UI folds reference tables.
+        return [self._narrative_block(str(message or "")), *evidence_blocks]
 
     def _merge_compatible_metric_blocks(
         self,
@@ -156,45 +154,6 @@ class FinancialQaPresentationService:
                     break
         return merged
 
-    @classmethod
-    def _display_narrative(
-        cls,
-        message: str,
-        *,
-        has_structured_evidence: bool,
-    ) -> str:
-        if not has_structured_evidence or not message.strip():
-            return message
-        lines = message.splitlines()
-        kept: list[str] = []
-        index = 0
-        while index < len(lines):
-            if (
-                index + 1 < len(lines)
-                and cls._looks_like_table_row(lines[index])
-                and cls._looks_like_table_separator(lines[index + 1])
-            ):
-                while kept and not kept[-1].strip():
-                    kept.pop()
-                while index < len(lines) and cls._looks_like_table_row(lines[index]):
-                    index += 1
-                continue
-            kept.append(lines[index])
-            index += 1
-        compact = re.sub(r"\n{3,}", "\n\n", "\n".join(kept)).strip()
-        return compact or message
-
-    @staticmethod
-    def _looks_like_table_row(line: str) -> bool:
-        stripped = line.strip()
-        return stripped.startswith("|") and stripped.endswith("|") and stripped.count("|") >= 3
-
-    @staticmethod
-    def _looks_like_table_separator(line: str) -> bool:
-        stripped = line.strip().strip("|")
-        cells = [cell.strip() for cell in stripped.split("|")]
-        return bool(cells) and all(re.fullmatch(r":?-{3,}:?", cell) for cell in cells)
-
     @staticmethod
     def _narrative_block(message: str) -> dict[str, Any]:
         return {
@@ -202,6 +161,7 @@ class FinancialQaPresentationService:
             "block_type": "narrative",
             "kind": "narrative",
             "semantic": "finance.answer",
+            "title": "分析回答",
             "mode": "replace",
             "content": message,
             "payload": {

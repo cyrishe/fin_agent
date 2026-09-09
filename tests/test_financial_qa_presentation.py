@@ -472,7 +472,7 @@ def test_empty_evidence_keeps_business_source_and_zero_row_trace():
     assert blocks[1]["domain_context"]["source"] == "股票 · 研报明细"
 
 
-def test_structured_evidence_removes_duplicate_markdown_table_but_keeps_section():
+def test_structured_evidence_preserves_analysis_tables_and_original_answer():
     service = FinancialQaPresentationService()
     message = """## 融资数据对比
 
@@ -502,7 +502,7 @@ def test_structured_evidence_removes_duplicate_markdown_table_but_keeps_section(
         }],
     )
 
-    assert "|" not in blocks[0]["content"]
+    assert blocks[0]["content"] == message
     assert "## 融资数据对比" in blocks[0]["content"]
     assert "比亚迪融资情绪相对更强" in blocks[0]["content"]
 

@@ -241,6 +241,9 @@ class LlmStreamBlockBuilder:
                 "progress_id": progress_id,
                 "status": status,
                 "current_step": event_type,
+                **({"skill_id": _trim(metadata["skill_id"]),
+                    "display_name": _trim(metadata.get("display_name"))}
+                   if metadata.get("skill_id") else {}),
                 "format": "markdown",
                 "summary": content,
             },

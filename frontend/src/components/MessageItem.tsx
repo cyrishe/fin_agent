@@ -5,6 +5,8 @@ import MarkdownContent from "./MarkdownContent";
 import ReportExportButton from "./ReportExportButton";
 import TurnMeta from "./TurnMeta";
 import TurnProcess from "./TurnProcess";
+import AnswerEvidence, { splitAnswerEvidence } from "./AnswerEvidence";
+import SkillActivity from "./SkillActivity";
 import type { ToolIdentitySelection } from "./renderers/ToolIdentityArtifact";
 
 interface Props {
@@ -31,8 +33,9 @@ function UserContent({ content }: { content: string }) {
 
 export default function MessageItem({ message, interactionDrafts, selectedInteractions, submittedInteractions, disabled, onDraftChange, onRequestCustomAnswer, onClearCustomAnswer, onSubmitDraft, onInteraction, onRequestFeedback, onSubmitFeedback, onUseAsset }: Props) {
   const run = message.run;
-  const firstArtifact = run?.artifacts[0];
-  const remainingArtifacts = run?.artifacts.slice(1) || [];
+  const { primary, references } = splitAnswerEvidence(run?.artifacts || []);
+  const firstArtifact = primary[0];
+  const remainingArtifacts = primary.slice(1);
   const renderBlock = (block: NonNullable<typeof firstArtifact>) => <BlockRenderer
     key={block.block_id}
     block={block}
@@ -59,15 +62,17 @@ export default function MessageItem({ message, interactionDrafts, selectedIntera
           {message.role === "user" ? <div className="user-bubble"><UserContent content={message.content} /></div> : message.content ? <MarkdownContent content={message.content} /> : null}
           {message.attachments?.length ? <div className="message-attachments">{message.attachments.map((attachment) => attachment.preview_url ? <img src={attachment.preview_url} alt={attachment.file_name || "附件"} key={attachment.attachment_id || attachment.preview_url} /> : <div className="message-file" key={attachment.attachment_id || attachment.file_name}><FileText size={18} /><span>{attachment.file_name || "附件"}</span></div>)}</div> : null}
           {run && <div className="agent-run-content">
+            <SkillActivity run={run} payload={message.payload} />
             {run.status === "running" && run.artifacts.length === 0 && <div className="answer-pending"><span className="pulse-dot" /><span>{run.summary}</span></div>}
             {run.status === "running" ? <>
               {firstArtifact ? renderBlock(firstArtifact) : null}
               <TurnProcess run={run} />
               {remainingArtifacts.map(renderBlock)}
             </> : <>
-              {run.artifacts.map(renderBlock)}
+              {primary.map(renderBlock)}
               <TurnProcess run={run} />
             </>}
+            <AnswerEvidence blocks={references} renderBlock={renderBlock} />
           </div>}
           {message.role === "assistant" && run?.status === "done" && <ReportExportButton
             payload={message.payload}

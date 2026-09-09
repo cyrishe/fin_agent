@@ -100,6 +100,50 @@ button { color: inherit; }
 .inline-code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .88em; background: #eff2f6; color: #c03450; padding: 2px 5px; border-radius: 4px; }
 
 .agent-run-content { display: flex; flex-direction: column; gap: 12px; }
+
+/* Answer / evidence / method are views of existing Surface facts, not states. */
+.skill-activity { border: 1px solid #c6e1e4; border-radius: 12px; background: #f2faf9; padding: 14px 16px; color: #245a63; }
+.skill-activity-heading { display: flex; align-items: center; gap: 8px; font-size: 13px; }
+.skill-activity-heading small { font-size: 9px; letter-spacing: .1em; opacity: .7; }
+.skill-activity-heading > span { margin-left: auto; color: #63808a; font-size: 11px; }
+.skill-activity-methods { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 10px; }
+.skill-activity-methods > span { border-radius: 6px; padding: 4px 9px; background: #fff; border: 1px solid #dcebed; font-size: 12px; }
+.skill-activity p { margin: 9px 0 0; font-size: 11px; color: #71868e; line-height: 1.6; }
+.answer-evidence { border: 1px solid #d5e3ea; border-radius: 12px; background: #f7fafc; overflow: hidden; }
+.answer-evidence > summary, .reference-item > summary { display: flex; align-items: center; gap: 10px; padding: 15px 17px; cursor: pointer; list-style: none; }
+.answer-evidence > summary::-webkit-details-marker, .reference-item > summary::-webkit-details-marker { display: none; }
+.answer-evidence > summary > span { display: inline-flex; align-items: center; gap: 9px; color: #426372; font-size: 13px; }
+.answer-evidence > summary small { font-size: 11px; color: #78909d; }
+.answer-evidence > summary .reference-action { margin-left: auto; color: #78909d; font-size: 11px; }
+.answer-evidence-body { padding: 0 10px 10px; }
+.reference-item { background: #fff; border: 1px solid #e2ebef; border-radius: 9px; margin-top: 7px; min-width: 0; }
+.reference-item > summary { color: #5f7b8a; padding: 12px; }
+.reference-item-label { flex: 1; min-width: 0; }
+.reference-item-label strong { display: block; font-size: 12px; font-weight: 500; line-height: 1.6; overflow-wrap: anywhere; }
+.reference-item-label small { display: block; margin-top: 4px; font-size: 10px; color: #8496a0; }
+.reference-chevron { flex-shrink: 0; transition: transform .15s ease; }
+details[open] > summary .reference-chevron { transform: rotate(90deg); }
+.reference-item-body { padding: 0 8px 8px; min-width: 0; }
+.reference-item-body .surface-title { display: none; }
+.answer-evidence summary:focus-visible, .reference-item:focus-visible { outline: 2px solid #34849e; outline-offset: -3px; }
+.markdown-table-scroll { max-width: 100%; overflow-x: auto; margin: 16px 0; border: 1px solid #dbe5eb; border-radius: 10px; }
+.markdown-table-scroll:focus-visible { outline: 2px solid #34849e; }
+.markdown-content .markdown-table-scroll table { margin: 0; }
+.finance-answer { max-width: 100%; }
+.finance-answer .markdown-content h2 { display: flex; align-items: baseline; gap: 10px; border-top: 1px solid #dfebf0; padding-top: 22px; }
+.finance-answer .markdown-content h2::before { content: ""; width: 3px; height: 13px; border-radius: 2px; background: #25849b; flex-shrink: 0; }
+.finance-answer .markdown-content blockquote { background: #edf7f8; border-left: 3px solid #2c8f9e; border-radius: 0 12px 12px 0; padding: 17px 20px; margin: 18px 0 24px; color: #234e60; }
+.finance-answer .markdown-content blockquote p:last-child { margin-bottom: 0; }
+.finance-answer .markdown-content th { white-space: nowrap; color: #496b7b; background: #f1f7fa; font-size: 12px; }
+.finance-answer .markdown-content td { font-variant-numeric: tabular-nums; font-size: 13px; }
+@media (max-width: 640px) {
+  .skill-activity { padding: 11px; }
+  .skill-activity-heading { flex-wrap: wrap; }
+  .answer-evidence > summary { padding: 12px; }
+  .answer-evidence-body { padding: 0 5px 5px; }
+  .finance-answer .markdown-content blockquote { padding: 12px 14px; }
+}
+@media (prefers-reduced-motion: reduce) { .reference-chevron { transition: none; } }
 .report-export-row { margin-top: 13px; min-height: 48px; padding: 8px 10px 8px 12px; border: 1px solid #cfe2e8; border-radius: 10px; display: flex; align-items: center; justify-content: space-between; gap: 12px; color: #3a586a; background: linear-gradient(100deg, #f2fafb, #f8fbfd); }
 .report-export-copy { min-width: 0; display: flex; align-items: center; gap: 8px; }
 .report-export-copy > svg { flex: 0 0 auto; color: #168ca7; }

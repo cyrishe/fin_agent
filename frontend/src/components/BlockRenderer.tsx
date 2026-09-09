@@ -253,8 +253,8 @@ export default function BlockRenderer(props: Props) {
   const stage = String(block.stage || record(block.data).stage || record(block.meta).stage || "");
   const hideSurfaceTitle = ["finance.custom_tool_implementation", "finance.custom_tool_edit"].includes(artifactType);
   return (
-    <section className={`surface-block block-${object.kind} renderer-${renderer.replaceAll(".", "-")}${stage ? ` stage-${stage}` : ""}`} data-block-id={block.block_id} data-renderer={renderer} tabIndex={-1}>
-      {block.title && !hideSurfaceTitle && <div className="surface-title">{block.title}</div>}
+    <section className={`surface-block block-${object.kind} renderer-${renderer.replaceAll(".", "-")}${block.semantic === "finance.answer" ? " finance-answer" : ""}${stage ? ` stage-${stage}` : ""}`} data-block-id={block.block_id} data-renderer={renderer} tabIndex={-1}>
+      {block.title && !hideSurfaceTitle && block.semantic !== "finance.answer" && <div className="surface-title">{block.title}</div>}
       {content}
       {object.kind === "data" && !["finance.kline", "finance.intraday"].includes(renderer) && <RenderMeta object={object} />}
     </section>

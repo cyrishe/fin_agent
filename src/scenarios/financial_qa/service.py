@@ -575,6 +575,22 @@ class FinancialQaCcService:
             for item in record.get("skill_entries") or []
             if isinstance(item, Mapping)
         ]
+        # Persist method-load evidence in the same Surface used by live progress.
+        # Completed means the method was loaded, not that analysis is verified.
+        for entry in skill_entries:
+            skill_id = _trim(entry.get("skill_id"))
+            if not skill_id:
+                continue
+            name = _trim(entry.get("display_name")) or skill_id
+            surface_blocks.append({
+                "block_id": f"runtime_skill_{skill_id}",
+                "block_type": "status",
+                "title": f"加载方法 · {name}",
+                "content": "已加载专业方法，用于指导本轮取证与分析。",
+                "data": {"role": "process", "status": "completed",
+                         "progress_id": f"skill_{skill_id}",
+                         "skill_id": skill_id, "display_name": name},
+            })
         stock_research_used = any(
             _trim(item.get("skill_id") or item.get("qualified_skill")).rsplit(":", 1)[-1]
             == "stock-research"

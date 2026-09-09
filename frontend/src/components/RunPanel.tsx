@@ -2,6 +2,7 @@ import { Activity, CheckCircle2, ChevronRight, Clock3, PanelRightClose, Terminal
 import { settleProcessBlocks } from "../surface";
 import type { AgentRun, SurfaceBlock } from "../types";
 import RunProcessList from "./RunProcessList";
+import SkillActivity from "./SkillActivity";
 
 function hasAction(block: SurfaceBlock): boolean {
   if (block.block_type !== "interaction") return false;
@@ -27,6 +28,7 @@ export default function RunPanel({ run, onClose, onArtifactSelect }: Props) {
           <div>{run.status === "done" && !awaiting ? <CheckCircle2 size={19} /> : run.status === "error" ? <XCircle size={19} /> : <Clock3 size={19} />}<span>{statusLabel}</span></div>
           <p>{awaiting ? "结果已经生成，请在主对话中确认下一步。" : run.summary}</p>
         </div>
+        <SkillActivity run={run} />
         <div className="run-section-label">{run.status === "running" ? "实时步骤" : "执行轨迹"}<span>{process.length}</span></div>
         <RunProcessList blocks={process} />
         <div className="run-section-label">{awaiting ? "结果与下一步" : "本轮结果"}<span>{run.artifacts.length}</span></div>

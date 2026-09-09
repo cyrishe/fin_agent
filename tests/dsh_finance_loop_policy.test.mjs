@@ -1366,6 +1366,61 @@ function completeCall(runtime, step, id, name, payload, args = {}) {
   runtime.event({ type: 'step/end', data: { turn: 1, step } })
 }
 
+test('actual Skill loading expands synthesis budget and resets between turns', async () => {
+  for (const payload of [{ skills: [] }, { error: 'missing' }, { method: '分析方法' }, { skills: [{ method: '分析方法' }] }]) {
+    await withSkillContext({}, async contextPath => {
+      const runtime = fixture({}, [], SKILL_NAMES)
+      runtime.event({ type: 'turn/start', data: { turn: 1 } })
+      completeCall(runtime, 1, 's', SKILL_NAMES.skill, payload)
+      completeCall(runtime, 2, 'c', NAMES.catalog, { mode: 'dataview' })
+      completeCall(runtime, 3, 'q', NAMES.query, { ok: true, result_ref: 'session://r', sample_complete: false })
+      completeCall(runtime, 4, 'd', NAMES.details, { rows: [{}] })
+      const request = await runtime.request({})
+      assert.equal(request.maxTokens, payload.method || payload.skills?.length ? 8192 : 3072)
+      assert.equal(request.reasoningEffort, 'low')
+      writeFileSync(contextPath, JSON.stringify({ tool_context: {} }))
+      runtime.event({ type: 'turn/start', data: { turn: 2 } })
+      assert.equal((await runtime.request({})).maxTokens, 1536)
+    })
+  }
+})
+
+test('Skill budgets retain useful followups through query eight and detail six', async () => {
+  await withSkillContext({}, async () => {
+    for (const kind of ['query', 'details']) {
+      const runtime = fixture({}, [], SKILL_NAMES)
+      runtime.event({ type: 'turn/start', data: { turn: 1 } })
+      completeCall(runtime, 1, 's', SKILL_NAMES.skill, { method: '分析方法' })
+      completeCall(runtime, 2, 'c', NAMES.catalog, { mode: 'dataview' })
+      if (kind === 'details') completeCall(runtime, 3, 'q', NAMES.query, { ok: true, result_ref: 'session://r', sample_complete: false })
+      const cap = kind === 'query' ? 8 : 6
+      for (let n = 1; n <= cap; n++) {
+        completeCall(runtime, n + 3, `${kind}${n}`, NAMES[kind], kind === 'query'
+          ? { ok: true, result_ref: `session://r${n}`, sample_complete: true } : { rows: [{}] }, { offset: n })
+        assert.match(runtime.prompt(), n === cap ? /stage=final/ : new RegExp(`stage=${kind}`))
+      }
+    }
+  })
+})
+
+test('Skill budgets are configurable and exclude fast and data-only requests', async () => {
+  for (const key of ['skillMaxCatalogAttempts', 'skillMaxQueryAttempts', 'skillMaxLoadAttempts', 'skillAnalysisMaxTokens']) {
+    assert.throws(() => resolveConfig({ [key]: -1 }))
+  }
+  for (const context of [{ _finance_data_only: true }, { _finance_execution_mode: 'fast' }, {}]) {
+    await withSkillContext(context, async () => {
+      const runtime = fixture({ skillAnalysisMaxTokens: 9000 }, [], SKILL_NAMES)
+      runtime.event({ type: 'turn/start', data: { turn: 1 } })
+      completeCall(runtime, 1, 's', SKILL_NAMES.skill, { method: '分析方法' })
+      completeCall(runtime, 2, 'c', NAMES.catalog, { mode: 'dataview' })
+      completeCall(runtime, 3, 'q', NAMES.query, { ok: true, sample_complete: true, result_ref: 'session://r' })
+      const request = await runtime.request({})
+      if (Object.keys(context).length) assert.ok(request.maxTokens <= 3072)
+      else assert.equal(request.maxTokens, 9000)
+    })
+  }
+})
+
 test('Skill-first permits optional methods and evidence-led followup without a forced match', async () => {
   await withSkillContext({}, async () => {
     const runtime = fixture({}, [], SKILL_NAMES)
@@ -1395,7 +1450,7 @@ test('Skill-first permits optional methods and evidence-led followup without a f
 
 test('Skill methods remain readable after data budget exhaustion without reopening queries', async () => {
   await withSkillContext({}, async () => {
-    const runtime = fixture({ maxQueryAttempts: 1 }, [], SKILL_NAMES)
+    const runtime = fixture({ maxQueryAttempts: 1, skillMaxQueryAttempts: 1 }, [], SKILL_NAMES)
     runtime.event({ type: 'turn/start', data: { turn: 1 } })
     completeCall(runtime, 0, 'method', SKILL_NAMES.skill, { method: '使用证据' })
     completeCall(runtime, 1, 'catalog', NAMES.catalog, { mode: 'dataview' })

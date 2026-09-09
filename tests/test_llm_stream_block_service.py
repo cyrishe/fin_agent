@@ -3,6 +3,20 @@ import json
 from src.services.llm_stream_block_service import LlmStreamBlockBuilder
 
 
+def test_skill_load_metadata_survives_surface_projection_without_method_body():
+    builder = LlmStreamBlockBuilder(run_id="method-test")
+    blocks = builder.event_to_blocks({
+        "source": "deepseek_harness", "type": "reasoning_summary_delta",
+        "content": "已加载专业方法。",
+        "metadata": {"stage": "runtime", "progress_id": "skill_example",
+                     "title": "加载方法 · 示例", "status": "completed",
+                     "skill_id": "example", "display_name": "示例", "method": "PRIVATE_BODY"},
+    })
+    assert blocks[0]["data"]["skill_id"] == "example"
+    assert blocks[0]["data"]["display_name"] == "示例"
+    assert "PRIVATE_BODY" not in json.dumps(blocks)
+
+
 def test_edit_plan_stage_explains_the_fast_path_instead_of_generic_processing() -> None:
     builder = LlmStreamBlockBuilder(run_id="edit_plan_turn")
 

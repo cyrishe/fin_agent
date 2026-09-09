@@ -297,6 +297,7 @@ class FinanceDataQueryToolRuntime:
             return
         self.tracker["skill_entries"].append({
             "skill_id": skill_id,
+            "display_name": _trim(method.get("display_name")) or skill_id,
             "revision": revision,
             "content_hash": _trim(method.get("content_hash")),
         })

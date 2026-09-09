@@ -35,6 +35,10 @@ _DEFAULT_LOOP_POLICY_CONFIG: dict[str, Any] = {
     "maxQueryAttempts": 3,
     "maxQueryRepairs": 1,
     "maxLoadAttempts": 2,
+    "skillMaxCatalogAttempts": 12,
+    "skillMaxQueryAttempts": 8,
+    "skillMaxLoadAttempts": 6,
+    "skillAnalysisMaxTokens": 8192,
     "duplicateCallLimit": 1,
     "maxRequiredStageSteers": 1,
     "businessHint": "",
@@ -799,6 +803,8 @@ class FinanceDeepSeekHarnessSessionService:
         progress_id: str,
         title: str,
         status: str,
+        skill_id: str = "",
+        display_name: str = "",
     ) -> None:
         if event_sink is None:
             return
@@ -812,6 +818,7 @@ class FinanceDeepSeekHarnessSessionService:
                     "progress_id": progress_id,
                     "title": title,
                     "status": status,
+                    **({"skill_id": skill_id, "display_name": display_name} if skill_id else {}),
                 },
             }
         )
@@ -1027,6 +1034,21 @@ class FinanceDeepSeekHarnessSessionService:
                     status="completed",
                 )
 
+            skill_snapshot = tool_context.get("_finance_skill_snapshot") or {}
+            skill_methods = skill_snapshot.get("skills", {})
+
+            def emit_loaded_skill(skill_id: str) -> None:
+                method = skill_methods.get(skill_id)
+                if not isinstance(method, Mapping) or not _trim(method.get("method")):
+                    return
+                label = _trim(method.get("display_name")) or skill_id
+                self._emit(event_sink, "已加载专业方法，用于指导本轮取证与分析。",
+                           progress_id=f"skill_{skill_id}", title=f"加载方法 · {label}",
+                           status="completed", skill_id=skill_id, display_name=label)
+
+            for explicit_id in tool_context.get("_finance_explicit_skill_ids") or []:
+                emit_loaded_skill(_trim(explicit_id))
+
             def on_notification(notification: Any) -> None:
                 # SDK result.events remains authoritative for audit and usage;
                 # this callback only builds optional user-facing progress.
@@ -1045,7 +1067,15 @@ class FinanceDeepSeekHarnessSessionService:
                     name = _trim(data.get("name"))
                     args = _json_arguments(data.get("arguments"))
                     call_names[call_id] = name
-                    if name.endswith("read_finance_catalog"):
+                    if name.endswith("read_finance_skill"):
+                        ids = args.get("skill_ids") if isinstance(args.get("skill_ids"), list) else [args.get("skill_id")]
+                        labels = [str((skill_methods.get(sid) or {}).get("display_name") or sid) for sid in ids if isinstance(sid, str) and sid in skill_methods]
+                        self._emit(event_sink, "正在读取" + ("、".join(labels) or "所选专业方法") + "。",
+                                   progress_id=call_id, title="读取专业方法", status="running")
+                    elif name.endswith("read_finance_skill_reference"):
+                        self._emit(event_sink, "正在读取方法所需的专业参考。", progress_id=call_id,
+                                   title="读取方法参考", status="running")
+                    elif name.endswith("read_finance_catalog"):
                         label = public_source_label(
                             subject=_trim(args.get("subject")),
                             dataview=_trim(args.get("dataview")),
@@ -1123,7 +1153,18 @@ class FinanceDeepSeekHarnessSessionService:
                         {"progress_id": call_id, "title": "金融数据处理", "label": ""}
                     ]
                     failed = bool(payload.get("error")) or payload.get("ok") is False
-                    if name.endswith("read_finance_catalog"):
+                    if name.endswith("read_finance_skill"):
+                        loaded = payload.get("skills") if isinstance(payload.get("skills"), list) else [payload]
+                        actual = [item for item in loaded if isinstance(item, Mapping) and _trim(item.get("method")) and not item.get("error")]
+                        self._emit(event_sink, "专业方法读取未完成。" if failed else "已读取所选专业方法。" if actual else "本轮继续使用通用数据工具。",
+                                   progress_id=call_id, title="读取专业方法", status="error" if failed else "completed")
+                        if not failed:
+                            for item in actual:
+                                emit_loaded_skill(_trim(item.get("skill_id")))
+                    elif name.endswith("read_finance_skill_reference"):
+                        self._emit(event_sink, "方法参考读取未完成。" if failed else "已读取所需专业参考。",
+                                   progress_id=call_id, title="读取方法参考", status="error" if failed else "completed")
+                    elif name.endswith("read_finance_catalog"):
                         item = progress_items[0]
                         label = item.get("label", "")
                         content = (
@@ -1170,7 +1211,7 @@ class FinanceDeepSeekHarnessSessionService:
                                 title=item["title"],
                                 status="error" if failed else "completed",
                             )
-                    else:
+                    elif name.endswith("load_finance_result"):
                         item = progress_items[0]
                         rows = payload.get("rows") if isinstance(payload.get("rows"), list) else []
                         content = (

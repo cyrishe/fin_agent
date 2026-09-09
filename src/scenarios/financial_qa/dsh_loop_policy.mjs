@@ -191,6 +191,10 @@ export function resolveConfig(input = {}) {
       'maxRequiredStageSteers',
     ),
     businessHint: String(supplied.businessHint ?? DEFAULT_CONFIG.businessHint).trim(),
+    skillMaxCatalogAttempts: positiveInteger(supplied.skillMaxCatalogAttempts, 12, 'skillMaxCatalogAttempts'),
+    skillMaxQueryAttempts: positiveInteger(supplied.skillMaxQueryAttempts, 8, 'skillMaxQueryAttempts'),
+    skillMaxLoadAttempts: positiveInteger(supplied.skillMaxLoadAttempts, 6, 'skillMaxLoadAttempts'),
+    skillAnalysisMaxTokens: positiveInteger(supplied.skillAnalysisMaxTokens, 8192, 'skillAnalysisMaxTokens'),
     budgets: Object.fromEntries(
       Object.entries(DEFAULT_BUDGETS).map(([stage, fallback]) => [
         stage,
@@ -607,6 +611,29 @@ function stageAllows(state, kind, args) {
   return false
 }
 
+function usesSkillAnalysis(state) {
+  if (state.executionMode !== 'standard' || state.dataOnlyRequested) return false
+  if (String(currentToolContext()._finance_explicit_skill_prompt ?? '').trim()) return true
+  return [...state.calls.values()].some(call => {
+    if (call.kind !== 'skill' || !call.allowedAtCall) return false
+    const result = state.results.get(call.callId)
+    if (!result || result.failed || result.payload?.error) return false
+    const payload = result.payload
+    return Boolean(typeof payload?.method === 'string' && payload.method.trim())
+      || Boolean(payload?.skills?.some?.(skill => typeof skill.method === 'string' && skill.method.trim()))
+  })
+}
+
+function executionLimits(state, config) {
+  if (!usesSkillAnalysis(state)) return config
+  return {
+    ...config,
+    maxCatalogAttempts: config.skillMaxCatalogAttempts,
+    maxQueryAttempts: config.skillMaxQueryAttempts,
+    maxLoadAttempts: config.skillMaxLoadAttempts,
+  }
+}
+
 function resetTurn(state, turn, config, agent, tools) {
   state.turn = turn
   const toolContext = currentToolContext()
@@ -634,6 +661,7 @@ function resetTurn(state, turn, config, agent, tools) {
 }
 
 function updateAfterStep(state, step, config) {
+  config = executionLimits(state, config)
   const stepCalls = [...state.calls.values()].filter(call => call.step === step)
   const calls = stepCalls.filter(call => call.allowedAtCall)
   const methodLoaded = calls.some(call => {
@@ -940,6 +968,7 @@ export function apply(ctx, input = {}) {
     }
 
     agent.ctx.tools.guard(exec => {
+      const limits = executionLimits(state, config)
       const kind = toolKind(exec.name, tools)
       if (kind === 'unknown') return undefined
       if (state.methodReady && kind === 'query' && state.stage !== 'final') {
@@ -952,9 +981,9 @@ export function apply(ctx, input = {}) {
       }
       // Harness emits tool/call before prepare/guard; these counters already
       // include this attempt. Admit the last budgeted call, reject the next.
-      if ((kind === 'catalog' && state.catalogAttempts > config.maxCatalogAttempts)
-        || (kind === 'query' && state.queryAttempts > config.maxQueryAttempts)
-        || ((hasDataOnlyResults(state) || skillGuidedAnswer(state)) && kind === 'details' && state.loadAttempts > config.maxLoadAttempts)
+      if ((kind === 'catalog' && state.catalogAttempts > limits.maxCatalogAttempts)
+        || (kind === 'query' && state.queryAttempts > limits.maxQueryAttempts)
+        || ((hasDataOnlyResults(state) || skillGuidedAnswer(state)) && kind === 'details' && state.loadAttempts > limits.maxLoadAttempts)
       ) return '本轮该类读取次数已达上限；请使用已有数据与当前可用工具完成剩余目标。'
       if (kind === 'catalog') {
         const routeError = concreteCatalogRouteError(exec.arguments)
@@ -1056,14 +1085,16 @@ export function apply(ctx, input = {}) {
       const budgetKey = state.executionMode === 'fast' && state.stage === 'query'
         ? 'fast_query' : state.stage
       const selected = config.budgets[budgetKey] ?? config.budgets.final
-      const analyzing = skillGuidedAnswer(state) && !state.requiredAction
+      const skillAnalysis = usesSkillAnalysis(state) && !state.requiredAction
+      const analyzing = (skillGuidedAnswer(state) || skillAnalysis) && !state.requiredAction
       return {
         ...proposed,
         reasoningEffort: analyzing && selected.reasoningEffort === 'off'
           ? config.budgets.catalog.reasoningEffort : selected.reasoningEffort,
         // A resumed routing step can now produce a complete query flow. Keep
         // routing reasoning, but don't truncate it at the smaller route budget.
-        maxTokens: analyzing || (state.stage === 'catalog' && state.reusableApis.length > 0)
+        maxTokens: skillAnalysis ? Math.max(selected.maxTokens, config.skillAnalysisMaxTokens)
+          : analyzing || (state.stage === 'catalog' && state.reusableApis.length > 0)
           ? Math.max(selected.maxTokens, config.budgets.query.maxTokens)
           : selected.maxTokens,
       }

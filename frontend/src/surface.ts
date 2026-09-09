@@ -270,7 +270,7 @@ export function blocksFromPayload(payload: UnknownRecord): SurfaceBlock[] {
 
   const taskState = asRecord(payload.task_state);
   const steps = Array.isArray(taskState.steps) ? taskState.steps : [];
-  const processBlock = steps.length && !displayBlocks.some(isProcessBlock)
+  const processBlock = steps.length && !displayBlocks.some(block => isProcessBlock(block) && !block.data?.skill_id)
     ? normalizeBlock({
       event: "block",
       block_id: "runtime_task_progress",

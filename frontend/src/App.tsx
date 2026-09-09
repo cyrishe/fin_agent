@@ -221,7 +221,9 @@ export default function App() {
             ...mergedRun,
             artifacts: reconcileBlockOrder(mergedRun.artifacts, canonicalArtifacts),
             process: settleProcessBlocks(
-              reconcileBlockOrder(mergedRun.process, canonicalProcess),
+              canonicalProcess.length && canonicalProcess.every(block => block.data?.skill_id)
+                ? mergedRun.process
+                : reconcileBlockOrder(mergedRun.process, canonicalProcess),
               mergedRun.status,
             ),
             startedAt,
@@ -458,8 +460,13 @@ export default function App() {
     const target = Array.from(messageNode?.querySelectorAll<HTMLElement>("[data-block-id]") || [])
       .find((node) => node.dataset.blockId === blockId);
     if (!target) return;
+    let disclosure = target.closest("details");
+    while (disclosure) {
+      disclosure.open = true;
+      disclosure = disclosure.parentElement?.closest("details") || null;
+    }
     setRightOpen(false);
-    target.scrollIntoView({ behavior: "smooth", block: "center" });
+    window.requestAnimationFrame(() => target.scrollIntoView({ behavior: "smooth", block: "center" }));
     target.focus({ preventScroll: true });
     target.classList.remove("surface-block-target");
     window.requestAnimationFrame(() => target.classList.add("surface-block-target"));

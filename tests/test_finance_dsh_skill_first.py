@@ -35,6 +35,47 @@ def _context() -> dict:
     }
 
 
+def test_skill_progress_uses_successful_loads_not_generic_zero_row_fallback(tmp_path):
+    notifications = []
+    class Harness:
+        def __init__(self, **kwargs):
+            self.env = kwargs["env"]
+
+        def run(self, prompt, *, session_id, on_notification):
+            def notify(event):
+                on_notification(SimpleNamespace(method="session.event", payload={"event": event}))
+            for call_id, name, payload in [
+                ("s1", "read_finance_skill", {"skills": [{"skill_id": "equity-report-analysis", "method": "正文"}]}),
+                ("s2", "read_finance_skill", {"skills": []}),
+                ("s3", "read_finance_skill", {"error": "unavailable"}),
+                ("ref", "read_finance_skill_reference", {"content": "专业参考"}),
+                ("identity", "resolve_security", {"results": []}),
+            ]:
+                notify({"type": "tool/call", "data": {"callId": call_id, "name": "mcp__finance__" + name, "arguments": {"skill_ids": ["equity-report-analysis"]}}})
+                notify({"type": "tool/result", "data": {"message": {"source": {"callId": call_id}, "content": [{"type": "tool-result", "content": [{"type": "text", "text": json.dumps(payload)}]}]}}})
+            return SimpleNamespace(final_response="有来源的回答", finish_reason="completed", events=[])
+
+        def close(self):
+            pass
+
+    service = FinanceDeepSeekHarnessSessionService(enabled=True, system_tools=_SystemTools(), harness_factory=Harness,
+        root_dir=tmp_path / "runtime", log_path=tmp_path / "trace.jsonl", worker_count=1)
+    context = _context()
+    context["_finance_explicit_skill_ids"] = []
+    context["_finance_explicit_skill_prompt"] = ""
+    context["_finance_skill_snapshot"]["skills"]["equity-report-analysis"]["display_name"] = "研报分析"
+    try:
+        service.run_turn(thread_id=1, owner_id="test", user_text="分析", context=context, event_sink=notifications.append)
+    finally:
+        service.close()
+    loaded = [event for event in notifications if event["metadata"].get("skill_id")]
+    assert len(loaded) == 1
+    assert loaded[0]["metadata"]["display_name"] == "研报分析"
+    assert loaded[0]["metadata"]["status"] == "completed"
+    assert not any("0 条必要明细" in event["content"] for event in notifications)
+    assert any(event["metadata"].get("progress_id") == "s3" and event["metadata"]["status"] == "error" for event in notifications)
+
+
 class _Runtime:
     runtime_scope = "test-runtime"
 

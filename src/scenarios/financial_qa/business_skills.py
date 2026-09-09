@@ -428,6 +428,7 @@ class FinanceBusinessSkillCatalog:
             "revision": self._snapshot.revision,
             "skills": {
                 skill.skill_id: {
+                    "display_name": self.studio_detail(skill.skill_id)["display_name"],
                     "description": skill.description,
                     "method": skill.method,
                     "content_hash": skill.content_hash,
