@@ -1441,7 +1441,7 @@ test('actual Skill loading expands synthesis budget and resets between turns', a
   }
 })
 
-test('Skill budgets retain useful followups through query eight and detail six', async () => {
+test('Skill budgets retain useful followups through query twelve and detail eight', async () => {
   await withSkillContext({}, async () => {
     for (const kind of ['query', 'details']) {
       const runtime = fixture({}, [], SKILL_NAMES)
@@ -1449,13 +1449,30 @@ test('Skill budgets retain useful followups through query eight and detail six',
       completeCall(runtime, 1, 's', SKILL_NAMES.skill, { method: '分析方法' })
       completeCall(runtime, 2, 'c', NAMES.catalog, { mode: 'dataview' })
       if (kind === 'details') completeCall(runtime, 3, 'q', NAMES.query, { ok: true, result_ref: 'session://r', sample_complete: false })
-      const cap = kind === 'query' ? 8 : 6
+      const cap = kind === 'query' ? 12 : 8
       for (let n = 1; n <= cap; n++) {
         completeCall(runtime, n + 3, `${kind}${n}`, NAMES[kind], kind === 'query'
           ? { ok: true, result_ref: `session://r${n}`, sample_complete: true } : { rows: [{}] }, { offset: n })
         assert.match(runtime.prompt(), kind === 'query' && n === cap ? /stage=final/ : /stage=query/)
       }
     }
+  })
+})
+
+test('larger Skill ceilings neither change guidance nor force another model round after success', async () => {
+  await withSkillContext({}, async () => {
+    const prompts = []
+    for (const skillMaxQueryAttempts of [8, 12, 24]) {
+      const runtime = fixture({ skillMaxQueryAttempts }, [], SKILL_NAMES)
+      runtime.event({ type: 'turn/start', data: { turn: 1 } })
+      completeCall(runtime, 1, 's', SKILL_NAMES.skill, { method: '分析方法' })
+      completeCall(runtime, 2, 'c', NAMES.catalog, { mode: 'dataview' })
+      completeCall(runtime, 3, 'q', NAMES.query, { ok: true, result_ref: 'session://r', sample_complete: false })
+      prompts.push(runtime.prompt())
+      runtime.stopping()
+      assert.equal(runtime.steered.length, 0)
+    }
+    assert.equal(new Set(prompts).size, 1)
   })
 })
 

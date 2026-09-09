@@ -16,11 +16,23 @@ from src.scenarios.financial_qa.dsh_mcp_server import FinanceDshMcpBridge
 from src.scenarios.financial_qa.dsh_service import (
     FinanceDeepSeekHarnessSessionService,
     _loop_policy_observability,
+    _merge_loop_policy_config,
 )
 from src.scenarios.financial_qa.runtime import normalize_financial_qa_runtime
 from src.scenarios.financial_qa.service import FinancialQaCcService
 from src.scenarios.financial_qa.tools import FinanceDataQueryCcTools
 from src.services.session_variable_store_service import SessionVariableStoreService
+
+
+def test_skill_call_ceiling_defaults_and_explicit_overrides(monkeypatch):
+    monkeypatch.delenv("FINANCE_DSH_LOOP_POLICY_CONFIG", raising=False)
+    config = _merge_loop_policy_config()
+    assert [config[k] for k in ("skillMaxCatalogAttempts", "skillMaxQueryAttempts", "skillMaxLoadAttempts")] == [16, 12, 8]
+    assert [config[k] for k in ("maxCatalogAttempts", "maxQueryAttempts", "maxLoadAttempts")] == [6, 3, 2]
+    assert config["maxRequiredStageSteers"] == 1
+    monkeypatch.setenv("FINANCE_DSH_LOOP_POLICY_CONFIG", '{"skillMaxQueryAttempts":8}')
+    assert _merge_loop_policy_config()["skillMaxQueryAttempts"] == 8
+    assert _merge_loop_policy_config({"skillMaxQueryAttempts":10})["skillMaxQueryAttempts"] == 10
 
 
 class _Session:

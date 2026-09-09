@@ -191,9 +191,9 @@ export function resolveConfig(input = {}) {
       'maxRequiredStageSteers',
     ),
     businessHint: String(supplied.businessHint ?? DEFAULT_CONFIG.businessHint).trim(),
-    skillMaxCatalogAttempts: positiveInteger(supplied.skillMaxCatalogAttempts, 12, 'skillMaxCatalogAttempts'),
-    skillMaxQueryAttempts: positiveInteger(supplied.skillMaxQueryAttempts, 8, 'skillMaxQueryAttempts'),
-    skillMaxLoadAttempts: positiveInteger(supplied.skillMaxLoadAttempts, 6, 'skillMaxLoadAttempts'),
+    skillMaxCatalogAttempts: positiveInteger(supplied.skillMaxCatalogAttempts, 16, 'skillMaxCatalogAttempts'),
+    skillMaxQueryAttempts: positiveInteger(supplied.skillMaxQueryAttempts, 12, 'skillMaxQueryAttempts'),
+    skillMaxLoadAttempts: positiveInteger(supplied.skillMaxLoadAttempts, 8, 'skillMaxLoadAttempts'),
     skillAnalysisMaxTokens: positiveInteger(supplied.skillAnalysisMaxTokens, 8192, 'skillAnalysisMaxTokens'),
     budgets: Object.fromEntries(
       Object.entries(DEFAULT_BUDGETS).map(([stage, fallback]) => [
