@@ -4,6 +4,8 @@
 
 本文记录已核实的状态、职责和断点，不将方案、历史评测或健康检查当作当前生产效果证明。根目录 `main_framework.md` 是 8 月架构地图，其中版本、运行分支和测试数字已过时；近期状态以本文及对应代码为准。
 
+专项入口：[DSH 查询效率优化 session 交接](financial_qa_dsh_optimization_session_handoff_20260909.md)，包含确定性空结果提前返回、历史等价性实验、未实施优化方向及评测脚本索引。
+
 ## 1. 先看结论
 
 - 主框架近期重点是 **DSH 金融问答、Skill 接入、数据工具执行、完成控制、过程展示和可观测性**。继续以 DSH 为优化主线，CC 保留冻结比较基准，不为兼容 CC 增加复杂度。
@@ -18,7 +20,8 @@
 |---|---|
 | 本地仓库 | `/Volumes/ext/fin_agent` |
 | 分支 | `agent/financial-tool-design-protocol` |
-| 本地、服务器 HEAD | `923a94a7538767aa3a92e1b36b9f1d9f38e32c60` |
+| 已核实的部署业务版本 | `923a94a7538767aa3a92e1b36b9f1d9f38e32c60` |
+| 本次补充交接前的本地 HEAD | `a42ab5f659d55df9dc606a91c7b0f96eefcf98de`；其后交接文档提交以 Git 为准 |
 | GitHub remote | `git@github.com:cyrishe/fin_agent.git` |
 | Codeup remote | `git@codeup.aliyun.com:684beabd28a6beb51d765af2/fin_agent_2c.git` |
 | 服务器 | `che@39.106.248.18` |
@@ -27,7 +30,7 @@
 | API/MCP服务 | `fin-agent-finance-api.service`，端口22054 |
 | 外部入口 | `https://ai-agent.kingdomai.com/fin_agent/` |
 
-本次只读核实：两个服务均 active，启动时间均为 `2026-09-09 19:37:51 CST`；API `/health` 返回 `ok=true`、`default_runtime=dsh`，API key认证已配置。服务器无已跟踪文件修改。健康检查不代表真实问答、MCP或Skill效果已经全链路验证。
+编写初版时只读核实：两个服务均 active，启动时间均为 `2026-09-09 19:37:51 CST`；API `/health` 返回 `ok=true`、`default_runtime=dsh`，API key认证已配置。服务器无已跟踪文件修改。此次补充文档与 Git 推送未重新核实服务器。健康检查不代表真实问答、MCP或Skill效果已经全链路验证。
 
 最近提交：
 
@@ -167,9 +170,9 @@ Excel：[`对话与MCP轮次统计.xlsx`](../../outputs/request_rounds_20260909/
 
 ## 9. 本地资产和接手注意
 
-- 当前已有未跟踪运行目录、评测报告、前端锁文件及PDF等，不属于本次全部产物；不要 `git add .`、清理或覆盖。
+- 当前已有未跟踪运行目录、评测报告、前端锁文件及PDF等；补充交接期间还出现其他前后端已跟踪修改，均不属于本次文档提交范围。不要 `git add .`、清理或覆盖，接手时重新检查工作区。
 - `outputs/`中的Excel与trace不随clone传播。新session在同机器可继续使用；跨机器接手先确认所需证据的授权与保留方式，不批量复制生产数据。
-- 本交接文档是本轮新文件；本轮用户只要求落盘，没有额外提交、推送或部署。
+- 本交接初版已提交为 `a42ab5f`。用户随后明确要求完整落盘并推送；本次补充交接文档按当前分支提交到两个 Git 远端，不部署或重启生产服务。
 
 新 session 可使用以下开场说明：
 
