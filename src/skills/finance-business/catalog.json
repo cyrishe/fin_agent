@@ -11,7 +11,7 @@
       "id": "sector-theme-analysis",
       "category": "market-and-sector",
       "path": "skills/sector-theme-analysis",
-      "description": "分析行业、板块、概念或主题的表现与驱动，适用于板块强弱、热点持续性、领涨与落后公司、事件影响和主题受益关系等问题。结合行情、成交、成分股参与度及业务证据，判断内部分化、催化传导和持续条件。"
+      "description": "分析行业、热点板块与概念主题，适用于寻找近期热点、比较板块强弱、判断热度演变与持续性、识别领涨分化及解释公司受益关系等问题。结合热点事件、行情资金、成分表现和业务证据，区分市场关注、交易表现与产业兑现。"
     },
     {
       "id": "stock-research",
@@ -59,7 +59,7 @@
       "id": "stock-comparison",
       "category": "equity-research",
       "path": "skills/stock-comparison",
-      "description": "比较两只或多只股票，适用于同业对比、寻找可比公司、比较相对优势及判断各自适用投资前提等问题。围绕用户关注点统一期间和指标口径，比较业务、成长、财务、估值、市场表现与风险，解释关键差异、优势及代价。"
+      "description": "比较两只或多只股票，适用于同业竞争、跨行业或不同成长阶段的投资取舍、寻找可比公司及指定指标对比等问题。围绕共同问题结合业务、财务、估值、市场表现与机构预期，按对象差异调整方法，解释相对优势、代价和结论成立条件。"
     },
     {
       "id": "technical-structure-analysis",
@@ -72,6 +72,24 @@
       "category": "equity-research",
       "path": "skills/dividend-analysis",
       "description": "分析公司的现金分红质量，适用于股息水平、分红是否稳定、高股息是否可靠及未来能否持续等问题。区分预案、已实施和特别分红，结合多期利润、现金流、负债与资本需求，判断分红支撑、主要风险和可持续条件。"
+    },
+    {
+      "id": "fund-analysis",
+      "category": "fund-research",
+      "path": "skills/fund-analysis",
+      "description": "分析一只基金或比较多只基金，适用于基金表现、ETF折溢价与交易活跃度、同类产品差异和持有风险等问题。先识别产品与份额类别，结合可用行情、净值和披露材料选择方法；取得持仓、费用或经理信息时进一步分析策略暴露与管理表现。"
+    },
+    {
+      "id": "bond-analysis",
+      "category": "fixed-income",
+      "path": "skills/bond-analysis",
+      "description": "分析单只或多只债券的市场表现与风险，适用于债券价格变化、交易活跃度、发行人风险和债券比较等问题。结合可用行情与已取得的条款材料，按普通债或可转债选择方法，分析收益口径、利率信用风险及转股赎回条件。"
+    },
+    {
+      "id": "capital-flow-analysis",
+      "category": "market-and-sector",
+      "path": "skills/capital-flow-analysis",
+      "description": "分析个股或板块的资金流与交易结构，适用于资金持续流入流出、资金与价格背离、板块资金集中以及两融变化等问题。结合分单资金、成交、行情及按需的融资融券和股东披露，区分短期交易信号、杠杆变化与持有人结构，解释证据及风险。"
     }
   ]
 }

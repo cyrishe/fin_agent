@@ -1,0 +1,4 @@
+interface:
+  display_name: "资金流与交易结构"
+  short_description: "分析个股与板块资金持续性、价量背离、资金集中及两融和股东结构"
+  default_prompt: "使用 $capital-flow-analysis 解释这只股票或板块的资金变化、价量背离与主要风险。"

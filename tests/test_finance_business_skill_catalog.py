@@ -20,6 +20,9 @@ EXPECTED_SKILLS = [
     "stock-comparison",
     "technical-structure-analysis",
     "dividend-analysis",
+    "fund-analysis",
+    "bond-analysis",
+    "capital-flow-analysis",
 ]
 
 

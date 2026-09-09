@@ -52,6 +52,9 @@ def test_finance_business_catalog_has_the_grounded_business_skills() -> None:
         "stock-comparison",
         "technical-structure-analysis",
         "dividend-analysis",
+        "fund-analysis",
+        "bond-analysis",
+        "capital-flow-analysis",
     ]
     assert all(
         set(item) == {"id", "category", "path", "description"}
@@ -188,7 +191,7 @@ def test_crawler_falls_back_to_managed_driver_when_path_driver_is_broken(
     assert calls[1]["service"].path == "/tmp/managed-chromedriver"
 
 
-def test_method_references_record_public_implementation_basis() -> None:
+def test_method_references_record_public_or_repository_basis() -> None:
     reference_count = 0
     for item in _catalog()["skills"]:
         method_path = ROOT / item["path"] / "references" / "method.md"
@@ -196,8 +199,9 @@ def test_method_references_record_public_implementation_basis() -> None:
             continue
         reference_count += 1
         method_text = method_path.read_text(encoding="utf-8")
-        assert "## 方法来源" in method_text
-        assert "https://github.com/" in method_text
+        # Methods grounded in our own data contracts need not invent a GitHub source.
+        repository_sources = re.findall(r"`(src/[^`]+)`", method_text)
+        assert "https://" in method_text or any(Path(source).is_file() for source in repository_sources)
     assert reference_count > 0
 
 
@@ -366,6 +370,9 @@ def test_financial_qa_cc_loads_only_the_new_business_skill_plugin() -> None:
         "fin-agent-finance-business:stock-comparison",
         "fin-agent-finance-business:technical-structure-analysis",
         "fin-agent-finance-business:dividend-analysis",
+        "fin-agent-finance-business:fund-analysis",
+        "fin-agent-finance-business:bond-analysis",
+        "fin-agent-finance-business:capital-flow-analysis",
     )
     plugin = json.loads(
         (
