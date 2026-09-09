@@ -999,8 +999,10 @@ def test_dsh_session_reuses_worker_and_projects_trace(tmp_path: Path) -> None:
     assert created[0].closed is True
 
 
+@pytest.mark.parametrize("partial_failure", [False, True])
 def test_dsh_progress_uses_business_sources_and_real_query_counts(
     tmp_path: Path,
+    partial_failure: bool,
 ) -> None:
     class _Harness:
         def __init__(self, **kwargs) -> None:
@@ -1070,6 +1072,8 @@ def test_dsh_progress_uses_business_sources_and_real_query_counts(
                     }
                 ]
             }
+            if partial_failure:
+                query_args["steps"].append({"goal": "后续筛选", "request": "r2 = stock.report_metric.query() -> unknown_field"})
             notify(
                 {
                     "type": "tool/call",
@@ -1088,6 +1092,9 @@ def test_dsh_progress_uses_business_sources_and_real_query_counts(
                 "row_count": 4,
                 "sample_complete": True,
             }
+            visible_result = ({"validation": {"ok": False, "errors": ["unknown field"]},
+                               "failed_step": 2, "completed_steps": [query_result]}
+                              if partial_failure else query_result)
             notify(
                 {
                     "type": "tool/result",
@@ -1100,7 +1107,7 @@ def test_dsh_progress_uses_business_sources_and_real_query_counts(
                                     "content": [
                                         {
                                             "type": "text",
-                                            "text": json.dumps(query_result),
+                                            "text": json.dumps(visible_result),
                                         }
                                     ],
                                 }
@@ -1149,9 +1156,15 @@ def test_dsh_progress_uses_business_sources_and_real_query_counts(
     titles = [event["metadata"]["title"] for event in events]
     contents = [event["content"] for event in events]
     assert "确认股票 · 研报预测指标" in titles
-    assert "查询股票 · 研报预测指标" in titles
+    assert any(title.startswith("查询股票 · 研报预测指标") for title in titles)
     assert any("取得 4 条记录" in content for content in contents)
     assert all("dataview" not in content and "stock.report" not in content for content in contents)
+    if partial_failure:
+        assert not any("0 条记录" in content for content in contents)
+        success = next(event for event in events if "取得 4 条记录" in event["content"])
+        failure = next(event for event in events if "查询未完成：后续筛选" in event["content"])
+        assert success["metadata"]["status"] == "completed"
+        assert failure["metadata"]["status"] == "error"
 
 
 def test_dsh_runs_ten_independent_sessions_concurrently_without_context_leakage(

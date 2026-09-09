@@ -166,8 +166,9 @@ def execute_financial_3_table_api(*, subject: str, args: Mapping[str, Any], outp
     if pf.condition(args) is not None and post_process:
         filter_columns = [p["field"] for p in pf.predicates(pf.condition(args)) if p["field"] in source.fields]
         query_columns = list(dict.fromkeys([*query_columns, *filter_columns]))
-    sql = _build_sql(source=source, columns=query_columns, where_sql=where_sql, order_sql=order_sql)
-    params.append(sql_limit)
+    sql = _build_sql(source=source, columns=query_columns, where_sql=where_sql, order_sql=order_sql, limited=sql_limit > 0)
+    if sql_limit > 0:
+        params.append(sql_limit)
 
     db = StockInfoDbUtils(database="kingdomai")
     try:
@@ -181,7 +182,7 @@ def execute_financial_3_table_api(*, subject: str, args: Mapping[str, Any], outp
         rows = [_normalize_row(row, processing_columns) for row in raw_rows]
         rows = _filter_post_rows(source=source, args=args, rows=rows)
         rows = _sort_post_rows(args=args, rows=rows)
-        if post_process:
+        if post_process and limit > 0:
             rows = rows[:limit]
         rows = [_project_row(row, columns) for row in rows]
         return _standard_result(
@@ -286,12 +287,16 @@ def _bounded_limit(value: Any) -> int:
         parsed = int(value)
     except Exception:
         parsed = 100
+    if parsed == -1:
+        return -1
     if parsed <= 0:
         parsed = 100
     return max(1, min(parsed, 500))
 
 
 def _candidate_limit(output_limit: int) -> int:
+    if output_limit == -1:
+        return -1
     return max(output_limit, min(max(output_limit * 20, 1000), 10000))
 
 
@@ -460,7 +465,7 @@ def _build_order(*, source: FinancialSource, args: Mapping[str, Any]) -> str:
     return f"{expression} {direction_sql}, i.report_period DESC, i.ann_date DESC"
 
 
-def _build_sql(*, source: FinancialSource, columns: List[str], where_sql: str, order_sql: str) -> str:
+def _build_sql(*, source: FinancialSource, columns: List[str], where_sql: str, order_sql: str, limited: bool = True) -> str:
     select_sql = ", ".join(f"{source.fields[column]} AS `{column}`" for column in columns)
     return f"""
         SELECT {select_sql}
@@ -479,7 +484,7 @@ def _build_sql(*, source: FinancialSource, columns: List[str], where_sql: str, o
            AND fi.report_period = i.report_period
         WHERE {where_sql}
         ORDER BY {order_sql}
-        LIMIT %s
+        {'LIMIT %s' if limited else ''}
     """
 
 

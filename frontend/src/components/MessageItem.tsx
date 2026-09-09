@@ -63,7 +63,10 @@ export default function MessageItem({ message, interactionDrafts, selectedIntera
           {message.attachments?.length ? <div className="message-attachments">{message.attachments.map((attachment) => attachment.preview_url ? <img src={attachment.preview_url} alt={attachment.file_name || "附件"} key={attachment.attachment_id || attachment.preview_url} /> : <div className="message-file" key={attachment.attachment_id || attachment.file_name}><FileText size={18} /><span>{attachment.file_name || "附件"}</span></div>)}</div> : null}
           {run && <div className="agent-run-content">
             <SkillActivity run={run} payload={message.payload} />
-            {run.status === "running" && run.artifacts.length === 0 && <div className="answer-pending"><span className="pulse-dot" /><span>{run.summary}</span></div>}
+            {run.status === "running" && <div className="answer-pending" role="status" aria-live="polite" aria-atomic="true">
+              <div className="answer-pending-heading"><span className="spinner" aria-hidden="true" /><strong>正在处理…</strong><span>本轮尚未完成</span></div>
+              {run.summary && <p>最新进展：{run.summary}</p>}
+            </div>}
             {run.status === "running" ? <>
               {firstArtifact ? renderBlock(firstArtifact) : null}
               <TurnProcess run={run} />

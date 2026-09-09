@@ -3,7 +3,8 @@
 ## 读取结果
 
 - 系统保存完整结果与血缘；工具返回本次新完成步骤的 schema、sample、`step_evidence` 和 `result_ref`。
-- `sample_complete=true` 表示样例已经覆盖全部结果。回答需要样例之外的内容时，用 `load_finance_result` 按必要列读取明细。
+- `sample_complete=true` 表示样例已经覆盖全部结果，仅描述展示范围。
+- `load_finance_result` 的 `filter`、`order` 在完整已保存表上执行后分页，`columns` 选择返回列；过滤沿用查询协议，字段使用结果列名。原始结果与其列集合引用保持不变。
 - 已返回的身份列可继续作为后续对象范围；某个指标缺值时，其他有值字段及其引用仍然可用。
 
 ## 判断完成与恢复

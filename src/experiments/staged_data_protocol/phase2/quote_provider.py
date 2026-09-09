@@ -400,7 +400,7 @@ def execute_kd_quote_api(
         )
 
     k = _bounded_k(args.get("k"))
-    limit = _bounded_limit(args.get("limit"))
+    limit = _bounded_limit(args.get("limit"), allow_all=True)
     identity_sql, identity_params = _build_identity_where(source=source, args=args)
     sql = _build_kd_aggregate_sql(source=source, field=field, method=method, identity_sql=identity_sql)
     market_code = _calendar_market_code(args)
@@ -526,11 +526,13 @@ def _has_unresolved_ref(args: Mapping[str, Any]) -> bool:
     return pf.has_unresolved_refs(args)
 
 
-def _bounded_limit(value: Any) -> int:
+def _bounded_limit(value: Any, *, allow_all: bool = False) -> int:
     try:
         parsed = int(value)
     except Exception:
         parsed = 100
+    if parsed == -1 and allow_all:
+        return -1
     if parsed <= 0:
         parsed = 100
     return max(1, min(parsed, 500))

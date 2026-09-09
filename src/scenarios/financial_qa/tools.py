@@ -8,10 +8,11 @@ from pathlib import Path, PurePosixPath
 from typing import Any, Callable, Dict, List, Mapping, Optional
 
 from src.experiments.staged_data_protocol.phase2.models import ResultHandle
-from src.experiments.staged_data_protocol.phase2.catalog import OPERATION_DESCRIPTIONS
+from src.experiments.staged_data_protocol.phase2.catalog import OPERATION_DESCRIPTIONS, catalog_source
 from src.experiments.staged_data_protocol.phase2.trade_date_resolver import TradeDateResolver
 from src.backtest import BacktestError
 from src.scenarios.financial_qa.result_registry import FinanceResultRegistry
+from src.scenarios.financial_qa.result_view import select_result_page
 from src.scenarios.financial_qa.query_recovery import (
     provider_retry_allowed,
     query_recovery,
@@ -1308,8 +1309,9 @@ class FinanceDataQueryCcTools:
         @tool(
             "load_finance_result",
             (
-                "按 result_ref 读取本会话已保存结果的一页数据，选择本次分析或后续查询所需的列。"
-                "sample_complete=true 表示摘要样例已包含全部记录，可直接使用；其余结果按需分页读取。"
+                "已保存结果的筛选、排序与明细读取入口。filter 支持结果列条件和 rN.column 集合引用，"
+                "order 排序，columns 选择返回列；程序在完整已存表上筛选排序后，按 offset、limit 返回一页。"
+                "过滤沿用数据查询协议，字段使用结果列名。原始 result_ref 与 rN 集合保持不变。"
             ),
             {
                 "type": "object",
@@ -1317,6 +1319,8 @@ class FinanceDataQueryCcTools:
                     "result_ref": {"type": "string", "minLength": 1, "maxLength": 200},
                     "offset": {"type": "integer", "minimum": 0},
                     "limit": {"type": "integer", "minimum": 1, "maximum": 50},
+                    "filter": {"type": "string", "maxLength": 4000, "description": str(catalog_source().get("filter_syntax") or "")},
+                    "order": {"type": "string", "maxLength": 500, "description": "结果列名 asc/desc，多个排序字段以逗号分隔。"},
                     "columns": {
                         "type": "array",
                         "maxItems": 20,
@@ -1334,6 +1338,7 @@ class FinanceDataQueryCcTools:
                 {
                     "tool": "load_finance_result",
                     "result_ref": result_ref,
+                    **{key: args[key] for key in ("filter", "order", "offset", "limit", "columns") if key in args},
                     **(
                         {"result_name": requested_ref}
                         if requested_ref and requested_ref != result_ref
@@ -1357,12 +1362,22 @@ class FinanceDataQueryCcTools:
                     )
                 except (TypeError, ValueError):
                     default_limit = 10
-                payload = self.result_store.load_data_ref(
-                    session_id=tool_runtime.result_scope,
-                    data_ref=result_ref,
-                    offset=int(args.get("offset") or 0),
-                    limit=int(args.get("limit") or default_limit),
-                )
+                if _trim(args.get("filter")) or _trim(args.get("order")):
+                    # Ownership is verified by the existing store before any
+                    # materialization; only the selected page reaches the LLM.
+                    payload = select_result_page(
+                        self.result_store.materialize_data_ref(session_id=tool_runtime.result_scope, data_ref=result_ref),
+                        filter_text=_trim(args.get("filter")), order=_trim(args.get("order")),
+                        offset=int(args.get("offset") or 0), limit=int(args.get("limit") or default_limit),
+                        previous_results=tool_runtime.result_handles,
+                    )
+                else:
+                    payload = self.result_store.load_data_ref(
+                        session_id=tool_runtime.result_scope,
+                        data_ref=result_ref,
+                        offset=int(args.get("offset") or 0),
+                        limit=int(args.get("limit") or default_limit),
+                    )
                 raw_columns = (
                     args.get("columns")
                     if isinstance(args.get("columns"), list)
@@ -1374,6 +1389,8 @@ class FinanceDataQueryCcTools:
                     if _trim(item)
                 ]
                 result_payload: Dict[str, Any] = {"result_ref": result_ref}
+                if "selection" in payload:
+                    result_payload["selection"] = payload["selection"]
                 page = payload.get("page")
                 if isinstance(page, Mapping):
                     result_payload["page"] = dict(page)

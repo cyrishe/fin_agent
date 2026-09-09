@@ -2041,3 +2041,22 @@ def test_chat_dispatch_keeps_an_existing_planned_run_outside_financial_cc(
 
     assert result["mode"] == "tool_plan_result"
     assert result["message"] == "既有计划执行完成"
+
+
+def test_saved_result_read_filters_before_projection_and_keeps_original(tmp_path: Path) -> None:
+    _, _, tool_runtime, tools, _, _ = _tools(tmp_path)
+    result = _payload(asyncio.run(tools["finance_query"].handler({"steps": [{
+        "goal": "读取行情", "request": "result = stock.quote() -> stock_code, stock_name, close",
+    }]})))
+    args = {"result_ref": result["result_ref"], "columns": ["stock_name"], "filter": "close > 1000", "order": "close desc", "limit": 1}
+    selected = _payload(asyncio.run(tools["load_finance_result"].handler(args)))
+    assert selected["rows"] == [{"stock_name": "贵州茅台"}]
+    assert selected["selection"]["source_row_count"] == 1
+    assert selected["page"]["total"] == 1
+    assert set(tool_runtime.result_handles) == {"r1"}
+    empty = _payload(asyncio.run(tools["load_finance_result"].handler({**args, "filter": "close < 0"})))
+    assert empty["rows"] == []
+    original = _payload(asyncio.run(tools["load_finance_result"].handler({"result_ref": "r1"})))
+    assert len(original["rows"]) == 1
+    denied = _payload(asyncio.run(tools["load_finance_result"].handler({**args, "result_ref": "session://another-user/vars/v1"})))
+    assert "error" in denied

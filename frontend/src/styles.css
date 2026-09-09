@@ -153,7 +153,12 @@ details[open] > summary .reference-chevron { transform: rotate(90deg); }
 .report-export-row > a { flex: 0 0 auto; min-height: 31px; padding: 0 11px; border: 1px solid #9dd2dc; border-radius: 8px; display: inline-flex; align-items: center; gap: 5px; color: #0b7893; background: #fff; font-size: 10px; font-weight: 700; text-decoration: none; transition: border-color .16s ease, box-shadow .16s ease, transform .16s ease; }
 .report-export-row > a:hover { border-color: #48b8cc; box-shadow: 0 5px 14px rgba(23, 143, 168, .12); transform: translateY(-1px); }
 .report-export-row > a:focus-visible { outline: 2px solid #2aa9c2; outline-offset: 2px; }
-.answer-pending { display: inline-flex; align-items: center; gap: 9px; color: #647188; font-size: 12px; padding: 7px 0; }
+.answer-pending { border: 1px solid #bfe2e8; border-radius: 10px; padding: 12px 14px; color: #426071; background: #f0fafb; }
+.answer-pending-heading { display: flex; flex-wrap: wrap; align-items: center; gap: 9px; }
+.answer-pending-heading strong { color: #087894; font-size: 13px; }
+.answer-pending-heading > span:last-child { color: #607b8a; font-size: 11px; }
+.answer-pending .spinner { flex-shrink: 0; }
+.answer-pending p { margin: 7px 0 0; font-size: 12px; line-height: 1.6; overflow-wrap: anywhere; }
 .pulse-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--blue); animation: pulse 1.3s infinite; }
 @keyframes pulse { 50% { box-shadow: 0 0 0 7px rgba(47,100,214,0); opacity: .65; } 0%, 100% { box-shadow: 0 0 0 0 rgba(47,100,214,.22); } }
 .surface-block { border: 1px solid var(--line); border-radius: 12px; background: #fff; overflow: hidden; box-shadow: 0 3px 12px rgba(27,42,71,.035); }
@@ -1229,6 +1234,24 @@ body {
 
 .turn-process-heading strong {
   font-size: 10px;
+}
+
+.turn-process-active {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  flex-shrink: 0;
+  padding: 3px 7px;
+  border-radius: 999px;
+  color: #087894;
+  background: #dff3f7;
+  font-size: 10px;
+}
+
+.turn-process-active .spinner { width: 11px; height: 11px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .answer-pending .spinner, .turn-process-active .spinner, .run-status-card .spinner { animation: none; }
 }
 
 .turn-process-summary {

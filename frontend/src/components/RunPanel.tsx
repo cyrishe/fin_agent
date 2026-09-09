@@ -25,7 +25,7 @@ export default function RunPanel({ run, onClose, onArtifactSelect }: Props) {
       <div className="run-panel-head"><div><Activity size={17} /><strong>运行过程</strong></div>{onClose && <button className="icon-button mobile-only" onClick={onClose} aria-label="关闭运行面板"><PanelRightClose size={18} /></button>}</div>
       {!run ? <div className="run-empty"><div><Terminal size={21} /></div><strong>等待任务开始</strong><p>Agent 的阶段状态和精简过程会显示在这里，正式结果保留在主对话中。</p></div> : <div className="run-detail">
         <div className={`run-status-card ${run.status}${awaiting ? " awaiting" : ""}`} role="status" aria-live="polite">
-          <div>{run.status === "done" && !awaiting ? <CheckCircle2 size={19} /> : run.status === "error" ? <XCircle size={19} /> : <Clock3 size={19} />}<span>{statusLabel}</span></div>
+          <div>{run.status === "running" ? <span className="spinner" aria-hidden="true" /> : run.status === "done" && !awaiting ? <CheckCircle2 size={19} /> : run.status === "error" ? <XCircle size={19} /> : <Clock3 size={19} />}<span>{statusLabel}</span></div>
           <p>{awaiting ? "结果已经生成，请在主对话中确认下一步。" : run.summary}</p>
         </div>
         <SkillActivity run={run} />

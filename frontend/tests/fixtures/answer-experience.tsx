@@ -30,14 +30,21 @@ const table: SurfaceBlock = { block_id: "financial_rows", block_type: "data", ki
 const skill: SurfaceBlock = { block_id: "runtime_skill_example", block_type: "status", title: "加载方法 · 财报分析", content: "已加载专业方法，用于指导本轮取证与分析。", data: { role: "process", status: "completed", skill_id: "earnings-analysis", display_name: "财报分析" } };
 function Fixture() {
   const [mode, setMode] = useState("done");
-  const run: AgentRun = mode === "loading" ? applyStreamEvent(initialRun("正在按专业方法取证"), { event: "block", ...skill }) : {
+  const queryDone = applyStreamEvent(applyStreamEvent(initialRun(), { event: "block", ...skill }), {
+    event: "block", block_id: "query", block_type: "status", title: "查询年度财务数据",
+    content: "已查询示例企业年度财务数据，取得 22 条记录。", data: { role: "process", status: "completed" },
+  });
+  const run: AgentRun = mode === "loading" ? applyStreamEvent(initialRun("正在按专业方法取证"), { event: "block", ...skill })
+    : mode === "processing" ? queryDone
+    : mode === "partial" ? { ...queryDone, artifacts: [answer, table] }
+    : mode === "error" ? applyStreamEvent(queryDone, { event: "error", message: "示例：连接已中断，请重试。" }) : {
     status: "done", summary: "本轮处理完成", durationMs: 49000,
     artifacts: mode === "data" ? [table] : [answer, table, { ...table, block_id: "segment_rows", title: "业务分部明细" }],
     process: mode === "data" ? [] : [skill, { block_id: "query", block_type: "status", title: "查询年度财务数据", content: "已取得 22 条示例记录。", data: { role: "process", status: "completed" } }],
   };
   const noop = () => undefined;
   return <div style={{ height: "100vh", overflow: "auto", background: "#f7fafc" }}>
-    <header style={{ padding: "16px 24px", display: "flex", flexWrap: "wrap", gap: 12, alignItems: "center" }}><strong>分析体验验收</strong><span>虚构数据 · 不连接生产</span>{[["done", "已完成分析"], ["loading", "模拟 Skill 加载"], ["data", "纯取数"]].map(([key, label]) => <button key={key} onClick={() => setMode(key)}>{label}</button>)}</header>
+    <header style={{ padding: "16px 24px", display: "flex", flexWrap: "wrap", gap: 12, alignItems: "center" }}><strong>分析体验验收</strong><span>虚构数据 · 不连接生产</span>{[["done", "已完成分析"], ["loading", "模拟 Skill 加载"], ["processing", "取数后继续处理"], ["partial", "已有结果仍在处理"], ["error", "请求失败"], ["data", "纯取数"]].map(([key, label]) => <button key={key} onClick={() => setMode(key)}>{label}</button>)}</header>
     <main style={{ display: "flex", maxWidth: 1300, margin: "0 auto", padding: 16, gap: 20 }}>
       <div style={{ flex: 1, minWidth: 0 }}><MessageItem key={mode} message={{ id: "fixture", role: "assistant", content: "", run, createdAt: Date.now() }} interactionDrafts={{}} selectedInteractions={{}} submittedInteractions={new Set()} disabled={false} onDraftChange={noop} onRequestCustomAnswer={noop} onClearCustomAnswer={noop} onSubmitDraft={noop} onInteraction={noop} onRequestFeedback={noop} onSubmitFeedback={noop} onUseAsset={noop} /></div>
       <div className="fixture-sidebar" style={{ width: 300, flexShrink: 0, background: "#eff5f8" }}><RunPanel run={run} /></div>

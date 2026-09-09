@@ -55,7 +55,7 @@ const DEFAULT_CONFIG = Object.freeze({
   emptyResultEarlyStop: true,
   maxCatalogAttempts: 6,
   maxQueryAttempts: 3,
-  maxQueryRepairs: 1,
+  maxQueryRepairs: 1, // Legacy configuration accepted; total query attempts bound repairs.
   maxLoadAttempts: 2,
   duplicateCallLimit: 1,
   maxRequiredStageSteers: 1,
@@ -74,7 +74,7 @@ const STAGE_PROMPTS = Object.freeze({
   repair:
     '上一查询未成功，本阶段可修复一次。依据返回的 recovery 与已加载契约修正失败步骤，保留用户目标和已成功结果。',
   details:
-    '查询已经成功。现有样例足以回答时直接完成；答案需要样例之外的内容时，用 load_finance_result 按必要列读取明细后完成。',
+    '按已有结果与本轮目标选择下一步；已保存结果可按 filter、order、columns 读取所需范围。',
   final:
     '工具阶段已经结束。依据已有结果与执行证据，用简洁中文给出最终答案。数据不足时交代已查范围、实际缺口及尚待确定的结论；零行如实说明当前条件未匹配记录。',
 })
@@ -467,11 +467,6 @@ function missingCatalogApis(state, args) {
   }))
 }
 
-function canReuseCatalog(state, args) {
-  return state.stage === 'catalog' && state.reusableApis.length > 0
-    && requestTargets(args).length > 0 && missingCatalogApis(state, args).length === 0
-}
-
 function querySucceeded(payload, failed) {
   return !failed && payload !== null && typeof payload === 'object' && payload.ok === true
 }
@@ -479,14 +474,6 @@ function querySucceeded(payload, failed) {
 function summaries(payload) {
   if (payload === null || typeof payload !== 'object') return []
   return Array.isArray(payload.steps) ? payload.steps : [payload]
-}
-
-function queryNeedsDetails(payload) {
-  return summaries(payload).some(item => item !== null
-    && typeof item === 'object'
-    && item.sample_complete === false
-    && typeof item.result_ref === 'string'
-    && item.result_ref.length > 0)
 }
 
 function queryIsPreparatory(payload) {
@@ -555,17 +542,28 @@ function promptFor(state, config) {
   if (!state.methodReady) {
     return `[FINANCE_LOOP stage=catalog reason=${state.reason}]\n[FINANCE_EXECUTION mode=${state.executionMode}]\n先按本轮方法选择规则判断：需要专业方法时用 read_finance_skill 加载；直接取数时用 read_finance_catalog 定位数据执行包。依据返回内容继续。`
   }
+  if (state.executionMode === 'standard' && state.stage !== 'final') {
+    return `[FINANCE_LOOP stage=${state.stage} reason=${state.reason}]\n[FINANCE_EXECUTION mode=standard]\n`
+      + '依据本轮目标与执行结果选择下一步。已确定的查询及依赖合并到 finance_query.steps；新方法先加载执行包。'
+      + (state.dataOnlyRequested ? '\n仅数据模式通过 data_request_complete 交付取数完成声明。' : '')
+      + (config.businessHint ? `\n${config.businessHint}` : '')
+  }
   const prompts = state.executionMode === 'fast' ? FAST_STAGE_PROMPTS : STAGE_PROMPTS
   let base = state.stage === 'catalog' && state.reusableApis.length > 0
     ? '按本轮问题更新对象、指标、时间与结果粒度。仍可见且版本有效的目录可以复用，按本轮条件调用 finance_query；需要新视图或方法时用 read_finance_catalog 加载对应契约。'
     : prompts[state.stage] ?? prompts.final
+  if (state.executionMode === 'standard' && state.reason === 'data_request_complete') {
+    base = '本轮已声明取数完成，依据已有证据完成回答；需要补充证据时仍可使用已授权工具。'
+  }
   if (skillGuidedAnswer(state)) {
     if (state.stage === 'catalog') {
       base += '\n按需读取适用 Skill 与参考，确定取证范围和分析方法。'
     } else if (['query', 'details'].includes(state.stage)) {
       base += '\n结合适用 Skill 与已有证据完成分析；需要新数据时加载对应执行包。'
     } else if (state.stage === 'final') {
-      base = '本轮取数预算已结束。可按需读取 Skill 及其参考，依据已有结果完成分析与回答，交代证据缺口与推断条件。'
+      base = state.reason === 'data_request_complete'
+        ? '本轮已声明取数完成，依据已有证据完成分析；需要补充证据时仍可使用已授权工具。'
+        : '本轮查询调用额度已用完。依据已有结果完成回答，并保留未完成的取数范围。'
     }
   }
   if (state.dataOnlyRequested || hasDataOnlyResults(state)) {
@@ -583,32 +581,21 @@ function stageTools(state, tools) {
   if (!state.methodReady) return [tools.skill, tools.catalog].filter(Boolean)
   const methods = state.stage === 'final' && state.dataOnlyRequested
     ? [] : [tools.skill, tools.reference].filter(Boolean)
-  let allowed
-  switch (state.stage) {
-    case 'catalog': allowed = state.reusableApis.length > 0 ? [tools.catalog, tools.query] : [tools.catalog]; break
-    case 'query': allowed = hasDataOnlyResults(state) || (state.executionMode === 'standard' && skillGuidedAnswer(state))
-      ? [tools.catalog, tools.query, tools.details]
-      : state.executionMode === 'standard' ? [tools.catalog, tools.query] : [tools.query]; break
-    case 'repair': allowed = [tools.catalog, tools.query]; break
-    case 'details': allowed = state.executionMode === 'standard' && skillGuidedAnswer(state)
-      ? [tools.catalog, tools.query, tools.details] : [tools.details]; break
-    default: allowed = []
+  // In standard mode, stages describe progress/budget profiles, not a forced
+  // business workflow. The guard still checks each API's visible contract.
+  if (state.executionMode === 'standard') {
+    if (state.stage === 'final' && (state.reason !== 'data_request_complete' || state.dataOnlyRequested)) return methods
+    return [...methods, tools.catalog, tools.query, tools.details, tools.identity].filter(Boolean)
   }
-  if (tools.identity && ['catalog', 'query', 'repair', 'details'].includes(state.stage)) allowed.push(tools.identity)
+  // Fast mode remains the explicit one-discovery/one-flow product contract.
+  const allowed = state.stage === 'catalog' ? [tools.catalog]
+    : state.stage === 'query' ? [tools.query] : []
+  if (tools.identity && state.stage !== 'final') allowed.push(tools.identity)
   return [...methods, ...allowed]
 }
 
-function stageAllows(state, kind, args) {
-  if (!state.methodReady) return kind === 'skill' || kind === 'catalog'
-  if (kind === 'skill' || kind === 'reference') return state.stage !== 'final' || !state.dataOnlyRequested
-  if (kind === 'identity') return ['catalog', 'query', 'repair', 'details'].includes(state.stage)
-  if (state.stage === 'catalog') return kind === 'catalog' || (kind === 'query' && canReuseCatalog(state, args))
-  if (state.executionMode === 'standard' && skillGuidedAnswer(state) && ['query', 'details'].includes(state.stage)) return ['catalog', 'query', 'details'].includes(kind)
-  if (state.stage === 'query' && hasDataOnlyResults(state)) return ['catalog', 'query', 'details'].includes(kind)
-  if (state.executionMode === 'standard' && ['query', 'repair'].includes(state.stage) && kind === 'catalog') return true
-  if (state.stage === 'query' || state.stage === 'repair') return kind === 'query'
-  if (state.stage === 'details') return kind === 'details'
-  return false
+function stageAllows(state, kind) {
+  return stageTools(state, TOOL_SUFFIXES).includes(TOOL_SUFFIXES[kind])
 }
 
 function usesSkillAnalysis(state) {
@@ -742,16 +729,14 @@ function updateAfterStep(state, step, config) {
     // request.  A success must not hide that repairable failure.
     if (failures.length > 0) {
       state.queryFailures += 1
-      if (state.queryFailures <= config.maxQueryRepairs
-        && state.queryAttempts < config.maxQueryAttempts) {
+      // Bound total work, not the number of unrelated mistakes across a task.
+      if (state.queryAttempts < config.maxQueryAttempts) {
         state.stage = 'repair'
         state.reason = 'query_repair_allowed'
         state.requiredAction = true
       } else {
         state.stage = 'final'
-        state.reason = state.queryAttempts >= config.maxQueryAttempts
-          ? 'query_attempt_limit'
-          : 'query_repair_limit'
+        state.reason = 'query_attempt_limit'
         state.requiredAction = false
       }
     } else if (missing.length > 0) {
@@ -780,11 +765,12 @@ function updateAfterStep(state, step, config) {
         // DB call merely because the model is done or declines more analysis.
         state.requiredAction = false
       } else {
-        state.stage = queryNeedsDetails(success.payload) ? 'details'
-          : skillGuidedAnswer(state) && state.queryAttempts < config.maxQueryAttempts ? 'query' : 'final'
-        state.reason = state.stage === 'details'
-          ? 'query_success_sample_incomplete'
-          : 'query_success_sample_complete'
+        const complete = outcomes.length === queries.length
+          && outcomes.every(outcome => outcome.payload?.data_request_complete === true)
+        const exhausted = state.queryAttempts >= config.maxQueryAttempts
+        state.stage = complete || exhausted ? 'final' : 'query'
+        state.reason = complete ? 'data_request_complete'
+          : exhausted ? 'query_attempt_limit' : 'query_succeeded'
         state.requiredAction = false
       }
     } else {
@@ -797,6 +783,11 @@ function updateAfterStep(state, step, config) {
 
   const loads = calls.filter(call => call.kind === 'details')
   if (loads.length > 0) {
+    if (state.executionMode === 'standard') {
+      // Reading a page changes visible evidence, not task completion. In
+      // particular it cannot erase an earlier explicit unfinished flow.
+      return
+    }
     if (hasDataOnlyResults(state)) {
       state.stage = 'query'
       state.reason = 'data_only_followup_allowed'
@@ -971,7 +962,7 @@ export function apply(ctx, input = {}) {
       const limits = executionLimits(state, config)
       const kind = toolKind(exec.name, tools)
       if (kind === 'unknown') return undefined
-      if (state.methodReady && kind === 'query' && state.stage !== 'final') {
+      if (state.methodReady && kind === 'query' && stageAllows(state, kind, exec.arguments)) {
         const missing = missingCatalogApis(state, exec.arguments)
         if (missing.length) return `当前阶段先用 read_finance_catalog 读取这些方法的执行包：${[...new Set(missing)].join('、')}。包内包含参数和字段；加载后提交原查询流。`
       }
@@ -983,7 +974,7 @@ export function apply(ctx, input = {}) {
       // include this attempt. Admit the last budgeted call, reject the next.
       if ((kind === 'catalog' && state.catalogAttempts > limits.maxCatalogAttempts)
         || (kind === 'query' && state.queryAttempts > limits.maxQueryAttempts)
-        || ((hasDataOnlyResults(state) || skillGuidedAnswer(state)) && kind === 'details' && state.loadAttempts > limits.maxLoadAttempts)
+        || (kind === 'details' && state.loadAttempts > limits.maxLoadAttempts)
       ) return '本轮该类读取次数已达上限；请使用已有数据与当前可用工具完成剩余目标。'
       if (kind === 'catalog') {
         const routeError = concreteCatalogRouteError(exec.arguments)
@@ -1106,15 +1097,33 @@ export function apply(ctx, input = {}) {
     agent.ctx.on('agent/turn-stopping', ({ agent: subject, turn }) => {
       if (turn !== state.turn) return
       if (state.executionMode === 'fast') return
-      const needsRequiredAction = state.requiredAction
+      const queries = [...state.calls.values()].filter(call => call.kind === 'query' && call.allowedAtCall)
+      const lastStep = Math.max(0, ...queries.map(call => call.step))
+      const unfinished = queries.filter(call => call.step === lastStep).flatMap(call => {
+        const outcome = state.results.get(call.callId)
+        if (!outcome || querySucceeded(outcome.payload, outcome.failed)
+          && outcome.payload?.data_request_complete !== false) return []
+        return [{
+          completed_steps: (outcome.payload?.completed_steps ?? summaries(outcome.payload)).filter(item => item?.result_ref).map(item => item.result_ref),
+          failed_step: outcome.payload?.failed_step,
+          data_request_complete: outcome.payload?.data_request_complete,
+          remaining: outcome.payload?.failed_step
+            ? (call.steps ?? []).slice(outcome.payload.failed_step - 1).map(item => item.goal) : undefined,
+          error: outcome.payload?.validation?.errors ?? outcome.payload?.error,
+        }]
+      })
+      const exhausted = state.stage === 'final' && state.reason !== 'data_request_complete'
+      const needsRequiredAction = !exhausted && (unfinished.length > 0 || state.requiredAction)
       const needsFinalAnswer = state.stage === 'final'
         && !state.dataOnlyRequested
         && !state.finalAnswerAttempted
         && !state.dataOnlyComplete
       if (!needsRequiredAction && !needsFinalAnswer) return
-      const prompt = requiredActionPrompt(state, tools)
+      const prompt = unfinished.length > 0 && !exhausted
+        ? `本轮执行记录：${JSON.stringify(unfinished)}。依据这些记录继续处理，或说明本次交付范围及缺口。`
+        : requiredActionPrompt(state, tools)
       if (!prompt) return
-      const key = `${state.stage}:${state.reason}`
+      const key = 'turn-completion-audit'
       const count = state.stageSteers.get(key) ?? 0
       if (count >= config.maxRequiredStageSteers) return
       state.stageSteers.set(key, count + 1)
@@ -1129,7 +1138,11 @@ export function apply(ctx, input = {}) {
       }
       if (event.type === 'tool/call' && event.data.turn === state.turn) {
         const kind = toolKind(event.data.name, tools)
-        const missingApis = kind === 'query' && state.methodReady && state.stage !== 'final'
+        let args = event.data.arguments
+        if (typeof args === 'string') {
+          try { args = JSON.parse(args) } catch { args = {} }
+        }
+        const missingApis = kind === 'query' && state.methodReady && stageAllows(state, kind, event.data.arguments)
           ? missingCatalogApis(state, event.data.arguments) : []
         const allowed = stageAllows(state, kind, event.data.arguments) && missingApis.length === 0
         state.calls.set(event.data.callId, {
@@ -1139,6 +1152,7 @@ export function apply(ctx, input = {}) {
           kind,
           allowedAtCall: allowed,
           missingApis,
+          steps: kind === 'query' && Array.isArray(args?.steps) ? args.steps : [],
         })
         if (allowed) {
           if (!state.dataOnlyRequested || !['skill', 'reference'].includes(kind)) state.requiredAction = false

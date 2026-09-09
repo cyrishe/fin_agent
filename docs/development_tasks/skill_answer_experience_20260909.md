@@ -35,3 +35,12 @@
 - `frontend/src/components/SkillActivity.tsx`：专业方法提示。
 - `frontend/src/components/AnswerEvidence.tsx`：参考数据分组与按需展开。
 - `frontend/src/components/MessageItem.tsx`、`BlockRenderer.tsx`、`MarkdownContent.tsx`：回答布局与渲染。
+
+## 2026-09-09 补充：取数后等待阶段
+
+- 根因：`applyStreamEvent` 将最新工具完成内容保存在 `run.summary`，主回答原样显示该内容，容易看成整轮完成；原提示还受 `artifacts.length === 0` 限制，出现任何结果后就隐藏。过程节点的完成状态本身没有错误。
+- 修复：整轮 `run.status === running` 时，主回答持续显示动态标识、“正在处理… / 本轮尚未完成”和最新进展。过程折叠标题显示“进行中”，侧栏运行卡同样使用动态标识。只使用现有请求状态；不新增业务状态、推理节点、提示词或进度百分比。
+- 收到 `done/run.finished` 或 `error/stream.error` 后移除运行提示；保留已完成步骤的真实结果。断流仍由现有 EventSource 错误处理结束运行。
+- 当前本地工作树验证：前端 124 项测试、TypeScript 检查、Vite 构建通过（保留既有大 chunk 警告）。新增 7 项主回答回归，覆盖首事件前、取数完成后、已有部分回答和终态。
+- 浏览器使用同一虚构数据验收页，核对等待、已有结果、折叠、完成和失败；390px 视口的文档宽度与滚动宽度均为 390px，未见错误覆盖层或控制台错误。CLI 浏览器在快照阶段无响应，改用应用内浏览器完成验收。
+- 本次补充仅本地实现和验证，未提交、推送或更新服务器；无真实模型／生产数据评测。

@@ -1152,7 +1152,10 @@ class FinanceDeepSeekHarnessSessionService:
                     progress_items = call_progress.get(call_id) or [
                         {"progress_id": call_id, "title": "金融数据处理", "label": ""}
                     ]
-                    failed = bool(payload.get("error")) or payload.get("ok") is False
+                    failed = (not payload or bool(payload.get("error")) or payload.get("ok") is False
+                              or (payload.get("validation") or {}).get("ok") is False
+                              or (payload.get("execution") or {}).get("ok") is False
+                              or payload.get("failed_step") is not None)
                     if name.endswith("read_finance_skill"):
                         loaded = payload.get("skills") if isinstance(payload.get("skills"), list) else [payload]
                         actual = [item for item in loaded if isinstance(item, Mapping) and _trim(item.get("method")) and not item.get("error")]
@@ -1183,12 +1186,16 @@ class FinanceDeepSeekHarnessSessionService:
                         )
                     elif name.endswith("finance_query"):
                         summaries = (
+                            [item for item in payload["completed_steps"] if isinstance(item, Mapping)]
+                            if isinstance(payload.get("completed_steps"), list)
+                            else
                             [item for item in payload.get("steps") or [] if isinstance(item, Mapping)]
                             if isinstance(payload.get("steps"), list)
                             else [payload]
                         )
                         for index, item in enumerate(progress_items):
                             summary = summaries[index] if index < len(summaries) else {}
+                            step_failed = failed and not summary.get("result_ref")
                             label = item.get("label", "") or public_source_label(
                                 api=_trim(summary.get("api"))
                             )
@@ -1199,9 +1206,9 @@ class FinanceDeepSeekHarnessSessionService:
                             goal = item.get("goal", "金融数据查询")
                             content = (
                                 f"已查询：{goal}，取得 {row_count} 条记录。"
-                                if row_count
+                                if row_count and not step_failed
                                 else f"已查询：{goal}，当前条件下为 0 条记录。"
-                                if not failed
+                                if not step_failed and "row_count" in summary
                                 else f"查询未完成：{goal}。"
                             )
                             self._emit(
@@ -1209,7 +1216,7 @@ class FinanceDeepSeekHarnessSessionService:
                                 content,
                                 progress_id=item["progress_id"],
                                 title=item["title"],
-                                status="error" if failed else "completed",
+                                status="error" if step_failed else "completed",
                             )
                     elif name.endswith("load_finance_result"):
                         item = progress_items[0]

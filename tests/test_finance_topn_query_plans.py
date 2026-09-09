@@ -2,6 +2,66 @@ from datetime import date
 import pytest
 from src.experiments.staged_data_protocol.phase2 import quote_provider as q
 from src.experiments.staged_data_protocol.phase2 import intraday_quote_provider as m
+from src.experiments.staged_data_protocol.phase2 import pricevalue_provider as pv
+from src.experiments.staged_data_protocol.phase2 import financial_provider as fin
+
+
+@pytest.mark.parametrize('provider,execute', [(pv, pv.execute_pricevalue_api), (fin, fin.execute_financial_3_table_api)])
+@pytest.mark.parametrize('limit,expected', [(-1, 600), (10, 10), (None, 100), (0, 100), (1000, 500)])
+def test_explicit_all_limit_preserves_full_saved_table(monkeypatch, provider, execute, limit, expected):
+    class DB:
+        def __init__(self, **_): self.conn = self
+        def cursor(self, *_): return self
+        def __enter__(self): return self
+        def __exit__(self, *_): pass
+        def close_db(self): pass
+        def execute(self, sql, params):
+            assert sql.count('%s') == len(params)
+            self.count = params[-1] if sql.rstrip().endswith('LIMIT %s') else 600
+            assert self.count == expected
+        def fetchall(self): return [{'code': f'{n:06d}.SZ'} for n in range(self.count)]
+    monkeypatch.setattr(provider, 'StockInfoDbUtils', DB)
+    result = execute(subject='stock', args={'limit': limit}, outputs=['code'])
+    assert result['status'] == 'ok'
+    assert len(result['rows']) == expected
+
+
+def test_financial_postprocessing_all_does_not_drop_last_row(monkeypatch):
+    class DB:
+        def __init__(self, **_): self.conn = self
+        def cursor(self, *_): return self
+        def __enter__(self): return self
+        def __exit__(self, *_): pass
+        def close_db(self): pass
+        def execute(self, sql, params):
+            assert sql.count('%s') == len(params)
+            assert not sql.rstrip().endswith('LIMIT %s')
+        def fetchall(self): return [{'code': f'{n:06d}.SZ'} for n in range(600)]
+    monkeypatch.setattr(fin, 'StockInfoDbUtils', DB)
+    monkeypatch.setattr(fin, '_computed_order_field', lambda args: 'test_computed')
+    monkeypatch.setattr(fin, '_computed_columns_for_request', lambda **kwargs: [])
+    result = fin.execute_financial_3_table_api(subject='stock', args={'limit': -1}, outputs=['code'])
+    assert result['status'] == 'ok'
+    assert len(result['rows']) == 600
+
+
+@pytest.mark.parametrize('provider,execute,field', [(q, q.execute_kd_quote_api, 'pct'), (pv, pv.execute_kd_pricevalue_api, 'pe')])
+@pytest.mark.parametrize('limit,expected', [(-1, 600), (10, 10), (None, 100)])
+def test_window_full_result_or_ordered_topn_is_computed_without_model_filtering(monkeypatch, provider, execute, field, limit, expected):
+    class DB:
+        def __init__(self, **_): self.conn = self
+        def cursor(self, *_): return self
+        def __enter__(self): return self
+        def __exit__(self, *_): pass
+        def close_db(self): pass
+        def execute(self, sql, params): assert sql.count('%s') == len(params)
+        def fetchall(self):
+            return [{'code': f'{n:06d}.SZ', 'name': str(n), 'value': n, 'window_count': 60} for n in range(600)]
+    monkeypatch.setattr(provider, 'StockInfoDbUtils', DB)
+    result = execute(subject='stock', field=field, method='sum', args={'k': 60, 'limit': limit, 'order': 'value desc'}, outputs=['code', 'value'])
+    assert result['status'] == 'ok'
+    assert len(result['rows']) == expected
+    assert result['rows'][0]['value'] == 599
 
 
 @pytest.mark.parametrize('subject', list(q.QUOTE_SOURCES))

@@ -15,6 +15,62 @@ const NAMES = {
   details: 'mcp__finance__load_finance_result',
 }
 
+test('sample visibility does not control completion or available evidence tools', () => {
+  const observations = []
+  for (const sample_complete of [true, false]) {
+    const runtime = fixture({ maxQueryAttempts: 8 })
+    runtime.event({ type: 'turn/start', data: { turn: 1 } })
+    completeCall(runtime, 1, 'catalog', NAMES.catalog, { mode: 'dataview' })
+    completeCall(runtime, 2, 'query', NAMES.query, { ok: true, sample_complete, result_ref: 'session://rows' })
+    runtime.stopping()
+    observations.push([runtime.restrictions.at(-1).allow, runtime.prompt(), runtime.steered.length])
+  }
+  assert.deepEqual(observations[0], observations[1])
+  assert.equal(observations[0][2], 0)
+})
+
+test('unrelated query failures do not consume a global one-repair allowance', () => {
+  const runtime = fixture({ maxQueryAttempts: 8, maxQueryRepairs: 1 })
+  runtime.event({ type: 'turn/start', data: { turn: 1 } })
+  completeCall(runtime, 1, 'catalog', NAMES.catalog, { mode: 'dataview' })
+  for (const [step, payload] of [[2, { validation: { ok: false } }], [3, { ok: true }], [4, { validation: { ok: false } }]]) {
+    completeCall(runtime, step, `q${step}`, NAMES.query, payload)
+  }
+  assert.match(runtime.prompt(), /stage=repair/)
+  assert.equal(runtime.guard({ name: NAMES.query, arguments: { steps: [] } }), undefined)
+})
+
+test('completion audit retains unfinished declaration across detail reads and is bounded per turn', () => {
+  const runtime = fixture({ maxQueryAttempts: 8 })
+  runtime.event({ type: 'turn/start', data: { turn: 1 } })
+  completeCall(runtime, 1, 'catalog', NAMES.catalog, { mode: 'dataview' })
+  completeCall(runtime, 2, 'query', NAMES.query, { ok: true, data_request_complete: false, result_ref: 'session://r1' }, { steps: [{ goal: '已完成的查询' }] })
+  completeCall(runtime, 3, 'page', NAMES.details, { rows: [{ code: 'a' }] })
+  runtime.stopping()
+  assert.equal(runtime.steered.length, 1)
+  assert.match(runtime.steered[0].content[0].text, /data_request_complete.*false/)
+  assert.doesNotMatch(runtime.steered[0].content[0].text, /已完成的查询/)
+  completeCall(runtime, 4, 'catalog2', NAMES.catalog, { mode: 'dataview' })
+  runtime.stopping()
+  assert.equal(runtime.steered.length, 1)
+})
+
+test('native string call arguments retain failed flow suffix and successful references', () => {
+  const runtime = fixture({ maxQueryAttempts: 8 })
+  runtime.event({ type: 'turn/start', data: { turn: 1 } })
+  completeCall(runtime, 1, 'catalog', NAMES.catalog, { mode: 'dataview' })
+  completeCall(runtime, 2, 'query', NAMES.query, {
+    failed_step: 2, validation: { ok: false, errors: ['invalid field'] },
+    completed_steps: [{ result_ref: 'session://r11', row_count: 600 }],
+  }, JSON.stringify({ steps: [{ goal: '已完成' }, { goal: '失败步骤' }, { goal: '依赖后续' }] }))
+  runtime.stopping()
+  const text = runtime.steered[0].content[0].text
+  assert.match(text, /session:\/\/r11/)
+  assert.match(text, /失败步骤/)
+  assert.match(text, /依赖后续/)
+  assert.doesNotMatch(text, /已完成/)
+})
+
 function resultEvent({ turn = 1, step, callId, payload, isError = false }) {
   // Older stage-only fixtures omitted the method body. Give them a real leaf
   // shape; tests of incomplete catalogs supply their own dataview explicitly.
@@ -254,11 +310,11 @@ test('explicitly loaded Skill and identity tool reuse the existing lifecycle', a
   })
 })
 
-test('missing contract cannot reopen a finished turn or be hidden by a parallel success', t => {
+test('missing contract cannot reopen an exhausted turn or be hidden by a parallel success', t => {
   const history = loadedBasicInfo(t)
   const known = { request: 'r1 = stock.basic_info.query() -> code' }
   const unknown = { request: 'r2 = stock.report.query() -> title' }
-  const runtime = fixture({}, history)
+  const runtime = fixture({ maxQueryAttempts: 1 }, history)
   runtime.event({ type: 'turn/start', data: { turn: 1 } })
   completeCall(runtime, 1, 'known', NAMES.query, { ok: true, sample_complete: true }, known)
   assert.match(runtime.prompt(), /stage=final/)
@@ -279,8 +335,8 @@ test('missing contract cannot reopen a finished turn or be hidden by a parallel 
 
 test('stage prompts use catalog routing and preserve the current action boundary', () => {
   const runtime = fixture()
-  assert.match(runtime.prompt(), /当前任务是目录定位/)
-  assert.match(runtime.prompt(), /subject \+ dataview \+ operation/)
+  assert.match(runtime.prompt(), /依据本轮目标与执行结果选择下一步/)
+  assert.match(runtime.prompt(), /新方法先加载执行包/)
   assert.doesNotMatch(runtime.prompt(), /stock\.report|financial_3_table|EPS|竞争格局/)
 
   const fast = fixture({ executionMode: 'fast' })
@@ -412,7 +468,7 @@ test('catalog reuse follows visible history, exact operation and revision across
     const runtime = fixture({ preserveRequestPrefix: true }, history)
     runtime.event({ type: 'turn/start', data: { turn: 1 } })
     const query = { name: NAMES.query, arguments: { steps: [{ request: 'r1 = stock.quote(codes=["600519.SH"],count=1) -> open' }] } }
-    assert.match(runtime.guard(query), /当前阶段/)
+    assert.match(runtime.guard(query), /执行包/)
     const original = { mode: 'dataview', dataview: { functions: [{ api_name: 'stock.quote.query' }] } }
     const projected = await runtime.post({ name: NAMES.catalog }, {
       content: [{ type: 'text', text: JSON.stringify(original) }], isError: false,
@@ -431,28 +487,28 @@ test('catalog reuse follows visible history, exact operation and revision across
     assert.equal(runtime.guard({ name: NAMES.query, arguments: { steps: [{
       request: 'r1 = stock.quote.query(codes=["600519.SH"],count=1) -> open',
     }] } }), undefined)
-    assert.match((await runtime.preStep({ turn: 2, step: 1 })).messages[0].content[0].text, /按本轮条件调用 finance_query/)
+    assert.match((await runtime.preStep({ turn: 2, step: 1 })).messages[0].content[0].text, /finance_query.steps/)
     runtime.event({ type: 'tool/call', data: { turn: 2, step: 1, callId: 'q2', name: NAMES.query, arguments: JSON.stringify(query.arguments) } })
     runtime.event(resultEvent({ turn: 2, step: 1, callId: 'q2', payload: { ok: true, sample_complete: true } }))
     runtime.event({ type: 'step/end', data: { turn: 2, step: 1 } })
     assert.equal((await runtime.request({})).reasoningEffort, 'off')
-    assert.match(runtime.guard(query), /当前阶段/)
+    assert.match(runtime.guard(query), /重复调用/)
     runtime.event({ type: 'turn/start', data: { turn: 3 } })
     for (const request of [
       'r1 = stock.margin() -> financing_balance',
       'r1 = stock.quote.agg(agg="avg(close)") -> value',
       'r1 = stock.quote.kd_close_max(k=5) -> value',
     ]) {
-      assert.match(runtime.guard({ name: NAMES.query, arguments: { request } }), /当前阶段/)
+      assert.match(runtime.guard({ name: NAMES.query, arguments: { request } }), /执行包/)
     }
-    assert.match(runtime.guard({ name: NAMES.query, arguments: { steps: [query.arguments.steps[0], { request: 'r2 = stock.margin() -> code' }] } }), /当前阶段/)
+    assert.match(runtime.guard({ name: NAMES.query, arguments: { steps: [query.arguments.steps[0], { request: 'r2 = stock.margin() -> code' }] } }), /执行包/)
     // A new Agent (cold session resume) derives the same eligibility, including
     // native tool-restriction mode. No in-memory cache is required.
     const cold = fixture({}, history)
     cold.event({ type: 'turn/start', data: { turn: 4 } })
-    assert.deepEqual(cold.restrictions.at(-1).allow, [NAMES.catalog, NAMES.query])
+    assert.deepEqual(cold.restrictions.at(-1).allow, [NAMES.catalog, NAMES.query, NAMES.details])
     assert.equal(cold.guard(query), undefined)
-    assert.match(cold.guard({ name: NAMES.query, arguments: { request: 'stock.margin() -> code' } }), /当前阶段/)
+    assert.match(cold.guard({ name: NAMES.query, arguments: { request: 'stock.margin() -> code' } }), /执行包/)
     const fast = fixture({ executionMode: 'fast', preserveRequestPrefix: true }, history)
     fast.event({ type: 'turn/start', data: { turn: 4 } })
     assert.match(fast.guard(query), /当前阶段/)
@@ -466,7 +522,7 @@ test('catalog reuse follows visible history, exact operation and revision across
       mixed.event(resultEvent({ turn: 4, step: 1, callId: 'q', payload: { ok: !failed, sample_complete: true }, isError: failed }))
       mixed.event({ type: 'step/end', data: { turn: 4, step: 1 } })
       assert.match(mixed.prompt(), failed ? /stage=repair/ : /stage=query/)
-      assert.deepEqual(mixed.restrictions.at(-1).allow, [NAMES.catalog, NAMES.query])
+      assert.deepEqual(mixed.restrictions.at(-1).allow, [NAMES.catalog, NAMES.query, NAMES.details])
     }
     writeRevision('catalog-v2')
     runtime.event({ type: 'turn/start', data: { turn: 5 } })
@@ -714,7 +770,7 @@ test('does not steer an optional detail or completed stage', () => {
   assert.equal(runtime.steered.length, 0)
 })
 
-test('steers one final-answer step only when query evidence has no answer step yet', () => {
+test('successful query without a completion declaration does not force a final-answer step', () => {
   const runtime = fixture()
   runtime.event({ type: 'turn/start', data: { turn: 1 } })
   runtime.event({
@@ -735,12 +791,11 @@ test('steers one final-answer step only when query evidence has no answer step y
   runtime.event({ type: 'step/end', data: { turn: 1, step: 2 } })
 
   runtime.stopping()
-  assert.equal(runtime.steered.length, 1)
-  assert.match(runtime.steered[0].content[0].text, /最终答案/)
+  assert.equal(runtime.steered.length, 0)
 
   runtime.event({ type: 'step/end', data: { turn: 1, step: 3 } })
   runtime.stopping()
-  assert.equal(runtime.steered.length, 1)
+  assert.equal(runtime.steered.length, 0)
 })
 
 test('catalog guard accepts optional operation and requires its subject/view scope', () => {
@@ -795,8 +850,8 @@ test('stable-prefix mode keeps all schemas visible, guards the stage, and uses s
   const runtime = fixture({ preserveRequestPrefix: true })
   assert.equal(runtime.restrictions.length, 0)
   assert.match(
-    runtime.guard({ name: NAMES.query, arguments: { steps: [] } }),
-    /当前阶段/,
+    runtime.guard({ name: NAMES.query, arguments: { steps: [{ request: 'result = stock.quote.query() -> code' }] } }),
+    /执行包/,
   )
   assert.equal(
     runtime.guard({ name: NAMES.catalog, arguments: { subject: 'stock' } }),
@@ -813,9 +868,9 @@ test('stable-prefix mode keeps all schemas visible, guards the stage, and uses s
   assert.match(entered.messages.at(-1).content[0].text, /stage=catalog/)
 })
 
-test('narrows catalog to query to final and applies per-stage request budgets', async () => {
+test('standard tools remain available after a successful query with bounded request budgets', async () => {
   const runtime = fixture()
-  assert.deepEqual(runtime.restrictions.at(-1).allow, [NAMES.catalog])
+  assert.deepEqual(runtime.restrictions.at(-1).allow, [NAMES.catalog, NAMES.query, NAMES.details])
   assert.match(runtime.prompt(), /stage=catalog/)
 
   runtime.event({ type: 'turn/start', data: { turn: 1 } })
@@ -829,7 +884,7 @@ test('narrows catalog to query to final and applies per-stage request budgets', 
     payload: { mode: 'dataview', dataview: { name: 'quote' } },
   }))
   runtime.event({ type: 'step/end', data: { turn: 1, step: 1 } })
-  assert.deepEqual(runtime.restrictions.at(-1).allow, [NAMES.catalog, NAMES.query])
+  assert.deepEqual(runtime.restrictions.at(-1).allow, [NAMES.catalog, NAMES.query, NAMES.details])
   assert.match(runtime.prompt(), /stage=query/)
   assert.deepEqual(await runtime.request({ provider: 'p', model: 'm' }), {
     provider: 'p',
@@ -848,8 +903,8 @@ test('narrows catalog to query to final and applies per-stage request budgets', 
     payload: { ok: true, result_ref: 'session://r1', sample_complete: true },
   }))
   runtime.event({ type: 'step/end', data: { turn: 1, step: 2 } })
-  assert.deepEqual(runtime.restrictions.at(-1).allow, [])
-  assert.match(runtime.prompt(), /stage=final/)
+  assert.deepEqual(runtime.restrictions.at(-1).allow, [NAMES.catalog, NAMES.query, NAMES.details])
+  assert.match(runtime.prompt(), /stage=query/)
   assert.equal((await runtime.request({})).reasoningEffort, 'off')
 })
 
@@ -1024,7 +1079,7 @@ test('data-only intermediate query keeps one follow-up query available', () => {
 
   assert.deepEqual(runtime.restrictions.at(-1).allow, [NAMES.catalog, NAMES.query, NAMES.details])
   assert.match(runtime.prompt(), /reason=data_only_followup_allowed/)
-  assert.match(runtime.prompt(), /已有数据集/)
+  assert.match(runtime.prompt(), /依据本轮目标与执行结果/)
   runtime.stopping()
   assert.equal(runtime.steered.length, 0)
 })
@@ -1190,7 +1245,7 @@ test('allows one query repair, then stops, and guards exact duplicates', () => {
     payload: { error: 'invalid request' },
   }))
   runtime.event({ type: 'step/end', data: { turn: 1, step: 2 } })
-  assert.deepEqual(runtime.restrictions.at(-1).allow, [NAMES.catalog, NAMES.query])
+  assert.deepEqual(runtime.restrictions.at(-1).allow, [NAMES.catalog, NAMES.query, NAMES.details])
   assert.match(runtime.prompt(), /stage=repair/)
 
   runtime.event({
@@ -1235,7 +1290,7 @@ test('a parallel success does not hide a repairable query failure', () => {
   }))
   runtime.event({ type: 'step/end', data: { turn: 1, step: 2 } })
 
-  assert.deepEqual(runtime.restrictions.at(-1).allow, [NAMES.catalog, NAMES.query])
+  assert.deepEqual(runtime.restrictions.at(-1).allow, [NAMES.catalog, NAMES.query, NAMES.details])
   assert.match(runtime.prompt(), /stage=repair/)
 })
 
@@ -1261,7 +1316,7 @@ test('a ready catalog route does not hide another incomplete parallel route', ()
   }))
   runtime.event({ type: 'step/end', data: { turn: 1, step: 1 } })
 
-  assert.deepEqual(runtime.restrictions.at(-1).allow, [NAMES.catalog])
+  assert.deepEqual(runtime.restrictions.at(-1).allow, [NAMES.catalog, NAMES.query, NAMES.details])
   assert.match(runtime.prompt(), /reason=catalog_needs_narrowing/)
 })
 
@@ -1285,7 +1340,7 @@ test('keeps querying after identity-only preparation and permits at most two det
     payload: { ok: true, api: 'stock.basic_info', sample_complete: true, data_request_complete: false },
   }))
   runtime.event({ type: 'step/end', data: { turn: 1, step: 2 } })
-  assert.deepEqual(runtime.restrictions.at(-1).allow, [NAMES.catalog, NAMES.query])
+  assert.deepEqual(runtime.restrictions.at(-1).allow, [NAMES.catalog, NAMES.query, NAMES.details])
   assert.match(runtime.prompt(), /reason=identity_scope_ready/)
 
   runtime.event({
@@ -1298,7 +1353,7 @@ test('keeps querying after identity-only preparation and permits at most two det
     payload: { ok: true, api: 'stock.report', result_ref: 'session://r2', sample_complete: false },
   }))
   runtime.event({ type: 'step/end', data: { turn: 1, step: 3 } })
-  assert.deepEqual(runtime.restrictions.at(-1).allow, [NAMES.details])
+  assert.deepEqual(runtime.restrictions.at(-1).allow, [NAMES.catalog, NAMES.query, NAMES.details])
 
   for (const [step, callId] of [[4, 'load-1'], [5, 'load-2']]) {
     runtime.event({
@@ -1308,9 +1363,10 @@ test('keeps querying after identity-only preparation and permits at most two det
     runtime.event(resultEvent({ step, callId, payload: { rows: [{}] } }))
     runtime.event({ type: 'step/end', data: { turn: 1, step } })
   }
-  assert.deepEqual(runtime.restrictions.at(-2).allow, [NAMES.details])
-  assert.deepEqual(runtime.restrictions.at(-1).allow, [])
-  assert.match(runtime.prompt(), /reason=detail_attempt_limit/)
+  assert.deepEqual(runtime.restrictions.at(-1).allow, [NAMES.catalog, NAMES.query, NAMES.details])
+  runtime.event({ type: 'tool/call', data: { turn: 1, step: 6, callId: 'load-3', name: NAMES.details } })
+  assert.match(runtime.guard({ name: NAMES.details, arguments: { offset: 100 } }), /上限/)
+  assert.match(runtime.prompt(), /stage=query/)
 })
 
 test('basic information can be the final data goal, including empty results', () => {
@@ -1326,10 +1382,10 @@ test('basic information can be the final data goal, including empty results', ()
       ...(complete === undefined ? {} : { data_request_complete: complete }),
     } }))
     runtime.event({ type: 'step/end', data: { turn: 1, step: 2 } })
-    assert.match(runtime.prompt(), /stage=final/)
+    assert.match(runtime.prompt(), complete ? /stage=final/ : /stage=query/)
     runtime.stopping()
-    assert.equal(runtime.steered.length, 1) // Final answer only, never another data query.
-    assert.match(runtime.steered[0].content[0].text, /最终答案/)
+    assert.equal(runtime.steered.length, complete ? 1 : 0)
+    if (complete) assert.match(runtime.steered[0].content[0].text, /最终答案/)
   }
 })
 
@@ -1397,7 +1453,7 @@ test('Skill budgets retain useful followups through query eight and detail six',
       for (let n = 1; n <= cap; n++) {
         completeCall(runtime, n + 3, `${kind}${n}`, NAMES[kind], kind === 'query'
           ? { ok: true, result_ref: `session://r${n}`, sample_complete: true } : { rows: [{}] }, { offset: n })
-        assert.match(runtime.prompt(), n === cap ? /stage=final/ : new RegExp(`stage=${kind}`))
+        assert.match(runtime.prompt(), kind === 'query' && n === cap ? /stage=final/ : /stage=query/)
       }
     }
   })
@@ -1433,18 +1489,17 @@ test('Skill-first permits optional methods and evidence-led followup without a f
     runtime.stopping()
     assert.equal(runtime.steered.length, 0) // Supplied-evidence questions may already be answerable.
     completeCall(runtime, 2, 'catalog', NAMES.catalog, { mode: 'dataview' })
-    assert.match(runtime.prompt(), /按已加载契约构造 finance_query/)
-    assert.match(runtime.prompt(), /结合适用 Skill/)
+    assert.match(runtime.prompt(), /finance_query.steps/)
     completeCall(runtime, 3, 'data', NAMES.query, { ok: true, sample_complete: true, data_request_complete: true })
-    assert.match(runtime.prompt(), /stage=query/)
+    assert.match(runtime.prompt(), /reason=data_request_complete/)
     assert.equal((await runtime.preStep({ step: 4 })).kind, 'enter')
     assert.equal(runtime.guard({ name: SKILL_NAMES.reference, arguments: { skill_id: 'equity-report-analysis', reference: 'references/consensus.md' } }), undefined)
     completeCall(runtime, 4, 'reference', SKILL_NAMES.reference, { content: '对齐样本' })
-    assert.match(runtime.prompt(), /stage=query/)
+    assert.match(runtime.prompt(), /reason=data_request_complete/)
     assert.equal(runtime.guard({ name: NAMES.catalog, arguments: { subject: 'stock', dataview: 'report_metric' } }), undefined)
     assert.equal((await runtime.request({})).reasoningEffort, 'low')
     runtime.stopping()
-    assert.equal(runtime.steered.length, 0) // Follow-up retrieval is optional, not mandatory.
+    assert.equal(runtime.steered.length, 1) // Only an answer is requested; evidence tools stay available.
   })
 })
 
@@ -1471,7 +1526,7 @@ test('an unmatched complex question can extend evidence without activating a Ski
     completeCall(runtime, 0, 'method', SKILL_NAMES.skill, { skills: [] }, { skill_ids: [] })
     completeCall(runtime, 1, 'catalog-1', NAMES.catalog, { mode: 'dataview' })
     completeCall(runtime, 2, 'query-1', NAMES.query, { ok: true, sample_complete: true, data_request_complete: true })
-    assert.match(runtime.prompt(), /stage=query/)
+    assert.match(runtime.prompt(), /reason=data_request_complete/)
     assert.equal(runtime.guard({ name: NAMES.catalog, arguments: { subject: 'stock', dataview: 'quote', operation: 'query' } }), undefined)
     completeCall(runtime, 3, 'catalog-2', NAMES.catalog, { mode: 'dataview' })
     completeCall(runtime, 4, 'query-2', NAMES.query, { ok: true, sample_complete: true })

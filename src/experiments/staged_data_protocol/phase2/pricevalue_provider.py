@@ -152,8 +152,9 @@ def execute_pricevalue_api(*, subject: str, args: Mapping[str, Any], outputs: Li
     limit = _bounded_limit(args.get("limit"))
     where_sql, params = _build_where(source=source, args=args)
     order_sql = _build_order(source=source, args=args)
-    sql = _build_sql(source=source, columns=columns, where_sql=where_sql, order_sql=order_sql)
-    params.append(limit)
+    sql = _build_sql(source=source, columns=columns, where_sql=where_sql, order_sql=order_sql, limited=limit > 0)
+    if limit > 0:
+        params.append(limit)
 
     db = StockInfoDbUtils(database="kingdomai")
     try:
@@ -339,6 +340,8 @@ def _bounded_limit(value: Any) -> int:
         parsed = int(value)
     except Exception:
         parsed = 100
+    if parsed == -1:
+        return -1
     if parsed <= 0:
         parsed = 100
     return max(1, min(parsed, 500))
@@ -543,7 +546,7 @@ def _build_order(*, source: PricevalueSource, args: Mapping[str, Any]) -> str:
     return f"{expression} {direction_sql}, {source.fields['tradedate']} DESC"
 
 
-def _build_sql(*, source: PricevalueSource, columns: List[str], where_sql: str, order_sql: str) -> str:
+def _build_sql(*, source: PricevalueSource, columns: List[str], where_sql: str, order_sql: str, limited: bool = True) -> str:
     select_sql = ", ".join(f"{source.fields[column]} AS `{column}`" for column in columns)
     return f"""
         SELECT {select_sql}
@@ -551,7 +554,7 @@ def _build_sql(*, source: PricevalueSource, columns: List[str], where_sql: str, 
         LEFT JOIN {source.base_table} b ON {source.join_on}
         WHERE {where_sql}
         ORDER BY {order_sql}
-        LIMIT %s
+        {'LIMIT %s' if limited else ''}
     """
 
 

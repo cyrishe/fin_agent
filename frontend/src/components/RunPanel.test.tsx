@@ -51,7 +51,8 @@ describe("RunPanel", () => {
 
     expect(html).toContain("process-item completed");
     expect(html).toContain("process-item error");
-    expect(html).not.toContain('class="spinner"');
+    // A failed step does not terminate the whole request; its run indicator remains active.
+    expect(html.match(/class="spinner"/g)).toHaveLength(1);
   });
 
   it("settles stale historical progress and renders results as navigation buttons", () => {

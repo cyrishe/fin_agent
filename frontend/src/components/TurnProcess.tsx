@@ -19,7 +19,7 @@ export default function TurnProcess({ run }: { run: AgentRun }) {
   return (
     <details className={`turn-process ${run.status}`} open={run.status === "running"}>
       <summary>
-        <span className="turn-process-heading"><Route size={15} /><strong>本轮过程</strong></span>
+        <span className="turn-process-heading"><Route size={15} /><strong>本轮过程</strong>{run.status === "running" ? <span className="turn-process-active"><span className="spinner" aria-hidden="true" />进行中</span> : null}</span>
         <span className="turn-process-summary">
           {process.length ? `${process.length} 个节点` : "等待执行线索"}
           {duration ? <><i /><Clock3 size={12} />{duration}</> : null}
