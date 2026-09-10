@@ -8,7 +8,7 @@ from types import SimpleNamespace
 import pytest
 
 from src.scenarios.custom_tool.dsh_mcp_server import CustomToolDshMcpBridge
-from src.scenarios.custom_tool.dsh_intent_router import CustomToolIntentDshRouter
+from src.scenarios.custom_tool.dsh_intent_router import CustomToolIntentDshRouter, _extract_json_object
 from src.scenarios.custom_tool.dsh_service import (
     CustomToolDeepSeekHarnessSessionService,
     _custom_loop_observability,
@@ -530,3 +530,26 @@ def test_custom_tool_dsh_session_keeps_blocking_interaction_out_of_coding(
     assert result["artifact_updates"][0]["payload"]["requirement_brief"].startswith(
         "构造一个收益目标工具"
     )
+
+
+@pytest.mark.parametrize("configured,expected", [(None, "deepseek-v4-flash-0731"), ("explicit-model", "explicit-model")])
+def test_intent_router_pins_default_model_and_preserves_override(tmp_path, monkeypatch, configured, expected):
+    monkeypatch.delenv("FINANCE_DSH_CUSTOM_TOOL_MODEL", raising=False)
+    if configured:
+        monkeypatch.setenv("FINANCE_DSH_CUSTOM_TOOL_MODEL", configured)
+    router = CustomToolIntentDshRouter(enabled=False, root_dir=tmp_path / "intent")
+    assert router.model == expected
+    router.close()
+
+
+@pytest.mark.parametrize("text", [
+    '{"is_custom_tool":false}',
+    '```json\n{"is_custom_tool":false,"reason":"普通查询"}\n```',
+])
+def test_intent_json_accepts_complete_plain_and_fenced_output(text):
+    assert _extract_json_object(text)["is_custom_tool"] is False
+
+
+def test_intent_json_does_not_guess_truncated_model_output():
+    with pytest.raises(ValueError, match="不完整"):
+        _extract_json_object('{"is_custom_tool":false,"reason":"普通查询')

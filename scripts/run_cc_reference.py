@@ -26,7 +26,7 @@ ROOT = Path(__file__).resolve().parents[1]
 SCRIPT_DIR = Path(__file__).resolve().parent
 DEFAULT_BASELINE = ROOT if SCRIPT_DIR.name == "tools" else ROOT / "baselines/cc_20260902_rebuilt"
 HISTORICAL_PROFILE = {
-    "runtime": "cc", "provider": "deepseek", "model": "deepseek-v4-flash",
+    "runtime": "cc", "provider": "deepseek", "model": "deepseek-v4-flash-0731",
     "effort": "low", "max_turns": 12, "research_mode": "auto", "data_only": False,
 }
 # Deliberately excludes platform identity/storage, DSH, Codex and ambient prompt
@@ -332,7 +332,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--output-dir", type=Path, required=True)
     parser.add_argument("--env-file", type=Path)
     parser.add_argument("--provider", choices=("deepseek", "dashscope"), default="deepseek")
-    parser.add_argument("--model", default="deepseek-v4-flash")
+    parser.add_argument("--model", default="deepseek-v4-flash-0731")
     parser.add_argument("--base-url", help="Explicit CC Anthropic-compatible HTTPS endpoint; auxiliary endpoint follows provider")
     parser.add_argument("--python", type=Path, default=Path(sys.executable))
     parser.add_argument("--check-only", action="store_true")

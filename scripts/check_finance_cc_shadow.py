@@ -44,7 +44,7 @@ def main() -> int:
     report = {
         "passed": passed,
         "provider": "dashscope",
-        "model": "deepseek-v4-flash",
+        "model": "deepseek-v4-flash-0731",
         "first": first,
         "second": second,
     }

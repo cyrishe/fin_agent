@@ -44,7 +44,7 @@ export CUSTOM_TOOL_AGENT_PROVIDER=claude
 export DEEPSEEK_API_KEY=...
 # 以下两项已有默认值，可以省略
 export CLAUDE_PROVIDER=deepseek
-export CLAUDE_MODEL=deepseek-v4-flash
+export CLAUDE_MODEL=deepseek-v4-flash-0731
 ```
 
 需要时仍可显式切换到 Anthropic 官方 API：
@@ -78,8 +78,8 @@ claude = build_agent_skill_harness("claude", complexity="high", capabilities=cap
 
 | 等级 | 任务定位 | Codex | Claude + DashScope |
 | --- | --- | --- | --- |
-| `fastest` | 直接问答、确定分类 | `gpt-5.6-luna`, effort `none` | `deepseek-v4-flash`, effort `low`, thinking disabled |
-| `fast` | 问题简单但上下文或链路较长 | `gpt-5.6-terra`, effort `high` | `deepseek-v4-flash`, effort `high` |
+| `fastest` | 直接问答、确定分类 | `gpt-5.6-luna`, effort `none` | `deepseek-v4-flash-0731`, effort `low`, thinking disabled |
+| `fast` | 问题简单但上下文或链路较长 | `gpt-5.6-terra`, effort `high` | `deepseek-v4-flash-0731`, effort `high` |
 | `mid` | 中等复杂分析与实现 | `gpt-5.6-terra`, effort `medium` | `deepseek-v4-pro`, effort `medium` |
 | `high` | 最复杂、上下文交互困难的专业任务 | `gpt-5.6-sol`, effort `high` | `deepseek-v4-pro`, effort `high` |
 
@@ -125,7 +125,7 @@ harness = build_agent_skill_harness("claude", complexity="fast", capabilities=ca
 安装依赖并配置凭据后，可发起一次有成本上限的真实 Structured Output 探测：
 
 ```bash
-# 默认使用 DashScope + deepseek-v4-flash
+# 默认使用 DashScope + deepseek-v4-flash-0731
 python scripts/check_claude_agent_provider.py
 # 或显式指定 provider / model
 python scripts/check_claude_agent_provider.py --provider anthropic --model <anthropic-model-name>

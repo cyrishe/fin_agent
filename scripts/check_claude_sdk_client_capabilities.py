@@ -70,7 +70,7 @@ async def _receive_turn(client: Any) -> dict[str, Any]:
 
 
 def _provider_env(provider: str, config_dir: Path) -> dict[str, str]:
-    harness = ClaudeSdkSkillHarness(provider=provider, model="deepseek-v4-flash", query_impl=lambda **_: None)
+    harness = ClaudeSdkSkillHarness(provider=provider, model="deepseek-v4-flash-0731", query_impl=lambda **_: None)
     env = harness.provider_env()
     env.update(
         {
@@ -125,7 +125,7 @@ def _core_options(*, provider: str, env: dict[str, str], cwd: Path, server: Any,
         cwd=str(cwd),
         include_partial_messages=True,
         max_turns=4,
-        model="deepseek-v4-flash",
+        model="deepseek-v4-flash-0731",
         effort="high",
         resume=resume or None,
         env=env,
@@ -206,7 +206,7 @@ async def _run_agent_tool_once(provider: str, workspace: Path, config_dir: Path)
         cwd=str(workspace),
         include_partial_messages=True,
         max_turns=4,
-        model="deepseek-v4-flash",
+        model="deepseek-v4-flash-0731",
         effort="high",
         env=_provider_env(provider, config_dir),
     )
@@ -249,7 +249,7 @@ async def _run(args: argparse.Namespace) -> dict[str, Any]:
                 )
     return {
         "provider": args.provider,
-        "model": "deepseek-v4-flash",
+        "model": "deepseek-v4-flash-0731",
         "runs": args.runs,
         "core_passed": all(item["passed"] for item in core_runs),
         "agent_tool_passed": all(item["passed"] for item in agent_runs) if agent_runs else None,

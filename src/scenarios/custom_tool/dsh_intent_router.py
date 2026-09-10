@@ -91,7 +91,7 @@ class CustomToolIntentDshRouter(FinanceDeepSeekHarnessSessionService):
         )
         self.model = _trim(
             os.environ.get("FINANCE_DSH_CUSTOM_TOOL_MODEL")
-            or "deepseek-v4-flash"
+            or "deepseek-v4-flash-0731"
         )
         self.reasoning_effort = "off"
         self.max_tokens = max(
