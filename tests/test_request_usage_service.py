@@ -85,3 +85,54 @@ def test_accounting_write_failure_does_not_fail_answer(monkeypatch,caplog):
     monkeypatch.setattr(module,'connect',fail)
     module.record_request(request_id='fq_test',channel='http_api',usage={},succeeded=False)
     assert 'Request usage persistence failed' in caplog.text
+
+
+def test_test_bucket_included_exactly_once_and_missing_usage_stays_unknown():
+    d=date(2026,9,10)
+    row=summarize([(d,'mcp',1,1,100),(d,'test',6,6,501107)],today=d,days=1)[0]
+    assert row['test']['requests']==6
+    assert row['test']['average_tokens']==83517.8
+    assert row['total_tokens']==501207 and row['mcp']['total_tokens']==100
+    row=summarize([(d,'test',1,0,None)],today=d,days=1)[0]
+    assert row['total_tokens'] is None and row['test']['unknown_usage_requests']==1
+
+
+@pytest.mark.parametrize('channel',['mcp','http_api'])
+def test_test_flag_only_changes_accounting_not_engine_input(channel):
+    import asyncio
+    from src.finance_api.models import FinanceQueryRequest
+    from src.finance_api.service import FinanceApiGateway
+    from tests.test_finance_api_gateway import _Engine
+    records=[]
+    engine=_Engine()
+    gateway=FinanceApiGateway(engine=engine,usage_recorder=lambda **r:records.append(r))
+    response=asyncio.run(gateway.execute(FinanceQueryRequest(query='贵州茅台行情',is_test=True),principal_id='a',request_channel=channel))
+    assert records[0]['channel']=='test' and response.execution.is_test is True
+    assert 'is_test' not in engine.calls[0]
+    assert FinanceQueryRequest(query='行情').is_test is False
+    with pytest.raises(ValueError):FinanceQueryRequest(query='行情',is_test={'invalid':True})
+
+
+def test_backfill_idempotency_and_conflict_rollback():
+    from datetime import datetime
+    from scripts.backfill_finance_test_usage import apply_rows
+    row=('fq_saved','test',datetime(2026,9,10,10),123,1)
+    class DB:
+        committed=rolled=False
+        current=None
+        def begin(self):pass
+        def close(self):pass
+        def commit(self):self.committed=True
+        def rollback(self):self.rolled=True
+        def cursor(self):return self
+        def __enter__(self):return self
+        def __exit__(self,*a):pass
+        def execute(self,sql,args):
+            if sql.startswith('INSERT'):self.current=args[1:]
+        def fetchone(self):return self.current
+    db=DB()
+    assert apply_rows([row],lambda:db)==1
+    assert apply_rows([row],lambda:db)==0
+    db.current=('mcp',*row[2:])
+    with pytest.raises(ValueError,match='differs'):apply_rows([row],lambda:db)
+    assert db.rolled

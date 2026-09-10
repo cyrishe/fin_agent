@@ -1,7 +1,7 @@
 """Isolated real-HTTP MCP regression: source questions, data only, no replay.
 
-Run from an isolated checkout. Credentials stay in memory; only the reporting
-counter is disabled, not the financial gateway or model/tool execution path.
+Run from an isolated checkout. Credentials stay in memory; real model usage is
+recorded in the test bucket, including isolated runs.
 """
 from __future__ import annotations
 
@@ -54,7 +54,7 @@ def main():
     from dotenv import load_dotenv
     load_dotenv(args.env_file)
     # The gateway is unchanged; isolate listeners, worker/session files and
-    # reporting counters from the production service and its usage statistics.
+    # transport from the production service; actual usage is still accounted.
     os.environ['FINANCE_API_ROOT_PATH'] = ''
     os.environ['FINANCE_API_ALLOWED_HOSTS'] = '127.0.0.1:*,localhost:*'
     os.environ['FINANCE_STATUS_ENABLED'] = '0'
@@ -118,7 +118,8 @@ def main():
         available = {item['id'] for item in engine.business_skill_catalog.entries()}
         if set(args.allowed_skills) - available:
             parser.error('allowed-skills contains an unregistered system Skill')
-    gateway = FinanceApiGateway(engine=engine, usage_recorder=lambda **_: None)
+    from src.services.request_usage_service import record_request
+    gateway = FinanceApiGateway(engine=engine, usage_recorder=record_request)
     app = create_app(auth=FinanceApiKeyAuth({'report-eval': key}), gateway=gateway)
     sock = socket.socket()
     sock.bind(('127.0.0.1', 0))
@@ -161,7 +162,7 @@ def main():
             'conversation_id_supplied': args.conversation_id,
             'allowed_skills': args.allowed_skills,
             'skill_catalog_revision': engine.business_skill_catalog.revision,
-            'usage_counter': 'disabled for benchmark', 'prewarm': warm,
+            'usage_counter': 'test bucket, included in system totals', 'prewarm': warm,
             'authentication_checks': auth_checks,
             'policy_sha256': hashlib.sha256((ROOT / 'src/scenarios/financial_qa/dsh_loop_policy.mjs').read_bytes()).hexdigest(),
             'created_at': datetime.now(timezone.utc).isoformat()}
@@ -173,7 +174,7 @@ def main():
         def run(case):
             request = {'query': case['question'], 'response_mode': args.response_mode, 'runtime': 'dsh',
                        'execution_mode': 'standard', 'research_mode': 'fast',
-                       'detail': True, 'max_rows': args.max_rows}
+                       'detail': True, 'max_rows': args.max_rows, 'is_test': True}
             if args.conversation_id:
                 request['conversation_id'] = args.conversation_id
             started = time.monotonic()

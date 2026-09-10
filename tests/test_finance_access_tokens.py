@@ -119,6 +119,7 @@ async def test_real_mcp_auth_middleware_rejects_expired_token_before_gateway(mon
             token=auth.issue_temporary_token()["access_token"], output_dir=tmp_path / "both", response_mode="both",
             transport=httpx.ASGITransport(app=app))
         assert records[0]["response"]["summary"] == "测试摘要"
+        assert all(call[0].is_test is True for call in gateway.calls)
         assert all(call[0].conversation_id is None for call in gateway.calls)
         async with httpx.AsyncClient(transport=httpx.ASGITransport(app=app), base_url="http://testserver") as client:
             assert (await client.post("/mcp", json=call)).status_code == 401

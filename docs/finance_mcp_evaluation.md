@@ -9,6 +9,22 @@
 默认 `finance_task`、`runtime=dsh`、`research_mode=auto`、`execution_mode=standard`、
 `response_mode=both`、`detail=true`、并发2、HTTP超时360秒。每题独立，不传conversation_id，不自动重试。
 
+评测器固定传`is_test=true`：正常写入用量账本，显示在独立的测试栏，且包含在系统总量内。
+普通REST/MCP调用省略此字段仍计入原渠道。测试标记不改变权限、模型提示或执行过程。
+测试与MCP/HTTP是互斥的记账分类，同一请求只累计一次。隔离研报评测器也启用测试记账，
+不再关闭用量记录；纯替身单元测试不连接生产账本。
+
+旧版服务需加载新代码并重启后支持此字段；评测器会先检查工具Schema。历史记录可由管理员凭原始证据补记：
+
+```bash
+python scripts/backfill_finance_test_usage.py <保存的运行目录> --env-file .env
+# 上面先预览数量、Token和完成日期；确认原始证据后执行：
+python scripts/backfill_finance_test_usage.py <保存的运行目录> --env-file .env --apply
+```
+
+补记保留原始请求ID和完成时间，按ID幂等；若已存在记录与证据冲突，则整批回滚。
+不会从历史请求数量猜测哪些是测试，也不会无证据重新归类旧的MCP记录。
+
 ## 一条命令签发1小时凭证并运行
 
 在有权读取服务端API父Key的环境运行，例如服务器项目目录：

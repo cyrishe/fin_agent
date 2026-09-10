@@ -19,6 +19,7 @@ SKILL_SELECTION_DESCRIPTION = (
 
 class FinanceQueryRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
+    is_test: bool = Field(default=False, description="Account this request in the test usage bucket, included in system totals. Does not change permissions or model behavior.")
     detail: bool = Field(default=False, description="Include execution steps, turns, token usage and timing diagnostics; does not change query behavior.")
 
     query: str = Field(
@@ -92,6 +93,7 @@ class FinanceTaskRequest(FinanceQueryRequest):
 
 class FinanceAnswerRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
+    is_test: bool = Field(default=False, description="Account this request as test usage, included in system totals.")
     detail: bool = Field(default=False, description="Include execution diagnostics without changing answer behavior.")
 
     query: str = Field(min_length=1, max_length=4_000)
@@ -161,6 +163,7 @@ class FinanceDataPayload(BaseModel):
 
 
 class FinanceExecutionMetadata(BaseModel):
+    is_test: bool = Field(default=False, description="This request is accounted in the test bucket, included in system totals.")
     duration_ms: int = 0
     worker_index: int | None = None
     queue_wait_ms: int = 0

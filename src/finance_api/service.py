@@ -132,6 +132,7 @@ class FinanceApiGateway:
         request_channel: str = "http_api",
     ) -> FinanceQueryResponse:
         request_id = f"fq_{uuid.uuid4().hex}"
+        request_channel = "test" if request.is_test else request_channel
         runtime = normalize_financial_qa_runtime(
             request.runtime or self.default_runtime
         )
@@ -292,6 +293,7 @@ class FinanceApiGateway:
                     else None
                 ),
                 "execution": {
+                    "is_test": request.is_test,
                     "duration_ms": int(finance_meta.get("duration_ms") or 0),
                     "worker_index": finance_meta.get("worker_index"),
                     "queue_wait_ms": int(finance_meta.get("queue_wait_ms") or 0),

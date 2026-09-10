@@ -263,6 +263,7 @@ def create_app(
             Field(ge=1, le=100, description="Maximum returned rows per result."),
         ] = 100,
         detail: Annotated[bool, Field(description="Include turns, per-step token usage, timings and query validation evidence. No change to execution behavior.")] = False,
+        is_test: Annotated[bool, Field(description="计入测试用量栏及系统总量，不改变权限或执行行为。")] = False,
     ) -> FinanceQueryResponse:
         return await execute_mcp(
             FinanceQueryRequest(
@@ -274,6 +275,7 @@ def create_app(
                 conversation_id=conversation_id,
                 max_rows=max_rows,
                 detail=detail,
+                is_test=is_test,
             ),
         )
 
@@ -293,11 +295,12 @@ def create_app(
         conversation_id: Annotated[str | None, Field(min_length=1, max_length=128, pattern=r"^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$", description="调用方会话 ID；省略则每次独立。")] = None,
         max_rows: Annotated[int, Field(ge=1, le=100, description="每个结果集返回行数上限。")] = 100,
         detail: Annotated[bool, Field(description="附带执行与用量明细。")] = False,
+        is_test: Annotated[bool, Field(description="计入测试用量栏及系统总量，不改变权限或执行行为。")] = False,
     ) -> FinanceQueryResponse:
         return await execute_mcp(FinanceTaskRequest(
             query=query, skill_ids=skill_ids, response_mode=response_mode,
             research_mode=research_mode, execution_mode=execution_mode, runtime=runtime,
-            conversation_id=conversation_id, max_rows=max_rows, detail=detail,
+            conversation_id=conversation_id, max_rows=max_rows, detail=detail, is_test=is_test,
         ))
 
     @mcp.tool(
@@ -571,6 +574,7 @@ def create_app(
             conversation_id=payload.conversation_id,
             max_rows=payload.max_rows,
             detail=payload.detail,
+            is_test=payload.is_test,
         )
         try:
             response = await current_gateway().execute(

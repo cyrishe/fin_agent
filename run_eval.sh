@@ -22,6 +22,7 @@ TOOL=""
 
 DETAIL=true                              # true默认返回轮次、Token、耗时、步骤和工具证据；false关闭
 # 当前API不返回内部思考原文；推理Token与执行步骤按API实际返回记录。
+# 本评测客户端自动标记is_test=true，计入统计页“测试”栏及系统总量。
 RESPONSE_MODE="both"                     # both=回答+数据；summary=仅回答；data=仅数据
 RESEARCH_MODE="auto"                     # auto / fast / deep：答复深度
 EXECUTION_MODE="standard"                # standard=正常执行；fast=服务端快速取数路径

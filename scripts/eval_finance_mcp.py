@@ -113,7 +113,7 @@ def case_request(case, *, tool=None, skill_ids=None, detail=True, runtime="dsh",
         raise ValueError("Explicit Skills require --tool finance_task; use --auto to clear case Skills.")
     request = {"query": case["question"], "runtime": runtime, "response_mode": response_mode,
                "execution_mode": execution_mode, "research_mode": research_mode,
-               "detail": detail, "max_rows": max_rows}
+               "detail": detail, "max_rows": max_rows, "is_test": True}
     if selected_tool == TOOL and selected_skills:
         request["skill_ids"] = selected_skills
     return selected_tool, request
@@ -255,6 +255,10 @@ async def evaluate(cases, *, url, token, output_dir, concurrency=2, response_mod
         names = {t.get("name") for t in tools}
         if {name for name, _ in requests.values()} - names:
             raise ValueError("Requested MCP tool is unavailable; check deployment version.")
+        for descriptor in tools:
+            if descriptor.get("name") in {name for name, _ in requests.values()} and "inputSchema" in descriptor:
+                if "is_test" not in descriptor["inputSchema"].get("properties", {}):
+                    raise ValueError("Server does not support test accounting yet; deploy/restart before evaluating.")
         manifest["protocol_version"] = protocol
         manifest["available_tools"] = sorted(names)
         # Resolve explicit IDs against the same authenticated catalog before model calls.

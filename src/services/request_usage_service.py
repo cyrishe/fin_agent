@@ -16,6 +16,8 @@ from src.utils.system_db_utils import system_db_connection_kwargs
 TZ = ZoneInfo("Asia/Shanghai")
 LOG = logging.getLogger(__name__)
 TABLE = "aiia_request_usage"
+# Mutually exclusive accounting buckets; test is included once in system totals.
+USAGE_CHANNELS = ("chat", "mcp", "http_api", "test")
 DDL = f"""CREATE TABLE IF NOT EXISTS {TABLE} (
     request_id VARCHAR(96) NOT NULL PRIMARY KEY,
     channel VARCHAR(16) NOT NULL,
@@ -69,8 +71,8 @@ def total_tokens(usage) -> int | None:
 
 def record_request(*, request_id, channel, usage, succeeded, finished_at=None):
     """One ID per accepted execution; duplicate completion replaces, never increments."""
-    if channel not in {"mcp", "http_api"}:
-        raise ValueError("External request channel must be mcp or http_api")
+    if channel not in {"mcp", "http_api", "test"}:
+        raise ValueError("External request channel must be mcp, http_api or test")
     try:
         conn = connect()
         try:
@@ -93,10 +95,10 @@ def summarize(rows, *, today: date, days: int):
         day = (today-timedelta(days=n)).isoformat()
         daily[day] = {"date": day, **{channel: {"requests": 0, "token_requests": 0,
             "total_tokens": 0, "unknown_usage_requests": 0, "average_tokens": None}
-            for channel in ("chat", "mcp", "http_api")}}
+            for channel in USAGE_CHANNELS}}
     for day, channel, count, known, tokens in rows:
         item = daily.get(str(day))
-        if item is None or channel not in ("chat", "mcp", "http_api"):
+        if item is None or channel not in USAGE_CHANNELS:
             continue
         count, known, tokens = int(count), int(known), int(tokens or 0)
         item[channel] = {"requests": count, "token_requests": known,
@@ -104,7 +106,7 @@ def summarize(rows, *, today: date, days: int):
             "unknown_usage_requests": count-known,
             "average_tokens": round(tokens/known, 1) if known else None}
     for item in daily.values():
-        channels = [item[c] for c in ("chat", "mcp", "http_api")]
+        channels = [item[c] for c in USAGE_CHANNELS]
         item["known_total_tokens"] = sum(c["total_tokens"] or 0 for c in channels)
         item["unknown_usage_requests"] = sum(c["unknown_usage_requests"] for c in channels)
         item["total_tokens"] = item["known_total_tokens"] if not item["unknown_usage_requests"] else None
@@ -163,13 +165,13 @@ class DailyUsageService:
                 "timezone": "Asia/Shanghai", "external_usage_since": str(first) if first else None,
                 "collection_started_at": str(collected_since) if collected_since else None,
                 "days": summarize(rows,today=now.date(),days=days),
-                "note": "按完整请求完成日统计；内部轮次不计为请求。Token为已上报用量（缓存如有上报则包含），非费用。缺失用量不计零，均值只除以有用量的请求数；HTTP API单列，总量不重复相加。历史未接入的MCP/API不可回溯。"}
+                "note": "按完整请求完成日统计；内部轮次不计为请求。测试请求单列，包含在系统总Token中，不重复计入MCP/HTTP。Token为已上报用量（缓存如有上报则包含），非费用。缺失用量不计零，均值只除以有用量的请求数；未记录的历史用量只有具备原始请求证据时才能补记。"}
             for day in result["days"]:
                 if not collected_since or day["date"] <= collected_since.date().isoformat():
                     day["total_tokens"] = None
                     day["external_history_incomplete"] = True
                     if not collected_since or day["date"] < collected_since.date().isoformat():
-                        for channel in ("mcp", "http_api"):
+                        for channel in ("mcp", "http_api", "test"):
                             day[channel] = {key: None for key in day[channel]}
             self.cache[days] = (time.monotonic(),result)
             return result

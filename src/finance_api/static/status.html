@@ -30,11 +30,11 @@ $('usage-load').onclick=async()=>{
     const result=await r.json();
     $('usage-note').textContent=result.note+' 外部请求采集起点：'+(result.collection_started_at||'未建立')+'；含历史缺口时系统总量显示—，已记录量单独列出。';
     const table=el('table'),head=el('tr');
-    for(const title of ['日期','系统总Token','已记录Token','对话次数','对话Token','对话均值','MCP次数','MCP Token','MCP均值','HTTP次数','HTTP Token','HTTP均值','用量缺失请求'])head.append(el('th',title));
+    for(const title of ['日期','系统总Token','已记录Token','对话次数','对话Token','对话均值','MCP次数','MCP Token','MCP均值','HTTP次数','HTTP Token','HTTP均值','测试次数','测试Token','测试均值','用量缺失请求'])head.append(el('th',title));
     const thead=el('thead');thead.append(head);table.append(thead);const body=el('tbody');
     for(const day of result.days){
       const row=el('tr');row.append(el('td',day.date));
-      for(const value of [day.total_tokens,day.known_total_tokens,day.chat.requests,day.chat.total_tokens,day.chat.average_tokens,day.mcp.requests,day.mcp.total_tokens,day.mcp.average_tokens,day.http_api.requests,day.http_api.total_tokens,day.http_api.average_tokens,day.unknown_usage_requests])row.append(el('td',fmt(value)));
+      for(const value of [day.total_tokens,day.known_total_tokens,day.chat.requests,day.chat.total_tokens,day.chat.average_tokens,day.mcp.requests,day.mcp.total_tokens,day.mcp.average_tokens,day.http_api.requests,day.http_api.total_tokens,day.http_api.average_tokens,day.test?.requests,day.test?.total_tokens,day.test?.average_tokens,day.unknown_usage_requests])row.append(el('td',fmt(value)));
       body.append(row);
     }
     table.append(body);$('usage-table').replaceChildren(table);
