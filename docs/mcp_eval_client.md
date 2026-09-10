@@ -5,20 +5,18 @@
 ## 首次准备
 
 解压评测包，将管理员给你的Token文件保存为本目录的`token.json`。
-首次安装依赖（以后无需重复安装）：
+无需手动pip install或激活环境。首次运行会自动选择Python 3.10及以上版本，在本目录创建`.eval-venv`并安装依赖；以后复用。不会修改系统或Homebrew Python。首次安装需要联网。
+如果Python没有加入PATH，可将Shell顶部的`PYTHON_BIN`设为其完整路径，例如`/usr/local/bin/python3.12`。
 
-```bash
-python3 -m pip install -r requirements-eval.txt
-```
-
-如果电脑的Python命令叫`python`，将上面的`python3`替换为`python`。
 Windows使用Git Bash或WSL运行Shell；普通CMD/PowerShell不能直接解释.sh文件。
 
 ## 每次评测只执行一条命令
 
 ```bash
-bash run_eval.sh
+sh run_eval.sh
 ```
+
+也支持`bash run_eval.sh`。仅准备环境、不发起评测时运行`sh run_eval.sh --setup-only`。
 
 运行前用文本编辑器打开`run_eval.sh`，只改顶部“用户配置”部分即可。
 自带6条研报样本。使用自己的样本时，把文件放在本目录，将`CASES_FILE`改为对应文件名。

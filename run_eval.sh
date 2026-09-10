@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
-# 用法：修改下面的配置，随后执行 bash run_eval.sh。
+# 用法：修改下面的配置，随后执行 sh run_eval.sh（也支持bash）。
 # macOS / Linux 可直接运行；Windows 请在 Git Bash 或 WSL 中运行。
+# 即使用 sh 启动，也先切换到 Bash 再解析下方数组配置。
+if [ -z "${BASH_VERSION:-}" ] || [ "${BASH##*/}" = "sh" ]; then
+  exec bash "$0" "$@"
+fi
 set -eo pipefail
 
 # ==================== 用户配置：通常只改这一段 ====================
@@ -31,46 +35,38 @@ TIMEOUT=360                              # 单次HTTP超时，单位秒；不会
 MAX_ROWS=100                             # 每个结果集返回的样本行数，1～100
 LIMIT=""                                 # 空=全部；例如3表示只测前3题
 OUTPUT_DIR=""                            # 空=自动创建独立outputs目录；相对路径以本脚本目录为基准
-PYTHON_BIN=""                            # 空=自动找Python；也可填写虚拟环境Python的完整路径
+PYTHON_BIN=""                            # 空=自动找Python≥3.10；指定路径用于首次创建.eval-venv
 # ==================== 以下为执行逻辑，无需修改 ====================
 
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 cd -- "$SCRIPT_DIR"
 
-if [[ -z "$PYTHON_BIN" ]]; then
-  if [[ -x .venv/bin/python ]]; then
-    PYTHON_BIN="$SCRIPT_DIR/.venv/bin/python"
-  elif command -v python3 >/dev/null 2>&1; then
-    PYTHON_BIN="python3"
-  elif command -v python >/dev/null 2>&1; then
-    PYTHON_BIN="python"
-  else
-    echo "未找到Python，请先安装Python 3.10或更新版本。" >&2
+# 依赖只装在本目录，避开系统/Homebrew Python的安装限制。
+EVAL_PYTHON="$SCRIPT_DIR/.eval-venv/bin/python"
+if [[ ! -x "$EVAL_PYTHON" ]]; then
+  if [[ -z "$PYTHON_BIN" ]]; then
+    for candidate in python3 python3.14 python3.13 python3.12 python3.11 python3.10 python; do
+      if "$candidate" -c 'import sys; sys.exit(sys.version_info < (3, 10))' 2>/dev/null; then
+        PYTHON_BIN="$candidate"
+        break
+      fi
+    done
+  fi
+  if ! "${PYTHON_BIN:-python3}" -c 'import sys; sys.exit(sys.version_info < (3, 10))' 2>/dev/null; then
+    echo '需要Python≥3.10；请安装或在顶部PYTHON_BIN填写新版Python路径。' >&2
     exit 2
   fi
+  echo '首次运行：创建独立环境 .eval-venv …'
+  "$PYTHON_BIN" -m venv "$SCRIPT_DIR/.eval-venv" || { echo '创建失败，请确认该Python已安装venv模块。' >&2; exit 2; }
 fi
-if ! "$PYTHON_BIN" -c 'import sys; assert sys.version_info >= (3, 10); import httpx, openpyxl' >/dev/null 2>&1; then
-  echo "请确认Python版本至少为3.10，并首次安装依赖：" >&2
-  printf '  "%s" -m pip install -r requirements-eval.txt\n' "$PYTHON_BIN" >&2
-  exit 2
+if ! "$EVAL_PYTHON" -c 'import httpx, openpyxl' 2>/dev/null; then
+  echo '首次安装评测依赖，需要联网 …'
+  "$EVAL_PYTHON" -m pip install --disable-pip-version-check -q -r requirements-eval.txt || exit 2
 fi
-for file in "$TOKEN_FILE" "$CASES_FILE"; do
-  if [[ ! -f "$file" ]]; then
-    printf '找不到文件：%s\n请检查顶部配置；相对路径以run_eval.sh所在目录为基准。\n' "$file" >&2
-    exit 2
-  fi
-done
-case "$TOOL" in
-  ""|finance_task) SELECTED_TOOL="finance_task" ;;
-  finance_data_query) SELECTED_TOOL="finance_data_query" ;;
-  *) echo 'TOOL只能为空、finance_task或finance_data_query。' >&2; exit 2 ;;
-esac
-if [[ "$SELECTED_TOOL" == finance_data_query && ${#SKILLS[@]} -gt 0 ]]; then
-  echo '金融数据查询入口不接受Skill，请将SKILLS设为()，或将TOOL设为finance_task。' >&2
-  exit 2
-fi
+[[ "${1:-}" != --setup-only ]] || { echo '评测环境已就绪。'; exit 0; }
+
 args=(--url "$MCP_URL" --token-file "$TOKEN_FILE" --cases-file "$CASES_FILE"
-      --tool "$SELECTED_TOOL" --runtime dsh --response-mode "$RESPONSE_MODE"
+      --tool "${TOOL:-finance_task}" --runtime dsh --response-mode "$RESPONSE_MODE"
       --research-mode "$RESEARCH_MODE" --execution-mode "$EXECUTION_MODE"
       --concurrency "$CONCURRENCY" --timeout "$TIMEOUT" --max-rows "$MAX_ROWS")
 if [[ ${#SKILLS[@]} -eq 0 ]]; then
@@ -85,11 +81,5 @@ case "$DETAIL" in
 esac
 [[ -z "$LIMIT" ]] || args+=(--limit "$LIMIT")
 [[ -z "$OUTPUT_DIR" ]] || args+=(--output-dir "$OUTPUT_DIR")
-printf '开始评测：%s\nMCP入口：%s；详细指标：%s\n' "$CASES_FILE" "$SELECTED_TOOL" "$DETAIL"
-"$PYTHON_BIN" scripts/eval_finance_mcp.py "${args[@]}" && status=0 || status=$?
-case "$status" in
-  0) echo '评测已完成。Excel、完整阅读页和原始JSON已生成，路径见上方。' ;;
-  1) echo '报告已生成，但部分问题失败或未完成，请查看报告中的异常。' >&2 ;;
-  *) echo '评测未完成，请查看上方错误。已有JSON会保留，不会自动重跑。' >&2 ;;
-esac
-exit "$status"
+printf '开始评测：%s；MCP入口：%s\n' "$CASES_FILE" "${TOOL:-finance_task}"
+exec "$EVAL_PYTHON" scripts/eval_finance_mcp.py "${args[@]}"

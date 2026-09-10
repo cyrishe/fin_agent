@@ -53,7 +53,7 @@ cd /home/che/cyris/fin_agent
 
 ## 普通客户端使用已领取的Key
 
-客户端依赖：`python -m pip install httpx openpyxl`。
+客户端依赖由 `sh run_eval.sh` 自动安装到独立的 `.eval-venv`，无需向系统 Python 安装包。
 自动签发模式另需项目已有的 `python-dotenv` 依赖；不需要模型Key或数据库访问。
 
 ```bash
