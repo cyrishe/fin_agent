@@ -523,6 +523,12 @@ class FinancialQaCcService:
                 "\n\n[上下文指代参考]\n" + resolved_question
                 + "\n此参考用于识别前文对象；本轮目标和要求以用户原话为准。"
             )
+        if not data_only:
+            delivery_prompt = FinancialQaPresentationService.result_delivery_prompt(
+                thread_id=thread_id,
+            )
+            if delivery_prompt:
+                model_question += "\n\n" + delivery_prompt
         if attachments:
             inspection = self.input_resolver.inspect(attachments)
             parsed_attachments = [

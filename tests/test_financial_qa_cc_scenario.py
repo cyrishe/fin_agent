@@ -1019,6 +1019,81 @@ def test_dsh_model_sample_can_cover_a_small_complete_result(tmp_path: Path, coun
     assert len(tracker["result_refs"][0]["sample"]["rows"]) == expected
 
 
+def test_large_result_pages_bypass_model_context_and_preserve_full_store(tmp_path: Path) -> None:
+    from flask import Flask
+    from src.scenarios.financial_qa.presentation import FinancialQaPresentationService
+    from src.web.assistant_result_routes import create_assistant_result_blueprint
+
+    rows = [{"stock_code": f"fixture_{i:03}", "stock_name": f"样本公司{i}"} for i in range(190)]
+
+    class FixtureRuntime(_Runtime):
+        def execute_request(self, *, request, previous_results=None):
+            result = super().execute_request(request=request, previous_results=previous_results)
+            result["result"]["data"] = {"rows": rows, "row_count": len(rows)}
+            return result
+
+    runtime = FixtureRuntime()
+    store = SessionVariableStoreService(data_root=tmp_path / "data")
+    service = FinanceDataQueryCcTools(
+        finance_runtime=runtime, finance_catalog=_Catalog(), result_store=store,
+    )
+    tools, _, tracker = service.build_tools(owner_ids=["owner-a"], tool_context={
+        "_agent_runtime_scope": "financial_qa_dsh:owner-a/thread-list",
+        "_finance_model_sample_rows": 50,
+        "_finance_model_sample_max_chars": 6000,
+    })
+    result = _payload(asyncio.run({t.name: t for t in tools}["finance_query"].handler({
+        "steps": [{"goal": "列出查询结果", "request": "r1 = stock.quote() -> stock_code, stock_name"}],
+        "data_request_complete": True,
+    })))
+    assert result["row_count"] == 190
+    assert len(result["sample"]["rows"]) == 3
+    assert result["sample_complete"] is False
+    assert result["data_request_complete"] is True
+    assert "fixture_189" not in json.dumps(result)
+    blocks = FinancialQaPresentationService().build("结果见参考数据区。", tracker["result_refs"], thread_id=23)
+    table = next(b for b in blocks if b.get("payload", {}).get("shape") == "records")
+    data = table["payload"]["data"]
+    assert data["row_count"] == 190 and len(data["rows"]) == 3
+    assert data["data_ref"] == result["result_ref"]
+
+    class Conversation:
+        def get_thread(self, **kwargs):
+            return {"thread_id": 23, "owner_type": "user", "owner_id": "owner-a"}
+
+        def list_turns(self, **kwargs):
+            return [{"output_payload": {"surface_blocks": blocks}}]
+
+    # The real HTTP paging handler only needs the store and ownership evidence.
+    # No model service is supplied; it can fetch the final page without one.
+    app = Flask(__name__)
+    app.register_blueprint(create_assistant_result_blueprint(
+        conversation_service=Conversation(), identity_resolver=lambda: {"user_id": "owner-a"},
+        variable_store=store,
+    ))
+    client = app.test_client()
+    delivered = []
+    for offset in range(0, 190, 10):
+        response = client.get("/api/assistant/results/page", query_string={
+            "thread_id": 23, "data_ref": data["data_ref"], "offset": offset, "limit": 10,
+        })
+        assert response.status_code == 200
+        page = response.get_json()
+        assert page["page"]["total"] == 190
+        assert page["page"]["has_more"] is (offset < 180)
+        delivered.extend(page["rows"])
+    assert delivered == rows
+    assert len(runtime.calls) == 1
+    assert not any(c["tool"] == "load_finance_result" for c in tracker["calls"])
+    assert len(tracker["result_refs"][0]["sample"]["rows"]) == 3
+
+    # Analysis can still load a necessary late row after all UI pages were read.
+    detail = _payload(asyncio.run({t.name: t for t in tools}["load_finance_result"].handler({
+        "result_ref": result["result_ref"], "offset": 180, "limit": 10,
+    })))
+    assert detail["rows"] == rows[180:]
+
+
 def test_dsh_detail_default_can_cover_a_small_multi_period_result(
     tmp_path: Path,
 ) -> None:
@@ -1559,6 +1634,23 @@ class _Session:
 
     def close(self):
         return None
+
+
+@pytest.mark.parametrize("thread_id,data_only,has_paging", [
+    (23, False, True), ("23", False, True), ("finance-api-fixture", False, False),
+    (23, True, False),
+])
+def test_result_delivery_capability_reaches_model_only_for_chat(thread_id, data_only, has_paging):
+    session = _Session()
+    service = FinancialQaCcService(enabled=True, session_service=session)
+    service.answer(
+        thread_id=thread_id, turn_id=1, owner_id="owner-a", user_text="列出查询结果",
+        dispatch_plan={"selected_agent": "investment_analyst", "turn_mode": "normal_qa"},
+        data_only=data_only, include_response_data=False,
+    )
+    prompt = session.calls[0]["user_text"]
+    assert prompt.startswith("列出查询结果")
+    assert ("[系统结果展示能力]" in prompt) is has_paging
 
 
 def test_stock_research_result_declares_pdf_export_without_an_extra_model_step() -> None:

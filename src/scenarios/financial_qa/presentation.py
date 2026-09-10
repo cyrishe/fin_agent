@@ -66,6 +66,24 @@ class FinancialQaPresentationService:
 
     max_metrics = 6
 
+    @staticmethod
+    def result_delivery_prompt(*, thread_id: int | str | None) -> str:
+        """Describe the existing chat renderer to the agent, not a business mode."""
+        normalized = _trim(thread_id)
+        if not normalized.isdigit() or int(normalized) <= 0:
+            # API/standalone consumers need not have the chat paging endpoint.
+            return ""
+        return (
+            "[系统结果展示能力]\n"
+            "本轮查询结果由系统保存。参考数据区的明细表支持分页，用户可直接分页查看完整已返回结果；"
+            "界面翻页从已存结果读取，不经过模型。"
+            "列表和明细展示可直接使用该表格：根据查询范围、schema、row_count 和样本判断是否取得所需数据，"
+            "正文简要说明结果与范围，可列少量示例并指向参考数据区；无需为了展示逐页读取或重抄整表。"
+            "sample_complete=false 只表示模型看到的是样本，不表示已存结果缺失。"
+            "分析、比较或核验需要样本之外的具体内容时，仍按需读取必要列与范围；"
+            "用户明确要求正文全文或特定格式时按其要求交付。"
+        )
+
     def __init__(
         self,
         *,
