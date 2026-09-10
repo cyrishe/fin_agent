@@ -222,3 +222,33 @@ def test_multi_method_chat_transport_reaches_one_agent_and_persists_order(tmp_pa
     assert saved[0]["user_input_text"] == "$my-report-method $equity-report-analysis 综合分析"
     assert saved[-1]["output_payload"]["follow_up_questions"] == ["还需要哪些证据？"]
     assert result["follow_up_questions"] == ["还需要哪些证据？"]
+
+
+def test_generic_finance_entry_preserves_natural_question_without_inventing_dsl(tmp_path, monkeypatch):
+    service = method_service(tmp_path, [])
+    target = {"kind": "tool", "name": "finance_data_query"}
+    monkeypatch.setattr(service, "_resolve_invocation_target", lambda **kw: {"status": "resolved", "target": target})
+    checked = []
+    def contract(**kw):
+        checked.append(kw)
+        return {"display_name": "金融数据协议查询", "input_schema": {"type": "object", "properties": {"request": {"type": "string"}}}}
+    monkeypatch.setattr(service, "load_contract", contract)
+    result = service.plan(text="第二个怎么样？", selected_asset=target, business_owner_id="alice")
+    assert result["status"] == "ready"
+    assert result["user_request"] == "第二个怎么样？"
+    assert checked[0]["business_owner_id"] == "alice"
+
+
+def test_generic_finance_entry_uses_shared_session_and_owner(monkeypatch):
+    from src.web import flask_app as web
+    calls = []
+    monkeypatch.setattr(web.financial_qa_cc_service, "answer", lambda **kw: calls.append(kw) or {"message": "第二个是五粮液", "surface_blocks": []})
+    monkeypatch.setattr(web.tool_plan_runtime_service, "execute_for_assistant", lambda **kw: pytest.fail("generic natural-language entry must not invent a standalone DSL call"))
+    result = web._execute_asset_invocation_payload(
+        {"status": "ready", "target": {"kind": "tool", "name": "finance_data_query"},
+         "contract": {}, "user_request": "第二个怎么样？"},
+        text="第二个怎么样？", application_context={}, thread_context={}, thread_id=7, turn_id=20,
+        owner_id="alice", financial_qa_runtime="dsh")
+    assert calls[0]["thread_id"] == 7 and calls[0]["owner_ids"] == ["alice"]
+    assert calls[0]["explicit_skill_ids"] == [] and calls[0]["user_text"] == "第二个怎么样？"
+    assert result["message"] == "第二个是五粮液"

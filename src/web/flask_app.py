@@ -3425,7 +3425,8 @@ def _execute_asset_invocation_payload(
         }
 
     target = invocation.get("target") if isinstance(invocation.get("target"), dict) else {}
-    if str(target.get("kind") or "").strip() == "tool":
+    generic_finance_query = target == {"kind": "tool", "name": "finance_data_query"}
+    if str(target.get("kind") or "").strip() == "tool" and not generic_finance_query:
         execution_plan = asset_invocation_service.build_tool_execution_plan(invocation)
         result = tool_plan_runtime_service.execute_for_assistant(
             execution_plan=execution_plan,
@@ -3450,13 +3451,13 @@ def _execute_asset_invocation_payload(
 
     skill_name = str(target.get("name") or "").strip()
     contract = invocation.get("contract") if isinstance(invocation.get("contract"), dict) else {}
-    if contract.get("skill_type") == "business_method":
+    if contract.get("skill_type") == "business_method" or generic_finance_query:
         result = financial_qa_cc_service.answer(
             thread_id=thread_id or "",
             turn_id=turn_id or "",
             owner_id=owner_id,
             owner_ids=[owner_id] if owner_id else [],
-            explicit_skill_ids=invocation.get("explicit_skill_ids") or [skill_name],
+            explicit_skill_ids=[] if generic_finance_query else invocation.get("explicit_skill_ids") or [skill_name],
             user_text=str(invocation.get("user_request") or "").strip() or f"请使用 {skill_name}，结合当前会话确认需要处理的问题。",
             dispatch_plan={"entry": "agent_route", "selected_agent": "investment_analyst", "turn_mode": "normal_qa"},
             application_context=application_context,

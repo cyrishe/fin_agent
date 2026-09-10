@@ -916,7 +916,9 @@ class AssetInvocationService:
             allow_inactive=allow_inactive,
         )
         user_request = self.strip_invocation_prefix(text, target_name=target["name"])
-        if contract.get("skill_type") == "business_method":
+        if contract.get("skill_type") == "business_method" or target == {"kind": "tool", "name": "finance_data_query"}:
+            # The generic data entry, like a method, preserves natural language.
+            # Its catalog and executable queries belong to the Finance Agent.
             # A method keeps the user's semantic request in the Finance Agent.
             # It has no executable parameter schema or legacy SkillRunner job.
             invocation = {

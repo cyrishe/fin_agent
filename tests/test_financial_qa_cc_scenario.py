@@ -1692,7 +1692,8 @@ def test_financial_qa_service_uses_resolved_question_and_normal_qa_only() -> Non
         },
     )
 
-    assert session.calls[0]["user_text"] == "贵州茅台最近交易日的收盘价是多少？"
+    assert session.calls[0]["user_text"].startswith("那它呢？")
+    assert "[上下文指代参考]\n贵州茅台最近交易日的收盘价是多少？" in session.calls[0]["user_text"]
     assert "context_window" not in session.calls[0]["context"]
     assert session.calls[0]["context"]["allowed_agent_tools"] == []
     assert session.calls[0]["context"]["allowed_finance_skills"] == [
@@ -1854,6 +1855,9 @@ def test_financial_qa_prompt_keeps_business_rules_and_manual_stays_generic() -> 
     assert "stock." not in prompt + manual + protocol
     assert "mode=" not in prompt + manual + protocol
     assert set(business_skills) == {
+        "bond-analysis",
+        "fund-analysis",
+        "capital-flow-analysis",
         "market-overview",
         "sector-theme-analysis",
         "stock-research",
