@@ -78,7 +78,7 @@ FINANCE_API_OWNER_IDS_JSON='{"internal":"existing-user-id"}'
 
 ### MCP评测与临时凭证
 
-通用MCP查询评测、并发、data/both模式、Excel导出及默认4小时临时token签发，见
+通用MCP评测、Skill/工具选择、默认detail与回答、Excel完整问答及一键1小时临时token签发，见
 [MCP评测操作说明](finance_mcp_evaluation.md)。长期API key仍兼容；临时token需要加载新的认证实现。
 
 ### 纯数据与执行明细

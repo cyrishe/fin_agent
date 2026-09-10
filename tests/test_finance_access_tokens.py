@@ -91,6 +91,9 @@ async def test_real_mcp_auth_middleware_rejects_expired_token_before_gateway(mon
     class Gateway:
         calls = []
 
+        def list_skills(self, *, principal_id):
+            return {"skills": [], "revision": "test"}
+
         async def execute(self, request, *, principal_id, request_channel):
             self.calls.append((request, principal_id, request_channel))
             return FinanceQueryResponse.model_validate({

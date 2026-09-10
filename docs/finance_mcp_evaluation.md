@@ -1,134 +1,163 @@
-# MCP 查询评测与临时 Access Token
+# MCP评测：临时Key、自动路由与完整报告
 
-## 已有实现与本次边界
+统一入口：`scripts/eval_finance_mcp.py`。只调用现有MCP，不启动服务器、不修改生产配置。
+默认 `finance_task`、`runtime=dsh`、`research_mode=auto`、`execution_mode=standard`、
+`response_mode=both`、`detail=true`、并发2、HTTP超时360秒。每题独立，不传conversation_id，不自动重试。
 
-- 正式工具：`finance_data_query`，Streamable HTTP、无状态，服务内路径`/mcp`，当前nginx外部路径`/fin_agent/mcp`。
-- REST/MCP共用`FinanceApiGateway → FinancialQaCcService → DSH`。类名含Cc不代表使用CC；本脚本明确传`runtime=dsh`。
-- DSH加载现有`dsh_loop_policy.mjs`，默认启用优化策略；实际开关/模型/推理强度由服务器配置决定。脚本不修改这些参数；`execution_mode=standard`不是未经优化的DSH，`fast`则是已有的无检查/重试快速路径。
-- 旧`scripts/eval_finance_report_mcp.py`是隔离启动服务的184题研报回归；`scripts/eval_mcp_both_sample.py`是固定地址、固定模式的历史20题脚本。均保留。
-- 新`scripts/eval_finance_mcp.py`只访问现有MCP地址，不创建服务、不访问DB、不持有模型key、不绕过认证。默认并发2、仅数据、每题独立，不传conversation_id，也不移除服务原有显式会话续接功能。
-- 新`scripts/create_finance_access_token.py`只给持有服务端父key的操作人员签发临时凭证。到期校验属于认证协议，不修改业务提示词、catalog、SQL或loop。
+## 一条命令签发1小时凭证并运行
 
-## 先部署一次认证改动
-
-长期`FINANCE_API_KEY / FINANCE_API_KEYS_JSON`继续有效。新增的临时token需要服务器加载本次`src/finance_api/auth.py`与`access_tokens.py`后才能识别；**旧服务会返回401，不能只生成token却不更新服务**。
-
-部署代码并按现有方式重启金融API服务一次。此后签发临时token不改.env、不增加数据库记录、也不需要再次重启。本文与脚本本身不会自动部署或重启生产。
-
-## 1. 在服务器签发临时token（默认4小时）
-
-用有权读取该服务.env的用户运行，不要把整份.env拷到评测电脑。
+在有权读取服务端API父Key的环境运行，例如服务器项目目录：
 
 ```bash
 cd /home/che/cyris/fin_agent
+.venv/bin/python scripts/eval_finance_mcp.py \
+  --url https://ai-agent.kingdomai.com/fin_agent/mcp \
+  --issue-token --env-file .env --ttl-hours 1 \
+  --cases-file tests/evals/report_mcp_skill_smoke_v1.json \
+  --output-dir outputs/report_mcp_run
+```
+
+这条命令复用现有临时Token签名机制，签发后直接调用，凭证只在进程内存中使用，不打印、不写入结果文件。
+多Key配置须加 `--principal 已有principal_ID`。真实环境变量优先于env文件。
+`--ttl-hours`支持小数，如0.5；默认1小时。报告仅记录principal、签发/到期时间等非秘密元数据。
+
+这里不是匿名申请接口：签发需要已有父Key权限，不引入新的远程发Key服务。
+临时Token继承父Key的权限和归属，过期后新请求401；过期前已接收的请求可完成。
+认证失败后停止未开始的题，已开始的请求收尾，不自动续期或重跑。
+父Key轮换并加载后，其临时Token同时失效；不支持单枚提前撤销。
+
+服务必须已加载支持临时Token及`finance_task`的代码。脚本先认证、initialize、tools/list，
+并通过list_skills核对显式方法的权限。旧服务或无权限会在业务请求之前失败，不悄悄改走其他入口。
+本脚本不会自动重启生产服务。
+
+## 普通客户端使用已领取的Key
+
+客户端依赖：`python -m pip install httpx openpyxl`。
+自动签发模式另需项目已有的 `python-dotenv` 依赖；不需要模型Key或数据库访问。
+
+```bash
+python scripts/eval_finance_mcp.py \
+  --url https://ai-agent.kingdomai.com/fin_agent/mcp \
+  --token-file /tmp/finance-eval-token.json \
+  --query '机构看好山东黄金的主要理由有哪些？' \
+  --skill equity-report-analysis
+```
+
+也可将已有Key/临时Token放在`FINANCE_ACCESS_TOKEN`环境变量，然后省略token-file。
+`--token-env NAME`改用其他变量。凭证不接受命令行明文参数。
+若要单独签发供别人使用，保留原工具：
+
+```bash
 .venv/bin/python scripts/create_finance_access_token.py \
-  --env-file .env \
-  --output /tmp/finance-eval-token.json
+  --env-file .env --ttl-hours 1 --output /tmp/finance-eval-token.json
 ```
 
-多key配置必须用`--principal 已有key的ID`选择归属；只有一个key时可省略。
-要改为2小时，加`--ttl-hours 2`，也允许小数（如0.5小时）。
+该工具默认仍是历史的4小时，指定1小时即可；文件权限0600，只能新建。通过安全渠道交付，不复制整份.env。
 
-输出文件包含access_token、归属及到期时间，文件权限0600，只能新建、不会覆盖。终端仅打印文件位置与到期时间，不打印token。通过SSH/SCP安全传到评测电脑并维持0600权限，不要放进Git、聊天、截图或报告。
+## 选择Skill、工具或自动路由
 
-```bash
-scp che@39.106.248.18:/tmp/finance-eval-token.json /tmp/finance-eval-token.json
-chmod 600 /tmp/finance-eval-token.json
-```
+在上述命令后组合这些参数：
 
-临时token以HMAC签名，归属继承签发它的父key；每次请求由服务器检查签名和到期时间。这里的“一次性”指一轮评测期间可重复使用，并非只能调用一次。到期前已被接收的请求允许完成；过期后新请求401。轮换/删除父key并让服务重新加载后，该父key签发的全部token失效。
+| 目的 | 参数 |
+|---|---|
+| 自动路由 | 不指定Skill/工具；默认`finance_task` |
+| 将题集里的显式选择清空 | `--auto` |
+| 指定研报Skill | `--skill equity-report-analysis` |
+| 多Skill，保留顺序并综合回答 | `--skill earnings-analysis --skill valuation-analysis` |
+| 指定金融数据查询入口 | `--tool finance_data_query` |
+| 对含Skill的题集改跑数据入口 | `--tool finance_data_query --auto` |
+| 回答和参考数据 | `--response-mode both`（默认） |
+| 只返回数据 / 只返回回答 | `--response-mode data` / `--response-mode summary` |
+| 详细执行证据 | `--detail`（默认）；关闭用`--no-detail` |
+| 深度、快速答复 | `--research-mode deep` / `--research-mode fast` |
+| 调用并发 / 超时 / 样本行数 | `--concurrency 2 --timeout 360 --max-rows 100` |
+| 题集筛选 | `--limit 3` 或 `--case-ids RTE016-explicit RTE020-auto` |
+| 已知服务器版本 | `--revision <server-commit>`，仅记录调用者声明，不用本地commit冒充服务器版本 |
 
-权限范围与父key相同（当前为金融数据REST/MCP访问），不是新增权限或管理员登录凭证。该设计没有单枚token的提前撤销列表；需要立即撤销时轮换父key。客户自助创建/撤销长期凭证的产品功能不在本次范围，脚本不会给客户服务器签名权限。
+`--tool`是MCP暴露的入口名，目前查询入口是`finance_task`、`finance_data_query`。
+`stock.report.query`等底层金融目录方法不是独立MCP工具，不能冒充MCP工具名传入。
+数据入口根据问题选择底层金融数据方法；本脚本不通过改写问题假装硬性锁定某个底层方法。
+工具工坊自定义工具不在本次范围。
 
-## 2. 单题或多题查询，直接获得Excel
+CLI的Skill/工具参数覆盖题集相应字段。`--auto`清空Skill选择，并默认使用finance_task；
+同时指定`--tool`时以显式工具为准。Skills仅用于finance_task；在数据入口传非空Skills会给出配置错误。
+Skill列表保留首次出现顺序，空列表或省略表示自动选择。
 
-评测端只需Python依赖，不需要DSH、模型配置或数据库连接：
-
-```bash
-python -m pip install httpx openpyxl
-
-python scripts/eval_finance_mcp.py \
-  --url https://ai-agent.kingdomai.com/fin_agent/mcp \
-  --token-file /tmp/finance-eval-token.json \
-  --query '鹏鼎控股与沪电股份2026年净利润预测增速有何差异？' \
-  --query '中信证券对迈瑞医疗2027年归母净利润预测是多少？' \
-  --concurrency 2 \
-  --response-mode data \
-  --output-dir outputs/mcp_my_eval
-```
-
-生成：`MCP评测结果.xlsx`、每题原始JSON、`results.json`及不含token的运行配置。
-
-- `--response-mode data`：原始数据，不生成summary。
-- `--response-mode both`：数据＋summary。其余参数保持一致，便于公平比较。
-- `--concurrency 10`：最多同时10个请求。实际吞吐受服务器worker数、DB连接池与模型限流影响，客户端不会自动调服务器。
-- `--timeout 180`：单请求HTTP超时；脚本不自动重试。客户端超时不等于服务端任务必然取消，报告记录为超时，不立即重发。
-- `--max-rows 100`：每个数据集接口最多返回100条（现有MCP上限）；Excel始终只预览前2条，原始JSON保存接口实际回传内容。真实总条数与返回条数分别保留，不声称JSON是数据库全量。
-- `--execution-mode fast`：使用已有DSH快速策略；默认standard与近期DSH Opt评测一致。
-- 默认每题独立。不允许题集中的额外字段覆盖认证、runtime或conversation_id。
-
-也可把已有长期key或临时token放进`FINANCE_ACCESS_TOKEN`环境变量，再省略`--token-file`；`--token-env NAME`可更改变量名。不要把token当命令行参数，以免进入shell历史或进程列表。
-
-脚本先做带认证的initialize与tools/list，再发送查询；认证不通过不发业务请求。途中401/403会停止尚未开始的题，已发出请求正常收尾，避免继续浪费配额。HTTP重定向不自动跟随，远程明文HTTP需要显式`--allow-insecure-http`。
-
-## 3. 复用已有评测集
-
-最近一批20题来自：
-
-```bash
-python scripts/eval_finance_mcp.py \
-  --url https://ai-agent.kingdomai.com/fin_agent/mcp \
-  --token-file /tmp/finance-eval-token.json \
-  --cases-file outputs/mcp_both_sample_20260907/manifest.json \
-  --limit 3 --concurrency 2 --response-mode both \
-  --output-dir outputs/mcp_latest20_pilot
-```
-
-manifest读取`pilot`，不会把155条分组候选也自动跑掉。确认前三题后，去掉`--limit 3`并选**新的输出目录**可跑20题。`--case-ids BUS026 RTEF112`可指定题目。
-
-研报题集可以重复指定`--cases-file`合并（67＋117＝184题）：
-
-- `outputs/financial_qa_mainland_eval_20260902/cases_mainland_supported.json`
-- `outputs/financial_qa_mainland_full_increment_20260903/cases_increment_no_news.json`
-
-通用金融题源：`outputs/d4f10504-8df6-435e-9316-3d89b5fd1015/source_cases.json`。
-历史outputs可能不在新克隆的仓库中，须携带所选题集JSON；脚本不会偷偷下载、改写题目或重建golden。
-
-自定义文件支持`{"cases":[{"case_id":"Q001","question":"你的问题"}]}`或字符串数组。
-入口覆盖仅使用题目已有`required_entries`；没有golden就留空，不杜撰正确率。
-
-## 4. 报告格式与离线重新导出
-
-参考最近`outputs/finance_python_filter_v2_20260907/同20题回归对比.xlsx`的结果明细，去掉跨版本对比，保留两个页签：
-
-1. **评测结果**：问题、所选工具、执行时间、各数据集条数、入口覆盖、接口状态、LLM轮次、总Token、模型/API累计时间、人工结论。耗时有包含/并行关系，不把这几列直接相加。
-2. **结果明细**：实际API及错误、数据集schema、前2条、summary原文、SQL核验条数和人工证据。长summary续行保全，长数据字段仅在预览中明确节选。
-
-“接口完成”“入口覆盖”和“业务正确”分开。0条可是真实空结果；请求失败的条数显示“未返回数据集”，不伪装成0。自动脚本不消耗模型做二次裁判，也不读取DB写入虚假的SQL核验结论。
-
-已有人工评审可用`--review-file reviews.json`导入，格式：
+题集支持字符串数组、`cases`/`pilot`数组，以及`question`/`query`、`case_id`/`id`兼容输入：
 
 ```json
-{"Q001":{"verdict":"取数匹配","sql_row_count":0,"evidence":"公司、年份、机构条件完整；独立SQL为0条。"}}
+{"cases":[
+  {"case_id":"report","question":"总结贵州茅台近期机构共识","skill_ids":["equity-report-analysis"]},
+  {"case_id":"quote","question":"贵州茅台最新收盘价","tool":"finance_data_query"},
+  {"case_id":"auto","question":"分析阳光电源的竞争优势"}
+]}
 ```
 
-`sql_row_count`也可用简短文字表达多个数据集，如`r1=17；r2=26`。无评审时显示未人工评审/未核验。
+额外题集字段不直接透传到API；不能覆盖认证、runtime或会话归属。
+不要向已有运行目录追加新调用，脚本会拒绝，避免混合配置和覆盖首跑。
+
+## detail与思考信息
+
+默认保存完整JSON响应与这些接口已有字段：
+
+- 模型响应次数`detail.turns`，不是用户对话次数，也不等于工具调用次数。
+- 每次模型响应的耗时、输入/缓存/输出/推理Token、内部turn/step编号。
+- 客户端耗时、服务端请求耗时、核心执行耗时、排队时间。
+- 工具事件、调用参数、成功/失败、校验耗时、供应商API耗时、执行尝试。
+- 实际加载的Skill、内容hash、目录版本、参考数据、返回行数和截断标识。
+
+当前API不返回模型内部思考原文或独立纯思考耗时。报告呈现已公开的步骤、查询目标、工具证据和推理Token，
+不会把工具调用日志称为内部思考，也不会为获取思考原文改变服务端协议。
+增加客户端timeout不改变服务端turn预算或推理强度。
+
+时间可能重叠，不能相加为总耗时。缓存Token、推理Token依API定义统计，避免重复相加；未返回指标留空。
+结果总行数可能包含重复查询和聚合，不等于独立研报篇数。
+
+## Excel与完整阅读
+
+每次运行生成 `MCP评测结果.xlsx`、`完整阅读.html`、`results.json`、`results/*.json`、`manifest.json`。
+Excel有五个页签：
+
+1. **评测结果**：一题一行，完整问题和完整回答各一个单元格；关键耗时、Token、轮次、所选Skill、接口状态、人工复核。
+2. **运行指标**：一题一行，完整的服务耗时、Token口径、模型/推理强度、行数和请求配置。
+3. **模型步骤**：一次模型响应一行，不再把一句话拆成一行。
+4. **工具调用**：一次事件/业务调用一行；两类来源明确区分，保留失败和尝试证据。
+5. **参考数据**：一个结果集一行，包含实际返回的数据、Schema和来源。
+
+Excel行高有限，长回答在单元格内保存全文，主表保持适当高度；点击“完整阅读”进入对应题目的离线阅读页，
+原始回答连续展示，诊断数据默认折叠。分享时请将HTML与Excel放在同一目录。
+只有超出Excel单元格32,767字符容量的极长文本才在Excel中明确节选，HTML/JSON仍保存全文。
+原始回答不改写；不会基于HTTP200、工具命中或Token数量自动推断业务正确率。
+
+人工评审可通过 `--review-file reviews.json` 导入：
+
+```json
+{"RTE003-auto":{"verdict":"存在数值比较错误","evidence":"指出具体错误和来源，不改写模型原文。"}}
+```
+
+离线重排旧结果，不调用MCP、模型或签发Token：
 
 ```bash
-python scripts/eval_finance_mcp.py --export-only outputs/mcp_my_eval
+python scripts/eval_finance_mcp.py \
+  --export-only outputs/server_report_skill_20260910/isolated \
+  --output-dir outputs/report_mcp_readable
 ```
 
-此命令只重新导出Excel，不调用MCP/模型，不需要token。默认拒绝向已有运行目录发起新评测，避免混合参数或覆盖首跑；导出失败后JSON仍保留。
+支持通用脚本的results.json，以及9月10日服务器隔离测试的manifest＋单题JSON。
+省略output-dir时原地重建报告。报告导出失败也保留已保存的JSON，不自动重跑业务请求。
 
-Excel优先使用可用的Artifact Tool；普通服务器未安装该工具时使用已有openpyxl依赖输出相同列、值及结构，无需安装Codex。开发环境可通过`FINANCE_EVAL_NODE`及`FINANCE_EVAL_ARTIFACT_MODULES`指定Node和node_modules目录。导出器不会把问题或summary中以`=`开头的文字当作公式执行。
+开发环境优先使用Artifact Tool，可设置 `FINANCE_EVAL_NODE` 与 `FINANCE_EVAL_ARTIFACT_MODULES`。
+普通服务器未安装Artifact Tool时使用openpyxl，保持相同列和值，不需要安装Codex。
+问题、回答和数据按文本写入，HTML全部转义，不执行模型输出中的公式或脚本。
 
-退出码：0＝请求及返回结构均完成（不代表语义全对）；1＝至少一题失败/未执行/结构异常，报告仍生成；2＝配置、认证预检或导出失败。原始结果与失败证据不会自动重跑覆盖。
+退出码：0＝所有请求与必要响应结构完成（不代表语义全对）；1＝存在失败/未执行题，但已生成报告；
+2＝配置、预检或导出失败。HTTP超时不代表服务端已经取消任务，因此不会自动重发。
 
-## 本次验证（2026-09-08）
+## 验证入口
 
-- 使用服务端已有key对生产`https://ai-agent.kingdomai.com/fin_agent/mcp`执行只读tools/list，HTTP 200；确认工具名、data/summary/both及cc/dsh参数。没有调用生产模型或新增生产凭证。
-- 38项测试通过：原有key兼容、4小时默认值、有效期精确边界、签名/归属篡改、父key轮换、0600文件及日志不泄露、MCP真实认证中间件、初始化/发现/查询、data/both、并发、默认无历史、认证失败停止和失败证据保留。
-- 中间件与客户端集成测试使用真实FastMCP应用和替身数据网关，不伪称真实金融模型回归。
-- 用9月7日v2批次已保存的BUS026、BUS093、RTEF112三题验证导出；本地Artifact Tool生成并检查两个页签，schema、样例与summary续行保留；原始业务错误仍显示未完成，没有借导出修改结论。
-- 在服务器新建隔离临时目录测试同一导出脚本，确认Artifact Tool不可用时Python导出成功，两个页签及失败标记一致。退出码1是样例中原有失败题导致，非导出失败。
-- 示例文件：`outputs/finance_mcp_cli_20260908/MCP评测结果.xlsx`，仅是历史数据导出示例。本轮0次新增模型调用，未运行全量评测，未修改生产.env、未重启生产服务、未提交/推送代码。
+```bash
+.venv/bin/python -m pytest tests/test_finance_mcp_client_eval.py tests/test_finance_access_tokens.py -q
+```
+
+测试覆盖真实MCP认证中间件与替身业务网关、临时Key寿命/归属、自动和显式路由、详细响应、并发、
+失败停止、秘密脱敏和报告原文完整性。替身测试不代表生产模型效果评测；历史隔离结果不代表公网新版已生效。
