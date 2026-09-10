@@ -65,7 +65,7 @@ describe("whole-request activity visibility", () => {
 });
 
 it("renders persisted follow-ups only after the answer completes", () => {
-  const message = { id: "follow", role: "assistant" as const, content: "", payload: { follow_up_questions: ["下一步核验什么？"] }, run: { ...initialRun(), status: "done" as const } };
+  const message = { id: "follow", createdAt: 0, role: "assistant" as const, content: "", payload: { follow_up_questions: ["下一步核验什么？"] }, run: { ...initialRun(), status: "done" as const } };
   const html = renderToStaticMarkup(<MessageItem {...props} message={message} onFollowUp={noop} />);
   expect(html).toContain('aria-label="进一步提问"');
   expect(html).toContain("下一步核验什么？");
