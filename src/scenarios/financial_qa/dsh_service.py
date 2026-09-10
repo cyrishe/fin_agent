@@ -34,7 +34,7 @@ _DEFAULT_LOOP_POLICY_CONFIG: dict[str, Any] = {
     "maxCatalogAttempts": 6,
     "maxQueryAttempts": 3,
     "maxQueryRepairs": 1,
-    "maxLoadAttempts": 2,
+    "maxLoadAttempts": 2,  # Failed detail reads; successful pages do not spend retries.
     "skillMaxCatalogAttempts": 16,
     "skillMaxQueryAttempts": 12,
     "skillMaxLoadAttempts": 8,
@@ -56,6 +56,7 @@ _DEFAULT_LOOP_POLICY_CONFIG: dict[str, Any] = {
         "queryCellMaxChars": 480,
         "queryTotalMaxChars": 6000,
         "detailMaxRows": 10,
+        # Legacy keys remain accepted; detail pages are no longer cropped.
         "detailCellMaxChars": 2400,
         "detailTotalMaxChars": 16000,
     },

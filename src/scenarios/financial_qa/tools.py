@@ -1330,11 +1330,12 @@ class FinanceDataQueryCcTools:
                 "properties": {
                     "result_ref": {"type": "string", "minLength": 1, "maxLength": 200},
                     "offset": {"type": "integer", "minimum": 0},
-                    "limit": {"type": "integer", "minimum": 1, "maximum": 50},
+                    "limit": {"type": "integer", "minimum": 1, "maximum": 50, "description": "本次读取行数，最多 50；按 page.offset + page.returned 继续分页。"},
                     "filter": {"type": "string", "maxLength": 4000, "description": str(catalog_source().get("filter_syntax") or "")},
                     "order": {"type": "string", "maxLength": 500, "description": "结果列名 asc/desc，多个排序字段以逗号分隔。"},
                     "columns": {
                         "type": "array",
+                        "description": "需要参与本轮分析的结果列；依据完整 schema 和样本选择，遍历全部行也可只读必要列。省略或空列表时返回本页全部列；可后续增列补读。",
                         "maxItems": 20,
                         "items": {"type": "string", "minLength": 1, "maxLength": 100},
                     },

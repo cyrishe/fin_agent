@@ -1,0 +1,58 @@
+{
+  "recorded_at": "2026-09-10T07:23:25.346193+00:00",
+  "fin_base_commit": "a4fd7d2b4d9bab2bcaeb734cecf84f2d6c77131f",
+  "fin_sources": {
+    "src/scenarios/financial_qa/dsh_loop_policy.mjs": "bba1e0c0b1ef2fa9dc320dbde8a2a2e1758732a27d70d40cb299dcf736f54b8f",
+    "src/scenarios/financial_qa/tools.py": "d4ef9455d1e00f482510eb21d1ab5c48ca9b121a7239fbdc617bc2afdaf82fb0",
+    "src/scenarios/financial_qa/dsh_service.py": "446ed81d5f571154a65bdc16c351a1eb43dd7a2c9ec83adfa1296ecb36abca37",
+    "src/scenarios/financial_qa/dsh_system.md": "f1314ef30736b6f8abf782fa82e20802af20c2e9374b760495490984a32f891f",
+    "config/deepseek_harness/finance_query.patch.yml": "5d6e3ab24aa56fba15b2452bd59f9418864d746c0deedfb356580a6ce5bb6b65",
+    "scripts/verify_finance_dsh_detail_replay.py": "584e6030396847a32cee03b05b91564a3590d007a3e50fa7bec7660dec6b804f"
+  },
+  "test_sha256": "1b1eac7b6d35cab3bdfb9ca5ba315663b9a9774912831330e340d9d6167e4359",
+  "dsh_commit": "0433ae61319e1cdbe8adc8f1ca7192306bd2a6e4",
+  "dsh_existing_modified_files_sha256": {
+    "packages/llm/llm-deepseek/README.i18n.yaml": "6338bf9bc41306f90a9a6faf837b537fa97b797cf10330ef5208aff3bd700937",
+    "packages/llm/llm-deepseek/README.md": "9c0222f8df1481a502503819070fe8d7484b814273a413a32ae88cce29f443f3",
+    "packages/llm/llm-deepseek/README.zh.md": "504f64867f1a740002fad86eefa2da9fe37e55374ca89a605c2e147b50b954ff",
+    "packages/llm/llm-deepseek/src/translate.ts": "9dd6e7ce4b949e90fc745cf6f5cbcb603533ed4b4afcfe009d6d503f36b8cf26",
+    "packages/llm/llm-deepseek/src/types.ts": "bb95a134b37b211167cf567d0f4342c179fd28429ccb44b27104fd109427b258",
+    "packages/llm/llm-deepseek/tests/translate.spec.ts": "85ec338fd154a8f9a088e610835ca890982a21da2956a7660a7ffd85ae1feca8"
+  },
+  "dsh_changes_by_this_task": false,
+  "python_version": "3.12.14",
+  "node_version": "v24.19.0",
+  "tests": [
+    {
+      "command": ".venv/bin/python -m pytest -q tests/test_financial_qa_cc_scenario.py tests/test_financial_qa_dsh_runtime.py tests/test_financial_qa_presentation.py tests/test_session_variable_store_service.py",
+      "passed": 118,
+      "failed": 0,
+      "warning": "python_multipart PendingDeprecationWarning"
+    },
+    {
+      "command": "node --test tests/dsh_finance_loop_policy.test.mjs",
+      "passed": 67,
+      "failed": 0
+    },
+    {
+      "command": ".venv/bin/python scripts/verify_finance_dsh_detail_replay.py",
+      "passed": 5,
+      "paid_model_calls": 0
+    },
+    {
+      "command": ".venv/bin/python scripts/verify_finance_dsh_detail_replay.py --live",
+      "coverage_checks_passed": 3,
+      "paid_model_calls": 12,
+      "total_tokens_including_cache": 76175,
+      "not_full_quality_eval": true
+    },
+    {
+      "command": ".venv/bin/python scripts/verify_finance_dsh_history_replay.py",
+      "passed": true,
+      "paid_model_calls": 0
+    }
+  ],
+  "production_deployed": false,
+  "production_runtime_readiness": "NOT_READY",
+  "scope": "Synthetic catalog and provider; actual query handlers, storage, MCP and DSH. No database or customer data. Code hashes bind tests despite pre-commit execution."
+}

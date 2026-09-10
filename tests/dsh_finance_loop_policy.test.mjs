@@ -769,7 +769,7 @@ test('small detail tables remain complete despite the preview row limit', async 
   assert.equal(projected.result_projection, undefined)
 })
 
-test('large detail pages are contiguous and page metadata matches visible rows', async () => {
+test('explicit detail pages keep every requested row even above legacy preview budgets', async () => {
   const runtime = fixture({ resultProjection: { detailMaxRows: 4, detailTotalMaxChars: 200 } })
   const original = {
     page: { offset: 7, returned: 20, total: 27, has_more: false },
@@ -779,10 +779,73 @@ test('large detail pages are contiguous and page metadata matches visible rows',
     content: [{ type: 'text', text: JSON.stringify(original) }],
   })
   const projected = JSON.parse(result.content[0].text)
-  assert.deepEqual(projected.rows.map(row => row.index), [7, 8, 9, 10])
-  assert.equal(projected.page.returned, 4)
-  assert.equal(projected.page.has_more, true)
-  assert.equal(original.page.returned, 20)
+  assert.deepEqual(projected, original)
+})
+
+test('parallel pages cover all 190 rows and preserve late long-field evidence', async () => {
+  for (const preserveRequestPrefix of [false, true]) {
+    const runtime = fixture({ preserveRequestPrefix, maxQueryAttempts: 1 })
+    runtime.event({ type: 'turn/start', data: { turn: 1 } })
+    completeCall(runtime, 1, 'query', NAMES.query, { ok: true, result_ref: 'session://r', sample_complete: false })
+    if (!preserveRequestPrefix) assert.deepEqual(runtime.restrictions.at(-1).allow, [NAMES.details])
+    assert.match(runtime.guard({ name: NAMES.query, arguments: {} }), /拒绝/)
+    const rows = Array.from({ length: 190 }, (_, index) => ({
+      index, text: '正文'.repeat(2100) + `完整尾证据-${index}`,
+    }))
+    const offsets = [0, 50, 100, 150]
+    for (const offset of offsets) {
+      const args = { result_ref: 'session://r', offset, limit: 50, columns: ['index', 'text'] }
+      runtime.event({ type: 'tool/call', data: { turn: 1, step: 3, callId: `page${offset}`, name: NAMES.details, arguments: args } })
+      assert.equal(runtime.guard({ name: NAMES.details, arguments: args }), undefined)
+    }
+    const visible = []
+    for (const offset of offsets) {
+      const payload = { result_ref: 'session://r', rows: rows.slice(offset, offset + 50),
+        page: { offset, limit: 50, returned: Math.min(50, 190 - offset), total: 190, has_more: offset < 150 } }
+      const canonical = { content: [{ type: 'text', text: JSON.stringify(payload, null, 2) }], value: payload }
+      const projected = await runtime.post({ name: NAMES.details }, canonical)
+      const actual = JSON.parse(projected.content[0].text)
+      assert.deepEqual(actual, payload)
+      assert.equal(canonical.value, payload)
+      visible.push(...actual.rows)
+      runtime.event(resultEvent({ step: 3, callId: `page${offset}`, payload: actual }))
+    }
+    assert.deepEqual(visible, rows)
+    if (preserveRequestPrefix) assert.match(JSON.stringify((await runtime.preStep({ step: 4 })).messages), /失败额度 2\/2/)
+    else assert.match(runtime.prompt(), /失败额度 2\/2/)
+    assert.match(runtime.guard({ name: NAMES.details, arguments: { result_ref: 'session://r', offset: 0, limit: 50, columns: ['index', 'text'] } }), /重复/)
+  }
+})
+
+test('detail strings and nested values are lossless while only JSON whitespace is removed', async () => {
+  const runtime = fixture()
+  const document = '正文\n'.repeat(9000) + '文档末尾证据'
+  for (const payload of [
+    { rows: [{ text: '中😀\n'.repeat(8000) + '末尾证据', nested: { source: '原始来源' } }] },
+    { text: document, page: { offset: 0, returned: document.length, total: document.length, has_more: false } },
+  ]) {
+    const text = JSON.stringify(payload, null, 2)
+    const projected = await runtime.post({ name: NAMES.details }, { content: [{ type: 'text', text }] })
+    assert.deepEqual(JSON.parse(projected.content[0].text), payload)
+    assert.ok(projected.content[0].text.length < text.length)
+  }
+})
+
+test('failed detail reads remain bounded and the allowance resets for a new turn', () => {
+  for (const payload of [{ error: 'not owned' }, { rows: [] }]) {
+    const runtime = fixture({ maxLoadAttempts: 2 })
+    runtime.event({ type: 'turn/start', data: { turn: 1 } })
+    for (let attempt = 1; attempt <= 3; attempt++) {
+      const args = { result_ref: `session://r${attempt}` }
+      runtime.event({ type: 'tool/call', data: { turn: 1, step: attempt, callId: `read${attempt}`, name: NAMES.details, arguments: args } })
+      const denied = runtime.guard({ name: NAMES.details, arguments: args })
+      if (attempt === 3 && payload.error) assert.match(denied, /失败次数已达上限/)
+      else assert.equal(denied, undefined)
+      runtime.event(resultEvent({ step: attempt, callId: `read${attempt}`, payload }))
+    }
+    runtime.event({ type: 'turn/start', data: { turn: 2 } })
+    assert.equal(runtime.guard({ name: NAMES.details, arguments: { result_ref: 'session://r1' } }), undefined)
+  }
 })
 
 test('leaves compact numeric query evidence byte-for-byte unchanged', async () => {
@@ -1216,20 +1279,16 @@ function toolStep(runtime, step, entries) {
 test('native call-before-guard order admits every budgeted call and rejects excess calls', t => {
   const history = loadedBasicInfo(t)
   for (const preserveRequestPrefix of [false, true]) {
-    for (const kind of ['catalog', 'query', 'details']) {
+    for (const kind of ['catalog', 'query']) {
       const runtime = fixture({ preserveRequestPrefix, maxCatalogAttempts: 2, maxQueryAttempts: 2, maxLoadAttempts: 2 }, history)
       runtime.event({ type: 'turn/start', data: { turn: 1 } })
       if (kind !== 'catalog') toolStep(runtime, 1, [{ kind: 'catalog', payload: { mode: 'dataview' } }])
-      if (kind === 'details') toolStep(runtime, 2, [{ kind: 'query', payload: {
-        ok: true, data_only_mode: true, data_only_complete: false, sample_complete: false, result_ref: 'r1',
-      } }])
       // Multiple calls may occur before step/end. Exercise the budget guard
       // itself, not only the final-stage transition after a completed step.
       for (const attempt of [1, 2, 3]) {
         const args = kind === 'catalog'
           ? { subject: 'stock', dataview: ['report', 'report_metric', 'basic_info'][attempt - 1], operation: 'query' }
-          : kind === 'details' ? { result_ref: 'r1', offset: attempt * 5 }
-            : { steps: [{ goal: '查询身份信息', request: `result = stock.basic_info(limit=${attempt}) -> code` }] }
+          : { steps: [{ goal: '查询身份信息', request: `result = stock.basic_info(limit=${attempt}) -> code` }] }
         runtime.event({ type: 'tool/call', data: {
           turn: 1, step: 3, callId: `${kind}-${attempt}`, name: NAMES[kind], arguments: JSON.stringify(args),
         } })
@@ -1364,7 +1423,7 @@ test('allows one query repair, then stops, and guards exact duplicates', () => {
     payload: { validation: { ok: false } },
   }))
   runtime.event({ type: 'step/end', data: { turn: 1, step: 3 } })
-  assert.deepEqual(runtime.restrictions.at(-1).allow, [])
+  assert.deepEqual(runtime.restrictions.at(-1).allow, [NAMES.details])
   assert.match(runtime.prompt(), /reason=query_attempt_limit/)
 })
 
@@ -1426,7 +1485,7 @@ test('a ready catalog route does not hide another incomplete parallel route', ()
   assert.match(runtime.prompt(), /reason=catalog_needs_narrowing/)
 })
 
-test('keeps querying after identity-only preparation and permits at most two detail pages', () => {
+test('keeps querying after identity-only preparation and permits continued successful detail reading', () => {
   const runtime = fixture()
   runtime.event({ type: 'turn/start', data: { turn: 1 } })
   runtime.event({
@@ -1471,7 +1530,7 @@ test('keeps querying after identity-only preparation and permits at most two det
   }
   assert.deepEqual(runtime.restrictions.at(-1).allow, [NAMES.catalog, NAMES.query, NAMES.details])
   runtime.event({ type: 'tool/call', data: { turn: 1, step: 6, callId: 'load-3', name: NAMES.details } })
-  assert.match(runtime.guard({ name: NAMES.details, arguments: { offset: 100 } }), /上限/)
+  assert.equal(runtime.guard({ name: NAMES.details, arguments: { offset: 100 } }), undefined)
   assert.match(runtime.prompt(), /stage=query/)
 })
 
@@ -1547,7 +1606,7 @@ test('actual Skill loading expands synthesis budget and resets between turns', a
   }
 })
 
-test('Skill budgets retain useful followups through query twelve and detail eight', async () => {
+test('Skill query budget remains bounded while successful detail reading can exceed eight pages', async () => {
   await withSkillContext({}, async () => {
     for (const kind of ['query', 'details']) {
       const runtime = fixture({}, [], SKILL_NAMES)
@@ -1555,11 +1614,15 @@ test('Skill budgets retain useful followups through query twelve and detail eigh
       completeCall(runtime, 1, 's', SKILL_NAMES.skill, { method: '分析方法' })
       completeCall(runtime, 2, 'c', NAMES.catalog, { mode: 'dataview' })
       if (kind === 'details') completeCall(runtime, 3, 'q', NAMES.query, { ok: true, result_ref: 'session://r', sample_complete: false })
-      const cap = kind === 'query' ? 12 : 8
+      const cap = kind === 'query' ? 12 : 10
       for (let n = 1; n <= cap; n++) {
         completeCall(runtime, n + 3, `${kind}${n}`, NAMES[kind], kind === 'query'
           ? { ok: true, result_ref: `session://r${n}`, sample_complete: true } : { rows: [{}] }, { offset: n })
         assert.match(runtime.prompt(), kind === 'query' && n === cap ? /stage=final/ : /stage=query/)
+      }
+      if (kind === 'details') {
+        assert.equal(runtime.guard({ name: NAMES.details, arguments: { result_ref: 'session://r', offset: 100 } }), undefined)
+        assert.match(runtime.prompt(), /失败额度 8\/8/)
       }
     }
   })

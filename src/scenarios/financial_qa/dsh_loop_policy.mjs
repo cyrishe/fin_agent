@@ -41,6 +41,7 @@ const DEFAULT_RESULT_PROJECTION = Object.freeze({
   queryCellMaxChars: 480,
   queryTotalMaxChars: 6000,
   detailMaxRows: 10,
+  // Accepted for old config files; explicit detail evidence is no longer cropped.
   detailCellMaxChars: 2400,
   detailTotalMaxChars: 16000,
 })
@@ -56,7 +57,7 @@ const DEFAULT_CONFIG = Object.freeze({
   maxCatalogAttempts: 6,
   maxQueryAttempts: 3,
   maxQueryRepairs: 1, // Legacy configuration accepted; total query attempts bound repairs.
-  maxLoadAttempts: 2,
+  maxLoadAttempts: 2, // Failed detail reads; successful pages do not spend retries.
   duplicateCallLimit: 1,
   maxRequiredStageSteers: 1,
   businessHint: '',
@@ -76,7 +77,7 @@ const STAGE_PROMPTS = Object.freeze({
   details:
     '按已有结果与本轮目标选择下一步；已保存结果可按 filter、order、columns 读取所需范围。',
   final:
-    '工具阶段已经结束。依据已有结果与执行证据，用简洁中文给出最终答案。数据不足时交代已查范围、实际缺口及尚待确定的结论；零行如实说明当前条件未匹配记录。',
+    '依据已有结果与执行证据给出最终答案，可按需继续读取已存明细。数据不足时交代已查范围、实际缺口及尚待确定的结论；零行如实说明当前条件未匹配记录。',
 })
 
 const FAST_STAGE_PROMPTS = Object.freeze({
@@ -355,38 +356,6 @@ function projectQueryPayload(payload, config) {
   return projected
 }
 
-function projectDetailPayload(payload, config) {
-  const projected = cloneJson(payload)
-  if (Array.isArray(projected.rows)) {
-    const result = projectRows(projected.rows, {
-      maxRows: config.detailMaxRows,
-      maxCellChars: config.detailCellMaxChars,
-      totalMaxChars: config.detailTotalMaxChars,
-    })
-    if (result.changed) {
-      projected.rows = result.rows
-      if (projected.page && typeof projected.page === 'object') {
-        const offset = Number(projected.page.offset ?? 0)
-        projected.page.returned = result.rows.length
-        projected.page.has_more = offset + result.rows.length < Number(projected.page.total ?? 0)
-      }
-      projected.result_projection = {
-        model_rows: result.rows.length,
-        shortened_fields: result.shortenedFields,
-        complete: false,
-        guidance: 'page 描述本页连续明细，shortened_fields 列出已缩略字段；完整原始行保存在 result_ref。',
-      }
-    }
-  } else if (typeof projected.text === 'string' && projected.text.length > config.detailTotalMaxChars) {
-    projected.text = `${projected.text.slice(0, config.detailTotalMaxChars)}…`
-    projected.result_projection = {
-      complete: false,
-      guidance: '这是面向模型的有界文本；原始内容仍保存在 result_ref。',
-    }
-  }
-  return projected
-}
-
 function projectedContent(content, kind, config) {
   if (!Array.isArray(content)) return undefined
   let replaced = false
@@ -401,7 +370,10 @@ function projectedContent(content, kind, config) {
     if (payload === null || typeof payload !== 'object' || Array.isArray(payload)) return block
     const projected = kind === 'query'
       ? projectQueryPayload(payload, config)
-      : projectDetailPayload(payload, config)
+      // A detail call already selects its columns and page at the tool boundary.
+      // Preserve that evidence verbatim: a second crop can skip rows in parallel
+      // pages or make the tail of a single cell impossible to retrieve.
+      : payload
     const text = JSON.stringify(projected)
     if (text === String(block.text ?? '')) return block
     replaced = true
@@ -538,13 +510,20 @@ function emptyResultHandoff(state, config) {
   return message
 }
 
+function unsuccessfulDetailReads(state) {
+  // Successful pages are progress, not retries. Derive failures from native
+  // outcomes so calls issued together are not rejected before any has run.
+  return [...state.calls.values()].filter(call => call.kind === 'details'
+    && call.allowedAtCall && state.results.get(call.callId)?.failed).length
+}
+
 function remainingBudget(state, config) {
   const limits = executionLimits(state, config)
   const fast = state.executionMode === 'fast'
   return {
     catalog: Math.max(0, (fast ? 1 : limits.maxCatalogAttempts) - state.catalogAttempts),
     query: Math.max(0, (fast ? 1 : limits.maxQueryAttempts) - state.queryAttempts),
-    details: Math.max(0, (fast ? 0 : limits.maxLoadAttempts) - state.loadAttempts),
+    details: Math.max(0, (fast ? 0 : limits.maxLoadAttempts) - unsuccessfulDetailReads(state)),
   }
 }
 
@@ -554,7 +533,7 @@ function budgetPrompt(state, config) {
   }
   const left = remainingBudget(state, config)
   const limits = executionLimits(state, config)
-  return `本轮工具额度（剩余/上限）：目录 ${left.catalog}/${limits.maxCatalogAttempts}，查询 ${left.query}/${limits.maxQueryAttempts}，结果读取 ${left.details}/${limits.maxLoadAttempts}。这是调用上限，不是必须用满的轮数；证据已足够时立即综合回答。根据剩余额度安排必要取证与修复，优先复用结果并合并已知依赖。`
+  return `本轮工具额度（剩余/上限）：目录 ${left.catalog}/${limits.maxCatalogAttempts}，查询 ${left.query}/${limits.maxQueryAttempts}，明细读取失败额度 ${left.details}/${limits.maxLoadAttempts}。成功分页不消耗失败额度，可按需继续读取已存结果。额度不是必须用满的轮数；证据已足够时立即综合回答。根据剩余额度安排必要取证与修复，优先复用结果并合并已知依赖。`
     + (left.query <= 1 ? '\n查询额度接近结束：聚焦最关键的缺口；额度用尽后依据已取得的证据收尾，明确未完成范围与结论限制。缺数据可以给有限结论，不把未验证条件说成已满足。' : '')
 }
 
@@ -607,7 +586,10 @@ function stageTools(state, tools) {
   // In standard mode, stages describe progress/budget profiles, not a forced
   // business workflow. The guard still checks each API's visible contract.
   if (state.executionMode === 'standard') {
-    if (state.stage === 'final' && (state.reason !== 'data_request_complete' || state.dataOnlyRequested)) return methods
+    if (state.stage === 'final' && (state.reason !== 'data_request_complete' || state.dataOnlyRequested)) {
+      // Exhausting provider queries does not revoke access to saved evidence.
+      return state.dataOnlyRequested || state.dataOnlyComplete ? methods : [...methods, tools.details].filter(Boolean)
+    }
     return [...methods, tools.catalog, tools.query, tools.details, tools.identity].filter(Boolean)
   }
   // Fast mode remains the explicit one-discovery/one-flow product contract.
@@ -1059,8 +1041,10 @@ export function apply(ctx, input = {}) {
       // include this attempt. Admit the last budgeted call, reject the next.
       if ((kind === 'catalog' && state.catalogAttempts > limits.maxCatalogAttempts)
         || (kind === 'query' && state.queryAttempts > limits.maxQueryAttempts)
-        || (kind === 'details' && state.loadAttempts > limits.maxLoadAttempts)
       ) return '本轮该类读取次数已达上限；请使用已有数据与当前可用工具完成剩余目标。'
+      if (kind === 'details' && unsuccessfulDetailReads(state) >= limits.maxLoadAttempts) {
+        return '本轮明细读取失败次数已达上限；请依据已取得的证据回答，明确尚未取得的内容。'
+      }
       if (kind === 'catalog') {
         const routeError = concreteCatalogRouteError(exec.arguments)
         if (routeError) return routeError
@@ -1088,9 +1072,8 @@ export function apply(ctx, input = {}) {
       return next()
     })
 
-    // Keep the durable result_ref and tracker untouched while bounding only
-    // the text copied into the next model request.  This is a DSH-native
-    // post-execute projection, so Chat/API callers still receive the full rows.
+    // Native post-execute projection bounds initial query previews and compacts
+    // JSON. Explicit detail pages and the canonical value stay lossless.
     agent.ctx.on('tools/post-execute', async (exec, result, next) => {
       const decision = await next()
       if (decision.kind !== 'accept'
