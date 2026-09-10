@@ -25,6 +25,7 @@ class _HistoryCursor:
             "已完成",
             json.dumps({
                 "mode": "custom_tool_flow",
+                "follow_up_questions": ["下一步核验什么？"],
                 "surface_blocks": [{"block_id": "result"}],
                 "workspace": None,
             }, ensure_ascii=False),
@@ -71,8 +72,10 @@ def test_history_query_projects_only_renderable_output_fields(monkeypatch) -> No
 
     assert "JSON_OBJECT" in _HistoryDb.latest._cursor.sql
     assert "JSON_EXTRACT" in _HistoryDb.latest._cursor.sql
+    assert "follow_up_questions" in _HistoryDb.latest._cursor.sql
     assert turns[0]["output_payload"] == {
         "mode": "custom_tool_flow",
+        "follow_up_questions": ["下一步核验什么？"],
         "surface_blocks": [{"block_id": "result"}],
     }
     assert turns[0]["model_name"] == "claude-sonnet"

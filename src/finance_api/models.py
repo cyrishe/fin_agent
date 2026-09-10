@@ -1,14 +1,20 @@
 from __future__ import annotations
 
-from typing import Any, Literal
+from typing import Annotated, Any, Literal
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator, model_serializer
+from pydantic import BaseModel, ConfigDict, Field, StringConstraints, field_validator, model_validator, model_serializer
 
 
 FinanceResponseMode = Literal["data", "summary", "both"]
 FinanceRuntime = Literal["cc", "dsh"]
 FinanceResearchMode = Literal["fast", "auto", "deep"]
 FinanceExecutionMode = Literal["standard", "fast"]
+SkillId = Annotated[str, StringConstraints(strip_whitespace=True, min_length=1)]
+SKILL_SELECTION_DESCRIPTION = (
+    "Optional ordered Skill IDs from list_skills. Omit, null or [] lets the agent choose "
+    "appropriate financial methods and data tools. Explicit Skills share evidence and produce "
+    "one combined answer in the supplied order. Only authorized, active business-method Skills are available."
+)
 
 
 class FinanceQueryRequest(BaseModel):
@@ -77,11 +83,19 @@ class FinanceQueryRequest(BaseModel):
         return self
 
 
+class FinanceTaskRequest(FinanceQueryRequest):
+    """One financial task, with automatic or explicit method selection."""
+
+    skill_ids: list[SkillId] | None = Field(default=None, description=SKILL_SELECTION_DESCRIPTION)
+    research_mode: FinanceResearchMode = Field(default="auto", description="Financial analysis depth.")
+
+
 class FinanceAnswerRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
     detail: bool = Field(default=False, description="Include execution diagnostics without changing answer behavior.")
 
     query: str = Field(min_length=1, max_length=4_000)
+    skill_ids: list[SkillId] | None = Field(default=None, description=SKILL_SELECTION_DESCRIPTION)
     runtime: FinanceRuntime | None = None
     research_mode: FinanceResearchMode = "fast"
     execution_mode: FinanceExecutionMode = "standard"

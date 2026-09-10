@@ -27,6 +27,7 @@ class RuntimeConversationService:
         "workspace",
         "task_state",
         "report_export",
+        "follow_up_questions",
     )
     HISTORY_OMIT_KEYS = {
         "events",

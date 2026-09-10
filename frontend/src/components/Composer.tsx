@@ -18,8 +18,9 @@ interface Props {
   focusRequest?: number;
   assets: InvocationAsset[];
   selectedAsset: InvocationAsset | null;
+  selectedAssets?: InvocationAsset[];
   onSelectAsset: (asset: InvocationAsset) => void;
-  onClearSelectedAsset: () => void;
+  onClearSelectedAsset: (ref: string) => void;
   attachments: Attachment[];
   onFiles: (files: File[]) => void;
   onRemoveAttachment: (index: number) => void;
@@ -174,12 +175,12 @@ export default function Composer(props: Props) {
       </div>}
       {props.attachments.length > 0 && <div className="attachment-preview">{props.attachments.map((attachment, index) => <div key={attachment.attachment_id || index}>{attachment.preview_url ? <img src={attachment.preview_url} alt={attachment.file_name || "附件"} /> : <span className="attachment-file"><Paperclip size={15} />{attachment.file_name || "附件"}</span>}<button type="button" onClick={() => props.onRemoveAttachment(index)} aria-label="移除附件"><X size={13} /></button></div>)}</div>}
       <div className={`composer ${focused ? "focused" : ""}`}>
-        {props.selectedAsset && <div className="invocation-guide">
-          <span className={`suggestion-icon ${props.selectedAsset.kind}`} aria-hidden="true">{props.selectedAsset.kind === "tool" ? <Blocks size={14} /> : <Sparkles size={14} />}</span>
+        {(props.selectedAssets || (props.selectedAsset ? [props.selectedAsset] : [])).map((asset, index) => <div className="invocation-guide" key={asset.ref}>
+          <span className={`suggestion-icon ${asset.kind}`} aria-hidden="true">{asset.kind === "tool" ? <Blocks size={14} /> : <Sparkles size={14} />}</span>
           <div className="invocation-identity">
-            <div><strong>{props.selectedAsset.displayName}</strong><small>{props.selectedAsset.kind === "skill" ? "Skill" : props.selectedAsset.customTool ? "个人工具" : "工具"}</small></div>
-            <code>{props.selectedAsset.invocation}</code>
-            <span>{props.selectedAsset.summary || "暂无作用说明"}</span>
+            <div><strong>{(props.selectedAssets?.length || 0) > 1 ? `${index + 1}. ` : ""}{asset.displayName}</strong><small>{asset.kind === "skill" ? "Skill" : asset.customTool ? "个人工具" : "工具"}</small></div>
+            <code>{asset.invocation}</code>
+            <span>{asset.summary || "暂无作用说明"}</span>
           </div>
           <div className="invocation-parameters">
             {invocationFields.map((field) => <span key={field.name} className={field.required ? "required" : "optional"} title={field.description}>
@@ -188,8 +189,8 @@ export default function Composer(props: Props) {
             {!invocationFields.length && <span className="ready">无需参数，可直接运行</span>}
             {invocationFields.length > 0 && !invocationFields.some((field) => field.required) && <span className="ready">可直接运行</span>}
           </div>
-          <button type="button" onClick={props.onClearSelectedAsset} aria-label={`取消调用${props.selectedAsset.displayName}`}><X size={13} /></button>
-        </div>}
+          <button type="button" onClick={() => props.onClearSelectedAsset(asset.ref)} aria-label={`取消调用${asset.displayName}`}><X size={13} /></button>
+        </div>)}
         <textarea
           ref={textRef}
           value={props.value}
@@ -262,6 +263,7 @@ export default function Composer(props: Props) {
           <button type="button" className="send-button" disabled={props.busy || (!props.value.trim() && !props.attachments.length && !props.selectedAsset)} onClick={props.onSend} aria-label="发送消息">{props.busy ? <LoaderCircle className="spin" size={18} /> : <ArrowUp size={19} />}</button>
         </div>
       </div>
+      {!!props.selectedAssets?.some(asset => asset.skillType === "business_method") && <div className="composer-hint">可继续用 $ 添加金融 Skill，按选择顺序分析并综合回答；基础数据按需补充。</div>}
       <div className="composer-hint"><span><kbd>/</kbd> 命令</span><span><kbd>$</kbd> 工具与 Skill</span><span><kbd>Tab</kbd> 补全</span><span>Ctrl / ⌘ + Enter 发送</span></div>
       <input ref={fileRef} type="file" multiple accept=".pdf,.doc,.docx,.txt,.md,.csv,.xls,.xlsx,application/pdf,text/plain,text/csv" hidden onChange={(event) => { props.onFiles(Array.from(event.target.files || [])); event.target.value = ""; }} />
       <input ref={imageRef} type="file" multiple accept="image/png,image/jpeg,image/webp,image/gif" hidden onChange={(event) => { props.onFiles(Array.from(event.target.files || [])); event.target.value = ""; }} />

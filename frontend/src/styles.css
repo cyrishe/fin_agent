@@ -1508,3 +1508,9 @@ body {
   .schedule-step-list li { grid-template-columns: 46px minmax(0,1fr); }
   .schedule-step-list li small { grid-column: 2; }
 }
+
+.follow-up-questions { display: grid; gap: 8px; margin-top: 20px; }
+.follow-up-questions > strong { font-size: 13px; color: var(--text-muted, #667085); }
+.follow-up-questions button { display: flex; justify-content: space-between; gap: 16px; text-align: left; padding: 10px 14px; border: 1px solid var(--border, #e3e7eb); border-radius: 10px; background: transparent; color: inherit; font: inherit; cursor: pointer; }
+.follow-up-questions button:hover { background: rgba(38, 120, 94, .06); }
+.follow-up-questions button:disabled { opacity: .5; cursor: default; }

@@ -2,6 +2,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
 import type { InvocationAsset } from "../types";
 import Composer from "./Composer";
+import { selectInvocationAsset } from "../composerSuggestions";
 
 const asset: InvocationAsset = {
   ref: "tool:ct_market_buy_decision",
@@ -79,4 +80,16 @@ describe("Composer asset identity", () => {
     expect(html).toContain('title="扩展关键证据、反证和验证点"');
     expect(html).toContain('class="active" aria-pressed="true"');
   });
+});
+
+it("keeps multiple financial methods in selection order and can remove one", () => {
+  const first = { ...asset, kind: "skill" as const, skillType: "business_method", ref: "skill:one", name: "one", displayName: "方法一" };
+  const second = { ...first, ref: "skill:two", name: "two", displayName: "方法二" };
+  const selected = selectInvocationAsset(selectInvocationAsset([], first), second);
+  expect(selectInvocationAsset(selected, first)).toEqual([first, second]);
+  const html = renderToStaticMarkup(<Composer {...baseProps} selectedAsset={first} selectedAssets={selected} />);
+  expect(html).toContain("1. 方法一");
+  expect(html).toContain("2. 方法二");
+  expect(html).toContain('aria-label="取消调用方法二"');
+  expect(selectInvocationAsset(selected, asset)).toEqual([asset]);
 });

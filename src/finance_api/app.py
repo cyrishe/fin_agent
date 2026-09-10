@@ -44,8 +44,12 @@ from src.finance_api.models import (
     FinanceAnswerRequest,
     FinanceQueryRequest,
     FinanceQueryResponse,
+    FinanceTaskRequest,
+    SkillId,
+    SKILL_SELECTION_DESCRIPTION,
 )
 from src.finance_api.service import FinanceApiGateway
+from src.scenarios.financial_qa.business_skills import FinanceSkillUnavailableError
 from src.finance_api.data_status import DataStatusMonitor
 from src.services.request_usage_service import DailyUsageService
 from src.services.finance_data_tool_catalog_service import (
@@ -72,6 +76,14 @@ FINANCE_TOOL_DESCRIPTION = (
     "会用公开业务名称说明实际查询的数据对象、数据类型、查询目标和记录数，便于核验与溯源。"
     "detail=true 另附轮数、逐步 Token、耗时与查询检查记录。"
     "默认每次调用独立；仅显式传入 conversation_id 时续接该用户的会话上下文。"
+)
+FINANCE_TASK_DESCRIPTION = (
+    "通用金融任务入口。提交自然语言问题，Fin Agent 自动选择合适的已授权金融 Skill 和金融数据工具，"
+    "完成取证与分析并返回综合结论。需要指定方法时，先用 list_skills 发现可用 ID，再传 skill_ids；"
+    "多个 Skill 按传入顺序指导分析、共享基础数据、综合输出。省略 skill_ids 则自动选择。"
+    "response_mode=both 同时返回结论与参考数据，summary 只返回结论，data 只返回数据。"
+    "仅使用当前金融数据工具，不执行工具工坊自定义工具或通用 Web Search。"
+    "默认 standard 执行与 auto 分析深度；conversation_id 可选，不传则每次独立。"
 )
 
 
@@ -124,33 +136,6 @@ def _catalog_projection(catalog: FinanceDataToolCatalogService) -> dict[str, Any
     }
 
 
-def _tool_descriptor() -> dict[str, Any]:
-    schema = FinanceQueryRequest.model_json_schema()
-    schema.pop("title", None)
-    return {
-        "name": FINANCE_TOOL_NAME,
-        "title": "Fin Agent 金融数据查询",
-        "description": FINANCE_TOOL_DESCRIPTION,
-        "inputSchema": schema,
-        "outputSchema": FinanceQueryResponse.model_json_schema(),
-        "annotations": {
-            "readOnlyHint": True,
-            "destructiveHint": False,
-            "idempotentHint": True,
-            "openWorldHint": False,
-        },
-        "http": {
-            "method": "POST",
-            "path": "/v1/finance/query",
-            "authentication": "Authorization: Bearer <key> or X-API-Key: <key>",
-        },
-        "mcp": {
-            "transport": "streamable-http",
-            "path": "/mcp",
-        },
-    }
-
-
 def create_app(
     *,
     auth: FinanceApiKeyAuth | None = None,
@@ -183,7 +168,9 @@ def create_app(
     mcp = FastMCP(
         "fin-agent-finance",
         instructions=(
-            "Use finance_data_query for structured Chinese financial and securities data. "
+            "Use finance_task for financial questions: the server selects suitable Skills and data tools. "
+            "Pass ordered skill_ids to finance_task when specific methods are required; discover IDs with list_skills. "
+            "Use finance_data_query for direct structured Chinese financial and securities data queries. "
             "Choose response_mode=data when another program or agent will analyze the rows, "
             "summary for a concise answer, and both when both evidence and explanation are needed."
         ),
@@ -202,6 +189,21 @@ def create_app(
         if current is None:
             raise RuntimeError("finance API gateway is not ready")
         return current
+
+    async def execute_mcp(request: FinanceQueryRequest) -> FinanceQueryResponse | CallToolResult:
+        principal = _CURRENT_PRINCIPAL.get()
+        if principal is None:
+            raise PermissionError("finance API authentication context is missing")
+        response = await current_gateway().execute(
+            request, principal_id=principal.principal_id, request_channel="mcp",
+        )
+        if not response.ok:
+            if request.detail:
+                return CallToolResult(isError=True,
+                    content=[TextContent(type="text", text=response.model_dump_json(by_alias=True))],
+                    structuredContent=response.model_dump(mode="json", by_alias=True))
+            raise RuntimeError(response.error.message if response.error else "finance query failed")
+        return response
 
     @mcp.tool(
         name=FINANCE_TOOL_NAME,
@@ -262,10 +264,7 @@ def create_app(
         ] = 100,
         detail: Annotated[bool, Field(description="Include turns, per-step token usage, timings and query validation evidence. No change to execution behavior.")] = False,
     ) -> FinanceQueryResponse:
-        principal = _CURRENT_PRINCIPAL.get()
-        if principal is None:
-            raise PermissionError("finance API authentication context is missing")
-        response = await current_gateway().execute(
+        return await execute_mcp(
             FinanceQueryRequest(
                 query=query,
                 response_mode=response_mode,
@@ -276,20 +275,42 @@ def create_app(
                 max_rows=max_rows,
                 detail=detail,
             ),
-            principal_id=principal.principal_id,
-            request_channel="mcp",
         )
-        if not response.ok:
-            if detail:
-                # MCP supports an explicit error envelope with the same typed
-                # structured payload, preserving evidence for failed queries.
-                return CallToolResult(isError=True,
-                    content=[TextContent(type="text", text=response.model_dump_json(by_alias=True))],
-                    structuredContent=response.model_dump(mode="json", by_alias=True))
-            raise RuntimeError(
-                response.error.message if response.error else "finance query failed"
-            )
-        return response
+
+    @mcp.tool(
+        name="finance_task", title="Fin Agent 金融分析与 Skill 调用",
+        description=FINANCE_TASK_DESCRIPTION,
+        annotations=ToolAnnotations(readOnlyHint=True, destructiveHint=False, openWorldHint=False),
+        structured_output=True,
+    )
+    async def finance_task(
+        query: Annotated[str, Field(min_length=1, max_length=4_000, description="自然语言金融问题。")],
+        skill_ids: Annotated[list[SkillId] | None, Field(description=SKILL_SELECTION_DESCRIPTION)] = None,
+        response_mode: Annotated[Literal["data", "summary", "both"], Field(description="返回数据、结论或两者。默认 both。")] = "both",
+        research_mode: Annotated[Literal["fast", "auto", "deep"], Field(description="分析深度，默认 auto。")] = "auto",
+        execution_mode: Annotated[Literal["standard", "fast"], Field(description="standard 支持取证和修正；fast 用于快速取数，省略检查与重试。")] = "standard",
+        runtime: Annotated[Literal["cc", "dsh"] | None, Field(description="省略则使用服务端默认运行时。")] = None,
+        conversation_id: Annotated[str | None, Field(min_length=1, max_length=128, pattern=r"^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$", description="调用方会话 ID；省略则每次独立。")] = None,
+        max_rows: Annotated[int, Field(ge=1, le=100, description="每个结果集返回行数上限。")] = 100,
+        detail: Annotated[bool, Field(description="附带执行与用量明细。")] = False,
+    ) -> FinanceQueryResponse:
+        return await execute_mcp(FinanceTaskRequest(
+            query=query, skill_ids=skill_ids, response_mode=response_mode,
+            research_mode=research_mode, execution_mode=execution_mode, runtime=runtime,
+            conversation_id=conversation_id, max_rows=max_rows, detail=detail,
+        ))
+
+    @mcp.tool(
+        name="list_skills", title="Fin Agent 可用金融 Skill",
+        description="列出当前调用身份可用的已发布金融方法，包含 ID、用途与版本。将 ID 传给 finance_task 的 skill_ids 可显式指定方法。不返回方法正文、私有资源或未发布草稿。",
+        annotations=ToolAnnotations(readOnlyHint=True, destructiveHint=False, idempotentHint=True, openWorldHint=False),
+        structured_output=True,
+    )
+    async def list_finance_skills() -> dict[str, Any]:
+        principal = _CURRENT_PRINCIPAL.get()
+        if principal is None:
+            raise PermissionError("finance API authentication context is missing")
+        return await asyncio.to_thread(current_gateway().list_skills, principal_id=principal.principal_id)
 
     mcp_http_app = mcp.streamable_http_app()
     data_monitor = DataStatusMonitor()
@@ -466,7 +487,35 @@ def create_app(
     async def list_tools(
         _principal: FinanceApiPrincipal = Depends(require_principal),
     ) -> dict[str, Any]:
-        return {"tools": [_tool_descriptor()]}
+        # Use the registered MCP schemas so REST discovery cannot drift from tools/list.
+        paths = {"finance_data_query": ("POST", "/v1/finance/query"),
+                 "finance_task": ("POST", "/v1/finance/task"), "list_skills": ("GET", "/v1/skills")}
+        return {"tools": [{
+            **tool.model_dump(mode="json", exclude_none=True),
+            "http": {"method": paths[tool.name][0], "path": paths[tool.name][1],
+                     "authentication": "Authorization: Bearer <key> or X-API-Key: <key>"},
+            "mcp": {"transport": "streamable-http", "path": "/mcp"},
+        } for tool in await mcp.list_tools()]}
+
+    @app.get("/v1/skills", tags=["catalog"])
+    async def available_skills(principal: FinanceApiPrincipal = Depends(require_principal)) -> dict[str, Any]:
+        return await asyncio.to_thread(current_gateway().list_skills, principal_id=principal.principal_id)
+
+    @app.post("/v1/finance/task", response_model=FinanceQueryResponse, response_model_by_alias=True,
+              tags=["finance"], summary="Run a financial task with automatic or explicit Skills",
+              description=FINANCE_TASK_DESCRIPTION)
+    async def run_finance_task(payload: FinanceTaskRequest,
+                               principal: FinanceApiPrincipal = Depends(require_principal)) -> FinanceQueryResponse | JSONResponse:
+        try:
+            response = await current_gateway().execute(payload, principal_id=principal.principal_id)
+        except FinanceSkillUnavailableError as exc:
+            raise HTTPException(status_code=422, detail=str(exc)) from exc
+        except Exception as exc:
+            logger.exception("finance task execution failed")
+            raise HTTPException(status_code=500, detail="The financial task failed to execute.") from exc
+        if response.ok:
+            return response
+        return JSONResponse(status_code=502, content=response.model_dump(mode="json", by_alias=True))
 
     @app.post(
         "/v1/finance/query",
@@ -512,8 +561,9 @@ def create_app(
         payload: FinanceAnswerRequest,
         principal: FinanceApiPrincipal = Depends(require_principal),
     ) -> FinanceQueryResponse | JSONResponse:
-        request_payload = FinanceQueryRequest(
+        request_payload = FinanceTaskRequest(
             query=payload.query,
+            skill_ids=payload.skill_ids,
             response_mode="both" if payload.include_data else "summary",
             runtime=payload.runtime,
             research_mode=payload.research_mode,
@@ -527,6 +577,8 @@ def create_app(
                 request_payload,
                 principal_id=principal.principal_id,
             )
+        except FinanceSkillUnavailableError as exc:
+            raise HTTPException(status_code=422, detail=str(exc)) from exc
         except Exception as exc:
             logger.exception("finance answer execution failed")
             raise HTTPException(

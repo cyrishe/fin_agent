@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import asyncio
 import hashlib
+import json
 import os
 import uuid
 import time
@@ -18,6 +19,8 @@ from src.services.finance_data_tool_catalog_service import (
     FinanceDataToolCatalogService,
 )
 from src.services.request_usage_service import record_request, total_tokens
+from src.services.skill_hub_catalog_service import SkillHubCatalogService
+from src.services.skill_candidate_store_service import SkillCandidateStoreError
 
 
 def _trim(value: Any) -> str:
@@ -35,8 +38,24 @@ class FinanceApiGateway:
         max_concurrency: int | None = None,
         catalog: FinanceDataToolCatalogService | None = None,
         usage_recorder=None,
+        principal_owner_ids: Mapping[str, str] | None = None,
     ) -> None:
-        self.engine = engine or FinancialQaCcService()
+        # Bind API identities to existing owners only through server configuration.
+        # Request bodies must never supply ownership or permission overrides.
+        bindings = principal_owner_ids
+        if bindings is None:
+            try:
+                bindings = json.loads(os.environ.get("FINANCE_API_OWNER_IDS_JSON") or "{}")
+            except json.JSONDecodeError as exc:
+                raise ValueError("FINANCE_API_OWNER_IDS_JSON must be a JSON object") from exc
+        if not isinstance(bindings, Mapping) or any(
+            not isinstance(key, str) or not key.strip()
+            or not isinstance(value, str) or not value.strip()
+            for key, value in bindings.items()
+        ):
+            raise ValueError("FINANCE_API_OWNER_IDS_JSON must map principal IDs to nonblank owner IDs")
+        self._principal_owner_ids = {key.strip(): value.strip() for key, value in bindings.items()}
+        self.engine = engine or FinancialQaCcService(skill_hub_catalog_service=SkillHubCatalogService())
         self.usage_recorder = usage_recorder or (record_request if engine is None else None)
         self.default_runtime = normalize_financial_qa_runtime(
             default_runtime
@@ -53,6 +72,34 @@ class FinanceApiGateway:
         )
         self.catalog = catalog or FinanceDataToolCatalogService()
         self._semaphore: asyncio.Semaphore | None = None
+
+    def owner_id(self, principal_id: str) -> str:
+        return self._principal_owner_ids.get(principal_id, f"finance-api:{principal_id}")
+
+    def list_skills(self, *, principal_id: str) -> dict[str, Any]:
+        """Project the same authorized business-method catalog used by execution."""
+        catalog = self.engine.business_skill_catalog
+        note = ""
+        if self.engine.skill_hub_catalog_service is not None:
+            try:
+                catalog = self.engine.skill_hub_catalog_service.runtime_catalog(
+                    owner_ids=[self.owner_id(principal_id)],
+                )
+            except SkillCandidateStoreError:
+                # Match the execution core's existing system-only fallback.
+                note = "个人 Skill 目录暂不可用，当前仅列出系统方法。"
+        snapshot = catalog.discovery_snapshot()
+        skills = []
+        for entry in snapshot["entries"]:
+            detail = catalog.studio_detail(entry["id"]) or {}
+            skills.append({
+                "id": entry["id"],
+                "display_name": detail.get("display_name") or entry["id"],
+                "description": entry["description"],
+                "category": entry["category"],
+                "active_revision_no": entry["active_revision_no"],
+            })
+        return {"revision": snapshot["revision"], "skills": skills, **({"note": note} if note else {})}
 
     async def execute(
         self,
@@ -90,8 +137,13 @@ class FinanceApiGateway:
         )
         public_conversation_id = request.conversation_id
         scope_value = public_conversation_id or request_id
+        # Rebinding a key to another owner must not resume the previous owner's session.
+        owner_scope = self.owner_id(principal_id)
+        scope_key = f"{principal_id}:{scope_value}"
+        if owner_scope != f"finance-api:{principal_id}":
+            scope_key = json.dumps([principal_id, owner_scope, scope_value], separators=(",", ":"))
         scope_digest = hashlib.sha256(
-            f"{principal_id}:{scope_value}".encode("utf-8")
+            scope_key.encode("utf-8")
         ).hexdigest()[:32]
         try:
             return self._answer_accounted(request=request, principal_id=principal_id,
@@ -108,7 +160,7 @@ class FinanceApiGateway:
         raw = self.engine.answer(
             thread_id=f"finance-api-{scope_digest}",
             turn_id=request_id,
-            owner_id=f"finance-api:{principal_id}",
+            owner_id=self.owner_id(principal_id),
             user_text=request.query,
             dispatch_plan={
                 "selected_agent": "investment_analyst",
@@ -126,6 +178,7 @@ class FinanceApiGateway:
             isolated_request=public_conversation_id is None,
             include_response_data=request.response_mode in {"data", "both"},
             response_data_max_rows=request.max_rows,
+            explicit_skill_ids=getattr(request, "skill_ids", None),
         )
         response = self._public_response(
             raw,
@@ -285,6 +338,11 @@ class FinanceApiGateway:
             "total_tokens": total_tokens(usage),
             "steps": steps,
             "tool_calls": calls,
+            "skills": [{key: value for key, value in item.items()
+                        if key in {"skill_id", "display_name", "content_hash", "active_revision_no"}}
+                       for item in meta.get("skill_entries") or [] if isinstance(item, Mapping)],
+            "skill_catalog_revision": meta.get("skill_catalog_revision"),
+            "skill_registry_note": meta.get("skill_registry_error") or "",
             "llm_step_usages": meta.get("llm_step_usages") or [],
             "note": "Timings use server event boundaries, not separate reasoning-only time. Missing timing/usage is unknown. Tool spans include transport and handling; api_execution_ms is the provider execution measurement, not pure SQL time. Tool/API timings may overlap and must not be added to request duration.",
         }

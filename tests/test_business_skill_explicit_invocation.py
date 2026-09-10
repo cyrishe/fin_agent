@@ -141,3 +141,84 @@ def test_skill_hub_routes_scope_details_and_references_to_current_user(monkeypat
         assert client.get(url).status_code == 200
     assert all(call["owner_ids"] == ["alice"] for call in seen)
     assert seen[-1]["expected_revision"] == "r1"
+
+
+def test_multiple_selected_methods_preserve_order_and_share_one_execution(tmp_path, monkeypatch):
+    from src.web import flask_app as web
+    service = method_service(tmp_path, [])
+    selected = [{"kind": "skill", "name": name} for name in ["my-report-method", "equity-report-analysis", "my-report-method"]]
+    invocation = service.plan(text="综合分析并补充行情", selected_assets=selected, business_owner_id="alice")
+    assert invocation["explicit_skill_ids"] == ["my-report-method", "equity-report-analysis"]
+    calls = []
+    monkeypatch.setattr(web.financial_qa_cc_service, "answer", lambda **kwargs: calls.append(kwargs) or {"message": "综合结果", "surface_blocks": []})
+    result = web._execute_asset_invocation_payload(invocation, text="综合分析并补充行情",
+        application_context={}, thread_context={}, thread_id=1, turn_id=2, owner_id="alice", financial_qa_runtime="dsh")
+    assert len(calls) == 1
+    assert calls[0]["explicit_skill_ids"] == ["my-report-method", "equity-report-analysis"]
+    assert calls[0]["user_text"] == "综合分析并补充行情"
+    assert result["message"] == "综合结果"
+    assert result["surface_blocks"][0]["data"]["items"][1]["value"] == "$my-report-method → $equity-report-analysis"
+    assert web._asset_invocation_user_display_text("分析", None, selected[:2]) == "$my-report-method $equity-report-analysis 分析"
+
+
+def test_multiple_selection_checks_every_method_permission_before_execution(tmp_path):
+    service = method_service(tmp_path, [])
+    result = service.plan(text="分析", selected_assets=[{"kind": "skill", "name": name} for name in ["equity-report-analysis", "my-report-method"]], business_owner_id="bob")
+    assert result["status"] == "needs_input"
+    assert result["calls"] == []
+    assert "explicit_skill_ids" not in result
+
+
+def test_single_list_selection_retains_legacy_contract(tmp_path):
+    service = method_service(tmp_path, [])
+    selected = {"kind": "skill", "name": "my-report-method"}
+    assert service.plan(text="分析", selected_assets=[selected], business_owner_id="alice") == service.plan(text="分析", selected_asset=selected, business_owner_id="alice")
+
+
+@pytest.mark.parametrize("value", ["skill:a", ["a"], [{}]])
+def test_malformed_selected_assets_rejected_at_transport(value):
+    from src.web import flask_app as web
+    with pytest.raises(ValueError):
+        web._selected_assets({"selected_assets": value})
+
+
+@pytest.mark.parametrize("transport", ["sync", "stream"])
+def test_multi_method_chat_transport_reaches_one_agent_and_persists_order(tmp_path, monkeypatch, transport):
+    import json
+    from src.web import flask_app as web
+    from src.services.follow_up_question_service import FollowUpQuestionService
+    seen = []
+    saved = []
+    monkeypatch.setattr(web, "asset_invocation_service", method_service(tmp_path, []))
+    monkeypatch.setattr(web, "_resolve_current_guest_identity", lambda: {"user_id": "alice"})
+    monkeypatch.setattr(web, "_guest_question_denial", lambda _: None)
+    monkeypatch.setattr(web, "_schedule_thread_title", lambda **kwargs: None)
+    monkeypatch.setattr(web.application_runtime_service, "get_application_context", lambda _: {})
+    monkeypatch.setattr(web.attachment_service, "list_attachments", lambda *a, **kw: [])
+    conversation = web.runtime_conversation_service
+    monkeypatch.setattr(conversation, "ensure_thread", lambda **kw: 123)
+    monkeypatch.setattr(conversation, "get_thread_context", lambda **kw: {})
+    monkeypatch.setattr(conversation, "get_context_window", lambda **kw: [])
+    monkeypatch.setattr(conversation, "create_turn", lambda **kw: saved.append(kw) or 456)
+    monkeypatch.setattr(conversation, "complete_turn", lambda **kw: saved.append(kw) or {})
+    monkeypatch.setattr(FollowUpQuestionService, "generate", lambda *a, **kw: {"questions": ["还需要哪些证据？"], "llm_usage": {}})
+    monkeypatch.setattr(web.financial_qa_cc_service, "answer", lambda **kw: seen.append(kw) or {"mode": "financial_qa_dsh", "message": "综合结果", "financial_qa": {"runtime": "dsh"}, "surface_blocks": []})
+    selected = [{"kind": "skill", "name": name} for name in ["my-report-method", "equity-report-analysis"]]
+    client = web.app.test_client()
+    request = {"text": "综合分析", "thread_id": 123, "selected_assets": selected, "financial_qa_runtime": "dsh"}
+    if transport == "sync":
+        response = client.post("/api/chat/dispatch", json=request)
+        assert response.status_code == 200, response.get_data(as_text=True)
+        result = response.get_json()
+    else:
+        start = client.post("/api/chat/stream/start", json=request)
+        assert start.status_code == 200
+        response = client.get(start.get_json()["stream_url"])
+        events = [json.loads(line[6:]) for line in response.get_data(as_text=True).splitlines() if line.startswith("data: ")]
+        assert not [item for item in events if item.get("event") == "error"], events
+        result = next(item["result"] for item in events if item.get("event") == "done")
+    assert len(seen) == 1
+    assert seen[0]["explicit_skill_ids"] == ["my-report-method", "equity-report-analysis"]
+    assert saved[0]["user_input_text"] == "$my-report-method $equity-report-analysis 综合分析"
+    assert saved[-1]["output_payload"]["follow_up_questions"] == ["还需要哪些证据？"]
+    assert result["follow_up_questions"] == ["还需要哪些证据？"]

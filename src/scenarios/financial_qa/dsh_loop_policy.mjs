@@ -72,7 +72,7 @@ const STAGE_PROMPTS = Object.freeze({
   query:
     '按已加载契约构造 finance_query；新增方法先加载对应执行包。将已确定的取数目标与依赖合并成一个最小 flow。',
   repair:
-    '上一查询未成功，本阶段可修复一次。依据返回的 recovery 与已加载契约修正失败步骤，保留用户目标和已成功结果。',
+    '上一查询未成功。结合剩余查询额度，依据返回的 recovery 与已加载契约修正失败步骤，保留用户目标和已成功结果。',
   details:
     '按已有结果与本轮目标选择下一步；已保存结果可按 filter、order、columns 读取所需范围。',
   final:
@@ -538,14 +538,35 @@ function emptyResultHandoff(state, config) {
   return message
 }
 
+function remainingBudget(state, config) {
+  const limits = executionLimits(state, config)
+  const fast = state.executionMode === 'fast'
+  return {
+    catalog: Math.max(0, (fast ? 1 : limits.maxCatalogAttempts) - state.catalogAttempts),
+    query: Math.max(0, (fast ? 1 : limits.maxQueryAttempts) - state.queryAttempts),
+    details: Math.max(0, (fast ? 0 : limits.maxLoadAttempts) - state.loadAttempts),
+  }
+}
+
+function budgetPrompt(state, config) {
+  if (state.executionMode === 'fast') {
+    return '快速模式提供一次目录定位阶段和一次查询阶段，同阶段独立调用可并行。之后直接依据结果回答，缺失数据如实说明；仅数据模式由系统交付结果。'
+  }
+  const left = remainingBudget(state, config)
+  const limits = executionLimits(state, config)
+  return `本轮工具额度（剩余/上限）：目录 ${left.catalog}/${limits.maxCatalogAttempts}，查询 ${left.query}/${limits.maxQueryAttempts}，结果读取 ${left.details}/${limits.maxLoadAttempts}。这是调用上限，不是必须用满的轮数；证据已足够时立即综合回答。根据剩余额度安排必要取证与修复，优先复用结果并合并已知依赖。`
+    + (left.query <= 1 ? '\n查询额度接近结束：聚焦最关键的缺口；额度用尽后依据已取得的证据收尾，明确未完成范围与结论限制。缺数据可以给有限结论，不把未验证条件说成已满足。' : '')
+}
+
 function promptFor(state, config) {
   if (!state.methodReady) {
-    return `[FINANCE_LOOP stage=catalog reason=${state.reason}]\n[FINANCE_EXECUTION mode=${state.executionMode}]\n先按本轮方法选择规则判断：需要专业方法时用 read_finance_skill 加载；直接取数时用 read_finance_catalog 定位数据执行包。依据返回内容继续。`
+    return `[FINANCE_LOOP stage=catalog reason=${state.reason}]\n[FINANCE_EXECUTION mode=${state.executionMode}]\n先按本轮方法选择规则判断：需要专业方法时用 read_finance_skill 加载；直接取数时用 read_finance_catalog 定位数据执行包。依据返回内容继续。\n${budgetPrompt(state, config)}`
   }
   if (state.executionMode === 'standard' && state.stage !== 'final') {
     return `[FINANCE_LOOP stage=${state.stage} reason=${state.reason}]\n[FINANCE_EXECUTION mode=standard]\n`
       + '依据本轮目标与执行结果选择下一步。已确定的查询及依赖合并到 finance_query.steps；新方法先加载执行包。'
       + (state.dataOnlyRequested ? '\n仅数据模式通过 data_request_complete 交付取数完成声明。' : '')
+      + `\n${budgetPrompt(state, config)}`
       + (config.businessHint ? `\n${config.businessHint}` : '')
   }
   const prompts = state.executionMode === 'fast' ? FAST_STAGE_PROMPTS : STAGE_PROMPTS
@@ -563,7 +584,7 @@ function promptFor(state, config) {
     } else if (state.stage === 'final') {
       base = state.reason === 'data_request_complete'
         ? '本轮已声明取数完成，依据已有证据完成分析；需要补充证据时仍可使用已授权工具。'
-        : '本轮查询调用额度已用完。依据已有结果完成回答，并保留未完成的取数范围。'
+        : '依据当前可用证据完成综合回答，明确尚未取得的数据和结论限制。'
     }
   }
   if (state.dataOnlyRequested || hasDataOnlyResults(state)) {
@@ -574,7 +595,7 @@ function promptFor(state, config) {
   }
   const marker = `[FINANCE_LOOP stage=${state.stage} reason=${state.reason}]`
   const mode = `[FINANCE_EXECUTION mode=${state.executionMode}]`
-  return [marker, mode, base, config.businessHint].filter(Boolean).join('\n')
+  return [marker, mode, base, budgetPrompt(state, config), config.businessHint].filter(Boolean).join('\n')
 }
 
 function stageTools(state, tools) {
@@ -1058,7 +1079,7 @@ export function apply(ctx, input = {}) {
         }
       }
       if (!config.preserveRequestPrefix) return downstream
-      const key = `${state.stage}:${state.reason}`
+      const key = `${state.stage}:${state.reason}:${JSON.stringify(remainingBudget(state, config))}`
       if (state.lastInjectedStage === key) return downstream
       state.lastInjectedStage = key
       return {
@@ -1120,7 +1141,7 @@ export function apply(ctx, input = {}) {
         && !state.dataOnlyComplete
       if (!needsRequiredAction && !needsFinalAnswer) return
       const prompt = unfinished.length > 0 && !exhausted
-        ? `本轮执行记录：${JSON.stringify(unfinished)}。依据这些记录继续处理，或说明本次交付范围及缺口。`
+        ? `系统执行事实（内部参考）：${JSON.stringify(unfinished)}。结合原始用户目标和剩余额度继续必要取证，或依据已有证据直接交付完整最终回答。最终回答面向原始金融问题，综合已有结论并说明业务数据缺口；执行记录与协议细节留在过程通道。`
         : requiredActionPrompt(state, tools)
       if (!prompt) return
       const key = 'turn-completion-audit'

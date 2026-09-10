@@ -2,6 +2,9 @@
 import React, { useState } from "react";
 import { createRoot } from "react-dom/client";
 import MessageItem from "../../src/components/MessageItem";
+import Composer from "../../src/components/Composer";
+import { selectInvocationAsset } from "../../src/composerSuggestions";
+import type { InvocationAsset } from "../../src/types";
 import RunPanel from "../../src/components/RunPanel";
 import { applyStreamEvent, initialRun } from "../../src/surface";
 import type { AgentRun, SurfaceBlock } from "../../src/types";
@@ -28,7 +31,15 @@ const answer: SurfaceBlock = { block_id: "answer", block_type: "narrative", sema
 - **一次性因素：** 尚缺扣非利润及附注明细，暂不判断是否为主要驱动。` };
 const table: SurfaceBlock = { block_id: "financial_rows", block_type: "data", kind: "data", semantic: "finance.financial.records", title: "年度财务明细", presentation_hint: { preferred_renderer: "data.table" }, domain_context: { source: "示例 · 年度财务数据" }, payload: { shape: "records", data: { columns: ["期间", "收入", "利润"], rows: Array.from({ length: 22 }, (_, i) => ({ 期间: `示例 ${i + 1}`, 收入: 100 + i, 利润: 20 + i })), row_count: 22 } } };
 const skill: SurfaceBlock = { block_id: "runtime_skill_example", block_type: "status", title: "加载方法 · 财报分析", content: "已加载专业方法，用于指导本轮取证与分析。", data: { role: "process", status: "completed", skill_id: "earnings-analysis", display_name: "财报分析" } };
+const methods: InvocationAsset[] = ["财报分析", "估值分析"].map((name, index) => ({
+  ref: `skill:method-${index}`, name: `method-${index}`, displayName: name, kind: "skill", skillType: "business_method",
+  summary: "示例方法，使用已有证据并按需补充数据", description: "示例方法", invocation: `$method-${index}`,
+  inputFields: [{ name: "question", label: "自然语言要求", description: "分析目标", required: true }], aliases: [], tags: [], customTool: false,
+}));
 function Fixture() {
+  const [input, setInput] = useState("");
+  const [selected, setSelected] = useState<InvocationAsset[]>([]);
+  const [sent, setSent] = useState("");
   const [mode, setMode] = useState("done");
   const queryDone = applyStreamEvent(applyStreamEvent(initialRun(), { event: "block", ...skill }), {
     event: "block", block_id: "query", block_type: "status", title: "查询年度财务数据",
@@ -46,7 +57,14 @@ function Fixture() {
   return <div style={{ height: "100vh", overflow: "auto", background: "#f7fafc" }}>
     <header style={{ padding: "16px 24px", display: "flex", flexWrap: "wrap", gap: 12, alignItems: "center" }}><strong>分析体验验收</strong><span>虚构数据 · 不连接生产</span>{[["done", "已完成分析"], ["loading", "模拟 Skill 加载"], ["processing", "取数后继续处理"], ["partial", "已有结果仍在处理"], ["error", "请求失败"], ["data", "纯取数"]].map(([key, label]) => <button key={key} onClick={() => setMode(key)}>{label}</button>)}</header>
     <main style={{ display: "flex", maxWidth: 1300, margin: "0 auto", padding: 16, gap: 20 }}>
-      <div style={{ flex: 1, minWidth: 0 }}><MessageItem key={mode} message={{ id: "fixture", role: "assistant", content: "", run, createdAt: Date.now() }} interactionDrafts={{}} selectedInteractions={{}} submittedInteractions={new Set()} disabled={false} onDraftChange={noop} onRequestCustomAnswer={noop} onClearCustomAnswer={noop} onSubmitDraft={noop} onInteraction={noop} onRequestFeedback={noop} onSubmitFeedback={noop} onUseAsset={noop} /></div>
+      <div style={{ flex: 1, minWidth: 0 }}><MessageItem key={mode} message={{ id: "fixture", role: "assistant", content: "", run, payload: { follow_up_questions: mode === "done" ? ["经营现金流增速偏慢，需要核验哪些营运资本项目？", "如何与同行比较盈利质量？"] : [] }, createdAt: Date.now() }} interactionDrafts={{}} selectedInteractions={{}} submittedInteractions={new Set()} disabled={false} onDraftChange={noop} onRequestCustomAnswer={noop} onClearCustomAnswer={noop} onSubmitDraft={noop} onInteraction={noop} onRequestFeedback={noop} onSubmitFeedback={noop} onUseAsset={noop} onFollowUp={question => { setInput(question); setSelected([]); }} />
+        <Composer value={input} onChange={setInput} onSend={() => setSent(JSON.stringify({text: input, selected_assets: selected.map(({kind, name}) => ({kind, name}))}))} busy={false}
+          assets={methods} selectedAsset={selected[0] || null} selectedAssets={selected}
+          onSelectAsset={asset => setSelected(current => selectInvocationAsset(current, asset))}
+          onClearSelectedAsset={ref => setSelected(current => current.filter(asset => asset.ref !== ref))}
+          attachments={[]} onFiles={noop} onRemoveAttachment={noop} researchMode="auto" onResearchModeChange={noop} />
+        {sent && <output aria-label="模拟提交">{sent}</output>}
+      </div>
       <div className="fixture-sidebar" style={{ width: 300, flexShrink: 0, background: "#eff5f8" }}><RunPanel run={run} /></div>
     </main><style>{`@media(max-width:850px){.fixture-sidebar{display:none}}`}</style>
   </div>;

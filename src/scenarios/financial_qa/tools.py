@@ -801,7 +801,7 @@ class FinanceDataQueryCcTools:
                     "data_request_complete": {
                         "type": "boolean",
                         "description": (
-                            "仅数据模式必填，也适用于带摘要的查询。"
+                            "仅数据模式必填；普通问答仅随实际查询填写，证据足够时直接回答。"
                             "本 flow 覆盖全部取数目标（含有效空结果）时为 true；"
                             "尚有依赖返回值的后续取数目标时为 false。原始文本也是可交付的数据。"
                         ),

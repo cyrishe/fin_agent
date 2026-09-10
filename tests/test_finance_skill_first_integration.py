@@ -177,3 +177,13 @@ def test_empty_query_does_not_erase_skill_guided_conditional_answer(hub):
         })
     assert result["message"] == session.result["result"]
     assert session.calls[0]["context"]["_finance_explicit_skill_ids"] == ["equity-report-analysis"]
+
+
+def test_explicit_methods_keep_user_order_and_all_base_tools(hub):
+    agent = service(hub)
+    names = ["personal-report", "equity-report-analysis"]
+    context = agent._runtime_context(application_context={}, owner_id="alice", explicit_skill_ids=names)
+    assert context["_finance_explicit_skill_ids"] == names
+    prompt = context["_finance_explicit_skill_prompt"]
+    assert prompt.index("用户选择顺序 1：personal-report") < prompt.index("用户选择顺序 2：equity-report-analysis")
+    assert context["allowed_agent_tools"] == agent._runtime_context(application_context={}, owner_id="alice")["allowed_agent_tools"]

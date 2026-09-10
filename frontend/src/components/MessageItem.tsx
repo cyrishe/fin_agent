@@ -23,6 +23,7 @@ interface Props {
   onRequestFeedback: (request: InteractionFeedbackRequest) => void;
   onSubmitFeedback: () => void;
   onUseAsset: (asset: ToolIdentitySelection) => void;
+  onFollowUp?: (question: string) => void;
 }
 
 function UserContent({ content }: { content: string }) {
@@ -31,8 +32,10 @@ function UserContent({ content }: { content: string }) {
   return <><span className="command-token">{match[1]}</span>{match[2]}</>;
 }
 
-export default function MessageItem({ message, interactionDrafts, selectedInteractions, submittedInteractions, disabled, onDraftChange, onRequestCustomAnswer, onClearCustomAnswer, onSubmitDraft, onInteraction, onRequestFeedback, onSubmitFeedback, onUseAsset }: Props) {
+export default function MessageItem({ message, interactionDrafts, selectedInteractions, submittedInteractions, disabled, onDraftChange, onRequestCustomAnswer, onClearCustomAnswer, onSubmitDraft, onInteraction, onRequestFeedback, onSubmitFeedback, onUseAsset, onFollowUp }: Props) {
   const run = message.run;
+  const followUps = Array.isArray(message.payload?.follow_up_questions)
+    ? message.payload.follow_up_questions.filter((item): item is string => typeof item === "string" && Boolean(item.trim())) : [];
   const { primary, references } = splitAnswerEvidence(run?.artifacts || []);
   const firstArtifact = primary[0];
   const remainingArtifacts = primary.slice(1);
@@ -77,6 +80,10 @@ export default function MessageItem({ message, interactionDrafts, selectedIntera
             </>}
             <AnswerEvidence blocks={references} renderBlock={renderBlock} />
           </div>}
+          {message.role === "assistant" && run?.status === "done" && followUps.length > 0 && <section className="follow-up-questions" aria-label="进一步提问">
+            <strong>进一步提问</strong>
+            {followUps.map(question => <button key={question} type="button" disabled={disabled} onClick={() => onFollowUp?.(question)}>{question}<span aria-hidden="true">↗</span></button>)}
+          </section>}
           {message.role === "assistant" && run?.status === "done" && <ReportExportButton
             payload={message.payload}
             threadId={message.threadId}

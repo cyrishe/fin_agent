@@ -10,12 +10,12 @@ const answer: SurfaceBlock = { block_id: "answer", block_type: "narrative", sema
 const table: SurfaceBlock = { block_id: "rows", block_type: "data", kind: "data", semantic: "finance.financial.records", title: "年度财务数据", payload: { shape: "records", data: { columns: ["收入"], rows: [{ 收入: 100 }], row_count: 12 } }, presentation_hint: { preferred_renderer: "data.table" } };
 
 describe("analysis / reference separation", () => {
-  it("folds reference tables only when an analysis answer exists", () => {
+  it("folds data evidence only when an analysis answer exists", () => {
     expect(splitAnswerEvidence([answer, table])).toEqual({ primary: [answer], references: [table] });
     expect(splitAnswerEvidence([table]).primary).toEqual([table]);
     expect(splitAnswerEvidence([{ ...answer, content: "" }, table]).references).toEqual([]);
     const chart = { ...table, block_id: "chart", block_type: "bar_chart", payload: { shape: "series", data: { series: [] } }, presentation_hint: { preferred_renderer: "data.bar" } };
-    expect(splitAnswerEvidence([answer, chart]).primary).toContain(chart);
+    expect(splitAnswerEvidence([answer, chart]).references).toContain(chart);
     const unrelated = { ...table, semantic: "custom.records" };
     expect(splitAnswerEvidence([answer, unrelated]).primary).toContain(unrelated);
   });

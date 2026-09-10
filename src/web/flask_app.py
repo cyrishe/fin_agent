@@ -860,6 +860,18 @@ def _turn_meta(request_received_at: object = None) -> dict:
     }
 
 
+def _attach_follow_up_questions(result: dict, *, question: str, answer: str) -> None:
+    if not result.get("financial_qa") or result.get("data_only") or result.get("error") or result.get("financial_qa", {}).get("error") or not answer.strip():
+        return
+    from src.services.follow_up_question_service import FollowUpQuestionService
+    follow_up = FollowUpQuestionService().generate(question=question, answer=answer)
+    result["follow_up_questions"] = follow_up["questions"]
+    # Keep the added call distinct from core DSH steps while accounting once.
+    result["follow_up_usage"] = follow_up["llm_usage"]
+    if follow_up["llm_usage"]:
+        result["llm_usage"] = _merge_llm_usage(result.get("llm_usage"), follow_up["llm_usage"])
+
+
 def _attach_answer_summary(
     result: dict,
     *,
@@ -876,6 +888,7 @@ def _attach_answer_summary(
     summary = str(summary_result.get("answer_summary") or "").strip()
     if summary:
         result["answer_summary"] = summary
+    _attach_follow_up_questions(result, question=raw_user_text, answer=assistant_message)
 
 
 def _recent_image_attachment_ids(thread_context: dict | None = None) -> list[str]:
@@ -2084,8 +2097,21 @@ def _run_custom_tool_stream_payload(payload: dict, *, emit) -> None:
         })
 
 
-def _asset_invocation_user_display_text(text: str, selected_asset: dict | None) -> str:
+def _selected_assets(payload: dict) -> list:
+    value = payload.get("selected_assets")
+    if value is None:
+        return []
+    if not isinstance(value, list) or any(not isinstance(item, dict) or not (item.get("name") or item.get("ref")) for item in value):
+        raise ValueError("selected_assets 必须是包含 name 或 ref 的资产引用列表")
+    return value
+
+
+def _asset_invocation_user_display_text(text: str, selected_asset: dict | None, selected_assets: list | None = None) -> str:
     """Keep the selected asset visible in persisted conversation history."""
+    if selected_assets:
+        for asset in reversed(selected_assets):
+            text = _asset_invocation_user_display_text(text, asset)
+        return text
     user_text = str(text or "").strip()
     selected = selected_asset if isinstance(selected_asset, dict) else {}
     asset_name = str(selected.get("name") or "").strip()
@@ -2110,6 +2136,7 @@ def _run_asset_invocation_stream_payload(payload: dict, *, emit) -> None:
     run_id = str(payload.get("run_id") or "").strip()
     text = str(payload.get("text") or "").strip()
     selected_asset = payload.get("selected_asset") if isinstance(payload.get("selected_asset"), dict) else {}
+    selected_assets = _selected_assets(payload)
     attachment_ids = payload.get("attachment_ids") if isinstance(payload.get("attachment_ids"), list) else []
     application_name = str(payload.get("application_name") or "investment_workbench").strip() or "investment_workbench"
     guest_identity = payload.get("guest_identity") if isinstance(payload.get("guest_identity"), dict) else {}
@@ -2146,7 +2173,7 @@ def _run_asset_invocation_stream_payload(payload: dict, *, emit) -> None:
                 thread_id=thread_id,
             ),
         }
-        display_text = _asset_invocation_user_display_text(text, selected_asset)
+        display_text = _asset_invocation_user_display_text(text, selected_asset, selected_assets)
         turn_id = runtime_conversation_service.create_turn(
             thread_id=thread_id,
             user_input_text=display_text,
@@ -2162,6 +2189,7 @@ def _run_asset_invocation_stream_payload(payload: dict, *, emit) -> None:
         invocation = asset_invocation_service.plan(
             text=text,
             selected_asset=selected_asset,
+            selected_assets=selected_assets,
             attachments=attachments,
             thread_context=thread_context,
             owner_ids=_custom_tool_owner_ids(thread_context=thread_context, thread_id=thread_id),
@@ -3248,6 +3276,7 @@ def _build_asset_invocation_payload(
     text: str,
     *,
     selected_asset: dict | None = None,
+    selected_assets: list | None = None,
     application_context: dict | None = None,
     thread_context: dict | None = None,
     attachments: list[dict] | None = None,
@@ -3265,6 +3294,7 @@ def _build_asset_invocation_payload(
     invocation = asset_invocation_service.plan(
         text=text,
         selected_asset=selected_asset,
+        selected_assets=selected_assets,
         attachments=attachments,
         thread_context=thread_context,
         owner_ids=_custom_tool_owner_ids(thread_context=thread_context, thread_id=thread_id),
@@ -3301,6 +3331,9 @@ def _asset_invocation_preview_block(invocation: dict) -> dict:
     ).strip()
     summary = str(target.get("summary") or contract.get("description") or "").strip()
     invocation_ref = str(target.get("invocation") or (f"${name}" if name else "")).strip()
+    selected_methods = invocation.get("explicit_skill_ids") or []
+    if selected_methods:
+        invocation_ref = " → ".join(f"${skill_id}" for skill_id in selected_methods)
     return {
         "event": "block",
         "block_id": "asset_invocation_preview",
@@ -3320,7 +3353,7 @@ def _asset_invocation_preview_block(invocation: dict) -> dict:
                 {"label": "名称", "value": display_name},
                 {"label": "调用引用", "value": invocation_ref or "—"},
                 {"label": "类型", "value": "工具" if kind == "tool" else "Skill" if kind == "skill" else "资产"},
-                {"label": "执行项", "value": int(preview.get("call_count") or 0) or 1},
+                {"label": "分析方法" if selected_methods else "执行项", "value": len(selected_methods) if selected_methods else int(preview.get("call_count") or 0) or 1},
             ],
             "details": {
                 "entities": preview.get("entities") if isinstance(preview.get("entities"), list) else [],
@@ -3423,7 +3456,7 @@ def _execute_asset_invocation_payload(
             turn_id=turn_id or "",
             owner_id=owner_id,
             owner_ids=[owner_id] if owner_id else [],
-            explicit_skill_ids=[skill_name],
+            explicit_skill_ids=invocation.get("explicit_skill_ids") or [skill_name],
             user_text=str(invocation.get("user_request") or "").strip() or f"请使用 {skill_name}，结合当前会话确认需要处理的问题。",
             dispatch_plan={"entry": "agent_route", "selected_agent": "investment_analyst", "turn_mode": "normal_qa"},
             application_context=application_context,
@@ -4316,7 +4349,8 @@ def api_chat_dispatch():
             require_all=True,
         )
         selected_asset = payload.get("selected_asset") if isinstance(payload.get("selected_asset"), dict) else {}
-        if not text and not attachments and not selected_asset:
+        selected_assets = _selected_assets(payload)
+        if not text and not attachments and not selected_asset and not selected_assets:
             return jsonify({"ok": False, "error": "text、attachments 和 selected_asset 不能同时为空"}), 400
         application_name = str(payload.get("application_name") or "investment_workbench").strip() or "investment_workbench"
         app_ctx = application_runtime_service.get_application_context(application_name)
@@ -4354,17 +4388,18 @@ def api_chat_dispatch():
         turn_id = runtime_conversation_service.create_turn(
             thread_id=thread_id,
             user_input_text=(
-                _asset_invocation_user_display_text(text, selected_asset)
-                if selected_asset
+                _asset_invocation_user_display_text(text, selected_asset, selected_assets)
+                if selected_asset or selected_assets
                 else text or f"[attachment:{len(attachments)}]"
             ),
             input_payload=_to_json_safe({**payload, "application_name": application_name, "attachments": attachments}),
             started_at=request_received_at,
         )
-        if asset_invocation_service.has_explicit_invocation(text=text, selected_asset=selected_asset):
+        if selected_assets or asset_invocation_service.has_explicit_invocation(text=text, selected_asset=selected_asset):
             result = _build_asset_invocation_payload(
                 text,
                 selected_asset=selected_asset,
+                selected_assets=selected_assets,
                 application_context=app_ctx,
                 thread_context=thread_context,
                 attachments=attachments,
@@ -4515,8 +4550,9 @@ def api_custom_tool_stream_start():
         text = str(payload.get("text") or payload.get("message") or "").strip()
         interaction_response = payload.get("interaction_response") if isinstance(payload.get("interaction_response"), dict) else {}
         selected_asset = payload.get("selected_asset") if isinstance(payload.get("selected_asset"), dict) else {}
+        selected_assets = _selected_assets(payload)
         attachment_ids = payload.get("attachment_ids") if isinstance(payload.get("attachment_ids"), list) else []
-        if not text and not interaction_response and not selected_asset and not attachment_ids:
+        if not text and not interaction_response and not selected_asset and not selected_assets and not attachment_ids:
             return jsonify({"ok": False, "error": "text、interaction_response、selected_asset 和 attachment_ids 不能同时为空"}), 400
         if interaction_response and not str(interaction_response.get("action_id") or "").strip():
             return jsonify({"ok": False, "error": "interaction_response.action_id 不能为空"}), 400
@@ -4537,6 +4573,7 @@ def api_custom_tool_stream_start():
             "text": text,
             "interaction_response": interaction_response,
             "selected_asset": selected_asset,
+            "selected_assets": selected_assets,
             "attachment_ids": attachment_ids,
             "thread_id": payload.get("thread_id"),
             "application_name": str(payload.get("application_name") or "investment_workbench").strip() or "investment_workbench",
@@ -4591,7 +4628,7 @@ def api_custom_tool_stream(run_id: str):
 
     def worker() -> None:
         try:
-            if asset_invocation_service.has_explicit_invocation(
+            if payload.get("selected_assets") or asset_invocation_service.has_explicit_invocation(
                 text=str(payload.get("text") or ""),
                 selected_asset=payload.get("selected_asset") if isinstance(payload.get("selected_asset"), dict) else {},
             ):
@@ -4604,7 +4641,7 @@ def api_custom_tool_stream(run_id: str):
     threading.Thread(target=worker, daemon=True).start()
 
     def generate():
-        is_asset_invocation = asset_invocation_service.has_explicit_invocation(
+        is_asset_invocation = bool(payload.get("selected_assets")) or asset_invocation_service.has_explicit_invocation(
             text=str(payload.get("text") or ""),
             selected_asset=payload.get("selected_asset") if isinstance(payload.get("selected_asset"), dict) else {},
         )

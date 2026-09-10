@@ -307,6 +307,7 @@ function mapInvocationAsset(
     aliases,
     tags,
     customTool: Boolean(item.custom_tool || item.customTool),
+    skillType: String(item.skill_type || "") || undefined,
     editable: Boolean(item.editable),
     version: String(item.version || "").trim() || undefined,
     revision: Number.isFinite(revision) ? revision : undefined,
@@ -395,6 +396,7 @@ export async function dispatchChat(input: {
   threadId: number | null;
   attachmentIds: string[];
   selectedAsset?: Pick<InvocationAsset, "kind" | "name"> & { ref?: string } | null;
+  selectedAssets?: Array<{ ref?: string; kind: "tool" | "skill"; name: string }>;
   researchMode?: ResearchMode;
   dataOnly?: boolean;
 }): Promise<UnknownRecord> {
@@ -408,6 +410,7 @@ export async function dispatchChat(input: {
       application_name: "investment_workbench",
       attachment_ids: input.attachmentIds,
       selected_asset: input.selectedAsset || undefined,
+      selected_assets: input.selectedAssets?.length ? input.selectedAssets : undefined,
       research_mode: input.researchMode || "auto",
       ...(input.dataOnly === undefined ? {} : { data_only: input.dataOnly }),
     }),
@@ -433,6 +436,7 @@ type AgentStreamInput = {
   interactionResponse?: InteractionResponse;
   attachmentIds?: string[];
   selectedAsset?: { ref?: string; kind: "tool" | "skill"; name: string } | null;
+  selectedAssets?: Array<{ ref?: string; kind: "tool" | "skill"; name: string }>;
   researchMode?: ResearchMode;
   dataOnly?: boolean;
   onEvent: (event: StreamEvent) => void;
@@ -453,6 +457,7 @@ async function startAgentStream(
         application_name: "investment_workbench",
         attachment_ids: input.attachmentIds || [],
         selected_asset: input.selectedAsset || undefined,
+      selected_assets: input.selectedAssets?.length ? input.selectedAssets : undefined,
         research_mode: input.researchMode || "auto",
         ...(input.dataOnly === undefined ? {} : { data_only: input.dataOnly }),
         ...(input.interactionResponse ? { interaction_response: input.interactionResponse } : {}),

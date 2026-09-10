@@ -1,15 +1,13 @@
 import { ChevronRight, Database, Table2 } from "lucide-react";
 import { useState, type ReactNode } from "react";
 import { normalizeRenderObject } from "../rendering/normalize";
-import { chooseRenderer } from "../rendering/registry";
 import type { SurfaceBlock } from "../types";
 
 export function splitAnswerEvidence(blocks: SurfaceBlock[]) {
   const hasAnswer = blocks.some(block => block.semantic === "finance.answer" &&
     Boolean(normalizeRenderObject(block).text?.trim() || block.content?.trim()));
   const reference = (block: SurfaceBlock) => hasAnswer &&
-    String(block.semantic || "").startsWith("finance.") &&
-    chooseRenderer(normalizeRenderObject(block)) === "data.table";
+    String(block.semantic || "").startsWith("finance.") && block.semantic !== "finance.answer";
   return { primary: blocks.filter(block => !reference(block)), references: blocks.filter(reference) };
 }
 

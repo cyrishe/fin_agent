@@ -1,3 +1,5 @@
+import type { InvocationAsset } from "./types";
+
 export type SuggestionKind = "command" | "tool" | "skill";
 
 export interface ComposerSuggestion {
@@ -250,4 +252,10 @@ export function removeInvocation(value: string, range: InvocationRange): { value
     value: `${before}${after}`,
     cursor: before.length,
   };
+}
+
+export function selectInvocationAsset(current: InvocationAsset[], asset: InvocationAsset | null): InvocationAsset[] {
+  if (!asset) return [];
+  if (asset.skillType !== "business_method" || current.some(item => item.skillType !== "business_method")) return [asset];
+  return current.some(item => item.ref === asset.ref) ? current : [...current, asset];
 }

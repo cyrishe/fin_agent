@@ -1,3 +1,4 @@
+import { selectInvocationAsset } from "./composerSuggestions";
 import { Menu, MessageSquarePlus, PanelRight, Sparkles } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { dispatchChat, loadAuthSession, loadInvocationAssets, loadThread, loadThreads, logoutAccount, resetThread, startChatStream, startCustomToolStream, uploadAttachments } from "./api";
@@ -90,7 +91,11 @@ export default function App() {
   const [rightOpen, setRightOpen] = useState(false);
   const [scheduleOpen, setScheduleOpen] = useState(false);
   const [invocationAssets, setInvocationAssets] = useState<InvocationAsset[]>([]);
-  const [selectedInvocationAsset, setSelectedInvocationAsset] = useState<InvocationAsset | null>(null);
+  const [selectedInvocationAssets, setSelectedInvocationAssets] = useState<InvocationAsset[]>([]);
+  const selectedInvocationAsset = selectedInvocationAssets[0] || null;
+  const setSelectedInvocationAsset = (asset: InvocationAsset | null) => {
+    setSelectedInvocationAssets(current => selectInvocationAsset(current, asset));
+  };
   const [researchMode, setResearchMode] = useState<ResearchMode>("auto");
   const [authUser, setAuthUser] = useState<AuthUser | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
@@ -260,7 +265,7 @@ export default function App() {
     text: string,
     assistantId: string,
     interactionResponse?: InteractionResponse,
-    invocation?: { attachmentIds?: string[]; selectedAsset?: { ref?: string; kind: "tool" | "skill"; name: string } | null },
+    invocation?: { selectedAssets?: Array<{ ref?: string; kind: "tool" | "skill"; name: string }>; attachmentIds?: string[]; selectedAsset?: { ref?: string; kind: "tool" | "skill"; name: string } | null },
     streamKind: "chat" | "custom_tool" = "custom_tool",
   ) => {
     const startStream = streamKind === "chat" ? startChatStream : startCustomToolStream;
@@ -342,7 +347,7 @@ export default function App() {
     }
     const text = input.trim();
     if ((!text && !attachments.length && !selectedInvocationAsset) || busy) return;
-    const invocationLabel = selectedInvocationAsset ? `$${selectedInvocationAsset.name}` : "";
+    const invocationLabel = selectedInvocationAssets.map(asset => `$${asset.name}`).join(" ");
     const userMessage: ChatMessage = {
       id: id(),
       role: "user",
@@ -364,22 +369,14 @@ export default function App() {
       if (useStream) {
         await runStream(text, assistantId, undefined, {
           attachmentIds,
-          selectedAsset: selectedInvocationAsset ? {
-            ref: selectedInvocationAsset.ref,
-            kind: selectedInvocationAsset.kind,
-            name: selectedInvocationAsset.name,
-          } : null,
+          selectedAssets: selectedInvocationAssets.map(({ ref, kind, name }) => ({ ref, kind, name })),
         }, "chat");
       } else {
         const payload = await dispatchChat({
           text,
           threadId,
           attachmentIds,
-          selectedAsset: selectedInvocationAsset ? {
-            ref: selectedInvocationAsset.ref,
-            kind: selectedInvocationAsset.kind,
-            name: selectedInvocationAsset.name,
-          } : null,
+          selectedAssets: selectedInvocationAssets.map(({ ref, kind, name }) => ({ ref, kind, name })),
           researchMode,
         });
         if (payload.thread_id) setThreadId(Number(payload.thread_id));
@@ -500,6 +497,11 @@ export default function App() {
                 onInteraction={(response, label, key) => void interact(response, label, key)}
                 onRequestFeedback={requestFeedback}
                 onSubmitFeedback={() => void submitFeedback()}
+                onFollowUp={(question) => {
+                  setInput(question);
+                  setSelectedInvocationAssets([]);
+                  setComposerFocusRequest(current => current + 1);
+                }}
                 onUseAsset={(asset) => {
                   const catalogAsset = invocationAssets.find((item) => item.kind === asset.kind && item.name === asset.name);
                   setSelectedInvocationAsset(catalogAsset || {
@@ -520,7 +522,7 @@ export default function App() {
               />)}<div ref={bottomRef} /></div>
             </section>
             {error && <div className="global-error" role="alert">{error}<button type="button" onClick={() => setError("")}>关闭</button></div>}
-            <Composer value={input} onChange={setInput} onSend={() => void send()} busy={busy} focusRequest={composerFocusRequest} assets={invocationAssets} selectedAsset={selectedInvocationAsset} onSelectAsset={setSelectedInvocationAsset} onClearSelectedAsset={() => setSelectedInvocationAsset(null)} attachments={attachments} onFiles={(files) => void addFiles(files)} onRemoveAttachment={(index) => setAttachments((current) => current.filter((_, itemIndex) => itemIndex !== index))} researchMode={researchMode} onResearchModeChange={setResearchMode} />
+            <Composer value={input} onChange={setInput} onSend={() => void send()} busy={busy} focusRequest={composerFocusRequest} assets={invocationAssets} selectedAsset={selectedInvocationAsset} selectedAssets={selectedInvocationAssets} onSelectAsset={setSelectedInvocationAsset} onClearSelectedAsset={(ref) => setSelectedInvocationAssets(current => current.filter(asset => asset.ref !== ref))} attachments={attachments} onFiles={(files) => void addFiles(files)} onRemoveAttachment={(index) => setAttachments((current) => current.filter((_, itemIndex) => itemIndex !== index))} researchMode={researchMode} onResearchModeChange={setResearchMode} />
           </>
         )}
       </main>

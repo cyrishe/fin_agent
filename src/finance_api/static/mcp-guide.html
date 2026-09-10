@@ -82,7 +82,7 @@
   <header>
     <div>
       <h1>Fin Agent MCP 使用说明</h1>
-      <p>把 Fin Agent 的结构化金融数据查询能力接入支持 MCP 的客户端或智能体。</p>
+      <p>接入金融分析、Skill 方法与结构化数据查询。提交问题即可自动选择，也可显式指定方法。</p>
     </div>
     <nav aria-label="相关资源">
       <a href="data-map">数据说明</a>
@@ -100,10 +100,10 @@
     <div class="grid">
       <section>
         <h2>可用工具</h2>
-        <p><code>finance_data_query</code></p>
         <ul>
-          <li>输入自然语言金融问题。</li>
-          <li>覆盖行情、财务、估值、资金流、研报等结构化数据。</li>
+          <li><code>finance_task</code>：通用金融任务；只传问题自动选择 Skill 和数据工具，传 <code>skill_ids</code> 指定有序方法。</li>
+          <li><code>list_skills</code>：发现当前身份可用的已发布 Skill ID、用途与版本。</li>
+          <li><code>finance_data_query</code>：直接查询行情、财务、估值、资金流、研报等结构化数据。</li>
           <li>这是封闭数据查询能力，不调用通用 Web Search。</li>
         </ul>
       </section>
@@ -117,15 +117,17 @@ X-API-Key: &lt;FINANCE_API_KEY&gt;</pre>
       </section>
 
       <section class="wide">
-        <h2>调用参数</h2>
+        <h2>任务与查数调用参数</h2>
+        <p><code>list_skills</code> 无需参数。下表适用于任务和数据查询入口。</p>
         <table>
           <thead><tr><th>参数</th><th>是否必需</th><th>说明</th></tr></thead>
           <tbody>
             <tr><td><code>query</code></td><td>是</td><td>自然语言金融数据问题。</td></tr>
+            <tr><td><code>skill_ids</code></td><td>否</td><td>仅 <code>finance_task</code>：传 Skill ID 列表，按顺序采用方法、共享基础数据、综合回答；省略、null 或空列表时自动选择。</td></tr>
             <tr><td><code>response_mode</code></td><td>否</td><td><code>data</code> 返回原始行数据，<code>summary</code> 返回结论，<code>both</code> 同时返回；默认 <code>both</code>。</td></tr>
             <tr><td><code>detail</code></td><td>否</td><td>默认 <code>false</code>；设为 <code>true</code> 附带模型轮数、每步 Token、耗时、API 请求与静态检查/重试记录，不改变查询行为。DSH 提供逐步事件耗时，其他运行时未采集的项留空。</td></tr>
             <tr><td><code>runtime</code></td><td>否</td><td><code>cc</code> 或 <code>dsh</code>；不填写时使用服务端默认值。</td></tr>
-            <tr><td><code>research_mode</code></td><td>否</td><td><code>fast</code>、<code>auto</code> 或 <code>deep</code>，控制摘要分析深度；默认 <code>fast</code>。</td></tr>
+            <tr><td><code>research_mode</code></td><td>否</td><td><code>fast</code>、<code>auto</code> 或 <code>deep</code>；通用任务默认 <code>auto</code>，直接查数默认 <code>fast</code>。</td></tr>
             <tr><td><code>execution_mode</code></td><td>否</td><td><code>standard</code> 或 <code>fast</code>；DSH 的快速执行模式省略检查与重试。</td></tr>
             <tr><td><code>conversation_id</code></td><td>否</td><td>默认不传，每次独立，不继承前次问题或结果。显式传相同 ID 时续接当前用户的会话；不同用户之间隔离。</td></tr>
             <tr><td><code>max_rows</code></td><td>否</td><td>每个结果集最多返回 1–100 行，默认 100。</td></tr>
@@ -149,7 +151,7 @@ async def main():
         async with ClientSession(read, write) as session:
             await session.initialize()
             result = await session.call_tool(
-                "finance_data_query",
+                "finance_task",
                 arguments={
                     "query": "海尔智家近四年的营业收入和归母净利润走势如何？",
                     "response_mode": "both",
@@ -158,7 +160,18 @@ async def main():
             )
             print(result.structuredContent)
 
+            # 指定方法：先发现当前身份可用的 Skill。
+            skills = await session.call_tool("list_skills", arguments={})
+            print(skills.structuredContent)
+            result = await session.call_tool("finance_task", arguments={
+                "query": "分析海尔智家的盈利质量和估值，给出综合判断",
+                "skill_ids": ["earnings-analysis", "valuation-analysis"],
+                "response_mode": "both",
+            })
+            print(result.structuredContent)
+
 asyncio.run(main())</pre>
+        <p class="note">MCP 调用时需要指定入口工具名；调用 <code>finance_task</code> 后，内部方法与数据工具可由 Fin Agent 自动选择。多个 Skill 在同一次 Agent 任务中指导分析，未授权或未发布的方法会被拒绝。工具工坊自定义工具不在本接口范围内。</p>
         <p class="note">返回值包含 <code>data_sources</code>、结构化结果、摘要和执行元数据。<code>data_sources</code> 使用“股票 · 研报明细”“行业 · 成分股”等公开业务名称，列出每个查询目标及实际记录数，便于核验查询逻辑；不会暴露内部目录路由标识。只需要裸数据时，将 <code>response_mode</code> 设为 <code>data</code>。</p>
       </section>
     </div>

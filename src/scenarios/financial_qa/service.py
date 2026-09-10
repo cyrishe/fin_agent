@@ -29,6 +29,7 @@ from src.scenarios.financial_qa.runtime import (
 from src.services.finance_claude_session_service import FinanceClaudeSessionService
 from src.services.invocation_input_resolver_service import InvocationInputResolverService
 from src.services.skill_candidate_store_service import SkillCandidateStoreError
+from src.scenarios.financial_qa.business_skills import FinanceSkillUnavailableError
 
 # Financial QA is deliberately limited to the structured finance-data surface.
 # News and general web search belong to a separate search scenario and must not
@@ -275,10 +276,10 @@ class FinancialQaCcService:
             _trim(item) for item in explicit_skill_ids or [] if _trim(item)
         ))
         if any(skill_id not in methods for skill_id in explicit_ids):
-            raise ValueError("所选业务 Skill 不存在、未启用或当前无权使用。")
+            raise FinanceSkillUnavailableError("所选业务 Skill 不存在、未启用或当前无权使用。")
         explicit_prompt = "\n\n".join(
-            f"[用户显式选择的业务方法：{skill_id}]\n{methods[skill_id]['method']}"
-            for skill_id in explicit_ids
+            f"[用户选择顺序 {index}：{skill_id}]\n{methods[skill_id]['method']}"
+            for index, skill_id in enumerate(explicit_ids, 1)
         )
         skill_routing_summary = _trim(
             business_skill_snapshot.get("routing_summary")
@@ -661,6 +662,7 @@ class FinancialQaCcService:
                     if _trim(item)
                 ],
                 "skill_entries": skill_entries,
+                "skill_catalog_revision": runtime_context["_finance_skill_catalog_revision"],
                 "skill_registry_error": runtime_context["_finance_skill_registry_error"],
                 "result_refs": result_refs,
                 "llm_step_usages": [

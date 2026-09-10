@@ -16,6 +16,10 @@ _ALLOWED_COMPANION_DIRS = frozenset({"agents", "assets", "examples"})
 _SNAPSHOT_FORMAT_VERSION = 4
 
 
+class FinanceSkillUnavailableError(ValueError):
+    """An explicit method is absent from the caller's authorized runtime snapshot."""
+
+
 def _trim(value: Any) -> str:
     return str(value or "").strip()
 

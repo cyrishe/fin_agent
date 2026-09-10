@@ -1459,7 +1459,7 @@ test('Skill budgets retain useful followups through query twelve and detail eigh
   })
 })
 
-test('larger Skill ceilings neither change guidance nor force another model round after success', async () => {
+test('larger Skill ceilings disclose capacity without forcing another model round after success', async () => {
   await withSkillContext({}, async () => {
     const prompts = []
     for (const skillMaxQueryAttempts of [8, 12, 24]) {
@@ -1469,10 +1469,11 @@ test('larger Skill ceilings neither change guidance nor force another model roun
       completeCall(runtime, 2, 'c', NAMES.catalog, { mode: 'dataview' })
       completeCall(runtime, 3, 'q', NAMES.query, { ok: true, result_ref: 'session://r', sample_complete: false })
       prompts.push(runtime.prompt())
+      assert.match(runtime.prompt(), new RegExp(`查询 ${skillMaxQueryAttempts - 1}/${skillMaxQueryAttempts}`))
       runtime.stopping()
       assert.equal(runtime.steered.length, 0)
     }
-    assert.equal(new Set(prompts).size, 1)
+    assert.equal(new Set(prompts).size, 3)
   })
 })
 
@@ -1585,4 +1586,32 @@ test('reused Skill workers reset scope and fast mode keeps its one-query budget'
     assert.match(runtime.prompt(), /一次目录定位/)
     assert.doesNotMatch(runtime.prompt(), /命中或用户显式指定/)
   })
+})
+
+test('low query allowance is visible before execution and still permits a final answer', async () => {
+  const runtime = fixture({ maxQueryAttempts: 1, preserveRequestPrefix: true })
+  runtime.event({ type: 'turn/start', data: { turn: 1 } })
+  let step = await runtime.preStep({ step: 1 })
+  assert.match(step.messages.at(-1).content[0].text, /查询 1\/1/)
+  assert.match(step.messages.at(-1).content[0].text, /不是必须用满/)
+  completeCall(runtime, 1, 'catalog', NAMES.catalog, { mode: 'dataview' })
+  completeCall(runtime, 2, 'query', NAMES.query, { error: 'unavailable', data_request_complete: false })
+  step = await runtime.preStep({ step: 3 })
+  assert.equal(step.kind, 'enter')
+  assert.match(step.messages.at(-1).content[0].text, /查询 0\/1/)
+  assert.match(step.messages.at(-1).content[0].text, /依据已取得的证据收尾/)
+  assert.ok((await runtime.request({})).maxTokens > 0)
+  runtime.stopping()
+  assert.ok(runtime.steered.length <= 1)
+})
+
+test('remaining budget is refreshed even when successive successful queries keep the same stage', async () => {
+  const runtime = fixture({ maxQueryAttempts: 4, preserveRequestPrefix: true })
+  runtime.event({ type: 'turn/start', data: { turn: 1 } })
+  completeCall(runtime, 1, 'catalog', NAMES.catalog, { mode: 'dataview' })
+  for (const [step, remaining] of [[2, 3], [3, 2]]) {
+    completeCall(runtime, step, `q${step}`, NAMES.query, { ok: true, result_ref: `session://r${step}` })
+    const next = await runtime.preStep({ step: step + 1 })
+    assert.match(next.messages.at(-1).content[0].text, new RegExp(`查询 ${remaining}/4`))
+  }
 })

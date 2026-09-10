@@ -5,7 +5,8 @@
 该服务把现有金融查数能力作为一个独立进程对外提供，同时保留两种消费方式：
 
 1. 普通 HTTP 应用使用 REST API；
-2. Agent/MCP 客户端通过工具描述发现并调用同一个 `finance_data_query`。
+2. Agent/MCP 客户端通过 `finance_task` 自动选择金融方法和数据工具，或显式指定 Skill；
+3. 直接查数继续使用 `finance_data_query`。
 
 服务不复制金融 Provider，也不另建目录。REST、问答和 MCP 最终都调用
 `FinancialQaCcService`，共用当前 Catalog、API DSL、结构化静态检查、结果存储以及
@@ -14,10 +15,64 @@ CC/DeepSeek Harness 执行路径。
 ```text
 REST /v1/finance/query ─┐
 REST /v1/finance/answer ├─> FinanceApiGateway ─> FinancialQaCcService
+REST /v1/finance/task  ─┤                         ↑
 MCP  /mcp               ┘                         ├─> CC
                                                   └─> DSH
                                                        └─> Catalog / Provider / result_ref
 ```
+
+## 通用任务、指定 Skill 与直接查数
+
+同一个 `/mcp` 提供三个工具：
+
+| 工具 | 用途 | REST 对应入口 |
+|---|---|---|
+| `finance_task` | 自然语言金融任务；省略 `skill_ids` 自动选择，传入列表则按顺序采用指定方法、共享数据、综合回答 | `POST /v1/finance/task` |
+| `list_skills` | 当前身份可用的已发布金融方法目录，返回 ID、用途、发布版本及目录 revision | `GET /v1/skills` |
+| `finance_data_query` | 保持原有直接金融查数能力 | `POST /v1/finance/query` |
+
+MCP 的 `tools/call` 必须有 `name`，但调用方不必选择内部方法或数据 API。
+调用 `finance_task` 时，只传问题即可把这项选择交给现有金融 Agent，无额外路由模型：
+
+```json
+{"name":"finance_task","arguments":{"query":"分析贵州茅台的盈利质量与估值，给出综合判断"}}
+```
+
+先通过 `list_skills` 发现 ID，再显式指定单个或多个方法：
+
+```json
+{"name":"finance_task","arguments":{"query":"分析贵州茅台的盈利质量与估值，给出综合判断","skill_ids":["earnings-analysis","valuation-analysis"],"response_mode":"both","detail":true}}
+```
+
+`skill_ids` 可省略、为 null 或空列表，均表示自动选择；非空列表保留首次出现的顺序。
+未知、未发布、停用或无权使用的 ID 在模型执行前拒绝，不会静默改用其他 Skill。
+多个 Skill 是同一 Agent 任务中的有序分析方法，不是分别运行并强制串联输出的工作流。
+基础数据工具始终可用；此接口不执行工具工坊自定义工具、Legacy SkillRunner 或通用 Web Search。
+
+`finance_task` 默认 `research_mode=auto`、`execution_mode=standard`、`response_mode=both`。
+其他参数与直接查数入口相同；显式选择 `fast` 执行模式仍具有快速取数的限制，不适合作为深度分析默认值。
+`/v1/finance/answer` 同样接受可选 `skill_ids`，原有参数默认值保持兼容。
+普通结果继续使用 `summary`、`data_sources`、`data`；`detail=true` 时另含
+`skills`（实际加载的方法及内容 hash）、`skill_catalog_revision` 与可选的目录降级说明。
+方法加载记录不代表业务结论已验证。
+内置文件 Skill 的 `active_revision_no` 为 0，目录 `revision` 与加载记录的 `content_hash`
+用于内容溯源；注册发布的 Skill 另外具有递增的发布版本号。执行时以当轮授权快照为准。
+
+### Skill 身份与可见性
+
+独立服务与网页共用 SkillHub 发布目录和金融执行核心。默认 API 身份为
+`finance-api:<principal_id>`，可使用系统方法、已发布公开方法及自身拥有的已发布私有方法。
+服务器可显式授权某个 API 身份使用既有用户的私有方法：
+
+```dotenv
+FINANCE_API_OWNER_IDS_JSON='{"internal":"existing-user-id"}'
+```
+
+这是部署方管理的授权映射，不是请求参数；请求不能传入 `owner_id` 或覆盖权限。
+临时 token 继承其 API principal 的绑定。目录发现和执行使用同一 owner；不同 principal 的
+会话仍然隔离，绑定到其他 owner 后也不会续接前一个 owner 的会话。
+未配置映射时保持原有 API 身份和会话寻址方式。SkillHub 暂不可用时沿用系统方法降级；
+目录返回说明，私有方法不猜测授权。未发布草稿和 Skill 正文不对外作为目录返回。
 
 ## 启动
 
@@ -325,7 +380,7 @@ https://finance-api.example.com/mcp
 ```
 
 服务使用官方 Python SDK 的 Streamable HTTP transport，支持 `initialize`、`tools/list` 和
-`tools/call`。`tools/list` 暴露一个高层工具 `finance_data_query`；工具返回同时包含
+`tools/call`。`tools/list` 暴露 `finance_task`、`list_skills` 和 `finance_data_query`；工具返回同时包含
 `content` JSON 文本和 `structuredContent`，兼容只识别文本结果的旧客户端与直接消费
 结构化输出的新客户端。
 

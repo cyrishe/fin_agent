@@ -861,12 +861,41 @@ class AssetInvocationService:
         *,
         text: str,
         selected_asset: Mapping[str, Any] | None = None,
+        selected_assets: list[Mapping[str, Any]] | None = None,
         attachments: Optional[List[Dict[str, Any]]] = None,
         thread_context: Optional[Dict[str, Any]] = None,
         owner_ids: Optional[List[str]] = None,
         business_owner_id: str = "",
         allow_inactive: bool = False,
     ) -> Dict[str, Any]:
+        if selected_assets:
+            if not isinstance(selected_assets, list) or any(not isinstance(item, Mapping) for item in selected_assets):
+                raise AssetInvocationError("selected_assets 必须是资产引用列表")
+            if len(selected_assets) == 1:
+                selected_asset = selected_assets[0]
+            else:
+                methods = []
+                seen = set()
+                for selected in selected_assets:
+                    item = self.plan(text=text, selected_asset=selected, attachments=attachments,
+                                     thread_context=thread_context, owner_ids=owner_ids,
+                                     business_owner_id=business_owner_id, allow_inactive=allow_inactive)
+                    if item.get("status") != "ready":
+                        return item
+                    if item.get("contract", {}).get("skill_type") != "business_method":
+                        raise AssetInvocationError("组合分析请选择金融方法 Skill；普通可执行工具请单独调用。基础数据可在分析中按需使用。")
+                    name = item["target"]["name"]
+                    if name not in seen:
+                        methods.append(item)
+                        seen.add(name)
+                invocation = methods[0]
+                invocation["explicit_skill_ids"] = [item["target"]["name"] for item in methods]
+                invocation["selected_assets"] = [item["target"] for item in methods]
+                names = " → ".join(item["contract"]["display_name"] for item in methods)
+                invocation["message"] = f"依次使用 {names}，共享数据并综合回答。"
+                invocation["preview"]["message"] = invocation["message"]
+                invocation["preview"]["target"]["display_name"] = names
+                return invocation
         resolution = self._resolve_invocation_target(
             text=text,
             selected_asset=selected_asset,

@@ -63,3 +63,11 @@ describe("whole-request activity visibility", () => {
     if (event.includes("error")) expect(html).toContain("连接已中断");
   });
 });
+
+it("renders persisted follow-ups only after the answer completes", () => {
+  const message = { id: "follow", role: "assistant" as const, content: "", payload: { follow_up_questions: ["下一步核验什么？"] }, run: { ...initialRun(), status: "done" as const } };
+  const html = renderToStaticMarkup(<MessageItem {...props} message={message} onFollowUp={noop} />);
+  expect(html).toContain('aria-label="进一步提问"');
+  expect(html).toContain("下一步核验什么？");
+  expect(renderToStaticMarkup(<MessageItem {...props} message={{ ...message, run: initialRun() }} />)).not.toContain("下一步核验什么？");
+});

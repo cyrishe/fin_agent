@@ -158,6 +158,7 @@ export interface InvocationInputField {
 }
 
 export interface InvocationAsset {
+  skillType?: string;
   ref: string;
   name: string;
   displayName: string;

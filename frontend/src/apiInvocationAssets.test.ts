@@ -168,3 +168,15 @@ describe("invocable asset API", () => {
     ]);
   });
 });
+
+it("sends ordered multi-selection without replacing it with a single asset", async () => {
+  const fetchMock = vi.fn().mockResolvedValue(jsonResponse({ ok: true }));
+  vi.stubGlobal("fetch", fetchMock);
+  try {
+    const selectedAssets = [{ kind: "skill" as const, name: "earnings-analysis" }, { kind: "skill" as const, name: "valuation-analysis" }];
+    await dispatchChat({ text: "综合分析", threadId: 1, attachmentIds: [], selectedAssets });
+    const sent = JSON.parse(fetchMock.mock.calls[0][1].body);
+    expect(sent.selected_assets).toEqual(selectedAssets);
+    expect(sent.selected_asset).toBeUndefined();
+  } finally { vi.unstubAllGlobals(); }
+});
