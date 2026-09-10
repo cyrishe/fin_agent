@@ -1,5 +1,10 @@
 # MCP评测：临时Key、自动路由与完整报告
 
+**给普通用户：优先使用根目录 `run_eval.sh`，编辑顶部带注释的配置后，只运行 `bash run_eval.sh`。**
+说明见 [客户端使用说明](mcp_eval_client.md)。管理员执行 `python scripts/package_finance_eval_client.py`
+即可生成可交付的客户端ZIP，仅包含白名单中的客户端文件、依赖清单和样本，不含Token或服务端配置。
+将单独签发的临时Token交给用户，用户放为包内的`token.json`即可。macOS/Linux支持Bash，Windows使用Git Bash/WSL。
+
 统一入口：`scripts/eval_finance_mcp.py`。只调用现有MCP，不启动服务器、不修改生产配置。
 默认 `finance_task`、`runtime=dsh`、`research_mode=auto`、`execution_mode=standard`、
 `response_mode=both`、`detail=true`、并发2、HTTP超时360秒。每题独立，不传conversation_id，不自动重试。
