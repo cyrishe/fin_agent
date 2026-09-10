@@ -75,6 +75,33 @@ def _cc_payload(result: dict) -> dict:
     return json.loads(result["content"][0]["text"])
 
 
+@pytest.mark.parametrize("source,refs,expected", [
+    ("llm", [], True), ("llm", ["turn:12"], False),
+    ("", [], False), ("explicit_command", [], False), ("no_context", [], False),
+])
+def test_history_scope_requires_explicit_semantic_provenance(source, refs, expected):
+    dsh = _Session("dsh")
+    service = FinancialQaCcService(enabled=True, session_service=_Session("cc"), dsh_session_service=dsh)
+    plan = _plan()
+    plan["semantic_turn"].update(context_resolution_source=source, context_refs=refs)
+    service.answer(thread_id=1, turn_id=2, owner_id="test", user_text="查询行情", dispatch_plan=plan, runtime="dsh")
+    assert dsh.calls[0]["context"]["_finance_history_independent"] is expected
+
+
+def test_independent_result_index_preserves_allocator_and_restorable_handles(tmp_path):
+    from src.experiments.staged_data_protocol.phase2.models import ResultHandle
+    system_tools = FinanceDataQueryCcTools(result_store=SessionVariableStoreService(data_root=tmp_path / "data"))
+    runtime = system_tools.create_runtime()
+    runtime.begin_turn(owner_ids=["test"], tool_context={"_agent_runtime_scope": "test:scope"})
+    runtime.result_handles["r13"] = ResultHandle(name="r13", api="stock.quote", columns=["close"], data={"rows": [{"close": 42}]})
+    original = runtime.working_set_prompt()
+    assert "\n" not in original
+    assert json.loads(runtime.current_context_prompt(include_results=False)) == {"next_result_name": "r14", "results": []}
+    assert runtime.result_handles["r13"].data["rows"] == [{"close": 42}]
+    assert runtime.working_set_prompt() == original
+    assert "r13" in runtime.current_context_prompt()
+
+
 def test_mcp_wire_preserves_complete_unicode_catalog_and_structured_content():
     from mcp import types
     from src.scenarios.financial_qa.dsh_mcp_server import create_server

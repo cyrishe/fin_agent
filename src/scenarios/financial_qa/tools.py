@@ -420,9 +420,16 @@ class FinanceDataQueryToolRuntime:
                 return resolved
         return candidate
 
-    def current_context_prompt(self) -> str:
+    def current_context_prompt(self, *, include_results: bool = True) -> str:
         if not self.result_handles:
             return ""
+        if not include_results:
+            # Keep aliases collision-free; only the request's advertised index
+            # changes. Persisted handles, metadata and reference loading do not.
+            return json.dumps({
+                "next_result_name": self.result_registry.next_result_name(self.result_handles),
+                "results": [],
+            }, ensure_ascii=False, separators=(",", ":"))
         return (
             "以下是系统持有的当前金融查询 working_set。它只包含可寻址索引、"
             "服务端已执行的选择条件和列覆盖，不包含隐藏的全量数据；"

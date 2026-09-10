@@ -599,7 +599,9 @@ function promptFor(state, config) {
 }
 
 function stageTools(state, tools) {
-  if (!state.methodReady) return [tools.skill, tools.catalog].filter(Boolean)
+  if (!state.methodReady) return [tools.skill, tools.catalog,
+    ...(state.executionMode === 'standard' ? [tools.identity] : []),
+  ].filter(Boolean)
   const methods = state.stage === 'final' && state.dataOnlyRequested
     ? [] : [tools.skill, tools.reference].filter(Boolean)
   // In standard mode, stages describe progress/budget profiles, not a forced
@@ -837,6 +839,67 @@ function updateAfterStep(state, step, config) {
   state.requiredAction = false
 }
 
+// The latest query batch owns the remaining execution facts. Deliver these
+// before the next owed model step, instead of asking it to rewrite a finished
+// answer. Real execution failures retain the terminal repair checkpoint.
+function completionFacts(state) {
+  const queries = [...state.calls.values()].filter(call => call.kind === 'query' && call.allowedAtCall)
+  const lastStep = Math.max(0, ...queries.map(call => call.step))
+  let failed = false
+  const unfinished = queries.filter(call => call.step === lastStep).flatMap(call => {
+    const outcome = state.results.get(call.callId)
+    if (!outcome) return []
+    const succeeded = querySucceeded(outcome.payload, outcome.failed)
+    if (succeeded && outcome.payload?.data_request_complete !== false) return []
+    failed ||= !succeeded
+    return [{
+      completed_steps: (outcome.payload?.completed_steps ?? summaries(outcome.payload)).filter(item => item?.result_ref).map(item => item.result_ref),
+      failed_step: outcome.payload?.failed_step,
+      data_request_complete: outcome.payload?.data_request_complete,
+      remaining: outcome.payload?.failed_step
+        ? (call.steps ?? []).slice(outcome.payload.failed_step - 1).map(item => item.goal) : undefined,
+      error: outcome.payload?.validation?.errors ?? outcome.payload?.error,
+    }]
+  })
+  return { unfinished, failed, key: `completion-facts:${lastStep}` }
+}
+
+function completionFactsPrompt(unfinished) {
+  return `系统执行事实（内部参考）：${JSON.stringify(unfinished)}。结合原始用户目标和剩余额度继续必要取证，或依据已有证据直接交付完整最终回答。最终回答面向原始金融问题，综合已有结论并说明业务数据缺口；执行记录与协议细节留在过程通道。`
+}
+
+function visibleTexts(agent) {
+  const texts = []
+  const visit = blocks => {
+    for (const block of blocks ?? []) {
+      if (block.type === 'text') texts.push(block.text)
+      if (Array.isArray(block.content)) visit(block.content)
+    }
+  }
+  for (const message of agent.session.deriveMessages()) visit(message.content)
+  return texts
+}
+
+function reuseVisibleSkill(content, agent) {
+  const texts = visibleTexts(agent)
+  const reuse = skill => {
+    if (typeof skill?.method !== 'string' || !skill.method.trim()
+      || !texts.some(text => text.includes(skill.method))) return skill
+    const { method, ...identity } = skill
+    return { ...identity, already_loaded: true,
+      guidance: '该方法正文已完整包含在当前模型上下文中，请直接使用；必要参考仍可按原方法中的路径读取。' }
+  }
+  return (content ?? []).map(block => {
+    if (block.type !== 'text') return block
+    let payload
+    try { payload = JSON.parse(block.text) } catch { return block }
+    if (!payload || payload.error) return block
+    const projected = Array.isArray(payload.skills)
+      ? { ...payload, skills: payload.skills.map(reuse) } : reuse(payload)
+    return { ...block, text: JSON.stringify(projected) }
+  })
+}
+
 function requiredActionPrompt(state, tools) {
   if (!state.methodReady) return '按本轮目标加载所需专业方法，或直接通过 read_finance_catalog 定位数据执行包。'
   if (hasDataOnlyResults(state)) {
@@ -928,6 +991,7 @@ export function apply(ctx, input = {}) {
       stageSteers: new Map(),
       lastInjectedStage: '',
       visibleKey: '',
+      historyTurn: 0,
       liftRestriction: undefined,
     }
 
@@ -1032,6 +1096,9 @@ export function apply(ctx, input = {}) {
       if (decision.kind !== 'accept'
         || Object.hasOwn(decision, 'value')) return decision
       const kind = toolKind(exec.name, tools)
+      if (kind === 'skill' && !result.isError) {
+        return { ...decision, content: reuseVisibleSkill(decision.content ?? result.content, agent) }
+      }
       if (kind === 'catalog' && !result.isError) {
         const revision = currentRuntimeContext().finance_catalog_revision
         const content = (decision.content ?? result.content ?? []).map(block => {
@@ -1061,12 +1128,26 @@ export function apply(ctx, input = {}) {
         resetTurn(state, turn, config, agent, tools)
         applyRestriction()
       }
+      let historyChanged = false
+      if (state.historyTurn !== turn) {
+        state.historyTurn = turn
+        // Native, replayable request selection leaves the session archive and
+        // tool/result ownership intact. Older Harness builds keep full history.
+        if (typeof agent.session.requestHistory === 'function') {
+          const fromTurn = currentToolContext()._finance_history_independent === true ? turn : undefined
+          if (agent.session.requestHistory().fromTurn !== fromTurn) {
+            agent.session.append('request/history', fromTurn === undefined ? {} : { fromTurn })
+            historyChanged = true
+          }
+        }
+      }
       // Snapshot only contracts already visible before this model generation.
       // A parallel catalog result cannot authorize a call generated beside it.
       state.reusableApis = reusableCatalogApis(agent, tools)
       if (state.dataOnlyComplete || (state.dataOnlyRequested && state.stage === 'final')) return { kind: 'reject' }
-      const downstream = await next()
+      let downstream = await next()
       if (downstream.kind !== 'enter') return downstream
+      if (historyChanged) downstream = { ...downstream, startsRequestSeries: true }
       if (downstream.messages.length === 0) {
         const message = emptyResultHandoff(state, config)
         if (message) {
@@ -1077,6 +1158,15 @@ export function apply(ctx, input = {}) {
           state.finalAnswerAttempted = true
           return { kind: 'reject' }
         }
+      }
+      const facts = completionFacts(state)
+      if (state.executionMode === 'standard' && !state.dataOnlyRequested
+        && !facts.failed && state.stage !== 'final'
+        && facts.unfinished.length > 0 && !state.stageSteers.has(facts.key)) {
+        state.stageSteers.set(facts.key, 1)
+        downstream = { ...downstream, messages: [
+          ...downstream.messages, steeringMessage(completionFactsPrompt(facts.unfinished)),
+        ] }
       }
       if (!config.preserveRequestPrefix) return downstream
       const key = `${state.stage}:${state.reason}:${JSON.stringify(remainingBudget(state, config))}`
@@ -1118,30 +1208,21 @@ export function apply(ctx, input = {}) {
     agent.ctx.on('agent/turn-stopping', ({ agent: subject, turn }) => {
       if (turn !== state.turn) return
       if (state.executionMode === 'fast') return
-      const queries = [...state.calls.values()].filter(call => call.kind === 'query' && call.allowedAtCall)
-      const lastStep = Math.max(0, ...queries.map(call => call.step))
-      const unfinished = queries.filter(call => call.step === lastStep).flatMap(call => {
-        const outcome = state.results.get(call.callId)
-        if (!outcome || querySucceeded(outcome.payload, outcome.failed)
-          && outcome.payload?.data_request_complete !== false) return []
-        return [{
-          completed_steps: (outcome.payload?.completed_steps ?? summaries(outcome.payload)).filter(item => item?.result_ref).map(item => item.result_ref),
-          failed_step: outcome.payload?.failed_step,
-          data_request_complete: outcome.payload?.data_request_complete,
-          remaining: outcome.payload?.failed_step
-            ? (call.steps ?? []).slice(outcome.payload.failed_step - 1).map(item => item.goal) : undefined,
-          error: outcome.payload?.validation?.errors ?? outcome.payload?.error,
-        }]
-      })
+      const { unfinished, failed, key: factsKey } = completionFacts(state)
+      const factsDelivered = !state.dataOnlyRequested && !failed
+        && unfinished.length > 0 && state.stageSteers.has(factsKey)
       const exhausted = state.stage === 'final' && state.reason !== 'data_request_complete'
-      const needsRequiredAction = !exhausted && (unfinished.length > 0 || state.requiredAction)
+      const needsRequiredAction = !exhausted && (
+        unfinished.length > 0 && !factsDelivered
+        || state.requiredAction && !(factsDelivered && state.reason === 'identity_scope_ready')
+      )
       const needsFinalAnswer = state.stage === 'final'
         && !state.dataOnlyRequested
         && !state.finalAnswerAttempted
         && !state.dataOnlyComplete
       if (!needsRequiredAction && !needsFinalAnswer) return
       const prompt = unfinished.length > 0 && !exhausted
-        ? `系统执行事实（内部参考）：${JSON.stringify(unfinished)}。结合原始用户目标和剩余额度继续必要取证，或依据已有证据直接交付完整最终回答。最终回答面向原始金融问题，综合已有结论并说明业务数据缺口；执行记录与协议细节留在过程通道。`
+        ? completionFactsPrompt(unfinished)
         : requiredActionPrompt(state, tools)
       if (!prompt) return
       const key = 'turn-completion-audit'

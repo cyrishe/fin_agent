@@ -15,6 +15,92 @@ const NAMES = {
   details: 'mcp__finance__load_finance_result',
 }
 
+test('completion facts land before synthesis and do not demand a second answer', async () => {
+  for (const details of [false, true]) {
+    const runtime = fixture({ maxQueryAttempts: 8 })
+    runtime.event({ type: 'turn/start', data: { turn: 1 } })
+    completeCall(runtime, 1, 'catalog', NAMES.catalog, { mode: 'dataview' })
+    completeCall(runtime, 2, 'query', NAMES.query, {
+      ok: true, data_request_complete: false, result_ref: 'session://evidence',
+    })
+    const next = await runtime.preStep({ step: 3 })
+    assert.match(JSON.stringify(next.messages), /data_request_complete/)
+    if (details) completeCall(runtime, 3, 'detail', NAMES.details, { rows: [{ value: 42 }] })
+    runtime.event({ type: 'step/end', data: { turn: 1, step: details ? 4 : 3 } })
+    runtime.stopping()
+    assert.equal(runtime.steered.length, 0)
+    assert.equal((await runtime.preStep({ step: 5 })).messages.length, 0)
+  }
+})
+
+test('early facts do not suppress an actual failed suffix or a new required catalog action', async () => {
+  for (const failed of [true, false]) {
+    const runtime = fixture({ maxQueryAttempts: 8 })
+    runtime.event({ type: 'turn/start', data: { turn: 1 } })
+    completeCall(runtime, 1, 'catalog', NAMES.catalog, { mode: 'dataview' })
+    completeCall(runtime, 2, 'query', NAMES.query, failed
+      ? { failed_step: 2, validation: { ok: false }, completed_steps: [{ result_ref: 'session://saved' }] }
+      : { ok: true, data_request_complete: false },
+    { steps: [{ goal: 'saved' }, { goal: 'remaining target' }] })
+    await runtime.preStep({ step: 3 })
+    if (!failed) completeCall(runtime, 3, 'catalog-new', NAMES.catalog, { mode: 'dataview' })
+    runtime.stopping()
+    assert.equal(runtime.steered.length, 1)
+    if (failed) assert.match(JSON.stringify(runtime.steered), /remaining target/)
+  }
+})
+
+test('skill projection removes only exact already-visible body and preserves identity and references', async () => {
+  const skillName = 'mcp__finance__read_finance_skill'
+  const method = '完整方法\n参考 references/proof.md'
+  const payload = { skill_id: 'analysis', revision: 'r1', content_hash: 'h1', method }
+  for (const visible of [method, method.slice(0, 5), '']) {
+    const runtime = fixture({}, [{ role: 'user', content: [{ type: 'text', text: visible }] }], { ...NAMES, skill: skillName })
+    const result = await runtime.post({ name: skillName }, {
+      content: [{ type: 'text', text: JSON.stringify(payload) }],
+    })
+    const projected = JSON.parse(result.content[0].text)
+    assert.equal(projected.content_hash, 'h1')
+    assert.equal(projected.revision, 'r1')
+    if (visible === method) {
+      assert.equal(projected.already_loaded, true)
+      assert.equal(projected.method, undefined)
+    } else assert.deepEqual(projected, payload)
+  }
+})
+
+test('independent history selection restores the archive for dependent turns and degrades safely on old DSH', async t => {
+  const dir = mkdtempSync(join(tmpdir(), 'history-scope-'))
+  const path = join(dir, 'context.json')
+  const previous = process.env.FIN_AGENT_DSH_CONTEXT_PATH
+  process.env.FIN_AGENT_DSH_CONTEXT_PATH = path
+  t.after(() => {
+    if (previous === undefined) delete process.env.FIN_AGENT_DSH_CONTEXT_PATH
+    else process.env.FIN_AGENT_DSH_CONTEXT_PATH = previous
+    rmSync(dir, { recursive: true, force: true })
+  })
+  const runtime = fixture()
+  let selected = {}
+  const append = runtime.agent.session.append
+  runtime.agent.session.requestHistory = () => selected
+  runtime.agent.session.append = (type, data, options) => {
+    if (type === 'request/history') selected = data
+    append(type, data, options)
+  }
+  writeFileSync(path, JSON.stringify({ tool_context: { _finance_history_independent: true } }))
+  assert.equal((await runtime.preStep({ turn: 2, step: 1 })).startsRequestSeries, true)
+  assert.deepEqual(selected, { fromTurn: 2 })
+  await runtime.preStep({ turn: 2, step: 2 })
+  assert.equal(runtime.appended.length, 1)
+  writeFileSync(path, JSON.stringify({ tool_context: {} }))
+  await runtime.preStep({ turn: 3, step: 1 })
+  assert.deepEqual(selected, {})
+  delete runtime.agent.session.requestHistory
+  writeFileSync(path, JSON.stringify({ tool_context: { _finance_history_independent: true } }))
+  await runtime.preStep({ turn: 4, step: 1 })
+  assert.equal(runtime.appended.length, 2)
+})
+
 test('sample visibility does not control completion or available evidence tools', () => {
   const observations = []
   for (const sample_complete of [true, false]) {
@@ -307,6 +393,26 @@ test('explicitly loaded Skill and identity tool reuse the existing lifecycle', a
     assert.equal(runtime.guard({ name: names.identity, arguments: { identifiers: ['阳光电源'] } }), undefined)
     completeCall(runtime, 1, 'id', names.identity, { ok: true, items: [] })
     assert.match(runtime.prompt(), /stage=catalog/)
+  })
+})
+
+test('standard discovery admits identity beside catalog before any Skill is loaded', async () => {
+  await withSkillContext({}, async () => {
+    const names = { ...SKILL_NAMES, identity: 'mcp__finance__resolve_security' }
+    const runtime = fixture({ preserveRequestPrefix: true }, [], names)
+    runtime.event({ type: 'turn/start', data: { turn: 1 } })
+    assert.ok(runtime.restrictions.at(-1).allow.includes(names.identity))
+    for (const [id, name, args] of [
+      ['identity', names.identity, { identifiers: ['示例公司'] }],
+      ['catalog', names.catalog, { subject: 'stock', dataview: 'margin', operation: 'query' }],
+    ]) {
+      runtime.event({ type: 'tool/call', data: { turn: 1, step: 1, callId: id, name, arguments: args } })
+      assert.equal(runtime.guard({ name, arguments: args }), undefined)
+    }
+    assert.match(runtime.guard({ name: names.query, arguments: {} }), /先读取方法或数据执行包/)
+    const fast = fixture({ executionMode: 'fast' }, [], names)
+    fast.event({ type: 'turn/start', data: { turn: 1 } })
+    assert.match(fast.guard({ name: names.identity, arguments: {} }), /先读取方法或数据执行包/)
   })
 })
 

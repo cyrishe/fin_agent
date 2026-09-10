@@ -508,6 +508,12 @@ class FinancialQaCcService:
         runtime_context["_finance_data_only"] = bool(data_only)
         runtime_context["_finance_execution_mode"] = normalized_execution_mode
         runtime_context["_finance_isolated_request"] = bool(isolated_request)
+        # Reuse the existing semantic decision. A missing/legacy provenance is
+        # not evidence of independence, even when a caller supplied no refs.
+        runtime_context["_finance_history_independent"] = (
+            semantic_turn.get("context_resolution_source") == "llm"
+            and semantic_turn.get("context_refs") == []
+        )
         # Reference resolution supplements the user's request; it must not
         # replace a new intent with the previous turn's task.
         original_question = _trim(semantic_turn.get("ori_question") or user_text)

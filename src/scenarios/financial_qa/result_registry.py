@@ -295,7 +295,7 @@ class FinanceResultRegistry:
                 metadata_by_name=metadata_by_name,
             ),
         }
-        return json.dumps(payload, ensure_ascii=False, default=str, indent=2)
+        return json.dumps(payload, ensure_ascii=False, default=str, separators=(",", ":"))
 
     @staticmethod
     def _sort_key(value: Any) -> tuple[int, str]:

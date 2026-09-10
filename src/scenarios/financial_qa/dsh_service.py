@@ -857,7 +857,8 @@ class FinanceDeepSeekHarnessSessionService:
             sections.append(
                 "[用户显式选择并已加载的业务 Skill]\n"
                 + explicit_skill_prompt
-                + "\n以上内容指导当前业务方法；平台权限与本轮用户目标保持不变。"
+                + "\n以上正文已加载，可直接使用；read_finance_skill 用于尚未加载的方法，必要参考仍按方法内路径读取。"
+                + "平台权限与本轮用户目标保持不变。"
             )
         elif explicit_skills:
             sections.append(
@@ -954,6 +955,7 @@ class FinanceDeepSeekHarnessSessionService:
             "_finance_explicit_skill_ids",
             "_finance_explicit_skill_prompt",
             "_finance_skill_snapshot",
+            "_finance_history_independent",
         ):
             if context_key in (context or {}):
                 tool_context[context_key] = context[context_key]
@@ -965,7 +967,10 @@ class FinanceDeepSeekHarnessSessionService:
         prompt = self._prompt(
             user_text,
             runtime_context=context or {},
-            working_set=host_runtime.current_context_prompt(),
+            working_set=host_runtime.current_context_prompt(
+                include_results=False,
+            ) if (context or {}).get("_finance_history_independent") is True
+            else host_runtime.current_context_prompt(),
         )
         revision = uuid.uuid4().hex
         started = time.monotonic()

@@ -834,7 +834,8 @@ def test_queries_keep_dependency_handles_and_results_are_pageable(tmp_path: Path
         "filter": "贵州茅台",
     }
     assert restored.working_set()[1]["depends_on"] == ["r1"]
-    assert '"result_name": "r1"' in restored.current_context_prompt()
+    restored_index = json.loads(restored.current_context_prompt().split("\n", 1)[1])
+    assert restored_index["results"][0]["result_name"] == "r1"
 
     restored_tools, _, _ = service.build_tools(
         owner_ids=["owner-a"],

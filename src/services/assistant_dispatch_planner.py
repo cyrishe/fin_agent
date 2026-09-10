@@ -142,6 +142,7 @@ class AssistantDispatchPlanner:
                 "ori_question": self._trim(normalized_request.get("ori_question") or normalized_request.get("raw_user_text")),
                 "resolved_question": self._trim(normalized_request.get("resolved_question") or normalized_request.get("round_task_desc")),
                 "context_refs": normalized_request.get("context_refs") if isinstance(normalized_request.get("context_refs"), list) else [],
+                "context_resolution_source": self._trim(normalized_request.get("source")),
             },
             "planning_scope": self._trim(dispatch_plan.get("planning_scope")) or "top_level_dispatch",
             "execution_plan": (
