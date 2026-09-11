@@ -1,6 +1,6 @@
 import { selectInvocationAsset } from "./composerSuggestions";
 import { Menu, MessageSquarePlus, PanelRight, Sparkles } from "lucide-react";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { dispatchChat, loadAuthSession, loadInvocationAssets, loadThread, loadThreads, logoutAccount, resetThread, startChatStream, startCustomToolStream, uploadAttachments } from "./api";
 import { appPath } from "./appPath";
 import Composer from "./components/Composer";
@@ -11,6 +11,8 @@ import Sidebar from "./components/Sidebar";
 import { applyStreamEvent, blocksFromPayload, initialRun, isProcessBlock, reconcileBlockOrder, settleProcessBlocks } from "./surface";
 import { customAnswerPrompt, prepareClarificationSubmission, readFeedbackValue, removeComposerPrompt, upsertComposerPrompt } from "./interactionDraft";
 import type { AgentRun, Attachment, AuthUser, ChatMessage, InteractionDraft, InteractionFeedbackRequest, InteractionResponse, InvocationAsset, ResearchMode, StreamEvent, ThreadSummary, UnknownRecord } from "./types";
+
+const SkillLibraryDialog = lazy(() => import("./SkillStudio").then(module => ({ default: module.SkillLibraryDialog })));
 
 const intro: ChatMessage = {
   id: "intro",
@@ -90,6 +92,7 @@ export default function App() {
   const [leftOpen, setLeftOpen] = useState(false);
   const [rightOpen, setRightOpen] = useState(false);
   const [scheduleOpen, setScheduleOpen] = useState(false);
+  const [skillsOpen, setSkillsOpen] = useState(false);
   const [invocationAssets, setInvocationAssets] = useState<InvocationAsset[]>([]);
   const [selectedInvocationAssets, setSelectedInvocationAssets] = useState<InvocationAsset[]>([]);
   const selectedInvocationAsset = selectedInvocationAssets[0] || null;
@@ -473,7 +476,14 @@ export default function App() {
   return (
     <div className="app-shell">
       <div className={`mobile-backdrop ${leftOpen || rightOpen ? "show" : ""}`} onClick={() => { setLeftOpen(false); setRightOpen(false); }} />
-      <div className={`sidebar-slot ${leftOpen ? "mobile-open" : ""}`}><Sidebar threads={threads} activeId={scheduleOpen ? null : threadId} query={query} onQuery={setQuery} onSelect={(value) => void selectThread(value)} onNew={() => void newThread()} onOpenSchedules={() => { setScheduleOpen(true); setLeftOpen(false); }} onClose={() => setLeftOpen(false)} authUser={authUser} onLogout={() => void logout()} /></div>
+      <div className={`sidebar-slot ${leftOpen ? "mobile-open" : ""}`}><Sidebar threads={threads} activeId={scheduleOpen ? null : threadId} query={query} onQuery={setQuery} onSelect={(value) => void selectThread(value)} onNew={() => void newThread()} onOpenSchedules={() => { setScheduleOpen(true); setLeftOpen(false); }} onOpenSkills={() => { setSkillsOpen(true); setLeftOpen(false); }} onClose={() => setLeftOpen(false)} authUser={authUser} onLogout={() => void logout()} /></div>
+      {skillsOpen && <Suspense fallback={<div role="status">正在打开方法库…</div>}><SkillLibraryDialog onClose={() => setSkillsOpen(false)} onUse={skill => {
+        setSelectedInvocationAsset(invocationAssets.find(asset => asset.kind === "skill" && asset.name === skill.skill_name) || {
+          ref: `skill:${skill.skill_name}`, kind: "skill", name: skill.skill_name, displayName: skill.display_name,
+          summary: skill.description, description: skill.description, invocation: `$${skill.skill_name}`, aliases: [], tags: [], inputFields: [], customTool: false,
+        });
+        setSkillsOpen(false); setScheduleOpen(false); setComposerFocusRequest(value => value + 1);
+      }} /></Suspense>}
       <main className="conversation-column">
         <header className="conversation-header">
           <button className="icon-button mobile-only" onClick={() => setLeftOpen(true)} aria-label="打开会话列表"><Menu size={20} /></button>

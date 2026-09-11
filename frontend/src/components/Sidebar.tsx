@@ -1,4 +1,4 @@
-import { CalendarClock, LogOut, MessageSquarePlus, PanelLeftClose, Search, Sparkles } from "lucide-react";
+import { BookOpen, CalendarClock, LogOut, MessageSquarePlus, PanelLeftClose, Search, Sparkles } from "lucide-react";
 import { appPath } from "../appPath";
 import type { AuthUser, ThreadSummary } from "../types";
 
@@ -10,6 +10,7 @@ interface Props {
   onSelect: (id: number) => void;
   onNew: () => void;
   onOpenSchedules: () => void;
+  onOpenSkills?: () => void;
   onClose?: () => void;
   authUser?: AuthUser | null;
   onLogout?: () => void;
@@ -43,6 +44,7 @@ export default function Sidebar(props: Props) {
       <div className="brand-row"><div className="brand-mark"><Sparkles size={19} /></div><div><strong>Fin Agent</strong><span>金融智能工作台</span></div>{props.onClose && <button className="icon-button sidebar-close mobile-only" onClick={props.onClose} aria-label="关闭会话列表"><PanelLeftClose size={18} /></button>}</div>
       <button className="new-chat" type="button" onClick={props.onNew}><MessageSquarePlus size={17} />新建对话</button>
       <button className="schedule-nav-button" type="button" onClick={props.onOpenSchedules}><CalendarClock size={17} />定时任务</button>
+      <button className="schedule-nav-button" type="button" onClick={props.onOpenSkills}><BookOpen size={17} />Skill 方法库</button>
       <label className="history-search"><Search size={16} /><input value={props.query} onChange={(event) => props.onQuery(event.target.value)} placeholder="搜索会话" /></label>
       <div className="history-label">最近对话</div>
       <nav className="thread-list" aria-label="会话历史">

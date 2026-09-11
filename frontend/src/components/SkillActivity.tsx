@@ -1,5 +1,6 @@
 import { BookOpen } from "lucide-react";
 import type { AgentRun, UnknownRecord } from "../types";
+import { appPath } from "../appPath";
 
 export function loadedSkills(run: AgentRun, payload?: UnknownRecord) {
   const result = new Map<string, string>();
@@ -23,7 +24,7 @@ export default function SkillActivity({ run, payload }: { run: AgentRun; payload
   return <section className="skill-activity" aria-label="本轮使用的专业方法">
     <div className="skill-activity-heading"><BookOpen size={17} aria-hidden="true" /><strong>专业方法</strong><small>SKILL</small>
       <span>{run.status === "running" ? "分析进行中" : "本轮已加载"}</span></div>
-    <div className="skill-activity-methods">{skills.map(skill => <span key={skill.id}>{skill.name}</span>)}</div>
+    <div className="skill-activity-methods">{skills.map(skill => <a key={skill.id} href={appPath(`/skills/studio/${encodeURIComponent(skill.id)}`)} target="_blank" rel="noreferrer" title={`查看 ${skill.name} 的当前方法内容`}>{skill.name}</a>)}</div>
     <p>方法指导分析，数据工具提供证据。执行记录可在本轮过程查看。</p>
   </section>;
 }

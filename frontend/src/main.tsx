@@ -8,12 +8,15 @@ const App = lazy(() => import("./App"));
 const AuthPage = lazy(() => import("./AuthPage"));
 const BacktestPrototype = lazy(() => import("./BacktestPrototype"));
 const RendererGallery = lazy(() => import("./RendererGallery"));
+const SkillStudio = lazy(() => import("./SkillStudio"));
 
 const pathname = stripAppBase(window.location.pathname);
 const Root = pathname === "/"
   ? LandingPage
   : pathname === "/login" || pathname === "/register"
     ? AuthPage
+    : pathname === "/skills/studio" || pathname.startsWith("/skills/studio/")
+      ? SkillStudio
     : pathname.endsWith("/renderers")
       ? RendererGallery
       : pathname.endsWith("/backtests")

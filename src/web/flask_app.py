@@ -3957,6 +3957,10 @@ def stock_deep_dive_task_view(job_id):
 @app.route("/skills/studio/", methods=["GET"])
 @app.route("/skills/studio/<skill_name>", methods=["GET"])
 def skill_studio_page(skill_name: str = ""):
+    # Reading is the default. Preserve the existing candidate authoring workspace
+    # as an explicit entry, separate from immutable published system methods.
+    if request.args.get("mode") != "authoring" and (REACT_FRONTEND_DIST_DIR / "index.html").is_file():
+        return send_from_directory(REACT_FRONTEND_DIST_DIR, "index.html")
     return render_template(
         "skill_studio_v2.html",
         page_title="Skill Studio",
