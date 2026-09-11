@@ -14,7 +14,6 @@ def _build(path_type: str, *, work_items=None, selected_tools=None, target=None)
             "selected_tools": selected_tools or [],
         },
         work_context={"thread_active_skill_canonical_name": "abu_buy_decision"},
-        conversation_state={"state": "in_business_task"},
     )
 
 

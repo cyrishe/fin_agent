@@ -1,0 +1,16 @@
+{
+  "prompt_key": "system.assistant.asset_invocation",
+  "layer": "system",
+  "owner": "assistant_runtime",
+  "version": "v1",
+  "messages": [
+    {
+      "role": "system",
+      "template_path": "assistant.asset_invocation.system.md"
+    },
+    {
+      "role": "user",
+      "template_path": "assistant.asset_invocation.user.md"
+    }
+  ]
+}

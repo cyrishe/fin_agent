@@ -8,10 +8,14 @@ from typing import Any, Dict, List, Mapping, Sequence
 
 from openpyxl import Workbook
 
+from src.experiments.staged_data_protocol.phase2.catalog import (
+    CATALOG_PATH,
+    load_catalog_source,
+)
 
 DEFAULT_PROMPT_PATH = Path("phrase_1_prompt.md")
 DEFAULT_CASES_PATH = Path("src/experiments/staged_data_protocol/fixtures/cases.json")
-DEFAULT_STAGE1_CATALOG_PATH = Path("src/tools/finance_data/catalog/api_view_catalog.json")
+DEFAULT_STAGE1_CATALOG_PATH = CATALOG_PATH
 
 
 def load_questions(path: str | Path | None = None) -> List[Dict[str, str]]:
@@ -77,7 +81,12 @@ def build_subject_dataview_context(
     *,
     catalog_path: str | Path = DEFAULT_STAGE1_CATALOG_PATH,
 ) -> str:
-    payload = json.loads(Path(catalog_path).read_text(encoding="utf-8"))
+    catalog_file = Path(catalog_path)
+    payload = (
+        load_catalog_source()
+        if catalog_file.resolve() == CATALOG_PATH.resolve()
+        else json.loads(catalog_file.read_text(encoding="utf-8"))
+    )
     subjects = payload.get("subjects")
     if not isinstance(subjects, Mapping):
         return ""
@@ -92,17 +101,17 @@ def build_subject_dataview_context(
         for dataview, view_cfg in subject_cfg.items():
             if str(dataview).startswith("_") or not isinstance(view_cfg, Mapping):
                 continue
-            desc = _one_line_desc(view_cfg.get("desc"))
-            lines.append(f"  + {dataview}: {desc}" if desc else f"  + {dataview}:")
+            route_summary = _one_line_desc(view_cfg.get("desc"))
+            lines.append(
+                f"  + {dataview}: {route_summary}"
+                if route_summary
+                else f"  + {dataview}:"
+            )
     return "\n".join(lines)
 
 
 def _one_line_desc(value: Any) -> str:
-    text = re.sub(r"\s+", " ", str(value or "")).strip()
-    for sep in ["。", "；", ";"]:
-        if sep in text:
-            return text.split(sep, 1)[0].strip()
-    return text
+    return re.sub(r"\s+", " ", str(value or "")).strip()
 
 
 def _run_cases_concurrently(

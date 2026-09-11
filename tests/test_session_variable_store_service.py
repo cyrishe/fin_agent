@@ -46,6 +46,69 @@ def test_session_variable_store_registers_finance_table_result(tmp_path: Path) -
     assert "## v1" in store.format_variables_for_prompt(session_id="conv-1")
 
 
+def test_session_variable_store_materializes_all_rows_without_prompt_expansion(
+    tmp_path: Path,
+) -> None:
+    store = SessionVariableStoreService(data_root=tmp_path / "data")
+    rows = [{"code": f"00000{index}.SZ", "value": index} for index in range(1, 7)]
+    variable = store.register_tool_result(
+        session_id="conv-full",
+        tool_name="finance_data_query",
+        result={
+            "ok": True,
+            "result": {
+                "name": "r1",
+                "api": "stock.quote",
+                "columns": ["code", "value"],
+                "data": {"rows": rows, "row_count": len(rows)},
+            },
+        },
+    )
+
+    assert variable is not None
+    assert len(variable["sample"]["rows"]) == store.MAX_SAMPLE_ROWS
+    assert "000006.SZ" not in store.format_variables_for_prompt(
+        session_id="conv-full"
+    )
+    materialized = store.materialize_data_ref(
+        session_id="conv-full",
+        data_ref=variable["data_ref"],
+    )
+    assert materialized["data_type"] == "table"
+    assert materialized["row_count"] == 6
+    assert materialized["rows"] == rows
+
+
+def test_session_variable_store_does_not_claim_a_type_for_all_null_column(
+    tmp_path: Path,
+) -> None:
+    store = SessionVariableStoreService(data_root=tmp_path / "data")
+    result = {
+        "ok": True,
+        "result": {
+            "name": "r1",
+            "api": "stock.quote.kd_pct_sum",
+            "columns": ["code", "pct_5d_sum"],
+            "data": {
+                "rows": [{"code": "600519.SH", "pct_5d_sum": None}],
+                "row_count": 1,
+            },
+        },
+    }
+
+    variable = store.register_tool_result(
+        session_id="conv-null",
+        tool_name="finance_data_query",
+        result=result,
+    )
+
+    assert variable is not None
+    assert variable["schema"]["columns"] == [
+        {"name": "code", "type": "string"},
+        {"name": "pct_5d_sum", "type": "unknown"},
+    ]
+
+
 def test_runtime_execution_attaches_session_variable_for_table_result(tmp_path: Path) -> None:
     store = SessionVariableStoreService(data_root=tmp_path / "data")
     runtime = RuntimeExecutionService(session_variable_store=store)
@@ -73,6 +136,37 @@ def test_runtime_execution_attaches_session_variable_for_table_result(tmp_path: 
     assert store.list_variables(session_id="conv-table")[0]["data_ref"] == "session://conv-table/vars/v1"
 
 
+def test_generic_list_result_is_pageable_as_a_table(tmp_path: Path) -> None:
+    store = SessionVariableStoreService(data_root=tmp_path / "data")
+    rows = [
+        {"title": f"新闻 {index}", "published_at": f"2026-07-{20 + index:02d}"}
+        for index in range(1, 6)
+    ]
+
+    variable = store.register_tool_result(
+        session_id="conv-news",
+        tool_name="financial_news_search",
+        result={"ok": True, "data": rows},
+    )
+    loaded = store.load_data_ref(
+        session_id="conv-news",
+        data_ref=variable["data_ref"],
+        offset=2,
+        limit=2,
+    )
+
+    assert variable["data_type"] == "table"
+    assert variable["row_count"] == 5
+    assert loaded["page"] == {
+        "offset": 2,
+        "limit": 2,
+        "returned": 2,
+        "total": 5,
+        "has_more": True,
+    }
+    assert [row["title"] for row in loaded["rows"]] == ["新闻 3", "新闻 4"]
+
+
 def test_runtime_session_variable_registration_failure_does_not_fail_tool() -> None:
     class FailingStore:
         def register_tool_result(self, **kwargs):  # noqa: ANN001, ANN003 - tiny test double.
@@ -89,3 +183,24 @@ def test_runtime_session_variable_registration_failure_does_not_fail_tool() -> N
     assert result["ok"] is True
     assert result["data"] == {"value": 1}
     assert result["meta"]["session_variable_error"] == "store unavailable"
+
+
+def test_session_variable_store_keeps_full_non_table_result_outside_prompt_summary(tmp_path: Path) -> None:
+    store = SessionVariableStoreService(data_root=tmp_path / "data")
+    large_text = "x" * 250_000
+    variable = store.register_tool_result(
+        session_id="owner/thread-1",
+        tool_name="demo_object_tool",
+        result={"ok": True, "data": {"payload": large_text}},
+    )
+
+    assert variable is not None
+    assert large_text not in store.format_variables_for_prompt(session_id="owner/thread-1")
+    loaded = store.load_data_ref(
+        session_id="owner/thread-1",
+        data_ref=variable["data_ref"],
+        offset=249_900,
+        limit=200,
+    )
+    assert loaded["page"]["total"] > 250_000
+    assert "x" * 50 in loaded["text"]

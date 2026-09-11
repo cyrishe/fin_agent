@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "general_search.schema.json",
+  "title": "General Search Output",
+  "type": "object",
+  "required": ["tool", "ok", "provider", "coverage", "query", "data", "total", "error"],
+  "properties": {
+    "tool": {"const": "general_search"},
+    "ok": {"type": "boolean"},
+    "provider": {"type": "string"},
+    "coverage": {"type": "string"},
+    "query": {"type": "string"},
+    "data": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["document_id", "title", "url", "source", "publish_time", "snippet", "category", "score"],
+        "properties": {
+          "document_id": {"type": "string"},
+          "title": {"type": "string"},
+          "url": {"type": "string"},
+          "source": {"type": "string"},
+          "publish_time": {"type": "string"},
+          "snippet": {"type": "string"},
+          "category": {"type": "string"},
+          "score": {"type": "number"}
+        },
+        "additionalProperties": false
+      }
+    },
+    "total": {"type": "integer", "minimum": 0},
+    "error": {"type": "string"}
+  },
+  "additionalProperties": false
+}

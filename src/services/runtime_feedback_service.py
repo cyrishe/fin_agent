@@ -186,6 +186,14 @@ class RuntimeFeedbackService:
     def _reason_code(self, *, reason: str, error: str, failure_kind: str) -> str:
         if failure_kind in {"missing_upstream_binding", "tool_schema_mismatch"}:
             return "tool_schema_mismatch"
+        if failure_kind in {
+            "runtime_error",
+            "timeout",
+            "output_missing",
+            "output_json_error",
+            "finance_query_round_limit",
+        }:
+            return "execution_failed"
         if reason in {"missing_required_by_schema", "missing_upstream_binding"}:
             return "tool_schema_mismatch"
         lowered = error.lower()

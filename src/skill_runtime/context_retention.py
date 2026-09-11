@@ -384,6 +384,20 @@ def reduce_tool_result_for_runtime(tool_name: str, result: Dict[str, Any]) -> Di
                     "strategy": "reference",
                 }
 
+    data = result.get("data") if isinstance(result.get("data"), dict) else None
+    if data and not plan.get("rules"):
+        # Dynamic/custom tools may not have a static Tool Spec. Preserve their
+        # declared business output instead of reducing a successful call to an
+        # empty execution acknowledgement.
+        prompt_context["compressed"]["data"] = _sample_value(data, max_chars=500)
+        for key, value in data.items():
+            render_path = f"data.{key}"
+            render_artifacts[render_path] = value
+            render_preferences[render_path] = {
+                "render_type": "auto",
+                "strategy": "render",
+            }
+
     return {
         "tool_name": tool_name,
         "profile": profile,

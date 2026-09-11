@@ -1,6 +1,6 @@
 import json
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional
 
 
 _SECTION_PRESETS: Dict[str, Dict[str, str]] = {
@@ -45,6 +45,7 @@ _TOOL_SECTION_HINTS: Dict[str, str] = {
     "equity_research_search": "research_prediction",
     "公司研报查询": "research_prediction",
     "financial_news_search": "news_catalyst",
+    "general_search": "news_catalyst",
     "theme_leaders": "stock_focus",
     "indicator_series_query": "market_overview",
 }
@@ -349,6 +350,7 @@ class DisplayContractCompiler:
             "stock_funds",
             "equity_research_search",
             "financial_news_search",
+            "general_search",
         } & set(tool_names):
             return "stock_deep_dive"
         return "analysis_report"

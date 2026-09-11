@@ -1,24 +1,18 @@
 from __future__ import annotations
 import json
 import re
-from functools import lru_cache
-from pathlib import Path
 from typing import Any, Iterable, Mapping
 
+from src.experiments.staged_data_protocol.phase2.catalog import catalog_source, OPERATION_DESCRIPTIONS
 from src.experiments.staged_data_protocol.phase2.models import ResultHandle, Step
+from src.services.finance_data_tool_catalog_service import FinanceDataToolCatalogService
 
 
-PROMPT_CATALOG_PATH = Path("src/tools/finance_data/catalog/api_view_catalog.json")
+_MODEL_CATALOG = FinanceDataToolCatalogService()
 
 
-@lru_cache(maxsize=1)
-def _prompt_catalog() -> dict[str, Any]:
-    return json.loads(PROMPT_CATALOG_PATH.read_text(encoding="utf-8"))
-
-
-def _api_class_patterns() -> Mapping[str, Any]:
-    patterns = _prompt_catalog().get("api_class_patterns") or {}
-    return patterns if isinstance(patterns, Mapping) else {}
+def _prompt_catalog() -> Mapping[str, Any]:
+    return catalog_source()
 
 
 def _subject_config(subject: str) -> Mapping[str, Any]:
@@ -59,7 +53,6 @@ def build_context_text(
         "# Request Types\n" + sections["request_types"],
         "# Current Dataview\n" + sections["current_dataview"],
         "# Available APIs\n" + sections["available_apis"],
-        "# Supported Metrics\n" + sections["supported_metrics"],
     ]
     if sections["previous_results"]:
         blocks.append("# Previous Results\n" + sections["previous_results"])
@@ -89,44 +82,23 @@ def build_context_sections(
             "validation_feedback": _format_feedback(validation_feedback),
             "required_result_id": f"`{result_id}`" if result_id else "none",
         }
-    api_classes = _api_classes(step, view)
-    request_type_lines: list[str] = []
-    for index, class_name in enumerate(api_classes, start=1):
-        if index > 1:
-            request_type_lines.append("")
-        request_type_lines.extend(_format_api_class(class_name, include_metrics=False))
-    subject_meta = _subject_config(step.subject).get("_meta")
-    current_dataview = [
-        f"- subject: `{step.subject}`",
-        f"- subject_desc: {_meta_text(subject_meta, 'desc')}",
-        f"- dataview: `{step.dataview}`",
-        f"- desc: {view.get('desc') or ''}",
-        "- fields:",
-        _code_block(_format_fields(view.get("fields"))),
-    ]
-    subject_rules = _meta_list(subject_meta, "rules")
-    if subject_rules:
-        current_dataview.append("- subject_rules:")
-        current_dataview.extend(f"  - {item}" for item in subject_rules)
-    if view.get("kd"):
-        current_dataview.append(f"- kd_methods: {_format_kd_methods(view.get('kd'))}")
-    computed = view.get("computed")
-    if isinstance(computed, Mapping):
-        current_dataview.append("- computed:")
-        current_dataview.append(_indent(_code_block(json.dumps(computed, ensure_ascii=False)), "  "))
+    # Legacy staged execution uses the same assembled contracts as CC/DSH.
+    view_name = "basic_info" if step.dataview == "base_info" and "basic_info" in _subject_config(step.subject) else step.dataview
+    model = _MODEL_CATALOG.get_model_dataview(step.subject, view_name)
+    functions = model.pop("functions")
+    current_dataview = {"subject": step.subject, **model}
     api_lines: list[str] = []
-    for row in _api_entries(step, view):
+    for row in functions:
         if api_lines:
             api_lines.append("")
         api_lines.append(f"## `{row['api_name']}`")
-        api_lines.append(f"- api_class: `{row['api_class']}`")
-        api_lines.append(f"- api_function: {row['api_function']}")
+        api_lines.append(_code_block(json.dumps(row, ensure_ascii=False)))
     return {
         "current_step": _code_block(f"{step.step_id} | {step.subject} | {step.dataview} | {step.condition_desc}"),
-        "request_types": "\n".join(request_type_lines) if request_type_lines else "none",
-        "current_dataview": "\n".join(current_dataview),
+        "request_types": "\n".join(f"- {name}: {desc}" for name, desc in OPERATION_DESCRIPTIONS.items()),
+        "current_dataview": _code_block(json.dumps(current_dataview, ensure_ascii=False)),
         "available_apis": "\n".join(api_lines) if api_lines else "none",
-        "supported_metrics": _format_supported_metrics(api_classes),
+        "supported_metrics": "",  # Methods are included in each complete API contract.
         "previous_results": _format_session_results(previous_results),
         "session_results": _format_session_results(previous_results),
         "validation_feedback": _format_feedback(validation_feedback),
@@ -171,78 +143,6 @@ def format_subject_dataviews_for_steps(steps: Iterable[Step]) -> str:
                 lines.append(f"    fields: {field_names}")
         blocks.append("\n".join(lines))
     return "\n\n".join(blocks)
-
-
-def _api_classes(step: Step, view: Mapping[str, Any]) -> list[str]:
-    rows: list[str] = []
-    for item in _api_entries(step, view):
-        class_name = str(item.get("api_class") or "").strip()
-        if class_name and class_name not in rows:
-            rows.append(class_name)
-    return rows
-
-
-def _format_api_class(class_name: str, *, include_metrics: bool = True) -> list[str]:
-    cfg = _api_class_patterns().get(class_name)
-    if not isinstance(cfg, Mapping):
-        return [f"## `{class_name}`", "", "- unavailable"]
-    rows = [
-        f"## `{class_name}`",
-        "",
-        f"- purpose: {cfg.get('desc') or ''}",
-        "- call_pattern:",
-        _code_block(str(cfg.get("call_pattern") or "")),
-    ]
-    examples = [str(item) for item in (cfg.get("examples") or [])]
-    if examples:
-        rows.append("- examples:")
-        for index, example in enumerate(examples, start=1):
-            request, notes = _split_example_notes(example)
-            rows.append(f"  - example {index}:")
-            rows.append("    ```text")
-            rows.append(f"    {request}")
-            rows.append("    ```")
-            for note in notes:
-                rows.append(f"    - note: {note}")
-    if cfg.get("output_rule"):
-        rows.append(f"- output_rule: {cfg['output_rule']}")
-    args = cfg.get("args")
-    if isinstance(args, Mapping):
-        rows.append("- args:")
-        for key in ["required", "optional"]:
-            values = args.get(key)
-            if values:
-                rows.append(f"  - {key}: {', '.join(str(item) for item in values)}")
-    methods = cfg.get("methods")
-    if methods:
-        rows.append(f"- methods: {', '.join(str(item) for item in methods)}")
-    rules = cfg.get("rules")
-    if isinstance(rules, list) and rules:
-        rows.append("- rules:")
-        rows.extend(f"  - {item}" for item in rules)
-    return rows
-
-
-def _format_supported_metrics(api_classes: list[str]) -> str:
-    rows: list[str] = []
-    for class_name in api_classes:
-        cfg = _api_class_patterns().get(class_name)
-        methods = cfg.get("methods") if isinstance(cfg, Mapping) else None
-        if not methods:
-            continue
-        if rows:
-            rows.append("")
-        rows.append(f"## `{class_name}`")
-        rows.append(f"- methods: {', '.join(str(item) for item in methods)}")
-    return "\n".join(rows) if rows else "none"
-
-
-def _format_kd_methods(kd: Any) -> str:
-    if isinstance(kd, Mapping):
-        return "; ".join(f"{field}: {', '.join(str(method) for method in methods)}" for field, methods in kd.items())
-    if isinstance(kd, list):
-        return ", ".join(str(item) for item in kd)
-    return str(kd or "")
 
 
 def _format_session_results(previous_results: Mapping[str, ResultHandle]) -> str:
@@ -306,45 +206,6 @@ def _indent(text: str, prefix: str) -> str:
     return "\n".join(prefix + line if line else line for line in text.splitlines())
 
 
-def _split_example_notes(example: str) -> tuple[str, list[str]]:
-    request_lines: list[str] = []
-    notes: list[str] = []
-    for line in str(example or "").splitlines():
-        stripped = line.strip()
-        if stripped.startswith("note:"):
-            notes.append(stripped.split("note:", 1)[1].strip())
-        elif stripped:
-            request_lines.append(stripped)
-    return " ".join(request_lines), notes
-
-
-def _api_entries(step: Step, view: Mapping[str, Any]) -> list[dict[str, str]]:
-    rows: list[dict[str, str]] = []
-    for item in view.get("api") or []:
-        if not isinstance(item, Mapping):
-            continue
-        rows.append(
-            {
-                "api_name": str(item.get("api_name") or "").strip(),
-                "api_function": str(item.get("api_function") or "").strip(),
-                "api_class": str(item.get("api_class") or "").strip(),
-            }
-        )
-    return [row for row in rows if row["api_name"] and row["api_class"]]
-
-
-def _format_fields(fields: Any) -> str:
-    if not isinstance(fields, Mapping):
-        return ""
-    rows: list[str] = []
-    for field_name, aliases in fields.items():
-        if isinstance(aliases, list) and aliases:
-            rows.append(f"{field_name}: {', '.join(str(item) for item in aliases)}")
-        else:
-            rows.append(str(field_name))
-    return "\n".join(rows)
-
-
 def _format_field_names(fields: Any) -> str:
     if not isinstance(fields, Mapping):
         return ""
@@ -368,7 +229,7 @@ def _meta_list(meta: Any, key: str) -> list[str]:
     if not isinstance(meta, Mapping):
         return []
     value = meta.get(key)
-    if not isinstance(value, list):
+    if not isinstance(value, (list, tuple)):
         return []
     return [str(item) for item in value if str(item).strip()]
 

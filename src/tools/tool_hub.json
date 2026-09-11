@@ -23,6 +23,24 @@
     "priority": 10
   },
   {
+    "capabilities": [
+      "search",
+      "news_search",
+      "external_evidence"
+    ],
+    "description": "通过部署时配置的搜索服务查询外部资料；当前覆盖内部新闻库。",
+    "keywords": [
+      "搜索",
+      "资料",
+      "新闻",
+      "政策",
+      "事件",
+      "背景"
+    ],
+    "name": "general_search",
+    "priority": 9
+  },
+  {
     "availability": {
       "lifecycle": "retired",
       "retrieval_mode": "direct_only",

@@ -1,0 +1,257 @@
+{
+  "eval_name": "natural_tool_conversations_v1",
+  "protocol_version": "v1",
+  "description": "中等复杂金融选股、评价、因子需求的多轮自然交互样本。只用于路由和交互观察，不作为业务结果正确性的裁判。",
+  "cases": [
+    {
+      "case_id": "selection_ma_cross_30_60",
+      "category": "选股策略",
+      "request": "帮我创建一个选股工具，判断每只股票最近30或60个交易日内是否出现MA5上穿MA20的金叉，返回信号日期和当前价格。",
+      "followups": [
+        {"kind": "sop", "text": "", "interaction": {"interaction_id": "custom_tool.design_review", "action_id": "custom_tool.confirm_design", "action": "accept", "expected_revision": 1}},
+        {"kind": "natural", "text": "先不要实现，把信号日期定义为真正上穿发生的交易日。"},
+        {"kind": "related_finance", "text": "顺便看一下今天贵州茅台的收盘价。"}
+      ]
+    },
+    {
+      "case_id": "selection_breakout_volume",
+      "category": "选股策略",
+      "request": "做一个放量突破选股工具，筛选收盘价突破前20日最高价且成交量超过20日均量1.5倍的股票，并标出突破日期。",
+      "followups": [
+        {"kind": "natural", "text": "流程图先给我看一下，暂时不改设计。"},
+        {"kind": "sop", "text": "", "interaction": {"interaction_id": "custom_tool.design_review", "action_id": "custom_tool.confirm_design", "action": "accept", "expected_revision": 1}},
+        {"kind": "natural", "text": "代码实现时把成交量倍数作为可配置参数。"}
+      ]
+    },
+    {
+      "case_id": "selection_pullback_support",
+      "category": "选股策略",
+      "request": "创建一个回踩支撑选股工具，找出股价突破后回踩20日均线但没有跌破且重新收阳的股票。",
+      "followups": [
+        {"kind": "natural", "text": "我想先看当前设计里的核心判断步骤。"},
+        {"kind": "natural", "text": "回踩不能只看收盘价，增加最低价是否跌破均线的判断。"},
+        {"kind": "related_finance", "text": "这个工具之外，今天宁德时代的涨跌幅是多少？"}
+      ]
+    },
+    {
+      "case_id": "selection_high_low_reversal",
+      "category": "选股策略",
+      "request": "我需要一个短线反转选股工具，筛选最近10日跌幅超过15%后，连续两天收盘价回升且第二天成交量放大的股票。",
+      "followups": [
+        {"kind": "sop", "text": "", "interaction": {"interaction_id": "custom_tool.design_review", "action_id": "custom_tool.confirm_design", "action": "accept", "expected_revision": 1}},
+        {"kind": "natural", "text": "刚才的跌幅窗口改成最近15个交易日，其他先不动。"},
+        {"kind": "natural", "text": "请把修改后的流程图展示出来。"}
+      ]
+    },
+    {
+      "case_id": "selection_dividend_quality",
+      "category": "选股策略",
+      "request": "设计一个红利质量选股工具，结合过去三年的股息率、净资产收益率和经营现金流，筛选稳定分红且现金流为正的公司。",
+      "followups": [
+        {"kind": "natural", "text": "先告诉我这个设计需要哪些数据字段，不要开始编码。"},
+        {"kind": "sop", "text": "", "interaction": {"interaction_id": "custom_tool.design_review", "action_id": "custom_tool.confirm_design", "action": "accept", "expected_revision": 1}},
+        {"kind": "natural", "text": "实现时请把三年窗口和分红稳定性的中间指标记录下来。"}
+      ]
+    },
+    {
+      "case_id": "selection_momentum_strength",
+      "category": "选股策略",
+      "request": "创建一个个股动量工具，比较20日、60日和120日收益率，同时要求最近20日最大回撤不能太大，输出动量排序依据。",
+      "followups": [
+        {"kind": "natural", "text": "20日和60日收益率的计算口径先解释一下。"},
+        {"kind": "natural", "text": "按这个方案实现，并在测试中给我一个真实股票的中间结果。"},
+        {"kind": "related_finance", "text": "另外查一下五粮液今天的行情。"}
+      ]
+    },
+    {
+      "case_id": "selection_gap_followthrough",
+      "category": "选股策略",
+      "request": "做一个跳空高开后持续走强的选股工具，要求开盘价高于前收盘2%，当天收盘保持在高位，且随后三天没有回补缺口。",
+      "followups": [
+        {"kind": "natural", "text": "缺口是否回补要按最低价触及前收盘来判断。"},
+        {"kind": "sop", "text": "", "interaction": {"interaction_id": "custom_tool.design_review", "action_id": "custom_tool.confirm_design", "action": "accept", "expected_revision": 1}},
+        {"kind": "natural", "text": "帮我看一下当前工具的实际核心代码。"}
+      ]
+    },
+    {
+      "case_id": "selection_sector_relative",
+      "category": "选股策略",
+      "request": "创建一个行业相对强度选股工具，比较股票近60日收益率与所属行业指数收益率，筛选相对强度持续为正且成交量没有明显萎缩的股票。",
+      "followups": [
+        {"kind": "natural", "text": "行业指数和个股的日期必须对齐，先把这个作为设计约束。"},
+        {"kind": "natural", "text": "我想看一下流程图和输入输出。"},
+        {"kind": "related_finance", "text": "今天大盘指数走势如何？"}
+      ]
+    },
+    {
+      "case_id": "score_value_growth",
+      "category": "股票评价",
+      "request": "设计一个股票综合评分工具，从估值、盈利增长和现金流三个维度给公司打分，并输出每个维度的分项得分和总分。",
+      "followups": [
+        {"kind": "natural", "text": "总分先不要做复杂加权，告诉我默认权重和理由。"},
+        {"kind": "sop", "text": "", "interaction": {"interaction_id": "custom_tool.design_review", "action_id": "custom_tool.confirm_design", "action": "accept", "expected_revision": 1}},
+        {"kind": "natural", "text": "编码后把三个分项的实际测试值都展示出来。"}
+      ]
+    },
+    {
+      "case_id": "score_financial_health",
+      "category": "股票评价",
+      "request": "做一个公司财务健康评分工具，综合资产负债率、流动比率、经营现金流和利息覆盖倍数，输出健康等级及扣分原因。",
+      "followups": [
+        {"kind": "natural", "text": "先查看设计中财务指标的计算和缺失数据处理。"},
+        {"kind": "natural", "text": "资产负债率超过70%时只扣分，不要直接判定公司不可投资。"},
+        {"kind": "sop", "text": "", "interaction": {"interaction_id": "custom_tool.design_review", "action_id": "custom_tool.confirm_design", "action": "accept", "expected_revision": 1}}
+      ]
+    },
+    {
+      "case_id": "score_earnings_quality",
+      "category": "股票评价",
+      "request": "创建一个盈利质量评价工具，对比净利润、经营现金流和应收账款变化，识别利润增长但现金流没有跟上的公司。",
+      "followups": [
+        {"kind": "natural", "text": "这个工具的核心不是预测股价，设计里只保留盈利质量评价。"},
+        {"kind": "natural", "text": "代码写好后给我看模块之间的调用关系。"},
+        {"kind": "related_finance", "text": "顺便解释一下贵州茅台最近的市盈率。"}
+      ]
+    },
+    {
+      "case_id": "score_management_efficiency",
+      "category": "股票评价",
+      "request": "设计一个管理效率评价工具，结合存货周转、应收账款周转和毛利率变化，输出效率改善或恶化的趋势判断。",
+      "followups": [
+        {"kind": "sop", "text": "", "interaction": {"interaction_id": "custom_tool.design_review", "action_id": "custom_tool.confirm_design", "action": "accept", "expected_revision": 1}},
+        {"kind": "natural", "text": "测试先选一家有完整数据的公司，不要为了覆盖而加入多家公司。"},
+        {"kind": "natural", "text": "我改变主意了，先把存货周转的计算公式给我看。"}
+      ]
+    },
+    {
+      "case_id": "score_analyst_revision",
+      "category": "股票评价",
+      "request": "做一个分析师预期修正评价工具，统计近30日和90日盈利预期上调、下调次数，并输出修正方向和一致性。",
+      "followups": [
+        {"kind": "natural", "text": "近30日和90日都保留，但不要把分析师数量本身当成得分。"},
+        {"kind": "natural", "text": "开始实现并测试这个版本。"},
+        {"kind": "natural", "text": "实现之前先让我看看设计流程图。"}
+      ]
+    },
+    {
+      "case_id": "score_valuation_percentile",
+      "category": "股票评价",
+      "request": "创建一个估值分位评价工具，计算市盈率、市净率相对自身历史区间的分位数，输出当前估值偏高还是偏低。",
+      "followups": [
+        {"kind": "natural", "text": "历史区间先按近五年，数据不足时返回数据不足。"},
+        {"kind": "sop", "text": "", "interaction": {"interaction_id": "custom_tool.design_review", "action_id": "custom_tool.confirm_design", "action": "accept", "expected_revision": 1}},
+        {"kind": "natural", "text": "把估值分位和原始估值都记录在测试日志里。"}
+      ]
+    },
+    {
+      "case_id": "factor_volatility",
+      "category": "因子计算",
+      "request": "开发一个波动率因子工具，计算近20日、60日年化波动率和真实波幅，并输出各窗口的中间值。",
+      "followups": [
+        {"kind": "natural", "text": "年化波动率请说明年化因子和收益率口径。"},
+        {"kind": "natural", "text": "按设计实现，测试时给出一只股票的20日和60日结果。"},
+        {"kind": "related_finance", "text": "不改工具，告诉我今天沪深300的涨跌幅。"}
+      ]
+    },
+    {
+      "case_id": "factor_liquidity",
+      "category": "因子计算",
+      "request": "做一个流动性因子工具，计算20日平均成交额、成交额波动率和换手率变化，识别流动性改善或恶化。",
+      "followups": [
+        {"kind": "natural", "text": "平均成交额和换手率要分开输出，不要合成一个指标。"},
+        {"kind": "natural", "text": "请给我看一下当前设计的输入输出字段。"},
+        {"kind": "sop", "text": "", "interaction": {"interaction_id": "custom_tool.design_review", "action_id": "custom_tool.confirm_design", "action": "accept", "expected_revision": 1}}
+      ]
+    },
+    {
+      "case_id": "factor_drawdown",
+      "category": "因子计算",
+      "request": "创建一个回撤因子工具，计算近30日和120日最大回撤、回撤持续天数及从低点恢复所需时间。",
+      "followups": [
+        {"kind": "natural", "text": "最大回撤要同时返回峰值日期和谷值日期。"},
+        {"kind": "sop", "text": "", "interaction": {"interaction_id": "custom_tool.design_review", "action_id": "custom_tool.confirm_design", "action": "accept", "expected_revision": 1}},
+        {"kind": "natural", "text": "测试没通过的话先展示测试错误，不要直接把设计重写。"}
+      ]
+    },
+    {
+      "case_id": "factor_quality",
+      "category": "因子计算",
+      "request": "设计一个质量因子工具，计算ROE、毛利率、经营现金流率和利润波动性，并输出标准化后的质量分数。",
+      "followups": [
+        {"kind": "natural", "text": "先解释标准化是在单只股票历史内做，还是横截面内做。"},
+        {"kind": "natural", "text": "我选择横截面不可用时，先支持单只股票历史标准化。"},
+        {"kind": "natural", "text": "把核心计算代码展示出来。"}
+      ]
+    },
+    {
+      "case_id": "factor_trend_consistency",
+      "category": "因子计算",
+      "request": "创建一个趋势一致性因子，比较短中长期均线方向、价格斜率和新高新低频率，输出趋势一致性等级。",
+      "followups": [
+        {"kind": "natural", "text": "趋势等级先只分为上行、震荡、下行三类。"},
+        {"kind": "natural", "text": "展示一下流程图，尤其是三个时间尺度如何合并。"},
+        {"kind": "sop", "text": "", "interaction": {"interaction_id": "custom_tool.design_review", "action_id": "custom_tool.confirm_design", "action": "accept", "expected_revision": 1}}
+      ]
+    },
+    {
+      "case_id": "factor_sentiment_proxy",
+      "category": "因子计算",
+      "request": "做一个价格成交量情绪代理因子，结合上涨日成交量、下跌日成交量和收益率，输出近10日与30日情绪倾向。",
+      "followups": [
+        {"kind": "natural", "text": "这个只是市场情绪代理，不要在设计里写成新闻情绪识别。"},
+        {"kind": "natural", "text": "先按当前设计实现并测试。"},
+        {"kind": "related_finance", "text": "顺便查一下五粮液今天成交量。"}
+      ]
+    },
+    {
+      "case_id": "risk_beta",
+      "category": "风险评价",
+      "request": "创建一个个股Beta风险工具，用近一年日收益率计算相对沪深300的Beta、R平方和残差波动率。",
+      "followups": [
+        {"kind": "natural", "text": "市场基准固定为沪深300，先不要扩展到多个基准。"},
+        {"kind": "natural", "text": "让我看看Beta计算涉及的输入和输出。"},
+        {"kind": "sop", "text": "", "interaction": {"interaction_id": "custom_tool.design_review", "action_id": "custom_tool.confirm_design", "action": "accept", "expected_revision": 1}}
+      ]
+    },
+    {
+      "case_id": "risk_tail_loss",
+      "category": "风险评价",
+      "request": "设计一个尾部损失评价工具，计算近250个交易日的历史VaR和预期损失，并列出最差五个交易日。",
+      "followups": [
+        {"kind": "natural", "text": "先用历史模拟法，不要引入复杂的参数分布假设。"},
+        {"kind": "sop", "text": "", "interaction": {"interaction_id": "custom_tool.design_review", "action_id": "custom_tool.confirm_design", "action": "accept", "expected_revision": 1}},
+        {"kind": "natural", "text": "代码实现后测试结果要包含VaR日期和对应收益率。"}
+      ]
+    },
+    {
+      "case_id": "risk_gap",
+      "category": "风险评价",
+      "request": "做一个隔夜跳空风险工具，统计近120日向下跳空超过2%的次数、平均损失和最大单日损失。",
+      "followups": [
+        {"kind": "natural", "text": "向下跳空按开盘价相对前收盘计算，盘中跌幅不要混进来。"},
+        {"kind": "natural", "text": "先看看这个工具的设计稿，不要开始编码。"},
+        {"kind": "related_finance", "text": "今天市场整体是高开还是低开？"}
+      ]
+    },
+    {
+      "case_id": "risk_liquidity_stress",
+      "category": "风险评价",
+      "request": "创建一个流动性压力评价工具，识别成交额突然下降、买卖价差扩大代理和连续下跌同时出现的阶段。",
+      "followups": [
+        {"kind": "natural", "text": "先说明当前数据体系能支持哪些流动性指标。"},
+        {"kind": "natural", "text": "如果某个字段没有数据，输出数据不足和缺失字段，不要猜值。"},
+        {"kind": "sop", "text": "", "interaction": {"interaction_id": "custom_tool.design_review", "action_id": "custom_tool.confirm_design", "action": "accept", "expected_revision": 1}}
+      ]
+    },
+    {
+      "case_id": "risk_concentration",
+      "category": "风险评价",
+      "request": "设计一个持仓集中度评价工具，输入一组股票权重，输出前一只、前三只和行业维度的集中度，并提示集中风险。",
+      "followups": [
+        {"kind": "natural", "text": "这个工具输入的是权重，不需要自己查询股价。"},
+        {"kind": "natural", "text": "请展示核心代码和一个简单样例结果。"},
+        {"kind": "natural", "text": "我想把行业集中度先去掉，只保留股票权重集中度。"}
+      ]
+    }
+  ]
+}

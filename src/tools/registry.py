@@ -34,6 +34,7 @@ TOOL_REGISTRY: Dict[str, str] = {
     "stock_protocol_data_query": "src.tools.stock_protocol_data_query_tool:run",
     "security_universe_query": "src.tools.security_universe_query_tool:run",
     "financial_news_search": "src.tools.company_news_tool:run",
+    "general_search": "src.tools.general_search_tool:run",
     "market_realtime_breadth": "src.tools.market_snapshot_tools:run_market_realtime_breadth",
     "market_history_amount": "src.tools.market_snapshot_tools:run_market_history_amount",
     "market_minute_amount_series": "src.tools.market_snapshot_tools:run_market_minute_amount_series",
@@ -342,6 +343,9 @@ def run_tool(
                 normalized_args,
                 owner_ids=owner_ids,
                 allow_inactive=False,
+                progress_sink=(runtime_ctx or {}).get("_progress_sink")
+                if callable((runtime_ctx or {}).get("_progress_sink"))
+                else None,
             )
         raise KeyError(f"unknown tool: {tool_name}")
     if not is_remote_http and is_tool_definition_disabled(tool_name):
@@ -352,10 +356,27 @@ def run_tool(
         module_path, func_name = TOOL_REGISTRY[tool_name].split(":", 1)
         module = import_module(module_path)
         func = getattr(module, func_name)
-    normalized_args = _normalize_tool_args(args)
+    normalized_args = dict(_normalize_tool_args(args))
+    # Runtime metadata is an internal, out-of-band contract.  Never trust an
+    # `_runtime` object supplied as an ordinary tool argument; otherwise a
+    # caller could forge the tracking-owner marker and bypass the registry's
+    # invocation lifecycle.
+    normalized_args.pop("_runtime", None)
+    trusted_runtime_ctx = dict(runtime_ctx or {})
+    if trusted_runtime_ctx:
+        normalized_args["_runtime"] = trusted_runtime_ctx
     contract_normalized = normalize_tool_args_for_definition(tool_name, normalized_args)
+    execution_args = (
+        contract_normalized.get("arguments")
+        if isinstance(contract_normalized.get("arguments"), dict)
+        else normalized_args
+    )
+    if str(trusted_runtime_ctx.get("_execution_tracking_owner") or "").strip():
+        clean_args = dict(execution_args)
+        clean_args.pop("_runtime", None)
+        return func(clean_args)
     return _runtime_execution_service.execute_tool(
         tool_name=tool_name,
-        args=contract_normalized.get("arguments") if isinstance(contract_normalized.get("arguments"), dict) else normalized_args,
+        args=execution_args,
         executor=func,
     )

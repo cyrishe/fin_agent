@@ -41,6 +41,8 @@ class SchemaValidator:
 
         if "const" in schema and payload != schema["const"]:
             raise SchemaValidationError(f"{path}: expected const {schema['const']!r}")
+        if "enum" in schema and payload not in schema["enum"]:
+            raise SchemaValidationError(f"{path}: expected one of {schema['enum']!r}")
 
         expected_type = schema.get("type")
         if expected_type is not None:

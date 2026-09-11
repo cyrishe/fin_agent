@@ -1,0 +1,31 @@
+{
+  "name": "fin-agent-web",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1 --port 22054",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview --host 127.0.0.1 --port 22054",
+    "typecheck": "tsc -b --pretty false",
+    "test": "vitest run --exclude '**/._*'"
+  },
+  "dependencies": {
+    "@highcharts/react": "^4.1.0",
+    "highcharts": "^12.4.0",
+    "lucide-react": "^0.468.0",
+    "mermaid": "^11.4.1",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-markdown": "^9.0.3",
+    "remark-gfm": "^4.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.18",
+    "@types/react-dom": "^18.3.5",
+    "@vitejs/plugin-react": "^4.3.4",
+    "typescript": "^5.7.2",
+    "vite": "^6.0.7",
+    "vitest": "^2.1.8"
+  }
+}

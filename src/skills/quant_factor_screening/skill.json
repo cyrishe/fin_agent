@@ -1,10 +1,10 @@
 {
   "skill_name": "quant_factor_screening",
   "availability": {
-    "lifecycle": "active",
-    "retrieval_mode": "retrievable"
+    "lifecycle": "retired",
+    "retrieval_mode": "direct_only"
   },
-  "purpose": "自然语言量化与消息面选股，生成 factor plan，调用 provider 准备数据，并通过 code runtime 输出可审计候选筛选结果。",
+  "purpose": "按自然语言量化条件、消息面条件或两者组合筛选股票，适用于多因子排序、概念催化与量化条件组合选股。生成因子计划，经数据准备和确定性计算输出候选、入选依据、覆盖率与审计摘要。",
   "best_for": [
     "量化选股",
     "多因子筛选",

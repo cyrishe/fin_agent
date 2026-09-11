@@ -1,0 +1,429 @@
+{
+  "name": "finance_api_static_validation_expanded_business_cases_20260825",
+  "scope": "60 additional ordinary finance business cases covering major API families: 40 contract-valid calls and 20 plausible structural mistakes. Labels assess API/dataview structure only, never user-intent equivalence.",
+  "cases": [
+    {
+      "case_id": "EXP_VALID_001",
+      "source": "ordinary_business_extension",
+      "user_query": "查询宁德时代的股票代码、所属行业和上市日期。",
+      "request": "r1 = stock.basic_info(filter = \"name = 宁德时代\", limit = 1) -> code, name, industry, listed_date",
+      "expected_static": "pass"
+    },
+    {
+      "case_id": "EXP_VALID_002",
+      "source": "ordinary_business_extension",
+      "user_query": "列出2020年以后上市的股票，按上市日期倒序取20只。",
+      "request": "r1 = stock.basic_info(filter = \"listed_date >= 2020-01-01\", order = \"listed_date desc\", limit = 20) -> code, name, industry, listed_date",
+      "expected_static": "pass"
+    },
+    {
+      "case_id": "EXP_VALID_003",
+      "source": "ordinary_business_extension",
+      "user_query": "比较贵州茅台和五粮液今天的最新价、涨跌幅和成交额。",
+      "request": "r1 = stock.quote(filter = \"code in (600519.SH, 000858.SZ)\", order = \"code asc\", limit = 2, mode = 2) -> code, name, tradedate, snapshot_time, close, pct, amount",
+      "expected_static": "pass"
+    },
+    {
+      "case_id": "EXP_VALID_004",
+      "source": "ordinary_business_extension",
+      "user_query": "查询贵州茅台最近30根5分钟K线。",
+      "request": "r1 = stock.quote(filter = \"code = 600519.SH\", mode = 1, period = 5, count = 30) -> code, name, bar_start_time, bar_end_time, open, high, low, close, amount, volumn, is_finalized",
+      "expected_static": "pass"
+    },
+    {
+      "case_id": "EXP_VALID_005",
+      "source": "ordinary_business_extension",
+      "user_query": "查询宁德时代最近20个交易日的日K。",
+      "request": "r1 = stock.quote(filter = \"code = 300750.SZ\", order = \"tradedate desc\", mode = 0, count = 20) -> code, name, tradedate, open, high, low, close, pct, amount",
+      "expected_static": "pass"
+    },
+    {
+      "case_id": "EXP_VALID_006",
+      "source": "ordinary_business_extension",
+      "user_query": "计算贵州茅台近20日平均成交额。",
+      "request": "r1 = stock.quote.kd_amount_avg(k = 20, filter = \"code = 600519.SH\", mode = 0) -> code, name, value as avg_amount_20d",
+      "expected_static": "pass"
+    },
+    {
+      "case_id": "EXP_VALID_007",
+      "source": "ordinary_business_extension",
+      "user_query": "找出近10日最高收盘价最高的10只股票。",
+      "request": "r1 = stock.quote.kd_close_max(k = 10, order = \"value desc\", limit = 10, mode = 0) -> code, name, value as max_close_10d",
+      "expected_static": "pass"
+    },
+    {
+      "case_id": "EXP_VALID_008",
+      "source": "ordinary_business_extension",
+      "user_query": "统计最新行情中上涨股票的平均涨幅。",
+      "request": "r1 = stock.quote.agg(filter = \"pct > 0\", agg = avg(stock.quote.pct), realtime = 1) -> avg_pct",
+      "expected_static": "pass"
+    },
+    {
+      "case_id": "EXP_VALID_009",
+      "source": "ordinary_business_extension",
+      "user_query": "比较贵州茅台与五粮液近期行情并给出区间波动分析。",
+      "request": "r1 = stock.quote.dynamic_cal(filter = \"code in (600519.SH, 000858.SZ)\", fields = \"code, name, tradedate, close, pct\", task = \"比较两只股票近期行情的涨跌与波动\", limit = 20, mode = 0) -> code, name, tradedate, close, pct",
+      "expected_static": "pass"
+    },
+    {
+      "case_id": "EXP_VALID_010",
+      "source": "ordinary_business_extension",
+      "user_query": "查询比亚迪最近交易日主力净流入和主力净占比。",
+      "request": "r1 = stock.moneyflow(filter = \"code = 002594.SZ\", order = \"tradedate desc\", limit = 1, realtime = 0) -> code, name, tradedate, main_net, main_ratio",
+      "expected_static": "pass"
+    },
+    {
+      "case_id": "EXP_VALID_011",
+      "source": "ordinary_business_extension",
+      "user_query": "筛选最近交易日主力净流入为正且大单净流入为正的股票。",
+      "request": "r1 = stock.moneyflow(filter = \"main_net > 0 and large_net > 0\", order = \"main_net desc\", limit = 20, realtime = 0) -> code, name, tradedate, main_net, main_ratio, large_net",
+      "expected_static": "pass"
+    },
+    {
+      "case_id": "EXP_VALID_012",
+      "source": "ordinary_business_extension",
+      "user_query": "查询近10日主力净流入合计最高的20只股票。",
+      "request": "r1 = stock.moneyflow.kd_main_net_sum(k = 10, order = \"value desc\", limit = 20, realtime = 0) -> code, name, value as main_net_sum_10d",
+      "expected_static": "pass"
+    },
+    {
+      "case_id": "EXP_VALID_013",
+      "source": "ordinary_business_extension",
+      "user_query": "查询贵州茅台最新PE、PB和总市值。",
+      "request": "r1 = stock.pricevalue(filter = \"code = 600519.SH\", order = \"tradedate desc\", limit = 1, realtime = 0) -> code, name, tradedate, pe, pe_ttm, pb, market_value",
+      "expected_static": "pass"
+    },
+    {
+      "case_id": "EXP_VALID_014",
+      "source": "ordinary_business_extension",
+      "user_query": "按总市值从高到低列出前20只股票。",
+      "request": "r1 = stock.pricevalue(order = \"market_value desc\", limit = 20, realtime = 0) -> code, name, tradedate, market_value, pe_ttm, pb",
+      "expected_static": "pass"
+    },
+    {
+      "case_id": "EXP_VALID_015",
+      "source": "ordinary_business_extension",
+      "user_query": "查询贵州茅台近三年PE历史百分位。",
+      "request": "r1 = stock.pricevalue.kd_pe_percentile(k = 750, filter = \"code = 600519.SH\", realtime = 0) -> code, name, value as pe_percentile_3y",
+      "expected_static": "pass"
+    },
+    {
+      "case_id": "EXP_VALID_016",
+      "source": "ordinary_business_extension",
+      "user_query": "查询宁德时代最新融资余额、融资买入额和融资净买入。",
+      "request": "r1 = stock.margin(filter = \"code = 300750.SZ\", order = \"tradedate desc\", limit = 1, realtime = 0) -> code, name, tradedate, financing_balance, financing_buy, financing_net_buy",
+      "expected_static": "pass"
+    },
+    {
+      "case_id": "EXP_VALID_017",
+      "source": "ordinary_business_extension",
+      "user_query": "统计近5日融资净买入合计最高的10只股票。",
+      "request": "r1 = stock.margin.kd_financing_net_buy_sum(k = 5, order = \"value desc\", limit = 10, realtime = 0) -> code, name, value as financing_net_buy_sum_5d",
+      "expected_static": "pass"
+    },
+    {
+      "case_id": "EXP_VALID_018",
+      "source": "ordinary_business_extension",
+      "user_query": "查询贵州茅台2025年以来的营业收入、净利润和ROE。",
+      "request": "r1 = stock.financial_3_table(filter = \"code = 600519.SH and report_period >= 2025-01-01\", order = \"report_date desc\", limit = 8) -> code, name, report_date, report_period, revenue, net_profit, roe",
+      "expected_static": "pass"
+    },
+    {
+      "case_id": "EXP_VALID_019",
+      "source": "ordinary_business_extension",
+      "user_query": "查询贵州茅台2026年以来最新研报的机构、评级与目标价。",
+      "request": "r1 = stock.report(filter = \"code = 600519.SH and report_date >= 2026-01-01\", order = \"report_date desc\", limit = 10) -> report_id, code, name, report_date, institution, rating, target_price_lower, target_price_upper",
+      "expected_static": "pass"
+    },
+    {
+      "case_id": "EXP_VALID_020",
+      "source": "ordinary_business_extension",
+      "user_query": "查询宁德时代2026年8月以来的相关新闻。",
+      "request": "r1 = stock.news(filter = \"code = 300750.SZ and publish_time >= 2026-08-01\", order = \"publish_time desc\", limit = 10) -> code, name, publish_time, source, title, url, snippet",
+      "expected_static": "pass"
+    },
+    {
+      "case_id": "EXP_VALID_021",
+      "source": "ordinary_business_extension",
+      "user_query": "查询贵州茅台最近一次分红的公告日、股权登记日和现金分红比例。",
+      "request": "r1 = stock.corporate_action(filter = \"code = 600519.SH and source = dividend\", order = \"ann_date desc\", limit = 1) -> code, name, ann_date, record_date, ex_date, div_cash_pre_tax, div_bonus_rate",
+      "expected_static": "pass"
+    },
+    {
+      "case_id": "EXP_VALID_022",
+      "source": "ordinary_business_extension",
+      "user_query": "查询宁德时代最近一期业绩预告。",
+      "request": "r1 = stock.performance_notice(filter = \"code = 300750.SZ\", order = \"ann_date desc\", limit = 1) -> code, name, ann_date, report_period, performance_type, performance_summary, net_profit_lower, net_profit_upper",
+      "expected_static": "pass"
+    },
+    {
+      "case_id": "EXP_VALID_023",
+      "source": "ordinary_business_extension",
+      "user_query": "查询贵州茅台最近一期主营业务分部收入与毛利率。",
+      "request": "r1 = stock.business_segment(filter = \"code = 600519.SH\", order = \"ann_date desc\", limit = 10) -> code, name, ann_date, report_period, project_name, segment_sales, gross_profit_margin",
+      "expected_static": "pass"
+    },
+    {
+      "case_id": "EXP_VALID_024",
+      "source": "ordinary_business_extension",
+      "user_query": "查询宁德时代最近披露的股权质押情况。",
+      "request": "r1 = stock.pledge(filter = \"code = 300750.SZ\", order = \"ann_date desc\", limit = 10) -> code, name, ann_date, holder_name, pledge_shares, pledge_ratio, is_discharge",
+      "expected_static": "pass"
+    },
+    {
+      "case_id": "EXP_VALID_025",
+      "source": "ordinary_business_extension",
+      "user_query": "查询申万一级行业代码和名称。",
+      "request": "r1 = industry.basic_info(filter = \"level = 1\", order = \"industry_code asc\", limit = -1) -> industry_code, industry_name, level, level1_industry_name",
+      "expected_static": "pass"
+    },
+    {
+      "case_id": "EXP_VALID_026",
+      "source": "ordinary_business_extension",
+      "user_query": "列出银行行业全部成分股。",
+      "request": "r1 = industry.constitution(filter = \"industry_name = 银行\", order = \"stock_code asc\", limit = -1) -> industry_code, industry_name, stock_code, stock_name, weight",
+      "expected_static": "pass"
+    },
+    {
+      "case_id": "EXP_VALID_027",
+      "source": "ordinary_business_extension",
+      "user_query": "统计各一级行业上涨成分股数量。",
+      "request": "r1 = industry.constitution.agg(filter = \"level = 1 and pct > 0\", agg = count(stock.quote.code), group_by = \"industry_code, industry_name\", order = \"count_code desc\", limit = -1, realtime = 1) -> industry_code, industry_name, count_code",
+      "expected_static": "pass"
+    },
+    {
+      "case_id": "EXP_VALID_028",
+      "source": "ordinary_business_extension",
+      "user_query": "查询名称包含人工智能的板块。",
+      "request": "r1 = plate.basic_info(filter = \"plate_name like %人工智能%\", order = \"plate_code asc\", limit = 20) -> plate_code, plate_name",
+      "expected_static": "pass"
+    },
+    {
+      "case_id": "EXP_VALID_029",
+      "source": "ordinary_business_extension",
+      "user_query": "查询今天涨幅最高的10个板块。",
+      "request": "r1 = plate.quote(order = \"pct desc\", limit = 10, realtime = 1) -> code, name, tradedate, close, pct, amount",
+      "expected_static": "pass"
+    },
+    {
+      "case_id": "EXP_VALID_030",
+      "source": "ordinary_business_extension",
+      "user_query": "查询今天主力净流入最高的10个板块。",
+      "request": "r1 = plate.moneyflow(order = \"main_net desc\", limit = 10, realtime = 1) -> code, name, tradedate, main_net, main_ratio",
+      "expected_static": "pass"
+    },
+    {
+      "case_id": "EXP_VALID_031",
+      "source": "ordinary_business_extension",
+      "user_query": "查询机器人板块的全部成分股。",
+      "request": "r1 = plate.constitution(filter = \"plate_name = 机器人\", order = \"stock_code asc\", limit = -1) -> plate_code, plate_name, stock_code, stock_name, weight",
+      "expected_static": "pass"
+    },
+    {
+      "case_id": "EXP_VALID_032",
+      "source": "ordinary_business_extension",
+      "user_query": "查询沪深300指数的最新行情。",
+      "request": "r1 = index.quote(filter = \"code = 000300.SH\", order = \"tradedate desc\", limit = 1, realtime = 1) -> code, name, tradedate, close, pct, amount",
+      "expected_static": "pass"
+    },
+    {
+      "case_id": "EXP_VALID_033",
+      "source": "ordinary_business_extension",
+      "user_query": "列出沪深300指数权重最高的20只成分股。",
+      "request": "r1 = index.constitution(filter = \"index_code = 000300.SH\", order = \"weight desc\", limit = 20) -> index_code, index_name, stock_code, stock_name, weight",
+      "expected_static": "pass"
+    },
+    {
+      "case_id": "EXP_VALID_034",
+      "source": "ordinary_business_extension",
+      "user_query": "查询沪深300ETF最新行情。",
+      "request": "r1 = fund.quote(filter = \"code = 510300.SH\", order = \"tradedate desc\", limit = 1, realtime = 1) -> code, name, tradedate, close, pct, amount, discount",
+      "expected_static": "pass"
+    },
+    {
+      "case_id": "EXP_VALID_035",
+      "source": "ordinary_business_extension",
+      "user_query": "查询中证转债指数代码和名称。",
+      "request": "r1 = bond.basic_info(filter = \"name like %转债%\", limit = 20) -> code, name, issuer",
+      "expected_static": "pass"
+    },
+    {
+      "case_id": "EXP_VALID_036",
+      "source": "ordinary_business_extension",
+      "user_query": "查询今天成交额最高的20只债券。",
+      "request": "r1 = bond.quote(order = \"amount desc\", limit = 20, realtime = 1) -> code, name, tradedate, close, pct, amount",
+      "expected_static": "pass"
+    },
+    {
+      "case_id": "EXP_VALID_037",
+      "source": "ordinary_business_extension",
+      "user_query": "查询当前仍活跃的热点事件。",
+      "request": "r1 = hot_event.base_info(filter = \"is_active = 1\", order = \"latest_trigger_date desc\", limit = 20) -> event_id, event, is_active, first_trigger_date, latest_trigger_date, latest_event_desc, company_num",
+      "expected_static": "pass"
+    },
+    {
+      "case_id": "EXP_VALID_038",
+      "source": "ordinary_business_extension",
+      "user_query": "查询热点事件最新状态和热度。",
+      "request": "r1 = hot_event.state(order = \"state_time desc\", limit = 20) -> event_id, event, active_id, state_time, heat_score, board_strength, limited_count",
+      "expected_static": "pass"
+    },
+    {
+      "case_id": "EXP_VALID_039",
+      "source": "ordinary_business_extension",
+      "user_query": "查询机器人热点事件的相关股票与龙头标记。",
+      "request": "r1 = hot_event.member(filter = \"event = 机器人\", order = \"stock_code asc\", limit = -1) -> event_id, event, active_id, stock_code, stock_name, relation_type, is_leader",
+      "expected_static": "pass"
+    },
+    {
+      "case_id": "EXP_VALID_040",
+      "source": "ordinary_business_extension",
+      "user_query": "统计沪深300成分股最新平均涨跌幅。",
+      "request": "r1 = index.constitution.agg(filter = \"index_code = 000300.SH\", agg = avg(stock.quote.pct), group_by = \"index_code, index_name\", realtime = 1) -> index_code, index_name, avg_pct",
+      "expected_static": "pass"
+    },
+    {
+      "case_id": "EXP_INVALID_001",
+      "source": "plausible_model_structure_error",
+      "user_query": "查询机器人板块成分股今天的涨跌幅。",
+      "request": "r2 = stock.quote(filter = \"stock_code in r1.stock_code\", order = \"pct desc\", limit = -1, mode = 2) -> code, name, pct",
+      "expected_static": "fail",
+      "previous_results": {"r1": {"api": "plate.constitution", "columns": ["stock_code", "stock_name"], "rows": [{"stock_code": "300024.SZ", "stock_name": "机器人"}]}}
+    },
+    {
+      "case_id": "EXP_INVALID_002",
+      "source": "plausible_model_structure_error",
+      "user_query": "查询总市值超过一千亿元的股票最新涨跌幅。",
+      "request": "r1 = stock.quote(filter = \"market_value > 100000000000\", order = \"pct desc\", limit = 20, mode = 2) -> code, name, pct",
+      "expected_static": "fail"
+    },
+    {
+      "case_id": "EXP_INVALID_003",
+      "source": "plausible_model_structure_error",
+      "user_query": "按总市值排序查看股票最新行情。",
+      "request": "r1 = stock.quote(order = \"market_value desc\", limit = 20, mode = 2) -> code, name, close, pct",
+      "expected_static": "fail"
+    },
+    {
+      "case_id": "EXP_INVALID_004",
+      "source": "plausible_model_structure_error",
+      "user_query": "查询贵州茅台最新行情和总市值。",
+      "request": "r1 = stock.quote(filter = \"code = 600519.SH\", limit = 1, mode = 2) -> code, name, close, pct, market_value",
+      "expected_static": "fail"
+    },
+    {
+      "case_id": "EXP_INVALID_005",
+      "source": "plausible_model_structure_error",
+      "user_query": "找出融资余额较高且主力净流入为正的股票。",
+      "request": "r1 = stock.moneyflow(filter = \"financing_balance > 1000000000 and main_net > 0\", order = \"main_net desc\", limit = 20) -> code, name, main_net",
+      "expected_static": "fail"
+    },
+    {
+      "case_id": "EXP_INVALID_006",
+      "source": "plausible_model_structure_error",
+      "user_query": "查询主力净流入为正的股票融资余额。",
+      "request": "r1 = stock.margin(filter = \"main_net > 0\", order = \"financing_balance desc\", limit = 20) -> code, name, financing_balance",
+      "expected_static": "fail"
+    },
+    {
+      "case_id": "EXP_INVALID_007",
+      "source": "plausible_model_structure_error",
+      "user_query": "筛选今天上涨且PE较低的股票。",
+      "request": "r1 = stock.pricevalue(filter = \"close > preclose and pe_ttm < 20\", order = \"pe_ttm asc\", limit = 20) -> code, name, pe_ttm",
+      "expected_static": "fail"
+    },
+    {
+      "case_id": "EXP_INVALID_008",
+      "source": "plausible_model_structure_error",
+      "user_query": "查询贵州茅台年报口径的营业收入和净利润。",
+      "request": "r1 = stock.financial_3_table(filter = \"code = 600519.SH and report_type = annual\", order = \"report_date desc\", limit = 4) -> code, name, report_date, revenue, net_profit",
+      "expected_static": "fail"
+    },
+    {
+      "case_id": "EXP_INVALID_009",
+      "source": "plausible_model_structure_error",
+      "user_query": "查询贵州茅台合同负债与营业收入。",
+      "request": "r1 = stock.financial_3_table(filter = \"code = 600519.SH\", order = \"report_date desc\", limit = 8) -> code, name, report_date, contract_liabilities, revenue",
+      "expected_static": "fail"
+    },
+    {
+      "case_id": "EXP_INVALID_010",
+      "source": "plausible_model_structure_error",
+      "user_query": "查询银行行业股票的代码和上市日期。",
+      "request": "r1 = stock.basic_info(filter = \"industry_name = 银行\", order = \"code asc\", limit = 50) -> code, name, listed_date",
+      "expected_static": "fail"
+    },
+    {
+      "case_id": "EXP_INVALID_011",
+      "source": "plausible_model_structure_error",
+      "user_query": "查询涨幅最高的板块代码和名称。",
+      "request": "r1 = plate.quote(order = \"pct desc\", limit = 10, realtime = 1) -> plate_code, plate_name, pct",
+      "expected_static": "fail"
+    },
+    {
+      "case_id": "EXP_INVALID_012",
+      "source": "plausible_model_structure_error",
+      "user_query": "查询宁德时代所在行业的全部成分股。",
+      "request": "r2 = industry.constitution(filter = \"industry_name = r1.industry\", limit = -1) -> industry_code, industry_name, stock_code, stock_name",
+      "expected_static": "fail",
+      "previous_results": {"r1": {"api": "stock.basic_info", "columns": ["code", "industry"], "rows": [{"code": "300750.SZ", "industry": "电池"}]}}
+    },
+    {
+      "case_id": "EXP_INVALID_013",
+      "source": "plausible_model_structure_error",
+      "user_query": "根据上一步板块结果查询成分股。",
+      "request": "r2 = plate.constitution(filter = \"plate_code in r1.code\", limit = -1) -> plate_code, plate_name, stock_code, stock_name",
+      "expected_static": "fail",
+      "previous_results": {"r1": {"api": "plate.basic_info", "columns": ["plate_code", "plate_name"], "rows": [{"plate_code": "885001", "plate_name": "机器人"}]}}
+    },
+    {
+      "case_id": "EXP_INVALID_014",
+      "source": "plausible_model_structure_error",
+      "user_query": "统计各行业成分股平均PE。",
+      "request": "r1 = industry.constitution.agg(agg = avg(stock.quote.pe), group_by = \"industry_code, industry_name\", order = \"avg_pe asc\", limit = -1) -> industry_code, industry_name, avg_pe",
+      "expected_static": "fail"
+    },
+    {
+      "case_id": "EXP_INVALID_015",
+      "source": "plausible_model_structure_error",
+      "user_query": "统计各板块最新平均涨幅。",
+      "request": "r1 = plate.constitution.agg(agg = avg(stock.quote.pct), group_by = \"sector_name\", order = \"avg_pct desc\", limit = 20) -> sector_name, avg_pct",
+      "expected_static": "fail"
+    },
+    {
+      "case_id": "EXP_INVALID_016",
+      "source": "plausible_model_structure_error",
+      "user_query": "按排名查看近20日累计涨幅最高的股票。",
+      "request": "r1 = stock.quote.kd_pct_sum(k = 20, order = \"rank desc\", limit = 20, mode = 0) -> code, name, value as pct_sum_20d",
+      "expected_static": "fail"
+    },
+    {
+      "case_id": "EXP_INVALID_017",
+      "source": "plausible_model_structure_error",
+      "user_query": "查询贵州茅台最近10个交易日行情。",
+      "request": "r1 = stock.quote(filters = \"code = 600519.SH\", order = \"tradedate desc\", limit = 10, mode = 0) -> code, name, tradedate, close, pct",
+      "expected_static": "fail"
+    },
+    {
+      "case_id": "EXP_INVALID_018",
+      "source": "plausible_model_structure_error",
+      "user_query": "筛选主力和大单同时净流入的股票。",
+      "request": "r1 = stock.moneyflow(filter = \"main_net > 0 and\", order = \"main_net desc\", limit = 20) -> code, name, main_net, large_net",
+      "expected_static": "fail"
+    },
+    {
+      "case_id": "EXP_INVALID_019",
+      "source": "plausible_model_structure_error",
+      "user_query": "查询贵州茅台最新估值。",
+      "request": "r1 = stock.valuation(filter = \"code = 600519.SH\", limit = 1) -> code, name, pe, pb",
+      "expected_static": "fail"
+    },
+    {
+      "case_id": "EXP_INVALID_020",
+      "source": "plausible_model_structure_error",
+      "user_query": "计算股票近20日平均总市值。",
+      "request": "r1 = stock.quote.kd_market_value_avg(k = 20, order = \"value desc\", limit = 20, mode = 0) -> code, name, value as avg_market_value_20d",
+      "expected_static": "fail"
+    }
+  ]
+}

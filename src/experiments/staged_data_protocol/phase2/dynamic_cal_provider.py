@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from src.experiments.staged_data_protocol.phase2 import python_filter as pf
+
 import ast
 import json
 import re
@@ -10,6 +12,10 @@ import numpy as np
 import pandas as pd
 import pymysql
 
+from src.experiments.staged_data_protocol.phase2.intraday_quote_provider import (
+    MINUTE_SESSION_START,
+    _minute_bar_cte,
+)
 from src.experiments.staged_data_protocol.phase2.quote_provider import (
     QUOTE_SOURCES,
     TRADE_CALENDAR_TABLE,
@@ -57,6 +63,38 @@ REALTIME_ONLY_FIELDS = {
     "source",
     "is_fallback",
 }
+HISTORICAL_RAW_ONLY_ARG = "_host_historical_raw_only"
+HISTORICAL_RAW_STOCK_FIELDS = frozenset(
+    {
+        "code",
+        "tradedate",
+        "preclose",
+        "open",
+        "high",
+        "low",
+        "close",
+        "avg_price",
+        "differ",
+        "pct",
+        "turn_ratio",
+        "volumn",
+        "amount",
+        "amplitude",
+        "is_limit_price",
+    }
+)
+HISTORICAL_DEFAULT_STOCK_FIELDS = (
+    "code",
+    "tradedate",
+    "open",
+    "high",
+    "low",
+    "close",
+    "pct",
+    "turn_ratio",
+    "volumn",
+    "amount",
+)
 REALTIME_QUOTE_SOURCE = QuoteSource(
     subject="stock",
     table=REALTIME_SNAPSHOT_TABLE,
@@ -222,40 +260,10 @@ def _load_realtime_quote_window_rows(*, args: Mapping[str, Any], fields: List[st
     identity_sql, identity_params = _realtime_identity_where(args)
     select_sql = ", ".join(f"`{field}`" for field in fields)
     sql = f"""
-        WITH base AS (
-            SELECT
-                s.stk_code AS code,
-                s.stk_name AS name,
-                s.trade_date AS tradedate,
-                s.minute_index AS minute_index,
-                TIME_FORMAT(s.snapshot_time, '%%H:%%i:%%s') AS minute_time,
-                s.snapshot_time AS snapshot_time,
-                s.snapshot_slot AS snapshot_slot,
-                s.preclose_price AS preclose,
-                s.open_price AS open,
-                s.latest_price AS close,
-                s.high_price AS high,
-                s.low_price AS low,
-                s.chg_value AS differ,
-                s.chg_ratio AS pct,
-                s.amount AS amount,
-                s.volume AS volumn,
-                GREATEST(s.amount - COALESCE(p.amount, 0), 0) AS minute_amount,
-                GREATEST(s.volume - COALESCE(p.volume, 0), 0) AS minute_volumn,
-                s.source AS source,
-                s.is_fallback AS is_fallback
-            FROM {REALTIME_SNAPSHOT_TABLE} s
-            LEFT JOIN {REALTIME_SNAPSHOT_TABLE} p
-              ON p.trade_date = s.trade_date
-             AND p.stk_code = s.stk_code
-             AND p.minute_index = s.minute_index - 1
-            WHERE s.trade_date IN ({placeholders})
-              AND s.minute_index = %s
-              AND s.stk_code REGEXP '^[0-9]{{6}}$'
-        )
+        {_minute_bar_cte(date_predicate=f"s.trade_date IN ({placeholders})")}
         SELECT {select_sql}
         FROM base
-        WHERE 1=1 {identity_sql}
+        WHERE minute_index = %s {identity_sql}
         ORDER BY code ASC, tradedate ASC
         LIMIT %s
     """
@@ -300,12 +308,26 @@ def _realtime_slot(args: Mapping[str, Any]) -> Dict[str, Any]:
                 minute_index = requested_minute
             elif requested_slot:
                 cursor.execute(
-                    f"SELECT MAX(minute_index) AS minute_index FROM {REALTIME_SNAPSHOT_TABLE} WHERE trade_date = %s AND snapshot_slot = %s",
+                    f"""
+                    SELECT MAX(minute_index) AS minute_index
+                    FROM {REALTIME_SNAPSHOT_TABLE}
+                    WHERE trade_date = %s
+                      AND snapshot_slot = %s
+                      AND TIME(snapshot_time) >= '{MINUTE_SESSION_START}'
+                    """,
                     (trade_date, requested_slot),
                 )
                 minute_index = int((cursor.fetchone() or {}).get("minute_index") or 0)
             else:
-                cursor.execute(f"SELECT MAX(minute_index) AS minute_index FROM {REALTIME_SNAPSHOT_TABLE} WHERE trade_date = %s", (trade_date,))
+                cursor.execute(
+                    f"""
+                    SELECT MAX(minute_index) AS minute_index
+                    FROM {REALTIME_SNAPSHOT_TABLE}
+                    WHERE trade_date = %s
+                      AND TIME(snapshot_time) >= '{MINUTE_SESSION_START}'
+                    """,
+                    (trade_date,),
+                )
                 minute_index = int((cursor.fetchone() or {}).get("minute_index") or 0)
     finally:
         db.close_db()
@@ -333,6 +355,15 @@ def _realtime_history_dates(*, anchor_date: str, k: int) -> List[str]:
 
 
 def _realtime_identity_where(args: Mapping[str, Any]) -> tuple[str, List[Any]]:
+    tree = pf.condition(args)
+    if tree is not None:
+        def normalize(p):
+            if p["field"] == "code" and p["operator"] in {"=", "==", "in"}:
+                p["value"] = [_code6(v) for v in p["value"]] if isinstance(p["value"], list) else _code6(p["value"])
+            return p
+        tree = pf.map_predicates(tree, normalize)
+        sql, params = pf.compile_tree(pf.project(tree, {"code", "name"}), {"code": "`code`", "name": "`name`"})
+        return (f"AND ({sql})" if sql else ""), params
     clauses: List[str] = []
     params: List[Any] = []
     for field_name, op, value in _simple_filter_items(str(args.get("filter") or "")):
@@ -421,7 +452,14 @@ def _validate_code_ast(code: str) -> List[str]:
 
 def _normalize_result_df(df: pd.DataFrame, *, output_columns: List[str], args: Mapping[str, Any]) -> pd.DataFrame:
     rows = df.copy()
-    if "value" in rows.columns:
+    if pf.condition(args) is not None:
+        tree = pf.condition(args)
+        # Identity selection is applied by the input query. A result may omit
+        # those columns, but dropping one side of a mixed OR is never valid.
+        pf.require_separable(tree, [{"code", "name"}, set(rows.columns)])
+        tree = pf.project(tree, set(rows.columns))
+        rows = rows.loc[[pf.evaluate(tree, row) for row in rows.to_dict("records")]]
+    elif "value" in rows.columns:
         rows = _apply_value_filters(rows, str(args.get("filter") or ""))
     rows = _apply_order(rows, str(args.get("order") or ""))
     limit = _bounded_output_limit(args.get("limit"))
@@ -438,7 +476,7 @@ def _normalize_result_df(df: pd.DataFrame, *, output_columns: List[str], args: M
 
 def _apply_value_filters(df: pd.DataFrame, filter_text: str) -> pd.DataFrame:
     rows = df
-    for op, value in re.findall(r"\bvalue\s*(>=|<=|>|<|=|==|!=)\s*(-?\d+(?:\.\d+)?)", filter_text, flags=re.IGNORECASE):
+    for op, value in re.findall(r"\bvalue\s*(>=|<=|>|<|==|=|!=)\s*(-?\d+(?:\.\d+)?)", filter_text, flags=re.IGNORECASE):
         number = float(value)
         if op in {"=", "=="}:
             rows = rows[rows["value"] == number]
@@ -469,13 +507,27 @@ def _apply_order(df: pd.DataFrame, order_text: str) -> pd.DataFrame:
 
 def _dynamic_fields(*, source: QuoteSource, args: Mapping[str, Any]) -> List[str]:
     requested = _field_list(args.get("fields"))
+    historical_raw_only = (
+        source.subject == "stock"
+        and args.get(HISTORICAL_RAW_ONLY_ARG) is True
+    )
+    if historical_raw_only:
+        requested = [
+            field for field in requested if field in HISTORICAL_RAW_STOCK_FIELDS
+        ]
     fields = [field for field in requested if field in source.fields]
     if "code" not in fields and "code" in source.fields:
         fields.insert(0, "code")
-    if "name" not in fields and "name" in source.fields:
+    if not historical_raw_only and "name" not in fields and "name" in source.fields:
         fields.insert(1 if fields and fields[0] == "code" else 0, "name")
     if fields:
         return fields
+    if historical_raw_only:
+        return [
+            field
+            for field in HISTORICAL_DEFAULT_STOCK_FIELDS
+            if field in source.fields
+        ]
     return [field for field in ["code", "name", "tradedate", "open", "close", "high", "low", "pct", "amount", "volumn"] if field in source.fields]
 
 
@@ -501,13 +553,13 @@ def _is_realtime(args: Mapping[str, Any]) -> bool:
     requested_fields = {field.strip() for field in _field_list(args.get("fields"))}
     if requested_fields & REALTIME_ONLY_FIELDS:
         return True
-    raw = args.get("realtime", 1)
+    raw = args.get("mode", args.get("realtime", 0))
     if raw in (None, ""):
-        return True
+        return False
     if isinstance(raw, bool):
         return raw
     if isinstance(raw, (int, float)):
-        return int(raw) == 1
+        return int(raw) in {1, 2}
     text = str(raw).strip().lower()
     if text in {"0", "false", "no", "history", "historical"}:
         return False
@@ -515,9 +567,12 @@ def _is_realtime(args: Mapping[str, Any]) -> bool:
 
 
 def _simple_filter_items(filter_text: str) -> List[tuple[str, str, str]]:
+    tree = pf.parse_python_filter(filter_text)
+    if tree is not None:
+        return [(p["field"], p["operator"], str(p["value"])) for p in pf.predicates(tree)]
     rows: List[tuple[str, str, str]] = []
     for match in re.finditer(
-        r"(?P<field>[A-Za-z_]\w*)\s*(?P<op>in|=|==|!=|>=|<=|>|<)\s*(?P<value>\[[^\]]+\]|\([^)]+\)|[^,;]+?)(?=\s+(?:and|or)\s+[A-Za-z_]\w*\s*(?:in|=|==|!=|>=|<=|>|<)|[,;]|$)",
+        r"(?P<field>[A-Za-z_]\w*)\s*(?P<op>in|==|=|!=|>=|<=|>|<)\s*(?P<value>\[[^\]]+\]|\([^)]+\)|[^,;]+?)(?=\s+(?:and|or)\s+[A-Za-z_]\w*\s*(?:in|==|=|!=|>=|<=|>|<)|[,;]|$)",
         str(filter_text or ""),
         flags=re.IGNORECASE,
     ):

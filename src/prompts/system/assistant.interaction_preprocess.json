@@ -2,7 +2,7 @@
   "prompt_key": "system.assistant.interaction_preprocess",
   "layer": "system",
   "owner": "assistant",
-  "version": "v2",
+  "version": "v3",
   "messages": [
     {
       "role": "system",

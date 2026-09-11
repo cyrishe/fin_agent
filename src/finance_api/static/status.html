@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>金融数据状态</title>
+<style>
+:root{font-family:system-ui,-apple-system,"PingFang SC",sans-serif;color:#172b45;background:#f3f6fa}body{max-width:1440px;margin:0 auto;padding:28px}h1{font-size:28px;margin:0}header{display:flex;justify-content:space-between;align-items:center;gap:16px}a{color:#176b87;margin-left:16px}p{color:#607087;line-height:1.7}.cards{display:flex;gap:16px;margin:24px 0;flex-wrap:wrap}.card{background:white;padding:20px 26px;border-radius:14px;flex:1;min-width:140px;border:1px solid #e0e7ef}.card strong{display:block;font-size:30px;margin-top:8px}.toolbar{display:flex;gap:16px;align-items:center;margin-bottom:18px;flex-wrap:wrap}input,select,button{font:inherit;padding:10px;border:1px solid #cbd5e1;border-radius:8px;background:white}section{background:white;border:1px solid #e0e7ef;border-radius:14px;margin-bottom:20px;overflow:hidden}h2{font-size:18px;padding:16px 20px;margin:0;background:#edf5fa}.scroll{overflow:auto}table{border-collapse:collapse;width:100%;font-size:14px;white-space:nowrap}th,td{text-align:left;padding:14px 18px;border-bottom:1px solid #edf0f5}th{color:#607087;font-weight:500}td small{display:block;color:#64748b;font-size:12px;max-width:340px;white-space:normal;margin-top:5px}.good{color:#087c65}.warn{color:#ad5500}.badge{padding:5px 9px;background:#edf7f4;border-radius:6px;display:inline-block}.warn .badge{background:#fff3df}.notice{background:#fff3df;border-radius:8px;padding:12px 18px}details{font-size:12px;color:#5d7084}summary{cursor:pointer}footer{font-size:13px;color:#607087;margin-top:24px}@media(max-width:640px){body{padding:16px}header{display:block}nav{margin-top:15px}.card{padding:14px}h1{font-size:24px}}
+#usage-table{max-width:100%}#usage-table table{min-width:920px;font-variant-numeric:tabular-nums}#usage-table th,#usage-table td{padding:12px 9px;line-height:1.5;vertical-align:middle;text-align:right}#usage-table th:first-child,#usage-table td:first-child{text-align:left}#usage-table small{white-space:nowrap;margin-top:3px;font-size:11px}#usage-note{font-size:13px;line-height:1.65;margin:12px 0}#usage-details{margin:10px 0 16px;line-height:1.65}
+</style></head><body>
+<header><div><h1>金融数据状态</h1><p>同步时效 · 数据量对比 · 数据范围</p></div><nav><a href="data-map">数据体系</a><a href="docs">API 文档</a></nav></header>
+<div id="notice" class="notice">正在获取最近一次扫描结果…</div>
+<div class="cards"><div class="card">监控数据集<strong id="total">—</strong></div><div class="card">需要关注<strong id="alerts">—</strong></div><div class="card">目标日记录总量<strong id="rows">—</strong></div><div class="card">最近扫描<strong id="checked" style="font-size:17px">—</strong></div></div>
+<div class="toolbar"><input id="search" placeholder="查找股票、研报、现金流…" aria-label="搜索数据集"><select id="group" aria-label="数据分类"><option value="">全部分类</option></select><label><input type="checkbox" id="only"> 只看需要关注</label><button id="refresh">刷新页面数据</button></div>
+<div id="groups"></div>
+<section><h2>系统每日用量</h2>
+<div style="padding:18px">
+<p>一次完整对话请求或 MCP 工具调用计一次；Token 汇总请求内部用量。仅管理员可查看。</p>
+<div class="toolbar"><select id="usage-days" aria-label="统计天数"><option value="7">近7天</option><option value="30" selected>近30天</option><option value="90">近90天</option></select><button id="usage-load">读取统计</button></div>
+<p id="usage-note">尚未加载。</p>
+<details id="usage-details"><summary>统计口径与完整说明</summary><p id="usage-method"></p></details>
+<div id="usage-table" class="scroll"></div>
+</div></section>
+<footer>北京时间；分钟K线每分钟检查，默认允许5分钟延迟，午休及收盘冻结预期时点；数量为1分钟源K线与前五交易日同时点的累计量对比。其他日更数据默认15:30后每15分钟检查T-1：交易数据取前一交易日，研报取前一自然日。前五日均值包含零记录日期；休市日免更新缺失告警，数据库检查失败仍提示。财报、分红、股东等按披露更新，零新增不代表同步失败。数据量总和不代表证券数量；库内到达不等于同步任务完成。</footer>
+<script>
+let snapshot={items:[]};const $=id=>document.getElementById(id);const fmt=n=>n==null?'—':Number(n).toLocaleString('zh-CN',{maximumFractionDigits:1});
+// 展示简写；悬停仍可查看未缩写的数值，费用始终用原始Token计算。
+const compactTokens=n=>n==null?'—':n>=1e6?(n/1e6).toFixed(2)+'M':n>=1e3?(n/1e3).toFixed(1)+'K':fmt(n);
+function tokenCell(value){const cell=el('td',compactTokens(value));cell.title=fmt(value)+' Token';return cell}
+function el(tag,text,cls){const n=document.createElement(tag);if(text!=null)n.textContent=text;if(cls)n.className=cls;return n}
+function render(){const items=snapshot.items||[];$('total').textContent=items.length;$('alerts').textContent=items.filter(x=>x.attention).length;$('rows').textContent=fmt(items.reduce((s,x)=>s+(x.count||0),0));$('checked').textContent=snapshot.checked_at?new Date(snapshot.checked_at).toLocaleString('zh-CN',{timeZone:'Asia/Shanghai'}):'尚未扫描';$('notice').textContent=[snapshot.scan_failed?'本轮检查失败。':'',snapshot.stale?'快照较旧，请关注扫描任务。':'',snapshot.trading_day===false?'今日非交易日，免更新缺失告警。':'',snapshot.message||''].join(' ');$('groups').replaceChildren();const selected=items.filter(x=>(!$('only').checked||x.attention)&&(!$('group').value||x.group===$('group').value)&&(x.group+x.label+x.message).includes($('search').value));for(const group of [...new Set(selected.map(x=>x.group))]){const section=el('section');section.append(el('h2',group));const wrap=el('div',null,'scroll'),table=el('table'),head=el('tr');for(const title of ['数据范围','状态','目标日期 / 频率','目标日量','前五日均值','相对均值','最新数据 / 入库时间'])head.append(el('th',title));const thead=el('thead');thead.append(head);table.append(thead);const body=el('tbody');for(const item of selected.filter(x=>x.group===group)){const row=el('tr');const name=el('td',item.label);name.append(el('small',item.id));row.append(name);const status=el('td',null,item.attention?'warn':'good');status.append(el('span',item.message,'badge'));if(item.volume_note)status.append(el('small',item.volume_note));row.append(status);const target=el('td',item.target_date||'—');target.append(el('small',item.cadence||''));row.append(target,el('td',fmt(item.count)));const baseline=el('td',fmt(item.baseline_mean));if(item.history){const details=el('details');details.append(el('summary','查看每日数量'));for(const day of item.history)details.append(el('div',day.date+' · '+fmt(day.count)));baseline.append(details)}row.append(baseline,el('td',item.ratio==null?'无可比基线':fmt(item.ratio*100)+'%'));const latest=el('td',item.latest_date||'—');latest.append(el('small','目标日批次最新入库/变更：'+(item.arrived_at||'—')));row.append(latest);body.append(row)}table.append(body);wrap.append(table);section.append(wrap);$('groups').append(section)}if(!selected.length)$('groups').append(el('p','暂无匹配数据。'))}
+async function refresh(){try{const response=await fetch('status/data',{cache:'no-store'});if(!response.ok)throw Error();snapshot=await response.json();const selected=$('group').value;$('group').replaceChildren(new Option('全部分类',''));for(const g of [...new Set((snapshot.items||[]).map(x=>x.group))])$('group').add(new Option(g,g));$('group').value=selected;render()}catch{$('notice').textContent='状态接口暂不可用；请稍后重试。'}}
+for(const id of ['search','group','only'])$(id).addEventListener('input',render);$('refresh').onclick=refresh;refresh();setInterval(refresh,60000);
+$('usage-load').onclick=async()=>{
+  $('usage-note').textContent='读取中…';
+  try {
+    const r=await fetch('v1/usage/daily?days='+$('usage-days').value,{credentials:'same-origin',cache:'no-store'});
+    if(!r.ok)throw Error(r.status===401?'请先登录管理员账号':r.status===403?'仅管理员可查看':'统计暂不可用（'+r.status+'）');
+    const result=await r.json();
+    $('usage-note').textContent='Token：K = 千，M = 百万，悬停查看完整数值。费用按 ¥2 / 1M Token 估算（含测试），仅供参考；用量不全时仅估已记录部分。';
+    $('usage-method').textContent=result.note+' 外部请求采集起点：'+(result.collection_started_at||'未建立')+'；含历史缺口时系统总量显示—，已记录量单独列出。';
+    const table=el('table'),head=el('tr');
+    for(const title of ['日期','系统总Token','已记录Token','估算费用','对话Token','MCP Token','HTTP Token','测试Token','缺失请求'])head.append(el('th',title));
+    const thead=el('thead');thead.append(head);table.append(thead);const body=el('tbody');
+    for(const day of result.days){
+      const row=el('tr');row.append(el('td',day.date),tokenCell(day.total_tokens),tokenCell(day.known_total_tokens));
+      const costTokens=day.total_tokens??day.known_total_tokens;
+      const cost=el('td',costTokens==null?'—':costTokens>0&&costTokens<5000?'< ¥0.01':'¥'+(costTokens*2/1e6).toFixed(2));
+      if(day.total_tokens==null&&costTokens!=null)cost.append(el('small','仅已记录'));
+      row.append(cost);
+      for(const channel of [day.chat,day.mcp,day.http_api,day.test]){
+        const cell=tokenCell(channel?.total_tokens);
+        const detail=el('small',fmt(channel?.requests)+'次 · 均 '+compactTokens(channel?.average_tokens));
+        detail.title='请求次数：'+fmt(channel?.requests)+'；平均Token：'+fmt(channel?.average_tokens);
+        cell.append(detail);row.append(cell);
+      }
+      row.append(el('td',fmt(day.unknown_usage_requests)));
+      body.append(row);
+    }
+    table.append(body);$('usage-table').replaceChildren(table);
+  }catch(e){$('usage-note').textContent=e.message;$('usage-table').replaceChildren();}
+};
+$('usage-load').click();
+</script></body></html>

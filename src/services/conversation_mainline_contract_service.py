@@ -24,7 +24,6 @@ class ConversationMainlineContractService:
         dispatch_plan: Dict[str, Any],
         execution_plan: Dict[str, Any],
         work_context: Dict[str, Any],
-        conversation_state: Dict[str, Any],
     ) -> Dict[str, Any]:
         selected_path = execution_plan.get("selected_path") if isinstance(execution_plan.get("selected_path"), dict) else {}
         entry = self._trim(dispatch_plan.get("entry")) or self._trim(selected_path.get("type")) or "agent_route"
@@ -77,7 +76,6 @@ class ConversationMainlineContractService:
                     or work_context.get("active_skill_canonical_name")
                     or work_context.get("active_skill_name")
                 ),
-                "conversation_state": self._trim(conversation_state.get("state")),
             },
         }
 
@@ -108,7 +106,7 @@ class ConversationMainlineContractService:
             return "vision_runtime"
         if path_type in {"asset_open", "catalog_browse"}:
             return "system_runtime"
-        return "assistant_agent_runtime"
+        return "agent_runtime"
 
     def _responsibilities(self, *, runtime_lane: str) -> Dict[str, List[str]]:
         planner = [

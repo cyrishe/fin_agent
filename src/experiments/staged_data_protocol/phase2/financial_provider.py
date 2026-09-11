@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from src.experiments.staged_data_protocol.phase2 import python_filter as pf
+
 import re
 from dataclasses import dataclass
 from datetime import date, datetime
@@ -115,9 +117,14 @@ OP_SQL = {"=": "=", "==": "=", "!=": "!=", ">": ">", ">=": ">=", "<": "<", "<=":
 FILTER_RE = re.compile(
     r"(?:(?P<connector>\band\b|\bor\b)\s+)?"
     r"(?P<field>[A-Za-z_]\w*)\s*"
-    r"(?P<op>in|=|==|!=|>=|<=|>|<)\s*"
+    r"(?P<op>in|==|=|!=|>=|<=|>|<)\s*"
     r"(?P<value>\[[^\]]+\]|\([^)]+\)|[^,;]+?)"
-    r"(?=\s+(?:and|or)\s+[A-Za-z_]\w*\s*(?:in|=|==|!=|>=|<=|>|<)|[,;]|$)",
+    r"(?=\s+(?:and|or)\s+[A-Za-z_]\w*\s*(?:in|==|=|!=|>=|<=|>|<)|[,;]|$)",
+    flags=re.IGNORECASE,
+)
+GROUPED_OR_RE = re.compile(r"\((?P<body>[^()]+)\)")
+GROUPED_OR_TERM_RE = re.compile(
+    r"(?P<field>[A-Za-z_]\w*)\s*=\s*(?P<value>[^,;()]+?)",
     flags=re.IGNORECASE,
 )
 
@@ -155,8 +162,13 @@ def execute_financial_3_table_api(*, subject: str, args: Mapping[str, Any], outp
     where_sql, params = _build_where(source=source, args=args)
     order_sql = _build_order(source=source, args=args)
     query_columns = _query_columns(columns=columns, computed_columns=computed_columns)
-    sql = _build_sql(source=source, columns=query_columns, where_sql=where_sql, order_sql=order_sql)
-    params.append(sql_limit)
+    filter_columns = []
+    if pf.condition(args) is not None and post_process:
+        filter_columns = [p["field"] for p in pf.predicates(pf.condition(args)) if p["field"] in source.fields]
+        query_columns = list(dict.fromkeys([*query_columns, *filter_columns]))
+    sql = _build_sql(source=source, columns=query_columns, where_sql=where_sql, order_sql=order_sql, limited=sql_limit > 0)
+    if sql_limit > 0:
+        params.append(sql_limit)
 
     db = StockInfoDbUtils(database="kingdomai")
     try:
@@ -166,10 +178,11 @@ def execute_financial_3_table_api(*, subject: str, args: Mapping[str, Any], outp
             if computed_columns:
                 _attach_computed_fields(cursor=cursor, rows=raw_rows, args=args, computed_columns=computed_columns)
         processing_columns = _processing_columns(columns=columns, computed_columns=computed_columns)
+        processing_columns = list(dict.fromkeys([*processing_columns, *filter_columns]))
         rows = [_normalize_row(row, processing_columns) for row in raw_rows]
         rows = _filter_post_rows(source=source, args=args, rows=rows)
         rows = _sort_post_rows(args=args, rows=rows)
-        if post_process:
+        if post_process and limit > 0:
             rows = rows[:limit]
         rows = [_project_row(row, columns) for row in rows]
         return _standard_result(
@@ -266,7 +279,7 @@ def _output_token(output: str) -> str:
 
 
 def _has_unresolved_ref(args: Mapping[str, Any]) -> bool:
-    return any(isinstance(value, str) and re.search(r"\br\d+\.", value) for value in args.values())
+    return pf.has_unresolved_refs(args)
 
 
 def _bounded_limit(value: Any) -> int:
@@ -274,18 +287,23 @@ def _bounded_limit(value: Any) -> int:
         parsed = int(value)
     except Exception:
         parsed = 100
+    if parsed == -1:
+        return -1
     if parsed <= 0:
         parsed = 100
     return max(1, min(parsed, 500))
 
 
 def _candidate_limit(output_limit: int) -> int:
+    if output_limit == -1:
+        return -1
     return max(output_limit, min(max(output_limit * 20, 1000), 10000))
 
 
 def _build_where(*, source: FinancialSource, args: Mapping[str, Any]) -> tuple[str, List[Any]]:
     clauses: List[str] = []
     params: List[Any] = []
+    explicit_filters = _explicit_filters(source=source, args=args)
     report_date = str(args.get("report_date") or args.get("report_period") or args.get("date") or "").strip()
     start = str(args.get("start") or args.get("start_date") or "").strip()
     end = str(args.get("end") or args.get("end_date") or "").strip()
@@ -296,22 +314,35 @@ def _build_where(*, source: FinancialSource, args: Mapping[str, Any]) -> tuple[s
     elif start and end:
         clauses.append("i.report_period BETWEEN %s AND %s")
         params.extend(sorted([start, end]))
-    else:
+    elif not any(field_name in {"report_date", "report_period"} for _, field_name, _, _ in explicit_filters):
         clauses.append("i.report_period = (SELECT MAX(report_period) FROM kcrp_stock_income)")
     clauses.append("i.statement_type = %s")
     params.append(statement_type)
 
-    filter_sql, filter_params = _build_filter_clauses(source=source, args=args)
+    filter_sql, filter_params = _build_filter_clauses(
+        source=source,
+        args=args,
+        explicit_filters=explicit_filters,
+    )
     if filter_sql:
         clauses.append(filter_sql)
         params.extend(filter_params)
     return " AND ".join(clauses), params
 
 
-def _build_filter_clauses(*, source: FinancialSource, args: Mapping[str, Any]) -> tuple[str, List[Any]]:
+def _build_filter_clauses(
+    *,
+    source: FinancialSource,
+    args: Mapping[str, Any],
+    explicit_filters: List[tuple[str, str, str, Any]] | None = None,
+) -> tuple[str, List[Any]]:
+    if pf.condition(args) is not None:
+        return pf.and_sql(_build_filter_clauses(source=source, args=pf.without_filter(args)),
+                          pf.sql_filter(args, source.fields, allowed=set(source.fields)))
     clauses: List[str] = []
     params: List[Any] = []
-    for connector, field_name, op, value in _explicit_filters(source=source, args=args):
+    filters = explicit_filters if explicit_filters is not None else _explicit_filters(source=source, args=args)
+    for connector, field_name, op, value in filters:
         if _computed_base(field_name):
             continue
         expression = source.fields.get(field_name)
@@ -346,6 +377,8 @@ def _ignored_filters(*, source: FinancialSource, args: Mapping[str, Any]) -> Lis
 
 
 def _explicit_filters(*, source: FinancialSource, args: Mapping[str, Any]) -> List[tuple[str, str, str, Any]]:
+    if pf.condition(args) is not None:
+        return _explicit_filters(source=source, args=pf.without_filter(args)) + pf.leaf_items(args)
     rows: List[tuple[str, str, str, Any]] = []
     for field_name in source.fields:
         value = args.get(field_name)
@@ -355,7 +388,7 @@ def _explicit_filters(*, source: FinancialSource, args: Mapping[str, Any]) -> Li
         value = args.get(plural)
         if value not in (None, "") and field_name in source.fields:
             rows.append(("AND", field_name, "in", value))
-    filter_text = str(args.get("filter") or "").strip()
+    filter_text = _normalize_grouped_same_field_or(str(args.get("filter") or "").strip())
     for match in FILTER_RE.finditer(filter_text):
         rows.append(
             (
@@ -366,6 +399,33 @@ def _explicit_filters(*, source: FinancialSource, args: Mapping[str, Any]) -> Li
             )
         )
     return rows
+
+
+def _normalize_grouped_same_field_or(filter_text: str) -> str:
+    """Collapse ``(field = a or field = b)`` to an equivalent IN predicate.
+
+    The lightweight provider parser intentionally supports a small filter
+    grammar.  Normalizing same-field OR groups preserves their boolean scope
+    without teaching the provider a second, partial SQL expression parser.
+    Groups containing different fields or operators are left untouched.
+    """
+
+    def replace(match: re.Match[str]) -> str:
+        body = str(match.group("body") or "").strip()
+        parts = re.split(r"\s+or\s+", body, flags=re.IGNORECASE)
+        if len(parts) < 2:
+            return match.group(0)
+        terms = [GROUPED_OR_TERM_RE.fullmatch(part.strip()) for part in parts]
+        if any(term is None for term in terms):
+            return match.group(0)
+        field_names = {str(term.group("field") or "").lower() for term in terms if term is not None}
+        if len(field_names) != 1:
+            return match.group(0)
+        field_name = str(terms[0].group("field") or "")
+        values = ", ".join(str(term.group("value") or "").strip() for term in terms if term is not None)
+        return f"{field_name} in [{values}]"
+
+    return GROUPED_OR_RE.sub(replace, str(filter_text or ""))
 
 
 def _clean_value(value: str) -> Any:
@@ -405,7 +465,7 @@ def _build_order(*, source: FinancialSource, args: Mapping[str, Any]) -> str:
     return f"{expression} {direction_sql}, i.report_period DESC, i.ann_date DESC"
 
 
-def _build_sql(*, source: FinancialSource, columns: List[str], where_sql: str, order_sql: str) -> str:
+def _build_sql(*, source: FinancialSource, columns: List[str], where_sql: str, order_sql: str, limited: bool = True) -> str:
     select_sql = ", ".join(f"{source.fields[column]} AS `{column}`" for column in columns)
     return f"""
         SELECT {select_sql}
@@ -424,7 +484,7 @@ def _build_sql(*, source: FinancialSource, columns: List[str], where_sql: str, o
            AND fi.report_period = i.report_period
         WHERE {where_sql}
         ORDER BY {order_sql}
-        LIMIT %s
+        {'LIMIT %s' if limited else ''}
     """
 
 
@@ -556,6 +616,9 @@ def _computed_columns_for_request(*, source: FinancialSource, args: Mapping[str,
 
 
 def _filter_post_rows(*, source: FinancialSource, args: Mapping[str, Any], rows: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    tree = pf.condition(args)
+    if tree is not None:
+        return [row for row in rows if pf.evaluate(tree, row)] if _computed_filter_fields(source=source, args=args) else rows
     result = rows
     for _connector, field_name, op, value in _explicit_filters(source=source, args=args):
         if not _computed_base(field_name):

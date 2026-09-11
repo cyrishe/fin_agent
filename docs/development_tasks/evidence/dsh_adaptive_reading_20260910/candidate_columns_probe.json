@@ -1,0 +1,96 @@
+{
+  "model": "deepseek-v4-flash-0731",
+  "scope": "Candidate columns description only; not applied to runtime; two independent single-step probes",
+  "candidate_columns_description": "需要参与本轮分析的结果列；依据 schema 和样本选择。遍历全部行也可只读这些列；省略时返回本页全部列。",
+  "cases": [
+    {
+      "run": 1,
+      "duration_ms": 8997,
+      "tool_calls": [
+        {
+          "name": "load_finance_result",
+          "arguments": {
+            "result_ref": "session://fixture/vars/v1",
+            "columns": [
+              "report_id",
+              "stock_name",
+              "institution",
+              "rating",
+              "investment_highlights",
+              "risk_warnings"
+            ],
+            "limit": 50
+          }
+        },
+        {
+          "name": "load_finance_result",
+          "arguments": {
+            "result_ref": "session://fixture/vars/v1",
+            "columns": [
+              "institution"
+            ],
+            "limit": 200
+          }
+        }
+      ],
+      "answer": "我已取得 190 篇研报的完整结果（result r1）。下面进一步读取内容，梳理共识与分歧、标注来源",
+      "usage": {
+        "completion_tokens": 695,
+        "prompt_tokens": 3745,
+        "total_tokens": 4440,
+        "completion_tokens_details": {
+          "accepted_prediction_tokens": null,
+          "audio_tokens": null,
+          "reasoning_tokens": 484,
+          "rejected_prediction_tokens": null
+        },
+        "prompt_tokens_details": {
+          "audio_tokens": null,
+          "cached_tokens": 2048
+        }
+      }
+    },
+    {
+      "run": 2,
+      "duration_ms": 9605,
+      "tool_calls": [
+        {
+          "name": "load_finance_result",
+          "arguments": {
+            "result_ref": "r1",
+            "columns": [
+              "institution",
+              "rating",
+              "stock_name"
+            ],
+            "limit": 190
+          }
+        },
+        {
+          "name": "read_finance_catalog",
+          "arguments": {
+            "subject": "stock",
+            "dataview": "report",
+            "operation": "aggregate"
+          }
+        }
+      ],
+      "answer": "The query returned 190 reports and they are saved. The sample shows a fixture-like dataset where some text appears identical, so I need to read the actual content across all 190 reports to properly summarize consensus, divergence, and attribute sources. Let me examine the composition of institutions, ratings, and stocks first.\n\n",
+      "usage": {
+        "completion_tokens": 735,
+        "prompt_tokens": 3745,
+        "total_tokens": 4480,
+        "completion_tokens_details": {
+          "accepted_prediction_tokens": null,
+          "audio_tokens": null,
+          "reasoning_tokens": 514,
+          "rejected_prediction_tokens": null
+        },
+        "prompt_tokens_details": {
+          "audio_tokens": null,
+          "cached_tokens": 3072
+        }
+      }
+    }
+  ]
+}

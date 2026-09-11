@@ -1,0 +1,6 @@
+interface:
+  display_name: "金融工具流程图"
+  short_description: "把模块流程设计转为清晰流程图"
+  default_prompt: "Use $financial-tool-flowchart to turn the current financial tool design into a readable flowchart without changing the design."
+policy:
+  allow_implicit_invocation: false

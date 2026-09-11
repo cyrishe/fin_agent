@@ -7,6 +7,10 @@ from src.prompting.prompt_registry import get_prompt_registry
 from src.utils.ai_service import chat_qwen_flash_json
 
 
+class ConversationTaskFinalizerError(RuntimeError):
+    pass
+
+
 class ConversationTaskFinalizerService:
     def __init__(self) -> None:
         self.registry = get_prompt_registry()
@@ -48,22 +52,19 @@ class ConversationTaskFinalizerService:
                 },
             )
             payload, usage = chat_qwen_flash_json(messages, enable_think=False)
-            if isinstance(payload, dict):
-                normalized = self._normalize_payload(payload, raw_user_text=text)
-                normalized["source"] = "llm"
-                normalized["llm_usage"] = usage if isinstance(usage, dict) else {}
-                normalized["messages"] = messages
-                return normalized
-        except Exception:
-            pass
-        return self._fallback_result(
-            raw_user_text=text,
-            context_relation=context_relation,
-            focus=focus or {},
-            target_asset=target_asset or {},
-            domain=domain,
-            context_resolution=context_resolution or {},
-        )
+        except Exception as exc:
+            raise ConversationTaskFinalizerError(f"本轮任务语义整理失败：{exc}") from exc
+        if not isinstance(payload, dict):
+            raise ConversationTaskFinalizerError("本轮任务语义整理失败：模型没有返回 JSON 对象")
+        normalized = self._normalize_payload(payload, raw_user_text=text)
+        normalized["source"] = "llm"
+        normalized["llm_usage"] = usage if isinstance(usage, dict) else {
+            "prompt_tokens": int(getattr(usage, "prompt_tokens", 0) or 0),
+            "completion_tokens": int(getattr(usage, "completion_tokens", 0) or 0),
+            "total_tokens": int(getattr(usage, "total_tokens", 0) or 0),
+        }
+        normalized["messages"] = messages
+        return normalized
 
     def _empty_result(self, raw_user_text: str, *, source: str = "empty") -> Dict[str, Any]:
         return {
@@ -72,53 +73,6 @@ class ConversationTaskFinalizerService:
             "round_task_desc": self._trim(raw_user_text),
             "task_splitd": [],
             "source": source,
-        }
-
-    def _fallback_result(
-        self,
-        *,
-        raw_user_text: str,
-        context_relation: str,
-        focus: Dict[str, Any],
-        target_asset: Dict[str, Any],
-        domain: str,
-        context_resolution: Dict[str, Any],
-    ) -> Dict[str, Any]:
-        text = self._trim(raw_user_text)
-        focus_label = self._trim(focus.get("label"))
-        target_label = self._trim(target_asset.get("label"))
-        resolution_summary = self._trim(context_resolution.get("resolution_summary"))
-        if domain == "system":
-            desc = f"用户提出系统侧请求：{text}。"
-            if target_label:
-                desc = f"用户希望处理系统侧目标 `{target_label}`。当前请求是：{text}。"
-        elif context_relation == "corrective":
-            if focus_label:
-                desc = f"用户质疑或纠正上一轮与 `{focus_label}` 相关的结果，当前要求是：{text}。"
-            else:
-                desc = f"用户质疑或纠正上一轮结果，当前要求是：{text}。"
-        elif context_relation == "referential":
-            if focus_label:
-                desc = f"用户引用前文对象 `{focus_label}`，当前问题是：{text}。"
-            elif resolution_summary:
-                desc = f"{resolution_summary}当前问题是：{text}。"
-            else:
-                desc = f"用户的问题依赖前文上下文，当前输入是：{text}。"
-        elif context_relation == "followup":
-            if focus_label:
-                desc = f"用户希望继续上一轮任务，当前仍围绕 `{focus_label}` 继续推进。"
-            elif resolution_summary:
-                desc = resolution_summary
-            else:
-                desc = f"用户希望继续上一轮任务，当前输入是：{text}。"
-        else:
-            desc = text
-        return {
-            "raw_user_text": text,
-            "analize": "",
-            "round_task_desc": desc,
-            "task_splitd": [],
-            "source": "fallback_rule",
         }
 
     def _normalize_payload(self, payload: Dict[str, Any], *, raw_user_text: str) -> Dict[str, Any]:
