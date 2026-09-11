@@ -118,6 +118,8 @@ def _catalog_projection(catalog: FinanceDataToolCatalogService) -> dict[str, Any
                     "description": str(dataview.get("description") or dataview.get("desc") or "").strip(),
                     "operations": operations,
                     "field_count": len(dataview.get("fields") or []),
+                    "public_name": str(dataview.get("public_name") or "").strip(),
+                    "fields": dataview.get("fields") or [],
                 }
             )
         subjects.append(

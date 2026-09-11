@@ -122,7 +122,7 @@
       <div class="legend" aria-label="层级说明">
         <span><i class="dot" style="background:var(--primary)"></i> 中心</span>
         <span><i class="dot" style="background:var(--c2)"></i> 数据主体</span>
-        <span>主体 → 业务域 → dataview → 数据范围</span>
+        <span>主体 → 业务分类 → 具体数据项</span>
       </div>
       <div class="controls" aria-label="图形控制">
         <button type="button" data-action="collapse">收起到主体</button>
@@ -195,9 +195,13 @@
       let height = 650;
       let radius = 230;
 
-      function compactDescription(text) {
-        const first = String(text || '').split('。')[0];
-        return first.replace(/^.+?用于查询/, '').replace(/^.+?覆盖/, '').slice(0, 38) || '数据字段以 Catalog 为准';
+      function fieldNode(field) {
+        const label = (field.aliases || []).find(alias => /[\u3400-\u9fff]/.test(alias)) || field.name;
+        return {
+          name: label.replace(/[（(].*$/, ''),
+          key: field.name,
+          detail: [label, field.name, field.desc].filter(Boolean).join(' · '),
+        };
       }
 
       function buildTree(catalog) {
@@ -212,17 +216,22 @@
             return {
               name: subjectLabels[subject.name] || subject.name,
               subject: subject.name,
-              children: effective.map(([groupName, names]) => ({
-                name: groupName,
-                children: names.filter(name => views.has(name)).map(name => {
+              children: effective.map(([groupName, names]) => {
+                const children = names.filter(name => views.has(name)).map(name => {
                   const view = views.get(name);
-                  const operations = view.operations.length ? ` · ${view.operations.join('/')}` : '';
                   return {
-                    name: `${name}${operations}`,
-                    children: [{ name: compactDescription(view.description) }],
+                    name: view.public_name || view.description || name,
+                    key: name,
+                    detail: [view.description, `${subject.name}.${name}`, (view.operations || []).join('/')].filter(Boolean).join(' · '),
+                    children: Array.isArray(view.fields) ? view.fields.map(fieldNode) : [{ name: view.description || name }],
                   };
-                }),
-              })).filter(group => group.children.length),
+                });
+                // A single view adds no business distinction: show its fields
+                // directly under the category, rather than another API-name node.
+                return children.length === 1
+                  ? { name: groupName, detail: children[0].detail, children: children[0].children }
+                  : { name: groupName, children };
+              }).filter(group => group.children.length),
             };
           }),
         };
@@ -261,21 +270,24 @@
       }
 
       function nodePath(node) {
-        return node.ancestors().reverse().map(item => item.data.name).join(' › ');
+        return node.ancestors().reverse().map(item => item.data.key || item.data.name).join(' › ');
       }
 
       function center(animated = true) {
-        const transform = d3.zoomIdentity.translate(width / 2, height / 2).scale(0.9);
+        const bounds = viewport.node().getBBox();
+        const scale = Math.min(1, (width - 50) / Math.max(1, bounds.width), (height - 50) / Math.max(1, bounds.height));
+        const transform = d3.zoomIdentity.translate(width / 2 - (bounds.x + bounds.width / 2) * scale, height / 2 - (bounds.y + bounds.height / 2) * scale).scale(scale);
         (animated ? svg.transition().duration(300) : svg).call(zoom.transform, transform);
       }
 
       function update(source = hierarchy) {
         const visible = hierarchy.descendants();
         const maxDepth = Math.max(1, d3.max(visible, node => node.depth));
-        d3.tree().size([Math.PI * 2, radius]).separation(
+        const layoutRadius = Math.max(radius, hierarchy.leaves().length * 14 / (Math.PI * 2));
+        d3.tree().size([Math.PI * 2, layoutRadius]).separation(
           (a, b) => (a.parent === b.parent ? 1 : 1.2) / Math.max(1, a.depth),
         )(hierarchy);
-        visible.forEach(node => { node.y = node.depth * radius / maxDepth; });
+        visible.forEach(node => { node.y = node.depth * layoutRadius / maxDepth; });
 
         linksLayer.selectAll('path.link')
           .data(hierarchy.links(), link => nodePath(link.target))
@@ -300,9 +312,11 @@
               node.children = node._children;
               node._children = null;
             }
-            statusElement.textContent = nodePath(node);
+            statusElement.textContent = node.ancestors().reverse().map(item => item.data.name).join(' › ') + (node.data.detail ? '：' + node.data.detail : '');
             update(node);
+            d3.timeout(() => center(), 280);
           });
+        entered.append('title').text(node => node.data.detail || node.data.name);
         entered.append('circle');
         entered.append('text').attr('dy', '0.32em');
 
@@ -334,7 +348,7 @@
         radius = Math.max(150, Math.min(width, height) / 2 - (width < 580 ? 65 : 90));
         svg.attr('viewBox', `0 0 ${width} ${height}`);
         update(hierarchy);
-        center(false);
+        d3.timeout(() => center(false), 280);
       }
 
       async function initialize() {
@@ -349,16 +363,16 @@
           viewport = svg.append('g');
           linksLayer = viewport.append('g');
           nodesLayer = viewport.append('g');
-          zoom = d3.zoom().scaleExtent([0.42, 3.5]).on('zoom', event => viewport.attr('transform', event.transform));
+          zoom = d3.zoom().scaleExtent([0.02, 5]).on('zoom', event => viewport.attr('transform', event.transform));
           svg.call(zoom);
 
           document.querySelector('[data-action="collapse"]').addEventListener('click', () => {
-            collapseToSubjects(); update(hierarchy); center();
+            collapseToSubjects(); update(hierarchy); d3.timeout(() => center(), 280);
             statusElement.textContent = '已收起：显示全部数据主体。';
           });
           document.querySelector('[data-action="expand"]').addEventListener('click', () => {
-            expand(hierarchy); update(hierarchy); center();
-            statusElement.textContent = '已展开：显示全部业务域、dataview 与数据范围。';
+            expand(hierarchy); update(hierarchy); d3.timeout(() => center(), 280);
+            statusElement.textContent = '已展开：显示全部业务分类与具体数据项；可放大查看。';
           });
           document.querySelector('[data-action="zoom-in"]').addEventListener('click', () => svg.transition().duration(180).call(zoom.scaleBy, 1.25));
           document.querySelector('[data-action="zoom-out"]').addEventListener('click', () => svg.transition().duration(180).call(zoom.scaleBy, 0.8));

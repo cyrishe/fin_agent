@@ -70,6 +70,14 @@ def test_public_health_catalog_and_data_map() -> None:
         assert catalog.status_code == 200
         assert catalog.json()["subject_count"] == 7
         assert catalog.json()["dataview_count"] == 31
+        for subject in catalog.json()["subjects"]:
+            for view in subject["dataviews"]:
+                assert len(view["fields"]) == view["field_count"]
+                assert all(field["name"] for field in view["fields"])
+        bond = next(subject for subject in catalog.json()["subjects"] if subject["name"] == "bond")
+        quote = next(view for view in bond["dataviews"] if view["name"] == "quote")
+        assert quote["public_name"] == "行情"
+        assert {"open", "close", "pct", "volumn"} <= {field["name"] for field in quote["fields"]}
 
         assert client.get("/v1/finance/catalog").status_code == 401
         protected_catalog = client.get(
