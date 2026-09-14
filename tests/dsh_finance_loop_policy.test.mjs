@@ -15,6 +15,18 @@ const NAMES = {
   details: 'mcp__finance__load_finance_result',
 }
 
+test('authorized search can read candidates then selected articles without forcing a database query', async () => {
+  const search = 'mcp__finance__general_search'
+  const runtime = fixture({}, [], { ...NAMES, search })
+  runtime.event({ type: 'turn/start', data: { turn: 1 } })
+  completeCall(runtime, 1, 'headlines', search, { ok: true, data: [{ title: '行业消息' }] })
+  completeCall(runtime, 2, 'articles', search, { ok: true, data: [{ content_markdown: '正文证据' }] })
+  runtime.stopping()
+  assert.equal(runtime.steered.length, 0)
+  const next = await runtime.preStep({ step: 3 })
+  assert.doesNotMatch(JSON.stringify(next.messages), /unknown_tool_stopped/)
+})
+
 test('completion facts land before synthesis and do not demand a second answer', async () => {
   for (const details of [false, true]) {
     const runtime = fixture({ maxQueryAttempts: 8 })

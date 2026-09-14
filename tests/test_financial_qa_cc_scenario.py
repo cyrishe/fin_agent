@@ -1788,13 +1788,13 @@ def test_financial_qa_service_uses_resolved_question_and_normal_qa_only() -> Non
     assert session.calls[0]["user_text"].startswith("那它呢？")
     assert "[上下文指代参考]\n贵州茅台最近交易日的收盘价是多少？" in session.calls[0]["user_text"]
     assert "context_window" not in session.calls[0]["context"]
-    assert session.calls[0]["context"]["allowed_agent_tools"] == []
+    assert session.calls[0]["context"]["allowed_agent_tools"] == ["general_search"]
     assert session.calls[0]["context"]["allowed_finance_skills"] == [
         "stock-research",
         "earnings-analysis",
     ]
     assert session.calls[0]["context"]["skill_tool_access"] == {
-        "stock-research": [],
+        "stock-research": ["general_search"],
         "earnings-analysis": [],
     }
     assert session.calls[0]["context"]["_resolved_question"] == (

@@ -31,7 +31,9 @@ def test_discovery_extends_existing_identities_without_duplicate_entries(catalog
     for skill_id in NEW + ENHANCED:
         item = next(entry for entry in entries if entry["id"] == skill_id)
         assert f"- {skill_id}: {item['description']}" in catalog.turn_snapshot()["routing_summary"]
-    assert all(catalog.allowed_tools_by_skill()[skill_id] == [] for skill_id in NEW)
+    assert catalog.allowed_tools_by_skill()["capital-flow-analysis"] == []
+    for skill_id in ("fund-analysis", "bond-analysis", "stock-comparison"):
+        assert catalog.allowed_tools_by_skill()[skill_id] == ["mcp__finance__general_search"]
 
 
 @pytest.mark.parametrize("skill_id", NEW + ENHANCED)

@@ -10,6 +10,7 @@
     "provider": {"type": "string"},
     "coverage": {"type": "string"},
     "query": {"type": "string"},
+    "index_url": {"type": "string"},
     "data": {
       "type": "array",
       "items": {
@@ -23,7 +24,8 @@
           "publish_time": {"type": "string"},
           "snippet": {"type": "string"},
           "category": {"type": "string"},
-          "score": {"type": "number"}
+          "score": {"type": "number"},
+          "content_markdown": {"type": "string"}
         },
         "additionalProperties": false
       }

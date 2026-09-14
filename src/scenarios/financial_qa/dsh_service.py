@@ -950,6 +950,8 @@ class FinanceDeepSeekHarnessSessionService:
             "_finance_detail_default_limit": detail_default_limit,
         }
         for context_key in (
+            "allowed_agent_tools",
+            "skill_tool_access",
             "allowed_finance_skills",
             "_finance_skill_catalog_prompt",
             "_finance_skill_catalog_revision",

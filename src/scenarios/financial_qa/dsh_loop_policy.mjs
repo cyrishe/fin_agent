@@ -19,6 +19,7 @@ const TOOL_SUFFIXES = Object.freeze({
   skill: 'read_finance_skill',
   reference: 'read_finance_skill_reference',
   identity: 'resolve_security',
+  search: 'general_search',
 })
 
 const DEFAULT_BUDGETS = Object.freeze({
@@ -590,7 +591,7 @@ function stageTools(state, tools) {
       // Exhausting provider queries does not revoke access to saved evidence.
       return state.dataOnlyRequested || state.dataOnlyComplete ? methods : [...methods, tools.details].filter(Boolean)
     }
-    return [...methods, tools.catalog, tools.query, tools.details, tools.identity].filter(Boolean)
+    return [...methods, tools.catalog, tools.query, tools.details, tools.identity, tools.search].filter(Boolean)
   }
   // Fast mode remains the explicit one-discovery/one-flow product contract.
   const allowed = state.stage === 'catalog' ? [tools.catalog]
@@ -809,7 +810,7 @@ function updateAfterStep(state, step, config) {
     return
   }
 
-  if (calls.every(call => ['skill', 'reference', 'identity'].includes(call.kind))) {
+  if (calls.every(call => ['skill', 'reference', 'identity', 'search'].includes(call.kind))) {
     // Method reads do not consume query attempts or complete the data stage.
     // A method can also answer a supplied-evidence question without a DB call.
     if (!state.dataOnlyRequested) state.requiredAction = false
@@ -932,7 +933,7 @@ function resolveToolNames(agent) {
   const resolved = {}
   for (const [kind, suffix] of Object.entries(TOOL_SUFFIXES)) {
     const matches = names.filter(candidate => candidate === suffix || candidate.endsWith(`__${suffix}`))
-    if (matches.length === 0 && ['skill', 'reference', 'identity'].includes(kind)) continue
+    if (matches.length === 0 && ['skill', 'reference', 'identity', 'search'].includes(kind)) continue
     if (matches.length !== 1) {
       throw new Error(
         `finance-loop-policy: expected exactly one visible tool ending in ${suffix}; found ${matches.join(', ') || '(none)'}`,

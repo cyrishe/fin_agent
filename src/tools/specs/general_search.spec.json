@@ -6,10 +6,15 @@
   "display_name": "资料搜索",
   "input_guidance": {
     "notes": [
+      "个股新闻优先用 stock_code（如 300408.SZ）读取新浪资讯目录。先浏览最新10至20条标题及日期，合并候选后为当前问题选择最多5篇正文，尽量以一次 urls 调用并行读取；分批读取时累计考虑已读文章，复用已有正文，不重复抓取，不足5篇不凑数。需要更广覆盖时可继续使用不带 stock_code 的搜索，补充候选仍纳入同一筛选预算。",
+      "选择正文时兼顾相关性、时效与信息增量：优先直接解释用户问题的公司或行业事件，按问题的时间窗口核对日期；同一事件的转载、近似标题或重复观点合并，优先原始发布者或证据更完整的报道，保留有新增事实或不同观点的来源。避免仅按最新顺序取前5条。目录可能含同名证券、基金持仓或产业链报道，结合证券代码、时间及正文确认关联；标题用于筛选线索，正文用于支持结论。",
+      "综合新闻时将价格涨跌归属到正文对应的证券市场与交易日；同一公司的不同上市证券分别表述。区分新闻报道、机构观点与分析推断，对关键结论附实际读取的原文链接；目录日期和抓取日期不能替代事件发生日。",
       "当前 provider 的 coverage 会随结果返回；internal_news 不代表完整互联网。",
+      "默认按日期降序返回最近结果；查询特定时段可传 start_time 和 end_time（YYYY-MM-DD）。公网网页的页面时间可能是修改时间，重要结论需核对正文发布日期。",
+      "公网检索可选免密钥 site_browser（新浪财经、证券时报）或 Brave；两者均可用 source_scope=[\"finance_news\"]。需要核对新闻正文时设置 include_content=true，只对前两条受支持网页并行提取有长度上限的 Markdown。",
       "公司、行业、政策、事件和主题新闻统一由本工具查询，不进入金融数据 catalog。"
     ],
-    "optional_fields": ["limit", "start_time", "end_time", "category_scope", "source_scope"],
+    "optional_fields": ["stock_code", "urls", "limit", "start_time", "end_time", "sort", "category_scope", "source_scope", "include_content"],
     "required_fields": ["query"]
   },
   "input_schema": "src/tools/definitions/general_search.tool.json#/schemas/input",

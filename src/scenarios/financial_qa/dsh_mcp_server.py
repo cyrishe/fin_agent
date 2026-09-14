@@ -17,7 +17,7 @@ from src.scenarios.financial_qa.empty_result import empty_result_context
 
 _EXPOSED_TOOLS = frozenset(
     {"read_finance_catalog", "finance_query", "load_finance_result",
-     "read_finance_skill", "read_finance_skill_reference", "resolve_security"}
+     "read_finance_skill", "read_finance_skill_reference", "resolve_security", "general_search"}
 )
 _REQUIRED_TOOLS = frozenset(
     {"read_finance_catalog", "finance_query", "load_finance_result"}
@@ -160,13 +160,14 @@ class FinanceDshMcpBridge:
         catalog_changed = (
             current_catalog_revision != self._catalog_revision_value
         )
+        tools_changed = self._tool_context(context).get("allowed_agent_tools") != self._tool_context(self._context).get("allowed_agent_tools")
         if not context_changed and not catalog_changed:
             return
         if context_changed:
             self._context = context
             self._context_revision = revision
             self._expected_catalog_revision = expected_catalog_revision
-        if catalog_changed:
+        if catalog_changed or tools_changed:
             self._rebuild_tools()
         else:
             self.tracker = self.tool_runtime.begin_turn(

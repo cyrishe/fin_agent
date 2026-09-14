@@ -183,6 +183,23 @@
       "article_wait_seconds": 2.0
     },
     {
+      "name": "sina_finance_search",
+      "enabled": true,
+      "search_url_template": "https://search.sina.com.cn/search?q={keyword}&tp=news",
+      "keyword_mode": "raw",
+      "allowed_domains": ["finance.sina.com.cn"],
+      "result_css_selectors": ["a[href*='finance.sina.com.cn/']"],
+      "result_link_patterns": ["https?://finance\\.sina\\.com\\.cn/.*/20\\d{2}-\\d{2}-\\d{2}/doc-[^?#]+\\.shtml"],
+      "article_content_selectors": ["#artibody", ".article-content", "article"],
+      "article_remove_selectors": ["script", "style", "iframe", ".advert", ".ad"],
+      "follow_css_selectors": [],
+      "follow_link_patterns": [],
+      "max_results_per_site": 10,
+      "max_follow_links_per_page": 0,
+      "search_wait_seconds": 2.0,
+      "article_wait_seconds": 2.0
+    },
+    {
       "name": "stcn",
       "enabled": true,
       "search_url_template": "https://stcn.com/article/search.html?search_type=news&keyword={keyword}&uncertainty=1&sorter=time",

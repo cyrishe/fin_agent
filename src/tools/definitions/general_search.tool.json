@@ -14,7 +14,7 @@
     "limit": 10
   },
   "identity": {
-    "description": "通过部署时配置的搜索服务查询外部资料；当前覆盖内部新闻库，未来可切换其他搜索 API。",
+    "description": "查询公开资料与新闻。个股可传 stock_code 读取按时间倒序的新浪资讯标题目录；结合问题选择链接后传 urls 读取去噪 Markdown 正文。其他问题通过配置的搜索服务查询。",
     "display_name": "资料搜索",
     "domain": "search",
     "owner": "tools"
@@ -61,11 +61,15 @@
       "additionalProperties": false,
       "properties": {
         "query": {"type": "string", "minLength": 1, "description": "检索词"},
+        "stock_code": {"type": "string", "description": "读取该股票的新浪资讯目录，仅返回标题、日期和链接；如 300408.SZ、sz300502。结合 query 判断哪些候选值得进一步阅读。"},
+        "urls": {"type": "array", "maxItems": 5, "items": {"type": "string"}, "description": "读取选中的受支持财经链接并返回去噪 Markdown。先按问题相关性、时效及同事件去重筛选，当前问题累计最多选5篇，优先一次并行读取，已有正文复用；传入时优先执行正文读取。"},
         "limit": {"type": "integer", "minimum": 1, "maximum": 50, "default": 10},
         "start_time": {"type": "string", "description": "可选的开始时间"},
         "end_time": {"type": "string", "description": "可选的结束时间"},
+        "sort": {"type": "string", "enum": ["date_desc", "date_asc", "relevance"], "default": "date_desc", "description": "默认按可核对的文章发布日期降序；无发布日期时参考搜索引擎页面时间，无法确定时间的结果排后。"},
         "category_scope": {"type": "array", "items": {"type": "string"}},
-        "source_scope": {"type": "array", "items": {"type": "string"}}
+        "source_scope": {"type": "array", "items": {"type": "string"}, "description": "Brave 公网搜索可传站点域名；finance_news 代表新浪财经、上海证券报、证券时报、中国证券报、证券日报。"},
+        "include_content": {"type": "boolean", "default": false, "description": "按需并行读取前两条受支持财经新闻网页，返回去噪后的短 Markdown 正文；默认只返回搜索结果以降低延迟。"}
       },
       "required": ["query"],
       "type": "object"

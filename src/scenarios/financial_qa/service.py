@@ -31,10 +31,9 @@ from src.services.invocation_input_resolver_service import InvocationInputResolv
 from src.services.skill_candidate_store_service import SkillCandidateStoreError
 from src.scenarios.financial_qa.business_skills import FinanceSkillUnavailableError
 
-# Financial QA is deliberately limited to the structured finance-data surface.
-# News and general web search belong to a separate search scenario and must not
-# leak into either the CC tool list or skill-granted tools here.
-_SUPPLEMENTARY_AGENT_TOOLS = frozenset()
+# Search is an optional supplemental capability. The agent profile still owns
+# authorization; a Skill declaration alone does not grant access.
+_SUPPLEMENTARY_AGENT_TOOLS = frozenset({"general_search"})
 _FINANCE_MCP_TOOL_PREFIX = "mcp__finance__"
 
 

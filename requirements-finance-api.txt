@@ -1,8 +1,9 @@
 # Runtime dependencies for the standalone financial REST/MCP service.
-# Keep this intentionally smaller than requirements.txt: the service does not
-# need Selenium or sentence-transformers/torch.
+# Keep this intentionally smaller than requirements.txt; the optional
+# site_browser search provider uses Selenium but does not need ML packages.
 requests==2.31.0
 beautifulsoup4==4.12.2
+selenium==4.10.0
 pandas>=2.0.0,<3.0.0
 Werkzeug>=3.1.0,<4.0.0
 openpyxl==3.1.5

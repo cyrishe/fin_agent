@@ -101,6 +101,7 @@ def test_native_skill_frontmatter_declares_only_needed_supplementary_tools() -> 
     assert access["stock-research"] == [
         "mcp__finance__general_search"
     ]
+    assert access["equity-report-analysis"] == ["mcp__finance__general_search"]
     assert FinanceBusinessSkillCatalog(root=ROOT).execution_budget_by_skill()[
         "stock-research"
     ] == "long"
