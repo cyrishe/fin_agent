@@ -87,6 +87,38 @@ export async function requestRegistrationCode(input: {
   };
 }
 
+export async function requestPasswordResetCode(input: { mobile: string }) {
+  const payload = await readJson<{
+    ok: boolean; challenge_id: string; mobile_masked: string;
+    expires_in_seconds: number; resend_after_seconds: number;
+  }>(await fetch(appPath("/api/auth/password-reset-code"), {
+    method: "POST", credentials: "include",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ mobile: input.mobile }),
+  }));
+  return {
+    challengeId: String(payload.challenge_id || ""),
+    mobileMasked: String(payload.mobile_masked || ""),
+    expiresInSeconds: Math.max(0, Number(payload.expires_in_seconds) || 0),
+    resendAfterSeconds: Math.max(0, Number(payload.resend_after_seconds) || 0),
+  };
+}
+
+export async function resetPhonePassword(input: {
+  mobile: string; challengeId: string; verificationCode: string;
+  password: string; confirmPassword: string;
+}): Promise<void> {
+  await readJson(await fetch(appPath("/api/auth/password-reset"), {
+    method: "POST", credentials: "include",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      mobile: input.mobile, challenge_id: input.challengeId,
+      verification_code: input.verificationCode,
+      password: input.password, confirm_password: input.confirmPassword,
+    }),
+  }));
+}
+
 export async function registerPhoneAccount(input: {
   realName?: string;
   mobile: string;

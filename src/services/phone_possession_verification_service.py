@@ -23,6 +23,7 @@ logger = logging.getLogger(__name__)
 
 CHALLENGE_TABLE = "aiia_phone_verification_challenge"
 _PURPOSE = "registration"
+_RESET_PURPOSE = "password_reset"
 _SUPPORTED_PROVIDERS = frozenset(
     {"disabled", "mock", "aliyun", "aliyun_pnvs"}
 )
@@ -476,7 +477,9 @@ class PhonePossessionVerificationService:
         self._require_secret()
         return self._hmac_hex(f"mobile:{normalized_mobile}")
 
-    def request_code(self, mobile: str, remote_addr: str) -> dict[str, Any]:
+    def request_code(self, mobile: str, remote_addr: str, *, purpose: str = _PURPOSE) -> dict[str, Any]:
+        if purpose not in {_PURPOSE, _RESET_PURPOSE}:
+            raise ValueError("unsupported phone challenge purpose")
         self._require_operational()
         normalized_mobile = _validate_mobile(mobile)
         normalized_remote_addr = _validate_remote_addr(remote_addr)
@@ -642,7 +645,7 @@ class PhonePossessionVerificationService:
                         challenge_id,
                         mobile_hash,
                         code_hash,
-                        _PURPOSE,
+                        purpose,
                         self.provider,
                         ip_hash,
                         expires_at,
@@ -772,7 +775,11 @@ class PhonePossessionVerificationService:
         challenge_id: str,
         mobile: str,
         code: str,
+        *,
+        purpose: str = _PURPOSE,
     ) -> PhonePossessionProof:
+        if purpose not in {_PURPOSE, _RESET_PURPOSE}:
+            raise ValueError("unsupported phone challenge purpose")
         self._require_operational()
         normalized_challenge_id = _validate_challenge_id(challenge_id)
         normalized_mobile = _validate_mobile(mobile)
@@ -784,6 +791,7 @@ class PhonePossessionVerificationService:
                 mobile=normalized_mobile,
                 mobile_hash=mobile_hash,
                 code=normalized_code,
+                purpose=purpose,
             )
         candidate_hash = self._code_hash(
             challenge_id=normalized_challenge_id,
@@ -812,7 +820,7 @@ class PhonePossessionVerificationService:
                     (normalized_challenge_id, mobile_hash),
                 )
                 row = cursor.fetchone()
-                if not row or _row_value(row, "purpose") != _PURPOSE:
+                if not row or _row_value(row, "purpose") != purpose:
                     raise PhonePossessionVerificationError(
                         "phone_code_invalid",
                         "验证码无效，请重新获取。",
@@ -1183,11 +1191,12 @@ class PhonePossessionVerificationService:
         mobile: str,
         mobile_hash: str,
         code: str,
+        purpose: str,
     ) -> PhonePossessionProof:
         # First establish that the challenge can still be attempted, then close
         # the connection before calling the provider. Registration consumption
         # remains protected by the account service's transaction.
-        self._load_verifiable_row(challenge_id, mobile_hash, for_update=False)
+        self._load_verifiable_row(challenge_id, mobile_hash, for_update=False, purpose=purpose)
         try:
             response = (
                 self._pnvs_verify_caller(mobile, code, challenge_id)
@@ -1240,7 +1249,7 @@ class PhonePossessionVerificationService:
             now = self._now()
             with db.conn.cursor(pymysql.cursors.DictCursor) as cursor:
                 row = self._select_verifiable_row(
-                    cursor, challenge_id, mobile_hash, now, for_update=True
+                    cursor, challenge_id, mobile_hash, now, for_update=True, purpose=purpose
                 )
                 max_attempts = _coerce_int(
                     _row_value(row, "max_attempts"),
@@ -1316,6 +1325,7 @@ class PhonePossessionVerificationService:
         mobile_hash: str,
         *,
         for_update: bool,
+        purpose: str = _PURPOSE,
     ) -> object:
         db = None
         try:
@@ -1327,6 +1337,7 @@ class PhonePossessionVerificationService:
                     mobile_hash,
                     self._now(),
                     for_update=for_update,
+                    purpose=purpose,
                 )
         except PhonePossessionVerificationError:
             raise
@@ -1347,6 +1358,7 @@ class PhonePossessionVerificationService:
         now: datetime,
         *,
         for_update: bool,
+        purpose: str = _PURPOSE,
     ) -> object:
         self._require_schema(cursor)
         lock_clause = " FOR UPDATE" if for_update else ""
@@ -1364,7 +1376,7 @@ class PhonePossessionVerificationService:
             (challenge_id, mobile_hash),
         )
         row = cursor.fetchone()
-        if not row or _row_value(row, "purpose") != _PURPOSE:
+        if not row or _row_value(row, "purpose") != purpose:
             raise PhonePossessionVerificationError(
                 "phone_code_invalid", "验证码无效，请重新获取。", False
             )

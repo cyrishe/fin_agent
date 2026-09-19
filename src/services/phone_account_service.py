@@ -547,5 +547,54 @@ class PhoneAccountService:
             "expires_at": str(session.get("expires_at") or ""),
         }
 
+    def request_password_reset_code(self, *, mobile: Any, remote_addr: str = "") -> Dict[str, Any]:
+        normalized_mobile = normalize_mainland_mobile(mobile)
+        if not self.user_sessions.account_schema_ready():
+            raise PhoneAccountError("account_storage_unavailable", "账户服务暂时不可用，请稍后重试。", status_code=503)
+        try:
+            challenge = self.possession_verifier.request_code(
+                normalized_mobile, remote_addr, purpose="password_reset"
+            )
+        except PhonePossessionVerificationError as exc:
+            raise self._map_possession_error(exc) from exc
+        result = {
+            "challenge_id": str(challenge.get("challenge_id") or ""),
+            "mobile_masked": self.user_sessions.mask_mobile(normalized_mobile),
+            "expires_in_seconds": self._seconds_until(challenge.get("expires_at")),
+            "resend_after_seconds": self._seconds_until(challenge.get("resend_after")),
+        }
+        if str(challenge.get("provider") or "") == "mock" and challenge.get("debug_code"):
+            result["debug_code"] = str(challenge["debug_code"])
+        return result
+
+    def reset_password(
+        self, *, mobile: Any, challenge_id: Any, verification_code: Any,
+        password: Any, confirm_password: Any,
+    ) -> None:
+        normalized_mobile = normalize_mainland_mobile(mobile)
+        normalized_password = _validate_password(password)
+        if normalized_password != str(confirm_password or ""):
+            raise PhoneAccountError("password_mismatch", "两次输入的密码不一致。", status_code=400)
+        try:
+            proof = self.possession_verifier.verify_code(
+                str(challenge_id or "").strip(), mobile=normalized_mobile,
+                code=str(verification_code or "").strip(), purpose="password_reset",
+            )
+        except PhonePossessionVerificationError as exc:
+            raise self._map_possession_error(exc) from exc
+        try:
+            self.user_sessions.reset_phone_password(
+                mobile=normalized_mobile,
+                password_hash=_hash_password(normalized_password),
+                challenge_id=proof.challenge_id,
+                challenge_mobile_hash=proof.mobile_hash,
+            )
+        except PhoneChallengeConsumptionError as exc:
+            raise PhoneAccountError("phone_code_consumed", "短信验证码已失效或已使用，请重新获取。", status_code=400) from exc
+        except UserIdentityConflictError as exc:
+            raise PhoneAccountError("account_unavailable", "无法重置该账户，请确认手机号或联系客服。", status_code=400) from exc
+        except UserSessionStorageError as exc:
+            raise PhoneAccountError("account_storage_unavailable", "账户服务暂时不可用，请稍后重试。", status_code=503) from exc
+
     def logout(self, *, session_token: str) -> None:
         self.user_sessions.revoke_member_session(session_token=session_token)

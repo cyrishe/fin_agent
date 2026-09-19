@@ -380,6 +380,34 @@ body:has(.auth-page) {
   font-size: 13px;
 }
 
+.auth-forgot {
+  display: block;
+  margin-top: 18px;
+  color: var(--auth-blue);
+  text-align: right;
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.auth-reset-complete {
+  display: grid;
+  gap: 12px;
+  color: var(--auth-ink);
+}
+
+.auth-reset-complete > svg { color: #317557; }
+.auth-reset-complete h3, .auth-reset-complete p { margin: 0; }
+.auth-reset-complete p { color: var(--auth-muted); line-height: 1.6; }
+.auth-reset-complete .auth-submit {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: #fff;
+  text-decoration: none;
+  margin-top: 10px;
+}
+
 .auth-switch a {
   margin-left: 7px;
   color: var(--auth-blue);

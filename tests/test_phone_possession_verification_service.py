@@ -331,6 +331,20 @@ def _service(
     )
 
 
+def test_reset_and_registration_codes_have_distinct_purposes() -> None:
+    store = _Store()
+    service = _service(store)
+    issued = service.request_code(_MOBILE, _IP, purpose="password_reset")
+    assert store.rows[0]["purpose"] == "password_reset"
+    with pytest.raises(PhonePossessionVerificationError) as captured:
+        service.verify_code(issued["challenge_id"], _MOBILE, "654321")
+    assert captured.value.code == "phone_code_invalid"
+    proof = service.verify_code(
+        issued["challenge_id"], _MOBILE, "654321", purpose="password_reset"
+    )
+    assert proof.challenge_id == issued["challenge_id"]
+
+
 def test_from_env_is_disabled_by_default_and_supports_existing_ak_names() -> None:
     default_service = PhonePossessionVerificationService.from_env({})
     assert default_service.status()["provider"] == "disabled"

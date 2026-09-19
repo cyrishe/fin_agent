@@ -498,6 +498,72 @@ class UserSessionService:
         finally:
             db.close_db()
 
+    def reset_phone_password(
+        self, *, mobile: str, password_hash: str, challenge_id: str,
+        challenge_mobile_hash: str,
+    ) -> None:
+        """Consume one reset proof, replace the credential, and revoke sessions atomically."""
+        db = SystemDbUtils()
+        try:
+            with db.conn.cursor(pymysql.cursors.DictCursor) as cursor:
+                self._require_tables(
+                    cursor, USER_TABLE, IDENTITY_TABLE, CREDENTIAL_TABLE,
+                    SESSION_TABLE, PHONE_CHALLENGE_TABLE,
+                )
+                cursor.execute(
+                    f"""SELECT challenge_id FROM {PHONE_CHALLENGE_TABLE}
+                    WHERE challenge_id = %s AND mobile_hash = %s
+                      AND purpose = 'password_reset'
+                      AND send_succeeded_at IS NOT NULL
+                      AND verified_at IS NOT NULL AND consumed_at IS NULL
+                      AND expires_at > UTC_TIMESTAMP(6)
+                    LIMIT 1 FOR UPDATE""",
+                    (challenge_id, challenge_mobile_hash),
+                )
+                if not cursor.fetchone():
+                    raise PhoneChallengeConsumptionError("短信验证码已失效或已使用")
+                cursor.execute(
+                    f"""SELECT u.user_id FROM {IDENTITY_TABLE} i
+                    JOIN {USER_TABLE} u ON u.user_id = i.user_id
+                    WHERE i.identity_type = 'phone' AND i.identity_value = %s
+                      AND u.status = 'active' AND u.user_type IN ('member', 'admin')
+                    LIMIT 1 FOR UPDATE""",
+                    (mobile,),
+                )
+                user = cursor.fetchone()
+                if not user:
+                    raise UserIdentityConflictError("账户不可用")
+                user_id = str(user["user_id"])
+                cursor.execute(
+                    f"""UPDATE {CREDENTIAL_TABLE} SET credential_hash = %s
+                    WHERE user_id = %s AND credential_type = 'password'""",
+                    (password_hash, user_id),
+                )
+                if cursor.rowcount != 1:
+                    raise UserIdentityConflictError("账户不可用")
+                cursor.execute(
+                    f"""UPDATE {SESSION_TABLE} SET status = 'revoked', updated_at = NOW()
+                    WHERE user_id = %s AND session_type = 'login' AND status = 'active'""",
+                    (user_id,),
+                )
+                cursor.execute(
+                    f"""UPDATE {PHONE_CHALLENGE_TABLE}
+                    SET consumed_at = UTC_TIMESTAMP(6), updated_at = UTC_TIMESTAMP(6)
+                    WHERE challenge_id = %s AND consumed_at IS NULL""",
+                    (challenge_id,),
+                )
+                if cursor.rowcount != 1:
+                    raise PhoneChallengeConsumptionError("短信验证码已失效或已使用")
+            db.conn.commit()
+        except (PhoneChallengeConsumptionError, UserIdentityConflictError):
+            db.conn.rollback()
+            raise
+        except Exception:
+            db.conn.rollback()
+            raise UserSessionStorageError("无法重置账户密码") from None
+        finally:
+            db.close_db()
+
     def create_member_session(
         self,
         *,

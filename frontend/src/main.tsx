@@ -13,7 +13,7 @@ const SkillStudio = lazy(() => import("./SkillStudio"));
 const pathname = stripAppBase(window.location.pathname);
 const Root = pathname === "/"
   ? LandingPage
-  : pathname === "/login" || pathname === "/register"
+  : pathname === "/login" || pathname === "/register" || pathname === "/reset-password"
     ? AuthPage
     : pathname === "/skills/studio" || pathname.startsWith("/skills/studio/")
       ? SkillStudio

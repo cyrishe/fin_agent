@@ -66,6 +66,14 @@ class _AuthService:
     def logout(self, *, session_token: str) -> None:
         self.revoked = session_token
 
+    def request_password_reset_code(self, **kwargs) -> dict:
+        self.code_kwargs = dict(kwargs)
+        return {"challenge_id": "reset_challenge", "mobile_masked": "138****8000",
+                "expires_in_seconds": 600, "resend_after_seconds": 60}
+
+    def reset_password(self, **kwargs) -> None:
+        self.reset_kwargs = dict(kwargs)
+
 
 def _app(service: _AuthService, identity=None) -> Flask:
     app = Flask(__name__)
@@ -76,6 +84,26 @@ def _app(service: _AuthService, identity=None) -> Flask:
         )
     )
     return app
+
+
+def test_password_reset_routes_do_not_authenticate_and_clear_old_cookie() -> None:
+    service = _AuthService()
+    client = _app(service).test_client()
+    code = client.post("/api/auth/password-reset-code", json={"mobile": "13800138000"})
+    assert code.status_code == 200
+    assert code.json["challenge_id"] == "reset_challenge"
+    assert service.code_kwargs["mobile"] == "13800138000"
+
+    client.set_cookie(UserSessionService.MEMBER_SESSION_COOKIE_NAME, "old_token")
+    result = client.post("/api/auth/password-reset", json={
+        "mobile": "13800138000", "challenge_id": "reset_challenge",
+        "verification_code": "123456", "password": "new-password",
+        "confirm_password": "new-password",
+    })
+    assert result.status_code == 200
+    assert result.json == {"ok": True}
+    assert service.reset_kwargs["challenge_id"] == "reset_challenge"
+    assert "Max-Age=0" in result.headers["Set-Cookie"]
 
 
 def test_register_sets_httponly_cookie_without_returning_session_token() -> None:

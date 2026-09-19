@@ -1,6 +1,6 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { registerPhoneAccount, requestRegistrationCode } from "./api";
+import { registerPhoneAccount, requestRegistrationCode, requestPasswordResetCode, resetPhonePassword } from "./api";
 import AuthPage from "./AuthPage";
 
 describe("AuthPage", () => {
@@ -27,6 +27,33 @@ describe("AuthPage", () => {
     expect(html).toContain("使用注册手机号和密码");
     expect(html).not.toContain("真实姓名");
     expect(html).not.toContain("发送验证码");
+    expect(html).toContain("忘记密码？");
+  });
+
+  it("shows a self-service password reset form", () => {
+    const html = renderToStaticMarkup(<AuthPage modeOverride="reset" />);
+    expect(html).toContain("重置密码");
+    expect(html).toContain("发送验证码");
+    expect(html).toContain("新密码");
+    expect(html).toContain("确认密码");
+    expect(html).toContain("直接登录");
+    expect(html).not.toContain("真实姓名");
+  });
+
+  it("uses reset-specific API endpoints and sends no password in code request", async () => {
+    const fetchMock = vi.fn()
+      .mockResolvedValueOnce(new Response(JSON.stringify({ ok: true, challenge_id: "reset-1" }), { status: 200 }))
+      .mockResolvedValueOnce(new Response(JSON.stringify({ ok: true }), { status: 200 }));
+    vi.stubGlobal("fetch", fetchMock);
+    await requestPasswordResetCode({ mobile: "13800138000" });
+    await resetPhonePassword({ mobile: "13800138000", challengeId: "reset-1",
+      verificationCode: "123456", password: "new-password", confirmPassword: "new-password" });
+    expect(fetchMock.mock.calls[0]?.[0]).toBe("/api/auth/password-reset-code");
+    expect(JSON.parse(String(fetchMock.mock.calls[0]?.[1]?.body))).toEqual({ mobile: "13800138000" });
+    expect(fetchMock.mock.calls[1]?.[0]).toBe("/api/auth/password-reset");
+    expect(JSON.parse(String(fetchMock.mock.calls[1]?.[1]?.body))).toMatchObject({
+      challenge_id: "reset-1", verification_code: "123456", password: "new-password",
+    });
   });
 
   it("maps the registration-code response into the frontend challenge contract", async () => {

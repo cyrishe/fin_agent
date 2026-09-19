@@ -4100,6 +4100,8 @@ def tool_studio_page(tool_name: str = ""):
 @app.route("/login/", methods=["GET"])
 @app.route("/register", methods=["GET"])
 @app.route("/register/", methods=["GET"])
+@app.route("/reset-password", methods=["GET"])
+@app.route("/reset-password/", methods=["GET"])
 def phone_auth_entry_page():
     if (REACT_FRONTEND_DIST_DIR / "index.html").is_file():
         return send_from_directory(REACT_FRONTEND_DIST_DIR, "index.html")

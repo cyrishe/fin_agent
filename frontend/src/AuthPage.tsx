@@ -14,15 +14,17 @@ import {
   loadAuthConfig,
   loadAuthSession,
   loginPhoneAccount,
+  requestPasswordResetCode,
   requestRegistrationCode,
   registerPhoneAccount,
+  resetPhonePassword,
 } from "./api";
 import { appPath, stripAppBase } from "./appPath";
 import "./auth.css";
 
 const PENDING_PROMPT_KEY = "fin_agent.pending_prompt";
 
-type AuthMode = "login" | "register";
+type AuthMode = "login" | "register" | "reset";
 
 interface Props {
   modeOverride?: AuthMode;
@@ -32,12 +34,15 @@ type AuthConfig = Awaited<ReturnType<typeof loadAuthConfig>>;
 
 function initialMode(): AuthMode {
   if (typeof window === "undefined") return "register";
-  return stripAppBase(window.location.pathname).startsWith("/login") ? "login" : "register";
+  const path = stripAppBase(window.location.pathname);
+  return path.startsWith("/reset-password") ? "reset" : path.startsWith("/login") ? "login" : "register";
 }
 
 export default function AuthPage({ modeOverride }: Props) {
   const mode = modeOverride || initialMode();
   const isRegister = mode === "register";
+  const isReset = mode === "reset";
+  const needsCode = isRegister || isReset;
   const [mobile, setMobile] = useState("");
   const [realName, setRealName] = useState("");
   const [password, setPassword] = useState("");
@@ -48,6 +53,7 @@ export default function AuthPage({ modeOverride }: Props) {
   const [codeBusy, setCodeBusy] = useState(false);
   const [checking, setChecking] = useState(true);
   const [error, setError] = useState("");
+  const [resetComplete, setResetComplete] = useState(false);
   const [authConfig, setAuthConfig] = useState<AuthConfig | null>(null);
   const [challengeId, setChallengeId] = useState("");
   const [challengeMobile, setChallengeMobile] = useState("");
@@ -100,8 +106,9 @@ export default function AuthPage({ modeOverride }: Props) {
 
   const identityMatchRequired = Boolean(authConfig?.identity_match_required);
   const possessionAvailable = Boolean(authConfig?.possession_available);
-  const registerUnavailable = isRegister && authConfig !== null && !authConfig.available;
-  const registerConfigurationPending = isRegister && authConfig === null;
+  const registerUnavailable = needsCode && authConfig !== null
+    && (isRegister ? !authConfig.available : !possessionAvailable);
+  const registerConfigurationPending = needsCode && authConfig === null;
   const compactMobile = mobile.trim().replace(/[\s-]/g, "");
   const mobileReady = /^(?:(?:\+|00)?86)?1[3-9]\d{9}$/.test(compactMobile);
   const registrationCodeReady = Boolean(
@@ -136,7 +143,9 @@ export default function AuthPage({ modeOverride }: Props) {
     setMobileMasked("");
     setCodeExpiresIn(0);
     try {
-      const result = await requestRegistrationCode({ mobile });
+      const result = isReset
+        ? await requestPasswordResetCode({ mobile })
+        : await requestRegistrationCode({ mobile });
       if (!result.challengeId) throw new Error("验证码发送成功，但服务未返回验证凭据，请重新发送。");
       setChallengeId(result.challengeId);
       setChallengeMobile(mobile.trim());
@@ -154,7 +163,7 @@ export default function AuthPage({ modeOverride }: Props) {
   const submit = async (event: FormEvent) => {
     event.preventDefault();
     if (busy) return;
-    if (isRegister && !registrationCodeReady) {
+    if (needsCode && !registrationCodeReady) {
       setError(challengeId ? "请输入收到的 6 位短信验证码。" : "请先发送短信验证码。");
       return;
     }
@@ -162,9 +171,21 @@ export default function AuthPage({ modeOverride }: Props) {
       setError("请先确认手机号使用与验证说明。");
       return;
     }
+    if (needsCode && password !== confirmPassword) {
+      setError("两次输入的密码不一致。");
+      return;
+    }
     setBusy(true);
     setError("");
     try {
+      if (isReset) {
+        await resetPhonePassword({ mobile, challengeId, verificationCode, password, confirmPassword });
+        setResetComplete(true);
+        setPassword("");
+        setConfirmPassword("");
+        setVerificationCode("");
+        return;
+      }
       if (isRegister) {
         await registerPhoneAccount({
           ...(identityMatchRequired ? { realName } : {}),
@@ -214,10 +235,10 @@ export default function AuthPage({ modeOverride }: Props) {
       <section className="auth-card" aria-labelledby="auth-title">
         <div className="auth-card-head">
           <div className="auth-step"><span>01</span><i /></div>
-          <p>{isRegister ? "创建你的金融工作台" : "欢迎回到金融工作台"}</p>
-          <h2 id="auth-title">{isRegister ? "免费注册" : "手机号登录"}</h2>
+          <p>{isReset ? "安全找回账户" : isRegister ? "创建你的金融工作台" : "欢迎回到金融工作台"}</p>
+          <h2 id="auth-title">{isReset ? "重置密码" : isRegister ? "免费注册" : "手机号登录"}</h2>
           <span>
-            {isRegister
+            {isReset ? "验证注册手机号后设置新密码。完成后，其他设备需重新登录。" : isRegister
               ? identityMatchRequired
                 ? "手机号是账户的唯一登录标识。短信验证持有权后，将单独核验姓名与手机号。"
                 : "手机号是账户的唯一登录标识，短信验证码用于确认你持有该号码。"
@@ -227,13 +248,20 @@ export default function AuthPage({ modeOverride }: Props) {
 
         {pendingPrompt && (
           <aside className="auth-pending" aria-label="待继续的问题">
-            <small>注册后继续</small>
+            <small>{isRegister ? "注册后继续" : "登录后继续"}</small>
             <p>{pendingPrompt}</p>
           </aside>
         )}
 
-        <form className="auth-form" onSubmit={(event) => void submit(event)}>
-          <div className={isRegister ? "auth-phone-verification" : undefined}>
+        {resetComplete ? (
+          <div className="auth-reset-complete" role="status">
+            <ShieldCheck size={32} />
+            <h3>密码已重置</h3>
+            <p>请使用新密码重新登录。其他设备上的登录状态已失效。</p>
+            <a className="auth-submit" href={appPath("/login")}>返回登录 <ArrowRight size={18} /></a>
+          </div>
+        ) : <form className="auth-form" onSubmit={(event) => void submit(event)}>
+          <div className={needsCode ? "auth-phone-verification" : undefined}>
             <label>
               <span>手机号</span>
               <div className="auth-field">
@@ -251,7 +279,7 @@ export default function AuthPage({ modeOverride }: Props) {
                 />
               </div>
             </label>
-            {isRegister && (
+            {needsCode && (
               <button
                 className="auth-send-code"
                 type="button"
@@ -278,7 +306,7 @@ export default function AuthPage({ modeOverride }: Props) {
             )}
           </div>
 
-          {isRegister && (
+          {needsCode && (
             <label>
               <span>短信验证码</span>
               <div className="auth-field">
@@ -307,7 +335,7 @@ export default function AuthPage({ modeOverride }: Props) {
               >
                 {challengeId
                   ? `验证码已发送至 ${mobileMasked || "该手机号"}，约 ${Math.max(1, Math.ceil(codeExpiresIn / 60))} 分钟内有效。`
-                  : "发送验证码后，再完成密码设置。"}
+                  : "发送验证码后，再设置新密码。"}
               </small>
             </label>
           )}
@@ -330,15 +358,15 @@ export default function AuthPage({ modeOverride }: Props) {
           )}
 
           <label>
-            <span>密码</span>
+            <span>{isReset ? "新密码" : "密码"}</span>
             <div className="auth-field">
               <LockKeyhole size={18} />
               <input
                 value={password}
                 onChange={(event) => setPassword(event.target.value)}
                 type={showPassword ? "text" : "password"}
-                autoComplete={isRegister ? "new-password" : "current-password"}
-                placeholder={isRegister ? "至少 8 个字符" : "请输入密码"}
+                autoComplete={needsCode ? "new-password" : "current-password"}
+                placeholder={needsCode ? "至少 8 个字符" : "请输入密码"}
                 minLength={8}
                 maxLength={128}
                 required
@@ -352,7 +380,7 @@ export default function AuthPage({ modeOverride }: Props) {
               </button>
             </div>
           </label>
-          {isRegister && (
+          {needsCode && (
             <label>
               <span>确认密码</span>
               <div className="auth-field">
@@ -389,7 +417,7 @@ export default function AuthPage({ modeOverride }: Props) {
             <div className="auth-notice" role="status">
               {possessionAvailable
                 ? "账户注册服务尚未完成配置，暂时无法创建新账户。"
-                : "短信验证服务尚未完成配置，暂时无法创建新账户。"}
+                : `短信验证服务尚未完成配置，暂时无法${isReset ? "重置密码" : "创建新账户"}。`}
             </div>
           )}
           {error && <div className="auth-error" role="alert">{error}</div>}
@@ -403,23 +431,25 @@ export default function AuthPage({ modeOverride }: Props) {
               || checking
               || registerUnavailable
               || registerConfigurationPending
-              || (isRegister && !registrationCodeReady)
+              || (needsCode && !registrationCodeReady)
             }
           >
-            <span>{busy ? "正在提交…" : isRegister ? "验证并创建账户" : "登录工作台"}</span>
+            <span>{busy ? "正在提交…" : isReset ? "验证并重置密码" : isRegister ? "验证并创建账户" : "登录工作台"}</span>
             <ArrowRight size={18} />
           </button>
-        </form>
+        </form>}
+
+        {mode === "login" && <a className="auth-forgot" href={appPath("/reset-password")}>忘记密码？</a>}
 
         <div className="auth-switch">
-          {isRegister ? "已经有账户？" : "第一次使用 Fin Agent？"}
-          <a href={appPath(isRegister ? "/login" : "/register")}>
-            {isRegister ? "直接登录" : "免费注册"}
+          {isReset ? "想起密码了？" : isRegister ? "已经有账户？" : "第一次使用 Fin Agent？"}
+          <a href={appPath(isRegister || isReset ? "/login" : "/register")}>
+            {isRegister || isReset ? "直接登录" : "免费注册"}
           </a>
         </div>
         <a className="auth-guest" href={appPath("/assistant")}>先以访客身份体验</a>
         <p className="auth-footnote">
-          {isRegister
+          {needsCode
             ? <>
                 短信验证码仅用于确认手机号持有权；
                 {identityMatchRequired ? "实名信息仅用于注册核验；" : ""}

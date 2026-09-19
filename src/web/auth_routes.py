@@ -252,6 +252,42 @@ def create_auth_blueprint(
                 )
             )
 
+    @blueprint.post("/api/auth/password-reset-code")
+    def auth_password_reset_code():
+        try:
+            payload = _json_payload()
+            result = service.request_password_reset_code(
+                mobile=payload.get("mobile"), remote_addr=_remote_addr(),
+            )
+            return jsonify({"ok": True, **result})
+        except PhoneAccountError as exc:
+            return error_response(exc)
+        except Exception:
+            return error_response(PhoneAccountError(
+                "password_reset_unavailable", "密码重置服务暂时不可用，请稍后重试。", status_code=503,
+            ))
+
+    @blueprint.post("/api/auth/password-reset")
+    def auth_password_reset():
+        try:
+            payload = _json_payload()
+            service.reset_password(
+                mobile=payload.get("mobile"),
+                challenge_id=payload.get("challenge_id"),
+                verification_code=payload.get("verification_code"),
+                password=payload.get("password"),
+                confirm_password=payload.get("confirm_password"),
+            )
+            response = jsonify({"ok": True})
+            response.delete_cookie(UserSessionService.MEMBER_SESSION_COOKIE_NAME, path="/")
+            return response
+        except PhoneAccountError as exc:
+            return error_response(exc)
+        except Exception:
+            return error_response(PhoneAccountError(
+                "password_reset_unavailable", "密码重置服务暂时不可用，请稍后重试。", status_code=503,
+            ))
+
     @blueprint.post("/api/auth/logout")
     def auth_logout():
         try:

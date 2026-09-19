@@ -437,3 +437,51 @@ def test_login_checks_password_and_issues_a_new_session() -> None:
     assert captured.value.status_code == 401
     assert len(auth_limiter.started) == 2
     assert auth_limiter.succeeded == ["ara_test_attempt_0001"]
+
+
+def test_reset_password_uses_distinct_proof_and_new_hash() -> None:
+    class ResetPossession(_Possession):
+        def request_code(self, mobile, remote_addr, *, purpose):
+            assert purpose == "password_reset"
+            return super().request_code(mobile, remote_addr)
+
+        def verify_code(self, challenge_id, mobile, code, *, purpose="registration"):
+            assert purpose in {"registration", "password_reset"}
+            return super().verify_code(challenge_id, mobile, code)
+
+    class ResetSessions(_Sessions):
+        def reset_phone_password(self, **kwargs):
+            self.reset_kwargs = kwargs
+            self.members[kwargs["mobile"]]["credential_hash"] = kwargs["password_hash"]
+
+    sessions = ResetSessions()
+    service = PhoneAccountService(
+        user_sessions=sessions, possession_verifier=ResetPossession(),
+        verifier=_Verifier(), auth_rate_limiter=_AuthLimiter(),
+    )
+    service.register(
+        mobile="13800138000", challenge_id="pvc_challenge_123",
+        verification_code="123456", password="old-password",
+        confirm_password="old-password", remote_addr="127.0.0.1",
+    )
+    assert service.request_password_reset_code(
+        mobile="13800138000", remote_addr="127.0.0.1"
+    )["challenge_id"] == "pvc_challenge_123"
+    service.reset_password(
+        mobile="13800138000", challenge_id="pvc_challenge_123",
+        verification_code="123456", password="new-password",
+        confirm_password="new-password",
+    )
+    assert sessions.reset_kwargs["challenge_mobile_hash"] == "mobile-hmac"
+    assert service.login(mobile="13800138000", password="new-password")["user"]["user_id"] == "user_test"
+    with pytest.raises(PhoneAccountError) as captured:
+        service.login(mobile="13800138000", password="old-password")
+    assert captured.value.code == "invalid_credentials"
+
+    with pytest.raises(PhoneAccountError) as captured:
+        service.reset_password(
+            mobile="13800138000", challenge_id="pvc_challenge_123",
+            verification_code="123456", password="new-password",
+            confirm_password="different-password",
+        )
+    assert captured.value.code == "password_mismatch"
