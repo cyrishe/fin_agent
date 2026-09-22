@@ -76,10 +76,8 @@ class MemoryCursor:
                 row["principal_id"], row["token_digest"], row["expires_at"], row["disabled_at"],
             )
         elif normalized.startswith("SELECT TOKEN_ID"):
-            project = params[0] if len(params) == 2 else None
             limit = params[-1]
-            rows = [row for row in self.database.rows.values()
-                    if project is None or row["project_name"] == project]
+            rows = list(self.database.rows.values())
             rows.sort(key=lambda row: row["created_at"], reverse=True)
             self.result = [(
                 row["token_id"], row["project_name"], row["token_name"], row["principal_id"],
@@ -107,7 +105,7 @@ def test_never_expiring_token_persists_digest_and_mask_only_then_disables():
     now = [1_000]
     store = FinanceAccessTokenStore(connection_factory=database.connect, now_provider=lambda: now[0])
     issued = store.issue(
-        project_name="alpha", token_name="research-client", principal_id="eval",
+        name="research-client", principal_id="eval",
         ttl_seconds=None, created_by="operator",
     )
 
@@ -120,10 +118,9 @@ def test_never_expiring_token_persists_digest_and_mask_only_then_disables():
     assert row["token_suffix"] == issued["access_token"][-8:]
     assert store.authenticate(issued["access_token"]) == "eval"
 
-    listed = store.list_tokens(project_name="alpha")
+    listed = store.list_tokens()
     assert listed == [{
-        "token_id": issued["token_id"], "project_name": "alpha",
-        "token_name": "research-client", "principal_id": "eval",
+        "token_id": issued["token_id"], "name": "research-client", "principal_id": "eval",
         "masked_token": issued["masked_token"], "created_at": 1000,
         "expires_at": None, "never_expires": True, "state": "active",
         "disabled_at": None, "disabled_reason": None,
@@ -145,7 +142,7 @@ def test_managed_token_expiration_and_tampering():
     now = [2_000]
     store = FinanceAccessTokenStore(connection_factory=database.connect, now_provider=lambda: now[0])
     issued = store.issue(
-        project_name="alpha", token_name="short", principal_id="eval", ttl_seconds=60,
+        name="short", principal_id="eval", ttl_seconds=60,
     )
     assert store.authenticate(issued["access_token"]) == "eval"
     with pytest.raises(ManagedTokenInvalid):
@@ -156,21 +153,19 @@ def test_managed_token_expiration_and_tampering():
     assert store.list_tokens()[0]["state"] == "expired"
 
 
-def test_project_and_name_are_optional_and_key_is_a_single_opaque_value():
+def test_name_is_optional_and_key_is_a_single_opaque_value():
     database = MemoryDatabase()
     store = FinanceAccessTokenStore(connection_factory=database.connect, now_provider=lambda: 2_000)
     issued = store.issue(principal_id="eval", ttl_seconds=None)
     row = database.rows[issued["token_id"]]
 
-    assert issued["project_name"] is None
-    assert issued["token_name"] is None
+    assert issued["name"] is None
     assert row["project_name"] == ""
     assert row["token_name"] == ""
     assert issued["access_token"].startswith("fin_sk_")
     assert "." not in issued["access_token"]
     assert store.authenticate(issued["access_token"]) == "eval"
-    assert store.list_tokens()[0]["project_name"] is None
-    assert store.list_tokens()[0]["token_name"] is None
+    assert store.list_tokens()[0]["name"] is None
 
 
 def test_previous_managed_token_format_remains_compatible():
@@ -189,7 +184,7 @@ def test_auth_accepts_managed_token_and_fails_closed_when_store_is_unavailable()
     store = FinanceAccessTokenStore(connection_factory=database.connect, now_provider=lambda: 3_000)
     auth = FinanceApiKeyAuth({"eval": KEY}, managed_token_store=store)
     issued = auth.issue_managed_token(
-        project_name="alpha", token_name="service", ttl_seconds=None,
+        name="service", ttl_seconds=None,
     )
     assert auth.authenticate(x_api_key=issued["access_token"]).principal_id == "eval"
     store.disable(issued["token_id"])
@@ -214,7 +209,7 @@ def test_auth_rejects_managed_token_if_its_parent_principal_was_removed():
     store = FinanceAccessTokenStore(connection_factory=database.connect, now_provider=lambda: 3_000)
     issuing_auth = FinanceApiKeyAuth({"eval": KEY}, managed_token_store=store)
     issued = issuing_auth.issue_managed_token(
-        project_name="alpha", token_name="service", ttl_seconds=None,
+        name="service", ttl_seconds=None,
     )
     rotated_auth = FinanceApiKeyAuth({"other": KEY + "-other"}, managed_token_store=store)
     with pytest.raises(FinanceApiAuthError) as rejected:
@@ -225,10 +220,10 @@ def test_auth_rejects_managed_token_if_its_parent_principal_was_removed():
 def test_managed_token_input_validation():
     store = FinanceAccessTokenStore(connection_factory=MemoryDatabase().connect)
     for kwargs in [
-        {"project_name": "x" * 129, "token_name": "name", "principal_id": "eval", "ttl_seconds": None},
-        {"project_name": "project", "token_name": "bad\nname", "principal_id": "eval", "ttl_seconds": None},
-        {"project_name": "project", "token_name": "name", "principal_id": "bad space", "ttl_seconds": None},
-        {"project_name": "project", "token_name": "name", "principal_id": "eval", "ttl_seconds": 0},
+        {"name": "x" * 129, "principal_id": "eval", "ttl_seconds": None},
+        {"name": "bad\nname", "principal_id": "eval", "ttl_seconds": None},
+        {"name": "name", "principal_id": "bad space", "ttl_seconds": None},
+        {"name": "name", "principal_id": "eval", "ttl_seconds": 0},
     ]:
         with pytest.raises(ValueError):
             store.issue(**kwargs)

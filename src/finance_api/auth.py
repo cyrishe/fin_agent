@@ -90,8 +90,7 @@ class FinanceApiKeyAuth:
     def issue_managed_token(
         self,
         *,
-        project_name: str | None = None,
-        token_name: str | None = None,
+        name: str | None = None,
         principal_id: str | None = None,
         ttl_seconds: int | None = DEFAULT_TTL_SECONDS,
         created_by: str | None = None,
@@ -103,8 +102,7 @@ class FinanceApiKeyAuth:
         if principal_id not in self._token_keys:
             raise ValueError("Select an existing API key principal with --principal.")
         return self._managed_token_store.issue(
-            project_name=project_name,
-            token_name=token_name,
+            name=name,
             principal_id=principal_id,
             ttl_seconds=ttl_seconds,
             created_by=created_by,

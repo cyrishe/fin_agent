@@ -72,8 +72,7 @@ def test_cli_secret_file_permissions_no_overwrite_no_secret_logs(tmp_path, monke
                 "access_token": "fin_sk_" + "a" * 43,
                 "token_type": "Bearer",
                 "token_id": "a" * 32,
-                "project_name": kwargs["project_name"],
-                "token_name": kwargs["token_name"],
+                "name": kwargs["name"],
                 "principal_id": kwargs["principal_id"],
                 "issued_at": 100,
                 "expires_at": None if kwargs["ttl_seconds"] is None else 100 + kwargs["ttl_seconds"],
@@ -85,18 +84,17 @@ def test_cli_secret_file_permissions_no_overwrite_no_secret_logs(tmp_path, monke
     auth = FinanceApiKeyAuth({"eval": KEY}, managed_token_store=ManagedStore())
     monkeypatch.setattr(FinanceApiKeyAuth, "from_env", classmethod(lambda cls: auth))
     output = tmp_path / "credential.json"
-    assert main(["--project", "research", "--name", "notebook", "--output", str(output)]) == 0
+    assert main(["--name", "notebook", "--output", str(output)]) == 0
     data = json.loads(output.read_text())
     assert stat.S_IMODE(output.stat().st_mode) == 0o600
     assert data["expires_in"] == 14400
-    assert data["project_name"] == "research"
-    assert data["token_name"] == "notebook"
+    assert data["name"] == "notebook"
     logs = capsys.readouterr()
     assert KEY not in logs.out + logs.err
     assert data["access_token"] not in logs.out + logs.err
     before = output.read_bytes()
     with pytest.raises(SystemExit):
-        main(["--project", "research", "--name", "notebook", "--output", str(output)])
+        main(["--name", "notebook", "--output", str(output)])
     assert output.read_bytes() == before
 
 
@@ -109,7 +107,7 @@ def test_cli_explicit_never_expires_and_default_tmp_output(monkeypatch, capsys):
             return {
                 "access_token": "fin_sk_" + "b" * 43,
                 "token_type": "Bearer", "token_id": "b" * 32,
-                "project_name": kwargs["project_name"], "token_name": kwargs["token_name"],
+                "name": kwargs["name"],
                 "principal_id": kwargs["principal_id"], "issued_at": 100,
                 "expires_at": None, "expires_in": None, "never_expires": True,
                 "masked_token": "fin_sk_bbbbbbbbb...bbbbbbbb",
@@ -122,8 +120,7 @@ def test_cli_explicit_never_expires_and_default_tmp_output(monkeypatch, capsys):
     output = Path(summary["token_file"])
     try:
         assert captured["ttl_seconds"] is None
-        assert captured["project_name"] is None
-        assert captured["token_name"] is None
+        assert captured["name"] is None
         assert summary["never_expires"] is True
         assert stat.S_IMODE(output.stat().st_mode) == 0o600
         assert str(output.resolve()).startswith(str(Path(tempfile.gettempdir()).resolve()))

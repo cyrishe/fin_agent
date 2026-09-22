@@ -35,8 +35,7 @@ def _reserve_output(path: Path | None) -> tuple[int, Path]:
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--env-file", type=Path, help="Server .env; actual environment takes precedence.")
-    parser.add_argument("--project", help="Optional project label for later management.")
-    parser.add_argument("--name", help="Optional human-readable label for later management.")
+    parser.add_argument("--name", help="Optional label for later management.")
     parser.add_argument("--principal", help="Required when multiple FINANCE_API_KEYS_JSON entries exist.")
     lifetime = parser.add_mutually_exclusive_group()
     lifetime.add_argument("--ttl-hours", type=float, help="Validity in hours (default: 4).")
@@ -69,8 +68,7 @@ def main(argv=None):
         fd, output = _reserve_output(args.output)
         from src.finance_api.auth import FinanceApiKeyAuth
         credential = FinanceApiKeyAuth.from_env().issue_managed_token(
-            project_name=args.project,
-            token_name=args.name,
+            name=args.name,
             principal_id=args.principal,
             ttl_seconds=None if args.never_expires else int(ttl_hours * 3600),
             created_by=args.created_by,
@@ -95,8 +93,7 @@ def main(argv=None):
     summary = {
         "token_file": str(output),
         "token_id": credential["token_id"],
-        "project_name": credential["project_name"],
-        "token_name": credential["token_name"],
+        "name": credential["name"],
         "principal_id": credential["principal_id"],
         "masked_token": credential["masked_token"],
         "never_expires": credential["never_expires"],

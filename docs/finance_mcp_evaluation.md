@@ -76,7 +76,7 @@ python scripts/eval_finance_mcp.py \
 ```
 
 默认有效期仍为4小时；明确需要长期凭证时将`--ttl-hours`替换为`--never-expires`。
-生成的是普通 Bearer Key 形态的单段`fin_sk_...`字符串。`--project`和`--name`可选，仅用于
+生成的是普通 Bearer Key 形态的单段`fin_sk_...`字符串。只有一个可选的`--name`，仅用于
 管理备注。完整 token 只写入命令返回的系统临时目录 JSON 文件，权限为0600；数据库只保存
 摘要、可选备注和首尾掩码。通过安全渠道交付该文件，不复制整份`.env`，复制完成后应删除临时文件。
 长期 token 仍可用`manage_finance_access_tokens.py disable`立即停用。

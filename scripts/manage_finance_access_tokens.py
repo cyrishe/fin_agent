@@ -15,7 +15,6 @@ def main(argv=None):
     parser.add_argument("--env-file", type=Path, help="Server .env; actual environment takes precedence.")
     commands = parser.add_subparsers(dest="command", required=True)
     list_parser = commands.add_parser("list", help="List token metadata; secrets and digests are omitted.")
-    list_parser.add_argument("--project")
     list_parser.add_argument("--limit", type=int, default=100)
     disable_parser = commands.add_parser("disable", help="Permanently disable a managed token.")
     disable_parser.add_argument("--token-id", required=True)
@@ -32,7 +31,7 @@ def main(argv=None):
     store = FinanceAccessTokenStore()
     try:
         if args.command == "list":
-            result = {"tokens": store.list_tokens(project_name=args.project, limit=args.limit)}
+            result = {"tokens": store.list_tokens(limit=args.limit)}
         else:
             result = {
                 "token_id": args.token_id,

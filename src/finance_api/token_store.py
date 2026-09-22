@@ -90,14 +90,12 @@ class FinanceAccessTokenStore:
     def issue(
         self,
         *,
-        project_name: str | None = None,
-        token_name: str | None = None,
+        name: str | None = None,
         principal_id: str,
         ttl_seconds: int | None,
         created_by: str | None = None,
     ) -> dict[str, object]:
-        project = _validate_optional_label("project_name", project_name, 128)
-        name = _validate_optional_label("token_name", token_name, 128)
+        label = _validate_optional_label("name", name, 128)
         principal = str(principal_id or "").strip()
         if not _PRINCIPAL_RE.fullmatch(principal):
             raise ValueError("principal_id is invalid")
@@ -125,8 +123,8 @@ class FinanceAccessTokenStore:
                     """,
                     (
                         token_id,
-                        project,
-                        name,
+                        "",
+                        label,
                         principal,
                         digest,
                         preview_start,
@@ -150,8 +148,7 @@ class FinanceAccessTokenStore:
             "access_token": token,
             "token_type": "Bearer",
             "token_id": token_id,
-            "project_name": project or None,
-            "token_name": name or None,
+            "name": label or None,
             "principal_id": principal,
             "issued_at": issued_at,
             "expires_at": expires_at,
@@ -199,27 +196,20 @@ class FinanceAccessTokenStore:
         except Exception as exc:
             raise ManagedTokenStoreUnavailable("Managed access-token storage is unavailable.") from exc
 
-    def list_tokens(self, *, project_name: str | None = None, limit: int = 100) -> list[dict[str, object]]:
+    def list_tokens(self, *, limit: int = 100) -> list[dict[str, object]]:
         if type(limit) is not int or not 1 <= limit <= 500:
             raise ValueError("limit must be an integer between 1 and 500")
-        project = None if project_name is None else _validate_label("project_name", project_name, 128)
         query = """
             SELECT token_id, project_name, token_name, principal_id, token_prefix,
                    token_suffix, created_at, expires_at, disabled_at, disabled_reason,
                    created_by, disabled_by
             FROM aiia_finance_access_token
+            ORDER BY created_at DESC LIMIT %s
         """
-        params: tuple[object, ...]
-        if project is None:
-            query += " ORDER BY created_at DESC LIMIT %s"
-            params = (limit,)
-        else:
-            query += " WHERE project_name = %s ORDER BY created_at DESC LIMIT %s"
-            params = (project, limit)
         connection = self._connect()
         try:
             with connection.cursor() as cursor:
-                cursor.execute(query, params)
+                cursor.execute(query, (limit,))
                 rows = cursor.fetchall()
         except Exception as exc:
             raise ManagedTokenStoreUnavailable("Managed access-token storage is unavailable.") from exc
@@ -237,8 +227,7 @@ class FinanceAccessTokenStore:
             )
             results.append({
                 "token_id": token_id,
-                "project_name": row_project or None,
-                "token_name": name or None,
+                "name": name or row_project or None,
                 "principal_id": principal,
                 "masked_token": f"{preview_start}...{preview_end}",
                 "created_at": _epoch_seconds(created_at),

@@ -274,12 +274,12 @@ docs/sql/create_aiia_finance_access_token.sql
 
 # 明确创建永不过期但仍可撤销的token
 .venv/bin/python scripts/create_finance_access_token.py \
-  --env-file .env --project research-platform --name long-lived-reader \
+  --env-file .env --name research-platform \
   --never-expires --created-by operator-id
 ```
 
 生成的 key 是单段、URL 安全的`fin_sk_...`不透明字符串，调用方只需按普通 API Key 使用
-`Authorization: Bearer <key>`，不需要理解内部记录。`--project`和`--name`只是可选管理备注。
+`Authorization: Bearer <key>`，不需要理解内部记录。只有一个可选的`--name`管理备注。
 可用`--principal`选择既有父 API principal；未指定且只有一个 principal 时自动选择。
 数据库不保存完整 token，只保存 SHA-256 摘要、可选项目/名称、principal、
 首尾掩码、有效期和停用审计字段。完整 token 仅在签发时写入系统临时目录中的`0600`文件，
@@ -289,7 +289,7 @@ docs/sql/create_aiia_finance_access_token.sql
 
 ```bash
 .venv/bin/python scripts/manage_finance_access_tokens.py --env-file .env list \
-  --project research-platform
+  --limit 100
 
 .venv/bin/python scripts/manage_finance_access_tokens.py --env-file .env disable \
   --token-id <32位token_id> --disabled-by operator-id --reason 'project retired'
