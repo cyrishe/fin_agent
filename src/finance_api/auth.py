@@ -9,6 +9,12 @@ from dataclasses import dataclass
 from typing import Mapping
 
 from src.finance_api.access_tokens import DEFAULT_TTL_SECONDS, PREFIX, issue_token, signing_key, verify_token
+from src.finance_api.token_store import (
+    MANAGED_TOKEN_PREFIX,
+    FinanceAccessTokenStore,
+    ManagedTokenInvalid,
+    ManagedTokenStoreUnavailable,
+)
 
 
 _PRINCIPAL_RE = re.compile(r"[A-Za-z0-9][A-Za-z0-9_.-]{0,63}")
@@ -37,7 +43,12 @@ class FinanceApiKeyAuth:
     on the service object and must never be written to logs or traces.
     """
 
-    def __init__(self, keys: Mapping[str, str]) -> None:
+    def __init__(
+        self,
+        keys: Mapping[str, str],
+        *,
+        managed_token_store: FinanceAccessTokenStore | None = None,
+    ) -> None:
         normalized: dict[str, bytes] = {}
         token_keys: dict[str, bytes] = {}
         for raw_principal, raw_key in keys.items():
@@ -65,6 +76,7 @@ class FinanceApiKeyAuth:
             )
         self._digests = normalized
         self._token_keys = token_keys
+        self._managed_token_store = managed_token_store
 
     def issue_temporary_token(
         self, principal_id: str | None = None, *, ttl_seconds: int = DEFAULT_TTL_SECONDS,
@@ -75,9 +87,38 @@ class FinanceApiKeyAuth:
             raise ValueError("Select an existing API key principal with --principal.")
         return issue_token(principal_id, self._token_keys[principal_id], ttl_seconds)
 
+    def issue_managed_token(
+        self,
+        *,
+        project_name: str,
+        token_name: str,
+        principal_id: str | None = None,
+        ttl_seconds: int | None = DEFAULT_TTL_SECONDS,
+        created_by: str | None = None,
+    ) -> dict[str, object]:
+        if self._managed_token_store is None:
+            raise ManagedTokenStoreUnavailable("Managed access-token storage is not configured.")
+        if principal_id is None and len(self._token_keys) == 1:
+            principal_id = next(iter(self._token_keys))
+        if principal_id not in self._token_keys:
+            raise ValueError("Select an existing API key principal with --principal.")
+        return self._managed_token_store.issue(
+            project_name=project_name,
+            token_name=token_name,
+            principal_id=principal_id,
+            ttl_seconds=ttl_seconds,
+            created_by=created_by,
+        )
+
     @classmethod
-    def from_env(cls, env: Mapping[str, str] | None = None) -> FinanceApiKeyAuth:
+    def from_env(
+        cls,
+        env: Mapping[str, str] | None = None,
+        *,
+        managed_token_store: FinanceAccessTokenStore | None = None,
+    ) -> FinanceApiKeyAuth:
         source = os.environ if env is None else env
+        store = managed_token_store if managed_token_store is not None else FinanceAccessTokenStore()
         raw_json = str(source.get("FINANCE_API_KEYS_JSON") or "").strip()
         if raw_json:
             try:
@@ -86,15 +127,18 @@ class FinanceApiKeyAuth:
                 raise ValueError("FINANCE_API_KEYS_JSON must be a JSON object") from exc
             if not isinstance(parsed, Mapping):
                 raise ValueError("FINANCE_API_KEYS_JSON must be a JSON object")
-            return cls({str(key): str(value) for key, value in parsed.items()})
+            return cls(
+                {str(key): str(value) for key, value in parsed.items()},
+                managed_token_store=store,
+            )
 
         single_key = str(source.get("FINANCE_API_KEY") or "").strip()
         if single_key:
             principal = str(
                 source.get("FINANCE_API_KEY_ID") or "default"
             ).strip()
-            return cls({principal: single_key})
-        return cls({})
+            return cls({principal: single_key}, managed_token_store=store)
+        return cls({}, managed_token_store=store)
 
     def authenticate(self, authorization: str = "", x_api_key: str = "") -> FinanceApiPrincipal:
         bearer = str(authorization or "").strip()
@@ -118,6 +162,30 @@ class FinanceApiKeyAuth:
         for principal, expected_digest in self._digests.items():
             if hmac.compare_digest(supplied_digest, expected_digest):
                 matched = principal
+        if not matched and supplied.startswith(MANAGED_TOKEN_PREFIX + "."):
+            if self._managed_token_store is None:
+                raise FinanceApiAuthError(
+                    "access_token_service_unavailable",
+                    "Managed access-token verification is unavailable.",
+                    status_code=503,
+                )
+            try:
+                managed_principal = self._managed_token_store.authenticate(supplied)
+                if managed_principal not in self._token_keys:
+                    raise ManagedTokenInvalid(
+                        "The managed access token is invalid or inactive."
+                    )
+                matched = managed_principal
+            except ManagedTokenInvalid:
+                raise FinanceApiAuthError(
+                    "invalid_access_token", "The managed access token is invalid or inactive.",
+                ) from None
+            except ManagedTokenStoreUnavailable:
+                raise FinanceApiAuthError(
+                    "access_token_service_unavailable",
+                    "Managed access-token verification is temporarily unavailable.",
+                    status_code=503,
+                ) from None
         if not matched and supplied.startswith(PREFIX + "."):
             try:
                 matched = verify_token(supplied, self._token_keys)

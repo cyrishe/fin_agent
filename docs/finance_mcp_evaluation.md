@@ -64,16 +64,23 @@ python scripts/eval_finance_mcp.py \
   --skill equity-report-analysis
 ```
 
-也可将已有Key/临时Token放在`FINANCE_ACCESS_TOKEN`环境变量，然后省略token-file。
+也可将已有Key或 access token 放在`FINANCE_ACCESS_TOKEN`环境变量，然后省略token-file。
 `--token-env NAME`改用其他变量。凭证不接受命令行明文参数。
-若要单独签发供别人使用，保留原工具：
+若要单独签发供别人使用，先确认系统库已经应用
+`docs/sql/create_aiia_finance_access_token.sql`，再使用管理型 token 工具：
 
 ```bash
 .venv/bin/python scripts/create_finance_access_token.py \
-  --env-file .env --ttl-hours 1 --output /tmp/finance-eval-token.json
+  --env-file .env \
+  --project finance-evaluation \
+  --name analyst-notebook \
+  --ttl-hours 1
 ```
 
-该工具默认仍是历史的4小时，指定1小时即可；文件权限0600，只能新建。通过安全渠道交付，不复制整份.env。
+默认有效期仍为4小时；明确需要长期凭证时将`--ttl-hours`替换为`--never-expires`。
+完整 token 只写入命令返回的系统临时目录 JSON 文件，权限为0600；数据库只保存摘要、项目、
+名称和首尾掩码。通过安全渠道交付该文件，不复制整份`.env`，复制完成后应删除临时文件。
+长期 token 仍可用`manage_finance_access_tokens.py disable`立即停用。
 
 ## 选择Skill、工具或自动路由
 

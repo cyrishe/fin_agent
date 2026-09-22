@@ -69,7 +69,7 @@ FINANCE_API_OWNER_IDS_JSON='{"internal":"existing-user-id"}'
 ```
 
 这是部署方管理的授权映射，不是请求参数；请求不能传入 `owner_id` 或覆盖权限。
-临时 token 继承其 API principal 的绑定。目录发现和执行使用同一 owner；不同 principal 的
+access token 继承其 API principal 的绑定。目录发现和执行使用同一 owner；不同 principal 的
 会话仍然隔离，绑定到其他 owner 后也不会续接前一个 owner 的会话。
 未配置映射时保持原有 API 身份和会话寻址方式。SkillHub 暂不可用时沿用系统方法降级；
 目录返回说明，私有方法不猜测授权。未发布草稿和 Skill 正文不对外作为目录返回。
@@ -78,8 +78,8 @@ FINANCE_API_OWNER_IDS_JSON='{"internal":"existing-user-id"}'
 
 ### MCP评测与临时凭证
 
-通用MCP评测、Skill/工具选择、默认detail与回答、Excel完整问答及一键1小时临时token签发，见
-[MCP评测操作说明](finance_mcp_evaluation.md)。长期API key仍兼容；临时token需要加载新的认证实现。
+通用MCP评测、Skill/工具选择、默认detail与回答、Excel完整问答及管理型token签发，见
+[MCP评测操作说明](finance_mcp_evaluation.md)。长期API key和历史签名临时token仍兼容。
 
 ### 纯数据与执行明细
 
@@ -255,6 +255,47 @@ X-API-Key: <key>
 
 Key 只在进程内做 SHA-256 摘要并使用常量时间比较，不进入业务 trace。缺少配置时服务
 拒绝启动；缺少或错误 Key 的查询返回 `401`。
+
+### 可撤销 access token
+
+需要给具体项目分发独立凭证时，使用数据库管理型 token。部署者先在`SYSTEM_DB_URL`指向的
+系统库应用幂等 DDL：
+
+```text
+docs/sql/create_aiia_finance_access_token.sql
+```
+
+签发示例：
+
+```bash
+# 默认4小时；完整token写入自动生成的/tmp/fin-agent-access-token-*.json
+.venv/bin/python scripts/create_finance_access_token.py \
+  --env-file .env --project research-platform --name production-reader
+
+# 明确创建永不过期但仍可撤销的token
+.venv/bin/python scripts/create_finance_access_token.py \
+  --env-file .env --project research-platform --name long-lived-reader \
+  --never-expires --created-by operator-id
+```
+
+`--project`和`--name`必填。可用`--principal`选择既有父 API principal；未指定且只有一个
+principal 时自动选择。数据库不保存完整 token，只保存 SHA-256 摘要、项目/名称、principal、
+首尾掩码、有效期和停用审计字段。完整 token 仅在签发时写入系统临时目录中的`0600`文件，
+复制给用户后应删除该文件；控制台输出不会包含完整 token。
+
+查询和停用：
+
+```bash
+.venv/bin/python scripts/manage_finance_access_tokens.py --env-file .env list \
+  --project research-platform
+
+.venv/bin/python scripts/manage_finance_access_tokens.py --env-file .env disable \
+  --token-id <32位token_id> --disabled-by operator-id --reason 'project retired'
+```
+
+管理型 token 每次认证都会查询系统库，因此 disable 立即生效；系统库不可用时以`503`关闭失败，
+不会绕过状态检查。历史`fa_tmp_v1`签名临时 token 仍兼容，但它们不在数据库中，不能单独
+disable，只能等待过期或轮换/移除父 API Key。
 
 以下入口公开且不访问金融事实数据：
 
