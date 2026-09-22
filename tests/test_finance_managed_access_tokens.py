@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 from pathlib import Path
 
 import pytest
@@ -66,7 +67,11 @@ class MemoryCursor:
             }
             self.rowcount = 1
         elif normalized.startswith("SELECT PRINCIPAL_ID"):
-            row = self.database.rows.get(params[0])
+            row = next(
+                (candidate for candidate in self.database.rows.values()
+                 if candidate["token_digest"] == params[0]),
+                None,
+            )
             self.result = None if row is None else (
                 row["principal_id"], row["token_digest"], row["expires_at"], row["disabled_at"],
             )
@@ -151,6 +156,34 @@ def test_managed_token_expiration_and_tampering():
     assert store.list_tokens()[0]["state"] == "expired"
 
 
+def test_project_and_name_are_optional_and_key_is_a_single_opaque_value():
+    database = MemoryDatabase()
+    store = FinanceAccessTokenStore(connection_factory=database.connect, now_provider=lambda: 2_000)
+    issued = store.issue(principal_id="eval", ttl_seconds=None)
+    row = database.rows[issued["token_id"]]
+
+    assert issued["project_name"] is None
+    assert issued["token_name"] is None
+    assert row["project_name"] == ""
+    assert row["token_name"] == ""
+    assert issued["access_token"].startswith("fin_sk_")
+    assert "." not in issued["access_token"]
+    assert store.authenticate(issued["access_token"]) == "eval"
+    assert store.list_tokens()[0]["project_name"] is None
+    assert store.list_tokens()[0]["token_name"] is None
+
+
+def test_previous_managed_token_format_remains_compatible():
+    database = MemoryDatabase()
+    store = FinanceAccessTokenStore(connection_factory=database.connect, now_provider=lambda: 2_000)
+    issued = store.issue(principal_id="eval", ttl_seconds=None)
+    legacy_token = "fa_db_v1." + "a" * 32 + "." + "b" * 43
+    database.rows[issued["token_id"]]["token_digest"] = hashlib.sha256(
+        legacy_token.encode("utf-8")
+    ).digest()
+    assert store.authenticate(legacy_token) == "eval"
+
+
 def test_auth_accepts_managed_token_and_fails_closed_when_store_is_unavailable():
     database = MemoryDatabase()
     store = FinanceAccessTokenStore(connection_factory=database.connect, now_provider=lambda: 3_000)
@@ -192,8 +225,8 @@ def test_auth_rejects_managed_token_if_its_parent_principal_was_removed():
 def test_managed_token_input_validation():
     store = FinanceAccessTokenStore(connection_factory=MemoryDatabase().connect)
     for kwargs in [
-        {"project_name": "", "token_name": "name", "principal_id": "eval", "ttl_seconds": None},
-        {"project_name": "project", "token_name": "", "principal_id": "eval", "ttl_seconds": None},
+        {"project_name": "x" * 129, "token_name": "name", "principal_id": "eval", "ttl_seconds": None},
+        {"project_name": "project", "token_name": "bad\nname", "principal_id": "eval", "ttl_seconds": None},
         {"project_name": "project", "token_name": "name", "principal_id": "bad space", "ttl_seconds": None},
         {"project_name": "project", "token_name": "name", "principal_id": "eval", "ttl_seconds": 0},
     ]:

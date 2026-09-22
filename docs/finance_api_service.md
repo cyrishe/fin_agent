@@ -258,7 +258,7 @@ Key 只在进程内做 SHA-256 摘要并使用常量时间比较，不进入业�
 
 ### 可撤销 access token
 
-需要给具体项目分发独立凭证时，使用数据库管理型 token。部署者先在`SYSTEM_DB_URL`指向的
+需要分发可单独撤销的凭证时，使用数据库管理型 token。部署者先在`SYSTEM_DB_URL`指向的
 系统库应用幂等 DDL：
 
 ```text
@@ -270,7 +270,7 @@ docs/sql/create_aiia_finance_access_token.sql
 ```bash
 # 默认4小时；完整token写入自动生成的/tmp/fin-agent-access-token-*.json
 .venv/bin/python scripts/create_finance_access_token.py \
-  --env-file .env --project research-platform --name production-reader
+  --env-file .env
 
 # 明确创建永不过期但仍可撤销的token
 .venv/bin/python scripts/create_finance_access_token.py \
@@ -278,8 +278,10 @@ docs/sql/create_aiia_finance_access_token.sql
   --never-expires --created-by operator-id
 ```
 
-`--project`和`--name`必填。可用`--principal`选择既有父 API principal；未指定且只有一个
-principal 时自动选择。数据库不保存完整 token，只保存 SHA-256 摘要、项目/名称、principal、
+生成的 key 是单段、URL 安全的`fin_sk_...`不透明字符串，调用方只需按普通 API Key 使用
+`Authorization: Bearer <key>`，不需要理解内部记录。`--project`和`--name`只是可选管理备注。
+可用`--principal`选择既有父 API principal；未指定且只有一个 principal 时自动选择。
+数据库不保存完整 token，只保存 SHA-256 摘要、可选项目/名称、principal、
 首尾掩码、有效期和停用审计字段。完整 token 仅在签发时写入系统临时目录中的`0600`文件，
 复制给用户后应删除该文件；控制台输出不会包含完整 token。
 
@@ -294,8 +296,8 @@ principal 时自动选择。数据库不保存完整 token，只保存 SHA-256 �
 ```
 
 管理型 token 每次认证都会查询系统库，因此 disable 立即生效；系统库不可用时以`503`关闭失败，
-不会绕过状态检查。历史`fa_tmp_v1`签名临时 token 仍兼容，但它们不在数据库中，不能单独
-disable，只能等待过期或轮换/移除父 API Key。
+不会绕过状态检查。上一版`fa_db_v1...`管理型 token 继续兼容。历史`fa_tmp_v1`签名临时
+token 也仍兼容，但它们不在数据库中，不能单独 disable，只能等待过期或轮换/移除父 API Key。
 
 以下入口公开且不访问金融事实数据：
 

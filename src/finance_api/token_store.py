@@ -17,8 +17,10 @@ from typing import Callable
 from src.utils.system_db_utils import connect_system_db
 
 
-MANAGED_TOKEN_PREFIX = "fa_db_v1"
+MANAGED_TOKEN_PREFIX = "fin_sk_"
+LEGACY_MANAGED_TOKEN_PREFIX = "fa_db_v1."
 _TOKEN_ID_RE = re.compile(r"[0-9a-f]{32}")
+_MANAGED_TOKEN_RE = re.compile(r"fin_sk_[A-Za-z0-9_-]{32,128}")
 _PRINCIPAL_RE = re.compile(r"[A-Za-z0-9][A-Za-z0-9_.-]{0,63}")
 
 
@@ -53,6 +55,20 @@ def _validate_label(field: str, value: str, maximum: int) -> str:
     return normalized
 
 
+def _validate_optional_label(field: str, value: str | None, maximum: int) -> str:
+    if value is None or not str(value).strip():
+        return ""
+    return _validate_label(field, value, maximum)
+
+
+def is_managed_token(value: str) -> bool:
+    """Return whether the credential belongs to a managed-token format."""
+    return bool(
+        _MANAGED_TOKEN_RE.fullmatch(value)
+        or (value.startswith(LEGACY_MANAGED_TOKEN_PREFIX) and len(value) <= 512)
+    )
+
+
 class FinanceAccessTokenStore:
     """Issue, authenticate, list, and disable managed access tokens."""
 
@@ -74,14 +90,14 @@ class FinanceAccessTokenStore:
     def issue(
         self,
         *,
-        project_name: str,
-        token_name: str,
+        project_name: str | None = None,
+        token_name: str | None = None,
         principal_id: str,
         ttl_seconds: int | None,
         created_by: str | None = None,
     ) -> dict[str, object]:
-        project = _validate_label("project_name", project_name, 128)
-        name = _validate_label("token_name", token_name, 128)
+        project = _validate_optional_label("project_name", project_name, 128)
+        name = _validate_optional_label("token_name", token_name, 128)
         principal = str(principal_id or "").strip()
         if not _PRINCIPAL_RE.fullmatch(principal):
             raise ValueError("principal_id is invalid")
@@ -94,7 +110,7 @@ class FinanceAccessTokenStore:
         issued_at = int(self._now_provider())
         expires_at = None if ttl_seconds is None else issued_at + ttl_seconds
         token_id = secrets.token_hex(16)
-        token = f"{MANAGED_TOKEN_PREFIX}.{token_id}.{secrets.token_urlsafe(32)}"
+        token = f"{MANAGED_TOKEN_PREFIX}{secrets.token_urlsafe(32)}"
         digest = hashlib.sha256(token.encode("utf-8")).digest()
         preview_start, preview_end = token[:16], token[-8:]
         connection = self._connect()
@@ -134,8 +150,8 @@ class FinanceAccessTokenStore:
             "access_token": token,
             "token_type": "Bearer",
             "token_id": token_id,
-            "project_name": project,
-            "token_name": name,
+            "project_name": project or None,
+            "token_name": name or None,
             "principal_id": principal,
             "issued_at": issued_at,
             "expires_at": expires_at,
@@ -145,18 +161,10 @@ class FinanceAccessTokenStore:
         }
 
     def authenticate(self, token: str) -> str:
-        try:
-            if len(token) > 512:
-                raise ManagedTokenInvalid("The managed access token is invalid or inactive.")
-            prefix, token_id, secret = token.split(".")
-            if (
-                prefix != MANAGED_TOKEN_PREFIX
-                or not _TOKEN_ID_RE.fullmatch(token_id)
-                or len(secret) < 32
-            ):
-                raise ManagedTokenInvalid("The managed access token is invalid or inactive.")
-        except ValueError:
-            raise ManagedTokenInvalid("The managed access token is invalid or inactive.") from None
+        if not is_managed_token(token):
+            raise ManagedTokenInvalid("The managed access token is invalid or inactive.")
+
+        supplied_digest = hashlib.sha256(token.encode("utf-8")).digest()
 
         connection = self._connect()
         try:
@@ -165,9 +173,9 @@ class FinanceAccessTokenStore:
                     """
                     SELECT principal_id, token_digest, expires_at, disabled_at
                     FROM aiia_finance_access_token
-                    WHERE token_id = %s
+                    WHERE token_digest = %s
                     """,
-                    (token_id,),
+                    (supplied_digest,),
                 )
                 row = cursor.fetchone()
         except Exception as exc:
@@ -179,7 +187,6 @@ class FinanceAccessTokenStore:
             raise ManagedTokenInvalid("The managed access token is invalid or inactive.")
         try:
             principal_id, expected_digest, expires_at, disabled_at = row
-            supplied_digest = hashlib.sha256(token.encode("utf-8")).digest()
             if (
                 disabled_at is not None
                 or not hmac.compare_digest(bytes(expected_digest), supplied_digest)
@@ -230,8 +237,8 @@ class FinanceAccessTokenStore:
             )
             results.append({
                 "token_id": token_id,
-                "project_name": row_project,
-                "token_name": name,
+                "project_name": row_project or None,
+                "token_name": name or None,
                 "principal_id": principal,
                 "masked_token": f"{preview_start}...{preview_end}",
                 "created_at": _epoch_seconds(created_at),

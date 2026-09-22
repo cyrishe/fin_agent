@@ -10,10 +10,10 @@ from typing import Mapping
 
 from src.finance_api.access_tokens import DEFAULT_TTL_SECONDS, PREFIX, issue_token, signing_key, verify_token
 from src.finance_api.token_store import (
-    MANAGED_TOKEN_PREFIX,
     FinanceAccessTokenStore,
     ManagedTokenInvalid,
     ManagedTokenStoreUnavailable,
+    is_managed_token,
 )
 
 
@@ -90,8 +90,8 @@ class FinanceApiKeyAuth:
     def issue_managed_token(
         self,
         *,
-        project_name: str,
-        token_name: str,
+        project_name: str | None = None,
+        token_name: str | None = None,
         principal_id: str | None = None,
         ttl_seconds: int | None = DEFAULT_TTL_SECONDS,
         created_by: str | None = None,
@@ -162,7 +162,7 @@ class FinanceApiKeyAuth:
         for principal, expected_digest in self._digests.items():
             if hmac.compare_digest(supplied_digest, expected_digest):
                 matched = principal
-        if not matched and supplied.startswith(MANAGED_TOKEN_PREFIX + "."):
+        if not matched and is_managed_token(supplied):
             if self._managed_token_store is None:
                 raise FinanceApiAuthError(
                     "access_token_service_unavailable",

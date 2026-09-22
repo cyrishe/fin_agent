@@ -35,8 +35,8 @@ def _reserve_output(path: Path | None) -> tuple[int, Path]:
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--env-file", type=Path, help="Server .env; actual environment takes precedence.")
-    parser.add_argument("--project", required=True, help="Project that owns this token.")
-    parser.add_argument("--name", required=True, help="Human-readable token name within the project.")
+    parser.add_argument("--project", help="Optional project label for later management.")
+    parser.add_argument("--name", help="Optional human-readable label for later management.")
     parser.add_argument("--principal", help="Required when multiple FINANCE_API_KEYS_JSON entries exist.")
     lifetime = parser.add_mutually_exclusive_group()
     lifetime.add_argument("--ttl-hours", type=float, help="Validity in hours (default: 4).")

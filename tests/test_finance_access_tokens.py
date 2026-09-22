@@ -69,7 +69,7 @@ def test_cli_secret_file_permissions_no_overwrite_no_secret_logs(tmp_path, monke
     class ManagedStore:
         def issue(self, **kwargs):
             return {
-                "access_token": "fa_db_v1." + "a" * 32 + ".secret-value-that-is-long-enough",
+                "access_token": "fin_sk_" + "a" * 43,
                 "token_type": "Bearer",
                 "token_id": "a" * 32,
                 "project_name": kwargs["project_name"],
@@ -79,7 +79,7 @@ def test_cli_secret_file_permissions_no_overwrite_no_secret_logs(tmp_path, monke
                 "expires_at": None if kwargs["ttl_seconds"] is None else 100 + kwargs["ttl_seconds"],
                 "expires_in": kwargs["ttl_seconds"],
                 "never_expires": kwargs["ttl_seconds"] is None,
-                "masked_token": "fa_db_v1.aaaaaa...ong-enough",
+                "masked_token": "fin_sk_aaaaaaaaa...aaaaaaaa",
             }
 
     auth = FinanceApiKeyAuth({"eval": KEY}, managed_token_store=ManagedStore())
@@ -107,21 +107,23 @@ def test_cli_explicit_never_expires_and_default_tmp_output(monkeypatch, capsys):
         def issue(self, **kwargs):
             captured.update(kwargs)
             return {
-                "access_token": "fa_db_v1." + "b" * 32 + ".secret-value-that-is-long-enough",
+                "access_token": "fin_sk_" + "b" * 43,
                 "token_type": "Bearer", "token_id": "b" * 32,
                 "project_name": kwargs["project_name"], "token_name": kwargs["token_name"],
                 "principal_id": kwargs["principal_id"], "issued_at": 100,
                 "expires_at": None, "expires_in": None, "never_expires": True,
-                "masked_token": "fa_db_v1.bbbbbb...ong-enough",
+                "masked_token": "fin_sk_bbbbbbbbb...bbbbbbbb",
             }
 
     auth = FinanceApiKeyAuth({"eval": KEY}, managed_token_store=ManagedStore())
     monkeypatch.setattr(FinanceApiKeyAuth, "from_env", classmethod(lambda cls: auth))
-    assert main(["--project", "research", "--name", "permanent", "--never-expires"]) == 0
+    assert main(["--never-expires"]) == 0
     summary = json.loads(capsys.readouterr().out)
     output = Path(summary["token_file"])
     try:
         assert captured["ttl_seconds"] is None
+        assert captured["project_name"] is None
+        assert captured["token_name"] is None
         assert summary["never_expires"] is True
         assert stat.S_IMODE(output.stat().st_mode) == 0o600
         assert str(output.resolve()).startswith(str(Path(tempfile.gettempdir()).resolve()))
