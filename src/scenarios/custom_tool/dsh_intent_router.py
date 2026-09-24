@@ -110,14 +110,17 @@ class CustomToolIntentDshRouter(FinanceDeepSeekHarnessSessionService):
         )
         self.base_url = _trim(
             os.environ.get("FINANCE_DSH_CUSTOM_TOOL_BASE_URL")
+            or os.environ.get("LLM_BASE_URL")
             or os.environ.get("DASHSCOPE_BASE_URL")
             or "https://dashscope.aliyuncs.com/compatible-mode/v1"
         )
-        self.api_key = _trim(os.environ.get("DASHSCOPE_API_KEY"))
-        if not is_dashscope_endpoint(self.base_url):
-            raise ValueError(
-                "自定义工具入口 DSH 必须连接阿里云 DashScope MaaS"
-            )
+        if not is_dashscope_endpoint(self.base_url) and self.base_url != _trim(os.environ.get("LLM_BASE_URL")):
+            raise ValueError("自定义工具地址必须与显式配置的 LLM_BASE_URL 一致，或使用旧 DashScope 配置")
+        self.api_key = _trim(
+            (os.environ.get("DASHSCOPE_API_KEY") or os.environ.get("LLM_API_KEY"))
+            if is_dashscope_endpoint(self.base_url)
+            else os.environ.get("LLM_API_KEY")
+        )
         self.patch_path = (
             self.repo_root
             / "config"
@@ -139,7 +142,7 @@ class CustomToolIntentDshRouter(FinanceDeepSeekHarnessSessionService):
     def _create_harness(self, worker: _DshWorker) -> Any:
         if not self.api_key:
             raise RuntimeError(
-                "DASHSCOPE_API_KEY 未配置，自定义工具入口不会回退到个人模型服务"
+                "模型 API key 未配置，自定义工具入口不会回退到个人模型服务"
             )
         factory = self._harness_factory or _load_sdk_class()
         worker.home.mkdir(parents=True, exist_ok=True)

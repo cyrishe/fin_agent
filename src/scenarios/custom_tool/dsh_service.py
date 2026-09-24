@@ -226,15 +226,20 @@ class CustomToolDeepSeekHarnessSessionService(
         self.model = _trim(
             os.environ.get("FINANCE_DSH_CUSTOM_TOOL_MODEL") or self.model
         )
-        # Personalized-tool semantics are production MaaS traffic. Never fall
-        # back to a developer's DeepSeek official endpoint or personal key.
+        # Use the configured shared gateway; retain the legacy MaaS fallback.
         self.base_url = _trim(
             os.environ.get("FINANCE_DSH_CUSTOM_TOOL_BASE_URL")
+            or os.environ.get("LLM_BASE_URL")
             or os.environ.get("DASHSCOPE_BASE_URL")
             or "https://dashscope.aliyuncs.com/compatible-mode/v1"
         )
-        self.api_key = _trim(os.environ.get("DASHSCOPE_API_KEY"))
-        self._assert_dashscope_route()
+        if not is_dashscope_endpoint(self.base_url) and self.base_url != _trim(os.environ.get("LLM_BASE_URL")):
+            raise ValueError("自定义工具地址必须与显式配置的 LLM_BASE_URL 一致，或使用旧 DashScope 配置")
+        self.api_key = _trim(
+            (os.environ.get("DASHSCOPE_API_KEY") or os.environ.get("LLM_API_KEY"))
+            if is_dashscope_endpoint(self.base_url)
+            else os.environ.get("LLM_API_KEY")
+        )
         self.loop_policy_config = _policy_config(loop_policy_config)
         self.patch_path = (
             self.repo_root
@@ -284,13 +289,6 @@ class CustomToolDeepSeekHarnessSessionService(
                 }.items()
             },
         }
-
-    def _assert_dashscope_route(self) -> None:
-        if not is_dashscope_endpoint(self.base_url):
-            raise ValueError(
-                "自定义工具 DSH 必须连接阿里云 DashScope MaaS，"
-                "请设置 DASHSCOPE_BASE_URL"
-            )
 
     @staticmethod
     def initial_progress_event(
