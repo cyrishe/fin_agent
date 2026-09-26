@@ -1,0 +1,8 @@
+{
+  "repository": "git@codeup.aliyun.com:684beabd28a6beb51d765af2/fin_harness.git",
+  "commit": "38ea60b22f86425fc8a52fdc88de7550a971035b",
+  "tag": "fin-v0.1.0",
+  "upstream_repository": "https://github.com/deepseek-ai/deepseek-harness.git",
+  "upstream_commit": "cd5ef8148158c3a752a658978873241fdf8e2bbc",
+  "upstream_tag": "dsh-v0.1.2-alpha.1"
+}
