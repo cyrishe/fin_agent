@@ -1,0 +1,70 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "skill_markdown": {
+      "type": "string",
+      "minLength": 40
+    },
+    "control_patch": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "tool_connections": {
+          "type": "array",
+          "maxItems": 16,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "tool_name": {"type": "string"},
+              "purpose": {"type": "string"}
+            },
+            "required": ["tool_name", "purpose"]
+          }
+        },
+        "related_skills": {
+          "type": "array",
+          "maxItems": 12,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "skill_id": {"type": "string"},
+              "purpose": {"type": "string"}
+            },
+            "required": ["skill_id", "purpose"]
+          }
+        },
+        "workflow_steps": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 10,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "id": {"type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"},
+              "title": {"type": "string"},
+              "instruction": {"type": "string"},
+              "uses": {
+                "type": "array",
+                "maxItems": 8,
+                "items": {"type": "string"}
+              }
+            },
+            "required": ["id", "title", "instruction", "uses"]
+          }
+        }
+      },
+      "required": ["tool_connections", "related_skills", "workflow_steps"]
+    },
+    "change_summary": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 240
+    }
+  },
+  "required": ["skill_markdown", "control_patch", "change_summary"]
+}

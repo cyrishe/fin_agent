@@ -1,0 +1,32 @@
+{
+  "scope": "Synthetic fixture through existing Python query/store/load tools; pre-DSH projection; no LLM or production data",
+  "rows_stored": 190,
+  "initial_sample_rows": 3,
+  "loads": [
+    {
+      "columns": "all",
+      "rows": 50,
+      "payload_chars": 262786,
+      "has_more": true
+    },
+    {
+      "columns": [
+        "stock_code",
+        "rating"
+      ],
+      "rows": 50,
+      "payload_chars": 2330,
+      "has_more": true
+    },
+    {
+      "columns": [
+        "stock_code",
+        "report_date",
+        "investment_highlights"
+      ],
+      "rows": 50,
+      "payload_chars": 60359,
+      "has_more": true
+    }
+  ]
+}

@@ -63,6 +63,24 @@ def test_runtime_feedback_invalid_input_asks_user():
     assert step_feedback["suggested_action"] == "ask_user"
 
 
+def test_runtime_feedback_classifies_custom_tool_runtime_error_as_execution_failure():
+    service = RuntimeFeedbackService()
+
+    step_feedback = service.build_step_feedback(
+        {
+            "step_id": "step_1",
+            "tool_name": "ct_example",
+            "status": "failed",
+            "reason": "tool_failed",
+            "failure_kind": "runtime_error",
+            "error": "TypeError: object is not callable",
+        }
+    )
+
+    assert step_feedback["reason_code"] == "execution_failed"
+    assert step_feedback["suggested_action"] == "retry_step"
+
+
 def test_runtime_feedback_unsupported_field_routes_to_replan():
     service = RuntimeFeedbackService()
 

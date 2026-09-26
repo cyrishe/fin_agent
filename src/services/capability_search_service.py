@@ -192,10 +192,10 @@ class CapabilitySearchService:
     def _load_quant_capability_catalog(self, application_context: Dict[str, Any]) -> List[Dict[str, Any]]:
         if self.quant_capability_adapter_service is None:
             return []
-        execution_agent = application_context.get("execution_agent") if isinstance(application_context.get("execution_agent"), dict) else {}
+        default_agent = application_context.get("default_agent") if isinstance(application_context.get("default_agent"), dict) else {}
         allowed_capabilities = {
             self._trim(item)
-            for item in (execution_agent.get("quant_capabilities") or [])
+            for item in (default_agent.get("quant_capabilities") or [])
             if self._trim(item)
         }
         try:
@@ -251,10 +251,10 @@ class CapabilitySearchService:
         *,
         custom_tool_owner_ids: Optional[List[str]] = None,
     ) -> List[Dict[str, Any]]:
-        execution_agent = application_context.get("execution_agent") if isinstance(application_context.get("execution_agent"), dict) else {}
+        default_agent = application_context.get("default_agent") if isinstance(application_context.get("default_agent"), dict) else {}
         allowed_tools = {
             self._trim(item)
-            for item in (execution_agent.get("tools") or [])
+            for item in (default_agent.get("tools") or [])
             if self._trim(item)
         }
         rows: List[Dict[str, Any]] = []

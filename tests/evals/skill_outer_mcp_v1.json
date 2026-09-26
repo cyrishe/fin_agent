@@ -1,0 +1,13 @@
+{
+  "source": "Four unchanged report protocol regression questions plus four historical data-access controls from skill_selection_outer_v1.json. Gold is never sent to the model.",
+  "cases": [
+    {"case_id": "RTE009", "question": "网易的净利率变化反映了什么行业趋势？"},
+    {"case_id": "RTE010", "question": "AI大模型技术发展对科大讯飞的业务增长有何催化作用？"},
+    {"case_id": "RTE017", "question": "看多蔚来汽车的机构主要理由是什么？"},
+    {"case_id": "RTE020", "question": "阳光电源在光伏行业的竞争格局中处于什么位置？"},
+    {"case_id": "raw_quote_control", "question": "宁德时代最近一个交易日的收盘价和涨跌幅是多少？"},
+    {"case_id": "direct_01", "question": "最近 10 个交易日，上证、深证、北证三大市场的总成交额分别是什么走势？帮我按日期列出来。"},
+    {"case_id": "direct_03", "question": "现在全市场上涨家数和下跌家数分别是多少？涨停和跌停家数也一起给我。"},
+    {"case_id": "direct_13", "question": "帮我看一下现在全市场成交额排名前 20 的股票。"}
+  ]
+}

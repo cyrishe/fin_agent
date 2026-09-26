@@ -1,0 +1,95 @@
+{
+  "version": "v1",
+  "skills": [
+    {
+      "id": "market-overview",
+      "category": "market-and-sector",
+      "path": "skills/market-overview",
+      "description": "分析证券市场或大盘的整体环境，适用于市场复盘、大盘强弱、行情参与度、风格分化和风险偏好等问题。结合指定时点或区间的指数、涨跌宽度、成交及板块表现，解释市场结构、主要分歧和后续观察点。"
+    },
+    {
+      "id": "sector-theme-analysis",
+      "category": "market-and-sector",
+      "path": "skills/sector-theme-analysis",
+      "description": "分析行业、热点板块与概念主题，适用于寻找近期热点、比较板块强弱、判断热度演变与持续性、识别领涨分化及解释公司受益关系等问题。结合热点事件、行情资金、成分表现和业务证据，区分市场关注、交易表现与产业兑现。"
+    },
+    {
+      "id": "stock-research",
+      "category": "equity-research",
+      "path": "skills/stock-research",
+      "description": "围绕单只股票开展分析，适用于投资逻辑、经营前景、价格走势、风险判断和持仓复盘等问题。按需结合基本面、技术面、资金面、研报观点、新闻热点、行业板块与宏观环境、同业对比，依据用户关注点和查询结果灵活选择、组合与调整分析方法。"
+    },
+    {
+      "id": "equity-report-analysis",
+      "category": "equity-research",
+      "path": "skills/equity-report-analysis",
+      "description": "从研报中检索、解读和综合与个股相关的机构观点与研究证据。适用于机构看法、预测指标、评级与目标价、看多看空理由，以及研报涉及的行业景气、公司经营、管理层、风险和产业链等问题；支持观点提炼、共识分歧比较和预期变化追踪，可独立使用或为个股分析提供证据。"
+    },
+    {
+      "id": "earnings-analysis",
+      "category": "equity-research",
+      "path": "skills/earnings-analysis",
+      "description": "解读公司的业绩预告、快报或定期报告，适用于本期业绩如何、增长由什么驱动、利润质量如何及是否超出预期等问题。对齐报告期和比较基准，分析收入利润、利润率、现金流与一次性因素，说明新增变化及其对经营判断的影响。"
+    },
+    {
+      "id": "stock-screening",
+      "category": "screening-and-factor",
+      "path": "skills/stock-screening",
+      "description": "按用户的自然语言条件筛选股票，适用于寻找符合估值、成长、财务、量价、资金或行业主题要求的候选等问题。明确股票范围、时间窗口、必要条件、偏好与排序，利用可用数据执行筛选，解释入选依据和数据缺口。"
+    },
+    {
+      "id": "factor-analysis",
+      "category": "screening-and-factor",
+      "path": "skills/factor-analysis",
+      "description": "分析已定义的投资因子，适用于因子含义与计算口径、股票间因子值或排名差异、因子随时间变化和适用局限等问题。围绕样本与窗口检查底层数据和计算结果，解释因子反映的股票特征；有相应测试数据时分析有效性与风险。"
+    },
+    {
+      "id": "valuation-analysis",
+      "category": "equity-research",
+      "path": "skills/valuation-analysis",
+      "description": "评估公司的估值与价格隐含预期，适用于贵不贵、估值是否有基本面支撑、历史位置、同业溢价折价和关键假设敏感性等问题。根据商业模式与盈利阶段选择估值口径，结合增长、回报率和现金流形成有条件的判断。"
+    },
+    {
+      "id": "financial-quality-analysis",
+      "category": "equity-research",
+      "path": "skills/financial-quality-analysis",
+      "description": "分析公司跨期财务质量，适用于盈利能否持续、利润是否转化为现金、应收存货是否异常、偿债压力和财务风险等问题。交叉核对多个可比报告期的盈利、现金流、营运效率与资产负债，识别趋势、背离和需要进一步验证的风险线索。"
+    },
+    {
+      "id": "stock-comparison",
+      "category": "equity-research",
+      "path": "skills/stock-comparison",
+      "description": "比较两只或多只股票，适用于同业竞争、跨行业或不同成长阶段的投资取舍、寻找可比公司及指定指标对比等问题。围绕共同问题结合业务、财务、估值、市场表现与机构预期，按对象差异调整方法，解释相对优势、代价和结论成立条件。"
+    },
+    {
+      "id": "technical-structure-analysis",
+      "category": "equity-research",
+      "path": "skills/technical-structure-analysis",
+      "description": "分析股票在指定周期的价格与成交结构，适用于走势强弱、趋势转折、支撑阻力、突破确认、量价背离及技术指标解读等问题。结合高低点、成交、均线和波动证据，给出当前结构、延续条件及信号失效条件。"
+    },
+    {
+      "id": "dividend-analysis",
+      "category": "equity-research",
+      "path": "skills/dividend-analysis",
+      "description": "分析公司的现金分红质量，适用于股息水平、分红是否稳定、高股息是否可靠及未来能否持续等问题。区分预案、已实施和特别分红，结合多期利润、现金流、负债与资本需求，判断分红支撑、主要风险和可持续条件。"
+    },
+    {
+      "id": "fund-analysis",
+      "category": "fund-research",
+      "path": "skills/fund-analysis",
+      "description": "分析一只基金或比较多只基金，适用于基金表现、ETF折溢价与交易活跃度、同类产品差异和持有风险等问题。先识别产品与份额类别，结合可用行情、净值和披露材料选择方法；取得持仓、费用或经理信息时进一步分析策略暴露与管理表现。"
+    },
+    {
+      "id": "bond-analysis",
+      "category": "fixed-income",
+      "path": "skills/bond-analysis",
+      "description": "分析单只或多只债券的市场表现与风险，适用于债券价格变化、交易活跃度、发行人风险和债券比较等问题。结合可用行情与已取得的条款材料，按普通债或可转债选择方法，分析收益口径、利率信用风险及转股赎回条件。"
+    },
+    {
+      "id": "capital-flow-analysis",
+      "category": "market-and-sector",
+      "path": "skills/capital-flow-analysis",
+      "description": "分析个股或板块的资金流与交易结构，适用于资金持续流入流出、资金与价格背离、板块资金集中以及两融变化等问题。结合分单资金、成交、行情及按需的融资融券和股东披露，区分短期交易信号、杠杆变化与持有人结构，解释证据及风险。"
+    }
+  ]
+}

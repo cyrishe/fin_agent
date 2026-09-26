@@ -1,0 +1,80 @@
+{
+  "source": "outputs/financial_qa_prompt_policy_random20_20260902/cc_results.json",
+  "source_sha256": "24175f5dc181ed04cf7417a60a72d71f3fcf8a9dce9bcb8e5f39791546b7083c",
+  "source_bytes": 13168859,
+  "case_count": 20,
+  "redactions": [],
+  "results.json_sha256": "8d7b2c3b868924457a67b79b112c3e5aab83eec213aee84006adeb5938a4ace6",
+  "cases.json_sha256": "14aad1a3a3edee40734257f9bb4ddb6d57256f80f05991732e5989937af76ad9",
+  "observations": {
+    "comparison_source": "outputs/financial_qa_prompt_policy_random20_20260902/comparison_analysis.json",
+    "comparison_source_sha256": "5f52605896766b7cef5fab7b36e5ea0a233fe1191649942b8380e35eb50c84b0",
+    "cc_configuration_description": "CC financial QA, effort=low; no explicit max_tokens in ClaudeAgentOptions",
+    "models_observed": [
+      "deepseek-v4-flash"
+    ],
+    "research_modes_observed": [
+      "auto"
+    ],
+    "completed_cases": 20,
+    "nonempty_final_answers": 20,
+    "selection": {
+      "case_filters": [
+        "RTE003",
+        "RTE009",
+        "RTE033",
+        "RTE034",
+        "RTE044",
+        "RTE045",
+        "RTE046",
+        "RTE053",
+        "RTE055",
+        "RTE056",
+        "RTE059",
+        "RTE067",
+        "RTE070",
+        "RTE073",
+        "RTE076",
+        "RTE080",
+        "RTE082",
+        "RTE089",
+        "RTE093",
+        "RTE096"
+      ],
+      "offset": 0,
+      "limit": null,
+      "concurrency": 3,
+      "timeout_seconds": 600.0,
+      "financial_qa_runtime": "cc",
+      "resume": false
+    },
+    "runtime_events_source": "outputs/financial_qa_cc/events.jsonl",
+    "runtime_events_source_sha256": "112a336f6d3e90e978479e0795f205dfc5c925e0785c2288b8ca1a95cba34f93",
+    "matched_event_count": 20,
+    "catalog_revisions_observed": [
+      "aa5713c6946a5aa1a802b0be62c6d77dec0f94bd6c33cf0b7b5b3006a39335a3"
+    ],
+    "turn_timeout_seconds_observed": [
+      180,
+      900
+    ],
+    "native_evidence": [
+      {
+        "path": "data/financial_qa_cc_sessions/_client_sessions/09757719-d4e0-49b4-aff8-fee54a8ce6c0/data/financial_qa_cc_sessions/_client_sessions/09757719-d4e0-49b4-aff8-fee54a8ce6c0/claude/projects/-Volumes-ext-fin-agent-data-financial-qa-cc-sessions--client-sessions-09757719-d4e0-49b4-aff8-fee54a8ce6c0/09757719-d4e0-49b4-aff8-fee54a8ce6c0.jsonl",
+        "sha256": "ad4c32d22685bf1c6690d6643ceebe6aa182b6349599148da069d8a58e0ae645",
+        "versions": [
+          "2.1.215"
+        ],
+        "models": [
+          "deepseek-v4-flash"
+        ]
+      }
+    ],
+    "missing": [
+      "Provider and effective upstream endpoint were not captured; historical code/template says deepseek, not a bound runtime observation.",
+      "Effective max_turns was not captured; contemporaneous template says 12, not a native observation.",
+      "Python claude-agent-sdk package version was not saved with this run; native CLI version is separately evidenced.",
+      "No complete source/config content manifest was attached to the historical run; reconstruction is not an exact verified checkout."
+    ]
+  }
+}

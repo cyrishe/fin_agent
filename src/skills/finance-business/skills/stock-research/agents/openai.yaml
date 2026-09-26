@@ -1,0 +1,4 @@
+interface:
+  display_name: "个股分析"
+  short_description: "围绕单只股票，按需结合基本面、量价资金、研报、热点、行业宏观与同业分析"
+  default_prompt: "使用 $stock-research 分析这只股票，根据我的关注点和查询结果选择相关视角与专业方法，说明判断、依据和后续验证条件。"

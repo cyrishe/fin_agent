@@ -35,7 +35,7 @@ class ApplicationStudioService:
                     "version": str(config.get("version") or "").strip(),
                     "enabled": bool(config.get("enabled", True)),
                     "domain": str(config.get("domain") or "").strip(),
-                    "default_agents": [str(x).strip() for x in config.get("default_agents", []) if str(x).strip()],
+                    "default_agent": str(config.get("default_agent") or "").strip(),
                     "default_skills": [str(x).strip() for x in config.get("default_skills", []) if str(x).strip()],
                     "default_tools": [str(x).strip() for x in config.get("default_tools", []) if str(x).strip()],
                 }
@@ -106,7 +106,7 @@ class ApplicationStudioService:
             "capabilities": [],
             "tags": [],
             "keywords": [],
-            "default_agents": [],
+            "default_agent": "",
             "default_skills": [],
             "default_tools": [],
         }

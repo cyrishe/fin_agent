@@ -1,5 +1,8 @@
 from __future__ import annotations
 
+from src.experiments.staged_data_protocol.phase2 import python_filter as pf
+
+import os
 import re
 import statistics
 from dataclasses import dataclass
@@ -79,13 +82,15 @@ OP_SQL = {"=": "=", "==": "=", "!=": "!=", ">": ">", ">=": ">=", "<": "<", "<=":
 FILTER_RE = re.compile(
     r"(?:(?P<connector>\band\b|\bor\b)\s+)?"
     r"(?P<field>[A-Za-z_]\w*(?:\.[A-Za-z_]\w*)*)\s*"
-    r"(?P<op>in|=|==|!=|>=|<=|>|<)\s*"
+    r"(?P<op>in|==|=|!=|>=|<=|>|<)\s*"
     r"(?P<value>\[[^\]]+\]|\([^)]+\)|[^,;]+?)"
-    r"(?=\s+(?:and|or)\s+[A-Za-z_]\w*(?:\.[A-Za-z_]\w*)*\s*(?:in|=|==|!=|>=|<=|>|<)|[,;]|$)",
+    r"(?=\s+(?:and|or)\s+[A-Za-z_]\w*(?:\.[A-Za-z_]\w*)*\s*(?:in|==|=|!=|>=|<=|>|<)|[,;]|$)",
     flags=re.IGNORECASE,
 )
 PREVIOUS_METRIC_RE = re.compile(r"^(r\d+)\.([A-Za-z_]\w*)$")
 AGG_METHODS = {"sum", "avg", "max", "min", "median", "count"}
+DEFAULT_CONSTITUTION_LIMIT = 100
+DEFAULT_CONSTITUTION_HARD_ROW_LIMIT = 10000
 
 
 def execute_constitution_api(*, subject: str, args: Mapping[str, Any], outputs: List[str]) -> Dict[str, Any]:
@@ -114,7 +119,19 @@ def execute_constitution_api(*, subject: str, args: Mapping[str, Any], outputs: 
             reason="filter contains result references that must be materialized by the execution engine",
         )
 
-    limit = _bounded_limit(args.get("limit"))
+    limit_policy = _constitution_limit_policy(args.get("limit"))
+    if limit_policy["rejected"]:
+        return _standard_result(
+            status="result_too_large",
+            source=source,
+            args=args,
+            columns=columns,
+            rows=[],
+            mocked_fields=_mocked_fields(source=source, columns=columns),
+            ignored_filters=ignored_filters,
+            reason=str(limit_policy["reason"]),
+        )
+    limit = int(limit_policy["fetch_limit"])
     where_sql, params = _build_where(source=source, args=args)
     order_sql = _build_order(source=source, args=args)
     sql = _build_sql(source=source, columns=columns, where_sql=where_sql, order_sql=order_sql)
@@ -125,6 +142,20 @@ def execute_constitution_api(*, subject: str, args: Mapping[str, Any], outputs: 
         with db.conn.cursor(pymysql.cursors.DictCursor) as cursor:
             cursor.execute(sql, tuple(params))
             raw_rows = cursor.fetchall()
+        if limit_policy["detect_overflow"] and len(raw_rows) > int(limit_policy["hard_limit"]):
+            return _standard_result(
+                status="result_too_large",
+                source=source,
+                args=args,
+                columns=columns,
+                rows=[],
+                mocked_fields=_mocked_fields(source=source, columns=columns),
+                ignored_filters=ignored_filters,
+                reason=(
+                    "explicit full constitution query exceeds the safety maximum "
+                    f"of {limit_policy['hard_limit']} rows; narrow the universe or date"
+                ),
+            )
         rows = [_normalize_row(row, columns) for row in raw_rows]
         return _standard_result(
             status="ok",
@@ -134,7 +165,11 @@ def execute_constitution_api(*, subject: str, args: Mapping[str, Any], outputs: 
             rows=rows,
             mocked_fields=_mocked_fields(source=source, columns=columns),
             ignored_filters=ignored_filters,
-            sql_shape={"where": where_sql, "order": order_sql, "limit": limit},
+            sql_shape={
+                "where": where_sql,
+                "order": order_sql,
+                "limit": -1 if limit_policy["explicit_full"] else limit,
+            },
         )
     except Exception as exc:  # noqa: BLE001 - experiment boundary should return structured failures.
         return _standard_result(
@@ -160,7 +195,21 @@ def execute_industry_base_info_api(*, args: Mapping[str, Any], outputs: List[str
     filter_sql, params = _build_filter_clauses(source=source, args=args)
     where_sql = filter_sql or "1=1"
     order_sql = _build_order(source=source, args=args)
-    limit = _bounded_limit(args.get("limit"))
+    limit_policy = _constitution_limit_policy(args.get("limit"))
+    if limit_policy["rejected"]:
+        data = _standard_result(
+            status="result_too_large",
+            source=source,
+            args=args,
+            columns=columns,
+            rows=[],
+            mocked_fields=_mocked_fields(source=source, columns=columns),
+            ignored_filters=ignored_filters,
+            reason=str(limit_policy["reason"]),
+        )
+        data["api"] = "industry.basic_info"
+        return data
+    limit = int(limit_policy["fetch_limit"])
     select_sql = ", ".join(f"{source.fields[column]} AS `{column}`" for column in columns)
     sql = f"""
         SELECT {select_sql}
@@ -176,6 +225,22 @@ def execute_industry_base_info_api(*, args: Mapping[str, Any], outputs: List[str
         with db.conn.cursor(pymysql.cursors.DictCursor) as cursor:
             cursor.execute(sql, tuple(params))
             raw_rows = cursor.fetchall()
+        if limit_policy["detect_overflow"] and len(raw_rows) > int(limit_policy["hard_limit"]):
+            data = _standard_result(
+                status="result_too_large",
+                source=source,
+                args=args,
+                columns=columns,
+                rows=[],
+                mocked_fields=_mocked_fields(source=source, columns=columns),
+                ignored_filters=ignored_filters,
+                reason=(
+                    "explicit full industry query exceeds the safety maximum "
+                    f"of {limit_policy['hard_limit']} rows; narrow the query"
+                ),
+            )
+            data["api"] = "industry.basic_info"
+            return data
         rows = [_normalize_row(row, columns) for row in raw_rows]
         data = _standard_result(
             status="ok",
@@ -248,6 +313,11 @@ def execute_constitution_agg_api(
                 rows=[],
                 reason=f"previous result has no rows: {result_name}",
             )
+        if pf.condition(args) is not None:
+            tree = pf.condition(args)
+            pf.require_separable(tree, [set(source.fields), set(metric_handle.columns)])
+            metric_tree = pf.project(tree, set(metric_handle.columns))
+            metric_rows = [row for row in metric_rows if pf.evaluate(metric_tree, row)]
     else:
         result_name = agg_spec.metric
         stock_codes = _unique([_code_key(row.get("stock_code")) for row in constitution_rows if isinstance(row, Mapping)])
@@ -459,6 +529,8 @@ def _query_financial_metric_rows(*, source: Any, field_name: str, args: Mapping[
     if report_date:
         date_sql = "i.report_period = %s"
         date_params: list[Any] = [report_date]
+    elif any(f in {"report_date", "report_period"} for _, f, _, _ in _metric_explicit_filters(args)):
+        date_sql, date_params = "1=1", []
     else:
         date_sql = "i.report_period = (SELECT MAX(report_period) FROM kcrp_stock_income)"
         date_params = []
@@ -496,7 +568,7 @@ def _metric_market_where(*, source: Any, args: Mapping[str, Any], stock_codes: l
     if exact_date:
         clauses.append(f"{source.fields['tradedate']} = %s")
         params.append(exact_date)
-    else:
+    elif not any(source.fields.get(f) == source.fields['tradedate'] for _, f, _, _ in _metric_explicit_filters(args)):
         clauses.append(f"{source.fields['tradedate']} = (SELECT MAX(trade_date) FROM {source.table})")
     code_sql, code_params = _code_in_sql(source.fields["code"], stock_codes)
     clauses.append(code_sql)
@@ -509,6 +581,8 @@ def _metric_market_where(*, source: Any, args: Mapping[str, Any], stock_codes: l
 
 
 def _metric_filter_clauses(*, fields: Mapping[str, str], args: Mapping[str, Any], allowed: set[str]) -> tuple[str, list[Any]]:
+    if pf.condition(args) is not None:
+        return pf.sql_filter(args, fields, allowed=allowed)
     clauses: list[str] = []
     params: list[Any] = []
     for connector, field_name, op, value in _metric_explicit_filters(args):
@@ -533,6 +607,8 @@ def _metric_filter_clauses(*, fields: Mapping[str, str], args: Mapping[str, Any]
 
 
 def _metric_explicit_filters(args: Mapping[str, Any]) -> list[tuple[str, str, str, Any]]:
+    if pf.condition(args) is not None:
+        return pf.leaf_items(args)
     rows: list[tuple[str, str, str, Any]] = []
     filter_text = str(args.get("filter") or "").strip()
     for match in FILTER_RE.finditer(filter_text):
@@ -650,17 +726,82 @@ def _output_token(output: str) -> str:
 
 
 def _has_unresolved_ref(args: Mapping[str, Any]) -> bool:
-    return any(isinstance(value, str) and re.search(r"\br\d+\.", value) for value in args.values())
+    return pf.has_unresolved_refs(args)
+
+
+def _constitution_hard_row_limit() -> int:
+    try:
+        configured = int(
+            os.getenv(
+                "FIN_AGENT_CONSTITUTION_HARD_ROW_LIMIT",
+                str(DEFAULT_CONSTITUTION_HARD_ROW_LIMIT),
+            )
+        )
+    except (TypeError, ValueError):
+        configured = DEFAULT_CONSTITUTION_HARD_ROW_LIMIT
+    return max(DEFAULT_CONSTITUTION_LIMIT, configured)
+
+
+def _constitution_limit_policy(value: Any) -> Dict[str, Any]:
+    hard_limit = _constitution_hard_row_limit()
+    if value in (None, ""):
+        return {
+            "fetch_limit": DEFAULT_CONSTITUTION_LIMIT,
+            "hard_limit": hard_limit,
+            "explicit_full": False,
+            "detect_overflow": False,
+            "rejected": False,
+            "reason": "",
+        }
+    try:
+        parsed = int(value)
+    except (TypeError, ValueError):
+        parsed = DEFAULT_CONSTITUTION_LIMIT
+    if parsed == -1:
+        return {
+            "fetch_limit": hard_limit + 1,
+            "hard_limit": hard_limit,
+            "explicit_full": True,
+            "detect_overflow": True,
+            "rejected": False,
+            "reason": "",
+        }
+    if parsed <= 0:
+        return {
+            "fetch_limit": 0,
+            "hard_limit": hard_limit,
+            "explicit_full": False,
+            "detect_overflow": False,
+            "rejected": True,
+            "reason": "limit must be -1 for explicit full results or a positive integer",
+        }
+    if parsed > hard_limit:
+        return {
+            "fetch_limit": 0,
+            "hard_limit": hard_limit,
+            "explicit_full": False,
+            "detect_overflow": False,
+            "rejected": True,
+            "reason": (
+                f"requested limit={parsed} exceeds the safety maximum of "
+                f"{hard_limit}; use limit=-1 for an explicit full query"
+            ),
+        }
+    return {
+        "fetch_limit": parsed,
+        "hard_limit": hard_limit,
+        "explicit_full": False,
+        "detect_overflow": False,
+        "rejected": False,
+        "reason": "",
+    }
 
 
 def _bounded_limit(value: Any) -> int:
-    try:
-        parsed = int(value)
-    except Exception:
-        parsed = 100
-    if parsed <= 0:
-        parsed = 100
-    return max(1, min(parsed, 10000))
+    policy = _constitution_limit_policy(value)
+    if policy["rejected"]:
+        return DEFAULT_CONSTITUTION_LIMIT
+    return int(policy["fetch_limit"])
 
 
 def _as_of(args: Mapping[str, Any]) -> str:
@@ -692,6 +833,17 @@ def _build_where(*, source: ConstitutionSource, args: Mapping[str, Any]) -> tupl
 
 
 def _build_filter_clauses(*, source: ConstitutionSource, args: Mapping[str, Any]) -> tuple[str, List[Any]]:
+    if pf.condition(args) is not None:
+        def leaf(p):
+            field, op, value = p["field"], p["operator"], p["value"]
+            if source.subject == "industry" and field in {"industry_code", "industry_name"} and op in {"=", "==", "in"}:
+                return _industry_filter_sql(field_name=field, op=op, value=value)
+            values = _equivalent_filter_values(source=source, field_name=field, value=value)
+            if op in {"=", "=="} and len(values) > 1:
+                p = {**p, "operator": "in", "value": values}
+            return pf.compile_predicate(p, source.fields)
+        return pf.and_sql(_build_filter_clauses(source=source, args=pf.without_filter(args)),
+                          pf.sql_filter(args, source.fields, allowed=set(source.fields), leaf=leaf))
     clauses: List[str] = []
     params: List[Any] = []
     for connector, field_name, op, value in _explicit_filters(source=source, args=args):
@@ -772,6 +924,8 @@ def _ignored_filters(*, source: ConstitutionSource, args: Mapping[str, Any]) -> 
 
 
 def _explicit_filters(*, source: ConstitutionSource, args: Mapping[str, Any]) -> List[tuple[str, str, str, Any]]:
+    if pf.condition(args) is not None:
+        return _explicit_filters(source=source, args=pf.without_filter(args)) + pf.leaf_items(args)
     rows: List[tuple[str, str, str, Any]] = []
     for raw_field in source.fields:
         value = args.get(raw_field)

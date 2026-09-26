@@ -1,0 +1,4 @@
+interface:
+  display_name: "财务质量分析"
+  short_description: "跨期分析公司的盈利持续性、现金流、资产负债与营运背离"
+  default_prompt: "Use $financial-quality-analysis to assess this company multi-period financial quality and key divergences."

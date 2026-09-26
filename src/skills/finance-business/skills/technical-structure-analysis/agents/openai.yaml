@@ -1,0 +1,4 @@
+interface:
+  display_name: "技术结构分析"
+  short_description: "分析指定周期的趋势、量价、关键区域和技术信号失效条件"
+  default_prompt: "Use $technical-structure-analysis to assess this stock price-volume structure and invalidation conditions."

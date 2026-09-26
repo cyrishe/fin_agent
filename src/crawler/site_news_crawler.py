@@ -15,6 +15,8 @@ from bs4 import Tag
 import requests
 from selenium.common.exceptions import TimeoutException, WebDriverException
 from selenium import webdriver
+from selenium.webdriver.chrome.service import Service as ChromeService
+from selenium.webdriver.common.selenium_manager import SeleniumManager
 
 
 @dataclass
@@ -372,6 +374,8 @@ class SiteNewsCrawler:
             s.name: threading.Semaphore(self.per_site_workers)
             for s in self.sites
         }
+        self.last_search_errors: Dict[str, str] = {}
+        self.last_search_counts: Dict[str, int] = {}
 
     def _resolve_site_keyword(self, keyword: str, site: SiteConfig) -> str:
         if site.keyword_mode == "stock_code_6":
@@ -390,7 +394,16 @@ class SiteNewsCrawler:
         options.add_argument("--no-sandbox")
         options.add_argument("--disable-dev-shm-usage")
         options.add_argument("--window-size=1920,1080")
-        driver = webdriver.Chrome(options=options)
+        try:
+            driver = webdriver.Chrome(options=options)
+        except WebDriverException:
+            managed_paths = SeleniumManager().binary_paths(
+                ["--browser", "chrome", "--skip-driver-in-path"]
+            )
+            driver = webdriver.Chrome(
+                service=ChromeService(managed_paths["driver_path"]),
+                options=options,
+            )
         driver.set_page_load_timeout(self.page_load_timeout)
         return driver
 
@@ -698,9 +711,12 @@ class SiteNewsCrawler:
         keep_days_override: Optional[int] = None,
     ) -> Dict[str, List[str]]:
         if not self.sites:
+            self.last_search_errors = {}
+            self.last_search_counts = {}
             return {}
 
         result: Dict[str, List[str]] = {}
+        search_errors: Dict[str, str] = {}
         with concurrent.futures.ThreadPoolExecutor(
             max_workers=min(self.site_search_workers, len(self.sites))
         ) as pool:
@@ -713,11 +729,17 @@ class SiteNewsCrawler:
                 try:
                     result[site.name] = fut.result()
                 except Exception as exc:
-                    print(f"[Warn] search failed: site={site.name} error={exc}")
+                    error = str(exc).strip().splitlines()[0] or type(exc).__name__
+                    search_errors[site.name] = error
+                    print(f"[Warn] search failed: site={site.name} error={error}")
                     result[site.name] = []
+        self.last_search_errors = search_errors
+        self.last_search_counts = {
+            name: len(urls) for name, urls in result.items()
+        }
         print(
             f"[Crawler] keyword={keyword} search_counts="
-            f"{ {name: len(urls) for name, urls in result.items()} }"
+            f"{self.last_search_counts}"
         )
         return result
 

@@ -1,0 +1,4 @@
+interface:
+  display_name: "个股研报解读"
+  short_description: "解读研报中的机构观点、预测与看多看空理由，比较分歧和变化并提取专题证据"
+  default_prompt: "请用 $equity-report-analysis 结合研报分析这家公司的机构观点、预测及我关注的专题，说明依据、分歧和变化。"

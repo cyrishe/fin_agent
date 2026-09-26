@@ -3,6 +3,7 @@ from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional
 
 from src.skill_runtime.agent_loop import AgentLoop
+from src.skill_runtime.availability import legacy_skill_is_active
 from src.skill_runtime.models import SkillDefinition, SkillRunResult
 from src.skill_runtime.schema_validator import SchemaValidator
 from src.skill_runtime.step_budget import resolve_step_budget
@@ -46,6 +47,14 @@ class SkillRunner:
             config=config,
         )
 
+    def require_active_skill(self, skill_name: str) -> SkillDefinition:
+        """Load a compiled Skill while enforcing its execution lifecycle."""
+
+        skill = self.load_skill(skill_name)
+        if not legacy_skill_is_active(skill.config):
+            raise ValueError(f"skill '{skill.name}' is not active")
+        return skill
+
     def run(
         self,
         skill_name: str,
@@ -58,12 +67,19 @@ class SkillRunner:
         runtime_context: Optional[Dict[str, Any]] = None,
         event_handler: Optional[Callable[[Dict[str, Any]], None]] = None,
     ) -> SkillRunResult:
-        skill = self.load_skill(skill_name)
-        resolved_tools = allowed_tools or self.tool_selector.select(
-            skill_name=skill.name,
-            skill_md=skill.skill_md,
-            skill_config=skill.config,
-            input_payload=input_payload,
+        skill = self.require_active_skill(skill_name)
+        # ``None`` means the caller delegates selection to the Skill policy.
+        # An explicit empty list is a deny-all grant and must never fall back
+        # to automatic selection.
+        resolved_tools = (
+            self.tool_selector.select(
+                skill_name=skill.name,
+                skill_md=skill.skill_md,
+                skill_config=skill.config,
+                input_payload=input_payload,
+            )
+            if allowed_tools is None
+            else list(allowed_tools)
         )
         resolved_max_steps = resolve_step_budget(
             base_max_steps=(

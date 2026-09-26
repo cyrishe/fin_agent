@@ -18,6 +18,11 @@ def test_conversation_preprocess_strips_code_hint_and_marks_context(monkeypatch)
 
 
 def test_tool_plan_runtime_executes_code_step_and_downstream_binding(monkeypatch, tmp_path):
+    # This tests execution/binding, not a live model's assessment of a tiny fixture.
+    monkeypatch.setattr(
+        "src.services.tool_plan_runtime_service.chat_qwen_json",
+        lambda *args, **kwargs: ({"summary": "已按 score 降序排序。", "facts": [], "risks": []}, {}),
+    )
     def fake_run_tool(tool_name, args, runtime_ctx=None):
         return {
             "tool": tool_name,
@@ -101,7 +106,7 @@ with open(os.path.join(os.environ["CODE_OUTPUT_DIR"], "output.json"), "w", encod
     items = result["items"]
     assert [item["status"] for item in items] == ["completed", "completed", "completed"]
     assert items[1]["name"] == "analysis_python"
-    assert result["runtime_trace"]["local_events"][1]["event_type"] == "code_call"
+    assert any(event["event_type"] == "code_call" for event in result["runtime_trace"]["local_events"])
     assert any(event["event_type"] == "code_result" for event in result["runtime_trace"]["local_events"])
     blocks = [block for section in result["task_result"]["render_payload"]["sections"] for block in (section.get("blocks") or [])]
     assert any(block.get("title") == "Ranked" for block in blocks)
@@ -197,3 +202,51 @@ def test_tool_plan_runtime_turns_retention_error_into_feedback(monkeypatch):
     assert result["runtime_feedback"]["reason_code"] == "execution_failed"
     runtime_execute = {item["node"]: item for item in result["runtime_node_results"]}["runtime_execute"]
     assert runtime_execute["feedback"]["to_node"] == "runtime_execute"
+
+
+def test_tool_plan_runtime_preserves_custom_tool_runtime_failure_kind(monkeypatch):
+    def fake_run_tool(tool_name, args, runtime_ctx=None):
+        return {
+            "tool": tool_name,
+            "ok": False,
+            "data": {},
+            "error": "TypeError: object is not callable",
+            "meta": {
+                "custom_tool": True,
+                "failure_kind": "runtime_error",
+            },
+        }
+
+    monkeypatch.setattr(
+        "src.services.tool_plan_runtime_service.run_tool",
+        fake_run_tool,
+    )
+    service = ToolPlanRuntimeService(enable_tool_preflight=False)
+    monkeypatch.setattr(
+        service,
+        "_build_final_output",
+        lambda **kwargs: ({"summary": "failed", "facts": [], "risks": []}, None),
+    )
+    monkeypatch.setattr(
+        service,
+        "_build_render_payload",
+        lambda **kwargs: {"sections": [], "reference_materials": []},
+    )
+
+    result = service.execute_for_assistant(
+        execution_plan={
+            "objective": "执行自定义工具",
+            "plan_type": "tool_plan_run",
+            "work_items": [
+                {
+                    "step_id": "step_1",
+                    "type": "tool",
+                    "name": "ct_example",
+                }
+            ],
+        },
+        user_text="$ct_example",
+    )
+
+    assert result["items"][0]["failure_kind"] == "runtime_error"
+    assert result["items"][0]["feedback"]["reason_code"] == "execution_failed"

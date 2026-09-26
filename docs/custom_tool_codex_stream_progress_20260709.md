@@ -45,8 +45,8 @@ Personal tools can call approved SDK helpers, but they are not merged into the s
   - `action`
 - Strict Codex structured output schema compatible with OpenAI response format rules.
 - Codex run timeout split:
-  - idle timeout: `STOCK_AGENT_CUSTOM_TOOL_CODEX_TIMEOUT_SECONDS`, default 180 seconds
-  - hard timeout: `STOCK_AGENT_CUSTOM_TOOL_CODEX_HARD_TIMEOUT_SECONDS`, default 900 seconds
+  - idle timeout: `STOCK_AGENT_CUSTOM_TOOL_CODEX_TIMEOUT_SECONDS`, default 300 seconds
+  - hard timeout: `STOCK_AGENT_CUSTOM_TOOL_CODEX_HARD_TIMEOUT_SECONDS`, default 1800 seconds
 
 ## Current Limitations
 

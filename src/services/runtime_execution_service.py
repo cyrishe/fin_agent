@@ -6,7 +6,7 @@ from typing import Any, Callable, Dict, Optional
 import pymysql
 
 from src.services.session_variable_store_service import SessionVariableStoreService
-from src.utils.mysql_utils import StockInfoDbUtils
+from src.utils.system_db_utils import SystemDbUtils
 
 
 THREAD_TABLE = "aiia_runtime_thread"
@@ -184,7 +184,7 @@ class RuntimeExecutionService:
         runtime_ctx: Optional[Dict[str, Any]] = None,
     ) -> Dict[str, Any]:
         ctx = dict(runtime_ctx or {})
-        db = StockInfoDbUtils()
+        db = SystemDbUtils()
         try:
             with db.conn.cursor() as cursor:
                 artifact = self._lookup_artifact(
@@ -221,7 +221,7 @@ class RuntimeExecutionService:
         payload: Dict[str, Any],
         turn_id: Optional[int] = None,
     ) -> int:
-        db = StockInfoDbUtils()
+        db = SystemDbUtils()
         try:
             with db.conn.cursor() as cursor:
                 event_id = self._insert_event(
@@ -250,7 +250,7 @@ class RuntimeExecutionService:
     ) -> None:
         if not task_id:
             return
-        db = StockInfoDbUtils()
+        db = SystemDbUtils()
         try:
             with db.conn.cursor() as cursor:
                 cursor.execute(
@@ -310,7 +310,7 @@ class RuntimeExecutionService:
         }
 
         try:
-            db = StockInfoDbUtils()
+            db = SystemDbUtils()
             with db.conn.cursor() as cursor:
                 artifact = self._lookup_artifact(cursor, artifact_type="tool", artifact_name=tool_name)
                 thread_id = self._ensure_thread(cursor, runtime_ctx=runtime_ctx, artifact_name=tool_name)

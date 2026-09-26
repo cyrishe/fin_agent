@@ -1,0 +1,11 @@
+{
+  "passed": true,
+  "model_requests": 6,
+  "turns": 3,
+  "independent_history_hidden": true,
+  "followup_history_restored": true,
+  "native_selection_logged": true,
+  "paid_model_calls": 0,
+  "restoration_scope": "live session; separate native log replay tests cover reconstruction",
+  "workload": "synthetic questions and empty Skill selection; no financial database"
+}

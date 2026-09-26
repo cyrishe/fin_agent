@@ -1,0 +1,67 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "route",
+    "affected_assets",
+    "impact_summary",
+    "metadata_patch",
+    "design_replacements",
+    "implementation_instruction"
+  ],
+  "properties": {
+    "route": {
+      "type": "string",
+      "enum": ["local_patch", "full_revision"]
+    },
+    "affected_assets": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 4,
+      "items": {
+        "type": "string",
+        "enum": ["metadata", "design", "implementation", "contract"]
+      }
+    },
+    "impact_summary": {
+      "type": "string",
+      "minLength": 1
+    },
+    "metadata_patch": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["display_name", "description"],
+      "properties": {
+        "display_name": {
+          "anyOf": [
+            {"type": "string", "minLength": 1},
+            {"type": "null"}
+          ]
+        },
+        "description": {
+          "anyOf": [
+            {"type": "string", "minLength": 1},
+            {"type": "null"}
+          ]
+        }
+      }
+    },
+    "design_replacements": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["before", "after", "reason"],
+        "properties": {
+          "before": {"type": "string", "minLength": 1},
+          "after": {"type": "string"},
+          "reason": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "implementation_instruction": {
+      "type": "string"
+    }
+  }
+}

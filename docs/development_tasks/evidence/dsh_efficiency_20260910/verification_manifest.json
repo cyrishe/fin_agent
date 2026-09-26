@@ -1,0 +1,45 @@
+{
+  "fin_agent_commit": "924114397d9bfc8dde05bd966087db368331f26a",
+  "dsh_commit": "0433ae61319e1cdbe8adc8f1ca7192306bd2a6e4",
+  "dsh_preexisting_uncommitted_source_paths": [
+    "packages/llm/llm-deepseek/src/translate.ts",
+    "packages/llm/llm-deepseek/src/types.ts"
+  ],
+  "dsh_preexisting_uncommitted_source_diff_sha256": "5139613e00c2f207056bac6ec746f5f7e4553232dd3383735c5c8a31405015ca",
+  "runtime": {
+    "python": "3.12.14",
+    "node": "v24.19.0",
+    "profile": "sdk-minimal",
+    "model": "local SSE fixture",
+    "database": "not used by process replay"
+  },
+  "checks": {
+    "finance_node_policy": {
+      "passed": 64
+    },
+    "finance_python_related": {
+      "passed": 97,
+      "execution": "grouped"
+    },
+    "dsh_related_tests": {
+      "passed": 167,
+      "execution": "grouped; Session, derived cache, agent loop, token meter"
+    },
+    "native_process_replay": {
+      "turns": 3,
+      "requests": 6,
+      "paid_calls": 0
+    },
+    "dsh_host_typescript": "passed",
+    "dsh_doc_quick": "15/15 passed",
+    "dsh_doc_sync": "30/32 initially passed; missing npm wrapper replaced by passing doc-typecheck:contracts-ready; stale generated Cordis catalog regenerated and check passed",
+    "dsh_changed_source_lint": "passed",
+    "dsh_precommit_gates": "passed with unused-disable warning",
+    "dsh_global_lint": "not passed; wrapper missing npm, direct invocation reports type errors in unmodified client/UI files"
+  },
+  "limitations": [
+    "No production deployment or paid-model A/B.",
+    "Current SDK create path does not restore native history across process restart; live-session restoration and native log reconstruction were verified.",
+    "Older DSH cannot read the new request/history event."
+  ]
+}

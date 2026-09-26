@@ -268,7 +268,9 @@ class StockQuoteTool:
                        preclose_price, chg_value, chg_ratio, volume, amount, source
                 FROM aiia_stock_realtime_minute_snapshot
                 WHERE stk_code = %s
-                ORDER BY trade_date DESC, minute_index DESC
+                  AND kline_type = '1d'
+                  AND period_minutes = 1440
+                ORDER BY trade_date DESC, snapshot_time DESC, bar_end_time DESC
                 LIMIT 1
             """
             with db.conn.cursor() as cursor:
@@ -360,7 +362,12 @@ class StockQuoteTool:
             "indicators": {},
         }
 
-    def get_minute_kline_from_db(self, code_or_name: str, minute_count: int = 240) -> Dict[str, Any]:
+    def get_minute_kline_from_db(
+        self,
+        code_or_name: str,
+        minute_count: int = 240,
+        period_minutes: int = 1,
+    ) -> Dict[str, Any]:
         db = StockInfoDbUtils()
         try:
             identity = db.resolve_stock_identity(code_or_name)
@@ -370,29 +377,38 @@ class StockQuoteTool:
             code6 = stk_code[:6] if stk_code else ""
             if not code6:
                 return {"kline": [], "indicators": {}}
+            period = int(period_minutes or 1)
+            if period not in {1, 3, 5, 10, 15, 30, 60}:
+                period = 1
             sql = """
-                SELECT snapshot_slot, open_price, latest_price, low_price, high_price, volume, chg_ratio
+                SELECT bar_end_time, open_price, latest_price, low_price, high_price, volume
                 FROM aiia_stock_realtime_minute_snapshot
                 WHERE stk_code = %s
-                ORDER BY trade_date DESC, minute_index DESC
+                  AND kline_type = %s
+                  AND period_minutes = %s
+                ORDER BY trade_date DESC, bar_end_time DESC, snapshot_time DESC
                 LIMIT %s
             """
             with db.conn.cursor() as cursor:
-                cursor.execute(sql, (code6, max(1, int(minute_count))))
+                cursor.execute(sql, (code6, f"{period}m", period, max(1, int(minute_count))))
                 rows = cursor.fetchall()
             if not rows:
                 return {"kline": [], "indicators": {}}
             kline_list = []
+            previous_close = None
             for row in reversed(rows):
+                close = float(row[2] or 0)
+                pct = 0.0 if previous_close in (None, 0) else (close - previous_close) / previous_close * 100
                 kline_list.append([
                     str(row[0] or ""),
                     float(row[1] or 0),
-                    float(row[2] or 0),
+                    close,
                     float(row[3] or 0),
                     float(row[4] or 0),
                     float(row[5] or 0),
-                    round(float(row[6] or 0) * 100, 4),
+                    round(pct, 4),
                 ])
+                previous_close = close
             return {
                 "kline": kline_list,
                 "indicators": {},

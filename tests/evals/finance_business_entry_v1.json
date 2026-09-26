@@ -1,0 +1,120 @@
+{
+  "version": "finance_business_entry_v1",
+  "description": "从顶层意图到 Finance CC 的业务 Skill/数据工具入口评测；Skill 用例只验证真实入口。",
+  "cases": [
+    {
+      "id": "concept_direct",
+      "question": "解释一下 PE TTM 和动态 PE 的区别。",
+      "expected_top": {
+        "selected_agent": "investment_analyst",
+        "turn_mode": "normal_qa",
+        "entry": "agent_route"
+      },
+      "expected_cc_entry": "direct"
+    },
+    {
+      "id": "structured_quote",
+      "question": "宁德时代最近一个交易日的收盘价和涨跌幅是多少？",
+      "expected_top": {
+        "selected_agent": "investment_analyst",
+        "turn_mode": "normal_qa",
+        "entry": "agent_route"
+      },
+      "expected_cc_entry": "finance_query"
+    },
+    {
+      "id": "structured_report_metric",
+      "question": "查询宁德时代研报中2026年的每股收益预测，列出报告日期、机构和预测值。",
+      "expected_top": {
+        "selected_agent": "investment_analyst",
+        "turn_mode": "normal_qa",
+        "entry": "agent_route"
+      },
+      "expected_cc_entry": "finance_query"
+    },
+    {
+      "id": "market_overview",
+      "question": "复盘今天A股整体市场：成交、涨跌宽度、风格和风险偏好分别如何？",
+      "expected_top": {
+        "selected_agent": "investment_analyst",
+        "turn_mode": "normal_qa",
+        "entry": "agent_route"
+      },
+      "expected_cc_entry": "skill",
+      "expected_skill_id": "market-overview"
+    },
+    {
+      "id": "stock_research",
+      "question": "全面研究宁德时代当前的基本面、估值、行业位置、催化剂和主要风险。",
+      "expected_top": {
+        "selected_agent": "investment_analyst",
+        "turn_mode": "normal_qa",
+        "entry": "agent_route"
+      },
+      "expected_cc_entry": "skill",
+      "expected_skill_id": "stock-research"
+    },
+    {
+      "id": "sector_theme_analysis",
+      "question": "分析机器人板块今天上涨的驱动、内部宽度、领涨与分化，并判断持续性。",
+      "expected_top": {
+        "selected_agent": "investment_analyst",
+        "turn_mode": "normal_qa",
+        "entry": "agent_route"
+      },
+      "expected_cc_entry": "skill",
+      "expected_skill_id": "sector-theme-analysis"
+    },
+    {
+      "id": "earnings_analysis",
+      "question": "分析贵州茅台最近一期年报的增长质量、利润率和经营现金流变化，不要只罗列数字。",
+      "expected_top": {
+        "selected_agent": "investment_analyst",
+        "turn_mode": "normal_qa",
+        "entry": "agent_route"
+      },
+      "expected_cc_entry": "skill",
+      "expected_skill_id": "earnings-analysis"
+    },
+    {
+      "id": "stock_screening",
+      "question": "帮我筛选近20日创阶段新高、成交活跃且盈利改善的A股，并解释候选为什么入选。",
+      "expected_top": {
+        "selected_agent": "investment_analyst",
+        "turn_mode": "normal_qa",
+        "entry": "agent_route"
+      },
+      "expected_cc_entry": "skill",
+      "expected_skill_id": "stock-screening"
+    },
+    {
+      "id": "factor_analysis",
+      "question": "比较沪深300成分股的60日动量因子，解释头尾股票差异和这个因子的局限。",
+      "expected_top": {
+        "selected_agent": "investment_analyst",
+        "turn_mode": "normal_qa",
+        "entry": "agent_route"
+      },
+      "expected_cc_entry": "skill",
+      "expected_skill_id": "factor-analysis"
+    },
+    {
+      "id": "tool_development",
+      "question": "帮我创建一个以后可以反复运行的低估值高股息选股工具。",
+      "expected_top": {
+        "selected_agent": "investment_analyst",
+        "turn_mode": "tool_development"
+      },
+      "expected_cc_entry": "outside_financial_qa"
+    },
+    {
+      "id": "system_operation",
+      "question": "运行已经发布的 stock_realtime_quote 工具查询宁德时代。",
+      "expected_top": {
+        "selected_agent": "investment_analyst",
+        "turn_mode": "system_operation"
+      },
+      "expected_cc_entry": "outside_financial_qa"
+    }
+  ]
+}

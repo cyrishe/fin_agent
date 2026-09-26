@@ -1,0 +1,4 @@
+interface:
+  display_name: "个股估值分析"
+  short_description: "解释股票当前估值、历史与同业基准及其隐含经营预期与风险"
+  default_prompt: "Use $valuation-analysis to assess this stock valuation, implied expectations, and invalidation conditions."

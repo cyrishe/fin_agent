@@ -41,7 +41,13 @@ class AgentRuntimeService:
     ) -> Dict[str, Any]:
         role = self._trim(config.get("role")) or agent_name
         responsibilities = [self._trim(x) for x in config.get("responsibilities", []) if self._trim(x)]
-        skills = [self._trim(x) for x in config.get("skills", []) if self._trim(x)]
+        raw_skills = config.get("skills")
+        if raw_skills is not None and not isinstance(raw_skills, list):
+            raise AgentRuntimeError("agent.skills 必须是列表或 null；省略表示使用授权目录，[] 表示禁用 Skill。")
+        # An omitted list follows the authorized registry; an explicit empty
+        # list is an actual permission boundary and must survive projection.
+        skills = ([self._trim(x) for x in raw_skills if self._trim(x)]
+                  if isinstance(raw_skills, list) else None)
         tools = [self._trim(x) for x in config.get("tools", []) if self._trim(x)]
         handoff_agents = [self._trim(x) for x in config.get("handoff_agents", []) if self._trim(x)]
         context_policy = config.get("context_policy") if isinstance(config.get("context_policy"), dict) else {}
@@ -85,7 +91,7 @@ class AgentRuntimeService:
                 "title": "Skill Policy",
                 "content": {
                     **skill_policy,
-                    "allowed_skills": skills,
+                    **({"allowed_skills": skills} if skills is not None else {}),
                 },
             },
             {
@@ -118,7 +124,7 @@ class AgentRuntimeService:
             "agent_name": agent_name,
             "display_name": self._trim(config.get("display_name")) or agent_name,
             "role": role,
-            "skills": skills,
+            **({"skills": skills} if skills is not None else {}),
             "tools": tools,
             "handoff_agents": handoff_agents,
             "sections": sections,

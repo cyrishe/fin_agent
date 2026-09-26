@@ -1,0 +1,130 @@
+{
+  "model": "deepseek-v4-flash-0731",
+  "scope": "post-query decision probe; synthetic data; real provider; no DSH loop or financial DB",
+  "cases": [
+    {
+      "case": "list",
+      "question": "请帮我查询示例板块的成分股，并以列表的形式返回给我",
+      "duration_ms": 3036,
+      "tool_calls": [],
+      "answer": "已查询到示例板块的成分股，共 **190** 只，结果由系统保存。\n\n**查询范围说明**\n- 数据视图：板块成分股（plate.constitution）\n- 返回字段：stock_code（股票代码）、stock_name（股票名称）、investment_highlights（投资要点）\n- 结果总数：190 条\n\n**示例（前 3 条）**\n\n| 股票代码 | 股票名称 | 投资要点 |\n|---------|---------|---------|\n| fixture_000 | 样本公司0 | 研发投入增加，业务正在转型。 |\n| fixture_001 | 样本公司1 | 研发投入增加，业务正在转型。 |\n| fixture_002 | 样本公司2 | 研发投入增加，业务正在转型。 |\n\n完整 190 条成分股明细请在下方**参考数据区**的表格中分页查看，可直接按股票代码、股票名称进行筛选与排序。",
+      "usage": {
+        "completion_tokens": 197,
+        "prompt_tokens": 3418,
+        "total_tokens": 3615,
+        "completion_tokens_details": {
+          "accepted_prediction_tokens": null,
+          "audio_tokens": null,
+          "reasoning_tokens": 0,
+          "rejected_prediction_tokens": null
+        },
+        "prompt_tokens_details": {
+          "audio_tokens": null,
+          "cached_tokens": 0
+        }
+      }
+    },
+    {
+      "case": "analysis",
+      "question": "比较示例板块查询结果中第189和190家公司的研报投资观点，说明异同",
+      "duration_ms": 1571,
+      "tool_calls": [
+        {
+          "name": "load_finance_result",
+          "arguments": {
+            "result_ref": "session://fixture/vars/v1",
+            "offset": 188,
+            "limit": 2
+          }
+        }
+      ],
+      "answer": "I need to look at rows 189 and 190 specifically (index 188 and 189).\n\n",
+      "usage": {
+        "completion_tokens": 106,
+        "prompt_tokens": 3425,
+        "total_tokens": 3531,
+        "completion_tokens_details": {
+          "accepted_prediction_tokens": null,
+          "audio_tokens": null,
+          "reasoning_tokens": 0,
+          "rejected_prediction_tokens": null
+        },
+        "prompt_tokens_details": {
+          "audio_tokens": null,
+          "cached_tokens": 2048
+        }
+      }
+    },
+    {
+      "case": "explicit_text",
+      "question": "将示例板块全部190家公司的代码和名称写在回答正文中，不要用参考数据区代替",
+      "duration_ms": 5409,
+      "tool_calls": [
+        {
+          "name": "load_finance_result",
+          "arguments": {
+            "result_ref": "session://fixture/vars/v1",
+            "offset": 0,
+            "limit": 50,
+            "columns": [
+              "stock_code",
+              "stock_name"
+            ]
+          }
+        },
+        {
+          "name": "load_finance_result",
+          "arguments": {
+            "result_ref": "session://fixture/vars/v1",
+            "offset": 50,
+            "limit": 50,
+            "columns": [
+              "stock_code",
+              "stock_name"
+            ]
+          }
+        },
+        {
+          "name": "load_finance_result",
+          "arguments": {
+            "result_ref": "session://fixture/vars/v1",
+            "offset": 100,
+            "limit": 50,
+            "columns": [
+              "stock_code",
+              "stock_name"
+            ]
+          }
+        },
+        {
+          "name": "load_finance_result",
+          "arguments": {
+            "result_ref": "session://fixture/vars/v1",
+            "offset": 150,
+            "limit": 50,
+            "columns": [
+              "stock_code",
+              "stock_name"
+            ]
+          }
+        }
+      ],
+      "answer": "用户要求将这190家公司的代码和名称全部写在正文中。我需要分页读取完整结果",
+      "usage": {
+        "completion_tokens": 573,
+        "prompt_tokens": 3426,
+        "total_tokens": 3999,
+        "completion_tokens_details": {
+          "accepted_prediction_tokens": null,
+          "audio_tokens": null,
+          "reasoning_tokens": 155,
+          "rejected_prediction_tokens": null
+        },
+        "prompt_tokens_details": {
+          "audio_tokens": null,
+          "cached_tokens": 2048
+        }
+      }
+    }
+  ]
+}

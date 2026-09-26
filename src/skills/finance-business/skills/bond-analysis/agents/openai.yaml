@@ -1,0 +1,4 @@
+interface:
+  display_name: "债券分析"
+  short_description: "结合行情与条款分析债券表现、收益口径及风险，按需解释可转债机制"
+  default_prompt: "使用 $bond-analysis 分析这只债券的市场表现、已知条款和主要风险，并说明数据缺口。"

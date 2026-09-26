@@ -1,0 +1,765 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="data:,">
+  <title>Fin Agent · 场景原型</title>
+  <style>
+    :root {
+      --bg: #f3f5f8;
+      --surface: #ffffff;
+      --surface-2: #f8fafc;
+      --surface-3: #eef2f6;
+      --line: #d9e0e8;
+      --line-strong: #b9c4d1;
+      --ink: #17202d;
+      --ink-2: #344054;
+      --muted: #667085;
+      --muted-2: #98a2b3;
+      --blue: #2457d6;
+      --blue-soft: #edf3ff;
+      --teal: #08756a;
+      --teal-soft: #e8f7f4;
+      --green: #087a55;
+      --green-soft: #eaf8f1;
+      --amber: #9a5c0a;
+      --amber-soft: #fff7e8;
+      --red: #b23b3b;
+      --red-soft: #fff1f0;
+      --violet: #7047a3;
+      --violet-soft: #f5effb;
+      --shadow: 0 16px 42px rgba(16, 24, 40, .1);
+      --sans: Inter, "PingFang SC", "Microsoft YaHei", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      --mono: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    }
+
+    * { box-sizing: border-box; }
+    [hidden] { display: none !important; }
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: var(--bg);
+      font-family: var(--sans);
+      letter-spacing: 0;
+      overflow: hidden;
+    }
+    button, input, select, textarea { font: inherit; letter-spacing: 0; }
+    button { color: inherit; }
+    button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
+      outline: 2px solid #8eb0ff;
+      outline-offset: 2px;
+    }
+    .icon { width: 16px; height: 16px; stroke-width: 1.9; }
+    .icon-sm { width: 14px; height: 14px; stroke-width: 2; }
+    .mono { font-family: var(--mono); }
+    .muted { color: var(--muted); }
+
+    .app { height: 100vh; display: grid; grid-template-rows: 54px minmax(0, 1fr); }
+    .global-bar {
+      min-width: 0;
+      display: grid;
+      grid-template-columns: 238px minmax(0, 1fr) 314px;
+      align-items: center;
+      border-bottom: 1px solid var(--line);
+      background: var(--surface);
+      z-index: 20;
+    }
+    .brand {
+      height: 100%;
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      padding: 0 13px;
+      border-right: 1px solid var(--line);
+    }
+    .brand-mark {
+      width: 30px;
+      height: 30px;
+      display: grid;
+      place-items: center;
+      border-radius: 7px;
+      color: #fff;
+      background: var(--ink);
+      font-size: 12px;
+      font-weight: 800;
+    }
+    .brand strong { font-size: 13px; }
+    .global-center { min-width: 0; padding: 0 14px; }
+    .global-center strong { overflow: hidden; display: block; font-size: 12px; text-overflow: ellipsis; white-space: nowrap; }
+    .global-actions {
+      height: 100%;
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 7px;
+      padding: 0 12px;
+      border-left: 1px solid var(--line);
+    }
+    .icon-button {
+      width: 34px;
+      height: 34px;
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: var(--surface);
+      cursor: pointer;
+    }
+    .icon-button:hover, .button:hover { border-color: var(--line-strong); background: var(--surface-2); }
+    .button {
+      min-height: 34px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      padding: 7px 11px;
+      color: var(--ink-2);
+      background: var(--surface);
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .button.primary { color: #fff; border-color: var(--blue); background: var(--blue); }
+    .button.success { color: #fff; border-color: var(--green); background: var(--green); }
+    .button.danger { color: var(--red); border-color: #edc1bf; background: var(--red-soft); }
+    .button:disabled { cursor: not-allowed; opacity: .45; }
+    .status-pill {
+      min-height: 25px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border: 1px solid #c9d8fb;
+      border-radius: 999px;
+      padding: 3px 8px;
+      color: var(--blue);
+      background: var(--blue-soft);
+      font-size: 9px;
+      font-weight: 750;
+      white-space: nowrap;
+    }
+    .status-pill.red { color: var(--red); border-color: #edc1bf; background: var(--red-soft); }
+    .status-pill.amber { color: var(--amber); border-color: #efd29b; background: var(--amber-soft); }
+    .status-pill.green { color: var(--green); border-color: #b9dfcd; background: var(--green-soft); }
+    .status-dot { width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+
+    .shell {
+      min-height: 0;
+      display: grid;
+      grid-template-columns: 238px minmax(560px, 1fr) 314px;
+      gap: 1px;
+      background: var(--line);
+    }
+    .history, .conversation, .harness { min-width: 0; min-height: 0; background: var(--surface); }
+
+    .history { display: grid; grid-template-rows: auto auto minmax(0, 1fr) auto; }
+    .history-head { padding: 10px; border-bottom: 1px solid var(--line); }
+    .history-head .button { width: 100%; justify-content: flex-start; }
+    .history-search { position: relative; padding: 8px 10px; border-bottom: 1px solid var(--line); }
+    .history-search i { position: absolute; top: 17px; left: 19px; color: var(--muted); }
+    .history-search input {
+      width: 100%;
+      min-height: 34px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 7px 9px 7px 31px;
+      color: var(--ink-2);
+      background: var(--surface-2);
+      font-size: 10px;
+    }
+    .history-list { min-height: 0; overflow: auto; padding: 6px; }
+    .history-label { padding: 8px 8px 5px; color: var(--muted); font-size: 9px; font-weight: 750; }
+    .thread {
+      width: 100%;
+      display: grid;
+      grid-template-columns: 18px minmax(0, 1fr);
+      gap: 8px;
+      border: 0;
+      border-radius: 6px;
+      padding: 9px 8px;
+      color: var(--muted);
+      background: transparent;
+      text-align: left;
+      cursor: pointer;
+    }
+    .thread:hover { background: var(--surface-2); }
+    .thread.active { color: var(--blue); background: var(--blue-soft); }
+    .thread-copy { min-width: 0; }
+    .thread-copy strong, .thread-copy span { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .thread-copy strong { color: var(--ink-2); font-size: 10px; }
+    .thread.active .thread-copy strong { color: var(--blue); }
+    .thread-copy span { margin-top: 4px; color: var(--muted); font-size: 9px; }
+    .history-foot { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 8px; padding: 9px 10px; border-top: 1px solid var(--line); }
+    .profile { min-width: 0; display: flex; align-items: center; gap: 8px; }
+    .avatar { width: 27px; height: 27px; display: grid; place-items: center; border-radius: 50%; color: #fff; background: var(--teal); font-size: 10px; font-weight: 800; }
+    .profile strong { overflow: hidden; display: block; font-size: 10px; text-overflow: ellipsis; white-space: nowrap; }
+
+    .conversation { display: grid; grid-template-rows: 46px minmax(0, 1fr) auto; }
+    .thread-head {
+      min-width: 0;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 12px;
+      padding: 0 12px 0 16px;
+      border-bottom: 1px solid var(--line);
+    }
+    .thread-title { min-width: 0; }
+    .thread-title strong, .thread-title span { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .thread-title strong { font-size: 11px; }
+    .thread-title span { margin-top: 2px; color: var(--muted); font-size: 9px; }
+    .scenario-controls { display: flex; align-items: center; gap: 5px; }
+    .frame-count { min-width: 39px; color: var(--muted); font-size: 9px; text-align: center; }
+    .mobile-only { display: none; }
+
+    .transcript { min-height: 0; overflow: auto; scroll-behavior: smooth; }
+    .message {
+      display: grid;
+      grid-template-columns: 28px minmax(0, 760px);
+      justify-content: center;
+      gap: 10px;
+      padding: 18px max(18px, 4vw);
+    }
+    .message.user { background: var(--surface-2); }
+    .message-avatar {
+      width: 27px;
+      height: 27px;
+      display: grid;
+      place-items: center;
+      border-radius: 7px;
+      color: #fff;
+      background: var(--ink);
+      font-size: 10px;
+      font-weight: 800;
+    }
+    .message.user .message-avatar { border-radius: 50%; background: var(--teal); }
+    .message-body { min-width: 0; }
+    .message-role { color: var(--muted); font-size: 9px; font-weight: 750; }
+    .message-body > p { margin: 7px 0 0; color: var(--ink-2); font-size: 11px; line-height: 1.7; }
+    .message-actions { display: flex; gap: 6px; margin-top: 9px; }
+
+    .rich-block { margin-top: 12px; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; background: var(--surface); }
+    .block-head {
+      min-height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 7px 10px;
+      border-bottom: 1px solid var(--line);
+      background: var(--surface-2);
+    }
+    .block-title { display: flex; align-items: center; gap: 7px; min-width: 0; font-size: 10px; font-weight: 750; }
+    .tag {
+      min-height: 21px;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 3px 7px;
+      color: var(--muted);
+      background: var(--surface);
+      font-size: 9px;
+      font-weight: 750;
+      white-space: nowrap;
+    }
+    .tag.green { color: var(--green); border-color: #b9dfcd; background: var(--green-soft); }
+    .tag.amber { color: var(--amber); border-color: #efd29b; background: var(--amber-soft); }
+    .tag.red { color: var(--red); border-color: #edc1bf; background: var(--red-soft); }
+    .tag.blue { color: var(--blue); border-color: #c9d8fb; background: var(--blue-soft); }
+    .tag.violet { color: var(--violet); border-color: #ddccec; background: var(--violet-soft); }
+    .block-content { padding: 12px; }
+    .block-content > p { margin: 0; color: var(--muted); font-size: 9px; line-height: 1.6; }
+
+    .form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px; }
+    .field { display: grid; gap: 5px; }
+    .field label { color: var(--muted); font-size: 9px; font-weight: 700; }
+    .field select {
+      width: 100%;
+      min-height: 34px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 6px 8px;
+      color: var(--ink-2);
+      background: var(--surface);
+      font-size: 10px;
+    }
+    .block-foot { display: flex; justify-content: flex-end; gap: 7px; padding: 9px 10px; border-top: 1px solid var(--line); }
+    .resolved-row { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1px; background: var(--line); }
+    .resolved-cell { padding: 9px; background: var(--surface); }
+    .resolved-cell span, .resolved-cell strong { display: block; }
+    .resolved-cell span { color: var(--muted); font-size: 8px; }
+    .resolved-cell strong { margin-top: 5px; font-size: 9px; }
+
+    .artifact-summary { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1px; background: var(--line); }
+    .artifact-metric { min-height: 60px; padding: 9px; background: var(--surface); }
+    .artifact-metric span, .artifact-metric strong { display: block; }
+    .artifact-metric span { color: var(--muted); font-size: 8px; }
+    .artifact-metric strong { margin-top: 6px; font-size: 10px; }
+    .artifact-tabs { display: flex; gap: 3px; padding: 6px 9px; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+    .artifact-tab { border: 0; border-radius: 5px; padding: 6px 8px; color: var(--muted); background: transparent; font-size: 9px; cursor: pointer; }
+    .artifact-tab.active { color: var(--blue); background: var(--blue-soft); font-weight: 750; }
+    .artifact-view { display: none; padding: 10px; }
+    .artifact-view.active { display: block; }
+    .logic-flow { display: grid; grid-template-columns: repeat(4, minmax(80px, 1fr)); gap: 15px; }
+    .logic-step { position: relative; min-height: 59px; padding: 9px; border: 1px solid var(--line); background: var(--surface-2); }
+    .logic-step:not(:last-child)::after { content: "→"; position: absolute; top: 19px; right: -12px; color: var(--muted-2); }
+    .logic-step b, .logic-step span { display: block; }
+    .logic-step b { font-size: 9px; }
+    .logic-step span { margin-top: 4px; color: var(--muted); font-size: 8px; line-height: 1.4; }
+    .mini-table { width: 100%; border-collapse: collapse; font-size: 9px; }
+    .mini-table th, .mini-table td { padding: 7px 8px; border-bottom: 1px solid var(--line); text-align: left; }
+    .mini-table th { color: var(--muted); font-weight: 700; }
+
+    .workflow-list { padding: 3px 10px; }
+    .workflow-row { display: grid; grid-template-columns: 20px minmax(0, 1fr) auto; gap: 8px; align-items: center; min-height: 39px; border-bottom: 1px solid var(--line); }
+    .workflow-row:last-child { border-bottom: 0; }
+    .workflow-mark { width: 18px; height: 18px; display: grid; place-items: center; border-radius: 50%; color: var(--muted); background: var(--surface-3); }
+    .workflow-row.done .workflow-mark { color: var(--green); background: var(--green-soft); }
+    .workflow-row.active .workflow-mark { color: #fff; background: var(--blue); }
+    .workflow-row.failed .workflow-mark { color: var(--red); background: var(--red-soft); }
+    .workflow-copy strong, .workflow-copy span { display: block; }
+    .workflow-copy strong { font-size: 9px; }
+    .workflow-copy span { margin-top: 2px; color: var(--muted); font-size: 8px; }
+    .spinner { width: 11px; height: 11px; border: 2px solid rgba(255,255,255,.55); border-top-color: #fff; border-radius: 50%; animation: spin .7s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .assessment-body { display: grid; grid-template-columns: minmax(0, 1fr) 165px; }
+    .issue-list { padding: 7px 10px; }
+    .issue { display: grid; grid-template-columns: 20px minmax(0, 1fr); gap: 8px; padding: 8px 0; border-bottom: 1px solid var(--line); }
+    .issue:last-child { border-bottom: 0; }
+    .issue-icon { width: 18px; height: 18px; display: grid; place-items: center; border-radius: 50%; color: var(--red); background: var(--red-soft); }
+    .issue strong, .issue span { display: block; }
+    .issue strong { font-size: 9px; }
+    .issue span { margin-top: 3px; color: var(--muted); font-size: 8px; line-height: 1.45; }
+    .assessment-stats { padding: 10px; border-left: 1px solid var(--line); background: var(--surface-2); }
+    .stat-row { display: flex; justify-content: space-between; gap: 10px; padding: 5px 0; color: var(--muted); font-size: 8px; }
+    .stat-row strong { color: var(--ink-2); }
+    .repair-note { padding: 11px; border-left: 3px solid var(--violet); background: var(--violet-soft); }
+    .repair-note strong { display: block; color: var(--violet); font-size: 9px; }
+    .repair-note p { margin: 5px 0 0; color: var(--ink-2); font-size: 8px; line-height: 1.55; }
+    .check-line { display: grid; grid-template-columns: 17px minmax(0, 1fr); gap: 7px; margin-top: 10px; color: var(--ink-2); font-size: 9px; line-height: 1.5; cursor: pointer; }
+    .check-line input { width: 15px; height: 15px; margin: 0; accent-color: var(--green); }
+
+    .composer-shell { padding: 9px max(16px, 4vw) 11px; border-top: 1px solid var(--line); background: var(--surface); }
+    .composer {
+      width: min(800px, 100%);
+      min-height: 48px;
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      align-items: end;
+      gap: 7px;
+      margin: 0 auto;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 6px;
+      background: var(--surface);
+      box-shadow: var(--shadow);
+    }
+    .composer textarea { min-height: 34px; max-height: 100px; resize: vertical; border: 0; padding: 8px 4px; color: var(--ink); outline: none; font-size: 10px; }
+    .send { color: #fff; border-color: var(--blue); background: var(--blue); }
+
+    .harness { display: grid; grid-template-rows: auto minmax(0, 1fr) auto; }
+    .panel-head { min-height: 43px; display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 8px 11px; border-bottom: 1px solid var(--line); }
+    .panel-title { display: flex; align-items: center; gap: 7px; font-size: 10px; font-weight: 750; }
+    .harness-scroll { min-height: 0; overflow: auto; }
+    .harness-section { padding: 11px; border-bottom: 1px solid var(--line); }
+    .harness-section h3 { margin: 0 0 8px; font-size: 9px; }
+    .run-line { display: flex; justify-content: space-between; gap: 10px; padding: 4px 0; color: var(--muted); font-size: 8px; }
+    .run-line strong { color: var(--ink-2); text-align: right; }
+    .thinking-item { position: relative; display: grid; grid-template-columns: 17px minmax(0, 1fr); gap: 7px; padding: 3px 0 12px; color: var(--muted); font-size: 8px; line-height: 1.5; }
+    .thinking-item:not(:last-child)::after { content: ""; position: absolute; top: 18px; bottom: 0; left: 8px; width: 1px; background: var(--line); }
+    .thinking-mark { position: relative; z-index: 1; width: 17px; height: 17px; display: grid; place-items: center; border-radius: 50%; color: var(--muted); background: var(--surface-3); }
+    .thinking-item.done .thinking-mark { color: var(--green); background: var(--green-soft); }
+    .thinking-item.active .thinking-mark { color: #fff; background: var(--blue); }
+    .thinking-item.failed .thinking-mark { color: var(--red); background: var(--red-soft); }
+    .thinking-item strong { display: block; margin-bottom: 2px; color: var(--ink-2); font-size: 8px; }
+    .tool-call { display: grid; grid-template-columns: 17px minmax(0, 1fr) auto; gap: 7px; align-items: center; min-height: 37px; border-bottom: 1px solid var(--line); }
+    .tool-call:last-child { border-bottom: 0; }
+    .tool-call strong, .tool-call span { display: block; }
+    .tool-call strong { font-size: 8px; }
+    .tool-call span { margin-top: 2px; color: var(--muted); font-size: 8px; }
+    .harness-foot { padding: 9px 11px; border-top: 1px solid var(--line); }
+    .harness-foot .button { width: 100%; }
+
+    .drawer-backdrop { position: fixed; inset: 0; z-index: 90; display: none; background: rgba(17,24,39,.24); }
+    .drawer-backdrop.open { display: block; }
+    .event-drawer { position: absolute; top: 0; right: 0; width: min(500px, 92vw); height: 100%; display: grid; grid-template-rows: auto auto minmax(0, 1fr); background: var(--surface); box-shadow: -18px 0 50px rgba(16,24,40,.18); }
+    .drawer-copy { padding: 11px; border-bottom: 1px solid var(--line); color: var(--muted); font-size: 9px; line-height: 1.55; }
+    .event-json { min-height: 0; margin: 0; overflow: auto; padding: 14px; color: #d6deeb; background: #17202d; font: 10px/1.65 var(--mono); white-space: pre-wrap; }
+    .toast { position: fixed; right: 18px; bottom: 18px; z-index: 120; transform: translateY(18px); border: 1px solid #b9dfcd; border-radius: 8px; padding: 10px 12px; color: #07583d; background: #effaf5; box-shadow: var(--shadow); font-size: 10px; opacity: 0; pointer-events: none; transition: .2s ease; }
+    .toast.show { transform: translateY(0); opacity: 1; }
+    .mobile-backdrop { display: none; }
+
+    @media (max-width: 1100px) {
+      .global-bar { grid-template-columns: 210px minmax(0, 1fr) 280px; }
+      .shell { grid-template-columns: 210px minmax(520px, 1fr) 280px; }
+      .message { padding-inline: 24px; }
+      .assessment-body { grid-template-columns: 1fr; }
+      .assessment-stats { border-top: 1px solid var(--line); border-left: 0; }
+    }
+    @media (max-width: 860px) {
+      body { overflow: hidden; }
+      .global-bar { grid-template-columns: minmax(0, 1fr) auto; }
+      .brand { border-right: 0; }
+      .global-center, .global-actions .status-pill { display: none; }
+      .global-actions { border-left: 0; }
+      .mobile-only { display: grid; }
+      .shell { grid-template-columns: 1fr; }
+      .conversation { height: calc(100vh - 54px); }
+      .history, .harness {
+        position: fixed;
+        top: 54px;
+        bottom: 0;
+        z-index: 70;
+        display: none;
+        width: min(320px, 88vw);
+        box-shadow: 16px 0 40px rgba(16,24,40,.16);
+      }
+      .history { left: 0; }
+      .harness { right: 0; box-shadow: -16px 0 40px rgba(16,24,40,.16); }
+      .history.mobile-open, .harness.mobile-open { display: grid; }
+      .thread-head { grid-template-columns: auto minmax(0, 1fr) auto; }
+      .thread-head .mobile-history { display: grid; }
+      .message { grid-template-columns: 26px minmax(0, 1fr); padding: 16px 13px; }
+      .scenario-controls .button span { display: none; }
+    }
+    @media (max-width: 520px) {
+      .scenario-controls .frame-count { display: none; }
+      .form-grid, .resolved-row, .artifact-summary { grid-template-columns: 1fr 1fr; }
+      .logic-flow { grid-template-columns: 1fr 1fr; }
+      .logic-step:nth-child(2)::after { display: none; }
+      .artifact-tabs { overflow-x: auto; }
+      .message-body > p { font-size: 10px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="global-bar">
+      <div class="brand"><div class="brand-mark">FA</div><strong>Fin Agent</strong></div>
+      <div class="global-center"></div>
+      <div class="global-actions">
+        <span class="status-pill red" id="globalStatus"><span class="status-dot"></span><span>验证发现问题</span></span>
+        <button class="icon-button mobile-only" id="mobileHistory" title="历史对话" aria-label="历史对话"><i data-lucide="panel-left" class="icon"></i></button>
+        <button class="icon-button mobile-only" id="mobileHarness" title="Harness" aria-label="Harness"><i data-lucide="panel-right" class="icon"></i></button>
+        <button class="icon-button" id="newConversationTop" title="新建对话" aria-label="新建对话"><i data-lucide="square-pen" class="icon"></i></button>
+      </div>
+    </header>
+
+    <div class="shell">
+      <aside class="history" id="historyPanel">
+        <div class="history-head"><button class="button"><i data-lucide="square-pen" class="icon-sm"></i>新建对话</button></div>
+        <div class="history-search"><i data-lucide="search" class="icon-sm"></i><input aria-label="搜索对话" placeholder="搜索对话"></div>
+        <div class="history-list">
+          <div class="history-label">今天</div>
+          <button class="thread active"><i data-lucide="message-square" class="icon-sm"></i><span class="thread-copy"><strong>市场状态判断</strong><span id="activeThreadState">验证发现问题 · 刚刚</span></span></button>
+          <button class="thread"><i data-lucide="message-square" class="icon-sm"></i><span class="thread-copy"><strong>沪深 300 最大回撤</strong><span>数据查询 · 24 分钟前</span></span></button>
+          <button class="thread"><i data-lucide="message-square" class="icon-sm"></i><span class="thread-copy"><strong>市盈率 TTM 与静态市盈率</strong><span>知识问答 · 1 小时前</span></span></button>
+          <div class="history-label">昨天</div>
+          <button class="thread"><i data-lucide="message-square" class="icon-sm"></i><span class="thread-copy"><strong>宁德时代与比亚迪比较</strong><span>综合分析 · 昨天</span></span></button>
+          <button class="thread"><i data-lucide="message-square" class="icon-sm"></i><span class="thread-copy"><strong>质量因子定义</strong><span>等待确认 · 昨天</span></span></button>
+          <button class="thread"><i data-lucide="message-square" class="icon-sm"></i><span class="thread-copy"><strong>导出全市场因子矩阵</strong><span>已完成 · 昨天</span></span></button>
+          <div class="history-label">更早</div>
+          <button class="thread"><i data-lucide="message-square" class="icon-sm"></i><span class="thread-copy"><strong>银行板块估值变化</strong><span>数据分析 · 7 月 9 日</span></span></button>
+        </div>
+        <div class="history-foot"><div class="profile"><span class="avatar">C</span><strong>个人账户</strong></div><button class="icon-button" title="设置" aria-label="设置"><i data-lucide="settings" class="icon-sm"></i></button></div>
+      </aside>
+
+      <section class="conversation">
+        <header class="thread-head">
+          <button class="icon-button mobile-only mobile-history" id="threadHistory" title="历史对话" aria-label="历史对话"><i data-lucide="panel-left" class="icon"></i></button>
+          <div class="thread-title"><strong>市场状态判断</strong><span id="threadSubtitle">验证发现问题</span></div>
+          <div class="scenario-controls">
+            <button class="icon-button" id="prevFrame" title="上一个状态" aria-label="上一个状态"><i data-lucide="chevron-left" class="icon"></i></button>
+            <span class="frame-count" id="frameCount">4 / 7</span>
+            <button class="button" id="playScenario" title="播放场景" aria-label="播放场景"><i data-lucide="play" class="icon-sm"></i><span>播放</span></button>
+            <button class="icon-button" id="nextFrame" title="下一个状态" aria-label="下一个状态"><i data-lucide="chevron-right" class="icon"></i></button>
+          </div>
+        </header>
+
+        <div class="transcript" id="transcript">
+          <article class="message user" data-min-frame="0">
+            <div class="message-avatar">C</div>
+            <div class="message-body"><div class="message-role">你</div><p>帮我设计一个普通研究用户能看懂的市场状态判断工具。它要综合趋势、波动和市场宽度，但不要产生交易指令。</p></div>
+          </article>
+
+          <article class="message assistant" data-min-frame="0">
+            <div class="message-avatar">FA</div>
+            <div class="message-body">
+              <div class="message-role">Fin Agent</div>
+              <p>我会把它定义为一个可解释的研究工具：输出积极、中性或谨慎三档状态，同时说明主要驱动和风险边界。先确认四个金融口径。</p>
+              <section class="rich-block" id="clarificationBlock">
+                <div class="block-head"><div class="block-title"><i data-lucide="list-checks" class="icon-sm"></i>确认金融口径</div><span class="tag amber" id="clarificationTag">等待输入</span></div>
+                <div id="clarificationOpen">
+                  <div class="block-content"><div class="form-grid">
+                    <div class="field"><label for="benchmark">市场基准</label><select id="benchmark"><option>沪深 300 · 000300.SH</option><option>中证 500 · 000905.SH</option></select></div>
+                    <div class="field"><label for="lookback">观察周期</label><select id="lookback"><option>60 个交易日</option><option>120 个交易日</option></select></div>
+                    <div class="field"><label for="universe">市场宽度范围</label><select id="universe"><option>全部 A 股</option><option>沪深 300 成分股</option></select></div>
+                    <div class="field"><label for="adjustment">价格口径</label><select id="adjustment"><option>前复权</option><option>不复权</option></select></div>
+                  </div></div>
+                  <div class="block-foot"><button class="button primary" data-go="1"><i data-lucide="check" class="icon-sm"></i>确认并继续</button></div>
+                </div>
+                <div class="resolved-row" id="clarificationResolved" hidden>
+                  <div class="resolved-cell"><span>基准</span><strong>沪深 300</strong></div><div class="resolved-cell"><span>窗口</span><strong>60 日</strong></div><div class="resolved-cell"><span>范围</span><strong>全部 A 股</strong></div><div class="resolved-cell"><span>价格</span><strong>前复权</strong></div>
+                </div>
+              </section>
+            </div>
+          </article>
+
+          <article class="message user" data-min-frame="1">
+            <div class="message-avatar">C</div><div class="message-body"><div class="message-role">你</div><p>按这个口径继续。</p></div>
+          </article>
+
+          <article class="message assistant" data-min-frame="1">
+            <div class="message-avatar">FA</div>
+            <div class="message-body">
+              <div class="message-role">Fin Agent</div>
+              <p>规格已经形成。它以沪深 300 为基准，使用 60 个交易日窗口，综合趋势、波动和全部 A 股市场宽度。</p>
+              <section class="rich-block">
+                <div class="block-head"><div class="block-title"><i data-lucide="file-text" class="icon-sm"></i>市场状态判断 · 工具规格</div><span class="tag" id="artifactStatus">reviewable v0.1</span></div>
+                <div class="artifact-summary"><div class="artifact-metric"><span>状态输出</span><strong>积极 / 中性 / 谨慎</strong></div><div class="artifact-metric"><span>观察周期</span><strong>60 个交易日</strong></div><div class="artifact-metric"><span>外部影响</span><strong>无</strong></div></div>
+                <div class="artifact-tabs"><button class="artifact-tab active" data-artifact-tab="logic">判断逻辑</button><button class="artifact-tab" data-artifact-tab="schema">输入输出</button><button class="artifact-tab" data-artifact-tab="data">数据口径</button></div>
+                <div class="artifact-view active" data-artifact-view="logic"><div class="logic-flow"><div class="logic-step"><b>趋势</b><span>中期方向与均线位置</span></div><div class="logic-step"><b>波动</b><span>波动率与回撤压力</span></div><div class="logic-step"><b>市场宽度</b><span>上涨与创新高比例</span></div><div class="logic-step"><b>综合状态</b><span>规则合成并保留证据</span></div></div></div>
+                <div class="artifact-view" data-artifact-view="schema"><table class="mini-table"><thead><tr><th>方向</th><th>字段</th><th>含义</th></tr></thead><tbody><tr><td>输入</td><td>benchmark / lookback / as_of</td><td>基准、窗口和分析日期</td></tr><tr><td>输出</td><td>regime / confidence</td><td>市场状态和可信程度</td></tr><tr><td>输出</td><td>drivers / risk_notes</td><td>主要驱动和风险边界</td></tr></tbody></table></div>
+                <div class="artifact-view" data-artifact-view="data"><table class="mini-table"><thead><tr><th>数据</th><th>频率</th><th>时间约束</th></tr></thead><tbody><tr><td>基准指数行情</td><td>日线</td><td>截至 as_of</td></tr><tr><td>全 A 个股行情</td><td>日线</td><td>截至 as_of</td></tr><tr><td>证券交易状态</td><td>交易日</td><td>同一历史日期</td></tr></tbody></table></div>
+                <div class="block-foot"><button class="button" data-toast="已打开可编辑规格"><i data-lucide="pencil" class="icon-sm"></i>修改规格</button><button class="button primary" data-go="2"><i data-lucide="play" class="icon-sm"></i>形成并验证</button></div>
+              </section>
+            </div>
+          </article>
+
+          <article class="message assistant" data-min-frame="2">
+            <div class="message-avatar">FA</div>
+            <div class="message-body">
+              <div class="message-role">Fin Agent</div>
+              <p id="implementationText">我已经形成可运行版本，正在用正常市场、历史时点、停牌和空数据样例验证。</p>
+              <section class="rich-block">
+                <div class="block-head"><div class="block-title"><i data-lucide="list-todo" class="icon-sm"></i>执行进度</div><span class="tag blue" id="workflowTag">验证中</span></div>
+                <div class="workflow-list" id="workflowList"></div>
+              </section>
+            </div>
+          </article>
+
+          <article class="message assistant" data-min-frame="3">
+            <div class="message-avatar">FA</div>
+            <div class="message-body">
+              <div class="message-role">Fin Agent</div>
+              <p>验证发现两个问题：市场宽度读取了分析日期之后的证券状态，停牌样本也没有稳定处理。当前版本不会进入评审。</p>
+              <section class="rich-block">
+                <div class="block-head"><div class="block-title"><i data-lucide="shield-alert" class="icon-sm"></i>业务验证</div><span class="tag red">2 项需修正</span></div>
+                <div class="assessment-body">
+                  <div class="issue-list"><div class="issue"><span class="issue-icon"><i data-lucide="x" class="icon-sm"></i></span><span><strong>历史时点检查</strong><span>市场宽度使用了分析日期之后才知道的证券状态。</span></span></div><div class="issue"><span class="issue-icon"><i data-lucide="x" class="icon-sm"></i></span><span><strong>停牌样本处理</strong><span>停牌证券被计入分母，可能扭曲宽度指标。</span></span></div></div>
+                  <div class="assessment-stats"><div class="stat-row"><span>通过</span><strong>4 / 6</strong></div><div class="stat-row"><span>数据覆盖</span><strong>98.4%</strong></div><div class="stat-row"><span>前视检查</span><strong style="color:var(--red)">未通过</strong></div><div class="stat-row"><span>需要输入</span><strong>否</strong></div></div>
+                </div>
+                <div class="block-foot"><button class="button" data-toast="已展开验证证据"><i data-lucide="search" class="icon-sm"></i>查看证据</button><button class="button primary" data-go="4"><i data-lucide="wand-sparkles" class="icon-sm"></i>让 Agent 修复并重验</button></div>
+              </section>
+            </div>
+          </article>
+
+          <article class="message assistant" data-min-frame="4">
+            <div class="message-avatar">FA</div>
+            <div class="message-body">
+              <div class="message-role">Fin Agent</div>
+              <p id="repairText">我正在原规格上修正，不会另起一份工具。所有宽度输入按分析日期截断，异常样本从有效分母中排除并单独披露。</p>
+              <section class="rich-block">
+                <div class="block-head"><div class="block-title"><i data-lucide="list-restart" class="icon-sm"></i>修订 2</div><span class="tag blue" id="repairTag">重验中</span></div>
+                <div class="block-content"><div class="repair-note"><strong>业务行为变化</strong><p>增加历史 as_of 截断；停牌和上市不足窗口样本不进入有效分母；数据不足时返回无法判断。</p></div></div>
+                <div class="block-foot"><button class="button" data-go="5"><i data-lucide="fast-forward" class="icon-sm"></i>查看重验结果</button></div>
+              </section>
+            </div>
+          </article>
+
+          <article class="message assistant" data-min-frame="5">
+            <div class="message-avatar">FA</div>
+            <div class="message-body">
+              <div class="message-role">Fin Agent</div>
+              <p>修订后的 6 项检查已经全部通过。请确认前复权、60 日窗口和全部 A 股范围；这次确认只会锁定设计，不会发布或执行交易。</p>
+              <section class="rich-block">
+                <div class="block-head"><div class="block-title"><i data-lucide="circle-check-big" class="icon-sm"></i>确认设计</div><span class="tag amber">等待确认</span></div>
+                <div class="resolved-row"><div class="resolved-cell"><span>基准</span><strong>沪深 300</strong></div><div class="resolved-cell"><span>窗口</span><strong>60 日</strong></div><div class="resolved-cell"><span>范围</span><strong>全部 A 股</strong></div><div class="resolved-cell"><span>验证</span><strong style="color:var(--green)">6 / 6</strong></div></div>
+                <div class="block-content"><p>影响范围：锁定规格 0.2 版并进入后续交付。无发布、写入外部系统或交易动作。</p><label class="check-line"><input type="checkbox" id="reviewCheck">我已检查金融口径、修订内容和验证结果</label></div>
+                <div class="block-foot"><button class="button" data-go="1"><i data-lucide="undo-2" class="icon-sm"></i>返回修改</button><button class="button success" id="approveButton" data-go="6" disabled><i data-lucide="check" class="icon-sm"></i>确认设计并继续</button></div>
+              </section>
+            </div>
+          </article>
+
+          <article class="message user" data-min-frame="6">
+            <div class="message-avatar">C</div><div class="message-body"><div class="message-role">你</div><p>确认这个设计。</p></div>
+          </article>
+
+          <article class="message assistant" data-min-frame="6">
+            <div class="message-avatar">FA</div><div class="message-body"><div class="message-role">Fin Agent</div><p>设计已经确认并锁定为 0.2 版。后续实现和发布仍会分别经过验证与审批；当前确认没有产生外部影响。</p><div class="message-actions"><span class="tag green"><i data-lucide="check" class="icon-sm"></i>规格已锁定</span><span class="tag green">6 项验证通过</span></div></div>
+          </article>
+        </div>
+
+        <footer class="composer-shell"><div class="composer"><button class="icon-button" title="添加附件" aria-label="添加附件"><i data-lucide="paperclip" class="icon"></i></button><textarea rows="1" id="composerInput" placeholder="继续对话，补充要求或调整当前任务…"></textarea><button class="icon-button send" id="sendMessage" title="发送" aria-label="发送"><i data-lucide="arrow-up" class="icon"></i></button></div></footer>
+      </section>
+
+      <aside class="harness" id="harnessPanel">
+        <div class="panel-head"><div class="panel-title"><i data-lucide="activity" class="icon"></i>Harness</div><span class="tag red" id="harnessTag">attention</span></div>
+        <div class="harness-scroll">
+          <section class="harness-section"><h3>当前运行</h3><div class="run-line"><span>状态</span><strong id="harnessStatus">验证发现问题</strong></div><div class="run-line"><span>阶段</span><strong id="harnessStage">validation</strong></div><div class="run-line"><span>模型</span><strong>finance-agent</strong></div><div class="run-line"><span>Run</span><strong class="mono">run_8f31</strong></div></section>
+          <section class="harness-section"><h3>思考摘要</h3><div id="thinkingList"></div></section>
+          <section class="harness-section"><h3>工具调用</h3><div id="toolCalls"></div></section>
+          <section class="harness-section"><h3>上下文</h3><div class="run-line"><span>当前目标</span><strong>定义市场状态工具</strong></div><div class="run-line"><span>约束</span><strong>无交易动作</strong></div><div class="run-line"><span>市场</span><strong>CN · 日线</strong></div><div class="run-line"><span>分析时点</span><strong>历史可回放</strong></div></section>
+        </div>
+        <div class="harness-foot"><button class="button" id="openEvents"><i data-lucide="radio" class="icon-sm"></i>查看协议事件</button></div>
+      </aside>
+    </div>
+  </div>
+
+  <div class="drawer-backdrop" id="eventBackdrop" aria-hidden="true"><aside class="event-drawer" role="dialog" aria-modal="true" aria-labelledby="eventTitle"><div class="panel-head"><div class="panel-title" id="eventTitle"><i data-lucide="radio" class="icon"></i>当前协议事件</div><button class="icon-button" id="closeEvents" title="关闭" aria-label="关闭"><i data-lucide="x" class="icon"></i></button></div><div class="drawer-copy">运行时补齐后的事件仅用于恢复、追踪和调试；增强 Block 已经直接渲染在对话流水中。</div><pre class="event-json" id="eventJson"></pre></aside></div>
+  <div class="toast" id="toast" role="status">已完成</div>
+
+  <script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.js"></script>
+  <script>
+    const $ = (selector, root = document) => root.querySelector(selector);
+    const $$ = (selector, root = document) => Array.from(root.querySelectorAll(selector));
+
+    const frames = [
+      { id: "understanding", label: "正在理解", tone: "", stage: "understanding", thread: "等待口径确认", event: { event_type: "run.status", payload: { status: "running", stage: "understanding" } } },
+      { id: "specification", label: "规格已形成", tone: "green", stage: "specification", thread: "规格已形成", event: { event_type: "block.complete", target: { block_id: "tool_spec" }, payload: { status: "succeeded", revision: 1 } } },
+      { id: "implementation", label: "正在验证", tone: "", stage: "implementation", thread: "正在形成并验证", event: { event_type: "run.status", payload: { status: "running", stage: "implementation", progress: .56 } } },
+      { id: "validation_failed", label: "验证发现问题", tone: "red", stage: "validation", thread: "验证发现问题", event: { event_type: "block.create", payload: { block_id: "validation_assessment", kind: "assessment", status: "partial", semantic: "finance.tool_validation" } } },
+      { id: "repairing", label: "正在自动修复", tone: "", stage: "validation", thread: "Agent 正在修复", event: { event_type: "block.patch", target: { block_id: "workflow" }, payload: { base_revision: 1, revision: 2, operations: [{ op: "replace", path: "/payload/items/4/status", value: "running" }] } } },
+      { id: "waiting_review", label: "等待你的确认", tone: "amber", stage: "review", thread: "等待设计确认", event: { event_type: "run.status", payload: { status: "waiting_user", stage: "review", wait_reason: "approval" } } },
+      { id: "approved", label: "设计已确认", tone: "green", stage: "review", thread: "设计已确认", event: { event_type: "interaction.resolved", payload: { interaction_id: "confirm_spec", action: "accept", resolved_by: "user" } } }
+    ];
+
+    const thinkingSteps = [
+      ["理解目标", "把需求限定为研究判断，不产生交易动作。"],
+      ["检查数据", "确认趋势、波动和市场宽度所需数据。"],
+      ["形成规格", "定义输入输出和可解释合成规则。"],
+      ["验证边界", "检查历史时点、停牌和空数据。"],
+      ["修正问题", "保持同一 Artifact，修改后重新验证。"],
+      ["等待决定", "说明确认影响并暂停原 Run。"]
+    ];
+
+    const toolCatalog = [
+      ["finance_data_catalog", "读取数据能力", 1],
+      ["tool_spec_validator", "校验规格结构", 2],
+      ["historical_case_runner", "运行历史样例", 3],
+      ["artifact_patch", "应用修订 2", 4]
+    ];
+
+    const workflowItems = [
+      ["确认金融口径", "基准、窗口、范围和复权", 1],
+      ["形成工具规格", "输入输出、逻辑和数据依赖", 1],
+      ["形成可运行版本", "实现细节保留在 Harness", 2],
+      ["运行业务验证", "正常、历史、停牌和空数据", 3],
+      ["修正历史边界", "as_of 截断和异常样本", 4],
+      ["等待设计确认", "确认后锁定版本", 5]
+    ];
+
+    let currentFrame = 3;
+    let playing = false;
+    let playTimer = null;
+
+    function refreshIcons() { if (window.lucide) window.lucide.createIcons(); }
+    function showToast(message) { const toast = $("#toast"); toast.textContent = message; toast.classList.add("show"); window.clearTimeout(showToast.timer); showToast.timer = window.setTimeout(() => toast.classList.remove("show"), 2100); }
+
+    function statusForStep(index, frameIndex) {
+      if (index < frameIndex) return "done";
+      if (index === frameIndex) return frameIndex === 3 ? "failed" : "active";
+      return "pending";
+    }
+
+    function renderWorkflow() {
+      const adjusted = currentFrame >= 5 ? 6 : currentFrame === 4 ? 4 : currentFrame;
+      $("#workflowList").innerHTML = workflowItems.map(([title, detail, minFrame], index) => {
+        let state = minFrame < adjusted ? "done" : minFrame === adjusted ? "active" : "pending";
+        if (currentFrame === 3 && minFrame === 3) state = "failed";
+        if (currentFrame >= 5) state = "done";
+        const icon = state === "done" ? '<i data-lucide="check" class="icon-sm"></i>' : state === "failed" ? '<i data-lucide="x" class="icon-sm"></i>' : state === "active" ? '<span class="spinner"></span>' : String(index + 1);
+        return `<div class="workflow-row ${state}"><span class="workflow-mark">${icon}</span><span class="workflow-copy"><strong>${title}</strong><span>${detail}</span></span><span class="tag ${state === "done" ? "green" : state === "failed" ? "red" : state === "active" ? "blue" : ""}">${state === "done" ? "完成" : state === "failed" ? "有问题" : state === "active" ? "进行中" : "待处理"}</span></div>`;
+      }).join("");
+      $("#workflowTag").textContent = currentFrame >= 5 ? "验证通过" : currentFrame === 4 ? "修复中" : currentFrame === 3 ? "验证中断" : "验证中";
+      $("#workflowTag").className = `tag ${currentFrame >= 5 ? "green" : currentFrame === 3 ? "red" : "blue"}`;
+    }
+
+    function renderHarness(frame) {
+      $("#harnessStatus").textContent = frame.label;
+      $("#harnessStage").textContent = frame.stage;
+      $("#harnessTag").textContent = frame.id === "validation_failed" ? "attention" : frame.id === "waiting_review" ? "waiting" : frame.id === "approved" ? "complete" : "running";
+      $("#harnessTag").className = `tag ${frame.tone || "blue"}`;
+      const activeThinking = Math.min(currentFrame, thinkingSteps.length - 1);
+      $("#thinkingList").innerHTML = thinkingSteps.map(([title, detail], index) => {
+        const state = index < activeThinking ? "done" : index === activeThinking ? (currentFrame === 3 ? "failed" : "active") : "";
+        const icon = state === "done" ? "check" : state === "failed" ? "alert-circle" : state === "active" ? "loader-circle" : "circle";
+        return `<div class="thinking-item ${state}"><span class="thinking-mark"><i data-lucide="${icon}" class="icon-sm"></i></span><span><strong>${title}</strong>${detail}</span></div>`;
+      }).join("");
+      $("#toolCalls").innerHTML = toolCatalog.filter(([, , minFrame]) => minFrame <= currentFrame).map(([name, detail, minFrame]) => {
+        const failed = currentFrame === 3 && name === "historical_case_runner";
+        const active = minFrame === currentFrame && !failed;
+        return `<div class="tool-call"><i data-lucide="${failed ? "circle-x" : active ? "loader-circle" : "circle-check"}" class="icon-sm" style="color:${failed ? "var(--red)" : active ? "var(--blue)" : "var(--green)"}"></i><span><strong>${name}</strong><span>${detail}</span></span><span class="tag ${failed ? "red" : active ? "blue" : "green"}">${failed ? "issue" : active ? "running" : "done"}</span></div>`;
+      }).join("") || '<span class="muted" style="font-size:8px">尚未调用工具</span>';
+    }
+
+    function bindDynamicControls() {
+      $$('[data-go]').forEach((button) => button.addEventListener("click", () => setFrame(Number(button.dataset.go), true)));
+      $$('[data-toast]').forEach((button) => button.addEventListener("click", () => showToast(button.dataset.toast)));
+      const check = $("#reviewCheck");
+      const approve = $("#approveButton");
+      if (check && approve) check.addEventListener("change", () => { approve.disabled = !check.checked; });
+    }
+
+    function setFrame(index, scroll = false) {
+      currentFrame = Math.max(0, Math.min(frames.length - 1, index));
+      const frame = frames[currentFrame];
+      $("#frameCount").textContent = `${currentFrame + 1} / ${frames.length}`;
+      $("#globalStatus").className = `status-pill ${frame.tone}`;
+      $("#globalStatus").innerHTML = `<span class="status-dot"></span><span>${frame.label}</span>`;
+      $("#activeThreadState").textContent = `${frame.thread} · 刚刚`;
+      $("#threadSubtitle").textContent = frame.thread;
+      $$('[data-min-frame]').forEach((message) => { message.hidden = Number(message.dataset.minFrame) > currentFrame; });
+      const resolved = currentFrame >= 1;
+      $("#clarificationOpen").hidden = resolved;
+      $("#clarificationResolved").hidden = !resolved;
+      $("#clarificationTag").textContent = resolved ? "已确认" : "等待输入";
+      $("#clarificationTag").className = `tag ${resolved ? "green" : "amber"}`;
+      $("#artifactStatus").textContent = currentFrame >= 6 ? "approved v0.2" : currentFrame >= 4 ? "revision v0.2" : currentFrame === 3 ? "needs revision" : "reviewable v0.1";
+      $("#artifactStatus").className = `tag ${currentFrame >= 6 ? "green" : currentFrame === 3 ? "red" : currentFrame === 5 ? "amber" : ""}`;
+      renderWorkflow();
+      renderHarness(frame);
+      $("#eventJson").textContent = JSON.stringify({ object_type: "surface.event", protocol_version: "agent_surface.v1", context_id: "ctx_unified_chat", run_id: "run_8f31", seq: 20 + currentFrame, commit_state: frame.id === "repairing" ? "provisional" : "committed", ...frame.event }, null, 2);
+      bindDynamicControls();
+      refreshIcons();
+      if (scroll) window.setTimeout(() => { $("#transcript").scrollTop = $("#transcript").scrollHeight; }, 0);
+    }
+
+    function togglePlay() {
+      playing = !playing;
+      const button = $("#playScenario");
+      if (!playing) { window.clearInterval(playTimer); button.innerHTML = '<i data-lucide="play" class="icon-sm"></i><span>播放</span>'; refreshIcons(); return; }
+      if (currentFrame >= frames.length - 1) setFrame(0, true);
+      button.innerHTML = '<i data-lucide="pause" class="icon-sm"></i><span>暂停</span>';
+      refreshIcons();
+      playTimer = window.setInterval(() => { if (currentFrame >= frames.length - 1) { togglePlay(); return; } setFrame(currentFrame + 1, true); }, 1700);
+    }
+
+    $$('[data-artifact-tab]').forEach((button) => button.addEventListener("click", () => {
+      $$('[data-artifact-tab]').forEach((item) => item.classList.toggle("active", item === button));
+      $$('[data-artifact-view]').forEach((view) => view.classList.toggle("active", view.dataset.artifactView === button.dataset.artifactTab));
+    }));
+    $("#prevFrame").addEventListener("click", () => setFrame(currentFrame - 1, true));
+    $("#nextFrame").addEventListener("click", () => setFrame(currentFrame + 1, true));
+    $("#playScenario").addEventListener("click", togglePlay);
+    $("#sendMessage").addEventListener("click", () => { const input = $("#composerInput"); if (!input.value.trim()) { showToast("请输入内容"); return; } showToast("消息已加入当前对话"); input.value = ""; });
+    $("#openEvents").addEventListener("click", () => { $("#eventBackdrop").classList.add("open"); $("#eventBackdrop").setAttribute("aria-hidden", "false"); });
+    $("#closeEvents").addEventListener("click", () => { $("#eventBackdrop").classList.remove("open"); $("#eventBackdrop").setAttribute("aria-hidden", "true"); });
+    $("#eventBackdrop").addEventListener("click", (event) => { if (event.target === event.currentTarget) $("#closeEvents").click(); });
+    function toggleMobile(panel) { $(panel).classList.toggle("mobile-open"); }
+    $("#mobileHistory").addEventListener("click", () => toggleMobile("#historyPanel"));
+    $("#threadHistory").addEventListener("click", () => toggleMobile("#historyPanel"));
+    $("#mobileHarness").addEventListener("click", () => toggleMobile("#harnessPanel"));
+    $("#newConversationTop").addEventListener("click", () => showToast("已准备新对话"));
+    document.addEventListener("keydown", (event) => { if (event.key === "Escape") { $("#closeEvents").click(); $("#historyPanel").classList.remove("mobile-open"); $("#harnessPanel").classList.remove("mobile-open"); } });
+
+    setFrame(currentFrame, true);
+  </script>
+</body>
+</html>
