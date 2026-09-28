@@ -206,19 +206,33 @@ def _public_goal(value: Any) -> str:
 
 
 def _load_sdk_class() -> type[Any]:
-    try:
+    configured = _trim(os.environ.get("FINANCE_DSH_SDK_SOURCE"))
+    source_root = _trim(os.environ.get("FINANCE_DSH_SOURCE_ROOT"))
+    sdk_source = Path(configured).expanduser().resolve() if configured else None
+    if source_root:
+        checkout_sdk = Path(source_root).expanduser().resolve() / "python" / "sdk" / "src"
+        if sdk_source is not None and sdk_source != checkout_sdk:
+            raise RuntimeError("FINANCE_DSH_SDK_SOURCE 必须属于 FINANCE_DSH_SOURCE_ROOT")
+        sdk_source = checkout_sdk
+    if sdk_source is None:
+        try:
+            module = importlib.import_module("deepseek_harness")
+        except ImportError:
+            sdk_source = (
+                Path(__file__).resolve().parents[4] / "fin_harness" / "python" / "sdk" / "src"
+            ).resolve()
+    if sdk_source is not None:
+        package = sdk_source / "deepseek_harness" / "__init__.py"
+        if not package.is_file():
+            raise RuntimeError(f"DeepSeek Harness Python SDK 源码不可用：{package}")
+        source_path = str(sdk_source)
+        if sys.path[0] != source_path:
+            if source_path in sys.path:
+                sys.path.remove(source_path)
+            sys.path.insert(0, source_path)
         module = importlib.import_module("deepseek_harness")
-    except ImportError:
-        configured = _trim(os.environ.get("FINANCE_DSH_SDK_SOURCE"))
-        adjacent = Path(__file__).resolve().parents[4] / "deepseek-harness" / "python" / "sdk" / "src"
-        sdk_source = Path(configured).expanduser().resolve() if configured else adjacent.resolve()
-        if not (sdk_source / "deepseek_harness" / "__init__.py").is_file():
-            raise RuntimeError(
-                "DeepSeek Harness Python SDK 不可用；请安装 deepseek-harness-sdk，"
-                "或设置 FINANCE_DSH_SDK_SOURCE"
-            )
-        sys.path.insert(0, str(sdk_source))
-        module = importlib.import_module("deepseek_harness")
+        if Path(module.__file__).resolve() != package:
+            raise RuntimeError(f"DeepSeek Harness Python SDK 已从其他位置导入：{module.__file__}")
     harness_class = getattr(module, "DeepSeekHarness", None)
     if harness_class is None:
         raise RuntimeError("DeepSeek Harness Python SDK 缺少 DeepSeekHarness")
@@ -674,6 +688,8 @@ class FinanceDeepSeekHarnessSessionService:
         configured = _trim(os.environ.get("FINANCE_DSH_BIN"))
         if configured:
             path = Path(configured).expanduser().resolve()
+        elif _trim(os.environ.get("FINANCE_DSH_SOURCE_ROOT")):
+            path = self.repo_root / "scripts" / "dsh_source_runtime.sh"
         else:
             installed = shutil.which("dsh")
             path = (

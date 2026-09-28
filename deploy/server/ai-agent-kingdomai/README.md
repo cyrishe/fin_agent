@@ -27,16 +27,17 @@ git pull --ff-only origin agent/financial-tool-design-protocol
   -r requirements-finance-api.txt
 ```
 
-## 2. 安装 DeepSeek Harness 运行时
+## 2. 安装 Fin Harness 运行时
 
-当前通过源码入口运行 DSH。服务器需要 Node.js `22.19+`，以及本次验证使用的
-Harness commit `cd5ef8148158c3a752a658978873241fdf8e2bbc`。
+当前通过源码入口运行 Fin Harness。服务器需要 Node.js `22.19+`。部署版本以
+[`deploy/dsh/fin_harness.lock.json`](../../dsh/fin_harness.lock.json) 的 `commit` 为准；
+不要直接部署浮动分支或官方跟踪分支。
 
 ```bash
 cd /home/che/cyris
-git clone git@github.com:deepseek-ai/deepseek-harness.git
-cd deepseek-harness
-git checkout cd5ef8148158c3a752a658978873241fdf8e2bbc
+git clone git@codeup.aliyun.com:684beabd28a6beb51d765af2/fin_harness.git
+cd fin_harness
+git checkout "$(/usr/bin/python3 -c 'import json; print(json.load(open("../fin_agent/deploy/dsh/fin_harness.lock.json"))["commit"])')"
 corepack enable
 pnpm install --frozen-lockfile
 ```
@@ -63,8 +64,8 @@ FINANCE_CHAT_DEFAULT_RUNTIME=dsh
 FINANCE_CC_FINANCIAL_QA_ENABLED=1
 FINANCE_CC_SUBPROCESS_ENV_SCRUB=1
 FINANCE_DSH_FINANCIAL_QA_ENABLED=1
-FINANCE_DSH_SOURCE_ROOT=/home/che/cyris/deepseek-harness
-FINANCE_DSH_SDK_SOURCE=/home/che/cyris/deepseek-harness/python/sdk/src
+FINANCE_DSH_SOURCE_ROOT=/home/che/cyris/fin_harness
+FINANCE_DSH_SDK_SOURCE=/home/che/cyris/fin_harness/python/sdk/src
 FINANCE_DSH_NODE_BIN=/home/che/cyris/runtime/node-v22.19.0-linux-x64/bin/node
 ```
 

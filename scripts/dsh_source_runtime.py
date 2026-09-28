@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Launch the adjacent DeepSeek Harness checkout through its supported dsh CLI."""
+"""Launch the adjacent Fin Harness checkout through its supported dsh CLI."""
 
 from __future__ import annotations
 
@@ -11,7 +11,7 @@ from pathlib import Path
 def main() -> None:
     root = Path(
         os.environ.get("FINANCE_DSH_SOURCE_ROOT")
-        or Path(__file__).resolve().parents[2] / "deepseek-harness"
+        or Path(__file__).resolve().parents[2] / "fin_harness"
     ).resolve()
     entry = root / "apps" / "cli" / "src" / "bin.ts"
     if not entry.is_file():
