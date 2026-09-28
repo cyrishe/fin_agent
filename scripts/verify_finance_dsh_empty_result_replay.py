@@ -138,7 +138,8 @@ def run(args):
                     assert unauth.status_code == 401
                     scenarios = [
                         ("empty", [catalog("corporate_action"), query(EMPTY_QUERY)], True, "both", "continuity"),
-                        ("followup", [query(EMPTY_QUERY.replace("limit = 20", "limit = 5"))], True, "both", "continuity"),
+                        ("followup", [catalog("corporate_action"),
+                                      query(EMPTY_QUERY.replace("limit = 20", "limit = 5"))], True, "both", "continuity"),
                         ("unfinished", [catalog("corporate_action"), query(EMPTY_QUERY, False),
                                         query(EMPTY_QUERY.replace("r1 =", "r2 =").replace("limit = 20", "limit = 5"))], True, "both", None),
                         ("nonempty", [catalog("quote"), query(QUOTE_QUERY)], False, "both", None),
@@ -149,7 +150,10 @@ def run(args):
                         wire_requests.clear()
                         pending.clear()
                         pending.extend(actions)
-                        if mode == "both" and not (enabled and empty):
+                        # This API supplies a Skill catalog even when the model
+                        # chooses no Skill. Keep the synthesis step in both
+                        # variants; the policy intentionally protects it.
+                        if mode == "both":
                             pending.append("固定回放答案；本项只验证运行协议，不评价模型理解能力。")
                         expected_count = len(pending)
                         arguments = {"query": "按指定条件查询金融数据。", "response_mode": mode,
@@ -172,17 +176,17 @@ def run(args):
                         assert not pending and len(requests) == expected_count, (variant, case_id, "model count")
                         counts = [ref["row_count"] for ref in record["result_refs"]]
                         assert counts and (all(count == 0 for count in counts) if empty else counts == [5]), (case_id, counts)
-                        assert record["empty_result_early_stop"] == (enabled and empty and mode == "both")
+                        assert record["loop_policy"]["config"]["emptyResultEarlyStop"] is enabled
+                        assert record["empty_result_early_stop"] is False
                         assert bool(payload.get("summary")) == (mode == "both")
                         if case_id == "followup":
                             assert record["resumed"]
-                            if enabled:
-                                first_context = json.dumps(requests[0]["messages"], ensure_ascii=False)
-                                assert report[variant]["empty"]["summary"] in first_context
+                            first_context = json.dumps(requests[0]["messages"], ensure_ascii=False)
+                            assert "固定回放答案" in first_context
                         else:
                             assert not record["resumed"]
                             if case_id != "empty":
-                                assert report[variant]["empty"]["summary"] not in json.dumps(requests[0]["messages"], ensure_ascii=False)
+                                assert "固定回放答案" not in json.dumps(requests[0]["messages"], ensure_ascii=False)
                         report[variant][case_id] = {"calls": len(requests), "rows": counts,
                                                     "summary": payload.get("summary"), "early_stop": record["empty_result_early_stop"],
                                                     "samples": [ref.get("sample") for ref in record["result_refs"]],
@@ -200,6 +204,7 @@ def run(args):
             assert report["baseline"][case_id]["summary"] == report["optimized"][case_id]["summary"]
             assert report["baseline"][case_id]["samples"] == report["optimized"][case_id]["samples"]
         report["verification"] = {"first_two_requests_byte_equivalent": True, "all_rows_and_summaries_equal": True,
+                                  "skill_catalog_retains_final_model_step": True,
                                   "unauthenticated_rejected": True,
                                   "note": "Fixed model decisions + real MCP/DSH/database. Not a model-quality or billing benchmark."}
         (output / "report.json").write_text(json.dumps(report, ensure_ascii=False, indent=2))
