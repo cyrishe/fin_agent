@@ -569,6 +569,7 @@ class _DshWorker:
     lock: threading.Lock = field(default_factory=threading.Lock)
     harness: Any = None
     catalog_revision: str = ""
+    allowed_agent_tools: frozenset[str] = field(default_factory=frozenset)
     seen_sessions: set[str] = field(default_factory=set)
 
 
@@ -1007,10 +1008,18 @@ class FinanceDeepSeekHarnessSessionService:
             retain_affinity=not isolated_request,
         ) as (worker, queue_wait_ms):
             catalog_revision = self._catalog_revision()
+            allowed_agent_tools = frozenset(
+                _trim(item) for item in tool_context.get("allowed_agent_tools") or []
+                if _trim(item)
+            )
             if (
                 worker.harness is not None
-                and worker.catalog_revision != catalog_revision
+                and (worker.catalog_revision != catalog_revision
+                     or worker.allowed_agent_tools != allowed_agent_tools)
             ):
+                # MCP tool definitions are cached at client startup. Prewarm
+                # has no caller grants; reconnect when the actual grant changes
+                # so the next model request sees exactly its authorized tools.
                 worker.harness.close()
                 worker.harness = None
             _atomic_write(
@@ -1029,6 +1038,7 @@ class FinanceDeepSeekHarnessSessionService:
             if worker.harness is None:
                 worker.harness = self._create_harness(worker)
                 worker.catalog_revision = catalog_revision
+                worker.allowed_agent_tools = allowed_agent_tools
             call_names: dict[str, str] = {}
             call_progress: dict[str, list[dict[str, str]]] = {}
             result_sources: dict[str, str] = {}
@@ -1475,6 +1485,9 @@ class FinanceDeepSeekHarnessSessionService:
                 ):
                     worker.harness.close()
                     worker.harness = None
+                if worker.harness is not None:
+                    worker.harness.start()
+                    return worker.index
                 _atomic_write(
                     worker.context_path,
                     {
@@ -1491,6 +1504,7 @@ class FinanceDeepSeekHarnessSessionService:
                 if worker.harness is None:
                     worker.harness = self._create_harness(worker)
                     worker.catalog_revision = catalog_revision
+                    worker.allowed_agent_tools = frozenset()
                 worker.harness.start()
                 return worker.index
 

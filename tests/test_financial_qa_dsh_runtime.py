@@ -1349,6 +1349,64 @@ def test_dsh_prewarms_each_configured_worker(tmp_path: Path, monkeypatch) -> Non
     service.close()
 
 
+@pytest.mark.parametrize("prewarm", [False, True])
+def test_dsh_refreshes_cached_tool_grants_without_losing_session(tmp_path, prewarm):
+    created = []
+
+    class Harness:
+        def __init__(self, **kwargs):
+            self.context_path = Path(kwargs["env"]["FIN_AGENT_DSH_CONTEXT_PATH"])
+            self.context = json.loads(self.context_path.read_text())
+            self.closed = False
+            created.append(self)
+
+        def start(self):
+            pass
+
+        def close(self):
+            self.closed = True
+
+        def run(self, prompt, *, session_id, on_notification):
+            return SimpleNamespace(final_response="ok", finish_reason="completed", events=[])
+
+    service = FinanceDeepSeekHarnessSessionService(
+        enabled=True, root_dir=tmp_path / "runtime", log_path=tmp_path / "events.jsonl",
+        worker_count=1, harness_factory=Harness,
+    )
+    try:
+        if prewarm:
+            service.prewarm()
+            assert not created[0].context["tool_context"].get("allowed_agent_tools")
+
+        def turn(tools):
+            return service.run_turn(thread_id="same-session", owner_id="owner", user_text="test",
+                                    context={"allowed_agent_tools": tools})
+
+        first = turn(["stock_kline_visual_analysis", "general_search"])
+        assert len(created) == 1 + int(prewarm)
+        if prewarm:
+            assert created[0].closed
+        assert created[-1].context["tool_context"]["allowed_agent_tools"] == [
+            "stock_kline_visual_analysis", "general_search"]
+
+        # Repeated warm-up must preserve a live client's grant and context.
+        context_before = created[-1].context_path.read_bytes()
+        service.prewarm()
+        assert created[-1].context_path.read_bytes() == context_before
+        same = turn(["general_search", "stock_kline_visual_analysis", "general_search"])
+        assert same["client_reused"] and same["resumed"]
+        assert len(created) == 1 + int(prewarm)
+
+        previous = created[-1]
+        revoked = turn([])
+        assert previous.closed
+        assert revoked["session_id"] == first["session_id"]
+        assert revoked["resumed"] and not revoked["client_reused"]
+        assert created[-1].context["tool_context"]["allowed_agent_tools"] == []
+    finally:
+        service.close()
+
+
 def test_dsh_reconnects_worker_when_finance_catalog_revision_changes(
     tmp_path: Path,
 ) -> None:

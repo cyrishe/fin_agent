@@ -143,6 +143,10 @@ def run(args):
             report[variant] = {}
             bodies[variant] = {}
             try:
+                # Match production: startup warms clients before any caller has
+                # granted supplementary tools. The first real turn must refresh
+                # the cached MCP definitions, while later turns retain context.
+                dsh.prewarm()
                 with TestClient(app) as client:
                     unauth = client.post("/mcp", json={"jsonrpc": "2.0", "id": "denied", "method": "tools/list"})
                     assert unauth.status_code == 401
@@ -188,6 +192,9 @@ def run(args):
                         (directory / f"{case_id}.json").write_text(json.dumps(saved, ensure_ascii=False, indent=2, default=str))
                         assert result.status_code == 200 and payload.get("ok"), (variant, case_id, payload.get("error"))
                         assert not pending and len(requests) == expected_count, (variant, case_id, "model count")
+                        if mode == "both":
+                            assert any(tool.get("function", {}).get("name") == "mcp__finance__stock_kline_visual_analysis"
+                                       for tool in requests[0]["tools"]), "Prewarm hid the caller-granted visual tool"
                         counts = [ref["row_count"] for ref in record["result_refs"]]
                         assert counts and (all(count == 0 for count in counts) if empty else counts == [5]), (case_id, counts)
                         assert record["loop_policy"]["config"]["emptyResultEarlyStop"] is enabled
@@ -256,6 +263,7 @@ def run(args):
                                   "unauthenticated_rejected": True,
                                   "interrupted_requests_recovered_without_duplicate_tools": True,
                                   "retry_exhaustion_and_auth_rejection_verified": True,
+                                  "prewarm_retains_caller_granted_tools": True,
                                   "note": "Fixed model decisions + real MCP/DSH/database. Not a model-quality or billing benchmark."}
         (output / "report.json").write_text(json.dumps(report, ensure_ascii=False, indent=2))
     finally:
