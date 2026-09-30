@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Controlled MCP/DSH regression: recorded decisions, real read-only data tools.
+"""Controlled MCP/DSH regression: decisions, stream recovery and read-only tools.
 
 No paid model calls. A loopback SSE fixture supplies fixed tool calls to the
 actual DSH runtime. API auth, SDK lifecycle, MCP bridge, catalog, SQL execution,
@@ -64,6 +64,12 @@ def run(args):
                 self.send_error(500, "Unexpected model call in controlled replay")
                 return
             action = pending.popleft()
+            if isinstance(action, dict) and "http_status" in action:
+                self.send_error(action["http_status"], "Controlled provider rejection")
+                return
+            interrupted = isinstance(action, dict) and "stream_eof" in action
+            if interrupted:
+                action = action["stream_eof"]
             delta = {"role": "assistant"}
             if isinstance(action, tuple):
                 name, arguments = action
@@ -79,7 +85,11 @@ def run(args):
                 {"id": "fixture", "model": "fixture", "choices": [{"index": 0, "delta": delta, "finish_reason": None}]},
                 {"id": "fixture", "model": "fixture", "choices": [{"index": 0, "delta": {}, "finish_reason": finish}]},
             ]
-            data = "".join(f"data: {json.dumps(chunk, ensure_ascii=False)}\n\n" for chunk in chunks) + "data: [DONE]\n\n"
+            if interrupted:
+                chunks = chunks[:1]
+            data = "".join(f"data: {json.dumps(chunk, ensure_ascii=False)}\n\n" for chunk in chunks)
+            if not interrupted:
+                data += "data: [DONE]\n\n"
             encoded = data.encode()
             self.send_response(200)
             self.send_header("Content-Type", "text/event-stream")
@@ -143,6 +153,10 @@ def run(args):
                         ("unfinished", [catalog("corporate_action"), query(EMPTY_QUERY, False),
                                         query(EMPTY_QUERY.replace("r1 =", "r2 =").replace("limit = 20", "limit = 5"))], True, "both", None),
                         ("nonempty", [catalog("quote"), query(QUOTE_QUERY)], False, "both", None),
+                        ("partial_tool_recovery", [catalog("quote"), {"stream_eof": query(QUOTE_QUERY)},
+                                                   query(QUOTE_QUERY)], False, "both", None),
+                        ("partial_text_recovery", [catalog("quote"), query(QUOTE_QUERY),
+                                                   {"stream_eof": "Discard this incomplete answer."}], False, "both", None),
                         ("data_only", [catalog("corporate_action"), query(EMPTY_QUERY)], True, "data", None),
                     ]
                     for case_id, actions, empty, mode, conversation in scenarios:
@@ -179,6 +193,14 @@ def run(args):
                         assert record["loop_policy"]["config"]["emptyResultEarlyStop"] is enabled
                         assert record["empty_result_early_stop"] is False
                         assert bool(payload.get("summary")) == (mode == "both")
+                        if case_id.endswith("_recovery"):
+                            retries = [e for e in captured_events[-1] if e.get("type") == "llm/retry"]
+                            assert len(retries) == 1
+                            assert retries[0]["data"]["failure"]["code"] == "STREAM_CLOSED"
+                            failed_index = 1 if case_id == "partial_tool_recovery" else 2
+                            assert wire_requests[failed_index] == wire_requests[failed_index + 1]
+                            assert sum(c.get("tool") == "finance_query" for c in record["tool_calls"]) == 1
+                            assert "Discard this incomplete answer" not in (payload.get("summary") or "")
                         if case_id == "followup":
                             assert record["resumed"]
                             first_context = json.dumps(requests[0]["messages"], ensure_ascii=False)
@@ -194,6 +216,32 @@ def run(args):
                         bodies[variant][case_id] = list(wire_requests)
                         print(json.dumps({"variant": variant, "case": case_id, "calls": len(requests),
                                           "rows": counts, "early_stop": record["empty_result_early_stop"]}), flush=True)
+                    for case_id, failures in (
+                        ("exhausted_stream", [{"stream_eof": query(QUOTE_QUERY)}] * 3),
+                        ("auth_rejection", [{"http_status": 401}]),
+                    ):
+                        requests.clear()
+                        wire_requests.clear()
+                        pending.clear()
+                        pending.extend(failures)
+                        result = client.post("/mcp", headers={"X-API-Key": token, "Accept": "application/json, text/event-stream"},
+                            json={"jsonrpc": "2.0", "id": case_id, "method": "tools/call",
+                                  "params": {"name": "finance_data_query", "arguments": {
+                                      "query": "查询贵州茅台最近行情", "runtime": "dsh", "detail": True}}})
+                        payload = result.json().get("result", {}).get("structuredContent", {})
+                        record = json.loads(dsh.log_path.read_text().splitlines()[-1])
+                        assert result.status_code == 200 and payload.get("ok") is False
+                        assert len(requests) == len(failures) and not pending
+                        assert not record["tool_calls"] and not record["result_refs"]
+                        retries = [e for e in captured_events[-1] if e.get("type") == "llm/retry"]
+                        assert len(retries) == len(failures) - 1
+                        assert all(body == wire_requests[0] for body in wire_requests)
+                        (directory / f"{case_id}.json").write_text(json.dumps({
+                            "response": payload, "native_events": captured_events[-1],
+                            "model_requests": requests}, ensure_ascii=False, indent=2))
+                        print(json.dumps({"variant": variant, "case": case_id,
+                                          "requests": len(requests), "retries": len(retries),
+                                          "tool_calls": 0, "rejected": True}), flush=True)
             finally:
                 dsh.close()
         # The two first model requests must be literally identical, including
@@ -206,6 +254,8 @@ def run(args):
         report["verification"] = {"first_two_requests_byte_equivalent": True, "all_rows_and_summaries_equal": True,
                                   "skill_catalog_retains_final_model_step": True,
                                   "unauthenticated_rejected": True,
+                                  "interrupted_requests_recovered_without_duplicate_tools": True,
+                                  "retry_exhaustion_and_auth_rejection_verified": True,
                                   "note": "Fixed model decisions + real MCP/DSH/database. Not a model-quality or billing benchmark."}
         (output / "report.json").write_text(json.dumps(report, ensure_ascii=False, indent=2))
     finally:

@@ -1,4 +1,13 @@
 # Keep the sdk-minimal lifecycle but expose only Fin Agent's financial tools.
+# The minimal SDK does not mount the request-retry plugin. Retry interrupted
+# model responses before any tool block is committed; never replay a whole turn.
+- id: llm-deepseek
+  config:
+    retryPolicy:
+      mode: normal
+      maxRetries: 2
+      retryableCodes: [EMPTY_RESPONSE, RATE_LIMIT, SERVER, TIMEOUT, TRANSPORT, STREAM_CLOSED]
+
 - id: persistent-bash
   disabled: true
 
@@ -9,6 +18,9 @@
   disabled: true
 
 - insert:
+    - id: fin-agent-llm-retry
+      name: '@deepseek-ai/dsh-llm-retry'
+
     - id: fin-agent-finance-mcp
       name: '@deepseek-ai/dsh-mcp-client'
       config:
