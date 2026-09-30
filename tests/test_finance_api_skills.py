@@ -94,7 +94,7 @@ def test_explicit_order_normalization_shared_data_and_rest_equivalence(api):
     assert context["_finance_explicit_skill_ids"] == ["personal-report", "earnings-analysis"]
     assert context["_finance_explicit_skill_prompt"].index("personal-report") < context["_finance_explicit_skill_prompt"].index("earnings-analysis")
     assert context["_finance_data_only"] is False
-    assert context["allowed_agent_tools"] == []  # No supplementary web/custom-tool grants.
+    assert context["allowed_agent_tools"] == ["stock_kline_visual_analysis"]  # System finance grant; no web/custom tools.
     assert result["structuredContent"]["data"] is not None
     assert result["structuredContent"]["detail"]["skill_catalog_revision"] == context["_finance_skill_catalog_revision"]
     assert "PRIVATE_METHOD_BODY" not in json.dumps(result)

@@ -25,7 +25,9 @@ def catalog(tmp_path):
 def test_discovery_extends_existing_identities_without_duplicate_entries(catalog):
     entries = catalog.public_entries()
     ids = [entry["id"] for entry in entries]
-    assert len(ids) == len(set(ids)) == 15
+    registered = [row["id"] for row in json.loads((ROOT / "catalog.json").read_text())["skills"]]
+    assert len(ids) == len(set(ids))
+    assert set(ids) == set(registered)
     assert set(NEW + ENHANCED) <= set(ids)
     assert all(entry["owner"] == "system" and entry["visibility"] == "public" for entry in entries)
     for skill_id in NEW + ENHANCED:

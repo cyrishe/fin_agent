@@ -154,7 +154,6 @@ class FinanceAccessTokenStore:
             "expires_at": expires_at,
             "expires_in": ttl_seconds,
             "never_expires": ttl_seconds is None,
-            "masked_token": f"{preview_start}...{preview_end}",
         }
 
     def authenticate(self, token: str) -> str:
@@ -229,7 +228,7 @@ class FinanceAccessTokenStore:
                 "token_id": token_id,
                 "name": name or row_project or None,
                 "principal_id": principal,
-                "masked_token": f"{preview_start}...{preview_end}",
+                "key_preview": f"{preview_start}...{preview_end}",
                 "created_at": _epoch_seconds(created_at),
                 "expires_at": expires_epoch,
                 "never_expires": expires_epoch is None,

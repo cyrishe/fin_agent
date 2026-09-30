@@ -315,6 +315,10 @@ def runtime_field_contract(call: ApiCall, *, usage: str) -> set[str] | None:
 
     if resolved_type != "kd":
         return None
+    if subject == "stock" and dataview == "technical":
+        # A daily indicator window returns a statistic, not the source row.
+        fields = {"code", "trade_date", "value", "current_value", "k", "window_count"}
+        return fields if usage != "source" else set(matched.get("fields") or set())
     if dataview == "margin":
         if usage in {"order", "output"}:
             return set(KD_MARGIN_OUTPUT_FIELDS)

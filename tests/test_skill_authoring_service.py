@@ -158,6 +158,32 @@ def test_discovery_uses_only_real_active_local_capabilities() -> None:
     }
 
 
+def test_revision_discovery_keeps_available_connections_when_feedback_changes_topic():
+    service = SkillCapabilityDiscoveryService(
+        business_catalog=_BusinessCatalog(), tool_registry=_ToolRegistry(),
+        skill_limit=1, tool_limit=1,
+    )
+    result = service.discover("市场整体环境", preferred_skill_ids=["stock-research", "unknown"],
+                              preferred_tool_names=["stock.quote"])
+    assert [item["skill_id"] for item in result["skills"]] == ["stock-research"]
+    assert [item["tool_name"] for item in result["tools"]] == ["stock.quote"]
+    assert "unknown" not in result["_skill_index"]
+
+
+def test_authoring_receives_shared_data_discovery_without_inventing_tool_ids():
+    harness = _Harness()
+    candidate = _service(harness=harness).create_candidate(
+        requirement="结合技术面研究，不预先指定因子", owner_id="alice")
+    payload = json.loads(harness.calls[0]["prompt"].split("\n", 1)[1])
+    data = payload["capability_catalog"]["data_catalog"]
+    stock = next(item for item in data["subjects"] if item["subject"] == "stock")
+    assert {"technical", "technical_minute", "technical_minute_series"} <= {
+        item["dataview"] for item in stock["dataviews"]}
+    assert candidate["authoring_evidence"]["data_catalog_revision"] == data["revision"]
+    assert "stock.technical" not in {
+        item["tool_name"] for item in payload["capability_catalog"]["tools"]}
+
+
 def test_create_candidate_compiles_markdown_bindings_and_flowchart() -> None:
     harness = _Harness()
     service = _service(harness=harness)

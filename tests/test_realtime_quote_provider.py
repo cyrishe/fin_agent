@@ -154,13 +154,14 @@ def test_limit_field_is_only_enabled_on_supported_modes(mode, valid):
     assert validate_call(call, previous_results={}).ok == valid
 
 
-def test_query_alias_is_not_registered_and_navigation_shows_real_entry():
+def test_navigation_advertises_canonical_query_and_preserves_legacy_input():
     service = FinanceDataToolCatalogService()
     pack = service.get_model_dataview('stock', 'report_metric', 'aggregate')
-    assert pack['available_operations'] == {'query': 'stock.report_metric', 'aggregate': 'stock.report_metric.agg'}
+    assert pack['available_operations'] == {'query': 'stock.report_metric.query', 'aggregate': 'stock.report_metric.agg'}
     assert [f['api_name'] for f in pack['functions']] == ['stock.report_metric.agg']
     call = ApiCall('r1', 'stock.report_metric.query', {}, ['code'], '')
-    assert not validate_call(call, previous_results={}).ok
+    assert validate_call(call, previous_results={}).ok
+    assert validate_call(ApiCall('r1', 'stock.report_metric', {}, ['code'], ''), previous_results={}).ok
 
 
 def test_live_aggregate_uses_api_route_without_intraday_or_daily(quotes, monkeypatch):

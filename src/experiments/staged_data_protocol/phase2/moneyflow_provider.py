@@ -392,7 +392,7 @@ def _build_where(*, source: MoneyflowSource, args: Mapping[str, Any]) -> tuple[s
     elif start and end:
         clauses.append(f"{source.fields['tradedate']} BETWEEN %s AND %s")
         params.extend(sorted([start, end]))
-    else:
+    elif not any(field == "tradedate" for _, field, _, _ in _explicit_filters(args, subject=source.subject)):
         clauses.append(f"{source.fields['tradedate']} = (SELECT MAX(trade_date) FROM {source.table})")
 
     filter_sql, filter_params = _build_filter_clauses(source=source, args=args, allowed=set(source.fields))

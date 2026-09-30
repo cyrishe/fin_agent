@@ -42,3 +42,14 @@
 @media(prefers-reduced-motion:reduce) { .sl-card { transition:none; }.sl-card:hover { transform:none; } }
 @media(max-width:850px) { .sl-file-nav { position:static; max-height:230px; } }
 @media(max-width:600px) { .sl-sidebar,.sl-dialog .sl-sidebar { position:static; height:auto; }.sl-sidebar-detail { display:none; }.sl-file-nav { position:static; } }
+
+.sl-editor { margin-top: 24px; padding: 24px; background: var(--sl-paper, #fff); border: 1px solid #deded6; border-radius: 12px; }
+.sl-editor header { display: flex; justify-content: space-between; align-items: start; gap: 16px; }
+.sl-editor label { display: grid; gap: 8px; margin: 16px 0; font-weight: 600; }
+.sl-editor input, .sl-editor textarea { box-sizing: border-box; width: 100%; padding: 12px; border: 1px solid #c9d0cb; border-radius: 6px; background: #fff; color: #24372f; }
+.sl-editor textarea { font: 13px/1.65 ui-monospace, monospace; resize: vertical; }
+.sl-editor fieldset { border: 0; padding: 0; min-width: 0; }
+.sl-editor summary, .sl-source summary { cursor: pointer; padding: 12px 0; font-weight: 600; }
+.sl-editor-actions, .sl-editor-add { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-top: 20px; }
+.sl-editor-add label { flex: 1; }
+.sl-editor [role=alert] { color: #9c3425; }

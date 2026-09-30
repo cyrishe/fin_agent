@@ -175,6 +175,12 @@ def create_assistant_result_blueprint(
             return jsonify({"ok": False, "error": "该轮报告正文为空。"}), 409
 
         title = _report_title(report_text)
+        # Use this owned, persisted turn's same figure assets; never fetch model URLs.
+        report = output_payload.get("report") or next((
+            (block.get("payload") or {}).get("report")
+            for block in output_payload.get("surface_blocks", [])
+            if block.get("semantic") == "finance.answer"
+        ), {}) or {}
         try:
             renderer = report_pdf or FinancialReportPdfService()
             pdf_bytes = renderer.render(
@@ -183,6 +189,7 @@ def create_assistant_result_blueprint(
                     report_text=report_text,
                     user_question=str(turn.get("user_input_text") or "").strip(),
                     generated_at=str(turn.get("finished_at") or "").strip(),
+                    figures=report.get("figures", []),
                 )
             )
         except Exception:

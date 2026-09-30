@@ -153,6 +153,12 @@ class SessionVariableStoreService:
         payload_path = self._session_dir(ref_session_id) / payload_file
         if payload_file == f"{manifest.get('var_id')}.data.json" and payload_path.is_file():
             text = payload_path.read_text(encoding="utf-8")
+            if manifest.get("data_type") == "document":
+                raw = json.loads(text)
+                if isinstance(raw.get("data"), str):
+                    # The semantic document is the public result; auxiliary
+                    # images, prompts and usage remain in the saved envelope.
+                    text = raw["data"]
         else:
             _, text = self.artifact_service.read_document_text(
                 artifact_ref,
@@ -296,6 +302,8 @@ class SessionVariableStoreService:
             )
 
         raw_data = result.get("data")
+        if isinstance(raw_data, str) and raw_data:
+            return self._find_document({"document": {"text": raw_data}})
         if isinstance(raw_data, list) and all(
             isinstance(row, Mapping) for row in raw_data
         ):

@@ -121,7 +121,8 @@ def test_never_expiring_token_persists_digest_and_mask_only_then_disables():
     listed = store.list_tokens()
     assert listed == [{
         "token_id": issued["token_id"], "name": "research-client", "principal_id": "eval",
-        "masked_token": issued["masked_token"], "created_at": 1000,
+        "key_preview": issued["access_token"][:16] + "..." + issued["access_token"][-8:],
+        "created_at": 1000,
         "expires_at": None, "never_expires": True, "state": "active",
         "disabled_at": None, "disabled_reason": None,
         "created_by": "operator", "disabled_by": None,

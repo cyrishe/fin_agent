@@ -6,6 +6,7 @@ import { scopedInteractionKey } from "../interactionDraft";
 import type { InteractionDraft, InteractionFeedbackRequest, InteractionResponse, SurfaceBlock, UnknownRecord } from "../types";
 import DataTable from "./DataTable";
 import MarkdownContent from "./MarkdownContent";
+import FinancialReport from "./FinancialReport";
 import CodeArtifact from "./renderers/CodeArtifact";
 import DesignArtifact from "./renderers/DesignArtifact";
 import EditSummaryArtifact from "./renderers/EditSummaryArtifact";
@@ -54,7 +55,7 @@ function Workflow({ data }: { data: UnknownRecord }) {
           <span className={status === "running" ? "spinner" : ""}>
             {status === "completed" ? <CheckCircle2 size={16} /> : status === "error" ? <AlertCircle size={16} /> : null}
           </span>
-          <strong>{status === "completed" ? "实现与验证已完成" : status === "error" ? "实现遇到问题" : "正在实现工具"}</strong>
+          <strong>{status === "completed" ? "代码实现已完成" : status === "error" ? "实现遇到问题" : "正在实现工具"}</strong>
         </div>
         <div className="coding-progress-list">
           {items.map((item, index) => {
@@ -197,6 +198,9 @@ export default function BlockRenderer(props: Props) {
   const data = object.payload;
   const artifactType = String(data.artifact_type || "");
   let content = <MarkdownContent content={object.text || block.content || String(data.summary || "")} />;
+  if (block.semantic === "finance.answer" && data.report && typeof data.report === "object") {
+    content = <FinancialReport report={record(data.report)} />;
+  }
 
   if (renderer === "artifact.code") content = <CodeArtifact object={object} />;
   else if (renderer === "data.table") content = <DataTable data={data} />;
@@ -244,6 +248,12 @@ export default function BlockRenderer(props: Props) {
     const resources = Array.isArray(data.resources) ? data.resources.map(record) : [];
     content = <div className="resource-list">{resources.length ? resources.map((resource, index) => {
       const href = resourceHref(resource.uri);
+      const image = resource.mime_type === "image/png" && typeof resource.uri === "string" &&
+        /^data:image\/png;base64,[A-Za-z0-9+/=]+$/.test(resource.uri) ? resource.uri : "";
+      if (image) return <figure key={String(resource.resource_id || index)} style={{ margin: 0, minWidth: 0 }}>
+        <img src={image} alt={String(resource.title || "分析图像")} loading="lazy" style={{ display: "block", maxWidth: "100%", height: "auto" }} />
+        <figcaption>{String(resource.title || "分析图像")} · {String(resource.relation || "")}</figcaption>
+      </figure>;
       return <div key={String(resource.resource_id || index)}><div><strong>{String(resource.title || `资源 ${index + 1}`)}</strong><span>{String(resource.relation || resource.mime_type || "")}</span></div>{href ? <a className="resource-link" href={href}>查看</a> : resource.uri ? <code>{String(resource.uri)}</code> : null}</div>;
     }) : <div className="empty-block">暂无可展示资源</div>}</div>;
   } else if (renderer === "fallback.structured") {

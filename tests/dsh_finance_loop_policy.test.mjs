@@ -27,6 +27,19 @@ test('authorized search can read candidates then selected articles without forci
   assert.doesNotMatch(JSON.stringify(next.messages), /unknown_tool_stopped/)
 })
 
+test('authorized visual evidence can finish without forcing a duplicate finance query', async () => {
+  const visual = 'mcp__finance__stock_kline_visual_analysis'
+  const runtime = fixture({}, [], { ...NAMES, visual })
+  runtime.event({ type: 'turn/start', data: { turn: 1 } })
+  completeCall(runtime, 1, 'visual', visual, {
+    result_ref: 'session://scope/vars/v1', analysis: '独立图像观察与同源数值事实',
+    provider_evidence: { code: '000001.SZ', data_as_of: '2026-09-29' },
+  })
+  runtime.stopping()
+  assert.equal(runtime.steered.length, 0)
+  assert.doesNotMatch(JSON.stringify((await runtime.preStep({ step: 2 })).messages), /unknown_tool_stopped/)
+})
+
 test('completion facts land before synthesis and do not demand a second answer', async () => {
   for (const details of [false, true]) {
     const runtime = fixture({ maxQueryAttempts: 8 })
@@ -66,7 +79,7 @@ test('skill projection removes only exact already-visible body and preserves ide
   const skillName = 'mcp__finance__read_finance_skill'
   const method = '完整方法\n参考 references/proof.md'
   const payload = { skill_id: 'analysis', revision: 'r1', content_hash: 'h1', method }
-  for (const visible of [method, method.slice(0, 5), '']) {
+  for (const visible of [method, JSON.stringify(payload), method.slice(0, 5), '']) {
     const runtime = fixture({}, [{ role: 'user', content: [{ type: 'text', text: visible }] }], { ...NAMES, skill: skillName })
     const result = await runtime.post({ name: skillName }, {
       content: [{ type: 'text', text: JSON.stringify(payload) }],
@@ -74,10 +87,55 @@ test('skill projection removes only exact already-visible body and preserves ide
     const projected = JSON.parse(result.content[0].text)
     assert.equal(projected.content_hash, 'h1')
     assert.equal(projected.revision, 'r1')
-    if (visible === method) {
+    if (visible === method || visible === JSON.stringify(payload)) {
       assert.equal(projected.already_loaded, true)
       assert.equal(projected.method, undefined)
     } else assert.deepEqual(projected, payload)
+  }
+})
+
+test('catalog projection reuses only visible same-view same-revision fields without losing new contracts', async t => {
+  const dir = mkdtempSync(join(tmpdir(), 'catalog-reuse-'))
+  const path = join(dir, 'context.json')
+  const old = process.env.FIN_AGENT_DSH_CONTEXT_PATH
+  process.env.FIN_AGENT_DSH_CONTEXT_PATH = path
+  writeFileSync(path, JSON.stringify({ finance_catalog_revision: 'r1' }))
+  t.after(() => {
+    if (old === undefined) delete process.env.FIN_AGENT_DSH_CONTEXT_PATH
+    else process.env.FIN_AGENT_DSH_CONTEXT_PATH = old
+    rmSync(dir, { recursive: true, force: true })
+  })
+  const definition = { desc: '成交量（股）', unit: 'share' }
+  const prior = { mode: 'dataview', subject: 'stock', catalog_revision: 'r1',
+    dataview: { name: 'quote', fields: { volumn: definition },
+      functions: [{ api_name: 'stock.quote.query', args: { optional: ['filter'] } }] } }
+  const incoming = { ...prior, dataview: { ...prior.dataview,
+    fields: { volumn: definition, close: { desc: '收盘价' } },
+    functions: [{ api_name: 'stock.quote.kd_<field>_<method>', args: { required: ['k'] } }] } }
+  for (const variant of ['same', 'stale', 'foreign', 'failed', 'missing', 'changed']) {
+    const stored = structuredClone(prior)
+    if (variant === 'stale') stored.catalog_revision = 'old'
+    if (variant === 'foreign') stored.subject = 'index'
+    if (variant === 'changed') stored.dataview.fields.volumn.unit = 'lot'
+    const history = variant === 'missing' ? [] : [
+      { role: 'assistant', content: [{ type: 'tool-call', id: 'c1', name: NAMES.catalog }] },
+      { role: 'tool', source: { kind: 'tool' }, content: [{ type: 'tool-result',
+        toolCallId: 'c1', isError: variant === 'failed', content: [{ type: 'text', text: JSON.stringify(stored) }] }] },
+    ]
+    const runtime = fixture({}, history)
+    const result = await runtime.post({ name: NAMES.catalog }, { content: [{ type: 'text', text: JSON.stringify(incoming) }] })
+    const projected = JSON.parse(result.content[0].text)
+    assert.deepEqual(projected.dataview.functions, incoming.dataview.functions)
+    assert.deepEqual(projected.dataview.fields.close, incoming.dataview.fields.close)
+    assert.equal(Object.hasOwn(projected.dataview.fields, 'volumn'), variant !== 'same', variant)
+    assert.deepEqual(incoming.dataview.fields.volumn, definition) // canonical input unchanged
+    if (variant === 'same') {
+      assert.match(projected.context_note, /volumn/)
+      // Compaction removes reuse eligibility: no worker-global cache of fields.
+      history.length = 0
+      const fresh = await runtime.post({ name: NAMES.catalog }, { content: [{ type: 'text', text: JSON.stringify(incoming) }] })
+      assert.deepEqual(JSON.parse(fresh.content[0].text).dataview.fields, incoming.dataview.fields)
+    }
   }
 })
 
@@ -367,16 +425,17 @@ test('discovery offers methods and data; empty method selection remains compatib
     for (const payload of [{ skills: [] }, { skills: [{ skill_id: 'equity-report-analysis', method: '按证据分析' }] }]) {
       const runtime = fixture({ preserveRequestPrefix: true }, [], SKILL_NAMES)
       runtime.event({ type: 'turn/start', data: { turn: 1 } })
-      assert.deepEqual(runtime.restrictions.at(-1).allow, [SKILL_NAMES.skill, NAMES.catalog])
+      assert.equal(runtime.guard({ name: SKILL_NAMES.skill, arguments: {} }), undefined)
       const opening = await runtime.preStep({ step: 1 })
       assert.match(opening.messages[0].content[0].text, /stage=catalog reason=turn_started/)
       assert.equal(runtime.guard({ name: NAMES.catalog, arguments: {} }), undefined)
-      assert.match(runtime.guard({ name: SKILL_NAMES.reference, arguments: {} }), /先读取方法或数据执行包/)
+      // Method-reference ownership/loading is checked by the host tool, not a
+      // second mandatory method-selection step in the loop controller.
+      assert.equal(runtime.guard({ name: SKILL_NAMES.reference, arguments: {} }), undefined)
       runtime.event({ type: 'tool/call', data: { turn: 1, step: 1, callId: 's', name: SKILL_NAMES.skill, arguments: { skill_ids: [] } } })
       runtime.event(resultEvent({ step: 1, callId: 's', payload }))
-      assert.match(runtime.guard({ name: NAMES.query, arguments: {} }), /先读取方法或数据执行包/)
+      assert.match(runtime.guard({ name: NAMES.query, arguments: { request: 'stock.quote.query() -> close' } }), /执行包/)
       runtime.event({ type: 'step/end', data: { turn: 1, step: 1 } })
-      assert.equal(runtime.restrictions.at(-1).lifted, true)
       assert.equal(runtime.guard({ name: NAMES.catalog, arguments: { subject: 'stock' } }), undefined)
       runtime.stopping()
       assert.equal(runtime.steered.length, 0)
@@ -389,7 +448,6 @@ test('generic discovery needs no empty Skill handshake and still waits for a lea
     const runtime = fixture({ preserveRequestPrefix: true }, [], SKILL_NAMES)
     runtime.event({ type: 'turn/start', data: { turn: 1 } })
     completeCall(runtime, 1, 'overview', NAMES.catalog, { mode: 'subject' })
-    assert.equal(runtime.restrictions.at(-1).lifted, true)
     assert.match((await runtime.preStep({ step: 2 })).messages[0].content[0].text, /stage=catalog/)
     assert.match(runtime.guard({ name: NAMES.query, arguments: { request: 'stock.quote.query() -> close' } }), /执行包/)
     // Professional methods remain available after choosing the generic path.
@@ -413,7 +471,7 @@ test('standard discovery admits identity beside catalog before any Skill is load
     const names = { ...SKILL_NAMES, identity: 'mcp__finance__resolve_security' }
     const runtime = fixture({ preserveRequestPrefix: true }, [], names)
     runtime.event({ type: 'turn/start', data: { turn: 1 } })
-    assert.ok(runtime.restrictions.at(-1).allow.includes(names.identity))
+    assert.equal(runtime.guard({ name: names.identity, arguments: {} }), undefined)
     for (const [id, name, args] of [
       ['identity', names.identity, { identifiers: ['示例公司'] }],
       ['catalog', names.catalog, { subject: 'stock', dataview: 'margin', operation: 'query' }],
@@ -421,7 +479,7 @@ test('standard discovery admits identity beside catalog before any Skill is load
       runtime.event({ type: 'tool/call', data: { turn: 1, step: 1, callId: id, name, arguments: args } })
       assert.equal(runtime.guard({ name, arguments: args }), undefined)
     }
-    assert.match(runtime.guard({ name: names.query, arguments: {} }), /先读取方法或数据执行包/)
+    assert.match(runtime.guard({ name: names.query, arguments: { request: 'stock.quote.query() -> close' } }), /执行包/)
     const fast = fixture({ executionMode: 'fast' }, [], names)
     fast.event({ type: 'turn/start', data: { turn: 1 } })
     assert.match(fast.guard({ name: names.identity, arguments: {} }), /先读取方法或数据执行包/)
@@ -1599,6 +1657,22 @@ function completeCall(runtime, step, id, name, payload, args = {}) {
   runtime.event({ type: 'step/end', data: { turn: 1, step } })
 }
 
+test('standard followups may explain saved evidence without a compulsory discovery or second answer', async () => {
+  await withSkillContext({}, async () => {
+    const runtime = fixture({ preserveRequestPrefix: true }, [], SKILL_NAMES)
+    runtime.event({ type: 'turn/start', data: { turn: 2 } })
+    assert.equal(runtime.guard({ name: NAMES.details, arguments: { result_ref: 'session://saved' } }), undefined)
+    assert.equal(runtime.guard({ name: SKILL_NAMES.reference, arguments: {} }), undefined)
+    // Reading a different data interface still requires its actual contract.
+    assert.match(runtime.guard({ name: NAMES.query,
+      arguments: { request: 'stock.technical_series.query(codes=["000001.SZ"]) -> close' } }), /执行包/)
+    await runtime.preStep({ turn: 2, step: 1 })
+    runtime.event({ type: 'step/end', data: { turn: 2, step: 1 } })
+    runtime.stopping(2)
+    assert.deepEqual(runtime.steered, [])
+  })
+})
+
 test('actual Skill loading expands synthesis budget and resets between turns', async () => {
   for (const payload of [{ skills: [] }, { error: 'missing' }, { method: '分析方法' }, { skills: [{ method: '分析方法' }] }]) {
     await withSkillContext({}, async contextPath => {
@@ -1609,7 +1683,7 @@ test('actual Skill loading expands synthesis budget and resets between turns', a
       completeCall(runtime, 3, 'q', NAMES.query, { ok: true, result_ref: 'session://r', sample_complete: false })
       completeCall(runtime, 4, 'd', NAMES.details, { rows: [{}] })
       const request = await runtime.request({})
-      assert.equal(request.maxTokens, payload.method || payload.skills?.length ? 8192 : 3072)
+      assert.equal(request.maxTokens, payload.method || payload.skills?.length ? 32768 : 3072)
       assert.equal(request.reasoningEffort, 'low')
       writeFileSync(contextPath, JSON.stringify({ tool_context: {} }))
       runtime.event({ type: 'turn/start', data: { turn: 2 } })
@@ -1676,11 +1750,32 @@ test('Skill budgets are configurable and exclude fast and data-only requests', a
   }
 })
 
+test('loaded Skill retains its output budget while a query is still required', async () => {
+  for (const payload of [{ method: '分析方法' }, { skills: [] }, { error: 'missing' }]) {
+    await withSkillContext({}, async () => {
+      const runtime = fixture({ skillAnalysisMaxTokens: 32768 }, [], SKILL_NAMES)
+      runtime.event({ type: 'turn/start', data: { turn: 1 } })
+      completeCall(runtime, 1, 's', SKILL_NAMES.skill, payload)
+      completeCall(runtime, 2, 'c', NAMES.catalog, { mode: 'dataview' })
+      const expected = payload.method ? 32768 : 3072
+      assert.equal((await runtime.request({})).maxTokens, expected)
+      completeCall(runtime, 3, 'q', NAMES.query, {
+        ok: true, sample_complete: true, result_ref: 'session://r', data_request_complete: false,
+      })
+      assert.match(runtime.prompt(), /stage=query.*reason=identity_scope_ready/)
+      assert.equal((await runtime.request({})).maxTokens, expected)
+      // A larger output budget does not complete the unfinished data contract.
+      runtime.stopping()
+      assert.equal(runtime.steered.length, 1)
+    })
+  }
+})
+
 test('Skill-first permits optional methods and evidence-led followup without a forced match', async () => {
   await withSkillContext({}, async () => {
     const runtime = fixture({}, [], SKILL_NAMES)
     runtime.event({ type: 'turn/start', data: { turn: 1 } })
-    assert.match(runtime.prompt(), /方法选择规则/)
+    assert.match(runtime.prompt(), /依据本轮目标/)
     assert.equal(runtime.guard({ name: SKILL_NAMES.skill, arguments: { skill_id: 'equity-report-analysis' } }), undefined)
     assert.equal(runtime.guard({ name: NAMES.catalog, arguments: { subject: 'stock', dataview: 'report' } }), undefined)
     completeCall(runtime, 1, 'method', SKILL_NAMES.skill, { skill_id: 'equity-report-analysis', method: '使用证据对比' })

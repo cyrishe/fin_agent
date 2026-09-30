@@ -57,9 +57,13 @@ def test_explicit_and_legacy_query_validate_and_dispatch_identically(monkeypatch
             monkeypatch.setattr(api_runner, name, provider(name))
 
     field = next(iter(catalog_source()["subjects"][subject][view]["fields"]))
+    contract = FinanceDataToolCatalogService().get_model_dataview(subject, view, "query")["functions"][0]
+    required = {name.split("(", 1)[0] for name in contract["args"].get("required", [])}
+    # Bounded technical views require a security selection in both spellings.
+    arguments = 'limit=2, codes=["000001.SZ"]' if "codes" in required else "limit=2"
     results = []
     for entry in (legacy, api):
-        call = parse_api_call(f"result = {entry}(limit=2) -> {field}")
+        call = parse_api_call(f"result = {entry}({arguments}) -> {field}")
         validation = validate_call(call, previous_results={})
         assert validation.ok, validation.errors
         result = api_runner.execute_api_call(call)

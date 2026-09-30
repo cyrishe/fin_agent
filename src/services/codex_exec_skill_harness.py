@@ -923,11 +923,21 @@ class CodexSdkSkillHarness(CodexExecSkillHarness):
                         sandbox=sdk_sandbox,
                     )
                 active_provider_session_id = _trim(getattr(thread, "id", "")) or provider_session_id
-                turn_input = (
-                    [TextInput(text=self._build_sdk_resume_prompt(user_request=user_request, context=prompt_context))]
+                turn_prompt = (
+                    self._build_sdk_resume_prompt(user_request=user_request, context=prompt_context)
                     if provider_session_id
-                    else [TextInput(text=prompt)]
+                    else prompt
                 )
+                # Keep the contract visible even when a Responses gateway does
+                # not enforce output_schema. The schema file remains the single
+                # source of truth for both the SDK option and the model context.
+                if output_schema:
+                    turn_prompt += (
+                        "\n# OUTPUT SCHEMA\n"
+                        "仅最终回答按以下 JSON Schema 输出；过程说明仍使用自然语言。\n"
+                        + json.dumps(output_schema, ensure_ascii=False)
+                    )
+                turn_input = [TextInput(text=turn_prompt)]
                 turn_options = {
                     "approval_mode": ApprovalMode.deny_all,
                     "effort": ReasoningEffort(runtime_reasoning_effort),
@@ -1394,11 +1404,23 @@ class CodexSdkSkillHarness(CodexExecSkillHarness):
         ]
         available_refs = [item for item in feedback_refs if item]
         reference_text = f"最新真实反馈：{', '.join(available_refs)}。" if available_refs else ""
+        implementation = context.get("current_implementation")
+        implementation = implementation if isinstance(implementation, Mapping) else {}
+        implementation_refs = {
+            key: implementation[key]
+            for key in ("manifest_ref", "module_files")
+            if implementation.get(key)
+        }
+        implementation_text = (
+            "本轮权威实现路径：" + json.dumps(implementation_refs, ensure_ascii=False) + "。"
+            if implementation_refs else ""
+        )
         coding_feedback = _trim(context.get("coding_feedback"))
         current_request = coding_feedback or user_request
         return (
             "继续当前金融工具 Coding 会话。保持未受影响的实现不变，只处理本轮新增要求或真实运行反馈。"
-            f"{reference_text}\n本轮要求：{current_request}"
+            "先读取当前 CODING_WORKSPACE.md 中的运行与证据调用约定。"
+            f"{implementation_text}{reference_text}\n本轮要求：{current_request}"
         )
 
     @staticmethod

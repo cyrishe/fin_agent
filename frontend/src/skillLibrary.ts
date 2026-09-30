@@ -13,12 +13,17 @@ export interface LibrarySkill {
   scope?: string;
   auth?: string;
   invocation_enabled: boolean;
+  viewable?: boolean;
+  editable?: boolean;
+  detail_available?: boolean;
 }
 export interface SkillReference { path: string; title: string; content_hash: string }
 export interface LibraryDetail extends LibrarySkill {
   skill_id: string;
   skill_markdown: string;
   references: SkillReference[];
+  companion_files?: Record<string, string>;
+  definition?: Record<string, unknown>;
   revision: string;
   content_hash: string;
   active_revision_no?: number;
@@ -26,7 +31,7 @@ export interface LibraryDetail extends LibrarySkill {
 }
 
 export const categories: Record<string, string> = {
-  "equity-research": "个股研究", "market-and-sector": "市场与板块",
+  "personal": "个人方法", "equity-research": "个股研究", "market-and-sector": "市场与板块",
   "screening-and-factor": "筛选与因子", "fund-research": "基金研究", "fixed-income": "债券研究",
 };
 export const categoryName = (category: string) => categories[category] || category || "其他方法";
@@ -72,3 +77,23 @@ export function referenceTarget(href: string, current: string, references: Skill
   }
   return references.find(ref => ref.path === normalized.join("/"));
 }
+
+export interface SkillDefinition {
+  skill_id: string;
+  display_name: string;
+  skill_markdown: string;
+  references: Record<string, string>;
+  control_manifest: Record<string, unknown>;
+  candidate_revision_no: number;
+  active_revision_no: number;
+  content_hash: string;
+}
+export const getSkillDefinition = (id: string, signal?: AbortSignal) => get<{ candidate: SkillDefinition }>(`/api/skill-hub/${encodeURIComponent(id)}/definition`, signal);
+async function writeSkill(path: string, method: string, body: unknown) {
+  const response = await fetch(appPath(path), { method, credentials: "include", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+  const payload = await response.json();
+  if (!response.ok || !payload.ok) throw new Error(payload.error || `操作失败（${response.status}）`);
+  return payload as { candidate: SkillDefinition };
+}
+export const saveSkillDefinition = (base: SkillDefinition, changes: Pick<SkillDefinition, "display_name" | "skill_markdown" | "references" | "control_manifest">) => writeSkill(`/api/skill-hub/${encodeURIComponent(base.skill_id)}/definition`, "PUT", { ...changes, expected_candidate_revision: base.candidate_revision_no, expected_content_hash: base.content_hash });
+export const activateSkillDefinition = (base: SkillDefinition) => writeSkill(`/api/skill-hub/${encodeURIComponent(base.skill_id)}/definition/activate`, "POST", { expected_candidate_revision: base.candidate_revision_no, expected_active_revision: base.active_revision_no });

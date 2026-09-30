@@ -12,6 +12,7 @@ from src.experiments.staged_data_protocol.phase2.catalog import OPERATION_DESCRI
 from src.experiments.staged_data_protocol.phase2.trade_date_resolver import TradeDateResolver
 from src.backtest import BacktestError
 from src.scenarios.financial_qa.result_registry import FinanceResultRegistry
+from src.scenarios.financial_qa.report import collect_figures
 from src.scenarios.financial_qa.result_view import select_result_page
 from src.scenarios.financial_qa.query_recovery import (
     provider_retry_allowed,
@@ -115,6 +116,7 @@ def _model_step_summary(summary: Mapping[str, Any]) -> Dict[str, Any]:
         "warnings",
         "recovery",
         "provider_retry_count",
+        "provider_evidence",
     ):
         value = summary.get(key)
         if value not in (None, "", [], {}):
@@ -302,7 +304,9 @@ class FinanceDataQueryToolRuntime:
             "revision": revision,
             "content_hash": _trim(method.get("content_hash")),
         })
-        self.tracker["skill_results"].append(_trim(method.get("method"))[:5000])
+        owner = _trim(method.get("owner")) or "system"
+        if method.get("viewable", owner == "system" or owner in self.owner_ids):
+            self.tracker["skill_results"].append(_trim(method.get("method"))[:5000])
 
     def activate_skill(self, skill_id: str) -> None:
         normalized = _trim(skill_id)
@@ -1253,6 +1257,8 @@ class FinanceDataQueryCcTools:
                     "schema": variable.get("schema"),
                     "sample": model_sample,
                     "sample_complete": model_sample_complete,
+                    **({"provider_evidence": current_entry["provider_evidence"]}
+                       if "provider_evidence" in current_entry else {}),
                     "warnings": [
                         *[
                             _trim(item)
@@ -1426,6 +1432,12 @@ class FinanceDataQueryCcTools:
                     result_payload["text"] = payload.get("text")
                 elif payload.get("data") is not None:
                     result_payload["data"] = payload.get("data")
+                for name, metadata in tool_runtime.result_metadata.items():
+                    if metadata.get("result_ref") == result_ref:
+                        handle = tool_runtime.result_handles.get(name)
+                        if handle and isinstance(handle.data, Mapping) and isinstance(handle.data.get("evidence"), Mapping):
+                            result_payload["provider_evidence"] = handle.data["evidence"]
+                        break
                 return _tool_result(result_payload)
             except Exception as exc:
                 return _tool_result({"result_ref": result_ref, "error": str(exc)})
@@ -1728,8 +1740,8 @@ class FinanceDataQueryCcTools:
 
         @tool(
             "read_finance_skill",
-            "按本轮方法选择规则提交 skill_ids。工具与通用能力已足够时传空列表；"
-            "需要专业方法时传最贴合的 Skill ID 并加载正文，后续可按实际缺口补充。兼容单个 skill_id。",
+            "加载当前授权目录中的专业方法正文，已加载的方法直接复用。"
+            "按实际需要提交 skill_ids，兼容单个 skill_id；无需方法时不必调用。",
             {
                 "type": "object",
                 "properties": {
@@ -1784,10 +1796,8 @@ class FinanceDataQueryCcTools:
         @tool(
             "read_finance_skill_reference",
             (
-                "Load one progressive reference explicitly linked by an already loaded Finance business Skill. "
-                "Use the exact skill_id and references/... path from that Skill. This reads only the immutable "
-                "in-memory Skill snapshot; it is not a general filesystem search tool. Load the parent Skill "
-                "first, and read only references that materially change the current analysis."
+                "读取已加载 Skill 中本题需要的参考。使用正文给出的 skill_id 和 references/... 路径；"
+                "已读参考直接复用，仅可访问本轮授权快照。"
             ),
             {
                 "type": "object",
@@ -1929,6 +1939,15 @@ class FinanceDataQueryCcTools:
                     if isinstance(raw_result, Mapping)
                     else {"ok": True, "data": raw_result}
                 )
+                # Auxiliary model calls are evidence-producing work, not new
+                # agent turns. Keep their usage in trace, outside business text.
+                if isinstance(result.get("llm_calls"), list):
+                    call_record["llm_calls"] = [
+                        {key: item[key] for key in ("stage", "model", "usage", "duration_ms", "finish_reason", "error", "image_sha256") if key in item}
+                        for item in result["llm_calls"] if isinstance(item, Mapping)
+                    ]
+                if result.get("duration_ms") is not None:
+                    call_record["duration_ms"] = result["duration_ms"]
                 if result.get("ok") is False:
                     call_record["error"] = _trim(result.get("error"))[:1_000]
                     return _tool_result(result)
@@ -1949,7 +1968,21 @@ class FinanceDataQueryCcTools:
                     "schema": variable.get("schema"),
                     "sample": variable.get("sample"),
                 }
-                tool_runtime.tracker["result_refs"].append(dict(summary))
+                if isinstance(result.get("data"), str):
+                    # A semantic tool result must reach synthesis intact. Large
+                    # documents retain the normal paged result-reference path.
+                    summary["analysis"] = result["data"][:24_000]
+                    summary["sample_complete"] = len(result["data"]) <= 24_000
+                if isinstance(result.get("provider_evidence"), Mapping):
+                    summary["provider_evidence"] = dict(result["provider_evidence"])
+                if result.get("charts"):
+                    summary["figures"] = collect_figures([result], include_images=False)
+                saved_summary = dict(summary)
+                if isinstance(result.get("charts"), list):
+                    # Images go to the renderer and saved result, never back to
+                    # the text-only main model or its next context window.
+                    saved_summary["charts"] = result["charts"]
+                tool_runtime.tracker["result_refs"].append(saved_summary)
                 call_record["result_ref"] = variable.get("data_ref")
                 call_record["row_count"] = variable.get("row_count")
                 return _tool_result(summary)

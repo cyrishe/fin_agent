@@ -339,6 +339,14 @@ class CustomToolDeepSeekHarnessSessionService(
     @staticmethod
     def _prompt(user_text: str, context: Mapping[str, Any]) -> str:
         sections = [f"用户当前的问题是：\n{_trim(user_text)}"]
+        state = context.get("custom_tool_state")
+        state = state if isinstance(state, Mapping) else {}
+        tool_name = _trim(state.get("tool_name") or context.get("custom_tool_name"))
+        if tool_name:
+            sections.append(
+                f"当前已保存工具的准确标识：{tool_name}。"
+                "通过 read_finance_asset 读取其 tool_contract，使用公开输入契约调用。"
+            )
         ui_action = (
             context.get("ui_action")
             if isinstance(context.get("ui_action"), Mapping)
@@ -456,7 +464,7 @@ class CustomToolDeepSeekHarnessSessionService(
                     call_id = _trim(source.get("callId")) if isinstance(source, Mapping) else ""
                     name = call_names.get(call_id, "")
                     result_payload = _notification_tool_payload(data)
-                    failed = bool(result_payload.get("error"))
+                    failed = bool(result_payload.get("error")) or result_payload.get("status") == "error"
                     if name.endswith("save_finance_artifact"):
                         artifact_type = _trim(
                             call_arguments.get(call_id, {}).get("artifact_type")
@@ -504,12 +512,13 @@ class CustomToolDeepSeekHarnessSessionService(
                     if raw_interaction_requests
                     else []
                 )
+                implementation_instruction = _trim(tracker.get("implementation_instruction"))
                 implementation_requested = bool(
                     not interaction_requests
-                    and any(
+                    and (implementation_instruction or any(
                         _trim(item.get("artifact_type")) == "flow"
                         for item in artifact_updates
-                    )
+                    ))
                 )
                 finish_reason = _trim(result.finish_reason)
                 terminal_tool_result = implementation_requested or bool(
@@ -578,6 +587,7 @@ class CustomToolDeepSeekHarnessSessionService(
                     ],
                     "implementation_runs": [],
                     "implementation_requested": implementation_requested,
+                    "implementation_instruction": implementation_instruction,
                     "result_refs": [
                         dict(item)
                         for item in tracker.get("result_refs") or []

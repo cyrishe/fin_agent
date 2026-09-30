@@ -14,6 +14,7 @@ import anyio
 
 from src.finance_api.models import FinanceQueryRequest, FinanceQueryResponse
 from src.scenarios.financial_qa import FinancialQaCcService
+from src.scenarios.financial_qa.report import public_report
 from src.scenarios.financial_qa.runtime import normalize_financial_qa_runtime
 from src.services.finance_data_tool_catalog_service import (
     FinanceDataToolCatalogService,
@@ -163,6 +164,10 @@ class FinanceApiGateway:
             turn_id=request_id,
             owner_id=self.owner_id(principal_id),
             user_text=request.query,
+            # Server-owned financial capability grant, shared by REST and MCP.
+            # Skill selection cannot grant web search or private/custom tools.
+            application_context={"default_agent": {"name": "investment_analyst",
+                "runtime_profile": {"tools": ["stock_kline_visual_analysis"]}}},
             dispatch_plan={
                 "selected_agent": "investment_analyst",
                 "turn_mode": "normal_qa",
@@ -287,6 +292,8 @@ class FinanceApiGateway:
                 "conversation_id": conversation_id,
                 "data_sources": data_sources,
                 "summary": summary if include_summary and summary else None,
+                "report": public_report(raw["report"], include_images=request.include_images)
+                if include_summary and isinstance(raw.get("report"), Mapping) else None,
                 "data": (
                     {"format": "row-dict", "results": projected_results}
                     if include_data
@@ -323,13 +330,13 @@ class FinanceApiGateway:
         fields = {"tool", "subject", "dataview", "operation", "api", "goal", "request",
             "skill_id", "skill_ids", "reference", "identifiers", "duration_ms",
             "submitted_request", "flow_step", "flow_size", "row_count", "static_validation_ms",
-            "api_execution_ms", "validation_errors", "error", "execution_error", "provider_retry_count", "attempts"}
+            "api_execution_ms", "validation_errors", "error", "execution_error", "provider_retry_count", "attempts", "llm_calls"}
         calls = [{k: v for k, v in call.items() if k in fields}
             for call in meta.get("tool_calls") or [] if isinstance(call, Mapping)]
         steps = [dict(s) for s in meta.get("execution_steps") or [] if isinstance(s, Mapping)]
         usage = raw.get("llm_usage")
         usage_fields = {"prompt_tokens", "completion_tokens", "total_tokens", "cache_read_tokens",
-            "cumulative_context_tokens", "reasoning_tokens", "accounting_total_tokens"}
+            "cumulative_context_tokens", "reasoning_tokens", "accounting_total_tokens", "auxiliary_usage"}
         projected_usage = {k:v for k,v in (usage or {}).items() if k in usage_fields}
         if projected_usage:
             projected_usage["total_tokens"] = total_tokens(usage)

@@ -1,8 +1,10 @@
 from src.services.conversation_title_service import ConversationTitleService
 from src.services import runtime_conversation_service as runtime_module
+from src.services import conversation_title_service as title_module
 
 
-def test_conversation_title_uses_flash_llm_and_normalizes_result() -> None:
+def test_conversation_title_uses_flash_llm_and_normalizes_result(monkeypatch) -> None:
+    monkeypatch.setattr(title_module, "DEFAULT_FLASH_MODEL", "configured-flash")
     calls = []
 
     def fake_llm(messages, enable_think=False):
@@ -15,12 +17,13 @@ def test_conversation_title_uses_flash_llm_and_normalizes_result() -> None:
 
     assert result["title"] == "A股放量突破工具设计"
     assert result["source"] == "llm"
-    assert result["model_name"] == "deepseek-v4-flash-0731"
+    assert result["model_name"] == "configured-flash"
     assert calls[0]["enable_think"] is False
     assert "/custom_tool create" in calls[0]["messages"][1]["content"]
 
 
-def test_conversation_title_falls_back_without_blocking_when_llm_fails() -> None:
+def test_conversation_title_falls_back_without_blocking_when_llm_fails(monkeypatch) -> None:
+    monkeypatch.setattr(title_module, "DEFAULT_FLASH_MODEL", "configured-flash")
     def failed_llm(_messages, enable_think=False):
         raise TimeoutError("maas timeout")
 
@@ -31,7 +34,7 @@ def test_conversation_title_falls_back_without_blocking_when_llm_fails() -> None
     assert result == {
         "title": "帮我做一个市场情绪温度计",
         "source": "fallback",
-        "model_name": "deepseek-v4-flash-0731",
+        "model_name": "configured-flash",
     }
 
 

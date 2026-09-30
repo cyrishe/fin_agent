@@ -19,6 +19,7 @@ Coding 按 Design 中必要的逻辑模块组推进；每组完成后写入动�
 
 ```json
 {
+  "sample_input": {},
   "cases": [{
     "name": "样例名称",
     "purpose": "核对哪项规则",
@@ -32,3 +33,5 @@ Coding 按 Design 中必要的逻辑模块组推进；每组完成后写入动�
 ```
 
 `expected` 必须在查看实际输出前从业务口径独立得到，不得复制 `actual`；`actual` 直接使用工具原始返回并包含 `key_process_info`。该证据由系统直接回收和展示，不由外层模型重写；缺失时不阻断 Coding，但必须明确验证证据不完整。功能样例只证明工具按既定口径运行，不证明信号或策略具有投资收益。
+
+证据文件中 `expected` 与 `sample_input` 的平台调用约定见当前工作区 `CODING_WORKSPACE.md`。

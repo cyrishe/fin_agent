@@ -22,6 +22,7 @@ _EXPOSED_TOOLS = frozenset(
         "request_user_interaction",
         "save_finance_artifact",
         "run_dynamic_tool",
+        "implement_dynamic_tool",
     }
 )
 
@@ -59,9 +60,8 @@ def _payload_from_sdk_result(result: Mapping[str, Any]) -> dict[str, Any]:
 class CustomToolDshMcpBridge:
     """Expose the existing custom-tool application tools to one DSH worker.
 
-    The coding tool is intentionally absent. DSH owns semantic orchestration;
-    after a saved flow concludes the DSH turn, the parent process invokes the
-    existing Codex implementation runner with the authoritative saved assets.
+    Implementation calls record a handoff request only. The parent process
+    invokes Codex with the authoritative assets after the DSH turn concludes.
     """
 
     def __init__(
@@ -75,10 +75,15 @@ class CustomToolDshMcpBridge:
         self.trace_path = trace_path
         self.system_tools = system_tools or FinanceCcSystemTools()
         self.tool_runtime = FinanceCcToolRuntime()
+        self.system_tools.implementation_runner = self._request_implementation
         self._context = self._read_context()
         self._context_revision = str(self._context.get("revision") or "")
         self._rebuild_tools()
         self._write_trace()
+
+    def _request_implementation(self, *, instruction: str, **kwargs: Any) -> dict[str, Any]:
+        self.tool_runtime.tracker["implementation_instruction"] = instruction
+        return {"message": "实现或修复请求已交给主进程，随后由 Codex 继续处理。"}
 
     @staticmethod
     def _owner_ids(context: Mapping[str, Any]) -> list[str]:

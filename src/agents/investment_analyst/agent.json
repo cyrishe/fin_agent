@@ -12,18 +12,11 @@
     "负责金融证券相关 Tool 与 Skill 的设计、创建、优化、修改、测试和明确调用"
   ],
   "tools": [
-    "个股动量排名",
+    "finance_data_query",
     "market_realtime_breadth",
-    "market_history_amount",
-    "market_minute_amount_series",
     "stock_realtime_quote",
-    "stock_history_kline",
-    "stock_intraday_kline",
-    "stock_realtime_funds_flow",
-    "stock_history_funds_flow",
-    "stock_industry_funds_flow",
     "financial_news_search",
     "general_search",
-    "equity_research_search"
+    "stock_kline_visual_analysis"
   ]
 }

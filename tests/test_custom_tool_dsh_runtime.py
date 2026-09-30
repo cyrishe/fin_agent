@@ -280,8 +280,8 @@ def test_custom_tool_dsh_bridge_reuses_system_tools_without_coding(
         "request_user_interaction",
         "save_finance_artifact",
         "run_dynamic_tool",
+        "implement_dynamic_tool",
     }
-    assert "implement_dynamic_tool" not in dsh_by_name
     for name, definition in dsh_by_name.items():
         assert definition.description == cc_by_name[name].description
         assert definition.inputSchema == cc_by_name[name].input_schema
@@ -318,6 +318,30 @@ def test_custom_tool_dsh_bridge_reuses_system_tools_without_coding(
     trace = json.loads(trace_path.read_text())
     assert trace["revision"] == "turn-2"
     assert trace["tracker"]["artifact_updates"][0] == arguments
+
+
+
+    # The same tool schema validates readiness but never invokes Codex in DSH.
+    rejected = asyncio.run(bridge.call_tool("implement_dynamic_tool", {"instruction": "修复"}))
+    assert rejected.get("error")
+    assert not json.loads(trace_path.read_text())["tracker"].get("implementation_instruction")
+    context["revision"] = "turn-3"
+    context["tool_context"]["custom_tool_state"] = {
+        "design_contract": {"document": "已有设计", "mermaid": "flowchart TD\nA --> B"},
+        "questions": [],
+    }
+    context_path.write_text(json.dumps(context), encoding="utf-8")
+    requested = asyncio.run(bridge.call_tool("implement_dynamic_tool", {"instruction": "沿用设计修复真实运行"}))
+    trace = json.loads(trace_path.read_text())
+    assert trace["tracker"]["implementation_instruction"] == "沿用设计修复真实运行"
+    assert "主进程" in requested["message"]
+    assert not requested.get("coding_status")
+    context["revision"] = "turn-4"
+    context["tool_context"]["custom_tool_state"]["questions"] = [{"question": "待确认"}]
+    context_path.write_text(json.dumps(context), encoding="utf-8")
+    rejected = asyncio.run(bridge.call_tool("implement_dynamic_tool", {"instruction": "修复"}))
+    assert rejected.get("error")
+    assert not json.loads(trace_path.read_text())["tracker"].get("implementation_instruction")
 
 
 def test_custom_tool_dsh_session_reuses_worker_and_requests_parent_coding(
@@ -385,6 +409,11 @@ def test_custom_tool_dsh_session_reuses_worker_and_requests_parent_coding(
                 ),
                 encoding="utf-8",
             )
+            if len(observed_contexts) == 2:
+                trace = json.loads(trace_path.read_text())
+                trace["tracker"]["artifact_updates"] = []
+                trace["tracker"]["implementation_instruction"] = "修复当前候选"
+                trace_path.write_text(json.dumps(trace), encoding="utf-8")
             return SimpleNamespace(
                 final_response="",
                 finish_reason="max-tokens",
@@ -432,6 +461,9 @@ def test_custom_tool_dsh_session_reuses_worker_and_requests_parent_coding(
     assert first["artifact_updates"][-1]["artifact_type"] == "flow"
     assert first["resumed"] is False
     assert second["resumed"] is True
+    assert second["implementation_requested"] is True
+    assert second["implementation_instruction"] == "修复当前候选"
+    assert second["artifact_updates"] == []
     assert observed_contexts[0]["tool_context"]["_agent_runtime_scope"].startswith(
         "custom_tool_dsh:"
     )
@@ -554,3 +586,12 @@ def test_intent_json_accepts_complete_plain_and_fenced_output(text):
 def test_intent_json_does_not_guess_truncated_model_output():
     with pytest.raises(ValueError, match="不完整"):
         _extract_json_object('{"is_custom_tool":false,"reason":"普通查询')
+
+
+def test_dsh_prompt_supplies_saved_identity_without_copying_tool_assets():
+    prompt = CustomToolDeepSeekHarnessSessionService._prompt("运行刚才的工具", {
+        "custom_tool_state": {"tool_name": "ct_a_share_daily_price_change", "design_contract": {"document": "private design content"}},
+    })
+    assert "ct_a_share_daily_price_change" in prompt
+    assert "tool_contract" in prompt
+    assert "private design content" not in prompt

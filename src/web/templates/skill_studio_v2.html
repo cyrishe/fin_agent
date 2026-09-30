@@ -137,14 +137,14 @@
         <div class="panel-head">
           <div>
             <h2 id="authoringTitle">用自然语言构建 Skill</h2>
-            <p class="panel-subtitle">描述目标与处理流程；CC 会结合当前真实 Tool 和已发布 Skill 生成一个私有 candidate revision。</p>
+            <p class="panel-subtitle">说明想解决的问题和希望得到的结果，系统会结合你可用的方法与数据生成草稿。</p>
           </div>
         </div>
         <div class="authoring-grid">
           <div class="field">
             <label for="skillRequirement">你想让这个 Skill 如何工作？</label>
             <textarea id="skillRequirement" maxlength="12000" placeholder="例如：我想做一个个股分析 Skill。先确认公司和时间范围，再获取行情、财务、估值和新闻证据，最后输出核心结论、风险与需要继续验证的问题。"></textarea>
-            <small>不必指定 Tool 或子 Skill；系统只会从当前注册表中选择真实可用的能力。</small>
+            <small>不必指定工具、指标或子方法；有明确的公式、范围或偏好时，直接写在这里。</small>
           </div>
           <button id="createCandidateBtn" class="btn primary" type="button">生成候选</button>
         </div>
@@ -169,12 +169,12 @@
         </section>
 
         <section class="panel">
-          <div class="panel-head"><div><h2>工作程序图</h2><p class="panel-subtitle">图由候选的有序步骤和能力绑定派生，不是另一套需要手工维护的协议。</p></div></div>
+          <div class="panel-head"><div><h2>它将如何工作</h2><p class="panel-subtitle">先确认这套分析步骤是否符合你的目标，再用下方输入框提出修改。</p></div></div>
           <div id="candidateProgramFlow" class="program-flow"></div>
         </section>
 
         <section class="panel">
-          <div class="panel-head"><div><h2>能力接入</h2><p class="panel-subtitle">模型负责建议；系统只保留当前本地注册表中可解析的 Tool 和相关 Skill。</p></div></div>
+          <div class="panel-head"><div><h2>可复用的能力</h2><p class="panel-subtitle">执行时按问题需要使用这些方法和数据能力，无需你手动配置调用顺序。</p></div></div>
           <div class="binding-grid">
             <div><h3>Tools</h3><div id="candidateTools" class="binding-list"></div></div>
             <div><h3>相关 Skills</h3><div id="candidateSkills" class="binding-list"></div></div>
@@ -182,17 +182,21 @@
         </section>
 
         <section class="panel">
-          <div class="panel-head"><div><h2>原始候选资产</h2><p class="panel-subtitle">当前 Studio 先直接展示完整 SKILL.md 和 Mermaid 源码，后续再优化编辑体验。</p></div></div>
+          <div class="panel-head"><div><h2>完整方法与修改</h2><p class="panel-subtitle">直接阅读方法。每次修改保存为新版本，已启用的版本在你再次启用前保持不变。</p></div></div>
+          <div id="candidateMethodPreview" class="markdown"></div>
+          <details>
+          <summary>查看方法与流程源码</summary>
           <div class="raw-grid">
             <div class="field"><strong>SKILL.md</strong><pre id="candidateMarkdownRaw" class="raw-code" tabindex="0" aria-label="SKILL.md 原始内容"></pre></div>
             <div class="field"><strong>flowchart.mmd</strong><pre id="candidateFlowRaw" class="raw-code" tabindex="0" aria-label="Mermaid 流程图原始内容"></pre></div>
           </div>
+          </details>
           <div class="feedback-row">
             <div class="field">
               <label for="candidateFeedback">继续用自然语言修改</label>
               <textarea id="candidateFeedback" maxlength="8000" placeholder="例如：把估值放到财务质量之后；新闻只看近 30 天；最后增加反方证据。"></textarea>
             </div>
-            <button id="reviseCandidateBtn" class="btn primary" type="button">生成新 revision</button>
+            <button id="reviseCandidateBtn" class="btn primary" type="button">按反馈修改</button>
           </div>
           <p id="revisionState" class="authoring-state" aria-live="polite"></p>
         </section>
@@ -249,11 +253,11 @@
         </section>
 
         <section class="panel">
-          <div class="panel-head"><div><h2>创建、测试与发布</h2><p class="panel-subtitle">当前纵切面先解决“用户能看见、看懂、带入对话”。</p></div></div>
+          <div class="panel-head"><div><h2>创建、测试与启用</h2><p class="panel-subtitle">创建草稿、启用版本和公开分享分别进行。</p></div></div>
           <div class="state-grid">
-            <div class="state-card"><strong>自然语言创建</strong><span>待接入 `/create_skill` 与 Skill Creator，会生成 candidate，而不是直接覆盖 active。</span></div>
-            <div class="state-card"><strong>测试与对比</strong><span>待绑定 revision 运行测试，并比较 with-skill / without-skill 的质量、成本与延迟。</span></div>
-            <div class="state-card"><strong>启用与分享</strong><span>在“我的候选”中启用版本，再选择 private 或 public。启用不会自动公开。</span></div>
+            <div class="state-card"><strong>自然语言创建</strong><span>在上方描述目标，查看草稿，并用反馈修改。每次修改保存为新版本。</span></div>
+            <div class="state-card"><strong>测试与对比</strong><span>当前页面尚未提供候选试跑与版本对比。成功生成不代表分析效果已验证。</span></div>
+            <div class="state-card"><strong>启用与分享</strong><span>在“我的候选”中启用版本，再选择仅自己使用或公开分享。启用不会自动公开。</span></div>
           </div>
         </section>
       </div>
@@ -447,6 +451,8 @@
       });
       if (!steps.length) appendText(flowRoot, "div", "候选暂无工作步骤。", "sidebar-copy");
       document.getElementById("candidateMarkdownRaw").textContent = String(candidate.skill_markdown || "");
+      renderMarkdown(document.getElementById("candidateMethodPreview"),
+        String(candidate.skill_markdown || "").replace(/^---\r?\n[\s\S]*?\r?\n---(?:\r?\n|$)/, ""));
       document.getElementById("candidateFlowRaw").textContent = String(candidate.flowchart?.source || "");
       document.getElementById("candidateFeedback").value = "";
       document.getElementById("revisionState").textContent = String(candidate.change_summary || "");

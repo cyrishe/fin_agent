@@ -47,6 +47,13 @@ class FinanceResultRegistry:
     """Compact, addressable working set for financial data query results."""
 
     SELECTION_KEYS = (
+        "codes",
+        "as_of",
+        "count",
+        "period",
+        "since",
+        "include_partial",
+        "max_lag_seconds",
         "k",
         "filter",
         "order",
@@ -223,6 +230,8 @@ class FinanceResultRegistry:
                     ],
                     "result_ref": _trim(metadata.get("result_ref")),
                     "sample_complete": count <= len(sample_rows),
+                    **({"provider_evidence": handle.data["evidence"]}
+                       if isinstance(handle.data, Mapping) and isinstance(handle.data.get("evidence"), Mapping) else {}),
                 }
             )
         return entries

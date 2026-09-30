@@ -449,7 +449,7 @@ def test_sdk_resumes_provider_thread_with_minimal_followup_prompt(tmp_path, monk
             self.id = thread_id
 
         def turn(self, turn_input, **kwargs):
-            calls.append({"kind": "turn", "input": turn_input})
+            calls.append({"kind": "turn", "input": turn_input, "options": kwargs})
             return FakeTurn()
 
     class FakeCodex:
@@ -516,5 +516,26 @@ def test_sdk_resumes_provider_thread_with_minimal_followup_prompt(tmp_path, monk
     assert len(second_turn_input) == 1
     assert "根据真实错误只修复相关函数" in second_turn_input[0].text
     assert "# CONTEXT" not in second_turn_input[0].text
-    assert "should_not_inline_on_resume" not in second_turn_input[0].text
+    assert '"tool_name": "should_not_inline_on_resume"' not in second_turn_input[0].text
     assert "首次实现" not in second_turn_input[0].text
+    for call in (item for item in calls if item["kind"] == "turn"):
+        visible_schema = json.loads(call["input"][0].text.split("# OUTPUT SCHEMA\n", 1)[1].split("\n", 1)[1])
+        assert visible_schema == call["options"]["output_schema"]
+        assert visible_schema == json.loads(schema.read_text(encoding="utf-8"))
+
+
+def test_sdk_resume_refreshes_only_authoritative_implementation_references():
+    prompt = CodexSdkSkillHarness._build_sdk_resume_prompt(
+        user_request="修复当前候选", context={
+            "current_implementation": {
+                "manifest_ref": "implementation/manifest.json",
+                "module_files": ["implementation/modules/001_custom_tool.py"],
+                "modules": [{"source_code": "private_source_must_not_repeat"}],
+            },
+            "design": {"document": "design_must_not_repeat"},
+        },
+    )
+    assert "implementation/manifest.json" in prompt
+    assert "implementation/modules/001_custom_tool.py" in prompt
+    assert "private_source_must_not_repeat" not in prompt
+    assert "design_must_not_repeat" not in prompt

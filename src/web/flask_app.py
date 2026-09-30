@@ -135,6 +135,7 @@ financial_qa_cc_service = FinancialQaCcService(
 skill_authoring_service = SkillAuthoringService(
     discovery_service=SkillCapabilityDiscoveryService(
         business_catalog=financial_qa_cc_service.business_skill_catalog,
+        catalog_provider=skill_hub_catalog_service.runtime_catalog,
     ),
 )
 custom_tool_orchestrator_name = str(
@@ -835,7 +836,11 @@ def _merge_llm_usage(*usages: dict | None) -> dict:
         merged["total_tokens"] += normalized["total_tokens"]
         merged["call_count"] += normalized["call_count"]
     totals = [_normalize_llm_usage(u)["accounting_total_tokens"] for u in usages]
-    merged["accounting_total_tokens"] = sum(v for v in totals if v is not None) if any(v is not None for v in totals) else None
+    # An explicitly incomplete executed branch must remain unknown after
+    # follow-up generation/routing adds its own known usage.
+    incomplete = any(isinstance(u, dict) and "accounting_total_tokens" in u
+                     and u["accounting_total_tokens"] is None for u in usages)
+    merged["accounting_total_tokens"] = sum(v for v in totals if v is not None) if not incomplete and any(v is not None for v in totals) else None
     return merged
 
 
@@ -4814,7 +4819,7 @@ def api_skill_hub():
 
     try:
         identity = _resolve_current_guest_identity()
-        catalog = skill_hub_catalog_service.catalog(owner_ids=[str(identity.get("user_id") or "")])
+        catalog = skill_hub_catalog_service.catalog(owner_ids=[str(identity.get("user_id") or "")], is_admin=identity.get("user_type") == "admin")
         return jsonify(_to_json_safe({"ok": True, **catalog}))
     except Exception as exc:
         return jsonify({"ok": False, "error": f"获取 Skill Hub 失败: {exc}"}), 500
@@ -4997,6 +5002,7 @@ def api_skill_hub_detail(skill_name):
             str(skill_name or "").strip(),
             catalog_id=str(request.args.get("catalog_id") or "").strip(),
             owner_ids=[str(identity.get("user_id") or "")],
+            is_admin=identity.get("user_type") == "admin",
         )
         if detail is None:
             return jsonify({"ok": False, "error": "Skill 不存在或当前不可查看。"}), 404
@@ -5010,6 +5016,35 @@ def _skill_revision_argument(payload: dict, name: str, *, allow_zero: bool = Fal
     if isinstance(value, bool) or not isinstance(value, int) or value < (0 if allow_zero else 1):
         raise SkillAuthoringError(f"{name} 必须是{'非负' if allow_zero else '正'}整数。", code="invalid_skill_authoring_request")
     return value
+
+
+@app.route("/api/skill-hub/<skill_id>/definition", methods=["GET", "PUT"])
+@app.route("/api/skill-hub/<skill_id>/definition/activate", methods=["POST"])
+def api_skill_definition(skill_id):
+    try:
+        identity = _resolve_current_member_identity()
+        if not identity:
+            return jsonify({"ok": False, "error": "请登录后编辑 Skill。"}), 403
+        auth = {"actor_id": str(identity.get("user_id") or ""), "is_admin": identity.get("user_type") == "admin"}
+        if request.method == "GET":
+            candidate = skill_hub_catalog_service.definition(skill_id, **auth)
+        else:
+            if not request.is_json or not isinstance(request.get_json(silent=True), dict):
+                return jsonify({"ok": False, "error": "请求必须是 JSON 对象。"}), 400
+            payload = request.get_json()
+            if request.method == "PUT":
+                candidate = skill_hub_catalog_service.save_definition(skill_id, payload, **auth)
+            else:
+                candidate = skill_hub_catalog_service.activate_definition(skill_id, **auth,
+                    expected_candidate_revision=_skill_revision_argument(payload, "expected_candidate_revision"),
+                    expected_active_revision=_skill_revision_argument(payload, "expected_active_revision", allow_zero=True))
+        return jsonify(_to_json_safe({"ok": True, "candidate": candidate}))
+    except PermissionError as exc:
+        return jsonify({"ok": False, "error": str(exc)}), 403
+    except (ValueError, TypeError) as exc:
+        return jsonify({"ok": False, "error": str(exc)}), 400
+    except Exception as exc:
+        return _skill_authoring_error(exc)
 
 
 @app.route("/api/skill-hub/candidates/<skill_id>/activate", methods=["POST"])

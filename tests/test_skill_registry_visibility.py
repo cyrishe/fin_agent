@@ -63,12 +63,62 @@ def test_draft_private_public_use_one_authorized_snapshot(hub):
     bob = hub.detail("personal-research", owner_ids=["bob"])
     assert bob["scope"] == "public" and not bob["owned"]
     runtime = hub.runtime_catalog(owner_ids=["bob"])
-    assert runtime.revision == bob["revision"]
-    assert runtime.load("personal-research")["method"] == bob["skill_markdown"]
-    assert hub.load_business_reference("personal-research", "references/method.md",
-        expected_revision=bob["revision"], owner_ids=["bob"])["content"] == "Reference one"
+    assert runtime.revision == bob["snapshot_revision"]
+    assert "Method one" in runtime.load("personal-research")["method"]
+    assert not bob["viewable"] and not bob["editable"] and bob["invocation_enabled"]
+    assert "skill_markdown" not in bob and "references" not in bob
+    assert "error" in hub.load_business_reference("personal-research", "references/method.md",
+        expected_revision=runtime.revision, owner_ids=["bob"])
     hub.set_visibility("personal-research", owner_id="alice", visibility="private", expected_active_revision=1)
     assert hub.detail("personal-research", owner_ids=["bob"]) is None
+
+
+def test_authoring_discovery_uses_callers_active_registry(hub):
+    from types import SimpleNamespace
+    from src.services.skill_authoring_service import SkillCapabilityDiscoveryService
+    hub.candidate_store.create_candidate(candidate(), owner_id="alice")
+    discovery = SkillCapabilityDiscoveryService(business_catalog=hub.business_catalog,
+        catalog_provider=hub.runtime_catalog,
+        tool_registry=SimpleNamespace(list_active_tools=lambda: []))
+    assert "personal-research" not in discovery.discover("research", owner_id="alice")["_skill_index"]
+    activate(hub)
+    assert "personal-research" in discovery.discover("research", owner_id="alice")["_skill_index"]
+    assert "personal-research" not in discovery.discover("research", owner_id="bob")["_skill_index"]
+    hub.set_visibility("personal-research", owner_id="alice", visibility="public", expected_active_revision=1)
+    assert "personal-research" in discovery.discover("research", owner_id="bob")["_skill_index"]
+
+
+def test_composition_survives_activation_without_eager_loading_or_grants(hub):
+    source = candidate()
+    source["control_manifest"] = {"related_skills": [
+        {"skill_id": "system-research", "purpose": "支持证据分析"},
+        {"skill_id": "not-authorized", "purpose": "SECRET_PURPOSE"},
+        {"skill_id": "personal-research", "purpose": "self"},
+        {"skill_id": "system-research", "purpose": "duplicate"},
+    ]}
+    hub.candidate_store.create_candidate(source, owner_id="alice")
+    activate(hub)
+    runtime = hub.runtime_catalog(owner_ids=["alice"])
+    method = runtime.load("personal-research")["method"]
+    assert method.count("`system-research`") == 1
+    assert "支持证据分析" in method
+    assert "SECRET_PURPOSE" not in method and "not-authorized" not in method
+    assert "System method" not in method  # Peer body remains progressive.
+    assert runtime.allowed_tools_by_skill()["personal-research"] == []
+    assert runtime.method_snapshot()["skills"]["personal-research"]["method"] == method
+    assert (runtime.runtime_root / "skills/personal-research/SKILL.md").read_text().strip() == method
+    with pytest.raises(KeyError):
+        runtime.method_snapshot(allowed_skill_ids=["personal-research"])["skills"]["system-research"]
+    assert "error" in runtime.load("system-research", allowed_skill_ids=["personal-research"])
+    revised = {**source, "revision_no": 2, "control_manifest": {"related_skills": [
+        {"skill_id": "system-research", "purpose": "更新后的用途"}]}}
+    hub.candidate_store.save_revision(revised, owner_id="alice", expected_base_revision=1)
+    assert hub.runtime_catalog(owner_ids=["alice"]).revision == runtime.revision
+    activate(hub, revision=2, previous=1)
+    current = hub.runtime_catalog(owner_ids=["alice"])
+    assert current.revision != runtime.revision
+    assert "更新后的用途" in current.load("personal-research")["method"]
+    assert "更新后的用途" not in runtime.load("personal-research")["method"]
 
 
 def test_revisions_pin_method_and_reference_and_require_explicit_activation(hub):

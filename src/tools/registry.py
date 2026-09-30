@@ -1,4 +1,6 @@
 import json
+import inspect
+from functools import partial
 from importlib import import_module
 from pathlib import Path
 from typing import Any, Dict
@@ -31,6 +33,8 @@ TOOL_REGISTRY: Dict[str, str] = {
     "index_daily_market_query": "src.tools.index_daily_market_query_tool:run",
     "stock_announcement_query": "src.tools.stock_announcement_query_tool:run",
     "finance_data_query": "src.tools.finance_data_query_tool:run",
+    "stock_kline_visual_analysis": "src.tools.stock_kline_visual_analysis_tool:run",
+    "stock_minute_signals": "src.tools.stock_minute_signals_tool:run",
     "stock_protocol_data_query": "src.tools.stock_protocol_data_query_tool:run",
     "security_universe_query": "src.tools.security_universe_query_tool:run",
     "financial_news_search": "src.tools.company_news_tool:run",
@@ -363,6 +367,11 @@ def run_tool(
     # invocation lifecycle.
     normalized_args.pop("_runtime", None)
     trusted_runtime_ctx = dict(runtime_ctx or {})
+    # Runtime tracking strips internal metadata from ordinary input arguments.
+    # Tools needing ownership receive it through an explicit optional keyword;
+    # existing single-argument tools retain their invocation contract.
+    if "runtime_ctx" in inspect.signature(func).parameters:
+        func = partial(func, runtime_ctx=trusted_runtime_ctx)
     if trusted_runtime_ctx:
         normalized_args["_runtime"] = trusted_runtime_ctx
     contract_normalized = normalize_tool_args_for_definition(tool_name, normalized_args)

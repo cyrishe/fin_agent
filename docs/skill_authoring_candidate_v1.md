@@ -1,5 +1,7 @@
 # CC-native Skill Authoring Candidate v1
 
+本篇保留最初candidate纵切面的设计。当前启用与统一授权目录见[Skill优先实现](development_tasks/skill_first_registry_implementation_20260908.md)；账户能力发现、关联方法运行和自然语言修改的最新对接见[2026-09-29协作与编写优化](development_tasks/skill_composition_authoring_20260929.md)。下文“尚未实现发布/启用”的范围不代表当前代码状态。
+
 ## 目标
 
 本纵切面让用户用自然语言创建和迭代新的 CC-native Skill 候选，同时保持它与 Legacy `SkillRunner / skill.json / schema.json` 完全隔离。

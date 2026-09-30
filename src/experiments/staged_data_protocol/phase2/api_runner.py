@@ -32,6 +32,12 @@ from src.experiments.staged_data_protocol.phase2.report_provider import (
 )
 from src.experiments.staged_data_protocol.phase2.realtime_quote_provider import execute_realtime_quote_api
 from src.experiments.staged_data_protocol.phase2.stock_corporate_provider import execute_stock_corporate_api
+from src.experiments.staged_data_protocol.phase2.technical_provider import (
+    execute_technical_api,
+    execute_technical_aggregate_api,
+    execute_technical_window_api,
+)
+from src.experiments.staged_data_protocol.phase2.technical_history_provider import execute_history_api
 
 
 REF_RE = re.compile(r"\b(r\d+)\.([A-Za-z_]\w*)\b")
@@ -156,6 +162,21 @@ def execute_api_call(call: ApiCall, previous_results: Mapping[str, ResultHandle]
         previous_results,
         skip_keys=skipped_ref_args,
     )
+    if resolved and resolved.get("type") == "base" and resolved.get("subject") == "stock" and resolved.get("dataview") in {"technical_series", "kline_patterns"}:
+        data = execute_history_api(patterns=resolved["dataview"] == "kline_patterns", args=call.args, outputs=call.outputs)
+        return ResultHandle(name=call.result_id, api=call.api, columns=data.get("columns", columns), data=data)
+    if resolved and resolved.get("type") == "base" and resolved.get("subject") == "stock" and resolved.get("dataview") in {"technical", "technical_minute", "technical_realtime", "technical_minute_series"}:
+        data = execute_technical_api(minute=resolved["dataview"] == "technical_minute",
+            realtime=resolved["dataview"] == "technical_realtime",
+            window=resolved["dataview"] == "technical_minute_series", args=call.args, outputs=call.outputs)
+        return ResultHandle(name=call.result_id, api=call.api, columns=data.get("columns", columns), data=data)
+    if resolved and resolved.get("subject") == "stock" and resolved.get("dataview") == "technical":
+        if resolved.get("type") == "kd":
+            data = execute_technical_window_api(field=resolved["field"], method=resolved["method"], args=call.args, outputs=call.outputs)
+            return ResultHandle(name=call.result_id, api=call.api, columns=data.get("columns", columns), data=data)
+        if resolved.get("type") == "agg":
+            data = execute_technical_aggregate_api(args=call.args, outputs=call.outputs)
+            return ResultHandle(name=call.result_id, api=call.api, columns=data.get("columns", columns), data=data)
     if resolved and resolved.get("type") == "base" and resolved.get("dataview") == "quote":
         subject = str(resolved.get("subject") or "")
         quote_mode = _stock_quote_mode(call.args, resolved)

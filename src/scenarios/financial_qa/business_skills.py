@@ -434,6 +434,7 @@ class FinanceBusinessSkillCatalog:
                 skill.skill_id: {
                     "display_name": self.studio_detail(skill.skill_id)["display_name"],
                     "description": skill.description,
+                    "owner": skill.owner,
                     "method": skill.method,
                     "content_hash": skill.content_hash,
                     "references": {
@@ -505,6 +506,12 @@ class FinanceBusinessSkillCatalog:
                 }
             )
 
+        companion_text = {}
+        for item in skill.companion_files:
+            try:
+                companion_text[item.path] = item.content.decode("utf-8")
+            except UnicodeDecodeError:
+                continue
         allowed_tools = list(skill.allowed_tools)
         return {
             "skill_id": skill.skill_id,
@@ -523,6 +530,7 @@ class FinanceBusinessSkillCatalog:
             "content_hash": skill.content_hash,
             "revision": self._snapshot.revision,
             "references": references,
+            "companion_files": companion_text,
             "controls": {
                 "execution_budget": skill.execution_budget,
                 "supplemental_tools": allowed_tools,
@@ -545,8 +553,9 @@ class FinanceBusinessSkillCatalog:
     ) -> "FinanceBusinessSkillCatalog":
         """Compile an already-authorized registry view into the same CC snapshot.
 
-        The registry owns visibility and active pointers. Method text cannot
-        grant tools, override a system identity, or supply executable files.
+        The registry owns visibility and active pointers. Only records owned by
+        system can revise a built-in identity. Method text cannot grant tools or
+        supply executable files; system revisions retain the built-in tool policy.
         """
 
         records = list(records)
@@ -559,12 +568,16 @@ class FinanceBusinessSkillCatalog:
         result._validated_runtime_bindings = {}
         skills = list(self._snapshot.skills)
         identities = {skill.skill_id for skill in skills}
+        available_ids = identities | {_trim(record.get("skill_id")) for record in records}
         for record in sorted(records, key=lambda item: _trim(item.get("skill_id"))):
             skill_id = _trim(record.get("skill_id"))
             if not re.fullmatch(r"[a-z0-9]+(?:-[a-z0-9]+)*", skill_id):
                 raise RuntimeError("invalid registered Finance Skill identity")
+            system_seed = next((item for item in skills if item.skill_id == skill_id and item.owner == "system"), None)
             if skill_id in identities:
-                raise RuntimeError("registered Finance Skill identity conflicts with system catalog")
+                if not system_seed or _trim(record.get("owner_id")) != "system":
+                    raise RuntimeError("registered Finance Skill identity conflicts with system catalog")
+                skills.remove(system_seed)
             identities.add(skill_id)
             markdown = _trim(record.get("skill_markdown"))
             frontmatter = dict(self._frontmatter(markdown))
@@ -577,6 +590,23 @@ class FinanceBusinessSkillCatalog:
             marker = markdown.find("\n---\n", 4)
             content = ("---\n" + yaml.safe_dump(frontmatter, allow_unicode=True, sort_keys=False)
                        + "---\n" + markdown[marker + 5:]).encode("utf-8")
+            # Preserve saved composition intent in every runtime (native plugin,
+            # explicit prompt and read tool), without loading or granting peers.
+            related = []
+            seen_related = set()
+            control = record.get("control_manifest") or {}
+            for item in control.get("related_skills", []):
+                peer = _trim(item.get("skill_id"))
+                if peer in available_ids and peer != skill_id and peer not in seen_related:
+                    seen_related.add(peer)
+                    purpose = " ".join(_trim(item.get("purpose")).split())
+                    related.append(f"- `{peer}`：{purpose or '按当前问题需要参考此方法。'}")
+            if related:
+                content += ("\n\n## 关联方法\n\n"
+                    "以下为本版本保存的方法关联。执行时按当前授权目录选择；"
+                    "采用其专业方法前先读取正文，名称和用途简介不能替代方法。"
+                    "已加载的方法与证据直接复用；不要求全部加载，不自动执行子任务或授予权限。\n\n"
+                    + "\n".join(related) + "\n").encode("utf-8")
             references = []
             for path, text in sorted(dict(record.get("references") or {}).items()):
                 normalized = _trim(path).replace("\\", "/")
@@ -589,15 +619,22 @@ class FinanceBusinessSkillCatalog:
                     path=normalized, content_hash=self._content_hash(reference_content),
                     content=reference_content,
                 ))
-            interface = yaml.safe_dump({"interface": {"display_name":
-                _trim(record.get("display_name")) or skill_id}}, allow_unicode=True).encode("utf-8")
+            interface_data = {}
+            if system_seed:
+                for companion in system_seed.companion_files:
+                    if companion.path == "agents/openai.yaml":
+                        interface_data = yaml.safe_load(companion.content.decode("utf-8")) or {}
+            interface_data.setdefault("interface", {})["display_name"] = _trim(record.get("display_name")) or skill_id
+            interface = yaml.safe_dump(interface_data, allow_unicode=True).encode("utf-8")
             skills.append(_FinanceBusinessSkillSnapshot(
-                skill_id=skill_id, category="personal", relative_path=f"skills/{skill_id}",
+                skill_id=skill_id, category=system_seed.category if system_seed else "personal", relative_path=f"skills/{skill_id}",
                 description=_trim(frontmatter["description"]), method=content.decode("utf-8").strip(),
-                method_content=content, content_hash=self._content_hash(content), allowed_tools=(),
+                method_content=content, content_hash=self._content_hash(content), allowed_tools=system_seed.allowed_tools if system_seed else (),
                 execution_budget=self._execution_budget(frontmatter), references=tuple(references),
                 companion_files=(_FinanceSkillCompanionSnapshot("agents/openai.yaml",
-                    self._content_hash(interface), interface),),
+                    self._content_hash(interface), interface),) + tuple(
+                        item for item in (system_seed.companion_files if system_seed else ())
+                        if item.path != "agents/openai.yaml"),
                 owner=_trim(record.get("owner_id")), visibility=_trim(record.get("visibility")) or "private",
                 active_revision_no=int(record.get("active_revision_no") or 0),
             ))

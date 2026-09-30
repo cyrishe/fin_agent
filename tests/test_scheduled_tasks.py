@@ -277,6 +277,7 @@ def test_executor_runs_dependencies_and_resolves_result_bindings():
     )
     assert calls[0][1] == {"code": "600519"}
     assert calls[0][2]["custom_tool_owner_ids"] == ["user_a"]
+    assert calls[0][2]["scheduled_task_step_id"] == "quote"
     assert skill.calls[0][1] == {"price": 1500}
     assert [step["status"] for step in result["steps"]] == ["completed", "completed"]
 

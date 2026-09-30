@@ -14,6 +14,7 @@ const NAMES = {
   interaction: 'mcp__finance__request_user_interaction',
   saveArtifact: 'mcp__finance__save_finance_artifact',
   runTool: 'mcp__finance__run_dynamic_tool',
+  implementTool: 'mcp__finance__implement_dynamic_tool',
 }
 
 function fixture(config = {}) {
@@ -139,4 +140,10 @@ test('duplicate calls are bounded without a business validator', () => {
   }
   assert.equal(runtime.guard(exec), undefined)
   assert.match(runtime.guard(exec), /重复调用/)
+})
+
+
+test('implementation requests conclude DSH before parent coding', async () => {
+  const runtime = fixture()
+  assert.equal(await runtime.execute({name: NAMES.implementTool, arguments: {instruction: '修复当前候选'}}), true)
 })

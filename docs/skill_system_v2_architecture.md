@@ -1,4 +1,10 @@
+> 2026-09-29：业务 Skill 查看/编辑/共享权限的当前实现见 [权限与版本说明](development_tasks/skill_inspection_permissions_20260929.md)。个人 public 表示共享使用，不再公开实现。
+>
+> 2026-09-29：复杂 Skill 的上下文交接与调度调研见 [框架比较与采用方案](development_tasks/skill_execution_framework_research_20260929.md)，真实冻结数据的最小实验见 [对照记录](development_tasks/skill_evidence_handoff_eval_20260929.md)。本轮为独立实验，尚未切换线上问答流程。
+
 # Fin Agent Skill System V2：CC-native 专业方法、Skill Hub 与可控执行
+
+当前代码对接：本篇保留原始整体方案；已实现的统一授权/启用见[2026-09-08记录](development_tasks/skill_first_registry_implementation_20260908.md)，最新的账户能力发现、方法组合与用户编写优化见[2026-09-29实现](development_tasks/skill_composition_authoring_20260929.md)。运行就绪程度以各记录中的实际验证范围为准。
 
 > 状态：Proposed
 >

@@ -13,6 +13,7 @@ const TOOL_SUFFIXES = Object.freeze({
   interaction: 'request_user_interaction',
   saveArtifact: 'save_finance_artifact',
   runTool: 'run_dynamic_tool',
+  implementTool: 'implement_dynamic_tool',
 })
 
 const DEFAULT_BUDGETS = Object.freeze({
@@ -46,7 +47,7 @@ const STAGE_GUIDANCE = Object.freeze({
   flow:
     '当前设计已经保存。按 Skill 生成 Mermaid，并调用 save_finance_artifact 保存 flow；不要修改设计内容。保存成功后系统将直接交给 Codex 实现和验证。',
   direct:
-    '当前会话已有完整工具资产。根据用户本轮意图直接读取资产、运行工具或形成必要修改；查看时不重新生成，运行前只在需要时读取 tool_contract。若用户改变整体目标，从新的 requirement 资产开始。',
+    '当前会话已有完整工具资产。根据用户本轮意图直接读取资产、运行工具或形成必要修改；查看时不重新生成，运行前只在需要时读取 tool_contract。实现或修复已有设计时，调用 implement_dynamic_tool 传递本轮要求，由主进程交给 Codex。若用户改变整体目标，从新的 requirement 资产开始。',
   final:
     '本轮需要的系统操作已经完成。不要再调用工具，只用简短中文说明真实结果或下一项必要操作；不得声称未发生的实现、测试或启用。',
 })
@@ -312,7 +313,7 @@ export function apply(ctx, input = {}) {
         && args.questions.length > 0
       const concludesForFlow = exec.name === tools.saveArtifact
         && args.artifact_type === 'flow'
-      if (concludesForInteraction || concludesForFlow) exec.concludeTurn()
+      if (concludesForInteraction || concludesForFlow || exec.name === tools.implementTool) exec.concludeTurn()
       return next()
     })
 

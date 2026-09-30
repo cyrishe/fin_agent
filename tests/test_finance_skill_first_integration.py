@@ -106,7 +106,7 @@ def test_method_choice_rule_is_shared_generic_and_absent_when_no_methods(hub):
     context = agent._runtime_context(application_context={}, owner_id="alice")
     rule = Path("src/scenarios/financial_qa/skill_selection.md").read_text().strip()
     assert context["_finance_skill_catalog_prompt"].count(rule) == 1
-    assert "选择空集" in rule and "当前缺口" in rule
+    assert "不必加载 Skill" in rule and "不是必跑清单" in rule
     for skill_id in context["_finance_skill_snapshot"]["skills"]:
         assert skill_id not in rule
     empty = agent._runtime_context(application_context={"default_agent": {"skills": []}}, owner_id="alice")
@@ -187,3 +187,21 @@ def test_explicit_methods_keep_user_order_and_all_base_tools(hub):
     prompt = context["_finance_explicit_skill_prompt"]
     assert prompt.index("用户选择顺序 1：personal-report") < prompt.index("用户选择顺序 2：equity-report-analysis")
     assert context["allowed_agent_tools"] == agent._runtime_context(application_context={}, owner_id="alice")["allowed_agent_tools"]
+
+
+def test_shared_method_executes_without_copying_implementation_to_public_tracker(hub, tmp_path):
+    hub.set_visibility("personal-report", owner_id="alice", visibility="public", expected_active_revision=1)
+    agent = service(hub)
+    context = agent._runtime_context(application_context={}, owner_id="bob", explicit_skill_ids=["personal-report"])
+    assert not context["_finance_skill_snapshot"]["skills"]["personal-report"]["viewable"]
+    tools = FinanceDataQueryCcTools(result_store=SessionVariableStoreService(data_root=tmp_path / "results"))
+    definitions, _, tracker = tools.build_tools(owner_ids=["bob"], tool_context=context)
+    read = next(item for item in definitions if item.name == "read_finance_skill")
+    loaded = asyncio.run(read.handler({"skill_id": "personal-report"}))
+    assert "PRIVATE_METHOD_BODY" in json.dumps(loaded)  # trusted server-side model execution
+    assert tracker["skill_entries"][0]["skill_id"] == "personal-report"
+    assert "PRIVATE_METHOD_BODY" not in json.dumps(tracker)
+    assert "PRIVATE_REFERENCE" not in json.dumps(tracker)
+    owner_context = agent._runtime_context(application_context={}, owner_id="alice", explicit_skill_ids=["personal-report"])
+    _, _, owner_tracker = tools.build_tools(owner_ids=["alice"], tool_context=owner_context)
+    assert "PRIVATE_METHOD_BODY" in json.dumps(owner_tracker)

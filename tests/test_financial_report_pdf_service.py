@@ -1,4 +1,5 @@
 from io import BytesIO
+import base64
 
 from pypdf import PdfReader
 
@@ -69,3 +70,19 @@ def test_financial_report_pdf_uses_matching_h1_as_body_boundary() -> None:
 def test_financial_report_pdf_headings_stay_with_following_content() -> None:
     styles = FinancialReportPdfService()._styles()
     assert all(styles[f"h{level}"].keepWithNext for level in range(1, 5))
+
+
+def test_pdf_embeds_the_saved_figure_in_the_same_section():
+    from PIL import Image
+    image = BytesIO()
+    Image.new("RGB", (700, 250), "blue").save(image, format="PNG")
+    payload = FinancialReportPdfService().render(PdfReportInput(
+        title="图文验证", report_text="## 技术面\n\n![同源日K](finance-figure:fig_a)\n\n当前仍低于MA5。",
+        figures=[{"id": "fig_a", "image_url": "data:image/png;base64," + base64.b64encode(image.getvalue()).decode(),
+                  "code": "000001.SZ", "as_of": "2026-09-29"}],
+    ))
+    reader = PdfReader(BytesIO(payload))
+    assert sum(len(page.images) for page in reader.pages) == 1
+    text = "\n".join(page.extract_text() for page in reader.pages)
+    assert "同源日K" in text and "2026-09-29" in text
+    assert "finance-figure:" not in text

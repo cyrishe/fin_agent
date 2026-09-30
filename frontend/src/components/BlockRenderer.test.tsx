@@ -3,6 +3,20 @@ import { describe, expect, it } from "vitest";
 import BlockRenderer from "./BlockRenderer";
 
 describe("resource list renderer", () => {
+  it("renders saved PNG evidence responsively without enabling arbitrary image URLs", () => {
+    const html = renderToStaticMarkup(<BlockRenderer block={{
+      block_id: "visual", block_type: "resource", kind: "resource", semantic: "finance.kline_visual",
+      payload: { resources: [
+        { title: "基础走势", mime_type: "image/png", uri: "data:image/png;base64,aGVsbG8=" },
+        { title: "Unsafe", mime_type: "image/png", uri: "javascript:alert(1)" },
+      ] },
+    }} />);
+    expect(html).toContain('alt="基础走势"');
+    expect(html).toContain("max-width:100%");
+    expect(html.match(/<img /g)).toHaveLength(1);
+    expect(html).not.toContain('src="javascript:');
+  });
+
   it("opens internal Skill Studio resources as links", () => {
     const html = renderToStaticMarkup(<BlockRenderer block={{
       block_id: "skills",

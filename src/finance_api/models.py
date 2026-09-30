@@ -19,6 +19,7 @@ SKILL_SELECTION_DESCRIPTION = (
 
 class FinanceQueryRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
+    include_images: bool = Field(default=False, description="Include saved PNG data URLs in report.figures; default returns figure metadata only.")
     is_test: bool = Field(default=False, description="Account this request in the test usage bucket, included in system totals. Does not change permissions or model behavior.")
     detail: bool = Field(default=False, description="Include execution steps, turns, token usage and timing diagnostics; does not change query behavior.")
 
@@ -93,6 +94,7 @@ class FinanceTaskRequest(FinanceQueryRequest):
 
 class FinanceAnswerRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
+    include_images: bool = Field(default=False, description="Include saved PNG data URLs in report.figures.")
     is_test: bool = Field(default=False, description="Account this request as test usage, included in system totals.")
     detail: bool = Field(default=False, description="Include execution diagnostics without changing answer behavior.")
 
@@ -188,6 +190,7 @@ class FinanceQueryResponse(BaseModel):
     conversation_id: str | None = None
     data_sources: list[FinanceDataSource] = Field(default_factory=list)
     summary: str | None = None
+    report: dict[str, Any] | None = Field(default=None, description="Projection of the same answer: title, introduction, sections (id/title/content/figure_ids), and saved figure metadata. Section content is Markdown, not a second analysis.")
     data: FinanceDataPayload | None = None
     execution: FinanceExecutionMetadata
     error: FinanceApiError | None = None
@@ -198,4 +201,6 @@ class FinanceQueryResponse(BaseModel):
         payload = handler(self)
         if self.detail is None:
             payload.pop("detail", None)
+        if self.report is None:
+            payload.pop("report", None)
         return payload

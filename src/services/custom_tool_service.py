@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from contextlib import contextmanager
+import copy
 import datetime as dt
 import hashlib
 import json
@@ -1015,8 +1016,11 @@ class CustomToolRuntimeService:
                             _trim(execution.get("reason"))
                             or "historical finance query failed",
                         )
-                except Exception:
-                    finance_bridge_errors.append("finance API execution failed")
+                except Exception as exc:
+                    # Protocol input failures are actionable Coding feedback.
+                    # Keep unexpected provider failures behind the existing safe error.
+                    error = str(exc) if isinstance(exc, ValueError) else "finance API execution failed"
+                    finance_bridge_errors.append(error)
                     if effective_as_of is not None:
                         return self._error(
                             manifest["tool_name"],
@@ -1025,7 +1029,7 @@ class CustomToolRuntimeService:
                         )
                     finance_responses[request_key] = {
                         "ok": False,
-                        "error": "finance API execution failed",
+                        "error": error,
                         "data": [],
                     }
         else:
@@ -2306,17 +2310,18 @@ class CustomToolAgentService:
         ]
         if (
             bool(cc_result.get("implementation_requested"))
-            and design_updated
+            and bool(next_state.get("design_contract"))
             and not questions
             and not implementation_runs
         ):
-            # DSH ends at the saved flow boundary. Coding stays in the parent
+            # DSH ends at a saved flow or implementation request. Coding stays in the parent
             # process so the existing Codex harness, version store, tests and
             # stream events remain the only implementation authority.
             implementation_runs = [
                 self.implement_dynamic_tool(
                     state=next_state,
                     owner_id=owner_id,
+                    instruction=_trim(cc_result.get("implementation_instruction")),
                     event_sink=event_sink,
                 )
             ]
@@ -2979,6 +2984,16 @@ class CustomToolAgentService:
     ) -> Dict[str, Any]:
         """Let Codex implement, validate, and review one dynamic-tool revision."""
         coding_state = self._clean_state_for_context(state)
+        tool_name = _trim(coding_state.get("tool_name"))
+        if tool_name and not coding_state.get("edit_target") and self.store.exists(tool_name):
+            bundle = self.store.load_for_runtime(
+                tool_name, owner_ids=[owner_id], allow_inactive=True,
+            )
+            if _trim((bundle.get("manifest") or {}).get("status")) == "active":
+                return self.start_edit(
+                    tool_name, _trim(instruction) or "根据当前设计继续实现并验证。",
+                    owner_id=owner_id, event_sink=event_sink,
+                )
         if _trim(instruction):
             coding_state["coding_feedback"] = _trim(instruction)
         return self._confirm_and_code(
@@ -3708,107 +3723,32 @@ class CustomToolAgentService:
                         )
                     ),
                 })
-        if not sample_input and evidence_cases:
-            coding_evidence_ok = all(
-                _trim(item.get("status")).lower() not in {"fail", "failed", "error"}
-                for item in evidence_cases
-            )
-            representative_input = dict(evidence_cases[0]["input"])
-            runtime_result = self.runtime.run(
-                manifest["tool_name"],
-                representative_input,
-                owner_ids=[owner_id] if owner_id else None,
-                allow_inactive=True,
-            )
-            runtime_ok = self._runtime_business_ok(runtime_result)
-            runtime_actual = (
-                dict(runtime_result.get("data") or {})
-                if isinstance(runtime_result.get("data"), Mapping)
-                else {}
-            )
-            expected = dict(evidence_cases[0].get("expected") or {})
-            runtime_expectation_ok = (
-                not expected
-                or self._expected_matches_actual(expected, runtime_actual)
-            )
-            execution_ok = (
-                coding_evidence_ok
-                and runtime_ok
-                and runtime_expectation_ok
-            )
-            runtime_case = {
-                **evidence_cases[0],
-                "test_id": "production_runtime_smoke",
-                "category": "runtime_compatibility",
-                "status": "passed" if execution_ok else "failed",
-                "actual": runtime_actual,
-                "logs": [
-                    dict(item)
-                    for item in ((runtime_result.get("meta") or {}).get("execution_logs") or [])
-                    if isinstance(item, Mapping)
-                ],
-                "purpose": (
-                    _trim(evidence_cases[0].get("purpose"))
-                    or "使用正式运行包装器验证动态加载、沙箱执行和代表性输入。"
-                ),
-                "error": (
-                    _trim(runtime_result.get("error"))
-                    or (
-                        "正式运行结果与独立预期不一致。"
-                        if not runtime_expectation_ok
-                        else ""
-                    )
-                ),
-            }
-            displayed_cases = [runtime_case, *evidence_cases[1:]]
-            passed_count = sum(
-                item.get("status") == "passed" for item in displayed_cases
-            )
+        if not sample_input and evidence_cases and (design.get("input_schema") or {}).get("required"):
+            # Focused cases may target helpers or use synthetic market data.
+            # Their inputs are not requests to the live finance service.
             test_result = {
-                **runtime_result,
-                "ok": execution_ok,
-                "execution_ok": execution_ok,
-                "contract_ok": execution_ok,
-                "data": runtime_actual,
-                "cases": displayed_cases,
+                "ok": False,
+                "execution_ok": False,
+                "contract_ok": False,
+                "cases": evidence_cases,
                 "coding_cases": evidence_cases,
-                "proposed_cases": proposed_tests,
-                "summary": (
-                    f"正式运行兼容性验证通过；{passed_count} / {len(displayed_cases)} 项代表性样例符合预期"
-                    if execution_ok
-                    else "正式运行兼容性验证失败"
-                ),
-                "error": (
-                    _trim(runtime_result.get("error"))
-                    or next(
-                        (
-                            _trim(item.get("error"))
-                            for item in displayed_cases
-                            if item.get("status") == "failed"
-                            and _trim(item.get("error"))
-                        ),
-                        "" if execution_ok else "代表性样例验证未通过。",
-                    )
-                ),
-                "evidence_source": "production_runtime",
+                "summary": "隔离功能样例已保存；尚未提供真实运行样例输入。",
+                "error": "尚未提供真实运行所需的入口样例，当前候选和功能证据已保留。",
+                "evidence_source": "isolated_synthetic_fixture",
             }
             saved = self.store.record_test(manifest["tool_name"], test_result)
+            next_state["test_feedback"] = self._test_feedback(
+                test_result, sample_input={}, expected={}, execution_logs=[],
+            )
             return {
-                "message": (
-                    f"已生成 draft：{manifest['tool_name']}。\n"
-                    + (
-                        "正式运行兼容性验证通过，实际结果和核心过程信息供你确认。"
-                        if execution_ok
-                        else f"正式运行兼容性验证失败：{_trim(runtime_result.get('error')) or '运行失败'}"
-                    )
-                ),
+                "message": f"已生成 draft：{manifest['tool_name']}。" + test_result["summary"],
                 "state": next_state,
                 "tool": saved,
                 "test_result": test_result,
                 "events": events or [],
                 "thread_context_patch": {"custom_tool_state": next_state},
             }
-        if not sample_input:
+        if not sample_input and (design.get("input_schema") or {}).get("required"):
             return {
                 "message": f"已生成 draft：{manifest['tool_name']}。代码实现和 Coding 检查结果已保存。",
                 "state": next_state,
@@ -3822,33 +3762,18 @@ class CustomToolAgentService:
             owner_ids=[owner_id] if owner_id else None,
             allow_inactive=True,
         )
-        matching_evidence = next(
-            (
-                item
-                for item in evidence_cases
-                if dict(item.get("input") or {}) == dict(sample_input)
-            ),
-            {},
-        )
-        expected = (
-            dict(matching_evidence.get("expected") or {})
-            if isinstance(matching_evidence.get("expected"), Mapping)
-            else self._expected_for_sample(proposed_tests, sample_input)
-        )
+        # The live data environment is different from Coding fixtures, even
+        # when the public input happens to match. Compare each focused case
+        # only to its own recorded actual, and report the live run separately.
+        expected = {}
         evidence_ok = all(
             item.get("status") == "passed" for item in evidence_cases
         )
-        runtime_expectation_ok = (
-            not expected
-            or self._expected_matches_actual(expected, test_result.get("data"))
-        )
-        execution_ok = (
-            self._runtime_business_ok(test_result)
-            and evidence_ok
-            and runtime_expectation_ok
-        )
+        runtime_ok = self._runtime_business_ok(test_result)
+        execution_ok = runtime_ok and evidence_ok
         contract_ok = execution_ok
         test_result.update({
+            "ok": execution_ok,
             "execution_ok": execution_ok,
             "contract_ok": contract_ok,
         })
@@ -3864,32 +3789,17 @@ class CustomToolAgentService:
                 actual_output = dict(diagnostics["actual_output"])
         runtime_case = {
             "test_id": "sample_smoke",
-            "category": "happy_path",
-            "status": "passed" if execution_ok else "failed",
+            "category": "runtime_compatibility",
+            "status": "passed" if runtime_ok else "failed",
             "input": sample_input,
             "expected": expected or {"business_result": "no top-level error and no ok=false"},
             "actual": dict(actual_output),
             "logs": execution_logs,
-            "purpose": (
-                _trim(matching_evidence.get("purpose"))
-                or "验证动态加载、沙箱执行和代表性输入能够完整走通。"
-            ),
-            "expected_basis": _trim(matching_evidence.get("expected_basis")),
-            "error": (
-                _trim(test_result.get("error"))
-                or (
-                    "正式运行结果与独立预期不一致。"
-                    if not runtime_expectation_ok
-                    else ""
-                )
-            ),
+            "purpose": "使用独立样例输入验证动态加载、沙箱执行和真实数据接入。",
+            "expected_basis": "正式运行只验证执行与数据接入；合成样例的业务预期单独核对。",
+            "error": _trim(test_result.get("error")),
         }
-        other_evidence_cases = [
-            item
-            for item in evidence_cases
-            if dict(item.get("input") or {}) != dict(sample_input)
-        ]
-        displayed_cases = [runtime_case, *other_evidence_cases]
+        displayed_cases = [runtime_case, *evidence_cases]
         test_result["cases"] = displayed_cases
         test_result["coding_cases"] = evidence_cases
         test_result["proposed_cases"] = proposed_tests
@@ -3950,8 +3860,10 @@ class CustomToolAgentService:
             else {}
         )
         tool_name = self.store.normalize_tool_name(
-            tool_contract.get("tool_name") or design.get("tool_name")
+            tool_contract.get("tool_name") or tool_contract.get("name") or design.get("tool_name")
         )
+        if not tool_name:
+            raise CustomToolError("coding tool contract requires a tool_name")
         display_name = (
             _trim(tool_contract.get("display_name"))
             or _trim(design.get("display_name"))
@@ -3975,6 +3887,18 @@ class CustomToolAgentService:
         output_fields = self._with_key_process_info_output(output_fields)
         input_schema = self._schema_from_fields(input_fields)
         output_schema = self._schema_from_fields(output_fields)
+        # Some providers return complete JSON Schemas instead of field lists.
+        # Preserve that executable contract, including nested items and nulls.
+        input_schema = self._coding_json_schema(tool_contract, "input_schema", input_schema)
+        output_schema = self._coding_json_schema(tool_contract, "output_schema", output_schema)
+        output_properties = output_schema.setdefault("properties", {})
+        output_properties.setdefault(
+            "key_process_info",
+            self._schema_from_fields(self._with_key_process_info_output([]))["properties"]["key_process_info"],
+        )
+        output_schema["required"] = list(dict.fromkeys([
+            *output_schema.get("required", []), "key_process_info",
+        ]))
         preserved_revision = (
             preserved_revision
             if isinstance(preserved_revision, Mapping)
@@ -4126,6 +4050,26 @@ class CustomToolAgentService:
             ),
             **strategy_bundle_fields,
         }
+
+    @staticmethod
+    def _coding_json_schema(
+        contract: Mapping[str, Any], key: str, fallback: Dict[str, Any],
+    ) -> Dict[str, Any]:
+        schema = contract.get(key)
+        if schema is None:
+            fields = contract.get("inputs" if key == "input_schema" else "outputs")
+            schema = fields if isinstance(fields, Mapping) else None
+        if schema is None:
+            return fallback
+        if (
+            not isinstance(schema, Mapping)
+            or schema.get("type", "object") != "object"
+            or not isinstance(schema.get("properties", {}), Mapping)
+            or not isinstance(schema.get("required", []), list)
+            or any(not isinstance(name, str) for name in schema.get("required", []))
+        ):
+            raise CustomToolError(f"coding tool contract {key} must be an object JSON Schema")
+        return copy.deepcopy(dict(schema))
 
     @staticmethod
     def _with_key_process_info_output(fields: List[Any]) -> List[Dict[str, Any]]:
@@ -4444,6 +4388,8 @@ class CustomToolAgentService:
 
     @staticmethod
     def _sample_input(final: Mapping[str, Any]) -> Dict[str, Any]:
+        if isinstance(final.get("sample_input"), Mapping):
+            return dict(final.get("sample_input") or {})
         examples = CustomToolAgentService._raw_execution_examples(final)
         for item in examples:
             if not isinstance(item, Mapping):
@@ -4451,8 +4397,6 @@ class CustomToolAgentService:
             value = item.get("input")
             if isinstance(value, Mapping):
                 return dict(value)
-        if isinstance(final.get("sample_input"), Mapping):
-            return dict(final.get("sample_input") or {})
         tests = final.get("tests") if isinstance(final.get("tests"), list) else []
         for item in tests:
             if isinstance(item, Mapping) and isinstance(item.get("input"), Mapping):

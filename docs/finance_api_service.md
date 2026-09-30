@@ -268,7 +268,7 @@ docs/sql/create_aiia_finance_access_token.sql
 签发示例：
 
 ```bash
-# 默认4小时；完整token写入自动生成的/tmp/fin-agent-access-token-*.json
+# 默认4小时；完整token写入自动生成的/tmp/fin-agent-access-token-*.txt
 .venv/bin/python scripts/create_finance_access_token.py \
   --env-file .env
 
@@ -282,8 +282,9 @@ docs/sql/create_aiia_finance_access_token.sql
 `Authorization: Bearer <key>`，不需要理解内部记录。只有一个可选的`--name`管理备注。
 可用`--principal`选择既有父 API principal；未指定且只有一个 principal 时自动选择。
 数据库不保存完整 token，只保存 SHA-256 摘要、可选项目/名称、principal、
-首尾掩码、有效期和停用审计字段。完整 token 仅在签发时写入系统临时目录中的`0600`文件，
-复制给用户后应删除该文件；控制台输出不会包含完整 token。
+首尾预览、有效期和停用审计字段。完整 token 仅在签发时写入系统临时目录中的`0600`纯文本
+文件，文件中只有一行完整 Key；执行`cat <token_file>`即可复制。复制给用户后应删除该文件，
+控制台输出只包含文件路径。
 
 查询和停用：
 
@@ -462,3 +463,15 @@ curl https://finance-api.example.com/v1/tools \
 4. API Key 来自服务器 Secret Manager，而不是提交到 Git；
 5. 外层 HTTPS、访问日志脱敏、请求超时和并发限制已生效；
 6. `/health` 的 Catalog revision 与评测时保存的 revision 一致。
+
+### 图文分析报告（2026-09-30）
+
+`finance_task`、`finance_data_query` 及对应 REST 接口在返回结论时，可以同时返回 `report`：
+
+- `title`、`introduction`：报告标题和首屏判断。
+- `sections[]`：`id`、`title`、`content`（Markdown）、`figure_ids`。章节来自同一份 `summary`，不进行二次模型改写；Skill 按问题选择章节，简短回答可以没有章节。建议个股维度使用 `conclusion`、`business`、`financials`、`valuation`、`technical`、`risks`、`watchlist`、`evidence`，并非必填字段。
+- `figures[]`：本轮保存图像的 `id`、`title`、证券 `code`、`as_of`、展示期间、价格口径、来源及 SHA256。正文通过 `![图注](finance-figure:图像id)` 引用对应图。
+
+新增可选参数 `include_images`（默认 `false`）。默认只返回图像元数据；设为 `true` 时 `report.figures[].image_url` 附带保存的 PNG data URL，适用于调用方展示图片，不建议回灌文本模型。`response_mode=data` 保持纯数据，不返回报告。旧调用参数不变，旧的 `summary` 与 `data` 继续保留。图像限于本次已授权执行得到的保存结果，不读取模型给出的文件路径或图片 URL。
+
+网页用同一报告渲染章节导航、比较表和文中图片；原始数据与完整扫描明细仍在折叠参考区。已有个股报告 PDF 从该用户已保存的轮次读取同一正文与图像。

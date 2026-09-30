@@ -167,7 +167,13 @@ def execute_dynamic_quote_api(*, subject: str, args: Mapping[str, Any], outputs:
     if df.empty:
         return _standard_result(status="ok", source=result_source, args=args, columns=output_columns, api_name=api_name, rows=[])
 
-    code_result = _generate_compute_code(task=task, columns=fields, output_columns=output_columns)
+    coverage = {"input_rows": len(df)}
+    if "tradedate" in df.columns:
+        observed = df["tradedate"].dropna().astype(str)
+        if not observed.empty:
+            coverage.update(first_observed_date=observed.min(), last_observed_date=observed.max())
+    code_result = _generate_compute_code(task=task, columns=fields, output_columns=output_columns,
+        input_context=json.dumps(coverage, ensure_ascii=False))
     if code_result.get("status") != "ok":
         return _standard_result(
             status=str(code_result.get("status") or "codegen_error"),
@@ -381,7 +387,7 @@ def _realtime_identity_where(args: Mapping[str, Any]) -> tuple[str, List[Any]]:
     return (" ".join(clauses), params)
 
 
-def _generate_compute_code(*, task: str, columns: List[str], output_columns: List[str]) -> Dict[str, Any]:
+def _generate_compute_code(*, task: str, columns: List[str], output_columns: List[str], input_context: str = "") -> Dict[str, Any]:
     from src.utils.ai_service import chat_qwen_flash
 
     prompt = (
@@ -389,6 +395,7 @@ def _generate_compute_code(*, task: str, columns: List[str], output_columns: Lis
         .replace("{{columns}}", ", ".join(columns))
         .replace("{{output_columns}}", ", ".join(output_columns))
         .replace("{{task}}", task)
+        .replace("{{input_context}}", input_context)
     )
     try:
         raw, _usage = chat_qwen_flash([{"role": "user", "content": prompt}], enable_think=False)

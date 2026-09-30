@@ -13,6 +13,8 @@ from src.services.skill_studio_service import SkillStudioService
 from src.services.skill_candidate_store_service import (
     DatabaseSkillCandidateStoreService,
     SkillCandidateConflictError,
+    SkillCandidateNotFoundError,
+    SkillCandidateStoreError,
 )
 
 
@@ -21,7 +23,7 @@ def _trim(value: Any) -> str:
 
 
 class SkillHubCatalogService:
-    """One authorized active Skill view for Hub, explicit use, and Finance CC."""
+    """Active execution catalog plus ownership-scoped inspection and editing."""
 
     def __init__(
         self,
@@ -47,15 +49,15 @@ class SkillHubCatalogService:
         # injected offline stores) include public and the caller's private Skills.
         if not owners and not self._registry_injected:
             return self.business_catalog
-        records = self.candidate_store.list_available(owner_ids=owners)
+        records = self.candidate_store.list_available(owner_ids=(*owners, "system"))
         return self.business_catalog.with_active_skills(records)
 
-    def catalog(self, *, owner_ids: Iterable[str] = ()) -> Dict[str, Any]:
+    def catalog(self, *, owner_ids: Iterable[str] = (), is_admin: bool = False) -> Dict[str, Any]:
         owners = tuple(owner_ids)
         catalog = self.runtime_catalog(owner_ids=owners)
         business_snapshot = catalog.discovery_snapshot()
         items = [
-            *self._business_method_items(business_snapshot, catalog=catalog, owner_ids=owners),
+            *self._business_method_items(business_snapshot, catalog=catalog, owner_ids=owners, is_admin=is_admin),
             *self._legacy_compiled_items(),
         ]
         revision_payload = {
@@ -82,7 +84,7 @@ class SkillHubCatalogService:
     def _business_method_items(
         self,
         snapshot: Mapping[str, Any],
-        *, catalog: FinanceBusinessSkillCatalog, owner_ids: Iterable[str] = (),
+        *, catalog: FinanceBusinessSkillCatalog, owner_ids: Iterable[str] = (), is_admin: bool = False,
     ) -> list[Dict[str, Any]]:
         revision = _trim(snapshot.get("revision"))
         rows: list[Dict[str, Any]] = []
@@ -95,6 +97,8 @@ class SkillHubCatalogService:
             detail = catalog.studio_detail(skill_id) or {}
             owner = _trim(detail.get("owner")) or "system"
             visibility = _trim(detail.get("visibility")) or "public"
+            viewable = owner == "system" or owner in owner_ids
+            editable = is_admin if owner == "system" else owner in owner_ids
             catalog_id = f"skill:business_method:{skill_id}"
             rows.append(
                 {
@@ -104,12 +108,13 @@ class SkillHubCatalogService:
                     "purpose": entry["description"],
                     "description": entry["description"],
                     "short_description": _trim(detail.get("short_description")),
-                    "default_prompt": _trim(detail.get("default_prompt")),
+                    "default_prompt": _trim(detail.get("default_prompt")) if viewable else "",
                     "category": entry.get("category") or "",
                     "skill_type": "business_method",
                     "invocation_mode": "finance_cc_preference",
                     "invocation_enabled": True,
-                    "editable": False,
+                    "editable": editable,
+                    "viewable": viewable,
                     "source": "finance_business_snapshot",
                     "workspace_url": (
                         f"/skills/studio/{quote(skill_id, safe='')}"
@@ -126,7 +131,7 @@ class SkillHubCatalogService:
                         "retrieval_mode": "retrievable",
                     },
                     "tool_mode": "runtime_policy",
-                    "tools": list(entry.get("allowed_tools") or []),
+                    "tools": list(entry.get("allowed_tools") or []) if viewable else [],
                     "example_count": 0,
                 }
             )
@@ -190,6 +195,7 @@ class SkillHubCatalogService:
         *,
         catalog_id: str = "",
         owner_ids: Iterable[str] = (),
+        is_admin: bool = False,
     ) -> Dict[str, Any] | None:
         """Return detail only from the caller's active authorized snapshot."""
 
@@ -200,7 +206,7 @@ class SkillHubCatalogService:
         matches = [
             item
             for item in [*self._business_method_items(catalog.discovery_snapshot(), catalog=catalog,
-                owner_ids=owners), *self._legacy_compiled_items()]
+                owner_ids=owners, is_admin=is_admin), *self._legacy_compiled_items()]
             if _trim(item.get("skill_name")) == normalized_name
         ]
         if normalized_catalog_id:
@@ -229,15 +235,23 @@ class SkillHubCatalogService:
                 ),
             }
 
+        if not item.get("viewable"):
+            return {**item, "detail_available": False}
         detail = catalog.studio_detail(normalized_name)
         if detail is None:
             return None
+        definition = {}
+        if detail.get("active_revision_no"):
+            record = self.candidate_store.load_revision(normalized_name, int(detail["active_revision_no"]), owner_id=detail["owner"])
+            definition = {key: record.get(key) for key in
+                ("control_manifest", "flowchart", "requirement", "change_summary", "authoring_evidence")}
         return {
             **item,
             **detail,
+            "definition": definition,
             "detail_available": True,
-            "editable": False,
-            "candidate_supported": False,
+            "editable": item["editable"],
+            "candidate_supported": item["editable"],
             "publish_supported": False,
             "test_supported": False,
         }
@@ -251,8 +265,10 @@ class SkillHubCatalogService:
         owner_ids: Iterable[str] = (),
     ) -> Dict[str, Any]:
         normalized_name = _trim(skill_name)
-        catalog = self.runtime_catalog(owner_ids=owner_ids)
-        if catalog.studio_detail(normalized_name) is None:
+        owners = tuple(owner_ids)
+        catalog = self.runtime_catalog(owner_ids=owners)
+        detail = catalog.studio_detail(normalized_name)
+        if detail is None or (detail["owner"] != "system" and detail["owner"] not in owners):
             return {
                 "skill_id": normalized_name,
                 "reference": _trim(reference_path),
@@ -263,6 +279,86 @@ class SkillHubCatalogService:
             reference_path,
             expected_revision=expected_revision,
         )
+
+    def _editable_owner(self, skill_id: str, *, actor_id: str, is_admin: bool) -> str:
+        if self.business_catalog.studio_detail(skill_id) is not None:
+            if not is_admin:
+                raise PermissionError("只有管理员可以修改系统 Skill。")
+            return "system"
+        # Owner-scoped lookup also covers private, not-yet-active candidates.
+        self.candidate_store.load_latest(skill_id, owner_id=actor_id)
+        return actor_id
+
+    def definition(self, skill_id: str, *, actor_id: str, is_admin: bool = False) -> Dict[str, Any]:
+        """Editor source, including pending revisions; never reconstructed from runtime text."""
+        owner = self._editable_owner(skill_id, actor_id=actor_id, is_admin=is_admin)
+        try:
+            return self.candidate_store.load_latest(skill_id, owner_id=owner)
+        except SkillCandidateNotFoundError:
+            if owner != "system":
+                raise
+        detail = self.business_catalog.studio_detail(skill_id)
+        references = {ref["path"]: self.business_catalog.load_reference(skill_id, ref["path"])["content"]
+                      for ref in detail["references"]}
+        return {"skill_id": skill_id, "owner_id": "system", "revision_no": 0,
+            "candidate_revision_no": 0, "active_revision_no": 0,
+            "skill_markdown": detail["skill_markdown"], "display_name": detail["display_name"],
+            "description": detail["description"], "references": references,
+            "control_manifest": {}, "flowchart": {}, "visibility": "public",
+            "content_hash": hashlib.sha256(json.dumps({"markdown": detail["skill_markdown"],
+                "references": references}, ensure_ascii=False, sort_keys=True).encode()).hexdigest()}
+
+    def save_definition(self, skill_id: str, payload: Mapping[str, Any], *,
+                        actor_id: str, is_admin: bool = False) -> Dict[str, Any]:
+        current = self.definition(skill_id, actor_id=actor_id, is_admin=is_admin)
+        expected = payload.get("expected_candidate_revision")
+        if (type(expected) is not int or expected != current["candidate_revision_no"]
+                or payload.get("expected_content_hash") != current["content_hash"]):
+            raise SkillCandidateConflictError("方法已发生变化，请重新读取后修改。")
+        for key in ("skill_markdown", "display_name"):
+            if not isinstance(payload.get(key), str) or not payload[key].strip():
+                raise ValueError(f"{key} 必须是非空文本。")
+        try:
+            references = DatabaseSkillCandidateStoreService._normalize_references(payload.get("references", current.get("references")))
+        except SkillCandidateStoreError as exc:
+            raise ValueError(str(exc)) from exc
+        control = payload.get("control_manifest", current.get("control_manifest", {}))
+        if not isinstance(control, dict):
+            raise ValueError("control_manifest 必须是对象。")
+        # These are the two machine-addressed composition lists used at runtime.
+        for key, identity in (("related_skills", "skill_id"), ("tool_connections", "tool_name")):
+            entries = control.get(key, [])
+            if not isinstance(entries, list) or any(not isinstance(item, dict) or not isinstance(item.get(identity), str) for item in entries):
+                raise ValueError(f"{key} 的引用格式不正确。")
+        markdown = payload["skill_markdown"].replace("\r\n", "\n").strip()
+        frontmatter = self.business_catalog._frontmatter(markdown)
+        marker = markdown.find("\n---\n", 4)
+        if (not isinstance(frontmatter, Mapping) or frontmatter.get("name") != skill_id
+                or not _trim(frontmatter.get("description")) or marker < 0 or not markdown[marker + 5:].strip()):
+            raise ValueError("SKILL.md 需要有效的 name、description 和正文；name 不能修改。")
+        candidate = {**current, "revision_no": expected + 1, "base_revision_no": expected,
+            "display_name": payload["display_name"].strip(), "skill_markdown": markdown,
+            "description": _trim(frontmatter["description"]), "references": references,
+            "control_manifest": control, "change_summary": _trim(payload.get("change_summary")) or "在方法库中编辑",
+            "authoring_evidence": {**current.get("authoring_evidence", {}), "edited_by": actor_id},
+            "content_hash": hashlib.sha256(json.dumps({"markdown": markdown,
+                "references": references, "control": control, "display_name": payload["display_name"]},
+                ensure_ascii=False, sort_keys=True).encode()).hexdigest()}
+        try:
+            self.business_catalog._execution_budget(frontmatter)
+        except RuntimeError as exc:
+            raise ValueError(str(exc)) from exc
+        # Validate before creating a durable candidate, with no mutation of active content.
+        self.business_catalog.with_active_skills([{**candidate, "active_revision_no": expected + 1}])
+        if not expected:
+            return self.candidate_store.create_candidate(candidate, owner_id=current["owner_id"])
+        return self.candidate_store.save_revision(candidate, owner_id=current["owner_id"], expected_base_revision=expected)
+
+    def activate_definition(self, skill_id: str, *, actor_id: str, is_admin: bool = False,
+                            expected_candidate_revision: int, expected_active_revision: int) -> Dict[str, Any]:
+        owner = self._editable_owner(skill_id, actor_id=actor_id, is_admin=is_admin)
+        return self.activate_candidate(skill_id, owner_id=owner,
+            expected_candidate_revision=expected_candidate_revision, expected_active_revision=expected_active_revision)
 
     def activate_candidate(self, skill_id: str, *, owner_id: str,
         expected_candidate_revision: int, expected_active_revision: int) -> Dict[str, Any]:

@@ -1,12 +1,15 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
+import base64
+from dataclasses import dataclass, field
 from html import escape
 from io import BytesIO
 import os
 from pathlib import Path
 import re
-from typing import Iterable
+from typing import Any, Iterable
+
+from src.scenarios.financial_qa.report import FIGURE_PATTERN, PNG_PATTERN
 
 from reportlab.lib import colors
 from reportlab.lib.enums import TA_LEFT
@@ -18,6 +21,8 @@ from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.platypus import (
     BaseDocTemplate,
     Frame,
+    Image,
+    KeepTogether,
     PageTemplate,
     Paragraph,
     Spacer,
@@ -42,6 +47,7 @@ class PdfReportInput:
     report_text: str
     user_question: str = ""
     generated_at: str = ""
+    figures: list[dict[str, Any]] = field(default_factory=list)
 
 
 class FinancialReportPdfService:
@@ -301,6 +307,7 @@ class FinancialReportPdfService:
             )
 
         lines = self._report_body_lines(value.report_text, value.title)
+        figures = {item["id"]: item for item in value.figures if item.get("id")}
         cursor = 0
         paragraph_buffer: list[str] = []
 
@@ -312,6 +319,23 @@ class FinancialReportPdfService:
 
         while cursor < len(lines):
             line = lines[cursor]
+            marker = FIGURE_PATTERN.fullmatch(line.strip())
+            if marker:
+                flush_paragraphs()
+                figure = figures.get(marker[2], {})
+                image_url = str(figure.get("image_url") or "")
+                caption = " · ".join(str(part) for part in (
+                    marker[1] or figure.get("title"), figure.get("code"),
+                    figure.get("as_of"), figure.get("price_basis")) if part)
+                if PNG_PATTERN.fullmatch(image_url):
+                    image = Image(BytesIO(base64.b64decode(image_url.split(",", 1)[1])))
+                    scale = min((document.width - 12) / image.imageWidth, (document.height * .65) / image.imageHeight)
+                    image.drawWidth, image.drawHeight = image.imageWidth * scale, image.imageHeight * scale
+                    story.append(KeepTogether([image, Paragraph(self._inline_markup(caption), styles["subtitle"])]))
+                elif caption:
+                    story.append(Paragraph(self._inline_markup(caption), styles["body"]))
+                cursor += 1
+                continue
             table_data = self._consume_table(lines, cursor)
             if table_data:
                 flush_paragraphs()

@@ -65,7 +65,25 @@
       "id": "technical-structure-analysis",
       "category": "equity-research",
       "path": "skills/technical-structure-analysis",
-      "description": "分析股票在指定周期的价格与成交结构，适用于走势强弱、趋势转折、支撑阻力、突破确认、量价背离及技术指标解读等问题。结合高低点、成交、均线和波动证据，给出当前结构、延续条件及信号失效条件。"
+      "description": "围绕同周期数值行情和技术指标判断价格、成交与趋势结构，适用于趋势强弱、支撑阻力、波动、突破条件及指标变化。需要直观量价背景时复用基础看图，需要具体形态演变时组合K线分析；数值证据与图像观察分别保留。"
+    },
+    {
+      "id": "kline-analysis",
+      "category": "equity-research",
+      "path": "skills/kline-analysis",
+      "description": "细致解读个股已完成日K及近期形态，适用于看看K线、近期出现过哪些形态、历史信号是否仍值得关注。通过授权看图工具取得独立基础解读、数值扫描和最多3个局部视觉复核，由主Agent综合当前结构、历史含义与后续演变；无典型形态也正常分析走势。"
+    },
+    {
+      "id": "kline-basic-reading",
+      "category": "equity-research",
+      "path": "skills/kline-basic-reading",
+      "description": "独立看图解读个股近期日K的走势、均线与量价背景，适合直接看K线或个股研究中的简要技术面分支；只读取一张同源近期价格与成交量图，不扫描形态，不接收候选或其他模型结论。"
+    },
+    {
+      "id": "relative-strength-analysis",
+      "category": "equity-research",
+      "path": "skills/relative-strength-analysis",
+      "description": "比较个股与行业、宽基或风格指数的同期表现，适用于判断跑赢跑输、市场共振、个股独立强弱和技术走势的外部背景。依据用户指定或业务可比的基准对齐区间和收益口径，区分绝对涨跌、相对表现及证据边界，可独立使用或配合K线与个股研究。"
     },
     {
       "id": "dividend-analysis",

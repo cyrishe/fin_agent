@@ -330,16 +330,16 @@ def test_margin_context_exposes_base_and_kday_api():
         result_id="r1",
     )
 
-    assert "`stock.margin`" in sections["available_apis"]
+    assert "`stock.margin.query`" in sections["available_apis"]
     assert "`stock.margin.kd_<field>_<method>`" in sections["available_apis"]
-    assert "r1 = stock.margin(" in sections["available_apis"]
+    assert "r1 = stock.margin.query(" in sections["available_apis"]
     assert "r1 = stock.margin.kd_financing_net_buy_sum(" in sections["available_apis"]
     functions = _json_context_blocks(sections["available_apis"])
     model = FinanceDataToolCatalogService().get_model_dataview("stock", "margin")
     assert functions == model["functions"]
     by_name = {row["api_name"]: row for row in functions}
-    assert set(by_name) == {"stock.margin", "stock.margin.kd_<field>_<method>"}
-    assert any("历史区间" in rule and "start/end" in rule for rule in by_name["stock.margin"]["rules"])
+    assert set(by_name) == {"stock.margin.query", "stock.margin.kd_<field>_<method>"}
+    assert any("历史区间" in rule and "start/end" in rule for rule in by_name["stock.margin.query"]["rules"])
     window = by_name["stock.margin.kd_<field>_<method>"]
     assert window["operation"] == "window"
     assert window["args"]["required"] == ["k"]
@@ -382,7 +382,7 @@ def test_finance_catalog_context_exposes_verified_field_units():
     assert "折价额（元，单位净值-收盘价）" in fund["fields"]["discount"]["aliases"]
     assert "基金份额（份）" in fund["fields"]["unit_total"]["aliases"]
     functions = _json_context_blocks(quote_sections["available_apis"])
-    quote_query = next(row for row in functions if row["api_name"] == "stock.quote")
+    quote_query = next(row for row in functions if row["api_name"] == "stock.quote.query")
     source_rules = catalog_source()["api_class_patterns"]["stock_quote_query"]["rules"]
     assert quote_query["rules"] == list(source_rules)
     assert any("mode=1" in rule and "区间值" in rule for rule in quote_query["rules"])

@@ -27,6 +27,8 @@ from src.services.session_variable_store_service import SessionVariableStoreServ
 def test_skill_call_ceiling_defaults_and_explicit_overrides(monkeypatch):
     monkeypatch.delenv("FINANCE_DSH_LOOP_POLICY_CONFIG", raising=False)
     config = _merge_loop_policy_config()
+    assert config["skillAnalysisMaxTokens"] == 32768
+    assert _merge_loop_policy_config({"skillAnalysisMaxTokens": 8192})["skillAnalysisMaxTokens"] == 8192
     assert [config[k] for k in ("skillMaxCatalogAttempts", "skillMaxQueryAttempts", "skillMaxLoadAttempts")] == [16, 12, 8]
     assert [config[k] for k in ("maxCatalogAttempts", "maxQueryAttempts", "maxLoadAttempts")] == [6, 3, 2]
     assert config["maxRequiredStageSteers"] == 1
@@ -221,6 +223,15 @@ def test_dsh_uses_canonical_llm_model_route(
         "https://dashscope.aliyuncs.com/compatible-mode/v1"
     )
     assert captured[0]["model"] == "server-model"
+    # Dynamic calculations inside the MCP subprocess receive the canonical
+    # configuration too. Secrets stay in environment, never in turn context.
+    assert captured[0]["env"]["LLM_API_KEY"] == "server-key"
+    assert captured[0]["env"]["LLM_BASE_URL"] == captured[0]["base_url"]
+    assert captured[0]["env"]["LLM_DEFAULT_MODEL"] == "server-model"
+    patch = Path("config/deepseek_harness/finance_query.patch.yml").read_text()
+    for key in ("LLM_API_KEY", "LLM_BASE_URL", "LLM_DEFAULT_MODEL", "LLM_FLASH_MODEL", "LLM_REASONING_MODEL"):
+        assert f"{key}: !!js process.env.{key}" in patch
+    assert "server-key" not in patch
 
 
 def test_dsh_prompt_injects_the_current_business_date(tmp_path: Path) -> None:

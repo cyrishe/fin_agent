@@ -866,3 +866,40 @@ def test_finance_cc_coding_turn_uses_authoritative_failure_and_does_not_replay_d
     assert result["design"] == {}
     assert result["design_artifact"] == {}
     assert result["understanding"] == {}
+
+
+def test_dsh_repairs_existing_design_without_resaving_flow():
+    orchestrator = _FinanceCcStub({
+        "ok": True, "runtime": "dsh_opt", "artifact_updates": [],
+        "implementation_requested": True, "implementation_instruction": "修复真实运行",
+    })
+    orchestrator.enabled = True
+    service = CustomToolAgentService(use_codex=False, orchestrator_service=orchestrator)
+    calls = []
+    def implement(**kwargs):
+        calls.append(kwargs)
+        return {"state": kwargs["state"], "message": "已修复", "coding_status": "implemented"}
+    service.implement_dynamic_tool = implement
+    state = {"requirement_brief": "计算收益", "requirement_revision": 1, "confirmed_requirement_revision": 1, "design_contract": {"document": "收益计算", "mermaid": "flowchart TD\nA --> B"}}
+    state.update(service._requirement_artifact_identity_from_state(state))
+    state["confirmed_requirement_revision"] = state["requirement_revision"]
+    result = service.handle_turn("修复真实运行", state=state, owner_id="owner-a")
+    assert len(calls) == 1
+    assert calls[0]["instruction"] == "修复真实运行"
+    assert calls[0]["state"]["design_contract"] == state["design_contract"]
+    assert result["coding_status"] == "implemented"
+
+
+def test_implementation_of_active_tool_uses_existing_edit_lifecycle():
+    class Store:
+        def exists(self, name):
+            return True
+        def load_for_runtime(self, name, **kwargs):
+            assert kwargs["owner_ids"] == ["owner-a"]
+            return {"manifest": {"status": "active"}}
+    service = CustomToolAgentService(use_codex=False, store=Store())
+    calls = []
+    service.start_edit = lambda *args, **kwargs: calls.append((args, kwargs)) or {"message": "候选编辑"}
+    result = service.implement_dynamic_tool(state={"tool_name": "returns"}, owner_id="owner-a", instruction="修改收益公式")
+    assert result["message"] == "候选编辑"
+    assert calls[0][0] == ("returns", "修改收益公式")

@@ -295,6 +295,8 @@ class CustomToolContextBundleService:
         except (OSError, json.JSONDecodeError):
             evidence = {}
         if isinstance(evidence, Mapping):
+            if isinstance(evidence.get("sample_input"), Mapping):
+                result["sample_input"] = dict(evidence["sample_input"])
             normalized_cases = []
             raw_cases = self._coding_evidence_cases(evidence)
             for item in raw_cases:
@@ -911,6 +913,9 @@ def run(inputs: dict) -> dict:
 - On a first implementation, read `DYNAMIC_TOOL_TEMPLATE.py`; it is a reference, not an editable module.
 - Put temporary focused tests under `scratch/`; they are never persisted as user assets.
 - After a representative focused test, write its exact input and raw tool output to `scratch/test_evidence.json`; the system persists that evidence separately.
+- In that evidence file, `expected` is a partial match of `actual` using the same field paths. Put formulas and explanatory assertions in `expected_basis`.
+- Also supply top-level `sample_input`: an independent public `run` input for the host's live runtime check, using real identifiers and dates for finance queries. Helper arguments and synthetic market fixtures belong only in `cases`.
+- The Coding SDK is a test double. The host performs the live finance call after collecting the implementation and `sample_input`; keep focused checks in this workspace on injected data.
 - Python interpreter: `{interpreter}`. Use this exact interpreter instead of `python` or the system `python3`.
 - For compilation use `{compile_command("<module>")}`.
 - For focused tests use `{focused_test_command("<test-or-script>")}` so `custom_tool_sdk` is available.
@@ -1219,7 +1224,7 @@ def run(inputs: dict) -> dict:
 
 Request format: `result_name = api_name(arguments) -> output_fields`.
 
-Large target lists must be passed out of band: write an exact placeholder such as `codes = $stock_codes` in the request and pass `bindings={"stock_codes": stock_codes}`. Do not interpolate target lists into `filter` or call `finance_query` once per target.
+Bindings replace a whole declared API argument. For methods with `codes`, use `codes = $stock_codes` and `bindings={"stock_codes": stock_codes}`. For filter-only methods, build the complete filter expression and pass `filter = $selection_filter` with `bindings={"selection_filter": expression}`. A `$name` inside a quoted filter is literal text, not a binding. Batch the target list in one query; keep large lists out of the request string.
 
 The 4,000-character guard applies only to the internal `request` DSL above; it is not a user chat-input limit, and serialized `bindings` do not consume that budget. Bindings are separately protected by the runtime contract (at most 16 keys, 10,000 scalar items, and 1 MiB serialized data per query).
 

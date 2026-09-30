@@ -5,6 +5,7 @@ import remarkGfm from "remark-gfm";
 import { appPath, stripAppBase } from "./appPath";
 import { categoryName, filterSkills, getSkillDetail, getSkillLibrary, getSkillReference, methodBody, methodSections, referenceTarget, scopeName, scopeOf, skillUrl, type LibraryDetail, type LibrarySkill } from "./skillLibrary";
 import "./skill-studio.css";
+import SkillEditor from "./SkillEditor";
 
 type BrowserProps = { onUse: (skill: LibrarySkill) => void; onClose?: () => void; standalone?: boolean };
 const messageOf = (error: unknown) => error instanceof Error ? error.message : "读取失败，请稍后重试。";
@@ -29,6 +30,7 @@ export function SkillBrowser({ onUse, onClose, standalone = false }: BrowserProp
     getSkillLibrary(controller.signal).then(payload => {
       if (controller.signal.aborted) return;
       setItems(payload.items);
+      if (!standalone) setSelected(previous => previous ? payload.items.find(row => row.catalog_id === previous.catalog_id) || null : null);
       if (standalone) {
         const resolveLocation = () => {
           const raw = stripAppBase(window.location.pathname).split("/skills/studio/")[1] || "";
@@ -66,7 +68,7 @@ export function SkillBrowser({ onUse, onClose, standalone = false }: BrowserProp
   return <section className="skill-studio" aria-label="Skill 方法库">
     <header className="sl-topbar">
       <a className="sl-brand" href={appPath("/assistant")}><span><Layers3 size={20} /></span><strong>Fin Agent</strong><i>/</i><span>Skill Studio</span></a>
-      <div className="sl-top-actions"><span className="sl-readonly"><LockKeyhole size={13} />阅读空间</span>{onClose ? <button className="sl-icon" onClick={onClose} aria-label="关闭 Skill 方法库"><X size={19} /></button> : <a className="sl-text-link" href={appPath("/assistant")}>返回对话 <ArrowRight size={14} /></a>}</div>
+      <div className="sl-top-actions"><span className="sl-readonly"><LockKeyhole size={13} />方法工作区</span>{onClose ? <button className="sl-icon" onClick={onClose} aria-label="关闭 Skill 方法库"><X size={19} /></button> : <a className="sl-text-link" href={appPath("/assistant")}>返回对话 <ArrowRight size={14} /></a>}</div>
     </header>
     <div className="sl-workspace">
       <aside className={`sl-sidebar ${selected ? "sl-sidebar-detail" : ""}`}>
@@ -80,11 +82,11 @@ export function SkillBrowser({ onUse, onClose, standalone = false }: BrowserProp
       <main className="sl-main">
         {loading ? <div className="sl-empty" role="status">正在读取已授权的方法库…</div> : error ? <div className="sl-empty" role="alert"><h2>方法库暂时无法读取</h2><p>{error}</p><button className="sl-button" onClick={() => setRetry(value => value + 1)}>重新加载</button></div> : missing ? <div className="sl-empty"><h2>当前无法查看这份 Skill</h2><p>它可能已下线，或不在你当前可访问的范围内。</p><button className="sl-button" onClick={() => choose(null)}>返回全部方法</button></div> : selected ? <>
           <button className="sl-back" onClick={() => choose(null)}><ArrowLeft size={14} />全部方法</button>
-          <SkillReader key={selected.catalog_id} item={selected} onUse={onUse} titleRef={titleRef} />
+          <SkillReader key={selected.catalog_id} item={selected} onUse={onUse} titleRef={titleRef} onUpdated={() => setRetry(value => value + 1)} />
         </> : <>
-          <div className="sl-intro"><span className="sl-eyebrow">THE METHOD LIBRARY</span><h1 ref={titleRef} tabIndex={-1}>读懂方法，再展开研究。</h1><p>从一个问题找到专业方法。看清它如何分析、何时深入，以及结论需要哪些证据。</p><div className="sl-intro-meta"><span><Check size={13} />当前账户可见</span><span><LockKeyhole size={13} />系统内容只读</span><span><Layers3 size={13} />按需展开子方法</span></div></div>
+          <div className="sl-intro"><span className="sl-eyebrow">THE METHOD LIBRARY</span><h1 ref={titleRef} tabIndex={-1}>读懂方法，再展开研究。</h1><p>从一个问题找到专业方法。看清它如何分析、何时深入，以及结论需要哪些证据。</p><div className="sl-intro-meta"><span><Check size={13} />当前账户可见</span><span><LockKeyhole size={13} />按归属管理权限</span><span><Layers3 size={13} />按需展开子方法</span></div></div>
           <div className="sl-results-head"><h2>{query ? "搜索结果" : scope ? `${scope === "system" ? "系统" : scope === "public" ? "公开" : "私有"}方法` : "全部方法"}<span>{filtered.length}</span></h2><span>选一份方法，了解它的工作方式</span></div>
-          <div className="sl-cards">{filtered.map(item => <button className="sl-card" key={item.catalog_id} onClick={() => choose(item)}><div className="sl-card-top"><span className="sl-card-icon"><BookOpen size={19} /></span><span className="sl-badge">{scopeName(item)} · 只读</span></div><span className="sl-card-category">{categoryName(item.category)}</span><h3>{item.display_name}</h3><p>{item.short_description || item.description}</p><div className="sl-card-bottom"><code>${item.skill_name}</code><span>查看方法 <ArrowRight size={14} /></span></div></button>)}</div>
+          <div className="sl-cards">{filtered.map(item => <button className="sl-card" key={item.catalog_id} onClick={() => choose(item)}><div className="sl-card-top"><span className="sl-card-icon"><BookOpen size={19} /></span><span className="sl-badge">{scopeName(item)} · {item.editable ? "可编辑" : item.viewable === false ? "仅可使用" : "可阅读"}</span></div><span className="sl-card-category">{categoryName(item.category)}</span><h3>{item.display_name}</h3><p>{item.short_description || item.description}</p><div className="sl-card-bottom"><code>${item.skill_name}</code><span>{item.viewable === false ? "使用方法" : "查看方法"} <ArrowRight size={14} /></span></div></button>)}</div>
           {!filtered.length && <div className="sl-empty"><h3>{available.length ? "没有找到匹配的方法" : "当前还没有可用方法"}</h3><p>{scope === "private" ? "只有你有权访问的私有方法才会显示在这里。" : "试试其他关键词或研究方向。"}</p><button className="sl-button" onClick={() => { setQuery(""); setCategory(""); setScope(""); }}>查看全部</button></div>}
           <footer className="sl-footer">方法指导分析 · 数据工具提供证据 · Agent 根据问题组织回答</footer>
         </>}
@@ -93,7 +95,7 @@ export function SkillBrowser({ onUse, onClose, standalone = false }: BrowserProp
   </section>;
 }
 
-export function SkillReader({ item, onUse, titleRef }: { item: LibrarySkill; onUse: (skill: LibrarySkill) => void; titleRef?: React.RefObject<HTMLHeadingElement> }) {
+export function SkillReader({ item, onUse, titleRef, onUpdated }: { item: LibrarySkill; onUse: (skill: LibrarySkill) => void; titleRef?: React.RefObject<HTMLHeadingElement>; onUpdated?: () => void }) {
   const [detail, setDetail] = useState<LibraryDetail | null>(null);
   const [error, setError] = useState("");
   const [retry, setRetry] = useState(0);
@@ -104,6 +106,7 @@ export function SkillReader({ item, onUse, titleRef }: { item: LibrarySkill; onU
   const [referenceError, setReferenceError] = useState("");
   const [referenceRetry, setReferenceRetry] = useState(0);
   const [raw, setRaw] = useState(false);
+  const [editing, setEditing] = useState(false);
   const [copyMessage, setCopyMessage] = useState("");
   const documentRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -135,10 +138,11 @@ export function SkillReader({ item, onUse, titleRef }: { item: LibrarySkill; onU
   };
   return <div className="sl-detail">
     <header className="sl-detail-hero"><div><div className="sl-eyebrow">{categoryName(item.category)} <span>/</span> {scopeName(item)} Skill</div><h1 ref={titleRef} tabIndex={-1}>{item.display_name}</h1><p>{item.description}</p></div><div className="sl-use"><button className="sl-button sl-primary" disabled={!detail || !item.invocation_enabled} onClick={() => detail && onUse(detail)}>用于对话 <ArrowRight size={16} /></button><small>仅带入选择，不会自动发送</small></div></header>
-    <div className="sl-permission"><LockKeyhole size={14} /><span>{item.owner === "system" ? "系统维护 · 所有人可阅读，普通用户不可修改" : scopeOf(item) === "private" ? "私有方法 · 当前展示你有权查看的启用版本" : "用户公开分享 · 当前展示已发布的只读版本"}</span><code>${item.skill_name}</code></div>
-    {detail && <section className="sl-permission" aria-label="Web Search 能力"><span><strong>Web Search · {detail.controls?.web_search_enabled ? "已申请搜索工具" : "未申请搜索工具"}</strong> · 按需使用，受 Agent 授权与部署配置约束。搜索范围以工具返回为准，内部新闻不等于全网搜索。</span></section>}
-    <nav className="sl-tabs" aria-label="内容视图">{[["overview", "概览"], ["method", "专业方法"], ["source", "来源与版本"]].map(([value, label]) => <button key={value} aria-pressed={tab === value} onClick={() => setTab(value)}>{label}</button>)}</nav>
-    {error ? <div className="sl-empty" role="alert"><p>{error}</p><button className="sl-button" onClick={() => setRetry(value => value + 1)}>重新读取方法</button></div> : !detail ? <div className="sl-empty" role="status">正在读取方法内容…</div> : tab === "overview" ? <>
+    <div className="sl-permission"><LockKeyhole size={14} /><span>{item.owner === "system" ? "系统维护 · 授权用户可阅读，普通用户不可修改" : scopeOf(item) === "private" ? "私有方法 · 当前展示你有权查看的启用版本" : (item.viewable === false ? "共享方法 · 可以使用，正文与内部配置仅作者可查看" : "个人方法 · 仅作者可查看和修改")}</span><code>${item.skill_name}</code></div>
+    {detail && detail.viewable !== false && <section className="sl-permission" aria-label="Web Search 能力"><span><strong>Web Search · {detail.controls?.web_search_enabled ? "已申请搜索工具" : "未申请搜索工具"}</strong> · 按需使用，受 Agent 授权与部署配置约束。搜索范围以工具返回为准，内部新闻不等于全网搜索。</span></section>}
+    {detail?.editable && <button className="sl-button" onClick={() => setEditing(value => !value)}>{editing ? "返回当前启用版本" : "编辑方法与参考"}</button>}
+    {detail?.viewable !== false && !editing && <nav className="sl-tabs" aria-label="内容视图">{[["overview", "概览"], ["method", "专业方法"], ["source", "来源与版本"]].map(([value, label]) => <button key={value} aria-pressed={tab === value} onClick={() => setTab(value)}>{label}</button>)}</nav>}
+    {editing && detail?.editable ? <SkillEditor skillId={item.skill_name} onClose={() => setEditing(false)} onActivated={() => { setEditing(false); setPath(""); setRetry(value => value + 1); onUpdated?.(); }} /> : error ? <div className="sl-empty" role="alert"><p>{error}</p><button className="sl-button" onClick={() => setRetry(value => value + 1)}>重新读取方法</button></div> : !detail ? <div className="sl-empty" role="status">正在读取方法内容…</div> : detail.viewable === false ? <section className="sl-empty"><h2>这份方法已开放使用</h2><p>可用它分析你的问题；作者的业务定义、处理方法、关联配置和参考文件不对其他用户开放。</p></section> : tab === "overview" ? <>
       <div className="sl-overview-grid"><section className="sl-outline"><div className="sl-section-label">01 / 主方法</div><h2>这份方法如何组织</h2><p>以下章节来自当前 SKILL.md。点击直接阅读，不另行生成一份摘要。</p><div>{sections.map((title, index) => <button key={`${index}-${title}`} onClick={() => jumpTo(index)}><span>{String(index + 1).padStart(2, "0")}</span><strong>{title}</strong><ArrowRight size={14} /></button>)}</div>{!sections.length && <button className="sl-button" onClick={() => openReference("")}>阅读完整方法</button>}</section>
       <section className="sl-branch-overview"><div className="sl-section-label">02 / 按需深入</div><h2>不是每次都走全部分支</h2><p>Agent 根据问题与已取得的证据，选择需要阅读的子方法和参考。这里展示的是方法结构，不是本轮执行记录。</p><div className="sl-branch-root"><BookOpen size={17} /><span>{item.display_name}</span><small>主方法</small></div><div className="sl-branch-list">{references.map(ref => <button key={ref.path} onClick={() => openReference(ref.path)}><span>{ref.title}</span><ChevronRight size={14} /></button>)}{!references.length && <p>当前方法没有单独的参考文件，完整指导在主方法中。</p>}</div></section></div>
       <section className="sl-invocation"><div><div className="sl-section-label">开始使用</div><h2>把方法带进你的问题</h2><p>{detail.default_prompt || `在输入框选择 $${item.skill_name}，再写下分析对象与问题。`}</p></div><button className="sl-button" onClick={async () => { try { await navigator.clipboard.writeText(`$${item.skill_name}`); setCopyMessage("已复制调用标识"); } catch { setCopyMessage("复制未成功，请手动复制右侧调用标识，或使用“用于对话”。"); } }}><Copy size={14} />复制调用标识</button><span role="status">{copyMessage}</span></section>
@@ -151,7 +155,7 @@ export function SkillReader({ item, onUse, titleRef }: { item: LibrarySkill; onU
           return /^https?:\/\//i.test(href) ? <a href={href} target="_blank" rel="noreferrer">{children}</a> : <span title="此资源未包含在当前可读方法中">{children}</span>;
         },
       }}>{methodBody(content)}</ReactMarkdown></div>}
-    </section></div> : <section className="sl-source"><div className="sl-section-label">可追溯的内容</div><h2>你正在阅读哪个版本</h2><p>展示内容直接来自当前账户的授权 Skill 快照。这里不展示未绑定该版本的测试成绩，也不代表本轮已经执行过此方法。</p><dl><dt>Skill ID</dt><dd>{detail.skill_id}</dd><dt>归属</dt><dd>{scopeName(item)}{item.owner === "system" ? " · 平台维护" : " · 用户创建"}</dd><dt>方法内容哈希</dt><dd><code>{detail.content_hash}</code></dd><dt>目录快照</dt><dd><code>{detail.revision}</code></dd><dt>参考文件</dt><dd>{references.length} 份 · 点击阅读时按同一快照校验</dd><dt>附加工具申请</dt><dd>{detail.controls?.supplemental_tools?.join("、") || "未申请额外工具；数据访问沿用 Agent 的授权能力"}</dd><dt>编辑权限</dt><dd>当前阅读空间只读。系统方法不提供普通用户写入入口。</dd><dt>评测证据</dt><dd>此接口未提供版本绑定的评测记录，暂不显示通过率。</dd></dl></section>}
+    </section></div> : <section className="sl-source"><div className="sl-section-label">可追溯的内容</div><h2>你正在阅读哪个版本</h2><p>展示内容直接来自当前账户的授权 Skill 快照。这里不展示未绑定该版本的测试成绩，也不代表本轮已经执行过此方法。</p><dl><dt>Skill ID</dt><dd>{detail.skill_id}</dd><dt>归属</dt><dd>{scopeName(item)}{item.owner === "system" ? " · 平台维护" : " · 用户创建"}</dd><dt>启用版本</dt><dd>{detail.active_revision_no ? `v${detail.active_revision_no}` : "系统初始版本"}</dd><dt>方法内容哈希</dt><dd><code>{detail.content_hash}</code></dd><dt>目录快照</dt><dd><code>{detail.revision}</code></dd><dt>参考文件</dt><dd>{references.length} 份 · 点击阅读时按同一快照校验</dd><dt>附加工具申请</dt><dd>{detail.controls?.supplemental_tools?.join("、") || "未申请额外工具；数据访问沿用 Agent 的授权能力"}</dd><dt>编辑权限</dt><dd>{detail.editable ? "你可以保存新版本并启用" : "当前账户可阅读，不可修改"}</dd><dt>评测证据</dt><dd>此接口未提供版本绑定的评测记录，暂不显示通过率。</dd></dl>{detail.definition && Object.keys(detail.definition).length > 0 && <details><summary>已保存的业务定义与关联配置</summary><pre className="sl-raw">{JSON.stringify(detail.definition, null, 2)}</pre></details>}{Object.entries(detail.companion_files || {}).map(([file, text]) => <details key={file}><summary>{file}</summary><pre className="sl-raw">{text}</pre></details>)}</section>}
   </div>;
 }
 

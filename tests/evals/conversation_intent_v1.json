@@ -5,6 +5,17 @@
   "description": "真实串联上下文语义补全与顶层 agent_name + turn_mode 路由。",
   "cases": [
     {
+      "case_id": "finance_calculation_capability_request",
+      "category": "boundary",
+      "input": "截至2026年9月29日，平安银行000001.SZ最近5个交易日的平均成交量是多少？请用动态计算工具计算并返回实际交易日，不要心算。只要结果和单位。",
+      "expected": {
+        "agent_name": "investment_analyst",
+        "turn_mode": "normal_qa",
+        "resolved_contains_all": ["000001.SZ", "成交量"],
+        "llm_policy": "required"
+      }
+    },
+    {
       "case_id": "finance_standalone_quote",
       "category": "happy_path",
       "input": "宁德时代现在股价是多少？",

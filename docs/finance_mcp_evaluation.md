@@ -3,7 +3,7 @@
 **给普通用户：优先使用根目录 `run_eval.sh`，编辑顶部带注释的配置后，只运行 `bash run_eval.sh`。**
 说明见 [客户端使用说明](mcp_eval_client.md)。管理员执行 `python scripts/package_finance_eval_client.py`
 即可生成可交付的客户端ZIP，仅包含白名单中的客户端文件、依赖清单和样本，不含Token或服务端配置。
-将单独签发的临时Token交给用户，用户放为包内的`token.json`即可。macOS/Linux支持Bash，Windows使用Git Bash/WSL。
+将单独签发的 Token 纯文本文件交给用户即可。macOS/Linux支持Bash，Windows使用Git Bash/WSL。
 
 统一入口：`scripts/eval_finance_mcp.py`。只调用现有MCP，不启动服务器、不修改生产配置。
 默认 `finance_task`、`runtime=dsh`、`research_mode=auto`、`execution_mode=standard`、
@@ -59,7 +59,7 @@ cd /home/che/cyris/fin_agent
 ```bash
 python scripts/eval_finance_mcp.py \
   --url https://ai-agent.kingdomai.com/fin_agent/mcp \
-  --token-file /tmp/finance-eval-token.json \
+  --token-file /tmp/fin-agent-access-token-example.txt \
   --query '机构看好山东黄金的主要理由有哪些？' \
   --skill equity-report-analysis
 ```
@@ -77,8 +77,9 @@ python scripts/eval_finance_mcp.py \
 
 默认有效期仍为4小时；明确需要长期凭证时将`--ttl-hours`替换为`--never-expires`。
 生成的是普通 Bearer Key 形态的单段`fin_sk_...`字符串。只有一个可选的`--name`，仅用于
-管理备注。完整 token 只写入命令返回的系统临时目录 JSON 文件，权限为0600；数据库只保存
-摘要、可选备注和首尾掩码。通过安全渠道交付该文件，不复制整份`.env`，复制完成后应删除临时文件。
+管理备注。完整 token 只写入命令返回的系统临时目录纯文本文件，权限为0600，文件中只有
+一行完整 Key；数据库只保存摘要、可选备注和首尾预览。通过安全渠道交付该文件，不复制
+整份`.env`，复制完成后应删除临时文件。
 长期 token 仍可用`manage_finance_access_tokens.py disable`立即停用。
 
 ## 选择Skill、工具或自动路由

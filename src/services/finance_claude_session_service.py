@@ -1615,12 +1615,8 @@ class FinanceClaudeSessionService:
                                 )
                             if tool_name != "Skill":
                                 continue
-                            content = getattr(block, "content", "")
-                            if isinstance(content, list):
-                                content = json.dumps(content, ensure_ascii=False, default=str)
-                            skill_result = _trim(content)
-                            if skill_result:
-                                evidence["skill_results"].append(skill_result[:5_000])
+                            # Native Skill results may contain private shared source.
+                            # The load event is sufficient public evidence; do not copy the body.
                     if class_name == "ResultMessage":
                         evidence["result"] = _trim(getattr(message, "result", ""))
                         evidence["llm_usage"] = _normalize_llm_usage(

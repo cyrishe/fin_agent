@@ -8,13 +8,14 @@ from pathlib import Path
 import re
 import secrets
 import threading
-from typing import Any, Dict, Iterable, List, Mapping, Optional
+from typing import Any, Callable, Dict, Iterable, List, Mapping, Optional
 
 import fastjsonschema
 import yaml
 
 from src.scenarios.financial_qa.business_skills import FinanceBusinessSkillCatalog
 from src.services.active_tool_registry_service import ActiveToolRegistryService
+from src.services.finance_data_tool_catalog_service import FinanceDataToolCatalogService
 from src.services.agent_providers.protocol import AgentSkillHarness
 from src.services.agent_providers.runtime_policy import (
     AgentCapabilityPolicy,
@@ -62,17 +63,26 @@ class SkillCapabilityDiscoveryService:
         self,
         *,
         business_catalog: Optional[FinanceBusinessSkillCatalog] = None,
+        catalog_provider: Optional[Callable[..., FinanceBusinessSkillCatalog]] = None,
         tool_registry: Optional[ActiveToolRegistryService] = None,
+        data_catalog: Optional[FinanceDataToolCatalogService] = None,
         skill_limit: int = 20,
         tool_limit: int = 48,
     ) -> None:
         self.business_catalog = business_catalog or FinanceBusinessSkillCatalog()
+        self.catalog_provider = catalog_provider
         self.tool_registry = tool_registry or ActiveToolRegistryService()
+        self.data_catalog = data_catalog or FinanceDataToolCatalogService()
         self.skill_limit = min(40, max(1, int(skill_limit or 20)))
         self.tool_limit = min(80, max(1, int(tool_limit or 48)))
 
-    def discover(self, requirement: str) -> Dict[str, Any]:
-        business_snapshot = self.business_catalog.discovery_snapshot()
+    def discover(
+        self, requirement: str, *, owner_id: str = "",
+        preferred_skill_ids: Iterable[str] = (), preferred_tool_names: Iterable[str] = (),
+    ) -> Dict[str, Any]:
+        catalog = (self.catalog_provider(owner_ids=[owner_id])
+                   if self.catalog_provider and owner_id else self.business_catalog)
+        business_snapshot = catalog.discovery_snapshot()
         raw_skills = [
             dict(item)
             for item in business_snapshot.get("entries") or []
@@ -87,7 +97,9 @@ class SkillCapabilityDiscoveryService:
             requirement,
             raw_skills,
             fields=("id", "category", "description"),
-        )[: self.skill_limit]
+        )
+        preferred_skills = set(preferred_skill_ids)
+        ranked_skills = sorted(ranked_skills, key=lambda row: row["id"] not in preferred_skills)[: self.skill_limit]
         ranked_tools = self._rank(
             requirement,
             raw_tools,
@@ -100,7 +112,9 @@ class SkillCapabilityDiscoveryService:
                 "subject_tags",
                 "tags",
             ),
-        )[: self.tool_limit]
+        )
+        preferred_tools = set(preferred_tool_names)
+        ranked_tools = sorted(ranked_tools, key=lambda row: row["tool_name"] not in preferred_tools)[: self.tool_limit]
         skill_rows = [
             {
                 "skill_id": _trim(item.get("id")),
@@ -167,6 +181,15 @@ class SkillCapabilityDiscoveryService:
             "tool_revision": tool_revision,
             "skills": skill_rows,
             "tools": tool_rows,
+            "data_catalog": {
+                "revision": self.data_catalog.catalog_revision(),
+                "subjects": [
+                    {"subject": subject["name"], "description": subject.get("desc", ""),
+                     "dataviews": [{"dataview": view["name"], "description": view.get("desc", "")}
+                                   for view in subject.get("dataviews", [])]}
+                    for subject in self.data_catalog.build_tree()["subjects"]
+                ],
+            },
             "_skill_index": {row["skill_id"]: row for row in skill_rows},
             "_tool_index": {row["tool_name"]: row for row in tool_rows},
         }
@@ -248,7 +271,7 @@ class SkillAuthoringService:
         )
         owner = self._require_owner(owner_id)
         with self._one_authoring_request(owner):
-            discovery = self.discovery_service.discover(normalized_requirement)
+            discovery = self.discovery_service.discover(normalized_requirement, owner_id=owner)
             agent_output, run_meta = self._author(
                 requirement=normalized_requirement,
                 feedback="",
@@ -312,7 +335,12 @@ class SkillAuthoringService:
                     ],
                 )
             )
-            discovery = self.discovery_service.discover(discovery_query)
+            control = base_candidate.get("control_manifest") or {}
+            discovery = self.discovery_service.discover(
+                discovery_query, owner_id=owner,
+                preferred_skill_ids=[item.get("skill_id", "") for item in control.get("related_skills", [])],
+                preferred_tool_names=[item.get("tool_name", "") for item in control.get("tool_connections", [])],
+            )
             agent_output, run_meta = self._author(
                 requirement=_trim(base_candidate.get("requirement")),
                 feedback=normalized_feedback,
@@ -388,6 +416,7 @@ class SkillAuthoringService:
             "tool_revision": discovery.get("tool_revision") or "",
             "skills": list(discovery.get("skills") or []),
             "tools": list(discovery.get("tools") or []),
+            "data_catalog": dict(discovery.get("data_catalog") or {}),
         }
         prompt_payload: Dict[str, Any] = {
             "mode": "revise" if base_candidate else "create",
@@ -534,6 +563,7 @@ class SkillAuthoringService:
             "authoring_evidence": {
                 "business_revision": _trim(discovery.get("business_revision")),
                 "tool_revision": _trim(discovery.get("tool_revision")),
+                "data_catalog_revision": _trim((discovery.get("data_catalog") or {}).get("revision")),
                 **dict(run_meta),
             },
             "resolution_notes": resolution_notes,
@@ -707,9 +737,15 @@ class SkillAuthoringService:
         proposed_name = SkillAuthoringService._slug(frontmatter.get("name"))
         description = _trim(frontmatter.get("description"))
         body = _trim(match.group(2))
-        if not description or not body:
+        if not description:
             raise SkillAuthoringError(
-                "生成的 SKILL.md 缺少 description 或正文。",
+                "SKILL.md 的 YAML frontmatter 缺少非空 description 字段；"
+                "请在 name 同级补充该方法的用途说明，保留已有正文。",
+                code="invalid_skill_authoring_output",
+            )
+        if not body:
+            raise SkillAuthoringError(
+                "SKILL.md 的第二个 --- 之后缺少方法正文；请补充执行方法。",
                 code="invalid_skill_authoring_output",
             )
         return proposed_name or "custom-skill", description[:1024], body

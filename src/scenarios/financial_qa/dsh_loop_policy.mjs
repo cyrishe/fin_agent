@@ -196,7 +196,7 @@ export function resolveConfig(input = {}) {
     skillMaxCatalogAttempts: positiveInteger(supplied.skillMaxCatalogAttempts, 16, 'skillMaxCatalogAttempts'),
     skillMaxQueryAttempts: positiveInteger(supplied.skillMaxQueryAttempts, 12, 'skillMaxQueryAttempts'),
     skillMaxLoadAttempts: positiveInteger(supplied.skillMaxLoadAttempts, 8, 'skillMaxLoadAttempts'),
-    skillAnalysisMaxTokens: positiveInteger(supplied.skillAnalysisMaxTokens, 8192, 'skillAnalysisMaxTokens'),
+    skillAnalysisMaxTokens: positiveInteger(supplied.skillAnalysisMaxTokens, 32768, 'skillAnalysisMaxTokens'),
     budgets: Object.fromEntries(
       Object.entries(DEFAULT_BUDGETS).map(([stage, fallback]) => [
         stage,
@@ -391,11 +391,11 @@ function catalogIsReady(payload) {
 // Derive reuse eligibility from the actual model-visible tool history, not a
 // second catalog or a worker-global cache. Compacted-away or old-revision packs
 // cannot authorize reuse. This also works when Harness resumes a cold session.
-function reusableCatalogApis(agent, tools) {
+function visibleCatalogs(agent, tools) {
   const revision = currentRuntimeContext().finance_catalog_revision
   if (!revision) return []
   const catalogCalls = new Set()
-  const apis = new Set()
+  const catalogs = []
   for (const message of agent.session?.deriveMessages() ?? []) {
     for (const block of message.content ?? []) {
       if (message.role === 'assistant' && block.type === 'tool-call' && block.name === tools.catalog) {
@@ -408,13 +408,35 @@ function reusableCatalogApis(agent, tools) {
         let payload
         try { payload = JSON.parse(content.text) } catch { continue }
         if (!catalogIsReady(payload) || payload.catalog_revision !== revision) continue
-        for (const fn of payload.dataview?.functions ?? []) {
-          if (typeof fn.api_name === 'string') apis.add(fn.api_name)
-        }
+        catalogs.push(payload)
       }
     }
   }
-  return [...apis]
+  return catalogs
+}
+
+function reusableCatalogApis(agent, tools) {
+  return [...new Set(visibleCatalogs(agent, tools).flatMap(payload =>
+    payload.dataview.functions.map(fn => fn.api_name).filter(api => typeof api === 'string')))]
+}
+
+// Operation packs share field definitions. Keep every new contract and changed
+// field; omit only exact definitions still visible in this session and revision.
+function reuseCatalogFields(payload, agent, tools) {
+  const view = payload.dataview
+  if (!catalogIsReady(payload) || !view.name || !payload.subject) return payload
+  const previous = visibleCatalogs(agent, tools).filter(item =>
+    item.subject === payload.subject && item.dataview.name === view.name)
+  const fields = {}
+  const reused = []
+  for (const [key, definition] of Object.entries(view.fields ?? {})) {
+    if (previous.some(item => Object.hasOwn(item.dataview.fields ?? {}, key)
+      && JSON.stringify(stableValue(item.dataview.fields[key])) === JSON.stringify(stableValue(definition)))) {
+      reused.push(key)
+    } else fields[key] = definition
+  }
+  return reused.length ? { ...payload, dataview: { ...view, fields },
+    context_note: `以下字段定义沿用当前上下文中同一视图、同一版本的执行包：${reused.join('、')}。本包的函数、参数和其他字段以本次返回为准。` } : payload
 }
 
 function requestTargets(args) {
@@ -633,7 +655,10 @@ function resetTurn(state, turn, config, agent, tools) {
   state.executionMode = executionMode(toolContext._finance_execution_mode, config.executionMode)
   state.dataOnlyRequested = toolContext._finance_data_only === true
   state.skillCatalogAvailable = hasSkillCatalog(toolContext)
-  state.methodReady = !state.skillCatalogAvailable
+  // Method selection is semantic in standard conversations: a follow-up may
+  // already have all required methods/evidence, or simply ask for explanation.
+  // Per-API catalog checks still authorize each actual query below.
+  state.methodReady = (state.executionMode === 'standard' && !state.dataOnlyRequested) || !state.skillCatalogAvailable
     || Boolean(String(toolContext._finance_explicit_skill_prompt ?? '').trim())
   state.stage = 'catalog'
   state.reason = 'turn_started'
@@ -644,7 +669,7 @@ function resetTurn(state, turn, config, agent, tools) {
   state.queryFailures = 0
   state.loadAttempts = 0
   state.dataOnlyComplete = false
-  state.requiredAction = true
+  state.requiredAction = state.executionMode === 'fast' || state.dataOnlyRequested
   state.finalAnswerAttempted = false
   state.stageSteers.clear()
   state.lastInjectedStage = ''
@@ -867,7 +892,7 @@ function reuseVisibleSkill(content, agent) {
   const texts = visibleTexts(agent)
   const reuse = skill => {
     if (typeof skill?.method !== 'string' || !skill.method.trim()
-      || !texts.some(text => text.includes(skill.method))) return skill
+      || !texts.some(text => text.includes(skill.method) || text.includes(JSON.stringify(skill.method)))) return skill
     const { method, ...identity } = skill
     return { ...identity, already_loaded: true,
       guidance: '该方法正文已完整包含在当前模型上下文中，请直接使用；必要参考仍可按原方法中的路径读取。' }
@@ -1090,7 +1115,7 @@ export function apply(ctx, input = {}) {
           let payload
           try { payload = JSON.parse(block.text) } catch { return block }
           return catalogIsReady(payload)
-            ? { ...block, text: JSON.stringify({ ...payload, catalog_revision: revision }) }
+            ? { ...block, text: JSON.stringify(reuseCatalogFields({ ...payload, catalog_revision: revision }, agent, tools)) }
             : block
         })
         return { ...decision, content }
@@ -1171,7 +1196,9 @@ export function apply(ctx, input = {}) {
       const budgetKey = state.executionMode === 'fast' && state.stage === 'query'
         ? 'fast_query' : state.stage
       const selected = config.budgets[budgetKey] ?? config.budgets.final
-      const skillAnalysis = usesSkillAnalysis(state) && !state.requiredAction
+      // A loaded method can reason or compose during a query step too. Tool
+      // obligations govern continuation, not the model's output-token budget.
+      const skillAnalysis = usesSkillAnalysis(state)
       const analyzing = (skillGuidedAnswer(state) || skillAnalysis) && !state.requiredAction
       return {
         ...proposed,

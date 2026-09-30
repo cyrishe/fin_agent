@@ -62,3 +62,28 @@ describe("Skill reading workspace", () => {
     expect(html).toContain('target="_blank"'); expect(html).toContain("当前方法内容");
   });
 });
+
+describe("Skill editing and use-only sharing", () => {
+  afterEach(() => vi.unstubAllGlobals());
+  it("never presents shared source as publicly readable", () => {
+    const shared = { ...privateSkill, scope: "public", viewable: false, editable: false };
+    const html = renderToStaticMarkup(<SkillReader item={shared} onUse={() => {}} />);
+    expect(html).toContain("正文与内部配置仅作者可查看");
+    expect(html).not.toContain("编辑方法与参考");
+  });
+  it("sends version checks and content, never caller-supplied role", async () => {
+    const { saveSkillDefinition, activateSkillDefinition } = await import("./skillLibrary");
+    const base = { skill_id: "personal", display_name: "个人", skill_markdown: "body", references: {}, control_manifest: {}, candidate_revision_no: 2, active_revision_no: 1, content_hash: "h2" };
+    const mock = vi.fn().mockResolvedValue(new Response(JSON.stringify({ ok: true, candidate: base })));
+    vi.stubGlobal("fetch", mock);
+    await saveSkillDefinition(base, { display_name: "新名称", skill_markdown: "body 3", references: {}, control_manifest: {} });
+    mock.mockResolvedValue(new Response(JSON.stringify({ ok: true, candidate: base })));
+    await activateSkillDefinition(base);
+    expect(mock.mock.calls[0][0]).toBe("/api/skill-hub/personal/definition");
+    expect(JSON.parse(mock.mock.calls[0][1].body)).toMatchObject({ expected_candidate_revision: 2, expected_content_hash: "h2" });
+    expect(mock.mock.calls[1][0]).toBe("/api/skill-hub/personal/definition/activate");
+    expect(JSON.parse(mock.mock.calls[1][1].body)).toEqual({ expected_candidate_revision: 2, expected_active_revision: 1 });
+    expect(mock.mock.calls[0][1].credentials).toBe("include");
+    expect(mock.mock.calls[0][1].body).not.toContain("is_admin");
+  });
+});

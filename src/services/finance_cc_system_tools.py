@@ -313,7 +313,7 @@ class FinanceCcSystemTools:
                         "type": "string",
                         "enum": ["api_catalog", "requirement", "design", "flow", "code", "tests", "tool_contract"],
                     },
-                    "tool_name": {"type": "string", "maxLength": 200},
+                    "tool_name": {"type": "string", "maxLength": 200, "description": "Exact saved tool identifier. Omit to read the current conversation tool."},
                     "subject": {"type": "string", "maxLength": 100},
                     "dataview": {"type": "string", "maxLength": 100},
                 },

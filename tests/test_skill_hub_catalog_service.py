@@ -273,7 +273,7 @@ def test_skill_hub_detail_api_is_read_only_and_reference_is_revision_bound(
     monkeypatch.setattr(
         web.skill_hub_catalog_service,
         "detail",
-        lambda skill_name, catalog_id="", owner_ids=(): {
+        lambda skill_name, catalog_id="", owner_ids=(), is_admin=False: {
             "skill_id": skill_name,
             "catalog_id": catalog_id,
             "skill_type": "business_method",

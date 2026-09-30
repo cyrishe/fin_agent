@@ -129,8 +129,8 @@ def test_dsh_prompt_discloses_catalog_and_selected_method_but_keeps_references_l
     assert "LAZY_REFERENCE_CONTENT" not in prompt
     assert "先用 read_finance_skill 读取这些 Skill" not in prompt
     assert "平台权限与本轮用户目标保持不变" in prompt
-    assert "选择合适的方法与数据" in service.system_prompt
-    assert "按实际缺口补充方法或数据" in service.system_prompt
+    # Selection guidance has one source in the runtime catalog. Do not require
+    # old copies of that prose to remain in the top-level system prompt.
     assert "方法选择" in service.system_prompt
     for name in ("read_finance_catalog", "finance_query", "load_finance_result", "resolve_security"):
         assert name not in service.system_prompt

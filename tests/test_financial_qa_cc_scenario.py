@@ -144,6 +144,46 @@ def _tools(tmp_path: Path):
     )
 
 
+@pytest.mark.parametrize("empty", [False, True])
+def test_provider_evidence_survives_query_restore_and_detail_without_cross_scope_access(tmp_path, empty):
+    service, provider, runtime, tools, _, tracker = _tools(tmp_path)
+    original = provider.execute_request
+    evidence = {"price_basis": "hfq", "sources": [{"code": "600519.SH", "data_as_of": "2026-09-29",
+        "candidate_count": 0, "unknown_evaluations": 3, "summary": "有三项无法判断，不能当作全部未命中"}]}
+    def execute(**kwargs):
+        result = original(**kwargs)
+        result["result"]["data"]["evidence"] = evidence
+        if empty:
+            result["result"]["data"].update(rows=[], row_count=0)
+        return result
+    provider.execute_request = execute
+    result = _payload(asyncio.run(tools["finance_query"].handler({"goal": "查询计算事实",
+        "request": "r1 = stock.quote() -> stock_code, close"})))
+    assert result["provider_evidence"] == evidence
+    assert tracker["result_refs"][0]["provider_evidence"] == evidence
+    restored = service.create_runtime()
+    definitions, _, _ = service.build_tools(owner_ids=["owner-a"],
+        tool_context={"_agent_runtime_scope": runtime.runtime_scope}, runtime=restored)
+    assert restored.working_set()[0]["provider_evidence"] == evidence
+    assert "hfq" in restored.working_set_prompt()
+    read = next(tool for tool in definitions if tool.name == "load_finance_result")
+    detail = _payload(asyncio.run(read.handler({"result_ref": result["result_ref"]})))
+    assert detail["provider_evidence"] == evidence
+    other, _, _ = service.build_tools(owner_ids=["owner-b"],
+        tool_context={"_agent_runtime_scope": "owner-b/another-thread"})
+    read_other = next(tool for tool in other if tool.name == "load_finance_result")
+    rejected = _payload(asyncio.run(read_other.handler({"result_ref": result["result_ref"]})))
+    assert "error" in rejected and "provider_evidence" not in rejected
+
+
+def test_result_context_preserves_actual_technical_query_scope():
+    from src.scenarios.financial_qa.result_registry import FinanceResultRegistry
+    args = {"codes": ["000001.SZ"], "as_of": "2026-09-29T14:30:00+08:00",
+        "period": 5, "count": 20, "since": "2026-09-29T13:00:00+08:00",
+        "include_partial": False, "max_lag_seconds": 0}
+    assert FinanceResultRegistry.selection_applied(args) == args
+
+
 def test_financial_qa_exposes_only_read_only_data_tools(tmp_path: Path) -> None:
     _, _, _, tools, names, _ = _tools(tmp_path)
 
@@ -1922,20 +1962,13 @@ def test_financial_qa_prompt_keeps_business_rules_and_manual_stays_generic() -> 
         for path in business_root.glob("*/SKILL.md")
     }
 
-    assert "具体金融事实通过金融数据工具取得" in prompt
-    assert "对象、指标、时间与结果粒度" in prompt
-    assert "有匹配方法时优先加载" in prompt
-    assert "只覆盖部分问题" in prompt
-    assert "通用分析能力补足" in prompt
+    assert "工具负责取数和计算" in prompt
+    assert "方法选择" in prompt
     assert "general_search" not in prompt
     assert "financial_news_search" not in prompt
     assert "服务端默认沪深300" in prompt
-    assert "依据回测前已知的持仓特征" in prompt
-    assert "展示感知的数据组织" in prompt
-    assert "可组织一份直接相关的补充数据" in prompt
-    assert "仅取数和极简回答按用户指定范围交付" in prompt
-    assert "真实可比的观测或正式窗口指标" in prompt
-    assert "系统根据实际结果生成卡片、图表与明细表" in prompt
+    assert "仅取数或极简回答" in prompt
+    assert "卡片、图表和明细" in prompt
     assert "rN.column" in protocol
     assert "stepN.column" in protocol
     assert "data_request_complete=true" in protocol
@@ -1943,8 +1976,8 @@ def test_financial_qa_prompt_keeps_business_rules_and_manual_stays_generic() -> 
     assert "金融公式、窗口与数据源适配由工具实现" in protocol
     assert "sample_complete=true" in manual
     assert "本步按空结果完成" in manual
-    assert "实际状态" in prompt
-    assert "恢复以工具返回的执行证据为准" in prompt
+    assert "零行、缺值和执行失败" in prompt
+    assert "错误恢复以工具返回为准" in prompt
     assert "stock." not in prompt + manual + protocol
     assert "mode=" not in prompt + manual + protocol
     assert set(business_skills) == {
@@ -1963,6 +1996,9 @@ def test_financial_qa_prompt_keeps_business_rules_and_manual_stays_generic() -> 
         "stock-comparison",
         "technical-structure-analysis",
         "dividend-analysis",
+        "kline-analysis",
+        "kline-basic-reading",
+        "relative-strength-analysis",
     }
     assert all(f"name: {name}" in text for name, text in business_skills.items())
     assert all("finance_query" not in text for text in business_skills.values())

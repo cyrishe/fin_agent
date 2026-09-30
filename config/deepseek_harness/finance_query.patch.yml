@@ -21,6 +21,12 @@
           PYTHONPATH: !!js process.env.FIN_AGENT_ROOT
           FIN_AGENT_DSH_CONTEXT_PATH: !!js process.env.FIN_AGENT_DSH_CONTEXT_PATH
           FIN_AGENT_DSH_TRACE_PATH: !!js process.env.FIN_AGENT_DSH_TRACE_PATH
+          LLM_BASE_URL: !!js process.env.LLM_BASE_URL
+          LLM_API_KEY: !!js process.env.LLM_API_KEY
+          LLM_DEFAULT_MODEL: !!js process.env.LLM_DEFAULT_MODEL
+          LLM_VISION_MODEL: !!js process.env.LLM_VISION_MODEL
+          LLM_FLASH_MODEL: !!js process.env.LLM_FLASH_MODEL
+          LLM_REASONING_MODEL: !!js process.env.LLM_REASONING_MODEL
         toolCallTimeoutMs: 180000
         failOnStartupError: true
         reconnect:

@@ -69,6 +69,27 @@ def total_tokens(usage) -> int | None:
     return prompt + output + (number("cache_read_input_tokens") or 0) + (number("cache_creation_input_tokens") or 0)
 
 
+def with_tool_model_usage(usage, tool_calls):
+    """Add auxiliary OpenAI-style usage once; keep agent turns/context separate."""
+    calls = [item for tool in tool_calls or [] if isinstance(tool, Mapping)
+             for item in tool.get("llm_calls") or [] if isinstance(item, Mapping)]
+    result = dict(usage or {})
+    if not calls:
+        return result
+    known = [item["usage"] for item in calls if isinstance(item.get("usage"), Mapping)
+             and all(type(item["usage"].get(key)) is int for key in
+                     ("prompt_tokens", "completion_tokens", "total_tokens"))]
+    subtotal = sum(item["total_tokens"] for item in known)
+    primary_total = total_tokens(result)
+    complete = len(known) == len(calls) and primary_total is not None
+    result["accounting_total_tokens"] = primary_total + subtotal if complete else None
+    result["auxiliary_usage"] = {"call_count": len(calls), "usage_received": len(known),
+        "complete": len(known) == len(calls), "reported_total_tokens": subtotal,
+        "prompt_tokens": sum(item["prompt_tokens"] for item in known),
+        "completion_tokens": sum(item["completion_tokens"] for item in known)}
+    return result
+
+
 def record_request(*, request_id, channel, usage, succeeded, finished_at=None):
     """One ID per accepted execution; duplicate completion replaces, never increments."""
     if channel not in {"mcp", "http_api", "test"}:

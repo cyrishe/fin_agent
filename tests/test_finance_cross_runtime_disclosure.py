@@ -150,8 +150,8 @@ def _flow(goal: str, request: str) -> dict:
 
 def test_full_inventory_and_shared_tool_schemas(catalog_adapters):
     assert len(_SUBJECTS) == 7
-    assert len(_VIEWS) == 31
-    assert len(_OPERATIONS) == 47
+    assert len(_VIEWS) == 37
+    assert len(_OPERATIONS) == 55
     assert set(op for _, _, op in _OPERATIONS) == set(_OPERATION_TYPES)
     dsh_tools = {item.name: item for item in catalog_adapters.bridge.list_tools()}
     assert set(dsh_tools) == {"read_finance_catalog", "finance_query", "load_finance_result",

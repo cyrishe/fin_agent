@@ -197,7 +197,7 @@ class LlmStreamBlockBuilder:
             if stage == "coding" and event_type in {"stage_result", "error"} and self.coding_updates:
                 failed = event_type == "error" or metadata.get("ok") is False
                 blocks.append(self._coding_progress_update(
-                    "本次实现未完成，请查看具体原因。" if failed else "实现与功能验证已完成。",
+                    "本次实现未完成，请查看具体原因。" if failed else "代码实现已完成，正在保存候选并检查运行结果。",
                     status="error" if failed else "completed",
                 ))
             return blocks

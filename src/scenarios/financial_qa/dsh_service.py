@@ -38,7 +38,7 @@ _DEFAULT_LOOP_POLICY_CONFIG: dict[str, Any] = {
     "skillMaxCatalogAttempts": 16,
     "skillMaxQueryAttempts": 12,
     "skillMaxLoadAttempts": 8,
-    "skillAnalysisMaxTokens": 8192,
+    "skillAnalysisMaxTokens": 32768,
     "duplicateCallLimit": 1,
     "maxRequiredStageSteers": 1,
     "businessHint": "",
@@ -727,6 +727,15 @@ class FinanceDeepSeekHarnessSessionService:
             "FIN_AGENT_DSH_PYTHON": sys.executable,
             "FIN_AGENT_DSH_CONTEXT_PATH": str(worker.context_path),
             "FIN_AGENT_DSH_TRACE_PATH": str(worker.trace_path),
+            # MCP stdio children inherit only a small platform environment.
+            # Internal model-backed tools must use the same gateway as the host,
+            # rather than silently loading stale credentials from .env.
+            "LLM_BASE_URL": self.base_url,
+            "LLM_API_KEY": self.api_key,
+            "LLM_DEFAULT_MODEL": self.model,
+            "LLM_VISION_MODEL": _trim(os.environ.get("LLM_VISION_MODEL")),
+            "LLM_FLASH_MODEL": _trim(os.environ.get("LLM_FLASH_MODEL")) or self.model,
+            "LLM_REASONING_MODEL": _trim(os.environ.get("LLM_REASONING_MODEL")) or self.model,
         }
         source_root = _trim(os.environ.get("FINANCE_DSH_SOURCE_ROOT"))
         if source_root:

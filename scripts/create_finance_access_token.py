@@ -2,7 +2,6 @@
 from __future__ import annotations
 
 import argparse
-from datetime import datetime, timezone
 import json
 import math
 import os
@@ -18,7 +17,7 @@ def _reserve_output(path: Path | None) -> tuple[int, Path]:
     temporary_root = Path(tempfile.gettempdir()).resolve()
     if path is None:
         fd, generated = tempfile.mkstemp(
-            prefix="fin-agent-access-token-", suffix=".json", dir=temporary_root,
+            prefix="fin-agent-access-token-", suffix=".txt", dir=temporary_root,
         )
         os.fchmod(fd, 0o600)
         return fd, Path(generated)
@@ -48,7 +47,7 @@ def main(argv=None):
     parser.add_argument(
         "--output",
         type=Path,
-        help="New JSON file below the system temporary directory; defaults to a unique /tmp file.",
+        help="New text file below the system temporary directory; defaults to a unique /tmp file.",
     )
     args = parser.parse_args(argv)
     ttl_hours = 4 if args.ttl_hours is None else args.ttl_hours
@@ -75,8 +74,7 @@ def main(argv=None):
         )
         with os.fdopen(fd, "w", encoding="utf-8") as stream:
             fd = None
-            json.dump(credential, stream, ensure_ascii=False, indent=2)
-            stream.write("\n")
+            stream.write(str(credential["access_token"]) + "\n")
     except (ValueError, OSError) as exc:
         if fd is not None:
             os.close(fd)
@@ -89,19 +87,7 @@ def main(argv=None):
             f"Token creation failed ({type(exc).__name__}); check configuration, database, principal and output path."
         )
 
-    expires_at = credential["expires_at"]
-    summary = {
-        "token_file": str(output),
-        "token_id": credential["token_id"],
-        "name": credential["name"],
-        "principal_id": credential["principal_id"],
-        "masked_token": credential["masked_token"],
-        "never_expires": credential["never_expires"],
-        "expires_at_utc": None if expires_at is None else datetime.fromtimestamp(
-            expires_at, timezone.utc
-        ).isoformat(),
-    }
-    print(json.dumps(summary, ensure_ascii=False))
+    print(json.dumps({"token_file": str(output)}, ensure_ascii=False))
     return 0
 
 

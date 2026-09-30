@@ -49,6 +49,9 @@ def validate_call(call: ApiCall, previous_results: Mapping[str, ResultHandle]) -
         k = call.args.get("k")
         if not isinstance(k, int) or k <= 0:
             errors.append("ARG_ERROR: kd api requires positive integer k")
+        if resolved.get("subject") == "stock" and resolved.get("dataview") == "technical":
+            if isinstance(k, bool) or isinstance(k, int) and k > 252:
+                errors.append("ARG_ERROR: stock.technical window k must be 1..252")
     if resolved["type"] == "agg":
         _validate_agg_args(call, previous_results, view, errors, dataview=str(resolved.get("dataview") or ""))
     if resolved["type"] == "dynamic_cal":
@@ -330,6 +333,8 @@ def _validate_agg_args(
         if agg not in AGG_METHODS:
             errors.append(f"API_ERROR: agg={agg} unsupported for metric={metric}")
     else:
+        if dataview == "technical" and not metric.startswith("stock.technical."):
+            errors.append("API_ERROR: stock.technical.agg requires a stock.technical metric")
         if dataview == "quote" and metric_column(metric) in set((view.get("fields") or {}).keys()):
             source_fields = runtime_field_contract(call, usage="source")
             if source_fields is not None and metric_column(metric) not in source_fields:

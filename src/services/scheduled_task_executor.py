@@ -82,6 +82,7 @@ class ScheduledTaskExecutor:
                             runtime_ctx={
                                 "scheduled_task_run_id": str(run.get("run_id") or ""),
                                 "scheduled_task_id": str(run.get("schedule_id") or ""),
+                                "scheduled_task_step_id": step_id,
                                 "owner_user_id": owner_user_id,
                                 "owner_type": "user",
                                 "owner_id": owner_user_id,
@@ -97,6 +98,7 @@ class ScheduledTaskExecutor:
                             runtime_context={
                                 "scheduled_task_run_id": str(run.get("run_id") or ""),
                                 "scheduled_task_id": str(run.get("schedule_id") or ""),
+                                "scheduled_task_step_id": step_id,
                                 "owner_user_id": owner_user_id,
                                 "owner_type": "user",
                                 "owner_id": owner_user_id,

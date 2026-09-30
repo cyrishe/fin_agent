@@ -717,7 +717,8 @@ def test_coding_harness_evidence_is_saved_without_changing_final_schema(tmp_path
     )
 
     assert implemented["coding_status"] == "implemented"
-    assert implemented["test_result"]["evidence_source"] == "production_runtime"
+    assert implemented["test_result"]["evidence_source"] == "isolated_synthetic_fixture"
+    assert implemented["test_result"]["execution_ok"] is False
     assert implemented["test_result"]["cases"][0]["input"] == {"values": [1, 2, 3]}
     assert implemented["test_result"]["cases"][0]["actual"]["key_process_info"] == {
         "value_count": 3,
@@ -734,6 +735,7 @@ def test_coding_keeps_a_minimal_sufficient_set_of_validation_cases(tmp_path: Pat
                 event_sink=event_sink,
             )
             result["final"].pop("execution_examples", None)
+            result["final"]["sample_input"] = {"values": [4, 5]}
             result["final"]["coding_test_evidence"] = {
                 "cases": [
                     {
@@ -799,18 +801,73 @@ def test_coding_keeps_a_minimal_sufficient_set_of_validation_cases(tmp_path: Pat
 
     cases = implemented["test_result"]["cases"]
     assert implemented["test_result"]["execution_ok"] is True
-    assert len(cases) == 3
-    assert [item["purpose"] for item in cases] == [
+    assert len(cases) == 4
+    assert cases[0]["category"] == "runtime_compatibility"
+    assert cases[0]["actual"]["total"] == 9
+    assert [item["purpose"] for item in cases[1:]] == [
         "核对正常求和",
         "核对负数不会被丢弃",
         "核对空数组",
     ]
-    assert cases[0]["expected"] == {"total": 6}
-    assert cases[0]["actual"]["key_process_info"] == {"value_count": 3}
-    assert cases[0]["expected_basis"] == "独立手算 1+2+3"
+    assert cases[1]["expected"] == {"total": 6}
+    assert cases[1]["actual"]["key_process_info"] == {"value_count": 3}
+    assert cases[1]["expected_basis"] == "独立手算 1+2+3"
     assert implemented["test_result"]["summary"].startswith(
-        "正式运行兼容性验证通过；3 / 3"
+        "4 / 4"
     )
+
+
+@pytest.mark.parametrize("with_live_sample", [False, True])
+def test_market_fixtures_are_not_replayed_as_live_expectations(tmp_path: Path, with_live_sample) -> None:
+    class Runtime:
+        def __init__(self):
+            self.calls = []
+
+        def run(self, tool_name, inputs, **kwargs):
+            self.calls.append(inputs)
+            return {"ok": True, "data": {"close": 12, "key_process_info": {}}, "meta": {}}
+
+    store = CustomToolStoreService(root_dir=str(tmp_path / "tools"), backend="filesystem")
+    runtime = Runtime()
+    service = CustomToolAgentService(store=store, runtime=runtime, use_codex=False)
+    final = _Coder().code({})["final"]
+    bundle = service._bundle_from_coding_final({"document": "读取行情"}, final)
+    inputs = {"stock_codes": ["600519.SH"]}
+    bundle["sample_input"] = inputs if with_live_sample else {}
+    evidence = {"cases": [{
+        "name": "固定行情样例", "input": inputs,
+        "expected": {"close": 10}, "expected_basis": "合成行情收盘价10",
+        "actual": {"close": 10, "key_process_info": {}}, "status": "passed",
+    }]}
+
+    result = service._save_test_and_return(bundle, owner_id="user_a", coding_evidence=evidence)
+
+    assert result["test_result"]["coding_cases"][0]["actual"]["close"] == 10
+    if with_live_sample:
+        assert runtime.calls == [inputs]
+        assert result["test_result"]["execution_ok"] is True
+        assert result["test_result"]["cases"][0]["actual"]["close"] == 12
+        assert result["test_result"]["cases"][1]["expected"] == {"close": 10}
+    else:
+        assert runtime.calls == []
+        assert result["test_result"]["execution_ok"] is False
+        assert "test_feedback" in result["state"]
+        with pytest.raises(CustomToolError, match="technical verification"):
+            store.commit(result["state"]["tool_name"], owner_ids=["user_a"])
+
+
+
+def test_empty_public_input_remains_valid_for_a_tool_without_required_arguments(tmp_path: Path) -> None:
+    store = CustomToolStoreService(root_dir=str(tmp_path / "tools"), backend="filesystem")
+    service = CustomToolAgentService(store=store, use_codex=False)
+    bundle = service._bundle_from_coding_final({"document": "无参工具"}, _Coder().code({})["final"])
+    bundle["input_schema"] = {"type": "object", "properties": {}}
+    bundle["sample_input"] = {}
+    bundle["code"] = "def run(inputs):\n    return {'total': 0, 'key_process_info': {}}\n"
+    evidence = {"cases": [{"input": {}, "expected": {"total": 0}, "actual": {"total": 0}}]}
+    result = service._save_test_and_return(bundle, owner_id="user_a", coding_evidence=evidence)
+    assert result["test_result"]["execution_ok"] is True
+    assert result["test_result"]["cases"][0]["input"] == {}
 
 
 def test_coding_detects_a_declared_expectation_mismatch(tmp_path: Path) -> None:
@@ -929,6 +986,84 @@ def test_coding_contract_builds_runtime_schema_from_natural_language_design(tmp_
     assert bundle["output_schema"]["required"] == ["total", "key_process_info"]
     assert bundle["output_schema"]["properties"]["total"]["type"] == "number"
     assert bundle["output_schema"]["properties"]["key_process_info"]["type"] == "object"
+
+
+@pytest.mark.parametrize("schema_keys", [("input_schema", "output_schema"), ("inputs", "outputs")])
+def test_coding_contract_preserves_complete_json_schemas(tmp_path: Path, schema_keys) -> None:
+    store = CustomToolStoreService(root_dir=str(tmp_path / "tools"), backend="filesystem")
+    service = CustomToolAgentService(store=store, use_codex=False)
+    final = _Coder().code({})["final"]
+    contract = {
+        "name": "sum_values",
+        "description": "计算数字之和",
+        "input_schema": {
+            "type": "object", "additionalProperties": False,
+            "properties": {"values": {"type": "array", "items": {"type": "number"}, "minItems": 1}},
+            "required": ["values"],
+        },
+        "output_schema": {
+            "type": "object", "additionalProperties": False,
+            "properties": {
+                "total": {"type": ["number", "null"]},
+                "key_process_info": {
+                    "type": "object",
+                    "properties": {"value_count": {"type": "integer"}},
+                },
+            },
+            "required": ["total"],
+        },
+    }
+    original = json.loads(json.dumps(contract))
+    if schema_keys != ("input_schema", "output_schema"):
+        contract[schema_keys[0]] = contract.pop("input_schema")
+        contract[schema_keys[1]] = contract.pop("output_schema")
+    original_contract = json.loads(json.dumps(contract))
+    final["tool_contract"] = contract
+    bundle = service._bundle_from_coding_final({"document": "求和工具设计"}, final)
+    saved = store.save_draft(bundle, owner_id="user_a")
+    loaded = store.load(saved["manifest"]["tool_name"])
+
+    assert loaded["manifest"]["tool_name"] == "ct_sum_values"
+    assert loaded["input_schema"] == original["input_schema"]
+    assert loaded["output_schema"]["properties"] == original["output_schema"]["properties"]
+    assert loaded["output_schema"]["additionalProperties"] is False
+    assert loaded["output_schema"]["required"] == ["total", "key_process_info"]
+    assert contract == original_contract
+    result = _runtime(store, tmp_path).run(
+        "ct_sum_values", {"values": [2, 3]}, owner_ids=["user_a"], allow_inactive=True,
+    )
+    assert result["ok"] is True
+    assert result["data"]["total"] == 5
+
+
+@pytest.mark.parametrize("broken_contract", [
+    {"inputs": [], "outputs": []},
+    {"name": "broken", "input_schema": []},
+    {"name": "broken", "output_schema": {"type": "array"}},
+    {"name": "broken", "output_schema": {"type": "object", "required": [None]}},
+])
+def test_invalid_coding_contract_preserves_design_and_resume_context(tmp_path: Path, broken_contract) -> None:
+    class BrokenCoder(_Coder):
+        def code(self, *args, **kwargs):
+            result = super().code(*args, **kwargs)
+            result["final"]["tool_contract"] = broken_contract
+            result["agent_runtime"] = {"session_id": "coding-session", "provider_session_id": "provider-thread"}
+            return result
+
+    store = CustomToolStoreService(root_dir=str(tmp_path / "tools"), backend="filesystem")
+    service = CustomToolAgentService(store=store, coder=BrokenCoder(), use_codex=False)
+    design = {"document": "输入数字数组并计算合计。"}
+    result = service.implement_dynamic_tool(
+        state={"design_contract": design, "requirement_brief": "求和", "design_revision": 3},
+        owner_id="user_a",
+    )
+
+    assert result["coding_status"] == "coding_failed"
+    assert result["coding_error"]["code"] == "coding_bundle_invalid"
+    assert result["state"]["design_contract"] == design
+    assert result["state"]["design_revision"] == 3
+    assert result["state"]["agent_runtime"]["provider_session_id"] == "provider-thread"
+    assert not store.exists("ct_broken")
 
 
 def test_runtime_does_not_reject_business_output_with_hard_schema_checks(tmp_path: Path) -> None:
@@ -1400,6 +1535,7 @@ def test_first_coding_turn_gets_editable_module_focused_api_context_and_test_run
     Path(bundle["bundle_dir"], bundle["coding_evidence"]).write_text(
         json.dumps({
             "result": "passed",
+            "sample_input": {"code": "000001.SZ"},
             "cases": [{
                 "name": "正常行情",
                 "purpose": "核对收盘价透传",
@@ -1424,6 +1560,7 @@ def test_first_coding_turn_gets_editable_module_focused_api_context_and_test_run
     assert "return {'close': 1}" in collected["implementation"]["modules"][0]["source_code"]
     assert "return {'close': 1}" in collected["code"]
     assert collected["implementation_summary"] == "读取行情并返回收盘价。"
+    assert collected["sample_input"] == {"code": "000001.SZ"}
     assert collected["coding_test_evidence"]["cases"][0]["actual"]["key_process_info"] == {
         "sample_count": 1,
     }
@@ -1587,19 +1724,13 @@ def test_coding_subject_asset_expands_method_contracts(tmp_path: Path) -> None:
         method["name"]: method
         for method in stock["methods"]
     }
-    quote = methods["stock.quote"]
-    assert quote["args"]["optional"] == [
-        "filter",
-        "codes(array<string>)",
-        "names(array<string>)",
-        "order",
-        "limit(-1 or positive integer; -1 means all matching rows within the safety ceiling)",
-        "mode(0|1|2; default 0)",
-        "period(1|3|5|10|15|30|60; mode=1 only)",
-        "count(mode=0: 1..5000 rows per code; mode=1: 1..1000 bars per code)",
-    ]
-    assert quote["call"].startswith("{result_name} = stock.quote(")
-    assert "只能从 stock.quote.fields" in quote["output_rule"]
+    quote = methods["stock.quote.query"]
+    assert {arg.split("(", 1)[0] for arg in quote["args"]["optional"]} == {
+        "filter", "codes", "names", "order", "limit", "mode", "period", "count",
+    }
+    assert quote["call"].startswith("{result_name} = stock.quote.query(")
+    assert quote["output_rule"]
+    assert quote["rules"] and quote["examples"]
 
     kday = methods["stock.quote.kd_<field>_<method>"]
     assert kday["available_names"]["field_methods"]["close"] == [
@@ -1627,9 +1758,9 @@ def test_coding_subject_asset_expands_method_contracts(tmp_path: Path) -> None:
         )
     )
     margin_methods = {method["name"]: method for method in margin["methods"]}
-    assert "历史明细" in "".join(margin_methods["stock.margin"]["guidance"])
-    assert "K 日窗口" in "".join(
-        margin_methods["stock.margin.kd_<field>_<method>"]["guidance"]
+    assert "start/end" in "".join(margin_methods["stock.margin.query"]["rules"])
+    assert "window_count" in "".join(
+        margin_methods["stock.margin.kd_<field>_<method>"]["rules"]
     )
 
     api_index = json.loads(
@@ -1655,9 +1786,8 @@ def test_coding_subject_asset_expands_method_contracts(tmp_path: Path) -> None:
             "api_catalog/subjects/plate/basic_info.json",
         ).read_text(encoding="utf-8")
     )
-    assert any(
-        "plate_name = 名称" in rule for rule in plate["subject_guidance"]
-    )
+    assert "板块名称" in plate["fields"]["plate_name"]
+    assert "板块代码" in plate["fields"]["plate_code"]
 
 
 def test_context_bundle_default_catalog_is_independent_of_process_cwd(
@@ -1801,3 +1931,39 @@ def test_runtime_exposes_objective_info_and_debug_logs(tmp_path: Path) -> None:
     assert result["ok"] is True
     logs = result["meta"]["execution_logs"]
     assert [item["level"] for item in logs] == ["info", "debug"]
+
+
+@pytest.mark.parametrize("error, expected", [
+    (ValueError("unused finance query bindings: stock_codes"), "unused finance query bindings: stock_codes"),
+    (RuntimeError("private provider details"), "finance API execution failed"),
+])
+def test_finance_bridge_keeps_actionable_protocol_feedback(tmp_path: Path, error, expected):
+    class FailingFinance:
+        def execute_request(self, **kwargs):
+            raise error
+    runtime = CustomToolRuntimeService(
+        python_runtime=PythonExecutionRuntime(allow_unsafe_backends=True),
+        runtime_root=str(tmp_path / "runtime"), finance_runtime=FailingFinance(),
+    )
+    bundle = {"manifest": {"tool_name": "ct_binding_failure", "runtime": {"kind": "python_sandbox", "backend": "local_dev", "timeout_ms": 2000}},
+              "code": "from custom_tool_sdk import finance_query\ndef run(inputs):\n    result = finance_query(request='q = stock.quote.query(mode = 0) -> code', bindings={'stock_codes': ['600519.SH']})\n    return {'ok': result['ok'], 'error': result['error'], 'key_process_info': {}}\n"}
+    result = runtime._run_loaded_bundle(bundle=bundle, arguments={})
+    assert result["data"]["ok"] is False
+    assert result["data"]["error"] == expected
+    assert result["meta"]["diagnostics"]["finance_bridge_errors"] == [expected]
+
+
+def test_filter_only_finance_method_uses_a_whole_argument_binding():
+    from src.services.finance_data_tool_runtime_service import FinanceDataToolRuntimeService
+    from src.experiments.staged_data_protocol.phase2.call_parser import parse_api_call
+    from src.experiments.staged_data_protocol.phase2.call_validator import validate_call
+    expression = "code in ['600519.SH', '000858.SZ'] and source == 'dividend'"
+    request = "dividends = stock.corporate_action.query(filter = $selection_filter) -> code, ex_date, div_cash_pre_tax"
+    bound = FinanceDataToolRuntimeService._bind_call(parse_api_call(request), {"selection_filter": expression})
+    assert bound.args["filter"] == expression
+    assert validate_call(bound, {}).ok is True
+    with pytest.raises(ValueError, match="unused finance query bindings"):
+        FinanceDataToolRuntimeService._bind_call(
+            parse_api_call('dividends = stock.corporate_action.query(filter = "code in $stock_codes") -> code'),
+            {"stock_codes": ["600519.SH"]},
+        )

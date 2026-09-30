@@ -1,0 +1,38 @@
+{
+  "tool_name": "stock_kline_visual_analysis",
+  "purpose": "取得同源已完成日线并绘图，独立视觉模型读取K线、均线和成交量；可选数值形态扫描、语义筛选与最多3个局部视觉复核。返回计算事实、图像解读和证据，不另写最终研究报告。",
+  "best_for": [
+    "独立看近期日K",
+    "个股研究中的量价背景",
+    "形态的独立视觉复核"
+  ],
+  "input_guidance": {
+    "required_fields": [
+      "code"
+    ],
+    "optional_fields": [
+      "question",
+      "as_of",
+      "window",
+      "review_patterns"
+    ],
+    "notes": [
+      "日线股票场景；无须先重复查询同一份K线或扫描。沿用已确定证券、截止日和问题，主Agent负责综合。",
+      "视觉模型独立于聊天主模型，需服务端配置LLM_VISION_MODEL；不接受本机文件路径或任意图片URL。",
+      "精确价位以计算事实为准；图像典型性不等于数值定义、预测胜率或投资结论。"
+    ]
+  },
+  "output_guidance": {
+    "high_value_for_reasoning": [
+      "data",
+      "provider_evidence"
+    ],
+    "high_value_for_render": [
+      "charts"
+    ],
+    "usually_too_large_for_prompt": [
+      "charts",
+      "llm_calls"
+    ]
+  }
+}

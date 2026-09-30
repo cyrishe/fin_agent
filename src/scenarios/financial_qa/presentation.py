@@ -5,6 +5,8 @@ import re
 from copy import deepcopy
 from typing import Any, Mapping, Sequence
 
+from src.scenarios.financial_qa.report import build_report
+
 from src.services.finance_data_tool_catalog_service import (
     FinanceDataToolCatalogService,
 )
@@ -112,7 +114,10 @@ class FinancialQaPresentationService:
         evidence_blocks = self._merge_compatible_metric_blocks(evidence_blocks)
         # Analysis tables can contain comparisons/derived conclusions absent
         # from raw evidence. Preserve the answer; the UI folds reference tables.
-        return [self._narrative_block(str(message or "")), *evidence_blocks]
+        text, report = build_report(str(message or ""), result_refs or [])
+        answer = self._narrative_block(text)
+        answer["payload"]["report"] = report
+        return [answer, *evidence_blocks]
 
     def _merge_compatible_metric_blocks(
         self,
@@ -195,6 +200,19 @@ class FinancialQaPresentationService:
         index: int,
         thread_id: int | None = None,
     ) -> list[dict[str, Any]]:
+        charts = result_ref.get("charts")
+        if isinstance(charts, list) and charts:
+            evidence = result_ref.get("provider_evidence") or {}
+            resources = [{"resource_id": chart.get("sha256"),
+                "title": "基础走势" if chart.get("name") == "current.png" else "形态局部复核",
+                "uri": chart.get("url"), "mime_type": "image/png",
+                "relation": "本轮生成的同源行情图像"}
+                for chart in charts if isinstance(chart, Mapping)]
+            return [{"block_id": f"financial_qa_visual_{index}", "block_type": "resource",
+                "kind": "resource", "semantic": "finance.kline_visual", "mode": "replace",
+                "title": f"{evidence.get('code', '')} K线看图证据",
+                "payload": {"resources": resources},
+                "domain_context": {"source": "同源日线图像", "as_of": evidence.get("data_as_of")}}]
         if _trim(result_ref.get("semantic")) == "finance.backtest":
             backtest_blocks = self._backtest_blocks(result_ref, index=index)
             if backtest_blocks:

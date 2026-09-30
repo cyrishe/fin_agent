@@ -69,7 +69,9 @@ def test_public_health_catalog_and_data_map() -> None:
         catalog = client.get("/data-map/catalog.json")
         assert catalog.status_code == 200
         assert catalog.json()["subject_count"] == 7
-        assert catalog.json()["dataview_count"] == 31
+        views = [view for subject in catalog.json()["subjects"] for view in subject["dataviews"]]
+        assert catalog.json()["dataview_count"] == len(views)
+        assert {"technical", "technical_series"} <= {view["name"] for view in views}
         for subject in catalog.json()["subjects"]:
             for view in subject["dataviews"]:
                 assert len(view["fields"]) == view["field_count"]

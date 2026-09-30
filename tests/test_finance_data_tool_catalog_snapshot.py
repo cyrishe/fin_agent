@@ -441,7 +441,7 @@ def test_production_catalog_is_the_runtime_source_and_examples_are_operation_exa
                 if operation not in {"query", "compute"}:
                     assert "computed" not in projection
 
-    assert operation_count == 47
+    assert operation_count == 55
 
 
 def test_operation_projection_does_not_mix_sibling_execution_guidance() -> None:
