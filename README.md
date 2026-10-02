@@ -69,3 +69,5 @@ MCP Streamable HTTP 入口为 `/mcp`。部署和调用说明见
 迁移来源和边界见 [MIGRATION.md](MIGRATION.md)。
 定时任务建表、API 与 worker 启动方式见 [docs/scheduled_task_runtime.md](docs/scheduled_task_runtime.md)。
 公开主页、手机号唯一账户、阿里云短信持有权验证、可选实名增强与建表方式见 [docs/phone_account_auth.md](docs/phone_account_auth.md)。
+
+股票 AutoML 独立研究任务（训练、时间/公司留出、回测、LLM评审）见 [docs/stock_automl.md](docs/stock_automl.md)，可从 `python scripts/run_stock_automl.py --demo --max-trials 6` 开始。

@@ -1,0 +1,14 @@
+{
+  "test_command": "python -m pytest -q tests/automl tests/test_backtest_core.py --disable-warnings",
+  "result": "52 passed in 22.12s",
+  "checks": [
+    "compileall passed",
+    "git diff --check passed"
+  ],
+  "live_run": "20261002T174618Z_584fcb51",
+  "git_commit": "d4b354bbe8f7f623f4c67e086f64b18cb04554a1",
+  "implementation_sha256": "db3ff25caa6e0592e678fbc7ce3364925c7623062808564883e01d0c71f6516e",
+  "panel_sha256": "8b839c896b99208c3e2c5b2cddfe6870c47a5ad8a631fe5ebaa2fcc5440ad097",
+  "live_result": "12/12 trials completed; both LLM planning rounds and final review completed; development constraints NOT met",
+  "scope": "Local targeted regression and read-only live smoke; repeated development smoke windows are not independent investment evidence. Full repository suite and production runtime not assessed."
+}

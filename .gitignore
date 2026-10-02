@@ -251,3 +251,6 @@ data/runtime_file_artifacts/
 data/stock_indicator_artifacts/
 data/session_variables/
 data/capability_embeddings*.json
+
+# Optional isolated stock AutoML research environment
+.venv-automl/
