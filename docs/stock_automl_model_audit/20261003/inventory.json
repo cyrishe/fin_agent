@@ -1,0 +1,340 @@
+{
+  "generated_at": "2026-10-03T08:26:32.901071+00:00",
+  "read_only_audit": true,
+  "retrained": false,
+  "network_used": false,
+  "notes": [
+    "Only real KingdomAI research runs are included; synthetic program tests are excluded.",
+    "Each run persists only the selected final estimator; other candidates retain configuration and evaluation metrics.",
+    "Repeated runs share historical data and are not independent new blind validation.",
+    "Null training_counts means the historical artifact predates stored training counts.",
+    "The selected_candidate depth setting is not used by linear or histogram gradient boosting estimators; actual winner complexity comes from the saved estimator."
+  ],
+  "runs": [
+    {
+      "run_id": "20261002T173655Z_fb3cc160",
+      "source": "kingdomai",
+      "created_at": "2026-10-02T17:36:55.935889+00:00",
+      "date_range": {
+        "start": "2024-01-01",
+        "end": "2025-12-31"
+      },
+      "companies": 10,
+      "panel_rows": 4850,
+      "sessions": 485,
+      "successful_candidate_count": 12,
+      "failed_candidate_count": 0,
+      "candidate_types": {
+        "hist_gradient_boosting:classification": 4,
+        "svm:classification": 1,
+        "forest:regression": 2,
+        "linear:classification": 1,
+        "linear:regression": 1,
+        "tree:regression": 1,
+        "forest:classification": 1,
+        "elastic_net:classification": 1
+      },
+      "selected_candidate": {
+        "horizon": 1,
+        "task": "classification",
+        "model": "hist_gradient_boosting",
+        "sampler": "liquid",
+        "features": "enriched",
+        "depth": 6,
+        "strength": 3.0,
+        "id": "87b3e089d1bb"
+      },
+      "winner_complexity": {
+        "estimator": "HistGradientBoostingClassifier",
+        "raw_feature_count": 16,
+        "transformed_feature_count": 22,
+        "trees": {
+          "count": 80,
+          "nodes": 2320,
+          "leaves": 1200,
+          "max_depth": 14,
+          "min_depth": 5
+        },
+        "regularization_and_tree_limits": {
+          "max_iter": 80,
+          "learning_rate": 0.1,
+          "max_depth": null,
+          "max_leaf_nodes": 15,
+          "min_samples_leaf": 20,
+          "l2_regularization": 0.3333333333333333
+        },
+        "probability_calibration": {
+          "estimator": "LogisticRegression",
+          "slope": -0.015100099601755148,
+          "intercept": 0.034194174345306826
+        }
+      },
+      "training_counts": null,
+      "development_constraints_met": false,
+      "development_constraint_checks": {},
+      "all_candidate_estimators_persisted": false,
+      "hashes": {
+        "run_git_commit": "d4b354bbe8f7f623f4c67e086f64b18cb04554a1",
+        "implementation_sha256": "088df820835db9754159ecd6aae0cda1993457895967b81976c45b5006de13ac",
+        "panel_sha256": "8b839c896b99208c3e2c5b2cddfe6870c47a5ad8a631fe5ebaa2fcc5440ad097",
+        "model_sha256": "3d11701ec2c4947d8f1a9472d1ed307f76fa641c321a593f86db35e70076d596"
+      }
+    },
+    {
+      "run_id": "20261002T174351Z_8ee73a17",
+      "source": "kingdomai",
+      "created_at": "2026-10-02T17:43:52.413620+00:00",
+      "date_range": {
+        "start": "2024-01-01",
+        "end": "2025-12-31"
+      },
+      "companies": 10,
+      "panel_rows": 4850,
+      "sessions": 485,
+      "successful_candidate_count": 12,
+      "failed_candidate_count": 0,
+      "candidate_types": {
+        "linear:regression": 1,
+        "tree:regression": 1,
+        "forest:regression": 2,
+        "linear:classification": 4,
+        "hist_gradient_boosting:classification": 3,
+        "hist_gradient_boosting:regression": 1
+      },
+      "selected_candidate": {
+        "horizon": 1,
+        "task": "classification",
+        "model": "linear",
+        "sampler": "all",
+        "features": "enriched",
+        "depth": 3,
+        "strength": 0.3,
+        "id": "b19c1298e839"
+      },
+      "winner_complexity": {
+        "estimator": "LogisticRegression",
+        "raw_feature_count": 16,
+        "transformed_feature_count": 22,
+        "nonzero_coefficient_count": 22,
+        "regularization_and_tree_limits": {
+          "C": 0.3,
+          "penalty": "l2",
+          "max_iter": 1000
+        },
+        "probability_calibration": {
+          "estimator": "LogisticRegression",
+          "slope": 0.1288025194987167,
+          "intercept": 0.03858060030302304
+        }
+      },
+      "training_counts": null,
+      "development_constraints_met": false,
+      "development_constraint_checks": {},
+      "all_candidate_estimators_persisted": false,
+      "hashes": {
+        "run_git_commit": "d4b354bbe8f7f623f4c67e086f64b18cb04554a1",
+        "implementation_sha256": "6fffc06bcb9e29003167fe5c802d8031eb3d37466614caa23d21b1abebace6ee",
+        "panel_sha256": "8b839c896b99208c3e2c5b2cddfe6870c47a5ad8a631fe5ebaa2fcc5440ad097",
+        "model_sha256": "9ece32a269f4e80dca973f69547ae7183e933588a7c4b8916ff8f74ec9e2196d"
+      }
+    },
+    {
+      "run_id": "20261002T174618Z_584fcb51",
+      "source": "kingdomai",
+      "created_at": "2026-10-02T17:46:18.623582+00:00",
+      "date_range": {
+        "start": "2024-01-01",
+        "end": "2025-12-31"
+      },
+      "companies": 10,
+      "panel_rows": 4850,
+      "sessions": 485,
+      "successful_candidate_count": 12,
+      "failed_candidate_count": 0,
+      "candidate_types": {
+        "hist_gradient_boosting:classification": 3,
+        "elastic_net:regression": 1,
+        "forest:regression": 2,
+        "linear:classification": 3,
+        "tree:regression": 1,
+        "svm:classification": 1,
+        "forest:classification": 1
+      },
+      "selected_candidate": {
+        "horizon": 7,
+        "task": "classification",
+        "model": "linear",
+        "sampler": "all",
+        "features": "enriched",
+        "depth": 6,
+        "strength": 3.0,
+        "id": "fddc822e3a0e"
+      },
+      "winner_complexity": {
+        "estimator": "LogisticRegression",
+        "raw_feature_count": 16,
+        "transformed_feature_count": 22,
+        "nonzero_coefficient_count": 22,
+        "regularization_and_tree_limits": {
+          "C": 3.0,
+          "penalty": "l2",
+          "max_iter": 1000
+        },
+        "probability_calibration": {
+          "estimator": "LogisticRegression",
+          "slope": 1.1177479031819137,
+          "intercept": 0.27563480364632714
+        }
+      },
+      "training_counts": null,
+      "development_constraints_met": false,
+      "development_constraint_checks": {
+        "enough_signals": true,
+        "each_fold_win_rate": false,
+        "drawdown_within_limit": true,
+        "each_fold_beats_constant": false
+      },
+      "all_candidate_estimators_persisted": false,
+      "hashes": {
+        "run_git_commit": "d4b354bbe8f7f623f4c67e086f64b18cb04554a1",
+        "implementation_sha256": "db3ff25caa6e0592e678fbc7ce3364925c7623062808564883e01d0c71f6516e",
+        "panel_sha256": "8b839c896b99208c3e2c5b2cddfe6870c47a5ad8a631fe5ebaa2fcc5440ad097",
+        "model_sha256": "7d3c8029597d8706f46ab7adeafa1c7ef003ca7b2351eb8c65dd16e50c303164"
+      }
+    },
+    {
+      "run_id": "20261003T042157Z_4609ceb6",
+      "source": "kingdomai",
+      "created_at": "2026-10-03T04:21:57.105493+00:00",
+      "date_range": {
+        "start": "2024-01-01",
+        "end": "2025-12-31"
+      },
+      "companies": 16,
+      "panel_rows": 7760,
+      "sessions": 485,
+      "successful_candidate_count": 8,
+      "failed_candidate_count": 0,
+      "candidate_types": {
+        "linear:classification": 2,
+        "tree:classification": 2,
+        "linear:regression": 3,
+        "tree:regression": 1
+      },
+      "selected_candidate": {
+        "horizon": 1,
+        "task": "classification",
+        "model": "linear",
+        "sampler": "all",
+        "features": "enriched",
+        "depth": 3,
+        "strength": 0.3,
+        "id": "b19c1298e839"
+      },
+      "winner_complexity": {
+        "estimator": "LogisticRegression",
+        "raw_feature_count": 16,
+        "transformed_feature_count": 25,
+        "nonzero_coefficient_count": 25,
+        "regularization_and_tree_limits": {
+          "C": 0.3,
+          "penalty": "l2",
+          "max_iter": 1000
+        },
+        "probability_calibration": {
+          "estimator": "LogisticRegression",
+          "slope": 0.41066858224464065,
+          "intercept": -0.036459374827488664
+        }
+      },
+      "training_counts": {
+        "input_rows": 4757,
+        "fit_rows": 3536,
+        "calibration_rows": 1195,
+        "purged_rows": 26,
+        "budget_sampled_out_rows": 0
+      },
+      "development_constraints_met": false,
+      "development_constraint_checks": {
+        "enough_signals": false,
+        "each_fold_win_rate": false,
+        "drawdown_within_limit": true,
+        "each_fold_beats_constant": false
+      },
+      "all_candidate_estimators_persisted": false,
+      "hashes": {
+        "run_git_commit": "ac1d53e321b75c01bc0a52d1016278388d7a5b21",
+        "implementation_sha256": "c7c728fabf839881f455bb01b122a79ada655ed0c833a3c10b5ff3350e678d8e",
+        "panel_sha256": "b955063c16cbc91b75457d21a5e9b27cb6aeb33c214998ed6a04b5ec6bbc8945",
+        "model_sha256": "3d302bd0e50505a05c2bb89603be27d3150412e84c00d3f6ec179b502fc0d2da"
+      }
+    },
+    {
+      "run_id": "20261003T042758Z_5370a71f",
+      "source": "kingdomai",
+      "created_at": "2026-10-03T04:27:58.593868+00:00",
+      "date_range": {
+        "start": "2024-01-01",
+        "end": "2025-12-31"
+      },
+      "companies": 16,
+      "panel_rows": 7760,
+      "sessions": 485,
+      "successful_candidate_count": 8,
+      "failed_candidate_count": 0,
+      "candidate_types": {
+        "linear:classification": 2,
+        "tree:classification": 2,
+        "linear:regression": 2,
+        "tree:regression": 2
+      },
+      "selected_candidate": {
+        "horizon": 7,
+        "task": "classification",
+        "model": "linear",
+        "sampler": "all",
+        "features": "enriched",
+        "depth": 6,
+        "strength": 3.0,
+        "id": "fddc822e3a0e"
+      },
+      "winner_complexity": {
+        "estimator": "LogisticRegression",
+        "raw_feature_count": 16,
+        "transformed_feature_count": 25,
+        "nonzero_coefficient_count": 25,
+        "regularization_and_tree_limits": {
+          "C": 3.0,
+          "penalty": "l2",
+          "max_iter": 1000
+        },
+        "probability_calibration": {
+          "estimator": "LogisticRegression",
+          "slope": 0.5295143663666826,
+          "intercept": 0.291455531694192
+        }
+      },
+      "training_counts": {
+        "input_rows": 4679,
+        "fit_rows": 3406,
+        "calibration_rows": 1169,
+        "purged_rows": 104,
+        "budget_sampled_out_rows": 0
+      },
+      "development_constraints_met": false,
+      "development_constraint_checks": {
+        "enough_signals": true,
+        "each_fold_win_rate": true,
+        "drawdown_within_limit": true,
+        "each_fold_beats_constant": false
+      },
+      "all_candidate_estimators_persisted": false,
+      "hashes": {
+        "run_git_commit": "ac1d53e321b75c01bc0a52d1016278388d7a5b21",
+        "implementation_sha256": "56b2912fef7a635770fed9d4b5e142efa74544bcc7e72e8d735239e807bf02d6",
+        "panel_sha256": "b955063c16cbc91b75457d21a5e9b27cb6aeb33c214998ed6a04b5ec6bbc8945",
+        "model_sha256": "05385feffb1c249519f854fb7f62b60057d7f640079f7560ae10336002e80c8d"
+      }
+    }
+  ]
+}

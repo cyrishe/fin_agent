@@ -1,0 +1,2336 @@
+{
+  "created_at": "2026-10-03T08:27:22.395435+00:00",
+  "source_run_id": "20261003T042758Z_5370a71f",
+  "source_manifest_sha256": "8e9c722a569352344aa573922b8c259e28b936d6b7d7e15c544f24693f113484",
+  "source_panel_sha256": "b955063c16cbc91b75457d21a5e9b27cb6aeb33c214998ed6a04b5ec6bbc8945",
+  "git_commit": "e61b275ea207b50420a5c1f258df1b5e858654b7",
+  "script_sha256": "a5a835ec2f7bc8ea95506ca4d1e04a91549a79470fe1311627e9fb7d49c76b54",
+  "implementation_sha256": {
+    "quant_research/automl/config.py": "332c577e1a1c37a0a6ca1aa3f01311b41265d70ce1eccf803addad7a9a16affb",
+    "quant_research/automl/features.py": "62eaf52e16a30973daf0dcc99b749719afc4e3a5a772b4fce9819b60ad782c58",
+    "quant_research/automl/learning.py": "2aa25a5bef45058beefbcdd7c33dbce273af8abfc8d8e8e6fc589f76b3e28d37",
+    "quant_research/automl/evaluation.py": "aa5266830caa42debc123ca16600a59630f625763267e9176af413c59954e2a5",
+    "backtest/__init__.py": "ff16ffc2f3c213293238e1bc77bde831382d7d0638d06b86d00d4eb11793d3d2",
+    "backtest/contracts.py": "1c29cc3ae9bb3d1538f0575114e6f1736eb62feb88002f8e08e450f1c92d763a",
+    "backtest/data.py": "8414f0b964df479782f58121c2920d2c41837b6cc60ef91790fbb123814f5b0a",
+    "backtest/engine.py": "5134d57a90016b2fbdb9f777102c3cab7a7572c196519c02a4aa283e8cf3aee3",
+    "backtest/execution.py": "e17fc0a57d08507baef8923a4a1206896d11932c5b2c5cf880344ef69b32330f",
+    "backtest/metrics.py": "e6f187498f7f7c0ef5b000e12f14742398ef6064d854f5fa124ad48ee373ca28",
+    "backtest/strategy.py": "c4be2ce816016534237faab06d74fb5155d3ac8c88650d4c9a3fbd0492031541"
+  },
+  "environment": {
+    "python": "3.13.5",
+    "pandas": "2.3.2",
+    "sklearn": "1.7.1"
+  },
+  "scope": {
+    "development_companies": 13,
+    "development_panel_rows": 5044,
+    "last_bar": "2025-08-08T00:00:00",
+    "holdout_starts": "2025-08-11T00:00:00",
+    "holdout_evaluations_read": false,
+    "original_model_modified": false,
+    "historical_trees_reconstructed": true,
+    "alpha_source": "first fold base-fit partition only, fixed across both folds",
+    "selected_replacement": null
+  },
+  "candidates": [
+    {
+      "candidate": {
+        "horizon": 3,
+        "task": "classification",
+        "model": "tree",
+        "sampler": "all",
+        "features": "enriched",
+        "depth": 6,
+        "strength": 3.0,
+        "id": "3aeb6f43b13d"
+      },
+      "columns": [
+        "return_1",
+        "return_3",
+        "return_7",
+        "return_20",
+        "volatility_20",
+        "range_ratio",
+        "open_gap",
+        "ma_distance",
+        "volume_ratio",
+        "amount_log",
+        "turn_ratio",
+        "total_mv",
+        "pe_ttm",
+        "pb_mrq",
+        "industry",
+        "news_count_7d"
+      ],
+      "alpha_grid": [
+        0.0,
+        0.0003130590339892668,
+        0.0020468992373583322,
+        0.005317094105004083,
+        0.013183652476649654
+      ],
+      "historical_reproduction": [
+        {
+          "fold": 1,
+          "matches": true,
+          "differences": []
+        },
+        {
+          "fold": 2,
+          "matches": true,
+          "differences": []
+        }
+      ],
+      "variants": [
+        {
+          "alpha": 0.0,
+          "folds": [
+            {
+              "train_end": "2024-11-05T00:00:00",
+              "validation_start": "2024-11-06T00:00:00",
+              "validation_end": "2025-03-21T00:00:00",
+              "training": {
+                "input_rows": 2314,
+                "fit_rows": 1677,
+                "calibration_rows": 585,
+                "purged_rows": 52,
+                "budget_sampled_out_rows": 0
+              },
+              "validation_rows": 1131,
+              "prediction": {
+                "rows": 1131,
+                "companies": 13,
+                "signal_count": 9,
+                "signal_win_rate_after_cost": 0.5555555555555556,
+                "mean_signal_net_return": 0.0013615998015076825,
+                "brier": 0.25233996161390754,
+                "baseline_brier": 0.2503547859879968,
+                "roc_auc": 0.5051816225952518,
+                "skill_vs_constant": -0.007929449473380146
+              },
+              "portfolio": {
+                "total_return": 0.050604213166943746,
+                "annualized_return": 0.14823184304405546,
+                "annualized_volatility": 0.12785220436658587,
+                "sharpe_ratio": 1.1427646614793747,
+                "max_drawdown": -0.030886823693039744,
+                "turnover_ratio": 3.868748313172542,
+                "trade_count": 6,
+                "total_commission": "1190.52833470459262765565849",
+                "total_tax": "1005.30695770199813310823755",
+                "total_slippage_cost": "3968.4845508816523242781"
+              },
+              "tree": {
+                "depth": 6,
+                "leaves": 24,
+                "nodes": 47,
+                "ccp_alpha": 0.0,
+                "max_depth_parameter": 6,
+                "min_samples_leaf": 20,
+                "calibration": {
+                  "coefficient_on_raw_log_odds": 0.0956128385562268,
+                  "intercept": 0.17938759653276004
+                }
+              }
+            },
+            {
+              "train_end": "2025-03-21T00:00:00",
+              "validation_start": "2025-03-24T00:00:00",
+              "validation_end": "2025-08-08T00:00:00",
+              "training": {
+                "input_rows": 3497,
+                "fit_rows": 2561,
+                "calibration_rows": 884,
+                "purged_rows": 52,
+                "budget_sampled_out_rows": 0
+              },
+              "validation_rows": 1182,
+              "prediction": {
+                "rows": 1182,
+                "companies": 13,
+                "signal_count": 0,
+                "signal_win_rate_after_cost": null,
+                "mean_signal_net_return": null,
+                "brier": 0.25043973254494556,
+                "baseline_brier": 0.25032500288436854,
+                "roc_auc": 0.44431774228207155,
+                "skill_vs_constant": -0.0004583228173575815
+              },
+              "portfolio": {
+                "total_return": 0.0,
+                "annualized_return": 0.0,
+                "annualized_volatility": 0.0,
+                "sharpe_ratio": null,
+                "max_drawdown": 0.0,
+                "turnover_ratio": 0.0,
+                "trade_count": 0,
+                "total_commission": "0",
+                "total_tax": "0",
+                "total_slippage_cost": "0"
+              },
+              "tree": {
+                "depth": 6,
+                "leaves": 20,
+                "nodes": 39,
+                "ccp_alpha": 0.0,
+                "max_depth_parameter": 6,
+                "min_samples_leaf": 20,
+                "calibration": {
+                  "coefficient_on_raw_log_odds": -0.002792878632998529,
+                  "intercept": -0.03130500486579331
+                }
+              }
+            }
+          ],
+          "score": -0.007929449473380146,
+          "constraint_checks": {
+            "enough_signals": false,
+            "each_fold_win_rate": false,
+            "drawdown_within_limit": true,
+            "each_fold_beats_constant": false
+          },
+          "meets_constraints": false
+        },
+        {
+          "alpha": 0.0003130590339892668,
+          "folds": [
+            {
+              "train_end": "2024-11-05T00:00:00",
+              "validation_start": "2024-11-06T00:00:00",
+              "validation_end": "2025-03-21T00:00:00",
+              "training": {
+                "input_rows": 2314,
+                "fit_rows": 1677,
+                "calibration_rows": 585,
+                "purged_rows": 52,
+                "budget_sampled_out_rows": 0
+              },
+              "validation_rows": 1131,
+              "prediction": {
+                "rows": 1131,
+                "companies": 13,
+                "signal_count": 61,
+                "signal_win_rate_after_cost": 0.4262295081967213,
+                "mean_signal_net_return": -0.017830231063027436,
+                "brier": 0.2524241760765802,
+                "baseline_brier": 0.2503547859879968,
+                "roc_auc": 0.5051816225952518,
+                "skill_vs_constant": -0.008265829951749293
+              },
+              "portfolio": {
+                "total_return": -0.3204599571245207,
+                "annualized_return": -0.6609980868819489,
+                "annualized_volatility": 0.3819952228993561,
+                "sharpe_ratio": -2.6357934339737783,
+                "max_drawdown": -0.3978014028089366,
+                "turnover_ratio": 19.268422718085873,
+                "trade_count": 32,
+                "total_commission": "4755.34673496215607469685223",
+                "total_tax": "3884.83400170483331700736305",
+                "total_slippage_cost": "15850.8598142906133526219"
+              },
+              "tree": {
+                "depth": 6,
+                "leaves": 23,
+                "nodes": 45,
+                "ccp_alpha": 0.0003130590339892668,
+                "max_depth_parameter": 6,
+                "min_samples_leaf": 20,
+                "calibration": {
+                  "coefficient_on_raw_log_odds": 0.0976227508389787,
+                  "intercept": 0.1870933794972039
+                }
+              }
+            },
+            {
+              "train_end": "2025-03-21T00:00:00",
+              "validation_start": "2025-03-24T00:00:00",
+              "validation_end": "2025-08-08T00:00:00",
+              "training": {
+                "input_rows": 3497,
+                "fit_rows": 2561,
+                "calibration_rows": 884,
+                "purged_rows": 52,
+                "budget_sampled_out_rows": 0
+              },
+              "validation_rows": 1182,
+              "prediction": {
+                "rows": 1182,
+                "companies": 13,
+                "signal_count": 0,
+                "signal_win_rate_after_cost": null,
+                "mean_signal_net_return": null,
+                "brier": 0.2500688905129539,
+                "baseline_brier": 0.25032500288436854,
+                "roc_auc": 0.5555934388654107,
+                "skill_vs_constant": 0.0010231194186102188
+              },
+              "portfolio": {
+                "total_return": 0.0,
+                "annualized_return": 0.0,
+                "annualized_volatility": 0.0,
+                "sharpe_ratio": null,
+                "max_drawdown": 0.0,
+                "turnover_ratio": 0.0,
+                "trade_count": 0,
+                "total_commission": "0",
+                "total_tax": "0",
+                "total_slippage_cost": "0"
+              },
+              "tree": {
+                "depth": 6,
+                "leaves": 19,
+                "nodes": 37,
+                "ccp_alpha": 0.0003130590339892668,
+                "max_depth_parameter": 6,
+                "min_samples_leaf": 20,
+                "calibration": {
+                  "coefficient_on_raw_log_odds": 0.00449046658941395,
+                  "intercept": -0.032259380270525086
+                }
+              }
+            }
+          ],
+          "score": -0.008265829951749293,
+          "constraint_checks": {
+            "enough_signals": true,
+            "each_fold_win_rate": false,
+            "drawdown_within_limit": false,
+            "each_fold_beats_constant": false
+          },
+          "meets_constraints": false
+        },
+        {
+          "alpha": 0.0020468992373583322,
+          "folds": [
+            {
+              "train_end": "2024-11-05T00:00:00",
+              "validation_start": "2024-11-06T00:00:00",
+              "validation_end": "2025-03-21T00:00:00",
+              "training": {
+                "input_rows": 2314,
+                "fit_rows": 1677,
+                "calibration_rows": 585,
+                "purged_rows": 52,
+                "budget_sampled_out_rows": 0
+              },
+              "validation_rows": 1131,
+              "prediction": {
+                "rows": 1131,
+                "companies": 13,
+                "signal_count": 9,
+                "signal_win_rate_after_cost": 0.5555555555555556,
+                "mean_signal_net_return": 0.0013615998015076825,
+                "brier": 0.2526545909441083,
+                "baseline_brier": 0.2503547859879968,
+                "roc_auc": 0.5159341930803292,
+                "skill_vs_constant": -0.009186183307962503
+              },
+              "portfolio": {
+                "total_return": 0.050604213166943746,
+                "annualized_return": 0.14823184304405546,
+                "annualized_volatility": 0.12785220436658587,
+                "sharpe_ratio": 1.1427646614793747,
+                "max_drawdown": -0.030886823693039744,
+                "turnover_ratio": 3.868748313172542,
+                "trade_count": 6,
+                "total_commission": "1190.52833470459262765565849",
+                "total_tax": "1005.30695770199813310823755",
+                "total_slippage_cost": "3968.4845508816523242781"
+              },
+              "tree": {
+                "depth": 6,
+                "leaves": 17,
+                "nodes": 33,
+                "ccp_alpha": 0.0020468992373583322,
+                "max_depth_parameter": 6,
+                "min_samples_leaf": 20,
+                "calibration": {
+                  "coefficient_on_raw_log_odds": 0.08289490790200049,
+                  "intercept": 0.18998651866076838
+                }
+              }
+            },
+            {
+              "train_end": "2025-03-21T00:00:00",
+              "validation_start": "2025-03-24T00:00:00",
+              "validation_end": "2025-08-08T00:00:00",
+              "training": {
+                "input_rows": 3497,
+                "fit_rows": 2561,
+                "calibration_rows": 884,
+                "purged_rows": 52,
+                "budget_sampled_out_rows": 0
+              },
+              "validation_rows": 1182,
+              "prediction": {
+                "rows": 1182,
+                "companies": 13,
+                "signal_count": 0,
+                "signal_win_rate_after_cost": null,
+                "mean_signal_net_return": null,
+                "brier": 0.25045949126637473,
+                "baseline_brier": 0.25032500288436854,
+                "roc_auc": 0.44616144975288297,
+                "skill_vs_constant": -0.0005372550902089657
+              },
+              "portfolio": {
+                "total_return": 0.0,
+                "annualized_return": 0.0,
+                "annualized_volatility": 0.0,
+                "sharpe_ratio": null,
+                "max_drawdown": 0.0,
+                "turnover_ratio": 0.0,
+                "trade_count": 0,
+                "total_commission": "0",
+                "total_tax": "0",
+                "total_slippage_cost": "0"
+              },
+              "tree": {
+                "depth": 6,
+                "leaves": 9,
+                "nodes": 17,
+                "ccp_alpha": 0.0020468992373583322,
+                "max_depth_parameter": 6,
+                "min_samples_leaf": 20,
+                "calibration": {
+                  "coefficient_on_raw_log_odds": -0.01200599992816987,
+                  "intercept": -0.03236031366252924
+                }
+              }
+            }
+          ],
+          "score": -0.009186183307962503,
+          "constraint_checks": {
+            "enough_signals": false,
+            "each_fold_win_rate": false,
+            "drawdown_within_limit": true,
+            "each_fold_beats_constant": false
+          },
+          "meets_constraints": false
+        },
+        {
+          "alpha": 0.005317094105004083,
+          "folds": [
+            {
+              "train_end": "2024-11-05T00:00:00",
+              "validation_start": "2024-11-06T00:00:00",
+              "validation_end": "2025-03-21T00:00:00",
+              "training": {
+                "input_rows": 2314,
+                "fit_rows": 1677,
+                "calibration_rows": 585,
+                "purged_rows": 52,
+                "budget_sampled_out_rows": 0
+              },
+              "validation_rows": 1131,
+              "prediction": {
+                "rows": 1131,
+                "companies": 13,
+                "signal_count": 0,
+                "signal_win_rate_after_cost": null,
+                "mean_signal_net_return": null,
+                "brier": 0.2519989618971319,
+                "baseline_brier": 0.2503547859879968,
+                "roc_auc": 0.5090232782127937,
+                "skill_vs_constant": -0.0065673835738611075
+              },
+              "portfolio": {
+                "total_return": 0.0,
+                "annualized_return": 0.0,
+                "annualized_volatility": 0.0,
+                "sharpe_ratio": null,
+                "max_drawdown": 0.0,
+                "turnover_ratio": 0.0,
+                "trade_count": 0,
+                "total_commission": "0",
+                "total_tax": "0",
+                "total_slippage_cost": "0"
+              },
+              "tree": {
+                "depth": 6,
+                "leaves": 10,
+                "nodes": 19,
+                "ccp_alpha": 0.005317094105004083,
+                "max_depth_parameter": 6,
+                "min_samples_leaf": 20,
+                "calibration": {
+                  "coefficient_on_raw_log_odds": 0.05040344600571773,
+                  "intercept": 0.1803750277801505
+                }
+              }
+            },
+            {
+              "train_end": "2025-03-21T00:00:00",
+              "validation_start": "2025-03-24T00:00:00",
+              "validation_end": "2025-08-08T00:00:00",
+              "training": {
+                "input_rows": 3497,
+                "fit_rows": 2561,
+                "calibration_rows": 884,
+                "purged_rows": 52,
+                "budget_sampled_out_rows": 0
+              },
+              "validation_rows": 1182,
+              "prediction": {
+                "rows": 1182,
+                "companies": 13,
+                "signal_count": 0,
+                "signal_win_rate_after_cost": null,
+                "mean_signal_net_return": null,
+                "brier": 0.25071821832910063,
+                "baseline_brier": 0.25032500288436854,
+                "roc_auc": 0.46384356421459777,
+                "skill_vs_constant": -0.001570819695201342
+              },
+              "portfolio": {
+                "total_return": 0.0,
+                "annualized_return": 0.0,
+                "annualized_volatility": 0.0,
+                "sharpe_ratio": null,
+                "max_drawdown": 0.0,
+                "turnover_ratio": 0.0,
+                "trade_count": 0,
+                "total_commission": "0",
+                "total_tax": "0",
+                "total_slippage_cost": "0"
+              },
+              "tree": {
+                "depth": 4,
+                "leaves": 5,
+                "nodes": 9,
+                "ccp_alpha": 0.005317094105004083,
+                "max_depth_parameter": 6,
+                "min_samples_leaf": 20,
+                "calibration": {
+                  "coefficient_on_raw_log_odds": -0.039990185663384276,
+                  "intercept": -0.0359725869772397
+                }
+              }
+            }
+          ],
+          "score": -0.0065673835738611075,
+          "constraint_checks": {
+            "enough_signals": false,
+            "each_fold_win_rate": false,
+            "drawdown_within_limit": true,
+            "each_fold_beats_constant": false
+          },
+          "meets_constraints": false
+        },
+        {
+          "alpha": 0.013183652476649654,
+          "folds": [
+            {
+              "train_end": "2024-11-05T00:00:00",
+              "validation_start": "2024-11-06T00:00:00",
+              "validation_end": "2025-03-21T00:00:00",
+              "training": {
+                "input_rows": 2314,
+                "fit_rows": 1677,
+                "calibration_rows": 585,
+                "purged_rows": 52,
+                "budget_sampled_out_rows": 0
+              },
+              "validation_rows": 1131,
+              "prediction": {
+                "rows": 1131,
+                "companies": 13,
+                "signal_count": 0,
+                "signal_win_rate_after_cost": null,
+                "mean_signal_net_return": null,
+                "brier": 0.2519383052601236,
+                "baseline_brier": 0.2503547859879968,
+                "roc_auc": 0.5,
+                "skill_vs_constant": -0.006325100859876143
+              },
+              "portfolio": {
+                "total_return": 0.0,
+                "annualized_return": 0.0,
+                "annualized_volatility": 0.0,
+                "sharpe_ratio": null,
+                "max_drawdown": 0.0,
+                "turnover_ratio": 0.0,
+                "trade_count": 0,
+                "total_commission": "0",
+                "total_tax": "0",
+                "total_slippage_cost": "0"
+              },
+              "tree": {
+                "depth": 0,
+                "leaves": 1,
+                "nodes": 1,
+                "ccp_alpha": 0.013183652476649654,
+                "max_depth_parameter": 6,
+                "min_samples_leaf": 20,
+                "calibration": {
+                  "coefficient_on_raw_log_odds": -0.023238625235271676,
+                  "intercept": 0.1645744277597677
+                }
+              }
+            },
+            {
+              "train_end": "2025-03-21T00:00:00",
+              "validation_start": "2025-03-24T00:00:00",
+              "validation_end": "2025-08-08T00:00:00",
+              "training": {
+                "input_rows": 3497,
+                "fit_rows": 2561,
+                "calibration_rows": 884,
+                "purged_rows": 52,
+                "budget_sampled_out_rows": 0
+              },
+              "validation_rows": 1182,
+              "prediction": {
+                "rows": 1182,
+                "companies": 13,
+                "signal_count": 0,
+                "signal_win_rate_after_cost": null,
+                "mean_signal_net_return": null,
+                "brier": 0.25027707332484045,
+                "baseline_brier": 0.25032500288436854,
+                "roc_auc": 0.5,
+                "skill_vs_constant": 0.0001914693257797362
+              },
+              "portfolio": {
+                "total_return": 0.0,
+                "annualized_return": 0.0,
+                "annualized_volatility": 0.0,
+                "sharpe_ratio": null,
+                "max_drawdown": 0.0,
+                "turnover_ratio": 0.0,
+                "trade_count": 0,
+                "total_commission": "0",
+                "total_tax": "0",
+                "total_slippage_cost": "0"
+              },
+              "tree": {
+                "depth": 0,
+                "leaves": 1,
+                "nodes": 1,
+                "ccp_alpha": 0.013183652476649654,
+                "max_depth_parameter": 6,
+                "min_samples_leaf": 20,
+                "calibration": {
+                  "coefficient_on_raw_log_odds": 0.001889952757133077,
+                  "intercept": -0.03156250438551102
+                }
+              }
+            }
+          ],
+          "score": -0.006325100859876143,
+          "constraint_checks": {
+            "enough_signals": false,
+            "each_fold_win_rate": false,
+            "drawdown_within_limit": true,
+            "each_fold_beats_constant": false
+          },
+          "meets_constraints": false
+        }
+      ],
+      "representative_rules": "rules_pruned_3aeb6f43b13d.json",
+      "baseline_rules": "rules_baseline_3aeb6f43b13d.json"
+    },
+    {
+      "candidate": {
+        "horizon": 1,
+        "task": "classification",
+        "model": "tree",
+        "sampler": "all",
+        "features": "technical",
+        "depth": 3,
+        "strength": 0.3,
+        "id": "752023b80aba"
+      },
+      "columns": [
+        "return_1",
+        "return_3",
+        "return_7",
+        "return_20",
+        "volatility_20",
+        "range_ratio",
+        "open_gap",
+        "ma_distance",
+        "volume_ratio",
+        "amount_log",
+        "turn_ratio"
+      ],
+      "alpha_grid": [
+        0.0,
+        0.0020202240885358047,
+        0.002684220798875467,
+        0.0034605064529373633,
+        0.006561871917648843
+      ],
+      "historical_reproduction": [
+        {
+          "fold": 1,
+          "matches": true,
+          "differences": []
+        },
+        {
+          "fold": 2,
+          "matches": true,
+          "differences": []
+        }
+      ],
+      "variants": [
+        {
+          "alpha": 0.0,
+          "folds": [
+            {
+              "train_end": "2024-11-06T00:00:00",
+              "validation_start": "2024-11-07T00:00:00",
+              "validation_end": "2025-03-24T00:00:00",
+              "training": {
+                "input_rows": 2353,
+                "fit_rows": 1729,
+                "calibration_rows": 598,
+                "purged_rows": 26,
+                "budget_sampled_out_rows": 0
+              },
+              "validation_rows": 1157,
+              "prediction": {
+                "rows": 1157,
+                "companies": 13,
+                "signal_count": 115,
+                "signal_win_rate_after_cost": 0.4434782608695652,
+                "mean_signal_net_return": -0.003905250751873291,
+                "brier": 0.2543620299734718,
+                "baseline_brier": 0.2500473736407687,
+                "roc_auc": 0.4942828281620771,
+                "skill_vs_constant": -0.017255355534754768
+              },
+              "portfolio": {
+                "total_return": -0.10377755464435912,
+                "annualized_return": -0.2641923719569633,
+                "annualized_volatility": 0.4593055012694038,
+                "sharpe_ratio": -0.44176054689469785,
+                "max_drawdown": -0.32160071677456115,
+                "turnover_ratio": 41.12556971884185,
+                "trade_count": 143,
+                "total_commission": "11123.19210974214374770031892",
+                "total_tax": "9248.47528630637547167724990",
+                "total_slippage_cost": "37077.2607038472680289968"
+              },
+              "tree": {
+                "depth": 3,
+                "leaves": 7,
+                "nodes": 13,
+                "ccp_alpha": 0.0,
+                "max_depth_parameter": 3,
+                "min_samples_leaf": 20,
+                "calibration": {
+                  "coefficient_on_raw_log_odds": 0.4130264567455222,
+                  "intercept": 0.20898583060342946
+                }
+              }
+            },
+            {
+              "train_end": "2025-03-24T00:00:00",
+              "validation_start": "2025-03-25T00:00:00",
+              "validation_end": "2025-08-08T00:00:00",
+              "training": {
+                "input_rows": 3536,
+                "fit_rows": 2626,
+                "calibration_rows": 884,
+                "purged_rows": 26,
+                "budget_sampled_out_rows": 0
+              },
+              "validation_rows": 1195,
+              "prediction": {
+                "rows": 1195,
+                "companies": 13,
+                "signal_count": 7,
+                "signal_win_rate_after_cost": 0.2857142857142857,
+                "mean_signal_net_return": -0.02578633661357238,
+                "brier": 0.2499049969498552,
+                "baseline_brier": 0.24970198318358458,
+                "roc_auc": 0.518,
+                "skill_vs_constant": -0.0008130242446708902
+              },
+              "portfolio": {
+                "total_return": -0.027715338985485616,
+                "annualized_return": -0.07333204606809185,
+                "annualized_volatility": 0.04943080955712237,
+                "sharpe_ratio": -1.5159446349238526,
+                "max_drawdown": -0.04276107405435603,
+                "turnover_ratio": 3.971096397953459,
+                "trade_count": 12,
+                "total_commission": "1161.64588168414052937305964",
+                "total_tax": "961.64022151621246126831740",
+                "total_slippage_cost": "3872.1312190254718381292"
+              },
+              "tree": {
+                "depth": 3,
+                "leaves": 8,
+                "nodes": 15,
+                "ccp_alpha": 0.0,
+                "max_depth_parameter": 3,
+                "min_samples_leaf": 20,
+                "calibration": {
+                  "coefficient_on_raw_log_odds": 0.2091191634595258,
+                  "intercept": -0.04713506231559521
+                }
+              }
+            }
+          ],
+          "score": -0.017255355534754768,
+          "constraint_checks": {
+            "enough_signals": true,
+            "each_fold_win_rate": false,
+            "drawdown_within_limit": false,
+            "each_fold_beats_constant": false
+          },
+          "meets_constraints": false
+        },
+        {
+          "alpha": 0.0020202240885358047,
+          "folds": [
+            {
+              "train_end": "2024-11-06T00:00:00",
+              "validation_start": "2024-11-07T00:00:00",
+              "validation_end": "2025-03-24T00:00:00",
+              "training": {
+                "input_rows": 2353,
+                "fit_rows": 1729,
+                "calibration_rows": 598,
+                "purged_rows": 26,
+                "budget_sampled_out_rows": 0
+              },
+              "validation_rows": 1157,
+              "prediction": {
+                "rows": 1157,
+                "companies": 13,
+                "signal_count": 115,
+                "signal_win_rate_after_cost": 0.4434782608695652,
+                "mean_signal_net_return": -0.003905250751873291,
+                "brier": 0.2544254433680633,
+                "baseline_brier": 0.2500473736407687,
+                "roc_auc": 0.49431420835251016,
+                "skill_vs_constant": -0.017508961056253103
+              },
+              "portfolio": {
+                "total_return": -0.10377755464435912,
+                "annualized_return": -0.2641923719569633,
+                "annualized_volatility": 0.4593055012694038,
+                "sharpe_ratio": -0.44176054689469785,
+                "max_drawdown": -0.32160071677456115,
+                "turnover_ratio": 41.12556971884185,
+                "trade_count": 143,
+                "total_commission": "11123.19210974214374770031892",
+                "total_tax": "9248.47528630637547167724990",
+                "total_slippage_cost": "37077.2607038472680289968"
+              },
+              "tree": {
+                "depth": 3,
+                "leaves": 6,
+                "nodes": 11,
+                "ccp_alpha": 0.0020202240885358047,
+                "max_depth_parameter": 3,
+                "min_samples_leaf": 20,
+                "calibration": {
+                  "coefficient_on_raw_log_odds": 0.4175779857903905,
+                  "intercept": 0.2163285675371779
+                }
+              }
+            },
+            {
+              "train_end": "2025-03-24T00:00:00",
+              "validation_start": "2025-03-25T00:00:00",
+              "validation_end": "2025-08-08T00:00:00",
+              "training": {
+                "input_rows": 3536,
+                "fit_rows": 2626,
+                "calibration_rows": 884,
+                "purged_rows": 26,
+                "budget_sampled_out_rows": 0
+              },
+              "validation_rows": 1195,
+              "prediction": {
+                "rows": 1195,
+                "companies": 13,
+                "signal_count": 7,
+                "signal_win_rate_after_cost": 0.2857142857142857,
+                "mean_signal_net_return": -0.02578633661357238,
+                "brier": 0.2500039157408066,
+                "baseline_brier": 0.24970198318358458,
+                "roc_auc": 0.5059158485273492,
+                "skill_vs_constant": -0.0012091716428219712
+              },
+              "portfolio": {
+                "total_return": -0.027715338985485616,
+                "annualized_return": -0.07333204606809185,
+                "annualized_volatility": 0.04943080955712237,
+                "sharpe_ratio": -1.5159446349238526,
+                "max_drawdown": -0.04276107405435603,
+                "turnover_ratio": 3.971096397953459,
+                "trade_count": 12,
+                "total_commission": "1161.64588168414052937305964",
+                "total_tax": "961.64022151621246126831740",
+                "total_slippage_cost": "3872.1312190254718381292"
+              },
+              "tree": {
+                "depth": 3,
+                "leaves": 6,
+                "nodes": 11,
+                "ccp_alpha": 0.0020202240885358047,
+                "max_depth_parameter": 3,
+                "min_samples_leaf": 20,
+                "calibration": {
+                  "coefficient_on_raw_log_odds": 0.21191081508772167,
+                  "intercept": -0.045653783540750816
+                }
+              }
+            }
+          ],
+          "score": -0.017508961056253103,
+          "constraint_checks": {
+            "enough_signals": true,
+            "each_fold_win_rate": false,
+            "drawdown_within_limit": false,
+            "each_fold_beats_constant": false
+          },
+          "meets_constraints": false
+        },
+        {
+          "alpha": 0.002684220798875467,
+          "folds": [
+            {
+              "train_end": "2024-11-06T00:00:00",
+              "validation_start": "2024-11-07T00:00:00",
+              "validation_end": "2025-03-24T00:00:00",
+              "training": {
+                "input_rows": 2353,
+                "fit_rows": 1729,
+                "calibration_rows": 598,
+                "purged_rows": 26,
+                "budget_sampled_out_rows": 0
+              },
+              "validation_rows": 1157,
+              "prediction": {
+                "rows": 1157,
+                "companies": 13,
+                "signal_count": 216,
+                "signal_win_rate_after_cost": 0.4444444444444444,
+                "mean_signal_net_return": -0.004123969983151246,
+                "brier": 0.2547374859327222,
+                "baseline_brier": 0.2500473736407687,
+                "roc_auc": 0.4943440942481605,
+                "skill_vs_constant": -0.018756894838222182
+              },
+              "portfolio": {
+                "total_return": -0.1001568729621205,
+                "annualized_return": -0.2558387513656589,
+                "annualized_volatility": 0.4288082498232382,
+                "sharpe_ratio": -0.4785792952996676,
+                "max_drawdown": -0.32890177996951275,
+                "turnover_ratio": 32.74905824228249,
+                "trade_count": 234,
+                "total_commission": "9090.46274861384335807911120",
+                "total_tax": "7554.50764820354368635908940",
+                "total_slippage_cost": "30301.4892849661975233464"
+              },
+              "tree": {
+                "depth": 3,
+                "leaves": 5,
+                "nodes": 9,
+                "ccp_alpha": 0.002684220798875467,
+                "max_depth_parameter": 3,
+                "min_samples_leaf": 20,
+                "calibration": {
+                  "coefficient_on_raw_log_odds": 0.466386061509029,
+                  "intercept": 0.23753740967403156
+                }
+              }
+            },
+            {
+              "train_end": "2025-03-24T00:00:00",
+              "validation_start": "2025-03-25T00:00:00",
+              "validation_end": "2025-08-08T00:00:00",
+              "training": {
+                "input_rows": 3536,
+                "fit_rows": 2626,
+                "calibration_rows": 884,
+                "purged_rows": 26,
+                "budget_sampled_out_rows": 0
+              },
+              "validation_rows": 1195,
+              "prediction": {
+                "rows": 1195,
+                "companies": 13,
+                "signal_count": 0,
+                "signal_win_rate_after_cost": null,
+                "mean_signal_net_return": null,
+                "brier": 0.24943810956446547,
+                "baseline_brier": 0.24970198318358458,
+                "roc_auc": 0.5229410939691445,
+                "skill_vs_constant": 0.0010567541985644358
+              },
+              "portfolio": {
+                "total_return": 0.0,
+                "annualized_return": 0.0,
+                "annualized_volatility": 0.0,
+                "sharpe_ratio": null,
+                "max_drawdown": 0.0,
+                "turnover_ratio": 0.0,
+                "trade_count": 0,
+                "total_commission": "0",
+                "total_tax": "0",
+                "total_slippage_cost": "0"
+              },
+              "tree": {
+                "depth": 3,
+                "leaves": 4,
+                "nodes": 7,
+                "ccp_alpha": 0.002684220798875467,
+                "max_depth_parameter": 3,
+                "min_samples_leaf": 20,
+                "calibration": {
+                  "coefficient_on_raw_log_odds": 0.0950784353310001,
+                  "intercept": -0.05621644683182346
+                }
+              }
+            }
+          ],
+          "score": -0.018756894838222182,
+          "constraint_checks": {
+            "enough_signals": true,
+            "each_fold_win_rate": false,
+            "drawdown_within_limit": false,
+            "each_fold_beats_constant": false
+          },
+          "meets_constraints": false
+        },
+        {
+          "alpha": 0.0034605064529373633,
+          "folds": [
+            {
+              "train_end": "2024-11-06T00:00:00",
+              "validation_start": "2024-11-07T00:00:00",
+              "validation_end": "2025-03-24T00:00:00",
+              "training": {
+                "input_rows": 2353,
+                "fit_rows": 1729,
+                "calibration_rows": 598,
+                "purged_rows": 26,
+                "budget_sampled_out_rows": 0
+              },
+              "validation_rows": 1157,
+              "prediction": {
+                "rows": 1157,
+                "companies": 13,
+                "signal_count": 0,
+                "signal_win_rate_after_cost": null,
+                "mean_signal_net_return": null,
+                "brier": 0.2528847888933957,
+                "baseline_brier": 0.2500473736407687,
+                "roc_auc": 0.4959564383185,
+                "skill_vs_constant": -0.011347510718922482
+              },
+              "portfolio": {
+                "total_return": 0.0,
+                "annualized_return": 0.0,
+                "annualized_volatility": 0.0,
+                "sharpe_ratio": null,
+                "max_drawdown": 0.0,
+                "turnover_ratio": 0.0,
+                "trade_count": 0,
+                "total_commission": "0",
+                "total_tax": "0",
+                "total_slippage_cost": "0"
+              },
+              "tree": {
+                "depth": 2,
+                "leaves": 3,
+                "nodes": 5,
+                "ccp_alpha": 0.0034605064529373633,
+                "max_depth_parameter": 3,
+                "min_samples_leaf": 20,
+                "calibration": {
+                  "coefficient_on_raw_log_odds": 0.29747123962750427,
+                  "intercept": 0.17869701977897637
+                }
+              }
+            },
+            {
+              "train_end": "2025-03-24T00:00:00",
+              "validation_start": "2025-03-25T00:00:00",
+              "validation_end": "2025-08-08T00:00:00",
+              "training": {
+                "input_rows": 3536,
+                "fit_rows": 2626,
+                "calibration_rows": 884,
+                "purged_rows": 26,
+                "budget_sampled_out_rows": 0
+              },
+              "validation_rows": 1195,
+              "prediction": {
+                "rows": 1195,
+                "companies": 13,
+                "signal_count": 0,
+                "signal_win_rate_after_cost": null,
+                "mean_signal_net_return": null,
+                "brier": 0.24912843580579502,
+                "baseline_brier": 0.24970198318358458,
+                "roc_auc": 0.5255189340813465,
+                "skill_vs_constant": 0.0022969276033657504
+              },
+              "portfolio": {
+                "total_return": 0.0,
+                "annualized_return": 0.0,
+                "annualized_volatility": 0.0,
+                "sharpe_ratio": null,
+                "max_drawdown": 0.0,
+                "turnover_ratio": 0.0,
+                "trade_count": 0,
+                "total_commission": "0",
+                "total_tax": "0",
+                "total_slippage_cost": "0"
+              },
+              "tree": {
+                "depth": 2,
+                "leaves": 3,
+                "nodes": 5,
+                "ccp_alpha": 0.0034605064529373633,
+                "max_depth_parameter": 3,
+                "min_samples_leaf": 20,
+                "calibration": {
+                  "coefficient_on_raw_log_odds": 0.14930940620670374,
+                  "intercept": -0.04834374966044112
+                }
+              }
+            }
+          ],
+          "score": -0.011347510718922482,
+          "constraint_checks": {
+            "enough_signals": false,
+            "each_fold_win_rate": false,
+            "drawdown_within_limit": true,
+            "each_fold_beats_constant": false
+          },
+          "meets_constraints": false
+        },
+        {
+          "alpha": 0.006561871917648843,
+          "folds": [
+            {
+              "train_end": "2024-11-06T00:00:00",
+              "validation_start": "2024-11-07T00:00:00",
+              "validation_end": "2025-03-24T00:00:00",
+              "training": {
+                "input_rows": 2353,
+                "fit_rows": 1729,
+                "calibration_rows": 598,
+                "purged_rows": 26,
+                "budget_sampled_out_rows": 0
+              },
+              "validation_rows": 1157,
+              "prediction": {
+                "rows": 1157,
+                "companies": 13,
+                "signal_count": 0,
+                "signal_win_rate_after_cost": null,
+                "mean_signal_net_return": null,
+                "brier": 0.25155174042829553,
+                "baseline_brier": 0.2500473736407687,
+                "roc_auc": 0.5,
+                "skill_vs_constant": -0.006016327088834483
+              },
+              "portfolio": {
+                "total_return": 0.0,
+                "annualized_return": 0.0,
+                "annualized_volatility": 0.0,
+                "sharpe_ratio": null,
+                "max_drawdown": 0.0,
+                "turnover_ratio": 0.0,
+                "trade_count": 0,
+                "total_commission": "0",
+                "total_tax": "0",
+                "total_slippage_cost": "0"
+              },
+              "tree": {
+                "depth": 0,
+                "leaves": 1,
+                "nodes": 1,
+                "ccp_alpha": 0.006561871917648843,
+                "max_depth_parameter": 3,
+                "min_samples_leaf": 20,
+                "calibration": {
+                  "coefficient_on_raw_log_odds": -0.015652515016384386,
+                  "intercept": 0.13209143804291426
+                }
+              }
+            },
+            {
+              "train_end": "2025-03-24T00:00:00",
+              "validation_start": "2025-03-25T00:00:00",
+              "validation_end": "2025-08-08T00:00:00",
+              "training": {
+                "input_rows": 3536,
+                "fit_rows": 2626,
+                "calibration_rows": 884,
+                "purged_rows": 26,
+                "budget_sampled_out_rows": 0
+              },
+              "validation_rows": 1195,
+              "prediction": {
+                "rows": 1195,
+                "companies": 13,
+                "signal_count": 0,
+                "signal_win_rate_after_cost": null,
+                "mean_signal_net_return": null,
+                "brier": 0.24964602158111754,
+                "baseline_brier": 0.24970198318358458,
+                "roc_auc": 0.5,
+                "skill_vs_constant": 0.00022411356831675278
+              },
+              "portfolio": {
+                "total_return": 0.0,
+                "annualized_return": 0.0,
+                "annualized_volatility": 0.0,
+                "sharpe_ratio": null,
+                "max_drawdown": 0.0,
+                "turnover_ratio": 0.0,
+                "trade_count": 0,
+                "total_commission": "0",
+                "total_tax": "0",
+                "total_slippage_cost": "0"
+              },
+              "tree": {
+                "depth": 0,
+                "leaves": 1,
+                "nodes": 1,
+                "ccp_alpha": 0.006561871917648843,
+                "max_depth_parameter": 3,
+                "min_samples_leaf": 20,
+                "calibration": {
+                  "coefficient_on_raw_log_odds": 0.003506809840441902,
+                  "intercept": -0.07225645406989487
+                }
+              }
+            }
+          ],
+          "score": -0.006016327088834483,
+          "constraint_checks": {
+            "enough_signals": false,
+            "each_fold_win_rate": false,
+            "drawdown_within_limit": true,
+            "each_fold_beats_constant": false
+          },
+          "meets_constraints": false
+        }
+      ],
+      "representative_rules": "rules_pruned_752023b80aba.json",
+      "baseline_rules": "rules_baseline_752023b80aba.json"
+    },
+    {
+      "candidate": {
+        "horizon": 1,
+        "task": "regression",
+        "model": "tree",
+        "sampler": "all",
+        "features": "technical",
+        "depth": 3,
+        "strength": 0.3,
+        "id": "7ffbf1d8b56f"
+      },
+      "columns": [
+        "return_1",
+        "return_3",
+        "return_7",
+        "return_20",
+        "volatility_20",
+        "range_ratio",
+        "open_gap",
+        "ma_distance",
+        "volume_ratio",
+        "amount_log",
+        "turn_ratio"
+      ],
+      "alpha_grid": [
+        0.0,
+        1.534254072124251e-05,
+        2.1224001007637576e-05,
+        2.3058487853109752e-05,
+        3.192031638164284e-05
+      ],
+      "historical_reproduction": [
+        {
+          "fold": 1,
+          "matches": true,
+          "differences": []
+        },
+        {
+          "fold": 2,
+          "matches": true,
+          "differences": []
+        }
+      ],
+      "variants": [
+        {
+          "alpha": 0.0,
+          "folds": [
+            {
+              "train_end": "2024-11-06T00:00:00",
+              "validation_start": "2024-11-07T00:00:00",
+              "validation_end": "2025-03-24T00:00:00",
+              "training": {
+                "input_rows": 2353,
+                "fit_rows": 2353,
+                "calibration_rows": 0,
+                "purged_rows": 0,
+                "budget_sampled_out_rows": 0
+              },
+              "validation_rows": 1157,
+              "prediction": {
+                "rows": 1157,
+                "companies": 13,
+                "signal_count": 9,
+                "signal_win_rate_after_cost": 0.3333333333333333,
+                "mean_signal_net_return": -0.0004140098730209532,
+                "rmse": 0.03621352167578696,
+                "baseline_rmse": 0.035391778409018707,
+                "skill_vs_constant": -0.04697605594087606
+              },
+              "portfolio": {
+                "total_return": -0.004216410933121195,
+                "annualized_return": -0.011761200131083172,
+                "annualized_volatility": 0.22116383803551448,
+                "sharpe_ratio": 0.05530603432264675,
+                "max_drawdown": -0.09489261572423646,
+                "turnover_ratio": 10.480560752455823,
+                "trade_count": 15,
+                "total_commission": "3113.99197500158586359120358",
+                "total_tax": "2595.36654939914143386564600",
+                "total_slippage_cost": "10379.9851229380004294946"
+              },
+              "tree": {
+                "depth": 3,
+                "leaves": 5,
+                "nodes": 9,
+                "ccp_alpha": 0.0,
+                "max_depth_parameter": 3,
+                "min_samples_leaf": 20,
+                "calibration": null
+              }
+            },
+            {
+              "train_end": "2025-03-24T00:00:00",
+              "validation_start": "2025-03-25T00:00:00",
+              "validation_end": "2025-08-08T00:00:00",
+              "training": {
+                "input_rows": 3536,
+                "fit_rows": 3536,
+                "calibration_rows": 0,
+                "purged_rows": 0,
+                "budget_sampled_out_rows": 0
+              },
+              "validation_rows": 1195,
+              "prediction": {
+                "rows": 1195,
+                "companies": 13,
+                "signal_count": 91,
+                "signal_win_rate_after_cost": 0.5714285714285714,
+                "mean_signal_net_return": 0.008268992814164619,
+                "rmse": 0.025979904701485368,
+                "baseline_rmse": 0.025394159661027885,
+                "skill_vs_constant": -0.04666431058138221
+              },
+              "portfolio": {
+                "total_return": 0.038330403075395925,
+                "annualized_return": 0.10729700935465081,
+                "annualized_volatility": 0.323933679572289,
+                "sharpe_ratio": 0.4759516698368629,
+                "max_drawdown": -0.14705546040360706,
+                "turnover_ratio": 76.15592262541213,
+                "trade_count": 158,
+                "total_commission": "24294.60666679258425778993092",
+                "total_tax": "20266.22836518733084904051220",
+                "total_slippage_cost": "80982.1860960661509679876"
+              },
+              "tree": {
+                "depth": 3,
+                "leaves": 6,
+                "nodes": 11,
+                "ccp_alpha": 0.0,
+                "max_depth_parameter": 3,
+                "min_samples_leaf": 20,
+                "calibration": null
+              }
+            }
+          ],
+          "score": -0.04697605594087606,
+          "constraint_checks": {
+            "enough_signals": true,
+            "each_fold_win_rate": false,
+            "drawdown_within_limit": true,
+            "each_fold_beats_constant": false
+          },
+          "meets_constraints": false
+        },
+        {
+          "alpha": 1.534254072124251e-05,
+          "folds": [
+            {
+              "train_end": "2024-11-06T00:00:00",
+              "validation_start": "2024-11-07T00:00:00",
+              "validation_end": "2025-03-24T00:00:00",
+              "training": {
+                "input_rows": 2353,
+                "fit_rows": 2353,
+                "calibration_rows": 0,
+                "purged_rows": 0,
+                "budget_sampled_out_rows": 0
+              },
+              "validation_rows": 1157,
+              "prediction": {
+                "rows": 1157,
+                "companies": 13,
+                "signal_count": 9,
+                "signal_win_rate_after_cost": 0.3333333333333333,
+                "mean_signal_net_return": -0.0004140098730209532,
+                "rmse": 0.03601720965307872,
+                "baseline_rmse": 0.035391778409018707,
+                "skill_vs_constant": -0.03565559429527321
+              },
+              "portfolio": {
+                "total_return": -0.004216410933121195,
+                "annualized_return": -0.011761200131083172,
+                "annualized_volatility": 0.22116383803551448,
+                "sharpe_ratio": 0.05530603432264675,
+                "max_drawdown": -0.09489261572423646,
+                "turnover_ratio": 10.480560752455823,
+                "trade_count": 15,
+                "total_commission": "3113.99197500158586359120358",
+                "total_tax": "2595.36654939914143386564600",
+                "total_slippage_cost": "10379.9851229380004294946"
+              },
+              "tree": {
+                "depth": 3,
+                "leaves": 4,
+                "nodes": 7,
+                "ccp_alpha": 1.534254072124251e-05,
+                "max_depth_parameter": 3,
+                "min_samples_leaf": 20,
+                "calibration": null
+              }
+            },
+            {
+              "train_end": "2025-03-24T00:00:00",
+              "validation_start": "2025-03-25T00:00:00",
+              "validation_end": "2025-08-08T00:00:00",
+              "training": {
+                "input_rows": 3536,
+                "fit_rows": 3536,
+                "calibration_rows": 0,
+                "purged_rows": 0,
+                "budget_sampled_out_rows": 0
+              },
+              "validation_rows": 1195,
+              "prediction": {
+                "rows": 1195,
+                "companies": 13,
+                "signal_count": 12,
+                "signal_win_rate_after_cost": 0.75,
+                "mean_signal_net_return": 0.03531794862285716,
+                "rmse": 0.025107218140305324,
+                "baseline_rmse": 0.025394159661027885,
+                "skill_vs_constant": 0.02247133793497913
+              },
+              "portfolio": {
+                "total_return": 0.13143138233067786,
+                "annualized_return": 0.3973821077810835,
+                "annualized_volatility": 0.16325838874164383,
+                "sharpe_ratio": 2.1295346999408373,
+                "max_drawdown": -0.03953465761315855,
+                "turnover_ratio": 6.709534532471491,
+                "trade_count": 20,
+                "total_commission": "2250.0920267337586749373434",
+                "total_tax": "1908.9743011094291699661390",
+                "total_slippage_cost": "7500.449846677700781922"
+              },
+              "tree": {
+                "depth": 1,
+                "leaves": 2,
+                "nodes": 3,
+                "ccp_alpha": 1.534254072124251e-05,
+                "max_depth_parameter": 3,
+                "min_samples_leaf": 20,
+                "calibration": null
+              }
+            }
+          ],
+          "score": -0.03565559429527321,
+          "constraint_checks": {
+            "enough_signals": true,
+            "each_fold_win_rate": false,
+            "drawdown_within_limit": true,
+            "each_fold_beats_constant": false
+          },
+          "meets_constraints": false
+        },
+        {
+          "alpha": 2.1224001007637576e-05,
+          "folds": [
+            {
+              "train_end": "2024-11-06T00:00:00",
+              "validation_start": "2024-11-07T00:00:00",
+              "validation_end": "2025-03-24T00:00:00",
+              "training": {
+                "input_rows": 2353,
+                "fit_rows": 2353,
+                "calibration_rows": 0,
+                "purged_rows": 0,
+                "budget_sampled_out_rows": 0
+              },
+              "validation_rows": 1157,
+              "prediction": {
+                "rows": 1157,
+                "companies": 13,
+                "signal_count": 9,
+                "signal_win_rate_after_cost": 0.3333333333333333,
+                "mean_signal_net_return": -0.0004140098730209532,
+                "rmse": 0.03583701857621702,
+                "baseline_rmse": 0.035391778409018707,
+                "skill_vs_constant": -0.02531891986920254
+              },
+              "portfolio": {
+                "total_return": -0.004216410933121195,
+                "annualized_return": -0.011761200131083172,
+                "annualized_volatility": 0.22116383803551448,
+                "sharpe_ratio": 0.05530603432264675,
+                "max_drawdown": -0.09489261572423646,
+                "turnover_ratio": 10.480560752455823,
+                "trade_count": 15,
+                "total_commission": "3113.99197500158586359120358",
+                "total_tax": "2595.36654939914143386564600",
+                "total_slippage_cost": "10379.9851229380004294946"
+              },
+              "tree": {
+                "depth": 2,
+                "leaves": 3,
+                "nodes": 5,
+                "ccp_alpha": 2.1224001007637576e-05,
+                "max_depth_parameter": 3,
+                "min_samples_leaf": 20,
+                "calibration": null
+              }
+            },
+            {
+              "train_end": "2025-03-24T00:00:00",
+              "validation_start": "2025-03-25T00:00:00",
+              "validation_end": "2025-08-08T00:00:00",
+              "training": {
+                "input_rows": 3536,
+                "fit_rows": 3536,
+                "calibration_rows": 0,
+                "purged_rows": 0,
+                "budget_sampled_out_rows": 0
+              },
+              "validation_rows": 1195,
+              "prediction": {
+                "rows": 1195,
+                "companies": 13,
+                "signal_count": 0,
+                "signal_win_rate_after_cost": null,
+                "mean_signal_net_return": null,
+                "rmse": 0.025394159661027885,
+                "baseline_rmse": 0.025394159661027885,
+                "skill_vs_constant": 0.0
+              },
+              "portfolio": {
+                "total_return": 0.0,
+                "annualized_return": 0.0,
+                "annualized_volatility": 0.0,
+                "sharpe_ratio": null,
+                "max_drawdown": 0.0,
+                "turnover_ratio": 0.0,
+                "trade_count": 0,
+                "total_commission": "0",
+                "total_tax": "0",
+                "total_slippage_cost": "0"
+              },
+              "tree": {
+                "depth": 0,
+                "leaves": 1,
+                "nodes": 1,
+                "ccp_alpha": 2.1224001007637576e-05,
+                "max_depth_parameter": 3,
+                "min_samples_leaf": 20,
+                "calibration": null
+              }
+            }
+          ],
+          "score": -0.02531891986920254,
+          "constraint_checks": {
+            "enough_signals": false,
+            "each_fold_win_rate": false,
+            "drawdown_within_limit": true,
+            "each_fold_beats_constant": false
+          },
+          "meets_constraints": false
+        },
+        {
+          "alpha": 2.3058487853109752e-05,
+          "folds": [
+            {
+              "train_end": "2024-11-06T00:00:00",
+              "validation_start": "2024-11-07T00:00:00",
+              "validation_end": "2025-03-24T00:00:00",
+              "training": {
+                "input_rows": 2353,
+                "fit_rows": 2353,
+                "calibration_rows": 0,
+                "purged_rows": 0,
+                "budget_sampled_out_rows": 0
+              },
+              "validation_rows": 1157,
+              "prediction": {
+                "rows": 1157,
+                "companies": 13,
+                "signal_count": 9,
+                "signal_win_rate_after_cost": 0.3333333333333333,
+                "mean_signal_net_return": -0.0004140098730209532,
+                "rmse": 0.035513568222633435,
+                "baseline_rmse": 0.035391778409018707,
+                "skill_vs_constant": -0.006894220635887738
+              },
+              "portfolio": {
+                "total_return": -0.004216410933121195,
+                "annualized_return": -0.011761200131083172,
+                "annualized_volatility": 0.22116383803551448,
+                "sharpe_ratio": 0.05530603432264675,
+                "max_drawdown": -0.09489261572423646,
+                "turnover_ratio": 10.480560752455823,
+                "trade_count": 15,
+                "total_commission": "3113.99197500158586359120358",
+                "total_tax": "2595.36654939914143386564600",
+                "total_slippage_cost": "10379.9851229380004294946"
+              },
+              "tree": {
+                "depth": 1,
+                "leaves": 2,
+                "nodes": 3,
+                "ccp_alpha": 2.3058487853109752e-05,
+                "max_depth_parameter": 3,
+                "min_samples_leaf": 20,
+                "calibration": null
+              }
+            },
+            {
+              "train_end": "2025-03-24T00:00:00",
+              "validation_start": "2025-03-25T00:00:00",
+              "validation_end": "2025-08-08T00:00:00",
+              "training": {
+                "input_rows": 3536,
+                "fit_rows": 3536,
+                "calibration_rows": 0,
+                "purged_rows": 0,
+                "budget_sampled_out_rows": 0
+              },
+              "validation_rows": 1195,
+              "prediction": {
+                "rows": 1195,
+                "companies": 13,
+                "signal_count": 0,
+                "signal_win_rate_after_cost": null,
+                "mean_signal_net_return": null,
+                "rmse": 0.025394159661027885,
+                "baseline_rmse": 0.025394159661027885,
+                "skill_vs_constant": 0.0
+              },
+              "portfolio": {
+                "total_return": 0.0,
+                "annualized_return": 0.0,
+                "annualized_volatility": 0.0,
+                "sharpe_ratio": null,
+                "max_drawdown": 0.0,
+                "turnover_ratio": 0.0,
+                "trade_count": 0,
+                "total_commission": "0",
+                "total_tax": "0",
+                "total_slippage_cost": "0"
+              },
+              "tree": {
+                "depth": 0,
+                "leaves": 1,
+                "nodes": 1,
+                "ccp_alpha": 2.3058487853109752e-05,
+                "max_depth_parameter": 3,
+                "min_samples_leaf": 20,
+                "calibration": null
+              }
+            }
+          ],
+          "score": -0.006894220635887738,
+          "constraint_checks": {
+            "enough_signals": false,
+            "each_fold_win_rate": false,
+            "drawdown_within_limit": true,
+            "each_fold_beats_constant": false
+          },
+          "meets_constraints": false
+        },
+        {
+          "alpha": 3.192031638164284e-05,
+          "folds": [
+            {
+              "train_end": "2024-11-06T00:00:00",
+              "validation_start": "2024-11-07T00:00:00",
+              "validation_end": "2025-03-24T00:00:00",
+              "training": {
+                "input_rows": 2353,
+                "fit_rows": 2353,
+                "calibration_rows": 0,
+                "purged_rows": 0,
+                "budget_sampled_out_rows": 0
+              },
+              "validation_rows": 1157,
+              "prediction": {
+                "rows": 1157,
+                "companies": 13,
+                "signal_count": 0,
+                "signal_win_rate_after_cost": null,
+                "mean_signal_net_return": null,
+                "rmse": 0.035391778409018707,
+                "baseline_rmse": 0.035391778409018707,
+                "skill_vs_constant": 0.0
+              },
+              "portfolio": {
+                "total_return": 0.0,
+                "annualized_return": 0.0,
+                "annualized_volatility": 0.0,
+                "sharpe_ratio": null,
+                "max_drawdown": 0.0,
+                "turnover_ratio": 0.0,
+                "trade_count": 0,
+                "total_commission": "0",
+                "total_tax": "0",
+                "total_slippage_cost": "0"
+              },
+              "tree": {
+                "depth": 0,
+                "leaves": 1,
+                "nodes": 1,
+                "ccp_alpha": 3.192031638164284e-05,
+                "max_depth_parameter": 3,
+                "min_samples_leaf": 20,
+                "calibration": null
+              }
+            },
+            {
+              "train_end": "2025-03-24T00:00:00",
+              "validation_start": "2025-03-25T00:00:00",
+              "validation_end": "2025-08-08T00:00:00",
+              "training": {
+                "input_rows": 3536,
+                "fit_rows": 3536,
+                "calibration_rows": 0,
+                "purged_rows": 0,
+                "budget_sampled_out_rows": 0
+              },
+              "validation_rows": 1195,
+              "prediction": {
+                "rows": 1195,
+                "companies": 13,
+                "signal_count": 0,
+                "signal_win_rate_after_cost": null,
+                "mean_signal_net_return": null,
+                "rmse": 0.025394159661027885,
+                "baseline_rmse": 0.025394159661027885,
+                "skill_vs_constant": 0.0
+              },
+              "portfolio": {
+                "total_return": 0.0,
+                "annualized_return": 0.0,
+                "annualized_volatility": 0.0,
+                "sharpe_ratio": null,
+                "max_drawdown": 0.0,
+                "turnover_ratio": 0.0,
+                "trade_count": 0,
+                "total_commission": "0",
+                "total_tax": "0",
+                "total_slippage_cost": "0"
+              },
+              "tree": {
+                "depth": 0,
+                "leaves": 1,
+                "nodes": 1,
+                "ccp_alpha": 3.192031638164284e-05,
+                "max_depth_parameter": 3,
+                "min_samples_leaf": 20,
+                "calibration": null
+              }
+            }
+          ],
+          "score": 0.0,
+          "constraint_checks": {
+            "enough_signals": false,
+            "each_fold_win_rate": false,
+            "drawdown_within_limit": true,
+            "each_fold_beats_constant": false
+          },
+          "meets_constraints": false
+        }
+      ],
+      "representative_rules": "rules_pruned_7ffbf1d8b56f.json",
+      "baseline_rules": "rules_baseline_7ffbf1d8b56f.json"
+    },
+    {
+      "candidate": {
+        "horizon": 7,
+        "task": "regression",
+        "model": "tree",
+        "sampler": "all",
+        "features": "technical",
+        "depth": 6,
+        "strength": 3.0,
+        "id": "15041da8b24a"
+      },
+      "columns": [
+        "return_1",
+        "return_3",
+        "return_7",
+        "return_20",
+        "volatility_20",
+        "range_ratio",
+        "open_gap",
+        "ma_distance",
+        "volume_ratio",
+        "amount_log",
+        "turn_ratio"
+      ],
+      "alpha_grid": [
+        0.0,
+        2.3785672686405023e-05,
+        5.7328365372135044e-05,
+        8.465940366102513e-05,
+        0.00088905778929926
+      ],
+      "historical_reproduction": [
+        {
+          "fold": 1,
+          "matches": true,
+          "differences": []
+        },
+        {
+          "fold": 2,
+          "matches": true,
+          "differences": []
+        }
+      ],
+      "variants": [
+        {
+          "alpha": 0.0,
+          "folds": [
+            {
+              "train_end": "2024-11-01T00:00:00",
+              "validation_start": "2024-11-04T00:00:00",
+              "validation_end": "2025-03-18T00:00:00",
+              "training": {
+                "input_rows": 2236,
+                "fit_rows": 2236,
+                "calibration_rows": 0,
+                "purged_rows": 0,
+                "budget_sampled_out_rows": 0
+              },
+              "validation_rows": 1066,
+              "prediction": {
+                "rows": 1066,
+                "companies": 13,
+                "signal_count": 552,
+                "signal_win_rate_after_cost": 0.5181159420289855,
+                "mean_signal_net_return": 0.004798812853074855,
+                "rmse": 0.0988685060384018,
+                "baseline_rmse": 0.08708364842545503,
+                "skill_vs_constant": -0.2889697103154656
+              },
+              "portfolio": {
+                "total_return": 0.08723537793822045,
+                "annualized_return": 0.26721053826987595,
+                "annualized_volatility": 0.3312458859589389,
+                "sharpe_ratio": 0.8782489749342142,
+                "max_drawdown": -0.17916598680537266,
+                "turnover_ratio": 13.313149868660169,
+                "trade_count": 93,
+                "total_commission": "4312.92742566019775638313346",
+                "total_tax": "3617.89773882584140853328285",
+                "total_slippage_cost": "14376.5342949380568324468"
+              },
+              "tree": {
+                "depth": 6,
+                "leaves": 16,
+                "nodes": 31,
+                "ccp_alpha": 0.0,
+                "max_depth_parameter": 6,
+                "min_samples_leaf": 20,
+                "calibration": null
+              }
+            },
+            {
+              "train_end": "2025-03-18T00:00:00",
+              "validation_start": "2025-03-19T00:00:00",
+              "validation_end": "2025-08-08T00:00:00",
+              "training": {
+                "input_rows": 3406,
+                "fit_rows": 3406,
+                "calibration_rows": 0,
+                "purged_rows": 0,
+                "budget_sampled_out_rows": 0
+              },
+              "validation_rows": 1169,
+              "prediction": {
+                "rows": 1169,
+                "companies": 13,
+                "signal_count": 1022,
+                "signal_win_rate_after_cost": 0.5273972602739726,
+                "mean_signal_net_return": 0.0017625869533811297,
+                "rmse": 0.0678463762615833,
+                "baseline_rmse": 0.06465131643754964,
+                "skill_vs_constant": -0.10128206908141779
+              },
+              "portfolio": {
+                "total_return": -0.07304773374488682,
+                "annualized_return": -0.1788602304951361,
+                "annualized_volatility": 0.28778674984181346,
+                "sharpe_ratio": -0.5374942259709028,
+                "max_drawdown": -0.15647199845042215,
+                "turnover_ratio": 11.540178131410007,
+                "trade_count": 94,
+                "total_commission": "3277.45873162980671122583976",
+                "total_tax": "2714.45165385165426610979550",
+                "total_slippage_cost": "10924.8063077489707144172"
+              },
+              "tree": {
+                "depth": 6,
+                "leaves": 16,
+                "nodes": 31,
+                "ccp_alpha": 0.0,
+                "max_depth_parameter": 6,
+                "min_samples_leaf": 20,
+                "calibration": null
+              }
+            }
+          ],
+          "score": -0.2889697103154656,
+          "constraint_checks": {
+            "enough_signals": true,
+            "each_fold_win_rate": true,
+            "drawdown_within_limit": true,
+            "each_fold_beats_constant": false
+          },
+          "meets_constraints": false
+        },
+        {
+          "alpha": 2.3785672686405023e-05,
+          "folds": [
+            {
+              "train_end": "2024-11-01T00:00:00",
+              "validation_start": "2024-11-04T00:00:00",
+              "validation_end": "2025-03-18T00:00:00",
+              "training": {
+                "input_rows": 2236,
+                "fit_rows": 2236,
+                "calibration_rows": 0,
+                "purged_rows": 0,
+                "budget_sampled_out_rows": 0
+              },
+              "validation_rows": 1066,
+              "prediction": {
+                "rows": 1066,
+                "companies": 13,
+                "signal_count": 552,
+                "signal_win_rate_after_cost": 0.5181159420289855,
+                "mean_signal_net_return": 0.004798812853074855,
+                "rmse": 0.09874869341584151,
+                "baseline_rmse": 0.08708364842545503,
+                "skill_vs_constant": -0.28584755802318185
+              },
+              "portfolio": {
+                "total_return": 0.08723537793822045,
+                "annualized_return": 0.26721053826987595,
+                "annualized_volatility": 0.3312458859589389,
+                "sharpe_ratio": 0.8782489749342142,
+                "max_drawdown": -0.17916598680537266,
+                "turnover_ratio": 13.313149868660169,
+                "trade_count": 93,
+                "total_commission": "4312.92742566019775638313346",
+                "total_tax": "3617.89773882584140853328285",
+                "total_slippage_cost": "14376.5342949380568324468"
+              },
+              "tree": {
+                "depth": 6,
+                "leaves": 15,
+                "nodes": 29,
+                "ccp_alpha": 2.3785672686405023e-05,
+                "max_depth_parameter": 6,
+                "min_samples_leaf": 20,
+                "calibration": null
+              }
+            },
+            {
+              "train_end": "2025-03-18T00:00:00",
+              "validation_start": "2025-03-19T00:00:00",
+              "validation_end": "2025-08-08T00:00:00",
+              "training": {
+                "input_rows": 3406,
+                "fit_rows": 3406,
+                "calibration_rows": 0,
+                "purged_rows": 0,
+                "budget_sampled_out_rows": 0
+              },
+              "validation_rows": 1169,
+              "prediction": {
+                "rows": 1169,
+                "companies": 13,
+                "signal_count": 1020,
+                "signal_win_rate_after_cost": 0.5274509803921569,
+                "mean_signal_net_return": 0.001743976548359886,
+                "rmse": 0.06792865699213894,
+                "baseline_rmse": 0.06465131643754964,
+                "skill_vs_constant": -0.10395484969123303
+              },
+              "portfolio": {
+                "total_return": -0.07304773374488682,
+                "annualized_return": -0.1788602304951361,
+                "annualized_volatility": 0.28778674984181346,
+                "sharpe_ratio": -0.5374942259709028,
+                "max_drawdown": -0.15647199845042215,
+                "turnover_ratio": 11.540178131410007,
+                "trade_count": 94,
+                "total_commission": "3277.45873162980671122583976",
+                "total_tax": "2714.45165385165426610979550",
+                "total_slippage_cost": "10924.8063077489707144172"
+              },
+              "tree": {
+                "depth": 6,
+                "leaves": 12,
+                "nodes": 23,
+                "ccp_alpha": 2.3785672686405023e-05,
+                "max_depth_parameter": 6,
+                "min_samples_leaf": 20,
+                "calibration": null
+              }
+            }
+          ],
+          "score": -0.28584755802318185,
+          "constraint_checks": {
+            "enough_signals": true,
+            "each_fold_win_rate": true,
+            "drawdown_within_limit": true,
+            "each_fold_beats_constant": false
+          },
+          "meets_constraints": false
+        },
+        {
+          "alpha": 5.7328365372135044e-05,
+          "folds": [
+            {
+              "train_end": "2024-11-01T00:00:00",
+              "validation_start": "2024-11-04T00:00:00",
+              "validation_end": "2025-03-18T00:00:00",
+              "training": {
+                "input_rows": 2236,
+                "fit_rows": 2236,
+                "calibration_rows": 0,
+                "purged_rows": 0,
+                "budget_sampled_out_rows": 0
+              },
+              "validation_rows": 1066,
+              "prediction": {
+                "rows": 1066,
+                "companies": 13,
+                "signal_count": 461,
+                "signal_win_rate_after_cost": 0.4772234273318872,
+                "mean_signal_net_return": 0.0026096316888917994,
+                "rmse": 0.09698860887047545,
+                "baseline_rmse": 0.08708364842545503,
+                "skill_vs_constant": -0.24041848277559597
+              },
+              "portfolio": {
+                "total_return": 0.07014713985975418,
+                "annualized_return": 0.21162464497629618,
+                "annualized_volatility": 0.32330945511181275,
+                "sharpe_ratio": 0.7535191017056232,
+                "max_drawdown": -0.17773399388453148,
+                "turnover_ratio": 13.24583078444814,
+                "trade_count": 77,
+                "total_commission": "4239.55610025253331602431582",
+                "total_tax": "3552.44820291784223327966985",
+                "total_slippage_cost": "14131.9457385983459096400"
+              },
+              "tree": {
+                "depth": 6,
+                "leaves": 10,
+                "nodes": 19,
+                "ccp_alpha": 5.7328365372135044e-05,
+                "max_depth_parameter": 6,
+                "min_samples_leaf": 20,
+                "calibration": null
+              }
+            },
+            {
+              "train_end": "2025-03-18T00:00:00",
+              "validation_start": "2025-03-19T00:00:00",
+              "validation_end": "2025-08-08T00:00:00",
+              "training": {
+                "input_rows": 3406,
+                "fit_rows": 3406,
+                "calibration_rows": 0,
+                "purged_rows": 0,
+                "budget_sampled_out_rows": 0
+              },
+              "validation_rows": 1169,
+              "prediction": {
+                "rows": 1169,
+                "companies": 13,
+                "signal_count": 1156,
+                "signal_win_rate_after_cost": 0.5173010380622838,
+                "mean_signal_net_return": -0.0007055863710222479,
+                "rmse": 0.06680504699922814,
+                "baseline_rmse": 0.06465131643754964,
+                "skill_vs_constant": -0.0677357961561269
+              },
+              "portfolio": {
+                "total_return": -0.06117061509479915,
+                "annualized_return": -0.15124591872157744,
+                "annualized_volatility": 0.2782017815372372,
+                "sharpe_ratio": -0.44711225708607344,
+                "max_drawdown": -0.16333130383808947,
+                "turnover_ratio": 6.967904168847665,
+                "trade_count": 82,
+                "total_commission": "1994.31064305268426151226534",
+                "total_tax": "1647.54334560070041909120045",
+                "total_slippage_cost": "6647.6512623991037916160"
+              },
+              "tree": {
+                "depth": 4,
+                "leaves": 6,
+                "nodes": 11,
+                "ccp_alpha": 5.7328365372135044e-05,
+                "max_depth_parameter": 6,
+                "min_samples_leaf": 20,
+                "calibration": null
+              }
+            }
+          ],
+          "score": -0.24041848277559597,
+          "constraint_checks": {
+            "enough_signals": true,
+            "each_fold_win_rate": false,
+            "drawdown_within_limit": true,
+            "each_fold_beats_constant": false
+          },
+          "meets_constraints": false
+        },
+        {
+          "alpha": 8.465940366102513e-05,
+          "folds": [
+            {
+              "train_end": "2024-11-01T00:00:00",
+              "validation_start": "2024-11-04T00:00:00",
+              "validation_end": "2025-03-18T00:00:00",
+              "training": {
+                "input_rows": 2236,
+                "fit_rows": 2236,
+                "calibration_rows": 0,
+                "purged_rows": 0,
+                "budget_sampled_out_rows": 0
+              },
+              "validation_rows": 1066,
+              "prediction": {
+                "rows": 1066,
+                "companies": 13,
+                "signal_count": 461,
+                "signal_win_rate_after_cost": 0.4772234273318872,
+                "mean_signal_net_return": 0.0026096316888917994,
+                "rmse": 0.09263793737316646,
+                "baseline_rmse": 0.08708364842545503,
+                "skill_vs_constant": -0.1316301812991547
+              },
+              "portfolio": {
+                "total_return": 0.07514643574945334,
+                "annualized_return": 0.22771998996181164,
+                "annualized_volatility": 0.37960986290691145,
+                "sharpe_ratio": 0.7280344890014397,
+                "max_drawdown": -0.23200579975536817,
+                "turnover_ratio": 12.919399807176895,
+                "trade_count": 76,
+                "total_commission": "4000.18189246956976000827369",
+                "total_tax": "3354.11009232487005085978455",
+                "total_slippage_cost": "13334.0354763284431094741"
+              },
+              "tree": {
+                "depth": 6,
+                "leaves": 7,
+                "nodes": 13,
+                "ccp_alpha": 8.465940366102513e-05,
+                "max_depth_parameter": 6,
+                "min_samples_leaf": 20,
+                "calibration": null
+              }
+            },
+            {
+              "train_end": "2025-03-18T00:00:00",
+              "validation_start": "2025-03-19T00:00:00",
+              "validation_end": "2025-08-08T00:00:00",
+              "training": {
+                "input_rows": 3406,
+                "fit_rows": 3406,
+                "calibration_rows": 0,
+                "purged_rows": 0,
+                "budget_sampled_out_rows": 0
+              },
+              "validation_rows": 1169,
+              "prediction": {
+                "rows": 1169,
+                "companies": 13,
+                "signal_count": 1156,
+                "signal_win_rate_after_cost": 0.5173010380622838,
+                "mean_signal_net_return": -0.0007055863710222479,
+                "rmse": 0.06680504699922814,
+                "baseline_rmse": 0.06465131643754964,
+                "skill_vs_constant": -0.0677357961561269
+              },
+              "portfolio": {
+                "total_return": -0.06117061509479915,
+                "annualized_return": -0.15124591872157744,
+                "annualized_volatility": 0.2782017815372372,
+                "sharpe_ratio": -0.44711225708607344,
+                "max_drawdown": -0.16333130383808947,
+                "turnover_ratio": 6.967904168847665,
+                "trade_count": 82,
+                "total_commission": "1994.31064305268426151226534",
+                "total_tax": "1647.54334560070041909120045",
+                "total_slippage_cost": "6647.6512623991037916160"
+              },
+              "tree": {
+                "depth": 4,
+                "leaves": 6,
+                "nodes": 11,
+                "ccp_alpha": 8.465940366102513e-05,
+                "max_depth_parameter": 6,
+                "min_samples_leaf": 20,
+                "calibration": null
+              }
+            }
+          ],
+          "score": -0.1316301812991547,
+          "constraint_checks": {
+            "enough_signals": true,
+            "each_fold_win_rate": false,
+            "drawdown_within_limit": true,
+            "each_fold_beats_constant": false
+          },
+          "meets_constraints": false
+        },
+        {
+          "alpha": 0.00088905778929926,
+          "folds": [
+            {
+              "train_end": "2024-11-01T00:00:00",
+              "validation_start": "2024-11-04T00:00:00",
+              "validation_end": "2025-03-18T00:00:00",
+              "training": {
+                "input_rows": 2236,
+                "fit_rows": 2236,
+                "calibration_rows": 0,
+                "purged_rows": 0,
+                "budget_sampled_out_rows": 0
+              },
+              "validation_rows": 1066,
+              "prediction": {
+                "rows": 1066,
+                "companies": 13,
+                "signal_count": 1066,
+                "signal_win_rate_after_cost": 0.5065666041275797,
+                "mean_signal_net_return": 0.003820746748962832,
+                "rmse": 0.08708364842545503,
+                "baseline_rmse": 0.08708364842545503,
+                "skill_vs_constant": 0.0
+              },
+              "portfolio": {
+                "total_return": -0.00023989702498350418,
+                "annualized_return": -0.0006791097817261393,
+                "annualized_volatility": 0.2922997403735356,
+                "sharpe_ratio": 0.1426906365761034,
+                "max_drawdown": -0.22362980764940932,
+                "turnover_ratio": 2.3739354145462492,
+                "trade_count": 65,
+                "total_commission": "721.73636486617435436266704",
+                "total_tax": "601.71786002178806418266310",
+                "total_slippage_cost": "2405.7913722358199881044"
+              },
+              "tree": {
+                "depth": 0,
+                "leaves": 1,
+                "nodes": 1,
+                "ccp_alpha": 0.00088905778929926,
+                "max_depth_parameter": 6,
+                "min_samples_leaf": 20,
+                "calibration": null
+              }
+            },
+            {
+              "train_end": "2025-03-18T00:00:00",
+              "validation_start": "2025-03-19T00:00:00",
+              "validation_end": "2025-08-08T00:00:00",
+              "training": {
+                "input_rows": 3406,
+                "fit_rows": 3406,
+                "calibration_rows": 0,
+                "purged_rows": 0,
+                "budget_sampled_out_rows": 0
+              },
+              "validation_rows": 1169,
+              "prediction": {
+                "rows": 1169,
+                "companies": 13,
+                "signal_count": 1169,
+                "signal_win_rate_after_cost": 0.5149700598802395,
+                "mean_signal_net_return": -0.0006568339195745948,
+                "rmse": 0.06465131643754964,
+                "baseline_rmse": 0.06465131643754964,
+                "skill_vs_constant": 0.0
+              },
+              "portfolio": {
+                "total_return": 0.02035178437135965,
+                "annualized_return": 0.05373589054838357,
+                "annualized_volatility": 0.2408086069648778,
+                "sharpe_ratio": 0.3387868797168438,
+                "max_drawdown": -0.13223791553704933,
+                "turnover_ratio": 2.377877668800784,
+                "trade_count": 70,
+                "total_commission": "725.87808936849051899791614",
+                "total_tax": "610.32040352313826528225620",
+                "total_slippage_cost": "2419.6177388289048102290"
+              },
+              "tree": {
+                "depth": 0,
+                "leaves": 1,
+                "nodes": 1,
+                "ccp_alpha": 0.00088905778929926,
+                "max_depth_parameter": 6,
+                "min_samples_leaf": 20,
+                "calibration": null
+              }
+            }
+          ],
+          "score": 0.0,
+          "constraint_checks": {
+            "enough_signals": true,
+            "each_fold_win_rate": true,
+            "drawdown_within_limit": true,
+            "each_fold_beats_constant": false
+          },
+          "meets_constraints": false
+        }
+      ],
+      "representative_rules": "rules_pruned_15041da8b24a.json",
+      "baseline_rules": "rules_baseline_15041da8b24a.json"
+    }
+  ]
+}
