@@ -129,7 +129,7 @@ def test_supervised_process_stops_for_control_changes(tmp_path,monkeypatch,actio
     monkeypatch.setattr(executor_module,"_child_step",_slow_child)
     monkeypatch.setenv("TASK_ARTIFACT_ROOT",str(tmp_path/"artifacts"))
     store=SqliteScheduledTaskStore(tmp_path/"queue.sqlite")
-    body=draft(budget={"max_runtime_seconds":2 if action=="deadline" else 60})
+    body=draft(budget={"max_runtime_seconds":60})
     body["execution_plan"]["steps"][0]["inputs"]={"started":str(tmp_path/"started"),"finished":str(tmp_path/"finished")}
     item=store.create(owner_user_id="a",draft=normalize_schedule_draft(body))
     executor=ScheduledTaskExecutor(authorizer=lambda *_:None)
@@ -143,6 +143,12 @@ def test_supervised_process_stops_for_control_changes(tmp_path,monkeypatch,actio
     assert (tmp_path/"started").exists()
     if action=="cancel":
         store.cancel(run_id=item["initial_run_id"],owner_user_id="a")
+    elif action=="deadline":
+        # Expire after the child starts: slow spawn/imports under a full-suite
+        # workload must not turn a termination test into a startup race.
+        with store._transaction() as cursor:
+            cursor.execute("UPDATE aiia_scheduled_task_run SET deadline_at=%s WHERE run_id=%s",
+                           ("2000-01-01 00:00:00.000000",item["initial_run_id"]))
     elif action=="lease_loss":
         with store._transaction() as cursor:
             cursor.execute("UPDATE aiia_scheduled_task_run SET lease_token='another' WHERE run_id=%s",(item["initial_run_id"],))

@@ -1,0 +1,28 @@
+{
+  "panel_rows": 7760,
+  "companies": 16,
+  "sessions": 485,
+  "eligible_by_horizon": {
+    "1": 7405,
+    "3": 7373,
+    "7": 7309
+  },
+  "development": {
+    "input_rows": 4679,
+    "fit_rows": 3406,
+    "calibration_rows": 1169,
+    "purged_rows": 104,
+    "budget_sampled_out_rows": 0
+  },
+  "test_start": "2025-08-11T00:00:00",
+  "test_signal_end": "2025-12-19T00:00:00",
+  "heldout_companies": [
+    "002330.SZ",
+    "002650.SZ",
+    "300345.SZ"
+  ],
+  "heldout_rows": {
+    "new_period": 1156,
+    "new_companies_and_period": 267
+  }
+}

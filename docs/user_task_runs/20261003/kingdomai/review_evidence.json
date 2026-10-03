@@ -1,0 +1,929 @@
+{
+  "run_id": "20261003T042758Z_5370a71f",
+  "objective": "立即用kingdomai库2024-01-01到2025-12-31的日K，对随机16只股票研究持有1/3/7个交易日到期收益。同时探索上涨概率分类和收益回归，仅比较逻辑回归/Ridge及决策树；样本不另筛选，特征可以使用技术及已支持的扩展特征。最多8个实验、2轮、2个时间验证折，保留其他公司与未来时间窗口，计入成本，输出设计、样本统计、各阶段回测和大模型评审。不要求保证达标，最多运行15分钟。",
+  "selected": {
+    "horizon": 7,
+    "task": "classification",
+    "model": "linear",
+    "sampler": "all",
+    "features": "enriched",
+    "depth": 6,
+    "strength": 3.0,
+    "id": "fddc822e3a0e"
+  },
+  "development_constraints_met": false,
+  "development_constraint_checks": {
+    "enough_signals": true,
+    "each_fold_win_rate": true,
+    "drawdown_within_limit": true,
+    "each_fold_beats_constant": false
+  },
+  "decision_policy": {
+    "probability_threshold": 0.6,
+    "regression_threshold": 0.005,
+    "target_return": 0.0,
+    "top_k": 5,
+    "min_signals": 15,
+    "min_win_rate": 0.5,
+    "max_drawdown": 0.3
+  },
+  "sample_counts": {
+    "panel_rows": 7760,
+    "companies": 16,
+    "sessions": 485,
+    "eligible_by_horizon": {
+      "1": 7405,
+      "3": 7373,
+      "7": 7309
+    },
+    "development": {
+      "input_rows": 4679,
+      "fit_rows": 3406,
+      "calibration_rows": 1169,
+      "purged_rows": 104,
+      "budget_sampled_out_rows": 0
+    },
+    "test_start": "2025-08-11T00:00:00",
+    "test_signal_end": "2025-12-19T00:00:00",
+    "heldout_companies": [
+      "002330.SZ",
+      "002650.SZ",
+      "300345.SZ"
+    ],
+    "heldout_rows": {
+      "new_period": 1156,
+      "new_companies_and_period": 267
+    }
+  },
+  "attempted_trials": 8,
+  "successful_trials": 8,
+  "evaluation": {
+    "new_period": {
+      "prediction": {
+        "rows": 1156,
+        "companies": 13,
+        "signal_count": 41,
+        "signal_win_rate_after_cost": 0.5609756097560976,
+        "descriptive_wilson_interval": [
+          0.41040265151757305,
+          0.7011009522789017
+        ],
+        "mean_signal_net_return": 0.009733257877485788,
+        "unconditional_up_rate": 0.49567474048442905,
+        "prediction_range": {
+          "min": 0.19949644548346251,
+          "max": 0.6653277212202867,
+          "mean": 0.5039908615244436
+        },
+        "calibration": [
+          {
+            "lower": 0.1,
+            "n": 1,
+            "predicted": 0.19949644548346251,
+            "observed": 0.0
+          },
+          {
+            "lower": 0.2,
+            "n": 18,
+            "predicted": 0.26806740016521974,
+            "observed": 0.3333333333333333
+          },
+          {
+            "lower": 0.3,
+            "n": 35,
+            "predicted": 0.3589119208162868,
+            "observed": 0.11428571428571428
+          },
+          {
+            "lower": 0.4,
+            "n": 422,
+            "predicted": 0.4619575168264461,
+            "observed": 0.4928909952606635
+          },
+          {
+            "lower": 0.5,
+            "n": 639,
+            "predicted": 0.5393744301139388,
+            "observed": 0.5179968701095462
+          },
+          {
+            "lower": 0.6,
+            "n": 41,
+            "predicted": 0.6200116122356637,
+            "observed": 0.5853658536585366
+          }
+        ],
+        "brier": 0.24656021030729125,
+        "baseline_brier": 0.2502433036008722,
+        "roc_auc": 0.5507200823806573,
+        "skill_vs_constant": 0.014718049356698626,
+        "by_month": [
+          {
+            "month": "2025-09",
+            "n": 23,
+            "mean_return": 0.008740329461461156,
+            "win_rate_after_cost": 0.43478260869565216
+          },
+          {
+            "month": "2025-10",
+            "n": 6,
+            "mean_return": 0.02275209088328987,
+            "win_rate_after_cost": 0.8333333333333334
+          },
+          {
+            "month": "2025-11",
+            "n": 5,
+            "mean_return": 0.0211742119484144,
+            "win_rate_after_cost": 0.6
+          },
+          {
+            "month": "2025-12",
+            "n": 7,
+            "mean_return": 0.011821770045928501,
+            "win_rate_after_cost": 0.7142857142857143
+          }
+        ],
+        "by_industry": [
+          {
+            "industry": "公用事业",
+            "n": 11,
+            "mean_return": 0.028769537927556724
+          },
+          {
+            "industry": "房地产",
+            "n": 6,
+            "mean_return": 0.011523860654979548
+          },
+          {
+            "industry": "电子",
+            "n": 3,
+            "mean_return": 0.036203358296212684
+          },
+          {
+            "industry": "纺织服饰",
+            "n": 9,
+            "mean_return": 0.020783715743273683
+          },
+          {
+            "industry": "计算机",
+            "n": 12,
+            "mean_return": -0.012925668727848763
+          }
+        ]
+      },
+      "portfolio": {
+        "total_return": 0.1632708408950685,
+        "annualized_return": 0.4873466863815048,
+        "annualized_volatility": 0.20855775555425266,
+        "sharpe_ratio": 2.0043662703262566,
+        "max_drawdown": -0.06217516474746432,
+        "turnover_ratio": 8.01135457933781,
+        "trade_count": 12,
+        "total_commission": "2702.18276452209342036329373",
+        "total_tax": "2293.88569777441910941570170",
+        "total_slippage_cost": "9007.4531561028248690723"
+      },
+      "benchmark": {
+        "total_return": 0.08483877060797718,
+        "annualized_return": 0.2383221589843536,
+        "annualized_volatility": 0.18972147826566396,
+        "sharpe_ratio": 1.2214142897030495,
+        "max_drawdown": -0.07624356295109191,
+        "turnover_ratio": 2.521326551771294,
+        "trade_count": 182,
+        "total_commission": "789.38051693937539380686774",
+        "total_tax": "679.39398372664027085190255",
+        "total_slippage_cost": "2631.3573287003553228156"
+      },
+      "excess_total_return": 0.07843207028709132,
+      "execution_issue_count": 0
+    },
+    "new_companies_and_period": {
+      "prediction": {
+        "rows": 267,
+        "companies": 3,
+        "signal_count": 12,
+        "signal_win_rate_after_cost": 0.25,
+        "descriptive_wilson_interval": [
+          0.08894003962896138,
+          0.53231033912066
+        ],
+        "mean_signal_net_return": -0.03756926451256532,
+        "unconditional_up_rate": 0.44569288389513106,
+        "prediction_range": {
+          "min": 0.29968897883501383,
+          "max": 0.647762462808381,
+          "mean": 0.5324843008127053
+        },
+        "calibration": [
+          {
+            "lower": 0.2,
+            "n": 1,
+            "predicted": 0.29968897883501383,
+            "observed": 0.0
+          },
+          {
+            "lower": 0.3,
+            "n": 3,
+            "predicted": 0.3543694514887948,
+            "observed": 0.0
+          },
+          {
+            "lower": 0.4,
+            "n": 41,
+            "predicted": 0.47991545909287103,
+            "observed": 0.3902439024390244
+          },
+          {
+            "lower": 0.5,
+            "n": 210,
+            "predicted": 0.5417807983698931,
+            "observed": 0.47619047619047616
+          },
+          {
+            "lower": 0.6,
+            "n": 12,
+            "predicted": 0.6133341252671359,
+            "observed": 0.25
+          }
+        ],
+        "brier": 0.2527149613235773,
+        "baseline_brier": 0.25142902407135986,
+        "roc_auc": 0.5318532818532818,
+        "skill_vs_constant": -0.005114513954651789,
+        "by_month": [
+          {
+            "month": "2025-09",
+            "n": 8,
+            "mean_return": -0.05342404188185261,
+            "win_rate_after_cost": 0.125
+          },
+          {
+            "month": "2025-11",
+            "n": 4,
+            "mean_return": 0.0034402902260092516,
+            "win_rate_after_cost": 0.5
+          }
+        ],
+        "by_industry": [
+          {
+            "industry": "电力设备",
+            "n": 11,
+            "mean_return": -0.03901877333669506
+          },
+          {
+            "industry": "食品饮料",
+            "n": 1,
+            "mean_return": 0.01557533255286181
+          }
+        ]
+      },
+      "portfolio": {
+        "total_return": -0.017771241981410557,
+        "annualized_return": -0.04597842966068133,
+        "annualized_volatility": 0.06405756015442164,
+        "sharpe_ratio": -0.7030930916333096,
+        "max_drawdown": -0.03471980731323088,
+        "turnover_ratio": 1.9529985229714848,
+        "trade_count": 2,
+        "total_commission": "578.7255243349690734156030",
+        "total_tax": "478.0926643309547523613650",
+        "total_slippage_cost": "1929.070295763066596550"
+      },
+      "benchmark": {
+        "total_return": -0.009401866881476928,
+        "annualized_return": -0.024491739992419936,
+        "annualized_volatility": 0.23316046182554642,
+        "sharpe_ratio": 0.008387706959447927,
+        "max_drawdown": -0.13201831844992462,
+        "turnover_ratio": 2.317548785613427,
+        "trade_count": 42,
+        "total_commission": "706.14129192559071716096790",
+        "total_tax": "586.42375114505734993599975",
+        "total_slippage_cost": "2353.7985509153482328940"
+      },
+      "excess_total_return": -0.00836937509993363,
+      "execution_issue_count": 0
+    }
+  },
+  "elapsed_seconds": 9.33,
+  "limitations": [
+    "研究回测使用复权价格及1份单位，未完整模拟A股100股整手、开盘涨跌停排队与停复牌可成交性；不作为实盘回报。",
+    "交易成本为任务假设，不自动推断历史税费制度；复权数据可能被供应商修订。",
+    "信号胜率是重叠持有期样本统计，不能视为独立已成交交易胜率；组合收益另由逐日现金账本计算。",
+    "horizon定义：收盘后信号，下一交易日开盘买入，持有h个交易日后开盘退出；不是期间触及目标价概率。",
+    "随机起始股票池可含后来退市股票，但退市清算和历史数据库完整性尚未认证。",
+    "所有盲测只评估开发集选定的一名候选；本轮报告不触发自动再训练或交易。",
+    "估值按下一自然日可用处理；原库未提供历史修订版本，不能证明原始发布时点。",
+    "行业按 SW2021 生效区间对齐，未取得分类历史版本；用于研究特征和分组，非严格历史成分认证。",
+    "新闻热度为已入库新闻的7日数量代理，不代表全网热度；不读取或上传新闻正文。"
+  ],
+  "review_context": {
+    "methodology": "数值特征在基础拟合集内拟合中位数插补、缺失指示和StandardScaler标准化，随后用于校准/验证/测试；行业使用OneHotEncoder且允许未知类别。分类模型用按时间靠后的独立校准集做sigmoid/Platt式LogisticRegression校准，基础拟合与校准边界按标签结束时间purge；回归模型不做概率校准。已有标准化和Platt式校准，不将它们当作尚未实现功能。开发阶段是同一开发股票池的扩展时间窗口验证；整家公司留出只用于最终评估，未实现开发期留公司交叉验证。分类概率的事件是毛收益超过target_return，扣成本信号胜率是另一个口径。信号逐日统计且持有期重叠；组合每h个交易日再平衡，非再平衡日的信号未必成交。trade_count是BUY/SELL成交记录数，不是独立完整交易次数。当前选中特征不含股票代码；仅凭公司留出差异不能断言模型使用或记忆了公司ID。",
+    "selected_feature_columns": [
+      "return_1",
+      "return_3",
+      "return_7",
+      "return_20",
+      "volatility_20",
+      "range_ratio",
+      "open_gap",
+      "ma_distance",
+      "volume_ratio",
+      "amount_log",
+      "turn_ratio",
+      "total_mv",
+      "pe_ttm",
+      "pb_mrq",
+      "industry",
+      "news_count_7d"
+    ],
+    "actually_evaluated": {
+      "horizons": [
+        1,
+        3,
+        7
+      ],
+      "tasks": [
+        "classification",
+        "regression"
+      ],
+      "models": [
+        "linear",
+        "tree"
+      ]
+    },
+    "development_evidence": [
+      {
+        "candidate": {
+          "horizon": 7,
+          "task": "classification",
+          "model": "linear",
+          "sampler": "all",
+          "features": "enriched",
+          "depth": 6,
+          "strength": 3.0,
+          "id": "fddc822e3a0e"
+        },
+        "score": -0.007406872663330066,
+        "constraint_checks": {
+          "enough_signals": true,
+          "each_fold_win_rate": true,
+          "drawdown_within_limit": true,
+          "each_fold_beats_constant": false
+        },
+        "folds": [
+          {
+            "training": {
+              "input_rows": 2236,
+              "fit_rows": 1573,
+              "calibration_rows": 559,
+              "purged_rows": 104,
+              "budget_sampled_out_rows": 0
+            },
+            "validation_rows": 1066,
+            "signal_count": 413,
+            "signal_win_rate_after_cost": 0.5326876513317191,
+            "skill_vs_constant": -0.007406872663330066,
+            "portfolio": {
+              "total_return": 0.052827622433886834,
+              "annualized_return": 0.1569210762552562,
+              "annualized_volatility": 0.29947035486213924,
+              "sharpe_ratio": 0.6350224099987131,
+              "max_drawdown": -0.1759243247337402,
+              "turnover_ratio": 12.878763512764102,
+              "trade_count": 66,
+              "total_commission": "3879.64367443069134318340824",
+              "total_tax": "3248.02521819053649299658870",
+              "total_slippage_cost": "12932.2184689454332642060"
+            }
+          },
+          {
+            "training": {
+              "input_rows": 3406,
+              "fit_rows": 2444,
+              "calibration_rows": 858,
+              "purged_rows": 104,
+              "budget_sampled_out_rows": 0
+            },
+            "validation_rows": 1169,
+            "signal_count": 5,
+            "signal_win_rate_after_cost": 0.8,
+            "skill_vs_constant": 0.013033968269982488,
+            "portfolio": {
+              "total_return": 0.0,
+              "annualized_return": 0.0,
+              "annualized_volatility": 0.0,
+              "sharpe_ratio": null,
+              "max_drawdown": 0.0,
+              "turnover_ratio": 0.0,
+              "trade_count": 0,
+              "total_commission": "0",
+              "total_tax": "0",
+              "total_slippage_cost": "0"
+            }
+          }
+        ]
+      },
+      {
+        "candidate": {
+          "horizon": 3,
+          "task": "classification",
+          "model": "tree",
+          "sampler": "all",
+          "features": "enriched",
+          "depth": 6,
+          "strength": 3.0,
+          "id": "3aeb6f43b13d"
+        },
+        "score": -0.007929449473380146,
+        "constraint_checks": {
+          "enough_signals": false,
+          "each_fold_win_rate": false,
+          "drawdown_within_limit": true,
+          "each_fold_beats_constant": false
+        },
+        "folds": [
+          {
+            "training": {
+              "input_rows": 2314,
+              "fit_rows": 1677,
+              "calibration_rows": 585,
+              "purged_rows": 52,
+              "budget_sampled_out_rows": 0
+            },
+            "validation_rows": 1131,
+            "signal_count": 9,
+            "signal_win_rate_after_cost": 0.5555555555555556,
+            "skill_vs_constant": -0.007929449473380146,
+            "portfolio": {
+              "total_return": 0.050604213166943746,
+              "annualized_return": 0.14823184304405546,
+              "annualized_volatility": 0.12785220436658587,
+              "sharpe_ratio": 1.1427646614793747,
+              "max_drawdown": -0.030886823693039744,
+              "turnover_ratio": 3.868748313172542,
+              "trade_count": 6,
+              "total_commission": "1190.52833470459262765565849",
+              "total_tax": "1005.30695770199813310823755",
+              "total_slippage_cost": "3968.4845508816523242781"
+            }
+          },
+          {
+            "training": {
+              "input_rows": 3497,
+              "fit_rows": 2561,
+              "calibration_rows": 884,
+              "purged_rows": 52,
+              "budget_sampled_out_rows": 0
+            },
+            "validation_rows": 1182,
+            "signal_count": 0,
+            "signal_win_rate_after_cost": null,
+            "skill_vs_constant": -0.0004583228173575815,
+            "portfolio": {
+              "total_return": 0.0,
+              "annualized_return": 0.0,
+              "annualized_volatility": 0.0,
+              "sharpe_ratio": null,
+              "max_drawdown": 0.0,
+              "turnover_ratio": 0.0,
+              "trade_count": 0,
+              "total_commission": "0",
+              "total_tax": "0",
+              "total_slippage_cost": "0"
+            }
+          }
+        ]
+      },
+      {
+        "candidate": {
+          "horizon": 1,
+          "task": "classification",
+          "model": "tree",
+          "sampler": "all",
+          "features": "technical",
+          "depth": 3,
+          "strength": 0.3,
+          "id": "752023b80aba"
+        },
+        "score": -0.017255355534754768,
+        "constraint_checks": {
+          "enough_signals": true,
+          "each_fold_win_rate": false,
+          "drawdown_within_limit": false,
+          "each_fold_beats_constant": false
+        },
+        "folds": [
+          {
+            "training": {
+              "input_rows": 2353,
+              "fit_rows": 1729,
+              "calibration_rows": 598,
+              "purged_rows": 26,
+              "budget_sampled_out_rows": 0
+            },
+            "validation_rows": 1157,
+            "signal_count": 115,
+            "signal_win_rate_after_cost": 0.4434782608695652,
+            "skill_vs_constant": -0.017255355534754768,
+            "portfolio": {
+              "total_return": -0.10377755464435912,
+              "annualized_return": -0.2641923719569633,
+              "annualized_volatility": 0.4593055012694038,
+              "sharpe_ratio": -0.44176054689469785,
+              "max_drawdown": -0.32160071677456115,
+              "turnover_ratio": 41.12556971884185,
+              "trade_count": 143,
+              "total_commission": "11123.19210974214374770031892",
+              "total_tax": "9248.47528630637547167724990",
+              "total_slippage_cost": "37077.2607038472680289968"
+            }
+          },
+          {
+            "training": {
+              "input_rows": 3536,
+              "fit_rows": 2626,
+              "calibration_rows": 884,
+              "purged_rows": 26,
+              "budget_sampled_out_rows": 0
+            },
+            "validation_rows": 1195,
+            "signal_count": 7,
+            "signal_win_rate_after_cost": 0.2857142857142857,
+            "skill_vs_constant": -0.0008130242446708902,
+            "portfolio": {
+              "total_return": -0.027715338985485616,
+              "annualized_return": -0.07333204606809185,
+              "annualized_volatility": 0.04943080955712237,
+              "sharpe_ratio": -1.5159446349238526,
+              "max_drawdown": -0.04276107405435603,
+              "turnover_ratio": 3.971096397953459,
+              "trade_count": 12,
+              "total_commission": "1161.64588168414052937305964",
+              "total_tax": "961.64022151621246126831740",
+              "total_slippage_cost": "3872.1312190254718381292"
+            }
+          }
+        ]
+      },
+      {
+        "candidate": {
+          "horizon": 1,
+          "task": "regression",
+          "model": "linear",
+          "sampler": "all",
+          "features": "enriched",
+          "depth": 3,
+          "strength": 0.3,
+          "id": "106431d8fa70"
+        },
+        "score": -0.03997279961290401,
+        "constraint_checks": {
+          "enough_signals": true,
+          "each_fold_win_rate": false,
+          "drawdown_within_limit": false,
+          "each_fold_beats_constant": false
+        },
+        "folds": [
+          {
+            "training": {
+              "input_rows": 2353,
+              "fit_rows": 2353,
+              "calibration_rows": 0,
+              "purged_rows": 0,
+              "budget_sampled_out_rows": 0
+            },
+            "validation_rows": 1157,
+            "signal_count": 103,
+            "signal_win_rate_after_cost": 0.4563106796116505,
+            "skill_vs_constant": -0.03997279961290401,
+            "portfolio": {
+              "total_return": -0.05810473138523753,
+              "annualized_return": -0.15431754042205448,
+              "annualized_volatility": 0.35433642957202355,
+              "sharpe_ratio": -0.296202266515287,
+              "max_drawdown": -0.1631916653127562,
+              "turnover_ratio": 50.727363379237225,
+              "trade_count": 147,
+              "total_commission": "14396.66823325545575168462820",
+              "total_tax": "11989.29383538373020330539685",
+              "total_slippage_cost": "47988.9103809925835665066"
+            }
+          },
+          {
+            "training": {
+              "input_rows": 3536,
+              "fit_rows": 3536,
+              "calibration_rows": 0,
+              "purged_rows": 0,
+              "budget_sampled_out_rows": 0
+            },
+            "validation_rows": 1195,
+            "signal_count": 180,
+            "signal_win_rate_after_cost": 0.4388888888888889,
+            "skill_vs_constant": -0.018854397158229563,
+            "portfolio": {
+              "total_return": -0.1351429557763184,
+              "annualized_return": -0.32525532333298335,
+              "annualized_volatility": 0.5322758722462017,
+              "sharpe_ratio": -0.4497245466957297,
+              "max_drawdown": -0.300175889538026,
+              "turnover_ratio": 30.81919992725165,
+              "trade_count": 189,
+              "total_commission": "8073.98242787031575191970595",
+              "total_tax": "6698.2260030555816470242575",
+              "total_slippage_cost": "26913.1813020016757821565"
+            }
+          }
+        ]
+      },
+      {
+        "candidate": {
+          "horizon": 1,
+          "task": "regression",
+          "model": "tree",
+          "sampler": "all",
+          "features": "technical",
+          "depth": 3,
+          "strength": 0.3,
+          "id": "7ffbf1d8b56f"
+        },
+        "score": -0.04697605594087606,
+        "constraint_checks": {
+          "enough_signals": true,
+          "each_fold_win_rate": false,
+          "drawdown_within_limit": true,
+          "each_fold_beats_constant": false
+        },
+        "folds": [
+          {
+            "training": {
+              "input_rows": 2353,
+              "fit_rows": 2353,
+              "calibration_rows": 0,
+              "purged_rows": 0,
+              "budget_sampled_out_rows": 0
+            },
+            "validation_rows": 1157,
+            "signal_count": 9,
+            "signal_win_rate_after_cost": 0.3333333333333333,
+            "skill_vs_constant": -0.04697605594087606,
+            "portfolio": {
+              "total_return": -0.004216410933121195,
+              "annualized_return": -0.011761200131083172,
+              "annualized_volatility": 0.22116383803551448,
+              "sharpe_ratio": 0.05530603432264675,
+              "max_drawdown": -0.09489261572423646,
+              "turnover_ratio": 10.480560752455823,
+              "trade_count": 15,
+              "total_commission": "3113.99197500158586359120358",
+              "total_tax": "2595.36654939914143386564600",
+              "total_slippage_cost": "10379.9851229380004294946"
+            }
+          },
+          {
+            "training": {
+              "input_rows": 3536,
+              "fit_rows": 3536,
+              "calibration_rows": 0,
+              "purged_rows": 0,
+              "budget_sampled_out_rows": 0
+            },
+            "validation_rows": 1195,
+            "signal_count": 91,
+            "signal_win_rate_after_cost": 0.5714285714285714,
+            "skill_vs_constant": -0.04666431058138221,
+            "portfolio": {
+              "total_return": 0.038330403075395925,
+              "annualized_return": 0.10729700935465081,
+              "annualized_volatility": 0.323933679572289,
+              "sharpe_ratio": 0.4759516698368629,
+              "max_drawdown": -0.14705546040360706,
+              "turnover_ratio": 76.15592262541213,
+              "trade_count": 158,
+              "total_commission": "24294.60666679258425778993092",
+              "total_tax": "20266.22836518733084904051220",
+              "total_slippage_cost": "80982.1860960661509679876"
+            }
+          }
+        ]
+      },
+      {
+        "candidate": {
+          "horizon": 7,
+          "task": "classification",
+          "model": "linear",
+          "sampler": "all",
+          "features": "technical",
+          "depth": 3,
+          "strength": 0.3,
+          "id": "59c01e05b6c8"
+        },
+        "score": -0.04752095541695334,
+        "constraint_checks": {
+          "enough_signals": true,
+          "each_fold_win_rate": false,
+          "drawdown_within_limit": true,
+          "each_fold_beats_constant": false
+        },
+        "folds": [
+          {
+            "training": {
+              "input_rows": 2236,
+              "fit_rows": 1573,
+              "calibration_rows": 559,
+              "purged_rows": 104,
+              "budget_sampled_out_rows": 0
+            },
+            "validation_rows": 1066,
+            "signal_count": 634,
+            "signal_win_rate_after_cost": 0.5141955835962145,
+            "skill_vs_constant": -0.04752095541695334,
+            "portfolio": {
+              "total_return": -0.023789250072915102,
+              "annualized_return": -0.0659006405629341,
+              "annualized_volatility": 0.31101752681635486,
+              "sharpe_ratio": -0.06495044692130225,
+              "max_drawdown": -0.22147211333913852,
+              "turnover_ratio": 12.328046838558578,
+              "trade_count": 84,
+              "total_commission": "3716.53985359725222067772961",
+              "total_tax": "3092.87158500579884377242660",
+              "total_slippage_cost": "12388.4615872804603706923"
+            }
+          },
+          {
+            "training": {
+              "input_rows": 3406,
+              "fit_rows": 2444,
+              "calibration_rows": 858,
+              "purged_rows": 104,
+              "budget_sampled_out_rows": 0
+            },
+            "validation_rows": 1169,
+            "signal_count": 0,
+            "signal_win_rate_after_cost": null,
+            "skill_vs_constant": 0.0002878891232156455,
+            "portfolio": {
+              "total_return": 0.0,
+              "annualized_return": 0.0,
+              "annualized_volatility": 0.0,
+              "sharpe_ratio": null,
+              "max_drawdown": 0.0,
+              "turnover_ratio": 0.0,
+              "trade_count": 0,
+              "total_commission": "0",
+              "total_tax": "0",
+              "total_slippage_cost": "0"
+            }
+          }
+        ]
+      },
+      {
+        "candidate": {
+          "horizon": 3,
+          "task": "regression",
+          "model": "linear",
+          "sampler": "all",
+          "features": "technical",
+          "depth": 3,
+          "strength": 0.3,
+          "id": "bfbc54a93f71"
+        },
+        "score": -0.06166344401159041,
+        "constraint_checks": {
+          "enough_signals": true,
+          "each_fold_win_rate": false,
+          "drawdown_within_limit": true,
+          "each_fold_beats_constant": false
+        },
+        "folds": [
+          {
+            "training": {
+              "input_rows": 2314,
+              "fit_rows": 2314,
+              "calibration_rows": 0,
+              "purged_rows": 0,
+              "budget_sampled_out_rows": 0
+            },
+            "validation_rows": 1131,
+            "signal_count": 392,
+            "signal_win_rate_after_cost": 0.5204081632653061,
+            "skill_vs_constant": -0.06166344401159041,
+            "portfolio": {
+              "total_return": -0.05909404295289189,
+              "annualized_return": -0.1568023047599898,
+              "annualized_volatility": 0.37968226283670914,
+              "sharpe_ratio": -0.25931838742636054,
+              "max_drawdown": -0.23754523776317105,
+              "turnover_ratio": 28.663185442457774,
+              "trade_count": 136,
+              "total_commission": "8288.01043432776496342695207",
+              "total_tax": "6895.69777825472678720115150",
+              "total_slippage_cost": "27626.6851641096403450009"
+            }
+          },
+          {
+            "training": {
+              "input_rows": 3497,
+              "fit_rows": 3497,
+              "calibration_rows": 0,
+              "purged_rows": 0,
+              "budget_sampled_out_rows": 0
+            },
+            "validation_rows": 1182,
+            "signal_count": 377,
+            "signal_win_rate_after_cost": 0.47480106100795755,
+            "skill_vs_constant": -0.036976429817737744,
+            "portfolio": {
+              "total_return": -0.051403415956461695,
+              "annualized_return": -0.13192136797380238,
+              "annualized_volatility": 0.36604027451776294,
+              "sharpe_ratio": -0.19464597881629128,
+              "max_drawdown": -0.19302492059127363,
+              "turnover_ratio": 28.040109436988825,
+              "trade_count": 146,
+              "total_commission": "8201.54566336657572166979133",
+              "total_tax": "6825.52730039063696932626675",
+              "total_slippage_cost": "27338.4765066887663898041"
+            }
+          }
+        ]
+      },
+      {
+        "candidate": {
+          "horizon": 7,
+          "task": "regression",
+          "model": "tree",
+          "sampler": "all",
+          "features": "technical",
+          "depth": 6,
+          "strength": 3.0,
+          "id": "15041da8b24a"
+        },
+        "score": -0.2889697103154656,
+        "constraint_checks": {
+          "enough_signals": true,
+          "each_fold_win_rate": true,
+          "drawdown_within_limit": true,
+          "each_fold_beats_constant": false
+        },
+        "folds": [
+          {
+            "training": {
+              "input_rows": 2236,
+              "fit_rows": 2236,
+              "calibration_rows": 0,
+              "purged_rows": 0,
+              "budget_sampled_out_rows": 0
+            },
+            "validation_rows": 1066,
+            "signal_count": 552,
+            "signal_win_rate_after_cost": 0.5181159420289855,
+            "skill_vs_constant": -0.2889697103154656,
+            "portfolio": {
+              "total_return": 0.08723537793822045,
+              "annualized_return": 0.26721053826987595,
+              "annualized_volatility": 0.3312458859589389,
+              "sharpe_ratio": 0.8782489749342142,
+              "max_drawdown": -0.17916598680537266,
+              "turnover_ratio": 13.313149868660169,
+              "trade_count": 93,
+              "total_commission": "4312.92742566019775638313346",
+              "total_tax": "3617.89773882584140853328285",
+              "total_slippage_cost": "14376.5342949380568324468"
+            }
+          },
+          {
+            "training": {
+              "input_rows": 3406,
+              "fit_rows": 3406,
+              "calibration_rows": 0,
+              "purged_rows": 0,
+              "budget_sampled_out_rows": 0
+            },
+            "validation_rows": 1169,
+            "signal_count": 1022,
+            "signal_win_rate_after_cost": 0.5273972602739726,
+            "skill_vs_constant": -0.10128206908141779,
+            "portfolio": {
+              "total_return": -0.07304773374488682,
+              "annualized_return": -0.1788602304951361,
+              "annualized_volatility": 0.28778674984181346,
+              "sharpe_ratio": -0.5374942259709028,
+              "max_drawdown": -0.15647199845042215,
+              "turnover_ratio": 11.540178131410007,
+              "trade_count": 94,
+              "total_commission": "3277.45873162980671122583976",
+              "total_tax": "2714.45165385165426610979550",
+              "total_slippage_cost": "10924.8063077489707144172"
+            }
+          }
+        ]
+      }
+    ],
+    "constraint_meaning": "enough_signals检查各折信号总数；each_fold_win_rate检查各折扣成本信号胜率门槛；drawdown_within_limit检查各折组合回撤绝对值；each_fold_beats_constant检查各折预测损失相对常数基准改善（分类Brier或回归MSE），不是胜率超过常数基准。",
+    "interpretation": "最后只对开发集选出的一名候选揭盲；整项研究覆盖范围以actually_evaluated为准。未做统计显著性检验或多组独立公司/新时期重复验证。小公司数、少量信号、重叠标签和有限成交记录只能支持当前切片的描述。trade_count大于0代表有实际成交及其收益观测；记录少不等于没有收益证据，需同时报告观测和不确定性。"
+  }
+}
