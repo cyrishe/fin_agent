@@ -40,18 +40,31 @@ export function matchesTask(task: UserTask, query: string, filter: string): bool
 
 export const activeTaskRun = (run: UserTaskRun): boolean => ["pending", "running"].includes(run.status);
 
+export function latestTaskRun(taskId: string, runs: UserTaskRun[]): UserTaskRun | undefined {
+  return runs.filter(run => (run.task_id || run.schedule_id) === taskId).reduce<UserTaskRun | undefined>((latest, run) => {
+    const time = (item: UserTaskRun) => Date.parse(item.created_at || item.started_at || item.scheduled_for || "") || 0;
+    return !latest || time(run) > time(latest) ? run : latest;
+  }, undefined);
+}
+
 export function taskRunLabel(run: Pick<UserTaskRun, "status" | "cancel_requested_at">): string {
   if (run.cancel_requested_at && ["pending", "running"].includes(run.status)) return "正在停止";
   return ({ pending: "等待执行", running: "执行中", completed: "已完成", failed: "运行失败", cancelled: "已取消" } as Record<string, string>)[run.status] || run.status;
 }
 
-export function taskProgress(run: UserTaskRun): { message: string; completed?: number; total?: number } {
+export function taskProgress(run: UserTaskRun): { message: string; stage?: string; completed?: number; total?: number; work?: { completed: number; total: number } } {
   const progress = asTaskRecord(run.progress);
   const completed = Number(progress.completed_steps);
   const total = Number(progress.total_steps);
   const counts = Number.isFinite(completed) && Number.isFinite(total) && total > 0
     ? { completed: Math.max(0, Math.min(completed, total)), total }
     : {};
+  const workCompleted = Number(progress.completed);
+  const workTotal = Number(progress.total);
+  const work = progress.completed != null && Number.isFinite(workCompleted) && Number.isFinite(workTotal) && workTotal > 0
+    ? { completed: Math.max(0, Math.min(workCompleted, workTotal)), total: workTotal }
+    : undefined;
+  const stage = typeof progress.stage === "string" ? progress.stage.trim() : "";
   return {
     message: String(progress.message || (run.status === "pending"
       ? run.scheduled_for && new Date(run.scheduled_for).getTime() > Date.now()
@@ -59,6 +72,8 @@ export function taskProgress(run: UserTaskRun): { message: string; completed?: n
         : "已进入执行队列，等待后台执行。"
       : run.status === "running" ? "任务执行中，完成阶段后会更新进度。" : "")),
     ...counts,
+    ...(stage ? { stage } : {}),
+    ...(work ? { work } : {}),
   };
 }
 

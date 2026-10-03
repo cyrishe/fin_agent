@@ -114,21 +114,111 @@ def _load_json(path):
     return json.loads(Path(path).read_text())
 
 
-def render_report(report, review):
+def model_display_name(candidate):
+    """Name the fitted estimator, rather than exposing its shared candidate-family key."""
+    classification = candidate.get("task") == "classification"
+    names = {
+        "linear": ("逻辑回归", "Ridge 收益回归"),
+        "elastic_net": ("ElasticNet 逻辑回归", "ElasticNet 收益回归"),
+        "tree": ("决策树分类", "决策树回归"),
+        "forest": ("随机森林分类", "随机森林回归"),
+        "svm": ("支持向量分类（SVC）", "支持向量回归（SVR）"),
+        "hist_gradient_boosting": ("直方图梯度提升分类", "直方图梯度提升回归"),
+    }
+    pair = names.get(candidate.get("model"))
+    return pair[0 if classification else 1] if pair else str(candidate.get("model") or "未记录模型")
+
+
+def _report_facts(report):
+    """Render saved measurements once for both the user and the language reviewer."""
     c = report["selected"]
-    lines = ["# 股票 AutoML 研究报告", "", report["objective"], "", f"候选：`{c}`", "",
-             f"开发集约束满足：{report['development_constraints_met']}。实验：{report['successful_trials']}/{report['attempted_trials']} 成功。", "",
-             "| 盲测切片 | 信号数 | 信号胜率（扣成本） | 组合收益 | 同池基准 | 最大回撤 |", "|---|---:|---:|---:|---:|---:|"]
-    for name, result in report["evaluation"].items():
-        if "prediction" in result:
-            pred, portfolio = result["prediction"], result["portfolio"]
-            win = f"{pred['signal_win_rate_after_cost']:.1%}" if pred['signal_win_rate_after_cost'] is not None else "无信号"
-            lines.append(f"| {name} | {pred['signal_count']} | {win} | {portfolio['total_return']:.2%} | {result['benchmark']['total_return']:.2%} | {portfolio['max_drawdown']:.2%} |")
-        else:
-            lines.append(f"| {name} | 无匹配样本 | — | — | — | — |")
+    classification = c["task"] == "classification"
+    policy = report.get("decision_policy", {})
+    target = policy.get("target_return")
+    target_text = f"超过 {target:.2%}" if target is not None else "超过设定阈值"
+    goal = f"预测到期毛收益{target_text}的概率" if classification else "预测到期收益率"
+    outcome = ("开发集模型满足全部预设筛选条件，泛化仍需结合留出评估。"
+               if report["development_constraints_met"] else
+               "本轮未找到满足全部开发集筛选条件的模型；以下交付的是最佳候选及其未达标证据。")
+    lines = [f"**{model_display_name(c)} · 持有 {c['horizon']} 个交易日 · {goal}。**", "", outcome,
+             f"完成 {report['attempted_trials']} 个候选实验，其中 {report['successful_trials']} 个可评估。"]
+    check_names = {
+        "enough_signals": "开发验证信号总数",
+        "each_fold_win_rate": "每个时间验证折的扣成本信号胜率",
+        "drawdown_within_limit": "每个时间验证折的组合回撤",
+        "each_fold_beats_constant": "每个时间验证折的预测损失优于常数基准",
+    }
+    failed = [check_names.get(key, key) for key, passed in report.get("development_constraint_checks", {}).items() if not passed]
+    if failed:
+        lines += ["未通过的条件：" + "；".join(failed) + "。"]
     counts = report.get("sample_counts", {})
-    lines += ["", "## 样本与检验", "", "```json", json.dumps(counts, ensure_ascii=False, indent=2, default=str), "```",
-              "", "## 大模型解读", "", "以下为自动解释；事实核对以本报告的数值指标与样本统计为准。", "", review, "", "## 边界", ""] + [f"- {text}" for text in report["limitations"]]
+    training = counts.get("development", {})
+    number = lambda value: f"{value:,}" if isinstance(value, (int, float)) else "未记录"
+    lines += ["", "## 样本与划分", "",
+              f"行情面板共 {number(counts.get('panel_rows'))} 行，覆盖 {number(counts.get('companies'))} 家公司、{number(counts.get('sessions'))} 个交易日。样本单位为“公司 × 交易日”。", "",
+              "| 开发集用途 | 样本行数 |", "|---|---:|"]
+    for label, key in (("进入最终训练的开发样本", "input_rows"), ("实际模型拟合", "fit_rows"),
+                       ("独立概率校准", "calibration_rows"), ("时间边界剔除", "purged_rows"),
+                       ("训练预算抽样排除", "budget_sampled_out_rows")):
+        if key in training:
+            suffix = "（收益回归不做概率校准）" if key == "calibration_rows" and not classification else ""
+            lines.append(f"| {label}{suffix} | {number(training[key])} |")
+    if counts.get("test_start") and counts.get("test_signal_end"):
+        lines += ["", f"留出信号日期：{str(counts['test_start'])[:10]} 至 {str(counts['test_signal_end'])[:10]}。"]
+    if isinstance(counts.get("heldout_companies"), list):
+        lines += [f"整家公司留出 {len(counts['heldout_companies'])} 家，不参与开发集训练和候选选择。"]
+    lines += ["", "## 留出评估", "",
+              "留出描述本次训练的数据划分，不自动证明历史窗口此前未被使用。重复使用的历史窗口仅作流程复验，不能作为新的盲测证据。",
+              "", "### 预测表现", "",
+              "预测损失越低越好。相对常数基准的改善为正表示损失更低，为负表示损失更高，不等于收益率。"]
+    loss_key, baseline_key, loss_label = (("brier", "baseline_brier", "Brier") if classification
+                                         else ("rmse", "baseline_rmse", "RMSE"))
+    lines += ["分类采用 Brier 损失。" if classification else "表中展示 RMSE；相对改善按 MSE 计算。", "",
+              f"| 留出范围 | 样本 / 公司 | {loss_label} | 常数基准 {loss_label} | 相对基准改善 |",
+              "|---|---:|---:|---:|---|"]
+    labels = {"new_period": "原公司 · 后续时段", "new_companies_and_period": "新公司 · 后续时段"}
+    available = []
+    for name, result in report.get("evaluation", {}).items():
+        label = labels.get(name, name)
+        if "prediction" not in result:
+            lines.append(f"| {label} | 无匹配样本，未评估 | — | — | — |")
+            continue
+        available.append((label, result))
+        pred = result["prediction"]
+        skill = pred.get("skill_vs_constant")
+        direction = "损失更低" if skill is not None and skill > 0 else "损失更高" if skill is not None and skill < 0 else "损失相同"
+        skill_text = f"{skill:+.2%}（{direction}）" if skill is not None else "未记录"
+        loss = lambda key: f"{pred[key]:.6f}" if pred.get(key) is not None else "未记录"
+        lines.append(f"| {label} | {number(pred.get('rows'))} / {number(pred.get('companies'))} | {loss(loss_key)} | {loss(baseline_key)} | {skill_text} |")
+    if not report.get("evaluation"):
+        lines.append("| 尚无留出评估记录 | — | — | — | — |")
+    lines += ["", "### 信号与组合回测", ""]
+    threshold = policy.get("probability_threshold" if classification else "regression_threshold")
+    if threshold is not None:
+        lines += [(f"预测概率至少达到 {threshold:.2%} 时计作信号。" if classification else
+                   f"预测收益率至少达到 {threshold:.2%} 时计作信号。"), ""]
+    lines += [
+              "| 留出范围 | 信号数 | 扣成本信号胜率 | 组合收益 | 同池基准收益 | 组合最大回撤 | 同池基准最大回撤 | 买卖成交记录 |",
+              "|---|---:|---:|---:|---:|---:|---:|---:|"]
+    percent = lambda value: f"{value:.2%}" if value is not None else "未记录"
+    for label, result in available:
+        pred, portfolio, benchmark = result["prediction"], result.get("portfolio", {}), result.get("benchmark", {})
+        win = "无信号，不计算" if pred.get("signal_count") == 0 else percent(pred.get("signal_win_rate_after_cost"))
+        trades = portfolio.get("trade_count")
+        trade_text = "0（未成交）" if trades == 0 else number(trades)
+        lines.append(f"| {label} | {number(pred.get('signal_count'))} | {win} | {percent(portfolio.get('total_return'))} | {percent(benchmark.get('total_return'))} | {percent(portfolio.get('max_drawdown'))} | {percent(benchmark.get('max_drawdown'))} | {trade_text} |")
+    if not available:
+        lines.append("| 尚无可评估切片 | — | — | — | — | — | — | — |")
+    lines += ["", "信号按公司和日期统计，持有区间可能重叠；组合按持有周期调仓，信号不一定成交。买卖成交记录数不是完整交易次数；零成交时的零收益代表未建立仓位，不代表模型预测正确。"]
+    return lines
+
+
+def render_report(report, review):
+    lines = ["# 股票 AutoML 研究报告", "", *_report_facts(report), "", "## 研究解读", "",
+             "以下为基于上述事实的语言分析，用于解释局限与下一轮假设；数值与筛选结论由程序生成。", "", review,
+             "", "## 本次研究要求", "", report["objective"], "", "## 口径与限制", ""]
+    lines += [f"- {text}" for text in report["limitations"]]
+    lines += ["", "完整候选参数、样本统计与数值证据可在交付的 spec.json、selection.json、sample_counts.json、development.json 和 report.json 中查看。"]
     return "\n".join(lines) + "\n"
 
 
@@ -163,6 +253,7 @@ def review_evidence(root, report):
                             "portfolio": fold["portfolio"]} for fold in item["folds"]]}
                for item in development.get("results", [])]
     return {**report, "review_context": {
+        "fact_summary": "\n".join(_report_facts(report)),
         "methodology": method, "selected_feature_columns": selection.get("columns", []),
         "actually_evaluated": {"horizons": sorted({item["horizon"] for item in candidates}),
                                "tasks": sorted({item["task"] for item in candidates}),
@@ -171,7 +262,8 @@ def review_evidence(root, report):
         "constraint_meaning": "enough_signals检查各折信号总数；each_fold_win_rate检查各折扣成本信号胜率门槛；"
             "drawdown_within_limit检查各折组合回撤绝对值；each_fold_beats_constant检查各折预测损失相对常数基准改善"
             "（分类Brier或回归MSE），不是胜率超过常数基准。",
-        "interpretation": "最后只对开发集选出的一名候选揭盲；整项研究覆盖范围以actually_evaluated为准。"
+        "interpretation": "最后只对开发集选出的一名候选做留出评估；整项研究覆盖范围以actually_evaluated为准。"
+            "留出是本次训练的数据划分，不能据此认定历史窗口从未被使用；重复历史窗口只支持流程复验。"
             "未做统计显著性检验或多组独立公司/新时期重复验证。小公司数、少量信号、重叠标签和有限成交记录只能支持当前切片的描述。"
             "trade_count大于0代表有实际成交及其收益观测；记录少不等于没有收益证据，需同时报告观测和不确定性。"
     }}
@@ -319,7 +411,8 @@ def run_research(spec, daily=None, events=(), *, source=None, output_root="outpu
                 random.Random(spec.seed + round_index).shuffle(explore)
                 remaining = exploit + explore
             picks = [c["id"] for c in remaining[:budget]]
-            emit("模型设计", f"规划第 {round_index + 1} 轮，最多 {budget} 个实验")
+            emit("模型设计", f"规划第 {round_index + 1} 轮，最多 {budget} 个实验",
+                 completed=len(results) + len(failures), total=spec.max_trials, attempted=len(attempted))
             if advisor is not None:
                 try:
                     proposed, analysis = advisor.plan(spec, remaining[:min(120, len(remaining))],
@@ -351,6 +444,8 @@ def run_research(spec, daily=None, events=(), *, source=None, output_root="outpu
             except ValueError as exc:
                 failures.append({"candidate": candidate, "reason": str(exc)[:300]})
             save()
+            emit("训练与验证", f"已处理 {len(results) + len(failures)} 个候选，其中 {len(results)} 个可评估、{len(failures)} 个不可评估",
+                 completed=len(results) + len(failures), total=spec.max_trials, attempted=len(attempted))
     if not results:
         raise ValueError("no evaluable candidates; inspect the saved development evidence")
     results.sort(key=lambda r: (r["meets_constraints"], r["score"]), reverse=True)

@@ -35,9 +35,11 @@ export default function TaskRunDetail({ run, cancelling, onCancel }: Props) {
         <div><dt>开始</dt><dd>{formatTaskTime(run.started_at)}</dd></div>
         <div><dt>结束</dt><dd>{formatTaskTime(run.finished_at)}</dd></div>
       </dl>
-      {(progress.message || progress.total) && <div className="task-progress" role="status" aria-live="polite">
+      {(progress.message || progress.stage || progress.total || progress.work) && <div className="task-progress" role="status" aria-live="polite">
+        {progress.stage && <strong className="task-progress-stage">当前阶段 · {progress.stage}</strong>}
         <p>{activeTaskRun(run) && <LoaderCircle size={15} className="spin" />}{progress.message}</p>
-        {progress.total !== undefined && <><progress max={progress.total} value={progress.completed} aria-label="已完成执行步骤" /><small>已完成 {progress.completed} / {progress.total} 个执行步骤</small></>}
+        {progress.work && <div className="task-progress-work"><progress max={progress.work.total} value={progress.work.completed} aria-label="步骤内已完成工作量" /><small>步骤内工作量 {progress.work.completed} / {progress.work.total} · 不代表整体耗时进度</small></div>}
+        {progress.total !== undefined && <>{!progress.work && <progress max={progress.total} value={progress.completed} aria-label="已完成执行步骤" />}<small>已完成 {progress.completed} / {progress.total} 个执行步骤</small></>}
       </div>}
       {run.cancel_requested_at && activeTaskRun(run) && <p className="task-notice">正在等待执行进程停止，已完成的结果会保留。周期任务的后续安排不受此次停止影响。</p>}
       {run.error_text && <div className="task-run-error" role="alert"><strong>本次运行未完成</strong><p>{run.error_text}</p><small>下方保留已完成步骤与可用结果。可在任务顶部重新运行。</small></div>}
@@ -55,8 +57,8 @@ export default function TaskRunDetail({ run, cancelling, onCancel }: Props) {
           {outputs.length > 1 && stepSummary && <MarkdownContent content={stepSummary} renderImages={false} />}
           {design && <details className="task-evidence"><summary>执行设计与分析</summary><MarkdownContent content={design} renderImages={false} /></details>}
           {metrics.length > 0 && <dl className="task-metrics">{metrics.map((metric, index) => <div key={`${metric.label}-${index}`}><dt>{metric.label}</dt><dd>{metric.value}<small>{metric.unit}</small></dd></div>)}</dl>}
-          {notes.length > 0 && <details className="task-evidence task-result-notes" open><summary>结果说明与限制</summary><ul>{notes.map((note, index) => <li key={index}>{String(note)}</li>)}</ul></details>}
-          {report && <details className="task-evidence"><summary>完整报告{outputs.length > 1 ? ` · ${stepId}` : ""}</summary><MarkdownContent content={report} renderImages={false} /></details>}
+          {report && <details className="task-evidence task-report"><summary>查看完整报告{outputs.length > 1 ? ` · ${stepId}` : ""}</summary><MarkdownContent content={report} renderImages={false} /></details>}
+          {notes.length > 0 && <details className="task-evidence task-result-notes"><summary>结果说明与限制 · {notes.length} 项</summary><ul>{notes.map((note, index) => <li key={index}>{String(note)}</li>)}</ul></details>}
           <details className="task-evidence"><summary>结果与验证依据{outputs.length > 1 ? ` · ${stepId}` : ""}</summary><pre>{JSON.stringify(value, (key, entry) => ["report_markdown", "artifacts"].includes(key) ? undefined : entry, 2)}</pre></details>
         </section>;
       })}

@@ -232,6 +232,7 @@ export interface UserTaskDraft {
   requirement_brief: string;
   trigger?: { cron?: string; at?: string; timezone?: string } | null;
   execution_plan: { steps: ScheduledTaskStep[] };
+  preview?: { steps?: { step_id?: string; display_name?: string }[] };
   budget?: { max_runtime_seconds?: number };
   next_run_at?: string | null;
 }

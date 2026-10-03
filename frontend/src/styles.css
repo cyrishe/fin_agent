@@ -1587,6 +1587,21 @@ body {
 .task-step-history { padding: 0 0 0 18px; color: #708798; font-size: 11px; }
 .task-step-history li { padding: 7px 0; }
 .task-step-history span { margin-left: 12px; }
+.task-step-brief { margin: 9px 0 0; color: #456074; font-size: 12px; line-height: 1.75; white-space: pre-wrap; }
+.task-progress-stage { display: block; margin-bottom: 5px; color: #22546a; font-size: 12px; }
+.task-report > summary { color: #087d99; background: #edf8fb; border: 1px solid #cce5ec; border-radius: 8px; padding: 10px 12px; }
+.task-schedule-icon { margin-top: 3px; color: #7895a6; }
+.task-center .schedule-task-item { grid-template-columns: 14px minmax(0, 1fr); }
+.task-center .schedule-detail-card { scroll-margin-top: 14px; }
+.task-requirement { min-width: 0; }
+.task-requirement-clamped { display: -webkit-box !important; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.task-requirement-full { margin-top: 7px; }
+.task-requirement-full > summary { color: #087d99; font-size: 11px; font-weight: 500; cursor: pointer; }
+.task-requirement-full p { margin: 8px 0 0; color: #456074; font-size: 12px; line-height: 1.75; font-weight: 400; white-space: pre-wrap; overflow-wrap: anywhere; }
+.task-requirement:has(.task-requirement-full[open]) > .task-requirement-clamped { display: none !important; }
+.task-center .schedule-preview-head > div { min-width: 0; }
+.task-center .schedule-detail-title > div:first-child { flex: 1 1 250px; }
+.task-center .schedule-preview-actions { position: sticky; bottom: 0; margin: 12px -14px -14px; padding: 10px 14px; border-top: 1px solid #d8e9ed; border-radius: 0 0 11px 11px; background: #f4fbfc; z-index: 1; }
 
 @container (max-width: 800px) {
   .task-center .schedule-grid { grid-template-columns: 1fr; }

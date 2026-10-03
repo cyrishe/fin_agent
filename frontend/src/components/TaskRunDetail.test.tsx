@@ -14,6 +14,16 @@ describe("TaskRunDetail", () => {
     expect(html).not.toContain("暂停后续安排");
   });
 
+  it("shows a tool stage and internal workload without calling them total task completion", () => {
+    const html = renderToStaticMarkup(<TaskRunDetail run={{ ...base, progress: { stage: "训练与验证", message: "拟合决策树", completed_steps: 0, total_steps: 1, completed: 3, total: 8 } }} onCancel={() => {}} />);
+    expect(html).toContain("当前阶段 · 训练与验证");
+    expect(html).toContain("步骤内工作量 3 / 8");
+    expect(html).toContain("不代表整体耗时进度");
+    expect(html).toContain("已完成 0 / 1 个执行步骤");
+    expect(html).toContain('<progress max="8" value="3" aria-label="步骤内已完成工作量"');
+    expect(html).not.toContain("37.5%");
+  });
+
   it("renders an ML finding as completed work with readable report and evidence", () => {
     const result = { summary: "研究完成；没有模型满足泛化要求。", report_markdown: "## 留出公司评估\n\n样本 178 条，没有选中信号。", metrics: [{ label: "训练样本", value: 2096 }, { label: "留出公司信号", value: 0 }], domain_result: { development_constraints_met: false, design: "冻结公司与时间留出集。", limitations: ["合成数据只验证流程。"] } };
     const html = renderToStaticMarkup(<TaskRunDetail run={{ ...base, status: "completed", summary: result.summary, result: { steps: [{ step_id: "research", status: "completed", result }] }, artifacts: [{ artifact_id: "report", name: "研究报告.md", url: "/api/task-runs/run_1/artifacts/report" }] }} onCancel={() => {}} />);
@@ -27,6 +37,8 @@ describe("TaskRunDetail", () => {
     expect(html).toContain("合成数据只验证流程");
     expect(html).toContain('href="/api/task-runs/run_1/artifacts/report"');
     expect(html).not.toContain("停止本次运行");
+    expect(html.indexOf("查看完整报告")).toBeLessThan(html.indexOf("结果说明与限制"));
+    expect(html).toContain('<details class="task-evidence task-result-notes"><summary>结果说明与限制 · 1 项');
   });
 
   it("keeps partial outputs readable when a non-ML task fails", () => {

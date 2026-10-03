@@ -5,7 +5,7 @@ import {
   previewUserTask, runUserTask, updateUserTask,
 } from "../api";
 import type { UserTask, UserTaskDraft, UserTaskRun } from "../types";
-import { activeTaskRun, formatTaskTime, matchesTask, readTaskLocation, taskKind, taskLink, taskRunLabel, taskSchedule } from "../taskCenter";
+import { activeTaskRun, formatTaskTime, latestTaskRun, matchesTask, readTaskLocation, taskKind, taskLink, taskRunLabel, taskSchedule } from "../taskCenter";
 import TaskRunDetail from "./TaskRunDetail";
 
 const requestId = () => globalThis.crypto?.randomUUID?.() || `${Date.now()}-${Math.random().toString(36).slice(2)}`;
@@ -15,10 +15,20 @@ const examples = [
   { label: "周期分析", text: "每个工作日上午 9 点查询贵州茅台行情，然后生成一份简短分析。" },
 ];
 
-function TaskPlan({ draft }: { draft: UserTaskDraft }) {
+export function TaskRequirement({ text, heading = false, step = false }: { text: string; heading?: boolean; step?: boolean }) {
+  const expandable = text.length > 120 || text.split("\n").length > 2;
+  const Tag = heading ? "h2" : step ? "p" : "strong";
+  return <div className="task-requirement">
+    <Tag className={`${step ? "task-step-brief" : "task-requirement-overview"}${expandable ? " task-requirement-clamped" : ""}`}>{text}</Tag>
+    {expandable && <details className="task-requirement-full"><summary>查看完整任务要求</summary><p>{text}</p></details>}
+  </div>;
+}
+
+export function TaskPlan({ draft }: { draft: UserTaskDraft }) {
   return <ol className="task-plan-list">{draft.execution_plan.steps.map((step, index) => <li key={step.step_id}>
     <span className="task-step-number">{index + 1}</span>
-    <div><strong>{step.target_ref.name}</strong><small>{step.depends_on.length ? `在 ${step.depends_on.join("、")} 完成后执行` : "直接执行"}</small>
+    <div><strong>{draft.preview?.steps?.find(item => item.step_id === step.step_id)?.display_name?.trim() || step.target_ref.name}</strong><small>{step.depends_on.length ? `在 ${step.depends_on.join("、")} 完成后执行` : "直接执行"}</small>
+      {typeof step.inputs.requirement_brief === "string" && step.inputs.requirement_brief.trim() && step.inputs.requirement_brief.trim() !== draft.requirement_brief.trim() && <TaskRequirement text={step.inputs.requirement_brief} step />}
       <details className="task-step-inputs"><summary>查看执行参数</summary><pre>{JSON.stringify(step.inputs, null, 2)}</pre></details>
     </div>
   </li>)}</ol>;
@@ -49,6 +59,8 @@ export default function TaskCenterPanel() {
   const previewRequestRef = useRef<AbortController | null>(null);
   const mountedRef = useRef(true);
   const composerRef = useRef<HTMLTextAreaElement>(null);
+  const detailRef = useRef<HTMLDivElement>(null);
+  const createdTaskRef = useRef("");
   const requestedTaskRef = useRef(initialLocation.taskId);
   const requestedRunRef = useRef(initialLocation.runId);
   const selectedIdRef = useRef(selectedId);
@@ -57,6 +69,7 @@ export default function TaskCenterPanel() {
   selectedRunRef.current = selectedRunId;
   const selected = tasks.find(task => task.task_id === selectedId) || null;
   const selectedRun = runDetail?.run_id === selectedRunId ? runDetail : runs.find(run => run.run_id === selectedRunId) || null;
+  const latestRun = latestTaskRun(selectedId, runs.map(run => runDetail?.run_id === run.run_id ? runDetail : run));
   const filtered = tasks.filter(task => matchesTask(task, query, filter));
 
   useEffect(() => {
@@ -157,6 +170,13 @@ export default function TaskCenterPanel() {
     if (selectedId) window.history.replaceState(null, "", taskLink(selectedId, selectedRunId || undefined));
   }, [selectedId, selectedRunId]);
 
+  useEffect(() => {
+    if (!selectedId || createdTaskRef.current !== selectedId || !detailRef.current) return;
+    createdTaskRef.current = "";
+    detailRef.current.focus({ preventScroll: true });
+    detailRef.current.scrollIntoView({ behavior: window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "start" });
+  }, [selectedId, refresh]);
+
   const changeInstruction = (text: string) => {
     previewRequestRef.current?.abort();
     setInstruction(text);
@@ -189,6 +209,7 @@ export default function TaskCenterPanel() {
       const task = await createUserTask({ instruction: instruction.trim(), draft: preview, idempotencyKey: createKeyRef.current || requestId() });
       if (!mountedRef.current) return;
       setTasks(items => [task, ...items.filter(item => item.task_id !== task.task_id)]);
+      createdTaskRef.current = task.task_id;
       setSelectedId(task.task_id); setSelectedRunId(task.initial_run_id || "");
       setPreview(null); setInstruction(""); createKeyRef.current = "";
       setQuery(""); setFilter("all"); setRefresh(value => value + 1);
@@ -242,7 +263,7 @@ export default function TaskCenterPanel() {
       <div className="task-examples" aria-label="任务示例">{examples.map(example => <button type="button" key={example.label} onClick={() => { changeInstruction(example.text); composerRef.current?.focus(); }} disabled={Boolean(busyAction)}>{example.label}</button>)}</div>
       <div className="schedule-create-actions"><small>{instruction.length}/4000 · 未指定时间即执行一次</small><button type="button" className="schedule-primary" disabled={!instruction.trim() || Boolean(busyAction)} onClick={() => void handlePreview()}>{busyAction === "preview" ? <LoaderCircle size={16} className="spin" /> : <Sparkles size={16} />}生成执行方案</button></div>
       {preview && <div className="schedule-preview" aria-label="任务预览">
-        <div className="schedule-preview-head"><div><strong>{preview.requirement_brief}</strong><span>{taskSchedule(preview)}</span></div><span className="schedule-next"><Clock3 size={14} />{preview.budget?.max_runtime_seconds ? `最长执行 ${Math.ceil(preview.budget.max_runtime_seconds / 60)} 分钟` : "执行预算见方案参数"}</span></div>
+        <div className="schedule-preview-head"><div><TaskRequirement text={preview.requirement_brief} /><span>{taskSchedule(preview)}</span></div><span className="schedule-next"><Clock3 size={14} />{preview.budget?.max_runtime_seconds ? `最长执行 ${Math.ceil(preview.budget.max_runtime_seconds / 60)} 分钟` : "执行预算见方案参数"}</span></div>
         <TaskPlan draft={preview} />
         <div className="schedule-preview-actions"><button type="button" className="schedule-quiet" onClick={() => { setPreview(null); composerRef.current?.focus(); }} disabled={Boolean(busyAction)}>调整说明</button><button type="button" className="schedule-primary" onClick={() => void handleCreate()} disabled={Boolean(busyAction)}>{busyAction === "create" ? <LoaderCircle className="spin" size={16} /> : <Check size={16} />}{taskKind(preview) === "immediate" ? "创建并开始" : "确认安排"}</button></div>
       </div>}
@@ -254,11 +275,11 @@ export default function TaskCenterPanel() {
         <div className="schedule-card-title"><div><h2>我的任务</h2><span>{tasks.length} 项 · 自动更新</span></div><button type="button" className="schedule-icon-button" onClick={() => setRefresh(value => value + 1)} disabled={Boolean(busyAction)} aria-label="刷新任务"><RefreshCw size={16} /></button></div>
         <div className="task-list-tools"><label><Search size={14} /><input aria-label="搜索任务" placeholder="搜索目标或任务编号" value={query} onChange={event => setQuery(event.target.value)} /></label><select aria-label="按执行安排筛选" value={filter} onChange={event => setFilter(event.target.value)}><option value="all">全部任务</option><option value="immediate">立即执行</option><option value="once">预约一次</option><option value="recurring">周期执行</option></select></div>
         {listError && <p className="task-fetch-error" role="alert">任务列表暂时无法更新：{listError}</p>}
-        {loading ? <div className="schedule-state"><LoaderCircle size={22} className="spin" />正在加载任务</div> : !filtered.length ? <div className="schedule-state"><CalendarClock size={24} />{tasks.length ? "没有匹配的任务" : "还没有任务，在上方描述你要完成的工作"}</div> : <div className="schedule-task-list">{filtered.map(task => <button type="button" key={task.task_id} className={`schedule-task-item ${task.task_id === selectedId ? "active" : ""}`} aria-pressed={task.task_id === selectedId} onClick={() => { setSelectedId(task.task_id); setSelectedRunId(""); }}><span className={`schedule-status-dot ${task.enabled ? "enabled" : ""}`} /><span><strong>{task.requirement_brief}</strong><small>{taskSchedule(task)}</small>{taskKind(task) === "recurring" && <small>{task.enabled ? `下次 ${formatTaskTime(task.next_run_at)}` : "后续安排已暂停"}</small>}</span></button>)}</div>}
+        {loading ? <div className="schedule-state"><LoaderCircle size={22} className="spin" />正在加载任务</div> : !filtered.length ? <div className="schedule-state"><CalendarClock size={24} />{tasks.length ? "没有匹配的任务" : "还没有任务，在上方描述你要完成的工作"}</div> : <div className="schedule-task-list">{filtered.map(task => <button type="button" key={task.task_id} className={`schedule-task-item ${task.task_id === selectedId ? "active" : ""}`} aria-pressed={task.task_id === selectedId} onClick={() => { setSelectedId(task.task_id); setSelectedRunId(""); }}><CalendarClock className="task-schedule-icon" size={14} aria-hidden="true" /><span><strong>{task.requirement_brief}</strong><small>{taskSchedule(task)}</small>{taskKind(task) === "recurring" && <small>{task.enabled ? `后续安排已启用 · 下次 ${formatTaskTime(task.next_run_at)}` : "后续安排已暂停"}</small>}{task.task_id === selectedId && latestRun && <small>最近运行 · {taskRunLabel(latestRun)}</small>}</span></button>)}</div>}
       </div>
-      <div className="schedule-detail-card">
+      <div className="schedule-detail-card" ref={detailRef} tabIndex={-1} aria-label="所选任务详情">
         {!selected ? <div className="schedule-state"><CalendarClock size={24} />选择任务查看方案、运行记录与结果</div> : <>
-          <div className="schedule-card-title schedule-detail-title"><div><h2>{selected.requirement_brief}</h2><span>方案修订 #{selected.revision_no}</span></div><div className="schedule-detail-actions">
+          <div className="schedule-card-title schedule-detail-title"><div><TaskRequirement text={selected.requirement_brief} heading /><span>方案修订 #{selected.revision_no}</span></div><div className="schedule-detail-actions">
             {taskKind(selected) === "recurring" && <button type="button" className="schedule-quiet" onClick={() => void handleToggle(selected)} disabled={Boolean(busyAction)} title="仅影响后续周期安排，正在运行的任务可单独停止">{selected.enabled ? <CirclePause size={15} /> : <CirclePlay size={15} />}{selected.enabled ? "暂停后续安排" : "恢复后续安排"}</button>}
             <button type="button" className="schedule-primary" onClick={() => void handleRun(selected)} disabled={Boolean(busyAction)}>{busyAction === `run:${selected.task_id}` ? <LoaderCircle className="spin" size={15} /> : <Play size={15} />}{runs.length ? "再次运行" : "立即运行"}</button>
           </div></div>

@@ -31,7 +31,7 @@ def run(args, *, runtime_ctx=None):
     from src.quant_research.automl.advisor import ResearchAdvisor
     from src.quant_research.automl.config import ResearchSpec
     from src.quant_research.automl.planning import compile_research, explicit_plan
-    from src.quant_research.automl.runner import run_research, write_json
+    from src.quant_research.automl.runner import model_display_name, run_research, write_json
     plan_path = output / "research_design.json"
     if plan_path.exists():
         plan = json.loads(plan_path.read_text())
@@ -91,12 +91,16 @@ def run(args, *, runtime_ctx=None):
     artifacts += [{"name": name, "path": str(root / name),
                    "mime_type": "text/markdown" if name.endswith(".md") else "application/json"} for name in names]
     qualified = report["development_constraints_met"]
-    summary = (f"完成 {report['attempted_trials']} 个候选实验，其中 {report['successful_trials']} 个可评估。"
+    selected = report["selected"]
+    summary = (f"本轮最佳候选为{model_display_name(selected)}，持有 {selected['horizon']} 个交易日。"
+               f"完成 {report['attempted_trials']} 个候选实验，其中 {report['successful_trials']} 个可评估。"
                + ("开发集选出的模型满足预设筛选条件；泛化仍以留出结果为准。" if qualified else "本轮未找到满足全部开发集条件的模型，已保存最佳候选及未达标证据。"))
     if source_name == "demo":
         summary = "合成数据流程验证。" + summary
     counts = report["sample_counts"]
-    metrics = [{"label": "行情样本行数", "value": counts["panel_rows"]},
+    metrics = [{"label": "候选模型", "value": model_display_name(selected)},
+               {"label": "持有周期", "value": selected["horizon"], "unit": "交易日"},
+               {"label": "行情样本行数", "value": counts["panel_rows"]},
                {"label": "股票数", "value": counts["companies"]},
                {"label": "开发集行数", "value": counts["development"]["input_rows"]},
                {"label": "实际拟合行数", "value": counts["development"]["fit_rows"]},
@@ -106,9 +110,12 @@ def run(args, *, runtime_ctx=None):
         if "prediction" not in evidence:
             continue
         label = "原公司新时段" if name == "new_period" else "新公司新时段"
+        win_rate = evidence["prediction"]["signal_win_rate_after_cost"]
         metrics += [{"label": label + "样本行数", "value": evidence["prediction"]["rows"]},
                     {"label": label + "信号数", "value": evidence["prediction"]["signal_count"]},
-                    {"label": label + "组合收益", "value": round(evidence["portfolio"]["total_return"] * 100, 3), "unit": "%"}]
+                    {"label": label + "扣成本信号胜率", "value": round(win_rate * 100, 2) if win_rate is not None else "无信号", "unit": "%" if win_rate is not None else ""},
+                    {"label": label + "组合收益", "value": round(evidence["portfolio"]["total_return"] * 100, 3), "unit": "%"},
+                    {"label": label + "组合最大回撤", "value": round(evidence["portfolio"]["max_drawdown"] * 100, 3), "unit": "%"}]
     return {"tool": "stock_automl_research", "ok": True, "summary": summary,
             "report_markdown": (root / "report.md").read_text(), "metrics": metrics, "artifacts": artifacts,
             "domain_result": {"design": plan["design"], "spec": spec.to_dict(),

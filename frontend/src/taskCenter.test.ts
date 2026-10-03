@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { matchesTask, readTaskLocation, taskArtifactUrl, taskKind, taskLink, taskMetrics, taskOutputs, taskProgress, taskResultSummary, taskRunLabel, taskSchedule } from "./taskCenter";
+import { latestTaskRun, matchesTask, readTaskLocation, taskArtifactUrl, taskKind, taskLink, taskMetrics, taskOutputs, taskProgress, taskResultSummary, taskRunLabel, taskSchedule } from "./taskCenter";
 import type { UserTask, UserTaskRun } from "./types";
 
 const task: UserTask = { task_id: "task_1", requirement_brief: "银行股研究", execution_plan: { steps: [] }, enabled: true, revision_no: 1 };
@@ -33,6 +33,18 @@ describe("task center view model", () => {
     expect(taskProgress({ ...run, status: "running", progress: { message: "拟合随机森林" } })).toEqual({ message: "拟合随机森林" });
     expect(taskProgress({ ...run, progress: { completed_steps: 1, total_steps: 3, message: "已完成数据准备" } })).toEqual({ message: "已完成数据准备", completed: 1, total: 3 });
     expect(taskProgress({ ...run, progress: { completed_steps: 1, total_steps: 0 } }).total).toBeUndefined();
+  });
+
+  it("keeps tool workload distinct from outer execution steps for any task", () => {
+    expect(taskProgress({ ...run, status: "running", progress: { stage: "资料整理", message: "正在整理第 4 份资料", completed_steps: 0, total_steps: 1, completed: 3, total: 12 } })).toEqual({ stage: "资料整理", message: "正在整理第 4 份资料", completed: 0, total: 1, work: { completed: 3, total: 12 } });
+    for (const progress of [{ completed: 2 }, { total: 12 }, { completed: 1, total: 0 }, { completed: null, total: 10 }]) expect(taskProgress({ ...run, progress }).work).toBeUndefined();
+  });
+
+  it("only uses a task's actual latest run even if a deep-linked older run comes first", () => {
+    const old = { ...run, run_id: "old", created_at: "2026-10-01T00:00:00Z" };
+    const latest = { ...run, run_id: "latest", status: "running", created_at: "2026-10-03T00:00:00Z" };
+    expect(latestTaskRun("task_1", [old, latest])).toEqual(latest);
+    expect(latestTaskRun("task_2", [old, latest])).toBeUndefined();
   });
 
   it("normalizes generic outputs once across persisted step records and bindings", () => {

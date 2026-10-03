@@ -102,6 +102,37 @@ def test_cancelled_fit_consumes_attempt_budget_without_rerunning(market, tmp_pat
     assert len(failures) == 1 and "budget remains consumed" in failures[0]["reason"]
 
 
+@pytest.mark.parametrize("failure_at", [None, 6, 12])
+def test_candidate_progress_is_current_at_round_and_completion_boundaries(market, tmp_path, monkeypatch, failure_at):
+    import src.quant_research.automl.runner as runner
+    updates, evaluated = [], []
+
+    def assess(data, panel, candidate, spec, extra, check_cancel):
+        # Before a fit starts, the UI must not count that in-flight candidate as complete.
+        assert updates[-1]["completed"] == len(evaluated)
+        evaluated.append(candidate["id"])
+        if len(evaluated) == failure_at:
+            raise ValueError("controlled unevaluable candidate")
+        return {"candidate": candidate, "columns": runner.feature_columns(data, candidate["features"], extra),
+                "folds": [], "score": .1, "meets_constraints": False, "constraint_checks": {}, "signal_count": 0}
+
+    # Control candidate outcomes; final fitting, saved checkpoints and report delivery are real.
+    monkeypatch.setattr(runner, "assess_candidate", assess)
+    spec = minimal_spec(models=("linear", "tree"), horizons=(1, 3, 7), max_trials=12, rounds=2)
+    root, report = run_research(spec, *market, output_root=tmp_path, progress=updates.append)
+    planning = [event for event in updates if event["stage"] == "模型设计"]
+    assert [(event.get("completed"), event.get("total")) for event in planning] == [(0, 12), (6, 12)]
+    completions = [event["completed"] for event in updates if event["stage"] == "训练与验证"
+                   and event["completed"] == event["attempted"]]
+    assert completions == list(range(1, 13))
+    assert next(event for event in updates if event["stage"] == "最终训练")["completed"] == 12
+    assert updates[-1]["completed"] == report["attempted_trials"] == 12
+    assert report["successful_trials"] == (11 if failure_at else 12)
+    state = json.loads((root / "checkpoint.json").read_text())
+    assert len(state["results"]) + len(state["failures"]) == 12
+    assert len(state["failures"]) == (1 if failure_at else 0)
+
+
 def test_completed_resume_and_review_never_retrain(market, tmp_path, monkeypatch):
     import src.quant_research.automl.runner as runner
     root, report = run_research(minimal_spec(), *market, output_root=tmp_path, progress=lambda _: None)
@@ -155,6 +186,14 @@ def test_tool_authorized_demo_reports_and_resume(tmp_path):
     assert next(event for event in updates if event["stage"] == "最终训练")["completed"] == 2
     assert not any(a["path"].endswith((".pkl", ".joblib", ".csv")) for a in result["artifacts"])
     assert result["domain_result"]["sample_counts"]["development"]["fit_rows"] > 0
+    metrics = {metric["label"]: metric for metric in result["metrics"]}
+    assert metrics["候选模型"]["value"] == "Ridge 收益回归"
+    assert metrics["持有周期"]["value"] == 1
+    for label, evidence in (("原公司新时段", result["domain_result"]["evaluation"]["new_period"]),
+                            ("新公司新时段", result["domain_result"]["evaluation"]["new_companies_and_period"])):
+        win = evidence["prediction"]["signal_win_rate_after_cost"]
+        assert metrics[label + "扣成本信号胜率"]["value"] == (round(win * 100, 2) if win is not None else "无信号")
+        assert metrics[label + "组合最大回撤"]["value"] == round(evidence["portfolio"]["max_drawdown"] * 100, 3)
     again = run(args, runtime_ctx=runtime)
     assert again["domain_result"]["selected"] == result["domain_result"]["selected"]
     # A new lease gets a copied isolated attempt directory, not the old path.
