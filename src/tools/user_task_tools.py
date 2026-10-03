@@ -36,9 +36,18 @@ def run_submit(args: dict, *, runtime_ctx: dict | None = None) -> dict:
     context = runtime_ctx or {}
     if context.get("task_run_id") or context.get("scheduled_task_run_id"):
         raise ValueError("后台任务不能递归提交另一项后台任务")
-    instruction = str(args.get("instruction") or "").strip()
+    # The authenticated turn owns the request. Model arguments only add prior context.
+    original = context.get("_task_user_text")
+    instruction = original if isinstance(original, str) and original.strip() else str(args.get("instruction") or "").strip()
     if not instruction or len(instruction) > 4000:
         raise ValueError("任务说明需要 1 到 4000 个字符")
+    supplement = args.get("context", "")
+    if not isinstance(supplement, str):
+        raise ValueError("任务上下文需要是文本")
+    if supplement.strip():
+        instruction = f"[本轮用户原文]\n{instruction}\n\n[前文已确认的补充]\n{supplement.strip()}"
+    if not instruction or len(instruction) > 4000:
+        raise ValueError("任务说明与上下文合计不能超过 4000 个字符，请精简补充内容")
     key = str(args.get("idempotency_key") or "").strip()
     if len(key) > 128:
         raise ValueError("幂等标识过长")

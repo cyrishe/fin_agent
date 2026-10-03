@@ -65,6 +65,7 @@ def build_user_task_agent_tools(runtime):
                     "owner_user_id": current["user_id"], "user_type": current["user_type"],
                     "conversation_id": runtime.tool_context.get("_task_conversation_id") or "",
                     "turn_id": runtime.tool_context.get("_task_turn_id") or "",
+                    "_task_user_text": runtime.tool_context.get("_task_user_text") or "",
                 })
                 call.update({key: payload[key] for key in ("task_id", "run_id", "task_url") if key in payload})
                 receipt = _receipt_snapshot(_name, payload)

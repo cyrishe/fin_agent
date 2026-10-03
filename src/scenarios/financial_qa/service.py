@@ -517,6 +517,7 @@ class FinancialQaCcService:
             runtime_context["_task_actor"] = dict(actor)
             runtime_context["_task_conversation_id"] = str(thread_id)
             runtime_context["_task_turn_id"] = str(turn_id)
+            runtime_context["_task_user_text"] = user_text
         runtime_context["_finance_execution_mode"] = normalized_execution_mode
         runtime_context["_finance_isolated_request"] = bool(isolated_request)
         # Reuse the existing semantic decision. A missing/legacy provenance is

@@ -1005,13 +1005,14 @@ def test_dsh_session_reuses_worker_and_projects_trace(tmp_path: Path) -> None:
         turn_id=1,
         owner_id="owner-a",
         user_text="贵州茅台最近收盘价",
-        context={"_finance_execution_mode": "fast"},
+        context={"_finance_execution_mode": "fast", "_task_user_text": "本轮原文一"},
     )
     second = service.run_turn(
         thread_id=7,
         turn_id=2,
         owner_id="owner-a",
         user_text="那成交额呢",
+        context={"_task_user_text": "本轮原文二"},
     )
 
     assert len(created) == 1
@@ -1021,6 +1022,8 @@ def test_dsh_session_reuses_worker_and_projects_trace(tmp_path: Path) -> None:
     assert second["execution_mode"] == "standard"
     assert observed_contexts[0]["tool_context"]["_finance_execution_mode"] == "fast"
     assert observed_contexts[1]["tool_context"]["_finance_execution_mode"] == "standard"
+    assert observed_contexts[0]["tool_context"]["_task_user_text"] == "本轮原文一"
+    assert observed_contexts[1]["tool_context"]["_task_user_text"] == "本轮原文二"
     assert first["tool_calls"][0]["api"] == "stock.quote"
     assert first["result_refs"][0]["result_ref"] == "session://dsh/vars/v1"
     assert first["llm_usage"] == {

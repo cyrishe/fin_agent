@@ -57,13 +57,14 @@ describe("TaskRunDetail", () => {
     expect(html).not.toContain(" open=");
   });
 
-  it("keeps partial outputs visible on failure and puts error diagnostics in records", () => {
+  it("shows the failure reason and partial outputs before collapsed records", () => {
     const html = render({ ...base, status: "failed", error_text: "报告步骤超时", result: { outputs: { fetch: { result: { summary: "已收集 20 份资料" } } } }, artifacts: [{ artifact_id: "unsafe", name: "不可访问附件", url: "file:///secret/report" }] });
     expect(html).toContain('role="alert"');
     expect(html).toContain("本次运行未完成");
     expect(html).toContain("已收集 20 份资料");
     expect(html.indexOf("已收集 20 份资料")).toBeLessThan(html.indexOf("详情与记录"));
-    expect(html.indexOf("报告步骤超时")).toBeGreaterThan(html.indexOf("详情与记录"));
+    expect(html.indexOf("报告步骤超时")).toBeLessThan(html.indexOf("<details"));
+    expect(html.match(/报告步骤超时/g)).toHaveLength(1);
     expect(html).not.toContain("file:///secret/report");
     expect(html).not.toContain("没有返回结果摘要");
   });

@@ -51,6 +51,27 @@ def test_domain_compiler_rejects_unsupported_and_unknown_contracts():
         compile_research("run", reference_time="2026-10-03", complete=lambda *a: json.dumps({"spec": {"end": "2027-01-01"}, "design": "x"}))
 
 
+def test_domain_planning_requests_reasoning_before_training(monkeypatch):
+    from types import SimpleNamespace
+    import src.quant_research.automl.advisor as advisor
+    monkeypatch.setenv("LLM_BASE_URL", "https://model.invalid/v1")
+    monkeypatch.setenv("LLM_API_KEY", "test-key")
+    monkeypatch.setenv("LLM_DEFAULT_MODEL", "test-model")
+    calls = []
+    def post(url, **kwargs):
+        calls.append(kwargs["json"])
+        content = json.dumps({"spec": {}, "design": "能力核对", "unsupported_requirements": ["开盘跳空标签尚未实现"]})
+        return SimpleNamespace(ok=True, json=lambda: {"choices": [{"finish_reason": "stop", "message": {"content": content}}]})
+    monkeypatch.setattr(advisor.requests, "post", post)
+    with pytest.raises(UnsupportedResearchRequirement, match="开盘跳空"):
+        compile_research("预测次日高开", reference_time="2026-10-03")
+    assert calls[0]["enable_thinking"] is True
+    assert "预测次日高开" in calls[0]["messages"][1]["content"]
+    # Existing candidate selection/review callers keep their previous request mode.
+    ResearchAdvisor._complete("review", {})
+    assert calls[1]["enable_thinking"] is False
+
+
 def test_resume_reuses_completed_trials_round_picks_and_frozen_data(market, tmp_path, monkeypatch):
     import src.quant_research.automl.runner as runner
     daily, events = market

@@ -52,7 +52,7 @@ export default function TaskRunDetail({ run, cancelling, embedded, onCancel }: P
           : progress.total !== undefined && <small>已完成 {progress.completed} / {progress.total} 个步骤</small>}
       </div>}
       {run.cancel_requested_at && active && <p className="task-notice" role="status">正在停止，已完成的结果会保留。</p>}
-      {run.status === "failed" && <div className="task-run-error" role="alert"><strong>本次运行未完成</strong><p>已完成的结果会保留。可以再次运行，或展开下方记录查看原因。</p></div>}
+      {run.status === "failed" && <div className="task-run-error" role="alert"><strong>本次运行未完成</strong><p>{run.error_text || "暂未返回具体原因，请查看下方运行记录。"}</p><small>已完成的结果会保留，请根据原因调整要求或重试。</small></div>}
       {summary && <div className="task-result-summary"><h3>{active ? "已有结果" : "结果摘要"}</h3><MarkdownContent content={summary} renderImages={false} /></div>}
       {hasReport && <details className="task-evidence task-report"><summary>查看完整报告</summary>
         {outputs.map(({ stepId, report, design, metrics, notes }) => <section className="task-step-result" key={stepId} aria-label={`步骤 ${stepId} 的结果`}>
@@ -72,7 +72,7 @@ export default function TaskRunDetail({ run, cancelling, embedded, onCancel }: P
           <div><dt>结束</dt><dd>{formatTaskTime(run.finished_at)}</dd></div>
         </dl>
         <p className="task-notice">运行编号：{run.run_id}</p>
-        {run.error_text && <div className="task-run-error"><strong>未完成原因</strong><p>{run.error_text}</p></div>}
+        {run.error_text && run.status !== "failed" && <div className="task-run-error"><strong>未完成原因</strong><p>{run.error_text}</p></div>}
         {!active && progress.message && <p className="task-notice">最后进展：{progress.message}</p>}
         {steps.length > 0 && <ol className="task-step-history">{steps.map((step, index) => <li key={String(step.step_id || index)}><strong>{String(step.step_id || `步骤 ${index + 1}`)}</strong><span>{taskRunLabel({ status: String(step.status || "completed") })}</span>{typeof step.error === "string" && <p>{step.error}</p>}</li>)}</ol>}
         {outputs.length > 0 && <details className="task-evidence"><summary>原始结果与验证依据</summary>{outputs.map(({ stepId, value }) => <pre key={stepId}>{JSON.stringify(value, (key, entry) => ["report_markdown", "artifacts"].includes(key) ? undefined : entry, 2)}</pre>)}</details>}

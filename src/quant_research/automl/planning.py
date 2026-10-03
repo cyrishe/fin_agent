@@ -47,11 +47,14 @@ def compile_research(requirement_brief, *, reference_time=None, complete=None):
     if not isinstance(requirement_brief, str) or not requirement_brief.strip():
         raise ValueError("requirement_brief is required")
     defaults = default_spec(reference_time)
-    text = (complete or ResearchAdvisor._complete)(Path(__file__).with_name("prompts").joinpath("compile.md").read_text(), {
+    system = Path(__file__).with_name("prompts").joinpath("compile.md").read_text()
+    payload = {
         "requirement_brief": requirement_brief,
         "reference_time": str(reference_time or datetime.now(ZoneInfo("Asia/Shanghai")).isoformat()),
         "default_spec": defaults.to_dict(),
-    })
+    }
+    # Comparing the requested label/timing to executable capabilities needs reasoning.
+    text = complete(system, payload) if complete else ResearchAdvisor._complete(system, payload, enable_thinking=True)
     cleaned = text.strip()
     if cleaned.startswith("```"):
         cleaned = cleaned.split("\n", 1)[1].rsplit("```", 1)[0]

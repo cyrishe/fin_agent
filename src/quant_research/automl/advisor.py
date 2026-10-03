@@ -15,7 +15,7 @@ class ResearchAdvisor:
         self.complete = complete or self._complete
 
     @staticmethod
-    def _complete(system, payload):
+    def _complete(system, payload, *, enable_thinking=False):
         base = os.getenv("LLM_BASE_URL") or os.getenv("LLM_ENDPOINT")
         key = os.getenv("LLM_API_KEY") or os.getenv("LLM_KEY") or os.getenv("DASHSCOPE_API_KEY")
         model = os.getenv("LLM_DEFAULT_MODEL")
@@ -25,7 +25,7 @@ class ResearchAdvisor:
             headers={"Authorization": f"Bearer {key}"},
             json={"model": model, "messages": [{"role": "system", "content": system},
                   {"role": "user", "content": json.dumps(payload, ensure_ascii=False)}],
-                  "temperature": .2, "enable_thinking": False,
+                  "temperature": .2, "enable_thinking": enable_thinking,
                   "max_tokens": min(int(os.getenv("LLM_DEFAULT_MAX_TOKENS", "8192")), 8192)}, timeout=(8, 90))
         if not response.ok:
             # Server errors can contain URLs or credentials. Persist only the status code.

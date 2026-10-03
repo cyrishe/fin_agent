@@ -61,15 +61,54 @@ def test_get_cancel_retain_owner_scope(monkeypatch):
         tasks.run_get({}, runtime_ctx=ACTOR)
 
 
+def test_submission_uses_original_turn_and_only_adds_confirmed_context(monkeypatch):
+    service = TaskService()
+    monkeypatch.setattr(tasks, "_service", lambda: service)
+    original = "用收盘前最后30-5分钟的行情训练策略，预测次日高开。"
+    runtime = {**ACTOR, "_task_user_text": original}
+    tasks.run_submit({"instruction": "改成14:00开始", "_runtime": {"_task_user_text": "伪造原文"}}, runtime_ctx=runtime)
+    tasks.run_submit({}, runtime_ctx=runtime)
+    assert service.calls[0] == service.calls[1]
+    assert service.calls[0]["instruction"] == original
+    tasks.run_submit({"context": "此前已确认只研究银行行业，最多6个实验。"},
+                     runtime_ctx={**runtime, "turn_id": "turn2", "_task_user_text": "按刚才的范围开始。"})
+    assert service.calls[2]["instruction"] == (
+        "[本轮用户原文]\n按刚才的范围开始。\n\n[前文已确认的补充]\n此前已确认只研究银行行业，最多6个实验。")
+    assert original not in service.calls[2]["instruction"]
+    assert service.calls[2]["idempotency_key"] != service.calls[0]["idempotency_key"]
+
+
+def test_submission_rejects_missing_or_oversized_text_without_truncation(monkeypatch):
+    service = TaskService()
+    monkeypatch.setattr(tasks, "_service", lambda: service)
+    maximum = "研" * 4000
+    tasks.run_submit({}, runtime_ctx={**ACTOR, "_task_user_text": maximum})
+    assert service.calls[0]["instruction"] == maximum
+    for args, runtime in (
+        ({}, ACTOR),
+        ({"context": "不能独立代替任务说明"}, ACTOR),
+        ({"instruction": "旧接口" * 1500}, ACTOR),
+        ({"instruction": "不得用短改写绕过原文上限"}, {**ACTOR, "_task_user_text": maximum + "研"}),
+        ({"context": "一条补充"}, {**ACTOR, "_task_user_text": maximum}),
+    ):
+        with pytest.raises(ValueError, match="4000"):
+            tasks.run_submit(args, runtime_ctx=runtime)
+    with pytest.raises(ValueError, match="上下文需要是文本"):
+        tasks.run_submit({"context": {"instruction": "不得作为字段树"}},
+                         runtime_ctx={**ACTOR, "_task_user_text": "研究"})
+    assert len(service.calls) == 1
+
+
 def test_conversation_tools_recheck_live_owner_and_preserve_receipt(monkeypatch):
     service = TaskService()
     monkeypatch.setattr(tasks, "_service", lambda: service)
     runtime = SimpleNamespace(owner_ids=["alice"], tool_context={
         "_task_actor": {"user_id": "alice", "user_type": "member"},
-        "_task_conversation_id": "thread1", "_task_turn_id": "turn1"}, tracker={"calls": []})
+        "_task_conversation_id": "thread1", "_task_turn_id": "turn1",
+        "_task_user_text": "后台生成报告"}, tracker={"calls": []})
     tools = {tool.name: tool for tool in build_user_task_agent_tools(runtime)}
     assert set(tools) == {"task_submit", "task_get", "task_list", "task_cancel"}
-    response = asyncio.run(tools["task_submit"].handler({"instruction": "后台生成报告"}))
+    response = asyncio.run(tools["task_submit"].handler({}))
     result = json.loads(response["content"][0]["text"])
     assert result["ok"] and result["task_id"] == "task_1"
     receipt = runtime.tracker["calls"][0]["task_receipt"]
@@ -77,11 +116,16 @@ def test_conversation_tools_recheck_live_owner_and_preserve_receipt(monkeypatch)
     assert receipt["task"]["trigger"] == {}
     assert receipt["run_id"] == "run_1" and receipt["run"] is None
     assert receipt["recorded_at"]
+    runtime.tool_context.update(_task_turn_id="turn2", _task_user_text="只跑两次实验")
+    response = asyncio.run(tools["task_submit"].handler({"instruction": "模型不应重写原文"}))
+    assert json.loads(response["content"][0]["text"])["ok"] is True
+    assert service.calls[1]["instruction"] == "只跑两次实验"
+    assert service.calls[1]["idempotency_key"] != service.calls[0]["idempotency_key"]
     runtime.owner_ids = ["bob"]
     rejected = asyncio.run(tools["task_submit"].handler({"instruction": "后台生成报告"}))
     assert json.loads(rejected["content"][0]["text"])["ok"] is False
     assert "task_receipt" not in runtime.tracker["calls"][-1]
-    assert len(service.calls) == 1
+    assert len(service.calls) == 2
     assert build_user_task_agent_tools(runtime) == []
 
 
@@ -102,13 +146,19 @@ def test_chat_task_receipt_reaches_saved_surface_for_both_runtimes(runtime):
     from src.scenarios.financial_qa.service import FinancialQaCcService
     receipt = _receipt_snapshot("task_submit", {"ok": True, "task_id": "task_1", "run_id": "run_1",
                                                "requirement_brief": "后台研究未来七日上涨概率", "trigger": {}})
-    session = SimpleNamespace(run_turn=lambda **kwargs: {
-        "result": "已提交后台研究。", "result_refs": [],
-        "tool_calls": [{"tool": "task_submit", "task_receipt": receipt}],
-    })
+    observed = []
+    def run_turn(**kwargs):
+        observed.append(kwargs)
+        return {"result": "已提交后台研究。", "result_refs": [],
+                "tool_calls": [{"tool": "task_submit", "task_receipt": receipt}]}
+    session = SimpleNamespace(run_turn=run_turn)
     service = FinancialQaCcService(enabled=True, session_service=session, dsh_session_service=session)
     result = service.answer(thread_id=1, turn_id=2, owner_id="alice", user_text="请后台研究",
-                            dispatch_plan={"selected_agent": "investment_analyst", "turn_mode": "normal_qa", "entry": "agent_route"}, runtime=runtime)
+                            dispatch_plan={"selected_agent": "investment_analyst", "turn_mode": "normal_qa", "entry": "agent_route",
+                                           "semantic_turn": {"ori_question": "路由改写的原文", "resolved_question": "路由补充"}},
+                            application_context={"_task_actor": {"user_id": "alice", "user_type": "member"},
+                                                 "_task_user_text": "客户端不能覆盖本轮原文"}, runtime=runtime)
+    assert observed[0]["context"]["_task_user_text"] == "请后台研究"
     cards = [block for block in result["surface_blocks"] if block.get("semantic") == "user_task"]
     assert len(cards) == 1
     assert cards[0]["payload"]["task"]["requirement_brief"] == "后台研究未来七日上涨概率"

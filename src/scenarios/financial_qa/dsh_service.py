@@ -982,6 +982,7 @@ class FinanceDeepSeekHarnessSessionService:
             "_task_actor",
             "_task_conversation_id",
             "_task_turn_id",
+            "_task_user_text",
             "allowed_agent_tools",
             "skill_tool_access",
             "allowed_finance_skills",
