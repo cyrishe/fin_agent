@@ -5,7 +5,7 @@
   "auth": "public",
   "identity": {
     "display_name": "股票 AutoML 研究任务",
-    "description": "后台股票机器学习研究：自然语言规划、有限候选搜索、时间滚动训练与回归评估、独立公司和时间留出回测、证据报告。必须由用户后台任务系统执行；普通对话先提交任务。研究完成不代表找到达标模型。",
+    "description": "一次性、需求驱动的股票机器学习研究与训练：自然语言设计一个或多个研究方向，共享实验预算，分别训练、解释并交付可复用模型策略及时间/公司留出回测证据。支持精确率优先、局部股票范围，允许未达标或无信号。必须由授权后台任务执行。日常选股应加载已有模型预测，不应重复调用本训练工具；本工具不代替模型推理或实盘交易。",
     "domain": "stock",
     "owner": "tools"
   },
@@ -90,8 +90,12 @@
               }
             },
             "max_symbols": {
-              "type": "integer",
-              "maximum": 500
+              "type": [
+                "integer",
+                "null"
+              ],
+              "minimum": 1,
+              "description": "默认 null 使用研究区间全股票池；明确设置整数才按固定种子限制公司数。"
             },
             "horizons": {
               "type": "array",
@@ -177,7 +181,7 @@
               "type": "number"
             },
             "initial_cash": {
-              "type": "integer"
+              "type": "number"
             },
             "include_minute": {
               "type": "boolean"
@@ -205,6 +209,31 @@
                 "number",
                 "null"
               ]
+            },
+            "feature_names": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "研究方向要使用的已有特征名；空列表使用feature_sets全部可用特征。"
+            },
+            "min_precision": {
+              "type": [
+                "number",
+                "null"
+              ],
+              "minimum": 0,
+              "maximum": 1,
+              "description": "选中事件达到target_return的最低精确率；自然语言研究默认0.6。"
+            },
+            "optimize_threshold": {
+              "type": "boolean",
+              "description": "只在开发数据选择筛选门槛，冻结后用于留出测试和复用。"
+            },
+            "min_signal_dates": {
+              "type": "integer",
+              "minimum": 1,
+              "description": "开发选择所需的最少不同出手日期数。"
             }
           },
           "description": "仅用于用户明确提供的完整结构化研究配置；提供时以字段为执行约束，说明文字不再隐式改写。自然语言任务请省略，由业务规划器编译。"

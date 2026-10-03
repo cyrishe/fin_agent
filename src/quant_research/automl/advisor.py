@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import json
 import os
+from functools import partial
 from pathlib import Path
 
 import requests
@@ -10,9 +11,17 @@ import requests
 PROMPTS = Path(__file__).with_name("prompts")
 
 
+def research_prompt(name):
+    """Every SOFT stage receives the same executable data semantics."""
+    return (PROMPTS / name).read_text() + "\n\n" + (PROMPTS / "data_contract.md").read_text()
+
+
 class ResearchAdvisor:
     def __init__(self, complete=None):
         self.complete = complete or self._complete
+        # Reviewing older prose against model and execution evidence requires
+        # reasoning; injected clients keep the existing two-argument contract.
+        self._review_complete = complete or partial(self._complete, enable_thinking=True)
 
     @staticmethod
     def _complete(system, payload, *, enable_thinking=False):
@@ -37,7 +46,7 @@ class ResearchAdvisor:
         return content
 
     def plan(self, spec, candidates, validation=(), budget=None):
-        text = self.complete((PROMPTS / "plan.md").read_text(), {
+        text = self.complete(research_prompt("plan.md"), {
             "objective": spec.objective, "constraints": spec.to_dict(),
             "round_trial_budget": budget or spec.max_trials, "candidates": candidates, "development_results": list(validation)})
         # The model selects existing candidate IDs. It cannot write code, SQL, budgets or source mappings.
@@ -52,4 +61,4 @@ class ResearchAdvisor:
         return list(dict.fromkeys(ids)), str(result.get("analysis", ""))
 
     def review(self, evidence):
-        return self.complete((PROMPTS / "review.md").read_text(), evidence)
+        return self._review_complete(research_prompt("review.md"), evidence)

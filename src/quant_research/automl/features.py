@@ -8,7 +8,7 @@ TECHNICAL = ("return_1", "return_3", "return_7", "return_20", "volatility_20",
              "range_ratio", "open_gap", "ma_distance", "volume_ratio", "amount_log", "turn_ratio")
 
 
-def build_panel(daily, events=()):
+def build_panel(daily, events=(), *, market_calendar=None):
     required = {"symbol", "date", "open", "high", "low", "close", "adjopen", "adjhigh", "adjlow", "adjclose", "volume", "amount"}
     if not required <= set(daily):
         raise ValueError(f"missing market columns: {sorted(required - set(daily))}")
@@ -20,7 +20,8 @@ def build_panel(daily, events=()):
         daily[col] = pd.to_numeric(daily[col], errors="raise")
     if (daily[["adjopen", "adjhigh", "adjlow", "adjclose"]].dropna() <= 0).any().any():
         raise ValueError("adjusted prices must be positive; raw/adjusted fallback is not allowed")
-    calendar = pd.DatetimeIndex(sorted(daily.date.unique()))
+    supplied_calendar = market_calendar if market_calendar is not None else daily.attrs.get("market_calendar")
+    calendar = pd.DatetimeIndex(sorted(daily.date.unique() if supplied_calendar is None else pd.to_datetime(supplied_calendar))).normalize()
     parts = []
     for symbol, group in daily.groupby("symbol"):
         # Reindex before shifting: a suspended stock must not turn 7 market days into 7 observations.
@@ -57,11 +58,16 @@ def labeled_panel(panel, horizon):
     return out.reset_index(drop=True)
 
 
-def feature_columns(panel, feature_set, extra_columns=()):
+def feature_columns(panel, feature_set, extra_columns=(), *, requested=()):
     cols = list(TECHNICAL)
     if feature_set == "enriched":
         cols += [c for c in ("total_mv", "pe_ttm", "pb_mrq", "industry", "news_count_7d",
                              "minute_volatility", "minute_bars", *extra_columns) if c in panel]
+    if requested:
+        unknown = set(requested) - set(cols)
+        if unknown:
+            raise ValueError("requested features unavailable in this feature set: " + ", ".join(sorted(unknown)))
+        return list(dict.fromkeys(requested))
     return list(dict.fromkeys(cols))
 
 

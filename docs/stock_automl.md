@@ -1,98 +1,182 @@
-# Stock AutoML：独立量化研究任务
+# Stock AutoML：由用户想法驱动的策略研究
 
-这是一个可运行、有限预算的研究框架，入口是 `python -m src.quant_research.automl`（`scripts/run_stock_automl.py` 保留兼容入口）。读取 KingdomAI，生成可追踪的样本、实验、模型、预测、回测与评审报告。没有接入生产聊天路由、定时调度或实盘交易，也不修改数据库。
+这是一个已接入用户任务系统的独立研究模块。用户用自然语言描述选股想法、目标和限制，LLM 在现有数据与模型能力内提出研究方向，后台分别训练、验证并交付策略资产。一次任务可以有多个方向；每个方向保留自己的模型和证据，系统不按最终测试成绩挑一个全局赢家。没有自动交易能力，也不修改行情数据库。
 
-遵循仓库的 SOFT → HARD → SOFT：自然语言研究目标 → `ResearchSpec` 执行约束和实验结果 → 大模型解释。自然语言不拆成业务 JSON 树；程序必须实际消费的日期、模型、周期、阈值、成本和预算才成为字段。大模型只从已有实验候选中选择和解释，不能生成执行代码、SQL、修改数据源、预算或指标。
+系统遵循 SOFT → HARD → SOFT：用户原始需求及研究假设 → 共同执行配置与各方向配置 → 真实实验、策略解释及用户报告。通用任务系统负责归属、调度、进度、取消与恢复；AutoML 模块负责研究，不另建任务生命周期。
 
-## 快速运行
+```mermaid
+flowchart TD
+    A[用户自然语言：想法、目标、限制] --> B[LLM 研究设计：方向与假设]
+    B --> C[冻结共同范围与总实验预算]
+    C --> D[逐方向：读取历史可用数据并锁定留出集]
+    D --> E[开发期时间验证：训练、校准、候选比较]
+    E --> F[冻结本方向候选]
+    F --> G[最终拟合与校准；独立开发末段选出手门槛]
+    G --> H[冻结模型与门槛]
+    H --> I[后续时间及可选新公司留出评估]
+    I --> J[各方向的模型、解释、回测与失败证据]
+    J --> K[用户策略集：各自交付，不选全局赢家]
+    K --> L[用户提出新反馈，发起下一次研究]
+```
+
+图中的独立门槛选择段用于 precision 模式。旧配置仍可运行固定阈值、预测损失优先的研究。
+
+## 一次性训练与日常使用是两种任务
+
+训练任务读取历史数据，设计、训练、校准、验证和回测，交付一个或多个固定版本的策略资产。用户之后可另外创建使用某个策略版本的选股任务：每次只读取当时可用输入，加载保存的预处理、模型、校准器与筛选门槛，执行预测并反馈结果；它不训练、不重新搜索规则，也不按当天结果更换门槛。
+
+当前已实现训练任务和 `predict_strategy` 复用接口；普通用户从自然语言创建定时模型推理任务的适配工具尚未接入。不能把重复调度 `stock_automl_research` 当作这个能力。通用任务系统已有的周期安排只负责何时调用哪个工具；不意味着每日必须重新训练。
+
+重新训练是用户另行发起的研究，产生新版本；新版本通过验证后是否替换日常使用模型，应单独决定。模型效果下降可以反馈给用户，不隐式改写正在使用的模型。定时推理还必须匹配训练的信息时点：例如14:55运行需要只使用截至14:55可得的数据训练模型，当前15:10收盘后模型不能提前使用。
+
+## 用户如何引导，以及系统能自主做什么
+
+用户可以要求“用低波动与量能研究少出手的机会”，也可以指定行业、股票、时间、持有周期、特征范围、模型及精确率目标。领域规划器保存完整原始需求，以自然语言说明各方向的假设，并将执行参数编译成 `ResearchSpec`。例如，两个方向可以分别只使用波动/量能特征和行业/估值特征，各自产生模型与解释。
+
+LLM 可以在共同约束内选择现有特征子集、样本机制、模型和持有期，并根据开发期证据调整后续候选顺序。未指定方向数量时，规划提示通常建议约 2—3 个不同方向；明确、简单的想法也可只研究一个。候选探索仍由有限模型、特征和参数组合执行，不是自由生成代码或任意新公式。
+
+用户决定的范围与预算不能由方向扩大。日期、股票池、算法族、目标等由配置承载；假设、设计理由和结果解释保持自然语言。明确要求但目前无法表达的目标会在规划阶段指出，不能用相似标签替代。尤其是“14:30—14:55 行情预测次日高开”所需的窗口与标签仍未实现。
+
+`max_trials` 是整项研究的候选预算，按方向顺序均分，余数分给靠前方向。比如 5 次、2 个方向分为 3+2 次。每个候选还会执行 `folds` 次时间验证，以及可能的分类校准；最终模型拟合和阈值比较另有计算开销，因此候选数不等于模型 `.fit()` 调用次数。当前不会把某方向未用完的预算自动转给其他方向。
+
+## 入口与快速运行
+
+用户入口是现有任务系统的自然语言提交；后台能力为 `stock_automl_research`。工具只接受具备任务运行、用户归属和产物目录的授权后台上下文。预约、周期调度和最长运行时间由通用任务系统处理。CLI 和 Python 接口适合开发、显式配置及离线复验。
 
 在仓库根目录，使用 Python 3.10+：
 
 ```bash
 python -m venv .venv-automl
 .venv-automl/bin/python -m pip install -r requirements-automl.txt
-.venv-automl/bin/python scripts/run_stock_automl.py --demo --max-trials 6
-.venv-automl/bin/python scripts/run_stock_automl.py --inventory
-.venv-automl/bin/python scripts/run_stock_automl.py --config docs/examples/stock_automl.json --llm
+.venv-automl/bin/python -m src.quant_research.automl --demo --max-trials 4
+.venv-automl/bin/python -m src.quant_research.automl --inventory
+.venv-automl/bin/python -m src.quant_research.automl --config docs/examples/stock_automl.json --llm
+.venv-automl/bin/python -m src.quant_research.automl --requirement '分别从低波动量能和行业估值研究3/7日持有机会，宁可漏选，总共6次实验' --llm
 ```
 
-`.env` 只加载到进程，不打印凭据。数据库 URL 按 `KINGDOMAI_DB_URL`、`BI_DB_URL`、`BUSINESS_DB_URL` 顺序解析，schema 必须为 `kingdomai`；也可通过 `--db-env ENV_VARIABLE_NAME` 指定。数据库连接使用只读一致性快照事务、超时、参数绑定与行数上限，超过上限报错而非静默截断。连接账号仍应由运维配置为只读。
+`scripts/run_stock_automl.py` 保留兼容入口。`--config` 接收一个显式 `ResearchSpec`，形成单方向研究；`--requirement` 通过 LLM 编译自然语言，不能同时使用 `--config`。`--requirement` 本身就需要 LLM；`--llm` 另外启用候选规划及报告评审。不用 `--requirement` 或 `--llm` 的合成 demo 不访问数据库或 LLM。
 
-`--llm` 使用现有 `LLM_BASE_URL/LLM_ENDPOINT`、`LLM_API_KEY/LLM_KEY`、`LLM_DEFAULT_MODEL` 的 Chat Completions 兼容接口，单次调用有连接和读取超时。当前 env 是 DeepSeek。只发送候选及汇总指标，不发送原始行情、新闻正文、数据库地址或凭据。不启用 LLM 时依然可以自动实验，`objective` 仅记录，实际筛选依据 JSON 中的显式字段。
+示例 JSON 已设 `max_symbols=null`、`min_precision=0.6`、`optimize_threshold=true`，采用全范围公司池与精确率研究。`max_train_rows=20000` 是每次基础模型拟合的行数上限，不会将验证或测试公司池缩成 20,000 行。若只做小试跑，可显式加 `--max-symbols 30 --max-trials 4`；产物会披露公司抽样，不能据此声称覆盖全市场。
 
-输出位于 `.gitignore` 已排除的 `outputs/stock_automl/<run_id>/`。不要把本地市场样本、模型或预测表提交到仓库。合成 demo 只能证明程序可运行。
+CLI 仅把 `.env` 加载到进程，不打印凭据。数据库 URL 按 `KINGDOMAI_DB_URL`、`BI_DB_URL`、`BUSINESS_DB_URL` 顺序解析，schema 必须为 `kingdomai`；`--db-env ENV_VARIABLE_NAME` 可指定连接。每次读取保持同一只读一致性快照，参数绑定，超时及单批行数上限；不会为寻找分钟表自动跨凭据切换数据库。LLM 使用现有兼容接口配置，接收用户需求、候选和汇总证据，不发送原始行情、新闻正文或数据库凭据。
 
-## 数据与特征
+## 数据、样本与特征
 
-| 数据 | 当前适配 | 时点处理与边界 |
+样本单位为“股票 × 交易日”的一次持有机会，分钟 bar 条数不是独立隔夜样本数。当天已发生行情和此前历史是输入，未来真实收益用于制作标签。
+
+| 数据 | 当前特征或作用 | 可得时点与边界 |
 |---|---|---|
-| `kcrp_stock_price` | 动量、波动、振幅、开盘缺口、均线距离、量能、成交额、换手率；复权收益标签 | 当日收盘后 15:10 决策；所有滚动特征仅使用过去。供应商复权版本仍可能修订 |
-| `kcrp_stock_pricevaluate` | 历史总市值、PE、PB | 保守设为次日可用；没有原始修订版本，不能声称严格历史财务信息集 |
-| `kcrp_stock_industry` | SW2021 一级行业类别、行业分组评估 | 使用 begin/end 生效区间，不用今天成分回填；历史分类修订仍有局限 |
-| `kcrp_news_info` | 已入库新闻数量的7日热度代理 | 日期型公告次日才可用，并取入库时间较晚者；无新闻日明确补零，不延续上次热度 |
-| `aiia_stock_realtime_minute_snapshot` | 完整1分钟bar的日内波动及覆盖数量，`--minute` 开启 | 仅用已完成且不晚于15:00的bar，15:05后可用；缺表明确披露 |
-| 任意其他表的历史特征 | `--events-csv` 或 Python `events` 输入 | 必须先生成 `symbol,available_at,<数值特征>`，按真实可得时间向后 as-of 合并；禁止覆盖价格或目标字段 |
+| `kcrp_stock_price` | 过去 1/3/7/20 日收益、20 日波动、振幅、开盘缺口、均线距离、量比、成交额、换手率；复权收益标签 | t 日收盘后 15:10 决策；滚动特征只使用截至当日数据；供应商复权版本仍可能修订 |
+| `kcrp_stock_pricevaluate` | 总市值、PE TTM、PB MRQ | 按下一自然日可用处理；没有原始修订版本 |
+| `kcrp_stock_industry` | SW2021 一级行业 | 按 begin/end 生效区间对齐，不使用今天行业回填全部历史；分类历史修订仍有局限 |
+| `kcrp_news_info` | 最近 7 个自然日可用新闻的条数 | 公告日期次日与实际入库时点取较晚者；无新闻日补零；不是新闻情绪或全网热度 |
+| `aiia_stock_realtime_minute_snapshot` | 日内分钟收益波动率、分钟条数 | 仅完整 1m bar、截至 15:00，15:05 后可用；不是指定尾盘窗口 |
+| Python `events` 或 `--events-csv` | 额外历史数值特征 | 需 `symbol,available_at,<数值列>`；按可得时间向后 as-of 合并，不能覆盖价格或标签 |
 
-`--inventory` 导出当前库完整表字段目录，不自动把所有表拼成训练宽表。财报、资金流、事件、股东等可沿统一事件入口增加；报告期不能冒充披露/可得时间。修订类特征必须在上游保留可得时点，不能用最新历史回填表假装 point-in-time。辅助数值特征自动进入 enriched 特征组。
+`technical` 使用 11 项日线派生特征；`enriched` 加上实际存在的辅助特征。`feature_names` 可明确限制到其中的一个子集；缺少指定特征会留下不可执行证据，不静默换成其他特征。`--inventory` 只导出表字段目录，不能解释为所有数据库表都已进入训练。
 
-2026-10-03 实际检查：env 中 `BI_DB_URL` 对应 KingdomAI 有172张表，上述日线、估值、行业、新闻表存在；该连接下没有分钟快照表。因此真实试跑只验证了日线及辅助数据，分钟适配只做本地回归，尚未做真实分钟库验收。分钟特征是收盘决策的补充，不是日内高频交易策略。
+未指定 `symbols` 且 `max_symbols=null` 时，使用在研究区间任一时间有效上市的 A 股池，包含期间 IPO 和随后退市公司；行业筛选先使用重叠历史区间，再按样本日过滤。显式 `symbols` 优先并完整保留；显式整数 `max_symbols` 才按 seed 抽取公司用于试跑。拟合阶段超过 `max_train_rows` 时只抽取训练行，概率校准、验证和测试仍保留其自然样本分布。SVM 的基础拟合另有 4,000 行上限。
 
-未指定股票时，从研究起点已上市、当时尚未退市的 A 股池按 seed 抽样，保留后来退市股票；不按期末收益挑样本。指定 `symbols` 则使用用户股票池，不能据此外推到全市场。交易日历目前取股票池日线日期的并集；单股票缺日补空，不跨停牌日错移标签。生产级研究应补充权威交易日历及退市清算数据。
+日线、估值、新闻按最多 64 只股票 × 366 日读取，每批最多 50,000 行，超过就报错；分钟按 8 只 × 31 日、每批 100,000 行读取并立即聚合。最终仍会构建内存 DataFrame；分批不等于训练全流程流式，也不构成全市场规模的性能验收。
 
-## 模型、目标与自动探索
+KingdomAI 适配器另从同一连接的日线表读取全市场 `DISTINCT trade_date`，存入 `daily.attrs['market_calendar']`。单股停牌缺报价时，交易日仍保留为空行，不把持有期顺延成“后几个有报价日”。这是数据库观测交易日历，尚非交易所权威日历认证。Python 调用可显式传 `build_panel(..., market_calendar=...)`；没有外部日历的 `provided_frame` 只能使用所给行情日期并集，不能据此认证单股跨停牌日期的标签；调用者需提供独立市场日历。
 
-- `linear`：逻辑回归 / Ridge 回归，作为简洁基准。
-- `elastic_net`：弹性网逻辑回归 / Elastic Net 回归，适合相关特征较多的比较实验。
-- `tree`：决策树；`forest`：随机森林。
-- `svm`：SVC / SVR；为控制内核模型复杂度，训练最多4000行。
-- `hist_gradient_boosting`：直方图梯度提升分类 / 回归。关闭其随机内部早停，使用外部时间验证。
+分钟必须在本次指定连接与区间真实可用；明确开启分钟而没有有效分钟特征时，任务/CLI 报告无法完成该方向。不会自动使用另一个库的短期分钟表来充当多年历史。
 
-这些都是通用统计学习模型，不保证对股票有效。LightGBM/XGBoost、分位数回归、排序学习等可以后续作为模型注册项加入；首版不引入其额外依赖，也不做深度学习。
+## 目标、模型和选股规则
 
-自动候选组合：持有期 × 任务 × 模型 × 样本机制 × 特征组 × 参数档位。样本机制包含全样本、动量、反转、放量流动性、低波动、新闻活跃。首轮覆盖不同角度，后续轮根据开发集表现兼顾邻近参数和随机探索；大模型可根据业务指导重新排序有限候选。`max_trials` 是整个任务预算，不是每轮预算；每个候选做 `folds` 次时间验证，分类内部还需独立校准。上限不代表预设全部实验都要运行。
+当前唯一标签时序是：t 日收盘后观察，t+1 日开盘进入，t+h+1 日开盘退出。
 
-显式约束支持 `industries`、`min_market_cap`、`max_market_cap`、`min_amount`、目标收益、预测概率阈值、收益预测阈值、持有期、模型列表、Top K、最低信号数、最低信号胜率和最大回撤。市值与成交额采用源字段原始单位，设置具体数字前需确认供应商单位。约束需要的特征缺失会报出，未知可选元信息可以兼容忽略。
+```text
+forward_return = adjusted_open[t+h+1] / adjusted_open[t+1] - 1
+分类标签 = 1，当 forward_return > target_return；否则为 0
+回归标签 = forward_return
+```
 
-自然语言是规划指导：如“偏向小盘反转”可影响候选选择，但任意语言目标不会自动变成未经验证的筛选规则。候选空间无法表达的要求应在规划理由中说明；需要精确约束时填写对应机器字段。没有配置的业务目标不暗自承诺已执行。
+`h=1` 也不是“次日开盘 / 今日收盘 − 1”的高开目标。期间触及目标、止盈止损、空头、期权等也未接入。训练标签是毛收益，扣成本盈利是另外一个评估口径。
 
-`horizon=h` 的统一标签是：t 日收盘后决策，t+1 开盘买入，t+h+1 开盘退出。分类预测这一收益是否超过 `target_return`，回归预测收益率。h=1符合次日买入、再下一日卖出的持有期；**不是当日收盘到明日收盘涨跌，也不是期间曾触及目标价的概率**。
+可用算法族为 `linear`（逻辑回归 / Ridge）、`elastic_net`、决策树、随机森林、SVC/SVR 和直方图梯度提升。它们都是通用统计学习模型，没有内置股票有效性保证。样本机制为 `all`、动量、反转、流动性、低波动及新闻活跃；行业、市值、成交额可进一步限定研究范围。单股研究应设置 `company_holdout_fraction=0`，重点检查后续时间证据。
 
-## 验证与回测
+| 参数 | 实际含义 |
+|---|---|
+| `target_return` | 定义正样本的毛收益门槛 |
+| `min_precision` | 选中事件达到目标的开发期精确率要求，不是整体 accuracy |
+| `optimize_threshold` | 是否在开发期比较出手阈值 |
+| `probability_threshold` / `regression_threshold` | 固定阈值；自动阈值模式下作为参与比较的起点之一 |
+| `top_k` | 每日最多选多少只，允许空选 |
+| `min_signals` / `min_signal_dates` | 开发证据至少覆盖多少信号与出手日期 |
+| `min_win_rate` | 扣假设成本后正收益的信号比例要求，与目标 precision 分开 |
+| `max_drawdown` | 开发组合回撤绝对值上限 |
 
-1. 开始就按 seed 留出公司，并锁定最后20%的时间。留出公司所有历史样本均不参与模型选择、拟合或校准。
-2. 开发期按日期滚动扩展训练窗；所有股票共享日期边界。训练标签结束时间必须严格早于下一验证起点，避免多日标签穿越边界。
-3. 填缺、缩放、行业编码只在训练集拟合。分类再切出较晚时间块进行 sigmoid 概率校准，并再次清除跨界标签。SVC 不使用随机的内部概率校准。
-4. 与训练期常数预测比较 Brier / MSE，输出 AUC、校准桶、RMSE、Rank IC、分月/行业统计。排序采用各折相对常数预测增益的均值减标准差；先比较是否达到指定开发集约束，不保证一定找到合格候选。
-5. 在揭盲前保存 `selection.json`。只用一名开发集优胜候选分别评估“新时期老公司”“新时期新公司”，不会用盲测换赢家。若想专门研究某个周期或目标，限制 horizons/tasks 后单独运行。
-6. 复用 `src/backtest`：收盘信号、次日开盘执行，按h天换仓，现金约束，逐日市值、费用、滑点、税费及执行问题。与同区间同池等权基准比较；不把重叠标签收益直接连乘成年化收益。
+自然语言规划默认启用 `min_precision=0.6` 与自动阈值研究，具体要求由用户需求决定。直接构造 `ResearchSpec` 的兼容默认仍是 `min_precision=None, optimize_threshold=False`，保留旧的固定阈值、损失优先路径。
 
-信号胜率是阈值以上的重叠样本统计，**不是成交交易胜率**。Wilson区间仅作描述，重叠收益不是独立样本；组合收益与回撤看回测账本。最低信号数 `min_signals` 约束 signal_count，不是实际成交笔数。没有信号就输出空胜率和零交易，不能把它表述为高胜率。
+## 每个方向如何训练、选门槛和测试
 
-回测使用复权价格重新定基及1份单位，不完整模拟100股整手、最小佣金、全部历史税费、停复牌/开盘涨跌停队列、现金分红或退市清算。一字涨跌的买卖侧仅保守阻断；OHLC无法认证开盘能否成交。所有输出均是研究证据，尚非生产或实盘放行。
+1. **先锁定留出范围。** 最晚 `test_fraction` 的时间作为最终测试；可选按 seed 留出一部分公司，它们的全部历史不参与开发。所有股票共享时间边界。标签结束时间必须早于下一阶段起点。
+2. **开发期滚动验证。** 对每个候选做扩展时间窗训练和后续验证，得到 OOF 预测。数值插补、缩放和行业编码只在拟合集学习；分类再用较晚时间块做 sigmoid 校准，边界再次 purge。回归不做概率校准。
+3. **比较开发候选。** precision 模式基于 OOF 比较阈值与每日 Top K 后的目标精确率、出手日期、按日期宏平均精确率、月度表现、实际下跌误选、扣成本胜率与回撤；允许某个时间段完全不出手。整体 Brier/MSE、AUC、校准桶、RMSE、Rank IC 仍保留为诊断。旧模式按各折相对常数预测损失改善的均值减标准差排序。
+4. **冻结该方向候选，再训练最终模型。** precision 模式把开发样本按日期再分成前 80% 的模型开发段与末 20% 的阈值选择段，并剔除跨界标签。分类在前段内部再按 75%/25% 分基础拟合与校准；回归使用前段拟合。实际行数受缺失、样本规则和训练行预算影响，不能直接用这些比例乘总行数。
+5. **冻结最终出手规则。** 最终模型和校准器固定后，用未参与它们拟合的开发末段选择阈值，并记录该段的支持度、精确率、扣成本胜率与回测。这个阶段属于模型选择证据，不能称为最终独立测试。未达标仍保留候选及原因，不伪造有效策略。
+6. **最后揭盲。** 每个方向只对其开发期选定的一名候选进行后续时间、以及可选新公司后续时间评估。不会看测试结果再换候选或调阈值。所有方向的结果并列交付，不根据这些最终成绩挑全局冠军。
 
-第一次盲测后，反复阅读同一窗口结果并修改规则会污染盲测。后续自适应研究只能使用开发集或新未揭盲窗口；脚本不会声称跨run自动维持保密盲测库。运行维、数据授权、生产放行仍须按根 AGENTS.md 单独提供证据。
+阈值、模型与冻结选择写入 `selection.json`；样本计数分别列出实际拟合、校准、阈值选择、purge 和预算抽样排除行数。日期/月度摘要是描述性稳定性证据，不是统计置信界。多个股票同日及多日持有标签有相关性；旧 Wilson 区间不能作为策略可靠性的独立试验置信保证。
 
-## 产物与预测复用
+## 回测与效果边界
 
-每个run保存：配置、完整可用候选、数据来源与警告、代码/数据指纹、Git ref及dirty标记、库版本、时间及公司切分、源代码副本、合并特征快照、逐轮规划、开发集结果及失败原因、最终选择、模型、两组样本外预测、交易/净值账本、基准、Markdown报告和LLM评审。失败实验保留原因；LLM失败不改写数值结果，回退状态独立记录。
+回测复用 `src.backtest` 的现金账本：收盘信号、次日开盘执行、按 h 日换仓，逐日记录现金、持仓、佣金、滑点、税费和执行问题，并与同区间同股票池基准比较。信号按股票日统计，可能重叠，也不一定在换仓日实际成交；信号 precision、扣成本信号胜率和组合收益是不同指标。
 
-`model.joblib` 是整个预处理、模型和校准器；只加载自己生成且可信的本地模型文件。新行情可通过 Python 复用：
+无信号时 precision 为空、交易为零，不能解释为高胜率。模型使用复权价格和 1 份单位；未完整模拟 A 股整手、最小佣金、历史税费、涨跌停开盘队列、停复牌、分红及退市清算。结果是研究证据，不能据此宣称真实成交回报或生产放行。
+
+反复观察同一测试窗口后修正模型，会污染测试。用户反馈可启动下一次研究，但当前程序不会跨研究自动维护“从未揭盲”的独立测试库。新的解释、剪枝或规则调整仍需新的开发与验证证据；LLM 不得改变已计算指标。
+
+## 策略资产、解释与复用
+
+新 CLI 运行输出到被 Git 忽略的 `outputs/stock_automl/study_<id>/`：
+
+```text
+study_<id>/
+  research_design.json       原始需求、共同配置和方向计划
+  study_plan.json             冻结执行计划与来源
+  research_checkpoint.json   各方向恢复引用
+  study.json / study.md       策略集合及失败说明
+  direction_1/<run_id>/       第一方向的独立研究资产
+  direction_2/<run_id>/       第二方向的独立研究资产
+```
+
+每个方向保存配置、候选、开发结果、模型选择、样本计数、模型、代码/数据指纹、回测与语言评审。`strategy.json` 保存目标、范围、特征、冻结门槛及证据；`explanation.json/.md` 来自实际模型结构：线性模型展示系数、预处理和校准关系；决策树展示路径、原始量纲阈值与叶子支持；复杂模型仅输出适合它的摘要，不假装拥有简洁精确规则。这一步没有自动完成新的事后剪枝。LLM 可以解释事实与局限，不能替模型编造选股理由。
+
+新行情可复用保存的预处理、模型、校准器和冻结规则：
 
 ```python
-from src.quant_research.automl.inference import predict_latest
-signals = predict_latest(run_directory, daily_frame, events)
+from src.quant_research.automl.inference import predict_strategy
+
+scored = predict_strategy(study_directory, daily_frame, events, strategy_id="direction_1")
+selected_stocks = scored[scored.selected]
 ```
 
-输入至少21个连续交易日（建议60日），列与数据适配器一致。仅对共同最新时点且符合样本约束的股票输出预测；字段包含symbol、date、horizon、target_return、prediction_kind、prediction。模型在旧开发集训练，不在盲测后自动偷用未来标签重拟合；新正式研究需明确新训练窗口。
+研究集合必须指定 `direction_1` 或已保存的 `strategy_id`；不能默认选第一项或回测最好的一项。单方向运行目录可以不传标识。输出包含 `symbol,date,horizon,target_return,prediction_kind,prediction,selected`。只对共同最新日期、有连续历史并符合已保存样本/股票约束的股票计算预测；`selected` 复用冻结阈值和 Top K，可能全为 False。建议提供至少 60 个交易日历史及市场日历，最低滚动历史需求为 21 个交易日。`predict_latest` 保留兼容接口。
 
-## 验证命令与参考
+后台发布研究设计、汇总、模型解释和报告；原始行情、逐行预测及 `model.joblib` 保留在受任务归属保护的本地目录。只加载自己生成、可信的本地 joblib 文件，不将市场训练矩阵或模型自动提交到 Git。
+
+## 恢复、复核与验证
 
 ```bash
+# 恢复整个研究集合，沿用原CLI输出目录
+python -m src.quant_research.automl --resume outputs/stock_automl/study_<id>
+
+# 单独重试某方向的LLM报告解读，不训练
+python -m src.quant_research.automl --review-only outputs/stock_automl/study_<id>/direction_1/<run_id>
+
+# 旧版单方向run目录仍可恢复
+python -m src.quant_research.automl --resume outputs/stock_automl/<legacy_run_id>
+
 python -m pytest -q tests/automl tests/test_backtest_core.py
 ```
 
-覆盖正常协议、可选元信息兼容、严重输入拒绝、future特征不变性、缺日标签、标签purge、全部六类模型的分类/回归、只在训练期校准、模型权限边界、盲测不影响候选选择、交易成本、零信号和完整产物。
+研究集合恢复校验完整冻结计划和来源；每个方向还校验配置、实现和数据指纹。已完成方向不会重训，已预留但中断的候选仍计入预算。一个方向不可执行会保存原因，其他方向继续交付。普通报告失败可以独立重试，不能因为 LLM 暂时失败重跑训练。
 
-方法参考：[scikit-learn 时间序列交叉验证](https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.TimeSeriesSplit.html)、[数据泄漏与Pipeline](https://scikit-learn.org/stable/common_pitfalls.html)、[概率校准](https://scikit-learn.org/stable/modules/calibration.html)。本框架额外按标签结束时间清除交叉区间，并按公司留出；没有直接将股票面板按随机行切分。
+目前测试覆盖多方向共享预算、独立产物、取消/恢复、失败方向隔离、冻结门槛、单股缺报价与交易日历、时间 purge、预处理/校准隔离、各算法族、推理复用与回测成本。合成训练仅证明流程与协议，不能作为股票效果证据；当前实现也未完成全市场规模训练的性能验收或新高精确率策略验收。
 
-模块依赖边界见 [模块README](../src/quant_research/automl/README.md)。本次可提交的真实试跑汇总见 [2026-10-03 运行证据](stock_automl_runs/20261003_smoke/README.md)。
+2026-10-03 的[数据与选模复核](development_tasks/automl_precision_event_review_20261003.md)记录：2024—2025 日 K 有 2,614,333 条原始记录，旧三千多行拟合来自小股票池配置。该文是历史审计；其中全池、precision、多方向与策略资产等待办已在本次实现推进，分钟窗口/高开目标仍未落地。另见[可解释策略参考调研](development_tasks/automl_interpretable_strategy_references_20261003.md)及[历史小池运行证据](stock_automl_runs/20261003_smoke/README.md)。历史结果不能冒充当前实现的全市场验证。
+
+方法参考：[时间序列验证](https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.TimeSeriesSplit.html)、[Pipeline 与数据泄漏](https://scikit-learn.org/stable/common_pitfalls.html)、[概率校准](https://scikit-learn.org/stable/modules/calibration.html)。模块依赖边界见[模块 README](../src/quant_research/automl/README.md)。

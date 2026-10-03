@@ -31,14 +31,40 @@ def main():
     from src.quant_research.automl.config import ResearchSpec
     from src.quant_research.automl.data import inventory, kingdom_connection, load_kingdom
     from src.quant_research.automl.runner import run_research, review_research, write_json
+    from src.quant_research.automl.study import run_study, load_market
+    from src.quant_research.automl.assets import export_strategy
+    from src.quant_research.automl.planning import compile_research, explicit_plan, normalize_plan
     from src.quant_research.automl.advisor import ResearchAdvisor
     import pandas as pd
+    loader_options = {"db_env": args.db_env, "events_csv": [str(Path(p).resolve()) for p in args.events_csv]}
+    def loader(spec, source_name):
+        if source_name == "demo":
+            daily, events, source = load_market(spec, source_name)
+        else:
+            daily, events, source = load_kingdom(spec, env_name=loader_options["db_env"])
+            if spec.include_minute and not any("minute_bars" in event for event in events):
+                raise ValueError("明确要求的分钟特征不可用")
+        events = list(events)
+        for path in loader_options["events_csv"]:
+            events.append(pd.read_csv(path, dtype={"symbol": str}))
+        return daily, events, source
     if args.review_only:
         print(json.dumps(review_research(args.review_only, ResearchAdvisor()), ensure_ascii=False))
         return
     if args.resume:
+        if (args.resume / "research_design.json").exists():
+            plan = json.loads((args.resume / "research_design.json").read_text())
+            loader_options = plan.get("loader_options", loader_options)
+            checkpoint_path = args.resume / "research_checkpoint.json"
+            _, study = run_study(plan, source_name=plan["source"], output_root=args.resume, market_loader=loader,
+                                 advisor=ResearchAdvisor() if args.llm else None,
+                                 saved=json.loads(checkpoint_path.read_text()) if checkpoint_path.exists() else None,
+                                 checkpoint=lambda value: write_json(checkpoint_path, value))
+            print(json.dumps({"output": str(args.resume), "strategies": len(study["strategies"])}, ensure_ascii=False))
+            return
         spec = ResearchSpec.from_dict(json.loads((args.resume / "spec.json").read_text()))
         _, report = run_research(spec, resume_dir=args.resume, advisor=ResearchAdvisor() if args.llm else None)
+        export_strategy(args.resume, hypothesis=spec.objective)
         print(json.dumps({"run_id": report["run_id"], "successful_trials": report["successful_trials"]}, ensure_ascii=False))
         return
     if args.inventory:
@@ -51,28 +77,27 @@ def main():
     if args.requirement and args.config:
         parser.error("choose --requirement or --config, not both")
     if args.requirement:
-        from src.quant_research.automl.planning import compile_research
         plan = compile_research(args.requirement)
-        value = plan["spec"]
         print(plan["design"])
     else:
         value = json.loads(args.config.read_text()) if args.config else {"start": args.start, "end": args.end}
-    for key in ("objective", "max_trials", "max_symbols", "seed"):
-        if getattr(args, key) is not None:
-            value[key] = getattr(args, key)
+        plan = explicit_plan(value, args.objective or "按显式配置进行股票策略研究")
+    overrides = {key: getattr(args, key) for key in ("objective", "max_trials", "max_symbols", "seed")
+                 if getattr(args, key) is not None}
     if args.minute:
-        value["include_minute"] = True
-    spec = ResearchSpec.from_dict(value)
-    if args.demo:
-        from src.quant_research.automl.demo import synthetic_market
-        daily, events = synthetic_market(seed=spec.seed)
-        source = {"source": "synthetic_demo", "warnings": ["合成数据仅验证程序，不用于股票效果或投资判断。"]}
-        spec = ResearchSpec.from_dict({**spec.to_dict(), "start": str(daily.date.min().date()), "end": str(daily.date.max().date())})
-    else:
-        daily, events, source = load_kingdom(spec, env_name=args.db_env)
-    for path in args.events_csv:
-        events.append(pd.read_csv(path, dtype={"symbol": str}))
-    _, report = run_research(spec, daily, events, source=source, output_root=args.output,
-                             advisor=ResearchAdvisor() if args.llm else None)
-    print(json.dumps({"run_id": report["run_id"], "successful_trials": report["successful_trials"],
-                      "development_constraints_met": report["development_constraints_met"]}, ensure_ascii=False))
+        overrides["include_minute"] = True
+    plan["spec"].update(overrides)
+    for direction in plan["directions"]:
+        direction["spec"].update(overrides)
+    plan = normalize_plan(plan)
+    plan["source"] = "demo" if args.demo else "kingdomai"
+    plan["loader_options"] = loader_options
+    from uuid import uuid4
+    output = args.output / ("study_" + uuid4().hex[:12])
+    output.mkdir(parents=True)
+    write_json(output / "research_design.json", plan)
+    _, study = run_study(plan, source_name=plan["source"], output_root=output, market_loader=loader,
+                         checkpoint=lambda value: write_json(output / "research_checkpoint.json", value),
+                         advisor=ResearchAdvisor() if args.llm else None)
+    print(json.dumps({"output": str(output), "strategies": len(study["strategies"]),
+                      "saved_models": sum(bool(s.get("report")) for s in study["strategies"])}, ensure_ascii=False))

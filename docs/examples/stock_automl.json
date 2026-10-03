@@ -1,13 +1,37 @@
 {
   "start": "2023-01-01",
   "end": "2026-09-30",
-  "objective": "探索具有跨时期、跨公司稳定性的股票规律，比较未来1、3、7个交易日收益，优先概率可信、扣成本后表现稳定的方案。",
-  "max_symbols": 30,
-  "horizons": [1, 3, 7],
-  "tasks": ["classification", "regression"],
-  "models": ["linear", "elastic_net", "tree", "forest", "svm", "hist_gradient_boosting"],
-  "samplers": ["all", "momentum", "reversal", "liquid", "low_volatility", "news"],
-  "feature_sets": ["technical", "enriched"],
+  "objective": "在历史股票日机会池中研究1、3、7个交易日持有收益，优先选中事件的精确率与误选下跌风险，允许少出手；保留未达标证据。此显式配置为单方向研究。",
+  "max_symbols": null,
+  "horizons": [
+    1,
+    3,
+    7
+  ],
+  "tasks": [
+    "classification",
+    "regression"
+  ],
+  "models": [
+    "linear",
+    "elastic_net",
+    "tree",
+    "forest",
+    "svm",
+    "hist_gradient_boosting"
+  ],
+  "samplers": [
+    "all",
+    "momentum",
+    "reversal",
+    "liquid",
+    "low_volatility",
+    "news"
+  ],
+  "feature_sets": [
+    "technical",
+    "enriched"
+  ],
   "max_trials": 24,
   "rounds": 2,
   "folds": 3,
@@ -26,5 +50,10 @@
   "min_market_cap": null,
   "max_market_cap": null,
   "min_amount": null,
-  "include_minute": false
+  "include_minute": false,
+  "max_train_rows": 20000,
+  "feature_names": [],
+  "min_precision": 0.6,
+  "optimize_threshold": true,
+  "min_signal_dates": 5
 }

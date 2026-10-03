@@ -19,8 +19,10 @@ import pandas as pd
 import sklearn
 
 from .evaluation import backtest_predictions, prediction_metrics
+from .config import ResearchSpec
 from .features import build_panel, feature_columns, labeled_panel, sample_mask
 from .learning import fit_model, temporal_folds
+from .decision import choose_decision_policy, decision_policy_rank
 
 
 def write_json(path, value):
@@ -72,9 +74,36 @@ def constraint_checks(folds, spec):
     }
 
 
+def _precision_constraint_checks(policy, folds, spec):
+    """Precision never substitutes for cost-aware wins or portfolio drawdown limits."""
+    signals = sum(fold["prediction"]["signal_count"] for fold in folds)
+    wins = sum(fold["prediction"]["signal_count"] * (fold["prediction"]["signal_win_rate_after_cost"] or 0)
+               for fold in folds)
+    return {**policy["checks"],
+            "drawdown_within_limit": all(abs(fold["portfolio"]["max_drawdown"]) <= spec.max_drawdown for fold in folds),
+            "net_signal_win_rate_at_least_minimum": signals > 0 and wins / signals >= spec.min_win_rate}
+
+
+def _policy_evidence(policy):
+    """Compact numerical evidence for both planning feedback and final language review."""
+    keys = ("signal_count", "signal_dates", "target_precision", "target_recall", "actual_down_count", "actual_down_rate",
+            "coverage", "positive_rows", "negative_rows", "precision_lift", "unconditional_up_rate", "date_macro_precision",
+            "date_precision_lower_quartile", "worst_active_month_precision", "signal_win_rate_after_cost", "mean_signal_net_return", "by_month")
+    return {**{key: policy[key] for key in ("threshold", "top_k", "eligible", "checks", "selection_source", "selection_note",
+                                          "rows", "signal_start", "signal_end", "search_trials", "portfolio") if key in policy},
+            "metrics": {key: policy.get("metrics", {})[key] for key in keys if key in policy.get("metrics", {})}}
+
+
+def _planning_evidence(result):
+    summary = {key: result[key] for key in ("candidate", "score", "meets_constraints", "signal_count", "constraint_checks")}
+    if result.get("decision_policy") is not None:
+        summary["decision_policy"] = _policy_evidence(result["decision_policy"])
+    return summary
+
+
 def assess_candidate(data, panel, candidate, spec, extra_columns, check_cancel=lambda: None):
-    columns = feature_columns(data, candidate["features"], extra_columns)
-    folds = []
+    columns = feature_columns(data, candidate["features"], extra_columns, requested=spec.feature_names)
+    folds, predictions = [], []
     for train, validation in temporal_folds(data, spec.folds):
         check_cancel()
         train = train[sample_mask(train, candidate["sampler"], spec)]
@@ -84,21 +113,38 @@ def assess_candidate(data, panel, candidate, spec, extra_columns, check_cancel=l
         model = fit_model(train, candidate, columns, spec)
         scored = validation.copy()
         scored["prediction"] = model.predict(scored)
-        metrics = prediction_metrics(scored, candidate["task"], spec, _baseline(train, candidate["task"], spec))
-        bt = backtest_predictions(scored, panel, candidate, spec)
+        predictions.append((scored, _baseline(train, candidate["task"], spec)))
         folds.append({"train_end": train.label_end.max(), "validation_start": validation.date.min(),
                       "validation_end": validation.label_end.max(), "training": model.training_counts,
-                      "validation_rows": len(validation), "prediction": metrics,
-                      "portfolio": bt["metrics"]})
+                      "validation_rows": len(validation)})
     if len(folds) != spec.folds:
         raise ValueError("insufficient chronological folds")
+    precision_mode = spec.min_precision is not None or spec.optimize_threshold
+    policy = choose_decision_policy(pd.concat([p for p, _ in predictions]), candidate["task"], spec) if precision_mode else None
+    for fold, (scored, baseline) in zip(folds, predictions):
+        check_cancel()
+        fold["prediction"] = prediction_metrics(scored, candidate["task"], spec, baseline, policy=policy)
+        fold["portfolio"] = backtest_predictions(scored, panel, candidate, spec, policy=policy)["metrics"]
     skills = [f["prediction"]["skill_vs_constant"] for f in folds]
     signals = sum(f["prediction"]["signal_count"] for f in folds)
     checks = constraint_checks(folds, spec)
+    if policy is not None:
+        checks = _precision_constraint_checks(policy, folds, spec)
+        policy["metrics"].update(
+            signal_win_rate_after_cost=sum(f["prediction"]["signal_count"] * (f["prediction"]["signal_win_rate_after_cost"] or 0)
+                                           for f in folds) / signals if signals else None)
+        policy.update(checks=checks, eligible=all(checks.values()))
     eligible = all(checks.values())
     return {"candidate": candidate, "columns": columns, "folds": folds,
-            "meets_constraints": bool(eligible), "constraint_checks": checks, "score": float(np.mean(skills) - np.std(skills)),
-            "signal_count": signals}
+            "meets_constraints": bool(eligible), "constraint_checks": checks,
+            "score": float(policy["metrics"]["date_macro_precision"] or 0) if policy else float(np.mean(skills) - np.std(skills)),
+            "signal_count": signals, **({"decision_policy": policy} if policy is not None else {})}
+
+
+def candidate_rank(result):
+    if "decision_policy" in result:
+        return (result["meets_constraints"], *decision_policy_rank(result["decision_policy"])[1:])
+    return (result["meets_constraints"], result["score"])
 
 
 def _implementation_files():
@@ -147,6 +193,13 @@ def _report_facts(report):
         "each_fold_win_rate": "每个时间验证折的扣成本信号胜率",
         "drawdown_within_limit": "每个时间验证折的组合回撤",
         "each_fold_beats_constant": "每个时间验证折的预测损失优于常数基准",
+        "enough_signal_dates": "有信号的交易日期数",
+        "target_precision_at_least_minimum": "选中事件精确率",
+        "date_macro_precision_at_least_minimum": "按日期平均的选中精确率",
+        "net_signal_win_rate_at_least_minimum": "开发期扣成本信号胜率",
+        "final_policy_support_and_precision": "最终模型独立开发选择段的支持数与精确率",
+        "final_policy_net_signal_win_rate_at_least_minimum": "最终门槛选择段的扣成本信号胜率",
+        "final_policy_drawdown_within_limit": "最终门槛选择段的组合回撤",
     }
     failed = [check_names.get(key, key) for key, passed in report.get("development_constraint_checks", {}).items() if not passed]
     if failed:
@@ -167,6 +220,11 @@ def _report_facts(report):
         lines += ["", f"留出信号日期：{str(counts['test_start'])[:10]} 至 {str(counts['test_signal_end'])[:10]}。"]
     if isinstance(counts.get("heldout_companies"), list):
         lines += [f"整家公司留出 {len(counts['heldout_companies'])} 家，不参与开发集训练和候选选择。"]
+    if counts.get("policy_selection"):
+        p = counts["policy_selection"]
+        lines += [f"模型和概率校准完成后，另用 {number(p['rows'])} 行开发末段样本选择出手门槛；这些样本未参与最终模型拟合或校准，仍属于开发选择证据。"]
+        if p.get("signal_start") and p.get("signal_end"):
+            lines += [f"最终门槛冻结于开发选择段：{str(p['signal_start'])[:10]} 至 {str(p['signal_end'])[:10]}；冻结后直接用于后续留出评估，未再重训模型或按测试结果调整门槛。"]
     lines += ["", "## 留出评估", "",
               "留出描述本次训练的数据划分，不自动证明历史窗口此前未被使用。重复使用的历史窗口仅作流程复验，不能作为新的盲测证据。",
               "", "### 预测表现", "",
@@ -193,10 +251,22 @@ def _report_facts(report):
     if not report.get("evaluation"):
         lines.append("| 尚无留出评估记录 | — | — | — | — |")
     lines += ["", "### 信号与组合回测", ""]
-    threshold = policy.get("probability_threshold" if classification else "regression_threshold")
+    threshold = policy.get("threshold", policy.get("probability_threshold" if classification else "regression_threshold"))
     if threshold is not None:
         lines += [(f"预测概率至少达到 {threshold:.2%} 时计作信号。" if classification else
                    f"预测收益率至少达到 {threshold:.2%} 时计作信号。"), ""]
+        if policy.get("top_k") is not None and policy.get("threshold") is not None:
+            lines += [f"每日从达到门槛的股票中最多选 {policy['top_k']} 只；达不到门槛可以空选。", ""]
+        elif policy.get("top_k") is not None:
+            lines += [f"本次固定门槛的信号统计包含全部过线样本；组合执行时每次最多选 {policy['top_k']} 只。", ""]
+    if any("target_precision" in result["prediction"] for _, result in available):
+        lines += ["| 留出范围 | 目标命中精确率 | 命中 / 选中 | 实际下跌数 | 覆盖率 | 出手日期 |",
+                  "|---|---:|---:|---:|---:|---:|"]
+        fmt = lambda value: f"{value:.2%}" if value is not None else "无信号，不计算"
+        for label, result in available:
+            m = result["prediction"]
+            lines.append(f"| {label} | {fmt(m.get('target_precision'))} | {number(m.get('true_positive'))} / {number(m.get('signal_count'))} | {number(m.get('actual_down_count'))} | {fmt(m.get('coverage'))} | {number(m.get('signal_dates'))} |")
+        lines += ["", "目标精确率检查毛收益是否超过 target_return；扣成本信号胜率检查毛收益扣除假设双边费用后是否为正，两者是不同事件。信号扣费采用费率直接相减的估算，实际成交费用与收益另由组合账本计算。实际下跌另行统计；按日期的统计仍是描述证据，不是未来胜率保证。", ""]
     lines += [
               "| 留出范围 | 信号数 | 扣成本信号胜率 | 组合收益 | 同池基准收益 | 组合最大回撤 | 同池基准最大回撤 | 买卖成交记录 |",
               "|---|---:|---:|---:|---:|---:|---:|---:|"]
@@ -244,11 +314,20 @@ def review_evidence(root, report):
     )
     if "symbol" not in selection.get("columns", []):
         method += "当前选中特征不含股票代码；仅凭公司留出差异不能断言模型使用或记忆了公司ID。"
+    if selection.get("frozen_policy"):
+        method += (
+            "候选模型用开发期OOF预测比较出手阈值与精确率；最终候选选定后，开发末段另作门槛选择段，"
+            "最终模型拟合及其内部概率校准均只使用此前的开发数据，标签结束时间也早于该选择段。"
+            "最终模型及校准器保持冻结，再在该开发末段选择最终门槛；这仍是开发选择证据，并非未参与选择的测试。"
+            "最终留出评估复用这个模型、校准器及门槛，不按留出结果重训或调阈值。"
+        )
     compact = [{"candidate": item["candidate"], "score": item["score"],
                 "constraint_checks": item["constraint_checks"],
+                **({"decision_policy": _policy_evidence(item["decision_policy"])} if item.get("decision_policy") else {}),
                 "folds": [{"training": fold.get("training", {}), "validation_rows": fold.get("validation_rows"),
                             "signal_count": fold["prediction"]["signal_count"],
                             "signal_win_rate_after_cost": fold["prediction"]["signal_win_rate_after_cost"],
+                            **{key: fold["prediction"][key] for key in ("target_precision", "signal_dates", "actual_down_count", "coverage", "date_macro_precision") if key in fold["prediction"]},
                             "skill_vs_constant": fold["prediction"]["skill_vs_constant"],
                             "portfolio": fold["portfolio"]} for fold in item["folds"]]}
                for item in development.get("results", [])]
@@ -259,9 +338,14 @@ def review_evidence(root, report):
                                "tasks": sorted({item["task"] for item in candidates}),
                                "models": sorted({item["model"] for item in candidates})},
         "development_evidence": compact,
+        **({"model_explanation": _load_json(root / "explanation.json")} if (root / "explanation.json").is_file() else {}),
+        **({"frozen_policy": _policy_evidence(selection["frozen_policy"])} if selection.get("frozen_policy") else {}),
         "constraint_meaning": "enough_signals检查各折信号总数；each_fold_win_rate检查各折扣成本信号胜率门槛；"
             "drawdown_within_limit检查各折组合回撤绝对值；each_fold_beats_constant检查各折预测损失相对常数基准改善"
-            "（分类Brier或回归MSE），不是胜率超过常数基准。",
+            "（分类Brier或回归MSE），不是胜率超过常数基准。"
+            "precision模式允许无信号验证折：按开发OOF合计支持数、出手日期数、目标精确率、日期平均精确率、"
+            "扣成本信号胜率及各折组合回撤判断资格，不要求各折都有信号，也不以预测损失改善作为硬门槛。"
+            "最终门槛选择段需再次满足支持数、目标精确率、扣成本信号胜率和组合回撤要求。",
         "interpretation": "最后只对开发集选出的一名候选做留出评估；整项研究覆盖范围以actually_evaluated为准。"
             "留出是本次训练的数据划分，不能据此认定历史窗口从未被使用；重复历史窗口只支持流程复验。"
             "未做统计显著性检验或多组独立公司/新时期重复验证。小公司数、少量信号、重叠标签和有限成交记录只能支持当前切片的描述。"
@@ -273,6 +357,10 @@ def review_research(root, advisor=None):
     """Retry language assessment using saved aggregate evidence; never fits a model."""
     root = Path(root)
     report = _load_json(root / "report.json")
+    if (root / "model.joblib").is_file():
+        from .assets import export_strategy
+        existing = _load_json(root / "strategy.json") if (root / "strategy.json").is_file() else {}
+        export_strategy(root, hypothesis=existing.get("hypothesis", ""))
     evidence = review_evidence(root, report)
     write_json(root / "review_evidence.json", evidence)
     review = "未启用大模型评审；数值证据已生成。"
@@ -298,6 +386,8 @@ def run_research(spec, daily=None, events=(), *, source=None, output_root="outpu
     An interrupted trial consumes its already reserved attempt. Completed trials, round picks,
     data and the pre-holdout selection are never recomputed on resume. A running sklearn fit
     is interrupted by the caller's process supervisor; callbacks cooperate at work boundaries.
+    Missing optional spec fields use compatible defaults; the implementation snapshot must
+    still match exactly. This is not cross-version retraining or recovery.
     """
     started = time.monotonic()
     files = _implementation_files()
@@ -307,7 +397,7 @@ def run_research(spec, daily=None, events=(), *, source=None, output_root="outpu
         progress({"stage": stage, "message": message, **facts})
     if resume_dir is not None:
         root = Path(resume_dir)
-        if _load_json(root / "spec.json") != json.loads(json.dumps(spec.to_dict())):
+        if ResearchSpec.from_dict(_load_json(root / "spec.json")).to_dict() != spec.to_dict():
             raise ValueError("resume spec differs from frozen research spec")
         manifest = _load_json(root / "manifest.json")
         if manifest["implementation_sha256"] != code_hash:
@@ -335,8 +425,10 @@ def run_research(spec, daily=None, events=(), *, source=None, output_root="outpu
         symbols = sorted(panel.symbol.unique())
         if len(dates) < 140:
             raise ValueError("at least 140 trading sessions are required")
-        if len(symbols) < 5:
-            raise ValueError("at least five companies are required")
+        if not symbols:
+            raise ValueError("at least one company is required")
+        if len(symbols) < 2 and spec.company_holdout_fraction:
+            raise ValueError("single-company research requires company_holdout_fraction=0")
         run_id = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ") + "_" + uuid.uuid4().hex[:8]
         root = Path(output_root) / run_id
         root.mkdir(parents=True, exist_ok=False)
@@ -355,7 +447,7 @@ def run_research(spec, daily=None, events=(), *, source=None, output_root="outpu
         test_start = pd.Timestamp(dates[int(len(dates) * (1 - spec.test_fraction))])
         shuffled = symbols.copy()
         random.Random(spec.seed).shuffle(shuffled)
-        heldout = sorted(shuffled[:max(1, int(len(shuffled) * spec.company_holdout_fraction))])
+        heldout = sorted(shuffled[:max(1, int(len(shuffled) * spec.company_holdout_fraction))]) if spec.company_holdout_fraction else []
         fingerprint = hashlib.sha256(pd.util.hash_pandas_object(panel, index=True).values.tobytes()).hexdigest()
         manifest = {"run_id": run_id, "git_commit": commit, "working_tree_dirty": dirty,
                     "implementation_sha256": code_hash, "panel_sha256": fingerprint,
@@ -404,7 +496,7 @@ def run_research(spec, daily=None, events=(), *, source=None, output_root="outpu
             if budget <= 0:
                 break
             if results:
-                best = max(results, key=lambda r: (r["meets_constraints"], r["score"]))["candidate"]
+                best = max(results, key=candidate_rank)["candidate"]
                 remaining.sort(key=lambda c: sum(c[k] != best[k] for k in ("model", "task", "horizon", "sampler", "features")))
                 exploit = remaining[:max(1, budget // 2)]
                 explore = remaining[len(exploit):]
@@ -416,7 +508,7 @@ def run_research(spec, daily=None, events=(), *, source=None, output_root="outpu
             if advisor is not None:
                 try:
                     proposed, analysis = advisor.plan(spec, remaining[:min(120, len(remaining))],
-                        [{k: r[k] for k in ("candidate", "score", "meets_constraints", "signal_count", "constraint_checks")} for r in results], budget=budget)
+                        [_planning_evidence(result) for result in results], budget=budget)
                     picks = list(dict.fromkeys(proposed + picks))[:budget]
                     planning.append({"round": round_index + 1, "analysis": analysis, "candidate_ids": picks})
                 except Exception as exc:
@@ -448,22 +540,45 @@ def run_research(spec, daily=None, events=(), *, source=None, output_root="outpu
                  completed=len(results) + len(failures), total=spec.max_trials, attempted=len(attempted))
     if not results:
         raise ValueError("no evaluable candidates; inspect the saved development evidence")
-    results.sort(key=lambda r: (r["meets_constraints"], r["score"]), reverse=True)
+    results.sort(key=candidate_rank, reverse=True)
     selection_path = root / "selection.json"
     winner = _load_json(selection_path) if selection_path.exists() else results[0]
-    write_json(selection_path, winner)  # freeze before revealing any test slice
+    write_json(selection_path, winner)  # candidate frozen before any test outcome is read
     c = winner["candidate"]
     data = labels[c["horizon"]]
     development = data[(~data.symbol.isin(heldout)) & (data.label_end < test_start)]
     development = development[sample_mask(development, c["sampler"], spec)]
+    policy_data = None
+    model_development = development
+    if spec.min_precision is not None or spec.optimize_threshold:
+        policy_start = sorted(development.date.unique())[int(development.date.nunique() * .8)]
+        model_development = development[(development.date < policy_start) & (development.label_end < policy_start)]
+        policy_data = development[development.date >= policy_start].copy()
     emit("最终训练", "冻结开发集选择，训练用于留出评估的模型",
          completed=len(results) + len(failures), total=spec.max_trials)
     if (root / "model.joblib").exists():
         model = joblib.load(root / "model.joblib")
     else:
-        model = fit_model(development, c, winner["columns"], spec)
+        model = fit_model(model_development, c, winner["columns"], spec)
         joblib.dump(model, root / "model.joblib.tmp")
         os.replace(root / "model.joblib.tmp", root / "model.joblib")
+    policy = None
+    if policy_data is not None:
+        policy = winner.get("frozen_policy")
+        policy_data["prediction"] = model.predict(policy_data)
+        if policy is None:
+            policy = choose_decision_policy(policy_data, c["task"], spec)
+            policy.update(selection_source="development_after_final_fit",
+                          selection_note="最终模型及校准器冻结后，在未参与该模型拟合/校准的开发末段选择阈值；该段属于选择证据，不是最终测试。",
+                          rows=len(policy_data), signal_start=policy_data.date.min(), signal_end=policy_data.date.max())
+        policy_metrics = prediction_metrics(policy_data, c["task"], spec, _baseline(model_development, c["task"], spec), policy=policy)
+        policy_backtest = backtest_predictions(policy_data, panel, c, spec, policy=policy)
+        policy.update(metrics=policy_metrics, portfolio=policy_backtest["metrics"])
+        checks = _precision_constraint_checks(policy, [{"prediction": policy_metrics, "portfolio": policy_backtest["metrics"]}], spec)
+        policy.update(checks=checks, eligible=all(checks.values()))
+        winner["frozen_policy"] = policy
+        write_json(root / "policy_selection_backtest.json", policy_backtest)
+        write_json(selection_path, winner)
     blind = data[data.date.between(test_start, common_end)]
     reports = {}
     for name, subset in (("new_period", blind[~blind.symbol.isin(heldout)]),
@@ -477,8 +592,8 @@ def run_research(spec, daily=None, events=(), *, source=None, output_root="outpu
             continue
         subset["prediction"] = model.predict(subset)
         subset.to_csv(root / f"{name}_predictions.csv", index=False)
-        metrics = prediction_metrics(subset, c["task"], spec, _baseline(development, c["task"], spec))
-        bt = backtest_predictions(subset, panel, c, spec)
+        metrics = prediction_metrics(subset, c["task"], spec, _baseline(model_development, c["task"], spec), policy=policy)
+        bt = backtest_predictions(subset, panel, c, spec, policy=policy)
         # Same dates and company universe, but without strategy selection or ranking.
         benchmark_rows = market_subset[market_subset.date.between(subset.date.min(), subset.date.max())].copy()
         benchmark_rows["prediction"] = 0.0
@@ -494,14 +609,25 @@ def run_research(spec, daily=None, events=(), *, source=None, output_root="outpu
                      "test_start": test_start, "test_signal_end": common_end,
                      "heldout_companies": heldout,
                      "heldout_rows": {name: r["prediction"]["rows"] for name, r in reports.items() if "prediction" in r}}
+    if policy is not None:
+        sample_counts["policy_selection"] = {"rows": len(policy_data), "signal_start": policy_data.date.min(),
+            "signal_end": policy_data.date.max(), "model_latest_label_end": model_development.label_end.max(),
+            "purged_before_policy": len(development) - len(model_development) - len(policy_data)}
     write_json(root / "sample_counts.json", sample_counts)
     report = {"run_id": run_id, "objective": spec.objective, "selected": c,
-              "development_constraints_met": winner["meets_constraints"],
-              "development_constraint_checks": winner["constraint_checks"],
+              "development_constraints_met": winner["meets_constraints"] and (policy is None or policy["eligible"]),
+              "development_constraint_checks": {**winner["constraint_checks"], **({
+                  "final_policy_support_and_precision": all(value for key, value in policy["checks"].items()
+                                                            if key not in ("drawdown_within_limit", "net_signal_win_rate_at_least_minimum")),
+                  "final_policy_net_signal_win_rate_at_least_minimum": policy["checks"]["net_signal_win_rate_at_least_minimum"],
+                  "final_policy_drawdown_within_limit": policy["checks"]["drawdown_within_limit"],
+              } if policy else {})},
               "decision_policy": {"probability_threshold": spec.probability_threshold,
                                   "regression_threshold": spec.regression_threshold, "target_return": spec.target_return,
                                   "top_k": spec.top_k, "min_signals": spec.min_signals,
-                                  "min_win_rate": spec.min_win_rate, "max_drawdown": spec.max_drawdown},
+                                  "min_signal_dates": spec.min_signal_dates, "min_precision": spec.min_precision,
+                                  "min_win_rate": spec.min_win_rate, "max_drawdown": spec.max_drawdown,
+                                  **(policy or {})},
               "sample_counts": sample_counts, "attempted_trials": len(attempted), "successful_trials": len(results),
               "evaluation": reports, "elapsed_seconds": round(base_elapsed + time.monotonic() - started, 2),
               "limitations": [
@@ -509,7 +635,7 @@ def run_research(spec, daily=None, events=(), *, source=None, output_root="outpu
                   "交易成本为任务假设，不自动推断历史税费制度；复权数据可能被供应商修订。",
                   "信号胜率是重叠持有期样本统计，不能视为独立已成交交易胜率；组合收益另由逐日现金账本计算。",
                   "horizon定义：收盘后信号，下一交易日开盘买入，持有h个交易日后开盘退出；不是期间触及目标价概率。",
-                  "随机起始股票池可含后来退市股票，但退市清算和历史数据库完整性尚未认证。",
+                  "股票池按研究配置选择，可含后来退市股票；退市清算和历史数据库完整性尚未认证。",
                   "所有盲测只评估开发集选定的一名候选；本轮报告不触发自动再训练或交易。",
               ] + (source or {}).get("warnings", [])}
     write_json(root / "report.json", report)

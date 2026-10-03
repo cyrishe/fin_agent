@@ -4,7 +4,7 @@ import json
 
 import pytest
 
-from src.quant_research.automl.runner import model_display_name, render_report, review_evidence
+from src.quant_research.automl.runner import model_display_name, render_report, review_evidence, review_research
 
 
 @pytest.fixture
@@ -103,6 +103,27 @@ def test_reviewer_receives_same_program_facts_without_altering_saved_evidence(re
     assert facts in render_report(report, "interpretation")
     assert "+0.87%（损失更低）" in facts and "-0.33%（损失更高）" in facts
     assert evidence["evaluation"] == saved["evaluation"] and report == saved
+
+
+def test_archived_aggregate_report_without_model_remains_reviewable(report, tmp_path):
+    (tmp_path / "report.json").write_text(json.dumps(report))
+    (tmp_path / "selection.json").write_text(json.dumps({"columns": ["return_7"]}))
+    (tmp_path / "development.json").write_text(json.dumps({"results": []}))
+
+    class Advisor:
+        def review(self, evidence):
+            assert "model_explanation" not in evidence["review_context"]
+            return "归档报告只有聚合指标，无法据此还原模型规则。"
+
+    assert review_research(tmp_path, Advisor())["completed"]
+    assert "无法据此还原模型规则" in (tmp_path / "report.md").read_text()
+
+
+def test_legacy_report_distinguishes_uncapped_signals_from_capped_portfolio(report):
+    report["decision_policy"].update(probability_threshold=.6, top_k=3)
+    text = render_report(report, "")
+    assert "信号统计包含全部过线样本" in text
+    assert "组合执行时每次最多选 3 只" in text
 
 
 @pytest.mark.parametrize("model,classification,regression", [

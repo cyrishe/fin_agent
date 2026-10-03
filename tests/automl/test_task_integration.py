@@ -192,6 +192,28 @@ def test_resume_rejects_changed_spec_and_data(market, tmp_path):
         run_research(minimal_spec(), resume_dir=root)
 
 
+def test_resume_accepts_missing_optional_spec_fields_only_with_same_implementation(market, tmp_path, monkeypatch):
+    import src.quant_research.automl.runner as runner
+    root, report = run_research(minimal_spec(), *market, output_root=tmp_path, progress=lambda _: None)
+    stored = json.loads((root / "spec.json").read_text())
+    for field in ("feature_names", "min_precision", "optimize_threshold", "min_signal_dates"):
+        stored.pop(field)
+    (root / "spec.json").write_text(json.dumps(stored))
+
+    def forbidden(*args, **kwargs):
+        raise AssertionError("resuming completed compatible artifacts must not refit")
+
+    monkeypatch.setattr(runner, "fit_model", forbidden)
+    _, recovered = run_research(minimal_spec(), resume_dir=root, progress=lambda _: None)
+    assert recovered["selected"] == report["selected"]
+    assert not set(("feature_names", "min_precision", "optimize_threshold", "min_signal_dates")) & set(json.loads((root / "spec.json").read_text()))
+    manifest = json.loads((root / "manifest.json").read_text())
+    manifest["implementation_sha256"] = "older-implementation-snapshot"
+    (root / "manifest.json").write_text(json.dumps(manifest))
+    with pytest.raises(ValueError, match="same implementation snapshot"):
+        run_research(minimal_spec(), resume_dir=root, progress=lambda _: None)
+
+
 def test_tool_authorized_demo_reports_and_resume(tmp_path):
     args = {"requirement_brief": "显式配置的合成流程验证", "spec": minimal_spec().to_dict(), "source": "demo", "llm_review": False}
     with pytest.raises(ValueError, match="authorized background"):
@@ -243,6 +265,6 @@ def test_industry_universe_is_selected_before_random_sampling(monkeypatch):
     chosen = select_symbols(None, {"kcrp_stock_industry": {}}, minimal_spec(industries=("银行",), max_symbols=5))
     assert len(chosen) == 5 and len(set(chosen)) == 5
     assert "EXISTS" in calls[0][0] and "i.industry_name IN (%s)" in calls[0][0]
-    assert calls[0][1] == ("2023-01-02", "2023-01-02", "2023-01-02", "2023-01-02", "银行")
+    assert calls[0][1] == ("2023-12-29", "2023-01-02", "2023-12-29", "2023-01-02", "银行")
     with pytest.raises(ValueError, match="historical industry"):
         select_symbols(None, {}, minimal_spec(industries=("银行",)))
