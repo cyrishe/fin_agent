@@ -11,6 +11,7 @@ class _StubPreprocessService:
             "capability_family": "business_analysis",
             "dispatch_plan": {
                 "entry": "planned_run",
+                "turn_mode": "normal_qa",
                 "selected_agent": "investment_analyst",
                 "execution_plan_preview": {
                     "plan_type": "planned_run",
@@ -30,6 +31,8 @@ class _StubPreprocessService:
                 ],
             },
             "interaction": {
+                "agent_name": "investment_analyst",
+                "turn_mode": "normal_qa",
                 "analize": "这是一个需要先找龙头再补资金面的业务分析问题。",
                 "domain_hint": "business",
                 "agent_hint": "investment_analyst",
@@ -61,6 +64,19 @@ class _StubPreprocessService:
             "normalized_input": {"text": "机器人概念前两只龙头看下资金面"},
             "llm_usage": {},
         }
+
+
+def test_planner_preserves_context_resolution_provenance_and_references():
+    class Preprocess(_StubPreprocessService):
+        def preprocess(self, **kwargs):
+            result = super().preprocess(**kwargs)
+            result["normalized_request"].update(source="llm", context_refs=["turn:42"])
+            return result
+
+    planner = AssistantDispatchPlanner(preprocess_service=Preprocess())
+    result = planner.plan_free_chat(text="继续", attachments=[], thread_context={}, application_context={})
+    assert result["semantic_turn"]["context_resolution_source"] == "llm"
+    assert result["semantic_turn"]["context_refs"] == ["turn:42"]
 
 
 def test_assistant_dispatch_planner_builds_planning_task_state():

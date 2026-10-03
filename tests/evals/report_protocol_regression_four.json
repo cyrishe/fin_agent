@@ -1,0 +1,9 @@
+{
+  "source": "2026-09-08 MCP 20-case evaluation; original questions unchanged",
+  "cases": [
+    {"case_id": "RTE009", "question": "网易的净利率变化反映了什么行业趋势？"},
+    {"case_id": "RTE010", "question": "AI大模型技术发展对科大讯飞的业务增长有何催化作用？"},
+    {"case_id": "RTE017", "question": "看多蔚来汽车的机构主要理由是什么？"},
+    {"case_id": "RTE020", "question": "阳光电源在光伏行业的竞争格局中处于什么位置？"}
+  ]
+}

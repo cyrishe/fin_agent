@@ -1,0 +1,41 @@
+{
+  "version": "stock_research_adaptive_real_v1",
+  "description": "验证 stock-research 作为自适应个股深研主 Skill，能按公司经济结构、事件状态和用户目标组合少量专业方法。",
+  "cases": [
+    {
+      "id": "moutai_consumer_mature",
+      "expected_skill_id": "stock-research",
+      "question": "请从中长期视角深度研究贵州茅台。不要套通用综合评分，要围绕白酒的量价、产品结构、渠道库存与价盘、直营占比、现金回款、资本配置和当前估值形成可证伪的核心命题；说明最强支持证据、最强反证、市场可能已计入的预期和未来三个观察点。"
+    },
+    {
+      "id": "cmb_financial_model",
+      "expected_skill_id": "stock-research",
+      "question": "深度研究招商银行当前的投资逻辑。请使用适合银行的资产质量、净息差、存贷款结构、拨备、资本充足和ROE视角，不要套普通工业公司的净债务或EV/EBITDA；结合当前估值说明核心逻辑、反证与失效条件。"
+    },
+    {
+      "id": "foxconn_ai_hotspot_exposure",
+      "expected_skill_id": "stock-research",
+      "question": "工业富联近期经常被视为AI算力热门股。请做一次事件与基本面结合的深度研究：核实AI业务的真实收入和利润传导，区分行业共振与公司独有变化，判断当前价格可能计入了什么，并列出热点延续和失效所需的可验证条件。"
+    },
+    {
+      "id": "zijin_cyclical_resource",
+      "expected_skill_id": "stock-research",
+      "question": "从完整周期视角深度研究紫金矿业：重点看资源量与产量、成本曲线、金铜价格暴露、资本开支、负债韧性和中周期盈利，不要用当前商品价格和峰值利润简单算低PE。"
+    },
+    {
+      "id": "missing_evidence_boundary",
+      "expected_skill_id": "stock-research",
+      "question": "深度分析一家系统中行业经营指标可能不完整的公司。若关键数据缺失，请缩小结论并列出缺口，不要用默认增长率、利润率、WACC或旧闻填充。标的是百济神州。"
+    },
+    {
+      "id": "earnings_expectation_gap_redteam",
+      "expected_skill_id": "stock-research",
+      "question": "宁德时代最近的业绩和股价表现之间是否存在预期差？请区分已兑现业绩、管理层表达、研报预测、当前价格可能隐含的预期和你的推断；不要用平均目标价代替判断，并给出最强熊案与下一验证点。"
+    },
+    {
+      "id": "event_timeline_price_reaction",
+      "expected_skill_id": "stock-research",
+      "question": "请深度分析中际旭创近期上涨的核心驱动。按事件首次可知时间、预期变化、价格反应、利润传导和下一验证点组织，不要用异动后才发布的转载倒推原因，也不要因为新闻多就认定催化强。"
+    }
+  ]
+}

@@ -66,6 +66,14 @@ class PythonExecutionRuntime:
                 merged[key] = value
         return merged
 
+    def resolve_backend(self, profile: Optional[Dict[str, Any]] = None) -> str:
+        """Resolve the effective backend without starting user code."""
+
+        backend = self._select_backend(self._merge_profile(profile or {}))
+        if backend in self.FORMAL_BACKENDS and not shutil.which(backend):
+            return "sandbox_unavailable"
+        return backend
+
     def execute(
         self,
         *,

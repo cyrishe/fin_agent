@@ -1,0 +1,4 @@
+interface:
+  display_name: "自然语言选股"
+  short_description: "把自然语言条件转为一次可验证筛选并解释候选与数据缺口"
+  default_prompt: "Use $stock-screening to run a one-time stock screen from my criteria and explain every verified match."

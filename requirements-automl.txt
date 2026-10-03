@@ -1,0 +1,8 @@
+# Independent research runner; does not add ML dependencies to the web process.
+numpy>=1.26,<3
+pandas>=2.2,<3
+scikit-learn>=1.5,<2
+joblib>=1.3,<2
+PyMySQL>=1.1,<2
+python-dotenv>=1,<2
+requests>=2.31,<3

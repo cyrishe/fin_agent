@@ -1,0 +1,876 @@
+{
+  "suite": "agent_surface_v1_thought_experiments",
+  "protocol_version": "agent_surface.v1",
+  "cases": [
+    {
+      "case_id": "E01",
+      "title": "轻量金融知识问答",
+      "expected_verdict": "pass",
+      "messages": [
+        {
+          "object_type": "model.surface_draft",
+          "protocol_version": "agent_surface.v1",
+          "sections": [
+            {
+              "role": "primary",
+              "blocks": [
+                {
+                  "kind": "narrative",
+                  "semantic": "finance.concept_explanation",
+                  "payload": {
+                    "format": "markdown",
+                    "text": "**静态市盈率**使用最近完整年度利润；**TTM 市盈率**使用最近连续十二个月利润。"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "object_type": "surface.event",
+          "protocol_version": "agent_surface.v1",
+          "event_id": "e01_001",
+          "event_type": "surface.snapshot",
+          "context_id": "ctx_e01",
+          "run_id": "run_e01",
+          "seq": 0,
+          "timestamp": "2026-07-11T10:00:00+08:00",
+          "commit_state": "committed",
+          "payload": {
+            "surface_id": "surface_e01",
+            "status": "succeeded",
+            "revision": 0,
+            "sections": [
+              {
+                "section_id": "primary_e01",
+                "role": "primary",
+                "blocks": [
+                  {
+                    "block_id": "answer_e01",
+                    "kind": "narrative",
+                    "status": "succeeded",
+                    "payload": {
+                      "format": "markdown",
+                      "text": "**静态市盈率**使用最近完整年度利润；**TTM 市盈率**使用最近连续十二个月利润。"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "E02",
+      "title": "单次行情数据查询",
+      "expected_verdict": "pass",
+      "messages": [
+        {
+          "object_type": "surface.event",
+          "protocol_version": "agent_surface.v1",
+          "event_id": "e02_001",
+          "event_type": "surface.snapshot",
+          "context_id": "ctx_e02",
+          "run_id": "run_e02",
+          "seq": 0,
+          "timestamp": "2026-07-11T10:01:00+08:00",
+          "commit_state": "committed",
+          "payload": {
+            "surface_id": "surface_e02",
+            "status": "succeeded",
+            "revision": 0,
+            "sections": [
+              {
+                "section_id": "primary_e02",
+                "role": "primary",
+                "blocks": [
+                  {
+                    "block_id": "summary_e02",
+                    "kind": "narrative",
+                    "status": "succeeded",
+                    "payload": {
+                      "format": "plain",
+                      "text": "近 60 个交易日的走势与最大回撤如下，数据截至 2026-07-10 收盘。",
+                      "evidence_refs": ["series_e02", "drawdown_e02"]
+                    }
+                  }
+                ]
+              },
+              {
+                "section_id": "evidence_e02",
+                "role": "evidence",
+                "blocks": [
+                  {
+                    "block_id": "series_e02",
+                    "kind": "data",
+                    "status": "succeeded",
+                    "semantic": "finance.index_ohlc",
+                    "payload": {
+                      "shape": "timeseries",
+                      "content_type": "finance.index_ohlc",
+                      "content_schema_version": "v1",
+                      "data": [
+                        {"date": "2026-07-09", "close": 4001.2},
+                        {"date": "2026-07-10", "close": 4012.8}
+                      ]
+                    },
+                    "domain_context": {
+                      "namespace": "finance",
+                      "as_of": "2026-07-10T15:00:00+08:00",
+                      "timezone": "Asia/Shanghai",
+                      "markets": ["CN"],
+                      "instruments": [{"id": "000300.SH", "asset_type": "index", "market": "SSE"}],
+                      "unit": "index_point",
+                      "frequency": "1d",
+                      "data_mode": "historical",
+                      "calendar": "SSE"
+                    },
+                    "presentation_hint": {
+                      "preferred_renderer": "data.line",
+                      "fallback_renderer": "data.table"
+                    }
+                  },
+                  {
+                    "block_id": "drawdown_e02",
+                    "kind": "data",
+                    "status": "succeeded",
+                    "semantic": "finance.drawdown_summary",
+                    "payload": {
+                      "shape": "record",
+                      "content_type": "finance.drawdown_summary",
+                      "data": {"max_drawdown": -0.061, "peak_date": "2026-05-08", "trough_date": "2026-05-29"}
+                    }
+                  },
+                  {
+                    "block_id": "source_e02",
+                    "kind": "resource",
+                    "status": "succeeded",
+                    "payload": {
+                      "resources": [
+                        {
+                          "resource_id": "history_tool_e02",
+                          "uri": "tool-result://stock_history_kline/e02",
+                          "title": "历史指数行情结果",
+                          "relation": "source",
+                          "mime_type": "application/json",
+                          "access": "authorized"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "E03",
+      "title": "多工具股票比较和部分数据缺失",
+      "expected_verdict": "pass",
+      "messages": [
+        {
+          "object_type": "surface.event",
+          "protocol_version": "agent_surface.v1",
+          "event_id": "e03_001",
+          "event_type": "surface.snapshot",
+          "context_id": "ctx_e03",
+          "run_id": "run_e03",
+          "seq": 0,
+          "timestamp": "2026-07-11T10:02:00+08:00",
+          "commit_state": "committed",
+          "payload": {
+            "surface_id": "surface_e03",
+            "status": "partial",
+            "revision": 0,
+            "sections": [
+              {
+                "section_id": "process_e03",
+                "role": "process",
+                "blocks": [
+                  {
+                    "block_id": "workflow_e03",
+                    "kind": "workflow",
+                    "status": "partial",
+                    "payload": {
+                      "scope": "plan",
+                      "items": [
+                        {"item_id": "valuation", "label": "读取估值", "status": "succeeded"},
+                        {"item_id": "growth", "label": "读取财务增长", "status": "partial"},
+                        {"item_id": "price", "label": "读取一年行情", "status": "succeeded"}
+                      ]
+                    }
+                  }
+                ]
+              },
+              {
+                "section_id": "evidence_e03",
+                "role": "evidence",
+                "blocks": [
+                  {
+                    "block_id": "comparison_e03",
+                    "kind": "data",
+                    "status": "partial",
+                    "payload": {
+                      "shape": "records",
+                      "content_type": "finance.company_comparison",
+                      "data": [
+                        {"instrument": "300750.SZ", "pe_ttm": 20.1, "latest_growth": 0.12},
+                        {"instrument": "002594.SZ", "pe_ttm": 18.7, "latest_growth": null}
+                      ],
+                      "quality": {
+                        "status": "degraded",
+                        "completeness": 0.83,
+                        "issues": ["002594.SZ latest_growth missing"]
+                      }
+                    }
+                  },
+                  {
+                    "block_id": "assessment_e03",
+                    "kind": "assessment",
+                    "status": "partial",
+                    "payload": {
+                      "assessment_type": "finance.data_quality",
+                      "overall": "warn",
+                      "summary": "行情完整，但一家公司最新季度增长字段缺失，估值数据为延迟数据。",
+                      "issues": [
+                        {
+                          "severity": "warning",
+                          "code": "finance.latest_quarter_field_missing",
+                          "message": "一家公司最新季度增长字段缺失。",
+                          "evidence_refs": ["comparison_e03"]
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "object_type": "surface.event",
+          "protocol_version": "agent_surface.v1",
+          "event_id": "e03_002",
+          "event_type": "run.finished",
+          "context_id": "ctx_e03",
+          "run_id": "run_e03",
+          "seq": 1,
+          "timestamp": "2026-07-11T10:02:05+08:00",
+          "commit_state": "committed",
+          "payload": {
+            "status": "partial",
+            "outcome": "partial",
+            "summary": "完成比较，保留数据缺失提示。"
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "E04",
+      "title": "金融工具设计和失败修复",
+      "expected_verdict": "pass_with_business_schema",
+      "related_example": "agent_surface_v1_financial_tool_design.json",
+      "messages": [
+        {
+          "object_type": "surface.event",
+          "protocol_version": "agent_surface.v1",
+          "event_id": "e04_001",
+          "event_type": "surface.snapshot",
+          "context_id": "ctx_e04",
+          "run_id": "run_e04",
+          "seq": 0,
+          "timestamp": "2026-07-11T10:03:00+08:00",
+          "commit_state": "committed",
+          "payload": {
+            "surface_id": "surface_e04",
+            "status": "running",
+            "revision": 0,
+            "sections": [
+              {
+                "section_id": "process_e04",
+                "role": "process",
+                "blocks": [
+                  {
+                    "block_id": "workflow_e04",
+                    "kind": "workflow",
+                    "status": "running",
+                    "revision": 0,
+                    "payload": {
+                      "scope": "validation",
+                      "current_item_id": "historical_check",
+                      "items": [
+                        {"item_id": "implementation", "label": "生成实现", "status": "succeeded"},
+                        {"item_id": "basic_examples", "label": "基础样例", "status": "succeeded"},
+                        {
+                          "item_id": "historical_check",
+                          "label": "历史时点检查",
+                          "status": "failed",
+                          "error": {"code": "lookahead_detected", "message": "宽度数据未按 as_of 截断", "retryable": true}
+                        },
+                        {"item_id": "repair", "label": "修正前视问题", "status": "running", "depends_on": ["historical_check"]},
+                        {"item_id": "reverify", "label": "重新验证", "status": "pending", "depends_on": ["repair"]}
+                      ]
+                    }
+                  }
+                ]
+              },
+              {
+                "section_id": "artifact_e04",
+                "role": "artifact",
+                "blocks": [
+                  {
+                    "block_id": "spec_e04",
+                    "kind": "artifact",
+                    "status": "running",
+                    "payload": {
+                      "artifact_id": "artifact_e04",
+                      "artifact_type": "finance.tool_spec",
+                      "lifecycle": "reviewable",
+                      "version": "0.2.0",
+                      "content_type": "application/vnd.fin-agent.tool-spec+json",
+                      "content_schema_version": "finance.tool_spec.v1",
+                      "content": {"display_name": "市场状态判断", "adjustment": "forward"},
+                      "validation_refs": ["validation_e04"]
+                    }
+                  },
+                  {
+                    "block_id": "validation_e04",
+                    "kind": "assessment",
+                    "status": "partial",
+                    "payload": {
+                      "assessment_type": "finance.tool_validation",
+                      "subject_ref": "artifact_e04",
+                      "overall": "fail",
+                      "summary": "检测到前视数据，Agent 正在修正。",
+                      "issues": [
+                        {"severity": "error", "code": "finance.lookahead_detected", "message": "宽度数据未按历史 as_of 截断。"}
+                      ]
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "object_type": "surface.event",
+          "protocol_version": "agent_surface.v1",
+          "event_id": "e04_002",
+          "event_type": "block.patch",
+          "context_id": "ctx_e04",
+          "run_id": "run_e04",
+          "seq": 1,
+          "timestamp": "2026-07-11T10:03:04+08:00",
+          "commit_state": "committed",
+          "target": {"surface_id": "surface_e04", "section_id": "process_e04", "block_id": "workflow_e04"},
+          "payload": {
+            "operations": [
+              {"op": "replace", "path": "/payload/items/3/status", "value": "succeeded"},
+              {"op": "replace", "path": "/payload/items/4/status", "value": "running"},
+              {"op": "replace", "path": "/payload/current_item_id", "value": "reverify"}
+            ],
+            "base_revision": 0,
+            "revision": 1
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "E05",
+      "title": "工具失败和自动改计划",
+      "expected_verdict": "pass",
+      "messages": [
+        {
+          "object_type": "surface.event",
+          "protocol_version": "agent_surface.v1",
+          "event_id": "e05_001",
+          "event_type": "surface.snapshot",
+          "context_id": "ctx_e05",
+          "run_id": "run_e05",
+          "seq": 0,
+          "timestamp": "2026-07-11T10:04:00+08:00",
+          "commit_state": "committed",
+          "payload": {
+            "surface_id": "surface_e05",
+            "status": "running",
+            "revision": 0,
+            "sections": [
+              {
+                "section_id": "process_e05",
+                "role": "process",
+                "blocks": [
+                  {
+                    "block_id": "workflow_e05",
+                    "kind": "workflow",
+                    "status": "running",
+                    "revision": 0,
+                    "payload": {
+                      "scope": "loop",
+                      "current_item_id": "official_search",
+                      "items": [
+                        {
+                          "item_id": "event_search",
+                          "label": "检索降准事件",
+                          "status": "failed",
+                          "attempt": 1,
+                          "error": {"code": "rate_limited", "message": "事件服务限流", "retryable": true}
+                        },
+                        {
+                          "item_id": "official_search",
+                          "label": "改用官方公告检索",
+                          "status": "running",
+                          "attempt": 2
+                        },
+                        {"item_id": "align_days", "label": "对齐交易日", "status": "pending", "depends_on": ["official_search"]}
+                      ]
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "object_type": "surface.event",
+          "protocol_version": "agent_surface.v1",
+          "event_id": "e05_002",
+          "event_type": "block.patch",
+          "context_id": "ctx_e05",
+          "run_id": "run_e05",
+          "seq": 1,
+          "timestamp": "2026-07-11T10:04:03+08:00",
+          "commit_state": "committed",
+          "target": {"surface_id": "surface_e05", "section_id": "process_e05", "block_id": "workflow_e05"},
+          "payload": {
+            "operations": [
+              {"op": "replace", "path": "/payload/items/1/status", "value": "succeeded"},
+              {"op": "replace", "path": "/payload/items/2/status", "value": "running"},
+              {"op": "replace", "path": "/payload/current_item_id", "value": "align_days"}
+            ],
+            "base_revision": 0,
+            "revision": 1
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "E06",
+      "title": "外部认证流程",
+      "expected_verdict": "conditional_external_flow_gap",
+      "workaround": "授权 URL 暂时作为 resource/input 表达，缺少正式 external_flow_ref。",
+      "messages": [
+        {
+          "object_type": "surface.event",
+          "protocol_version": "agent_surface.v1",
+          "event_id": "e06_001",
+          "event_type": "surface.snapshot",
+          "context_id": "ctx_e06",
+          "run_id": "run_e06",
+          "seq": 0,
+          "timestamp": "2026-07-11T10:05:00+08:00",
+          "commit_state": "committed",
+          "payload": {
+            "surface_id": "surface_e06",
+            "status": "waiting_user",
+            "revision": 0,
+            "sections": [
+              {
+                "section_id": "interaction_e06",
+                "role": "interaction",
+                "blocks": [
+                  {
+                    "block_id": "auth_resource_e06",
+                    "kind": "resource",
+                    "status": "waiting_user",
+                    "payload": {
+                      "resources": [
+                        {
+                          "resource_id": "broker_auth_e06",
+                          "uri": "https://broker.example.com/oauth/authorize",
+                          "title": "券商授权页面",
+                          "description": "当前协议只能临时使用 input relation。",
+                          "relation": "input",
+                          "access": "authorized"
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "block_id": "auth_interaction_e06",
+                    "kind": "interaction",
+                    "status": "waiting_user",
+                    "payload": {
+                      "interaction_id": "auth_e06",
+                      "intent": "authenticate",
+                      "prompt": "需要连接券商账户后才能读取持仓。",
+                      "actions": [
+                        {"action_id": "open_auth_e06", "label": "检查并授权", "intent": "accept", "style": "primary", "requires_confirmation": true},
+                        {"action_id": "cancel_auth_e06", "label": "取消", "intent": "cancel", "style": "default"}
+                      ],
+                      "decision_context": {
+                        "severity": "high",
+                        "effect_summary": "授权读取持仓，不允许交易。",
+                        "data_scope": "持仓和账户汇总",
+                        "external_effect": true,
+                        "allowed_scopes": ["once"]
+                      },
+                      "resume_token": "resume_auth_e06"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "object_type": "surface.event",
+          "protocol_version": "agent_surface.v1",
+          "event_id": "e06_002",
+          "event_type": "run.status",
+          "context_id": "ctx_e06",
+          "run_id": "run_e06",
+          "seq": 1,
+          "timestamp": "2026-07-11T10:05:01+08:00",
+          "commit_state": "committed",
+          "payload": {
+            "status": "waiting_user",
+            "wait_reason": "authentication",
+            "summary": "等待券商授权。"
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "E07",
+      "title": "临时问题插队和原任务恢复",
+      "expected_verdict": "fail_run_relation_gap",
+      "workaround": "Run A 暂时使用 blocked，Run A/B 只能通过共同 context_id 推断关系。",
+      "messages": [
+        {
+          "object_type": "surface.event",
+          "protocol_version": "agent_surface.v1",
+          "event_id": "e07_a_001",
+          "event_type": "run.status",
+          "context_id": "ctx_e07",
+          "run_id": "run_e07_a",
+          "task_id": "tool_design",
+          "seq": 0,
+          "timestamp": "2026-07-11T10:06:00+08:00",
+          "commit_state": "committed",
+          "payload": {
+            "status": "blocked",
+            "stage": "review",
+            "summary": "原任务因临时查询而暂停；blocked 只是当前协议的错误近似。",
+            "reason_code": "temporary_user_interrupt"
+          }
+        },
+        {
+          "object_type": "surface.event",
+          "protocol_version": "agent_surface.v1",
+          "event_id": "e07_b_001",
+          "event_type": "surface.snapshot",
+          "context_id": "ctx_e07",
+          "run_id": "run_e07_b",
+          "task_id": "temporary_market_query",
+          "seq": 0,
+          "timestamp": "2026-07-11T10:06:01+08:00",
+          "commit_state": "committed",
+          "payload": {
+            "surface_id": "surface_e07_b",
+            "status": "succeeded",
+            "revision": 0,
+            "sections": [
+              {
+                "section_id": "primary_e07_b",
+                "role": "primary",
+                "blocks": [
+                  {
+                    "block_id": "answer_e07_b",
+                    "kind": "narrative",
+                    "status": "succeeded",
+                    "payload": {"format": "plain", "text": "临时行情查询已完成。"}
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "object_type": "surface.event",
+          "protocol_version": "agent_surface.v1",
+          "event_id": "e07_a_002",
+          "event_type": "run.status",
+          "context_id": "ctx_e07",
+          "run_id": "run_e07_a",
+          "task_id": "tool_design",
+          "seq": 1,
+          "timestamp": "2026-07-11T10:06:05+08:00",
+          "commit_state": "committed",
+          "payload": {
+            "status": "running",
+            "stage": "review",
+            "summary": "恢复原工具设计任务，但协议没有正式 resumes_run_id。"
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "E08",
+      "title": "长任务断线重连",
+      "expected_verdict": "conditional_resume_contract_gap",
+      "missing_client_contract": ["run_id", "after_seq", "known_surface_revision", "replay_or_snapshot_response"],
+      "messages": [
+        {
+          "object_type": "surface.event",
+          "protocol_version": "agent_surface.v1",
+          "event_id": "e08_001",
+          "event_type": "surface.snapshot",
+          "context_id": "ctx_e08",
+          "run_id": "run_e08",
+          "seq": 0,
+          "timestamp": "2026-07-11T10:07:00+08:00",
+          "commit_state": "committed",
+          "payload": {
+            "surface_id": "surface_e08",
+            "status": "running",
+            "revision": 42,
+            "sections": [
+              {
+                "section_id": "process_e08",
+                "role": "process",
+                "blocks": [
+                  {
+                    "block_id": "workflow_e08",
+                    "kind": "workflow",
+                    "status": "running",
+                    "payload": {
+                      "scope": "task",
+                      "items": [{"item_id": "backtest", "label": "运行历史回测", "status": "running", "progress": 0.47}]
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "object_type": "surface.event",
+          "protocol_version": "agent_surface.v1",
+          "event_id": "e08_002",
+          "event_type": "stream.heartbeat",
+          "context_id": "ctx_e08",
+          "run_id": "run_e08",
+          "seq": 1,
+          "timestamp": "2026-07-11T10:07:02+08:00",
+          "commit_state": "committed",
+          "transient": true,
+          "payload": {
+            "server_time": "2026-07-11T10:07:02+08:00",
+            "last_committed_seq": 1
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "E09",
+      "title": "高风险结论和多来源证据",
+      "expected_verdict": "conditional_claim_anchor_gap",
+      "messages": [
+        {
+          "object_type": "surface.event",
+          "protocol_version": "agent_surface.v1",
+          "event_id": "e09_001",
+          "event_type": "surface.snapshot",
+          "context_id": "ctx_e09",
+          "run_id": "run_e09",
+          "seq": 0,
+          "timestamp": "2026-07-11T10:08:00+08:00",
+          "commit_state": "committed",
+          "payload": {
+            "surface_id": "surface_e09",
+            "status": "succeeded",
+            "revision": 0,
+            "sections": [
+              {
+                "section_id": "primary_e09",
+                "role": "primary",
+                "blocks": [
+                  {
+                    "block_id": "answer_e09",
+                    "kind": "narrative",
+                    "status": "succeeded",
+                    "payload": {
+                      "format": "markdown",
+                      "text": "估值已回到历史低位，但盈利预测仍在下修，因此低估值未必意味着风险已经释放。",
+                      "evidence_refs": ["valuation_e09", "forecast_e09", "sources_e09"]
+                    },
+                    "annotations": {
+                      "experiment.gap": "当前只能块级引用，不能稳定区分三句话各自的证据和认识论类型。"
+                    }
+                  }
+                ]
+              },
+              {
+                "section_id": "evidence_e09",
+                "role": "evidence",
+                "blocks": [
+                  {
+                    "block_id": "valuation_e09",
+                    "kind": "data",
+                    "status": "succeeded",
+                    "payload": {"shape": "record", "content_type": "finance.valuation_percentile", "data": {"percentile_3y": 0.12}}
+                  },
+                  {
+                    "block_id": "forecast_e09",
+                    "kind": "data",
+                    "status": "succeeded",
+                    "payload": {"shape": "series", "content_type": "finance.earnings_forecast_revision", "data": [-0.03, -0.05, -0.08]}
+                  },
+                  {
+                    "block_id": "sources_e09",
+                    "kind": "resource",
+                    "status": "succeeded",
+                    "payload": {
+                      "resources": [
+                        {"resource_id": "source_a_e09", "title": "估值数据", "relation": "source", "access": "authorized"},
+                        {"resource_id": "source_b_e09", "title": "盈利预测数据", "relation": "source", "access": "authorized"}
+                      ]
+                    }
+                  },
+                  {
+                    "block_id": "uncertainty_e09",
+                    "kind": "assessment",
+                    "status": "succeeded",
+                    "payload": {
+                      "assessment_type": "finance.epistemic_assessment",
+                      "overall": "warn",
+                      "summary": "事实、推断与未来不确定性需要分开阅读。",
+                      "dimensions": [
+                        {"name": "估值事实", "status": "pass", "evidence_refs": ["valuation_e09"]},
+                        {"name": "盈利预测事实", "status": "pass", "evidence_refs": ["forecast_e09"]},
+                        {"name": "风险释放判断", "status": "unknown", "detail": "属于条件化推断，不是可验证事实。"}
+                      ]
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "E10",
+      "title": "海量因子矩阵和渐进预览",
+      "expected_verdict": "pass",
+      "messages": [
+        {
+          "object_type": "surface.event",
+          "protocol_version": "agent_surface.v1",
+          "event_id": "e10_001",
+          "event_type": "surface.snapshot",
+          "context_id": "ctx_e10",
+          "run_id": "run_e10",
+          "seq": 0,
+          "timestamp": "2026-07-11T10:09:00+08:00",
+          "commit_state": "committed",
+          "payload": {
+            "surface_id": "surface_e10",
+            "status": "succeeded",
+            "revision": 0,
+            "sections": [
+              {
+                "section_id": "process_e10",
+                "role": "process",
+                "blocks": [
+                  {
+                    "block_id": "workflow_e10",
+                    "kind": "workflow",
+                    "status": "succeeded",
+                    "payload": {
+                      "scope": "task",
+                      "items": [
+                        {"item_id": "universe", "label": "确定股票池", "status": "succeeded"},
+                        {"item_id": "compute", "label": "计算因子矩阵", "status": "succeeded"},
+                        {"item_id": "export", "label": "导出完整数据", "status": "succeeded"}
+                      ]
+                    }
+                  }
+                ]
+              },
+              {
+                "section_id": "evidence_e10",
+                "role": "evidence",
+                "blocks": [
+                  {
+                    "block_id": "preview_e10",
+                    "kind": "data",
+                    "status": "succeeded",
+                    "payload": {
+                      "shape": "records",
+                      "content_type": "finance.factor_matrix_preview",
+                      "data": [
+                        {"instrument": "000001.SZ", "momentum_20d": 0.032, "quality": "good"},
+                        {"instrument": "000002.SZ", "momentum_20d": null, "quality": "suspended"}
+                      ]
+                    }
+                  },
+                  {
+                    "block_id": "quality_e10",
+                    "kind": "assessment",
+                    "status": "succeeded",
+                    "payload": {
+                      "assessment_type": "finance.factor_data_quality",
+                      "overall": "warn",
+                      "summary": "覆盖 98.4%，缺失主要来自停牌和上市不足观察期。"
+                    }
+                  }
+                ]
+              },
+              {
+                "section_id": "artifact_e10",
+                "role": "artifact",
+                "blocks": [
+                  {
+                    "block_id": "dataset_e10",
+                    "kind": "artifact",
+                    "status": "succeeded",
+                    "payload": {
+                      "artifact_id": "factor_matrix_e10",
+                      "artifact_type": "finance.dataset",
+                      "lifecycle": "published",
+                      "version": "1.0.0",
+                      "content_type": "application/vnd.apache.parquet",
+                      "resource_refs": ["parquet_e10"]
+                    }
+                  },
+                  {
+                    "block_id": "resource_e10",
+                    "kind": "resource",
+                    "status": "succeeded",
+                    "payload": {
+                      "resources": [
+                        {
+                          "resource_id": "parquet_e10",
+                          "uri": "artifact://factor_matrix_e10/data.parquet",
+                          "title": "完整因子矩阵",
+                          "relation": "output",
+                          "mime_type": "application/vnd.apache.parquet",
+                          "size_bytes": 28400000,
+                          "access": "private"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

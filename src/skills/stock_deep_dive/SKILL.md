@@ -1,3 +1,8 @@
+---
+name: stock-deep-dive
+description: 围绕单只股票形成行情、资金、研报观点、新闻催化与风险的结构化深度分析，适用于个股投资逻辑梳理、代表股研究和异动后的驱动复盘。
+---
+
 # Stock Deep Dive Skill
 
 ## 目标
@@ -23,10 +28,9 @@
 
 ## 优先使用的 tools
 
-- `stock_quote`
-- `stock_funds`
-- `stock_reports`
-- `company_news`
+- 行情、资金和财务数据使用 `finance_query`
+- 新闻使用 `financial_news_search`
+- 研报工具已注册时使用 `equity_research_search`
 
 使用原则：
 

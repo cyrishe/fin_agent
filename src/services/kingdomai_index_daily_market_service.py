@@ -13,6 +13,8 @@ DbFactory = Callable[[], Any]
 class KingdomaiIndexDailyMarketService:
     """Read-only index daily market provider backed by kingdomai tables."""
 
+    MAX_INTERNAL_ROWS = 1000
+
     def __init__(self, *, db_factory: Optional[DbFactory] = None) -> None:
         self.db_factory = db_factory or StockInfoDbUtils
 
@@ -68,7 +70,12 @@ class KingdomaiIndexDailyMarketService:
         if not raw_subject:
             raise ValueError("subject is required")
         start_date, end_date, exact_date = self._normalize_date_range(start=start, end=end)
-        row_limit = self._bounded_int(limit, default=50, min_value=1, max_value=500)
+        row_limit = self._bounded_int(
+            limit,
+            default=50,
+            min_value=1,
+            max_value=self.MAX_INTERNAL_ROWS,
+        )
 
         db = self.db_factory()
         try:

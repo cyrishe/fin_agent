@@ -1,0 +1,13 @@
+{
+  "run_id": "run_2f02293ff42f4f6cad1815d31af4c475",
+  "schedule_id": "sch_84d6634fd4694fd996640591a6a787b0",
+  "status": "completed",
+  "scheduled_for": "2026-10-03 04:27:46.424746",
+  "started_at": "2026-10-03 04:27:46.429443",
+  "finished_at": "2026-10-03 04:28:23.229596",
+  "deadline_at": "2026-10-03 04:42:46.429443",
+  "budget": {
+    "max_runtime_seconds": 900
+  },
+  "deadline_seconds_from_first_start": 900.0
+}

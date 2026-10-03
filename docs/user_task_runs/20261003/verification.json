@@ -1,0 +1,137 @@
+{
+  "implementation_commit": "19abeb37fc26841c7be542e288cf77e7f8287e8d",
+  "baseline_commit": "ac1d53e321b75c01bc0a52d1016278388d7a5b21",
+  "environment": {
+    "platform": "Darwin",
+    "architecture": "arm64",
+    "python": "3.13.5",
+    "packages": {
+      "pytest": "9.0.3",
+      "pandas": "2.3.2",
+      "scikit-learn": "1.7.1",
+      "Flask": "3.1.3",
+      "numpy": "2.3.2"
+    },
+    "node": "v24.5.0"
+  },
+  "configuration": {
+    "task_store": "isolated SQLite",
+    "system_db_url": "explicitly empty in evaluation",
+    "market_source": "KingdomAI SELECT only",
+    "ml_llm_model": "deepseek-v4-flash",
+    "web_identity": "explicit evaluation fixture"
+  },
+  "targeted_pytest": {
+    "passed": 269,
+    "duration_seconds": 77.78,
+    "scope": "task runtime, tools, ML, backtest, file I/O, CC/DSH adapters, minute signals",
+    "command": "SYSTEM_DB_URL='' .venv-automl/bin/python -m pytest tests/test_scheduled_tasks.py tests/test_user_task_runtime.py tests/test_user_task_tools.py tests/test_task_llm_configuration.py tests/automl tests/test_backtest_core.py tests/test_financial_qa_cc_scenario.py tests/test_financial_qa_dsh_runtime.py tests/test_file_io_tool_service.py tests/test_file_intake_tools.py tests/test_tool_plan_dependency_and_realtime_ranking.py tests/test_stock_minute_signals.py -q",
+    "timing_note": "After final review changes and deadline test startup-race repair. Production source unchanged from implementation_commit.",
+    "log_sha256": "c11774c8bfde5784e61a3d6c7ec482e846c60a38f70f862ffbec67a5bd4acdaa",
+    "test_source_sha256": "caef5fb9ddfcee3cd4101e3f444bfba07233708f358d6ee98b0e151864de443b"
+  },
+  "frontend": {
+    "passed": 156,
+    "files": 26,
+    "command": "npm test -- --run",
+    "duration_seconds": 5.74,
+    "build": "tsc -b && vite build: passed; existing >500kB chunk warning"
+  },
+  "runtime_after_commit": {
+    "artifact": "runtime_final_commit.json",
+    "cases": [
+      "document-two-steps",
+      "automl-structured-demo"
+    ],
+    "passed": true,
+    "published_automl_artifacts": 10
+  },
+  "browser": {
+    "passed": [
+      "ML aggregate result display",
+      "natural-language one-time preview",
+      "5-minute budget",
+      "one-time submit",
+      "cancel pending",
+      "run again",
+      "download and verify exact Markdown contents",
+      "deep-link refresh"
+    ],
+    "screenshots": [
+      "ui_cancelled.jpg",
+      "ui_completed.jpg"
+    ],
+    "identity": "fixture, not production login",
+    "servers_stopped_after_validation": true
+  },
+  "baseline_failures": {
+    "method": "Load src Python modules from git show baseline commit through a temporary MetaPathFinder; same tests and resources; block socket connect/connect_ex. No working-tree changes.",
+    "reproduced": 10,
+    "groups": {
+      "model_environment_overrides": 2,
+      "selenium_dependency_api": 1,
+      "legacy_deep_dive_output_contract": 1,
+      "legacy_async_tests_without_authentication": 5,
+      "tool_catalog_without_storage_fixture": 1
+    }
+  },
+  "security_review": {
+    "new_high_or_medium_blockers": 0,
+    "checked": [
+      "trusted actor and per-invocation ownership",
+      "forged runtime arguments",
+      "owned task/run operations",
+      "artifact containment including symlinks",
+      "download attachment/nosniff/no-store",
+      "fixed DSH MCP env forwarding"
+    ],
+    "limits": [
+      "trusted-code process supervisor, not malicious-code sandbox",
+      "no production resource/load/security certification"
+    ]
+  },
+  "not_ready": [
+    "production MySQL migration/concurrency and deployment",
+    "full DSH/HTTP chat: missing Harness SDK",
+    "production workload and restore verification",
+    "global test quality gate"
+  ],
+  "review_source_matches_implementation_commit": {
+    "src/quant_research/automl/runner.py": true,
+    "src/quant_research/automl/prompts/review.md": true,
+    "src/quant_research/automl/learning.py": true
+  },
+  "review_quality": {
+    "automated_call_completed": true,
+    "manually_found_residual_errors": 2,
+    "authoritative_evidence": "numeric metrics and README_ML.md corrections",
+    "model_retrained_during_review": false
+  },
+  "full_pytest": {
+    "command": "SYSTEM_DB_URL='' .venv-automl/bin/python -m pytest -q",
+    "failed": 11,
+    "passed": 2364,
+    "skipped": 27,
+    "duration_seconds": 256.22,
+    "default_quality_gate": "NOT_PASSED",
+    "failure_nodes": [
+      "tests/test_agent_provider_harness.py::test_factory_applies_profile_without_changing_capability_defaults",
+      "tests/test_agent_provider_harness.py::test_custom_tool_service_uses_fast_claude_for_design_and_mid_claude_for_coding",
+      "tests/test_finance_business_skills.py::test_crawler_falls_back_to_managed_driver_when_path_driver_is_broken",
+      "tests/test_stock_deep_dive_api.py::test_api_stock_deep_dive_returns_result",
+      "tests/test_stock_deep_dive_async_api.py::test_create_stock_deep_dive_job",
+      "tests/test_stock_deep_dive_async_api.py::test_create_hotspot_trace_job",
+      "tests/test_stock_deep_dive_async_api.py::test_create_stock_deep_dive_job_accepts_execution_profile",
+      "tests/test_stock_deep_dive_async_api.py::test_router_preview_returns_mock_argument_plans",
+      "tests/test_stock_deep_dive_async_api.py::test_create_stock_deep_dive_job_capacity_limited",
+      "tests/test_tool_studio_api.py::test_tool_catalog_api_hides_theme_leaders",
+      "tests/test_user_task_runtime.py::test_supervised_process_stops_for_control_changes[deadline]"
+    ],
+    "baseline_failures_reproduced": 10,
+    "new_failure": "deadline termination test assumed spawn completes within 2 seconds; runtime correctly enforced deadline before child startup",
+    "repair": "Test now expires the persisted deadline after observing child startup, retaining real-process termination and durable failed-state assertions. Production implementation unchanged.",
+    "log_sha256": "40c971351d134fd182eae556e49f7c09b887b9ef29c1b864272f058949943e38",
+    "repair_verification": "269 related regression tests passed after test-only correction; full suite was not repeated after this correction. 10 unrelated baseline failures remain known."
+  },
+  "recorded_at": "2026-10-03T04:39:29.002595+00:00"
+}

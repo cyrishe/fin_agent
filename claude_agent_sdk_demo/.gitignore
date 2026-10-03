@@ -1,0 +1,11 @@
+.env
+.env.*
+!.env.example
+!.env.deepseek.example
+!.env.dashscope.example
+.runtime/
+.venv/
+__pycache__/
+.pytest_cache/
+*.py[cod]
+*.egg-info/

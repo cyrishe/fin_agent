@@ -1,0 +1,10 @@
+# No tools are required for the top-level semantic route. The result is a
+# bounded JSON object returned through the ordinary DSH final response.
+- id: persistent-bash
+  disabled: true
+
+- id: persistent-pwsh
+  disabled: true
+
+- id: str-replace-editor
+  disabled: true

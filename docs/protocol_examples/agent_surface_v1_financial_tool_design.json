@@ -1,0 +1,658 @@
+{
+  "scenario": "financial_tool_design_with_streaming_review_and_resume",
+  "description": "A non-IDE financial tool design flow using all seven semantic block families.",
+  "messages": [
+    {
+      "object_type": "client.capabilities",
+      "protocol_versions": ["agent_surface.v1"],
+      "supported_block_kinds": [
+        "narrative",
+        "data",
+        "workflow",
+        "artifact",
+        "assessment",
+        "resource",
+        "interaction"
+      ],
+      "supported_renderers": [
+        "text.markdown",
+        "data.table",
+        "data.kline",
+        "workflow.steps",
+        "artifact.spec_editor",
+        "assessment.review",
+        "interaction.form"
+      ],
+      "supports_json_patch": true,
+      "supports_resume": true,
+      "max_inline_bytes": 262144,
+      "locale": "zh-CN",
+      "timezone": "Asia/Shanghai"
+    },
+    {
+      "object_type": "model.surface_draft",
+      "protocol_version": "agent_surface.v1",
+      "title": "市场状态判断工具设计",
+      "purpose": "finance.tool_design",
+      "sections": [
+        {
+          "role": "primary",
+          "blocks": [
+            {
+              "kind": "narrative",
+              "semantic": "finance.tool_requirement_summary",
+              "payload": {
+                "format": "markdown",
+                "text": "该工具面向投资研究用户，输出市场状态、核心证据和风险边界。"
+              }
+            }
+          ]
+        },
+        {
+          "role": "process",
+          "blocks": [
+            {
+              "kind": "workflow",
+              "semantic": "finance.tool_design_workflow",
+              "payload": {
+                "scope": "plan",
+                "current_key": "contract",
+                "items": [
+                  { "key": "contract", "label": "确认输入输出和业务口径", "status": "running" },
+                  { "key": "logic", "label": "设计判断逻辑", "status": "pending", "depends_on": ["contract"] }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "role": "artifact",
+          "blocks": [
+            {
+              "kind": "artifact",
+              "semantic": "finance.tool_spec",
+              "payload": {
+                "artifact_type": "finance.tool_spec",
+                "content_type": "application/vnd.fin-agent.tool-spec+json",
+                "content_schema_version": "finance.tool_spec.v1",
+                "content": {
+                  "display_name": "市场状态判断",
+                  "inputs": ["benchmark", "lookback", "as_of"],
+                  "outputs": ["regime", "confidence", "drivers", "risk_notes"]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "role": "interaction",
+          "blocks": [
+            {
+              "kind": "interaction",
+              "semantic": "finance.tool_design_confirmation",
+              "payload": {
+                "intent": "confirm",
+                "prompt": "请确认价格复权口径。",
+                "response_schema": {
+                  "type": "object",
+                  "properties": {
+                    "adjustment": {
+                      "type": "string",
+                      "title": "价格复权口径",
+                      "enum": ["forward", "backward", "none"]
+                    }
+                  },
+                  "required": ["adjustment"]
+                },
+                "suggested_actions": [
+                  { "intent": "accept", "label": "确认并继续", "style": "primary" },
+                  { "intent": "decline", "label": "返回修改", "style": "default" }
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "object_type": "surface.event",
+      "protocol_version": "agent_surface.v1",
+      "event_id": "evt_000",
+      "event_type": "run.started",
+      "context_id": "ctx_tool_studio_01",
+      "run_id": "run_tool_design_01",
+      "task_id": "task_design_market_regime",
+      "seq": 0,
+      "timestamp": "2026-07-11T09:00:00+08:00",
+      "commit_state": "committed",
+      "payload": {
+        "status": "running",
+        "stage": "understanding",
+        "summary": "开始理解市场状态判断工具的业务目标和数据约束。"
+      }
+    },
+    {
+      "object_type": "surface.event",
+      "protocol_version": "agent_surface.v1",
+      "event_id": "evt_001",
+      "event_type": "surface.snapshot",
+      "context_id": "ctx_tool_studio_01",
+      "run_id": "run_tool_design_01",
+      "task_id": "task_design_market_regime",
+      "message_id": "msg_assistant_01",
+      "seq": 1,
+      "timestamp": "2026-07-11T09:00:01+08:00",
+      "commit_state": "committed",
+      "payload": {
+        "surface_id": "surface_tool_design_01",
+        "status": "running",
+        "revision": 0,
+        "title": "设计金融工具",
+        "purpose": "finance.tool_design",
+        "sections": [
+          {
+            "section_id": "section_primary",
+            "role": "primary",
+            "title": "需求理解",
+            "status": "running",
+            "order": 10,
+            "blocks": [
+              {
+                "block_id": "block_understanding",
+                "kind": "narrative",
+                "status": "running",
+                "revision": 0,
+                "title": "当前理解",
+                "semantic": "finance.tool_requirement_summary",
+                "visibility": "primary",
+                "persistence": "durable",
+                "payload": {
+                  "format": "markdown",
+                  "text": "目标是设计一个面向普通投资研究用户的市场状态判断工具。它应输出可解释的状态、核心证据和风险边界，而不是暴露代码实现。"
+                },
+                "provenance": [
+                  {
+                    "produced_by": "agent",
+                    "producer_id": "tool_designer",
+                    "generated_at": "2026-07-11T09:00:01+08:00"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "section_id": "section_process",
+            "role": "process",
+            "title": "设计进度",
+            "status": "running",
+            "order": 20,
+            "blocks": [
+              {
+                "block_id": "block_workflow",
+                "kind": "workflow",
+                "status": "running",
+                "revision": 0,
+                "title": "工作步骤",
+                "semantic": "finance.tool_design_workflow",
+                "visibility": "primary",
+                "persistence": "durable",
+                "payload": {
+                  "scope": "plan",
+                  "current_item_id": "step_contract",
+                  "items": [
+                    {
+                      "item_id": "step_contract",
+                      "label": "确认输入输出和业务口径",
+                      "status": "running",
+                      "progress": 0.6
+                    },
+                    {
+                      "item_id": "step_logic",
+                      "label": "设计判断逻辑和解释结构",
+                      "status": "pending",
+                      "depends_on": ["step_contract"]
+                    },
+                    {
+                      "item_id": "step_validate",
+                      "label": "检查前视偏差、数据质量和边界",
+                      "status": "pending",
+                      "depends_on": ["step_logic"]
+                    },
+                    {
+                      "item_id": "step_review",
+                      "label": "请用户评审设计稿",
+                      "status": "pending",
+                      "depends_on": ["step_validate"]
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "section_id": "section_evidence",
+            "role": "evidence",
+            "title": "数据和上下文",
+            "status": "succeeded",
+            "order": 30,
+            "blocks": [
+              {
+                "block_id": "block_input_contract",
+                "kind": "data",
+                "status": "succeeded",
+                "revision": 0,
+                "title": "建议输入",
+                "semantic": "finance.tool_input_contract",
+                "visibility": "primary",
+                "persistence": "durable",
+                "payload": {
+                  "shape": "records",
+                  "content_type": "finance.field_definitions",
+                  "content_schema_version": "v1",
+                  "data": [
+                    { "name": "benchmark", "type": "instrument", "required": true, "example": "000300.SH" },
+                    { "name": "lookback", "type": "integer", "required": true, "example": 60 },
+                    { "name": "as_of", "type": "date", "required": false, "example": "2026-07-10" }
+                  ],
+                  "quality": {
+                    "status": "good",
+                    "freshness": "design-time definition",
+                    "completeness": 1
+                  }
+                },
+                "domain_context": {
+                  "namespace": "finance",
+                  "as_of": "2026-07-10T15:00:00+08:00",
+                  "timezone": "Asia/Shanghai",
+                  "markets": ["CN"],
+                  "currency": "CNY",
+                  "frequency": "1d",
+                  "adjustment": "forward",
+                  "data_mode": "historical",
+                  "calendar": "SSE"
+                },
+                "presentation_hint": {
+                  "preferred_renderer": "data.table",
+                  "density": "compact",
+                  "default_state": "expanded"
+                }
+              },
+              {
+                "block_id": "block_resources",
+                "kind": "resource",
+                "status": "succeeded",
+                "revision": 0,
+                "title": "参考材料",
+                "semantic": "finance.design_inputs",
+                "visibility": "details",
+                "persistence": "durable",
+                "payload": {
+                  "resources": [
+                    {
+                      "resource_id": "resource_user_note",
+                      "title": "用户需求说明",
+                      "relation": "input",
+                      "mime_type": "text/markdown",
+                      "access": "private",
+                      "priority": 1
+                    },
+                    {
+                      "resource_id": "resource_market_schema",
+                      "uri": "tool-schema://stock_history_kline/v2",
+                      "title": "历史行情工具输出 Schema",
+                      "relation": "source",
+                      "mime_type": "application/schema+json",
+                      "access": "authorized",
+                      "priority": 0.9
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "section_id": "section_artifact",
+            "role": "artifact",
+            "title": "工具设计稿",
+            "status": "running",
+            "order": 40,
+            "blocks": [
+              {
+                "block_id": "block_tool_spec",
+                "kind": "artifact",
+                "status": "running",
+                "revision": 0,
+                "title": "市场状态判断工具规格",
+                "semantic": "finance.tool_spec",
+                "visibility": "primary",
+                "persistence": "durable",
+                "payload": {
+                  "artifact_id": "artifact_market_regime_spec",
+                  "artifact_type": "finance.tool_spec",
+                  "lifecycle": "draft",
+                  "version": "0.1.0",
+                  "content_type": "application/vnd.fin-agent.tool-spec+json",
+                  "content_schema_version": "finance.tool_spec.v1",
+                  "content": {
+                    "display_name": "市场状态判断",
+                    "purpose": "结合趋势、波动和市场宽度判断当前市场环境，并给出可追溯证据。",
+                    "inputs": ["benchmark", "lookback", "as_of"],
+                    "outputs": ["regime", "confidence", "drivers", "risk_notes"],
+                    "regimes": ["risk_on", "neutral", "risk_off"],
+                    "logic": [
+                      "计算基准趋势与波动状态",
+                      "计算上涨比例和创新高比例",
+                      "使用显式规则合成状态",
+                      "输出每个判断因子的贡献和风险边界"
+                    ]
+                  },
+                  "validation_refs": ["block_design_assessment"]
+                },
+                "presentation_hint": {
+                  "preferred_renderer": "artifact.spec_editor",
+                  "fallback_renderer": "data.record",
+                  "density": "comfortable",
+                  "default_state": "expanded"
+                }
+              }
+            ]
+          },
+          {
+            "section_id": "section_assessment",
+            "role": "evidence",
+            "title": "设计检查",
+            "status": "partial",
+            "order": 50,
+            "blocks": [
+              {
+                "block_id": "block_design_assessment",
+                "kind": "assessment",
+                "status": "partial",
+                "revision": 0,
+                "title": "可实现性与金融边界",
+                "semantic": "finance.tool_design_review",
+                "visibility": "primary",
+                "persistence": "durable",
+                "payload": {
+                  "assessment_type": "finance.design_validation",
+                  "subject_ref": "artifact_market_regime_spec",
+                  "overall": "warn",
+                  "summary": "结构可以实现，但复权口径和历史时点约束需要在实现前确认。",
+                  "confidence": 0.86,
+                  "dimensions": [
+                    {
+                      "name": "输入可获得性",
+                      "status": "pass",
+                      "detail": "现有历史行情工具可以提供趋势和波动输入。",
+                      "evidence_refs": ["resource_market_schema"]
+                    },
+                    {
+                      "name": "避免前视偏差",
+                      "status": "warn",
+                      "detail": "所有宽度指标必须按 as_of 截断。"
+                    }
+                  ],
+                  "issues": [
+                    {
+                      "severity": "warning",
+                      "code": "finance.adjustment_not_confirmed",
+                      "message": "价格序列复权口径尚未由用户确认。",
+                      "remediation": "在进入实现前确认前复权、后复权或不复权。"
+                    }
+                  ],
+                  "evidence_refs": ["block_input_contract"]
+                }
+              }
+            ]
+          },
+          {
+            "section_id": "section_interaction",
+            "role": "interaction",
+            "title": "需要确认",
+            "status": "waiting_user",
+            "order": 60,
+            "blocks": [
+              {
+                "block_id": "block_review_request",
+                "kind": "interaction",
+                "status": "waiting_user",
+                "revision": 0,
+                "title": "确认设计口径",
+                "semantic": "finance.tool_design_confirmation",
+                "visibility": "primary",
+                "persistence": "durable",
+                "payload": {
+                  "interaction_id": "interaction_confirm_spec",
+                  "intent": "confirm",
+                  "prompt": "请确认采用前复权日线，并允许进入实现与样例验证阶段。",
+                  "submission_mode": "action",
+                  "subject_ref": "artifact_market_regime_spec",
+                  "subject_revision": 0,
+                  "response_schema": {
+                    "type": "object",
+                    "properties": {
+                      "adjustment": {
+                        "type": "string",
+                        "title": "价格复权口径",
+                        "enum": ["forward", "backward", "none"],
+                        "default": "forward"
+                      }
+                    },
+                    "required": ["adjustment"]
+                  },
+                  "actions": [
+                    {
+                      "action_id": "action_accept_spec",
+                      "label": "确认并继续",
+                      "intent": "accept",
+                      "style": "primary",
+                      "requires_confirmation": false
+                    },
+                    {
+                      "action_id": "action_decline_spec",
+                      "label": "返回修改",
+                      "intent": "decline",
+                      "style": "default",
+                      "requires_confirmation": false
+                    }
+                  ],
+                  "decision_context": {
+                    "severity": "low",
+                    "effect_summary": "确认后只生成和验证工具，不执行交易或写入外部系统。",
+                    "data_scope": "A 股历史日线",
+                    "external_effect": false,
+                    "allowed_scopes": ["once"]
+                  },
+                  "resume_token": "resume_opaque_01"
+                }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "object_type": "surface.event",
+      "protocol_version": "agent_surface.v1",
+      "event_id": "evt_002",
+      "event_type": "block.append",
+      "context_id": "ctx_tool_studio_01",
+      "run_id": "run_tool_design_01",
+      "seq": 2,
+      "timestamp": "2026-07-11T09:00:02+08:00",
+      "commit_state": "provisional",
+      "target": {
+        "surface_id": "surface_tool_design_01",
+        "section_id": "section_primary",
+        "block_id": "block_understanding"
+      },
+      "payload": {
+        "path": "/payload/text",
+        "value": "\n\n当前不把代码和 IDE 操作作为主界面。",
+        "base_revision": 0,
+        "revision": 1
+      }
+    },
+    {
+      "object_type": "surface.event",
+      "protocol_version": "agent_surface.v1",
+      "event_id": "evt_003",
+      "event_type": "block.patch",
+      "context_id": "ctx_tool_studio_01",
+      "run_id": "run_tool_design_01",
+      "seq": 3,
+      "timestamp": "2026-07-11T09:00:03+08:00",
+      "commit_state": "committed",
+      "target": {
+        "surface_id": "surface_tool_design_01",
+        "section_id": "section_process",
+        "block_id": "block_workflow"
+      },
+      "payload": {
+        "operations": [
+          { "op": "replace", "path": "/payload/items/0/status", "value": "succeeded" },
+          { "op": "replace", "path": "/payload/items/0/progress", "value": 1 },
+          { "op": "replace", "path": "/payload/items/1/status", "value": "running" },
+          { "op": "replace", "path": "/payload/current_item_id", "value": "step_logic" }
+        ],
+        "base_revision": 0,
+        "revision": 1
+      }
+    },
+    {
+      "object_type": "surface.event",
+      "protocol_version": "agent_surface.v1",
+      "event_id": "evt_004",
+      "event_type": "block.complete",
+      "context_id": "ctx_tool_studio_01",
+      "run_id": "run_tool_design_01",
+      "seq": 4,
+      "timestamp": "2026-07-11T09:00:04+08:00",
+      "commit_state": "committed",
+      "target": {
+        "surface_id": "surface_tool_design_01",
+        "section_id": "section_artifact",
+        "block_id": "block_tool_spec"
+      },
+      "payload": {
+        "status": "succeeded",
+        "revision": 1,
+        "summary": "工具规格已经形成可评审版本。"
+      }
+    },
+    {
+      "object_type": "surface.event",
+      "protocol_version": "agent_surface.v1",
+      "event_id": "evt_005",
+      "event_type": "run.status",
+      "context_id": "ctx_tool_studio_01",
+      "run_id": "run_tool_design_01",
+      "seq": 5,
+      "timestamp": "2026-07-11T09:00:05+08:00",
+      "commit_state": "committed",
+      "payload": {
+        "status": "waiting_user",
+        "stage": "review",
+        "wait_reason": "approval",
+        "summary": "设计稿已就绪，等待用户确认复权口径。",
+        "progress": 0.7
+      }
+    },
+    {
+      "object_type": "interaction.response",
+      "protocol_version": "agent_surface.v1",
+      "context_id": "ctx_tool_studio_01",
+      "run_id": "run_tool_design_01",
+      "interaction_id": "interaction_confirm_spec",
+      "action_id": "action_accept_spec",
+      "action": "accept",
+      "values": { "adjustment": "forward" },
+      "approval_scope": "once",
+      "expected_revision": 0,
+      "idempotency_key": "idem_confirm_spec_01",
+      "resume_token": "resume_opaque_01",
+      "timestamp": "2026-07-11T09:03:00+08:00"
+    },
+    {
+      "object_type": "surface.event",
+      "protocol_version": "agent_surface.v1",
+      "event_id": "evt_006",
+      "event_type": "interaction.resolved",
+      "context_id": "ctx_tool_studio_01",
+      "run_id": "run_tool_design_01",
+      "seq": 6,
+      "timestamp": "2026-07-11T09:03:01+08:00",
+      "commit_state": "committed",
+      "target": {
+        "surface_id": "surface_tool_design_01",
+        "section_id": "section_interaction",
+        "block_id": "block_review_request"
+      },
+      "payload": {
+        "interaction_id": "interaction_confirm_spec",
+        "action": "accept",
+        "resolved_by": "user",
+        "summary": "用户确认采用前复权并进入实现。"
+      }
+    },
+    {
+      "object_type": "surface.event",
+      "protocol_version": "agent_surface.v1",
+      "event_id": "evt_007",
+      "event_type": "block.patch",
+      "context_id": "ctx_tool_studio_01",
+      "run_id": "run_tool_design_01",
+      "seq": 7,
+      "timestamp": "2026-07-11T09:03:02+08:00",
+      "commit_state": "committed",
+      "target": {
+        "surface_id": "surface_tool_design_01",
+        "section_id": "section_artifact",
+        "block_id": "block_tool_spec"
+      },
+      "payload": {
+        "operations": [
+          { "op": "replace", "path": "/payload/lifecycle", "value": "approved" },
+          { "op": "add", "path": "/payload/content/adjustment", "value": "forward" }
+        ],
+        "base_revision": 1,
+        "revision": 2
+      }
+    },
+    {
+      "object_type": "surface.event",
+      "protocol_version": "agent_surface.v1",
+      "event_id": "evt_008",
+      "event_type": "run.status",
+      "context_id": "ctx_tool_studio_01",
+      "run_id": "run_tool_design_01",
+      "seq": 8,
+      "timestamp": "2026-07-11T09:03:03+08:00",
+      "commit_state": "committed",
+      "payload": {
+        "status": "running",
+        "stage": "implementation",
+        "summary": "复权口径已确认，开始实现和验证。",
+        "progress": 0.72
+      }
+    },
+    {
+      "object_type": "surface.event",
+      "protocol_version": "agent_surface.v1",
+      "event_id": "evt_009",
+      "event_type": "run.finished",
+      "context_id": "ctx_tool_studio_01",
+      "run_id": "run_tool_design_01",
+      "seq": 9,
+      "timestamp": "2026-07-11T09:08:00+08:00",
+      "commit_state": "committed",
+      "payload": {
+        "status": "succeeded",
+        "stage": "delivery",
+        "outcome": "succeeded",
+        "summary": "工具设计、实现和样例验证已经完成。",
+        "progress": 1
+      }
+    }
+  ]
+}

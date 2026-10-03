@@ -1,0 +1,1663 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="data:,">
+  <title>Fin Agent · 金融工具设计工作区</title>
+  <style>
+    :root {
+      --bg: #f2f4f7;
+      --surface: #ffffff;
+      --surface-2: #f8fafc;
+      --surface-3: #eef2f6;
+      --line: #d9dee7;
+      --line-strong: #bcc5d2;
+      --ink: #151b26;
+      --ink-2: #344054;
+      --muted: #667085;
+      --muted-2: #98a2b3;
+      --blue: #2457d6;
+      --blue-soft: #edf3ff;
+      --green: #087a55;
+      --green-soft: #eaf8f1;
+      --red: #b93838;
+      --red-soft: #fff0ef;
+      --amber: #a15c09;
+      --amber-soft: #fff7e8;
+      --cyan: #116b78;
+      --cyan-soft: #e9f7f8;
+      --code: #111827;
+      --code-line: #263246;
+      --shadow: 0 12px 36px rgba(16, 24, 40, .08);
+      --sans: Inter, "PingFang SC", "Microsoft YaHei", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      --mono: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { min-height: 100%; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: var(--bg);
+      font-family: var(--sans);
+      letter-spacing: 0;
+    }
+    button, input, textarea { font: inherit; letter-spacing: 0; }
+    button { color: inherit; }
+    button:focus-visible, input:focus-visible, textarea:focus-visible {
+      outline: 2px solid #8eb0ff;
+      outline-offset: 2px;
+    }
+    .icon { width: 16px; height: 16px; stroke-width: 1.9; }
+    .icon-sm { width: 14px; height: 14px; }
+    .icon-lg { width: 20px; height: 20px; }
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    .app-shell {
+      min-height: 100vh;
+      display: grid;
+      grid-template-rows: 58px minmax(0, 1fr);
+    }
+    .global-bar {
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      min-width: 0;
+      display: grid;
+      grid-template-columns: 220px minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 14px;
+      padding: 0 16px;
+      border-bottom: 1px solid var(--line);
+      background: rgba(255, 255, 255, .97);
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      min-width: 0;
+    }
+    .brand-mark {
+      width: 30px;
+      height: 30px;
+      display: grid;
+      place-items: center;
+      border-radius: 7px;
+      color: #fff;
+      background: var(--ink);
+      font-size: 13px;
+      font-weight: 800;
+    }
+    .brand-copy { min-width: 0; }
+    .brand-copy strong, .brand-copy span { display: block; }
+    .brand-copy strong { font-size: 13px; }
+    .brand-copy span {
+      margin-top: 2px;
+      overflow: hidden;
+      color: var(--muted);
+      font-size: 11px;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .variant-switcher {
+      min-width: 0;
+      display: flex;
+      justify-content: center;
+      gap: 3px;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .variant-switcher::-webkit-scrollbar { display: none; }
+    .variant-button {
+      flex: 0 0 auto;
+      min-height: 34px;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      border: 0;
+      border-radius: 6px;
+      padding: 7px 10px;
+      color: var(--muted);
+      background: transparent;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .variant-button:hover { background: var(--surface-2); color: var(--ink); }
+    .variant-button.active { color: var(--blue); background: var(--blue-soft); font-weight: 700; }
+    .global-actions {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+    .status-chip {
+      min-height: 26px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border-radius: 999px;
+      padding: 4px 8px;
+      color: var(--green);
+      background: var(--green-soft);
+      font-size: 11px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .status-dot { width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+    .icon-button {
+      width: 34px;
+      height: 34px;
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: var(--surface);
+      cursor: pointer;
+    }
+    .icon-button:hover { border-color: var(--line-strong); background: var(--surface-2); }
+    .btn {
+      min-height: 34px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      padding: 7px 11px;
+      background: var(--surface);
+      color: var(--ink-2);
+      font-size: 12px;
+      font-weight: 650;
+      cursor: pointer;
+    }
+    .btn:hover { border-color: var(--line-strong); background: var(--surface-2); }
+    .btn.primary { border-color: var(--blue); color: #fff; background: var(--blue); }
+    .btn.success { border-color: var(--green); color: #fff; background: var(--green); }
+    .btn.danger { color: var(--red); border-color: #efc1bf; background: var(--red-soft); }
+    .btn:disabled { cursor: not-allowed; opacity: .45; }
+
+    .views { min-height: calc(100vh - 58px); }
+    .view { display: none; min-height: calc(100vh - 58px); }
+    .view.active { display: block; }
+    .section-label {
+      color: var(--muted);
+      font-size: 10px;
+      font-weight: 750;
+      line-height: 1.2;
+      text-transform: uppercase;
+    }
+    .subtle { color: var(--muted); }
+    .mono { font-family: var(--mono); }
+    .positive { color: var(--red); }
+    .negative { color: var(--green); }
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 3px 7px;
+      color: var(--muted);
+      background: var(--surface);
+      font-size: 10px;
+      font-weight: 650;
+      white-space: nowrap;
+    }
+    .tag.blue { color: var(--blue); border-color: #c9d8fb; background: var(--blue-soft); }
+    .tag.green { color: var(--green); border-color: #bee4d3; background: var(--green-soft); }
+    .tag.amber { color: var(--amber); border-color: #f3d59b; background: var(--amber-soft); }
+    .tag.red { color: var(--red); border-color: #efc1bf; background: var(--red-soft); }
+    .toolbar {
+      min-height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 0 12px;
+      border-bottom: 1px solid var(--line);
+      background: var(--surface);
+    }
+    .toolbar-title {
+      min-width: 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      font-weight: 750;
+    }
+    .toolbar-title span {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .toolbar-actions { display: flex; align-items: center; gap: 7px; }
+    .panel-heading {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 14px 16px 12px;
+      border-bottom: 1px solid var(--line);
+    }
+    .panel-heading h2, .panel-heading h3 { margin: 0; }
+    .panel-heading h2 { font-size: 15px; }
+    .panel-heading h3 { font-size: 13px; }
+    .panel-heading p { margin: 4px 0 0; color: var(--muted); font-size: 11px; line-height: 1.5; }
+    .segmented {
+      display: inline-flex;
+      align-items: center;
+      padding: 3px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: var(--surface-2);
+    }
+    .segment {
+      min-height: 27px;
+      border: 0;
+      border-radius: 5px;
+      padding: 5px 8px;
+      color: var(--muted);
+      background: transparent;
+      font-size: 11px;
+      cursor: pointer;
+    }
+    .segment.active { color: var(--ink); background: var(--surface); box-shadow: 0 1px 2px rgba(16,24,40,.08); font-weight: 700; }
+    .table-wrap { width: 100%; overflow: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 11px; }
+    th, td { padding: 8px 10px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
+    th { color: var(--muted); background: var(--surface-2); font-weight: 700; white-space: nowrap; }
+    tbody tr:last-child td { border-bottom: 0; }
+    .field-name { color: var(--blue); font-family: var(--mono); font-size: 10px; }
+    .empty-note { padding: 24px; color: var(--muted); text-align: center; font-size: 12px; }
+    .composer {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      align-items: end;
+      gap: 8px;
+      padding: 10px 12px;
+      border-top: 1px solid var(--line);
+      background: var(--surface);
+    }
+    .composer textarea {
+      width: 100%;
+      min-height: 36px;
+      max-height: 110px;
+      resize: vertical;
+      border: 0;
+      padding: 8px 2px;
+      color: var(--ink);
+      background: transparent;
+      font-size: 12px;
+      line-height: 1.55;
+    }
+    .composer textarea::placeholder { color: var(--muted-2); }
+    .send-button { border-color: var(--blue); color: #fff; background: var(--blue); }
+
+    /* 1. Conversation canvas */
+    .chat-canvas {
+      height: calc(100vh - 58px);
+      display: grid;
+      grid-template-columns: 230px minmax(360px, 1fr) minmax(360px, 430px);
+      background: var(--surface);
+    }
+    .chat-rail {
+      min-width: 0;
+      display: grid;
+      grid-template-rows: auto auto minmax(0, 1fr) auto;
+      border-right: 1px solid var(--line);
+      background: var(--surface-2);
+    }
+    .new-task { margin: 12px; width: calc(100% - 24px); justify-content: flex-start; }
+    .rail-label { padding: 7px 14px; }
+    .thread-list { min-height: 0; overflow: auto; padding: 0 8px 12px; }
+    .thread-item {
+      width: 100%;
+      display: grid;
+      grid-template-columns: 20px minmax(0, 1fr);
+      gap: 7px;
+      border: 0;
+      border-radius: 6px;
+      padding: 9px 8px;
+      color: var(--ink-2);
+      background: transparent;
+      text-align: left;
+      cursor: pointer;
+    }
+    .thread-item:hover { background: #edf0f4; }
+    .thread-item.active { color: var(--blue); background: var(--blue-soft); }
+    .thread-copy { min-width: 0; }
+    .thread-copy strong, .thread-copy span { display: block; }
+    .thread-copy strong { overflow: hidden; font-size: 11px; text-overflow: ellipsis; white-space: nowrap; }
+    .thread-copy span { margin-top: 3px; color: var(--muted); font-size: 10px; }
+    .rail-footer { padding: 12px; border-top: 1px solid var(--line); }
+    .rail-profile { display: flex; align-items: center; gap: 8px; font-size: 11px; }
+    .avatar {
+      width: 28px;
+      height: 28px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      color: #fff;
+      background: var(--cyan);
+      font-size: 10px;
+      font-weight: 750;
+    }
+    .conversation {
+      min-width: 0;
+      min-height: 0;
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr) auto;
+      background: var(--surface);
+    }
+    .conversation-head {
+      min-height: 52px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 8px 14px;
+      border-bottom: 1px solid var(--line);
+    }
+    .conversation-title strong, .conversation-title span { display: block; }
+    .conversation-title strong { font-size: 12px; }
+    .conversation-title span { margin-top: 3px; color: var(--muted); font-size: 10px; }
+    .messages { min-height: 0; overflow: auto; padding: 22px max(18px, 5vw) 28px; }
+    .message { display: grid; gap: 6px; margin-bottom: 22px; }
+    .message.user { justify-items: end; }
+    .message-role { display: flex; align-items: center; gap: 6px; color: var(--muted); font-size: 10px; }
+    .message-bubble {
+      max-width: 92%;
+      padding: 10px 12px;
+      border-radius: 8px;
+      color: var(--ink-2);
+      background: var(--surface-2);
+      font-size: 12px;
+      line-height: 1.7;
+    }
+    .message.user .message-bubble { background: var(--blue-soft); color: #1f3d82; }
+    .agent-answer { font-size: 12px; line-height: 1.75; color: var(--ink-2); }
+    .agent-answer p { margin: 0 0 10px; }
+    .assumption-list {
+      margin: 10px 0 0;
+      padding: 0;
+      list-style: none;
+      border-top: 1px solid var(--line);
+    }
+    .assumption-list li {
+      display: grid;
+      grid-template-columns: 18px minmax(0, 1fr);
+      gap: 8px;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--line);
+      color: var(--ink-2);
+      font-size: 11px;
+    }
+    .agent-progress {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      margin-top: 12px;
+      overflow-x: auto;
+    }
+    .progress-step {
+      flex: 0 0 auto;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--muted);
+      font-size: 10px;
+    }
+    .progress-step:not(:last-child)::after {
+      content: "";
+      width: 24px;
+      height: 1px;
+      margin: 0 7px;
+      background: var(--line-strong);
+    }
+    .progress-mark { width: 17px; height: 17px; display: grid; place-items: center; border-radius: 50%; background: var(--surface-3); }
+    .progress-step.done { color: var(--green); }
+    .progress-step.done .progress-mark { color: #fff; background: var(--green); }
+    .progress-step.active { color: var(--blue); font-weight: 700; }
+    .progress-step.active .progress-mark { color: #fff; background: var(--blue); }
+    .artifact-pane {
+      min-width: 0;
+      min-height: 0;
+      display: grid;
+      grid-template-rows: auto auto minmax(0, 1fr) auto;
+      border-left: 1px solid var(--line);
+      background: var(--surface-2);
+    }
+    .artifact-summary { padding: 12px 14px; border-bottom: 1px solid var(--line); background: var(--surface); }
+    .artifact-summary strong { font-size: 13px; }
+    .artifact-summary p { margin: 5px 0 0; color: var(--muted); font-size: 10px; line-height: 1.5; }
+    .artifact-tabs { display: flex; gap: 2px; padding: 7px 8px; border-bottom: 1px solid var(--line); }
+    .artifact-tab {
+      flex: 1 1 0;
+      min-width: 0;
+      border: 0;
+      border-radius: 5px;
+      padding: 7px 5px;
+      color: var(--muted);
+      background: transparent;
+      font-size: 10px;
+      cursor: pointer;
+    }
+    .artifact-tab.active { color: var(--blue); background: var(--blue-soft); font-weight: 700; }
+    .artifact-content { min-height: 0; overflow: auto; }
+    .artifact-section { display: none; }
+    .artifact-section.active { display: block; }
+    .contract-row { padding: 12px 14px; border-bottom: 1px solid var(--line); }
+    .contract-row h4 { margin: 0 0 5px; font-size: 11px; }
+    .contract-row p { margin: 0; color: var(--muted); font-size: 10px; line-height: 1.6; }
+    .logic-list { margin: 0; padding: 0; list-style: none; counter-reset: logic; }
+    .logic-list li {
+      counter-increment: logic;
+      display: grid;
+      grid-template-columns: 22px minmax(0, 1fr);
+      gap: 8px;
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--line);
+      color: var(--ink-2);
+      font-size: 10px;
+      line-height: 1.55;
+    }
+    .logic-list li::before {
+      content: counter(logic);
+      width: 20px;
+      height: 20px;
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--line-strong);
+      border-radius: 50%;
+      color: var(--muted);
+      font-size: 9px;
+    }
+    .artifact-footer { display: flex; justify-content: flex-end; gap: 7px; padding: 10px 12px; border-top: 1px solid var(--line); background: var(--surface); }
+
+    /* 2. Agent IDE */
+    .ide {
+      height: calc(100vh - 58px);
+      min-height: 620px;
+      display: grid;
+      grid-template-columns: 230px minmax(430px, 1fr) 320px;
+      grid-template-rows: minmax(0, 1fr) 185px;
+      background: #f7f8fa;
+    }
+    .ide-explorer {
+      grid-row: 1 / 3;
+      min-height: 0;
+      display: grid;
+      grid-template-rows: auto auto minmax(0, 1fr) auto;
+      border-right: 1px solid var(--line);
+      background: var(--surface);
+    }
+    .explorer-tree { min-height: 0; overflow: auto; padding: 7px; }
+    .tree-row {
+      min-height: 30px;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      border-radius: 5px;
+      padding: 6px 7px;
+      color: var(--ink-2);
+      font-size: 11px;
+      cursor: pointer;
+    }
+    .tree-row:hover { background: var(--surface-2); }
+    .tree-row.active { color: var(--blue); background: var(--blue-soft); }
+    .tree-row.indent { padding-left: 25px; }
+    .outline { border-top: 1px solid var(--line); }
+    .outline .tree-row { padding-left: 12px; }
+    .ide-editor {
+      min-width: 0;
+      min-height: 0;
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr);
+      background: var(--code);
+    }
+    .editor-tabs {
+      min-width: 0;
+      display: flex;
+      align-items: stretch;
+      border-bottom: 1px solid var(--code-line);
+      background: #171f2e;
+      overflow-x: auto;
+    }
+    .file-tab {
+      flex: 0 0 auto;
+      min-width: 130px;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      border: 0;
+      border-right: 1px solid var(--code-line);
+      padding: 10px 12px;
+      color: #8fa0b8;
+      background: #171f2e;
+      font-size: 11px;
+      cursor: pointer;
+    }
+    .file-tab.active { color: #edf2f7; background: var(--code); }
+    .code-editor { min-height: 0; overflow: auto; padding: 16px 0 30px; }
+    .code-line {
+      min-width: 720px;
+      display: grid;
+      grid-template-columns: 48px minmax(0, 1fr);
+      padding-right: 22px;
+      font-family: var(--mono);
+      font-size: 11px;
+      line-height: 1.75;
+      white-space: pre;
+    }
+    .line-no { padding-right: 13px; color: #52627a; text-align: right; user-select: none; }
+    .line-code { color: #d7e0ed; }
+    .tok-key { color: #f0a8d0; }
+    .tok-fn { color: #7fc8ff; }
+    .tok-str { color: #b7d78a; }
+    .tok-comment { color: #64748b; }
+    .tok-num { color: #f2bd75; }
+    .ide-agent {
+      min-width: 0;
+      min-height: 0;
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr) auto;
+      border-left: 1px solid var(--line);
+      background: var(--surface);
+    }
+    .agent-feed { min-height: 0; overflow: auto; padding: 12px; }
+    .feed-item {
+      position: relative;
+      display: grid;
+      grid-template-columns: 18px minmax(0, 1fr);
+      gap: 8px;
+      padding-bottom: 15px;
+      color: var(--ink-2);
+      font-size: 10px;
+      line-height: 1.55;
+    }
+    .feed-item:not(:last-child)::after { content: ""; position: absolute; left: 8px; top: 20px; bottom: 3px; width: 1px; background: var(--line); }
+    .feed-icon { width: 18px; height: 18px; display: grid; place-items: center; border-radius: 50%; color: var(--muted); background: var(--surface-3); }
+    .feed-item.done .feed-icon { color: #fff; background: var(--green); }
+    .feed-item.active .feed-icon { color: #fff; background: var(--blue); }
+    .feed-copy strong { display: block; margin-bottom: 3px; font-size: 11px; }
+    .tool-call {
+      margin-top: 7px;
+      padding: 7px 8px;
+      border-left: 2px solid var(--cyan);
+      color: var(--muted);
+      background: var(--cyan-soft);
+      font-family: var(--mono);
+      font-size: 9px;
+      line-height: 1.5;
+      overflow-wrap: anywhere;
+    }
+    .ide-terminal {
+      grid-column: 2 / 4;
+      min-width: 0;
+      min-height: 0;
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr);
+      border-top: 1px solid var(--code-line);
+      background: #0d1420;
+    }
+    .terminal-tabs { min-height: 36px; display: flex; align-items: center; gap: 2px; padding: 0 9px; border-bottom: 1px solid var(--code-line); }
+    .terminal-tab { border: 0; padding: 7px 9px; color: #7d8da5; background: transparent; font-size: 10px; cursor: pointer; }
+    .terminal-tab.active { color: #eef3f8; border-bottom: 2px solid #74a2ff; }
+    .terminal-output { min-height: 0; overflow: auto; padding: 11px 14px; color: #aebbd0; font-family: var(--mono); font-size: 10px; line-height: 1.65; white-space: pre-wrap; }
+    .terminal-output .pass { color: #68d4a3; }
+    .ide-composer { border-color: var(--line); }
+
+    /* 3. Data orchestrator */
+    .data-workbench {
+      height: calc(100vh - 58px);
+      min-height: 640px;
+      display: grid;
+      grid-template-columns: 245px minmax(500px, 1fr) 330px;
+      background: #f5f7f9;
+    }
+    .data-left {
+      min-height: 0;
+      display: grid;
+      grid-template-rows: auto 170px auto minmax(0, 1fr);
+      border-right: 1px solid var(--line);
+      background: var(--surface);
+    }
+    .mini-dialog { padding: 12px; overflow: auto; border-bottom: 1px solid var(--line); }
+    .mini-dialog .user-line { margin-left: 22px; padding: 7px 9px; border-radius: 6px; color: #28447d; background: var(--blue-soft); font-size: 10px; line-height: 1.5; }
+    .mini-dialog .agent-line { margin-top: 8px; color: var(--ink-2); font-size: 10px; line-height: 1.55; }
+    .node-list { min-height: 0; overflow: auto; padding: 8px; }
+    .data-node-button {
+      width: 100%;
+      display: grid;
+      grid-template-columns: 25px minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 8px;
+      border: 0;
+      border-radius: 6px;
+      padding: 8px;
+      background: transparent;
+      text-align: left;
+      cursor: pointer;
+    }
+    .data-node-button:hover { background: var(--surface-2); }
+    .data-node-button.active { background: var(--cyan-soft); color: var(--cyan); }
+    .node-index { width: 23px; height: 23px; display: grid; place-items: center; border: 1px solid var(--line); border-radius: 6px; font-size: 9px; font-weight: 750; }
+    .node-copy { min-width: 0; }
+    .node-copy strong, .node-copy span { display: block; }
+    .node-copy strong { font-size: 10px; }
+    .node-copy span { margin-top: 2px; overflow: hidden; color: var(--muted); font-size: 9px; text-overflow: ellipsis; white-space: nowrap; }
+    .node-state { color: var(--green); font-size: 9px; }
+    .pipeline-area {
+      min-width: 0;
+      min-height: 0;
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr) auto;
+    }
+    .pipeline-canvas { min-height: 0; overflow: auto; padding: 18px; }
+    .pipeline-track { min-width: 650px; display: grid; grid-template-columns: repeat(4, minmax(135px, 1fr)); gap: 24px; align-items: start; }
+    .pipeline-node {
+      position: relative;
+      min-height: 126px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--surface);
+      box-shadow: 0 5px 14px rgba(16,24,40,.05);
+    }
+    .pipeline-node:not(:last-child)::after { content: ""; position: absolute; left: 100%; top: 42px; width: 25px; height: 1px; background: var(--line-strong); }
+    .pipeline-node-head { display: flex; align-items: center; justify-content: space-between; gap: 6px; padding: 9px 10px; border-bottom: 1px solid var(--line); }
+    .pipeline-node-head strong { font-size: 10px; }
+    .pipeline-node-body { padding: 9px 10px; }
+    .pipeline-node-body p { margin: 0 0 7px; color: var(--muted); font-size: 9px; line-height: 1.45; }
+    .field-list { display: flex; gap: 4px; flex-wrap: wrap; }
+    .field-chip { padding: 3px 5px; border-radius: 4px; color: var(--ink-2); background: var(--surface-3); font-family: var(--mono); font-size: 8px; }
+    .data-evidence {
+      margin-top: 18px;
+      display: grid;
+      grid-template-columns: minmax(280px, 1fr) minmax(270px, .85fr);
+      gap: 14px;
+    }
+    .evidence-panel { min-width: 0; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); }
+    .evidence-head { min-height: 37px; display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 0 10px; border-bottom: 1px solid var(--line); font-size: 10px; font-weight: 700; }
+    .chart-box { height: 180px; padding: 10px; }
+    .chart-box svg { width: 100%; height: 100%; display: block; }
+    .query-box { min-height: 180px; overflow: auto; padding: 11px; color: #dbe5f1; background: var(--code); font-family: var(--mono); font-size: 9px; line-height: 1.6; white-space: pre-wrap; }
+    .data-preview { border-top: 1px solid var(--line); background: var(--surface); }
+    .data-inspector {
+      min-width: 0;
+      min-height: 0;
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr) auto;
+      border-left: 1px solid var(--line);
+      background: var(--surface);
+    }
+    .inspector-content { min-height: 0; overflow: auto; }
+    .property-group { border-bottom: 1px solid var(--line); }
+    .property-group h4 { margin: 0; padding: 10px 12px; color: var(--muted); background: var(--surface-2); font-size: 9px; text-transform: uppercase; }
+    .property-row { display: grid; grid-template-columns: 105px minmax(0, 1fr); gap: 9px; padding: 8px 12px; border-top: 1px solid #edf0f4; font-size: 10px; }
+    .property-row:first-of-type { border-top: 0; }
+    .property-key { color: var(--muted); }
+    .property-value { min-width: 0; overflow-wrap: anywhere; color: var(--ink-2); }
+    .inspector-actions { display: flex; gap: 7px; padding: 10px 12px; border-top: 1px solid var(--line); }
+
+    /* 4. Review gate */
+    .review-workspace {
+      height: calc(100vh - 58px);
+      min-height: 650px;
+      display: grid;
+      grid-template-columns: 215px minmax(460px, 1fr) 315px;
+      background: var(--surface);
+    }
+    .review-rail { min-height: 0; border-right: 1px solid var(--line); background: var(--surface-2); }
+    .review-title { padding: 16px 14px 12px; border-bottom: 1px solid var(--line); }
+    .review-title strong { display: block; font-size: 12px; }
+    .review-title span { display: block; margin-top: 4px; color: var(--muted); font-size: 9px; }
+    .gate-list { padding: 8px; }
+    .gate-row {
+      display: grid;
+      grid-template-columns: 22px minmax(0, 1fr);
+      gap: 8px;
+      padding: 9px 8px;
+      border-radius: 6px;
+      color: var(--ink-2);
+      font-size: 10px;
+      line-height: 1.4;
+    }
+    .gate-row.active { color: var(--amber); background: var(--amber-soft); }
+    .gate-row.done { color: var(--green); }
+    .gate-number { width: 20px; height: 20px; display: grid; place-items: center; border: 1px solid currentColor; border-radius: 50%; font-size: 9px; }
+    .review-main { min-width: 0; min-height: 0; display: grid; grid-template-rows: auto minmax(0, 1fr) auto; }
+    .review-document { min-height: 0; overflow: auto; padding: 18px max(18px, 4vw) 28px; }
+    .review-document h1 { margin: 0; font-size: 18px; }
+    .review-meta { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 9px; }
+    .review-summary { margin-top: 18px; padding: 12px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); color: var(--ink-2); font-size: 11px; line-height: 1.7; }
+    .diff-section { margin-top: 18px; }
+    .diff-section h3 { margin: 0 0 9px; font-size: 12px; }
+    .diff-line {
+      display: grid;
+      grid-template-columns: 28px minmax(0, 1fr);
+      min-width: 0;
+      border-top: 1px solid #edf0f4;
+      font-family: var(--mono);
+      font-size: 10px;
+      line-height: 1.6;
+    }
+    .diff-line:last-child { border-bottom: 1px solid #edf0f4; }
+    .diff-line .sign { padding: 5px 7px; color: var(--muted); text-align: center; }
+    .diff-line .text { padding: 5px 8px; overflow-wrap: anywhere; }
+    .diff-line.add { color: #08633f; background: #eefaf4; }
+    .diff-line.remove { color: #9b2c2c; background: #fff2f1; }
+    .decision-matrix { margin-top: 18px; border: 1px solid var(--line); }
+    .decision-matrix .matrix-head { padding: 9px 10px; border-bottom: 1px solid var(--line); font-size: 10px; font-weight: 750; }
+    .review-side { min-width: 0; min-height: 0; display: grid; grid-template-rows: auto minmax(0, 1fr) auto; border-left: 1px solid var(--line); }
+    .checklist { min-height: 0; overflow: auto; }
+    .check-row {
+      width: 100%;
+      display: grid;
+      grid-template-columns: 20px minmax(0, 1fr);
+      gap: 9px;
+      border: 0;
+      border-bottom: 1px solid var(--line);
+      padding: 11px 12px;
+      background: var(--surface);
+      text-align: left;
+      cursor: pointer;
+    }
+    .check-box { width: 18px; height: 18px; display: grid; place-items: center; border: 1px solid var(--line-strong); border-radius: 4px; color: transparent; }
+    .check-row.checked .check-box { color: #fff; border-color: var(--green); background: var(--green); }
+    .check-copy strong, .check-copy span { display: block; }
+    .check-copy strong { font-size: 10px; }
+    .check-copy span { margin-top: 3px; color: var(--muted); font-size: 9px; line-height: 1.5; }
+    .risk-band { padding: 11px 12px; border-top: 1px solid var(--line); background: var(--amber-soft); }
+    .risk-band strong { display: block; color: var(--amber); font-size: 10px; }
+    .risk-band p { margin: 4px 0 0; color: #78501f; font-size: 9px; line-height: 1.5; }
+    .approval-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; padding: 10px 12px; border-top: 1px solid var(--line); }
+
+    /* 5. Adaptive focus */
+    .focus-workspace {
+      min-height: calc(100vh - 58px);
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr) auto;
+      background: var(--surface-2);
+    }
+    .focus-stagebar {
+      min-height: 62px;
+      display: grid;
+      grid-template-columns: minmax(230px, .7fr) minmax(480px, 1.6fr) minmax(180px, .6fr);
+      align-items: center;
+      gap: 20px;
+      padding: 8px 18px;
+      border-bottom: 1px solid var(--line);
+      background: var(--surface);
+    }
+    .focus-title strong, .focus-title span { display: block; }
+    .focus-title strong { font-size: 12px; }
+    .focus-title span { margin-top: 3px; color: var(--muted); font-size: 10px; }
+    .stage-strip { display: grid; grid-template-columns: repeat(5, minmax(72px, 1fr)); gap: 4px; }
+    .stage-button {
+      min-height: 38px;
+      display: grid;
+      place-items: center;
+      gap: 2px;
+      border: 0;
+      border-radius: 6px;
+      color: var(--muted);
+      background: transparent;
+      font-size: 9px;
+      cursor: pointer;
+    }
+    .stage-button strong { font-size: 10px; }
+    .stage-button.done { color: var(--green); }
+    .stage-button.active { color: var(--blue); background: var(--blue-soft); }
+    .focus-body {
+      min-height: 0;
+      display: grid;
+      grid-template-columns: minmax(210px, .5fr) minmax(560px, 1.6fr) minmax(240px, .65fr);
+      gap: 1px;
+      background: var(--line);
+    }
+    .focus-context, .focus-main, .focus-aside { min-width: 0; min-height: 0; background: var(--surface); }
+    .focus-context { display: grid; grid-template-rows: auto minmax(0, 1fr); }
+    .context-feed { min-height: 0; overflow: auto; padding: 12px; }
+    .context-event { display: grid; grid-template-columns: 18px minmax(0, 1fr); gap: 8px; padding-bottom: 15px; color: var(--muted); font-size: 9px; line-height: 1.5; }
+    .context-event strong { display: block; margin-bottom: 2px; color: var(--ink-2); font-size: 10px; }
+    .context-event .event-mark { width: 17px; height: 17px; display: grid; place-items: center; border-radius: 50%; color: #fff; background: var(--green); }
+    .context-event.current .event-mark { background: var(--blue); }
+    .focus-main { display: grid; grid-template-rows: auto minmax(0, 1fr); }
+    .focus-artifact-tabs { display: flex; align-items: center; gap: 2px; padding: 7px 10px; border-bottom: 1px solid var(--line); }
+    .focus-tab { border: 0; border-radius: 5px; padding: 7px 9px; color: var(--muted); background: transparent; font-size: 10px; cursor: pointer; }
+    .focus-tab.active { color: var(--blue); background: var(--blue-soft); font-weight: 700; }
+    .focus-artifact { min-height: 0; overflow: auto; padding: 18px max(18px, 4vw) 28px; }
+    .focus-artifact-view { display: none; }
+    .focus-artifact-view.active { display: block; }
+    .artifact-hero { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 20px; align-items: start; padding-bottom: 15px; border-bottom: 1px solid var(--line); }
+    .artifact-hero h2 { margin: 0; font-size: 17px; }
+    .artifact-hero p { max-width: 670px; margin: 7px 0 0; color: var(--muted); font-size: 10px; line-height: 1.65; }
+    .metric-cluster { display: grid; grid-template-columns: repeat(3, minmax(90px, 1fr)); gap: 1px; margin-top: 16px; border: 1px solid var(--line); background: var(--line); }
+    .metric-cell { min-height: 68px; padding: 10px; background: var(--surface); }
+    .metric-cell span, .metric-cell strong { display: block; }
+    .metric-cell span { color: var(--muted); font-size: 9px; }
+    .metric-cell strong { margin-top: 7px; font-size: 14px; }
+    .result-preview { margin-top: 16px; display: grid; grid-template-columns: minmax(250px, .8fr) minmax(320px, 1.2fr); gap: 14px; }
+    .decision-preview { border: 1px solid var(--line); }
+    .decision-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 9px 11px; border-bottom: 1px solid var(--line); font-size: 10px; font-weight: 700; }
+    .decision-body { padding: 12px; }
+    .decision-value { display: flex; align-items: baseline; gap: 9px; }
+    .decision-value strong { color: var(--red); font-size: 24px; }
+    .decision-value span { color: var(--muted); font-size: 10px; }
+    .rule-meter { margin-top: 13px; }
+    .meter-row { display: grid; grid-template-columns: 85px minmax(0, 1fr) 38px; align-items: center; gap: 8px; margin-top: 8px; font-size: 9px; }
+    .meter-track { height: 6px; border-radius: 3px; background: var(--surface-3); overflow: hidden; }
+    .meter-fill { height: 100%; background: var(--blue); }
+    .focus-chart { min-height: 245px; border: 1px solid var(--line); }
+    .focus-chart svg { width: 100%; height: 245px; display: block; }
+    .focus-aside { display: grid; grid-template-rows: auto minmax(0, 1fr) auto; }
+    .aside-sections { min-height: 0; overflow: auto; }
+    .aside-section { padding: 12px; border-bottom: 1px solid var(--line); }
+    .aside-section h4 { margin: 0 0 8px; font-size: 10px; }
+    .aside-row { display: flex; justify-content: space-between; gap: 10px; padding: 5px 0; color: var(--muted); font-size: 9px; }
+    .aside-row strong { color: var(--ink-2); text-align: right; }
+    .focus-composer { width: min(980px, calc(100% - 28px)); margin: 10px auto 12px; border: 1px solid var(--line); border-radius: 8px; box-shadow: var(--shadow); }
+    .run-progress { display: none; align-items: center; gap: 8px; color: var(--blue); font-size: 10px; }
+    .run-progress.visible { display: flex; }
+    .spinner { width: 13px; height: 13px; border: 2px solid #c8d7fb; border-top-color: var(--blue); border-radius: 50%; animation: spin .75s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .toast {
+      position: fixed;
+      right: 18px;
+      bottom: 18px;
+      z-index: 100;
+      max-width: min(380px, calc(100vw - 36px));
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      transform: translateY(20px);
+      border: 1px solid #b9dfce;
+      border-radius: 8px;
+      padding: 10px 12px;
+      color: #07583d;
+      background: #effaf5;
+      box-shadow: var(--shadow);
+      font-size: 11px;
+      opacity: 0;
+      pointer-events: none;
+      transition: .2s ease;
+    }
+    .toast.visible { transform: translateY(0); opacity: 1; }
+
+    @media (max-width: 1180px) {
+      .global-bar { grid-template-columns: 175px minmax(0, 1fr) auto; }
+      .variant-button span { display: none; }
+      .chat-canvas { grid-template-columns: 190px minmax(340px, 1fr) 360px; }
+      .ide { grid-template-columns: 200px minmax(390px, 1fr) 285px; }
+      .data-workbench { grid-template-columns: 210px minmax(460px, 1fr) 290px; }
+      .review-workspace { grid-template-columns: 185px minmax(420px, 1fr) 280px; }
+      .focus-body { grid-template-columns: 190px minmax(480px, 1fr) 225px; }
+    }
+
+    @media (max-width: 900px) {
+      .app-shell { grid-template-rows: auto minmax(0, 1fr); }
+      .global-bar {
+        position: sticky;
+        grid-template-columns: minmax(130px, 1fr) auto;
+        grid-template-rows: 50px 44px;
+        gap: 0 8px;
+        padding: 0 10px;
+      }
+      .variant-switcher { grid-column: 1 / -1; grid-row: 2; justify-content: flex-start; width: 100%; padding-bottom: 6px; }
+      .variant-button span { display: inline; }
+      .global-actions .status-chip { display: none; }
+      .views, .view { min-height: calc(100vh - 94px); }
+      .chat-canvas {
+        height: calc(100vh - 94px);
+        grid-template-columns: minmax(0, 1fr);
+      }
+      .chat-rail { display: none; }
+      .artifact-pane {
+        position: fixed;
+        inset: 94px 0 0 12%;
+        z-index: 30;
+        display: none;
+        box-shadow: -12px 0 32px rgba(16,24,40,.14);
+      }
+      .artifact-pane.mobile-open { display: grid; }
+      .conversation-head .artifact-mobile-toggle { display: inline-flex; }
+      .ide {
+        height: calc(100vh - 94px);
+        grid-template-columns: minmax(0, 1fr);
+        grid-template-rows: minmax(360px, 1fr) 185px 250px;
+      }
+      .ide-explorer { display: none; }
+      .ide-agent { grid-row: 3; border-left: 0; border-top: 1px solid var(--line); }
+      .ide-terminal { grid-column: 1; grid-row: 2; }
+      .data-workbench {
+        height: auto;
+        min-height: calc(100vh - 94px);
+        grid-template-columns: 1fr;
+      }
+      .data-left { display: none; }
+      .pipeline-area { min-height: 620px; }
+      .data-inspector { min-height: 460px; border-left: 0; border-top: 1px solid var(--line); }
+      .review-workspace {
+        height: auto;
+        min-height: calc(100vh - 94px);
+        grid-template-columns: 1fr;
+      }
+      .review-rail { display: none; }
+      .review-main { min-height: 650px; }
+      .review-side { min-height: 520px; border-left: 0; border-top: 1px solid var(--line); }
+      .focus-stagebar { grid-template-columns: 1fr; gap: 8px; padding: 10px; }
+      .focus-title, .focus-stage-actions { display: none; }
+      .focus-body { grid-template-columns: 1fr; }
+      .focus-context, .focus-aside { display: none; }
+      .result-preview { grid-template-columns: 1fr; }
+    }
+
+    @media (min-width: 901px) {
+      .artifact-mobile-toggle { display: none; }
+    }
+
+    @media (max-width: 560px) {
+      .brand-copy span { display: none; }
+      .variant-button { padding: 7px 8px; }
+      .variant-button span { font-size: 11px; }
+      .messages { padding: 16px 12px 22px; }
+      .message-bubble { max-width: 96%; }
+      .artifact-pane { left: 0; }
+      .data-evidence { grid-template-columns: 1fr; }
+      .focus-artifact { padding: 14px 11px 22px; }
+      .artifact-hero { grid-template-columns: 1fr; }
+      .metric-cluster { grid-template-columns: 1fr 1fr; }
+      .metric-cluster .metric-cell:last-child:nth-child(odd) { grid-column: 1 / -1; }
+      .stage-strip { overflow-x: auto; grid-template-columns: repeat(5, 92px); }
+      .approval-actions { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <header class="global-bar">
+      <div class="brand">
+        <div class="brand-mark">FA</div>
+        <div class="brand-copy">
+          <strong>Fin Agent</strong>
+          <span>ct_abu_market_buy_decision</span>
+        </div>
+      </div>
+      <nav class="variant-switcher" role="tablist" aria-label="工作区方案">
+        <button class="variant-button active" data-view-target="chat" role="tab" aria-selected="true"><i data-lucide="message-square" class="icon"></i><span>对话画布</span></button>
+        <button class="variant-button" data-view-target="ide" role="tab" aria-selected="false"><i data-lucide="code-2" class="icon"></i><span>Agent IDE</span></button>
+        <button class="variant-button" data-view-target="data" role="tab" aria-selected="false"><i data-lucide="workflow" class="icon"></i><span>数据编排</span></button>
+        <button class="variant-button" data-view-target="review" role="tab" aria-selected="false"><i data-lucide="shield-check" class="icon"></i><span>审核门</span></button>
+        <button class="variant-button" data-view-target="focus" role="tab" aria-selected="false"><i data-lucide="sparkles" class="icon"></i><span>自适应</span></button>
+      </nav>
+      <div class="global-actions">
+        <span class="status-chip"><span class="status-dot"></span>design_ready</span>
+        <button class="icon-button" title="打开运行记录" aria-label="打开运行记录" data-toast="已打开运行记录"><i data-lucide="history" class="icon"></i></button>
+      </div>
+    </header>
+
+    <main class="views">
+      <!-- Variant 1: conversation first -->
+      <section class="view active" data-view="chat">
+        <div class="chat-canvas">
+          <aside class="chat-rail">
+            <button class="btn new-task"><i data-lucide="square-pen" class="icon"></i>新建任务</button>
+            <div class="section-label rail-label">最近</div>
+            <div class="thread-list">
+              <button class="thread-item active"><i data-lucide="wrench" class="icon"></i><span class="thread-copy"><strong>阿布大盘买入决策</strong><span>设计待确认 · 2 分钟前</span></span></button>
+              <button class="thread-item"><i data-lucide="scan-search" class="icon"></i><span class="thread-copy"><strong>涨停次日强弱筛选</strong><span>测试通过 · 昨天</span></span></button>
+              <button class="thread-item"><i data-lucide="chart-no-axes-combined" class="icon"></i><span class="thread-copy"><strong>行业景气度评分</strong><span>需求澄清 · 周三</span></span></button>
+              <button class="thread-item"><i data-lucide="database" class="icon"></i><span class="thread-copy"><strong>北向资金归因</strong><span>已发布 · 7 月 8 日</span></span></button>
+            </div>
+            <div class="rail-footer"><div class="rail-profile"><div class="avatar">CY</div><span><strong>个人工作区</strong><br><span class="subtle">4 个自定义工具</span></span></div></div>
+          </aside>
+
+          <section class="conversation">
+            <header class="conversation-head">
+              <div class="conversation-title"><strong>阿布大盘买入决策</strong><span>自定义金融工具 · 设计阶段</span></div>
+              <div class="toolbar-actions">
+                <span class="tag amber"><i data-lucide="circle-pause" class="icon-sm"></i>等待确认</span>
+                <button class="btn artifact-mobile-toggle" data-toggle-artifact><i data-lucide="panel-right-open" class="icon"></i>设计稿</button>
+                <button class="icon-button" title="更多操作" aria-label="更多操作"><i data-lucide="ellipsis" class="icon"></i></button>
+              </div>
+            </header>
+            <div class="messages">
+              <article class="message user">
+                <div class="message-role">你</div>
+                <div class="message-bubble">创建一个阿布大盘买入决策工具：根据上证指数日线、15 分钟强弱和个股 15 分钟买入信号，输出可买或不可买，并给出止损参考。</div>
+              </article>
+              <article class="message">
+                <div class="message-role"><i data-lucide="sparkles" class="icon-sm"></i>Fin Agent</div>
+                <div class="agent-answer">
+                  <p>我把它整理成了一个可复用、可测试的决策工具。工具先判断大盘是否允许交易，再识别个股是追强、回调还是无有效信号，最后输出决策与止损位。</p>
+                  <p>右侧是可编辑设计契约。我做了三项默认假设，你只需要检查是否符合你的交易规则：</p>
+                  <ul class="assumption-list">
+                    <li><i data-lucide="check" class="icon-sm positive"></i><span>市场基准默认使用上证指数 <span class="mono">000001.SH</span>。</span></li>
+                    <li><i data-lucide="check" class="icon-sm positive"></i><span>盘中数据以调用时刻为截止时间，不使用未来数据。</span></li>
+                    <li><i data-lucide="alert-circle" class="icon-sm" style="color:var(--amber)"></i><span>止损位采用最近 15 分钟结构低点；跌破时输出不可买。</span></li>
+                  </ul>
+                  <div class="agent-progress" aria-label="任务进度">
+                    <span class="progress-step done"><span class="progress-mark">✓</span>理解</span>
+                    <span class="progress-step active"><span class="progress-mark">2</span>设计</span>
+                    <span class="progress-step"><span class="progress-mark">3</span>编码</span>
+                    <span class="progress-step"><span class="progress-mark">4</span>测试</span>
+                    <span class="progress-step"><span class="progress-mark">5</span>发布</span>
+                  </div>
+                </div>
+              </article>
+            </div>
+            <div class="composer">
+              <button class="icon-button" title="添加附件" aria-label="添加附件"><i data-lucide="paperclip" class="icon"></i></button>
+              <textarea rows="1" placeholder="告诉我需要修改的规则、字段或默认值…"></textarea>
+              <button class="icon-button send-button" title="发送" aria-label="发送" data-toast="修改要求已加入设计轮次"><i data-lucide="arrow-up" class="icon"></i></button>
+            </div>
+          </section>
+
+          <aside class="artifact-pane" id="chatArtifactPane">
+            <div class="artifact-summary">
+              <div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start">
+                <div><strong>工具设计契约</strong><p>最后保存 11:42 · 由需求设计 Agent 生成</p></div>
+                <button class="icon-button artifact-mobile-toggle" title="关闭设计稿" aria-label="关闭设计稿" data-toggle-artifact><i data-lucide="panel-right-close" class="icon"></i></button>
+              </div>
+            </div>
+            <div class="artifact-tabs" role="tablist">
+              <button class="artifact-tab active" data-artifact-tab="contract">契约</button>
+              <button class="artifact-tab" data-artifact-tab="schema">输入输出</button>
+              <button class="artifact-tab" data-artifact-tab="logic">逻辑</button>
+              <button class="artifact-tab" data-artifact-tab="data">数据</button>
+            </div>
+            <div class="artifact-content">
+              <div class="artifact-section active" data-artifact-section="contract">
+                <div class="contract-row"><h4>ct_abu_market_buy_decision</h4><p>根据大盘状态与个股 15 分钟信号，输出盘中买入决策、信号类型和止损参考。</p></div>
+                <div class="contract-row"><h4>运行边界</h4><p>只读金融数据；不下单；不持久化证券账户信息；结果属于规则判断，不构成投资建议。</p></div>
+                <div class="contract-row"><h4>验收样例</h4><p>600519.SH · 2026-07-09 10:45。预期返回 decision、market_status、buy_type、stop_loss 和 rule_details。</p></div>
+                <div class="contract-row"><h4>未确认项</h4><p style="color:var(--amber)">结构低点止损是否需要叠加固定 3% 最大损失约束？</p></div>
+              </div>
+              <div class="artifact-section" data-artifact-section="schema">
+                <div class="section-label" style="padding:11px 12px 6px">Inputs</div>
+                <div class="table-wrap"><table><thead><tr><th>字段</th><th>类型</th><th>必填</th><th>默认</th></tr></thead><tbody>
+                  <tr><td class="field-name">stock_code</td><td>string</td><td>是</td><td>—</td></tr>
+                  <tr><td class="field-name">trade_date</td><td>date</td><td>是</td><td>latest</td></tr>
+                  <tr><td class="field-name">as_of_time</td><td>time</td><td>否</td><td>now</td></tr>
+                  <tr><td class="field-name">market_index</td><td>string</td><td>否</td><td>000001.SH</td></tr>
+                </tbody></table></div>
+                <div class="section-label" style="padding:14px 12px 6px">Outputs</div>
+                <div class="table-wrap"><table><thead><tr><th>字段</th><th>类型</th><th>业务含义</th></tr></thead><tbody>
+                  <tr><td class="field-name">decision</td><td>enum</td><td>可买 / 不可买</td></tr>
+                  <tr><td class="field-name">market_status</td><td>string</td><td>大盘交易状态</td></tr>
+                  <tr><td class="field-name">buy_type</td><td>enum</td><td>追强 / 回调 / 无</td></tr>
+                  <tr><td class="field-name">stop_loss</td><td>number</td><td>止损参考价</td></tr>
+                  <tr><td class="field-name">rule_details</td><td>dict</td><td>规则命中证据</td></tr>
+                </tbody></table></div>
+              </div>
+              <div class="artifact-section" data-artifact-section="logic">
+                <ol class="logic-list">
+                  <li>校验股票代码、交易日期和盘中截止时间，禁止读取截止时间之后的数据。</li>
+                  <li>读取上证指数日线，计算中期趋势、风险位与最近交易日状态。</li>
+                  <li>聚合上证指数 15 分钟行情，判断盘中强弱、回撤与量能变化。</li>
+                  <li>读取个股 15 分钟行情，识别追强、回调和无效信号。</li>
+                  <li>组合市场许可与个股信号，计算 decision、stop_loss 和证据明细。</li>
+                </ol>
+              </div>
+              <div class="artifact-section" data-artifact-section="data">
+                <div class="table-wrap"><table><thead><tr><th>用途</th><th>subject.dataview</th><th>粒度</th></tr></thead><tbody>
+                  <tr><td>指数日线</td><td class="field-name">index.quote</td><td>1d × 120</td></tr>
+                  <tr><td>指数盘中</td><td class="field-name">index.quote</td><td>15m × 当日</td></tr>
+                  <tr><td>个股盘中</td><td class="field-name">stock.quote</td><td>15m × 5日</td></tr>
+                  <tr><td>证券信息</td><td class="field-name">stock.basic_info</td><td>latest</td></tr>
+                </tbody></table></div>
+                <div class="contract-row"><h4>数据新鲜度</h4><p>盘中行情允许最多延迟 60 秒；日线必须包含最近完整交易日。</p></div>
+              </div>
+            </div>
+            <footer class="artifact-footer">
+              <button class="btn" data-toast="已进入设计编辑状态"><i data-lucide="pencil" class="icon"></i>编辑</button>
+              <button class="btn primary" data-confirm-design><i data-lucide="check" class="icon"></i>确认并编码</button>
+            </footer>
+          </aside>
+        </div>
+      </section>
+
+      <!-- Variant 2: Codex-like IDE -->
+      <section class="view" data-view="ide">
+        <div class="ide">
+          <aside class="ide-explorer">
+            <div class="toolbar"><div class="toolbar-title"><i data-lucide="files" class="icon"></i><span>工具文件</span></div><button class="icon-button" title="新建文件" aria-label="新建文件"><i data-lucide="file-plus-2" class="icon"></i></button></div>
+            <div class="section-label" style="padding:10px 12px 4px">ct_abu_market_buy_decision</div>
+            <div class="explorer-tree">
+              <div class="tree-row"><i data-lucide="chevron-down" class="icon-sm"></i><strong>draft</strong></div>
+              <div class="tree-row indent active"><i data-lucide="file-code-2" class="icon-sm"></i>tool.py</div>
+              <div class="tree-row indent"><i data-lucide="braces" class="icon-sm"></i>manifest.json</div>
+              <div class="tree-row indent"><i data-lucide="braces" class="icon-sm"></i>input.schema.json</div>
+              <div class="tree-row indent"><i data-lucide="braces" class="icon-sm"></i>output.schema.json</div>
+              <div class="tree-row indent"><i data-lucide="flask-conical" class="icon-sm"></i>test_tool.py</div>
+              <div class="tree-row"><i data-lucide="chevron-right" class="icon-sm"></i><strong>context</strong></div>
+              <div class="tree-row"><i data-lucide="chevron-right" class="icon-sm"></i><strong>artifacts</strong></div>
+            </div>
+            <div class="outline">
+              <div class="section-label" style="padding:9px 12px 3px">Outline</div>
+              <div class="tree-row"><i data-lucide="box" class="icon-sm"></i>validate_inputs</div>
+              <div class="tree-row"><i data-lucide="box" class="icon-sm"></i>market_state</div>
+              <div class="tree-row"><i data-lucide="box" class="icon-sm"></i>stock_signal</div>
+              <div class="tree-row"><i data-lucide="play" class="icon-sm"></i>run</div>
+            </div>
+          </aside>
+
+          <section class="ide-editor">
+            <div class="editor-tabs">
+              <button class="file-tab active"><i data-lucide="file-code-2" class="icon-sm"></i>tool.py</button>
+              <button class="file-tab"><i data-lucide="flask-conical" class="icon-sm"></i>test_tool.py</button>
+              <button class="file-tab"><i data-lucide="braces" class="icon-sm"></i>output.schema.json</button>
+            </div>
+            <div class="code-editor" aria-label="Python 代码编辑器">
+              <div class="code-line"><span class="line-no">1</span><span class="line-code"><span class="tok-key">from</span> __future__ <span class="tok-key">import</span> annotations</span></div>
+              <div class="code-line"><span class="line-no">2</span><span class="line-code"><span class="tok-key">from</span> typing <span class="tok-key">import</span> Any</span></div>
+              <div class="code-line"><span class="line-no">3</span><span class="line-code"><span class="tok-key">from</span> custom_tool_sdk <span class="tok-key">import</span> finance_query</span></div>
+              <div class="code-line"><span class="line-no">4</span><span class="line-code"></span></div>
+              <div class="code-line"><span class="line-no">5</span><span class="line-code"><span class="tok-key">def</span> <span class="tok-fn">market_state</span>(params: dict[str, Any]) -> dict[str, Any]:</span></div>
+              <div class="code-line"><span class="line-no">6</span><span class="line-code">    daily = finance_query(request=<span class="tok-str">build_index_daily_request(params)</span>)</span></div>
+              <div class="code-line"><span class="line-no">7</span><span class="line-code">    intraday = finance_query(request=<span class="tok-str">build_index_intraday_request(params)</span>)</span></div>
+              <div class="code-line"><span class="line-no">8</span><span class="line-code">    <span class="tok-key">return</span> classify_market(daily, intraday)</span></div>
+              <div class="code-line"><span class="line-no">9</span><span class="line-code"></span></div>
+              <div class="code-line"><span class="line-no">10</span><span class="line-code"><span class="tok-key">def</span> <span class="tok-fn">stock_signal</span>(params: dict[str, Any], market: dict[str, Any]) -> dict[str, Any]:</span></div>
+              <div class="code-line"><span class="line-no">11</span><span class="line-code">    bars = finance_query(request=<span class="tok-str">build_stock_intraday_request(params)</span>)</span></div>
+              <div class="code-line"><span class="line-no">12</span><span class="line-code">    structure = detect_price_structure(bars)</span></div>
+              <div class="code-line"><span class="line-no">13</span><span class="line-code">    <span class="tok-key">return</span> score_signal(structure, market)</span></div>
+              <div class="code-line"><span class="line-no">14</span><span class="line-code"></span></div>
+              <div class="code-line"><span class="line-no">15</span><span class="line-code"><span class="tok-key">def</span> <span class="tok-fn">run</span>(inputs: dict[str, Any]) -> dict[str, Any]:</span></div>
+              <div class="code-line"><span class="line-no">16</span><span class="line-code">    params = validate_inputs(inputs)</span></div>
+              <div class="code-line"><span class="line-no">17</span><span class="line-code">    market = market_state(params)</span></div>
+              <div class="code-line"><span class="line-no">18</span><span class="line-code">    <span class="tok-key">if</span> market[<span class="tok-str">"tradable"</span>] <span class="tok-key">is</span> <span class="tok-key">False</span>:</span></div>
+              <div class="code-line"><span class="line-no">19</span><span class="line-code">        <span class="tok-key">return</span> build_output(<span class="tok-str">"不可买"</span>, market=market)</span></div>
+              <div class="code-line"><span class="line-no">20</span><span class="line-code">    signal = stock_signal(params, market)</span></div>
+              <div class="code-line"><span class="line-no">21</span><span class="line-code">    <span class="tok-key">return</span> build_output(signal[<span class="tok-str">"decision"</span>], market=market, signal=signal)</span></div>
+              <div class="code-line"><span class="line-no">22</span><span class="line-code"></span></div>
+              <div class="code-line"><span class="line-no">23</span><span class="line-code"><span class="tok-comment"># 设计契约校验：输出字段 5/5 已覆盖</span></span></div>
+            </div>
+          </section>
+
+          <aside class="ide-agent">
+            <div class="toolbar"><div class="toolbar-title"><i data-lucide="sparkles" class="icon"></i><span>Agent</span></div><span class="tag blue">coding</span></div>
+            <div class="agent-feed">
+              <div class="feed-item done"><span class="feed-icon">✓</span><span class="feed-copy"><strong>读取已确认设计</strong>输入输出契约已锁定，编码阶段不得改名。</span></div>
+              <div class="feed-item done"><span class="feed-icon">✓</span><span class="feed-copy"><strong>加载金融数据能力</strong><span class="tool-call">read api_catalog/subjects/index.json<br>read api_catalog/subjects/stock.json</span></span></div>
+              <div class="feed-item active"><span class="feed-icon"><i data-lucide="code-2" class="icon-sm"></i></span><span class="feed-copy"><strong>实现决策模块</strong>正在补全止损边界和异常数据处理。</span></div>
+              <div class="feed-item"><span class="feed-icon">4</span><span class="feed-copy"><strong>运行样例测试</strong>检查正常、弱市和缺失行情三种路径。</span></div>
+              <div class="feed-item"><span class="feed-icon">5</span><span class="feed-copy"><strong>生成 draft</strong>测试通过后形成可提交版本。</span></div>
+            </div>
+            <div class="composer ide-composer">
+              <button class="icon-button" title="添加上下文" aria-label="添加上下文"><i data-lucide="at-sign" class="icon"></i></button>
+              <textarea rows="1" placeholder="让 Agent 修改代码…"></textarea>
+              <button class="icon-button send-button" title="发送" aria-label="发送" data-toast="修改请求已发送给 coding Agent"><i data-lucide="arrow-up" class="icon"></i></button>
+            </div>
+          </aside>
+
+          <section class="ide-terminal">
+            <div class="terminal-tabs">
+              <button class="terminal-tab active">测试</button>
+              <button class="terminal-tab">输出</button>
+              <button class="terminal-tab">问题 <span class="tag" style="margin-left:4px">0</span></button>
+              <span style="flex:1"></span>
+              <button class="btn" style="min-height:27px;color:#dce5f2;border-color:#34435a;background:#151e2d" data-run-ide-test><i data-lucide="play" class="icon-sm"></i>运行样例</button>
+            </div>
+            <div class="terminal-output" id="ideTerminalOutput">$ pytest -q test_tool.py
+<span class="subtle">等待运行…</span></div>
+          </section>
+        </div>
+      </section>
+
+      <!-- Variant 3: financial data orchestration -->
+      <section class="view" data-view="data">
+        <div class="data-workbench">
+          <aside class="data-left">
+            <div class="toolbar"><div class="toolbar-title"><i data-lucide="message-square" class="icon"></i><span>Agent 对话</span></div><span class="tag green">已解析</span></div>
+            <div class="mini-dialog">
+              <div class="user-line">大盘允许交易时，再判断个股 15 分钟买点。</div>
+              <div class="agent-line"><strong>已拆为 4 个数据节点。</strong><br>请选择节点检查字段、粒度和截止时间。</div>
+            </div>
+            <div class="section-label" style="padding:10px 12px 4px">数据与计算节点</div>
+            <div class="node-list">
+              <button class="data-node-button active" data-node="market_daily"><span class="node-index">D1</span><span class="node-copy"><strong>指数日线状态</strong><span>index.quote · 120d</span></span><span class="node-state">ready</span></button>
+              <button class="data-node-button" data-node="market_intraday"><span class="node-index">D2</span><span class="node-copy"><strong>指数 15m 强弱</strong><span>index.quote · 15m</span></span><span class="node-state">ready</span></button>
+              <button class="data-node-button" data-node="stock_signal"><span class="node-index">D3</span><span class="node-copy"><strong>个股 15m 信号</strong><span>stock.quote · 15m</span></span><span class="node-state">ready</span></button>
+              <button class="data-node-button" data-node="decision"><span class="node-index">C1</span><span class="node-copy"><strong>决策组合</strong><span>deterministic code</span></span><span class="node-state">ready</span></button>
+            </div>
+          </aside>
+
+          <section class="pipeline-area">
+            <div class="toolbar">
+              <div class="toolbar-title"><i data-lucide="workflow" class="icon"></i><span>阿布大盘买入决策 · 数据流</span></div>
+              <div class="toolbar-actions"><span class="tag"><i data-lucide="clock-3" class="icon-sm"></i>as_of 10:45</span><button class="btn primary" data-run-data><i data-lucide="play" class="icon"></i>试运行</button></div>
+            </div>
+            <div class="pipeline-canvas">
+              <div class="pipeline-track">
+                <article class="pipeline-node"><div class="pipeline-node-head"><strong>指数日线</strong><span class="tag green">live</span></div><div class="pipeline-node-body"><p>识别中期趋势、最近风险位和交易许可。</p><div class="field-list"><span class="field-chip">close</span><span class="field-chip">ma20</span><span class="field-chip">ma60</span></div></div></article>
+                <article class="pipeline-node"><div class="pipeline-node-head"><strong>指数 15m</strong><span class="tag green">live</span></div><div class="pipeline-node-body"><p>评估开盘后强弱、回撤与成交量变化。</p><div class="field-list"><span class="field-chip">close</span><span class="field-chip">amount</span><span class="field-chip">vwap</span></div></div></article>
+                <article class="pipeline-node"><div class="pipeline-node-head"><strong>个股信号</strong><span class="tag green">live</span></div><div class="pipeline-node-body"><p>识别追强、回调和无效结构。</p><div class="field-list"><span class="field-chip">high</span><span class="field-chip">low</span><span class="field-chip">volume</span></div></div></article>
+                <article class="pipeline-node"><div class="pipeline-node-head"><strong>买入决策</strong><span class="tag blue">code</span></div><div class="pipeline-node-body"><p>组合市场许可、个股得分和止损位。</p><div class="field-list"><span class="field-chip">decision</span><span class="field-chip">stop_loss</span></div></div></article>
+              </div>
+              <div class="data-evidence">
+                <section class="evidence-panel">
+                  <div class="evidence-head"><span>数据形态预览 · 上证指数</span><span class="tag">120 日</span></div>
+                  <div class="chart-box">
+                    <svg viewBox="0 0 560 180" preserveAspectRatio="none" aria-label="指数日线趋势图">
+                      <g stroke="#e5e9ef" stroke-width="1"><line x1="0" y1="35" x2="560" y2="35"/><line x1="0" y1="90" x2="560" y2="90"/><line x1="0" y1="145" x2="560" y2="145"/></g>
+                      <polyline fill="none" stroke="#2457d6" stroke-width="3" points="0,135 35,128 70,116 105,122 140,98 175,104 210,82 245,74 280,87 315,60 350,72 385,49 420,55 455,38 490,45 525,27 560,33"/>
+                      <polyline fill="none" stroke="#d19a36" stroke-width="2" points="0,142 35,137 70,132 105,125 140,119 175,111 210,104 245,96 280,88 315,81 350,73 385,66 420,59 455,53 490,47 525,42 560,38"/>
+                    </svg>
+                  </div>
+                </section>
+                <section class="evidence-panel">
+                  <div class="evidence-head"><span>协议请求</span><button class="icon-button" title="复制请求" aria-label="复制请求" style="width:28px;height:28px"><i data-lucide="copy" class="icon-sm"></i></button></div>
+                  <div class="query-box" id="queryPreview">r1 = index.quote(
+  filter = "code = 000001.SH",
+  order = "tradedate desc",
+  limit = 120
+) -> tradedate, open, high, low, close, amount</div>
+                </section>
+              </div>
+            </div>
+            <div class="data-preview">
+              <div class="evidence-head"><span>样例数据 · 截止 2026-07-09 10:45</span><span id="dataRunState" class="tag green">schema valid</span></div>
+              <div class="table-wrap"><table><thead><tr><th>tradedate</th><th>close</th><th>ma20</th><th>ma60</th><th>trend</th><th>freshness</th></tr></thead><tbody>
+                <tr><td>2026-07-09</td><td>3524.61</td><td>3498.20</td><td>3442.18</td><td class="positive">up</td><td>complete</td></tr>
+                <tr><td>2026-07-08</td><td>3510.32</td><td>3492.41</td><td>3438.76</td><td class="positive">up</td><td>complete</td></tr>
+              </tbody></table></div>
+            </div>
+          </section>
+
+          <aside class="data-inspector">
+            <div class="toolbar"><div class="toolbar-title"><i data-lucide="sliders-horizontal" class="icon"></i><span id="inspectorTitle">指数日线状态</span></div><span class="tag green" id="inspectorStatus">ready</span></div>
+            <div class="inspector-content" id="inspectorContent"></div>
+            <div class="inspector-actions"><button class="btn" style="flex:1" data-toast="节点设置已保存"><i data-lucide="save" class="icon"></i>保存节点</button><button class="icon-button" title="删除节点" aria-label="删除节点"><i data-lucide="trash-2" class="icon"></i></button></div>
+          </aside>
+        </div>
+      </section>
+
+      <!-- Variant 4: approval and governance -->
+      <section class="view" data-view="review">
+        <div class="review-workspace">
+          <aside class="review-rail">
+            <div class="review-title"><strong>设计审核</strong><span>version draft-03 · 未发布</span></div>
+            <div class="gate-list">
+              <div class="gate-row done"><span class="gate-number">✓</span><span><strong>需求范围</strong><br>目标和非目标已确认</span></div>
+              <div class="gate-row done"><span class="gate-number">✓</span><span><strong>输入输出</strong><br>schema 已锁定</span></div>
+              <div class="gate-row active"><span class="gate-number">3</span><span><strong>业务规则</strong><br>1 项等待确认</span></div>
+              <div class="gate-row"><span class="gate-number">4</span><span><strong>数据权限</strong><br>只读数据检查</span></div>
+              <div class="gate-row"><span class="gate-number">5</span><span><strong>实现授权</strong><br>确认后进入 coding</span></div>
+            </div>
+          </aside>
+
+          <section class="review-main">
+            <div class="toolbar">
+              <div class="toolbar-title"><i data-lucide="file-check-2" class="icon"></i><span>设计审阅单</span></div>
+              <div class="segmented"><button class="segment active">变更</button><button class="segment">完整设计</button><button class="segment">原始需求</button></div>
+            </div>
+            <div class="review-document">
+              <h1>阿布大盘买入决策</h1>
+              <div class="review-meta"><span class="tag blue">个人工具</span><span class="tag">只读</span><span class="tag">盘中决策</span><span class="tag amber">中风险解释</span></div>
+              <div class="review-summary">Agent 根据现有金融 API 能力，把自然语言规则整理为确定性决策工具。此版本新增盘中截止时间约束，并将止损位从固定比例改为结构低点；后者需要你明确是否设置最大损失上限。</div>
+
+              <section class="diff-section">
+                <h3>规则变更</h3>
+                <div class="diff-line remove"><span class="sign">−</span><span class="text">stop_loss = entry_price × 0.97</span></div>
+                <div class="diff-line add"><span class="sign">+</span><span class="text">stop_loss = min(recent_structure_low, entry_price × (1 - max_loss_pct))</span></div>
+                <div class="diff-line add"><span class="sign">+</span><span class="text">默认 max_loss_pct = 0.03，可由输入覆盖</span></div>
+              </section>
+
+              <section class="diff-section">
+                <h3>时间与数据边界</h3>
+                <div class="diff-line add"><span class="sign">+</span><span class="text">所有盘中查询必须带 as_of_time，不得访问其后的 K 线</span></div>
+                <div class="diff-line add"><span class="sign">+</span><span class="text">盘中行情延迟超过 60 秒时，decision 强制返回“不可买”并说明数据过期</span></div>
+              </section>
+
+              <section class="decision-matrix">
+                <div class="matrix-head">核心决策矩阵</div>
+                <div class="table-wrap"><table><thead><tr><th>市场许可</th><th>个股信号</th><th>数据状态</th><th>decision</th></tr></thead><tbody>
+                  <tr><td>允许</td><td>追强 / 回调</td><td>新鲜</td><td class="positive">可买</td></tr>
+                  <tr><td>允许</td><td>无</td><td>新鲜</td><td>不可买</td></tr>
+                  <tr><td>禁止</td><td>任意</td><td>任意</td><td>不可买</td></tr>
+                  <tr><td>任意</td><td>任意</td><td>过期 / 缺失</td><td>不可买</td></tr>
+                </tbody></table></div>
+              </section>
+            </div>
+            <div class="composer">
+              <button class="icon-button" title="引用设计内容" aria-label="引用设计内容"><i data-lucide="quote" class="icon"></i></button>
+              <textarea rows="1" placeholder="对选中的规则提出修改，或说明你的审批意见…"></textarea>
+              <button class="icon-button send-button" title="发送意见" aria-label="发送意见" data-toast="审核意见已记录"><i data-lucide="arrow-up" class="icon"></i></button>
+            </div>
+          </section>
+
+          <aside class="review-side">
+            <div class="panel-heading"><div><h3>确认清单</h3><p><span id="checkCount">3</span>/4 已确认</p></div><span class="tag amber" id="pendingTag">1 pending</span></div>
+            <div class="checklist">
+              <button class="check-row checked"><span class="check-box"><i data-lucide="check" class="icon-sm"></i></span><span class="check-copy"><strong>输出不是自动交易指令</strong><span>工具仅返回判断和证据，不连接下单能力。</span></span></button>
+              <button class="check-row checked"><span class="check-box"><i data-lucide="check" class="icon-sm"></i></span><span class="check-copy"><strong>数据不存在未来函数</strong><span>as_of_time 已进入所有盘中请求。</span></span></button>
+              <button class="check-row checked"><span class="check-box"><i data-lucide="check" class="icon-sm"></i></span><span class="check-copy"><strong>schema 可稳定消费</strong><span>五个输出字段均有确定类型和含义。</span></span></button>
+              <button class="check-row"><span class="check-box"><i data-lucide="check" class="icon-sm"></i></span><span class="check-copy"><strong>确认最大损失约束</strong><span>接受默认 3%，或在对话中提出新数值。</span></span></button>
+              <div class="risk-band"><strong>金融业务提醒</strong><p>规则只能反映设定条件，无法覆盖停牌、涨跌停流动性和突发公告风险。</p></div>
+            </div>
+            <div class="approval-actions"><button class="btn danger" data-toast="已标记为需要设计修正"><i data-lucide="undo-2" class="icon"></i>退回修改</button><button class="btn success" id="approveDesign" disabled><i data-lucide="check" class="icon"></i>批准编码</button></div>
+          </aside>
+        </div>
+      </section>
+
+      <!-- Variant 5: adaptive focus workspace -->
+      <section class="view" data-view="focus">
+        <div class="focus-workspace">
+          <div class="focus-stagebar">
+            <div class="focus-title"><strong>阿布大盘买入决策</strong><span>工作区随任务阶段自动聚焦</span></div>
+            <div class="stage-strip" role="tablist" aria-label="工具构建阶段">
+              <button class="stage-button done" data-focus-stage="understand"><strong>理解</strong><span>完成</span></button>
+              <button class="stage-button done" data-focus-stage="design"><strong>设计</strong><span>已确认</span></button>
+              <button class="stage-button done" data-focus-stage="code"><strong>编码</strong><span>完成</span></button>
+              <button class="stage-button active" data-focus-stage="test"><strong>测试</strong><span>运行中</span></button>
+              <button class="stage-button" data-focus-stage="publish"><strong>发布</strong><span>待处理</span></button>
+            </div>
+            <div class="focus-stage-actions" style="display:flex;justify-content:flex-end;align-items:center;gap:8px"><span class="run-progress visible" id="focusRunProgress"><span class="spinner"></span>case 2/3</span><button class="btn primary" data-run-focus><i data-lucide="play" class="icon"></i>重新测试</button></div>
+          </div>
+
+          <div class="focus-body">
+            <aside class="focus-context">
+              <div class="toolbar"><div class="toolbar-title"><i data-lucide="activity" class="icon"></i><span>Agent 进程</span></div></div>
+              <div class="context-feed">
+                <div class="context-event"><span class="event-mark">✓</span><span><strong>锁定设计契约</strong>4 个输入、5 个输出、5 条计算逻辑。</span></div>
+                <div class="context-event"><span class="event-mark">✓</span><span><strong>生成 Python 工具</strong>tool.py 与 test_tool.py 已写入 draft。</span></div>
+                <div class="context-event"><span class="event-mark">✓</span><span><strong>正常行情样例</strong>600519.SH 返回“可买”，schema valid。</span></div>
+                <div class="context-event current"><span class="event-mark"><i data-lucide="loader-circle" class="icon-sm"></i></span><span><strong>弱市拦截样例</strong>验证大盘禁止时不继续计算个股买点。</span></div>
+                <div class="context-event"><span class="event-mark">5</span><span><strong>缺失数据样例</strong>预期返回不可买和 data_stale 证据。</span></div>
+              </div>
+            </aside>
+
+            <section class="focus-main">
+              <div class="focus-artifact-tabs">
+                <button class="focus-tab" data-focus-tab="design">设计契约</button>
+                <button class="focus-tab" data-focus-tab="code">代码</button>
+                <button class="focus-tab active" data-focus-tab="test">测试结果</button>
+                <button class="focus-tab" data-focus-tab="output">输出预览</button>
+              </div>
+              <div class="focus-artifact">
+                <div class="focus-artifact-view" data-focus-artifact="design">
+                  <div class="artifact-hero"><div><h2>工具设计契约</h2><p>确定性盘中买入决策，按市场许可、个股信号和数据新鲜度输出结论。</p></div><span class="tag green">confirmed</span></div>
+                  <div class="table-wrap" style="margin-top:16px"><table><thead><tr><th>模块</th><th>职责</th><th>数据依赖</th></tr></thead><tbody><tr><td>market_state</td><td>计算大盘交易许可</td><td>index.quote 1d / 15m</td></tr><tr><td>stock_signal</td><td>识别个股买点与止损</td><td>stock.quote 15m</td></tr><tr><td>build_output</td><td>组合结论和证据</td><td>上游结构化结果</td></tr></tbody></table></div>
+                </div>
+                <div class="focus-artifact-view" data-focus-artifact="code">
+                  <div class="artifact-hero"><div><h2>实现摘要</h2><p>入口函数、数据查询和规则判断已拆分；运行时只通过 custom_tool_sdk 访问数据。</p></div><span class="tag green">0 issues</span></div>
+                  <div class="query-box" style="margin-top:16px;min-height:300px">def run(inputs: dict[str, Any]) -> dict[str, Any]:
+    params = validate_inputs(inputs)
+    market = market_state(params)
+    if not market["tradable"]:
+        return build_output("不可买", market=market)
+    signal = stock_signal(params, market)
+    return build_output(signal["decision"], market=market, signal=signal)</div>
+                </div>
+                <div class="focus-artifact-view active" data-focus-artifact="test">
+                  <div class="artifact-hero"><div><h2>样例验证</h2><p>测试不是单独的日志页；它直接回答工具是否按金融规则工作，并保留原始证据供检查。</p></div><span class="tag blue" id="focusTestTag">running 2/3</span></div>
+                  <div class="metric-cluster">
+                    <div class="metric-cell"><span>通过</span><strong id="focusPassCount">1 / 3</strong></div>
+                    <div class="metric-cell"><span>schema</span><strong>valid</strong></div>
+                    <div class="metric-cell"><span>耗时</span><strong id="focusLatency">1.8s</strong></div>
+                  </div>
+                  <div class="result-preview">
+                    <section class="decision-preview">
+                      <div class="decision-head"><span>case_normal_market</span><span class="tag green">passed</span></div>
+                      <div class="decision-body">
+                        <div class="decision-value"><strong>可买</strong><span>回调买点 · 置信 78</span></div>
+                        <div class="rule-meter">
+                          <div class="meter-row"><span>市场趋势</span><span class="meter-track"><span class="meter-fill" style="width:82%"></span></span><span>82</span></div>
+                          <div class="meter-row"><span>盘中强弱</span><span class="meter-track"><span class="meter-fill" style="width:71%"></span></span><span>71</span></div>
+                          <div class="meter-row"><span>个股结构</span><span class="meter-track"><span class="meter-fill" style="width:78%"></span></span><span>78</span></div>
+                        </div>
+                      </div>
+                    </section>
+                    <section class="focus-chart">
+                      <div class="decision-head"><span>600519.SH · 15m</span><span class="subtle">止损 1438.20</span></div>
+                      <svg viewBox="0 0 620 210" preserveAspectRatio="none" aria-label="个股十五分钟走势">
+                        <g stroke="#e5e9ef" stroke-width="1"><line x1="0" y1="35" x2="620" y2="35"/><line x1="0" y1="100" x2="620" y2="100"/><line x1="0" y1="165" x2="620" y2="165"/></g>
+                        <polyline fill="none" stroke="#2457d6" stroke-width="3" points="0,155 40,147 80,133 120,139 160,114 200,103 240,112 280,89 320,73 360,82 400,65 440,75 480,54 520,62 560,45 620,35"/>
+                        <line x1="0" y1="172" x2="620" y2="172" stroke="#b93838" stroke-width="2" stroke-dasharray="6 5"/>
+                      </svg>
+                    </section>
+                  </div>
+                </div>
+                <div class="focus-artifact-view" data-focus-artifact="output">
+                  <div class="artifact-hero"><div><h2>结构化输出预览</h2><p>最终返回可被对话、报告或其他工具继续消费的稳定 JSON。</p></div><span class="tag green">schema valid</span></div>
+                  <div class="query-box" style="margin-top:16px;min-height:300px">{
+  "decision": "可买",
+  "market_status": "日线多头，15分钟回撤企稳",
+  "buy_type": "回调",
+  "stop_loss": 1438.20,
+  "rule_details": {
+    "market_score": 78,
+    "signal_score": 78,
+    "data_freshness_seconds": 18
+  }
+}</div>
+                </div>
+              </div>
+            </section>
+
+            <aside class="focus-aside">
+              <div class="toolbar"><div class="toolbar-title"><i data-lucide="panel-right" class="icon"></i><span>当前上下文</span></div></div>
+              <div class="aside-sections">
+                <section class="aside-section"><h4>测试输入</h4><div class="aside-row"><span>stock_code</span><strong>600519.SH</strong></div><div class="aside-row"><span>trade_date</span><strong>2026-07-09</strong></div><div class="aside-row"><span>as_of_time</span><strong>10:45</strong></div></section>
+                <section class="aside-section"><h4>数据证据</h4><div class="aside-row"><span>index.quote</span><strong>120 rows</strong></div><div class="aside-row"><span>index.quote 15m</span><strong>8 rows</strong></div><div class="aside-row"><span>stock.quote 15m</span><strong>28 rows</strong></div></section>
+                <section class="aside-section"><h4>运行边界</h4><div class="aside-row"><span>network</span><strong>SDK only</strong></div><div class="aside-row"><span>side effect</span><strong>none</strong></div><div class="aside-row"><span>persistence</span><strong>draft files</strong></div></section>
+              </div>
+              <div style="padding:10px 12px;border-top:1px solid var(--line)"><button class="btn" style="width:100%" data-toast="已打开完整证据包"><i data-lucide="package-open" class="icon"></i>查看完整证据</button></div>
+            </aside>
+          </div>
+
+          <div class="composer focus-composer">
+            <button class="icon-button" title="添加上下文" aria-label="添加上下文"><i data-lucide="paperclip" class="icon"></i></button>
+            <textarea rows="1" placeholder="继续修改规则、修复失败测试，或要求 Agent 解释当前结果…"></textarea>
+            <button class="icon-button send-button" title="发送" aria-label="发送" data-toast="消息已发送，工作区将根据任务自动切换"><i data-lucide="arrow-up" class="icon"></i></button>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div class="toast" id="toast" role="status"><i data-lucide="check-circle-2" class="icon"></i><span id="toastText">已完成</span></div>
+
+  <script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.js"></script>
+  <script>
+    const $ = (selector, root = document) => root.querySelector(selector);
+    const $$ = (selector, root = document) => Array.from(root.querySelectorAll(selector));
+
+    function refreshIcons() {
+      if (window.lucide) window.lucide.createIcons();
+    }
+
+    function showToast(message) {
+      const toast = $("#toast");
+      $("#toastText").textContent = message;
+      toast.classList.add("visible");
+      window.clearTimeout(showToast.timer);
+      showToast.timer = window.setTimeout(() => toast.classList.remove("visible"), 2300);
+    }
+
+    $$("[data-view-target]").forEach((button) => {
+      button.addEventListener("click", () => {
+        const target = button.dataset.viewTarget;
+        $$("[data-view-target]").forEach((item) => {
+          const active = item === button;
+          item.classList.toggle("active", active);
+          item.setAttribute("aria-selected", active ? "true" : "false");
+        });
+        $$("[data-view]").forEach((view) => view.classList.toggle("active", view.dataset.view === target));
+        window.history.replaceState(null, "", `#${target}`);
+        window.scrollTo({ top: 0, behavior: "instant" });
+      });
+    });
+
+    $$("[data-toast]").forEach((button) => button.addEventListener("click", () => showToast(button.dataset.toast)));
+
+    $$("[data-toggle-artifact]").forEach((button) => {
+      button.addEventListener("click", () => $("#chatArtifactPane").classList.toggle("mobile-open"));
+    });
+
+    $$("[data-artifact-tab]").forEach((button) => {
+      button.addEventListener("click", () => {
+        const name = button.dataset.artifactTab;
+        $$("[data-artifact-tab]").forEach((item) => item.classList.toggle("active", item === button));
+        $$("[data-artifact-section]").forEach((section) => section.classList.toggle("active", section.dataset.artifactSection === name));
+      });
+    });
+
+    $("[data-confirm-design]").addEventListener("click", (event) => {
+      event.currentTarget.innerHTML = '<i data-lucide="check-check" class="icon"></i>设计已确认';
+      event.currentTarget.classList.remove("primary");
+      event.currentTarget.classList.add("success");
+      showToast("设计契约已锁定，可以进入 coding 阶段");
+      refreshIcons();
+    });
+
+    $("[data-run-ide-test]").addEventListener("click", (event) => {
+      const output = $("#ideTerminalOutput");
+      const button = event.currentTarget;
+      button.disabled = true;
+      output.textContent = "$ pytest -q test_tool.py\ncollecting 3 items…\n";
+      window.setTimeout(() => {
+        output.innerHTML = '$ pytest -q test_tool.py\n<span class="pass">✓ test_normal_market_decision</span>  0.42s\n<span class="pass">✓ test_weak_market_blocks_buy</span>  0.31s\n<span class="pass">✓ test_stale_data_fails_closed</span>  0.18s\n\n<span class="pass">3 passed</span> in 0.91s';
+        button.disabled = false;
+        showToast("3 个样例测试全部通过");
+      }, 950);
+    });
+
+    const inspectorData = {
+      market_daily: {
+        title: "指数日线状态",
+        groups: [
+          ["数据契约", [["subject.dataview", "index.quote"], ["证券代码", "000001.SH"], ["粒度", "1d"], ["窗口", "120 bars"]]],
+          ["字段", [["行情", "open, high, low, close"], ["成交", "amount"], ["派生", "ma20, ma60, trend"]]],
+          ["校验", [["最新交易日", "必须完整"], ["空值策略", "blocked"], ["时区", "Asia/Shanghai"]]]
+        ]
+      },
+      market_intraday: {
+        title: "指数 15m 强弱",
+        groups: [
+          ["数据契约", [["subject.dataview", "index.quote"], ["证券代码", "000001.SH"], ["粒度", "15m"], ["截止时间", "${as_of_time}"]]],
+          ["字段", [["行情", "close, high, low"], ["成交", "volume, amount"], ["派生", "vwap, pullback_pct"]]],
+          ["校验", [["最大延迟", "60 seconds"], ["未来数据", "forbidden"], ["缺失策略", "decision=不可买"]]]
+        ]
+      },
+      stock_signal: {
+        title: "个股 15m 信号",
+        groups: [
+          ["数据契约", [["subject.dataview", "stock.quote"], ["证券代码", "${stock_code}"], ["粒度", "15m"], ["窗口", "5 trading days"]]],
+          ["信号", [["追强", "breakout + volume"], ["回调", "support rebound"], ["无效", "score < 60"]]],
+          ["输出", [["buy_type", "enum"], ["signal_score", "0..100"], ["structure_low", "number"]]]
+        ]
+      },
+      decision: {
+        title: "决策组合",
+        groups: [
+          ["执行类型", [["runtime", "deterministic Python"], ["side effect", "none"], ["LLM at runtime", "false"]]],
+          ["规则", [["市场禁止", "always 不可买"], ["数据过期", "always 不可买"], ["信号通过", "score >= 60"]]],
+          ["输出", [["decision", "可买 / 不可买"], ["stop_loss", "structure low"], ["rule_details", "evidence dict"]]]
+        ]
+      }
+    };
+
+    function renderInspector(key) {
+      const data = inspectorData[key];
+      $("#inspectorTitle").textContent = data.title;
+      $("#inspectorContent").innerHTML = data.groups.map(([title, rows]) => `
+        <section class="property-group">
+          <h4>${title}</h4>
+          ${rows.map(([name, value]) => `<div class="property-row"><span class="property-key">${name}</span><span class="property-value mono">${value}</span></div>`).join("")}
+        </section>
+      `).join("");
+    }
+
+    $$("[data-node]").forEach((button) => {
+      button.addEventListener("click", () => {
+        $$("[data-node]").forEach((item) => item.classList.toggle("active", item === button));
+        renderInspector(button.dataset.node);
+      });
+    });
+    renderInspector("market_daily");
+
+    $("[data-run-data]").addEventListener("click", (event) => {
+      const state = $("#dataRunState");
+      const button = event.currentTarget;
+      button.disabled = true;
+      state.textContent = "executing";
+      state.className = "tag blue";
+      window.setTimeout(() => {
+        state.textContent = "4 nodes passed";
+        state.className = "tag green";
+        button.disabled = false;
+        showToast("数据流试运行通过，所有字段与时间边界有效");
+      }, 1100);
+    });
+
+    function updateApproval() {
+      const rows = $$(".check-row");
+      const count = rows.filter((row) => row.classList.contains("checked")).length;
+      const pending = rows.length - count;
+      $("#checkCount").textContent = String(count);
+      $("#pendingTag").textContent = pending ? `${pending} pending` : "ready";
+      $("#pendingTag").className = pending ? "tag amber" : "tag green";
+      $("#approveDesign").disabled = count !== rows.length;
+    }
+    $$(".check-row").forEach((row) => row.addEventListener("click", () => {
+      row.classList.toggle("checked");
+      updateApproval();
+    }));
+    $("#approveDesign").addEventListener("click", () => showToast("设计审核已通过，coding run 已创建"));
+
+    function activateFocusTab(name) {
+      $$("[data-focus-tab]").forEach((tab) => tab.classList.toggle("active", tab.dataset.focusTab === name));
+      $$("[data-focus-artifact]").forEach((artifact) => artifact.classList.toggle("active", artifact.dataset.focusArtifact === name));
+    }
+    $$("[data-focus-tab]").forEach((tab) => tab.addEventListener("click", () => activateFocusTab(tab.dataset.focusTab)));
+    $$("[data-focus-stage]").forEach((button) => button.addEventListener("click", () => {
+      const stage = button.dataset.focusStage;
+      $$("[data-focus-stage]").forEach((item) => item.classList.toggle("active", item === button));
+      const mapped = { understand: "design", design: "design", code: "code", test: "test", publish: "output" }[stage];
+      activateFocusTab(mapped);
+    }));
+
+    $("[data-run-focus]").addEventListener("click", (event) => {
+      const button = event.currentTarget;
+      button.disabled = true;
+      $("#focusRunProgress").classList.add("visible");
+      $("#focusTestTag").textContent = "running 1/3";
+      $("#focusPassCount").textContent = "0 / 3";
+      $("#focusLatency").textContent = "0.0s";
+      let step = 0;
+      const timer = window.setInterval(() => {
+        step += 1;
+        $("#focusTestTag").textContent = `running ${Math.min(step, 3)}/3`;
+        $("#focusPassCount").textContent = `${Math.min(step, 3)} / 3`;
+        $("#focusLatency").textContent = `${(step * .6).toFixed(1)}s`;
+        if (step >= 3) {
+          window.clearInterval(timer);
+          $("#focusRunProgress").classList.remove("visible");
+          $("#focusTestTag").textContent = "3 passed";
+          $("#focusTestTag").className = "tag green";
+          button.disabled = false;
+          showToast("测试完成：3 passed，可以进入发布阶段");
+        }
+      }, 550);
+    });
+
+    const initialView = window.location.hash.replace("#", "");
+    const initialButton = $(`[data-view-target="${initialView}"]`);
+    if (initialButton) initialButton.click();
+    refreshIcons();
+  </script>
+</body>
+</html>
