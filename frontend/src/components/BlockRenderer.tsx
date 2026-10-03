@@ -15,6 +15,7 @@ import MetricStrip from "./renderers/MetricStrip";
 import RenderMeta from "./renderers/RenderMeta";
 import InteractionRenderer from "./renderers/InteractionRenderer";
 import ToolIdentityArtifact, { type ToolIdentitySelection } from "./renderers/ToolIdentityArtifact";
+import UserTaskArtifact from "./renderers/UserTaskArtifact";
 import JsonBlock from "./JsonBlock";
 
 const ChartBlock = lazy(() => import("./ChartBlock"));
@@ -211,7 +212,9 @@ export default function BlockRenderer(props: Props) {
   else if (renderer === "diagram.flow" || renderer === "diagram.hierarchy") content = <FlowRenderer object={object} />;
   else if (renderer === "workflow.steps") content = block.block_type === "status" ? <div className="status-line"><Clock3 size={15} />{block.content || String(data.summary || "处理中")}</div> : <Workflow data={data} />;
   else if (renderer === "artifact.spec") {
-    if (artifactType === "finance.tool_spec") {
+    if (artifactType === "user_task") {
+      content = <UserTaskArtifact data={data} />;
+    } else if (artifactType === "finance.tool_spec") {
       content = <DesignArtifact data={record(data.content || data)} content={block.content || String(data.change_summary || "")} />;
     } else if (artifactType === "finance.custom_tool_implementation") {
       content = <ToolIdentityArtifact data={data} onUseAsset={props.onUseAsset} />;
@@ -261,7 +264,7 @@ export default function BlockRenderer(props: Props) {
   }
 
   const stage = String(block.stage || record(block.data).stage || record(block.meta).stage || "");
-  const hideSurfaceTitle = ["finance.custom_tool_implementation", "finance.custom_tool_edit"].includes(artifactType);
+  const hideSurfaceTitle = ["finance.custom_tool_implementation", "finance.custom_tool_edit", "user_task"].includes(artifactType);
   return (
     <section className={`surface-block block-${object.kind} renderer-${renderer.replaceAll(".", "-")}${block.semantic === "finance.answer" ? " finance-answer" : ""}${stage ? ` stage-${stage}` : ""}`} data-block-id={block.block_id} data-renderer={renderer} tabIndex={-1}>
       {block.title && !hideSurfaceTitle && block.semantic !== "finance.answer" && <div className="surface-title">{block.title}</div>}

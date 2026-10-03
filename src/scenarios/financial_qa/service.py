@@ -596,6 +596,7 @@ class FinancialQaCcService:
             result_refs,
             thread_id=thread_id,
         )
+        surface_blocks.extend(FinancialQaPresentationService.task_receipt_blocks(record.get("tool_calls")))
         answer_block = next((block for block in surface_blocks if block.get("semantic") == "finance.answer"), {})
         report = (answer_block.get("payload") or {}).get("report")
         message = summary = answer_block.get("content", message)

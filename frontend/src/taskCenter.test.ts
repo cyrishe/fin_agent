@@ -10,9 +10,16 @@ describe("task center view model", () => {
     expect(taskKind(task)).toBe("immediate");
     expect(taskSchedule(task)).toBe("立即执行一次");
     expect(taskKind({ ...task, trigger: { at: "2026-10-04T01:00:00Z" } })).toBe("once");
-    expect(taskSchedule({ ...task, trigger: { cron: "0 9 * * 1-5", timezone: "Asia/Shanghai" } })).toContain("周期执行 · 0 9 * * 1-5 · Asia/Shanghai");
+    expect(taskSchedule({ ...task, trigger: { cron: "0 9 * * 1-5", timezone: "Asia/Shanghai" } })).toContain("周一至周五 09:00 · 北京时间");
     expect(matchesTask(task, "银行", "immediate")).toBe(true);
     expect(matchesTask(task, "银行", "recurring")).toBe(false);
+  });
+
+  it("describes common recurring schedules without exposing cron on the card", () => {
+    expect(taskSchedule({ ...task, trigger: { cron: "30 8 * * *" } })).toBe("每天 08:30 · 北京时间");
+    expect(taskSchedule({ ...task, trigger: { cron: "0 9 * * 1" } })).toBe("每周一 09:00 · 北京时间");
+    expect(taskSchedule({ ...task, trigger: { cron: "0 9 15 * *" } })).toBe("每月 15 日 09:00 · 北京时间");
+    expect(taskSchedule({ ...task, trigger: { cron: "*/10 * * * *", timezone: "UTC" } })).toBe("按自定义周期执行 · UTC");
   });
 
   it("encodes task/run links and restores their selection", () => {

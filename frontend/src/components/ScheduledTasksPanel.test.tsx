@@ -26,11 +26,13 @@ describe("ScheduledTasksPanel", () => {
     const html = renderToStaticMarkup(<ScheduledTasksPanel />);
 
     expect(html).toContain('aria-label="任务中心"');
-    expect(html).toContain("把复杂工作交给后台任务");
+    expect(html).toContain("想交给我什么任务？");
     expect(html).toContain("<textarea");
-    expect(html).toContain("生成执行方案");
+    expect(html).toContain("整理成任务");
     expect(html).toContain("我的任务");
-    expect(html).toContain("正在加载");
+    expect(html).not.toContain("schedule-grid");
+    expect(html).not.toContain("<select");
+    expect(html).toContain("正在读取任务");
   });
 
   it("sends natural language to preview without persisting", async () => {

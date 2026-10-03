@@ -26,6 +26,7 @@
 ```
 
 # 规则
+- requirement_brief 首句简洁说明任务目的和预期交付，后续自然语言保留时间、范围、预算等明确约束，便于任务卡片先展示目的、再展开完整要求。
 - 默认时区是 Asia/Shanghai。立即执行或没有指定时间时 trigger 为 {}；预约一次用 {"at":"ISO 日期时间", "timezone":"Asia/Shanghai"}；周期执行用 cron/timezone。不要为立即任务编造 cron。
 - 用户给出最长运行时限时，换算为秒写入 budget.max_runtime_seconds；未给出时使用 3600。该约束由运行器执行，不得仅保留在 requirement_brief。实验数等业务约束交给对应业务工具。
 - stock_automl_research 接收完整 requirement_brief，保留所有明确约束；自然语言任务不替领域规划器生成 spec。只有用户明确给出了结构化研究配置时才传 spec。

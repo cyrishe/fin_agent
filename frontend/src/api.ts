@@ -675,6 +675,20 @@ export async function loadUserTasks(signal?: AbortSignal): Promise<UserTask[]> {
   return Array.isArray(payload.tasks) ? payload.tasks : [];
 }
 
+export async function loadRecentUserTaskRuns(signal?: AbortSignal): Promise<UserTaskRun[]> {
+  const payload = await readJson<{ runs?: UserTaskRun[] }>(await fetch(appPath("/api/task-runs?limit=50"), {
+    credentials: "include", signal,
+  }));
+  return Array.isArray(payload.runs) ? payload.runs : [];
+}
+
+export async function loadUserTask(taskId: string, signal?: AbortSignal): Promise<UserTask> {
+  const payload = await readJson<{ task: UserTask }>(await fetch(appPath(`/api/task-definitions/${encodeURIComponent(taskId)}`), {
+    credentials: "include", signal,
+  }));
+  return payload.task;
+}
+
 export async function updateUserTask(taskId: string, input: { enabled: boolean }): Promise<UserTask> {
   const payload = await readJson<{ task: UserTask }>(await fetch(appPath(`/api/task-definitions/${encodeURIComponent(taskId)}`), {
     method: "PATCH", credentials: "include", headers: { "Content-Type": "application/json" },

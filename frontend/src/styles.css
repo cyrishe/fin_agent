@@ -1603,6 +1603,56 @@ body {
 .task-center .schedule-detail-title > div:first-child { flex: 1 1 250px; }
 .task-center .schedule-preview-actions { position: sticky; bottom: 0; margin: 12px -14px -14px; padding: 10px 14px; border-top: 1px solid #d8e9ed; border-radius: 0 0 11px 11px; background: #f4fbfc; z-index: 1; }
 
+/* One natural-language entry and the same task card in chat and task management. */
+.task-center-simple > * { max-width: 860px; margin-left: auto; margin-right: auto; }
+.task-center-simple .schedule-section-heading h2 { font-size: 19px; font-weight: 600; }
+.task-center-simple .schedule-instruction { font-size: 12px; font-weight: 500; }
+.task-center-simple .schedule-instruction textarea { min-height: 92px; font-size: 14px; }
+.task-center-simple .schedule-create-actions { justify-content: space-between; flex-wrap: wrap; }
+.task-center-simple .task-examples { margin-top: 0; }
+.task-center-simple .schedule-primary, .user-task-card .schedule-primary, .user-task-card .schedule-quiet { min-height: 36px; font-size: 12px; }
+.task-preview-card { margin-top: 18px; }
+.task-preview-card .user-task-card { background: #f4fbfc; border-color: #b7dce5; box-shadow: none; }
+.task-list-heading { display: flex; align-items: center; justify-content: space-between; margin-top: 28px; margin-bottom: 12px; }
+.task-list-heading h2 { margin: 0; color: #304c61; font-size: 15px; font-weight: 600; }
+.task-find { margin-bottom: 12px; }
+.task-find > summary { width: fit-content; color: #607c8d; font-size: 12px; cursor: pointer; }
+.task-find .task-list-tools { padding: 10px 0 0; }
+.task-card-list { display: grid; gap: 14px; }
+.task-card-list > div { min-width: 0; scroll-margin-top: 18px; }
+.user-task-card { padding: 20px; border: 1px solid #d9e5ec; border-radius: 13px; background: #fff; color: #355065; overflow-wrap: anywhere; }
+.user-task-card-header { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+.user-task-kind { color: #688291; font-size: 12px; }
+.user-task-card .schedule-run-status { font-size: 11px; padding: 4px 9px; }
+.user-task-purpose { margin-top: 11px; }
+.user-task-purpose h3 { margin: 0; color: #203d51; font-size: 15px; font-weight: 600; line-height: 1.65; }
+.user-task-card .task-requirement-full p { font-size: 13px; }
+.user-task-schedule { margin: 8px 0 0; color: #718794; font-size: 12px; line-height: 1.7; }
+.user-task-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 15px; }
+.user-task-actions a { text-decoration: none; }
+.user-task-content { min-width: 0; }
+.user-task-content:empty { display: none; }
+.user-task-card .task-run-detail { padding: 0; margin-top: 16px; }
+.user-task-card .task-result-summary { margin-top: 0; }
+.user-task-card .task-run-detail .markdown-content { font-size: 13px; }
+.user-task-card .task-progress { border: 0; border-left: 2px solid #4cb7cc; border-radius: 0; background: #f4fafc; padding: 9px 12px; }
+.task-run-heading + .task-progress { margin-top: 12px; }
+.task-artifacts > ul { margin-top: 10px; }
+.task-small-note, .task-receipt-observed { color: #738997; font-size: 12px; line-height: 1.7; overflow-wrap: anywhere; }
+.task-small-note { margin: 12px 0 0; }
+.task-receipt { max-width: 760px; }
+.task-receipt-observed { margin: 0 0 8px; }
+.task-receipt .user-task-content > p { font-size: 13px; line-height: 1.7; }
+.task-management-details .task-small-note { font-size: 11px; }
+.task-history-select { display: grid; gap: 6px; margin: 12px 0; color: #627c8e; font-size: 12px; }
+.task-history-select select { min-width: 0; width: 100%; padding: 8px; border: 1px solid #d9e5ec; border-radius: 7px; color: #355065; background: #fff; }
+@media (max-width: 600px) {
+  .user-task-card { padding: 15px; }
+  .task-center-simple .schedule-section-heading h2 { font-size: 17px; }
+  .task-center-simple .schedule-instruction textarea { font-size: 16px; }
+  .task-center-simple .schedule-primary, .user-task-card .schedule-primary, .user-task-card .schedule-quiet { min-height: 40px; }
+}
+
 @container (max-width: 800px) {
   .task-center .schedule-grid { grid-template-columns: 1fr; }
   .task-center .schedule-task-list { max-height: 270px; overflow-y: auto; }

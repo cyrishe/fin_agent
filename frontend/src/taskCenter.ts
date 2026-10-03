@@ -28,7 +28,21 @@ export function taskKind(task: UserTaskDraft): "immediate" | "once" | "recurring
 }
 
 export function taskSchedule(task: UserTaskDraft): string {
-  if (task.trigger?.cron) return `周期执行 · ${task.trigger.cron} · ${task.trigger.timezone || "Asia/Shanghai"}`;
+  if (task.trigger?.cron) {
+    const [minute, hour, day, month, week, extra] = task.trigger.cron.trim().split(/\s+/);
+    const zone = task.trigger.timezone || "Asia/Shanghai";
+    const zoneLabel = zone === "Asia/Shanghai" ? "北京时间" : zone;
+    const clock = /^\d+$/.test(minute || "") && /^\d+$/.test(hour || "")
+      ? `${hour.padStart(2, "0")}:${minute.padStart(2, "0")}` : "";
+    let description = "按自定义周期执行";
+    if (clock && !extra && month === "*") {
+      if (day === "*" && week === "*") description = `每天 ${clock}`;
+      else if (day === "*" && week === "1-5") description = `周一至周五 ${clock}`;
+      else if (day === "*" && /^[0-7]$/.test(week)) description = `每周${["日", "一", "二", "三", "四", "五", "六", "日"][Number(week)]} ${clock}`;
+      else if (/^\d+$/.test(day) && week === "*") description = `每月 ${day} 日 ${clock}`;
+    }
+    return `${description} · ${zoneLabel}`;
+  }
   if (task.trigger?.at) return `预约一次 · ${formatTaskTime(task.trigger.at)}`;
   return "立即执行一次";
 }

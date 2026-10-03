@@ -119,6 +119,27 @@ class FinancialQaPresentationService:
         answer["payload"]["report"] = report
         return [answer, *evidence_blocks]
 
+    @staticmethod
+    def task_receipt_blocks(tool_calls: Sequence[Mapping[str, Any]] | None) -> list[dict[str, Any]]:
+        """Project saved tool receipts through the existing artifact Surface."""
+        receipts: dict[str, dict[str, Any]] = {}
+        for call in tool_calls or []:
+            if not isinstance(call, Mapping) or call.get("error"):
+                continue
+            receipt = call.get("task_receipt")
+            if not isinstance(receipt, Mapping):
+                continue
+            task = receipt.get("task")
+            task_id = _trim(task.get("task_id")) if isinstance(task, Mapping) else ""
+            if not task_id:
+                continue
+            receipts[task_id] = {
+                "block_id": f"user_task_{task_id}", "block_type": "artifact", "kind": "artifact",
+                "semantic": "user_task", "title": "任务", "mode": "replace",
+                "payload": {"artifact_type": "user_task", **deepcopy(dict(receipt))},
+            }
+        return list(receipts.values())
+
     def _merge_compatible_metric_blocks(
         self,
         blocks: Sequence[Mapping[str, Any]],

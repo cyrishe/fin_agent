@@ -4,7 +4,7 @@ from types import SimpleNamespace
 
 import pytest
 
-from src.services.user_task_agent_tools import build_user_task_agent_tools
+from src.services.user_task_agent_tools import build_user_task_agent_tools, _receipt_snapshot
 from src.tools import user_task_tools as tasks
 
 
@@ -72,11 +72,47 @@ def test_conversation_tools_recheck_live_owner_and_preserve_receipt(monkeypatch)
     response = asyncio.run(tools["task_submit"].handler({"instruction": "后台生成报告"}))
     result = json.loads(response["content"][0]["text"])
     assert result["ok"] and result["task_id"] == "task_1"
+    receipt = runtime.tracker["calls"][0]["task_receipt"]
+    assert receipt["task"]["requirement_brief"] == "后台生成报告"
+    assert receipt["task"]["trigger"] == {}
+    assert receipt["run_id"] == "run_1" and receipt["run"] is None
+    assert receipt["recorded_at"]
     runtime.owner_ids = ["bob"]
     rejected = asyncio.run(tools["task_submit"].handler({"instruction": "后台生成报告"}))
     assert json.loads(rejected["content"][0]["text"])["ok"] is False
+    assert "task_receipt" not in runtime.tracker["calls"][-1]
     assert len(service.calls) == 1
     assert build_user_task_agent_tools(runtime) == []
+
+
+def test_task_receipt_preserves_observed_run_without_copying_large_results():
+    payload = {"ok": True, "task": {"task_id": "task_1", "requirement_brief": "研究", "trigger": {"cron": "0 9 * * 1-5"}},
+               "runs": [{"run_id": "old", "status": "completed", "created_at": "2026-09-01"},
+                        {"run_id": "latest", "status": "running", "created_at": "2026-10-03", "progress": {"message": "训练第三个模型"}, "result": {"large": "body"}}]}
+    receipt = _receipt_snapshot("task_get", payload)
+    assert receipt["run"]["run_id"] == "latest"
+    assert receipt["run"]["progress"]["message"] == "训练第三个模型"
+    assert "result" not in receipt["run"]
+    assert _receipt_snapshot("task_submit", {"ok": False, "error": "无法安排"}) is None
+    assert _receipt_snapshot("task_list", {"ok": True, "tasks": []}) is None
+
+
+@pytest.mark.parametrize("runtime", ["cc", "dsh"])
+def test_chat_task_receipt_reaches_saved_surface_for_both_runtimes(runtime):
+    from src.scenarios.financial_qa.service import FinancialQaCcService
+    receipt = _receipt_snapshot("task_submit", {"ok": True, "task_id": "task_1", "run_id": "run_1",
+                                               "requirement_brief": "后台研究未来七日上涨概率", "trigger": {}})
+    session = SimpleNamespace(run_turn=lambda **kwargs: {
+        "result": "已提交后台研究。", "result_refs": [],
+        "tool_calls": [{"tool": "task_submit", "task_receipt": receipt}],
+    })
+    service = FinancialQaCcService(enabled=True, session_service=session, dsh_session_service=session)
+    result = service.answer(thread_id=1, turn_id=2, owner_id="alice", user_text="请后台研究",
+                            dispatch_plan={"selected_agent": "investment_analyst", "turn_mode": "normal_qa", "entry": "agent_route"}, runtime=runtime)
+    cards = [block for block in result["surface_blocks"] if block.get("semantic") == "user_task"]
+    assert len(cards) == 1
+    assert cards[0]["payload"]["task"]["requirement_brief"] == "后台研究未来七日上涨概率"
+    assert cards[0]["payload"]["run_id"] == "run_1"
 
 
 def test_registry_never_accepts_client_runtime_owner():

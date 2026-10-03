@@ -2,10 +2,40 @@
 from __future__ import annotations
 
 import asyncio
+import datetime as dt
 import json
 from pathlib import Path
 
 from src.tools import user_task_tools
+
+
+def _receipt_snapshot(operation, payload):
+    """Keep the observed display facts, separate from authoritative task state."""
+    if not payload.get("ok") or operation == "task_list":
+        return None
+    task = payload.get("task") or {}
+    run = payload.get("run") or {}
+    if not run:
+        runs = payload.get("runs") or []
+        run = max(runs, key=lambda item: str(item.get("created_at") or ""), default={})
+    task_id = task.get("task_id") or task.get("schedule_id") or payload.get("task_id") or run.get("task_id") or run.get("schedule_id")
+    if not task_id:
+        return None
+    observed_task = {key: task[key] for key in ("requirement_brief", "trigger", "enabled", "next_run_at") if key in task}
+    observed_task["task_id"] = task_id
+    for key in ("requirement_brief", "trigger"):
+        if key not in observed_task and key in payload:
+            observed_task[key] = payload[key]
+    if not observed_task.get("requirement_brief") and run.get("requirement_brief"):
+        observed_task["requirement_brief"] = run["requirement_brief"]
+    # No result bodies, model files or internal execution metadata in chat cards.
+    observed_run = {key: run[key] for key in (
+        "run_id", "task_id", "schedule_id", "status", "summary", "progress",
+        "error_text", "cancel_requested_at", "scheduled_for", "created_at",
+    ) if key in run}
+    return {"operation": operation, "recorded_at": dt.datetime.now(dt.timezone.utc).isoformat(),
+            "task": observed_task, "run": observed_run or None,
+            "run_id": payload.get("run_id") or run.get("run_id")}
 
 
 def build_user_task_agent_tools(runtime):
@@ -37,6 +67,9 @@ def build_user_task_agent_tools(runtime):
                     "turn_id": runtime.tool_context.get("_task_turn_id") or "",
                 })
                 call.update({key: payload[key] for key in ("task_id", "run_id", "task_url") if key in payload})
+                receipt = _receipt_snapshot(_name, payload)
+                if receipt:
+                    call["task_receipt"] = receipt
             except (ValueError, LookupError, PermissionError) as exc:
                 payload = {"ok": False, "error": str(exc)}
                 call["error"] = str(exc)

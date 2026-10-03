@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { cancelUserTaskRun, createUserTask, loadUserTaskRun, loadUserTaskRuns, loadUserTasks, previewUserTask, runUserTask, updateUserTask } from "./api";
+import { cancelUserTaskRun, createUserTask, loadUserTaskRun, loadUserTaskRuns, loadUserTasks, loadUserTask, loadRecentUserTaskRuns, previewUserTask, runUserTask, updateUserTask } from "./api";
 import type { UserTaskDraft } from "./types";
 
 const draft: UserTaskDraft = { requirement_brief: "研究未来三天上涨概率", trigger: {}, budget: { max_runtime_seconds: 3600 }, execution_plan: { steps: [] } };
@@ -46,6 +46,17 @@ describe("user task API", () => {
     await expect(loadUserTaskRuns("task_1")).resolves.toEqual([{ run_id: "run_1" }]);
     await expect(loadUserTaskRun("run_1")).resolves.toEqual({ run_id: "run_1", status: "running" });
     expect(mock.mock.calls.map(call => call[0])).toEqual(["/api/task-definitions", "/api/task-definitions/task_1/runs?limit=50", "/api/task-runs/run_1"]);
+  });
+
+  it("reads current card facts through existing authenticated endpoints", async () => {
+    const mock = vi.fn().mockResolvedValueOnce(response({ ok: true, task: { ...draft, task_id: "task/1" } })).mockResolvedValueOnce(response({ ok: true, runs: [] }));
+    vi.stubGlobal("fetch", mock);
+    const controller = new AbortController();
+    await loadUserTask("task/1", controller.signal);
+    await loadRecentUserTaskRuns(controller.signal);
+    expect(mock.mock.calls[0][0]).toBe("/api/task-definitions/task%2F1");
+    expect(mock.mock.calls[1][0]).toBe("/api/task-runs?limit=50");
+    for (const [, options] of mock.mock.calls) expect(options).toEqual(expect.objectContaining({ credentials: "include", signal: controller.signal }));
   });
 
   it("surfaces owner/access and compilation errors instead of an empty result", async () => {

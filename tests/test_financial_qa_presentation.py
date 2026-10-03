@@ -5,6 +5,31 @@ import pytest
 from src.scenarios.financial_qa.presentation import FinancialQaPresentationService
 
 
+def test_task_receipts_are_saved_artifacts_and_latest_observation_wins():
+    receipt = {"operation": "task_submit", "recorded_at": "2026-10-03T09:00:00Z",
+               "task": {"task_id": "task_1", "requirement_brief": "研究未来七日上涨概率", "trigger": {}}, "run": None}
+    queried = {**receipt, "operation": "task_get", "run": {"run_id": "run_1", "status": "running"}}
+    blocks = FinancialQaPresentationService.task_receipt_blocks([
+        {"tool": "task_submit", "task_receipt": receipt},
+        {"tool": "task_get", "task_receipt": queried},
+    ])
+    assert len(blocks) == 1
+    assert blocks[0]["kind"] == "artifact"
+    assert blocks[0]["payload"]["artifact_type"] == "user_task"
+    assert blocks[0]["payload"]["run"]["status"] == "running"
+    blocks[0]["payload"]["task"]["requirement_brief"] = "changed presentation"
+    assert queried["task"]["requirement_brief"] == "研究未来七日上涨概率"
+
+
+def test_failed_and_legacy_tool_calls_do_not_invent_task_receipts():
+    assert FinancialQaPresentationService.task_receipt_blocks([
+        {"tool": "task_submit", "task_id": "legacy", "task_url": "?view=tasks&task=legacy"},
+        {"tool": "task_submit", "error": "没有权限", "task_receipt": {"task": {"task_id": "rejected"}}},
+        {"tool": "finance_query"},
+    ]) == []
+    assert FinancialQaPresentationService.task_receipt_blocks(None) == []
+
+
 def _schema(*columns: tuple[str, str]) -> dict:
     return {
         "columns": [
