@@ -1,0 +1,46 @@
+{
+  "name": "task_list",
+  "version": "v1",
+  "status": "active",
+  "availability": {
+    "lifecycle": "active",
+    "retrieval_mode": "retrievable"
+  },
+  "identity": {
+    "display_name": "查找我的任务",
+    "description": "列出当前用户的后台任务，查找任务后用 task_get 查看具体进度和结果。",
+    "domain": "user_tasks",
+    "owner": "tools"
+  },
+  "schemas": {
+    "input": {
+      "type": "object",
+      "properties": {},
+      "required": [],
+      "additionalProperties": false
+    },
+    "output": {
+      "type": "object"
+    }
+  },
+  "profiles": {
+    "real": {
+      "enabled": true,
+      "implementation": {
+        "kind": "python_callable",
+        "target": "src.tools.user_task_tools:run_list"
+      }
+    }
+  },
+  "safety": {
+    "network": false,
+    "persistence": false,
+    "side_effect": "read"
+  },
+  "runtime_hints": {
+    "cost_class": "low",
+    "latency_class": "short",
+    "supports_async_submit": false
+  },
+  "auth": "internal"
+}

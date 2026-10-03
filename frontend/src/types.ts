@@ -226,3 +226,49 @@ export interface ScheduledTaskRun {
   finished_at?: string | null;
   created_at?: string | null;
 }
+
+/** Durable user tasks. Business-specific research fields stay inside step inputs/results. */
+export interface UserTaskDraft {
+  requirement_brief: string;
+  trigger?: { cron?: string; at?: string; timezone?: string } | null;
+  execution_plan: { steps: ScheduledTaskStep[] };
+  budget?: { max_runtime_seconds?: number };
+  next_run_at?: string | null;
+}
+
+export interface UserTask extends UserTaskDraft {
+  task_id: string;
+  schedule_id?: string;
+  enabled: boolean;
+  revision_no: number;
+  initial_run_id?: string;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface UserTaskArtifact {
+  artifact_id: string;
+  name: string;
+  url: string;
+  mime_type?: string;
+  size_bytes?: number;
+}
+
+export interface UserTaskRun {
+  run_id: string;
+  task_id: string;
+  schedule_id?: string;
+  schedule_revision_no?: number;
+  requirement_brief?: string;
+  status: string;
+  summary?: string;
+  progress?: UnknownRecord | null;
+  result?: UnknownRecord | null;
+  artifacts?: UserTaskArtifact[];
+  error_text?: string | null;
+  scheduled_for?: string | null;
+  started_at?: string | null;
+  finished_at?: string | null;
+  created_at?: string | null;
+  cancel_requested_at?: string | null;
+}

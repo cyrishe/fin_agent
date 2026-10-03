@@ -3,9 +3,9 @@ import numpy as np
 import pandas as pd
 
 
-def synthetic_market(seed=42, companies=8, sessions=260):
+def synthetic_market(seed=42, companies=8, sessions=260, start="2023-01-02"):
     rng = np.random.default_rng(seed)
-    dates = pd.bdate_range("2023-01-02", periods=sessions)
+    dates = pd.bdate_range(start, periods=sessions)
     rows, values = [], []
     market = rng.normal(.0003, .008, sessions)
     for i in range(companies):

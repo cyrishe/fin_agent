@@ -512,6 +512,11 @@ class FinancialQaCcService:
             explicit_skill_ids=explicit_skill_ids,
         )
         runtime_context["_finance_data_only"] = bool(data_only)
+        actor = (application_context or {}).get("_task_actor") or {}
+        if isinstance(actor, Mapping) and _trim(actor.get("user_id")) == _trim(owner_id) and not data_only:
+            runtime_context["_task_actor"] = dict(actor)
+            runtime_context["_task_conversation_id"] = str(thread_id)
+            runtime_context["_task_turn_id"] = str(turn_id)
         runtime_context["_finance_execution_mode"] = normalized_execution_mode
         runtime_context["_finance_isolated_request"] = bool(isolated_request)
         # Reuse the existing semantic decision. A missing/legacy provenance is

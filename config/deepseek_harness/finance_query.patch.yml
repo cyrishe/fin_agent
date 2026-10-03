@@ -39,6 +39,9 @@
           LLM_VISION_MODEL: !!js process.env.LLM_VISION_MODEL
           LLM_FLASH_MODEL: !!js process.env.LLM_FLASH_MODEL
           LLM_REASONING_MODEL: !!js process.env.LLM_REASONING_MODEL
+          TASK_SQLITE_PATH: !!js process.env.TASK_SQLITE_PATH
+          TASK_ARTIFACT_ROOT: !!js process.env.TASK_ARTIFACT_ROOT
+          SYSTEM_DB_URL: !!js process.env.SYSTEM_DB_URL
         toolCallTimeoutMs: 180000
         failOnStartupError: true
         reconnect:

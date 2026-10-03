@@ -11,7 +11,7 @@ const RendererGallery = lazy(() => import("./RendererGallery"));
 const SkillStudio = lazy(() => import("./SkillStudio"));
 
 const pathname = stripAppBase(window.location.pathname);
-const Root = pathname === "/"
+const Root = pathname === "/" && new URLSearchParams(window.location.search).get("view") !== "tasks"
   ? LandingPage
   : pathname === "/login" || pathname === "/register" || pathname === "/reset-password"
     ? AuthPage

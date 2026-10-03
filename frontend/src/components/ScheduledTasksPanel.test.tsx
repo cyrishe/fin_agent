@@ -25,11 +25,11 @@ describe("ScheduledTasksPanel", () => {
   it("renders the preview-confirm workflow and task management regions", () => {
     const html = renderToStaticMarkup(<ScheduledTasksPanel />);
 
-    expect(html).toContain('aria-label="定时任务"');
-    expect(html).toContain("用自然语言创建任务");
+    expect(html).toContain('aria-label="任务中心"');
+    expect(html).toContain("把复杂工作交给后台任务");
     expect(html).toContain("<textarea");
-    expect(html).toContain("生成预览");
-    expect(html).toContain("我的定时任务");
+    expect(html).toContain("生成执行方案");
+    expect(html).toContain("我的任务");
     expect(html).toContain("正在加载");
   });
 

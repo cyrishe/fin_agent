@@ -13,7 +13,7 @@ from src.services.scheduled_task_protocol import (
 from src.services.skill_studio_service import SkillStudioService
 from src.services.tool_studio_service import ToolStudioService
 from src.tools.registry import is_tool_definition_disabled
-from src.utils.ai_service import chat_qwen_flash_json
+from src.utils.ai_service import chat_deepseek_flash_json
 
 
 class ScheduledTaskCompileError(ValueError):
@@ -34,7 +34,7 @@ class ScheduledTaskCompiler:
         tool_studio: ToolStudioService | None = None,
         skill_studio: SkillStudioService | None = None,
     ) -> None:
-        self.llm_chat = llm_chat or chat_qwen_flash_json
+        self.llm_chat = llm_chat or chat_deepseek_flash_json
         self.asset_service = asset_service or AssetInvocationService()
         self.tool_studio = tool_studio or ToolStudioService()
         self.skill_studio = skill_studio or SkillStudioService()
@@ -62,7 +62,7 @@ class ScheduledTaskCompiler:
                 {
                     "now_utc": ensure_utc(now).isoformat(),
                     "instruction": normalized_instruction,
-                    "available_assets": self._asset_catalog(),
+                    "available_assets": self._asset_catalog(owner_user_id=owner_user_id),
                 },
             )
             try:
@@ -70,7 +70,7 @@ class ScheduledTaskCompiler:
             except Exception as exc:
                 raise ScheduledTaskCompileError(
                     "schedule_compile_failed",
-                    f"定时任务理解失败：{exc}",
+                    "任务理解暂时失败，请检查模型服务配置或稍后重试",
                 ) from exc
             if not isinstance(raw, Mapping):
                 raise ScheduledTaskCompileError(
@@ -128,7 +128,7 @@ class ScheduledTaskCompiler:
             target = dict(step.get("target_ref") or {})
             kind = str(target.get("kind") or step.get("type") or "")
             name = str(target.get("name") or "")
-            if kind == "tool" and is_tool_definition_disabled(name):
+            if kind == "tool" and (name in {"task_submit", "task_get", "task_list", "task_cancel"} or is_tool_definition_disabled(name)):
                 raise ScheduledTaskCompileError(
                     "asset_not_available",
                     f"Tool 不可用于新定时任务：{name}",
@@ -148,11 +148,17 @@ class ScheduledTaskCompiler:
             )
         return contracts
 
-    def _asset_catalog(self) -> list[Dict[str, Any]]:
+    def _asset_catalog(self, *, owner_user_id: str = "") -> list[Dict[str, Any]]:
         assets: list[Dict[str, Any]] = []
         for item in self.tool_studio.list_tools():
-            if is_tool_definition_disabled(str(item.get("tool_name") or "")):
+            name = str(item.get("tool_name") or "")
+            if name in {"task_submit", "task_get", "task_list", "task_cancel"} or is_tool_definition_disabled(name):
                 continue
+            if owner_user_id:
+                try:
+                    self.asset_service.load_contract(kind="tool", name=name, owner_ids=[owner_user_id], allow_inactive=False)
+                except AssetInvocationError:
+                    continue
             assets.append(
                 {
                     "kind": "tool",
@@ -164,6 +170,11 @@ class ScheduledTaskCompiler:
         for item in self.skill_studio.list_skills():
             if not self._is_skill_schedulable(item):
                 continue
+            if owner_user_id:
+                try:
+                    self.asset_service.load_contract(kind="skill", name=str(item.get("skill_name") or ""), owner_ids=[owner_user_id], allow_inactive=False)
+                except AssetInvocationError:
+                    continue
             assets.append(
                 {
                     "kind": "skill",
@@ -242,7 +253,7 @@ class ScheduledTaskCompiler:
     ) -> Dict[str, Any]:
         steps = list((draft.get("execution_plan") or {}).get("steps") or [])
         return {
-            "title": "定时任务预览",
+            "title": "任务预览",
             "requirement_brief": draft.get("requirement_brief"),
             "schedule": {
                 **dict(draft.get("trigger") or {}),

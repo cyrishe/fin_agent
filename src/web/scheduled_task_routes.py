@@ -4,13 +4,14 @@ import os
 from typing import Any, Callable, Mapping
 from urllib.parse import urlsplit
 
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, jsonify, request, send_file
 
 from src.services.scheduled_task_compiler import ScheduledTaskCompileError
 from src.services.scheduled_task_service import (
     ScheduledTaskNotFoundError,
     ScheduledTaskService,
 )
+from src.services.scheduled_task_store import TaskIdempotencyConflict
 from src.services.user_session_service import UserSessionStorageError
 
 
@@ -121,6 +122,7 @@ def create_scheduled_task_blueprint(
         return owner
 
     @blueprint.post("/api/schedules/preview")
+    @blueprint.post("/api/task-definitions/preview")
     def preview_schedule():
         payload = _json_payload()
         return _respond(
@@ -135,6 +137,7 @@ def create_scheduled_task_blueprint(
         )
 
     @blueprint.post("/api/schedules")
+    @blueprint.post("/api/task-definitions")
     def create_schedule():
         payload = _json_payload()
         key = str(
@@ -150,7 +153,7 @@ def create_scheduled_task_blueprint(
         return _respond(
             lambda: {
                 "ok": True,
-                "schedule": service.create(
+                ("task" if request.path.startswith("/api/task-definitions") else "schedule"): service.create(
                     owner_user_id=owner_user_id(),
                     instruction=_instruction(payload),
                     draft=payload.get("draft") if isinstance(payload.get("draft"), Mapping) else None,
@@ -161,20 +164,22 @@ def create_scheduled_task_blueprint(
         )
 
     @blueprint.get("/api/schedules")
+    @blueprint.get("/api/task-definitions")
     def list_schedules():
         return _respond(
             lambda: {
                 "ok": True,
-                "schedules": service.list(owner_user_id=owner_user_id()),
+                ("tasks" if request.path.startswith("/api/task-definitions") else "schedules"): service.list(owner_user_id=owner_user_id()),
             }
         )
 
     @blueprint.get("/api/schedules/<schedule_id>")
+    @blueprint.get("/api/task-definitions/<schedule_id>")
     def get_schedule(schedule_id: str):
         return _respond(
             lambda: {
                 "ok": True,
-                "schedule": service.get(
+                ("task" if request.path.startswith("/api/task-definitions") else "schedule"): service.get(
                     owner_user_id=owner_user_id(),
                     schedule_id=schedule_id,
                 ),
@@ -182,13 +187,14 @@ def create_scheduled_task_blueprint(
         )
 
     @blueprint.patch("/api/schedules/<schedule_id>")
+    @blueprint.patch("/api/task-definitions/<schedule_id>")
     def update_schedule(schedule_id: str):
         payload = _json_payload()
         enabled = payload.get("enabled") if isinstance(payload.get("enabled"), bool) else None
         return _respond(
             lambda: {
                 "ok": True,
-                "schedule": service.update(
+                ("task" if request.path.startswith("/api/task-definitions") else "schedule"): service.update(
                     owner_user_id=owner_user_id(),
                     schedule_id=schedule_id,
                     instruction=_instruction(payload),
@@ -199,6 +205,7 @@ def create_scheduled_task_blueprint(
         )
 
     @blueprint.post("/api/schedules/<schedule_id>/run")
+    @blueprint.post("/api/task-definitions/<schedule_id>/run")
     def run_schedule(schedule_id: str):
         _json_payload(allow_empty=True)
         return _respond(
@@ -207,12 +214,14 @@ def create_scheduled_task_blueprint(
                 "run": service.run_now(
                     owner_user_id=owner_user_id(),
                     schedule_id=schedule_id,
+                    idempotency_key=str(request.headers.get("Idempotency-Key") or "")[:128],
                 ),
             },
             success_status=202,
         )
 
     @blueprint.get("/api/schedules/<schedule_id>/runs")
+    @blueprint.get("/api/task-definitions/<schedule_id>/runs")
     def list_schedule_runs(schedule_id: str):
         raw_limit = str(request.args.get("limit") or "50").strip()
         limit = int(raw_limit) if raw_limit.isdigit() else 50
@@ -228,6 +237,7 @@ def create_scheduled_task_blueprint(
         )
 
     @blueprint.get("/api/schedule-runs/<run_id>")
+    @blueprint.get("/api/task-runs/<run_id>")
     def get_schedule_run(run_id: str):
         return _respond(
             lambda: {
@@ -238,6 +248,26 @@ def create_scheduled_task_blueprint(
                 ),
             }
         )
+
+    @blueprint.get("/api/task-runs")
+    def list_task_runs():
+        limit = request.args.get("limit", 50, type=int)
+        return _respond(lambda: {"ok": True, "runs": service.list_all_runs(owner_user_id=owner_user_id(), limit=limit)})
+
+    @blueprint.post("/api/task-runs/<run_id>/cancel")
+    def cancel_task_run(run_id):
+        _json_payload(allow_empty=True)
+        return _respond(lambda: {"ok": True, "run": service.cancel_run(owner_user_id=owner_user_id(), run_id=run_id)})
+
+    @blueprint.get("/api/task-runs/<run_id>/artifacts/<artifact_id>")
+    def download_task_artifact(run_id, artifact_id):
+        try:
+            artifact = service.artifact(owner_user_id=owner_user_id(), run_id=run_id, artifact_id=artifact_id)
+            response = send_file(artifact["path"], mimetype=artifact["mime_type"], as_attachment=True, download_name=artifact["name"])
+            response.headers["X-Content-Type-Options"] = "nosniff"
+            return response
+        except ScheduledTaskNotFoundError as exc:
+            return jsonify({"ok": False, "error": str(exc), "code": "artifact_not_found"}), 404
 
     return blueprint
 
@@ -251,6 +281,8 @@ def _respond(action: Callable[[], dict], *, success_status: int = 200):
         return jsonify({"ok": False, "error": str(exc), "code": "schedule_not_found"}), 404
     except ScheduledTaskCompileError as exc:
         return jsonify({"ok": False, "error": exc.message, "code": exc.code}), 400
+    except TaskIdempotencyConflict as exc:
+        return jsonify({"ok": False, "error": str(exc), "code": "idempotency_conflict"}), 409
     except ValueError as exc:
         return jsonify({"ok": False, "error": str(exc), "code": "invalid_request"}), 400
     except UserSessionStorageError:

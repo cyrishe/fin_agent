@@ -36,7 +36,10 @@ def is_dashscope_endpoint(base_url: str) -> bool:
 
 def _resolved_llm_key_source(base_url: str) -> str:
     if is_dashscope_endpoint(base_url):
-        return "DASHSCOPE_API_KEY" if os.getenv("DASHSCOPE_API_KEY") else "LLM_API_KEY"
+        for name in ("DASHSCOPE_API_KEY", "LLM_API_KEY", "LLM_KEY"):
+            if os.getenv(name):
+                return name
+        return ""
     for name in ("LLM_API_KEY", "LLM_KEY", "DEEPSEEK_API_KEY"):
         if os.getenv(name):
             return name

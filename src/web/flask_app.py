@@ -1714,6 +1714,7 @@ def _run_custom_tool_stream_payload(payload: dict, *, emit) -> None:
 
     try:
         app_ctx = application_runtime_service.get_application_context(application_name)
+        app_ctx = {**app_ctx, "_task_actor": {key: guest_identity.get(key) for key in ("user_id", "user_type")}}
         initial_thread_title = str(app_ctx.get("display_name") or application_name)
         requested_thread_id = (
             int(thread_id_payload)
@@ -2154,6 +2155,7 @@ def _run_asset_invocation_stream_payload(payload: dict, *, emit) -> None:
             require_all=True,
         )
         app_ctx = application_runtime_service.get_application_context(application_name)
+        app_ctx = {**app_ctx, "_task_actor": {key: guest_identity.get(key) for key in ("user_id", "user_type")}}
         requested_thread_id = (
             int(payload.get("thread_id"))
             if str(payload.get("thread_id") or "").strip().isdigit()
@@ -4366,6 +4368,7 @@ def api_chat_dispatch():
             return jsonify({"ok": False, "error": "text、attachments 和 selected_asset 不能同时为空"}), 400
         application_name = str(payload.get("application_name") or "investment_workbench").strip() or "investment_workbench"
         app_ctx = application_runtime_service.get_application_context(application_name)
+        app_ctx = {**app_ctx, "_task_actor": {key: guest_identity.get(key) for key in ("user_id", "user_type")}}
         initial_thread_title = str(app_ctx.get("display_name") or application_name)
         requested_thread_id = (
             int(payload.get("thread_id"))

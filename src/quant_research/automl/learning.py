@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 import numpy as np
 from sklearn.compose import ColumnTransformer
 from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor, HistGradientBoostingClassifier, HistGradientBoostingRegressor
@@ -18,6 +18,7 @@ class FittedModel:
     calibrator: object
     columns: list
     task: str
+    training_counts: dict = field(default_factory=dict)
 
     def predict(self, frame):
         if self.task == "regression":
@@ -32,9 +33,11 @@ def raw_score(model, x):
     return np.log(p / (1 - p))
 
 
-def fit_model(train, candidate, columns, spec):
+def training_partition(train, candidate, spec):
+    """One authoritative split for fitting and auditable sample counts."""
     task, name = candidate["task"], candidate["model"]
     train = train.sort_values(["date", "symbol"])
+    input_rows = len(train)
     calibration = None
     if task == "classification":
         dates = sorted(train.date.unique())
@@ -43,9 +46,20 @@ def fit_model(train, candidate, columns, spec):
         cutoff = dates[int(len(dates) * .75)]
         calibration = train[train.date >= cutoff]
         train = train[(train.date < cutoff) & (train.label_end < cutoff)]
+    before_cap = len(train)
     budget = min(spec.max_train_rows, 4000 if name == "svm" else spec.max_train_rows)
     if len(train) > budget:
         train = train.sample(n=budget, random_state=spec.seed).sort_values(["date", "symbol"])
+    counts = {"input_rows": input_rows, "fit_rows": len(train),
+              "calibration_rows": len(calibration) if calibration is not None else 0,
+              "purged_rows": input_rows - before_cap - (len(calibration) if calibration is not None else 0),
+              "budget_sampled_out_rows": before_cap - len(train)}
+    return train, calibration, counts
+
+
+def fit_model(train, candidate, columns, spec):
+    task, name = candidate["task"], candidate["model"]
+    train, calibration, counts = training_partition(train, candidate, spec)
     if len(train) < 40:
         raise ValueError("insufficient training rows after purging/sample selection")
     y = (train.forward_return > spec.target_return).astype(int) if task == "classification" else train.forward_return
@@ -83,7 +97,7 @@ def fit_model(train, candidate, columns, spec):
         calibrator = LogisticRegression(C=1.0, max_iter=500, random_state=spec.seed)
         calibrator.fit(raw_score(pipeline, calibration[columns]).reshape(-1, 1),
                        (calibration.forward_return > spec.target_return).astype(int))
-    return FittedModel(pipeline, calibrator, columns, task)
+    return FittedModel(pipeline, calibrator, columns, task, counts)
 
 
 def temporal_folds(frame, n_folds):

@@ -82,6 +82,9 @@ class ToolPlanRuntimeService:
             thread_id=thread_id,
             turn_id=turn_id,
         )
+        task_actor = app_ctx.get("_task_actor") if isinstance(app_ctx.get("_task_actor"), dict) else {}
+        runtime_trace["owner_user_id"] = self._trim(task_actor.get("user_id"))
+        runtime_trace["user_type"] = self._trim(task_actor.get("user_type"))
         if callable(event_sink):
             # The sink exists only for the active HTTP stream. Keep it on the
             # in-memory trace while the work is running, then remove it before
@@ -750,6 +753,9 @@ class ToolPlanRuntimeService:
                 )
 
             tool_args["_runtime"] = {
+                "owner_user_id": runtime_trace.get("owner_user_id"),
+                "user_type": runtime_trace.get("user_type"),
+                "conversation_id": runtime_trace.get("thread_id"),
                 "thread_id": runtime_trace.get("thread_id"),
                 "task_id": runtime_trace.get("task_id"),
                 "turn_id": runtime_trace.get("turn_id"),

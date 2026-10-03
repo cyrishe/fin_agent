@@ -618,8 +618,8 @@ class FinanceDeepSeekHarnessSessionService:
         # model route. Runtime-specific settings below only tune Harness
         # execution; they must not introduce a second credential or endpoint.
         self.model = _trim(os.environ.get("LLM_DEFAULT_MODEL"))
-        self.base_url = _trim(os.environ.get("LLM_BASE_URL"))
-        self.api_key = _trim(os.environ.get("LLM_API_KEY"))
+        self.base_url = _trim(os.environ.get("LLM_BASE_URL") or os.environ.get("LLM_ENDPOINT"))
+        self.api_key = _trim(os.environ.get("LLM_API_KEY") or os.environ.get("LLM_KEY"))
         self.reasoning_effort = _reasoning_effort(
             os.environ.get("FINANCE_DSH_REASONING_EFFORT")
         )
@@ -737,6 +737,9 @@ class FinanceDeepSeekHarnessSessionService:
             "LLM_VISION_MODEL": _trim(os.environ.get("LLM_VISION_MODEL")),
             "LLM_FLASH_MODEL": _trim(os.environ.get("LLM_FLASH_MODEL")) or self.model,
             "LLM_REASONING_MODEL": _trim(os.environ.get("LLM_REASONING_MODEL")) or self.model,
+            "TASK_SQLITE_PATH": os.environ.get("TASK_SQLITE_PATH", ""),
+            "TASK_ARTIFACT_ROOT": os.environ.get("TASK_ARTIFACT_ROOT", ""),
+            "SYSTEM_DB_URL": os.environ.get("SYSTEM_DB_URL", ""),
         }
         source_root = _trim(os.environ.get("FINANCE_DSH_SOURCE_ROOT"))
         if source_root:
@@ -976,6 +979,9 @@ class FinanceDeepSeekHarnessSessionService:
             "_finance_detail_default_limit": detail_default_limit,
         }
         for context_key in (
+            "_task_actor",
+            "_task_conversation_id",
+            "_task_turn_id",
             "allowed_agent_tools",
             "skill_tool_access",
             "allowed_finance_skills",

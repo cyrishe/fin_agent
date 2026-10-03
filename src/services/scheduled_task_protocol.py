@@ -158,11 +158,36 @@ def normalize_schedule_draft(
     ).strip()
     if not requirement_brief:
         raise ScheduledTaskProtocolError("missing_instruction", "缺少定时任务说明")
-    trigger = payload.get("trigger") if isinstance(payload.get("trigger"), Mapping) else {}
+    if payload.get("trigger") is not None and not isinstance(payload.get("trigger"), Mapping):
+        raise ScheduledTaskProtocolError("invalid_trigger", "trigger 必须是对象")
+    trigger = payload.get("trigger") or {}
     timezone = str(trigger.get("timezone") or payload.get("timezone") or "Asia/Shanghai").strip()
     cron = str(trigger.get("cron") or payload.get("cron") or "").strip()
     parse_timezone(timezone)
-    cron_expression = CronExpression(cron)
+    at = trigger.get("at")
+    if cron and at:
+        raise ScheduledTaskProtocolError("invalid_trigger", "trigger 只能指定 cron 或 at")
+    cron_expression = CronExpression(cron) if cron else None
+    run_at = None
+    if at:
+        try:
+            run_at = dt.datetime.fromisoformat(str(at).replace("Z", "+00:00"))
+            if run_at.tzinfo is None:
+                run_at = run_at.replace(tzinfo=parse_timezone(timezone))
+            run_at = ensure_utc(run_at)
+        except (TypeError, ValueError) as exc:
+            raise ScheduledTaskProtocolError("invalid_trigger", "at 必须是 ISO 日期时间") from exc
+    if set(trigger) - {"cron", "at", "timezone"}:
+        raise ScheduledTaskProtocolError("invalid_trigger", "trigger 支持 cron、at、timezone")
+    budget = payload.get("budget") or {}
+    if not isinstance(budget, Mapping):
+        raise ScheduledTaskProtocolError("invalid_budget", "budget 必须是对象")
+    try:
+        max_runtime = int(budget.get("max_runtime_seconds", 3600))
+    except (TypeError, ValueError) as exc:
+        raise ScheduledTaskProtocolError("invalid_budget", "运行时限必须为整数秒") from exc
+    if max_runtime < 1 or max_runtime > 7 * 86400:
+        raise ScheduledTaskProtocolError("invalid_budget", "运行时限必须在 1 秒到 7 天之间")
     execution_plan = normalize_execution_plan(
         payload.get("execution_plan")
         if isinstance(payload.get("execution_plan"), Mapping)
@@ -172,12 +197,12 @@ def normalize_schedule_draft(
     return {
         "schema_version": "scheduled_task.v1",
         "requirement_brief": requirement_brief,
-        "trigger": {
-            "cron": cron_expression.expression,
-            "timezone": timezone,
-        },
+        "trigger": ({"cron": cron_expression.expression, "timezone": timezone} if cron_expression
+                    else {"at": run_at.isoformat(), "timezone": timezone} if run_at else {}),
+        "budget": {"max_runtime_seconds": max_runtime},
+        "source_ref": str(payload.get("source_ref") or "")[:512],
         "execution_plan": execution_plan,
-        "next_run_at": cron_expression.next_after(current, timezone=timezone),
+        "next_run_at": cron_expression.next_after(current, timezone=timezone) if cron_expression else (run_at or current),
     }
 
 

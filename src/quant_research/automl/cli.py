@@ -13,7 +13,10 @@ def main():
     parser.add_argument("--inventory", action="store_true", help="read schema catalog and save locally, no training")
     parser.add_argument("--start", default="2024-01-01")
     parser.add_argument("--end", default="2025-12-31")
-    parser.add_argument("--objective", help="natural-language research guidance; interpreted when --llm is enabled")
+    parser.add_argument("--objective", help="candidate exploration guidance; executable constraints come from --config or --requirement")
+    parser.add_argument("--requirement", help="compile complete natural-language constraints through the configured LLM")
+    parser.add_argument("--resume", type=Path, help="resume a frozen run directory without reloading market data")
+    parser.add_argument("--review-only", type=Path, help="retry the LLM assessment of saved evidence without retraining")
     parser.add_argument("--max-trials", type=int)
     parser.add_argument("--max-symbols", type=int)
     parser.add_argument("--seed", type=int)
@@ -27,9 +30,17 @@ def main():
     load_dotenv(ROOT / ".env", override=False)
     from src.quant_research.automl.config import ResearchSpec
     from src.quant_research.automl.data import inventory, kingdom_connection, load_kingdom
-    from src.quant_research.automl.runner import run_research, write_json
+    from src.quant_research.automl.runner import run_research, review_research, write_json
     from src.quant_research.automl.advisor import ResearchAdvisor
     import pandas as pd
+    if args.review_only:
+        print(json.dumps(review_research(args.review_only, ResearchAdvisor()), ensure_ascii=False))
+        return
+    if args.resume:
+        spec = ResearchSpec.from_dict(json.loads((args.resume / "spec.json").read_text()))
+        _, report = run_research(spec, resume_dir=args.resume, advisor=ResearchAdvisor() if args.llm else None)
+        print(json.dumps({"run_id": report["run_id"], "successful_trials": report["successful_trials"]}, ensure_ascii=False))
+        return
     if args.inventory:
         with kingdom_connection(args.db_env) as conn:
             catalog = inventory(conn)
@@ -37,7 +48,15 @@ def main():
         write_json(args.output / "catalog.json", catalog)
         print(f"{len(catalog)} tables: {args.output / 'catalog.json'}")
         return
-    value = json.loads(args.config.read_text()) if args.config else {"start": args.start, "end": args.end}
+    if args.requirement and args.config:
+        parser.error("choose --requirement or --config, not both")
+    if args.requirement:
+        from src.quant_research.automl.planning import compile_research
+        plan = compile_research(args.requirement)
+        value = plan["spec"]
+        print(plan["design"])
+    else:
+        value = json.loads(args.config.read_text()) if args.config else {"start": args.start, "end": args.end}
     for key in ("objective", "max_trials", "max_symbols", "seed"):
         if getattr(args, key) is not None:
             value[key] = getattr(args, key)

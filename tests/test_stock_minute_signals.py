@@ -228,7 +228,9 @@ def test_real_runtime_tracking_keeps_trusted_schedule_scope_out_of_arguments(mon
         'snapshots':[dict(code=CODE,trade_date=str(DAY),input_fingerprint='a',data_as_of=None,as_of='2026-09-28T10:00:00+08:00')],
         'external_requests':0})
     monkeypatch.setattr(tool,'record_monitor_result',lambda result,**kwargs:record_monitor_result(result,root=tmp_path,**kwargs))
-    executor=ScheduledTaskExecutor(authorizer=lambda *_:None)
+    # Exercise the real registry with in-process fixtures; spawn supervision has
+    # separate process tests and deliberately cannot inherit these monkeypatches.
+    executor=ScheduledTaskExecutor(authorizer=lambda *_:None,tool_runner=registry.run_tool)
     run=dict(run_id='run1',schedule_id='schedule1',owner_user_id='owner1',execution_plan={'steps':[
         dict(step_id='signal',type='tool',target_ref={'name':'stock_minute_signals'},
              inputs={'codes':[CODE],'_runtime':{'owner_user_id':'forged'}},depends_on=[])]})

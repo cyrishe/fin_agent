@@ -1,10 +1,12 @@
 from __future__ import annotations
 
 import datetime as dt
+import hashlib
+import json
 from typing import Any, Dict, Mapping
 
 from src.services.scheduled_task_compiler import ScheduledTaskCompiler
-from src.services.scheduled_task_store import MySqlScheduledTaskStore, ScheduledTaskStore
+from src.services.scheduled_task_store import ScheduledTaskStore, default_task_store, TaskIdempotencyConflict
 
 
 class ScheduledTaskNotFoundError(LookupError):
@@ -18,7 +20,7 @@ class ScheduledTaskService:
         store: ScheduledTaskStore | None = None,
         compiler: ScheduledTaskCompiler | None = None,
     ) -> None:
-        self.store = store or MySqlScheduledTaskStore()
+        self.store = store or default_task_store()
         self.compiler = compiler or ScheduledTaskCompiler()
 
     def preview(
@@ -46,15 +48,28 @@ class ScheduledTaskService:
         instruction: str,
         draft: Mapping[str, Any] | None = None,
         idempotency_key: str = "",
+        source_conversation: str = "",
         now: dt.datetime | None = None,
     ) -> Dict[str, Any]:
         owner = self._owner(owner_user_id)
+        # Hash the submitted request, not nondeterministic LLM output or derived next_run_at.
+        request_fingerprint = hashlib.sha256(json.dumps({"instruction": instruction, "draft": draft,
+            "source_conversation": source_conversation}, sort_keys=True, ensure_ascii=False, default=str).encode()).hexdigest()
+        if idempotency_key:
+            old, fingerprint = self.store.find_idempotent(owner_user_id=owner, idempotency_key=idempotency_key)
+            if old:
+                if fingerprint != request_fingerprint:
+                    raise TaskIdempotencyConflict("此幂等键已用于不同的任务要求")
+                return _public(old)
         compiled = self.compiler.compile(
             instruction=instruction,
             owner_user_id=owner,
             draft=draft,
             now=now,
         )
+        compiled["request_fingerprint"] = request_fingerprint
+        if source_conversation:
+            compiled["source_ref"] = source_conversation
         created = self.store.create(
             owner_user_id=owner,
             draft=compiled,
@@ -120,15 +135,17 @@ class ScheduledTaskService:
         owner_user_id: str,
         schedule_id: str,
         now: dt.datetime | None = None,
+        idempotency_key: str = "",
     ) -> Dict[str, Any]:
         run = self.store.enqueue_manual(
             owner_user_id=self._owner(owner_user_id),
             schedule_id=self._schedule_id(schedule_id),
             now=now,
+            idempotency_key=idempotency_key,
         )
         if not run:
             raise ScheduledTaskNotFoundError("定时任务不存在")
-        return _public(run)
+        return self._public_run(run)
 
     def list_runs(
         self,
@@ -144,13 +161,8 @@ class ScheduledTaskService:
             owner_user_id=owner,
         ):
             raise ScheduledTaskNotFoundError("定时任务不存在")
-        return _public(
-            self.store.list_runs_for_owner(
-                schedule_id=normalized_id,
-                owner_user_id=owner,
-                limit=limit,
-            )
-        )
+        return [self._public_run(run) for run in self.store.list_runs_for_owner(
+            schedule_id=normalized_id, owner_user_id=owner, limit=limit)]
 
     def get_run(self, *, owner_user_id: str, run_id: str) -> Dict[str, Any]:
         run = self.store.get_run_for_owner(
@@ -159,7 +171,32 @@ class ScheduledTaskService:
         )
         if not run:
             raise ScheduledTaskNotFoundError("定时任务运行不存在")
-        return _public(run)
+        return self._public_run(run)
+
+    def cancel_run(self, *, owner_user_id: str, run_id: str) -> Dict[str, Any]:
+        run = self.store.cancel(owner_user_id=self._owner(owner_user_id), run_id=run_id)
+        if not run:
+            raise ScheduledTaskNotFoundError("任务运行不存在")
+        return self._public_run(run)
+
+    def list_all_runs(self, *, owner_user_id: str, limit: int = 50):
+        return [self._public_run(r) for r in self.store.list_runs_for_owner(
+            owner_user_id=self._owner(owner_user_id), limit=limit)]
+
+    def artifact(self, *, owner_user_id: str, run_id: str, artifact_id: str):
+        from src.services.task_artifacts import run_artifacts
+        run = self.store.get_run_for_owner(owner_user_id=self._owner(owner_user_id), run_id=run_id)
+        if not run:
+            raise ScheduledTaskNotFoundError("任务运行不存在")
+        for item in run_artifacts(run, include_path=True):
+            if item["artifact_id"] == artifact_id:
+                return item
+        raise ScheduledTaskNotFoundError("任务产物不存在")
+
+    @staticmethod
+    def _public_run(run):
+        from src.services.task_artifacts import public_run
+        return _public(public_run(run))
 
     @staticmethod
     def _owner(value: str) -> str:

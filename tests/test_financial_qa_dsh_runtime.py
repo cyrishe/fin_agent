@@ -209,6 +209,9 @@ def test_dsh_uses_canonical_llm_model_route(
         "https://dashscope.aliyuncs.com/compatible-mode/v1",
     )
     monkeypatch.setenv("LLM_DEFAULT_MODEL", "server-model")
+    monkeypatch.setenv("TASK_SQLITE_PATH", str(tmp_path / "tasks.sqlite3"))
+    monkeypatch.setenv("TASK_ARTIFACT_ROOT", str(tmp_path / "artifacts"))
+    monkeypatch.setenv("SYSTEM_DB_URL", "")
     service = FinanceDeepSeekHarnessSessionService(
         enabled=False,
         root_dir=tmp_path / "runtime",
@@ -228,8 +231,11 @@ def test_dsh_uses_canonical_llm_model_route(
     assert captured[0]["env"]["LLM_API_KEY"] == "server-key"
     assert captured[0]["env"]["LLM_BASE_URL"] == captured[0]["base_url"]
     assert captured[0]["env"]["LLM_DEFAULT_MODEL"] == "server-model"
+    assert captured[0]["env"]["TASK_SQLITE_PATH"] == str(tmp_path / "tasks.sqlite3")
+    assert captured[0]["env"]["SYSTEM_DB_URL"] == ""
     patch = Path("config/deepseek_harness/finance_query.patch.yml").read_text()
-    for key in ("LLM_API_KEY", "LLM_BASE_URL", "LLM_DEFAULT_MODEL", "LLM_FLASH_MODEL", "LLM_REASONING_MODEL"):
+    for key in ("LLM_API_KEY", "LLM_BASE_URL", "LLM_DEFAULT_MODEL", "LLM_FLASH_MODEL", "LLM_REASONING_MODEL",
+                "TASK_SQLITE_PATH", "TASK_ARTIFACT_ROOT", "SYSTEM_DB_URL"):
         assert f"{key}: !!js process.env.{key}" in patch
     assert "server-key" not in patch
 

@@ -55,20 +55,34 @@ def _bounded(conn, sql, args, limit=500000):
     return pd.DataFrame(rows)
 
 
+def select_symbols(conn, catalog, spec):
+    """Sample within the requested historical industry universe, before applying per-day filters."""
+    if spec.symbols:
+        symbols = sorted(set(symbol.upper() for symbol in spec.symbols))
+        if len(symbols) > spec.max_symbols:
+            raise ValueError("explicit symbols exceed max_symbols")
+        return symbols
+    sql = "SELECT b.stk_code FROM kcrp_stock_baseinfo b WHERE b.list_date<=%s AND b.delist_date>=%s"
+    args = [spec.start, spec.start]
+    if spec.industries:
+        if "kcrp_stock_industry" not in catalog:
+            raise ValueError("requested industry selection requires historical industry data")
+        marks = ",".join(["%s"] * len(spec.industries))
+        sql += (" AND EXISTS (SELECT 1 FROM kcrp_stock_industry i WHERE i.stk_code=b.stk_code"
+                " AND i.industry_type='SW2021' AND i.level=1 AND i.begin_date<=%s AND i.end_date>%s"
+                f" AND i.industry_name IN ({marks}))")
+        args += [spec.start, spec.start, *spec.industries]
+    rows = query(conn, sql + " ORDER BY b.stk_code", tuple(args))
+    pool = [row["stk_code"] for row in rows if re.fullmatch(r"(?:(?:60|68)\d{4}\.SH|(?:00|30)\d{4}\.SZ|\d{6}\.BJ)", row["stk_code"])]
+    return sorted(random.Random(spec.seed).sample(pool, min(spec.max_symbols, len(pool))))
+
+
 def load_kingdom(spec, *, env_name=None):
     """Return daily prices plus only locally derived, timestamped auxiliary facts."""
     warnings = []
     with kingdom_connection(env_name) as conn:
         catalog = inventory(conn)
-        if spec.symbols:
-            symbols = sorted(set(s.upper() for s in spec.symbols))
-            if len(symbols) > spec.max_symbols:
-                raise ValueError("explicit symbols exceed max_symbols")
-        else:
-            rows = query(conn, "SELECT stk_code FROM kcrp_stock_baseinfo WHERE list_date<=%s "
-                         "AND delist_date>=%s ORDER BY stk_code", (spec.start, spec.start))
-            pool = [r["stk_code"] for r in rows if re.fullmatch(r"(?:(?:60|68)\d{4}\.SH|(?:00|30)\d{4}\.SZ|\d{6}\.BJ)", r["stk_code"])]
-            symbols = sorted(random.Random(spec.seed).sample(pool, min(spec.max_symbols, len(pool))))
+        symbols = select_symbols(conn, catalog, spec)
         if len(symbols) < 5:
             raise ValueError("at least five companies are required for company holdout")
         marks = ",".join(["%s"] * len(symbols))
@@ -134,7 +148,7 @@ def load_kingdom(spec, *, env_name=None):
         daily["industry"] = daily.get("industry", "unknown")
     return daily, events, {"source": "kingdomai", "symbols": symbols, "tables": catalog,
                            "warnings": warnings, "price_basis": "vendor_adjusted",
-                           "universe": "listed at start, including companies subsequently delisted"}
+                           "universe": "listed at start, including companies subsequently delisted; requested industries use membership at start then per-date filtering"}
 
 
 def minute_features(frame, symbols):

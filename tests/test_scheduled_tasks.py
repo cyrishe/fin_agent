@@ -148,7 +148,8 @@ def test_compiler_uses_catalog_and_server_owner_for_authorization():
     )
     assert result["compile_source"] == "natural_language"
     assert result["next_run_at"] == dt.datetime(2026, 7, 30, 1, 0, tzinfo=UTC)
-    assert assets.calls == [("tool", "stock_realtime_quote", ("user_a",), False)]
+    assert assets.calls[-1] == ("tool", "stock_realtime_quote", ("user_a",), False)
+    assert all(call[2] == ("user_a",) and call[3] is False for call in assets.calls)
     assert "stock_realtime_quote" in seen["messages"][-1]["content"]
 
 

@@ -12,6 +12,9 @@ import type {
   ThreadListResult,
   ThreadSummary,
   UnknownRecord,
+  UserTask,
+  UserTaskDraft,
+  UserTaskRun,
 } from "./types";
 import { appPath } from "./appPath";
 
@@ -642,4 +645,69 @@ export async function loadScheduledTaskRuns(
     }),
   );
   return Array.isArray(payload.runs) ? payload.runs : [];
+}
+
+export async function previewUserTask(instruction: string, signal?: AbortSignal): Promise<UserTaskDraft> {
+  const payload = await readJson<{ preview: UserTaskDraft }>(await fetch(appPath("/api/task-definitions/preview"), {
+    method: "POST", credentials: "include", signal,
+    headers: { "Content-Type": "application/json" }, body: JSON.stringify({ instruction }),
+  }));
+  return payload.preview;
+}
+
+export async function createUserTask(input: {
+  instruction: string;
+  draft: UserTaskDraft;
+  idempotencyKey: string;
+}): Promise<UserTask> {
+  const payload = await readJson<{ task: UserTask }>(await fetch(appPath("/api/task-definitions"), {
+    method: "POST", credentials: "include",
+    headers: { "Content-Type": "application/json", "Idempotency-Key": input.idempotencyKey },
+    body: JSON.stringify({ instruction: input.instruction, draft: input.draft }),
+  }));
+  return payload.task;
+}
+
+export async function loadUserTasks(signal?: AbortSignal): Promise<UserTask[]> {
+  const payload = await readJson<{ tasks?: UserTask[] }>(await fetch(appPath("/api/task-definitions"), {
+    credentials: "include", signal,
+  }));
+  return Array.isArray(payload.tasks) ? payload.tasks : [];
+}
+
+export async function updateUserTask(taskId: string, input: { enabled: boolean }): Promise<UserTask> {
+  const payload = await readJson<{ task: UserTask }>(await fetch(appPath(`/api/task-definitions/${encodeURIComponent(taskId)}`), {
+    method: "PATCH", credentials: "include", headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(input),
+  }));
+  return payload.task;
+}
+
+export async function runUserTask(taskId: string, idempotencyKey: string): Promise<UserTaskRun> {
+  const payload = await readJson<{ run: UserTaskRun }>(await fetch(appPath(`/api/task-definitions/${encodeURIComponent(taskId)}/run`), {
+    method: "POST", credentials: "include",
+    headers: { "Content-Type": "application/json", "Idempotency-Key": idempotencyKey }, body: "{}",
+  }));
+  return payload.run;
+}
+
+export async function loadUserTaskRuns(taskId: string, signal?: AbortSignal): Promise<UserTaskRun[]> {
+  const payload = await readJson<{ runs?: UserTaskRun[] }>(await fetch(appPath(`/api/task-definitions/${encodeURIComponent(taskId)}/runs?limit=50`), {
+    credentials: "include", signal,
+  }));
+  return Array.isArray(payload.runs) ? payload.runs : [];
+}
+
+export async function loadUserTaskRun(runId: string, signal?: AbortSignal): Promise<UserTaskRun> {
+  const payload = await readJson<{ run: UserTaskRun }>(await fetch(appPath(`/api/task-runs/${encodeURIComponent(runId)}`), {
+    credentials: "include", signal,
+  }));
+  return payload.run;
+}
+
+export async function cancelUserTaskRun(runId: string): Promise<UserTaskRun> {
+  const payload = await readJson<{ run: UserTaskRun }>(await fetch(appPath(`/api/task-runs/${encodeURIComponent(runId)}/cancel`), {
+    method: "POST", credentials: "include", headers: { "Content-Type": "application/json" }, body: "{}",
+  }));
+  return payload.run;
 }

@@ -11,6 +11,11 @@ from src.tools.http_tool_runner import is_http_tool, run_http_tool
 
 
 TOOL_REGISTRY: Dict[str, str] = {
+    "task_submit": "src.tools.user_task_tools:run_submit",
+    "task_get": "src.tools.user_task_tools:run_get",
+    "task_list": "src.tools.user_task_tools:run_list",
+    "task_cancel": "src.tools.user_task_tools:run_cancel",
+    "stock_automl_research": "src.tools.stock_automl_research_tool:run",
     "equity_research_search": "src.tools.stock_reports_tool:run",
     "stock_funds": "src.tools.stock_funds_tool:run",
     "stock_realtime_funds_flow": "src.tools.stock_funds_split_tools:run_realtime_funds_flow",

@@ -15,8 +15,8 @@ def main() -> None:
     parser.add_argument("--lease-seconds", type=int, default=3600)
     args = parser.parse_args()
     logging.basicConfig(level=logging.INFO)
-    worker = ScheduledTaskWorker(lease_seconds=args.lease_seconds)
     stopping = threading.Event()
+    worker = ScheduledTaskWorker(lease_seconds=args.lease_seconds, stop_event=stopping)
 
     def stop_worker(_signum, _frame) -> None:
         stopping.set()

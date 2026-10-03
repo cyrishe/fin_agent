@@ -981,6 +981,7 @@ class FinanceClaudeSessionService:
                     str(effective_skill_root),
                     skill_revision,
                     finance_catalog_revision,
+                    str((tool_context.get("_task_actor") or {}).get("user_type") or ""),
                     *effective_skill_names,
                     *[
                         _trim(item)

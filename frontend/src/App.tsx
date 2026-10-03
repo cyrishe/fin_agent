@@ -6,7 +6,8 @@ import { appPath } from "./appPath";
 import Composer from "./components/Composer";
 import MessageItem from "./components/MessageItem";
 import RunPanel from "./components/RunPanel";
-import ScheduledTasksPanel from "./components/ScheduledTasksPanel";
+import TaskCenterPanel from "./components/TaskCenterPanel";
+import { readTaskLocation, taskLink } from "./taskCenter";
 import Sidebar from "./components/Sidebar";
 import { applyStreamEvent, blocksFromPayload, initialRun, isProcessBlock, reconcileBlockOrder, settleProcessBlocks } from "./surface";
 import { customAnswerPrompt, prepareClarificationSubmission, readFeedbackValue, removeComposerPrompt, upsertComposerPrompt } from "./interactionDraft";
@@ -91,7 +92,7 @@ export default function App() {
   const [error, setError] = useState("");
   const [leftOpen, setLeftOpen] = useState(false);
   const [rightOpen, setRightOpen] = useState(false);
-  const [scheduleOpen, setScheduleOpen] = useState(false);
+  const [scheduleOpen, setScheduleOpen] = useState(() => readTaskLocation(window.location.search).open);
   const [skillsOpen, setSkillsOpen] = useState(false);
   const [invocationAssets, setInvocationAssets] = useState<InvocationAsset[]>([]);
   const [selectedInvocationAssets, setSelectedInvocationAssets] = useState<InvocationAsset[]>([]);
@@ -163,6 +164,13 @@ export default function App() {
     })();
   }, [refreshThreads]);
   useEffect(() => { void refreshInvocationAssets(); }, [refreshInvocationAssets]);
+  useEffect(() => {
+    if (!scheduleOpen && readTaskLocation(window.location.search).open) {
+      const url = new URL(window.location.href);
+      ["view", "task", "run"].forEach(key => url.searchParams.delete(key));
+      window.history.replaceState(null, "", `${appPath("/assistant")}${url.search}${url.hash}`);
+    }
+  }, [scheduleOpen]);
   useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: busy ? "auto" : "smooth", block: "end" }); }, [messages.length, busy]);
   useEffect(() => {
     if (busy) bottomRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
@@ -474,9 +482,9 @@ export default function App() {
   }, [latestRunMessage]);
 
   return (
-    <div className="app-shell">
+    <div className={`app-shell${scheduleOpen ? " task-center-shell" : ""}`}>
       <div className={`mobile-backdrop ${leftOpen || rightOpen ? "show" : ""}`} onClick={() => { setLeftOpen(false); setRightOpen(false); }} />
-      <div className={`sidebar-slot ${leftOpen ? "mobile-open" : ""}`}><Sidebar threads={threads} activeId={scheduleOpen ? null : threadId} query={query} onQuery={setQuery} onSelect={(value) => void selectThread(value)} onNew={() => void newThread()} onOpenSchedules={() => { setScheduleOpen(true); setLeftOpen(false); }} onOpenSkills={() => { setSkillsOpen(true); setLeftOpen(false); }} onClose={() => setLeftOpen(false)} authUser={authUser} onLogout={() => void logout()} /></div>
+      <div className={`sidebar-slot ${leftOpen ? "mobile-open" : ""}`}><Sidebar threads={threads} activeId={scheduleOpen ? null : threadId} query={query} onQuery={setQuery} onSelect={(value) => void selectThread(value)} onNew={() => void newThread()} onOpenSchedules={() => { window.history.replaceState(null, "", taskLink()); setScheduleOpen(true); setLeftOpen(false); }} onOpenSkills={() => { setSkillsOpen(true); setLeftOpen(false); }} onClose={() => setLeftOpen(false)} authUser={authUser} onLogout={() => void logout()} /></div>
       {skillsOpen && <Suspense fallback={<div role="status">正在打开方法库…</div>}><SkillLibraryDialog onClose={() => setSkillsOpen(false)} onUse={skill => {
         setSelectedInvocationAsset(invocationAssets.find(asset => asset.kind === "skill" && asset.name === skill.skill_name) || {
           ref: `skill:${skill.skill_name}`, kind: "skill", name: skill.skill_name, displayName: skill.display_name,
@@ -487,10 +495,10 @@ export default function App() {
       <main className="conversation-column">
         <header className="conversation-header">
           <button className="icon-button mobile-only" onClick={() => setLeftOpen(true)} aria-label="打开会话列表"><Menu size={20} /></button>
-          <div className="conversation-title"><div className="title-icon"><Sparkles size={17} /></div><div><strong>{scheduleOpen ? "定时任务" : activeThread?.title || "Fin Agent"}</strong><span>{scheduleOpen ? "自然语言调度工作台" : threadId ? `会话 #${threadId}` : "新的金融对话"}</span></div></div>
-          <div className="header-actions"><button className="header-new" type="button" onClick={() => void newThread()}><MessageSquarePlus size={16} /><span>新对话</span></button><button className="icon-button mobile-only" onClick={() => setRightOpen(true)} aria-label="打开运行信息"><PanelRight size={20} /></button></div>
+          <div className="conversation-title"><div className="title-icon"><Sparkles size={17} /></div><div><strong>{scheduleOpen ? "任务中心" : activeThread?.title || "Fin Agent"}</strong><span>{scheduleOpen ? "后台执行 · 进度 · 结果" : threadId ? `会话 #${threadId}` : "新的金融对话"}</span></div></div>
+          <div className="header-actions"><button className="header-new" type="button" onClick={() => void newThread()}><MessageSquarePlus size={16} /><span>新对话</span></button>{!scheduleOpen && <button className="icon-button mobile-only" onClick={() => setRightOpen(true)} aria-label="打开运行信息"><PanelRight size={20} /></button>}</div>
         </header>
-        {scheduleOpen ? <ScheduledTasksPanel /> : (
+        {scheduleOpen ? <TaskCenterPanel /> : (
           <>
             <section className="message-scroll" aria-live="polite">
               <div className="message-list">{messages.map((message) => <MessageItem
@@ -536,7 +544,7 @@ export default function App() {
           </>
         )}
       </main>
-      <div className={`run-slot ${rightOpen ? "mobile-open" : ""}`}><RunPanel run={latestRun} onArtifactSelect={focusArtifact} onClose={() => setRightOpen(false)} /></div>
+      {!scheduleOpen && <div className={`run-slot ${rightOpen ? "mobile-open" : ""}`}><RunPanel run={latestRun} onArtifactSelect={focusArtifact} onClose={() => setRightOpen(false)} /></div>}
     </div>
   );
 }

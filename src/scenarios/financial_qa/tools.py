@@ -1714,6 +1714,8 @@ class FinanceDataQueryCcTools:
                 call["duration_ms"] = round((time.monotonic() - started) * 1000, 3)
 
         tools = [read_finance_catalog, finance_query, load_finance_result, resolve_security, run_backtest]
+        from src.services.user_task_agent_tools import build_user_task_agent_tools
+        tools.extend(build_user_task_agent_tools(tool_runtime))
         fallback_snapshot = (
             self.business_skill_catalog.method_snapshot()
             if self.business_skill_catalog is not None else {"revision": "", "skills": {}}
