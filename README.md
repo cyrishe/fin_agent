@@ -71,3 +71,5 @@ MCP Streamable HTTP 入口为 `/mcp`。部署和调用说明见
 公开主页、手机号唯一账户、阿里云短信持有权验证、可选实名增强与建表方式见 [docs/phone_account_auth.md](docs/phone_account_auth.md)。
 
 股票 AutoML 独立研究任务（训练、时间/公司留出、回测、LLM评审）见 [docs/stock_automl.md](docs/stock_automl.md)，可从 `python scripts/run_stock_automl.py --demo --max-trials 6` 开始。
+
+换环境继续任务系统与 AutoML 开发，先读 [开发交接：进展、验证、环境与下一步](docs/development_tasks/automl_handoff_20261003.md)。训练是一次性任务；已保存模型的日常定时推理是独立任务，当前自然语言推理适配尚待接入。

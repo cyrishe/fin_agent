@@ -40,7 +40,7 @@ python -m src.quant_research.automl --resume outputs/stock_automl/study_<id>
 python -m src.quant_research.automl --review-only outputs/stock_automl/study_<id>/direction_1/<run_id>
 ```
 
-`--review-only` 使用单方向目录，只重试 LLM 评审。旧版 `<run_id>` 单方向目录仍可恢复。`run_study` 冻结完整计划和来源，`run_research` 冻结配置、代码、样本、候选、切分和选择；已完成方向不重训，中断但已预留的候选继续占用预算。业务 `progress/checkpoint/check_cancel` 回调不依赖任务系统，阻塞拟合由外层进程监督取消。
+`--review-only` 使用单方向目录，只重试 LLM 评审。兼容旧版 `<run_id>` 单方向目录格式；恢复仍需匹配冻结配置及实现指纹，不表示可跨代码版本续训。`run_study` 冻结完整计划和来源，`run_research` 冻结配置、代码、样本、候选、切分和选择；已完成方向不重训，中断但已预留的候选继续占用预算。业务 `progress/checkpoint/check_cancel` 回调不依赖任务系统，阻塞拟合由外层进程监督取消。
 
 ```python
 from src.quant_research.automl.inference import predict_strategy
@@ -52,3 +52,5 @@ picks = scored[scored.selected]
 研究集合必须明确策略标识；兼容单方向路径及 `predict_latest`。输入需足够滚动历史，并建议提供 `daily_frame.attrs['market_calendar']`；输出 `selected` 使用保存的阈值和每日 Top K，可以全为空选。只加载可信、自己生成的本地模型。
 
 输出目录受 Git 忽略；行情、训练矩阵、逐行预测和模型保留本地，提交仅选取获准的汇总、配置和版本证据。合成测试验证程序，不证明策略收益；分批查询不代表全市场训练性能已验收。当前能力与限制、历史审计及运行证据链接均在[使用文档](../../../docs/stock_automl.md)。
+
+换环境的依赖、启动、运行资产边界和后续定时推理接入入口见[开发交接](../../../docs/development_tasks/automl_handoff_20261003.md)。
