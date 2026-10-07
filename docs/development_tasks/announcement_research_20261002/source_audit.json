@@ -1,0 +1,78 @@
+{
+  "audited_at_utc": "2026-10-02T04:34:13.068972+00:00",
+  "base_commit": "d4b354bbe8f7f623f4c67e086f64b18cb04554a1",
+  "source": "configured PostgreSQL public.news_notice; endpoint and credentials omitted",
+  "transaction_read_only": true,
+  "sample_query": "WITH s AS (SELECT id,pub_time,content,stk_code,notice_type_new,url FROM public.news_notice WHERE pub_time < %s ORDER BY pub_time DESC,id DESC,url DESC LIMIT 1000) SELECT count(*) AS sampled,min(pub_time) AS first_publication,max(pub_time) AS last_publication,count(*) FILTER(WHERE nullif(btrim(content),'') IS NULL) AS empty_content,count(*) FILTER(WHERE nullif(btrim(stk_code),'') IS NULL) AS empty_code,count(*) FILTER(WHERE notice_type_new IS NULL) AS empty_new_type,count(*) FILTER(WHERE nullif(btrim(url),'') IS NULL) AS empty_link FROM s",
+  "samples": [
+    {
+      "sampled": 1000,
+      "first_publication": "2026-09-30 15:56:09",
+      "last_publication": "2026-10-01 08:00:00",
+      "empty_content": 579,
+      "empty_code": 0,
+      "empty_new_type": 350,
+      "empty_link": 0,
+      "exclusive_cutoff": "2026-10-02"
+    },
+    {
+      "sampled": 1000,
+      "first_publication": "2026-09-25 08:00:00",
+      "last_publication": "2026-09-28 22:53:31",
+      "empty_content": 380,
+      "empty_code": 0,
+      "empty_new_type": 66,
+      "empty_link": 0,
+      "exclusive_cutoff": "2026-09-29"
+    },
+    {
+      "sampled": 1000,
+      "first_publication": "2026-08-31 08:00:00",
+      "last_publication": "2026-08-31 22:57:00",
+      "empty_content": 731,
+      "empty_code": 0,
+      "empty_new_type": 671,
+      "empty_link": 0,
+      "exclusive_cutoff": "2026-09-01"
+    },
+    {
+      "sampled": 1000,
+      "first_publication": "2026-06-30 08:00:00",
+      "last_publication": "2026-06-30 20:32:53",
+      "empty_content": 395,
+      "empty_code": 0,
+      "empty_new_type": 101,
+      "empty_link": 0,
+      "exclusive_cutoff": "2026-07-01"
+    }
+  ],
+  "source_estimated_rows": 193606,
+  "company_window": {
+    "start": "2026-07-01",
+    "end_exclusive": "2026-10-02"
+  },
+  "company_query": "SELECT stk_code,count(*) AS documents,count(*) FILTER(WHERE nullif(btrim(content),'') IS NULL) AS empty_content FROM public.news_notice WHERE pub_time>='2026-07-01' AND pub_time<'2026-10-02' AND stk_code IN ('688981','002594','600519','300750') GROUP BY stk_code ORDER BY stk_code",
+  "companies": [
+    {
+      "stk_code": "002594",
+      "documents": 36,
+      "empty_content": 31
+    },
+    {
+      "stk_code": "300750",
+      "documents": 63,
+      "empty_content": 42
+    },
+    {
+      "stk_code": "600519",
+      "documents": 7,
+      "empty_content": 1
+    },
+    {
+      "stk_code": "688981",
+      "documents": 20,
+      "empty_content": 12
+    }
+  ],
+  "scope_limit": "Bounded date-window samples and exact raw-code matches; not global extraction coverage or cross-listed issuer coverage. Source timezone and category mapping not verified."
+}

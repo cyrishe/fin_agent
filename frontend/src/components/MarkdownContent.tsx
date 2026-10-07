@@ -5,7 +5,7 @@ export default function MarkdownContent({ content, renderImages = true }: { cont
   return (
     <div className="markdown-content">
       <ReactMarkdown
-        remarkPlugins={[remarkGfm]}
+        remarkPlugins={[[remarkGfm, { singleTilde: false }]]}
         components={{
           ...(!renderImages ? { img: ({ alt }: { alt?: string }) => <span>{alt || ""}</span> } : {}),
           table: ({ children }) => <div className="markdown-table-scroll" tabIndex={0} role="region" aria-label="分析对比表"><table>{children}</table></div>,

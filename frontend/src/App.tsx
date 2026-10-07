@@ -42,7 +42,7 @@ const readPendingPrompt = (): string => {
   return String(window.sessionStorage.getItem("fin_agent.pending_prompt") || "").trim();
 };
 
-function hydrateMessages(turns: UnknownRecord[], threadId: number): ChatMessage[] {
+export function hydrateMessages(turns: UnknownRecord[], threadId: number): ChatMessage[] {
   const messages: ChatMessage[] = [];
   turns.forEach((turn, index) => {
     const startedAt = parseTimestamp(turn.started_at);
@@ -60,7 +60,7 @@ function hydrateMessages(turns: UnknownRecord[], threadId: number): ChatMessage[
       const runStatus: AgentRun["status"] = String(turn.status || "completed") === "failed" ? "error" : "done";
       const run: AgentRun = {
         status: runStatus,
-        summary: assistantText || "本轮处理完成",
+        summary: runStatus === "error" ? assistantText || "本轮处理失败" : "本轮处理完成",
         artifacts: blocks.filter((block) => !isProcessBlock(block)),
         process: settleProcessBlocks(blocks.filter(isProcessBlock), runStatus),
         startedAt: startedAt || undefined,

@@ -73,3 +73,5 @@ MCP Streamable HTTP 入口为 `/mcp`。部署和调用说明见
 股票 AutoML 独立研究任务（训练、时间/公司留出、回测、LLM评审）见 [docs/stock_automl.md](docs/stock_automl.md)，可从 `python scripts/run_stock_automl.py --demo --max-trials 6` 开始。
 
 换环境继续任务系统与 AutoML 开发，先读 [开发交接：进展、验证、环境与下一步](docs/development_tasks/automl_handoff_20261003.md)。训练是一次性任务；已保存模型的日常定时推理是独立任务，当前自然语言推理适配尚待接入。
+
+公告离线抽取、PDF/扫描页补解析与 `notice_*` 四表写入见 [公告原生 Python 流程](docs/notice_pipeline.md)；该流程独立于聊天和 MCP 服务。
