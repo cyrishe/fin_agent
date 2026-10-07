@@ -72,6 +72,8 @@ def main():
     parser.add_argument("--analysis-max-tokens", type=int, default=32768)
     parser.add_argument("--step-max-tokens", type=int, default=8192)
     parser.add_argument("--timeout", type=int, default=600)
+    parser.add_argument("--dsh-skill-task-experiment", action="store_true",
+                        help="Mount one bounded DSH skill subtask in this local evaluation only")
     args = parser.parse_args()
     os.chdir(ROOT)
     from dotenv import load_dotenv, dotenv_values
@@ -107,6 +109,35 @@ def main():
     policy["budgets"]["final"] = {"maxTokens": args.analysis_max_tokens}
     dsh = FinanceDeepSeekHarnessSessionService(enabled=True, worker_count=1,
         root_dir=out / "runtime", log_path=out / "events.jsonl", loop_policy_config=policy)
+    if args.dsh_skill_task_experiment:
+        experiment_patch = out / "finance_skill_task.patch.yml"
+        experiment_patch.write_text(
+            dsh.patch_path.read_text(encoding="utf-8")
+            + "\n- insert:\n"
+            + "    - id: fin-eval-subagent\n"
+            + "      name: '@deepseek-ai/dsh-subagent'\n"
+            + "    - id: fin-eval-subagent-spawn\n"
+            + "      name: '@deepseek-ai/dsh-subagent-spawn-in-process'\n"
+            + "      config:\n"
+            + "        providerName: spawn\n"
+            + "    - id: fin-eval-skill-task\n"
+            + "      name: '@deepseek-ai/dsh-tool-subagent'\n"
+            + "      config:\n"
+            + "        provider: spawn\n"
+            + "        toolName: finance_skill_task\n"
+            + "        backgroundMode: one-shot\n"
+            + "        maxDepth: 1\n"
+            + "        toolFilter:\n"
+            + "          allow: [mcp__finance__read_finance_skill, mcp__finance__read_finance_skill_reference, mcp__finance__load_finance_result]\n",
+            encoding="utf-8",
+        )
+        dsh.patch_path = experiment_patch
+        dsh.loop_policy_config["businessHint"] = (
+            "复杂个股研究中，如果财报质量值得独立判断，先取得核心财务结果，再用 "
+            "finance_skill_task 委托一次有界的业绩分析：description 简述局部目标，prompt 给子任务具体问题、证券与报告期、"
+            "已有 result_ref；子任务从授权目录加载所需 Skill 并读取已有结果，"
+            "只返回短判断、依据和缺口。主会话仍负责最终答案。"
+        )
     DeepSeekHarness = _load_sdk_class()
     run_harness = DeepSeekHarness.run
     router = CustomToolIntentDshRouter(enabled=True, worker_count=1,
@@ -138,6 +169,7 @@ def main():
         "source_hashes": hashes, "cases_file": str(args.cases_file),
         "cases_sha256": hashlib.sha256(args.cases_file.read_bytes()).hexdigest(), "skill_revision": service.business_skill_catalog.revision,
         "effective_policy": dsh.loop_policy_config, "timeout_seconds": args.timeout,
+        "dsh_skill_task_experiment": args.dsh_skill_task_experiment,
         "excluded": ["browser rendering", "network HTTP transport", "production identity/quota/persistence", "personal skills", "background title generation"]})
     failures = []
     conversations = {}
@@ -171,6 +203,37 @@ def main():
             endings = []
             def capture_endings(harness, *a, **kw):
                 result = run_harness(harness, *a, **kw)
+                tree = {"subagents": [], "sessions": {}, "delegation_results": []}
+                delegation_calls = set()
+                for notification in result.notifications:
+                    payload = notification.payload
+                    if notification.method == "subagent.started":
+                        tree["subagents"].append({
+                            "parent_session_id": payload.get("parentSessionId"),
+                            "child_session_id": payload.get("childSessionId"),
+                        })
+                    if notification.method != "session.event":
+                        continue
+                    event = payload.get("event") or {}
+                    data = event.get("data") or {}
+                    session = tree["sessions"].setdefault(str(payload.get("sessionId") or ""),
+                        {"model_calls": 0, "input_tokens": 0, "cache_read_tokens": 0,
+                         "output_tokens": 0, "reasoning_tokens": 0, "tool_calls": []})
+                    if event.get("type") == "tool/call":
+                        session["tool_calls"].append(data.get("name"))
+                        if data.get("name") == "finance_skill_task":
+                            delegation_calls.add(data.get("callId"))
+                    if event.get("type") == "tool/result" and data.get("callId") in delegation_calls:
+                        tree["delegation_results"].append(str(data)[:1600])
+                    if event.get("type") == "assistant/message" and isinstance(data.get("usage"), dict):
+                        usage = data["usage"]
+                        session["model_calls"] += 1
+                        for key, source in (("input_tokens", "inputTokens"),
+                                            ("cache_read_tokens", "cacheReadTokens"),
+                                            ("output_tokens", "outputTokens"),
+                                            ("reasoning_tokens", "reasoningTokens")):
+                            session[key] += int(usage.get(source) or 0)
+                save(case_out / "dsh_tree_summary.json", tree)
                 endings.append({"session_id": result.session_id, "finish_reason": result.finish_reason,
                     "events": [event for event in result.events
                         if event.get("type") in {"step/end", "turn/end"}
