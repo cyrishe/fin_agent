@@ -179,4 +179,12 @@ python -m pytest -q tests/automl tests/test_backtest_core.py
 
 2026-10-03 的[数据与选模复核](development_tasks/automl_precision_event_review_20261003.md)记录：2024—2025 日 K 有 2,614,333 条原始记录，旧三千多行拟合来自小股票池配置。该文是历史审计；其中全池、precision、多方向与策略资产等待办已在本次实现推进，分钟窗口/高开目标仍未落地。另见[可解释策略参考调研](development_tasks/automl_interpretable_strategy_references_20261003.md)及[历史小池运行证据](stock_automl_runs/20261003_smoke/README.md)。历史结果不能冒充当前实现的全市场验证。
 
+2026-10-07 的[14:45 次日高开独立探索](stock_automl_runs/20261007_next_open_1445/README.md)使用约一个月的真实分钟窗口，在独立试验脚本中核对目标和信息时点；留出的 5 个交易日里，已试线性模型没有超过同池高开基率。后续发现这版短窗口模型也使用了可能跨基准断点的复权价收益与标签，结果尚未按一致价格口径重算。该试验尚未接入本模块的 `ResearchSpec`、策略资产或日常推理任务，不能按它声称现有 AutoML 已支持 14:45 高开预测。
+
+同日的[长历史、每周限额选股试验](stock_automl_runs/20261007_next_open_weekly/README.md)在固定抽样 1,000 只股票上，用前一交易日及更早的行情、资金流、大盘、行业和估值验证“少量出手、允许空仓”的口径。验证期选出的模型在 2026 年 1—7 月留出测试上有 79 个信号、49.37% 高开，名次与命中率未稳定单调；它没有使用当天 14:45 分钟特征，不能视为可部署的高置信度策略。
+
+后续的[高开超过 2% 目标、随机基准与涨停可交易性复核](stock_automl_runs/20261007_next_open_targets/README.md)发现受限树集成的测试段虽有 24/62 次高开事件，但 62 条信号中 50 条前日涨停，24 次命中中 21 次选股日最终涨停；后续 7 次命中全部对应选股日最终涨停。剔除前日涨停后重训，测试期逻辑回归仅 11/65 次高开 `>2%`，后续期 0/19；受限树集成测试为 12/145。旧的同日同波动率 lift 未控制涨停接力，不能解读成可交易的高置信度策略。该研究仍只有 T−1 输入和固定抽样股票，没有全期 14:45 可买入证据。
+
+[因子解释和 `>1%` 目标的再审查](stock_automl_runs/20261007_next_open_targets/factors_and_high1_audit.md)发现跨日期复权价基准断点，因此新试验改用同一交易日的昨收、收盘和开盘比值。排除最近五日涨停后，逻辑回归测试期 29/145（20.0%）、后续期 6/45（13.3%），对应同日同上市板块基率为 16.1% 和 10.0%；按周重采样的超额下十分位均低于零。两段低开均超过一半，且没有实现空仓或可靠的分数排序。四个新增量价/资金组合因子没有稳定改善，去除两个冗余因子的逻辑回归后续期仅 3/42。原逻辑回归后续期只有 10/45 条信号能核对到合格的 14:45 分钟记录，仍缺可买入性证明。
+
 方法参考：[时间序列验证](https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.TimeSeriesSplit.html)、[Pipeline 与数据泄漏](https://scikit-learn.org/stable/common_pitfalls.html)、[概率校准](https://scikit-learn.org/stable/modules/calibration.html)。模块依赖边界见[模块 README](../src/quant_research/automl/README.md)。
