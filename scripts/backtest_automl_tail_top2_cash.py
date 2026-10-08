@@ -2,7 +2,7 @@
 
 The historical model scores and stock rows are local, ignored inputs. This
 script never refits a model or uses the next morning to select a stock. It
-compares three specified morning exits, including a touch-based 1% limit
+compares three specified morning exits, including a configurable touch-based limit
 scenario whose execution remains an assumption rather than a proven fill.
 """
 from __future__ import annotations
@@ -18,12 +18,15 @@ import pandas as pd
 from dotenv import dotenv_values
 
 
-STARTING_CASH = Decimal("10000")
-EXIT_MODES = ("next_open", "next_0940", "limit_1pct_then_0940")
+STARTING_CASH = Decimal("1000000")
+TARGET_PCT = Decimal("0.02")
+EXIT_MODES = ("next_open", "next_0940", "limit_then_0940")
+SENSITIVITY_PCTS = tuple(Decimal(value) for value in
+                         ("0.005", "0.01", "0.015", "0.02", "0.025", "0.03"))
 
 
-def target_price(entry: Decimal) -> Decimal:
-    return (entry * Decimal("1.01")).quantize(Decimal("0.01"), rounding=ROUND_CEILING)
+def target_price(entry: Decimal, target_pct: Decimal = TARGET_PCT) -> Decimal:
+    return (entry * (1 + target_pct)).quantize(Decimal("0.01"), rounding=ROUND_CEILING)
 
 
 def minimum_buy_shares(symbol: str) -> int:
@@ -110,20 +113,27 @@ def load_selection(workbook_path: Path, candidate_path: Path, bar_path: Path) ->
         ["signal_date", "rank_binary", "symbol6"]).reset_index(drop=True)
 
 
-def exit_price(row, mode: str) -> Decimal:
+def exit_price(row, mode: str, target_pct: Decimal = TARGET_PCT) -> Decimal:
     entry = Decimal(str(row.entry_1450))
     if mode == "next_open":
         return Decimal(str(row.next_open))
     if mode == "next_0940":
         return Decimal(str(row.next_0940))
-    if mode == "limit_1pct_then_0940":
-        target = target_price(entry)
-        return target if Decimal(str(row.next_high10)) >= target else Decimal(str(row.next_0940))
+    if mode == "limit_then_0940":
+        target = target_price(entry, target_pct)
+        if Decimal(str(row.next_high10)) >= target:
+            # An opening price above the sell limit executes at the opening
+            # price in this idealized auction model, not below it.
+            return max(target, Decimal(str(row.next_open)))
+        return Decimal(str(row.next_0940))
     raise ValueError(f"Unknown exit mode: {mode}")
 
 
 def simulate(rows: pd.DataFrame, *, mode: str, lot_constrained: bool,
-             starting_cash: Decimal = STARTING_CASH) -> tuple[dict, list[dict], list[dict]]:
+             starting_cash: Decimal = STARTING_CASH,
+             target_pct: Decimal = TARGET_PCT) -> tuple[dict, list[dict], list[dict]]:
+    if starting_cash <= 0 or target_pct <= 0:
+        raise ValueError("Starting cash and target percentage must be positive")
     equity = starting_cash
     peak = starting_cash
     max_drawdown = Decimal("0")
@@ -137,7 +147,7 @@ def simulate(rows: pd.DataFrame, *, mode: str, lot_constrained: bool,
         profit = Decimal("0")
         for row in group.itertuples(index=False):
             entry = Decimal(str(row.entry_1450))
-            sell = exit_price(row, mode)
+            sell = exit_price(row, mode, target_pct)
             if lot_constrained:
                 quantity = Decimal(buy_quantity(budget, entry, str(row.symbol6)))
             else:
@@ -152,8 +162,8 @@ def simulate(rows: pd.DataFrame, *, mode: str, lot_constrained: bool,
                 "rank_binary": int(row.rank_binary), "actual_class": int(row.actual_class),
                 "entry_1450": float(entry), "next_open": float(row.next_open),
                 "next_high10": float(row.next_high10), "next_0940": float(row.next_0940),
-                "target_1pct": float(target_price(entry)),
-                "target_touched": Decimal(str(row.next_high10)) >= target_price(entry),
+                "target_price": float(target_price(entry, target_pct)),
+                "target_touched": Decimal(str(row.next_high10)) >= target_price(entry, target_pct),
                 "sell_price": float(sell), "shares": float(quantity),
                 "buy_cost": float(buy_cost), "profit": float(quantity * (sell - entry)),
                 "executed": quantity > 0,
@@ -170,6 +180,7 @@ def simulate(rows: pd.DataFrame, *, mode: str, lot_constrained: bool,
         })
     result = {
         "exit_mode": mode, "lot_constrained": lot_constrained,
+        "target_pct": float(target_pct),
         "starting_cash": float(starting_cash), "ending_cash": float(equity),
         "total_return": float(equity / starting_cash - 1),
         "max_close_to_close_drawdown": float(max_drawdown),
@@ -193,14 +204,18 @@ def main() -> None:
     parser.add_argument("--morning-bars", type=Path, default=Path(
         "outputs/stock_automl/tail_critical_review/next_0940_bars.csv"))
     parser.add_argument("--fetch-morning-bars", action="store_true")
+    parser.add_argument("--starting-cash", type=Decimal, default=STARTING_CASH)
+    parser.add_argument("--target-pct", type=Decimal, default=TARGET_PCT)
     parser.add_argument("--env-file", type=Path, default=Path(".env"))
     parser.add_argument("--summary", type=Path, default=Path(
-        "docs/stock_automl_runs/20261008_tail_cash_backtest/summary.json"))
+        "docs/stock_automl_runs/20261008_tail_cash_backtest_1m_2pct/summary.json"))
     parser.add_argument("--daily", type=Path, default=Path(
-        "outputs/stock_automl/tail_critical_review/cash_backtest_daily.csv"))
+        "outputs/stock_automl/tail_critical_review/cash_backtest_1m_2pct_daily.csv"))
     parser.add_argument("--trades", type=Path, default=Path(
-        "outputs/stock_automl/tail_critical_review/cash_backtest_trades.csv"))
+        "outputs/stock_automl/tail_critical_review/cash_backtest_1m_2pct_trades.csv"))
     args = parser.parse_args()
+    if args.starting_cash <= 0 or args.target_pct <= 0:
+        parser.error("--starting-cash and --target-pct must be positive")
     if args.fetch_morning_bars:
         fetch_morning_bars(args.workbook_data, args.env_file, args.morning_bars)
     rows = load_selection(args.workbook_data, args.candidates, args.morning_bars)
@@ -209,7 +224,9 @@ def main() -> None:
     trade_rows = []
     for mode in EXIT_MODES:
         for lot_constrained in (False, True):
-            metrics, daily, trades = simulate(rows, mode=mode, lot_constrained=lot_constrained)
+            metrics, daily, trades = simulate(rows, mode=mode, lot_constrained=lot_constrained,
+                                              starting_cash=args.starting_cash,
+                                              target_pct=args.target_pct)
             runs.append(metrics)
             for item in daily:
                 day_rows.append({"exit_mode": mode, "lot_constrained": lot_constrained, **item})
@@ -222,17 +239,30 @@ def main() -> None:
         "backtest_exit_period": [rows.next_date.min(), rows.next_date.max()],
         "signal_days": int(rows.signal_date.nunique()),
         "ranked_stocks": len(rows),
+        "target_pct": float(args.target_pct),
         "target_touched_stocks": sum(Decimal(str(row.next_high10)) >=
-                                     target_price(Decimal(str(row.entry_1450)))
+                                     target_price(Decimal(str(row.entry_1450)), args.target_pct)
                                      for row in rows.itertuples(index=False)),
         "assumptions": [
             "Buy at the T 14:50 minute latest-price proxy; close all positions the next morning.",
             "Split available cash equally between the two daily names and roll end cash into the next signal day.",
             "Ideal equal-weight uses fractional shares. Trading-unit mode uses 100-share multiples for regular A shares, a 200-share minimum and one-share increments thereafter for 688/689, and leaves unaffordable allocations in cash.",
-            "1% target rounds upward to the next CNY 0.01. A first-ten-minute high touch is assumed filled at that target; otherwise sell at the 09:40 minute latest-price proxy.",
+            "The target percentage rounds upward to the next CNY 0.01. A first-ten-minute high touch is assumed filled at the target (or at the opening price if higher); otherwise sell at the 09:40 minute latest-price proxy.",
             "No commissions, stamp duty, slippage, queue priority, or actual fill data are included.",
         ],
         "runs": runs,
+        "same_period_target_sensitivity_not_oos_optimization": [
+            {
+                "target_pct": float(pct),
+                "target_touched_stocks": sum(
+                    Decimal(str(row.next_high10)) >=
+                    target_price(Decimal(str(row.entry_1450)), pct)
+                    for row in rows.itertuples(index=False)),
+                "ending_cash": float(simulate(rows, mode="limit_then_0940",
+                                              lot_constrained=True,
+                                              starting_cash=args.starting_cash,
+                                              target_pct=pct)[0]["ending_cash"]),
+            } for pct in SENSITIVITY_PCTS],
         "provenance": {
             "workbook_data_sha256": sha256(args.workbook_data),
             "candidates_sha256": sha256(args.candidates),
