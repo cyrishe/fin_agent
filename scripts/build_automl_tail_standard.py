@@ -262,17 +262,24 @@ TRAIN_EXPORT = ("signal_date", "next_date", "symbol6", "name", *FEATURES, *TARGE
 
 def main():
     parser = argparse.ArgumentParser()
+    parser.add_argument("--start", default=START)
+    parser.add_argument("--end", default=END)
+    parser.add_argument("--history-start", default=HISTORY_START)
     parser.add_argument("--env-file", default=".env")
     parser.add_argument("--output-dir", default="outputs/stock_automl/tail_standard")
     parser.add_argument("--summary", default="docs/stock_automl_runs/20261008_tail_standard/summary.json")
     args = parser.parse_args()
+    if not args.history_start < args.start < args.end:
+        parser.error("Expected history-start < start < end")
     config = dotenv_values(args.env_file)
     os.environ.setdefault("SIMPLE_BI_PLATFORM_DB_URL",
                           config.get("SIMPLE_BI_PLATFORM_DB_URL") or config.get("PLATFORM_DB_URL") or "")
     with read_only_db() as conn:
-        daily, value = load_daily(conn)
+        daily, value = load_daily(conn, history_start=args.history_start, end=args.end)
         profile, calendar = prior_profile(daily, value)
-        signal_days = [day for day in calendar if pd.Timestamp(START) <= day <= pd.Timestamp(END)]
+        signal_days = [day for day in calendar if pd.Timestamp(args.start) <= day <= pd.Timestamp(args.end)]
+        if len(signal_days) < 2:
+            raise ValueError("Need at least two trading days in the selected range")
         day_after = dict(zip(signal_days[:-1], signal_days[1:]))
         daily_today = daily[["date", "symbol6", "preclose", "is_limit_price"]].rename(
             columns={"date": "signal_date", "preclose": "t_reference_preclose",
@@ -312,6 +319,8 @@ def main():
                                             rows.limit_buffer.notna() &
                                             rows.signal_return.lt(rows.limit_buffer)).sum())})
             print(f"{day_text}: {audit[-1]}", flush=True)
+    if not result:
+        raise ValueError("No 14:40 candidate rows in the selected range")
     rows = pd.concat(result, ignore_index=True)[EXPORT].sort_values(["signal_date", "symbol6"])
     output = Path(args.output_dir)
     output.mkdir(parents=True, exist_ok=True)
@@ -325,6 +334,8 @@ def main():
                                         index=False, float_format="%.8f")
     summary = {"generated_at": datetime.now().isoformat(timespec="seconds"),
                "signal_period": [str(signal_days[0])[:10], str(signal_days[-2])[:10]],
+               "requested_period": [args.start, args.end],
+               "history_start": args.history_start,
                "minute_ingestion_times_used": False,
                "signal_time": "14:40", "selection_return": [0.03, 0.06],
                "candidates": len(rows), "feature_complete": int(rows.feature_complete.sum()),
