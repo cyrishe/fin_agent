@@ -1,0 +1,38 @@
+{
+  "generated_at": "2026-10-08T20:58:00",
+  "signal_period": [
+    "2026-08-24",
+    "2026-08-24"
+  ],
+  "requested_period": [
+    "2026-08-24",
+    "2026-08-25"
+  ],
+  "history_start": "2026-07-01",
+  "minute_ingestion_times_used": false,
+  "signal_time": "14:40",
+  "selection_return": [
+    0.03,
+    0.06
+  ],
+  "candidates": 131,
+  "feature_complete": 129,
+  "label_complete": 114,
+  "trainable": 104,
+  "execution_feasible": 104,
+  "excluded_adj_price_break_20d": 0,
+  "day_audit": [
+    {
+      "date": "2026-08-24",
+      "candidates": 131,
+      "feature_complete": 129,
+      "label_complete": 114,
+      "trainable": 104
+    }
+  ],
+  "provenance": {
+    "script_sha256": "6538a94f940bf3288de7967c050cc7d3595cd7d3626f74bbd544b5c1b7538b7a",
+    "database_snapshot_version": null,
+    "raw_row_location": "outputs/stock_automl/tail_aug24_exact"
+  }
+}
