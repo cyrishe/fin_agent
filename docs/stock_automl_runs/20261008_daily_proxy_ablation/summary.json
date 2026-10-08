@@ -1,0 +1,214 @@
+{
+  "train_days": 20,
+  "train_rows": 7488,
+  "test_days": 17,
+  "test_rows": 5684,
+  "test_candidate_baseline": {
+    "n": 5684,
+    "strong": 2624,
+    "neutral": 792,
+    "critical": 2268,
+    "strong_rate": 0.4616467276565799,
+    "pass_rate": 0.6009852216748769
+  },
+  "models": {
+    "八因子原模型": {
+      "features": [
+        "signal_return",
+        "volume_ratio",
+        "turnover_so_far_pct",
+        "float_mv_100m_cny",
+        "volume_4of5_increasing",
+        "ma_bull_5_10_20",
+        "price_above_all_ma",
+        "all_intraday_lows_above_ma"
+      ],
+      "top2": {
+        "n": 34,
+        "strong": 21,
+        "neutral": 7,
+        "critical": 6,
+        "strong_rate": 0.6176470588235294,
+        "pass_rate": 0.8235294117647058
+      },
+      "top5": {
+        "n": 85,
+        "strong": 49,
+        "neutral": 15,
+        "critical": 21,
+        "strong_rate": 0.5764705882352941,
+        "pass_rate": 0.7529411764705882
+      },
+      "aug_top2": {
+        "n": 22,
+        "strong": 12,
+        "neutral": 5,
+        "critical": 5,
+        "strong_rate": 0.5454545454545454,
+        "pass_rate": 0.7727272727272727
+      },
+      "sep_top2": {
+        "n": 12,
+        "strong": 9,
+        "neutral": 2,
+        "critical": 1,
+        "strong_rate": 0.75,
+        "pass_rate": 0.9166666666666666
+      }
+    },
+    "删除日内最低价因子": {
+      "features": [
+        "signal_return",
+        "volume_ratio",
+        "turnover_so_far_pct",
+        "float_mv_100m_cny",
+        "volume_4of5_increasing",
+        "ma_bull_5_10_20",
+        "price_above_all_ma"
+      ],
+      "top2": {
+        "n": 34,
+        "strong": 18,
+        "neutral": 8,
+        "critical": 8,
+        "strong_rate": 0.5294117647058824,
+        "pass_rate": 0.7647058823529411
+      },
+      "top5": {
+        "n": 85,
+        "strong": 43,
+        "neutral": 17,
+        "critical": 25,
+        "strong_rate": 0.5058823529411764,
+        "pass_rate": 0.7058823529411765
+      },
+      "aug_top2": {
+        "n": 22,
+        "strong": 11,
+        "neutral": 5,
+        "critical": 6,
+        "strong_rate": 0.5,
+        "pass_rate": 0.7272727272727273
+      },
+      "sep_top2": {
+        "n": 12,
+        "strong": 7,
+        "neutral": 3,
+        "critical": 2,
+        "strong_rate": 0.5833333333333334,
+        "pass_rate": 0.8333333333333334
+      }
+    },
+    "只保留日内最低价因子": {
+      "features": [
+        "signal_return",
+        "volume_ratio",
+        "turnover_so_far_pct",
+        "float_mv_100m_cny",
+        "volume_4of5_increasing",
+        "ma_bull_5_10_20",
+        "all_intraday_lows_above_ma"
+      ],
+      "top2": {
+        "n": 34,
+        "strong": 21,
+        "neutral": 8,
+        "critical": 5,
+        "strong_rate": 0.6176470588235294,
+        "pass_rate": 0.8529411764705882
+      },
+      "top5": {
+        "n": 85,
+        "strong": 47,
+        "neutral": 15,
+        "critical": 23,
+        "strong_rate": 0.5529411764705883,
+        "pass_rate": 0.7294117647058823
+      },
+      "aug_top2": {
+        "n": 22,
+        "strong": 13,
+        "neutral": 6,
+        "critical": 3,
+        "strong_rate": 0.5909090909090909,
+        "pass_rate": 0.8636363636363636
+      },
+      "sep_top2": {
+        "n": 12,
+        "strong": 8,
+        "neutral": 2,
+        "critical": 2,
+        "strong_rate": 0.6666666666666666,
+        "pass_rate": 0.8333333333333334
+      }
+    }
+  },
+  "feature_overlap_counts": {
+    "0": {
+      "0": 3297,
+      "1": 0
+    },
+    "1": {
+      "0": 6045,
+      "1": 3830
+    }
+  },
+  "proxy_on_existing_candidate_pool": {
+    "paired_rows": 13172,
+    "signal_3to6_but_close_outside": 1774,
+    "signal_3to6_but_close_outside_rate": 0.13467962344366838,
+    "close_minus_1440_return_median_pp": 2.688733489325523e-07,
+    "close_minus_1440_return_abs_p90_pp": 0.7844459944487193,
+    "daily_volume_to_1440_volume_median": 1.099558157089593,
+    "daily_volume_to_1440_volume_p90": 1.164060705721803,
+    "daily_volume_ratio_to_1440_ratio_median": 1.0079283120259868,
+    "daily_volume_ratio_to_1440_ratio_abs_pct_error_p90": 6.705564980132792,
+    "prorated_daily_turnover_to_1440_turnover_abs_pct_error_p90": 6.705564691165297,
+    "daily_close_above_vs_1440_above_disagree": 260,
+    "daily_low_above_vs_1440_all_lows_disagree": 0,
+    "daily_low_above_implies_1440_all_lows_violations": 0,
+    "seven_factor_same_candidate_pool": {
+      "score_spearman": 0.9604909432008176,
+      "actual_top2": {
+        "n": 34,
+        "strong": 18,
+        "neutral": 8,
+        "critical": 8,
+        "strong_rate": 0.5294117647058824,
+        "pass_rate": 0.7647058823529411
+      },
+      "proxy_top2": {
+        "n": 34,
+        "strong": 18,
+        "neutral": 8,
+        "critical": 8,
+        "strong_rate": 0.5294117647058824,
+        "pass_rate": 0.7647058823529411
+      },
+      "actual_top5": {
+        "n": 85,
+        "strong": 43,
+        "neutral": 17,
+        "critical": 25,
+        "strong_rate": 0.5058823529411764,
+        "pass_rate": 0.7058823529411765
+      },
+      "proxy_top5": {
+        "n": 85,
+        "strong": 43,
+        "neutral": 15,
+        "critical": 27,
+        "strong_rate": 0.5058823529411764,
+        "pass_rate": 0.6823529411764706
+      },
+      "top2_selection_overlap": 20,
+      "top5_selection_overlap": 58
+    },
+    "close_as_1450_entry_label_audit": {
+      "n": 13172,
+      "close_vs_entry_abs_return_p90_pp": 0.5272176182239673,
+      "changed_class_count": 1548,
+      "changed_class_rate": 0.11752201639842089
+    }
+  }
+}
