@@ -65,13 +65,45 @@ def evaluate(expanded: Path, sep30: Path, env_file: Path, output: Path) -> dict:
     with connection(env_file) as db:
         with db.cursor() as cursor:
             cursor.execute("""SELECT trade_date AS signal_date,LEFT(stk_code,6) AS symbol6,
-                             close,low,volume FROM kcrp_stock_price
-                             WHERE trade_date BETWEEN '2026-08-07' AND '2026-09-30'""")
+                             open,high,close,low,volume FROM kcrp_stock_price
+                             WHERE trade_date BETWEEN '2026-08-07' AND '2026-10-08'""")
             daily = pd.DataFrame(cursor.fetchall())
+            # A separate comparison universe is needed for close-only *new*
+            # candidates; the trainable 14:40 cohort cannot contain them.
+            all_dates = sorted(data.signal_date.dt.date.unique())
+            minute_points = []
+            for day in all_dates:
+                cursor.execute("""SELECT stk_code AS symbol6,latest_price AS price_1440
+                    FROM aiia_stock_realtime_minute_snapshot_full
+                    WHERE trade_date=%s AND kline_type='1m' AND period_minutes=1
+                      AND bar_end_time=%s AND is_finalized=1 AND is_fallback=0
+                      AND source_snapshot_time=bar_end_time""",
+                               (day, f"{day} 14:40:00"))
+                minute_points.extend({"signal_date": day, **r} for r in cursor.fetchall())
+            cursor.execute("""SELECT trade_date AS signal_date,LEFT(stk_code,6) AS symbol6,
+                            preclose FROM kcrp_stock_price
+                            WHERE trade_date BETWEEN '2026-08-07' AND '2026-09-30'""")
+            preclose = pd.DataFrame(cursor.fetchall())
     daily["signal_date"] = pd.to_datetime(daily.signal_date)
     daily["symbol6"] = daily.symbol6.astype(str).str.zfill(6)
     if daily.duplicated(["signal_date", "symbol6"]).any():
         raise ValueError("Duplicate daily stock-day")
+    all_bars = pd.DataFrame(minute_points)
+    all_bars["signal_date"] = pd.to_datetime(all_bars.signal_date)
+    preclose["signal_date"] = pd.to_datetime(preclose.signal_date)
+    preclose["symbol6"] = preclose.symbol6.astype(str).str.zfill(6)
+    full = all_bars.merge(daily[["signal_date", "symbol6", "close"]],
+                          on=["signal_date", "symbol6"], validate="one_to_one")
+    full = full.merge(preclose, on=["signal_date", "symbol6"], validate="one_to_one")
+    for field in ("price_1440", "close", "preclose"):
+        full[field] = pd.to_numeric(full[field], errors="coerce")
+    full = full[(full.price_1440 > 0) & (full.close > 0) & (full.preclose > 0)]
+    f1440 = (full.price_1440 / full.preclose - 1).between(.03, .06, inclusive="both")
+    fclosed = (full.close / full.preclose - 1).between(.03, .06, inclusive="both")
+    full_universe = {"paired_stock_days": len(full), "at_1440": int(f1440.sum()),
+                     "at_close": int(fclosed.sum()), "both": int((f1440 & fclosed).sum()),
+                     "added_by_close": int((~f1440 & fclosed).sum()),
+                     "removed_by_close": int((f1440 & ~fclosed).sum())}
     merged = data.merge(daily, on=["signal_date", "symbol6"], how="left", validate="one_to_one")
     for field in ("close", "low", "volume"):
         merged[field] = pd.to_numeric(merged[field], errors="coerce")
@@ -139,7 +171,8 @@ def evaluate(expanded: Path, sep30: Path, env_file: Path, output: Path) -> dict:
     audit = pd.concat([pd.read_csv(p.parent / "candidates_1440.csv", dtype={"symbol6": str})
                        for p in (expanded, sep30)], ignore_index=True)
     audit["signal_date"] = pd.to_datetime(audit.signal_date)
-    audit = audit[["signal_date", "symbol6", "entry_1450", "next_high10"]]
+    audit = audit[["signal_date", "next_date", "symbol6", "entry_1450", "next_open", "next_high10"]]
+    audit["next_date"] = pd.to_datetime(audit.next_date)
     audit = merged[["signal_date", "symbol6", "close"]].merge(
         audit, on=["signal_date", "symbol6"], how="inner", validate="one_to_one")
     for field in ("entry_1450", "next_high10"):
@@ -154,10 +187,47 @@ def evaluate(expanded: Path, sep30: Path, env_file: Path, output: Path) -> dict:
         "close_vs_entry_abs_return_p90_pp": float((audit.close / audit.entry_1450 - 1).abs().quantile(.9) * 100),
         "changed_class_count": int((proxy_labels != actual_labels).sum()),
         "changed_class_rate": float((proxy_labels != actual_labels).mean())}
+    next_daily = daily[["signal_date", "symbol6", "open", "high"]].rename(
+        columns={"signal_date": "next_date", "open": "daily_next_open",
+                 "high": "daily_next_high"})
+    audit = audit.merge(next_daily, on=["next_date", "symbol6"],
+                        how="left", validate="one_to_one")
+    for field in ("daily_next_open", "daily_next_high", "next_open"):
+        audit[field] = pd.to_numeric(audit[field], errors="coerce")
+    morning = audit.dropna(subset=["daily_next_open", "daily_next_high", "next_open"])
+    # With exact 14:50 entry, the daily open is a lower bound and full-day
+    # high is an upper bound for first-ten-minute high, assuming same scale.
+    lower = morning.daily_next_open / morning.entry_1450 - 1
+    upper = morning.daily_next_high / morning.entry_1450 - 1
+    inferred = np.select((lower > .01, upper < .005,
+                          (lower >= .005) & (upper <= .01)), (1, -1, 0), default=9)
+    true = np.select((morning.next_high10 / morning.entry_1450 - 1 > .01,
+                      morning.next_high10 / morning.entry_1450 - 1 < .005), (1, -1), 0)
+    # Repeat with the entirely daily observable T close price proxy.
+    lower_close = morning.daily_next_open / morning.close - 1
+    upper_close = morning.daily_next_high / morning.close - 1
+    inferred_close = np.select((lower_close > .01, upper_close < .005,
+                                (lower_close >= .005) & (upper_close <= .01)),
+                               (1, -1, 0), default=9)
+    proxy["daily_next_morning_bounds"] = {
+        "n": len(morning),
+        "daily_open_vs_first_minute_open_exact_rate": float(np.isclose(
+            morning.daily_next_open, morning.next_open, rtol=0, atol=1e-6).mean()),
+        "using_true_1450_entry_certain": int((inferred != 9).sum()),
+        "using_true_1450_entry_errors_among_certain": int(((inferred != 9) & (inferred != true)).sum()),
+        "using_close_entry_certain": int((inferred_close != 9).sum()),
+        "using_close_entry_errors_among_certain": int(((inferred_close != 9) & (inferred_close != true)).sum()),
+        "using_close_entry_certain_strong": int((inferred_close == 1).sum()),
+        "using_close_entry_strong_true": int(((inferred_close == 1) & (true == 1)).sum()),
+        "using_close_entry_certain_critical": int((inferred_close == -1).sum()),
+        "using_close_entry_critical_true": int(((inferred_close == -1) & (true == -1)).sum()),
+        "daily_high_naive_strong": int((upper_close > .01).sum()),
+        "actual_strong": int((true == 1).sum())}
     overlap = pd.crosstab(data.price_above_all_ma, data.all_intraday_lows_above_ma)
     result = {"train_days": int(train.signal_date.nunique()), "train_rows": len(train),
               "test_days": int(test.signal_date.nunique()), "test_rows": len(test),
               "test_candidate_baseline": outcomes(test), "models": model_report,
+              "raw_complete_1440_quote_universe": full_universe,
               "feature_overlap_counts": {str(a): {str(b): int(overlap.loc[a, b]) for b in overlap.columns}
                                          for a in overlap.index},
               "proxy_on_existing_candidate_pool": proxy}

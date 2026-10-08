@@ -143,6 +143,14 @@
       }
     }
   },
+  "raw_complete_1440_quote_universe": {
+    "paired_stock_days": 191796,
+    "at_1440": 13787,
+    "at_close": 14081,
+    "both": 11922,
+    "added_by_close": 2159,
+    "removed_by_close": 1865
+  },
   "feature_overlap_counts": {
     "0": {
       "0": 3297,
@@ -209,6 +217,20 @@
       "close_vs_entry_abs_return_p90_pp": 0.5272176182239673,
       "changed_class_count": 1548,
       "changed_class_rate": 0.11752201639842089
+    },
+    "daily_next_morning_bounds": {
+      "n": 13172,
+      "daily_open_vs_first_minute_open_exact_rate": 0.9986334649255998,
+      "using_true_1450_entry_certain": 5067,
+      "using_true_1450_entry_errors_among_certain": 0,
+      "using_close_entry_certain": 4998,
+      "using_close_entry_errors_among_certain": 381,
+      "using_close_entry_certain_strong": 1667,
+      "using_close_entry_strong_true": 1638,
+      "using_close_entry_certain_critical": 3125,
+      "using_close_entry_critical_true": 2839,
+      "daily_high_naive_strong": 8344,
+      "actual_strong": 6569
     }
   }
 }
