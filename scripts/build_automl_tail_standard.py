@@ -28,17 +28,17 @@ MINUTE_TO_SHARES = 100
 ADJ_PRICE_BREAK_TOLERANCE = 0.01
 
 
-def load_daily(conn):
+def load_daily(conn, history_start=HISTORY_START, end=END):
     price = frame(conn, """
         SELECT trade_date AS date, LEFT(stk_code,6) AS symbol6,
           preclose, close, adjpreclose, adjclose, volume, is_limit_price
         FROM kcrp_stock_price WHERE trade_date BETWEEN %s AND %s
-    """, (HISTORY_START, END))
+    """, (history_start, end))
     value = frame(conn, """
         SELECT trade_date AS date, LEFT(stk_code,6) AS symbol6,
           float_mv, float_share
         FROM kcrp_stock_pricevaluate WHERE trade_date BETWEEN %s AND %s
-    """, (HISTORY_START, END))
+    """, (history_start, end))
     for source in (price, value):
         source["date"] = pd.to_datetime(source.date)
         source["symbol6"] = source.symbol6.astype(str).str.zfill(6)
@@ -109,7 +109,8 @@ def signal_bar(conn, day):
     rows = frame(conn, """
         SELECT stk_code AS symbol6, stk_name AS name,
           latest_price AS signal_price, is_fallback AS signal_fallback,
-          is_finalized AS signal_finalized
+          is_finalized AS signal_finalized,
+          source_snapshot_time AS signal_source_time
         FROM aiia_stock_realtime_minute_snapshot_full
         WHERE trade_date=%s AND kline_type='1m' AND period_minutes=1
           AND bar_end_time=%s

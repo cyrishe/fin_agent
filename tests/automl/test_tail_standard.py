@@ -4,6 +4,7 @@ import pytest
 from scripts.build_automl_tail_standard import (
     TRAIN_EXPORT, assemble, four_of_five_volume_increasing, prior_profile,
 )
+from scripts.experiment_automl_tail_three_class import COMPACT_FEATURES
 
 
 def test_standard_1440_features_need_complete_bars_but_no_ingestion_timestamps():
@@ -51,6 +52,11 @@ def test_standard_1440_features_need_complete_bars_but_no_ingestion_timestamps()
     assert "adj_price_break_20d" not in TRAIN_EXPORT
     assert {"volume_4of5_increasing", "turnover_so_far_pct",
             "float_mv_100m_cny"}.issubset(TRAIN_EXPORT)
+
+    later_entry = entry.assign(entry_1450=9.5)
+    later_morning = morning.assign(next_open=9.7, next_high5=9.8, next_high10=10.0)
+    changed_result = assemble(signal, minute, later_entry, later_morning).iloc[0]
+    assert row[list(COMPACT_FEATURES)].tolist() == changed_result[list(COMPACT_FEATURES)].tolist()
 
     signal.loc[0, "adj_price_break_20d"] = True
     break_row = assemble(signal, minute, entry, morning).iloc[0]
