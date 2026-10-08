@@ -12,6 +12,7 @@ import hashlib
 import json
 import os
 from datetime import datetime
+from itertools import combinations
 from pathlib import Path
 
 import numpy as np
@@ -24,12 +25,13 @@ from scripts.experiment_automl_1450_grid import board_limit, frame, read_only_db
 START, END = "2026-08-24", "2026-09-30"
 HISTORY_START = "2026-07-15"
 MINUTE_TO_SHARES = 100
+ADJ_PRICE_BREAK_TOLERANCE = 0.01
 
 
 def load_daily(conn):
     price = frame(conn, """
         SELECT trade_date AS date, LEFT(stk_code,6) AS symbol6,
-          preclose, close, adjclose, volume, is_limit_price
+          preclose, close, adjpreclose, adjclose, volume, is_limit_price
         FROM kcrp_stock_price WHERE trade_date BETWEEN %s AND %s
     """, (HISTORY_START, END))
     value = frame(conn, """
@@ -41,11 +43,23 @@ def load_daily(conn):
         source["date"] = pd.to_datetime(source.date)
         source["symbol6"] = source.symbol6.astype(str).str.zfill(6)
         source.drop_duplicates(["date", "symbol6"], keep=False, inplace=True)
-    for column in ("preclose", "close", "adjclose", "volume"):
+    for column in ("preclose", "close", "adjpreclose", "adjclose", "volume"):
         price[column] = pd.to_numeric(price[column], errors="coerce")
     for column in ("float_mv", "float_share"):
         value[column] = pd.to_numeric(value[column], errors="coerce")
     return price, value
+
+
+def four_of_five_volume_increasing(price):
+    """Whether any four chronological observations strictly increase."""
+    chronological = [f"volume_tminus{i}" for i in range(5, 0, -1)]
+    increasing = pd.Series(False, index=price.index)
+    for sequence in combinations(chronological, 4):
+        pattern = pd.Series(True, index=price.index)
+        for earlier, later in zip(sequence, sequence[1:]):
+            pattern &= price[earlier].lt(price[later])
+        increasing |= pattern
+    return increasing.astype("Int8")
 
 
 def prior_profile(price, value):
@@ -55,6 +69,12 @@ def prior_profile(price, value):
     price = price.sort_values(["symbol6", "date"]).copy()
     price["date_index"] = price.date.map(date_index)
     groups = price.groupby("symbol6", sort=False)
+    previous_adjclose = groups.adjclose.shift(1)
+    adj_ratio = price.adjpreclose.div(previous_adjclose)
+    price["adj_price_break_on_day"] = adj_ratio.notna() & adj_ratio.sub(1).abs().gt(
+        ADJ_PRICE_BREAK_TOLERANCE)
+    price["adj_price_break_20d"] = price.groupby("symbol6")["adj_price_break_on_day"].transform(
+        lambda s: s.rolling(20, min_periods=20).max()).astype("boolean")
     for window in (5, 10, 20):
         price[f"ma{window}_adj"] = groups.adjclose.transform(
             lambda s: s.rolling(window, min_periods=window).mean())
@@ -65,12 +85,14 @@ def prior_profile(price, value):
         price[f"volume_tminus{lag}"] = groups.volume.shift(lag - 1)
     volume_columns = [f"volume_tminus{i}" for i in range(1, 6)]
     price["avg_volume5_shares"] = price[volume_columns].mean(axis=1)
+    price["volume_4of5_increasing"] = four_of_five_volume_increasing(price)
     price["history_complete"] = (
         price.contiguous20 & price.close.gt(0) & price.adjclose.gt(0) &
         price.min_adjclose20.gt(0) & price[volume_columns].gt(0).all(axis=1))
     price["signal_date"] = price.date.map(next_date)
     history = price[["signal_date", "symbol6", "date", "close", "adjclose",
-                     "history_complete", "avg_volume5_shares", "ma5_adj",
+                     "history_complete", "adj_price_break_20d", "avg_volume5_shares",
+                     "volume_4of5_increasing", "ma5_adj",
                      "ma10_adj", "ma20_adj", *volume_columns]].rename(
                          columns={"date": "prior_date", "close": "prior_close",
                                   "adjclose": "prior_adjclose"})
@@ -181,12 +203,17 @@ def assemble(signal, minute, entry, morning):
                                  rows.signal_price.gt(0) & rows.signal_fallback.eq(0) &
                                  rows.signal_finalized.eq(1) & rows.minute_complete &
                                  rows.history_complete.eq(True) &
+                                 rows.adj_price_break_20d.eq(False) &
                                  rows.value_complete.eq(True))
     history_missing = ~rows.history_complete.eq(True)
-    history_columns = ("avg_volume5_shares", "volume_ratio", "ma5", "ma10", "ma20",
-                       "ma_bull_5_10_20", "price_above_all_ma",
-                       "all_intraday_lows_above_ma", *[f"volume_tminus{i}" for i in range(1, 6)])
+    history_columns = ("avg_volume5_shares", "volume_4of5_increasing", "volume_ratio",
+                       "ma5", "ma10", "ma20", "ma_bull_5_10_20",
+                       "price_above_all_ma", "all_intraday_lows_above_ma",
+                       *[f"volume_tminus{i}" for i in range(1, 6)])
     rows.loc[history_missing, history_columns] = np.nan
+    rows.loc[rows.adj_price_break_20d.eq(True),
+             ["ma5", "ma10", "ma20", "ma_bull_5_10_20",
+              "price_above_all_ma", "all_intraday_lows_above_ma"]] = np.nan
     rows.loc[~rows.value_complete.eq(True), ["float_mv_100m_cny",
               "turnover_so_far_pct"]] = np.nan
     rows.loc[~rows.minute_complete, ["minute_volume_shares", "min_low_so_far",
@@ -208,11 +235,13 @@ def assemble(signal, minute, entry, morning):
 
 EXPORT = ["signal_date", "next_date", "symbol6", "name", "t_reference_preclose",
           "signal_price", "signal_return", "signal_fallback", "signal_finalized",
-          "history_complete", "value_complete", "minute_bars", "minute_complete",
+          "history_complete", "adj_price_break_20d", "value_complete",
+          "minute_bars", "minute_complete",
           "feature_complete", "minute_volume_shares", "volume_ratio",
           "turnover_so_far_pct", "float_mv_100m_cny", "volume_tminus5",
           "volume_tminus4", "volume_tminus3", "volume_tminus2", "volume_tminus1",
-          "avg_volume5_shares", "ma5", "ma10", "ma20", "ma_bull_5_10_20",
+          "avg_volume5_shares", "volume_4of5_increasing", "ma5", "ma10", "ma20",
+          "ma_bull_5_10_20",
           "price_above_all_ma", "all_intraday_lows_above_ma", "limit_buffer",
           "entry_1450", "entry_not_near_limit_proxy", "next_open", "next_high5",
           "next_high10", "label_complete", "target_next_open_return",
@@ -222,7 +251,8 @@ FEATURES = ("t_reference_preclose", "signal_price", "signal_return",
             "minute_volume_shares", "volume_ratio", "turnover_so_far_pct",
             "float_mv_100m_cny", "volume_tminus5", "volume_tminus4",
             "volume_tminus3", "volume_tminus2", "volume_tminus1",
-            "avg_volume5_shares", "ma5", "ma10", "ma20", "ma_bull_5_10_20",
+            "avg_volume5_shares", "volume_4of5_increasing", "ma5", "ma10", "ma20",
+            "ma_bull_5_10_20",
             "price_above_all_ma", "all_intraday_lows_above_ma")
 TARGETS = ("target_next_open_return", "target_next_high5_return",
            "target_next_high10_return")
@@ -299,6 +329,10 @@ def main():
                "candidates": len(rows), "feature_complete": int(rows.feature_complete.sum()),
                "label_complete": int(rows.label_complete.sum()),
                "trainable": len(training), "execution_feasible": len(feasible),
+               "excluded_adj_price_break_20d": int((rows.adj_price_break_20d.eq(True) &
+                    rows.history_complete.eq(True) & rows.minute_complete &
+                    rows.value_complete.eq(True) & rows.label_complete &
+                    rows.limit_buffer.notna() & rows.signal_return.lt(rows.limit_buffer)).sum()),
                "day_audit": audit,
                "provenance": {"script_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
                               "database_snapshot_version": None,

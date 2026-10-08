@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-08T13:41:56",
+  "generated_at": "2026-10-08T14:09:30",
   "signal_period": [
     "2026-08-24",
     "2026-09-29"
@@ -11,10 +11,11 @@
     0.06
   ],
   "candidates": 8999,
-  "feature_complete": 8829,
+  "feature_complete": 8818,
   "label_complete": 8959,
-  "trainable": 8601,
-  "execution_feasible": 8597,
+  "trainable": 8590,
+  "execution_feasible": 8586,
+  "excluded_adj_price_break_20d": 11,
   "day_audit": [
     {
       "date": "2026-08-24",
@@ -122,9 +123,9 @@
     {
       "date": "2026-09-14",
       "candidates": 279,
-      "feature_complete": 276,
+      "feature_complete": 275,
       "label_complete": 261,
-      "trainable": 254
+      "trainable": 253
     },
     {
       "date": "2026-09-15",
@@ -143,37 +144,37 @@
     {
       "date": "2026-09-17",
       "candidates": 280,
-      "feature_complete": 278,
+      "feature_complete": 276,
       "label_complete": 280,
-      "trainable": 267
+      "trainable": 265
     },
     {
       "date": "2026-09-18",
       "candidates": 598,
-      "feature_complete": 596,
+      "feature_complete": 595,
       "label_complete": 597,
-      "trainable": 584
+      "trainable": 583
     },
     {
       "date": "2026-09-21",
       "candidates": 948,
-      "feature_complete": 947,
+      "feature_complete": 944,
       "label_complete": 948,
-      "trainable": 930
+      "trainable": 927
     },
     {
       "date": "2026-09-22",
       "candidates": 241,
-      "feature_complete": 241,
+      "feature_complete": 240,
       "label_complete": 241,
-      "trainable": 238
+      "trainable": 237
     },
     {
       "date": "2026-09-23",
       "candidates": 230,
-      "feature_complete": 229,
+      "feature_complete": 228,
       "label_complete": 230,
-      "trainable": 227
+      "trainable": 226
     },
     {
       "date": "2026-09-24",
@@ -192,13 +193,13 @@
     {
       "date": "2026-09-29",
       "candidates": 440,
-      "feature_complete": 440,
+      "feature_complete": 438,
       "label_complete": 440,
-      "trainable": 430
+      "trainable": 428
     }
   ],
   "provenance": {
-    "script_sha256": "4755220cc913e66367cd33e26ac1ee6abf493b5feec675cb1250c3b57192d7b3",
+    "script_sha256": "144ab7d605a4b6aac1a719a56746cf636a077a470827af72b159f2283a04aee7",
     "database_snapshot_version": null,
     "raw_row_location": "outputs/stock_automl/tail_standard"
   }
