@@ -38,3 +38,20 @@ def test_source_window_moves_toward_the_complete_last_day(monkeypatch):
 
     assert offsets == [6500, 6300]
     assert offset == 6300
+
+
+def test_source_window_seeks_earlier_august_session(monkeypatch):
+    offsets = []
+
+    def bars(symbol, offset, want):
+        offsets.append(offset)
+        first_minute = 9 * 60 + 31 if offset == 6900 else 11 * 60
+        return [{"sttDateTime": {"iDate": 20260805, "shtTime": first_minute}},
+                {"sttDateTime": {"iDate": 20260806, "shtTime": 15 * 60}}]
+
+    monkeypatch.setattr(backfill, "request_bars", bars)
+
+    _, offset = backfill.source_window("600519", "2026-08-05", "2026-08-06")
+
+    assert offsets == [6500, 6700, 6900]
+    assert offset == 6900

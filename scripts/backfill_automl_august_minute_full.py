@@ -1,8 +1,7 @@
 """Resume-safe, missing-only August 2026 1m backfill into kingdomai's full table.
 
-The confirmed vendor 1m window starts with a partial 2026-08-06 session;
-2026-08-07..21 are the missing full-table dates. July is not synthesized.
-Only finalized raw 1m bars are inserted. Existing rows are never updated.
+Only finalized complete raw 1m sessions are inserted. Existing rows are not
+replaced; source days outside the vendor's retained window are not synthesized.
 """
 from __future__ import annotations
 
@@ -22,6 +21,7 @@ from scripts.audit_automl_minute_api_backfill import request_bars
 
 
 START, END = "2026-08-07", "2026-08-21"
+EARLIEST_START, LATEST_END = "2026-08-05", "2026-08-24"
 TABLE = "aiia_stock_realtime_minute_snapshot_full"
 INSERT_SQL = f"""INSERT INTO {TABLE} (
   trade_date,kline_type,period_minutes,bar_start_time,bar_end_time,
@@ -77,7 +77,7 @@ def source_window(symbol: str, start: str, end: str):
         newest, oldest = max(stamps), min(stamps)
         if newest < (end.replace("-", ""), 15 * 60):
             offset = max(0, offset - 200)
-        elif oldest > (start.replace("-", ""), 9 * 60 + 31) and offset + 3000 < 9500:
+        elif oldest > (start.replace("-", ""), 9 * 60 + 31) and offset + 3000 < 9900:
             offset += 200
         else:
             break
@@ -156,8 +156,8 @@ def main():
     parser.add_argument("--max-symbols", type=int)
     parser.add_argument("--execute", action="store_true")
     args = parser.parse_args()
-    if args.start < START or args.end > END or args.start > args.end:
-        parser.error("Only the confirmed 2026-08-07..21 1m backfill window is supported")
+    if args.start < EARLIEST_START or args.end > LATEST_END or args.start > args.end:
+        parser.error("Only the confirmed 2026-08-05..24 1m backfill window is supported")
     if args.workers < 1 or args.workers > 8:
         parser.error("--workers must be between 1 and 8")
     db = connection(args.env_file)
