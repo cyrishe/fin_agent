@@ -43,6 +43,33 @@
       "max_daily_drawdown": -0.1200179
     }
   },
+  "exact_label_trade_reconciliation": {
+    "archived_exact_stocks": 40,
+    "archived_labels": {
+      "1": 24,
+      "0": 8,
+      "-1": 8
+    },
+    "label_mismatch_count": 0,
+    "max_return_difference": 4.676996731740879e-09,
+    "label_by_trade_result": {
+      "-1": {
+        "亏损": 4,
+        "未买入": 3,
+        "盈利": 1
+      },
+      "0": {
+        "亏损": 3,
+        "未买入": 2,
+        "盈利": 3
+      },
+      "1": {
+        "亏损": 8,
+        "未买入": 3,
+        "盈利": 13
+      }
+    }
+  },
   "input_sha256": {
     "docs/stock_automl_runs/20261009_seven_factor_cash_backtest/trades.csv": "9d1c25f297014d02cc388fc5f80ca3bc8140495d648ebdc556e51e731cd75bf9",
     "docs/stock_automl_runs/20261009_seven_factor_cash_backtest/selected_1m_bars.csv": "1bd9e4c5619493a79c947e80cbbe49074e221eb33d1015be3c96773da4313e29",

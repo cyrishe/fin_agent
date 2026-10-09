@@ -2,7 +2,9 @@ from decimal import Decimal
 
 import pandas as pd
 
-from scripts.reprice_automl_first10_high_exit import exit_at_observed_high
+from scripts.reprice_automl_first10_high_exit import (
+    audit_exact_labels, exit_at_observed_high, load_inputs, simulate,
+)
 
 
 def bars(highs, last_close=9.8):
@@ -21,3 +23,12 @@ def test_first_three_only_falls_back_to_0940_and_boundary_is_strict():
     morning = bars([10.4, 10, 10, 10.1, 10.1, 10, 10, 10, 10, 10.1])
     assert exit_at_observed_high(Decimal("10"), morning) == (
         Decimal("9.8"), "09:40收盘价", False)
+
+
+def test_archived_40_labels_recompute_from_saved_exact_minute_bars():
+    picks, minute_bars = load_inputs()
+    _, _, trades = simulate(picks["old_all"], minute_bars)
+    audit, _ = audit_exact_labels(minute_bars, trades)
+    assert audit["archived_labels"] == {"1": 24, "0": 8, "-1": 8}
+    assert audit["label_mismatch_count"] == 0
+    assert audit["max_return_difference"] < 1e-7

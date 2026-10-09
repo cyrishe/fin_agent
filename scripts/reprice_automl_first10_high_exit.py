@@ -6,6 +6,7 @@ import json
 from decimal import Decimal
 from pathlib import Path
 
+import numpy as np
 import pandas as pd
 
 from scripts.backtest_automl_tail_top2_cash import buy_quantity
@@ -93,17 +94,60 @@ def load_inputs():
     return selections, all_bars.drop_duplicates(keys)
 
 
+def audit_exact_labels(bars: pd.DataFrame, trades: pd.DataFrame):
+    archive = pd.read_csv(
+        "docs/stock_automl_runs/20261008_sina_15m_july/exact_top5_two_models.csv",
+        dtype={"symbol6": str})
+    archive = archive[(archive.model == "精确训练七因子_去当前价高于均线") &
+                      archive["rank"].le(2)].copy()
+    entries = bars[bars.minute.eq("14:50")][["day", "symbol6", "latest_price"]].rename(
+        columns={"day": "signal_date", "latest_price": "entry"})
+    highs = bars[bars.minute.between("09:31", "09:40")].groupby(
+        ["day", "symbol6"], as_index=False).high_price.max().rename(
+            columns={"day": "next_date", "high_price": "high10"})
+    detail = archive.merge(entries, on=["signal_date", "symbol6"], validate="one_to_one")
+    detail = detail.merge(highs, on=["next_date", "symbol6"], validate="one_to_one")
+    if len(detail) != 40:
+        raise ValueError("Expected all 40 archived exact top-two stocks")
+    detail["recomputed_return"] = detail.high10 / detail.entry - 1
+    detail["recomputed_class"] = np.select(
+        [detail.recomputed_return.gt(.01), detail.recomputed_return.lt(.005)],
+        [1, -1], default=0)
+    max_difference = float((detail.recomputed_return - detail.target_return).abs().max())
+    if max_difference > 1e-7 or not detail.recomputed_class.eq(detail["class"]).all():
+        raise ValueError("Archived labels do not agree with exact one-minute highs")
+    detail = detail.merge(trades[["信号日", "代码", "实际买入", "卖出时点", "单笔盈亏"]],
+                          left_on=["signal_date", "symbol6"], right_on=["信号日", "代码"],
+                          validate="one_to_one")
+    detail["trade_result"] = np.select(
+        [detail["实际买入"].eq(0), detail["单笔盈亏"].gt(0),
+         detail["单笔盈亏"].lt(0)], ["未买入", "盈利", "亏损"], default="持平")
+    table = pd.crosstab(detail["class"], detail.trade_result).to_dict("index")
+    return {"archived_exact_stocks": len(detail), "archived_labels": {
+        str(label): int(detail["class"].eq(label).sum()) for label in (1, 0, -1)},
+        "label_mismatch_count": 0, "max_return_difference": max_difference,
+        "label_by_trade_result": {str(k): v for k, v in table.items()}}, detail
+
+
 def main():
     picks, bars = load_inputs()
     OUT.mkdir(parents=True, exist_ok=True)
     results = {}
+    old_trades = None
     for name, selected in picks.items():
         result, daily, trades = simulate(selected, bars)
         results[name] = result
+        if name == "old_all":
+            old_trades = trades
         daily.to_csv(OUT / f"{name}_daily.csv", index=False)
         trades.to_csv(OUT / f"{name}_trades.csv", index=False)
+    reconciliation, detail = audit_exact_labels(bars, old_trades)
+    detail[["signal_date", "next_date", "symbol6", "name", "rank", "class",
+            "target_return", "recomputed_return", "实际买入", "卖出时点", "单笔盈亏",
+            "trade_result"]].to_csv(OUT / "exact_40_label_trade_reconciliation.csv", index=False)
     summary = {"rule": "Ignore 09:31–09:33; inspect 09:34–09:40 one-minute highs in order. First high strictly above entry ×1.01 exits at that high. Otherwise exit at 09:40 close. Minute-high fill is optimistic, not proven execution.",
                "starting_cash": float(START_CASH), "results": results,
+               "exact_label_trade_reconciliation": reconciliation,
                "input_sha256": {str(path): hashlib.sha256(path.read_bytes()).hexdigest()
                                 for path in (OLD / "trades.csv", OLD / "selected_1m_bars.csv",
                                              NEW / "selected_1m_bars.csv", *(
