@@ -1,5 +1,7 @@
 # 次日十根 1 分钟 K 第二高价：连续涨幅排序
 
+按此前“高开”口径复核这套回归模型的**每日前二**：次日 09:31–09:40 十根 1 分钟 K 的最高开盘价相对信号日 14:40 买价涨超 1%，共 **23/40**。第一名 13/20，第二名 10/20；[逐日是否高开和 40 只逐股明细](daily_top2_review.xlsx)直接看结果。
+
 ## 目标与数据
 
 候选仍是信号日 14:40 涨幅 3%–6% 的股票，输入仍是原七因子。次日 **09:31–09:40** 十根精确 1 分钟 K 的 `high_price` 从大到小排序，取**第二个值**；两根 K 并列最高时第二高价等于最高价。训练目标为 `round(100 × (第二高价 / 14:40 买入价 − 1))`，单位是整数百分点。模型给出的预测是连续数值，**按预测涨幅降序选股，评价用实际未取整的第二高价涨幅**，不设涨幅达标线。
@@ -36,4 +38,4 @@
 
 整体分数与实际最高价涨幅的 Spearman 相关仅 **0.049**；同日相关的 20 日平均为 **0.051**。岭回归和浅回归树的整体相关分别为 −0.003、0.033。因此“低分组平均较低”有数据支持，**低分股票并非不会大涨**：最低组仍有 10.3% 落入当日实际最高价前 10%，其平均最高涨幅也有 1.247%。当前分数可作弱排序或候选压缩，不能作可靠的排除条件。以上仍是已用于比较模型的同一段折外日期，需要新日期确认。
 
-数据：[每日前二 Excel 明细和按天汇总](daily_top2_review.xlsx)、[完整逐股预测](rolling_predictions.csv.gz)、[连续排序指标](continuous_ranking_by_k.csv)、[每日前二与候选池对比](continuous_ranking_daily_top2.csv)、[同日高低分组逐日对照](score_tail_daily.csv)、[各模型相关性](score_actual_correlations.csv)、[分组完整指标](score_gradient_summary.json)、[预测分数十等份](boosted_tree_score_deciles.csv)、[每日前五及七因子](daily_top5.csv)、[价格底稿](second_high_prices.csv.gz)、[原始拟合指标](summary.json)。复现：先运行 `/Volumes/ext/fin_agent/.venv-automl/bin/python -m scripts.experiment_automl_second_high_regression`，再分别运行 `-m scripts.evaluate_automl_second_high_ranking` 与 `-m scripts.audit_automl_second_high_score_gradient`。从数据库重建价格底稿可给第一个命令追加 `--rebuild-prices`。
+数据：[每日前二是否高开 Excel](daily_top2_review.xlsx)、[对应 CSV](daily_top2_open_review.csv)、[完整逐股预测](rolling_predictions.csv.gz)、[连续排序指标](continuous_ranking_by_k.csv)、[每日前二与候选池对比](continuous_ranking_daily_top2.csv)、[同日高低分组逐日对照](score_tail_daily.csv)、[各模型相关性](score_actual_correlations.csv)、[分组完整指标](score_gradient_summary.json)、[预测分数十等份](boosted_tree_score_deciles.csv)、[每日前五及七因子](daily_top5.csv)、[价格底稿](second_high_prices.csv.gz)、[原始拟合指标](summary.json)。复现：先运行 `/Volumes/ext/fin_agent/.venv-automl/bin/python -m scripts.experiment_automl_second_high_regression`，再分别运行 `-m scripts.evaluate_automl_second_high_ranking` 与 `-m scripts.audit_automl_second_high_score_gradient`。从数据库重建价格底稿可给第一个命令追加 `--rebuild-prices`。
