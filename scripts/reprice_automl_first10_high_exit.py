@@ -18,20 +18,32 @@ OUT = Path("docs/stock_automl_runs/20261009_first10_high_exit")
 START_CASH = Decimal("100000")
 
 
-def exit_at_observed_high(entry: Decimal, morning: pd.DataFrame):
-    """First qualifying 09:34–09:40 minute high; otherwise 09:40 close."""
+def exit_at_observed_high(entry: Decimal, morning: pd.DataFrame, *, skip_minutes=3,
+                          fill_mode="high"):
+    """First qualifying minute high after the skipped opening bars."""
     ordered = morning.sort_values("minute")
     if ordered.minute.tolist() != [f"09:{n:02}" for n in range(31, 41)]:
         raise ValueError("Expected ten exact morning minutes")
+    if not 0 <= skip_minutes < 10:
+        raise ValueError("Invalid number of skipped opening minutes")
+    if fill_mode not in ("high", "next_open"):
+        raise ValueError("Unknown fill mode")
     threshold = entry * Decimal("1.01")
-    for bar in ordered.iloc[3:].itertuples():
+    for index in range(skip_minutes, 10):
+        bar = ordered.iloc[index]
         high = Decimal(str(bar.high_price))
         if high > threshold:
+            if fill_mode == "next_open":
+                if index < 9:
+                    return (Decimal(str(ordered.iloc[index + 1].open_price)),
+                            ordered.iloc[index + 1].minute + "次分钟开盘价", True)
+                return Decimal(str(bar.latest_price)), "09:40收盘价", True
             return high, bar.minute + "分钟最高价", True
     return Decimal(str(ordered.iloc[-1].latest_price)), "09:40收盘价", False
 
 
-def simulate(picks: pd.DataFrame, bars: pd.DataFrame):
+def simulate(picks: pd.DataFrame, bars: pd.DataFrame, *, skip_minutes=3,
+             fill_mode="high"):
     equity = START_CASH
     peak = equity
     drawdown = Decimal(0)
@@ -48,7 +60,9 @@ def simulate(picks: pd.DataFrame, bars: pd.DataFrame):
             if len(entry_bar) != 1:
                 raise ValueError(f"Missing entry minute: {day} {row.symbol6}")
             entry = Decimal(str(entry_bar.iloc[0].latest_price))
-            sell, when, triggered = exit_at_observed_high(entry, morning)
+            sell, when, triggered = exit_at_observed_high(entry, morning,
+                                                          skip_minutes=skip_minutes,
+                                                          fill_mode=fill_mode)
             budget = before * (Decimal("0.6") if row.rank == 1 else Decimal("0.4"))
             shares = buy_quantity(budget, entry, row.symbol6)
             pnl = (sell - entry) * shares

@@ -32,3 +32,13 @@ def test_archived_40_labels_recompute_from_saved_exact_minute_bars():
     assert audit["archived_labels"] == {"1": 24, "0": 8, "-1": 8}
     assert audit["label_mismatch_count"] == 0
     assert audit["max_return_difference"] < 1e-7
+
+
+def test_open_all_ten_minutes_and_delayed_fill_are_separate_prices():
+    morning = bars([10.3, 10.2, 10, 10, 10, 10, 10, 10, 10, 10])
+    morning["open_price"] = [10.0, 10.08] + [10.0] * 8
+    assert exit_at_observed_high(Decimal("10"), morning, skip_minutes=0) == (
+        Decimal("10.3"), "09:31分钟最高价", True)
+    assert exit_at_observed_high(Decimal("10"), morning, skip_minutes=0,
+                                 fill_mode="next_open") == (
+        Decimal("10.08"), "09:32次分钟开盘价", True)
