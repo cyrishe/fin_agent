@@ -38,9 +38,10 @@ FEATURES = ("signal_return", "volume_ratio", "turnover_so_far_pct",
 SHANGHAI = ZoneInfo("Asia/Shanghai")
 
 
-def db_connection():
-    load_dotenv(".env")
-    raw = os.environ.get("SIMPLE_BI_PLATFORM_DB_URL", "")
+def db_connection(env_file=Path(".env")):
+    load_dotenv(env_file)
+    raw = (os.environ.get("SIMPLE_BI_PLATFORM_DB_URL") or
+           os.environ.get("PLATFORM_DB_URL", ""))
     parsed = urlparse(raw.replace("mysql+pymysql://", "mysql://", 1))
     if parsed.hostname != "47.94.1.2" or parsed.port != 3312:
         raise ValueError("Read-only benchmark requires the configured kingdomai host")
@@ -219,12 +220,12 @@ def frozen_score(model, features):
     return expit(transformed @ logistic.coef_[0] + logistic.intercept_[0])
 
 
-def run(day, batch_size=200, workers=6):
+def run(day, batch_size=200, workers=6, env_file=Path(".env")):
     if day != datetime.now(SHANGHAI).date().isoformat():
         raise ValueError("Live quote date must be today's Shanghai date")
     started = time.perf_counter()
     stages = {}
-    conn = db_connection()
+    conn = db_connection(env_file)
     try:
         t = time.perf_counter()
         dates = query(conn, "SELECT DISTINCT trade_date FROM kcrp_stock_price "
@@ -304,9 +305,10 @@ def main():
     parser.add_argument("--day", default=datetime.now(SHANGHAI).date().isoformat())
     parser.add_argument("--batch-size", type=int, default=200)
     parser.add_argument("--workers", type=int, default=6)
+    parser.add_argument("--env-file", type=Path, default=Path(".env"))
     parser.add_argument("--output", type=Path)
     args = parser.parse_args()
-    result = run(args.day, args.batch_size, args.workers)
+    result = run(args.day, args.batch_size, args.workers, args.env_file)
     payload = json.dumps(result, ensure_ascii=False, indent=2)
     if args.output:
         args.output.parent.mkdir(parents=True, exist_ok=True)
