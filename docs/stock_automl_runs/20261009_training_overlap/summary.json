@@ -1,0 +1,100 @@
+{
+  "seed": 20261009,
+  "sample_days": [
+    "2026-09-09",
+    "2026-09-14",
+    "2026-09-16",
+    "2026-09-30"
+  ],
+  "train_rows": 5818,
+  "class_counts": {
+    "-1": 901,
+    "0": 1942,
+    "1": 2975
+  },
+  "random_sample_rows": 24,
+  "matched_opposite_same_binary": 24,
+  "median_opposite_distance": 0.4605202561229002,
+  "neighbor_shares_by_true_class": {
+    "-1": {
+      "count": 901,
+      "mean_neighbor_hit": 0.4326859045504995,
+      "mean_neighbor_critical": 0.23990011098779135
+    },
+    "0": {
+      "count": 1942,
+      "mean_neighbor_hit": 0.46673532440782695,
+      "mean_neighbor_critical": 0.148043254376931
+    },
+    "1": {
+      "count": 2975,
+      "mean_neighbor_hit": 0.5605210084033613,
+      "mean_neighbor_critical": 0.12673949579831933
+    }
+  },
+  "feature_auc": {
+    "signal_return": {
+      "positive_auc_raw_direction": 0.5088140412689874,
+      "positive_auc_best_direction": 0.5088140412689874,
+      "median_by_class": {
+        "-1": 0.04069767,
+        "0": 0.038725645,
+        "1": 0.03960396
+      }
+    },
+    "volume_ratio": {
+      "positive_auc_raw_direction": 0.48542615357785746,
+      "positive_auc_best_direction": 0.5145738464221425,
+      "median_by_class": {
+        "-1": 1.42945914,
+        "0": 1.3511199600000001,
+        "1": 1.36643959
+      }
+    },
+    "turnover_so_far_pct": {
+      "positive_auc_raw_direction": 0.543836224605917,
+      "positive_auc_best_direction": 0.543836224605917,
+      "median_by_class": {
+        "-1": 4.20875841,
+        "0": 2.83396361,
+        "1": 3.68424724
+      }
+    },
+    "float_mv_100m_cny": {
+      "positive_auc_raw_direction": 0.5143152132467479,
+      "positive_auc_best_direction": 0.5143152132467479,
+      "median_by_class": {
+        "-1": 62.78202582,
+        "0": 52.39685926,
+        "1": 56.89573231
+      }
+    },
+    "volume_4of5_increasing": {
+      "positive_auc_raw_direction": 0.5122658335229977,
+      "positive_auc_best_direction": 0.5122658335229977,
+      "median_by_class": {
+        "-1": 0.0,
+        "0": 0.0,
+        "1": 0.0
+      }
+    },
+    "ma_bull_5_10_20": {
+      "positive_auc_raw_direction": 0.5224494187404121,
+      "positive_auc_best_direction": 0.5224494187404121,
+      "median_by_class": {
+        "-1": 0.0,
+        "0": 0.0,
+        "1": 0.0
+      }
+    },
+    "all_intraday_lows_above_ma": {
+      "positive_auc_raw_direction": 0.5236367075848982,
+      "positive_auc_best_direction": 0.5236367075848982,
+      "median_by_class": {
+        "-1": 0.0,
+        "0": 0.0,
+        "1": 0.0
+      }
+    }
+  }
+}
