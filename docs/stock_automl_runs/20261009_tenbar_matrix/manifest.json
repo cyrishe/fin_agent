@@ -1,0 +1,277 @@
+{
+  "definition": "T+1 09:31–09:40 exact 1m bars; max(open/close/high)/T 14:40 price - 1; >1%=1, <0.5%=-1, otherwise 0",
+  "fit": "Each of 12 combinations trained once. Binary label is target 1 versus 0/-1. LogisticRegression(C=0.2) scales four continuous features and passes three binary features. Tree max_depth=3, min_samples_leaf=200. No model selection or trading simulation.",
+  "training_dates": {
+    "连续20日（08-25至09-21）": [
+      "2026-08-25",
+      "2026-08-26",
+      "2026-08-27",
+      "2026-08-28",
+      "2026-08-31",
+      "2026-09-01",
+      "2026-09-02",
+      "2026-09-03",
+      "2026-09-04",
+      "2026-09-07",
+      "2026-09-08",
+      "2026-09-09",
+      "2026-09-10",
+      "2026-09-11",
+      "2026-09-14",
+      "2026-09-15",
+      "2026-09-16",
+      "2026-09-17",
+      "2026-09-18",
+      "2026-09-21"
+    ],
+    "选取20日（四类大盘各5日）": [
+      "2026-08-05",
+      "2026-08-07",
+      "2026-08-12",
+      "2026-08-13",
+      "2026-08-18",
+      "2026-08-19",
+      "2026-08-20",
+      "2026-08-25",
+      "2026-08-26",
+      "2026-08-31",
+      "2026-09-07",
+      "2026-09-08",
+      "2026-09-11",
+      "2026-09-16",
+      "2026-09-17",
+      "2026-09-21",
+      "2026-09-23",
+      "2026-09-28",
+      "2026-09-29",
+      "2026-09-30"
+    ]
+  },
+  "common_out_of_training_dates": [
+    "2026-08-06",
+    "2026-08-10",
+    "2026-08-11",
+    "2026-08-14",
+    "2026-08-17",
+    "2026-08-21",
+    "2026-08-24",
+    "2026-09-22",
+    "2026-09-24"
+  ],
+  "models": [
+    {
+      "name": "contiguous_open_logistic",
+      "training": "连续20日（08-25至09-21）",
+      "price": "开盘价",
+      "model": "逻辑回归",
+      "path": "docs/stock_automl_runs/20261009_tenbar_matrix/models/contiguous_open_logistic.joblib",
+      "reused_saved_model": null,
+      "sha256": "b95abe9814e28c2496335319bc37f7ab2e140e72926c689b2b82eb21ba57158c",
+      "logistic_intercept": -0.4319789008555265,
+      "logistic_coefficients": {
+        "signal_return": 0.1039831147153377,
+        "volume_ratio": -0.1437973429031505,
+        "turnover_so_far_pct": 0.03663203310274799,
+        "float_mv_100m_cny": 0.061609333044739194,
+        "volume_4of5_increasing": 0.10681947364438661,
+        "ma_bull_5_10_20": -0.028051388677024995,
+        "all_intraday_lows_above_ma": 0.12292472333788365
+      },
+      "tree_rules": null
+    },
+    {
+      "name": "contiguous_open_tree",
+      "training": "连续20日（08-25至09-21）",
+      "price": "开盘价",
+      "model": "决策树",
+      "path": "docs/stock_automl_runs/20261009_tenbar_matrix/models/contiguous_open_tree.joblib",
+      "reused_saved_model": null,
+      "sha256": "b20dabc0cc90f5b2dea96217189d241a183702de7d4970182a5cc03823fdc9c5",
+      "logistic_intercept": null,
+      "logistic_coefficients": null,
+      "tree_rules": "|--- float_mv_100m_cny <= 24.48\n|   |--- volume_ratio <= 1.60\n|   |   |--- turnover_so_far_pct <= 3.06\n|   |   |   |--- class: 0\n|   |   |--- turnover_so_far_pct >  3.06\n|   |   |   |--- class: 0\n|   |--- volume_ratio >  1.60\n|   |   |--- class: 0\n|--- float_mv_100m_cny >  24.48\n|   |--- turnover_so_far_pct <= 2.56\n|   |   |--- volume_ratio <= 2.13\n|   |   |   |--- class: 0\n|   |   |--- volume_ratio >  2.13\n|   |   |   |--- class: 0\n|   |--- turnover_so_far_pct >  2.56\n|   |   |--- float_mv_100m_cny <= 264.96\n|   |   |   |--- class: 0\n|   |   |--- float_mv_100m_cny >  264.96\n|   |   |   |--- class: 1\n"
+    },
+    {
+      "name": "contiguous_close_logistic",
+      "training": "连续20日（08-25至09-21）",
+      "price": "收盘价",
+      "model": "逻辑回归",
+      "path": "docs/stock_automl_runs/20261009_tenbar_matrix/models/contiguous_close_logistic.joblib",
+      "reused_saved_model": "docs/stock_automl_runs/20261009_close10_target/新连续七因子_含首分钟收盘目标.joblib",
+      "sha256": "ffd77d1992adb88e4d4b317da0664b0b4c32556981c68b8911cb53a7ea7e7639",
+      "logistic_intercept": -0.49839776523975643,
+      "logistic_coefficients": {
+        "signal_return": 0.10807420515005224,
+        "volume_ratio": -0.13483190968729097,
+        "turnover_so_far_pct": 0.019925768150575274,
+        "float_mv_100m_cny": 0.07081522015085627,
+        "volume_4of5_increasing": 0.008531974124620775,
+        "ma_bull_5_10_20": -0.035119268556025374,
+        "all_intraday_lows_above_ma": 0.07948375341275907
+      },
+      "tree_rules": null
+    },
+    {
+      "name": "contiguous_close_tree",
+      "training": "连续20日（08-25至09-21）",
+      "price": "收盘价",
+      "model": "决策树",
+      "path": "docs/stock_automl_runs/20261009_tenbar_matrix/models/contiguous_close_tree.joblib",
+      "reused_saved_model": null,
+      "sha256": "48274836a5320dc48e588abdda4da62f493de7afe3892a1742a7bd08f359e6d4",
+      "logistic_intercept": null,
+      "logistic_coefficients": null,
+      "tree_rules": "|--- float_mv_100m_cny <= 41.85\n|   |--- float_mv_100m_cny <= 19.82\n|   |   |--- volume_ratio <= 1.39\n|   |   |   |--- class: 0\n|   |   |--- volume_ratio >  1.39\n|   |   |   |--- class: 0\n|   |--- float_mv_100m_cny >  19.82\n|   |   |--- ma_bull_5_10_20 <= 0.50\n|   |   |   |--- class: 0\n|   |   |--- ma_bull_5_10_20 >  0.50\n|   |   |   |--- class: 0\n|--- float_mv_100m_cny >  41.85\n|   |--- turnover_so_far_pct <= 2.62\n|   |   |--- volume_ratio <= 2.14\n|   |   |   |--- class: 0\n|   |   |--- volume_ratio >  2.14\n|   |   |   |--- class: 0\n|   |--- turnover_so_far_pct >  2.62\n|   |   |--- float_mv_100m_cny <= 221.73\n|   |   |   |--- class: 0\n|   |   |--- float_mv_100m_cny >  221.73\n|   |   |   |--- class: 1\n"
+    },
+    {
+      "name": "contiguous_high_logistic",
+      "training": "连续20日（08-25至09-21）",
+      "price": "最高价",
+      "model": "逻辑回归",
+      "path": "docs/stock_automl_runs/20261009_tenbar_matrix/models/contiguous_high_logistic.joblib",
+      "reused_saved_model": null,
+      "sha256": "33f56348d5482ecba4ebcb23d2b2e5fc7426a8e1f7fea6b8093a485c830ae097",
+      "logistic_intercept": 0.018058839860920765,
+      "logistic_coefficients": {
+        "signal_return": 0.09000561506896115,
+        "volume_ratio": -0.11419094238481971,
+        "turnover_so_far_pct": -0.002685027905810258,
+        "float_mv_100m_cny": 0.0334864382991702,
+        "volume_4of5_increasing": 0.14601738255266095,
+        "ma_bull_5_10_20": 0.01150104305423097,
+        "all_intraday_lows_above_ma": 0.10788807360226099
+      },
+      "tree_rules": null
+    },
+    {
+      "name": "contiguous_high_tree",
+      "training": "连续20日（08-25至09-21）",
+      "price": "最高价",
+      "model": "决策树",
+      "path": "docs/stock_automl_runs/20261009_tenbar_matrix/models/contiguous_high_tree.joblib",
+      "reused_saved_model": null,
+      "sha256": "76c716ded3b594efb45f8c9870786dac45f095c224802fad7a13176b8866a33d",
+      "logistic_intercept": null,
+      "logistic_coefficients": null,
+      "tree_rules": "|--- turnover_so_far_pct <= 2.43\n|   |--- volume_ratio <= 0.95\n|   |   |--- turnover_so_far_pct <= 1.54\n|   |   |   |--- class: 0\n|   |   |--- turnover_so_far_pct >  1.54\n|   |   |   |--- class: 1\n|   |--- volume_ratio >  0.95\n|   |   |--- float_mv_100m_cny <= 213.81\n|   |   |   |--- class: 0\n|   |   |--- float_mv_100m_cny >  213.81\n|   |   |   |--- class: 0\n|--- turnover_so_far_pct >  2.43\n|   |--- float_mv_100m_cny <= 18.28\n|   |   |--- class: 0\n|   |--- float_mv_100m_cny >  18.28\n|   |   |--- turnover_so_far_pct <= 13.01\n|   |   |   |--- class: 1\n|   |   |--- turnover_so_far_pct >  13.01\n|   |   |   |--- class: 0\n"
+    },
+    {
+      "name": "selected_open_logistic",
+      "training": "选取20日（四类大盘各5日）",
+      "price": "开盘价",
+      "model": "逻辑回归",
+      "path": "docs/stock_automl_runs/20261009_tenbar_matrix/models/selected_open_logistic.joblib",
+      "reused_saved_model": null,
+      "sha256": "7497ae64bf5ee66b1864c2625d04a438cecb4451950d0f45b111e133395f6181",
+      "logistic_intercept": -0.5710350316007227,
+      "logistic_coefficients": {
+        "signal_return": 0.06439512908883933,
+        "volume_ratio": -0.1442910734298507,
+        "turnover_so_far_pct": 0.10741219345365668,
+        "float_mv_100m_cny": 0.05346717026177086,
+        "volume_4of5_increasing": 0.1299544650010911,
+        "ma_bull_5_10_20": -0.3227324792629047,
+        "all_intraday_lows_above_ma": 0.39186765464123974
+      },
+      "tree_rules": null
+    },
+    {
+      "name": "selected_open_tree",
+      "training": "选取20日（四类大盘各5日）",
+      "price": "开盘价",
+      "model": "决策树",
+      "path": "docs/stock_automl_runs/20261009_tenbar_matrix/models/selected_open_tree.joblib",
+      "reused_saved_model": null,
+      "sha256": "b3a2a4f9e051a3572a69e2ef4608c51eb2b560461cebf369a00636d02b48ae82",
+      "logistic_intercept": null,
+      "logistic_coefficients": null,
+      "tree_rules": "|--- float_mv_100m_cny <= 41.85\n|   |--- turnover_so_far_pct <= 2.32\n|   |   |--- float_mv_100m_cny <= 23.69\n|   |   |   |--- class: 0\n|   |   |--- float_mv_100m_cny >  23.69\n|   |   |   |--- class: 0\n|   |--- turnover_so_far_pct >  2.32\n|   |   |--- volume_ratio <= 0.92\n|   |   |   |--- class: 0\n|   |   |--- volume_ratio >  0.92\n|   |   |   |--- class: 0\n|--- float_mv_100m_cny >  41.85\n|   |--- turnover_so_far_pct <= 2.29\n|   |   |--- volume_ratio <= 0.86\n|   |   |   |--- class: 0\n|   |   |--- volume_ratio >  0.86\n|   |   |   |--- class: 0\n|   |--- turnover_so_far_pct >  2.29\n|   |   |--- ma_bull_5_10_20 <= 0.50\n|   |   |   |--- class: 0\n|   |   |--- ma_bull_5_10_20 >  0.50\n|   |   |   |--- class: 0\n"
+    },
+    {
+      "name": "selected_close_logistic",
+      "training": "选取20日（四类大盘各5日）",
+      "price": "收盘价",
+      "model": "逻辑回归",
+      "path": "docs/stock_automl_runs/20261009_tenbar_matrix/models/selected_close_logistic.joblib",
+      "reused_saved_model": null,
+      "sha256": "b3624c1e0d4cd91c9ed1cb8046b60f02f8f02ed683f5b3e71b0d3e7c23f2e484",
+      "logistic_intercept": -0.6710314075413432,
+      "logistic_coefficients": {
+        "signal_return": 0.06688241982579873,
+        "volume_ratio": -0.11352770414494115,
+        "turnover_so_far_pct": 0.09524283688821004,
+        "float_mv_100m_cny": 0.06365645122292055,
+        "volume_4of5_increasing": 0.047897482367641575,
+        "ma_bull_5_10_20": -0.3125816924285137,
+        "all_intraday_lows_above_ma": 0.3808220766829257
+      },
+      "tree_rules": null
+    },
+    {
+      "name": "selected_close_tree",
+      "training": "选取20日（四类大盘各5日）",
+      "price": "收盘价",
+      "model": "决策树",
+      "path": "docs/stock_automl_runs/20261009_tenbar_matrix/models/selected_close_tree.joblib",
+      "reused_saved_model": null,
+      "sha256": "f5247f979f4701a6408a30ed88bef6ab7dc8c45aaba7feebd3a121a85a083971",
+      "logistic_intercept": null,
+      "logistic_coefficients": null,
+      "tree_rules": "|--- float_mv_100m_cny <= 41.52\n|   |--- turnover_so_far_pct <= 2.32\n|   |   |--- float_mv_100m_cny <= 20.52\n|   |   |   |--- class: 0\n|   |   |--- float_mv_100m_cny >  20.52\n|   |   |   |--- class: 0\n|   |--- turnover_so_far_pct >  2.32\n|   |   |--- float_mv_100m_cny <= 18.66\n|   |   |   |--- class: 0\n|   |   |--- float_mv_100m_cny >  18.66\n|   |   |   |--- class: 0\n|--- float_mv_100m_cny >  41.52\n|   |--- turnover_so_far_pct <= 2.07\n|   |   |--- signal_return <= 0.05\n|   |   |   |--- class: 0\n|   |   |--- signal_return >  0.05\n|   |   |   |--- class: 0\n|   |--- turnover_so_far_pct >  2.07\n|   |   |--- volume_ratio <= 0.88\n|   |   |   |--- class: 0\n|   |   |--- volume_ratio >  0.88\n|   |   |   |--- class: 0\n"
+    },
+    {
+      "name": "selected_high_logistic",
+      "training": "选取20日（四类大盘各5日）",
+      "price": "最高价",
+      "model": "逻辑回归",
+      "path": "docs/stock_automl_runs/20261009_tenbar_matrix/models/selected_high_logistic.joblib",
+      "reused_saved_model": null,
+      "sha256": "1389d544c00295afa788d31e21f83b165c751ee4843d6b777aa5fd6ed31404d3",
+      "logistic_intercept": -0.10642884167280262,
+      "logistic_coefficients": {
+        "signal_return": 0.05094667920386815,
+        "volume_ratio": -0.15058977435416407,
+        "turnover_so_far_pct": 0.09246603746838204,
+        "float_mv_100m_cny": 0.02956998680022285,
+        "volume_4of5_increasing": 0.13170003401179467,
+        "ma_bull_5_10_20": -0.25156887543968864,
+        "all_intraday_lows_above_ma": 0.35239127106716006
+      },
+      "tree_rules": null
+    },
+    {
+      "name": "selected_high_tree",
+      "training": "选取20日（四类大盘各5日）",
+      "price": "最高价",
+      "model": "决策树",
+      "path": "docs/stock_automl_runs/20261009_tenbar_matrix/models/selected_high_tree.joblib",
+      "reused_saved_model": null,
+      "sha256": "e39bc39c44b09395cde33051892a6c7cc37314cc96c4258870d47c34b7e1cf08",
+      "logistic_intercept": null,
+      "logistic_coefficients": null,
+      "tree_rules": "|--- turnover_so_far_pct <= 2.30\n|   |--- volume_ratio <= 0.87\n|   |   |--- turnover_so_far_pct <= 1.53\n|   |   |   |--- class: 0\n|   |   |--- turnover_so_far_pct >  1.53\n|   |   |   |--- class: 1\n|   |--- volume_ratio >  0.87\n|   |   |--- float_mv_100m_cny <= 20.60\n|   |   |   |--- class: 0\n|   |   |--- float_mv_100m_cny >  20.60\n|   |   |   |--- class: 0\n|--- turnover_so_far_pct >  2.30\n|   |--- volume_ratio <= 0.92\n|   |   |--- float_mv_100m_cny <= 28.63\n|   |   |   |--- class: 1\n|   |   |--- float_mv_100m_cny >  28.63\n|   |   |   |--- class: 1\n|   |--- volume_ratio >  0.92\n|   |   |--- float_mv_100m_cny <= 43.40\n|   |   |   |--- class: 0\n|   |   |--- float_mv_100m_cny >  43.40\n|   |   |   |--- class: 1\n"
+    }
+  ],
+  "candidate_counts": {
+    "开盘价": {
+      "1": 5565,
+      "0": 1953,
+      "-1": 6774
+    },
+    "收盘价": {
+      "1": 5217,
+      "0": 1642,
+      "-1": 7433
+    },
+    "最高价": {
+      "1": 7171,
+      "0": 2157,
+      "-1": 4964
+    }
+  },
+  "source_sha256": {
+    "candidates": "99263a8722907209d1cc45ffd6e3e73a1386fc36050f67e5d55f78b0c3e8942a",
+    "tenbar_extrema": "502d38a7e88ffa48e5663dc9727cdc105dfb32c8bd8b5e49b24a5fb0ab796ff9",
+    "selected_dates": "ad07d89d8b54fb5381817c0069b64606c0532ca29019ad89e5d3b486caded078"
+  }
+}
