@@ -34,7 +34,7 @@ def main():
         raise ValueError("Minute closes differ from exact archived ten-bar maxima")
     returns = joined[closes].div(joined.entry_1440, axis=0).sub(1)
     output = joined[["signal_date", "next_date", "rank", "symbol6", "name",
-                     "predicted_pct", "entry_1440", "open_return"]].copy()
+                     "predicted_pct", "entry_1440"]].copy()
     for minute, column in zip(range(31, 41), closes):
         output[f"09:{minute:02}"] = returns[column]
     output["十分钟最高收盘涨幅"] = returns.max(axis=1)
