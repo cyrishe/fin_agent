@@ -1,0 +1,214 @@
+{
+  "evaluation": "realized second-high return / 14:40 price - 1, no binary threshold",
+  "models": [
+    {
+      "model": "小型提升树",
+      "daily_top_k": 1,
+      "selected": 20,
+      "mean_actual_return_pct": 2.085775880548233,
+      "median_actual_return_pct": 2.183689277228015,
+      "below_zero": 7,
+      "daily_pool_mean_pct": 0.7822061657370327,
+      "daily_mean_uplift_pct_points": 1.3035697148112004,
+      "days_above_pool": 13
+    },
+    {
+      "model": "小型提升树",
+      "daily_top_k": 2,
+      "selected": 40,
+      "mean_actual_return_pct": 1.5870676862788788,
+      "median_actual_return_pct": 1.655862449754715,
+      "below_zero": 13,
+      "daily_pool_mean_pct": 0.7822061657370327,
+      "daily_mean_uplift_pct_points": 0.8048615205418461,
+      "days_above_pool": 13
+    },
+    {
+      "model": "小型提升树",
+      "daily_top_k": 5,
+      "selected": 100,
+      "mean_actual_return_pct": 1.0189664515113823,
+      "median_actual_return_pct": 0.80421744625255,
+      "below_zero": 36,
+      "daily_pool_mean_pct": 0.7822061657370327,
+      "daily_mean_uplift_pct_points": 0.23676028577434968,
+      "days_above_pool": 12
+    },
+    {
+      "model": "小型提升树",
+      "daily_top_k": 10,
+      "selected": 200,
+      "mean_actual_return_pct": 1.1875656279536988,
+      "median_actual_return_pct": 0.933133075012275,
+      "below_zero": 69,
+      "daily_pool_mean_pct": 0.7822061657370327,
+      "daily_mean_uplift_pct_points": 0.40535946221666597,
+      "days_above_pool": 15
+    },
+    {
+      "model": "岭回归",
+      "daily_top_k": 1,
+      "selected": 20,
+      "mean_actual_return_pct": 0.16359199675288594,
+      "median_actual_return_pct": 0.10394462465758,
+      "below_zero": 9,
+      "daily_pool_mean_pct": 0.7822061657370327,
+      "daily_mean_uplift_pct_points": -0.6186141689841467,
+      "days_above_pool": 3
+    },
+    {
+      "model": "岭回归",
+      "daily_top_k": 2,
+      "selected": 40,
+      "mean_actual_return_pct": 0.914843658897062,
+      "median_actual_return_pct": 0.59245481906398,
+      "below_zero": 13,
+      "daily_pool_mean_pct": 0.7822061657370327,
+      "daily_mean_uplift_pct_points": 0.1326374931600292,
+      "days_above_pool": 9
+    },
+    {
+      "model": "岭回归",
+      "daily_top_k": 5,
+      "selected": 100,
+      "mean_actual_return_pct": 1.0556265833239389,
+      "median_actual_return_pct": 0.42558744746597504,
+      "below_zero": 32,
+      "daily_pool_mean_pct": 0.7822061657370327,
+      "daily_mean_uplift_pct_points": 0.2734204175869063,
+      "days_above_pool": 12
+    },
+    {
+      "model": "岭回归",
+      "daily_top_k": 10,
+      "selected": 200,
+      "mean_actual_return_pct": 0.6919077151062956,
+      "median_actual_return_pct": 0.425999839345355,
+      "below_zero": 72,
+      "daily_pool_mean_pct": 0.7822061657370327,
+      "daily_mean_uplift_pct_points": -0.0902984506307372,
+      "days_above_pool": 9
+    },
+    {
+      "model": "浅回归树",
+      "daily_top_k": 1,
+      "selected": 20,
+      "mean_actual_return_pct": 0.564149712463783,
+      "median_actual_return_pct": -0.330049821308925,
+      "below_zero": 11,
+      "daily_pool_mean_pct": 0.7822061657370327,
+      "daily_mean_uplift_pct_points": -0.21805645327324968,
+      "days_above_pool": 7
+    },
+    {
+      "model": "浅回归树",
+      "daily_top_k": 2,
+      "selected": 40,
+      "mean_actual_return_pct": 0.5790700233255975,
+      "median_actual_return_pct": 0.25161047742633996,
+      "below_zero": 20,
+      "daily_pool_mean_pct": 0.7822061657370327,
+      "daily_mean_uplift_pct_points": -0.2031361424114353,
+      "days_above_pool": 9
+    },
+    {
+      "model": "浅回归树",
+      "daily_top_k": 5,
+      "selected": 100,
+      "mean_actual_return_pct": 0.6434698306996376,
+      "median_actual_return_pct": 0.30306501019573,
+      "below_zero": 43,
+      "daily_pool_mean_pct": 0.7822061657370327,
+      "daily_mean_uplift_pct_points": -0.138736335037395,
+      "days_above_pool": 6
+    },
+    {
+      "model": "浅回归树",
+      "daily_top_k": 10,
+      "selected": 200,
+      "mean_actual_return_pct": 0.7825217718029209,
+      "median_actual_return_pct": 0.56721753993401,
+      "below_zero": 83,
+      "daily_pool_mean_pct": 0.7822061657370327,
+      "daily_mean_uplift_pct_points": 0.00031560606588823537,
+      "days_above_pool": 10
+    }
+  ],
+  "boosted_tree_top2_day_bootstrap_95pct_uplift_ci": [
+    0.010836339661648667,
+    1.6877932149568244
+  ],
+  "bootstrap_seed": 20261009,
+  "score_deciles": [
+    {
+      "predicted_decile": 1,
+      "count": 582,
+      "mean_predicted_pct": 0.28671979378546203,
+      "mean_actual_pct": 0.490793609085516,
+      "median_actual_pct": 0.479102324412365
+    },
+    {
+      "predicted_decile": 2,
+      "count": 582,
+      "mean_predicted_pct": 0.6272467875184525,
+      "mean_actual_pct": 0.9414301587733666,
+      "median_actual_pct": 0.55373141111032
+    },
+    {
+      "predicted_decile": 3,
+      "count": 582,
+      "mean_predicted_pct": 0.7065115965609433,
+      "mean_actual_pct": 0.8656613810463759,
+      "median_actual_pct": 0.570986791855285
+    },
+    {
+      "predicted_decile": 4,
+      "count": 581,
+      "mean_predicted_pct": 0.7703109222131549,
+      "mean_actual_pct": 0.7112980340519379,
+      "median_actual_pct": 0.45662100456622
+    },
+    {
+      "predicted_decile": 5,
+      "count": 582,
+      "mean_predicted_pct": 0.8256948927727508,
+      "mean_actual_pct": 0.8844472748142432,
+      "median_actual_pct": 0.641806859954425
+    },
+    {
+      "predicted_decile": 6,
+      "count": 582,
+      "mean_predicted_pct": 0.8833633196450356,
+      "mean_actual_pct": 1.078064473928925,
+      "median_actual_pct": 0.61956362849169
+    },
+    {
+      "predicted_decile": 7,
+      "count": 581,
+      "mean_predicted_pct": 0.9473082184304632,
+      "mean_actual_pct": 0.8497213257734235,
+      "median_actual_pct": 0.54249547920433
+    },
+    {
+      "predicted_decile": 8,
+      "count": 582,
+      "mean_predicted_pct": 1.0180594618865804,
+      "mean_actual_pct": 1.025614308209088,
+      "median_actual_pct": 0.5550432311182
+    },
+    {
+      "predicted_decile": 9,
+      "count": 582,
+      "mean_predicted_pct": 1.1120113586387423,
+      "mean_actual_pct": 0.9337402153916229,
+      "median_actual_pct": 0.5316856547084999
+    },
+    {
+      "predicted_decile": 10,
+      "count": 582,
+      "mean_predicted_pct": 1.3225696128942075,
+      "mean_actual_pct": 1.0518465250227698,
+      "median_actual_pct": 0.723375004757
+    }
+  ]
+}
