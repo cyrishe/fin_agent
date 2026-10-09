@@ -22,4 +22,18 @@
 
 这里比较了几种模型与多个取前名次；前二看起来较好属于**探索结果**。下一步应固定小型提升回归树和选股数，在新的日期上只评实际涨幅均值、中位数、低于 0% 比例及相对同日候选池的差值。第二高价意味着至少两根 K 的最高价达到这一水平，仍不保证实际限价单成交。
 
-数据：[完整逐股预测](rolling_predictions.csv.gz)、[连续排序指标](continuous_ranking_by_k.csv)、[每日前二与候选池对比](continuous_ranking_daily_top2.csv)、[预测分数十等份](boosted_tree_score_deciles.csv)、[每日前五及七因子](daily_top5.csv)、[价格底稿](second_high_prices.csv.gz)、[原始拟合指标](summary.json)。复现：`/Volumes/ext/fin_agent/.venv-automl/bin/python -m scripts.experiment_automl_second_high_regression`，再运行 `-m scripts.evaluate_automl_second_high_ranking`。从数据库重建价格底稿可给前一个命令追加 `--rebuild-prices`。
+## 预测低的股票，实际十分钟最高价是否也低？
+
+用同一批 **5,818 只折外股票**，在每天内部按小型提升回归树的预测值排序，各取最高和最低约 10%，再看次日十根 K 的**最高价涨幅**。比较的是相对同一 14:40 买价的涨幅；两组各 592 只。
+
+| 同日预测分数 | 实际最高价平均涨幅 | 实际最高价中位数 | 实际第二高价平均涨幅 | 实际最高价低于买价 | 落入当日实际最高价前 10% |
+|---|---:|---:|---:|---:|---:|
+| 最低 10% | 1.247% | 0.932% | 0.531% | 17.6% | 10.3% |
+| 最高 10% | **1.830%** | **1.460%** | **1.185%** | 16.6% | **14.5%** |
+| 全部候选 | 1.475% | 1.033% | 0.883% | 15.5% | 10.2% |
+
+最高组与最低组的**同日平均最高价涨幅差**为 +0.559 个百分点，20 天中有 16 天最高组较高。按交易日重采样的探索性 95% 区间约 +0.186 至 +0.933 个百分点。若只看“抓住真正大涨股票”，预测最高的约 10% 候选包含当日实际最高价前 10% 股票中的约 14.5%，比随机的约 10% 有富集，但提升有限。
+
+整体分数与实际最高价涨幅的 Spearman 相关仅 **0.049**；同日相关的 20 日平均为 **0.051**。岭回归和浅回归树的整体相关分别为 −0.003、0.033。因此“低分组平均较低”有数据支持，**低分股票并非不会大涨**：最低组仍有 10.3% 落入当日实际最高价前 10%，其平均最高涨幅也有 1.247%。当前分数可作弱排序或候选压缩，不能作可靠的排除条件。以上仍是已用于比较模型的同一段折外日期，需要新日期确认。
+
+数据：[完整逐股预测](rolling_predictions.csv.gz)、[连续排序指标](continuous_ranking_by_k.csv)、[每日前二与候选池对比](continuous_ranking_daily_top2.csv)、[同日高低分组逐日对照](score_tail_daily.csv)、[各模型相关性](score_actual_correlations.csv)、[分组完整指标](score_gradient_summary.json)、[预测分数十等份](boosted_tree_score_deciles.csv)、[每日前五及七因子](daily_top5.csv)、[价格底稿](second_high_prices.csv.gz)、[原始拟合指标](summary.json)。复现：先运行 `/Volumes/ext/fin_agent/.venv-automl/bin/python -m scripts.experiment_automl_second_high_regression`，再分别运行 `-m scripts.evaluate_automl_second_high_ranking` 与 `-m scripts.audit_automl_second_high_score_gradient`。从数据库重建价格底稿可给第一个命令追加 `--rebuild-prices`。
