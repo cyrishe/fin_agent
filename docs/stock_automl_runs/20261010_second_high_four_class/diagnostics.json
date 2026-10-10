@@ -236,6 +236,66 @@
       "actual_vs_predicted_day_ge3_correlation": 0.17627779065717283
     }
   },
+  "small_boosted_tree_confusion": {
+    "label_order": [
+      "lt0",
+      "0to1",
+      "1to3",
+      "ge3"
+    ],
+    "training_folds_aggregate": [
+      [
+        32666,
+        8616,
+        6202,
+        24
+      ],
+      [
+        18525,
+        14048,
+        6363,
+        15
+      ],
+      [
+        18462,
+        8417,
+        10452,
+        18
+      ],
+      [
+        9884,
+        2561,
+        3717,
+        63
+      ]
+    ],
+    "next_day_unique_aggregate": [
+      [
+        1039,
+        460,
+        314,
+        2
+      ],
+      [
+        798,
+        573,
+        387,
+        1
+      ],
+      [
+        878,
+        363,
+        311,
+        0
+      ],
+      [
+        446,
+        121,
+        121,
+        4
+      ]
+    ]
+  },
   "out_of_fold_prediction": {
     "logistic": {
       "classes_actual": {

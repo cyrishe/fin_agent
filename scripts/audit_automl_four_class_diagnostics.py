@@ -10,7 +10,8 @@ from scipy.spatial.distance import cdist
 from scipy.stats import spearmanr
 from sklearn.ensemble import HistGradientBoostingClassifier
 from sklearn.metrics import (accuracy_score, average_precision_score,
-                             balanced_accuracy_score, f1_score, roc_auc_score)
+                             balanced_accuracy_score, confusion_matrix, f1_score,
+                             roc_auc_score)
 
 from scripts.benchmark_automl_1440_inference import FEATURES
 from scripts.experiment_automl_close9_models import DATA
@@ -56,9 +57,10 @@ def binary_auc(actual: pd.Series, score: np.ndarray) -> float:
     return float(roc_auc_score(binary, score))
 
 
-def fit_diagnostics(data: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+def fit_diagnostics(data: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame,
+                                                 pd.DataFrame, pd.DataFrame]:
     dates = sorted(data.signal_date.unique())
-    rows, probability_rows, class_rows = [], [], []
+    rows, probability_rows, class_rows, train_confusions = [], [], [], []
     for index in range(20, len(dates)):
         train = data[data.signal_date.isin(dates[index-20:index])]
         test = data[data.signal_date.eq(dates[index])]
@@ -86,6 +88,13 @@ def fit_diagnostics(data: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame, pd.
                     axis=1)/np.log(len(labels))
                 ge3_event = actual.eq("ge3").to_numpy()
                 ge3_picked = np.asarray(predicted) == "ge3"
+                if name == "small_boosted_tree" and scope == "same_fold_train":
+                    matrix = confusion_matrix(actual, predicted, labels=list(CLASSES))
+                    train_confusions.append({
+                        "test_date": dates[index], "train_rows": len(train),
+                        **{f"actual_{true}_pred_{guess}": int(matrix[i, j])
+                           for i, true in enumerate(CLASSES)
+                           for j, guess in enumerate(CLASSES)}})
                 rows.append({"test_date": dates[index], "model": name,
                              "scope": scope, "rows": len(frame),
                              "ge3_auc": binary_auc(actual, p_ge3),
@@ -123,7 +132,8 @@ def fit_diagnostics(data: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame, pd.
                            for label in CLASSES},
                     })
         print(f"diagnosed {dates[index]}", flush=True)
-    return pd.DataFrame(rows), pd.DataFrame(probability_rows), pd.DataFrame(class_rows)
+    return (pd.DataFrame(rows), pd.DataFrame(probability_rows),
+            pd.DataFrame(class_rows), pd.DataFrame(train_confusions))
 
 
 def prediction_diagnostics(scored: pd.DataFrame) -> tuple[dict, pd.DataFrame, pd.DataFrame]:
@@ -295,7 +305,7 @@ def write_errors(scored: pd.DataFrame) -> None:
 def run() -> dict:
     data = load_data()
     scored = pd.read_csv(OUT / "predictions.csv.gz", dtype={"symbol6": str})
-    fit, probability_fit, class_fit = fit_diagnostics(data)
+    fit, probability_fit, class_fit, train_confusions = fit_diagnostics(data)
     prediction, calibration, ranks = prediction_diagnostics(scored)
     day_fit = day_probability_diagnostics(scored)
     overlap = overlap_diagnostic(data)
@@ -304,6 +314,17 @@ def run() -> dict:
     fit.to_csv(OUT / "train_vs_next_day_fit.csv", index=False)
     probability_fit.to_csv(OUT / "probability_fit_by_fold.csv", index=False)
     class_fit.to_csv(OUT / "probability_by_true_class.csv", index=False)
+    train_confusions.to_csv(OUT / "train_confusion_by_fold.csv", index=False)
+    train_matrix = np.asarray([
+        [train_confusions[f"actual_{true}_pred_{guess}"].sum()
+         for guess in CLASSES] for true in CLASSES], dtype=int)
+    test_boosted = scored[scored.model.eq("small_boosted_tree")]
+    next_day_matrix = confusion_matrix(test_boosted["class"],
+                                       test_boosted.predicted_class, labels=list(CLASSES))
+    pd.DataFrame(train_matrix, index=CLASSES, columns=CLASSES).to_csv(
+        OUT / "train_confusion_aggregate.csv", index_label="actual_class")
+    pd.DataFrame(next_day_matrix, index=CLASSES, columns=CLASSES).to_csv(
+        OUT / "next_day_confusion_aggregate.csv", index_label="actual_class")
     calibration.to_csv(OUT / "probability_deciles.csv", index=False)
     ranks.to_csv(OUT / "ranking_by_k.csv", index=False)
     day_fit.to_csv(OUT / "probability_by_day.csv", index=False)
@@ -338,6 +359,10 @@ def run() -> dict:
     summary = {"samples": sample_distribution(data),
                "fit": fit_summary, "probability_fit": probability_summary,
                "day_probability_fit": day_summary,
+               "small_boosted_tree_confusion": {
+                   "label_order": list(CLASSES),
+                   "training_folds_aggregate": train_matrix.tolist(),
+                   "next_day_unique_aggregate": next_day_matrix.tolist()},
                "out_of_fold_prediction": prediction,
                "feature_overlap": overlap,
                "score_sensitivity": scores.to_dict("records"),
