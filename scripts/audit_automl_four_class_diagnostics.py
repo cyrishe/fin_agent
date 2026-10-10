@@ -56,9 +56,9 @@ def binary_auc(actual: pd.Series, score: np.ndarray) -> float:
     return float(roc_auc_score(binary, score))
 
 
-def fit_diagnostics(data: pd.DataFrame) -> pd.DataFrame:
+def fit_diagnostics(data: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     dates = sorted(data.signal_date.unique())
-    rows = []
+    rows, probability_rows, class_rows = [], [], []
     for index in range(20, len(dates)):
         train = data[data.signal_date.isin(dates[index-20:index])]
         test = data[data.signal_date.eq(dates[index])]
@@ -69,21 +69,61 @@ def fit_diagnostics(data: pd.DataFrame) -> pd.DataFrame:
             early_stopping=False, random_state=42)
         for name, model in candidates.items():
             model.fit(train[list(FEATURES)], train["class"].astype(str))
+            labels = list(model.classes_)
+            prior = train["class"].astype(str).value_counts(normalize=True).reindex(
+                labels).to_numpy(dtype=float)
             for scope, frame in (("same_fold_train", train), ("next_day_test", test)):
                 probability = model.predict_proba(frame[list(FEATURES)])
-                labels = list(model.classes_)
                 predicted = labels[0] if len(labels) == 1 else np.asarray(labels)[
                     probability.argmax(axis=1)]
                 actual = frame["class"].astype(str)
+                actual_index = pd.Categorical(actual, categories=labels).codes
+                p_true = probability[np.arange(len(frame)), actual_index]
+                p_ge3 = probability[:, labels.index("ge3")]
+                sorted_p = np.sort(probability, axis=1)
+                lead = sorted_p[:, -1]-sorted_p[:, -2]
+                entropy = -(probability*np.log(np.clip(probability, 1e-15, 1))).sum(
+                    axis=1)/np.log(len(labels))
+                ge3_event = actual.eq("ge3").to_numpy()
+                ge3_picked = np.asarray(predicted) == "ge3"
                 rows.append({"test_date": dates[index], "model": name,
                              "scope": scope, "rows": len(frame),
-                             "ge3_auc": binary_auc(actual, probability[:, labels.index("ge3")]),
+                             "ge3_auc": binary_auc(actual, p_ge3),
                              "balanced_accuracy": float(balanced_accuracy_score(actual, predicted)),
                              "macro_f1": float(f1_score(actual, predicted,
                                                         labels=list(CLASSES), average="macro",
                                                         zero_division=0))})
+                probability_rows.append({
+                    "test_date": dates[index], "model": name, "scope": scope,
+                    "rows": len(frame), "actual_ge3_rate": float(ge3_event.mean()),
+                    "train_prior_ge3": float(prior[labels.index("ge3")]),
+                    "mean_p_ge3": float(p_ge3.mean()),
+                    "p_ge3_median": float(np.median(p_ge3)),
+                    "p_ge3_p90": float(np.quantile(p_ge3, .9)),
+                    "p_ge3_max": float(p_ge3.max()),
+                    "argmax_ge3_count": int(ge3_picked.sum()),
+                    "argmax_ge3_rate": float(ge3_picked.mean()),
+                    "max_class_probability_median": float(np.median(sorted_p[:, -1])),
+                    "max_class_probability_p90": float(np.quantile(sorted_p[:, -1], .9)),
+                    "lead_over_second_median": float(np.median(lead)),
+                    "lead_over_second_p90": float(np.quantile(lead, .9)),
+                    "normalized_entropy_mean": float(entropy.mean()),
+                    "log_loss": float(-np.log(np.clip(p_true, 1e-15, 1)).mean()),
+                    "train_prior_log_loss": float(-np.log(np.clip(
+                        prior[actual_index], 1e-15, 1)).mean()),
+                    "mean_p_ge3_given_ge3": float(p_ge3[ge3_event].mean()),
+                    "mean_p_ge3_given_lt0": float(p_ge3[actual.eq("lt0")].mean()),
+                })
+                for true_label in CLASSES:
+                    mask = actual.eq(true_label).to_numpy()
+                    class_rows.append({
+                        "test_date": dates[index], "model": name, "scope": scope,
+                        "true_class": true_label, "rows": int(mask.sum()),
+                        **{f"mean_p_{label}": float(probability[mask, labels.index(label)].mean())
+                           for label in CLASSES},
+                    })
         print(f"diagnosed {dates[index]}", flush=True)
-    return pd.DataFrame(rows)
+    return pd.DataFrame(rows), pd.DataFrame(probability_rows), pd.DataFrame(class_rows)
 
 
 def prediction_diagnostics(scored: pd.DataFrame) -> tuple[dict, pd.DataFrame, pd.DataFrame]:
@@ -150,6 +190,18 @@ def prediction_diagnostics(scored: pd.DataFrame) -> tuple[dict, pd.DataFrame, pd
                                 "actual_ge3_rate": float(group["class"].eq("ge3").mean()),
                                 "actual_lt0_rate": float(group["class"].eq("lt0").mean())})
     return summary, pd.DataFrame(calibration), pd.DataFrame(ranks)
+
+
+def day_probability_diagnostics(scored: pd.DataFrame) -> pd.DataFrame:
+    rows = []
+    for (model, day), frame in scored.groupby(["model", "signal_date"]):
+        rows.append({"model": model, "signal_date": day, "rows": len(frame),
+                     "actual_ge3_rate": float(frame["class"].eq("ge3").mean()),
+                     "mean_p_ge3": float(frame.p_ge3.mean()),
+                     "actual_lt0_rate": float(frame["class"].eq("lt0").mean()),
+                     "mean_p_lt0": float(frame.p_lt0.mean()),
+                     "argmax_ge3_count": int(frame.predicted_class.eq("ge3").sum())})
+    return pd.DataFrame(rows)
 
 
 def overlap_diagnostic(data: pd.DataFrame) -> dict:
@@ -243,14 +295,18 @@ def write_errors(scored: pd.DataFrame) -> None:
 def run() -> dict:
     data = load_data()
     scored = pd.read_csv(OUT / "predictions.csv.gz", dtype={"symbol6": str})
-    fit = fit_diagnostics(data)
+    fit, probability_fit, class_fit = fit_diagnostics(data)
     prediction, calibration, ranks = prediction_diagnostics(scored)
+    day_fit = day_probability_diagnostics(scored)
     overlap = overlap_diagnostic(data)
     scores = score_sensitivity(scored)
     write_errors(scored)
     fit.to_csv(OUT / "train_vs_next_day_fit.csv", index=False)
+    probability_fit.to_csv(OUT / "probability_fit_by_fold.csv", index=False)
+    class_fit.to_csv(OUT / "probability_by_true_class.csv", index=False)
     calibration.to_csv(OUT / "probability_deciles.csv", index=False)
     ranks.to_csv(OUT / "ranking_by_k.csv", index=False)
+    day_fit.to_csv(OUT / "probability_by_day.csv", index=False)
     fit_summary = {}
     for (name, scope), frame in fit.groupby(["model", "scope"]):
         fit_summary.setdefault(name, {})[scope] = {
@@ -258,8 +314,31 @@ def run() -> dict:
             "mean_balanced_accuracy_across_20_folds": float(frame.balanced_accuracy.mean()),
             "mean_macro_f1_across_20_folds": float(frame.macro_f1.mean()),
             "mean_rows_per_fold": float(frame.rows.mean())}
+    probability_summary = {}
+    columns = ("actual_ge3_rate", "train_prior_ge3", "mean_p_ge3",
+               "p_ge3_median", "p_ge3_p90", "p_ge3_max", "argmax_ge3_count",
+               "argmax_ge3_rate", "max_class_probability_median",
+               "max_class_probability_p90", "lead_over_second_median",
+               "lead_over_second_p90", "normalized_entropy_mean",
+               "log_loss", "train_prior_log_loss",
+               "mean_p_ge3_given_ge3", "mean_p_ge3_given_lt0")
+    for (name, scope), frame in probability_fit.groupby(["model", "scope"]):
+        probability_summary.setdefault(name, {})[scope] = {
+            key: float(frame[key].mean()) for key in columns}
+    day_summary = {}
+    for name, frame in day_fit.groupby("model"):
+        day_summary[name] = {
+            "actual_ge3_rate_min_max": [float(frame.actual_ge3_rate.min()),
+                                         float(frame.actual_ge3_rate.max())],
+            "mean_p_ge3_min_max": [float(frame.mean_p_ge3.min()),
+                                   float(frame.mean_p_ge3.max())],
+            "actual_vs_predicted_day_ge3_correlation": float(frame.actual_ge3_rate.corr(
+                frame.mean_p_ge3)),
+        }
     summary = {"samples": sample_distribution(data),
-               "fit": fit_summary, "out_of_fold_prediction": prediction,
+               "fit": fit_summary, "probability_fit": probability_summary,
+               "day_probability_fit": day_summary,
+               "out_of_fold_prediction": prediction,
                "feature_overlap": overlap,
                "score_sensitivity": scores.to_dict("records"),
                "interpretation": "Training metrics reuse overlapping 20-day windows and are optimistic fit diagnostics, not an attainable return bound. Test metrics are one next-day fold at a time. Capacity probe is only a diagnostic and was not selected as a strategy."}

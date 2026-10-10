@@ -90,6 +90,152 @@
       }
     }
   },
+  "probability_fit": {
+    "capacity_probe": {
+      "next_day_test": {
+        "actual_ge3_rate": 0.127167509307083,
+        "train_prior_ge3": 0.11558477949384434,
+        "mean_p_ge3": 0.11309330638597645,
+        "p_ge3_median": 0.0857443806820577,
+        "p_ge3_p90": 0.24119965454302603,
+        "p_ge3_max": 0.5601250144311367,
+        "argmax_ge3_count": 11.35,
+        "argmax_ge3_rate": 0.04067638627975759,
+        "max_class_probability_median": 0.45023025294085073,
+        "max_class_probability_p90": 0.6418062439119926,
+        "lead_over_second_median": 0.1571240318242854,
+        "lead_over_second_p90": 0.45180723745737544,
+        "normalized_entropy_mean": 0.8372510384640961,
+        "log_loss": 1.4470919156246826,
+        "train_prior_log_loss": 1.3359017373214601,
+        "mean_p_ge3_given_ge3": 0.13350214384383396,
+        "mean_p_ge3_given_lt0": 0.11680490218329294
+      },
+      "same_fold_train": {
+        "actual_ge3_rate": 0.11558477949384434,
+        "train_prior_ge3": 0.11558477949384434,
+        "mean_p_ge3": 0.11570733608858619,
+        "p_ge3_median": 0.0703297708961265,
+        "p_ge3_p90": 0.283812745231859,
+        "p_ge3_max": 0.8658096296221134,
+        "argmax_ge3_count": 595.15,
+        "argmax_ge3_rate": 0.08527807820777601,
+        "max_class_probability_median": 0.514304961193192,
+        "max_class_probability_p90": 0.7145943146949902,
+        "lead_over_second_median": 0.2525115623465043,
+        "lead_over_second_p90": 0.5604942634950789,
+        "normalized_entropy_mean": 0.7905781062699134,
+        "log_loss": 0.70778744561415,
+        "train_prior_log_loss": 1.322697319952067,
+        "mean_p_ge3_given_ge3": 0.42828676818369366,
+        "mean_p_ge3_given_lt0": 0.07649739958777975
+      }
+    },
+    "logistic": {
+      "next_day_test": {
+        "actual_ge3_rate": 0.127167509307083,
+        "train_prior_ge3": 0.11558477949384434,
+        "mean_p_ge3": 0.11909121226822636,
+        "p_ge3_median": 0.11122382711351494,
+        "p_ge3_p90": 0.16297790716118807,
+        "p_ge3_max": 0.3129362529070358,
+        "argmax_ge3_count": 0.15,
+        "argmax_ge3_rate": 0.00042023439924794743,
+        "max_class_probability_median": 0.3581559041395174,
+        "max_class_probability_p90": 0.43730171844746135,
+        "lead_over_second_median": 0.07203674619379923,
+        "lead_over_second_p90": 0.19551914032850087,
+        "normalized_entropy_mean": 0.9362848800287971,
+        "log_loss": 1.3213041196809718,
+        "train_prior_log_loss": 1.3359017373214601,
+        "mean_p_ge3_given_ge3": 0.12863070797072224,
+        "mean_p_ge3_given_lt0": 0.12370770425268299
+      },
+      "same_fold_train": {
+        "actual_ge3_rate": 0.11558477949384434,
+        "train_prior_ge3": 0.11558477949384434,
+        "mean_p_ge3": 0.11557844623423838,
+        "p_ge3_median": 0.10726596090202015,
+        "p_ge3_p90": 0.15822252397174724,
+        "p_ge3_max": 0.4711968792088583,
+        "argmax_ge3_count": 5.8,
+        "argmax_ge3_rate": 0.0007335587533662504,
+        "max_class_probability_median": 0.34899226904897374,
+        "max_class_probability_p90": 0.41948929126433504,
+        "lead_over_second_median": 0.057711904009581774,
+        "lead_over_second_p90": 0.1691330754772033,
+        "normalized_entropy_mean": 0.9391635405003462,
+        "log_loss": 1.3017541008211058,
+        "train_prior_log_loss": 1.322697319952067,
+        "mean_p_ge3_given_ge3": 0.12637703133140335,
+        "mean_p_ge3_given_lt0": 0.11777340103748739
+      }
+    },
+    "small_boosted_tree": {
+      "next_day_test": {
+        "actual_ge3_rate": 0.127167509307083,
+        "train_prior_ge3": 0.11558477949384434,
+        "mean_p_ge3": 0.12144815886094144,
+        "p_ge3_median": 0.12027442991385581,
+        "p_ge3_p90": 0.17260523469171682,
+        "p_ge3_max": 0.26168661903151375,
+        "argmax_ge3_count": 0.35,
+        "argmax_ge3_rate": 0.0014621798329863295,
+        "max_class_probability_median": 0.36967328335420097,
+        "max_class_probability_p90": 0.4485160135573179,
+        "lead_over_second_median": 0.08558671458977986,
+        "lead_over_second_p90": 0.2120583458465119,
+        "normalized_entropy_mean": 0.933713199373871,
+        "log_loss": 1.3215275560381747,
+        "train_prior_log_loss": 1.3359017373214601,
+        "mean_p_ge3_given_ge3": 0.13566522947887694,
+        "mean_p_ge3_given_lt0": 0.12608454191264848
+      },
+      "same_fold_train": {
+        "actual_ge3_rate": 0.11558477949384434,
+        "train_prior_ge3": 0.11558477949384434,
+        "mean_p_ge3": 0.11567467750569545,
+        "p_ge3_median": 0.11547907944940741,
+        "p_ge3_p90": 0.17196503741926905,
+        "p_ge3_max": 0.2999294166911287,
+        "argmax_ge3_count": 6.0,
+        "argmax_ge3_rate": 0.0009026932059650747,
+        "max_class_probability_median": 0.3645170958944502,
+        "max_class_probability_p90": 0.443602737203733,
+        "lead_over_second_median": 0.07072928501669287,
+        "lead_over_second_p90": 0.19915435224031122,
+        "normalized_entropy_mean": 0.9316272961703749,
+        "log_loss": 1.2565715326072606,
+        "train_prior_log_loss": 1.322697319952067,
+        "mean_p_ge3_given_ge3": 0.14185579151462263,
+        "mean_p_ge3_given_lt0": 0.1152107323121871
+      }
+    }
+  },
+  "day_probability_fit": {
+    "logistic": {
+      "actual_ge3_rate_min_max": [
+        0.06542056074766354,
+        0.23773584905660378
+      ],
+      "mean_p_ge3_min_max": [
+        0.10198235632207849,
+        0.13380726257840098
+      ],
+      "actual_vs_predicted_day_ge3_correlation": -0.031643705801510214
+    },
+    "small_boosted_tree": {
+      "actual_ge3_rate_min_max": [
+        0.06542056074766354,
+        0.23773584905660378
+      ],
+      "mean_p_ge3_min_max": [
+        0.09968410174145988,
+        0.1390229565787585
+      ],
+      "actual_vs_predicted_day_ge3_correlation": 0.17627779065717283
+    }
+  },
   "out_of_fold_prediction": {
     "logistic": {
       "classes_actual": {
