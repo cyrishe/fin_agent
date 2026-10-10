@@ -104,7 +104,7 @@ def arm_summary(top1: pd.DataFrame, days: int) -> dict:
 
 
 def aggregate(rows: pd.DataFrame, dates: list[str], checkpoint: Path,
-              output: Path) -> dict:
+              output: Path, data: Path = DATA) -> dict:
     test_days = dates[20:-1]  # July 31 has no Aug 3 morning label.
     folds = [json.loads((checkpoint / f"{day}_fold.json").read_text()) for day in test_days]
     picks = pd.concat([pd.read_csv(checkpoint / f"{day}_picks.csv",
@@ -142,7 +142,7 @@ def aggregate(rows: pd.DataFrame, dates: list[str], checkpoint: Path,
     summary = {"source_rows": len(rows), "signal_dates": len(dates),
                "test_first": test_days[0], "test_last": test_days[-1],
                "test_days": len(test_days), "arms": summaries,
-               "data_sha256": hashlib.sha256(DATA.read_bytes()).hexdigest(),
+               "data_sha256": hashlib.sha256(data.read_bytes()).hexdigest(),
                "script_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest()}
     (output / "summary.json").write_text(json.dumps(summary, ensure_ascii=False, indent=2)+"\n")
     return summary
@@ -154,26 +154,38 @@ def main() -> None:
     parser.add_argument("--checkpoint", type=Path, default=CHECKPOINT)
     parser.add_argument("--output", type=Path, default=OUT)
     parser.add_argument("--max-folds", type=int)
+    parser.add_argument("--workers", type=int, default=1,
+                        help="Total independent fold workers")
+    parser.add_argument("--worker-index", type=int, default=0,
+                        help="This worker's zero-based fold shard")
+    parser.add_argument("--aggregate-only", action="store_true")
+    parser.add_argument("--calendar-archive", type=Path, action="append",
+                        help="Unadjusted minute directory; repeat for adjoining archives")
     args = parser.parse_args()
     rows = pd.read_csv(args.data, dtype={"symbol6": str, "signal_date": str,
                                          "next_date": str}, low_memory=False)
-    dates = sorted(path.stem for path in
-                   Path("outputs/stock_automl/mk_archive/mk/none").glob("2026-*.csv"))
-    if len(dates) != 62 or len(rows) < 1000:
+    archives = args.calendar_archive or [Path("outputs/stock_automl/mk_archive/mk/none")]
+    dates = sorted(path.stem for root in archives for path in root.glob("2026-*.csv"))
+    if len(dates) < 21 or len(dates) != len(set(dates)) or len(rows) < 1000:
         raise ValueError("Source cohort or trading calendar is incomplete")
     args.checkpoint.mkdir(parents=True, exist_ok=True)
     test_days = dates[20:-1]
     if args.max_folds is not None:
         test_days = test_days[:args.max_folds]
-    for index, day in enumerate(test_days, start=20):
-        meta = args.checkpoint / f"{day}_fold.json"
-        pick = args.checkpoint / f"{day}_picks.csv"
-        score = args.checkpoint / f"{day}_scores.csv.gz"
-        if not (meta.exists() and pick.exists() and score.exists()):
-            one_fold(rows, dates, index, args.checkpoint)
-        print(f"completed {day} ({index-19}/{len(dates)-21})", flush=True)
-    if args.max_folds is None:
-        print(json.dumps(aggregate(rows, dates, args.checkpoint, args.output),
+    if args.workers < 1 or not 0 <= args.worker_index < args.workers:
+        raise ValueError("Invalid independent fold worker")
+    if not args.aggregate_only:
+        for index, day in enumerate(test_days, start=20):
+            if (index - 20) % args.workers != args.worker_index:
+                continue
+            meta = args.checkpoint / f"{day}_fold.json"
+            pick = args.checkpoint / f"{day}_picks.csv"
+            score = args.checkpoint / f"{day}_scores.csv.gz"
+            if not (meta.exists() and pick.exists() and score.exists()):
+                one_fold(rows, dates, index, args.checkpoint)
+            print(f"completed {day} ({index-19}/{len(dates)-21})", flush=True)
+    if args.max_folds is None and (args.aggregate_only or args.workers == 1):
+        print(json.dumps(aggregate(rows, dates, args.checkpoint, args.output, args.data),
                          ensure_ascii=False, indent=2), flush=True)
 
 

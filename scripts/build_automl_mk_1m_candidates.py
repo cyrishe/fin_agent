@@ -56,10 +56,16 @@ def summarize_day(path: Path) -> tuple[pd.DataFrame, dict]:
         ["symbol", "high"]].rename(columns={"high": "morning_second_high"})
     close40 = morning.loc[morning.time.str.endswith("09:40:00"),
                           ["symbol", "close"]].rename(columns={"close": "morning_close_40"})
+    morning_closes = morning.assign(slot=morning.time.str[-8:-3]).pivot(
+        index="symbol", columns="slot", values="close")
+    morning_closes = morning_closes.rename(
+        columns={f"09:{minute:02d}": f"morning_close_{minute:02d}"
+                 for minute in range(31, 40)})[
+                     [f"morning_close_{minute:02d}" for minute in range(31, 40)]].reset_index()
     volume5 = morning.loc[morning.time.str[-8:].le("09:35:00")].groupby(
         "symbol", sort=False).volume.sum().rename("morning_volume5_shares").reset_index()
     merged = signal.merge(intraday, on="symbol", validate="one_to_one")
-    for part in (second, close40, volume5):
+    for part in (second, close40, volume5, morning_closes):
         merged = merged.merge(part, on="symbol", validate="one_to_one")
     if len(merged) != len(counts):
         raise ValueError(f"Lost stock keys in {path}")
@@ -68,20 +74,22 @@ def summarize_day(path: Path) -> tuple[pd.DataFrame, dict]:
     return merged.drop(columns="symbol"), audit
 
 
-def load_daily_profile(env_file: Path) -> tuple[pd.DataFrame, pd.DataFrame, list]:
+def load_daily_profile(env_file: Path, start: str = START,
+                       end: str = END) -> tuple[pd.DataFrame, pd.DataFrame, list, dict]:
+    history_start = (pd.Timestamp(start) - pd.Timedelta(days=70)).strftime("%Y-%m-%d")
     with db_connection(env_file) as db:
         with db.cursor() as cursor:
             cursor.execute("""SELECT trade_date AS date,LEFT(stk_code,6) AS symbol6,
                 preclose,close,adjpreclose,adjclose,volume,turn_ratio
                 FROM kcrp_stock_price WHERE trade_date BETWEEN %s AND %s""",
-                           ("2026-04-01", END))
+                           (history_start, end))
             daily = pd.DataFrame(cursor.fetchall())
             cursor.execute("SELECT LEFT(stk_code,6) AS symbol6,stk_name AS name "
                            "FROM kcrp_stock_baseinfo")
             names = pd.DataFrame(cursor.fetchall()).drop_duplicates("symbol6", keep=False)
             cursor.execute("""SELECT trade_date AS date,LEFT(stk_code,6) AS symbol6,float_mv
                 FROM kcrp_stock_pricevaluate WHERE trade_date BETWEEN %s AND %s""",
-                           ("2026-04-01", END))
+                           (history_start, end))
             reported = pd.DataFrame(cursor.fetchall())
     daily["date"] = pd.to_datetime(daily.date)
     daily["symbol6"] = daily.symbol6.astype(str).str.zfill(6)
@@ -107,24 +115,46 @@ def load_daily_profile(env_file: Path) -> tuple[pd.DataFrame, pd.DataFrame, list
     return daily.merge(names, on="symbol6", how="left", validate="many_to_one"), profile, calendar, proxy_audit
 
 
-def build(archive: Path, env_file: Path, output: Path) -> dict:
-    files = sorted(archive.glob("2026-*.csv"))
-    if len(files) != 62 or files[0].stem != START or files[-1].stem != END:
-        raise ValueError("Expected the complete 62-day May–July unadjusted archive")
-    daily, profile, calendar, proxy_audit = load_daily_profile(env_file)
+def build(archive: Path | list[Path], env_file: Path, output: Path,
+          reuse_snapshots: bool = False) -> dict:
+    archives = [archive] if isinstance(archive, Path) else archive
+    files = sorted((file for root in archives for file in root.glob("2026-*.csv")),
+                   key=lambda file: file.stem)
+    if not files or len({file.stem for file in files}) != len(files):
+        raise ValueError("Missing or duplicate unadjusted minute days")
+    start, end = files[0].stem, files[-1].stem
+    daily, profile, calendar, proxy_audit = load_daily_profile(env_file, start, end)
+    expected = [str(day)[:10] for day in calendar
+                if pd.Timestamp(start) <= day <= pd.Timestamp(end)]
+    if [file.stem for file in files] != expected:
+        raise ValueError("Minute archive days differ from the daily trading calendar")
     next_date = {pd.Timestamp(a): pd.Timestamp(b)
                  for a, b in zip(calendar[:-1], calendar[1:])}
-    snapshots, minute_audits = [], []
-    for file in files:
-        frame, audit = summarize_day(file)
-        snapshots.append(frame)
-        minute_audits.append(audit)
-        print(f"summarized {file.stem}", flush=True)
-    snapshots = pd.concat(snapshots, ignore_index=True)
-    snapshots["signal_date"] = pd.to_datetime(snapshots.signal_date)
     output.mkdir(parents=True, exist_ok=True)
-    snapshots.to_csv(output / "minute_daily_snapshots.csv.gz", index=False, compression="gzip")
-    pd.DataFrame(minute_audits).to_csv(output / "minute_source_audit.csv", index=False)
+    if reuse_snapshots:
+        snapshots = pd.read_csv(output / "minute_daily_snapshots.csv.gz",
+                                dtype={"symbol6": str})
+        minute_audits = pd.read_csv(output / "minute_source_audit.csv").to_dict("records")
+        if "morning_close_40_x" in snapshots:
+            if not np.allclose(snapshots.morning_close_40_x,
+                               snapshots.morning_close_40_y):
+                raise ValueError("Conflicting duplicated 09:40 close columns")
+            snapshots = snapshots.rename(columns={"morning_close_40_x": "morning_close_40"})
+            snapshots = snapshots.drop(columns="morning_close_40_y")
+    else:
+        snapshots, minute_audits = [], []
+        for file in files:
+            frame, audit = summarize_day(file)
+            snapshots.append(frame)
+            minute_audits.append(audit)
+            print(f"summarized {file.stem}", flush=True)
+        snapshots = pd.concat(snapshots, ignore_index=True)
+        snapshots.to_csv(output / "minute_daily_snapshots.csv.gz", index=False,
+                         compression="gzip")
+        pd.DataFrame(minute_audits).to_csv(output / "minute_source_audit.csv", index=False)
+    snapshots["signal_date"] = pd.to_datetime(snapshots.signal_date)
+    if sorted(snapshots.signal_date.dt.strftime("%Y-%m-%d").unique()) != expected:
+        raise ValueError("Saved minute snapshots do not match the archive calendar")
     signals = snapshots.merge(
         daily[["date", "symbol6", "preclose", "name"]].rename(
             columns={"date": "signal_date", "preclose": "t_reference_preclose"}),
@@ -133,9 +163,13 @@ def build(archive: Path, env_file: Path, output: Path) -> dict:
                             validate="one_to_one")
     signals["next_date"] = signals.signal_date.map(next_date)
     morning = snapshots[["signal_date", "symbol6", "morning_second_high",
-                         "morning_close_40", "morning_volume5_shares"]].rename(
+                         "morning_close_40", "morning_volume5_shares",
+                         *(f"morning_close_{minute:02d}" for minute in range(31, 40))]].rename(
         columns={"signal_date": "next_date", "morning_second_high": "second_high",
-                 "morning_close_40": "close_40", "morning_volume5_shares": "next_volume5"})
+                 "morning_close_40": "close_40", "morning_volume5_shares": "next_volume5",
+                 **{f"morning_close_{minute:02d}": f"next_close_{minute:02d}"
+                    for minute in range(31, 40)}})
+    morning["next_close_40"] = morning.close_40
     signals = signals.merge(morning, on=["next_date", "symbol6"], how="left",
                             validate="one_to_one")
     signals["signal_return"] = signals.signal_price / signals.t_reference_preclose - 1
@@ -168,7 +202,9 @@ def build(archive: Path, env_file: Path, output: Path) -> dict:
     coverage = candidates.groupby("signal_date").agg(
         candidates=("symbol6", "size"), labeled=("label_complete", "sum"))
     coverage.to_csv(output / "candidate_coverage.csv")
-    summary = {"archive": str(archive), "signal_days": int(candidates.signal_date.nunique()),
+    summary = {"archive": str(archives[0]) if len(archives) == 1 else
+               [str(root) for root in archives],
+               "signal_days": int(candidates.signal_date.nunique()),
                "first_signal_date": str(candidates.signal_date.min())[:10],
                "last_signal_date": str(candidates.signal_date.max())[:10],
                "candidates": len(candidates), "labeled": int(candidates.label_complete.sum()),
@@ -184,8 +220,11 @@ def build(archive: Path, env_file: Path, output: Path) -> dict:
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--archive", type=Path, default=ARCHIVE)
+    parser.add_argument("--archive", type=Path, action="append",
+                        help="Unadjusted minute directory; repeat for adjoining archives")
     parser.add_argument("--env-file", type=Path, default=Path("/Volumes/ext/fin_agent/.env"))
     parser.add_argument("--output", type=Path, default=OUT)
+    parser.add_argument("--reuse-snapshots", action="store_true")
     args = parser.parse_args()
-    print(json.dumps(build(args.archive, args.env_file, args.output), ensure_ascii=False, indent=2))
+    print(json.dumps(build(args.archive or ARCHIVE, args.env_file, args.output,
+                           args.reuse_snapshots), ensure_ascii=False, indent=2))
