@@ -6,7 +6,8 @@
     "ge3": "return >= 0.03"
   },
   "target": "second highest of T+1 09:31–09:40 exact 1m highs / T 14:40 price - 1",
-  "ranking": "descending P(ge3), symbol ascending for ties",
+  "ranking": "daily_top2.csv is the forced-two ranking baseline, not a trade decision",
+  "selection": "diagnostic argmax ge3 gate, then at most two by P(ge3); zero allowed; not a trade rule",
   "training": "previous 20 available signal days only; 20 forward test days",
   "models": {
     "logistic": {
@@ -57,7 +58,17 @@
       "daily_equal_weight_pool_ge3_rate": 0.127167509307083,
       "top2_ge3_rate": 0.075,
       "top2_below_minus1": 13,
-      "days_with_top2_ge3": 3
+      "days_with_top2_ge3": 3,
+      "argmax_ge3_gate": {
+        "selected": 3,
+        "days_with_selection": 3,
+        "days_skipped": 17,
+        "actual_ge3": 0,
+        "actual_lt0": 2,
+        "actual_below_minus1": 2,
+        "mean_second_high_return_pct": -0.997046673740328,
+        "median_lead_over_next_class": 0.010697706083880654
+      }
     },
     "small_boosted_tree": {
       "rows": 5818,
@@ -107,7 +118,17 @@
       "daily_equal_weight_pool_ge3_rate": 0.127167509307083,
       "top2_ge3_rate": 0.2,
       "top2_below_minus1": 7,
-      "days_with_top2_ge3": 8
+      "days_with_top2_ge3": 8,
+      "argmax_ge3_gate": {
+        "selected": 7,
+        "days_with_selection": 7,
+        "days_skipped": 13,
+        "actual_ge3": 4,
+        "actual_lt0": 2,
+        "actual_below_minus1": 0,
+        "mean_second_high_return_pct": 2.2788228294121766,
+        "median_lead_over_next_class": 0.02068402619689791
+      }
     }
   },
   "source_sha256": {

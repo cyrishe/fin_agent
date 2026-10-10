@@ -45,6 +45,18 @@ def models():
     return {"logistic": logistic, "small_boosted_tree": boosted}
 
 
+def select_ge3_predictions(scored: pd.DataFrame) -> pd.DataFrame:
+    """Diagnostic gate: retain up to two/day only if >=3% leads; not a trade rule."""
+    other = scored[["p_lt0", "p_0to1", "p_1to3"]].max(axis=1)
+    eligible = scored.loc[scored.p_ge3.gt(other)].copy()
+    eligible["lead_over_next_class"] = eligible.p_ge3 - other.loc[eligible.index]
+    eligible = eligible.sort_values(
+        ["model", "signal_date", "p_ge3", "symbol6"],
+        ascending=[True, True, False, True])
+    eligible["selection_rank"] = eligible.groupby(["model", "signal_date"]).cumcount()+1
+    return eligible[eligible.selection_rank.le(2)]
+
+
 def run() -> dict:
     base = pd.read_csv(DATA, dtype={"symbol6": str})
     prices = pd.read_csv(SECOND_HIGHS, dtype={"symbol6": str})
@@ -85,12 +97,14 @@ def run() -> dict:
             predictions.append(frame)
         print(f"test {dates[index]}: {len(test)} candidates", flush=True)
     scored = pd.concat(predictions, ignore_index=True)
+    gated = select_ge3_predictions(scored)
     metrics = {}
     for name, frame in scored.groupby("model"):
         actual = frame["class"].astype(str)
         probability_matrix = frame[[f"p_{label}" for label in CLASSES]].to_numpy(dtype=float)
         actual_index = actual.map({label: index for index, label in enumerate(CLASSES)}).to_numpy()
         top = frame[frame["rank"].le(2)]
+        selected = gated[gated.model.eq(name)]
         baseline = frame.groupby("signal_date")["class"].apply(
             lambda values: values.eq("ge3").mean()).mean()
         metrics[name] = {
@@ -109,15 +123,29 @@ def run() -> dict:
             "top2_below_minus1": int(top.second_high_return.lt(-.01).sum()),
             "days_with_top2_ge3": int(top.groupby("signal_date")["class"].apply(
                 lambda values: values.eq("ge3").any()).sum()),
+            "argmax_ge3_gate": {
+                "selected": len(selected),
+                "days_with_selection": int(selected.signal_date.nunique()),
+                "days_skipped": int(frame.signal_date.nunique()-selected.signal_date.nunique()),
+                "actual_ge3": int(selected["class"].eq("ge3").sum()),
+                "actual_lt0": int(selected["class"].eq("lt0").sum()),
+                "actual_below_minus1": int(selected.second_high_return.lt(-.01).sum()),
+                "mean_second_high_return_pct": (float(selected.second_high_return.mean()*100)
+                                                if len(selected) else None),
+                "median_lead_over_next_class": (float(selected.lead_over_next_class.median())
+                                                if len(selected) else None),
+            },
         }
     OUT.mkdir(parents=True, exist_ok=True)
     scored.to_csv(OUT / "predictions.csv.gz", index=False, compression="gzip")
     scored[scored["rank"].le(2)].to_csv(OUT / "daily_top2.csv", index=False)
+    gated.to_csv(OUT / "daily_argmax_ge3_at_most2.csv", index=False)
     pd.DataFrame(folds).to_csv(OUT / "folds.csv", index=False)
     summary = {"boundary": {"lt0": "return < 0", "0to1": "0 <= return < 0.01",
                             "1to3": "0.01 <= return < 0.03", "ge3": "return >= 0.03"},
                "target": "second highest of T+1 09:31–09:40 exact 1m highs / T 14:40 price - 1",
-               "ranking": "descending P(ge3), symbol ascending for ties",
+               "ranking": "daily_top2.csv is the forced-two ranking baseline, not a trade decision",
+               "selection": "diagnostic argmax ge3 gate, then at most two by P(ge3); zero allowed; not a trade rule",
                "training": "previous 20 available signal days only; 20 forward test days",
                "models": metrics,
                "source_sha256": {str(path): hashlib.sha256(path.read_bytes()).hexdigest()
