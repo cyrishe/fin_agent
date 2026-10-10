@@ -1,6 +1,7 @@
 """Replay the fixed four-class rules on the Oct 8 signal / Oct 9 morning."""
 from __future__ import annotations
 
+import argparse
 import hashlib
 import json
 from pathlib import Path
@@ -9,6 +10,7 @@ import numpy as np
 import pandas as pd
 from sklearn.metrics import confusion_matrix
 
+from scripts.automl_st_status import ELIGIBLE_TYPES, attach_st_status, load_st_intervals
 from scripts.audit_automl_exit_variants import CLOSES, replay
 from scripts.audit_automl_four_class_decisions import (
     class_priority_fallback, label_outcomes)
@@ -145,13 +147,15 @@ def summarize(picks: pd.DataFrame, trades: pd.DataFrame,
     return result
 
 
-def run(env_file: Path = Path("/Volumes/ext/fin_agent/.env")) -> dict:
+def run(env_file: Path = Path("/Volumes/ext/fin_agent/.env"),
+        expected_history_rows: int = 14292,
+        exclude_historical_st: bool = False) -> dict:
     historical = pd.read_csv(DATA, dtype={"symbol6": str})
     prices = pd.read_csv(SECOND_HIGHS, dtype={"symbol6": str})
     history = historical.merge(prices[["next_date", "symbol6", "second_high"]],
                                on=["next_date", "symbol6"], validate="one_to_one")
     dates = sorted(history.signal_date.unique())
-    if len(history) != 14292 or len(dates) != 40 or dates[-1] != "2026-09-30":
+    if len(history) != expected_history_rows or len(dates) != 40 or dates[-1] != "2026-09-30":
         raise ValueError("Historical training source changed")
     history["second_high_return"] = history.second_high/history.entry_1440-1
     history["class"] = four_class(history.second_high_return)
@@ -166,6 +170,9 @@ def run(env_file: Path = Path("/Volumes/ext/fin_agent/.env")) -> dict:
     current["next_date"] = NEXT_DATE
     conn = db_connection(env_file)
     try:
+        if exclude_historical_st:
+            current = attach_st_status(current, load_st_intervals(conn))
+            current = current[current.st_type.isin(ELIGIBLE_TYPES)].copy()
         codes = current.symbol6.tolist()
         placeholders = ",".join(["%s"]*len(codes))
         entry = query(conn, "SELECT LEFT(stk_code,6) symbol6, latest_price entry_1440, "
@@ -218,6 +225,8 @@ def run(env_file: Path = Path("/Volumes/ext/fin_agent/.env")) -> dict:
         "signal_date": SIGNAL_DATE, "exit_date": NEXT_DATE,
         "training_signal_dates": [train_dates[0], train_dates[-1]],
         "training_rows": len(train), "candidate_rows": len(current),
+        "historical_st_filter": exclude_historical_st,
+        "candidate_risk_excluded": 178-len(current),
         "selection_frozen_before_outcome_query": True,
         "weights": balanced_class_weights(train["class"]),
         "models": summarize(selected, trades, predictions),
@@ -233,4 +242,14 @@ def run(env_file: Path = Path("/Volumes/ext/fin_agent/.env")) -> dict:
 
 
 if __name__ == "__main__":
-    print(json.dumps(run(), ensure_ascii=False, indent=2))
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--env-file", type=Path,
+                        default=Path("/Volumes/ext/fin_agent/.env"))
+    parser.add_argument("--historical-data", type=Path, default=DATA)
+    parser.add_argument("--out", type=Path, default=OUT)
+    parser.add_argument("--expected-history-rows", type=int, default=14292)
+    parser.add_argument("--exclude-historical-st", action="store_true")
+    args = parser.parse_args()
+    DATA, OUT = args.historical_data, args.out
+    print(json.dumps(run(args.env_file, args.expected_history_rows,
+                         args.exclude_historical_st), ensure_ascii=False, indent=2))

@@ -20,15 +20,15 @@ from scripts.experiment_automl_second_high_four_class import (
 from scripts.experiment_automl_second_high_regression import SECOND_HIGHS
 
 
-def load_data() -> pd.DataFrame:
-    base = pd.read_csv(DATA, dtype={"symbol6": str})
+def load_data(data_path: Path = DATA, expected_rows: int = 14292) -> pd.DataFrame:
+    base = pd.read_csv(data_path, dtype={"symbol6": str})
     prices = pd.read_csv(SECOND_HIGHS, dtype={"symbol6": str})
     data = base.merge(prices[["next_date", "symbol6", "second_high"]],
                       on=["next_date", "symbol6"], validate="one_to_one")
     data["second_high_return"] = data.second_high/data.entry_1440-1
     data["class"] = four_class(data.second_high_return)
     dates = sorted(data.signal_date.unique())
-    if len(data) != 14292 or len(dates) != 40 or not data.signal_return.between(
+    if len(data) != expected_rows or len(dates) != 40 or not data.signal_return.between(
             .03-1e-10, .06+1e-10).all():
         raise ValueError("Expected 40 exact 3%-6% signal-day candidate pools")
     return data

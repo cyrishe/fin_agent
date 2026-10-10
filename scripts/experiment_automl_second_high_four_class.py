@@ -1,6 +1,7 @@
 """Walk-forward four-class study of next-morning second-high returns."""
 from __future__ import annotations
 
+import argparse
 import hashlib
 import json
 from pathlib import Path
@@ -57,13 +58,13 @@ def select_ge3_predictions(scored: pd.DataFrame) -> pd.DataFrame:
     return eligible[eligible.selection_rank.le(2)]
 
 
-def run() -> dict:
+def run(expected_rows: int = 14292) -> dict:
     base = pd.read_csv(DATA, dtype={"symbol6": str})
     prices = pd.read_csv(SECOND_HIGHS, dtype={"symbol6": str})
     data = base.merge(prices[["next_date", "symbol6", "second_high"]],
                       on=["next_date", "symbol6"], validate="one_to_one")
     dates = sorted(data.signal_date.unique())
-    if len(data) != 14292 or len(dates) != 40 or data[list(FEATURES)].isna().any().any():
+    if len(data) != expected_rows or len(dates) != 40 or data[list(FEATURES)].isna().any().any():
         raise ValueError("Expected complete 40-day exact candidate pool")
     data["second_high_return"] = data.second_high / data.entry_1440 - 1
     data["class"] = four_class(data.second_high_return)
@@ -155,4 +156,10 @@ def run() -> dict:
 
 
 if __name__ == "__main__":
-    print(json.dumps(run()["models"], ensure_ascii=False, indent=2))
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--data", type=Path, default=DATA)
+    parser.add_argument("--out", type=Path, default=OUT)
+    parser.add_argument("--expected-rows", type=int, default=14292)
+    args = parser.parse_args()
+    DATA, OUT = args.data, args.out
+    print(json.dumps(run(args.expected_rows)["models"], ensure_ascii=False, indent=2))

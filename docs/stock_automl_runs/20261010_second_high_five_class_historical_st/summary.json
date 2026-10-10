@@ -1,0 +1,558 @@
+{
+  "classes": [
+    "ltm1",
+    "m1to0",
+    "0to1",
+    "1to3",
+    "ge3"
+  ],
+  "boundaries": "<-1%, [-1%,0%), [0%,1%), [1%,3%), >=3%",
+  "train_days_per_fold": 20,
+  "uniform_random_accuracy": 0.2,
+  "rolling_prior_next_day_log_loss": 1.545924562752596,
+  "pool_classes": {
+    "ltm1": 1956,
+    "m1to0": 2746,
+    "0to1": 3924,
+    "1to3": 3680,
+    "ge3": 1686
+  },
+  "cost_matrix_rows_actual_columns_decision": [
+    [
+      0.0,
+      1.0,
+      4.0,
+      9.0,
+      16.0
+    ],
+    [
+      1.0,
+      0.0,
+      1.0,
+      4.0,
+      9.0
+    ],
+    [
+      2.0,
+      1.0,
+      0.0,
+      1.0,
+      4.0
+    ],
+    [
+      3.0,
+      2.0,
+      1.0,
+      0.0,
+      1.0
+    ],
+    [
+      4.0,
+      3.0,
+      2.0,
+      1.0,
+      0.0
+    ]
+  ],
+  "cost_note": "Overprediction uses squared class distance; underprediction uses linear distance. Illustrative prespecified decision cost, not transaction profit.",
+  "models": {
+    "cumulative_trees": {
+      "next_day_test": {
+        "rows": 5628,
+        "correct": 1770,
+        "accuracy": 0.31449893390191896,
+        "majority_class_accuracy": 0.3036602700781805,
+        "best_constant_action_ordinal_cost": 1.1783937455579248,
+        "balanced_accuracy_fold_mean": 0.23664120060226992,
+        "log_loss_weighted_mean": 1.5207097550829798,
+        "argmax_mean_ordinal_cost": 1.5813788201847903,
+        "risk_decision_mean_ordinal_cost": 1.157960199004975,
+        "argmax_confusion_rows_actual_columns_predicted": [
+          [
+            150,
+            10,
+            272,
+            251,
+            2
+          ],
+          [
+            86,
+            16,
+            563,
+            422,
+            2
+          ],
+          [
+            81,
+            36,
+            956,
+            636,
+            0
+          ],
+          [
+            107,
+            36,
+            700,
+            644,
+            0
+          ],
+          [
+            99,
+            19,
+            240,
+            296,
+            4
+          ]
+        ],
+        "risk_decision_confusion_rows_actual_columns_decision": [
+          [
+            1,
+            385,
+            299,
+            0,
+            0
+          ],
+          [
+            0,
+            391,
+            698,
+            0,
+            0
+          ],
+          [
+            2,
+            517,
+            1190,
+            0,
+            0
+          ],
+          [
+            0,
+            589,
+            898,
+            0,
+            0
+          ],
+          [
+            1,
+            323,
+            334,
+            0,
+            0
+          ]
+        ],
+        "top2": {
+          "p_ge3": {
+            "selected": 40,
+            "days_or_train_day_evaluations": 20,
+            "actual_ge3": 11,
+            "actual_ge1": 21,
+            "actual_0to1": 5,
+            "actual_m1to0": 8,
+            "actual_ltm1": 6,
+            "mean_second_high_return_pct": 1.1092565938358134,
+            "minute_close_exit_mean_return_pct": 0.1370582511981805,
+            "minute_close_exit_positive": 22,
+            "minute_close_exit_below_minus1": 13
+          },
+          "utility_score": {
+            "selected": 40,
+            "days_or_train_day_evaluations": 20,
+            "actual_ge3": 12,
+            "actual_ge1": 23,
+            "actual_0to1": 6,
+            "actual_m1to0": 7,
+            "actual_ltm1": 4,
+            "mean_second_high_return_pct": 1.4867337427274845,
+            "minute_close_exit_mean_return_pct": 0.08175225742680786,
+            "minute_close_exit_positive": 24,
+            "minute_close_exit_below_minus1": 14
+          },
+          "class_priority_fallback": {
+            "selected": 40,
+            "days_or_train_day_evaluations": 20,
+            "actual_ge3": 9,
+            "actual_ge1": 18,
+            "actual_0to1": 8,
+            "actual_m1to0": 7,
+            "actual_ltm1": 7,
+            "mean_second_high_return_pct": 0.9093494045950686,
+            "minute_close_exit_mean_return_pct": -0.3782947769924966,
+            "minute_close_exit_positive": 18,
+            "minute_close_exit_below_minus1": 18
+          }
+        },
+        "ltm1_auc": 0.6378501781624387,
+        "ltm1_average_precision": 0.23306343513077005,
+        "ge3_auc": 0.621840618177148,
+        "ge3_average_precision": 0.16594877877067435
+      },
+      "same_fold_train": {
+        "rows": 136493,
+        "correct": 47178,
+        "accuracy": 0.3456440989647821,
+        "majority_class_accuracy": 0.2773182507527859,
+        "best_constant_action_ordinal_cost": 1.2799923805616404,
+        "balanced_accuracy_fold_mean": 0.27617060580630115,
+        "log_loss_weighted_mean": 1.4748980547493924,
+        "argmax_mean_ordinal_cost": 1.593627512033584,
+        "risk_decision_mean_ordinal_cost": 1.1465569662913115,
+        "argmax_confusion_rows_actual_columns_predicted": [
+          [
+            4433,
+            728,
+            7794,
+            7143,
+            18
+          ],
+          [
+            1854,
+            1272,
+            14060,
+            9350,
+            31
+          ],
+          [
+            1702,
+            850,
+            23522,
+            11733,
+            45
+          ],
+          [
+            2102,
+            685,
+            15559,
+            17837,
+            54
+          ],
+          [
+            1931,
+            401,
+            5789,
+            7486,
+            114
+          ]
+        ],
+        "risk_decision_confusion_rows_actual_columns_decision": [
+          [
+            22,
+            13074,
+            7020,
+            0,
+            0
+          ],
+          [
+            4,
+            11892,
+            14671,
+            0,
+            0
+          ],
+          [
+            1,
+            13278,
+            24573,
+            0,
+            0
+          ],
+          [
+            4,
+            12595,
+            23637,
+            1,
+            0
+          ],
+          [
+            2,
+            7103,
+            8616,
+            0,
+            0
+          ]
+        ],
+        "top2": {
+          "p_ge3": {
+            "selected": 800,
+            "days_or_train_day_evaluations": 400,
+            "actual_ge3": 306,
+            "actual_ge1": 470,
+            "actual_0to1": 111,
+            "actual_m1to0": 89,
+            "actual_ltm1": 130,
+            "mean_second_high_return_pct": 2.151173556361043
+          },
+          "utility_score": {
+            "selected": 800,
+            "days_or_train_day_evaluations": 400,
+            "actual_ge3": 231,
+            "actual_ge1": 461,
+            "actual_0to1": 167,
+            "actual_m1to0": 115,
+            "actual_ltm1": 57,
+            "mean_second_high_return_pct": 1.8111012180708315
+          },
+          "class_priority_fallback": {
+            "selected": 800,
+            "days_or_train_day_evaluations": 400,
+            "actual_ge3": 210,
+            "actual_ge1": 497,
+            "actual_0to1": 112,
+            "actual_m1to0": 96,
+            "actual_ltm1": 95,
+            "mean_second_high_return_pct": 1.8655942432435872
+          }
+        }
+      }
+    },
+    "nominal_tree": {
+      "next_day_test": {
+        "rows": 5628,
+        "correct": 1751,
+        "accuracy": 0.31112295664534473,
+        "majority_class_accuracy": 0.3036602700781805,
+        "best_constant_action_ordinal_cost": 1.1783937455579248,
+        "balanced_accuracy_fold_mean": 0.24226750716996678,
+        "log_loss_weighted_mean": 1.5174363153805877,
+        "argmax_mean_ordinal_cost": 1.5938166311300639,
+        "risk_decision_mean_ordinal_cost": 1.1652452025586353,
+        "argmax_confusion_rows_actual_columns_predicted": [
+          [
+            166,
+            11,
+            251,
+            251,
+            6
+          ],
+          [
+            98,
+            21,
+            541,
+            426,
+            3
+          ],
+          [
+            90,
+            34,
+            890,
+            688,
+            7
+          ],
+          [
+            111,
+            34,
+            666,
+            670,
+            6
+          ],
+          [
+            109,
+            14,
+            218,
+            313,
+            4
+          ]
+        ],
+        "risk_decision_confusion_rows_actual_columns_decision": [
+          [
+            0,
+            362,
+            323,
+            0,
+            0
+          ],
+          [
+            0,
+            365,
+            724,
+            0,
+            0
+          ],
+          [
+            2,
+            503,
+            1204,
+            0,
+            0
+          ],
+          [
+            0,
+            558,
+            929,
+            0,
+            0
+          ],
+          [
+            1,
+            310,
+            347,
+            0,
+            0
+          ]
+        ],
+        "top2": {
+          "p_ge3": {
+            "selected": 40,
+            "days_or_train_day_evaluations": 20,
+            "actual_ge3": 10,
+            "actual_ge1": 20,
+            "actual_0to1": 7,
+            "actual_m1to0": 7,
+            "actual_ltm1": 6,
+            "mean_second_high_return_pct": 1.200190576224767,
+            "minute_close_exit_mean_return_pct": 0.16067069214062368,
+            "minute_close_exit_positive": 19,
+            "minute_close_exit_below_minus1": 16
+          },
+          "utility_score": {
+            "selected": 40,
+            "days_or_train_day_evaluations": 20,
+            "actual_ge3": 10,
+            "actual_ge1": 20,
+            "actual_0to1": 8,
+            "actual_m1to0": 8,
+            "actual_ltm1": 4,
+            "mean_second_high_return_pct": 1.219531546236039,
+            "minute_close_exit_mean_return_pct": 0.001118132754791279,
+            "minute_close_exit_positive": 20,
+            "minute_close_exit_below_minus1": 15
+          },
+          "class_priority_fallback": {
+            "selected": 40,
+            "days_or_train_day_evaluations": 20,
+            "actual_ge3": 7,
+            "actual_ge1": 14,
+            "actual_0to1": 9,
+            "actual_m1to0": 10,
+            "actual_ltm1": 7,
+            "mean_second_high_return_pct": 0.6399134211962652,
+            "minute_close_exit_mean_return_pct": -0.6042388970142948,
+            "minute_close_exit_positive": 13,
+            "minute_close_exit_below_minus1": 20
+          }
+        },
+        "ltm1_auc": 0.640226612580498,
+        "ltm1_average_precision": 0.23278425648342485,
+        "ge3_auc": 0.6196516484927804,
+        "ge3_average_precision": 0.1632046814752648
+      },
+      "same_fold_train": {
+        "rows": 136493,
+        "correct": 48588,
+        "accuracy": 0.35597429904830286,
+        "majority_class_accuracy": 0.2773182507527859,
+        "best_constant_action_ordinal_cost": 1.2799923805616404,
+        "balanced_accuracy_fold_mean": 0.2875441459604458,
+        "log_loss_weighted_mean": 1.464495724884803,
+        "argmax_mean_ordinal_cost": 1.5972687244034494,
+        "risk_decision_mean_ordinal_cost": 1.141963324126512,
+        "argmax_confusion_rows_actual_columns_predicted": [
+          [
+            4948,
+            475,
+            7416,
+            7241,
+            36
+          ],
+          [
+            2114,
+            1458,
+            13321,
+            9590,
+            84
+          ],
+          [
+            2009,
+            739,
+            23092,
+            11945,
+            67
+          ],
+          [
+            2326,
+            649,
+            14308,
+            18869,
+            85
+          ],
+          [
+            2139,
+            310,
+            5405,
+            7646,
+            221
+          ]
+        ],
+        "risk_decision_confusion_rows_actual_columns_decision": [
+          [
+            104,
+            12690,
+            7322,
+            0,
+            0
+          ],
+          [
+            11,
+            11500,
+            15056,
+            0,
+            0
+          ],
+          [
+            8,
+            12390,
+            25454,
+            0,
+            0
+          ],
+          [
+            15,
+            11890,
+            24331,
+            1,
+            0
+          ],
+          [
+            14,
+            6793,
+            8914,
+            0,
+            0
+          ]
+        ],
+        "top2": {
+          "p_ge3": {
+            "selected": 800,
+            "days_or_train_day_evaluations": 400,
+            "actual_ge3": 326,
+            "actual_ge1": 475,
+            "actual_0to1": 117,
+            "actual_m1to0": 103,
+            "actual_ltm1": 105,
+            "mean_second_high_return_pct": 2.3400940191496273
+          },
+          "utility_score": {
+            "selected": 800,
+            "days_or_train_day_evaluations": 400,
+            "actual_ge3": 247,
+            "actual_ge1": 460,
+            "actual_0to1": 153,
+            "actual_m1to0": 122,
+            "actual_ltm1": 65,
+            "mean_second_high_return_pct": 1.8709614768833747
+          },
+          "class_priority_fallback": {
+            "selected": 800,
+            "days_or_train_day_evaluations": 400,
+            "actual_ge3": 245,
+            "actual_ge1": 478,
+            "actual_0to1": 119,
+            "actual_m1to0": 108,
+            "actual_ltm1": 95,
+            "mean_second_high_return_pct": 1.8916125663077057
+          }
+        }
+      }
+    }
+  }
+}

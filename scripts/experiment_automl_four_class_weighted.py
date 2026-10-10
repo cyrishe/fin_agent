@@ -1,6 +1,7 @@
 """Compare fold-balanced four-class training with the saved unweighted tree."""
 from __future__ import annotations
 
+import argparse
 import hashlib
 import json
 from pathlib import Path
@@ -107,13 +108,13 @@ def summarize_selections(selected: pd.DataFrame, trades: pd.DataFrame,
     return rows
 
 
-def run() -> dict:
+def run(expected_rows: int = 14292) -> dict:
     base = pd.read_csv(DATA, dtype={"symbol6": str})
     prices = pd.read_csv(SECOND_HIGHS, dtype={"symbol6": str})
     data = base.merge(prices[["next_date", "symbol6", "second_high"]],
                       on=["next_date", "symbol6"], validate="one_to_one")
     dates = sorted(data.signal_date.unique())
-    if len(data) != 14292 or len(dates) != 40 or data[list(FEATURES)].isna().any().any():
+    if len(data) != expected_rows or len(dates) != 40 or data[list(FEATURES)].isna().any().any():
         raise ValueError("Expected the same complete 40-day candidate pool")
     data["second_high_return"] = data.second_high/data.entry_1440-1
     data["class"] = four_class(data.second_high_return)
@@ -166,15 +167,17 @@ def run() -> dict:
         for rule in ("class_priority_fallback", "p_ge3")], ignore_index=True)
     trades = replay(with_minute_closes(selected))
     summaries = summarize_selections(selected, trades, dates[WINDOW:])
-    old_fallback = json.loads((OLD / "class_priority_fallback_summary.json").read_text())
-    reference = next(row for row in summaries if
-                     row["model"] == BASELINE
-                     and row["selection_rule"] == "class_priority_fallback"
-                     and row["top_k"] == 2
-                     and row["exit_strategy"] == "original_four_rules")
-    if not np.isclose(reference["mean_trade_exit_pct"],
-                      old_fallback["fallback_minute_close_exit"]["mean_return_pct"]):
-        raise ValueError("Unweighted baseline did not reproduce the saved exit return")
+    prior_summary = OLD / "class_priority_fallback_summary.json"
+    if prior_summary.exists():
+        old_fallback = json.loads(prior_summary.read_text())
+        reference = next(row for row in summaries if
+                         row["model"] == BASELINE
+                         and row["selection_rule"] == "class_priority_fallback"
+                         and row["top_k"] == 2
+                         and row["exit_strategy"] == "original_four_rules")
+        if not np.isclose(reference["mean_trade_exit_pct"],
+                          old_fallback["fallback_minute_close_exit"]["mean_return_pct"]):
+            raise ValueError("Unweighted baseline did not reproduce the saved exit return")
     summary = {
         "weight_rule": "Within each 20-day training fold, weight(class)=train_rows/(4*class_count); each class has equal total training weight. No test labels enter weights.",
         "same_model": "HistGradientBoostingClassifier; 60 iterations, learning rate .05, 7 leaves, min leaf 100, L2 5; seven original features.",
@@ -196,4 +199,11 @@ def run() -> dict:
 
 
 if __name__ == "__main__":
-    print(json.dumps(run(), ensure_ascii=False, indent=2))
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--data", type=Path, default=DATA)
+    parser.add_argument("--baseline", type=Path, default=OLD)
+    parser.add_argument("--out", type=Path, default=OUT)
+    parser.add_argument("--expected-rows", type=int, default=14292)
+    args = parser.parse_args()
+    DATA, OLD, OUT = args.data, args.baseline, args.out
+    print(json.dumps(run(args.expected_rows), ensure_ascii=False, indent=2))

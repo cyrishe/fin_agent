@@ -1,0 +1,314 @@
+{
+  "model": "unweighted seven-factor four-class small_boosted_tree",
+  "model_settings": {
+    "max_iter": 60,
+    "learning_rate": 0.05,
+    "max_leaf_nodes": 7,
+    "min_samples_leaf": 100,
+    "l2_regularization": 5,
+    "random_state": 42
+  },
+  "training": "previous 20 available signal days, refit for every test day",
+  "target": "next 09:45 15m close / same-day 14:45 close proxy - 1",
+  "class_boundaries": "<0%; [0%,1%); [1%,3%); >=3%",
+  "selection": "argmax >=3% class first; fallback argmax 1-3%; up to two per day",
+  "entry_proxy": "same-day completed 14:45 15m close",
+  "exit": "next-day completed 09:45, 10:00, or 10:15 15m close",
+  "july": {
+    "candidate_days": 23,
+    "candidate_rows": 13261,
+    "labeled_rows": 13259,
+    "unlabeled_rows": 2,
+    "class_distribution": {
+      "lt0": 6519,
+      "0to1": 2516,
+      "1to3": 3010,
+      "ge3": 1214
+    },
+    "predicted_class_distribution": {
+      "lt0": 12626,
+      "0to1": 26,
+      "1to3": 530,
+      "ge3": 79
+    },
+    "confusion_rows_actual_columns_predicted": [
+      [
+        6184,
+        10,
+        300,
+        25
+      ],
+      [
+        2392,
+        10,
+        109,
+        5
+      ],
+      [
+        2907,
+        6,
+        86,
+        11
+      ],
+      [
+        1142,
+        0,
+        35,
+        37
+      ]
+    ],
+    "correct": 6317,
+    "accuracy": 0.47643110340146316,
+    "uniform_random_accuracy": 0.25,
+    "majority_label_accuracy": 0.4916660381627574,
+    "log_loss": 1.2570673695705876,
+    "candidate_median_max_probability": 0.49738381029017203,
+    "top1_days": 15,
+    "top1_median_max_probability": 0.4280970138595714,
+    "top1_median_p_lt0": 0.2841360788357668,
+    "top1_observed_0945_days": 15,
+    "top1_missing_0945_days": 0,
+    "top1_mean_0945_pct": 0.9222110575577322,
+    "top1_mean_per_signal_day_with_cash_pct": 0.6014419940593906,
+    "top1_median_0945_pct": 0.6960556844547661,
+    "top1_positive_0945": 8,
+    "top1_at_least_1pct_0945": 7,
+    "top1_below_minus1pct_0945": 5,
+    "top1_observed_1000_days": 15,
+    "top1_mean_1000_pct": 0.6792006770972876,
+    "top1_observed_1015_days": 15,
+    "top1_mean_1015_pct": 0.5966827439667106,
+    "top1_observed_1500_entry_days": 15,
+    "top1_mean_0945_from_1500_pct": 0.7335640660450392,
+    "pool_daily_equal_mean_0945_pct": -0.1002484832986807,
+    "highest_signal_gain_mean_0945_pct": 0.07396229553069059,
+    "highest_signal_gain_on_model_days_mean_0945_pct": 0.6249402870157271,
+    "top1_outperformed_pool_days": 8,
+    "selected_top2_trades": 29,
+    "selected_top2_observed_0945_trades": 29,
+    "selected_top2_mean_0945_pct": 1.040347064444711,
+    "selected_top2_positive_0945": 16,
+    "selected_top2_below_minus1pct_0945": 7,
+    "selected_top2_actual_classes": {
+      "lt0": 12,
+      "0to1": 3,
+      "1to3": 7,
+      "ge3": 7
+    },
+    "selected_top2_by_predicted_class": {
+      "ge3": {
+        "observed_trades": 18,
+        "mean_0945_pct": 1.3322533934022316,
+        "actual_classes": {
+          "lt0": 8,
+          "0to1": 1,
+          "1to3": 3,
+          "ge3": 6
+        }
+      },
+      "1to3": {
+        "observed_trades": 11,
+        "mean_0945_pct": 0.5626821625142225,
+        "actual_classes": {
+          "lt0": 4,
+          "0to1": 2,
+          "1to3": 4,
+          "ge3": 1
+        }
+      }
+    }
+  },
+  "august_bridge": {
+    "candidate_days": 6,
+    "candidate_rows": 4073,
+    "labeled_rows": 4072,
+    "unlabeled_rows": 1,
+    "class_distribution": {
+      "lt0": 1775,
+      "0to1": 817,
+      "1to3": 978,
+      "ge3": 502
+    },
+    "predicted_class_distribution": {
+      "lt0": 3835,
+      "0to1": 116,
+      "1to3": 121,
+      "ge3": 1
+    },
+    "confusion_rows_actual_columns_predicted": [
+      [
+        1675,
+        63,
+        36,
+        1
+      ],
+      [
+        767,
+        22,
+        28,
+        0
+      ],
+      [
+        909,
+        26,
+        43,
+        0
+      ],
+      [
+        483,
+        5,
+        14,
+        0
+      ]
+    ],
+    "correct": 1740,
+    "accuracy": 0.42730844793713163,
+    "uniform_random_accuracy": 0.25,
+    "majority_label_accuracy": 0.43590373280943023,
+    "log_loss": 1.3089379586651884,
+    "candidate_median_max_probability": 0.49744842728902683,
+    "top1_days": 6,
+    "top1_median_max_probability": 0.4370504232411636,
+    "top1_median_p_lt0": 0.307772226068685,
+    "top1_observed_0945_days": 6,
+    "top1_missing_0945_days": 0,
+    "top1_mean_0945_pct": -0.6947369835779038,
+    "top1_mean_per_signal_day_with_cash_pct": -0.6947369835779038,
+    "top1_median_0945_pct": -0.9724139045281799,
+    "top1_positive_0945": 2,
+    "top1_at_least_1pct_0945": 2,
+    "top1_below_minus1pct_0945": 3,
+    "top1_observed_1000_days": 6,
+    "top1_mean_1000_pct": 0.1906113768788039,
+    "top1_observed_1015_days": 6,
+    "top1_mean_1015_pct": 0.41842504010484544,
+    "top1_observed_1500_entry_days": 6,
+    "top1_mean_0945_from_1500_pct": -0.950017282947352,
+    "pool_daily_equal_mean_0945_pct": 0.25261183512454916,
+    "highest_signal_gain_mean_0945_pct": 1.14930388858779,
+    "highest_signal_gain_on_model_days_mean_0945_pct": 1.14930388858779,
+    "top1_outperformed_pool_days": 2,
+    "selected_top2_trades": 12,
+    "selected_top2_observed_0945_trades": 12,
+    "selected_top2_mean_0945_pct": -0.14288039142219544,
+    "selected_top2_positive_0945": 7,
+    "selected_top2_below_minus1pct_0945": 4,
+    "selected_top2_actual_classes": {
+      "lt0": 5,
+      "0to1": 3,
+      "1to3": 4,
+      "ge3": 0
+    },
+    "selected_top2_by_predicted_class": {
+      "ge3": {
+        "observed_trades": 1,
+        "mean_0945_pct": -3.116964076989015,
+        "actual_classes": {
+          "lt0": 1,
+          "0to1": 0,
+          "1to3": 0,
+          "ge3": 0
+        }
+      },
+      "1to3": {
+        "observed_trades": 11,
+        "mean_0945_pct": 0.12749085272024271,
+        "actual_classes": {
+          "lt0": 4,
+          "0to1": 3,
+          "1to3": 4,
+          "ge3": 0
+        }
+      }
+    }
+  },
+  "training_fold_count": 29,
+  "mean_fold_train_accuracy": 0.5082924542587798,
+  "mean_fold_train_majority_accuracy": 0.4953594422988932,
+  "median_fold_test_max_probability": 0.5048130847082322,
+  "july_training_fit_aggregate": {
+    "note": "Summed fit predictions from July's 23 rolling models; repeated training stock-days are counted in multiple windows.",
+    "rows": 226846,
+    "correct": 115771,
+    "accuracy": 0.5103506343510575,
+    "confusion_rows_actual_columns_predicted": [
+      [
+        111564,
+        25,
+        1372,
+        397
+      ],
+      [
+        35406,
+        95,
+        1102,
+        143
+      ],
+      [
+        44537,
+        39,
+        2848,
+        319
+      ],
+      [
+        26951,
+        13,
+        771,
+        1264
+      ]
+    ]
+  },
+  "first_fold": {
+    "test_date": "2026-07-01",
+    "train_start": "2026-06-02",
+    "train_end": "2026-06-30",
+    "train_days": 20,
+    "train_rows": 8256,
+    "test_rows": 1294,
+    "train_class_counts": {
+      "lt0": 4154,
+      "0to1": 1261,
+      "1to3": 1576,
+      "ge3": 1265
+    },
+    "train_accuracy": 0.5090843023255814,
+    "train_majority_accuracy": 0.5031492248062015,
+    "train_median_max_probability": 0.5055825617876197,
+    "test_median_max_probability": 0.4981152548374942
+  },
+  "last_fold": {
+    "test_date": "2026-08-10",
+    "train_start": "2026-07-13",
+    "train_end": "2026-08-07",
+    "train_days": 20,
+    "train_rows": 11907,
+    "test_rows": 770,
+    "train_class_counts": {
+      "lt0": 5366,
+      "0to1": 2591,
+      "1to3": 2856,
+      "ge3": 1094
+    },
+    "train_accuracy": 0.4808096077937348,
+    "train_majority_accuracy": 0.45065927605610145,
+    "train_median_max_probability": 0.4608502694572757,
+    "test_median_max_probability": 0.4814620914323343
+  },
+  "input_sha256": {
+    "outputs/stock_automl/sina_15m_rolling/trainable_15m_candidates.csv": "861f32d50022e53caf57e0e1752a7afe14d8d4783adffa49337303618413c591",
+    "outputs/stock_automl/sina_15m_rolling/build_summary.json": "f2e6ca53ed535a1a56f9232c115e00174fa6eca714ffbef06c1a3b7231e5240f"
+  },
+  "code_sha256": {
+    "/Users/imac/.codex/worktrees/automl-five-class/fin_agent/scripts/experiment_automl_four_class_15m_rolling.py": "243a5b74b1d475b2100d4468a40ba6179eca30e008901eb1f0160f4aaab4f716",
+    "scripts/build_automl_sina_15m_rolling.py": "d1a5991befef05ed7b38afeddee26fcc9c3ddb99179be2f03ce7fc18af46317c",
+    "scripts/experiment_automl_second_high_four_class.py": "9ef35d8cd90d419ce10979213b77a157c6cdcaf0e25603c80a1f74f17ba411fe",
+    "scripts/audit_automl_four_class_decisions.py": "48fde079ac9630e1dd6ffa2d28a058b8e9dc15d070b86f84ff94c8730a59bf28"
+  },
+  "limitations": [
+    "July and early-August stock outcomes have already been explored, so this is not an untouched validation set.",
+    "14:45 completed-bar close is only an entry-price proxy, not a guaranteed execution.",
+    "Historical July ST identity is unavailable; current base names are display-only.",
+    "Prices and database daily/valuation records have no frozen as-of revision snapshot.",
+    "No commissions, slippage, or fill constraints are included."
+  ]
+}

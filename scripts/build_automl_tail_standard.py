@@ -19,6 +19,7 @@ import numpy as np
 import pandas as pd
 from dotenv import dotenv_values
 
+from scripts.automl_st_status import ELIGIBLE_TYPES, attach_st_status, load_st_intervals
 from scripts.experiment_automl_1450_grid import board_limit, frame, read_only_db
 
 
@@ -105,6 +106,16 @@ def prior_profile(price, value):
     return profile, calendar
 
 
+def signal_days_for_build(calendar, start, end, allow_open_end=False):
+    """Append today's unlabeled daily date only as the last label morning."""
+    signal_days = [day for day in calendar if pd.Timestamp(start) <= day <= pd.Timestamp(end)]
+    if allow_open_end:
+        if not calendar or pd.Timestamp(end) <= calendar[-1]:
+            raise ValueError("Open end must follow the last completed daily date")
+        signal_days.append(pd.Timestamp(end))
+    return signal_days
+
+
 def signal_bar(conn, day):
     rows = frame(conn, """
         SELECT stk_code AS symbol6, stk_name AS name,
@@ -181,8 +192,9 @@ def assemble(signal, minute, entry, morning):
     for column in numeric:
         rows[column] = pd.to_numeric(rows[column], errors="coerce")
     rows["signal_return"] = rows.signal_price / rows.t_reference_preclose - 1
-    rows["limit_buffer"] = [board_limit(symbol, name) for symbol, name in
-                            zip(rows.symbol6, rows.name)]
+    rows["limit_buffer"] = [board_limit(symbol, "") if st_type in ELIGIBLE_TYPES
+                            else np.nan for symbol, st_type in
+                            zip(rows.symbol6, rows.st_type)]
     rows["minute_complete"] = (
         rows.minute_bars.eq(220) & rows.exact_source_bars.eq(220) &
         rows.minute_fallback.eq(0) & rows.minute_finalized.eq(1) &
@@ -234,7 +246,7 @@ def assemble(signal, minute, entry, morning):
     return rows
 
 
-EXPORT = ["signal_date", "next_date", "symbol6", "name", "t_reference_preclose",
+EXPORT = ["signal_date", "next_date", "symbol6", "name", "st_type", "t_reference_preclose",
           "signal_price", "signal_return", "signal_fallback", "signal_finalized",
           "history_complete", "adj_price_break_20d", "value_complete",
           "minute_bars", "minute_complete",
@@ -257,7 +269,8 @@ FEATURES = ("t_reference_preclose", "signal_price", "signal_return",
             "price_above_all_ma", "all_intraday_lows_above_ma")
 TARGETS = ("target_next_open_return", "target_next_high5_return",
            "target_next_high10_return")
-TRAIN_EXPORT = ("signal_date", "next_date", "symbol6", "name", *FEATURES, *TARGETS)
+TRAIN_EXPORT = ("signal_date", "next_date", "symbol6", "name", "st_type",
+                *FEATURES, *TARGETS)
 
 
 def main():
@@ -265,19 +278,27 @@ def main():
     parser.add_argument("--start", default=START)
     parser.add_argument("--end", default=END)
     parser.add_argument("--history-start", default=HISTORY_START)
+    parser.add_argument("--min-signal-return", type=float, default=.03)
+    parser.add_argument("--max-signal-return", type=float, default=.06)
+    parser.add_argument("--allow-open-end", action="store_true",
+                        help="Use --end as the next trading morning without requiring its EOD daily row")
     parser.add_argument("--env-file", default=".env")
     parser.add_argument("--output-dir", default="outputs/stock_automl/tail_standard")
     parser.add_argument("--summary", default="docs/stock_automl_runs/20261008_tail_standard/summary.json")
     args = parser.parse_args()
     if not args.history_start < args.start < args.end:
         parser.error("Expected history-start < start < end")
+    if not 0 <= args.min_signal_return < args.max_signal_return:
+        parser.error("Expected 0 <= min-signal-return < max-signal-return")
     config = dotenv_values(args.env_file)
     os.environ.setdefault("SIMPLE_BI_PLATFORM_DB_URL",
                           config.get("SIMPLE_BI_PLATFORM_DB_URL") or config.get("PLATFORM_DB_URL") or "")
     with read_only_db() as conn:
         daily, value = load_daily(conn, history_start=args.history_start, end=args.end)
+        st_intervals = load_st_intervals(conn)
         profile, calendar = prior_profile(daily, value)
-        signal_days = [day for day in calendar if pd.Timestamp(args.start) <= day <= pd.Timestamp(args.end)]
+        signal_days = signal_days_for_build(calendar, args.start, args.end,
+                                            args.allow_open_end)
         if len(signal_days) < 2:
             raise ValueError("Need at least two trading days in the selected range")
         day_after = dict(zip(signal_days[:-1], signal_days[1:]))
@@ -302,10 +323,13 @@ def main():
             signal["t_reference_preclose"] = pd.to_numeric(
                 signal.t_reference_preclose, errors="coerce")
             signal["signal_return"] = signal.signal_price / signal.t_reference_preclose - 1
-            signal = signal[signal.signal_return.between(.03, .06, inclusive="both")].copy()
+            signal = signal[signal.signal_return.between(
+                args.min_signal_return, args.max_signal_return,
+                inclusive="both")].copy()
             if signal.empty:
                 audit.append({"date": day_text, "candidates": 0})
                 continue
+            signal = attach_st_status(signal, st_intervals)
             signal["next_date"] = following
             minute = intraday_to_1440(conn, day_text, sorted(signal.symbol6.tolist()))
             entry = entry_bar(conn, day_text)
@@ -333,11 +357,13 @@ def main():
     feasible[list(TRAIN_EXPORT)].to_csv(output / "execution_feasible_1440.csv",
                                         index=False, float_format="%.8f")
     summary = {"generated_at": datetime.now().isoformat(timespec="seconds"),
+               "allow_open_end": args.allow_open_end,
                "signal_period": [str(signal_days[0])[:10], str(signal_days[-2])[:10]],
                "requested_period": [args.start, args.end],
                "history_start": args.history_start,
                "minute_ingestion_times_used": False,
-               "signal_time": "14:40", "selection_return": [0.03, 0.06],
+               "signal_time": "14:40", "selection_return": [
+                   args.min_signal_return, args.max_signal_return],
                "candidates": len(rows), "feature_complete": int(rows.feature_complete.sum()),
                "label_complete": int(rows.label_complete.sum()),
                "trainable": len(training), "execution_feasible": len(feasible),

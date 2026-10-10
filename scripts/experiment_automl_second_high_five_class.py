@@ -1,6 +1,7 @@
 """Five ordered next-morning second-high classes, evaluated by rolling day."""
 from __future__ import annotations
 
+import argparse
 import json
 from pathlib import Path
 
@@ -14,6 +15,7 @@ from scripts.audit_automl_four_class_diagnostics import load_data
 from scripts.audit_automl_four_class_decisions import (
     class_priority_fallback, exit_observations)
 from scripts.benchmark_automl_1440_inference import FEATURES
+from scripts.experiment_automl_close9_models import DATA
 
 
 OUT = Path("docs/stock_automl_runs/20261010_second_high_five_class")
@@ -129,8 +131,8 @@ def probability_metrics(actual: pd.Series, probability: np.ndarray) -> dict:
     }
 
 
-def run() -> dict:
-    data = load_data()
+def run(data_path: Path = DATA, expected_rows: int = 14292) -> dict:
+    data = load_data(data_path, expected_rows)
     data["class"] = five_class(data.second_high_return)
     dates = sorted(data.signal_date.unique())
     all_scored, fold_metrics, selections = [], [], []
@@ -245,4 +247,10 @@ def run() -> dict:
 
 
 if __name__ == "__main__":
-    print(json.dumps(run(), ensure_ascii=False, indent=2))
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--data", type=Path, default=DATA)
+    parser.add_argument("--out", type=Path, default=OUT)
+    parser.add_argument("--expected-rows", type=int, default=14292)
+    args = parser.parse_args()
+    OUT = args.out
+    print(json.dumps(run(args.data, args.expected_rows), ensure_ascii=False, indent=2))

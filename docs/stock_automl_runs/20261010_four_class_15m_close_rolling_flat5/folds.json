@@ -1,0 +1,524 @@
+[
+  {
+    "test_date": "2026-07-01",
+    "train_start": "2026-06-02",
+    "train_end": "2026-06-30",
+    "train_days": 20,
+    "train_rows": 8062,
+    "test_rows": 1245,
+    "train_class_counts": {
+      "lt0": 4102,
+      "0to1": 1246,
+      "1to3": 1548,
+      "ge3": 1166
+    },
+    "train_accuracy": 0.5107913669064749,
+    "train_majority_accuracy": 0.508806747705284,
+    "train_median_max_probability": 0.5069881653116666,
+    "test_median_max_probability": 0.5037501079277391
+  },
+  {
+    "test_date": "2026-07-02",
+    "train_start": "2026-06-03",
+    "train_end": "2026-07-01",
+    "train_days": 20,
+    "train_rows": 9008,
+    "test_rows": 309,
+    "train_class_counts": {
+      "lt0": 4203,
+      "0to1": 1393,
+      "1to3": 2135,
+      "ge3": 1277
+    },
+    "train_accuracy": 0.49178507992895204,
+    "train_majority_accuracy": 0.46658525754884544,
+    "train_median_max_probability": 0.4783503664504627,
+    "test_median_max_probability": 0.47147896821150104
+  },
+  {
+    "test_date": "2026-07-03",
+    "train_start": "2026-06-04",
+    "train_end": "2026-07-02",
+    "train_days": 20,
+    "train_rows": 9073,
+    "test_rows": 933,
+    "train_class_counts": {
+      "lt0": 4185,
+      "0to1": 1414,
+      "1to3": 2169,
+      "ge3": 1305
+    },
+    "train_accuracy": 0.4866086189793894,
+    "train_majority_accuracy": 0.4612586795988097,
+    "train_median_max_probability": 0.47367911414369707,
+    "test_median_max_probability": 0.43587126220321004
+  },
+  {
+    "test_date": "2026-07-06",
+    "train_start": "2026-06-05",
+    "train_end": "2026-07-03",
+    "train_days": 20,
+    "train_rows": 9763,
+    "test_rows": 316,
+    "train_class_counts": {
+      "lt0": 4579,
+      "0to1": 1579,
+      "1to3": 2242,
+      "ge3": 1363
+    },
+    "train_accuracy": 0.48110212024992316,
+    "train_majority_accuracy": 0.4690156714124757,
+    "train_median_max_probability": 0.47169487328699544,
+    "test_median_max_probability": 0.4748310794400259
+  },
+  {
+    "test_date": "2026-07-07",
+    "train_start": "2026-06-08",
+    "train_end": "2026-07-06",
+    "train_days": 20,
+    "train_rows": 9636,
+    "test_rows": 141,
+    "train_class_counts": {
+      "lt0": 4650,
+      "0to1": 1522,
+      "1to3": 2128,
+      "ge3": 1336
+    },
+    "train_accuracy": 0.4897260273972603,
+    "train_majority_accuracy": 0.4825653798256538,
+    "train_median_max_probability": 0.4813820455058384,
+    "test_median_max_probability": 0.5122510206195497
+  },
+  {
+    "test_date": "2026-07-08",
+    "train_start": "2026-06-09",
+    "train_end": "2026-07-07",
+    "train_days": 20,
+    "train_rows": 9596,
+    "test_rows": 216,
+    "train_class_counts": {
+      "lt0": 4641,
+      "0to1": 1514,
+      "1to3": 2116,
+      "ge3": 1325
+    },
+    "train_accuracy": 0.4916631929970821,
+    "train_majority_accuracy": 0.48363901625677364,
+    "train_median_max_probability": 0.48325475636789805,
+    "test_median_max_probability": 0.4838637654835223
+  },
+  {
+    "test_date": "2026-07-09",
+    "train_start": "2026-06-10",
+    "train_end": "2026-07-08",
+    "train_days": 20,
+    "train_rows": 9166,
+    "test_rows": 487,
+    "train_class_counts": {
+      "lt0": 4333,
+      "0to1": 1479,
+      "1to3": 2056,
+      "ge3": 1298
+    },
+    "train_accuracy": 0.4811259000654593,
+    "train_majority_accuracy": 0.4727252891119354,
+    "train_median_max_probability": 0.45992011190001925,
+    "test_median_max_probability": 0.46280519349197796
+  },
+  {
+    "test_date": "2026-07-10",
+    "train_start": "2026-06-11",
+    "train_end": "2026-07-09",
+    "train_days": 20,
+    "train_rows": 9449,
+    "test_rows": 877,
+    "train_class_counts": {
+      "lt0": 4344,
+      "0to1": 1532,
+      "1to3": 2166,
+      "ge3": 1407
+    },
+    "train_accuracy": 0.46534024764525345,
+    "train_majority_accuracy": 0.45973118848555405,
+    "train_median_max_probability": 0.44106486939843237,
+    "test_median_max_probability": 0.4294678934919883
+  },
+  {
+    "test_date": "2026-07-13",
+    "train_start": "2026-06-12",
+    "train_end": "2026-07-10",
+    "train_days": 20,
+    "train_rows": 10124,
+    "test_rows": 108,
+    "train_class_counts": {
+      "lt0": 5048,
+      "0to1": 1555,
+      "1to3": 2149,
+      "ge3": 1372
+    },
+    "train_accuracy": 0.4994073488739629,
+    "train_majority_accuracy": 0.49861714737258,
+    "train_median_max_probability": 0.48798979876671145,
+    "test_median_max_probability": 0.5647382888452179
+  },
+  {
+    "test_date": "2026-07-14",
+    "train_start": "2026-06-15",
+    "train_end": "2026-07-13",
+    "train_days": 20,
+    "train_rows": 9580,
+    "test_rows": 815,
+    "train_class_counts": {
+      "lt0": 4978,
+      "0to1": 1455,
+      "1to3": 1938,
+      "ge3": 1209
+    },
+    "train_accuracy": 0.5197286012526096,
+    "train_majority_accuracy": 0.5196242171189979,
+    "train_median_max_probability": 0.5085358234754095,
+    "test_median_max_probability": 0.4897291271476686
+  },
+  {
+    "test_date": "2026-07-15",
+    "train_start": "2026-06-16",
+    "train_end": "2026-07-14",
+    "train_days": 20,
+    "train_rows": 9601,
+    "test_rows": 568,
+    "train_class_counts": {
+      "lt0": 4819,
+      "0to1": 1529,
+      "1to3": 2044,
+      "ge3": 1209
+    },
+    "train_accuracy": 0.5045307780439537,
+    "train_majority_accuracy": 0.5019268826163942,
+    "train_median_max_probability": 0.4905241999386584,
+    "test_median_max_probability": 0.5003876657347441
+  },
+  {
+    "test_date": "2026-07-16",
+    "train_start": "2026-06-17",
+    "train_end": "2026-07-15",
+    "train_days": 20,
+    "train_rows": 9662,
+    "test_rows": 248,
+    "train_class_counts": {
+      "lt0": 4951,
+      "0to1": 1537,
+      "1to3": 1995,
+      "ge3": 1179
+    },
+    "train_accuracy": 0.513868764231008,
+    "train_majority_accuracy": 0.5124197888635893,
+    "train_median_max_probability": 0.501474411079869,
+    "test_median_max_probability": 0.5443382047118187
+  },
+  {
+    "test_date": "2026-07-17",
+    "train_start": "2026-06-18",
+    "train_end": "2026-07-16",
+    "train_days": 20,
+    "train_rows": 9568,
+    "test_rows": 69,
+    "train_class_counts": {
+      "lt0": 4938,
+      "0to1": 1533,
+      "1to3": 1962,
+      "ge3": 1135
+    },
+    "train_accuracy": 0.517767558528428,
+    "train_majority_accuracy": 0.5160953177257525,
+    "train_median_max_probability": 0.5045496680703547,
+    "test_median_max_probability": 0.6208663614294243
+  },
+  {
+    "test_date": "2026-07-20",
+    "train_start": "2026-06-22",
+    "train_end": "2026-07-17",
+    "train_days": 20,
+    "train_rows": 9230,
+    "test_rows": 255,
+    "train_class_counts": {
+      "lt0": 4729,
+      "0to1": 1505,
+      "1to3": 1920,
+      "ge3": 1076
+    },
+    "train_accuracy": 0.5147345612134344,
+    "train_majority_accuracy": 0.5123510292524377,
+    "train_median_max_probability": 0.5000157222888828,
+    "test_median_max_probability": 0.5608775873548145
+  },
+  {
+    "test_date": "2026-07-21",
+    "train_start": "2026-06-23",
+    "train_end": "2026-07-20",
+    "train_days": 20,
+    "train_rows": 8962,
+    "test_rows": 669,
+    "train_class_counts": {
+      "lt0": 4613,
+      "0to1": 1482,
+      "1to3": 1835,
+      "ge3": 1032
+    },
+    "train_accuracy": 0.5165141709439857,
+    "train_majority_accuracy": 0.5147288551662575,
+    "train_median_max_probability": 0.49502969768698973,
+    "test_median_max_probability": 0.4858769713379601
+  },
+  {
+    "test_date": "2026-07-22",
+    "train_start": "2026-06-24",
+    "train_end": "2026-07-21",
+    "train_days": 20,
+    "train_rows": 9219,
+    "test_rows": 222,
+    "train_class_counts": {
+      "lt0": 4739,
+      "0to1": 1546,
+      "1to3": 1880,
+      "ge3": 1054
+    },
+    "train_accuracy": 0.5177351122681418,
+    "train_majority_accuracy": 0.5140470766894457,
+    "train_median_max_probability": 0.4980144671367354,
+    "test_median_max_probability": 0.515973182470233
+  },
+  {
+    "test_date": "2026-07-23",
+    "train_start": "2026-06-25",
+    "train_end": "2026-07-22",
+    "train_days": 20,
+    "train_rows": 9133,
+    "test_rows": 1324,
+    "train_class_counts": {
+      "lt0": 4711,
+      "0to1": 1549,
+      "1to3": 1872,
+      "ge3": 1001
+    },
+    "train_accuracy": 0.5206394393955984,
+    "train_majority_accuracy": 0.5158217453191722,
+    "train_median_max_probability": 0.501477127973267,
+    "test_median_max_probability": 0.4522112985848635
+  },
+  {
+    "test_date": "2026-07-24",
+    "train_start": "2026-06-26",
+    "train_end": "2026-07-23",
+    "train_days": 20,
+    "train_rows": 10205,
+    "test_rows": 84,
+    "train_class_counts": {
+      "lt0": 5646,
+      "0to1": 1650,
+      "1to3": 1911,
+      "ge3": 998
+    },
+    "train_accuracy": 0.5535521803037726,
+    "train_majority_accuracy": 0.5532582067613915,
+    "train_median_max_probability": 0.5314810570983882,
+    "test_median_max_probability": 0.5269871088321542
+  },
+  {
+    "test_date": "2026-07-27",
+    "train_start": "2026-06-29",
+    "train_end": "2026-07-24",
+    "train_days": 20,
+    "train_rows": 10114,
+    "test_rows": 1856,
+    "train_class_counts": {
+      "lt0": 5623,
+      "0to1": 1642,
+      "1to3": 1879,
+      "ge3": 970
+    },
+    "train_accuracy": 0.5562586513743326,
+    "train_majority_accuracy": 0.555962032825786,
+    "train_median_max_probability": 0.5341631926641941,
+    "test_median_max_probability": 0.5419939128694394
+  },
+  {
+    "test_date": "2026-07-28",
+    "train_start": "2026-06-30",
+    "train_end": "2026-07-27",
+    "train_days": 20,
+    "train_rows": 11501,
+    "test_rows": 197,
+    "train_class_counts": {
+      "lt0": 5873,
+      "0to1": 2032,
+      "1to3": 2545,
+      "ge3": 1051
+    },
+    "train_accuracy": 0.5181288583601426,
+    "train_majority_accuracy": 0.5106512477175897,
+    "train_median_max_probability": 0.5073053376203929,
+    "test_median_max_probability": 0.5443839100691608
+  },
+  {
+    "test_date": "2026-07-29",
+    "train_start": "2026-07-01",
+    "train_end": "2026-07-28",
+    "train_days": 20,
+    "train_rows": 10938,
+    "test_rows": 687,
+    "train_class_counts": {
+      "lt0": 5663,
+      "0to1": 1910,
+      "1to3": 2397,
+      "ge3": 968
+    },
+    "train_accuracy": 0.5245017370634485,
+    "train_majority_accuracy": 0.5177363320533919,
+    "train_median_max_probability": 0.5186222286397106,
+    "test_median_max_probability": 0.5413886017148698
+  },
+  {
+    "test_date": "2026-07-30",
+    "train_start": "2026-07-02",
+    "train_end": "2026-07-29",
+    "train_days": 20,
+    "train_rows": 10380,
+    "test_rows": 182,
+    "train_class_counts": {
+      "lt0": 5598,
+      "0to1": 1899,
+      "1to3": 2025,
+      "ge3": 858
+    },
+    "train_accuracy": 0.5461464354527938,
+    "train_majority_accuracy": 0.5393063583815029,
+    "train_median_max_probability": 0.5417342074966565,
+    "test_median_max_probability": 0.5746877255400153
+  },
+  {
+    "test_date": "2026-07-31",
+    "train_start": "2026-07-03",
+    "train_end": "2026-07-30",
+    "train_days": 20,
+    "train_rows": 10253,
+    "test_rows": 1322,
+    "train_class_counts": {
+      "lt0": 5591,
+      "0to1": 1874,
+      "1to3": 1966,
+      "ge3": 822
+    },
+    "train_accuracy": 0.5519360187262264,
+    "train_majority_accuracy": 0.5453038135179947,
+    "train_median_max_probability": 0.5501125114631917,
+    "test_median_max_probability": 0.5592553363541768
+  },
+  {
+    "test_date": "2026-08-03",
+    "train_start": "2026-07-06",
+    "train_end": "2026-07-31",
+    "train_days": 20,
+    "train_rows": 10642,
+    "test_rows": 880,
+    "train_class_counts": {
+      "lt0": 5611,
+      "0to1": 2060,
+      "1to3": 2154,
+      "ge3": 817
+    },
+    "train_accuracy": 0.5390903965420034,
+    "train_majority_accuracy": 0.5272505168201466,
+    "train_median_max_probability": 0.541165188142448,
+    "test_median_max_probability": 0.49753810649486835
+  },
+  {
+    "test_date": "2026-08-04",
+    "train_start": "2026-07-07",
+    "train_end": "2026-08-03",
+    "train_days": 20,
+    "train_rows": 11205,
+    "test_rows": 773,
+    "train_class_counts": {
+      "lt0": 5613,
+      "0to1": 2324,
+      "1to3": 2402,
+      "ge3": 866
+    },
+    "train_accuracy": 0.5233377956269523,
+    "train_majority_accuracy": 0.5009370816599732,
+    "train_median_max_probability": 0.5165641459327878,
+    "test_median_max_probability": 0.5165141499340866
+  },
+  {
+    "test_date": "2026-08-05",
+    "train_start": "2026-07-08",
+    "train_end": "2026-08-04",
+    "train_days": 20,
+    "train_rows": 11837,
+    "test_rows": 734,
+    "train_class_counts": {
+      "lt0": 5579,
+      "0to1": 2405,
+      "1to3": 2733,
+      "ge3": 1120
+    },
+    "train_accuracy": 0.49387513728140575,
+    "train_majority_accuracy": 0.47131874630396214,
+    "train_median_max_probability": 0.4757086273558854,
+    "test_median_max_probability": 0.48094255146769005
+  },
+  {
+    "test_date": "2026-08-06",
+    "train_start": "2026-07-09",
+    "train_end": "2026-08-05",
+    "train_days": 20,
+    "train_rows": 12355,
+    "test_rows": 359,
+    "train_class_counts": {
+      "lt0": 5714,
+      "0to1": 2579,
+      "1to3": 2884,
+      "ge3": 1178
+    },
+    "train_accuracy": 0.4857952246054229,
+    "train_majority_accuracy": 0.4624848239579118,
+    "train_median_max_probability": 0.46270289166707257,
+    "test_median_max_probability": 0.48628460884431973
+  },
+  {
+    "test_date": "2026-08-07",
+    "train_start": "2026-07-10",
+    "train_end": "2026-08-06",
+    "train_days": 20,
+    "train_rows": 12227,
+    "test_rows": 557,
+    "train_class_counts": {
+      "lt0": 5801,
+      "0to1": 2551,
+      "1to3": 2799,
+      "ge3": 1076
+    },
+    "train_accuracy": 0.49227120307516153,
+    "train_majority_accuracy": 0.4744418091109839,
+    "train_median_max_probability": 0.4789222261071807,
+    "test_median_max_probability": 0.5225564908572244
+  },
+  {
+    "test_date": "2026-08-10",
+    "train_start": "2026-07-13",
+    "train_end": "2026-08-07",
+    "train_days": 20,
+    "train_rows": 11907,
+    "test_rows": 770,
+    "train_class_counts": {
+      "lt0": 5366,
+      "0to1": 2591,
+      "1to3": 2856,
+      "ge3": 1094
+    },
+    "train_accuracy": 0.4808096077937348,
+    "train_majority_accuracy": 0.45065927605610145,
+    "train_median_max_probability": 0.4608502694572757,
+    "test_median_max_probability": 0.4814620914323343
+  }
+]

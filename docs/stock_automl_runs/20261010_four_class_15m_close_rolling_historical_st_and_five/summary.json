@@ -1,0 +1,315 @@
+{
+  "model": "unweighted seven-factor four-class small_boosted_tree",
+  "model_settings": {
+    "max_iter": 60,
+    "learning_rate": 0.05,
+    "max_leaf_nodes": 7,
+    "min_samples_leaf": 100,
+    "l2_regularization": 5,
+    "random_state": 42
+  },
+  "training": "previous 20 available signal days, refit for every test day",
+  "candidate_risk_filter": "kcrp_stock_st interval active on signal date [begin_date,end_date); keep N or R only; exclude S/Y/L/T/Z or missing status; Exclude 14:45 close exactly equal (within CNY 0.001) to ROUND_HALF_UP(previous close * 1.05, CNY 0.01); uses information known by 14:45 and can exclude non-ST stocks.",
+  "target": "next 09:45 15m close / same-day 14:45 close proxy - 1",
+  "class_boundaries": "<0%; [0%,1%); [1%,3%); >=3%",
+  "selection": "argmax >=3% class first; fallback argmax 1-3%; up to two per day",
+  "entry_proxy": "same-day completed 14:45 15m close",
+  "exit": "next-day completed 09:45, 10:00, or 10:15 15m close",
+  "july": {
+    "candidate_days": 23,
+    "candidate_rows": 12327,
+    "labeled_rows": 12326,
+    "unlabeled_rows": 1,
+    "class_distribution": {
+      "lt0": 6159,
+      "0to1": 2336,
+      "1to3": 2802,
+      "ge3": 1029
+    },
+    "predicted_class_distribution": {
+      "lt0": 11857,
+      "0to1": 8,
+      "1to3": 462,
+      "ge3": 0
+    },
+    "confusion_rows_actual_columns_predicted": [
+      [
+        5876,
+        3,
+        280,
+        0
+      ],
+      [
+        2231,
+        3,
+        102,
+        0
+      ],
+      [
+        2737,
+        2,
+        63,
+        0
+      ],
+      [
+        1012,
+        0,
+        17,
+        0
+      ]
+    ],
+    "correct": 5942,
+    "accuracy": 0.4820704202498783,
+    "uniform_random_accuracy": 0.25,
+    "majority_label_accuracy": 0.49967548271945483,
+    "log_loss": 1.2532641335605321,
+    "candidate_median_max_probability": 0.5041923094332905,
+    "top1_days": 14,
+    "top1_median_max_probability": 0.42860828465936956,
+    "top1_median_p_lt0": 0.29320060910745116,
+    "top1_observed_0945_days": 14,
+    "top1_missing_0945_days": 0,
+    "top1_mean_0945_pct": -0.30076193957046604,
+    "top1_mean_per_signal_day_with_cash_pct": -0.18307248495593587,
+    "top1_median_0945_pct": -0.33783783783783994,
+    "top1_positive_0945": 6,
+    "top1_at_least_1pct_0945": 3,
+    "top1_below_minus1pct_0945": 5,
+    "top1_observed_1000_days": 14,
+    "top1_mean_1000_pct": -0.28292122241087253,
+    "top1_observed_1015_days": 14,
+    "top1_mean_1015_pct": -0.4255098688735691,
+    "top1_observed_1500_entry_days": 14,
+    "top1_mean_0945_from_1500_pct": -0.17852603977409856,
+    "pool_daily_equal_mean_0945_pct": -0.11841263334085504,
+    "highest_signal_gain_mean_0945_pct": 0.07396229553069059,
+    "highest_signal_gain_on_model_days_mean_0945_pct": -0.06292939067024353,
+    "top1_outperformed_pool_days": 4,
+    "selected_top2_trades": 25,
+    "selected_top2_observed_0945_trades": 25,
+    "selected_top2_mean_0945_pct": -0.14890343177061685,
+    "selected_top2_positive_0945": 11,
+    "selected_top2_below_minus1pct_0945": 7,
+    "selected_top2_actual_classes": {
+      "lt0": 13,
+      "0to1": 6,
+      "1to3": 6,
+      "ge3": 0
+    },
+    "selected_top2_by_predicted_class": {
+      "ge3": {
+        "observed_trades": 0,
+        "mean_0945_pct": null,
+        "actual_classes": {
+          "lt0": 0,
+          "0to1": 0,
+          "1to3": 0,
+          "ge3": 0
+        }
+      },
+      "1to3": {
+        "observed_trades": 25,
+        "mean_0945_pct": -0.14890343177061685,
+        "actual_classes": {
+          "lt0": 13,
+          "0to1": 6,
+          "1to3": 6,
+          "ge3": 0
+        }
+      }
+    }
+  },
+  "august_bridge": {
+    "candidate_days": 6,
+    "candidate_rows": 3869,
+    "labeled_rows": 3869,
+    "unlabeled_rows": 0,
+    "class_distribution": {
+      "lt0": 1677,
+      "0to1": 782,
+      "1to3": 932,
+      "ge3": 478
+    },
+    "predicted_class_distribution": {
+      "lt0": 3634,
+      "0to1": 105,
+      "1to3": 129,
+      "ge3": 1
+    },
+    "confusion_rows_actual_columns_predicted": [
+      [
+        1587,
+        58,
+        31,
+        1
+      ],
+      [
+        731,
+        18,
+        33,
+        0
+      ],
+      [
+        855,
+        25,
+        52,
+        0
+      ],
+      [
+        461,
+        4,
+        13,
+        0
+      ]
+    ],
+    "correct": 1657,
+    "accuracy": 0.42827604032049627,
+    "uniform_random_accuracy": 0.25,
+    "majority_label_accuracy": 0.43344533471181185,
+    "log_loss": 1.3148838542755574,
+    "candidate_median_max_probability": 0.4953752708040529,
+    "top1_days": 6,
+    "top1_median_max_probability": 0.43802406437414315,
+    "top1_median_p_lt0": 0.3055677899384993,
+    "top1_observed_0945_days": 6,
+    "top1_missing_0945_days": 0,
+    "top1_mean_0945_pct": -0.9940151921832804,
+    "top1_mean_per_signal_day_with_cash_pct": -0.9940151921832804,
+    "top1_median_0945_pct": -0.9724139045281799,
+    "top1_positive_0945": 2,
+    "top1_at_least_1pct_0945": 1,
+    "top1_below_minus1pct_0945": 3,
+    "top1_observed_1000_days": 6,
+    "top1_mean_1000_pct": -0.013602177566655419,
+    "top1_observed_1015_days": 6,
+    "top1_mean_1015_pct": 0.37755575420077386,
+    "top1_observed_1500_entry_days": 6,
+    "top1_mean_0945_from_1500_pct": -1.0022992128876418,
+    "pool_daily_equal_mean_0945_pct": 0.26033331838707674,
+    "highest_signal_gain_mean_0945_pct": 1.14930388858779,
+    "highest_signal_gain_on_model_days_mean_0945_pct": 1.14930388858779,
+    "top1_outperformed_pool_days": 2,
+    "selected_top2_trades": 12,
+    "selected_top2_observed_0945_trades": 12,
+    "selected_top2_mean_0945_pct": -0.5271085282329308,
+    "selected_top2_positive_0945": 6,
+    "selected_top2_below_minus1pct_0945": 4,
+    "selected_top2_actual_classes": {
+      "lt0": 6,
+      "0to1": 3,
+      "1to3": 3,
+      "ge3": 0
+    },
+    "selected_top2_by_predicted_class": {
+      "ge3": {
+        "observed_trades": 1,
+        "mean_0945_pct": -3.116964076989015,
+        "actual_classes": {
+          "lt0": 1,
+          "0to1": 0,
+          "1to3": 0,
+          "ge3": 0
+        }
+      },
+      "1to3": {
+        "observed_trades": 11,
+        "mean_0945_pct": -0.29166711470965034,
+        "actual_classes": {
+          "lt0": 5,
+          "0to1": 3,
+          "1to3": 3,
+          "ge3": 0
+        }
+      }
+    }
+  },
+  "training_fold_count": 29,
+  "mean_fold_train_accuracy": 0.5133368217434835,
+  "mean_fold_train_majority_accuracy": 0.5035773789734954,
+  "median_fold_test_max_probability": 0.5051408054345035,
+  "july_training_fit_aggregate": {
+    "note": "Summed fit predictions from July's 23 rolling models; repeated training stock-days are counted in multiple windows.",
+    "rows": 208873,
+    "correct": 107785,
+    "accuracy": 0.5160312725914791,
+    "confusion_rows_actual_columns_predicted": [
+      [
+        105255,
+        8,
+        1183,
+        0
+      ],
+      [
+        33043,
+        52,
+        863,
+        1
+      ],
+      [
+        41560,
+        19,
+        2474,
+        0
+      ],
+      [
+        24006,
+        6,
+        399,
+        4
+      ]
+    ]
+  },
+  "first_fold": {
+    "test_date": "2026-07-01",
+    "train_start": "2026-06-02",
+    "train_end": "2026-06-30",
+    "train_days": 20,
+    "train_rows": 7678,
+    "test_rows": 1152,
+    "train_class_counts": {
+      "lt0": 3897,
+      "0to1": 1189,
+      "1to3": 1472,
+      "ge3": 1120
+    },
+    "train_accuracy": 0.5112008335504038,
+    "train_majority_accuracy": 0.5075540505339933,
+    "train_median_max_probability": 0.50567972354736,
+    "test_median_max_probability": 0.502073896776444
+  },
+  "last_fold": {
+    "test_date": "2026-08-10",
+    "train_start": "2026-07-13",
+    "train_end": "2026-08-07",
+    "train_days": 20,
+    "train_rows": 11276,
+    "test_rows": 741,
+    "train_class_counts": {
+      "lt0": 5094,
+      "0to1": 2451,
+      "1to3": 2713,
+      "ge3": 1018
+    },
+    "train_accuracy": 0.4828840014189429,
+    "train_majority_accuracy": 0.4517559418233416,
+    "train_median_max_probability": 0.4638549584202367,
+    "test_median_max_probability": 0.46961177466993287
+  },
+  "input_sha256": {
+    "outputs/stock_automl/sina_15m_rolling_historical_st_and_five/trainable_15m_candidates.csv": "b027e5dfa2b7426ca19b948cac027de01e4e7cf561bb6a280ae768dceb3f25be",
+    "outputs/stock_automl/sina_15m_rolling_historical_st_and_five/build_summary.json": "9235591ba794940909ee7134b89973d964c5bfd2a5ec0097143d8975981931be"
+  },
+  "code_sha256": {
+    "/Users/imac/.codex/worktrees/automl-five-class/fin_agent/scripts/experiment_automl_four_class_15m_rolling.py": "fd61b954d3473afdb173cb29b16b2e4e577902b4d3921304f5164c68ac6c9554",
+    "scripts/build_automl_sina_15m_rolling.py": "da63a3d34e3550e2ba075787602844ce57a8d77eef23d3e0fc5cb6fa8f73511b",
+    "scripts/experiment_automl_second_high_four_class.py": "25608c7bd18f7b2775aa9b7f5f24ee2f18cd1b5a4f32ab4f334381dbaef28be5",
+    "scripts/audit_automl_four_class_decisions.py": "48fde079ac9630e1dd6ffa2d28a058b8e9dc15d070b86f84ff94c8730a59bf28"
+  },
+  "limitations": [
+    "July and early-August stock outcomes have already been explored, so this is not an untouched validation set.",
+    "14:45 completed-bar close is only an entry-price proxy, not a guaranteed execution.",
+    "Historical risk status uses kcrp_stock_st effective intervals, but its source records are not frozen at each historical decision time.",
+    "Prices and database daily/valuation records have no frozen as-of revision snapshot.",
+    "No commissions, slippage, or fill constraints are included."
+  ]
+}

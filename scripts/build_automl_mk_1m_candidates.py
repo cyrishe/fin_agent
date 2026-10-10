@@ -1,0 +1,191 @@
+"""Build the frozen 14:40 seven-factor cohort directly from supplied raw 1m CSVs."""
+
+from __future__ import annotations
+
+import argparse
+import json
+from pathlib import Path
+
+import numpy as np
+import pandas as pd
+
+from scripts.benchmark_automl_1440_inference import FEATURES, db_connection
+from scripts.build_automl_tail_standard import prior_profile
+
+
+START, END = "2026-05-06", "2026-07-31"
+ARCHIVE = Path("outputs/stock_automl/mk_archive/mk/none")
+OUT = Path("outputs/stock_automl/mk_1m_study")
+
+
+def summarize_day(path: Path) -> tuple[pd.DataFrame, dict]:
+    day = path.stem
+    bars = pd.read_csv(path, usecols=["time", "symbol", "open", "high", "low",
+                                      "close", "volume"], dtype={"symbol": str})
+    if bars.empty or not bars.time.str[:10].eq(day).all():
+        raise ValueError(f"Wrong timestamp date in {path}")
+    if not bars.symbol.str.endswith((".SH", ".SZ")).all():
+        raise ValueError(f"Unexpected exchange in {path}")
+    clock = bars.time.str[-8:]
+    bad = (~bars[["open", "high", "low", "close"]].gt(0).all(axis=1) |
+           ~bars.volume.ge(0) |
+           ~bars.high.ge(bars[["open", "close"]].max(axis=1)) |
+           ~bars.low.le(bars[["open", "close"]].min(axis=1)))
+    bad_required_symbols = set(bars.loc[bad & clock.le("14:40:00"), "symbol"])
+    audit = {"date": day, "invalid_bars_anytime": int(bad.sum()),
+             "invalid_required_stock_days": len(bad_required_symbols)}
+    if bad_required_symbols:
+        keep = ~bars.symbol.isin(bad_required_symbols)
+        bars, clock = bars.loc[keep], clock.loc[keep]
+    counts = bars.groupby("symbol", sort=False).size()
+    if (not counts.eq(240).all() or bars[["symbol", "time"]].duplicated().any()
+            or clock.nunique() != 240):
+        raise ValueError(f"Incomplete or duplicate 1m session in {path}")
+    signal = bars.loc[clock.eq("14:40:00"), ["symbol", "close"]].rename(
+        columns={"close": "signal_price"})
+    intraday = bars.loc[clock.le("14:40:00")].groupby("symbol", sort=False).agg(
+        minute_bars=("low", "size"), minute_volume_shares=("volume", "sum"),
+        min_low_so_far=("low", "min")).reset_index()
+    morning = bars.loc[clock.le("09:40:00"), ["symbol", "time", "high", "close", "volume"]]
+    morning_count = morning.groupby("symbol", sort=False).size()
+    if (not intraday.minute_bars.eq(220).all() or not morning_count.eq(10).all()
+            or len(signal) != len(counts)):
+        raise ValueError(f"Wrong 14:40 or morning coverage in {path}")
+    ordered_highs = morning.sort_values(["symbol", "high"], ascending=[True, False])
+    second = ordered_highs.groupby("symbol", sort=False).nth(1).reset_index()[
+        ["symbol", "high"]].rename(columns={"high": "morning_second_high"})
+    close40 = morning.loc[morning.time.str.endswith("09:40:00"),
+                          ["symbol", "close"]].rename(columns={"close": "morning_close_40"})
+    volume5 = morning.loc[morning.time.str[-8:].le("09:35:00")].groupby(
+        "symbol", sort=False).volume.sum().rename("morning_volume5_shares").reset_index()
+    merged = signal.merge(intraday, on="symbol", validate="one_to_one")
+    for part in (second, close40, volume5):
+        merged = merged.merge(part, on="symbol", validate="one_to_one")
+    if len(merged) != len(counts):
+        raise ValueError(f"Lost stock keys in {path}")
+    merged["signal_date"] = day
+    merged["symbol6"] = merged.symbol.str[:6]
+    return merged.drop(columns="symbol"), audit
+
+
+def load_daily_profile(env_file: Path) -> tuple[pd.DataFrame, pd.DataFrame, list]:
+    with db_connection(env_file) as db:
+        with db.cursor() as cursor:
+            cursor.execute("""SELECT trade_date AS date,LEFT(stk_code,6) AS symbol6,
+                preclose,close,adjpreclose,adjclose,volume,turn_ratio
+                FROM kcrp_stock_price WHERE trade_date BETWEEN %s AND %s""",
+                           ("2026-04-01", END))
+            daily = pd.DataFrame(cursor.fetchall())
+            cursor.execute("SELECT LEFT(stk_code,6) AS symbol6,stk_name AS name "
+                           "FROM kcrp_stock_baseinfo")
+            names = pd.DataFrame(cursor.fetchall()).drop_duplicates("symbol6", keep=False)
+            cursor.execute("""SELECT trade_date AS date,LEFT(stk_code,6) AS symbol6,float_mv
+                FROM kcrp_stock_pricevaluate WHERE trade_date BETWEEN %s AND %s""",
+                           ("2026-04-01", END))
+            reported = pd.DataFrame(cursor.fetchall())
+    daily["date"] = pd.to_datetime(daily.date)
+    daily["symbol6"] = daily.symbol6.astype(str).str.zfill(6)
+    daily = daily.drop_duplicates(["date", "symbol6"], keep=False)
+    for col in ("preclose", "close", "adjpreclose", "adjclose", "volume", "turn_ratio"):
+        daily[col] = pd.to_numeric(daily[col], errors="coerce")
+    daily["float_share"] = daily.volume / (daily.turn_ratio / 100)
+    daily["float_mv"] = daily.float_share * daily.close
+    valid = (daily.turn_ratio.gt(0) & daily.volume.gt(0) & daily.close.gt(0) &
+             np.isfinite(daily.float_share) & np.isfinite(daily.float_mv))
+    value = daily.loc[valid, ["date", "symbol6", "float_share", "float_mv"]].copy()
+    profile, calendar = prior_profile(daily, value)
+    reported["date"] = pd.to_datetime(reported.date)
+    reported["symbol6"] = reported.symbol6.astype(str).str.zfill(6)
+    reported["float_mv"] = pd.to_numeric(reported.float_mv, errors="coerce")
+    audit = daily.loc[valid, ["date", "symbol6", "float_mv"]].merge(
+        reported, on=["date", "symbol6"], how="inner", suffixes=("_proxy", "_reported"))
+    audit = audit[audit.float_mv_reported.gt(0)]
+    ratio = audit.float_mv_proxy / audit.float_mv_reported
+    proxy_audit = {"overlap": len(audit), "within_1pct": float(ratio.between(.99, 1.01).mean()),
+                   "within_5pct": float(ratio.between(.95, 1.05).mean()),
+                   "p95_abs_relative_error": float((ratio - 1).abs().quantile(.95))}
+    return daily.merge(names, on="symbol6", how="left", validate="many_to_one"), profile, calendar, proxy_audit
+
+
+def build(archive: Path, env_file: Path, output: Path) -> dict:
+    files = sorted(archive.glob("2026-*.csv"))
+    if len(files) != 62 or files[0].stem != START or files[-1].stem != END:
+        raise ValueError("Expected the complete 62-day May–July unadjusted archive")
+    daily, profile, calendar, proxy_audit = load_daily_profile(env_file)
+    next_date = {pd.Timestamp(a): pd.Timestamp(b)
+                 for a, b in zip(calendar[:-1], calendar[1:])}
+    snapshots, minute_audits = [], []
+    for file in files:
+        frame, audit = summarize_day(file)
+        snapshots.append(frame)
+        minute_audits.append(audit)
+        print(f"summarized {file.stem}", flush=True)
+    snapshots = pd.concat(snapshots, ignore_index=True)
+    snapshots["signal_date"] = pd.to_datetime(snapshots.signal_date)
+    output.mkdir(parents=True, exist_ok=True)
+    snapshots.to_csv(output / "minute_daily_snapshots.csv.gz", index=False, compression="gzip")
+    pd.DataFrame(minute_audits).to_csv(output / "minute_source_audit.csv", index=False)
+    signals = snapshots.merge(
+        daily[["date", "symbol6", "preclose", "name"]].rename(
+            columns={"date": "signal_date", "preclose": "t_reference_preclose"}),
+        on=["signal_date", "symbol6"], validate="one_to_one")
+    signals = signals.merge(profile, on=["signal_date", "symbol6"], how="left",
+                            validate="one_to_one")
+    signals["next_date"] = signals.signal_date.map(next_date)
+    morning = snapshots[["signal_date", "symbol6", "morning_second_high",
+                         "morning_close_40", "morning_volume5_shares"]].rename(
+        columns={"signal_date": "next_date", "morning_second_high": "second_high",
+                 "morning_close_40": "close_40", "morning_volume5_shares": "next_volume5"})
+    signals = signals.merge(morning, on=["next_date", "symbol6"], how="left",
+                            validate="one_to_one")
+    signals["signal_return"] = signals.signal_price / signals.t_reference_preclose - 1
+    signals["volume_ratio"] = (signals.minute_volume_shares * 240 /
+                               (220 * signals.avg_volume5_shares))
+    signals["turnover_so_far_pct"] = signals.minute_volume_shares / signals.float_share * 100
+    signals["float_mv_100m_cny"] = signals.float_mv / 1e8
+    for window in (5, 10, 20):
+        signals[f"ma{window}"] = (signals[f"ma{window}_adj"] *
+                                  signals.t_reference_preclose / signals.prior_adjclose)
+    signals["ma_bull_5_10_20"] = (signals.ma5.gt(signals.ma10) &
+                                   signals.ma10.gt(signals.ma20)).astype("Int8")
+    highest_ma = signals[["ma5", "ma10", "ma20"]].max(axis=1)
+    signals["all_intraday_lows_above_ma"] = signals.min_low_so_far.gt(highest_ma).astype("Int8")
+    keep = (signals.signal_return.between(.03, .06, inclusive="both") &
+            signals.t_reference_preclose.gt(0) & signals.signal_price.gt(0) &
+            signals.minute_volume_shares.gt(0) & signals.min_low_so_far.gt(0) &
+            signals.history_complete.eq(True) & signals.adj_price_break_20d.eq(False) &
+            signals.value_complete.eq(True) & signals[list(FEATURES)].notna().all(axis=1))
+    candidates = signals.loc[keep].copy()
+    for col in ("volume_4of5_increasing", "ma_bull_5_10_20",
+                "all_intraday_lows_above_ma"):
+        candidates[col] = candidates[col].astype(int)
+    candidates.loc[candidates.next_volume5.le(0), ["second_high", "close_40"]] = np.nan
+    candidates["label_complete"] = candidates.second_high.notna() & candidates.close_40.notna()
+    if candidates.duplicated(["signal_date", "symbol6"]).any():
+        raise ValueError("Duplicate candidate stock-day")
+    candidates.sort_values(["signal_date", "symbol6"]).to_csv(
+        output / "trainable_candidates.csv.gz", index=False, compression="gzip")
+    coverage = candidates.groupby("signal_date").agg(
+        candidates=("symbol6", "size"), labeled=("label_complete", "sum"))
+    coverage.to_csv(output / "candidate_coverage.csv")
+    summary = {"archive": str(archive), "signal_days": int(candidates.signal_date.nunique()),
+               "first_signal_date": str(candidates.signal_date.min())[:10],
+               "last_signal_date": str(candidates.signal_date.max())[:10],
+               "candidates": len(candidates), "labeled": int(candidates.label_complete.sum()),
+               "invalid_bars_anytime": sum(x["invalid_bars_anytime"] for x in minute_audits),
+               "invalid_required_stock_days": sum(x["invalid_required_stock_days"]
+                                                  for x in minute_audits),
+               "proxy_float_mv": proxy_audit,
+               "feature_source": "unadjusted raw 1m; T-1 daily/derived float share and market value",
+               "universe": "active SH/SZ only; no ST name filter or next-day candidate filter"}
+    (output / "build_summary.json").write_text(json.dumps(summary, ensure_ascii=False, indent=2)+"\n")
+    return summary
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--archive", type=Path, default=ARCHIVE)
+    parser.add_argument("--env-file", type=Path, default=Path("/Volumes/ext/fin_agent/.env"))
+    parser.add_argument("--output", type=Path, default=OUT)
+    args = parser.parse_args()
+    print(json.dumps(build(args.archive, args.env_file, args.output), ensure_ascii=False, indent=2))

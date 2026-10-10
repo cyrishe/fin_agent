@@ -11,7 +11,8 @@ def test_standard_1440_features_need_complete_bars_but_no_ingestion_timestamps()
     day, following = pd.Timestamp("2026-09-22"), pd.Timestamp("2026-09-23")
     signal = pd.DataFrame([{
         "signal_date": day, "next_date": following, "symbol6": "000001",
-        "name": "平安银行", "signal_price": 10.4, "t_reference_preclose": 10.0,
+        "name": "平安银行", "st_type": "N", "signal_price": 10.4,
+        "t_reference_preclose": 10.0,
         "prior_close": 10.0, "prior_adjclose": 20.0,
         "history_complete": True, "adj_price_break_20d": False,
         "value_complete": True,
@@ -43,6 +44,7 @@ def test_standard_1440_features_need_complete_bars_but_no_ingestion_timestamps()
     assert row.turnover_so_far_pct == pytest.approx(22.0)
     assert row.float_mv_100m_cny == pytest.approx(0.1)
     assert row.ma_bull_5_10_20
+    assert row.limit_buffer == pytest.approx(.095)
     assert not row.all_intraday_lows_above_ma
     assert row.target_next_high5_return == pytest.approx(11.2 / 10.6 - 1)
     assert row.target_next_high10_return == pytest.approx(11.4 / 10.6 - 1)
@@ -63,6 +65,11 @@ def test_standard_1440_features_need_complete_bars_but_no_ingestion_timestamps()
     assert not break_row.feature_complete
     assert pd.isna(break_row.ma5)
     assert break_row.volume_4of5_increasing == 1
+
+    signal.loc[0, "st_type"] = "Y"
+    risk_row = assemble(signal, minute, entry, morning).iloc[0]
+    assert pd.isna(risk_row.limit_buffer)
+    assert not risk_row.entry_not_near_limit_proxy
 
 
 @pytest.mark.parametrize(("series", "expected"), [

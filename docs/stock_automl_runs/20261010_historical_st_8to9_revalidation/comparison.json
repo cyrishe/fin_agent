@@ -1,0 +1,237 @@
+{
+  "candidate_rows": {
+    "old": 14292,
+    "filtered": 13992,
+    "risk_removed": 300
+  },
+  "test_rows": {
+    "old": 5818,
+    "filtered": 5628
+  },
+  "risk_by_month": {
+    "2026-08": 96,
+    "2026-09": 204
+  },
+  "four_class": {
+    "unweighted": {
+      "old": {
+        "top1": {
+          "selected": 20,
+          "risk_selected": 0,
+          "actual_ge3": 9,
+          "returns_pct": {
+            "always_0940": 1.3110405633586808,
+            "no_rebound": 1.1860004673978175,
+            "original_four_rules": 0.8860786000544019
+          }
+        },
+        "top2": {
+          "selected": 40,
+          "risk_selected": 0,
+          "actual_ge3": 10,
+          "returns_pct": {
+            "always_0940": 0.484341984624502,
+            "no_rebound": 0.4780075796872748,
+            "original_four_rules": 0.3387213360937197
+          }
+        }
+      },
+      "filtered": {
+        "top1": {
+          "selected": 20,
+          "risk_selected": 0,
+          "actual_ge3": 6,
+          "returns_pct": {
+            "always_0940": 0.9075239094943671,
+            "no_rebound": 0.6184663056388612,
+            "original_four_rules": 0.4013253598953104
+          }
+        },
+        "top2": {
+          "selected": 40,
+          "risk_selected": 0,
+          "actual_ge3": 7,
+          "returns_pct": {
+            "always_0940": -0.2360944677431834,
+            "no_rebound": -0.3313928091017401,
+            "original_four_rules": -0.36369832232411636
+          }
+        }
+      },
+      "overlap": {
+        "top1": 13,
+        "top2": 29
+      }
+    },
+    "balanced_class_weight": {
+      "old": {
+        "top1": {
+          "selected": 20,
+          "risk_selected": 0,
+          "actual_ge3": 5,
+          "returns_pct": {
+            "always_0940": -0.8450334500287204,
+            "no_rebound": -0.83992418128488,
+            "original_four_rules": -0.44090372652119453
+          }
+        },
+        "top2": {
+          "selected": 40,
+          "risk_selected": 0,
+          "actual_ge3": 8,
+          "returns_pct": {
+            "always_0940": -0.18174708800478612,
+            "no_rebound": -0.28970611079861264,
+            "original_four_rules": -0.14528572838339915
+          }
+        }
+      },
+      "filtered": {
+        "top1": {
+          "selected": 20,
+          "risk_selected": 0,
+          "actual_ge3": 5,
+          "returns_pct": {
+            "always_0940": -0.13253771895348598,
+            "no_rebound": -0.4279137780354769,
+            "original_four_rules": -0.11572086014302262
+          }
+        },
+        "top2": {
+          "selected": 40,
+          "risk_selected": 0,
+          "actual_ge3": 8,
+          "returns_pct": {
+            "always_0940": -0.19518552226594266,
+            "no_rebound": -0.27136150337590204,
+            "original_four_rules": -0.18313461197811104
+          }
+        }
+      },
+      "overlap": {
+        "top1": 14,
+        "top2": 28
+      }
+    }
+  },
+  "five_class": {
+    "cumulative_trees": {
+      "old": {
+        "rows": 5818,
+        "accuracy": 0.3143691990374699,
+        "top2": {
+          "p_ge3": {
+            "selected": 40,
+            "actual_ge3": 7,
+            "exit_original_rules_pct": -0.20735277039533292
+          },
+          "utility_score": {
+            "selected": 40,
+            "actual_ge3": 9,
+            "exit_original_rules_pct": -0.1537603759775677
+          },
+          "class_priority_fallback": {
+            "selected": 40,
+            "actual_ge3": 10,
+            "exit_original_rules_pct": 0.1833101412591434
+          }
+        }
+      },
+      "filtered": {
+        "rows": 5628,
+        "accuracy": 0.31449893390191896,
+        "top2": {
+          "p_ge3": {
+            "selected": 40,
+            "actual_ge3": 11,
+            "exit_original_rules_pct": 0.1370582511981805
+          },
+          "utility_score": {
+            "selected": 40,
+            "actual_ge3": 12,
+            "exit_original_rules_pct": 0.08175225742680786
+          },
+          "class_priority_fallback": {
+            "selected": 40,
+            "actual_ge3": 9,
+            "exit_original_rules_pct": -0.3782947769924966
+          }
+        }
+      }
+    },
+    "nominal_tree": {
+      "old": {
+        "rows": 5818,
+        "accuracy": 0.3080096253007906,
+        "top2": {
+          "p_ge3": {
+            "selected": 40,
+            "actual_ge3": 8,
+            "exit_original_rules_pct": -0.21136678013849386
+          },
+          "utility_score": {
+            "selected": 40,
+            "actual_ge3": 9,
+            "exit_original_rules_pct": 0.09981532254623587
+          },
+          "class_priority_fallback": {
+            "selected": 40,
+            "actual_ge3": 7,
+            "exit_original_rules_pct": -0.6602073974642577
+          }
+        }
+      },
+      "filtered": {
+        "rows": 5628,
+        "accuracy": 0.31112295664534473,
+        "top2": {
+          "p_ge3": {
+            "selected": 40,
+            "actual_ge3": 10,
+            "exit_original_rules_pct": 0.16067069214062368
+          },
+          "utility_score": {
+            "selected": 40,
+            "actual_ge3": 10,
+            "exit_original_rules_pct": 0.001118132754791279
+          },
+          "class_priority_fallback": {
+            "selected": 40,
+            "actual_ge3": 7,
+            "exit_original_rules_pct": -0.6042388970142948
+          }
+        }
+      }
+    }
+  },
+  "oct9": {
+    "old": {
+      "training_rows": 5818,
+      "candidate_rows": 178,
+      "results": {
+        "balanced_class_weight": {
+          "accuracy": 0.3089887640449438,
+          "fallback_top2_0940_pct": 1.1361303163628766
+        },
+        "unweighted": {
+          "accuracy": 0.4101123595505618,
+          "fallback_top2_0940_pct": 0.11030274677752971
+        }
+      }
+    },
+    "filtered": {
+      "training_rows": 5628,
+      "candidate_rows": 171,
+      "results": {
+        "balanced_class_weight": {
+          "accuracy": 0.34502923976608185,
+          "fallback_top2_0940_pct": 1.1361303163628766
+        },
+        "unweighted": {
+          "accuracy": 0.4444444444444444,
+          "fallback_top2_0940_pct": -1.5763547905537911
+        }
+      }
+    }
+  }
+}

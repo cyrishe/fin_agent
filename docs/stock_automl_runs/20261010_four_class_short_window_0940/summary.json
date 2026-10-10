@@ -1,0 +1,179 @@
+{
+  "test_dates": [
+    "2026-09-02",
+    "2026-09-03",
+    "2026-09-04",
+    "2026-09-07",
+    "2026-09-08",
+    "2026-09-09",
+    "2026-09-10",
+    "2026-09-11",
+    "2026-09-14",
+    "2026-09-15",
+    "2026-09-16",
+    "2026-09-17",
+    "2026-09-18",
+    "2026-09-21",
+    "2026-09-22",
+    "2026-09-23",
+    "2026-09-24",
+    "2026-09-28",
+    "2026-09-29",
+    "2026-09-30"
+  ],
+  "candidate_pool_rows": 14783,
+  "daily_distribution": {
+    "0940_close": {
+      "known": 5981,
+      "unknown": 3,
+      "counts": {
+        "ge3": 455,
+        "1to3": 927,
+        "0to1": 1182,
+        "lt0": 3417
+      },
+      "equal_day_fraction": {
+        "ge3": 0.07986680383270647,
+        "1to3": 0.14461497539687215,
+        "0to1": 0.18136484029250483,
+        "lt0": 0.5941533804779165
+      }
+    },
+    "second_high": {
+      "known": 5981,
+      "unknown": 3,
+      "counts": {
+        "ge3": 711,
+        "1to3": 1599,
+        "0to1": 1809,
+        "lt0": 1862
+      },
+      "equal_day_fraction": {
+        "ge3": 0.12614210882482807,
+        "1to3": 0.2546468092667585,
+        "0to1": 0.27179561713276307,
+        "lt0": 0.34741546477565044
+      }
+    }
+  },
+  "arms": {
+    "recent10_T": {
+      "top1_picks": 20,
+      "known_top1": 20,
+      "class_counts": {
+        "ge3": 6,
+        "1to3": 3,
+        "0to1": 3,
+        "lt0": 8
+      },
+      "sell_0940_class_counts": {
+        "ge3": 6,
+        "1to3": 0,
+        "0to1": 3,
+        "lt0": 11
+      },
+      "mean_0940_return_pct": 0.5825230806264703,
+      "training_rows_mean": 3367.25,
+      "all_candidate_ge3_auc": 0.6039749450889652
+    },
+    "recent5_T": {
+      "top1_picks": 20,
+      "known_top1": 20,
+      "class_counts": {
+        "ge3": 3,
+        "1to3": 7,
+        "0to1": 4,
+        "lt0": 6
+      },
+      "sell_0940_class_counts": {
+        "ge3": 2,
+        "1to3": 5,
+        "0to1": 3,
+        "lt0": 10
+      },
+      "mean_0940_return_pct": -0.3537900589845838,
+      "training_rows_mean": 1627.7,
+      "all_candidate_ge3_auc": 0.5861891074654988
+    },
+    "recent5_hold_tminus1_T": {
+      "top1_picks": 20,
+      "known_top1": 20,
+      "class_counts": {
+        "ge3": 2,
+        "1to3": 6,
+        "0to1": 5,
+        "lt0": 7
+      },
+      "sell_0940_class_counts": {
+        "ge3": 2,
+        "1to3": 3,
+        "0to1": 3,
+        "lt0": 12
+      },
+      "mean_0940_return_pct": -0.7962016585686482,
+      "training_rows_mean": 1708.9,
+      "all_candidate_ge3_auc": 0.572495509705175
+    },
+    "recent5_hold_tminus1_T−1": {
+      "top1_picks": 20,
+      "known_top1": 20,
+      "class_counts": {
+        "ge3": 3,
+        "1to3": 7,
+        "0to1": 5,
+        "lt0": 5
+      },
+      "sell_0940_class_counts": {
+        "ge3": 2,
+        "1to3": 5,
+        "0to1": 3,
+        "lt0": 10
+      },
+      "mean_0940_return_pct": -0.35031349105244636,
+      "training_rows_mean": 1708.9
+    },
+    "recent5_leaf25_T": {
+      "top1_picks": 20,
+      "known_top1": 20,
+      "class_counts": {
+        "ge3": 5,
+        "1to3": 6,
+        "0to1": 2,
+        "lt0": 7
+      },
+      "sell_0940_class_counts": {
+        "ge3": 4,
+        "1to3": 3,
+        "0to1": 3,
+        "lt0": 10
+      },
+      "mean_0940_return_pct": -0.391365700494623,
+      "training_rows_mean": 1627.7,
+      "all_candidate_ge3_auc": 0.5859246270986957
+    },
+    "recent5_leaf50_T": {
+      "top1_picks": 20,
+      "known_top1": 20,
+      "class_counts": {
+        "ge3": 5,
+        "1to3": 6,
+        "0to1": 2,
+        "lt0": 7
+      },
+      "sell_0940_class_counts": {
+        "ge3": 5,
+        "1to3": 2,
+        "0to1": 5,
+        "lt0": 8
+      },
+      "mean_0940_return_pct": -0.06677658645070639,
+      "training_rows_mean": 1627.7,
+      "all_candidate_ge3_auc": 0.590006591992997
+    }
+  },
+  "sources_sha256": {
+    "docs/stock_automl_runs/20261010_four_class_similar_days/prepared_candidates.csv.gz": "c0a4d1ea86c0ea7bbcb21d98cb8efe133efeaf8bd981ca0a86557e00bff00c08",
+    "docs/stock_automl_runs/20261010_four_class_baseline_recent20/minute_api_label_audit.csv": "d054e741e368093ef7b45a3b32da213ac1c0fb4ef944064bcdb3e67b2a2bb5f2",
+    "/Users/imac/.codex/worktrees/automl-five-class/fin_agent/scripts/experiment_automl_short_window_0940.py": "d54c53af4273e557d4dea484f3c9b20fd5cb09b4642ff5e1e5b208335bbc7e3a"
+  }
+}

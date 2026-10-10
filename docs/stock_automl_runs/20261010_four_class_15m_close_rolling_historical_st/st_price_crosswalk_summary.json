@@ -1,0 +1,30 @@
+{
+  "candidate_day_limit_up": 508,
+  "by_type": {
+    "Y": 281,
+    "S": 187,
+    "N": 40
+  },
+  "mainboard_by_type": {
+    "N": {
+      "n": 40,
+      "min_gain_pct": 4.970326409495551,
+      "median_gain_pct": 10.000000000000009,
+      "max_gain_pct": 10.05586592178771
+    },
+    "S": {
+      "n": 187,
+      "min_gain_pct": 4.651162790697683,
+      "median_gain_pct": 4.999999999999982,
+      "max_gain_pct": 5.454545454545445
+    },
+    "Y": {
+      "n": 281,
+      "min_gain_pct": 4.629629629629606,
+      "median_gain_pct": 5.007153075822601,
+      "max_gain_pct": 10.035587188612105
+    }
+  },
+  "mainboard_risk_not_near_5pct": 1,
+  "mainboard_normal_near_5pct_limit_flag": 2
+}
