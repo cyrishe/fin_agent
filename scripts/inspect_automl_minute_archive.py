@@ -13,6 +13,8 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("archive", type=Path)
     parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument("--series", choices=("none", "post"),
+                        help="Extract only one price series when disk space is limited")
     args = parser.parse_args()
     root = args.output.resolve()
     root.mkdir(parents=True, exist_ok=True)
@@ -33,6 +35,8 @@ def main() -> None:
                 continue
             if not member.isfile() or target.suffix.lower() != ".csv":
                 raise ValueError(f"Unexpected archive member type: {member.name}")
+            if args.series and (len(path.parts) != 3 or path.parts[1] != args.series):
+                continue
             target.parent.mkdir(parents=True, exist_ok=True)
             source = archive.extractfile(member)
             if source is None:
