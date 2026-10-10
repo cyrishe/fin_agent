@@ -8,7 +8,11 @@ import numpy as np
 import pandas as pd
 
 from scripts.backtest_automl_staged_minute_exit import exit_on_closes
-from scripts.experiment_automl_second_high_four_class import CLASSES, OUT
+from scripts.benchmark_automl_1440_inference import FEATURES
+from scripts.experiment_automl_close9_models import DATA
+from scripts.experiment_automl_second_high_four_class import (
+    CLASSES, OUT, four_class, models)
+from scripts.experiment_automl_second_high_regression import SECOND_HIGHS
 
 
 BASE = Path("docs/stock_automl_runs/20261009_close9_target/exact_1440_to_close9_candidates.csv.gz")
@@ -65,6 +69,51 @@ def label_outcomes(frame: pd.DataFrame) -> dict:
             "mean_second_high_return_pct": float(frame.second_high_return.mean()*100)}
 
 
+def selection_columns(frame: pd.DataFrame) -> dict:
+    """Actual label counts grouped by the selected stocks' predicted class."""
+    result = {}
+    for predicted in CLASSES:
+        subset = frame[frame.predicted_class.eq(predicted)]
+        result[predicted] = {
+            "selected": len(subset),
+            "actual_ge1": int(subset["class"].isin(("1to3", "ge3")).sum()),
+            "actual_0to1": int(subset["class"].eq("0to1").sum()),
+            "actual_lt0": int(subset["class"].eq("lt0").sum()),
+        }
+    return result
+
+
+def same_fold_train_top2() -> tuple[pd.DataFrame, pd.DataFrame]:
+    """Refit each forward fold and select two within each day of its training window."""
+    base = pd.read_csv(DATA, dtype={"symbol6": str})
+    prices = pd.read_csv(SECOND_HIGHS, dtype={"symbol6": str})
+    data = base.merge(prices[["next_date", "symbol6", "second_high"]],
+                      on=["next_date", "symbol6"], validate="one_to_one")
+    data["second_high_return"] = data.second_high/data.entry_1440-1
+    data["class"] = four_class(data.second_high_return)
+    dates = sorted(data.signal_date.unique())
+    if len(data) != 14292 or len(dates) != 40:
+        raise ValueError("Expected the saved 40-day exact candidate pool")
+    fallback_rows, forced_rows = [], []
+    for index in range(20, len(dates)):
+        train = data[data.signal_date.isin(dates[index-20:index])].copy()
+        model = models()["small_boosted_tree"]
+        model.fit(train[list(FEATURES)], train["class"].astype(str))
+        labels = list(model.classes_)
+        probability = model.predict_proba(train[list(FEATURES)])
+        train["predicted_class"] = np.asarray(labels)[probability.argmax(axis=1)]
+        for label in CLASSES:
+            train[f"p_{label}"] = probability[:, labels.index(label)]
+        train["fit_test_date"] = dates[index]
+        fallback_rows.append(class_priority_fallback(train))
+        forced = train.sort_values(["signal_date", "p_ge3", "symbol6"],
+                                   ascending=[True, False, True]).copy()
+        forced["selection_rank"] = forced.groupby("signal_date").cumcount()+1
+        forced_rows.append(forced[forced.selection_rank.le(2)])
+    return (pd.concat(fallback_rows, ignore_index=True),
+            pd.concat(forced_rows, ignore_index=True))
+
+
 def exit_observations(selection: pd.DataFrame) -> pd.DataFrame:
     base = pd.read_csv(BASE, dtype={"symbol6": str})
     first = pd.read_csv(FIRST, dtype={"symbol6": str})
@@ -100,6 +149,9 @@ def run() -> dict:
     forced = boosted[boosted["rank"].le(2)].copy()
     forced["selection_rank"] = forced["rank"]
     forced_exits = exit_observations(forced)
+    train_fallback, train_forced = same_fold_train_top2()
+    train_fallback.to_csv(OUT / "same_fold_train_class_priority_top2.csv", index=False)
+    train_forced.to_csv(OUT / "same_fold_train_forced_p_ge3_top2.csv", index=False)
     summary = {
         "train_confusion": matrix_metrics(train),
         "next_day_confusion": matrix_metrics(test),
@@ -107,6 +159,12 @@ def run() -> dict:
         "fallback_rule": "predicted ge3 first by P(ge3), then predicted 1to3 by P(>=1); at most two/day; retrospective diagnostic",
         "fallback": label_outcomes(selected),
         "forced_p_ge3_top2": label_outcomes(forced),
+        "top2_by_predicted_class": {
+            "same_fold_train_class_priority": selection_columns(train_fallback),
+            "same_fold_train_forced_p_ge3": selection_columns(train_forced),
+            "next_day_class_priority": selection_columns(selected),
+            "next_day_forced_p_ge3": selection_columns(forced),
+        },
         "fallback_minute_close_exit": {
             "positive": int(exits.exit_return.gt(0).sum()),
             "negative": int(exits.exit_return.lt(0).sum()),

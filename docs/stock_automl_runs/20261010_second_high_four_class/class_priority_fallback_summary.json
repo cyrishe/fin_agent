@@ -65,6 +65,112 @@
     "actual_below_minus1": 7,
     "mean_second_high_return_pct": 1.033753273331529
   },
+  "top2_by_predicted_class": {
+    "same_fold_train_class_priority": {
+      "lt0": {
+        "selected": 0,
+        "actual_ge1": 0,
+        "actual_0to1": 0,
+        "actual_lt0": 0
+      },
+      "0to1": {
+        "selected": 0,
+        "actual_ge1": 0,
+        "actual_0to1": 0,
+        "actual_lt0": 0
+      },
+      "1to3": {
+        "selected": 681,
+        "actual_ge1": 383,
+        "actual_0to1": 109,
+        "actual_lt0": 189
+      },
+      "ge3": {
+        "selected": 107,
+        "actual_ge1": 72,
+        "actual_0to1": 11,
+        "actual_lt0": 24
+      }
+    },
+    "same_fold_train_forced_p_ge3": {
+      "lt0": {
+        "selected": 534,
+        "actual_ge1": 328,
+        "actual_0to1": 56,
+        "actual_lt0": 150
+      },
+      "0to1": {
+        "selected": 2,
+        "actual_ge1": 1,
+        "actual_0to1": 0,
+        "actual_lt0": 1
+      },
+      "1to3": {
+        "selected": 160,
+        "actual_ge1": 87,
+        "actual_0to1": 39,
+        "actual_lt0": 34
+      },
+      "ge3": {
+        "selected": 104,
+        "actual_ge1": 70,
+        "actual_0to1": 10,
+        "actual_lt0": 24
+      }
+    },
+    "next_day_class_priority": {
+      "lt0": {
+        "selected": 0,
+        "actual_ge1": 0,
+        "actual_0to1": 0,
+        "actual_lt0": 0
+      },
+      "0to1": {
+        "selected": 0,
+        "actual_ge1": 0,
+        "actual_0to1": 0,
+        "actual_lt0": 0
+      },
+      "1to3": {
+        "selected": 33,
+        "actual_ge1": 17,
+        "actual_0to1": 6,
+        "actual_lt0": 10
+      },
+      "ge3": {
+        "selected": 7,
+        "actual_ge1": 4,
+        "actual_0to1": 1,
+        "actual_lt0": 2
+      }
+    },
+    "next_day_forced_p_ge3": {
+      "lt0": {
+        "selected": 29,
+        "actual_ge1": 13,
+        "actual_0to1": 6,
+        "actual_lt0": 10
+      },
+      "0to1": {
+        "selected": 0,
+        "actual_ge1": 0,
+        "actual_0to1": 0,
+        "actual_lt0": 0
+      },
+      "1to3": {
+        "selected": 4,
+        "actual_ge1": 2,
+        "actual_0to1": 0,
+        "actual_lt0": 2
+      },
+      "ge3": {
+        "selected": 7,
+        "actual_ge1": 4,
+        "actual_0to1": 1,
+        "actual_lt0": 2
+      }
+    }
+  },
   "fallback_minute_close_exit": {
     "positive": 21,
     "negative": 19,

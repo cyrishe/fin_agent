@@ -1,7 +1,7 @@
 import pandas as pd
 
 from scripts.audit_automl_four_class_decisions import (
-    class_priority_fallback, matrix_metrics)
+    class_priority_fallback, matrix_metrics, selection_columns)
 from scripts.experiment_automl_second_high_four_class import CLASSES
 
 
@@ -33,3 +33,15 @@ def test_fallback_prioritizes_ge3_then_ge1_and_can_skip_a_day():
     assert selected.symbol6.tolist() == ["000002", "000001"]
     assert selected.selection_rank.tolist() == [1, 2]
     assert selected.signal_date.unique().tolist() == ["day1"]
+
+
+def test_selection_columns_uses_actual_labels_within_each_selected_prediction():
+    frame = pd.DataFrame([
+        ("ge3", "1to3"), ("ge3", "lt0"),
+        ("1to3", "ge3"), ("1to3", "0to1"),
+    ], columns=["predicted_class", "class"])
+    result = selection_columns(frame)
+    assert result["ge3"] == {
+        "selected": 2, "actual_ge1": 1, "actual_0to1": 0, "actual_lt0": 1}
+    assert result["1to3"] == {
+        "selected": 2, "actual_ge1": 1, "actual_0to1": 1, "actual_lt0": 0}
