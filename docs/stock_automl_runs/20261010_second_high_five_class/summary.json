@@ -167,6 +167,19 @@
             "minute_close_exit_mean_return_pct": -0.1537603759775677,
             "minute_close_exit_positive": 19,
             "minute_close_exit_below_minus1": 15
+          },
+          "class_priority_fallback": {
+            "selected": 40,
+            "days_or_train_day_evaluations": 20,
+            "actual_ge3": 10,
+            "actual_ge1": 19,
+            "actual_0to1": 7,
+            "actual_m1to0": 6,
+            "actual_ltm1": 8,
+            "mean_second_high_return_pct": 1.3847362591383483,
+            "minute_close_exit_mean_return_pct": 0.1833101412591434,
+            "minute_close_exit_positive": 20,
+            "minute_close_exit_below_minus1": 14
           }
         },
         "ltm1_auc": 0.6389913429964509,
@@ -278,6 +291,16 @@
             "actual_m1to0": 121,
             "actual_ltm1": 53,
             "mean_second_high_return_pct": 1.7512808550864627
+          },
+          "class_priority_fallback": {
+            "selected": 800,
+            "days_or_train_day_evaluations": 400,
+            "actual_ge3": 224,
+            "actual_ge1": 511,
+            "actual_0to1": 117,
+            "actual_m1to0": 80,
+            "actual_ltm1": 92,
+            "mean_second_high_return_pct": 1.969919416337125
           }
         }
       }
@@ -393,6 +416,19 @@
             "minute_close_exit_mean_return_pct": 0.09981532254623587,
             "minute_close_exit_positive": 22,
             "minute_close_exit_below_minus1": 13
+          },
+          "class_priority_fallback": {
+            "selected": 40,
+            "days_or_train_day_evaluations": 20,
+            "actual_ge3": 7,
+            "actual_ge1": 16,
+            "actual_0to1": 8,
+            "actual_m1to0": 7,
+            "actual_ltm1": 9,
+            "mean_second_high_return_pct": 0.572747309102537,
+            "minute_close_exit_mean_return_pct": -0.6602073974642577,
+            "minute_close_exit_positive": 17,
+            "minute_close_exit_below_minus1": 19
           }
         },
         "ltm1_auc": 0.640951054208542,
@@ -504,6 +540,16 @@
             "actual_m1to0": 124,
             "actual_ltm1": 68,
             "mean_second_high_return_pct": 1.736150274106643
+          },
+          "class_priority_fallback": {
+            "selected": 800,
+            "days_or_train_day_evaluations": 400,
+            "actual_ge3": 254,
+            "actual_ge1": 486,
+            "actual_0to1": 117,
+            "actual_m1to0": 106,
+            "actual_ltm1": 91,
+            "mean_second_high_return_pct": 1.9904880141808006
           }
         }
       }

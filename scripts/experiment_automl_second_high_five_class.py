@@ -11,7 +11,8 @@ from sklearn.metrics import (average_precision_score, balanced_accuracy_score,
                              confusion_matrix, roc_auc_score)
 
 from scripts.audit_automl_four_class_diagnostics import load_data
-from scripts.audit_automl_four_class_decisions import exit_observations
+from scripts.audit_automl_four_class_decisions import (
+    class_priority_fallback, exit_observations)
 from scripts.benchmark_automl_1440_inference import FEATURES
 
 
@@ -155,6 +156,9 @@ def run() -> dict:
                     top = top_two(scored, score)
                     top["selection_score"] = score
                     selections.append(top)
+                fallback = class_priority_fallback(scored)
+                fallback["selection_score"] = "class_priority_fallback"
+                selections.append(fallback)
         print(f"scored {dates[index]}", flush=True)
     out_predictions = pd.concat(all_scored, ignore_index=True)
     out_metrics = pd.DataFrame(fold_metrics)
@@ -215,7 +219,8 @@ def run() -> dict:
                 score: top_two_outcomes(out_selections[
                     out_selections.model.eq(name) & out_selections.scope.eq(scope)
                     & out_selections.selection_score.eq(score)])
-                for score in ("p_ge3", "utility_score")},
+                for score in ("p_ge3", "utility_score",
+                              "class_priority_fallback")},
         }
         summary["models"].setdefault(name, {})[scope] = result
         if scope == "next_day_test":

@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 
+from scripts.audit_automl_four_class_decisions import class_priority_fallback
 from scripts.experiment_automl_second_high_five_class import (
     LABELS, cost_matrix, five_class, project_cumulative, probability_metrics)
 
@@ -29,3 +30,15 @@ def test_ordinal_cost_penalizes_overoptimistic_extreme_more():
     metrics = probability_metrics(pd.Series(["ltm1", "ge3"]), probabilities)
     assert metrics["accuracy"] == 1
     assert metrics["log_loss"] > 0
+
+
+def test_five_class_fallback_uses_only_two_upper_predicted_classes():
+    frame = pd.DataFrame([
+        ("day1", "000001", "ltm1", .9, .05),
+        ("day1", "000002", "1to3", .45, .1),
+        ("day1", "000003", "ge3", .25, .3),
+        ("day2", "000004", "m1to0", .4, .05),
+    ], columns=["signal_date", "symbol6", "predicted_class", "p_1to3", "p_ge3"])
+    selected = class_priority_fallback(frame)
+    assert selected.symbol6.tolist() == ["000003", "000002"]
+    assert selected.selection_rank.tolist() == [1, 2]
