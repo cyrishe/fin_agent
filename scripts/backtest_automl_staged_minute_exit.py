@@ -19,16 +19,22 @@ START_CASH = Decimal("100000")
 MINUTES = tuple(f"09:{minute:02}" for minute in range(31, 41))
 
 
-def exit_on_closes(entry: float, closes: list[float]) -> dict:
-    """Return the first rule that fires; all thresholds use return vs entry."""
+def _validate_prices(entry: float, closes: list[float]) -> None:
     if len(closes) != 10 or not np.isfinite(closes).all() or min(closes) <= 0 or entry <= 0:
         raise ValueError("Need ten positive minute closes and a positive entry")
+
+
+def exit_on_closes(entry: float, closes: list[float], *,
+                   allow_rebound: bool = True) -> dict:
+    """Return the first rule that fires; optionally omit the rebound rule."""
+    _validate_prices(entry, closes)
     previous_low_return = None
     for index, close in enumerate(closes):
         current_return = close / entry - 1
         if index < 3 and current_return > .03:
             rule = "first3_over_3pct"
-        elif previous_low_return is not None and current_return-previous_low_return >= .01-1e-12:
+        elif (allow_rebound and previous_low_return is not None
+              and current_return-previous_low_return >= .01-1e-12):
             rule = "rebound_1pp_from_prior_low"
         elif index >= 3 and current_return > .01:
             rule = "last7_over_1pct"
@@ -42,6 +48,15 @@ def exit_on_closes(entry: float, closes: list[float]) -> dict:
                 "exit_return": float(current_return), "rule": rule,
                 "prior_low_return": previous_low_return}
     raise AssertionError("09:40 fallback must exit")
+
+
+def exit_at_0940(entry: float, closes: list[float]) -> dict:
+    """Hold through 09:40 and sell at its observed one-minute close."""
+    _validate_prices(entry, closes)
+    close = float(closes[-1])
+    return {"exit_minute": "09:40", "exit_price": close,
+            "exit_return": float(close/entry-1), "rule": "always_0940_close",
+            "prior_low_return": None}
 
 
 def run() -> dict:

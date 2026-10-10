@@ -1,6 +1,7 @@
 import pandas as pd
+import pytest
 
-from scripts.backtest_automl_staged_minute_exit import exit_on_closes
+from scripts.backtest_automl_staged_minute_exit import exit_at_0940, exit_on_closes
 from scripts.experiment_automl_second_high_four_class import four_class, select_ge3_predictions
 
 
@@ -36,3 +37,18 @@ def test_staged_exit_respects_time_and_first_trigger():
     assert (late["exit_minute"], late["rule"]) == ("09:34", "last7_over_1pct")
     fallback = exit_on_closes(100, [100]*10)
     assert (fallback["exit_minute"], fallback["rule"]) == ("09:40", "0940_close")
+
+
+def test_exit_variants_preserve_other_rules_and_use_the_same_price_path():
+    closes = [99, 97, 98, 105, 105, 105, 105, 105, 105, 94]
+    original = exit_on_closes(100, closes)
+    no_rebound = exit_on_closes(100, closes, allow_rebound=False)
+    always_0940 = exit_at_0940(100, closes)
+    assert (original["exit_minute"], original["exit_price"], original["rule"]) == (
+        "09:33", 98, "rebound_1pp_from_prior_low")
+    assert (no_rebound["exit_minute"], no_rebound["exit_price"], no_rebound["rule"]) == (
+        "09:34", 105, "last7_over_1pct")
+    assert (always_0940["exit_minute"], always_0940["exit_price"]) == ("09:40", 94)
+    assert always_0940["exit_return"] == pytest.approx(-.06)
+    early = exit_on_closes(100, [104]*10, allow_rebound=False)
+    assert early["rule"] == "first3_over_3pct"
