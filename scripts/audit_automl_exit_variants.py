@@ -88,9 +88,42 @@ def summarize(trades: pd.DataFrame) -> list[dict]:
     return summaries
 
 
+def summarize_by_rank(selected: pd.DataFrame, trades: pd.DataFrame,
+                      overall: list[dict]) -> list[dict]:
+    """Split each fixed daily top-two list into its first and second pick."""
+    results = []
+    for rank in (1, 2):
+        rank_selected = selected[selected.selection_rank.eq(rank)]
+        for row in summarize(trades[trades.selection_rank.eq(rank)]):
+            picks = rank_selected[
+                rank_selected.model.eq(row["model"])
+                & rank_selected.selection_rule.eq(row["selection_rule"])]
+            if row["trades"] != 20 or row["days"] != 20 or len(picks) != 20:
+                raise ValueError("Expected one pick per day at each selection rank")
+            row.update({
+                "selection_rank": rank,
+                "second_high_ge1": int(picks.second_high_return.ge(.01).sum()),
+                "second_high_ge3": int(picks.second_high_return.ge(.03).sum()),
+                "second_high_below_minus1": int(
+                    picks.second_high_return.lt(-.01).sum()),
+            })
+            results.append(row)
+    for row in overall:
+        matching = [item for item in results if all(
+            item[key] == row[key]
+            for key in ("model", "selection_rule", "exit_strategy"))]
+        if len(matching) != 2 or not np.isclose(
+                sum(item["mean_trade_return_pct"] for item in matching)/2,
+                row["mean_trade_return_pct"], atol=1e-10):
+            raise ValueError("Rank-one and rank-two returns do not reconcile")
+    return results
+
+
 def run() -> list[dict]:
-    trades = replay(with_minute_closes(load_selected()))
+    selected = load_selected()
+    trades = replay(with_minute_closes(selected))
     summaries = summarize(trades)
+    ranked = summarize_by_rank(selected, trades, summaries)
     if len(trades) != 840 or len(summaries) != 21:
         raise ValueError("Expected 280 picks replayed under three exit rules")
     old = json.loads((FOUR / "class_priority_fallback_summary.json").read_text())
@@ -113,6 +146,11 @@ def run() -> list[dict]:
                         "no_rebound": "first 3 >3%; last 7 >1%; otherwise 09:40 close",
                         "always_0940": "09:40 minute close for every selected stock",
                     }, "results": summaries}, ensure_ascii=False, indent=2)+"\n")
+    (OUT / "exit_strategy_by_rank_summary.json").write_text(
+        json.dumps({
+            "scope": "Same 20 next-day dates and seven fixed daily rankings; rank 1 and rank 2 each contain 20 trades. Minute close price proxy, before costs.",
+            "results": ranked,
+        }, ensure_ascii=False, indent=2)+"\n")
     return summaries
 
 

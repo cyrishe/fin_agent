@@ -1,0 +1,870 @@
+{
+  "scope": "Same 20 next-day dates and seven fixed daily rankings; rank 1 and rank 2 each contain 20 trades. Minute close price proxy, before costs.",
+  "results": [
+    {
+      "model": "cumulative_trees",
+      "selection_rule": "class_priority_fallback",
+      "exit_strategy": "always_0940",
+      "trades": 20,
+      "days": 20,
+      "mean_trade_return_pct": 0.847908158792457,
+      "median_trade_return_pct": 1.8037834494001648,
+      "positive": 12,
+      "negative": 8,
+      "below_minus1": 8,
+      "rule_counts": {
+        "always_0940_close": 20
+      },
+      "selection_rank": 1,
+      "second_high_ge1": 12,
+      "second_high_ge3": 8,
+      "second_high_below_minus1": 5
+    },
+    {
+      "model": "cumulative_trees",
+      "selection_rule": "class_priority_fallback",
+      "exit_strategy": "no_rebound",
+      "trades": 20,
+      "days": 20,
+      "mean_trade_return_pct": 0.7011896936014667,
+      "median_trade_return_pct": 1.3451066347116458,
+      "positive": 12,
+      "negative": 8,
+      "below_minus1": 8,
+      "rule_counts": {
+        "0940_close": 8,
+        "first3_over_3pct": 6,
+        "last7_over_1pct": 6
+      },
+      "selection_rank": 1,
+      "second_high_ge1": 12,
+      "second_high_ge3": 8,
+      "second_high_below_minus1": 5
+    },
+    {
+      "model": "cumulative_trees",
+      "selection_rule": "class_priority_fallback",
+      "exit_strategy": "original_four_rules",
+      "trades": 20,
+      "days": 20,
+      "mean_trade_return_pct": 0.40498821124991924,
+      "median_trade_return_pct": 0.5590280162709571,
+      "positive": 12,
+      "negative": 8,
+      "below_minus1": 7,
+      "rule_counts": {
+        "rebound_1pp_from_prior_low": 12,
+        "first3_over_3pct": 6,
+        "0940_close": 1,
+        "last7_over_1pct": 1
+      },
+      "selection_rank": 1,
+      "second_high_ge1": 12,
+      "second_high_ge3": 8,
+      "second_high_below_minus1": 5
+    },
+    {
+      "model": "cumulative_trees",
+      "selection_rule": "p_ge3",
+      "exit_strategy": "always_0940",
+      "trades": 20,
+      "days": 20,
+      "mean_trade_return_pct": 0.0529874687405113,
+      "median_trade_return_pct": 0.05939094960865088,
+      "positive": 11,
+      "negative": 9,
+      "below_minus1": 9,
+      "rule_counts": {
+        "always_0940_close": 20
+      },
+      "selection_rank": 1,
+      "second_high_ge1": 10,
+      "second_high_ge3": 5,
+      "second_high_below_minus1": 3
+    },
+    {
+      "model": "cumulative_trees",
+      "selection_rule": "p_ge3",
+      "exit_strategy": "no_rebound",
+      "trades": 20,
+      "days": 20,
+      "mean_trade_return_pct": -0.20714300472236047,
+      "median_trade_return_pct": 0.05939094960865088,
+      "positive": 11,
+      "negative": 9,
+      "below_minus1": 9,
+      "rule_counts": {
+        "0940_close": 11,
+        "last7_over_1pct": 7,
+        "first3_over_3pct": 2
+      },
+      "selection_rank": 1,
+      "second_high_ge1": 10,
+      "second_high_ge3": 5,
+      "second_high_below_minus1": 3
+    },
+    {
+      "model": "cumulative_trees",
+      "selection_rule": "p_ge3",
+      "exit_strategy": "original_four_rules",
+      "trades": 20,
+      "days": 20,
+      "mean_trade_return_pct": 0.0445214334969779,
+      "median_trade_return_pct": 0.3086137486032703,
+      "positive": 12,
+      "negative": 8,
+      "below_minus1": 5,
+      "rule_counts": {
+        "rebound_1pp_from_prior_low": 17,
+        "first3_over_3pct": 2,
+        "last7_over_1pct": 1
+      },
+      "selection_rank": 1,
+      "second_high_ge1": 10,
+      "second_high_ge3": 5,
+      "second_high_below_minus1": 3
+    },
+    {
+      "model": "cumulative_trees",
+      "selection_rule": "utility_score",
+      "exit_strategy": "always_0940",
+      "trades": 20,
+      "days": 20,
+      "mean_trade_return_pct": 0.39946871166791026,
+      "median_trade_return_pct": 0.7063199047365298,
+      "positive": 12,
+      "negative": 8,
+      "below_minus1": 7,
+      "rule_counts": {
+        "always_0940_close": 20
+      },
+      "selection_rank": 1,
+      "second_high_ge1": 12,
+      "second_high_ge3": 5,
+      "second_high_below_minus1": 2
+    },
+    {
+      "model": "cumulative_trees",
+      "selection_rule": "utility_score",
+      "exit_strategy": "no_rebound",
+      "trades": 20,
+      "days": 20,
+      "mean_trade_return_pct": 0.3938195116248583,
+      "median_trade_return_pct": 1.1251399168168086,
+      "positive": 12,
+      "negative": 8,
+      "below_minus1": 7,
+      "rule_counts": {
+        "last7_over_1pct": 9,
+        "0940_close": 9,
+        "first3_over_3pct": 2
+      },
+      "selection_rank": 1,
+      "second_high_ge1": 12,
+      "second_high_ge3": 5,
+      "second_high_below_minus1": 2
+    },
+    {
+      "model": "cumulative_trees",
+      "selection_rule": "utility_score",
+      "exit_strategy": "original_four_rules",
+      "trades": 20,
+      "days": 20,
+      "mean_trade_return_pct": -0.0492519352001991,
+      "median_trade_return_pct": 0.28490546318721277,
+      "positive": 11,
+      "negative": 9,
+      "below_minus1": 8,
+      "rule_counts": {
+        "rebound_1pp_from_prior_low": 10,
+        "0940_close": 6,
+        "last7_over_1pct": 2,
+        "first3_over_3pct": 2
+      },
+      "selection_rank": 1,
+      "second_high_ge1": 12,
+      "second_high_ge3": 5,
+      "second_high_below_minus1": 2
+    },
+    {
+      "model": "four_class_small_tree",
+      "selection_rule": "class_priority_fallback",
+      "exit_strategy": "always_0940",
+      "trades": 20,
+      "days": 20,
+      "mean_trade_return_pct": 1.3110405633586808,
+      "median_trade_return_pct": 1.8037834494001648,
+      "positive": 14,
+      "negative": 6,
+      "below_minus1": 5,
+      "rule_counts": {
+        "always_0940_close": 20
+      },
+      "selection_rank": 1,
+      "second_high_ge1": 14,
+      "second_high_ge3": 9,
+      "second_high_below_minus1": 0
+    },
+    {
+      "model": "four_class_small_tree",
+      "selection_rule": "class_priority_fallback",
+      "exit_strategy": "no_rebound",
+      "trades": 20,
+      "days": 20,
+      "mean_trade_return_pct": 1.1860004673978175,
+      "median_trade_return_pct": 1.3105482974390847,
+      "positive": 15,
+      "negative": 5,
+      "below_minus1": 5,
+      "rule_counts": {
+        "last7_over_1pct": 10,
+        "first3_over_3pct": 5,
+        "0940_close": 5
+      },
+      "selection_rank": 1,
+      "second_high_ge1": 14,
+      "second_high_ge3": 9,
+      "second_high_below_minus1": 0
+    },
+    {
+      "model": "four_class_small_tree",
+      "selection_rule": "class_priority_fallback",
+      "exit_strategy": "original_four_rules",
+      "trades": 20,
+      "days": 20,
+      "mean_trade_return_pct": 0.8860786000544019,
+      "median_trade_return_pct": 1.094367939424734,
+      "positive": 13,
+      "negative": 7,
+      "below_minus1": 5,
+      "rule_counts": {
+        "rebound_1pp_from_prior_low": 11,
+        "first3_over_3pct": 5,
+        "0940_close": 3,
+        "last7_over_1pct": 1
+      },
+      "selection_rank": 1,
+      "second_high_ge1": 14,
+      "second_high_ge3": 9,
+      "second_high_below_minus1": 0
+    },
+    {
+      "model": "nominal_tree",
+      "selection_rule": "class_priority_fallback",
+      "exit_strategy": "always_0940",
+      "trades": 20,
+      "days": 20,
+      "mean_trade_return_pct": 0.33281968016284136,
+      "median_trade_return_pct": 0.36590036194729114,
+      "positive": 11,
+      "negative": 8,
+      "below_minus1": 7,
+      "rule_counts": {
+        "always_0940_close": 20
+      },
+      "selection_rank": 1,
+      "second_high_ge1": 10,
+      "second_high_ge3": 6,
+      "second_high_below_minus1": 2
+    },
+    {
+      "model": "nominal_tree",
+      "selection_rule": "class_priority_fallback",
+      "exit_strategy": "no_rebound",
+      "trades": 20,
+      "days": 20,
+      "mean_trade_return_pct": 0.44200928820371294,
+      "median_trade_return_pct": 0.9929318569740553,
+      "positive": 12,
+      "negative": 7,
+      "below_minus1": 7,
+      "rule_counts": {
+        "0940_close": 10,
+        "last7_over_1pct": 6,
+        "first3_over_3pct": 4
+      },
+      "selection_rank": 1,
+      "second_high_ge1": 10,
+      "second_high_ge3": 6,
+      "second_high_below_minus1": 2
+    },
+    {
+      "model": "nominal_tree",
+      "selection_rule": "class_priority_fallback",
+      "exit_strategy": "original_four_rules",
+      "trades": 20,
+      "days": 20,
+      "mean_trade_return_pct": 0.16848619910879714,
+      "median_trade_return_pct": 0.3086137486032703,
+      "positive": 11,
+      "negative": 9,
+      "below_minus1": 8,
+      "rule_counts": {
+        "rebound_1pp_from_prior_low": 11,
+        "first3_over_3pct": 4,
+        "0940_close": 4,
+        "last7_over_1pct": 1
+      },
+      "selection_rank": 1,
+      "second_high_ge1": 10,
+      "second_high_ge3": 6,
+      "second_high_below_minus1": 2
+    },
+    {
+      "model": "nominal_tree",
+      "selection_rule": "p_ge3",
+      "exit_strategy": "always_0940",
+      "trades": 20,
+      "days": 20,
+      "mean_trade_return_pct": 0.2649218298262057,
+      "median_trade_return_pct": 0.11171921453295708,
+      "positive": 12,
+      "negative": 7,
+      "below_minus1": 7,
+      "rule_counts": {
+        "always_0940_close": 20
+      },
+      "selection_rank": 1,
+      "second_high_ge1": 11,
+      "second_high_ge3": 5,
+      "second_high_below_minus1": 2
+    },
+    {
+      "model": "nominal_tree",
+      "selection_rule": "p_ge3",
+      "exit_strategy": "no_rebound",
+      "trades": 20,
+      "days": 20,
+      "mean_trade_return_pct": -0.03711565626331792,
+      "median_trade_return_pct": 0.6067687194834526,
+      "positive": 12,
+      "negative": 7,
+      "below_minus1": 7,
+      "rule_counts": {
+        "0940_close": 10,
+        "last7_over_1pct": 9,
+        "first3_over_3pct": 1
+      },
+      "selection_rank": 1,
+      "second_high_ge1": 11,
+      "second_high_ge3": 5,
+      "second_high_below_minus1": 2
+    },
+    {
+      "model": "nominal_tree",
+      "selection_rule": "p_ge3",
+      "exit_strategy": "original_four_rules",
+      "trades": 20,
+      "days": 20,
+      "mean_trade_return_pct": -0.1444991051937361,
+      "median_trade_return_pct": 0.3086137486032703,
+      "positive": 11,
+      "negative": 9,
+      "below_minus1": 7,
+      "rule_counts": {
+        "rebound_1pp_from_prior_low": 16,
+        "0940_close": 2,
+        "first3_over_3pct": 1,
+        "last7_over_1pct": 1
+      },
+      "selection_rank": 1,
+      "second_high_ge1": 11,
+      "second_high_ge3": 5,
+      "second_high_below_minus1": 2
+    },
+    {
+      "model": "nominal_tree",
+      "selection_rule": "utility_score",
+      "exit_strategy": "always_0940",
+      "trades": 20,
+      "days": 20,
+      "mean_trade_return_pct": 0.30516083005039385,
+      "median_trade_return_pct": 0.651871768893042,
+      "positive": 13,
+      "negative": 7,
+      "below_minus1": 7,
+      "rule_counts": {
+        "always_0940_close": 20
+      },
+      "selection_rank": 1,
+      "second_high_ge1": 12,
+      "second_high_ge3": 4,
+      "second_high_below_minus1": 2
+    },
+    {
+      "model": "nominal_tree",
+      "selection_rule": "utility_score",
+      "exit_strategy": "no_rebound",
+      "trades": 20,
+      "days": 20,
+      "mean_trade_return_pct": 0.3421172646155757,
+      "median_trade_return_pct": 1.131133772321824,
+      "positive": 13,
+      "negative": 7,
+      "below_minus1": 7,
+      "rule_counts": {
+        "last7_over_1pct": 10,
+        "0940_close": 9,
+        "first3_over_3pct": 1
+      },
+      "selection_rank": 1,
+      "second_high_ge1": 12,
+      "second_high_ge3": 4,
+      "second_high_below_minus1": 2
+    },
+    {
+      "model": "nominal_tree",
+      "selection_rule": "utility_score",
+      "exit_strategy": "original_four_rules",
+      "trades": 20,
+      "days": 20,
+      "mean_trade_return_pct": -0.05189972213557048,
+      "median_trade_return_pct": 0.12146805030737173,
+      "positive": 11,
+      "negative": 9,
+      "below_minus1": 6,
+      "rule_counts": {
+        "rebound_1pp_from_prior_low": 12,
+        "0940_close": 5,
+        "last7_over_1pct": 2,
+        "first3_over_3pct": 1
+      },
+      "selection_rank": 1,
+      "second_high_ge1": 12,
+      "second_high_ge3": 4,
+      "second_high_below_minus1": 2
+    },
+    {
+      "model": "cumulative_trees",
+      "selection_rule": "class_priority_fallback",
+      "exit_strategy": "always_0940",
+      "trades": 20,
+      "days": 20,
+      "mean_trade_return_pct": -0.5173956289772413,
+      "median_trade_return_pct": -0.5067509790843583,
+      "positive": 8,
+      "negative": 12,
+      "below_minus1": 8,
+      "rule_counts": {
+        "always_0940_close": 20
+      },
+      "selection_rank": 2,
+      "second_high_ge1": 7,
+      "second_high_ge3": 2,
+      "second_high_below_minus1": 3
+    },
+    {
+      "model": "cumulative_trees",
+      "selection_rule": "class_priority_fallback",
+      "exit_strategy": "no_rebound",
+      "trades": 20,
+      "days": 20,
+      "mean_trade_return_pct": -0.08735673117458875,
+      "median_trade_return_pct": -0.49498230265907495,
+      "positive": 9,
+      "negative": 11,
+      "below_minus1": 8,
+      "rule_counts": {
+        "0940_close": 14,
+        "last7_over_1pct": 5,
+        "first3_over_3pct": 1
+      },
+      "selection_rank": 2,
+      "second_high_ge1": 7,
+      "second_high_ge3": 2,
+      "second_high_below_minus1": 3
+    },
+    {
+      "model": "cumulative_trees",
+      "selection_rule": "class_priority_fallback",
+      "exit_strategy": "original_four_rules",
+      "trades": 20,
+      "days": 20,
+      "mean_trade_return_pct": -0.03836792873163242,
+      "median_trade_return_pct": -0.1860450158186422,
+      "positive": 8,
+      "negative": 12,
+      "below_minus1": 7,
+      "rule_counts": {
+        "rebound_1pp_from_prior_low": 11,
+        "0940_close": 7,
+        "first3_over_3pct": 1,
+        "last7_over_1pct": 1
+      },
+      "selection_rank": 2,
+      "second_high_ge1": 7,
+      "second_high_ge3": 2,
+      "second_high_below_minus1": 3
+    },
+    {
+      "model": "cumulative_trees",
+      "selection_rule": "p_ge3",
+      "exit_strategy": "always_0940",
+      "trades": 20,
+      "days": 20,
+      "mean_trade_return_pct": -0.2887140829493645,
+      "median_trade_return_pct": -0.0868394513415971,
+      "positive": 10,
+      "negative": 10,
+      "below_minus1": 9,
+      "rule_counts": {
+        "always_0940_close": 20
+      },
+      "selection_rank": 2,
+      "second_high_ge1": 9,
+      "second_high_ge3": 2,
+      "second_high_below_minus1": 4
+    },
+    {
+      "model": "cumulative_trees",
+      "selection_rule": "p_ge3",
+      "exit_strategy": "no_rebound",
+      "trades": 20,
+      "days": 20,
+      "mean_trade_return_pct": -0.36615792844986117,
+      "median_trade_return_pct": -0.0868394513415971,
+      "positive": 10,
+      "negative": 10,
+      "below_minus1": 9,
+      "rule_counts": {
+        "0940_close": 12,
+        "last7_over_1pct": 7,
+        "first3_over_3pct": 1
+      },
+      "selection_rank": 2,
+      "second_high_ge1": 9,
+      "second_high_ge3": 2,
+      "second_high_below_minus1": 4
+    },
+    {
+      "model": "cumulative_trees",
+      "selection_rule": "p_ge3",
+      "exit_strategy": "original_four_rules",
+      "trades": 20,
+      "days": 20,
+      "mean_trade_return_pct": -0.4592269742876437,
+      "median_trade_return_pct": -0.25748791550541106,
+      "positive": 9,
+      "negative": 11,
+      "below_minus1": 8,
+      "rule_counts": {
+        "rebound_1pp_from_prior_low": 14,
+        "0940_close": 3,
+        "last7_over_1pct": 2,
+        "first3_over_3pct": 1
+      },
+      "selection_rank": 2,
+      "second_high_ge1": 9,
+      "second_high_ge3": 2,
+      "second_high_below_minus1": 4
+    },
+    {
+      "model": "cumulative_trees",
+      "selection_rule": "utility_score",
+      "exit_strategy": "always_0940",
+      "trades": 20,
+      "days": 20,
+      "mean_trade_return_pct": -0.33998916846544214,
+      "median_trade_return_pct": -0.5747128135111967,
+      "positive": 8,
+      "negative": 12,
+      "below_minus1": 9,
+      "rule_counts": {
+        "always_0940_close": 20
+      },
+      "selection_rank": 2,
+      "second_high_ge1": 7,
+      "second_high_ge3": 4,
+      "second_high_below_minus1": 2
+    },
+    {
+      "model": "cumulative_trees",
+      "selection_rule": "utility_score",
+      "exit_strategy": "no_rebound",
+      "trades": 20,
+      "days": 20,
+      "mean_trade_return_pct": -0.360579998478463,
+      "median_trade_return_pct": -0.5747128135111967,
+      "positive": 8,
+      "negative": 12,
+      "below_minus1": 9,
+      "rule_counts": {
+        "0940_close": 13,
+        "last7_over_1pct": 6,
+        "first3_over_3pct": 1
+      },
+      "selection_rank": 2,
+      "second_high_ge1": 7,
+      "second_high_ge3": 4,
+      "second_high_below_minus1": 2
+    },
+    {
+      "model": "cumulative_trees",
+      "selection_rule": "utility_score",
+      "exit_strategy": "original_four_rules",
+      "trades": 20,
+      "days": 20,
+      "mean_trade_return_pct": -0.2582688167549363,
+      "median_trade_return_pct": -0.34300868450196087,
+      "positive": 8,
+      "negative": 12,
+      "below_minus1": 7,
+      "rule_counts": {
+        "rebound_1pp_from_prior_low": 10,
+        "0940_close": 7,
+        "last7_over_1pct": 2,
+        "first3_over_3pct": 1
+      },
+      "selection_rank": 2,
+      "second_high_ge1": 7,
+      "second_high_ge3": 4,
+      "second_high_below_minus1": 2
+    },
+    {
+      "model": "four_class_small_tree",
+      "selection_rule": "class_priority_fallback",
+      "exit_strategy": "always_0940",
+      "trades": 20,
+      "days": 20,
+      "mean_trade_return_pct": -0.3423565941096768,
+      "median_trade_return_pct": -0.8372625140607215,
+      "positive": 7,
+      "negative": 13,
+      "below_minus1": 9,
+      "rule_counts": {
+        "always_0940_close": 20
+      },
+      "selection_rank": 2,
+      "second_high_ge1": 7,
+      "second_high_ge3": 1,
+      "second_high_below_minus1": 2
+    },
+    {
+      "model": "four_class_small_tree",
+      "selection_rule": "class_priority_fallback",
+      "exit_strategy": "no_rebound",
+      "trades": 20,
+      "days": 20,
+      "mean_trade_return_pct": -0.22998530802326778,
+      "median_trade_return_pct": -0.8372625140607215,
+      "positive": 7,
+      "negative": 13,
+      "below_minus1": 9,
+      "rule_counts": {
+        "0940_close": 14,
+        "last7_over_1pct": 5,
+        "first3_over_3pct": 1
+      },
+      "selection_rank": 2,
+      "second_high_ge1": 7,
+      "second_high_ge3": 1,
+      "second_high_below_minus1": 2
+    },
+    {
+      "model": "four_class_small_tree",
+      "selection_rule": "class_priority_fallback",
+      "exit_strategy": "original_four_rules",
+      "trades": 20,
+      "days": 20,
+      "mean_trade_return_pct": -0.2086359278669625,
+      "median_trade_return_pct": -0.5084909560836126,
+      "positive": 8,
+      "negative": 12,
+      "below_minus1": 8,
+      "rule_counts": {
+        "rebound_1pp_from_prior_low": 10,
+        "0940_close": 8,
+        "last7_over_1pct": 1,
+        "first3_over_3pct": 1
+      },
+      "selection_rank": 2,
+      "second_high_ge1": 7,
+      "second_high_ge3": 1,
+      "second_high_below_minus1": 2
+    },
+    {
+      "model": "nominal_tree",
+      "selection_rule": "class_priority_fallback",
+      "exit_strategy": "always_0940",
+      "trades": 20,
+      "days": 20,
+      "mean_trade_return_pct": -1.4796558723187563,
+      "median_trade_return_pct": -1.398088435738093,
+      "positive": 7,
+      "negative": 13,
+      "below_minus1": 11,
+      "rule_counts": {
+        "always_0940_close": 20
+      },
+      "selection_rank": 2,
+      "second_high_ge1": 6,
+      "second_high_ge3": 1,
+      "second_high_below_minus1": 7
+    },
+    {
+      "model": "nominal_tree",
+      "selection_rule": "class_priority_fallback",
+      "exit_strategy": "no_rebound",
+      "trades": 20,
+      "days": 20,
+      "mean_trade_return_pct": -1.4194694071094365,
+      "median_trade_return_pct": -1.398088435738093,
+      "positive": 7,
+      "negative": 13,
+      "below_minus1": 11,
+      "rule_counts": {
+        "0940_close": 15,
+        "last7_over_1pct": 5
+      },
+      "selection_rank": 2,
+      "second_high_ge1": 6,
+      "second_high_ge3": 1,
+      "second_high_below_minus1": 7
+    },
+    {
+      "model": "nominal_tree",
+      "selection_rule": "class_priority_fallback",
+      "exit_strategy": "original_four_rules",
+      "trades": 20,
+      "days": 20,
+      "mean_trade_return_pct": -1.4889009940373126,
+      "median_trade_return_pct": -1.398088435738093,
+      "positive": 6,
+      "negative": 14,
+      "below_minus1": 11,
+      "rule_counts": {
+        "rebound_1pp_from_prior_low": 11,
+        "0940_close": 7,
+        "last7_over_1pct": 2
+      },
+      "selection_rank": 2,
+      "second_high_ge1": 6,
+      "second_high_ge3": 1,
+      "second_high_below_minus1": 7
+    },
+    {
+      "model": "nominal_tree",
+      "selection_rule": "p_ge3",
+      "exit_strategy": "always_0940",
+      "trades": 20,
+      "days": 20,
+      "mean_trade_return_pct": -0.5517527438773895,
+      "median_trade_return_pct": -0.8090632405836851,
+      "positive": 9,
+      "negative": 11,
+      "below_minus1": 10,
+      "rule_counts": {
+        "always_0940_close": 20
+      },
+      "selection_rank": 2,
+      "second_high_ge1": 9,
+      "second_high_ge3": 3,
+      "second_high_below_minus1": 6
+    },
+    {
+      "model": "nominal_tree",
+      "selection_rule": "p_ge3",
+      "exit_strategy": "no_rebound",
+      "trades": 20,
+      "days": 20,
+      "mean_trade_return_pct": -0.4495729015229666,
+      "median_trade_return_pct": -0.8090632405836851,
+      "positive": 9,
+      "negative": 11,
+      "below_minus1": 10,
+      "rule_counts": {
+        "0940_close": 12,
+        "last7_over_1pct": 5,
+        "first3_over_3pct": 3
+      },
+      "selection_rank": 2,
+      "second_high_ge1": 9,
+      "second_high_ge3": 3,
+      "second_high_below_minus1": 6
+    },
+    {
+      "model": "nominal_tree",
+      "selection_rule": "p_ge3",
+      "exit_strategy": "original_four_rules",
+      "trades": 20,
+      "days": 20,
+      "mean_trade_return_pct": -0.2782344550832516,
+      "median_trade_return_pct": -0.5682372761955656,
+      "positive": 9,
+      "negative": 11,
+      "below_minus1": 8,
+      "rule_counts": {
+        "rebound_1pp_from_prior_low": 15,
+        "first3_over_3pct": 3,
+        "0940_close": 1,
+        "last7_over_1pct": 1
+      },
+      "selection_rank": 2,
+      "second_high_ge1": 9,
+      "second_high_ge3": 3,
+      "second_high_below_minus1": 6
+    },
+    {
+      "model": "nominal_tree",
+      "selection_rule": "utility_score",
+      "exit_strategy": "always_0940",
+      "trades": 20,
+      "days": 20,
+      "mean_trade_return_pct": 0.11121805607405111,
+      "median_trade_return_pct": -0.15203186383992984,
+      "positive": 10,
+      "negative": 10,
+      "below_minus1": 7,
+      "rule_counts": {
+        "always_0940_close": 20
+      },
+      "selection_rank": 2,
+      "second_high_ge1": 9,
+      "second_high_ge3": 5,
+      "second_high_below_minus1": 2
+    },
+    {
+      "model": "nominal_tree",
+      "selection_rule": "utility_score",
+      "exit_strategy": "no_rebound",
+      "trades": 20,
+      "days": 20,
+      "mean_trade_return_pct": 0.10554720531727955,
+      "median_trade_return_pct": -0.15203186383992984,
+      "positive": 10,
+      "negative": 10,
+      "below_minus1": 7,
+      "rule_counts": {
+        "0940_close": 12,
+        "last7_over_1pct": 6,
+        "first3_over_3pct": 2
+      },
+      "selection_rank": 2,
+      "second_high_ge1": 9,
+      "second_high_ge3": 5,
+      "second_high_below_minus1": 2
+    },
+    {
+      "model": "nominal_tree",
+      "selection_rule": "utility_score",
+      "exit_strategy": "original_four_rules",
+      "trades": 20,
+      "days": 20,
+      "mean_trade_return_pct": 0.25153036722804223,
+      "median_trade_return_pct": 0.542916410284533,
+      "positive": 11,
+      "negative": 9,
+      "below_minus1": 7,
+      "rule_counts": {
+        "rebound_1pp_from_prior_low": 11,
+        "0940_close": 4,
+        "last7_over_1pct": 3,
+        "first3_over_3pct": 2
+      },
+      "selection_rank": 2,
+      "second_high_ge1": 9,
+      "second_high_ge3": 5,
+      "second_high_below_minus1": 2
+    }
+  ]
+}
