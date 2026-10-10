@@ -1,0 +1,281 @@
+{
+  "samples": {
+    "all_40_days": {
+      "days": 40,
+      "stocks": 14292,
+      "date_start": "2026-08-05",
+      "date_end": "2026-09-30",
+      "per_day_min": 50,
+      "per_day_median": 271.5,
+      "per_day_max": 953,
+      "classes": {
+        "lt0": 4770,
+        "0to1": 4017,
+        "1to3": 3777,
+        "ge3": 1728
+      }
+    },
+    "first_20_days_initial_history": {
+      "days": 20,
+      "stocks": 8474,
+      "date_start": "2026-08-05",
+      "date_end": "2026-09-01",
+      "per_day_min": 50,
+      "per_day_median": 335.0,
+      "per_day_max": 953,
+      "classes": {
+        "lt0": 2955,
+        "0to1": 2258,
+        "1to3": 2225,
+        "ge3": 1036
+      }
+    },
+    "last_20_days_scored": {
+      "days": 20,
+      "stocks": 5818,
+      "date_start": "2026-09-02",
+      "date_end": "2026-09-30",
+      "per_day_min": 76,
+      "per_day_median": 243.0,
+      "per_day_max": 927,
+      "classes": {
+        "lt0": 1815,
+        "0to1": 1759,
+        "1to3": 1552,
+        "ge3": 692
+      }
+    }
+  },
+  "fit": {
+    "capacity_probe": {
+      "next_day_test": {
+        "mean_ge3_auc_across_20_folds": 0.5704711863492669,
+        "mean_balanced_accuracy_across_20_folds": 0.2695446655603113,
+        "mean_macro_f1_across_20_folds": 0.25284167878067515,
+        "mean_rows_per_fold": 290.9
+      },
+      "same_fold_train": {
+        "mean_ge3_auc_across_20_folds": 0.989959037746526,
+        "mean_balanced_accuracy_across_20_folds": 0.836051702544298,
+        "mean_macro_f1_across_20_folds": 0.8551631083583942,
+        "mean_rows_per_fold": 7001.65
+      }
+    },
+    "logistic": {
+      "next_day_test": {
+        "mean_ge3_auc_across_20_folds": 0.6038850752207089,
+        "mean_balanced_accuracy_across_20_folds": 0.27065670794037355,
+        "mean_macro_f1_across_20_folds": 0.20675785913217978,
+        "mean_rows_per_fold": 290.9
+      },
+      "same_fold_train": {
+        "mean_ge3_auc_across_20_folds": 0.603827415297993,
+        "mean_balanced_accuracy_across_20_folds": 0.28383130222179087,
+        "mean_macro_f1_across_20_folds": 0.23676116540637757,
+        "mean_rows_per_fold": 7001.65
+      }
+    },
+    "small_boosted_tree": {
+      "next_day_test": {
+        "mean_ge3_auc_across_20_folds": 0.6136234052991678,
+        "mean_balanced_accuracy_across_20_folds": 0.2720809034587198,
+        "mean_macro_f1_across_20_folds": 0.22131143575624387,
+        "mean_rows_per_fold": 290.9
+      },
+      "same_fold_train": {
+        "mean_ge3_auc_across_20_folds": 0.6838458650849407,
+        "mean_balanced_accuracy_across_20_folds": 0.327590623040246,
+        "mean_macro_f1_across_20_folds": 0.298984403811408,
+        "mean_rows_per_fold": 7001.65
+      }
+    }
+  },
+  "out_of_fold_prediction": {
+    "logistic": {
+      "classes_actual": {
+        "lt0": 1815,
+        "0to1": 1759,
+        "1to3": 1552,
+        "ge3": 692
+      },
+      "classes_predicted_argmax": {
+        "lt0": 3318,
+        "0to1": 1756,
+        "1to3": 741,
+        "ge3": 3
+      },
+      "confusion_actual_by_predicted": {
+        "lt0": {
+          "lt0": 1087,
+          "0to1": 509,
+          "1to3": 217,
+          "ge3": 2
+        },
+        "0to1": {
+          "lt0": 837,
+          "0to1": 664,
+          "1to3": 257,
+          "ge3": 1
+        },
+        "1to3": {
+          "lt0": 913,
+          "0to1": 459,
+          "1to3": 180,
+          "ge3": 0
+        },
+        "ge3": {
+          "lt0": 481,
+          "0to1": 124,
+          "1to3": 87,
+          "ge3": 0
+        }
+      },
+      "accuracy": 0.3319009969061533,
+      "balanced_accuracy": 0.2730911654274792,
+      "macro_f1": 0.23958573698495295,
+      "ge3_auc": 0.5962620574245769,
+      "ge3_average_precision": 0.1556492911938411,
+      "ge3_base_rate": 0.11894121691302853,
+      "ge3_mean_probability": 0.11728249532053048,
+      "ge3_probability_min_median_max": [
+        0.0265389980997356,
+        0.1094953838025629,
+        0.520911709916395
+      ],
+      "low_return_probability_mean_by_true_class": {
+        "lt0": 0.33910227286542216,
+        "0to1": 0.31535792831644965,
+        "1to3": 0.32872052704725213,
+        "ge3": 0.3460337522726523
+      },
+      "ge3_probability_mean_by_true_class": {
+        "lt0": 0.12174341219408087,
+        "0to1": 0.11076847671542119,
+        "1to3": 0.1154870973721282,
+        "ge3": 0.12616696384193735
+      },
+      "probability_sum_max_error": 4.440892098500626e-16,
+      "same_day_ge3_auc_mean": 0.6038850752207089,
+      "score_vs_second_high_spearman": 0.003119257009121255,
+      "second_place_score_tie_max": 2,
+      "second_place_score_tie_days": 0
+    },
+    "small_boosted_tree": {
+      "classes_actual": {
+        "lt0": 1815,
+        "0to1": 1759,
+        "1to3": 1552,
+        "ge3": 692
+      },
+      "classes_predicted_argmax": {
+        "lt0": 3161,
+        "0to1": 1517,
+        "1to3": 1133,
+        "ge3": 7
+      },
+      "confusion_actual_by_predicted": {
+        "lt0": {
+          "lt0": 1039,
+          "0to1": 460,
+          "1to3": 314,
+          "ge3": 2
+        },
+        "0to1": {
+          "lt0": 798,
+          "0to1": 573,
+          "1to3": 387,
+          "ge3": 1
+        },
+        "1to3": {
+          "lt0": 878,
+          "0to1": 363,
+          "1to3": 311,
+          "ge3": 0
+        },
+        "ge3": {
+          "lt0": 446,
+          "0to1": 121,
+          "1to3": 121,
+          "ge3": 4
+        }
+      },
+      "accuracy": 0.3312134754211069,
+      "balanced_accuracy": 0.27609300107383705,
+      "macro_f1": 0.2526309071051087,
+      "ge3_auc": 0.6147876968599388,
+      "ge3_average_precision": 0.16433093935457288,
+      "ge3_base_rate": 0.11894121691302853,
+      "ge3_mean_probability": 0.11823850165719754,
+      "ge3_probability_min_median_max": [
+        0.0296127329823283,
+        0.11834715127472906,
+        0.3070998418349553
+      ],
+      "low_return_probability_mean_by_true_class": {
+        "lt0": 0.3391313782413448,
+        "0to1": 0.319084730021951,
+        "1to3": 0.3319121712766939,
+        "ge3": 0.34627362505897297
+      },
+      "ge3_probability_mean_by_true_class": {
+        "lt0": 0.12185537537453846,
+        "0to1": 0.10806164395808512,
+        "1to3": 0.1188905054498222,
+        "ge3": 0.13315838172889038
+      },
+      "probability_sum_max_error": 5.551115123125783e-16,
+      "same_day_ge3_auc_mean": 0.6136234052991678,
+      "score_vs_second_high_spearman": 0.035759801018240035,
+      "second_place_score_tie_max": 2,
+      "second_place_score_tie_days": 0
+    }
+  },
+  "feature_overlap": {
+    "ge3_samples_with_comparable_neighbors": 692,
+    "nearest_lt0_distance_median": 0.7809556640549623,
+    "nearest_ge3_distance_median": 0.869016345536652,
+    "opposite_class_closer_count": 402,
+    "ge3_samples_20_neighbor_ge3_rate": 0.15715317919075145,
+    "ge3_samples_same_day_pool_ge3_rate": 0.14288054752302773,
+    "definition": "For each >=3% sample on the same test date, compare nearest <0% and >=3% stocks by the seven inputs: first four standardized on initial 20 dates, last three kept as 0/1."
+  },
+  "score_sensitivity": [
+    {
+      "model": "logistic",
+      "score": "p_ge3",
+      "selected": 40,
+      "ge3": 3,
+      "lt0": 19,
+      "lt_minus1": 13,
+      "mean_return_pct": 0.17330153805884527
+    },
+    {
+      "model": "logistic",
+      "score": "p_ge3_minus_p_lt0",
+      "selected": 40,
+      "ge3": 7,
+      "lt0": 13,
+      "lt_minus1": 6,
+      "mean_return_pct": 0.9993933688221548
+    },
+    {
+      "model": "small_boosted_tree",
+      "score": "p_ge3",
+      "selected": 40,
+      "ge3": 8,
+      "lt0": 14,
+      "lt_minus1": 7,
+      "mean_return_pct": 1.033753273331529
+    },
+    {
+      "model": "small_boosted_tree",
+      "score": "p_ge3_minus_p_lt0",
+      "selected": 40,
+      "ge3": 11,
+      "lt0": 14,
+      "lt_minus1": 3,
+      "mean_return_pct": 1.4505224163635362
+    }
+  ],
+  "interpretation": "Training metrics reuse overlapping 20-day windows and are optimistic fit diagnostics, not an attainable return bound. Test metrics are one next-day fold at a time. Capacity probe is only a diagnostic and was not selected as a strategy."
+}
