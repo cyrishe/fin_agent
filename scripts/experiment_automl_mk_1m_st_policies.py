@@ -138,9 +138,21 @@ def compact_tables(picks: pd.DataFrame, dates: list[str]) -> tuple[pd.DataFrame,
                 f"{label}{int(labels.eq(label).sum())}" for label in LABELS.values())
             returns = picks.loc[
                 picks.policy.eq(policy) & picks.signal_date.str[:7].eq(month)
-                & picks.selection_rank.eq(rank), "actual_0940_return"]
-            row[f"Top{rank} 09:40收益"] = (f"{returns.mean() * 100:+.2f}%"
-                                             if returns.notna().any() else "—")
+                & picks.selection_rank.eq(rank),
+                ["actual_0940_return", "historical_st", "entry_at_limit"]]
+            observed = returns.actual_0940_return.dropna()
+            ordinary = observed[observed.between(-.05, .05)]
+            row[f"Top{rank} 09:40收益"] = (f"{observed.mean() * 100:+.2f}%"
+                                             if not observed.empty else "—")
+            row[f"Top{rank} 月复利代理"] = (
+                f"{((1 + observed).prod() - 1) * 100:+.2f}%"
+                if not observed.empty else "—")
+            row[f"Top{rank} 去极端平均"] = (
+                f"{ordinary.mean() * 100:+.2f}%" if not ordinary.empty else "—")
+            row[f"Top{rank} 超过+5%笔数"] = int(observed.gt(.05).sum())
+            row[f"Top{rank} 低于-5%笔数"] = int(observed.lt(-.05).sum())
+            row[f"Top{rank} 14:40涨停ST笔数"] = int((
+                returns.historical_st & returns.entry_at_limit).sum())
         monthly_rows.append(row)
     monthly = pd.DataFrame(monthly_rows)
     monthly["方案"] = pd.Categorical(monthly["方案"], categories=POLICIES,
