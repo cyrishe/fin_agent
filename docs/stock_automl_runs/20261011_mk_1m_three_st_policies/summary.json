@@ -1,0 +1,59 @@
+{
+  "source_sha256": "7197393104b61b8ab3b73e2b30a42636a63d543352fc57dfcc50fa3ac1534713",
+  "test_days": 118,
+  "policy_counts": {
+    "去掉全部ST": {
+      "rows": 56493,
+      "st_rows": 0,
+      "st_share": 0.0,
+      "st_at_limit_rows": 0
+    },
+    "只去掉14:40涨停ST": {
+      "rows": 58317,
+      "st_rows": 1824,
+      "st_share": 0.031277329080714025,
+      "st_at_limit_rows": 0
+    },
+    "保留涨停ST并控制比例": {
+      "rows": 58553,
+      "st_rows": 2060,
+      "st_share": 0.03518180110327396,
+      "st_at_limit_rows": 1642
+    }
+  },
+  "aug_sep_reference_counts": {
+    "rows": 14783,
+    "st_rows": 576,
+    "st_share": 0.03896367449096936,
+    "st_at_limit_rows": 0
+  },
+  "per_policy": {
+    "去掉全部ST": {
+      "top1_days": 113,
+      "top2_days": 108,
+      "suspension_zero_picks": 0,
+      "unknown_picks": 0,
+      "st_top1_picks": 0,
+      "limit_st_top1_picks": 0,
+      "mean_training_rows": 7808.313559322034
+    },
+    "只去掉14:40涨停ST": {
+      "top1_days": 115,
+      "top2_days": 109,
+      "suspension_zero_picks": 0,
+      "unknown_picks": 0,
+      "st_top1_picks": 8,
+      "limit_st_top1_picks": 0,
+      "mean_training_rows": 8058.1016949152545
+    },
+    "保留涨停ST并控制比例": {
+      "top1_days": 118,
+      "top2_days": 117,
+      "suspension_zero_picks": 2,
+      "unknown_picks": 0,
+      "st_top1_picks": 98,
+      "limit_st_top1_picks": 96,
+      "mean_training_rows": 8120.542372881356
+    }
+  }
+}
