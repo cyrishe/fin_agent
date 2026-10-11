@@ -79,13 +79,17 @@ def build_daily(scores: pd.DataFrame, candidates: pd.DataFrame,
         raise ValueError("Duplicate market date")
     dates = market.trade_date.tolist()
     positions = {date: index for index, date in enumerate(dates)}
+    prior_pool_sizes = candidates.groupby("signal_date").size().to_dict()
     for i, row in daily.iterrows():
         day = row.T_date
         if day not in positions or positions[day] < 5:
             raise ValueError(f"Five prior market days unavailable for {day}")
         previous = market.iloc[positions[day] - 1]
+        if previous.trade_date not in prior_pool_sizes:
+            raise ValueError(f"Prior candidate pool unavailable for {day}")
         trailing = market.iloc[positions[day] - 5:positions[day]]
         daily.loc[i, "T_minus_1_date"] = previous.trade_date
+        daily.loc[i, "T_minus_1_candidate_pool_n"] = prior_pool_sizes[previous.trade_date]
         daily.loc[i, "T_minus_1_up"] = int(previous.up_count)
         daily.loc[i, "T_minus_1_down"] = int(previous.down_count)
         daily.loc[i, "T_minus_1_listed"] = int(previous.listed_count)
@@ -106,15 +110,16 @@ def render_markdown(daily: pd.DataFrame, source_commit: str) -> str:
              "**模型效果**统计当日被模型预测为次晨上涨至少 1%、且次晨价格数据完整的全部股票。"
              "这不是每日实际买入数。达标指次晨 09:31–09:40 第二高价比选股日 14:40 价格上涨至少 3%；"
              "可接受指上涨 1% 至不足 3%；严重错误指跌破选股日 14:40 价格。"
-             "上涨 0% 至不足 1% 的中性结果不展示；已验证股票数减去上述三类就是中性数。"
-             "缺少次晨数据的股票单列，不参与评价。第一名按原选股规则确定，"
+             "上涨 0% 至不足 1% 的中性结果和缺少次晨数据的股票不展示。"
+             "前一交易日候选池股票数，是前一交易日 14:40 满足涨幅 3%–6% 等入池条件的股票总数，"
+             "用于观察前一天的市场状态，不是当天三类结果的分母。第一名按原选股规则确定，"
              "三列第一名结果中，1 表示属于该类，0 表示不属于；无交易时留空。"
              "收益单独按次晨 09:40 收盘价计算，不代表在第二高价卖出。", "",
              "前一交易日大盘涨跌家数来自 `kingdomai.kcrp_stock_price` 收盘价对昨收价；平盘未计入。"
              "范围是沪深 A 股代码（`.SH/.SZ`，首位 `0/3/6`），停牌且价格有效者可计入挂牌数；"
              "近五个交易日成交额为同表逐股 `amount` 求和，单位亿元，从较早交易日到较近交易日排列，"
              "截止选股日前一交易日，不含选股日数据。成交额为数据库覆盖口径，未与交易所公报逐日对账。", ""]
-    columns = ["选股日", "预测上涨且已验证的股票数", "预测上涨但缺数据的股票数",
+    columns = ["选股日", "前一交易日候选池股票数",
                "达标数", "可接受数", "严重错误数", "当天第一名股票", "第一名实际分类",
                "第一名达标", "第一名可接受", "第一名严重错误",
                "第一名次晨卖出收益", "前一交易日上涨/下跌家数", "此前五日沪深成交额（亿元，从远到近）"]
@@ -128,8 +133,7 @@ def render_markdown(daily: pd.DataFrame, source_commit: str) -> str:
             top1 = f"{row.top1_symbol6} {row.top1_name}" if isinstance(row.top1_symbol6, str) else "无交易"
             profit = f"{row.top1_0940_return_pct:+.2f}%" if pd.notna(row.top1_0940_return_pct) else "—"
             amounts = row.T_minus_5_to_minus_1_amount_100m_cny.replace("; ", "<br>")
-            lines.append("| " + " | ".join(map(str, [row.T_date, row.predicted_up_labeled_n,
-                row.predicted_up_unlabeled_n,
+            lines.append("| " + " | ".join(map(str, [row.T_date, int(row.T_minus_1_candidate_pool_n),
                 row.target_ge3_n, row.acceptable_1to3_n, row.error_lt0_n,
                 top1, target, *("—" if value is None else value for value in flags), profit,
                 f"{int(row.T_minus_1_up)}/{int(row.T_minus_1_down)}", amounts])) + " |")
@@ -146,8 +150,7 @@ def top1_flags(symbol: object, actual_class: object) -> tuple[int | None, int | 
 def export_daily(daily: pd.DataFrame) -> pd.DataFrame:
     columns = {
         "T_date": "选股日",
-        "predicted_up_labeled_n": "预测上涨且已验证的股票数",
-        "predicted_up_unlabeled_n": "预测上涨但缺数据的股票数",
+        "T_minus_1_candidate_pool_n": "前一交易日候选池股票数",
         "target_ge3_n": "达标数",
         "acceptable_1to3_n": "可接受数",
         "error_lt0_n": "严重错误数",
@@ -167,7 +170,7 @@ def export_daily(daily: pd.DataFrame) -> pd.DataFrame:
                       name, pd.Series(values, dtype="Int64"))
     result["第一名实际分类"] = result["第一名实际分类"].map(
         {"ge3": "达标", "1to3": "可接受", "lt0": "严重错误"})
-    for name in ("前一交易日上涨家数", "前一交易日下跌家数"):
+    for name in ("前一交易日候选池股票数", "前一交易日上涨家数", "前一交易日下跌家数"):
         result[name] = result[name].astype(int)
     return result
 
