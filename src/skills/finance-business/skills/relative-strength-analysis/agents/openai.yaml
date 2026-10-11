@@ -1,0 +1,4 @@
+interface:
+  display_name: "个股与基准相对强弱"
+  short_description: "对齐个股、行业与指数的时间和收益口径，解释同期相对强弱与分化"
+  default_prompt: "Use $relative-strength-analysis to compare this stock with appropriate sector and market benchmarks."

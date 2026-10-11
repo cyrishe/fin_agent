@@ -1,0 +1,22 @@
+{
+  "smoke-metadata.json": {
+    "source": "outputs/cc_reference_rebuilt_smoke4_verified_20260908/metadata.json",
+    "sha256": "aa086e9fddeb048aa30cf77ecb155aa80bfd742ed86a598f61bd13c75a86916c",
+    "redactions": []
+  },
+  "smoke-results.json": {
+    "source": "outputs/cc_reference_rebuilt_smoke4_verified_20260908/results.jsonl",
+    "sha256": "721cd74a08fb718e9a25e7b5b5c7b4cbb0a100936767d5aea29cb656dab94315",
+    "redactions": []
+  },
+  "cc-runtime-records.json": {
+    "source": "outputs/cc_reference_rebuilt_smoke4_verified_20260908/workspace/outputs/financial_qa_cc/events.jsonl",
+    "sha256": "2a63c02842f6ab982ec6178d53e2cbd548c8e6a2cc66b1f9ecfa5e49772c00a0",
+    "redactions": []
+  },
+  "offline-check.json": {
+    "source": "outputs/cc_reference_sealed_entry_check_20260908/metadata.json",
+    "sha256": "e611ff0f53674a66d56c9cccf0e026bd63d35a52600c6d38c568c787fcd7306c",
+    "redactions": []
+  }
+}

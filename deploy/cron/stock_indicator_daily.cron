@@ -1,0 +1,4 @@
+# Server timezone: Asia/Shanghai (UTC+08:00).
+# Read only existing daily prices; holidays skip; unchanged inputs reuse a batch.
+# The second pass includes late source corrections without duplicate result rows.
+20 20,22 * * * /bin/bash /home/che/cyris/fin_agent/scripts/run_stock_indicator_daily.sh

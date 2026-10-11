@@ -1,0 +1,405 @@
+{
+  "provenance_sha256": {
+    "historical_scores": "42e4a581a0f354c48e01f1a2fa5f1326d666a1101eb928998195c72e2011b054",
+    "training_samples": "3978d45bd9a145828b6f7445c3646e79a90f33a6437268bd402413cc810396f8",
+    "today_summary": "42a47d13546cd84a7b2192b68c3e4f3699d85631d422b7f6868188e6fe1f58f1",
+    "script": "18df69717f01d1c782fc19d4b702f1aa429246f6ea797b4f283d83655f220a79"
+  },
+  "historical_test_days": 15,
+  "historical_scored_rows": 4481,
+  "pass_definition": "class 0 or 1; class -1 is critical",
+  "score_mean": 0.6922421807135191,
+  "actual_pass_rate": 0.6612363311760767,
+  "auc": 0.5059121790621885,
+  "brier_score": 0.22671145289950256,
+  "chronological_training_prior_brier": 0.22806440505007117,
+  "calibration_bins": [
+    {
+      "score_range": [
+        0,
+        0.6
+      ],
+      "n": 149,
+      "mean_score": 0.5397625652943524,
+      "actual_pass_rate": 0.5503355704697986,
+      "actual_over_1pct_rate": 0.4161073825503356
+    },
+    {
+      "score_range": [
+        0.6,
+        0.65
+      ],
+      "n": 605,
+      "mean_score": 0.6312281637926181,
+      "actual_pass_rate": 0.6776859504132231,
+      "actual_over_1pct_rate": 0.5421487603305785
+    },
+    {
+      "score_range": [
+        0.65,
+        0.7
+      ],
+      "n": 1651,
+      "mean_score": 0.6761184570055518,
+      "actual_pass_rate": 0.6565717746820109,
+      "actual_over_1pct_rate": 0.5075711689884919
+    },
+    {
+      "score_range": [
+        0.7,
+        0.75
+      ],
+      "n": 1630,
+      "mean_score": 0.7238249701771239,
+      "actual_pass_rate": 0.6803680981595092,
+      "actual_over_1pct_rate": 0.48588957055214727
+    },
+    {
+      "score_range": [
+        0.75,
+        0.8
+      ],
+      "n": 427,
+      "mean_score": 0.7685317773305214,
+      "actual_pass_rate": 0.6276346604215457,
+      "actual_over_1pct_rate": 0.45433255269320844
+    },
+    {
+      "score_range": [
+        0.8,
+        1.000001
+      ],
+      "n": 19,
+      "mean_score": 0.8079056646776757,
+      "actual_pass_rate": 0.5263157894736842,
+      "actual_over_1pct_rate": 0.2631578947368421
+    }
+  ],
+  "folds": [
+    {
+      "fold": 1,
+      "n": 1061,
+      "mean_score": 0.7083930144013154,
+      "actual_pass_rate": 0.53440150801131,
+      "auc": 0.535798184920992
+    },
+    {
+      "fold": 2,
+      "n": 2318,
+      "mean_score": 0.6857420652909758,
+      "actual_pass_rate": 0.7424503882657464,
+      "auc": 0.47589779227339485
+    },
+    {
+      "fold": 3,
+      "n": 1102,
+      "mean_score": 0.6903648966905639,
+      "actual_pass_rate": 0.6125226860254084,
+      "auc": 0.6189018995576372
+    }
+  ],
+  "daily_spearman": {
+    "top2_min_score": {
+      "top2_pass": -0.22295610597199264,
+      "top2_over_1pct": -0.3535587866661153,
+      "pool_pass": -0.07857142857142857
+    },
+    "top2_mean_score": {
+      "top2_pass": -0.26203088743100167,
+      "top2_over_1pct": -0.3945794193732336,
+      "pool_pass": -0.125
+    },
+    "up_fraction": {
+      "top2_pass": 0.3838522649208533,
+      "top2_over_1pct": 0.39848614629772106,
+      "pool_pass": 0.5142857142857142
+    },
+    "median_return": {
+      "top2_pass": 0.3838522649208533,
+      "top2_over_1pct": 0.39848614629772106,
+      "pool_pass": 0.5142857142857142
+    },
+    "pool_mean_score": {
+      "top2_pass": 0.1517020927232115,
+      "top2_over_1pct": 0.23245025200700398,
+      "pool_pass": 0.10357142857142855
+    }
+  },
+  "top2_daily_min_median": 0.7778743083005561,
+  "top2_low_score_days": {
+    "days": 7,
+    "stocks": 14,
+    "critical": 1
+  },
+  "top2_high_score_days": {
+    "days": 8,
+    "stocks": 16,
+    "critical": 5
+  },
+  "today": {
+    "date": "2026-10-08",
+    "top2_min_score": 0.7574153412080528,
+    "top2_min_historical_percentile": 0.3333333333333333,
+    "market_up_fraction_1440": 0.27326266195524146,
+    "market_median_return_1440": -0.011516947610962891,
+    "market_up_historical_percentile": 0.3333333333333333,
+    "market_stocks": 5094
+  },
+  "daily": [
+    {
+      "signal_date": "2026-09-08",
+      "top2_min_score": 0.8088012161361839,
+      "top2_mean_score": 0.808976006214503,
+      "top2_pass": 1.0,
+      "top2_over_1pct": 0.5,
+      "top2_critical": 0,
+      "pool_n": 414,
+      "pool_pass": 0.5217391304347826,
+      "pool_over_1pct": 0.37922705314009664,
+      "pool_mean_score": 0.7061181274028934,
+      "stocks": 5100,
+      "up_fraction": 0.6092156862745098,
+      "median_return": 0.0049776020296922185,
+      "over_1pct_fraction": 0.37411764705882355,
+      "below_minus_1pct_fraction": 0.20470588235294118
+    },
+    {
+      "signal_date": "2026-09-09",
+      "top2_min_score": 0.7971543582863377,
+      "top2_mean_score": 0.7988112533275364,
+      "top2_pass": 0.0,
+      "top2_over_1pct": 0.0,
+      "top2_critical": 2,
+      "pool_n": 195,
+      "pool_pass": 0.48205128205128206,
+      "pool_over_1pct": 0.3282051282051282,
+      "pool_mean_score": 0.6991786967374363,
+      "stocks": 5099,
+      "up_fraction": 0.3445773681113944,
+      "median_return": -0.005540166204986208,
+      "over_1pct_fraction": 0.18062365169641106,
+      "below_minus_1pct_fraction": 0.3781133555599137
+    },
+    {
+      "signal_date": "2026-09-10",
+      "top2_min_score": 0.7834160869183612,
+      "top2_mean_score": 0.7972450159513556,
+      "top2_pass": 0.0,
+      "top2_over_1pct": 0.0,
+      "top2_critical": 2,
+      "pool_n": 123,
+      "pool_pass": 0.3252032520325203,
+      "pool_over_1pct": 0.2601626016260163,
+      "pool_mean_score": 0.6819573825464911,
+      "stocks": 5097,
+      "up_fraction": 0.19423190111830488,
+      "median_return": -0.012362637362637319,
+      "over_1pct_fraction": 0.10300176574455562,
+      "below_minus_1pct_fraction": 0.5707278791445949
+    },
+    {
+      "signal_date": "2026-09-11",
+      "top2_min_score": 0.7903623968821036,
+      "top2_mean_score": 0.7922206557652214,
+      "top2_pass": 1.0,
+      "top2_over_1pct": 0.5,
+      "top2_critical": 0,
+      "pool_n": 76,
+      "pool_pass": 0.618421052631579,
+      "pool_over_1pct": 0.5394736842105263,
+      "pool_mean_score": 0.6761844582481209,
+      "stocks": 5097,
+      "up_fraction": 0.10417892878163626,
+      "median_return": -0.023529411764705688,
+      "over_1pct_fraction": 0.06552874239748872,
+      "below_minus_1pct_fraction": 0.8063566804002354
+    },
+    {
+      "signal_date": "2026-09-14",
+      "top2_min_score": 0.82212772553903,
+      "top2_mean_score": 0.8235795080055579,
+      "top2_pass": 1.0,
+      "top2_over_1pct": 1.0,
+      "top2_critical": 0,
+      "pool_n": 253,
+      "pool_pass": 0.6719367588932806,
+      "pool_over_1pct": 0.4426877470355731,
+      "pool_mean_score": 0.7417449043127359,
+      "stocks": 4113,
+      "up_fraction": 0.5472890833941162,
+      "median_return": 0.0020929259104227604,
+      "over_1pct_fraction": 0.30926331145149527,
+      "below_minus_1pct_fraction": 0.2137126185266229
+    },
+    {
+      "signal_date": "2026-09-15",
+      "top2_min_score": 0.7540838758333579,
+      "top2_mean_score": 0.7556619757544344,
+      "top2_pass": 1.0,
+      "top2_over_1pct": 1.0,
+      "top2_critical": 0,
+      "pool_n": 106,
+      "pool_pass": 0.7169811320754716,
+      "pool_over_1pct": 0.5849056603773585,
+      "pool_mean_score": 0.6631845131286134,
+      "stocks": 4462,
+      "up_fraction": 0.1913939937247871,
+      "median_return": -0.015476881987652014,
+      "over_1pct_fraction": 0.106006275212909,
+      "below_minus_1pct_fraction": 0.6371582250112058
+    },
+    {
+      "signal_date": "2026-09-16",
+      "top2_min_score": 0.7781012130999677,
+      "top2_mean_score": 0.7860928056688692,
+      "top2_pass": 1.0,
+      "top2_over_1pct": 1.0,
+      "top2_critical": 0,
+      "pool_n": 437,
+      "pool_pass": 0.7482837528604119,
+      "pool_over_1pct": 0.562929061784897,
+      "pool_mean_score": 0.7018681789286507,
+      "stocks": 5096,
+      "up_fraction": 0.728021978021978,
+      "median_return": 0.008984482016359485,
+      "over_1pct_fraction": 0.47311616954474095,
+      "below_minus_1pct_fraction": 0.08771585557299844
+    },
+    {
+      "signal_date": "2026-09-17",
+      "top2_min_score": 0.7778743083005561,
+      "top2_mean_score": 0.7804253160896327,
+      "top2_pass": 0.5,
+      "top2_over_1pct": 0.5,
+      "top2_critical": 1,
+      "pool_n": 265,
+      "pool_pass": 0.7924528301886793,
+      "pool_over_1pct": 0.690566037735849,
+      "pool_mean_score": 0.680446804255293,
+      "stocks": 5098,
+      "up_fraction": 0.4868575912122401,
+      "median_return": 0.0,
+      "over_1pct_fraction": 0.2614750882699098,
+      "below_minus_1pct_fraction": 0.2561788936837976
+    },
+    {
+      "signal_date": "2026-09-18",
+      "top2_min_score": 0.775742928580788,
+      "top2_mean_score": 0.778444566417496,
+      "top2_pass": 1.0,
+      "top2_over_1pct": 0.5,
+      "top2_critical": 0,
+      "pool_n": 583,
+      "pool_pass": 0.8576329331046312,
+      "pool_over_1pct": 0.7186963979416809,
+      "pool_mean_score": 0.6816586579743101,
+      "stocks": 5098,
+      "up_fraction": 0.7448018830914084,
+      "median_return": 0.009471197691629296,
+      "over_1pct_fraction": 0.48528834837191054,
+      "below_minus_1pct_fraction": 0.07041977245978816
+    },
+    {
+      "signal_date": "2026-09-21",
+      "top2_min_score": 0.783284665060395,
+      "top2_mean_score": 0.7861062059496906,
+      "top2_pass": 1.0,
+      "top2_over_1pct": 1.0,
+      "top2_critical": 0,
+      "pool_n": 927,
+      "pool_pass": 0.6558791801510249,
+      "pool_over_1pct": 0.43797195253505933,
+      "pool_mean_score": 0.6848012449130022,
+      "stocks": 5098,
+      "up_fraction": 0.8069831306394665,
+      "median_return": 0.01525438031237547,
+      "over_1pct_fraction": 0.6141624166339741,
+      "below_minus_1pct_fraction": 0.08042369556688897
+    },
+    {
+      "signal_date": "2026-09-22",
+      "top2_min_score": 0.7494196771790301,
+      "top2_mean_score": 0.749594188439044,
+      "top2_pass": 1.0,
+      "top2_over_1pct": 1.0,
+      "top2_critical": 0,
+      "pool_n": 237,
+      "pool_pass": 0.569620253164557,
+      "pool_over_1pct": 0.459915611814346,
+      "pool_mean_score": 0.676073134270031,
+      "stocks": 5097,
+      "up_fraction": 0.3865018638414754,
+      "median_return": -0.003411306042884976,
+      "over_1pct_fraction": 0.20992740827938003,
+      "below_minus_1pct_fraction": 0.3150873062585835
+    },
+    {
+      "signal_date": "2026-09-23",
+      "top2_min_score": 0.7455241743772358,
+      "top2_mean_score": 0.7521347559558066,
+      "top2_pass": 1.0,
+      "top2_over_1pct": 1.0,
+      "top2_critical": 0,
+      "pool_n": 226,
+      "pool_pass": 0.5309734513274337,
+      "pool_over_1pct": 0.3893805309734513,
+      "pool_mean_score": 0.6858690504360999,
+      "stocks": 5098,
+      "up_fraction": 0.35288348371910555,
+      "median_return": -0.005496015803877319,
+      "over_1pct_fraction": 0.196547665751275,
+      "below_minus_1pct_fraction": 0.3785798352295018
+    },
+    {
+      "signal_date": "2026-09-24",
+      "top2_min_score": 0.7523846074605933,
+      "top2_mean_score": 0.7567423247732138,
+      "top2_pass": 1.0,
+      "top2_over_1pct": 0.5,
+      "top2_critical": 0,
+      "pool_n": 118,
+      "pool_pass": 0.5932203389830508,
+      "pool_over_1pct": 0.4152542372881356,
+      "pool_mean_score": 0.6627311484078523,
+      "stocks": 5098,
+      "up_fraction": 0.21518242448018832,
+      "median_return": -0.011722914445629062,
+      "over_1pct_fraction": 0.10082385249117301,
+      "below_minus_1pct_fraction": 0.5494311494703805
+    },
+    {
+      "signal_date": "2026-09-28",
+      "top2_min_score": 0.7549638130399123,
+      "top2_mean_score": 0.7624101383329708,
+      "top2_pass": 0.5,
+      "top2_over_1pct": 0.5,
+      "top2_critical": 1,
+      "pool_n": 93,
+      "pool_pass": 0.4731182795698925,
+      "pool_over_1pct": 0.3118279569892473,
+      "pool_mean_score": 0.6548062812558617,
+      "stocks": 5098,
+      "up_fraction": 0.17163593566104354,
+      "median_return": -0.01728212574695065,
+      "over_1pct_fraction": 0.07689289917614751,
+      "below_minus_1pct_fraction": 0.6402510788544528
+    },
+    {
+      "signal_date": "2026-09-29",
+      "top2_min_score": 0.7751781785896728,
+      "top2_mean_score": 0.7758362881164658,
+      "top2_pass": 1.0,
+      "top2_over_1pct": 1.0,
+      "top2_critical": 0,
+      "pool_n": 428,
+      "pool_pass": 0.7149532710280374,
+      "pool_over_1pct": 0.5186915887850467,
+      "pool_mean_score": 0.715997939868046,
+      "stocks": 5098,
+      "up_fraction": 0.6834052569635151,
+      "median_return": 0.007337206433233878,
+      "over_1pct_fraction": 0.43409180070615927,
+      "below_minus_1pct_fraction": 0.11730090231463319
+    }
+  ]
+}

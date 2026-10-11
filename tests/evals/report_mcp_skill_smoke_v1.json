@@ -1,0 +1,11 @@
+{
+  "source": "2026-09-10 server-isolated report Skill acceptance questions. No generated golden answers; use human review separately.",
+  "cases": [
+    {"case_id":"RTE016-explicit","question":"机构看好山东黄金的主要理由有哪些？请依据最近90天可用研报归纳观点，并注明机构、日期、关键证据与风险。","skill_ids":["equity-report-analysis"]},
+    {"case_id":"RTE010-explicit","question":"AI大模型技术发展对科大讯飞的业务增长有何催化作用？请依据可用研报区分机构观点、已披露事实与尚待验证的推断。","skill_ids":["equity-report-analysis"]},
+    {"case_id":"RTE020-auto","question":"根据近期机构研报，阳光电源在光伏行业的竞争格局中处于什么位置？请分析优势、竞争压力和证据限制。"},
+    {"case_id":"RTE003-auto","question":"鹏鼎控股与沪电股份2026年净利润预测增速有何差异？请依据机构预测，说明报告时点、同比基准及口径是否可比。"},
+    {"case_id":"consensus-explicit","question":"请根据贵州茅台最近90天的机构研报，总结机构共识与主要分歧，并说明预测、评级与目标价证据能支持什么结论。缺少的内容请明确说明。","skill_ids":["equity-report-analysis"]},
+    {"case_id":"sensitivity-explicit","question":"假设糖蜜采购价格上涨10%，根据安琪酵母近期研报分析利润可能受到什么影响。请区分定性传导和能够计算的量化影响，说明缺失输入及依据。","skill_ids":["equity-report-analysis"]}
+  ]
+}

@@ -1,5 +1,6 @@
 - equity_research_search: src/prompts/system/tool_prompt_samples/equity_research_search.sample.md
 - financial_news_search: src/prompts/system/tool_prompt_samples/financial_news_search.sample.md
+- general_search: src/prompts/system/tool_prompt_samples/general_search.sample.md
 - get_company_taxonomy_profile: src/prompts/system/tool_prompt_samples/get_company_taxonomy_profile.sample.md
 - get_hot_concepts_and_leaders: src/prompts/system/tool_prompt_samples/get_hot_concepts_and_leaders.sample.md
 - get_hot_industries_and_leaders: src/prompts/system/tool_prompt_samples/get_hot_industries_and_leaders.sample.md

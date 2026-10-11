@@ -1,0 +1,63 @@
+{
+  "signal_days": 21,
+  "stocks": 42,
+  "executed_stocks": 34,
+  "unaffordable_stocks": 8,
+  "morning_triggered": 12,
+  "starting_cash": 100000.0,
+  "ending_cash": 96695.5,
+  "return": -0.033045,
+  "max_daily_drawdown": -0.07822835972227636,
+  "model": "docs/stock_automl_runs/20261008_sina_15m_july/exact_trained_seven_factor.joblib",
+  "training_signal_period": [
+    "2026-08-25",
+    "2026-09-21"
+  ],
+  "test_signal_period": [
+    "2026-08-05",
+    "2026-10-08"
+  ],
+  "test_exit_period": [
+    "2026-08-06",
+    "2026-10-09"
+  ],
+  "test_dates": [
+    "2026-08-05",
+    "2026-08-06",
+    "2026-08-07",
+    "2026-08-10",
+    "2026-08-11",
+    "2026-08-12",
+    "2026-08-13",
+    "2026-08-14",
+    "2026-08-17",
+    "2026-08-18",
+    "2026-08-19",
+    "2026-08-20",
+    "2026-08-21",
+    "2026-08-24",
+    "2026-09-22",
+    "2026-09-23",
+    "2026-09-24",
+    "2026-09-28",
+    "2026-09-29",
+    "2026-09-30",
+    "2026-10-08"
+  ],
+  "model_validation": {
+    "saved_sklearn": "1.9.1",
+    "runtime_sklearn": "1.9.1",
+    "load_warnings": 0,
+    "archived_score_max_difference": 0.0
+  },
+  "top2_label_counts": {
+    "1": 25,
+    "0": 9,
+    "-1": 8
+  },
+  "source_sha256": {
+    "docs/stock_automl_runs/20261008_sina_15m_july/exact_top5_two_models.csv": "33796233c623e5ee7af4fb17dbfe4951668ed47b6b06c9601bb802d98f31d7c5",
+    "docs/stock_automl_runs/20261009_seven_factor_cash_backtest/20261008_exact_candidates.csv": "fc45294ee301f2edc3581c25e3a23b3c6226ddf8332bdd4c3ac87764308b5355"
+  },
+  "selected_1m_bars_sha256": "1bd9e4c5619493a79c947e80cbbe49074e221eb33d1015be3c96773da4313e29"
+}

@@ -1,0 +1,19 @@
+{
+  "definition": "Retrospective diagnostic: daily is_limit_price=1, daily close above preclose, and signal 14:45 close equals daily limit close within 0.001 CNY.",
+  "selected_trades": 37,
+  "selected_at_limit_close": 0,
+  "selected_at_flat_five_limit": 0,
+  "limit_close_all_flat_five": true,
+  "july_top1_trades": 14,
+  "july_top1_at_limit_close": 0,
+  "july_top1_reported_mean_0945_pct": -0.05825156978569294,
+  "july_top1_excluding_limit_close_trades": 14,
+  "july_top1_excluding_limit_close_mean_0945_pct": -0.05825156978569294,
+  "july_top2_trades": 25,
+  "july_top2_at_limit_close": 0,
+  "july_top2_reported_mean_0945_pct": 0.08445383893413048,
+  "july_top2_excluding_limit_close_trades": 25,
+  "july_top2_excluding_limit_close_mean_0945_pct": 0.08445383893413048,
+  "flagged_july_top1": [],
+  "caution": "This uses end-of-day data only as a retrospective fill-risk audit; it was not used to filter or rerank the 14:45 predictions. A limit-close flag does not prove an individual order could or could not fill."
+}

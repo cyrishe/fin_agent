@@ -1,0 +1,760 @@
+{
+  "method": "Same 40 historical signal dates, 20 prior signal days per fold, same seven factors, same unweighted four-class model and class-priority fallback; exact ten 1m highs/close; price proxies before costs.",
+  "source": {
+    "data": "outputs/stock_automl/tail_20261010_wide_025_065/trainable_1440.csv",
+    "sha256": "f902b7b4a82da1451ed250c9171b656e01ef7f6d81d1565f3ae6c16c03c19b32"
+  },
+  "pool_reconciliation": {
+    "raw_wide_trainable": 20842,
+    "removed_non_nr_or_st_name": 200,
+    "excluded_new_rows_inside_original_3_to_6_band": 13,
+    "new_analysis_pool_before_morning_check": 20629
+  },
+  "coverage": {
+    "input_stock_days": 20629,
+    "exact_stock_days": 20629,
+    "excluded_incomplete_or_nonexact": 0,
+    "valid_minute_bars": 206290
+  },
+  "old_narrow_overlap": {
+    "old_rows": 13992,
+    "new_narrow_rows": 13992,
+    "common_rows": 13992,
+    "old_only": 0,
+    "new_only": 0,
+    "max_abs_difference": {
+      "signal_return": 0.0,
+      "volume_ratio": 0.0,
+      "turnover_so_far_pct": 0.0,
+      "float_mv_100m_cny": 0.0,
+      "volume_4of5_increasing": 0.0,
+      "ma_bull_5_10_20": 0.0,
+      "all_intraday_lows_above_ma": 0.0,
+      "entry_1440": 0.0,
+      "second_high": 0.0,
+      "close_40": 0.0
+    }
+  },
+  "bands": {
+    "3_to_6": {
+      "all_rows": 13992,
+      "test_rows": 5628,
+      "pool_class_counts": {
+        "lt0": 4702,
+        "0to1": 3924,
+        "1to3": 3680,
+        "ge3": 1686
+      },
+      "models": {
+        "logistic": {
+          "accuracy": 0.3391968727789623,
+          "confusion_rows_actual_columns_predicted": [
+            [
+              1102,
+              469,
+              201,
+              2
+            ],
+            [
+              840,
+              633,
+              235,
+              1
+            ],
+            [
+              890,
+              422,
+              174,
+              1
+            ],
+            [
+              463,
+              110,
+              85,
+              0
+            ]
+          ],
+          "top": {
+            "1": {
+              "selected": 19,
+              "days": 19,
+              "skipped_days": 1,
+              "actual_ge3": 2,
+              "actual_ge1": 6,
+              "actual_lt0": 9,
+              "actual_below_minus1": 5,
+              "mean_second_high_pct": 0.2694609929917044,
+              "mean_0940_pct": -0.6465774211447864,
+              "median_0940_pct": -0.9049773755656187,
+              "positive_0940": 7,
+              "mean_original_rules_pct": -0.5368019262464716,
+              "calendar_mean_0940_with_skip_zero_pct": -0.6142485500875472
+            },
+            "2": {
+              "selected": 37,
+              "days": 19,
+              "skipped_days": 1,
+              "actual_ge3": 6,
+              "actual_ge1": 13,
+              "actual_lt0": 14,
+              "actual_below_minus1": 6,
+              "mean_second_high_pct": 0.7353138621454739,
+              "mean_0940_pct": 0.006790383110447632,
+              "median_0940_pct": -0.567221366590287,
+              "positive_0940": 16,
+              "mean_original_rules_pct": -0.06103677435395592,
+              "calendar_mean_0940_with_skip_zero_pct": -0.11457712484608418
+            }
+          }
+        },
+        "small_boosted_tree": {
+          "accuracy": 0.3390191897654584,
+          "confusion_rows_actual_columns_predicted": [
+            [
+              1037,
+              448,
+              288,
+              1
+            ],
+            [
+              806,
+              559,
+              344,
+              0
+            ],
+            [
+              851,
+              327,
+              309,
+              0
+            ],
+            [
+              429,
+              102,
+              124,
+              3
+            ]
+          ],
+          "top": {
+            "1": {
+              "selected": 20,
+              "days": 20,
+              "skipped_days": 0,
+              "actual_ge3": 6,
+              "actual_ge1": 13,
+              "actual_lt0": 4,
+              "actual_below_minus1": 0,
+              "mean_second_high_pct": 2.002489118673272,
+              "mean_0940_pct": 0.9075239094943671,
+              "median_0940_pct": 1.1553028090682482,
+              "positive_0940": 12,
+              "mean_original_rules_pct": 0.4013253598953104,
+              "calendar_mean_0940_with_skip_zero_pct": 0.9075239094943671
+            },
+            "2": {
+              "selected": 40,
+              "days": 20,
+              "skipped_days": 0,
+              "actual_ge3": 7,
+              "actual_ge1": 18,
+              "actual_lt0": 16,
+              "actual_below_minus1": 8,
+              "mean_second_high_pct": 0.8915113032517383,
+              "mean_0940_pct": -0.2360944677431834,
+              "median_0940_pct": -0.7262234283025304,
+              "positive_0940": 17,
+              "mean_original_rules_pct": -0.36369832232411636,
+              "calendar_mean_0940_with_skip_zero_pct": -0.2360944677431834
+            }
+          }
+        }
+      },
+      "folds": [
+        {
+          "test_date": "2026-09-02",
+          "train_rows": 8364,
+          "test_rows": 142,
+          "train_start": "2026-08-05",
+          "train_end": "2026-09-01",
+          "logistic_train_fit_accuracy": 0.3632233381157341,
+          "logistic_test_accuracy": 0.2605633802816901,
+          "small_boosted_tree_train_fit_accuracy": 0.4014825442372071,
+          "small_boosted_tree_test_accuracy": 0.2535211267605634
+        },
+        {
+          "test_date": "2026-09-03",
+          "train_rows": 7803,
+          "test_rows": 245,
+          "train_start": "2026-08-06",
+          "train_end": "2026-09-02",
+          "logistic_train_fit_accuracy": 0.368319876970396,
+          "logistic_test_accuracy": 0.2612244897959184,
+          "small_boosted_tree_train_fit_accuracy": 0.4077918749199026,
+          "small_boosted_tree_test_accuracy": 0.3224489795918367
+        },
+        {
+          "test_date": "2026-09-04",
+          "train_rows": 7740,
+          "test_rows": 181,
+          "train_start": "2026-08-07",
+          "train_end": "2026-09-03",
+          "logistic_train_fit_accuracy": 0.36576227390180877,
+          "logistic_test_accuracy": 0.2541436464088398,
+          "small_boosted_tree_train_fit_accuracy": 0.4112403100775194,
+          "small_boosted_tree_test_accuracy": 0.24861878453038674
+        },
+        {
+          "test_date": "2026-09-07",
+          "train_rows": 7409,
+          "test_rows": 473,
+          "train_start": "2026-08-10",
+          "train_end": "2026-09-04",
+          "logistic_train_fit_accuracy": 0.3762990956944257,
+          "logistic_test_accuracy": 0.3044397463002114,
+          "small_boosted_tree_train_fit_accuracy": 0.4169253610473748,
+          "small_boosted_tree_test_accuracy": 0.3298097251585624
+        },
+        {
+          "test_date": "2026-09-08",
+          "train_rows": 7165,
+          "test_rows": 403,
+          "train_start": "2026-08-11",
+          "train_end": "2026-09-07",
+          "logistic_train_fit_accuracy": 0.3666434054431263,
+          "logistic_test_accuracy": 0.3746898263027295,
+          "small_boosted_tree_train_fit_accuracy": 0.409351011863224,
+          "small_boosted_tree_test_accuracy": 0.3523573200992556
+        },
+        {
+          "test_date": "2026-09-09",
+          "train_rows": 7376,
+          "test_rows": 190,
+          "train_start": "2026-08-12",
+          "train_end": "2026-09-08",
+          "logistic_train_fit_accuracy": 0.3705260303687636,
+          "logistic_test_accuracy": 0.49473684210526314,
+          "small_boosted_tree_train_fit_accuracy": 0.41146963123644253,
+          "small_boosted_tree_test_accuracy": 0.45789473684210524
+        },
+        {
+          "test_date": "2026-09-10",
+          "train_rows": 7114,
+          "test_rows": 109,
+          "train_start": "2026-08-13",
+          "train_end": "2026-09-09",
+          "logistic_train_fit_accuracy": 0.3763002530222097,
+          "logistic_test_accuracy": 0.6422018348623854,
+          "small_boosted_tree_train_fit_accuracy": 0.4127073376440821,
+          "small_boosted_tree_test_accuracy": 0.6055045871559633
+        },
+        {
+          "test_date": "2026-09-11",
+          "train_rows": 7037,
+          "test_rows": 72,
+          "train_start": "2026-08-14",
+          "train_end": "2026-09-10",
+          "logistic_train_fit_accuracy": 0.3780019894841552,
+          "logistic_test_accuracy": 0.3611111111111111,
+          "small_boosted_tree_train_fit_accuracy": 0.4116811141111269,
+          "small_boosted_tree_test_accuracy": 0.375
+        },
+        {
+          "test_date": "2026-09-14",
+          "train_rows": 6834,
+          "test_rows": 245,
+          "train_start": "2026-08-17",
+          "train_end": "2026-09-11",
+          "logistic_train_fit_accuracy": 0.3833772314896108,
+          "logistic_test_accuracy": 0.3469387755102041,
+          "small_boosted_tree_train_fit_accuracy": 0.4190810652619257,
+          "small_boosted_tree_test_accuracy": 0.34285714285714286
+        },
+        {
+          "test_date": "2026-09-15",
+          "train_rows": 6377,
+          "test_rows": 101,
+          "train_start": "2026-08-18",
+          "train_end": "2026-09-14",
+          "logistic_train_fit_accuracy": 0.39909048141759446,
+          "logistic_test_accuracy": 0.297029702970297,
+          "small_boosted_tree_train_fit_accuracy": 0.4318645130939313,
+          "small_boosted_tree_test_accuracy": 0.26732673267326734
+        },
+        {
+          "test_date": "2026-09-16",
+          "train_rows": 6170,
+          "test_rows": 432,
+          "train_start": "2026-08-19",
+          "train_end": "2026-09-15",
+          "logistic_train_fit_accuracy": 0.38217179902755266,
+          "logistic_test_accuracy": 0.2175925925925926,
+          "small_boosted_tree_train_fit_accuracy": 0.42236628849270663,
+          "small_boosted_tree_test_accuracy": 0.2638888888888889
+        },
+        {
+          "test_date": "2026-09-17",
+          "train_rows": 6553,
+          "test_rows": 256,
+          "train_start": "2026-08-20",
+          "train_end": "2026-09-16",
+          "logistic_train_fit_accuracy": 0.36990691286433697,
+          "logistic_test_accuracy": 0.25390625,
+          "small_boosted_tree_train_fit_accuracy": 0.4106516099496414,
+          "small_boosted_tree_test_accuracy": 0.2421875
+        },
+        {
+          "test_date": "2026-09-18",
+          "train_rows": 6138,
+          "test_rows": 574,
+          "train_start": "2026-08-21",
+          "train_end": "2026-09-17",
+          "logistic_train_fit_accuracy": 0.3496252851091561,
+          "logistic_test_accuracy": 0.2787456445993031,
+          "small_boosted_tree_train_fit_accuracy": 0.4068100358422939,
+          "small_boosted_tree_test_accuracy": 0.2613240418118467
+        },
+        {
+          "test_date": "2026-09-21",
+          "train_rows": 6452,
+          "test_rows": 909,
+          "train_start": "2026-08-24",
+          "train_end": "2026-09-18",
+          "logistic_train_fit_accuracy": 0.34733415995040295,
+          "logistic_test_accuracy": 0.33773377337733773,
+          "small_boosted_tree_train_fit_accuracy": 0.4039057656540608,
+          "small_boosted_tree_test_accuracy": 0.3487348734873487
+        },
+        {
+          "test_date": "2026-09-22",
+          "train_rows": 7258,
+          "test_rows": 230,
+          "train_start": "2026-08-25",
+          "train_end": "2026-09-21",
+          "logistic_train_fit_accuracy": 0.3545053733810967,
+          "logistic_test_accuracy": 0.3695652173913043,
+          "small_boosted_tree_train_fit_accuracy": 0.4025902452466244,
+          "small_boosted_tree_test_accuracy": 0.40869565217391307
+        },
+        {
+          "test_date": "2026-09-23",
+          "train_rows": 6558,
+          "test_rows": 221,
+          "train_start": "2026-08-26",
+          "train_end": "2026-09-22",
+          "logistic_train_fit_accuracy": 0.34980176883196096,
+          "logistic_test_accuracy": 0.45701357466063347,
+          "small_boosted_tree_train_fit_accuracy": 0.3989021043000915,
+          "small_boosted_tree_test_accuracy": 0.4253393665158371
+        },
+        {
+          "test_date": "2026-09-24",
+          "train_rows": 6532,
+          "test_rows": 111,
+          "train_start": "2026-08-27",
+          "train_end": "2026-09-23",
+          "logistic_train_fit_accuracy": 0.352112676056338,
+          "logistic_test_accuracy": 0.5045045045045045,
+          "small_boosted_tree_train_fit_accuracy": 0.40125535823637476,
+          "small_boosted_tree_test_accuracy": 0.42342342342342343
+        },
+        {
+          "test_date": "2026-09-28",
+          "train_rows": 6073,
+          "test_rows": 88,
+          "train_start": "2026-08-28",
+          "train_end": "2026-09-24",
+          "logistic_train_fit_accuracy": 0.3592952412316812,
+          "logistic_test_accuracy": 0.4659090909090909,
+          "small_boosted_tree_train_fit_accuracy": 0.4070475876831879,
+          "small_boosted_tree_test_accuracy": 0.4318181818181818
+        },
+        {
+          "test_date": "2026-09-29",
+          "train_rows": 5832,
+          "test_rows": 407,
+          "train_start": "2026-08-31",
+          "train_end": "2026-09-28",
+          "logistic_train_fit_accuracy": 0.36093964334705075,
+          "logistic_test_accuracy": 0.40786240786240785,
+          "small_boosted_tree_train_fit_accuracy": 0.41066529492455417,
+          "small_boosted_tree_test_accuracy": 0.3783783783783784
+        },
+        {
+          "test_date": "2026-09-30",
+          "train_rows": 5708,
+          "test_rows": 239,
+          "train_start": "2026-09-01",
+          "train_end": "2026-09-29",
+          "logistic_train_fit_accuracy": 0.36965662228451296,
+          "logistic_test_accuracy": 0.36401673640167365,
+          "small_boosted_tree_train_fit_accuracy": 0.41520672740014014,
+          "small_boosted_tree_test_accuracy": 0.3723849372384937
+        }
+      ],
+      "mean_fold_train_fit_accuracy": {
+        "logistic": 0.3671446728995956,
+        "small_boosted_tree": 0.41064978906112054
+      }
+    },
+    "2p5_to_6p5": {
+      "all_rows": 20629,
+      "test_rows": 8260,
+      "pool_class_counts": {
+        "lt0": 6796,
+        "0to1": 6094,
+        "1to3": 5383,
+        "ge3": 2356
+      },
+      "models": {
+        "logistic": {
+          "accuracy": 0.3474576271186441,
+          "confusion_rows_actual_columns_predicted": [
+            [
+              1417,
+              914,
+              170,
+              9
+            ],
+            [
+              1135,
+              1312,
+              210,
+              1
+            ],
+            [
+              1198,
+              806,
+              141,
+              1
+            ],
+            [
+              645,
+              221,
+              80,
+              0
+            ]
+          ],
+          "top": {
+            "1": {
+              "selected": 19,
+              "days": 19,
+              "skipped_days": 1,
+              "actual_ge3": 4,
+              "actual_ge1": 6,
+              "actual_lt0": 10,
+              "actual_below_minus1": 5,
+              "mean_second_high_pct": 0.32485515076985966,
+              "mean_0940_pct": -1.2031053254656212,
+              "median_0940_pct": -0.9049773755656187,
+              "positive_0940": 7,
+              "mean_original_rules_pct": -1.108609165147258,
+              "calendar_mean_0940_with_skip_zero_pct": -1.1429500591923403
+            },
+            "2": {
+              "selected": 36,
+              "days": 19,
+              "skipped_days": 1,
+              "actual_ge3": 5,
+              "actual_ge1": 9,
+              "actual_lt0": 20,
+              "actual_below_minus1": 14,
+              "mean_second_high_pct": 0.01699815570596187,
+              "mean_0940_pct": -1.3152666944573226,
+              "median_0940_pct": -1.2510159365390239,
+              "positive_0940": 10,
+              "mean_original_rules_pct": -1.1503138184997879,
+              "calendar_mean_0940_with_skip_zero_pct": -1.1415855771064405
+            }
+          }
+        },
+        "small_boosted_tree": {
+          "accuracy": 0.3458837772397094,
+          "confusion_rows_actual_columns_predicted": [
+            [
+              1351,
+              815,
+              340,
+              4
+            ],
+            [
+              1116,
+              1169,
+              371,
+              2
+            ],
+            [
+              1114,
+              695,
+              337,
+              0
+            ],
+            [
+              597,
+              195,
+              154,
+              0
+            ]
+          ],
+          "top": {
+            "1": {
+              "selected": 20,
+              "days": 20,
+              "skipped_days": 0,
+              "actual_ge3": 3,
+              "actual_ge1": 8,
+              "actual_lt0": 9,
+              "actual_below_minus1": 5,
+              "mean_second_high_pct": 0.5190073368128362,
+              "mean_0940_pct": -0.8232930842140839,
+              "median_0940_pct": -1.647781892679856,
+              "positive_0940": 8,
+              "mean_original_rules_pct": -0.7268123538486942,
+              "calendar_mean_0940_with_skip_zero_pct": -0.8232930842140839
+            },
+            "2": {
+              "selected": 40,
+              "days": 20,
+              "skipped_days": 0,
+              "actual_ge3": 4,
+              "actual_ge1": 16,
+              "actual_lt0": 17,
+              "actual_below_minus1": 7,
+              "mean_second_high_pct": 0.5069297707979827,
+              "mean_0940_pct": -0.7060167285977867,
+              "median_0940_pct": -0.9603255790950505,
+              "positive_0940": 16,
+              "mean_original_rules_pct": -0.6945812357595649,
+              "calendar_mean_0940_with_skip_zero_pct": -0.7060167285977867
+            }
+          }
+        }
+      },
+      "folds": [
+        {
+          "test_date": "2026-09-02",
+          "train_rows": 12369,
+          "test_rows": 200,
+          "train_start": "2026-08-05",
+          "train_end": "2026-09-01",
+          "logistic_train_fit_accuracy": 0.36454038321610477,
+          "logistic_test_accuracy": 0.255,
+          "small_boosted_tree_train_fit_accuracy": 0.40027488075026274,
+          "small_boosted_tree_test_accuracy": 0.285
+        },
+        {
+          "test_date": "2026-09-03",
+          "train_rows": 11581,
+          "test_rows": 347,
+          "train_start": "2026-08-06",
+          "train_end": "2026-09-02",
+          "logistic_train_fit_accuracy": 0.37008893877903465,
+          "logistic_test_accuracy": 0.2564841498559078,
+          "small_boosted_tree_train_fit_accuracy": 0.4069596753302824,
+          "small_boosted_tree_test_accuracy": 0.3371757925072046
+        },
+        {
+          "test_date": "2026-09-04",
+          "train_rows": 11464,
+          "test_rows": 278,
+          "train_start": "2026-08-07",
+          "train_end": "2026-09-03",
+          "logistic_train_fit_accuracy": 0.37133635729239356,
+          "logistic_test_accuracy": 0.2841726618705036,
+          "small_boosted_tree_train_fit_accuracy": 0.4041346824842987,
+          "small_boosted_tree_test_accuracy": 0.29136690647482016
+        },
+        {
+          "test_date": "2026-09-07",
+          "train_rows": 11037,
+          "test_rows": 665,
+          "train_start": "2026-08-10",
+          "train_end": "2026-09-04",
+          "logistic_train_fit_accuracy": 0.38035698106369487,
+          "logistic_test_accuracy": 0.3082706766917293,
+          "small_boosted_tree_train_fit_accuracy": 0.4122497055359246,
+          "small_boosted_tree_test_accuracy": 0.3218045112781955
+        },
+        {
+          "test_date": "2026-09-08",
+          "train_rows": 10629,
+          "test_rows": 581,
+          "train_start": "2026-08-11",
+          "train_end": "2026-09-07",
+          "logistic_train_fit_accuracy": 0.3664502775425722,
+          "logistic_test_accuracy": 0.39070567986230637,
+          "small_boosted_tree_train_fit_accuracy": 0.404929908740239,
+          "small_boosted_tree_test_accuracy": 0.3683304647160069
+        },
+        {
+          "test_date": "2026-09-09",
+          "train_rows": 10934,
+          "test_rows": 287,
+          "train_start": "2026-08-12",
+          "train_end": "2026-09-08",
+          "logistic_train_fit_accuracy": 0.37077007499542713,
+          "logistic_test_accuracy": 0.4878048780487805,
+          "small_boosted_tree_train_fit_accuracy": 0.40963965611852937,
+          "small_boosted_tree_test_accuracy": 0.4738675958188153
+        },
+        {
+          "test_date": "2026-09-10",
+          "train_rows": 10526,
+          "test_rows": 146,
+          "train_start": "2026-08-13",
+          "train_end": "2026-09-09",
+          "logistic_train_fit_accuracy": 0.3775413262397872,
+          "logistic_test_accuracy": 0.636986301369863,
+          "small_boosted_tree_train_fit_accuracy": 0.4118373551206536,
+          "small_boosted_tree_test_accuracy": 0.5753424657534246
+        },
+        {
+          "test_date": "2026-09-11",
+          "train_rows": 10419,
+          "test_rows": 100,
+          "train_start": "2026-08-14",
+          "train_end": "2026-09-10",
+          "logistic_train_fit_accuracy": 0.3778673577118725,
+          "logistic_test_accuracy": 0.33,
+          "small_boosted_tree_train_fit_accuracy": 0.4104040694884346,
+          "small_boosted_tree_test_accuracy": 0.31
+        },
+        {
+          "test_date": "2026-09-14",
+          "train_rows": 10118,
+          "test_rows": 362,
+          "train_start": "2026-08-17",
+          "train_end": "2026-09-11",
+          "logistic_train_fit_accuracy": 0.3823878236805693,
+          "logistic_test_accuracy": 0.3397790055248619,
+          "small_boosted_tree_train_fit_accuracy": 0.4096659418857482,
+          "small_boosted_tree_test_accuracy": 0.3259668508287293
+        },
+        {
+          "test_date": "2026-09-15",
+          "train_rows": 9401,
+          "test_rows": 159,
+          "train_start": "2026-08-18",
+          "train_end": "2026-09-14",
+          "logistic_train_fit_accuracy": 0.3926178066163174,
+          "logistic_test_accuracy": 0.32075471698113206,
+          "small_boosted_tree_train_fit_accuracy": 0.42623125199446865,
+          "small_boosted_tree_test_accuracy": 0.3018867924528302
+        },
+        {
+          "test_date": "2026-09-16",
+          "train_rows": 9129,
+          "test_rows": 652,
+          "train_start": "2026-08-19",
+          "train_end": "2026-09-15",
+          "logistic_train_fit_accuracy": 0.3797787271333114,
+          "logistic_test_accuracy": 0.23006134969325154,
+          "small_boosted_tree_train_fit_accuracy": 0.41899441340782123,
+          "small_boosted_tree_test_accuracy": 0.27607361963190186
+        },
+        {
+          "test_date": "2026-09-17",
+          "train_rows": 9712,
+          "test_rows": 382,
+          "train_start": "2026-08-20",
+          "train_end": "2026-09-16",
+          "logistic_train_fit_accuracy": 0.3725288303130148,
+          "logistic_test_accuracy": 0.24607329842931938,
+          "small_boosted_tree_train_fit_accuracy": 0.4132001647446458,
+          "small_boosted_tree_test_accuracy": 0.21465968586387435
+        },
+        {
+          "test_date": "2026-09-18",
+          "train_rows": 9058,
+          "test_rows": 842,
+          "train_start": "2026-08-21",
+          "train_end": "2026-09-17",
+          "logistic_train_fit_accuracy": 0.36476043276661513,
+          "logistic_test_accuracy": 0.27672209026128264,
+          "small_boosted_tree_train_fit_accuracy": 0.3988739236034445,
+          "small_boosted_tree_test_accuracy": 0.2838479809976247
+        },
+        {
+          "test_date": "2026-09-21",
+          "train_rows": 9505,
+          "test_rows": 1296,
+          "train_start": "2026-08-24",
+          "train_end": "2026-09-18",
+          "logistic_train_fit_accuracy": 0.3594950026301946,
+          "logistic_test_accuracy": 0.3888888888888889,
+          "small_boosted_tree_train_fit_accuracy": 0.39547606522882695,
+          "small_boosted_tree_test_accuracy": 0.3881172839506173
+        },
+        {
+          "test_date": "2026-09-22",
+          "train_rows": 10635,
+          "test_rows": 340,
+          "train_start": "2026-08-25",
+          "train_end": "2026-09-21",
+          "logistic_train_fit_accuracy": 0.36577338975082274,
+          "logistic_test_accuracy": 0.35294117647058826,
+          "small_boosted_tree_train_fit_accuracy": 0.3946403385049365,
+          "small_boosted_tree_test_accuracy": 0.35294117647058826
+        },
+        {
+          "test_date": "2026-09-23",
+          "train_rows": 9570,
+          "test_rows": 322,
+          "train_start": "2026-08-26",
+          "train_end": "2026-09-22",
+          "logistic_train_fit_accuracy": 0.3563218390804598,
+          "logistic_test_accuracy": 0.4192546583850932,
+          "small_boosted_tree_train_fit_accuracy": 0.3917450365726228,
+          "small_boosted_tree_test_accuracy": 0.38198757763975155
+        },
+        {
+          "test_date": "2026-09-24",
+          "train_rows": 9505,
+          "test_rows": 156,
+          "train_start": "2026-08-27",
+          "train_end": "2026-09-23",
+          "logistic_train_fit_accuracy": 0.3583377169910573,
+          "logistic_test_accuracy": 0.47435897435897434,
+          "small_boosted_tree_train_fit_accuracy": 0.39274066280904785,
+          "small_boosted_tree_test_accuracy": 0.44871794871794873
+        },
+        {
+          "test_date": "2026-09-28",
+          "train_rows": 8888,
+          "test_rows": 122,
+          "train_start": "2026-08-28",
+          "train_end": "2026-09-24",
+          "logistic_train_fit_accuracy": 0.3666741674167417,
+          "logistic_test_accuracy": 0.48360655737704916,
+          "small_boosted_tree_train_fit_accuracy": 0.4000900090009001,
+          "small_boosted_tree_test_accuracy": 0.47540983606557374
+        },
+        {
+          "test_date": "2026-09-29",
+          "train_rows": 8495,
+          "test_rows": 641,
+          "train_start": "2026-08-31",
+          "train_end": "2026-09-28",
+          "logistic_train_fit_accuracy": 0.36892289582107124,
+          "logistic_test_accuracy": 0.41809672386895474,
+          "small_boosted_tree_train_fit_accuracy": 0.4031783402001177,
+          "small_boosted_tree_test_accuracy": 0.39313572542901715
+        },
+        {
+          "test_date": "2026-09-30",
+          "train_rows": 8382,
+          "test_rows": 382,
+          "train_start": "2026-09-01",
+          "train_end": "2026-09-29",
+          "logistic_train_fit_accuracy": 0.37628251014077785,
+          "logistic_test_accuracy": 0.3717277486910995,
+          "small_boosted_tree_train_fit_accuracy": 0.4098067287043665,
+          "small_boosted_tree_test_accuracy": 0.3403141361256545
+        }
+      ],
+      "mean_fold_train_fit_accuracy": {
+        "logistic": 0.371141641959092,
+        "small_boosted_tree": 0.4057536405112786
+      }
+    }
+  }
+}

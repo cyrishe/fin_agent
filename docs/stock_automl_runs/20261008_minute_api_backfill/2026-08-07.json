@@ -1,0 +1,17 @@
+{
+  "signal_date": "2026-08-07",
+  "next_date": "2026-08-10",
+  "generated_at": "2026-10-08T16:25:42",
+  "source": "Upchina kLineData 1-minute HTTP API, eLineType=1",
+  "historical_daily_prefilter_only": "T high >= T preclose * 1.03 and T low <= T preclose * 1.06",
+  "daily_prefilter_stocks": 1341,
+  "api_status": {
+    "complete": 1341
+  },
+  "complete_1440_candidates": 528,
+  "target_1pct_high10_count": 360,
+  "output": "outputs/stock_automl/minute_api_backfill/2026-08-07.csv",
+  "initial_offset": 9000,
+  "want": 600,
+  "limitation": "API completeness and one-day cohort audit only; no model training or out-of-sample return claim."
+}

@@ -1,0 +1,290 @@
+[
+  {
+    "scenario": "auto",
+    "turn": 1,
+    "thread_id": 4367,
+    "run_id": "63c93240f18841c5aba23d2dacec19cb",
+    "seconds": 21.97,
+    "question": "请按以下顺序列出两家公司最近一篇研报的标题、机构和日期：1.贵州茅台；2.五粮液。请保留编号，暂不展开分析。",
+    "model": "deepseek-v4-flash-0731",
+    "session_id": "financial-qa-08137fb925b231ff88b9aa510edb4039",
+    "resumed": false,
+    "accounting_total_tokens": 18284,
+    "assistant_message_count": 3,
+    "tools": [
+      "finance_query",
+      "read_finance_catalog",
+      "resolve_security"
+    ],
+    "semantic_turn": {
+      "ori_question": "请按以下顺序列出两家公司最近一篇研报的标题、机构和日期：1.贵州茅台；2.五粮液。请保留编号，暂不展开分析。",
+      "resolved_question": "请按以下顺序列出两家公司最近一篇研报的标题、机构和日期：1.贵州茅台；2.五粮液。请保留编号，暂不展开分析。",
+      "context_refs": [],
+      "context_resolution_source": "no_context"
+    },
+    "error": ""
+  },
+  {
+    "scenario": "auto",
+    "turn": 2,
+    "thread_id": 4367,
+    "run_id": "4c91c1dcf1bc47f8be56187a444049c6",
+    "seconds": 32.59,
+    "question": "第二个怎么样？",
+    "model": "deepseek-v4-flash-0731",
+    "session_id": "financial-qa-08137fb925b231ff88b9aa510edb4039",
+    "resumed": true,
+    "accounting_total_tokens": 54611,
+    "assistant_message_count": 4,
+    "tools": [
+      "finance_query",
+      "read_finance_catalog",
+      "read_finance_skill"
+    ],
+    "semantic_turn": {
+      "ori_question": "第二个怎么样？",
+      "resolved_question": "第二家公司（五粮液）的研报标题、机构和日期是什么？",
+      "context_refs": [
+        "turn:1:assistant"
+      ],
+      "context_resolution_source": "llm"
+    },
+    "error": ""
+  },
+  {
+    "scenario": "auto",
+    "turn": 3,
+    "thread_id": 4367,
+    "run_id": "547311efaef448ec9b84be9bb688d3b3",
+    "seconds": 30.66,
+    "question": "和第一个比呢？",
+    "model": "deepseek-v4-flash-0731",
+    "session_id": "financial-qa-08137fb925b231ff88b9aa510edb4039",
+    "resumed": true,
+    "accounting_total_tokens": 104721,
+    "assistant_message_count": 5,
+    "tools": [
+      "finance_query",
+      "read_finance_catalog"
+    ],
+    "semantic_turn": {
+      "ori_question": "和第一个比呢？",
+      "resolved_question": "和第一个（贵州茅台）那篇研报相比，五粮液这篇研报怎么样？",
+      "context_refs": [
+        "turn:1:assistant",
+        "turn:2:assistant"
+      ],
+      "context_resolution_source": "llm"
+    },
+    "error": ""
+  },
+  {
+    "scenario": "skill",
+    "turn": 1,
+    "thread_id": 4369,
+    "run_id": "8c9866c797904ba4a26f7c0761999757",
+    "seconds": 13.74,
+    "question": "请按以下顺序列出两家公司最近一篇研报的标题、机构和日期：1.贵州茅台；2.五粮液。请保留编号，暂不展开分析。",
+    "model": "deepseek-v4-flash-0731",
+    "session_id": "financial-qa-19d09302eb2a4ba9258d384a1af9a66b",
+    "resumed": false,
+    "accounting_total_tokens": 37645,
+    "assistant_message_count": 5,
+    "tools": [
+      "finance_query",
+      "read_finance_catalog",
+      "resolve_security"
+    ],
+    "semantic_turn": null,
+    "error": ""
+  },
+  {
+    "scenario": "skill",
+    "turn": 2,
+    "thread_id": 4369,
+    "run_id": "9e7a03a5ccab41eb97c8455c2452005e",
+    "seconds": 21.45,
+    "question": "第二个怎么样？",
+    "model": "deepseek-v4-flash-0731",
+    "session_id": "financial-qa-19d09302eb2a4ba9258d384a1af9a66b",
+    "resumed": true,
+    "accounting_total_tokens": 49058,
+    "assistant_message_count": 4,
+    "tools": [
+      "finance_query",
+      "read_finance_catalog"
+    ],
+    "semantic_turn": {
+      "ori_question": "第二个怎么样？",
+      "resolved_question": "第二家五粮液最近一篇研报怎么样？",
+      "context_refs": [
+        "turn:1:assistant"
+      ],
+      "context_resolution_source": "llm"
+    },
+    "error": ""
+  },
+  {
+    "scenario": "skill",
+    "turn": 3,
+    "thread_id": 4369,
+    "run_id": "9211287579d840508d5574e56764fcae",
+    "seconds": 19.51,
+    "question": "和第一个比呢？",
+    "model": "deepseek-v4-flash-0731",
+    "session_id": "financial-qa-19d09302eb2a4ba9258d384a1af9a66b",
+    "resumed": true,
+    "accounting_total_tokens": 56218,
+    "assistant_message_count": 3,
+    "tools": [
+      "finance_query",
+      "read_finance_catalog"
+    ],
+    "semantic_turn": {
+      "ori_question": "和第一个比呢？",
+      "resolved_question": "和第一个（贵州茅台）相比，五粮液最近一篇研报怎么样？",
+      "context_refs": [
+        "turn:1:assistant",
+        "turn:2:assistant"
+      ],
+      "context_resolution_source": "llm"
+    },
+    "error": ""
+  },
+  {
+    "scenario": "tool",
+    "turn": 1,
+    "thread_id": 4370,
+    "run_id": "efb1d579000d402da59392272e669da4",
+    "seconds": 11.4,
+    "question": "请按以下顺序列出两家公司最近一篇研报的标题、机构和日期：1.贵州茅台；2.五粮液。请保留编号，暂不展开分析。",
+    "model": "deepseek-v4-flash-0731",
+    "session_id": "financial-qa-2b0583ca634c8743060ebc7fee249167",
+    "resumed": false,
+    "accounting_total_tokens": 18242,
+    "assistant_message_count": 3,
+    "tools": [
+      "finance_query",
+      "read_finance_catalog",
+      "resolve_security"
+    ],
+    "semantic_turn": null,
+    "error": ""
+  },
+  {
+    "scenario": "tool",
+    "turn": 2,
+    "thread_id": 4370,
+    "run_id": "cff69ecf406c46f9a72790fdd87f9719",
+    "seconds": 18.26,
+    "question": "第二个怎么样？",
+    "model": "deepseek-v4-flash-0731",
+    "session_id": "financial-qa-2b0583ca634c8743060ebc7fee249167",
+    "resumed": true,
+    "accounting_total_tokens": 36913,
+    "assistant_message_count": 3,
+    "tools": [
+      "finance_query",
+      "read_finance_catalog",
+      "read_finance_skill"
+    ],
+    "semantic_turn": null,
+    "error": ""
+  },
+  {
+    "scenario": "tool",
+    "turn": 3,
+    "thread_id": 4370,
+    "run_id": "d400eed3f9d946d6b5d5f6fc80fcce83",
+    "seconds": 20.46,
+    "question": "和第一个比呢？",
+    "model": "deepseek-v4-flash-0731",
+    "session_id": "financial-qa-2b0583ca634c8743060ebc7fee249167",
+    "resumed": true,
+    "accounting_total_tokens": 74698,
+    "assistant_message_count": 4,
+    "tools": [
+      "finance_query",
+      "read_finance_catalog"
+    ],
+    "semantic_turn": null,
+    "error": ""
+  },
+  {
+    "scenario": "switch",
+    "turn": 1,
+    "thread_id": 4368,
+    "run_id": "3fd219521c8b4b8787a5a50b2ef2f1ee",
+    "seconds": 21.86,
+    "question": "请按以下顺序列出两家公司最近一篇研报的标题、机构和日期：1.贵州茅台；2.五粮液。请保留编号，暂不展开分析。",
+    "model": "deepseek-v4-flash-0731",
+    "session_id": "financial-qa-5d20712e6cc68253c5caeb650042eda9",
+    "resumed": false,
+    "accounting_total_tokens": 18222,
+    "assistant_message_count": 3,
+    "tools": [
+      "finance_query",
+      "read_finance_catalog",
+      "resolve_security"
+    ],
+    "semantic_turn": {
+      "ori_question": "请按以下顺序列出两家公司最近一篇研报的标题、机构和日期：1.贵州茅台；2.五粮液。请保留编号，暂不展开分析。",
+      "resolved_question": "请按以下顺序列出两家公司最近一篇研报的标题、机构和日期：1.贵州茅台；2.五粮液。请保留编号，暂不展开分析。",
+      "context_refs": [],
+      "context_resolution_source": "no_context"
+    },
+    "error": ""
+  },
+  {
+    "scenario": "switch",
+    "turn": 2,
+    "thread_id": 4368,
+    "run_id": "1e2624ce9d8f48a097ffea3af22889e8",
+    "seconds": 12.12,
+    "question": "请查询宁德时代的证券代码和上市日期。",
+    "model": "deepseek-v4-flash-0731",
+    "session_id": "financial-qa-5d20712e6cc68253c5caeb650042eda9",
+    "resumed": true,
+    "accounting_total_tokens": 15534,
+    "assistant_message_count": 3,
+    "tools": [
+      "finance_query",
+      "read_finance_catalog"
+    ],
+    "semantic_turn": {
+      "ori_question": "请查询宁德时代的证券代码和上市日期。",
+      "resolved_question": "请查询宁德时代的证券代码和上市日期。",
+      "context_refs": [],
+      "context_resolution_source": "llm"
+    },
+    "error": ""
+  },
+  {
+    "scenario": "switch",
+    "turn": 3,
+    "thread_id": 4368,
+    "run_id": "47cef1bbd03649bdad703a32485c9c39",
+    "seconds": 41.7,
+    "question": "回到第一问，第二家公司怎么样？",
+    "model": "deepseek-v4-flash-0731",
+    "session_id": "financial-qa-5d20712e6cc68253c5caeb650042eda9",
+    "resumed": true,
+    "accounting_total_tokens": 68816,
+    "assistant_message_count": 4,
+    "tools": [
+      "finance_query",
+      "load_finance_result",
+      "read_finance_catalog",
+      "read_finance_skill"
+    ],
+    "semantic_turn": {
+      "ori_question": "回到第一问，第二家公司怎么样？",
+      "resolved_question": "回到第一问，第二家公司（五粮液）怎么样？",
+      "context_refs": [
+        "turn:1:assistant"
+      ],
+      "context_resolution_source": "llm"
+    },
+    "error": ""
+  }
+]

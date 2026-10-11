@@ -6,8 +6,6 @@ from typing import Any, Dict, List, Optional
 class PromptContextCompilerService:
     DEFAULT_BUDGETS = {
         "agent_role_section": 400,
-        "interaction_mode_section": 120,
-        "current_focus_section": 220,
         "thread_summary_section": 600,
         "active_task_section": 260,
         "relevant_objects_section": 400,
@@ -19,7 +17,6 @@ class PromptContextCompilerService:
 
     PROFILE_BUDGETS = {
         "planner": {
-            "current_focus_section": {"priority": 100, "token_budget": 260},
             "active_task_section": {"priority": 95, "token_budget": 320},
             "candidate_skills_section": {"priority": 90, "token_budget": 650},
             "candidate_tools_section": {"priority": 90, "token_budget": 650},
@@ -48,8 +45,6 @@ class PromptContextCompilerService:
         *,
         profile: str = "planner",
         agent_context: Optional[Dict[str, Any]] = None,
-        interaction_frame: Optional[Dict[str, Any]] = None,
-        conversation_state: Optional[Dict[str, Any]] = None,
         work_context: Optional[Dict[str, Any]] = None,
         execution_plan: Optional[Dict[str, Any]] = None,
         candidate_skills: Optional[List[Dict[str, Any]]] = None,
@@ -57,8 +52,6 @@ class PromptContextCompilerService:
         output_contract: Optional[Dict[str, Any]] = None,
     ) -> Dict[str, Any]:
         agent_ctx = agent_context if isinstance(agent_context, dict) else {}
-        frame = interaction_frame if isinstance(interaction_frame, dict) else {}
-        state = conversation_state if isinstance(conversation_state, dict) else {}
         work = work_context if isinstance(work_context, dict) else {}
         plan = execution_plan if isinstance(execution_plan, dict) else {}
         contract = output_contract if isinstance(output_contract, dict) else {}
@@ -70,28 +63,8 @@ class PromptContextCompilerService:
                 "priority": self._budget_value(profile_budgets, "agent_role_section", "priority", 70),
                 "token_budget": self._budget_value(profile_budgets, "agent_role_section", "token_budget", self.DEFAULT_BUDGETS["agent_role_section"]),
                 "content": {
-                    "assistant_agent": self._trim(agent_ctx.get("assistant_agent")),
-                    "execution_agent": self._trim(agent_ctx.get("execution_agent")),
+                    "default_agent": self._trim(agent_ctx.get("default_agent")),
                     "planner_agent": self._trim(plan.get("planner_agent")),
-                },
-            },
-            "interaction_mode_section": {
-                "required": True,
-                "priority": self._budget_value(profile_budgets, "interaction_mode_section", "priority", 75),
-                "token_budget": self._budget_value(profile_budgets, "interaction_mode_section", "token_budget", self.DEFAULT_BUDGETS["interaction_mode_section"]),
-                "content": {
-                    "interaction_mode": self._trim(frame.get("interaction_mode")),
-                    "conversation_state": self._trim(state.get("state")),
-                },
-            },
-            "current_focus_section": {
-                "required": True,
-                "priority": self._budget_value(profile_budgets, "current_focus_section", "priority", 80),
-                "token_budget": self._budget_value(profile_budgets, "current_focus_section", "token_budget", self.DEFAULT_BUDGETS["current_focus_section"]),
-                "content": {
-                    "active_focus_type": self._trim(frame.get("active_focus_type")),
-                    "active_focus_id": self._trim(frame.get("active_focus_id")),
-                    "reference_scope": frame.get("reference_scope") if isinstance(frame.get("reference_scope"), list) else [],
                 },
             },
             "thread_summary_section": {
@@ -99,7 +72,6 @@ class PromptContextCompilerService:
                 "priority": self._budget_value(profile_budgets, "thread_summary_section", "priority", 60),
                 "token_budget": self._budget_value(profile_budgets, "thread_summary_section", "token_budget", self.DEFAULT_BUDGETS["thread_summary_section"]),
                 "content": {
-                    "current_user_goal": self._trim(frame.get("current_user_goal")),
                     "recent_result_subject": self._trim(work.get("recent_result_subject")),
                 },
             },
@@ -140,10 +112,7 @@ class PromptContextCompilerService:
                 "required": True,
                 "priority": self._budget_value(profile_budgets, "runtime_constraints_section", "priority", 70),
                 "token_budget": self._budget_value(profile_budgets, "runtime_constraints_section", "token_budget", self.DEFAULT_BUDGETS["runtime_constraints_section"]),
-                "content": {
-                    "accepted_constraints": frame.get("accepted_constraints") if isinstance(frame.get("accepted_constraints"), list) else [],
-                    "pending_questions": frame.get("pending_questions") if isinstance(frame.get("pending_questions"), list) else [],
-                },
+                "content": plan.get("runtime_constraints") if isinstance(plan.get("runtime_constraints"), dict) else {},
             },
             "output_contract_section": {
                 "required": False,

@@ -1,0 +1,21 @@
+{
+  "entry": "Real compatible model + build_user_task_agent_tools; NOT DSH/HTTP/browser",
+  "checks": {
+    "all_responses_present": true,
+    "submit_called": true,
+    "query_called": true,
+    "cancel_called": true,
+    "exactly_one_task": true,
+    "one_durable_run": true,
+    "pending_after_submit": true,
+    "pending_after_query": true,
+    "cancelled_after_cancel": true,
+    "source_conversation_linked": true,
+    "no_other_owner_visibility": true,
+    "bounded_300_second_budget": true,
+    "automl_demo_asset_selected": true
+  },
+  "passed": true,
+  "fallback_used": true,
+  "elapsed_seconds": 24.78
+}

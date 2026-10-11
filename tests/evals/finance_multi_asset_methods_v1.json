@@ -1,0 +1,42 @@
+{
+  "version": "finance_multi_asset_methods_v1",
+  "description": "合成证据下的方法行为检查，不是实际投资分析或生产数据验证。输入与人工复核标准分离。",
+  "cases": [
+    {
+      "id":"fund_aligned","skill_id":"fund-analysis","references":["references/data-evidence.md","references/performance-and-trading.md"],
+      "question":"这只ETF的价格和净值有什么差异，是否值得注意？",
+      "evidence":"合成ETF甲。行情和净值均为2026-09-08收盘、同一份额：close=1.02元，nav_unit=1.00元，discount=-0.02元。已授权确定性计算结果：溢价率2.00%。当日成交较活跃。没有持仓、经理、费用或申赎限制材料。",
+      "review_criteria":["正确识别溢价而非折价，discount是元而非百分比","可引用已经计算的2%，不称成交活跃消除了溢价风险","不虚构经理能力、持仓或套利资格"]
+    },
+    {
+      "id":"fund_stale_nav","skill_id":"fund-analysis","references":["references/data-evidence.md","references/performance-and-trading.md"],
+      "question":"这只ETF的价格和净值有什么差异，是否值得注意？",
+      "evidence":"合成跨境ETF甲。close=1.02元，价格为2026-09-08收盘；nav_unit=1.00元，但确认净值对应2026-09-04境外估值时点。没有同日净值、IOPV、底层市场即时价格或授权派生计算结果。",
+      "review_criteria":["识别日期不匹配，转向时点核验而非确定当前溢价率","保留表观价差与实际可交易溢价的区别","不宣称确定套利机会或补造实时净值"]
+    },
+    {
+      "id":"bond_missing_terms","skill_id":"bond-analysis","references":["references/data-evidence.md","references/yield-and-risk.md"],
+      "question":"这只债券价格上涨，收益和风险该怎么看？",
+      "evidence":"合成普通债乙。过去两周报价从100元变为102元，只有两个有成交的日期。可读信息只有债券名称、发行人、行情；票息、到期日、净价全价定义和信用资料均缺失。没有确定性收益率计算。",
+      "review_criteria":["价格上涨不等于到期收益2%或年化2%","识别稀疏成交、陈旧报价与未知现金流限制","不能量化久期、到期收益或信用安全性"]
+    },
+    {
+      "id":"bond_call_notice","skill_id":"bond-analysis","references":["references/data-evidence.md","references/convertible.md"],
+      "question":"这只债券价格上涨，收益和风险该怎么看？",
+      "evidence":"合成可转债乙。已确认产品为可转债，市场价从125元升至130元。用户提供已核验且当前有效的该券赎回公告：赎回价格100.5元；还有明确的最后交易日和转股期限，但本段未提供具体日期。当前缺正股价格、有效转股价、到期现金流和适当性信息。",
+      "review_criteria":["根据公告将关注点转向赎回现金流及期限风险","不能根据上涨推断持有至赎回盈利，不能虚构具体日期","缺少转股数据时不量化转股溢价或强行建议转股"]
+    },
+    {
+      "id":"flow_conflicting","skill_id":"capital-flow-analysis","references":["references/method.md","references/financing-and-holders.md"],
+      "question":"主力净流入但价格下跌，是不是机构在建仓？",
+      "evidence":"合成公司丙，同一组完整20个交易日：源定义主力净流入累计为正，但逐日正负交替；区间股价下跌。融资余额增加，但没有融资买入者身份。股东户数减少的报告今天公告，统计截止日是上季度末。没有逐笔订单、投资者身份或事件证据。",
+      "review_criteria":["不把主力分类认定为真实机构身份，不断言吸筹","累计正值不代表连续每天流入","两融存量和流量分开，股东公告日与持股截止日分开"]
+    },
+    {
+      "id":"hot_repeated_snapshots","skill_id":"sector-theme-analysis","references":["references/hot-events.md","references/comparison-and-transmission.md"],
+      "question":"这个概念热度一直升，能判断行情持续扩散、相关公司业绩都会受益吗？",
+      "evidence":"合成概念丁。相同event_id和active_id下有三个state快照，全部来自2026-09-08，state_time分别10:00、13:00、14:30，heat_score依次升高。只返回两家关联公司，其中一家relation_type=extended，is_leader=true；没有全量关联公司或业务收入、订单数据。",
+      "review_criteria":["三个日内快照不当作连续三天","两家样本不能证明全板块扩散","extended和leader标签不能证明已兑现业绩或龙头竞争优势"]
+    }
+  ]
+}

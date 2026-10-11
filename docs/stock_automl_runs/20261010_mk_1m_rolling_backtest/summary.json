@@ -1,0 +1,77 @@
+{
+  "source_rows": 28191,
+  "signal_dates": 62,
+  "test_first": "2026-06-03",
+  "test_last": "2026-07-30",
+  "test_days": 41,
+  "arms": {
+    "rolling20_tminus1": {
+      "test_days": 41,
+      "selected_days": 41,
+      "known_outcome_days": 41,
+      "unknown_outcome_days": 0,
+      "second_high_counts": {
+        "ge3": 24,
+        "1to3": 7,
+        "0to1": 4,
+        "lt0": 6
+      },
+      "sale_0940_counts": {
+        "ge3": 18,
+        "1to3": 6,
+        "0to1": 3,
+        "lt0": 14
+      },
+      "mean_0940_return_pct_per_trade": 1.755706285750104,
+      "median_0940_return_pct_per_trade": 2.70833333333333,
+      "random_expected_ge3_days": 4.854064634567292,
+      "random_p_at_least_ge3_hits": 1.094802320941533e-07
+    },
+    "full19_tminus2": {
+      "test_days": 41,
+      "selected_days": 41,
+      "known_outcome_days": 41,
+      "unknown_outcome_days": 0,
+      "second_high_counts": {
+        "ge3": 19,
+        "1to3": 13,
+        "0to1": 4,
+        "lt0": 5
+      },
+      "sale_0940_counts": {
+        "ge3": 13,
+        "1to3": 8,
+        "0to1": 4,
+        "lt0": 16
+      },
+      "mean_0940_return_pct_per_trade": 1.2480198206830242,
+      "median_0940_return_pct_per_trade": 1.1605415860735,
+      "random_expected_ge3_days": 4.854064634567292,
+      "random_p_at_least_ge3_hits": 0.00043955546500172506
+    },
+    "p3_selected_tminus2": {
+      "test_days": 41,
+      "selected_days": 41,
+      "known_outcome_days": 41,
+      "unknown_outcome_days": 0,
+      "second_high_counts": {
+        "ge3": 21,
+        "1to3": 12,
+        "0to1": 3,
+        "lt0": 5
+      },
+      "sale_0940_counts": {
+        "ge3": 15,
+        "1to3": 8,
+        "0to1": 3,
+        "lt0": 15
+      },
+      "mean_0940_return_pct_per_trade": 1.6893381997963068,
+      "median_0940_return_pct_per_trade": 1.24843945068664,
+      "random_expected_ge3_days": 4.854064634567292,
+      "random_p_at_least_ge3_hits": 2.204442651797546e-05
+    }
+  },
+  "data_sha256": "5ad1996ea75f962980a52b0a848f0f8773da11bee76d6bdbdcf99a85cab0f125",
+  "script_sha256": "eec2afa67da3414b2260e4235d01632ffe27b6461a731fb5e20a08cdd91d571a"
+}

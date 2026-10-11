@@ -1,0 +1,64 @@
+{
+  "supported_holding_return": {
+    "accepted": true,
+    "design": "研究基于日K及行业、市值、PE/PB特征，使用逻辑回归模型预测未来3个交易日（持有期）的上涨概率（收益>0）。次日开盘买入，持有3个交易日后开盘退出。使用2折时间滚动验证，最多4个超参数实验。默认假设：target_return=0，概率阈值0.6，胜率门槛0.5，最大回撤0.3，手续费率等沿用默认值。验收口径：分类任务，标签为open[t+4]/open[t+1]-1，预测其超过0的概率。",
+    "spec": {
+      "start": "2023-10-03",
+      "end": "2026-10-02",
+      "objective": "研究日K信号，次日开盘买入，持有3个交易日后开盘退出的上涨概率。使用行业及市值PE/PB，最多4个实验，仅逻辑回归，2个时间验证折。",
+      "symbols": [],
+      "max_symbols": 30,
+      "horizons": [
+        3
+      ],
+      "tasks": [
+        "classification"
+      ],
+      "models": [
+        "linear"
+      ],
+      "samplers": [
+        "all",
+        "momentum",
+        "reversal",
+        "liquid",
+        "low_volatility",
+        "news"
+      ],
+      "feature_sets": [
+        "enriched"
+      ],
+      "max_trials": 4,
+      "rounds": 2,
+      "max_train_rows": 20000,
+      "seed": 42,
+      "folds": 2,
+      "test_fraction": 0.2,
+      "company_holdout_fraction": 0.2,
+      "target_return": 0.0,
+      "probability_threshold": 0.6,
+      "regression_threshold": 0.005,
+      "top_k": 5,
+      "min_signals": 15,
+      "min_win_rate": 0.5,
+      "max_drawdown": 0.3,
+      "commission_rate": 0.0003,
+      "sell_tax_rate": 0.0005,
+      "slippage_rate": 0.001,
+      "initial_cash": 1000000,
+      "include_minute": false,
+      "industries": [],
+      "min_market_cap": null,
+      "max_market_cap": null,
+      "min_amount": null
+    }
+  },
+  "unsupported_open_gap": {
+    "accepted": false,
+    "reason": "暂不能执行以下明确要求：用户要求标签为次日开盘价除以当日收盘价减1大于0（隔夜高开事件），成交时点为 t+1 开盘买入并在同一时点判断。引擎固定标签为 open[t+h+1]/open[t+1]-1，成交时点为 t+1 开盘买入、持有 h 个交易日后开盘退出，无法实现该标签和时点。"
+  },
+  "original_request": {
+    "accepted": false,
+    "reason": "暂不能执行以下明确要求：提取并利用每日收盘前最后30分钟到收盘前5分钟（即14:30-14:55）的分钟行情数据作为特征；预测次日开盘价相对于今日收盘价的隔夜高开幅度（open[t+1]/close[t]-1）；获取完整财务报表指标（如营收、净利润等）；当前仅支持行业、市值、PE/PB、新闻数量"
+  }
+}

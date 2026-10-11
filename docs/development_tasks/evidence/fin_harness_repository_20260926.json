@@ -1,0 +1,115 @@
+{
+  "date": "2026-09-26",
+  "fin_harness_commit": "38ea60b22f86425fc8a52fdc88de7550a971035b",
+  "fin_harness_tag": "fin-v0.1.0",
+  "fin_agent_base_commit": "95449b3a2304c42b57839780b22dea436c30aa3a",
+  "fin_agent_worktree_clean": false,
+  "fin_agent_tracked_runtime_diff_sha256": "c693fa6c95de6d098b4bfa5e8fd6174fd71a1867181954656b6f3a35cf84bc90",
+  "diff_scope": [
+    "src",
+    "tests",
+    "scripts",
+    "config"
+  ],
+  "environment": {
+    "system": "Darwin",
+    "machine": "x86_64",
+    "python": "3.12.14",
+    "node": "v24.19.0",
+    "profile": "sdk-minimal",
+    "model": "loopback SSE fixture",
+    "harness_home": "isolated temporary directory",
+    "pnpm": "11.19.0",
+    "npm": "10.9.3 (isolated temporary tooling directory)"
+  },
+  "checks": [
+    {
+      "command": "pnpm exec vitest run packages/llm/llm-deepseek/tests/translate.spec.ts packages/core/session/tests/request-history.spec.ts packages/core/agent-loop/tests/contract-regressions.spec.ts packages/llm/token-meter/tests/token-meter.spec.ts packages/llm/token-meter/tests/token-usage-projection.spec.ts",
+      "passed": 127,
+      "files": 5
+    },
+    {
+      "command": "node --test tests/dsh_finance_loop_policy.test.mjs tests/custom_tool_dsh_loop_policy.test.mjs",
+      "passed": 74
+    },
+    {
+      "command": ".venv/bin/python -m pytest -q tests/test_dsh_source_launcher.py tests/test_financial_qa_dsh_runtime.py tests/test_custom_tool_dsh_runtime.py",
+      "passed": 66
+    },
+    {
+      "command": ".venv/bin/python scripts/verify_finance_dsh_history_replay.py",
+      "result": {
+        "passed": true,
+        "model_requests": 6,
+        "turns": 3,
+        "independent_history_hidden": true,
+        "followup_history_restored": true,
+        "native_selection_logged": true,
+        "paid_model_calls": 0,
+        "restoration_scope": "live session; separate native log replay tests cover reconstruction",
+        "workload": "synthetic questions and empty Skill selection; no financial database"
+      }
+    },
+    {
+      "command": "pnpm run test:docs",
+      "initial_result": "14 passed, 1 failed: newly added root AGENTS text exceeded the upstream word budget; shortened and verified with verify-doc-budgets and the final doc-sync run"
+    },
+    {
+      "command": "pnpm run doc-sync",
+      "aggregate_result": "31 passed, 1 failed (npm absent from the bundled toolchain)",
+      "failed_check": "doc-typecheck",
+      "remaining_failed_checks_after_retry": 0
+    },
+    {
+      "command": "pnpm run doc-typecheck",
+      "result": "passed after providing npm 10.9.3 in temporary PATH; 78 blocks compiled"
+    },
+    {
+      "command": "pnpm run lint",
+      "result": "passed; full upstream lint, after host build"
+    },
+    {
+      "command": "git push (normal pre-push hook: pnpm run typecheck)",
+      "result": "passed; 122.66 seconds; hook enabled"
+    }
+  ],
+  "limitations": [
+    "Fin consumer tests include pre-existing uncommitted runtime changes, identified by the scoped diff hash.",
+    "No paid model evaluation, financial database query, production deployment, load or endurance test.",
+    "Codeup branch protection and CI are not verified; SSH Git access does not establish web administration access."
+  ],
+  "runtime_equivalence": {
+    "tested_runtime_commit": "8bcea71528bdd50e4e802d787a3b75c73daafa75",
+    "unchanged_paths": [
+      "packages",
+      "apps",
+      "python",
+      "scripts",
+      "vendor",
+      "pnpm-lock.yaml",
+      "package.json"
+    ],
+    "method": "git diff --exit-code tested_runtime_commit fin_harness_commit -- paths"
+  },
+  "publication": {
+    "atomic_push": true,
+    "force_push": false,
+    "remote_default_branch": "master",
+    "verified_remote_refs": {
+      "HEAD": "38ea60b22f86425fc8a52fdc88de7550a971035b",
+      "refs/heads/master": "38ea60b22f86425fc8a52fdc88de7550a971035b",
+      "refs/heads/upstream/master": "477b4f420553e8a52c2fbccc464d7561b239c443",
+      "refs/tags/dsh-v0.1.2-alpha.1": "cd5ef8148158c3a752a658978873241fdf8e2bbc",
+      "refs/tags/dsh-v0.1.7-rc.2": "477b4f420553e8a52c2fbccc464d7561b239c443",
+      "refs/tags/fin-v0.1.0": "01d16febf35396866ae8a34793fc8a86c6c4bfaa",
+      "refs/tags/fin-v0.1.0^{}": "38ea60b22f86425fc8a52fdc88de7550a971035b"
+    },
+    "fresh_clone": {
+      "commit": "38ea60b22f86425fc8a52fdc88de7550a971035b",
+      "tree": "41f3fc68a1ec57eb0be2ea22b2af1cdae114f8b1",
+      "worktree_clean": true,
+      "source_tree_matches": true,
+      "dependencies_installed": false
+    }
+  }
+}

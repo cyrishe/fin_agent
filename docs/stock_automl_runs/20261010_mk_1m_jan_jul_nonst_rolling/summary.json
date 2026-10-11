@@ -1,0 +1,77 @@
+{
+  "source_rows": 56493,
+  "signal_dates": 139,
+  "test_first": "2026-02-02",
+  "test_last": "2026-07-30",
+  "test_days": 118,
+  "arms": {
+    "rolling20_tminus1": {
+      "test_days": 118,
+      "selected_days": 113,
+      "known_outcome_days": 113,
+      "unknown_outcome_days": 0,
+      "second_high_counts": {
+        "ge3": 26,
+        "1to3": 27,
+        "0to1": 21,
+        "lt0": 39
+      },
+      "sale_0940_counts": {
+        "ge3": 17,
+        "1to3": 13,
+        "0to1": 18,
+        "lt0": 65
+      },
+      "mean_0940_return_pct_per_trade": 0.004150351161916851,
+      "median_0940_return_pct_per_trade": -0.5288766659614901,
+      "random_expected_ge3_days": 12.476824743226862,
+      "random_p_at_least_ge3_hits": 0.11282701910722238
+    },
+    "full19_tminus2": {
+      "test_days": 118,
+      "selected_days": 115,
+      "known_outcome_days": 115,
+      "unknown_outcome_days": 0,
+      "second_high_counts": {
+        "ge3": 34,
+        "1to3": 26,
+        "0to1": 21,
+        "lt0": 34
+      },
+      "sale_0940_counts": {
+        "ge3": 21,
+        "1to3": 16,
+        "0to1": 19,
+        "lt0": 59
+      },
+      "mean_0940_return_pct_per_trade": 0.3162245041510925,
+      "median_0940_return_pct_per_trade": -0.09099181073703,
+      "random_expected_ge3_days": 12.476824743226862,
+      "random_p_at_least_ge3_hits": 0.010702041110547521
+    },
+    "p3_selected_tminus2": {
+      "test_days": 118,
+      "selected_days": 116,
+      "known_outcome_days": 116,
+      "unknown_outcome_days": 0,
+      "second_high_counts": {
+        "ge3": 24,
+        "1to3": 29,
+        "0to1": 16,
+        "lt0": 47
+      },
+      "sale_0940_counts": {
+        "ge3": 13,
+        "1to3": 17,
+        "0to1": 20,
+        "lt0": 66
+      },
+      "mean_0940_return_pct_per_trade": -0.6112822826596932,
+      "median_0940_return_pct_per_trade": -0.797462289495115,
+      "random_expected_ge3_days": 12.476824743226862,
+      "random_p_at_least_ge3_hits": 0.4820895853310021
+    }
+  },
+  "data_sha256": "951f104d85c5306024fc2c54acbd7f32420805b1fe3cac4cb6121e356df7e983",
+  "script_sha256": "f9da650a0537471d2db45b2a4b3edae5b1a024de54281bd81330264cc3cb755b"
+}

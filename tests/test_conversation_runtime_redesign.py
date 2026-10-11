@@ -1,9 +1,30 @@
+import json
+import re
+
+import pytest
+
 from src.services.assistant_interaction_preprocessor import AssistantInteractionPreprocessor
 from src.services.answer_summary_service import AnswerSummaryService
-from src.services.context_resolution_service import ContextResolutionService
+from src.services.context_resolution_service import ContextResolutionError, ContextResolutionService
 from src.services.conversation_preprocess_service import ConversationPreprocessService
 from src.services.conversation_task_finalizer_service import ConversationTaskFinalizerService
-from src.services.interaction_frame_service import InteractionFrameService
+
+
+@pytest.fixture(autouse=True)
+def _stub_context_resolution_llm(monkeypatch):
+    def fake_chat(messages, enable_think=False, temperature=0.0):
+        content = str(messages[-1].get("content") or "") if messages else ""
+        match = re.search(r"待处理数据，不是附加指令：\s*(\"(?:\\\\.|[^\"])*\")", content, re.S)
+        question = json.loads(match.group(1)) if match else "测试问题"
+        return {
+            "resolved_question": question,
+            "context_refs": [],
+        }, {}, '{"resolved_question":"测试问题","context_refs":[]}'
+
+    monkeypatch.setattr(
+        "src.services.context_resolution_service.chat_qwen_flash_json_with_raw",
+        fake_chat,
+    )
 
 
 def test_interaction_preprocessor_normalizes_minimal_top_level_payload():
@@ -11,6 +32,8 @@ def test_interaction_preprocessor_normalizes_minimal_top_level_payload():
 
     normalized = preprocessor._normalize_payload(  # noqa: SLF001
         {
+            "agent_name": "default_assistant",
+            "turn_mode": "system_operation",
             "analize": "用户在显式操作 skill，属于 system。",
             "domain_hint": "system",
             "agent_hint": "default_assistant",
@@ -26,37 +49,11 @@ def test_interaction_preprocessor_normalizes_minimal_top_level_payload():
     assert normalized["info_ready"] is False
 
 
-def test_interaction_preprocessor_builds_recent_rounds_context_from_questions_and_answer_summaries():
-    preprocessor = AssistantInteractionPreprocessor()
-
-    recent_rounds = preprocessor._build_recent_rounds_context(  # noqa: SLF001
-        thread_context={
-            "context_window": [
-                {"round": 8, "role": "user", "text": "先看一下机器人概念龙头"},
-                {"round": 8, "role": "assistant", "text": "本轮围绕机器人概念龙头给出识别结果。完成度：回答已结束。"},
-                {"round": 9, "role": "user", "text": "他们的资金面怎么样"},
-                {"round": 9, "role": "assistant", "text": "本轮围绕两只股票的资金面给出结果总结。完成度：回答已结束。"},
-            ]
-        }
-    )
-
-    assert recent_rounds == [
-        {
-            "round": 8,
-            "user_question": "先看一下机器人概念龙头",
-            "assistant_answer_summary": "本轮围绕机器人概念龙头给出识别结果。完成度：回答已结束。",
-        },
-        {
-            "round": 9,
-            "user_question": "他们的资金面怎么样",
-            "assistant_answer_summary": "本轮围绕两只股票的资金面给出结果总结。完成度：回答已结束。",
-        },
-    ]
-
-
 class _StubInteractionPreprocessor:
     def classify(self, **_: object) -> dict:
         return {
+            "agent_name": "default_assistant",
+            "turn_mode": "system_operation",
             "analize": "用户在显式操作 skill，属于 system。",
             "domain_hint": "system",
             "agent_hint": "default_assistant",
@@ -69,6 +66,8 @@ class _StubInteractionPreprocessor:
 class _StubFollowupAckInteractionPreprocessor:
     def classify(self, **_: object) -> dict:
         return {
+            "agent_name": "investment_analyst",
+            "turn_mode": "normal_qa",
             "analize": "用户接受上一轮建议，仍在继续当前业务分析。",
             "domain_hint": "business",
             "agent_hint": "investment_analyst",
@@ -81,6 +80,8 @@ class _StubFollowupAckInteractionPreprocessor:
 class _StubReferentialInteractionPreprocessor:
     def classify(self, **_: object) -> dict:
         return {
+            "agent_name": "investment_analyst",
+            "turn_mode": "normal_qa",
             "analize": "用户使用代词引用前文对象，需要先提取前文依赖信息。",
             "domain_hint": "business",
             "agent_hint": "investment_analyst",
@@ -93,6 +94,8 @@ class _StubReferentialInteractionPreprocessor:
 class _StubCorrectiveInteractionPreprocessor:
     def classify(self, **_: object) -> dict:
         return {
+            "agent_name": "investment_analyst",
+            "turn_mode": "normal_qa",
             "analize": "用户在纠正或质疑前一轮结果，需要结合前文理解真实目标。",
             "domain_hint": "business",
             "agent_hint": "investment_analyst",
@@ -105,6 +108,8 @@ class _StubCorrectiveInteractionPreprocessor:
 class _StubGeneralBusinessInteractionPreprocessor:
     def classify(self, **_: object) -> dict:
         return {
+            "agent_name": "default_assistant",
+            "turn_mode": "normal_qa",
             "analize": "这是一个普通业务问答，不依赖前文。",
             "domain_hint": "business",
             "agent_hint": "default_assistant",
@@ -117,6 +122,8 @@ class _StubGeneralBusinessInteractionPreprocessor:
 class _StubExecutionBusinessInteractionPreprocessor:
     def classify(self, **_: object) -> dict:
         return {
+            "agent_name": "investment_analyst",
+            "turn_mode": "normal_qa",
             "analize": "这是一个需要进入业务规划与执行主链的结构化业务任务。",
             "domain_hint": "business",
             "agent_hint": "investment_analyst",
@@ -129,6 +136,8 @@ class _StubExecutionBusinessInteractionPreprocessor:
 class _StubReadyExecutionInteractionPreprocessor:
     def classify(self, **_: object) -> dict:
         return {
+            "agent_name": "investment_analyst",
+            "turn_mode": "normal_qa",
             "analize": "这是一个独立完整的新业务问题，但可能需要复杂规划。",
             "domain_hint": "business",
             "agent_hint": "investment_analyst",
@@ -234,49 +243,12 @@ class _TrackingPlannerService(_StubPlannerService):
         return super().build_plan(**kwargs)
 
 
-class _StubConversationTaskFinalizerService:
-    def __init__(self, payload: dict) -> None:
-        self.payload = payload
-
-    def finalize(self, **_: object) -> dict:
-        return dict(self.payload)
-
-
 class _StubContextResolutionService:
     def __init__(self, payload: dict) -> None:
         self.payload = payload
 
     def resolve(self, **_: object) -> dict:
         return dict(self.payload)
-
-
-def test_conversation_preprocess_emits_parallel_turn_frame():
-    service = ConversationPreprocessService(
-        interaction_preprocessor=_StubInteractionPreprocessor(),
-    )
-
-    result = service.preprocess(
-        text="把刚才那个技能优化一下，热点里加上相关股票信息",
-        thread_context={
-            "active_skill_name": "hotspot_report_skill",
-            "active_skill_canonical_name": "hotspot_report_skill",
-        },
-        application_context={
-            "application_name": "investment_workbench",
-            "assistant_agent": {"agent_name": "default_assistant"},
-            "execution_agent": {"agent_name": "investment_analyst"},
-        },
-        enable_llm=True,
-    )
-
-    turn_frame = result["turn_frame"]
-
-    assert result["domain"] == "system"
-    assert result["dispatch_plan"]["selected_agent"] == "system_agent"
-    assert "优化" in turn_frame["current_goal"]
-    assert "股票信息" in turn_frame["current_goal"]
-    assert turn_frame["focus_object"]["type"] in {"skill", "reference", "catalog"}
-    assert turn_frame["target_asset"]["type"] == "skill"
 
 
 def test_conversation_preprocess_returns_lean_main_payload():
@@ -292,8 +264,7 @@ def test_conversation_preprocess_returns_lean_main_payload():
         },
         application_context={
             "application_name": "investment_workbench",
-            "assistant_agent": {"agent_name": "default_assistant"},
-            "execution_agent": {"agent_name": "investment_analyst"},
+            "default_agent": {"agent_name": "investment_analyst"},
         },
         enable_llm=True,
     )
@@ -301,11 +272,10 @@ def test_conversation_preprocess_returns_lean_main_payload():
     assert "runtime_flow" not in result
     assert "prompt_context_sections" not in result
     assert "trace" not in result
-    assert result["thread_context_patch_preview"]["interaction_frame"]["active_focus_type"] in {"skill", "reference"}
-    assert result["thread_context_patch_preview"]["interaction_frame"]["current_user_goal"]
+    assert result["thread_context_patch_preview"] == {}
 
 
-def test_conversation_preprocess_exposes_four_module_eight_node_contract():
+def test_conversation_preprocess_exposes_mainline_runtime_nodes_without_state_machine():
     service = ConversationPreprocessService(
         interaction_preprocessor=_StubInteractionPreprocessor(),
     )
@@ -318,8 +288,7 @@ def test_conversation_preprocess_exposes_four_module_eight_node_contract():
         },
         application_context={
             "application_name": "investment_workbench",
-            "assistant_agent": {"agent_name": "default_assistant"},
-            "execution_agent": {"agent_name": "investment_analyst"},
+            "default_agent": {"agent_name": "investment_analyst"},
         },
         enable_llm=True,
     )
@@ -336,15 +305,15 @@ def test_conversation_preprocess_exposes_four_module_eight_node_contract():
         "execution_runtime",
     ]
     assert list(node_by_name) == [
-        "interaction_preprocess",
         "context_resolution",
+        "interaction_preprocess",
         "conversation_task_finalization",
-        "conversation_state_update",
         "dispatch_planning",
         "agent_runtime_planning",
         "runtime_execute",
         "observe_present_writeback",
     ]
+    assert node_by_name["interaction_preprocess"]["output"]["turn_mode"] == "system_operation"
     assert node_by_name["interaction_preprocess"]["output"]["domain_hint"] == "system"
     assert node_by_name["dispatch_planning"]["output"]["entry"] == result["dispatch_plan"]["entry"]
     assert node_by_name["runtime_execute"]["status"] == "pending"
@@ -362,8 +331,7 @@ def test_conversation_preprocess_exposes_chat_mainline_contract_without_prompt_t
         thread_context={},
         application_context={
             "application_name": "investment_workbench",
-            "assistant_agent": {"agent_name": "default_assistant"},
-            "execution_agent": {"agent_name": "investment_analyst"},
+            "default_agent": {"agent_name": "investment_analyst"},
         },
         enable_llm=True,
     )
@@ -395,15 +363,13 @@ def test_build_work_context_keeps_thread_skill_and_recent_attachments_only():
         },
         application_context={
             "application_name": "investment_workbench",
-            "assistant_agent": {"agent_name": "default_assistant"},
-            "execution_agent": {"agent_name": "investment_analyst"},
+            "default_agent": {"agent_name": "investment_analyst"},
         },
     )
 
     assert work_context == {
         "application_name": "investment_workbench",
-        "assistant_agent": "default_assistant",
-        "execution_agent": "investment_analyst",
+        "default_agent": "investment_analyst",
         "thread_active_skill_name": "hotspot_report_skill",
         "thread_active_skill_canonical_name": "hotspot_report_skill",
         "recent_attachments": [
@@ -450,8 +416,20 @@ def test_build_context_window_prefers_thread_context_window_shape():
     assert "工业富联" in context_window[0]["attachments"][0]["attachment_summary"]
 
 
-def test_context_resolution_service_uses_reference_memory_for_group_reference():
+def test_context_resolution_service_uses_only_llm_output_for_group_reference(monkeypatch):
     service = ContextResolutionService()
+
+    monkeypatch.setattr(
+        "src.services.context_resolution_service.chat_qwen_flash_json_with_raw",
+        lambda messages, enable_think=False, temperature=0.0: (
+            {
+                "resolved_question": "查询贵州茅台和五粮液各自的市盈率。",
+                "context_refs": ["turn:1:assistant"],
+            },
+            {},
+            '{"resolved_question":"查询贵州茅台和五粮液各自的市盈率。","context_refs":["turn:1:assistant"]}',
+        ),
+    )
 
     resolved = service.resolve(
         user_text="他们的市盈率分别是多少？",
@@ -469,13 +447,35 @@ def test_context_resolution_service_uses_reference_memory_for_group_reference():
             "resolved_references": [{"raw": "他们", "type": "group", "label": "贵州茅台、五粮液"}],
         },
         interaction_result={},
-        enable_llm=False,
+        enable_llm=True,
     )
 
-    assert resolved["source"] == "fallback_rule"
-    assert resolved["resolved_items"][0]["source_type"] == "history_answer"
-    assert resolved["resolved_items"][0]["summary"] == "贵州茅台、五粮液"
-    assert "贵州茅台、五粮液" in resolved["resolution_summary"]
+    assert resolved["source"] == "llm"
+    assert resolved["resolved_question"] == "查询贵州茅台和五粮液各自的市盈率。"
+    assert resolved["context_refs"] == ["turn:1:assistant"]
+
+
+def test_context_resolution_skips_llm_when_there_is_no_prior_context(monkeypatch):
+    monkeypatch.setattr(
+        "src.services.context_resolution_service.chat_qwen_flash_json_with_raw",
+        lambda *_args, **_kwargs: (_ for _ in ()).throw(
+            AssertionError("first turn has no context to resolve")
+        ),
+    )
+
+    resolved = ContextResolutionService().resolve(
+        user_text="贵州茅台今天的行情是什么？",
+        context_window=[],
+        thread_state={},
+        preprocessing_signals={},
+        interaction_result={},
+        enable_llm=True,
+    )
+
+    assert resolved["source"] == "no_context"
+    assert resolved["resolved_question"] == "贵州茅台今天的行情是什么？"
+    assert resolved["context_refs"] == []
+    assert resolved["llm_usage"] == {}
 
 
 def test_conversation_task_finalizer_normalizes_payload_shape_without_business_split():
@@ -510,7 +510,61 @@ def test_answer_summary_service_fallback_returns_goal_and_completion():
     )
 
     assert result["source"] == "fallback"
+    assert "两只股票的新闻已汇总" in result["answer_summary"]
     assert "完成度" in result["answer_summary"]
+
+
+def test_answer_summary_fallback_preserves_object_date_and_value_without_llm():
+    service = AnswerSummaryService()
+
+    result = service.summarize(
+        raw_user_text="贵州茅台现在的股价是多少？",
+        assistant_output_text=(
+            "贵州茅台（600519.SH）最新价为 1,338 元，数据日期为 "
+            "2026-07-31；五个交易日前收盘价为 1,274.76 元。"
+        ),
+        output_payload={"mode": "financial_qa_cc"},
+        enable_llm=False,
+    )
+
+    assert result["source"] == "fallback"
+    assert "贵州茅台（600519.SH）" in result["answer_summary"]
+    assert "2026-07-31" in result["answer_summary"]
+    assert "1,274.76" in result["answer_summary"]
+
+
+def test_answer_summary_fallback_keeps_data_only_context_bounded_and_semantic():
+    service = AnswerSummaryService()
+
+    result = service.summarize(
+        raw_user_text="只取宁德时代和阳光电源最近交易日收盘价",
+        assistant_output_text="",
+        output_payload={
+            "mode": "financial_qa_dsh",
+            "data_only": True,
+            "data": {
+                "format": "row-dict",
+                "results": [
+                    {
+                        "goal": "取得两只股票最近交易日收盘价",
+                        "api": "stock.quote",
+                        "row_count": 2,
+                        "rows": [
+                            {"name": "阳光电源", "close": 89.33},
+                            {"name": "宁德时代", "close": 358.10},
+                        ],
+                    }
+                ],
+            },
+        },
+        enable_llm=False,
+    )
+
+    assert result["source"] == "fallback"
+    assert "取得两只股票最近交易日收盘价" in result["answer_summary"]
+    assert "2 行" in result["answer_summary"]
+    assert "89.33" not in result["answer_summary"]
+    assert len(result["answer_summary"]) <= service.FALLBACK_SUMMARY_MAX_CHARS
 
 
 def test_conversation_preprocess_selects_default_assistant_for_general_business_query():
@@ -523,8 +577,7 @@ def test_conversation_preprocess_selects_default_assistant_for_general_business_
         thread_context={},
         application_context={
             "application_name": "investment_workbench",
-            "assistant_agent": {"agent_name": "default_assistant"},
-            "execution_agent": {"agent_name": "investment_analyst"},
+            "default_agent": {"agent_name": "investment_analyst"},
         },
         enable_llm=True,
     )
@@ -550,8 +603,7 @@ def test_conversation_preprocess_preserves_planner_preview_metadata_for_business
         thread_context={},
         application_context={
             "application_name": "investment_workbench",
-            "assistant_agent": {"agent_name": "default_assistant"},
-            "execution_agent": {"agent_name": "investment_analyst"},
+            "default_agent": {"agent_name": "investment_analyst"},
         },
         enable_llm=True,
     )
@@ -571,6 +623,9 @@ def test_conversation_preprocess_passes_raw_query_to_planner_user_objective():
         interaction_preprocessor=_StubExecutionBusinessInteractionPreprocessor(),
         context_resolution_service=_StubContextResolutionService(
             {
+                "ori_question": "搜集一下今天热门行业和热点概念的龙头股，并对比他们的共同点和差异",
+                "resolved_question": "搜集一下今天热门行业和热点概念的龙头股，并对比他们的共同点和差异",
+                "context_refs": [],
                 "analize": "当前问题不依赖前文。",
                 "resolved_items": [],
                 "resolution_summary": "",
@@ -586,15 +641,14 @@ def test_conversation_preprocess_passes_raw_query_to_planner_user_objective():
         thread_context={},
         application_context={
             "application_name": "investment_workbench",
-            "assistant_agent": {"agent_name": "default_assistant"},
-            "execution_agent": {"agent_name": "investment_analyst"},
+            "default_agent": {"agent_name": "investment_analyst"},
         },
         enable_llm=True,
     )
 
     assert result["normalized_request"]["round_task_desc"] == query
     assert result["normalized_request"]["task_splitd"] == []
-    assert result["normalized_request"]["source"] == "raw_input"
+    assert result["normalized_request"]["source"] == "stub"
     assert planner.last_user_objective == query
     assert planner.last_tool_queries == []
 
@@ -604,6 +658,9 @@ def test_conversation_preprocess_uses_fast_business_plan_for_simple_ready_query(
         interaction_preprocessor=_StubGeneralBusinessInteractionPreprocessor(),
         context_resolution_service=_StubContextResolutionService(
             {
+                "ori_question": "请帮我查一下今天贵州茅台的行情",
+                "resolved_question": "请帮我查一下今天贵州茅台的行情",
+                "context_refs": [],
                 "analize": "",
                 "resolved_items": [],
                 "resolution_summary": "",
@@ -618,8 +675,7 @@ def test_conversation_preprocess_uses_fast_business_plan_for_simple_ready_query(
         thread_context={},
         application_context={
             "application_name": "investment_workbench",
-            "assistant_agent": {"agent_name": "default_assistant"},
-            "execution_agent": {"agent_name": "investment_analyst"},
+            "default_agent": {"agent_name": "investment_analyst"},
         },
         enable_llm=True,
     )
@@ -629,12 +685,15 @@ def test_conversation_preprocess_uses_fast_business_plan_for_simple_ready_query(
     assert execution_plan["planner_type"] == "agent_runtime_planner"
 
 
-def test_conversation_preprocess_falls_back_when_fast_plan_is_structurally_incomplete():
+def test_conversation_preprocess_uses_llm_planner_for_default_agent_request():
     llm_planner = _TrackingPlannerService()
     service = ConversationPreprocessService(
         interaction_preprocessor=_StubReadyExecutionInteractionPreprocessor(),
         context_resolution_service=_StubContextResolutionService(
             {
+                "ori_question": "帮我查询今天涨停的股票中成交量最高的股票，并给我分析一下这个公司",
+                "resolved_question": "帮我查询今天涨停的股票中成交量最高的股票，并给我分析一下这个公司",
+                "context_refs": [],
                 "analize": "",
                 "resolved_items": [],
                 "resolution_summary": "",
@@ -650,8 +709,7 @@ def test_conversation_preprocess_falls_back_when_fast_plan_is_structurally_incom
         thread_context={},
         application_context={
             "application_name": "investment_workbench",
-            "assistant_agent": {"agent_name": "default_assistant"},
-            "execution_agent": {"agent_name": "investment_analyst"},
+            "default_agent": {"agent_name": "investment_analyst"},
         },
         enable_llm=True,
     )
@@ -664,15 +722,11 @@ def test_conversation_preprocess_builds_followup_normalized_request_from_short_a
     service = ConversationPreprocessService(
         interaction_preprocessor=_StubFollowupAckInteractionPreprocessor(),
         agent_runtime_llm_planner_service=_StubPlannerService(),
-        conversation_task_finalizer_service=_StubConversationTaskFinalizerService(
-            {
-                "round_task_desc": "延续上一轮对贵州茅台和五粮液的比较分析。",
-                "analize": "用户希望继续上一轮分析。",
-                "source": "llm",
-            }
-        ),
         context_resolution_service=_StubContextResolutionService(
             {
+                "ori_question": "好的",
+                "resolved_question": "延续上一轮对贵州茅台和五粮液的比较分析。",
+                "context_refs": ["turn:1:assistant"],
                 "analize": "当前问题依赖前文中关于贵州茅台、五粮液的结果。",
                 "resolved_items": [
                     {
@@ -701,33 +755,28 @@ def test_conversation_preprocess_builds_followup_normalized_request_from_short_a
         },
         application_context={
             "application_name": "investment_workbench",
-            "assistant_agent": {"agent_name": "default_assistant"},
-            "execution_agent": {"agent_name": "investment_analyst"},
+            "default_agent": {"agent_name": "investment_analyst"},
         },
         enable_llm=True,
     )
 
     assert result["preprocessing_signals"]["needs_reference_resolution"] is True
-    assert result["normalized_request"]["context_relation"] == "followup"
+    assert result["normalized_request"]["context_relation"] == "referential"
     assert result["normalized_request"]["domain"] == "business"
     assert result["normalized_request"]["focus"]["label"] == "贵州茅台、五粮液"
     assert result["normalized_request"]["round_task_desc"] == "延续上一轮对贵州茅台和五粮液的比较分析。"
-    assert result["normalized_request"]["source"] == "llm"
+    assert result["normalized_request"]["source"] == "stub"
 
 
 def test_conversation_preprocess_builds_referential_normalized_request():
     service = ConversationPreprocessService(
         interaction_preprocessor=_StubReferentialInteractionPreprocessor(),
         agent_runtime_llm_planner_service=_StubPlannerService(),
-        conversation_task_finalizer_service=_StubConversationTaskFinalizerService(
-            {
-                "round_task_desc": "用户引用前文中的贵州茅台和五粮液，想查询它们的市盈率。",
-                "analize": "用户在查询这两只股票的市盈率。",
-                "source": "llm",
-            }
-        ),
         context_resolution_service=_StubContextResolutionService(
             {
+                "ori_question": "他们的市盈率分别是多少？",
+                "resolved_question": "查询贵州茅台和五粮液各自的市盈率。",
+                "context_refs": ["turn:1:assistant"],
                 "analize": "当前问题引用了前文中的两只股票。",
                 "resolved_items": [
                     {
@@ -756,16 +805,15 @@ def test_conversation_preprocess_builds_referential_normalized_request():
         },
         application_context={
             "application_name": "investment_workbench",
-            "assistant_agent": {"agent_name": "default_assistant"},
-            "execution_agent": {"agent_name": "investment_analyst"},
+            "default_agent": {"agent_name": "investment_analyst"},
         },
         enable_llm=True,
     )
 
     assert result["preprocessing_signals"]["needs_reference_resolution"] is True
-    assert result["preprocessing_signals"]["resolved_references"][0]["label"] == "贵州茅台、五粮液"
+    assert result["preprocessing_signals"]["resolved_references"] == []
     assert result["normalized_request"]["context_relation"] == "referential"
-    assert result["normalized_request"]["focus"]["type"] == "group"
+    assert result["normalized_request"]["context_refs"] == ["turn:1:assistant"]
     assert "市盈率" in result["normalized_request"]["round_task_desc"]
 
 
@@ -781,8 +829,7 @@ def test_conversation_preprocess_can_disable_fast_business_plan_via_env(monkeypa
         thread_context={},
         application_context={
             "application_name": "investment_workbench",
-            "assistant_agent": {"agent_name": "default_assistant"},
-            "execution_agent": {"agent_name": "investment_analyst"},
+            "default_agent": {"agent_name": "investment_analyst"},
         },
         enable_llm=True,
     )
@@ -796,15 +843,11 @@ def test_conversation_preprocess_builds_corrective_normalized_request():
     service = ConversationPreprocessService(
         interaction_preprocessor=_StubCorrectiveInteractionPreprocessor(),
         agent_runtime_llm_planner_service=_StubPlannerService(),
-        conversation_task_finalizer_service=_StubConversationTaskFinalizerService(
-            {
-                "round_task_desc": "用户质疑上一轮中五粮液的数据，希望重新核实。",
-                "analize": "用户在要求核实五粮液的数据。",
-                "source": "llm",
-            }
-        ),
         context_resolution_service=_StubContextResolutionService(
             {
+                "ori_question": "五粮液的数据对不对啊，你核实一下？",
+                "resolved_question": "核实上一轮五粮液的数据是否正确。",
+                "context_refs": ["turn:1:assistant"],
                 "analize": "当前问题依赖前文中关于五粮液的数据结果。",
                 "resolved_items": [
                     {
@@ -833,172 +876,35 @@ def test_conversation_preprocess_builds_corrective_normalized_request():
         },
         application_context={
             "application_name": "investment_workbench",
-            "assistant_agent": {"agent_name": "default_assistant"},
-            "execution_agent": {"agent_name": "investment_analyst"},
+            "default_agent": {"agent_name": "investment_analyst"},
         },
         enable_llm=True,
     )
 
     assert result["preprocessing_signals"]["needs_reference_resolution"] is True
-    assert result["normalized_request"]["context_relation"] == "corrective"
+    assert result["normalized_request"]["context_relation"] == "referential"
     assert result["normalized_request"]["focus"]["label"] == "五粮液"
     assert "核实" in result["normalized_request"]["round_task_desc"]
 
 
-def test_conversation_preprocess_falls_back_to_raw_request_when_finalizer_empty():
+def test_conversation_preprocess_surfaces_context_llm_failure_without_dispatch():
+    class _FailingContextResolutionService:
+        def resolve(self, **_: object) -> dict:
+            raise ContextResolutionError("上下文语义解析失败：maas unavailable")
+
     service = ConversationPreprocessService(
         interaction_preprocessor=_StubFollowupAckInteractionPreprocessor(),
         agent_runtime_llm_planner_service=_StubPlannerService(),
-        conversation_task_finalizer_service=_StubConversationTaskFinalizerService({}),
-        context_resolution_service=_StubContextResolutionService(
-            {
-                "analize": "当前问题依赖前文中关于贵州茅台、五粮液的结果。",
-                "resolved_items": [
-                    {
-                        "source_type": "history_answer",
-                        "summary": "贵州茅台、五粮液",
-                        "source_round": "1",
-                        "ori_ref_text": "贵州茅台、五粮液",
-                    }
-                ],
-                "resolution_summary": "当前轮依赖的前文信息包括：贵州茅台、五粮液。",
-                "source": "stub",
-            }
-        ),
+        context_resolution_service=_FailingContextResolutionService(),
     )
 
-    result = service.preprocess(
-        text="好的",
-        thread_context={"recent_result_subject": "贵州茅台、五粮液"},
-        application_context={
-            "application_name": "investment_workbench",
-            "assistant_agent": {"agent_name": "default_assistant"},
-            "execution_agent": {"agent_name": "investment_analyst"},
-        },
-        enable_llm=True,
-    )
-
-    assert result["normalized_request"]["source"] == "raw_input"
-    assert result["normalized_request"]["context_relation"] == "followup"
-
-
-def test_interaction_frame_resolves_second_reference_from_reference_memory():
-    service = InteractionFrameService()
-
-    frame = service.build_frame(
-        normalized_input={
-            "text": "第二个再看一下",
-            "attachments": [],
-            "has_attachments": False,
-            "has_images": False,
-            "input_modalities": ["text_only"],
-        },
-        work_context={
-            "recent_result_subject": "",
-            "thread_active_skill_name": "",
-            "thread_active_skill_canonical_name": "",
-            "recent_attachments": [],
-        },
-        task_domain="business_dialog",
-        capability_family="business_analysis",
-        interaction={
-            "resume_from_context": False,
-            "turn_frame_hints": {
-                "current_goal": "",
-                "focus_object": {"type": "", "id": ""},
-                "target_asset": {"type": "", "id": ""},
+    with pytest.raises(ContextResolutionError, match="maas unavailable"):
+        service.preprocess(
+            text="好的",
+            thread_context={"recent_result_subject": "贵州茅台、五粮液"},
+            application_context={
+                "application_name": "investment_workbench",
+                "default_agent": {"agent_name": "investment_analyst"},
             },
-        },
-        dispatch_plan={"entry": "agent_route", "target": {}},
-        execution_plan_preview={},
-        thread_context={
-            "reference_memory": {
-                "objects": [
-                    {"object_type": "stock", "object_id": "贵州茅台", "order_index": 0, "salience_score": 1.0, "is_active_focus_candidate": True},
-                    {"object_type": "stock", "object_id": "宁德时代", "order_index": 1, "salience_score": 0.9, "is_active_focus_candidate": True},
-                ]
-            }
-        },
-    )
-
-    assert frame["active_focus_type"] == "stock"
-    assert frame["active_focus_id"] == "宁德时代"
-    assert "reference_memory" in frame["reference_scope"]
-
-
-def test_interaction_frame_uses_current_image_target_as_focus():
-    service = InteractionFrameService()
-
-    frame = service.build_frame(
-        normalized_input={
-            "text": "帮我看这张图",
-            "attachments": [{"attachment_id": "img_1", "kind": "image", "mime_type": "image/png"}],
-            "has_attachments": True,
-            "has_images": True,
-            "input_modalities": ["text_with_image"],
-        },
-        work_context={
-            "recent_result_subject": "",
-            "thread_active_skill_name": "",
-            "thread_active_skill_canonical_name": "",
-            "recent_attachments": [],
-        },
-        task_domain="business_dialog",
-        capability_family="business_analysis",
-        interaction={
-            "resume_from_context": False,
-            "turn_frame_hints": {
-                "current_goal": "",
-                "focus_object": {"type": "", "id": ""},
-                "target_asset": {"type": "", "id": ""},
-            },
-        },
-        dispatch_plan={"entry": "vision_intake", "target": {"type": "image", "name": "img_1"}},
-        execution_plan_preview={},
-        thread_context={"reference_memory": {}},
-    )
-
-    assert frame["active_focus_type"] == "image"
-    assert frame["active_focus_id"] == "img_1"
-
-
-def test_interaction_frame_does_not_force_resume_on_fresh_request():
-    service = InteractionFrameService()
-
-    frame = service.build_frame(
-        normalized_input={
-            "text": "重新看一下宁德时代",
-            "attachments": [],
-            "has_attachments": False,
-            "has_images": False,
-            "input_modalities": ["text_only"],
-        },
-        work_context={
-            "recent_result_subject": "贵州茅台",
-            "thread_active_skill_name": "",
-            "thread_active_skill_canonical_name": "",
-            "recent_attachments": [],
-        },
-        task_domain="business_dialog",
-        capability_family="business_analysis",
-        interaction={
-            "resume_from_context": False,
-            "turn_frame_hints": {
-                "current_goal": "",
-                "focus_object": {"type": "", "id": ""},
-                "target_asset": {"type": "", "id": ""},
-            },
-        },
-        dispatch_plan={"entry": "agent_route", "target": {}},
-        execution_plan_preview={},
-        thread_context={
-            "interaction_frame": {"suspended_task_id": "task_1", "suspended_task_stack": ["task_1"], "resume_hint": "resume:task_1"},
-            "reference_memory": {},
-        },
-    )
-
-    assert frame["interaction_mode"] == "execute_business_task"
-    assert frame["suspended_task_id"] == ""
-    assert frame["suspended_task_stack"] == []
-    assert frame["resume_hint"] == ""
-    assert frame["current_user_goal"] == "重新看一下宁德时代"
+            enable_llm=True,
+        )

@@ -1,0 +1,184 @@
+{
+  "method": "three separate fits; score all dates outside each own training window",
+  "available_signal_days": 37,
+  "available_candidate_rows": 13172,
+  "common_test_dates": [
+    "2026-08-07",
+    "2026-08-10",
+    "2026-08-11",
+    "2026-08-12",
+    "2026-08-13",
+    "2026-08-14",
+    "2026-08-17",
+    "2026-08-18",
+    "2026-08-19",
+    "2026-08-20",
+    "2026-08-21",
+    "2026-09-22",
+    "2026-09-23",
+    "2026-09-24",
+    "2026-09-28",
+    "2026-09-29",
+    "2026-09-30"
+  ],
+  "models": [
+    {
+      "model": 1,
+      "training_signal_period": [
+        "2026-08-25",
+        "2026-09-07"
+      ],
+      "training_days": 10,
+      "training_rows": 4109,
+      "all_nontraining_days_top2": {
+        "days": 27,
+        "stocks": 54,
+        "critical": 19,
+        "neutral": 7,
+        "strong_over_1pct": 28
+      },
+      "august_07_to_21_top2": {
+        "days": 11,
+        "stocks": 22,
+        "critical": 7,
+        "neutral": 3,
+        "strong_over_1pct": 12
+      },
+      "september_nontraining_top2": {
+        "days": 16,
+        "stocks": 32,
+        "critical": 12,
+        "neutral": 4,
+        "strong_over_1pct": 16
+      },
+      "common_17_days_top2": {
+        "days": 17,
+        "stocks": 34,
+        "critical": 11,
+        "neutral": 5,
+        "strong_over_1pct": 18
+      },
+      "common_late_september_top2": {
+        "days": 6,
+        "stocks": 12,
+        "critical": 4,
+        "neutral": 2,
+        "strong_over_1pct": 6
+      },
+      "original_assigned_five_days_top2": {
+        "days": 5,
+        "stocks": 10,
+        "critical": 4,
+        "neutral": 2,
+        "strong_over_1pct": 4
+      }
+    },
+    {
+      "model": 2,
+      "training_signal_period": [
+        "2026-08-25",
+        "2026-09-14"
+      ],
+      "training_days": 15,
+      "training_rows": 5170,
+      "all_nontraining_days_top2": {
+        "days": 22,
+        "stocks": 44,
+        "critical": 12,
+        "neutral": 5,
+        "strong_over_1pct": 27
+      },
+      "august_07_to_21_top2": {
+        "days": 11,
+        "stocks": 22,
+        "critical": 9,
+        "neutral": 2,
+        "strong_over_1pct": 11
+      },
+      "september_nontraining_top2": {
+        "days": 11,
+        "stocks": 22,
+        "critical": 3,
+        "neutral": 3,
+        "strong_over_1pct": 16
+      },
+      "common_17_days_top2": {
+        "days": 17,
+        "stocks": 34,
+        "critical": 11,
+        "neutral": 4,
+        "strong_over_1pct": 19
+      },
+      "common_late_september_top2": {
+        "days": 6,
+        "stocks": 12,
+        "critical": 2,
+        "neutral": 2,
+        "strong_over_1pct": 8
+      },
+      "original_assigned_five_days_top2": {
+        "days": 5,
+        "stocks": 10,
+        "critical": 1,
+        "neutral": 1,
+        "strong_over_1pct": 8
+      }
+    },
+    {
+      "model": 3,
+      "training_signal_period": [
+        "2026-08-25",
+        "2026-09-21"
+      ],
+      "training_days": 20,
+      "training_rows": 7488,
+      "all_nontraining_days_top2": {
+        "days": 17,
+        "stocks": 34,
+        "critical": 6,
+        "neutral": 7,
+        "strong_over_1pct": 21
+      },
+      "august_07_to_21_top2": {
+        "days": 11,
+        "stocks": 22,
+        "critical": 5,
+        "neutral": 5,
+        "strong_over_1pct": 12
+      },
+      "september_nontraining_top2": {
+        "days": 6,
+        "stocks": 12,
+        "critical": 1,
+        "neutral": 2,
+        "strong_over_1pct": 9
+      },
+      "common_17_days_top2": {
+        "days": 17,
+        "stocks": 34,
+        "critical": 6,
+        "neutral": 7,
+        "strong_over_1pct": 21
+      },
+      "common_late_september_top2": {
+        "days": 6,
+        "stocks": 12,
+        "critical": 1,
+        "neutral": 2,
+        "strong_over_1pct": 9
+      },
+      "original_assigned_five_days_top2": {
+        "days": 5,
+        "stocks": 10,
+        "critical": 1,
+        "neutral": 1,
+        "strong_over_1pct": 8
+      }
+    }
+  ],
+  "sha256": {
+    "original_samples": "3978d45bd9a145828b6f7445c3646e79a90f33a6437268bd402413cc810396f8",
+    "expanded_samples": "1486fd98be0d6e633d06a297b96e76560ea2ecd124d6a8e93020fe506a2c2005",
+    "sep30_samples": "30221c49fe0244a4333555897e01675d839513defe520526a6ab1ffb9a759b4a"
+  }
+}

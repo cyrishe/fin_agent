@@ -136,6 +136,38 @@ def test_build_plan_keeps_fallback_execution_plan_with_forced_deep_mode():
     assert result["execution_plan"]["selected_path"]["reason"] == "stubbed_fallback"
 
 
+def test_build_plan_uses_fallback_when_deep_planner_returns_empty(monkeypatch):
+    capability_result = {
+        "skills": [],
+        "tools": [{"tool_name": "company_news", "score": 6}],
+        "planner_skills": [],
+        "planner_tools": [{"tool_name": "company_news", "score": 6}],
+    }
+    service = AgentRuntimeLLMPlannerService(
+        capability_search_service=_CapabilitySearchStub(capability_result),
+        fallback_planner=_FallbackPlannerStub(),
+        prompt_context_compiler=_PromptContextCompilerStub(),
+    )
+    monkeypatch.setattr(
+        service,
+        "_run_high_level_planner",
+        lambda **kwargs: {"payload": None, "text": "", "explanation": "", "usage": None},
+    )
+
+    result = service.build_plan(
+        user_objective="分析今天市场下跌的原因",
+        work_context={"preferred_thinking_mode": "deep"},
+        application_context={},
+        enable_llm=True,
+    )
+
+    assert result["ok"] is True
+    assert result["source"] == "planner_empty_fallback"
+    assert result["planner_question_contract"]["primary_lane"] == "deep_analysis"
+    assert result["execution_plan"]["question_contract"]["primary_lane"] == "deep_analysis"
+    assert result["execution_plan"]["selected_path"]["reason"] == "stubbed_fallback"
+
+
 def test_build_plan_routes_simple_queries_to_fast_thinking():
     capability_result = {
         "skills": [{"skill_name": "quote_lookup", "score": 4}],

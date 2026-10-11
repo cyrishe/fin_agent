@@ -1,0 +1,5 @@
+model,score,selected,ge3,lt0,lt_minus1,mean_return_pct
+logistic,p_ge3,40,3,19,13,0.17330153805884527
+logistic,p_ge3_minus_p_lt0,40,7,13,6,0.9993933688221548
+small_boosted_tree,p_ge3,40,8,14,7,1.033753273331529
+small_boosted_tree,p_ge3_minus_p_lt0,40,11,14,3,1.4505224163635362

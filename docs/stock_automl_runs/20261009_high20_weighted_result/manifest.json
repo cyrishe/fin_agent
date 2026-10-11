@@ -1,0 +1,28 @@
+{
+  "definition": "20 previous available signal days, highest-price training label, boundary downweight, top two daily",
+  "dates": [
+    "2026-09-02",
+    "2026-09-03",
+    "2026-09-04",
+    "2026-09-07",
+    "2026-09-08",
+    "2026-09-09",
+    "2026-09-10",
+    "2026-09-11",
+    "2026-09-14",
+    "2026-09-15",
+    "2026-09-16",
+    "2026-09-17",
+    "2026-09-18",
+    "2026-09-21",
+    "2026-09-22",
+    "2026-09-23",
+    "2026-09-24",
+    "2026-09-28",
+    "2026-09-29",
+    "2026-09-30"
+  ],
+  "same_as_hard_count": 37,
+  "weighted_only_count": 3,
+  "source": "docs/stock_automl_runs/20261009_fuzzy_boundary/daily_top2.csv"
+}

@@ -1,0 +1,623 @@
+{
+  "full19_tminus2/fixed_0940": {
+    "trades": 118,
+    "first": "2026-02-02",
+    "last": "2026-07-30",
+    "observed_exits": 116,
+    "unobservable_exits": 2,
+    "mean_trade_return_pct": 2.421603526580681,
+    "median_trade_return_pct": 3.586972389442711,
+    "positive": 89,
+    "ge3": 62,
+    "negative": 26,
+    "below_minus1": 17,
+    "gross_compounded_return_pct": null,
+    "historical_st": 101,
+    "entry_at_limit": 95,
+    "entry_status_unknown": 0,
+    "unknown_historical_st": 0,
+    "missing_daily_limit_marker": 0,
+    "historical_st_at_limit": 94,
+    "exit_rule_counts": {
+      "always_0940_close": 116,
+      "unobservable": 2
+    },
+    "monthly": {
+      "2026-02": {
+        "selected": 14,
+        "observed": 14,
+        "ge3": 8,
+        "mean_return_pct": 3.3602807115462103,
+        "compounded_return_pct": 58.47111352005487
+      },
+      "2026-03": {
+        "selected": 22,
+        "observed": 21,
+        "ge3": 12,
+        "mean_return_pct": 2.2646520671973676,
+        "compounded_return_pct": null
+      },
+      "2026-04": {
+        "selected": 21,
+        "observed": 20,
+        "ge3": 13,
+        "mean_return_pct": 3.2064010016421847,
+        "compounded_return_pct": null
+      },
+      "2026-05": {
+        "selected": 18,
+        "observed": 18,
+        "ge3": 13,
+        "mean_return_pct": 3.3641452938583734,
+        "compounded_return_pct": 79.8139050634767
+      },
+      "2026-06": {
+        "selected": 21,
+        "observed": 21,
+        "ge3": 11,
+        "mean_return_pct": 2.470666070719788,
+        "compounded_return_pct": 65.5799396492307
+      },
+      "2026-07": {
+        "selected": 22,
+        "observed": 22,
+        "ge3": 5,
+        "mean_return_pct": 0.4426255865071535,
+        "compounded_return_pct": 9.00462236977968
+      }
+    }
+  },
+  "full19_tminus2/staged_four_rules": {
+    "trades": 118,
+    "first": "2026-02-02",
+    "last": "2026-07-30",
+    "observed_exits": 116,
+    "unobservable_exits": 2,
+    "mean_trade_return_pct": 2.9652877522901444,
+    "median_trade_return_pct": 4.064219494667432,
+    "positive": 100,
+    "ge3": 78,
+    "negative": 16,
+    "below_minus1": 10,
+    "gross_compounded_return_pct": null,
+    "historical_st": 101,
+    "entry_at_limit": 95,
+    "entry_status_unknown": 0,
+    "unknown_historical_st": 0,
+    "missing_daily_limit_marker": 0,
+    "historical_st_at_limit": 94,
+    "exit_rule_counts": {
+      "first3_over_3pct": 78,
+      "rebound_1pp_from_prior_low": 26,
+      "0940_close": 8,
+      "last7_over_1pct": 4,
+      "unobservable": 2
+    },
+    "monthly": {
+      "2026-02": {
+        "selected": 14,
+        "observed": 14,
+        "ge3": 11,
+        "mean_return_pct": 3.9163124323897973,
+        "compounded_return_pct": 70.8844374928743
+      },
+      "2026-03": {
+        "selected": 22,
+        "observed": 21,
+        "ge3": 17,
+        "mean_return_pct": 3.4122607093835744,
+        "compounded_return_pct": null
+      },
+      "2026-04": {
+        "selected": 21,
+        "observed": 20,
+        "ge3": 16,
+        "mean_return_pct": 3.836233480549983,
+        "compounded_return_pct": null
+      },
+      "2026-05": {
+        "selected": 18,
+        "observed": 18,
+        "ge3": 15,
+        "mean_return_pct": 3.377808789069018,
+        "compounded_return_pct": 80.32698197888193
+      },
+      "2026-06": {
+        "selected": 21,
+        "observed": 21,
+        "ge3": 13,
+        "mean_return_pct": 3.3111381119431864,
+        "compounded_return_pct": 97.50867532753138
+      },
+      "2026-07": {
+        "selected": 22,
+        "observed": 22,
+        "ge3": 6,
+        "mean_return_pct": 0.4740182795498023,
+        "compounded_return_pct": 10.115911382115272
+      }
+    }
+  },
+  "full19_tminus2/staged_no_rebound": {
+    "trades": 118,
+    "first": "2026-02-02",
+    "last": "2026-07-30",
+    "observed_exits": 116,
+    "unobservable_exits": 2,
+    "mean_trade_return_pct": 2.8949619914517677,
+    "median_trade_return_pct": 4.064219494667432,
+    "positive": 99,
+    "ge3": 80,
+    "negative": 17,
+    "below_minus1": 14,
+    "gross_compounded_return_pct": null,
+    "historical_st": 101,
+    "entry_at_limit": 95,
+    "entry_status_unknown": 0,
+    "unknown_historical_st": 0,
+    "missing_daily_limit_marker": 0,
+    "historical_st_at_limit": 94,
+    "exit_rule_counts": {
+      "first3_over_3pct": 79,
+      "0940_close": 21,
+      "last7_over_1pct": 16,
+      "unobservable": 2
+    },
+    "monthly": {
+      "2026-02": {
+        "selected": 14,
+        "observed": 14,
+        "ge3": 11,
+        "mean_return_pct": 3.981159282269818,
+        "compounded_return_pct": 72.43480001171862
+      },
+      "2026-03": {
+        "selected": 22,
+        "observed": 21,
+        "ge3": 17,
+        "mean_return_pct": 3.2118085389791737,
+        "compounded_return_pct": null
+      },
+      "2026-04": {
+        "selected": 21,
+        "observed": 20,
+        "ge3": 16,
+        "mean_return_pct": 3.8169934613099645,
+        "compounded_return_pct": null
+      },
+      "2026-05": {
+        "selected": 18,
+        "observed": 18,
+        "ge3": 15,
+        "mean_return_pct": 3.377808789069018,
+        "compounded_return_pct": 80.32698197888193
+      },
+      "2026-06": {
+        "selected": 21,
+        "observed": 21,
+        "ge3": 15,
+        "mean_return_pct": 3.257324241470252,
+        "compounded_return_pct": 94.81393778535106
+      },
+      "2026-07": {
+        "selected": 22,
+        "observed": 22,
+        "ge3": 6,
+        "mean_return_pct": 0.32214296535218406,
+        "compounded_return_pct": 6.45919198366911
+      }
+    }
+  },
+  "p3_selected_tminus2/fixed_0940": {
+    "trades": 118,
+    "first": "2026-02-02",
+    "last": "2026-07-30",
+    "observed_exits": 118,
+    "unobservable_exits": 0,
+    "mean_trade_return_pct": 2.6088984337224232,
+    "median_trade_return_pct": 3.7950889420617973,
+    "positive": 94,
+    "ge3": 66,
+    "negative": 22,
+    "below_minus1": 15,
+    "gross_compounded_return_pct": 1891.4318124014849,
+    "historical_st": 100,
+    "entry_at_limit": 95,
+    "entry_status_unknown": 0,
+    "unknown_historical_st": 0,
+    "missing_daily_limit_marker": 0,
+    "historical_st_at_limit": 93,
+    "exit_rule_counts": {
+      "always_0940_close": 118
+    },
+    "monthly": {
+      "2026-02": {
+        "selected": 14,
+        "observed": 14,
+        "ge3": 8,
+        "mean_return_pct": 3.362790015568916,
+        "compounded_return_pct": 58.63713631433352
+      },
+      "2026-03": {
+        "selected": 22,
+        "observed": 22,
+        "ge3": 11,
+        "mean_return_pct": 2.2367204830528125,
+        "compounded_return_pct": 61.12158767080154
+      },
+      "2026-04": {
+        "selected": 21,
+        "observed": 21,
+        "ge3": 13,
+        "mean_return_pct": 2.8352388306748697,
+        "compounded_return_pct": 78.35351133048205
+      },
+      "2026-05": {
+        "selected": 18,
+        "observed": 18,
+        "ge3": 12,
+        "mean_return_pct": 3.3670077558143414,
+        "compounded_return_pct": 80.35334237386532
+      },
+      "2026-06": {
+        "selected": 21,
+        "observed": 21,
+        "ge3": 13,
+        "mean_return_pct": 2.795006952267412,
+        "compounded_return_pct": 76.808942823051
+      },
+      "2026-07": {
+        "selected": 22,
+        "observed": 22,
+        "ge3": 9,
+        "mean_return_pct": 1.4873546948942356,
+        "compounded_return_pct": 36.99249007219858
+      }
+    }
+  },
+  "p3_selected_tminus2/staged_four_rules": {
+    "trades": 118,
+    "first": "2026-02-02",
+    "last": "2026-07-30",
+    "observed_exits": 118,
+    "unobservable_exits": 0,
+    "mean_trade_return_pct": 2.9950101383652736,
+    "median_trade_return_pct": 3.9540246987055494,
+    "positive": 102,
+    "ge3": 79,
+    "negative": 16,
+    "below_minus1": 13,
+    "gross_compounded_return_pct": 3036.4642841518403,
+    "historical_st": 100,
+    "entry_at_limit": 95,
+    "entry_status_unknown": 0,
+    "unknown_historical_st": 0,
+    "missing_daily_limit_marker": 0,
+    "historical_st_at_limit": 93,
+    "exit_rule_counts": {
+      "first3_over_3pct": 78,
+      "rebound_1pp_from_prior_low": 30,
+      "last7_over_1pct": 5,
+      "0940_close": 5
+    },
+    "monthly": {
+      "2026-02": {
+        "selected": 14,
+        "observed": 14,
+        "ge3": 10,
+        "mean_return_pct": 3.720904081597044,
+        "compounded_return_pct": 66.48684431589771
+      },
+      "2026-03": {
+        "selected": 22,
+        "observed": 22,
+        "ge3": 18,
+        "mean_return_pct": 3.440574199159854,
+        "compounded_return_pct": 109.19128280425463
+      },
+      "2026-04": {
+        "selected": 21,
+        "observed": 21,
+        "ge3": 16,
+        "mean_return_pct": 3.2792171381412145,
+        "compounded_return_pct": 95.62852562113804
+      },
+      "2026-05": {
+        "selected": 18,
+        "observed": 18,
+        "ge3": 14,
+        "mean_return_pct": 3.282209632140499,
+        "compounded_return_pct": 77.51639683327821
+      },
+      "2026-06": {
+        "selected": 21,
+        "observed": 21,
+        "ge3": 13,
+        "mean_return_pct": 3.269375253435343,
+        "compounded_return_pct": 95.62301899128349
+      },
+      "2026-07": {
+        "selected": 22,
+        "observed": 22,
+        "ge3": 8,
+        "mean_return_pct": 1.3193496909813751,
+        "compounded_return_pct": 32.564191943223705
+      }
+    }
+  },
+  "p3_selected_tminus2/staged_no_rebound": {
+    "trades": 118,
+    "first": "2026-02-02",
+    "last": "2026-07-30",
+    "observed_exits": 118,
+    "unobservable_exits": 0,
+    "mean_trade_return_pct": 3.0018077123071722,
+    "median_trade_return_pct": 3.9877417643574775,
+    "positive": 104,
+    "ge3": 82,
+    "negative": 14,
+    "below_minus1": 13,
+    "gross_compounded_return_pct": 3049.5147619957957,
+    "historical_st": 100,
+    "entry_at_limit": 95,
+    "entry_status_unknown": 0,
+    "unknown_historical_st": 0,
+    "missing_daily_limit_marker": 0,
+    "historical_st_at_limit": 93,
+    "exit_rule_counts": {
+      "first3_over_3pct": 80,
+      "last7_over_1pct": 20,
+      "0940_close": 18
+    },
+    "monthly": {
+      "2026-02": {
+        "selected": 14,
+        "observed": 14,
+        "ge3": 10,
+        "mean_return_pct": 3.860346116867297,
+        "compounded_return_pct": 69.72777009386452
+      },
+      "2026-03": {
+        "selected": 22,
+        "observed": 22,
+        "ge3": 18,
+        "mean_return_pct": 3.3356423758735425,
+        "compounded_return_pct": 104.46958302961167
+      },
+      "2026-04": {
+        "selected": 21,
+        "observed": 21,
+        "ge3": 17,
+        "mean_return_pct": 3.239015895157736,
+        "compounded_return_pct": 93.85951170983884
+      },
+      "2026-05": {
+        "selected": 18,
+        "observed": 18,
+        "ge3": 14,
+        "mean_return_pct": 3.476794042937586,
+        "compounded_return_pct": 83.8931410636467
+      },
+      "2026-06": {
+        "selected": 21,
+        "observed": 21,
+        "ge3": 15,
+        "mean_return_pct": 3.1893574676746543,
+        "compounded_return_pct": 91.77380276482978
+      },
+      "2026-07": {
+        "selected": 22,
+        "observed": 22,
+        "ge3": 8,
+        "mean_return_pct": 1.327554488842252,
+        "compounded_return_pct": 32.74559113319604
+      }
+    }
+  },
+  "rolling20_tminus1/fixed_0940": {
+    "trades": 118,
+    "first": "2026-02-02",
+    "last": "2026-07-30",
+    "observed_exits": 118,
+    "unobservable_exits": 0,
+    "mean_trade_return_pct": 2.3353372751781736,
+    "median_trade_return_pct": 3.212580534448972,
+    "positive": 90,
+    "ge3": 60,
+    "negative": 27,
+    "below_minus1": 18,
+    "gross_compounded_return_pct": 1344.7252137491246,
+    "historical_st": 102,
+    "entry_at_limit": 95,
+    "entry_status_unknown": 0,
+    "unknown_historical_st": 0,
+    "missing_daily_limit_marker": 0,
+    "historical_st_at_limit": 94,
+    "exit_rule_counts": {
+      "always_0940_close": 118
+    },
+    "monthly": {
+      "2026-02": {
+        "selected": 14,
+        "observed": 14,
+        "ge3": 7,
+        "mean_return_pct": 3.104785996691192,
+        "compounded_return_pct": 53.076479105702944
+      },
+      "2026-03": {
+        "selected": 22,
+        "observed": 22,
+        "ge3": 11,
+        "mean_return_pct": 2.157058154762206,
+        "compounded_return_pct": 58.11913158446467
+      },
+      "2026-04": {
+        "selected": 21,
+        "observed": 21,
+        "ge3": 11,
+        "mean_return_pct": 2.509997619106104,
+        "compounded_return_pct": 67.03170436618274
+      },
+      "2026-05": {
+        "selected": 18,
+        "observed": 18,
+        "ge3": 13,
+        "mean_return_pct": 3.4994110978743733,
+        "compounded_return_pct": 84.62173880537182
+      },
+      "2026-06": {
+        "selected": 21,
+        "observed": 21,
+        "ge3": 11,
+        "mean_return_pct": 2.2537568282421474,
+        "compounded_return_pct": 58.0043610845449
+      },
+      "2026-07": {
+        "selected": 22,
+        "observed": 22,
+        "ge3": 7,
+        "mean_return_pct": 0.9826941798421428,
+        "compounded_return_pct": 22.501538675913004
+      }
+    }
+  },
+  "rolling20_tminus1/staged_four_rules": {
+    "trades": 118,
+    "first": "2026-02-02",
+    "last": "2026-07-30",
+    "observed_exits": 118,
+    "unobservable_exits": 0,
+    "mean_trade_return_pct": 2.8764211921482667,
+    "median_trade_return_pct": 3.9225422045680247,
+    "positive": 99,
+    "ge3": 78,
+    "negative": 18,
+    "below_minus1": 12,
+    "gross_compounded_return_pct": 2627.107408961978,
+    "historical_st": 102,
+    "entry_at_limit": 95,
+    "entry_status_unknown": 0,
+    "unknown_historical_st": 0,
+    "missing_daily_limit_marker": 0,
+    "historical_st_at_limit": 94,
+    "exit_rule_counts": {
+      "first3_over_3pct": 78,
+      "rebound_1pp_from_prior_low": 30,
+      "0940_close": 7,
+      "last7_over_1pct": 3
+    },
+    "monthly": {
+      "2026-02": {
+        "selected": 14,
+        "observed": 14,
+        "ge3": 11,
+        "mean_return_pct": 3.756916604286784,
+        "compounded_return_pct": 67.18602132326114
+      },
+      "2026-03": {
+        "selected": 22,
+        "observed": 22,
+        "ge3": 17,
+        "mean_return_pct": 3.352433533027627,
+        "compounded_return_pct": 105.12935766279989
+      },
+      "2026-04": {
+        "selected": 21,
+        "observed": 21,
+        "ge3": 14,
+        "mean_return_pct": 3.1409125864399643,
+        "compounded_return_pct": 90.27778793171024
+      },
+      "2026-05": {
+        "selected": 18,
+        "observed": 18,
+        "ge3": 15,
+        "mean_return_pct": 3.665033815728755,
+        "compounded_return_pct": 90.01463382366765
+      },
+      "2026-06": {
+        "selected": 21,
+        "observed": 21,
+        "ge3": 12,
+        "mean_return_pct": 2.8791787610308126,
+        "compounded_return_pct": 80.50536194411193
+      },
+      "2026-07": {
+        "selected": 22,
+        "observed": 22,
+        "ge3": 9,
+        "mean_return_pct": 0.9397637957667636,
+        "compounded_return_pct": 21.845420297196316
+      }
+    }
+  },
+  "rolling20_tminus1/staged_no_rebound": {
+    "trades": 118,
+    "first": "2026-02-02",
+    "last": "2026-07-30",
+    "observed_exits": 118,
+    "unobservable_exits": 0,
+    "mean_trade_return_pct": 2.816897613411595,
+    "median_trade_return_pct": 3.992543740466692,
+    "positive": 99,
+    "ge3": 81,
+    "negative": 19,
+    "below_minus1": 16,
+    "gross_compounded_return_pct": 2428.5006178539616,
+    "historical_st": 102,
+    "entry_at_limit": 95,
+    "entry_status_unknown": 0,
+    "unknown_historical_st": 0,
+    "missing_daily_limit_marker": 0,
+    "historical_st_at_limit": 94,
+    "exit_rule_counts": {
+      "first3_over_3pct": 80,
+      "0940_close": 23,
+      "last7_over_1pct": 15
+    },
+    "monthly": {
+      "2026-02": {
+        "selected": 14,
+        "observed": 14,
+        "ge3": 11,
+        "mean_return_pct": 4.001052037069845,
+        "compounded_return_pct": 72.9246222043882
+      },
+      "2026-03": {
+        "selected": 22,
+        "observed": 22,
+        "ge3": 17,
+        "mean_return_pct": 3.1610928249143346,
+        "compounded_return_pct": 96.51911926997442
+      },
+      "2026-04": {
+        "selected": 21,
+        "observed": 21,
+        "ge3": 15,
+        "mean_return_pct": 3.0857104713127566,
+        "compounded_return_pct": 88.01584339184292
+      },
+      "2026-05": {
+        "selected": 18,
+        "observed": 18,
+        "ge3": 15,
+        "mean_return_pct": 3.698102598797538,
+        "compounded_return_pct": 91.15930029248493
+      },
+      "2026-06": {
+        "selected": 21,
+        "observed": 21,
+        "ge3": 14,
+        "mean_return_pct": 2.7683555350347526,
+        "compounded_return_pct": 75.77133979735164
+      },
+      "2026-07": {
+        "selected": 22,
+        "observed": 22,
+        "ge3": 9,
+        "mean_return_pct": 0.7879052183555301,
+        "compounded_return_pct": 17.777810635178405
+      }
+    }
+  }
+}

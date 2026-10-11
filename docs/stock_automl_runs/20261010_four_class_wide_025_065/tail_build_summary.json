@@ -1,0 +1,311 @@
+{
+  "generated_at": "2026-10-10T15:29:34",
+  "signal_period": [
+    "2026-08-05",
+    "2026-09-30"
+  ],
+  "requested_period": [
+    "2026-08-05",
+    "2026-10-08"
+  ],
+  "history_start": "2026-07-01",
+  "minute_ingestion_times_used": false,
+  "signal_time": "14:40",
+  "selection_return": [
+    0.025,
+    0.065
+  ],
+  "candidates": 22044,
+  "feature_complete": 21770,
+  "label_complete": 21962,
+  "trainable": 20842,
+  "execution_feasible": 20833,
+  "excluded_adj_price_break_20d": 21,
+  "day_audit": [
+    {
+      "date": "2026-08-05",
+      "candidates": 1020,
+      "feature_complete": 1013,
+      "label_complete": 1020,
+      "trainable": 988
+    },
+    {
+      "date": "2026-08-06",
+      "candidates": 513,
+      "feature_complete": 511,
+      "label_complete": 513,
+      "trainable": 464
+    },
+    {
+      "date": "2026-08-07",
+      "candidates": 725,
+      "feature_complete": 725,
+      "label_complete": 725,
+      "trainable": 706
+    },
+    {
+      "date": "2026-08-10",
+      "candidates": 1103,
+      "feature_complete": 1102,
+      "label_complete": 1103,
+      "trainable": 1074
+    },
+    {
+      "date": "2026-08-11",
+      "candidates": 300,
+      "feature_complete": 298,
+      "label_complete": 300,
+      "trainable": 277
+    },
+    {
+      "date": "2026-08-12",
+      "candidates": 730,
+      "feature_complete": 728,
+      "label_complete": 730,
+      "trainable": 697
+    },
+    {
+      "date": "2026-08-13",
+      "candidates": 270,
+      "feature_complete": 270,
+      "label_complete": 270,
+      "trainable": 253
+    },
+    {
+      "date": "2026-08-14",
+      "candidates": 417,
+      "feature_complete": 412,
+      "label_complete": 416,
+      "trainable": 401
+    },
+    {
+      "date": "2026-08-17",
+      "candidates": 1110,
+      "feature_complete": 1109,
+      "label_complete": 1107,
+      "trainable": 1080
+    },
+    {
+      "date": "2026-08-18",
+      "candidates": 450,
+      "feature_complete": 450,
+      "label_complete": 449,
+      "trainable": 431
+    },
+    {
+      "date": "2026-08-19",
+      "candidates": 76,
+      "feature_complete": 76,
+      "label_complete": 76,
+      "trainable": 69
+    },
+    {
+      "date": "2026-08-20",
+      "candidates": 1081,
+      "feature_complete": 1079,
+      "label_complete": 1081,
+      "trainable": 1036
+    },
+    {
+      "date": "2026-08-21",
+      "candidates": 449,
+      "feature_complete": 449,
+      "label_complete": 449,
+      "trainable": 406
+    },
+    {
+      "date": "2026-08-24",
+      "candidates": 204,
+      "feature_complete": 202,
+      "label_complete": 180,
+      "trainable": 166
+    },
+    {
+      "date": "2026-08-25",
+      "candidates": 1477,
+      "feature_complete": 1476,
+      "label_complete": 1476,
+      "trainable": 1431
+    },
+    {
+      "date": "2026-08-26",
+      "candidates": 431,
+      "feature_complete": 430,
+      "label_complete": 431,
+      "trainable": 397
+    },
+    {
+      "date": "2026-08-27",
+      "candidates": 804,
+      "feature_complete": 803,
+      "label_complete": 804,
+      "trainable": 784
+    },
+    {
+      "date": "2026-08-28",
+      "candidates": 553,
+      "feature_complete": 550,
+      "label_complete": 553,
+      "trainable": 527
+    },
+    {
+      "date": "2026-08-31",
+      "candidates": 790,
+      "feature_complete": 789,
+      "label_complete": 790,
+      "trainable": 759
+    },
+    {
+      "date": "2026-09-01",
+      "candidates": 538,
+      "feature_complete": 537,
+      "label_complete": 538,
+      "trainable": 516
+    },
+    {
+      "date": "2026-09-02",
+      "candidates": 227,
+      "feature_complete": 227,
+      "label_complete": 227,
+      "trainable": 207
+    },
+    {
+      "date": "2026-09-03",
+      "candidates": 366,
+      "feature_complete": 364,
+      "label_complete": 366,
+      "trainable": 351
+    },
+    {
+      "date": "2026-09-04",
+      "candidates": 293,
+      "feature_complete": 292,
+      "label_complete": 293,
+      "trainable": 281
+    },
+    {
+      "date": "2026-09-07",
+      "candidates": 705,
+      "feature_complete": 704,
+      "label_complete": 704,
+      "trainable": 674
+    },
+    {
+      "date": "2026-09-08",
+      "candidates": 615,
+      "feature_complete": 611,
+      "label_complete": 615,
+      "trainable": 592
+    },
+    {
+      "date": "2026-09-09",
+      "candidates": 306,
+      "feature_complete": 306,
+      "label_complete": 306,
+      "trainable": 292
+    },
+    {
+      "date": "2026-09-10",
+      "candidates": 167,
+      "feature_complete": 167,
+      "label_complete": 167,
+      "trainable": 151
+    },
+    {
+      "date": "2026-09-11",
+      "candidates": 138,
+      "feature_complete": 137,
+      "label_complete": 113,
+      "trainable": 102
+    },
+    {
+      "date": "2026-09-14",
+      "candidates": 410,
+      "feature_complete": 405,
+      "label_complete": 386,
+      "trainable": 367
+    },
+    {
+      "date": "2026-09-15",
+      "candidates": 169,
+      "feature_complete": 169,
+      "label_complete": 169,
+      "trainable": 161
+    },
+    {
+      "date": "2026-09-16",
+      "candidates": 870,
+      "feature_complete": 670,
+      "label_complete": 870,
+      "trainable": 657
+    },
+    {
+      "date": "2026-09-17",
+      "candidates": 412,
+      "feature_complete": 408,
+      "label_complete": 412,
+      "trainable": 392
+    },
+    {
+      "date": "2026-09-18",
+      "candidates": 875,
+      "feature_complete": 871,
+      "label_complete": 874,
+      "trainable": 852
+    },
+    {
+      "date": "2026-09-21",
+      "candidates": 1352,
+      "feature_complete": 1345,
+      "label_complete": 1352,
+      "trainable": 1315
+    },
+    {
+      "date": "2026-09-22",
+      "candidates": 358,
+      "feature_complete": 356,
+      "label_complete": 358,
+      "trainable": 342
+    },
+    {
+      "date": "2026-09-23",
+      "candidates": 336,
+      "feature_complete": 334,
+      "label_complete": 336,
+      "trainable": 323
+    },
+    {
+      "date": "2026-09-24",
+      "candidates": 173,
+      "feature_complete": 172,
+      "label_complete": 173,
+      "trainable": 160
+    },
+    {
+      "date": "2026-09-28",
+      "candidates": 136,
+      "feature_complete": 135,
+      "label_complete": 135,
+      "trainable": 124
+    },
+    {
+      "date": "2026-09-29",
+      "candidates": 686,
+      "feature_complete": 684,
+      "label_complete": 686,
+      "trainable": 651
+    },
+    {
+      "date": "2026-09-30",
+      "candidates": 409,
+      "feature_complete": 404,
+      "label_complete": 409,
+      "trainable": 386
+    }
+  ],
+  "provenance": {
+    "script_sha256": "8b5914eef046369e8e76c65425b23f15337b0d0d0069c44caa7a493781e1d189",
+    "database_snapshot_version": null,
+    "raw_row_location": "outputs/stock_automl/tail_20261010_wide_025_065"
+  }
+}

@@ -1,0 +1,110 @@
+{
+  "training": {
+    "training_days": 20,
+    "training_stocks": 5818,
+    "training_start": "2026-09-02",
+    "training_end": "2026-09-30",
+    "oct8_probability_max_abs_diff": 9.020562075079397e-17
+  },
+  "july_source_check": {
+    "candidate_rows": 13244,
+    "candidate_days": 23,
+    "prior_top5_rows_reproduced": 115,
+    "prior_feature_max_abs_diff": 0.0,
+    "prior_target_max_abs_diff": 0.0
+  },
+  "selected_overnight_reference_check": {
+    "checked": 46,
+    "over_1pct_gap": 0,
+    "max_abs_gap_pct": 0.0
+  },
+  "model": "unweighted four-class small_boosted_tree",
+  "signal": "July 14:45 completed 15m bar; seven proxy factors, candidate 3-6%",
+  "entry_proxy": "same July 14:45 bar close; 15:00 close alternative",
+  "exit": "next trading day completed 09:45/10:00/10:15 15m bar close",
+  "label_warning": "Original 10-minute second-high target is not observable from one 15m bar; do not call 09:45 close return four-class accuracy",
+  "temporal_warning": "Model trained on September days after July; retrospective cross-period transport, not July-time forward inference",
+  "metrics": {
+    "candidate_pool": {
+      "stocks": 13244,
+      "days": 23,
+      "mean_pct": 0.06288871580366778,
+      "median_pct": 0.0,
+      "positive": 6483,
+      "at_least_1pct": 4219,
+      "at_least_3pct": 1209,
+      "below_minus_1pct": 4172
+    },
+    "candidate_pool_equal_day_mean_pct": -0.10050588291725963,
+    "top1": {
+      "stocks": 23,
+      "days": 23,
+      "mean_pct": 1.2790135316872717,
+      "median_pct": 1.3756469626804657,
+      "positive": 15,
+      "at_least_1pct": 12,
+      "at_least_3pct": 6,
+      "below_minus_1pct": 7
+    },
+    "top1_without_three_best_days_mean_pct": 0.17642810656790683,
+    "rank2": {
+      "stocks": 23,
+      "days": 23,
+      "mean_pct": -2.35796671824356,
+      "median_pct": -1.9491525423728784,
+      "positive": 5,
+      "at_least_1pct": 3,
+      "at_least_3pct": 2,
+      "below_minus_1pct": 12
+    },
+    "top2": {
+      "stocks": 46,
+      "days": 23,
+      "mean_pct": -0.5394765932781441,
+      "median_pct": -0.5192656535816353,
+      "positive": 20,
+      "at_least_1pct": 15,
+      "at_least_3pct": 8,
+      "below_minus_1pct": 19
+    },
+    "top1_daily_outperformed_pool_days": 15,
+    "top2_daily_outperformed_pool_days": 10,
+    "mean_return_by_exit_pct": {
+      "0945": {
+        "top1": 1.2790135316872717,
+        "top2": -0.5394765932781441,
+        "candidate_pool_stock_weighted": 0.06288871580366778,
+        "candidate_pool_equal_day": -0.10050588291725963
+      },
+      "1000": {
+        "top1": 0.9057207406012442,
+        "top2": -0.7393266123224349,
+        "candidate_pool_stock_weighted": 0.10278673542184069,
+        "candidate_pool_equal_day": -0.00612738348547553
+      },
+      "1015": {
+        "top1": 0.8434483680115351,
+        "top2": -0.8871575446810208,
+        "candidate_pool_stock_weighted": -0.06464583564817585,
+        "candidate_pool_equal_day": -0.09242733860094052
+      }
+    },
+    "from_1500_entry_0945_exit_pct": {
+      "top1": 1.2278298433154575,
+      "top2": -0.6195740700848091
+    },
+    "selected_predicted_classes": {
+      "ge3": 32,
+      "1to3": 14
+    },
+    "top1_0945_bar_high_at_least_1pct": 16,
+    "top2_0945_bar_high_at_least_1pct": 27,
+    "selected_current_names_containing_st": 0
+  },
+  "input_sha256": {
+    "docs/stock_automl_runs/20261009_close9_target/exact_1440_to_close9_candidates.csv.gz": "99263a8722907209d1cc45ffd6e3e73a1386fc36050f67e5d55f78b0c3e8942a",
+    "docs/stock_automl_runs/20261009_second_high_regression/second_high_prices.csv.gz": "3e979277eac24110e0b7abb63d6ef59fd2977788ff66185c6e6fc4e579d1811c",
+    "outputs/stock_automl/sina_15m_july/trainable_proxy_candidates.csv": "eae28c46679401e0191f08bd7c1e62c67079aecd0b905eb6c51105d202b3a015",
+    "docs/stock_automl_runs/20261008_sina_15m_july/july_top5_two_models.csv": "ada52a19b828c71675d7ed665ea068bca12f07961c6cce11cedc303bdaa8fd5b"
+  }
+}

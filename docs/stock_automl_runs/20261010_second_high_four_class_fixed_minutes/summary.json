@@ -1,0 +1,18 @@
+{
+  "model": "unweighted four-class small_boosted_tree",
+  "selection": "class_priority_fallback, saved pre-outcome picks",
+  "entry": "signal-date 14:40 finalized minute close",
+  "exits": "next-morning 09:31 bar open or 09:31-09:40 finalized minute closes",
+  "historical_dates": "2026-09-02 through 2026-09-30, 20 signal days",
+  "additional_date": "2026-10-08 signal, 2026-10-09 morning",
+  "daily_extrema": "Among 11 fixed exit prices; ties list all slots and display the earliest",
+  "historical_0940_control": {
+    "1": 1.3110405633586808,
+    "2": 0.48434198462450195
+  },
+  "rows": {
+    "trades": 42,
+    "daily": 42,
+    "averages": 66
+  }
+}

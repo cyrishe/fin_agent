@@ -1,6 +1,9 @@
 from __future__ import annotations
 
+from src.experiments.staged_data_protocol.phase2 import python_filter as pf
+
 import re
+import os
 from dataclasses import dataclass
 from datetime import date, datetime
 from decimal import Decimal
@@ -8,12 +11,18 @@ from typing import Any, Dict, List, Mapping
 
 import pymysql
 
-from src.experiments.staged_data_protocol.phase2.agg_protocol import AGG_METHODS, output_alias, parse_agg_spec
+from src.experiments.staged_data_protocol.phase2.agg_protocol import AGG_METHODS, median_query, output_alias, parse_agg_spec
 from src.utils.mysql_utils import StockInfoDbUtils
+from src.experiments.staged_data_protocol.phase2.recent_scan import (
+    chronological_recent_where, fetch_recent_first, recent_predicate,
+)
 
 
 TRADE_CALENDAR_TABLE = "aiia_trade_calendar"
 DEFAULT_MARKET_CODE = "CN_A"
+DEFAULT_QUOTE_LIMIT = 100
+DEFAULT_QUOTE_HARD_ROW_LIMIT = 500_000
+MAX_DAILY_COUNT_PER_CODE = 5_000
 
 
 @dataclass(frozen=True)
@@ -162,9 +171,9 @@ OP_SQL = {
 FILTER_RE = re.compile(
     r"(?:(?P<connector>\band\b|\bor\b)\s+)?"
     r"(?P<field>[A-Za-z_]\w*)\s*"
-    r"(?P<op>in|=|==|!=|>=|<=|>|<)\s*"
+    r"(?P<op>in|==|=|!=|>=|<=|>|<)\s*"
     r"(?P<value>\[[^\]]+\]|\([^)]+\)|[^,;]+?)"
-    r"(?=\s+(?:and|or)\s+[A-Za-z_]\w*\s*(?:in|=|==|!=|>=|<=|>|<)|[,;]|$)",
+    r"(?=\s+(?:and|or)\s+[A-Za-z_]\w*\s*(?:in|==|=|!=|>=|<=|>|<)|[,;]|$)",
     flags=re.IGNORECASE,
 )
 
@@ -190,17 +199,85 @@ def execute_quote_api(*, subject: str, args: Mapping[str, Any], outputs: List[st
             mocked_fields=_mocked_fields(source=source, columns=requested_fields),
         )
 
-    limit = _bounded_limit(args.get("limit"))
+    count_per_code = _daily_count_per_code(args.get("count"))
+    limit_policy = _base_query_limit(args, count_per_code=count_per_code)
+    if limit_policy["error"]:
+        return _standard_result(
+            status="result_too_large",
+            source=source,
+            args=args,
+            columns=requested_fields,
+            rows=[],
+            reason=str(limit_policy["error"]),
+            mocked_fields=_mocked_fields(source=source, columns=requested_fields),
+        )
     where_sql, params = _build_where(source=source, args=args)
     order_sql = _build_order(source=source, args=args)
-    sql = _build_sql(source=source, fields=requested_fields, where_sql=where_sql, order_sql=order_sql)
-    params.append(limit)
+    if count_per_code is not None:
+        sql = _build_per_entity_sql(
+            source=source,
+            fields=requested_fields,
+            where_sql=where_sql,
+            args=args,
+        )
+        _, scope_params = _count_identity_scope(source=source, args=args)
+        params = [*scope_params, *params]
+        params.extend([count_per_code, limit_policy["fetch_limit"]])
+    else:
+        sql = _build_sql(
+            source=source,
+            fields=requested_fields,
+            where_sql=where_sql,
+            order_sql=order_sql,
+        )
+        params.append(limit_policy["fetch_limit"])
 
+    recent_sql = None
+    required_codes = []
+    scan_evidence = {}
+    if count_per_code is not None:
+        filters = _explicit_filters(args, subject=subject)
+        if not any(connector == 'OR' for connector, *_ in filters):
+            for _, field, op, value in filters:
+                if field == 'code' and op in {'=', '==', 'in'}:
+                    required_codes.extend(_list_value(value) if op == 'in' else [value])
+        required_codes = list(dict.fromkeys(str(code) for code in required_codes))
+        # All quote subjects now use bounded code/date reads. A forced probe
+        # remains available for A/B checks, but is not needed for this shape.
+        predicate = recent_predicate(args=args, date_expression=source.fields['tradedate'])
+        # A global LIMIT can hide a deficient security. Only accept a probe
+        # when the complete explicit universe fits before the output limit.
+        if predicate and required_codes and limit_policy['fetch_limit'] >= len(required_codes) * count_per_code:
+            recent_sql = _build_per_entity_sql(source=source,
+                fields=list(dict.fromkeys([*requested_fields, 'code'])),
+                where_sql=f'({where_sql}) AND {predicate}', args=args)
+    elif _identity_time_series_request(source=source, args=args):
+        recent_where = chronological_recent_where(args=args, where_sql=where_sql,
+            order_sql=order_sql, date_expression=source.fields['tradedate'])
+        if recent_where:
+            recent_sql = _build_sql(source=source, fields=requested_fields,
+                where_sql=recent_where, order_sql=order_sql)
     db = StockInfoDbUtils(database="kingdomai")
     try:
         with db.conn.cursor(pymysql.cursors.DictCursor) as cursor:
-            cursor.execute(sql, tuple(params))
-            raw_rows = cursor.fetchall()
+            raw_rows = fetch_recent_first(cursor, sql=sql, params=params,
+                recent_sql=recent_sql, required_rows=limit_policy['fetch_limit'],
+                required_codes=required_codes if count_per_code else (),
+                per_code=count_per_code or 0, evidence=scan_evidence)
+        if limit_policy["detect_overflow"] and len(raw_rows) > limit_policy["hard_limit"]:
+            return _standard_result(
+                status="result_too_large",
+                source=source,
+                args=args,
+                columns=requested_fields,
+                rows=[],
+                reason=(
+                    "matching daily K rows exceed the safety limit "
+                    f"({limit_policy['hard_limit']}); narrow the date range or raise "
+                    "FIN_AGENT_QUOTE_HARD_ROW_LIMIT for an authorized bulk run"
+                ),
+                mocked_fields=_mocked_fields(source=source, columns=requested_fields),
+            )
         rows = [_normalize_row(row, requested_fields) for row in raw_rows]
         return _standard_result(
             status="ok",
@@ -208,7 +285,16 @@ def execute_quote_api(*, subject: str, args: Mapping[str, Any], outputs: List[st
             args=args,
             columns=requested_fields,
             rows=rows,
-            sql_shape=_sql_shape(where_sql=where_sql, order_sql=order_sql, limit=limit),
+            sql_shape={
+                **_sql_shape(
+                    where_sql=where_sql,
+                    order_sql=order_sql,
+                    limit=limit_policy["business_limit"],
+                ),
+                "count_per_code": count_per_code,
+                "hard_row_limit": limit_policy["hard_limit"],
+                "recent_scan": scan_evidence,
+            },
             mocked_fields=_mocked_fields(source=source, columns=requested_fields),
         )
     except Exception as exc:  # noqa: BLE001 - experiment boundary should return structured failures.
@@ -242,7 +328,8 @@ def execute_quote_agg_api(*, subject: str, args: Mapping[str, Any], outputs: Lis
     alias = _aggregate_alias(outputs, default=f"{agg}_{metric}", group_fields=group_fields)
     columns = [*group_fields, alias]
     select_parts = [f"{source.fields[field]} AS `{field}`" for field in group_fields]
-    select_parts.append(f"{_agg_sql(source=source, agg=agg, metric=metric)} AS `{alias}`")
+    select_parts.append(f"{source.fields[metric]} AS __metric_value" if agg == "median"
+                        else f"{_agg_sql(source=source, agg=agg, metric=metric)} AS `{alias}`")
     group_sql = f"GROUP BY {', '.join(source.fields[field] for field in group_fields)}" if group_fields else ""
     where_sql, params = _build_where(source=source, args=args)
     order_sql = _agg_order(str(args.get("order") or ""), alias=alias)
@@ -252,10 +339,11 @@ def execute_quote_agg_api(*, subject: str, args: Mapping[str, Any], outputs: Lis
         FROM {source.table} q
         LEFT JOIN {source.base_table} b ON {source.join_on}
         WHERE {where_sql}
-        {group_sql}
-        ORDER BY {order_sql}
-        LIMIT %s
+        {group_sql if agg != 'median' else ''}
     """
+    if agg == "median":
+        sql = median_query(sql, group_fields=group_fields, alias=alias)
+    sql += f" ORDER BY {order_sql} LIMIT %s"
     params.append(limit)
 
     db = StockInfoDbUtils(database="kingdomai")
@@ -312,7 +400,7 @@ def execute_kd_quote_api(
         )
 
     k = _bounded_k(args.get("k"))
-    limit = _bounded_limit(args.get("limit"))
+    limit = _bounded_limit(args.get("limit"), allow_all=True)
     identity_sql, identity_params = _build_identity_where(source=source, args=args)
     sql = _build_kd_aggregate_sql(source=source, field=field, method=method, identity_sql=identity_sql)
     market_code = _calendar_market_code(args)
@@ -408,7 +496,7 @@ def _agg_sql(*, source: QuoteSource, agg: str, metric: str) -> str:
     if agg == "count":
         return "COUNT(*)"
     if agg == "median":
-        return f"AVG({source.fields[metric]})"
+        raise ValueError("median requires ranked rows, not a scalar aggregate")
     return f"{agg.upper()}({source.fields[metric]})"
 
 
@@ -435,17 +523,98 @@ def _output_token(output: str) -> str:
 
 
 def _has_unresolved_ref(args: Mapping[str, Any]) -> bool:
-    return any(isinstance(value, str) and re.search(r"\br\d+\.", value) for value in args.values())
+    return pf.has_unresolved_refs(args)
 
 
-def _bounded_limit(value: Any) -> int:
+def _bounded_limit(value: Any, *, allow_all: bool = False) -> int:
     try:
         parsed = int(value)
     except Exception:
         parsed = 100
+    if parsed == -1 and allow_all:
+        return -1
     if parsed <= 0:
         parsed = 100
     return max(1, min(parsed, 500))
+
+
+def _daily_count_per_code(value: Any) -> int | None:
+    if value in (None, ""):
+        return None
+    try:
+        parsed = int(value)
+    except (TypeError, ValueError):
+        return None
+    if parsed <= 0:
+        return None
+    return parsed
+
+
+def _quote_hard_row_limit() -> int:
+    try:
+        parsed = int(
+            os.environ.get(
+                "FIN_AGENT_QUOTE_HARD_ROW_LIMIT",
+                DEFAULT_QUOTE_HARD_ROW_LIMIT,
+            )
+        )
+    except (TypeError, ValueError):
+        parsed = DEFAULT_QUOTE_HARD_ROW_LIMIT
+    return max(1_000, parsed)
+
+
+def _base_query_limit(
+    args: Mapping[str, Any],
+    *,
+    count_per_code: int | None,
+) -> Dict[str, Any]:
+    hard_limit = _quote_hard_row_limit()
+    has_limit = "limit" in args and args.get("limit") not in (None, "")
+    try:
+        requested = int(args.get("limit")) if has_limit else None
+    except (TypeError, ValueError):
+        requested = None
+    explicit_full = requested == -1
+    if requested is not None and requested < -1:
+        return {
+            "error": "limit must be -1 or a positive integer",
+            "hard_limit": hard_limit,
+        }
+    if requested is not None and requested > hard_limit:
+        return {
+            "error": (
+                f"requested limit {requested} exceeds the safety limit {hard_limit}; "
+                "use limit=-1 for an explicit full query and configure a larger "
+                "FIN_AGENT_QUOTE_HARD_ROW_LIMIT only for an authorized bulk run"
+            ),
+            "hard_limit": hard_limit,
+        }
+    if requested is not None and requested > 0:
+        return {
+            "error": "",
+            "business_limit": requested,
+            "fetch_limit": requested,
+            "hard_limit": hard_limit,
+            "detect_overflow": False,
+            "explicit_full": False,
+        }
+    if explicit_full or count_per_code is not None:
+        return {
+            "error": "",
+            "business_limit": -1 if explicit_full else None,
+            "fetch_limit": hard_limit + 1,
+            "hard_limit": hard_limit,
+            "detect_overflow": True,
+            "explicit_full": explicit_full,
+        }
+    return {
+        "error": "",
+        "business_limit": DEFAULT_QUOTE_LIMIT,
+        "fetch_limit": DEFAULT_QUOTE_LIMIT,
+        "hard_limit": hard_limit,
+        "detect_overflow": False,
+        "explicit_full": False,
+    }
 
 
 def _bounded_k(value: Any) -> int:
@@ -468,6 +637,15 @@ def _calendar_as_of(args: Mapping[str, Any]) -> str:
 def _build_where(*, source: QuoteSource, args: Mapping[str, Any]) -> tuple[str, List[Any]]:
     clauses: List[str] = []
     params: List[Any] = []
+    filters = _explicit_filters(args, subject=source.subject)
+    has_date_filter = any(
+        source.fields.get(field_name) == source.fields['tradedate']
+        for _connector, field_name, _op, _value in filters
+    )
+    current_date = date.today().isoformat()
+    if source.subject == "stock":
+        clauses.append(f"{source.fields['tradedate']} < %s")
+        params.append(current_date)
     start = str(args.get("start") or args.get("start_date") or "").strip()
     end = str(args.get("end") or args.get("end_date") or "").strip()
     exact_date = str(args.get("date") or args.get("tradedate") or "").strip()
@@ -477,13 +655,20 @@ def _build_where(*, source: QuoteSource, args: Mapping[str, Any]) -> tuple[str, 
     elif start and end:
         clauses.append(f"{source.fields['tradedate']} BETWEEN %s AND %s")
         params.extend(sorted([start, end]))
-    elif not _identity_time_series_request(source=source, args=args):
-        clauses.append(f"{source.fields['tradedate']} = (SELECT MAX(trade_date) FROM {source.table})")
+    elif not has_date_filter and not _identity_time_series_request(source=source, args=args):
+        if source.subject == "stock":
+            clauses.append(
+                f"{source.fields['tradedate']} = "
+                f"(SELECT MAX(trade_date) FROM {source.table} WHERE trade_date < %s)"
+            )
+            params.append(current_date)
+        else:
+            clauses.append(f"{source.fields['tradedate']} = (SELECT MAX(trade_date) FROM {source.table})")
 
-    filters = _explicit_filters(args)
     filter_clauses: List[str] = []
     filter_params: List[Any] = []
-    for connector, field_name, op, value in filters:
+    python_tree = pf.condition(args)
+    for connector, field_name, op, value in (filters if python_tree is None else []):
         expression = source.fields.get(field_name)
         if not expression:
             continue
@@ -504,13 +689,29 @@ def _build_where(*, source: QuoteSource, args: Mapping[str, Any]) -> tuple[str, 
         clauses.append(f"({' '.join(filter_clauses)})")
         params.extend(filter_params)
 
+    if python_tree is not None:
+        # Dates/default windows use metadata; execution compiles the tree once.
+        direct_args = pf.without_filter(args)
+        direct_items = _explicit_filters(direct_args, subject=source.subject)
+        direct_tree = {"and": [{"field": f, "operator": op, "value": _list_value(v) if op == "in" else v} for _, f, op, v in direct_items]} if direct_items else None
+        aliases = {"plate_code": "code", "plate_name": "name"} if source.subject == "plate" else {}
+        sql, values = pf.and_sql(pf.compile_tree(direct_tree, source.fields), pf.sql_filter(args, source.fields, aliases=aliases))
+        if sql:
+            clauses.append(f"({sql})")
+            params.extend(values)
+
     return " AND ".join(clauses), params
 
 
 def _build_identity_where(*, source: QuoteSource, args: Mapping[str, Any]) -> tuple[str, List[Any]]:
+    if pf.condition(args) is not None:
+        direct = _build_identity_where(source=source, args=pf.without_filter(args))
+        direct = (direct[0].removeprefix("AND "), direct[1])
+        sql, params = pf.and_sql(direct, pf.sql_filter(args, source.fields, allowed={"code", "name"}))
+        return (f"AND ({sql})" if sql else ""), params
     clauses: List[str] = []
     params: List[Any] = []
-    for connector, field_name, op, value in _explicit_filters(args):
+    for connector, field_name, op, value in _explicit_filters(args, subject=source.subject):
         if field_name not in {"code", "name"}:
             continue
         expression = source.fields.get(field_name)
@@ -534,18 +735,27 @@ def _build_identity_where(*, source: QuoteSource, args: Mapping[str, Any]) -> tu
 
 
 def _identity_time_series_request(*, source: QuoteSource, args: Mapping[str, Any]) -> bool:
+    if _daily_count_per_code(args.get("count")) is not None:
+        return True
     if _bounded_limit(args.get("limit")) <= 1:
         return False
     order = str(args.get("order") or "").lower()
     if "tradedate" not in order and "trade_date" not in order:
         return False
-    for _connector, field_name, op, _value in _explicit_filters(args):
+    for _connector, field_name, op, _value in _explicit_filters(args, subject=source.subject):
         if field_name in {"code", "name"} and op in {"=", "==", "in"} and field_name in source.fields:
             return True
     return False
 
 
-def _explicit_filters(args: Mapping[str, Any]) -> List[tuple[str, str, str, Any]]:
+def _explicit_filters(
+    args: Mapping[str, Any],
+    *,
+    subject: str = "",
+) -> List[tuple[str, str, str, Any]]:
+    if pf.condition(args) is not None:
+        aliases = {"plate_code": "code", "plate_name": "name"} if subject == "plate" else {}
+        return _explicit_filters(pf.without_filter(args), subject=subject) + pf.leaf_items(args, aliases)
     rows: List[tuple[str, str, str, Any]] = []
     for field_name in ["code", "name"]:
         value = args.get(field_name)
@@ -559,6 +769,11 @@ def _explicit_filters(args: Mapping[str, Any]) -> List[tuple[str, str, str, Any]
     for match in FILTER_RE.finditer(filter_text):
         connector = str(match.group("connector") or "AND").upper()
         field_name = str(match.group("field") or "").strip()
+        if subject == "plate":
+            field_name = {
+                "plate_code": "code",
+                "plate_name": "name",
+            }.get(field_name, field_name)
         op = str(match.group("op") or "").strip().lower()
         value = _clean_value(str(match.group("value") or ""))
         rows.append((connector, field_name, op, value))
@@ -610,6 +825,107 @@ def _build_sql(*, source: QuoteSource, fields: List[str], where_sql: str, order_
         ORDER BY {order_sql}
         LIMIT %s
     """
+
+
+def _build_per_entity_sql(
+    *,
+    source: QuoteSource,
+    fields: List[str],
+    where_sql: str,
+    args: Mapping[str, Any],
+) -> str:
+    select_sql = ", ".join(
+        f"{source.fields[field]} AS `{field}`" for field in fields
+    )
+    raw_order = str(args.get("order") or "").strip()
+    order_tokens = re.split(r"\s+", raw_order, maxsplit=1) if raw_order else []
+    order_field = order_tokens[0] if order_tokens else "code"
+    order_direction = "ASC" if not order_tokens else (
+        "ASC"
+        if len(order_tokens) > 1 and order_tokens[1].lower().startswith("asc")
+        else "DESC"
+    )
+    order_expression = source.fields.get(order_field, source.fields["code"])
+    single_code = _single_count_code(source=source, args=args)
+    scope_sql, _ = _count_identity_scope(source=source, args=args)
+    filters = _explicit_filters(args, subject=source.subject)
+    explicit_dates = (args.get('date') or args.get('tradedate')
+                      or ((args.get('start') or args.get('start_date')) and
+                          (args.get('end') or args.get('end_date')))
+                      or any(source.fields.get(field) == source.fields['tradedate']
+                             for _, field, _, _ in filters))
+    if explicit_dates and not single_code and not scope_sql:
+        # A market-wide explicit time slice is already bounded by the date-first
+        # primary key. Rank that slice once, not one index lookup per security.
+        return f"""
+            SELECT {', '.join(f'`{field}`' for field in fields)}
+            FROM (
+                SELECT {select_sql},
+                    ROW_NUMBER() OVER (
+                        PARTITION BY {source.fields['code']}
+                        ORDER BY {source.fields['tradedate']} DESC
+                    ) AS `__entity_row`,
+                    {order_expression} AS `__order_value`,
+                    {source.fields['tradedate']} AS `__trade_date_sort`
+                FROM {source.table} q
+                LEFT JOIN {source.base_table} b ON {source.join_on}
+                WHERE {where_sql}
+            ) ranked
+            WHERE `__entity_row` <= %s
+            ORDER BY `__order_value` {order_direction}, `__trade_date_sort` DESC
+            LIMIT %s
+        """
+    # count is per security for every subject. Read at most N matching rows
+    # from each code/date index, then apply the existing global order/limit.
+    # Column expressions are owned by the source registry, never by the LLM.
+    code_expression = source.fields['code']
+    code_column = code_expression.split('.')[-1]
+    date_expression = source.fields['tradedate']
+    projected = f"{select_sql}, {order_expression} AS `__order_value`, {date_expression} AS `__trade_date_sort`"
+    bounded = f"""
+        SELECT {projected}
+        FROM {source.table} q
+        LEFT JOIN {source.base_table} b ON {source.join_on}
+        WHERE ({where_sql})
+        {'' if single_code else f'AND {code_expression} = identities.{code_column}'}
+        ORDER BY {code_expression} DESC, {date_expression} DESC
+        LIMIT %s
+    """
+    identities = f"SELECT DISTINCT {code_expression} FROM {source.table} q"
+    if scope_sql:
+        identities += f" LEFT JOIN {source.base_table} b ON {source.join_on} WHERE 1=1 {scope_sql}"
+    recent = f"({bounded}) recent" if single_code else f"""
+        ({identities}) identities
+        JOIN LATERAL ({bounded}) recent ON TRUE
+    """
+    return f"""
+        SELECT {', '.join(f'recent.`{field}`' for field in fields)}
+        FROM {recent}
+        ORDER BY `__order_value` {order_direction}, `__trade_date_sort` DESC
+        LIMIT %s
+    """
+
+
+def _single_count_code(*, source: QuoteSource, args: Mapping[str, Any]) -> bool:
+    filters = _explicit_filters(args, subject=source.subject)
+    return not any(c == "OR" for c, *_ in filters) and any(
+        field == "code" and (op in {"=", "=="} or (op == "in" and len(_list_value(value)) == 1))
+        for _connector, field, op, value in filters
+    )
+
+
+def _count_identity_scope(*, source: QuoteSource, args: Mapping[str, Any]) -> tuple[str, List[Any]]:
+    if _single_count_code(source=source, args=args):
+        return "", []
+    # An identity-only expression can be pushed down intact, including OR.
+    # For a mixed OR, extracting just identity terms would drop valid rows.
+    filters = _explicit_filters(args, subject=source.subject)
+    identity_only = all(field in {'code', 'name'} and op in {'=', '==', 'in'}
+                        and (op != 'in' or bool(_list_value(value)))
+                        for _, field, op, value in filters)
+    if any(c == "OR" for c, *_ in filters) and not identity_only:
+        return "", []
+    return _build_identity_where(source=source, args=args)
 
 
 def _build_kd_aggregate_sql(*, source: QuoteSource, field: str, method: str, identity_sql: str) -> str:
@@ -821,6 +1137,9 @@ def _normalize_kd_metric_row(
 
 
 def _filter_kd_rows(rows: List[Dict[str, Any]], *, args: Mapping[str, Any]) -> List[Dict[str, Any]]:
+    tree = pf.condition(args)
+    if tree is not None:
+        return [row for row in rows if pf.evaluate(tree, row)]
     filters = [item for item in _explicit_filters(args) if item[1] in {"value", "k", "end_date", "tradedate"}]
     if not filters:
         return rows
