@@ -1,4 +1,4 @@
-"""Isolated April-train/May-test replay of board-specific entry and target bands."""
+"""Replay board entry bands with either fixed-April or rolling 20-day training."""
 from __future__ import annotations
 
 import argparse
@@ -24,12 +24,14 @@ SOURCES = {
         "legacy": Path("outputs/stock_automl/mk_1m_2025_continuous/cohort/trainable_candidates.csv.gz"),
         "board": Path("outputs/stock_automl/board_band_2025/trainable_candidates.csv.gz"),
         "board_window": Path("outputs/stock_automl/main_3to6_wide_4to8_2025/trainable_candidates.csv.gz"),
+        "wide_only_ge3": Path("outputs/stock_automl/main_3to6_wide_4to8_2025/trainable_candidates.csv.gz"),
         "snapshots": Path("outputs/stock_automl/mk_1m_2025_continuous/cohort/minute_daily_snapshots.csv.gz"),
     },
     "2026": {
         "legacy": Path("outputs/stock_automl/mk_1m_jan_jul/trainable_candidates.csv.gz"),
         "board": Path("outputs/stock_automl/board_band_2026/trainable_candidates.csv.gz"),
         "board_window": Path("outputs/stock_automl/main_3to6_wide_4to8_2026/trainable_candidates.csv.gz"),
+        "wide_only_ge3": Path("outputs/stock_automl/main_3to6_wide_4to8_2026/trainable_candidates.csv.gz"),
         "snapshots": Path("outputs/stock_automl/mk_1m_jan_jul/minute_daily_snapshots.csv.gz"),
     },
 }
@@ -43,9 +45,9 @@ def is_wide_board(symbols: pd.Series) -> pd.Series:
 def outcome_class(returns: pd.Series, symbols: pd.Series,
                   scheme: str) -> pd.Series:
     """Use the same four semantic classes with scheme-specific thresholds."""
-    if scheme not in ("legacy", "board", "board_window"):
+    if scheme not in ("legacy", "board", "board_window", "wide_only_ge3"):
         raise ValueError(f"Unknown scheme: {scheme}")
-    if scheme == "legacy":
+    if scheme in ("legacy", "wide_only_ge3"):
         acceptable = pd.Series(.01, index=returns.index)
         target = pd.Series(.03, index=returns.index)
     elif scheme == "board_window":
@@ -125,6 +127,8 @@ def run_one(year: str, scheme: str, intervals: pd.DataFrame,
     rows = pd.read_csv(source, dtype={"symbol6": str}, low_memory=False)
     test_months = tuple(f"{year}-{month:02d}" for month in range(5, test_through_month + 1))
     rows = rows[rows.signal_date.str[:7].isin((f"{year}-04", *test_months))].copy()
+    if scheme == "wide_only_ge3":
+        rows = rows[is_wide_board(rows.symbol6)].copy()
     rows = attach_outcome_adjustment(rows)
     cohorts, _ = make_cohorts(rows, intervals)
     eligible = cohorts["只去掉14:40涨停ST"]
@@ -135,7 +139,7 @@ def run_one(year: str, scheme: str, intervals: pd.DataFrame,
     if not test_days or test.empty:
         raise ValueError(f"Incomplete April-to-test experiment: {year}, {scheme}")
     feature_columns = list(FEATURES)
-    if scheme != "legacy":
+    if scheme in ("board", "board_window"):
         # The label thresholds depend on the board, so the model needs that
         # decision-time fact as an input. The legacy control stays seven-factor.
         eligible["wide_board"] = is_wide_board(eligible.symbol6).astype(int)
@@ -291,7 +295,7 @@ def main() -> None:
     parser.add_argument("--output", type=Path,
                         default=Path("docs/stock_automl_runs/20261011_board_band_april_may"))
     parser.add_argument("--scheme", action="append",
-                        choices=("legacy", "board", "board_window"))
+                        choices=("legacy", "board", "board_window", "wide_only_ge3"))
     parser.add_argument("--year", action="append", choices=("2025", "2026"))
     parser.add_argument("--test-through-month", type=int, choices=(5, 6, 7), default=5)
     parser.add_argument("--rolling20", action="store_true")

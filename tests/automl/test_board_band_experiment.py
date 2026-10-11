@@ -30,6 +30,11 @@ def test_board_specific_outcome_boundaries():
                          "board_window").tolist() == [
                              "neutral", "neutral", "acceptable", "acceptable",
                              "target", "acceptable", "target"]
+    assert outcome_class(pd.Series([-.001, 0, .009, .01, .029, .03]),
+                         pd.Series(["300001", "688001"] * 3),
+                         "wide_only_ge3").tolist() == [
+                             "wrong", "neutral", "neutral", "acceptable",
+                             "acceptable", "target"]
 
 
 def test_selection_uses_target_then_acceptable_and_two_slots():
