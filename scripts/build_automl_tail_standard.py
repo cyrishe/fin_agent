@@ -176,6 +176,10 @@ def morning_bars(conn, day):
         GROUP BY stk_code
     """, (f"{day} 09:31:00", f"{day} 09:35:00", f"{day} 09:35:00",
           f"{day} 09:35:00", day, f"{day} 09:31:00", f"{day} 09:40:00"))
+    if rows.empty:
+        rows = rows.reindex(columns=["symbol6", "next_open", "next_high5",
+                                     "next_high10", "bars5", "bars10", "volume5",
+                                     "morning_fallback", "morning_finalized"])
     rows["next_date"] = pd.Timestamp(day)
     return rows
 
