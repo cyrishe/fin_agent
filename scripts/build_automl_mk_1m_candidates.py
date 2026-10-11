@@ -128,8 +128,20 @@ def load_daily_profile(env_file: Path, start: str = START,
     return daily.merge(names, on="symbol6", how="left", validate="many_to_one"), profile, calendar, proxy_audit
 
 
+def candidate_band_mask(signals: pd.DataFrame, band: str) -> pd.Series:
+    """Select the 14:40 entry band without using any next-day outcome."""
+    if band == "legacy_3to6":
+        return signals.signal_return.between(.03, .06, inclusive="both")
+    if band != "board_volatility":
+        raise ValueError(f"Unknown candidate band: {band}")
+    code = signals.symbol6.astype(str).str.zfill(6)
+    wide = code.str.startswith(("30", "68", "4", "8", "92"))
+    return ((~wide & signals.signal_return.between(.02, .05, inclusive="both")) |
+            (wide & signals.signal_return.between(.04, .08, inclusive="both")))
+
+
 def build(archive: Path | list[Path], env_file: Path, output: Path,
-          reuse_snapshots: bool = False) -> dict:
+          reuse_snapshots: bool = False, candidate_band: str = "legacy_3to6") -> dict:
     archives = [archive] if isinstance(archive, Path) else archive
     files = day_files(archives)
     if not files:
@@ -196,7 +208,7 @@ def build(archive: Path | list[Path], env_file: Path, output: Path,
                                    signals.ma10.gt(signals.ma20)).astype("Int8")
     highest_ma = signals[["ma5", "ma10", "ma20"]].max(axis=1)
     signals["all_intraday_lows_above_ma"] = signals.min_low_so_far.gt(highest_ma).astype("Int8")
-    keep = (signals.signal_return.between(.03, .06, inclusive="both") &
+    keep = (candidate_band_mask(signals, candidate_band) &
             signals.t_reference_preclose.gt(0) & signals.signal_price.gt(0) &
             signals.minute_volume_shares.gt(0) & signals.min_low_so_far.gt(0) &
             signals.history_complete.eq(True) & signals.adj_price_break_20d.eq(False) &
@@ -225,7 +237,8 @@ def build(archive: Path | list[Path], env_file: Path, output: Path,
                                                   for x in minute_audits),
                "proxy_float_mv": proxy_audit,
                "feature_source": "unadjusted raw 1m; T-1 daily/derived float share and market value",
-               "universe": "active SH/SZ only; no ST name filter or next-day candidate filter"}
+               "universe": "active SH/SZ only; no ST name filter or next-day candidate filter",
+               "candidate_band": candidate_band}
     (output / "build_summary.json").write_text(json.dumps(summary, ensure_ascii=False, indent=2)+"\n")
     return summary
 
@@ -237,6 +250,8 @@ if __name__ == "__main__":
     parser.add_argument("--env-file", type=Path, default=Path("/Volumes/ext/fin_agent/.env"))
     parser.add_argument("--output", type=Path, default=OUT)
     parser.add_argument("--reuse-snapshots", action="store_true")
+    parser.add_argument("--candidate-band", choices=("legacy_3to6", "board_volatility"),
+                        default="legacy_3to6")
     args = parser.parse_args()
     print(json.dumps(build(args.archive or ARCHIVE, args.env_file, args.output,
-                           args.reuse_snapshots), ensure_ascii=False, indent=2))
+                           args.reuse_snapshots, args.candidate_band), ensure_ascii=False, indent=2))

@@ -1,0 +1,50 @@
+{
+  "year": "2025",
+  "scheme": "legacy",
+  "train_month": "2025-04",
+  "test_month": "2025-05",
+  "train_days": 21,
+  "train_rows": 10320,
+  "test_days": 19,
+  "test_candidates": 5850,
+  "north_exchange_rows": 0,
+  "features": [
+    "signal_return",
+    "volume_ratio",
+    "turnover_so_far_pct",
+    "float_mv_100m_cny",
+    "volume_4of5_increasing",
+    "ma_bull_5_10_20",
+    "all_intraday_lows_above_ma"
+  ],
+  "train_class_counts": {
+    "acceptable": 2909,
+    "neutral": 2831,
+    "wrong": 2641,
+    "target": 1939
+  },
+  "top1": {
+    "picks": 19,
+    "target": 2,
+    "acceptable": 5,
+    "neutral": 2,
+    "wrong": 10,
+    "unknown": 0,
+    "mean_0940_pct": -0.4986,
+    "mean_staged_pct": -0.5702,
+    "main_board": 9,
+    "wide_board": 10
+  },
+  "top2": {
+    "picks": 19,
+    "target": 1,
+    "acceptable": 5,
+    "neutral": 9,
+    "wrong": 4,
+    "unknown": 0,
+    "mean_0940_pct": -0.1941,
+    "mean_staged_pct": -0.242,
+    "main_board": 10,
+    "wide_board": 9
+  }
+}
