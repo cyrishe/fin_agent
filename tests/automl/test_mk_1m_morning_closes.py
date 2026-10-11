@@ -24,3 +24,35 @@ def test_minute_summary_preserves_all_ten_morning_closes(tmp_path):
     assert result.iloc[0].morning_close_35 == 10.35
     assert result.iloc[0].morning_close_40 == 10.
     assert result.iloc[0].morning_second_high == 10.
+
+
+def test_minute_summary_does_not_require_bars_after_signal(tmp_path):
+    morning = pd.date_range("2026-01-05 09:31", periods=120, freq="min")
+    afternoon = pd.date_range("2026-01-05 13:01", periods=100, freq="min")
+    rows = pd.DataFrame({
+        "time": morning.append(afternoon).strftime("%Y-%m-%d %H:%M:%S"),
+        "symbol": "600000.SH", "open": 10., "high": 10.,
+        "low": 10., "close": 10., "volume": 100.,
+    })
+    path = tmp_path / "2026-01-05.csv"
+    rows.to_csv(path, index=False)
+    result, _ = summarize_day(path)
+    assert len(result) == 1
+    assert result.iloc[0].signal_price == 10.
+    assert result.iloc[0].minute_volume_shares == 22000.
+
+
+def test_incomplete_signal_stock_is_dropped_without_dropping_the_day(tmp_path):
+    morning = pd.date_range("2026-01-05 09:31", periods=120, freq="min")
+    afternoon = pd.date_range("2026-01-05 13:01", periods=100, freq="min")
+    times = morning.append(afternoon).strftime("%Y-%m-%d %H:%M:%S")
+    complete = pd.DataFrame({
+        "time": times, "symbol": "600000.SH", "open": 10.,
+        "high": 10., "low": 10., "close": 10., "volume": 100.,
+    })
+    incomplete = complete.iloc[:-1].assign(symbol="600001.SH")
+    path = tmp_path / "2026-01-05.csv"
+    pd.concat([complete, incomplete]).to_csv(path, index=False)
+    result, audit = summarize_day(path)
+    assert result.symbol6.tolist() == ["600000"]
+    assert audit["invalid_required_stock_days"] == 1

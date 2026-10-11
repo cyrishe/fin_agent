@@ -33,20 +33,32 @@ def summarize_day(path: Path) -> tuple[pd.DataFrame, dict]:
            ~bars.low.le(bars[["open", "close"]].min(axis=1)))
     bad_required_symbols = set(bars.loc[bad & clock.le("14:40:00"), "symbol"])
     audit = {"date": day, "invalid_bars_anytime": int(bad.sum()),
-             "invalid_required_stock_days": len(bad_required_symbols)}
-    if bad_required_symbols:
-        keep = ~bars.symbol.isin(bad_required_symbols)
-        bars, clock = bars.loc[keep], clock.loc[keep]
-    counts = bars.groupby("symbol", sort=False).size()
-    if (not counts.eq(240).all() or bars[["symbol", "time"]].duplicated().any()
-            or clock.nunique() != 240):
-        raise ValueError(f"Incomplete or duplicate 1m session in {path}")
-    signal = bars.loc[clock.eq("14:40:00"), ["symbol", "close"]].rename(
+             "invalid_required_stock_days": 0}
+    # The signal is decided at 14:40. Later bars must not decide whether a
+    # stock-day is eligible, even when replaying a complete historical file.
+    visible = bars.loc[clock.le("14:40:00")].copy()
+    visible_clock = visible.time.str[-8:]
+    expected_clock = set(pd.date_range("09:31", periods=120, freq="min").strftime("%H:%M:%S"))
+    expected_clock.update(pd.date_range("13:01", periods=100, freq="min").strftime("%H:%M:%S"))
+    counts = visible.groupby("symbol", sort=False).size()
+    duplicates = set(visible.loc[
+        visible[["symbol", "time"]].duplicated(keep=False), "symbol"])
+    unexpected = set(visible.loc[~visible_clock.isin(expected_clock), "symbol"])
+    incomplete = set(counts.index[~counts.eq(220)]) | duplicates | unexpected
+    excluded = bad_required_symbols | incomplete
+    audit["invalid_required_stock_days"] = len(excluded)
+    visible = visible.loc[~visible.symbol.isin(excluded)].copy()
+    visible_clock = visible.time.str[-8:]
+    counts = visible.groupby("symbol", sort=False).size()
+    if visible.empty:
+        raise ValueError(f"No complete 14:40 stock-day in {path}")
+    signal = visible.loc[visible_clock.eq("14:40:00"), ["symbol", "close"]].rename(
         columns={"close": "signal_price"})
-    intraday = bars.loc[clock.le("14:40:00")].groupby("symbol", sort=False).agg(
+    intraday = visible.groupby("symbol", sort=False).agg(
         minute_bars=("low", "size"), minute_volume_shares=("volume", "sum"),
         min_low_so_far=("low", "min")).reset_index()
-    morning = bars.loc[clock.le("09:40:00"), ["symbol", "time", "high", "close", "volume"]]
+    morning = visible.loc[visible_clock.le("09:40:00"),
+                          ["symbol", "time", "high", "close", "volume"]]
     morning_count = morning.groupby("symbol", sort=False).size()
     if (not intraday.minute_bars.eq(220).all() or not morning_count.eq(10).all()
             or len(signal) != len(counts)):

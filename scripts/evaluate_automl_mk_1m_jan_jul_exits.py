@@ -24,7 +24,8 @@ STRATEGIES = {
 
 
 def evaluate(picks: pd.DataFrame, rows: pd.DataFrame,
-             intervals: pd.DataFrame, daily: pd.DataFrame) -> tuple[pd.DataFrame, dict]:
+             intervals: pd.DataFrame, daily: pd.DataFrame,
+             next_daily: pd.DataFrame) -> tuple[pd.DataFrame, dict]:
     if picks.duplicated(["arm", "signal_date"]).any() or picks.selection_rank.ne(1).any():
         raise ValueError("Expected exactly one Top1 per arm and signal day")
     observations = rows[["signal_date", "symbol6", "next_date", *CLOSES]]
@@ -35,6 +36,8 @@ def evaluate(picks: pd.DataFrame, rows: pd.DataFrame,
     joined = attach_st_status(joined, intervals)
     joined["signal_date"] = joined.signal_date.dt.strftime("%Y-%m-%d")
     joined = joined.merge(daily, on=["signal_date", "symbol6"], how="left",
+                          validate="many_to_one")
+    joined = joined.merge(next_daily, on=["next_date", "symbol6"], how="left",
                           validate="many_to_one")
     joined = mark_entry_limit(joined.assign(preclose=joined.day_preclose))
     joined["historical_st"] = joined.st_type.isin(("S", "Y"))
@@ -47,9 +50,14 @@ def evaluate(picks: pd.DataFrame, rows: pd.DataFrame,
         closes = [getattr(row, col) for col in CLOSES]
         morning_known = np.isfinite(closes).all()
         for strategy, rule in STRATEGIES.items():
-            result = (rule(row.signal_price, closes) if morning_known else
-                      {"exit_minute": None, "exit_price": np.nan,
-                       "exit_return": np.nan, "rule": "unobservable"})
+            if morning_known:
+                result = rule(row.signal_price, closes)
+            elif pd.notna(row.next_day_volume) and row.next_day_volume == 0:
+                result = {"exit_minute": None, "exit_price": np.nan,
+                          "exit_return": 0.0, "rule": "next_day_suspended_zero"}
+            else:
+                result = {"exit_minute": None, "exit_price": np.nan,
+                          "exit_return": np.nan, "rule": "unobservable"}
             trades.append({
                 "arm": row.arm, "signal_date": row.signal_date,
                 "next_date": row.next_date, "symbol6": row.symbol6,
@@ -75,7 +83,10 @@ def evaluate(picks: pd.DataFrame, rows: pd.DataFrame,
         for month, month_rows in ordered.groupby(ordered.signal_date.str[:7]):
             month_returns = month_rows.exit_return.dropna()
             monthly[str(month)] = {
-                "selected": len(month_rows), "observed": len(month_returns),
+                "selected": len(month_rows),
+                "observed": int((month_rows.exit_return.notna() &
+                                 month_rows.exit_rule.ne("next_day_suspended_zero")).sum()),
+                "settled": len(month_returns),
                 "ge3": int(month_rows.exit_return.ge(.03).sum()),
                 "mean_return_pct": float(month_returns.mean() * 100)
                 if len(month_returns) else None,
@@ -85,7 +96,10 @@ def evaluate(picks: pd.DataFrame, rows: pd.DataFrame,
         summary[f"{arm}/{strategy}"] = {
             "trades": len(group), "first": str(group.signal_date.min()),
             "last": str(group.signal_date.max()),
-            "observed_exits": len(observed),
+            "observed_exits": int((group.exit_return.notna() &
+                                   group.exit_rule.ne("next_day_suspended_zero")).sum()),
+            "settled_exits": len(observed),
+            "suspended_zero_exits": int(group.exit_rule.eq("next_day_suspended_zero").sum()),
             "unobservable_exits": int(returns.isna().sum()),
             "mean_trade_return_pct": float(observed.mean() * 100)
             if len(observed) else None,
@@ -125,10 +139,17 @@ def run(picks_path: Path, candidates_path: Path, output: Path) -> dict:
                       "FROM kcrp_stock_price WHERE trade_date BETWEEN %s AND %s "
                       f"AND stk_code IN ({placeholders})",
                       (picks.signal_date.min(), picks.signal_date.max(), *symbols))
+        next_daily = query(db, "SELECT trade_date AS next_date, LEFT(stk_code,6) AS symbol6, "
+                           "volume AS next_day_volume FROM kcrp_stock_price "
+                           "WHERE trade_date BETWEEN %s AND %s "
+                           f"AND stk_code IN ({placeholders})",
+                           (picks.next_date.min(), picks.next_date.max(), *symbols))
     daily["signal_date"] = pd.to_datetime(daily.signal_date).dt.strftime("%Y-%m-%d")
     for col in ("day_preclose", "day_close"):
         daily[col] = pd.to_numeric(daily[col])
-    trades, summary = evaluate(picks, rows, intervals, daily)
+    next_daily["next_date"] = pd.to_datetime(next_daily.next_date).dt.strftime("%Y-%m-%d")
+    next_daily["next_day_volume"] = pd.to_numeric(next_daily.next_day_volume)
+    trades, summary = evaluate(picks, rows, intervals, daily, next_daily)
     output.mkdir(parents=True, exist_ok=True)
     trades.to_csv(output / "top1_exit_trades.csv", index=False)
     (output / "exit_summary.json").write_text(
