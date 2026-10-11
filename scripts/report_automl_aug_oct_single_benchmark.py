@@ -40,7 +40,7 @@ def attach_observed_morning(db, candidates: pd.DataFrame) -> pd.DataFrame:
             chunk = codes[start:start + 300]
             placeholders = ",".join(["%s"] * len(chunk))
             bars = query(db, "SELECT stk_code AS symbol6, bar_end_time, high_price, "
-                         "latest_price, is_finalized, is_fallback, source_snapshot_time "
+                         "latest_price, volume, is_finalized, is_fallback, source_snapshot_time "
                          "FROM aiia_stock_realtime_minute_snapshot_full "
                          "WHERE trade_date=%s AND kline_type='1m' AND period_minutes=1 "
                          "AND bar_end_time BETWEEN %s AND %s "
@@ -59,9 +59,13 @@ def attach_observed_morning(db, candidates: pd.DataFrame) -> pd.DataFrame:
                             group.bar_end_time).all()):
                     continue
                 high = pd.to_numeric(group.high_price)
+                first_five_volume = pd.to_numeric(group.loc[
+                    group.bar_end_time.le(pd.Timestamp(next_day + " 09:35:00")),
+                    "volume"]).sum()
                 close = pd.to_numeric(group.loc[group.bar_end_time.eq(
                     pd.Timestamp(next_day + " 09:40:00")), "latest_price"])
-                if len(close) == 1 and high.gt(0).all() and close.gt(0).all():
+                if (len(close) == 1 and high.gt(0).all() and close.gt(0).all()
+                        and first_five_volume > 0):
                     records.append({"next_date": next_day, "symbol6": code,
                                     "second_high": np.sort(high)[-2],
                                     "close_40": close.iloc[0]})
