@@ -31,13 +31,15 @@ def test_board_assignment_keeps_000_distinct():
     assert board_of("688001") == "STAR"
 
 
-def test_saved_daily_reconciles_previous_five_and_including_today():
+def test_saved_daily_uses_one_previous_five_day_0940_benchmark():
     root = Path("docs/stock_automl_runs/20261011_mk_1m_market_amount_board")
     daily = pd.read_csv(root / "gate_daily.csv")
-    previous = daily[daily["前五日通过2万亿门槛"]]
-    including_today = daily[daily["通过2万亿门槛"]]
-    assert len(previous) == 97 and len(including_today) == 96
-    assert previous["Top1固定09:40收益（%）"].count() == 94
-    assert including_today["Top1固定09:40收益（%）"].count() == 94
-    assert abs(previous["Top1固定09:40收益（%）"].mean() - .5117235859) < 1e-6
-    assert abs(including_today["Top1固定09:40收益（%）"].mean() - .3079341822) < 1e-6
+    monthly = pd.read_csv(root / "gate_monthly.csv")
+    assert len(daily) == 118 and daily["是否交易"].sum() == 97
+    assert daily["Top1 09:40收益（%）"].count() == 94
+    assert not any("新规则" in column or "含选股日" in column for column in daily)
+    assert daily.loc[~daily["是否交易"], "Top1股票"].isna().all()
+    assert abs(daily["Top1 09:40收益（%）"].mean() - .5117235859) < 1e-6
+    assert monthly["Top1交易笔数"].sum() == daily["Top1 09:40收益（%）"].count()
+    assert abs(monthly["Top1收益简单求和（%）"].sum() -
+               daily["Top1 09:40收益（%）"].sum()) < 1e-5

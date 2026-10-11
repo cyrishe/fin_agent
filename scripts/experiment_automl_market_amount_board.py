@@ -18,9 +18,7 @@ from scripts.experiment_automl_mk_1m_st_policies import (
 )
 from scripts.experiment_automl_second_high_four_class import CLASSES, four_class, models
 from scripts.automl_st_status import load_st_intervals
-from scripts.report_automl_tradable_st_new_exit_market import (
-    NEXT_CLOSES, PICKS, sell,
-)
+from scripts.report_automl_tradable_st_new_exit_market import PICKS
 from scripts.run_automl_four_class_pipeline import select_top, verify_next_day
 
 
@@ -189,18 +187,17 @@ def summarize(picks: pd.DataFrame, days: list[str]) -> pd.DataFrame:
                          "可接受数": int(frame.actual_class.eq("1to3").sum()),
                          "中性数": int(frame.actual_class.eq("0to1").sum()),
                          "错误数": int(frame.actual_class.eq("lt0").sum()),
-                         "固定09:40平均收益（%）": known.actual_0940_return.mean()*100,
-                         "新卖出平均收益（%）": known.new_exit_return.mean()*100,
-                         "固定09:40收益简单求和（%）": known.actual_0940_return.sum()*100,
-                         "新卖出收益简单求和（%）": known.new_exit_return.sum()*100,
-                         "固定09:40复利代理（%）": ((1+known.actual_0940_return).prod()-1)*100,
-                         "新卖出复利代理（%）": ((1+known.new_exit_return).prod()-1)*100})
+                         "09:40平均收益（%）": known.actual_0940_return.mean()*100,
+                         "09:40收益简单求和（%）": known.actual_0940_return.sum()*100,
+                         "09:40复利代理（%）": ((1+known.actual_0940_return).prod()-1)*100})
     return pd.DataFrame(rows)
 
 
 def collect(output: Path, env_file: Path) -> None:
+    experiments = output / "experiments"
+    experiments.mkdir(parents=True, exist_ok=True)
     market = market_by_day(pd.read_csv(AMOUNT, dtype={"trade_date": str}))
-    source = pd.read_csv(SOURCE, usecols=["signal_date", "symbol6", *NEXT_CLOSES],
+    source = pd.read_csv(SOURCE, usecols=["signal_date", "symbol6", "next_close_40"],
                          dtype={"signal_date": str, "symbol6": str}, low_memory=False)
     days = sorted(pd.read_csv(PICKS, usecols=["signal_date"],
                               dtype=str).signal_date.unique())[4:]
@@ -222,9 +219,9 @@ def collect(output: Path, env_file: Path) -> None:
                 frames.append(pd.DataFrame(payload["picks"]).assign(arm=arm))
     picks = pd.concat(frames, ignore_index=True)
     picks = picks.merge(source, on=["signal_date", "symbol6"], validate="many_to_one")
-    if picks[NEXT_CLOSES].isna().any().any():
+    if picks.next_close_40.isna().any():
         picks["_row_id"] = np.arange(len(picks))
-        missing = picks[picks[NEXT_CLOSES].isna().any(axis=1)].copy()
+        missing = picks[picks.next_close_40.isna()].copy()
         missing["actual_0940_return"] = pd.to_numeric(missing.actual_0940_return)
         missing = settle_suspensions(missing, env_file)
         if not missing.suspension_zero.all():
@@ -236,15 +233,6 @@ def collect(output: Path, env_file: Path) -> None:
         picks = picks.drop(columns="_row_id")
     else:
         picks["sale_status"] = "正常"
-    def exit_for(row):
-        if row.sale_status == "停牌不盈亏":
-            return "停牌", "停牌不盈亏", 0.
-        return sell(float(row.signal_price), [float(getattr(row, col))
-                                              for col in NEXT_CLOSES])
-    outcomes = [exit_for(row) for row in picks.itertuples(index=False)]
-    picks["sell_minute"] = [part[0] for part in outcomes]
-    picks["sell_rule"] = [part[1] for part in outcomes]
-    picks["new_exit_return"] = [part[2] for part in outcomes]
     picks["actual_0940_return"] = pd.to_numeric(picks.actual_0940_return)
     prices = picks.next_close_40 / picks.signal_price - 1
     if not np.allclose(prices[picks.sale_status.eq("正常")],
@@ -260,107 +248,48 @@ def collect(output: Path, env_file: Path) -> None:
     prior_gated = picks[picks.arm.eq("原模型") & picks.prior_high_amount].copy()
     prior_gated["arm"] = "原模型+前五日轮空"
     combined = pd.concat([picks, gated, prior_gated], ignore_index=True)
-    combined.to_csv(output / "all_picks.csv", index=False)
-    pd.DataFrame(folds).to_csv(output / "folds.csv", index=False)
-    market.to_csv(output / "daily_market.csv", index=False)
-    summarize(combined, days).to_csv(output / "summary.csv", index=False,
+    combined.to_csv(experiments / "all_picks.csv", index=False)
+    pd.DataFrame(folds).to_csv(experiments / "folds.csv", index=False)
+    market.to_csv(experiments / "daily_market.csv", index=False)
+    summarize(combined, days).to_csv(experiments / "summary.csv", index=False,
                                      float_format="%.6f")
 
 
 def write_gate_replay(output: Path) -> None:
     prior = Path("docs/stock_automl_runs/20261011_mk_1m_three_st_policies/"
                  "tradable_st_new_exit_market/daily.csv")
-    daily = pd.read_csv(prior, dtype={"Top1股票": str, "Top2股票": str})
+    source = pd.read_csv(prior, dtype={"Top1股票": str, "Top2股票": str})
     previous_columns = [f"前{lag}交易日截至14:40成交额（亿元）"
                         for lag in range(1, 6)]
+    if len(source) != 118 or source[previous_columns].isna().any().any():
+        raise ValueError("Incomplete previous-five-day market amount replay")
+    daily = source[["选股日", "前一交易日上涨家数", "前一交易日下跌家数",
+                    *previous_columns, "Top1股票", "Top1结果", "Top1固定09:40收益（%）",
+                    "Top2股票", "Top2结果", "Top2固定09:40收益（%）"]].copy()
     daily["前五日平均成交额（亿元）"] = daily[previous_columns].mean(axis=1)
-    daily["前五日通过2万亿门槛"] = daily["前五日平均成交额（亿元）"].ge(20000)
-    daily = daily.drop(columns=[column for column in daily if column.startswith(
-        "前") and "截至14:40成交额" in column])
-    market = market_by_day(pd.read_csv(AMOUNT, dtype={"trade_date": str}))
-    for lag in range(1, 5):
-        market[f"前{lag}交易日14:40成交额（亿元）"] = (
-            market.amount_1440_100m_cny.shift(lag))
-    market = market.rename(columns={
-        "amount_1440_100m_cny": "选股日14:40成交额（亿元）",
-        "amount_avg5_1440_100m": "含选股日五日平均成交额（亿元）",
-        "high_amount": "通过2万亿门槛"})
-    columns = ["trade_date", "选股日14:40成交额（亿元）",
-               *[f"前{lag}交易日14:40成交额（亿元）" for lag in range(1, 5)],
-               "含选股日五日平均成交额（亿元）", "通过2万亿门槛"]
-    daily = daily.merge(market[columns], left_on="选股日", right_on="trade_date",
-                        validate="one_to_one").drop(columns="trade_date")
-    if len(daily) != 118 or daily[columns[1:]].isna().any().any():
-        raise ValueError("Incomplete five-day gate replay")
+    daily["是否交易"] = daily["前五日平均成交额（亿元）"].ge(20000)
+    daily = daily.rename(columns={f"Top{rank}固定09:40收益（%）":
+                                  f"Top{rank} 09:40收益（%）" for rank in (1, 2)})
+    for rank in (1, 2):
+        daily.loc[~daily["是否交易"], [f"Top{rank}股票", f"Top{rank}结果",
+                                     f"Top{rank} 09:40收益（%）"]] = np.nan
     output.mkdir(parents=True, exist_ok=True)
     daily.to_csv(output / "gate_daily.csv", index=False, float_format="%.6f")
     months = []
     for month, group in daily.groupby(daily["选股日"].str[:7]):
         row = {"月份": month, "选股日数": len(group),
-               "交易日数": int(group["通过2万亿门槛"].sum()),
-               "轮空日数": int((~group["通过2万亿门槛"]).sum())}
+               "交易日数": int(group["是否交易"].sum()),
+               "轮空日数": int((~group["是否交易"]).sum())}
         for rank in (1, 2):
-            for rule in ("固定09:40", "新规则"):
-                col = f"Top{rank}{rule}收益（%）"
-                original = group[col].dropna()/100
-                gated = group.loc[group["通过2万亿门槛"], col].dropna()/100
-                row[f"Top{rank}{rule}原笔数"] = len(original)
-                row[f"Top{rank}{rule}轮空后笔数"] = len(gated)
-                row[f"Top{rank}{rule}原平均收益（%）"] = original.mean()*100
-                row[f"Top{rank}{rule}轮空后平均收益（%）"] = gated.mean()*100
-                row[f"Top{rank}{rule}原收益简单求和（%）"] = original.sum()*100
-                row[f"Top{rank}{rule}轮空后收益简单求和（%）"] = gated.sum()*100
-                row[f"Top{rank}{rule}原复利代理（%）"] = ((1+original).prod()-1)*100
-                row[f"Top{rank}{rule}轮空后复利代理（%）"] = ((1+gated).prod()-1)*100
+            returns = group[f"Top{rank} 09:40收益（%）"].dropna()
+            row[f"Top{rank}交易笔数"] = len(returns)
+            row[f"Top{rank}平均收益（%）"] = returns.mean()
+            row[f"Top{rank}收益简单求和（%）"] = returns.sum()
+            for label in ("达标", "可接受", "中性", "错误"):
+                row[f"Top{rank}{label}数"] = int(group[f"Top{rank}结果"].eq(label).sum())
         months.append(row)
     pd.DataFrame(months).to_csv(output / "gate_monthly.csv", index=False,
                                 float_format="%.6f")
-    sensitivity = []
-    for threshold in (18000, 19000, 20000, 21000, 22000, 25000):
-        accepted = daily[daily["含选股日五日平均成交额（亿元）"].ge(threshold)]
-        for rank in (1, 2):
-            for rule in ("固定09:40", "新规则"):
-                ret = accepted[f"Top{rank}{rule}收益（%）"].dropna()/100
-                sensitivity.append({"门槛（亿元）": threshold, "排名": f"Top{rank}",
-                                    "卖出方式": rule, "交易日数": len(accepted),
-                                    "交易笔数": len(ret), "平均收益（%）": ret.mean()*100,
-                                    "收益简单求和（%）": ret.sum()*100,
-                                    "复利代理（%）": ((1+ret).prod()-1)*100})
-    pd.DataFrame(sensitivity).to_csv(output / "gate_threshold_sensitivity.csv",
-                                     index=False, float_format="%.6f")
-    comparisons = []
-    for window, gate in (("前五日T−1至T−5", "前五日通过2万亿门槛"),
-                         ("含当天T至T−4", "通过2万亿门槛")):
-        accepted = daily[daily[gate]]
-        for rank in (1, 2):
-            for rule in ("固定09:40", "新规则"):
-                returns = accepted[f"Top{rank}{rule}收益（%）"].dropna()
-                comparisons.append({"五日窗口": window, "卖出方式": rule,
-                                    "排名": f"Top{rank}", "通过日数": len(accepted),
-                                    "交易笔数": len(returns),
-                                    "平均每笔收益（%）": returns.mean(),
-                                    "收益简单求和（%）": returns.sum()})
-    pd.DataFrame(comparisons).to_csv(output / "gate_window_comparison.csv",
-                                     index=False, float_format="%.6f")
-    prior_trades = Path("docs/stock_automl_runs/20261011_mk_1m_three_st_policies/"
-                        "tradable_st_new_exit_market/trades.csv")
-    trades = pd.read_csv(prior_trades, dtype={"symbol6": str, "signal_date": str})
-    trades["board"] = trades.symbol6.map(board_of)
-    trades = trades.merge(market[["trade_date", "通过2万亿门槛"]],
-                          left_on="signal_date", right_on="trade_date",
-                          validate="many_to_one")
-    board_rows = []
-    for (rank, board), group in trades.groupby(["selection_rank", "board"]):
-        for sample, frame in (("全部", group),
-                              ("2万亿以上", group[group["通过2万亿门槛"]])):
-            board_rows.append({"排名": f"Top{rank}", "板块": board, "样本": sample,
-                               "笔数": len(frame),
-                               "固定09:40平均收益（%）": frame.baseline_return.mean()*100,
-                               "新卖出平均收益（%）": frame.sell_return.mean()*100,
-                               "固定09:40收益总和（%）": frame.baseline_return.sum()*100,
-                               "新卖出收益总和（%）": frame.sell_return.sum()*100})
-    pd.DataFrame(board_rows).to_csv(output / "original_board_diagnostic.csv",
-                                    index=False, float_format="%.6f")
 
 
 def main() -> None:
