@@ -53,12 +53,15 @@ def required_bars(rows: list[dict[str, str]], calendar: list[str]) -> dict[str, 
     return needed
 
 
-def archive_amounts(needed: dict[str, set[str]]) -> list[dict]:
+def archive_amounts(
+    needed: dict[str, set[str]], *, root: Path = COMPACT_ROOT,
+    before: str | None = "2026-08-01",
+) -> list[dict]:
     records = []
     for index, (day, codes) in enumerate(sorted(needed.items()), start=1):
-        if day >= "2026-08-01":
+        if before is not None and day >= before:
             continue
-        path = day_file(COMPACT_ROOT, day)
+        path = day_file(root, day)
         bars = pd.read_csv(path, usecols=["time", "symbol", "turnover"],
                            dtype={"time": str, "symbol": str})
         bars = bars[bars.time.str[-8:].between("09:31:00", "14:40:00")]
