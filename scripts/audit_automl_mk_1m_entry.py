@@ -8,8 +8,10 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
+from scripts.mk_minute_archive import COMPACT_ROOT, day_file
 
-SOURCE = Path("outputs/stock_automl/mk_archive/mk/none")
+
+SOURCE = COMPACT_ROOT
 OUT = Path("docs/stock_automl_runs/20261010_mk_1m_rolling_backtest")
 
 
@@ -17,7 +19,7 @@ def run(source: Path = SOURCE, output: Path = OUT) -> dict:
     picks = pd.read_csv(output / "top1_verified.csv", dtype={"symbol6": str})
     parts = []
     for day, group in picks.groupby("signal_date"):
-        bars = pd.read_csv(source / f"{day}.csv",
+        bars = pd.read_csv(day_file(source, day),
                            usecols=["time", "symbol", "open", "high", "low",
                                     "close", "volume"], dtype={"symbol": str})
         bars = bars[bars.time.str.endswith("14:40:00")].copy()

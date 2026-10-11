@@ -12,6 +12,7 @@ import pandas as pd
 from scripts.experiment_automl_four_class_subset_selection import fit_tree
 from scripts.experiment_automl_mk_1m_rolling import arm_summary, evaluate
 from scripts.experiment_automl_second_high_four_class import four_class
+from scripts.mk_minute_archive import day_files, trading_day
 from scripts.run_automl_four_class_pipeline import select_training_samples
 
 
@@ -78,8 +79,7 @@ def main() -> None:
     a = p.parse_args()
     rows = pd.read_csv(a.data, dtype={"symbol6": str, "signal_date": str,
                                       "next_date": str}, low_memory=False)
-    dates = sorted(path.stem for root in a.calendar_archive
-                   for path in root.glob("2026-*.csv"))
+    dates = [trading_day(path) for path in day_files(a.calendar_archive)]
     if len(dates) < 21 or len(dates) != len(set(dates)):
         raise ValueError("Trading calendar is incomplete or duplicated")
     if a.workers < 1 or not 0 <= a.worker_index < a.workers:

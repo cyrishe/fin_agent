@@ -14,9 +14,10 @@ import pandas as pd
 
 from scripts.automl_st_status import attach_st_status, load_st_intervals
 from scripts.benchmark_automl_1440_inference import db_connection, query
+from scripts.mk_minute_archive import COMPACT_ROOT, day_file
 
 
-DEFAULT_SOURCE = Path("outputs/stock_automl/mk_archive/mk/none")
+DEFAULT_SOURCE = COMPACT_ROOT
 DEFAULT_REPORT = Path("docs/stock_automl_runs/20261010_mk_1m_buyability")
 PICKS = Path("docs/stock_automl_runs/20261010_mk_1m_rolling_backtest/top2_verified.csv")
 
@@ -24,9 +25,7 @@ PICKS = Path("docs/stock_automl_runs/20261010_mk_1m_rolling_backtest/top2_verifi
 def selected_minutes(source: Path, selected: pd.DataFrame) -> pd.DataFrame:
     parts = []
     for day, group in selected.groupby("signal_date"):
-        path = source / f"{day}.csv"
-        if not path.exists():
-            raise FileNotFoundError(path)
+        path = day_file(source, day)
         codes = set(group.symbol6)
         day_parts = []
         for chunk in pd.read_csv(path, usecols=["time", "symbol", "open", "high",

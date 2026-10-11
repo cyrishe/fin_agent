@@ -1,5 +1,7 @@
 # 5–7 月分钟 K 压缩包与 8 月衔接核查
 
+本页是原始解压审计；2026-10-11 起本机已[改用逐日无损压缩分钟 K](../20261011_mk_1m_compact/README.md)，原 CSV 已在核验后移除。
+
 核查日期：2026-10-10。输入为 `/Users/imac/Downloads/mk.tar.xz`，SHA-256：`169a84390f4e9444faf72d92200ff58473545bcbdf5e224b1c1baab1d21da635`。已按路径和成员类型校验后解压至本机 Git 忽略目录 `outputs/stock_automl/mk_archive/mk/`；共 124 个 CSV、解压后 11,008,950,736 字节。没有把原始行情复制进 Git 报告。
 
 | 目录 | 含义 | 日期 | 文件数 | 数据行数 |

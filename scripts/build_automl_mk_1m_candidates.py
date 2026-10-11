@@ -11,15 +11,16 @@ import pandas as pd
 
 from scripts.benchmark_automl_1440_inference import FEATURES, db_connection
 from scripts.build_automl_tail_standard import prior_profile
+from scripts.mk_minute_archive import COMPACT_ROOT, day_files, trading_day
 
 
 START, END = "2026-05-06", "2026-07-31"
-ARCHIVE = Path("outputs/stock_automl/mk_archive/mk/none")
+ARCHIVE = COMPACT_ROOT
 OUT = Path("outputs/stock_automl/mk_1m_study")
 
 
 def summarize_day(path: Path) -> tuple[pd.DataFrame, dict]:
-    day = path.stem
+    day = trading_day(path)
     bars = pd.read_csv(path, usecols=["time", "symbol", "open", "high", "low",
                                       "close", "volume"], dtype={"symbol": str})
     if bars.empty or not bars.time.str[:10].eq(day).all():
@@ -130,15 +131,14 @@ def load_daily_profile(env_file: Path, start: str = START,
 def build(archive: Path | list[Path], env_file: Path, output: Path,
           reuse_snapshots: bool = False) -> dict:
     archives = [archive] if isinstance(archive, Path) else archive
-    files = sorted((file for root in archives for file in root.glob("2026-*.csv")),
-                   key=lambda file: file.stem)
-    if not files or len({file.stem for file in files}) != len(files):
+    files = day_files(archives)
+    if not files:
         raise ValueError("Missing or duplicate unadjusted minute days")
-    start, end = files[0].stem, files[-1].stem
+    start, end = trading_day(files[0]), trading_day(files[-1])
     daily, profile, calendar, proxy_audit = load_daily_profile(env_file, start, end)
     expected = [str(day)[:10] for day in calendar
                 if pd.Timestamp(start) <= day <= pd.Timestamp(end)]
-    if [file.stem for file in files] != expected:
+    if [trading_day(file) for file in files] != expected:
         raise ValueError("Minute archive days differ from the daily trading calendar")
     next_date = {pd.Timestamp(a): pd.Timestamp(b)
                  for a, b in zip(calendar[:-1], calendar[1:])}
@@ -159,7 +159,7 @@ def build(archive: Path | list[Path], env_file: Path, output: Path,
             frame, audit = summarize_day(file)
             snapshots.append(frame)
             minute_audits.append(audit)
-            print(f"summarized {file.stem}", flush=True)
+            print(f"summarized {trading_day(file)}", flush=True)
         snapshots = pd.concat(snapshots, ignore_index=True)
         snapshots.to_csv(output / "minute_daily_snapshots.csv.gz", index=False,
                          compression="gzip")

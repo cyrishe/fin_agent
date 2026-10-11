@@ -7,6 +7,8 @@ import hashlib
 import json
 from pathlib import Path
 
+from scripts.mk_minute_archive import COMPACT_ROOT, day_files, trading_day
+
 import numpy as np
 import pandas as pd
 
@@ -164,8 +166,8 @@ def main() -> None:
     args = parser.parse_args()
     rows = pd.read_csv(args.data, dtype={"symbol6": str, "signal_date": str,
                                          "next_date": str}, low_memory=False)
-    archives = args.calendar_archive or [Path("outputs/stock_automl/mk_archive/mk/none")]
-    dates = sorted(path.stem for root in archives for path in root.glob("2026-*.csv"))
+    archives = args.calendar_archive or [COMPACT_ROOT]
+    dates = [trading_day(path) for path in day_files(archives)]
     if len(dates) < 21 or len(dates) != len(set(dates)) or len(rows) < 1000:
         raise ValueError("Source cohort or trading calendar is incomplete")
     args.checkpoint.mkdir(parents=True, exist_ok=True)

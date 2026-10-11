@@ -10,16 +10,14 @@ import pandas as pd
 
 from scripts.benchmark_automl_1440_inference import db_connection, query
 from scripts.experiment_automl_mk_1m_st_policies import POLICIES, SOURCE
+from scripts.mk_minute_archive import COMPACT_ROOT, day_files, trading_day
 from scripts.report_automl_daily_market_context import MARKET_SQL
 
 
 BASE = Path("docs/stock_automl_runs/20261011_mk_1m_three_st_policies")
 OUTPUT = BASE / "tradable_st_new_exit_market"
 PICKS = BASE / "top2_verified.csv"
-ARCHIVES = (
-    Path("outputs/stock_automl/mk_archive_jan_apr/mk/none"),
-    Path("outputs/stock_automl/mk_archive/mk/none"),
-)
+ARCHIVES = (COMPACT_ROOT,)
 NEXT_CLOSES = [f"next_close_{minute:02d}" for minute in range(31, 41)]
 LABELS = {"ge3": "达标", "1to3": "可接受", "0to1": "中性", "lt0": "错误"}
 
@@ -42,14 +40,15 @@ def market_amounts(archives: tuple[Path, ...], cache: Path) -> pd.DataFrame:
     if cache.exists():
         result = pd.read_csv(cache, dtype={"trade_date": str})
     else:
-        paths = sorted(path for root in archives for path in root.glob("2026-*.csv"))
-        if len(paths) != 139 or len({path.stem for path in paths}) != len(paths):
+        paths = day_files(archives)
+        if len(paths) != 139:
             raise ValueError("Expected 139 distinct January–July minute files")
         records = []
         for index, path in enumerate(paths, start=1):
             bars = pd.read_csv(path, usecols=["time", "symbol", "turnover"],
                                dtype={"symbol": str})
-            if not bars.time.str[:10].eq(path.stem).all():
+            day = trading_day(path)
+            if not bars.time.str[:10].eq(day).all():
                 raise ValueError(f"Unexpected date in {path}")
             a_share = bars.symbol.str.endswith((".SH", ".SZ")) & bars.symbol.str[0].isin(
                 ("0", "3", "6"))
@@ -60,7 +59,7 @@ def market_amounts(archives: tuple[Path, ...], cache: Path) -> pd.DataFrame:
                     at_1440.symbol.nunique() < 4000 or
                     visible[["time", "symbol"]].duplicated().any()):
                 raise ValueError(f"Incomplete or duplicate A-share turnover in {path}")
-            records.append({"trade_date": path.stem,
+            records.append({"trade_date": day,
                             "amount_1440_100m_cny": visible.turnover.sum() / 1e8,
                             "symbols_at_1440": at_1440.symbol.nunique()})
             if index % 10 == 0 or index == len(paths):
