@@ -3,7 +3,9 @@ from __future__ import annotations
 import pandas as pd
 import pytest
 
-from scripts.report_automl_daily_market_context import build_daily, export_daily, render_markdown
+from scripts.report_automl_daily_market_context import (
+    build_daily, export_daily, render_markdown, top1_flags,
+)
 
 
 def test_daily_report_uses_only_prior_market_days_and_labeled_positive_signals():
@@ -44,9 +46,15 @@ def test_daily_report_uses_only_prior_market_days_and_labeled_positive_signals()
     csv = export_daily(pd.DataFrame([result]))
     assert "达标数" in csv.columns and "严重错误数" in csv.columns
     assert csv.iloc[0]["第一名实际分类"] == "达标"
+    assert csv.iloc[0][["第一名达标", "第一名可接受", "第一名严重错误"]].tolist() == [1, 0, 0]
     markdown = render_markdown(pd.DataFrame([result]), "source")
-    assert "当天第一名股票" in markdown
+    assert "当天第一名股票" in markdown and "第一名严重错误" in markdown
     assert "Top1" not in markdown
+
+
+def test_top1_flags_distinguish_neutral_and_no_trade():
+    assert top1_flags("000001", "0to1") == (0, 0, 0)
+    assert top1_flags(None, None) == (None, None, None)
 
 
 def test_daily_report_rejects_price_disagreement():
