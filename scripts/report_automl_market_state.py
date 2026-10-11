@@ -9,7 +9,7 @@ import pandas as pd
 
 
 ROOT = Path("docs/stock_automl_runs")
-OUT = ROOT / "20261011_market_state_asof"
+OUT = Path("outputs/stock_automl/market_state_threshold_exploration")
 POLICY = "只去掉14:40涨停ST"
 
 
