@@ -63,6 +63,7 @@ def build_daily(scores: pd.DataFrame, candidates: pd.DataFrame,
                      "predicted_up_unlabeled_n": len(selected) - len(labeled),
                      "target_ge3_n": int(outcome.ge(.03).sum()),
                      "acceptable_1to3_n": int((outcome.ge(.01) & outcome.lt(.03)).sum()),
+                     "neutral_0to1_n": int((outcome.ge(0) & outcome.lt(.01)).sum()),
                      "error_lt0_n": int(outcome.lt(0).sum())})
     daily = pd.DataFrame(rows)
     if top1.duplicated("signal_date").any():
@@ -98,8 +99,12 @@ def build_daily(scores: pd.DataFrame, candidates: pd.DataFrame,
             f"{float(item.amount_100m_cny):.2f}" for item in trailing.itertuples())
     daily["top1_0940_return_pct"] = daily.top1_0940_return * 100
     daily = daily.drop(columns="top1_0940_return")
-    if daily.predicted_up_labeled_n.lt(daily.target_ge3_n + daily.acceptable_1to3_n + daily.error_lt0_n).any():
-        raise ValueError("Outcome counts exceed predicted-up candidates")
+    if daily.candidate_n.lt(daily.predicted_up_n).any():
+        raise ValueError("Model bullish count exceeds same-day candidate pool")
+    outcome_total = (daily.target_ge3_n + daily.acceptable_1to3_n + daily.neutral_0to1_n +
+                     daily.error_lt0_n + daily.predicted_up_unlabeled_n)
+    if not daily.predicted_up_n.eq(outcome_total).all():
+        raise ValueError("Predicted-up count does not reconcile with outcomes and missing labels")
     return daily
 
 
@@ -107,57 +112,67 @@ def render_markdown(daily: pd.DataFrame, source_commit: str) -> str:
     lines = ["# 逐日模型效果、第一名收益与前一交易日大盘", "",
              f"采用保留可交易特殊处理股票的二十日训练模型，模型结果来源：`{source_commit}`。"
              "每行日期是下午 14:40 的选股日；第一名收益在下一交易日 09:40 分钟收盘价实现。", "",
-             "**模型效果**统计当日被模型预测为次晨上涨至少 1%、且次晨价格数据完整的全部股票。"
-             "这不是每日实际买入数。达标指次晨 09:31–09:40 第二高价比选股日 14:40 价格上涨至少 3%；"
+             "当天先统计 14:40 入池并完成评分的股票，再统计其中被模型判为次晨上涨至少 1% 的股票。"
+             "达标、可接受、中性、严重错误统计后一组中次晨价格完整的股票；缺少数据者另列。"
+             "每天都应满足：当日入池数 ≥ 模型判涨数 ＝ 达标＋可接受＋中性＋严重错误＋缺数据。"
+             "达标指次晨 09:31–09:40 第二高价比选股日 14:40 价格上涨至少 3%；"
              "可接受指上涨 1% 至不足 3%；严重错误指跌破选股日 14:40 价格。"
-             "上涨 0% 至不足 1% 的中性结果和缺少次晨数据的股票不展示。"
-             "前一交易日候选池股票数，是前一交易日 14:40 满足涨幅 3%–6% 等入池条件的股票总数，"
-             "用于观察前一天的市场状态，不是当天三类结果的分母。第一名按原选股规则确定，"
-             "三列第一名结果中，1 表示属于该类，0 表示不属于；无交易时留空。"
+             "中性指上涨 0% 至不足 1%；缺少次晨数据的股票不参与效果评价。"
+             "第一名按原选股规则确定，"
+             "四列第一名结果中，1 表示属于该类，0 表示不属于；无交易时留空。"
              "收益单独按次晨 09:40 收盘价计算，不代表在第二高价卖出。", "",
+             "**前一交易日候选池股票数属于前一天的市场背景**：按前一交易日 14:40 涨幅 3%–6% 等入池条件统计，"
+             "与本行当天的达标、可接受、严重错误数不是同一批股票，不应相加比较。"
+             "例如 4 月 8 日当天入池 2,074 只，模型判涨 1,220 只：达标 16、可接受 84、"
+             "中性 334、严重错误 786、缺数据 0，合计恰好 1,220。前一日候选池 730 只是 4 月 7 日的市场背景。", "",
              "前一交易日大盘涨跌家数来自 `kingdomai.kcrp_stock_price` 收盘价对昨收价；平盘未计入。"
              "范围是沪深 A 股代码（`.SH/.SZ`，首位 `0/3/6`），停牌且价格有效者可计入挂牌数；"
              "近五个交易日成交额为同表逐股 `amount` 求和，单位亿元，从较早交易日到较近交易日排列，"
              "截止选股日前一交易日，不含选股日数据。成交额为数据库覆盖口径，未与交易所公报逐日对账。", ""]
-    columns = ["选股日", "前一交易日候选池股票数",
-               "达标数", "可接受数", "严重错误数", "当天第一名股票", "第一名实际分类",
-               "第一名达标", "第一名可接受", "第一名严重错误",
-               "第一名次晨卖出收益", "前一交易日上涨/下跌家数", "此前五日沪深成交额（亿元，从远到近）"]
+    columns = ["选股日", "当日入池股票数", "模型判涨股票数", "达标数", "可接受数", "中性数",
+               "严重错误数", "缺数据数",
+               "当天第一名股票",
+               "第一名达标", "第一名可接受", "第一名中性", "第一名严重错误",
+               "第一名次晨卖出收益", "前一交易日候选池股票数",
+               "前一交易日上涨/下跌家数", "此前五日沪深成交额（亿元，从远到近）"]
     for month, group in daily.groupby(daily.T_date.str[:7], sort=True):
         lines += [f"## {month[:4]} 年 {int(month[5:])} 月", "", "| " + " | ".join(columns) + " |",
                   "|" + "|".join(["---"] * len(columns)) + "|"]
         for row in group.itertuples():
-            target = {"ge3": "达标", "1to3": "可接受", "lt0": "严重错误"}.get(
-                row.top1_target_class, "—")
             flags = top1_flags(row.top1_symbol6, row.top1_target_class)
             top1 = f"{row.top1_symbol6} {row.top1_name}" if isinstance(row.top1_symbol6, str) else "无交易"
             profit = f"{row.top1_0940_return_pct:+.2f}%" if pd.notna(row.top1_0940_return_pct) else "—"
             amounts = row.T_minus_5_to_minus_1_amount_100m_cny.replace("; ", "<br>")
-            lines.append("| " + " | ".join(map(str, [row.T_date, int(row.T_minus_1_candidate_pool_n),
-                row.target_ge3_n, row.acceptable_1to3_n, row.error_lt0_n,
-                top1, target, *("—" if value is None else value for value in flags), profit,
+            lines.append("| " + " | ".join(map(str, [row.T_date, row.candidate_n, row.predicted_up_n,
+                row.target_ge3_n, row.acceptable_1to3_n, row.neutral_0to1_n,
+                row.error_lt0_n, row.predicted_up_unlabeled_n,
+                top1, *("—" if value is None else value for value in flags), profit,
+                int(row.T_minus_1_candidate_pool_n),
                 f"{int(row.T_minus_1_up)}/{int(row.T_minus_1_down)}", amounts])) + " |")
         lines.append("")
     return "\n".join(lines)
 
 
-def top1_flags(symbol: object, actual_class: object) -> tuple[int | None, int | None, int | None]:
+def top1_flags(symbol: object, actual_class: object) -> tuple[int | None, ...]:
     if not isinstance(symbol, str):
-        return None, None, None
-    return tuple(int(actual_class == label) for label in ("ge3", "1to3", "lt0"))
+        return None, None, None, None
+    return tuple(int(actual_class == label) for label in ("ge3", "1to3", "0to1", "lt0"))
 
 
 def export_daily(daily: pd.DataFrame) -> pd.DataFrame:
     columns = {
         "T_date": "选股日",
-        "T_minus_1_candidate_pool_n": "前一交易日候选池股票数",
+        "candidate_n": "当日入池股票数",
+        "predicted_up_n": "模型判涨股票数",
         "target_ge3_n": "达标数",
         "acceptable_1to3_n": "可接受数",
+        "neutral_0to1_n": "中性数",
         "error_lt0_n": "严重错误数",
+        "predicted_up_unlabeled_n": "缺数据数",
         "top1_symbol6": "当天第一名股票代码",
         "top1_name": "当天第一名股票名称",
-        "top1_target_class": "第一名实际分类",
         "top1_0940_return_pct": "第一名次晨卖出收益百分比",
+        "T_minus_1_candidate_pool_n": "前一交易日候选池股票数",
         "T_minus_1_up": "前一交易日上涨家数",
         "T_minus_1_down": "前一交易日下跌家数",
         "T_minus_5_to_minus_1_amount_100m_cny": "此前五日沪深成交额亿元从远到近",
@@ -165,11 +180,9 @@ def export_daily(daily: pd.DataFrame) -> pd.DataFrame:
     result = daily[list(columns)].rename(columns=columns)
     flags = [top1_flags(row.top1_symbol6, row.top1_target_class) for row in daily.itertuples()]
     for offset, (name, values) in enumerate(zip(
-            ("第一名达标", "第一名可接受", "第一名严重错误"), zip(*flags))):
-        result.insert(result.columns.get_loc("第一名实际分类") + 1 + offset,
+            ("第一名达标", "第一名可接受", "第一名中性", "第一名严重错误"), zip(*flags))):
+        result.insert(result.columns.get_loc("当天第一名股票名称") + 1 + offset,
                       name, pd.Series(values, dtype="Int64"))
-    result["第一名实际分类"] = result["第一名实际分类"].map(
-        {"ge3": "达标", "1to3": "可接受", "lt0": "严重错误"})
     for name in ("前一交易日候选池股票数", "前一交易日上涨家数", "前一交易日下跌家数"):
         result[name] = result[name].astype(int)
     return result

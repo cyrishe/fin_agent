@@ -37,10 +37,12 @@ def test_daily_report_uses_only_prior_market_days_and_labeled_positive_signals()
                            "listed_count": [7] * 6, "traded_count": [7] * 6})
     market.loc[5, "trade_date"] = pd.Timestamp(day)
     result = build_daily(scores, candidates, top1, market).iloc[0]
+    assert result.candidate_n == 4
     assert result.predicted_up_n == 3
     assert result.predicted_up_labeled_n == 2
     assert result.predicted_up_unlabeled_n == 1
-    assert (result.target_ge3_n, result.acceptable_1to3_n, result.error_lt0_n) == (1, 0, 1)
+    assert (result.target_ge3_n, result.acceptable_1to3_n,
+            result.neutral_0to1_n, result.error_lt0_n) == (1, 0, 0, 1)
     assert result.T_minus_1_date == "2026-01-30"
     assert result.T_minus_1_candidate_pool_n == 1
     assert result.T_minus_1_up == 5
@@ -50,11 +52,14 @@ def test_daily_report_uses_only_prior_market_days_and_labeled_positive_signals()
 
     csv = export_daily(pd.DataFrame([result]))
     assert "达标数" in csv.columns and "严重错误数" in csv.columns
+    assert csv.iloc[0]["当日入池股票数"] == 4
+    assert csv.iloc[0]["模型判涨股票数"] == 3
+    assert csv.iloc[0][["达标数", "可接受数", "中性数", "严重错误数", "缺数据数"]].sum() == 3
     assert "预测上涨且已验证的股票数" not in csv.columns
     assert csv.iloc[0]["前一交易日候选池股票数"] == 1
     assert "前一交易日" not in csv.columns
-    assert csv.iloc[0]["第一名实际分类"] == "达标"
-    assert csv.iloc[0][["第一名达标", "第一名可接受", "第一名严重错误"]].tolist() == [1, 0, 0]
+    assert "第一名实际分类" not in csv.columns
+    assert csv.iloc[0][["第一名达标", "第一名可接受", "第一名中性", "第一名严重错误"]].tolist() == [1, 0, 0, 0]
     markdown = render_markdown(pd.DataFrame([result]), "source")
     assert "当天第一名股票" in markdown and "第一名严重错误" in markdown
     assert "前一交易日候选池股票数" in markdown
@@ -64,8 +69,8 @@ def test_daily_report_uses_only_prior_market_days_and_labeled_positive_signals()
 
 
 def test_top1_flags_distinguish_neutral_and_no_trade():
-    assert top1_flags("000001", "0to1") == (0, 0, 0)
-    assert top1_flags(None, None) == (None, None, None)
+    assert top1_flags("000001", "0to1") == (0, 0, 1, 0)
+    assert top1_flags(None, None) == (None, None, None, None)
 
 
 def test_daily_report_rejects_price_disagreement():
