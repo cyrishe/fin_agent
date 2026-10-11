@@ -132,11 +132,12 @@ def candidate_band_mask(signals: pd.DataFrame, band: str) -> pd.Series:
     """Select the 14:40 entry band without using any next-day outcome."""
     if band == "legacy_3to6":
         return signals.signal_return.between(.03, .06, inclusive="both")
-    if band != "board_volatility":
+    if band not in ("board_volatility", "main_3to6_wide_4to8"):
         raise ValueError(f"Unknown candidate band: {band}")
     code = signals.symbol6.astype(str).str.zfill(6)
     wide = code.str.startswith(("30", "68", "4", "8", "92"))
-    return ((~wide & signals.signal_return.between(.02, .05, inclusive="both")) |
+    main_low, main_high = ((.02, .05) if band == "board_volatility" else (.03, .06))
+    return ((~wide & signals.signal_return.between(main_low, main_high, inclusive="both")) |
             (wide & signals.signal_return.between(.04, .08, inclusive="both")))
 
 
@@ -250,7 +251,8 @@ if __name__ == "__main__":
     parser.add_argument("--env-file", type=Path, default=Path("/Volumes/ext/fin_agent/.env"))
     parser.add_argument("--output", type=Path, default=OUT)
     parser.add_argument("--reuse-snapshots", action="store_true")
-    parser.add_argument("--candidate-band", choices=("legacy_3to6", "board_volatility"),
+    parser.add_argument("--candidate-band", choices=("legacy_3to6", "board_volatility",
+                                                    "main_3to6_wide_4to8"),
                         default="legacy_3to6")
     args = parser.parse_args()
     print(json.dumps(build(args.archive or ARCHIVE, args.env_file, args.output,
