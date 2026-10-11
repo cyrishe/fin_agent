@@ -248,6 +248,8 @@ def main() -> None:
     for name, group in (("2025_validation", validation), ("2026_test", test),
                         ("2026_sep_test", sep_test)):
         shape_pred = shape_model.predict(group[morning])
+        p_down = shape_model.predict_proba(group[morning])[:,
+                                           list(shape_model[-1].classes_).index("持续走低")]
         p_early = action_model.predict_proba(group[morning])[:, 1]
         p_early_plus = action_plus_prior.predict_proba(group[morning + prior])[:, 1]
         p_early_rolling = np.array([
@@ -284,6 +286,10 @@ def main() -> None:
                 "next_date": rec["next_date"],
                 "symbol6": rec["symbol6"], "name": rec["name"],
                 "actual_shape": rec["shape_label"], "predicted_shape": shape_pred[i],
+                "p_sustained_down": p_down[i],
+                "g1_max_close": rec["g1_max_close"],
+                "g2_max_close": rec["g2_max_close"],
+                "g3_max_close": rec["g3_max_close"],
                 "p_early_morning": p_early[i], "p_early_plus_prior": p_early_plus[i],
                 "p_early_rolling": p_early_rolling[i],
                 "tree_predicted_early_gain_pctpt": predicted_early_gain[i],
@@ -299,8 +305,12 @@ def main() -> None:
                 "prefix_rule_early": bool(simple_rule[i]),
             })
     OUT.mkdir(parents=True, exist_ok=True)
-    pd.DataFrame(prediction_rows).to_csv(OUT / "exit_predictions.csv", index=False,
-                                          float_format="%.6f")
+    predictions = pd.DataFrame(prediction_rows)
+    predictions.to_csv(OUT / "exit_predictions.csv", index=False, float_format="%.6f")
+    predictions[["split", "signal_date", "next_date", "symbol6", "name",
+                 "g1_max_close", "g2_max_close", "g3_max_close",
+                 "actual_shape", "predicted_shape", "p_sustained_down"]].to_csv(
+                     OUT / "shape_predictions.csv", index=False, float_format="%.6f")
     (OUT / "model_summary.json").write_text(json.dumps(results, ensure_ascii=False,
                                                          indent=2) + "\n")
     print(json.dumps(results, ensure_ascii=False, indent=2))
