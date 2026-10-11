@@ -1,9 +1,30 @@
 from pathlib import Path
 
 import pandas as pd
+import pytest
+
+from scripts.report_automl_aug_oct_single_benchmark import attach_recovered_labels
 
 
 ROOT = Path("docs/stock_automl_runs/20261011_aug_oct_single_benchmark")
+
+
+def test_recovered_morning_labels_are_used_once_and_conflicts_rejected():
+    rows = pd.DataFrame({"signal_date": ["2026-08-17", "2026-08-18"],
+                         "symbol6": ["688432", "600000"],
+                         "second_high": [float("nan"), 10.0],
+                         "close_40": [float("nan"), 9.9]})
+    audit = pd.DataFrame({"signal_date": ["2026-08-17", "2026-08-18"],
+                          "symbol6": ["688432", "600000"],
+                          "status": ["complete", "no_target_day"],
+                          "second_high": [10.5, float("nan")],
+                          "close_40": [10.1, float("nan")]})
+    filled = attach_recovered_labels(rows, audit)
+    assert filled.second_high.tolist() == [10.5, 10.0]
+    assert filled.close_40.tolist() == [10.1, 9.9]
+    rows.loc[0, "second_high"] = 10.6
+    with pytest.raises(ValueError, match="Conflicting recovered second_high"):
+        attach_recovered_labels(rows, audit)
 
 
 def test_daily_shows_all_model_picks_without_market_amount_gate():

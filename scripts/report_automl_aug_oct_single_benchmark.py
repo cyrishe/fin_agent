@@ -22,6 +22,8 @@ PREPARED = Path("docs/stock_automl_runs/20261010_four_class_similar_days/"
                 "prepared_candidates.csv.gz")
 OCT = Path("outputs/stock_automl/oct_20261008_09_standard/candidates_1440.csv")
 SEPTEMBER_PATCH = Path("outputs/stock_automl/sep14_16_rebuilt/candidates_1440.csv")
+RECOVERED_LABELS = Path("docs/stock_automl_runs/20261010_four_class_baseline_recent20/"
+                        "minute_api_label_audit.csv")
 OUT = Path("docs/stock_automl_runs/20261011_aug_oct_single_benchmark")
 MARKET = OUT / "market_context.csv"
 LABELS = {"ge3": "达标", "1to3": "可接受", "0to1": "中性", "lt0": "错误"}
@@ -69,6 +71,21 @@ def attach_observed_morning(db, candidates: pd.DataFrame) -> pd.DataFrame:
                             validate="many_to_one")
 
 
+def attach_recovered_labels(rows: pd.DataFrame, audit: pd.DataFrame) -> pd.DataFrame:
+    recovered = audit.loc[audit.status.eq("complete"),
+                          ["signal_date", "symbol6", "second_high", "close_40"]]
+    rows = rows.merge(recovered, on=["signal_date", "symbol6"], how="left",
+                      suffixes=("", "_recovered"), validate="one_to_one")
+    for column in ("second_high", "close_40"):
+        recovered_column = f"{column}_recovered"
+        conflict = (rows[column].notna() & rows[recovered_column].notna() &
+                    ~np.isclose(rows[column], rows[recovered_column], equal_nan=True))
+        if conflict.any():
+            raise ValueError(f"Conflicting recovered {column} for {int(conflict.sum())} rows")
+        rows[column] = rows[column].fillna(rows[recovered_column])
+    return rows.drop(columns=["second_high_recovered", "close_40_recovered"])
+
+
 def load_candidates(env_file: Path) -> pd.DataFrame:
     july = pd.read_csv(SOURCE, dtype={"signal_date": str, "next_date": str,
                                       "symbol6": str}, low_memory=False)
@@ -89,6 +106,8 @@ def load_candidates(env_file: Path) -> pd.DataFrame:
         october = attach_observed_morning(db, october)
         intervals = load_st_intervals(db)
     rows = pd.concat([july, august, september, october], ignore_index=True)
+    rows = attach_recovered_labels(
+        rows, pd.read_csv(RECOVERED_LABELS, dtype={"symbol6": str}))
     rows = rows.drop(columns=[column for column in ("st_type", "ann_date")
                               if column in rows])
     rows["symbol6"] = rows.symbol6.astype(str).str.zfill(6)
