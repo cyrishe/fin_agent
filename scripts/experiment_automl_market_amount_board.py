@@ -38,7 +38,9 @@ def market_by_day(amount: pd.DataFrame) -> pd.DataFrame:
     if market.trade_date.duplicated().any() or len(market) != 139:
         raise ValueError("Expected 139 distinct source trading days")
     market["amount_avg5_1440_100m"] = market.amount_1440_100m_cny.rolling(5).mean()
+    market["prior_avg5_1440_100m"] = market.amount_1440_100m_cny.shift(1).rolling(5).mean()
     market["high_amount"] = market.amount_avg5_1440_100m.ge(20000)
+    market["prior_high_amount"] = market.prior_avg5_1440_100m.ge(20000)
     market["amount_binary"] = market.high_amount.astype(int)
     # Ordinal buckets: <20k is 1; [20k,25k) is 2, then +1 per 5k (亿元).
     market["amount_tier"] = np.where(
@@ -249,12 +251,15 @@ def collect(output: Path, env_file: Path) -> None:
                        picks.loc[picks.sale_status.eq("正常"), "actual_0940_return"],
                        atol=1e-10):
         raise ValueError("09:40 return does not match source minute close")
-    picks = picks.merge(market[["trade_date", "amount_avg5_1440_100m", "high_amount"]],
+    picks = picks.merge(market[["trade_date", "amount_avg5_1440_100m", "high_amount",
+                                "prior_avg5_1440_100m", "prior_high_amount"]],
                         left_on="signal_date", right_on="trade_date", validate="many_to_one")
     picks["gate_pass"] = picks.high_amount
     gated = picks[picks.gate_pass & ~picks.arm.str.startswith("high_")].copy()
-    gated["arm"] = gated.arm + "+2万亿轮空"
-    combined = pd.concat([picks, gated], ignore_index=True)
+    gated["arm"] = gated.arm + "+含T五日轮空"
+    prior_gated = picks[picks.arm.eq("原模型") & picks.prior_high_amount].copy()
+    prior_gated["arm"] = "原模型+前五日轮空"
+    combined = pd.concat([picks, gated, prior_gated], ignore_index=True)
     combined.to_csv(output / "all_picks.csv", index=False)
     pd.DataFrame(folds).to_csv(output / "folds.csv", index=False)
     market.to_csv(output / "daily_market.csv", index=False)
@@ -266,6 +271,10 @@ def write_gate_replay(output: Path) -> None:
     prior = Path("docs/stock_automl_runs/20261011_mk_1m_three_st_policies/"
                  "tradable_st_new_exit_market/daily.csv")
     daily = pd.read_csv(prior, dtype={"Top1股票": str, "Top2股票": str})
+    previous_columns = [f"前{lag}交易日截至14:40成交额（亿元）"
+                        for lag in range(1, 6)]
+    daily["前五日平均成交额（亿元）"] = daily[previous_columns].mean(axis=1)
+    daily["前五日通过2万亿门槛"] = daily["前五日平均成交额（亿元）"].ge(20000)
     daily = daily.drop(columns=[column for column in daily if column.startswith(
         "前") and "截至14:40成交额" in column])
     market = market_by_day(pd.read_csv(AMOUNT, dtype={"trade_date": str}))
@@ -318,6 +327,20 @@ def write_gate_replay(output: Path) -> None:
                                     "收益简单求和（%）": ret.sum()*100,
                                     "复利代理（%）": ((1+ret).prod()-1)*100})
     pd.DataFrame(sensitivity).to_csv(output / "gate_threshold_sensitivity.csv",
+                                     index=False, float_format="%.6f")
+    comparisons = []
+    for window, gate in (("前五日T−1至T−5", "前五日通过2万亿门槛"),
+                         ("含当天T至T−4", "通过2万亿门槛")):
+        accepted = daily[daily[gate]]
+        for rank in (1, 2):
+            for rule in ("固定09:40", "新规则"):
+                returns = accepted[f"Top{rank}{rule}收益（%）"].dropna()
+                comparisons.append({"五日窗口": window, "卖出方式": rule,
+                                    "排名": f"Top{rank}", "通过日数": len(accepted),
+                                    "交易笔数": len(returns),
+                                    "平均每笔收益（%）": returns.mean(),
+                                    "收益简单求和（%）": returns.sum()})
+    pd.DataFrame(comparisons).to_csv(output / "gate_window_comparison.csv",
                                      index=False, float_format="%.6f")
     prior_trades = Path("docs/stock_automl_runs/20261011_mk_1m_three_st_policies/"
                         "tradable_st_new_exit_market/trades.csv")
