@@ -65,7 +65,7 @@ def market_amounts(archives: tuple[Path, ...], cache: Path) -> pd.DataFrame:
                             "symbols_at_1440": at_1440.symbol.nunique()})
             if index % 10 == 0 or index == len(paths):
                 print(f"14:40 market amounts: {index}/{len(paths)} days", flush=True)
-        result = pd.DataFrame(records)
+        result = pd.DataFrame(records).sort_values("trade_date").reset_index(drop=True)
         cache.parent.mkdir(parents=True, exist_ok=True)
         result.to_csv(cache, index=False, float_format="%.6f")
     if len(result) != 139 or result.trade_date.duplicated().any():
