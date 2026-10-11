@@ -133,8 +133,13 @@ def replay(rows: pd.DataFrame, market: pd.DataFrame) -> tuple[pd.DataFrame, pd.D
         previous_dates = dates[max(0, index-20):index]
         training = rows[rows.signal_date.isin(previous_dates) &
                         rows.second_high.notna() & rows.next_date.le(day)].copy()
-        if training.signal_date.nunique() < 15:
-            raise ValueError(f"Insufficient mature 20-day window on {day}")
+        training_days = training.signal_date.nunique()
+        if training_days != 20:
+            folds.append({"选股日": day, "候选股票数": len(rows[rows.signal_date.eq(day)]),
+                          "训练日数": training_days, "训练样本数": len(training),
+                          "入选数": 0})
+            print(f"{day}: skipped, only {training_days}/20 training days", flush=True)
+            continue
         model = models()["small_boosted_tree"]
         model.fit(generate_training_features(training), generate_training_labels(training))
         current = rows[rows.signal_date.eq(day)].copy()
@@ -143,7 +148,7 @@ def replay(rows: pd.DataFrame, market: pd.DataFrame) -> tuple[pd.DataFrame, pd.D
         if len(selected):
             picks.append(selected)
         folds.append({"选股日": day, "候选股票数": len(current),
-                      "训练日数": training.signal_date.nunique(),
+                      "训练日数": training_days,
                       "训练样本数": len(training), "入选数": len(selected)})
         print(f"{day}: {len(training)} train, {len(current)} candidates, "
               f"{len(selected)} picks", flush=True)
@@ -155,6 +160,7 @@ def daily_monthly(picks: pd.DataFrame, folds: pd.DataFrame,
     positions = {day: i for i, day in enumerate(market.trade_date)}
     by_day = {day: group.set_index("selection_rank") for day, group in
               picks.groupby("signal_date")}
+    skipped = set(folds.loc[folds["训练日数"].lt(20), "选股日"])
     records = []
     for day in market.loc[market.trade_date.between("2026-08-01", "2026-10-09"),
                           "trade_date"]:
@@ -170,7 +176,8 @@ def daily_monthly(picks: pd.DataFrame, folds: pd.DataFrame,
         for lag, column in enumerate(PRIOR, start=1):
             row[column] = previous.amount_1440_100m_cny.iloc[lag-1] if len(previous) >= lag else np.nan
         row["前五日平均成交额（亿元）"] = mean
-        row["备注"] = ("候选数据不足" if group is None else
+        row["备注"] = ("训练窗口不足" if day in skipped else
+                     "候选数据不足" if group is None else
                      "五日成交额缺失" if not complete else
                      "次日待验证" if day == "2026-10-09" else "已验证")
         for rank in (1, 2):
@@ -194,7 +201,7 @@ def daily_monthly(picks: pd.DataFrame, folds: pd.DataFrame,
     for month, group in daily.groupby(daily["选股日"].str[:7]):
         row = {"月份": month, "选股日数": len(group),
                "模型选股日数": int(group["Top1股票"].notna().sum()),
-               "无候选数据日数": int(group["Top1股票"].isna().sum()),
+               "无模型选股日数": int(group["Top1股票"].isna().sum()),
                "五日成交额缺失日数": int(group["前五日平均成交额（亿元）"].isna().sum())}
         for rank in (1, 2):
             returns = group[f"Top{rank} 09:40收益（%）"].dropna()
@@ -206,7 +213,7 @@ def daily_monthly(picks: pd.DataFrame, folds: pd.DataFrame,
                 row[f"Top{rank}{label}数"] = int(group[f"Top{rank}结果"].eq(label).sum())
         monthly.append(row)
     monthly = pd.DataFrame(monthly)
-    ordered = ["月份", "选股日数", "模型选股日数", "无候选数据日数"]
+    ordered = ["月份", "选股日数", "模型选股日数", "无模型选股日数"]
     for rank in (1, 2):
         ordered.extend([f"Top{rank}入选笔数", f"Top{rank}已验证笔数",
                         f"Top{rank}平均收益（%）",

@@ -27,14 +27,16 @@ def test_recovered_morning_labels_are_used_once_and_conflicts_rejected():
         attach_recovered_labels(rows, audit)
 
 
-def test_daily_shows_all_model_picks_without_market_amount_gate():
+def test_daily_requires_complete_20_day_training_window_without_amount_gate():
     daily = pd.read_csv(ROOT / "daily.csv", dtype={"Top1股票": str,
                                                          "Top2股票": str})
     assert len(daily) == 44
     assert "是否交易" not in daily and "备注" in daily
-    assert daily["Top1股票"].count() == 42
-    assert daily["Top1 09:40收益（%）"].count() == 41
-    assert daily.loc[daily["选股日"].eq("2026-08-05"), "Top1股票"].notna().all()
+    assert daily["Top1股票"].count() == 22
+    assert daily["Top1 09:40收益（%）"].count() == 21
+    assert daily.loc[daily["选股日"].between("2026-08-05", "2026-09-01"),
+                     "备注"].eq("训练窗口不足").all()
+    assert daily.loc[daily["选股日"].eq("2026-09-02"), "Top1股票"].notna().all()
     assert daily.loc[daily["选股日"].eq("2026-08-05"),
                      "前五日平均成交额（亿元）"].isna().all()
     assert daily.loc[daily["选股日"].eq("2026-10-09"),
