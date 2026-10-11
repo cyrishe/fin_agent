@@ -36,13 +36,14 @@ def sell(entry: float, closes: list[float]) -> tuple[str, str, float]:
     return "09:40", "到时卖出", closes[-1] / entry - 1
 
 
-def market_amounts(archives: tuple[Path, ...], cache: Path) -> pd.DataFrame:
+def market_amounts(archives: tuple[Path, ...], cache: Path,
+                   expected_days: int = 139) -> pd.DataFrame:
+    paths = day_files(archives)
+    if len(paths) != expected_days:
+        raise ValueError(f"Expected {expected_days} distinct minute files")
     if cache.exists():
         result = pd.read_csv(cache, dtype={"trade_date": str})
     else:
-        paths = day_files(archives)
-        if len(paths) != 139:
-            raise ValueError("Expected 139 distinct January–July minute files")
         records = []
         for index, path in enumerate(paths, start=1):
             bars = pd.read_csv(path, usecols=["time", "symbol", "turnover"],
@@ -67,7 +68,7 @@ def market_amounts(archives: tuple[Path, ...], cache: Path) -> pd.DataFrame:
         result = pd.DataFrame(records).sort_values("trade_date").reset_index(drop=True)
         cache.parent.mkdir(parents=True, exist_ok=True)
         result.to_csv(cache, index=False, float_format="%.6f")
-    if len(result) != 139 or result.trade_date.duplicated().any():
+    if len(result) != expected_days or result.trade_date.duplicated().any():
         raise ValueError("Incomplete or duplicate cached 14:40 market amounts")
     return result.sort_values("trade_date").reset_index(drop=True)
 
@@ -101,11 +102,11 @@ def attach_market(daily: pd.DataFrame, amount: pd.DataFrame,
 
 
 def make_daily(picks: pd.DataFrame, candidates: pd.DataFrame,
-               dates: list[str]) -> tuple[pd.DataFrame, pd.DataFrame]:
+               dates: list[str], expected_picks: int | None = 224) -> tuple[pd.DataFrame, pd.DataFrame]:
     policy = POLICIES[1]
     selected = picks[picks.policy.eq(policy)].copy()
-    if len(selected) != 224 or selected.entry_at_limit.any():
-        raise ValueError("Expected 224 non-limit Top1/Top2 picks")
+    if (expected_picks is not None and len(selected) != expected_picks) or selected.entry_at_limit.any():
+        raise ValueError("Expected non-limit Top1/Top2 picks")
     observations = candidates[["signal_date", "symbol6", *NEXT_CLOSES]]
     selected = selected.merge(observations, on=["signal_date", "symbol6"],
                               how="left", validate="one_to_one")
