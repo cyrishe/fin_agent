@@ -39,16 +39,19 @@ def test_daily_report_uses_only_prior_market_days_and_labeled_positive_signals()
     assert (result.target_ge3_n, result.acceptable_1to3_n, result.error_lt0_n) == (1, 0, 1)
     assert result.T_minus_1_date == "2026-01-30"
     assert result.T_minus_1_up == 5
-    assert "2026-01-30:50.00" in result.T_minus_5_to_minus_1_amount_100m_cny
-    assert "2026-02-02" not in result.T_minus_5_to_minus_1_amount_100m_cny
+    assert result.T_minus_5_to_minus_1_amount_100m_cny == (
+        "10.00; 20.00; 30.00; 40.00; 50.00")
     assert result.top1_0940_return_pct == pytest.approx(2.0)
 
     csv = export_daily(pd.DataFrame([result]))
     assert "达标数" in csv.columns and "严重错误数" in csv.columns
+    assert "前一交易日" not in csv.columns
     assert csv.iloc[0]["第一名实际分类"] == "达标"
     assert csv.iloc[0][["第一名达标", "第一名可接受", "第一名严重错误"]].tolist() == [1, 0, 0]
     markdown = render_markdown(pd.DataFrame([result]), "source")
     assert "当天第一名股票" in markdown and "第一名严重错误" in markdown
+    assert "| 5/2 |" in markdown
+    assert "10.00<br>20.00<br>30.00<br>40.00<br>50.00" in markdown
     assert "Top1" not in markdown
 
 

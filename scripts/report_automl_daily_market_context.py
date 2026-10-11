@@ -91,7 +91,7 @@ def build_daily(scores: pd.DataFrame, candidates: pd.DataFrame,
         daily.loc[i, "T_minus_1_listed"] = int(previous.listed_count)
         daily.loc[i, "T_minus_1_traded"] = int(previous.traded_count)
         daily.loc[i, "T_minus_5_to_minus_1_amount_100m_cny"] = "; ".join(
-            f"{item.trade_date}:{float(item.amount_100m_cny):.2f}" for item in trailing.itertuples())
+            f"{float(item.amount_100m_cny):.2f}" for item in trailing.itertuples())
     daily["top1_0940_return_pct"] = daily.top1_0940_return * 100
     daily = daily.drop(columns="top1_0940_return")
     if daily.predicted_up_labeled_n.lt(daily.target_ge3_n + daily.acceptable_1to3_n + daily.error_lt0_n).any():
@@ -112,12 +112,12 @@ def render_markdown(daily: pd.DataFrame, source_commit: str) -> str:
              "收益单独按次晨 09:40 收盘价计算，不代表在第二高价卖出。", "",
              "前一交易日大盘涨跌家数来自 `kingdomai.kcrp_stock_price` 收盘价对昨收价；平盘未计入。"
              "范围是沪深 A 股代码（`.SH/.SZ`，首位 `0/3/6`），停牌且价格有效者可计入挂牌数；"
-             "近五个交易日成交额为同表逐股 `amount` 求和，单位亿元，按日期从早到晚，"
+             "近五个交易日成交额为同表逐股 `amount` 求和，单位亿元，从较早交易日到较近交易日排列，"
              "截止选股日前一交易日，不含选股日数据。成交额为数据库覆盖口径，未与交易所公报逐日对账。", ""]
     columns = ["选股日", "预测上涨且已验证的股票数", "预测上涨但缺数据的股票数",
                "达标数", "可接受数", "严重错误数", "当天第一名股票", "第一名实际分类",
                "第一名达标", "第一名可接受", "第一名严重错误",
-               "第一名次晨卖出收益", "前一交易日上涨/下跌家数", "此前五日沪深成交额（亿元）"]
+               "第一名次晨卖出收益", "前一交易日上涨/下跌家数", "此前五日沪深成交额（亿元，从远到近）"]
     for month, group in daily.groupby(daily.T_date.str[:7], sort=True):
         lines += [f"## {month[:4]} 年 {int(month[5:])} 月", "", "| " + " | ".join(columns) + " |",
                   "|" + "|".join(["---"] * len(columns)) + "|"]
@@ -132,7 +132,7 @@ def render_markdown(daily: pd.DataFrame, source_commit: str) -> str:
                 row.predicted_up_unlabeled_n,
                 row.target_ge3_n, row.acceptable_1to3_n, row.error_lt0_n,
                 top1, target, *("—" if value is None else value for value in flags), profit,
-                f"{row.T_minus_1_date} {int(row.T_minus_1_up)}/{int(row.T_minus_1_down)}", amounts])) + " |")
+                f"{int(row.T_minus_1_up)}/{int(row.T_minus_1_down)}", amounts])) + " |")
         lines.append("")
     return "\n".join(lines)
 
@@ -155,10 +155,9 @@ def export_daily(daily: pd.DataFrame) -> pd.DataFrame:
         "top1_name": "当天第一名股票名称",
         "top1_target_class": "第一名实际分类",
         "top1_0940_return_pct": "第一名次晨卖出收益百分比",
-        "T_minus_1_date": "前一交易日",
         "T_minus_1_up": "前一交易日上涨家数",
         "T_minus_1_down": "前一交易日下跌家数",
-        "T_minus_5_to_minus_1_amount_100m_cny": "此前五日沪深成交额亿元",
+        "T_minus_5_to_minus_1_amount_100m_cny": "此前五日沪深成交额亿元从远到近",
     }
     result = daily[list(columns)].rename(columns=columns)
     flags = [top1_flags(row.top1_symbol6, row.top1_target_class) for row in daily.itertuples()]
