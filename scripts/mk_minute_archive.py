@@ -5,6 +5,7 @@ from pathlib import Path
 
 
 COMPACT_ROOT = Path("outputs/stock_automl/mk_1m_compact")
+COMPACT_ROOT_2025 = Path("outputs/stock_automl/mk_1m_compact_2025")
 SUFFIXES = (".csv.zst", ".csv")
 
 
@@ -18,7 +19,7 @@ def trading_day(path: Path) -> str:
 def day_files(roots: list[Path] | tuple[Path, ...]) -> list[Path]:
     files = sorted(
         (path for root in roots for suffix in SUFFIXES
-         for path in root.glob(f"2026-*{suffix}")),
+         for path in root.glob(f"20[0-9][0-9]-*{suffix}")),
         key=trading_day,
     )
     days = [trading_day(path) for path in files]
