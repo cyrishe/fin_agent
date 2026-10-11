@@ -3,7 +3,7 @@ from __future__ import annotations
 import pandas as pd
 import pytest
 
-from scripts.report_automl_daily_market_context import build_daily
+from scripts.report_automl_daily_market_context import build_daily, export_daily, render_markdown
 
 
 def test_daily_report_uses_only_prior_market_days_and_labeled_positive_signals():
@@ -40,6 +40,13 @@ def test_daily_report_uses_only_prior_market_days_and_labeled_positive_signals()
     assert "2026-01-30:50.00" in result.T_minus_5_to_minus_1_amount_100m_cny
     assert "2026-02-02" not in result.T_minus_5_to_minus_1_amount_100m_cny
     assert result.top1_0940_return_pct == pytest.approx(2.0)
+
+    csv = export_daily(pd.DataFrame([result]))
+    assert "达标数" in csv.columns and "严重错误数" in csv.columns
+    assert csv.iloc[0]["第一名实际分类"] == "达标"
+    markdown = render_markdown(pd.DataFrame([result]), "source")
+    assert "当天第一名股票" in markdown
+    assert "Top1" not in markdown
 
 
 def test_daily_report_rejects_price_disagreement():

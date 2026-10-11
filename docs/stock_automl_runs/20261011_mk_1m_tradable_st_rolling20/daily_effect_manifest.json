@@ -127,5 +127,5 @@
     "outputs/stock_automl/mk_1m_jan_jul/tradable_st_rolling20_checkpoints/2026-07-29_scores.csv.gz": "6a07ce523eba28455f35e198092a531d167ff760f7981536cd3975ffd19a2302",
     "outputs/stock_automl/mk_1m_jan_jul/tradable_st_rolling20_checkpoints/2026-07-30_scores.csv.gz": "790f4e6b3cb128064c50f0700dd565b725f33cc4222e8ca2cd2cb406f76037be"
   },
-  "market_daily_sha256": "641734ab7b659a46835188e829d5a87b85721f0b3cb83f6074886d9b6a1f998e"
+  "market_daily_sha256": "893420ecca5d73a4d97de5930d29d7e338093aac29129b176ff0f088aa8e85e3"
 }

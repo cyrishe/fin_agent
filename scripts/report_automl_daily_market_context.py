@@ -18,6 +18,7 @@ from scripts.benchmark_automl_1440_inference import db_connection, query
 ROOT = Path("docs/stock_automl_runs/20261011_mk_1m_tradable_st_rolling20")
 CHECKPOINTS = Path("outputs/stock_automl/mk_1m_jan_jul/tradable_st_rolling20_checkpoints")
 CANDIDATES = Path("outputs/stock_automl/mk_1m_jan_jul/tradable_st_candidates.csv.gz")
+MODEL_SOURCE_COMMIT = "99c3b7f5edd61926a32e8b9fb0d98f3b3225a938"
 MARKET_SQL = """SELECT trade_date,
     SUM(close > preclose) AS up_count,
     SUM(close < preclose) AS down_count,
@@ -99,22 +100,24 @@ def build_daily(scores: pd.DataFrame, candidates: pd.DataFrame,
 
 
 def render_markdown(daily: pd.DataFrame, source_commit: str) -> str:
-    lines = ["# 20 日保留可入场 ST 模型：逐日效果与前一日大盘", "",
-             f"模型结果来源：`{source_commit}`。T 为 14:40 信号日；Top1 收益在 T+1 09:40 分钟收盘价实现。", "",
-             "**模型本身效果**统计当日全部被四分类模型判为 `≥3%` 或 `1%–3%`、且次晨标签完整的候选；"
-             "这不是每日实际买入数。达标为次晨 09:31–09:40 第二高价相对 T 14:40 价 `≥3%`，"
-             "可接受为 `1%–3%`，严重错误为 `<0%`。`0%–1%` 中性未展示；"
-             "有标签正向信号数减去这三列即中性数；缺标签的正向信号另列，不参与评价。"
-             "Top1 按原规则从正向候选中取一只，收益单独按次晨 09:40 收盘价计算，"
-             "不代表在第二高价卖出。", "",
-             "大盘 T−1 涨跌家数来自 `kingdomai.kcrp_stock_price` 收盘价对昨收价；平盘未计入。"
+    lines = ["# 逐日模型效果、第一名收益与前一交易日大盘", "",
+             f"采用保留可交易特殊处理股票的二十日训练模型，模型结果来源：`{source_commit}`。"
+             "每行日期是下午 14:40 的选股日；第一名收益在下一交易日 09:40 分钟收盘价实现。", "",
+             "**模型效果**统计当日被模型预测为次晨上涨至少 1%、且次晨价格数据完整的全部股票。"
+             "这不是每日实际买入数。达标指次晨 09:31–09:40 第二高价比选股日 14:40 价格上涨至少 3%；"
+             "可接受指上涨 1% 至不足 3%；严重错误指跌破选股日 14:40 价格。"
+             "上涨 0% 至不足 1% 的中性结果不展示；已验证股票数减去上述三类就是中性数。"
+             "缺少次晨数据的股票单列，不参与评价。第一名按原选股规则确定，"
+             "收益单独按次晨 09:40 收盘价计算，不代表在第二高价卖出。", "",
+             "前一交易日大盘涨跌家数来自 `kingdomai.kcrp_stock_price` 收盘价对昨收价；平盘未计入。"
              "范围是沪深 A 股代码（`.SH/.SZ`，首位 `0/3/6`），停牌且价格有效者可计入挂牌数；"
-             "近五个交易日成交额为同表逐股 `amount` 求和，单位亿元，按日期从早到晚，截止 T−1，"
-             "不含 T 当天数据。成交额为数据库覆盖口径，未与交易所公报逐日对账。", ""]
-    columns = ["T", "有标签正向信号", "缺标签", "达标", "可接受", "严重错误", "Top1", "Top1目标",
-               "09:40收益", "T−1涨/跌", "T−5…T−1成交额（亿元）"]
+             "近五个交易日成交额为同表逐股 `amount` 求和，单位亿元，按日期从早到晚，"
+             "截止选股日前一交易日，不含选股日数据。成交额为数据库覆盖口径，未与交易所公报逐日对账。", ""]
+    columns = ["选股日", "预测上涨且已验证的股票数", "预测上涨但缺数据的股票数",
+               "达标数", "可接受数", "严重错误数", "当天第一名股票", "第一名实际分类",
+               "第一名次晨卖出收益", "前一交易日上涨/下跌家数", "此前五日沪深成交额（亿元）"]
     for month, group in daily.groupby(daily.T_date.str[:7], sort=True):
-        lines += [f"## {month}", "", "| " + " | ".join(columns) + " |",
+        lines += [f"## {month[:4]} 年 {int(month[5:])} 月", "", "| " + " | ".join(columns) + " |",
                   "|" + "|".join(["---"] * len(columns)) + "|"]
         for row in group.itertuples():
             target = {"ge3": "达标", "1to3": "可接受", "lt0": "严重错误"}.get(
@@ -129,6 +132,31 @@ def render_markdown(daily: pd.DataFrame, source_commit: str) -> str:
                 f"{row.T_minus_1_date} {int(row.T_minus_1_up)}/{int(row.T_minus_1_down)}", amounts])) + " |")
         lines.append("")
     return "\n".join(lines)
+
+
+def export_daily(daily: pd.DataFrame) -> pd.DataFrame:
+    columns = {
+        "T_date": "选股日",
+        "predicted_up_labeled_n": "预测上涨且已验证的股票数",
+        "predicted_up_unlabeled_n": "预测上涨但缺数据的股票数",
+        "target_ge3_n": "达标数",
+        "acceptable_1to3_n": "可接受数",
+        "error_lt0_n": "严重错误数",
+        "top1_symbol6": "当天第一名股票代码",
+        "top1_name": "当天第一名股票名称",
+        "top1_target_class": "第一名实际分类",
+        "top1_0940_return_pct": "第一名次晨卖出收益百分比",
+        "T_minus_1_date": "前一交易日",
+        "T_minus_1_up": "前一交易日上涨家数",
+        "T_minus_1_down": "前一交易日下跌家数",
+        "T_minus_5_to_minus_1_amount_100m_cny": "此前五日沪深成交额亿元",
+    }
+    result = daily[list(columns)].rename(columns=columns)
+    result["第一名实际分类"] = result["第一名实际分类"].map(
+        {"ge3": "达标", "1to3": "可接受", "lt0": "严重错误"})
+    for name in ("前一交易日上涨家数", "前一交易日下跌家数"):
+        result[name] = result[name].astype(int)
+    return result
 
 
 def main() -> None:
@@ -146,12 +174,14 @@ def main() -> None:
         market = query(conn, MARKET_SQL, ("2026-01-01", "2026-07-30"))
     daily = build_daily(scores, candidates, top1, market)
     ROOT.mkdir(parents=True, exist_ok=True)
-    daily.to_csv(ROOT / "daily_effect_market_context.csv", index=False, float_format="%.6f")
-    market.to_csv(ROOT / "market_daily_context.csv", index=False, float_format="%.6f")
-    source_commit = __import__("subprocess").check_output(["git", "rev-parse", "HEAD"], text=True).strip()
+    export_daily(daily).to_csv(ROOT / "daily_effect_market_context.csv", index=False, float_format="%.6f")
+    market.rename(columns={"trade_date": "交易日", "up_count": "上涨家数",
+                           "down_count": "下跌家数", "amount_100m_cny": "沪深成交额亿元",
+                           "listed_count": "有效价格股票数", "traded_count": "有成交股票数"}).to_csv(
+        ROOT / "market_daily_context.csv", index=False, float_format="%.6f")
     (ROOT / "daily_effect_market_context.md").write_text(
-        render_markdown(daily, source_commit), encoding="utf-8")
-    manifest = {"source_commit": source_commit, "days": len(daily),
+        render_markdown(daily, MODEL_SOURCE_COMMIT), encoding="utf-8")
+    manifest = {"source_commit": MODEL_SOURCE_COMMIT, "days": len(daily),
                 "scored_candidates": len(scores), "predicted_up": int(daily.predicted_up_n.sum()),
                 "top1_trades": int(daily.top1_symbol6.notna().sum()),
                 "market_query": MARKET_SQL,
