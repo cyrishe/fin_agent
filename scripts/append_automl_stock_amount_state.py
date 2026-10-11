@@ -16,7 +16,7 @@ REPORT = Path("docs/stock_automl_runs/20261011_market_state_asof/daily_2026.csv"
 MARKET_OLD = Path("docs/stock_automl_runs/20261011_mk_1m_market_amount_board/experiments/daily_market.csv")
 MARKET_NEW = Path("docs/stock_automl_runs/20261011_aug_oct_independent20/market_context.csv")
 CACHE = Path("outputs/stock_automl/top1_stock_amount_1440_2026.csv")
-GATE_COLUMN = "大盘当日成交额为前20日最低时"
+MARKET_TAG = "大盘成交额低于此前20日全部（标签）"
 STOCK_COLUMNS = [
     "个股当日截至14:40成交额（亿元）",
     "个股此前20日成交额（亿元，远到近）",
@@ -28,6 +28,8 @@ STOCK_COLUMNS = [
     "个股当日相对前20日中位数",
     "个股当日在前20日中的百分位",
     "个股此前20日有效天数",
+    "个股成交额低于此前20日全部（标签）",
+    "个股成交额低于此前20日中位数（标签）",
 ]
 
 
@@ -132,6 +134,10 @@ def stock_columns(current: float | None, prior: list[float | None]) -> dict[str,
         percentile = (int(values.lt(current).sum()) +
                       int(values.eq(current).sum()) / 2) / 20
         result["个股当日在前20日中的百分位"] = f"{percentile:.6f}"
+        result["个股成交额低于此前20日全部（标签）"] = (
+            "是" if current < values.min() else "否")
+        result["个股成交额低于此前20日中位数（标签）"] = (
+            "是" if current < median else "否")
     return result
 
 
@@ -170,13 +176,14 @@ def main() -> None:
     for row in rows:
         for column in STOCK_COLUMNS:
             row.pop(column, None)
-        row.pop(GATE_COLUMN, None)
+        row.pop(MARKET_TAG, None)
+        row.pop("大盘当日成交额为前20日最低时", None)
+        market_percentile = row["当日在前20日中的百分位"]
+        row[MARKET_TAG] = (
+            "是" if float(market_percentile) == 0 else "否") if market_percentile else ""
         if not row.get("Top1代码"):
-            row[GATE_COLUMN] = ""
             row.update(dict.fromkeys(STOCK_COLUMNS, ""))
             continue
-        market_percentile = float(row["当日在前20日中的百分位"])
-        row[GATE_COLUMN] = "轮空" if market_percentile == 0 else "交易"
         day = normalize_date(row["选股日"])
         code = row["Top1代码"].zfill(6)
         pos = positions[day]
@@ -188,8 +195,8 @@ def main() -> None:
         complete_history += len([value for value in previous if value is not None]) == 20
     if missing_current:
         raise ValueError(f"{missing_current} selected stocks lack T-day 14:40 turnover")
-    output_fields = [field for field in fields if field not in STOCK_COLUMNS + [GATE_COLUMN]]
-    output_fields += [GATE_COLUMN] + STOCK_COLUMNS
+    output_fields = [field for field in fields if field not in STOCK_COLUMNS + [MARKET_TAG, "大盘当日成交额为前20日最低时"]]
+    output_fields += [MARKET_TAG] + STOCK_COLUMNS
     with args.report.open("w", newline="", encoding="utf-8") as target:
         writer = csv.DictWriter(target, fieldnames=output_fields, lineterminator="\n")
         writer.writeheader()

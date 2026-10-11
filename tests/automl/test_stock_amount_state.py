@@ -7,6 +7,8 @@ def test_stock_percentile_and_increasing_days_use_only_prior_trading_days():
     assert row["个股此前20日有效天数"] == "20"
     assert row["个股此前5日递增次数（共4次比较）"] == "4"
     assert row["个股当日在前20日中的百分位"] == "0.000000"
+    assert row["个股成交额低于此前20日全部（标签）"] == "是"
+    assert row["个股成交额低于此前20日中位数（标签）"] == "是"
     assert row["个股此前5日成交额（亿元，远到近）"] == (
         "16.0000;17.0000;18.0000;19.0000;20.0000")
     rows = [{"选股日": "2026/2/2", "Top1代码": "002131"}]
@@ -24,3 +26,4 @@ def test_missing_stock_history_is_explicit_and_has_no_percentile():
     assert row["个股此前20日有效天数"] == "19"
     assert row["个股当日截至14:40成交额（亿元）"] == "25.0000"
     assert row["个股当日在前20日中的百分位"] == ""
+    assert row["个股成交额低于此前20日全部（标签）"] == ""
