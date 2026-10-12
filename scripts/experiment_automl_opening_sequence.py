@@ -41,9 +41,18 @@ OPENING_LEVELS = ("opening_gap_pct", "opening_mean_log_volume",
                   "opening_mean_log_amount")
 
 
+def cached_frame(path: Path, build=None) -> pd.DataFrame:
+    """Prefer a local cache, then the checked-in experiment snapshot."""
+    for candidate in (path, ROOT / "data" / path.name):
+        if candidate.is_file():
+            return pd.read_csv(candidate, dtype={"symbol6": str})
+    if build is None:
+        raise FileNotFoundError(f"Missing opening-shape snapshot: {path}")
+    return build()
+
+
 def source_rows() -> pd.DataFrame:
-    rows = pd.concat([pd.read_csv(SOURCE, dtype={"symbol6": str}),
-                      pd.read_csv(SEP_SOURCE, dtype={"symbol6": str})], ignore_index=True)
+    rows = pd.concat([cached_frame(SOURCE), cached_frame(SEP_SOURCE)], ignore_index=True)
     if len(rows) != 294 or rows.duplicated(["signal_date", "symbol6"]).any():
         raise ValueError("Unexpected Top1 sample identity or count")
     return rows.sort_values("signal_date").reset_index(drop=True)
@@ -168,9 +177,8 @@ def build_sep_context_cache(rows: pd.DataFrame) -> pd.DataFrame:
 
 
 def attach_context(rows: pd.DataFrame) -> pd.DataFrame:
-    context = pd.read_csv(CACHE, dtype={"symbol6": str}) if CACHE.exists() else build_context_cache(rows)
-    sep_context = (pd.read_csv(SEP_CACHE, dtype={"symbol6": str}) if SEP_CACHE.exists()
-                   else build_sep_context_cache(rows))
+    context = cached_frame(CACHE, lambda: build_context_cache(rows))
+    sep_context = cached_frame(SEP_CACHE, lambda: build_sep_context_cache(rows))
     context = pd.concat([context, sep_context], ignore_index=True)
     data = rows.merge(context, on=["signal_date", "next_date", "symbol6"], how="left",
                       validate="one_to_one")

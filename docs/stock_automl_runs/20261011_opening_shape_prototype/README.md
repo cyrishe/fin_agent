@@ -62,6 +62,6 @@ python -m scripts.evaluate_automl_opening_exit
 python -m pytest -q tests/automl/test_opening_shape_prototype.py
 ```
 
-脚本在 `outputs/stock_automl/` 生成本机缓存，未纳入 Git；报告中的逐笔摘要、图片和结果在本目录。
+四份用于复现实验的压缩样本和上下文缓存在 [data/](data/) 中：294 笔 Top1 的十分钟 OHLCVA/标签，以及其中可用的前一日个股与次晨早间大盘摘要。脚本优先读 `outputs/stock_automl/` 本机缓存，缺失时自动使用这里的已提交快照。报告中的逐笔摘要、图片和结果也在本目录；原始逐分钟全市场数据另行管理。
 
 设计参考：[scikit-learn 的时间序列切分说明](https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.TimeSeriesSplit.html)；[DeepLOB 原始论文](https://arxiv.org/abs/1808.03668)研究的是订单簿序列上的深度网络，任务和样本规模与本次 120 笔 Top1 初始训练交易不同。

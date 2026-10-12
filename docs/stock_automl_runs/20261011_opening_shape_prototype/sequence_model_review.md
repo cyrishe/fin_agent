@@ -38,4 +38,4 @@
 
 因此暂不把 CNN 或新增上下文替换为正式形态模型，也不把它们接到“只有报持续走低才择高卖出”的交易动作上。更有价值的下一轮是从原 14:40 策略的可交易候选池扩大训练样本，再**只在原 Top1 持仓上**按后续月份评估“持续走低”的判断正确率和可执行卖出收益；训练池与实盘持仓分布不同的问题也要一并检查。
 
-复现：`python -m scripts.experiment_automl_opening_sequence`。机器可读的完整五种子结果在 [sequence_model_summary.json](sequence_model_summary.json)，固定种子 0 的逐笔标签在 [sequence_seed0_predictions.csv](sequence_seed0_predictions.csv)。本机的全市场/个股上下文缓存位于 `outputs/stock_automl/`，不纳入 Git；脚本可从原始归档和数据库重建。
+复现：`python -m scripts.experiment_automl_opening_sequence`。机器可读的完整五种子结果在 [sequence_model_summary.json](sequence_model_summary.json)，固定种子 0 的逐笔标签在 [sequence_seed0_predictions.csv](sequence_seed0_predictions.csv)。实验所需的 294 笔样本和全市场/个股上下文摘要已提交到 [data/](data/)；脚本优先使用本机缓存，缺失时读取该快照，因此无需重新查询原始归档和数据库也能复核这次实验。

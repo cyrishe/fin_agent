@@ -29,6 +29,14 @@ SHAPES = ["持续升高", "冲高回落", "持续走低", "起伏/其他"]
 DECISION_THRESHOLD = 0.65
 
 
+def cached_frame(path: Path, build) -> pd.DataFrame:
+    """Prefer a local cache, then the checked-in experiment snapshot."""
+    for candidate in (path, OUT / "data" / path.name):
+        if candidate.is_file():
+            return pd.read_csv(candidate, dtype={"symbol6": str})
+    return build()
+
+
 def selected_picks() -> pd.DataFrame:
     previous = []
     for folder in ("20261011_mk_2025_mar_aug_backtest",
@@ -206,8 +214,8 @@ def rolling_probabilities(data: pd.DataFrame, features: list[str]) -> dict[tuple
 
 
 def main() -> None:
-    data = pd.read_csv(CACHE, dtype={"symbol6": str}) if CACHE.exists() else build_features()
-    sep = pd.read_csv(SEP_CACHE, dtype={"symbol6": str}) if SEP_CACHE.exists() else build_sep_features()
+    data = cached_frame(CACHE, build_features)
+    sep = cached_frame(SEP_CACHE, build_sep_features)
     data = pd.concat([data, sep], ignore_index=True)
     training = data[(data.source == "2025_top1") &
                     data.signal_date.between("2025-03-05", "2025-08-29")].copy()
