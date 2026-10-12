@@ -1,0 +1,68 @@
+{
+  "verified_ref": "15cb446c55723501959bdb10e9a286eefc3f09df",
+  "source_sha256": "d160e906712f8d9f0d7b1f052079c023fd2e8d7def5611fd71c31c738e4b90f2",
+  "factor_snapshot_sha256": "081238aa9bb95f9836874d7b31da734c5c2eac7d53a6b64aeef2a7f42a07ddd5",
+  "source_rows": 58317,
+  "factor_rows": 110395,
+  "mature_rows": 56944,
+  "test_days": 118,
+  "gate_pass_days": 97,
+  "arms": {
+    "all_factor_changes": {
+      "factor_change_floor": 0.0,
+      "label_flips": 666,
+      "selected_days": 113,
+      "changed_top1_days": 42,
+      "gate_trades": 92,
+      "mean_raw_0940_return_pct": -0.014064878149478965,
+      "price_proxy_compound_pct": -7.90881400679649,
+      "max_sale_return_abs_difference": 9.985502008591496e-17,
+      "fresh_118_fold_rerun_matched": true
+    },
+    "material_changes": {
+      "factor_change_floor": 0.0001,
+      "label_flips": 94,
+      "selected_days": 111,
+      "changed_top1_days": 37,
+      "gate_trades": 91,
+      "mean_raw_0940_return_pct": 0.1856055079103629,
+      "price_proxy_compound_pct": 10.091689362469054,
+      "max_sale_return_abs_difference": 9.985502008591496e-17,
+      "fresh_118_fold_rerun_matched": true
+    },
+    "no_change_control": {
+      "factor_change_floor": 0.99,
+      "label_flips": 0,
+      "selected_days": 115,
+      "changed_top1_days": 0,
+      "gate_trades": 94,
+      "mean_raw_0940_return_pct": 0.5117235862942328,
+      "price_proxy_compound_pct": 50.77143322587497,
+      "max_sale_return_abs_difference": 9.985502008591496e-17,
+      "fresh_118_fold_rerun_matched": true
+    }
+  },
+  "artifact_sha256": {
+    "all_factor_changes": {
+      "summary.json": "d05a7969b3c388e591530d2d08b9716d84c54ba52126cb3e027ac896c003740c",
+      "adjusted_label_top1.csv": "04e40a5e51c1af7f382a971a991901ba1b241a7a26aa5ad15ac0700e835f1b38",
+      "folds.csv": "0b8d1d18d3a445afa6a01e90a5a0b8a73112e6a6714940fb89de564d99244e98",
+      "paired_daily.csv": "18f7288a5f4be1cd9ef693a813ce39a6bd80ec72f2e1249e005c91a3617e7f04",
+      "monthly.csv": "f3ac49a0824243fc04bfe7ce6b8daf84bad6365e41d6fae4bc433f146b266756"
+    },
+    "material_changes": {
+      "summary.json": "8256ca6eaa5ee6ce7da7e83ae183db21141023d1154cbefca57cb6aae0a54c6d",
+      "adjusted_label_top1.csv": "8e6a655507fa10f35fb2a25cf25284730691090a46c9709aba2f9b56a9181377",
+      "folds.csv": "4418d04f354a6c14e876b28e4b5cad06dff1680f2bf9aba8a917cd148337b1d2",
+      "paired_daily.csv": "30bc7a14ae4204a7e0c621cbdb6c1b6201328dde283ceb6aeb89cc02e57d4006",
+      "monthly.csv": "44bef2acdfb7b69a806d8ef29044fbd26b364cce9ad51ea2cd0d6386e855a502"
+    },
+    "no_change_control": {
+      "summary.json": "694758ddeed54f195d937434159654a743fc0184b1b975dccd2c342a259d82d6",
+      "adjusted_label_top1.csv": "1ce5942c2a9b06748a1192cb6646216782291b5205773ff66d997f0d7c60da17",
+      "folds.csv": "4380d60687dea32372814b6165bf263c0926f97d28f2c2164d648d605e83c6a6",
+      "paired_daily.csv": "c6b52e5d5c72f1223adafa2f4b8db9fb543c3770c5e4a924f957cfe577e893fb",
+      "monthly.csv": "8910e2912bcd7414c0df5eadc464b6bde57b7ea2f21f8b8fd91c68304eaf3726"
+    }
+  }
+}

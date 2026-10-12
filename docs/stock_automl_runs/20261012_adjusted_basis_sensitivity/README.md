@@ -35,3 +35,9 @@ Top1 改变日包含轮空日；只数通过成交额门槛的日子，两个复
 原模型已选中的 115 只 Top1 中，跨日因子变化超过万分之一的只有 2 笔，**没有一笔超过 1%**；大规模复权事件没有直接污染原 Top1 的买卖价格代理。此处差异主要经“训练标签变化 → 模型拟合与排序变化 → 选股变化”传导，而不是把原交易价格乘上复权因子造成的。
 
 复算入口：[脚本](../../../scripts/evaluate_automl_adjusted_basis.py)、[全部因子变化汇总](summary.json)、[显著变化汇总](material_change/summary.json)、[负对照汇总](no_change_control/summary.json)。三个方案各有 `paired_daily.csv`、`monthly.csv` 和逐日 Top1。`python -m scripts.evaluate_automl_adjusted_basis --factor-file docs/stock_automl_runs/20261012_adjusted_basis_sensitivity/daily_adjustment_factors.csv.gz --factor-change-floor 0.0001 --output docs/stock_automl_runs/20261012_adjusted_basis_sensitivity/material_change` 使用已保存因子快照重算显著变化方案，不再依赖实时数据库。
+
+## 2026-10-13 独立验证
+
+验证结果和输入、输出 SHA-256 见 [verification_20261013.json](verification_20261013.json)，复核程序见 [verify_automl_adjusted_basis.py](../../../scripts/verify_automl_adjusted_basis.py)。从冻结候选表与因子快照重新跑了三组各 118 折；逐日 Top1、折数、配对结果和月表均与已保存结果一致。月表中少数浮点值仅有约 `1e-14` 的序列化差异，因此按数值容差核对。验证程序另从原始候选价独立重算每笔未复权 09:40 收益，核对逐日配对、轮空日期、收益汇总和无变化负对照；最大单笔收益差小于 `1e-16`。以固定随机种子 `20261013` 从因子快照抽取 20 个股票／日期键，只读对照 `kingdomai.kcrp_stock_price`，20 条都存在，`close` 和 `adjclose` 最大绝对差均为零。
+
+这验证了**已保存的日 K 因子换标签代理实验可以复现**，没有补回原供应商的 `post` 分钟 K；因而不能把这里的收益差当作完整复权分钟数据训练的效果，更不能据此证明原模型将来的收益。

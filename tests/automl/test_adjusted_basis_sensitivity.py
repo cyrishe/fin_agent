@@ -3,11 +3,24 @@ import json
 from pathlib import Path
 
 import pandas as pd
+import pytest
 
 from scripts.evaluate_automl_adjusted_basis import attach_factors, monthly_summary, sha256
+from scripts.verify_automl_adjusted_basis import compare_csv
 
 
 ROOT = Path("docs/stock_automl_runs/20261012_adjusted_basis_sensitivity")
+
+
+def test_verifier_tolerates_roundoff_but_rejects_changed_stock(tmp_path):
+    saved = tmp_path / "saved.csv"
+    fresh = tmp_path / "fresh.csv"
+    saved.write_text("symbol6,return_pct\n000001,0.12345678901234\n")
+    fresh.write_text("symbol6,return_pct\n000001,0.12345678901235\n")
+    compare_csv(fresh, saved, "test")
+    fresh.write_text("symbol6,return_pct\n000002,0.12345678901235\n")
+    with pytest.raises(ValueError, match="symbol6 differs"):
+        compare_csv(fresh, saved, "test")
 
 
 def test_tiny_factor_change_can_flip_zero_label_but_floor_removes_noise():
