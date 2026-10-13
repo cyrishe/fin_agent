@@ -1,0 +1,75 @@
+{
+  "cloud_path": "策略训练/涨停冷静期_20261014",
+  "runs": {
+    "20261013_两年日线与行业候选": {
+      "files": [
+        {
+          "file": "features.csv.gz",
+          "bytes": 27352513,
+          "sha256": "9186b5a34552c384c175a2e9cefb916a06776f1bf9826c4c0a50373fc776b2a4"
+        },
+        {
+          "file": "features_industry.csv.gz",
+          "bytes": 29376487,
+          "sha256": "ef1c56d80320dc13f5293be3e41bb4dccf28feb68826212612d4d6c8fe618ec0"
+        },
+        {
+          "file": "labels.csv.gz",
+          "bytes": 673601,
+          "sha256": "0ba8da8f6169478362b942b0e80ace1505cfb90ae1d714a6590f6b59939dc820"
+        },
+        {
+          "file": "events.csv.gz",
+          "bytes": 142903,
+          "sha256": "579e5e542687e13356f41c450447614400ed33327c659fd3fed0be2a71c51eca"
+        },
+        {
+          "file": "feature_catalog_2y.json",
+          "bytes": 6585,
+          "sha256": "3d7b8d2400e12283d720016c8ecc35a380ad939020aff93317b6c3e42da6a5fc"
+        },
+        {
+          "file": "manifest.json",
+          "bytes": 2907,
+          "sha256": "5828eafd4fe099145dfcf1ac44b50e2885d1a56a49b8e79860124a65090b41f6"
+        },
+        {
+          "file": "industry_manifest.json",
+          "bytes": 475,
+          "sha256": "452c16f46502030d9eeae3ec129c63ea5260c5c9e3a4275cb8e2f6ba052ee7bd"
+        },
+        {
+          "file": "amac_membership_snapshot.csv.gz",
+          "bytes": 122414,
+          "sha256": "8bcb80c65621d35a465bd37a91c204b3fe354e1684a8c3c512e76a4067cddef8"
+        }
+      ],
+      "total_bytes": 57677885
+    },
+    "20261013_首板分钟候选": {
+      "files": [
+        {
+          "file": "features.csv.gz",
+          "bytes": 10205320,
+          "sha256": "049c350096fb21bbba6cb1c70e687fe28510424a01b31ca46359d9180b289cb4"
+        },
+        {
+          "file": "labels.csv.gz",
+          "bytes": 231715,
+          "sha256": "d609df487b9e5dccf2c6de1de374eef77824ab88f5bb769557342906ecd09710"
+        },
+        {
+          "file": "feature_catalog.json",
+          "bytes": 5583,
+          "sha256": "620d671db6bc6cd120336a42114b89529cfdc568abbefc8df0cdf6516559c47d"
+        },
+        {
+          "file": "manifest.json",
+          "bytes": 1065,
+          "sha256": "8d914d70fa6cc43eff0b50b7b99a52538a418cea8d1cff747f14695552f23c68"
+        }
+      ],
+      "total_bytes": 10443683
+    }
+  }
+}

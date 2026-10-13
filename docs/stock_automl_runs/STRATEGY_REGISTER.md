@@ -6,7 +6,7 @@
 | --- | --- | --- | --- |
 | 收盘选股—次晨开盘 | [14:40 七因子滚动模型](20261011_mk_1m_tradable_st_rolling20/README.md)；[开盘序列及卖出时机实验](20261011_opening_shape_prototype/README.md) | 14:40 候选、次晨目标；[冻结样本与模型溯源](20261012_model_provenance/README.md) | 已有滚动训练和历史回放；实盘成交与未来泛化尚未证明 |
 | 日内深 V | [实验登记](DEEP_V_REGISTER.md)；[D5 双阶段报告](20261013_deep_v_two_stage_d5/README.md) | 盘前与 10:00 两阶段；全日形态、触发后恢复、交易路径分别统计 | 历史回放；10:00 数据的当时可得性尚未证明，不是实时信号 |
-| 涨停后冷静期再涨停 | [R1 样本普查](20261013_limit_rebound_r1/README.md)；`scripts/analyze_automl_limit_rebound_2026.py` | 2026 年封板涨停段、1–3 日冷静期后的再次涨停与右删失 | 仅样本及标签审计；尚无训练模型或收益回测 |
+| 涨停后冷静期再涨停 | [R1 样本普查](20261013_limit_rebound_r1/README.md)；[特征设计](20261013_limit_rebound_r1/FEATURE_DESIGN.md)；[初版逐日实验](20261013_limit_rebound_model_r1/README.md)；[两年样本与前推实验](20261013_limit_rebound_2y_r1/README.md)；[训练样本清单](20261013_limit_rebound_2y_r1/training_data_manifest.json)；[2026 年 5–7 月卖出回测](20261014_limit_rebound_may_july_exit/README.md) | 2024-10 至 2026-10 的 1–3 日冷静决策；预测下一日或未来 3 日再封板，另有 5–7 月价格代理资金回放 | 有时间留出分类、季度前推和历史卖出规则对照；概念板块历史缺口、真实委托成交与未来收益仍未验证 |
 
 ## 合并与隔离约定
 

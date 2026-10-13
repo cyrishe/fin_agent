@@ -1,0 +1,187 @@
+{
+  "window": "2026-05-06 to 2026-07-31 entry dates",
+  "initial_cash": 1000000.0,
+  "selection": {
+    "train_rows": 66993,
+    "train_last_decision": "2026-04-27",
+    "candidate_rows": 14215,
+    "unsupported_or_st_proxy_excluded": 1770,
+    "signal_days": 62,
+    "selected": 310,
+    "selected_three_day_label_hits": 89
+  },
+  "entry_skips": {
+    "open_at_upper_limit": 2,
+    "no_open_trade": 2
+  },
+  "minute_quality": {
+    "complete_stock_day": 221,
+    "incomplete_stock_day": 4,
+    "requested_stock_days": 225,
+    "database_days": 2,
+    "lower_limit_open_stock_days": 13,
+    "lower_limit_complete_stock_days": 13
+  },
+  "policies": {
+    "first_limit_touch": {
+      "common_fillable_trades": 306,
+      "common_gross_mean": -0.01002360394680309,
+      "trigger_reasons": {
+        "three_day_timeout": 179,
+        "next_minute_after_trigger": 68,
+        "t_plus_one_after_trigger": 51,
+        "down_limit_reopen_next_minute": 4,
+        "next_open_after_trigger": 4
+      },
+      "portfolio_buys": 123,
+      "portfolio_realized_win_rate": 0.4796747967479675,
+      "portfolio_net_pnl": -220188.369113061,
+      "monthly_equity_returns": {
+        "2026-05": -0.14260088574134466,
+        "2026-06": 0.05274534634770167,
+        "2026-07": -0.15218034112227796
+      },
+      "may_july_equity_return": -0.23473853751306117,
+      "post_july_final_equity_return": -0.2201883691130614,
+      "max_drawdown_may_july": -0.36781706272003745,
+      "portfolio_skips": {
+        "event_already_traded": 60,
+        "five_slots_full": 123
+      }
+    },
+    "first_ge7_touch": {
+      "common_fillable_trades": 306,
+      "common_gross_mean": -0.004173957348061583,
+      "trigger_reasons": {
+        "three_day_timeout": 116,
+        "next_minute_after_trigger": 93,
+        "t_plus_one_after_trigger": 88,
+        "down_limit_reopen_next_minute": 5,
+        "next_open_after_trigger": 4
+      },
+      "portfolio_buys": 143,
+      "portfolio_realized_win_rate": 0.5874125874125874,
+      "portfolio_net_pnl": -9785.57856789371,
+      "monthly_equity_returns": {
+        "2026-05": -0.08115533038000011,
+        "2026-06": 0.14586488254274088,
+        "2026-07": -0.07641376644726272
+      },
+      "may_july_equity_return": -0.02758206340789371,
+      "post_july_final_equity_return": -0.009785578567893749,
+      "max_drawdown_may_july": -0.20869375543263557,
+      "portfolio_skips": {
+        "event_already_traded": 69,
+        "five_slots_full": 94
+      }
+    },
+    "hold_until_unsealed": {
+      "common_fillable_trades": 306,
+      "common_gross_mean": -0.0184201241538236,
+      "trigger_reasons": {
+        "three_day_timeout": 217,
+        "first_unsealed_next_open": 82,
+        "down_limit_reopen_next_minute": 6,
+        "down_limit_retry_next_open": 1
+      },
+      "portfolio_buys": 103,
+      "portfolio_realized_win_rate": 0.49514563106796117,
+      "portfolio_net_pnl": 13523.576457335119,
+      "monthly_equity_returns": {
+        "2026-05": -0.025598735281344487,
+        "2026-06": 0.17332634914471856,
+        "2026-07": -0.1199437002082433
+      },
+      "may_july_equity_return": 0.006160164137335,
+      "post_july_final_equity_return": 0.013523576457335151,
+      "max_drawdown_may_july": -0.20315111797584662,
+      "portfolio_skips": {
+        "five_slots_full": 143,
+        "event_already_traded": 60
+      }
+    },
+    "fixed_3day": {
+      "common_fillable_trades": 306,
+      "common_gross_mean": -0.014726957383550947,
+      "trigger_reasons": {
+        "three_day_timeout": 302,
+        "down_limit_reopen_next_minute": 3,
+        "down_limit_retry_next_open": 1
+      },
+      "portfolio_buys": 105,
+      "portfolio_realized_win_rate": 0.44761904761904764,
+      "portfolio_net_pnl": -116388.92854910452,
+      "monthly_equity_returns": {
+        "2026-05": 0.11908551895865527,
+        "2026-06": 0.22172904126182047,
+        "2026-07": -0.3658562537729413
+      },
+      "may_july_equity_return": -0.13298644502910506,
+      "post_july_final_equity_return": -0.1163889285491051,
+      "max_drawdown_may_july": -0.37147412357821175,
+      "portfolio_skips": {
+        "five_slots_full": 161,
+        "event_already_traded": 39,
+        "already_holding": 1
+      }
+    }
+  },
+  "same_entries_comparison": {
+    "first_ge7_minus_first_limit_touch": {
+      "paired_mean_gross_return_difference": 0.005849646598741507,
+      "week_bootstrap_95pct": [
+        -0.0010239067092068562,
+        0.012699900904361395
+      ],
+      "weeks": 14
+    },
+    "first_ge7_minus_hold_until_unsealed": {
+      "paired_mean_gross_return_difference": 0.014246166805762015,
+      "week_bootstrap_95pct": [
+        0.006414622006160196,
+        0.0224874778673173
+      ],
+      "weeks": 14
+    },
+    "first_ge7_minus_fixed_3day": {
+      "paired_mean_gross_return_difference": 0.010553000035489365,
+      "week_bootstrap_95pct": [
+        0.0010431470077177443,
+        0.019635526564138327
+      ],
+      "weeks": 14
+    }
+  },
+  "assumptions": {
+    "model": "31 daily/market features, fixed shallow boost; train decisions through 2026-04-27",
+    "signal": "Daily top 5 after cooling close; enter next open; rank and candidate filter known at signal close",
+    "entry": "Skip absent open, zero-volume, or open at theoretical upper limit",
+    "execution": "First touch uses next 1m open on T+1 or later; entry-day touch exits following open. Missing/incomplete minute or 15:00 touch exits following open. Sell orders at a lower-limit open wait for the first observed minute reopening (then next minute open) or a later tradable open.",
+    "hold_until_unsealed": "Seek first sealed close in entry sessions 1–3, then hold sealed closes; first unsealed close exits following open, at most 10 holding sessions. No seal exits fourth-session open.",
+    "fees": {
+      "commission_each_side": 0.00025,
+      "minimum_each_side_cny": 5.0,
+      "transfer_each_side": 1e-05,
+      "stamp_on_sell": 0.0005
+    },
+    "capital": "CNY 1m initial; at most five positions; one purchase per initial limit-run event; each new position targets one fifth of marked equity at open, board lots; sell at open before buy; no leverage",
+    "corporate_actions": "Vendor previous-close/raw-close ratio is used as a reinvested total-return share factor on ex-rights/ex-dividend days; exact distribution cash and tax are unavailable.",
+    "limitations": "Historical bar/open prices are fill proxies; no order book, spread, slippage, intraminute sequence, suspension exit or market impact. Previously explored May–July dates are not a blind holdout."
+  },
+  "source_sha256": {
+    "features": "9186b5a34552c384c175a2e9cefb916a06776f1bf9826c4c0a50373fc776b2a4",
+    "labels": "0ba8da8f6169478362b942b0e80ace1505cfb90ae1d714a6590f6b59939dc820"
+  },
+  "provenance": {
+    "git_head": "1ce6c78fd411fa5f1af88608ee552ce366290f00",
+    "script_sha256": "56f155acbdc987876f4e2446882eb1ed182cb2ea9d863e5f20403ed19f04fd88",
+    "daily_month_sha256": {
+      "2026-04": "8f1531f8b1c317f4ce6977de9a9229a1d1ba61524e6b449ca71ee97747063d08",
+      "2026-05": "15b15626837aabc90e67c25dca84047e365b36bbb8872d7dd68b7e927c3bc93c",
+      "2026-06": "483b1a731ccc7c36f71d604115404d9ac2c44e727fe900befdd431e38360fd20",
+      "2026-07": "72b612498e4d6296868f2a0ee4a4685dbe617b215d39791f6426ba899b3fb329",
+      "2026-08": "bbd0cde6b86a9f0cc635f2025266be4f14625854392466897ea347fa4062cf5d"
+    },
+    "generated_at_utc": "2026-10-13T16:49:47.938520+00:00"
+  }
+}
