@@ -1,0 +1,43 @@
+{
+  "feb_jul": {
+    "1.7.1": {
+      "candidate_rows": 49279,
+      "prediction_days": 118,
+      "all_candidate_probabilities_exactly_equal": true,
+      "all_predicted_classes_equal": true,
+      "all_prices_and_outcomes_equal": true,
+      "old_score_sha256": "6a2491431ec8c525181fccb1005a7d0b5794e8487582b23cd94d03f962295577",
+      "new_score_sha256": "6a2491431ec8c525181fccb1005a7d0b5794e8487582b23cd94d03f962295577"
+    },
+    "1.9.1": {
+      "candidate_rows": 49279,
+      "prediction_days": 118,
+      "all_candidate_probabilities_exactly_equal": true,
+      "all_predicted_classes_equal": true,
+      "all_prices_and_outcomes_equal": true,
+      "old_score_sha256": "408882973f98616b0dd34796092b618ac49fc0099dd984262230ee19bb8ccc2a",
+      "new_score_sha256": "408882973f98616b0dd34796092b618ac49fc0099dd984262230ee19bb8ccc2a"
+    }
+  },
+  "aug_oct": {
+    "1.7.1": {
+      "candidate_rows": 6426,
+      "prediction_days": 21,
+      "all_candidate_probabilities_exactly_equal": true,
+      "all_predicted_classes_equal": true,
+      "all_prices_and_outcomes_equal": true,
+      "old_score_sha256": "66b909bb4503d2faf5985e2dacf0b94a638facd93af936f9ef191c08d4a10b45",
+      "new_score_sha256": "66b909bb4503d2faf5985e2dacf0b94a638facd93af936f9ef191c08d4a10b45"
+    },
+    "1.9.1": {
+      "candidate_rows": 6426,
+      "prediction_days": 21,
+      "all_candidate_probabilities_exactly_equal": true,
+      "all_predicted_classes_equal": true,
+      "all_prices_and_outcomes_equal": true,
+      "old_score_sha256": "41168a5c6a6e3d1a18f75d25fa762f9120f139f1d1aab7b8fe3241377bf9456e",
+      "new_score_sha256": "41168a5c6a6e3d1a18f75d25fa762f9120f139f1d1aab7b8fe3241377bf9456e"
+    }
+  },
+  "weight_formula": "2 ** ((K-20)/10) = 2 ** (-(distance-1)/10)"
+}

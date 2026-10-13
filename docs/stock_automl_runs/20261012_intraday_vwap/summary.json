@@ -1,0 +1,119 @@
+{
+  "factor_coverage": [
+    {
+      "segment": "feb_jul",
+      "total": 58317,
+      "complete": 58317
+    },
+    {
+      "segment": "sep_oct",
+      "total": 15696,
+      "complete": 15696
+    }
+  ],
+  "existing_top1": [
+    {
+      "all_above": 0,
+      "picks": 136,
+      "known": 136,
+      "ge3_0940": 23,
+      "ge1_0940": 46,
+      "negative_0940": 68,
+      "mean_0940_pct": 0.21780946162530956
+    },
+    {
+      "all_above": 1,
+      "picks": 1,
+      "known": 1,
+      "ge3_0940": 0,
+      "ge1_0940": 0,
+      "negative_0940": 0,
+      "mean_0940_pct": 0.4665629860031162
+    }
+  ],
+  "paired": [
+    {
+      "segment": "feb_jul",
+      "arm": "baseline7",
+      "picks": 113,
+      "known": 113,
+      "ge3_second_high": 29,
+      "ge3_0940": 17,
+      "ge1_0940": 32,
+      "negative_0940": 64,
+      "mean_0940_pct": -0.25036643926251184
+    },
+    {
+      "segment": "feb_jul",
+      "arm": "vwap8",
+      "picks": 115,
+      "known": 115,
+      "ge3_second_high": 30,
+      "ge3_0940": 16,
+      "ge1_0940": 34,
+      "negative_0940": 70,
+      "mean_0940_pct": -0.30852492440491025
+    },
+    {
+      "segment": "sep_oct",
+      "arm": "baseline7",
+      "picks": 22,
+      "known": 22,
+      "ge3_second_high": 7,
+      "ge3_0940": 3,
+      "ge1_0940": 10,
+      "negative_0940": 8,
+      "mean_0940_pct": 0.6877595488463925
+    },
+    {
+      "segment": "sep_oct",
+      "arm": "vwap8",
+      "picks": 22,
+      "known": 22,
+      "ge3_second_high": 4,
+      "ge3_0940": 2,
+      "ge1_0940": 6,
+      "negative_0940": 11,
+      "mean_0940_pct": 0.08722556282959551
+    }
+  ],
+  "paired_difference": [
+    {
+      "segment": "feb_jul",
+      "common_known_days": 112,
+      "changed_top1_days": 63,
+      "vwap8_better_days": 30,
+      "vwap8_worse_days": 33,
+      "same_return_days": 49,
+      "mean_delta_percentage_points": -0.1308321870530052
+    },
+    {
+      "segment": "sep_oct",
+      "common_known_days": 22,
+      "changed_top1_days": 14,
+      "vwap8_better_days": 5,
+      "vwap8_worse_days": 9,
+      "same_return_days": 8,
+      "mean_delta_percentage_points": -0.6005339860167966
+    }
+  ],
+  "archived_baseline_reproduction": [
+    {
+      "segment": "feb_jul",
+      "archived_picks": 115,
+      "recomputed_picks": 113,
+      "common_days": 113,
+      "same_top1": 84,
+      "same_stock_median_abs_p_ge3_difference": 0.0047556338237511875
+    },
+    {
+      "segment": "sep_oct",
+      "archived_picks": 22,
+      "recomputed_picks": 22,
+      "common_days": 22,
+      "same_top1": 19,
+      "same_stock_median_abs_p_ge3_difference": 0.004018788536343382
+    }
+  ],
+  "existing_top1_fisher_ge3_p": 1.0
+}

@@ -1,0 +1,1670 @@
+[
+  {
+    "day": "2026-05-28",
+    "variant": "old_all",
+    "training_rows": 7984,
+    "candidate_count": 449,
+    "top1": {
+      "symbol6": "600545",
+      "return_0940": 0.09554973821989532,
+      "predicted_class": "ge3",
+      "p_ge3": 0.30278425576629603,
+      "p_ge1": 0.5367481427240135
+    },
+    "first_round_roots": [
+      {
+        "feature_idx": 2,
+        "feature_name": "turnover_so_far_pct",
+        "num_threshold": 5.541948627348592,
+        "gain": 81.5103228450769
+      },
+      {
+        "feature_idx": 3,
+        "feature_name": "float_mv_100m_cny",
+        "num_threshold": 27.264289585008477,
+        "gain": 20.137796067844427
+      },
+      {
+        "feature_idx": 2,
+        "feature_name": "turnover_so_far_pct",
+        "num_threshold": 4.542152009456224,
+        "gain": 80.45021165551339
+      },
+      {
+        "feature_idx": 2,
+        "feature_name": "turnover_so_far_pct",
+        "num_threshold": 8.682055894158967,
+        "gain": 30.13174655031276
+      }
+    ]
+  },
+  {
+    "day": "2026-05-28",
+    "variant": "new_all",
+    "training_rows": 7984,
+    "candidate_count": 449,
+    "top1": {
+      "symbol6": "688507",
+      "return_0940": -0.0640012397334574,
+      "predicted_class": "ge3",
+      "p_ge3": 0.37513652824252325,
+      "p_ge1": 0.5496285172385575
+    },
+    "first_round_roots": [
+      {
+        "feature_idx": 2,
+        "feature_name": "turnover_so_far_pct",
+        "num_threshold": 5.541494895527711,
+        "gain": 81.5103228450769
+      },
+      {
+        "feature_idx": 3,
+        "feature_name": "float_mv_100m_cny",
+        "num_threshold": 27.254147276211334,
+        "gain": 20.137796067844427
+      },
+      {
+        "feature_idx": 2,
+        "feature_name": "turnover_so_far_pct",
+        "num_threshold": 4.542537793312058,
+        "gain": 79.54780878288597
+      },
+      {
+        "feature_idx": 2,
+        "feature_name": "turnover_so_far_pct",
+        "num_threshold": 8.681494426065132,
+        "gain": 30.13174655031276
+      }
+    ]
+  },
+  {
+    "day": "2026-05-28",
+    "variant": "linear_all",
+    "training_rows": 7984,
+    "candidate_count": 449,
+    "top1": {
+      "symbol6": "600545",
+      "return_0940": 0.09554973821989532,
+      "predicted_class": "ge3",
+      "p_ge3": 0.30278425576629603,
+      "p_ge1": 0.5367481427240135
+    },
+    "first_round_roots": [
+      {
+        "feature_idx": 2,
+        "feature_name": "turnover_so_far_pct",
+        "num_threshold": 5.541665712213219,
+        "gain": 81.5103228450769
+      },
+      {
+        "feature_idx": 3,
+        "feature_name": "float_mv_100m_cny",
+        "num_threshold": 27.27013632772683,
+        "gain": 20.137796067844427
+      },
+      {
+        "feature_idx": 2,
+        "feature_name": "turnover_so_far_pct",
+        "num_threshold": 4.542247320761783,
+        "gain": 80.45021165551339
+      },
+      {
+        "feature_idx": 2,
+        "feature_name": "turnover_so_far_pct",
+        "num_threshold": 8.681507637079106,
+        "gain": 30.13174655031276
+      }
+    ]
+  },
+  {
+    "day": "2026-05-28",
+    "variant": "new_except_old_0",
+    "training_rows": 7984,
+    "candidate_count": 449,
+    "top1": {
+      "symbol6": "300623",
+      "return_0940": -0.03864605543710031,
+      "predicted_class": "ge3",
+      "p_ge3": 0.29166728543932396,
+      "p_ge1": 0.5423804661458478
+    },
+    "first_round_roots": [
+      {
+        "feature_idx": 2,
+        "feature_name": "turnover_so_far_pct",
+        "num_threshold": 5.541494895527711,
+        "gain": 81.5103228450769
+      },
+      {
+        "feature_idx": 3,
+        "feature_name": "float_mv_100m_cny",
+        "num_threshold": 27.254147276211334,
+        "gain": 20.137796067844427
+      },
+      {
+        "feature_idx": 2,
+        "feature_name": "turnover_so_far_pct",
+        "num_threshold": 4.542537793312058,
+        "gain": 79.54780878288597
+      },
+      {
+        "feature_idx": 2,
+        "feature_name": "turnover_so_far_pct",
+        "num_threshold": 8.681494426065132,
+        "gain": 30.13174655031276
+      }
+    ]
+  },
+  {
+    "day": "2026-05-28",
+    "variant": "new_except_old_1",
+    "training_rows": 7984,
+    "candidate_count": 449,
+    "top1": {
+      "symbol6": "600545",
+      "return_0940": 0.09554973821989532,
+      "predicted_class": "ge3",
+      "p_ge3": 0.3051535063808246,
+      "p_ge1": 0.5364469236111349
+    },
+    "first_round_roots": [
+      {
+        "feature_idx": 2,
+        "feature_name": "turnover_so_far_pct",
+        "num_threshold": 5.541494895527711,
+        "gain": 81.5103228450769
+      },
+      {
+        "feature_idx": 3,
+        "feature_name": "float_mv_100m_cny",
+        "num_threshold": 27.254147276211334,
+        "gain": 20.137796067844427
+      },
+      {
+        "feature_idx": 2,
+        "feature_name": "turnover_so_far_pct",
+        "num_threshold": 4.542537793312058,
+        "gain": 79.54780878288597
+      },
+      {
+        "feature_idx": 2,
+        "feature_name": "turnover_so_far_pct",
+        "num_threshold": 8.681494426065132,
+        "gain": 30.13174655031276
+      }
+    ]
+  },
+  {
+    "day": "2026-05-28",
+    "variant": "new_except_old_2",
+    "training_rows": 7984,
+    "candidate_count": 449,
+    "top1": {
+      "symbol6": "688507",
+      "return_0940": -0.0640012397334574,
+      "predicted_class": "ge3",
+      "p_ge3": 0.374561771863986,
+      "p_ge1": 0.5503493023223435
+    },
+    "first_round_roots": [
+      {
+        "feature_idx": 2,
+        "feature_name": "turnover_so_far_pct",
+        "num_threshold": 5.541948627348592,
+        "gain": 81.5103228450769
+      },
+      {
+        "feature_idx": 3,
+        "feature_name": "float_mv_100m_cny",
+        "num_threshold": 27.254147276211334,
+        "gain": 20.137796067844427
+      },
+      {
+        "feature_idx": 2,
+        "feature_name": "turnover_so_far_pct",
+        "num_threshold": 4.542152009456224,
+        "gain": 80.45021165551339
+      },
+      {
+        "feature_idx": 2,
+        "feature_name": "turnover_so_far_pct",
+        "num_threshold": 8.682055894158967,
+        "gain": 30.13174655031276
+      }
+    ]
+  },
+  {
+    "day": "2026-05-28",
+    "variant": "new_except_old_3",
+    "training_rows": 7984,
+    "candidate_count": 449,
+    "top1": {
+      "symbol6": "688662",
+      "return_0940": 0.02000591307775701,
+      "predicted_class": "ge3",
+      "p_ge3": 0.30014699992047034,
+      "p_ge1": 0.5832783271539128
+    },
+    "first_round_roots": [
+      {
+        "feature_idx": 2,
+        "feature_name": "turnover_so_far_pct",
+        "num_threshold": 5.541494895527711,
+        "gain": 81.5103228450769
+      },
+      {
+        "feature_idx": 3,
+        "feature_name": "float_mv_100m_cny",
+        "num_threshold": 27.264289585008477,
+        "gain": 20.137796067844427
+      },
+      {
+        "feature_idx": 2,
+        "feature_name": "turnover_so_far_pct",
+        "num_threshold": 4.542537793312058,
+        "gain": 79.54780878288597
+      },
+      {
+        "feature_idx": 2,
+        "feature_name": "turnover_so_far_pct",
+        "num_threshold": 8.681494426065132,
+        "gain": 30.13174655031276
+      }
+    ]
+  },
+  {
+    "day": "2026-05-28",
+    "variant": "old_except_new_0",
+    "training_rows": 7984,
+    "candidate_count": 449,
+    "top1": {
+      "symbol6": "688507",
+      "return_0940": -0.0640012397334574,
+      "predicted_class": "ge3",
+      "p_ge3": 0.3709079509579098,
+      "p_ge1": 0.5458089003070461
+    },
+    "first_round_roots": [
+      {
+        "feature_idx": 2,
+        "feature_name": "turnover_so_far_pct",
+        "num_threshold": 5.541948627348592,
+        "gain": 81.5103228450769
+      },
+      {
+        "feature_idx": 3,
+        "feature_name": "float_mv_100m_cny",
+        "num_threshold": 27.264289585008477,
+        "gain": 20.137796067844427
+      },
+      {
+        "feature_idx": 2,
+        "feature_name": "turnover_so_far_pct",
+        "num_threshold": 4.542152009456224,
+        "gain": 80.45021165551339
+      },
+      {
+        "feature_idx": 2,
+        "feature_name": "turnover_so_far_pct",
+        "num_threshold": 8.682055894158967,
+        "gain": 30.13174655031276
+      }
+    ]
+  },
+  {
+    "day": "2026-05-28",
+    "variant": "old_except_new_1",
+    "training_rows": 7984,
+    "candidate_count": 449,
+    "top1": {
+      "symbol6": "600545",
+      "return_0940": 0.09554973821989532,
+      "predicted_class": "ge3",
+      "p_ge3": 0.3027753927066172,
+      "p_ge1": 0.5422307057684381
+    },
+    "first_round_roots": [
+      {
+        "feature_idx": 2,
+        "feature_name": "turnover_so_far_pct",
+        "num_threshold": 5.541948627348592,
+        "gain": 81.5103228450769
+      },
+      {
+        "feature_idx": 3,
+        "feature_name": "float_mv_100m_cny",
+        "num_threshold": 27.264289585008477,
+        "gain": 20.137796067844427
+      },
+      {
+        "feature_idx": 2,
+        "feature_name": "turnover_so_far_pct",
+        "num_threshold": 4.542152009456224,
+        "gain": 80.45021165551339
+      },
+      {
+        "feature_idx": 2,
+        "feature_name": "turnover_so_far_pct",
+        "num_threshold": 8.682055894158967,
+        "gain": 30.13174655031276
+      }
+    ]
+  },
+  {
+    "day": "2026-05-28",
+    "variant": "old_except_new_2",
+    "training_rows": 7984,
+    "candidate_count": 449,
+    "top1": {
+      "symbol6": "688507",
+      "return_0940": -0.0640012397334574,
+      "predicted_class": "ge3",
+      "p_ge3": 0.37361494649864985,
+      "p_ge1": 0.5525761147860572
+    },
+    "first_round_roots": [
+      {
+        "feature_idx": 2,
+        "feature_name": "turnover_so_far_pct",
+        "num_threshold": 5.541494895527711,
+        "gain": 81.5103228450769
+      },
+      {
+        "feature_idx": 3,
+        "feature_name": "float_mv_100m_cny",
+        "num_threshold": 27.264289585008477,
+        "gain": 20.137796067844427
+      },
+      {
+        "feature_idx": 2,
+        "feature_name": "turnover_so_far_pct",
+        "num_threshold": 4.542537793312058,
+        "gain": 79.54780878288597
+      },
+      {
+        "feature_idx": 2,
+        "feature_name": "turnover_so_far_pct",
+        "num_threshold": 8.681494426065132,
+        "gain": 30.13174655031276
+      }
+    ]
+  },
+  {
+    "day": "2026-05-28",
+    "variant": "old_except_new_3",
+    "training_rows": 7984,
+    "candidate_count": 449,
+    "top1": {
+      "symbol6": "600545",
+      "return_0940": 0.09554973821989532,
+      "predicted_class": "ge3",
+      "p_ge3": 0.30099107014888465,
+      "p_ge1": 0.5371931999024775
+    },
+    "first_round_roots": [
+      {
+        "feature_idx": 2,
+        "feature_name": "turnover_so_far_pct",
+        "num_threshold": 5.541948627348592,
+        "gain": 81.5103228450769
+      },
+      {
+        "feature_idx": 3,
+        "feature_name": "float_mv_100m_cny",
+        "num_threshold": 27.254147276211334,
+        "gain": 20.137796067844427
+      },
+      {
+        "feature_idx": 2,
+        "feature_name": "turnover_so_far_pct",
+        "num_threshold": 4.542152009456224,
+        "gain": 80.45021165551339
+      },
+      {
+        "feature_idx": 2,
+        "feature_name": "turnover_so_far_pct",
+        "num_threshold": 8.682055894158967,
+        "gain": 30.13174655031276
+      }
+    ]
+  },
+  {
+    "day": "2026-06-09",
+    "variant": "old_all",
+    "training_rows": 6566,
+    "candidate_count": 614,
+    "top1": {
+      "symbol6": "002185",
+      "return_0940": -0.011357183418512218,
+      "predicted_class": "ge3",
+      "p_ge3": 0.34603472574116856,
+      "p_ge1": 0.5498417846946357
+    },
+    "first_round_roots": [
+      {
+        "feature_idx": 2,
+        "feature_name": "turnover_so_far_pct",
+        "num_threshold": 3.659204786658289,
+        "gain": 198.03805865298477
+      },
+      {
+        "feature_idx": 2,
+        "feature_name": "turnover_so_far_pct",
+        "num_threshold": 16.580559018125868,
+        "gain": 13.182293634307017
+      },
+      {
+        "feature_idx": 2,
+        "feature_name": "turnover_so_far_pct",
+        "num_threshold": 4.316446585870821,
+        "gain": 110.74863584549225
+      },
+      {
+        "feature_idx": 3,
+        "feature_name": "float_mv_100m_cny",
+        "num_threshold": 22.52231006868761,
+        "gain": 56.571013514322786
+      }
+    ]
+  },
+  {
+    "day": "2026-06-09",
+    "variant": "new_all",
+    "training_rows": 6566,
+    "candidate_count": 614,
+    "top1": {
+      "symbol6": "300174",
+      "return_0940": 0.08217497955846276,
+      "predicted_class": "ge3",
+      "p_ge3": 0.3389325907110865,
+      "p_ge1": 0.5389418643399705
+    },
+    "first_round_roots": [
+      {
+        "feature_idx": 2,
+        "feature_name": "turnover_so_far_pct",
+        "num_threshold": 3.659106728271756,
+        "gain": 198.03805865298477
+      },
+      {
+        "feature_idx": 2,
+        "feature_name": "turnover_so_far_pct",
+        "num_threshold": 16.604724269917718,
+        "gain": 12.970176582087323
+      },
+      {
+        "feature_idx": 2,
+        "feature_name": "turnover_so_far_pct",
+        "num_threshold": 4.31606317381956,
+        "gain": 110.74863584549225
+      },
+      {
+        "feature_idx": 3,
+        "feature_name": "float_mv_100m_cny",
+        "num_threshold": 22.51441249340543,
+        "gain": 56.571013514322786
+      }
+    ]
+  },
+  {
+    "day": "2026-06-09",
+    "variant": "linear_all",
+    "training_rows": 6566,
+    "candidate_count": 614,
+    "top1": {
+      "symbol6": "002185",
+      "return_0940": -0.011357183418512218,
+      "predicted_class": "ge3",
+      "p_ge3": 0.34603472574116856,
+      "p_ge1": 0.5498417846946357
+    },
+    "first_round_roots": [
+      {
+        "feature_idx": 2,
+        "feature_name": "turnover_so_far_pct",
+        "num_threshold": 3.6592067093717504,
+        "gain": 198.03805865298477
+      },
+      {
+        "feature_idx": 2,
+        "feature_name": "turnover_so_far_pct",
+        "num_threshold": 16.570608620329214,
+        "gain": 13.182293634307017
+      },
+      {
+        "feature_idx": 2,
+        "feature_name": "turnover_so_far_pct",
+        "num_threshold": 4.316378924920598,
+        "gain": 110.74863584549225
+      },
+      {
+        "feature_idx": 3,
+        "feature_name": "float_mv_100m_cny",
+        "num_threshold": 22.528349390962216,
+        "gain": 56.571013514322786
+      }
+    ]
+  },
+  {
+    "day": "2026-06-09",
+    "variant": "new_except_old_0",
+    "training_rows": 6566,
+    "candidate_count": 614,
+    "top1": {
+      "symbol6": "002185",
+      "return_0940": -0.011357183418512218,
+      "predicted_class": "ge3",
+      "p_ge3": 0.34655372283135205,
+      "p_ge1": 0.5482003409146496
+    },
+    "first_round_roots": [
+      {
+        "feature_idx": 2,
+        "feature_name": "turnover_so_far_pct",
+        "num_threshold": 3.659106728271756,
+        "gain": 198.03805865298477
+      },
+      {
+        "feature_idx": 2,
+        "feature_name": "turnover_so_far_pct",
+        "num_threshold": 16.604724269917718,
+        "gain": 12.970176582087323
+      },
+      {
+        "feature_idx": 2,
+        "feature_name": "turnover_so_far_pct",
+        "num_threshold": 4.31606317381956,
+        "gain": 110.74863584549225
+      },
+      {
+        "feature_idx": 3,
+        "feature_name": "float_mv_100m_cny",
+        "num_threshold": 22.51441249340543,
+        "gain": 56.571013514322786
+      }
+    ]
+  },
+  {
+    "day": "2026-06-09",
+    "variant": "new_except_old_1",
+    "training_rows": 6566,
+    "candidate_count": 614,
+    "top1": {
+      "symbol6": "002185",
+      "return_0940": -0.011357183418512218,
+      "predicted_class": "ge3",
+      "p_ge3": 0.3444757196090246,
+      "p_ge1": 0.5454908458655879
+    },
+    "first_round_roots": [
+      {
+        "feature_idx": 2,
+        "feature_name": "turnover_so_far_pct",
+        "num_threshold": 3.659106728271756,
+        "gain": 198.03805865298477
+      },
+      {
+        "feature_idx": 2,
+        "feature_name": "turnover_so_far_pct",
+        "num_threshold": 16.604724269917718,
+        "gain": 12.970176582087323
+      },
+      {
+        "feature_idx": 2,
+        "feature_name": "turnover_so_far_pct",
+        "num_threshold": 4.31606317381956,
+        "gain": 110.74863584549225
+      },
+      {
+        "feature_idx": 3,
+        "feature_name": "float_mv_100m_cny",
+        "num_threshold": 22.51441249340543,
+        "gain": 56.571013514322786
+      }
+    ]
+  },
+  {
+    "day": "2026-06-09",
+    "variant": "new_except_old_2",
+    "training_rows": 6566,
+    "candidate_count": 614,
+    "top1": {
+      "symbol6": "002185",
+      "return_0940": -0.011357183418512218,
+      "predicted_class": "ge3",
+      "p_ge3": 0.35433657709774563,
+      "p_ge1": 0.5511269106193826
+    },
+    "first_round_roots": [
+      {
+        "feature_idx": 2,
+        "feature_name": "turnover_so_far_pct",
+        "num_threshold": 3.659204786658289,
+        "gain": 198.03805865298477
+      },
+      {
+        "feature_idx": 2,
+        "feature_name": "turnover_so_far_pct",
+        "num_threshold": 16.580559018125868,
+        "gain": 13.182293634307017
+      },
+      {
+        "feature_idx": 2,
+        "feature_name": "turnover_so_far_pct",
+        "num_threshold": 4.316446585870821,
+        "gain": 110.74863584549225
+      },
+      {
+        "feature_idx": 3,
+        "feature_name": "float_mv_100m_cny",
+        "num_threshold": 22.51441249340543,
+        "gain": 56.571013514322786
+      }
+    ]
+  },
+  {
+    "day": "2026-06-09",
+    "variant": "new_except_old_3",
+    "training_rows": 6566,
+    "candidate_count": 614,
+    "top1": {
+      "symbol6": "002185",
+      "return_0940": -0.011357183418512218,
+      "predicted_class": "ge3",
+      "p_ge3": 0.35340833010258815,
+      "p_ge1": 0.5534714548245646
+    },
+    "first_round_roots": [
+      {
+        "feature_idx": 2,
+        "feature_name": "turnover_so_far_pct",
+        "num_threshold": 3.659106728271756,
+        "gain": 198.03805865298477
+      },
+      {
+        "feature_idx": 2,
+        "feature_name": "turnover_so_far_pct",
+        "num_threshold": 16.604724269917718,
+        "gain": 12.970176582087323
+      },
+      {
+        "feature_idx": 2,
+        "feature_name": "turnover_so_far_pct",
+        "num_threshold": 4.31606317381956,
+        "gain": 110.74863584549225
+      },
+      {
+        "feature_idx": 3,
+        "feature_name": "float_mv_100m_cny",
+        "num_threshold": 22.52231006868761,
+        "gain": 56.571013514322786
+      }
+    ]
+  },
+  {
+    "day": "2026-06-09",
+    "variant": "old_except_new_0",
+    "training_rows": 6566,
+    "candidate_count": 614,
+    "top1": {
+      "symbol6": "002185",
+      "return_0940": -0.011357183418512218,
+      "predicted_class": "ge3",
+      "p_ge3": 0.34083025665259353,
+      "p_ge1": 0.543307376266001
+    },
+    "first_round_roots": [
+      {
+        "feature_idx": 2,
+        "feature_name": "turnover_so_far_pct",
+        "num_threshold": 3.659204786658289,
+        "gain": 198.03805865298477
+      },
+      {
+        "feature_idx": 2,
+        "feature_name": "turnover_so_far_pct",
+        "num_threshold": 16.580559018125868,
+        "gain": 13.182293634307017
+      },
+      {
+        "feature_idx": 2,
+        "feature_name": "turnover_so_far_pct",
+        "num_threshold": 4.316446585870821,
+        "gain": 110.74863584549225
+      },
+      {
+        "feature_idx": 3,
+        "feature_name": "float_mv_100m_cny",
+        "num_threshold": 22.52231006868761,
+        "gain": 56.571013514322786
+      }
+    ]
+  },
+  {
+    "day": "2026-06-09",
+    "variant": "old_except_new_1",
+    "training_rows": 6566,
+    "candidate_count": 614,
+    "top1": {
+      "symbol6": "002185",
+      "return_0940": -0.011357183418512218,
+      "predicted_class": "ge3",
+      "p_ge3": 0.35036174699029515,
+      "p_ge1": 0.5368450512647451
+    },
+    "first_round_roots": [
+      {
+        "feature_idx": 2,
+        "feature_name": "turnover_so_far_pct",
+        "num_threshold": 3.659204786658289,
+        "gain": 198.03805865298477
+      },
+      {
+        "feature_idx": 2,
+        "feature_name": "turnover_so_far_pct",
+        "num_threshold": 16.580559018125868,
+        "gain": 13.182293634307017
+      },
+      {
+        "feature_idx": 2,
+        "feature_name": "turnover_so_far_pct",
+        "num_threshold": 4.316446585870821,
+        "gain": 110.74863584549225
+      },
+      {
+        "feature_idx": 3,
+        "feature_name": "float_mv_100m_cny",
+        "num_threshold": 22.52231006868761,
+        "gain": 56.571013514322786
+      }
+    ]
+  },
+  {
+    "day": "2026-06-09",
+    "variant": "old_except_new_2",
+    "training_rows": 6566,
+    "candidate_count": 614,
+    "top1": {
+      "symbol6": "002185",
+      "return_0940": -0.011357183418512218,
+      "predicted_class": "ge3",
+      "p_ge3": 0.3473411927778511,
+      "p_ge1": 0.5449634830240337
+    },
+    "first_round_roots": [
+      {
+        "feature_idx": 2,
+        "feature_name": "turnover_so_far_pct",
+        "num_threshold": 3.659106728271756,
+        "gain": 198.03805865298477
+      },
+      {
+        "feature_idx": 2,
+        "feature_name": "turnover_so_far_pct",
+        "num_threshold": 16.604724269917718,
+        "gain": 12.970176582087323
+      },
+      {
+        "feature_idx": 2,
+        "feature_name": "turnover_so_far_pct",
+        "num_threshold": 4.31606317381956,
+        "gain": 110.74863584549225
+      },
+      {
+        "feature_idx": 3,
+        "feature_name": "float_mv_100m_cny",
+        "num_threshold": 22.52231006868761,
+        "gain": 56.571013514322786
+      }
+    ]
+  },
+  {
+    "day": "2026-06-09",
+    "variant": "old_except_new_3",
+    "training_rows": 6566,
+    "candidate_count": 614,
+    "top1": {
+      "symbol6": "002185",
+      "return_0940": -0.011357183418512218,
+      "predicted_class": "ge3",
+      "p_ge3": 0.3462238938203354,
+      "p_ge1": 0.5437952533069093
+    },
+    "first_round_roots": [
+      {
+        "feature_idx": 2,
+        "feature_name": "turnover_so_far_pct",
+        "num_threshold": 3.659204786658289,
+        "gain": 198.03805865298477
+      },
+      {
+        "feature_idx": 2,
+        "feature_name": "turnover_so_far_pct",
+        "num_threshold": 16.580559018125868,
+        "gain": 13.182293634307017
+      },
+      {
+        "feature_idx": 2,
+        "feature_name": "turnover_so_far_pct",
+        "num_threshold": 4.316446585870821,
+        "gain": 110.74863584549225
+      },
+      {
+        "feature_idx": 3,
+        "feature_name": "float_mv_100m_cny",
+        "num_threshold": 22.51441249340543,
+        "gain": 56.571013514322786
+      }
+    ]
+  },
+  {
+    "day": "2026-06-10",
+    "variant": "old_all",
+    "training_rows": 6981,
+    "candidate_count": 196,
+    "top1": {
+      "symbol6": "300665",
+      "return_0940": 0.119360902255639,
+      "predicted_class": "1to3",
+      "p_ge3": 0.20209436923949045,
+      "p_ge1": 0.49026869930043504
+    },
+    "first_round_roots": [
+      {
+        "feature_idx": 2,
+        "feature_name": "turnover_so_far_pct",
+        "num_threshold": 3.6456211381180346,
+        "gain": 187.31741034820584
+      },
+      {
+        "feature_idx": 2,
+        "feature_name": "turnover_so_far_pct",
+        "num_threshold": 14.51799621307434,
+        "gain": 16.103054832735086
+      },
+      {
+        "feature_idx": 2,
+        "feature_name": "turnover_so_far_pct",
+        "num_threshold": 4.541845381867743,
+        "gain": 111.99015582294572
+      },
+      {
+        "feature_idx": 3,
+        "feature_name": "float_mv_100m_cny",
+        "num_threshold": 22.46000434119156,
+        "gain": 58.42601630498519
+      }
+    ]
+  },
+  {
+    "day": "2026-06-10",
+    "variant": "new_all",
+    "training_rows": 6981,
+    "candidate_count": 196,
+    "top1": null,
+    "first_round_roots": [
+      {
+        "feature_idx": 2,
+        "feature_name": "turnover_so_far_pct",
+        "num_threshold": 3.6455271969333047,
+        "gain": 187.31741034820584
+      },
+      {
+        "feature_idx": 2,
+        "feature_name": "turnover_so_far_pct",
+        "num_threshold": 15.404432380267004,
+        "gain": 16.00876066384849
+      },
+      {
+        "feature_idx": 2,
+        "feature_name": "turnover_so_far_pct",
+        "num_threshold": 4.479947302301119,
+        "gain": 110.95314441968449
+      },
+      {
+        "feature_idx": 3,
+        "feature_name": "float_mv_100m_cny",
+        "num_threshold": 22.455363209964133,
+        "gain": 58.42601630498519
+      }
+    ]
+  },
+  {
+    "day": "2026-06-10",
+    "variant": "linear_all",
+    "training_rows": 6981,
+    "candidate_count": 196,
+    "top1": {
+      "symbol6": "300665",
+      "return_0940": 0.119360902255639,
+      "predicted_class": "1to3",
+      "p_ge3": 0.20209436923949045,
+      "p_ge1": 0.49026869930043504
+    },
+    "first_round_roots": [
+      {
+        "feature_idx": 2,
+        "feature_name": "turnover_so_far_pct",
+        "num_threshold": 3.6455971923258486,
+        "gain": 187.31741034820584
+      },
+      {
+        "feature_idx": 2,
+        "feature_name": "turnover_so_far_pct",
+        "num_threshold": 14.515957073174844,
+        "gain": 16.103054832735086
+      },
+      {
+        "feature_idx": 2,
+        "feature_name": "turnover_so_far_pct",
+        "num_threshold": 4.542266259412328,
+        "gain": 111.99015582294572
+      },
+      {
+        "feature_idx": 3,
+        "feature_name": "float_mv_100m_cny",
+        "num_threshold": 22.460641359203166,
+        "gain": 58.42601630498519
+      }
+    ]
+  },
+  {
+    "day": "2026-06-10",
+    "variant": "new_except_old_0",
+    "training_rows": 6981,
+    "candidate_count": 196,
+    "top1": null,
+    "first_round_roots": [
+      {
+        "feature_idx": 2,
+        "feature_name": "turnover_so_far_pct",
+        "num_threshold": 3.6455271969333047,
+        "gain": 187.31741034820584
+      },
+      {
+        "feature_idx": 2,
+        "feature_name": "turnover_so_far_pct",
+        "num_threshold": 15.404432380267004,
+        "gain": 16.00876066384849
+      },
+      {
+        "feature_idx": 2,
+        "feature_name": "turnover_so_far_pct",
+        "num_threshold": 4.479947302301119,
+        "gain": 110.95314441968449
+      },
+      {
+        "feature_idx": 3,
+        "feature_name": "float_mv_100m_cny",
+        "num_threshold": 22.455363209964133,
+        "gain": 58.42601630498519
+      }
+    ]
+  },
+  {
+    "day": "2026-06-10",
+    "variant": "new_except_old_1",
+    "training_rows": 6981,
+    "candidate_count": 196,
+    "top1": null,
+    "first_round_roots": [
+      {
+        "feature_idx": 2,
+        "feature_name": "turnover_so_far_pct",
+        "num_threshold": 3.6455271969333047,
+        "gain": 187.31741034820584
+      },
+      {
+        "feature_idx": 2,
+        "feature_name": "turnover_so_far_pct",
+        "num_threshold": 15.404432380267004,
+        "gain": 16.00876066384849
+      },
+      {
+        "feature_idx": 2,
+        "feature_name": "turnover_so_far_pct",
+        "num_threshold": 4.479947302301119,
+        "gain": 110.95314441968449
+      },
+      {
+        "feature_idx": 3,
+        "feature_name": "float_mv_100m_cny",
+        "num_threshold": 22.455363209964133,
+        "gain": 58.42601630498519
+      }
+    ]
+  },
+  {
+    "day": "2026-06-10",
+    "variant": "new_except_old_2",
+    "training_rows": 6981,
+    "candidate_count": 196,
+    "top1": null,
+    "first_round_roots": [
+      {
+        "feature_idx": 2,
+        "feature_name": "turnover_so_far_pct",
+        "num_threshold": 3.6456211381180346,
+        "gain": 187.31741034820584
+      },
+      {
+        "feature_idx": 2,
+        "feature_name": "turnover_so_far_pct",
+        "num_threshold": 14.51799621307434,
+        "gain": 16.103054832735086
+      },
+      {
+        "feature_idx": 2,
+        "feature_name": "turnover_so_far_pct",
+        "num_threshold": 4.541845381867743,
+        "gain": 111.99015582294572
+      },
+      {
+        "feature_idx": 3,
+        "feature_name": "float_mv_100m_cny",
+        "num_threshold": 22.455363209964133,
+        "gain": 58.42601630498519
+      }
+    ]
+  },
+  {
+    "day": "2026-06-10",
+    "variant": "new_except_old_3",
+    "training_rows": 6981,
+    "candidate_count": 196,
+    "top1": null,
+    "first_round_roots": [
+      {
+        "feature_idx": 2,
+        "feature_name": "turnover_so_far_pct",
+        "num_threshold": 3.6455271969333047,
+        "gain": 187.31741034820584
+      },
+      {
+        "feature_idx": 2,
+        "feature_name": "turnover_so_far_pct",
+        "num_threshold": 15.404432380267004,
+        "gain": 16.00876066384849
+      },
+      {
+        "feature_idx": 2,
+        "feature_name": "turnover_so_far_pct",
+        "num_threshold": 4.479947302301119,
+        "gain": 110.95314441968449
+      },
+      {
+        "feature_idx": 3,
+        "feature_name": "float_mv_100m_cny",
+        "num_threshold": 22.46000434119156,
+        "gain": 58.42601630498519
+      }
+    ]
+  },
+  {
+    "day": "2026-06-10",
+    "variant": "old_except_new_0",
+    "training_rows": 6981,
+    "candidate_count": 196,
+    "top1": {
+      "symbol6": "300665",
+      "return_0940": 0.119360902255639,
+      "predicted_class": "1to3",
+      "p_ge3": 0.20743123337645833,
+      "p_ge1": 0.49359971340959774
+    },
+    "first_round_roots": [
+      {
+        "feature_idx": 2,
+        "feature_name": "turnover_so_far_pct",
+        "num_threshold": 3.6456211381180346,
+        "gain": 187.31741034820584
+      },
+      {
+        "feature_idx": 2,
+        "feature_name": "turnover_so_far_pct",
+        "num_threshold": 14.51799621307434,
+        "gain": 16.103054832735086
+      },
+      {
+        "feature_idx": 2,
+        "feature_name": "turnover_so_far_pct",
+        "num_threshold": 4.541845381867743,
+        "gain": 111.99015582294572
+      },
+      {
+        "feature_idx": 3,
+        "feature_name": "float_mv_100m_cny",
+        "num_threshold": 22.46000434119156,
+        "gain": 58.42601630498519
+      }
+    ]
+  },
+  {
+    "day": "2026-06-10",
+    "variant": "old_except_new_1",
+    "training_rows": 6981,
+    "candidate_count": 196,
+    "top1": null,
+    "first_round_roots": [
+      {
+        "feature_idx": 2,
+        "feature_name": "turnover_so_far_pct",
+        "num_threshold": 3.6456211381180346,
+        "gain": 187.31741034820584
+      },
+      {
+        "feature_idx": 2,
+        "feature_name": "turnover_so_far_pct",
+        "num_threshold": 14.51799621307434,
+        "gain": 16.103054832735086
+      },
+      {
+        "feature_idx": 2,
+        "feature_name": "turnover_so_far_pct",
+        "num_threshold": 4.541845381867743,
+        "gain": 111.99015582294572
+      },
+      {
+        "feature_idx": 3,
+        "feature_name": "float_mv_100m_cny",
+        "num_threshold": 22.46000434119156,
+        "gain": 58.42601630498519
+      }
+    ]
+  },
+  {
+    "day": "2026-06-10",
+    "variant": "old_except_new_2",
+    "training_rows": 6981,
+    "candidate_count": 196,
+    "top1": null,
+    "first_round_roots": [
+      {
+        "feature_idx": 2,
+        "feature_name": "turnover_so_far_pct",
+        "num_threshold": 3.6455271969333047,
+        "gain": 187.31741034820584
+      },
+      {
+        "feature_idx": 2,
+        "feature_name": "turnover_so_far_pct",
+        "num_threshold": 15.404432380267004,
+        "gain": 16.00876066384849
+      },
+      {
+        "feature_idx": 2,
+        "feature_name": "turnover_so_far_pct",
+        "num_threshold": 4.479947302301119,
+        "gain": 110.95314441968449
+      },
+      {
+        "feature_idx": 3,
+        "feature_name": "float_mv_100m_cny",
+        "num_threshold": 22.46000434119156,
+        "gain": 58.42601630498519
+      }
+    ]
+  },
+  {
+    "day": "2026-06-10",
+    "variant": "old_except_new_3",
+    "training_rows": 6981,
+    "candidate_count": 196,
+    "top1": null,
+    "first_round_roots": [
+      {
+        "feature_idx": 2,
+        "feature_name": "turnover_so_far_pct",
+        "num_threshold": 3.6456211381180346,
+        "gain": 187.31741034820584
+      },
+      {
+        "feature_idx": 2,
+        "feature_name": "turnover_so_far_pct",
+        "num_threshold": 14.51799621307434,
+        "gain": 16.103054832735086
+      },
+      {
+        "feature_idx": 2,
+        "feature_name": "turnover_so_far_pct",
+        "num_threshold": 4.541845381867743,
+        "gain": 111.99015582294572
+      },
+      {
+        "feature_idx": 3,
+        "feature_name": "float_mv_100m_cny",
+        "num_threshold": 22.455363209964133,
+        "gain": 58.42601630498519
+      }
+    ]
+  },
+  {
+    "day": "2026-07-15",
+    "variant": "old_all",
+    "training_rows": 9047,
+    "candidate_count": 488,
+    "top1": {
+      "symbol6": "002768",
+      "return_0940": -0.03572643756379723,
+      "predicted_class": "ge3",
+      "p_ge3": 0.34570389839057847,
+      "p_ge1": 0.6001785113468399
+    },
+    "first_round_roots": [
+      {
+        "feature_idx": 2,
+        "feature_name": "turnover_so_far_pct",
+        "num_threshold": 4.525905619412773,
+        "gain": 142.70451547107083
+      },
+      {
+        "feature_idx": 2,
+        "feature_name": "turnover_so_far_pct",
+        "num_threshold": 7.642211003919495,
+        "gain": 56.41995632054369
+      },
+      {
+        "feature_idx": 2,
+        "feature_name": "turnover_so_far_pct",
+        "num_threshold": 3.344625414681566,
+        "gain": 198.18147382728654
+      },
+      {
+        "feature_idx": 2,
+        "feature_name": "turnover_so_far_pct",
+        "num_threshold": 7.642211003919495,
+        "gain": 72.4254458757877
+      }
+    ]
+  },
+  {
+    "day": "2026-07-15",
+    "variant": "new_all",
+    "training_rows": 9047,
+    "candidate_count": 488,
+    "top1": {
+      "symbol6": "000779",
+      "return_0940": 0.012544802867383575,
+      "predicted_class": "ge3",
+      "p_ge3": 0.3471970874546467,
+      "p_ge1": 0.6025297439247067
+    },
+    "first_round_roots": [
+      {
+        "feature_idx": 2,
+        "feature_name": "turnover_so_far_pct",
+        "num_threshold": 4.558432215322987,
+        "gain": 143.41598167868227
+      },
+      {
+        "feature_idx": 2,
+        "feature_name": "turnover_so_far_pct",
+        "num_threshold": 7.641150072012389,
+        "gain": 56.41995632054369
+      },
+      {
+        "feature_idx": 2,
+        "feature_name": "turnover_so_far_pct",
+        "num_threshold": 3.3438626663906676,
+        "gain": 198.18147382728654
+      },
+      {
+        "feature_idx": 2,
+        "feature_name": "turnover_so_far_pct",
+        "num_threshold": 7.641150072012389,
+        "gain": 72.4254458757877
+      }
+    ]
+  },
+  {
+    "day": "2026-07-15",
+    "variant": "linear_all",
+    "training_rows": 9047,
+    "candidate_count": 488,
+    "top1": {
+      "symbol6": "002768",
+      "return_0940": -0.03572643756379723,
+      "predicted_class": "ge3",
+      "p_ge3": 0.34570389839057847,
+      "p_ge1": 0.6001785113468399
+    },
+    "first_round_roots": [
+      {
+        "feature_idx": 2,
+        "feature_name": "turnover_so_far_pct",
+        "num_threshold": 4.525870239697275,
+        "gain": 142.70451547107083
+      },
+      {
+        "feature_idx": 2,
+        "feature_name": "turnover_so_far_pct",
+        "num_threshold": 7.641408024083922,
+        "gain": 56.41995632054369
+      },
+      {
+        "feature_idx": 2,
+        "feature_name": "turnover_so_far_pct",
+        "num_threshold": 3.344341253553584,
+        "gain": 198.18147382728654
+      },
+      {
+        "feature_idx": 2,
+        "feature_name": "turnover_so_far_pct",
+        "num_threshold": 7.641408024083922,
+        "gain": 72.4254458757877
+      }
+    ]
+  },
+  {
+    "day": "2026-07-15",
+    "variant": "new_except_old_0",
+    "training_rows": 9047,
+    "candidate_count": 488,
+    "top1": {
+      "symbol6": "002768",
+      "return_0940": -0.03572643756379723,
+      "predicted_class": "ge3",
+      "p_ge3": 0.34468536992161614,
+      "p_ge1": 0.6012399886925572
+    },
+    "first_round_roots": [
+      {
+        "feature_idx": 2,
+        "feature_name": "turnover_so_far_pct",
+        "num_threshold": 4.558432215322987,
+        "gain": 143.41598167868227
+      },
+      {
+        "feature_idx": 2,
+        "feature_name": "turnover_so_far_pct",
+        "num_threshold": 7.641150072012389,
+        "gain": 56.41995632054369
+      },
+      {
+        "feature_idx": 2,
+        "feature_name": "turnover_so_far_pct",
+        "num_threshold": 3.3438626663906676,
+        "gain": 198.18147382728654
+      },
+      {
+        "feature_idx": 2,
+        "feature_name": "turnover_so_far_pct",
+        "num_threshold": 7.641150072012389,
+        "gain": 72.4254458757877
+      }
+    ]
+  },
+  {
+    "day": "2026-07-15",
+    "variant": "new_except_old_1",
+    "training_rows": 9047,
+    "candidate_count": 488,
+    "top1": {
+      "symbol6": "002768",
+      "return_0940": -0.03572643756379723,
+      "predicted_class": "ge3",
+      "p_ge3": 0.34444827539539247,
+      "p_ge1": 0.5954959895051948
+    },
+    "first_round_roots": [
+      {
+        "feature_idx": 2,
+        "feature_name": "turnover_so_far_pct",
+        "num_threshold": 4.558432215322987,
+        "gain": 143.41598167868227
+      },
+      {
+        "feature_idx": 2,
+        "feature_name": "turnover_so_far_pct",
+        "num_threshold": 7.641150072012389,
+        "gain": 56.41995632054369
+      },
+      {
+        "feature_idx": 2,
+        "feature_name": "turnover_so_far_pct",
+        "num_threshold": 3.3438626663906676,
+        "gain": 198.18147382728654
+      },
+      {
+        "feature_idx": 2,
+        "feature_name": "turnover_so_far_pct",
+        "num_threshold": 7.641150072012389,
+        "gain": 72.4254458757877
+      }
+    ]
+  },
+  {
+    "day": "2026-07-15",
+    "variant": "new_except_old_2",
+    "training_rows": 9047,
+    "candidate_count": 488,
+    "top1": {
+      "symbol6": "000779",
+      "return_0940": 0.012544802867383575,
+      "predicted_class": "ge3",
+      "p_ge3": 0.3507938960919578,
+      "p_ge1": 0.6049107816216535
+    },
+    "first_round_roots": [
+      {
+        "feature_idx": 2,
+        "feature_name": "turnover_so_far_pct",
+        "num_threshold": 4.525905619412773,
+        "gain": 142.70451547107083
+      },
+      {
+        "feature_idx": 2,
+        "feature_name": "turnover_so_far_pct",
+        "num_threshold": 7.642211003919495,
+        "gain": 56.41995632054369
+      },
+      {
+        "feature_idx": 2,
+        "feature_name": "turnover_so_far_pct",
+        "num_threshold": 3.344625414681566,
+        "gain": 198.18147382728654
+      },
+      {
+        "feature_idx": 2,
+        "feature_name": "turnover_so_far_pct",
+        "num_threshold": 7.642211003919495,
+        "gain": 72.4254458757877
+      }
+    ]
+  },
+  {
+    "day": "2026-07-15",
+    "variant": "new_except_old_3",
+    "training_rows": 9047,
+    "candidate_count": 488,
+    "top1": {
+      "symbol6": "000779",
+      "return_0940": 0.012544802867383575,
+      "predicted_class": "ge3",
+      "p_ge3": 0.3479492118681339,
+      "p_ge1": 0.605795513893481
+    },
+    "first_round_roots": [
+      {
+        "feature_idx": 2,
+        "feature_name": "turnover_so_far_pct",
+        "num_threshold": 4.558432215322987,
+        "gain": 143.41598167868227
+      },
+      {
+        "feature_idx": 2,
+        "feature_name": "turnover_so_far_pct",
+        "num_threshold": 7.641150072012389,
+        "gain": 56.41995632054369
+      },
+      {
+        "feature_idx": 2,
+        "feature_name": "turnover_so_far_pct",
+        "num_threshold": 3.3438626663906676,
+        "gain": 198.18147382728654
+      },
+      {
+        "feature_idx": 2,
+        "feature_name": "turnover_so_far_pct",
+        "num_threshold": 7.641150072012389,
+        "gain": 72.4254458757877
+      }
+    ]
+  },
+  {
+    "day": "2026-07-15",
+    "variant": "old_except_new_0",
+    "training_rows": 9047,
+    "candidate_count": 488,
+    "top1": {
+      "symbol6": "002768",
+      "return_0940": -0.03572643756379723,
+      "predicted_class": "ge3",
+      "p_ge3": 0.34339375584606774,
+      "p_ge1": 0.5983219188114689
+    },
+    "first_round_roots": [
+      {
+        "feature_idx": 2,
+        "feature_name": "turnover_so_far_pct",
+        "num_threshold": 4.525905619412773,
+        "gain": 142.70451547107083
+      },
+      {
+        "feature_idx": 2,
+        "feature_name": "turnover_so_far_pct",
+        "num_threshold": 7.642211003919495,
+        "gain": 56.41995632054369
+      },
+      {
+        "feature_idx": 2,
+        "feature_name": "turnover_so_far_pct",
+        "num_threshold": 3.344625414681566,
+        "gain": 198.18147382728654
+      },
+      {
+        "feature_idx": 2,
+        "feature_name": "turnover_so_far_pct",
+        "num_threshold": 7.642211003919495,
+        "gain": 72.4254458757877
+      }
+    ]
+  },
+  {
+    "day": "2026-07-15",
+    "variant": "old_except_new_1",
+    "training_rows": 9047,
+    "candidate_count": 488,
+    "top1": {
+      "symbol6": "000779",
+      "return_0940": 0.012544802867383575,
+      "predicted_class": "ge3",
+      "p_ge3": 0.34899737103906836,
+      "p_ge1": 0.5950042538427494
+    },
+    "first_round_roots": [
+      {
+        "feature_idx": 2,
+        "feature_name": "turnover_so_far_pct",
+        "num_threshold": 4.525905619412773,
+        "gain": 142.70451547107083
+      },
+      {
+        "feature_idx": 2,
+        "feature_name": "turnover_so_far_pct",
+        "num_threshold": 7.642211003919495,
+        "gain": 56.41995632054369
+      },
+      {
+        "feature_idx": 2,
+        "feature_name": "turnover_so_far_pct",
+        "num_threshold": 3.344625414681566,
+        "gain": 198.18147382728654
+      },
+      {
+        "feature_idx": 2,
+        "feature_name": "turnover_so_far_pct",
+        "num_threshold": 7.642211003919495,
+        "gain": 72.4254458757877
+      }
+    ]
+  },
+  {
+    "day": "2026-07-15",
+    "variant": "old_except_new_2",
+    "training_rows": 9047,
+    "candidate_count": 488,
+    "top1": {
+      "symbol6": "000779",
+      "return_0940": 0.012544802867383575,
+      "predicted_class": "ge3",
+      "p_ge3": 0.3505179213028678,
+      "p_ge1": 0.6052561544442576
+    },
+    "first_round_roots": [
+      {
+        "feature_idx": 2,
+        "feature_name": "turnover_so_far_pct",
+        "num_threshold": 4.558432215322987,
+        "gain": 143.41598167868227
+      },
+      {
+        "feature_idx": 2,
+        "feature_name": "turnover_so_far_pct",
+        "num_threshold": 7.641150072012389,
+        "gain": 56.41995632054369
+      },
+      {
+        "feature_idx": 2,
+        "feature_name": "turnover_so_far_pct",
+        "num_threshold": 3.3438626663906676,
+        "gain": 198.18147382728654
+      },
+      {
+        "feature_idx": 2,
+        "feature_name": "turnover_so_far_pct",
+        "num_threshold": 7.641150072012389,
+        "gain": 72.4254458757877
+      }
+    ]
+  },
+  {
+    "day": "2026-07-15",
+    "variant": "old_except_new_3",
+    "training_rows": 9047,
+    "candidate_count": 488,
+    "top1": {
+      "symbol6": "000779",
+      "return_0940": 0.012544802867383575,
+      "predicted_class": "ge3",
+      "p_ge3": 0.3481846466755765,
+      "p_ge1": 0.6016838420308472
+    },
+    "first_round_roots": [
+      {
+        "feature_idx": 2,
+        "feature_name": "turnover_so_far_pct",
+        "num_threshold": 4.525905619412773,
+        "gain": 142.70451547107083
+      },
+      {
+        "feature_idx": 2,
+        "feature_name": "turnover_so_far_pct",
+        "num_threshold": 7.642211003919495,
+        "gain": 56.41995632054369
+      },
+      {
+        "feature_idx": 2,
+        "feature_name": "turnover_so_far_pct",
+        "num_threshold": 3.344625414681566,
+        "gain": 198.18147382728654
+      },
+      {
+        "feature_idx": 2,
+        "feature_name": "turnover_so_far_pct",
+        "num_threshold": 7.642211003919495,
+        "gain": 72.4254458757877
+      }
+    ]
+  }
+]

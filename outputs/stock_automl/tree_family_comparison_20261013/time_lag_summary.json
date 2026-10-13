@@ -1,0 +1,236 @@
+{
+  "feb_jul": {
+    "prediction_days": 118,
+    "arms": {
+      "sklearn_1.7.1_none": {
+        "labeled_candidates": 49229,
+        "logloss": 1.370317728260348,
+        "brier4": 0.7451974035287672,
+        "selected_days": 115,
+        "unknown_outcome_picks": 0,
+        "raw_compound_proxy": 0.06458949958975513,
+        "gate_counts": {
+          "trade": 91,
+          "below_median": 20,
+          "missing_amount": 4,
+          "no_pick": 3
+        },
+        "gated_compound_proxy": 0.5760701335674183,
+        "gated_max_drawdown": -0.23139749138168408,
+        "gated_compound_hypothetical_0p2pct_cost": 0.3146009437578796
+      },
+      "sklearn_1.7.1_age_feature": {
+        "labeled_candidates": 49229,
+        "logloss": 1.4399176185356153,
+        "brier4": 0.7789171284743682,
+        "selected_days": 78,
+        "unknown_outcome_picks": 0,
+        "raw_compound_proxy": -0.4092584033878657,
+        "gate_counts": {
+          "trade": 58,
+          "no_pick": 40,
+          "below_median": 16,
+          "missing_amount": 4
+        },
+        "gated_compound_proxy": -0.42102293136353497,
+        "gated_max_drawdown": -0.4845153451860005,
+        "gated_compound_hypothetical_0p2pct_cost": -0.48510490940798745
+      },
+      "sklearn_1.7.1_recency_weight10": {
+        "labeled_candidates": 49229,
+        "logloss": 1.3809029616851964,
+        "brier4": 0.7506727489059491,
+        "selected_days": 114,
+        "unknown_outcome_picks": 0,
+        "raw_compound_proxy": -0.346503180402287,
+        "gate_counts": {
+          "trade": 88,
+          "below_median": 23,
+          "no_pick": 4,
+          "missing_amount": 3
+        },
+        "gated_compound_proxy": -0.27501451425035617,
+        "gated_max_drawdown": -0.4210197634402245,
+        "gated_compound_hypothetical_0p2pct_cost": -0.3925879565651125
+      },
+      "sklearn_1.9.1_none": {
+        "labeled_candidates": 49229,
+        "logloss": 1.3704782643489997,
+        "brier4": 0.7453373099163776,
+        "selected_days": 113,
+        "unknown_outcome_picks": 0,
+        "raw_compound_proxy": -0.29860420962833645,
+        "gate_counts": {
+          "trade": 89,
+          "below_median": 20,
+          "no_pick": 5,
+          "missing_amount": 4
+        },
+        "gated_compound_proxy": -0.13032247457710688,
+        "gated_max_drawdown": -0.29020303216344945,
+        "gated_compound_hypothetical_0p2pct_cost": -0.2725396059940327
+      },
+      "sklearn_1.9.1_age_feature": {
+        "labeled_candidates": 49229,
+        "logloss": 1.4400505548834552,
+        "brier4": 0.7789358855369408,
+        "selected_days": 79,
+        "unknown_outcome_picks": 0,
+        "raw_compound_proxy": -0.18933103897716264,
+        "gate_counts": {
+          "trade": 62,
+          "no_pick": 39,
+          "below_median": 13,
+          "missing_amount": 4
+        },
+        "gated_compound_proxy": -0.23036694395205737,
+        "gated_max_drawdown": -0.3313660052838968,
+        "gated_compound_hypothetical_0p2pct_cost": -0.32062333220954786
+      },
+      "sklearn_1.9.1_recency_weight10": {
+        "labeled_candidates": 49229,
+        "logloss": 1.3807661594616767,
+        "brier4": 0.7505868233461641,
+        "selected_days": 114,
+        "unknown_outcome_picks": 0,
+        "raw_compound_proxy": -0.3506152128311839,
+        "gate_counts": {
+          "trade": 89,
+          "below_median": 22,
+          "no_pick": 4,
+          "missing_amount": 3
+        },
+        "gated_compound_proxy": -0.16255503633672486,
+        "gated_max_drawdown": -0.34223610779686586,
+        "gated_compound_hypothetical_0p2pct_cost": -0.29956852860163874
+      }
+    },
+    "same_top1_vs_171_none": {
+      "sklearn_1.7.1_none": 118,
+      "sklearn_1.7.1_age_feature": 21,
+      "sklearn_1.7.1_recency_weight10": 45,
+      "sklearn_1.9.1_none": 87,
+      "sklearn_1.9.1_age_feature": 21,
+      "sklearn_1.9.1_recency_weight10": 42
+    },
+    "same_top1_between_versions": {
+      "none": 87,
+      "age_feature": 94,
+      "recency_weight10": 72
+    }
+  },
+  "aug_oct": {
+    "prediction_days": 21,
+    "arms": {
+      "sklearn_1.7.1_none": {
+        "labeled_candidates": 6402,
+        "logloss": 1.319477723626257,
+        "brier4": 0.7223244049844776,
+        "selected_days": 21,
+        "unknown_outcome_picks": 0,
+        "raw_compound_proxy": 0.20274636852481143,
+        "gate_counts": {
+          "trade": 14,
+          "below_median": 6,
+          "missing_amount": 1
+        },
+        "gated_compound_proxy": 0.25008730602671436,
+        "gated_max_drawdown": -0.015672563046795318,
+        "gated_compound_hypothetical_0p2pct_cost": 0.21607003849305184
+      },
+      "sklearn_1.7.1_age_feature": {
+        "labeled_candidates": 6402,
+        "logloss": 1.3345881797984824,
+        "brier4": 0.7300858247475239,
+        "selected_days": 11,
+        "unknown_outcome_picks": 0,
+        "raw_compound_proxy": 0.06999415119995556,
+        "gate_counts": {
+          "no_pick": 10,
+          "trade": 10,
+          "below_median": 1
+        },
+        "gated_compound_proxy": -0.012097203351122965,
+        "gated_max_drawdown": -0.05658233587015926,
+        "gated_compound_hypothetical_0p2pct_cost": -0.03170811969195131
+      },
+      "sklearn_1.7.1_recency_weight10": {
+        "labeled_candidates": 6402,
+        "logloss": 1.3225635125552637,
+        "brier4": 0.723999901691974,
+        "selected_days": 20,
+        "unknown_outcome_picks": 0,
+        "raw_compound_proxy": 0.07906953274262318,
+        "gate_counts": {
+          "trade": 15,
+          "below_median": 5,
+          "no_pick": 1
+        },
+        "gated_compound_proxy": -0.0049338486582873875,
+        "gated_max_drawdown": -0.15820442568067894,
+        "gated_compound_hypothetical_0p2pct_cost": -0.03439783209770064
+      },
+      "sklearn_1.9.1_none": {
+        "labeled_candidates": 6402,
+        "logloss": 1.3191962307937848,
+        "brier4": 0.7221550374544347,
+        "selected_days": 21,
+        "unknown_outcome_picks": 0,
+        "raw_compound_proxy": 0.17774708074408996,
+        "gate_counts": {
+          "trade": 14,
+          "below_median": 6,
+          "missing_amount": 1
+        },
+        "gated_compound_proxy": 0.2195628542061001,
+        "gated_max_drawdown": -0.018139661756682912,
+        "gated_compound_hypothetical_0p2pct_cost": 0.1863170900070379
+      },
+      "sklearn_1.9.1_age_feature": {
+        "labeled_candidates": 6402,
+        "logloss": 1.3356421586591076,
+        "brier4": 0.7305245532449204,
+        "selected_days": 11,
+        "unknown_outcome_picks": 0,
+        "raw_compound_proxy": 0.01523894704076345,
+        "gate_counts": {
+          "no_pick": 10,
+          "trade": 10,
+          "below_median": 1
+        },
+        "gated_compound_proxy": 0.00573671059062808,
+        "gated_max_drawdown": -0.055577314189037774,
+        "gated_compound_hypothetical_0p2pct_cost": -0.014195000676233693
+      },
+      "sklearn_1.9.1_recency_weight10": {
+        "labeled_candidates": 6402,
+        "logloss": 1.322085670500971,
+        "brier4": 0.7238122123880731,
+        "selected_days": 20,
+        "unknown_outcome_picks": 0,
+        "raw_compound_proxy": 0.25970793816140314,
+        "gate_counts": {
+          "trade": 18,
+          "below_median": 2,
+          "no_pick": 1
+        },
+        "gated_compound_proxy": 0.18849691138004587,
+        "gated_max_drawdown": -0.039468659949348006,
+        "gated_compound_hypothetical_0p2pct_cost": 0.146804971561725
+      }
+    },
+    "same_top1_vs_171_none": {
+      "sklearn_1.7.1_none": 21,
+      "sklearn_1.7.1_age_feature": 0,
+      "sklearn_1.7.1_recency_weight10": 6,
+      "sklearn_1.9.1_none": 19,
+      "sklearn_1.9.1_age_feature": 1,
+      "sklearn_1.9.1_recency_weight10": 9
+    },
+    "same_top1_between_versions": {
+      "none": 19,
+      "age_feature": 16,
+      "recency_weight10": 10
+    }
+  }
+}

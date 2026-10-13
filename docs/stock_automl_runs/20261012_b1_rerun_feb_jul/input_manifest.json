@@ -1,0 +1,10 @@
+{
+  "raw_source": "outputs/stock_automl/mk_1m_jan_jul/trainable_candidates.csv.gz",
+  "raw_sha256": "7e726db8c3794b762b838c10b13b4b0fa5cc6cc7b13b974efbe187080ac85b58",
+  "cohort": "outputs/stock_automl/b1_rerun_20261012/tradable_st_candidates.csv.gz",
+  "cohort_sha256": "975cdfcf39d786bbdb5af920d52da02392bd341978b065dba36fb767bb727dc4",
+  "raw_rows": 59959,
+  "cohort_rows": 58317,
+  "candidate_days": 139,
+  "policy": "exclude only ST already at limit at signal; retain other ST"
+}

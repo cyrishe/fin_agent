@@ -1,0 +1,5 @@
+arm,prediction_days,top1_picks,top1_result_known,top1_result_unknown,top1_pass_pct,top1_acceptable_pct,top1_error_pct,gate_trades,gate_mean_per_trade_pct,no_gate_trades,no_gate_mean_per_trade_pct,rule_skip_days,missing_amount_days,no_0940_exit_days
+sklearn_1.7.1_ratio,118,118,115,3,32.174,21.739,46.087,84,-0.04291,115,-0.24493,23,10,1
+sklearn_1.7.1_ratio_log_weight,118,117,116,1,23.276,23.276,53.448,85,-0.58776,116,-0.72405,24,8,0
+sklearn_1.9.1_ratio,118,118,115,3,31.304,26.957,41.739,85,-0.10052,115,-0.08998,23,9,1
+sklearn_1.9.1_ratio_log_weight,118,117,115,2,26.087,26.957,46.957,84,-0.16398,115,-0.32243,24,8,1

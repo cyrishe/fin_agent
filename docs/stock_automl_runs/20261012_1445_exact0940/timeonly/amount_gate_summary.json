@@ -1,0 +1,18 @@
+{
+  "method": "14:45 T stock amount >= median of its prior 20 complete trading days at 14:45; no replacement",
+  "segments": [
+    {
+      "segment": "aug_oct",
+      "test_days": 22,
+      "selected_top1": 22,
+      "trades": 14,
+      "idle_days": 8,
+      "target_ge3_trades": 2,
+      "sale_ge3_trades": 2,
+      "negative_trades": 7,
+      "mean_return_per_trade_pct": -0.530688257335493,
+      "mean_return_per_day_pct": -0.3377107092134954,
+      "compounded_price_proxy_pct": -7.637304431049063
+    }
+  ]
+}

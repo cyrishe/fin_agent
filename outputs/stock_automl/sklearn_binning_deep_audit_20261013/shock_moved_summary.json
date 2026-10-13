@@ -1,0 +1,293 @@
+[
+  {
+    "prediction_day": "2026-05-28",
+    "training_rows": 7984,
+    "moved_any_rows": 490,
+    "moved_any_ge1_rate": 0.38979591836734695,
+    "unmoved_ge1_rate": 0.43354683746997597,
+    "moved_any_ge3_rate": 0.16122448979591836,
+    "unmoved_ge3_rate": 0.16399786495863358,
+    "moved_by_training_day": {
+      "2026-04-27": 30,
+      "2026-04-28": 22,
+      "2026-04-29": 33,
+      "2026-04-30": 22,
+      "2026-05-06": 32,
+      "2026-05-07": 29,
+      "2026-05-08": 33,
+      "2026-05-11": 40,
+      "2026-05-12": 16,
+      "2026-05-13": 31,
+      "2026-05-14": 15,
+      "2026-05-15": 18,
+      "2026-05-18": 22,
+      "2026-05-19": 35,
+      "2026-05-20": 20,
+      "2026-05-21": 9,
+      "2026-05-22": 40,
+      "2026-05-25": 24,
+      "2026-05-26": 7,
+      "2026-05-27": 12
+    },
+    "top1_candidate_direct_bin_changes": {
+      "688507": [],
+      "600545": []
+    },
+    "by_feature": {
+      "signal_return": {
+        "changed_rows": 121,
+        "moved_up_bins": 0,
+        "moved_down_bins": 121,
+        "moved_ge1_rate": 0.4132231404958678,
+        "moved_ge3_rate": 0.19834710743801653,
+        "unmoved_ge1_rate": 0.4311331552842427,
+        "unmoved_ge3_rate": 0.16329645173597862
+      },
+      "volume_ratio": {
+        "changed_rows": 126,
+        "moved_up_bins": 0,
+        "moved_down_bins": 126,
+        "moved_ge1_rate": 0.3253968253968254,
+        "moved_ge3_rate": 0.15873015873015872,
+        "unmoved_ge1_rate": 0.43255281242046323,
+        "unmoved_ge3_rate": 0.16390939170272334
+      },
+      "turnover_so_far_pct": {
+        "changed_rows": 126,
+        "moved_up_bins": 0,
+        "moved_down_bins": 126,
+        "moved_ge1_rate": 0.5,
+        "moved_ge3_rate": 0.1746031746031746,
+        "unmoved_ge1_rate": 0.42975311784169,
+        "unmoved_ge3_rate": 0.16365487401374396
+      },
+      "float_mv_100m_cny": {
+        "changed_rows": 126,
+        "moved_up_bins": 0,
+        "moved_down_bins": 126,
+        "moved_ge1_rate": 0.3253968253968254,
+        "moved_ge3_rate": 0.11904761904761904,
+        "unmoved_ge1_rate": 0.43255281242046323,
+        "unmoved_ge3_rate": 0.1645456859251718
+      }
+    }
+  },
+  {
+    "prediction_day": "2026-06-09",
+    "training_rows": 6566,
+    "moved_any_rows": 496,
+    "moved_any_ge1_rate": 0.4637096774193548,
+    "unmoved_ge1_rate": 0.4041186161449753,
+    "moved_any_ge3_rate": 0.18346774193548387,
+    "unmoved_ge3_rate": 0.1630971993410214,
+    "moved_by_training_day": {
+      "2026-05-12": 20,
+      "2026-05-13": 30,
+      "2026-05-14": 17,
+      "2026-05-15": 24,
+      "2026-05-18": 22,
+      "2026-05-19": 36,
+      "2026-05-20": 23,
+      "2026-05-21": 11,
+      "2026-05-22": 42,
+      "2026-05-25": 33,
+      "2026-05-26": 22,
+      "2026-05-27": 12,
+      "2026-05-28": 33,
+      "2026-05-29": 25,
+      "2026-06-01": 59,
+      "2026-06-02": 15,
+      "2026-06-03": 18,
+      "2026-06-04": 24,
+      "2026-06-05": 19,
+      "2026-06-08": 11
+    },
+    "top1_candidate_direct_bin_changes": {
+      "002185": [],
+      "300174": []
+    },
+    "by_feature": {
+      "signal_return": {
+        "changed_rows": 131,
+        "moved_up_bins": 0,
+        "moved_down_bins": 131,
+        "moved_ge1_rate": 0.4351145038167939,
+        "moved_ge3_rate": 0.1450381679389313,
+        "unmoved_ge1_rate": 0.4080808080808081,
+        "unmoved_ge3_rate": 0.16503496503496504
+      },
+      "volume_ratio": {
+        "changed_rows": 125,
+        "moved_up_bins": 0,
+        "moved_down_bins": 125,
+        "moved_ge1_rate": 0.424,
+        "moved_ge3_rate": 0.152,
+        "unmoved_ge1_rate": 0.40832168917869893,
+        "unmoved_ge3_rate": 0.16488122962272939
+      },
+      "turnover_so_far_pct": {
+        "changed_rows": 125,
+        "moved_up_bins": 0,
+        "moved_down_bins": 125,
+        "moved_ge1_rate": 0.536,
+        "moved_ge3_rate": 0.216,
+        "unmoved_ge1_rate": 0.40614811364694925,
+        "unmoved_ge3_rate": 0.16363918646172954
+      },
+      "float_mv_100m_cny": {
+        "changed_rows": 125,
+        "moved_up_bins": 0,
+        "moved_down_bins": 125,
+        "moved_ge1_rate": 0.472,
+        "moved_ge3_rate": 0.216,
+        "unmoved_ge1_rate": 0.4073901568079491,
+        "unmoved_ge3_rate": 0.16363918646172954
+      }
+    }
+  },
+  {
+    "prediction_day": "2026-06-10",
+    "training_rows": 6981,
+    "moved_any_rows": 485,
+    "moved_any_ge1_rate": 0.4061855670103093,
+    "unmoved_ge1_rate": 0.4050184729064039,
+    "moved_any_ge3_rate": 0.15257731958762888,
+    "unmoved_ge3_rate": 0.16194581280788178,
+    "moved_by_training_day": {
+      "2026-05-13": 37,
+      "2026-05-14": 15,
+      "2026-05-15": 28,
+      "2026-05-18": 18,
+      "2026-05-19": 38,
+      "2026-05-20": 24,
+      "2026-05-21": 11,
+      "2026-05-22": 45,
+      "2026-05-25": 26,
+      "2026-05-26": 13,
+      "2026-05-27": 18,
+      "2026-05-28": 30,
+      "2026-05-29": 17,
+      "2026-06-01": 49,
+      "2026-06-02": 14,
+      "2026-06-03": 16,
+      "2026-06-04": 13,
+      "2026-06-05": 19,
+      "2026-06-08": 11,
+      "2026-06-09": 43
+    },
+    "top1_candidate_direct_bin_changes": {
+      "300665": []
+    },
+    "by_feature": {
+      "signal_return": {
+        "changed_rows": 123,
+        "moved_up_bins": 0,
+        "moved_down_bins": 123,
+        "moved_ge1_rate": 0.4065040650406504,
+        "moved_ge3_rate": 0.17886178861788618,
+        "unmoved_ge1_rate": 0.40507436570428695,
+        "unmoved_ge3_rate": 0.1609798775153106
+      },
+      "volume_ratio": {
+        "changed_rows": 126,
+        "moved_up_bins": 0,
+        "moved_down_bins": 126,
+        "moved_ge1_rate": 0.4126984126984127,
+        "moved_ge3_rate": 0.15079365079365079,
+        "unmoved_ge1_rate": 0.4049598832968636,
+        "unmoved_ge3_rate": 0.16148796498905907
+      },
+      "turnover_so_far_pct": {
+        "changed_rows": 126,
+        "moved_up_bins": 0,
+        "moved_down_bins": 126,
+        "moved_ge1_rate": 0.3968253968253968,
+        "moved_ge3_rate": 0.15873015873015872,
+        "unmoved_ge1_rate": 0.40525164113785556,
+        "unmoved_ge3_rate": 0.1613420860685631
+      },
+      "float_mv_100m_cny": {
+        "changed_rows": 126,
+        "moved_up_bins": 0,
+        "moved_down_bins": 126,
+        "moved_ge1_rate": 0.4444444444444444,
+        "moved_ge3_rate": 0.1349206349206349,
+        "unmoved_ge1_rate": 0.40437636761487966,
+        "unmoved_ge3_rate": 0.16177972283005107
+      }
+    }
+  },
+  {
+    "prediction_day": "2026-07-15",
+    "training_rows": 9047,
+    "moved_any_rows": 489,
+    "moved_any_ge1_rate": 0.47648261758691207,
+    "unmoved_ge1_rate": 0.4658798784762795,
+    "moved_any_ge3_rate": 0.17177914110429449,
+    "unmoved_ge3_rate": 0.16452442159383032,
+    "moved_by_training_day": {
+      "2026-06-16": 28,
+      "2026-06-17": 18,
+      "2026-06-18": 25,
+      "2026-06-22": 33,
+      "2026-06-23": 13,
+      "2026-06-24": 25,
+      "2026-06-25": 21,
+      "2026-06-26": 10,
+      "2026-06-29": 26,
+      "2026-06-30": 49,
+      "2026-07-01": 46,
+      "2026-07-02": 16,
+      "2026-07-03": 40,
+      "2026-07-06": 21,
+      "2026-07-07": 12,
+      "2026-07-08": 14,
+      "2026-07-09": 17,
+      "2026-07-10": 36,
+      "2026-07-13": 9,
+      "2026-07-14": 30
+    },
+    "top1_candidate_direct_bin_changes": {
+      "002768": [],
+      "000779": []
+    },
+    "by_feature": {
+      "signal_return": {
+        "changed_rows": 120,
+        "moved_up_bins": 0,
+        "moved_down_bins": 120,
+        "moved_ge1_rate": 0.4583333333333333,
+        "moved_ge3_rate": 0.14166666666666666,
+        "unmoved_ge1_rate": 0.46656211493222804,
+        "unmoved_ge3_rate": 0.165229080318136
+      },
+      "volume_ratio": {
+        "changed_rows": 127,
+        "moved_up_bins": 0,
+        "moved_down_bins": 127,
+        "moved_ge1_rate": 0.44881889763779526,
+        "moved_ge3_rate": 0.14960629921259844,
+        "unmoved_ge1_rate": 0.4667040358744395,
+        "unmoved_ge3_rate": 0.16513452914798207
+      },
+      "turnover_so_far_pct": {
+        "changed_rows": 127,
+        "moved_up_bins": 0,
+        "moved_down_bins": 127,
+        "moved_ge1_rate": 0.44881889763779526,
+        "moved_ge3_rate": 0.16535433070866143,
+        "unmoved_ge1_rate": 0.4667040358744395,
+        "unmoved_ge3_rate": 0.16491031390134528
+      },
+      "float_mv_100m_cny": {
+        "changed_rows": 127,
+        "moved_up_bins": 0,
+        "moved_down_bins": 127,
+        "moved_ge1_rate": 0.5354330708661418,
+        "moved_ge3_rate": 0.2283464566929134,
+        "unmoved_ge1_rate": 0.4654708520179372,
+        "unmoved_ge3_rate": 0.1640134529147982
+      }
+    }
+  }
+]

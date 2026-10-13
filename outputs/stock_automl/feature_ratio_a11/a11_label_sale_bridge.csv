@@ -1,0 +1,5 @@
+version,mode,top1_known,top1_ge3,top1_lt1,ge3_rule_skipped,sale_trades,sale_mean_pct,high_to_sale_gap_mean_pp,sold_ge3_count,sold_ge3_mean_pct,sold_acceptable_count,sold_acceptable_mean_pct,sold_error_count,sold_error_mean_pct
+1.7.1,none,115,31,56,3,91,0.572872,1.403998,28,4.490707,26,0.747446,37,-2.514651
+1.7.1,ratio,115,37,53,8,84,-0.042908,1.778080,29,3.905881,19,-0.027254,36,-3.232139
+1.9.1,none,113,29,56,4,89,-0.098380,1.585323,25,3.652778,24,0.313147,40,-2.689770
+1.9.1,ratio,115,36,48,8,85,-0.100522,1.686551,28,3.536846,24,0.264341,33,-3.452129

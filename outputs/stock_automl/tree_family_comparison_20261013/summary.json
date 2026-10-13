@@ -1,0 +1,357 @@
+{
+  "feb_jul": {
+    "prediction_days": 118,
+    "models": {
+      "b1_sklearn_171": {
+        "labeled_candidates": 49229,
+        "logloss": 1.370317728260348,
+        "brier4": 0.7451974035287672,
+        "eligible_fraction": 0.23953408145457497,
+        "selected_days": 115,
+        "selected_days_with_unknown_0940_return": 0,
+        "return_proxy_treats_unknown_as_cash": false,
+        "mean_return_per_selected_day": 0.001277521569487903,
+        "mean_return_per_calendar_day": 0.0012450422075517698,
+        "calendar_daily_standard_deviation": 0.03823671912184825,
+        "raw_compound_proxy": 0.06458949958975513,
+        "max_drawdown_raw_proxy": -0.3033377871767562,
+        "positive_months": 3,
+        "months": 6,
+        "monthly_raw_compound_proxy": {
+          "2026-02": 0.2252363821185166,
+          "2026-03": 0.04165268866539962,
+          "2026-04": -0.1648712262152876,
+          "2026-05": -0.017818187483943926,
+          "2026-06": 0.2593036443109815,
+          "2026-07": -0.1924608998734555
+        },
+        "mean_selected_return_after_hypothetical_0p2pct_roundtrip_cost": -0.000722478430512097
+      },
+      "cart_shallow": {
+        "labeled_candidates": 49229,
+        "logloss": 1.3713807352628062,
+        "brier4": 0.7458931537595335,
+        "eligible_fraction": 0.23488707157206923,
+        "selected_days": 67,
+        "selected_days_with_unknown_0940_return": 0,
+        "return_proxy_treats_unknown_as_cash": false,
+        "mean_return_per_selected_day": 0.0008766421116934775,
+        "mean_return_per_calendar_day": 0.0004977544193513813,
+        "calendar_daily_standard_deviation": 0.016667871877068623,
+        "raw_compound_proxy": 0.043478516559410485,
+        "max_drawdown_raw_proxy": -0.12574431208672487,
+        "positive_months": 4,
+        "months": 6,
+        "monthly_raw_compound_proxy": {
+          "2026-02": 0.042634218760349896,
+          "2026-03": -0.04983220741206895,
+          "2026-04": 0.014173654111196976,
+          "2026-05": 0.036957582752031426,
+          "2026-06": 0.04413195483306165,
+          "2026-07": -0.04077049369755992
+        },
+        "mean_selected_return_after_hypothetical_0p2pct_roundtrip_cost": -0.0011233578883065227
+      },
+      "random_forest_128": {
+        "labeled_candidates": 49229,
+        "logloss": 1.370212793609196,
+        "brier4": 0.7451518144728769,
+        "eligible_fraction": 0.23888471762819863,
+        "selected_days": 111,
+        "selected_days_with_unknown_0940_return": 0,
+        "return_proxy_treats_unknown_as_cash": false,
+        "mean_return_per_selected_day": -0.0004914075125673127,
+        "mean_return_per_calendar_day": -0.0004622562194489128,
+        "calendar_daily_standard_deviation": 0.033839801240216176,
+        "raw_compound_proxy": -0.11355327965222417,
+        "max_drawdown_raw_proxy": -0.41178470545334167,
+        "positive_months": 3,
+        "months": 6,
+        "monthly_raw_compound_proxy": {
+          "2026-02": 0.038690059213377204,
+          "2026-03": -0.08269725726464672,
+          "2026-04": -0.19816476079995127,
+          "2026-05": 0.06953765518120347,
+          "2026-06": 0.24415911718956917,
+          "2026-07": -0.12803947194255372
+        },
+        "mean_selected_return_after_hypothetical_0p2pct_roundtrip_cost": -0.0024914075125673125
+      },
+      "extra_trees_128": {
+        "labeled_candidates": 49229,
+        "logloss": 1.3615501888046915,
+        "brier4": 0.7415085637221335,
+        "eligible_fraction": 0.23415653726739585,
+        "selected_days": 94,
+        "selected_days_with_unknown_0940_return": 1,
+        "return_proxy_treats_unknown_as_cash": true,
+        "mean_return_per_selected_day": -0.0018561070222855318,
+        "mean_return_per_calendar_day": -0.0014628640090894446,
+        "calendar_daily_standard_deviation": 0.02129205728817091,
+        "raw_compound_proxy": -0.18069586142535732,
+        "max_drawdown_raw_proxy": -0.2419587954845287,
+        "positive_months": 3,
+        "months": 6,
+        "monthly_raw_compound_proxy": {
+          "2026-02": -0.15381686137452621,
+          "2026-03": 0.022671951241548083,
+          "2026-04": -0.04833597523167843,
+          "2026-05": 0.022797778507752442,
+          "2026-06": 0.05457040723128226,
+          "2026-07": -0.07765068793139074
+        },
+        "mean_selected_return_after_hypothetical_0p2pct_roundtrip_cost": -0.003856107022285532
+      },
+      "exact_boost_60": {
+        "labeled_candidates": 49229,
+        "logloss": 1.3667479746552778,
+        "brier4": 0.7438797777554773,
+        "eligible_fraction": 0.23991964122648593,
+        "selected_days": 111,
+        "selected_days_with_unknown_0940_return": 0,
+        "return_proxy_treats_unknown_as_cash": false,
+        "mean_return_per_selected_day": -0.003427367004388133,
+        "mean_return_per_calendar_day": -0.0032240486227718876,
+        "calendar_daily_standard_deviation": 0.04129616910479936,
+        "raw_compound_proxy": -0.3810253787061223,
+        "max_drawdown_raw_proxy": -0.5788927369916418,
+        "positive_months": 2,
+        "months": 6,
+        "monthly_raw_compound_proxy": {
+          "2026-02": 0.009559352556959055,
+          "2026-03": -0.025996160673636637,
+          "2026-04": -0.07139695398330781,
+          "2026-05": -0.35179290031067356,
+          "2026-06": 0.19153164192828243,
+          "2026-07": -0.12233081533530932
+        },
+        "mean_selected_return_after_hypothetical_0p2pct_roundtrip_cost": -0.005427367004388133
+      }
+    },
+    "top1_stability": {
+      "cart_shallow": {
+        "window19": {
+          "same_top1_days": 99,
+          "different_top1_days": 19,
+          "both_have_pick_days": 64,
+          "one_missing_pick_days": 6,
+          "maximum_abs_probability_difference_median": 0.010047929159412772
+        }
+      },
+      "random_forest_128": {
+        "seed43": {
+          "same_top1_days": 65,
+          "different_top1_days": 53,
+          "both_have_pick_days": 109,
+          "one_missing_pick_days": 5,
+          "maximum_abs_probability_difference_median": 0.010884229063022
+        },
+        "window19": {
+          "same_top1_days": 66,
+          "different_top1_days": 52,
+          "both_have_pick_days": 105,
+          "one_missing_pick_days": 8,
+          "maximum_abs_probability_difference_median": 0.015116580574361715
+        }
+      },
+      "extra_trees_128": {
+        "seed43": {
+          "same_top1_days": 83,
+          "different_top1_days": 35,
+          "both_have_pick_days": 91,
+          "one_missing_pick_days": 4,
+          "maximum_abs_probability_difference_median": 0.005768817457557585
+        },
+        "window19": {
+          "same_top1_days": 65,
+          "different_top1_days": 53,
+          "both_have_pick_days": 86,
+          "one_missing_pick_days": 12,
+          "maximum_abs_probability_difference_median": 0.008495302391753695
+        }
+      },
+      "exact_boost_60": {}
+    },
+    "same_top1_vs_b1": {
+      "cart_shallow": 9,
+      "random_forest_128": 22,
+      "extra_trees_128": 5,
+      "exact_boost_60": 49
+    }
+  },
+  "aug_oct": {
+    "prediction_days": 21,
+    "models": {
+      "b1_sklearn_171": {
+        "labeled_candidates": 6402,
+        "logloss": 1.319477723626257,
+        "brier4": 0.7223244049844776,
+        "eligible_fraction": 0.20681605975723621,
+        "selected_days": 21,
+        "selected_days_with_unknown_0940_return": 0,
+        "return_proxy_treats_unknown_as_cash": false,
+        "mean_return_per_selected_day": 0.009145213635920045,
+        "mean_return_per_calendar_day": 0.009145213635920045,
+        "calendar_daily_standard_deviation": 0.025780977393941435,
+        "raw_compound_proxy": 0.20274636852481143,
+        "max_drawdown_raw_proxy": -0.06251935438740452,
+        "positive_months": 1,
+        "months": 2,
+        "monthly_raw_compound_proxy": {
+          "2026-09": 0.2086019983618359,
+          "2026-10": -0.004844961240310197
+        },
+        "mean_selected_return_after_hypothetical_0p2pct_roundtrip_cost": 0.007145213635920045
+      },
+      "cart_shallow": {
+        "labeled_candidates": 6402,
+        "logloss": 1.324869721266423,
+        "brier4": 0.7240344819864859,
+        "eligible_fraction": 0.1906318082788671,
+        "selected_days": 20,
+        "selected_days_with_unknown_0940_return": 0,
+        "return_proxy_treats_unknown_as_cash": false,
+        "mean_return_per_selected_day": -0.00353475580859135,
+        "mean_return_per_calendar_day": -0.0033664341034203332,
+        "calendar_daily_standard_deviation": 0.0382320766405507,
+        "raw_compound_proxy": -0.0818641925613719,
+        "max_drawdown_raw_proxy": -0.19791772873359403,
+        "positive_months": 0,
+        "months": 2,
+        "monthly_raw_compound_proxy": {
+          "2026-09": -0.07739420323596469,
+          "2026-10": -0.004844961240310197
+        },
+        "mean_selected_return_after_hypothetical_0p2pct_roundtrip_cost": -0.00553475580859135
+      },
+      "random_forest_128": {
+        "labeled_candidates": 6402,
+        "logloss": 1.3169496469083841,
+        "brier4": 0.7208674651838473,
+        "eligible_fraction": 0.20339246809835046,
+        "selected_days": 21,
+        "selected_days_with_unknown_0940_return": 0,
+        "return_proxy_treats_unknown_as_cash": false,
+        "mean_return_per_selected_day": -0.004382634673529544,
+        "mean_return_per_calendar_day": -0.004382634673529544,
+        "calendar_daily_standard_deviation": 0.03552595401282474,
+        "raw_compound_proxy": -0.09985974111283191,
+        "max_drawdown_raw_proxy": -0.1685995322578251,
+        "positive_months": 0,
+        "months": 2,
+        "monthly_raw_compound_proxy": {
+          "2026-09": -0.08412090672744754,
+          "2026-10": -0.017184401850627973
+        },
+        "mean_selected_return_after_hypothetical_0p2pct_roundtrip_cost": -0.006382634673529544
+      },
+      "extra_trees_128": {
+        "labeled_candidates": 6402,
+        "logloss": 1.3208315812886267,
+        "brier4": 0.7231875031158728,
+        "eligible_fraction": 0.1157796451914099,
+        "selected_days": 19,
+        "selected_days_with_unknown_0940_return": 0,
+        "return_proxy_treats_unknown_as_cash": false,
+        "mean_return_per_selected_day": 0.0002854580617740991,
+        "mean_return_per_calendar_day": 0.0002582715797003754,
+        "calendar_daily_standard_deviation": 0.021875487691159785,
+        "raw_compound_proxy": 0.0006112549568146886,
+        "max_drawdown_raw_proxy": -0.06320737679677424,
+        "positive_months": 1,
+        "months": 2,
+        "monthly_raw_compound_proxy": {
+          "2026-09": 0.018460563807041197,
+          "2026-10": -0.017525773195876337
+        },
+        "mean_selected_return_after_hypothetical_0p2pct_roundtrip_cost": -0.001714541938225901
+      },
+      "exact_boost_60": {
+        "labeled_candidates": 6402,
+        "logloss": 1.318905625019322,
+        "brier4": 0.7219207478578774,
+        "eligible_fraction": 0.19094304388422034,
+        "selected_days": 21,
+        "selected_days_with_unknown_0940_return": 0,
+        "return_proxy_treats_unknown_as_cash": false,
+        "mean_return_per_selected_day": 0.0066191250734901515,
+        "mean_return_per_calendar_day": 0.0066191250734901515,
+        "calendar_daily_standard_deviation": 0.025441319600180503,
+        "raw_compound_proxy": 0.14129602566105115,
+        "max_drawdown_raw_proxy": -0.044967403973952824,
+        "positive_months": 2,
+        "months": 2,
+        "monthly_raw_compound_proxy": {
+          "2026-09": 0.13330507325732865,
+          "2026-10": 0.0070510161758607914
+        },
+        "mean_selected_return_after_hypothetical_0p2pct_roundtrip_cost": 0.004619125073490151
+      }
+    },
+    "top1_stability": {
+      "cart_shallow": {
+        "window19": {
+          "same_top1_days": 9,
+          "different_top1_days": 12,
+          "both_have_pick_days": 18,
+          "one_missing_pick_days": 2,
+          "maximum_abs_probability_difference_median": 0.017274976319345048
+        }
+      },
+      "random_forest_128": {
+        "seed43": {
+          "same_top1_days": 13,
+          "different_top1_days": 8,
+          "both_have_pick_days": 21,
+          "one_missing_pick_days": 0,
+          "maximum_abs_probability_difference_median": 0.011000171313279551
+        },
+        "window19": {
+          "same_top1_days": 11,
+          "different_top1_days": 10,
+          "both_have_pick_days": 20,
+          "one_missing_pick_days": 1,
+          "maximum_abs_probability_difference_median": 0.015062224205573432
+        }
+      },
+      "extra_trees_128": {
+        "seed43": {
+          "same_top1_days": 10,
+          "different_top1_days": 11,
+          "both_have_pick_days": 19,
+          "one_missing_pick_days": 0,
+          "maximum_abs_probability_difference_median": 0.005793110701952403
+        },
+        "window19": {
+          "same_top1_days": 12,
+          "different_top1_days": 9,
+          "both_have_pick_days": 18,
+          "one_missing_pick_days": 1,
+          "maximum_abs_probability_difference_median": 0.008095941451569472
+        }
+      },
+      "exact_boost_60": {
+        "seed43": {
+          "same_top1_days": 21,
+          "different_top1_days": 0,
+          "both_have_pick_days": 21,
+          "one_missing_pick_days": 0,
+          "maximum_abs_probability_difference_median": 0.0
+        },
+        "window19": {
+          "same_top1_days": 8,
+          "different_top1_days": 13,
+          "both_have_pick_days": 20,
+          "one_missing_pick_days": 1,
+          "maximum_abs_probability_difference_median": 0.0142707590095741
+        }
+      }
+    },
+    "same_top1_vs_b1": {
+      "cart_shallow": 2,
+      "random_forest_128": 8,
+      "extra_trees_128": 3,
+      "exact_boost_60": 10
+    }
+  }
+}

@@ -1,0 +1,39 @@
+{
+  "signal_date": "2026-10-13",
+  "training_dates": [
+    "2026-09-07",
+    "2026-09-08",
+    "2026-09-09",
+    "2026-09-10",
+    "2026-09-11",
+    "2026-09-14",
+    "2026-09-15",
+    "2026-09-16",
+    "2026-09-17",
+    "2026-09-18",
+    "2026-09-21",
+    "2026-09-22",
+    "2026-09-23",
+    "2026-09-24",
+    "2026-09-28",
+    "2026-09-29",
+    "2026-09-30",
+    "2026-10-08",
+    "2026-10-09",
+    "2026-10-12"
+  ],
+  "training_rows": 6576,
+  "feature_names": [
+    "signal_return",
+    "volume_ratio",
+    "turnover_so_far_pct",
+    "float_mv_100m_cny",
+    "volume_4of5_increasing",
+    "ma_bull_5_10_20",
+    "all_intraday_lows_above_ma"
+  ],
+  "pipeline_sha256": "96cf4a4cba51bfa9d17794ac0a88edf2d2ca1f2c77a91568b8e4c414f77267e7",
+  "training_sha256": "28a7a26f7d9bb2db898f7176be28de42deaff763d2d72ead3ad7f6b7aba1dbf0",
+  "model_sha256": "addae01f67535e68d92e6562045d24098bd4ec9e56188e9c76cd75d8e2a45397",
+  "prepared_at": "2026-10-13T19:25:16.914059+08:00"
+}

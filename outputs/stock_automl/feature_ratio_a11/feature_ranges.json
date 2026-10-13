@@ -1,0 +1,128 @@
+{
+  "feb_jul": {
+    "labeled_candidate_rows": 49229,
+    "factors": {
+      "signal_return": {
+        "min": 0.03,
+        "q01": 0.03013433665572251,
+        "median": 0.04,
+        "q99": 0.05940511304861816,
+        "q999": 0.05993068355227784,
+        "max": 0.0599999999999998,
+        "nonfinite": 0
+      },
+      "volume_ratio": {
+        "min": 0.2821654046266509,
+        "q01": 0.5692062315505585,
+        "median": 1.2289491726698338,
+        "q99": 4.00321598703847,
+        "q999": 6.799870868657475,
+        "max": 73.458202227586,
+        "nonfinite": 0
+      },
+      "turnover_so_far_pct": {
+        "min": 0.105316475450083,
+        "q01": 0.5510223198186801,
+        "median": 3.48666730284331,
+        "q99": 22.625978048277297,
+        "q999": 36.64201462312241,
+        "max": 62.37722959814976,
+        "nonfinite": 0
+      },
+      "float_mv_100m_cny": {
+        "min": 0.3958237807822308,
+        "q01": 10.605061556170302,
+        "median": 63.15188067819527,
+        "q99": 1965.603441708464,
+        "q999": 12632.990955117619,
+        "max": 21455.14187517084,
+        "nonfinite": 0
+      }
+    },
+    "prediction_candidate_rows": 49279,
+    "clip_q01_q99_affected_prediction_rows": {
+      "volume_ratio": 1259,
+      "turnover_so_far_pct": 1026,
+      "float_mv_100m_cny": 1097
+    },
+    "outside_training_minmax_prediction_rows": {
+      "signal_return": 8,
+      "volume_ratio": 15,
+      "turnover_so_far_pct": 12,
+      "float_mv_100m_cny": 19
+    },
+    "ratios": {
+      "ma_bull_ratio": {
+        "min": -0.8400008278317018,
+        "q01": -0.14021361961504802,
+        "median": -0.021479000312769836,
+        "q99": 0.08510878354648463,
+        "q999": 0.15623525846975309,
+        "max": 0.20617508502224946,
+        "nonfinite": 0
+      },
+      "intraday_low_over_highest_ma": {
+        "min": -0.9374863889560269,
+        "q01": -0.28226401160914183,
+        "median": -0.04170793113512472,
+        "q99": 0.10915761848300472,
+        "q999": 0.19685591922343684,
+        "max": 0.3529368302462137,
+        "nonfinite": 0
+      }
+    }
+  },
+  "aug_oct": {
+    "labeled_candidate_rows": 6402,
+    "factors": {
+      "signal_return": {
+        "min": 0.03,
+        "q01": 0.030153854299999998,
+        "median": 0.039492025,
+        "q99": 0.059398290599999994,
+        "q999": 0.0599279588,
+        "max": 0.05999044,
+        "nonfinite": 0
+      },
+      "volume_ratio": {
+        "min": 0.37240691,
+        "q01": 0.6088372744,
+        "median": 1.376977395,
+        "q99": 5.1278790938,
+        "q999": 8.933756162590434,
+        "max": 11.99300394,
+        "nonfinite": 0
+      },
+      "turnover_so_far_pct": {
+        "min": 0.0787536,
+        "q01": 0.5087254331,
+        "median": 3.43574343,
+        "q99": 21.542272251199996,
+        "q999": 36.44993852079069,
+        "max": 46.27039887,
+        "nonfinite": 0
+      },
+      "float_mv_100m_cny": {
+        "min": 3.48180672,
+        "q01": 11.419687705200001,
+        "median": 56.07382221,
+        "q99": 1647.0403281488993,
+        "q999": 6769.138395263547,
+        "max": 18151.4649234,
+        "nonfinite": 0
+      }
+    },
+    "prediction_candidate_rows": 6426,
+    "clip_q01_q99_affected_prediction_rows": {
+      "volume_ratio": 136,
+      "turnover_so_far_pct": 133,
+      "float_mv_100m_cny": 94
+    },
+    "outside_training_minmax_prediction_rows": {
+      "signal_return": 0,
+      "volume_ratio": 2,
+      "turnover_so_far_pct": 3,
+      "float_mv_100m_cny": 1
+    }
+  }
+}

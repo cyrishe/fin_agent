@@ -1,0 +1,11 @@
+cohort,variant,sklearn_version,transform,prediction_days,same_top1_days,max_abs_probability_difference,probabilities_compared,different_probability_count_gt_1e-12,constant_feature_fold_count
+aug_oct,drop_volume,1.7.1,"all-input train-fold minmax [0,1], no prediction clipping",21,21,1.1102230246251565e-16,25704,0,0
+aug_oct,drop_volume,1.9.1,"all-input train-fold minmax [0,1], no prediction clipping",21,21,1.1102230246251565e-16,25704,0,0
+aug_oct,none,1.7.1,"all-input train-fold minmax [0,1], no prediction clipping",21,21,1.1102230246251565e-16,25704,0,0
+aug_oct,none,1.9.1,"all-input train-fold minmax [0,1], no prediction clipping",21,21,1.1102230246251565e-16,25704,0,0
+feb_jul,drop_volume,1.7.1,"all-input train-fold minmax [0,1], no prediction clipping",118,118,1.1102230246251565e-16,197116,0,0
+feb_jul,drop_volume,1.9.1,"all-input train-fold minmax [0,1], no prediction clipping",118,118,1.1102230246251565e-16,197116,0,0
+feb_jul,none,1.7.1,"all-input train-fold minmax [0,1], no prediction clipping",118,118,1.1102230246251565e-16,197116,0,0
+feb_jul,none,1.9.1,"all-input train-fold minmax [0,1], no prediction clipping",118,118,1.1102230246251565e-16,197116,0,0
+feb_jul,ratio,1.7.1,"all-input train-fold minmax [0,1], no prediction clipping",118,118,1.1102230246251565e-16,197116,0,0
+feb_jul,ratio,1.9.1,"all-input train-fold minmax [0,1], no prediction clipping",118,118,1.1102230246251565e-16,197116,0,0

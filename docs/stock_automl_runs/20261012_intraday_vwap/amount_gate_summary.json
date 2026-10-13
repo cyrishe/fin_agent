@@ -1,0 +1,57 @@
+{
+  "method": "Current stock amount through 14:40 >= median of its exact prior 20 trading days; no Top2 replacement",
+  "segments": [
+    {
+      "segment": "feb_jul",
+      "arm": "baseline7",
+      "test_days": 118,
+      "selected_top1": 113,
+      "trades": 89,
+      "idle_days": 29,
+      "ge3_trades": 15,
+      "negative_trades": 49,
+      "mean_return_per_trade_pct": -0.0983801951986574,
+      "mean_return_per_calendar_day_pct": -0.07420201163288556,
+      "compounded_price_proxy_pct": -13.032247457710577
+    },
+    {
+      "segment": "feb_jul",
+      "arm": "vwap8",
+      "test_days": 118,
+      "selected_top1": 115,
+      "trades": 88,
+      "idle_days": 30,
+      "ge3_trades": 13,
+      "negative_trades": 53,
+      "mean_return_per_trade_pct": -0.31807365172804164,
+      "mean_return_per_calendar_day_pct": -0.23720746908531926,
+      "compounded_price_proxy_pct": -30.088024879215624
+    },
+    {
+      "segment": "sep_oct",
+      "arm": "baseline7",
+      "test_days": 22,
+      "selected_top1": 22,
+      "trades": 15,
+      "idle_days": 7,
+      "ge3_trades": 2,
+      "negative_trades": 5,
+      "mean_return_per_trade_pct": 1.2204387913446935,
+      "mean_return_per_calendar_day_pct": 0.8321173577350183,
+      "compounded_price_proxy_pct": 19.53879875369189
+    },
+    {
+      "segment": "sep_oct",
+      "arm": "vwap8",
+      "test_days": 22,
+      "selected_top1": 22,
+      "trades": 14,
+      "idle_days": 8,
+      "ge3_trades": 2,
+      "negative_trades": 7,
+      "mean_return_per_trade_pct": 0.5054371180940433,
+      "mean_return_per_calendar_day_pct": 0.3216418024234823,
+      "compounded_price_proxy_pct": 6.823015684060163
+    }
+  ]
+}

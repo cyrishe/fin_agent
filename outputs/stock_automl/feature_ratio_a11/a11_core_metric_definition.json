@@ -1,0 +1,12 @@
+{
+  "top1_outcome_basis": "next trading day's 09:31-09:40 second-high / 14:40 signal price - 1",
+  "top1_result_denominator": "Top1 picks with known second-high; before amount gate",
+  "pass": ">=3%",
+  "acceptable": ">=1% and <3%",
+  "error": "<1%",
+  "sale_basis": "next trading day's 09:40 minute close / 14:40 signal price - 1",
+  "sale_mean_denominator": "Known 09:40 sales after original amount gate",
+  "month_basis": "signal date month",
+  "rule_skip": "Top1 amount below preceding 20 signal-time amounts' median or those amounts incomplete",
+  "no_0940_exit": "Passed amount gate but no next-day 09:40 price; excluded from sale mean"
+}

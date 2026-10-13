@@ -1,0 +1,62 @@
+{
+  "day": "2026-10-13",
+  "previous_day": "2026-10-12",
+  "sklearn_version": "1.7.1",
+  "signal_source": "database",
+  "previous_day_candidates": 110,
+  "previous_day_known_labels": 110,
+  "training_rows": 6576,
+  "current_candidates": 327,
+  "top1": "603083",
+  "probabilities_match_full_prepare": true,
+  "one_day_value_differences": {
+    "signal_price": {
+      "max_abs": 0.0,
+      "max_relative": 0.0
+    },
+    "second_high": {
+      "max_abs": 0.0,
+      "max_relative": 0.0
+    },
+    "signal_return": {
+      "max_abs": 0.0,
+      "max_relative": 0.0
+    },
+    "volume_ratio": {
+      "max_abs": 0.0,
+      "max_relative": 0.0
+    },
+    "turnover_so_far_pct": {
+      "max_abs": 0.0,
+      "max_relative": 0.0
+    },
+    "float_mv_100m_cny": {
+      "max_abs": 0.0,
+      "max_relative": 0.0
+    },
+    "volume_4of5_increasing": {
+      "max_abs": 0.0,
+      "max_relative": 0.0
+    },
+    "ma_bull_5_10_20": {
+      "max_abs": 0.0,
+      "max_relative": 0.0
+    },
+    "all_intraday_lows_above_ma": {
+      "max_abs": 0.0,
+      "max_relative": 0.0
+    }
+  },
+  "steps_seconds": {
+    "calendar_daily_and_st_seconds": 11.304,
+    "previous_day_signal_db_seconds": 4.583,
+    "previous_day_features_st_seconds": 0.511,
+    "current_morning_labels_seconds": 0.761,
+    "one_day_market_amount_seconds": 6.363,
+    "read_cached_training_seconds": 0.038,
+    "one_day_identity_check_seconds": 0.004,
+    "fit_6576_rows_seconds": 0.322,
+    "score_327_candidates_seconds": 0.022
+  },
+  "sum_measured_seconds": 23.908
+}

@@ -1,0 +1,92 @@
+{
+  "fold": "2026-07-30",
+  "training_rows": 9755,
+  "test_candidates": 153,
+  "test_candidates_with_any_changed_bin": 9,
+  "features": [
+    {
+      "feature": "signal_return",
+      "distinct_train_values": 7610,
+      "old_thresholds": 254,
+      "new_thresholds": 254,
+      "old_edges_equal_observed_values": 53,
+      "new_edges_equal_observed_values": 250,
+      "changed_training_bin_rows": 133,
+      "changed_test_bin_rows": 4,
+      "old_bin_occupancy_std": 2.8672808547807507,
+      "new_bin_occupancy_std": 2.9120650799053234
+    },
+    {
+      "feature": "volume_ratio",
+      "distinct_train_values": 9755,
+      "old_thresholds": 254,
+      "new_thresholds": 254,
+      "old_edges_equal_observed_values": 0,
+      "new_edges_equal_observed_values": 250,
+      "changed_training_bin_rows": 125,
+      "changed_test_bin_rows": 2,
+      "old_bin_occupancy_std": 0.43580609354691896,
+      "new_bin_occupancy_std": 0.435806093546919
+    },
+    {
+      "feature": "turnover_so_far_pct",
+      "distinct_train_values": 9755,
+      "old_thresholds": 254,
+      "new_thresholds": 254,
+      "old_edges_equal_observed_values": 0,
+      "new_edges_equal_observed_values": 250,
+      "changed_training_bin_rows": 125,
+      "changed_test_bin_rows": 2,
+      "old_bin_occupancy_std": 0.43580609354691896,
+      "new_bin_occupancy_std": 0.435806093546919
+    },
+    {
+      "feature": "float_mv_100m_cny",
+      "distinct_train_values": 9755,
+      "old_thresholds": 254,
+      "new_thresholds": 254,
+      "old_edges_equal_observed_values": 0,
+      "new_edges_equal_observed_values": 250,
+      "changed_training_bin_rows": 125,
+      "changed_test_bin_rows": 1,
+      "old_bin_occupancy_std": 0.43580609354691896,
+      "new_bin_occupancy_std": 0.435806093546919
+    },
+    {
+      "feature": "volume_4of5_increasing",
+      "distinct_train_values": 2,
+      "old_thresholds": 1,
+      "new_thresholds": 1,
+      "old_edges_equal_observed_values": 0,
+      "new_edges_equal_observed_values": 0,
+      "changed_training_bin_rows": 0,
+      "changed_test_bin_rows": 0,
+      "old_bin_occupancy_std": 3249.5,
+      "new_bin_occupancy_std": 3249.5
+    },
+    {
+      "feature": "ma_bull_5_10_20",
+      "distinct_train_values": 2,
+      "old_thresholds": 1,
+      "new_thresholds": 1,
+      "old_edges_equal_observed_values": 0,
+      "new_edges_equal_observed_values": 0,
+      "changed_training_bin_rows": 0,
+      "changed_test_bin_rows": 0,
+      "old_bin_occupancy_std": 3584.5,
+      "new_bin_occupancy_std": 3584.5
+    },
+    {
+      "feature": "all_intraday_lows_above_ma",
+      "distinct_train_values": 2,
+      "old_thresholds": 1,
+      "new_thresholds": 1,
+      "old_edges_equal_observed_values": 0,
+      "new_edges_equal_observed_values": 0,
+      "changed_training_bin_rows": 0,
+      "changed_test_bin_rows": 0,
+      "old_bin_occupancy_std": 3704.5,
+      "new_bin_occupancy_std": 3704.5
+    }
+  ]
+}

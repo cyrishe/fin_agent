@@ -1,0 +1,35 @@
+{
+  "signal_cutoff": "14:45",
+  "checks": [
+    {
+      "day": "2026-09-02",
+      "native_candidates": 162,
+      "minute_complete": 162,
+      "max_abs_difference": {
+        "price": 0.0,
+        "volume_shares": 0.0,
+        "low": 0.0
+      }
+    },
+    {
+      "day": "2026-09-15",
+      "native_candidates": 134,
+      "minute_complete": 134,
+      "max_abs_difference": {
+        "price": 0.0,
+        "volume_shares": 0.0,
+        "low": 0.0
+      }
+    },
+    {
+      "day": "2026-10-09",
+      "native_candidates": 525,
+      "minute_complete": 490,
+      "max_abs_difference": {
+        "price": 0.0,
+        "volume_shares": 0.0,
+        "low": 0.0
+      }
+    }
+  ]
+}

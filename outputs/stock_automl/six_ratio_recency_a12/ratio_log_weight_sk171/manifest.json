@@ -1,0 +1,43 @@
+{
+  "experiment": "A12 six-factor ratio plus inverse-log recency sample weights",
+  "cohort": "feb_jul",
+  "training_days": 20,
+  "features": [
+    "signal_return",
+    "volume_ratio",
+    "turnover_so_far_pct",
+    "float_mv_100m_cny",
+    "ma_bull_ratio",
+    "intraday_low_over_highest_ma"
+  ],
+  "weight": "D=index(signal_date to prediction_date); raw=1/log2(D+1); divide by training-row mean",
+  "model": {
+    "categorical_features": "from_dtype",
+    "class_weight": null,
+    "early_stopping": false,
+    "interaction_cst": null,
+    "l2_regularization": 5,
+    "learning_rate": 0.05,
+    "loss": "log_loss",
+    "max_bins": 255,
+    "max_depth": null,
+    "max_features": 1.0,
+    "max_iter": 60,
+    "max_leaf_nodes": 7,
+    "min_samples_leaf": 100,
+    "monotonic_cst": null,
+    "n_iter_no_change": 10,
+    "random_state": 42,
+    "scoring": "loss",
+    "tol": 1e-07,
+    "validation_fraction": 0.1,
+    "verbose": 0,
+    "warm_start": false
+  },
+  "source": "outputs/stock_automl/mk_1m_jan_jul/tradable_st_candidates.csv.gz",
+  "source_sha256": "d160e906712f8d9f0d7b1f052079c023fd2e8d7def5611fd71c31c738e4b90f2",
+  "sklearn_version": "1.7.1",
+  "prediction_first": "2026-02-02",
+  "prediction_last": "2026-07-30",
+  "prediction_days": 118
+}

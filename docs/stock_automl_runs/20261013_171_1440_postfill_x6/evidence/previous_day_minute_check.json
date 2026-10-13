@@ -1,0 +1,15 @@
+{
+  "day": "2026-10-12",
+  "checked_at": "2026-10-13T19:16:28.166081+08:00",
+  "expected_bars_per_active_stock": 220,
+  "active_stocks": 5212,
+  "complete_before": 5212,
+  "incomplete_before": 0,
+  "execute": true,
+  "api_complete": 0,
+  "api_incomplete": 0,
+  "inserted_missing_bars": 0,
+  "complete_after": 5212,
+  "incomplete_after": 0,
+  "remaining_symbols": []
+}
