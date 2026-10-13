@@ -1,0 +1,20 @@
+{
+  "source": "kingdomai.kcrp_stock_price",
+  "start": "2026-01-01",
+  "end": "2026-10-13",
+  "market_trading_days": 185,
+  "limit_up_stock_days": 15515,
+  "limit_up_unique_stocks": 3441,
+  "first_board_streaks": 12342,
+  "observed_streaks": 12148,
+  "right_censored": 191,
+  "missing_quote": 3,
+  "rebound_limit_streaks": 1912,
+  "rebound_limit_unique_stocks": 959,
+  "ge7_nonlimit_only_streaks": 855,
+  "rebound_limit_by_cooling_days": {
+    "1": 715,
+    "2": 601,
+    "3": 596
+  }
+}
