@@ -1,0 +1,5 @@
+month,policy,days,late_success,trades,positive_trades,mean_daily_slot_return
+2026-09,stage1_eligible,20,6,149,55,-0.001017123925174858
+2026-09,stage2,20,7,256,103,-0.0013647187225694947
+2026-10,stage1_eligible,3,1,39,17,-0.0031723300276527075
+2026-10,stage2,3,0,48,19,-0.00971453928801802

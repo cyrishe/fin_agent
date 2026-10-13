@@ -1,0 +1,14 @@
+{
+  "sklearn": "1.9.1",
+  "test_days": 23,
+  "full_stock_days": 223894,
+  "test_candidates": 2300,
+  "script_sha256": {
+    "scripts/explore_automl_deep_v_samples.py": "59c8a28ebbbcff832dc50516cdc304f98c22cc0c2952143feb5af28d18747dc2",
+    "scripts/build_automl_deep_v_panel.py": "ce7c6a027f5c5e80c57551b0c979f97e2ff7d477b28a6374e3865b434d9267c5",
+    "scripts/build_automl_deep_v_d4_universe.py": "42b9098ad741cbb8c18ea41086314637bc40e0f8c2de2ed716c97181cf8fc8ea",
+    "scripts/build_automl_deep_v_early30.py": "783e52e09f5831784947b6cff140360b50888bc4179c14949366d3c77691b976",
+    "scripts/experiment_automl_deep_v_d5.py": "1106a0a627e5a0eed1925f0570ce10a1d361d979df95bbc6b24a7f11bef86333",
+    "scripts/analyze_automl_deep_v_d5.py": "fa4d97df9275f8bc998999c6aa5048e5f6c2cd52640b9716de62eb0bb56c9a44"
+  }
+}
