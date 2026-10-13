@@ -1,0 +1,41 @@
+{
+  "sources": {
+    "2025": {
+      "path": "outputs/stock_automl/mk_1m_2025_continuous/cohort/trainable_candidates.csv.gz",
+      "sha256": "42ae5ea4c5ef76c10bb3176f4998985b599ba10c9a40e61f53b1e73ba2807dde"
+    },
+    "2026": {
+      "path": "outputs/stock_automl/mk_1m_jan_jul/tradable_st_candidates.csv.gz",
+      "sha256": "d160e906712f8d9f0d7b1f052079c023fd2e8d7def5611fd71c31c738e4b90f2"
+    },
+    "2026s": {
+      "path": "docs/stock_automl_runs/20261009_close9_target/exact_1440_to_close9_candidates.csv.gz",
+      "sha256": "99263a8722907209d1cc45ffd6e3e73a1386fc36050f67e5d55f78b0c3e8942a"
+    }
+  },
+  "baselines": {
+    "2025a": "outputs/stock_automl/mk_1m_2025_mar_aug/backtest/top2_verified.csv",
+    "2025b": "outputs/stock_automl/mk_1m_2025_sep_oct/backtest_aligned/top2_verified.csv",
+    "2026": "docs/stock_automl_runs/20261011_mk_1m_tradable_st_rolling20/top1_verified.csv"
+  },
+  "tree_note": "Saved historical daily Top1; no tree retraining in this study",
+  "perturbation": "outcome-independent fixed 2% hash deletion from each training window",
+  "target": "T+1 09:40 minute close / T 14:40 signal price - 1",
+  "model_specs": [
+    [
+      "ridge20",
+      20,
+      "ridge"
+    ],
+    [
+      "ridge60",
+      60,
+      "ridge"
+    ],
+    [
+      "logit60",
+      60,
+      "logit"
+    ]
+  ]
+}

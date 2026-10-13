@@ -1,0 +1,20 @@
+{
+  "broker_commission": "all-in for exchange and regulatory fees, per side; minimum CNY 5",
+  "stamp_sell": 0.0005,
+  "transfer_each_side": 1e-05,
+  "scenarios": {
+    "1w_yi": {
+      "principal_cny": 10000,
+      "broker_commission_rate": 0.0001
+    },
+    "5w_yi": {
+      "principal_cny": 50000,
+      "broker_commission_rate": 0.0001
+    },
+    "5w_erwu": {
+      "principal_cny": 50000,
+      "broker_commission_rate": 0.00025
+    }
+  },
+  "excluded": "spread, slippage, impact, failure to fill; one BSE pick uses the same A-share proxy"
+}

@@ -1,0 +1,4 @@
+period,signal_return,volume_ratio,turnover_so_far_pct,float_mv_100m_cny,volume_4of5_increasing,ma_bull_5_10_20,all_intraday_lows_above_ma,open_gap,from_open,lag_return,lag_upper_shadow,lag_close_position,prior5_return,prior5_volatility,prior5_range,prior5_contract_fraction,relative_turnover,distance_ma5,ma5_over_ma20,lag_market_breadth,breadth_x_signal,breadth_x_prior5
+2025,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+2026,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+2026s,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0

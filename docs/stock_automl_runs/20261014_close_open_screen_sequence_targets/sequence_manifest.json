@@ -1,0 +1,29 @@
+{
+  "source_path": "outputs/stock_automl/close_open_screen_sequence_targets_r1/candidate_sequence_targets.csv.gz",
+  "source_sha256": "74f87da7f61b8c991d565a4a8a683734561d7b4289322aa78adf80d3bc826ce2",
+  "script_sha256": "3549bf6edb037f844c71ad5ce5c82ce6940a801d4fb2ec0cfdfd52f5c7a5b11f",
+  "entry": "14:56 1m open after observing complete 14:55 1m bar",
+  "target": "T+1 09:40 1m close",
+  "cuts": [
+    "14:30:00",
+    "14:35:00",
+    "14:40:00",
+    "14:45:00",
+    "14:50:00",
+    "14:55:00"
+  ],
+  "channels": [
+    "signal_return",
+    "volume_ratio",
+    "turnover_so_far_pct",
+    "float_mv_100m_cny",
+    "all_intraday_lows_above_ma",
+    "open_gap",
+    "from_open",
+    "prior5_return",
+    "relative_turnover",
+    "distance_ma5"
+  ],
+  "cohort": "old 14:40 candidates still in 3%-6% at 14:55 with complete 235 observed bars",
+  "sklearn_version": "1.7.1"
+}

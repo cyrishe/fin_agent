@@ -1,0 +1,18 @@
+{
+  "source_path": "outputs/stock_automl/close_open_screen_sequence_targets_r1/candidate_sequence_targets.csv.gz",
+  "source_sha256": "74f87da7f61b8c991d565a4a8a683734561d7b4289322aa78adf80d3bc826ce2",
+  "script_sha256": "006a93c3b7f0704dcb3e08bea408085e3fada7a78298835cf0428710eef8d019",
+  "parameters": {
+    "max_iter": 60,
+    "learning_rate": 0.05,
+    "max_leaf_nodes": 7,
+    "min_samples_leaf": 100,
+    "l2_regularization": 5,
+    "early_stopping": false,
+    "random_state": 42
+  },
+  "original_saved_model": "untouched; this is a fresh refit with the same settings",
+  "selection": "predicted >=3 class priority, else predicted 1-3 class, Top1 or cash",
+  "realized_exit": "T+1 09:40 minute close for every target",
+  "sklearn_version": "1.7.1"
+}

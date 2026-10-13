@@ -1,0 +1,18 @@
+{
+  "source_path": "outputs/stock_automl/close_open_screen_sequence_targets_r1/candidate_sequence_targets.csv.gz",
+  "source_sha256": "74f87da7f61b8c991d565a4a8a683734561d7b4289322aa78adf80d3bc826ce2",
+  "script_sha256": "adb6b1c991b73907573b8b5120679d5c88fb16a10b723feea8a9a34814be6e55",
+  "sklearn_version": "1.7.1",
+  "torch_version": "2.8.0",
+  "model": "Conv1d(10,16,3,pad1)-GELU-Conv1d(16,8,3,pad1)-GELU-Flatten-Linear",
+  "seeds": [
+    11,
+    23,
+    37
+  ],
+  "epochs": 20,
+  "batch": 512,
+  "optimizer": "Adam lr=.001 weight_decay=.01",
+  "target": "clipped actual close/14:56 open return *100",
+  "preprocess": "train-only MatrixTransform; no future price in candidate qualification"
+}
