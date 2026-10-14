@@ -69,3 +69,12 @@ def test_outlier_removal_drops_one_per_month_and_preserves_cash_denominator():
     assert np.isclose(r['ex_month_top_trade_mean_pct'],-1.5)
     assert np.isclose(r['ex_month_top_daily_mean_pct'],-.6)
     assert np.isclose(r['ex_both_trade_mean_pct'],-1.)
+
+
+def test_cash_and_unknown_trade_outcome_have_distinct_denominators():
+    d=pd.DataFrame({'selected':[False,True,True],'amount_gate':[np.nan,1.,0.],
+                    'net_return':[np.nan,np.nan,.5],'close40_return':[np.nan,np.nan,.5]})
+    out=execution(d,True)
+    assert out.daily_net.iloc[0]==0 and np.isnan(out.daily_net.iloc[1]) and out.daily_net.iloc[2]==0
+    assert out.trade.tolist()==[False,True,False]
+    assert not out.unknown_gate.any()

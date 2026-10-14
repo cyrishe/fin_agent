@@ -201,7 +201,11 @@ def original_b1(panel):
                      'weak':float(maximum<r.signal_price-1e-10) if np.isfinite(maximum) else np.nan,
                      'close40_return':r.actual_0940_return,'model':'B1_frozen_original171',
                      'in_co4_pool':bool(((panel.signal_date==r.signal_date)&(panel.symbol6==r.symbol6)).any())})
-    return pd.DataFrame(rows)
+    original_dates = [f['test_date'] for f in json.loads((source.parent/'folds.json').read_text())]
+    result = pd.DataFrame({'signal_date':original_dates}).merge(
+        pd.DataFrame(rows), on='signal_date', how='left', validate='one_to_one')
+    result['model'] = 'B1_frozen_original171'
+    return result
 
 
 def run(months=None):
