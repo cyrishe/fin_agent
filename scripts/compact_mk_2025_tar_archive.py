@@ -18,6 +18,7 @@ from scripts.mk_minute_archive import COMPACT_ROOT_2025
 ARCHIVES = (
     (Path.home() / "Downloads/mk202501_202506.tar.xz", "2025-01-01", "2025-06-30"),
     (Path.home() / "Downloads/mk202507_202511.tar.xz", "2025-07-01", "2025-11-30"),
+    (Path.home() / "Downloads/mk202512.tar.xz", "2025-12-01", "2025-12-31"),
 )
 MEMBER = re.compile(r"(?:\./)?mk/(none|post)/(2025-\d{2}-\d{2})\.csv\Z")
 HEADER = b"time,symbol,open,high,low,close,volume,turnover\n"
