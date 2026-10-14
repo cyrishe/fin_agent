@@ -1,0 +1,77 @@
+factor,group,formula,latest_input
+signal_return,original7,14:40 close / 当日前收 - 1,T 14:40
+volume_ratio,original7,截至14:40股数 × 240 / (220 × 前五日日均股数),T 14:40
+turnover_so_far_pct,original7,截至14:40股数 / 昨日流通股本代理 × 100,T 14:40
+float_mv_100m_cny,original7,昨日流通股本代理 × 昨收 / 1亿,T 14:40
+volume_4of5_increasing,original7,前五日成交量是否存在按时间递增的四项子序列,T 14:40
+ma_bull_5_10_20,original7,截至昨日的MA5 > MA10 > MA20,T 14:40
+all_intraday_lows_above_ma,original7,截至14:40最低价 > 三条历史均线最大值,T 14:40
+open_gap,history,当天首根分钟open / 当日前收 - 1,T 14:40
+from_open,history,14:40 close / 当天首根分钟open - 1,T 14:40
+lag_return,history,昨日close / 昨日preclose - 1,T 14:40
+lag_close_position,history,昨日(close-low)/(high-low)，平盘为0.5,T 14:40
+lag_upper_shadow,history,"昨日(high-max(open,close))/preclose",T 14:40
+prior5_return,history,前5个交易日close/preclose的连乘 - 1,T 14:40
+prior10_return,history,前10个交易日close/preclose的连乘 - 1,T 14:40
+prior20_return,history,前20个交易日close/preclose的连乘 - 1,T 14:40
+prior5_volatility,history,前5个交易日日收益标准差,T 14:40
+prior20_volatility,history,前20个交易日日收益标准差,T 14:40
+prior5_range,history,前5个交易日(high-low)/preclose的均值,T 14:40
+prior5_contract_fraction,history,前5日成交量相对前一日缩量的比例,T 14:40
+relative_turnover5,history,截至14:40换手率 / 前5日日均换手率,T 14:40
+relative_turnover20,history,截至14:40换手率 / 前20日日均换手率,T 14:40
+distance_ma5,history,14:40价 / 昨日MA5换算到当日未复权尺度 - 1,T 14:40
+distance_ma20,history,14:40价 / 昨日MA20换算到当日未复权尺度 - 1,T 14:40
+ma5_over_ma10,history,历史MA5/MA10 - 1,T 14:40
+ma10_over_ma20,history,历史MA10/MA20 - 1,T 14:40
+day_range,intraday,(窗口最高high-最低low)/当日前收,T 14:40
+day_efficiency,intraday,窗口净对数涨幅/逐分钟close路径绝对对数变化总和；首点为窗口open,T 14:40
+day_realized_vol,intraday,逐分钟close路径对数收益平方和开方；首点为窗口open,T 14:40
+day_close_position,intraday,(末close-窗口最低low)/(窗口最高high-最低low)，平盘0.5,T 14:40
+day_up_volume_fraction,intraday,close高于前一分钟close的分钟成交量占比；首点对窗口open,T 14:40
+day_vwap_distance,intraday,窗口末close / (窗口成交额/成交股数) - 1,T 14:40
+day_volume_acceleration,intraday,窗口后一半每分钟均量 / 前一半每分钟均量 - 1,T 14:40
+day_max_drawdown,path,截至14:40 close相对先前close累计最高值的最小收益,T 14:40
+day_high_age,path,截至14:40距最后一次最高high的交易分钟数 / 220,T 14:40
+day_low_age,path,截至14:40距最后一次最低low的交易分钟数 / 220,T 14:40
+day_volume_hhi,path,截至14:40各分钟成交量占比平方和,T 14:40
+day_up_fraction,path,截至14:40上涨分钟数/220；首分钟对open,T 14:40
+morning_return,path,11:30 close/09:31 open - 1,T 14:40
+afternoon_return,path,14:40 close/13:01 open - 1,T 14:40
+afternoon_volume_fraction,path,13:01至14:40量/截至14:40总量,T 14:40
+last5_return,late,窗口末close/窗口首open - 1,T 14:40
+last5_range,late,(窗口最高high-最低low)/当日前收,T 14:40
+last5_efficiency,late,窗口净对数涨幅/逐分钟close路径绝对对数变化总和；首点为窗口open,T 14:40
+last5_realized_vol,late,逐分钟close路径对数收益平方和开方；首点为窗口open,T 14:40
+last5_close_position,late,(末close-窗口最低low)/(窗口最高high-最低low)，平盘0.5,T 14:40
+last5_up_volume_fraction,late,close高于前一分钟close的分钟成交量占比；首点对窗口open,T 14:40
+last5_volume_fraction,late,窗口成交量/截至14:40总成交量,T 14:40
+last5_vwap_distance,late,窗口末close / (窗口成交额/成交股数) - 1,T 14:40
+last5_volume_acceleration,late,窗口后一半每分钟均量 / 前一半每分钟均量 - 1,T 14:40
+last15_return,late,窗口末close/窗口首open - 1,T 14:40
+last15_range,late,(窗口最高high-最低low)/当日前收,T 14:40
+last15_efficiency,late,窗口净对数涨幅/逐分钟close路径绝对对数变化总和；首点为窗口open,T 14:40
+last15_realized_vol,late,逐分钟close路径对数收益平方和开方；首点为窗口open,T 14:40
+last15_close_position,late,(末close-窗口最低low)/(窗口最高high-最低low)，平盘0.5,T 14:40
+last15_up_volume_fraction,late,close高于前一分钟close的分钟成交量占比；首点对窗口open,T 14:40
+last15_volume_fraction,late,窗口成交量/截至14:40总成交量,T 14:40
+last15_vwap_distance,late,窗口末close / (窗口成交额/成交股数) - 1,T 14:40
+last15_volume_acceleration,late,窗口后一半每分钟均量 / 前一半每分钟均量 - 1,T 14:40
+last30_return,late,窗口末close/窗口首open - 1,T 14:40
+last30_range,late,(窗口最高high-最低low)/当日前收,T 14:40
+last30_efficiency,late,窗口净对数涨幅/逐分钟close路径绝对对数变化总和；首点为窗口open,T 14:40
+last30_realized_vol,late,逐分钟close路径对数收益平方和开方；首点为窗口open,T 14:40
+last30_close_position,late,(末close-窗口最低low)/(窗口最高high-最低low)，平盘0.5,T 14:40
+last30_up_volume_fraction,late,close高于前一分钟close的分钟成交量占比；首点对窗口open,T 14:40
+last30_volume_fraction,late,窗口成交量/截至14:40总成交量,T 14:40
+last30_vwap_distance,late,窗口末close / (窗口成交额/成交股数) - 1,T 14:40
+last30_volume_acceleration,late,窗口后一半每分钟均量 / 前一半每分钟均量 - 1,T 14:40
+last60_return,late,窗口末close/窗口首open - 1,T 14:40
+last60_range,late,(窗口最高high-最低low)/当日前收,T 14:40
+last60_efficiency,late,窗口净对数涨幅/逐分钟close路径绝对对数变化总和；首点为窗口open,T 14:40
+last60_realized_vol,late,逐分钟close路径对数收益平方和开方；首点为窗口open,T 14:40
+last60_close_position,late,(末close-窗口最低low)/(窗口最高high-最低low)，平盘0.5,T 14:40
+last60_up_volume_fraction,late,close高于前一分钟close的分钟成交量占比；首点对窗口open,T 14:40
+last60_volume_fraction,late,窗口成交量/截至14:40总成交量,T 14:40
+last60_vwap_distance,late,窗口末close / (窗口成交额/成交股数) - 1,T 14:40
+last60_volume_acceleration,late,窗口后一半每分钟均量 / 前一半每分钟均量 - 1,T 14:40
