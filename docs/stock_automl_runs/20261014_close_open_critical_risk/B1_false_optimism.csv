@@ -1,0 +1,5 @@
+scope,predicted_class,trades,actual_net_critical,critical_but_old_peak_not_severe
+before_amount_gate,1to3,41,7,2
+before_amount_gate,ge3,74,21,5
+after_amount_gate,1to3,34,5,1
+after_amount_gate,ge3,57,14,4

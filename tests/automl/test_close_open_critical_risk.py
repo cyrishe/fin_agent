@@ -44,3 +44,23 @@ def test_ordinal_projection_is_a_valid_five_class_distribution():
     p=project_cumulative(np.array([[.8,.9,.5,.7],[1,1,1,1],[0,0,0,0]]))
     assert np.all(p>=0) and np.allclose(p.sum(axis=1),1)
     assert p[0,0]==pytest.approx(.2)
+
+
+def test_veto_is_cash_when_known_and_unknown_is_preserved():
+    from scripts.report_automl_close_open_critical_risk import combined_gate
+    a=np.array([1,0,1,np.nan,np.nan]);b=np.array([0,np.nan,np.nan,0,1])
+    result=combined_gate(a,b)
+    assert result[0]==result[1]==result[3]==0
+    assert np.isnan(result[2]) and np.isnan(result[4])
+
+
+def test_interception_counts_rejected_winners_and_random_trade_reduction():
+    from scripts.report_automl_close_open_critical_risk import risk_stats
+    d=pd.DataFrame({'month':['2026-01']*4,'selected':True,'amount_gate':1.,
+                    'net_return':[-.04,-.01,.02,.04],'strong':[0,0,0,1],
+                    'p_critical':[.4,.3,.1,.5]})
+    r=risk_stats(d,.2)
+    assert r['blocked']==3 and r['blocked_critical']==1 and r['blocked_profitable']==1
+    assert r['blocked_strong']==1 and r['critical_recall_pct']==100
+    assert r['random_same_month_expected_critical_blocked']==.75
+    assert r['remaining_critical_pct']==0
