@@ -1,0 +1,40 @@
+{
+  "source_package": "/Users/cyrcyrisis/work/fin_agent/outputs/stock_automl/close_open_conditional_b1_r1/package",
+  "zip_path": "/Users/cyrcyrisis/work/fin_agent/outputs/stock_automl/close_open_conditional_b1_r1/CO7_原B1折外TopK_二阶段风险_20261015.zip",
+  "zip_bytes": 510811859,
+  "zip_sha256": "274f5b41c7e7a1dfe53868cb4de6105e06fe1b155feef3b640777fa5f2b004ae",
+  "manifest_sha256": "ac013d7020087b14ca2cc6ed43ae4d87ceb2c9c7aa992db32243aadc57348570",
+  "files": 3444,
+  "source_commit": "28363f1f316df22032639a592caa1ec578b8aa7e",
+  "training_source_commit": "2e9258097fdb1ed779d55bdf3bd8d8c785536700",
+  "training_rows": 155027,
+  "stage2_training_rows": 1752,
+  "model_bundles": 528,
+  "zip_readback": "all_files_match",
+  "cloud_verified_at": null,
+  "upload_note": "用户要求先保留本地包，稍后上传",
+  "stage": {
+    "user_id": "cyrcyrisis",
+    "experiment_id": "CO7_20261015_B1_conditional_risk",
+    "experiment_date": "2026-10-15",
+    "title": "CO7 原B1历史折外TopK温和大亏风险过滤",
+    "category_path": "02_联合目标与尾部风险",
+    "local_path": "/Users/cyrcyrisis/work/fin_agent/outputs/stock_automl/aliyun_drive_local/策略训练/收盘开盘_20261014/02_联合目标与尾部风险/20261015_CO7_原B1折外TopK_二阶段风险",
+    "cloud_path": "策略训练/收盘开盘_20261014/02_联合目标与尾部风险/20261015_CO7_原B1折外TopK_二阶段风险",
+    "source_commit": "28363f1f316df22032639a592caa1ec578b8aa7e",
+    "manifest_sha256": "ac013d7020087b14ca2cc6ed43ae4d87ceb2c9c7aa992db32243aadc57348570",
+    "file_count": 3444,
+    "db_recorded": true,
+    "cloud_verified": false
+  },
+  "database_readback": {
+    "experiment_id": "CO7_20261015_B1_conditional_risk",
+    "local_path": "/Users/cyrcyrisis/work/fin_agent/outputs/stock_automl/aliyun_drive_local/策略训练/收盘开盘_20261014/02_联合目标与尾部风险/20261015_CO7_原B1折外TopK_二阶段风险",
+    "local_check": "ok",
+    "cloud_path": "策略训练/收盘开盘_20261014/02_联合目标与尾部风险/20261015_CO7_原B1折外TopK_二阶段风险",
+    "cloud_verified_at": null
+  },
+  "all_local_packages_valid": true,
+  "prior_packages_unchanged": true,
+  "verified_at": "2026-10-15T00:33:19.330354+08:00"
+}
