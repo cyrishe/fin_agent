@@ -1,0 +1,13 @@
+{
+  "targeted_tests": {
+    "command": ".venv-automl/bin/python -m pytest -q tests/automl/test_close_open_simple_rolling.py tests/automl/test_close_open_factor_discovery.py",
+    "passed": 14,
+    "failed": 0
+  },
+  "audit": "audit.json",
+  "full_repository_tests": "not_run_unrelated_to_research_change",
+  "repairs": [
+    "Restored 3 cash dates from original B1 118-fold calendar",
+    "Original ledger has 111 known gates plus 4 unknown gates; audit now checks both separately"
+  ]
+}
