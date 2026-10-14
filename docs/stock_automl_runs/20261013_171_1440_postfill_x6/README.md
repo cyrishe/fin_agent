@@ -33,4 +33,4 @@ Top1 成交额约为中位数的 **91.6%**，低于门槛；Top2 不递补。两
 
 ## 训练资产副本
 
-按[归档约定](../TRAINING_ASSET_ARCHIVE.md)，已在 `outputs/stock_automl/cloud_archive_staging/20261013_X6_171_postfill/` 形成 14 个内容文件及 SHA256SUMS 校验清单的自包含训练包，含逐行训练样本、模型、全候选概率、决策和依赖；本地核验训练 SHA `28a7a26f…`、模型 SHA `addae01f…` 与运行清单一致。阿里云盘实际同步目录尚未定位，因此状态为**本地待同步**，不称云盘归档完成。
+按[归档约定](../TRAINING_ASSET_ARCHIVE.md)，已在 `outputs/stock_automl/cloud_archive_staging/20261013_X6_171_postfill/` 形成 14 个内容文件及 SHA256SUMS 校验清单的自包含训练包，含逐行训练样本、模型、全候选概率、决策和依赖；本地核验训练 SHA `28a7a26f…`、模型 SHA `addae01f…` 与运行清单一致。目标云盘目录为 `策略训练/收盘开盘_20261014/01_时间稳定性_七因子基线/20261013_X6_171_postfill`。目前只有云端目录截图，本机同步路径尚未定位，因此状态为**本地待同步**，不称云盘归档完成。
