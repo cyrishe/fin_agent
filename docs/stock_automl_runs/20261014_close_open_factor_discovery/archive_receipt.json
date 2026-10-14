@@ -27,5 +27,5 @@
   },
   "cloud_uploaded": false,
   "cloud_verified_at": null,
-  "cloud_blocker": "Desktop UI could not continue opening folders reliably; web quick login did not complete. User asked to sign in through Chrome. No upload or independent cloud readback occurred."
+  "cloud_blocker": "2026-10-14 用户明确选择：先保留本地包，稍后上传。现按用户安排暂缓上传；本地包与哈希保持不变。此前桌面自动操作和网页快捷登录未成功；未上传或云端回读。"
 }
