@@ -143,4 +143,4 @@ OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 .venv-automl/bin/python -m scripts.audi
 .venv-automl/bin/python -m pytest -q tests/automl/test_close_open_simple_rolling.py tests/automl/test_close_open_factor_discovery.py
 ```
 
-新包保存模型、训练样本、每折日期与因子选择、验证记录、全候选分数、日/月指标和哈希，保留本地并登记；用户已明确暂缓云盘上传。预处理与选因子的时间隔离参照 [scikit-learn 数据泄漏说明](https://scikit-learn.org/stable/common_pitfalls)。
+新包保存模型、训练样本、每折日期与因子选择、验证记录、全候选分数、日/月指标和哈希，本地登记后经阿里云盘桌面客户端上传；云端回读与核验状态见[归档回执](archive_receipt.json)。预处理与选因子的时间隔离参照 [scikit-learn 数据泄漏说明](https://scikit-learn.org/stable/common_pitfalls)。

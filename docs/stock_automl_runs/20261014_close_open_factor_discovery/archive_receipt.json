@@ -10,7 +10,7 @@
   "manifest_sha256": "e3baaf50e579bcf533e3a53d03e4f1af8881e67ce99f2d47b8271a80c8be97f1",
   "file_count": 1399,
   "db_recorded": true,
-  "cloud_verified": false,
+  "cloud_verified": true,
   "zip": {
     "path": "/Users/cyrcyrisis/work/fin_agent/outputs/stock_automl/close_open_factor_discovery_r1/CO4_76因子_时间验证_20261014.zip",
     "bytes": 416909259,
@@ -23,9 +23,17 @@
     "local_path": "/Users/cyrcyrisis/work/fin_agent/outputs/stock_automl/aliyun_drive_local/策略训练/收盘开盘_20261014/03_因子筛选_7至14/20261014_CO4_76因子_时间验证",
     "local_check": "ok",
     "cloud_path": "策略训练/收盘开盘_20261014/03_因子筛选_7至14/20261014_CO4_76因子_时间验证",
-    "cloud_verified_at": null
+    "cloud_verified_at": "2026-10-15T00:49:02.755662"
   },
-  "cloud_uploaded": false,
-  "cloud_verified_at": null,
-  "cloud_blocker": "2026-10-14 用户明确选择：先保留本地包，稍后上传。现按用户安排暂缓上传；本地包与哈希保持不变。此前桌面自动操作和网页快捷登录未成功；未上传或云端回读。"
+  "cloud_uploaded": true,
+  "cloud_verified_at": "2026-10-15T00:49:02.755662",
+  "cloud_readback": {
+    "method": "阿里云盘桌面客户端独立下载后本地核验",
+    "path": "/Users/cyrcyrisis/work/fin_agent/outputs/stock_automl/close_open_factor_discovery_r1/cloud_readback/CO4_76因子_时间验证_20261014.zip",
+    "bytes": 416909259,
+    "zip_sha256": "751ae7b1ae0dc5e9e2b80b9c5daf581b815edaf896082588005ae830812e747e",
+    "manifest_sha256": "e3baaf50e579bcf533e3a53d03e4f1af8881e67ce99f2d47b8271a80c8be97f1",
+    "zip_entries": 1400,
+    "contained_files": 1399
+  }
 }

@@ -137,4 +137,4 @@
 
 本地镜像：`outputs/stock_automl/aliyun_drive_local/策略训练/收盘开盘_20261014/03_因子筛选_7至14/20261014_CO4_76因子_时间验证`。便于上传的 ZIP 位于 `outputs/stock_automl/close_open_factor_discovery_r1/CO4_76因子_时间验证_20261014.zip`，SHA-256 为 `751ae7b1ae0dc5e9e2b80b9c5daf581b815edaf896082588005ae830812e747e`。
 
-**按用户安排暂缓上传。** 2026-10-14 用户明确选择“先保留本地包，稍后上传”。本地研究包和校验清单保持原样，待用户恢复上传时继续；目前未上传、未云端回读，`cloud_verified_at` 保持为空。详见[归档回执](archive_receipt.json)。
+2026-10-14 用户曾选择“先保留本地包，稍后上传”；2026-10-15 用户指出阿里云盘桌面客户端已打开，已恢复归档。完整云端回读结果与 `cloud_verified_at` 见[归档回执](archive_receipt.json)。本地研究包和校验清单保持原样。
