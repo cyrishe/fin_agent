@@ -129,3 +129,12 @@
 已有本轮逐日缓存时，用 `--assemble-only` 仅合并，不重复解析全市场分钟。因子宽表及逐日关联保存在 `outputs/stock_automl/close_open_factor_discovery_r1/`；报告清单绑定源数据、面板、冻结规则、脚本及依赖版本哈希。
 
 针对本轮及已有收盘—开盘目标／序列口径的测试共 **18 项通过**，包括未来日线和 14:40 后数据隔离、缺分钟、第二高价并列、未知标签、集合边界、排名并列和方向冻结。此处只报告专项测试，不代表整个仓库全量测试通过。
+
+
+## 归档与提交
+
+代码、完整统计结果及月度图已推送至 `origin/codex/stock-automl-strategies`，研究内容提交 `b534fb9`。完整样本、逐日缓存、数据库候选分钟、历史日线、冻结规则及报告整理为 **416,909,259 字节**的 ZIP；内含 1,399 个被清单覆盖的文件及 SHA256SUMS，全部从包内回读哈希通过。数据库研究归档记录已回读，`local_check=ok`。
+
+本地镜像：`outputs/stock_automl/aliyun_drive_local/策略训练/收盘开盘_20261014/03_因子筛选_7至14/20261014_CO4_76因子_时间验证`。便于上传的 ZIP 位于 `outputs/stock_automl/close_open_factor_discovery_r1/CO4_76因子_时间验证_20261014.zip`，SHA-256 为 `751ae7b1ae0dc5e9e2b80b9c5daf581b815edaf896082588005ae830812e747e`。
+
+**云盘待同步。** 桌面端自动操作无法继续，网页快捷登录未成功；已请用户在 Chrome 登录。未上传、未云端回读，`cloud_verified_at` 保持为空。不能把本地完成或数据库登记写成云盘已同步。详见[归档回执](archive_receipt.json)。
