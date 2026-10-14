@@ -34,3 +34,9 @@
 `CO5_20261014_simple_rolling76` 已生成独立不可变包，1,883个文件、148,782行实际拟合样本、814个模型及逐折样本名单/权重。源提交 `1138f38`；ZIP为335,976,044字节，SHA-256 `7323809aea1acb7569d47dc11784789424dc8398d8e0ad49aa3a6988c4854a3e`，逐文件ZIP回读与本机镜像核验通过；数据库登记后再次audit为 `local_check=ok`。
 
 镜像：`03_因子筛选_7至14/20261014_CO5_76因子_简单模型滚动`；ZIP：`outputs/stock_automl/close_open_simple_rolling_r1/CO5_简单模型滚动_76因子_20261014.zip`。CO4旧包核验通过且未改动。用户已明确先保留本地包、稍后上传，故CO4/CO5都不恢复网页登录或自动上传，`cloud_verified_at`为空。[CO5归档回执](20261014_close_open_simple_rolling/archive_receipt.json)。
+
+## 2026-10-15 本机新增 CO6（10月14日研究，用户暂缓上传）
+
+`CO6_20261014_critical_net_loss` 已生成独立不可变包，932个清单文件、147,968行实际拟合样本、160个模型包（448个估计器）、48份逐折样本名单与日/严重权重。训练源提交 `ae248e6`，报告与打包源提交 `4c459aa`。ZIP为283,834,379字节，SHA-256 `dc38170aa1783c8ebb29cfad7a54da5aa5b77496dd20f5d8fad7a77740b10c29`；清单SHA `228a904066f938ec0f0cd11d1443cefb3ceb95c31e858664b73a3ace888d715f`。
+
+压缩包全部文件回读通过；镜像位于 `02_联合目标与尾部风险/20261014_CO6_严重净亏_跨档惩罚`，数据库已登记且回读 `local_check=ok`。CO4/CO5旧包本机再次核验通过，未改动；三包云端核验均为空，没有上传。研究ZIP位于 `outputs/stock_automl/close_open_critical_risk_r1/CO6_严重净亏与跨档惩罚_20261014.zip`。结论是尚无可靠升级方案，不因资产登记而替换B1。见 [CO6归档回执](20261014_close_open_critical_risk/archive_receipt.json)。
