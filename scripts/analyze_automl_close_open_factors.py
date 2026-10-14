@@ -3,6 +3,8 @@ from __future__ import annotations
 
 import json
 import math
+import platform
+from importlib.metadata import version
 from pathlib import Path
 
 import numpy as np
@@ -195,8 +197,17 @@ def rolling(daily: pd.DataFrame, panel: pd.DataFrame, rules: dict) -> tuple[pd.D
 
 
 def run() -> None:
-    raw = pd.read_csv(DATA/'factor_panel.csv.gz',dtype={'symbol6':str,'signal_date':str,'next_date':str})
+    raw = pd.read_csv(DATA/'factor_panel.csv.gz',dtype={'symbol6':str,'signal_date':str,'next_date':str},
+                      float_precision='round_trip')
+    raw.groupby(raw.signal_date.str[:7].rename('month')).agg(
+        candidates=('symbol6','size'),signal_days=('signal_date','nunique'),
+        labeled=('strong','count'),strong=('strong','sum'),weak=('weak','sum')).to_csv(
+            REPORT/'sample_coverage_monthly.csv')
     panel = sample_split(raw)
+    pd.DataFrame([{'phase':part,'factor':name,'rows':len(group),
+                   'missing':int((~np.isfinite(group[name].to_numpy(float))).sum())}
+                  for part,group in panel.groupby('phase') for name in FACTORS]).to_csv(
+                      REPORT/'factor_missing.csv',index=False)
     train = panel[panel.phase.eq('discovery')]
     training_daily = daily_associations(train)
     screening,rules = freeze_discovery(training_daily,train)
@@ -239,6 +250,8 @@ def run() -> None:
         'panel_sha256':sha(DATA/'factor_panel.csv.gz'),'script_sha256':sha(Path(__file__)),
         'design_sha256':sha(REPORT/'DESIGN.md'),'frozen_rules_sha256':sha(REPORT/'discovery_rules.json'),
         'bootstrap_repetitions':2000,'block_days':5,'seed':20261014,
+        'python':platform.python_version(),
+        'dependencies':{name:version(name) for name in ('numpy','pandas','scipy','scikit-learn','zstandard')},
         'discovery_candidates':int(screening.discovery_selected.sum()),
         'discovery_representatives':int(screening.discovery_representative.sum()),
         'validation_supported':selected,

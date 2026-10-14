@@ -348,14 +348,20 @@ def run(workers: int = 3, limit: int | None = None) -> None:
     tasks = tasks[:limit] if limit else tasks
     with ProcessPoolExecutor(max_workers=workers) as pool:
         audits = list(pool.map(build_day,tasks))
+    assemble(audits,paths)
+
+
+def assemble(audits: list[dict], paths: list[Path]) -> None:
+    """Join frozen per-day features and outcomes without recalculating minutes."""
     pd.DataFrame(audits).to_csv(REPORT/'minute_coverage.csv',index=False)
     factors = []
     mornings = []
-    for day,_,_ in tasks:
+    for audit in audits:
+        day = audit['date']
         p = DATA/'days'/(day+'_factors.csv.gz')
-        if next(a for a in audits if a['date'] == day)['complete_candidates'] > 0:
-            factors.append(pd.read_csv(p,dtype={'symbol6':str}))
-        mornings.append(pd.read_csv(DATA/'days'/(day+'_morning.csv.gz'),dtype={'symbol6':str}))
+        if audit['complete_candidates'] > 0:
+            factors.append(pd.read_csv(p,dtype={'symbol6':str},float_precision='round_trip'))
+        mornings.append(pd.read_csv(DATA/'days'/(day+'_morning.csv.gz'),dtype={'symbol6':str},float_precision='round_trip'))
     factors = pd.concat(factors,ignore_index=True)
     morning = pd.concat(mornings,ignore_index=True)
     rows = factors.merge(morning,on=['symbol6','next_date'],how='left',validate='many_to_one')
@@ -384,8 +390,12 @@ if __name__ == '__main__':
     parser.add_argument('--workers',type=int,default=3)
     parser.add_argument('--limit',type=int)
     parser.add_argument('--audit-availability',action='store_true')
+    parser.add_argument('--assemble-only',action='store_true')
     args = parser.parse_args()
     if args.audit_availability:
         audit_availability()
+    elif args.assemble_only:
+        assemble([json.loads(p.read_text()) for p in sorted((DATA/'days').glob('*.json'))],
+                 sorted(DAILY.glob('price_*.csv.gz')))
     else:
         run(args.workers,args.limit)
