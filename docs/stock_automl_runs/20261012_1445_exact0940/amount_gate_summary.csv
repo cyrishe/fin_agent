@@ -1,0 +1,3 @@
+segment,test_days,selected_top1,trades,idle_days,target_ge3_trades,sale_ge3_trades,negative_trades,mean_return_per_trade_pct,mean_return_per_day_pct,compounded_price_proxy_pct
+jan_jul,118,115,96,22,37,21,49,0.4826132209013981,0.3926344848011375,47.69206036352984
+aug_oct,22,22,15,7,1,1,9,-1.185648707494501,-0.8083968460189779,-16.989343742238205

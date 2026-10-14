@@ -1,0 +1,14 @@
+{
+  "segment": "aug_oct",
+  "candidate_rows": 15758,
+  "signal_days": 42,
+  "calendar_days": 44,
+  "prediction_days": 22,
+  "top1_picks": 22,
+  "observed_top1": 22,
+  "target_ge3": 2,
+  "target_lt0": 6,
+  "sale_ge3": 2,
+  "sale_lt0": 12,
+  "mean_0940_pct": -0.6944437382828118
+}

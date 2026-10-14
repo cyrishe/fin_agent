@@ -1,0 +1,43 @@
+{
+  "git_commit": "a935e9527508fc217469f8b4fde6d9dd1ee7fa10",
+  "python_packages": {
+    "pandas": "2.3.3",
+    "numpy": "2.5.2",
+    "scikit_learn": "1.9.1"
+  },
+  "sources_sha256": {
+    "outputs/stock_automl/mk_1m_jan_jul/trainable_candidates.csv.gz": "7e726db8c3794b762b838c10b13b4b0fa5cc6cc7b13b974efbe187080ac85b58",
+    "docs/stock_automl_runs/20261011_aug_oct_independent20/candidates.csv.gz": "df2667be0370576d7643005042f9f35518a39e6da23ceeb05d1405242ef3f573",
+    "outputs/stock_automl/live_1440/cache/2026-10-12_training.csv.gz": "8ec5842cc84834a161507eac64f13d031ab5e7fed83e2ce1c5dc6d1ef8203276",
+    "docs/stock_automl_runs/20261011_mk_1m_compact/compressed_manifest.json": "0292c5f6916eb1273b5f04c605af4de8da6b81bd6e9223da6425dafa6727164f",
+    "/Volumes/ext/fin_agent/scripts/experiment_automl_intraday_vwap.py": "f091685ea46ad2ffcbbbe1661d8d0432d669043b4ad63023f37dcaa1812f02b3",
+    "scripts/analyze_automl_top1_low_vwap.py": "28f746799a49e234fa37388bf85a37082306ace0772ce182c8b54e6dd1467bac",
+    "scripts/backtest_automl_intraday_vwap_gate.py": "04723326e919265de8c2d538e795f319017e0d3d524dbda59122ff8f0b8690e4"
+  },
+  "model_parameters": {
+    "categorical_features": "from_dtype",
+    "class_weight": null,
+    "early_stopping": false,
+    "interaction_cst": null,
+    "l2_regularization": 5,
+    "learning_rate": 0.05,
+    "loss": "log_loss",
+    "max_bins": 255,
+    "max_depth": null,
+    "max_features": 1.0,
+    "max_iter": 60,
+    "max_leaf_nodes": 7,
+    "min_samples_leaf": 100,
+    "monotonic_cst": null,
+    "n_iter_no_change": 10,
+    "random_state": 42,
+    "scoring": "loss",
+    "tol": 1e-07,
+    "validation_fraction": 0.1,
+    "verbose": 0,
+    "warm_start": false
+  },
+  "vwap_formula": "cumulative amount / cumulative shares, 09:31 through 14:40",
+  "db_volume_unit": "100 shares per lot",
+  "archive_volume_unit": "shares"
+}

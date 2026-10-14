@@ -1,0 +1,12 @@
+{
+  "git_commit": "a935e9527508fc217469f8b4fde6d9dd1ee7fa10",
+  "python": "3.12.14",
+  "scikit_learn": "1.9.1",
+  "pandas": "2.3.3",
+  "numpy": "2.5.2",
+  "scipy": "1.18.1",
+  "joblib": "1.6.0",
+  "model_files": 118,
+  "model_hashes_in": "folds.json",
+  "training_source_sha256": "975cdfcf39d786bbdb5af920d52da02392bd341978b065dba36fb767bb727dc4"
+}

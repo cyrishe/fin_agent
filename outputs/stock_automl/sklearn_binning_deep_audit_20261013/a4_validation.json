@@ -1,0 +1,148 @@
+{
+  "shock_ablation_controls": {
+    "old_all": {
+      "matched_candidates": 1747,
+      "maximum_probability_difference": 1.1102230246251565e-16,
+      "predicted_class_disagreements": 0
+    },
+    "new_all": {
+      "matched_candidates": 1747,
+      "maximum_probability_difference": 1.1102230246251565e-16,
+      "predicted_class_disagreements": 0
+    }
+  },
+  "moved_sample_bin_shifts": {
+    "signal_return": {
+      "-1": 495
+    },
+    "volume_ratio": {
+      "-1": 504
+    },
+    "turnover_so_far_pct": {
+      "-1": 504
+    },
+    "float_mv_100m_cny": {
+      "-1": 504
+    }
+  },
+  "cohorts": {
+    "feb_jul": {
+      "training_rows_min": 6477,
+      "training_rows_max": 10744,
+      "coarse_better_daily_loss_days_vs_old": 68,
+      "training_rows_vs_coarse_loss_delta_correlation": 0.01870751730696356,
+      "training_size_groups": [
+        {
+          "tertile": 1,
+          "days": 40,
+          "mean_training_rows": 7065.875,
+          "mean_daily_loss_coarse_minus_old": -0.0008748605542650278,
+          "mean_daily_loss_coarse_minus_new": -0.0010432398804105958
+        },
+        {
+          "tertile": 2,
+          "days": 39,
+          "mean_training_rows": 7908.282051282052,
+          "mean_daily_loss_coarse_minus_old": -0.0009164579421179037,
+          "mean_daily_loss_coarse_minus_new": -0.0005556906441242587
+        },
+        {
+          "tertile": 3,
+          "days": 39,
+          "mean_training_rows": 9225.589743589744,
+          "mean_daily_loss_coarse_minus_old": -0.0006115683894941118,
+          "mean_daily_loss_coarse_minus_new": -0.0007600870250077898
+        }
+      ],
+      "paired_top1_return": {
+        "avgcdf255": {
+          "daily_mean_return_difference": -0.003737643972676063,
+          "day_bootstrap_95pct": [
+            -0.009277293859965369,
+            0.0013144709409516155
+          ]
+        },
+        "linear255": {
+          "daily_mean_return_difference": 0.0,
+          "day_bootstrap_95pct": [
+            0.0,
+            0.0
+          ]
+        },
+        "midpoint63": {
+          "daily_mean_return_difference": -0.004185197862021089,
+          "day_bootstrap_95pct": [
+            -0.011250267222560633,
+            0.0028390059947520103
+          ]
+        },
+        "avgcdf63": {
+          "daily_mean_return_difference": -0.0036333005902946494,
+          "day_bootstrap_95pct": [
+            -0.009612794781758503,
+            0.0022844283780472053
+          ]
+        }
+      }
+    },
+    "aug_oct": {
+      "training_rows_min": 6221,
+      "training_rows_max": 8796,
+      "coarse_better_daily_loss_days_vs_old": 12,
+      "training_rows_vs_coarse_loss_delta_correlation": 0.30089662267726486,
+      "training_size_groups": [
+        {
+          "tertile": 1,
+          "days": 7,
+          "mean_training_rows": 6582.857142857143,
+          "mean_daily_loss_coarse_minus_old": -0.0019023056872301072,
+          "mean_daily_loss_coarse_minus_new": -0.0013888709962215045
+        },
+        {
+          "tertile": 2,
+          "days": 7,
+          "mean_training_rows": 7283.142857142857,
+          "mean_daily_loss_coarse_minus_old": -0.0011940839110401605,
+          "mean_daily_loss_coarse_minus_new": -0.001783503762138951
+        },
+        {
+          "tertile": 3,
+          "days": 7,
+          "mean_training_rows": 8048.285714285715,
+          "mean_daily_loss_coarse_minus_old": 0.0020699685309071925,
+          "mean_daily_loss_coarse_minus_new": 0.002905415756437562
+        }
+      ],
+      "paired_top1_return": {
+        "avgcdf255": {
+          "daily_mean_return_difference": -0.000996181827510881,
+          "day_bootstrap_95pct": [
+            -0.0035107132838524,
+            0.000522167801319757
+          ]
+        },
+        "linear255": {
+          "daily_mean_return_difference": 0.0,
+          "day_bootstrap_95pct": [
+            0.0,
+            0.0
+          ]
+        },
+        "midpoint63": {
+          "daily_mean_return_difference": -0.00023585596341325237,
+          "day_bootstrap_95pct": [
+            -0.010484835555618657,
+            0.01136486918229637
+          ]
+        },
+        "avgcdf63": {
+          "daily_mean_return_difference": 0.0026204308521913717,
+          "day_bootstrap_95pct": [
+            -0.006605828019988596,
+            0.01312148175629948
+          ]
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,3 @@
+segment,arm,test_days,selected_top1,trades,idle_days,sale_ge3,sale_negative,mean_trade_pct,mean_test_day_pct,compounded_price_proxy_pct
+sep_oct,baseline7,21,20,13,8,2,3,1.5979488244030733,0.9892064151066644,22.550035593056993
+sep_oct,low_vwap8,21,20,12,9,1,6,0.24199649366998083,0.13828371066856046,2.6418077279633634

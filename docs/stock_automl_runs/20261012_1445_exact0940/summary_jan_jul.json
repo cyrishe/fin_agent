@@ -1,0 +1,13 @@
+{
+  "segment": "jan_jul",
+  "candidate_rows": 58929,
+  "signal_days": 139,
+  "prediction_days": 118,
+  "top1_picks": 115,
+  "observed_top1": 115,
+  "target_ge3": 42,
+  "target_lt0": 37,
+  "sale_ge3": 23,
+  "sale_lt0": 55,
+  "mean_0940_pct": 0.49937183710288424
+}

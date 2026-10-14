@@ -1,0 +1,285 @@
+{
+  "signal_date": "2026-07-30",
+  "symbol6": "688638",
+  "training_rows": 9755,
+  "candidate_rows": 153,
+  "label_counts": {
+    "1to3": 3004,
+    "0to1": 2817,
+    "lt0": 2760,
+    "ge3": 1174
+  },
+  "model_params": {
+    "categorical_features": "from_dtype",
+    "class_weight": null,
+    "early_stopping": false,
+    "interaction_cst": null,
+    "l2_regularization": 5,
+    "learning_rate": 0.05,
+    "loss": "log_loss",
+    "max_bins": 255,
+    "max_depth": null,
+    "max_features": 1.0,
+    "max_iter": 60,
+    "max_leaf_nodes": 7,
+    "min_samples_leaf": 100,
+    "monotonic_cst": null,
+    "n_iter_no_change": 10,
+    "random_state": 42,
+    "scoring": "loss",
+    "tol": 1e-07,
+    "validation_fraction": 0.1,
+    "verbose": 0,
+    "warm_start": false
+  },
+  "training_days": [
+    {
+      "date": "2026-07-02",
+      "K": 1,
+      "D": 20,
+      "training_rows": 318,
+      "raw_weight_per_row": 0.2679433656340733,
+      "fit_weight_per_row": 0.44329913403489407,
+      "total_fit_weight": 140.96912462309632
+    },
+    {
+      "date": "2026-07-03",
+      "K": 2,
+      "D": 19,
+      "training_rows": 852,
+      "raw_weight_per_row": 0.2871745887492587,
+      "fit_weight_per_row": 0.4751162478239187,
+      "total_fit_weight": 404.7990431459787
+    },
+    {
+      "date": "2026-07-06",
+      "K": 3,
+      "D": 18,
+      "training_rows": 310,
+      "raw_weight_per_row": 0.3077861033362291,
+      "fit_weight_per_row": 0.509216986037493,
+      "total_fit_weight": 157.85726567162283
+    },
+    {
+      "date": "2026-07-07",
+      "K": 4,
+      "D": 17,
+      "training_rows": 130,
+      "raw_weight_per_row": 0.32987697769322355,
+      "fit_weight_per_row": 0.545765252307699,
+      "total_fit_weight": 70.94948280000087
+    },
+    {
+      "date": "2026-07-08",
+      "K": 5,
+      "D": 16,
+      "training_rows": 216,
+      "raw_weight_per_row": 0.3535533905932738,
+      "fit_weight_per_row": 0.5849367141978163,
+      "total_fit_weight": 126.34633026672833
+    },
+    {
+      "date": "2026-07-09",
+      "K": 6,
+      "D": 15,
+      "training_rows": 427,
+      "raw_weight_per_row": 0.37892914162759955,
+      "fit_weight_per_row": 0.6269196475403958,
+      "total_fit_weight": 267.69468949974896
+    },
+    {
+      "date": "2026-07-10",
+      "K": 7,
+      "D": 14,
+      "training_rows": 875,
+      "raw_weight_per_row": 0.40612619817811774,
+      "fit_weight_per_row": 0.6719158413764024,
+      "total_fit_weight": 587.9263612043521
+    },
+    {
+      "date": "2026-07-13",
+      "K": 8,
+      "D": 13,
+      "training_rows": 100,
+      "raw_weight_per_row": 0.43527528164806206,
+      "fit_weight_per_row": 0.7201415678449735,
+      "total_fit_weight": 72.01415678449736
+    },
+    {
+      "date": "2026-07-14",
+      "K": 9,
+      "D": 12,
+      "training_rows": 864,
+      "raw_weight_per_row": 0.4665164957684037,
+      "fit_weight_per_row": 0.7718286216855221,
+      "total_fit_weight": 666.859929136291
+    },
+    {
+      "date": "2026-07-15",
+      "K": 10,
+      "D": 11,
+      "training_rows": 488,
+      "raw_weight_per_row": 0.5,
+      "fit_weight_per_row": 0.8272254343485067,
+      "total_fit_weight": 403.6860119620711
+    },
+    {
+      "date": "2026-07-16",
+      "K": 11,
+      "D": 10,
+      "training_rows": 223,
+      "raw_weight_per_row": 0.5358867312681466,
+      "fit_weight_per_row": 0.8865982680697881,
+      "total_fit_weight": 197.71141377956275
+    },
+    {
+      "date": "2026-07-17",
+      "K": 12,
+      "D": 9,
+      "training_rows": 65,
+      "raw_weight_per_row": 0.5743491774985174,
+      "fit_weight_per_row": 0.9502324956478374,
+      "total_fit_weight": 61.765112217109426
+    },
+    {
+      "date": "2026-07-20",
+      "K": 13,
+      "D": 8,
+      "training_rows": 201,
+      "raw_weight_per_row": 0.6155722066724582,
+      "fit_weight_per_row": 1.018433972074986,
+      "total_fit_weight": 204.70522838707217
+    },
+    {
+      "date": "2026-07-21",
+      "K": 14,
+      "D": 7,
+      "training_rows": 627,
+      "raw_weight_per_row": 0.6597539553864471,
+      "fit_weight_per_row": 1.091530504615398,
+      "total_fit_weight": 684.3896263938547
+    },
+    {
+      "date": "2026-07-22",
+      "K": 15,
+      "D": 6,
+      "training_rows": 211,
+      "raw_weight_per_row": 0.7071067811865476,
+      "fit_weight_per_row": 1.1698734283956327,
+      "total_fit_weight": 246.84329339147848
+    },
+    {
+      "date": "2026-07-23",
+      "K": 16,
+      "D": 5,
+      "training_rows": 1206,
+      "raw_weight_per_row": 0.757858283255199,
+      "fit_weight_per_row": 1.2538392950807913,
+      "total_fit_weight": 1512.1301898674342
+    },
+    {
+      "date": "2026-07-24",
+      "K": 17,
+      "D": 4,
+      "training_rows": 89,
+      "raw_weight_per_row": 0.8122523963562356,
+      "fit_weight_per_row": 1.343831682752805,
+      "total_fit_weight": 119.60101976499965
+    },
+    {
+      "date": "2026-07-27",
+      "K": 18,
+      "D": 3,
+      "training_rows": 1751,
+      "raw_weight_per_row": 0.8705505632961241,
+      "fit_weight_per_row": 1.440283135689947,
+      "total_fit_weight": 2521.935770593097
+    },
+    {
+      "date": "2026-07-28",
+      "K": 19,
+      "D": 2,
+      "training_rows": 181,
+      "raw_weight_per_row": 0.9330329915368074,
+      "fit_weight_per_row": 1.5436572433710443,
+      "total_fit_weight": 279.40196105015906
+    },
+    {
+      "date": "2026-07-29",
+      "K": 20,
+      "D": 1,
+      "training_rows": 621,
+      "raw_weight_per_row": 1.0,
+      "fit_weight_per_row": 1.6544508686970134,
+      "total_fit_weight": 1027.4139894608452
+    }
+  ],
+  "raw_weight_mean": 0.60443015801827,
+  "normalized_weight_mean": 1.0000000000000002,
+  "normalized_weight_ess": 8489.186283398667,
+  "candidate_factors": {
+    "signal_return": 0.0367697594501719,
+    "volume_ratio": 1.2952546294893663,
+    "turnover_so_far_pct": 2.827418030573291,
+    "float_mv_100m_cny": 7.700139832377591,
+    "volume_4of5_increasing": 0,
+    "ma_bull_5_10_20": 0,
+    "all_intraday_lows_above_ma": 1
+  },
+  "candidate_D": 0,
+  "candidate_K": 21,
+  "classes_order": [
+    "0to1",
+    "1to3",
+    "ge3",
+    "lt0"
+  ],
+  "raw_logits_D": [
+    0.2209463828257731,
+    1.392833638658776,
+    -0.5021434818569356,
+    -1.3343772633201911
+  ],
+  "raw_logits_K": [
+    0.2209463828257731,
+    1.392833638658776,
+    -0.5021434818569356,
+    -1.3343772633201911
+  ],
+  "probabilities_D": [
+    0.20306833302268823,
+    0.6555206426125544,
+    0.09853902608237369,
+    0.042871998282383604
+  ],
+  "probabilities_K": [
+    0.20306833302268823,
+    0.6555206426125544,
+    0.09853902608237369,
+    0.042871998282383604
+  ],
+  "first_round_1to3_tree_root_D": {
+    "feature_idx": 7,
+    "threshold": 3.5,
+    "gain": 402.8825351361369,
+    "left_count": 2553,
+    "right_count": 7202,
+    "left_value": 0.7354408780177731,
+    "right_value": -0.2622442400156397
+  },
+  "first_round_1to3_tree_root_K": {
+    "feature_idx": 7,
+    "threshold": 17.5,
+    "gain": 402.8825351361369,
+    "left_count": 7202,
+    "right_count": 2553,
+    "left_value": -0.2622442400156397,
+    "right_value": 0.7354408780177731
+  },
+  "signal_price": 30.17,
+  "second_high": 30.68,
+  "second_high_return": 0.016904209479615462,
+  "close_40": 30.63,
+  "return_0940": 0.015246934040437532,
+  "amount_gate": "trade"
+}

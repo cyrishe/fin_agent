@@ -1,0 +1,106 @@
+{
+  "baseline": "docs/stock_automl_runs/20261012_intraday_vwap",
+  "results": "docs/stock_automl_runs/20261012_1445_exact0940",
+  "segments": [
+    {
+      "segment": "jan_jul",
+      "arm": "14:40 baseline",
+      "days": 118,
+      "top1_picks": 113,
+      "target_ge3_picks": 29,
+      "sale_negative_picks": 64,
+      "raw_mean_per_pick_pct": -0.25036643926251184,
+      "trades": 89,
+      "idle_days": 29,
+      "target_ge3_trades": 25,
+      "sale_negative_trades": 49,
+      "mean_per_trade_pct": -0.0983801951986574,
+      "mean_per_day_pct": -0.07420201163288556,
+      "compound_proxy_pct": -13.032247457710577
+    },
+    {
+      "segment": "jan_jul",
+      "arm": "14:45 1m",
+      "days": 118,
+      "top1_picks": 115,
+      "target_ge3_picks": 42,
+      "sale_negative_picks": 55,
+      "raw_mean_per_pick_pct": 0.4993718371028844,
+      "trades": 96,
+      "idle_days": 22,
+      "target_ge3_trades": 37,
+      "sale_negative_trades": 49,
+      "mean_per_trade_pct": 0.4826132209013981,
+      "mean_per_day_pct": 0.3926344848011375,
+      "compound_proxy_pct": 47.69206036352984
+    },
+    {
+      "segment": "aug_oct",
+      "arm": "14:40 baseline",
+      "days": 22,
+      "top1_picks": 22,
+      "target_ge3_picks": 7,
+      "sale_negative_picks": 8,
+      "raw_mean_per_pick_pct": 0.6877595488463925,
+      "trades": 15,
+      "idle_days": 7,
+      "target_ge3_trades": 5,
+      "sale_negative_trades": 5,
+      "mean_per_trade_pct": 1.2204387913446935,
+      "mean_per_day_pct": 0.8321173577350183,
+      "compound_proxy_pct": 19.53879875369189
+    },
+    {
+      "segment": "aug_oct",
+      "arm": "14:45 1m",
+      "days": 22,
+      "top1_picks": 22,
+      "target_ge3_picks": 3,
+      "sale_negative_picks": 12,
+      "raw_mean_per_pick_pct": -0.37266999316978866,
+      "trades": 14,
+      "idle_days": 8,
+      "target_ge3_trades": 2,
+      "sale_negative_trades": 7,
+      "mean_per_trade_pct": -0.530688257335493,
+      "mean_per_day_pct": -0.3377107092134954,
+      "compound_proxy_pct": -7.637304431049063
+    },
+    {
+      "segment": "aug_oct",
+      "arm": "14:45 hybrid",
+      "days": 22,
+      "top1_picks": 22,
+      "target_ge3_picks": 2,
+      "sale_negative_picks": 12,
+      "raw_mean_per_pick_pct": -0.6944437382828115,
+      "trades": 15,
+      "idle_days": 7,
+      "target_ge3_trades": 1,
+      "sale_negative_trades": 9,
+      "mean_per_trade_pct": -1.185648707494501,
+      "mean_per_day_pct": -0.8083968460189779,
+      "compound_proxy_pct": -16.989343742238205
+    }
+  ],
+  "overlap": [
+    {
+      "segment": "jan_jul",
+      "arm": "14:45 1m",
+      "both_picked_days": 113,
+      "same_stock_days": 25
+    },
+    {
+      "segment": "aug_oct",
+      "arm": "14:45 1m",
+      "both_picked_days": 22,
+      "same_stock_days": 6
+    },
+    {
+      "segment": "aug_oct",
+      "arm": "14:45 hybrid",
+      "both_picked_days": 22,
+      "same_stock_days": 5
+    }
+  ]
+}

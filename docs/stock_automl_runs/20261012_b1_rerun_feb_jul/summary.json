@@ -1,0 +1,30 @@
+{
+  "source_rows": 58317,
+  "signal_dates": 139,
+  "test_days": 118,
+  "test_first": "2026-02-02",
+  "test_last": "2026-07-30",
+  "arm": "rolling20_tminus1",
+  "result": {
+    "test_days": 118,
+    "selected_days": 113,
+    "known_outcome_days": 113,
+    "unknown_outcome_days": 0,
+    "second_high_counts": {
+      "ge3": 29,
+      "1to3": 28,
+      "0to1": 21,
+      "lt0": 35
+    },
+    "sale_0940_counts": {
+      "ge3": 17,
+      "1to3": 15,
+      "0to1": 17,
+      "lt0": 64
+    },
+    "mean_0940_return_pct_per_trade": -0.25036643926251184,
+    "median_0940_return_pct_per_trade": -0.53182917002416
+  },
+  "data_sha256": "975cdfcf39d786bbdb5af920d52da02392bd341978b065dba36fb767bb727dc4",
+  "script_sha256": "ef847305577a3c1cf2540f4ecc8dc216e710bbf0388425f88e335ea50e619abb"
+}

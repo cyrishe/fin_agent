@@ -1,0 +1,154 @@
+{
+  "feb_jul": {
+    "prediction_days": 118,
+    "days_with_any_eligible_candidate": 115,
+    "days_with_full_top5_both_versions": 102,
+    "full_top5_mean_overlap": 3.980392156862745,
+    "full_top5_median_overlap": 4.0,
+    "full_top5_exact_same_set_days": 27,
+    "top1_changed_days": 31,
+    "changed_days_both_top1_in_other_top5": 12,
+    "changed_days_old_top1_outside_new_top5": 15,
+    "changed_days_new_top1_outside_old_top5": 11,
+    "changed_days_exact_same_top5_set": 1,
+    "changed_days_mean_absolute_version_return_difference": {
+      "1": 0.04135750181932306,
+      "2": 0.01832174810065744,
+      "3": 0.013981684313823732,
+      "5": 0.01393979783798435
+    },
+    "active_day_portfolio_returns": {
+      "old": {
+        "1": {
+          "mean": 0.001277521569487903,
+          "daily_standard_deviation": 0.03873602644847573
+        },
+        "2": {
+          "mean": 8.567007154026599e-05,
+          "daily_standard_deviation": 0.02812023818009877
+        },
+        "3": {
+          "mean": -0.0005486252980726504,
+          "daily_standard_deviation": 0.024186175646120623
+        },
+        "5": {
+          "mean": 0.00019295594738544735,
+          "daily_standard_deviation": 0.02157250173029194
+        }
+      },
+      "new": {
+        "1": {
+          "mean": -0.0024601224031881633,
+          "daily_standard_deviation": 0.03540380523015514
+        },
+        "2": {
+          "mean": 0.0003053675137391733,
+          "daily_standard_deviation": 0.025489304664274164
+        },
+        "3": {
+          "mean": -0.0013271665144146004,
+          "daily_standard_deviation": 0.02094762218672397
+        },
+        "5": {
+          "mean": -0.001785961715442322,
+          "daily_standard_deviation": 0.019476945893324025
+        }
+      }
+    },
+    "shock_days": {
+      "2026-05-28": {
+        "top5_overlap": 2,
+        "old_top5": "600545|300623|001339|688662|000809",
+        "new_top5": "688507|688662|001339|688583|603375",
+        "old_top1_return": 0.09554973821989532,
+        "new_top1_return": -0.0640012397334574,
+        "old_equal_weight_up_to5_return": 0.02746866426959522,
+        "new_equal_weight_up_to5_return": -0.012084078741948745
+      },
+      "2026-06-09": {
+        "top5_overlap": 4,
+        "old_top5": "002185|300174|000021|000539|301366",
+        "new_top5": "300174|301682|002185|000021|301366",
+        "old_top1_return": -0.011357183418512218,
+        "new_top1_return": 0.08217497955846276,
+        "old_equal_weight_up_to5_return": 4.464404383304199e-05,
+        "new_equal_weight_up_to5_return": 0.0032483969086166244
+      },
+      "2026-06-10": {
+        "top5_overlap": 0,
+        "old_top5": "300665",
+        "new_top5": "",
+        "old_top1_return": 0.119360902255639,
+        "new_top1_return": 0.0,
+        "old_equal_weight_up_to5_return": 0.119360902255639,
+        "new_equal_weight_up_to5_return": 0.0
+      },
+      "2026-07-15": {
+        "top5_overlap": 4,
+        "old_top5": "002768|000779|301345|300043|002292",
+        "new_top5": "000779|002768|301345|300043|300002",
+        "old_top1_return": -0.03572643756379723,
+        "new_top1_return": 0.012544802867383575,
+        "old_equal_weight_up_to5_return": -0.01463342856592773,
+        "new_equal_weight_up_to5_return": -0.015550599754606487
+      }
+    }
+  },
+  "aug_oct": {
+    "prediction_days": 21,
+    "days_with_any_eligible_candidate": 21,
+    "days_with_full_top5_both_versions": 20,
+    "full_top5_mean_overlap": 4.2,
+    "full_top5_median_overlap": 4.0,
+    "full_top5_exact_same_set_days": 6,
+    "top1_changed_days": 2,
+    "changed_days_both_top1_in_other_top5": 1,
+    "changed_days_old_top1_outside_new_top5": 0,
+    "changed_days_new_top1_outside_old_top5": 1,
+    "changed_days_exact_same_top5_set": 0,
+    "changed_days_mean_absolute_version_return_difference": {
+      "1": 0.014115083798102557,
+      "2": 0.006314274869775677,
+      "3": 0.010875382582324195,
+      "5": 0.006094510248893015
+    },
+    "active_day_portfolio_returns": {
+      "old": {
+        "1": {
+          "mean": 0.009145213635920045,
+          "daily_standard_deviation": 0.025780977393941435
+        },
+        "2": {
+          "mean": 0.0034234492835342615,
+          "daily_standard_deviation": 0.026204469611476103
+        },
+        "3": {
+          "mean": -0.00018806438558097838,
+          "daily_standard_deviation": 0.01903381154539244
+        },
+        "5": {
+          "mean": -0.0028941686482645856,
+          "daily_standard_deviation": 0.018215264673130838
+        }
+      },
+      "new": {
+        "1": {
+          "mean": 0.00814903180840916,
+          "daily_standard_deviation": 0.026288410145371838
+        },
+        "2": {
+          "mean": -0.0011684244295394688,
+          "daily_standard_deviation": 0.023873025137650692
+        },
+        "3": {
+          "mean": -0.004789378475518737,
+          "daily_standard_deviation": 0.01900102573398754
+        },
+        "5": {
+          "mean": -0.004674563785271953,
+          "daily_standard_deviation": 0.018296304761867617
+        }
+      }
+    }
+  }
+}

@@ -85,6 +85,7 @@ def fetch_batch(codes, timeout):
                      "signal_price": q.get("fNowPrice"),
                      "preclose": q.get("fClose"),
                      "volume_hands": q.get("lVolume"),
+                     "amount_so_far": q.get("fAmount"),
                      "low_so_far": q.get("fLow")})
     return rows, time.perf_counter() - start, len(response.content)
 
@@ -105,7 +106,8 @@ def fetch_full_market(codes, batch_size=200, workers=6, timeout=12):
     ended_at = datetime.now(SHANGHAI).isoformat(timespec="seconds")
     quotes = pd.DataFrame(collected)
     quotes = quotes[quotes.symbol6.isin(codes)].drop_duplicates("symbol6", keep=False)
-    for col in ("signal_price", "preclose", "volume_hands", "low_so_far"):
+    for col in ("signal_price", "preclose", "volume_hands", "amount_so_far",
+                "low_so_far"):
         quotes[col] = pd.to_numeric(quotes[col], errors="coerce")
     metadata = {"source": QUOTE_URL, "requested_symbols": len(codes),
                 "returned_symbols": len(quotes), "batches": len(batches),

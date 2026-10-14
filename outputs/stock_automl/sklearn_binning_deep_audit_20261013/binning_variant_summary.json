@@ -1,0 +1,138 @@
+{
+  "feb_jul": {
+    "days": 118,
+    "candidate_rows": 49279,
+    "labeled_rows": 49229,
+    "metrics": {
+      "midpoint255": {
+        "logloss": 1.370317728260348,
+        "brier4": 0.7451974035287672,
+        "top1_days": 115,
+        "top1_mean_0940_return": 0.001277521569487903,
+        "daily_mean_logloss_delta_vs_midpoint255": 0.0,
+        "daily_delta_day_bootstrap_95pct": [
+          0.0,
+          0.0
+        ],
+        "top1_different_or_missing_vs_midpoint255": 0
+      },
+      "avgcdf255": {
+        "logloss": 1.3704782643489997,
+        "brier4": 0.7453373099163776,
+        "top1_days": 113,
+        "top1_mean_0940_return": -0.002503664392625122,
+        "daily_mean_logloss_delta_vs_midpoint255": -1.307224399064411e-05,
+        "daily_delta_day_bootstrap_95pct": [
+          -0.0003993631738047352,
+          0.0003693239373341953
+        ],
+        "top1_different_or_missing_vs_midpoint255": 31
+      },
+      "linear255": {
+        "logloss": 1.3702971724684132,
+        "brier4": 0.7451626148523715,
+        "top1_days": 115,
+        "top1_mean_0940_return": 0.001277521569487903,
+        "daily_mean_logloss_delta_vs_midpoint255": 2.6918724269631156e-06,
+        "daily_delta_day_bootstrap_95pct": [
+          -9.902457491996239e-05,
+          9.334097648991772e-05
+        ],
+        "top1_different_or_missing_vs_midpoint255": 0
+      },
+      "midpoint63": {
+        "logloss": 1.3705170149901915,
+        "brier4": 0.7452361127412734,
+        "top1_days": 111,
+        "top1_mean_0940_return": -0.0030124574201920397,
+        "daily_mean_logloss_delta_vs_midpoint255": -0.0006169943675310524,
+        "daily_delta_day_bootstrap_95pct": [
+          -0.0012829910123230664,
+          3.989591747454845e-05
+        ],
+        "top1_different_or_missing_vs_midpoint255": 57
+      },
+      "avgcdf63": {
+        "logloss": 1.3699596565502166,
+        "brier4": 0.7450068566718878,
+        "top1_days": 111,
+        "top1_mean_0940_return": -0.002440671958493476,
+        "daily_mean_logloss_delta_vs_midpoint255": -0.0008015885517243197,
+        "daily_delta_day_bootstrap_95pct": [
+          -0.0014604216772241526,
+          -0.00017624588740965905
+        ],
+        "top1_different_or_missing_vs_midpoint255": 58
+      }
+    },
+    "coarse63_old_new_top1_disagreements": 27
+  },
+  "aug_oct": {
+    "days": 21,
+    "candidate_rows": 6426,
+    "labeled_rows": 6402,
+    "metrics": {
+      "midpoint255": {
+        "logloss": 1.319477723626257,
+        "brier4": 0.7223244049844776,
+        "top1_days": 21,
+        "top1_mean_0940_return": 0.009145213635920045,
+        "daily_mean_logloss_delta_vs_midpoint255": 0.0,
+        "daily_delta_day_bootstrap_95pct": [
+          0.0,
+          0.0
+        ],
+        "top1_different_or_missing_vs_midpoint255": 0
+      },
+      "avgcdf255": {
+        "logloss": 1.3191962307937848,
+        "brier4": 0.7221550374544347,
+        "top1_days": 21,
+        "top1_mean_0940_return": 0.00814903180840916,
+        "daily_mean_logloss_delta_vs_midpoint255": -0.0002531540218133938,
+        "daily_delta_day_bootstrap_95pct": [
+          -0.0011499793730875953,
+          0.0007213349915811261
+        ],
+        "top1_different_or_missing_vs_midpoint255": 2
+      },
+      "linear255": {
+        "logloss": 1.3195236206392644,
+        "brier4": 0.72236324974106,
+        "top1_days": 21,
+        "top1_mean_0940_return": 0.009145213635920045,
+        "daily_mean_logloss_delta_vs_midpoint255": 0.00011744579310141432,
+        "daily_delta_day_bootstrap_95pct": [
+          -3.551202604667854e-05,
+          0.0003232718794126208
+        ],
+        "top1_different_or_missing_vs_midpoint255": 0
+      },
+      "midpoint63": {
+        "logloss": 1.3196669782496055,
+        "brier4": 0.7226183700463222,
+        "top1_days": 21,
+        "top1_mean_0940_return": 0.008909357672506774,
+        "daily_mean_logloss_delta_vs_midpoint255": -0.00022442877705139023,
+        "daily_delta_day_bootstrap_95pct": [
+          -0.002236481775151385,
+          0.0019153478141479261
+        ],
+        "top1_different_or_missing_vs_midpoint255": 11
+      },
+      "avgcdf63": {
+        "logloss": 1.3193512110252725,
+        "brier4": 0.7225746666822159,
+        "top1_days": 21,
+        "top1_mean_0940_return": 0.011765644488111396,
+        "daily_mean_logloss_delta_vs_midpoint255": -0.0003421403557876917,
+        "daily_delta_day_bootstrap_95pct": [
+          -0.0024164377222654003,
+          0.0019703209191237366
+        ],
+        "top1_different_or_missing_vs_midpoint255": 10
+      }
+    },
+    "coarse63_old_new_top1_disagreements": 5
+  }
+}

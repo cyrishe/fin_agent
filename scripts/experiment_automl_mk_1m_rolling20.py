@@ -8,6 +8,7 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
+import joblib
 
 from scripts.experiment_automl_four_class_subset_selection import fit_tree
 from scripts.experiment_automl_mk_1m_rolling import arm_summary, evaluate
@@ -20,20 +21,27 @@ ARM = "rolling20_tminus1"
 
 
 def one_fold(rows: pd.DataFrame, dates: list[str], index: int,
-             checkpoint: Path) -> None:
+             checkpoint: Path, save_model: bool = False) -> None:
     day = dates[index]
     training_dates = dates[index-20:index]
     training = select_training_samples(rows, training_dates)
     if training.signal_date.nunique() != 20 or not training.next_date.le(day).all():
         raise ValueError(f"Incomplete or immature 20-day training window: {day}")
     model = fit_tree(training, day)
+    model_path = checkpoint / f"{day}_model.joblib"
+    if save_model:
+        joblib.dump(model, model_path)
     scores, picks = evaluate(model, rows, day, ARM)
     scores.to_csv(checkpoint / f"{day}_scores.csv.gz", index=False, compression="gzip")
     picks.to_csv(checkpoint / f"{day}_picks.csv", index=False)
-    (checkpoint / f"{day}_fold.json").write_text(json.dumps({
+    fold = {
         "test_date": day, "training_dates": training_dates,
         "training_rows": len(training), "inference_candidates": len(scores),
-    }, ensure_ascii=False, indent=2) + "\n")
+    }
+    if save_model:
+        fold["model_sha256"] = hashlib.sha256(model_path.read_bytes()).hexdigest()
+    (checkpoint / f"{day}_fold.json").write_text(json.dumps(
+        fold, ensure_ascii=False, indent=2) + "\n")
 
 
 def aggregate(rows: pd.DataFrame, dates: list[str], checkpoint: Path,
@@ -76,6 +84,7 @@ def main() -> None:
     p.add_argument("--worker-index", type=int, default=0)
     p.add_argument("--max-folds", type=int)
     p.add_argument("--aggregate-only", action="store_true")
+    p.add_argument("--save-models", action="store_true")
     a = p.parse_args()
     rows = pd.read_csv(a.data, dtype={"symbol6": str, "signal_date": str,
                                       "next_date": str}, low_memory=False)
@@ -94,8 +103,10 @@ def main() -> None:
                 continue
             paths = [a.checkpoint / f"{day}_{suffix}" for suffix in
                      ("fold.json", "picks.csv", "scores.csv.gz")]
+            if a.save_models:
+                paths.append(a.checkpoint / f"{day}_model.joblib")
             if not all(path.exists() for path in paths):
-                one_fold(rows, dates, index, a.checkpoint)
+                one_fold(rows, dates, index, a.checkpoint, a.save_models)
             print(f"completed {day} ({index-19}/{len(dates)-21})", flush=True)
     if a.max_folds is None and (a.aggregate_only or a.workers == 1):
         print(json.dumps(aggregate(rows, dates, a.checkpoint, a.output, a.data),

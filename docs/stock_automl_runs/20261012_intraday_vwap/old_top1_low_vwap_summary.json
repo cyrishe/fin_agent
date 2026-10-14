@@ -1,0 +1,37 @@
+{
+  "historical_days": 137,
+  "low_all_above_days": 0,
+  "low_ratio_min": 0.01818181818181818,
+  "low_ratio_median": 0.75,
+  "low_ratio_max": 0.9954545454545455,
+  "bands": [
+    {
+      "low_ratio_band": "≤25%",
+      "picks": 10,
+      "sale_ge3": 0,
+      "sale_negative": 3,
+      "mean_sale_pct": 0.16274182328440306
+    },
+    {
+      "low_ratio_band": "25–50%",
+      "picks": 24,
+      "sale_ge3": 6,
+      "sale_negative": 11,
+      "mean_sale_pct": 1.2358879311847453
+    },
+    {
+      "low_ratio_band": "50–75%",
+      "picks": 35,
+      "sale_ge3": 8,
+      "sale_negative": 15,
+      "mean_sale_pct": 0.6026969580345857
+    },
+    {
+      "low_ratio_band": ">75%",
+      "picks": 68,
+      "sale_ge3": 9,
+      "sale_negative": 39,
+      "mean_sale_pct": -0.32785988743298855
+    }
+  ]
+}

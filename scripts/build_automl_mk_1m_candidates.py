@@ -1,4 +1,4 @@
-"""Build the frozen 14:40 seven-factor cohort directly from supplied raw 1m CSVs."""
+"""Build seven-factor cohorts at 14:40 or 14:45 from supplied raw 1m CSVs."""
 
 from __future__ import annotations
 
@@ -19,8 +19,12 @@ ARCHIVE = COMPACT_ROOT
 OUT = Path("outputs/stock_automl/mk_1m_study")
 
 
-def summarize_day(path: Path) -> tuple[pd.DataFrame, dict]:
+def summarize_day(path: Path, cutoff: str = "14:40") -> tuple[pd.DataFrame, dict]:
     day = trading_day(path)
+    if cutoff not in ("14:40", "14:45"):
+        raise ValueError("Unsupported signal cutoff")
+    required_bars = 220 if cutoff == "14:40" else 225
+    cutoff_clock = f"{cutoff}:00"
     bars = pd.read_csv(path, usecols=["time", "symbol", "open", "high", "low",
                                       "close", "volume"], dtype={"symbol": str})
     if bars.empty or not bars.time.str[:10].eq(day).all():
@@ -32,28 +36,29 @@ def summarize_day(path: Path) -> tuple[pd.DataFrame, dict]:
            ~bars.volume.ge(0) |
            ~bars.high.ge(bars[["open", "close"]].max(axis=1)) |
            ~bars.low.le(bars[["open", "close"]].min(axis=1)))
-    bad_required_symbols = set(bars.loc[bad & clock.le("14:40:00"), "symbol"])
+    bad_required_symbols = set(bars.loc[bad & clock.le(cutoff_clock), "symbol"])
     audit = {"date": day, "invalid_bars_anytime": int(bad.sum()),
              "invalid_required_stock_days": 0}
-    # The signal is decided at 14:40. Later bars must not decide whether a
+    # The signal is decided at the cutoff. Later bars must not decide whether a
     # stock-day is eligible, even when replaying a complete historical file.
-    visible = bars.loc[clock.le("14:40:00")].copy()
+    visible = bars.loc[clock.le(cutoff_clock)].copy()
     visible_clock = visible.time.str[-8:]
     expected_clock = set(pd.date_range("09:31", periods=120, freq="min").strftime("%H:%M:%S"))
-    expected_clock.update(pd.date_range("13:01", periods=100, freq="min").strftime("%H:%M:%S"))
+    expected_clock.update(pd.date_range("13:01", periods=required_bars-120,
+                                         freq="min").strftime("%H:%M:%S"))
     counts = visible.groupby("symbol", sort=False).size()
     duplicates = set(visible.loc[
         visible[["symbol", "time"]].duplicated(keep=False), "symbol"])
     unexpected = set(visible.loc[~visible_clock.isin(expected_clock), "symbol"])
-    incomplete = set(counts.index[~counts.eq(220)]) | duplicates | unexpected
+    incomplete = set(counts.index[~counts.eq(required_bars)]) | duplicates | unexpected
     excluded = bad_required_symbols | incomplete
     audit["invalid_required_stock_days"] = len(excluded)
     visible = visible.loc[~visible.symbol.isin(excluded)].copy()
     visible_clock = visible.time.str[-8:]
     counts = visible.groupby("symbol", sort=False).size()
     if visible.empty:
-        raise ValueError(f"No complete 14:40 stock-day in {path}")
-    signal = visible.loc[visible_clock.eq("14:40:00"), ["symbol", "close"]].rename(
+        raise ValueError(f"No complete {cutoff} stock-day in {path}")
+    signal = visible.loc[visible_clock.eq(cutoff_clock), ["symbol", "close"]].rename(
         columns={"close": "signal_price"})
     intraday = visible.groupby("symbol", sort=False).agg(
         minute_bars=("low", "size"), minute_volume_shares=("volume", "sum"),
@@ -61,9 +66,9 @@ def summarize_day(path: Path) -> tuple[pd.DataFrame, dict]:
     morning = visible.loc[visible_clock.le("09:40:00"),
                           ["symbol", "time", "high", "close", "volume"]]
     morning_count = morning.groupby("symbol", sort=False).size()
-    if (not intraday.minute_bars.eq(220).all() or not morning_count.eq(10).all()
+    if (not intraday.minute_bars.eq(required_bars).all() or not morning_count.eq(10).all()
             or len(signal) != len(counts)):
-        raise ValueError(f"Wrong 14:40 or morning coverage in {path}")
+        raise ValueError(f"Wrong {cutoff} or morning coverage in {path}")
     ordered_highs = morning.sort_values(["symbol", "high"], ascending=[True, False])
     second = ordered_highs.groupby("symbol", sort=False).nth(1).reset_index()[
         ["symbol", "high"]].rename(columns={"high": "morning_second_high"})
@@ -142,7 +147,11 @@ def candidate_band_mask(signals: pd.DataFrame, band: str) -> pd.Series:
 
 
 def build(archive: Path | list[Path], env_file: Path, output: Path,
-          reuse_snapshots: bool = False, candidate_band: str = "legacy_3to6") -> dict:
+          reuse_snapshots: bool = False, candidate_band: str = "legacy_3to6",
+          cutoff: str = "14:40") -> dict:
+    if cutoff not in ("14:40", "14:45"):
+        raise ValueError("Unsupported signal cutoff")
+    required_bars = 220 if cutoff == "14:40" else 225
     archives = [archive] if isinstance(archive, Path) else archive
     files = day_files(archives)
     if not files:
@@ -169,7 +178,7 @@ def build(archive: Path | list[Path], env_file: Path, output: Path,
     else:
         snapshots, minute_audits = [], []
         for file in files:
-            frame, audit = summarize_day(file)
+            frame, audit = summarize_day(file, cutoff)
             snapshots.append(frame)
             minute_audits.append(audit)
             print(f"summarized {trading_day(file)}", flush=True)
@@ -199,7 +208,7 @@ def build(archive: Path | list[Path], env_file: Path, output: Path,
                             validate="one_to_one")
     signals["signal_return"] = signals.signal_price / signals.t_reference_preclose - 1
     signals["volume_ratio"] = (signals.minute_volume_shares * 240 /
-                               (220 * signals.avg_volume5_shares))
+                               (required_bars * signals.avg_volume5_shares))
     signals["turnover_so_far_pct"] = signals.minute_volume_shares / signals.float_share * 100
     signals["float_mv_100m_cny"] = signals.float_mv / 1e8
     for window in (5, 10, 20):
@@ -227,7 +236,9 @@ def build(archive: Path | list[Path], env_file: Path, output: Path,
     coverage = candidates.groupby("signal_date").agg(
         candidates=("symbol6", "size"), labeled=("label_complete", "sum"))
     coverage.to_csv(output / "candidate_coverage.csv")
-    summary = {"archive": str(archives[0]) if len(archives) == 1 else
+    summary = {"decision_time": cutoff,
+               "signal_bars": required_bars,
+               "archive": str(archives[0]) if len(archives) == 1 else
                [str(root) for root in archives],
                "signal_days": int(candidates.signal_date.nunique()),
                "first_signal_date": str(candidates.signal_date.min())[:10],
@@ -254,6 +265,8 @@ if __name__ == "__main__":
     parser.add_argument("--candidate-band", choices=("legacy_3to6", "board_volatility",
                                                     "main_3to6_wide_4to8"),
                         default="legacy_3to6")
+    parser.add_argument("--cutoff", choices=("14:40", "14:45"), default="14:40")
     args = parser.parse_args()
     print(json.dumps(build(args.archive or ARCHIVE, args.env_file, args.output,
-                           args.reuse_snapshots, args.candidate_band), ensure_ascii=False, indent=2))
+                           args.reuse_snapshots, args.candidate_band, args.cutoff),
+                     ensure_ascii=False, indent=2))

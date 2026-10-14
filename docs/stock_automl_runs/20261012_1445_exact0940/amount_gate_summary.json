@@ -1,0 +1,31 @@
+{
+  "method": "14:45 T stock amount >= median of its prior 20 complete trading days at 14:45; no replacement",
+  "segments": [
+    {
+      "segment": "jan_jul",
+      "test_days": 118,
+      "selected_top1": 115,
+      "trades": 96,
+      "idle_days": 22,
+      "target_ge3_trades": 37,
+      "sale_ge3_trades": 21,
+      "negative_trades": 49,
+      "mean_return_per_trade_pct": 0.4826132209013981,
+      "mean_return_per_day_pct": 0.3926344848011375,
+      "compounded_price_proxy_pct": 47.69206036352984
+    },
+    {
+      "segment": "aug_oct",
+      "test_days": 22,
+      "selected_top1": 22,
+      "trades": 15,
+      "idle_days": 7,
+      "target_ge3_trades": 1,
+      "sale_ge3_trades": 1,
+      "negative_trades": 9,
+      "mean_return_per_trade_pct": -1.185648707494501,
+      "mean_return_per_day_pct": -0.8083968460189779,
+      "compounded_price_proxy_pct": -16.989343742238205
+    }
+  ]
+}

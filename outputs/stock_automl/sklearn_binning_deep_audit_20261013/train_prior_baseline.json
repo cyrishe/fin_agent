@@ -1,0 +1,12 @@
+{
+  "feb_jul": {
+    "labeled_candidates": 49229,
+    "logloss": 1.3674315969132582,
+    "brier4": 0.7432663213513347
+  },
+  "aug_oct": {
+    "labeled_candidates": 6402,
+    "logloss": 1.3362147332461025,
+    "brier4": 0.7296365480231217
+  }
+}

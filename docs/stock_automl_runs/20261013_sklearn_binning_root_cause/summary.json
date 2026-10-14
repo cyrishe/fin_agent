@@ -1,0 +1,60 @@
+{
+  "audit_date": "2026-10-13",
+  "training_source_sha256": "d160e906712f8d9f0d7b1f052079c023fd2e8d7def5611fd71c31c738e4b90f2",
+  "controlled_dependencies": {
+    "python": "3.12.14",
+    "numpy": "2.5.2",
+    "scipy": "1.18.1",
+    "pandas": "2.3.3",
+    "joblib": "1.6.0",
+    "threadpoolctl": "3.7.0",
+    "libomp_sha256": "be61ec108198547b38d6f8b797131f64032ac5013f912012cf5e42d961011e4a"
+  },
+  "versions": [
+    "1.7.1",
+    "1.9.1"
+  ],
+  "prediction_days": 118,
+  "candidate_count": 49279,
+  "probability_max_absolute_difference_quantiles": {
+    "min": 0.0001349430705357979,
+    "p50": 0.00826299968476868,
+    "p90": 0.01640132644574043,
+    "p99": 0.027166879003178407,
+    "max": 0.13392367939137595
+  },
+  "class_flips": 1947,
+  "top1_changed_days": 31,
+  "old_binning_on_new_version_controls": [
+    {
+      "day": "2026-05-28",
+      "candidate_count": 449,
+      "bin_hash_equal": true,
+      "first_two_rounds_tree_nodes_equal": true,
+      "max_probability_difference": 0.0,
+      "top2_equal": true
+    },
+    {
+      "day": "2026-06-10",
+      "candidate_count": 196,
+      "bin_hash_equal": true,
+      "first_two_rounds_tree_nodes_equal": true,
+      "max_probability_difference": 0.0,
+      "top2_equal": true
+    },
+    {
+      "day": "2026-07-30",
+      "candidate_count": 153,
+      "bin_hash_equal": true,
+      "first_two_rounds_tree_nodes_equal": true,
+      "max_probability_difference": 0.0,
+      "top2_equal": true
+    }
+  ],
+  "full_118_fold_old_binning_control": {
+    "probability_sha256_equal_folds": 118,
+    "top1_equal_folds": 118,
+    "folds": 118,
+    "hashes_file": "fold_probability_hashes.csv"
+  }
+}

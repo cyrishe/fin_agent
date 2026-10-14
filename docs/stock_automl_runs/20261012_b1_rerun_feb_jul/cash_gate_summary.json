@@ -1,0 +1,26 @@
+{
+  "signal_days": 118,
+  "selected_days": 113,
+  "trades": 89,
+  "idle_days": 29,
+  "skipped_below_median": 20,
+  "skipped_missing_amount": 4,
+  "model_no_pick": 5,
+  "ungated_mean_return": -0.0025036643926251187,
+  "ungated_compound_return": -0.298604209628334,
+  "gated_mean_return_per_trade": -0.000983801951986574,
+  "gated_win_rate": 0.449438202247191,
+  "gated_compound_return": -0.13032247457710577,
+  "ending_equity_cny": 869677.5254228943,
+  "max_drawdown": -0.2902030321634491,
+  "annualized_volatility_252": 0.47325138463885313,
+  "sharpe_rf0_252": -0.39511573633866165,
+  "actual_0940_classes_traded": {
+    "lt0": 49,
+    "ge3": 15,
+    "0to1": 13,
+    "1to3": 12
+  },
+  "candidate_sha256": "975cdfcf39d786bbdb5af920d52da02392bd341978b065dba36fb767bb727dc4",
+  "top1_sha256": "a6ff6bdcfac9cb37a096505dc985a6af5b6feb51c56653641daba1462195712f"
+}

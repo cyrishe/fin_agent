@@ -1,0 +1,5 @@
+segment,arm,0to1,1to3,ge3,lt0
+feb_jul,baseline7,17,15,17,64
+feb_jul,vwap8,11,18,16,70
+sep_oct,baseline7,4,7,3,8
+sep_oct,vwap8,5,4,2,11

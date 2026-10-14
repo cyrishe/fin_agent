@@ -1,0 +1,8 @@
+{
+  "within_version_ratio_vs_weight": {
+    "1.7.1": 52,
+    "1.9.1": 48
+  },
+  "across_version_unweighted": 88,
+  "across_version_weighted": 82
+}

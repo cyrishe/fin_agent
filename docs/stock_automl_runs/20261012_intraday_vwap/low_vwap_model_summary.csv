@@ -1,0 +1,5 @@
+segment,arm,picks,target_ge3,target_lt0,sale_ge3,sale_negative,mean_sale_pct
+feb_jul,baseline7,113,29,35,17,64,-0.25036643926251184
+sep_oct,baseline7,20,7,3,3,6,0.8798731460845092
+feb_jul,low_vwap8,114,26,41,17,61,-0.19547153429239236
+sep_oct,low_vwap8,20,4,4,3,10,0.333788148008313
