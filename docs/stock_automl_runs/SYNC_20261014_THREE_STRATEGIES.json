@@ -1,0 +1,71 @@
+{
+  "updated_at": "2026-10-14T20:55:32.203613+08:00",
+  "branch": "codex/stock-automl-strategies",
+  "source_commit": "7502142445627bec2164ec99583195bc2caa3326",
+  "origin_push_verified": true,
+  "total_bytes": 7438392913,
+  "cloud_upload_complete": false,
+  "blocker": "用户已授权开启扩展文件网址权限；浏览器工具禁止打开 chrome://extensions 设置页，等待用户手动开启 ChatGPT 扩展的允许访问文件网址。所有包均已完成本地逐文件哈希校验，尚未开始本轮新归档上传。",
+  "packages": [
+    {
+      "name": "D0涨停_D1开盘_R1至R14_20261014",
+      "path": "/Volumes/ext/fin_agent/outputs/stock_automl/submission_20261014_three_strategies/D0涨停_D1开盘_R1至R14_20261014.zip",
+      "cloud_directory": "策略训练/涨停冷静期_20261014",
+      "files": 3346,
+      "bytes": 667083997,
+      "sha256": "a8f7ca4917000b9682162ed67f6fa8e31ed22d5b8204952f14344e0a324e7ae1",
+      "source_commit": "7502142445627bec2164ec99583195bc2caa3326",
+      "local_verified": true,
+      "cloud_uploaded": false,
+      "cloud_readback_verified": false
+    },
+    {
+      "name": "D1盘末判定_C1430_ABCD_20261014",
+      "path": "/Volumes/ext/fin_agent/outputs/stock_automl/submission_20261014_three_strategies/D1盘末判定_C1430_ABCD_20261014.zip",
+      "cloud_directory": "策略训练/涨停冷静期_20261014",
+      "files": 959,
+      "bytes": 71147091,
+      "sha256": "2b8574155b5a999e0c30b791ea091a96fa1f6ce5ab42cb6ee1ec6d24b831d52f",
+      "source_commit": "7502142445627bec2164ec99583195bc2caa3326",
+      "local_verified": true,
+      "cloud_uploaded": false,
+      "cloud_readback_verified": false
+    },
+    {
+      "name": "收盘开盘_代码结论与可用模型_20261014",
+      "path": "/Volumes/ext/fin_agent/outputs/stock_automl/submission_20261014_three_strategies/收盘开盘_代码结论与可用模型_20261014.zip",
+      "cloud_directory": "策略训练/收盘开盘_20261014",
+      "files": 3045,
+      "bytes": 445330298,
+      "sha256": "15b0df982feb68e52e3271e72596d7fc356b105d631694813ced01bae33f81f9",
+      "source_commit": "7502142445627bec2164ec99583195bc2caa3326",
+      "local_verified": true,
+      "cloud_uploaded": false,
+      "cloud_readback_verified": false
+    },
+    {
+      "name": "共享分钟_2025未复权全年_20261014",
+      "path": "/Volumes/ext/fin_agent/outputs/stock_automl/submission_20261014_three_strategies/共享分钟_2025未复权全年_20261014.zip",
+      "cloud_directory": "策略训练/涨停冷静期_20261014",
+      "files": 247,
+      "bytes": 3828674774,
+      "sha256": "ed4ffa0f45e1cf25a4328537980f82584fe470302f82e7ece6367663d5ade64b",
+      "source_commit": "7502142445627bec2164ec99583195bc2caa3326",
+      "local_verified": true,
+      "cloud_uploaded": false,
+      "cloud_readback_verified": false
+    },
+    {
+      "name": "共享分钟_2026本地未复权_20261014",
+      "path": "/Volumes/ext/fin_agent/outputs/stock_automl/submission_20261014_three_strategies/共享分钟_2026本地未复权_20261014.zip",
+      "cloud_directory": "策略训练/涨停冷静期_20261014",
+      "files": 150,
+      "bytes": 2426156753,
+      "sha256": "ab2a74853a2d4b48e3feb4289f4aa4620838f972b3f2d727e9f268f1f8524054",
+      "source_commit": "7502142445627bec2164ec99583195bc2caa3326",
+      "local_verified": true,
+      "cloud_uploaded": false,
+      "cloud_readback_verified": false
+    }
+  ]
+}
