@@ -135,4 +135,6 @@ Fin Agent 的每个业务阶段默认采用：
 
 涉及 14:40 收盘—次晨 09:40 策略时，先读 `docs/stock_automl_runs/ACTIVE.md` 和 `docs/stock_automl_runs/EXPERIMENT_REGISTER.md`。用户未指定实验名而询问策略结果时，只返回登记的最佳历史基准；若询问当日新信号，先核查该运行是否复现基准，未通过则明确说没有可信的基准信号，不用中途实验结果代替。每次实验命名并登记数据区间、关键口径、核心结果和证据；其他实验只在用户点名或追溯差异时查阅。新训练或实时脚本未复现基准选股前，不得把它的名单或收益称为基准延续。
 
+每次开始该策略工作时还要读最新 `docs/stock_automl_runs/HANDOFF_YYYYMMDD.md`，运行 `.venv-automl/bin/python -m scripts.archive_automl_training audit --check-db` 核对本机训练包、数据库记录和云端待核验项。有价值的新训练按 `docs/stock_automl_runs/TRAINING_ASSET_ARCHIVE.md` 命名、归档并登记；云端未独立回读核验时不得标为已同步。
+
 形成可复现的基准、影响策略选择的对照证据，或将用于后续运行的训练时，按 `docs/stock_automl_runs/TRAINING_ASSET_ARCHIVE.md` 保存训练样本与完整运行材料到用户阿里云盘的 `策略训练/收盘开盘_20261014`。归档完成必须回读文件并核对哈希；仅有本地暂存时明确写“待同步”，不得称为云盘归档完成。
