@@ -166,7 +166,7 @@ Top1固定35%拦6笔，3笔大亏、2笔盈利，保留216笔；它在2025年没
 
 核验见 [audit.json](audit.json)：408个第一阶段模型、120个第二阶段模型包的日期和哈希检查通过；所有120个二阶段模型重开，验证及测试概率误差0；原2025/2026冻结预测逐项匹配。23项定向测试通过，未跑无关全仓库测试。第一阶段155,027行曾进入拟合，第二阶段1,752条独立折外候选曾进入拟合，逐折名单与权重全部保存。
 
-训练入口：[experiment_automl_close_open_conditional_b1.py](../../../scripts/experiment_automl_close_open_conditional_b1.py)；源提交与哈希见 [run_manifest.json](run_manifest.json)。数据、模型、逐日及逐月证据保留在 `outputs/stock_automl/close_open_conditional_b1_r1`。独立研究包生成后登记本地镜像与数据库；以archive_receipt.json记录最终文件数、哈希和ZIP回读。用户要求暂缓云盘上传，旧CO4/CO5/CO6包保持原样。
+训练入口：[experiment_automl_close_open_conditional_b1.py](../../../scripts/experiment_automl_close_open_conditional_b1.py)；源提交与哈希见 [run_manifest.json](run_manifest.json)。数据、模型、逐日及逐月证据保留在 `outputs/stock_automl/close_open_conditional_b1_r1`。CO7完整研究包已由阿里云盘客户端上传至 `策略训练/收盘开盘_20261014/02_联合目标与尾部风险/20261015_CO7_原B1折外TopK_二阶段风险`，从云端独立下载后，510,811,859字节ZIP的SHA-256与本地冻结包一致，包内清单对应3,444个文件；见[云端回读回执](archive_receipt.json)。CO4/CO5/CO6旧包保持原样，各自云端状态仍以各自回执为准。
 '''
     (REPORT/'README.md').write_text(text)
     cols={'model':'方案','month':'月份','trades':'保留交易数','nav_return_pct':'月净值收益百分数','max_drawdown_pct':'月内最大回撤百分数','critical_count':'剩余大亏数','blocked_critical':'拦住大亏数','blocked_profitable':'误拦盈利数','strong_pct':'次高强势命中百分数'}

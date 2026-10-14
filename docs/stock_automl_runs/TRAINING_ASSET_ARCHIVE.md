@@ -41,8 +41,8 @@
 
 压缩包全部文件回读通过；镜像位于 `02_联合目标与尾部风险/20261014_CO6_严重净亏_跨档惩罚`，数据库已登记且回读 `local_check=ok`。CO4/CO5旧包本机再次核验通过，未改动；三包云端核验均为空，没有上传。研究ZIP位于 `outputs/stock_automl/close_open_critical_risk_r1/CO6_严重净亏与跨档惩罚_20261014.zip`。结论是尚无可靠升级方案，不因资产登记而替换B1。见 [CO6归档回执](20261014_close_open_critical_risk/archive_receipt.json)。
 
-## 2026-10-15 本机新增 CO7（用户暂缓上传）
+## 2026-10-15 CO7 本机与云端均已核验
 
 `CO7_20261015_B1_conditional_risk` 保存原B1历史折外TopK条件风险实验：3,444个清单文件，408个基础模型＋120个风险模型包，155,027行实际基础拟合样本、1,752条实际折外风险拟合样本及逐折名单/权重。训练源提交 `2e92580`，报告与打包源提交 `28363f1`。ZIP为510,811,859字节，SHA-256 `274f5b41c7e7a1dfe53868cb4de6105e06fe1b155feef3b640777fa5f2b004ae`；清单SHA `ac013d7020087b14ca2cc6ed43ae4d87ceb2c9c7aa992db32243aadc57348570`。
 
-全部ZIP文件回读通过，镜像位于 `02_联合目标与尾部风险/20261015_CO7_原B1折外TopK_二阶段风险`；数据库登记后回读 `local_check=ok`。此前本机包再次核验并与开工前清单比对，哈希未变。云盘继续暂缓，`cloud_verified_at`为空。ZIP位于 `outputs/stock_automl/close_open_conditional_b1_r1/CO7_原B1折外TopK_二阶段风险_20261015.zip`，完整回执见 [CO7本地核验记录](20261015_close_open_conditional_b1/archive_receipt.json)。用户已将逐月删最好一笔改为辅助检验，但本轮仍未达到跨年多数月份盈利；没有生产替换。
+全部ZIP文件回读通过，镜像位于 `02_联合目标与尾部风险/20261015_CO7_原B1折外TopK_二阶段风险`；数据库登记后回读 `local_check=ok`。此前本机包再次核验并与开工前清单比对，哈希未变。用户随后告知阿里云盘桌面客户端已打开，CO7压缩包已上传到云端同名目录。客户端显示上传完成后，从云端重新下载到独立的 `cloud_readback` 目录，510,811,859字节与完整ZIP SHA-256均匹配；ZIP内SHA256SUMS也匹配原清单，因上传前逐文件核验，确认3,444个归档文件随包完整。数据库 `cloud_verified_at` 已按回读时间填写；其他实验包没有因此更改云端状态。ZIP位于 `outputs/stock_automl/close_open_conditional_b1_r1/CO7_原B1折外TopK_二阶段风险_20261015.zip`，完整回执见 [CO7云端回读记录](20261015_close_open_conditional_b1/archive_receipt.json)。用户已将逐月删最好一笔改为辅助检验，但本轮仍未达到跨年多数月份盈利；没有生产替换。

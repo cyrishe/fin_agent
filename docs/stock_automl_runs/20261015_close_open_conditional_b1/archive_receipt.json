@@ -11,7 +11,7 @@
   "stage2_training_rows": 1752,
   "model_bundles": 528,
   "zip_readback": "all_files_match",
-  "cloud_verified_at": null,
+  "cloud_verified_at": "2026-10-15T00:41:28.840334",
   "upload_note": "用户要求先保留本地包，稍后上传",
   "stage": {
     "user_id": "cyrcyrisis",
@@ -32,9 +32,22 @@
     "local_path": "/Users/cyrcyrisis/work/fin_agent/outputs/stock_automl/aliyun_drive_local/策略训练/收盘开盘_20261014/02_联合目标与尾部风险/20261015_CO7_原B1折外TopK_二阶段风险",
     "local_check": "ok",
     "cloud_path": "策略训练/收盘开盘_20261014/02_联合目标与尾部风险/20261015_CO7_原B1折外TopK_二阶段风险",
-    "cloud_verified_at": null
+    "cloud_verified_at": "2026-10-15T00:41:28.840334"
   },
   "all_local_packages_valid": true,
   "prior_packages_unchanged": true,
-  "verified_at": "2026-10-15T00:33:19.330354+08:00"
+  "verified_at": "2026-10-15T00:33:19.330354+08:00",
+  "cloud_readback": {
+    "verified_at": "2026-10-15T00:41:28.724665+08:00",
+    "database_cloud_verified_at": "2026-10-15T00:41:28.840334",
+    "cloud_path": "策略训练/收盘开盘_20261014/02_联合目标与尾部风险/20261015_CO7_原B1折外TopK_二阶段风险",
+    "cloud_zip_name": "CO7_原B1折外TopK_二阶段风险_20261015.zip",
+    "readback_path": "/Users/cyrcyrisis/work/fin_agent/outputs/stock_automl/close_open_conditional_b1_r1/cloud_readback/CO7_原B1折外TopK_二阶段风险_20261015.zip",
+    "readback_bytes": 510811859,
+    "readback_zip_sha256": "274f5b41c7e7a1dfe53868cb4de6105e06fe1b155feef3b640777fa5f2b004ae",
+    "package_manifest_sha256": "ac013d7020087b14ca2cc6ed43ae4d87ceb2c9c7aa992db32243aadc57348570",
+    "archived_files_in_zip": 3444,
+    "method": "阿里云盘桌面客户端上传，从云端重新下载到独立目录，比对完整ZIP哈希及内部清单哈希；包内逐文件哈希已于打包时验证"
+  },
+  "cloud_verified": true
 }
