@@ -1,0 +1,58 @@
+{
+  "stage1_folds": 408,
+  "stage1_candidate_scores": 147152,
+  "stage1_unique_fitting_rows": 155027,
+  "frozen_identity_checks": [
+    {
+      "source": "docs/stock_automl_runs/20261011_mk_2025_mar_aug_backtest/top2_verified.csv",
+      "top2_rows": 232,
+      "max_probability_error": 0.0
+    },
+    {
+      "source": "docs/stock_automl_runs/20261011_mk_2025_sep_oct_backtest/top2_verified.csv",
+      "top2_rows": 75,
+      "max_probability_error": 0.0
+    },
+    {
+      "source": "docs/stock_automl_runs/20261011_mk_1m_tradable_st_rolling20/top2_verified.csv",
+      "top2_rows": 224,
+      "max_probability_error": 9.71445146547012e-17
+    }
+  ],
+  "stage1_saved_model_replay": [
+    {
+      "day": "2025-11-20",
+      "rows": 150,
+      "max_error": 0.0
+    },
+    {
+      "day": "2026-06-30",
+      "rows": 721,
+      "max_error": 0.0
+    },
+    {
+      "day": "2026-10-13",
+      "rows": 282,
+      "max_error": 0.0
+    }
+  ],
+  "stage2_model_bundles_checked": 120,
+  "stage2_membership_rows_checked": 34677,
+  "stage2_unique_fitting_rows": 1752,
+  "stage2_all_validation_and_test_max_error": 0.0,
+  "B1_original_trades": 91,
+  "B1_original_unknown_gates_preserved": 4,
+  "test_days": 288,
+  "first_test": "2025-08-01",
+  "last_test": "2026-10-13",
+  "unknown_scheduled_exits": 0,
+  "corporate_action_executions": 0,
+  "dependencies": {
+    "scikit-learn": "1.7.1",
+    "numpy": "2.3.2",
+    "pandas": "2.3.2",
+    "scipy": "1.16.1",
+    "joblib": "1.5.1"
+  },
+  "targeted_tests_passed": 23
+}
