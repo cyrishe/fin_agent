@@ -30,3 +30,7 @@ Top1 成交额约为中位数的 **91.6%**，低于门槛；Top2 不递补。两
 ## 数据库归档
 
 14:40 自动任务已经把旧模型结果写入 `kingdomai.automl_strategy_selection`：`user_id=imac`、`strategy_id=rolling20_7f_hgb_dbapi_amount_v1`、训练 6,352 行、模型 SHA `022a907d…`，Top1 `603083`、Top2 `600601`，Top1 规则轮空。随后运行[单独归档脚本](../../../scripts/record_automl_1440_x6.py)将 X6 保存为 `strategy_id=x6_20261013_rolling20_7f_sklearn171_postfill`：训练 6,576 行、模型 SHA `addae01f…`，Top1 `603083`、Top2 `603629`，同样轮空。回读确认两套各有两条记录；原自动记录未覆盖。X6 表中 `quote_source=saved_1440_capture_replay`、`context_json.experiment=X6`、`baseline_reproduced=false`，可与原实时信号区分。两者都只是 10/13 的预测和轮空结果，次晨达标与 09:40 收益待 10/14 数据。
+
+## 训练资产副本
+
+按[归档约定](../TRAINING_ASSET_ARCHIVE.md)，已在 `outputs/stock_automl/cloud_archive_staging/20261013_X6_171_postfill/` 形成 14 个内容文件及 SHA256SUMS 校验清单的自包含训练包，含逐行训练样本、模型、全候选概率、决策和依赖；本地核验训练 SHA `28a7a26f…`、模型 SHA `addae01f…` 与运行清单一致。阿里云盘实际同步目录尚未定位，因此状态为**本地待同步**，不称云盘归档完成。
