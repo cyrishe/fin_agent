@@ -7,7 +7,7 @@ import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
-from scripts.build_automl_close_open_factor_panel import REPORT
+from scripts.build_automl_close_open_factor_panel import DATA, REPORT
 
 
 NAMES = {
@@ -71,6 +71,26 @@ def run():
     fig.tight_layout(rect=(0,.04,1,1))
     fig.savefig(REPORT/'monthly_factor_association.png',dpi=160)
     plt.close(fig)
+    # Amount / volume should lie inside the corresponding price range. This
+    # diagnoses source rounding/inconsistency, without filtering on outcomes.
+    panel = pd.read_csv(DATA/'factor_panel.csv.gz',float_precision='round_trip')
+    quality = []
+    for prefix in ('day','last5','last15','last30','last60'):
+        span = panel[f'{prefix}_range']*panel.preclose
+        low = panel.signal_price-panel[f'{prefix}_close_position']*span
+        high = low+span
+        vwap = panel.signal_price/(1+panel[f'{prefix}_vwap_distance'])
+        error = (low-vwap).clip(lower=0)+(vwap-high).clip(lower=0)
+        d = pd.DataFrame({'month':panel.signal_date.str[:7],'error':error,
+                          'relative_error':error/panel.signal_price})
+        for month,g in d.groupby('month'):
+            quality.append({'month':month,'window':prefix,'rows':len(g),
+                            'known':int(g.error.notna().sum()),
+                            'outside_by_over_one_cent':int(g.error.gt(.01000001).sum()),
+                            'outside_by_over_half_percent':int(g.relative_error.gt(.005).sum()),
+                            'relative_error_p99':g.relative_error.quantile(.99),
+                            'relative_error_max':g.relative_error.max()})
+    pd.DataFrame(quality).to_csv(REPORT/'vwap_source_quality_monthly.csv',index=False)
 
 
 if __name__ == '__main__':

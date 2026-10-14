@@ -1,0 +1,713 @@
+{
+  "signal_return": {
+    "direction": -1,
+    "numeric_cuts": [
+      0.033153430994603106,
+      0.03714085494043462,
+      0.04186952288218104,
+      0.04884065120868297
+    ]
+  },
+  "volume_ratio": {
+    "direction": -1,
+    "numeric_cuts": [
+      1.0054521511405334,
+      1.2587365886732782,
+      1.554999689609103,
+      2.042312310228559
+    ],
+    "representative": "relative_turnover5"
+  },
+  "turnover_so_far_pct": {
+    "direction": -1,
+    "numeric_cuts": [
+      1.9840015434624299,
+      3.2143422864299236,
+      4.957535802105569,
+      8.459918230754813
+    ],
+    "representative": "turnover_so_far_pct"
+  },
+  "float_mv_100m_cny": {
+    "direction": -1,
+    "numeric_cuts": [
+      20.57280233122875,
+      33.3851575952062,
+      53.69882253412969,
+      103.29592765050612
+    ]
+  },
+  "volume_4of5_increasing": {
+    "direction": -1,
+    "numeric_cuts": [
+      0.5
+    ]
+  },
+  "ma_bull_5_10_20": {
+    "direction": 1,
+    "numeric_cuts": [
+      0.5
+    ]
+  },
+  "all_intraday_lows_above_ma": {
+    "direction": -1,
+    "numeric_cuts": [
+      0.5
+    ]
+  },
+  "open_gap": {
+    "direction": 1,
+    "numeric_cuts": [
+      -0.004966887417218624,
+      0.0,
+      0.0043290043290042934,
+      0.012322274881516382
+    ],
+    "representative": "open_gap"
+  },
+  "from_open": {
+    "direction": -1,
+    "numeric_cuts": [
+      0.026143790849673332,
+      0.03375527426160341,
+      0.04035874439461873,
+      0.04948646125116718
+    ],
+    "representative": "from_open"
+  },
+  "lag_return": {
+    "direction": -1,
+    "numeric_cuts": [
+      -0.020050125313283207,
+      -0.004196642685851293,
+      0.007889546351084853,
+      0.024719101123595433
+    ]
+  },
+  "lag_close_position": {
+    "direction": -1,
+    "numeric_cuts": [
+      0.183179723502305,
+      0.40000000000000235,
+      0.6190476190476186,
+      0.8214285714285691
+    ],
+    "representative": "lag_close_position"
+  },
+  "lag_upper_shadow": {
+    "direction": 1,
+    "numeric_cuts": [
+      0.0034965034965034913,
+      0.007949125596184391,
+      0.012987012987012998,
+      0.021665538253216
+    ],
+    "representative": "lag_upper_shadow"
+  },
+  "prior5_return": {
+    "direction": -1,
+    "numeric_cuts": [
+      -0.06647398843930642,
+      -0.020467836257309854,
+      0.008329581269698225,
+      0.04795737122557714
+    ]
+  },
+  "prior10_return": {
+    "direction": -1,
+    "numeric_cuts": [
+      -0.10014104372355431,
+      -0.028649386084583676,
+      0.020307893874877008,
+      0.07676130389064158
+    ]
+  },
+  "prior20_return": {
+    "direction": -1,
+    "numeric_cuts": [
+      -0.14180078294910808,
+      -0.04768392370572176,
+      0.025193798449612458,
+      0.11032863849765225
+    ]
+  },
+  "prior5_volatility": {
+    "direction": -1,
+    "numeric_cuts": [
+      0.014458265982796809,
+      0.020540692627543662,
+      0.028742617235464545,
+      0.04428048195859539
+    ]
+  },
+  "prior20_volatility": {
+    "direction": -1,
+    "numeric_cuts": [
+      0.02101777591598469,
+      0.027987754936956922,
+      0.03503522779999136,
+      0.04660810812130232
+    ]
+  },
+  "prior5_range": {
+    "direction": 1,
+    "numeric_cuts": [
+      0.030163368180170357,
+      0.038315828029252465,
+      0.04818877877386281,
+      0.06253688235774342
+    ]
+  },
+  "prior5_contract_fraction": {
+    "direction": 1,
+    "numeric_cuts": [
+      0.4,
+      0.6
+    ]
+  },
+  "relative_turnover5": {
+    "direction": -1,
+    "numeric_cuts": [
+      0.9210647411574365,
+      1.1529889540297398,
+      1.4241310507174552,
+      1.8701474366612927
+    ],
+    "representative": "relative_turnover5"
+  },
+  "relative_turnover20": {
+    "direction": -1,
+    "numeric_cuts": [
+      0.825146300630978,
+      1.0873696886785433,
+      1.393496576060092,
+      1.9361196884087233
+    ],
+    "representative": "relative_turnover20"
+  },
+  "distance_ma5": {
+    "direction": -1,
+    "numeric_cuts": [
+      0.007920792079207706,
+      0.029074215761285327,
+      0.04507888805409466,
+      0.06625312760633828
+    ]
+  },
+  "distance_ma20": {
+    "direction": -1,
+    "numeric_cuts": [
+      -0.04100483623278084,
+      0.017271430835049673,
+      0.05490530969005869,
+      0.09971634300676424
+    ]
+  },
+  "ma5_over_ma10": {
+    "direction": -1,
+    "numeric_cuts": [
+      -0.025460045374338547,
+      -0.007789095266626522,
+      0.004272253760168265,
+      0.019445051343674802
+    ]
+  },
+  "ma10_over_ma20": {
+    "direction": 1,
+    "numeric_cuts": [
+      -0.03959472070390602,
+      -0.009202986629623378,
+      0.009158115414322321,
+      0.030099941211052084
+    ]
+  },
+  "day_range": {
+    "direction": -1,
+    "numeric_cuts": [
+      0.04434447300771216,
+      0.05433245808927499,
+      0.06581740976645427,
+      0.08380520951302381
+    ],
+    "representative": "day_range"
+  },
+  "day_efficiency": {
+    "direction": -1,
+    "numeric_cuts": [
+      0.06931121842821446,
+      0.09700204344537226,
+      0.11977372465638672,
+      0.14704925390160406
+    ]
+  },
+  "day_realized_vol": {
+    "direction": -1,
+    "numeric_cuts": [
+      0.02664902406024349,
+      0.032851377498236814,
+      0.04000554532640679,
+      0.05181640087526119
+    ],
+    "representative": "day_realized_vol"
+  },
+  "day_close_position": {
+    "direction": 1,
+    "numeric_cuts": [
+      0.5925925925925931,
+      0.7222222222222234,
+      0.8181818181818178,
+      0.9032258064516149
+    ]
+  },
+  "day_up_volume_fraction": {
+    "direction": 1,
+    "numeric_cuts": [
+      0.4508005868285697,
+      0.4956208695373988,
+      0.5304516670274951,
+      0.567845508580463
+    ],
+    "representative": "day_up_volume_fraction"
+  },
+  "day_vwap_distance": {
+    "direction": -1,
+    "numeric_cuts": [
+      0.0010603123096333267,
+      0.007081588509025627,
+      0.011443828295397696,
+      0.01697733840656457
+    ],
+    "representative": "day_vwap_distance"
+  },
+  "day_volume_acceleration": {
+    "direction": 1,
+    "numeric_cuts": [
+      -0.6985602666871258,
+      -0.572751239499848,
+      -0.4021618695449397,
+      -0.09810889706815584
+    ]
+  },
+  "day_max_drawdown": {
+    "direction": 1,
+    "numeric_cuts": [
+      -0.03748326639892896,
+      -0.025380710659898553,
+      -0.018680539134547147,
+      -0.013174019607843146
+    ],
+    "representative": "day_max_drawdown"
+  },
+  "day_high_age": {
+    "direction": 1,
+    "numeric_cuts": [
+      0.09090909090909091,
+      0.2863636363636364,
+      0.4954545454545455,
+      0.8
+    ]
+  },
+  "day_low_age": {
+    "direction": 1,
+    "numeric_cuts": [
+      0.9590909090909091,
+      0.990909090909091,
+      0.9954545454545455
+    ]
+  },
+  "day_volume_hhi": {
+    "direction": -1,
+    "numeric_cuts": [
+      0.010464913725611709,
+      0.012508876500768923,
+      0.01501048962838619,
+      0.019321235932307668
+    ],
+    "representative": "day_volume_hhi"
+  },
+  "day_up_fraction": {
+    "direction": 1,
+    "numeric_cuts": [
+      0.31363636363636366,
+      0.36818181818181817,
+      0.4090909090909091,
+      0.45
+    ]
+  },
+  "morning_return": {
+    "direction": 1,
+    "numeric_cuts": [
+      0.013096351730589317,
+      0.0240452616690241,
+      0.03279272856888271,
+      0.043740573152337925
+    ]
+  },
+  "afternoon_return": {
+    "direction": -1,
+    "numeric_cuts": [
+      -0.004886988393402625,
+      0.0022346368715084886,
+      0.00920245398773023,
+      0.02042341220423416
+    ],
+    "representative": "afternoon_return"
+  },
+  "afternoon_volume_fraction": {
+    "direction": 1,
+    "numeric_cuts": [
+      0.21018406668803225,
+      0.27189191772916055,
+      0.3422177317240641,
+      0.4405830661784168
+    ]
+  },
+  "last5_return": {
+    "direction": -1,
+    "numeric_cuts": [
+      -0.0020000000000000018,
+      -0.00039354584809137005,
+      0.0004466778336125188,
+      0.0021082220660575413
+    ],
+    "representative": "last5_return"
+  },
+  "last5_range": {
+    "direction": -1,
+    "numeric_cuts": [
+      0.002100840336134443,
+      0.003078501795792831,
+      0.004206098843322915,
+      0.006060606060606067
+    ],
+    "representative": "last5_range"
+  },
+  "last5_efficiency": {
+    "direction": -1,
+    "numeric_cuts": [
+      -0.49977456036115764,
+      -0.09964800732255912,
+      0.11101321594067662,
+      0.46644829954879097
+    ],
+    "representative": "last5_return"
+  },
+  "last5_realized_vol": {
+    "direction": -1,
+    "numeric_cuts": [
+      0.0015129173312771168,
+      0.0022337236385425933,
+      0.003074337809759253,
+      0.004471535987238388
+    ],
+    "representative": "last5_realized_vol"
+  },
+  "last5_close_position": {
+    "direction": -1,
+    "numeric_cuts": [
+      0.0,
+      0.3999999999999858,
+      0.6666666666666617,
+      1.0
+    ],
+    "representative": "last5_close_position"
+  },
+  "last5_up_volume_fraction": {
+    "direction": -1,
+    "numeric_cuts": [
+      0.12675897843861875,
+      0.2762901487369907,
+      0.4322804191620845,
+      0.6170757146945655
+    ]
+  },
+  "last5_volume_fraction": {
+    "direction": -1,
+    "numeric_cuts": [
+      0.009330876057523472,
+      0.012745233681064777,
+      0.01686366662404825,
+      0.024088466987639546
+    ]
+  },
+  "last5_vwap_distance": {
+    "direction": -1,
+    "numeric_cuts": [
+      -0.0011683440208285932,
+      -0.0002785609827625545,
+      0.00038090244149069363,
+      0.0013548589350780293
+    ],
+    "representative": "last5_vwap_distance"
+  },
+  "last5_volume_acceleration": {
+    "direction": 1,
+    "numeric_cuts": [
+      -0.40079508492952653,
+      -0.11018518518518516,
+      0.2251308900523561,
+      0.8288431061806656
+    ]
+  },
+  "last15_return": {
+    "direction": -1,
+    "numeric_cuts": [
+      -0.0032297133629389796,
+      -0.0007052186177715081,
+      0.0011547344110853786,
+      0.004027386226339136
+    ],
+    "representative": "last15_return"
+  },
+  "last15_range": {
+    "direction": -1,
+    "numeric_cuts": [
+      0.004076086956521733,
+      0.005714285714285796,
+      0.0076103500761034735,
+      0.010826771653543251
+    ],
+    "representative": "last15_range"
+  },
+  "last15_efficiency": {
+    "direction": -1,
+    "numeric_cuts": [
+      -0.23061276411026638,
+      -0.058690382048864384,
+      0.09090909090909091,
+      0.2665612152814466
+    ],
+    "representative": "last15_return"
+  },
+  "last15_realized_vol": {
+    "direction": -1,
+    "numeric_cuts": [
+      0.003310299805122861,
+      0.004452924130218043,
+      0.005785409446264903,
+      0.008082752279466456
+    ],
+    "representative": "last15_realized_vol"
+  },
+  "last15_close_position": {
+    "direction": -1,
+    "numeric_cuts": [
+      0.1999999999999716,
+      0.42857142857134156,
+      0.6097560975609736,
+      0.8333333333333334
+    ],
+    "representative": "last15_close_position"
+  },
+  "last15_up_volume_fraction": {
+    "direction": -1,
+    "numeric_cuts": [
+      0.23195876288659795,
+      0.3408204937813254,
+      0.441834451901566,
+      0.5615069373296057
+    ]
+  },
+  "last15_volume_fraction": {
+    "direction": -1,
+    "numeric_cuts": [
+      0.029159323430454784,
+      0.037723773410013484,
+      0.04810686208735442,
+      0.06683687813425565
+    ]
+  },
+  "last15_vwap_distance": {
+    "direction": -1,
+    "numeric_cuts": [
+      -0.0017246642132343615,
+      -0.0004413658235163931,
+      0.000528869100596463,
+      0.0018088709304846518
+    ],
+    "representative": "last15_vwap_distance"
+  },
+  "last15_volume_acceleration": {
+    "direction": -1,
+    "numeric_cuts": [
+      -0.2536212446351931,
+      0.022520134515700674,
+      0.3135014602573212,
+      0.79616060961313
+    ]
+  },
+  "last30_return": {
+    "direction": -1,
+    "numeric_cuts": [
+      -0.003684598378776771,
+      -0.00022598870056489417,
+      0.0022321428571427937,
+      0.006337558372248253
+    ],
+    "representative": "last30_return"
+  },
+  "last30_range": {
+    "direction": -1,
+    "numeric_cuts": [
+      0.005882352941176494,
+      0.008177570093457976,
+      0.0109321058688146,
+      0.015814443858724152
+    ],
+    "representative": "last30_range"
+  },
+  "last30_efficiency": {
+    "direction": -1,
+    "numeric_cuts": [
+      -0.13335088485309884,
+      -0.008190520194877227,
+      0.07985361895282932,
+      0.19998073454349816
+    ],
+    "representative": "last30_return"
+  },
+  "last30_realized_vol": {
+    "direction": -1,
+    "numeric_cuts": [
+      0.005079244323963059,
+      0.006642799865122773,
+      0.00845993804509761,
+      0.01177084293375813
+    ],
+    "representative": "last60_realized_vol"
+  },
+  "last30_close_position": {
+    "direction": -1,
+    "numeric_cuts": [
+      0.22727272727271552,
+      0.44000000000001194,
+      0.6250000000000083,
+      0.8181818181818211
+    ],
+    "representative": "last30_close_position"
+  },
+  "last30_up_volume_fraction": {
+    "direction": 1,
+    "numeric_cuts": [
+      0.2778840314349682,
+      0.369167205965334,
+      0.4507206247992481,
+      0.5445729866017767
+    ]
+  },
+  "last30_volume_fraction": {
+    "direction": 1,
+    "numeric_cuts": [
+      0.055059046508237355,
+      0.07065770981342755,
+      0.09048903900645974,
+      0.12610754512848307
+    ]
+  },
+  "last30_vwap_distance": {
+    "direction": -1,
+    "numeric_cuts": [
+      -0.0022659457519126347,
+      -0.0005391591161127973,
+      0.0007739314655175189,
+      0.002604582529791788
+    ],
+    "representative": "last30_vwap_distance"
+  },
+  "last30_volume_acceleration": {
+    "direction": -1,
+    "numeric_cuts": [
+      -0.18871940404398724,
+      0.08831521739130421,
+      0.37749569406276806,
+      0.841717791411043
+    ]
+  },
+  "last60_return": {
+    "direction": -1,
+    "numeric_cuts": [
+      -0.0036250647332988217,
+      0.0005047955577992536,
+      0.004344963791968359,
+      0.010486577181208157
+    ],
+    "representative": "last60_return"
+  },
+  "last60_range": {
+    "direction": -1,
+    "numeric_cuts": [
+      0.009174311926605444,
+      0.01241534988713312,
+      0.01666666666666668,
+      0.024371069182389973
+    ],
+    "representative": "last60_range"
+  },
+  "last60_efficiency": {
+    "direction": -1,
+    "numeric_cuts": [
+      -0.06179784179318482,
+      0.008719163624949237,
+      0.07147695075914132,
+      0.15066785739723584
+    ],
+    "representative": "last60_return"
+  },
+  "last60_realized_vol": {
+    "direction": -1,
+    "numeric_cuts": [
+      0.008094477795617045,
+      0.010374264409726799,
+      0.013177363799730928,
+      0.017980784988714756
+    ],
+    "representative": "last60_realized_vol"
+  },
+  "last60_close_position": {
+    "direction": -1,
+    "numeric_cuts": [
+      0.2727272727272683,
+      0.4999999999999889,
+      0.6666666666666666,
+      0.8260869565217355
+    ],
+    "representative": "last60_close_position"
+  },
+  "last60_up_volume_fraction": {
+    "direction": 1,
+    "numeric_cuts": [
+      0.3212062019289464,
+      0.3979378985636808,
+      0.4645990916809601,
+      0.5396156485929993
+    ]
+  },
+  "last60_volume_fraction": {
+    "direction": -1,
+    "numeric_cuts": [
+      0.11223856257044722,
+      0.14446727133893975,
+      0.18535266105234624,
+      0.2524918924155555
+    ]
+  },
+  "last60_vwap_distance": {
+    "direction": -1,
+    "numeric_cuts": [
+      -0.002635865837026241,
+      -0.00024736593313123834,
+      0.0016495569021228729,
+      0.004302825242423092
+    ],
+    "representative": "last60_close_position"
+  },
+  "last60_volume_acceleration": {
+    "direction": -1,
+    "numeric_cuts": [
+      -0.28762857714628776,
+      -0.05606418121755541,
+      0.1875424966281365,
+      0.60425679356534
+    ]
+  }
+}
