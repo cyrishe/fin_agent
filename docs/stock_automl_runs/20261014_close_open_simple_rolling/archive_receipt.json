@@ -1,0 +1,37 @@
+{
+  "source_package": "/Users/cyrcyrisis/work/fin_agent/outputs/stock_automl/close_open_simple_rolling_r1/package",
+  "zip_path": "/Users/cyrcyrisis/work/fin_agent/outputs/stock_automl/close_open_simple_rolling_r1/CO5_简单模型滚动_76因子_20261014.zip",
+  "zip_bytes": 335976044,
+  "zip_sha256": "7323809aea1acb7569d47dc11784789424dc8398d8e0ad49aa3a6988c4854a3e",
+  "manifest_sha256": "3fec1be63ed762f255086f4e60d0851f270f45f27509e75e132c2d88e998a34d",
+  "files": 1883,
+  "source_commit": "1138f380b87b573601dfeceec057231e5c27d178",
+  "training_rows": 148782,
+  "models": 814,
+  "zip_readback": "all_files_match",
+  "cloud_verified_at": null,
+  "upload_note": "用户要求先保留本地包，稍后上传",
+  "registration": {
+    "user_id": "cyrcyrisis",
+    "experiment_id": "CO5_20261014_simple_rolling76",
+    "experiment_date": "2026-10-14",
+    "title": "CO5 收盘开盘76因子简单模型滚动与原1.7.1七因子对照",
+    "category_path": "03_因子筛选_7至14",
+    "local_path": "/Users/cyrcyrisis/work/fin_agent/outputs/stock_automl/aliyun_drive_local/策略训练/收盘开盘_20261014/03_因子筛选_7至14/20261014_CO5_76因子_简单模型滚动",
+    "cloud_path": "策略训练/收盘开盘_20261014/03_因子筛选_7至14/20261014_CO5_76因子_简单模型滚动",
+    "source_commit": "1138f380b87b573601dfeceec057231e5c27d178",
+    "manifest_sha256": "3fec1be63ed762f255086f4e60d0851f270f45f27509e75e132c2d88e998a34d",
+    "file_count": 1883,
+    "db_recorded": true,
+    "cloud_verified": false
+  },
+  "final_database_audit": {
+    "experiment_id": "CO5_20261014_simple_rolling76",
+    "local_path": "/Users/cyrcyrisis/work/fin_agent/outputs/stock_automl/aliyun_drive_local/策略训练/收盘开盘_20261014/03_因子筛选_7至14/20261014_CO5_76因子_简单模型滚动",
+    "local_check": "ok",
+    "cloud_path": "策略训练/收盘开盘_20261014/03_因子筛选_7至14/20261014_CO5_76因子_简单模型滚动",
+    "cloud_verified_at": null
+  },
+  "all_saved_model_membership_and_weights_checked": 814,
+  "distinct_final_fit_lists": 327
+}
