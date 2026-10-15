@@ -1,0 +1,49 @@
+{
+  "source_package": "/Users/cyrcyrisis/work/fin_agent/outputs/stock_automl/close_open_critical_risk_r1/package",
+  "zip_path": "/Users/cyrcyrisis/work/fin_agent/outputs/stock_automl/close_open_critical_risk_r1/CO6_严重净亏与跨档惩罚_20261014.zip",
+  "zip_bytes": 283834379,
+  "zip_sha256": "dc38170aa1783c8ebb29cfad7a54da5aa5b77496dd20f5d8fad7a77740b10c29",
+  "manifest_sha256": "228a904066f938ec0f0cd11d1443cefb3ceb95c31e858664b73a3ace888d715f",
+  "files": 932,
+  "source_commit": "4c459aa636cbd4a6bcc54e329180101776eb3dd5",
+  "training_source_commit": "ae248e678e7276be563ebf9060c88f62b985ed33",
+  "training_rows": 147968,
+  "model_bundles": 160,
+  "estimators": 448,
+  "zip_readback": "all_files_match",
+  "cloud_verified_at": "2026-10-15T00:47:23.095274",
+  "stage": {
+    "user_id": "cyrcyrisis",
+    "experiment_id": "CO6_20261014_critical_net_loss",
+    "experiment_date": "2026-10-14",
+    "title": "CO6 实际净亏2%风险过滤与五分类跨档惩罚",
+    "category_path": "02_联合目标与尾部风险",
+    "local_path": "/Users/cyrcyrisis/work/fin_agent/outputs/stock_automl/aliyun_drive_local/策略训练/收盘开盘_20261014/02_联合目标与尾部风险/20261014_CO6_严重净亏_跨档惩罚",
+    "cloud_path": "策略训练/收盘开盘_20261014/02_联合目标与尾部风险/20261014_CO6_严重净亏_跨档惩罚",
+    "source_commit": "4c459aa636cbd4a6bcc54e329180101776eb3dd5",
+    "manifest_sha256": "228a904066f938ec0f0cd11d1443cefb3ceb95c31e858664b73a3ace888d715f",
+    "file_count": 932,
+    "db_recorded": true,
+    "cloud_verified": false
+  },
+  "database_readback": {
+    "experiment_id": "CO6_20261014_critical_net_loss",
+    "local_path": "/Users/cyrcyrisis/work/fin_agent/outputs/stock_automl/aliyun_drive_local/策略训练/收盘开盘_20261014/02_联合目标与尾部风险/20261014_CO6_严重净亏_跨档惩罚",
+    "local_check": "ok",
+    "cloud_path": "策略训练/收盘开盘_20261014/02_联合目标与尾部风险/20261014_CO6_严重净亏_跨档惩罚",
+    "cloud_verified_at": "2026-10-15T00:47:23.095274"
+  },
+  "all_local_packages_valid": true,
+  "verified_at": "2026-10-15T00:00:47.379077+08:00",
+  "cloud_verified": true,
+  "cloud_uploaded": true,
+  "cloud_readback": {
+    "method": "阿里云盘桌面客户端独立下载后本地核验",
+    "path": "/Users/cyrcyrisis/work/fin_agent/outputs/stock_automl/close_open_critical_risk_r1/cloud_readback/CO6_严重净亏与跨档惩罚_20261014.zip",
+    "bytes": 283834379,
+    "zip_sha256": "dc38170aa1783c8ebb29cfad7a54da5aa5b77496dd20f5d8fad7a77740b10c29",
+    "manifest_sha256": "228a904066f938ec0f0cd11d1443cefb3ceb95c31e858664b73a3ace888d715f",
+    "zip_entries": 933,
+    "contained_files": 932
+  }
+}

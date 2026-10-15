@@ -1,0 +1,24 @@
+{
+  "completed_month_folds": 16,
+  "model_hashes_and_chronology_checked": 814,
+  "candidate_score_rows": 1590484,
+  "representative_saved_score_reproduction": [
+    {
+      "model": "logit_broad76",
+      "rows": 1099,
+      "max_score_error": 0.0
+    },
+    {
+      "model": "tree171_seven7_samepool",
+      "rows": 283,
+      "max_score_error": 0.0
+    }
+  ],
+  "original_B1_days": 118,
+  "original_B1_selected": 115,
+  "original_B1_gate_passes": 91,
+  "original_B1_known_gates_match": 111,
+  "original_B1_unknown_gates_match": 4,
+  "selected_rows_gate_unknown": 107,
+  "amount_vwap_reconstruction_max_relative_error": 4.440892098500626e-16
+}

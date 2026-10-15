@@ -1,0 +1,50 @@
+{
+  "folds": 16,
+  "saved_model_bundles_checked": 160,
+  "estimators_checked": 448,
+  "memberships_checked": 48,
+  "unique_fitting_rows": 147968,
+  "candidate_prediction_rows": 681636,
+  "candidate_risk_rows": 113606,
+  "representative_prediction_reproduction": [
+    {
+      "kind": "risk_binary",
+      "rows": 1099,
+      "max_probability_error": 0.0
+    },
+    {
+      "kind": "nominal",
+      "rows": 1099,
+      "max_probability_error": 0.0
+    },
+    {
+      "kind": "ordinal",
+      "rows": 1099,
+      "max_probability_error": 0.0
+    },
+    {
+      "kind": "ordinal_critical",
+      "rows": 1099,
+      "max_probability_error": 0.0
+    },
+    {
+      "kind": "ordinal_critical_fuzzy",
+      "rows": 1099,
+      "max_probability_error": 0.0
+    }
+  ],
+  "B1_frozen_days": 118,
+  "B1_selected": 115,
+  "B1_trades": 91,
+  "B1_unknown_gates": 4,
+  "python": "3.13.5",
+  "dependencies": {
+    "numpy": "2.3.2",
+    "pandas": "2.3.2",
+    "scikit-learn": "1.7.1",
+    "scipy": "1.16.1",
+    "joblib": "1.5.1",
+    "threadpoolctl": "3.6.0"
+  },
+  "training_script_matches_manifest": true
+}

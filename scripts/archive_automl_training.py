@@ -199,12 +199,16 @@ def main() -> None:
         prepare_local_root(args.root)
         print(json.dumps({"local_root": str(args.root), "categories": CATEGORIES}, ensure_ascii=False))
     elif args.command == "audit":
-        handoffs = sorted((ROOT / "docs/stock_automl_runs").glob("HANDOFF_*.md"))
+        handoff_dir = ROOT / "docs/stock_automl_runs"
+        handoffs = sorted(handoff_dir.glob("HANDOFF_????????.md"))
+        latest = handoffs[-1] if handoffs else None
+        related = sorted(handoff_dir.glob(f"{latest.stem}_*.md")) if latest else []
         packages = audit_local(args.root)
         result = {"branch": subprocess.check_output(
             ["git", "branch", "--show-current"], cwd=ROOT, text=True).strip(),
             "read_first": [str(ROOT / "docs/stock_automl_runs/ACTIVE.md"),
-                           str(handoffs[-1]) if handoffs else None,
+                           str(latest) if latest else None,
+                           *[str(path) for path in related],
                            str(ROOT / "docs/stock_automl_runs/EXPERIMENT_REGISTER.md")],
             "local_root": str(args.root), "packages": packages}
         if args.check_db:

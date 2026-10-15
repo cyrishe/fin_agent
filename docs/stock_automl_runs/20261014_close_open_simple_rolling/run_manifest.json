@@ -1,0 +1,29 @@
+{
+  "panel": "outputs/stock_automl/close_open_factor_discovery_r1/factor_panel.csv.gz",
+  "panel_sha256": "692b84cc7b36f64dacff4f5b45f0a07e1f3d162c42d7a37c685964a8b2020bcc",
+  "sklearn": "1.7.1",
+  "python": "Python 3.13.5",
+  "source_commit": "5f830a6d270a6618925ebc26bf8865ca822d25bd",
+  "design_sha256": "9e35cca62be2591ace54a2e373172c64453b03c0e0f41595d281ec167dc97912",
+  "code_sha256": "7bb39283dc436f62be9cffa2180457d2f473eb86929ce346e4197e78026e7d85",
+  "test_months": [
+    "2025-07",
+    "2025-08",
+    "2025-09",
+    "2025-10",
+    "2025-11",
+    "2025-12",
+    "2026-01",
+    "2026-02",
+    "2026-03",
+    "2026-04",
+    "2026-05",
+    "2026-06",
+    "2026-07",
+    "2026-08",
+    "2026-09",
+    "2026-10"
+  ],
+  "source_rows": 155811,
+  "predicted_months": 16
+}

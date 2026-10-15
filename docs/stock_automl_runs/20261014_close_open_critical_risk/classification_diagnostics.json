@@ -1,0 +1,6882 @@
+[
+  {
+    "month": "2025-07",
+    "scope": "validation",
+    "kind": "risk_binary",
+    "rows": 6199,
+    "critical_rate": 0.16860599347604774,
+    "mean_risk_score": 0.1877584583214528,
+    "critical_auc": 0.7688907864310149,
+    "critical_brier": 0.12067662817733649,
+    "critical_logloss": 0.3906293115412751
+  },
+  {
+    "month": "2025-07",
+    "scope": "test",
+    "kind": "risk_binary",
+    "rows": 5727,
+    "critical_rate": 0.15453031789771002,
+    "mean_risk_score": 0.1780321511075123,
+    "critical_auc": 0.7272542682991063,
+    "critical_brier": 0.11950418584624163,
+    "critical_logloss": 0.39023091060802395
+  },
+  {
+    "month": "2025-07",
+    "scope": "validation",
+    "kind": "nominal",
+    "rows": 6199,
+    "critical_rate": 0.16860599347604774,
+    "mean_risk_score": 0.186606490674041,
+    "critical_auc": 0.772353227760123,
+    "critical_brier": 0.12019779767931997,
+    "critical_logloss": 0.3888824821507437,
+    "confusion": [
+      [
+        266,
+        545,
+        0,
+        1,
+        3
+      ],
+      [
+        150,
+        2622,
+        0,
+        2,
+        5
+      ],
+      [
+        42,
+        1270,
+        0,
+        0,
+        0
+      ],
+      [
+        58,
+        848,
+        0,
+        1,
+        0
+      ],
+      [
+        65,
+        317,
+        0,
+        1,
+        3
+      ]
+    ],
+    "critical_as_acceptable_or_strong": 4,
+    "critical_count": 815,
+    "mean_overoptimistic_cost": 0.8655702544100929
+  },
+  {
+    "month": "2025-07",
+    "scope": "test",
+    "kind": "nominal",
+    "rows": 5727,
+    "critical_rate": 0.15453031789771002,
+    "mean_risk_score": 0.17747139628221448,
+    "critical_auc": 0.7303406028309234,
+    "critical_brier": 0.11921915502956598,
+    "critical_logloss": 0.38893578891567454,
+    "confusion": [
+      [
+        223,
+        617,
+        0,
+        1,
+        0
+      ],
+      [
+        159,
+        2537,
+        0,
+        3,
+        1
+      ],
+      [
+        50,
+        926,
+        0,
+        3,
+        1
+      ],
+      [
+        63,
+        711,
+        0,
+        2,
+        0
+      ],
+      [
+        68,
+        360,
+        0,
+        0,
+        2
+      ]
+    ],
+    "critical_as_acceptable_or_strong": 1,
+    "critical_count": 841,
+    "mean_overoptimistic_cost": 0.8757369183373601
+  },
+  {
+    "month": "2025-07",
+    "scope": "validation",
+    "kind": "ordinal",
+    "rows": 6199,
+    "critical_rate": 0.16860599347604774,
+    "mean_risk_score": 0.18775848166955256,
+    "critical_auc": 0.7688907864310149,
+    "critical_brier": 0.12067663050993356,
+    "critical_logloss": 0.3906293171813267,
+    "confusion": [
+      [
+        250,
+        562,
+        0,
+        1,
+        2
+      ],
+      [
+        146,
+        2630,
+        0,
+        2,
+        1
+      ],
+      [
+        39,
+        1272,
+        0,
+        1,
+        0
+      ],
+      [
+        54,
+        852,
+        0,
+        1,
+        0
+      ],
+      [
+        62,
+        321,
+        0,
+        2,
+        1
+      ]
+    ],
+    "critical_as_acceptable_or_strong": 3,
+    "critical_count": 815,
+    "mean_overoptimistic_cost": 0.8573990770637983
+  },
+  {
+    "month": "2025-07",
+    "scope": "test",
+    "kind": "ordinal",
+    "rows": 5727,
+    "critical_rate": 0.15453031789771002,
+    "mean_risk_score": 0.17803219836801126,
+    "critical_auc": 0.7272538331215146,
+    "critical_brier": 0.11950418739673375,
+    "critical_logloss": 0.39023092137101767,
+    "confusion": [
+      [
+        213,
+        628,
+        0,
+        0,
+        0
+      ],
+      [
+        147,
+        2550,
+        0,
+        3,
+        0
+      ],
+      [
+        48,
+        929,
+        0,
+        2,
+        1
+      ],
+      [
+        54,
+        721,
+        0,
+        1,
+        0
+      ],
+      [
+        59,
+        369,
+        0,
+        0,
+        2
+      ]
+    ],
+    "critical_as_acceptable_or_strong": 0,
+    "critical_count": 841,
+    "mean_overoptimistic_cost": 0.8653887208213803
+  },
+  {
+    "month": "2025-07",
+    "scope": "validation",
+    "kind": "ordinal_critical",
+    "rows": 6199,
+    "critical_rate": 0.16860599347604774,
+    "mean_risk_score": 0.37663702037740754,
+    "critical_auc": 0.7679273567902094,
+    "critical_brier": 0.1651853555528816,
+    "critical_logloss": 0.5091718061276297,
+    "confusion": [
+      [
+        620,
+        195,
+        0,
+        0,
+        0
+      ],
+      [
+        919,
+        1859,
+        0,
+        1,
+        0
+      ],
+      [
+        279,
+        1032,
+        0,
+        1,
+        0
+      ],
+      [
+        282,
+        625,
+        0,
+        0,
+        0
+      ],
+      [
+        206,
+        180,
+        0,
+        0,
+        0
+      ]
+    ],
+    "critical_as_acceptable_or_strong": 0,
+    "critical_count": 815,
+    "mean_overoptimistic_cost": 1.0191004354115059
+  },
+  {
+    "month": "2025-07",
+    "scope": "test",
+    "kind": "ordinal_critical",
+    "rows": 5727,
+    "critical_rate": 0.15453031789771002,
+    "mean_risk_score": 0.3645321874287989,
+    "critical_auc": 0.7275183205891512,
+    "critical_brier": 0.1663818721494093,
+    "critical_logloss": 0.5122923069726727,
+    "confusion": [
+      [
+        596,
+        245,
+        0,
+        0,
+        0
+      ],
+      [
+        870,
+        1830,
+        0,
+        0,
+        0
+      ],
+      [
+        277,
+        703,
+        0,
+        0,
+        0
+      ],
+      [
+        279,
+        497,
+        0,
+        0,
+        0
+      ],
+      [
+        231,
+        199,
+        0,
+        0,
+        0
+      ]
+    ],
+    "critical_as_acceptable_or_strong": 0,
+    "critical_count": 841,
+    "mean_overoptimistic_cost": 1.0504555376913378
+  },
+  {
+    "month": "2025-07",
+    "scope": "validation",
+    "kind": "ordinal_critical_fuzzy",
+    "rows": 6199,
+    "critical_rate": 0.16860599347604774,
+    "mean_risk_score": 0.37663702037740754,
+    "critical_auc": 0.7679273567902094,
+    "critical_brier": 0.1651853555528816,
+    "critical_logloss": 0.5091718061276297,
+    "confusion": [
+      [
+        620,
+        195,
+        0,
+        0,
+        0
+      ],
+      [
+        917,
+        1861,
+        0,
+        1,
+        0
+      ],
+      [
+        278,
+        1033,
+        0,
+        1,
+        0
+      ],
+      [
+        282,
+        625,
+        0,
+        0,
+        0
+      ],
+      [
+        207,
+        179,
+        0,
+        0,
+        0
+      ]
+    ],
+    "critical_as_acceptable_or_strong": 0,
+    "critical_count": 815,
+    "mean_overoptimistic_cost": 1.018868718079291
+  },
+  {
+    "month": "2025-07",
+    "scope": "test",
+    "kind": "ordinal_critical_fuzzy",
+    "rows": 5727,
+    "critical_rate": 0.15453031789771002,
+    "mean_risk_score": 0.3645321874287989,
+    "critical_auc": 0.7275183205891512,
+    "critical_brier": 0.1663818721494093,
+    "critical_logloss": 0.5122923069726727,
+    "confusion": [
+      [
+        595,
+        246,
+        0,
+        0,
+        0
+      ],
+      [
+        873,
+        1827,
+        0,
+        0,
+        0
+      ],
+      [
+        275,
+        705,
+        0,
+        0,
+        0
+      ],
+      [
+        280,
+        496,
+        0,
+        0,
+        0
+      ],
+      [
+        232,
+        198,
+        0,
+        0,
+        0
+      ]
+    ],
+    "critical_as_acceptable_or_strong": 0,
+    "critical_count": 841,
+    "mean_overoptimistic_cost": 1.0516994734032281
+  },
+  {
+    "month": "2025-08",
+    "scope": "validation",
+    "kind": "risk_binary",
+    "rows": 5030,
+    "critical_rate": 0.1439828447807103,
+    "mean_risk_score": 0.18669141020108812,
+    "critical_auc": 0.7231850857853317,
+    "critical_brier": 0.11456020453338969,
+    "critical_logloss": 0.37956653962266923
+  },
+  {
+    "month": "2025-08",
+    "scope": "test",
+    "kind": "risk_binary",
+    "rows": 6881,
+    "critical_rate": 0.16058100279939533,
+    "mean_risk_score": 0.18046934070728943,
+    "critical_auc": 0.7210108445333127,
+    "critical_brier": 0.1229272455724069,
+    "critical_logloss": 0.39981901793837527
+  },
+  {
+    "month": "2025-08",
+    "scope": "validation",
+    "kind": "nominal",
+    "rows": 5030,
+    "critical_rate": 0.1439828447807103,
+    "mean_risk_score": 0.18615743931091266,
+    "critical_auc": 0.7268999506534322,
+    "critical_brier": 0.11422365056626312,
+    "critical_logloss": 0.3781105028575267,
+    "confusion": [
+      [
+        192,
+        487,
+        0,
+        1,
+        3
+      ],
+      [
+        155,
+        2202,
+        0,
+        0,
+        1
+      ],
+      [
+        44,
+        833,
+        0,
+        1,
+        2
+      ],
+      [
+        52,
+        655,
+        0,
+        2,
+        3
+      ],
+      [
+        59,
+        338,
+        0,
+        0,
+        0
+      ]
+    ],
+    "critical_as_acceptable_or_strong": 4,
+    "critical_count": 683,
+    "mean_overoptimistic_cost": 0.9225389680173178
+  },
+  {
+    "month": "2025-08",
+    "scope": "test",
+    "kind": "nominal",
+    "rows": 6881,
+    "critical_rate": 0.16058100279939533,
+    "mean_risk_score": 0.18068447312102348,
+    "critical_auc": 0.7245190278679562,
+    "critical_brier": 0.12248149075491162,
+    "critical_logloss": 0.39821073533645224,
+    "confusion": [
+      [
+        294,
+        671,
+        0,
+        2,
+        7
+      ],
+      [
+        163,
+        2962,
+        0,
+        1,
+        5
+      ],
+      [
+        68,
+        1232,
+        0,
+        1,
+        2
+      ],
+      [
+        75,
+        828,
+        0,
+        1,
+        3
+      ],
+      [
+        91,
+        473,
+        0,
+        1,
+        1
+      ]
+    ],
+    "critical_as_acceptable_or_strong": 9,
+    "critical_count": 974,
+    "mean_overoptimistic_cost": 0.9081015879668192
+  },
+  {
+    "month": "2025-08",
+    "scope": "validation",
+    "kind": "ordinal",
+    "rows": 5030,
+    "critical_rate": 0.1439828447807103,
+    "mean_risk_score": 0.18669141097160766,
+    "critical_auc": 0.7231850857853317,
+    "critical_brier": 0.11456020466190735,
+    "critical_logloss": 0.3795665397463625,
+    "confusion": [
+      [
+        182,
+        499,
+        0,
+        1,
+        1
+      ],
+      [
+        143,
+        2215,
+        0,
+        0,
+        0
+      ],
+      [
+        41,
+        837,
+        0,
+        0,
+        2
+      ],
+      [
+        44,
+        664,
+        0,
+        3,
+        1
+      ],
+      [
+        52,
+        345,
+        0,
+        0,
+        0
+      ]
+    ],
+    "critical_as_acceptable_or_strong": 2,
+    "critical_count": 683,
+    "mean_overoptimistic_cost": 0.8996425557487432
+  },
+  {
+    "month": "2025-08",
+    "scope": "test",
+    "kind": "ordinal",
+    "rows": 6881,
+    "critical_rate": 0.16058100279939533,
+    "mean_risk_score": 0.18046934034522746,
+    "critical_auc": 0.7210108445333127,
+    "critical_brier": 0.12292724554968096,
+    "critical_logloss": 0.39981901779355,
+    "confusion": [
+      [
+        269,
+        698,
+        0,
+        2,
+        5
+      ],
+      [
+        145,
+        2984,
+        0,
+        1,
+        1
+      ],
+      [
+        61,
+        1240,
+        0,
+        1,
+        1
+      ],
+      [
+        67,
+        838,
+        0,
+        0,
+        2
+      ],
+      [
+        82,
+        483,
+        0,
+        0,
+        1
+      ]
+    ],
+    "critical_as_acceptable_or_strong": 7,
+    "critical_count": 974,
+    "mean_overoptimistic_cost": 0.8845482471289181
+  },
+  {
+    "month": "2025-08",
+    "scope": "validation",
+    "kind": "ordinal_critical",
+    "rows": 5030,
+    "critical_rate": 0.1439828447807103,
+    "mean_risk_score": 0.3790451556893037,
+    "critical_auc": 0.7225917437104732,
+    "critical_brier": 0.17265988578094718,
+    "critical_logloss": 0.5268152783569364,
+    "confusion": [
+      [
+        502,
+        181,
+        0,
+        0,
+        0
+      ],
+      [
+        867,
+        1491,
+        0,
+        0,
+        0
+      ],
+      [
+        285,
+        595,
+        0,
+        0,
+        0
+      ],
+      [
+        277,
+        435,
+        0,
+        0,
+        0
+      ],
+      [
+        224,
+        173,
+        0,
+        0,
+        0
+      ]
+    ],
+    "critical_as_acceptable_or_strong": 0,
+    "critical_count": 683,
+    "mean_overoptimistic_cost": 1.1172951611691901
+  },
+  {
+    "month": "2025-08",
+    "scope": "test",
+    "kind": "ordinal_critical",
+    "rows": 6881,
+    "critical_rate": 0.16058100279939533,
+    "mean_risk_score": 0.3701635187289885,
+    "critical_auc": 0.7237045076269575,
+    "critical_brier": 0.16948027082333514,
+    "critical_logloss": 0.518840279565533,
+    "confusion": [
+      [
+        725,
+        249,
+        0,
+        0,
+        0
+      ],
+      [
+        1091,
+        2040,
+        0,
+        0,
+        0
+      ],
+      [
+        430,
+        873,
+        0,
+        0,
+        0
+      ],
+      [
+        355,
+        552,
+        0,
+        0,
+        0
+      ],
+      [
+        299,
+        267,
+        0,
+        0,
+        0
+      ]
+    ],
+    "critical_as_acceptable_or_strong": 0,
+    "critical_count": 974,
+    "mean_overoptimistic_cost": 1.0637988876166413
+  },
+  {
+    "month": "2025-08",
+    "scope": "validation",
+    "kind": "ordinal_critical_fuzzy",
+    "rows": 5030,
+    "critical_rate": 0.1439828447807103,
+    "mean_risk_score": 0.3790451556893037,
+    "critical_auc": 0.7225917437104732,
+    "critical_brier": 0.17265988578094718,
+    "critical_logloss": 0.5268152783569364,
+    "confusion": [
+      [
+        502,
+        181,
+        0,
+        0,
+        0
+      ],
+      [
+        872,
+        1486,
+        0,
+        0,
+        0
+      ],
+      [
+        284,
+        596,
+        0,
+        0,
+        0
+      ],
+      [
+        277,
+        435,
+        0,
+        0,
+        0
+      ],
+      [
+        224,
+        173,
+        0,
+        0,
+        0
+      ]
+    ],
+    "critical_as_acceptable_or_strong": 0,
+    "critical_count": 683,
+    "mean_overoptimistic_cost": 1.1177475292400643
+  },
+  {
+    "month": "2025-08",
+    "scope": "test",
+    "kind": "ordinal_critical_fuzzy",
+    "rows": 6881,
+    "critical_rate": 0.16058100279939533,
+    "mean_risk_score": 0.3701635187289885,
+    "critical_auc": 0.7237045076269575,
+    "critical_brier": 0.16948027082333514,
+    "critical_logloss": 0.518840279565533,
+    "confusion": [
+      [
+        727,
+        247,
+        0,
+        0,
+        0
+      ],
+      [
+        1096,
+        2035,
+        0,
+        0,
+        0
+      ],
+      [
+        432,
+        871,
+        0,
+        0,
+        0
+      ],
+      [
+        356,
+        551,
+        0,
+        0,
+        0
+      ],
+      [
+        298,
+        268,
+        0,
+        0,
+        0
+      ]
+    ],
+    "critical_as_acceptable_or_strong": 0,
+    "critical_count": 974,
+    "mean_overoptimistic_cost": 1.0644350019328148
+  },
+  {
+    "month": "2025-09",
+    "scope": "validation",
+    "kind": "risk_binary",
+    "rows": 6635,
+    "critical_rate": 0.1602767196060318,
+    "mean_risk_score": 0.17847508824125285,
+    "critical_auc": 0.7268472539296198,
+    "critical_brier": 0.12298443249371749,
+    "critical_logloss": 0.3984354529217465
+  },
+  {
+    "month": "2025-09",
+    "scope": "test",
+    "kind": "risk_binary",
+    "rows": 7334,
+    "critical_rate": 0.19263977423854314,
+    "mean_risk_score": 0.1782897453587762,
+    "critical_auc": 0.6714022417666683,
+    "critical_brier": 0.147468928412003,
+    "critical_logloss": 0.4658413788689547
+  },
+  {
+    "month": "2025-09",
+    "scope": "validation",
+    "kind": "nominal",
+    "rows": 6635,
+    "critical_rate": 0.1602767196060318,
+    "mean_risk_score": 0.17886240157038083,
+    "critical_auc": 0.7299576042177804,
+    "critical_brier": 0.12242518496632884,
+    "critical_logloss": 0.3964440769725961,
+    "confusion": [
+      [
+        293,
+        627,
+        0,
+        3,
+        10
+      ],
+      [
+        183,
+        2853,
+        0,
+        0,
+        6
+      ],
+      [
+        72,
+        1173,
+        0,
+        1,
+        3
+      ],
+      [
+        86,
+        777,
+        1,
+        2,
+        3
+      ],
+      [
+        94,
+        446,
+        0,
+        1,
+        1
+      ]
+    ],
+    "critical_as_acceptable_or_strong": 13,
+    "critical_count": 933,
+    "mean_overoptimistic_cost": 0.9308230685781961
+  },
+  {
+    "month": "2025-09",
+    "scope": "test",
+    "kind": "nominal",
+    "rows": 7334,
+    "critical_rate": 0.19263977423854314,
+    "mean_risk_score": 0.17940783813647904,
+    "critical_auc": 0.6727116709798283,
+    "critical_brier": 0.14716036030286214,
+    "critical_logloss": 0.46513079627439213,
+    "confusion": [
+      [
+        264,
+        859,
+        0,
+        1,
+        10
+      ],
+      [
+        205,
+        2766,
+        1,
+        3,
+        8
+      ],
+      [
+        73,
+        1325,
+        0,
+        1,
+        1
+      ],
+      [
+        78,
+        1064,
+        0,
+        1,
+        3
+      ],
+      [
+        91,
+        573,
+        0,
+        3,
+        4
+      ]
+    ],
+    "critical_as_acceptable_or_strong": 11,
+    "critical_count": 1134,
+    "mean_overoptimistic_cost": 1.0519866701665115
+  },
+  {
+    "month": "2025-09",
+    "scope": "validation",
+    "kind": "ordinal",
+    "rows": 6635,
+    "critical_rate": 0.1602767196060318,
+    "mean_risk_score": 0.17847508810927987,
+    "critical_auc": 0.7268472539296198,
+    "critical_brier": 0.12298443249226632,
+    "critical_logloss": 0.3984354529307474,
+    "confusion": [
+      [
+        275,
+        652,
+        0,
+        1,
+        5
+      ],
+      [
+        159,
+        2879,
+        0,
+        0,
+        4
+      ],
+      [
+        64,
+        1183,
+        0,
+        1,
+        1
+      ],
+      [
+        71,
+        796,
+        0,
+        1,
+        1
+      ],
+      [
+        81,
+        459,
+        0,
+        1,
+        1
+      ]
+    ],
+    "critical_as_acceptable_or_strong": 6,
+    "critical_count": 933,
+    "mean_overoptimistic_cost": 0.8821085209532198
+  },
+  {
+    "month": "2025-09",
+    "scope": "test",
+    "kind": "ordinal",
+    "rows": 7334,
+    "critical_rate": 0.19263977423854314,
+    "mean_risk_score": 0.17828975532451732,
+    "critical_auc": 0.6714022417666683,
+    "critical_brier": 0.14746892965484235,
+    "critical_logloss": 0.46584138135261877,
+    "confusion": [
+      [
+        244,
+        887,
+        0,
+        1,
+        2
+      ],
+      [
+        178,
+        2800,
+        0,
+        2,
+        3
+      ],
+      [
+        66,
+        1333,
+        0,
+        0,
+        1
+      ],
+      [
+        68,
+        1077,
+        0,
+        1,
+        0
+      ],
+      [
+        82,
+        584,
+        0,
+        2,
+        3
+      ]
+    ],
+    "critical_as_acceptable_or_strong": 3,
+    "critical_count": 1134,
+    "mean_overoptimistic_cost": 0.9917526209528268
+  },
+  {
+    "month": "2025-09",
+    "scope": "validation",
+    "kind": "ordinal_critical",
+    "rows": 6635,
+    "critical_rate": 0.1602767196060318,
+    "mean_risk_score": 0.3603873953622307,
+    "critical_auc": 0.7282916121571604,
+    "critical_brier": 0.16720426075950198,
+    "critical_logloss": 0.5131493785021328,
+    "confusion": [
+      [
+        678,
+        255,
+        0,
+        0,
+        0
+      ],
+      [
+        966,
+        2076,
+        0,
+        0,
+        0
+      ],
+      [
+        358,
+        890,
+        0,
+        1,
+        0
+      ],
+      [
+        313,
+        555,
+        0,
+        1,
+        0
+      ],
+      [
+        277,
+        265,
+        0,
+        0,
+        0
+      ]
+    ],
+    "critical_as_acceptable_or_strong": 0,
+    "critical_count": 933,
+    "mean_overoptimistic_cost": 1.0303583889050985
+  },
+  {
+    "month": "2025-09",
+    "scope": "test",
+    "kind": "ordinal_critical",
+    "rows": 7334,
+    "critical_rate": 0.19263977423854314,
+    "mean_risk_score": 0.35877021287047406,
+    "critical_auc": 0.6705046240845645,
+    "critical_brier": 0.18268856240859574,
+    "critical_logloss": 0.5460272889535629,
+    "confusion": [
+      [
+        679,
+        455,
+        0,
+        0,
+        0
+      ],
+      [
+        907,
+        2073,
+        0,
+        2,
+        1
+      ],
+      [
+        361,
+        1039,
+        0,
+        0,
+        0
+      ],
+      [
+        340,
+        806,
+        0,
+        0,
+        0
+      ],
+      [
+        324,
+        347,
+        0,
+        0,
+        0
+      ]
+    ],
+    "critical_as_acceptable_or_strong": 0,
+    "critical_count": 1134,
+    "mean_overoptimistic_cost": 1.1578720032910597
+  },
+  {
+    "month": "2025-09",
+    "scope": "validation",
+    "kind": "ordinal_critical_fuzzy",
+    "rows": 6635,
+    "critical_rate": 0.1602767196060318,
+    "mean_risk_score": 0.3603873953622307,
+    "critical_auc": 0.7282916121571604,
+    "critical_brier": 0.16720426075950198,
+    "critical_logloss": 0.5131493785021328,
+    "confusion": [
+      [
+        678,
+        255,
+        0,
+        0,
+        0
+      ],
+      [
+        965,
+        2077,
+        0,
+        0,
+        0
+      ],
+      [
+        358,
+        890,
+        0,
+        1,
+        0
+      ],
+      [
+        315,
+        553,
+        0,
+        1,
+        0
+      ],
+      [
+        277,
+        265,
+        0,
+        0,
+        0
+      ]
+    ],
+    "critical_as_acceptable_or_strong": 0,
+    "critical_count": 933,
+    "mean_overoptimistic_cost": 1.03045427401817
+  },
+  {
+    "month": "2025-09",
+    "scope": "test",
+    "kind": "ordinal_critical_fuzzy",
+    "rows": 7334,
+    "critical_rate": 0.19263977423854314,
+    "mean_risk_score": 0.35877021287047406,
+    "critical_auc": 0.6705046240845645,
+    "critical_brier": 0.18268856240859574,
+    "critical_logloss": 0.5460272889535629,
+    "confusion": [
+      [
+        683,
+        451,
+        0,
+        0,
+        0
+      ],
+      [
+        911,
+        2069,
+        0,
+        2,
+        1
+      ],
+      [
+        366,
+        1034,
+        0,
+        0,
+        0
+      ],
+      [
+        342,
+        804,
+        0,
+        0,
+        0
+      ],
+      [
+        324,
+        347,
+        0,
+        0,
+        0
+      ]
+    ],
+    "critical_as_acceptable_or_strong": 0,
+    "critical_count": 1134,
+    "mean_overoptimistic_cost": 1.1586463472345752
+  },
+  {
+    "month": "2025-10",
+    "scope": "validation",
+    "kind": "risk_binary",
+    "rows": 6694,
+    "critical_rate": 0.1852220020394714,
+    "mean_risk_score": 0.18178686223384483,
+    "critical_auc": 0.6762605623320591,
+    "critical_brier": 0.14191112774949902,
+    "critical_logloss": 0.4510403543168187
+  },
+  {
+    "month": "2025-10",
+    "scope": "test",
+    "kind": "risk_binary",
+    "rows": 5368,
+    "critical_rate": 0.21283580399156773,
+    "mean_risk_score": 0.1620081975223669,
+    "critical_auc": 0.6947374781852826,
+    "critical_brier": 0.1544297894594517,
+    "critical_logloss": 0.48416890588183387
+  },
+  {
+    "month": "2025-10",
+    "scope": "validation",
+    "kind": "nominal",
+    "rows": 6694,
+    "critical_rate": 0.1852220020394714,
+    "mean_risk_score": 0.1822228609666312,
+    "critical_auc": 0.6765798917539212,
+    "critical_brier": 0.14188563889538294,
+    "critical_logloss": 0.4511235332546783,
+    "confusion": [
+      [
+        256,
+        712,
+        0,
+        0,
+        2
+      ],
+      [
+        192,
+        2485,
+        0,
+        0,
+        0
+      ],
+      [
+        72,
+        1244,
+        0,
+        0,
+        0
+      ],
+      [
+        81,
+        1007,
+        1,
+        0,
+        2
+      ],
+      [
+        96,
+        541,
+        0,
+        1,
+        2
+      ]
+    ],
+    "critical_as_acceptable_or_strong": 2,
+    "critical_count": 970,
+    "mean_overoptimistic_cost": 1.0209385491346936
+  },
+  {
+    "month": "2025-10",
+    "scope": "test",
+    "kind": "nominal",
+    "rows": 5368,
+    "critical_rate": 0.21283580399156773,
+    "mean_risk_score": 0.16215868776087147,
+    "critical_auc": 0.6943939642566161,
+    "critical_brier": 0.15444284086256424,
+    "critical_logloss": 0.4845360943192495,
+    "confusion": [
+      [
+        187,
+        803,
+        0,
+        1,
+        8
+      ],
+      [
+        79,
+        2104,
+        0,
+        0,
+        1
+      ],
+      [
+        30,
+        851,
+        0,
+        0,
+        1
+      ],
+      [
+        26,
+        811,
+        0,
+        0,
+        1
+      ],
+      [
+        69,
+        394,
+        0,
+        0,
+        2
+      ]
+    ],
+    "critical_as_acceptable_or_strong": 9,
+    "critical_count": 999,
+    "mean_overoptimistic_cost": 0.9939405357224864
+  },
+  {
+    "month": "2025-10",
+    "scope": "validation",
+    "kind": "ordinal",
+    "rows": 6694,
+    "critical_rate": 0.1852220020394714,
+    "mean_risk_score": 0.18178686248018874,
+    "critical_auc": 0.6762605623320591,
+    "critical_brier": 0.14191112773591633,
+    "critical_logloss": 0.4510403542547506,
+    "confusion": [
+      [
+        240,
+        730,
+        0,
+        0,
+        0
+      ],
+      [
+        177,
+        2500,
+        0,
+        0,
+        0
+      ],
+      [
+        63,
+        1253,
+        0,
+        0,
+        0
+      ],
+      [
+        72,
+        1018,
+        0,
+        0,
+        1
+      ],
+      [
+        87,
+        553,
+        0,
+        0,
+        0
+      ]
+    ],
+    "critical_as_acceptable_or_strong": 0,
+    "critical_count": 970,
+    "mean_overoptimistic_cost": 1.0035293362127518
+  },
+  {
+    "month": "2025-10",
+    "scope": "test",
+    "kind": "ordinal",
+    "rows": 5368,
+    "critical_rate": 0.21283580399156773,
+    "mean_risk_score": 0.1620081975948666,
+    "critical_auc": 0.6947374781852826,
+    "critical_brier": 0.15442978944205035,
+    "critical_logloss": 0.48416890584052297,
+    "confusion": [
+      [
+        182,
+        812,
+        0,
+        1,
+        4
+      ],
+      [
+        75,
+        2108,
+        0,
+        1,
+        0
+      ],
+      [
+        29,
+        852,
+        0,
+        0,
+        1
+      ],
+      [
+        26,
+        811,
+        0,
+        0,
+        1
+      ],
+      [
+        61,
+        402,
+        0,
+        0,
+        2
+      ]
+    ],
+    "critical_as_acceptable_or_strong": 5,
+    "critical_count": 999,
+    "mean_overoptimistic_cost": 0.9517439537422376
+  },
+  {
+    "month": "2025-10",
+    "scope": "validation",
+    "kind": "ordinal_critical",
+    "rows": 6694,
+    "critical_rate": 0.1852220020394714,
+    "mean_risk_score": 0.36887766047727866,
+    "critical_auc": 0.6743422948991624,
+    "critical_brier": 0.18303675872668915,
+    "critical_logloss": 0.5468298703154292,
+    "confusion": [
+      [
+        632,
+        338,
+        0,
+        0,
+        0
+      ],
+      [
+        899,
+        1778,
+        0,
+        0,
+        0
+      ],
+      [
+        364,
+        952,
+        0,
+        0,
+        0
+      ],
+      [
+        345,
+        746,
+        0,
+        0,
+        0
+      ],
+      [
+        319,
+        321,
+        0,
+        0,
+        0
+      ]
+    ],
+    "critical_as_acceptable_or_strong": 0,
+    "critical_count": 970,
+    "mean_overoptimistic_cost": 1.1941537335845713
+  },
+  {
+    "month": "2025-10",
+    "scope": "test",
+    "kind": "ordinal_critical",
+    "rows": 5368,
+    "critical_rate": 0.21283580399156773,
+    "mean_risk_score": 0.3373477170379649,
+    "critical_auc": 0.6941785603608559,
+    "critical_brier": 0.1701837988695672,
+    "critical_logloss": 0.5181245892853829,
+    "confusion": [
+      [
+        569,
+        430,
+        0,
+        0,
+        0
+      ],
+      [
+        593,
+        1591,
+        0,
+        0,
+        0
+      ],
+      [
+        194,
+        688,
+        0,
+        0,
+        0
+      ],
+      [
+        245,
+        593,
+        0,
+        0,
+        0
+      ],
+      [
+        218,
+        247,
+        0,
+        0,
+        0
+      ]
+    ],
+    "critical_as_acceptable_or_strong": 0,
+    "critical_count": 999,
+    "mean_overoptimistic_cost": 1.0727694479872785
+  },
+  {
+    "month": "2025-10",
+    "scope": "validation",
+    "kind": "ordinal_critical_fuzzy",
+    "rows": 6694,
+    "critical_rate": 0.1852220020394714,
+    "mean_risk_score": 0.36887766047727866,
+    "critical_auc": 0.6743422948991624,
+    "critical_brier": 0.18303675872668915,
+    "critical_logloss": 0.5468298703154292,
+    "confusion": [
+      [
+        635,
+        335,
+        0,
+        0,
+        0
+      ],
+      [
+        902,
+        1775,
+        0,
+        0,
+        0
+      ],
+      [
+        362,
+        954,
+        0,
+        0,
+        0
+      ],
+      [
+        346,
+        745,
+        0,
+        0,
+        0
+      ],
+      [
+        321,
+        319,
+        0,
+        0,
+        0
+      ]
+    ],
+    "critical_as_acceptable_or_strong": 0,
+    "critical_count": 970,
+    "mean_overoptimistic_cost": 1.1952415920330401
+  },
+  {
+    "month": "2025-10",
+    "scope": "test",
+    "kind": "ordinal_critical_fuzzy",
+    "rows": 5368,
+    "critical_rate": 0.21283580399156773,
+    "mean_risk_score": 0.3373477170379649,
+    "critical_auc": 0.6941785603608559,
+    "critical_brier": 0.1701837988695672,
+    "critical_logloss": 0.5181245892853829,
+    "confusion": [
+      [
+        569,
+        430,
+        0,
+        0,
+        0
+      ],
+      [
+        591,
+        1593,
+        0,
+        0,
+        0
+      ],
+      [
+        195,
+        687,
+        0,
+        0,
+        0
+      ],
+      [
+        243,
+        595,
+        0,
+        0,
+        0
+      ],
+      [
+        218,
+        247,
+        0,
+        0,
+        0
+      ]
+    ],
+    "critical_as_acceptable_or_strong": 0,
+    "critical_count": 999,
+    "mean_overoptimistic_cost": 1.0723534476208483
+  },
+  {
+    "month": "2025-11",
+    "scope": "validation",
+    "kind": "risk_binary",
+    "rows": 6295,
+    "critical_rate": 0.20586397114610935,
+    "mean_risk_score": 0.15265436259398946,
+    "critical_auc": 0.6752288850807804,
+    "critical_brier": 0.15368654731793552,
+    "critical_logloss": 0.48739729540459104
+  },
+  {
+    "month": "2025-11",
+    "scope": "test",
+    "kind": "risk_binary",
+    "rows": 5874,
+    "critical_rate": 0.20385888813179873,
+    "mean_risk_score": 0.18387713486026971,
+    "critical_auc": 0.7019734357215364,
+    "critical_brier": 0.14994187487024604,
+    "critical_logloss": 0.4673750162848554
+  },
+  {
+    "month": "2025-11",
+    "scope": "validation",
+    "kind": "nominal",
+    "rows": 6295,
+    "critical_rate": 0.20586397114610935,
+    "mean_risk_score": 0.15281081305262137,
+    "critical_auc": 0.6748237740771846,
+    "critical_brier": 0.15371208144342807,
+    "critical_logloss": 0.4880988634034104,
+    "confusion": [
+      [
+        204,
+        904,
+        1,
+        3,
+        2
+      ],
+      [
+        103,
+        2426,
+        1,
+        0,
+        1
+      ],
+      [
+        39,
+        1000,
+        1,
+        0,
+        1
+      ],
+      [
+        38,
+        985,
+        0,
+        0,
+        1
+      ],
+      [
+        90,
+        493,
+        0,
+        1,
+        1
+      ]
+    ],
+    "critical_as_acceptable_or_strong": 5,
+    "critical_count": 1114,
+    "mean_overoptimistic_cost": 0.9867184216595285
+  },
+  {
+    "month": "2025-11",
+    "scope": "test",
+    "kind": "nominal",
+    "rows": 5874,
+    "critical_rate": 0.20385888813179873,
+    "mean_risk_score": 0.18321630974187333,
+    "critical_auc": 0.7020910802990952,
+    "critical_brier": 0.14962685849908572,
+    "critical_logloss": 0.46665866181402627,
+    "confusion": [
+      [
+        258,
+        707,
+        0,
+        0,
+        4
+      ],
+      [
+        152,
+        2260,
+        1,
+        1,
+        0
+      ],
+      [
+        55,
+        1040,
+        1,
+        0,
+        1
+      ],
+      [
+        73,
+        850,
+        1,
+        0,
+        1
+      ],
+      [
+        96,
+        372,
+        0,
+        0,
+        1
+      ]
+    ],
+    "critical_as_acceptable_or_strong": 4,
+    "critical_count": 969,
+    "mean_overoptimistic_cost": 0.9611350007037973
+  },
+  {
+    "month": "2025-11",
+    "scope": "validation",
+    "kind": "ordinal",
+    "rows": 6295,
+    "critical_rate": 0.20586397114610935,
+    "mean_risk_score": 0.15265436255556433,
+    "critical_auc": 0.6752288850807804,
+    "critical_brier": 0.15368654726198339,
+    "critical_logloss": 0.4873972952236569,
+    "confusion": [
+      [
+        195,
+        918,
+        0,
+        1,
+        0
+      ],
+      [
+        96,
+        2435,
+        0,
+        0,
+        0
+      ],
+      [
+        36,
+        1005,
+        0,
+        0,
+        0
+      ],
+      [
+        37,
+        987,
+        0,
+        0,
+        0
+      ],
+      [
+        84,
+        500,
+        0,
+        0,
+        1
+      ]
+    ],
+    "critical_as_acceptable_or_strong": 1,
+    "critical_count": 1114,
+    "mean_overoptimistic_cost": 0.9585623465215897
+  },
+  {
+    "month": "2025-11",
+    "scope": "test",
+    "kind": "ordinal",
+    "rows": 5874,
+    "critical_rate": 0.20385888813179873,
+    "mean_risk_score": 0.18387707950235174,
+    "critical_auc": 0.7019736178308206,
+    "critical_brier": 0.14994186306220958,
+    "critical_logloss": 0.46737498526025095,
+    "confusion": [
+      [
+        253,
+        713,
+        0,
+        0,
+        3
+      ],
+      [
+        144,
+        2269,
+        1,
+        0,
+        0
+      ],
+      [
+        53,
+        1043,
+        0,
+        0,
+        1
+      ],
+      [
+        70,
+        854,
+        1,
+        0,
+        0
+      ],
+      [
+        92,
+        377,
+        0,
+        0,
+        0
+      ]
+    ],
+    "critical_as_acceptable_or_strong": 3,
+    "critical_count": 969,
+    "mean_overoptimistic_cost": 0.9490352578372623
+  },
+  {
+    "month": "2025-11",
+    "scope": "validation",
+    "kind": "ordinal_critical",
+    "rows": 6295,
+    "critical_rate": 0.20586397114610935,
+    "mean_risk_score": 0.3193839020031408,
+    "critical_auc": 0.673999451638425,
+    "critical_brier": 0.16899611857619246,
+    "critical_logloss": 0.515357831843145,
+    "confusion": [
+      [
+        580,
+        534,
+        0,
+        0,
+        0
+      ],
+      [
+        637,
+        1893,
+        1,
+        0,
+        0
+      ],
+      [
+        228,
+        813,
+        0,
+        0,
+        0
+      ],
+      [
+        277,
+        747,
+        0,
+        0,
+        0
+      ],
+      [
+        260,
+        325,
+        0,
+        0,
+        0
+      ]
+    ],
+    "critical_as_acceptable_or_strong": 0,
+    "critical_count": 1114,
+    "mean_overoptimistic_cost": 1.0916895170296779
+  },
+  {
+    "month": "2025-11",
+    "scope": "test",
+    "kind": "ordinal_critical",
+    "rows": 5874,
+    "critical_rate": 0.20385888813179873,
+    "mean_risk_score": 0.36571014442769767,
+    "critical_auc": 0.7027973322146701,
+    "critical_brier": 0.1792120681025119,
+    "critical_logloss": 0.5390019247982109,
+    "confusion": [
+      [
+        635,
+        334,
+        0,
+        0,
+        0
+      ],
+      [
+        756,
+        1657,
+        1,
+        0,
+        0
+      ],
+      [
+        309,
+        787,
+        1,
+        0,
+        0
+      ],
+      [
+        323,
+        601,
+        1,
+        0,
+        0
+      ],
+      [
+        263,
+        206,
+        0,
+        0,
+        0
+      ]
+    ],
+    "critical_as_acceptable_or_strong": 0,
+    "critical_count": 969,
+    "mean_overoptimistic_cost": 1.0947009536210581
+  },
+  {
+    "month": "2025-11",
+    "scope": "validation",
+    "kind": "ordinal_critical_fuzzy",
+    "rows": 6295,
+    "critical_rate": 0.20586397114610935,
+    "mean_risk_score": 0.3193839020031408,
+    "critical_auc": 0.673999451638425,
+    "critical_brier": 0.16899611857619246,
+    "critical_logloss": 0.515357831843145,
+    "confusion": [
+      [
+        583,
+        531,
+        0,
+        0,
+        0
+      ],
+      [
+        638,
+        1891,
+        2,
+        0,
+        0
+      ],
+      [
+        227,
+        814,
+        0,
+        0,
+        0
+      ],
+      [
+        280,
+        744,
+        0,
+        0,
+        0
+      ],
+      [
+        260,
+        325,
+        0,
+        0,
+        0
+      ]
+    ],
+    "critical_as_acceptable_or_strong": 0,
+    "critical_count": 1114,
+    "mean_overoptimistic_cost": 1.0917391476098726
+  },
+  {
+    "month": "2025-11",
+    "scope": "test",
+    "kind": "ordinal_critical_fuzzy",
+    "rows": 5874,
+    "critical_rate": 0.20385888813179873,
+    "mean_risk_score": 0.36571014442769767,
+    "critical_auc": 0.7027973322146701,
+    "critical_brier": 0.1792120681025119,
+    "critical_logloss": 0.5390019247982109,
+    "confusion": [
+      [
+        639,
+        330,
+        0,
+        0,
+        0
+      ],
+      [
+        755,
+        1658,
+        1,
+        0,
+        0
+      ],
+      [
+        313,
+        784,
+        0,
+        0,
+        0
+      ],
+      [
+        324,
+        600,
+        1,
+        0,
+        0
+      ],
+      [
+        265,
+        204,
+        0,
+        0,
+        0
+      ]
+    ],
+    "critical_as_acceptable_or_strong": 0,
+    "critical_count": 969,
+    "mean_overoptimistic_cost": 1.0939047538889064
+  },
+  {
+    "month": "2025-12",
+    "scope": "validation",
+    "kind": "risk_binary",
+    "rows": 5874,
+    "critical_rate": 0.20385888813179873,
+    "mean_risk_score": 0.18564199248735452,
+    "critical_auc": 0.6995017534870527,
+    "critical_brier": 0.15010312576601464,
+    "critical_logloss": 0.46757842303079655
+  },
+  {
+    "month": "2025-12",
+    "scope": "test",
+    "kind": "risk_binary",
+    "rows": 6316,
+    "critical_rate": 0.222298223584621,
+    "mean_risk_score": 0.1847308503318287,
+    "critical_auc": 0.734895713774987,
+    "critical_brier": 0.15363952288604954,
+    "critical_logloss": 0.4735317360249894
+  },
+  {
+    "month": "2025-12",
+    "scope": "validation",
+    "kind": "nominal",
+    "rows": 5874,
+    "critical_rate": 0.20385888813179873,
+    "mean_risk_score": 0.18482319064094885,
+    "critical_auc": 0.6995908528445325,
+    "critical_brier": 0.14977405281725228,
+    "critical_logloss": 0.4668807026272498,
+    "confusion": [
+      [
+        260,
+        706,
+        0,
+        0,
+        3
+      ],
+      [
+        150,
+        2261,
+        1,
+        1,
+        1
+      ],
+      [
+        61,
+        1035,
+        0,
+        0,
+        1
+      ],
+      [
+        72,
+        851,
+        1,
+        0,
+        1
+      ],
+      [
+        90,
+        375,
+        0,
+        1,
+        3
+      ]
+    ],
+    "critical_as_acceptable_or_strong": 3,
+    "critical_count": 969,
+    "mean_overoptimistic_cost": 0.9490953524492768
+  },
+  {
+    "month": "2025-12",
+    "scope": "test",
+    "kind": "nominal",
+    "rows": 6316,
+    "critical_rate": 0.222298223584621,
+    "mean_risk_score": 0.18446299374828856,
+    "critical_auc": 0.7360397269717733,
+    "critical_brier": 0.15336002337292431,
+    "critical_logloss": 0.47264711717533203,
+    "confusion": [
+      [
+        330,
+        825,
+        0,
+        0,
+        1
+      ],
+      [
+        188,
+        2527,
+        0,
+        0,
+        1
+      ],
+      [
+        44,
+        1021,
+        0,
+        0,
+        0
+      ],
+      [
+        80,
+        803,
+        0,
+        0,
+        1
+      ],
+      [
+        83,
+        411,
+        0,
+        0,
+        1
+      ]
+    ],
+    "critical_as_acceptable_or_strong": 1,
+    "critical_count": 1156,
+    "mean_overoptimistic_cost": 0.884586811631786
+  },
+  {
+    "month": "2025-12",
+    "scope": "validation",
+    "kind": "ordinal",
+    "rows": 5874,
+    "critical_rate": 0.20385888813179873,
+    "mean_risk_score": 0.18564199295475312,
+    "critical_auc": 0.6995017534870527,
+    "critical_brier": 0.1501031233048292,
+    "critical_logloss": 0.4675784146875193,
+    "confusion": [
+      [
+        255,
+        712,
+        0,
+        0,
+        2
+      ],
+      [
+        145,
+        2269,
+        0,
+        0,
+        0
+      ],
+      [
+        54,
+        1042,
+        0,
+        0,
+        1
+      ],
+      [
+        70,
+        853,
+        1,
+        0,
+        1
+      ],
+      [
+        88,
+        381,
+        0,
+        0,
+        0
+      ]
+    ],
+    "critical_as_acceptable_or_strong": 2,
+    "critical_count": 969,
+    "mean_overoptimistic_cost": 0.9376443782680368
+  },
+  {
+    "month": "2025-12",
+    "scope": "test",
+    "kind": "ordinal",
+    "rows": 6316,
+    "critical_rate": 0.222298223584621,
+    "mean_risk_score": 0.18473083238652355,
+    "critical_auc": 0.7348954319059722,
+    "critical_brier": 0.15363952596872918,
+    "critical_logloss": 0.47353174490664657,
+    "confusion": [
+      [
+        320,
+        835,
+        0,
+        0,
+        1
+      ],
+      [
+        179,
+        2537,
+        0,
+        0,
+        0
+      ],
+      [
+        38,
+        1027,
+        0,
+        0,
+        0
+      ],
+      [
+        75,
+        808,
+        0,
+        0,
+        1
+      ],
+      [
+        77,
+        417,
+        0,
+        0,
+        1
+      ]
+    ],
+    "critical_as_acceptable_or_strong": 1,
+    "critical_count": 1156,
+    "mean_overoptimistic_cost": 0.8797364063641157
+  },
+  {
+    "month": "2025-12",
+    "scope": "validation",
+    "kind": "ordinal_critical",
+    "rows": 5874,
+    "critical_rate": 0.20385888813179873,
+    "mean_risk_score": 0.370064590522643,
+    "critical_auc": 0.700409050038381,
+    "critical_brier": 0.18035258087312458,
+    "critical_logloss": 0.5420788978110855,
+    "confusion": [
+      [
+        649,
+        320,
+        0,
+        0,
+        0
+      ],
+      [
+        803,
+        1611,
+        0,
+        0,
+        0
+      ],
+      [
+        314,
+        783,
+        0,
+        0,
+        0
+      ],
+      [
+        335,
+        589,
+        1,
+        0,
+        0
+      ],
+      [
+        263,
+        206,
+        0,
+        0,
+        0
+      ]
+    ],
+    "critical_as_acceptable_or_strong": 0,
+    "critical_count": 969,
+    "mean_overoptimistic_cost": 1.1009854841327051
+  },
+  {
+    "month": "2025-12",
+    "scope": "test",
+    "kind": "ordinal_critical",
+    "rows": 6316,
+    "critical_rate": 0.222298223584621,
+    "mean_risk_score": 0.37172514317153876,
+    "critical_auc": 0.7345425314574716,
+    "critical_brier": 0.17499171435002245,
+    "critical_logloss": 0.5283428199869962,
+    "confusion": [
+      [
+        820,
+        336,
+        0,
+        0,
+        0
+      ],
+      [
+        916,
+        1800,
+        0,
+        0,
+        0
+      ],
+      [
+        287,
+        778,
+        0,
+        0,
+        0
+      ],
+      [
+        322,
+        562,
+        0,
+        0,
+        0
+      ],
+      [
+        258,
+        237,
+        0,
+        0,
+        0
+      ]
+    ],
+    "critical_as_acceptable_or_strong": 0,
+    "critical_count": 1156,
+    "mean_overoptimistic_cost": 1.0159126773150653
+  },
+  {
+    "month": "2025-12",
+    "scope": "validation",
+    "kind": "ordinal_critical_fuzzy",
+    "rows": 5874,
+    "critical_rate": 0.20385888813179873,
+    "mean_risk_score": 0.370064590522643,
+    "critical_auc": 0.700409050038381,
+    "critical_brier": 0.18035258087312458,
+    "critical_logloss": 0.5420788978110855,
+    "confusion": [
+      [
+        649,
+        320,
+        0,
+        0,
+        0
+      ],
+      [
+        807,
+        1607,
+        0,
+        0,
+        0
+      ],
+      [
+        314,
+        783,
+        0,
+        0,
+        0
+      ],
+      [
+        334,
+        591,
+        0,
+        0,
+        0
+      ],
+      [
+        267,
+        202,
+        0,
+        0,
+        0
+      ]
+    ],
+    "critical_as_acceptable_or_strong": 0,
+    "critical_count": 969,
+    "mean_overoptimistic_cost": 1.101994039577191
+  },
+  {
+    "month": "2025-12",
+    "scope": "test",
+    "kind": "ordinal_critical_fuzzy",
+    "rows": 6316,
+    "critical_rate": 0.222298223584621,
+    "mean_risk_score": 0.37172514317153876,
+    "critical_auc": 0.7345425314574716,
+    "critical_brier": 0.17499171435002245,
+    "critical_logloss": 0.5283428199869962,
+    "confusion": [
+      [
+        823,
+        333,
+        0,
+        0,
+        0
+      ],
+      [
+        921,
+        1795,
+        0,
+        0,
+        0
+      ],
+      [
+        287,
+        778,
+        0,
+        0,
+        0
+      ],
+      [
+        327,
+        557,
+        0,
+        0,
+        0
+      ],
+      [
+        260,
+        235,
+        0,
+        0,
+        0
+      ]
+    ],
+    "critical_as_acceptable_or_strong": 0,
+    "critical_count": 1156,
+    "mean_overoptimistic_cost": 1.016840878489236
+  },
+  {
+    "month": "2026-01",
+    "scope": "validation",
+    "kind": "risk_binary",
+    "rows": 5686,
+    "critical_rate": 0.2052843118782124,
+    "mean_risk_score": 0.19378175707516188,
+    "critical_auc": 0.7199974686898113,
+    "critical_brier": 0.14647929258500939,
+    "critical_logloss": 0.4571782089703261
+  },
+  {
+    "month": "2026-01",
+    "scope": "test",
+    "kind": "risk_binary",
+    "rows": 7727,
+    "critical_rate": 0.19723272742923678,
+    "mean_risk_score": 0.1891134956177557,
+    "critical_auc": 0.6860704974545064,
+    "critical_brier": 0.1481559200533364,
+    "critical_logloss": 0.463539532669591
+  },
+  {
+    "month": "2026-01",
+    "scope": "validation",
+    "kind": "nominal",
+    "rows": 5686,
+    "critical_rate": 0.2052843118782124,
+    "mean_risk_score": 0.19325504821891737,
+    "critical_auc": 0.7218238753976064,
+    "critical_brier": 0.14615558293565747,
+    "critical_logloss": 0.45611240413500875,
+    "confusion": [
+      [
+        302,
+        665,
+        1,
+        1,
+        2
+      ],
+      [
+        195,
+        2244,
+        1,
+        0,
+        1
+      ],
+      [
+        45,
+        935,
+        0,
+        0,
+        0
+      ],
+      [
+        81,
+        742,
+        0,
+        0,
+        1
+      ],
+      [
+        86,
+        383,
+        0,
+        0,
+        1
+      ]
+    ],
+    "critical_as_acceptable_or_strong": 3,
+    "critical_count": 971,
+    "mean_overoptimistic_cost": 0.915518619892016
+  },
+  {
+    "month": "2026-01",
+    "scope": "test",
+    "kind": "nominal",
+    "rows": 7727,
+    "critical_rate": 0.19723272742923678,
+    "mean_risk_score": 0.18886400161936948,
+    "critical_auc": 0.687245958469194,
+    "critical_brier": 0.14806117013767672,
+    "critical_logloss": 0.46305875897998827,
+    "confusion": [
+      [
+        374,
+        1087,
+        0,
+        1,
+        17
+      ],
+      [
+        241,
+        2820,
+        0,
+        0,
+        11
+      ],
+      [
+        89,
+        1137,
+        0,
+        0,
+        4
+      ],
+      [
+        122,
+        982,
+        0,
+        2,
+        3
+      ],
+      [
+        169,
+        660,
+        0,
+        0,
+        8
+      ]
+    ],
+    "critical_as_acceptable_or_strong": 18,
+    "critical_count": 1479,
+    "mean_overoptimistic_cost": 1.1110481818759275
+  },
+  {
+    "month": "2026-01",
+    "scope": "validation",
+    "kind": "ordinal",
+    "rows": 5686,
+    "critical_rate": 0.2052843118782124,
+    "mean_risk_score": 0.19378175711144527,
+    "critical_auc": 0.7199974686898113,
+    "critical_brier": 0.14647929260281048,
+    "critical_logloss": 0.457178209023208,
+    "confusion": [
+      [
+        289,
+        681,
+        0,
+        0,
+        1
+      ],
+      [
+        179,
+        2261,
+        0,
+        0,
+        1
+      ],
+      [
+        42,
+        938,
+        0,
+        0,
+        0
+      ],
+      [
+        77,
+        746,
+        0,
+        0,
+        1
+      ],
+      [
+        79,
+        390,
+        0,
+        0,
+        1
+      ]
+    ],
+    "critical_as_acceptable_or_strong": 1,
+    "critical_count": 971,
+    "mean_overoptimistic_cost": 0.9026572123299952
+  },
+  {
+    "month": "2026-01",
+    "scope": "test",
+    "kind": "ordinal",
+    "rows": 7727,
+    "critical_rate": 0.19723272742923678,
+    "mean_risk_score": 0.18911349562014912,
+    "critical_auc": 0.6860704974545064,
+    "critical_brier": 0.14815592005374553,
+    "critical_logloss": 0.46353953267103565,
+    "confusion": [
+      [
+        363,
+        1112,
+        0,
+        0,
+        4
+      ],
+      [
+        222,
+        2843,
+        0,
+        0,
+        7
+      ],
+      [
+        84,
+        1146,
+        0,
+        0,
+        0
+      ],
+      [
+        118,
+        990,
+        0,
+        0,
+        1
+      ],
+      [
+        148,
+        684,
+        0,
+        0,
+        5
+      ]
+    ],
+    "critical_as_acceptable_or_strong": 4,
+    "critical_count": 1479,
+    "mean_overoptimistic_cost": 1.0340960424557573
+  },
+  {
+    "month": "2026-01",
+    "scope": "validation",
+    "kind": "ordinal_critical",
+    "rows": 5686,
+    "critical_rate": 0.2052843118782124,
+    "mean_risk_score": 0.38537259240662014,
+    "critical_auc": 0.7205358617046169,
+    "critical_brier": 0.18087847192402912,
+    "critical_logloss": 0.5428687264386726,
+    "confusion": [
+      [
+        710,
+        261,
+        0,
+        0,
+        0
+      ],
+      [
+        914,
+        1527,
+        0,
+        0,
+        0
+      ],
+      [
+        292,
+        688,
+        0,
+        0,
+        0
+      ],
+      [
+        335,
+        489,
+        0,
+        0,
+        0
+      ],
+      [
+        268,
+        202,
+        0,
+        0,
+        0
+      ]
+    ],
+    "critical_as_acceptable_or_strong": 0,
+    "critical_count": 971,
+    "mean_overoptimistic_cost": 1.0766638865604554
+  },
+  {
+    "month": "2026-01",
+    "scope": "test",
+    "kind": "ordinal_critical",
+    "rows": 7727,
+    "critical_rate": 0.19723272742923678,
+    "mean_risk_score": 0.3821265150204221,
+    "critical_auc": 0.6867808192814792,
+    "critical_brier": 0.18572658551092763,
+    "critical_logloss": 0.5537812702498761,
+    "confusion": [
+      [
+        1075,
+        404,
+        0,
+        0,
+        0
+      ],
+      [
+        1223,
+        1849,
+        0,
+        0,
+        0
+      ],
+      [
+        458,
+        772,
+        0,
+        0,
+        0
+      ],
+      [
+        509,
+        600,
+        0,
+        0,
+        0
+      ],
+      [
+        506,
+        331,
+        0,
+        0,
+        0
+      ]
+    ],
+    "critical_as_acceptable_or_strong": 0,
+    "critical_count": 1479,
+    "mean_overoptimistic_cost": 1.2073801286421426
+  },
+  {
+    "month": "2026-01",
+    "scope": "validation",
+    "kind": "ordinal_critical_fuzzy",
+    "rows": 5686,
+    "critical_rate": 0.2052843118782124,
+    "mean_risk_score": 0.38537259240662014,
+    "critical_auc": 0.7205358617046169,
+    "critical_brier": 0.18087847192402912,
+    "critical_logloss": 0.5428687264386726,
+    "confusion": [
+      [
+        713,
+        258,
+        0,
+        0,
+        0
+      ],
+      [
+        921,
+        1520,
+        0,
+        0,
+        0
+      ],
+      [
+        295,
+        685,
+        0,
+        0,
+        0
+      ],
+      [
+        337,
+        487,
+        0,
+        0,
+        0
+      ],
+      [
+        267,
+        203,
+        0,
+        0,
+        0
+      ]
+    ],
+    "critical_as_acceptable_or_strong": 0,
+    "critical_count": 971,
+    "mean_overoptimistic_cost": 1.0780258712284387
+  },
+  {
+    "month": "2026-01",
+    "scope": "test",
+    "kind": "ordinal_critical_fuzzy",
+    "rows": 7727,
+    "critical_rate": 0.19723272742923678,
+    "mean_risk_score": 0.3821265150204221,
+    "critical_auc": 0.6867808192814792,
+    "critical_brier": 0.18572658551092763,
+    "critical_logloss": 0.5537812702498761,
+    "confusion": [
+      [
+        1076,
+        403,
+        0,
+        0,
+        0
+      ],
+      [
+        1230,
+        1842,
+        0,
+        0,
+        0
+      ],
+      [
+        459,
+        771,
+        0,
+        0,
+        0
+      ],
+      [
+        509,
+        600,
+        0,
+        0,
+        0
+      ],
+      [
+        505,
+        332,
+        0,
+        0,
+        0
+      ]
+    ],
+    "critical_as_acceptable_or_strong": 0,
+    "critical_count": 1479,
+    "mean_overoptimistic_cost": 1.208046110130223
+  },
+  {
+    "month": "2026-02",
+    "scope": "validation",
+    "kind": "risk_binary",
+    "rows": 7727,
+    "critical_rate": 0.19723272742923678,
+    "mean_risk_score": 0.20005032164109357,
+    "critical_auc": 0.6850128152595301,
+    "critical_brier": 0.14801458685471428,
+    "critical_logloss": 0.4632390296292789
+  },
+  {
+    "month": "2026-02",
+    "scope": "test",
+    "kind": "risk_binary",
+    "rows": 5333,
+    "critical_rate": 0.2069527911954544,
+    "mean_risk_score": 0.17764869018382576,
+    "critical_auc": 0.6723621877800822,
+    "critical_brier": 0.15548081371313857,
+    "critical_logloss": 0.4837983026573167
+  },
+  {
+    "month": "2026-02",
+    "scope": "validation",
+    "kind": "nominal",
+    "rows": 7727,
+    "critical_rate": 0.19723272742923678,
+    "mean_risk_score": 0.20001070781269986,
+    "critical_auc": 0.6857385335175342,
+    "critical_brier": 0.14800815351973687,
+    "critical_logloss": 0.46297666952968264,
+    "confusion": [
+      [
+        421,
+        1040,
+        0,
+        1,
+        17
+      ],
+      [
+        273,
+        2784,
+        0,
+        1,
+        14
+      ],
+      [
+        98,
+        1128,
+        0,
+        0,
+        4
+      ],
+      [
+        140,
+        961,
+        0,
+        0,
+        8
+      ],
+      [
+        190,
+        638,
+        0,
+        0,
+        9
+      ]
+    ],
+    "critical_as_acceptable_or_strong": 18,
+    "critical_count": 1479,
+    "mean_overoptimistic_cost": 1.1154311251059832
+  },
+  {
+    "month": "2026-02",
+    "scope": "test",
+    "kind": "nominal",
+    "rows": 5333,
+    "critical_rate": 0.2069527911954544,
+    "mean_risk_score": 0.177728073726217,
+    "critical_auc": 0.6730543730600227,
+    "critical_brier": 0.15540627300942875,
+    "critical_logloss": 0.48350544193675554,
+    "confusion": [
+      [
+        201,
+        734,
+        0,
+        0,
+        4
+      ],
+      [
+        127,
+        2178,
+        0,
+        0,
+        2
+      ],
+      [
+        56,
+        883,
+        0,
+        0,
+        2
+      ],
+      [
+        64,
+        653,
+        0,
+        1,
+        2
+      ],
+      [
+        77,
+        347,
+        0,
+        0,
+        2
+      ]
+    ],
+    "critical_as_acceptable_or_strong": 4,
+    "critical_count": 939,
+    "mean_overoptimistic_cost": 0.944044960657049
+  },
+  {
+    "month": "2026-02",
+    "scope": "validation",
+    "kind": "ordinal",
+    "rows": 7727,
+    "critical_rate": 0.19723272742923678,
+    "mean_risk_score": 0.20005032170620107,
+    "critical_auc": 0.6850128152595301,
+    "critical_brier": 0.14801458684531527,
+    "critical_logloss": 0.4632390296010683,
+    "confusion": [
+      [
+        392,
+        1076,
+        0,
+        1,
+        10
+      ],
+      [
+        257,
+        2808,
+        0,
+        1,
+        6
+      ],
+      [
+        92,
+        1137,
+        0,
+        0,
+        1
+      ],
+      [
+        133,
+        973,
+        0,
+        0,
+        3
+      ],
+      [
+        169,
+        664,
+        0,
+        0,
+        4
+      ]
+    ],
+    "critical_as_acceptable_or_strong": 11,
+    "critical_count": 1479,
+    "mean_overoptimistic_cost": 1.0675970327893518
+  },
+  {
+    "month": "2026-02",
+    "scope": "test",
+    "kind": "ordinal",
+    "rows": 5333,
+    "critical_rate": 0.2069527911954544,
+    "mean_risk_score": 0.17764853670245467,
+    "critical_auc": 0.6723625301429241,
+    "critical_brier": 0.15548081686787735,
+    "critical_logloss": 0.4837983325283483,
+    "confusion": [
+      [
+        191,
+        748,
+        0,
+        0,
+        0
+      ],
+      [
+        121,
+        2186,
+        0,
+        0,
+        0
+      ],
+      [
+        57,
+        884,
+        0,
+        0,
+        0
+      ],
+      [
+        60,
+        657,
+        0,
+        1,
+        2
+      ],
+      [
+        77,
+        348,
+        0,
+        0,
+        1
+      ]
+    ],
+    "critical_as_acceptable_or_strong": 0,
+    "critical_count": 939,
+    "mean_overoptimistic_cost": 0.9210237494373833
+  },
+  {
+    "month": "2026-02",
+    "scope": "validation",
+    "kind": "ordinal_critical",
+    "rows": 7727,
+    "critical_rate": 0.19723272742923678,
+    "mean_risk_score": 0.39968421341671156,
+    "critical_auc": 0.6861084006360121,
+    "critical_brier": 0.1923063556629739,
+    "critical_logloss": 0.5690884461269671,
+    "confusion": [
+      [
+        1152,
+        327,
+        0,
+        0,
+        0
+      ],
+      [
+        1416,
+        1656,
+        0,
+        0,
+        0
+      ],
+      [
+        515,
+        715,
+        0,
+        0,
+        0
+      ],
+      [
+        564,
+        545,
+        0,
+        0,
+        0
+      ],
+      [
+        556,
+        281,
+        0,
+        0,
+        0
+      ]
+    ],
+    "critical_as_acceptable_or_strong": 0,
+    "critical_count": 1479,
+    "mean_overoptimistic_cost": 1.244776642939841
+  },
+  {
+    "month": "2026-02",
+    "scope": "test",
+    "kind": "ordinal_critical",
+    "rows": 5333,
+    "critical_rate": 0.2069527911954544,
+    "mean_risk_score": 0.36421373881579927,
+    "critical_auc": 0.67358913120158,
+    "critical_brier": 0.182514567035226,
+    "critical_logloss": 0.5468633873431711,
+    "confusion": [
+      [
+        616,
+        323,
+        0,
+        0,
+        0
+      ],
+      [
+        800,
+        1507,
+        0,
+        0,
+        0
+      ],
+      [
+        301,
+        640,
+        0,
+        0,
+        0
+      ],
+      [
+        301,
+        419,
+        0,
+        0,
+        0
+      ],
+      [
+        241,
+        185,
+        0,
+        0,
+        0
+      ]
+    ],
+    "critical_as_acceptable_or_strong": 0,
+    "critical_count": 939,
+    "mean_overoptimistic_cost": 1.0994011864854123
+  },
+  {
+    "month": "2026-02",
+    "scope": "validation",
+    "kind": "ordinal_critical_fuzzy",
+    "rows": 7727,
+    "critical_rate": 0.19723272742923678,
+    "mean_risk_score": 0.39968421341671156,
+    "critical_auc": 0.6861084006360121,
+    "critical_brier": 0.1923063556629739,
+    "critical_logloss": 0.5690884461269671,
+    "confusion": [
+      [
+        1152,
+        327,
+        0,
+        0,
+        0
+      ],
+      [
+        1421,
+        1651,
+        0,
+        0,
+        0
+      ],
+      [
+        516,
+        714,
+        0,
+        0,
+        0
+      ],
+      [
+        570,
+        539,
+        0,
+        0,
+        0
+      ],
+      [
+        557,
+        280,
+        0,
+        0,
+        0
+      ]
+    ],
+    "critical_as_acceptable_or_strong": 0,
+    "critical_count": 1479,
+    "mean_overoptimistic_cost": 1.2463626427067425
+  },
+  {
+    "month": "2026-02",
+    "scope": "test",
+    "kind": "ordinal_critical_fuzzy",
+    "rows": 5333,
+    "critical_rate": 0.2069527911954544,
+    "mean_risk_score": 0.36421373881579927,
+    "critical_auc": 0.67358913120158,
+    "critical_brier": 0.182514567035226,
+    "critical_logloss": 0.5468633873431711,
+    "confusion": [
+      [
+        614,
+        325,
+        0,
+        0,
+        0
+      ],
+      [
+        798,
+        1509,
+        0,
+        0,
+        0
+      ],
+      [
+        303,
+        638,
+        0,
+        0,
+        0
+      ],
+      [
+        301,
+        419,
+        0,
+        0,
+        0
+      ],
+      [
+        243,
+        183,
+        0,
+        0,
+        0
+      ]
+    ],
+    "critical_as_acceptable_or_strong": 0,
+    "critical_count": 939,
+    "mean_overoptimistic_cost": 1.1001411397320988
+  },
+  {
+    "month": "2026-03",
+    "scope": "validation",
+    "kind": "risk_binary",
+    "rows": 7188,
+    "critical_rate": 0.22922368041889132,
+    "mean_risk_score": 0.1862827060452256,
+    "critical_auc": 0.6670705997279711,
+    "critical_brier": 0.16884228467783632,
+    "critical_logloss": 0.5170766315477766
+  },
+  {
+    "month": "2026-03",
+    "scope": "test",
+    "kind": "risk_binary",
+    "rows": 8524,
+    "critical_rate": 0.23835502904883268,
+    "mean_risk_score": 0.22062643362299972,
+    "critical_auc": 0.6891890771119484,
+    "critical_brier": 0.16588901929648192,
+    "critical_logloss": 0.5087649699899306
+  },
+  {
+    "month": "2026-03",
+    "scope": "validation",
+    "kind": "nominal",
+    "rows": 7188,
+    "critical_rate": 0.22922368041889132,
+    "mean_risk_score": 0.18657388171867034,
+    "critical_auc": 0.6676459960495513,
+    "critical_brier": 0.1687229174070174,
+    "critical_logloss": 0.5167233009919252,
+    "confusion": [
+      [
+        344,
+        1099,
+        0,
+        4,
+        11
+      ],
+      [
+        216,
+        2749,
+        0,
+        0,
+        8
+      ],
+      [
+        89,
+        1112,
+        0,
+        0,
+        2
+      ],
+      [
+        103,
+        839,
+        0,
+        0,
+        2
+      ],
+      [
+        129,
+        474,
+        0,
+        0,
+        7
+      ]
+    ],
+    "critical_as_acceptable_or_strong": 15,
+    "critical_count": 1458,
+    "mean_overoptimistic_cost": 1.005977740439793
+  },
+  {
+    "month": "2026-03",
+    "scope": "test",
+    "kind": "nominal",
+    "rows": 8524,
+    "critical_rate": 0.23835502904883268,
+    "mean_risk_score": 0.22079033553054767,
+    "critical_auc": 0.6904957468989464,
+    "critical_brier": 0.16572042173747048,
+    "critical_logloss": 0.5086184755733715,
+    "confusion": [
+      [
+        367,
+        951,
+        0,
+        0,
+        1
+      ],
+      [
+        241,
+        2265,
+        1,
+        0,
+        2
+      ],
+      [
+        85,
+        1674,
+        0,
+        0,
+        1
+      ],
+      [
+        126,
+        2029,
+        1,
+        0,
+        0
+      ],
+      [
+        154,
+        625,
+        0,
+        0,
+        1
+      ]
+    ],
+    "critical_as_acceptable_or_strong": 1,
+    "critical_count": 1319,
+    "mean_overoptimistic_cost": 1.0522040797257801
+  },
+  {
+    "month": "2026-03",
+    "scope": "validation",
+    "kind": "ordinal",
+    "rows": 7188,
+    "critical_rate": 0.22922368041889132,
+    "mean_risk_score": 0.18628272747294658,
+    "critical_auc": 0.6670706310811985,
+    "critical_brier": 0.1688422848181238,
+    "critical_logloss": 0.5170766316375304,
+    "confusion": [
+      [
+        324,
+        1128,
+        0,
+        0,
+        6
+      ],
+      [
+        198,
+        2770,
+        0,
+        0,
+        5
+      ],
+      [
+        86,
+        1116,
+        0,
+        0,
+        1
+      ],
+      [
+        93,
+        850,
+        0,
+        0,
+        1
+      ],
+      [
+        126,
+        482,
+        0,
+        0,
+        2
+      ]
+    ],
+    "critical_as_acceptable_or_strong": 6,
+    "critical_count": 1458,
+    "mean_overoptimistic_cost": 0.9699558705063335
+  },
+  {
+    "month": "2026-03",
+    "scope": "test",
+    "kind": "ordinal",
+    "rows": 8524,
+    "critical_rate": 0.23835502904883268,
+    "mean_risk_score": 0.22062643362365195,
+    "critical_auc": 0.6891890771119484,
+    "critical_brier": 0.16588901929552674,
+    "critical_logloss": 0.5087649699883576,
+    "confusion": [
+      [
+        344,
+        975,
+        0,
+        0,
+        0
+      ],
+      [
+        228,
+        2280,
+        0,
+        0,
+        1
+      ],
+      [
+        83,
+        1677,
+        0,
+        0,
+        0
+      ],
+      [
+        117,
+        2038,
+        1,
+        0,
+        0
+      ],
+      [
+        151,
+        629,
+        0,
+        0,
+        0
+      ]
+    ],
+    "critical_as_acceptable_or_strong": 0,
+    "critical_count": 1319,
+    "mean_overoptimistic_cost": 1.0327401629212916
+  },
+  {
+    "month": "2026-03",
+    "scope": "validation",
+    "kind": "ordinal_critical",
+    "rows": 7188,
+    "critical_rate": 0.22922368041889132,
+    "mean_risk_score": 0.37690415437697017,
+    "critical_auc": 0.6680672585970455,
+    "critical_brier": 0.19197645059082202,
+    "critical_logloss": 0.568134236159091,
+    "confusion": [
+      [
+        1004,
+        454,
+        0,
+        0,
+        0
+      ],
+      [
+        1154,
+        1818,
+        1,
+        0,
+        0
+      ],
+      [
+        429,
+        774,
+        0,
+        0,
+        0
+      ],
+      [
+        429,
+        515,
+        0,
+        0,
+        0
+      ],
+      [
+        375,
+        235,
+        0,
+        0,
+        0
+      ]
+    ],
+    "critical_as_acceptable_or_strong": 0,
+    "critical_count": 1458,
+    "mean_overoptimistic_cost": 1.1089838704668031
+  },
+  {
+    "month": "2026-03",
+    "scope": "test",
+    "kind": "ordinal_critical",
+    "rows": 8524,
+    "critical_rate": 0.23835502904883268,
+    "mean_risk_score": 0.4255974754939687,
+    "critical_auc": 0.6901040261959858,
+    "critical_brier": 0.2043922650803916,
+    "critical_logloss": 0.5961688618047863,
+    "confusion": [
+      [
+        939,
+        379,
+        1,
+        0,
+        0
+      ],
+      [
+        1053,
+        1455,
+        1,
+        0,
+        0
+      ],
+      [
+        580,
+        1180,
+        0,
+        0,
+        0
+      ],
+      [
+        938,
+        1217,
+        1,
+        0,
+        0
+      ],
+      [
+        550,
+        230,
+        0,
+        0,
+        0
+      ]
+    ],
+    "critical_as_acceptable_or_strong": 0,
+    "critical_count": 1319,
+    "mean_overoptimistic_cost": 1.2595023509730883
+  },
+  {
+    "month": "2026-03",
+    "scope": "validation",
+    "kind": "ordinal_critical_fuzzy",
+    "rows": 7188,
+    "critical_rate": 0.22922368041889132,
+    "mean_risk_score": 0.37690415437697017,
+    "critical_auc": 0.6680672585970455,
+    "critical_brier": 0.19197645059082202,
+    "critical_logloss": 0.568134236159091,
+    "confusion": [
+      [
+        1007,
+        451,
+        0,
+        0,
+        0
+      ],
+      [
+        1160,
+        1813,
+        0,
+        0,
+        0
+      ],
+      [
+        430,
+        773,
+        0,
+        0,
+        0
+      ],
+      [
+        431,
+        513,
+        0,
+        0,
+        0
+      ],
+      [
+        377,
+        233,
+        0,
+        0,
+        0
+      ]
+    ],
+    "critical_as_acceptable_or_strong": 0,
+    "critical_count": 1458,
+    "mean_overoptimistic_cost": 1.1101414091372717
+  },
+  {
+    "month": "2026-03",
+    "scope": "test",
+    "kind": "ordinal_critical_fuzzy",
+    "rows": 8524,
+    "critical_rate": 0.23835502904883268,
+    "mean_risk_score": 0.4255974754939687,
+    "critical_auc": 0.6901040261959858,
+    "critical_brier": 0.2043922650803916,
+    "critical_logloss": 0.5961688618047863,
+    "confusion": [
+      [
+        939,
+        379,
+        1,
+        0,
+        0
+      ],
+      [
+        1057,
+        1451,
+        1,
+        0,
+        0
+      ],
+      [
+        584,
+        1176,
+        0,
+        0,
+        0
+      ],
+      [
+        940,
+        1215,
+        1,
+        0,
+        0
+      ],
+      [
+        553,
+        227,
+        0,
+        0,
+        0
+      ]
+    ],
+    "critical_as_acceptable_or_strong": 0,
+    "critical_count": 1319,
+    "mean_overoptimistic_cost": 1.2612432401573155
+  },
+  {
+    "month": "2026-04",
+    "scope": "validation",
+    "kind": "risk_binary",
+    "rows": 8224,
+    "critical_rate": 0.2190058115051012,
+    "mean_risk_score": 0.22135877480265756,
+    "critical_auc": 0.6693358339325721,
+    "critical_brier": 0.1600588943607144,
+    "critical_logloss": 0.4967703701708503
+  },
+  {
+    "month": "2026-04",
+    "scope": "test",
+    "kind": "risk_binary",
+    "rows": 9371,
+    "critical_rate": 0.19973803537275284,
+    "mean_risk_score": 0.21531796881489332,
+    "critical_auc": 0.6660250482548176,
+    "critical_brier": 0.15142239419330558,
+    "critical_logloss": 0.474773957057499
+  },
+  {
+    "month": "2026-04",
+    "scope": "validation",
+    "kind": "nominal",
+    "rows": 8224,
+    "critical_rate": 0.2190058115051012,
+    "mean_risk_score": 0.22090223043448462,
+    "critical_auc": 0.6704974057051465,
+    "critical_brier": 0.16022919982860984,
+    "critical_logloss": 0.4974682561338169,
+    "confusion": [
+      [
+        323,
+        876,
+        0,
+        0,
+        2
+      ],
+      [
+        248,
+        2174,
+        1,
+        0,
+        3
+      ],
+      [
+        93,
+        1630,
+        0,
+        0,
+        2
+      ],
+      [
+        194,
+        1929,
+        0,
+        0,
+        0
+      ],
+      [
+        182,
+        563,
+        0,
+        1,
+        3
+      ]
+    ],
+    "critical_as_acceptable_or_strong": 2,
+    "critical_count": 1201,
+    "mean_overoptimistic_cost": 1.0816869816761938
+  },
+  {
+    "month": "2026-04",
+    "scope": "test",
+    "kind": "nominal",
+    "rows": 9371,
+    "critical_rate": 0.19973803537275284,
+    "mean_risk_score": 0.21591636258583172,
+    "critical_auc": 0.6664455526793149,
+    "critical_brier": 0.1513756783760645,
+    "critical_logloss": 0.47470266227931784,
+    "confusion": [
+      [
+        378,
+        1223,
+        0,
+        9,
+        0
+      ],
+      [
+        306,
+        4020,
+        3,
+        4,
+        0
+      ],
+      [
+        113,
+        1178,
+        0,
+        1,
+        1
+      ],
+      [
+        136,
+        1196,
+        0,
+        6,
+        1
+      ],
+      [
+        160,
+        634,
+        0,
+        1,
+        1
+      ]
+    ],
+    "critical_as_acceptable_or_strong": 9,
+    "critical_count": 1610,
+    "mean_overoptimistic_cost": 1.0031582020197392
+  },
+  {
+    "month": "2026-04",
+    "scope": "validation",
+    "kind": "ordinal",
+    "rows": 8224,
+    "critical_rate": 0.2190058115051012,
+    "mean_risk_score": 0.2213586490456128,
+    "critical_auc": 0.6693357284471977,
+    "critical_brier": 0.16005887499784835,
+    "critical_logloss": 0.49677030723735605,
+    "confusion": [
+      [
+        312,
+        888,
+        0,
+        0,
+        1
+      ],
+      [
+        238,
+        2187,
+        0,
+        0,
+        1
+      ],
+      [
+        90,
+        1635,
+        0,
+        0,
+        0
+      ],
+      [
+        188,
+        1935,
+        0,
+        0,
+        0
+      ],
+      [
+        176,
+        573,
+        0,
+        0,
+        0
+      ]
+    ],
+    "critical_as_acceptable_or_strong": 1,
+    "critical_count": 1201,
+    "mean_overoptimistic_cost": 1.0713428830923433
+  },
+  {
+    "month": "2026-04",
+    "scope": "test",
+    "kind": "ordinal",
+    "rows": 9371,
+    "critical_rate": 0.19973803537275284,
+    "mean_risk_score": 0.21531797246668707,
+    "critical_auc": 0.6660247571014475,
+    "critical_brier": 0.15142239172033972,
+    "critical_logloss": 0.47477394907204207,
+    "confusion": [
+      [
+        355,
+        1249,
+        0,
+        6,
+        0
+      ],
+      [
+        293,
+        4035,
+        2,
+        3,
+        0
+      ],
+      [
+        113,
+        1179,
+        0,
+        1,
+        0
+      ],
+      [
+        125,
+        1209,
+        0,
+        5,
+        0
+      ],
+      [
+        152,
+        643,
+        0,
+        1,
+        0
+      ]
+    ],
+    "critical_as_acceptable_or_strong": 6,
+    "critical_count": 1610,
+    "mean_overoptimistic_cost": 1.0007523394563176
+  },
+  {
+    "month": "2026-04",
+    "scope": "validation",
+    "kind": "ordinal_critical",
+    "rows": 8224,
+    "critical_rate": 0.2190058115051012,
+    "mean_risk_score": 0.4218157717174361,
+    "critical_auc": 0.6723456668839883,
+    "critical_brier": 0.2074909240380557,
+    "critical_logloss": 0.6032950084509645,
+    "confusion": [
+      [
+        821,
+        379,
+        1,
+        0,
+        0
+      ],
+      [
+        980,
+        1445,
+        1,
+        0,
+        0
+      ],
+      [
+        575,
+        1150,
+        0,
+        0,
+        0
+      ],
+      [
+        1063,
+        1060,
+        0,
+        0,
+        0
+      ],
+      [
+        534,
+        215,
+        0,
+        0,
+        0
+      ]
+    ],
+    "critical_as_acceptable_or_strong": 0,
+    "critical_count": 1201,
+    "mean_overoptimistic_cost": 1.2780276971248172
+  },
+  {
+    "month": "2026-04",
+    "scope": "test",
+    "kind": "ordinal_critical",
+    "rows": 9371,
+    "critical_rate": 0.19973803537275284,
+    "mean_risk_score": 0.4225885769534743,
+    "critical_auc": 0.6665783227340634,
+    "critical_brier": 0.20635236930811016,
+    "critical_logloss": 0.6010580653771501,
+    "confusion": [
+      [
+        1082,
+        527,
+        0,
+        1,
+        0
+      ],
+      [
+        1706,
+        2626,
+        1,
+        0,
+        0
+      ],
+      [
+        601,
+        692,
+        0,
+        0,
+        0
+      ],
+      [
+        679,
+        659,
+        0,
+        1,
+        0
+      ],
+      [
+        511,
+        285,
+        0,
+        0,
+        0
+      ]
+    ],
+    "critical_as_acceptable_or_strong": 1,
+    "critical_count": 1610,
+    "mean_overoptimistic_cost": 1.2522283743902598
+  },
+  {
+    "month": "2026-04",
+    "scope": "validation",
+    "kind": "ordinal_critical_fuzzy",
+    "rows": 8224,
+    "critical_rate": 0.2190058115051012,
+    "mean_risk_score": 0.4218157717174361,
+    "critical_auc": 0.6723456668839883,
+    "critical_brier": 0.2074909240380557,
+    "critical_logloss": 0.6032950084509645,
+    "confusion": [
+      [
+        819,
+        381,
+        1,
+        0,
+        0
+      ],
+      [
+        985,
+        1440,
+        1,
+        0,
+        0
+      ],
+      [
+        578,
+        1147,
+        0,
+        0,
+        0
+      ],
+      [
+        1064,
+        1059,
+        0,
+        0,
+        0
+      ],
+      [
+        535,
+        214,
+        0,
+        0,
+        0
+      ]
+    ],
+    "critical_as_acceptable_or_strong": 0,
+    "critical_count": 1201,
+    "mean_overoptimistic_cost": 1.2800871196182926
+  },
+  {
+    "month": "2026-04",
+    "scope": "test",
+    "kind": "ordinal_critical_fuzzy",
+    "rows": 9371,
+    "critical_rate": 0.19973803537275284,
+    "mean_risk_score": 0.4225885769534743,
+    "critical_auc": 0.6665783227340634,
+    "critical_brier": 0.20635236930811016,
+    "critical_logloss": 0.6010580653771501,
+    "confusion": [
+      [
+        1081,
+        528,
+        0,
+        1,
+        0
+      ],
+      [
+        1709,
+        2622,
+        2,
+        0,
+        0
+      ],
+      [
+        603,
+        690,
+        0,
+        0,
+        0
+      ],
+      [
+        683,
+        656,
+        0,
+        0,
+        0
+      ],
+      [
+        516,
+        280,
+        0,
+        0,
+        0
+      ]
+    ],
+    "critical_as_acceptable_or_strong": 1,
+    "critical_count": 1610,
+    "mean_overoptimistic_cost": 1.2536270500474658
+  },
+  {
+    "month": "2026-05",
+    "scope": "validation",
+    "kind": "risk_binary",
+    "rows": 8735,
+    "critical_rate": 0.20375009437409494,
+    "mean_risk_score": 0.21706110419032504,
+    "critical_auc": 0.66244711733138,
+    "critical_brier": 0.1543195495149387,
+    "critical_logloss": 0.4815519129287133
+  },
+  {
+    "month": "2026-05",
+    "scope": "test",
+    "kind": "risk_binary",
+    "rows": 6798,
+    "critical_rate": 0.22810600882486498,
+    "mean_risk_score": 0.228896225204168,
+    "critical_auc": 0.6537269227665626,
+    "critical_brier": 0.16663810374366,
+    "critical_logloss": 0.5109828190458722
+  },
+  {
+    "month": "2026-05",
+    "scope": "validation",
+    "kind": "nominal",
+    "rows": 8735,
+    "critical_rate": 0.20375009437409494,
+    "mean_risk_score": 0.2177470954535212,
+    "critical_auc": 0.6624022409122599,
+    "critical_brier": 0.1543089695897343,
+    "critical_logloss": 0.48161350282120896,
+    "confusion": [
+      [
+        346,
+        1176,
+        4,
+        8,
+        0
+      ],
+      [
+        281,
+        3660,
+        12,
+        8,
+        0
+      ],
+      [
+        99,
+        1074,
+        0,
+        2,
+        0
+      ],
+      [
+        126,
+        1164,
+        0,
+        5,
+        0
+      ],
+      [
+        153,
+        616,
+        0,
+        1,
+        0
+      ]
+    ],
+    "critical_as_acceptable_or_strong": 8,
+    "critical_count": 1534,
+    "mean_overoptimistic_cost": 1.0248376423938557
+  },
+  {
+    "month": "2026-05",
+    "scope": "test",
+    "kind": "nominal",
+    "rows": 6798,
+    "critical_rate": 0.22810600882486498,
+    "mean_risk_score": 0.22939221623679798,
+    "critical_auc": 0.653466493310993,
+    "critical_brier": 0.1666201685606064,
+    "critical_logloss": 0.5110268073930206,
+    "confusion": [
+      [
+        464,
+        930,
+        0,
+        5,
+        5
+      ],
+      [
+        316,
+        2268,
+        0,
+        7,
+        0
+      ],
+      [
+        120,
+        922,
+        0,
+        2,
+        1
+      ],
+      [
+        159,
+        899,
+        1,
+        4,
+        0
+      ],
+      [
+        193,
+        494,
+        0,
+        6,
+        2
+      ]
+    ],
+    "critical_as_acceptable_or_strong": 10,
+    "critical_count": 1404,
+    "mean_overoptimistic_cost": 1.0908616251730034
+  },
+  {
+    "month": "2026-05",
+    "scope": "validation",
+    "kind": "ordinal",
+    "rows": 8735,
+    "critical_rate": 0.20375009437409494,
+    "mean_risk_score": 0.21706110802384304,
+    "critical_auc": 0.6624471107168256,
+    "critical_brier": 0.15431955042456583,
+    "critical_logloss": 0.4815519175959066,
+    "confusion": [
+      [
+        330,
+        1198,
+        0,
+        6,
+        0
+      ],
+      [
+        257,
+        3694,
+        4,
+        6,
+        0
+      ],
+      [
+        96,
+        1077,
+        0,
+        2,
+        0
+      ],
+      [
+        117,
+        1174,
+        0,
+        4,
+        0
+      ],
+      [
+        138,
+        631,
+        0,
+        1,
+        0
+      ]
+    ],
+    "critical_as_acceptable_or_strong": 6,
+    "critical_count": 1534,
+    "mean_overoptimistic_cost": 1.0142560360399973
+  },
+  {
+    "month": "2026-05",
+    "scope": "test",
+    "kind": "ordinal",
+    "rows": 6798,
+    "critical_rate": 0.22810600882486498,
+    "mean_risk_score": 0.22889622325801035,
+    "critical_auc": 0.6537269227665626,
+    "critical_brier": 0.16663810378199384,
+    "critical_logloss": 0.5109828191720321,
+    "confusion": [
+      [
+        445,
+        951,
+        0,
+        6,
+        2
+      ],
+      [
+        291,
+        2297,
+        0,
+        3,
+        0
+      ],
+      [
+        114,
+        929,
+        0,
+        2,
+        0
+      ],
+      [
+        140,
+        919,
+        0,
+        4,
+        0
+      ],
+      [
+        183,
+        508,
+        0,
+        3,
+        1
+      ]
+    ],
+    "critical_as_acceptable_or_strong": 8,
+    "critical_count": 1404,
+    "mean_overoptimistic_cost": 1.0700296222773675
+  },
+  {
+    "month": "2026-05",
+    "scope": "validation",
+    "kind": "ordinal_critical",
+    "rows": 8735,
+    "critical_rate": 0.20375009437409494,
+    "mean_risk_score": 0.4240398283564179,
+    "critical_auc": 0.6623652633060602,
+    "critical_brier": 0.20815148004545753,
+    "critical_logloss": 0.6053197771278571,
+    "confusion": [
+      [
+        1031,
+        501,
+        0,
+        2,
+        0
+      ],
+      [
+        1506,
+        2444,
+        7,
+        4,
+        0
+      ],
+      [
+        548,
+        627,
+        0,
+        0,
+        0
+      ],
+      [
+        653,
+        642,
+        0,
+        0,
+        0
+      ],
+      [
+        497,
+        273,
+        0,
+        0,
+        0
+      ]
+    ],
+    "critical_as_acceptable_or_strong": 2,
+    "critical_count": 1534,
+    "mean_overoptimistic_cost": 1.2713981657690008
+  },
+  {
+    "month": "2026-05",
+    "scope": "test",
+    "kind": "ordinal_critical",
+    "rows": 6798,
+    "critical_rate": 0.22810600882486498,
+    "mean_risk_score": 0.4444561589086878,
+    "critical_auc": 0.6527290414791407,
+    "critical_brier": 0.21771321663686613,
+    "critical_logloss": 0.6260366996770846,
+    "confusion": [
+      [
+        1130,
+        274,
+        0,
+        0,
+        0
+      ],
+      [
+        1465,
+        1126,
+        0,
+        0,
+        0
+      ],
+      [
+        587,
+        458,
+        0,
+        0,
+        0
+      ],
+      [
+        692,
+        370,
+        0,
+        1,
+        0
+      ],
+      [
+        575,
+        120,
+        0,
+        0,
+        0
+      ]
+    ],
+    "critical_as_acceptable_or_strong": 0,
+    "critical_count": 1404,
+    "mean_overoptimistic_cost": 1.3140016706003688
+  },
+  {
+    "month": "2026-05",
+    "scope": "validation",
+    "kind": "ordinal_critical_fuzzy",
+    "rows": 8735,
+    "critical_rate": 0.20375009437409494,
+    "mean_risk_score": 0.4240398283564179,
+    "critical_auc": 0.6623652633060602,
+    "critical_brier": 0.20815148004545753,
+    "critical_logloss": 0.6053197771278571,
+    "confusion": [
+      [
+        1031,
+        501,
+        0,
+        2,
+        0
+      ],
+      [
+        1510,
+        2444,
+        6,
+        1,
+        0
+      ],
+      [
+        548,
+        627,
+        0,
+        0,
+        0
+      ],
+      [
+        654,
+        641,
+        0,
+        0,
+        0
+      ],
+      [
+        496,
+        274,
+        0,
+        0,
+        0
+      ]
+    ],
+    "critical_as_acceptable_or_strong": 2,
+    "critical_count": 1534,
+    "mean_overoptimistic_cost": 1.2713569632883712
+  },
+  {
+    "month": "2026-05",
+    "scope": "test",
+    "kind": "ordinal_critical_fuzzy",
+    "rows": 6798,
+    "critical_rate": 0.22810600882486498,
+    "mean_risk_score": 0.4444561589086878,
+    "critical_auc": 0.6527290414791407,
+    "critical_brier": 0.21771321663686613,
+    "critical_logloss": 0.6260366996770846,
+    "confusion": [
+      [
+        1135,
+        269,
+        0,
+        0,
+        0
+      ],
+      [
+        1467,
+        1124,
+        0,
+        0,
+        0
+      ],
+      [
+        583,
+        462,
+        0,
+        0,
+        0
+      ],
+      [
+        692,
+        370,
+        0,
+        1,
+        0
+      ],
+      [
+        576,
+        119,
+        0,
+        0,
+        0
+      ]
+    ],
+    "critical_as_acceptable_or_strong": 0,
+    "critical_count": 1404,
+    "mean_overoptimistic_cost": 1.31351041231175
+  },
+  {
+    "month": "2026-06",
+    "scope": "validation",
+    "kind": "risk_binary",
+    "rows": 7928,
+    "critical_rate": 0.21564758043713822,
+    "mean_risk_score": 0.22431200790259653,
+    "critical_auc": 0.6579978106260325,
+    "critical_brier": 0.15992404356033538,
+    "critical_logloss": 0.4948656583759026
+  },
+  {
+    "month": "2026-06",
+    "scope": "test",
+    "kind": "risk_binary",
+    "rows": 8312,
+    "critical_rate": 0.22840161405489287,
+    "mean_risk_score": 0.2620023064581017,
+    "critical_auc": 0.615179820214209,
+    "critical_brier": 0.17588151468539928,
+    "critical_logloss": 0.5325351101807703
+  },
+  {
+    "month": "2026-06",
+    "scope": "validation",
+    "kind": "nominal",
+    "rows": 7928,
+    "critical_rate": 0.21564758043713822,
+    "mean_risk_score": 0.22474529118663117,
+    "critical_auc": 0.6580613478110973,
+    "critical_brier": 0.1598991754672145,
+    "critical_logloss": 0.49485722784480896,
+    "confusion": [
+      [
+        477,
+        1029,
+        0,
+        17,
+        4
+      ],
+      [
+        347,
+        2648,
+        1,
+        14,
+        1
+      ],
+      [
+        131,
+        1117,
+        0,
+        7,
+        1
+      ],
+      [
+        170,
+        1118,
+        1,
+        4,
+        2
+      ],
+      [
+        212,
+        617,
+        0,
+        7,
+        3
+      ]
+    ],
+    "critical_as_acceptable_or_strong": 21,
+    "critical_count": 1527,
+    "mean_overoptimistic_cost": 1.127091730974148
+  },
+  {
+    "month": "2026-06",
+    "scope": "test",
+    "kind": "nominal",
+    "rows": 8312,
+    "critical_rate": 0.22840161405489287,
+    "mean_risk_score": 0.2611073552035909,
+    "critical_auc": 0.6159447460149494,
+    "critical_brier": 0.1751319797665524,
+    "critical_logloss": 0.5309301789225256,
+    "confusion": [
+      [
+        717,
+        956,
+        0,
+        14,
+        7
+      ],
+      [
+        602,
+        2501,
+        1,
+        13,
+        4
+      ],
+      [
+        288,
+        896,
+        0,
+        9,
+        4
+      ],
+      [
+        380,
+        938,
+        0,
+        5,
+        4
+      ],
+      [
+        432,
+        528,
+        0,
+        9,
+        4
+      ]
+    ],
+    "critical_as_acceptable_or_strong": 21,
+    "critical_count": 1694,
+    "mean_overoptimistic_cost": 1.2766569201076143
+  },
+  {
+    "month": "2026-06",
+    "scope": "validation",
+    "kind": "ordinal",
+    "rows": 7928,
+    "critical_rate": 0.21564758043713822,
+    "mean_risk_score": 0.22431204473812155,
+    "critical_auc": 0.657997652362741,
+    "critical_brier": 0.1599240439974751,
+    "critical_logloss": 0.49486565860366843,
+    "confusion": [
+      [
+        459,
+        1054,
+        0,
+        11,
+        3
+      ],
+      [
+        318,
+        2689,
+        0,
+        3,
+        1
+      ],
+      [
+        125,
+        1126,
+        0,
+        5,
+        0
+      ],
+      [
+        153,
+        1139,
+        0,
+        3,
+        0
+      ],
+      [
+        203,
+        632,
+        0,
+        2,
+        2
+      ]
+    ],
+    "critical_as_acceptable_or_strong": 14,
+    "critical_count": 1527,
+    "mean_overoptimistic_cost": 1.099042158838673
+  },
+  {
+    "month": "2026-06",
+    "scope": "test",
+    "kind": "ordinal",
+    "rows": 8312,
+    "critical_rate": 0.22840161405489287,
+    "mean_risk_score": 0.2620023395293879,
+    "critical_auc": 0.6151805169492308,
+    "critical_brier": 0.17588152509140662,
+    "critical_logloss": 0.5325351343499812,
+    "confusion": [
+      [
+        692,
+        988,
+        0,
+        11,
+        3
+      ],
+      [
+        568,
+        2544,
+        0,
+        8,
+        1
+      ],
+      [
+        273,
+        918,
+        0,
+        4,
+        2
+      ],
+      [
+        362,
+        959,
+        0,
+        2,
+        4
+      ],
+      [
+        422,
+        545,
+        0,
+        5,
+        1
+      ]
+    ],
+    "critical_as_acceptable_or_strong": 14,
+    "critical_count": 1694,
+    "mean_overoptimistic_cost": 1.2404686067650643
+  },
+  {
+    "month": "2026-06",
+    "scope": "validation",
+    "kind": "ordinal_critical",
+    "rows": 7928,
+    "critical_rate": 0.21564758043713822,
+    "mean_risk_score": 0.4395852870255723,
+    "critical_auc": 0.656382086471477,
+    "critical_brier": 0.21412473543899274,
+    "critical_logloss": 0.6182220657759382,
+    "confusion": [
+      [
+        1228,
+        299,
+        0,
+        0,
+        0
+      ],
+      [
+        1703,
+        1307,
+        0,
+        1,
+        0
+      ],
+      [
+        682,
+        573,
+        0,
+        1,
+        0
+      ],
+      [
+        827,
+        467,
+        1,
+        0,
+        0
+      ],
+      [
+        677,
+        162,
+        0,
+        0,
+        0
+      ]
+    ],
+    "critical_as_acceptable_or_strong": 0,
+    "critical_count": 1527,
+    "mean_overoptimistic_cost": 1.3429313403215515
+  },
+  {
+    "month": "2026-06",
+    "scope": "test",
+    "kind": "ordinal_critical",
+    "rows": 8312,
+    "critical_rate": 0.22840161405489287,
+    "mean_risk_score": 0.48840754044046136,
+    "critical_auc": 0.6152098441141407,
+    "critical_brier": 0.24733589323533361,
+    "critical_logloss": 0.690919405788775,
+    "confusion": [
+      [
+        1474,
+        220,
+        0,
+        0,
+        0
+      ],
+      [
+        2043,
+        1078,
+        0,
+        0,
+        0
+      ],
+      [
+        891,
+        305,
+        0,
+        1,
+        0
+      ],
+      [
+        1024,
+        303,
+        0,
+        0,
+        0
+      ],
+      [
+        842,
+        131,
+        0,
+        0,
+        0
+      ]
+    ],
+    "critical_as_acceptable_or_strong": 0,
+    "critical_count": 1694,
+    "mean_overoptimistic_cost": 1.4729699415416253
+  },
+  {
+    "month": "2026-06",
+    "scope": "validation",
+    "kind": "ordinal_critical_fuzzy",
+    "rows": 7928,
+    "critical_rate": 0.21564758043713822,
+    "mean_risk_score": 0.4395852870255723,
+    "critical_auc": 0.656382086471477,
+    "critical_brier": 0.21412473543899274,
+    "critical_logloss": 0.6182220657759382,
+    "confusion": [
+      [
+        1232,
+        295,
+        0,
+        0,
+        0
+      ],
+      [
+        1708,
+        1302,
+        0,
+        1,
+        0
+      ],
+      [
+        682,
+        573,
+        0,
+        1,
+        0
+      ],
+      [
+        828,
+        466,
+        0,
+        1,
+        0
+      ],
+      [
+        676,
+        163,
+        0,
+        0,
+        0
+      ]
+    ],
+    "critical_as_acceptable_or_strong": 0,
+    "critical_count": 1527,
+    "mean_overoptimistic_cost": 1.34303403260099
+  },
+  {
+    "month": "2026-06",
+    "scope": "test",
+    "kind": "ordinal_critical_fuzzy",
+    "rows": 8312,
+    "critical_rate": 0.22840161405489287,
+    "mean_risk_score": 0.48840754044046136,
+    "critical_auc": 0.6152098441141407,
+    "critical_brier": 0.24733589323533361,
+    "critical_logloss": 0.690919405788775,
+    "confusion": [
+      [
+        1480,
+        214,
+        0,
+        0,
+        0
+      ],
+      [
+        2050,
+        1071,
+        0,
+        0,
+        0
+      ],
+      [
+        892,
+        304,
+        0,
+        1,
+        0
+      ],
+      [
+        1024,
+        303,
+        0,
+        0,
+        0
+      ],
+      [
+        843,
+        130,
+        0,
+        0,
+        0
+      ]
+    ],
+    "critical_as_acceptable_or_strong": 0,
+    "critical_count": 1694,
+    "mean_overoptimistic_cost": 1.472936134847207
+  },
+  {
+    "month": "2026-07",
+    "scope": "validation",
+    "kind": "risk_binary",
+    "rows": 7442,
+    "critical_rate": 0.23223548786108583,
+    "mean_risk_score": 0.2683831498451929,
+    "critical_auc": 0.6119270143458087,
+    "critical_brier": 0.17824976137448573,
+    "critical_logloss": 0.5381950152126441
+  },
+  {
+    "month": "2026-07",
+    "scope": "test",
+    "kind": "risk_binary",
+    "rows": 12305,
+    "critical_rate": 0.202050514547576,
+    "mean_risk_score": 0.23400553661462212,
+    "critical_auc": 0.6929991292362239,
+    "critical_brier": 0.14980096589446798,
+    "critical_logloss": 0.46871035113954884
+  },
+  {
+    "month": "2026-07",
+    "scope": "validation",
+    "kind": "nominal",
+    "rows": 7442,
+    "critical_rate": 0.23223548786108583,
+    "mean_risk_score": 0.2673033489102862,
+    "critical_auc": 0.6124150212614468,
+    "critical_brier": 0.1773692139778823,
+    "critical_logloss": 0.5363315236165017,
+    "confusion": [
+      [
+        687,
+        857,
+        0,
+        10,
+        8
+      ],
+      [
+        571,
+        1948,
+        0,
+        9,
+        8
+      ],
+      [
+        264,
+        838,
+        0,
+        3,
+        6
+      ],
+      [
+        355,
+        917,
+        0,
+        6,
+        9
+      ],
+      [
+        400,
+        534,
+        0,
+        6,
+        6
+      ]
+    ],
+    "critical_as_acceptable_or_strong": 18,
+    "critical_count": 1562,
+    "mean_overoptimistic_cost": 1.3019177435014733
+  },
+  {
+    "month": "2026-07",
+    "scope": "test",
+    "kind": "nominal",
+    "rows": 12305,
+    "critical_rate": 0.202050514547576,
+    "mean_risk_score": 0.23158868932765186,
+    "critical_auc": 0.6946419449003475,
+    "critical_brier": 0.14871601965565473,
+    "critical_logloss": 0.46629956459021354,
+    "confusion": [
+      [
+        762,
+        1145,
+        0,
+        27,
+        27
+      ],
+      [
+        653,
+        3789,
+        0,
+        88,
+        23
+      ],
+      [
+        293,
+        2116,
+        0,
+        39,
+        12
+      ],
+      [
+        403,
+        2057,
+        0,
+        24,
+        14
+      ],
+      [
+        295,
+        515,
+        0,
+        10,
+        13
+      ]
+    ],
+    "critical_as_acceptable_or_strong": 54,
+    "critical_count": 1961,
+    "mean_overoptimistic_cost": 1.2130744374697602
+  },
+  {
+    "month": "2026-07",
+    "scope": "validation",
+    "kind": "ordinal",
+    "rows": 7442,
+    "critical_rate": 0.23223548786108583,
+    "mean_risk_score": 0.26838314999291935,
+    "critical_auc": 0.6119270143458087,
+    "critical_brier": 0.17824976137791265,
+    "critical_logloss": 0.5381950151868778,
+    "confusion": [
+      [
+        659,
+        891,
+        0,
+        7,
+        5
+      ],
+      [
+        541,
+        1986,
+        0,
+        6,
+        3
+      ],
+      [
+        250,
+        854,
+        0,
+        3,
+        4
+      ],
+      [
+        332,
+        947,
+        0,
+        6,
+        2
+      ],
+      [
+        385,
+        552,
+        0,
+        6,
+        3
+      ]
+    ],
+    "critical_as_acceptable_or_strong": 12,
+    "critical_count": 1562,
+    "mean_overoptimistic_cost": 1.2736856788410358
+  },
+  {
+    "month": "2026-07",
+    "scope": "test",
+    "kind": "ordinal",
+    "rows": 12305,
+    "critical_rate": 0.202050514547576,
+    "mean_risk_score": 0.2340055127449509,
+    "critical_auc": 0.6929996161319005,
+    "critical_brier": 0.14980095415500141,
+    "critical_logloss": 0.4687103268061399,
+    "confusion": [
+      [
+        746,
+        1173,
+        0,
+        26,
+        16
+      ],
+      [
+        631,
+        3835,
+        0,
+        76,
+        11
+      ],
+      [
+        279,
+        2139,
+        0,
+        33,
+        9
+      ],
+      [
+        389,
+        2082,
+        0,
+        20,
+        7
+      ],
+      [
+        298,
+        523,
+        0,
+        7,
+        5
+      ]
+    ],
+    "critical_as_acceptable_or_strong": 42,
+    "critical_count": 1961,
+    "mean_overoptimistic_cost": 1.168210920469738
+  },
+  {
+    "month": "2026-07",
+    "scope": "validation",
+    "kind": "ordinal_critical",
+    "rows": 7442,
+    "critical_rate": 0.23223548786108583,
+    "mean_risk_score": 0.497878250452047,
+    "critical_auc": 0.6121099595330819,
+    "critical_brier": 0.2514228881720767,
+    "critical_logloss": 0.7003767741983558,
+    "confusion": [
+      [
+        1403,
+        159,
+        0,
+        0,
+        0
+      ],
+      [
+        1888,
+        648,
+        0,
+        0,
+        0
+      ],
+      [
+        858,
+        253,
+        0,
+        0,
+        0
+      ],
+      [
+        997,
+        290,
+        0,
+        0,
+        0
+      ],
+      [
+        815,
+        131,
+        0,
+        0,
+        0
+      ]
+    ],
+    "critical_as_acceptable_or_strong": 0,
+    "critical_count": 1562,
+    "mean_overoptimistic_cost": 1.513502973827573
+  },
+  {
+    "month": "2026-07",
+    "scope": "test",
+    "kind": "ordinal_critical",
+    "rows": 12305,
+    "critical_rate": 0.202050514547576,
+    "mean_risk_score": 0.4492823419857693,
+    "critical_auc": 0.6922595571002373,
+    "critical_brier": 0.2131421579776016,
+    "critical_logloss": 0.6179849711226658,
+    "confusion": [
+      [
+        1577,
+        384,
+        0,
+        0,
+        0
+      ],
+      [
+        2720,
+        1833,
+        0,
+        0,
+        0
+      ],
+      [
+        1162,
+        1297,
+        0,
+        1,
+        0
+      ],
+      [
+        1379,
+        1119,
+        0,
+        0,
+        0
+      ],
+      [
+        665,
+        168,
+        0,
+        0,
+        0
+      ]
+    ],
+    "critical_as_acceptable_or_strong": 0,
+    "critical_count": 1961,
+    "mean_overoptimistic_cost": 1.3444968095993564
+  },
+  {
+    "month": "2026-07",
+    "scope": "validation",
+    "kind": "ordinal_critical_fuzzy",
+    "rows": 7442,
+    "critical_rate": 0.23223548786108583,
+    "mean_risk_score": 0.497878250452047,
+    "critical_auc": 0.6121099595330819,
+    "critical_brier": 0.2514228881720767,
+    "critical_logloss": 0.7003767741983558,
+    "confusion": [
+      [
+        1406,
+        156,
+        0,
+        0,
+        0
+      ],
+      [
+        1895,
+        641,
+        0,
+        0,
+        0
+      ],
+      [
+        864,
+        247,
+        0,
+        0,
+        0
+      ],
+      [
+        996,
+        291,
+        0,
+        0,
+        0
+      ],
+      [
+        818,
+        128,
+        0,
+        0,
+        0
+      ]
+    ],
+    "critical_as_acceptable_or_strong": 0,
+    "critical_count": 1562,
+    "mean_overoptimistic_cost": 1.5142297545858163
+  },
+  {
+    "month": "2026-07",
+    "scope": "test",
+    "kind": "ordinal_critical_fuzzy",
+    "rows": 12305,
+    "critical_rate": 0.202050514547576,
+    "mean_risk_score": 0.4492823419857693,
+    "critical_auc": 0.6922595571002373,
+    "critical_brier": 0.2131421579776016,
+    "critical_logloss": 0.6179849711226658,
+    "confusion": [
+      [
+        1576,
+        385,
+        0,
+        0,
+        0
+      ],
+      [
+        2726,
+        1827,
+        0,
+        0,
+        0
+      ],
+      [
+        1171,
+        1288,
+        0,
+        1,
+        0
+      ],
+      [
+        1388,
+        1110,
+        0,
+        0,
+        0
+      ],
+      [
+        665,
+        168,
+        0,
+        0,
+        0
+      ]
+    ],
+    "critical_as_acceptable_or_strong": 0,
+    "critical_count": 1961,
+    "mean_overoptimistic_cost": 1.3468130407687766
+  },
+  {
+    "month": "2026-08",
+    "scope": "validation",
+    "kind": "risk_binary",
+    "rows": 10061,
+    "critical_rate": 0.2196218942808227,
+    "mean_risk_score": 0.22867822519212838,
+    "critical_auc": 0.6689908529737858,
+    "critical_brier": 0.16120795009552996,
+    "critical_logloss": 0.4980910179319684
+  },
+  {
+    "month": "2026-08",
+    "scope": "test",
+    "kind": "risk_binary",
+    "rows": 9811,
+    "critical_rate": 0.21332597318555357,
+    "mean_risk_score": 0.2015360275606621,
+    "critical_auc": 0.6720349792312632,
+    "critical_brier": 0.1571170406623514,
+    "critical_logloss": 0.48713139862042953
+  },
+  {
+    "month": "2026-08",
+    "scope": "validation",
+    "kind": "nominal",
+    "rows": 10061,
+    "critical_rate": 0.2196218942808227,
+    "mean_risk_score": 0.2260615991093617,
+    "critical_auc": 0.6714764978249959,
+    "critical_brier": 0.16011950724591192,
+    "critical_logloss": 0.4956713599171759,
+    "confusion": [
+      [
+        643,
+        1075,
+        0,
+        41,
+        43
+      ],
+      [
+        552,
+        3077,
+        1,
+        167,
+        40
+      ],
+      [
+        217,
+        1503,
+        0,
+        99,
+        19
+      ],
+      [
+        342,
+        1513,
+        1,
+        65,
+        24
+      ],
+      [
+        247,
+        350,
+        0,
+        25,
+        17
+      ]
+    ],
+    "critical_as_acceptable_or_strong": 84,
+    "critical_count": 1802,
+    "mean_overoptimistic_cost": 1.3313106557658616
+  },
+  {
+    "month": "2026-08",
+    "scope": "test",
+    "kind": "nominal",
+    "rows": 9811,
+    "critical_rate": 0.21332597318555357,
+    "mean_risk_score": 0.202241336057038,
+    "critical_auc": 0.6731419357840575,
+    "critical_brier": 0.15668771300506373,
+    "critical_logloss": 0.4861251996121176,
+    "confusion": [
+      [
+        386,
+        1309,
+        4,
+        6,
+        9
+      ],
+      [
+        298,
+        3023,
+        2,
+        8,
+        15
+      ],
+      [
+        124,
+        1847,
+        0,
+        3,
+        6
+      ],
+      [
+        138,
+        1767,
+        0,
+        11,
+        20
+      ],
+      [
+        149,
+        662,
+        0,
+        7,
+        17
+      ]
+    ],
+    "critical_as_acceptable_or_strong": 15,
+    "critical_count": 1714,
+    "mean_overoptimistic_cost": 1.1143440322382612
+  },
+  {
+    "month": "2026-08",
+    "scope": "validation",
+    "kind": "ordinal",
+    "rows": 10061,
+    "critical_rate": 0.2196218942808227,
+    "mean_risk_score": 0.22867825415643137,
+    "critical_auc": 0.6689901225253085,
+    "critical_brier": 0.1612079694890081,
+    "critical_logloss": 0.49809105885925475,
+    "confusion": [
+      [
+        635,
+        1110,
+        0,
+        31,
+        26
+      ],
+      [
+        532,
+        3137,
+        0,
+        141,
+        27
+      ],
+      [
+        210,
+        1529,
+        0,
+        85,
+        14
+      ],
+      [
+        332,
+        1542,
+        0,
+        55,
+        16
+      ],
+      [
+        244,
+        362,
+        0,
+        20,
+        13
+      ]
+    ],
+    "critical_as_acceptable_or_strong": 57,
+    "critical_count": 1802,
+    "mean_overoptimistic_cost": 1.2504849551650385
+  },
+  {
+    "month": "2026-08",
+    "scope": "test",
+    "kind": "ordinal",
+    "rows": 9811,
+    "critical_rate": 0.21332597318555357,
+    "mean_risk_score": 0.20153602759421788,
+    "critical_auc": 0.6720349792312632,
+    "critical_brier": 0.15711704065451226,
+    "critical_logloss": 0.4871313985957442,
+    "confusion": [
+      [
+        362,
+        1341,
+        0,
+        5,
+        6
+      ],
+      [
+        272,
+        3056,
+        0,
+        9,
+        9
+      ],
+      [
+        111,
+        1864,
+        0,
+        3,
+        2
+      ],
+      [
+        126,
+        1788,
+        0,
+        12,
+        10
+      ],
+      [
+        140,
+        680,
+        0,
+        6,
+        9
+      ]
+    ],
+    "critical_as_acceptable_or_strong": 11,
+    "critical_count": 1714,
+    "mean_overoptimistic_cost": 1.0886145093489032
+  },
+  {
+    "month": "2026-08",
+    "scope": "validation",
+    "kind": "ordinal_critical",
+    "rows": 10061,
+    "critical_rate": 0.2196218942808227,
+    "mean_risk_score": 0.43944134028716664,
+    "critical_auc": 0.6685575775466049,
+    "critical_brier": 0.2138336907873155,
+    "critical_logloss": 0.6191675937159148,
+    "confusion": [
+      [
+        1347,
+        454,
+        0,
+        1,
+        0
+      ],
+      [
+        2228,
+        1607,
+        0,
+        2,
+        0
+      ],
+      [
+        917,
+        920,
+        0,
+        1,
+        0
+      ],
+      [
+        1078,
+        867,
+        0,
+        0,
+        0
+      ],
+      [
+        507,
+        132,
+        0,
+        0,
+        0
+      ]
+    ],
+    "critical_as_acceptable_or_strong": 1,
+    "critical_count": 1802,
+    "mean_overoptimistic_cost": 1.2987048229566696
+  },
+  {
+    "month": "2026-08",
+    "scope": "test",
+    "kind": "ordinal_critical",
+    "rows": 9811,
+    "critical_rate": 0.21332597318555357,
+    "mean_risk_score": 0.40703407859973206,
+    "critical_auc": 0.6698545778821606,
+    "critical_brier": 0.19743678228110023,
+    "critical_logloss": 0.5813549350160802,
+    "confusion": [
+      [
+        1281,
+        433,
+        0,
+        0,
+        0
+      ],
+      [
+        1754,
+        1589,
+        0,
+        3,
+        0
+      ],
+      [
+        868,
+        1110,
+        0,
+        2,
+        0
+      ],
+      [
+        920,
+        1012,
+        0,
+        4,
+        0
+      ],
+      [
+        547,
+        288,
+        0,
+        0,
+        0
+      ]
+    ],
+    "critical_as_acceptable_or_strong": 0,
+    "critical_count": 1714,
+    "mean_overoptimistic_cost": 1.3052808159172404
+  },
+  {
+    "month": "2026-08",
+    "scope": "validation",
+    "kind": "ordinal_critical_fuzzy",
+    "rows": 10061,
+    "critical_rate": 0.2196218942808227,
+    "mean_risk_score": 0.43944134028716664,
+    "critical_auc": 0.6685575775466049,
+    "critical_brier": 0.2138336907873155,
+    "critical_logloss": 0.6191675937159148,
+    "confusion": [
+      [
+        1347,
+        454,
+        0,
+        1,
+        0
+      ],
+      [
+        2237,
+        1596,
+        0,
+        4,
+        0
+      ],
+      [
+        917,
+        920,
+        0,
+        1,
+        0
+      ],
+      [
+        1081,
+        864,
+        0,
+        0,
+        0
+      ],
+      [
+        508,
+        131,
+        0,
+        0,
+        0
+      ]
+    ],
+    "critical_as_acceptable_or_strong": 1,
+    "critical_count": 1802,
+    "mean_overoptimistic_cost": 1.3007353003720983
+  },
+  {
+    "month": "2026-08",
+    "scope": "test",
+    "kind": "ordinal_critical_fuzzy",
+    "rows": 9811,
+    "critical_rate": 0.21332597318555357,
+    "mean_risk_score": 0.40703407859973206,
+    "critical_auc": 0.6698545778821606,
+    "critical_brier": 0.19743678228110023,
+    "critical_logloss": 0.5813549350160802,
+    "confusion": [
+      [
+        1284,
+        430,
+        0,
+        0,
+        0
+      ],
+      [
+        1757,
+        1585,
+        0,
+        4,
+        0
+      ],
+      [
+        870,
+        1109,
+        0,
+        1,
+        0
+      ],
+      [
+        916,
+        1016,
+        0,
+        4,
+        0
+      ],
+      [
+        548,
+        286,
+        0,
+        1,
+        0
+      ]
+    ],
+    "critical_as_acceptable_or_strong": 0,
+    "critical_count": 1714,
+    "mean_overoptimistic_cost": 1.3052831433599097
+  },
+  {
+    "month": "2026-09",
+    "scope": "validation",
+    "kind": "risk_binary",
+    "rows": 8962,
+    "critical_rate": 0.22310887961868284,
+    "mean_risk_score": 0.19931051718889137,
+    "critical_auc": 0.6718867867578117,
+    "critical_brier": 0.16133300537422685,
+    "critical_logloss": 0.49832580318311603
+  },
+  {
+    "month": "2026-09",
+    "scope": "test",
+    "kind": "risk_binary",
+    "rows": 6735,
+    "critical_rate": 0.23510789922874983,
+    "mean_risk_score": 0.20785045435654564,
+    "critical_auc": 0.7036520831645877,
+    "critical_brier": 0.16296184502690186,
+    "critical_logloss": 0.4992859686037511
+  },
+  {
+    "month": "2026-09",
+    "scope": "validation",
+    "kind": "nominal",
+    "rows": 8962,
+    "critical_rate": 0.22310887961868284,
+    "mean_risk_score": 0.20011075105440446,
+    "critical_auc": 0.6722962531091821,
+    "critical_brier": 0.16103968979997324,
+    "critical_logloss": 0.497760567459161,
+    "confusion": [
+      [
+        377,
+        1304,
+        2,
+        4,
+        12
+      ],
+      [
+        264,
+        2886,
+        2,
+        6,
+        24
+      ],
+      [
+        115,
+        1575,
+        0,
+        2,
+        7
+      ],
+      [
+        130,
+        1463,
+        0,
+        4,
+        22
+      ],
+      [
+        128,
+        615,
+        0,
+        1,
+        19
+      ]
+    ],
+    "critical_as_acceptable_or_strong": 16,
+    "critical_count": 1699,
+    "mean_overoptimistic_cost": 1.115013588861584
+  },
+  {
+    "month": "2026-09",
+    "scope": "test",
+    "kind": "nominal",
+    "rows": 6735,
+    "critical_rate": 0.23510789922874983,
+    "mean_risk_score": 0.20794222415462046,
+    "critical_auc": 0.7043479174978049,
+    "critical_brier": 0.16278160817573248,
+    "critical_logloss": 0.49872771346658795,
+    "confusion": [
+      [
+        320,
+        920,
+        0,
+        2,
+        0
+      ],
+      [
+        218,
+        2680,
+        0,
+        3,
+        1
+      ],
+      [
+        68,
+        1119,
+        0,
+        1,
+        2
+      ],
+      [
+        81,
+        855,
+        0,
+        4,
+        2
+      ],
+      [
+        68,
+        381,
+        0,
+        4,
+        6
+      ]
+    ],
+    "critical_as_acceptable_or_strong": 2,
+    "critical_count": 1242,
+    "mean_overoptimistic_cost": 0.8858506525936386
+  },
+  {
+    "month": "2026-09",
+    "scope": "validation",
+    "kind": "ordinal",
+    "rows": 8962,
+    "critical_rate": 0.22310887961868284,
+    "mean_risk_score": 0.19931053541818802,
+    "critical_auc": 0.6718859137583195,
+    "critical_brier": 0.16133300181376498,
+    "critical_logloss": 0.49832581074277654,
+    "confusion": [
+      [
+        357,
+        1333,
+        1,
+        2,
+        6
+      ],
+      [
+        244,
+        2917,
+        0,
+        7,
+        14
+      ],
+      [
+        108,
+        1584,
+        0,
+        3,
+        4
+      ],
+      [
+        122,
+        1476,
+        0,
+        5,
+        16
+      ],
+      [
+        126,
+        621,
+        0,
+        1,
+        15
+      ]
+    ],
+    "critical_as_acceptable_or_strong": 8,
+    "critical_count": 1699,
+    "mean_overoptimistic_cost": 1.065722966249342
+  },
+  {
+    "month": "2026-09",
+    "scope": "test",
+    "kind": "ordinal",
+    "rows": 6735,
+    "critical_rate": 0.23510789922874983,
+    "mean_risk_score": 0.2078504953513799,
+    "critical_auc": 0.703651824180622,
+    "critical_brier": 0.16296183416750637,
+    "critical_logloss": 0.4992859296110653,
+    "confusion": [
+      [
+        303,
+        937,
+        0,
+        2,
+        0
+      ],
+      [
+        195,
+        2704,
+        0,
+        2,
+        1
+      ],
+      [
+        60,
+        1129,
+        0,
+        1,
+        0
+      ],
+      [
+        76,
+        862,
+        0,
+        4,
+        0
+      ],
+      [
+        63,
+        388,
+        0,
+        4,
+        4
+      ]
+    ],
+    "critical_as_acceptable_or_strong": 2,
+    "critical_count": 1242,
+    "mean_overoptimistic_cost": 0.881590417265689
+  },
+  {
+    "month": "2026-09",
+    "scope": "validation",
+    "kind": "ordinal_critical",
+    "rows": 8962,
+    "critical_rate": 0.22310887961868284,
+    "mean_risk_score": 0.4030701623521985,
+    "critical_auc": 0.6711796818053205,
+    "critical_brier": 0.1952146520470429,
+    "critical_logloss": 0.5770356754460111,
+    "confusion": [
+      [
+        1239,
+        460,
+        0,
+        0,
+        0
+      ],
+      [
+        1640,
+        1541,
+        0,
+        1,
+        0
+      ],
+      [
+        768,
+        930,
+        0,
+        1,
+        0
+      ],
+      [
+        794,
+        823,
+        0,
+        2,
+        0
+      ],
+      [
+        489,
+        274,
+        0,
+        0,
+        0
+      ]
+    ],
+    "critical_as_acceptable_or_strong": 0,
+    "critical_count": 1699,
+    "mean_overoptimistic_cost": 1.2762053056629097
+  },
+  {
+    "month": "2026-09",
+    "scope": "test",
+    "kind": "ordinal_critical",
+    "rows": 6735,
+    "critical_rate": 0.23510789922874983,
+    "mean_risk_score": 0.415408939717493,
+    "critical_auc": 0.7040079024530828,
+    "critical_brier": 0.19472507252934035,
+    "critical_logloss": 0.5762055786150125,
+    "confusion": [
+      [
+        964,
+        278,
+        0,
+        0,
+        0
+      ],
+      [
+        1409,
+        1493,
+        0,
+        0,
+        0
+      ],
+      [
+        572,
+        618,
+        0,
+        0,
+        0
+      ],
+      [
+        541,
+        401,
+        0,
+        0,
+        0
+      ],
+      [
+        352,
+        105,
+        0,
+        2,
+        0
+      ]
+    ],
+    "critical_as_acceptable_or_strong": 0,
+    "critical_count": 1242,
+    "mean_overoptimistic_cost": 1.137204865113952
+  },
+  {
+    "month": "2026-09",
+    "scope": "validation",
+    "kind": "ordinal_critical_fuzzy",
+    "rows": 8962,
+    "critical_rate": 0.22310887961868284,
+    "mean_risk_score": 0.4030701623521985,
+    "critical_auc": 0.6711796818053205,
+    "critical_brier": 0.1952146520470429,
+    "critical_logloss": 0.5770356754460111,
+    "confusion": [
+      [
+        1235,
+        464,
+        0,
+        0,
+        0
+      ],
+      [
+        1636,
+        1545,
+        0,
+        1,
+        0
+      ],
+      [
+        767,
+        930,
+        0,
+        2,
+        0
+      ],
+      [
+        797,
+        820,
+        0,
+        2,
+        0
+      ],
+      [
+        488,
+        275,
+        0,
+        0,
+        0
+      ]
+    ],
+    "critical_as_acceptable_or_strong": 0,
+    "critical_count": 1699,
+    "mean_overoptimistic_cost": 1.2760889258126877
+  },
+  {
+    "month": "2026-09",
+    "scope": "test",
+    "kind": "ordinal_critical_fuzzy",
+    "rows": 6735,
+    "critical_rate": 0.23510789922874983,
+    "mean_risk_score": 0.415408939717493,
+    "critical_auc": 0.7040079024530828,
+    "critical_brier": 0.19472507252934035,
+    "critical_logloss": 0.5762055786150125,
+    "confusion": [
+      [
+        963,
+        279,
+        0,
+        0,
+        0
+      ],
+      [
+        1405,
+        1497,
+        0,
+        0,
+        0
+      ],
+      [
+        571,
+        619,
+        0,
+        0,
+        0
+      ],
+      [
+        537,
+        405,
+        0,
+        0,
+        0
+      ],
+      [
+        352,
+        106,
+        0,
+        1,
+        0
+      ]
+    ],
+    "critical_as_acceptable_or_strong": 0,
+    "critical_count": 1242,
+    "mean_overoptimistic_cost": 1.136801003293189
+  },
+  {
+    "month": "2026-10",
+    "scope": "validation",
+    "kind": "risk_binary",
+    "rows": 6393,
+    "critical_rate": 0.22274048717264353,
+    "mean_risk_score": 0.21863978856228553,
+    "critical_auc": 0.7041873064095779,
+    "critical_brier": 0.15603527098443837,
+    "critical_logloss": 0.48289565049150474
+  },
+  {
+    "month": "2026-10",
+    "scope": "test",
+    "kind": "risk_binary",
+    "rows": 1097,
+    "critical_rate": 0.366217521483103,
+    "mean_risk_score": 0.23002639462681448,
+    "critical_auc": 0.6660781245656147,
+    "critical_brier": 0.23406835218214622,
+    "critical_logloss": 0.6694493185969791
+  },
+  {
+    "month": "2026-10",
+    "scope": "validation",
+    "kind": "nominal",
+    "rows": 6393,
+    "critical_rate": 0.22274048717264353,
+    "mean_risk_score": 0.21882534702725737,
+    "critical_auc": 0.7059641728968609,
+    "critical_brier": 0.15579208133388256,
+    "critical_logloss": 0.48207290437389433,
+    "confusion": [
+      [
+        322,
+        750,
+        0,
+        3,
+        2
+      ],
+      [
+        241,
+        2503,
+        7,
+        8,
+        1
+      ],
+      [
+        84,
+        1078,
+        2,
+        7,
+        3
+      ],
+      [
+        101,
+        823,
+        0,
+        7,
+        2
+      ],
+      [
+        81,
+        360,
+        0,
+        3,
+        5
+      ]
+    ],
+    "critical_as_acceptable_or_strong": 5,
+    "critical_count": 1077,
+    "mean_overoptimistic_cost": 0.9342430041952988
+  },
+  {
+    "month": "2026-10",
+    "scope": "test",
+    "kind": "nominal",
+    "rows": 1097,
+    "critical_rate": 0.366217521483103,
+    "mean_risk_score": 0.2303414983755648,
+    "critical_auc": 0.6690600293242461,
+    "critical_brier": 0.23352615899310533,
+    "critical_logloss": 0.6675036087675341,
+    "confusion": [
+      [
+        93,
+        235,
+        0,
+        0,
+        1
+      ],
+      [
+        46,
+        459,
+        0,
+        1,
+        0
+      ],
+      [
+        19,
+        119,
+        0,
+        0,
+        0
+      ],
+      [
+        14,
+        73,
+        0,
+        0,
+        0
+      ],
+      [
+        7,
+        30,
+        0,
+        0,
+        0
+      ]
+    ],
+    "critical_as_acceptable_or_strong": 1,
+    "critical_count": 329,
+    "mean_overoptimistic_cost": 0.810292023452688
+  },
+  {
+    "month": "2026-10",
+    "scope": "validation",
+    "kind": "ordinal",
+    "rows": 6393,
+    "critical_rate": 0.22274048717264353,
+    "mean_risk_score": 0.2186397918711831,
+    "critical_auc": 0.7041873357701287,
+    "critical_brier": 0.1560352673729309,
+    "critical_logloss": 0.4828956383522821,
+    "confusion": [
+      [
+        306,
+        768,
+        0,
+        2,
+        1
+      ],
+      [
+        219,
+        2532,
+        2,
+        6,
+        1
+      ],
+      [
+        76,
+        1090,
+        2,
+        6,
+        0
+      ],
+      [
+        95,
+        828,
+        0,
+        10,
+        0
+      ],
+      [
+        76,
+        366,
+        0,
+        3,
+        4
+      ]
+    ],
+    "critical_as_acceptable_or_strong": 3,
+    "critical_count": 1077,
+    "mean_overoptimistic_cost": 0.9122741223798254
+  },
+  {
+    "month": "2026-10",
+    "scope": "test",
+    "kind": "ordinal",
+    "rows": 1097,
+    "critical_rate": 0.366217521483103,
+    "mean_risk_score": 0.23002630156291445,
+    "critical_auc": 0.6660781245656147,
+    "critical_brier": 0.23406837220564666,
+    "critical_logloss": 0.6694493795553091,
+    "confusion": [
+      [
+        88,
+        240,
+        0,
+        0,
+        1
+      ],
+      [
+        44,
+        461,
+        0,
+        1,
+        0
+      ],
+      [
+        16,
+        122,
+        0,
+        0,
+        0
+      ],
+      [
+        14,
+        73,
+        0,
+        0,
+        0
+      ],
+      [
+        6,
+        31,
+        0,
+        0,
+        0
+      ]
+    ],
+    "critical_as_acceptable_or_strong": 1,
+    "critical_count": 329,
+    "mean_overoptimistic_cost": 0.8145025654564412
+  },
+  {
+    "month": "2026-10",
+    "scope": "validation",
+    "kind": "ordinal_critical",
+    "rows": 6393,
+    "critical_rate": 0.22274048717264353,
+    "mean_risk_score": 0.43038192519255086,
+    "critical_auc": 0.7048836417207718,
+    "critical_brier": 0.20006662655566246,
+    "critical_logloss": 0.5881754669362919,
+    "confusion": [
+      [
+        908,
+        169,
+        0,
+        0,
+        0
+      ],
+      [
+        1545,
+        1210,
+        1,
+        4,
+        0
+      ],
+      [
+        672,
+        500,
+        1,
+        1,
+        0
+      ],
+      [
+        605,
+        323,
+        0,
+        5,
+        0
+      ],
+      [
+        376,
+        70,
+        0,
+        3,
+        0
+      ]
+    ],
+    "critical_as_acceptable_or_strong": 0,
+    "critical_count": 1077,
+    "mean_overoptimistic_cost": 1.2087181824544542
+  },
+  {
+    "month": "2026-10",
+    "scope": "test",
+    "kind": "ordinal_critical",
+    "rows": 1097,
+    "critical_rate": 0.366217521483103,
+    "mean_risk_score": 0.4457114166057174,
+    "critical_auc": 0.6674832396275822,
+    "critical_brier": 0.220528089810195,
+    "critical_logloss": 0.6320446376691039,
+    "confusion": [
+      [
+        284,
+        45,
+        0,
+        0,
+        0
+      ],
+      [
+        296,
+        210,
+        0,
+        0,
+        0
+      ],
+      [
+        77,
+        61,
+        0,
+        0,
+        0
+      ],
+      [
+        56,
+        31,
+        0,
+        0,
+        0
+      ],
+      [
+        30,
+        7,
+        0,
+        0,
+        0
+      ]
+    ],
+    "critical_as_acceptable_or_strong": 0,
+    "critical_count": 329,
+    "mean_overoptimistic_cost": 0.8331220593597484
+  },
+  {
+    "month": "2026-10",
+    "scope": "validation",
+    "kind": "ordinal_critical_fuzzy",
+    "rows": 6393,
+    "critical_rate": 0.22274048717264353,
+    "mean_risk_score": 0.43038192519255086,
+    "critical_auc": 0.7048836417207718,
+    "critical_brier": 0.20006662655566246,
+    "critical_logloss": 0.5881754669362919,
+    "confusion": [
+      [
+        908,
+        169,
+        0,
+        0,
+        0
+      ],
+      [
+        1546,
+        1210,
+        1,
+        3,
+        0
+      ],
+      [
+        674,
+        498,
+        1,
+        1,
+        0
+      ],
+      [
+        605,
+        325,
+        0,
+        3,
+        0
+      ],
+      [
+        376,
+        70,
+        0,
+        3,
+        0
+      ]
+    ],
+    "critical_as_acceptable_or_strong": 0,
+    "critical_count": 1077,
+    "mean_overoptimistic_cost": 1.209355785753445
+  },
+  {
+    "month": "2026-10",
+    "scope": "test",
+    "kind": "ordinal_critical_fuzzy",
+    "rows": 1097,
+    "critical_rate": 0.366217521483103,
+    "mean_risk_score": 0.4457114166057174,
+    "critical_auc": 0.6674832396275822,
+    "critical_brier": 0.220528089810195,
+    "critical_logloss": 0.6320446376691039,
+    "confusion": [
+      [
+        284,
+        45,
+        0,
+        0,
+        0
+      ],
+      [
+        296,
+        210,
+        0,
+        0,
+        0
+      ],
+      [
+        77,
+        61,
+        0,
+        0,
+        0
+      ],
+      [
+        56,
+        31,
+        0,
+        0,
+        0
+      ],
+      [
+        30,
+        7,
+        0,
+        0,
+        0
+      ]
+    ],
+    "critical_as_acceptable_or_strong": 0,
+    "critical_count": 329,
+    "mean_overoptimistic_cost": 0.8327222261277971
+  }
+]
