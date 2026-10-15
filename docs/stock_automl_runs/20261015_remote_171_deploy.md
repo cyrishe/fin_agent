@@ -14,7 +14,7 @@
 | 源码包，22 个清单文件 | `642e743345ec95cd0f2d836339390b582b9d16c0b90d3ae9fad930a627529a8d` | 本机 `outputs/stock_automl/deployment/automl1440-171-source-20261015.tar.gz`；服务器同名文件 |
 | Linux 轮子包 | `9c9ac7b81ba233bfc5ee3ef5f4c7714208ace0d6512c943759d3a120394fb3fe` | 本机 `outputs/stock_automl/deployment/automl1440-171-linux-wheels.tar`；服务器同名文件 |
 | 10/15 模型与 20 日成交额缓存 | `0378cee4f63956f7b395dfcd12a2424d5a86b805431dd17b11d8c1071f61e6a8` | 本机 `outputs/stock_automl/deployment/automl1440-171-cache-20261015.tar.gz`；服务器同名文件 |
-| 完整 Linux 包（源码、轮子、Python、虚拟环境、缓存；256 MB） | `1130e5afc5f8616fd36e4406ebd81214c6493ef4dffe0eca4ebe404a6f00994f` | 服务器 `automl1440-171-linux-x86_64-py312-complete.tar.gz` |
+| 完整 Linux 包（源码、轮子、Python、虚拟环境、缓存；195,122,390 字节） | `1130e5afc5f8616fd36e4406ebd81214c6493ef4dffe0eca4ebe404a6f00994f` | 本机 `outputs/stock_automl/deployment/automl1440-171-linux-x86_64-py312-complete.tar.gz`；服务器部署目录下同名文件 |
 
 源码包回读 22/22 文件哈希通过；完整包 13,648 个归档条目，没有 `.env`。完整包的虚拟环境记录了部署路径，恢复时应解压到上述同一路径。
 
