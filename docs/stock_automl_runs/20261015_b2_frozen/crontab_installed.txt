@@ -1,0 +1,45 @@
+# Edit this file to introduce tasks to be run by cron.
+# 
+# Each task to run has to be defined through a single line
+# indicating with different fields when the task will be run
+# and what command to run for the task
+# 
+# To define the time you can provide concrete values for
+# minute (m), hour (h), day of month (dom), month (mon),
+# and day of week (dow) or use '*' in these fields (for 'any').
+# 
+# Notice that tasks will be started based on the cron's system
+# daemon's notion of time and timezones.
+# 
+# Output of the crontab jobs (including errors) is sent through
+# email to the user the crontab file belongs to (unless redirected).
+# 
+# For example, you can run a backup of all your user accounts
+# at 5 a.m every week with:
+# 0 5 * * 1 tar -zcf /var/backups/home.tgz /home/
+# 
+# For more information see the manual pages of crontab(5) and cron(8)
+# 
+# m h  dom mon dow   command
+50 15 * * *  /bin/bash /home/che/cyris/stock_agent/review_dayly_run.sh >> /tmp/stock.log 2>&1
+#*/15 * * * * /usr/bin/python3 /home/che/robot/service_monitor.py >> /home/che/robot/monitor.log 2>&1
+0 21 * * * cd /home/che/cyris/stock_agent_V2.0/stock_agent && python3 -m src.stock_concept_snapshot_cleanup --keep-latest 100000 --batch-size 500 >> /home/che/robot/clean_db.log 2>&1 
+#11 15 * * 1-5 cd /home/che/cyris/stock_agent_V2.0/stock_agent && bash scripts/aiia_service_manager.sh run-funds-daily >> logs/aiia_services/eastmoney_capital_flow_daily_refresh.log 2>&1
+#11 15 * * 1-5 cd /home/che/cyris/stock_agent_V2.0/stock_agent && bash scripts/aiia_service_manager.sh run-ths-funds-daily >> logs/aiia_services/ths_capital_flow_daily_refresh.log 2>&1
+#11 15 * * 1-5 cd /home/che/cyris/stock_agent_V2.0/stock_agent && bash scripts/aiia_service_manager.sh run-cnstock-funds-daily >> logs/aiia_services/cnstock_capital_flow_daily_refresh.log 2>&1
+# BEGIN fin-agent-stock-indicator-daily
+# Server timezone: Asia/Shanghai (UTC+08:00).
+# Read only existing daily prices; holidays skip; unchanged inputs reuse a batch.
+# The second pass includes late source corrections without duplicate result rows.
+20 20,22 * * * /bin/bash /home/che/cyris/fin_agent/scripts/run_stock_indicator_daily.sh
+# END fin-agent-stock-indicator-daily
+# BEGIN fin-agent-automl1440-171
+50 13 * * 1-5 /home/che/cyris/fin_agent_deploy/automl1440-171-20261015/automl1440.sh prepare >> /home/che/cyris/fin_agent_deploy/automl1440-171-20261015/logs/prepare.log 2>&1
+40 14 * * 1-5 /home/che/cyris/fin_agent_deploy/automl1440-171-20261015/automl1440.sh run --write-db >> /home/che/cyris/fin_agent_deploy/automl1440-171-20261015/logs/run.log 2>&1
+# END fin-agent-automl1440-171
+
+# BEGIN FIN_AGENT_B2
+20 16,18,20 * * 1-5 /data/cyris/fin_agent_deploy/b2-20261015/b2.sh close --write-db >> /data/cyris/fin_agent_deploy/b2-20261015/logs/close.log 2>&1
+10 16,18,20 * * 1-5 /data/cyris/fin_agent_deploy/b2-20261015/b2.sh settle --write-db >> /data/cyris/fin_agent_deploy/b2-20261015/logs/settle.log 2>&1
+30-40 9 * * 1-5 /data/cyris/fin_agent_deploy/b2-20261015/b2.sh scan --watch --write-db >> /data/cyris/fin_agent_deploy/b2-20261015/logs/scan.log 2>&1
+# END FIN_AGENT_B2

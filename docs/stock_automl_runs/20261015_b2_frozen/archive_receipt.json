@@ -1,0 +1,14 @@
+{
+  "user_id": "imac",
+  "experiment_id": "B2_20261015",
+  "experiment_date": "2026-10-15",
+  "title": "B2四K延后一K冻结模型与模拟运行",
+  "category_path": "涨停冷静期/D0判断-D1开盘伺机买入/2026-10-15",
+  "local_path": "/Volumes/ext/fin_agent/outputs/stock_automl/aliyun_drive_local/策略训练/涨停冷静期/D0判断-D1开盘伺机买入/2026-10-15/B2_20261015",
+  "cloud_path": "策略训练/涨停冷静期/D0判断-D1开盘伺机买入/2026-10-15/B2_四K延后一K_完整训练运行包_20261015.zip",
+  "source_commit": "7aeabf01cd7b25a9d67430b12a0b0fea2905b4ac",
+  "manifest_sha256": "94325acfa3d7287106308f26fc0f4254b81d61e895e52967e9b51cee4a309284",
+  "file_count": 7,
+  "cloud_verified": false,
+  "cloud_blocker": "Browser file URL permission disabled; settings navigation rejected by browser policy; user asked to enable or drag."
+}

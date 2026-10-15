@@ -1,0 +1,46 @@
+{
+  "definition": {
+    "strategy_id": "B2",
+    "title": "B2｜D0涨停前三·D1四K形态·延后一K模拟买入",
+    "summary": "D0收盘封板股票按已冻结的51因子随机森林三日再板分数排序，保存原Top3；D1仅观察历史状态N/R的候选，前四根完整分钟K（09:31—09:34结束）计算形态，采用当月事先冻结的简单规则。09:35—09:40结束的分钟K逐根判断：开盘价低于涨停价0.005元且该分钟有成交即激活；最早分钟优先，同分钟D0排名优先。锁定唯一股票后，四分实体须严格大于−8%；不通过则当日轮空、不替补。通过后至少等下一根K，在同股首次再次满足上述条件的分钟开盘价记模拟买入，最迟使用09:40结束的K；超时轮空、不换股。actionable初始为0，只有最终模拟买入的一只变1。所有Top3的开板分钟、形态与确认时间均回写；K内低于涨停只表示该分钟打开过，不能推断秒级时刻。D2（D1下一市场交易日）收盘记模拟卖出。买卖各0.1%用于净收益；资金基准100万元，早晨空仓用可用现金一半、有昨日持仓则用剩余全部现金，允许零碎股。模拟记录使用分钟开盘价代理，完成K后才可确认，entry_at与confirmed_at分开；不下单、不声称当时可全额成交。",
+    "definition_sha256": "157b9d77bb9951214b0978365cec407320b1d5663636b80fe60939ae94172c0c"
+  },
+  "runs": [
+    {
+      "signal_date": "2026-10-15",
+      "candidate_count": 36,
+      "selection_count": 3,
+      "model_sha256": "2d336ffdcc6f9b7c40d72eec33893e66795b98324d8401c80f21a7a1b76ed8c1"
+    }
+  ],
+  "top3": [
+    {
+      "signal_date": "2026-10-15",
+      "selection_rank": 1,
+      "stock_code": "002343",
+      "stock_name": "慈文传媒",
+      "actionable": 0,
+      "entry_price": null,
+      "score": 0.7793902660373024
+    },
+    {
+      "signal_date": "2026-10-15",
+      "selection_rank": 2,
+      "stock_code": "002696",
+      "stock_name": "百洋股份",
+      "actionable": 0,
+      "entry_price": null,
+      "score": 0.7376842225606767
+    },
+    {
+      "signal_date": "2026-10-15",
+      "selection_rank": 3,
+      "stock_code": "001318",
+      "stock_name": "阳光乳业",
+      "actionable": 0,
+      "entry_price": null,
+      "score": 0.7162723055600522
+    }
+  ],
+  "repeat_close_identical": true
+}

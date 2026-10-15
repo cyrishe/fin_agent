@@ -1,0 +1,16 @@
+{
+  "user_id": "imac",
+  "experiment_id": "B2_20261015_R2",
+  "experiment_date": "2026-10-15",
+  "title": "B2四K延后一K最终运行归档R2",
+  "category_path": "涨停冷静期/D0判断-D1开盘伺机买入/2026-10-15",
+  "local_path": "/Volumes/ext/fin_agent/outputs/stock_automl/aliyun_drive_local/策略训练/涨停冷静期/D0判断-D1开盘伺机买入/2026-10-15/B2_20261015_R2",
+  "cloud_path": "策略训练/涨停冷静期/D0判断-D1开盘伺机买入/2026-10-15/B2_四K延后一K_完整训练运行包_R2_20261015.zip",
+  "source_commit": "4eb86446b8c77d1872bf2481c7f4f3369fe319b4",
+  "manifest_sha256": "c350a79675e3f8a0b542df0532c4ce4af5a95f8dc3ca5cee1f597646a9a3b20e",
+  "file_count": 11,
+  "zip_path": "/Volumes/ext/fin_agent/outputs/stock_automl/B2_四K延后一K_完整训练运行包_R2_20261015.zip",
+  "zip_sha256": "7820e250acb8a2304ef238c3f2cc61b980cb163a7f5a0473bc7a21a998080486",
+  "cloud_verified": false,
+  "cloud_blocker": "Chrome file URL permission disabled; browser settings rejected by security policy; awaiting user enable or drag."
+}

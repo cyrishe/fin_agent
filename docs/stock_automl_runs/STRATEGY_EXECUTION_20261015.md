@@ -1,6 +1,6 @@
-# 多策略每日执行记录：待生产迁移
+# 多策略每日执行记录：B2已启用，收开盘适配待迁移
 
-当前实现位于 `deploy/sql/automl_1440_strategy.sql`、`scripts/automl_strategy_execution.py` 和 `scripts/run_automl_1440_strategy.py`。截至 2026-10-15 20:00，生产库尚无新增表，服务器仍运行原版脚本。本文描述待审批的变更，不是生产上线回执。
+当前实现位于 `deploy/sql/automl_1440_strategy.sql`、`scripts/automl_strategy_execution.py` 和 `scripts/run_automl_1440_strategy.py`。截至 2026-10-15 21:59，B2已获用户授权并创建两张共享表、完成定义注册及Top3写入。原14:40收开盘服务器仍运行原版脚本，其下述历史迁入与新版适配尚未部署；不能因共享表存在就称该服务已迁移。B2实测回执见 [B2部署](20261015_b2_frozen/DEPLOYMENT.md)。
 
 ## 表与事实
 
