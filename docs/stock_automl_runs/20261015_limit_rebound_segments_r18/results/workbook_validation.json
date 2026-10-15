@@ -1,0 +1,28 @@
+{
+  "zip_crc": "passed",
+  "date_numeric": true,
+  "top1_count": 166,
+  "top1_hits": 100,
+  "sheets": {
+    "效果对照": {
+      "data_rows": 16,
+      "sheet_rows": 25
+    },
+    "逐月效果": {
+      "data_rows": 224,
+      "sheet_rows": 225
+    },
+    "选模记录": {
+      "data_rows": 14,
+      "sheet_rows": 15
+    },
+    "分段模型前五": {
+      "data_rows": 1335,
+      "sheet_rows": 1336
+    },
+    "特征定义": {
+      "data_rows": 23,
+      "sheet_rows": 24
+    }
+  }
+}

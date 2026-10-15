@@ -1,0 +1,16 @@
+{
+  "status": "PASS",
+  "rows": 5128,
+  "classification_groups": 528,
+  "identical_keys_scores_ranks_labels": true,
+  "mature_labels_from_D1_D3_rebuilt": 5115,
+  "independent_crosstabs": true,
+  "monthly_confusion_sums_match": true,
+  "train_valid_D4_purged": true,
+  "frozen_rule_hashes_unchanged": true,
+  "test_unique": true,
+  "export_cells_checked": 9059,
+  "export_formula_cells": 4032,
+  "export_sha256": "7bf5d9589127e7139319ca09e91b4f1acf1d90c127b10933d428234dcdcb5ddc",
+  "source_hashes_still_unchanged": true
+}

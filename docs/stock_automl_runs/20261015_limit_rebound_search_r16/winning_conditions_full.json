@@ -1,0 +1,2393 @@
+[
+  {
+    "month": "2025-09",
+    "group": {
+      "id": "rf_p3_sqrt_weight",
+      "algorithm": "rf",
+      "parameters": {
+        "n_estimators": 240,
+        "max_depth": 8,
+        "min_samples_leaf": 30,
+        "max_features": 0.8
+      },
+      "scheme": "sqrt_weight",
+      "fraction": 0.8,
+      "seeds": [
+        171,
+        191
+      ]
+    },
+    "probability_average_weights": [
+      0.5,
+      0.5
+    ],
+    "estimator_parameters": [
+      {
+        "bootstrap": true,
+        "ccp_alpha": 0.0,
+        "class_weight": null,
+        "criterion": "gini",
+        "max_depth": 8,
+        "max_features": 0.8,
+        "max_leaf_nodes": null,
+        "max_samples": null,
+        "min_impurity_decrease": 0.0,
+        "min_samples_leaf": 30,
+        "min_samples_split": 2,
+        "min_weight_fraction_leaf": 0.0,
+        "monotonic_cst": null,
+        "n_estimators": 240,
+        "n_jobs": 1,
+        "oob_score": false,
+        "random_state": 171,
+        "verbose": 0,
+        "warm_start": false
+      },
+      {
+        "bootstrap": true,
+        "ccp_alpha": 0.0,
+        "class_weight": null,
+        "criterion": "gini",
+        "max_depth": 8,
+        "max_features": 0.8,
+        "max_leaf_nodes": null,
+        "max_samples": null,
+        "min_impurity_decrease": 0.0,
+        "min_samples_leaf": 30,
+        "min_samples_split": 2,
+        "min_weight_fraction_leaf": 0.0,
+        "monotonic_cst": null,
+        "n_estimators": 240,
+        "n_jobs": 1,
+        "oob_score": false,
+        "random_state": 191,
+        "verbose": 0,
+        "warm_start": false
+      }
+    ],
+    "sampling": [
+      {
+        "seed": 171,
+        "available": 6749,
+        "sampled": 5395,
+        "class_counts": {
+          "0": 4070,
+          "1": 1325
+        },
+        "class_weights": {
+          "0": 0.8439934725221806,
+          "1": 1.4792049561016798
+        }
+      },
+      {
+        "seed": 191,
+        "available": 6749,
+        "sampled": 5395,
+        "class_counts": {
+          "0": 4070,
+          "1": 1325
+        },
+        "class_weights": {
+          "0": 0.8439934725221806,
+          "1": 1.4792049561016798
+        }
+      }
+    ],
+    "risk": {
+      "name": "logistic",
+      "tail": 0.2,
+      "threshold": 0.5880964634654132,
+      "train_oof": {
+        "n": 171,
+        "bad": 83,
+        "removed": 35,
+        "bad_removed": 24,
+        "good_removed": 9,
+        "good": 71,
+        "retention": 0.7953216374269005,
+        "precision": 0.6857142857142857,
+        "recall": 0.2891566265060241,
+        "base_bad_rate": 0.4853801169590643,
+        "kept_bad_rate": 0.4338235294117647,
+        "base_return": -0.030316863311212174,
+        "kept_return": -0.015293766682718209
+      },
+      "valid": {
+        "n": 138,
+        "bad": 71,
+        "removed": 28,
+        "bad_removed": 20,
+        "good_removed": 6,
+        "good": 51,
+        "retention": 0.7971014492753623,
+        "precision": 0.7142857142857143,
+        "recall": 0.28169014084507044,
+        "base_bad_rate": 0.5144927536231884,
+        "kept_bad_rate": 0.4636363636363636,
+        "base_return": -0.04231351141255026,
+        "kept_return": -0.030638168668773905
+      },
+      "passes": true,
+      "selection_gain": 0.026698439372270323
+    },
+    "features": [
+      "board_streak_days",
+      "streak_return",
+      "d0_return",
+      "d0_open_gap",
+      "d0_range",
+      "d0_lower_shadow",
+      "d0_close_position",
+      "first_open_gap",
+      "first_range",
+      "first_one_price",
+      "d0_volume_ratio_pre5",
+      "d0_amount_ratio_pre5",
+      "d0_turnover_pct",
+      "d0_amount_100m",
+      "d0_volume_ratio_first",
+      "d0_turnover_ratio_first",
+      "first_turnover_pct",
+      "pre5_return",
+      "pre5_mean_turnover_pct",
+      "market_limit_count",
+      "market_prev_limit_count",
+      "market_up_fraction",
+      "market_median_return",
+      "limit_rate",
+      "d0_one_price",
+      "range_to_limit",
+      "gap_to_limit",
+      "turnover_ratio_pre5",
+      "pre5_volatility",
+      "pre5_up_count",
+      "market_reseal_fraction",
+      "amount_board_rank",
+      "turnover_board_rank",
+      "log_float_mv_proxy",
+      "log_price"
+    ]
+  },
+  {
+    "month": "2025-10",
+    "group": {
+      "id": "rf_p1_undersample",
+      "algorithm": "rf",
+      "parameters": {
+        "n_estimators": 240,
+        "max_depth": 4,
+        "min_samples_leaf": 100,
+        "max_features": 0.8
+      },
+      "scheme": "undersample",
+      "fraction": 0.8,
+      "seeds": [
+        171,
+        191
+      ]
+    },
+    "probability_average_weights": [
+      0.5,
+      0.5
+    ],
+    "estimator_parameters": [
+      {
+        "bootstrap": true,
+        "ccp_alpha": 0.0,
+        "class_weight": null,
+        "criterion": "gini",
+        "max_depth": 4,
+        "max_features": 0.8,
+        "max_leaf_nodes": null,
+        "max_samples": null,
+        "min_impurity_decrease": 0.0,
+        "min_samples_leaf": 100,
+        "min_samples_split": 2,
+        "min_weight_fraction_leaf": 0.0,
+        "monotonic_cst": null,
+        "n_estimators": 240,
+        "n_jobs": 1,
+        "oob_score": false,
+        "random_state": 171,
+        "verbose": 0,
+        "warm_start": false
+      },
+      {
+        "bootstrap": true,
+        "ccp_alpha": 0.0,
+        "class_weight": null,
+        "criterion": "gini",
+        "max_depth": 4,
+        "max_features": 0.8,
+        "max_leaf_nodes": null,
+        "max_samples": null,
+        "min_impurity_decrease": 0.0,
+        "min_samples_leaf": 100,
+        "min_samples_split": 2,
+        "min_weight_fraction_leaf": 0.0,
+        "monotonic_cst": null,
+        "n_estimators": 240,
+        "n_jobs": 1,
+        "oob_score": false,
+        "random_state": 191,
+        "verbose": 0,
+        "warm_start": false
+      }
+    ],
+    "sampling": [
+      {
+        "seed": 171,
+        "available": 7032,
+        "sampled": 2748,
+        "class_counts": {
+          "1": 1374,
+          "0": 1374
+        },
+        "class_weights": {
+          "0": 1.0,
+          "1": 1.0
+        }
+      },
+      {
+        "seed": 191,
+        "available": 7032,
+        "sampled": 2748,
+        "class_counts": {
+          "0": 1374,
+          "1": 1374
+        },
+        "class_weights": {
+          "0": 1.0,
+          "1": 1.0
+        }
+      }
+    ],
+    "risk": {
+      "name": "logistic",
+      "tail": 0.3,
+      "threshold": 0.5748781851348864,
+      "train_oof": {
+        "n": 176,
+        "bad": 81,
+        "removed": 53,
+        "bad_removed": 30,
+        "good_removed": 16,
+        "good": 73,
+        "retention": 0.6988636363636364,
+        "precision": 0.5660377358490566,
+        "recall": 0.37037037037037035,
+        "base_bad_rate": 0.4602272727272727,
+        "kept_bad_rate": 0.4146341463414634,
+        "base_return": -0.021838569616905924,
+        "kept_return": -0.009700100395524608
+      },
+      "valid": {
+        "n": 122,
+        "bad": 51,
+        "removed": 26,
+        "bad_removed": 17,
+        "good_removed": 7,
+        "good": 58,
+        "retention": 0.7868852459016393,
+        "precision": 0.6538461538461539,
+        "recall": 0.3333333333333333,
+        "base_bad_rate": 0.4180327868852459,
+        "kept_bad_rate": 0.3541666666666667,
+        "base_return": -0.012656702322732933,
+        "kept_return": 0.006770731873228191
+      },
+      "passes": true,
+      "selection_gain": 0.03156590341734244
+    },
+    "features": [
+      "board_streak_days",
+      "streak_return",
+      "d0_return",
+      "d0_open_gap",
+      "d0_range",
+      "d0_lower_shadow",
+      "d0_close_position",
+      "first_open_gap",
+      "first_range",
+      "first_one_price",
+      "d0_volume_ratio_pre5",
+      "d0_amount_ratio_pre5",
+      "d0_turnover_pct",
+      "d0_amount_100m",
+      "d0_volume_ratio_first",
+      "d0_turnover_ratio_first",
+      "first_turnover_pct",
+      "pre5_return",
+      "pre5_mean_turnover_pct",
+      "market_limit_count",
+      "market_prev_limit_count",
+      "market_up_fraction",
+      "market_median_return",
+      "limit_rate",
+      "d0_one_price",
+      "range_to_limit",
+      "gap_to_limit",
+      "turnover_ratio_pre5",
+      "pre5_volatility",
+      "pre5_up_count",
+      "market_reseal_fraction",
+      "amount_board_rank",
+      "turnover_board_rank",
+      "log_float_mv_proxy",
+      "log_price"
+    ]
+  },
+  {
+    "month": "2025-11",
+    "group": {
+      "id": "rf_p1_sqrt_weight",
+      "algorithm": "rf",
+      "parameters": {
+        "n_estimators": 240,
+        "max_depth": 4,
+        "min_samples_leaf": 100,
+        "max_features": 0.8
+      },
+      "scheme": "sqrt_weight",
+      "fraction": 0.8,
+      "seeds": [
+        171,
+        191
+      ]
+    },
+    "probability_average_weights": [
+      0.5,
+      0.5
+    ],
+    "estimator_parameters": [
+      {
+        "bootstrap": true,
+        "ccp_alpha": 0.0,
+        "class_weight": null,
+        "criterion": "gini",
+        "max_depth": 4,
+        "max_features": 0.8,
+        "max_leaf_nodes": null,
+        "max_samples": null,
+        "min_impurity_decrease": 0.0,
+        "min_samples_leaf": 100,
+        "min_samples_split": 2,
+        "min_weight_fraction_leaf": 0.0,
+        "monotonic_cst": null,
+        "n_estimators": 240,
+        "n_jobs": 1,
+        "oob_score": false,
+        "random_state": 171,
+        "verbose": 0,
+        "warm_start": false
+      },
+      {
+        "bootstrap": true,
+        "ccp_alpha": 0.0,
+        "class_weight": null,
+        "criterion": "gini",
+        "max_depth": 4,
+        "max_features": 0.8,
+        "max_leaf_nodes": null,
+        "max_samples": null,
+        "min_impurity_decrease": 0.0,
+        "min_samples_leaf": 100,
+        "min_samples_split": 2,
+        "min_weight_fraction_leaf": 0.0,
+        "monotonic_cst": null,
+        "n_estimators": 240,
+        "n_jobs": 1,
+        "oob_score": false,
+        "random_state": 191,
+        "verbose": 0,
+        "warm_start": false
+      }
+    ],
+    "sampling": [
+      {
+        "seed": 171,
+        "available": 6921,
+        "sampled": 5532,
+        "class_counts": {
+          "0": 4167,
+          "1": 1365
+        },
+        "class_weights": {
+          "0": 0.8443296387073941,
+          "1": 1.4752222677701747
+        }
+      },
+      {
+        "seed": 191,
+        "available": 6921,
+        "sampled": 5532,
+        "class_counts": {
+          "0": 4167,
+          "1": 1365
+        },
+        "class_weights": {
+          "0": 0.8443296387073941,
+          "1": 1.4752222677701747
+        }
+      }
+    ],
+    "risk": {
+      "name": "logistic",
+      "tail": 0.3,
+      "threshold": 0.5330277970671256,
+      "train_oof": {
+        "n": 196,
+        "bad": 97,
+        "removed": 59,
+        "bad_removed": 35,
+        "good_removed": 19,
+        "good": 80,
+        "retention": 0.6989795918367347,
+        "precision": 0.5932203389830508,
+        "recall": 0.36082474226804123,
+        "base_bad_rate": 0.49489795918367346,
+        "kept_bad_rate": 0.45255474452554745,
+        "base_return": -0.027300922699266875,
+        "kept_return": -0.017000404984099764
+      },
+      "valid": {
+        "n": 98,
+        "bad": 42,
+        "removed": 31,
+        "bad_removed": 21,
+        "good_removed": 8,
+        "good": 43,
+        "retention": 0.6836734693877551,
+        "precision": 0.6774193548387096,
+        "recall": 0.5,
+        "base_bad_rate": 0.42857142857142855,
+        "kept_bad_rate": 0.31343283582089554,
+        "base_return": -0.023755771633596594,
+        "kept_return": 0.0021892294995826014
+      },
+      "passes": true,
+      "selection_gain": 0.03624551884834631
+    },
+    "features": [
+      "board_streak_days",
+      "streak_return",
+      "d0_return",
+      "d0_open_gap",
+      "d0_range",
+      "d0_lower_shadow",
+      "d0_close_position",
+      "first_open_gap",
+      "first_range",
+      "first_one_price",
+      "d0_volume_ratio_pre5",
+      "d0_amount_ratio_pre5",
+      "d0_turnover_pct",
+      "d0_amount_100m",
+      "d0_volume_ratio_first",
+      "d0_turnover_ratio_first",
+      "first_turnover_pct",
+      "pre5_return",
+      "pre5_mean_turnover_pct",
+      "market_limit_count",
+      "market_prev_limit_count",
+      "market_up_fraction",
+      "market_median_return",
+      "limit_rate",
+      "d0_one_price",
+      "range_to_limit",
+      "gap_to_limit",
+      "turnover_ratio_pre5",
+      "pre5_volatility",
+      "pre5_up_count",
+      "market_reseal_fraction",
+      "amount_board_rank",
+      "turnover_board_rank",
+      "log_float_mv_proxy",
+      "log_price"
+    ]
+  },
+  {
+    "month": "2025-12",
+    "group": {
+      "id": "xgb_p3_undersample",
+      "algorithm": "xgb",
+      "parameters": {
+        "n_estimators": 320,
+        "learning_rate": 0.025,
+        "max_depth": 4,
+        "min_child_weight": 30,
+        "reg_lambda": 15.0
+      },
+      "scheme": "undersample",
+      "fraction": 0.8,
+      "seeds": [
+        171,
+        191
+      ]
+    },
+    "probability_average_weights": [
+      0.5,
+      0.5
+    ],
+    "estimator_parameters": [
+      {
+        "objective": "binary:logistic",
+        "base_score": null,
+        "booster": null,
+        "callbacks": null,
+        "colsample_bylevel": null,
+        "colsample_bynode": null,
+        "colsample_bytree": 0.8,
+        "device": null,
+        "early_stopping_rounds": null,
+        "enable_categorical": false,
+        "eval_metric": "logloss",
+        "feature_types": null,
+        "feature_weights": null,
+        "gamma": null,
+        "grow_policy": null,
+        "importance_type": null,
+        "interaction_constraints": null,
+        "learning_rate": 0.025,
+        "max_bin": null,
+        "max_cat_threshold": null,
+        "max_cat_to_onehot": null,
+        "max_delta_step": null,
+        "max_depth": 4,
+        "max_leaves": null,
+        "min_child_weight": 30,
+        "missing": "nan",
+        "monotone_constraints": null,
+        "multi_strategy": null,
+        "n_estimators": 320,
+        "n_jobs": 1,
+        "num_parallel_tree": null,
+        "random_state": 171,
+        "reg_alpha": null,
+        "reg_lambda": 15.0,
+        "sampling_method": null,
+        "scale_pos_weight": null,
+        "subsample": 1.0,
+        "tree_method": "hist",
+        "validate_parameters": null,
+        "verbosity": null
+      },
+      {
+        "objective": "binary:logistic",
+        "base_score": null,
+        "booster": null,
+        "callbacks": null,
+        "colsample_bylevel": null,
+        "colsample_bynode": null,
+        "colsample_bytree": 0.8,
+        "device": null,
+        "early_stopping_rounds": null,
+        "enable_categorical": false,
+        "eval_metric": "logloss",
+        "feature_types": null,
+        "feature_weights": null,
+        "gamma": null,
+        "grow_policy": null,
+        "importance_type": null,
+        "interaction_constraints": null,
+        "learning_rate": 0.025,
+        "max_bin": null,
+        "max_cat_threshold": null,
+        "max_cat_to_onehot": null,
+        "max_delta_step": null,
+        "max_depth": 4,
+        "max_leaves": null,
+        "min_child_weight": 30,
+        "missing": "nan",
+        "monotone_constraints": null,
+        "multi_strategy": null,
+        "n_estimators": 320,
+        "n_jobs": 1,
+        "num_parallel_tree": null,
+        "random_state": 191,
+        "reg_alpha": null,
+        "reg_lambda": 15.0,
+        "sampling_method": null,
+        "scale_pos_weight": null,
+        "subsample": 1.0,
+        "tree_method": "hist",
+        "validate_parameters": null,
+        "verbosity": null
+      }
+    ],
+    "sampling": [
+      {
+        "seed": 171,
+        "available": 7029,
+        "sampled": 2794,
+        "class_counts": {
+          "0": 1397,
+          "1": 1397
+        },
+        "class_weights": {
+          "0": 1.0,
+          "1": 1.0
+        }
+      },
+      {
+        "seed": 191,
+        "available": 7029,
+        "sampled": 2794,
+        "class_counts": {
+          "0": 1397,
+          "1": 1397
+        },
+        "class_weights": {
+          "0": 1.0,
+          "1": 1.0
+        }
+      }
+    ],
+    "risk": {
+      "name": "logistic",
+      "tail": 0.2,
+      "threshold": 0.5886112649997982,
+      "train_oof": {
+        "n": 210,
+        "bad": 99,
+        "removed": 42,
+        "bad_removed": 27,
+        "good_removed": 13,
+        "good": 82,
+        "retention": 0.8,
+        "precision": 0.6428571428571429,
+        "recall": 0.2727272727272727,
+        "base_bad_rate": 0.4714285714285714,
+        "kept_bad_rate": 0.42857142857142855,
+        "base_return": -0.034200688730880044,
+        "kept_return": -0.023879181483566974
+      },
+      "valid": {
+        "n": 85,
+        "bad": 43,
+        "removed": 29,
+        "bad_removed": 20,
+        "good_removed": 7,
+        "good": 29,
+        "retention": 0.6588235294117647,
+        "precision": 0.6896551724137931,
+        "recall": 0.46511627906976744,
+        "base_bad_rate": 0.5058823529411764,
+        "kept_bad_rate": 0.4107142857142857,
+        "base_return": -0.04165048212593282,
+        "kept_return": -0.022210101173063306
+      },
+      "passes": true,
+      "selection_gain": 0.029761888200182586
+    },
+    "features": [
+      "board_streak_days",
+      "streak_return",
+      "d0_return",
+      "d0_open_gap",
+      "d0_range",
+      "d0_lower_shadow",
+      "d0_close_position",
+      "first_open_gap",
+      "first_range",
+      "first_one_price",
+      "d0_volume_ratio_pre5",
+      "d0_amount_ratio_pre5",
+      "d0_turnover_pct",
+      "d0_amount_100m",
+      "d0_volume_ratio_first",
+      "d0_turnover_ratio_first",
+      "first_turnover_pct",
+      "pre5_return",
+      "pre5_mean_turnover_pct",
+      "market_limit_count",
+      "market_prev_limit_count",
+      "market_up_fraction",
+      "market_median_return",
+      "limit_rate",
+      "d0_one_price",
+      "range_to_limit",
+      "gap_to_limit",
+      "turnover_ratio_pre5",
+      "pre5_volatility",
+      "pre5_up_count",
+      "market_reseal_fraction",
+      "amount_board_rank",
+      "turnover_board_rank",
+      "log_float_mv_proxy",
+      "log_price"
+    ]
+  },
+  {
+    "month": "2026-01",
+    "group": {
+      "id": "rf_p3_sqrt_weight",
+      "algorithm": "rf",
+      "parameters": {
+        "n_estimators": 240,
+        "max_depth": 8,
+        "min_samples_leaf": 30,
+        "max_features": 0.8
+      },
+      "scheme": "sqrt_weight",
+      "fraction": 0.8,
+      "seeds": [
+        171,
+        191
+      ]
+    },
+    "probability_average_weights": [
+      0.5,
+      0.5
+    ],
+    "estimator_parameters": [
+      {
+        "bootstrap": true,
+        "ccp_alpha": 0.0,
+        "class_weight": null,
+        "criterion": "gini",
+        "max_depth": 8,
+        "max_features": 0.8,
+        "max_leaf_nodes": null,
+        "max_samples": null,
+        "min_impurity_decrease": 0.0,
+        "min_samples_leaf": 30,
+        "min_samples_split": 2,
+        "min_weight_fraction_leaf": 0.0,
+        "monotonic_cst": null,
+        "n_estimators": 240,
+        "n_jobs": 1,
+        "oob_score": false,
+        "random_state": 171,
+        "verbose": 0,
+        "warm_start": false
+      },
+      {
+        "bootstrap": true,
+        "ccp_alpha": 0.0,
+        "class_weight": null,
+        "criterion": "gini",
+        "max_depth": 8,
+        "max_features": 0.8,
+        "max_leaf_nodes": null,
+        "max_samples": null,
+        "min_impurity_decrease": 0.0,
+        "min_samples_leaf": 30,
+        "min_samples_split": 2,
+        "min_weight_fraction_leaf": 0.0,
+        "monotonic_cst": null,
+        "n_estimators": 240,
+        "n_jobs": 1,
+        "oob_score": false,
+        "random_state": 191,
+        "verbose": 0,
+        "warm_start": false
+      }
+    ],
+    "sampling": [
+      {
+        "seed": 171,
+        "available": 6496,
+        "sampled": 5192,
+        "class_counts": {
+          "0": 3880,
+          "1": 1312
+        },
+        "class_weights": {
+          "0": 0.8461225524518524,
+          "1": 1.4550644028100703
+        }
+      },
+      {
+        "seed": 191,
+        "available": 6496,
+        "sampled": 5192,
+        "class_counts": {
+          "0": 3880,
+          "1": 1312
+        },
+        "class_weights": {
+          "0": 0.8461225524518525,
+          "1": 1.4550644028100705
+        }
+      }
+    ],
+    "risk": {
+      "name": "logistic",
+      "tail": 0.2,
+      "threshold": 0.6295964087656541,
+      "train_oof": {
+        "n": 182,
+        "bad": 81,
+        "removed": 37,
+        "bad_removed": 24,
+        "good_removed": 11,
+        "good": 76,
+        "retention": 0.7967032967032966,
+        "precision": 0.6486486486486487,
+        "recall": 0.2962962962962963,
+        "base_bad_rate": 0.44505494505494503,
+        "kept_bad_rate": 0.3931034482758621,
+        "base_return": -0.028919247126774093,
+        "kept_return": -0.016483271961879563
+      },
+      "valid": {
+        "n": 96,
+        "bad": 44,
+        "removed": 18,
+        "bad_removed": 13,
+        "good_removed": 5,
+        "good": 46,
+        "retention": 0.8125,
+        "precision": 0.7222222222222222,
+        "recall": 0.29545454545454547,
+        "base_bad_rate": 0.4583333333333333,
+        "kept_bad_rate": 0.3974358974358974,
+        "base_return": -0.016316818177183147,
+        "kept_return": -0.003935028412473682
+      },
+      "passes": true,
+      "selection_gain": 0.024817764929603997
+    },
+    "features": [
+      "board_streak_days",
+      "streak_return",
+      "d0_return",
+      "d0_open_gap",
+      "d0_range",
+      "d0_lower_shadow",
+      "d0_close_position",
+      "first_open_gap",
+      "first_range",
+      "first_one_price",
+      "d0_volume_ratio_pre5",
+      "d0_amount_ratio_pre5",
+      "d0_turnover_pct",
+      "d0_amount_100m",
+      "d0_volume_ratio_first",
+      "d0_turnover_ratio_first",
+      "first_turnover_pct",
+      "pre5_return",
+      "pre5_mean_turnover_pct",
+      "market_limit_count",
+      "market_prev_limit_count",
+      "market_up_fraction",
+      "market_median_return",
+      "limit_rate",
+      "d0_one_price",
+      "range_to_limit",
+      "gap_to_limit",
+      "turnover_ratio_pre5",
+      "pre5_volatility",
+      "pre5_up_count",
+      "market_reseal_fraction",
+      "amount_board_rank",
+      "turnover_board_rank",
+      "log_float_mv_proxy",
+      "log_price"
+    ]
+  },
+  {
+    "month": "2026-02",
+    "group": {
+      "id": "rf_reference",
+      "algorithm": "rf",
+      "parameters": {
+        "n_estimators": 240,
+        "max_depth": 7,
+        "min_samples_leaf": 50,
+        "max_features": 0.8
+      },
+      "scheme": "balanced_weight",
+      "fraction": 1.0,
+      "seeds": [
+        20261013
+      ]
+    },
+    "probability_average_weights": [
+      1.0
+    ],
+    "estimator_parameters": [
+      {
+        "bootstrap": true,
+        "ccp_alpha": 0.0,
+        "class_weight": null,
+        "criterion": "gini",
+        "max_depth": 7,
+        "max_features": 0.8,
+        "max_leaf_nodes": null,
+        "max_samples": null,
+        "min_impurity_decrease": 0.0,
+        "min_samples_leaf": 50,
+        "min_samples_split": 2,
+        "min_weight_fraction_leaf": 0.0,
+        "monotonic_cst": null,
+        "n_estimators": 240,
+        "n_jobs": 1,
+        "oob_score": false,
+        "random_state": 20261013,
+        "verbose": 0,
+        "warm_start": false
+      }
+    ],
+    "sampling": [
+      {}
+    ],
+    "risk": {
+      "name": "logistic",
+      "tail": 0.3,
+      "threshold": 0.563665706062553,
+      "train_oof": {
+        "n": 161,
+        "bad": 71,
+        "removed": 49,
+        "bad_removed": 30,
+        "good_removed": 15,
+        "good": 68,
+        "retention": 0.6956521739130435,
+        "precision": 0.6122448979591837,
+        "recall": 0.4225352112676056,
+        "base_bad_rate": 0.4409937888198758,
+        "kept_bad_rate": 0.36607142857142855,
+        "base_return": -0.02967479926585035,
+        "kept_return": -0.013427591063920465
+      },
+      "valid": {
+        "n": 119,
+        "bad": 51,
+        "removed": 34,
+        "bad_removed": 19,
+        "good_removed": 12,
+        "good": 56,
+        "retention": 0.7142857142857143,
+        "precision": 0.5588235294117647,
+        "recall": 0.37254901960784315,
+        "base_bad_rate": 0.42857142857142855,
+        "kept_bad_rate": 0.3764705882352941,
+        "base_return": -0.013014247800763101,
+        "kept_return": -6.895102053094959e-05
+      },
+      "passes": true,
+      "selection_gain": 0.029192504982162037
+    },
+    "features": [
+      "board_streak_days",
+      "streak_return",
+      "d0_return",
+      "d0_open_gap",
+      "d0_range",
+      "d0_lower_shadow",
+      "d0_close_position",
+      "first_open_gap",
+      "first_range",
+      "first_one_price",
+      "d0_volume_ratio_pre5",
+      "d0_amount_ratio_pre5",
+      "d0_turnover_pct",
+      "d0_amount_100m",
+      "d0_volume_ratio_first",
+      "d0_turnover_ratio_first",
+      "first_turnover_pct",
+      "pre5_return",
+      "pre5_mean_turnover_pct",
+      "market_limit_count",
+      "market_prev_limit_count",
+      "market_up_fraction",
+      "market_median_return",
+      "limit_rate",
+      "d0_one_price",
+      "range_to_limit",
+      "gap_to_limit",
+      "turnover_ratio_pre5",
+      "pre5_volatility",
+      "pre5_up_count",
+      "market_reseal_fraction",
+      "amount_board_rank",
+      "turnover_board_rank",
+      "log_float_mv_proxy",
+      "log_price"
+    ]
+  },
+  {
+    "month": "2026-03",
+    "group": {
+      "id": "lgb_p2_undersample",
+      "algorithm": "lgb",
+      "parameters": {
+        "n_estimators": 240,
+        "learning_rate": 0.03,
+        "num_leaves": 15,
+        "max_depth": 4,
+        "min_child_samples": 60,
+        "reg_lambda": 10.0
+      },
+      "scheme": "undersample",
+      "fraction": 0.8,
+      "seeds": [
+        171,
+        191
+      ]
+    },
+    "probability_average_weights": [
+      0.5,
+      0.5
+    ],
+    "estimator_parameters": [
+      {
+        "boosting_type": "gbdt",
+        "class_weight": null,
+        "colsample_bytree": 0.8,
+        "importance_type": "split",
+        "learning_rate": 0.03,
+        "max_depth": 4,
+        "min_child_samples": 60,
+        "min_child_weight": 0.001,
+        "min_split_gain": 0.0,
+        "n_estimators": 240,
+        "n_jobs": 1,
+        "num_leaves": 15,
+        "objective": "binary",
+        "random_state": 171,
+        "reg_alpha": 0.0,
+        "reg_lambda": 10.0,
+        "subsample": 1.0,
+        "subsample_for_bin": 200000,
+        "subsample_freq": 0,
+        "verbosity": -1,
+        "deterministic": true,
+        "force_col_wise": true
+      },
+      {
+        "boosting_type": "gbdt",
+        "class_weight": null,
+        "colsample_bytree": 0.8,
+        "importance_type": "split",
+        "learning_rate": 0.03,
+        "max_depth": 4,
+        "min_child_samples": 60,
+        "min_child_weight": 0.001,
+        "min_split_gain": 0.0,
+        "n_estimators": 240,
+        "n_jobs": 1,
+        "num_leaves": 15,
+        "objective": "binary",
+        "random_state": 191,
+        "reg_alpha": 0.0,
+        "reg_lambda": 10.0,
+        "subsample": 1.0,
+        "subsample_for_bin": 200000,
+        "subsample_freq": 0,
+        "verbosity": -1,
+        "deterministic": true,
+        "force_col_wise": true
+      }
+    ],
+    "sampling": [
+      {
+        "seed": 171,
+        "available": 6784,
+        "sampled": 2744,
+        "class_counts": {
+          "0": 1372,
+          "1": 1372
+        },
+        "class_weights": {
+          "0": 1.0,
+          "1": 1.0
+        }
+      },
+      {
+        "seed": 191,
+        "available": 6784,
+        "sampled": 2744,
+        "class_counts": {
+          "0": 1372,
+          "1": 1372
+        },
+        "class_weights": {
+          "0": 1.0,
+          "1": 1.0
+        }
+      }
+    ],
+    "risk": {
+      "name": "logistic",
+      "tail": 0.3,
+      "threshold": 0.5598591580571827,
+      "train_oof": {
+        "n": 154,
+        "bad": 69,
+        "removed": 46,
+        "bad_removed": 25,
+        "good_removed": 13,
+        "good": 62,
+        "retention": 0.7012987012987013,
+        "precision": 0.5434782608695652,
+        "recall": 0.36231884057971014,
+        "base_bad_rate": 0.44805194805194803,
+        "kept_bad_rate": 0.4074074074074074,
+        "base_return": -0.025499214038533856,
+        "kept_return": -0.015237620466570446
+      },
+      "valid": {
+        "n": 86,
+        "bad": 37,
+        "removed": 20,
+        "bad_removed": 11,
+        "good_removed": 7,
+        "good": 38,
+        "retention": 0.7674418604651163,
+        "precision": 0.55,
+        "recall": 0.2972972972972973,
+        "base_bad_rate": 0.43023255813953487,
+        "kept_bad_rate": 0.3939393939393939,
+        "base_return": -0.02285808096188197,
+        "kept_return": -0.015142711236077439
+      },
+      "passes": true,
+      "selection_gain": 0.01797696329776794
+    },
+    "features": [
+      "board_streak_days",
+      "streak_return",
+      "d0_return",
+      "d0_open_gap",
+      "d0_range",
+      "d0_lower_shadow",
+      "d0_close_position",
+      "first_open_gap",
+      "first_range",
+      "first_one_price",
+      "d0_volume_ratio_pre5",
+      "d0_amount_ratio_pre5",
+      "d0_turnover_pct",
+      "d0_amount_100m",
+      "d0_volume_ratio_first",
+      "d0_turnover_ratio_first",
+      "first_turnover_pct",
+      "pre5_return",
+      "pre5_mean_turnover_pct",
+      "market_limit_count",
+      "market_prev_limit_count",
+      "market_up_fraction",
+      "market_median_return",
+      "limit_rate",
+      "d0_one_price",
+      "range_to_limit",
+      "gap_to_limit",
+      "turnover_ratio_pre5",
+      "pre5_volatility",
+      "pre5_up_count",
+      "market_reseal_fraction",
+      "amount_board_rank",
+      "turnover_board_rank",
+      "log_float_mv_proxy",
+      "log_price"
+    ]
+  },
+  {
+    "month": "2026-04",
+    "group": {
+      "id": "xgb_p3_sqrt_weight",
+      "algorithm": "xgb",
+      "parameters": {
+        "n_estimators": 320,
+        "learning_rate": 0.025,
+        "max_depth": 4,
+        "min_child_weight": 30,
+        "reg_lambda": 15.0
+      },
+      "scheme": "sqrt_weight",
+      "fraction": 0.8,
+      "seeds": [
+        171,
+        191
+      ]
+    },
+    "probability_average_weights": [
+      0.5,
+      0.5
+    ],
+    "estimator_parameters": [
+      {
+        "objective": "binary:logistic",
+        "base_score": null,
+        "booster": null,
+        "callbacks": null,
+        "colsample_bylevel": null,
+        "colsample_bynode": null,
+        "colsample_bytree": 0.8,
+        "device": null,
+        "early_stopping_rounds": null,
+        "enable_categorical": false,
+        "eval_metric": "logloss",
+        "feature_types": null,
+        "feature_weights": null,
+        "gamma": null,
+        "grow_policy": null,
+        "importance_type": null,
+        "interaction_constraints": null,
+        "learning_rate": 0.025,
+        "max_bin": null,
+        "max_cat_threshold": null,
+        "max_cat_to_onehot": null,
+        "max_delta_step": null,
+        "max_depth": 4,
+        "max_leaves": null,
+        "min_child_weight": 30,
+        "missing": "nan",
+        "monotone_constraints": null,
+        "multi_strategy": null,
+        "n_estimators": 320,
+        "n_jobs": 1,
+        "num_parallel_tree": null,
+        "random_state": 171,
+        "reg_alpha": null,
+        "reg_lambda": 15.0,
+        "sampling_method": null,
+        "scale_pos_weight": null,
+        "subsample": 1.0,
+        "tree_method": "hist",
+        "validate_parameters": null,
+        "verbosity": null
+      },
+      {
+        "objective": "binary:logistic",
+        "base_score": null,
+        "booster": null,
+        "callbacks": null,
+        "colsample_bylevel": null,
+        "colsample_bynode": null,
+        "colsample_bytree": 0.8,
+        "device": null,
+        "early_stopping_rounds": null,
+        "enable_categorical": false,
+        "eval_metric": "logloss",
+        "feature_types": null,
+        "feature_weights": null,
+        "gamma": null,
+        "grow_policy": null,
+        "importance_type": null,
+        "interaction_constraints": null,
+        "learning_rate": 0.025,
+        "max_bin": null,
+        "max_cat_threshold": null,
+        "max_cat_to_onehot": null,
+        "max_delta_step": null,
+        "max_depth": 4,
+        "max_leaves": null,
+        "min_child_weight": 30,
+        "missing": "nan",
+        "monotone_constraints": null,
+        "multi_strategy": null,
+        "n_estimators": 320,
+        "n_jobs": 1,
+        "num_parallel_tree": null,
+        "random_state": 191,
+        "reg_alpha": null,
+        "reg_lambda": 15.0,
+        "sampling_method": null,
+        "scale_pos_weight": null,
+        "subsample": 1.0,
+        "tree_method": "hist",
+        "validate_parameters": null,
+        "verbosity": null
+      }
+    ],
+    "sampling": [
+      {
+        "seed": 171,
+        "available": 7088,
+        "sampled": 5666,
+        "class_counts": {
+          "0": 4240,
+          "1": 1426
+        },
+        "class_weights": {
+          "0": 0.8458092022092429,
+          "1": 1.458463522182896
+        }
+      },
+      {
+        "seed": 191,
+        "available": 7088,
+        "sampled": 5666,
+        "class_counts": {
+          "0": 4240,
+          "1": 1426
+        },
+        "class_weights": {
+          "0": 0.8458092022092429,
+          "1": 1.458463522182896
+        }
+      }
+    ],
+    "risk": {
+      "name": "logistic",
+      "tail": 0.2,
+      "threshold": 0.6556100552975401,
+      "train_oof": {
+        "n": 157,
+        "bad": 66,
+        "removed": 32,
+        "bad_removed": 23,
+        "good_removed": 9,
+        "good": 76,
+        "retention": 0.7961783439490446,
+        "precision": 0.71875,
+        "recall": 0.3484848484848485,
+        "base_bad_rate": 0.42038216560509556,
+        "kept_bad_rate": 0.344,
+        "base_return": -0.011083474884097645,
+        "kept_return": 0.004646158435487766
+      },
+      "valid": {
+        "n": 102,
+        "bad": 45,
+        "removed": 7,
+        "bad_removed": 4,
+        "good_removed": 2,
+        "good": 44,
+        "retention": 0.9313725490196079,
+        "precision": 0.5714285714285714,
+        "recall": 0.08888888888888889,
+        "base_bad_rate": 0.4411764705882353,
+        "kept_bad_rate": 0.43157894736842106,
+        "base_return": -0.029466689546509404,
+        "kept_return": -0.028039069109131773
+      },
+      "passes": true,
+      "selection_gain": 0.01715725375696304
+    },
+    "features": [
+      "board_streak_days",
+      "streak_return",
+      "d0_return",
+      "d0_open_gap",
+      "d0_range",
+      "d0_lower_shadow",
+      "d0_close_position",
+      "first_open_gap",
+      "first_range",
+      "first_one_price",
+      "d0_volume_ratio_pre5",
+      "d0_amount_ratio_pre5",
+      "d0_turnover_pct",
+      "d0_amount_100m",
+      "d0_volume_ratio_first",
+      "d0_turnover_ratio_first",
+      "first_turnover_pct",
+      "pre5_return",
+      "pre5_mean_turnover_pct",
+      "market_limit_count",
+      "market_prev_limit_count",
+      "market_up_fraction",
+      "market_median_return",
+      "limit_rate",
+      "d0_one_price",
+      "range_to_limit",
+      "gap_to_limit",
+      "turnover_ratio_pre5",
+      "pre5_volatility",
+      "pre5_up_count",
+      "market_reseal_fraction",
+      "amount_board_rank",
+      "turnover_board_rank",
+      "log_float_mv_proxy",
+      "log_price"
+    ]
+  },
+  {
+    "month": "2026-05",
+    "group": {
+      "id": "rf_p3_undersample",
+      "algorithm": "rf",
+      "parameters": {
+        "n_estimators": 240,
+        "max_depth": 8,
+        "min_samples_leaf": 30,
+        "max_features": 0.8
+      },
+      "scheme": "undersample",
+      "fraction": 0.8,
+      "seeds": [
+        171,
+        191
+      ]
+    },
+    "probability_average_weights": [
+      0.5,
+      0.5
+    ],
+    "estimator_parameters": [
+      {
+        "bootstrap": true,
+        "ccp_alpha": 0.0,
+        "class_weight": null,
+        "criterion": "gini",
+        "max_depth": 8,
+        "max_features": 0.8,
+        "max_leaf_nodes": null,
+        "max_samples": null,
+        "min_impurity_decrease": 0.0,
+        "min_samples_leaf": 30,
+        "min_samples_split": 2,
+        "min_weight_fraction_leaf": 0.0,
+        "monotonic_cst": null,
+        "n_estimators": 240,
+        "n_jobs": 1,
+        "oob_score": false,
+        "random_state": 171,
+        "verbose": 0,
+        "warm_start": false
+      },
+      {
+        "bootstrap": true,
+        "ccp_alpha": 0.0,
+        "class_weight": null,
+        "criterion": "gini",
+        "max_depth": 8,
+        "max_features": 0.8,
+        "max_leaf_nodes": null,
+        "max_samples": null,
+        "min_impurity_decrease": 0.0,
+        "min_samples_leaf": 30,
+        "min_samples_split": 2,
+        "min_weight_fraction_leaf": 0.0,
+        "monotonic_cst": null,
+        "n_estimators": 240,
+        "n_jobs": 1,
+        "oob_score": false,
+        "random_state": 191,
+        "verbose": 0,
+        "warm_start": false
+      }
+    ],
+    "sampling": [
+      {
+        "seed": 171,
+        "available": 6567,
+        "sampled": 2590,
+        "class_counts": {
+          "0": 1295,
+          "1": 1295
+        },
+        "class_weights": {
+          "0": 1.0,
+          "1": 1.0
+        }
+      },
+      {
+        "seed": 191,
+        "available": 6567,
+        "sampled": 2590,
+        "class_counts": {
+          "0": 1295,
+          "1": 1295
+        },
+        "class_weights": {
+          "0": 1.0,
+          "1": 1.0
+        }
+      }
+    ],
+    "risk": {
+      "name": "logistic",
+      "tail": 0.3,
+      "threshold": 0.5152867191549456,
+      "train_oof": {
+        "n": 165,
+        "bad": 68,
+        "removed": 50,
+        "bad_removed": 26,
+        "good_removed": 17,
+        "good": 71,
+        "retention": 0.696969696969697,
+        "precision": 0.52,
+        "recall": 0.38235294117647056,
+        "base_bad_rate": 0.4121212121212121,
+        "kept_bad_rate": 0.3652173913043478,
+        "base_return": -0.017923189094696867,
+        "kept_return": -0.007538346714646648
+      },
+      "valid": {
+        "n": 119,
+        "bad": 46,
+        "removed": 41,
+        "bad_removed": 16,
+        "good_removed": 17,
+        "good": 53,
+        "retention": 0.6554621848739496,
+        "precision": 0.3902439024390244,
+        "recall": 0.34782608695652173,
+        "base_bad_rate": 0.3865546218487395,
+        "kept_bad_rate": 0.38461538461538464,
+        "base_return": -0.02328192759909759,
+        "kept_return": -0.018733958645969488
+      },
+      "passes": true,
+      "selection_gain": 0.014932811333178319
+    },
+    "features": [
+      "board_streak_days",
+      "streak_return",
+      "d0_return",
+      "d0_open_gap",
+      "d0_range",
+      "d0_lower_shadow",
+      "d0_close_position",
+      "first_open_gap",
+      "first_range",
+      "first_one_price",
+      "d0_volume_ratio_pre5",
+      "d0_amount_ratio_pre5",
+      "d0_turnover_pct",
+      "d0_amount_100m",
+      "d0_volume_ratio_first",
+      "d0_turnover_ratio_first",
+      "first_turnover_pct",
+      "pre5_return",
+      "pre5_mean_turnover_pct",
+      "market_limit_count",
+      "market_prev_limit_count",
+      "market_up_fraction",
+      "market_median_return",
+      "limit_rate",
+      "d0_one_price",
+      "range_to_limit",
+      "gap_to_limit",
+      "turnover_ratio_pre5",
+      "pre5_volatility",
+      "pre5_up_count",
+      "market_reseal_fraction",
+      "amount_board_rank",
+      "turnover_board_rank",
+      "log_float_mv_proxy",
+      "log_price"
+    ]
+  },
+  {
+    "month": "2026-06",
+    "group": {
+      "id": "lgb_p1_natural",
+      "algorithm": "lgb",
+      "parameters": {
+        "n_estimators": 160,
+        "learning_rate": 0.04,
+        "num_leaves": 7,
+        "max_depth": 3,
+        "min_child_samples": 80,
+        "reg_lambda": 5.0
+      },
+      "scheme": "natural",
+      "fraction": 0.8,
+      "seeds": [
+        171,
+        191
+      ]
+    },
+    "probability_average_weights": [
+      0.5,
+      0.5
+    ],
+    "estimator_parameters": [
+      {
+        "boosting_type": "gbdt",
+        "class_weight": null,
+        "colsample_bytree": 0.8,
+        "importance_type": "split",
+        "learning_rate": 0.04,
+        "max_depth": 3,
+        "min_child_samples": 80,
+        "min_child_weight": 0.001,
+        "min_split_gain": 0.0,
+        "n_estimators": 160,
+        "n_jobs": 1,
+        "num_leaves": 7,
+        "objective": "binary",
+        "random_state": 171,
+        "reg_alpha": 0.0,
+        "reg_lambda": 5.0,
+        "subsample": 1.0,
+        "subsample_for_bin": 200000,
+        "subsample_freq": 0,
+        "verbosity": -1,
+        "deterministic": true,
+        "force_col_wise": true
+      },
+      {
+        "boosting_type": "gbdt",
+        "class_weight": null,
+        "colsample_bytree": 0.8,
+        "importance_type": "split",
+        "learning_rate": 0.04,
+        "max_depth": 3,
+        "min_child_samples": 80,
+        "min_child_weight": 0.001,
+        "min_split_gain": 0.0,
+        "n_estimators": 160,
+        "n_jobs": 1,
+        "num_leaves": 7,
+        "objective": "binary",
+        "random_state": 191,
+        "reg_alpha": 0.0,
+        "reg_lambda": 5.0,
+        "subsample": 1.0,
+        "subsample_for_bin": 200000,
+        "subsample_freq": 0,
+        "verbosity": -1,
+        "deterministic": true,
+        "force_col_wise": true
+      }
+    ],
+    "sampling": [
+      {
+        "seed": 171,
+        "available": 6567,
+        "sampled": 5250,
+        "class_counts": {
+          "0": 3952,
+          "1": 1298
+        },
+        "class_weights": {
+          "0": 1.0,
+          "1": 1.0
+        }
+      },
+      {
+        "seed": 191,
+        "available": 6567,
+        "sampled": 5250,
+        "class_counts": {
+          "0": 3952,
+          "1": 1298
+        },
+        "class_weights": {
+          "0": 1.0,
+          "1": 1.0
+        }
+      }
+    ],
+    "risk": {
+      "name": "none",
+      "threshold": null,
+      "tail": 0
+    },
+    "features": [
+      "board_streak_days",
+      "streak_return",
+      "d0_return",
+      "d0_open_gap",
+      "d0_range",
+      "d0_lower_shadow",
+      "d0_close_position",
+      "first_open_gap",
+      "first_range",
+      "first_one_price",
+      "d0_volume_ratio_pre5",
+      "d0_amount_ratio_pre5",
+      "d0_turnover_pct",
+      "d0_amount_100m",
+      "d0_volume_ratio_first",
+      "d0_turnover_ratio_first",
+      "first_turnover_pct",
+      "pre5_return",
+      "pre5_mean_turnover_pct",
+      "market_limit_count",
+      "market_prev_limit_count",
+      "market_up_fraction",
+      "market_median_return",
+      "limit_rate",
+      "d0_one_price",
+      "range_to_limit",
+      "gap_to_limit",
+      "turnover_ratio_pre5",
+      "pre5_volatility",
+      "pre5_up_count",
+      "market_reseal_fraction",
+      "amount_board_rank",
+      "turnover_board_rank",
+      "log_float_mv_proxy",
+      "log_price"
+    ]
+  },
+  {
+    "month": "2026-07",
+    "group": {
+      "id": "lgb_p1_undersample",
+      "algorithm": "lgb",
+      "parameters": {
+        "n_estimators": 160,
+        "learning_rate": 0.04,
+        "num_leaves": 7,
+        "max_depth": 3,
+        "min_child_samples": 80,
+        "reg_lambda": 5.0
+      },
+      "scheme": "undersample",
+      "fraction": 0.8,
+      "seeds": [
+        171,
+        191
+      ]
+    },
+    "probability_average_weights": [
+      0.5,
+      0.5
+    ],
+    "estimator_parameters": [
+      {
+        "boosting_type": "gbdt",
+        "class_weight": null,
+        "colsample_bytree": 0.8,
+        "importance_type": "split",
+        "learning_rate": 0.04,
+        "max_depth": 3,
+        "min_child_samples": 80,
+        "min_child_weight": 0.001,
+        "min_split_gain": 0.0,
+        "n_estimators": 160,
+        "n_jobs": 1,
+        "num_leaves": 7,
+        "objective": "binary",
+        "random_state": 171,
+        "reg_alpha": 0.0,
+        "reg_lambda": 5.0,
+        "subsample": 1.0,
+        "subsample_for_bin": 200000,
+        "subsample_freq": 0,
+        "verbosity": -1,
+        "deterministic": true,
+        "force_col_wise": true
+      },
+      {
+        "boosting_type": "gbdt",
+        "class_weight": null,
+        "colsample_bytree": 0.8,
+        "importance_type": "split",
+        "learning_rate": 0.04,
+        "max_depth": 3,
+        "min_child_samples": 80,
+        "min_child_weight": 0.001,
+        "min_split_gain": 0.0,
+        "n_estimators": 160,
+        "n_jobs": 1,
+        "num_leaves": 7,
+        "objective": "binary",
+        "random_state": 191,
+        "reg_alpha": 0.0,
+        "reg_lambda": 5.0,
+        "subsample": 1.0,
+        "subsample_for_bin": 200000,
+        "subsample_freq": 0,
+        "verbosity": -1,
+        "deterministic": true,
+        "force_col_wise": true
+      }
+    ],
+    "sampling": [
+      {
+        "seed": 171,
+        "available": 6893,
+        "sampled": 2664,
+        "class_counts": {
+          "1": 1332,
+          "0": 1332
+        },
+        "class_weights": {
+          "0": 1.0,
+          "1": 1.0
+        }
+      },
+      {
+        "seed": 191,
+        "available": 6893,
+        "sampled": 2664,
+        "class_counts": {
+          "1": 1332,
+          "0": 1332
+        },
+        "class_weights": {
+          "0": 1.0,
+          "1": 1.0
+        }
+      }
+    ],
+    "risk": {
+      "name": "tree",
+      "tail": 0.1,
+      "threshold": 0.7012644889357222,
+      "train_oof": {
+        "n": 162,
+        "bad": 61,
+        "removed": 21,
+        "bad_removed": 11,
+        "good_removed": 7,
+        "good": 70,
+        "retention": 0.8703703703703703,
+        "precision": 0.5238095238095238,
+        "recall": 0.18032786885245902,
+        "base_bad_rate": 0.3765432098765432,
+        "kept_bad_rate": 0.3546099290780142,
+        "base_return": -0.020805008268202807,
+        "kept_return": -0.017595678804105317
+      },
+      "valid": {
+        "n": 109,
+        "bad": 48,
+        "removed": 14,
+        "bad_removed": 10,
+        "good_removed": 2,
+        "good": 42,
+        "retention": 0.8715596330275229,
+        "precision": 0.7142857142857143,
+        "recall": 0.20833333333333334,
+        "base_bad_rate": 0.44036697247706424,
+        "kept_bad_rate": 0.4,
+        "base_return": -0.02311340605850986,
+        "kept_return": -0.013250638836380097
+      },
+      "passes": true,
+      "selection_gain": 0.013072096686227252
+    },
+    "features": [
+      "board_streak_days",
+      "streak_return",
+      "d0_return",
+      "d0_open_gap",
+      "d0_range",
+      "d0_lower_shadow",
+      "d0_close_position",
+      "first_open_gap",
+      "first_range",
+      "first_one_price",
+      "d0_volume_ratio_pre5",
+      "d0_amount_ratio_pre5",
+      "d0_turnover_pct",
+      "d0_amount_100m",
+      "d0_volume_ratio_first",
+      "d0_turnover_ratio_first",
+      "first_turnover_pct",
+      "pre5_return",
+      "pre5_mean_turnover_pct",
+      "market_limit_count",
+      "market_prev_limit_count",
+      "market_up_fraction",
+      "market_median_return",
+      "limit_rate",
+      "d0_one_price",
+      "range_to_limit",
+      "gap_to_limit",
+      "turnover_ratio_pre5",
+      "pre5_volatility",
+      "pre5_up_count",
+      "market_reseal_fraction",
+      "amount_board_rank",
+      "turnover_board_rank",
+      "log_float_mv_proxy",
+      "log_price"
+    ]
+  },
+  {
+    "month": "2026-08",
+    "group": {
+      "id": "xgb_p2_natural",
+      "algorithm": "xgb",
+      "parameters": {
+        "n_estimators": 240,
+        "learning_rate": 0.03,
+        "max_depth": 3,
+        "min_child_weight": 20,
+        "reg_lambda": 10.0
+      },
+      "scheme": "natural",
+      "fraction": 0.8,
+      "seeds": [
+        171,
+        191
+      ]
+    },
+    "probability_average_weights": [
+      0.5,
+      0.5
+    ],
+    "estimator_parameters": [
+      {
+        "objective": "binary:logistic",
+        "base_score": null,
+        "booster": null,
+        "callbacks": null,
+        "colsample_bylevel": null,
+        "colsample_bynode": null,
+        "colsample_bytree": 0.8,
+        "device": null,
+        "early_stopping_rounds": null,
+        "enable_categorical": false,
+        "eval_metric": "logloss",
+        "feature_types": null,
+        "feature_weights": null,
+        "gamma": null,
+        "grow_policy": null,
+        "importance_type": null,
+        "interaction_constraints": null,
+        "learning_rate": 0.03,
+        "max_bin": null,
+        "max_cat_threshold": null,
+        "max_cat_to_onehot": null,
+        "max_delta_step": null,
+        "max_depth": 3,
+        "max_leaves": null,
+        "min_child_weight": 20,
+        "missing": "nan",
+        "monotone_constraints": null,
+        "multi_strategy": null,
+        "n_estimators": 240,
+        "n_jobs": 1,
+        "num_parallel_tree": null,
+        "random_state": 171,
+        "reg_alpha": null,
+        "reg_lambda": 10.0,
+        "sampling_method": null,
+        "scale_pos_weight": null,
+        "subsample": 1.0,
+        "tree_method": "hist",
+        "validate_parameters": null,
+        "verbosity": null
+      },
+      {
+        "objective": "binary:logistic",
+        "base_score": null,
+        "booster": null,
+        "callbacks": null,
+        "colsample_bylevel": null,
+        "colsample_bynode": null,
+        "colsample_bytree": 0.8,
+        "device": null,
+        "early_stopping_rounds": null,
+        "enable_categorical": false,
+        "eval_metric": "logloss",
+        "feature_types": null,
+        "feature_weights": null,
+        "gamma": null,
+        "grow_policy": null,
+        "importance_type": null,
+        "interaction_constraints": null,
+        "learning_rate": 0.03,
+        "max_bin": null,
+        "max_cat_threshold": null,
+        "max_cat_to_onehot": null,
+        "max_delta_step": null,
+        "max_depth": 3,
+        "max_leaves": null,
+        "min_child_weight": 20,
+        "missing": "nan",
+        "monotone_constraints": null,
+        "multi_strategy": null,
+        "n_estimators": 240,
+        "n_jobs": 1,
+        "num_parallel_tree": null,
+        "random_state": 191,
+        "reg_alpha": null,
+        "reg_lambda": 10.0,
+        "sampling_method": null,
+        "scale_pos_weight": null,
+        "subsample": 1.0,
+        "tree_method": "hist",
+        "validate_parameters": null,
+        "verbosity": null
+      }
+    ],
+    "sampling": [
+      {
+        "seed": 171,
+        "available": 7181,
+        "sampled": 5740,
+        "class_counts": {
+          "0": 4401,
+          "1": 1339
+        },
+        "class_weights": {
+          "0": 1.0,
+          "1": 1.0
+        }
+      },
+      {
+        "seed": 191,
+        "available": 7181,
+        "sampled": 5740,
+        "class_counts": {
+          "0": 4401,
+          "1": 1339
+        },
+        "class_weights": {
+          "0": 1.0,
+          "1": 1.0
+        }
+      }
+    ],
+    "risk": {
+      "name": "logistic",
+      "tail": 0.3,
+      "threshold": 0.5291697959448417,
+      "train_oof": {
+        "n": 178,
+        "bad": 78,
+        "removed": 54,
+        "bad_removed": 26,
+        "good_removed": 20,
+        "good": 75,
+        "retention": 0.6966292134831461,
+        "precision": 0.48148148148148145,
+        "recall": 0.3333333333333333,
+        "base_bad_rate": 0.43820224719101125,
+        "kept_bad_rate": 0.41935483870967744,
+        "base_return": -0.02548512064367819,
+        "kept_return": -0.01704814621346052
+      },
+      "valid": {
+        "n": 123,
+        "bad": 58,
+        "removed": 33,
+        "bad_removed": 19,
+        "good_removed": 9,
+        "good": 48,
+        "retention": 0.7317073170731707,
+        "precision": 0.5757575757575758,
+        "recall": 0.3275862068965517,
+        "base_bad_rate": 0.4715447154471545,
+        "kept_bad_rate": 0.43333333333333335,
+        "base_return": -0.034248088569067296,
+        "kept_return": -0.028551475490574754
+      },
+      "passes": true,
+      "selection_gain": 0.014133587508710212
+    },
+    "features": [
+      "board_streak_days",
+      "streak_return",
+      "d0_return",
+      "d0_open_gap",
+      "d0_range",
+      "d0_lower_shadow",
+      "d0_close_position",
+      "first_open_gap",
+      "first_range",
+      "first_one_price",
+      "d0_volume_ratio_pre5",
+      "d0_amount_ratio_pre5",
+      "d0_turnover_pct",
+      "d0_amount_100m",
+      "d0_volume_ratio_first",
+      "d0_turnover_ratio_first",
+      "first_turnover_pct",
+      "pre5_return",
+      "pre5_mean_turnover_pct",
+      "market_limit_count",
+      "market_prev_limit_count",
+      "market_up_fraction",
+      "market_median_return",
+      "limit_rate",
+      "d0_one_price",
+      "range_to_limit",
+      "gap_to_limit",
+      "turnover_ratio_pre5",
+      "pre5_volatility",
+      "pre5_up_count",
+      "market_reseal_fraction",
+      "amount_board_rank",
+      "turnover_board_rank",
+      "log_float_mv_proxy",
+      "log_price"
+    ]
+  },
+  {
+    "month": "2026-09",
+    "group": {
+      "id": "rf_reference",
+      "algorithm": "rf",
+      "parameters": {
+        "n_estimators": 240,
+        "max_depth": 7,
+        "min_samples_leaf": 50,
+        "max_features": 0.8
+      },
+      "scheme": "balanced_weight",
+      "fraction": 1.0,
+      "seeds": [
+        20261013
+      ]
+    },
+    "probability_average_weights": [
+      1.0
+    ],
+    "estimator_parameters": [
+      {
+        "bootstrap": true,
+        "ccp_alpha": 0.0,
+        "class_weight": null,
+        "criterion": "gini",
+        "max_depth": 7,
+        "max_features": 0.8,
+        "max_leaf_nodes": null,
+        "max_samples": null,
+        "min_impurity_decrease": 0.0,
+        "min_samples_leaf": 50,
+        "min_samples_split": 2,
+        "min_weight_fraction_leaf": 0.0,
+        "monotonic_cst": null,
+        "n_estimators": 240,
+        "n_jobs": 1,
+        "oob_score": false,
+        "random_state": 20261013,
+        "verbose": 0,
+        "warm_start": false
+      }
+    ],
+    "sampling": [
+      {}
+    ],
+    "risk": {
+      "name": "tree",
+      "tail": 0.1,
+      "threshold": 0.6650773345737883,
+      "train_oof": {
+        "n": 172,
+        "bad": 62,
+        "removed": 29,
+        "bad_removed": 12,
+        "good_removed": 11,
+        "good": 80,
+        "retention": 0.8313953488372093,
+        "precision": 0.41379310344827586,
+        "recall": 0.1935483870967742,
+        "base_bad_rate": 0.36046511627906974,
+        "kept_bad_rate": 0.34965034965034963,
+        "base_return": -0.011401816679398727,
+        "kept_return": -0.006380097634823652
+      },
+      "valid": {
+        "n": 119,
+        "bad": 47,
+        "removed": 22,
+        "bad_removed": 9,
+        "good_removed": 6,
+        "good": 54,
+        "retention": 0.8151260504201681,
+        "precision": 0.4090909090909091,
+        "recall": 0.19148936170212766,
+        "base_bad_rate": 0.3949579831932773,
+        "kept_bad_rate": 0.3917525773195876,
+        "base_return": -0.021020581566401943,
+        "kept_return": -0.01416442855235238
+      },
+      "passes": true,
+      "selection_gain": 0.011877872058624638
+    },
+    "features": [
+      "board_streak_days",
+      "streak_return",
+      "d0_return",
+      "d0_open_gap",
+      "d0_range",
+      "d0_lower_shadow",
+      "d0_close_position",
+      "first_open_gap",
+      "first_range",
+      "first_one_price",
+      "d0_volume_ratio_pre5",
+      "d0_amount_ratio_pre5",
+      "d0_turnover_pct",
+      "d0_amount_100m",
+      "d0_volume_ratio_first",
+      "d0_turnover_ratio_first",
+      "first_turnover_pct",
+      "pre5_return",
+      "pre5_mean_turnover_pct",
+      "market_limit_count",
+      "market_prev_limit_count",
+      "market_up_fraction",
+      "market_median_return",
+      "limit_rate",
+      "d0_one_price",
+      "range_to_limit",
+      "gap_to_limit",
+      "turnover_ratio_pre5",
+      "pre5_volatility",
+      "pre5_up_count",
+      "market_reseal_fraction",
+      "amount_board_rank",
+      "turnover_board_rank",
+      "log_float_mv_proxy",
+      "log_price"
+    ]
+  },
+  {
+    "month": "2026-10",
+    "group": {
+      "id": "rf_p3_undersample",
+      "algorithm": "rf",
+      "parameters": {
+        "n_estimators": 240,
+        "max_depth": 8,
+        "min_samples_leaf": 30,
+        "max_features": 0.8
+      },
+      "scheme": "undersample",
+      "fraction": 0.8,
+      "seeds": [
+        171,
+        191
+      ]
+    },
+    "probability_average_weights": [
+      0.5,
+      0.5
+    ],
+    "estimator_parameters": [
+      {
+        "bootstrap": true,
+        "ccp_alpha": 0.0,
+        "class_weight": null,
+        "criterion": "gini",
+        "max_depth": 8,
+        "max_features": 0.8,
+        "max_leaf_nodes": null,
+        "max_samples": null,
+        "min_impurity_decrease": 0.0,
+        "min_samples_leaf": 30,
+        "min_samples_split": 2,
+        "min_weight_fraction_leaf": 0.0,
+        "monotonic_cst": null,
+        "n_estimators": 240,
+        "n_jobs": 1,
+        "oob_score": false,
+        "random_state": 171,
+        "verbose": 0,
+        "warm_start": false
+      },
+      {
+        "bootstrap": true,
+        "ccp_alpha": 0.0,
+        "class_weight": null,
+        "criterion": "gini",
+        "max_depth": 8,
+        "max_features": 0.8,
+        "max_leaf_nodes": null,
+        "max_samples": null,
+        "min_impurity_decrease": 0.0,
+        "min_samples_leaf": 30,
+        "min_samples_split": 2,
+        "min_weight_fraction_leaf": 0.0,
+        "monotonic_cst": null,
+        "n_estimators": 240,
+        "n_jobs": 1,
+        "oob_score": false,
+        "random_state": 191,
+        "verbose": 0,
+        "warm_start": false
+      }
+    ],
+    "sampling": [
+      {
+        "seed": 171,
+        "available": 7939,
+        "sampled": 2762,
+        "class_counts": {
+          "0": 1381,
+          "1": 1381
+        },
+        "class_weights": {
+          "0": 1.0,
+          "1": 1.0
+        }
+      },
+      {
+        "seed": 191,
+        "available": 7939,
+        "sampled": 2762,
+        "class_counts": {
+          "1": 1381,
+          "0": 1381
+        },
+        "class_weights": {
+          "0": 1.0,
+          "1": 1.0
+        }
+      }
+    ],
+    "risk": {
+      "name": "tree",
+      "tail": 0.1,
+      "threshold": 0.6718962136068787,
+      "train_oof": {
+        "n": 187,
+        "bad": 94,
+        "removed": 32,
+        "bad_removed": 20,
+        "good_removed": 8,
+        "good": 70,
+        "retention": 0.8288770053475936,
+        "precision": 0.625,
+        "recall": 0.2127659574468085,
+        "base_bad_rate": 0.5026737967914439,
+        "kept_bad_rate": 0.4774193548387097,
+        "base_return": -0.03949011361790626,
+        "kept_return": -0.03398816299718123
+      },
+      "valid": {
+        "n": 113,
+        "bad": 40,
+        "removed": 24,
+        "bad_removed": 11,
+        "good_removed": 9,
+        "good": 48,
+        "retention": 0.7876106194690266,
+        "precision": 0.4583333333333333,
+        "recall": 0.275,
+        "base_bad_rate": 0.35398230088495575,
+        "kept_bad_rate": 0.3258426966292135,
+        "base_return": -0.015750822875576276,
+        "kept_return": -0.007135214335762468
+      },
+      "passes": true,
+      "selection_gain": 0.014117559160538841
+    },
+    "features": [
+      "board_streak_days",
+      "streak_return",
+      "d0_return",
+      "d0_open_gap",
+      "d0_range",
+      "d0_lower_shadow",
+      "d0_close_position",
+      "first_open_gap",
+      "first_range",
+      "first_one_price",
+      "d0_volume_ratio_pre5",
+      "d0_amount_ratio_pre5",
+      "d0_turnover_pct",
+      "d0_amount_100m",
+      "d0_volume_ratio_first",
+      "d0_turnover_ratio_first",
+      "first_turnover_pct",
+      "pre5_return",
+      "pre5_mean_turnover_pct",
+      "market_limit_count",
+      "market_prev_limit_count",
+      "market_up_fraction",
+      "market_median_return",
+      "limit_rate",
+      "d0_one_price",
+      "range_to_limit",
+      "gap_to_limit",
+      "turnover_ratio_pre5",
+      "pre5_volatility",
+      "pre5_up_count",
+      "market_reseal_fraction",
+      "amount_board_rank",
+      "turnover_board_rank",
+      "log_float_mv_proxy",
+      "log_price"
+    ]
+  }
+]

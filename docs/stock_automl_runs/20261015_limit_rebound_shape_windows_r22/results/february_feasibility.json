@@ -1,0 +1,17 @@
+{
+  "note": "Feasibility only, not a fitted strategy. Jan split into calendar halves, using causal January Top1 scores for a sample-size screen. Actual February-model validation ranking not fitted here.",
+  "half_month_counts": [
+    {
+      "start": "2025-01-01",
+      "end_exclusive": "2025-01-16",
+      "D0_days_after_D4_purge": 6,
+      "complete_tradable_Top1": 4
+    },
+    {
+      "start": "2025-01-16",
+      "end_exclusive": "2025-02-01",
+      "D0_days_after_D4_purge": 4,
+      "complete_tradable_Top1": 2
+    }
+  ]
+}

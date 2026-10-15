@@ -1,0 +1,192 @@
+{
+  "scope": "Fixed R19 monthly rules, test D0 2025-09-01 through 2026-10-13. No fitting or selection.",
+  "definition": "Five bars ending09:36..09:40. Whole means positive-volume bar high strictly below cap; not evidence of quote availability throughout every second.",
+  "qualified": 186,
+  "filled": 67,
+  "no_fill": 119,
+  "no_fill_all_cap": 109,
+  "no_fill_intraminute_only": 10,
+  "selected_window": {
+    "n": 67,
+    "hit": 0.6716417910447762,
+    "whole_at_least1": 59,
+    "whole_at_least3": 49,
+    "whole_all5": 41,
+    "whole_count_dist": {
+      "0": 8,
+      "1": 7,
+      "2": 3,
+      "3": 4,
+      "4": 4,
+      "5": 41
+    },
+    "longest_whole_dist": {
+      "0": 8,
+      "1": 8,
+      "2": 4,
+      "3": 2,
+      "4": 4,
+      "5": 41
+    },
+    "below_count_dist": {
+      "1": 2,
+      "2": 4,
+      "3": 4,
+      "4": 2,
+      "5": 55
+    },
+    "whole_median": 5.0,
+    "longest_whole_median": 5.0,
+    "ret2": 0.012945479235281694,
+    "ret3": 0.01593991297893757,
+    "strategy": 0.0030161849854099497
+  },
+  "qualified_window": {
+    "n": 186,
+    "hit": 0.8594594594594595,
+    "whole_at_least1": 59,
+    "whole_at_least3": 49,
+    "whole_all5": 41,
+    "whole_count_dist": {
+      "0": 127,
+      "1": 7,
+      "2": 3,
+      "3": 4,
+      "4": 4,
+      "5": 41
+    },
+    "longest_whole_dist": {
+      "0": 127,
+      "1": 8,
+      "2": 4,
+      "3": 2,
+      "4": 4,
+      "5": 41
+    },
+    "below_count_dist": {
+      "0": 109,
+      "1": 8,
+      "2": 6,
+      "3": 6,
+      "4": 2,
+      "5": 55
+    },
+    "whole_median": 0.0,
+    "longest_whole_median": 0.0,
+    "ret2": 0.012945479235281696,
+    "ret3": 0.015939912978937567,
+    "strategy": 0.0030161849854099497
+  },
+  "entry_distribution": {
+    "6": 58,
+    "7": 6,
+    "8": 1,
+    "9": 1,
+    "10": 1
+  },
+  "entry_whole_prefix": {
+    "0": 12,
+    "1": 7,
+    "2": 2,
+    "3": 2,
+    "4": 3,
+    "5": 41
+  },
+  "entry_first_touch_offset": {
+    "0": 12,
+    "1": 7,
+    "2": 2,
+    "3": 1
+  },
+  "no_touch_from_entry_to0940": 45,
+  "already_below_at0935": 57,
+  "entry_gap_to_cap_median": 0.048192771084337505,
+  "notouched_first5": {
+    "n": 33,
+    "hit": 0.5757575757575758,
+    "whole_at_least1": 32,
+    "whole_at_least3": 30,
+    "whole_all5": 28,
+    "whole_count_dist": {
+      "0": 1,
+      "1": 2,
+      "3": 2,
+      "5": 28
+    },
+    "longest_whole_dist": {
+      "0": 1,
+      "1": 2,
+      "2": 1,
+      "3": 1,
+      "5": 28
+    },
+    "below_count_dist": {
+      "3": 3,
+      "4": 1,
+      "5": 29
+    },
+    "whole_median": 5.0,
+    "longest_whole_median": 5.0,
+    "ret2": 0.016148187854171176,
+    "ret3": 0.018174814126819205,
+    "strategy": 0.0006777031833691098
+  },
+  "touched_first5": {
+    "n": 34,
+    "hit": 0.7647058823529411,
+    "whole_at_least1": 27,
+    "whole_at_least3": 19,
+    "whole_all5": 13,
+    "whole_count_dist": {
+      "0": 7,
+      "1": 5,
+      "2": 3,
+      "3": 2,
+      "4": 4,
+      "5": 13
+    },
+    "longest_whole_dist": {
+      "0": 7,
+      "1": 6,
+      "2": 3,
+      "3": 1,
+      "4": 4,
+      "5": 13
+    },
+    "below_count_dist": {
+      "1": 2,
+      "2": 4,
+      "3": 1,
+      "4": 1,
+      "5": 26
+    },
+    "whole_median": 3.5,
+    "longest_whole_median": 3.5,
+    "ret2": 0.009836967928712493,
+    "ret3": 0.013770744217758332,
+    "strategy": 0.005217109034389564
+  },
+  "delay_one_minute": {
+    "n": 65,
+    "retained_original": 65,
+    "hit": 0.6615384615384615,
+    "entry_whole": 52,
+    "ret2": {
+      "n": 65,
+      "mean": 0.009922480278278946
+    },
+    "ret3": {
+      "n": 65,
+      "mean": 0.012261285623413878
+    },
+    "ret4": {
+      "n": 64,
+      "mean": -0.0006306548773135218
+    },
+    "strategy": {
+      "n": 64,
+      "mean": 0.0021959881724027686
+    }
+  },
+  "frozen_rules_sha256": "e18cf06b9917bd508dfdb031935b7864f35bb864603964e70a5ce977069b2f86"
+}

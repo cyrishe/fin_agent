@@ -1,0 +1,16 @@
+{
+  "same_market_sample_ids": true,
+  "B1_picks_unchanged": true,
+  "no_future_labels_in_ranking": true,
+  "K": [
+    100,
+    250,
+    500
+  ],
+  "formal_days": 288,
+  "ranks_use_calibrated_probability_only": true,
+  "source_sha256": {
+    "60d": "see_rank_gate_pre_run_freeze",
+    "20d": "37d3663a564951f7e2234ed2228ce85f1c6b09eb959c6929cadb511ebd908762"
+  }
+}

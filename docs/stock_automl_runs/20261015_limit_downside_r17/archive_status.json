@@ -1,0 +1,10 @@
+{
+  "archive": "/Volumes/ext/fin_agent/outputs/stock_automl/aliyun_staging/涨停冷静期/D0判断-D1开盘伺机买入/20261015/R17_独立三日大跌两极模型_20261015.zip",
+  "bytes": 672323062,
+  "sha256": "13f42f6a88e64421f3b924fad5217a67ec3602f5d911049a576d9d76a66306b1",
+  "source_files": 4600,
+  "local_readback_verified": true,
+  "cloud_uploaded": false,
+  "cloud_readback_verified": false,
+  "intended_cloud_directory": "策略训练/涨停冷静期/D0判断-D1开盘伺机买入/20261015"
+}

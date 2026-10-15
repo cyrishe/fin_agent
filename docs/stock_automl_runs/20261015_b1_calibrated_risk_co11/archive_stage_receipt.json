@@ -1,0 +1,14 @@
+{
+  "user_id": "imac",
+  "experiment_id": "CO11_20261015_B1_calibrated_independent_risk",
+  "experiment_date": "2026-10-15",
+  "title": "CO11：独立下跌概率校准后叠加B1，轮空与分档减仓",
+  "category_path": "02_联合目标与尾部风险",
+  "local_path": "/Volumes/ext/fin_agent/outputs/stock_automl/aliyun_drive_local/策略训练/收盘开盘_20261014/02_联合目标与尾部风险/20261015_CO11_B1叠加独立下跌概率_校准轮空与减仓",
+  "cloud_path": "策略训练/收盘开盘_20261014/02_联合目标与尾部风险/20261015_CO11_B1叠加独立下跌概率_校准轮空与减仓",
+  "source_commit": "e55c2f79787f22efac905cfb08a52b0ad7db6198",
+  "manifest_sha256": "26b14720de41ef7da950e319b6677fbe646d0117dd45f3604250fc3eecba7a0a",
+  "file_count": 100,
+  "db_recorded": true,
+  "cloud_verified": false
+}

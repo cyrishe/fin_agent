@@ -1,0 +1,17 @@
+{
+  "source_n": 47253,
+  "exact_seal_n": 46851,
+  "excluded_d0_cap_mismatch": 402,
+  "known": 46403,
+  "price_gaps": 330,
+  "groups": {
+    "非大跌": 27493,
+    "大跌": 12934,
+    "中间": 5976,
+    "未标注": 448
+  },
+  "source_start": "2024-01-02",
+  "source_end": "2026-10-13",
+  "outcome_end": "2026-10-14",
+  "panel_sha256": "263bd117e57993a7568252efdbff7e58990657a42987fc82b8c1525af1cb9810"
+}

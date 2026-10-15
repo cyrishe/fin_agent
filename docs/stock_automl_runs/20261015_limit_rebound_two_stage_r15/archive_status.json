@@ -1,0 +1,13 @@
+{
+  "experiment": "R15",
+  "path": "/Volumes/ext/fin_agent/outputs/stock_automl/aliyun_staging/涨停冷静期/D0判断-D1开盘伺机买入/20261015/R15_六个月训练_两阶段早盘避险_20261015.zip",
+  "bytes": 66493200,
+  "sha256": "e54e840d5f85d99b00564645df59ec27ae6c26e205922dfa07875f411b3f7426",
+  "files": 1022,
+  "local_readback_verified": true,
+  "cloud_directory": "策略训练/涨停冷静期/D0判断-D1开盘伺机买入/20261015",
+  "cloud_uploaded": false,
+  "cloud_readback_verified": false,
+  "cloud_note": "本轮本地归档；此前浏览器扩展文件权限需用户手动开启，原会话已改为用户通过桌面App拖动上传。本轮未新增云端操作。",
+  "base_commit": "e55c2f79787f22efac905cfb08a52b0ad7db6198"
+}

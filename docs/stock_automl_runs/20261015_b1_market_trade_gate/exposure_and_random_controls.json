@@ -1,0 +1,38 @@
+{
+  "primary_exposure_fraction": 0.36936936936936937,
+  "constant_fraction_baseline": {
+    "days": 288,
+    "trades": 222,
+    "baseline_trades": 222,
+    "net_nav_pct": -16.514103363045496,
+    "settled_max_drawdown_pct": 25.236243946801018,
+    "minute_close_max_drawdown_pct": 26.78597052130993,
+    "minute_marks_complete": true,
+    "net_trade_mean_pct": -0.1990770590102261,
+    "net_daily_mean_pct": -0.056681662634854676,
+    "losses_avoided": 0,
+    "large_losses_avoided": 0,
+    "profits_missed": 0,
+    "avoided_loss_sum_pp": -0.0,
+    "missed_profit_sum_pp": 0.0,
+    "added_trades": 0,
+    "added_losses": 0,
+    "added_profits": 0,
+    "retained_large_losses": 51,
+    "corporate_action_trades": 0,
+    "worst_trade_pct": -16.515673624264416,
+    "worst5pct_mean_pct": -7.160890709378387
+  },
+  "random_same_month_same_trade_counts": {
+    "replicates": 2000,
+    "median_nav_pct": -27.05813277016632,
+    "nav_95_range_pct": [
+      -42.76026248662449,
+      -8.308669300186063
+    ],
+    "fraction_random_nav_at_least_primary": 0.5325,
+    "mean_losses_avoided": 77.0455,
+    "mean_profits_missed": 62.9545,
+    "note": "ex-post coverage-matched diagnostic, not a deployable policy or corrected significance test"
+  }
+}

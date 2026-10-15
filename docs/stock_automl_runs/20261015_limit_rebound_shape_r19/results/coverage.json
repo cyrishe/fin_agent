@@ -1,0 +1,10 @@
+{
+  "unique_demand": 603,
+  "minute_days": 428,
+  "minute_verified": 601,
+  "failed_reasons": {
+    "分钟缺失": 2
+  },
+  "ordinary_unique": 598,
+  "no_model_retraining": true
+}

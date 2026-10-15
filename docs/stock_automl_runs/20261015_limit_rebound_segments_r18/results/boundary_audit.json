@@ -1,0 +1,178 @@
+[
+  {
+    "month": "2025-01",
+    "train_last_d0": "2024-10-25",
+    "valid_first_d0": "2024-11-01",
+    "valid_last_d0": "2024-12-25",
+    "test_first_d0": "2025-01-02",
+    "valid_test_shared_board_events": 2
+  },
+  {
+    "month": "2025-02",
+    "train_last_d0": "2024-11-25",
+    "valid_first_d0": "2024-12-02",
+    "valid_last_d0": "2025-01-21",
+    "test_first_d0": "2025-02-05",
+    "valid_test_shared_board_events": 0
+  },
+  {
+    "month": "2025-03",
+    "train_last_d0": "2024-12-25",
+    "valid_first_d0": "2025-01-02",
+    "valid_last_d0": "2025-02-24",
+    "test_first_d0": "2025-03-03",
+    "valid_test_shared_board_events": 0
+  },
+  {
+    "month": "2025-04",
+    "train_last_d0": "2025-01-21",
+    "valid_first_d0": "2025-02-05",
+    "valid_last_d0": "2025-03-25",
+    "test_first_d0": "2025-04-01",
+    "valid_test_shared_board_events": 0
+  },
+  {
+    "month": "2025-05",
+    "train_last_d0": "2025-02-24",
+    "valid_first_d0": "2025-03-03",
+    "valid_last_d0": "2025-04-24",
+    "test_first_d0": "2025-05-06",
+    "valid_test_shared_board_events": 0
+  },
+  {
+    "month": "2025-06",
+    "train_last_d0": "2025-03-25",
+    "valid_first_d0": "2025-04-01",
+    "valid_last_d0": "2025-05-26",
+    "test_first_d0": "2025-06-03",
+    "valid_test_shared_board_events": 0
+  },
+  {
+    "month": "2025-07",
+    "train_last_d0": "2025-04-24",
+    "valid_first_d0": "2025-05-06",
+    "valid_last_d0": "2025-06-24",
+    "test_first_d0": "2025-07-01",
+    "valid_test_shared_board_events": 0
+  },
+  {
+    "month": "2025-08",
+    "train_last_d0": "2025-05-26",
+    "valid_first_d0": "2025-06-03",
+    "valid_last_d0": "2025-07-25",
+    "test_first_d0": "2025-08-01",
+    "valid_test_shared_board_events": 0
+  },
+  {
+    "month": "2025-09",
+    "train_last_d0": "2025-06-24",
+    "valid_first_d0": "2025-07-01",
+    "valid_last_d0": "2025-08-25",
+    "test_first_d0": "2025-09-01",
+    "valid_test_shared_board_events": 1
+  },
+  {
+    "month": "2025-10",
+    "train_last_d0": "2025-07-25",
+    "valid_first_d0": "2025-08-01",
+    "valid_last_d0": "2025-09-24",
+    "test_first_d0": "2025-10-09",
+    "valid_test_shared_board_events": 0
+  },
+  {
+    "month": "2025-11",
+    "train_last_d0": "2025-08-25",
+    "valid_first_d0": "2025-09-01",
+    "valid_last_d0": "2025-10-27",
+    "test_first_d0": "2025-11-03",
+    "valid_test_shared_board_events": 0
+  },
+  {
+    "month": "2025-12",
+    "train_last_d0": "2025-09-24",
+    "valid_first_d0": "2025-10-09",
+    "valid_last_d0": "2025-11-24",
+    "test_first_d0": "2025-12-01",
+    "valid_test_shared_board_events": 1
+  },
+  {
+    "month": "2026-01",
+    "train_last_d0": "2025-10-27",
+    "valid_first_d0": "2025-11-03",
+    "valid_last_d0": "2025-12-25",
+    "test_first_d0": "2026-01-05",
+    "valid_test_shared_board_events": 1
+  },
+  {
+    "month": "2026-02",
+    "train_last_d0": "2025-11-24",
+    "valid_first_d0": "2025-12-01",
+    "valid_last_d0": "2026-01-26",
+    "test_first_d0": "2026-02-02",
+    "valid_test_shared_board_events": 0
+  },
+  {
+    "month": "2026-03",
+    "train_last_d0": "2025-12-25",
+    "valid_first_d0": "2026-01-05",
+    "valid_last_d0": "2026-02-13",
+    "test_first_d0": "2026-03-02",
+    "valid_test_shared_board_events": 0
+  },
+  {
+    "month": "2026-04",
+    "train_last_d0": "2026-01-26",
+    "valid_first_d0": "2026-02-02",
+    "valid_last_d0": "2026-03-25",
+    "test_first_d0": "2026-04-01",
+    "valid_test_shared_board_events": 0
+  },
+  {
+    "month": "2026-05",
+    "train_last_d0": "2026-02-13",
+    "valid_first_d0": "2026-03-02",
+    "valid_last_d0": "2026-04-24",
+    "test_first_d0": "2026-05-06",
+    "valid_test_shared_board_events": 0
+  },
+  {
+    "month": "2026-06",
+    "train_last_d0": "2026-03-25",
+    "valid_first_d0": "2026-04-01",
+    "valid_last_d0": "2026-05-25",
+    "test_first_d0": "2026-06-01",
+    "valid_test_shared_board_events": 0
+  },
+  {
+    "month": "2026-07",
+    "train_last_d0": "2026-04-24",
+    "valid_first_d0": "2026-05-06",
+    "valid_last_d0": "2026-06-24",
+    "test_first_d0": "2026-07-01",
+    "valid_test_shared_board_events": 0
+  },
+  {
+    "month": "2026-08",
+    "train_last_d0": "2026-05-25",
+    "valid_first_d0": "2026-06-01",
+    "valid_last_d0": "2026-07-27",
+    "test_first_d0": "2026-08-03",
+    "valid_test_shared_board_events": 1
+  },
+  {
+    "month": "2026-09",
+    "train_last_d0": "2026-06-24",
+    "valid_first_d0": "2026-07-01",
+    "valid_last_d0": "2026-08-25",
+    "test_first_d0": "2026-09-01",
+    "valid_test_shared_board_events": 3
+  },
+  {
+    "month": "2026-10",
+    "train_last_d0": "2026-07-27",
+    "valid_first_d0": "2026-08-03",
+    "valid_last_d0": "2026-09-23",
+    "test_first_d0": "2026-10-08",
+    "valid_test_shared_board_events": 1
+  }
+]

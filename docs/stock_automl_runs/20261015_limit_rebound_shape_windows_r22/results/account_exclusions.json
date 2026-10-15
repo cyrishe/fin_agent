@@ -1,0 +1,1122 @@
+[
+  {
+    "scope": "早期4—8月",
+    "scheme": "none",
+    "body_gate": false,
+    "exit": "D3",
+    "symbol": "603390",
+    "d0_date": "2025-05-29",
+    "d1_date": "2025-05-30",
+    "reason": "持仓参考价不连续"
+  },
+  {
+    "scope": "早期4—8月",
+    "scheme": "none",
+    "body_gate": false,
+    "exit": "D4",
+    "symbol": "603390",
+    "d0_date": "2025-05-29",
+    "d1_date": "2025-05-30",
+    "reason": "持仓参考价不连续"
+  },
+  {
+    "scope": "早期4—8月",
+    "scheme": "none",
+    "body_gate": false,
+    "exit": "策略",
+    "symbol": "603390",
+    "d0_date": "2025-05-29",
+    "d1_date": "2025-05-30",
+    "reason": "持仓参考价不连续"
+  },
+  {
+    "scope": "早期4—8月",
+    "scheme": "none",
+    "body_gate": true,
+    "exit": "D3",
+    "symbol": "603390",
+    "d0_date": "2025-05-29",
+    "d1_date": "2025-05-30",
+    "reason": "持仓参考价不连续"
+  },
+  {
+    "scope": "早期4—8月",
+    "scheme": "none",
+    "body_gate": true,
+    "exit": "D4",
+    "symbol": "603390",
+    "d0_date": "2025-05-29",
+    "d1_date": "2025-05-30",
+    "reason": "持仓参考价不连续"
+  },
+  {
+    "scope": "早期4—8月",
+    "scheme": "none",
+    "body_gate": true,
+    "exit": "策略",
+    "symbol": "603390",
+    "d0_date": "2025-05-29",
+    "d1_date": "2025-05-30",
+    "reason": "持仓参考价不连续"
+  },
+  {
+    "scope": "早期4—8月",
+    "scheme": "fixed6",
+    "body_gate": false,
+    "exit": "D3",
+    "symbol": "603390",
+    "d0_date": "2025-05-29",
+    "d1_date": "2025-05-30",
+    "reason": "持仓参考价不连续"
+  },
+  {
+    "scope": "早期4—8月",
+    "scheme": "fixed6",
+    "body_gate": false,
+    "exit": "D4",
+    "symbol": "603390",
+    "d0_date": "2025-05-29",
+    "d1_date": "2025-05-30",
+    "reason": "持仓参考价不连续"
+  },
+  {
+    "scope": "早期4—8月",
+    "scheme": "fixed6",
+    "body_gate": false,
+    "exit": "策略",
+    "symbol": "603390",
+    "d0_date": "2025-05-29",
+    "d1_date": "2025-05-30",
+    "reason": "持仓参考价不连续"
+  },
+  {
+    "scope": "早期4—8月",
+    "scheme": "fixed6",
+    "body_gate": true,
+    "exit": "D3",
+    "symbol": "603390",
+    "d0_date": "2025-05-29",
+    "d1_date": "2025-05-30",
+    "reason": "持仓参考价不连续"
+  },
+  {
+    "scope": "早期4—8月",
+    "scheme": "fixed6",
+    "body_gate": true,
+    "exit": "D4",
+    "symbol": "603390",
+    "d0_date": "2025-05-29",
+    "d1_date": "2025-05-30",
+    "reason": "持仓参考价不连续"
+  },
+  {
+    "scope": "早期4—8月",
+    "scheme": "fixed6",
+    "body_gate": true,
+    "exit": "策略",
+    "symbol": "603390",
+    "d0_date": "2025-05-29",
+    "d1_date": "2025-05-30",
+    "reason": "持仓参考价不连续"
+  },
+  {
+    "scope": "早期4—8月",
+    "scheme": "fixed6low",
+    "body_gate": false,
+    "exit": "D3",
+    "symbol": "603390",
+    "d0_date": "2025-05-29",
+    "d1_date": "2025-05-30",
+    "reason": "持仓参考价不连续"
+  },
+  {
+    "scope": "早期4—8月",
+    "scheme": "fixed6low",
+    "body_gate": false,
+    "exit": "D4",
+    "symbol": "603390",
+    "d0_date": "2025-05-29",
+    "d1_date": "2025-05-30",
+    "reason": "持仓参考价不连续"
+  },
+  {
+    "scope": "早期4—8月",
+    "scheme": "fixed6low",
+    "body_gate": false,
+    "exit": "策略",
+    "symbol": "603390",
+    "d0_date": "2025-05-29",
+    "d1_date": "2025-05-30",
+    "reason": "持仓参考价不连续"
+  },
+  {
+    "scope": "早期4—8月",
+    "scheme": "fixed6low",
+    "body_gate": true,
+    "exit": "D3",
+    "symbol": "603390",
+    "d0_date": "2025-05-29",
+    "d1_date": "2025-05-30",
+    "reason": "持仓参考价不连续"
+  },
+  {
+    "scope": "早期4—8月",
+    "scheme": "fixed6low",
+    "body_gate": true,
+    "exit": "D4",
+    "symbol": "603390",
+    "d0_date": "2025-05-29",
+    "d1_date": "2025-05-30",
+    "reason": "持仓参考价不连续"
+  },
+  {
+    "scope": "早期4—8月",
+    "scheme": "fixed6low",
+    "body_gate": true,
+    "exit": "策略",
+    "symbol": "603390",
+    "d0_date": "2025-05-29",
+    "d1_date": "2025-05-30",
+    "reason": "持仓参考价不连续"
+  },
+  {
+    "scope": "早期4—8月",
+    "scheme": "short1",
+    "body_gate": false,
+    "exit": "D3",
+    "symbol": "603390",
+    "d0_date": "2025-05-29",
+    "d1_date": "2025-05-30",
+    "reason": "持仓参考价不连续"
+  },
+  {
+    "scope": "早期4—8月",
+    "scheme": "short1",
+    "body_gate": false,
+    "exit": "D4",
+    "symbol": "603390",
+    "d0_date": "2025-05-29",
+    "d1_date": "2025-05-30",
+    "reason": "持仓参考价不连续"
+  },
+  {
+    "scope": "早期4—8月",
+    "scheme": "short1",
+    "body_gate": false,
+    "exit": "策略",
+    "symbol": "603390",
+    "d0_date": "2025-05-29",
+    "d1_date": "2025-05-30",
+    "reason": "持仓参考价不连续"
+  },
+  {
+    "scope": "早期4—8月",
+    "scheme": "short1",
+    "body_gate": true,
+    "exit": "D3",
+    "symbol": "603390",
+    "d0_date": "2025-05-29",
+    "d1_date": "2025-05-30",
+    "reason": "持仓参考价不连续"
+  },
+  {
+    "scope": "早期4—8月",
+    "scheme": "short1",
+    "body_gate": true,
+    "exit": "D4",
+    "symbol": "603390",
+    "d0_date": "2025-05-29",
+    "d1_date": "2025-05-30",
+    "reason": "持仓参考价不连续"
+  },
+  {
+    "scope": "早期4—8月",
+    "scheme": "short1",
+    "body_gate": true,
+    "exit": "策略",
+    "symbol": "603390",
+    "d0_date": "2025-05-29",
+    "d1_date": "2025-05-30",
+    "reason": "持仓参考价不连续"
+  },
+  {
+    "scope": "早期4—8月",
+    "scheme": "short2",
+    "body_gate": false,
+    "exit": "D3",
+    "symbol": "603390",
+    "d0_date": "2025-05-29",
+    "d1_date": "2025-05-30",
+    "reason": "持仓参考价不连续"
+  },
+  {
+    "scope": "早期4—8月",
+    "scheme": "short2",
+    "body_gate": false,
+    "exit": "D4",
+    "symbol": "603390",
+    "d0_date": "2025-05-29",
+    "d1_date": "2025-05-30",
+    "reason": "持仓参考价不连续"
+  },
+  {
+    "scope": "早期4—8月",
+    "scheme": "short2",
+    "body_gate": false,
+    "exit": "策略",
+    "symbol": "603390",
+    "d0_date": "2025-05-29",
+    "d1_date": "2025-05-30",
+    "reason": "持仓参考价不连续"
+  },
+  {
+    "scope": "早期4—8月",
+    "scheme": "short2",
+    "body_gate": true,
+    "exit": "D3",
+    "symbol": "603390",
+    "d0_date": "2025-05-29",
+    "d1_date": "2025-05-30",
+    "reason": "持仓参考价不连续"
+  },
+  {
+    "scope": "早期4—8月",
+    "scheme": "short2",
+    "body_gate": true,
+    "exit": "D4",
+    "symbol": "603390",
+    "d0_date": "2025-05-29",
+    "d1_date": "2025-05-30",
+    "reason": "持仓参考价不连续"
+  },
+  {
+    "scope": "早期4—8月",
+    "scheme": "short2",
+    "body_gate": true,
+    "exit": "策略",
+    "symbol": "603390",
+    "d0_date": "2025-05-29",
+    "d1_date": "2025-05-30",
+    "reason": "持仓参考价不连续"
+  },
+  {
+    "scope": "后段9月起",
+    "scheme": "none",
+    "body_gate": false,
+    "exit": "D4",
+    "symbol": "002585",
+    "d0_date": "2026-05-25",
+    "d1_date": "2026-05-26",
+    "reason": "持仓参考价不连续"
+  },
+  {
+    "scope": "后段9月起",
+    "scheme": "none",
+    "body_gate": false,
+    "exit": "策略",
+    "symbol": "002585",
+    "d0_date": "2026-05-25",
+    "d1_date": "2026-05-26",
+    "reason": "持仓参考价不连续"
+  },
+  {
+    "scope": "后段9月起",
+    "scheme": "none",
+    "body_gate": true,
+    "exit": "D4",
+    "symbol": "002585",
+    "d0_date": "2026-05-25",
+    "d1_date": "2026-05-26",
+    "reason": "持仓参考价不连续"
+  },
+  {
+    "scope": "后段9月起",
+    "scheme": "none",
+    "body_gate": true,
+    "exit": "策略",
+    "symbol": "002585",
+    "d0_date": "2026-05-25",
+    "d1_date": "2026-05-26",
+    "reason": "持仓参考价不连续"
+  },
+  {
+    "scope": "后段9月起",
+    "scheme": "fixed6",
+    "body_gate": false,
+    "exit": "D4",
+    "symbol": "002585",
+    "d0_date": "2026-05-25",
+    "d1_date": "2026-05-26",
+    "reason": "持仓参考价不连续"
+  },
+  {
+    "scope": "后段9月起",
+    "scheme": "fixed6",
+    "body_gate": false,
+    "exit": "策略",
+    "symbol": "002585",
+    "d0_date": "2026-05-25",
+    "d1_date": "2026-05-26",
+    "reason": "持仓参考价不连续"
+  },
+  {
+    "scope": "后段9月起",
+    "scheme": "fixed6",
+    "body_gate": true,
+    "exit": "D4",
+    "symbol": "002585",
+    "d0_date": "2026-05-25",
+    "d1_date": "2026-05-26",
+    "reason": "持仓参考价不连续"
+  },
+  {
+    "scope": "后段9月起",
+    "scheme": "fixed6",
+    "body_gate": true,
+    "exit": "策略",
+    "symbol": "002585",
+    "d0_date": "2026-05-25",
+    "d1_date": "2026-05-26",
+    "reason": "持仓参考价不连续"
+  },
+  {
+    "scope": "后段9月起",
+    "scheme": "fixed6low",
+    "body_gate": false,
+    "exit": "D4",
+    "symbol": "002585",
+    "d0_date": "2026-05-25",
+    "d1_date": "2026-05-26",
+    "reason": "持仓参考价不连续"
+  },
+  {
+    "scope": "后段9月起",
+    "scheme": "fixed6low",
+    "body_gate": false,
+    "exit": "策略",
+    "symbol": "002585",
+    "d0_date": "2026-05-25",
+    "d1_date": "2026-05-26",
+    "reason": "持仓参考价不连续"
+  },
+  {
+    "scope": "后段9月起",
+    "scheme": "fixed6low",
+    "body_gate": true,
+    "exit": "D4",
+    "symbol": "002585",
+    "d0_date": "2026-05-25",
+    "d1_date": "2026-05-26",
+    "reason": "持仓参考价不连续"
+  },
+  {
+    "scope": "后段9月起",
+    "scheme": "fixed6low",
+    "body_gate": true,
+    "exit": "策略",
+    "symbol": "002585",
+    "d0_date": "2026-05-25",
+    "d1_date": "2026-05-26",
+    "reason": "持仓参考价不连续"
+  },
+  {
+    "scope": "后段9月起",
+    "scheme": "original",
+    "body_gate": false,
+    "exit": "D4",
+    "symbol": "002585",
+    "d0_date": "2026-05-25",
+    "d1_date": "2026-05-26",
+    "reason": "持仓参考价不连续"
+  },
+  {
+    "scope": "后段9月起",
+    "scheme": "original",
+    "body_gate": false,
+    "exit": "策略",
+    "symbol": "002585",
+    "d0_date": "2026-05-25",
+    "d1_date": "2026-05-26",
+    "reason": "持仓参考价不连续"
+  },
+  {
+    "scope": "后段9月起",
+    "scheme": "original",
+    "body_gate": true,
+    "exit": "D4",
+    "symbol": "002585",
+    "d0_date": "2026-05-25",
+    "d1_date": "2026-05-26",
+    "reason": "持仓参考价不连续"
+  },
+  {
+    "scope": "后段9月起",
+    "scheme": "original",
+    "body_gate": true,
+    "exit": "策略",
+    "symbol": "002585",
+    "d0_date": "2026-05-25",
+    "d1_date": "2026-05-26",
+    "reason": "持仓参考价不连续"
+  },
+  {
+    "scope": "后段9月起",
+    "scheme": "short1",
+    "body_gate": false,
+    "exit": "D3",
+    "symbol": "002767",
+    "d0_date": "2026-07-06",
+    "d1_date": "2026-07-07",
+    "reason": "持仓参考价不连续"
+  },
+  {
+    "scope": "后段9月起",
+    "scheme": "short1",
+    "body_gate": false,
+    "exit": "D4",
+    "symbol": "002585",
+    "d0_date": "2026-05-25",
+    "d1_date": "2026-05-26",
+    "reason": "持仓参考价不连续"
+  },
+  {
+    "scope": "后段9月起",
+    "scheme": "short1",
+    "body_gate": false,
+    "exit": "D4",
+    "symbol": "002767",
+    "d0_date": "2026-07-06",
+    "d1_date": "2026-07-07",
+    "reason": "持仓参考价不连续"
+  },
+  {
+    "scope": "后段9月起",
+    "scheme": "short1",
+    "body_gate": false,
+    "exit": "策略",
+    "symbol": "002585",
+    "d0_date": "2026-05-25",
+    "d1_date": "2026-05-26",
+    "reason": "持仓参考价不连续"
+  },
+  {
+    "scope": "后段9月起",
+    "scheme": "short1",
+    "body_gate": false,
+    "exit": "策略",
+    "symbol": "002767",
+    "d0_date": "2026-07-06",
+    "d1_date": "2026-07-07",
+    "reason": "持仓参考价不连续"
+  },
+  {
+    "scope": "后段9月起",
+    "scheme": "short1",
+    "body_gate": true,
+    "exit": "D3",
+    "symbol": "002767",
+    "d0_date": "2026-07-06",
+    "d1_date": "2026-07-07",
+    "reason": "持仓参考价不连续"
+  },
+  {
+    "scope": "后段9月起",
+    "scheme": "short1",
+    "body_gate": true,
+    "exit": "D4",
+    "symbol": "002585",
+    "d0_date": "2026-05-25",
+    "d1_date": "2026-05-26",
+    "reason": "持仓参考价不连续"
+  },
+  {
+    "scope": "后段9月起",
+    "scheme": "short1",
+    "body_gate": true,
+    "exit": "D4",
+    "symbol": "002767",
+    "d0_date": "2026-07-06",
+    "d1_date": "2026-07-07",
+    "reason": "持仓参考价不连续"
+  },
+  {
+    "scope": "后段9月起",
+    "scheme": "short1",
+    "body_gate": true,
+    "exit": "策略",
+    "symbol": "002585",
+    "d0_date": "2026-05-25",
+    "d1_date": "2026-05-26",
+    "reason": "持仓参考价不连续"
+  },
+  {
+    "scope": "后段9月起",
+    "scheme": "short1",
+    "body_gate": true,
+    "exit": "策略",
+    "symbol": "002767",
+    "d0_date": "2026-07-06",
+    "d1_date": "2026-07-07",
+    "reason": "持仓参考价不连续"
+  },
+  {
+    "scope": "后段9月起",
+    "scheme": "short2",
+    "body_gate": false,
+    "exit": "D3",
+    "symbol": "002842",
+    "d0_date": "2026-06-11",
+    "d1_date": "2026-06-12",
+    "reason": "持仓参考价不连续"
+  },
+  {
+    "scope": "后段9月起",
+    "scheme": "short2",
+    "body_gate": false,
+    "exit": "D3",
+    "symbol": "002767",
+    "d0_date": "2026-07-06",
+    "d1_date": "2026-07-07",
+    "reason": "持仓参考价不连续"
+  },
+  {
+    "scope": "后段9月起",
+    "scheme": "short2",
+    "body_gate": false,
+    "exit": "D4",
+    "symbol": "002585",
+    "d0_date": "2026-05-25",
+    "d1_date": "2026-05-26",
+    "reason": "持仓参考价不连续"
+  },
+  {
+    "scope": "后段9月起",
+    "scheme": "short2",
+    "body_gate": false,
+    "exit": "D4",
+    "symbol": "002842",
+    "d0_date": "2026-06-11",
+    "d1_date": "2026-06-12",
+    "reason": "持仓参考价不连续"
+  },
+  {
+    "scope": "后段9月起",
+    "scheme": "short2",
+    "body_gate": false,
+    "exit": "D4",
+    "symbol": "002767",
+    "d0_date": "2026-07-06",
+    "d1_date": "2026-07-07",
+    "reason": "持仓参考价不连续"
+  },
+  {
+    "scope": "后段9月起",
+    "scheme": "short2",
+    "body_gate": false,
+    "exit": "策略",
+    "symbol": "002585",
+    "d0_date": "2026-05-25",
+    "d1_date": "2026-05-26",
+    "reason": "持仓参考价不连续"
+  },
+  {
+    "scope": "后段9月起",
+    "scheme": "short2",
+    "body_gate": false,
+    "exit": "策略",
+    "symbol": "002842",
+    "d0_date": "2026-06-11",
+    "d1_date": "2026-06-12",
+    "reason": "持仓参考价不连续"
+  },
+  {
+    "scope": "后段9月起",
+    "scheme": "short2",
+    "body_gate": false,
+    "exit": "策略",
+    "symbol": "002767",
+    "d0_date": "2026-07-06",
+    "d1_date": "2026-07-07",
+    "reason": "持仓参考价不连续"
+  },
+  {
+    "scope": "后段9月起",
+    "scheme": "short2",
+    "body_gate": true,
+    "exit": "D3",
+    "symbol": "002842",
+    "d0_date": "2026-06-11",
+    "d1_date": "2026-06-12",
+    "reason": "持仓参考价不连续"
+  },
+  {
+    "scope": "后段9月起",
+    "scheme": "short2",
+    "body_gate": true,
+    "exit": "D3",
+    "symbol": "002767",
+    "d0_date": "2026-07-06",
+    "d1_date": "2026-07-07",
+    "reason": "持仓参考价不连续"
+  },
+  {
+    "scope": "后段9月起",
+    "scheme": "short2",
+    "body_gate": true,
+    "exit": "D4",
+    "symbol": "002585",
+    "d0_date": "2026-05-25",
+    "d1_date": "2026-05-26",
+    "reason": "持仓参考价不连续"
+  },
+  {
+    "scope": "后段9月起",
+    "scheme": "short2",
+    "body_gate": true,
+    "exit": "D4",
+    "symbol": "002842",
+    "d0_date": "2026-06-11",
+    "d1_date": "2026-06-12",
+    "reason": "持仓参考价不连续"
+  },
+  {
+    "scope": "后段9月起",
+    "scheme": "short2",
+    "body_gate": true,
+    "exit": "D4",
+    "symbol": "002767",
+    "d0_date": "2026-07-06",
+    "d1_date": "2026-07-07",
+    "reason": "持仓参考价不连续"
+  },
+  {
+    "scope": "后段9月起",
+    "scheme": "short2",
+    "body_gate": true,
+    "exit": "策略",
+    "symbol": "002585",
+    "d0_date": "2026-05-25",
+    "d1_date": "2026-05-26",
+    "reason": "持仓参考价不连续"
+  },
+  {
+    "scope": "后段9月起",
+    "scheme": "short2",
+    "body_gate": true,
+    "exit": "策略",
+    "symbol": "002842",
+    "d0_date": "2026-06-11",
+    "d1_date": "2026-06-12",
+    "reason": "持仓参考价不连续"
+  },
+  {
+    "scope": "后段9月起",
+    "scheme": "short2",
+    "body_gate": true,
+    "exit": "策略",
+    "symbol": "002767",
+    "d0_date": "2026-07-06",
+    "d1_date": "2026-07-07",
+    "reason": "持仓参考价不连续"
+  },
+  {
+    "scope": "扩展3月起",
+    "scheme": "none",
+    "body_gate": false,
+    "exit": "D3",
+    "symbol": "603390",
+    "d0_date": "2025-05-29",
+    "d1_date": "2025-05-30",
+    "reason": "持仓参考价不连续"
+  },
+  {
+    "scope": "扩展3月起",
+    "scheme": "none",
+    "body_gate": false,
+    "exit": "D4",
+    "symbol": "603390",
+    "d0_date": "2025-05-29",
+    "d1_date": "2025-05-30",
+    "reason": "持仓参考价不连续"
+  },
+  {
+    "scope": "扩展3月起",
+    "scheme": "none",
+    "body_gate": false,
+    "exit": "D4",
+    "symbol": "002585",
+    "d0_date": "2026-05-25",
+    "d1_date": "2026-05-26",
+    "reason": "持仓参考价不连续"
+  },
+  {
+    "scope": "扩展3月起",
+    "scheme": "none",
+    "body_gate": false,
+    "exit": "策略",
+    "symbol": "603390",
+    "d0_date": "2025-05-29",
+    "d1_date": "2025-05-30",
+    "reason": "持仓参考价不连续"
+  },
+  {
+    "scope": "扩展3月起",
+    "scheme": "none",
+    "body_gate": false,
+    "exit": "策略",
+    "symbol": "002585",
+    "d0_date": "2026-05-25",
+    "d1_date": "2026-05-26",
+    "reason": "持仓参考价不连续"
+  },
+  {
+    "scope": "扩展3月起",
+    "scheme": "none",
+    "body_gate": true,
+    "exit": "D3",
+    "symbol": "603390",
+    "d0_date": "2025-05-29",
+    "d1_date": "2025-05-30",
+    "reason": "持仓参考价不连续"
+  },
+  {
+    "scope": "扩展3月起",
+    "scheme": "none",
+    "body_gate": true,
+    "exit": "D4",
+    "symbol": "603390",
+    "d0_date": "2025-05-29",
+    "d1_date": "2025-05-30",
+    "reason": "持仓参考价不连续"
+  },
+  {
+    "scope": "扩展3月起",
+    "scheme": "none",
+    "body_gate": true,
+    "exit": "D4",
+    "symbol": "002585",
+    "d0_date": "2026-05-25",
+    "d1_date": "2026-05-26",
+    "reason": "持仓参考价不连续"
+  },
+  {
+    "scope": "扩展3月起",
+    "scheme": "none",
+    "body_gate": true,
+    "exit": "策略",
+    "symbol": "603390",
+    "d0_date": "2025-05-29",
+    "d1_date": "2025-05-30",
+    "reason": "持仓参考价不连续"
+  },
+  {
+    "scope": "扩展3月起",
+    "scheme": "none",
+    "body_gate": true,
+    "exit": "策略",
+    "symbol": "002585",
+    "d0_date": "2026-05-25",
+    "d1_date": "2026-05-26",
+    "reason": "持仓参考价不连续"
+  },
+  {
+    "scope": "扩展3月起",
+    "scheme": "fixed6",
+    "body_gate": false,
+    "exit": "D3",
+    "symbol": "603390",
+    "d0_date": "2025-05-29",
+    "d1_date": "2025-05-30",
+    "reason": "持仓参考价不连续"
+  },
+  {
+    "scope": "扩展3月起",
+    "scheme": "fixed6",
+    "body_gate": false,
+    "exit": "D4",
+    "symbol": "603390",
+    "d0_date": "2025-05-29",
+    "d1_date": "2025-05-30",
+    "reason": "持仓参考价不连续"
+  },
+  {
+    "scope": "扩展3月起",
+    "scheme": "fixed6",
+    "body_gate": false,
+    "exit": "D4",
+    "symbol": "002585",
+    "d0_date": "2026-05-25",
+    "d1_date": "2026-05-26",
+    "reason": "持仓参考价不连续"
+  },
+  {
+    "scope": "扩展3月起",
+    "scheme": "fixed6",
+    "body_gate": false,
+    "exit": "策略",
+    "symbol": "603390",
+    "d0_date": "2025-05-29",
+    "d1_date": "2025-05-30",
+    "reason": "持仓参考价不连续"
+  },
+  {
+    "scope": "扩展3月起",
+    "scheme": "fixed6",
+    "body_gate": false,
+    "exit": "策略",
+    "symbol": "002585",
+    "d0_date": "2026-05-25",
+    "d1_date": "2026-05-26",
+    "reason": "持仓参考价不连续"
+  },
+  {
+    "scope": "扩展3月起",
+    "scheme": "fixed6",
+    "body_gate": true,
+    "exit": "D3",
+    "symbol": "603390",
+    "d0_date": "2025-05-29",
+    "d1_date": "2025-05-30",
+    "reason": "持仓参考价不连续"
+  },
+  {
+    "scope": "扩展3月起",
+    "scheme": "fixed6",
+    "body_gate": true,
+    "exit": "D4",
+    "symbol": "603390",
+    "d0_date": "2025-05-29",
+    "d1_date": "2025-05-30",
+    "reason": "持仓参考价不连续"
+  },
+  {
+    "scope": "扩展3月起",
+    "scheme": "fixed6",
+    "body_gate": true,
+    "exit": "D4",
+    "symbol": "002585",
+    "d0_date": "2026-05-25",
+    "d1_date": "2026-05-26",
+    "reason": "持仓参考价不连续"
+  },
+  {
+    "scope": "扩展3月起",
+    "scheme": "fixed6",
+    "body_gate": true,
+    "exit": "策略",
+    "symbol": "603390",
+    "d0_date": "2025-05-29",
+    "d1_date": "2025-05-30",
+    "reason": "持仓参考价不连续"
+  },
+  {
+    "scope": "扩展3月起",
+    "scheme": "fixed6",
+    "body_gate": true,
+    "exit": "策略",
+    "symbol": "002585",
+    "d0_date": "2026-05-25",
+    "d1_date": "2026-05-26",
+    "reason": "持仓参考价不连续"
+  },
+  {
+    "scope": "扩展3月起",
+    "scheme": "fixed6low",
+    "body_gate": false,
+    "exit": "D3",
+    "symbol": "603390",
+    "d0_date": "2025-05-29",
+    "d1_date": "2025-05-30",
+    "reason": "持仓参考价不连续"
+  },
+  {
+    "scope": "扩展3月起",
+    "scheme": "fixed6low",
+    "body_gate": false,
+    "exit": "D4",
+    "symbol": "603390",
+    "d0_date": "2025-05-29",
+    "d1_date": "2025-05-30",
+    "reason": "持仓参考价不连续"
+  },
+  {
+    "scope": "扩展3月起",
+    "scheme": "fixed6low",
+    "body_gate": false,
+    "exit": "D4",
+    "symbol": "002585",
+    "d0_date": "2026-05-25",
+    "d1_date": "2026-05-26",
+    "reason": "持仓参考价不连续"
+  },
+  {
+    "scope": "扩展3月起",
+    "scheme": "fixed6low",
+    "body_gate": false,
+    "exit": "策略",
+    "symbol": "603390",
+    "d0_date": "2025-05-29",
+    "d1_date": "2025-05-30",
+    "reason": "持仓参考价不连续"
+  },
+  {
+    "scope": "扩展3月起",
+    "scheme": "fixed6low",
+    "body_gate": false,
+    "exit": "策略",
+    "symbol": "002585",
+    "d0_date": "2026-05-25",
+    "d1_date": "2026-05-26",
+    "reason": "持仓参考价不连续"
+  },
+  {
+    "scope": "扩展3月起",
+    "scheme": "fixed6low",
+    "body_gate": true,
+    "exit": "D3",
+    "symbol": "603390",
+    "d0_date": "2025-05-29",
+    "d1_date": "2025-05-30",
+    "reason": "持仓参考价不连续"
+  },
+  {
+    "scope": "扩展3月起",
+    "scheme": "fixed6low",
+    "body_gate": true,
+    "exit": "D4",
+    "symbol": "603390",
+    "d0_date": "2025-05-29",
+    "d1_date": "2025-05-30",
+    "reason": "持仓参考价不连续"
+  },
+  {
+    "scope": "扩展3月起",
+    "scheme": "fixed6low",
+    "body_gate": true,
+    "exit": "D4",
+    "symbol": "002585",
+    "d0_date": "2026-05-25",
+    "d1_date": "2026-05-26",
+    "reason": "持仓参考价不连续"
+  },
+  {
+    "scope": "扩展3月起",
+    "scheme": "fixed6low",
+    "body_gate": true,
+    "exit": "策略",
+    "symbol": "603390",
+    "d0_date": "2025-05-29",
+    "d1_date": "2025-05-30",
+    "reason": "持仓参考价不连续"
+  },
+  {
+    "scope": "扩展3月起",
+    "scheme": "fixed6low",
+    "body_gate": true,
+    "exit": "策略",
+    "symbol": "002585",
+    "d0_date": "2026-05-25",
+    "d1_date": "2026-05-26",
+    "reason": "持仓参考价不连续"
+  },
+  {
+    "scope": "扩展3月起",
+    "scheme": "extended",
+    "body_gate": false,
+    "exit": "D3",
+    "symbol": "603390",
+    "d0_date": "2025-05-29",
+    "d1_date": "2025-05-30",
+    "reason": "持仓参考价不连续"
+  },
+  {
+    "scope": "扩展3月起",
+    "scheme": "extended",
+    "body_gate": false,
+    "exit": "D4",
+    "symbol": "603390",
+    "d0_date": "2025-05-29",
+    "d1_date": "2025-05-30",
+    "reason": "持仓参考价不连续"
+  },
+  {
+    "scope": "扩展3月起",
+    "scheme": "extended",
+    "body_gate": false,
+    "exit": "D4",
+    "symbol": "002585",
+    "d0_date": "2026-05-25",
+    "d1_date": "2026-05-26",
+    "reason": "持仓参考价不连续"
+  },
+  {
+    "scope": "扩展3月起",
+    "scheme": "extended",
+    "body_gate": false,
+    "exit": "策略",
+    "symbol": "603390",
+    "d0_date": "2025-05-29",
+    "d1_date": "2025-05-30",
+    "reason": "持仓参考价不连续"
+  },
+  {
+    "scope": "扩展3月起",
+    "scheme": "extended",
+    "body_gate": false,
+    "exit": "策略",
+    "symbol": "002585",
+    "d0_date": "2026-05-25",
+    "d1_date": "2026-05-26",
+    "reason": "持仓参考价不连续"
+  },
+  {
+    "scope": "扩展3月起",
+    "scheme": "extended",
+    "body_gate": true,
+    "exit": "D3",
+    "symbol": "603390",
+    "d0_date": "2025-05-29",
+    "d1_date": "2025-05-30",
+    "reason": "持仓参考价不连续"
+  },
+  {
+    "scope": "扩展3月起",
+    "scheme": "extended",
+    "body_gate": true,
+    "exit": "D4",
+    "symbol": "603390",
+    "d0_date": "2025-05-29",
+    "d1_date": "2025-05-30",
+    "reason": "持仓参考价不连续"
+  },
+  {
+    "scope": "扩展3月起",
+    "scheme": "extended",
+    "body_gate": true,
+    "exit": "D4",
+    "symbol": "002585",
+    "d0_date": "2026-05-25",
+    "d1_date": "2026-05-26",
+    "reason": "持仓参考价不连续"
+  },
+  {
+    "scope": "扩展3月起",
+    "scheme": "extended",
+    "body_gate": true,
+    "exit": "策略",
+    "symbol": "603390",
+    "d0_date": "2025-05-29",
+    "d1_date": "2025-05-30",
+    "reason": "持仓参考价不连续"
+  },
+  {
+    "scope": "扩展3月起",
+    "scheme": "extended",
+    "body_gate": true,
+    "exit": "策略",
+    "symbol": "002585",
+    "d0_date": "2026-05-25",
+    "d1_date": "2026-05-26",
+    "reason": "持仓参考价不连续"
+  }
+]

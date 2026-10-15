@@ -1,0 +1,332 @@
+[
+  {
+    "path": "outputs/stock_automl/limit_rebound_segments_r18_20261015/2025-01/aligned.joblib",
+    "sha256": "c482d2a76bef6b23133b84c563f73a130b33dfc48b2ad50731f45b3e4f2ae948",
+    "bytes": 669943
+  },
+  {
+    "path": "outputs/stock_automl/limit_rebound_segments_r18_20261015/2025-01/old.joblib",
+    "sha256": "7a54e643102876c9fa343619eccb2ee854f7d746f5ec1c86ddcef620b37fc75d",
+    "bytes": 738702
+  },
+  {
+    "path": "outputs/stock_automl/limit_rebound_segments_r18_20261015/2025-01/segments.joblib",
+    "sha256": "4daf5d1b9f2c9221935386ec3e36a49ccb81f256d491b68a27aa0206bc1664a0",
+    "bytes": 671977
+  },
+  {
+    "path": "outputs/stock_automl/limit_rebound_segments_r18_20261015/2025-02/aligned.joblib",
+    "sha256": "646af6cd7f9e2136afe8fbeb3e38ed14e031066bde9e29f8fc035a1ea18489f4",
+    "bytes": 695120
+  },
+  {
+    "path": "outputs/stock_automl/limit_rebound_segments_r18_20261015/2025-02/old.joblib",
+    "sha256": "8b6fd82da10b4ea4da3039568e0587689832cf9bada38cfe6f9f4ae1fed51688",
+    "bytes": 785035
+  },
+  {
+    "path": "outputs/stock_automl/limit_rebound_segments_r18_20261015/2025-02/segments.joblib",
+    "sha256": "20492cb54f325f6fde71f8caff54cf973d0d582378055b3c7e80c231659d6b35",
+    "bytes": 691999
+  },
+  {
+    "path": "outputs/stock_automl/limit_rebound_segments_r18_20261015/2025-03/aligned.joblib",
+    "sha256": "8de2770ee85d2ab810737979f19b9d5592a9148b62cee640e02395114e1c801f",
+    "bytes": 742076
+  },
+  {
+    "path": "outputs/stock_automl/limit_rebound_segments_r18_20261015/2025-03/old.joblib",
+    "sha256": "c643ae3c61f8ffb73b99f85c840e53f6587f5c62de3cfde1231d9a948897960d",
+    "bytes": 789867
+  },
+  {
+    "path": "outputs/stock_automl/limit_rebound_segments_r18_20261015/2025-03/segments.joblib",
+    "sha256": "ef2fbe90b99897290d86b46ca5d7a3ce6481496ac0e8b96a5d19228abcac84f8",
+    "bytes": 733060
+  },
+  {
+    "path": "outputs/stock_automl/limit_rebound_segments_r18_20261015/2025-04/aligned.joblib",
+    "sha256": "862f91b11252be965725d9a3ceecb30e3996748ad75b7c8a5add7cd8fdfd5c00",
+    "bytes": 720698
+  },
+  {
+    "path": "outputs/stock_automl/limit_rebound_segments_r18_20261015/2025-04/old.joblib",
+    "sha256": "7d9ff0c12cf6f01dc1dffd241000ef69c65cc5e25b3cb9242faf802311f099e7",
+    "bytes": 780126
+  },
+  {
+    "path": "outputs/stock_automl/limit_rebound_segments_r18_20261015/2025-04/segments.joblib",
+    "sha256": "1f49ada0651f9101b5b5b0affc76b51e33c0399ce71933d56ab06a67d61e9fe4",
+    "bytes": 714585
+  },
+  {
+    "path": "outputs/stock_automl/limit_rebound_segments_r18_20261015/2025-05/aligned.joblib",
+    "sha256": "daa6fcbdc642c69e932b6d260c637f0aba25a521236f6ee1e1d89ae007b3396a",
+    "bytes": 713956
+  },
+  {
+    "path": "outputs/stock_automl/limit_rebound_segments_r18_20261015/2025-05/old.joblib",
+    "sha256": "d2ef5089fe82ad84b085951b9c87e2d167e3ab3e9c4e8dac9269f5539664c162",
+    "bytes": 806727
+  },
+  {
+    "path": "outputs/stock_automl/limit_rebound_segments_r18_20261015/2025-05/segments.joblib",
+    "sha256": "0b8c662dd694b2403b45f7476a529f9e0ad95db087b9fdae5a0cda12305ac804",
+    "bytes": 714548
+  },
+  {
+    "path": "outputs/stock_automl/limit_rebound_segments_r18_20261015/2025-06/aligned.joblib",
+    "sha256": "4b9ab6e7b0327124c1d4120f3e1bd2abe2d3f37cd71f452a9b46b3712787e0fe",
+    "bytes": 797193
+  },
+  {
+    "path": "outputs/stock_automl/limit_rebound_segments_r18_20261015/2025-06/old.joblib",
+    "sha256": "edcf8657be0cf43e5a238d5ff90e855cf37a23383c8a410b3acecafbe5bb68cd",
+    "bytes": 901157
+  },
+  {
+    "path": "outputs/stock_automl/limit_rebound_segments_r18_20261015/2025-06/segments.joblib",
+    "sha256": "4d2d2e3096ae02bb7dea856d88368b26f0b35182b32227d69b73003110765fb3",
+    "bytes": 796354
+  },
+  {
+    "path": "outputs/stock_automl/limit_rebound_segments_r18_20261015/2025-07/aligned.joblib",
+    "sha256": "32ab675d9009ccec296e7f2384f5db50f4c9f6da92294b4d7824702b2ddba4ca",
+    "bytes": 850845
+  },
+  {
+    "path": "outputs/stock_automl/limit_rebound_segments_r18_20261015/2025-07/old.joblib",
+    "sha256": "2a5671dd7d3e76d29ebf9be6ebaff46fd01871fd7aeb1d1c2f5afd4125f00be4",
+    "bytes": 967155
+  },
+  {
+    "path": "outputs/stock_automl/limit_rebound_segments_r18_20261015/2025-07/segments.joblib",
+    "sha256": "9c28936d6f81cf906cfe82af713e9aae8a0af542fc136df9b09528de977043ec",
+    "bytes": 850429
+  },
+  {
+    "path": "outputs/stock_automl/limit_rebound_segments_r18_20261015/2025-08/aligned.joblib",
+    "sha256": "12a611de4ab878162d090c349fb0ec09a58371863a6a634c1823d4158a39c732",
+    "bytes": 815659
+  },
+  {
+    "path": "outputs/stock_automl/limit_rebound_segments_r18_20261015/2025-08/old.joblib",
+    "sha256": "4c5b64554b316e33471be274e441154f4ad2a6ba62df7c8dd81a2d3bdd9342e9",
+    "bytes": 938084
+  },
+  {
+    "path": "outputs/stock_automl/limit_rebound_segments_r18_20261015/2025-08/segments.joblib",
+    "sha256": "31397c7a297af714c1ed26da1206a9d20bd86ad17f47dec80b5b62ea229928f9",
+    "bytes": 825928
+  },
+  {
+    "path": "outputs/stock_automl/limit_rebound_segments_r18_20261015/2025-09/aligned.joblib",
+    "sha256": "d5b830662264df7c743f8eb01fd80b0e0dcdef980aff632910d33171fd077f05",
+    "bytes": 805126
+  },
+  {
+    "path": "outputs/stock_automl/limit_rebound_segments_r18_20261015/2025-09/old.joblib",
+    "sha256": "6e20338c252b2f677a81d4c06a1d8f62317bfdd2b25e83877627acbf2cd5f0be",
+    "bytes": 917591
+  },
+  {
+    "path": "outputs/stock_automl/limit_rebound_segments_r18_20261015/2025-09/segments.joblib",
+    "sha256": "bca33e4e701ab0fcee6c445264136612bb35f004e20e7ca549f0a7e071bbbfd6",
+    "bytes": 809817
+  },
+  {
+    "path": "outputs/stock_automl/limit_rebound_segments_r18_20261015/2025-10/aligned.joblib",
+    "sha256": "1dcd5b6b64596740264de2aa5d95370ad6ea1670fc91092aa9e38827547061d2",
+    "bytes": 833388
+  },
+  {
+    "path": "outputs/stock_automl/limit_rebound_segments_r18_20261015/2025-10/old.joblib",
+    "sha256": "f3d0ce06822cab439656fa43260b9dff30e47db0a9e66ad236a496b98daaaf6d",
+    "bytes": 920362
+  },
+  {
+    "path": "outputs/stock_automl/limit_rebound_segments_r18_20261015/2025-10/segments.joblib",
+    "sha256": "e45c604b73687535e55d92be26b7fa3166082f35e53421564817b8fd13e00d52",
+    "bytes": 834385
+  },
+  {
+    "path": "outputs/stock_automl/limit_rebound_segments_r18_20261015/2025-11/aligned.joblib",
+    "sha256": "f2349342e912ae7c62cbdb7954ae23834753a81ec25212b04f35ecaeec05f0f9",
+    "bytes": 790195
+  },
+  {
+    "path": "outputs/stock_automl/limit_rebound_segments_r18_20261015/2025-11/old.joblib",
+    "sha256": "a8603cdc3e5c488fb6f3c4e71067548422bfa8c2a7219d7f85406a61710f75d6",
+    "bytes": 895999
+  },
+  {
+    "path": "outputs/stock_automl/limit_rebound_segments_r18_20261015/2025-11/segments.joblib",
+    "sha256": "0099c99b50849fc4b4cd43050c008b856cba8d727f4e2ff147b0c423c50b1c48",
+    "bytes": 792918
+  },
+  {
+    "path": "outputs/stock_automl/limit_rebound_segments_r18_20261015/2025-12/aligned.joblib",
+    "sha256": "040d01be2e3c663e261be8e7961558fab907aeec52976e537029f00521576b54",
+    "bytes": 789022
+  },
+  {
+    "path": "outputs/stock_automl/limit_rebound_segments_r18_20261015/2025-12/old.joblib",
+    "sha256": "c1e1325245de7965fd4ebba612a3cd34d158d02b697150aa7b0cae69abb3fa6b",
+    "bytes": 909971
+  },
+  {
+    "path": "outputs/stock_automl/limit_rebound_segments_r18_20261015/2025-12/segments.joblib",
+    "sha256": "1fa2c0287844542d3f1338a971636dcde984a07a0e46ca221db39bbe4ceec6f5",
+    "bytes": 799882
+  },
+  {
+    "path": "outputs/stock_automl/limit_rebound_segments_r18_20261015/2026-01/aligned.joblib",
+    "sha256": "953f2011b49a0166e66354561e43c239c941d0bc48595ee802c934c85ecd36fe",
+    "bytes": 745853
+  },
+  {
+    "path": "outputs/stock_automl/limit_rebound_segments_r18_20261015/2026-01/old.joblib",
+    "sha256": "a2a801de8930fc9a49a451e78b0c37c813ddd47984992c6cf75f6332fff72e2c",
+    "bytes": 836868
+  },
+  {
+    "path": "outputs/stock_automl/limit_rebound_segments_r18_20261015/2026-01/segments.joblib",
+    "sha256": "12d2423e83103e6c607f38656181db8705698aff5484d66bf2ccfb900df95fb1",
+    "bytes": 766953
+  },
+  {
+    "path": "outputs/stock_automl/limit_rebound_segments_r18_20261015/2026-02/aligned.joblib",
+    "sha256": "468ca745d601d8681991ae8a98b08bd1aaf264872411280e605264c7349a7bd0",
+    "bytes": 727526
+  },
+  {
+    "path": "outputs/stock_automl/limit_rebound_segments_r18_20261015/2026-02/old.joblib",
+    "sha256": "f8e32683cae95c708f71b5e68008053613e9f3b3e2fe4128a6540f5fd0aa2166",
+    "bytes": 818464
+  },
+  {
+    "path": "outputs/stock_automl/limit_rebound_segments_r18_20261015/2026-02/segments.joblib",
+    "sha256": "85cead8bc00be921c113512d743fe8a20f6503b30e53715d668c46ae938b6741",
+    "bytes": 746598
+  },
+  {
+    "path": "outputs/stock_automl/limit_rebound_segments_r18_20261015/2026-03/aligned.joblib",
+    "sha256": "3d2cc08c460a6f9081c7ae094433eb7cd686a3626c97d153af226772ef11c5eb",
+    "bytes": 727628
+  },
+  {
+    "path": "outputs/stock_automl/limit_rebound_segments_r18_20261015/2026-03/old.joblib",
+    "sha256": "b359733bad6f5cc451a4c133c73bedebb690b0e2e655cd20f77e45e7db655466",
+    "bytes": 799119
+  },
+  {
+    "path": "outputs/stock_automl/limit_rebound_segments_r18_20261015/2026-03/segments.joblib",
+    "sha256": "2580382d3b6257a8aa4b2e7b83a28c30f61c4a648acc55afe50756a492573a1b",
+    "bytes": 742600
+  },
+  {
+    "path": "outputs/stock_automl/limit_rebound_segments_r18_20261015/2026-04/aligned.joblib",
+    "sha256": "c56effdfefa3fe52148b41505a60aec6807f277b0f78b82e86728f8d054feaea",
+    "bytes": 763404
+  },
+  {
+    "path": "outputs/stock_automl/limit_rebound_segments_r18_20261015/2026-04/old.joblib",
+    "sha256": "079ccdf57d5b508a290f92577d64026dcedcbd9ebc9e9dab32a792f90f23228c",
+    "bytes": 846750
+  },
+  {
+    "path": "outputs/stock_automl/limit_rebound_segments_r18_20261015/2026-04/segments.joblib",
+    "sha256": "bf565f806d6fb60569244e9db262f3de7a98802067350ab974841ca334cfbbf8",
+    "bytes": 768874
+  },
+  {
+    "path": "outputs/stock_automl/limit_rebound_segments_r18_20261015/2026-05/aligned.joblib",
+    "sha256": "6c7d71f7f4ef2367d084e1a0789acf1541c00887ff024cb42f7d60f3fc8feed3",
+    "bytes": 716896
+  },
+  {
+    "path": "outputs/stock_automl/limit_rebound_segments_r18_20261015/2026-05/old.joblib",
+    "sha256": "974fc06b043e04d74125cabddcf211a35e1d4bd300fdff1d2b5588569045ac33",
+    "bytes": 775750
+  },
+  {
+    "path": "outputs/stock_automl/limit_rebound_segments_r18_20261015/2026-05/segments.joblib",
+    "sha256": "e8af463c338e55a1288532c807f981b1f46dfa3f77aa97ff8baf60bd0871c465",
+    "bytes": 719385
+  },
+  {
+    "path": "outputs/stock_automl/limit_rebound_segments_r18_20261015/2026-06/aligned.joblib",
+    "sha256": "76d4f7e230b709e895223ac23f158ea97a874ab194813b10e823c975946538a2",
+    "bytes": 722882
+  },
+  {
+    "path": "outputs/stock_automl/limit_rebound_segments_r18_20261015/2026-06/old.joblib",
+    "sha256": "a245be97ed758d1ed2d6fc1eae181421c681217b73858d9ba8e74c56567aff48",
+    "bytes": 784730
+  },
+  {
+    "path": "outputs/stock_automl/limit_rebound_segments_r18_20261015/2026-06/segments.joblib",
+    "sha256": "1d4948a89a138bce80dd010c1489f3bc4495a908fdb965a6bc4c10ff5a2b57b9",
+    "bytes": 729415
+  },
+  {
+    "path": "outputs/stock_automl/limit_rebound_segments_r18_20261015/2026-07/aligned.joblib",
+    "sha256": "8a2467c5f71f2eccd0001b2f5dd4a370ebf96bd9dba2704c6968f95adb70ffe3",
+    "bytes": 749938
+  },
+  {
+    "path": "outputs/stock_automl/limit_rebound_segments_r18_20261015/2026-07/old.joblib",
+    "sha256": "602fd79f4a810aa23419cf0a75c3b047fa98ff797313b149376013979c5fe085",
+    "bytes": 820280
+  },
+  {
+    "path": "outputs/stock_automl/limit_rebound_segments_r18_20261015/2026-07/segments.joblib",
+    "sha256": "431befae44cf12e94cce32698cc303be4618d145167b36d44ee1325de135b0bf",
+    "bytes": 756583
+  },
+  {
+    "path": "outputs/stock_automl/limit_rebound_segments_r18_20261015/2026-08/aligned.joblib",
+    "sha256": "21a8db0b6ef7306447be872c669b63403dcc9eecef01d40f74035eb920beb305",
+    "bytes": 748252
+  },
+  {
+    "path": "outputs/stock_automl/limit_rebound_segments_r18_20261015/2026-08/old.joblib",
+    "sha256": "9b4f1af773f525938b72989b231a54fc84cb63a635a67528d4ce807428ec9870",
+    "bytes": 822976
+  },
+  {
+    "path": "outputs/stock_automl/limit_rebound_segments_r18_20261015/2026-08/segments.joblib",
+    "sha256": "65be0b842c5201d4c53aa8533588e881111e1679999bca32683d63c50304572a",
+    "bytes": 760172
+  },
+  {
+    "path": "outputs/stock_automl/limit_rebound_segments_r18_20261015/2026-09/aligned.joblib",
+    "sha256": "ba357dd52560af4103635ccc53ac70c728e4ed4fa5a306b5ae80f79e350e09a9",
+    "bytes": 767651
+  },
+  {
+    "path": "outputs/stock_automl/limit_rebound_segments_r18_20261015/2026-09/old.joblib",
+    "sha256": "17aa8d750f559bfcc5cd85aff6c1cfbca850c583cde489e8a87aaa4632d6ea1b",
+    "bytes": 874855
+  },
+  {
+    "path": "outputs/stock_automl/limit_rebound_segments_r18_20261015/2026-09/segments.joblib",
+    "sha256": "3b72922a470ed409ced0f7202f2bb074683162a224720ea19b50825327f3feb6",
+    "bytes": 768430
+  },
+  {
+    "path": "outputs/stock_automl/limit_rebound_segments_r18_20261015/2026-10/aligned.joblib",
+    "sha256": "03ed961620030ac9c9f0c58fe4293dda55870ea966bb15a474dd1b2c1534f730",
+    "bytes": 731541
+  },
+  {
+    "path": "outputs/stock_automl/limit_rebound_segments_r18_20261015/2026-10/old.joblib",
+    "sha256": "806213068cc170a4cc1bbf88497dafb7aaa88d2eb8145eade2ba6b06d33ee88f",
+    "bytes": 840038
+  },
+  {
+    "path": "outputs/stock_automl/limit_rebound_segments_r18_20261015/2026-10/segments.joblib",
+    "sha256": "2d336ffdcc6f9b7c40d72eec33893e66795b98324d8401c80f21a7a1b76ed8c1",
+    "bytes": 740966
+  }
+]

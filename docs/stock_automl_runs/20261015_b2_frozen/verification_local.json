@@ -1,0 +1,12 @@
+{
+  "minute_days": 186,
+  "prefix_replays": 1302,
+  "entries": 122,
+  "stock_time_price_exact": true,
+  "daily_prediction_rows": 14822,
+  "daily_prediction_days": 208,
+  "max_probability_difference": 0.0,
+  "rebuilt_daily_feature_rows": 13413,
+  "reference_ledger_sha256": "60cf776d5bc2a0413c3f581f232b882cedf675c75600266319665add82329747",
+  "scope": "历史合格数据样本；线上仅用已到达K，并记录真实确认时间，不使用未来全天审计决定信号。"
+}

@@ -1,0 +1,8 @@
+{
+  "known_top1": 284,
+  "target_pct": 21.12676056338028,
+  "acceptable_pct": 29.577464788732392,
+  "error_pct": 49.29577464788733,
+  "same_picks_for_every_gate": true,
+  "label_reference": "second morning high relative to frozen 14:40 signal price; before any gate"
+}

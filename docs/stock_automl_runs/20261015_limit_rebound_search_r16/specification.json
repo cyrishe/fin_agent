@@ -1,0 +1,739 @@
+{
+  "name": "R16_72_variants_36_paired_groups_plus_reference",
+  "groups": [
+    {
+      "id": "rf_reference",
+      "algorithm": "rf",
+      "parameters": {
+        "n_estimators": 240,
+        "max_depth": 7,
+        "min_samples_leaf": 50,
+        "max_features": 0.8
+      },
+      "scheme": "balanced_weight",
+      "fraction": 1.0,
+      "seeds": [
+        20261013
+      ]
+    },
+    {
+      "id": "rf_p1_natural",
+      "algorithm": "rf",
+      "parameters": {
+        "n_estimators": 240,
+        "max_depth": 4,
+        "min_samples_leaf": 100,
+        "max_features": 0.8
+      },
+      "scheme": "natural",
+      "fraction": 0.8,
+      "seeds": [
+        171,
+        191
+      ]
+    },
+    {
+      "id": "rf_p1_sqrt_weight",
+      "algorithm": "rf",
+      "parameters": {
+        "n_estimators": 240,
+        "max_depth": 4,
+        "min_samples_leaf": 100,
+        "max_features": 0.8
+      },
+      "scheme": "sqrt_weight",
+      "fraction": 0.8,
+      "seeds": [
+        171,
+        191
+      ]
+    },
+    {
+      "id": "rf_p1_balanced_weight",
+      "algorithm": "rf",
+      "parameters": {
+        "n_estimators": 240,
+        "max_depth": 4,
+        "min_samples_leaf": 100,
+        "max_features": 0.8
+      },
+      "scheme": "balanced_weight",
+      "fraction": 0.8,
+      "seeds": [
+        171,
+        191
+      ]
+    },
+    {
+      "id": "rf_p1_undersample",
+      "algorithm": "rf",
+      "parameters": {
+        "n_estimators": 240,
+        "max_depth": 4,
+        "min_samples_leaf": 100,
+        "max_features": 0.8
+      },
+      "scheme": "undersample",
+      "fraction": 0.8,
+      "seeds": [
+        171,
+        191
+      ]
+    },
+    {
+      "id": "rf_p2_natural",
+      "algorithm": "rf",
+      "parameters": {
+        "n_estimators": 240,
+        "max_depth": 6,
+        "min_samples_leaf": 50,
+        "max_features": 0.8
+      },
+      "scheme": "natural",
+      "fraction": 0.8,
+      "seeds": [
+        171,
+        191
+      ]
+    },
+    {
+      "id": "rf_p2_sqrt_weight",
+      "algorithm": "rf",
+      "parameters": {
+        "n_estimators": 240,
+        "max_depth": 6,
+        "min_samples_leaf": 50,
+        "max_features": 0.8
+      },
+      "scheme": "sqrt_weight",
+      "fraction": 0.8,
+      "seeds": [
+        171,
+        191
+      ]
+    },
+    {
+      "id": "rf_p2_balanced_weight",
+      "algorithm": "rf",
+      "parameters": {
+        "n_estimators": 240,
+        "max_depth": 6,
+        "min_samples_leaf": 50,
+        "max_features": 0.8
+      },
+      "scheme": "balanced_weight",
+      "fraction": 0.8,
+      "seeds": [
+        171,
+        191
+      ]
+    },
+    {
+      "id": "rf_p2_undersample",
+      "algorithm": "rf",
+      "parameters": {
+        "n_estimators": 240,
+        "max_depth": 6,
+        "min_samples_leaf": 50,
+        "max_features": 0.8
+      },
+      "scheme": "undersample",
+      "fraction": 0.8,
+      "seeds": [
+        171,
+        191
+      ]
+    },
+    {
+      "id": "rf_p3_natural",
+      "algorithm": "rf",
+      "parameters": {
+        "n_estimators": 240,
+        "max_depth": 8,
+        "min_samples_leaf": 30,
+        "max_features": 0.8
+      },
+      "scheme": "natural",
+      "fraction": 0.8,
+      "seeds": [
+        171,
+        191
+      ]
+    },
+    {
+      "id": "rf_p3_sqrt_weight",
+      "algorithm": "rf",
+      "parameters": {
+        "n_estimators": 240,
+        "max_depth": 8,
+        "min_samples_leaf": 30,
+        "max_features": 0.8
+      },
+      "scheme": "sqrt_weight",
+      "fraction": 0.8,
+      "seeds": [
+        171,
+        191
+      ]
+    },
+    {
+      "id": "rf_p3_balanced_weight",
+      "algorithm": "rf",
+      "parameters": {
+        "n_estimators": 240,
+        "max_depth": 8,
+        "min_samples_leaf": 30,
+        "max_features": 0.8
+      },
+      "scheme": "balanced_weight",
+      "fraction": 0.8,
+      "seeds": [
+        171,
+        191
+      ]
+    },
+    {
+      "id": "rf_p3_undersample",
+      "algorithm": "rf",
+      "parameters": {
+        "n_estimators": 240,
+        "max_depth": 8,
+        "min_samples_leaf": 30,
+        "max_features": 0.8
+      },
+      "scheme": "undersample",
+      "fraction": 0.8,
+      "seeds": [
+        171,
+        191
+      ]
+    },
+    {
+      "id": "lgb_p1_natural",
+      "algorithm": "lgb",
+      "parameters": {
+        "n_estimators": 160,
+        "learning_rate": 0.04,
+        "num_leaves": 7,
+        "max_depth": 3,
+        "min_child_samples": 80,
+        "reg_lambda": 5.0
+      },
+      "scheme": "natural",
+      "fraction": 0.8,
+      "seeds": [
+        171,
+        191
+      ]
+    },
+    {
+      "id": "lgb_p1_sqrt_weight",
+      "algorithm": "lgb",
+      "parameters": {
+        "n_estimators": 160,
+        "learning_rate": 0.04,
+        "num_leaves": 7,
+        "max_depth": 3,
+        "min_child_samples": 80,
+        "reg_lambda": 5.0
+      },
+      "scheme": "sqrt_weight",
+      "fraction": 0.8,
+      "seeds": [
+        171,
+        191
+      ]
+    },
+    {
+      "id": "lgb_p1_balanced_weight",
+      "algorithm": "lgb",
+      "parameters": {
+        "n_estimators": 160,
+        "learning_rate": 0.04,
+        "num_leaves": 7,
+        "max_depth": 3,
+        "min_child_samples": 80,
+        "reg_lambda": 5.0
+      },
+      "scheme": "balanced_weight",
+      "fraction": 0.8,
+      "seeds": [
+        171,
+        191
+      ]
+    },
+    {
+      "id": "lgb_p1_undersample",
+      "algorithm": "lgb",
+      "parameters": {
+        "n_estimators": 160,
+        "learning_rate": 0.04,
+        "num_leaves": 7,
+        "max_depth": 3,
+        "min_child_samples": 80,
+        "reg_lambda": 5.0
+      },
+      "scheme": "undersample",
+      "fraction": 0.8,
+      "seeds": [
+        171,
+        191
+      ]
+    },
+    {
+      "id": "lgb_p2_natural",
+      "algorithm": "lgb",
+      "parameters": {
+        "n_estimators": 240,
+        "learning_rate": 0.03,
+        "num_leaves": 15,
+        "max_depth": 4,
+        "min_child_samples": 60,
+        "reg_lambda": 10.0
+      },
+      "scheme": "natural",
+      "fraction": 0.8,
+      "seeds": [
+        171,
+        191
+      ]
+    },
+    {
+      "id": "lgb_p2_sqrt_weight",
+      "algorithm": "lgb",
+      "parameters": {
+        "n_estimators": 240,
+        "learning_rate": 0.03,
+        "num_leaves": 15,
+        "max_depth": 4,
+        "min_child_samples": 60,
+        "reg_lambda": 10.0
+      },
+      "scheme": "sqrt_weight",
+      "fraction": 0.8,
+      "seeds": [
+        171,
+        191
+      ]
+    },
+    {
+      "id": "lgb_p2_balanced_weight",
+      "algorithm": "lgb",
+      "parameters": {
+        "n_estimators": 240,
+        "learning_rate": 0.03,
+        "num_leaves": 15,
+        "max_depth": 4,
+        "min_child_samples": 60,
+        "reg_lambda": 10.0
+      },
+      "scheme": "balanced_weight",
+      "fraction": 0.8,
+      "seeds": [
+        171,
+        191
+      ]
+    },
+    {
+      "id": "lgb_p2_undersample",
+      "algorithm": "lgb",
+      "parameters": {
+        "n_estimators": 240,
+        "learning_rate": 0.03,
+        "num_leaves": 15,
+        "max_depth": 4,
+        "min_child_samples": 60,
+        "reg_lambda": 10.0
+      },
+      "scheme": "undersample",
+      "fraction": 0.8,
+      "seeds": [
+        171,
+        191
+      ]
+    },
+    {
+      "id": "lgb_p3_natural",
+      "algorithm": "lgb",
+      "parameters": {
+        "n_estimators": 320,
+        "learning_rate": 0.025,
+        "num_leaves": 31,
+        "max_depth": 5,
+        "min_child_samples": 50,
+        "reg_lambda": 15.0
+      },
+      "scheme": "natural",
+      "fraction": 0.8,
+      "seeds": [
+        171,
+        191
+      ]
+    },
+    {
+      "id": "lgb_p3_sqrt_weight",
+      "algorithm": "lgb",
+      "parameters": {
+        "n_estimators": 320,
+        "learning_rate": 0.025,
+        "num_leaves": 31,
+        "max_depth": 5,
+        "min_child_samples": 50,
+        "reg_lambda": 15.0
+      },
+      "scheme": "sqrt_weight",
+      "fraction": 0.8,
+      "seeds": [
+        171,
+        191
+      ]
+    },
+    {
+      "id": "lgb_p3_balanced_weight",
+      "algorithm": "lgb",
+      "parameters": {
+        "n_estimators": 320,
+        "learning_rate": 0.025,
+        "num_leaves": 31,
+        "max_depth": 5,
+        "min_child_samples": 50,
+        "reg_lambda": 15.0
+      },
+      "scheme": "balanced_weight",
+      "fraction": 0.8,
+      "seeds": [
+        171,
+        191
+      ]
+    },
+    {
+      "id": "lgb_p3_undersample",
+      "algorithm": "lgb",
+      "parameters": {
+        "n_estimators": 320,
+        "learning_rate": 0.025,
+        "num_leaves": 31,
+        "max_depth": 5,
+        "min_child_samples": 50,
+        "reg_lambda": 15.0
+      },
+      "scheme": "undersample",
+      "fraction": 0.8,
+      "seeds": [
+        171,
+        191
+      ]
+    },
+    {
+      "id": "xgb_p1_natural",
+      "algorithm": "xgb",
+      "parameters": {
+        "n_estimators": 160,
+        "learning_rate": 0.04,
+        "max_depth": 2,
+        "min_child_weight": 20,
+        "reg_lambda": 5.0
+      },
+      "scheme": "natural",
+      "fraction": 0.8,
+      "seeds": [
+        171,
+        191
+      ]
+    },
+    {
+      "id": "xgb_p1_sqrt_weight",
+      "algorithm": "xgb",
+      "parameters": {
+        "n_estimators": 160,
+        "learning_rate": 0.04,
+        "max_depth": 2,
+        "min_child_weight": 20,
+        "reg_lambda": 5.0
+      },
+      "scheme": "sqrt_weight",
+      "fraction": 0.8,
+      "seeds": [
+        171,
+        191
+      ]
+    },
+    {
+      "id": "xgb_p1_balanced_weight",
+      "algorithm": "xgb",
+      "parameters": {
+        "n_estimators": 160,
+        "learning_rate": 0.04,
+        "max_depth": 2,
+        "min_child_weight": 20,
+        "reg_lambda": 5.0
+      },
+      "scheme": "balanced_weight",
+      "fraction": 0.8,
+      "seeds": [
+        171,
+        191
+      ]
+    },
+    {
+      "id": "xgb_p1_undersample",
+      "algorithm": "xgb",
+      "parameters": {
+        "n_estimators": 160,
+        "learning_rate": 0.04,
+        "max_depth": 2,
+        "min_child_weight": 20,
+        "reg_lambda": 5.0
+      },
+      "scheme": "undersample",
+      "fraction": 0.8,
+      "seeds": [
+        171,
+        191
+      ]
+    },
+    {
+      "id": "xgb_p2_natural",
+      "algorithm": "xgb",
+      "parameters": {
+        "n_estimators": 240,
+        "learning_rate": 0.03,
+        "max_depth": 3,
+        "min_child_weight": 20,
+        "reg_lambda": 10.0
+      },
+      "scheme": "natural",
+      "fraction": 0.8,
+      "seeds": [
+        171,
+        191
+      ]
+    },
+    {
+      "id": "xgb_p2_sqrt_weight",
+      "algorithm": "xgb",
+      "parameters": {
+        "n_estimators": 240,
+        "learning_rate": 0.03,
+        "max_depth": 3,
+        "min_child_weight": 20,
+        "reg_lambda": 10.0
+      },
+      "scheme": "sqrt_weight",
+      "fraction": 0.8,
+      "seeds": [
+        171,
+        191
+      ]
+    },
+    {
+      "id": "xgb_p2_balanced_weight",
+      "algorithm": "xgb",
+      "parameters": {
+        "n_estimators": 240,
+        "learning_rate": 0.03,
+        "max_depth": 3,
+        "min_child_weight": 20,
+        "reg_lambda": 10.0
+      },
+      "scheme": "balanced_weight",
+      "fraction": 0.8,
+      "seeds": [
+        171,
+        191
+      ]
+    },
+    {
+      "id": "xgb_p2_undersample",
+      "algorithm": "xgb",
+      "parameters": {
+        "n_estimators": 240,
+        "learning_rate": 0.03,
+        "max_depth": 3,
+        "min_child_weight": 20,
+        "reg_lambda": 10.0
+      },
+      "scheme": "undersample",
+      "fraction": 0.8,
+      "seeds": [
+        171,
+        191
+      ]
+    },
+    {
+      "id": "xgb_p3_natural",
+      "algorithm": "xgb",
+      "parameters": {
+        "n_estimators": 320,
+        "learning_rate": 0.025,
+        "max_depth": 4,
+        "min_child_weight": 30,
+        "reg_lambda": 15.0
+      },
+      "scheme": "natural",
+      "fraction": 0.8,
+      "seeds": [
+        171,
+        191
+      ]
+    },
+    {
+      "id": "xgb_p3_sqrt_weight",
+      "algorithm": "xgb",
+      "parameters": {
+        "n_estimators": 320,
+        "learning_rate": 0.025,
+        "max_depth": 4,
+        "min_child_weight": 30,
+        "reg_lambda": 15.0
+      },
+      "scheme": "sqrt_weight",
+      "fraction": 0.8,
+      "seeds": [
+        171,
+        191
+      ]
+    },
+    {
+      "id": "xgb_p3_balanced_weight",
+      "algorithm": "xgb",
+      "parameters": {
+        "n_estimators": 320,
+        "learning_rate": 0.025,
+        "max_depth": 4,
+        "min_child_weight": 30,
+        "reg_lambda": 15.0
+      },
+      "scheme": "balanced_weight",
+      "fraction": 0.8,
+      "seeds": [
+        171,
+        191
+      ]
+    },
+    {
+      "id": "xgb_p3_undersample",
+      "algorithm": "xgb",
+      "parameters": {
+        "n_estimators": 320,
+        "learning_rate": 0.025,
+        "max_depth": 4,
+        "min_child_weight": 30,
+        "reg_lambda": 15.0
+      },
+      "scheme": "undersample",
+      "fraction": 0.8,
+      "seeds": [
+        171,
+        191
+      ]
+    }
+  ],
+  "months": [
+    "2025-01",
+    "2025-02",
+    "2025-03",
+    "2025-04",
+    "2025-05",
+    "2025-06",
+    "2025-07",
+    "2025-08",
+    "2025-09",
+    "2025-10",
+    "2025-11",
+    "2025-12",
+    "2026-01",
+    "2026-02",
+    "2026-03",
+    "2026-04",
+    "2026-05",
+    "2026-06",
+    "2026-07",
+    "2026-08",
+    "2026-09",
+    "2026-10"
+  ],
+  "test_months": [
+    "2025-09",
+    "2025-10",
+    "2025-11",
+    "2025-12",
+    "2026-01",
+    "2026-02",
+    "2026-03",
+    "2026-04",
+    "2026-05",
+    "2026-06",
+    "2026-07",
+    "2026-08",
+    "2026-09",
+    "2026-10"
+  ],
+  "features": [
+    "board_streak_days",
+    "streak_return",
+    "d0_return",
+    "d0_open_gap",
+    "d0_range",
+    "d0_lower_shadow",
+    "d0_close_position",
+    "first_open_gap",
+    "first_range",
+    "first_one_price",
+    "d0_volume_ratio_pre5",
+    "d0_amount_ratio_pre5",
+    "d0_turnover_pct",
+    "d0_amount_100m",
+    "d0_volume_ratio_first",
+    "d0_turnover_ratio_first",
+    "first_turnover_pct",
+    "pre5_return",
+    "pre5_mean_turnover_pct",
+    "market_limit_count",
+    "market_prev_limit_count",
+    "market_up_fraction",
+    "market_median_return",
+    "limit_rate",
+    "d0_one_price",
+    "range_to_limit",
+    "gap_to_limit",
+    "turnover_ratio_pre5",
+    "pre5_volatility",
+    "pre5_up_count",
+    "market_reseal_fraction",
+    "amount_board_rank",
+    "turnover_board_rank",
+    "log_float_mv_proxy",
+    "log_price"
+  ],
+  "risk_features": [
+    "board_streak_days",
+    "d0_turnover_pct",
+    "log_float_mv_proxy",
+    "market_median_return",
+    "open_gap",
+    "early_return",
+    "early_pullback",
+    "early_volume_ratio"
+  ],
+  "sampling": "80% without replacement stratified by month and label; optional majority undersampling after the 80% draw; weights computed only from sampled train",
+  "seeds": "171 and 191 are RNG seeds, not sklearn versions; average probabilities of both, never choose the better seed",
+  "cv": "same R15 causal rolling OOF: each of six historical training months scored by a separate six-month fit ending two months before it; warm-up history allowed",
+  "score": ".5*(OOF mean Top3/5+validation mean Top3/5)-.25*abs(OOF-validation)-.25*std(eight monthly qualities)-.25*mean(abs(two seed qualities in OOF and validation))",
+  "gate": "challenger must improve or equal RF reference on both pooled OOF and validation and beat its stability score; otherwise retain reference",
+  "testing": "all monthly choices frozen before held-out outcomes are evaluated; per-group test results descriptive only, no re-selection",
+  "stage2": "unchanged R15 8-factor logistic or depth2 tree; 09:40 candidates; 09:41 open execution proxy; D2-D4 no seal and D4 loss>5% bad",
+  "feature_pool": "same 35 features and historical non-ST D0/D1 pool as R15; no D0 final-seal-time filter",
+  "no_refit_on_validation": true,
+  "historically_researched_not_new_blind_data": true,
+  "source_sha256": "47048e72ffd5023b0378ca6aec9145e7df7c7955b878e1b87fbe4fe72f31f3ef",
+  "versions": {
+    "sklearn": "1.7.1",
+    "lightgbm": "4.6.0",
+    "xgboost": "3.0.2"
+  },
+  "parameter_sources": [
+    "https://lightgbm.readthedocs.io/en/v4.6.0/Parameters.html",
+    "https://xgboost.readthedocs.io/en/stable/parameter.html"
+  ]
+}

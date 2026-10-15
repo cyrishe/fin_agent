@@ -1,0 +1,17 @@
+{
+  "rows": 2116184,
+  "known": 2106742,
+  "events": 201391,
+  "dates": 410,
+  "B1_matched": 383,
+  "B1_endpoint_max_errors": {
+    "entry_1442": 0.0,
+    "exit_0940": 0.0,
+    "gross_1442": 0.0
+  },
+  "original_features_sha256": "ab00d323f6a2ad4f5dc28e0209c59b936d9bee560b6d23ab4f80d6fe31758bd8",
+  "dataset_sha256": "15ac8a78cde22200a89d0c36668de988a056218d375d75f9c519085bd6d92248",
+  "unknown_labels_not_negative": true,
+  "post_decision_prices_only_used_in_labels": true,
+  "live_arrival_not_proven_by_final_historical_archive": true
+}

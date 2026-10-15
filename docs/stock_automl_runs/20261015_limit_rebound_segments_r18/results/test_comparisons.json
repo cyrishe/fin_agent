@@ -1,0 +1,101 @@
+[
+  {
+    "variant": "aligned",
+    "k": 1,
+    "pooled_rate_difference": -0.0060240963855421326,
+    "positive_months": 4,
+    "tied_months": 4,
+    "month_cluster_95pct": [
+      -0.05978583441485858,
+      0.04973755394408755
+    ]
+  },
+  {
+    "variant": "aligned",
+    "k": 3,
+    "pooled_rate_difference": 0.013590705149668536,
+    "positive_months": 9,
+    "tied_months": 1,
+    "month_cluster_95pct": [
+      -0.008586344596751182,
+      0.03567349992155145
+    ]
+  },
+  {
+    "variant": "aligned",
+    "k": 5,
+    "pooled_rate_difference": 0.003722570532915359,
+    "positive_months": 7,
+    "tied_months": 0,
+    "month_cluster_95pct": [
+      -0.022260783429591133,
+      0.025350000381747853
+    ]
+  },
+  {
+    "variant": "segments",
+    "k": 1,
+    "pooled_rate_difference": 0.030120481927710885,
+    "positive_months": 9,
+    "tied_months": 2,
+    "month_cluster_95pct": [
+      -0.031573884334546214,
+      0.08464792804908437
+    ]
+  },
+  {
+    "variant": "segments",
+    "k": 3,
+    "pooled_rate_difference": 0.011659716430358569,
+    "positive_months": 9,
+    "tied_months": 0,
+    "month_cluster_95pct": [
+      -0.014505682772135469,
+      0.0389615106881083
+    ]
+  },
+  {
+    "variant": "segments",
+    "k": 5,
+    "pooled_rate_difference": -0.002883120523995253,
+    "positive_months": 7,
+    "tied_months": 0,
+    "month_cluster_95pct": [
+      -0.024878236410039212,
+      0.018204414795813497
+    ]
+  },
+  {
+    "variant": "selected",
+    "k": 1,
+    "pooled_rate_difference": -0.02683461117196062,
+    "positive_months": 1,
+    "tied_months": 8,
+    "month_cluster_95pct": [
+      -0.0532753518410688,
+      -0.00041367226205048485
+    ]
+  },
+  {
+    "variant": "selected",
+    "k": 3,
+    "pooled_rate_difference": 0.0035159840243310647,
+    "positive_months": 3,
+    "tied_months": 8,
+    "month_cluster_95pct": [
+      -0.012597970584637342,
+      0.021021038236746396
+    ]
+  },
+  {
+    "variant": "selected",
+    "k": 5,
+    "pooled_rate_difference": -0.008154376507583105,
+    "positive_months": 3,
+    "tied_months": 8,
+    "month_cluster_95pct": [
+      -0.031843897729916804,
+      0.01142962903600342
+    ]
+  }
+]

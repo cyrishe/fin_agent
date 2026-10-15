@@ -1,0 +1,14 @@
+{
+  "user_id": "imac",
+  "experiment_id": "CO12_20261015_independent_0940_netloss",
+  "experiment_date": "2026-10-15",
+  "title": "CO12：独立09:40净亏概率与幅度，B1轮空和减仓",
+  "category_path": "02_联合目标与尾部风险",
+  "local_path": "/Volumes/ext/fin_agent/outputs/stock_automl/aliyun_drive_local/策略训练/收盘开盘_20261014/02_联合目标与尾部风险/20261015_CO12_独立0940净亏概率与幅度_B1轮空减仓",
+  "cloud_path": "策略训练/收盘开盘_20261014/02_联合目标与尾部风险/20261015_CO12_独立0940净亏概率与幅度_B1轮空减仓",
+  "source_commit": "e55c2f79787f22efac905cfb08a52b0ad7db6198",
+  "manifest_sha256": "57f08f62fffdc329f7f7add827c4570a1b08e4cd2578ec758d0b8e7fbfefff76",
+  "file_count": 1020,
+  "db_recorded": true,
+  "cloud_verified": false
+}

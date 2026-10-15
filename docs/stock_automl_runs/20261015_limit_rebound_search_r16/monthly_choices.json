@@ -1,0 +1,373 @@
+[
+  {
+    "month": "2025-09",
+    "family": "rf_p3_sqrt_weight",
+    "group": {
+      "id": "rf_p3_sqrt_weight",
+      "algorithm": "rf",
+      "parameters": {
+        "n_estimators": 240,
+        "max_depth": 8,
+        "min_samples_leaf": 30,
+        "max_features": 0.8
+      },
+      "scheme": "sqrt_weight",
+      "fraction": 0.8,
+      "seeds": [
+        171,
+        191
+      ]
+    },
+    "oof_quality": 0.5367647058823529,
+    "valid_quality": 0.5188172043010753,
+    "monthly_std": 0.06124608769586713,
+    "worst_month": 0.45577242524916944,
+    "seed_gap": 0.014897857962944683,
+    "selection_score": 0.5042680932816918
+  },
+  {
+    "month": "2025-10",
+    "family": "rf_p1_undersample",
+    "group": {
+      "id": "rf_p1_undersample",
+      "algorithm": "rf",
+      "parameters": {
+        "n_estimators": 240,
+        "max_depth": 4,
+        "min_samples_leaf": 100,
+        "max_features": 0.8
+      },
+      "scheme": "undersample",
+      "fraction": 0.8,
+      "seeds": [
+        171,
+        191
+      ]
+    },
+    "oof_quality": 0.5524737332092033,
+    "valid_quality": 0.6053445850914205,
+    "monthly_std": 0.03903704915991157,
+    "worst_month": 0.4809523809523809,
+    "seed_gap": 0.03346150448096691,
+    "selection_score": 0.547566807769538
+  },
+  {
+    "month": "2025-11",
+    "family": "rf_p1_sqrt_weight",
+    "group": {
+      "id": "rf_p1_sqrt_weight",
+      "algorithm": "rf",
+      "parameters": {
+        "n_estimators": 240,
+        "max_depth": 4,
+        "min_samples_leaf": 100,
+        "max_features": 0.8
+      },
+      "scheme": "sqrt_weight",
+      "fraction": 0.8,
+      "seeds": [
+        171,
+        191
+      ]
+    },
+    "oof_quality": 0.5401616361537194,
+    "valid_quality": 0.6022179363548699,
+    "monthly_std": 0.0560938314618636,
+    "worst_month": 0.46247654784240155,
+    "seed_gap": 0.007776213820048616,
+    "selection_score": 0.5397081998835289
+  },
+  {
+    "month": "2025-12",
+    "family": "xgb_p3_undersample",
+    "group": {
+      "id": "xgb_p3_undersample",
+      "algorithm": "xgb",
+      "parameters": {
+        "n_estimators": 320,
+        "learning_rate": 0.025,
+        "max_depth": 4,
+        "min_child_weight": 30,
+        "reg_lambda": 15.0
+      },
+      "scheme": "undersample",
+      "fraction": 0.8,
+      "seeds": [
+        171,
+        191
+      ]
+    },
+    "oof_quality": 0.5475225583161166,
+    "valid_quality": 0.5829483695652173,
+    "monthly_std": 0.04825953351081842,
+    "worst_month": 0.4838176234349161,
+    "seed_gap": 0.019026862530829913,
+    "selection_score": 0.5395574121179796
+  },
+  {
+    "month": "2026-01",
+    "family": "rf_p3_sqrt_weight",
+    "group": {
+      "id": "rf_p3_sqrt_weight",
+      "algorithm": "rf",
+      "parameters": {
+        "n_estimators": 240,
+        "max_depth": 8,
+        "min_samples_leaf": 30,
+        "max_features": 0.8
+      },
+      "scheme": "sqrt_weight",
+      "fraction": 0.8,
+      "seeds": [
+        171,
+        191
+      ]
+    },
+    "oof_quality": 0.551966079927476,
+    "valid_quality": 0.6489130434782608,
+    "monthly_std": 0.05409098874386547,
+    "worst_month": 0.4898417198204583,
+    "seed_gap": 0.007697449954982283,
+    "selection_score": 0.5607557111404602
+  },
+  {
+    "month": "2026-02",
+    "family": "rf_reference",
+    "group": {
+      "id": "rf_reference",
+      "algorithm": "rf",
+      "parameters": {
+        "n_estimators": 240,
+        "max_depth": 7,
+        "min_samples_leaf": 50,
+        "max_features": 0.8
+      },
+      "scheme": "balanced_weight",
+      "fraction": 1.0,
+      "seeds": [
+        20261013
+      ]
+    },
+    "oof_quality": 0.5414524566252803,
+    "valid_quality": 0.5828538550057537,
+    "monthly_std": 0.05209257754799547,
+    "worst_month": 0.46291208791208793,
+    "seed_gap": 0.0,
+    "selection_score": 0.5387796618333998
+  },
+  {
+    "month": "2026-03",
+    "family": "lgb_p2_undersample",
+    "group": {
+      "id": "lgb_p2_undersample",
+      "algorithm": "lgb",
+      "parameters": {
+        "n_estimators": 240,
+        "learning_rate": 0.03,
+        "num_leaves": 15,
+        "max_depth": 4,
+        "min_child_samples": 60,
+        "reg_lambda": 10.0
+      },
+      "scheme": "undersample",
+      "fraction": 0.8,
+      "seeds": [
+        171,
+        191
+      ]
+    },
+    "oof_quality": 0.5426111253670916,
+    "valid_quality": 0.529019688269073,
+    "monthly_std": 0.046551667249387335,
+    "worst_month": 0.46703296703296704,
+    "seed_gap": 0.017990142827662897,
+    "selection_score": 0.5162820950243151
+  },
+  {
+    "month": "2026-04",
+    "family": "xgb_p3_sqrt_weight",
+    "group": {
+      "id": "xgb_p3_sqrt_weight",
+      "algorithm": "xgb",
+      "parameters": {
+        "n_estimators": 320,
+        "learning_rate": 0.025,
+        "max_depth": 4,
+        "min_child_weight": 30,
+        "reg_lambda": 15.0
+      },
+      "scheme": "sqrt_weight",
+      "fraction": 0.8,
+      "seeds": [
+        171,
+        191
+      ]
+    },
+    "oof_quality": 0.5628348969919721,
+    "valid_quality": 0.5398431570958766,
+    "monthly_std": 0.039927264532421555,
+    "worst_month": 0.5092170895684234,
+    "seed_gap": 0.011201093876271107,
+    "selection_score": 0.5328090024677274
+  },
+  {
+    "month": "2026-05",
+    "family": "rf_p3_undersample",
+    "group": {
+      "id": "rf_p3_undersample",
+      "algorithm": "rf",
+      "parameters": {
+        "n_estimators": 240,
+        "max_depth": 8,
+        "min_samples_leaf": 30,
+        "max_features": 0.8
+      },
+      "scheme": "undersample",
+      "fraction": 0.8,
+      "seeds": [
+        171,
+        191
+      ]
+    },
+    "oof_quality": 0.553741674284968,
+    "valid_quality": 0.5331402831402832,
+    "monthly_std": 0.04276930834802402,
+    "worst_month": 0.5022883295194508,
+    "seed_gap": 0.014121214633511958,
+    "selection_score": 0.5240680001810704
+  },
+  {
+    "month": "2026-06",
+    "family": "lgb_p1_natural",
+    "group": {
+      "id": "lgb_p1_natural",
+      "algorithm": "lgb",
+      "parameters": {
+        "n_estimators": 160,
+        "learning_rate": 0.04,
+        "num_leaves": 7,
+        "max_depth": 3,
+        "min_child_samples": 80,
+        "reg_lambda": 5.0
+      },
+      "scheme": "natural",
+      "fraction": 0.8,
+      "seeds": [
+        171,
+        191
+      ]
+    },
+    "oof_quality": 0.5514792454720809,
+    "valid_quality": 0.5206567164179104,
+    "monthly_std": 0.03403357597705303,
+    "worst_month": 0.4945054945054945,
+    "seed_gap": 0.009503575858734292,
+    "selection_score": 0.5174780607225062
+  },
+  {
+    "month": "2026-07",
+    "family": "lgb_p1_undersample",
+    "group": {
+      "id": "lgb_p1_undersample",
+      "algorithm": "lgb",
+      "parameters": {
+        "n_estimators": 160,
+        "learning_rate": 0.04,
+        "num_leaves": 7,
+        "max_depth": 3,
+        "min_child_samples": 80,
+        "reg_lambda": 5.0
+      },
+      "scheme": "undersample",
+      "fraction": 0.8,
+      "seeds": [
+        171,
+        191
+      ]
+    },
+    "oof_quality": 0.5504736069729177,
+    "valid_quality": 0.5084260195483654,
+    "monthly_std": 0.03844203077210819,
+    "worst_month": 0.4901785714285714,
+    "seed_gap": 0.006156391295796121,
+    "selection_score": 0.5077883108875274
+  },
+  {
+    "month": "2026-08",
+    "family": "xgb_p2_natural",
+    "group": {
+      "id": "xgb_p2_natural",
+      "algorithm": "xgb",
+      "parameters": {
+        "n_estimators": 240,
+        "learning_rate": 0.03,
+        "max_depth": 3,
+        "min_child_weight": 20,
+        "reg_lambda": 10.0
+      },
+      "scheme": "natural",
+      "fraction": 0.8,
+      "seeds": [
+        171,
+        191
+      ]
+    },
+    "oof_quality": 0.5151905528717122,
+    "valid_quality": 0.487459224356651,
+    "monthly_std": 0.0421843153697495,
+    "worst_month": 0.45285714285714285,
+    "seed_gap": 0.0066570424142237405,
+    "selection_score": 0.4821817170394231
+  },
+  {
+    "month": "2026-09",
+    "family": "rf_reference",
+    "group": {
+      "id": "rf_reference",
+      "algorithm": "rf",
+      "parameters": {
+        "n_estimators": 240,
+        "max_depth": 7,
+        "min_samples_leaf": 50,
+        "max_features": 0.8
+      },
+      "scheme": "balanced_weight",
+      "fraction": 1.0,
+      "seeds": [
+        20261013
+      ]
+    },
+    "oof_quality": 0.48846068682314103,
+    "valid_quality": 0.48897331356560414,
+    "monthly_std": 0.02960175175479693,
+    "worst_month": 0.44588989441930615,
+    "seed_gap": 0.0,
+    "selection_score": 0.4811884055700576
+  },
+  {
+    "month": "2026-10",
+    "family": "rf_p3_undersample",
+    "group": {
+      "id": "rf_p3_undersample",
+      "algorithm": "rf",
+      "parameters": {
+        "n_estimators": 240,
+        "max_depth": 8,
+        "min_samples_leaf": 30,
+        "max_features": 0.8
+      },
+      "scheme": "undersample",
+      "fraction": 0.8,
+      "seeds": [
+        171,
+        191
+      ]
+    },
+    "oof_quality": 0.4745098039215686,
+    "valid_quality": 0.5184170471841705,
+    "monthly_std": 0.05958457662041508,
+    "worst_month": 0.40659645232815966,
+    "seed_gap": 0.007071511378862194,
+    "selection_score": 0.4688225927373998
+  }
+]

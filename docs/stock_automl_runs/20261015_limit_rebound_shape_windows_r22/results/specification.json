@@ -1,0 +1,1145 @@
+{
+  "name": "R22_shorter_shape_windows_fixed_rule_controls",
+  "stage1": "All R18 monthly RF models, rankings and score files unchanged; 6-month RF training/2-month validation. Only shape-selection windows shortened.",
+  "data_start": "Complete audited minute archive begins Jan2025; 1train+1valid first test Mar2025; 2train+1valid first test Apr2025. Jan/Feb lack two prior calendar months for this monthly design.",
+  "short_windows": {
+    "short2": "2 train +1 validation, main short window",
+    "short1": "1 train +1 validation, small-sample sensitivity"
+  },
+  "training_scores": "Own historical-month saved RF forecast Top1 scores, genuinely causal OOF; never in-fit scores.",
+  "validation_scores": "Target-month saved R18 validation scores, last validation month only. Same score source as R19 validation, shortened to1month.",
+  "outcomes_purged": "Train D4 trading date strictly before validation month; validation D4 strictly before forecast month. Only complete valid-price returns used in selection.",
+  "candidates": [
+    {
+      "id": "all",
+      "atoms": [],
+      "family": "none",
+      "text": "全部保留"
+    },
+    {
+      "id": "r001",
+      "atoms": [
+        [
+          "high5",
+          ">=",
+          0
+        ]
+      ],
+      "family": "单条件",
+      "text": "五分最高涨幅>=0%"
+    },
+    {
+      "id": "r002",
+      "atoms": [
+        [
+          "high5",
+          "<",
+          0
+        ]
+      ],
+      "family": "单条件",
+      "text": "五分最高涨幅<0%"
+    },
+    {
+      "id": "r003",
+      "atoms": [
+        [
+          "high5",
+          ">=",
+          0.03
+        ]
+      ],
+      "family": "单条件",
+      "text": "五分最高涨幅>=3%"
+    },
+    {
+      "id": "r004",
+      "atoms": [
+        [
+          "high5",
+          "<",
+          0.03
+        ]
+      ],
+      "family": "单条件",
+      "text": "五分最高涨幅<3%"
+    },
+    {
+      "id": "r005",
+      "atoms": [
+        [
+          "high5",
+          ">=",
+          0.06
+        ]
+      ],
+      "family": "单条件",
+      "text": "五分最高涨幅>=6%"
+    },
+    {
+      "id": "r006",
+      "atoms": [
+        [
+          "high5",
+          "<",
+          0.06
+        ]
+      ],
+      "family": "单条件",
+      "text": "五分最高涨幅<6%"
+    },
+    {
+      "id": "r007",
+      "atoms": [
+        [
+          "high5",
+          ">=",
+          0.09
+        ]
+      ],
+      "family": "单条件",
+      "text": "五分最高涨幅>=9%"
+    },
+    {
+      "id": "r008",
+      "atoms": [
+        [
+          "high5",
+          "<",
+          0.09
+        ]
+      ],
+      "family": "单条件",
+      "text": "五分最高涨幅<9%"
+    },
+    {
+      "id": "r009",
+      "atoms": [
+        [
+          "low5",
+          ">=",
+          -0.03
+        ]
+      ],
+      "family": "单条件",
+      "text": "五分最低涨幅>=-3%"
+    },
+    {
+      "id": "r010",
+      "atoms": [
+        [
+          "low5",
+          "<",
+          -0.03
+        ]
+      ],
+      "family": "单条件",
+      "text": "五分最低涨幅<-3%"
+    },
+    {
+      "id": "r011",
+      "atoms": [
+        [
+          "low5",
+          ">=",
+          0
+        ]
+      ],
+      "family": "单条件",
+      "text": "五分最低涨幅>=0%"
+    },
+    {
+      "id": "r012",
+      "atoms": [
+        [
+          "low5",
+          "<",
+          0
+        ]
+      ],
+      "family": "单条件",
+      "text": "五分最低涨幅<0%"
+    },
+    {
+      "id": "r013",
+      "atoms": [
+        [
+          "low5",
+          ">=",
+          0.03
+        ]
+      ],
+      "family": "单条件",
+      "text": "五分最低涨幅>=3%"
+    },
+    {
+      "id": "r014",
+      "atoms": [
+        [
+          "low5",
+          "<",
+          0.03
+        ]
+      ],
+      "family": "单条件",
+      "text": "五分最低涨幅<3%"
+    },
+    {
+      "id": "r015",
+      "atoms": [
+        [
+          "low5",
+          ">=",
+          0.06
+        ]
+      ],
+      "family": "单条件",
+      "text": "五分最低涨幅>=6%"
+    },
+    {
+      "id": "r016",
+      "atoms": [
+        [
+          "low5",
+          "<",
+          0.06
+        ]
+      ],
+      "family": "单条件",
+      "text": "五分最低涨幅<6%"
+    },
+    {
+      "id": "r017",
+      "atoms": [
+        [
+          "body5",
+          ">=",
+          -0.02
+        ]
+      ],
+      "family": "单条件",
+      "text": "五分实体涨幅>=-2%"
+    },
+    {
+      "id": "r018",
+      "atoms": [
+        [
+          "body5",
+          "<",
+          -0.02
+        ]
+      ],
+      "family": "单条件",
+      "text": "五分实体涨幅<-2%"
+    },
+    {
+      "id": "r019",
+      "atoms": [
+        [
+          "body5",
+          ">=",
+          0
+        ]
+      ],
+      "family": "单条件",
+      "text": "五分实体涨幅>=0%"
+    },
+    {
+      "id": "r020",
+      "atoms": [
+        [
+          "body5",
+          "<",
+          0
+        ]
+      ],
+      "family": "单条件",
+      "text": "五分实体涨幅<0%"
+    },
+    {
+      "id": "r021",
+      "atoms": [
+        [
+          "body5",
+          ">=",
+          0.02
+        ]
+      ],
+      "family": "单条件",
+      "text": "五分实体涨幅>=2%"
+    },
+    {
+      "id": "r022",
+      "atoms": [
+        [
+          "body5",
+          "<",
+          0.02
+        ]
+      ],
+      "family": "单条件",
+      "text": "五分实体涨幅<2%"
+    },
+    {
+      "id": "r023",
+      "atoms": [
+        [
+          "pullback5",
+          ">=",
+          0.01
+        ]
+      ],
+      "family": "单条件",
+      "text": "高点回落>=1%"
+    },
+    {
+      "id": "r024",
+      "atoms": [
+        [
+          "pullback5",
+          "<",
+          0.01
+        ]
+      ],
+      "family": "单条件",
+      "text": "高点回落<1%"
+    },
+    {
+      "id": "r025",
+      "atoms": [
+        [
+          "pullback5",
+          ">=",
+          0.03
+        ]
+      ],
+      "family": "单条件",
+      "text": "高点回落>=3%"
+    },
+    {
+      "id": "r026",
+      "atoms": [
+        [
+          "pullback5",
+          "<",
+          0.03
+        ]
+      ],
+      "family": "单条件",
+      "text": "高点回落<3%"
+    },
+    {
+      "id": "r027",
+      "atoms": [
+        [
+          "pullback5",
+          ">=",
+          0.05
+        ]
+      ],
+      "family": "单条件",
+      "text": "高点回落>=5%"
+    },
+    {
+      "id": "r028",
+      "atoms": [
+        [
+          "pullback5",
+          "<",
+          0.05
+        ]
+      ],
+      "family": "单条件",
+      "text": "高点回落<5%"
+    },
+    {
+      "id": "r029",
+      "atoms": [
+        [
+          "position5",
+          ">=",
+          0.3
+        ]
+      ],
+      "family": "单条件",
+      "text": "五分收价位置>=30%"
+    },
+    {
+      "id": "r030",
+      "atoms": [
+        [
+          "position5",
+          "<",
+          0.3
+        ]
+      ],
+      "family": "单条件",
+      "text": "五分收价位置<30%"
+    },
+    {
+      "id": "r031",
+      "atoms": [
+        [
+          "position5",
+          ">=",
+          0.7
+        ]
+      ],
+      "family": "单条件",
+      "text": "五分收价位置>=70%"
+    },
+    {
+      "id": "r032",
+      "atoms": [
+        [
+          "position5",
+          "<",
+          0.7
+        ]
+      ],
+      "family": "单条件",
+      "text": "五分收价位置<70%"
+    },
+    {
+      "id": "r033",
+      "atoms": [
+        [
+          "below5",
+          ">=",
+          1
+        ]
+      ],
+      "family": "单条件",
+      "text": "板下分钟数>=1"
+    },
+    {
+      "id": "r034",
+      "atoms": [
+        [
+          "below5",
+          "<",
+          1
+        ]
+      ],
+      "family": "单条件",
+      "text": "板下分钟数<1"
+    },
+    {
+      "id": "r035",
+      "atoms": [
+        [
+          "below5",
+          ">=",
+          3
+        ]
+      ],
+      "family": "单条件",
+      "text": "板下分钟数>=3"
+    },
+    {
+      "id": "r036",
+      "atoms": [
+        [
+          "below5",
+          "<",
+          3
+        ]
+      ],
+      "family": "单条件",
+      "text": "板下分钟数<3"
+    },
+    {
+      "id": "r037",
+      "atoms": [
+        [
+          "whole5",
+          ">=",
+          1
+        ]
+      ],
+      "family": "单条件",
+      "text": "整分板下数>=1"
+    },
+    {
+      "id": "r038",
+      "atoms": [
+        [
+          "whole5",
+          "<",
+          1
+        ]
+      ],
+      "family": "单条件",
+      "text": "整分板下数<1"
+    },
+    {
+      "id": "r039",
+      "atoms": [
+        [
+          "whole5",
+          ">=",
+          2
+        ]
+      ],
+      "family": "单条件",
+      "text": "整分板下数>=2"
+    },
+    {
+      "id": "r040",
+      "atoms": [
+        [
+          "whole5",
+          "<",
+          2
+        ]
+      ],
+      "family": "单条件",
+      "text": "整分板下数<2"
+    },
+    {
+      "id": "r041",
+      "atoms": [
+        [
+          "touch5",
+          ">=",
+          1
+        ]
+      ],
+      "family": "单条件",
+      "text": "触板分钟数>=1"
+    },
+    {
+      "id": "r042",
+      "atoms": [
+        [
+          "touch5",
+          "<",
+          1
+        ]
+      ],
+      "family": "单条件",
+      "text": "触板分钟数<1"
+    },
+    {
+      "id": "r043",
+      "atoms": [
+        [
+          "shape",
+          "==",
+          "前弱后强"
+        ]
+      ],
+      "family": "单条件",
+      "text": "前五分形态==前弱后强"
+    },
+    {
+      "id": "r044",
+      "atoms": [
+        [
+          "shape",
+          "==",
+          "前强后弱"
+        ]
+      ],
+      "family": "单条件",
+      "text": "前五分形态==前强后弱"
+    },
+    {
+      "id": "r045",
+      "atoms": [
+        [
+          "shape",
+          "==",
+          "两段走强"
+        ]
+      ],
+      "family": "单条件",
+      "text": "前五分形态==两段走强"
+    },
+    {
+      "id": "r046",
+      "atoms": [
+        [
+          "shape",
+          "==",
+          "两段走弱"
+        ]
+      ],
+      "family": "单条件",
+      "text": "前五分形态==两段走弱"
+    },
+    {
+      "id": "r047",
+      "atoms": [
+        [
+          "shape",
+          "==",
+          "平走"
+        ]
+      ],
+      "family": "单条件",
+      "text": "前五分形态==平走"
+    },
+    {
+      "id": "r048",
+      "atoms": [
+        [
+          "high5",
+          ">=",
+          0.03
+        ],
+        [
+          "low5",
+          ">=",
+          -0.03
+        ]
+      ],
+      "family": "high5+low5",
+      "text": "五分最高涨幅>=3% 且 五分最低涨幅>=-3%"
+    },
+    {
+      "id": "r049",
+      "atoms": [
+        [
+          "high5",
+          ">=",
+          0.03
+        ],
+        [
+          "low5",
+          ">=",
+          0
+        ]
+      ],
+      "family": "high5+low5",
+      "text": "五分最高涨幅>=3% 且 五分最低涨幅>=0%"
+    },
+    {
+      "id": "r050",
+      "atoms": [
+        [
+          "high5",
+          ">=",
+          0.03
+        ],
+        [
+          "low5",
+          ">=",
+          0.03
+        ]
+      ],
+      "family": "high5+low5",
+      "text": "五分最高涨幅>=3% 且 五分最低涨幅>=3%"
+    },
+    {
+      "id": "r051",
+      "atoms": [
+        [
+          "high5",
+          ">=",
+          0.06
+        ],
+        [
+          "low5",
+          ">=",
+          -0.03
+        ]
+      ],
+      "family": "high5+low5",
+      "text": "五分最高涨幅>=6% 且 五分最低涨幅>=-3%"
+    },
+    {
+      "id": "r052",
+      "atoms": [
+        [
+          "high5",
+          ">=",
+          0.06
+        ],
+        [
+          "low5",
+          ">=",
+          0
+        ]
+      ],
+      "family": "high5+low5",
+      "text": "五分最高涨幅>=6% 且 五分最低涨幅>=0%"
+    },
+    {
+      "id": "r053",
+      "atoms": [
+        [
+          "high5",
+          ">=",
+          0.06
+        ],
+        [
+          "low5",
+          ">=",
+          0.03
+        ]
+      ],
+      "family": "high5+low5",
+      "text": "五分最高涨幅>=6% 且 五分最低涨幅>=3%"
+    },
+    {
+      "id": "r054",
+      "atoms": [
+        [
+          "high5",
+          ">=",
+          0.09
+        ],
+        [
+          "low5",
+          ">=",
+          -0.03
+        ]
+      ],
+      "family": "high5+low5",
+      "text": "五分最高涨幅>=9% 且 五分最低涨幅>=-3%"
+    },
+    {
+      "id": "r055",
+      "atoms": [
+        [
+          "high5",
+          ">=",
+          0.09
+        ],
+        [
+          "low5",
+          ">=",
+          0
+        ]
+      ],
+      "family": "high5+low5",
+      "text": "五分最高涨幅>=9% 且 五分最低涨幅>=0%"
+    },
+    {
+      "id": "r056",
+      "atoms": [
+        [
+          "high5",
+          ">=",
+          0.09
+        ],
+        [
+          "low5",
+          ">=",
+          0.03
+        ]
+      ],
+      "family": "high5+low5",
+      "text": "五分最高涨幅>=9% 且 五分最低涨幅>=3%"
+    },
+    {
+      "id": "r057",
+      "atoms": [
+        [
+          "body5",
+          ">=",
+          0
+        ],
+        [
+          "pullback5",
+          "<",
+          0.01
+        ]
+      ],
+      "family": "body5+pullback5",
+      "text": "五分实体涨幅>=0% 且 高点回落<1%"
+    },
+    {
+      "id": "r058",
+      "atoms": [
+        [
+          "body5",
+          ">=",
+          0
+        ],
+        [
+          "pullback5",
+          "<",
+          0.03
+        ]
+      ],
+      "family": "body5+pullback5",
+      "text": "五分实体涨幅>=0% 且 高点回落<3%"
+    },
+    {
+      "id": "r059",
+      "atoms": [
+        [
+          "body5",
+          ">=",
+          0
+        ],
+        [
+          "pullback5",
+          "<",
+          0.05
+        ]
+      ],
+      "family": "body5+pullback5",
+      "text": "五分实体涨幅>=0% 且 高点回落<5%"
+    },
+    {
+      "id": "r060",
+      "atoms": [
+        [
+          "body5",
+          ">=",
+          0.02
+        ],
+        [
+          "pullback5",
+          "<",
+          0.01
+        ]
+      ],
+      "family": "body5+pullback5",
+      "text": "五分实体涨幅>=2% 且 高点回落<1%"
+    },
+    {
+      "id": "r061",
+      "atoms": [
+        [
+          "body5",
+          ">=",
+          0.02
+        ],
+        [
+          "pullback5",
+          "<",
+          0.03
+        ]
+      ],
+      "family": "body5+pullback5",
+      "text": "五分实体涨幅>=2% 且 高点回落<3%"
+    },
+    {
+      "id": "r062",
+      "atoms": [
+        [
+          "body5",
+          ">=",
+          0.02
+        ],
+        [
+          "pullback5",
+          "<",
+          0.05
+        ]
+      ],
+      "family": "body5+pullback5",
+      "text": "五分实体涨幅>=2% 且 高点回落<5%"
+    },
+    {
+      "id": "r063",
+      "atoms": [
+        [
+          "position5",
+          ">=",
+          0.3
+        ],
+        [
+          "low5",
+          ">=",
+          -0.03
+        ]
+      ],
+      "family": "position5+low5",
+      "text": "五分收价位置>=30% 且 五分最低涨幅>=-3%"
+    },
+    {
+      "id": "r064",
+      "atoms": [
+        [
+          "position5",
+          ">=",
+          0.3
+        ],
+        [
+          "low5",
+          ">=",
+          0
+        ]
+      ],
+      "family": "position5+low5",
+      "text": "五分收价位置>=30% 且 五分最低涨幅>=0%"
+    },
+    {
+      "id": "r065",
+      "atoms": [
+        [
+          "position5",
+          ">=",
+          0.3
+        ],
+        [
+          "low5",
+          ">=",
+          0.03
+        ]
+      ],
+      "family": "position5+low5",
+      "text": "五分收价位置>=30% 且 五分最低涨幅>=3%"
+    },
+    {
+      "id": "r066",
+      "atoms": [
+        [
+          "position5",
+          ">=",
+          0.7
+        ],
+        [
+          "low5",
+          ">=",
+          -0.03
+        ]
+      ],
+      "family": "position5+low5",
+      "text": "五分收价位置>=70% 且 五分最低涨幅>=-3%"
+    },
+    {
+      "id": "r067",
+      "atoms": [
+        [
+          "position5",
+          ">=",
+          0.7
+        ],
+        [
+          "low5",
+          ">=",
+          0
+        ]
+      ],
+      "family": "position5+low5",
+      "text": "五分收价位置>=70% 且 五分最低涨幅>=0%"
+    },
+    {
+      "id": "r068",
+      "atoms": [
+        [
+          "position5",
+          ">=",
+          0.7
+        ],
+        [
+          "low5",
+          ">=",
+          0.03
+        ]
+      ],
+      "family": "position5+low5",
+      "text": "五分收价位置>=70% 且 五分最低涨幅>=3%"
+    },
+    {
+      "id": "r069",
+      "atoms": [
+        [
+          "touch5",
+          ">=",
+          1
+        ],
+        [
+          "whole5",
+          ">=",
+          1
+        ]
+      ],
+      "family": "touch5+whole5",
+      "text": "触板分钟数>=1 且 整分板下数>=1"
+    },
+    {
+      "id": "r070",
+      "atoms": [
+        [
+          "touch5",
+          ">=",
+          1
+        ],
+        [
+          "whole5",
+          ">=",
+          2
+        ]
+      ],
+      "family": "touch5+whole5",
+      "text": "触板分钟数>=1 且 整分板下数>=2"
+    },
+    {
+      "id": "r071",
+      "atoms": [
+        [
+          "touch5",
+          ">=",
+          1
+        ],
+        [
+          "below5",
+          ">=",
+          1
+        ]
+      ],
+      "family": "touch5+below5",
+      "text": "触板分钟数>=1 且 板下分钟数>=1"
+    },
+    {
+      "id": "r072",
+      "atoms": [
+        [
+          "touch5",
+          ">=",
+          1
+        ],
+        [
+          "below5",
+          ">=",
+          3
+        ]
+      ],
+      "family": "touch5+below5",
+      "text": "触板分钟数>=1 且 板下分钟数>=3"
+    },
+    {
+      "id": "r073",
+      "atoms": [
+        [
+          "shape",
+          "==",
+          "前弱后强"
+        ],
+        [
+          "low5",
+          ">=",
+          -0.03
+        ]
+      ],
+      "family": "shape+low5",
+      "text": "前五分形态==前弱后强 且 五分最低涨幅>=-3%"
+    },
+    {
+      "id": "r074",
+      "atoms": [
+        [
+          "shape",
+          "==",
+          "前弱后强"
+        ],
+        [
+          "low5",
+          ">=",
+          0
+        ]
+      ],
+      "family": "shape+low5",
+      "text": "前五分形态==前弱后强 且 五分最低涨幅>=0%"
+    },
+    {
+      "id": "r075",
+      "atoms": [
+        [
+          "shape",
+          "==",
+          "前弱后强"
+        ],
+        [
+          "low5",
+          ">=",
+          0.03
+        ]
+      ],
+      "family": "shape+low5",
+      "text": "前五分形态==前弱后强 且 五分最低涨幅>=3%"
+    },
+    {
+      "id": "r076",
+      "atoms": [
+        [
+          "shape",
+          "==",
+          "两段走强"
+        ],
+        [
+          "low5",
+          ">=",
+          -0.03
+        ]
+      ],
+      "family": "shape+low5",
+      "text": "前五分形态==两段走强 且 五分最低涨幅>=-3%"
+    },
+    {
+      "id": "r077",
+      "atoms": [
+        [
+          "shape",
+          "==",
+          "两段走强"
+        ],
+        [
+          "low5",
+          ">=",
+          0
+        ]
+      ],
+      "family": "shape+low5",
+      "text": "前五分形态==两段走强 且 五分最低涨幅>=0%"
+    },
+    {
+      "id": "r078",
+      "atoms": [
+        [
+          "shape",
+          "==",
+          "两段走强"
+        ],
+        [
+          "low5",
+          ">=",
+          0.03
+        ]
+      ],
+      "family": "shape+low5",
+      "text": "前五分形态==两段走强 且 五分最低涨幅>=3%"
+    }
+  ],
+  "selection": "Same79 rules and target as R19, Top1 only. Train hit>=base+3pp and strategy mean>=base, >=40% retention, min8fills for2train or6for1train. Two training stability blocks: monthly for2train, chronological halves for1train. Each block>=3fills for2train or2for1train; hit noninferior in both blocks for2train or>=1 for1train. Wilson lower bound(z=1) minus .02 per extra condition; <=3 finalists, distinct families. Validation>=4fills and30% retention, hit and strategy mean noninferior; best mean train/validation Wilson, fewer conditions tie. If none, no filter.",
+  "no_window_selection_on_test": "Both short windows fully reported, not monthwise choosing test winner. Extended schedule pre-fixed: Mar short1, Apr-Aug short2, Sep onward original6+2.",
+  "controls": {
+    "none": [],
+    "fixed6": [
+      [
+        "high5",
+        ">=",
+        0.06
+      ]
+    ],
+    "fixed6low": [
+      [
+        "high5",
+        ">=",
+        0.06
+      ],
+      [
+        "low5",
+        ">=",
+        -0.03
+      ]
+    ]
+  },
+  "entry": "Same R20 Top3 chronological first-open proxy09:36..09:40, first five minutes observed. Original shape gate can fall back inside Top3. Common -8% body gate AFTER daily choice: filtered day remains cash, never replaced.",
+  "gate_comparison": "Main comparison adds fixed body>-8% to every scheme. Secondary un-gated comparison isolates shape-only contribution. Shape rule selection itself remains pre-body-gate like originalR19.",
+  "portfolio": "Reuse audited R21B 25%priorNAV cash-funded ledger, four exits, end positions marked at known close, ex-post price-reference anomaly exclusion with no replacement; gross, no fees. Scope entry dates are D0 within range; follow each chosen trade up to D4 or last known date. Month tables distinguish signal month from holding-calendar account month.",
+  "uncertainty": "Later14months: paired monthly account-return differences, 10000 bootstrap resamples of months, seed20261015, percentile95%; partial Oct remains labeled.",
+  "historical_exposure": "Chronologically held out from each rule selection, but this historical range and fixed thresholds have already been examined; NOT fresh external blind test.",
+  "source_hashes": {
+    "R21_candidates": "48f4ac983b70e1279a526d11b2ba5d78e19aec18bb2194838dad51ae6b6bbc88",
+    "R20_enriched": "bb069c02ea02547d1e2e983d7ac28d5d03bd0621de3964f3c2851f1e6cacfcef",
+    "R19_rules": "e18cf06b9917bd508dfdb031935b7864f35bb864603964e70a5ce977069b2f86"
+  }
+}

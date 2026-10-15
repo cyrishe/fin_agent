@@ -1,0 +1,47 @@
+[
+  {
+    "policy": "four_old",
+    "missed8_recovered_same_stock": 7,
+    "profitable_recovered": 6,
+    "dates": [
+      "2026-01-08",
+      "2026-01-27",
+      "2026-03-06",
+      "2026-04-17",
+      "2026-05-20",
+      "2026-07-22",
+      "2026-10-09"
+    ]
+  },
+  {
+    "policy": "four_old_delay",
+    "missed8_recovered_same_stock": 4,
+    "profitable_recovered": 3,
+    "dates": [
+      "2026-01-08",
+      "2026-01-27",
+      "2026-05-20",
+      "2026-07-22"
+    ]
+  },
+  {
+    "policy": "four_fit",
+    "missed8_recovered_same_stock": 4,
+    "profitable_recovered": 3,
+    "dates": [
+      "2026-01-27",
+      "2026-03-06",
+      "2026-04-17",
+      "2026-05-20"
+    ]
+  },
+  {
+    "policy": "four_fit_delay",
+    "missed8_recovered_same_stock": 2,
+    "profitable_recovered": 1,
+    "dates": [
+      "2026-01-27",
+      "2026-05-20"
+    ]
+  }
+]

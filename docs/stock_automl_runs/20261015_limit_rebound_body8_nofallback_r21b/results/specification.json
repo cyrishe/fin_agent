@@ -1,0 +1,17 @@
+{
+  "name": "R21B_Top3_shape_body_above_minus8_no_replacement",
+  "threshold": "D1 C09:35/O09:30-1 > -0.08 strictly; equal excluded",
+  "user_choice": "Add to original shape rules; earlier period separately marked. User correction: if new rule filters original daily choice, no replacement; keep cash that day.",
+  "stage1": "Saved R18 daily-only models for each month Jan2025..Oct2026; no retraining, no D1 minute feature in D0 RF.",
+  "early": "Jan-Aug2025 uses first saved September2025 R19 shape rule for retrospective coverage; this rule was selected using Jan-Jun training and Jul-Aug validation and is NOT contemporaneous or independently heldout in early months.",
+  "later": "Sep2025..Oct2026 uses each month original frozen R19 rule; extra -8 threshold is user-proposed after seeing historical results, not a new blind test.",
+  "entry": "First find original R20 daily choice: first eligible bar-end 09:36..09:40 open below cap, simultaneous candidates sorted by D0 rank<=3. Then keep only if body>-8%; otherwise NO TRADE for the entire day, never replace with another rank or later minute.",
+  "36bar": "09:36 means 09:35-09:36. Full high/low is retrospective display only, never an input to the opening-price execution decision.",
+  "prices": "Buy return and 09:36 high/low returns relative to D1 preclose. Five-minute body relative to D1 open.",
+  "portfolio": "NAV starts1, each entry min(25% prior closing NAV, available cash), <=4 overlapping lots, no debt, daily close mark-to-market, sells at close fund next morning. Fractional shares and zero fees/slippage, as prior R13/R15 gross convention.",
+  "exits": "Separate accounts for D2/D3/D4 close; strategy exits D2 sealed close else D3 sealed close else D4 close. Pending endpoint positions remain marked at known daily closes.",
+  "anomalies": "Chosen records with historical missing/nonpositive or discontinuous prices up to relevant exit are excluded from that account, no stock replacement. Ex-post data cleaning disclosed, never claimed knowable at entry. Pending future observations not excluded.",
+  "monthly": "NAV end/prior-month-end-1; monthly close-based maximum drawdown resets peak at prior month NAV. Account months are holding-calendar months; trade counts/means use D1 entry month. Final Oct2026 incomplete.",
+  "source_rules_sha256": "e18cf06b9917bd508dfdb031935b7864f35bb864603964e70a5ce977069b2f86",
+  "source_data_sha256": "bb069c02ea02547d1e2e983d7ac28d5d03bd0621de3964f3c2851f1e6cacfcef"
+}

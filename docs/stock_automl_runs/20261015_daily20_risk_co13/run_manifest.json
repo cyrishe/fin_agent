@@ -1,0 +1,28 @@
+{
+  "sklearn": "1.7.1",
+  "numpy": "2.5.2",
+  "scipy": "1.18.1",
+  "pandas": "2.3.3",
+  "joblib": "1.6.0",
+  "python": "3.12.14",
+  "features": [
+    "market_breadth",
+    "market_median",
+    "market_iqr",
+    "lag5_market_breadth",
+    "signal_return",
+    "relative_amount20",
+    "lag_return",
+    "prior5_return",
+    "prior5_vol",
+    "prior10_vol",
+    "prior5_downside",
+    "prior5_worst"
+  ],
+  "folds": 308,
+  "heads": 616,
+  "formal_days": 288,
+  "warmup_days": 20,
+  "total_seconds": 1197.365972268999,
+  "max_reload_error": 0.0
+}

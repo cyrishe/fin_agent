@@ -1,0 +1,9 @@
+model,large_winners_blocked,opening_big_winners_total,opening_big_winners_blocked_pct
+extreme_hist_aggressive,52022,64702,80.40246051126704
+extreme_hist_main,48704,64702,75.2743346418967
+extreme_logistic_aggressive,52711,64702,81.4673425860097
+extreme_logistic_main,50431,64702,77.94349479150567
+nonfall_hist_aggressive,56776,64702,87.74999227226361
+nonfall_hist_main,55679,64702,86.05452690797811
+nonfall_logistic_aggressive,53417,64702,82.55849896448332
+nonfall_logistic_main,52959,64702,81.85063831102593

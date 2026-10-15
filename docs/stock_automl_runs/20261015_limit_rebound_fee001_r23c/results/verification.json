@@ -1,0 +1,24 @@
+{
+  "status": "PASS",
+  "unchanged_signals": 106,
+  "raw_entry_minutes": 106,
+  "raw_daily_price_fields": 422,
+  "independent_cash_days": 186,
+  "monthly_checks": 10,
+  "no_borrowing": true,
+  "no_future_sale_cash_used": true,
+  "endpoint_marked_not_sold": true,
+  "spec_sha256": "285fa484950c34b537c50ba005402e718f7f22aaa2fb2feb0a44ed237ae10c35",
+  "signals_sha256": "8d40164b2e52f6ea648dd97737c5d41f5c5c01f2c51d2261660fd6a6fb26172d",
+  "workbook_cells": 3703,
+  "workbook_sha256": "47c7bac38171b52849a71f490d9607b147742a793535733df7706ddff57f9db3",
+  "pytest": "5 passed; cash rotation, falling budget, idle-day Sharpe, cross-month marking, fee-aware budget and endpoint",
+  "fee_rate": 0.001,
+  "buy_fee_checks": 106,
+  "sell_fee_checks": 105,
+  "zero_fee_reproduction": {
+    "days": 186,
+    "status": "PASS",
+    "max_nav_error": 0.0
+  }
+}

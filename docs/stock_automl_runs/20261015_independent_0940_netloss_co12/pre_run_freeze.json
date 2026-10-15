@@ -1,0 +1,24 @@
+{
+  "created_utc": "2026-10-15T07:15:02.570789+00:00",
+  "files": {
+    "scripts/experiment_independent_0940_netloss_co12.py": "1aaab802ddbe6e42c05664b419f57718ed787491226b85bbdddd22f01c0279f2",
+    "scripts/build_independent_0940_netloss_co12.py": "95aa05a9044f16eb21bcada211d968a3692f357242278a049c3388c3d27d7ff0",
+    "scripts/report_independent_0940_netloss_co12.py": "d27d7fa0e2f045fa82ba4c6f49e3d555883f23df5d487582be10872df4725769",
+    "tests/automl/test_independent_0940_netloss_co12.py": "49ccc05fa532d313156adcca92ee8eecddc7d84766a3dff76e756a6a770ef87a",
+    "scripts/predict_independent_0940_netloss_co12.py": "0aadddb4cf82a5a619f5170a7fc45e5d7eab0571b31f7c21dc138fd88a4f8d1a",
+    "docs/stock_automl_runs/20261015_independent_0940_netloss_co12/DESIGN.md": "85417789ba404359cc1f0e645c34dee8be176ff666e6baec9ba4072b9ba07770",
+    "outputs/stock_automl/independent_0940_netloss_co12/dataset.csv.gz": "15ac8a78cde22200a89d0c36668de988a056218d375d75f9c519085bd6d92248",
+    "outputs/stock_automl/independent_open_drop_co10/folds.json": "e3e08804827e54a975a6b780dc70036de53cdba37a97b8cc30b940a289582ad4",
+    "outputs/stock_automl/b1_market_trade_gate_co8/dataset.csv.gz": "292f4ea31b9d8b388f7825b3ea9b2a9f74703005a6da5a2ba742aae06f07078b",
+    "outputs/stock_automl/b1_market_trade_gate_co8/valuation_paths.csv.gz": "3bae52bd9bdcdd44e597ad3e446920894d2eefd5c30615b7d1ea59234dfc8467",
+    "docs/stock_automl_runs/20261015_b1_calibrated_risk_co11/daily.csv.gz": "65a5e74fe57fc1714f819891292d6ed21a43902a3e0e804aabe6c91867a3bee8",
+    "docs/stock_automl_runs/20261015_b1_calibrated_risk_co11/summary.csv": "3fbd88801f4968fd9818177ceb4ca758c00dbd90d42683158a86c7f0f5c7d301",
+    "scripts/experiment_b1_calibrated_risk_co11.py": "764faa74aa365b304c98a09cf7999d59a56b4acf847c0010efda0ae307b4817e",
+    "scripts/experiment_b1_market_trade_gate_co8.py": "3f5690e1105921e953c6ce161a408d44c47d6d6086232596ba7759b93f1da2d6",
+    "scripts/report_b1_market_trade_gate_co8.py": "1359a5d0b7dcc793047704b80635d9f0e1f26ecde98a9673b56149f91124b893"
+  },
+  "git_base": "e55c2f79787f22efac905cfb08a52b0ad7db6198",
+  "prior_research_seen": true,
+  "primary": "tail_budget_005",
+  "B1_used_in_independent_training": false
+}

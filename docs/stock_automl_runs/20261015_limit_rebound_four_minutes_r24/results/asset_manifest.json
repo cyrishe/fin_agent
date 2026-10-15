@@ -1,0 +1,110 @@
+{
+  "python": "3.12.14",
+  "files": [
+    {
+      "path": "outputs/stock_automl/limit_rebound_four_minutes_r24_20261015/specification.json",
+      "bytes": 2070,
+      "sha256": "2d7bfaed38b8622aeb729dac300c60661a3b9af400434bb9d5592371a948544a"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_four_minutes_r24_20261015/four_all_top3.pkl",
+      "bytes": 8152728,
+      "sha256": "d64e267e191a77f8b926e61ed8cfcae658369a873b428453941a30e7da287f68"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_four_minutes_r24_20261015/first10_evidence.pkl",
+      "bytes": 1527608,
+      "sha256": "21158c3e37a8a36de502f2b3bd79904f2db983fc1212a5dcb4fe7d554ef6ea29"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_four_minutes_r24_20261015/raw_sources.json",
+      "bytes": 83463,
+      "sha256": "2f45fd943d2fcff38d4d7a024f5baac6772eb440e039cd557cd9b9e41c226369"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_four_minutes_r24_20261015/four_rules_frozen.json",
+      "bytes": 492785,
+      "sha256": "81f297e033f8911f967d14a4801faff5edc308ace8b4e35b3f2447a9ebd7df49"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_four_minutes_r24_20261015/selection_receipt.json",
+      "bytes": 123,
+      "sha256": "d7c12cc235f4240d4fa3d35f5c8ac77842212089c4503aa1db032a3dbd4368d3"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_four_minutes_r24_20261015/policy_picks.pkl",
+      "bytes": 1065665,
+      "sha256": "536541756debda7237a2b28670cf539c7adbb1950b78e71e7e343891402afa83"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_four_minutes_r24_20261015/daily_nav.pkl",
+      "bytes": 118124,
+      "sha256": "f9c0a869e5c2f81f3dcd38c76b9f2322a06a3ae2ae149295081c3c26b2a7e2ab"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_four_minutes_r24_20261015/ledger.pkl",
+      "bytes": 874681,
+      "sha256": "60cf776d5bc2a0413c3f581f232b882cedf675c75600266319665add82329747"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_four_minutes_r24_20261015/accounts.json",
+      "bytes": 13367,
+      "sha256": "89cdd69dc37adf296b981d78e67e6d118a41d48d0d7de782bb6d6134a99c4df6"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_four_minutes_r24_20261015/monthly.json",
+      "bytes": 25453,
+      "sha256": "ee6a634cc4df905bb603126dcd08cf9d6b8aeb4a900de58722fb7ac7a41c5343"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_four_minutes_r24_20261015/exclusions.json",
+      "bytes": 3,
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_four_minutes_r24_20261015/selection_metrics.json",
+      "bytes": 133977,
+      "sha256": "9a2f5e0949aad47714a307d082bd272f6d0727714a32622d97b2244fa88f5b49"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_four_minutes_r24_20261015/shape_discrimination.json",
+      "bytes": 9863,
+      "sha256": "e22daa1c869d593cc89297782b1b405dd99d366938428bb94c8dff7268c6619d"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_four_minutes_r24_20261015/monitor_counts.json",
+      "bytes": 77433,
+      "sha256": "164e093a01b69b46b77d1c6a4809e7f84d73123b765bf5a46988df825af1229b"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_four_minutes_r24_20261015/recovery.json",
+      "bytes": 855,
+      "sha256": "9af34b5fe623239c83f948603837e203ac76820e6de7d9345cbfd83519a58097"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_four_minutes_r24_20261015/verification.json",
+      "bytes": 325,
+      "sha256": "e36fda53bf736fcd951692bb1f7849f204bb4a8bc750ae294bcf7b694b2b93ed"
+    },
+    {
+      "path": "docs/stock_automl_runs/20261015_limit_rebound_four_minutes_r24/README.md",
+      "bytes": 9503,
+      "sha256": "24ff6203b924f148475635f5c3a58703f6cefb0057f6dfee4e795b8d4eb2ed64"
+    },
+    {
+      "path": "scripts/experiment_limit_rebound_four_minutes_r24.py",
+      "bytes": 15935,
+      "sha256": "bbac1597910523160f0df5f10c17f0ef836241c365392100a29e4dcb522b7e3e"
+    },
+    {
+      "path": "scripts/report_limit_rebound_four_minutes_r24.py",
+      "bytes": 9670,
+      "sha256": "d118045d1db7ca1a9a9b2316cc51c590526b4218e4140e0c2e2210261f97aed3"
+    },
+    {
+      "path": "tests/automl/test_limit_rebound_four_minutes_r24.py",
+      "bytes": 1865,
+      "sha256": "13996b3935b30e807708dc4a85c9efa18f98ed18b51b7d5b968e8b96588673b8"
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "package": "/Volumes/ext/fin_agent/outputs/stock_automl/independent_open_drop_co10/package",
+  "files": 1162,
+  "manifest_sha256": "641327c10a7abac508d90488968b88412f97dff4818c5360ac80eaa9e74a4a51",
+  "zip_path": "/Volumes/ext/fin_agent/outputs/stock_automl/independent_open_drop_co10/CO10_独立全市场_次晨大跌与不跌分类_20261015.zip",
+  "zip_sha256": "7f407c518e715a18ca4c22e788af41f274facf08a07249c6b5b2297295bc9129",
+  "zip_bytes": 523279993,
+  "zip_all_members_readback_verified": true,
+  "cloud_verified": false,
+  "cloud_status": "待同步",
+  "db_readback_verified": true,
+  "local_mirror": "/Volumes/ext/fin_agent/outputs/stock_automl/aliyun_drive_local/策略训练/收盘开盘_20261014/02_联合目标与尾部风险/20261015_CO10_独立全市场_次晨大跌与不跌分类",
+  "database_record": {
+    "experiment_id": "CO10_20261015_independent_market_open_drop",
+    "manifest_sha256": "641327c10a7abac508d90488968b88412f97dff4818c5360ac80eaa9e74a4a51",
+    "file_count": 1162,
+    "local_path": "/Volumes/ext/fin_agent/outputs/stock_automl/aliyun_drive_local/策略训练/收盘开盘_20261014/02_联合目标与尾部风险/20261015_CO10_独立全市场_次晨大跌与不跌分类",
+    "cloud_path": "策略训练/收盘开盘_20261014/02_联合目标与尾部风险/20261015_CO10_独立全市场_次晨大跌与不跌分类",
+    "local_verified_at": "2026-10-15 14:33:17.400985",
+    "cloud_verified_at": null
+  }
+}

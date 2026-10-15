@@ -1,0 +1,22 @@
+{
+  "package": "/Volumes/ext/fin_agent/outputs/stock_automl/b1_calibrated_risk_co11/package",
+  "manifest_sha256": "26b14720de41ef7da950e319b6677fbe646d0117dd45f3604250fc3eecba7a0a",
+  "files": 100,
+  "zip_path": "/Volumes/ext/fin_agent/outputs/stock_automl/b1_calibrated_risk_co11/CO11_B1叠加独立下跌概率_校准轮空与减仓_20261015.zip",
+  "zip_sha256": "bc60af4a323fe112b4ae2987449a265691073e0e64c25aa8735e5c48bf7f72dd",
+  "zip_bytes": 94326457,
+  "zip_all_members_readback_verified": true,
+  "cloud_verified": false,
+  "cloud_status": "待同步",
+  "database_readback_verified": true,
+  "local_mirror_readback_verified": true,
+  "database_record": {
+    "experiment_id": "CO11_20261015_B1_calibrated_independent_risk",
+    "manifest_sha256": "26b14720de41ef7da950e319b6677fbe646d0117dd45f3604250fc3eecba7a0a",
+    "file_count": 100,
+    "local_path": "/Volumes/ext/fin_agent/outputs/stock_automl/aliyun_drive_local/策略训练/收盘开盘_20261014/02_联合目标与尾部风险/20261015_CO11_B1叠加独立下跌概率_校准轮空与减仓",
+    "cloud_path": "策略训练/收盘开盘_20261014/02_联合目标与尾部风险/20261015_CO11_B1叠加独立下跌概率_校准轮空与减仓",
+    "local_verified_at": "2026-10-15 14:54:51.622293",
+    "cloud_verified_at": null
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "same_d0_scores_open_policy": {
+    "trades": 260,
+    "h3_rate": 0.5769230769230769,
+    "d2_mean": 0.010577923839833971,
+    "strategy_mean": -0.0032653931894063046,
+    "already_capped_at_0940": 86
+  },
+  "0940_selected_priced_at_daily_open": {
+    "trades": 260,
+    "d2_mean": -0.02911285269711727,
+    "strategy_mean": -0.05104550915164569
+  },
+  "0940_selected_priced_at_0941": {
+    "trades": 260,
+    "d2_mean": -0.00923261195192553,
+    "strategy_mean": -0.03214847193190991
+  }
+}

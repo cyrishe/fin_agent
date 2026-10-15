@@ -11,9 +11,11 @@ import getpass
 import hashlib
 import json
 import os
+import platform
 import subprocess
 import sys
 import tempfile
+from collections import Counter
 from concurrent.futures import ThreadPoolExecutor
 from datetime import date, datetime, time
 from pathlib import Path
@@ -25,6 +27,7 @@ import numpy as np
 import pandas as pd
 import pymysql
 import sklearn
+import scipy
 from dotenv import load_dotenv
 
 from scripts.audit_automl_mk_1m_entry_limit import mark_entry_limit
@@ -38,6 +41,7 @@ from scripts.run_automl_four_class_pipeline import (
     train_model,
 )
 from scripts.audit_automl_minute_api_backfill import request_bars
+from scripts.automl_strategy_execution import record_decisions, record_run, settle_previous
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -545,11 +549,71 @@ def init_db(env_file: Path) -> None:
         db.commit()
 
 
+def backfill_execution(env_file: Path, user_id: str, strategy_id: str,
+                       as_of_date: str) -> dict:
+    """Adopt saved selections once; existing price observations remain frozen."""
+    with write_connection(env_file) as db:
+        try:
+            with db.cursor() as cursor:
+                cursor.execute("""SELECT s.*,d.title AS strategy_name
+                    FROM automl_strategy_selection AS s
+                    JOIN automl_strategy_definition AS d
+                      ON d.user_id=s.user_id AND d.strategy_id=s.strategy_id
+                    WHERE s.user_id=%s AND s.strategy_id=%s AND s.signal_date<=%s
+                    ORDER BY s.signal_date,s.selection_rank""",
+                    (user_id, strategy_id, as_of_date))
+                rows = cursor.fetchall()
+                counts = Counter(row["signal_date"] for row in rows)
+                for row in rows:
+                    context = row["context_json"]
+                    if isinstance(context, str):
+                        context = json.loads(context)
+                    signal_date = row["signal_date"].isoformat()
+                    signal_at = row["signal_capture_at"]
+                    if signal_at is not None:
+                        signal_at = str(signal_at)
+                    environment = {"source": "legacy_selection",
+                                   "sklearn": context.get("sklearn_version"),
+                                   "training_sha256": context.get("training_sha256"),
+                                   "prepared_at": context.get("prepared_at"),
+                                   "quote_source": row["quote_source"]}
+                    record_run(
+                        cursor, user_id=user_id, strategy_id=strategy_id,
+                        strategy_name=row["strategy_name"], signal_date=signal_date,
+                        signal_at=signal_at, candidate_count=row["candidate_count"],
+                        selection_count=counts[row["signal_date"]],
+                        model_sha256=context.get("model_sha256"),
+                        environment=environment)
+                    record_decisions(
+                        cursor, user_id=user_id, strategy_id=strategy_id,
+                        strategy_name=row["strategy_name"], signal_date=signal_date,
+                        picks=[{"selection_rank": row["selection_rank"],
+                                "symbol6": row["stock_code"], "name": row["stock_name"],
+                                "actionable": row["actionable"],
+                                "signal_price": row["signal_price"],
+                                "predicted_class": row["predicted_class"],
+                                "turnover_gate_pass": row["turnover_gate_pass"],
+                                "p_lt0": row["p_lt0"], "p_0to1": row["p_0to1"],
+                                "p_1to3": row["p_1to3"], "p_ge3": row["p_ge3"]}],
+                        signal_at=signal_at,
+                        model_sha256=context.get("model_sha256"),
+                        environment=environment)
+                settled = settle_previous(cursor, user_id=user_id,
+                                          strategy_id=strategy_id,
+                                          as_of_date=as_of_date)
+            db.commit()
+            return {"adopted_selection_rows": len(rows),
+                    "settled_previous": settled}
+        except Exception:
+            db.rollback()
+            raise
+
+
 def save_selection(env_file: Path, user_id: str, day: str, picks: list[dict],
                    meta: dict, candidate_count: int, source: str,
                    captured_at: str | None, *, strategy_id: str = STRATEGY_ID,
                    strategy_definition: dict | None = None,
-                   extra_context: dict | None = None) -> None:
+                   extra_context: dict | None = None) -> list[dict]:
     strategy_definition = strategy_definition or DEFINITION
     definition = json.dumps(strategy_definition, ensure_ascii=False, sort_keys=True)
     definition_hash = hashlib.sha256(definition.encode()).hexdigest()
@@ -611,7 +675,33 @@ def save_selection(env_file: Path, user_id: str, day: str, picks: list[dict],
                          candidate_count, meta["training_rows"],
                          json.dumps(meta["training_dates"]), json.dumps(features),
                          json.dumps(context, ensure_ascii=False), source, captured_at))
+                environment = {
+                    "python": platform.python_version(),
+                    "platform": platform.platform(),
+                    "sklearn": sklearn.__version__,
+                    "numpy": np.__version__,
+                    "scipy": scipy.__version__,
+                    "pandas": pd.__version__,
+                    "pipeline_sha256": meta.get("pipeline_sha256"),
+                    "training_sha256": meta["training_sha256"],
+                    "prepared_at": meta["prepared_at"],
+                    "quote_source": source,
+                }
+                settled = settle_previous(cursor, user_id=user_id,
+                                          strategy_id=strategy_id, as_of_date=day)
+                record_run(cursor, user_id=user_id, strategy_id=strategy_id,
+                           strategy_name=strategy_definition["title"],
+                           signal_date=day, signal_at=captured_at,
+                           candidate_count=candidate_count, selection_count=len(picks),
+                           model_sha256=meta["model_sha256"],
+                           environment=environment)
+                record_decisions(cursor, user_id=user_id, strategy_id=strategy_id,
+                                 strategy_name=strategy_definition["title"],
+                                 signal_date=day, picks=picks, signal_at=captured_at,
+                                 model_sha256=meta["model_sha256"],
+                                 environment=environment)
             db.commit()
+            return settled
         except Exception:
             db.rollback()
             raise
@@ -703,7 +793,8 @@ def extract_tar(archive_tar: Path, needed: list[str], output: Path) -> Path:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("mode", choices=("init-db", "prepare", "run"), nargs="?", default="run")
+    parser.add_argument("mode", choices=("init-db", "backfill-execution", "prepare", "run"),
+                        nargs="?", default="run")
     parser.add_argument("--date", default=datetime.now(SHANGHAI).date().isoformat())
     parser.add_argument("--user-id", default=getpass.getuser())
     parser.add_argument("--env-file", type=Path, default=ROOT / ".env")
@@ -719,6 +810,12 @@ def main() -> int:
     if args.mode == "init-db":
         init_db(args.env_file)
         print("kingdomai策略表和选股结果表已准备")
+        return 0
+    if args.mode == "backfill-execution":
+        if not args.write_db:
+            parser.error("backfill-execution须显式指定--write-db")
+        result = backfill_execution(args.env_file, args.user_id, STRATEGY_ID, day)
+        print(json.dumps(result, ensure_ascii=False, indent=2, default=str))
         return 0
     now = datetime.now(SHANGHAI)
     if args.mode == "run" and day == now.date().isoformat() and now.time() < time(14, 40):
@@ -744,9 +841,10 @@ def main() -> int:
             model, meta = model_for_day(db, day, archive, args.cache)
             result = score(db, day, model, meta, archive, args.output, args.cache)
     if args.mode == "run" and args.write_db:
-        save_selection(args.env_file, args.user_id, day, result["picks"], meta,
-                       result["candidate_count"], result["quote_source"],
-                       result["signal_capture_at"])
+        result["settled_previous"] = save_selection(
+            args.env_file, args.user_id, day, result["picks"], meta,
+            result["candidate_count"], result["quote_source"],
+            result["signal_capture_at"])
         result["saved_to_kingdomai"] = True
     print(json.dumps(result, ensure_ascii=False, indent=2, default=str))
     return 0

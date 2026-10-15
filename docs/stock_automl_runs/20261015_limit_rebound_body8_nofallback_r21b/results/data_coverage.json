@@ -1,0 +1,14 @@
+{
+  "rows": 1284,
+  "D0_days": 428,
+  "first_D0": "2025-01-02",
+  "last_D0": "2026-10-13",
+  "first_D1": "2025-01-03",
+  "last_D1": "2026-10-14",
+  "audited": 1276,
+  "eligible": 1270,
+  "selected_old": 263,
+  "selected_new": 245,
+  "new_rejected_body": 27,
+  "frozen_original_rules_sha256": "e18cf06b9917bd508dfdb031935b7864f35bb864603964e70a5ce977069b2f86"
+}

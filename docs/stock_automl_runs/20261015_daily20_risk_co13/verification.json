@@ -1,0 +1,128 @@
+{
+  "monthly_checkpoints": [
+    {
+      "day": "2025-08-29",
+      "calibration_rebuild_error": 0.0,
+      "feature_only_prediction_error": 0.0,
+      "test_rows": 5141,
+      "prediction_seconds": 0.04191568299938808,
+      "late_feature_rejected": true
+    },
+    {
+      "day": "2025-09-30",
+      "calibration_rebuild_error": 0.0,
+      "feature_only_prediction_error": 0.0,
+      "test_rows": 5147,
+      "prediction_seconds": 0.035872843000106514,
+      "late_feature_rejected": true
+    },
+    {
+      "day": "2025-10-31",
+      "calibration_rebuild_error": 0.0,
+      "feature_only_prediction_error": 0.0,
+      "test_rows": 5153,
+      "prediction_seconds": 0.03698577300019679,
+      "late_feature_rejected": true
+    },
+    {
+      "day": "2025-11-28",
+      "calibration_rebuild_error": 0.0,
+      "feature_only_prediction_error": 0.0,
+      "test_rows": 5149,
+      "prediction_seconds": 0.03723979999995208,
+      "late_feature_rejected": true
+    },
+    {
+      "day": "2025-12-31",
+      "calibration_rebuild_error": 0.0,
+      "feature_only_prediction_error": 0.0,
+      "test_rows": 5171,
+      "prediction_seconds": 0.04404430499926093,
+      "late_feature_rejected": true
+    },
+    {
+      "day": "2026-01-30",
+      "calibration_rebuild_error": 0.0,
+      "feature_only_prediction_error": 0.0,
+      "test_rows": 5171,
+      "prediction_seconds": 0.04015436700137798,
+      "late_feature_rejected": true
+    },
+    {
+      "day": "2026-02-27",
+      "calibration_rebuild_error": 0.0,
+      "feature_only_prediction_error": 0.0,
+      "test_rows": 5176,
+      "prediction_seconds": 0.03530750600111787,
+      "late_feature_rejected": true
+    },
+    {
+      "day": "2026-03-31",
+      "calibration_rebuild_error": 0.0,
+      "feature_only_prediction_error": 0.0,
+      "test_rows": 5179,
+      "prediction_seconds": 0.04632166900046286,
+      "late_feature_rejected": true
+    },
+    {
+      "day": "2026-04-30",
+      "calibration_rebuild_error": 0.0,
+      "feature_only_prediction_error": 0.0,
+      "test_rows": 5151,
+      "prediction_seconds": 0.04830990399932489,
+      "late_feature_rejected": true
+    },
+    {
+      "day": "2026-05-29",
+      "calibration_rebuild_error": 0.0,
+      "feature_only_prediction_error": 0.0,
+      "test_rows": 5190,
+      "prediction_seconds": 0.14662177500213147,
+      "late_feature_rejected": true
+    },
+    {
+      "day": "2026-06-30",
+      "calibration_rebuild_error": 0.0,
+      "feature_only_prediction_error": 0.0,
+      "test_rows": 5186,
+      "prediction_seconds": 0.0395493539981544,
+      "late_feature_rejected": true
+    },
+    {
+      "day": "2026-07-31",
+      "calibration_rebuild_error": 0.0,
+      "feature_only_prediction_error": 0.0,
+      "test_rows": 5197,
+      "prediction_seconds": 0.038681791000271915,
+      "late_feature_rejected": true
+    },
+    {
+      "day": "2026-08-31",
+      "calibration_rebuild_error": 0.0,
+      "feature_only_prediction_error": 0.0,
+      "test_rows": 5206,
+      "prediction_seconds": 0.03926262299864902,
+      "late_feature_rejected": true
+    },
+    {
+      "day": "2026-09-30",
+      "calibration_rebuild_error": 0.0,
+      "feature_only_prediction_error": 0.0,
+      "test_rows": 5213,
+      "prediction_seconds": 0.037917669000307797,
+      "late_feature_rejected": true
+    },
+    {
+      "day": "2026-10-13",
+      "calibration_rebuild_error": 0.0,
+      "feature_only_prediction_error": 0.0,
+      "test_rows": 5212,
+      "prediction_seconds": 0.15015620000121999,
+      "late_feature_rejected": true
+    }
+  ],
+  "old_monthly_metrics_exact": true,
+  "all_scores_reloaded_during_training": true,
+  "max_calibration_error": 0.0,
+  "max_feature_only_error": 0.0
+}

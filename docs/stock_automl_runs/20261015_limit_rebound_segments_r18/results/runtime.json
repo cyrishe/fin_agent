@@ -1,0 +1,9 @@
+{
+  "python": "3.12.14 (main, Aug 25 2026, 13:50:22) [Clang 22.1.3 ]",
+  "platform": "macOS-15.7.9-x86_64-i386-64bit",
+  "numpy": "2.5.3",
+  "pandas": "2.3.3",
+  "joblib": "1.6.0",
+  "sklearn": "1.7.1",
+  "training_command_prefix": "DYLD_LIBRARY_PATH=/tmp/fin_agent_sklearn171/sklearn/.dylibs PYTHONPATH=/tmp/fin_agent_sklearn171:. OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 .venv-automl/bin/python"
+}

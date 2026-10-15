@@ -1,0 +1,747 @@
+{
+  "experiment": "R17_independent_three_day_downside",
+  "source_sha256": "47048e72ffd5023b0378ca6aec9145e7df7c7955b878e1b87fbe4fe72f31f3ef",
+  "features": [
+    "board_streak_days",
+    "streak_return",
+    "d0_return",
+    "d0_open_gap",
+    "d0_range",
+    "d0_lower_shadow",
+    "d0_close_position",
+    "first_open_gap",
+    "first_range",
+    "first_one_price",
+    "d0_volume_ratio_pre5",
+    "d0_amount_ratio_pre5",
+    "d0_turnover_pct",
+    "d0_amount_100m",
+    "d0_volume_ratio_first",
+    "d0_turnover_ratio_first",
+    "first_turnover_pct",
+    "pre5_return",
+    "pre5_mean_turnover_pct",
+    "market_limit_count",
+    "market_prev_limit_count",
+    "market_up_fraction",
+    "market_median_return",
+    "limit_rate",
+    "d0_one_price",
+    "range_to_limit",
+    "gap_to_limit",
+    "turnover_ratio_pre5",
+    "pre5_volatility",
+    "pre5_up_count",
+    "market_reseal_fraction",
+    "amount_board_rank",
+    "turnover_board_rank",
+    "log_float_mv_proxy",
+    "log_price"
+  ],
+  "configs": [
+    {
+      "id": "rf_p1_natural",
+      "algorithm": "rf",
+      "parameters": {
+        "n_estimators": 80,
+        "max_depth": 4,
+        "min_samples_leaf": 100,
+        "max_features": 0.8
+      },
+      "scheme": "natural",
+      "fraction": 0.8,
+      "seeds": [
+        171,
+        191
+      ]
+    },
+    {
+      "id": "rf_p1_sqrt_weight",
+      "algorithm": "rf",
+      "parameters": {
+        "n_estimators": 80,
+        "max_depth": 4,
+        "min_samples_leaf": 100,
+        "max_features": 0.8
+      },
+      "scheme": "sqrt_weight",
+      "fraction": 0.8,
+      "seeds": [
+        171,
+        191
+      ]
+    },
+    {
+      "id": "rf_p1_balanced_weight",
+      "algorithm": "rf",
+      "parameters": {
+        "n_estimators": 80,
+        "max_depth": 4,
+        "min_samples_leaf": 100,
+        "max_features": 0.8
+      },
+      "scheme": "balanced_weight",
+      "fraction": 0.8,
+      "seeds": [
+        171,
+        191
+      ]
+    },
+    {
+      "id": "rf_p1_undersample",
+      "algorithm": "rf",
+      "parameters": {
+        "n_estimators": 80,
+        "max_depth": 4,
+        "min_samples_leaf": 100,
+        "max_features": 0.8
+      },
+      "scheme": "undersample",
+      "fraction": 0.8,
+      "seeds": [
+        171,
+        191
+      ]
+    },
+    {
+      "id": "rf_p2_natural",
+      "algorithm": "rf",
+      "parameters": {
+        "n_estimators": 80,
+        "max_depth": 6,
+        "min_samples_leaf": 50,
+        "max_features": 0.8
+      },
+      "scheme": "natural",
+      "fraction": 0.8,
+      "seeds": [
+        171,
+        191
+      ]
+    },
+    {
+      "id": "rf_p2_sqrt_weight",
+      "algorithm": "rf",
+      "parameters": {
+        "n_estimators": 80,
+        "max_depth": 6,
+        "min_samples_leaf": 50,
+        "max_features": 0.8
+      },
+      "scheme": "sqrt_weight",
+      "fraction": 0.8,
+      "seeds": [
+        171,
+        191
+      ]
+    },
+    {
+      "id": "rf_p2_balanced_weight",
+      "algorithm": "rf",
+      "parameters": {
+        "n_estimators": 80,
+        "max_depth": 6,
+        "min_samples_leaf": 50,
+        "max_features": 0.8
+      },
+      "scheme": "balanced_weight",
+      "fraction": 0.8,
+      "seeds": [
+        171,
+        191
+      ]
+    },
+    {
+      "id": "rf_p2_undersample",
+      "algorithm": "rf",
+      "parameters": {
+        "n_estimators": 80,
+        "max_depth": 6,
+        "min_samples_leaf": 50,
+        "max_features": 0.8
+      },
+      "scheme": "undersample",
+      "fraction": 0.8,
+      "seeds": [
+        171,
+        191
+      ]
+    },
+    {
+      "id": "rf_p3_natural",
+      "algorithm": "rf",
+      "parameters": {
+        "n_estimators": 80,
+        "max_depth": 8,
+        "min_samples_leaf": 30,
+        "max_features": 0.8
+      },
+      "scheme": "natural",
+      "fraction": 0.8,
+      "seeds": [
+        171,
+        191
+      ]
+    },
+    {
+      "id": "rf_p3_sqrt_weight",
+      "algorithm": "rf",
+      "parameters": {
+        "n_estimators": 80,
+        "max_depth": 8,
+        "min_samples_leaf": 30,
+        "max_features": 0.8
+      },
+      "scheme": "sqrt_weight",
+      "fraction": 0.8,
+      "seeds": [
+        171,
+        191
+      ]
+    },
+    {
+      "id": "rf_p3_balanced_weight",
+      "algorithm": "rf",
+      "parameters": {
+        "n_estimators": 80,
+        "max_depth": 8,
+        "min_samples_leaf": 30,
+        "max_features": 0.8
+      },
+      "scheme": "balanced_weight",
+      "fraction": 0.8,
+      "seeds": [
+        171,
+        191
+      ]
+    },
+    {
+      "id": "rf_p3_undersample",
+      "algorithm": "rf",
+      "parameters": {
+        "n_estimators": 80,
+        "max_depth": 8,
+        "min_samples_leaf": 30,
+        "max_features": 0.8
+      },
+      "scheme": "undersample",
+      "fraction": 0.8,
+      "seeds": [
+        171,
+        191
+      ]
+    },
+    {
+      "id": "lgb_p1_natural",
+      "algorithm": "lgb",
+      "parameters": {
+        "n_estimators": 160,
+        "learning_rate": 0.04,
+        "num_leaves": 7,
+        "max_depth": 3,
+        "min_child_samples": 80,
+        "reg_lambda": 5.0
+      },
+      "scheme": "natural",
+      "fraction": 0.8,
+      "seeds": [
+        171,
+        191
+      ]
+    },
+    {
+      "id": "lgb_p1_sqrt_weight",
+      "algorithm": "lgb",
+      "parameters": {
+        "n_estimators": 160,
+        "learning_rate": 0.04,
+        "num_leaves": 7,
+        "max_depth": 3,
+        "min_child_samples": 80,
+        "reg_lambda": 5.0
+      },
+      "scheme": "sqrt_weight",
+      "fraction": 0.8,
+      "seeds": [
+        171,
+        191
+      ]
+    },
+    {
+      "id": "lgb_p1_balanced_weight",
+      "algorithm": "lgb",
+      "parameters": {
+        "n_estimators": 160,
+        "learning_rate": 0.04,
+        "num_leaves": 7,
+        "max_depth": 3,
+        "min_child_samples": 80,
+        "reg_lambda": 5.0
+      },
+      "scheme": "balanced_weight",
+      "fraction": 0.8,
+      "seeds": [
+        171,
+        191
+      ]
+    },
+    {
+      "id": "lgb_p1_undersample",
+      "algorithm": "lgb",
+      "parameters": {
+        "n_estimators": 160,
+        "learning_rate": 0.04,
+        "num_leaves": 7,
+        "max_depth": 3,
+        "min_child_samples": 80,
+        "reg_lambda": 5.0
+      },
+      "scheme": "undersample",
+      "fraction": 0.8,
+      "seeds": [
+        171,
+        191
+      ]
+    },
+    {
+      "id": "lgb_p2_natural",
+      "algorithm": "lgb",
+      "parameters": {
+        "n_estimators": 240,
+        "learning_rate": 0.03,
+        "num_leaves": 15,
+        "max_depth": 4,
+        "min_child_samples": 60,
+        "reg_lambda": 10.0
+      },
+      "scheme": "natural",
+      "fraction": 0.8,
+      "seeds": [
+        171,
+        191
+      ]
+    },
+    {
+      "id": "lgb_p2_sqrt_weight",
+      "algorithm": "lgb",
+      "parameters": {
+        "n_estimators": 240,
+        "learning_rate": 0.03,
+        "num_leaves": 15,
+        "max_depth": 4,
+        "min_child_samples": 60,
+        "reg_lambda": 10.0
+      },
+      "scheme": "sqrt_weight",
+      "fraction": 0.8,
+      "seeds": [
+        171,
+        191
+      ]
+    },
+    {
+      "id": "lgb_p2_balanced_weight",
+      "algorithm": "lgb",
+      "parameters": {
+        "n_estimators": 240,
+        "learning_rate": 0.03,
+        "num_leaves": 15,
+        "max_depth": 4,
+        "min_child_samples": 60,
+        "reg_lambda": 10.0
+      },
+      "scheme": "balanced_weight",
+      "fraction": 0.8,
+      "seeds": [
+        171,
+        191
+      ]
+    },
+    {
+      "id": "lgb_p2_undersample",
+      "algorithm": "lgb",
+      "parameters": {
+        "n_estimators": 240,
+        "learning_rate": 0.03,
+        "num_leaves": 15,
+        "max_depth": 4,
+        "min_child_samples": 60,
+        "reg_lambda": 10.0
+      },
+      "scheme": "undersample",
+      "fraction": 0.8,
+      "seeds": [
+        171,
+        191
+      ]
+    },
+    {
+      "id": "lgb_p3_natural",
+      "algorithm": "lgb",
+      "parameters": {
+        "n_estimators": 320,
+        "learning_rate": 0.025,
+        "num_leaves": 31,
+        "max_depth": 5,
+        "min_child_samples": 50,
+        "reg_lambda": 15.0
+      },
+      "scheme": "natural",
+      "fraction": 0.8,
+      "seeds": [
+        171,
+        191
+      ]
+    },
+    {
+      "id": "lgb_p3_sqrt_weight",
+      "algorithm": "lgb",
+      "parameters": {
+        "n_estimators": 320,
+        "learning_rate": 0.025,
+        "num_leaves": 31,
+        "max_depth": 5,
+        "min_child_samples": 50,
+        "reg_lambda": 15.0
+      },
+      "scheme": "sqrt_weight",
+      "fraction": 0.8,
+      "seeds": [
+        171,
+        191
+      ]
+    },
+    {
+      "id": "lgb_p3_balanced_weight",
+      "algorithm": "lgb",
+      "parameters": {
+        "n_estimators": 320,
+        "learning_rate": 0.025,
+        "num_leaves": 31,
+        "max_depth": 5,
+        "min_child_samples": 50,
+        "reg_lambda": 15.0
+      },
+      "scheme": "balanced_weight",
+      "fraction": 0.8,
+      "seeds": [
+        171,
+        191
+      ]
+    },
+    {
+      "id": "lgb_p3_undersample",
+      "algorithm": "lgb",
+      "parameters": {
+        "n_estimators": 320,
+        "learning_rate": 0.025,
+        "num_leaves": 31,
+        "max_depth": 5,
+        "min_child_samples": 50,
+        "reg_lambda": 15.0
+      },
+      "scheme": "undersample",
+      "fraction": 0.8,
+      "seeds": [
+        171,
+        191
+      ]
+    },
+    {
+      "id": "xgb_p1_natural",
+      "algorithm": "xgb",
+      "parameters": {
+        "n_estimators": 160,
+        "learning_rate": 0.04,
+        "max_depth": 2,
+        "min_child_weight": 20,
+        "reg_lambda": 5.0
+      },
+      "scheme": "natural",
+      "fraction": 0.8,
+      "seeds": [
+        171,
+        191
+      ]
+    },
+    {
+      "id": "xgb_p1_sqrt_weight",
+      "algorithm": "xgb",
+      "parameters": {
+        "n_estimators": 160,
+        "learning_rate": 0.04,
+        "max_depth": 2,
+        "min_child_weight": 20,
+        "reg_lambda": 5.0
+      },
+      "scheme": "sqrt_weight",
+      "fraction": 0.8,
+      "seeds": [
+        171,
+        191
+      ]
+    },
+    {
+      "id": "xgb_p1_balanced_weight",
+      "algorithm": "xgb",
+      "parameters": {
+        "n_estimators": 160,
+        "learning_rate": 0.04,
+        "max_depth": 2,
+        "min_child_weight": 20,
+        "reg_lambda": 5.0
+      },
+      "scheme": "balanced_weight",
+      "fraction": 0.8,
+      "seeds": [
+        171,
+        191
+      ]
+    },
+    {
+      "id": "xgb_p1_undersample",
+      "algorithm": "xgb",
+      "parameters": {
+        "n_estimators": 160,
+        "learning_rate": 0.04,
+        "max_depth": 2,
+        "min_child_weight": 20,
+        "reg_lambda": 5.0
+      },
+      "scheme": "undersample",
+      "fraction": 0.8,
+      "seeds": [
+        171,
+        191
+      ]
+    },
+    {
+      "id": "xgb_p2_natural",
+      "algorithm": "xgb",
+      "parameters": {
+        "n_estimators": 240,
+        "learning_rate": 0.03,
+        "max_depth": 3,
+        "min_child_weight": 20,
+        "reg_lambda": 10.0
+      },
+      "scheme": "natural",
+      "fraction": 0.8,
+      "seeds": [
+        171,
+        191
+      ]
+    },
+    {
+      "id": "xgb_p2_sqrt_weight",
+      "algorithm": "xgb",
+      "parameters": {
+        "n_estimators": 240,
+        "learning_rate": 0.03,
+        "max_depth": 3,
+        "min_child_weight": 20,
+        "reg_lambda": 10.0
+      },
+      "scheme": "sqrt_weight",
+      "fraction": 0.8,
+      "seeds": [
+        171,
+        191
+      ]
+    },
+    {
+      "id": "xgb_p2_balanced_weight",
+      "algorithm": "xgb",
+      "parameters": {
+        "n_estimators": 240,
+        "learning_rate": 0.03,
+        "max_depth": 3,
+        "min_child_weight": 20,
+        "reg_lambda": 10.0
+      },
+      "scheme": "balanced_weight",
+      "fraction": 0.8,
+      "seeds": [
+        171,
+        191
+      ]
+    },
+    {
+      "id": "xgb_p2_undersample",
+      "algorithm": "xgb",
+      "parameters": {
+        "n_estimators": 240,
+        "learning_rate": 0.03,
+        "max_depth": 3,
+        "min_child_weight": 20,
+        "reg_lambda": 10.0
+      },
+      "scheme": "undersample",
+      "fraction": 0.8,
+      "seeds": [
+        171,
+        191
+      ]
+    },
+    {
+      "id": "xgb_p3_natural",
+      "algorithm": "xgb",
+      "parameters": {
+        "n_estimators": 320,
+        "learning_rate": 0.025,
+        "max_depth": 4,
+        "min_child_weight": 30,
+        "reg_lambda": 15.0
+      },
+      "scheme": "natural",
+      "fraction": 0.8,
+      "seeds": [
+        171,
+        191
+      ]
+    },
+    {
+      "id": "xgb_p3_sqrt_weight",
+      "algorithm": "xgb",
+      "parameters": {
+        "n_estimators": 320,
+        "learning_rate": 0.025,
+        "max_depth": 4,
+        "min_child_weight": 30,
+        "reg_lambda": 15.0
+      },
+      "scheme": "sqrt_weight",
+      "fraction": 0.8,
+      "seeds": [
+        171,
+        191
+      ]
+    },
+    {
+      "id": "xgb_p3_balanced_weight",
+      "algorithm": "xgb",
+      "parameters": {
+        "n_estimators": 320,
+        "learning_rate": 0.025,
+        "max_depth": 4,
+        "min_child_weight": 30,
+        "reg_lambda": 15.0
+      },
+      "scheme": "balanced_weight",
+      "fraction": 0.8,
+      "seeds": [
+        171,
+        191
+      ]
+    },
+    {
+      "id": "xgb_p3_undersample",
+      "algorithm": "xgb",
+      "parameters": {
+        "n_estimators": 320,
+        "learning_rate": 0.025,
+        "max_depth": 4,
+        "min_child_weight": 30,
+        "reg_lambda": 15.0
+      },
+      "scheme": "undersample",
+      "fraction": 0.8,
+      "seeds": [
+        171,
+        191
+      ]
+    },
+    {
+      "id": "logistic_c0.1_natural",
+      "algorithm": "logistic",
+      "parameters": {
+        "C": 0.1
+      },
+      "scheme": "natural",
+      "fraction": 0.8,
+      "seeds": [
+        171,
+        191
+      ]
+    },
+    {
+      "id": "logistic_c0.1_balanced_weight",
+      "algorithm": "logistic",
+      "parameters": {
+        "C": 0.1
+      },
+      "scheme": "balanced_weight",
+      "fraction": 0.8,
+      "seeds": [
+        171,
+        191
+      ]
+    },
+    {
+      "id": "logistic_c1.0_natural",
+      "algorithm": "logistic",
+      "parameters": {
+        "C": 1.0
+      },
+      "scheme": "natural",
+      "fraction": 0.8,
+      "seeds": [
+        171,
+        191
+      ]
+    },
+    {
+      "id": "logistic_c1.0_balanced_weight",
+      "algorithm": "logistic",
+      "parameters": {
+        "C": 1.0
+      },
+      "scheme": "balanced_weight",
+      "fraction": 0.8,
+      "seeds": [
+        171,
+        191
+      ]
+    }
+  ],
+  "test_months": [
+    "2025-09",
+    "2025-10",
+    "2025-11",
+    "2025-12",
+    "2026-01",
+    "2026-02",
+    "2026-03",
+    "2026-04",
+    "2026-05",
+    "2026-06",
+    "2026-07",
+    "2026-08",
+    "2026-09",
+    "2026-10"
+  ],
+  "rolling": "6 months train / next 2 validation / next 1 test; no refit on validation",
+  "target": {
+    "positive": "D3 close < 0.95 * D0 close",
+    "negative": "D3 close >= 0.98 * D0 close",
+    "middle": "[-5%,-2%) excluded only from binary fitting and binary classification metrics"
+  },
+  "universe": "historical non-ST, supported price-limit boards, exact rounded D0 cap; every sealed stock-day incl all streak lengths, no D1 activation requirement",
+  "quality": "complete positive D1-D3 closes/precloses; each next preclose must match preceding close within 0.011; otherwise outcomes unavailable, predictions retained",
+  "cv": "inside six-month train: first3 -> month4, first4 -> month5, first5 -> month6; D3 labels purged at each boundary; ongoing board events removed at preceding cutoff",
+  "selection": "maximize .5*(CV AUC+validation AUC)-.25*abs(CV AUC-validation AUC)-.25*std(monthly AUC across CV and validation); challenger must at least match regularized logistic baseline on CV and validation AUC",
+  "threshold": "fixed CV all-outcome score quantiles 70/80/90%; main flag at 80th percentile (nominal highest-risk 20%); threshold never tuned on test or prior-strategy lists",
+  "scores": "binary pole-discrimination scores, not calibrated all-population crash probabilities",
+  "sampling": "80% without replacement per month/label; natural/sqrt-balanced/full-balanced/1:1 undersample; average RNG171+191 for each configuration",
+  "independence": "no R15/R16 scores or selection membership in fitting, feature construction or model/threshold selection",
+  "test_history": "previously researched dates; chronological out-of-sample replay, not newly unseen market history",
+  "pretest_runtime_revision": "RF 240 trees reduced to 80 per seed before any R17 held-out result was generated; partial 240-tree pilot preserved separately and not used for model selection",
+  "versions": {
+    "python": "3.12.14",
+    "sklearn": "1.7.1",
+    "lightgbm": "4.6.0",
+    "xgboost": "3.0.2",
+    "numpy": "2.5.3",
+    "pandas": "2.3.3"
+  }
+}

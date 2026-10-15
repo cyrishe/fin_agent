@@ -1,0 +1,20 @@
+{
+  "rows": 47253,
+  "multi_board_rows": 10591,
+  "old_pre5_contains_any_board": 16931,
+  "normal_zero_days": 94,
+  "normal_less_than5": 8984,
+  "board_price_discontinuity": 19,
+  "d0_turnover_quantiles": {
+    "0.1": 2.11232,
+    "0.5": 7.6545,
+    "0.9": 23.214920000000006
+  },
+  "d0_volume_below_normal_fraction": 0.25139652801650053,
+  "choices": {
+    "old": 8,
+    "aligned": 4,
+    "segments": 2
+  },
+  "multi_board_old_pre5_contamination": 1.0
+}

@@ -1,0 +1,19 @@
+{
+  "first_stage_bundles": 814,
+  "first_stage_models": 1606,
+  "sample_draws_verified": 1584,
+  "all_forecast_probabilities_exact": true,
+  "reference_matches_R15": true,
+  "time_cutoffs_verified": true,
+  "all_choices_reconstructed_without_test": true,
+  "second_stage_reload_exact": true,
+  "labels_and_returns_reconciled": true,
+  "independent_daily_price_checks": 304,
+  "test_top5_rows": 1335,
+  "test_days": 267,
+  "selected_trades": {
+    "过滤前": 256,
+    "过滤后": 241
+  },
+  "manifest_sha256": "71f0ddc42b76b0a566372dcf5abbeb7b8b35ab64a465a464c36303b7f8f05a48"
+}

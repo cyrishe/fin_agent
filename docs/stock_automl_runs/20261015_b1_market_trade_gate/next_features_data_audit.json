@@ -1,0 +1,222 @@
+{
+  "kcrp_stock_moneyflow": [
+    {
+      "trade_date": "2026-10-08",
+      "rows_count": 5209,
+      "min_created": "2026-10-08 15:08:00",
+      "max_created": "2026-10-08 15:58:01",
+      "min_updated": "2026-10-08 15:08:00",
+      "max_updated": "2026-10-09 01:41:02"
+    },
+    {
+      "trade_date": "2026-10-09",
+      "rows_count": 5210,
+      "min_created": "2026-10-09 15:58:01",
+      "max_created": "2026-10-09 15:58:01",
+      "min_updated": "2026-10-09 15:58:01",
+      "max_updated": "2026-10-09 15:58:01"
+    },
+    {
+      "trade_date": "2026-10-12",
+      "rows_count": 5212,
+      "min_created": "2026-10-12 15:58:01",
+      "max_created": "2026-10-12 15:58:01",
+      "min_updated": "2026-10-12 15:58:01",
+      "max_updated": "2026-10-12 15:58:01"
+    },
+    {
+      "trade_date": "2026-10-13",
+      "rows_count": 5212,
+      "min_created": "2026-10-13 15:58:01",
+      "max_created": "2026-10-13 15:58:01",
+      "min_updated": "2026-10-13 15:58:01",
+      "max_updated": "2026-10-13 15:58:01"
+    },
+    {
+      "trade_date": "2026-10-14",
+      "rows_count": 5214,
+      "min_created": "2026-10-14 15:58:00",
+      "max_created": "2026-10-14 15:58:00",
+      "min_updated": "2026-10-14 15:58:00",
+      "max_updated": "2026-10-14 15:58:00"
+    }
+  ],
+  "kcrp_yp_plate_moneyflow": [
+    {
+      "trade_date": "2026-10-08",
+      "rows_count": 863,
+      "min_created": "2026-10-08 17:00:28",
+      "max_created": "2026-10-08 17:00:28",
+      "min_updated": "2026-10-08 17:00:28",
+      "max_updated": "2026-10-09 17:00:27"
+    },
+    {
+      "trade_date": "2026-10-09",
+      "rows_count": 863,
+      "min_created": "2026-10-09 17:00:27",
+      "max_created": "2026-10-09 17:00:27",
+      "min_updated": "2026-10-09 17:00:27",
+      "max_updated": "2026-10-10 23:00:29"
+    },
+    {
+      "trade_date": "2026-10-12",
+      "rows_count": 863,
+      "min_created": "2026-10-12 23:00:29",
+      "max_created": "2026-10-12 23:00:29",
+      "min_updated": "2026-10-12 23:00:29",
+      "max_updated": "2026-10-13 17:00:29"
+    },
+    {
+      "trade_date": "2026-10-13",
+      "rows_count": 863,
+      "min_created": "2026-10-13 23:00:30",
+      "max_created": "2026-10-13 23:00:30",
+      "min_updated": "2026-10-13 23:00:30",
+      "max_updated": "2026-10-14 16:03:43"
+    },
+    {
+      "trade_date": "2026-10-14",
+      "rows_count": 863,
+      "min_created": "2026-10-14 23:00:19",
+      "max_created": "2026-10-14 23:00:19",
+      "min_updated": "2026-10-14 23:00:19",
+      "max_updated": "2026-10-14 23:00:19"
+    }
+  ],
+  "kcrp_stock_price": [
+    {
+      "trade_date": "2026-10-08",
+      "rows_count": 5572,
+      "min_created": "2026-10-08 15:08:00",
+      "max_created": "2026-10-08 15:08:00",
+      "min_updated": "2026-10-08 15:08:00",
+      "max_updated": "2026-10-08 15:08:00"
+    },
+    {
+      "trade_date": "2026-10-09",
+      "rows_count": 5573,
+      "min_created": "2026-10-09 15:08:01",
+      "max_created": "2026-10-09 15:08:01",
+      "min_updated": "2026-10-09 15:08:01",
+      "max_updated": "2026-10-09 15:08:01"
+    },
+    {
+      "trade_date": "2026-10-12",
+      "rows_count": 5573,
+      "min_created": "2026-10-12 15:08:01",
+      "max_created": "2026-10-12 15:08:01",
+      "min_updated": "2026-10-12 15:08:01",
+      "max_updated": "2026-10-12 15:08:01"
+    },
+    {
+      "trade_date": "2026-10-13",
+      "rows_count": 5574,
+      "min_created": "2026-10-13 15:08:01",
+      "max_created": "2026-10-13 15:08:01",
+      "min_updated": "2026-10-13 15:08:01",
+      "max_updated": "2026-10-13 15:08:01"
+    },
+    {
+      "trade_date": "2026-10-14",
+      "rows_count": 5574,
+      "min_created": "2026-10-14 15:08:01",
+      "max_created": "2026-10-14 15:58:00",
+      "min_updated": "2026-10-14 15:08:01",
+      "max_updated": "2026-10-14 15:58:00"
+    }
+  ],
+  "industry": [
+    {
+      "industry_type": "AMAC",
+      "level": 1,
+      "rows_count": 18774,
+      "min_created": "2024-05-31 15:40:06",
+      "max_updated": "2026-10-15 00:20:21"
+    },
+    {
+      "industry_type": "CITI",
+      "level": 1,
+      "rows_count": 8889,
+      "min_created": "2024-05-31 15:40:06",
+      "max_updated": "2026-10-07 07:15:30"
+    },
+    {
+      "industry_type": "CITI",
+      "level": 2,
+      "rows_count": 8889,
+      "min_created": "2024-05-31 15:40:06",
+      "max_updated": "2026-10-07 07:15:30"
+    },
+    {
+      "industry_type": "CITI",
+      "level": 3,
+      "rows_count": 8889,
+      "min_created": "2024-05-31 15:40:06",
+      "max_updated": "2026-10-07 07:15:30"
+    },
+    {
+      "industry_type": "CRSC",
+      "level": 1,
+      "rows_count": 7059,
+      "min_created": "2024-05-31 15:40:06",
+      "max_updated": "2026-10-13 00:20:21"
+    },
+    {
+      "industry_type": "CRSC",
+      "level": 2,
+      "rows_count": 7059,
+      "min_created": "2024-05-31 15:40:06",
+      "max_updated": "2026-10-13 00:20:21"
+    },
+    {
+      "industry_type": "SW2021",
+      "level": 1,
+      "rows_count": 13705,
+      "min_created": "2026-03-11 17:49:45",
+      "max_updated": "2026-10-14 15:23:23"
+    },
+    {
+      "industry_type": "SW2021",
+      "level": 2,
+      "rows_count": 13704,
+      "min_created": "2026-03-11 17:49:45",
+      "max_updated": "2026-10-14 15:23:23"
+    },
+    {
+      "industry_type": "SW2021",
+      "level": 3,
+      "rows_count": 13698,
+      "min_created": "2026-03-11 17:49:45",
+      "max_updated": "2026-10-14 15:23:23"
+    }
+  ],
+  "other_possible_tables": [
+    {
+      "TABLE_NAME": "kcrp_dwd_fund_index"
+    },
+    {
+      "TABLE_NAME": "kcrp_fund_baseinfo"
+    },
+    {
+      "TABLE_NAME": "kcrp_fund_dividend"
+    },
+    {
+      "TABLE_NAME": "kcrp_fund_price"
+    },
+    {
+      "TABLE_NAME": "kcrp_hk_stock_cashflow"
+    },
+    {
+      "TABLE_NAME": "kcrp_stock_cashflow"
+    },
+    {
+      "TABLE_NAME": "kcrp_stock_moneyflow"
+    },
+    {
+      "TABLE_NAME": "kcrp_yp_plate_moneyflow"
+    },
+    {
+      "TABLE_NAME": "kcrp_yp_plate_moneyflow_stat"
+    }
+  ]
+}

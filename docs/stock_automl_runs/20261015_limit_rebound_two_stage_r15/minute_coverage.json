@@ -1,0 +1,10 @@
+{
+  "requested": 2591,
+  "valid": 2580,
+  "full_day_audit": 2580,
+  "sources": {
+    "local_unadjusted": 2333,
+    "database_finalized": 247,
+    "missing_or_mismatch": 11
+  }
+}

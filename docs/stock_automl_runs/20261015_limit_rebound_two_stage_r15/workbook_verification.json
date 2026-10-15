@@ -1,0 +1,17 @@
+{
+  "path": "/Volumes/ext/fin_agent/outputs/stock_automl/limit_rebound_two_stage_r15_20261015/D0初选_D1早盘避险_6月训练2月验证_R15_20261015.xlsx",
+  "bytes": 2268192,
+  "sha256": "87ebaa4f23689201ad418a889b7cbe9aa3a30cd3d372bdd5f1357b4b78b264ec",
+  "sheet_rows": {
+    "交易效果": 248,
+    "逐月收益": 112,
+    "第一阶段": 564,
+    "风险过滤": 42,
+    "月度模型": 14,
+    "前五明细": 12062
+  },
+  "zip_integrity": true,
+  "error_cells": 0,
+  "tables": 6,
+  "visual_review": "all sheets and detail numeric sections reviewed"
+}

@@ -1,0 +1,17 @@
+block_days,paired_daily_delta_pp,ci95_low_pp,ci95_high_pp,bootstrap_replicates,note,model,comparison
+5,-0.04638072131216396,-0.20596007936757255,0.11088657271039357,4000,exploratory paired block interval; repeated research not corrected,20d_new_net_p20,60d_new_net_p20
+10,-0.04638072131216396,-0.21009338707854916,0.11892305525955792,4000,exploratory paired block interval; repeated research not corrected,20d_new_net_p20,60d_new_net_p20
+5,-0.06807275673894268,-0.202935897528834,0.06851212648635682,4000,exploratory paired block interval; repeated research not corrected,20d_new_net_p20,same_exposure_B1
+10,-0.06807275673894268,-0.1995397780996965,0.060482967222449724,4000,exploratory paired block interval; repeated research not corrected,20d_new_net_p20,same_exposure_B1
+5,-0.05289269295709817,-0.141735696530824,0.03762900638610355,4000,exploratory paired block interval; repeated research not corrected,20d_new_net_size20_40,60d_new_net_size20_40
+10,-0.05289269295709817,-0.14696635187018253,0.038847452274559886,4000,exploratory paired block interval; repeated research not corrected,20d_new_net_size20_40,60d_new_net_size20_40
+5,-0.03137524986694465,-0.09924104237635935,0.03622739107144236,4000,exploratory paired block interval; repeated research not corrected,20d_new_net_size20_40,same_exposure_B1
+10,-0.03137524986694465,-0.09744715461370791,0.033896955279575106,4000,exploratory paired block interval; repeated research not corrected,20d_new_net_size20_40,same_exposure_B1
+5,-0.02636306845511361,-0.1950709812143702,0.1411289131035879,4000,exploratory paired block interval; repeated research not corrected,20d_new_tail_veto01,60d_new_tail_veto01
+10,-0.02636306845511361,-0.20410580727685115,0.1425583387661018,4000,exploratory paired block interval; repeated research not corrected,20d_new_tail_veto01,60d_new_tail_veto01
+5,0.05164280523893318,-0.12413295796402145,0.23128702583876365,4000,exploratory paired block interval; repeated research not corrected,20d_new_tail_veto01,same_exposure_B1
+10,0.05164280523893318,-0.12824989644280793,0.22601066594926922,4000,exploratory paired block interval; repeated research not corrected,20d_new_tail_veto01,same_exposure_B1
+5,-0.04063686656317699,-0.10568969304987934,0.025039753045494578,4000,exploratory paired block interval; repeated research not corrected,20d_tail_budget_005,60d_tail_budget_005
+10,-0.04063686656317699,-0.10900426607354965,0.023241256463606114,4000,exploratory paired block interval; repeated research not corrected,20d_tail_budget_005,60d_tail_budget_005
+5,-0.0032829595758928336,-0.07553090565607505,0.07399781286284088,4000,exploratory paired block interval; repeated research not corrected,20d_tail_budget_005,same_exposure_B1
+10,-0.0032829595758928336,-0.07272139243074949,0.06931426359008666,4000,exploratory paired block interval; repeated research not corrected,20d_tail_budget_005,same_exposure_B1

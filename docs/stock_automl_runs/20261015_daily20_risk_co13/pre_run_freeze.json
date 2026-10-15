@@ -1,0 +1,43 @@
+{
+  "created_utc": "2026-10-15T08:02:09.574802+00:00",
+  "files": {
+    "scripts/experiment_daily20_risk_co13.py": "5ea0185fb88a8b8a446888f02b44e01df6c35d88cc6b6b6e8af868200f6e1637",
+    "scripts/report_daily20_risk_co13.py": "e77123f1ad61f85229101240ad9a3c247effc1ca4b423208b2133d4f8b9faa19",
+    "tests/automl/test_daily20_risk_co13.py": "35fe4ab3861c81cb4ce4874a04a2139c928e1a26238c1f8a53456d8fc8030906",
+    "docs/stock_automl_runs/20261015_daily20_risk_co13/DESIGN.md": "a3345e494c5ffca760255dc0fca221044313e4289a4df323ff87f82669a753ad",
+    "outputs/stock_automl/independent_0940_netloss_co12/dataset.csv.gz": "15ac8a78cde22200a89d0c36668de988a056218d375d75f9c519085bd6d92248",
+    "outputs/stock_automl/b1_market_trade_gate_co8/dataset.csv.gz": "292f4ea31b9d8b388f7825b3ea9b2a9f74703005a6da5a2ba742aae06f07078b",
+    "outputs/stock_automl/b1_market_trade_gate_co8/valuation_paths.csv.gz": "3bae52bd9bdcdd44e597ad3e446920894d2eefd5c30615b7d1ea59234dfc8467",
+    "docs/stock_automl_runs/20261015_independent_0940_netloss_co12/daily.csv.gz": "1ab1ac13daff5c5e477bccd187ce3b45f672ea77ac5d3591e54f4cfbe7c874fa",
+    "docs/stock_automl_runs/20261015_independent_0940_netloss_co12/monthly.csv": "31d4466eba00a112557dc28c5d29ecf8b32f011f6e2968e4636abe14e2c416d8",
+    "docs/stock_automl_runs/20261015_independent_0940_netloss_co12/summary.csv": "d51f4511ed29bffea208c924c1a55e94dc8d97b8f7c12c75d64f433e1d75b5a1",
+    "docs/stock_automl_runs/20261015_independent_0940_netloss_co12/top1_classification.json": "160e23f9f4dd8067b58d001024de7a54b75fc5729547d8e1880a871a870cdfc3",
+    "scripts/build_independent_0940_netloss_co12.py": "95aa05a9044f16eb21bcada211d968a3692f357242278a049c3388c3d27d7ff0",
+    "scripts/experiment_independent_0940_netloss_co12.py": "1aaab802ddbe6e42c05664b419f57718ed787491226b85bbdddd22f01c0279f2",
+    "scripts/report_independent_0940_netloss_co12.py": "d27d7fa0e2f045fa82ba4c6f49e3d555883f23df5d487582be10872df4725769",
+    "scripts/predict_independent_0940_netloss_co12.py": "0aadddb4cf82a5a619f5170a7fc45e5d7eab0571b31f7c21dc138fd88a4f8d1a",
+    "scripts/package_independent_0940_netloss_co12.py": "b3f61ad6038d7fd8ec48ab73449ec70eb5345b34ae61555e5ab15dbf116030e2",
+    "scripts/analyze_independent_0940_netloss_co12.py": "a5c8545bf0e09a5efc2fa3a70e719b48477f337fdf52fb6b599785d822977579",
+    "scripts/verify_independent_0940_netloss_co12.py": "6a213ee432727f030b6822a49a7453296e1f40fa41d928b9a87c9442e55ab994",
+    "scripts/experiment_b1_calibrated_risk_co11.py": "764faa74aa365b304c98a09cf7999d59a56b4acf847c0010efda0ae307b4817e",
+    "scripts/experiment_b1_market_trade_gate_co8.py": "3f5690e1105921e953c6ce161a408d44c47d6d6086232596ba7759b93f1da2d6",
+    "scripts/report_b1_market_trade_gate_co8.py": "1359a5d0b7dcc793047704b80635d9f0e1f26ecde98a9673b56149f91124b893"
+  },
+  "git_base": "e55c2f79787f22efac905cfb08a52b0ad7db6198",
+  "train_days": 20,
+  "calibration_OOS_days": 20,
+  "refresh": "daily",
+  "parameters": {
+    "max_iter": 60,
+    "learning_rate": 0.05,
+    "max_leaf_nodes": 7,
+    "min_samples_leaf": 100,
+    "l2_regularization": 10,
+    "max_bins": 63,
+    "early_stopping": false,
+    "random_state": 1015
+  },
+  "primary": "tail_budget_005",
+  "prior_research_seen": true,
+  "thresholds_unchanged": true
+}

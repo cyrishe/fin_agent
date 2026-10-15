@@ -150,6 +150,7 @@ activemq-data/
 # Environments
 .env
 .env_tmp
+.llm_env
 .env.backup*
 .env.before-*
 .env.pre-*

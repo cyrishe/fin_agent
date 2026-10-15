@@ -1,0 +1,49 @@
+{
+  "scope": "K500 monthly stability follow-up; no retraining or threshold selection",
+  "source_sha256": {
+    "docs/stock_automl_runs/20261015_daily20_risk_co13/rank_gate_monthly.csv": "901f6c2c83cb5fbd3ce95de6ddb07a70373b27de88e8e44c375a4877bc5b2b1b",
+    "docs/stock_automl_runs/20261015_daily20_risk_co13/rank_gate_daily.csv.gz": "0798f64e0d8d0c320c99e12f18909d817d22bdbe74da924a566f48e0aebf76a9",
+    "docs/stock_automl_runs/20261015_daily20_risk_co13/rank_gate_summary.csv": "c7a07fb1b4eaadeef5dbd3208fde27da583da31f905a192f563721b1f8845f47"
+  },
+  "formula": "Monthly subset return = 100*(product(1+monthly_net_nav_pct/100)-1); losing streak counted across executed trades, excluding cash days; subset removal is a hindsight concentration diagnostic, not a tradable rule.",
+  "results": [
+    {
+      "model": "60d_rank_top500",
+      "positive_months": 5,
+      "negative_months": 9,
+      "zero_months": 1,
+      "may_june_compound_pct": 16.19219523515547,
+      "other_months_compound_pct": -16.89924347526839,
+      "aug_to_oct13_compound_pct": -5.357300419367872,
+      "max_consecutive_losing_trades": 4,
+      "worst_account_trade_pct": -7.5214555621373895,
+      "worst_trade": {
+        "signal_date": "2026-02-13",
+        "symbol6": "688027"
+      },
+      "months_at_most_two_trades": 9,
+      "settled_drawdown_pct": 22.915900025570977,
+      "minute_close_drawdown_pct": 23.079420978465524,
+      "retained_large_losses": 8
+    },
+    {
+      "model": "20d_rank_top500",
+      "positive_months": 6,
+      "negative_months": 8,
+      "zero_months": 1,
+      "may_june_compound_pct": 33.109571959434845,
+      "other_months_compound_pct": -6.610657313751256,
+      "aug_to_oct13_compound_pct": -9.091422330509157,
+      "max_consecutive_losing_trades": 7,
+      "worst_account_trade_pct": -4.2936434708042395,
+      "worst_trade": {
+        "signal_date": "2026-08-18",
+        "symbol6": "301013"
+      },
+      "months_at_most_two_trades": 6,
+      "settled_drawdown_pct": 10.332114002839443,
+      "minute_close_drawdown_pct": 14.554542719772313,
+      "retained_large_losses": 9
+    }
+  ]
+}

@@ -1,0 +1,7 @@
+block_days,paired_daily_delta_pp,ci95_low_pp,ci95_high_pp,bootstrap_replicates,note,K
+5,0.044040513480506624,-0.1120340496861958,0.19738159884511852,4000,exploratory paired block interval; repeated research not corrected,100
+10,0.044040513480506624,-0.1125250861859667,0.1972096535392553,4000,exploratory paired block interval; repeated research not corrected,100
+5,0.13878306204884464,-0.008673586773268366,0.290436322589968,4000,exploratory paired block interval; repeated research not corrected,250
+10,0.13878306204884464,-0.018359149318174787,0.30790091706243344,4000,exploratory paired block interval; repeated research not corrected,250
+5,0.08882294169243597,-0.05876657996207947,0.24055756742800816,4000,exploratory paired block interval; repeated research not corrected,500
+10,0.08882294169243597,-0.057761302112128377,0.2363430845085798,4000,exploratory paired block interval; repeated research not corrected,500

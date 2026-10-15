@@ -1,0 +1,186 @@
+{
+  "local_status": "complete",
+  "cloud_status": "not_synced",
+  "files": [
+    {
+      "path": "outputs/stock_automl/limit_rebound_fee001_r23c_20261015/specification.json",
+      "bytes": 2518,
+      "sha256": "285fa484950c34b537c50ba005402e718f7f22aaa2fb2feb0a44ed237ae10c35"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_fee001_r23c_20261015/signals.pkl",
+      "bytes": 141135,
+      "sha256": "8d40164b2e52f6ea648dd97737c5d41f5c5c01f2c51d2261660fd6a6fb26172d"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_fee001_r23c_20261015/inherited_models.json",
+      "bytes": 6053,
+      "sha256": "4879d5a40262cb443d2c33b166cceddc8944cdd135cff39b102d72981390e0ba"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_fee001_r23c_20261015/inherited_rules.json",
+      "bytes": 3857,
+      "sha256": "1f0b65a4c166e70bba53898cf6cbdb70a9963738b089856da3d2b17042b629e2"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_fee001_r23c_20261015/summary.json",
+      "bytes": 976,
+      "sha256": "d1bbbf9acce37b11e067b01e63b1c6163272735f8f69593a08a9e47d0003a88b"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_fee001_r23c_20261015/monthly.json",
+      "bytes": 3966,
+      "sha256": "5bea0f6a9e66f36c0ae599847b2ca3f304cf00392cfa2d6b722275681ee1ead8"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_fee001_r23c_20261015/excluded.json",
+      "bytes": 3,
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_fee001_r23c_20261015/daily_nav.pkl",
+      "bytes": 21330,
+      "sha256": "144b1ade8ec281da8ad2afc2eb873a1e9da221e0a2c2d7359bc23b96ba07134f"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_fee001_r23c_20261015/ledger.pkl",
+      "bytes": 159031,
+      "sha256": "edf60f55c2bc36d2f57093461b990847cf376f654be8a4cd3b69e09e424397d9"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_fee001_r23c_20261015/gross_reproduction.json",
+      "bytes": 62,
+      "sha256": "f9002e685301bbdde08cb83b24d622bcec95431dbaa1ef721195ac4d33f95607"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_fee001_r23c_20261015/output_config.json",
+      "bytes": 94,
+      "sha256": "e53e17cf00f746a8a8a9458eb8d396525bb06d3e50f4c236ceffa46d9376b3ea"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_fee001_r23c_20261015/workbook_data.json",
+      "bytes": 131574,
+      "sha256": "becc8ec1ec1f52608d70b4877e8d219659a4d119f3c91010c9c9f2b1cd2ed1df"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_fee001_r23c_20261015/workbook_notes.json",
+      "bytes": 2070,
+      "sha256": "c25f820535dca12872646e5d8985700248c125272b48761df91a54e15a14a1e7"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_fee001_r23c_20261015/preview_资金总览_0.png",
+      "bytes": 148164,
+      "sha256": "dd259a20270c19ba7e9665868d76fe7cd02869717f2714c69bfb93cefd00a8f5"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_fee001_r23c_20261015/preview_月度表现_0.png",
+      "bytes": 41268,
+      "sha256": "9d286ef930b46a4aab370e8770781040e3b243ed574a059edbb89ad74f8cde48"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_fee001_r23c_20261015/preview_月度表现_5.png",
+      "bytes": 33286,
+      "sha256": "ae1bbcbad6f262f6ee9e7a47faecadf1103a9d774cc3b52b4c0de12e7f155ae7"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_fee001_r23c_20261015/preview_每日资金_0.png",
+      "bytes": 42305,
+      "sha256": "e1aa213d2ef76ed9d8e38974251e9d1a9247e6ead1b158e84a24cd941b33b031"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_fee001_r23c_20261015/preview_每日资金_5.png",
+      "bytes": 35351,
+      "sha256": "7591dad8bb837251397a85eff4d346e2220efb6ab66a94f25783afe03e40d636"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_fee001_r23c_20261015/preview_买卖明细_0.png",
+      "bytes": 47255,
+      "sha256": "b6b8f5aeafa48b483eb2ca21d262876ce0312e800e9dd399af96cec9a16b0bcf"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_fee001_r23c_20261015/preview_买卖明细_5.png",
+      "bytes": 43793,
+      "sha256": "fc330666bce426b75787b0a0f4a65d6337c20bfc9522fab181d40d332c5204d6"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_fee001_r23c_20261015/preview_买卖明细_10.png",
+      "bytes": 39682,
+      "sha256": "a95194ded217181385019df6c237c39a40751a6e5c66114677c0f18fd569d071"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_fee001_r23c_20261015/preview_买卖明细_15.png",
+      "bytes": 12752,
+      "sha256": "7156eeafeecd2f61e974496537beab3edadf00d1ef50c5945b34ab4e30a5e6e7"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_fee001_r23c_20261015/preview_pending.png",
+      "bytes": 34444,
+      "sha256": "0382c4ec4966b047930f5e7b9fcb6097e3965559eca4be9f9e493a21eb05266a"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_fee001_r23c_20261015/preview_notes.png",
+      "bytes": 207630,
+      "sha256": "abfc4b290bc26145a664709c378e25b2f740c58a351d6ea4e94f029a990c02e9"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_fee001_r23c_20261015/workbook_checks.txt",
+      "bytes": 2071,
+      "sha256": "654b1e17c6fcd0d6553a8dfe6281212abb7fa63eb41ea277023d0bdc8cc530d0"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_fee001_r23c_20261015/百万资金轮换_单边千一费后_R23C_20261015.xlsx",
+      "bytes": 44342,
+      "sha256": "47c7bac38171b52849a71f490d9607b147742a793535733df7706ddff57f9db3"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_fee001_r23c_20261015/百万资金轮换_单边千一费后_R23C_20261015.xlsx.inspect.ndjson",
+      "bytes": 1176318,
+      "sha256": "bac49d79108d081d5991c4b8aea9a3cfa29f305e2f4b382d5ccf396d60bb9117"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_fee001_r23c_20261015/verification.json",
+      "bytes": 846,
+      "sha256": "1c11fb983a8efab77eb14d58cfe04b4daa25778ca4638dd5fa0a19d3357fcb55"
+    },
+    {
+      "path": "scripts/replay_limit_rebound_cash_r23.py",
+      "bytes": 9940,
+      "sha256": "343c60ac7f47519217a602b59233ad9b88494c0592b6ddf35a0744d8e3517073"
+    },
+    {
+      "path": "scripts/replay_limit_rebound_fees_r23c.py",
+      "bytes": 2470,
+      "sha256": "7c07f728a933ba0951663e8d6a2d2bb7bd1713e17a512440d1dde9d1ae27ec19"
+    },
+    {
+      "path": "scripts/verify_limit_rebound_cash_r23.py",
+      "bytes": 8252,
+      "sha256": "f45d3de54d45a2b32270fd31e08750d6139cc5ac51bc04aba6cd080f01fd310a"
+    },
+    {
+      "path": "scripts/verify_limit_rebound_fees_r23c.py",
+      "bytes": 230,
+      "sha256": "43fcd0639f3ece23506910874ce931b7f3dabfac033f36d504f15b201b23f768"
+    },
+    {
+      "path": "scripts/report_limit_rebound_cash_r23.py",
+      "bytes": 9373,
+      "sha256": "dec691a25ca6ab3255bbc9adffab3a21a4dd8b7ffc1c776d834bc6123950df01"
+    },
+    {
+      "path": "scripts/build_limit_rebound_cash_r23.mjs",
+      "bytes": 4539,
+      "sha256": "85b7f75d5aa8cf41ee3b689857ffd09686042a853190a857dc65e7a8c847a4dc"
+    },
+    {
+      "path": "tests/automl/test_limit_rebound_cash_r23.py",
+      "bytes": 2669,
+      "sha256": "f4cae24e50893de784fa0dcc3a1d262571095b8516ad0b50e5ed037fc4907c2d"
+    },
+    {
+      "path": "docs/stock_automl_runs/20261015_limit_rebound_fee001_r23c/README.md",
+      "bytes": 3997,
+      "sha256": "34c25bd1fad3630d6cde6a3327eefe9ab8191ea06c9be0e903939b33a8e36674"
+    }
+  ]
+}

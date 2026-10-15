@@ -1,0 +1,10 @@
+feature,latest_input,formula
+market_breadth,14:40,沪深有效14:40价/当日前收−1大于0的比例
+market_median,14:40,上述横截面收益中位数
+market_iqr,14:40,上述横截面收益75%分位−25%分位
+lag5_market_breadth,T−1收盘,前5个市场日有效成交股票的上涨比例均值
+relative_turnover5,14:40,截至14:40分钟股数/昨日股本代理×100/前5日平均换手率
+last5_return,14:40,14:40 close/14:36 open−1
+last30_position,14:40,(14:40 close−末30根最低low)/(末30根最高high−最低low)，平盘0.5
+prior5_return,T−1收盘,此前5个市场日close/preclose连乘−1
+open_gap,T开盘,09:31分钟open/当日前收−1

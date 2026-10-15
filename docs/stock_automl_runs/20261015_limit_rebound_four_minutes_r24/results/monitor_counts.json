@@ -1,0 +1,4808 @@
+[
+  {
+    "policy": "five",
+    "date": "2025-09-02",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "five",
+    "date": "2025-09-03",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "five",
+    "date": "2025-09-04",
+    "ranked": 3,
+    "shape_pass": 0
+  },
+  {
+    "policy": "five",
+    "date": "2025-09-05",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "five",
+    "date": "2025-09-08",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "five",
+    "date": "2025-09-09",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "five",
+    "date": "2025-09-10",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "five",
+    "date": "2025-09-11",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "five",
+    "date": "2025-09-12",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "five",
+    "date": "2025-09-15",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "five",
+    "date": "2025-09-16",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "five",
+    "date": "2025-09-17",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "five",
+    "date": "2025-09-18",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "five",
+    "date": "2025-09-19",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "five",
+    "date": "2025-09-22",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "five",
+    "date": "2025-09-23",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "five",
+    "date": "2025-09-24",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "five",
+    "date": "2025-09-25",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "five",
+    "date": "2025-09-26",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "five",
+    "date": "2025-09-29",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "five",
+    "date": "2025-09-30",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "five",
+    "date": "2025-10-09",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "five",
+    "date": "2025-10-10",
+    "ranked": 3,
+    "shape_pass": 0
+  },
+  {
+    "policy": "five",
+    "date": "2025-10-13",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "five",
+    "date": "2025-10-14",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "five",
+    "date": "2025-10-15",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "five",
+    "date": "2025-10-16",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "five",
+    "date": "2025-10-17",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "five",
+    "date": "2025-10-20",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "five",
+    "date": "2025-10-21",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "five",
+    "date": "2025-10-22",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "five",
+    "date": "2025-10-23",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "five",
+    "date": "2025-10-24",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "five",
+    "date": "2025-10-27",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "five",
+    "date": "2025-10-28",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "five",
+    "date": "2025-10-29",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "five",
+    "date": "2025-10-30",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "five",
+    "date": "2025-10-31",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "five",
+    "date": "2025-11-03",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "five",
+    "date": "2025-11-04",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "five",
+    "date": "2025-11-05",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "five",
+    "date": "2025-11-06",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "five",
+    "date": "2025-11-07",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "five",
+    "date": "2025-11-10",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "five",
+    "date": "2025-11-11",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "five",
+    "date": "2025-11-12",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "five",
+    "date": "2025-11-13",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "five",
+    "date": "2025-11-14",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "five",
+    "date": "2025-11-17",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "five",
+    "date": "2025-11-18",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "five",
+    "date": "2025-11-19",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "five",
+    "date": "2025-11-20",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "five",
+    "date": "2025-11-21",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "five",
+    "date": "2025-11-24",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "five",
+    "date": "2025-11-25",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "five",
+    "date": "2025-11-26",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "five",
+    "date": "2025-11-27",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "five",
+    "date": "2025-11-28",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "five",
+    "date": "2025-12-01",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "five",
+    "date": "2025-12-02",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "five",
+    "date": "2025-12-03",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "five",
+    "date": "2025-12-04",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "five",
+    "date": "2025-12-05",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "five",
+    "date": "2025-12-08",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "five",
+    "date": "2025-12-09",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "five",
+    "date": "2025-12-10",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "five",
+    "date": "2025-12-11",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "five",
+    "date": "2025-12-12",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "five",
+    "date": "2025-12-15",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "five",
+    "date": "2025-12-16",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "five",
+    "date": "2025-12-17",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "five",
+    "date": "2025-12-18",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "five",
+    "date": "2025-12-19",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "five",
+    "date": "2025-12-22",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "five",
+    "date": "2025-12-23",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "five",
+    "date": "2025-12-24",
+    "ranked": 3,
+    "shape_pass": 0
+  },
+  {
+    "policy": "five",
+    "date": "2025-12-25",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "five",
+    "date": "2025-12-26",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "five",
+    "date": "2025-12-29",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "five",
+    "date": "2025-12-30",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "five",
+    "date": "2025-12-31",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "five",
+    "date": "2026-01-05",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "five",
+    "date": "2026-01-06",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "five",
+    "date": "2026-01-07",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "five",
+    "date": "2026-01-08",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "five",
+    "date": "2026-01-09",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "five",
+    "date": "2026-01-12",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "five",
+    "date": "2026-01-13",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "five",
+    "date": "2026-01-14",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "five",
+    "date": "2026-01-15",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "five",
+    "date": "2026-01-16",
+    "ranked": 3,
+    "shape_pass": 0
+  },
+  {
+    "policy": "five",
+    "date": "2026-01-19",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "five",
+    "date": "2026-01-20",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "five",
+    "date": "2026-01-21",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "five",
+    "date": "2026-01-22",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "five",
+    "date": "2026-01-23",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "five",
+    "date": "2026-01-26",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "five",
+    "date": "2026-01-27",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "five",
+    "date": "2026-01-28",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "five",
+    "date": "2026-01-29",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "five",
+    "date": "2026-01-30",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "five",
+    "date": "2026-02-02",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "five",
+    "date": "2026-02-03",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "five",
+    "date": "2026-02-04",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "five",
+    "date": "2026-02-05",
+    "ranked": 3,
+    "shape_pass": 0
+  },
+  {
+    "policy": "five",
+    "date": "2026-02-06",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "five",
+    "date": "2026-02-09",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "five",
+    "date": "2026-02-10",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "five",
+    "date": "2026-02-11",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "five",
+    "date": "2026-02-12",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "five",
+    "date": "2026-02-13",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "five",
+    "date": "2026-02-24",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "five",
+    "date": "2026-02-25",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "five",
+    "date": "2026-02-26",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "five",
+    "date": "2026-02-27",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "five",
+    "date": "2026-03-02",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "five",
+    "date": "2026-03-03",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "five",
+    "date": "2026-03-04",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "five",
+    "date": "2026-03-05",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "five",
+    "date": "2026-03-06",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "five",
+    "date": "2026-03-09",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "five",
+    "date": "2026-03-10",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "five",
+    "date": "2026-03-11",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "five",
+    "date": "2026-03-12",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "five",
+    "date": "2026-03-13",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "five",
+    "date": "2026-03-16",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "five",
+    "date": "2026-03-17",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "five",
+    "date": "2026-03-18",
+    "ranked": 3,
+    "shape_pass": 0
+  },
+  {
+    "policy": "five",
+    "date": "2026-03-19",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "five",
+    "date": "2026-03-20",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "five",
+    "date": "2026-03-23",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "five",
+    "date": "2026-03-24",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "five",
+    "date": "2026-03-25",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "five",
+    "date": "2026-03-26",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "five",
+    "date": "2026-03-27",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "five",
+    "date": "2026-03-30",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "five",
+    "date": "2026-03-31",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "five",
+    "date": "2026-04-01",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "five",
+    "date": "2026-04-02",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "five",
+    "date": "2026-04-03",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "five",
+    "date": "2026-04-07",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "five",
+    "date": "2026-04-08",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "five",
+    "date": "2026-04-09",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "five",
+    "date": "2026-04-10",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "five",
+    "date": "2026-04-13",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "five",
+    "date": "2026-04-14",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "five",
+    "date": "2026-04-15",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "five",
+    "date": "2026-04-16",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "five",
+    "date": "2026-04-17",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "five",
+    "date": "2026-04-20",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "five",
+    "date": "2026-04-21",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "five",
+    "date": "2026-04-22",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "five",
+    "date": "2026-04-23",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "five",
+    "date": "2026-04-24",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "five",
+    "date": "2026-04-27",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "five",
+    "date": "2026-04-28",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "five",
+    "date": "2026-04-29",
+    "ranked": 3,
+    "shape_pass": 0
+  },
+  {
+    "policy": "five",
+    "date": "2026-04-30",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "five",
+    "date": "2026-05-06",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "five",
+    "date": "2026-05-07",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "five",
+    "date": "2026-05-08",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "five",
+    "date": "2026-05-11",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "five",
+    "date": "2026-05-12",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "five",
+    "date": "2026-05-13",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "five",
+    "date": "2026-05-14",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "five",
+    "date": "2026-05-15",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "five",
+    "date": "2026-05-18",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "five",
+    "date": "2026-05-19",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "five",
+    "date": "2026-05-20",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "five",
+    "date": "2026-05-21",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "five",
+    "date": "2026-05-22",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "five",
+    "date": "2026-05-25",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "five",
+    "date": "2026-05-26",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "five",
+    "date": "2026-05-27",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "five",
+    "date": "2026-05-28",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "five",
+    "date": "2026-05-29",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "five",
+    "date": "2026-06-01",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "five",
+    "date": "2026-06-02",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "five",
+    "date": "2026-06-03",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "five",
+    "date": "2026-06-04",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "five",
+    "date": "2026-06-05",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "five",
+    "date": "2026-06-08",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "five",
+    "date": "2026-06-09",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "five",
+    "date": "2026-06-10",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "five",
+    "date": "2026-06-11",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "five",
+    "date": "2026-06-12",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "five",
+    "date": "2026-06-15",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "five",
+    "date": "2026-06-16",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "five",
+    "date": "2026-06-17",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "five",
+    "date": "2026-06-18",
+    "ranked": 3,
+    "shape_pass": 0
+  },
+  {
+    "policy": "five",
+    "date": "2026-06-22",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "five",
+    "date": "2026-06-23",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "five",
+    "date": "2026-06-24",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "five",
+    "date": "2026-06-25",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "five",
+    "date": "2026-06-26",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "five",
+    "date": "2026-06-29",
+    "ranked": 3,
+    "shape_pass": 0
+  },
+  {
+    "policy": "five",
+    "date": "2026-06-30",
+    "ranked": 3,
+    "shape_pass": 0
+  },
+  {
+    "policy": "five",
+    "date": "2026-07-01",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "five",
+    "date": "2026-07-02",
+    "ranked": 3,
+    "shape_pass": 0
+  },
+  {
+    "policy": "five",
+    "date": "2026-07-03",
+    "ranked": 3,
+    "shape_pass": 0
+  },
+  {
+    "policy": "five",
+    "date": "2026-07-06",
+    "ranked": 3,
+    "shape_pass": 0
+  },
+  {
+    "policy": "five",
+    "date": "2026-07-07",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "five",
+    "date": "2026-07-08",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "five",
+    "date": "2026-07-09",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "five",
+    "date": "2026-07-10",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "five",
+    "date": "2026-07-13",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "five",
+    "date": "2026-07-14",
+    "ranked": 2,
+    "shape_pass": 0
+  },
+  {
+    "policy": "five",
+    "date": "2026-07-15",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "five",
+    "date": "2026-07-16",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "five",
+    "date": "2026-07-17",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "five",
+    "date": "2026-07-20",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "five",
+    "date": "2026-07-21",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "five",
+    "date": "2026-07-22",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "five",
+    "date": "2026-07-23",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "five",
+    "date": "2026-07-24",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "five",
+    "date": "2026-07-27",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "five",
+    "date": "2026-07-28",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "five",
+    "date": "2026-07-29",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "five",
+    "date": "2026-07-30",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "five",
+    "date": "2026-07-31",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "five",
+    "date": "2026-08-03",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "five",
+    "date": "2026-08-04",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "five",
+    "date": "2026-08-05",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "five",
+    "date": "2026-08-06",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "five",
+    "date": "2026-08-07",
+    "ranked": 3,
+    "shape_pass": 0
+  },
+  {
+    "policy": "five",
+    "date": "2026-08-10",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "five",
+    "date": "2026-08-11",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "five",
+    "date": "2026-08-12",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "five",
+    "date": "2026-08-13",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "five",
+    "date": "2026-08-14",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "five",
+    "date": "2026-08-17",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "five",
+    "date": "2026-08-18",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "five",
+    "date": "2026-08-19",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "five",
+    "date": "2026-08-20",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "five",
+    "date": "2026-08-21",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "five",
+    "date": "2026-08-24",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "five",
+    "date": "2026-08-25",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "five",
+    "date": "2026-08-26",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "five",
+    "date": "2026-08-27",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "five",
+    "date": "2026-08-28",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "five",
+    "date": "2026-08-31",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "five",
+    "date": "2026-09-01",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "five",
+    "date": "2026-09-02",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "five",
+    "date": "2026-09-03",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "five",
+    "date": "2026-09-04",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "five",
+    "date": "2026-09-07",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "five",
+    "date": "2026-09-08",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "five",
+    "date": "2026-09-09",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "five",
+    "date": "2026-09-10",
+    "ranked": 3,
+    "shape_pass": 0
+  },
+  {
+    "policy": "five",
+    "date": "2026-09-11",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "five",
+    "date": "2026-09-14",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "five",
+    "date": "2026-09-15",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "five",
+    "date": "2026-09-16",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "five",
+    "date": "2026-09-17",
+    "ranked": 3,
+    "shape_pass": 0
+  },
+  {
+    "policy": "five",
+    "date": "2026-09-18",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "five",
+    "date": "2026-09-21",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "five",
+    "date": "2026-09-22",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "five",
+    "date": "2026-09-23",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "five",
+    "date": "2026-09-24",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "five",
+    "date": "2026-09-28",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "five",
+    "date": "2026-09-29",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "five",
+    "date": "2026-09-30",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "five",
+    "date": "2026-10-08",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "five",
+    "date": "2026-10-09",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "five",
+    "date": "2026-10-12",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "five",
+    "date": "2026-10-13",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "five",
+    "date": "2026-10-14",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_old",
+    "date": "2025-09-02",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_old",
+    "date": "2025-09-03",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_old",
+    "date": "2025-09-04",
+    "ranked": 3,
+    "shape_pass": 0
+  },
+  {
+    "policy": "four_old",
+    "date": "2025-09-05",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_old",
+    "date": "2025-09-08",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "four_old",
+    "date": "2025-09-09",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_old",
+    "date": "2025-09-10",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_old",
+    "date": "2025-09-11",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_old",
+    "date": "2025-09-12",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_old",
+    "date": "2025-09-15",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_old",
+    "date": "2025-09-16",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "four_old",
+    "date": "2025-09-17",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "four_old",
+    "date": "2025-09-18",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_old",
+    "date": "2025-09-19",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_old",
+    "date": "2025-09-22",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_old",
+    "date": "2025-09-23",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_old",
+    "date": "2025-09-24",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "four_old",
+    "date": "2025-09-25",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_old",
+    "date": "2025-09-26",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "four_old",
+    "date": "2025-09-29",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_old",
+    "date": "2025-09-30",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_old",
+    "date": "2025-10-09",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_old",
+    "date": "2025-10-10",
+    "ranked": 3,
+    "shape_pass": 0
+  },
+  {
+    "policy": "four_old",
+    "date": "2025-10-13",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "four_old",
+    "date": "2025-10-14",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_old",
+    "date": "2025-10-15",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_old",
+    "date": "2025-10-16",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "four_old",
+    "date": "2025-10-17",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_old",
+    "date": "2025-10-20",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "four_old",
+    "date": "2025-10-21",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_old",
+    "date": "2025-10-22",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_old",
+    "date": "2025-10-23",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_old",
+    "date": "2025-10-24",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "four_old",
+    "date": "2025-10-27",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_old",
+    "date": "2025-10-28",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_old",
+    "date": "2025-10-29",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "four_old",
+    "date": "2025-10-30",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_old",
+    "date": "2025-10-31",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_old",
+    "date": "2025-11-03",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_old",
+    "date": "2025-11-04",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_old",
+    "date": "2025-11-05",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_old",
+    "date": "2025-11-06",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_old",
+    "date": "2025-11-07",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_old",
+    "date": "2025-11-10",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_old",
+    "date": "2025-11-11",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_old",
+    "date": "2025-11-12",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "four_old",
+    "date": "2025-11-13",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_old",
+    "date": "2025-11-14",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_old",
+    "date": "2025-11-17",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_old",
+    "date": "2025-11-18",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_old",
+    "date": "2025-11-19",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "four_old",
+    "date": "2025-11-20",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_old",
+    "date": "2025-11-21",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_old",
+    "date": "2025-11-24",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "four_old",
+    "date": "2025-11-25",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_old",
+    "date": "2025-11-26",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_old",
+    "date": "2025-11-27",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "four_old",
+    "date": "2025-11-28",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "four_old",
+    "date": "2025-12-01",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_old",
+    "date": "2025-12-02",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "four_old",
+    "date": "2025-12-03",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_old",
+    "date": "2025-12-04",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_old",
+    "date": "2025-12-05",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_old",
+    "date": "2025-12-08",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "four_old",
+    "date": "2025-12-09",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "four_old",
+    "date": "2025-12-10",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_old",
+    "date": "2025-12-11",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_old",
+    "date": "2025-12-12",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "four_old",
+    "date": "2025-12-15",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "four_old",
+    "date": "2025-12-16",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_old",
+    "date": "2025-12-17",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "four_old",
+    "date": "2025-12-18",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_old",
+    "date": "2025-12-19",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_old",
+    "date": "2025-12-22",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_old",
+    "date": "2025-12-23",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_old",
+    "date": "2025-12-24",
+    "ranked": 3,
+    "shape_pass": 0
+  },
+  {
+    "policy": "four_old",
+    "date": "2025-12-25",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_old",
+    "date": "2025-12-26",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_old",
+    "date": "2025-12-29",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_old",
+    "date": "2025-12-30",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_old",
+    "date": "2025-12-31",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-01-05",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-01-06",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-01-07",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-01-08",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-01-09",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-01-12",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-01-13",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-01-14",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-01-15",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-01-16",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-01-19",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-01-20",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-01-21",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-01-22",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-01-23",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-01-26",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-01-27",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-01-28",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-01-29",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-01-30",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-02-02",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-02-03",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-02-04",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-02-05",
+    "ranked": 3,
+    "shape_pass": 0
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-02-06",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-02-09",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-02-10",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-02-11",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-02-12",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-02-13",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-02-24",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-02-25",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-02-26",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-02-27",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-03-02",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-03-03",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-03-04",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-03-05",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-03-06",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-03-09",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-03-10",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-03-11",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-03-12",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-03-13",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-03-16",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-03-17",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-03-18",
+    "ranked": 3,
+    "shape_pass": 0
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-03-19",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-03-20",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-03-23",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-03-24",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-03-25",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-03-26",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-03-27",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-03-30",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-03-31",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-04-01",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-04-02",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-04-03",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-04-07",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-04-08",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-04-09",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-04-10",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-04-13",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-04-14",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-04-15",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-04-16",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-04-17",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-04-20",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-04-21",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-04-22",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-04-23",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-04-24",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-04-27",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-04-28",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-04-29",
+    "ranked": 3,
+    "shape_pass": 0
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-04-30",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-05-06",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-05-07",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-05-08",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-05-11",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-05-12",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-05-13",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-05-14",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-05-15",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-05-18",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-05-19",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-05-20",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-05-21",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-05-22",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-05-25",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-05-26",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-05-27",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-05-28",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-05-29",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-06-01",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-06-02",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-06-03",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-06-04",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-06-05",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-06-08",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-06-09",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-06-10",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-06-11",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-06-12",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-06-15",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-06-16",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-06-17",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-06-18",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-06-22",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-06-23",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-06-24",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-06-25",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-06-26",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-06-29",
+    "ranked": 3,
+    "shape_pass": 0
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-06-30",
+    "ranked": 3,
+    "shape_pass": 0
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-07-01",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-07-02",
+    "ranked": 3,
+    "shape_pass": 0
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-07-03",
+    "ranked": 3,
+    "shape_pass": 0
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-07-06",
+    "ranked": 3,
+    "shape_pass": 0
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-07-07",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-07-08",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-07-09",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-07-10",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-07-13",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-07-14",
+    "ranked": 2,
+    "shape_pass": 0
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-07-15",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-07-16",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-07-17",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-07-20",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-07-21",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-07-22",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-07-23",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-07-24",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-07-27",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-07-28",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-07-29",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-07-30",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-07-31",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-08-03",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-08-04",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-08-05",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-08-06",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-08-07",
+    "ranked": 3,
+    "shape_pass": 0
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-08-10",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-08-11",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-08-12",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-08-13",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-08-14",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-08-17",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-08-18",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-08-19",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-08-20",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-08-21",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-08-24",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-08-25",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-08-26",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-08-27",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-08-28",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-08-31",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-09-01",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-09-02",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-09-03",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-09-04",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-09-07",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-09-08",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-09-09",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-09-10",
+    "ranked": 3,
+    "shape_pass": 0
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-09-11",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-09-14",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-09-15",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-09-16",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-09-17",
+    "ranked": 3,
+    "shape_pass": 0
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-09-18",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-09-21",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-09-22",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-09-23",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-09-24",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-09-28",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-09-29",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-09-30",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-10-08",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-10-09",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-10-12",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-10-13",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "four_old",
+    "date": "2026-10-14",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_fit",
+    "date": "2025-09-02",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_fit",
+    "date": "2025-09-03",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_fit",
+    "date": "2025-09-04",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_fit",
+    "date": "2025-09-05",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_fit",
+    "date": "2025-09-08",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_fit",
+    "date": "2025-09-09",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_fit",
+    "date": "2025-09-10",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_fit",
+    "date": "2025-09-11",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_fit",
+    "date": "2025-09-12",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_fit",
+    "date": "2025-09-15",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_fit",
+    "date": "2025-09-16",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_fit",
+    "date": "2025-09-17",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_fit",
+    "date": "2025-09-18",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_fit",
+    "date": "2025-09-19",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_fit",
+    "date": "2025-09-22",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_fit",
+    "date": "2025-09-23",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "four_fit",
+    "date": "2025-09-24",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "four_fit",
+    "date": "2025-09-25",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_fit",
+    "date": "2025-09-26",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "four_fit",
+    "date": "2025-09-29",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "four_fit",
+    "date": "2025-09-30",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_fit",
+    "date": "2025-10-09",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_fit",
+    "date": "2025-10-10",
+    "ranked": 3,
+    "shape_pass": 0
+  },
+  {
+    "policy": "four_fit",
+    "date": "2025-10-13",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "four_fit",
+    "date": "2025-10-14",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_fit",
+    "date": "2025-10-15",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_fit",
+    "date": "2025-10-16",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "four_fit",
+    "date": "2025-10-17",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_fit",
+    "date": "2025-10-20",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "four_fit",
+    "date": "2025-10-21",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_fit",
+    "date": "2025-10-22",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_fit",
+    "date": "2025-10-23",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_fit",
+    "date": "2025-10-24",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "four_fit",
+    "date": "2025-10-27",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_fit",
+    "date": "2025-10-28",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_fit",
+    "date": "2025-10-29",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "four_fit",
+    "date": "2025-10-30",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_fit",
+    "date": "2025-10-31",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_fit",
+    "date": "2025-11-03",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_fit",
+    "date": "2025-11-04",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_fit",
+    "date": "2025-11-05",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_fit",
+    "date": "2025-11-06",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_fit",
+    "date": "2025-11-07",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_fit",
+    "date": "2025-11-10",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_fit",
+    "date": "2025-11-11",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_fit",
+    "date": "2025-11-12",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "four_fit",
+    "date": "2025-11-13",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_fit",
+    "date": "2025-11-14",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_fit",
+    "date": "2025-11-17",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_fit",
+    "date": "2025-11-18",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_fit",
+    "date": "2025-11-19",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "four_fit",
+    "date": "2025-11-20",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_fit",
+    "date": "2025-11-21",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_fit",
+    "date": "2025-11-24",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "four_fit",
+    "date": "2025-11-25",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_fit",
+    "date": "2025-11-26",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_fit",
+    "date": "2025-11-27",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "four_fit",
+    "date": "2025-11-28",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "four_fit",
+    "date": "2025-12-01",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_fit",
+    "date": "2025-12-02",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_fit",
+    "date": "2025-12-03",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_fit",
+    "date": "2025-12-04",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "four_fit",
+    "date": "2025-12-05",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_fit",
+    "date": "2025-12-08",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "four_fit",
+    "date": "2025-12-09",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "four_fit",
+    "date": "2025-12-10",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_fit",
+    "date": "2025-12-11",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_fit",
+    "date": "2025-12-12",
+    "ranked": 3,
+    "shape_pass": 0
+  },
+  {
+    "policy": "four_fit",
+    "date": "2025-12-15",
+    "ranked": 3,
+    "shape_pass": 0
+  },
+  {
+    "policy": "four_fit",
+    "date": "2025-12-16",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_fit",
+    "date": "2025-12-17",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "four_fit",
+    "date": "2025-12-18",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_fit",
+    "date": "2025-12-19",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_fit",
+    "date": "2025-12-22",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_fit",
+    "date": "2025-12-23",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_fit",
+    "date": "2025-12-24",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "four_fit",
+    "date": "2025-12-25",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_fit",
+    "date": "2025-12-26",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_fit",
+    "date": "2025-12-29",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_fit",
+    "date": "2025-12-30",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_fit",
+    "date": "2025-12-31",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-01-05",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-01-06",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-01-07",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-01-08",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-01-09",
+    "ranked": 3,
+    "shape_pass": 0
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-01-12",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-01-13",
+    "ranked": 3,
+    "shape_pass": 0
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-01-14",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-01-15",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-01-16",
+    "ranked": 3,
+    "shape_pass": 0
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-01-19",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-01-20",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-01-21",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-01-22",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-01-23",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-01-26",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-01-27",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-01-28",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-01-29",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-01-30",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-02-02",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-02-03",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-02-04",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-02-05",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-02-06",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-02-09",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-02-10",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-02-11",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-02-12",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-02-13",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-02-24",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-02-25",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-02-26",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-02-27",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-03-02",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-03-03",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-03-04",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-03-05",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-03-06",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-03-09",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-03-10",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-03-11",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-03-12",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-03-13",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-03-16",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-03-17",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-03-18",
+    "ranked": 3,
+    "shape_pass": 0
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-03-19",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-03-20",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-03-23",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-03-24",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-03-25",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-03-26",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-03-27",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-03-30",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-03-31",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-04-01",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-04-02",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-04-03",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-04-07",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-04-08",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-04-09",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-04-10",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-04-13",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-04-14",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-04-15",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-04-16",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-04-17",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-04-20",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-04-21",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-04-22",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-04-23",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-04-24",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-04-27",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-04-28",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-04-29",
+    "ranked": 3,
+    "shape_pass": 0
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-04-30",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-05-06",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-05-07",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-05-08",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-05-11",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-05-12",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-05-13",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-05-14",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-05-15",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-05-18",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-05-19",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-05-20",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-05-21",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-05-22",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-05-25",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-05-26",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-05-27",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-05-28",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-05-29",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-06-01",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-06-02",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-06-03",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-06-04",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-06-05",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-06-08",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-06-09",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-06-10",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-06-11",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-06-12",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-06-15",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-06-16",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-06-17",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-06-18",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-06-22",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-06-23",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-06-24",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-06-25",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-06-26",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-06-29",
+    "ranked": 3,
+    "shape_pass": 0
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-06-30",
+    "ranked": 3,
+    "shape_pass": 0
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-07-01",
+    "ranked": 3,
+    "shape_pass": 0
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-07-02",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-07-03",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-07-06",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-07-07",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-07-08",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-07-09",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-07-10",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-07-13",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-07-14",
+    "ranked": 2,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-07-15",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-07-16",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-07-17",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-07-20",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-07-21",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-07-22",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-07-23",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-07-24",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-07-27",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-07-28",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-07-29",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-07-30",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-07-31",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-08-03",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-08-04",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-08-05",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-08-06",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-08-07",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-08-10",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-08-11",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-08-12",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-08-13",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-08-14",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-08-17",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-08-18",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-08-19",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-08-20",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-08-21",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-08-24",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-08-25",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-08-26",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-08-27",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-08-28",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-08-31",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-09-01",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-09-02",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-09-03",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-09-04",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-09-07",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-09-08",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-09-09",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-09-10",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-09-11",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-09-14",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-09-15",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-09-16",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-09-17",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-09-18",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-09-21",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-09-22",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-09-23",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-09-24",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-09-28",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-09-29",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-09-30",
+    "ranked": 3,
+    "shape_pass": 1
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-10-08",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-10-09",
+    "ranked": 3,
+    "shape_pass": 3
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-10-12",
+    "ranked": 3,
+    "shape_pass": 2
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-10-13",
+    "ranked": 3,
+    "shape_pass": 0
+  },
+  {
+    "policy": "four_fit",
+    "date": "2026-10-14",
+    "ranked": 3,
+    "shape_pass": 2
+  }
+]

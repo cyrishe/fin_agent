@@ -1,0 +1,674 @@
+[
+  {
+    "file": "docs/stock_automl_runs/20261015_limit_rebound_segments_r18/results/all_selections_frozen.json",
+    "sha256": "3feb5ae71d61e7159ead6d836cde98670e2d1d9e5ca58b1c8785da09b878971d",
+    "source": "outputs/stock_automl/limit_rebound_segments_r18_20261015/all_selections_frozen.json",
+    "bytes": 190868
+  },
+  {
+    "file": "docs/stock_automl_runs/20261015_limit_rebound_segments_r18/results/archive_status.json",
+    "sha256": "da6b30dc4524f4c33d33e32897bcbda5f280f2d92f1ec5b5d30184653dfab9b6",
+    "source": "outputs/stock_automl/limit_rebound_segments_r18_20261015/archive_status.json",
+    "bytes": 502
+  },
+  {
+    "file": "docs/stock_automl_runs/20261015_limit_rebound_segments_r18/results/boundary_audit.json",
+    "sha256": "1e1904ed788820d88215ec24d56d27e8ea3952dbcda01b9bcc3e094e40fa61de",
+    "source": "outputs/stock_automl/limit_rebound_segments_r18_20261015/boundary_audit.json",
+    "bytes": 4711
+  },
+  {
+    "file": "docs/stock_automl_runs/20261015_limit_rebound_segments_r18/results/calendar.json",
+    "sha256": "a90c4178a06586a0a6797c428deae42b61f49ee7608aee8e267072f25fc78387",
+    "source": "outputs/stock_automl/limit_rebound_segments_r18_20261015/calendar.json",
+    "bytes": 11075
+  },
+  {
+    "file": "docs/stock_automl_runs/20261015_limit_rebound_segments_r18/results/conditions.csv",
+    "sha256": "317ba3961ece03f71c76ecc07493223ee4d50856c643bf3aa6a7df0178fac09f",
+    "source": "outputs/stock_automl/limit_rebound_segments_r18_20261015/conditions.csv",
+    "bytes": 1172
+  },
+  {
+    "file": "docs/stock_automl_runs/20261015_limit_rebound_segments_r18/results/cross_event_sensitivity.json",
+    "sha256": "fb706ff88af82f12f2b6acae722e594ce511f12296728f44bd832b7bf4eb4291",
+    "source": "outputs/stock_automl/limit_rebound_segments_r18_20261015/cross_event_sensitivity.json",
+    "bytes": 5145
+  },
+  {
+    "file": "docs/stock_automl_runs/20261015_limit_rebound_segments_r18/results/feature_diagnostics.json",
+    "sha256": "a82bd8ce13ac602f25dd3eceb03ae48debe6ae2b2708c3059e71f1038c0708ec",
+    "source": "outputs/stock_automl/limit_rebound_segments_r18_20261015/feature_diagnostics.json",
+    "bytes": 455
+  },
+  {
+    "file": "docs/stock_automl_runs/20261015_limit_rebound_segments_r18/results/model_manifest.json",
+    "sha256": "2b2f6f717e0b71f5aed672bb1db2e732f521cfc389304da04bddb8fa2bff9aa1",
+    "source": "outputs/stock_automl/limit_rebound_segments_r18_20261015/model_manifest.json",
+    "bytes": 13533
+  },
+  {
+    "file": "docs/stock_automl_runs/20261015_limit_rebound_segments_r18/results/monthly_metrics.csv",
+    "sha256": "93c9a1c51a0ff55ab6908924996a95b7ae176e1c80e21e00ee584331b28f91d8",
+    "source": "outputs/stock_automl/limit_rebound_segments_r18_20261015/monthly_metrics.csv",
+    "bytes": 44911
+  },
+  {
+    "file": "docs/stock_automl_runs/20261015_limit_rebound_segments_r18/results/result.json",
+    "sha256": "db1eb3cd7305804fa7c5f40250c14a741a4b0593ed4b860deb9a4123faca76f6",
+    "source": "outputs/stock_automl/limit_rebound_segments_r18_20261015/result.json",
+    "bytes": 13453
+  },
+  {
+    "file": "docs/stock_automl_runs/20261015_limit_rebound_segments_r18/results/runtime.json",
+    "sha256": "08f260c5e59e643bd359d6af7beaf37f5683cb67161f302f771e6057c4101dcb",
+    "source": "outputs/stock_automl/limit_rebound_segments_r18_20261015/runtime.json",
+    "bytes": 400
+  },
+  {
+    "file": "docs/stock_automl_runs/20261015_limit_rebound_segments_r18/results/source_manifest.json",
+    "sha256": "a7d7b68d494da603baf8401b897abb417a9ffbd3fa0817a585370e626a175835",
+    "source": "outputs/stock_automl/limit_rebound_segments_r18_20261015/source_manifest.json",
+    "bytes": 7235
+  },
+  {
+    "file": "docs/stock_automl_runs/20261015_limit_rebound_segments_r18/results/specification.json",
+    "sha256": "d82e1135e2fc83344a3771400187d6406397d59c096def3b979aa2daf170a73a",
+    "source": "outputs/stock_automl/limit_rebound_segments_r18_20261015/specification.json",
+    "bytes": 5922
+  },
+  {
+    "file": "docs/stock_automl_runs/20261015_limit_rebound_segments_r18/results/summary.csv",
+    "sha256": "eeffa2f611aae10e7e217b65b5a877d9999e0c81fb320f8ba4a29a2c5081e1cf",
+    "source": "outputs/stock_automl/limit_rebound_segments_r18_20261015/summary.csv",
+    "bytes": 3606
+  },
+  {
+    "file": "docs/stock_automl_runs/20261015_limit_rebound_segments_r18/results/test_comparisons.json",
+    "sha256": "6e2913af10609ea6f336a1870c722ebbb7b41c525e91e3ad52bb26d7a99138a0",
+    "source": "outputs/stock_automl/limit_rebound_segments_r18_20261015/test_comparisons.json",
+    "bytes": 2150
+  },
+  {
+    "file": "docs/stock_automl_runs/20261015_limit_rebound_segments_r18/results/verification.json",
+    "sha256": "ca9c27b025dc9d6eb1b88f580ade3eaedef05d83cae21b0f73d42f0c193eda11",
+    "source": "outputs/stock_automl/limit_rebound_segments_r18_20261015/verification.json",
+    "bytes": 615
+  },
+  {
+    "file": "docs/stock_automl_runs/20261015_limit_rebound_segments_r18/results/workbook_validation.json",
+    "sha256": "ebbc32f3df5b09815c5338fb959b71e075863974a395e348d91d80f3fd7bca87",
+    "source": "outputs/stock_automl/limit_rebound_segments_r18_20261015/workbook_validation.json",
+    "bytes": 495
+  },
+  {
+    "file": "docs/stock_automl_runs/20261015_limit_rebound_segments_r18/results/涨停前与连板段_特征对照及前五_R18_20261015.xlsx",
+    "sha256": "210c63bc8bd6eeb5fe38ec23d356f80cbb1df0d7be83de0187ec1484c1edce6c",
+    "source": "outputs/stock_automl/limit_rebound_segments_r18_20261015/涨停前与连板段_特征对照及前五_R18_20261015.xlsx",
+    "bytes": 231153
+  },
+  {
+    "file": "docs/stock_automl_runs/20261015_limit_rebound_shape_r19/results/all_rules_frozen.json",
+    "sha256": "e18cf06b9917bd508dfdb031935b7864f35bb864603964e70a5ce977069b2f86",
+    "source": "outputs/stock_automl/limit_rebound_shape_r19_20261015/all_rules_frozen.json",
+    "bytes": 502459
+  },
+  {
+    "file": "docs/stock_automl_runs/20261015_limit_rebound_shape_r19/results/coverage.json",
+    "sha256": "ebf623160859864c7e8025863f892aaedf69e930ddd5cb8f18e755cebb91bdf0",
+    "source": "outputs/stock_automl/limit_rebound_shape_r19_20261015/coverage.json",
+    "bytes": 181
+  },
+  {
+    "file": "docs/stock_automl_runs/20261015_limit_rebound_shape_r19/results/diagnostics.json",
+    "sha256": "1d2bdd5fe370f6cd786feeef0b70d48764bb1c43d63939c57efcae8b02c4875c",
+    "source": "outputs/stock_automl/limit_rebound_shape_r19_20261015/diagnostics.json",
+    "bytes": 3038
+  },
+  {
+    "file": "docs/stock_automl_runs/20261015_limit_rebound_shape_r19/results/execution_windows.json",
+    "sha256": "5dbea9e4d0d523e2b836201bd106bc358a284c0735b99b53b9eb83424715df0a",
+    "source": "outputs/stock_automl/limit_rebound_shape_r19_20261015/execution_windows.json",
+    "bytes": 3846
+  },
+  {
+    "file": "docs/stock_automl_runs/20261015_limit_rebound_shape_r19/results/monthly_metrics.json",
+    "sha256": "8a53eb2408f29922fa70218be713f4e8f91aff5b1b6876bfd510acbef0cb7955",
+    "source": "outputs/stock_automl/limit_rebound_shape_r19_20261015/monthly_metrics.json",
+    "bytes": 66968
+  },
+  {
+    "file": "docs/stock_automl_runs/20261015_limit_rebound_shape_r19/results/result.json",
+    "sha256": "4a4a1cd8bb3653cd49f5d383fdf2fe4b1c0a09b72fbed36237718c06c5aa7fc1",
+    "source": "outputs/stock_automl/limit_rebound_shape_r19_20261015/result.json",
+    "bytes": 3543
+  },
+  {
+    "file": "docs/stock_automl_runs/20261015_limit_rebound_shape_r19/results/specification.json",
+    "sha256": "0349c1958ecaff98fb2a7c21178e6bde47afed2e48778f4fc59f132e8e2b159c",
+    "source": "outputs/stock_automl/limit_rebound_shape_r19_20261015/specification.json",
+    "bytes": 21154
+  },
+  {
+    "file": "docs/stock_automl_runs/20261015_limit_rebound_shape_r19/results/verification.json",
+    "sha256": "248cd1ec75b163424c889bd93067cb95ae81aad3ef805c47b49e2ff15c9cfd76",
+    "source": "outputs/stock_automl/limit_rebound_shape_r19_20261015/verification.json",
+    "bytes": 783
+  },
+  {
+    "file": "docs/stock_automl_runs/20261015_limit_rebound_shape_r19/results/前五分钟形态_Top1简单规则_R19_20261015.xlsx",
+    "sha256": "be7538a7f55ffb72917f754cd04c5564f26e6c6e9acc5c9cfaa67aa174369140",
+    "source": "outputs/stock_automl/limit_rebound_shape_r19_20261015/前五分钟形态_Top1简单规则_R19_20261015.xlsx",
+    "bytes": 56228
+  },
+  {
+    "file": "docs/stock_automl_runs/20261015_limit_rebound_shape_top3_r20/results/coverage.json",
+    "sha256": "5ca0567b5fd3b2d68597aa2aec777aacf7da743d5c46537ecf7442e23e45330d",
+    "source": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/coverage.json",
+    "bytes": 1491
+  },
+  {
+    "file": "docs/stock_automl_runs/20261015_limit_rebound_shape_top3_r20/results/monthly_discrimination.json",
+    "sha256": "a303d4f1b7e5bba1e929415e7798a3ee4ad77581903f1b375b57859d93663d57",
+    "source": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/monthly_discrimination.json",
+    "bytes": 390240
+  },
+  {
+    "file": "docs/stock_automl_runs/20261015_limit_rebound_shape_top3_r20/results/monthly_policy_metrics.json",
+    "sha256": "41c62ad91f3597fefcd55c784968252bfbaac63a672ff2e8319331cf6793bcbf",
+    "source": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/monthly_policy_metrics.json",
+    "bytes": 176579
+  },
+  {
+    "file": "docs/stock_automl_runs/20261015_limit_rebound_shape_top3_r20/results/result.json",
+    "sha256": "6893621c1b2c3757651c8ee51e9e578e0e7f3e12faadf84332fb4a739093b142",
+    "source": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/result.json",
+    "bytes": 18427
+  },
+  {
+    "file": "docs/stock_automl_runs/20261015_limit_rebound_shape_top3_r20/results/rules_frozen.json",
+    "sha256": "e18cf06b9917bd508dfdb031935b7864f35bb864603964e70a5ce977069b2f86",
+    "source": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/rules_frozen.json",
+    "bytes": 502459
+  },
+  {
+    "file": "docs/stock_automl_runs/20261015_limit_rebound_shape_top3_r20/results/specification.json",
+    "sha256": "7d06b6dd13049e43651895b12fb4072b10b13dababc9139e4a435b8c6c75f963",
+    "source": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/specification.json",
+    "bytes": 1697
+  },
+  {
+    "file": "docs/stock_automl_runs/20261015_limit_rebound_shape_top3_r20/results/verification.json",
+    "sha256": "af50b1ac1dc3ca6d48576fceaae090adcb772a2d49188571939472c8e2945410",
+    "source": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/verification.json",
+    "bytes": 411
+  },
+  {
+    "file": "docs/stock_automl_runs/20261015_limit_rebound_shape_top3_r20/results/前五分形态_涨跌区分与前三顺延_R20_20261015.xlsx",
+    "sha256": "1e03c61e21396c9eadbceca39e696a0af72e9d7912dc87bdc5f2b0e18d6352ec",
+    "source": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/前五分形态_涨跌区分与前三顺延_R20_20261015.xlsx",
+    "bytes": 139708
+  },
+  {
+    "file": "docs/stock_automl_runs/20261015_limit_rebound_body8_nofallback_r21b/results/account_exclusions.json",
+    "sha256": "e0bcf2b9173a9fc675c3bd1f1357c921b0e52e6688589b003322aab6016b9841",
+    "source": "outputs/stock_automl/limit_rebound_body8_nofallback_r21b_20261015/account_exclusions.json",
+    "bytes": 2931
+  },
+  {
+    "file": "docs/stock_automl_runs/20261015_limit_rebound_body8_nofallback_r21b/results/account_results.json",
+    "sha256": "c5c87ec2f82cf932aa83622225c1f78670442f1bece9a85579930401a44b2166",
+    "source": "outputs/stock_automl/limit_rebound_body8_nofallback_r21b_20261015/account_results.json",
+    "bytes": 7802
+  },
+  {
+    "file": "docs/stock_automl_runs/20261015_limit_rebound_body8_nofallback_r21b/results/data_coverage.json",
+    "sha256": "0bd8d6a453b32893d857d782a13efe59223344b27376e8e4b3563a29cf014250",
+    "source": "outputs/stock_automl/limit_rebound_body8_nofallback_r21b_20261015/data_coverage.json",
+    "bytes": 361
+  },
+  {
+    "file": "docs/stock_automl_runs/20261015_limit_rebound_body8_nofallback_r21b/results/models.json",
+    "sha256": "bc5b05648abb10eaacbc95066adaf9968fa197aacd50a5f97c78f73e0083c45e",
+    "source": "outputs/stock_automl/limit_rebound_body8_nofallback_r21b_20261015/models.json",
+    "bytes": 13313
+  },
+  {
+    "file": "docs/stock_automl_runs/20261015_limit_rebound_body8_nofallback_r21b/results/monthly_results.json",
+    "sha256": "6674f0bcf74099946a93f7449f2095efa1a9ee7e32c45a98871944d75ded2c1f",
+    "source": "outputs/stock_automl/limit_rebound_body8_nofallback_r21b_20261015/monthly_results.json",
+    "bytes": 71113
+  },
+  {
+    "file": "docs/stock_automl_runs/20261015_limit_rebound_body8_nofallback_r21b/results/rules.json",
+    "sha256": "b29e6b6701522b6640688c569000557996dfe067385c5ede5104b39b84bd351a",
+    "source": "outputs/stock_automl/limit_rebound_body8_nofallback_r21b_20261015/rules.json",
+    "bytes": 7989
+  },
+  {
+    "file": "docs/stock_automl_runs/20261015_limit_rebound_body8_nofallback_r21b/results/specification.json",
+    "sha256": "595fc3cbff38b93c3e3e80e8fff10518033699acd6d2551f2d03428167206ca3",
+    "source": "outputs/stock_automl/limit_rebound_body8_nofallback_r21b_20261015/specification.json",
+    "bytes": 2480
+  },
+  {
+    "file": "docs/stock_automl_runs/20261015_limit_rebound_body8_nofallback_r21b/results/trade_stats.json",
+    "sha256": "e039174071090381171d18fcc99b22f2b63d4b31c501a095659fc04a975be99d",
+    "source": "outputs/stock_automl/limit_rebound_body8_nofallback_r21b_20261015/trade_stats.json",
+    "bytes": 4253
+  },
+  {
+    "file": "docs/stock_automl_runs/20261015_limit_rebound_body8_nofallback_r21b/results/verification.json",
+    "sha256": "691aef922853c6b8299d6be0155594cbdc23d7a42eb538f38c679d6b4008a1d3",
+    "source": "outputs/stock_automl/limit_rebound_body8_nofallback_r21b_20261015/verification.json",
+    "bytes": 488
+  },
+  {
+    "file": "docs/stock_automl_runs/20261015_limit_rebound_body8_nofallback_r21b/results/前三原选_实体过滤不顺延_买价与月度回撤_R21B_20261015.xlsx",
+    "sha256": "35e77850448cd6995539607b71b943eca009efae30a584970bab16cfd0b700a7",
+    "source": "outputs/stock_automl/limit_rebound_body8_nofallback_r21b_20261015/前三原选_实体过滤不顺延_买价与月度回撤_R21B_20261015.xlsx",
+    "bytes": 225425
+  },
+  {
+    "file": "docs/stock_automl_runs/20261015_limit_rebound_shape_windows_r22/results/account_exclusions.json",
+    "sha256": "24acace9c2447750f757d383a442b0a600588af169c5c330e198fd023c566c98",
+    "source": "outputs/stock_automl/limit_rebound_shape_windows_r22_20261015/account_exclusions.json",
+    "bytes": 25737
+  },
+  {
+    "file": "docs/stock_automl_runs/20261015_limit_rebound_shape_windows_r22/results/account_months.json",
+    "sha256": "89537414b23194c786a0e8d8bfa44071f036a9d4fa251934968fd12826fb0861",
+    "source": "outputs/stock_automl/limit_rebound_shape_windows_r22_20261015/account_months.json",
+    "bytes": 754863
+  },
+  {
+    "file": "docs/stock_automl_runs/20261015_limit_rebound_shape_windows_r22/results/accounts.json",
+    "sha256": "3296571d56a83f3304c10a58e99e84ffc0882380e268e4ea70db171a20b3bbfc",
+    "source": "outputs/stock_automl/limit_rebound_shape_windows_r22_20261015/accounts.json",
+    "bytes": 75542
+  },
+  {
+    "file": "docs/stock_automl_runs/20261015_limit_rebound_shape_windows_r22/results/asset_manifest.json",
+    "sha256": "0529deef0b643095f244b8ab5103e1db8df5ad722c44e4d3e7b4321c1f3a91f5",
+    "source": "outputs/stock_automl/limit_rebound_shape_windows_r22_20261015/asset_manifest.json",
+    "bytes": 12442
+  },
+  {
+    "file": "docs/stock_automl_runs/20261015_limit_rebound_shape_windows_r22/results/february_feasibility.json",
+    "sha256": "4f85d871f73297d3cba1caadd83e138de83157d48d9312ca7a6f2465c8444014",
+    "source": "outputs/stock_automl/limit_rebound_shape_windows_r22_20261015/february_feasibility.json",
+    "bytes": 530
+  },
+  {
+    "file": "docs/stock_automl_runs/20261015_limit_rebound_shape_windows_r22/results/original_rules_frozen.json",
+    "sha256": "e18cf06b9917bd508dfdb031935b7864f35bb864603964e70a5ce977069b2f86",
+    "source": "outputs/stock_automl/limit_rebound_shape_windows_r22_20261015/original_rules_frozen.json",
+    "bytes": 502459
+  },
+  {
+    "file": "docs/stock_automl_runs/20261015_limit_rebound_shape_windows_r22/results/overall.json",
+    "sha256": "43b7423fd5a9025f2ed38e59aaae4c077f12d496a28676bb445ab3baaca49c14",
+    "source": "outputs/stock_automl/limit_rebound_shape_windows_r22_20261015/overall.json",
+    "bytes": 41971
+  },
+  {
+    "file": "docs/stock_automl_runs/20261015_limit_rebound_shape_windows_r22/results/paired_month_comparison.json",
+    "sha256": "fef8e6e95cfbb19fa3e7247b378f8bb46859b4806384ca9b645245b278b66057",
+    "source": "outputs/stock_automl/limit_rebound_shape_windows_r22_20261015/paired_month_comparison.json",
+    "bytes": 9430
+  },
+  {
+    "file": "docs/stock_automl_runs/20261015_limit_rebound_shape_windows_r22/results/rule_assignments.json",
+    "sha256": "ddad962fae493933875af4b6a8b1c7eac661257c74a292b3c528a2e33b099d7c",
+    "source": "outputs/stock_automl/limit_rebound_shape_windows_r22_20261015/rule_assignments.json",
+    "bytes": 34311
+  },
+  {
+    "file": "docs/stock_automl_runs/20261015_limit_rebound_shape_windows_r22/results/selection_receipt.json",
+    "sha256": "1434b4c295b1b3a6e4ed03b9edec7c6785777127db0f97f9d548f2e54e081310",
+    "source": "outputs/stock_automl/limit_rebound_shape_windows_r22_20261015/selection_receipt.json",
+    "bytes": 336
+  },
+  {
+    "file": "docs/stock_automl_runs/20261015_limit_rebound_shape_windows_r22/results/short_rules_frozen.json",
+    "sha256": "0fd959f9ad017310882aab887ca6e3d5c7fb87b98e2bbbd4b4c6571cbf28095a",
+    "source": "outputs/stock_automl/limit_rebound_shape_windows_r22_20261015/short_rules_frozen.json",
+    "bytes": 686342
+  },
+  {
+    "file": "docs/stock_automl_runs/20261015_limit_rebound_shape_windows_r22/results/signal_month_metrics.json",
+    "sha256": "3be61c7f3dc1eda3307ca4a5feb9bc1aca758720dcf2949c64204a69d70408a1",
+    "source": "outputs/stock_automl/limit_rebound_shape_windows_r22_20261015/signal_month_metrics.json",
+    "bytes": 278997
+  },
+  {
+    "file": "docs/stock_automl_runs/20261015_limit_rebound_shape_windows_r22/results/specification.json",
+    "sha256": "9beb25646026f6e33c2928c321715371721909b73bdaa55981c08267d644ab08",
+    "source": "outputs/stock_automl/limit_rebound_shape_windows_r22_20261015/specification.json",
+    "bytes": 22103
+  },
+  {
+    "file": "docs/stock_automl_runs/20261015_limit_rebound_shape_windows_r22/results/verification.json",
+    "sha256": "6aa2d8107ea64e44a8f4ff2efb95ebe0bd4566f5c274208c4a4a4587800abab3",
+    "source": "outputs/stock_automl/limit_rebound_shape_windows_r22_20261015/verification.json",
+    "bytes": 613
+  },
+  {
+    "file": "docs/stock_automl_runs/20261015_limit_rebound_shape_windows_r22/results/形态短窗_滚动与固定规则对照_R22_20261015.xlsx",
+    "sha256": "5c5e2a51a46109d9b5122d1aea65c0689c3e6aaf871dc569fd32229bb0b3be0a",
+    "source": "outputs/stock_automl/limit_rebound_shape_windows_r22_20261015/形态短窗_滚动与固定规则对照_R22_20261015.xlsx",
+    "bytes": 44890
+  },
+  {
+    "file": "docs/stock_automl_runs/20261015_limit_rebound_cash_rotation_r23b/results/asset_manifest.json",
+    "sha256": "3e684eb31b83950216a1447c40769fc3cc8fe3e8ba8138381f0bbe8397047422",
+    "source": "outputs/stock_automl/limit_rebound_cash_rotation_r23b_20261015/asset_manifest.json",
+    "bytes": 6730
+  },
+  {
+    "file": "docs/stock_automl_runs/20261015_limit_rebound_cash_rotation_r23b/results/excluded.json",
+    "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+    "source": "outputs/stock_automl/limit_rebound_cash_rotation_r23b_20261015/excluded.json",
+    "bytes": 3
+  },
+  {
+    "file": "docs/stock_automl_runs/20261015_limit_rebound_cash_rotation_r23b/results/inherited_models.json",
+    "sha256": "4879d5a40262cb443d2c33b166cceddc8944cdd135cff39b102d72981390e0ba",
+    "source": "outputs/stock_automl/limit_rebound_cash_rotation_r23b_20261015/inherited_models.json",
+    "bytes": 6053
+  },
+  {
+    "file": "docs/stock_automl_runs/20261015_limit_rebound_cash_rotation_r23b/results/inherited_rules.json",
+    "sha256": "1f0b65a4c166e70bba53898cf6cbdb70a9963738b089856da3d2b17042b629e2",
+    "source": "outputs/stock_automl/limit_rebound_cash_rotation_r23b_20261015/inherited_rules.json",
+    "bytes": 3857
+  },
+  {
+    "file": "docs/stock_automl_runs/20261015_limit_rebound_cash_rotation_r23b/results/monthly.json",
+    "sha256": "b754ef795cef3aa8f931d26cd33e1d251e15797edffb97936057a555f86a0e78",
+    "source": "outputs/stock_automl/limit_rebound_cash_rotation_r23b_20261015/monthly.json",
+    "bytes": 3644
+  },
+  {
+    "file": "docs/stock_automl_runs/20261015_limit_rebound_cash_rotation_r23b/results/specification.json",
+    "sha256": "220dc924a1945032a75c63d8b3c4a9e12d8a4a93266065b689e84a13ff8f1cf4",
+    "source": "outputs/stock_automl/limit_rebound_cash_rotation_r23b_20261015/specification.json",
+    "bytes": 2197
+  },
+  {
+    "file": "docs/stock_automl_runs/20261015_limit_rebound_cash_rotation_r23b/results/summary.json",
+    "sha256": "0b8f9bc42c9f2b3a43ea4f7f6fd9fef3344c0ecadd3d1f4377039f75990cc554",
+    "source": "outputs/stock_automl/limit_rebound_cash_rotation_r23b_20261015/summary.json",
+    "bytes": 908
+  },
+  {
+    "file": "docs/stock_automl_runs/20261015_limit_rebound_cash_rotation_r23b/results/verification.json",
+    "sha256": "5c3a3c9bfe8a5dbccc2cd5c11f9a868aaeb643dabd36fc2194cb97b31a1ca8f4",
+    "source": "outputs/stock_automl/limit_rebound_cash_rotation_r23b_20261015/verification.json",
+    "bytes": 645
+  },
+  {
+    "file": "docs/stock_automl_runs/20261015_limit_rebound_cash_rotation_r23b/results/百万资金轮换_D2卖出_月度收益回撤_R23B_20261015.xlsx",
+    "sha256": "0ff43b0e0435746214c34ecc61f61459fa3ac6e0f32a9ded100aa79318e4e188",
+    "source": "outputs/stock_automl/limit_rebound_cash_rotation_r23b_20261015/百万资金轮换_D2卖出_月度收益回撤_R23B_20261015.xlsx",
+    "bytes": 38449
+  },
+  {
+    "file": "docs/stock_automl_runs/20261015_limit_rebound_fee001_r23c/results/asset_manifest.json",
+    "sha256": "74fd29d014557dde198bb7031b7721619b91f2268bd755388649a28ca016c7f7",
+    "source": "outputs/stock_automl/limit_rebound_fee001_r23c_20261015/asset_manifest.json",
+    "bytes": 7519
+  },
+  {
+    "file": "docs/stock_automl_runs/20261015_limit_rebound_fee001_r23c/results/excluded.json",
+    "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+    "source": "outputs/stock_automl/limit_rebound_fee001_r23c_20261015/excluded.json",
+    "bytes": 3
+  },
+  {
+    "file": "docs/stock_automl_runs/20261015_limit_rebound_fee001_r23c/results/gross_reproduction.json",
+    "sha256": "f9002e685301bbdde08cb83b24d622bcec95431dbaa1ef721195ac4d33f95607",
+    "source": "outputs/stock_automl/limit_rebound_fee001_r23c_20261015/gross_reproduction.json",
+    "bytes": 62
+  },
+  {
+    "file": "docs/stock_automl_runs/20261015_limit_rebound_fee001_r23c/results/inherited_models.json",
+    "sha256": "4879d5a40262cb443d2c33b166cceddc8944cdd135cff39b102d72981390e0ba",
+    "source": "outputs/stock_automl/limit_rebound_fee001_r23c_20261015/inherited_models.json",
+    "bytes": 6053
+  },
+  {
+    "file": "docs/stock_automl_runs/20261015_limit_rebound_fee001_r23c/results/inherited_rules.json",
+    "sha256": "1f0b65a4c166e70bba53898cf6cbdb70a9963738b089856da3d2b17042b629e2",
+    "source": "outputs/stock_automl/limit_rebound_fee001_r23c_20261015/inherited_rules.json",
+    "bytes": 3857
+  },
+  {
+    "file": "docs/stock_automl_runs/20261015_limit_rebound_fee001_r23c/results/monthly.json",
+    "sha256": "5bea0f6a9e66f36c0ae599847b2ca3f304cf00392cfa2d6b722275681ee1ead8",
+    "source": "outputs/stock_automl/limit_rebound_fee001_r23c_20261015/monthly.json",
+    "bytes": 3966
+  },
+  {
+    "file": "docs/stock_automl_runs/20261015_limit_rebound_fee001_r23c/results/output_config.json",
+    "sha256": "e53e17cf00f746a8a8a9458eb8d396525bb06d3e50f4c236ceffa46d9376b3ea",
+    "source": "outputs/stock_automl/limit_rebound_fee001_r23c_20261015/output_config.json",
+    "bytes": 94
+  },
+  {
+    "file": "docs/stock_automl_runs/20261015_limit_rebound_fee001_r23c/results/specification.json",
+    "sha256": "285fa484950c34b537c50ba005402e718f7f22aaa2fb2feb0a44ed237ae10c35",
+    "source": "outputs/stock_automl/limit_rebound_fee001_r23c_20261015/specification.json",
+    "bytes": 2518
+  },
+  {
+    "file": "docs/stock_automl_runs/20261015_limit_rebound_fee001_r23c/results/summary.json",
+    "sha256": "d1bbbf9acce37b11e067b01e63b1c6163272735f8f69593a08a9e47d0003a88b",
+    "source": "outputs/stock_automl/limit_rebound_fee001_r23c_20261015/summary.json",
+    "bytes": 976
+  },
+  {
+    "file": "docs/stock_automl_runs/20261015_limit_rebound_fee001_r23c/results/verification.json",
+    "sha256": "1c11fb983a8efab77eb14d58cfe04b4daa25778ca4638dd5fa0a19d3357fcb55",
+    "source": "outputs/stock_automl/limit_rebound_fee001_r23c_20261015/verification.json",
+    "bytes": 846
+  },
+  {
+    "file": "docs/stock_automl_runs/20261015_limit_rebound_fee001_r23c/results/百万资金轮换_单边千一费后_R23C_20261015.xlsx",
+    "sha256": "47c7bac38171b52849a71f490d9607b147742a793535733df7706ddff57f9db3",
+    "source": "outputs/stock_automl/limit_rebound_fee001_r23c_20261015/百万资金轮换_单边千一费后_R23C_20261015.xlsx",
+    "bytes": 44342
+  },
+  {
+    "file": "docs/stock_automl_runs/20261015_limit_rebound_windows_r23d/results/added_notes.json",
+    "sha256": "3a7be853aaadf99d7667a77f3301999d2e695581065dcd2f61d74d078f5f8b85",
+    "source": "outputs/stock_automl/limit_rebound_windows_r23d_20261015/added_notes.json",
+    "bytes": 1952
+  },
+  {
+    "file": "docs/stock_automl_runs/20261015_limit_rebound_windows_r23d/results/analysis.json",
+    "sha256": "c385215cbc56dccccb3466f43cf76bcf9e3063828af3e6013df728f525468058",
+    "source": "outputs/stock_automl/limit_rebound_windows_r23d_20261015/analysis.json",
+    "bytes": 1162
+  },
+  {
+    "file": "docs/stock_automl_runs/20261015_limit_rebound_windows_r23d/results/asset_manifest.json",
+    "sha256": "3f1c9d9b0c0276a96d8cc5f5a79bd48fba07f4c6195077ca7a6eeca8370b79a6",
+    "source": "outputs/stock_automl/limit_rebound_windows_r23d_20261015/asset_manifest.json",
+    "bytes": 5757
+  },
+  {
+    "file": "docs/stock_automl_runs/20261015_limit_rebound_windows_r23d/results/delay_monthly.json",
+    "sha256": "3faa3dc84f17bb04865e27a17f505ce1cf5383782415dc0495d3e2e361dfc033",
+    "source": "outputs/stock_automl/limit_rebound_windows_r23d_20261015/delay_monthly.json",
+    "bytes": 3961
+  },
+  {
+    "file": "docs/stock_automl_runs/20261015_limit_rebound_windows_r23d/results/delay_summary.json",
+    "sha256": "47a3b3ca87a4ca5af92d0d62f391a5d365f38709845d022fd9a096e103bf8a1f",
+    "source": "outputs/stock_automl/limit_rebound_windows_r23d_20261015/delay_summary.json",
+    "bytes": 961
+  },
+  {
+    "file": "docs/stock_automl_runs/20261015_limit_rebound_windows_r23d/results/specification.json",
+    "sha256": "030d9323d560612e4e81a29b89a2483433a7357132ce69d94f58c5496ff70c2a",
+    "source": "outputs/stock_automl/limit_rebound_windows_r23d_20261015/specification.json",
+    "bytes": 1522
+  },
+  {
+    "file": "docs/stock_automl_runs/20261015_limit_rebound_windows_r23d/results/timing_explanation.json",
+    "sha256": "911a20ff36733603364e9d6c3e3b55c017aad6ac2791e59ee3dc3a5fe4e50926",
+    "source": "outputs/stock_automl/limit_rebound_windows_r23d_20261015/timing_explanation.json",
+    "bytes": 2258
+  },
+  {
+    "file": "docs/stock_automl_runs/20261015_limit_rebound_windows_r23d/results/timing_missed.json",
+    "sha256": "f718a774ad732e4ba28ea40e9eb26ad4da5853cfa4ea2571613120b82c5f82a2",
+    "source": "outputs/stock_automl/limit_rebound_windows_r23d_20261015/timing_missed.json",
+    "bytes": 1350
+  },
+  {
+    "file": "docs/stock_automl_runs/20261015_limit_rebound_windows_r23d/results/verification.json",
+    "sha256": "4aacff11fbf148e3ffe5054099327ba7a2a34bb56629d5d8b67fc80ae1bb4b48",
+    "source": "outputs/stock_automl/limit_rebound_windows_r23d_20261015/verification.json",
+    "bytes": 513
+  },
+  {
+    "file": "docs/stock_automl_runs/20261015_limit_rebound_windows_r23d/results/百万资金轮换_信号与交易窗口_R23D_20261015.xlsx",
+    "sha256": "8ace019e3e2f9910286ee0c2a5ac0f36263d6987de0a5f5f03ac5759ffdb4dba",
+    "source": "outputs/stock_automl/limit_rebound_windows_r23d_20261015/百万资金轮换_信号与交易窗口_R23D_20261015.xlsx",
+    "bytes": 58286
+  },
+  {
+    "file": "docs/stock_automl_runs/20261015_limit_rebound_four_minutes_r24/results/accounts.json",
+    "sha256": "89cdd69dc37adf296b981d78e67e6d118a41d48d0d7de782bb6d6134a99c4df6",
+    "source": "outputs/stock_automl/limit_rebound_four_minutes_r24_20261015/accounts.json",
+    "bytes": 13367
+  },
+  {
+    "file": "docs/stock_automl_runs/20261015_limit_rebound_four_minutes_r24/results/asset_manifest.json",
+    "sha256": "5c3a76162c096663e3faff49ae8bb91e2c07cf7d45980c7ae28d778f6a979a5d",
+    "source": "outputs/stock_automl/limit_rebound_four_minutes_r24_20261015/asset_manifest.json",
+    "bytes": 4444
+  },
+  {
+    "file": "docs/stock_automl_runs/20261015_limit_rebound_four_minutes_r24/results/exclusions.json",
+    "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+    "source": "outputs/stock_automl/limit_rebound_four_minutes_r24_20261015/exclusions.json",
+    "bytes": 3
+  },
+  {
+    "file": "docs/stock_automl_runs/20261015_limit_rebound_four_minutes_r24/results/four_rules_frozen.json",
+    "sha256": "81f297e033f8911f967d14a4801faff5edc308ace8b4e35b3f2447a9ebd7df49",
+    "source": "outputs/stock_automl/limit_rebound_four_minutes_r24_20261015/four_rules_frozen.json",
+    "bytes": 492785
+  },
+  {
+    "file": "docs/stock_automl_runs/20261015_limit_rebound_four_minutes_r24/results/monitor_counts.json",
+    "sha256": "164e093a01b69b46b77d1c6a4809e7f84d73123b765bf5a46988df825af1229b",
+    "source": "outputs/stock_automl/limit_rebound_four_minutes_r24_20261015/monitor_counts.json",
+    "bytes": 77433
+  },
+  {
+    "file": "docs/stock_automl_runs/20261015_limit_rebound_four_minutes_r24/results/monthly.json",
+    "sha256": "ee6a634cc4df905bb603126dcd08cf9d6b8aeb4a900de58722fb7ac7a41c5343",
+    "source": "outputs/stock_automl/limit_rebound_four_minutes_r24_20261015/monthly.json",
+    "bytes": 25453
+  },
+  {
+    "file": "docs/stock_automl_runs/20261015_limit_rebound_four_minutes_r24/results/recovery.json",
+    "sha256": "9af34b5fe623239c83f948603837e203ac76820e6de7d9345cbfd83519a58097",
+    "source": "outputs/stock_automl/limit_rebound_four_minutes_r24_20261015/recovery.json",
+    "bytes": 855
+  },
+  {
+    "file": "docs/stock_automl_runs/20261015_limit_rebound_four_minutes_r24/results/selection_metrics.json",
+    "sha256": "9a2f5e0949aad47714a307d082bd272f6d0727714a32622d97b2244fa88f5b49",
+    "source": "outputs/stock_automl/limit_rebound_four_minutes_r24_20261015/selection_metrics.json",
+    "bytes": 133977
+  },
+  {
+    "file": "docs/stock_automl_runs/20261015_limit_rebound_four_minutes_r24/results/selection_receipt.json",
+    "sha256": "d7c12cc235f4240d4fa3d35f5c8ac77842212089c4503aa1db032a3dbd4368d3",
+    "source": "outputs/stock_automl/limit_rebound_four_minutes_r24_20261015/selection_receipt.json",
+    "bytes": 123
+  },
+  {
+    "file": "docs/stock_automl_runs/20261015_limit_rebound_four_minutes_r24/results/shape_discrimination.json",
+    "sha256": "e22daa1c869d593cc89297782b1b405dd99d366938428bb94c8dff7268c6619d",
+    "source": "outputs/stock_automl/limit_rebound_four_minutes_r24_20261015/shape_discrimination.json",
+    "bytes": 9863
+  },
+  {
+    "file": "docs/stock_automl_runs/20261015_limit_rebound_four_minutes_r24/results/specification.json",
+    "sha256": "2d7bfaed38b8622aeb729dac300c60661a3b9af400434bb9d5592371a948544a",
+    "source": "outputs/stock_automl/limit_rebound_four_minutes_r24_20261015/specification.json",
+    "bytes": 2070
+  },
+  {
+    "file": "docs/stock_automl_runs/20261015_limit_rebound_four_minutes_r24/results/verification.json",
+    "sha256": "e36fda53bf736fcd951692bb1f7849f204bb4a8bc750ae294bcf7b694b2b93ed",
+    "source": "outputs/stock_automl/limit_rebound_four_minutes_r24_20261015/verification.json",
+    "bytes": 325
+  },
+  {
+    "file": "docs/stock_automl_runs/20261015_limit_rebound_classification_r24b/results/asset_manifest.json",
+    "sha256": "a11a67c1018d00379bba522ac68c9384d883dd513f6f6fe0e061fe62e5070b41",
+    "source": "outputs/stock_automl/limit_rebound_classification_r24b_20261015/asset_manifest.json",
+    "bytes": 4859
+  },
+  {
+    "file": "docs/stock_automl_runs/20261015_limit_rebound_classification_r24b/results/coverage.json",
+    "sha256": "694849e83b95b15adc869f72a873b7cf7474e4cfd06e99c0ee0d0bfeff6181e9",
+    "source": "outputs/stock_automl/limit_rebound_classification_r24b_20261015/coverage.json",
+    "bytes": 4658
+  },
+  {
+    "file": "docs/stock_automl_runs/20261015_limit_rebound_classification_r24b/results/monthly.json",
+    "sha256": "51d11bbb1ed236a1d55fb2e5d581a9cdb697dd78688028102016cf210d915c19",
+    "source": "outputs/stock_automl/limit_rebound_classification_r24b_20261015/monthly.json",
+    "bytes": 200613
+  },
+  {
+    "file": "docs/stock_automl_runs/20261015_limit_rebound_classification_r24b/results/overall.json",
+    "sha256": "12d641cecfc8dd65000f10768dbe07b3b1f5df87989ef50f467ff61f877f9c0f",
+    "source": "outputs/stock_automl/limit_rebound_classification_r24b_20261015/overall.json",
+    "bytes": 19842
+  },
+  {
+    "file": "docs/stock_automl_runs/20261015_limit_rebound_classification_r24b/results/specification.json",
+    "sha256": "fbcbd7fc7298c09298ffaf98133c8919a65f5df2c9506b8c34a2b142aedaa554",
+    "source": "outputs/stock_automl/limit_rebound_classification_r24b_20261015/specification.json",
+    "bytes": 2856
+  },
+  {
+    "file": "docs/stock_automl_runs/20261015_limit_rebound_classification_r24b/results/verification.json",
+    "sha256": "f46e4575b65f16b59916a02f29baa6768f099c77a4815c49b573d7a69c515a36",
+    "source": "outputs/stock_automl/limit_rebound_classification_r24b_20261015/verification.json",
+    "bytes": 522
+  },
+  {
+    "file": "docs/stock_automl_runs/20261015_limit_rebound_classification_r24b/results/workbook_verification.json",
+    "sha256": "3a77478ae5986a2c154ae18477f0365b92badb2fbbc19776771fc8f4187d701f",
+    "source": "outputs/stock_automl/limit_rebound_classification_r24b_20261015/workbook_verification.json",
+    "bytes": 226
+  },
+  {
+    "file": "docs/stock_automl_runs/20261015_limit_rebound_classification_r24b/results/四K五K_分类指标与混淆矩阵_R24B_20261015.xlsx",
+    "sha256": "7bf5d9589127e7139319ca09e91b4f1acf1d90c127b10933d428234dcdcb5ddc",
+    "source": "outputs/stock_automl/limit_rebound_classification_r24b_20261015/四K五K_分类指标与混淆矩阵_R24B_20261015.xlsx",
+    "bytes": 96602
+  },
+  {
+    "file": "docs/stock_automl_runs/20261015_limit_rebound_profit_gap_r24c/results/groups.json",
+    "sha256": "495f9f3257a33af35d4ec0f5aae69b7d17f1189b9dc3cef929b6c89b94f108e2",
+    "source": "outputs/stock_automl/limit_rebound_profit_gap_r24c_20261015/groups.json",
+    "bytes": 2484
+  },
+  {
+    "file": "docs/stock_automl_runs/20261015_limit_rebound_profit_gap_r24c/results/result.json",
+    "sha256": "d641aacded10c4cee2fa8e3da85cd26c08333b899103a2bfa8c43f0db24d68be",
+    "source": "outputs/stock_automl/limit_rebound_profit_gap_r24c_20261015/result.json",
+    "bytes": 7986
+  }
+]

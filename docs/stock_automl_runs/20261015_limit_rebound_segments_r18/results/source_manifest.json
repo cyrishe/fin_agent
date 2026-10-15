@@ -1,0 +1,150 @@
+{
+  "source_panel": "outputs/stock_automl/limit_rebound_short_mixed_r12_20261014/panel_replay_through_20261014.pkl",
+  "source_panel_sha256": "47048e72ffd5023b0378ca6aec9145e7df7c7955b878e1b87fbe4fe72f31f3ef",
+  "raw_sources": [
+    {
+      "path": "outputs/stock_automl/limit_rebound_short_mixed_r12_20261014/price_months/price_2023-12.csv.gz",
+      "sha256": "e4293813a17240f672aaf3cd21ef194f782a8068b9650b838e2ac50fe31c9255"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_short_mixed_r12_20261014/price_months/price_2024-01.csv.gz",
+      "sha256": "50ecc824e539cb3ed621185212e25d78f7770a13754b389414868f83d8487945"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_short_mixed_r12_20261014/price_months/price_2024-02.csv.gz",
+      "sha256": "f7222b1f5cee9aa795a66496cde510faa6499859d61308186f3132386c3ee1d0"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_short_mixed_r12_20261014/price_months/price_2024-03.csv.gz",
+      "sha256": "430f22768fcda20761f5c2c77008b1687a16a074bc2c91084321dbf941708e08"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_2024_may_sep_r11_20261014/price_months/price_2024-04.csv.gz",
+      "sha256": "ff71e59503b01218cc6c336aed7f08b658273df6d15a05f739439ca6f673701d"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_2024_may_sep_r11_20261014/price_months/price_2024-05.csv.gz",
+      "sha256": "d2639aca79e8716318473bade67311f6f381958de2ee809b9bfe1520c2b02843"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_2024_may_sep_r11_20261014/price_months/price_2024-06.csv.gz",
+      "sha256": "d41bc7c27af991aa9f7c1d935fbdf7e9afd053db144d483c260af5a3d6093d8e"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_2024_may_sep_r11_20261014/price_months/price_2024-07.csv.gz",
+      "sha256": "eedb7d3d667b07d0a1434fc1753023d4d7cbdfb54888db352edfd71440aea3c6"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_2024_may_sep_r11_20261014/price_months/price_2024-08.csv.gz",
+      "sha256": "a8290533b61b6cbc49d2f736aef40eb81d108167aa429631bb252d0b8ef84516"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_2024_may_sep_r11_20261014/price_months/price_2024-09.csv.gz",
+      "sha256": "0793b12f0821c8f6023856b9aafe401e5299f92ea9c38fed4842e33dd9d986ac"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_2y_r1/price_months/price_2024-10.csv.gz",
+      "sha256": "591898e1fad760aa08661e2b9318d7f3216a918400e247a7a28624078a798f86"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_2y_r1/price_months/price_2024-11.csv.gz",
+      "sha256": "68c321cc29126c068eaeac3cf8a1eb3644180b13f7fdc8ae9d25fc74a8dc9a10"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_2y_r1/price_months/price_2024-12.csv.gz",
+      "sha256": "fcf174a8839bff5c065808e93d2d8122b4b41e8ad79ee53eb5ef6b769bf4be6f"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_2y_r1/price_months/price_2025-01.csv.gz",
+      "sha256": "1d29e0654e09c65ac3ce8254ba2fd0fceb7d6b607e65f6a32d919210bbebb985"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_2y_r1/price_months/price_2025-02.csv.gz",
+      "sha256": "f29a3fbbe25a8de61adb5e911b6dce54a1f7000efd518be3231e9240327a7692"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_2y_r1/price_months/price_2025-03.csv.gz",
+      "sha256": "a4a09cbe8e253fba06c7d4d544d9da70682e29145829541c664d9600cb56f966"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_2y_r1/price_months/price_2025-04.csv.gz",
+      "sha256": "2fdb0fe27bf382d99ed7903ef01c55fdfe6511d655439a1e4310330332b5049e"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_2y_r1/price_months/price_2025-05.csv.gz",
+      "sha256": "498461b60623709dba0eb1f9a40f2e7d384bb44745a8d80943ecb172ac075288"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_2y_r1/price_months/price_2025-06.csv.gz",
+      "sha256": "ee83e97fe117b07e6090c5fd53cfdf209c7480fd0a46a1bfb16f429b73cd513a"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_2y_r1/price_months/price_2025-07.csv.gz",
+      "sha256": "dc6860a5bfd1a4f299713bf45de70ecb36b0f0df40e68026a1593a8e3ce28921"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_2y_r1/price_months/price_2025-08.csv.gz",
+      "sha256": "8777a5b6f51da0806466e9328432125a70b6511fe2188a41696e0787514a7e0b"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_2y_r1/price_months/price_2025-09.csv.gz",
+      "sha256": "1b8d3d9e7d68752bc1557bfbca80e907d092a073797a8dd65d9ba1067965f17f"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_2y_r1/price_months/price_2025-10.csv.gz",
+      "sha256": "c2387ede5e7a93922cb6a14c732c00d1cb3205b148fe7585bf579a21963eb1c3"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_2y_r1/price_months/price_2025-11.csv.gz",
+      "sha256": "32a811e31b95dc2579cbf3ef42bf52c8a6549ea87cde001af351dcfdb56e998a"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_2y_r1/price_months/price_2025-12.csv.gz",
+      "sha256": "c192e894aa2ce64accd2900e9410a10faad5235f56d60a413728a3b0807a910c"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_2y_r1/price_months/price_2026-01.csv.gz",
+      "sha256": "fa4c392385edc3e0736214125f9a3bb4e0bfe28f101411502ee751e82a8719b1"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_2y_r1/price_months/price_2026-02.csv.gz",
+      "sha256": "293b7095604fa0e38afe093b780ac64d8e96b71f5b5f543561748d7b9c629d7d"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_2y_r1/price_months/price_2026-03.csv.gz",
+      "sha256": "08aa28b8bb5a292baf90a99737c7d2d6138447687dad6a5df80703cc0391f7e3"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_2y_r1/price_months/price_2026-04.csv.gz",
+      "sha256": "f44385f8a95f55fd537452e454f834c65cb4ea247237d1d912f18da876a2d2bb"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_2y_r1/price_months/price_2026-05.csv.gz",
+      "sha256": "6d38c57660229305fe791e1654a2c6a4f42a25e0efab57b5f1f91361c409b65c"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_2y_r1/price_months/price_2026-06.csv.gz",
+      "sha256": "f5475f9a84bd41bca58eac2167a28a6e10ed7052d4f2f853b827f748c63acc7a"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_2y_r1/price_months/price_2026-07.csv.gz",
+      "sha256": "45d1d3e4d5c04f5d2716a3e64fc874c304e193d5358ca11907c8a3c6f34a7b51"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_2y_r1/price_months/price_2026-08.csv.gz",
+      "sha256": "b02f3b0fadb95223630379756f34a651cb4a62f098120a98a4995630188fcadb"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_2y_r1/price_months/price_2026-09.csv.gz",
+      "sha256": "943d90ce9178218c62eb643a1cfb01acd2234a1400fa727449c09aae59ac4d31"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_2y_r1/price_months/price_2026-10.csv.gz",
+      "sha256": "4c1254885d37b9b56dff492c3453face366b9eae4a8e4fcc2158f3f0c7be7759"
+    }
+  ],
+  "panel_sha256": "72000be89c9d2cceba0f680d010e4c7f848d5e2982009eaff8dbb8b2ead27351",
+  "raw_extract_sha256": "241e0acd63133034636c7ea8275ceabf531f6032adffa5efef009021adbbf752",
+  "rows": 47253,
+  "raw_extract_rows": 346245
+}

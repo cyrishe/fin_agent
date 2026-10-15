@@ -1,0 +1,14 @@
+{
+  "status": "PASS",
+  "saved_model_score_matches": 1284,
+  "models_hash_checked": 22,
+  "raw_minute_stock_days": 1276,
+  "chronological_policy_days": 856,
+  "daily_cash_nav_checks": 5576,
+  "R20_original_test_picks_unchanged": 156,
+  "strict_body_boundary_test": "see pytest log",
+  "monthly_compounding_accounts": 8,
+  "new_gate_never_replaces_original_choice": true,
+  "workbook_cells": 34896,
+  "workbook_sha256": "35e77850448cd6995539607b71b943eca009efae30a584970bab16cfd0b700a7"
+}

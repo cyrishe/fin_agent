@@ -1,0 +1,21 @@
+{
+  "status": "PASS",
+  "unique_raw_days_replayed": 601,
+  "feature_max_abs_difference": 0.0,
+  "saved_top1_scores_exact": 2410,
+  "independent_horizon_return_checks": 7230,
+  "label_replay": "D1-D3 daily flags match",
+  "train_valid_D4_before_cutoff": true,
+  "test_outcome_and_feature_mutation_does_not_change_selection": true,
+  "missing_minute_cases": 2,
+  "missing_cases_daily_volume_zero": true,
+  "rules_sha256": "e18cf06b9917bd508dfdb031935b7864f35bb864603964e70a5ce977069b2f86",
+  "spec_sha256": "0349c1958ecaff98fb2a7c21178e6bde47afed2e48778f4fc59f132e8e2b159c",
+  "export_cells_reconciled": 7296,
+  "workbook_sha256": "be7538a7f55ffb72917f754cd04c5564f26e6c6e9acc5c9cfaa67aa174369140",
+  "workbook_sheets": [
+    "效果对照",
+    "月度规则",
+    "测试Top1"
+  ]
+}

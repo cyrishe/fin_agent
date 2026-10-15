@@ -1,0 +1,14 @@
+{
+  "user_id": "imac",
+  "experiment_id": "CO10_20261015_independent_market_open_drop",
+  "experiment_date": "2026-10-15",
+  "title": "CO10 独立全市场次晨大跌与不跌分类",
+  "category_path": "02_联合目标与尾部风险",
+  "local_path": "/Volumes/ext/fin_agent/outputs/stock_automl/aliyun_drive_local/策略训练/收盘开盘_20261014/02_联合目标与尾部风险/20261015_CO10_独立全市场_次晨大跌与不跌分类",
+  "cloud_path": "策略训练/收盘开盘_20261014/02_联合目标与尾部风险/20261015_CO10_独立全市场_次晨大跌与不跌分类",
+  "source_commit": "e55c2f79787f22efac905cfb08a52b0ad7db6198",
+  "manifest_sha256": "641327c10a7abac508d90488968b88412f97dff4818c5360ac80eaa9e74a4a51",
+  "file_count": 1162,
+  "db_recorded": true,
+  "cloud_verified": false
+}

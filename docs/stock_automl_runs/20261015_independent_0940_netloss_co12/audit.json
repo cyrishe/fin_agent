@@ -1,0 +1,159 @@
+{
+  "folds": [
+    {
+      "month": "2025-08",
+      "training_rows": 305787,
+      "events": 30331,
+      "test_rows": 107972,
+      "model_sha256": "50b33f0c70dc9da2132c00476f63345f1f4441d7605ffa0be08092e929cdac58",
+      "reload_error": 0.0,
+      "chronology_pass": true
+    },
+    {
+      "month": "2025-09",
+      "training_rows": 304723,
+      "events": 20879,
+      "test_rows": 113219,
+      "model_sha256": "bef100ba242a9704531c4e5a455b4c6cf5c5acfd0d39dd4ab941a7e068db9cb5",
+      "reload_error": 0.0,
+      "chronology_pass": true
+    },
+    {
+      "month": "2025-10",
+      "training_rows": 304767,
+      "events": 14824,
+      "test_rows": 87557,
+      "model_sha256": "3e183395d9233aa318ca9820ce3591327680002dc3cfc8e7f905167c4a608239",
+      "reload_error": 0.0,
+      "chronology_pass": true
+    },
+    {
+      "month": "2025-11",
+      "training_rows": 306146,
+      "events": 14495,
+      "test_rows": 103119,
+      "model_sha256": "3aa0911a9320e939144fe3bfb9ad5cb3a59c4908a573232dbd5795ad4af34605",
+      "reload_error": 0.0,
+      "chronology_pass": true
+    },
+    {
+      "month": "2025-12",
+      "training_rows": 307371,
+      "events": 16587,
+      "test_rows": 118671,
+      "model_sha256": "5e28a6dad527e0a201d191ccae9c8986ca22ed571b03ac8e389b497530043c4a",
+      "reload_error": 0.0,
+      "chronology_pass": true
+    },
+    {
+      "month": "2026-01",
+      "training_rows": 307898,
+      "events": 23506,
+      "test_rows": 103454,
+      "model_sha256": "7523b5f475d090d614c96ea2d4fed9f306fb0eb83775987ee5886e873ae0a34b",
+      "reload_error": 0.0,
+      "chronology_pass": true
+    },
+    {
+      "month": "2026-02",
+      "training_rows": 308166,
+      "events": 26042,
+      "test_rows": 72477,
+      "model_sha256": "109455baec4af04cee3d8c946d8a133e9131e3c99ffd10f4cc090626f9e5fc17",
+      "reload_error": 0.0,
+      "chronology_pass": true
+    },
+    {
+      "month": "2026-03",
+      "training_rows": 308396,
+      "events": 26983,
+      "test_rows": 113964,
+      "model_sha256": "db0395dc4b3392f80e1ed012ff86743e668e567f04803873c2a6b787bb03ddc3",
+      "reload_error": 0.0,
+      "chronology_pass": true
+    },
+    {
+      "month": "2026-04",
+      "training_rows": 309201,
+      "events": 24406,
+      "test_rows": 108842,
+      "model_sha256": "f1eb94f207585a748074a34cac80616c0c850ddb636beca9f52b88527ffcf22e",
+      "reload_error": 0.0,
+      "chronology_pass": true
+    },
+    {
+      "month": "2026-05",
+      "training_rows": 309731,
+      "events": 24835,
+      "test_rows": 93340,
+      "model_sha256": "4cd4742a716bde929af1ffe30b92f59923e9cbdd85c85da311408c0334a89a9c",
+      "reload_error": 0.0,
+      "chronology_pass": true
+    },
+    {
+      "month": "2026-06",
+      "training_rows": 310266,
+      "events": 29646,
+      "test_rows": 109044,
+      "model_sha256": "015d2bb9c5225b256c100bdd825a2a664535c023e05b0ad70eb0b8f638a73d39",
+      "reload_error": 0.0,
+      "chronology_pass": true
+    },
+    {
+      "month": "2026-07",
+      "training_rows": 310427,
+      "events": 32666,
+      "test_rows": 119492,
+      "model_sha256": "8b31e354dc0a786cb84dc8d42a2edb93fe69702629b193d2884917d4f14520e5",
+      "reload_error": 0.0,
+      "chronology_pass": true
+    },
+    {
+      "month": "2026-08",
+      "training_rows": 309503,
+      "events": 35394,
+      "test_rows": 109282,
+      "model_sha256": "b576fa97f97fc52194fee5e4e62ccd3b371ddd7d1c1c6d6b34aca0fc8ee8bf68",
+      "reload_error": 0.0,
+      "chronology_pass": true
+    },
+    {
+      "month": "2026-09",
+      "training_rows": 308427,
+      "events": 43001,
+      "test_rows": 109373,
+      "model_sha256": "b9664da38bed29806c813f8adaee0970ae472b9bbd6250a5bbcb8b147a71fc4e",
+      "reload_error": 0.0,
+      "chronology_pass": true
+    },
+    {
+      "month": "2026-10",
+      "training_rows": 308445,
+      "events": 43622,
+      "test_rows": 20843,
+      "model_sha256": "e1a9363140cc96b195fe365429b1235453ef79fd28bfa106f0508e1d1e79bc71",
+      "reload_error": 0.0,
+      "chronology_pass": true
+    }
+  ],
+  "max_reloaded_prediction_error": 0.0,
+  "B1_baseline_reproduced": true,
+  "CO11_p20_daily_nav_reproduced": true,
+  "feature_whitelist": [
+    "market_breadth",
+    "market_median",
+    "market_iqr",
+    "lag5_market_breadth",
+    "signal_return",
+    "relative_amount20",
+    "lag_return",
+    "prior5_return",
+    "prior5_vol",
+    "prior10_vol",
+    "prior5_downside",
+    "prior5_worst"
+  ],
+  "unknown_future_labels_not_used_to_filter_predictions": true,
+  "chronology_all_passed": true,
+  "baseline_missing_risk": 0
+}

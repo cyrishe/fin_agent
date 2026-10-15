@@ -1,0 +1,1746 @@
+{
+  "days": [
+    {
+      "day": "2025-08-01",
+      "training_rows": 102148,
+      "calibration_rows": 102148,
+      "chronology_pass": true
+    },
+    {
+      "day": "2025-08-04",
+      "training_rows": 102180,
+      "calibration_rows": 102180,
+      "chronology_pass": true
+    },
+    {
+      "day": "2025-08-05",
+      "training_rows": 102222,
+      "calibration_rows": 102222,
+      "chronology_pass": true
+    },
+    {
+      "day": "2025-08-06",
+      "training_rows": 102273,
+      "calibration_rows": 102273,
+      "chronology_pass": true
+    },
+    {
+      "day": "2025-08-07",
+      "training_rows": 102336,
+      "calibration_rows": 102336,
+      "chronology_pass": true
+    },
+    {
+      "day": "2025-08-08",
+      "training_rows": 102397,
+      "calibration_rows": 102397,
+      "chronology_pass": true
+    },
+    {
+      "day": "2025-08-11",
+      "training_rows": 102426,
+      "calibration_rows": 102426,
+      "chronology_pass": true
+    },
+    {
+      "day": "2025-08-12",
+      "training_rows": 102457,
+      "calibration_rows": 102457,
+      "chronology_pass": true
+    },
+    {
+      "day": "2025-08-13",
+      "training_rows": 102487,
+      "calibration_rows": 102487,
+      "chronology_pass": true
+    },
+    {
+      "day": "2025-08-14",
+      "training_rows": 102518,
+      "calibration_rows": 102518,
+      "chronology_pass": true
+    },
+    {
+      "day": "2025-08-15",
+      "training_rows": 102559,
+      "calibration_rows": 102559,
+      "chronology_pass": true
+    },
+    {
+      "day": "2025-08-18",
+      "training_rows": 102570,
+      "calibration_rows": 102570,
+      "chronology_pass": true
+    },
+    {
+      "day": "2025-08-19",
+      "training_rows": 102573,
+      "calibration_rows": 102573,
+      "chronology_pass": true
+    },
+    {
+      "day": "2025-08-20",
+      "training_rows": 102591,
+      "calibration_rows": 102591,
+      "chronology_pass": true
+    },
+    {
+      "day": "2025-08-21",
+      "training_rows": 102603,
+      "calibration_rows": 102603,
+      "chronology_pass": true
+    },
+    {
+      "day": "2025-08-22",
+      "training_rows": 102623,
+      "calibration_rows": 102623,
+      "chronology_pass": true
+    },
+    {
+      "day": "2025-08-25",
+      "training_rows": 102626,
+      "calibration_rows": 102626,
+      "chronology_pass": true
+    },
+    {
+      "day": "2025-08-26",
+      "training_rows": 102623,
+      "calibration_rows": 102623,
+      "chronology_pass": true
+    },
+    {
+      "day": "2025-08-27",
+      "training_rows": 102629,
+      "calibration_rows": 102629,
+      "chronology_pass": true
+    },
+    {
+      "day": "2025-08-28",
+      "training_rows": 102641,
+      "calibration_rows": 102641,
+      "chronology_pass": true
+    },
+    {
+      "day": "2025-08-29",
+      "training_rows": 102644,
+      "calibration_rows": 102644,
+      "chronology_pass": true
+    },
+    {
+      "day": "2025-09-01",
+      "training_rows": 102646,
+      "calibration_rows": 102646,
+      "chronology_pass": true
+    },
+    {
+      "day": "2025-09-02",
+      "training_rows": 102655,
+      "calibration_rows": 102655,
+      "chronology_pass": true
+    },
+    {
+      "day": "2025-09-03",
+      "training_rows": 102658,
+      "calibration_rows": 102658,
+      "chronology_pass": true
+    },
+    {
+      "day": "2025-09-04",
+      "training_rows": 102665,
+      "calibration_rows": 102665,
+      "chronology_pass": true
+    },
+    {
+      "day": "2025-09-05",
+      "training_rows": 102678,
+      "calibration_rows": 102678,
+      "chronology_pass": true
+    },
+    {
+      "day": "2025-09-08",
+      "training_rows": 102677,
+      "calibration_rows": 102677,
+      "chronology_pass": true
+    },
+    {
+      "day": "2025-09-09",
+      "training_rows": 102677,
+      "calibration_rows": 102677,
+      "chronology_pass": true
+    },
+    {
+      "day": "2025-09-10",
+      "training_rows": 102665,
+      "calibration_rows": 102665,
+      "chronology_pass": true
+    },
+    {
+      "day": "2025-09-11",
+      "training_rows": 102665,
+      "calibration_rows": 102665,
+      "chronology_pass": true
+    },
+    {
+      "day": "2025-09-12",
+      "training_rows": 102667,
+      "calibration_rows": 102667,
+      "chronology_pass": true
+    },
+    {
+      "day": "2025-09-15",
+      "training_rows": 102671,
+      "calibration_rows": 102671,
+      "chronology_pass": true
+    },
+    {
+      "day": "2025-09-16",
+      "training_rows": 102681,
+      "calibration_rows": 102681,
+      "chronology_pass": true
+    },
+    {
+      "day": "2025-09-17",
+      "training_rows": 102677,
+      "calibration_rows": 102677,
+      "chronology_pass": true
+    },
+    {
+      "day": "2025-09-18",
+      "training_rows": 102679,
+      "calibration_rows": 102679,
+      "chronology_pass": true
+    },
+    {
+      "day": "2025-09-19",
+      "training_rows": 102683,
+      "calibration_rows": 102683,
+      "chronology_pass": true
+    },
+    {
+      "day": "2025-09-22",
+      "training_rows": 102682,
+      "calibration_rows": 102682,
+      "chronology_pass": true
+    },
+    {
+      "day": "2025-09-23",
+      "training_rows": 102672,
+      "calibration_rows": 102672,
+      "chronology_pass": true
+    },
+    {
+      "day": "2025-09-24",
+      "training_rows": 102642,
+      "calibration_rows": 102642,
+      "chronology_pass": true
+    },
+    {
+      "day": "2025-09-25",
+      "training_rows": 102612,
+      "calibration_rows": 102612,
+      "chronology_pass": true
+    },
+    {
+      "day": "2025-09-26",
+      "training_rows": 102579,
+      "calibration_rows": 102579,
+      "chronology_pass": true
+    },
+    {
+      "day": "2025-09-29",
+      "training_rows": 102569,
+      "calibration_rows": 102569,
+      "chronology_pass": true
+    },
+    {
+      "day": "2025-09-30",
+      "training_rows": 102538,
+      "calibration_rows": 102538,
+      "chronology_pass": true
+    },
+    {
+      "day": "2025-10-09",
+      "training_rows": 102541,
+      "calibration_rows": 102541,
+      "chronology_pass": true
+    },
+    {
+      "day": "2025-10-10",
+      "training_rows": 102538,
+      "calibration_rows": 102538,
+      "chronology_pass": true
+    },
+    {
+      "day": "2025-10-13",
+      "training_rows": 102532,
+      "calibration_rows": 102532,
+      "chronology_pass": true
+    },
+    {
+      "day": "2025-10-14",
+      "training_rows": 102530,
+      "calibration_rows": 102530,
+      "chronology_pass": true
+    },
+    {
+      "day": "2025-10-15",
+      "training_rows": 102518,
+      "calibration_rows": 102518,
+      "chronology_pass": true
+    },
+    {
+      "day": "2025-10-16",
+      "training_rows": 102519,
+      "calibration_rows": 102519,
+      "chronology_pass": true
+    },
+    {
+      "day": "2025-10-17",
+      "training_rows": 102497,
+      "calibration_rows": 102497,
+      "chronology_pass": true
+    },
+    {
+      "day": "2025-10-20",
+      "training_rows": 102506,
+      "calibration_rows": 102506,
+      "chronology_pass": true
+    },
+    {
+      "day": "2025-10-21",
+      "training_rows": 102506,
+      "calibration_rows": 102506,
+      "chronology_pass": true
+    },
+    {
+      "day": "2025-10-22",
+      "training_rows": 102495,
+      "calibration_rows": 102495,
+      "chronology_pass": true
+    },
+    {
+      "day": "2025-10-23",
+      "training_rows": 102497,
+      "calibration_rows": 102497,
+      "chronology_pass": true
+    },
+    {
+      "day": "2025-10-24",
+      "training_rows": 102478,
+      "calibration_rows": 102478,
+      "chronology_pass": true
+    },
+    {
+      "day": "2025-10-27",
+      "training_rows": 102488,
+      "calibration_rows": 102488,
+      "chronology_pass": true
+    },
+    {
+      "day": "2025-10-28",
+      "training_rows": 102488,
+      "calibration_rows": 102488,
+      "chronology_pass": true
+    },
+    {
+      "day": "2025-10-29",
+      "training_rows": 102513,
+      "calibration_rows": 102513,
+      "chronology_pass": true
+    },
+    {
+      "day": "2025-10-30",
+      "training_rows": 102548,
+      "calibration_rows": 102548,
+      "chronology_pass": true
+    },
+    {
+      "day": "2025-10-31",
+      "training_rows": 102585,
+      "calibration_rows": 102585,
+      "chronology_pass": true
+    },
+    {
+      "day": "2025-11-03",
+      "training_rows": 102631,
+      "calibration_rows": 102631,
+      "chronology_pass": true
+    },
+    {
+      "day": "2025-11-04",
+      "training_rows": 102652,
+      "calibration_rows": 102652,
+      "chronology_pass": true
+    },
+    {
+      "day": "2025-11-05",
+      "training_rows": 102691,
+      "calibration_rows": 102691,
+      "chronology_pass": true
+    },
+    {
+      "day": "2025-11-06",
+      "training_rows": 102699,
+      "calibration_rows": 102699,
+      "chronology_pass": true
+    },
+    {
+      "day": "2025-11-07",
+      "training_rows": 102704,
+      "calibration_rows": 102704,
+      "chronology_pass": true
+    },
+    {
+      "day": "2025-11-10",
+      "training_rows": 102727,
+      "calibration_rows": 102727,
+      "chronology_pass": true
+    },
+    {
+      "day": "2025-11-11",
+      "training_rows": 102737,
+      "calibration_rows": 102737,
+      "chronology_pass": true
+    },
+    {
+      "day": "2025-11-12",
+      "training_rows": 102754,
+      "calibration_rows": 102754,
+      "chronology_pass": true
+    },
+    {
+      "day": "2025-11-13",
+      "training_rows": 102782,
+      "calibration_rows": 102782,
+      "chronology_pass": true
+    },
+    {
+      "day": "2025-11-14",
+      "training_rows": 102819,
+      "calibration_rows": 102819,
+      "chronology_pass": true
+    },
+    {
+      "day": "2025-11-17",
+      "training_rows": 102836,
+      "calibration_rows": 102836,
+      "chronology_pass": true
+    },
+    {
+      "day": "2025-11-18",
+      "training_rows": 102843,
+      "calibration_rows": 102843,
+      "chronology_pass": true
+    },
+    {
+      "day": "2025-11-19",
+      "training_rows": 102864,
+      "calibration_rows": 102864,
+      "chronology_pass": true
+    },
+    {
+      "day": "2025-11-20",
+      "training_rows": 102888,
+      "calibration_rows": 102888,
+      "chronology_pass": true
+    },
+    {
+      "day": "2025-11-21",
+      "training_rows": 102924,
+      "calibration_rows": 102924,
+      "chronology_pass": true
+    },
+    {
+      "day": "2025-11-24",
+      "training_rows": 102935,
+      "calibration_rows": 102935,
+      "chronology_pass": true
+    },
+    {
+      "day": "2025-11-25",
+      "training_rows": 102947,
+      "calibration_rows": 102947,
+      "chronology_pass": true
+    },
+    {
+      "day": "2025-11-26",
+      "training_rows": 102941,
+      "calibration_rows": 102941,
+      "chronology_pass": true
+    },
+    {
+      "day": "2025-11-27",
+      "training_rows": 102939,
+      "calibration_rows": 102939,
+      "chronology_pass": true
+    },
+    {
+      "day": "2025-11-28",
+      "training_rows": 102931,
+      "calibration_rows": 102931,
+      "chronology_pass": true
+    },
+    {
+      "day": "2025-12-01",
+      "training_rows": 102927,
+      "calibration_rows": 102927,
+      "chronology_pass": true
+    },
+    {
+      "day": "2025-12-02",
+      "training_rows": 102924,
+      "calibration_rows": 102924,
+      "chronology_pass": true
+    },
+    {
+      "day": "2025-12-03",
+      "training_rows": 102925,
+      "calibration_rows": 102925,
+      "chronology_pass": true
+    },
+    {
+      "day": "2025-12-04",
+      "training_rows": 102926,
+      "calibration_rows": 102926,
+      "chronology_pass": true
+    },
+    {
+      "day": "2025-12-05",
+      "training_rows": 102929,
+      "calibration_rows": 102929,
+      "chronology_pass": true
+    },
+    {
+      "day": "2025-12-08",
+      "training_rows": 102924,
+      "calibration_rows": 102924,
+      "chronology_pass": true
+    },
+    {
+      "day": "2025-12-09",
+      "training_rows": 102928,
+      "calibration_rows": 102928,
+      "chronology_pass": true
+    },
+    {
+      "day": "2025-12-10",
+      "training_rows": 102927,
+      "calibration_rows": 102927,
+      "chronology_pass": true
+    },
+    {
+      "day": "2025-12-11",
+      "training_rows": 102922,
+      "calibration_rows": 102922,
+      "chronology_pass": true
+    },
+    {
+      "day": "2025-12-12",
+      "training_rows": 102917,
+      "calibration_rows": 102917,
+      "chronology_pass": true
+    },
+    {
+      "day": "2025-12-15",
+      "training_rows": 102915,
+      "calibration_rows": 102915,
+      "chronology_pass": true
+    },
+    {
+      "day": "2025-12-16",
+      "training_rows": 102923,
+      "calibration_rows": 102923,
+      "chronology_pass": true
+    },
+    {
+      "day": "2025-12-17",
+      "training_rows": 102928,
+      "calibration_rows": 102928,
+      "chronology_pass": true
+    },
+    {
+      "day": "2025-12-18",
+      "training_rows": 102926,
+      "calibration_rows": 102926,
+      "chronology_pass": true
+    },
+    {
+      "day": "2025-12-19",
+      "training_rows": 102919,
+      "calibration_rows": 102919,
+      "chronology_pass": true
+    },
+    {
+      "day": "2025-12-22",
+      "training_rows": 102918,
+      "calibration_rows": 102918,
+      "chronology_pass": true
+    },
+    {
+      "day": "2025-12-23",
+      "training_rows": 102927,
+      "calibration_rows": 102927,
+      "chronology_pass": true
+    },
+    {
+      "day": "2025-12-24",
+      "training_rows": 102942,
+      "calibration_rows": 102942,
+      "chronology_pass": true
+    },
+    {
+      "day": "2025-12-25",
+      "training_rows": 102961,
+      "calibration_rows": 102961,
+      "chronology_pass": true
+    },
+    {
+      "day": "2025-12-26",
+      "training_rows": 102984,
+      "calibration_rows": 102984,
+      "chronology_pass": true
+    },
+    {
+      "day": "2025-12-29",
+      "training_rows": 102999,
+      "calibration_rows": 102999,
+      "chronology_pass": true
+    },
+    {
+      "day": "2025-12-30",
+      "training_rows": 103017,
+      "calibration_rows": 103017,
+      "chronology_pass": true
+    },
+    {
+      "day": "2025-12-31",
+      "training_rows": 103029,
+      "calibration_rows": 103029,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-01-05",
+      "training_rows": 103046,
+      "calibration_rows": 103046,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-01-06",
+      "training_rows": 103071,
+      "calibration_rows": 103071,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-01-07",
+      "training_rows": 103092,
+      "calibration_rows": 103092,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-01-08",
+      "training_rows": 103103,
+      "calibration_rows": 103103,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-01-09",
+      "training_rows": 103118,
+      "calibration_rows": 103118,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-01-12",
+      "training_rows": 103134,
+      "calibration_rows": 103134,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-01-13",
+      "training_rows": 103149,
+      "calibration_rows": 103149,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-01-14",
+      "training_rows": 103158,
+      "calibration_rows": 103158,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-01-15",
+      "training_rows": 103165,
+      "calibration_rows": 103165,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-01-16",
+      "training_rows": 103171,
+      "calibration_rows": 103171,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-01-19",
+      "training_rows": 103188,
+      "calibration_rows": 103188,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-01-20",
+      "training_rows": 103211,
+      "calibration_rows": 103211,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-01-21",
+      "training_rows": 103233,
+      "calibration_rows": 103233,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-01-22",
+      "training_rows": 103254,
+      "calibration_rows": 103254,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-01-23",
+      "training_rows": 103270,
+      "calibration_rows": 103270,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-01-26",
+      "training_rows": 103276,
+      "calibration_rows": 103276,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-01-27",
+      "training_rows": 103286,
+      "calibration_rows": 103286,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-01-28",
+      "training_rows": 103299,
+      "calibration_rows": 103299,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-01-29",
+      "training_rows": 103308,
+      "calibration_rows": 103308,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-01-30",
+      "training_rows": 103312,
+      "calibration_rows": 103312,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-02-02",
+      "training_rows": 103317,
+      "calibration_rows": 103317,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-02-03",
+      "training_rows": 103320,
+      "calibration_rows": 103320,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-02-04",
+      "training_rows": 103325,
+      "calibration_rows": 103325,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-02-05",
+      "training_rows": 103336,
+      "calibration_rows": 103336,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-02-06",
+      "training_rows": 103343,
+      "calibration_rows": 103343,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-02-09",
+      "training_rows": 103346,
+      "calibration_rows": 103346,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-02-10",
+      "training_rows": 103356,
+      "calibration_rows": 103356,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-02-11",
+      "training_rows": 103362,
+      "calibration_rows": 103362,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-02-12",
+      "training_rows": 103374,
+      "calibration_rows": 103374,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-02-13",
+      "training_rows": 103394,
+      "calibration_rows": 103394,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-02-24",
+      "training_rows": 103404,
+      "calibration_rows": 103404,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-02-25",
+      "training_rows": 103410,
+      "calibration_rows": 103410,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-02-26",
+      "training_rows": 103411,
+      "calibration_rows": 103411,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-02-27",
+      "training_rows": 103410,
+      "calibration_rows": 103410,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-03-02",
+      "training_rows": 103413,
+      "calibration_rows": 103413,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-03-03",
+      "training_rows": 103421,
+      "calibration_rows": 103421,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-03-04",
+      "training_rows": 103427,
+      "calibration_rows": 103427,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-03-05",
+      "training_rows": 103433,
+      "calibration_rows": 103433,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-03-06",
+      "training_rows": 103441,
+      "calibration_rows": 103441,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-03-09",
+      "training_rows": 103456,
+      "calibration_rows": 103456,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-03-10",
+      "training_rows": 103464,
+      "calibration_rows": 103464,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-03-11",
+      "training_rows": 103472,
+      "calibration_rows": 103472,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-03-12",
+      "training_rows": 103487,
+      "calibration_rows": 103487,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-03-13",
+      "training_rows": 103499,
+      "calibration_rows": 103499,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-03-16",
+      "training_rows": 103515,
+      "calibration_rows": 103515,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-03-17",
+      "training_rows": 103528,
+      "calibration_rows": 103528,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-03-18",
+      "training_rows": 103541,
+      "calibration_rows": 103541,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-03-19",
+      "training_rows": 103554,
+      "calibration_rows": 103554,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-03-20",
+      "training_rows": 103562,
+      "calibration_rows": 103562,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-03-23",
+      "training_rows": 103563,
+      "calibration_rows": 103563,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-03-24",
+      "training_rows": 103565,
+      "calibration_rows": 103565,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-03-25",
+      "training_rows": 103568,
+      "calibration_rows": 103568,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-03-26",
+      "training_rows": 103574,
+      "calibration_rows": 103574,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-03-27",
+      "training_rows": 103575,
+      "calibration_rows": 103575,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-03-30",
+      "training_rows": 103573,
+      "calibration_rows": 103573,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-03-31",
+      "training_rows": 103569,
+      "calibration_rows": 103569,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-04-01",
+      "training_rows": 103568,
+      "calibration_rows": 103568,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-04-02",
+      "training_rows": 103572,
+      "calibration_rows": 103572,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-04-03",
+      "training_rows": 103574,
+      "calibration_rows": 103574,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-04-07",
+      "training_rows": 103571,
+      "calibration_rows": 103571,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-04-08",
+      "training_rows": 103571,
+      "calibration_rows": 103571,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-04-09",
+      "training_rows": 103577,
+      "calibration_rows": 103577,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-04-10",
+      "training_rows": 103578,
+      "calibration_rows": 103578,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-04-13",
+      "training_rows": 103580,
+      "calibration_rows": 103580,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-04-14",
+      "training_rows": 103586,
+      "calibration_rows": 103586,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-04-15",
+      "training_rows": 103593,
+      "calibration_rows": 103593,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-04-16",
+      "training_rows": 103600,
+      "calibration_rows": 103600,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-04-17",
+      "training_rows": 103606,
+      "calibration_rows": 103606,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-04-20",
+      "training_rows": 103609,
+      "calibration_rows": 103609,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-04-21",
+      "training_rows": 103601,
+      "calibration_rows": 103601,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-04-22",
+      "training_rows": 103602,
+      "calibration_rows": 103602,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-04-23",
+      "training_rows": 103604,
+      "calibration_rows": 103604,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-04-24",
+      "training_rows": 103598,
+      "calibration_rows": 103598,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-04-27",
+      "training_rows": 103597,
+      "calibration_rows": 103597,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-04-28",
+      "training_rows": 103581,
+      "calibration_rows": 103581,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-04-29",
+      "training_rows": 103528,
+      "calibration_rows": 103528,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-04-30",
+      "training_rows": 103432,
+      "calibration_rows": 103432,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-05-06",
+      "training_rows": 103390,
+      "calibration_rows": 103390,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-05-07",
+      "training_rows": 103386,
+      "calibration_rows": 103386,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-05-08",
+      "training_rows": 103367,
+      "calibration_rows": 103367,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-05-11",
+      "training_rows": 103342,
+      "calibration_rows": 103342,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-05-12",
+      "training_rows": 103314,
+      "calibration_rows": 103314,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-05-13",
+      "training_rows": 103292,
+      "calibration_rows": 103292,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-05-14",
+      "training_rows": 103267,
+      "calibration_rows": 103267,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-05-15",
+      "training_rows": 103232,
+      "calibration_rows": 103232,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-05-18",
+      "training_rows": 103205,
+      "calibration_rows": 103205,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-05-19",
+      "training_rows": 103162,
+      "calibration_rows": 103162,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-05-20",
+      "training_rows": 103122,
+      "calibration_rows": 103122,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-05-21",
+      "training_rows": 103072,
+      "calibration_rows": 103072,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-05-22",
+      "training_rows": 103031,
+      "calibration_rows": 103031,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-05-25",
+      "training_rows": 103006,
+      "calibration_rows": 103006,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-05-26",
+      "training_rows": 102943,
+      "calibration_rows": 102943,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-05-27",
+      "training_rows": 102888,
+      "calibration_rows": 102888,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-05-28",
+      "training_rows": 102803,
+      "calibration_rows": 102803,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-05-29",
+      "training_rows": 102681,
+      "calibration_rows": 102681,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-06-01",
+      "training_rows": 102674,
+      "calibration_rows": 102674,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-06-02",
+      "training_rows": 102721,
+      "calibration_rows": 102721,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-06-03",
+      "training_rows": 102697,
+      "calibration_rows": 102697,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-06-04",
+      "training_rows": 102628,
+      "calibration_rows": 102628,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-06-05",
+      "training_rows": 102565,
+      "calibration_rows": 102565,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-06-08",
+      "training_rows": 102552,
+      "calibration_rows": 102552,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-06-09",
+      "training_rows": 102506,
+      "calibration_rows": 102506,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-06-10",
+      "training_rows": 102427,
+      "calibration_rows": 102427,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-06-11",
+      "training_rows": 102376,
+      "calibration_rows": 102376,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-06-12",
+      "training_rows": 102326,
+      "calibration_rows": 102326,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-06-15",
+      "training_rows": 102295,
+      "calibration_rows": 102295,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-06-16",
+      "training_rows": 102270,
+      "calibration_rows": 102270,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-06-17",
+      "training_rows": 102234,
+      "calibration_rows": 102234,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-06-18",
+      "training_rows": 102162,
+      "calibration_rows": 102162,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-06-22",
+      "training_rows": 102176,
+      "calibration_rows": 102176,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-06-23",
+      "training_rows": 102175,
+      "calibration_rows": 102175,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-06-24",
+      "training_rows": 102189,
+      "calibration_rows": 102189,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-06-25",
+      "training_rows": 102198,
+      "calibration_rows": 102198,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-06-26",
+      "training_rows": 102189,
+      "calibration_rows": 102189,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-06-29",
+      "training_rows": 102308,
+      "calibration_rows": 102308,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-06-30",
+      "training_rows": 102329,
+      "calibration_rows": 102329,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-07-01",
+      "training_rows": 102355,
+      "calibration_rows": 102355,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-07-02",
+      "training_rows": 102408,
+      "calibration_rows": 102408,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-07-03",
+      "training_rows": 102449,
+      "calibration_rows": 102449,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-07-06",
+      "training_rows": 102511,
+      "calibration_rows": 102511,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-07-07",
+      "training_rows": 102533,
+      "calibration_rows": 102533,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-07-08",
+      "training_rows": 102563,
+      "calibration_rows": 102563,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-07-09",
+      "training_rows": 102615,
+      "calibration_rows": 102615,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-07-10",
+      "training_rows": 102608,
+      "calibration_rows": 102608,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-07-13",
+      "training_rows": 102668,
+      "calibration_rows": 102668,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-07-14",
+      "training_rows": 102712,
+      "calibration_rows": 102712,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-07-15",
+      "training_rows": 102751,
+      "calibration_rows": 102751,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-07-16",
+      "training_rows": 102798,
+      "calibration_rows": 102798,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-07-17",
+      "training_rows": 102876,
+      "calibration_rows": 102876,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-07-20",
+      "training_rows": 102911,
+      "calibration_rows": 102911,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-07-21",
+      "training_rows": 102937,
+      "calibration_rows": 102937,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-07-22",
+      "training_rows": 102975,
+      "calibration_rows": 102975,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-07-23",
+      "training_rows": 103030,
+      "calibration_rows": 103030,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-07-24",
+      "training_rows": 103131,
+      "calibration_rows": 103131,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-07-27",
+      "training_rows": 103164,
+      "calibration_rows": 103164,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-07-28",
+      "training_rows": 103206,
+      "calibration_rows": 103206,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-07-29",
+      "training_rows": 103235,
+      "calibration_rows": 103235,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-07-30",
+      "training_rows": 103245,
+      "calibration_rows": 103245,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-07-31",
+      "training_rows": 103268,
+      "calibration_rows": 103268,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-08-03",
+      "training_rows": 103297,
+      "calibration_rows": 103297,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-08-04",
+      "training_rows": 103327,
+      "calibration_rows": 103327,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-08-05",
+      "training_rows": 103376,
+      "calibration_rows": 103376,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-08-06",
+      "training_rows": 103431,
+      "calibration_rows": 103431,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-08-07",
+      "training_rows": 103514,
+      "calibration_rows": 103514,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-08-10",
+      "training_rows": 103548,
+      "calibration_rows": 103548,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-08-11",
+      "training_rows": 103572,
+      "calibration_rows": 103572,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-08-12",
+      "training_rows": 103615,
+      "calibration_rows": 103615,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-08-13",
+      "training_rows": 103654,
+      "calibration_rows": 103654,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-08-14",
+      "training_rows": 103710,
+      "calibration_rows": 103710,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-08-17",
+      "training_rows": 103732,
+      "calibration_rows": 103732,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-08-18",
+      "training_rows": 103748,
+      "calibration_rows": 103748,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-08-19",
+      "training_rows": 103772,
+      "calibration_rows": 103772,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-08-20",
+      "training_rows": 103784,
+      "calibration_rows": 103784,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-08-21",
+      "training_rows": 103796,
+      "calibration_rows": 103796,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-08-24",
+      "training_rows": 103809,
+      "calibration_rows": 103809,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-08-25",
+      "training_rows": 103835,
+      "calibration_rows": 103835,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-08-26",
+      "training_rows": 103850,
+      "calibration_rows": 103850,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-08-27",
+      "training_rows": 103871,
+      "calibration_rows": 103871,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-08-28",
+      "training_rows": 103898,
+      "calibration_rows": 103898,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-08-31",
+      "training_rows": 103912,
+      "calibration_rows": 103912,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-09-01",
+      "training_rows": 103920,
+      "calibration_rows": 103920,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-09-02",
+      "training_rows": 103928,
+      "calibration_rows": 103928,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-09-03",
+      "training_rows": 103930,
+      "calibration_rows": 103930,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-09-04",
+      "training_rows": 103938,
+      "calibration_rows": 103938,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-09-07",
+      "training_rows": 103938,
+      "calibration_rows": 103938,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-09-08",
+      "training_rows": 103931,
+      "calibration_rows": 103931,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-09-09",
+      "training_rows": 103920,
+      "calibration_rows": 103920,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-09-10",
+      "training_rows": 103912,
+      "calibration_rows": 103912,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-09-11",
+      "training_rows": 103907,
+      "calibration_rows": 103907,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-09-14",
+      "training_rows": 103900,
+      "calibration_rows": 103900,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-09-15",
+      "training_rows": 103893,
+      "calibration_rows": 103893,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-09-16",
+      "training_rows": 103876,
+      "calibration_rows": 103876,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-09-17",
+      "training_rows": 103865,
+      "calibration_rows": 103865,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-09-18",
+      "training_rows": 103856,
+      "calibration_rows": 103856,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-09-21",
+      "training_rows": 103845,
+      "calibration_rows": 103845,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-09-22",
+      "training_rows": 103824,
+      "calibration_rows": 103824,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-09-23",
+      "training_rows": 103798,
+      "calibration_rows": 103798,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-09-24",
+      "training_rows": 103765,
+      "calibration_rows": 103765,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-09-28",
+      "training_rows": 103760,
+      "calibration_rows": 103760,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-09-29",
+      "training_rows": 103735,
+      "calibration_rows": 103735,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-09-30",
+      "training_rows": 103705,
+      "calibration_rows": 103705,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-10-08",
+      "training_rows": 103709,
+      "calibration_rows": 103709,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-10-09",
+      "training_rows": 103717,
+      "calibration_rows": 103717,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-10-12",
+      "training_rows": 103719,
+      "calibration_rows": 103719,
+      "chronology_pass": true
+    },
+    {
+      "day": "2026-10-13",
+      "training_rows": 103716,
+      "calibration_rows": 103716,
+      "chronology_pass": true
+    }
+  ],
+  "formal_days": 288,
+  "warmup_days": 20,
+  "all_chronology_pass": true,
+  "all_calibration_scores_historical_OOS": true,
+  "all_training_weights_verified": true,
+  "original_B1_and_all_CO12_daily_NAV_reproduced": true,
+  "baseline_missing_risk": 0,
+  "top1_classification": {
+    "known": 284,
+    "target_pct": 21.12676056338028,
+    "acceptable_pct": 29.577464788732392,
+    "error_pct": 49.29577464788733,
+    "same_fixed_picks": true
+  }
+}

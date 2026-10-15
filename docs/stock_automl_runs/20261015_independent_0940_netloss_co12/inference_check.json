@@ -1,0 +1,9 @@
+{
+  "rows": 100,
+  "maximum_error": 0.0,
+  "feature_only_input": true,
+  "late_feature_cutoff_rejected": true,
+  "cli_wall_seconds": 3.1432147989999066,
+  "includes_python_import_time": true,
+  "model_month": "2025-08"
+}

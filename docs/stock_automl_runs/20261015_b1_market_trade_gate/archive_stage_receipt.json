@@ -1,0 +1,14 @@
+{
+  "user_id": "imac",
+  "experiment_id": "CO8_20261015_B1_market_stock_trade_gate",
+  "experiment_date": "2026-10-15",
+  "title": "CO8 固定B1市场环境与个股状态交易开关",
+  "category_path": "02_联合目标与尾部风险",
+  "local_path": "/Volumes/ext/fin_agent/outputs/stock_automl/aliyun_drive_local/策略训练/收盘开盘_20261014/02_联合目标与尾部风险/20261015_CO8_B1固定选股_市场个股交易开关",
+  "cloud_path": "策略训练/收盘开盘_20261014/02_联合目标与尾部风险/20261015_CO8_B1固定选股_市场个股交易开关",
+  "source_commit": "e55c2f79787f22efac905cfb08a52b0ad7db6198",
+  "manifest_sha256": "8ca02643669777a0075514152d539aa5a4fbe5d5538110fe9d9ba92c85b68544",
+  "file_count": 1918,
+  "db_recorded": true,
+  "cloud_verified": false
+}

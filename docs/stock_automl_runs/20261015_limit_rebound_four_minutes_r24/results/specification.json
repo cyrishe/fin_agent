@@ -1,0 +1,14 @@
+{
+  "name": "R24_four_completed_minutes_vs_five",
+  "source_sha256": "bb069c02ea02547d1e2e983d7ac28d5d03bd0621de3964f3c2851f1e6cacfcef",
+  "old_rules_sha256": "e18cf06b9917bd508dfdb031935b7864f35bb864603964e70a5ce977069b2f86",
+  "scope": "Saved R18 Top3; Jan-Oct14 2026 accounts. Four-minute rule train/validation/test use original fourteen rolling windows. No daily model retrain.",
+  "observation": "Four bars end09:31..09:34; five bars end09:31..09:35. high/low relative D1preclose, body relative D1open; path split at09:32 in both.",
+  "internal_columns": "Four-minute frame reuses high5/low5/body5 etc as evaluator aliases, observation_bars=4. These contain only first FOUR bars. Fractional features rounded to15 decimals, matching R20 cache precision and normalizing exact-threshold floating error. Original five-minute selections/prices remain unchanged.",
+  "selection": "Exact original79 candidates, Top1 six train months/two validation, purged D4, original shortlist/stability/retention/precision/return guards. Save all rules before evaluating tests. Transfer to Top3.",
+  "execution": "Monitor shape-passing originalTop3 chronologically; first below-cap positive-volume minute OPEN wins; tie D0rank. Four starts end-label09:35, five09:36; cutoff09:40. Apply body>-8% after choosing; failed day not replaced.",
+  "delayed": "Same selected stock, at least one bar after its activation; first qualifying open by09:40. No substitution. This differs from imposing a fixed one-minute delay only after feature completion.",
+  "controls": "Existing five baseline and its known delayed result must reproduce. Four old thresholds and four reselected rules both reported. Shape-only discrimination uses common original-five entry prices/universe.",
+  "account": "100w; flat half available cash, carrying one lot all cash; D2 close; buy/sell each0.1%; fractional shares; end pending marked; no fill/capacity guarantee.",
+  "exposure": "Previously examined historical period. Monthly test not used for each rule selection, but this comparison is not a new blind test."
+}

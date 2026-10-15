@@ -1,0 +1,15 @@
+{
+  "status": "PASS",
+  "short_rules_future_mutation_and_temporal_checks": 39,
+  "validation_saved_model_exact_scores": 326,
+  "extra_minute_stock_days": 13,
+  "chronological_policy_days": 5196,
+  "prior_R21B150_picks_unchanged": true,
+  "cash_nav_days": 30560,
+  "month_return_drawdown_checks": 1616,
+  "pytest": "8 passed",
+  "spec_sha256": "9beb25646026f6e33c2928c321715371721909b73bdaa55981c08267d644ab08",
+  "rules_sha256": "0fd959f9ad017310882aab887ca6e3d5c7fb87b98e2bbbd4b4c6571cbf28095a",
+  "workbook_cells": 4218,
+  "workbook_sha256": "5c5e2a51a46109d9b5122d1aea65c0689c3e6aaf871dc569fd32229bb0b3be0a"
+}

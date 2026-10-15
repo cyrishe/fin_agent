@@ -1,0 +1,16 @@
+{
+  "file": "/Volumes/ext/fin_agent/outputs/stock_automl/limit_downside_r17_20261015/涨停后三日大跌_独立两极模型_验证与前五核验_R17_20261015.xlsx",
+  "bytes": 378972,
+  "sha256": "6f37ab39a2f8929939033e29b0556bf2bbb0db2437633d41e88035b71896db25",
+  "sheets": {
+    "总体效果": 4,
+    "逐月效果": 56,
+    "过滤强度": 9,
+    "条件组合": 14,
+    "原模型核验": 12,
+    "原交易逐月": 56,
+    "前五核验": 2670
+  },
+  "zip_crc": "passed",
+  "detail_date_numeric": true
+}

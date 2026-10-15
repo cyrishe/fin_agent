@@ -1,0 +1,17 @@
+{
+  "package": "/Volumes/ext/fin_agent/outputs/stock_automl/daily20_risk_co13/package",
+  "manifest_sha256": "19ce7f82611ac2851a25c271c95cf420d83c1ad29998d0813161087656cb59ec",
+  "files": 2269,
+  "zip_path": "/Volumes/ext/fin_agent/outputs/stock_automl/daily20_risk_co13/CO13_风险20日每日滚动_对照60日_B1固定_20261015.zip",
+  "zip_sha256": "3590a5b416b197573dcf3316b9f32dea16837141def0e1afca483caa28b36667",
+  "zip_bytes": 868549347,
+  "zip_all_members_readback_verified": true,
+  "cloud_verified": false,
+  "cloud_status": "待同步",
+  "experiment_id": "CO13_20261015_daily20_risk_vs60",
+  "database_readback_verified": true,
+  "local_mirror_readback_verified": true,
+  "local_mirror": "/Volumes/ext/fin_agent/outputs/stock_automl/aliyun_drive_local/策略训练/收盘开盘_20261014/02_联合目标与尾部风险/20261015_CO13_风险20日每日滚动_对照60日_B1固定",
+  "cloud_path": "策略训练/收盘开盘_20261014/02_联合目标与尾部风险/20261015_CO13_风险20日每日滚动_对照60日_B1固定",
+  "cloud_verified_at": null
+}

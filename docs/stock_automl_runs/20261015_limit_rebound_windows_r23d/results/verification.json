@@ -1,0 +1,13 @@
+{
+  "status": "PASS",
+  "trades": 106,
+  "minute_bars": 530,
+  "independent_window_checks": 106,
+  "delayed_cash_days": 186,
+  "original_cells_preserved": 3645,
+  "new_cells_checked": 1484,
+  "all_original_number_formats_panes_and_table_styles_preserved": true,
+  "tests": "3 targeted window tests; 5 existing cash/fee tests",
+  "source_workbook_sha256": "47c7bac38171b52849a71f490d9607b147742a793535733df7706ddff57f9db3",
+  "workbook_sha256": "8ace019e3e2f9910286ee0c2a5ac0f36263d6987de0a5f5f03ac5759ffdb4dba"
+}

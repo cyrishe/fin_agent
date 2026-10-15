@@ -1,0 +1,43 @@
+{
+  "trades": 106,
+  "all_original_prices_unchanged": true,
+  "first5_features_recomputed": 424,
+  "rules_passed": 106,
+  "entry_whole": 91,
+  "entry_mixed": 15,
+  "continuous_whole_distribution": {
+    "0": 15,
+    "1": 15,
+    "2": 2,
+    "3": 3,
+    "4": 4,
+    "5": 67
+  },
+  "whole_minutes_distribution": {
+    "0": 11,
+    "1": 10,
+    "2": 4,
+    "3": 9,
+    "4": 5,
+    "5": 67
+  },
+  "no_whole_minutes": 11,
+  "whole_at_least3": 81,
+  "first_touch_same_minute": 15,
+  "no_touch_before0940": 73,
+  "buy_share_ratio_median": 0.014165799864202083,
+  "buy_share_ratio_p90": 0.05209222702367035,
+  "buy_share_ratio_max": 1.3671434258121187,
+  "buy_share_ratio_over10pct": 4,
+  "buy_share_ratio_over100pct": 2,
+  "delay_available": 98,
+  "delay_missed": 8,
+  "delay_entry_whole": 80,
+  "original_total_return": 1.0358168982692004,
+  "original_sharpe": 2.2476448654842156,
+  "original_drawdown": 0.18833605605358483,
+  "delayed_total_return": 0.7304912778659227,
+  "delayed_sharpe": 1.8423306130387633,
+  "delayed_drawdown": 0.18965646314358808,
+  "scope": "Descriptive original106 trades, same-stock one-minute delay; not a fitted filter or new blind test"
+}

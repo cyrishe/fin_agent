@@ -1,0 +1,287 @@
+{
+  "local_status": "complete",
+  "cloud_status": "not_synced",
+  "dependencies": "R18 monthly models and R19/R20/R21 snapshots: see specification.json and sources.json",
+  "files": [
+    {
+      "path": "docs/stock_automl_runs/20261015_limit_rebound_shape_windows_r22/README.md",
+      "bytes": 11902,
+      "sha256": "17e0e0023d10612607a9cfed93c8f876516cf7d0b05cc2e833578d14184aafc8"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_windows_r22_20261015/account_exclusions.json",
+      "bytes": 25737,
+      "sha256": "24acace9c2447750f757d383a442b0a600588af169c5c330e198fd023c566c98"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_windows_r22_20261015/account_months.json",
+      "bytes": 754863,
+      "sha256": "89537414b23194c786a0e8d8bfa44071f036a9d4fa251934968fd12826fb0861"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_windows_r22_20261015/accounts.json",
+      "bytes": 75542,
+      "sha256": "3296571d56a83f3304c10a58e99e84ffc0882380e268e4ea70db171a20b3bbfc"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_windows_r22_20261015/cash_ledger.pkl",
+      "bytes": 1410824,
+      "sha256": "d7a5dd9f710f55a2e6fa118d2128419a3710b66e56f07c6383c480ecaf45bc9a"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_windows_r22_20261015/daily_nav.pkl",
+      "bytes": 1618267,
+      "sha256": "c06ab137d714931aea477dfcff286c890b9038df28bb4b435b84e81e83765545"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_windows_r22_20261015/extra_minute_demand.pkl",
+      "bytes": 16412,
+      "sha256": "2ce34bf2fb69a0755a4ce746a70afd814c84b5a7b850a5a7514be6a6cd9e2403"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_windows_r22_20261015/february_feasibility.json",
+      "bytes": 530,
+      "sha256": "4f85d871f73297d3cba1caadd83e138de83157d48d9312ca7a6f2465c8444014"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_windows_r22_20261015/forecast_top3.pkl",
+      "bytes": 1631833,
+      "sha256": "33256ad7c1525a67fa2d43e8daba73500654a3139eedee31d8b7d04cdeb34050"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_windows_r22_20261015/metadata.pkl",
+      "bytes": 1926032,
+      "sha256": "dc3232588eed24f66b495dee4d60cee99453942ab290ed41341c252194d3afee"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_windows_r22_20261015/minute_days/2025-02-21.json",
+      "bytes": 635,
+      "sha256": "1f12f73b503f6e834b6ec51d415eeb9872f02054693847ab8ec1e0178d5134b1"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_windows_r22_20261015/minute_days/2025-02-21_raw.pkl",
+      "bytes": 21106,
+      "sha256": "cb5cb8dbceee704c1714b00cae2d58c91b5dadc07a7a5965aa0f9539fb3dba28"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_windows_r22_20261015/minute_days/2025-03-12.json",
+      "bytes": 634,
+      "sha256": "d59ba0952ca179d9144808d7e6eabfcdce561b9179186958e8c6b9edd4bfd710"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_windows_r22_20261015/minute_days/2025-03-12_raw.pkl",
+      "bytes": 21106,
+      "sha256": "193649abc8d99dc340a480c348049b49b5cc5cd49f4d44f0659373507441397f"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_windows_r22_20261015/minute_days/2025-03-19.json",
+      "bytes": 670,
+      "sha256": "c3d33f605b17596e1a44cc5086e14ef3b6e35df69a3fb9018a70bad4a8cd7b35"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_windows_r22_20261015/minute_days/2025-03-19_raw.pkl",
+      "bytes": 21106,
+      "sha256": "89bb4a0012ebf435824cb5a8be5ddf263d8be71982e59dd01a353d05341ee7d9"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_windows_r22_20261015/minute_days/2025-04-03.json",
+      "bytes": 685,
+      "sha256": "7271974dff43f142c2d370908f61062ec415d5832dd72ac90c797015620d6d1f"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_windows_r22_20261015/minute_days/2025-04-03_raw.pkl",
+      "bytes": 21106,
+      "sha256": "6a0523fa940189a5f228a721e785f0d2500d748fc7f5b42fd05fe0e137e90d1c"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_windows_r22_20261015/minute_days/2025-04-21.json",
+      "bytes": 658,
+      "sha256": "4d0d966b06f335ee46021659ebd224d45ae11de45ad3364eaffa5f1e3dbbfd47"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_windows_r22_20261015/minute_days/2025-04-21_raw.pkl",
+      "bytes": 21106,
+      "sha256": "487ab119348d8f9ffca3a8d8b5fa5f25435abbde031317d2ff5ab08fdc4d30eb"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_windows_r22_20261015/minute_days/2025-04-22.json",
+      "bytes": 687,
+      "sha256": "569558137c5258d6f50cf09b2ced3972e2fbaa05d64543c2ffe85adb4d45b192"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_windows_r22_20261015/minute_days/2025-04-22_raw.pkl",
+      "bytes": 21106,
+      "sha256": "09b213cc998916523b1ac748093ba8d48762f6c1946127543656f44b417956f5"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_windows_r22_20261015/minute_days/2025-05-08.json",
+      "bytes": 672,
+      "sha256": "ff0c66f01f5def106df722dd272bc44eac34b1c1f7c469ea621fba0f44b513fe"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_windows_r22_20261015/minute_days/2025-05-08_raw.pkl",
+      "bytes": 21106,
+      "sha256": "991fd15e18e364fd18372049d6fd9d06caae1c02520fb92dbfe159d48f6c4457"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_windows_r22_20261015/minute_days/2025-05-09.json",
+      "bytes": 685,
+      "sha256": "2ebc32126757483276df0d445673183ddc27921edee1f6ddd89f40e0cfcbec9b"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_windows_r22_20261015/minute_days/2025-05-09_raw.pkl",
+      "bytes": 21106,
+      "sha256": "14f660d6985c3d85b81a55cc650bf43957bdc68ea5e2b712ddeaa0cbb045c2f2"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_windows_r22_20261015/minute_days/2025-06-05.json",
+      "bytes": 686,
+      "sha256": "b77c611e890e72f8b332409a048ac1f01a9f9ffaf52d8d56e13e9b9fbc0d3bc3"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_windows_r22_20261015/minute_days/2025-06-05_raw.pkl",
+      "bytes": 21106,
+      "sha256": "6a96861e8b7b37d6d1254822e05d42a074089537e139ab8b0c106524ec35b271"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_windows_r22_20261015/minute_days/2025-06-10.json",
+      "bytes": 685,
+      "sha256": "6d7cb8dae0721600271d0fc9900fabc8e9cfcc57210bb6ee56ddf75bf52e706c"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_windows_r22_20261015/minute_days/2025-06-10_raw.pkl",
+      "bytes": 21106,
+      "sha256": "18372da4aef04b0e188a5ac19d952ebd903a898d8d6d43fcc57f57c115cf5862"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_windows_r22_20261015/minute_days/2025-06-16.json",
+      "bytes": 685,
+      "sha256": "9d57a26ddeab524d8c1402678421dcaf084c65a1d48f1464c6b7a3ec66456553"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_windows_r22_20261015/minute_days/2025-06-16_raw.pkl",
+      "bytes": 21106,
+      "sha256": "cd9e62d6c1b28748591783c90875709f1db4343c549e943d5a8b6aa70c9a8abc"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_windows_r22_20261015/minute_days/2025-06-17.json",
+      "bytes": 686,
+      "sha256": "b17113817ab8056ffc597e5d547473cc3b84b667f63e0db4c5bb59e21b2cc415"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_windows_r22_20261015/minute_days/2025-06-17_raw.pkl",
+      "bytes": 21106,
+      "sha256": "25b97979fa7645877631472edba8f86784e3d9bd244787f30023e271918c5972"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_windows_r22_20261015/minute_days/2025-06-20.json",
+      "bytes": 684,
+      "sha256": "54d63f18915336aef06f9b588dee2cd90b86e00e3b0df21541b321ba27b44229"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_windows_r22_20261015/minute_days/2025-06-20_raw.pkl",
+      "bytes": 21106,
+      "sha256": "0b0453c98cd2639f24d04434cb4391148042c82a6e0f68e519efa5004013b5a1"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_windows_r22_20261015/original_rules_frozen.json",
+      "bytes": 502459,
+      "sha256": "e18cf06b9917bd508dfdb031935b7864f35bb864603964e70a5ce977069b2f86"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_windows_r22_20261015/overall.json",
+      "bytes": 41971,
+      "sha256": "43b7423fd5a9025f2ed38e59aaae4c077f12d496a28676bb445ab3baaca49c14"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_windows_r22_20261015/paired_month_comparison.json",
+      "bytes": 9430,
+      "sha256": "fef8e6e95cfbb19fa3e7247b378f8bb46859b4806384ca9b645245b278b66057"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_windows_r22_20261015/policy_picks.pkl",
+      "bytes": 4411172,
+      "sha256": "41f3a714b1d9c3dbfae50d739160e4e328b682835e8e50a87e5bf1ef5e8813ef"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_windows_r22_20261015/rule_assignments.json",
+      "bytes": 34311,
+      "sha256": "ddad962fae493933875af4b6a8b1c7eac661257c74a292b3c528a2e33b099d7c"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_windows_r22_20261015/selection_receipt.json",
+      "bytes": 336,
+      "sha256": "1434b4c295b1b3a6e4ed03b9edec7c6785777127db0f97f9d548f2e54e081310"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_windows_r22_20261015/short_rules_frozen.json",
+      "bytes": 686342,
+      "sha256": "0fd959f9ad017310882aab887ca6e3d5c7fb87b98e2bbbd4b4c6571cbf28095a"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_windows_r22_20261015/signal_month_metrics.json",
+      "bytes": 278997,
+      "sha256": "3be61c7f3dc1eda3307ca4a5feb9bc1aca758720dcf2949c64204a69d70408a1"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_windows_r22_20261015/sources.json",
+      "bytes": 4424,
+      "sha256": "5d6fc494bc0c00d3f378f0fef931e4eeea86fdbf5abeead47287f68f3ddd0e8c"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_windows_r22_20261015/specification.json",
+      "bytes": 22103,
+      "sha256": "9beb25646026f6e33c2928c321715371721909b73bdaa55981c08267d644ab08"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_windows_r22_20261015/validation_top1.pkl",
+      "bytes": 396030,
+      "sha256": "c5c3c1d833e01151597bec07d4930694dd000876bd5332e3815615c26008c807"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_windows_r22_20261015/verification.json",
+      "bytes": 613,
+      "sha256": "6aa2d8107ea64e44a8f4ff2efb95ebe0bd4566f5c274208c4a4a4587800abab3"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_windows_r22_20261015/workbook_data.json",
+      "bytes": 145630,
+      "sha256": "ed98241040f305df6c25b40042951e80c91a9b21b23875916153233eef7859ad"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_windows_r22_20261015/workbook_notes.json",
+      "bytes": 4111,
+      "sha256": "7f69b4ecfa7ce75918380adf94603c4dff106239393f72c71955e5996940ca05"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_windows_r22_20261015/形态短窗_滚动与固定规则对照_R22_20261015.xlsx",
+      "bytes": 44890,
+      "sha256": "5c5e2a51a46109d9b5122d1aea65c0689c3e6aaf871dc569fd32229bb0b3be0a"
+    },
+    {
+      "path": "scripts/build_limit_rebound_shape_windows_r22.mjs",
+      "bytes": 3968,
+      "sha256": "ff57538561a06169df0c35199673ecd3cbd6ac4f5ee868b005bf9925546d3daf"
+    },
+    {
+      "path": "scripts/experiment_limit_rebound_shape_windows_r22.py",
+      "bytes": 16189,
+      "sha256": "f3c1911d1838a77600d78c4cd32b130adbc4924b9107c89cdd9d569cc6af70e7"
+    },
+    {
+      "path": "scripts/report_limit_rebound_shape_windows_r22.py",
+      "bytes": 14843,
+      "sha256": "a045457408a1a156705eca4f7c36f9ddd01b34541694f1be90fc137597cce850"
+    },
+    {
+      "path": "scripts/verify_limit_rebound_shape_windows_r22.py",
+      "bytes": 7505,
+      "sha256": "63e5c908415f06b15e0251fc9b87f4e886348355206597e80c86b5230197788b"
+    },
+    {
+      "path": "tests/automl/test_limit_rebound_shape_windows_r22.py",
+      "bytes": 1923,
+      "sha256": "6d49a201362d4195189ecc1a92aa03378543d08c396134e5b829b3292db43a18"
+    }
+  ]
+}

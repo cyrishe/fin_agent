@@ -1,0 +1,27 @@
+{
+  "sklearn": "1.7.1",
+  "numpy": "2.5.2",
+  "scipy": "1.18.1",
+  "pandas": "2.3.3",
+  "joblib": "1.6.0",
+  "python": "3.12.14",
+  "folds": 15,
+  "heads": 30,
+  "features": [
+    "market_breadth",
+    "market_median",
+    "market_iqr",
+    "lag5_market_breadth",
+    "signal_return",
+    "relative_amount20",
+    "lag_return",
+    "prior5_return",
+    "prior5_vol",
+    "prior10_vol",
+    "prior5_downside",
+    "prior5_worst"
+  ],
+  "total_seconds": 317.5947224350002,
+  "source_in_working_tree": true,
+  "max_reload_error": 0.0
+}

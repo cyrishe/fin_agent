@@ -1,0 +1,42 @@
+{
+  "name": "R24B_frozen_classification_confusion_matrices",
+  "months": [
+    "2026-01",
+    "2026-02",
+    "2026-03",
+    "2026-04",
+    "2026-05",
+    "2026-06",
+    "2026-07",
+    "2026-08",
+    "2026-09",
+    "2026-10"
+  ],
+  "primary": "All historical ordinary N/R, audited D0 original Top1/Top3 with mature D1-D3 sealed-close label; no condition on later opening or fill, no buy price or outcome return selection.",
+  "secondary": "Same original five-bar future-entry-eligible subset for all four policies, descriptive execution-conditioned comparison only; not primary classification population.",
+  "label": "1 iff D1 or D2 or D3 sealed at daily close. D1 included. All three days must be observed; partial labels excluded even if D1 already sealed.",
+  "prediction": "Shape pass=1, reject=0. No-filter retains all=all-positive reference, not a fitted classifier. No -8 body gate, daily one-stock choice, latency or account results in classifier predictions.",
+  "split": "Frozen 2026-01..10 monthly model windows: six months train with causal OOF D0 scores, two validation, next month test. Train/valid count each model-stock-day evaluation; overlapping windows are NOT independent samples. Unique stock-day count separately shown. Test stock-days unique.",
+  "date": "Target/model month determined by D0. 2025-12-31 D0 / 2026-01-05 D1 uses December model, hence outside this ten-model comparison; this accounts for three observations vs prior D1-calendar-year matrix.",
+  "metrics": "Accuracy=(TP+TN)/N; precision=TP/(TP+FP); recall=TP/(TP+FN); F1=2TP/(2TP+FP+FN); balanced accuracy=mean(TPR,TNR). Undefined denominators blank. No continuous calibrated shape score, so probability AUC/calibration not invented.",
+  "fitting": "No retraining or rule changes. Four-K reselected rules are R24; five-K original R19 rules; four-K transferred thresholds reuse five-K selections.",
+  "exposure": "Training/validation used for rule selection, optimistic. Monthly test not used for selection, but historical period previously studied, not new blind holdout.",
+  "source_hashes": [
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/enriched_top3.pkl",
+      "sha256": "bb069c02ea02547d1e2e983d7ac28d5d03bd0621de3964f3c2851f1e6cacfcef"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_four_minutes_r24_20261015/four_all_top3.pkl",
+      "sha256": "d64e267e191a77f8b926e61ed8cfcae658369a873b428453941a30e7da287f68"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_r19_20261015/all_rules_frozen.json",
+      "sha256": "e18cf06b9917bd508dfdb031935b7864f35bb864603964e70a5ce977069b2f86"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_four_minutes_r24_20261015/four_rules_frozen.json",
+      "sha256": "81f297e033f8911f967d14a4801faff5edc308ace8b4e35b3f2447a9ebd7df49"
+    }
+  ]
+}

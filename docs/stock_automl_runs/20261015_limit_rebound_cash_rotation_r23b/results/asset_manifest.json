@@ -1,0 +1,161 @@
+{
+  "local_status": "complete",
+  "cloud_status": "not_synced",
+  "files": [
+    {
+      "path": "outputs/stock_automl/limit_rebound_cash_rotation_r23b_20261015/specification.json",
+      "bytes": 2197,
+      "sha256": "220dc924a1945032a75c63d8b3c4a9e12d8a4a93266065b689e84a13ff8f1cf4"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_cash_rotation_r23b_20261015/signals.pkl",
+      "bytes": 141135,
+      "sha256": "8d40164b2e52f6ea648dd97737c5d41f5c5c01f2c51d2261660fd6a6fb26172d"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_cash_rotation_r23b_20261015/summary.json",
+      "bytes": 908,
+      "sha256": "0b8f9bc42c9f2b3a43ea4f7f6fd9fef3344c0ecadd3d1f4377039f75990cc554"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_cash_rotation_r23b_20261015/monthly.json",
+      "bytes": 3644,
+      "sha256": "b754ef795cef3aa8f931d26cd33e1d251e15797edffb97936057a555f86a0e78"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_cash_rotation_r23b_20261015/excluded.json",
+      "bytes": 3,
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_cash_rotation_r23b_20261015/daily_nav.pkl",
+      "bytes": 19827,
+      "sha256": "9c1b91002fcc5f7f10e22ce023f9153d34aee3d33dd0a3b550488eb15151e06f"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_cash_rotation_r23b_20261015/ledger.pkl",
+      "bytes": 155559,
+      "sha256": "2302612a4ab5dd59e838eb53bcc023d03be8ed3d008f8aaa9b171755d260433a"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_cash_rotation_r23b_20261015/verification.json",
+      "bytes": 645,
+      "sha256": "5c3a3c9bfe8a5dbccc2cd5c11f9a868aaeb643dabd36fc2194cb97b31a1ca8f4"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_cash_rotation_r23b_20261015/workbook_data.json",
+      "bytes": 113082,
+      "sha256": "3bb8c884e1d4c2149e65c3e79b79740b1380ba9de9c6c8ccbb12643dd065a544"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_cash_rotation_r23b_20261015/workbook_notes.json",
+      "bytes": 1906,
+      "sha256": "f085fe6225421f7f5354ceb47303d435b6868d65b34caf520b07f132ecf419c3"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_cash_rotation_r23b_20261015/preview_资金总览_0.png",
+      "bytes": 124932,
+      "sha256": "27eeb14de30a961f57d4c5e4d56aaae05240fb3fe56e3fd6355f1597fcd4835d"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_cash_rotation_r23b_20261015/preview_月度表现_0.png",
+      "bytes": 37631,
+      "sha256": "9da87544de02a2dd00060e855455abb4a145b9c9b9fa5a45b39ac89914ff0568"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_cash_rotation_r23b_20261015/preview_月度表现_5.png",
+      "bytes": 27871,
+      "sha256": "991a59ebd7a96728504204db4cf9b4dad13cf350721aeef183ae3a7fa669d96a"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_cash_rotation_r23b_20261015/preview_每日资金_0.png",
+      "bytes": 35010,
+      "sha256": "39464c85296aee236dbd50169cabc37806a821c9e1103fe155d298a003b44693"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_cash_rotation_r23b_20261015/preview_每日资金_5.png",
+      "bytes": 29072,
+      "sha256": "8ef8c41cbb2a5cd532f9bc5172f42c8db3a7d127d73f1aec5a40e2e20884c49b"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_cash_rotation_r23b_20261015/preview_买卖明细_0.png",
+      "bytes": 45041,
+      "sha256": "c18b78336252ea1acd65c2dc36dc16acd9d673bc000d3b56a7af59ce96264edd"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_cash_rotation_r23b_20261015/preview_买卖明细_5.png",
+      "bytes": 38399,
+      "sha256": "65babfcff4f4e0715b425cd79713f4948d3ac2fb8e17ea369e6283328c3e920e"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_cash_rotation_r23b_20261015/preview_买卖明细_10.png",
+      "bytes": 27794,
+      "sha256": "3ca87543fb2dacfe50a7ac0897ee2dfb449a12be4d61b96f2b390e9948c53ab3"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_cash_rotation_r23b_20261015/preview_pending.png",
+      "bytes": 35279,
+      "sha256": "cca5c4b9a8757a65b89b0b278297c74e73abe9d06ecbce59ee6e254944305979"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_cash_rotation_r23b_20261015/preview_notes.png",
+      "bytes": 193653,
+      "sha256": "f77fc258a398a2b534cd090c594fb2a6983c222433940953cec784d308fae7c3"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_cash_rotation_r23b_20261015/workbook_checks.txt",
+      "bytes": 1986,
+      "sha256": "fada1a31590cf84918e289869c28046170d865c9b1df1cd2e486775b6d4e774e"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_cash_rotation_r23b_20261015/百万资金轮换_D2卖出_月度收益回撤_R23B_20261015.xlsx",
+      "bytes": 38449,
+      "sha256": "0ff43b0e0435746214c34ecc61f61459fa3ac6e0f32a9ded100aa79318e4e188"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_cash_rotation_r23b_20261015/百万资金轮换_D2卖出_月度收益回撤_R23B_20261015.xlsx.inspect.ndjson",
+      "bytes": 1049372,
+      "sha256": "63fafe3330c9ebf1c4cc2fa9bd2f8aa482faa2370978cffe6464773e69334841"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_cash_rotation_r23b_20261015/inherited_models.json",
+      "bytes": 6053,
+      "sha256": "4879d5a40262cb443d2c33b166cceddc8944cdd135cff39b102d72981390e0ba"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_cash_rotation_r23b_20261015/inherited_rules.json",
+      "bytes": 3857,
+      "sha256": "1f0b65a4c166e70bba53898cf6cbdb70a9963738b089856da3d2b17042b629e2"
+    },
+    {
+      "path": "scripts/replay_limit_rebound_cash_r23.py",
+      "bytes": 9468,
+      "sha256": "63274e4724bb0e586b2e348d84ad2755602361d05ae7d96107c33eab3a017cc9"
+    },
+    {
+      "path": "scripts/verify_limit_rebound_cash_r23.py",
+      "bytes": 6882,
+      "sha256": "ea56e5c99f56174e3baff6ec05ff05bddc6b51fead419474565527e921c4d46d"
+    },
+    {
+      "path": "scripts/report_limit_rebound_cash_r23.py",
+      "bytes": 7134,
+      "sha256": "af45796170e5dc5ab1a655778941feef35fd18e7839ac0367790311c606840ee"
+    },
+    {
+      "path": "scripts/build_limit_rebound_cash_r23.mjs",
+      "bytes": 4228,
+      "sha256": "645ef21254c8382ba4202f1ebc7816f24a2f373af41a05983ac45436041d5389"
+    },
+    {
+      "path": "tests/automl/test_limit_rebound_cash_r23.py",
+      "bytes": 1962,
+      "sha256": "c7ecebcdbb5a092a391f6178d6efb7e6b462e30dc183e792d56926095fa2e4a0"
+    },
+    {
+      "path": "docs/stock_automl_runs/20261015_limit_rebound_cash_rotation_r23b/README.md",
+      "bytes": 3664,
+      "sha256": "8efb0cbae8576648f183d47c96949d9937012e0bb719bf87633b0d5e67e961c4"
+    }
+  ]
+}

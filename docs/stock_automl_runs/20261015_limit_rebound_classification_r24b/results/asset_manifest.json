@@ -1,0 +1,114 @@
+{
+  "files": [
+    {
+      "path": "outputs/stock_automl/limit_rebound_classification_r24b_20261015/specification.json",
+      "sha256": "fbcbd7fc7298c09298ffaf98133c8919a65f5df2c9506b8c34a2b142aedaa554",
+      "bytes": 2856
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_classification_r24b_20261015/predictions.pkl",
+      "sha256": "a4e6fe31087300d3daf6a84d95d2a01d6037dc26f819d76504888d673686199e",
+      "bytes": 375811
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_classification_r24b_20261015/overall.json",
+      "sha256": "12d641cecfc8dd65000f10768dbe07b3b1f5df87989ef50f467ff61f877f9c0f",
+      "bytes": 19842
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_classification_r24b_20261015/monthly.json",
+      "sha256": "51d11bbb1ed236a1d55fb2e5d581a9cdb697dd78688028102016cf210d915c19",
+      "bytes": 200613
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_classification_r24b_20261015/coverage.json",
+      "sha256": "694849e83b95b15adc869f72a873b7cf7474e4cfd06e99c0ee0d0bfeff6181e9",
+      "bytes": 4658
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_classification_r24b_20261015/workbook_data.json",
+      "sha256": "615b8b1e170ca563262672ee9376928dbdcaa6822fbe22260dbaa272de025c9b",
+      "bytes": 275676
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_classification_r24b_20261015/workbook_notes.json",
+      "sha256": "b338b35192d584641789ec7f22a3d722723a1926f66ee99c4c6cdc75469511e9",
+      "bytes": 1844
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_classification_r24b_20261015/verification.json",
+      "sha256": "f46e4575b65f16b59916a02f29baa6768f099c77a4815c49b573d7a69c515a36",
+      "bytes": 522
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_classification_r24b_20261015/preview_分类对照_left.png",
+      "sha256": "ec685cf3e14d53125ee8c17caca68034f9b2d7ceeba994355ca9c9851b846799",
+      "bytes": 151351
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_classification_r24b_20261015/preview_分类对照_right.png",
+      "sha256": "ab96611e951d9a898b41804b4b04c2dd0baad3b93488f7b0235ba0161c7fa647",
+      "bytes": 34374
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_classification_r24b_20261015/preview_逐月对照_left.png",
+      "sha256": "2f4809a494611e335c56add72c0443da60c962ef8ab003b8152590ee2eda2968",
+      "bytes": 163760
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_classification_r24b_20261015/preview_逐月对照_right.png",
+      "sha256": "ae584ede7cbcb1551e5331c1dcff75babb1dfc50bbad5b42e0a978d59443371d",
+      "bytes": 29889
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_classification_r24b_20261015/preview_notes.png",
+      "sha256": "e671d09c5ba9c1a661e7bba8cc032bcfbed20b519b33ba04463f527ed3fe630f",
+      "bytes": 153374
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_classification_r24b_20261015/preview_rules.png",
+      "sha256": "0e34f170ed88e063b5b51a024f15d1441a3a5ffb8341cbf3d81cb96c4c6bfa84",
+      "bytes": 84276
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_classification_r24b_20261015/workbook_checks.txt",
+      "sha256": "91a2ba30b518c08de17a2bbd54507cb5663d3b7be64921362fe2ea621719b79b",
+      "bytes": 1808
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_classification_r24b_20261015/四K五K_分类指标与混淆矩阵_R24B_20261015.xlsx",
+      "sha256": "7bf5d9589127e7139319ca09e91b4f1acf1d90c127b10933d428234dcdcb5ddc",
+      "bytes": 96602
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_classification_r24b_20261015/四K五K_分类指标与混淆矩阵_R24B_20261015.xlsx.inspect.ndjson",
+      "sha256": "5fc3877676ced500b04757036b1df0fb64f5b45a5975ff2cd76664d94014ca29",
+      "bytes": 3304829
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_classification_r24b_20261015/workbook_verification.json",
+      "sha256": "3a77478ae5986a2c154ae18477f0365b92badb2fbbc19776771fc8f4187d701f",
+      "bytes": 226
+    },
+    {
+      "path": "docs/stock_automl_runs/20261015_limit_rebound_classification_r24b/README.md",
+      "sha256": "632615d285f9fb54ce853eca08fc10f6bfcb7cdffd0fe5f9148e3349a0b0b608",
+      "bytes": 3776
+    },
+    {
+      "path": "scripts/analyze_limit_rebound_classification_r24b.py",
+      "sha256": "76ce3e0e33a3010a3fd13a317957a6a7d38a9b852358c0b7344523419abe2207",
+      "bytes": 13787
+    },
+    {
+      "path": "scripts/build_limit_rebound_classification_r24b.mjs",
+      "sha256": "2bd783e4cb758f62601d7542721933423de284a02be9e75d5ab770a1634fe546",
+      "bytes": 7793
+    },
+    {
+      "path": "/Volumes/ext/fin_agent/scripts/verify_limit_rebound_classification_r24b.py",
+      "sha256": "16ff4b93cdd21da31cc021092b4aa7cc03c06cfb7b86381f01edf5844bd88293",
+      "bytes": 3824
+    }
+  ]
+}

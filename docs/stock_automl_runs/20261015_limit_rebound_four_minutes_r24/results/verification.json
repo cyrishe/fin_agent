@@ -1,0 +1,10 @@
+{
+  "status": "PASS",
+  "raw_unique_stock_days": 1609,
+  "original14_rule_selections_exact": true,
+  "original106_trades_and_delayed98_exact": true,
+  "four_features_immune_to_bar5_and_later": true,
+  "test_mutation_does_not_change_selection": true,
+  "purged_train_valid_D4": true,
+  "independent_daily_cash_checks": 1116
+}

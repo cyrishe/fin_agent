@@ -1,0 +1,14 @@
+{
+  "fixed_B1_days_matched": 288,
+  "model_bundles": 45,
+  "max_reloaded_prediction_error": 0.0,
+  "chronology_all_passed": true,
+  "fixed_model_after_validation": true,
+  "source_reference_return_max_difference": 0.0,
+  "source_return_differences_over_1bp": 0,
+  "incomplete_selected_feature_rows": 0,
+  "incomplete_selected_valuation_paths": 0,
+  "corporate_action_selected_rows": 2,
+  "database_days": 47,
+  "final_archive_does_not_prove_live_arrival": true
+}

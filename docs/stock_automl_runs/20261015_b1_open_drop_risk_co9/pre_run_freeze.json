@@ -1,0 +1,10 @@
+{
+  "created_utc": "2026-10-15T06:07:19.621235+00:00",
+  "files": {
+    "docs/stock_automl_runs/20261015_b1_open_drop_risk_co9/DESIGN.md": "788f588182396c30b346ed6fbe3070712c0b8e8fa3e4effe73a0049edf9a7140",
+    "outputs/stock_automl/b1_open_drop_risk_co9/dataset.csv.gz": "e3644cb5ffeabf7e3f8c1abb1dbd94e662527a2b032bb1dbd5f46a698b7f4b1c",
+    "/Volumes/ext/fin_agent/scripts/experiment_b1_open_drop_risk_co9.py": "047e5acd6478181ef3ca03726a8319327f21416db38a0b2563e05ea17205aad4",
+    "scripts/experiment_b1_market_trade_gate_co8.py": "3f5690e1105921e953c6ce161a408d44c47d6d6086232596ba7759b93f1da2d6",
+    "scripts/report_b1_market_trade_gate_co8.py": "1359a5d0b7dcc793047704b80635d9f0e1f26ecde98a9673b56149f91124b893"
+  }
+}

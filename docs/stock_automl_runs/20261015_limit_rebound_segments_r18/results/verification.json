@@ -1,0 +1,15 @@
+{
+  "status": "passed",
+  "models_reloaded_and_replayed": 66,
+  "maximum_score_error": 0,
+  "raw_segment_checks": 500,
+  "original_pool_features_labels_unchanged": true,
+  "baseline_r15_exact_replay": true,
+  "feature_cutoff_at_d0": true,
+  "train_validation_event_isolation": true,
+  "selection_has_no_test_metric": true,
+  "unit_tests": 5,
+  "panel_sha256": "72000be89c9d2cceba0f680d010e4c7f848d5e2982009eaff8dbb8b2ead27351",
+  "model_manifest_sha256": "2b2f6f717e0b71f5aed672bb1db2e732f521cfc389304da04bddb8fa2bff9aa1",
+  "selections_sha256": "3feb5ae71d61e7159ead6d836cde98670e2d1d9e5ca58b1c8785da09b878971d"
+}

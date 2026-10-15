@@ -1,0 +1,73 @@
+{
+  "interpretation": "D0 top3 score/rank known previous close; first5 shape visible after09:35. Final chosen stock requires later activation. End-label09:36 bar open is first print09:35–09:36; delayed case buys later bar open, not09:36 close. Positive full-bar volume is an ex-post proxy, not a live fill proof.",
+  "original_end_label_counts": {
+    "09:36": 93,
+    "09:37": 7,
+    "09:38": 3,
+    "09:39": 1,
+    "09:40": 2
+  },
+  "delayed_end_label_counts": {
+    "09:37": 87,
+    "09:38": 7,
+    "09:39": 2,
+    "09:40": 2
+  },
+  "attribution": [
+    {
+      "case": "全部106笔原买价",
+      "total_return": 1.0358168982692004
+    },
+    {
+      "case": "仅延后可买98笔仍用原买价_事后归因非可执行策略",
+      "total_return": 0.6830613360631554
+    },
+    {
+      "case": "同98笔改用延后买价",
+      "total_return": 0.7304912778659227
+    }
+  ],
+  "removal_effect_pp": -35.2755562206045,
+  "delayed_price_effect_pp": 4.742994180276727,
+  "missed": 8,
+  "missed_profitable": 7,
+  "missed_mean_return": 0.059723080779899324,
+  "missed_original_path_pnl": 358349.2304568687,
+  "missed_reasons": {
+    "后续全板": 5,
+    "截止时间": 2,
+    "仅分钟内板下": 1
+  },
+  "paired_price_higher": 46,
+  "paired_price_same": 5,
+  "paired_price_lower": 47,
+  "paired_original_mean": 0.010646213462486042,
+  "paired_delayed_mean": 0.011107643683477136,
+  "true_clock_window": {
+    "start": "09:36",
+    "end": "09:40",
+    "bar_end_labels": [
+      "09:37",
+      "09:38",
+      "09:39",
+      "09:40"
+    ],
+    "universe": "106 finally selected stocks; not all were already activated at09:36",
+    "whole_four": 71,
+    "below_each_four": 85,
+    "any_below": 103,
+    "repeated_separated_episodes": 3,
+    "repeat_dates": [
+      "2026-04-23",
+      "2026-05-07",
+      "2026-06-05"
+    ],
+    "caveat": "At least2 below-cap trade segments separated by a whole-minute cap-only trade bar; exact intraminute reopen counts/order unobservable."
+  },
+  "first_bar93_subset": {
+    "n": 93,
+    "whole_four": 68,
+    "any_below": 90
+  },
+  "preservation": "No workbook or strategy inputs changed; middle account is diagnostic attribution only; account effects depend on this decomposition order and capital rotation."
+}

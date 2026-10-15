@@ -1,0 +1,10 @@
+{
+  "created_utc": "2026-10-15T06:22:26.864201+00:00",
+  "files": {
+    "docs/stock_automl_runs/20261015_independent_open_drop_co10/DESIGN.md": "a144a0062a457cdb9381d91ffe75d0b1734f52b4bd67d1792926460a5f8d4215",
+    "outputs/stock_automl/independent_open_drop_co10/dataset.csv.gz": "ab00d323f6a2ad4f5dc28e0209c59b936d9bee560b6d23ab4f80d6fe31758bd8",
+    "/Volumes/ext/fin_agent/scripts/experiment_independent_open_drop_co10.py": "9b6bb33947d79e92f0392d490e183c152bc897e9734047f861e06a207c2bd5d5",
+    "scripts/experiment_b1_market_trade_gate_co8.py": "3f5690e1105921e953c6ce161a408d44c47d6d6086232596ba7759b93f1da2d6",
+    "scripts/report_b1_market_trade_gate_co8.py": "1359a5d0b7dcc793047704b80635d9f0e1f26ecde98a9673b56149f91124b893"
+  }
+}

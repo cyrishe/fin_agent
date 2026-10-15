@@ -1,0 +1,9 @@
+{
+  "market_known_rows": 2106742,
+  "market_zero_entry_bar_volume": 17076,
+  "market_zero_exit_bar_volume": 2822,
+  "B1_baseline_trades": 222,
+  "B1_zero_entry_bar_volume": 1,
+  "B1_zero_exit_bar_volume": 0,
+  "note": "Endpoint prices remain execution proxies; nonzero minute volume does not prove available liquidity or guaranteed fill. Zero volume never becomes an as-of feature or an ex-post filter of prediction rows."
+}

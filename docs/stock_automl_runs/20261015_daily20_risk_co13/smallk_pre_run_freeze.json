@@ -1,0 +1,34 @@
+{
+  "created_utc": "2026-10-15T08:32:43.083527+00:00",
+  "K": [
+    10,
+    25,
+    50
+  ],
+  "files": {
+    "scripts/smallk_gate_daily20_risk_co13.py": "67437072550c8a1b45f2edba4fd409a15f655bd56462a54ac2b8e4e6413da5be",
+    "scripts/rank_gate_daily20_risk_co13.py": "5608df0e580dedeb52dc2f3bfcc4ffd73a0a44a23be74f1a8c64c2e7b7467846",
+    "docs/stock_automl_runs/20261015_daily20_risk_co13/rank_gate_summary.csv": "c7a07fb1b4eaadeef5dbd3208fde27da583da31f905a192f563721b1f8845f47",
+    "docs/stock_automl_runs/20261015_daily20_risk_co13/rank_gate_pre_run_freeze.json": "6dba40f9c28f87463529fa1614f3d29172a6485fd8801dd288a57ceffd55039f",
+    "outputs/stock_automl/daily20_risk_co13/predictions.csv.gz": "37d3663a564951f7e2234ed2228ce85f1c6b09eb959c6929cadb511ebd908762",
+    "outputs/stock_automl/independent_0940_netloss_co12/models/2025-08/test.csv.gz": "3efb66d1e43b7e44463bdaf431233c5ba380bfff6d5e2eb7e030f3ea0db78d1b",
+    "outputs/stock_automl/independent_0940_netloss_co12/models/2025-09/test.csv.gz": "95af6705d21d702902b7cc7139e7844fcd4b1fb354b60b0e2054a178b0f9f3c0",
+    "outputs/stock_automl/independent_0940_netloss_co12/models/2025-10/test.csv.gz": "b1a84fe2225ba0323df6f3eb97a7a38f33bd8b4870627359a1043fd072dd854e",
+    "outputs/stock_automl/independent_0940_netloss_co12/models/2025-11/test.csv.gz": "11edca3cbbdc73c18642c729f36cfeb5d7402f293feb6770ffae004d3271b1b2",
+    "outputs/stock_automl/independent_0940_netloss_co12/models/2025-12/test.csv.gz": "b8db7b1c62dd6dff54f602f443d4fb9e55ed05f191b64f916a8d875a73886df3",
+    "outputs/stock_automl/independent_0940_netloss_co12/models/2026-01/test.csv.gz": "3b57d4bf52b65b5fb967901ab405d40a65dca6abbc07dd9406d960720d2b3ffc",
+    "outputs/stock_automl/independent_0940_netloss_co12/models/2026-02/test.csv.gz": "c0b5cd9dcb55a89cc4a866d06a4efa8a876f29a2d85ed2cb14faa7c5c2eba127",
+    "outputs/stock_automl/independent_0940_netloss_co12/models/2026-03/test.csv.gz": "9ff2c5c06e0b72425e902ee8c5f400ecc53f2bbeef8b958be16d5501dd3ffd7f",
+    "outputs/stock_automl/independent_0940_netloss_co12/models/2026-04/test.csv.gz": "f9ff2fc7394a106e53824cb858fa8365b63d256ffd6aa903263a6680b519398f",
+    "outputs/stock_automl/independent_0940_netloss_co12/models/2026-05/test.csv.gz": "f62fa8ea8855d3a29ad4146b86c8257b34e0c0b8eb02513b1f7dcbadddad2979",
+    "outputs/stock_automl/independent_0940_netloss_co12/models/2026-06/test.csv.gz": "df8ac0316e3e7ffa95fbdc426fa4bf872bad858dbe76180c62e8b663cc7f128c",
+    "outputs/stock_automl/independent_0940_netloss_co12/models/2026-07/test.csv.gz": "52f22cadea57942ef7cd5fbe98f4a88a511d42bfb9e3cef955c665265e035b15",
+    "outputs/stock_automl/independent_0940_netloss_co12/models/2026-08/test.csv.gz": "418ff64410a75651851f2d98e5ca3d8b91305796692c35aea5665b74a8aad796",
+    "outputs/stock_automl/independent_0940_netloss_co12/models/2026-09/test.csv.gz": "05bfd48b46b58e28eb917a9e4c71d2d7b6d1b2bf0e4c73a91ccdd564f49082fd",
+    "outputs/stock_automl/independent_0940_netloss_co12/models/2026-10/test.csv.gz": "b9163e8699a797ece20b2c8a0900a1890297b48e58f56a2554cb12bb829b87a1"
+  },
+  "initial_K_results_already_seen": true,
+  "reason": "K100 blocks 74/222 B1 trades with daily20; user wants only a few dangerous operations removed",
+  "status": "additional exploratory coverage diagnostic, not untouched validation",
+  "threshold_selection_by_profit": false
+}

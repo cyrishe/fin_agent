@@ -1,0 +1,15 @@
+{
+  "first_models_reloaded": 66,
+  "test_top5_rows": 1335,
+  "test_unique_days": 267,
+  "test_valid_returns": 792,
+  "test_trades_by_policy": {
+    "过滤前": 260,
+    "过滤后": 247
+  },
+  "time_isolation": true,
+  "probability_reproduction": true,
+  "bad_label_reconciliation": true,
+  "selection_reconciliation": true,
+  "model_manifest_sha256": "381e21a7a9ecb11a8a4588a754dd45229f65bdc5b1712ba2d23337ce5ef0c539"
+}

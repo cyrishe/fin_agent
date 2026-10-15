@@ -1,0 +1,56 @@
+{
+  "exposure_fraction": 0.7432432432432432,
+  "constant_exposure": {
+    "days": 288,
+    "trades": 222,
+    "baseline_trades": 222,
+    "net_nav_pct": -32.8594916738155,
+    "settled_max_drawdown_pct": 45.079534589062376,
+    "minute_close_max_drawdown_pct": 47.368651619549965,
+    "minute_marks_complete": true,
+    "net_trade_mean_pct": -0.1990770590102261,
+    "net_daily_mean_pct": -0.11405456505793968,
+    "losses_avoided": 0,
+    "large_losses_avoided": 0,
+    "profits_missed": 0,
+    "avoided_loss_sum_pp": -0.0,
+    "missed_profit_sum_pp": 0.0,
+    "added_trades": 0,
+    "added_losses": 0,
+    "added_profits": 0,
+    "retained_large_losses": 51,
+    "corporate_action_trades": 0,
+    "worst_trade_pct": -16.515673624264416,
+    "worst5pct_mean_pct": -7.160890709378387
+  },
+  "random_median_nav_pct": -36.44166021002668,
+  "random_fraction_at_least_primary": 0.9515,
+  "bootstrap": [
+    {
+      "block_days": 5,
+      "replicates": 2000,
+      "daily_delta_pp": -0.05693833778525824,
+      "daily_delta_ci95": [
+        -0.22921904235985813,
+        0.107155229698603
+      ],
+      "recall_ci95": [
+        6.890804597701149,
+        44.44444444444444
+      ]
+    },
+    {
+      "block_days": 10,
+      "replicates": 2000,
+      "daily_delta_pp": -0.05693833778525824,
+      "daily_delta_ci95": [
+        -0.23701585678915574,
+        0.11240232445338225
+      ],
+      "recall_ci95": [
+        8.56547619047619,
+        45.0
+      ]
+    }
+  ]
+}

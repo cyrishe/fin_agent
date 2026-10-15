@@ -1,0 +1,13 @@
+{
+  "name": "R23D_frozen_trigger_execution_window",
+  "source_workbook_sha256": "47c7bac38171b52849a71f490d9607b147742a793535733df7706ddff57f9db3",
+  "source_signals_sha256": "8d40164b2e52f6ea648dd97737c5d41f5c5c01f2c51d2261660fd6a6fb26172d",
+  "source_ledger_sha256": "edf60f55c2bc36d2f57093461b990847cf376f654be8a4cd3b69e09e424397d9",
+  "rules_sha256": "1f0b65a4c166e70bba53898cf6cbdb70a9963738b089856da3d2b17042b629e2",
+  "intent": "Append columns to original fee workbook. Preserve all original trades, fees, NAV and outputs.",
+  "window": "Original entry bar through 09:40 only; full minute high below cap vs low below cap. Consecutive prefix starts at entry, no post-hoc replacement. First-touch interval in this window.",
+  "trigger": "Frozen D0 monthly original Top3 + R19 monthly rule + body5>-8%; shape computable after completed09:35 bar. Score has no extra probability threshold.",
+  "liquidity": "Original fee-funded number of shares divided by ALL prints of entry minute. Ex-post diagnostic only; volume is not freely available ask liquidity, cap prints also included.",
+  "delay": "Hold same original chosen stock; wait one full bar after original entry, then first positive-volume open below cap up to09:40. No other-stock replacement. Same fee-funded account as sensitivity; original workbook results unchanged.",
+  "missing": "No exact seconds, orderbook, latency or queue proof available. Zero whole minutes does not mean impossible to trade. Future window fields never used to form original signal."
+}

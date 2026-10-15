@@ -1,0 +1,22 @@
+{
+  "models": 60,
+  "all_memberships_and_date_boundaries_passed": true,
+  "frozen_hashes_unchanged": true,
+  "B1_used_in_training_or_threshold": false,
+  "training_rows_min": 14572,
+  "training_rows_max": 187749,
+  "features": [
+    "market_breadth",
+    "market_median",
+    "market_iqr",
+    "lag5_market_breadth",
+    "signal_return",
+    "relative_amount20",
+    "lag_return",
+    "prior5_return",
+    "prior5_vol",
+    "prior10_vol",
+    "prior5_downside",
+    "prior5_worst"
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "experiment": "R20_frozen_shape_gain_loss_and_top3_transfer",
+  "source_rules_sha256": "e18cf06b9917bd508dfdb031935b7864f35bb864603964e70a5ce977069b2f86",
+  "stage1": "Saved R18 segments scores; Top1-3 original D0 ranks, no retrain or rerank.",
+  "shape": "Apply same monthly R19 frozen rules to rank1,2,3; no optimization on rank2/3 or on test.",
+  "split": "same six training months, two validation months, next test month; train D0 scores from saved causal OOF. Existing test period is not new untouched data.",
+  "direction_labels": "Each D2/D3/D4 close and strategy exit relative to causal entry proxy: gain>=7%, loss<-5%, middle otherwise. No intraday-high label. Each horizon drops only unknown/discontinuous price outcomes, never imputes zero.",
+  "entry": "Observe first five completed minute bars; chronological 09:36..09:40 bar-end labels. Positive-volume open below cap proxy, no cap queue fills.",
+  "fallback": "Each minute choose highest D0 rank among shape-passing, ordinary, audited stocks with open below cap and positive volume AT THAT MINUTE; one per day, max rank3. Earlier eligible rank2/3 can precede rank1 opening later. No hindsight priority after seeing entire window.",
+  "comparisons": "Individual ranks pass/reject plus all; four daily policies with same causal priority and entry. Expose rank2/3 fallback separately and displacement of later rank1.",
+  "data": "Historical D0/D1 N/R only, minute full-day OHLC/volume reconciliation as R19. Missing data excluded and disclosed; fixed top3 ranks not expanded.",
+  "returns": "D2/D3/D4 gross, strategy D2 sealed close else D3 sealed close else D4 close. No fees, latency/order-book fill or capital overlap model."
+}

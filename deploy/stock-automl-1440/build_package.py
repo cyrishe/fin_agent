@@ -49,7 +49,7 @@ def main() -> None:
              for path in files]
     manifest = {name: hashlib.sha256(path.read_bytes()).hexdigest()
                 for name, path in zip(names, files)}
-    tar_path = OUTPUT / "automl1440-171-source-20261015.tar.gz"
+    tar_path = OUTPUT / "automl1440-execution-20261015-source.tar.gz"
     with tar_path.open("wb") as output, gzip.GzipFile(
             filename="", mode="wb", fileobj=output, mtime=0) as compressed, \
             tarfile.open(fileobj=compressed, mode="w") as tar:

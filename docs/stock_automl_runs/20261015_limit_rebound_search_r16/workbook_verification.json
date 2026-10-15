@@ -1,0 +1,43 @@
+{
+  "path": "/Volumes/ext/fin_agent/outputs/stock_automl/limit_rebound_search_r16_20261015/D0涨停_三算法72模型搜索_条件组合与前五_R16_20261015.xlsx",
+  "bytes": 2456370,
+  "sha256": "8b03d1a7e7aedd55f7c6580dbf2d627359e5974f4fae60b3a825289b2f537c68",
+  "zip_crc_valid": true,
+  "typed_dates": true,
+  "all_eight_sheets_visually_reviewed": true,
+  "formula_error_scan_matches": 0,
+  "sheets": {
+    "交易效果": {
+      "rows": 256,
+      "columns": 14
+    },
+    "搜索对比": {
+      "rows": 39,
+      "columns": 14
+    },
+    "条件组合": {
+      "rows": 14,
+      "columns": 23
+    },
+    "逐月收益": {
+      "rows": 112,
+      "columns": 9
+    },
+    "第一阶段": {
+      "rows": 416,
+      "columns": 11
+    },
+    "风险过滤": {
+      "rows": 42,
+      "columns": 17
+    },
+    "候选比较": {
+      "rows": 1526,
+      "columns": 17
+    },
+    "前五明细": {
+      "rows": 12070,
+      "columns": 26
+    }
+  }
+}

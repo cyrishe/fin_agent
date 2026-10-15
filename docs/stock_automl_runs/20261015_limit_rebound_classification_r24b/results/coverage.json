@@ -1,0 +1,272 @@
+[
+  {
+    "month": "2026-01",
+    "part": "test",
+    "total": 60,
+    "not_eligible": 0,
+    "immature": 0,
+    "primary": 60,
+    "common_fill": 42
+  },
+  {
+    "month": "2026-01",
+    "part": "train",
+    "total": 354,
+    "not_eligible": 2,
+    "immature": 0,
+    "primary": 352,
+    "common_fill": 232
+  },
+  {
+    "month": "2026-01",
+    "part": "valid",
+    "total": 117,
+    "not_eligible": 0,
+    "immature": 0,
+    "primary": 117,
+    "common_fill": 58
+  },
+  {
+    "month": "2026-02",
+    "part": "test",
+    "total": 42,
+    "not_eligible": 0,
+    "immature": 0,
+    "primary": 42,
+    "common_fill": 29
+  },
+  {
+    "month": "2026-02",
+    "part": "train",
+    "total": 357,
+    "not_eligible": 2,
+    "immature": 0,
+    "primary": 355,
+    "common_fill": 231
+  },
+  {
+    "month": "2026-02",
+    "part": "valid",
+    "total": 117,
+    "not_eligible": 1,
+    "immature": 0,
+    "primary": 116,
+    "common_fill": 76
+  },
+  {
+    "month": "2026-03",
+    "part": "test",
+    "total": 66,
+    "not_eligible": 0,
+    "immature": 0,
+    "primary": 66,
+    "common_fill": 39
+  },
+  {
+    "month": "2026-03",
+    "part": "train",
+    "total": 366,
+    "not_eligible": 1,
+    "immature": 0,
+    "primary": 365,
+    "common_fill": 231
+  },
+  {
+    "month": "2026-03",
+    "part": "valid",
+    "total": 90,
+    "not_eligible": 0,
+    "immature": 0,
+    "primary": 90,
+    "common_fill": 59
+  },
+  {
+    "month": "2026-04",
+    "part": "test",
+    "total": 63,
+    "not_eligible": 2,
+    "immature": 0,
+    "primary": 61,
+    "common_fill": 34
+  },
+  {
+    "month": "2026-04",
+    "part": "train",
+    "total": 357,
+    "not_eligible": 1,
+    "immature": 0,
+    "primary": 356,
+    "common_fill": 222
+  },
+  {
+    "month": "2026-04",
+    "part": "valid",
+    "total": 96,
+    "not_eligible": 0,
+    "immature": 0,
+    "primary": 96,
+    "common_fill": 61
+  },
+  {
+    "month": "2026-05",
+    "part": "test",
+    "total": 54,
+    "not_eligible": 0,
+    "immature": 0,
+    "primary": 54,
+    "common_fill": 38
+  },
+  {
+    "month": "2026-05",
+    "part": "train",
+    "total": 335,
+    "not_eligible": 1,
+    "immature": 0,
+    "primary": 334,
+    "common_fill": 204
+  },
+  {
+    "month": "2026-05",
+    "part": "valid",
+    "total": 117,
+    "not_eligible": 0,
+    "immature": 0,
+    "primary": 117,
+    "common_fill": 69
+  },
+  {
+    "month": "2026-06",
+    "part": "test",
+    "total": 63,
+    "not_eligible": 1,
+    "immature": 0,
+    "primary": 62,
+    "common_fill": 43
+  },
+  {
+    "month": "2026-06",
+    "part": "train",
+    "total": 336,
+    "not_eligible": 0,
+    "immature": 0,
+    "primary": 336,
+    "common_fill": 196
+  },
+  {
+    "month": "2026-06",
+    "part": "valid",
+    "total": 105,
+    "not_eligible": 1,
+    "immature": 0,
+    "primary": 104,
+    "common_fill": 60
+  },
+  {
+    "month": "2026-07",
+    "part": "test",
+    "total": 69,
+    "not_eligible": 8,
+    "immature": 0,
+    "primary": 61,
+    "common_fill": 35
+  },
+  {
+    "month": "2026-07",
+    "part": "train",
+    "total": 348,
+    "not_eligible": 0,
+    "immature": 0,
+    "primary": 348,
+    "common_fill": 202
+  },
+  {
+    "month": "2026-07",
+    "part": "valid",
+    "total": 105,
+    "not_eligible": 0,
+    "immature": 0,
+    "primary": 105,
+    "common_fill": 62
+  },
+  {
+    "month": "2026-08",
+    "part": "test",
+    "total": 63,
+    "not_eligible": 0,
+    "immature": 0,
+    "primary": 63,
+    "common_fill": 36
+  },
+  {
+    "month": "2026-08",
+    "part": "train",
+    "total": 342,
+    "not_eligible": 2,
+    "immature": 0,
+    "primary": 340,
+    "common_fill": 208
+  },
+  {
+    "month": "2026-08",
+    "part": "valid",
+    "total": 120,
+    "not_eligible": 5,
+    "immature": 0,
+    "primary": 115,
+    "common_fill": 80
+  },
+  {
+    "month": "2026-09",
+    "part": "test",
+    "total": 63,
+    "not_eligible": 0,
+    "immature": 0,
+    "primary": 63,
+    "common_fill": 39
+  },
+  {
+    "month": "2026-09",
+    "part": "train",
+    "total": 336,
+    "not_eligible": 2,
+    "immature": 0,
+    "primary": 334,
+    "common_fill": 215
+  },
+  {
+    "month": "2026-09",
+    "part": "valid",
+    "total": 120,
+    "not_eligible": 4,
+    "immature": 0,
+    "primary": 116,
+    "common_fill": 71
+  },
+  {
+    "month": "2026-10",
+    "part": "test",
+    "total": 12,
+    "not_eligible": 1,
+    "immature": 5,
+    "primary": 6,
+    "common_fill": 3
+  },
+  {
+    "month": "2026-10",
+    "part": "train",
+    "total": 341,
+    "not_eligible": 10,
+    "immature": 0,
+    "primary": 331,
+    "common_fill": 216
+  },
+  {
+    "month": "2026-10",
+    "part": "valid",
+    "total": 114,
+    "not_eligible": 0,
+    "immature": 0,
+    "primary": 114,
+    "common_fill": 65
+  }
+]

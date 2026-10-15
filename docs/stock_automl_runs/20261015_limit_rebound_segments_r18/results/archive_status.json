@@ -1,0 +1,10 @@
+{
+  "archive": "/Volumes/ext/fin_agent/outputs/stock_automl/aliyun_staging/涨停冷静期/D0判断-D1开盘伺机买入/20261015/R18_板前与连板分段特征_20261015.zip",
+  "bytes": 179984883,
+  "sha256": "0680dbe4b72b98f0a02dc40b2e593a9647c417eeafd1cb49d06ee1f2fbe5f19b",
+  "source_files": 546,
+  "local_readback_verified": true,
+  "cloud_uploaded": false,
+  "cloud_readback_verified": false,
+  "intended_cloud_directory": "策略训练/涨停冷静期/D0判断-D1开盘伺机买入/20261015"
+}

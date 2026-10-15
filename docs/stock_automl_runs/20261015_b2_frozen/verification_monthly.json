@@ -1,0 +1,21 @@
+{
+  "minute_days": 186,
+  "prefix_replays": 1302,
+  "entries": 122,
+  "stock_time_price_exact": true,
+  "daily_prediction_rows": 14822,
+  "daily_prediction_days": 208,
+  "max_probability_difference": 0.0,
+  "rebuilt_daily_feature_rows": null,
+  "reference_ledger_sha256": "60cf776d5bc2a0413c3f581f232b882cedf675c75600266319665add82329747",
+  "monthly_training_check": {
+    "month": "2026-10",
+    "training_keys_identical": true,
+    "shape_selection_keys_identical": true,
+    "rule_identical": true,
+    "max_score_difference": 0.0,
+    "training_rows": 7939,
+    "manifest_sha256": "b9d18f0376c09ef0938814365ce910ebb104a50d8e78bbc5f294fbd7ccbc818f"
+  },
+  "scope": "历史合格数据样本；线上仅用已到达K，并记录真实确认时间，不使用未来全天审计决定信号。"
+}

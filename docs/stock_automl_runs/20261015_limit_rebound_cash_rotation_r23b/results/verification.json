@@ -1,0 +1,16 @@
+{
+  "status": "PASS",
+  "unchanged_signals": 106,
+  "raw_entry_minutes": 106,
+  "raw_daily_price_fields": 422,
+  "independent_cash_days": 186,
+  "monthly_checks": 10,
+  "no_borrowing": true,
+  "no_future_sale_cash_used": true,
+  "endpoint_marked_not_sold": true,
+  "spec_sha256": "220dc924a1945032a75c63d8b3c4a9e12d8a4a93266065b689e84a13ff8f1cf4",
+  "signals_sha256": "8d40164b2e52f6ea648dd97737c5d41f5c5c01f2c51d2261660fd6a6fb26172d",
+  "workbook_cells": 3289,
+  "workbook_sha256": "0ff43b0e0435746214c34ecc61f61459fa3ac6e0f32a9ded100aa79318e4e188",
+  "pytest": "4 passed; cash rotation, falling budget, idle-day Sharpe, cross-month marking"
+}

@@ -1,0 +1,11 @@
+{
+  "frozen_at_utc": "2026-10-15T05:42:13.514308+00:00",
+  "before_first_CO8_fit": true,
+  "files": {
+    "docs/stock_automl_runs/20261015_b1_market_trade_gate/DESIGN.md": "6a8f03ec88f3e686b8393c636db9f3130101a1f640a9ca6bcf7e32347dcd134e",
+    "scripts/experiment_b1_market_trade_gate_co8.py": "3f5690e1105921e953c6ce161a408d44c47d6d6086232596ba7759b93f1da2d6",
+    "scripts/report_b1_market_trade_gate_co8.py": "1359a5d0b7dcc793047704b80635d9f0e1f26ecde98a9673b56149f91124b893",
+    "scripts/check_b1_market_trade_gate_co8.py": "31f8512e3b9b94e01d7ddee1d6b2324d8c3b3f514c9ee942af0d0c90c1b84267",
+    "outputs/stock_automl/b1_market_trade_gate_co8/dataset.csv.gz": "292f4ea31b9d8b388f7825b3ea9b2a9f74703005a6da5a2ba742aae06f07078b"
+  }
+}

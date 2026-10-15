@@ -1,0 +1,437 @@
+[
+  {
+    "month": "2025-01",
+    "source": "2025-09后定",
+    "phase": "早期回看",
+    "rule": {
+      "id": "r005",
+      "atoms": [
+        [
+          "high5",
+          ">=",
+          0.06
+        ]
+      ],
+      "family": "单条件",
+      "text": "五分最高涨幅>=6%"
+    },
+    "body_min_exclusive": -0.08
+  },
+  {
+    "month": "2025-02",
+    "source": "2025-09后定",
+    "phase": "早期回看",
+    "rule": {
+      "id": "r005",
+      "atoms": [
+        [
+          "high5",
+          ">=",
+          0.06
+        ]
+      ],
+      "family": "单条件",
+      "text": "五分最高涨幅>=6%"
+    },
+    "body_min_exclusive": -0.08
+  },
+  {
+    "month": "2025-03",
+    "source": "2025-09后定",
+    "phase": "早期回看",
+    "rule": {
+      "id": "r005",
+      "atoms": [
+        [
+          "high5",
+          ">=",
+          0.06
+        ]
+      ],
+      "family": "单条件",
+      "text": "五分最高涨幅>=6%"
+    },
+    "body_min_exclusive": -0.08
+  },
+  {
+    "month": "2025-04",
+    "source": "2025-09后定",
+    "phase": "早期回看",
+    "rule": {
+      "id": "r005",
+      "atoms": [
+        [
+          "high5",
+          ">=",
+          0.06
+        ]
+      ],
+      "family": "单条件",
+      "text": "五分最高涨幅>=6%"
+    },
+    "body_min_exclusive": -0.08
+  },
+  {
+    "month": "2025-05",
+    "source": "2025-09后定",
+    "phase": "早期回看",
+    "rule": {
+      "id": "r005",
+      "atoms": [
+        [
+          "high5",
+          ">=",
+          0.06
+        ]
+      ],
+      "family": "单条件",
+      "text": "五分最高涨幅>=6%"
+    },
+    "body_min_exclusive": -0.08
+  },
+  {
+    "month": "2025-06",
+    "source": "2025-09后定",
+    "phase": "早期回看",
+    "rule": {
+      "id": "r005",
+      "atoms": [
+        [
+          "high5",
+          ">=",
+          0.06
+        ]
+      ],
+      "family": "单条件",
+      "text": "五分最高涨幅>=6%"
+    },
+    "body_min_exclusive": -0.08
+  },
+  {
+    "month": "2025-07",
+    "source": "2025-09后定",
+    "phase": "早期回看",
+    "rule": {
+      "id": "r005",
+      "atoms": [
+        [
+          "high5",
+          ">=",
+          0.06
+        ]
+      ],
+      "family": "单条件",
+      "text": "五分最高涨幅>=6%"
+    },
+    "body_min_exclusive": -0.08
+  },
+  {
+    "month": "2025-08",
+    "source": "2025-09后定",
+    "phase": "早期回看",
+    "rule": {
+      "id": "r005",
+      "atoms": [
+        [
+          "high5",
+          ">=",
+          0.06
+        ]
+      ],
+      "family": "单条件",
+      "text": "五分最高涨幅>=6%"
+    },
+    "body_min_exclusive": -0.08
+  },
+  {
+    "month": "2025-09",
+    "source": "2025-09",
+    "phase": "原测试段",
+    "rule": {
+      "id": "r005",
+      "atoms": [
+        [
+          "high5",
+          ">=",
+          0.06
+        ]
+      ],
+      "family": "单条件",
+      "text": "五分最高涨幅>=6%"
+    },
+    "body_min_exclusive": -0.08
+  },
+  {
+    "month": "2025-10",
+    "source": "2025-10",
+    "phase": "原测试段",
+    "rule": {
+      "id": "r011",
+      "atoms": [
+        [
+          "low5",
+          ">=",
+          0
+        ]
+      ],
+      "family": "单条件",
+      "text": "五分最低涨幅>=0%"
+    },
+    "body_min_exclusive": -0.08
+  },
+  {
+    "month": "2025-11",
+    "source": "2025-11",
+    "phase": "原测试段",
+    "rule": {
+      "id": "r051",
+      "atoms": [
+        [
+          "high5",
+          ">=",
+          0.06
+        ],
+        [
+          "low5",
+          ">=",
+          -0.03
+        ]
+      ],
+      "family": "high5+low5",
+      "text": "五分最高涨幅>=6% 且 五分最低涨幅>=-3%"
+    },
+    "body_min_exclusive": -0.08
+  },
+  {
+    "month": "2025-12",
+    "source": "2025-12",
+    "phase": "原测试段",
+    "rule": {
+      "id": "r051",
+      "atoms": [
+        [
+          "high5",
+          ">=",
+          0.06
+        ],
+        [
+          "low5",
+          ">=",
+          -0.03
+        ]
+      ],
+      "family": "high5+low5",
+      "text": "五分最高涨幅>=6% 且 五分最低涨幅>=-3%"
+    },
+    "body_min_exclusive": -0.08
+  },
+  {
+    "month": "2026-01",
+    "source": "2026-01",
+    "phase": "原测试段",
+    "rule": {
+      "id": "r051",
+      "atoms": [
+        [
+          "high5",
+          ">=",
+          0.06
+        ],
+        [
+          "low5",
+          ">=",
+          -0.03
+        ]
+      ],
+      "family": "high5+low5",
+      "text": "五分最高涨幅>=6% 且 五分最低涨幅>=-3%"
+    },
+    "body_min_exclusive": -0.08
+  },
+  {
+    "month": "2026-02",
+    "source": "2026-02",
+    "phase": "原测试段",
+    "rule": {
+      "id": "r051",
+      "atoms": [
+        [
+          "high5",
+          ">=",
+          0.06
+        ],
+        [
+          "low5",
+          ">=",
+          -0.03
+        ]
+      ],
+      "family": "high5+low5",
+      "text": "五分最高涨幅>=6% 且 五分最低涨幅>=-3%"
+    },
+    "body_min_exclusive": -0.08
+  },
+  {
+    "month": "2026-03",
+    "source": "2026-03",
+    "phase": "原测试段",
+    "rule": {
+      "id": "r051",
+      "atoms": [
+        [
+          "high5",
+          ">=",
+          0.06
+        ],
+        [
+          "low5",
+          ">=",
+          -0.03
+        ]
+      ],
+      "family": "high5+low5",
+      "text": "五分最高涨幅>=6% 且 五分最低涨幅>=-3%"
+    },
+    "body_min_exclusive": -0.08
+  },
+  {
+    "month": "2026-04",
+    "source": "2026-04",
+    "phase": "原测试段",
+    "rule": {
+      "id": "r051",
+      "atoms": [
+        [
+          "high5",
+          ">=",
+          0.06
+        ],
+        [
+          "low5",
+          ">=",
+          -0.03
+        ]
+      ],
+      "family": "high5+low5",
+      "text": "五分最高涨幅>=6% 且 五分最低涨幅>=-3%"
+    },
+    "body_min_exclusive": -0.08
+  },
+  {
+    "month": "2026-05",
+    "source": "2026-05",
+    "phase": "原测试段",
+    "rule": {
+      "id": "all",
+      "atoms": [],
+      "family": "none",
+      "text": "全部保留"
+    },
+    "body_min_exclusive": -0.08
+  },
+  {
+    "month": "2026-06",
+    "source": "2026-06",
+    "phase": "原测试段",
+    "rule": {
+      "id": "r063",
+      "atoms": [
+        [
+          "position5",
+          ">=",
+          0.3
+        ],
+        [
+          "low5",
+          ">=",
+          -0.03
+        ]
+      ],
+      "family": "position5+low5",
+      "text": "五分收价位置>=30% 且 五分最低涨幅>=-3%"
+    },
+    "body_min_exclusive": -0.08
+  },
+  {
+    "month": "2026-07",
+    "source": "2026-07",
+    "phase": "原测试段",
+    "rule": {
+      "id": "r051",
+      "atoms": [
+        [
+          "high5",
+          ">=",
+          0.06
+        ],
+        [
+          "low5",
+          ">=",
+          -0.03
+        ]
+      ],
+      "family": "high5+low5",
+      "text": "五分最高涨幅>=6% 且 五分最低涨幅>=-3%"
+    },
+    "body_min_exclusive": -0.08
+  },
+  {
+    "month": "2026-08",
+    "source": "2026-08",
+    "phase": "原测试段",
+    "rule": {
+      "id": "r019",
+      "atoms": [
+        [
+          "body5",
+          ">=",
+          0
+        ]
+      ],
+      "family": "单条件",
+      "text": "五分实体涨幅>=0%"
+    },
+    "body_min_exclusive": -0.08
+  },
+  {
+    "month": "2026-09",
+    "source": "2026-09",
+    "phase": "原测试段",
+    "rule": {
+      "id": "r051",
+      "atoms": [
+        [
+          "high5",
+          ">=",
+          0.06
+        ],
+        [
+          "low5",
+          ">=",
+          -0.03
+        ]
+      ],
+      "family": "high5+low5",
+      "text": "五分最高涨幅>=6% 且 五分最低涨幅>=-3%"
+    },
+    "body_min_exclusive": -0.08
+  },
+  {
+    "month": "2026-10",
+    "source": "2026-10",
+    "phase": "原测试段",
+    "rule": {
+      "id": "r017",
+      "atoms": [
+        [
+          "body5",
+          ">=",
+          -0.02
+        ]
+      ],
+      "family": "单条件",
+      "text": "五分实体涨幅>=-2%"
+    },
+    "body_min_exclusive": -0.08
+  }
+]

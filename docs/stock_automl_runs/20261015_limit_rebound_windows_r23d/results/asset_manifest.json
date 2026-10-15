@@ -1,0 +1,141 @@
+{
+  "local_status": "complete",
+  "cloud_status": "not_synced",
+  "files": [
+    {
+      "path": "outputs/stock_automl/limit_rebound_windows_r23d_20261015/specification.json",
+      "bytes": 1522,
+      "sha256": "030d9323d560612e4e81a29b89a2483433a7357132ce69d94f58c5496ff70c2a"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_windows_r23d_20261015/preview_before.png",
+      "bytes": 44379,
+      "sha256": "bfad9c4b6803a6a7517f79d1e070e8ef70534e60220b5890630b12bbf78358ad"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_windows_r23d_20261015/windows.pkl",
+      "bytes": 26464,
+      "sha256": "8242b6ce625e15d7cade520cc7598f1d6cf1bc0445031b0b7eda9a3c2de1699c"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_windows_r23d_20261015/minute_evidence.pkl",
+      "bytes": 42588,
+      "sha256": "fa25bc69bb05715d8d3ecf80b519192ff9d4dc4babb015c7b643b2a8cbfcb48b"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_windows_r23d_20261015/delay_signals.pkl",
+      "bytes": 148319,
+      "sha256": "40cbdaca4facbeeaeba6542815e6cf596c3d47df9fbddab806ca340f1e0d3098"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_windows_r23d_20261015/delay_summary.json",
+      "bytes": 961,
+      "sha256": "47a3b3ca87a4ca5af92d0d62f391a5d365f38709845d022fd9a096e103bf8a1f"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_windows_r23d_20261015/delay_monthly.json",
+      "bytes": 3961,
+      "sha256": "3faa3dc84f17bb04865e27a17f505ce1cf5383782415dc0495d3e2e361dfc033"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_windows_r23d_20261015/delay_daily_nav.pkl",
+      "bytes": 21330,
+      "sha256": "65e9a3115de8ca620646c32a715ee6791720227bc1db29050fe8cc4ca86a2a92"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_windows_r23d_20261015/delay_ledger.pkl",
+      "bytes": 148319,
+      "sha256": "e7f84527422e5a69bc4d2aeef896c3ac0413a6fd9f18f1198bfb01e97748aea1"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_windows_r23d_20261015/analysis.json",
+      "bytes": 1162,
+      "sha256": "c385215cbc56dccccb3466f43cf76bcf9e3063828af3e6013df728f525468058"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_windows_r23d_20261015/raw_sources.json",
+      "bytes": 20673,
+      "sha256": "6443809f4f60955254df4f1ce888313444e3d5803df6119060eb95d6eb9c341b"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_windows_r23d_20261015/added_columns.json",
+      "bytes": 57245,
+      "sha256": "fb2a38c918e1c5c770b7684af9c471730e8adb2565c9e56c0bb2bb24152bcb3e"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_windows_r23d_20261015/added_notes.json",
+      "bytes": 1952,
+      "sha256": "3a7be853aaadf99d7667a77f3301999d2e695581065dcd2f61d74d078f5f8b85"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_windows_r23d_20261015/preview_added_0.png",
+      "bytes": 68952,
+      "sha256": "1a2e6a57c30632136796b539e5f4e18ee0570c8d777f3f33e02c2129c5c7854f"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_windows_r23d_20261015/preview_added_4.png",
+      "bytes": 57635,
+      "sha256": "9add1e2646c42739e625d729a14df97479721d9c186f8f977ce6ac6a6d5c7efd"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_windows_r23d_20261015/preview_added_8.png",
+      "bytes": 36509,
+      "sha256": "7ed3a024cde42bed028b08f5600ee8e654a7b6224bbce693020e75e057d95f1a"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_windows_r23d_20261015/preview_added_12.png",
+      "bytes": 16740,
+      "sha256": "d26804377520c2f02a9dce8862f94a7695dc7e09ae62b352f0a5b8a4aa198b42"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_windows_r23d_20261015/preview_added_notes.png",
+      "bytes": 198311,
+      "sha256": "c018236a754d6544ab7054ddfa870702af8c388c81d43509351e1be543258b05"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_windows_r23d_20261015/workbook_checks.txt",
+      "bytes": 60,
+      "sha256": "acc0111e19cf44d2753fc9ecd164bf1b27fbd65597463a25cf48bd1c65e90146"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_windows_r23d_20261015/百万资金轮换_信号与交易窗口_R23D_20261015.xlsx",
+      "bytes": 58286,
+      "sha256": "8ace019e3e2f9910286ee0c2a5ac0f36263d6987de0a5f5f03ac5759ffdb4dba"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_windows_r23d_20261015/百万资金轮换_信号与交易窗口_R23D_20261015.xlsx.inspect.ndjson",
+      "bytes": 1656727,
+      "sha256": "c737851d238bf212946c53dd9df612f0cedabc380cebf08748e34db0cf32e34c"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_windows_r23d_20261015/verification.json",
+      "bytes": 513,
+      "sha256": "4aacff11fbf148e3ffe5054099327ba7a2a34bb56629d5d8b67fc80ae1bb4b48"
+    },
+    {
+      "path": "scripts/analyze_limit_rebound_entry_windows_r23d.py",
+      "bytes": 11163,
+      "sha256": "6bd7f26ea11f5c29046f1a32446e0e8033b713105bce5cfa981841128cdd57d4"
+    },
+    {
+      "path": "scripts/append_limit_rebound_entry_windows_r23d.mjs",
+      "bytes": 4310,
+      "sha256": "03bbf16a622d712c9f5c27cadf1325a356f46e9985f50307fdd6c29fbb6205fa"
+    },
+    {
+      "path": "scripts/verify_limit_rebound_entry_windows_r23d.py",
+      "bytes": 7195,
+      "sha256": "ed54bcd7400ba661981a2b145279bdec07d4aa3549195e82d02b8b7923b3d974"
+    },
+    {
+      "path": "tests/automl/test_limit_rebound_entry_windows_r23d.py",
+      "bytes": 1316,
+      "sha256": "3f78bbe0540045b68998d313731277c5797fe7fc3ad62a14ffa4b39c30f0facb"
+    },
+    {
+      "path": "docs/stock_automl_runs/20261015_limit_rebound_windows_r23d/README.md",
+      "bytes": 5025,
+      "sha256": "5647fc929b31c1aa274e1cdd56877ce024945a3649960f332c6256d9b12387d1"
+    }
+  ]
+}

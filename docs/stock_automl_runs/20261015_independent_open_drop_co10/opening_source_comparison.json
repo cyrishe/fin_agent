@@ -1,0 +1,7 @@
+{
+  "compared_B1_labels": 383,
+  "missing_official_open": 0,
+  "over_1bp": 0,
+  "max_abs_relative_difference": 4.440892098500626e-16,
+  "note": "Official daily open is opening label; prior CO9 used first minute open proxy. Only a source comparison, never training selection."
+}

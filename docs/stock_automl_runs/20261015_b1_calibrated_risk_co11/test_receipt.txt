@@ -1,0 +1,4 @@
+Command executed with sklearn 1.7.1, OPENBLAS_NUM_THREADS=1, OMP_NUM_THREADS=1:
+.venv/bin/python -m pytest tests/automl/test_b1_calibrated_risk_co11.py -q
+Observed output: 4 passed in 2.29s
+Experiment source unchanged since this test run; SHA pinned in pre_run_freeze.json.

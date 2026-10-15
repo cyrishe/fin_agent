@@ -1,0 +1,114 @@
+{
+  "branch": "codex/stock-automl-strategies",
+  "read_first": [
+    "/Volumes/ext/fin_agent/docs/stock_automl_runs/ACTIVE.md",
+    "/Volumes/ext/fin_agent/docs/stock_automl_runs/HANDOFF_20261015.md",
+    "/Volumes/ext/fin_agent/docs/stock_automl_runs/HANDOFF_20261015_CO10.md",
+    "/Volumes/ext/fin_agent/docs/stock_automl_runs/HANDOFF_20261015_CO11.md",
+    "/Volumes/ext/fin_agent/docs/stock_automl_runs/HANDOFF_20261015_CO12.md",
+    "/Volumes/ext/fin_agent/docs/stock_automl_runs/HANDOFF_20261015_CO13.md",
+    "/Volumes/ext/fin_agent/docs/stock_automl_runs/HANDOFF_20261015_CO7.md",
+    "/Volumes/ext/fin_agent/docs/stock_automl_runs/HANDOFF_20261015_CO8.md",
+    "/Volumes/ext/fin_agent/docs/stock_automl_runs/EXPERIMENT_REGISTER.md"
+  ],
+  "local_root": "/Volumes/ext/fin_agent/outputs/stock_automl/aliyun_drive_local/策略训练/收盘开盘_20261014",
+  "packages": [
+    {
+      "path": "/Volumes/ext/fin_agent/outputs/stock_automl/aliyun_drive_local/策略训练/收盘开盘_20261014/01_时间稳定性_七因子基线/20261013_X6_七因子_sklearn1.7.1_分钟补全后1440模拟",
+      "manifest_sha256": "a89bc2179dfa24417601d27be8fb7d7f01de14067d28ba5f2f8d3798c237d9ec",
+      "file_count": 14,
+      "valid": true
+    },
+    {
+      "path": "/Volumes/ext/fin_agent/outputs/stock_automl/aliyun_drive_local/策略训练/收盘开盘_20261014/01_时间稳定性_七因子基线/20261014_X8_七因子_171主191影子_分钟补全后",
+      "manifest_sha256": "f1aa97f547940685f89f3a7ebef205dad18dee87c84103d4c4f04c41c50b47aa",
+      "file_count": 39,
+      "valid": true
+    },
+    {
+      "path": "/Volumes/ext/fin_agent/outputs/stock_automl/aliyun_drive_local/策略训练/收盘开盘_20261014/02_联合目标与尾部风险/20261015_CO10_独立全市场_次晨大跌与不跌分类",
+      "manifest_sha256": "641327c10a7abac508d90488968b88412f97dff4818c5360ac80eaa9e74a4a51",
+      "file_count": 1162,
+      "valid": true
+    },
+    {
+      "path": "/Volumes/ext/fin_agent/outputs/stock_automl/aliyun_drive_local/策略训练/收盘开盘_20261014/02_联合目标与尾部风险/20261015_CO11_B1叠加独立下跌概率_校准轮空与减仓",
+      "manifest_sha256": "26b14720de41ef7da950e319b6677fbe646d0117dd45f3604250fc3eecba7a0a",
+      "file_count": 100,
+      "valid": true
+    },
+    {
+      "path": "/Volumes/ext/fin_agent/outputs/stock_automl/aliyun_drive_local/策略训练/收盘开盘_20261014/02_联合目标与尾部风险/20261015_CO12_独立0940净亏概率与幅度_B1轮空减仓",
+      "manifest_sha256": "57f08f62fffdc329f7f7add827c4570a1b08e4cd2578ec758d0b8e7fbfefff76",
+      "file_count": 1020,
+      "valid": true
+    },
+    {
+      "path": "/Volumes/ext/fin_agent/outputs/stock_automl/aliyun_drive_local/策略训练/收盘开盘_20261014/02_联合目标与尾部风险/20261015_CO13_风险20日每日滚动_对照60日_B1固定",
+      "manifest_sha256": "19ce7f82611ac2851a25c271c95cf420d83c1ad29998d0813161087656cb59ec",
+      "file_count": 2269,
+      "valid": true
+    },
+    {
+      "path": "/Volumes/ext/fin_agent/outputs/stock_automl/aliyun_drive_local/策略训练/收盘开盘_20261014/02_联合目标与尾部风险/20261015_CO8_B1固定选股_市场个股交易开关",
+      "manifest_sha256": "8ca02643669777a0075514152d539aa5a4fbe5d5538110fe9d9ba92c85b68544",
+      "file_count": 1918,
+      "valid": true
+    }
+  ],
+  "database": {
+    "records": [
+      {
+        "experiment_id": "X6_20261013_7f_sklearn171_postfill",
+        "local_path": "/Volumes/ext/fin_agent/outputs/stock_automl/aliyun_drive_local/策略训练/收盘开盘_20261014/01_时间稳定性_七因子基线/20261013_X6_七因子_sklearn1.7.1_分钟补全后1440模拟",
+        "local_check": "ok",
+        "cloud_path": "策略训练/收盘开盘_20261014/01_时间稳定性_七因子基线/20261013_X6_七因子_sklearn1.7.1_分钟补全后1440模拟",
+        "cloud_verified_at": null
+      },
+      {
+        "experiment_id": "X8_20261014_7f_sklearn171_main_191_shadow_postfill",
+        "local_path": "/Volumes/ext/fin_agent/outputs/stock_automl/aliyun_drive_local/策略训练/收盘开盘_20261014/01_时间稳定性_七因子基线/20261014_X8_七因子_171主191影子_分钟补全后",
+        "local_check": "ok",
+        "cloud_path": "策略训练/收盘开盘_20261014/01_时间稳定性_七因子基线/20261014_X8_七因子_171主191影子_分钟补全后",
+        "cloud_verified_at": null
+      },
+      {
+        "experiment_id": "CO10_20261015_independent_market_open_drop",
+        "local_path": "/Volumes/ext/fin_agent/outputs/stock_automl/aliyun_drive_local/策略训练/收盘开盘_20261014/02_联合目标与尾部风险/20261015_CO10_独立全市场_次晨大跌与不跌分类",
+        "local_check": "ok",
+        "cloud_path": "策略训练/收盘开盘_20261014/02_联合目标与尾部风险/20261015_CO10_独立全市场_次晨大跌与不跌分类",
+        "cloud_verified_at": null
+      },
+      {
+        "experiment_id": "CO11_20261015_B1_calibrated_independent_risk",
+        "local_path": "/Volumes/ext/fin_agent/outputs/stock_automl/aliyun_drive_local/策略训练/收盘开盘_20261014/02_联合目标与尾部风险/20261015_CO11_B1叠加独立下跌概率_校准轮空与减仓",
+        "local_check": "ok",
+        "cloud_path": "策略训练/收盘开盘_20261014/02_联合目标与尾部风险/20261015_CO11_B1叠加独立下跌概率_校准轮空与减仓",
+        "cloud_verified_at": null
+      },
+      {
+        "experiment_id": "CO12_20261015_independent_0940_netloss",
+        "local_path": "/Volumes/ext/fin_agent/outputs/stock_automl/aliyun_drive_local/策略训练/收盘开盘_20261014/02_联合目标与尾部风险/20261015_CO12_独立0940净亏概率与幅度_B1轮空减仓",
+        "local_check": "ok",
+        "cloud_path": "策略训练/收盘开盘_20261014/02_联合目标与尾部风险/20261015_CO12_独立0940净亏概率与幅度_B1轮空减仓",
+        "cloud_verified_at": null
+      },
+      {
+        "experiment_id": "CO13_20261015_daily20_risk_vs60",
+        "local_path": "/Volumes/ext/fin_agent/outputs/stock_automl/aliyun_drive_local/策略训练/收盘开盘_20261014/02_联合目标与尾部风险/20261015_CO13_风险20日每日滚动_对照60日_B1固定",
+        "local_check": "ok",
+        "cloud_path": "策略训练/收盘开盘_20261014/02_联合目标与尾部风险/20261015_CO13_风险20日每日滚动_对照60日_B1固定",
+        "cloud_verified_at": null
+      },
+      {
+        "experiment_id": "CO8_20261015_B1_market_stock_trade_gate",
+        "local_path": "/Volumes/ext/fin_agent/outputs/stock_automl/aliyun_drive_local/策略训练/收盘开盘_20261014/02_联合目标与尾部风险/20261015_CO8_B1固定选股_市场个股交易开关",
+        "local_check": "ok",
+        "cloud_path": "策略训练/收盘开盘_20261014/02_联合目标与尾部风险/20261015_CO8_B1固定选股_市场个股交易开关",
+        "cloud_verified_at": null
+      }
+    ],
+    "unregistered_local_packages": [],
+    "local_root": "/Volumes/ext/fin_agent/outputs/stock_automl/aliyun_drive_local/策略训练/收盘开盘_20261014"
+  }
+}
