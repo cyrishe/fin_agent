@@ -1,0 +1,14 @@
+{
+  "signal_date": "2026-10-14",
+  "next_date": "2026-10-15",
+  "symbol6": "002812",
+  "signal_price_1440": 46.33,
+  "second_high_0931_0940": 47.5,
+  "second_high_return_pct": 2.5253615368012072,
+  "actual_bucket": "1to3",
+  "close_0940": 47.22,
+  "close_0940_return_pct": 1.9210015109000667,
+  "turnover_gate_pass_171": true,
+  "turnover_gate_pass_191": true,
+  "orders_placed": 0
+}

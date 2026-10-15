@@ -1,0 +1,31 @@
+{
+  "signal_date": "2026-10-14",
+  "training_rows": 6370,
+  "training_sha256": "580164e3faa1e925fb368d36701cf801a56c63928541949ee9747ecedc89abe2",
+  "same_training_file": true,
+  "candidate_count": 106,
+  "class_changed_count": 6,
+  "max_absolute_class_probability_delta": 0.031019588004197907,
+  "top5_171": [
+    "002812",
+    "603216",
+    "603920",
+    "600403",
+    "600863"
+  ],
+  "top5_191": [
+    "002812",
+    "603920",
+    "600403",
+    "688097",
+    "300938"
+  ],
+  "top5_overlap_count": 3,
+  "top1_171": "002812",
+  "top1_191": "002812",
+  "top2_171": "603216",
+  "top2_191": "603920",
+  "model_sha256_171": "4af8904bd0cf785d3ff89d96954454b30b294ef287ae60905e5ae933bedd01f4",
+  "model_sha256_191": "61d420b2f693489246f931bab8e486023ce1f95b7388be383db18fea9dcefe72",
+  "refit_171_same_model_sha256": true
+}
