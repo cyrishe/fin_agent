@@ -540,7 +540,10 @@ def write_connection(env_file: Path):
 
 
 def init_db(env_file: Path) -> None:
-    sql = SCHEMA.read_text()
+    # Full-line SQL comments may contain punctuation, including semicolons.
+    # Remove them before splitting this repository's simple CREATE statements.
+    sql = "\n".join(line for line in SCHEMA.read_text().splitlines()
+                    if not line.lstrip().startswith("--"))
     statements = [part.strip() for part in sql.split(";") if part.strip()]
     with write_connection(env_file) as db:
         with db.cursor() as cursor:

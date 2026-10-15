@@ -7,6 +7,29 @@ import pytest
 from scripts.automl_strategy_execution import record_decisions, record_run, settle_previous
 
 
+def test_schema_initialization_ignores_semicolons_in_comments(monkeypatch):
+    from contextlib import contextmanager
+    from pathlib import Path
+    from scripts import run_automl_1440_strategy as runner
+    calls = []
+    class Connection:
+        @contextmanager
+        def cursor(self):
+            class StatementCursor:
+                def execute(self, sql):
+                    calls.append(sql)
+            yield StatementCursor()
+        def commit(self):
+            pass
+    @contextmanager
+    def connection(_):
+        yield Connection()
+    monkeypatch.setattr(runner, "write_connection", connection)
+    runner.init_db(Path("unused"))
+    assert len(calls) == 4
+    assert all(sql.startswith("CREATE TABLE IF NOT EXISTS") for sql in calls)
+
+
 class Cursor:
     def __init__(self, *, existing=None, pending=None, bars=None):
         self.existing = existing
