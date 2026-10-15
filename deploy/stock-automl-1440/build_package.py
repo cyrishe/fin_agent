@@ -57,7 +57,7 @@ def main() -> None:
             payload = path.read_bytes()
             info = tarfile.TarInfo(name)
             info.size = len(payload)
-            info.mode = path.stat().st_mode & 0o777
+            info.mode = 0o755 if name in ("automl1440.sh", "install_runtime.sh") else 0o644
             info.mtime = 0
             tar.addfile(info, io.BytesIO(payload))
         payload = json.dumps(manifest, indent=2, sort_keys=True).encode() + b"\n"
