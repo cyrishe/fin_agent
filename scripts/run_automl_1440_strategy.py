@@ -24,6 +24,7 @@ import joblib
 import numpy as np
 import pandas as pd
 import pymysql
+import sklearn
 from dotenv import load_dotenv
 
 from scripts.audit_automl_mk_1m_entry_limit import mark_entry_limit
@@ -42,7 +43,7 @@ from scripts.audit_automl_minute_api_backfill import request_bars
 ROOT = Path(__file__).resolve().parents[1]
 SCHEMA = ROOT / "deploy/sql/automl_1440_strategy.sql"
 SHANGHAI = ZoneInfo("Asia/Shanghai")
-STRATEGY_ID = "rolling20_7f_hgb_dbapi_amount_v1"
+STRATEGY_ID = f"rolling20_7f_hgb_sklearn{sklearn.__version__.replace('.', '')}_dbapi_amount_v2"
 DEFINITION = {
     "title": "14:40 近20日七因子四分类",
     "summary": "涨幅3%–6%候选；近20个连续交易日全量样本；小型提升树四分类；Top1成交额不足则轮空，Top2仅供观察。",
@@ -51,6 +52,7 @@ DEFINITION = {
     "execution_formula": "Top1选股日截至14:40累计成交额≥该股此前20个交易日同口径中位数才标记可交易；否则轮空。历史回放买卖价格代理为14:40–14:41及次晨09:39–09:40各一分钟K高低均价，实时信号不预知这些价格。",
     "formula": {"candidate_return_min": 0.03, "candidate_return_max": 0.06,
                 "training_days": 20, "features": list(FEATURES),
+                "sklearn_version": sklearn.__version__,
                 "labels": ["lt0", "0to1", "1to3", "ge3"],
                 "model": "sklearn HistGradientBoostingClassifier",
                 "model_params": {"max_iter": 60, "learning_rate": 0.05,
@@ -403,6 +405,7 @@ def prepare(db, day: str, archive: Path | None, cache: Path) -> dict:
     joblib.dump(model, model_file)
     meta = {"signal_date": day, "training_dates": training_dates,
             "training_rows": len(training), "feature_names": list(FEATURES),
+            "sklearn_version": sklearn.__version__,
             "pipeline_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
             "training_sha256": hashlib.sha256(training_file.read_bytes()).hexdigest(),
             "model_sha256": hashlib.sha256(model_file.read_bytes()).hexdigest(),
@@ -421,11 +424,12 @@ def model_for_day(db, day: str, archive: Path | None, cache: Path):
         prepare(db, day, archive, cache)
     meta = json.loads(meta_file.read_text())
     if (meta["signal_date"] != day or meta["feature_names"] != list(FEATURES) or
+            meta.get("sklearn_version") != sklearn.__version__ or
             meta.get("pipeline_sha256") != hashlib.sha256(Path(__file__).read_bytes()).hexdigest() or
             meta["training_dates"] != database_calendar(db, day)[-20:] or
             hashlib.sha256((cache / f"{day}_training.csv.gz").read_bytes()).hexdigest() != meta["training_sha256"] or
             hashlib.sha256(model_file.read_bytes()).hexdigest() != meta["model_sha256"]):
-        raise ValueError("缓存模型与本日训练窗口或文件校验不符")
+        raise ValueError("缓存模型与本日训练窗口、sklearn版本或文件校验不符")
     return joblib.load(model_file), meta
 
 
@@ -581,6 +585,7 @@ def save_selection(env_file: Path, user_id: str, day: str, picks: list[dict],
                                "entry_at_limit": bool(pick.get("entry_at_limit", False)),
                                "model_sha256": meta["model_sha256"],
                                "training_sha256": meta["training_sha256"],
+                               "sklearn_version": meta.get("sklearn_version"),
                                "prepared_at": meta["prepared_at"]}
                     if extra_context:
                         context.update(extra_context)

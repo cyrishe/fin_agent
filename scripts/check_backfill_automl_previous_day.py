@@ -15,7 +15,7 @@ from pathlib import Path
 from zoneinfo import ZoneInfo
 
 from scripts.backfill_automl_august_minute_full import (
-    INSERT_SQL, connection, pause_during_market,
+    INSERT_SQL, connection,
 )
 from scripts.backfill_automl_deep_v_minute_gaps import fetch_day
 
@@ -64,15 +64,23 @@ def incomplete(state: dict[str, dict]) -> list[str]:
             if (row["bars"], row["slots"], row["exact"]) != (220, 220, 220)]
 
 
-def existing_slots(db, day: str, code: str) -> set[int]:
+def existing_slots(db, day: str, codes: list[str]) -> dict[str, set[int]]:
+    if not codes:
+        return {}
+    holders = ",".join(["%s"] * len(codes))
     with db.cursor() as cursor:
-        cursor.execute("""SELECT bar_end_time
+        cursor.execute(f"""SELECT stk_code,bar_end_time
             FROM aiia_stock_realtime_minute_snapshot_full
             WHERE trade_date=%s AND kline_type='1m' AND period_minutes=1
-              AND LEFT(stk_code,6)=%s AND bar_end_time BETWEEN %s AND %s""",
-                       (day, code, day + " 09:31:00", day + " 14:40:00"))
-        return {row["bar_end_time"].hour * 60 + row["bar_end_time"].minute
-                for row in cursor.fetchall()}
+              AND bar_end_time BETWEEN %s AND %s
+              AND stk_code IN ({holders})""",
+                       (day, day + " 09:31:00", day + " 14:40:00", *codes))
+        rows = cursor.fetchall()
+    found: dict[str, set[int]] = {code: set() for code in codes}
+    for row in rows:
+        found[row["stk_code"]].add(
+            row["bar_end_time"].hour * 60 + row["bar_end_time"].minute)
+    return found
 
 
 def main() -> None:
@@ -88,6 +96,8 @@ def main() -> None:
     db = connection(args.env_file)
     try:
         day = args.day or previous_day(db)
+        if args.execute and day >= datetime.now(SHANGHAI).date().isoformat():
+            raise ValueError("只能回填已结束的交易日")
         before = coverage(db, day)
         needed = incomplete(before)
         result = {"day": day, "checked_at": datetime.now(SHANGHAI).isoformat(),
@@ -109,13 +119,13 @@ def main() -> None:
                         fetched[code] = ([], {"error": type(exc).__name__})
             result["api_complete"] = sum(bool(rows) for rows, _ in fetched.values())
             result["api_incomplete"] = len(needed)-result["api_complete"]
+            have_by_code = existing_slots(db, day, needed)
             for index, code in enumerate(needed, 1):
                 rows, _ = fetched[code]
                 if not rows:
                     continue
-                pause_during_market()
-                db.ping(reconnect=True)
-                have = existing_slots(db, day, code)
+                db.ping()
+                have = have_by_code[code]
                 missing = [row for row in rows
                            if row[0].strftime("%Y-%m-%d") == day and
                            row[5] in EXPECTED and row[5] not in have]
