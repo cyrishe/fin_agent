@@ -258,7 +258,12 @@ def test_history_uses_selection_date_database_bars_and_never_live_api(monkeypatc
             day=date.fromisoformat(args[-1])
             return [dict(stk_code='000823.SZ',trade_date=day,preclose=20,open=20.1,high=22,low=20,close=21,volume=1000,amount=21000)]
         if 'FROM aiia_stock_realtime_minute_snapshot_full' in sql:
-            assert args[1:] == ('000823',)
+            assert args[1:-240] == ('000823',)
+            assert 'bar_end_time IN (' in sql
+            ends=args[-240:]
+            assert len(set(ends))==240
+            assert [ends[i].strftime('%H:%M') for i in (0,119,120,239)]==['09:31','11:30','13:01','15:00']
+            assert all(t.date().isoformat()==args[0] for t in ends)
             assert 'is_finalized=1' in sql and 'is_fallback=0' in sql
             return [dict(stk_code='000823',end=datetime.fromisoformat(args[0]+' '+t),open=20,high=22,low=20,close=21,volume=100,amount=2100) for t in ['09:31:00','15:00:00']]
         raise AssertionError(sql)
@@ -330,7 +335,7 @@ def test_minute_navigation_keeps_owned_selection_and_routes_target_source(monkey
             assert args[0]=='000823.SZ' and args[-1]==target
             return []
         if 'minute_snapshot' in sql:
-            assert target!='2026-10-16' and args==(target,'000823')
+            assert target!='2026-10-16' and args[:-240]==(target,'000823')
             return [dict(stk_code='000823',end=datetime.fromisoformat(target+' 09:31:00'),open=10,high=11,low=9,close=10,volume=10)]
         raise AssertionError(sql)
     monkeypatch.setattr(view_module,'kingdom_connection',connection)

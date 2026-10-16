@@ -196,16 +196,23 @@ class StrategyExecutionViewService:
                 for rows in daily.values():
                     rows.reverse()
                 if not live:
+                    # Complete the existing primary key (date, type, end, code)
+                    # so one stock reads 240 rows instead of scanning the market.
+                    day = date.fromisoformat(target)
+                    ends = tuple(datetime.combine(day, start) + timedelta(minutes=i)
+                                 for start in (time(9, 30), time(13))
+                                 for i in range(1, 121))
+                    end_marks = ','.join(['%s'] * len(ends))
                     marks = ','.join(['%s'] * len(codes))
                     rows = query(conn, f"""SELECT stk_code,bar_end_time AS end,
                         open_price AS open,high_price AS high,low_price AS low,
                         latest_price AS close,volume,amount
                         FROM aiia_stock_realtime_minute_snapshot_full
                         WHERE trade_date=%s AND stk_code IN ({marks})
-                          AND kline_type='1m' AND period_minutes=1
-                          AND is_finalized=1 AND is_fallback=0
+                          AND kline_type='1m' AND bar_end_time IN ({end_marks})
+                          AND period_minutes=1 AND is_finalized=1 AND is_fallback=0
                           AND source_snapshot_time=bar_end_time
-                        ORDER BY stk_code,bar_end_time""", (target, *codes))
+                        ORDER BY stk_code,bar_end_time""", (target, *codes, *ends))
                     by_code = {}
                     for row in rows:
                         by_code.setdefault(str(row['stk_code'])[:6], []).append(row)
