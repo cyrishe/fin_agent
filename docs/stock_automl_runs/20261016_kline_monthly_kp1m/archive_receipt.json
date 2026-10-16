@@ -1,0 +1,10 @@
+{
+  "experiment": "KP1M",
+  "local_mirror": "/Volumes/ext/fin_agent/outputs/stock_automl/aliyun_drive_local/策略训练/收盘开盘_20261014/03_因子筛选_7至14/20261016_KP1M_K线形态_月度上涨比例与时间尺度",
+  "manifest_sha256": "c807c9c0354af1b7ded43796ff9640a5d86371c3d5b977b3abfaa551cff2f41c",
+  "files_verified": 10,
+  "cloud_status": "待同步；未上传或独立回读云端",
+  "model_training": false,
+  "pattern_rescan": false,
+  "base_archive_unchanged": true
+}

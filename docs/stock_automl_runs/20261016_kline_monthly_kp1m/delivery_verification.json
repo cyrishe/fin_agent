@@ -1,0 +1,11 @@
+{
+  "test_command": ".venv-automl/bin/python -m pytest tests/automl/test_kline_forward_kp1.py tests/test_kline_pattern_lab.py tests/test_kline_definition_refinement.py -q",
+  "result": "29 passed in 3.98s",
+  "change_scope": "research documentation and archived research scripts; no production changes",
+  "scripts_sha256": {
+    "research_kline_forward_kp1.py": "f5603805949bd7b6fcd1130215da2fc7b5e89df31c6eff3834e26b49ad396706",
+    "select_kline_candidates_kp1.py": "11a5b8872940f8a5e11a51981f94ee4f088fe28e958a4e9c4173ebcdf0fe0ad6",
+    "verify_kline_forward_kp1.py": "764a05abfea97726b3c0cfd9f954d5aaa6244a2ec3b9b16e07e7ca582dfc7447",
+    "analyze_kline_monthly_kp1m.py": "03d504a161a7ebe13a7cef18c2dc235e4bc852b678e92d167f5f998451ac36ec"
+  }
+}

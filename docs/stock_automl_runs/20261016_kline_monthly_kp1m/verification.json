@@ -1,0 +1,21 @@
+{
+  "experiment": "KP1M",
+  "source": "KP1 saved stock-date hits and labels",
+  "pattern_rescan": false,
+  "model_training": false,
+  "verified_parts": 53,
+  "stock_days": 642173,
+  "trading_days": 125,
+  "patterns": 64,
+  "aggregate_reconciliations": 192,
+  "independent_month_market_checks": 6,
+  "monthly_rows": 4032,
+  "base_manifest_sha256": "ca48d05f7e14c72b7b6372d8c32e48e2190ce5950c452fdb1d1768ca93042a67",
+  "definitions_sha256": "ff9ee7be1a94fa6f0d5e234394cc07b81ac97a45110e2cd3749443ee448312af",
+  "script_sha256": "03d504a161a7ebe13a7cef18c2dc235e4bc852b678e92d167f5f998451ac36ec",
+  "month_basis": "signal date",
+  "up_definition": "t+h close/reference-price index > t close by >1e-9 return percentage points",
+  "baseline": "same signal date, same horizon, all eligible market stocks with valid labels; weighted by pattern occurrence count",
+  "scopes": "nonlimit excludes signal-day close-limit and one-price hits; episode_start uses cached starts; baseline remains full eligible market",
+  "note": "Monthly signs are descriptive, not independent hypothesis tests. No 5–20 day test or afternoon execution test."
+}

@@ -1,0 +1,9 @@
+{
+  "scripts/research_kline_forward_kp1.py": "f5603805949bd7b6fcd1130215da2fc7b5e89df31c6eff3834e26b49ad396706",
+  "src/experiments/kline_patterns/catalog.py": "1f60cbfb65e64047b88724deb30064ce5c1a33409f904f26c63e26dee8b5254b",
+  "src/experiments/kline_patterns/engine.py": "6b341cd0935db526b2b26639b1c4811d11d12fbe8a436f930583295823adf877",
+  "src/services/technical_indicator_calculator.py": "3d78b7f6fa1b716aa26cbef9f74fca98633c4c57e16c25b77eefe805ecffa3cd",
+  "scripts/select_kline_candidates_kp1.py": "11a5b8872940f8a5e11a51981f94ee4f088fe28e958a4e9c4173ebcdf0fe0ad6",
+  "scripts/verify_kline_forward_kp1.py": "764a05abfea97726b3c0cfd9f954d5aaa6244a2ec3b9b16e07e7ca582dfc7447",
+  "tests/automl/test_kline_forward_kp1.py": "7f7fb473e22348858c91887a85a0a8dcaeb3b03e004d5b9299d7da76cbc218b8"
+}

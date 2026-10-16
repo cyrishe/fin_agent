@@ -1,0 +1,12 @@
+{
+  "zip": "/Volumes/ext/fin_agent/outputs/stock_automl/kline_survey_kp1_20261016/K线形态研究_完整交接_20261016.zip",
+  "bytes": 195676620,
+  "sha256": "3e831a948243e17a0a6bbb752ed480afb4b8f7fe4025b0ca76d7370b6a71dcfa",
+  "files_independently_read_back": 188,
+  "source_KP1_zip_sha256": "ba71733dbb1ac140ab928be14fb4eae74c91cb3619cb8fa049869473644ab642",
+  "cloud_target": "策略训练/收盘开盘_20261014/03_因子筛选_7至14/20261016_K线形态研究_完整交接/",
+  "cloud_status": "待用户上传；未进行云端回读核验",
+  "contains_model_weights": false,
+  "contains_training_split": false,
+  "contains_raw_prices_and_frozen_research_samples": true
+}

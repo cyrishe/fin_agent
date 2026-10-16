@@ -1,0 +1,10 @@
+{
+  "independent_raw_forward_values_checked": 1863,
+  "max_absolute_error_pp": 4.618527782440651e-14,
+  "sample_stock_days": 220,
+  "real_data_prefix_pattern_checks": 320,
+  "pattern_aggregates_reconciled": 64,
+  "duplicate_panel_keys": 0,
+  "model_training_calls": 0,
+  "status": "passed"
+}

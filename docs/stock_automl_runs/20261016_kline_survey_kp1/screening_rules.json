@@ -1,0 +1,8 @@
+{
+  "frequency": "500–25000 occurrences in six months; >=60 signal days; P90 daily market share <=10%",
+  "return": "same-date equal-weight market excess >0 at each of t+1,t+2,t+3; no requirement every stock or every day wins",
+  "robustness": "recent three months, exclude signal close limit/one-price, episode starts; disclose failures",
+  "model_training": false,
+  "market_days": 125,
+  "selected_count": 9
+}
