@@ -27,9 +27,10 @@ const price=x=>x==null?'—':Number(x).toFixed(2);
 const signed=x=>x==null?'—':`${Number(x)>0?'+':''}${Number(x).toFixed(2)}%`;
 const color=x=>x==null?'flat':Number(x)>0?'up':Number(x)<0?'down':'flat';
 const dateTime=x=>x?String(x).replace('T',' ').slice(5,16):'—';
+let pendingCharts=[];
 let records=null,market=null,request=null,owner=new URLSearchParams(location.search).get('user_id')||'';
-function chart(bars,title){
- const width=660,height=248,left=49,right=14,top=18,bottom=175;
+function chart(bars,title,width){
+ const height=248,left=49,right=14,top=18,bottom=175;
  const root=svg('svg',{class:'chart',viewBox:`0 0 ${width} ${height}`,preserveAspectRatio:'none',role:'img','aria-label':`${title} · ${bars.length} 根K线`});
  root.dataset.barCount=String(bars.length);root.dataset.firstTime=bars[0].time;root.dataset.lastTime=bars.at(-1).time;
  const lo=Math.min(...bars.map(b=>Number(b.low))),hi=Math.max(...bars.map(b=>Number(b.high))),pad=Math.max((hi-lo)*.08,.02);
@@ -46,10 +47,11 @@ function chart(bars,title){
 function panel(title,caption,bars,empty){
  const p=el('div','chart-panel'),head=el('div','chart-head');head.append(el('h3','',title),el('span','',caption));p.append(head);
  const valid=bars.filter(b=>['open','high','low','close'].every(k=>b[k]!=null&&Number.isFinite(Number(b[k]))&&Number(b[k])>0));
- p.append(valid.length?chart(valid,title):el('div','empty-chart',empty));return p;
+ if(valid.length){const slot=el('div');p.append(slot);pendingCharts.push(()=>slot.replaceWith(chart(valid,title,Math.max(280,p.clientWidth-28))));}
+ else p.append(el('div','empty-chart',empty));return p;
 }
 function render(){
- if(!records)return;
+ if(!records)return;pendingCharts=[];
  const selected=$('strategy-filter').value,groups=new Map(),names=new Map(records.strategies.map(s=>[s.strategy_id,s.name]));
  for(const p of records.picks){if(selected&&p.strategy_id!==selected)continue;const key=`${p.strategy_id}:${p.stock_code}`;if(!groups.has(key))groups.set(key,[]);groups.get(key).push(p);}
  const stockMap=new Map((market?.stocks||[]).map(s=>[s.code,s])),container=$('stock-list');container.replaceChildren();
@@ -74,6 +76,7 @@ function render(){
  let daily=[...(stock?.daily_bars||[])];if(q&&q.open>0&&q.high>0&&q.low>0&&q.close>0){daily.push({date:market.trade_date,time:market.trade_date.slice(5),open:q.open,high:q.high,low:q.low,close:q.close,volume:q.volumn==null?null:Number(q.volumn)*100,amount:q.amount});}daily=daily.slice(-20);
  body.append(panel('近 20 日日 K','未复权 · 今日动态更新',daily,'等待日 K 数据'));article.append(body);container.append(article);
  }
+ pendingCharts.forEach(draw=>draw());pendingCharts=[];
 }
 function options(){
  const selected=$('strategy-filter').value;const opts=[{strategy_id:'',name:'全部模型'},...records.strategies];
