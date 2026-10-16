@@ -4,18 +4,26 @@
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>策略选股总览 · Fin Agent</title>
 <style>
-:root{color-scheme:dark;font-family:Inter,"PingFang SC","Microsoft YaHei",sans-serif;background:#0b1320;color:#e7eef6;font-synthesis:none}*{box-sizing:border-box}body{margin:0}button,select{font:inherit}a{color:#91c7e8;text-decoration:none}button,select{background:#18293b;border:1px solid #36516a;border-radius:7px;color:#e7eef6;padding:7px 10px}button{cursor:pointer}button:hover{border-color:#5dc9b8}.shell{max-width:1900px;margin:auto;padding:16px 24px 40px}.toolbar{position:sticky;top:0;z-index:2;background:#0b1320f5;border-bottom:1px solid #304259;padding:10px 0 12px;display:flex;gap:14px;align-items:center;flex-wrap:wrap;backdrop-filter:blur(12px)}h1{font-size:22px;margin:0 12px 0 0;letter-spacing:-.5px}.toolbar label{font-size:12px;color:#91a6ba}.toolbar select{max-width:260px}.spacer{flex:1}.live{color:#79d9c5;font-size:12px}.live:before{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;background:currentColor;margin-right:6px}.subtitle{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;color:#93a8bd;font-size:12px;margin:13px 0 16px}.list{display:flex;flex-direction:column;gap:14px}.stock-row{border:1px solid #2b4359;border-radius:11px;background:#112032;overflow:hidden}.row-head{display:flex;gap:20px;align-items:center;flex-wrap:wrap;padding:12px 16px;background:#15263a;border-bottom:1px solid #294056}.identity{min-width:185px}.identity strong{font-size:20px}.code{font-size:12px;color:#a0b4c8;margin-left:9px}.model{font-size:12px;color:#75d5c3;display:block;margin-top:6px}.quote{display:flex;align-items:baseline;gap:12px;min-width:154px}.quote b{font-size:27px;letter-spacing:-.5px}.quote span{font-size:14px;font-weight:600}.up{color:#ff8b8b}.down{color:#70d9b9}.flat{color:#b4c7d7}.quote-block{flex-shrink:0}.quote-block .quote-time{margin-top:5px}.quote-time{font-size:11px;color:#88a0b7;white-space:nowrap}.stats{display:flex;gap:18px;flex-wrap:wrap;margin-left:0}.stat{font-size:11px;color:#8da5bb}.stat b{display:block;color:#d9e7f3;font-size:13px;margin-top:4px;font-weight:500}.row-body{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(0,1fr)}.decision-summary{flex:1;min-width:400px;border-left:1px solid #345064;margin-left:6px;padding-left:20px}.execution{display:flex;gap:24px;align-items:center;padding:8px 0 0;font-size:12px}.trade{display:grid;grid-template-columns:auto auto;column-gap:10px;align-items:baseline}.trade-label{color:#9ab0c5}.trade b{font-size:16px;font-weight:500}.trade time{grid-column:2;font-size:10px;color:#8ba2b9;margin-top:3px}.trade-return{margin-left:8px;font-size:12px}.trade-return b{margin-left:10px}.badge{padding:3px 7px;border-radius:4px;font-size:10px;background:#293b50;color:#b0c3d5}.badge.holding{color:#f0d18e;background:#443e30}.selection-meta{display:flex;flex-wrap:wrap;gap:12px;align-items:center;font-size:11px;color:#8ba2b9;padding:0}.selection-date{font-variant-numeric:tabular-nums;color:#c4d7e7}.history-trigger{margin-left:10px;border:0;padding:0;background:transparent;color:#8ebad1;font-size:11px}.day-section{display:flex;flex-direction:column;gap:12px;margin-top:18px}.day-section:first-child{margin-top:0}.day-toggle{position:sticky;top:calc(var(--toolbar-height,105px) + 8px);z-index:1;display:flex;width:100%;align-items:center;gap:14px;text-align:left;padding:15px 17px;background:#254655;border:1px solid #487783;border-left:5px solid #80e0cd;border-radius:8px;box-shadow:0 5px 14px #02081266}.day-toggle strong{font-size:23px;letter-spacing:.5px;color:#effffa}.day-toggle span{font-size:12px;color:#c1dedf}.day-toggle .day-label{font-size:11px;color:#9ed2cc}.day-toggle .arrow{margin-left:auto;padding:6px 10px;border:1px solid #638b93;border-radius:5px;color:#e1f8f2;white-space:nowrap}.trade b.waiting{font-size:12px;font-weight:400;color:#9ab0c5}.day-stocks[hidden]{display:none}.day-stocks{display:flex;flex-direction:column;gap:10px}.history-dialog{background:#112032;border:1px solid #36516a;border-radius:12px;color:#e7eef6;width:min(720px,calc(100vw - 24px));padding:18px;max-height:75vh}.history-dialog::backdrop{background:#020812b8}.dialog-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:16px}.dialog-head h2{font-size:17px;margin:0}.history-scroll{overflow:auto}.history-table{border-collapse:collapse;width:100%;font-size:12px;white-space:nowrap;text-align:left}.history-table th{color:#91a7bd;font-weight:400}.history-table th,.history-table td{padding:9px 12px;border-bottom:1px solid #2b4054}.history-table th:first-child,.history-table td:first-child{padding-left:0}.history-table time{display:block;font-size:10px;color:#8ba2b9;margin-top:4px}
+:root{color-scheme:dark;font-family:Inter,"PingFang SC","Microsoft YaHei",sans-serif;background:#0b1320;color:#e7eef6;font-synthesis:none}*{box-sizing:border-box}body{margin:0}button,select{font:inherit}a{color:#91c7e8;text-decoration:none}button,select{background:#18293b;border:1px solid #36516a;border-radius:7px;color:#e7eef6;padding:7px 10px}button{cursor:pointer}button:hover{border-color:#5dc9b8}.shell{max-width:1900px;margin:auto;padding:16px 24px 40px}.toolbar{position:sticky;top:0;z-index:2;background:#0b1320f5;border-bottom:1px solid #304259;padding:10px 0 12px;display:flex;gap:14px;align-items:center;flex-wrap:wrap;backdrop-filter:blur(12px)}h1{font-size:22px;margin:0 12px 0 0;letter-spacing:-.5px}.toolbar label{font-size:12px;color:#91a6ba}.toolbar select{max-width:260px}.spacer{flex:1}.live{color:#79d9c5;font-size:12px}.live:before{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;background:currentColor;margin-right:6px}.subtitle{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;color:#93a8bd;font-size:12px;margin:13px 0 16px}.list{display:flex;flex-direction:column;gap:14px}.stock-row{border:1px solid #2b4359;border-radius:11px;background:#112032;overflow:hidden}.row-head{display:flex;gap:20px;align-items:center;flex-wrap:wrap;padding:12px 16px;background:#15263a;border-bottom:1px solid #294056}.identity{min-width:185px}.identity strong{font-size:20px}.code{font-size:12px;color:#a0b4c8;margin-left:9px}.model{font-size:12px;color:#75d5c3;display:block;margin-top:6px}.quote{display:flex;align-items:baseline;gap:12px;min-width:154px}.quote b{font-size:27px;letter-spacing:-.5px}.quote span{font-size:14px;font-weight:600}.up{color:#ff8b8b}.down{color:#70d9b9}.flat{color:#b4c7d7}.quote-block{flex-shrink:0}.quote-block .quote-time{margin-top:5px}.quote-time{font-size:11px;color:#88a0b7;white-space:nowrap}.stats{display:flex;gap:18px;flex-wrap:wrap;margin-left:0}.stat{font-size:11px;color:#8da5bb}.stat b{display:block;color:#d9e7f3;font-size:13px;margin-top:4px;font-weight:500}.row-body{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(0,1fr)}.decision-summary{flex:1;min-width:400px;border-left:1px solid #345064;margin-left:6px;padding-left:20px}.execution{display:flex;gap:24px;align-items:center;padding:8px 0 0;font-size:12px}.trade{display:grid;grid-template-columns:auto auto;column-gap:10px;align-items:baseline}.trade-label{color:#9ab0c5}.trade b{font-size:16px;font-weight:500}.trade time{grid-column:2;font-size:10px;color:#8ba2b9;margin-top:3px}.trade-return{margin-left:8px;font-size:12px}.trade-return b{margin-left:10px}.badge{padding:3px 7px;border-radius:4px;font-size:10px;background:#293b50;color:#b0c3d5}.badge.holding{color:#f0d18e;background:#443e30}.selection-meta{display:flex;flex-wrap:wrap;gap:12px;align-items:center;font-size:11px;color:#8ba2b9;padding:0}.selection-date{font-variant-numeric:tabular-nums;color:#c4d7e7}.history-trigger{margin-left:10px;border:0;padding:0;background:transparent;color:#8ebad1;font-size:11px}.trade b.waiting{font-size:12px;font-weight:400;color:#9ab0c5}.history-dialog{background:#112032;border:1px solid #36516a;border-radius:12px;color:#e7eef6;width:min(720px,calc(100vw - 24px));padding:18px;max-height:75vh}.history-dialog::backdrop{background:#020812b8}.dialog-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:16px}.dialog-head h2{font-size:17px;margin:0}.history-scroll{overflow:auto}.history-table{border-collapse:collapse;width:100%;font-size:12px;white-space:nowrap;text-align:left}.history-table th{color:#91a7bd;font-weight:400}.history-table th,.history-table td{padding:9px 12px;border-bottom:1px solid #2b4054}.history-table th:first-child,.history-table td:first-child{padding-left:0}.history-table time{display:block;font-size:10px;color:#8ba2b9;margin-top:4px}
 .minute-nav{display:flex;align-items:center;gap:6px;flex-wrap:wrap}.minute-nav button{padding:3px 7px;font-size:11px}.minute-nav button:disabled{opacity:.3;cursor:default}.minute-nav .minute-date{color:#d5e8f4;font-size:12px;font-variant-numeric:tabular-nums}
 .chart-panel{padding:12px 14px 8px;min-width:0}.chart-panel+ .chart-panel{border-left:1px solid #293e54}.chart-head{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:2px}.chart-head h3{font-size:13px;margin:0}.chart-head span{color:#91a7bd;font-size:10px}.chart{display:block;width:100%;height:118px}.chart-grid{stroke:#2a4055;stroke-width:.7}.chart-label{fill:#88a1b9;font-size:10px}.empty-chart{height:118px;display:flex;align-items:center;justify-content:center;color:#839db6;font-size:13px;border:1px dashed #2d465f;border-radius:6px}.error{padding:10px 14px;background:#402a2f;color:#ffb8b8;border:1px solid #89585f;border-radius:7px;margin:12px 0}.hidden{display:none!important}.empty{padding:28px;color:#9ab1c7;text-align:center;border:1px dashed #2e4c67;border-radius:10px}.footer{font-size:11px;color:#8098af;margin:18px 0;line-height:1.7}.stale{color:#efc87b!important}
 @media(min-width:1600px){.chart{height:130px}.empty-chart{height:130px}}
 @media(max-width:1100px){.stats{gap:14px}.decision-summary{flex-basis:100%;min-width:0;margin-left:0;padding:8px 0 0;border-left:0;border-top:1px solid #345064}}
-@media(max-width:680px){.shell{padding:8px 10px 24px}.row-body{display:block}.chart-panel+.chart-panel{border-left:0;border-top:1px solid #293e54}.row-head{gap:12px;padding:10px 14px}.stats{margin-left:0;flex:0 1 auto}.identity{min-width:145px}.quote{min-width:130px}.quote b{font-size:24px}.toolbar{gap:9px}h1{font-size:19px}.toolbar select{max-width:180px}.execution{gap:20px;padding:8px 0 0}.selection-meta{padding:0;gap:8px}.history-trigger{font-size:10px}.day-toggle{gap:9px;padding:13px 12px}.day-toggle strong{font-size:21px}.day-toggle .day-label{display:none}.day-toggle .arrow{padding:5px 8px}.trade-return b{display:block;margin:3px 0 0}.chart-head{flex-wrap:wrap}}
+@media(max-width:680px){.shell{padding:8px 10px 24px}.row-body{display:block}.chart-panel+.chart-panel{border-left:0;border-top:1px solid #293e54}.row-head{gap:12px;padding:10px 14px}.stats{margin-left:0;flex:0 1 auto}.identity{min-width:145px}.quote{min-width:130px}.quote b{font-size:24px}.toolbar{gap:9px}h1{font-size:19px}.toolbar select{max-width:180px}.execution{gap:20px;padding:8px 0 0}.selection-meta{padding:0;gap:8px}.history-trigger{font-size:10px}.trade-return b{display:block;margin:3px 0 0}.chart-head{flex-wrap:wrap}}
+
+.stock-row{background:var(--row-bg);content-visibility:auto;contain-intrinsic-size:auto 270px}.stock-row .row-head{background:var(--head-bg)}
+.date-tone-0{--row-bg:#102131;--head-bg:#172b3c}.date-tone-1{--row-bg:#172238;--head-bg:#202e45}
+.row-head{gap:18px}.record-date{min-width:134px;flex-shrink:0;color:#e2eff7;font-size:21px;font-weight:650;letter-spacing:.2px}.record-date small{display:block;color:#88b2c5;font-size:10px;letter-spacing:1px;margin-bottom:5px;font-weight:400}
+.selection-meta .selection-date{display:none}.identity{min-width:155px}.decision-summary{min-width:300px}.list{gap:12px}.stock-row.new-date{margin-top:14px;border-top:2px solid #527589}.stock-row:first-child{margin-top:0}
+.chart-slot{height:118px;width:100%}.chart-slot canvas{display:block;width:100%;height:118px}.load-footer{text-align:center;padding:28px 0 12px;color:#91a6ba}.load-footer button{min-width:230px;padding:12px 22px}.load-footer small{display:block;margin-top:10px;font-size:12px}
+@media(max-width:680px){.record-date{font-size:19px;min-width:122px}.row-head{gap:10px 18px}.identity{min-width:130px}.decision-summary{min-width:0;width:100%;flex-basis:100%}.stock-row{contain-intrinsic-size:auto 440px}.stats{gap:14px}}
 </style>
 </head>
 <body><main class="shell">
 <header class="toolbar"><h1>策略选股总览</h1><label for="strategy-filter">模型</label><select id="strategy-filter"><option value="">全部模型</option></select><label for="owner-filter" id="owner-label" class="hidden">用户</label><select id="owner-filter" class="hidden"></select><span class="spacer"></span><span class="live" id="refresh-state">每 10 秒自动刷新</span><button id="refresh" type="button">立即刷新</button><a id="home-link" href="#">工作台</a></header>
 <div class="subtitle"><span id="summary">最近 20 个交易日 · 按选股日期</span><span id="asof">正在读取…</span></div>
 <div id="error" class="error hidden" role="alert"></div><section id="stock-list" class="list" aria-label="选股与实时行情列表"><div class="empty">正在加载股票列表…</div></section>
+<div id="load-footer" class="load-footer"><button id="load-more" type="button">再看 20 个交易日</button><small>向下滚动加载更早记录</small></div>
 <dialog id="selection-history" class="history-dialog" aria-labelledby="history-title"><div class="dialog-head"><h2 id="history-title">选股历史</h2><button id="close-history" type="button" aria-label="关闭选股历史">关闭</button></div><div id="history-content" class="history-scroll"></div></dialog>
 </main>
 <script>
@@ -24,45 +32,43 @@ const base=location.pathname.replace(/\/strategies\/?$/,'').replace(/\/$/,'');
 const $=id=>document.getElementById(id);
 $('home-link').href=`${base}/assistant`;
 const el=(tag,cls='',text)=>{const n=document.createElement(tag);n.className=cls;if(text!==undefined)n.textContent=String(text);return n;};
-const svg=(tag,attrs={})=>{const n=document.createElementNS('http://www.w3.org/2000/svg',tag);for(const [k,v] of Object.entries(attrs))n.setAttribute(k,String(v));return n;};
 const price=x=>x==null?'—':Number(x).toFixed(2);
 const signed=x=>x==null?'—':`${Number(x)>0?'+':''}${Number(x).toFixed(2)}%`;
 const color=x=>x==null?'flat':Number(x)>0?'up':Number(x)<0?'down':'flat';
 const dateTime=x=>x?String(x).replace('T',' ').slice(5,16):'—';
 let pendingCharts=[];
-const expandedDates=new Map(),historicalMarkets=new Map(),historyRequests=new Map();
-const minuteOffsets=new Map(),minuteMarkets=new Map(),minuteRequests=new Map(),visibleMinuteViews=new Map();
+const chartDrawers=new WeakMap();
+const chartObserver=new IntersectionObserver(entries=>{for(const entry of entries){if(entry.isIntersecting){chartDrawers.get(entry.target)?.();chartObserver.unobserve(entry.target);}}},{rootMargin:'500px'});
+const historicalMarkets=new Map(),rowNodes=new Map();
+const minuteOffsets=new Map(),minuteMarkets=new Map(),minuteRequests=new Map();
 const pickKey=p=>`${p.signal_date}:${p.strategy_id}:${p.stock_code}`;
 const minuteKey=(p,offset)=>`${p.signal_date}:${offset}:${p.stock_code}`;
 let historyEpoch=0;
 let historyFocus=null;
-let records=null,market=null,request=null,owner=new URLSearchParams(location.search).get('user_id')||'';
+let records=null,market=null,request=null,nextBefore=null,loadingPage=false,pageEpoch=0,needLiveDaily=true,owner=new URLSearchParams(location.search).get('user_id')||'';
 function chart(bars,title,width,options={}){
- const height=118,left=42,right=options.reference>0?55:10,top=10,bottom=77;
- const root=svg('svg',{class:'chart',viewBox:`0 0 ${width} ${height}`,preserveAspectRatio:'none',role:'img','aria-label':`${title} · ${bars.length} 根K线`});
- root.dataset.barCount=String(bars.length);root.dataset.firstTime=bars[0].time;root.dataset.lastTime=bars.at(-1).time;
- const lo=Math.min(...bars.map(b=>Number(b.low))),hi=Math.max(...bars.map(b=>Number(b.high))),pad=Math.max((hi-lo)*.08,.02);
- const min=lo-pad,max=hi+pad,y=p=>bottom-(Number(p)-min)/(max-min)*(bottom-top);
- for(let i=0;i<3;i++){const yy=top+(bottom-top)*i/2;root.append(svg('line',{x1:left,y1:yy,x2:width-right,y2:yy,class:'chart-grid'}));const t=svg('text',{x:left-7,y:yy+3,'text-anchor':'end',class:'chart-label'});const tick=max-(max-min)*i/2;t.textContent=tick.toFixed(2);root.append(t);if(options.reference>0){const pct=svg('text',{x:width-right+5,y:yy+3,class:'chart-label'});pct.textContent=signed((tick/options.reference-1)*100);root.append(pct);}}
- const step=(width-left-right)/bars.length,barWidth=Math.min(16,step*.62),volMax=Math.max(1,...bars.map(b=>Number(b.volume)||0));
- bars.forEach((b,i)=>{const x=left+(i+.5)*step,up=Number(b.close)>=Number(b.open),fill=up?'#ff8b8b':'#70d9b9';
- const g=svg('g'),tip=svg('title');tip.textContent=`${b.date} ${b.time} 开${price(b.open)} 高${price(b.high)} 低${price(b.low)} 收${price(b.close)}`;g.append(tip);
- g.append(svg('line',{x1:x,x2:x,y1:y(b.high),y2:y(b.low),stroke:fill,'stroke-width':1.2}),svg('rect',{x:x-barWidth/2,y:Math.min(y(b.open),y(b.close)),width:barWidth,height:Math.max(1,Math.abs(y(b.open)-y(b.close))),fill}));root.append(g);
- const v=Number(b.volume)||0;root.append(svg('rect',{x:x-barWidth/2,y:101-v/volMax*16,width:barWidth,height:v/volMax*16,fill,opacity:.5}));
- if(new Set([0,Math.floor((bars.length-1)/2),bars.length-1]).has(i)){const t=svg('text',{x,y:115,'text-anchor':'middle',class:'chart-label'});t.textContent=b.time;root.append(t);}
- });
- if(options.reference>0&&options.reference>=min&&options.reference<=max)root.append(svg('line',{x1:left,x2:width-right,y1:y(options.reference),y2:y(options.reference),stroke:'#8ba3b8','stroke-dasharray':'3 3',opacity:.7}));
- if(options.average){let volume=0,weighted=0;const points=[];bars.forEach((b,i)=>{const v=Number(b.volume)||0;if(v>0){volume+=v;weighted+=((Number(b.high)+Number(b.low)+Number(b.close))/3)*v;}if(volume)points.push(`${left+(i+.5)*step},${y(weighted/volume)}`);});if(points.length)root.append(svg('polyline',{points:points.join(' '),fill:'none',stroke:'#edc66b','stroke-width':1.3,'aria-label':'当日成交均价估算线'}));}
- return root;
+ const canvas=el('canvas');canvas.setAttribute('role','img');canvas.setAttribute('aria-label',`${title} · ${bars.length} 根K线`);canvas.dataset.barCount=bars.length;canvas.dataset.firstTime=bars[0].time;canvas.dataset.lastTime=bars.at(-1).time;
+ const height=118,ratio=window.devicePixelRatio||1;canvas.width=width*ratio;canvas.height=height*ratio;
+ const ctx=canvas.getContext('2d');ctx.scale(ratio,ratio);ctx.font='10px system-ui';
+ const left=42,right=options.reference>0?55:10,top=10,bottom=77;
+ const lo=Math.min(...bars.map(b=>Number(b.low))),hi=Math.max(...bars.map(b=>Number(b.high))),pad=Math.max((hi-lo)*.08,.02),min=lo-pad,max=hi+pad;
+ const y=p=>bottom-(Number(p)-min)/(max-min)*(bottom-top),step=(width-left-right)/bars.length,bw=Math.min(16,step*.62),volMax=Math.max(1,...bars.map(b=>Number(b.volume)||0));
+ const line=(x1,y1,x2,y2,color)=>{ctx.strokeStyle=color;ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();};
+ for(let i=0;i<3;i++){const yy=top+(bottom-top)*i/2,tick=max-(max-min)*i/2;line(left,yy,width-right,yy,'#2b4359');ctx.fillStyle='#91abc1';ctx.textAlign='right';ctx.fillText(tick.toFixed(2),left-7,yy+3);if(options.reference>0){ctx.textAlign='left';ctx.fillText(signed((tick/options.reference-1)*100),width-right+5,yy+3);}}
+ bars.forEach((b,i)=>{const x=left+(i+.5)*step,fill=Number(b.close)>=Number(b.open)?'#ff8b8b':'#70d9b9';line(x,y(b.high),x,y(b.low),fill);ctx.fillStyle=fill;ctx.fillRect(x-bw/2,Math.min(y(b.open),y(b.close)),Math.max(.6,bw),Math.max(1,Math.abs(y(b.open)-y(b.close))));const v=Number(b.volume)||0;ctx.globalAlpha=.5;ctx.fillRect(x-bw/2,101-v/volMax*16,Math.max(.6,bw),v/volMax*16);ctx.globalAlpha=1;if(i===0||i===Math.floor((bars.length-1)/2)||i===bars.length-1){ctx.fillStyle='#91abc1';ctx.textAlign='center';ctx.fillText(b.time,x,115);}});
+ if(options.reference>=min&&options.reference<=max){ctx.setLineDash([3,3]);line(left,y(options.reference),width-right,y(options.reference),'#7894aa');ctx.setLineDash([]);}
+ if(options.average){let volume=0,weighted=0,started=false;ctx.beginPath();bars.forEach((b,i)=>{const v=Number(b.volume)||0;if(v>0){volume+=v;weighted+=(Number(b.high)+Number(b.low)+Number(b.close))/3*v;}if(volume){const x=left+(i+.5)*step,yy=y(weighted/volume);if(started)ctx.lineTo(x,yy);else{ctx.moveTo(x,yy);started=true;}}});ctx.strokeStyle='#edc66b';ctx.stroke();}
+ canvas.addEventListener('pointermove',e=>{const r=canvas.getBoundingClientRect(),x=(e.clientX-r.left)*width/r.width,i=Math.max(0,Math.min(bars.length-1,Math.floor((x-left)/step))),b=bars[i];canvas.title=`${b.date} ${b.time} 开${price(b.open)} 高${price(b.high)} 低${price(b.low)} 收${price(b.close)}`;});
+ return canvas;
 }
 function panel(title,caption,bars,empty,options={}){
  const p=el('div','chart-panel'),head=el('div','chart-head');head.append(el('h3','',title),el('span','',caption));p.append(head);
  const valid=bars.filter(b=>['open','high','low','close'].every(k=>b[k]!=null&&Number.isFinite(Number(b[k]))&&Number(b[k])>0));
- if(valid.length){const slot=el('div');p.append(slot);pendingCharts.push(()=>slot.replaceWith(chart(valid,title,Math.max(240,p.clientWidth-28),options)));}
+ if(valid.length){const slot=el('div','chart-slot');p.append(slot);chartDrawers.set(slot,()=>slot.replaceChildren(chart(valid,title,Math.max(240,p.clientWidth-28),options)));pendingCharts.push(()=>chartObserver.observe(slot));}
  else p.append(el('div','empty-chart',empty));return p;
 }
 const modelName=p=>p.strategy_name||p.strategy_id;
-function recentHistory(pick){const dates=new Set(records.trade_dates);return records.picks.filter(p=>p.stock_code===pick.stock_code&&dates.has(p.signal_date)).sort((a,b)=>b.signal_date.localeCompare(a.signal_date)||a.strategy_id.localeCompare(b.strategy_id));}
+function recentHistory(pick){const dates=new Set(records.trade_dates.slice(0,20));return records.picks.filter(p=>p.stock_code===pick.stock_code&&dates.has(p.signal_date)).sort((a,b)=>b.signal_date.localeCompare(a.signal_date)||a.strategy_id.localeCompare(b.strategy_id));}
 function historyCount(rows){return new Set(rows.map(p=>`${p.signal_date}:${modelName(p)}`)).size;}
 function showHistory(pick){
  const dialog=$('selection-history');historyFocus=document.activeElement;
@@ -79,7 +85,7 @@ function drawCharts(){pendingCharts.forEach(draw=>draw());pendingCharts=[];}
 function stockRow(pick,names,stockMap,dayMarket){
  const live=pick.signal_date===market?.trade_date;
  const stock=stockMap.get(pick.stock_code),q=stock?.quote,article=el('article','stock-row');article.dataset.code=pick.stock_code;article.dataset.model=pick.strategy_id;article.dataset.selectionDate=pick.signal_date;
- const head=el('div','row-head'),identity=el('div','identity'),name=el('div');name.append(el('strong','',pick.stock_name),el('span','code',pick.stock_code));identity.append(name,el('span','model',names.get(pick.strategy_id)||pick.strategy_id));
+ const head=el('div','row-head'),stamp=el('time','record-date',pick.signal_date);stamp.dateTime=pick.signal_date;stamp.prepend(el('small','','选股日期'));head.append(stamp);const identity=el('div','identity'),name=el('div');name.append(el('strong','',pick.stock_name),el('span','code',pick.stock_code));identity.append(name,el('span','model',names.get(pick.strategy_id)||pick.strategy_id));
  const quote=el('div',`quote ${color(q?.pct)}`);quote.append(el('b','',price(q?.close)),el('span','',signed(q?.pct)));const quoteBlock=el('div','quote-block');quoteBlock.append(quote);head.append(identity,quoteBlock);
  quoteBlock.append(el('div','quote-time',q?(live?`行情 ${q.snapshot_time?.slice(11,19)||''}`:`${pick.signal_date.slice(5)} 收盘`):dayMarket?.quote_error||dayMarket?.error||(dayMarket?'该日行情缺失':'加载中…')));
  const stats=el('div','stats');for(const [name,value]of [[live?'昨收':'前收',q?.preclose],[live?'今开':'开盘',q?.open],['最高',q?.high],['最低',q?.low]]){const v=el('div','stat',name);v.append(el('b','',price(value)));stats.append(v);}head.append(stats);article.append(head);
@@ -102,11 +108,11 @@ function stockRow(pick,names,stockMap,dayMarket){
  prev.type=next.type=reset.type='button';prev.setAttribute('aria-label',`${pick.stock_name}前一交易日分钟K`);next.setAttribute('aria-label',`${pick.stock_name}后一交易日分钟K`);
  prev.disabled=index<=0;next.disabled=index>=dates.length-1||minuteDay>=market?.trade_date;
  reset.disabled=offset===0;reset.setAttribute('aria-label',`${pick.stock_name}返回选股日分钟K`);
- const change=value=>{minuteOffsets.set(pickKey(pick),value);render();};
+ const change=value=>{minuteOffsets.set(pickKey(pick),value);replaceRow(pick);};
  prev.addEventListener('click',()=>change(offset-1));next.addEventListener('click',()=>change(offset+1));reset.addEventListener('click',()=>change(0));
  nav.append(prev,el('span','minute-date',`${minuteDay.slice(5)}${minuteLive?' 今日':''} · 1 分钟 K`),next,reset);
  minutePanel.querySelector('h3').replaceWith(nav);minutePanel.dataset.minuteDate=minuteDay;body.append(minutePanel);
- if(offset){visibleMinuteViews.set(minuteKey(pick,offset),{pick,offset,day:minuteDay});ensureMinuteMarket(pick,offset);}
+ if(offset){ensureMinuteMarket(pick,offset);}
  let daily=[...(stock?.daily_bars||[])];if(live&&q&&q.open>0&&q.high>0&&q.low>0&&q.close>0){daily.push({date:market.trade_date,time:market.trade_date.slice(5),open:q.open,high:q.high,low:q.low,close:q.close,volume:q.volumn==null?null:Number(q.volumn)*100,amount:q.amount});}daily=daily.slice(-20);
  body.append(panel('近 20 日日 K',`截至 ${pick.signal_date.slice(5)}`,daily,dayMarket?.error||(dayMarket?'该日数据缺失':'加载中…'),{reference:q?.preclose}));article.append(body);return article;
 }
@@ -116,37 +122,19 @@ async function ensureMinuteMarket(pick,offset,force=false){
  minuteRequests.set(key,true);
  try{const response=await fetch(`${base}/api/strategies/market?${params}`,{credentials:'same-origin',cache:'no-store'});const data=await response.json();if(!response.ok||!data.ok)throw new Error(data.error||'分钟行情加载失败');if(epoch===historyEpoch)minuteMarkets.set(key,data);}
  catch(e){if(epoch===historyEpoch)minuteMarkets.set(key,{stocks:[],error:e.message});}
- finally{if(epoch===historyEpoch){minuteRequests.delete(key);render();}}
+ finally{if(epoch===historyEpoch){minuteRequests.delete(key);replaceRow(pick);}}
 }
-async function ensureHistoricalMarket(day){
- if(day===market?.trade_date||historicalMarkets.has(day)||historyRequests.has(day))return;
- const epoch=historyEpoch,params=new URLSearchParams({date:day});if(owner)params.set('user_id',owner);
- historyRequests.set(day,true);
- try{const response=await fetch(`${base}/api/strategies/market?${params}`,{credentials:'same-origin',cache:'no-store'});const data=await response.json();if(!response.ok||!data.ok)throw new Error(data.error||'历史行情加载失败');if(epoch===historyEpoch)historicalMarkets.set(day,data);}
- catch(e){if(epoch===historyEpoch)historicalMarkets.set(day,{trade_date:day,stocks:[],error:e.message});}
- finally{if(epoch===historyEpoch){historyRequests.delete(day);render();}}
-}
+function rowKey(p){return `${pickKey(p)}:${p.selection_rank}`;}
+function makeRow(p){const dayMarket=p.signal_date===market?.trade_date?market:historicalMarkets.get(p.signal_date),stocks=new Map((dayMarket?.stocks||[]).map(s=>[s.code,s]));return stockRow(p,new Map(records.strategies.map(s=>[s.strategy_id,s.name])),stocks,dayMarket);}
+function replaceRow(p){const key=rowKey(p),old=rowNodes.get(key);if(!old?.isConnected)return;const node=makeRow(p);node.className=old.className;old.replaceWith(node);rowNodes.set(key,node);drawCharts();}
 function render(){
- if(!records)return;pendingCharts=[];visibleMinuteViews.clear();
- const selected=$('strategy-filter').value,groups=new Map(),names=new Map(records.strategies.map(s=>[s.strategy_id,s.name]));
- const picks=records.picks.filter(p=>!selected||p.strategy_id===selected).sort((a,b)=>b.signal_date.localeCompare(a.signal_date)||a.strategy_id.localeCompare(b.strategy_id)||a.selection_rank-b.selection_rank);
- for(const p of picks){if(!groups.has(p.signal_date))groups.set(p.signal_date,[]);groups.get(p.signal_date).push(p);}
- const container=$('stock-list');container.replaceChildren();
- $('summary').textContent=`${market&&!groups.has(market.trade_date)?'今日暂无新选股 · ':''}最近 20 个交易日 · 按选股日期`;
- $('asof').textContent=market?`${market.trade_date} · ${market.as_of.slice(11,19)} 更新`:'行情正在加载…';
- if(!groups.size){container.append(el('div','empty','此模型暂无选股记录。'));return;}
- const latest=groups.keys().next().value;
- for(const [day,entries] of groups){
- const key=`${selected}:${day}`;if(!expandedDates.has(key))expandedDates.set(key,day===latest);
- const section=el('section','day-section'),toggle=el('button','day-toggle');toggle.type='button';toggle.setAttribute('aria-expanded',String(expandedDates.get(key)));
- toggle.append(el('span','day-label','选股日期'),el('strong','',day),el('span','',`${day===market?.trade_date?'今日 · ':day===latest?'最近选股 · ':''}${entries.length} 条选股`),el('span','arrow',expandedDates.get(key)?'收起 −':'展开 +'));
- section.dataset.date=day;section.append(toggle);
- const list=el('div','day-stocks');
- function fill(){const dayMarket=day===market?.trade_date?market:historicalMarkets.get(day),stockMap=new Map((dayMarket?.stocks||[]).map(s=>[s.code,s]));list.replaceChildren(...entries.map(p=>stockRow(p,names,stockMap,dayMarket)));ensureHistoricalMarket(day);}
- if(expandedDates.get(key))fill();else list.hidden=true;
- toggle.addEventListener('click',()=>{const open=!expandedDates.get(key);expandedDates.set(key,open);toggle.setAttribute('aria-expanded',String(open));toggle.querySelector('.arrow').textContent=open?'收起 −':'展开 +';list.hidden=!open;if(open){fill();drawCharts();}});
- section.append(list);container.append(section);
- }
+ if(!records)return;pendingCharts=[];
+ const selected=$('strategy-filter').value,picks=records.picks.filter(p=>!selected||p.strategy_id===selected).sort((a,b)=>b.signal_date.localeCompare(a.signal_date)||a.strategy_id.localeCompare(b.strategy_id)||a.selection_rank-b.selection_rank);
+ const fragment=document.createDocumentFragment();let last=null,tone=-1;
+ for(const p of picks){const newDate=p.signal_date!==last;if(newDate){tone++;last=p.signal_date;}const key=rowKey(p);let node=rowNodes.get(key);if(!node){node=makeRow(p);rowNodes.set(key,node);}node.className=`stock-row date-tone-${tone%2}${newDate?' new-date':''}`;fragment.append(node);}
+ $('stock-list').replaceChildren(fragment);if(!picks.length)$('stock-list').append(el('div','empty','这个日期范围暂无选股记录。'));
+ const dates=records.trade_dates;$('summary').textContent=`已加载 ${dates.length} 个交易日 · ${dates.at(-1)||''} — ${dates[0]||''}`;
+ $('load-more').disabled=loadingPage||!nextBefore;$('load-more').textContent=loadingPage?'正在读取更早记录…':nextBefore?'再看 20 个交易日':'已显示全部记录';
  drawCharts();
 }
 function options(){
@@ -154,30 +142,39 @@ function options(){
  if(JSON.stringify([...$('strategy-filter').options].map(o=>[o.value,o.textContent]))!==JSON.stringify(opts.map(s=>[s.strategy_id,s.name]))){$('strategy-filter').replaceChildren(...opts.map(s=>{const o=el('option','',s.name);o.value=s.strategy_id;return o;}));$('strategy-filter').value=opts.some(o=>o.strategy_id===selected)?selected:'';}
  if(records.owners.length){$('owner-filter').classList.remove('hidden');$('owner-label').classList.remove('hidden');const owners=[...new Set([...records.owners,records.owner_user_id])];$('owner-filter').replaceChildren(...owners.map(v=>{const o=el('option','',v);o.value=v;return o;}));$('owner-filter').value=records.owner_user_id;owner=records.owner_user_id;const url=new URL(location.href);url.searchParams.set('user_id',owner);history.replaceState(null,'',url);}
 }
-function refreshHistoricalCache(picks){
- // Execution records can gain stocks after a historical backfill. Keep only
- // cached responses that still cover the selected stocks and have chart data.
- const required=new Map();
- for(const p of picks){if(!required.has(p.signal_date))required.set(p.signal_date,new Set());required.get(p.signal_date).add(p.stock_code);}
- const incomplete=(data,codes)=>{const stocks=new Map((data.stocks||[]).map(s=>[s.code,s]));return data.error||[...codes].some(code=>{const s=stocks.get(code);return !s||!s.daily_bars?.length||(data.requested_minutes>0&&!s.bars?.length);});};
- for(const [day,data]of historicalMarkets){const codes=required.get(day);if(!codes||incomplete(data,codes))historicalMarkets.delete(day);}
- for(const [key,data]of minuteMarkets){const code=key.split(':').at(-1);if(incomplete(data,[code]))minuteMarkets.delete(key);}
+async function getData(path,params={}){const q=new URLSearchParams(params);if(owner)q.set('user_id',owner);const r=await fetch(`${base}${path}?${q}`,{credentials:'same-origin',cache:'no-store'});const data=await r.json();if(!r.ok||!data.ok)throw new Error(data.error||`HTTP ${r.status}`);return data;}
+function mergeRecords(previous,next){if(!previous)return next;const picks=new Map(previous.picks.map(p=>[rowKey(p),p]));for(const p of next.picks)picks.set(rowKey(p),p);return {...previous,...next,owners:next.owners.length?next.owners:previous.owners,trade_dates:[...new Set([...previous.trade_dates,...next.trade_dates])].sort().reverse(),picks:[...picks.values()]};}
+async function loadPage(reset=false){
+ if(loadingPage&&!reset)return;if(!reset&&!nextBefore)return;
+ const epoch=reset?++pageEpoch:pageEpoch;loadingPage=true;$('load-more').disabled=true;$('load-more').textContent='正在整批读取 20 个交易日…';
+ if(reset){historyEpoch++;historicalMarkets.clear();minuteMarkets.clear();minuteRequests.clear();minuteOffsets.clear();rowNodes.clear();chartObserver.disconnect();records=null;market=null;needLiveDaily=true;$('stock-list').replaceChildren(el('div','empty','正在读取选股和历史图表…'));}
+ try{const data=await getData('/api/strategies/page',!reset&&nextBefore?{before:nextBefore}:{});if(epoch!==pageEpoch)return;
+ records=mergeRecords(records,data.records);nextBefore=data.next_before;for(const [day,value]of Object.entries(data.markets))historicalMarkets.set(day,value);
+ if(!market)market={trade_date:data.trade_date,as_of:'',stocks:[]};const todayHistory=historicalMarkets.get(market.trade_date);if(todayHistory&&!market.stocks.length)market={...todayHistory,as_of:''};
+ options();render();$('error').classList.add('hidden');if(reset)await refresh(true);
+ }catch(e){if(epoch===pageEpoch){$('error').textContent=e.message;$('error').classList.remove('hidden');}}
+ finally{if(epoch===pageEpoch){loadingPage=false;if(records)render();else{$('load-more').disabled=false;$('load-more').textContent='重试加载';}}}
 }
 async function refresh(force=false){
- if(document.hidden&&!force)return;if(request&&!force)return;if(request)request.abort();const active=new AbortController();request=active;
- $('refresh-state').textContent='正在刷新…';
- const params=owner?`?user_id=${encodeURIComponent(owner)}`:'';
- async function get(path){const r=await fetch(`${base}${path}${params}`,{credentials:'same-origin',cache:'no-store',signal:active.signal});const data=await r.json();if(!r.ok||!data.ok)throw new Error(data.error||`HTTP ${r.status}`);return data;}
- try{const [r,m]=await Promise.all([get('/api/strategies/executions'),get('/api/strategies/market')]);if(request!==active)return;refreshHistoricalCache(r.picks);records=r;market=m;options();render();await Promise.all([...visibleMinuteViews.values()].filter(v=>v.day===market.trade_date).map(v=>ensureMinuteMarket(v.pick,v.offset,true)));if(request!==active)return;$('error').classList.add('hidden');$('refresh-state').textContent='每 10 秒自动刷新';}
- catch(e){if(request!==active||e.name==='AbortError')return;$('error').textContent=`更新失败，保留上次画面：${e.message}`;$('error').classList.remove('hidden');$('refresh-state').textContent='更新失败 · 10 秒后重试';}
- finally{if(request===active)request=null;}
+ if(!records||document.hidden&&!force||request)return;const epoch=pageEpoch;request=true;
+ try{const data=await getData('/api/strategies/live',needLiveDaily?{daily:'1'}:{});if(epoch!==pageEpoch)return;
+ const prior=new Map((market?.stocks||[]).map(s=>[s.code,s]));for(const s of data.market.stocks)if(!s.daily_bars?.length)s.daily_bars=prior.get(s.code)?.daily_bars||[];
+ market=data.market;needLiveDaily=market.stocks.some(s=>!s.daily_bars.length);
+ const day=market.trade_date,oldToday=records.picks.filter(p=>p.signal_date===day),changed=JSON.stringify(oldToday)!==JSON.stringify(data.records.picks);
+ records=mergeRecords({...records,picks:records.picks.filter(p=>p.signal_date!==day)},data.records);
+ if(changed){for(const p of oldToday)rowNodes.delete(rowKey(p));options();render();}else for(const p of data.records.picks)replaceRow(p);
+ for(const p of records.picks){const offset=minuteOffsets.get(pickKey(p))||0;const d=historicalMarkets.get(p.signal_date),dates=d?.minute_dates||[];if(offset&&dates[dates.indexOf(p.signal_date)+offset]===day&&rowNodes.get(rowKey(p))?.isConnected)await ensureMinuteMarket(p,offset,true);}
+ $('asof').textContent=`${market.trade_date} · ${market.as_of.slice(11,19)} 更新`;$('refresh-state').textContent='当天行情 · 每 10 秒刷新';
+ }catch(e){if(epoch===pageEpoch){$('refresh-state').textContent='实时行情暂不可用 · 正在重试';}}
+ finally{request=null;}
 }
 $('strategy-filter').addEventListener('change',render);
 $('close-history').addEventListener('click',()=>$('selection-history').close());
-$('selection-history').addEventListener('close',()=>{const target=historyFocus?.isConnected?historyFocus:[...document.querySelectorAll('.history-trigger')].find(n=>n.getAttribute('aria-label')===historyFocus?.getAttribute('aria-label'));target?.focus();});
-$('owner-filter').addEventListener('change',()=>{owner=$('owner-filter').value;historyEpoch++;minuteOffsets.clear();minuteMarkets.clear();minuteRequests.clear();historicalMarkets.clear();historyRequests.clear();expandedDates.clear();$('selection-history').close();records=null;market=null;$('stock-list').replaceChildren(el('div','empty','正在切换用户…'));refresh(true);});
-new ResizeObserver(([entry])=>document.documentElement.style.setProperty('--toolbar-height',`${entry.target.getBoundingClientRect().bottom-entry.target.getBoundingClientRect().top}px`)).observe(document.querySelector('.toolbar'));
-$('refresh').addEventListener('click',()=>{minuteMarkets.clear();historicalMarkets.clear();refresh(true);});setInterval(()=>refresh(),10000);
-document.addEventListener('visibilitychange',()=>{if(!document.hidden)refresh(true);});refresh();
+$('selection-history').addEventListener('close',()=>historyFocus?.isConnected&&historyFocus.focus());
+$('owner-filter').addEventListener('change',()=>{owner=$('owner-filter').value;$('selection-history').close();loadPage(true);});
+$('load-more').addEventListener('click',()=>loadPage(!records));
+const pageObserver=new IntersectionObserver(entries=>{if(entries.some(e=>e.isIntersecting)&&records&&nextBefore&&!loadingPage)loadPage();},{rootMargin:'300px'});pageObserver.observe($('load-footer'));
+$('refresh').addEventListener('click',()=>loadPage(true));setInterval(()=>refresh(),10000);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)refresh(true);});loadPage(true);
 })();
 </script></body></html>

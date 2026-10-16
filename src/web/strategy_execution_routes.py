@@ -40,6 +40,47 @@ def create_strategy_execution_blueprint(
         response.headers["Vary"] = "Cookie"
         return response
 
+    @blueprint.get("/api/strategies/page")
+    def execution_page():
+        owner, is_admin, error = resolve_owner()
+        if error: return error
+        before = request.args.get('before') or None
+        if before:
+            try:
+                before = date.fromisoformat(before).isoformat()
+                if before > datetime.now(ZoneInfo('Asia/Shanghai')).date().isoformat():
+                    raise ValueError()
+            except ValueError:
+                return jsonify(ok=False,error='分页日期无效。'),400
+        try:
+            result = view_service.load_page(owner_user_id=owner,include_owners=is_admin,before=before)
+        except Exception:
+            current_app.logger.exception('strategy page unavailable')
+            return jsonify(ok=False,error='选股数据暂不可用，请重试。'),503
+        # A month of candles compresses well; avoid sending megabytes of JSON.
+        response = jsonify(result)
+        if 'gzip' in request.headers.get('Accept-Encoding',''):
+            import gzip
+            response.set_data(gzip.compress(response.get_data(),compresslevel=3))
+            response.headers['Content-Encoding']='gzip'
+        response.headers['Cache-Control']='no-store, private'
+        response.headers['Vary']='Cookie, Accept-Encoding'
+        return response
+
+    @blueprint.get("/api/strategies/live")
+    def live_page():
+        owner, _admin, error = resolve_owner()
+        if error: return error
+        try:
+            result=view_service.load_live(owner_user_id=owner,include_daily=request.args.get('daily')=='1')
+        except Exception:
+            current_app.logger.exception('strategy live unavailable')
+            return jsonify(ok=False,error='实时行情暂不可用。'),503
+        response=jsonify(result)
+        response.headers['Cache-Control']='no-store, private'
+        response.headers['Vary']='Cookie'
+        return response
+
     def resolve_owner():
         identity = identity_resolver()
         if not identity or identity.get("user_type") not in {"member", "admin"}:

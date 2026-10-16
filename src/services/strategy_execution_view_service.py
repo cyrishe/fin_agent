@@ -121,7 +121,8 @@ class StrategyExecutionViewService:
 
     def load_today_market(self, *, owner_user_id: str, now: datetime | None = None,
                           quote_loader=None, minute_loader=None, signal_date: str | None = None,
-                          minute_offset: int = 0, stock_code: str | None = None) -> dict:
+                          minute_offset: int = 0, stock_code: str | None = None,
+                          include_daily: bool = True) -> dict:
         current = (now or datetime.now(ZoneInfo("Asia/Shanghai"))).astimezone(ZoneInfo("Asia/Shanghai"))
         today = current.date().isoformat()
         target = date.fromisoformat(signal_date).isoformat() if signal_date else today
@@ -151,23 +152,14 @@ class StrategyExecutionViewService:
             target = minute_dates[index]
             live = target == today
             requested_minutes = completed_session_minutes(current) if live else 240
-            # Exactly the same 20-trading-day scope and older unsold positions
-            # as the execution list. Browser codes only narrow this owned set.
-            days = query(conn, """SELECT calendar_date FROM aiia_trade_calendar
-                WHERE market_code='CN_A' AND is_trade_day=1 AND calendar_date<=%s
-                ORDER BY calendar_date DESC LIMIT 20""", (today,))
-            first = _iso(days[-1]["calendar_date"]) if days else today
+            # Explicit dates remain scoped to this owner's selections, including
+            # older pages. Stock codes can only narrow that authorized set.
             for table in (("strategy_execution",) if "strategy_execution" in tables else
                           ("automl_strategy_execution", "automl_strategy_selection")):
                 if table not in tables:
                     continue
-                where = "signal_date BETWEEN %s AND %s"
-                args = (owner_user_id, first, today)
-                if table == "strategy_execution":
-                    where = "(signal_date BETWEEN %s AND %s OR (signal_date<%s AND buy_price IS NOT NULL AND sell_price IS NULL))"
-                    args += (first,)
                 for row in query(conn, f"""SELECT DISTINCT stock_code,stock_name FROM {table}
-                    WHERE user_id=%s AND {where} AND signal_date=%s""", (*args, selection_day)):
+                    WHERE user_id=%s AND signal_date=%s""", (owner_user_id, selection_day)):
                     code = str(row["stock_code"]).strip()
                     if re.fullmatch(r"[0-9]{6}", code):
                         picks.setdefault(code, str(row["stock_name"]).strip())
@@ -181,7 +173,7 @@ class StrategyExecutionViewService:
                 rows = query(conn, f"""SELECT stk_code,trade_date,preclose,open,high,low,close,volume,amount
                     FROM kcrp_stock_price WHERE stk_code IN ({marks})
                     AND trade_date>=%s AND trade_date{'<' if live else '<='}%s ORDER BY stk_code,trade_date DESC""",
-                    (*symbols, (date.fromisoformat(target)-timedelta(days=60)).isoformat(), target))
+                    (*symbols, (date.fromisoformat(target)-timedelta(days=60)).isoformat(), target)) if include_daily else []
                 for row in rows:
                     code = str(row['stk_code'])[:6]
                     history = daily.setdefault(code, [])
@@ -249,8 +241,92 @@ class StrategyExecutionViewService:
                        ('close','pct','preclose','open','high','low','amount','volumn','snapshot_time','source')}
                       if c in quotes else None) for c in codes])
 
-    def load(self, *, owner_user_id: str, include_owners: bool = False) -> dict:
+    def load_page(self, *, owner_user_id: str, include_owners: bool = False,
+                  before: str | None = None) -> dict:
+        records = self.load(owner_user_id=owner_user_id, include_owners=include_owners,
+                            before=before, include_open=False)
         today = datetime.now(ZoneInfo("Asia/Shanghai")).date().isoformat()
+        days = records['trade_dates']
+        first_dates = [s.get('first_date') for s in records['strategies'] if s.get('first_date')]
+        has_more = bool(days and first_dates and min(first_dates) < days[-1])
+        return dict(ok=True, records=records, markets=self.load_history_batch(records['picks'], today),
+                    trade_date=today, next_before=days[-1] if has_more else None)
+
+    def load_live(self, *, owner_user_id: str, include_daily: bool = False) -> dict:
+        today = datetime.now(ZoneInfo("Asia/Shanghai")).date().isoformat()
+        with kingdom_connection("KINGDOMAI_DB_URL") as conn:
+            records = self._load_readable(conn, owner_user_id, [], [today], include_open=False)
+        return dict(ok=True, records=records, market=self.load_today_market(
+            owner_user_id=owner_user_id, include_daily=include_daily))
+
+    def load_history_batch(self, picks: list[dict], today: str) -> dict:
+        """One minute query and one daily query for the entire owned page."""
+        groups = {}
+        for p in picks:
+            groups.setdefault(p['signal_date'], {})[p['stock_code']] = p['stock_name']
+        if not groups:
+            return {}
+        codes = sorted({c for stocks in groups.values() for c in stocks})
+        symbols = tuple(c + ('.SH' if c.startswith('6') else '.BJ' if c.startswith(('9','4','8')) else '.SZ') for c in codes)
+        daily, minutes = {}, {}
+        with kingdom_connection("KINGDOMAI_DB_URL") as conn:
+            calendar = [_iso(r['calendar_date']) for r in query(conn, """SELECT calendar_date
+                FROM aiia_trade_calendar WHERE market_code='CN_A' AND is_trade_day=1
+                AND calendar_date BETWEEN %s AND %s ORDER BY calendar_date""",
+                ((date.fromisoformat(min(groups))-timedelta(days=12)).isoformat(),
+                 min(today, (date.fromisoformat(max(groups))+timedelta(days=12)).isoformat())))]
+            rows = query(conn, f"""SELECT stk_code,trade_date,preclose,open,high,low,close,volume,amount
+                FROM kcrp_stock_price WHERE stk_code IN ({','.join(['%s']*len(symbols))})
+                AND trade_date BETWEEN %s AND %s ORDER BY stk_code,trade_date""",
+                (*symbols,(date.fromisoformat(min(groups))-timedelta(days=60)).isoformat(),max(groups)))
+            for row in rows:
+                daily.setdefault(str(row['stk_code'])[:6], []).append(row)
+            pairs = [[day,code] for day,stocks in sorted(groups.items()) if day<today for code in stocks]
+            if pairs:
+                clocks = [(datetime.combine(date(2000,1,1),start)+timedelta(minutes=i)).strftime('%H:%M:%S')
+                          for start in (time(9,30),time(13)) for i in range(1,121)]
+                keys = [[day,day+' '+clock,code] for day in sorted(groups) if day<today
+                        for clock in clocks for code in sorted(groups[day])]
+                # Materialize the exact requested PKs in physical index order.
+                # This avoids MySQL range-optimizer expansion for a month of INs.
+                rows = query(conn, """SELECT m.trade_date,m.stk_code,m.bar_end_time AS end,
+                    m.open_price AS open,m.high_price AS high,m.low_price AS low,m.latest_price AS close,m.volume,m.amount
+                    FROM JSON_TABLE(%s, '$[*]' COLUMNS(day DATE PATH '$[0]',end_at DATETIME PATH '$[1]',code VARCHAR(6) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci PATH '$[2]')) AS p
+                    STRAIGHT_JOIN aiia_stock_realtime_minute_snapshot_full AS m FORCE INDEX(PRIMARY)
+                    ON m.trade_date=p.day AND m.kline_type='1m'
+                    AND m.bar_end_time=p.end_at AND m.stk_code=p.code
+                    WHERE m.period_minutes=1 AND m.is_finalized=1 AND m.is_fallback=0
+                    AND m.source_snapshot_time=m.bar_end_time""",(json.dumps(keys),))
+                for row in rows:
+                    minutes.setdefault((_iso(row['trade_date']),str(row['stk_code'])[:6]), []).append(row)
+        result = {}
+        for day, stocks in groups.items():
+            window = [d for d in calendar if d < day][-2:] + [day] + [d for d in calendar if d > day][:2]
+            payload = dict(trade_date=day,signal_date=day,minute_dates=window,is_live=day==today,
+                           requested_minutes=240 if day<today else 0,stocks=[])
+            for code,name in stocks.items():
+                history = [r for r in daily.get(code,[]) if _iso(r['trade_date']) <= day and (day<today or _iso(r['trade_date'])<today)][-20:]
+                quote = None
+                if history and _iso(history[-1]['trade_date']) == day:
+                    r=history[-1];close,preclose=_number(r['close']),_number(r['preclose'])
+                    quote={**{k:_number(r[k]) for k in ('close','preclose','open','high','low','amount')},
+                           'pct':(close/preclose-1)*100 if close and preclose else None,
+                           'snapshot_time':day+' 15:00:00','source':'daily_database'}
+                bars=today_minute_bars(minutes.get((day,code),[]),datetime.fromisoformat(day+'T15:00:00').replace(tzinfo=ZoneInfo('Asia/Shanghai')))
+                payload['stocks'].append(dict(code=code,name=name,quote=quote,bars=bars,
+                    daily_bars=[dict(date=_iso(r['trade_date']),time=_iso(r['trade_date'])[5:],
+                        **{k:_number(r[k]) for k in ('open','high','low','close','volume','amount')}) for r in history],
+                    minute_error='该日分钟数据缺失' if day<today and not bars else None))
+            result[day]=payload
+        return result
+
+    def load(self, *, owner_user_id: str, include_owners: bool = False,
+             before: str | None = None, include_open: bool = True) -> dict:
+        today = datetime.now(ZoneInfo("Asia/Shanghai")).date().isoformat()
+        if before:
+            before = date.fromisoformat(before).isoformat()
+            if before > today: raise ValueError("分页日期不能晚于今天")
+        cutoff = (date.fromisoformat(before)-timedelta(days=1)).isoformat() if before else today
         with kingdom_connection("KINGDOMAI_DB_URL") as conn:
             tables = _tables(conn)
             owners = []
@@ -265,13 +341,13 @@ class StrategyExecutionViewService:
                 conn, """SELECT calendar_date FROM aiia_trade_calendar
                     WHERE market_code='CN_A' AND is_trade_day=1
                       AND calendar_date<=%s
-                    ORDER BY calendar_date DESC LIMIT 20""", (today,))]
+                    ORDER BY calendar_date DESC LIMIT 20""", (cutoff,))]
             if not days:
                 return {"owner_user_id": owner_user_id, "owners": owners,
                         "trade_dates": [], "strategies": [], "runs": [], "picks": []}
             first, last = days[-1], days[0]
             if "strategy_daily_run" in tables and "strategy_execution" in tables:
-                return self._load_readable(conn, owner_user_id, owners, days)
+                return self._load_readable(conn, owner_user_id, owners, days, include_open=include_open)
             strategies = []
             if "automl_strategy_definition" in tables:
                 strategies = [{"strategy_id": str(row["strategy_id"]),
@@ -355,7 +431,7 @@ class StrategyExecutionViewService:
                     "trade_dates": days, "strategies": strategies,
                     "runs": runs, "picks": picks}
 
-    def _load_readable(self, conn, owner, owners, days):
+    def _load_readable(self, conn, owner, owners, days, include_open=True):
         def decode(value):
             return json.loads(value) if isinstance(value, str) else (value or {})
         def key(row):
@@ -370,12 +446,13 @@ class StrategyExecutionViewService:
         runs = query(conn, """SELECT * FROM strategy_daily_run WHERE user_id=%s
             AND signal_date BETWEEN %s AND %s ORDER BY signal_date DESC,strategy_name,model_version""",
             (owner, days[-1], days[0]))
-        # Open positions survive the 20-day window until their own job settles them.
-        rows = query(conn, """SELECT * FROM strategy_execution WHERE user_id=%s
-            AND (signal_date BETWEEN %s AND %s OR
-                 (signal_date<%s AND buy_price IS NOT NULL AND sell_price IS NULL))
-            ORDER BY signal_date DESC,strategy_name,model_version,selection_rank""",
-            (owner, days[-1], days[0], days[-1]))
+        where = "signal_date BETWEEN %s AND %s"
+        args = (owner, days[-1], days[0])
+        if include_open:
+            where = "(" + where + " OR (signal_date<%s AND buy_price IS NOT NULL AND sell_price IS NULL))"
+            args += (days[-1],)
+        rows = query(conn, f"""SELECT * FROM strategy_execution WHERE user_id=%s
+            AND {where} ORDER BY signal_date DESC,strategy_name,model_version,selection_rank""", args)
         picks = []
         for row in rows:
             value = normalized(row)

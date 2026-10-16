@@ -1,28 +1,12 @@
-const {test}=require('node:test');
-const assert=require('node:assert/strict');
-const fs=require('node:fs');
-const vm=require('node:vm');
-const path=require('node:path');
+const {test}=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm'),path=require('node:path');
 const html=fs.readFileSync(path.join(__dirname,'../src/web/templates/strategy_executions.html'),'utf8');
-const helper=html.slice(html.indexOf('function refreshHistoricalCache('),html.indexOf('async function refresh(force='));
-const stock=code=>({code,bars:[{close:10}],daily_bars:[{close:10}]});
-const response=codes=>({requested_minutes:240,stocks:codes.map(stock)});
-function cache(){const context={historicalMarkets:new Map(),minuteMarkets:new Map()};vm.createContext(context);vm.runInContext(helper,context);return context;}
-test('backfill adds stocks to an already viewed date; next poll invalidates only the stale date',()=>{
- const c=cache(),old=response(['002343']),complete=response(['002812']);
- c.historicalMarkets.set('2026-10-13',old);c.historicalMarkets.set('2026-10-14',complete);
- c.refreshHistoricalCache([{signal_date:'2026-10-13',stock_code:'002343'},{signal_date:'2026-10-13',stock_code:'603629'},{signal_date:'2026-10-13',stock_code:'688498'},{signal_date:'2026-10-14',stock_code:'002812'}]);
- assert.equal(c.historicalMarkets.has('2026-10-13'),false);assert.equal(c.historicalMarkets.get('2026-10-14'),complete);
-});
-test('complete cached history is reused across unchanged execution polls and model filters',()=>{
- const c=cache(),data=response(['603629','688498']);c.historicalMarkets.set('2026-10-13',data);
- for(let i=0;i<2;i++)c.refreshHistoricalCache([{signal_date:'2026-10-13',stock_code:'603629'}]);
- assert.equal(c.historicalMarkets.get('2026-10-13'),data);
-});
-test('empty data or failed requests retry on the next poll, including browsed minute dates',()=>{
- const c=cache();c.historicalMarkets.set('2026-10-13',{stocks:[]});
- c.minuteMarkets.set('2026-10-13:1:603629',{error:'temporary unavailable'});
- c.minuteMarkets.set('2026-10-13:-1:688498',{requested_minutes:240,stocks:[{code:'688498',bars:[],daily_bars:[{}]}]});
- c.refreshHistoricalCache([{signal_date:'2026-10-13',stock_code:'603629'}]);
- assert.equal(c.historicalMarkets.size,0);assert.equal(c.minuteMarkets.size,0);
+const rowKey=p=>`${p.signal_date}:${p.strategy_id}:${p.stock_code}:${p.selection_rank}`;
+const merge=html.slice(html.indexOf('function mergeRecords('),html.indexOf('async function loadPage('));
+const refresh=html.slice(html.indexOf('async function refresh('),html.indexOf("$('strategy-filter').addEventListener"));
+const pick=(day,code)=>({signal_date:day,stock_code:code,strategy_id:'收盘开盘 / v1.1',selection_rank:1});
+const records=(dates,picks)=>({owners:[],trade_dates:dates,picks,strategies:[]});
+test('older pages append and overlapping records do not duplicate',()=>{const c={rowKey};vm.createContext(c);vm.runInContext(merge,c);const a=pick('2026-10-15','603629'),b=pick('2026-09-10','002636');const merged=c.mergeRecords(records(['2026-10-15'],[a]),records(['2026-09-10','2026-10-15'],[b,a]));assert.equal(merged.picks.length,2);assert.equal(merged.trade_dates.length,2);assert.equal(merged.trade_dates[0],'2026-10-15');});
+test('10 second poll fetches only live data and replaces only today rows',async()=>{const old=pick('2026-10-15','603629'),today=pick('2026-10-16','002636'),calls=[],patched=[];
+ const c={rowKey,document:{hidden:false},records:records(['2026-10-16','2026-10-15'],[today,old]),request:null,pageEpoch:1,needLiveDaily:false,market:{stocks:[]},minuteOffsets:new Map(),historicalMarkets:new Map(),rowNodes:new Map(),pickKey:p=>rowKey(p),getData:async(p)=>{calls.push(p);return {records:records(['2026-10-16'],[today]),market:{trade_date:'2026-10-16',as_of:'2026-10-16T10:00:00',stocks:[]}}},replaceRow:p=>patched.push(p.signal_date),options:()=>{},render:()=>assert.fail('historical list should not be redrawn'),$:()=>({})};
+ vm.createContext(c);vm.runInContext(merge+refresh,c);await c.refresh();assert.deepEqual(calls,['/api/strategies/live']);assert.deepEqual(patched,['2026-10-16']);assert.equal(c.records.picks.find(p=>p.signal_date==='2026-10-15'),old);
 });

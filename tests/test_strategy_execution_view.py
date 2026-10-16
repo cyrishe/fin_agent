@@ -100,7 +100,7 @@ def test_market_reads_owned_list_and_live_api_without_minute_database(monkeypatc
     assert result['stocks'][0]['bars'][0]['time']=='09:31'
     assert result['minute_source']=='upchina_1m_api'
     scoped = next(args for sql,args in calls if f'FROM {table}' in sql)
-    assert scoped[:3] == ('alice','2026-09-15','2026-10-15')
+    assert scoped == ('alice','2026-10-15')
 
 
 def test_live_minute_request_uses_one_minute_type_and_elapsed_count(monkeypatch):
@@ -398,3 +398,58 @@ def test_minute_navigation_route_validates_offset_and_retains_owner_scope():
     def unavailable(**kwargs):raise ValueError('不能翻到今天之后')
     service.load_today_market=unavailable
     assert client.get('/api/strategies/market?minute_offset=1').status_code==400
+
+
+def test_page_route_cursor_and_owner_are_validated():
+    class PageView(FakeView):
+        def load_page(self, **kwargs):
+            self.calls.append(kwargs)
+            return dict(ok=True,records={},markets={},next_before=None)
+        def load_live(self, **kwargs):
+            self.calls.append(kwargs)
+            return dict(ok=True,records={},market={})
+    service=PageView()
+    client=_app({'user_type':'member','user_id':'alice'},service).test_client()
+    assert client.get('/api/strategies/page?before=not-a-date').status_code==400
+    assert client.get('/api/strategies/page?before=2099-01-01').status_code==400
+    assert not service.calls
+    response=client.get('/api/strategies/page?user_id=imac&before=2026-09-11')
+    assert response.status_code==200
+    assert service.calls[-1]==dict(owner_user_id='alice',include_owners=False,before='2026-09-11')
+    assert client.get('/api/strategies/live?user_id=imac').status_code==200
+    assert service.calls[-1]==dict(owner_user_id='alice',include_daily=False)
+    assert client.get('/api/strategies/live?daily=1').status_code==200
+    assert service.calls[-1]['include_daily'] is True
+    guest=_app(None,service).test_client()
+    assert guest.get('/api/strategies/page').status_code==403
+    assert guest.get('/api/strategies/live').status_code==403
+
+
+def test_batch_history_queries_each_data_type_once_and_keeps_dates_separate(monkeypatch):
+    @contextmanager
+    def connection(_):yield object()
+    calls=[]
+    def query(conn,sql,args=()):
+        calls.append((sql,args))
+        if 'aiia_trade_calendar' in sql:
+            return [dict(calendar_date=date(2026,10,d)) for d in [12,13,14,15,16]]
+        if 'FROM kcrp_stock_price' in sql:
+            return [dict(stk_code='603629.SH',trade_date=date(2026,10,d),preclose=10,open=10,high=12,low=9,close=d,volume=100,amount=1000) for d in [12,13,14,15,16]]
+        if 'minute_snapshot' in sql:
+            import json
+            keys=json.loads(args[0])
+            assert {day for day,end,code in keys}=={'2026-10-13','2026-10-14'}
+            assert len(keys)==480
+            assert keys==sorted(keys)
+            return [dict(trade_date=date(2026,10,d),stk_code='603629',end=datetime(2026,10,d,9,31),open=10,high=15,low=9,close=d,volume=10,amount=100) for d in [13,14]]
+        raise AssertionError(sql)
+    monkeypatch.setattr(view_module,'kingdom_connection',connection);monkeypatch.setattr(view_module,'query',query)
+    picks=[dict(signal_date=f'2026-10-{d}',stock_code='603629',stock_name='利通电子') for d in [13,14,16]]
+    data=view_module.StrategyExecutionViewService().load_history_batch(picks,'2026-10-16')
+    assert len(calls)==3
+    assert data['2026-10-13']['stocks'][0]['bars'][0]['close']==13
+    assert data['2026-10-14']['stocks'][0]['bars'][0]['close']==14
+    assert data['2026-10-13']['stocks'][0]['daily_bars'][-1]['date']=='2026-10-13'
+    assert data['2026-10-16']['stocks'][0]['daily_bars'][-1]['date']=='2026-10-15'
+    assert data['2026-10-16']['stocks'][0]['bars']==[]
+    assert data['2026-10-14']['minute_dates']==['2026-10-12','2026-10-13','2026-10-14','2026-10-15','2026-10-16']
