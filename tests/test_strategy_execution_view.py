@@ -308,3 +308,88 @@ def test_market_date_route_scopes_owner_and_rejects_invalid_or_future_date():
         assert client.get('/api/strategies/market?date='+day).status_code==400
     assert len(service.calls)==count
     assert _app(None,service).test_client().get('/api/strategies/market?date=2026-10-14').status_code==403
+
+
+@pytest.mark.parametrize('offset,target', [(-2,'2026-10-12'),(-1,'2026-10-13'),(0,'2026-10-14'),(1,'2026-10-15'),(2,'2026-10-16')])
+def test_minute_navigation_keeps_owned_selection_and_routes_target_source(monkeypatch,offset,target):
+    @contextmanager
+    def connection(_):yield object()
+    calls=[]
+    def query(_conn,sql,args=()):
+        calls.append((sql,args))
+        if 'information_schema.tables' in sql:return [{'table_name':'strategy_execution'}]
+        if 'aiia_trade_calendar' in sql:
+            if 'calendar_date<%s' in sql:days=['2026-10-13','2026-10-12']
+            elif 'calendar_date>%s' in sql:days=['2026-10-15','2026-10-16']
+            else:days=['2026-10-16','2026-09-11']
+            return [{'calendar_date':date.fromisoformat(d)} for d in days]
+        if 'FROM strategy_execution' in sql:
+            assert args[0]=='alice' and args[-1]=='2026-10-14'
+            return [{'stock_code':'000823','stock_name':'超声电子'}, {'stock_code':'002636','stock_name':'金安国纪'}]
+        if 'FROM kcrp_stock_price' in sql:
+            assert args[0]=='000823.SZ' and args[-1]==target
+            return []
+        if 'minute_snapshot' in sql:
+            assert target!='2026-10-16' and args==(target,'000823')
+            return [dict(stk_code='000823',end=datetime.fromisoformat(target+' 09:31:00'),open=10,high=11,low=9,close=10,volume=10)]
+        raise AssertionError(sql)
+    monkeypatch.setattr(view_module,'kingdom_connection',connection)
+    monkeypatch.setattr(view_module,'query',query)
+    live_calls=[]
+    def minutes(code,now):
+        assert target=='2026-10-16'
+        live_calls.append(code)
+        return [dict(date=target,time='09:31',open=10,high=11,low=9,close=10,volume=10)]
+    def quotes(args):
+        assert target=='2026-10-16' and args=={'codes':['000823']}
+        return [],{}
+    result=view_module.StrategyExecutionViewService().load_today_market(owner_user_id='alice',signal_date='2026-10-14',
+        stock_code='000823',minute_offset=offset,now=datetime(2026,10,16,10,10,tzinfo=ZoneInfo('Asia/Shanghai')),
+        quote_loader=quotes,minute_loader=minutes)
+    assert result['signal_date']=='2026-10-14' and result['trade_date']==target
+    assert result['minute_dates']==['2026-10-12','2026-10-13','2026-10-14','2026-10-15','2026-10-16']
+    assert result['requested_minutes']==(40 if offset==2 else 240)
+    assert result['minute_source']==('upchina_1m_api' if offset==2 else 'minute_database')
+    assert len(result['stocks'])==1 and result['stocks'][0]['bars'][0]['date']==target
+    assert live_calls==(['000823'] if offset==2 else [])
+
+
+def test_minute_navigation_calendar_skips_weekend_and_blocks_future_and_unowned_code(monkeypatch):
+    @contextmanager
+    def connection(_):yield object()
+    def query(_conn,sql,args=()):
+        if 'information_schema.tables' in sql:return [{'table_name':'strategy_execution'}]
+        if 'aiia_trade_calendar' in sql:
+            if 'calendar_date<%s' in sql:days=['2026-10-16','2026-10-15']
+            elif 'calendar_date>%s' in sql:days=[]
+            else:days=['2026-10-19','2026-09-11']
+            return [{'calendar_date':date.fromisoformat(d)} for d in days]
+        if 'FROM strategy_execution' in sql:
+            return [{'stock_code':'000823','stock_name':'超声电子'}]
+        raise AssertionError('Unowned code must not query market data: '+sql)
+    monkeypatch.setattr(view_module,'kingdom_connection',connection)
+    monkeypatch.setattr(view_module,'query',query)
+    args=dict(owner_user_id='alice',signal_date='2026-10-19',stock_code='999999',
+              now=datetime(2026,10,19,10,tzinfo=ZoneInfo('Asia/Shanghai')))
+    service=view_module.StrategyExecutionViewService()
+    result=service.load_today_market(**args,minute_offset=-1)
+    assert result['trade_date']=='2026-10-16'
+    assert result['minute_dates']==['2026-10-15','2026-10-16','2026-10-19']
+    assert result['stocks']==[]
+    for offset in [-3,1,2,3]:
+        with pytest.raises(ValueError):service.load_today_market(**args,minute_offset=offset)
+
+
+def test_minute_navigation_route_validates_offset_and_retains_owner_scope():
+    service=FakeView()
+    client=_app({'user_type':'member','user_id':'alice'},service).test_client()
+    response=client.get('/api/strategies/market?date=2026-10-14&minute_offset=2&stock_code=000823&user_id=imac')
+    assert response.status_code==200
+    assert service.calls[-1]==dict(owner_user_id='alice',signal_date='2026-10-14',minute_offset=2,stock_code='000823')
+    count=len(service.calls)
+    for query in ['minute_offset=-3','minute_offset=3','minute_offset=1.5','minute_offset=x','stock_code=abc','stock_code=000823.SZ']:
+        assert client.get('/api/strategies/market?'+query).status_code==400
+    assert len(service.calls)==count
+    def unavailable(**kwargs):raise ValueError('不能翻到今天之后')
+    service.load_today_market=unavailable
+    assert client.get('/api/strategies/market?minute_offset=1').status_code==400

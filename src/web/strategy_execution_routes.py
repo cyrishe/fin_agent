@@ -71,7 +71,22 @@ def create_strategy_execution_blueprint(
             except ValueError:
                 return jsonify({"ok": False, "error": "选股日期无效。"}), 400
         try:
+            if "minute_offset" in request.args:
+                offset = int(request.args["minute_offset"])
+                if offset not in range(-2, 3):
+                    raise ValueError()
+                args["minute_offset"] = offset
+            if "stock_code" in request.args:
+                code = request.args["stock_code"]
+                if len(code) != 6 or not code.isascii() or not code.isdigit():
+                    raise ValueError()
+                args["stock_code"] = code
+        except ValueError:
+            return jsonify({"ok": False, "error": "分钟图翻日参数无效。"}), 400
+        try:
             result = view_service.load_today_market(**args)
+        except ValueError as exc:
+            return jsonify({"ok": False, "error": str(exc)}), 400
         except Exception:
             current_app.logger.exception("strategy today market unavailable")
             return jsonify({"ok": False, "error": "行情暂时不可用，请稍后重试。"}), 503

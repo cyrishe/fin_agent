@@ -120,20 +120,39 @@ class StrategyExecutionViewService:
     """Read selection-day charts: historical DB snapshots or today’s live minute API."""
 
     def load_today_market(self, *, owner_user_id: str, now: datetime | None = None,
-                          quote_loader=None, minute_loader=None, signal_date: str | None = None) -> dict:
+                          quote_loader=None, minute_loader=None, signal_date: str | None = None,
+                          minute_offset: int = 0, stock_code: str | None = None) -> dict:
         current = (now or datetime.now(ZoneInfo("Asia/Shanghai"))).astimezone(ZoneInfo("Asia/Shanghai"))
         today = current.date().isoformat()
         target = date.fromisoformat(signal_date).isoformat() if signal_date else today
         if target > today:
             raise ValueError("选股日期不能晚于今天")
-        live = target == today
-        requested_minutes = completed_session_minutes(current) if live else 240
+        selection_day = target
+        if minute_offset not in range(-2, 3):
+            raise ValueError("只能查看选股日前后各两个交易日")
         picks, daily, bars, errors, quotes = {}, {}, {}, {}, {}
         quote_error = None
         with kingdom_connection("KINGDOMAI_DB_URL") as conn:
             tables = _tables(conn)
+            before = query(conn, """SELECT calendar_date FROM aiia_trade_calendar
+                WHERE market_code='CN_A' AND is_trade_day=1 AND calendar_date<%s
+                ORDER BY calendar_date DESC LIMIT 2""", (selection_day,))
+            after = query(conn, """SELECT calendar_date FROM aiia_trade_calendar
+                WHERE market_code='CN_A' AND is_trade_day=1 AND calendar_date>%s
+                  AND calendar_date<=%s ORDER BY calendar_date LIMIT 2""", (selection_day, today))
+            previous = sorted({_iso(r['calendar_date']) for r in before
+                               if _iso(r['calendar_date']) < selection_day})[-2:]
+            following = sorted({_iso(r['calendar_date']) for r in after
+                                if selection_day < _iso(r['calendar_date']) <= today})[:2]
+            minute_dates = previous + [selection_day] + following
+            index = len(previous) + minute_offset
+            if index < 0 or index >= len(minute_dates):
+                raise ValueError("该交易日不可查看，不能翻到今天之后")
+            target = minute_dates[index]
+            live = target == today
+            requested_minutes = completed_session_minutes(current) if live else 240
             # Exactly the same 20-trading-day scope and older unsold positions
-            # as the execution list. Codes are never accepted from the browser.
+            # as the execution list. Browser codes only narrow this owned set.
             days = query(conn, """SELECT calendar_date FROM aiia_trade_calendar
                 WHERE market_code='CN_A' AND is_trade_day=1 AND calendar_date<=%s
                 ORDER BY calendar_date DESC LIMIT 20""", (today,))
@@ -148,10 +167,12 @@ class StrategyExecutionViewService:
                     where = "(signal_date BETWEEN %s AND %s OR (signal_date<%s AND buy_price IS NOT NULL AND sell_price IS NULL))"
                     args += (first,)
                 for row in query(conn, f"""SELECT DISTINCT stock_code,stock_name FROM {table}
-                    WHERE user_id=%s AND {where} AND signal_date=%s""", (*args, target)):
+                    WHERE user_id=%s AND {where} AND signal_date=%s""", (*args, selection_day)):
                     code = str(row["stock_code"]).strip()
                     if re.fullmatch(r"[0-9]{6}", code):
                         picks.setdefault(code, str(row["stock_name"]).strip())
+            if stock_code is not None:
+                picks = {c: name for c, name in picks.items() if c == stock_code}
             codes = sorted(picks)
             if codes:
                 # Daily history is raw/unadjusted, matching the live quotes.
@@ -212,7 +233,8 @@ class StrategyExecutionViewService:
                     quotes = {str(r.get('code')):r for r in quote_rows if str(r.get('tradedate')) == today}
                 except Exception:
                     quote_error = "实时行情接口暂不可用"
-        return dict(trade_date=target, as_of=current.isoformat(), requested_minutes=requested_minutes,
+        return dict(trade_date=target, signal_date=selection_day, minute_dates=minute_dates,
+            as_of=current.isoformat(), requested_minutes=requested_minutes,
             is_live=live, quote_error=quote_error, minute_source='upchina_1m_api' if live else 'minute_database', stocks=[dict(
                 code=c, name=picks[c], bars=bars.get(c,[]), daily_bars=daily.get(c,[]),
                 minute_error=errors.get(c),

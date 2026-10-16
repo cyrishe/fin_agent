@@ -5,6 +5,7 @@
 <title>策略选股总览 · Fin Agent</title>
 <style>
 :root{color-scheme:dark;font-family:Inter,"PingFang SC","Microsoft YaHei",sans-serif;background:#0b1320;color:#e7eef6;font-synthesis:none}*{box-sizing:border-box}body{margin:0}button,select{font:inherit}a{color:#91c7e8;text-decoration:none}button,select{background:#18293b;border:1px solid #36516a;border-radius:7px;color:#e7eef6;padding:7px 10px}button{cursor:pointer}button:hover{border-color:#5dc9b8}.shell{max-width:1900px;margin:auto;padding:16px 24px 40px}.toolbar{position:sticky;top:0;z-index:2;background:#0b1320f5;border-bottom:1px solid #304259;padding:10px 0 12px;display:flex;gap:14px;align-items:center;flex-wrap:wrap;backdrop-filter:blur(12px)}h1{font-size:22px;margin:0 12px 0 0;letter-spacing:-.5px}.toolbar label{font-size:12px;color:#91a6ba}.toolbar select{max-width:260px}.spacer{flex:1}.live{color:#79d9c5;font-size:12px}.live:before{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;background:currentColor;margin-right:6px}.subtitle{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;color:#93a8bd;font-size:12px;margin:13px 0 16px}.list{display:flex;flex-direction:column;gap:14px}.stock-row{border:1px solid #2b4359;border-radius:11px;background:#112032;overflow:hidden}.row-head{display:flex;gap:20px;align-items:center;flex-wrap:wrap;padding:12px 16px;background:#15263a;border-bottom:1px solid #294056}.identity{min-width:185px}.identity strong{font-size:20px}.code{font-size:12px;color:#a0b4c8;margin-left:9px}.model{font-size:12px;color:#75d5c3;display:block;margin-top:6px}.quote{display:flex;align-items:baseline;gap:12px;min-width:154px}.quote b{font-size:27px;letter-spacing:-.5px}.quote span{font-size:14px;font-weight:600}.up{color:#ff8b8b}.down{color:#70d9b9}.flat{color:#b4c7d7}.quote-block{flex-shrink:0}.quote-block .quote-time{margin-top:5px}.quote-time{font-size:11px;color:#88a0b7;white-space:nowrap}.stats{display:flex;gap:18px;flex-wrap:wrap;margin-left:0}.stat{font-size:11px;color:#8da5bb}.stat b{display:block;color:#d9e7f3;font-size:13px;margin-top:4px;font-weight:500}.row-body{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(0,1fr)}.decision-summary{flex:1;min-width:400px;border-left:1px solid #345064;margin-left:6px;padding-left:20px}.execution{display:flex;gap:24px;align-items:center;padding:8px 0 0;font-size:12px}.trade{display:grid;grid-template-columns:auto auto;column-gap:10px;align-items:baseline}.trade-label{color:#9ab0c5}.trade b{font-size:16px;font-weight:500}.trade time{grid-column:2;font-size:10px;color:#8ba2b9;margin-top:3px}.trade-return{margin-left:8px;font-size:12px}.trade-return b{margin-left:10px}.badge{padding:3px 7px;border-radius:4px;font-size:10px;background:#293b50;color:#b0c3d5}.badge.holding{color:#f0d18e;background:#443e30}.selection-meta{display:flex;flex-wrap:wrap;gap:12px;align-items:center;font-size:11px;color:#8ba2b9;padding:0}.selection-date{font-variant-numeric:tabular-nums;color:#c4d7e7}.history-trigger{margin-left:10px;border:0;padding:0;background:transparent;color:#8ebad1;font-size:11px}.day-section{display:flex;flex-direction:column;gap:12px;margin-top:18px}.day-section:first-child{margin-top:0}.day-toggle{position:sticky;top:calc(var(--toolbar-height,105px) + 8px);z-index:1;display:flex;width:100%;align-items:center;gap:14px;text-align:left;padding:15px 17px;background:#254655;border:1px solid #487783;border-left:5px solid #80e0cd;border-radius:8px;box-shadow:0 5px 14px #02081266}.day-toggle strong{font-size:23px;letter-spacing:.5px;color:#effffa}.day-toggle span{font-size:12px;color:#c1dedf}.day-toggle .day-label{font-size:11px;color:#9ed2cc}.day-toggle .arrow{margin-left:auto;padding:6px 10px;border:1px solid #638b93;border-radius:5px;color:#e1f8f2;white-space:nowrap}.trade b.waiting{font-size:12px;font-weight:400;color:#9ab0c5}.day-stocks[hidden]{display:none}.day-stocks{display:flex;flex-direction:column;gap:10px}.history-dialog{background:#112032;border:1px solid #36516a;border-radius:12px;color:#e7eef6;width:min(720px,calc(100vw - 24px));padding:18px;max-height:75vh}.history-dialog::backdrop{background:#020812b8}.dialog-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:16px}.dialog-head h2{font-size:17px;margin:0}.history-scroll{overflow:auto}.history-table{border-collapse:collapse;width:100%;font-size:12px;white-space:nowrap;text-align:left}.history-table th{color:#91a7bd;font-weight:400}.history-table th,.history-table td{padding:9px 12px;border-bottom:1px solid #2b4054}.history-table th:first-child,.history-table td:first-child{padding-left:0}.history-table time{display:block;font-size:10px;color:#8ba2b9;margin-top:4px}
+.minute-nav{display:flex;align-items:center;gap:6px;flex-wrap:wrap}.minute-nav button{padding:3px 7px;font-size:11px}.minute-nav button:disabled{opacity:.3;cursor:default}.minute-nav .minute-date{color:#d5e8f4;font-size:12px;font-variant-numeric:tabular-nums}
 .chart-panel{padding:12px 14px 8px;min-width:0}.chart-panel+ .chart-panel{border-left:1px solid #293e54}.chart-head{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:2px}.chart-head h3{font-size:13px;margin:0}.chart-head span{color:#91a7bd;font-size:10px}.chart{display:block;width:100%;height:118px}.chart-grid{stroke:#2a4055;stroke-width:.7}.chart-label{fill:#88a1b9;font-size:10px}.empty-chart{height:118px;display:flex;align-items:center;justify-content:center;color:#839db6;font-size:13px;border:1px dashed #2d465f;border-radius:6px}.error{padding:10px 14px;background:#402a2f;color:#ffb8b8;border:1px solid #89585f;border-radius:7px;margin:12px 0}.hidden{display:none!important}.empty{padding:28px;color:#9ab1c7;text-align:center;border:1px dashed #2e4c67;border-radius:10px}.footer{font-size:11px;color:#8098af;margin:18px 0;line-height:1.7}.stale{color:#efc87b!important}
 @media(min-width:1600px){.chart{height:130px}.empty-chart{height:130px}}
 @media(max-width:1100px){.stats{gap:14px}.decision-summary{flex-basis:100%;min-width:0;margin-left:0;padding:8px 0 0;border-left:0;border-top:1px solid #345064}}
@@ -30,6 +31,9 @@ const color=x=>x==null?'flat':Number(x)>0?'up':Number(x)<0?'down':'flat';
 const dateTime=x=>x?String(x).replace('T',' ').slice(5,16):'—';
 let pendingCharts=[];
 const expandedDates=new Map(),historicalMarkets=new Map(),historyRequests=new Map();
+const minuteOffsets=new Map(),minuteMarkets=new Map(),minuteRequests=new Map(),visibleMinuteViews=new Map();
+const pickKey=p=>`${p.signal_date}:${p.strategy_id}:${p.stock_code}`;
+const minuteKey=(p,offset)=>`${p.signal_date}:${offset}:${p.stock_code}`;
 let historyEpoch=0;
 let historyFocus=null;
 let records=null,market=null,request=null,owner=new URLSearchParams(location.search).get('user_id')||'';
@@ -86,11 +90,33 @@ function stockRow(pick,names,stockMap,dayMarket){
  const execution=el('div','execution');
  for(const [label,value,at]of [['买',pick.entry_price,pick.entry_at],['卖',pick.exit_price,pick.exit_at]]){const cell=el('div','trade');cell.append(el('span','trade-label',label),el('b',label==='卖'&&value==null?'waiting':'',label==='卖'&&value==null?'暂未卖出':price(value)));if(at)cell.append(el('time','',dateTime(at)));execution.append(cell);}
  const ret=el('div','trade-return','收益');ret.append(el('b',color(pick.gross_return_pct),signed(pick.gross_return_pct)));execution.append(ret);decision.append(execution);
- const body=el('div','row-body'),minute=stock?.bars||[],n=dayMarket?.requested_minutes??(live?0:240);
- const minuteCaption=dayMarket?.error||stock?.minute_error||`${minute.length}/${n} 根 · 均价线`;
- body.append(panel(`${live?'今日':pick.signal_date.slice(5)} · 1 分钟 K`,minuteCaption,minute,dayMarket?.error||stock?.minute_error||(dayMarket?(n?'该日分钟数据缺失':'尚未开盘'):'加载中…'),{reference:q?.preclose,average:true}));
+ const body=el('div','row-body'),offset=minuteOffsets.get(pickKey(pick))||0;
+ const minuteMarket=offset?minuteMarkets.get(minuteKey(pick,offset)):dayMarket;
+ const minuteStock=offset?minuteMarket?.stocks?.find(s=>s.code===pick.stock_code):stock;
+ const dates=dayMarket?.minute_dates||[pick.signal_date],index=dates.indexOf(pick.signal_date)+offset;
+ const minuteDay=dates[index]||pick.signal_date,minuteLive=minuteDay===market?.trade_date;
+ const minute=minuteStock?.bars||[],n=minuteMarket?.requested_minutes??(minuteLive?0:240);
+ const minuteCaption=minuteMarket?.error||minuteStock?.minute_error||`${minute.length}/${n} 根 · 均价线`;
+ const minutePanel=panel(`${minuteDay} · 1 分钟 K`,minuteCaption,minute,minuteMarket?.error||minuteStock?.minute_error||(minuteMarket?(n?'该日分钟数据缺失':'尚未开盘'):'加载中…'),{reference:minuteStock?.quote?.preclose,average:true});
+ const nav=el('div','minute-nav'),prev=el('button','','‹'),next=el('button','','›'),reset=el('button','','选股日');
+ prev.type=next.type=reset.type='button';prev.setAttribute('aria-label',`${pick.stock_name}前一交易日分钟K`);next.setAttribute('aria-label',`${pick.stock_name}后一交易日分钟K`);
+ prev.disabled=index<=0;next.disabled=index>=dates.length-1||minuteDay>=market?.trade_date;
+ reset.disabled=offset===0;reset.setAttribute('aria-label',`${pick.stock_name}返回选股日分钟K`);
+ const change=value=>{minuteOffsets.set(pickKey(pick),value);render();};
+ prev.addEventListener('click',()=>change(offset-1));next.addEventListener('click',()=>change(offset+1));reset.addEventListener('click',()=>change(0));
+ nav.append(prev,el('span','minute-date',`${minuteDay.slice(5)}${minuteLive?' 今日':''} · 1 分钟 K`),next,reset);
+ minutePanel.querySelector('h3').replaceWith(nav);minutePanel.dataset.minuteDate=minuteDay;body.append(minutePanel);
+ if(offset){visibleMinuteViews.set(minuteKey(pick,offset),{pick,offset,day:minuteDay});ensureMinuteMarket(pick,offset);}
  let daily=[...(stock?.daily_bars||[])];if(live&&q&&q.open>0&&q.high>0&&q.low>0&&q.close>0){daily.push({date:market.trade_date,time:market.trade_date.slice(5),open:q.open,high:q.high,low:q.low,close:q.close,volume:q.volumn==null?null:Number(q.volumn)*100,amount:q.amount});}daily=daily.slice(-20);
  body.append(panel('近 20 日日 K',`截至 ${pick.signal_date.slice(5)}`,daily,dayMarket?.error||(dayMarket?'该日数据缺失':'加载中…'),{reference:q?.preclose}));article.append(body);return article;
+}
+async function ensureMinuteMarket(pick,offset,force=false){
+ const key=minuteKey(pick,offset);if(minuteRequests.has(key)||(!force&&minuteMarkets.has(key)))return;
+ const epoch=historyEpoch,params=new URLSearchParams({date:pick.signal_date,minute_offset:String(offset),stock_code:pick.stock_code});if(owner)params.set('user_id',owner);
+ minuteRequests.set(key,true);
+ try{const response=await fetch(`${base}/api/strategies/market?${params}`,{credentials:'same-origin',cache:'no-store'});const data=await response.json();if(!response.ok||!data.ok)throw new Error(data.error||'分钟行情加载失败');if(epoch===historyEpoch)minuteMarkets.set(key,data);}
+ catch(e){if(epoch===historyEpoch)minuteMarkets.set(key,{stocks:[],error:e.message});}
+ finally{if(epoch===historyEpoch){minuteRequests.delete(key);render();}}
 }
 async function ensureHistoricalMarket(day){
  if(day===market?.trade_date||historicalMarkets.has(day)||historyRequests.has(day))return;
@@ -101,7 +127,7 @@ async function ensureHistoricalMarket(day){
  finally{if(epoch===historyEpoch){historyRequests.delete(day);render();}}
 }
 function render(){
- if(!records)return;pendingCharts=[];
+ if(!records)return;pendingCharts=[];visibleMinuteViews.clear();
  const selected=$('strategy-filter').value,groups=new Map(),names=new Map(records.strategies.map(s=>[s.strategy_id,s.name]));
  const picks=records.picks.filter(p=>!selected||p.strategy_id===selected).sort((a,b)=>b.signal_date.localeCompare(a.signal_date)||a.strategy_id.localeCompare(b.strategy_id)||a.selection_rank-b.selection_rank);
  for(const p of picks){if(!groups.has(p.signal_date))groups.set(p.signal_date,[]);groups.get(p.signal_date).push(p);}
@@ -133,16 +159,16 @@ async function refresh(force=false){
  $('refresh-state').textContent='正在刷新…';
  const params=owner?`?user_id=${encodeURIComponent(owner)}`:'';
  async function get(path){const r=await fetch(`${base}${path}${params}`,{credentials:'same-origin',cache:'no-store',signal:active.signal});const data=await r.json();if(!r.ok||!data.ok)throw new Error(data.error||`HTTP ${r.status}`);return data;}
- try{const [r,m]=await Promise.all([get('/api/strategies/executions'),get('/api/strategies/market')]);if(request!==active)return;records=r;market=m;options();render();$('error').classList.add('hidden');$('refresh-state').textContent='每 10 秒自动刷新';}
+ try{const [r,m]=await Promise.all([get('/api/strategies/executions'),get('/api/strategies/market')]);if(request!==active)return;records=r;market=m;options();render();await Promise.all([...visibleMinuteViews.values()].filter(v=>v.day===market.trade_date).map(v=>ensureMinuteMarket(v.pick,v.offset,true)));if(request!==active)return;$('error').classList.add('hidden');$('refresh-state').textContent='每 10 秒自动刷新';}
  catch(e){if(request!==active||e.name==='AbortError')return;$('error').textContent=`更新失败，保留上次画面：${e.message}`;$('error').classList.remove('hidden');$('refresh-state').textContent='更新失败 · 10 秒后重试';}
  finally{if(request===active)request=null;}
 }
 $('strategy-filter').addEventListener('change',render);
 $('close-history').addEventListener('click',()=>$('selection-history').close());
 $('selection-history').addEventListener('close',()=>{const target=historyFocus?.isConnected?historyFocus:[...document.querySelectorAll('.history-trigger')].find(n=>n.getAttribute('aria-label')===historyFocus?.getAttribute('aria-label'));target?.focus();});
-$('owner-filter').addEventListener('change',()=>{owner=$('owner-filter').value;historyEpoch++;historicalMarkets.clear();historyRequests.clear();expandedDates.clear();$('selection-history').close();records=null;market=null;$('stock-list').replaceChildren(el('div','empty','正在切换用户…'));refresh(true);});
+$('owner-filter').addEventListener('change',()=>{owner=$('owner-filter').value;historyEpoch++;minuteOffsets.clear();minuteMarkets.clear();minuteRequests.clear();historicalMarkets.clear();historyRequests.clear();expandedDates.clear();$('selection-history').close();records=null;market=null;$('stock-list').replaceChildren(el('div','empty','正在切换用户…'));refresh(true);});
 new ResizeObserver(([entry])=>document.documentElement.style.setProperty('--toolbar-height',`${entry.target.getBoundingClientRect().bottom-entry.target.getBoundingClientRect().top}px`)).observe(document.querySelector('.toolbar'));
-$('refresh').addEventListener('click',()=>{historicalMarkets.clear();refresh(true);});setInterval(()=>refresh(),10000);
+$('refresh').addEventListener('click',()=>{minuteMarkets.clear();historicalMarkets.clear();refresh(true);});setInterval(()=>refresh(),10000);
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)refresh(true);});refresh();
 })();
 </script></body></html>
