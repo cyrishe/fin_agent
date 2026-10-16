@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from src.experiments.staged_data_protocol.phase2 import python_filter as pf
+
 import re
 from dataclasses import dataclass
 from datetime import date, datetime
@@ -24,9 +26,9 @@ OP_SQL = {"=": "=", "==": "=", "!=": "!=", ">": ">", ">=": ">=", "<": "<", "<=":
 FILTER_RE = re.compile(
     r"(?:(?P<connector>\band\b|\bor\b)\s+)?"
     r"(?P<field>[A-Za-z_]\w*)\s*"
-    r"(?P<op>in|=|==|!=|>=|<=|>|<)\s*"
+    r"(?P<op>in|==|=|!=|>=|<=|>|<)\s*"
     r"(?P<value>\[[^\]]+\]|\([^)]+\)|[^,;]+?)"
-    r"(?=\s+(?:and|or)\s+[A-Za-z_]\w*\s*(?:in|=|==|!=|>=|<=|>|<)|[,;]|$)",
+    r"(?=\s+(?:and|or)\s+[A-Za-z_]\w*\s*(?:in|==|=|!=|>=|<=|>|<)|[,;]|$)",
     flags=re.IGNORECASE,
 )
 
@@ -219,7 +221,7 @@ def _output_token(output: str) -> str:
 
 
 def _has_unresolved_ref(args: Mapping[str, Any]) -> bool:
-    return any(isinstance(value, str) and re.search(r"\br\d+\.", value) for value in args.values())
+    return pf.has_unresolved_refs(args)
 
 
 def _bounded_limit(value: Any) -> int:
@@ -255,6 +257,9 @@ def _build_where(*, source: HotEventSource, args: Mapping[str, Any]) -> tuple[st
 
 
 def _build_filter_clauses(*, source: HotEventSource, args: Mapping[str, Any], allowed: set[str]) -> tuple[str, List[Any]]:
+    if pf.condition(args) is not None:
+        return pf.and_sql(_build_filter_clauses(source=source, args=pf.without_filter(args), allowed=allowed),
+                          pf.sql_filter(args, source.fields, allowed=allowed))
     clauses: List[str] = []
     params: List[Any] = []
     for connector, field_name, op, value in _explicit_filters(args):
@@ -286,6 +291,8 @@ def _build_filter_clauses(*, source: HotEventSource, args: Mapping[str, Any], al
 
 
 def _explicit_filters(args: Mapping[str, Any]) -> List[tuple[str, str, str, Any]]:
+    if pf.condition(args) is not None:
+        return _explicit_filters(pf.without_filter(args)) + pf.leaf_items(args)
     rows: List[tuple[str, str, str, Any]] = []
     direct_aliases = {
         "event_id": "event_id",

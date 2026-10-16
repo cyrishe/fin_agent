@@ -1,0 +1,61 @@
+{
+  "version": "finance_business_skills_real_v1",
+  "description": "使用真实 Finance CC 与金融数据工具验证 11 个金融业务 Skill 的入口、执行过程和最终回答。",
+  "cases": [
+    {
+      "id": "market_overview_real",
+      "expected_skill_id": "market-overview",
+      "question": "复盘最近一个完整交易日的A股市场环境：主要指数、成交活跃度、涨跌宽度和大小盘风格分别怎样？目前最值得警惕的风险是什么？"
+    },
+    {
+      "id": "sector_theme_real",
+      "expected_skill_id": "sector-theme-analysis",
+      "question": "分析白酒板块最近20个交易日的表现和内部结构：板块整体强弱、成交变化、领涨与落后公司分别怎样，这种表现是否具有持续性？"
+    },
+    {
+      "id": "stock_research_real",
+      "expected_skill_id": "stock-research",
+      "question": "从中期投资视角研究宁德时代：结合近期行情、最近三年经营与现金流、当前估值和行业位置，给出核心优势、主要风险及最值得继续观察的三个变量。"
+    },
+    {
+      "id": "earnings_analysis_real",
+      "expected_skill_id": "earnings-analysis",
+      "question": "分析贵州茅台最近一期年度报告的增长质量。重点看收入与利润增长是否匹配、利润率变化、经营现金流表现，以及增长中是否存在基数或一次性因素。"
+    },
+    {
+      "id": "stock_screening_real",
+      "expected_skill_id": "stock-screening",
+      "question": "在沪深300成分股中筛选最近60日走势较强、最新PE TTM低于50倍且最近一期ROE为正的股票，列出前10个候选，并说明每只股票为什么入选。"
+    },
+    {
+      "id": "factor_analysis_real",
+      "expected_skill_id": "factor-analysis",
+      "question": "比较沪深300成分股最近60日动量因子的横截面差异，列出动量靠前和靠后的代表股票，同时检查20日波动率，解释这个因子当前可能偏好的股票特征和主要局限。"
+    },
+    {
+      "id": "valuation_analysis_real",
+      "expected_skill_id": "valuation-analysis",
+      "question": "判断美的集团当前估值是否有基本面支撑：分析最新PE、PB及其近五年历史位置，并结合最近三年的盈利增长、ROE和经营现金流给出有条件的估值判断。"
+    },
+    {
+      "id": "financial_quality_real",
+      "expected_skill_id": "financial-quality-analysis",
+      "question": "评估海天味业最近三年的财务质量：利润现金含量、应收和存货变化、负债与偿债压力、ROE趋势分别怎样？请指出最值得关注的财务背离。"
+    },
+    {
+      "id": "stock_comparison_real",
+      "expected_skill_id": "stock-comparison",
+      "question": "比较贵州茅台和五粮液最近三年的成长、盈利能力、经营现金流质量、资产负债和当前估值。不要机械打分，而要说明两家公司各自的优势、代价和更适合的投资前提。"
+    },
+    {
+      "id": "technical_structure_real",
+      "expected_skill_id": "technical-structure-analysis",
+      "question": "分析宁德时代最近120个交易日的技术结构：趋势和高低点结构、20日与60日均线、成交量确认、20日波动率以及关键支撑阻力分别怎样？给出信号失效条件。"
+    },
+    {
+      "id": "dividend_analysis_real",
+      "expected_skill_id": "dividend-analysis",
+      "question": "评估中国神华近五年的分红质量和可持续性：分红是否稳定、当前股息率处于什么水平、利润与经营现金流能否支撑，以及高股息背后最大的风险是什么？"
+    }
+  ]
+}

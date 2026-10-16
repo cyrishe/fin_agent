@@ -1,0 +1,48 @@
+{
+  "run_id": "20261003T042758Z_5370a71f",
+  "git_commit": "ac1d53e321b75c01bc0a52d1016278388d7a5b21",
+  "working_tree_dirty": true,
+  "implementation_sha256": "56b2912fef7a635770fed9d4b5e142efa74544bcc7e72e8d735239e807bf02d6",
+  "panel_sha256": "b955063c16cbc91b75457d21a5e9b27cb6aeb33c214998ed6a04b5ec6bbc8945",
+  "python": "3.13.5",
+  "pandas": "2.3.2",
+  "sklearn": "1.7.1",
+  "created_at": "2026-10-03T04:27:58.593868+00:00",
+  "test_start": "2025-08-11T00:00:00",
+  "heldout_companies": [
+    "002330.SZ",
+    "002650.SZ",
+    "300345.SZ"
+  ],
+  "source": {
+    "source": "kingdomai",
+    "symbols": [
+      "000659.SZ",
+      "000718.SZ",
+      "000738.SZ",
+      "002200.SZ",
+      "002256.SZ",
+      "002330.SZ",
+      "002404.SZ",
+      "002650.SZ",
+      "300303.SZ",
+      "300345.SZ",
+      "300532.SZ",
+      "300790.SZ",
+      "600783.SH",
+      "605177.SH",
+      "688355.SH",
+      "920579.BJ"
+    ],
+    "warnings": [
+      "估值按下一自然日可用处理；原库未提供历史修订版本，不能证明原始发布时点。",
+      "行业按 SW2021 生效区间对齐，未取得分类历史版本；用于研究特征和分组，非严格历史成分认证。",
+      "新闻热度为已入库新闻的7日数量代理，不代表全网热度；不读取或上传新闻正文。"
+    ],
+    "price_basis": "vendor_adjusted",
+    "universe": "listed at start, including companies subsequently delisted; requested industries use membership at start then per-date filtering"
+  },
+  "rows": 7760,
+  "sessions": 485,
+  "repeated_holdout_warning": "同一数据反复运行会污染盲测；后续研究须指定未揭盲的新时间窗口。"
+}

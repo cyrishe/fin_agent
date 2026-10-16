@@ -1,0 +1,595 @@
+{
+  "recorded_at": "2026-09-10T07:21:34.113579+00:00",
+  "fin_base_commit": "a4fd7d2b4d9bab2bcaeb734cecf84f2d6c77131f",
+  "source_sha256": {
+    "src/scenarios/financial_qa/dsh_loop_policy.mjs": "bba1e0c0b1ef2fa9dc320dbde8a2a2e1758732a27d70d40cb299dcf736f54b8f",
+    "src/scenarios/financial_qa/tools.py": "d4ef9455d1e00f482510eb21d1ab5c48ca9b121a7239fbdc617bc2afdaf82fb0",
+    "src/scenarios/financial_qa/dsh_service.py": "446ed81d5f571154a65bdc16c351a1eb43dd7a2c9ec83adfa1296ecb36abca37",
+    "src/scenarios/financial_qa/dsh_system.md": "f1314ef30736b6f8abf782fa82e20802af20c2e9374b760495490984a32f891f",
+    "config/deepseek_harness/finance_query.patch.yml": "5d6e3ab24aa56fba15b2452bd59f9418864d746c0deedfb356580a6ce5bb6b65",
+    "scripts/verify_finance_dsh_detail_replay.py": "584e6030396847a32cee03b05b91564a3590d007a3e50fa7bec7660dec6b804f"
+  },
+  "mode": "keyless replay",
+  "model": "fixture",
+  "scope": "synthetic catalog/provider; real DSH/MCP/query handlers/storage; no database, outer routing or production deployment",
+  "cases": {
+    "list": {
+      "elapsed_seconds": 4.45,
+      "calls": [
+        {
+          "name": "mcp__finance__read_finance_catalog",
+          "arguments": {
+            "subject": "fixture",
+            "dataview": "reports",
+            "operation": "query"
+          }
+        },
+        {
+          "name": "mcp__finance__finance_query",
+          "arguments": {
+            "steps": [
+              {
+                "goal": "取得合成研报快照",
+                "request": "r1 = fixture.reports.query() -> code, name, rating, highlights, risk, raw_text"
+              }
+            ],
+            "data_request_complete": true
+          }
+        }
+      ],
+      "pages_returned": [],
+      "rows_returned": 0,
+      "row_json_chars": 0,
+      "errors": [],
+      "usage": {
+        "prompt_tokens": 0,
+        "completion_tokens": 0,
+        "total_tokens": 0,
+        "cache_read_tokens": 0,
+        "cumulative_context_tokens": 0,
+        "mean_context_tokens_per_call": 0.0,
+        "max_context_tokens_per_call": 0,
+        "final_context_tokens": 0,
+        "reasoning_tokens": 0,
+        "non_reasoning_completion_tokens": 0,
+        "call_count": 0
+      },
+      "answer": "固定回放完成；只验证数据传递，不评估模型理解。",
+      "passed": true,
+      "model_requests": 3
+    },
+    "selected_all": {
+      "elapsed_seconds": 0.176,
+      "calls": [
+        {
+          "name": "mcp__finance__read_finance_catalog",
+          "arguments": {
+            "subject": "fixture",
+            "dataview": "reports",
+            "operation": "query"
+          }
+        },
+        {
+          "name": "mcp__finance__finance_query",
+          "arguments": {
+            "steps": [
+              {
+                "goal": "取得合成研报快照",
+                "request": "r1 = fixture.reports.query() -> code, name, rating, highlights, risk, raw_text"
+              }
+            ],
+            "data_request_complete": true
+          }
+        },
+        {
+          "name": "mcp__finance__load_finance_result",
+          "arguments": {
+            "result_ref": "r1",
+            "offset": 0,
+            "limit": 50,
+            "columns": [
+              "code",
+              "highlights",
+              "risk"
+            ]
+          }
+        },
+        {
+          "name": "mcp__finance__load_finance_result",
+          "arguments": {
+            "result_ref": "r1",
+            "offset": 50,
+            "limit": 50,
+            "columns": [
+              "code",
+              "highlights",
+              "risk"
+            ]
+          }
+        },
+        {
+          "name": "mcp__finance__load_finance_result",
+          "arguments": {
+            "result_ref": "r1",
+            "offset": 100,
+            "limit": 50,
+            "columns": [
+              "code",
+              "highlights",
+              "risk"
+            ]
+          }
+        },
+        {
+          "name": "mcp__finance__load_finance_result",
+          "arguments": {
+            "result_ref": "r1",
+            "offset": 150,
+            "limit": 50,
+            "columns": [
+              "code",
+              "highlights",
+              "risk"
+            ]
+          }
+        }
+      ],
+      "pages_returned": [
+        {
+          "offset": 0,
+          "limit": 50,
+          "returned": 50,
+          "total": 190,
+          "has_more": true
+        },
+        {
+          "offset": 50,
+          "limit": 50,
+          "returned": 50,
+          "total": 190,
+          "has_more": true
+        },
+        {
+          "offset": 100,
+          "limit": 50,
+          "returned": 50,
+          "total": 190,
+          "has_more": true
+        },
+        {
+          "offset": 150,
+          "limit": 50,
+          "returned": 40,
+          "total": 190,
+          "has_more": false
+        }
+      ],
+      "rows_returned": 190,
+      "row_json_chars": 13306,
+      "errors": [],
+      "usage": {
+        "prompt_tokens": 0,
+        "completion_tokens": 0,
+        "total_tokens": 0,
+        "cache_read_tokens": 0,
+        "cumulative_context_tokens": 0,
+        "mean_context_tokens_per_call": 0.0,
+        "max_context_tokens_per_call": 0,
+        "final_context_tokens": 0,
+        "reasoning_tokens": 0,
+        "non_reasoning_completion_tokens": 0,
+        "call_count": 0
+      },
+      "answer": "固定回放完成；只验证数据传递，不评估模型理解。",
+      "passed": true,
+      "model_requests": 4
+    },
+    "tail": {
+      "elapsed_seconds": 0.106,
+      "calls": [
+        {
+          "name": "mcp__finance__read_finance_catalog",
+          "arguments": {
+            "subject": "fixture",
+            "dataview": "reports",
+            "operation": "query"
+          }
+        },
+        {
+          "name": "mcp__finance__finance_query",
+          "arguments": {
+            "steps": [
+              {
+                "goal": "取得合成研报快照",
+                "request": "r1 = fixture.reports.query() -> code, name, rating, highlights, risk, raw_text"
+              }
+            ],
+            "data_request_complete": true
+          }
+        },
+        {
+          "name": "mcp__finance__load_finance_result",
+          "arguments": {
+            "result_ref": "r1",
+            "offset": 189,
+            "limit": 1,
+            "columns": [
+              "code",
+              "raw_text"
+            ]
+          }
+        }
+      ],
+      "pages_returned": [
+        {
+          "offset": 189,
+          "limit": 1,
+          "returned": 1,
+          "total": 190,
+          "has_more": false
+        }
+      ],
+      "rows_returned": 1,
+      "row_json_chars": 24052,
+      "errors": [],
+      "usage": {
+        "prompt_tokens": 0,
+        "completion_tokens": 0,
+        "total_tokens": 0,
+        "cache_read_tokens": 0,
+        "cumulative_context_tokens": 0,
+        "mean_context_tokens_per_call": 0.0,
+        "max_context_tokens_per_call": 0,
+        "final_context_tokens": 0,
+        "reasoning_tokens": 0,
+        "non_reasoning_completion_tokens": 0,
+        "call_count": 0
+      },
+      "answer": "固定回放完成；只验证数据传递，不评估模型理解。",
+      "passed": true,
+      "model_requests": 4
+    },
+    "all_columns": {
+      "elapsed_seconds": 0.279,
+      "calls": [
+        {
+          "name": "mcp__finance__read_finance_catalog",
+          "arguments": {
+            "subject": "fixture",
+            "dataview": "reports",
+            "operation": "query"
+          }
+        },
+        {
+          "name": "mcp__finance__finance_query",
+          "arguments": {
+            "steps": [
+              {
+                "goal": "取得合成研报快照",
+                "request": "r1 = fixture.reports.query() -> code, name, rating, highlights, risk, raw_text"
+              }
+            ],
+            "data_request_complete": true
+          }
+        },
+        {
+          "name": "mcp__finance__load_finance_result",
+          "arguments": {
+            "result_ref": "r1",
+            "offset": 0,
+            "limit": 50
+          }
+        },
+        {
+          "name": "mcp__finance__load_finance_result",
+          "arguments": {
+            "result_ref": "r1",
+            "offset": 50,
+            "limit": 50
+          }
+        },
+        {
+          "name": "mcp__finance__load_finance_result",
+          "arguments": {
+            "result_ref": "r1",
+            "offset": 100,
+            "limit": 50
+          }
+        },
+        {
+          "name": "mcp__finance__load_finance_result",
+          "arguments": {
+            "result_ref": "r1",
+            "offset": 150,
+            "limit": 50
+          }
+        }
+      ],
+      "pages_returned": [
+        {
+          "offset": 0,
+          "limit": 50,
+          "returned": 50,
+          "total": 190,
+          "has_more": true
+        },
+        {
+          "offset": 50,
+          "limit": 50,
+          "returned": 50,
+          "total": 190,
+          "has_more": true
+        },
+        {
+          "offset": 100,
+          "limit": 50,
+          "returned": 50,
+          "total": 190,
+          "has_more": true
+        },
+        {
+          "offset": 150,
+          "limit": 50,
+          "returned": 40,
+          "total": 190,
+          "has_more": false
+        }
+      ],
+      "rows_returned": 190,
+      "row_json_chars": 802815,
+      "errors": [],
+      "usage": {
+        "prompt_tokens": 0,
+        "completion_tokens": 0,
+        "total_tokens": 0,
+        "cache_read_tokens": 0,
+        "cumulative_context_tokens": 0,
+        "mean_context_tokens_per_call": 0.0,
+        "max_context_tokens_per_call": 0,
+        "final_context_tokens": 0,
+        "reasoning_tokens": 0,
+        "non_reasoning_completion_tokens": 0,
+        "call_count": 0
+      },
+      "answer": "固定回放完成；只验证数据传递，不评估模型理解。",
+      "passed": true,
+      "model_requests": 4
+    },
+    "skill_ten_pages": {
+      "elapsed_seconds": 0.289,
+      "calls": [
+        {
+          "name": "mcp__finance__read_finance_catalog",
+          "arguments": {
+            "subject": "fixture",
+            "dataview": "reports",
+            "operation": "query"
+          }
+        },
+        {
+          "name": "mcp__finance__finance_query",
+          "arguments": {
+            "steps": [
+              {
+                "goal": "取得合成研报快照",
+                "request": "r1 = fixture.reports.query() -> code, name, rating, highlights, risk, raw_text"
+              }
+            ],
+            "data_request_complete": true
+          }
+        },
+        {
+          "name": "mcp__finance__load_finance_result",
+          "arguments": {
+            "result_ref": "r1",
+            "offset": 0,
+            "limit": 20,
+            "columns": [
+              "code",
+              "risk"
+            ]
+          }
+        },
+        {
+          "name": "mcp__finance__load_finance_result",
+          "arguments": {
+            "result_ref": "r1",
+            "offset": 20,
+            "limit": 20,
+            "columns": [
+              "code",
+              "risk"
+            ]
+          }
+        },
+        {
+          "name": "mcp__finance__load_finance_result",
+          "arguments": {
+            "result_ref": "r1",
+            "offset": 40,
+            "limit": 20,
+            "columns": [
+              "code",
+              "risk"
+            ]
+          }
+        },
+        {
+          "name": "mcp__finance__load_finance_result",
+          "arguments": {
+            "result_ref": "r1",
+            "offset": 60,
+            "limit": 20,
+            "columns": [
+              "code",
+              "risk"
+            ]
+          }
+        },
+        {
+          "name": "mcp__finance__load_finance_result",
+          "arguments": {
+            "result_ref": "r1",
+            "offset": 80,
+            "limit": 20,
+            "columns": [
+              "code",
+              "risk"
+            ]
+          }
+        },
+        {
+          "name": "mcp__finance__load_finance_result",
+          "arguments": {
+            "result_ref": "r1",
+            "offset": 100,
+            "limit": 20,
+            "columns": [
+              "code",
+              "risk"
+            ]
+          }
+        },
+        {
+          "name": "mcp__finance__load_finance_result",
+          "arguments": {
+            "result_ref": "r1",
+            "offset": 120,
+            "limit": 20,
+            "columns": [
+              "code",
+              "risk"
+            ]
+          }
+        },
+        {
+          "name": "mcp__finance__load_finance_result",
+          "arguments": {
+            "result_ref": "r1",
+            "offset": 140,
+            "limit": 20,
+            "columns": [
+              "code",
+              "risk"
+            ]
+          }
+        },
+        {
+          "name": "mcp__finance__load_finance_result",
+          "arguments": {
+            "result_ref": "r1",
+            "offset": 160,
+            "limit": 20,
+            "columns": [
+              "code",
+              "risk"
+            ]
+          }
+        },
+        {
+          "name": "mcp__finance__load_finance_result",
+          "arguments": {
+            "result_ref": "r1",
+            "offset": 180,
+            "limit": 20,
+            "columns": [
+              "code",
+              "risk"
+            ]
+          }
+        }
+      ],
+      "pages_returned": [
+        {
+          "offset": 0,
+          "limit": 20,
+          "returned": 20,
+          "total": 190,
+          "has_more": true
+        },
+        {
+          "offset": 20,
+          "limit": 20,
+          "returned": 20,
+          "total": 190,
+          "has_more": true
+        },
+        {
+          "offset": 40,
+          "limit": 20,
+          "returned": 20,
+          "total": 190,
+          "has_more": true
+        },
+        {
+          "offset": 60,
+          "limit": 20,
+          "returned": 20,
+          "total": 190,
+          "has_more": true
+        },
+        {
+          "offset": 80,
+          "limit": 20,
+          "returned": 20,
+          "total": 190,
+          "has_more": true
+        },
+        {
+          "offset": 100,
+          "limit": 20,
+          "returned": 20,
+          "total": 190,
+          "has_more": true
+        },
+        {
+          "offset": 120,
+          "limit": 20,
+          "returned": 20,
+          "total": 190,
+          "has_more": true
+        },
+        {
+          "offset": 140,
+          "limit": 20,
+          "returned": 20,
+          "total": 190,
+          "has_more": true
+        },
+        {
+          "offset": 160,
+          "limit": 20,
+          "returned": 20,
+          "total": 190,
+          "has_more": true
+        },
+        {
+          "offset": 180,
+          "limit": 20,
+          "returned": 10,
+          "total": 190,
+          "has_more": false
+        }
+      ],
+      "rows_returned": 190,
+      "row_json_chars": 7422,
+      "errors": [],
+      "usage": {
+        "prompt_tokens": 0,
+        "completion_tokens": 0,
+        "total_tokens": 0,
+        "cache_read_tokens": 0,
+        "cumulative_context_tokens": 0,
+        "mean_context_tokens_per_call": 0.0,
+        "max_context_tokens_per_call": 0,
+        "final_context_tokens": 0,
+        "reasoning_tokens": 0,
+        "non_reasoning_completion_tokens": 0,
+        "call_count": 0
+      },
+      "answer": "固定回放完成；只验证数据传递，不评估模型理解。",
+      "passed": true,
+      "model_requests": 13
+    }
+  }
+}

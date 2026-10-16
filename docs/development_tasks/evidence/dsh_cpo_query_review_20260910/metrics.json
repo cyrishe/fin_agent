@@ -1,0 +1,55 @@
+{
+  "thread_id": 4244,
+  "turn_id": 2260,
+  "server_fin_head_at_inspection": "f0b7f6ecc0a21b4a66d41a1b2f512aecddff82c5",
+  "model": "deepseek-v4-flash-0731",
+  "server_trace_elapsed_ms": 63245,
+  "dsh_duration_ms": 55599,
+  "dsh_model_step_ms_sum": 55389,
+  "tool_ms_sum_including_parallel_calls": 129,
+  "query_api_execution_ms": 29.278,
+  "queue_wait_ms": 0,
+  "usage": {
+    "planning": {"calls": 3, "input": 3439, "output": 123, "total": 3562},
+    "dsh": {"calls": 7, "uncached_input": 14832, "cached_input": 33792, "input": 48624, "output": 4855, "reasoning_output_subset": 2498, "total": 53479},
+    "followup": {"calls": 1, "input": 1888, "output": 72, "total": 1960},
+    "reconstructed": {"calls": 11, "input": 53951, "output": 5050, "total": 59001},
+    "persisted_accounting_total": 55439,
+    "persisted_total_excluding_dsh_cache": 21647,
+    "missing_planning_total": 3562
+  },
+  "result": {
+    "stored_rows": 190,
+    "loaded_unique_codes": 100,
+    "markdown_table_unique_codes": 100,
+    "loaded_codes_missing_from_markdown": 0,
+    "markdown_codes_not_in_loaded_pages": 0,
+    "pages": [
+      {"offset": 0, "limit": 50, "returned": 50, "total": 190, "has_more": true},
+      {"offset": 50, "limit": 50, "returned": 50, "total": 190, "has_more": true}
+    ],
+    "data_block_initial_rows": 3,
+    "data_block_row_count": 190,
+    "data_block_has_result_ref": true,
+    "browser_pagination_verified": false
+  },
+  "history": {
+    "semantic_source": "llm",
+    "context_refs": [],
+    "native_request_history": {"fromTurn": 1},
+    "native_turn": 1,
+    "resumed": false,
+    "prompt_result_index_count": 0,
+    "next_result_name": "r15"
+  },
+  "model_steps": [
+    {"step": 1, "duration_ms": 4090, "input": 3687, "output": 289, "reasoning": 144},
+    {"step": 2, "duration_ms": 2753, "input": 5516, "output": 225, "reasoning": 77},
+    {"step": 3, "duration_ms": 1769, "input": 5909, "output": 99, "reasoning": 0},
+    {"step": 4, "duration_ms": 1674, "input": 6419, "output": 128, "reasoning": 0},
+    {"step": 5, "duration_ms": 2060, "input": 7140, "output": 141, "reasoning": 0},
+    {"step": 6, "duration_ms": 24082, "input": 8511, "output": 1919, "reasoning": 1757},
+    {"step": 7, "duration_ms": 18961, "input": 11442, "output": 2054, "reasoning": 520}
+  ],
+  "verification_scope": "Read-only existing server trace and database; no new model requests, browser replay, or runtime changes. No raw security rows or full production prompts retained."
+}

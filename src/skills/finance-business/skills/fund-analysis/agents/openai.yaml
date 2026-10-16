@@ -1,0 +1,4 @@
+interface:
+  display_name: "基金分析"
+  short_description: "分析基金表现、ETF折溢价与交易活跃度，比较产品差异和持有风险"
+  default_prompt: "使用 $fund-analysis 分析这只基金，或比较我指定基金的表现、主要差异和风险。"

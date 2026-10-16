@@ -1,0 +1,179 @@
+{
+  "selection_method": "Four KMeans groups from T-1 equal-weight market return, breadth, trailing five-day return and breadth; five chronologically spaced dates from each group; random_state=0, n_init=10; no next-morning labels in date selection.",
+  "old_training_dates": [
+    "2026-08-25",
+    "2026-08-26",
+    "2026-08-27",
+    "2026-08-28",
+    "2026-08-31",
+    "2026-09-01",
+    "2026-09-02",
+    "2026-09-03",
+    "2026-09-04",
+    "2026-09-07",
+    "2026-09-08",
+    "2026-09-09",
+    "2026-09-10",
+    "2026-09-11",
+    "2026-09-14",
+    "2026-09-15",
+    "2026-09-16",
+    "2026-09-17",
+    "2026-09-18",
+    "2026-09-21"
+  ],
+  "new_training_dates": [
+    "2026-08-05",
+    "2026-08-07",
+    "2026-08-12",
+    "2026-08-13",
+    "2026-08-18",
+    "2026-08-19",
+    "2026-08-20",
+    "2026-08-25",
+    "2026-08-26",
+    "2026-08-31",
+    "2026-09-07",
+    "2026-09-08",
+    "2026-09-11",
+    "2026-09-16",
+    "2026-09-17",
+    "2026-09-21",
+    "2026-09-23",
+    "2026-09-28",
+    "2026-09-29",
+    "2026-09-30"
+  ],
+  "new_training_rows": 8264,
+  "common_test_dates": [
+    "2026-08-06",
+    "2026-08-10",
+    "2026-08-11",
+    "2026-08-14",
+    "2026-08-17",
+    "2026-08-21",
+    "2026-08-24",
+    "2026-09-22",
+    "2026-09-24",
+    "2026-10-08"
+  ],
+  "new_all_out_of_training_dates": [
+    "2026-08-06",
+    "2026-08-10",
+    "2026-08-11",
+    "2026-08-14",
+    "2026-08-17",
+    "2026-08-21",
+    "2026-08-24",
+    "2026-08-27",
+    "2026-08-28",
+    "2026-09-01",
+    "2026-09-02",
+    "2026-09-03",
+    "2026-09-04",
+    "2026-09-09",
+    "2026-09-10",
+    "2026-09-14",
+    "2026-09-15",
+    "2026-09-18",
+    "2026-09-22",
+    "2026-09-24",
+    "2026-10-08"
+  ],
+  "market_groups": {
+    "0": {
+      "available_dates": 10,
+      "selected_dates": 5,
+      "mean_prior_return": 0.0104999157697,
+      "mean_prior_breadth": 0.64766,
+      "mean_prior_5d_return": -0.007658179706600004
+    },
+    "1": {
+      "available_dates": 13,
+      "selected_dates": 5,
+      "mean_prior_return": -0.0029583179925384614,
+      "mean_prior_breadth": 0.3654769230769231,
+      "mean_prior_5d_return": 0.01770899509323077
+    },
+    "2": {
+      "available_dates": 11,
+      "selected_dates": 5,
+      "mean_prior_return": 0.01183662123709091,
+      "mean_prior_breadth": 0.6376454545454545,
+      "mean_prior_5d_return": 0.04957368197463636
+    },
+    "3": {
+      "available_dates": 6,
+      "selected_dates": 5,
+      "mean_prior_return": -0.020068815671,
+      "mean_prior_breadth": 0.16565,
+      "mean_prior_5d_return": -0.025595989482000005
+    }
+  },
+  "old_model_validation": {
+    "saved_sklearn": "1.9.1",
+    "runtime_sklearn": "1.9.1",
+    "load_warnings": 0,
+    "archived_score_max_difference": 0.0
+  },
+  "results": {
+    "old_common": {
+      "signal_days": 10,
+      "stocks": 20,
+      "executed_stocks": 16,
+      "unaffordable_stocks": 4,
+      "morning_triggered": 5,
+      "starting_cash": 100000.0,
+      "ending_cash": 96253.6,
+      "return": -0.037464,
+      "max_daily_drawdown": -0.06163680102115961,
+      "strong": 13,
+      "neutral": 5,
+      "critical": 2,
+      "labeled_stocks": 20
+    },
+    "new_common": {
+      "signal_days": 10,
+      "stocks": 20,
+      "executed_stocks": 19,
+      "unaffordable_stocks": 1,
+      "morning_triggered": 5,
+      "starting_cash": 100000.0,
+      "ending_cash": 96848.5,
+      "return": -0.031515,
+      "max_daily_drawdown": -0.0492198,
+      "strong": 11,
+      "neutral": 2,
+      "critical": 7,
+      "labeled_stocks": 20
+    },
+    "new_all_out_of_training": {
+      "signal_days": 21,
+      "stocks": 42,
+      "executed_stocks": 41,
+      "unaffordable_stocks": 1,
+      "morning_triggered": 10,
+      "starting_cash": 100000.0,
+      "ending_cash": 89054.3,
+      "return": -0.109457,
+      "max_daily_drawdown": -0.1349273,
+      "strong": 21,
+      "neutral": 6,
+      "critical": 15,
+      "labeled_stocks": 42
+    }
+  },
+  "artifact_sha256": {
+    "market_diverse_seven_factor.joblib": "bbc552396ec4a9994e3edf55a0045fd764612b4d460d32101100f6450c0a6189",
+    "market_states.csv": "727471a0f1e272afb065809651ab12be3c8088f0f9c00a5628a2b358b084535d",
+    "selected_1m_bars.csv": "c506c3081d9ccfea1bbef07bf71e3554eb0397447ccebb6976db77c5a47396ae"
+  },
+  "source_sha256": {
+    "outputs/stock_automl/tail_expanded_august/trainable_1440.csv": "1486fd98be0d6e633d06a297b96e76560ea2ecd124d6a8e93020fe506a2c2005",
+    "outputs/stock_automl/tail_sep30_check/trainable_1440.csv": "30221c49fe0244a4333555897e01675d839513defe520526a6ab1ffb9a759b4a",
+    "outputs/stock_automl/tail_aug05_aug06_exact/trainable_1440.csv": "5ec7b327d50b513bbc72a4807a5efaa270a38803a9bfa2656aca7dd4f7dac792",
+    "outputs/stock_automl/tail_aug24_exact/trainable_1440.csv": "b5cdc37be54b9cb014fd32bec2cce78a2e4f1864c862c301b6ffb3907386654a",
+    "docs/stock_automl_runs/20261009_seven_factor_cash_backtest/20261008_exact_candidates.csv": "fc45294ee301f2edc3581c25e3a23b3c6226ddf8332bdd4c3ac87764308b5355",
+    "docs/stock_automl_runs/20261008_sina_15m_july/exact_top5_two_models.csv": "33796233c623e5ee7af4fb17dbfe4951668ed47b6b06c9601bb802d98f31d7c5"
+  }
+}

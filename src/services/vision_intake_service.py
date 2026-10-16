@@ -121,7 +121,7 @@ class VisionIntakeService:
             "system.assistant.vision_intake",
             {
                 "application_name": self._trim(app_ctx.get("application_name") or "investment_workbench"),
-                "agent_name": self._trim(((app_ctx.get("assistant_agent") or {}) if isinstance(app_ctx.get("assistant_agent"), dict) else {}).get("agent_name")),
+                "agent_name": self._trim(((app_ctx.get("default_agent") or {}) if isinstance(app_ctx.get("default_agent"), dict) else {}).get("agent_name")),
                 "thread_context": thread_ctx,
                 "user_text": self._trim(user_text) or "请分析这张图片",
             },

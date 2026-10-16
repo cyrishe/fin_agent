@@ -1,0 +1,31 @@
+{
+  "source": "Sina unadjusted 15m cached bars; daily/valuation from KingdomAI",
+  "decision_time": "14:45",
+  "entry_proxy": "same completed 14:45 bar close",
+  "label": "next trading day 09:45 15m bar high / entry proxy - 1",
+  "first_signal_date": "2026-07-01",
+  "last_signal_date": "2026-07-31",
+  "raw_candidates": 13323,
+  "complete_candidates": 13244,
+  "complete_days": 23,
+  "source_symbols_expected": 5542,
+  "fetch_cache_symbols": 5539,
+  "candidate_filter_steps": {
+    "raw_3to6": 13323,
+    "complete_15m": 13323,
+    "complete_tminus1_history": 13289,
+    "no_recent_adjustment": 13289,
+    "no_t_day_reference_break": 13260,
+    "complete_tminus1_valuation": 13246,
+    "not_near_limit": 13244,
+    "all_model_features_present": 13244
+  },
+  "status": {
+    "source_stock_days": 127179,
+    "outside_3to6_1445": 113457,
+    "raw_3to6_1445": 13323,
+    "next_0945_missing": 37,
+    "signal_15m_incomplete": 362,
+    "stock_cache_missing": 3
+  }
+}

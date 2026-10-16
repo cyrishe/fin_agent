@@ -1,0 +1,71 @@
+{
+  "scope": "Actual projection function imported from source with export-only test adapter; synthetic rows; no source mutation",
+  "projections": [
+    {
+      "columns": "all",
+      "requested_rows": 50,
+      "actual_model_rows": 4,
+      "model_payload_chars": 14894,
+      "shortened_fields": [
+        "raw_text"
+      ],
+      "page": {
+        "offset": 0,
+        "limit": 50,
+        "returned": 4,
+        "total": 190,
+        "has_more": true
+      }
+    },
+    {
+      "columns": [
+        "stock_code",
+        "rating"
+      ],
+      "requested_rows": 50,
+      "actual_model_rows": 50,
+      "model_payload_chars": 2274,
+      "shortened_fields": [],
+      "page": {
+        "offset": 0,
+        "limit": 50,
+        "returned": 50,
+        "total": 190,
+        "has_more": true
+      }
+    },
+    {
+      "columns": [
+        "stock_code",
+        "report_date",
+        "investment_highlights"
+      ],
+      "requested_rows": 50,
+      "actual_model_rows": 10,
+      "model_payload_chars": 12304,
+      "shortened_fields": [],
+      "page": {
+        "offset": 0,
+        "limit": 50,
+        "returned": 10,
+        "total": 190,
+        "has_more": true
+      }
+    }
+  ],
+  "long_cell": {
+    "full_chars": 24013,
+    "model_chars": 2401,
+    "shortened_fields": [
+      "investment_highlights"
+    ],
+    "repeating_read_reveals_tail": false,
+    "page": {
+      "offset": 0,
+      "limit": 1,
+      "returned": 1,
+      "total": 1,
+      "has_more": false
+    }
+  }
+}

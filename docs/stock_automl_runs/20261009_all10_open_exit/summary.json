@@ -1,0 +1,109 @@
+{
+  "rules": {
+    "trigger": "Inspect 09:31–09:40 minute highs in order; first high strictly above T 14:50 entry ×1.01 triggers.",
+    "minute_high_optimistic": "Sell at that minute high; price touch does not prove execution.",
+    "next_minute_open_delay": "After the qualifying minute completes, sell at the following minute open; if 09:40 triggers, use 09:40 close.",
+    "fallback": "If no minute triggers, sell at 09:40 close."
+  },
+  "starting_cash": 100000,
+  "results": {
+    "minute_high_optimistic": {
+      "old_all": {
+        "signal_days": 21,
+        "selected_stocks": 42,
+        "bought_stocks": 35,
+        "unaffordable_stocks": 7,
+        "bought_first_trigger_count": 23,
+        "ending_cash": 116775.97,
+        "return": 0.1677597,
+        "max_daily_drawdown": -0.03638081811022212
+      },
+      "old_common": {
+        "signal_days": 10,
+        "selected_stocks": 20,
+        "bought_stocks": 16,
+        "unaffordable_stocks": 4,
+        "bought_first_trigger_count": 12,
+        "ending_cash": 107807.88,
+        "return": 0.0780788,
+        "max_daily_drawdown": -0.034584136499774834
+      },
+      "new_common": {
+        "signal_days": 10,
+        "selected_stocks": 20,
+        "bought_stocks": 19,
+        "unaffordable_stocks": 1,
+        "bought_first_trigger_count": 10,
+        "ending_cash": 99834.68,
+        "return": -0.0016532,
+        "max_daily_drawdown": -0.0492198
+      },
+      "new_all_out_of_training": {
+        "signal_days": 21,
+        "selected_stocks": 42,
+        "bought_stocks": 41,
+        "unaffordable_stocks": 1,
+        "bought_first_trigger_count": 20,
+        "ending_cash": 97500.02,
+        "return": -0.0249998,
+        "max_daily_drawdown": -0.0581914
+      }
+    },
+    "next_minute_open_delay": {
+      "old_all": {
+        "signal_days": 21,
+        "selected_stocks": 42,
+        "bought_stocks": 34,
+        "unaffordable_stocks": 8,
+        "bought_first_trigger_count": 22,
+        "ending_cash": 102747.61,
+        "return": 0.0274761,
+        "max_daily_drawdown": -0.04163632480970255
+      },
+      "old_common": {
+        "signal_days": 10,
+        "selected_stocks": 20,
+        "bought_stocks": 16,
+        "unaffordable_stocks": 4,
+        "bought_first_trigger_count": 12,
+        "ending_cash": 99768.36,
+        "return": -0.0023164,
+        "max_daily_drawdown": -0.03936222086881936
+      },
+      "new_common": {
+        "signal_days": 10,
+        "selected_stocks": 20,
+        "bought_stocks": 19,
+        "unaffordable_stocks": 1,
+        "bought_first_trigger_count": 10,
+        "ending_cash": 97004.6,
+        "return": -0.029954,
+        "max_daily_drawdown": -0.0492198
+      },
+      "new_all_out_of_training": {
+        "signal_days": 21,
+        "selected_stocks": 42,
+        "bought_stocks": 41,
+        "unaffordable_stocks": 1,
+        "bought_first_trigger_count": 20,
+        "ending_cash": 90459.6,
+        "return": -0.095404,
+        "max_daily_drawdown": -0.1040918
+      }
+    }
+  },
+  "tail_gap_audit": {
+    "selected_stocks": 42,
+    "actual_entry_time": "14:50 one-minute close proxy",
+    "from_1440_to_close_down_more_than_1pct": 2,
+    "from_1450_to_close_down_more_than_1pct": 0,
+    "from_1450_to_close_down_more_than_0_5pct": 2,
+    "median_1450_to_close_return": 3.1359759157023603e-05,
+    "next_open_up_vs_close_but_below_entry": 2
+  },
+  "input_sha256": {
+    "docs/stock_automl_runs/20261009_seven_factor_cash_backtest/trades.csv": "9d1c25f297014d02cc388fc5f80ca3bc8140495d648ebdc556e51e731cd75bf9",
+    "docs/stock_automl_runs/20261009_seven_factor_cash_backtest/selected_1m_bars.csv": "1bd9e4c5619493a79c947e80cbbe49074e221eb33d1015be3c96773da4313e29",
+    "docs/stock_automl_runs/20261009_market_shape_training/selected_1m_bars.csv": "c506c3081d9ccfea1bbef07bf71e3554eb0397447ccebb6976db77c5a47396ae"
+  }
+}

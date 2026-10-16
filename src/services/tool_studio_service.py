@@ -103,6 +103,11 @@ class ToolStudioService:
                 continue
             identity = definition.get("identity") if isinstance(definition.get("identity"), dict) else {}
             profiles = definition.get("profiles") if isinstance(definition.get("profiles"), dict) else {}
+            schemas = definition.get("schemas") if isinstance(definition.get("schemas"), dict) else {}
+            input_schema = schemas.get("input") if isinstance(schemas.get("input"), dict) else {}
+            tests = definition.get("tests") if isinstance(definition.get("tests"), dict) else {}
+            sample_inputs = tests.get("sample_inputs") if isinstance(tests.get("sample_inputs"), list) else []
+            first_sample = sample_inputs[0] if sample_inputs and isinstance(sample_inputs[0], dict) else {}
             rows.append(
                 {
                     "tool_name": tool_name,
@@ -117,6 +122,8 @@ class ToolStudioService:
                     "has_spec": (self.specs_dir / f"{tool_name}.spec.json").exists(),
                     "has_output_schema": self._resolve_output_schema_path(tool_name, definition).exists(),
                     "hub_entry": hub_map.get(tool_name) or {},
+                    "input_schema": input_schema,
+                    "sample_input": first_sample.get("arguments") if isinstance(first_sample.get("arguments"), dict) else {},
                 }
             )
         return rows

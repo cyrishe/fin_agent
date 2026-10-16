@@ -1,0 +1,487 @@
+{
+  "samples": {
+    "all_40_days": {
+      "days": 40,
+      "stocks": 14292,
+      "date_start": "2026-08-05",
+      "date_end": "2026-09-30",
+      "per_day_min": 50,
+      "per_day_median": 271.5,
+      "per_day_max": 953,
+      "classes": {
+        "lt0": 4770,
+        "0to1": 4017,
+        "1to3": 3777,
+        "ge3": 1728
+      }
+    },
+    "first_20_days_initial_history": {
+      "days": 20,
+      "stocks": 8474,
+      "date_start": "2026-08-05",
+      "date_end": "2026-09-01",
+      "per_day_min": 50,
+      "per_day_median": 335.0,
+      "per_day_max": 953,
+      "classes": {
+        "lt0": 2955,
+        "0to1": 2258,
+        "1to3": 2225,
+        "ge3": 1036
+      }
+    },
+    "last_20_days_scored": {
+      "days": 20,
+      "stocks": 5818,
+      "date_start": "2026-09-02",
+      "date_end": "2026-09-30",
+      "per_day_min": 76,
+      "per_day_median": 243.0,
+      "per_day_max": 927,
+      "classes": {
+        "lt0": 1815,
+        "0to1": 1759,
+        "1to3": 1552,
+        "ge3": 692
+      }
+    }
+  },
+  "fit": {
+    "capacity_probe": {
+      "next_day_test": {
+        "mean_ge3_auc_across_20_folds": 0.5704711863492669,
+        "mean_balanced_accuracy_across_20_folds": 0.2695446655603113,
+        "mean_macro_f1_across_20_folds": 0.25284167878067515,
+        "mean_rows_per_fold": 290.9
+      },
+      "same_fold_train": {
+        "mean_ge3_auc_across_20_folds": 0.989959037746526,
+        "mean_balanced_accuracy_across_20_folds": 0.836051702544298,
+        "mean_macro_f1_across_20_folds": 0.8551631083583942,
+        "mean_rows_per_fold": 7001.65
+      }
+    },
+    "logistic": {
+      "next_day_test": {
+        "mean_ge3_auc_across_20_folds": 0.6038850752207089,
+        "mean_balanced_accuracy_across_20_folds": 0.27065670794037355,
+        "mean_macro_f1_across_20_folds": 0.20675785913217978,
+        "mean_rows_per_fold": 290.9
+      },
+      "same_fold_train": {
+        "mean_ge3_auc_across_20_folds": 0.603827415297993,
+        "mean_balanced_accuracy_across_20_folds": 0.28383130222179087,
+        "mean_macro_f1_across_20_folds": 0.23676116540637757,
+        "mean_rows_per_fold": 7001.65
+      }
+    },
+    "small_boosted_tree": {
+      "next_day_test": {
+        "mean_ge3_auc_across_20_folds": 0.6136234052991678,
+        "mean_balanced_accuracy_across_20_folds": 0.2720809034587198,
+        "mean_macro_f1_across_20_folds": 0.22131143575624387,
+        "mean_rows_per_fold": 290.9
+      },
+      "same_fold_train": {
+        "mean_ge3_auc_across_20_folds": 0.6838458650849407,
+        "mean_balanced_accuracy_across_20_folds": 0.327590623040246,
+        "mean_macro_f1_across_20_folds": 0.298984403811408,
+        "mean_rows_per_fold": 7001.65
+      }
+    }
+  },
+  "probability_fit": {
+    "capacity_probe": {
+      "next_day_test": {
+        "actual_ge3_rate": 0.127167509307083,
+        "train_prior_ge3": 0.11558477949384434,
+        "mean_p_ge3": 0.11309330638597645,
+        "p_ge3_median": 0.0857443806820577,
+        "p_ge3_p90": 0.24119965454302603,
+        "p_ge3_max": 0.5601250144311367,
+        "argmax_ge3_count": 11.35,
+        "argmax_ge3_rate": 0.04067638627975759,
+        "max_class_probability_median": 0.45023025294085073,
+        "max_class_probability_p90": 0.6418062439119926,
+        "lead_over_second_median": 0.1571240318242854,
+        "lead_over_second_p90": 0.45180723745737544,
+        "normalized_entropy_mean": 0.8372510384640961,
+        "log_loss": 1.4470919156246826,
+        "train_prior_log_loss": 1.3359017373214601,
+        "mean_p_ge3_given_ge3": 0.13350214384383396,
+        "mean_p_ge3_given_lt0": 0.11680490218329294
+      },
+      "same_fold_train": {
+        "actual_ge3_rate": 0.11558477949384434,
+        "train_prior_ge3": 0.11558477949384434,
+        "mean_p_ge3": 0.11570733608858619,
+        "p_ge3_median": 0.0703297708961265,
+        "p_ge3_p90": 0.283812745231859,
+        "p_ge3_max": 0.8658096296221134,
+        "argmax_ge3_count": 595.15,
+        "argmax_ge3_rate": 0.08527807820777601,
+        "max_class_probability_median": 0.514304961193192,
+        "max_class_probability_p90": 0.7145943146949902,
+        "lead_over_second_median": 0.2525115623465043,
+        "lead_over_second_p90": 0.5604942634950789,
+        "normalized_entropy_mean": 0.7905781062699134,
+        "log_loss": 0.70778744561415,
+        "train_prior_log_loss": 1.322697319952067,
+        "mean_p_ge3_given_ge3": 0.42828676818369366,
+        "mean_p_ge3_given_lt0": 0.07649739958777975
+      }
+    },
+    "logistic": {
+      "next_day_test": {
+        "actual_ge3_rate": 0.127167509307083,
+        "train_prior_ge3": 0.11558477949384434,
+        "mean_p_ge3": 0.11909121226822636,
+        "p_ge3_median": 0.11122382711351494,
+        "p_ge3_p90": 0.16297790716118807,
+        "p_ge3_max": 0.3129362529070358,
+        "argmax_ge3_count": 0.15,
+        "argmax_ge3_rate": 0.00042023439924794743,
+        "max_class_probability_median": 0.3581559041395174,
+        "max_class_probability_p90": 0.43730171844746135,
+        "lead_over_second_median": 0.07203674619379923,
+        "lead_over_second_p90": 0.19551914032850087,
+        "normalized_entropy_mean": 0.9362848800287971,
+        "log_loss": 1.3213041196809718,
+        "train_prior_log_loss": 1.3359017373214601,
+        "mean_p_ge3_given_ge3": 0.12863070797072224,
+        "mean_p_ge3_given_lt0": 0.12370770425268299
+      },
+      "same_fold_train": {
+        "actual_ge3_rate": 0.11558477949384434,
+        "train_prior_ge3": 0.11558477949384434,
+        "mean_p_ge3": 0.11557844623423838,
+        "p_ge3_median": 0.10726596090202015,
+        "p_ge3_p90": 0.15822252397174724,
+        "p_ge3_max": 0.4711968792088583,
+        "argmax_ge3_count": 5.8,
+        "argmax_ge3_rate": 0.0007335587533662504,
+        "max_class_probability_median": 0.34899226904897374,
+        "max_class_probability_p90": 0.41948929126433504,
+        "lead_over_second_median": 0.057711904009581774,
+        "lead_over_second_p90": 0.1691330754772033,
+        "normalized_entropy_mean": 0.9391635405003462,
+        "log_loss": 1.3017541008211058,
+        "train_prior_log_loss": 1.322697319952067,
+        "mean_p_ge3_given_ge3": 0.12637703133140335,
+        "mean_p_ge3_given_lt0": 0.11777340103748739
+      }
+    },
+    "small_boosted_tree": {
+      "next_day_test": {
+        "actual_ge3_rate": 0.127167509307083,
+        "train_prior_ge3": 0.11558477949384434,
+        "mean_p_ge3": 0.12144815886094144,
+        "p_ge3_median": 0.12027442991385581,
+        "p_ge3_p90": 0.17260523469171682,
+        "p_ge3_max": 0.26168661903151375,
+        "argmax_ge3_count": 0.35,
+        "argmax_ge3_rate": 0.0014621798329863295,
+        "max_class_probability_median": 0.36967328335420097,
+        "max_class_probability_p90": 0.4485160135573179,
+        "lead_over_second_median": 0.08558671458977986,
+        "lead_over_second_p90": 0.2120583458465119,
+        "normalized_entropy_mean": 0.933713199373871,
+        "log_loss": 1.3215275560381747,
+        "train_prior_log_loss": 1.3359017373214601,
+        "mean_p_ge3_given_ge3": 0.13566522947887694,
+        "mean_p_ge3_given_lt0": 0.12608454191264848
+      },
+      "same_fold_train": {
+        "actual_ge3_rate": 0.11558477949384434,
+        "train_prior_ge3": 0.11558477949384434,
+        "mean_p_ge3": 0.11567467750569545,
+        "p_ge3_median": 0.11547907944940741,
+        "p_ge3_p90": 0.17196503741926905,
+        "p_ge3_max": 0.2999294166911287,
+        "argmax_ge3_count": 6.0,
+        "argmax_ge3_rate": 0.0009026932059650747,
+        "max_class_probability_median": 0.3645170958944502,
+        "max_class_probability_p90": 0.443602737203733,
+        "lead_over_second_median": 0.07072928501669287,
+        "lead_over_second_p90": 0.19915435224031122,
+        "normalized_entropy_mean": 0.9316272961703749,
+        "log_loss": 1.2565715326072606,
+        "train_prior_log_loss": 1.322697319952067,
+        "mean_p_ge3_given_ge3": 0.14185579151462263,
+        "mean_p_ge3_given_lt0": 0.1152107323121871
+      }
+    }
+  },
+  "day_probability_fit": {
+    "logistic": {
+      "actual_ge3_rate_min_max": [
+        0.06542056074766354,
+        0.23773584905660378
+      ],
+      "mean_p_ge3_min_max": [
+        0.10198235632207849,
+        0.13380726257840098
+      ],
+      "actual_vs_predicted_day_ge3_correlation": -0.031643705801510214
+    },
+    "small_boosted_tree": {
+      "actual_ge3_rate_min_max": [
+        0.06542056074766354,
+        0.23773584905660378
+      ],
+      "mean_p_ge3_min_max": [
+        0.09968410174145988,
+        0.1390229565787585
+      ],
+      "actual_vs_predicted_day_ge3_correlation": 0.17627779065717283
+    }
+  },
+  "small_boosted_tree_confusion": {
+    "label_order": [
+      "lt0",
+      "0to1",
+      "1to3",
+      "ge3"
+    ],
+    "training_folds_aggregate": [
+      [
+        32666,
+        8616,
+        6202,
+        24
+      ],
+      [
+        18525,
+        14048,
+        6363,
+        15
+      ],
+      [
+        18462,
+        8417,
+        10452,
+        18
+      ],
+      [
+        9884,
+        2561,
+        3717,
+        63
+      ]
+    ],
+    "next_day_unique_aggregate": [
+      [
+        1039,
+        460,
+        314,
+        2
+      ],
+      [
+        798,
+        573,
+        387,
+        1
+      ],
+      [
+        878,
+        363,
+        311,
+        0
+      ],
+      [
+        446,
+        121,
+        121,
+        4
+      ]
+    ]
+  },
+  "out_of_fold_prediction": {
+    "logistic": {
+      "classes_actual": {
+        "lt0": 1815,
+        "0to1": 1759,
+        "1to3": 1552,
+        "ge3": 692
+      },
+      "classes_predicted_argmax": {
+        "lt0": 3318,
+        "0to1": 1756,
+        "1to3": 741,
+        "ge3": 3
+      },
+      "confusion_actual_by_predicted": {
+        "lt0": {
+          "lt0": 1087,
+          "0to1": 509,
+          "1to3": 217,
+          "ge3": 2
+        },
+        "0to1": {
+          "lt0": 837,
+          "0to1": 664,
+          "1to3": 257,
+          "ge3": 1
+        },
+        "1to3": {
+          "lt0": 913,
+          "0to1": 459,
+          "1to3": 180,
+          "ge3": 0
+        },
+        "ge3": {
+          "lt0": 481,
+          "0to1": 124,
+          "1to3": 87,
+          "ge3": 0
+        }
+      },
+      "accuracy": 0.3319009969061533,
+      "balanced_accuracy": 0.2730911654274792,
+      "macro_f1": 0.23958573698495295,
+      "ge3_auc": 0.5962620574245769,
+      "ge3_average_precision": 0.1556492911938411,
+      "ge3_base_rate": 0.11894121691302853,
+      "ge3_mean_probability": 0.11728249532053048,
+      "ge3_probability_min_median_max": [
+        0.0265389980997356,
+        0.1094953838025629,
+        0.520911709916395
+      ],
+      "low_return_probability_mean_by_true_class": {
+        "lt0": 0.33910227286542216,
+        "0to1": 0.31535792831644965,
+        "1to3": 0.32872052704725213,
+        "ge3": 0.3460337522726523
+      },
+      "ge3_probability_mean_by_true_class": {
+        "lt0": 0.12174341219408087,
+        "0to1": 0.11076847671542119,
+        "1to3": 0.1154870973721282,
+        "ge3": 0.12616696384193735
+      },
+      "probability_sum_max_error": 4.440892098500626e-16,
+      "same_day_ge3_auc_mean": 0.6038850752207089,
+      "score_vs_second_high_spearman": 0.003119257009121255,
+      "second_place_score_tie_max": 2,
+      "second_place_score_tie_days": 0
+    },
+    "small_boosted_tree": {
+      "classes_actual": {
+        "lt0": 1815,
+        "0to1": 1759,
+        "1to3": 1552,
+        "ge3": 692
+      },
+      "classes_predicted_argmax": {
+        "lt0": 3161,
+        "0to1": 1517,
+        "1to3": 1133,
+        "ge3": 7
+      },
+      "confusion_actual_by_predicted": {
+        "lt0": {
+          "lt0": 1039,
+          "0to1": 460,
+          "1to3": 314,
+          "ge3": 2
+        },
+        "0to1": {
+          "lt0": 798,
+          "0to1": 573,
+          "1to3": 387,
+          "ge3": 1
+        },
+        "1to3": {
+          "lt0": 878,
+          "0to1": 363,
+          "1to3": 311,
+          "ge3": 0
+        },
+        "ge3": {
+          "lt0": 446,
+          "0to1": 121,
+          "1to3": 121,
+          "ge3": 4
+        }
+      },
+      "accuracy": 0.3312134754211069,
+      "balanced_accuracy": 0.27609300107383705,
+      "macro_f1": 0.2526309071051087,
+      "ge3_auc": 0.6147876968599388,
+      "ge3_average_precision": 0.16433093935457288,
+      "ge3_base_rate": 0.11894121691302853,
+      "ge3_mean_probability": 0.11823850165719754,
+      "ge3_probability_min_median_max": [
+        0.0296127329823283,
+        0.11834715127472906,
+        0.3070998418349553
+      ],
+      "low_return_probability_mean_by_true_class": {
+        "lt0": 0.3391313782413448,
+        "0to1": 0.319084730021951,
+        "1to3": 0.3319121712766939,
+        "ge3": 0.34627362505897297
+      },
+      "ge3_probability_mean_by_true_class": {
+        "lt0": 0.12185537537453846,
+        "0to1": 0.10806164395808512,
+        "1to3": 0.1188905054498222,
+        "ge3": 0.13315838172889038
+      },
+      "probability_sum_max_error": 5.551115123125783e-16,
+      "same_day_ge3_auc_mean": 0.6136234052991678,
+      "score_vs_second_high_spearman": 0.035759801018240035,
+      "second_place_score_tie_max": 2,
+      "second_place_score_tie_days": 0
+    }
+  },
+  "feature_overlap": {
+    "ge3_samples_with_comparable_neighbors": 692,
+    "nearest_lt0_distance_median": 0.7809556640549623,
+    "nearest_ge3_distance_median": 0.869016345536652,
+    "opposite_class_closer_count": 402,
+    "ge3_samples_20_neighbor_ge3_rate": 0.15715317919075145,
+    "ge3_samples_same_day_pool_ge3_rate": 0.14288054752302773,
+    "definition": "For each >=3% sample on the same test date, compare nearest <0% and >=3% stocks by the seven inputs: first four standardized on initial 20 dates, last three kept as 0/1."
+  },
+  "score_sensitivity": [
+    {
+      "model": "logistic",
+      "score": "p_ge3",
+      "selected": 40,
+      "ge3": 3,
+      "lt0": 19,
+      "lt_minus1": 13,
+      "mean_return_pct": 0.17330153805884527
+    },
+    {
+      "model": "logistic",
+      "score": "p_ge3_minus_p_lt0",
+      "selected": 40,
+      "ge3": 7,
+      "lt0": 13,
+      "lt_minus1": 6,
+      "mean_return_pct": 0.9993933688221548
+    },
+    {
+      "model": "small_boosted_tree",
+      "score": "p_ge3",
+      "selected": 40,
+      "ge3": 8,
+      "lt0": 14,
+      "lt_minus1": 7,
+      "mean_return_pct": 1.033753273331529
+    },
+    {
+      "model": "small_boosted_tree",
+      "score": "p_ge3_minus_p_lt0",
+      "selected": 40,
+      "ge3": 11,
+      "lt0": 14,
+      "lt_minus1": 3,
+      "mean_return_pct": 1.4505224163635362
+    }
+  ],
+  "interpretation": "Training metrics reuse overlapping 20-day windows and are optimistic fit diagnostics, not an attainable return bound. Test metrics are one next-day fold at a time. Capacity probe is only a diagnostic and was not selected as a strategy."
+}

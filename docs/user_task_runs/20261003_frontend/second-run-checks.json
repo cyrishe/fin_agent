@@ -1,0 +1,304 @@
+{
+  "checked_at": "2026-10-03T08:54:29.934654+00:00",
+  "run_id": "run_5fce84c5ecc6460bb5c260f6e17615b0",
+  "task_id": "sch_5b71cc066f9d4227975fcb9a6800e43b",
+  "status": "completed",
+  "verification_source": "GET http://127.0.0.1:22153/api/task-runs/<run_id> and its 10 authenticated artifact URLs; no POST/retraining performed",
+  "constraints": {
+    "horizons": true,
+    "models": true,
+    "tasks": true,
+    "max_symbols": true,
+    "max_trials": true,
+    "rounds": true,
+    "folds": true,
+    "include_minute": true,
+    "probability_threshold": true,
+    "min_signals": true,
+    "min_win_rate": true,
+    "max_drawdown": true,
+    "start": true,
+    "end": true
+  },
+  "constraint_values": {
+    "horizons": [
+      1,
+      3,
+      7
+    ],
+    "models": [
+      "linear",
+      "tree"
+    ],
+    "tasks": [
+      "classification",
+      "regression"
+    ],
+    "max_symbols": 16,
+    "max_trials": 12,
+    "rounds": 2,
+    "folds": 2,
+    "include_minute": false,
+    "probability_threshold": 0.6,
+    "min_signals": 15,
+    "min_win_rate": 0.5,
+    "max_drawdown": 0.3,
+    "start": "2024-01-01",
+    "end": "2025-12-31"
+  },
+  "entire_spec_equal_to_first_run": true,
+  "same_requirement_and_execution_plan_as_first": true,
+  "artifacts": [
+    {
+      "name": "研究设计",
+      "http_status": 200,
+      "bytes": 4050,
+      "size_matches_manifest": true,
+      "sha256": "0242dac2fb75b2f149f827aac029f5970158935c99410d8fff1a4a112332b512",
+      "content_type": "application/json"
+    },
+    {
+      "name": "report.md",
+      "http_status": 200,
+      "bytes": 7425,
+      "size_matches_manifest": true,
+      "sha256": "5cf7c7b4de34d14dc66c7dc2e2d115865574453919bf2d6b253ab7bf600ce819",
+      "content_type": "text/markdown; charset=utf-8"
+    },
+    {
+      "name": "report.json",
+      "http_status": 200,
+      "bytes": 7723,
+      "size_matches_manifest": true,
+      "sha256": "f2651a00446da1daee5d6168a73e05c279cca30c7e01c73cceb3dbe5c7c1f658",
+      "content_type": "application/json"
+    },
+    {
+      "name": "review.md",
+      "http_status": 200,
+      "bytes": 2798,
+      "size_matches_manifest": true,
+      "sha256": "610e855e6f98d805073cc35112afe94d909fbe7235f6484bf6226f98e72e01f1",
+      "content_type": "text/markdown; charset=utf-8"
+    },
+    {
+      "name": "review_status.json",
+      "http_status": 200,
+      "bytes": 44,
+      "size_matches_manifest": true,
+      "sha256": "0d77367518b7fcba9d780c8efdfea5eee0b9b7b4aa1aa0fb5da2dbc8354cb8c4",
+      "content_type": "application/json"
+    },
+    {
+      "name": "review_evidence.json",
+      "http_status": 200,
+      "bytes": 42265,
+      "size_matches_manifest": true,
+      "sha256": "db6caec76baddfa1fe592b3f44e12c9e53580ac226ea84ef997c1cea56e0b398",
+      "content_type": "application/json"
+    },
+    {
+      "name": "sample_counts.json",
+      "http_status": 200,
+      "bytes": 542,
+      "size_matches_manifest": true,
+      "sha256": "c0d7a3bab976fb5ef3ba51d86ae2e2082ba7922be95359945ac2f82b510f5586",
+      "content_type": "application/json"
+    },
+    {
+      "name": "development.json",
+      "http_status": 200,
+      "bytes": 99152,
+      "size_matches_manifest": true,
+      "sha256": "1e7751b4b85c09400ca59fa618568e8d7ec2cb9b4727845aa0f0e2f16bf25da3",
+      "content_type": "application/json"
+    },
+    {
+      "name": "selection.json",
+      "http_status": 200,
+      "bytes": 4208,
+      "size_matches_manifest": true,
+      "sha256": "8febe8f56200b82c658c7f19c3292a889c18982a973272939b9419e572e85c8c",
+      "content_type": "application/json"
+    },
+    {
+      "name": "spec.json",
+      "http_status": 200,
+      "bytes": 1738,
+      "size_matches_manifest": true,
+      "sha256": "0e7c2f5b6ece54bb80fe72d08d4c607135f25b955b24e744f06d0ffea376cd3a",
+      "content_type": "application/json"
+    }
+  ],
+  "all_artifacts_downloaded_and_size_verified": true,
+  "candidates": {
+    "attempted": 12,
+    "evaluable": 12,
+    "failures": 0,
+    "unique_candidate_ids": 12,
+    "planning_rounds": 2,
+    "temporal_validation_folds": 24,
+    "qualified": 0,
+    "by_model_task": [
+      {
+        "model": "linear",
+        "task": "classification",
+        "count": 3
+      },
+      {
+        "model": "linear",
+        "task": "regression",
+        "count": 4
+      },
+      {
+        "model": "tree",
+        "task": "classification",
+        "count": 3
+      },
+      {
+        "model": "tree",
+        "task": "regression",
+        "count": 2
+      }
+    ]
+  },
+  "selected": {
+    "horizon": 1,
+    "task": "classification",
+    "model": "linear",
+    "sampler": "all",
+    "features": "enriched",
+    "depth": 6,
+    "strength": 3.0,
+    "id": "3e966eb3db07"
+  },
+  "sample_counts": {
+    "panel_rows": 7760,
+    "companies": 16,
+    "sessions": 485,
+    "eligible_by_horizon": {
+      "1": 7405,
+      "3": 7373,
+      "7": 7309
+    },
+    "development": {
+      "input_rows": 4757,
+      "fit_rows": 3536,
+      "calibration_rows": 1195,
+      "purged_rows": 26,
+      "budget_sampled_out_rows": 0
+    },
+    "test_start": "2025-08-11T00:00:00",
+    "test_signal_end": "2025-12-19T00:00:00",
+    "heldout_companies": [
+      "002330.SZ",
+      "002650.SZ",
+      "300345.SZ"
+    ],
+    "heldout_rows": {
+      "new_period": 1156,
+      "new_companies_and_period": 267
+    }
+  },
+  "evaluation": [
+    {
+      "slice": "new_period",
+      "rows": 1156,
+      "companies": 13,
+      "signals": 0,
+      "signal_win_rate_after_cost": null,
+      "portfolio_return": 0.0,
+      "trade_records": 0,
+      "baseline_return": 0.057993477199800525,
+      "brier": 0.248970625170198,
+      "baseline_brier": 0.24968263860734094,
+      "skill_vs_constant": 0.0028516737932374747,
+      "roc_auc": 0.5253609396870307
+    },
+    {
+      "slice": "new_companies_and_period",
+      "rows": 267,
+      "companies": 3,
+      "signals": 0,
+      "signal_win_rate_after_cost": null,
+      "portfolio_return": 0.0,
+      "trade_records": 0,
+      "baseline_return": -0.011154942062609141,
+      "brier": 0.24850658215378077,
+      "baseline_brier": 0.24829827863546883,
+      "skill_vs_constant": -0.0008389245364754938,
+      "roc_auc": 0.490237497145467
+    }
+  ],
+  "report_numeric_checks": {
+    "review_verbatim_embedded": true,
+    "selected_model_and_horizon": true,
+    "12_evaluable_candidates": true,
+    "sample_counts": true,
+    "no_model_qualified": true,
+    "zero_signals_and_trades_shown": true,
+    "reused_holdout_disclaimer": true
+  },
+  "review_numeric_checks": {
+    "panel_counts_correct": true,
+    "original_company_brier_and_auc_correct": true,
+    "original_company_skill_correct": true,
+    "seven_day_tree_numbers_correct": true
+  },
+  "review_status": {
+    "completed": true,
+    "requested": true
+  },
+  "language_review": {
+    "main_numeric_claims_match_saved_evidence": true,
+    "fully_fact_checked": false,
+    "assessment": "主要数字、模型选择、零信号与未达标结论一致；仍有口径措辞及泛化范围问题，不能宣称LLM正文已完全无误。",
+    "findings": [
+      {
+        "kind": "wording_not_numeric_error",
+        "excerpt": "重叠样本（同一交易日多个持有期信号）",
+        "evidence": "单个候选固定一个持有期；这里应指不同信号日期的未来持有区间重叠，而不是同日多个持有期。",
+        "correction": "同一公司的相邻日期样本可能共享未来持有区间，相关样本不能当独立试验。"
+      },
+      {
+        "kind": "metric_scope_mixed",
+        "excerpt": "少量成交记录（开发验证折中部分候选信号数不足15个）",
+        "evidence": "signal_count与portfolio.trade_count分别是信号数和买卖成交记录数；信号不足15不等于成交记录不足15。",
+        "correction": "分别陈述信号量和已成交买卖记录；本轮最终两留出片均0信号、0成交。"
+      },
+      {
+        "kind": "overbroad_interpretation",
+        "excerpt": "无法产生超越基准的收益",
+        "evidence": {
+          "new_period_excess_total_return": -0.057993477199800525,
+          "new_companies_and_period_excess_total_return": 0.011154942062609141
+        },
+        "correction": "本次未建立仓位。空仓0%低于原公司基准5.80%，高于新公司基准-1.12%；后一差异不证明模型预测能力。"
+      }
+    ],
+    "original_review_evidence": {
+      "path": "second-run/review.md",
+      "sha256": "610e855e6f98d805073cc35112afe94d909fbe7235f6484bf6226f98e72e01f1",
+      "unaltered": true,
+      "authoritative_numeric_report": "second-run/report.json",
+      "original_private_source_relative": "outputs/task_ui_eval/20261003_frontend/artifacts/run_5fce84c5ecc6460bb5c260f6e17615b0/step_1/acc852105aa842668d351e7c8f206535/20261003T084916Z_9f2c50f8/review.md"
+    },
+    "authority": "report.json、development.json、sample_counts.json 等机器数值证据为事实依据；review.md 是解释性产物，本轮人工核对发现3项措辞或口径问题，仍需复核，未回写或重生成原评审。"
+  },
+  "timing": {
+    "created_at": "2026-10-03T08:48:54.282145+00:00",
+    "started_at": "2026-10-03T08:48:54.719560+00:00",
+    "finished_at": "2026-10-03T08:49:40.889837+00:00",
+    "queue_seconds": 0.437415,
+    "worker_wall_seconds": 46.170277,
+    "submit_to_finish_seconds": 46.607692,
+    "report_elapsed_seconds": 16.75,
+    "report_elapsed_scope": "run_research保存数值report.json前的研究计时；不等于用户提交到结束全程，且不含随后LLM评审耗时。"
+  },
+  "assessment": {
+    "execution": "第二次真实前端再次运行后的API链路已完成，14项要求与第一次一致，12/12候选可评估，10个交付产物可下载。",
+    "business": "没有候选满足全部开发筛选要求；最终留出无信号、无成交，应保留并展示这个有效的否定结果。历史留出窗口此前已使用，本次只能验收流程。",
+    "interaction": "本次子任务仅核对API与产物；浏览器交互是否清晰由父任务的截图与实际点击验证。当前界面已具备阶段、工作量、任务完成与研究未达标的区分，但仍不能将LLM正文视作已通过事实验收的最终结论。"
+  },
+  "publication_note": "聚合检查内容保持；本机用户目录的绝对路径替换为仓库相对报告路径。原报告与评审字节未改写。"
+}

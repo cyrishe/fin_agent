@@ -1,0 +1,32 @@
+# DSH Opt profile for personalized financial-tool orchestration.
+# Coding remains in the parent Codex runtime; this profile can only read/run
+# application assets and save requirement/design/flow artifacts.
+- id: persistent-bash
+  disabled: true
+
+- id: persistent-pwsh
+  disabled: true
+
+- id: str-replace-editor
+  disabled: true
+
+- insert:
+    - id: fin-agent-custom-tool-mcp
+      name: '@deepseek-ai/dsh-mcp-client'
+      config:
+        serverName: finance
+        transport: stdio
+        command: !!js process.env.FIN_AGENT_DSH_PYTHON
+        args: ['-m', 'src.scenarios.custom_tool.dsh_mcp_server']
+        cwd: !!js process.env.FIN_AGENT_ROOT
+        env:
+          PYTHONPATH: !!js process.env.FIN_AGENT_ROOT
+          FIN_AGENT_DSH_CONTEXT_PATH: !!js process.env.FIN_AGENT_DSH_CONTEXT_PATH
+          FIN_AGENT_DSH_TRACE_PATH: !!js process.env.FIN_AGENT_DSH_TRACE_PATH
+        toolCallTimeoutMs: 180000
+        failOnStartupError: true
+        reconnect:
+          enabled: true
+          initialDelayMs: 500
+          maxDelayMs: 10000
+          maxAttempts: 3

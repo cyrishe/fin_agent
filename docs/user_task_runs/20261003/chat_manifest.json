@@ -1,0 +1,27 @@
+{
+  "started_at": "2026-10-03T04:25:30.080880+00:00",
+  "git_commit": "ac1d53e321b75c01bc0a52d1016278388d7a5b21",
+  "dirty": true,
+  "source_sha256": {
+    "scripts/eval_user_task_chat.py": "0f567fe73e338f233830fbc6025225b09b23bffa88da91d6f7775882ea44e3ac",
+    "src/scenarios/financial_qa/service.py": "fcd31ec5450ffb6033fbb24dc740fb175da7e6a413b9d3e7658ff772f68081e2",
+    "src/scenarios/financial_qa/dsh_service.py": "90859347f057c47c16224e8ed71aca877c023cbbf33d37deb9eb01b196ce3a56",
+    "src/services/user_task_agent_tools.py": "b6b7aa5abd23f9a980d90ed2da9fb75849446a6238746e5b5ee696d0cddf6d62",
+    "src/tools/user_task_tools.py": "0e23bfeeaec8d9211f1afd9664e0b7812c77b6ba55e69d3fa0481e669af6a5a2",
+    "src/services/scheduled_task_compiler.py": "bc2919d55e4653febf7484d97732645a3b555b0fdb33b4c84086a3d27b46749e",
+    "src/services/scheduled_task_store.py": "433e9b50c489e5626beac6b8878994e1038c4966b53ecac57c418265a9de633e",
+    "config/deepseek_harness/finance_query.patch.yml": "982f87781981ed3ce6b3d6c97cdcbca7369363703cefa3905a736d9cdea4d710"
+  },
+  "model": "deepseek-v4-flash",
+  "requested_runtime": "dsh",
+  "scope": "Real LLM + authenticated conversation task tools + isolated SQLite; no HTTP, browser, worker, real-market data or production storage.",
+  "isolation": {
+    "task_storage": "local SQLite",
+    "system_db_disabled": true
+  },
+  "questions": [
+    "请立即提交一个后台股票AutoML任务，只用合成demo数据验证流程，不连接真实行情。使用2023-01-02到2023-12-29的6家合成公司，持有1个交易日，只比较线性分类（逻辑回归）和线性回归（Ridge），最多4个实验、1轮、2个时间验证折。生成训练、回归评估和留出回测报告，不调用大模型评审，运行预算最长300秒。请现在提交并给我任务回执，不要在对话里同步训练，也无需再次确认。",
+    "请查询刚才提交的后台任务的实际状态，并给我任务入口。现在还没有启动worker，不要声称训练已完成。",
+    "请取消刚才那个尚未运行的任务，确认实际状态并保留记录。"
+  ]
+}

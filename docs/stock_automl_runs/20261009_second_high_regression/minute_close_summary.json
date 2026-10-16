@@ -1,0 +1,22 @@
+{
+  "stocks": 40,
+  "days": 20,
+  "price_definition": "Each exact 1m bar close at 09:31–09:40 divided by the previous signal day's 14:40 entry price minus one",
+  "max_minute_close_above_1pct": 24,
+  "close_0940_above_1pct": 18,
+  "max_above_1pct_but_0940_not": 6,
+  "first_close_above_1pct": 10,
+  "first_close_above_1pct_and_0940_higher": 3,
+  "first_hit_close_above_1pct": 24,
+  "later_close_higher_than_first_hit": 15,
+  "0940_higher_than_first_hit": 9,
+  "0940_not_above_1pct_after_first_hit": 6,
+  "peak_to_0940_drop_median_pct_points": 0.7210995868382586,
+  "peak_to_0940_drop_over_1pp": 16,
+  "source_sha256": {
+    "docs/stock_automl_runs/20261009_second_high_regression/daily_top2_open_review.csv": "93e9195316b8bf5ceece534d518387cd19e6d386c0c6cb4ead19e30e330e40ab",
+    "docs/stock_automl_runs/20261009_close9_target/exact_1440_to_close9_candidates.csv.gz": "99263a8722907209d1cc45ffd6e3e73a1386fc36050f67e5d55f78b0c3e8942a",
+    "docs/stock_automl_runs/20261009_close10_target/exact_0931_closes.csv.gz": "c08be955894c1366b4d4dd3f2c194b9b665b03604c32d31206d7b8795693bc50",
+    "docs/stock_automl_runs/20261009_tenbar_matrix/tenbar_price_extrema.csv.gz": "502d38a7e88ffa48e5663dc9727cdc105dfb32c8bd8b5e49b24a5fb0ab796ff9"
+  }
+}

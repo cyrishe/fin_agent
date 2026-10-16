@@ -1,0 +1,853 @@
+{
+  "training_period": [
+    "2026-08-07",
+    "2026-09-29"
+  ],
+  "all_sample_rows": 12923,
+  "all_sample_days": 36,
+  "test_period": [
+    "2026-08-21",
+    "2026-09-29"
+  ],
+  "test_days": 26,
+  "pool": {
+    "n": 8851,
+    "days": 26,
+    "critical": 2750,
+    "neutral": 1508,
+    "strong": 4593,
+    "critical_rate": 0.31069935600497117,
+    "strong_rate": 0.5189244153203028,
+    "pass_rate": 0.6893006439950288
+  },
+  "top2": {
+    "n": 52,
+    "days": 26,
+    "critical": 14,
+    "neutral": 10,
+    "strong": 28,
+    "critical_rate": 0.2692307692307692,
+    "strong_rate": 0.5384615384615384,
+    "pass_rate": 0.7307692307692307
+  },
+  "top5": {
+    "n": 130,
+    "days": 26,
+    "critical": 44,
+    "neutral": 17,
+    "strong": 69,
+    "critical_rate": 0.3384615384615385,
+    "strong_rate": 0.5307692307692308,
+    "pass_rate": 0.6615384615384615
+  },
+  "by_month": [
+    {
+      "month": "2026-08",
+      "pool": {
+        "n": 2949,
+        "days": 6,
+        "critical": 807,
+        "neutral": 521,
+        "strong": 1621,
+        "critical_rate": 0.2736520854526958,
+        "strong_rate": 0.5496778569006443,
+        "pass_rate": 0.7263479145473042
+      },
+      "top2": {
+        "n": 12,
+        "days": 6,
+        "critical": 0,
+        "neutral": 4,
+        "strong": 8,
+        "critical_rate": 0.0,
+        "strong_rate": 0.6666666666666666,
+        "pass_rate": 1.0
+      },
+      "top5": {
+        "n": 30,
+        "days": 6,
+        "critical": 7,
+        "neutral": 7,
+        "strong": 16,
+        "critical_rate": 0.23333333333333334,
+        "strong_rate": 0.5333333333333333,
+        "pass_rate": 0.7666666666666667
+      }
+    },
+    {
+      "month": "2026-09",
+      "pool": {
+        "n": 5902,
+        "days": 20,
+        "critical": 1943,
+        "neutral": 987,
+        "strong": 2972,
+        "critical_rate": 0.32921043713995257,
+        "strong_rate": 0.5035581158929177,
+        "pass_rate": 0.6707895628600474
+      },
+      "top2": {
+        "n": 40,
+        "days": 20,
+        "critical": 14,
+        "neutral": 6,
+        "strong": 20,
+        "critical_rate": 0.35,
+        "strong_rate": 0.5,
+        "pass_rate": 0.65
+      },
+      "top5": {
+        "n": 100,
+        "days": 20,
+        "critical": 37,
+        "neutral": 10,
+        "strong": 53,
+        "critical_rate": 0.37,
+        "strong_rate": 0.53,
+        "pass_rate": 0.63
+      }
+    }
+  ],
+  "daily": [
+    {
+      "signal_date": "2026-08-21",
+      "pool": {
+        "n": 261,
+        "days": 1,
+        "critical": 75,
+        "neutral": 30,
+        "strong": 156,
+        "critical_rate": 0.28735632183908044,
+        "strong_rate": 0.5977011494252874,
+        "pass_rate": 0.7126436781609196
+      },
+      "top2": {
+        "n": 2,
+        "days": 1,
+        "critical": 0,
+        "neutral": 1,
+        "strong": 1,
+        "critical_rate": 0.0,
+        "strong_rate": 0.5,
+        "pass_rate": 1.0
+      },
+      "top2_min_score": 0.7421866023834833
+    },
+    {
+      "signal_date": "2026-08-25",
+      "pool": {
+        "n": 953,
+        "days": 1,
+        "critical": 207,
+        "neutral": 203,
+        "strong": 543,
+        "critical_rate": 0.21720881427072403,
+        "strong_rate": 0.5697796432318992,
+        "pass_rate": 0.782791185729276
+      },
+      "top2": {
+        "n": 2,
+        "days": 1,
+        "critical": 0,
+        "neutral": 1,
+        "strong": 1,
+        "critical_rate": 0.0,
+        "strong_rate": 0.5,
+        "pass_rate": 1.0
+      },
+      "top2_min_score": 0.8140592830403314
+    },
+    {
+      "signal_date": "2026-08-26",
+      "pool": {
+        "n": 267,
+        "days": 1,
+        "critical": 100,
+        "neutral": 48,
+        "strong": 119,
+        "critical_rate": 0.37453183520599254,
+        "strong_rate": 0.44569288389513106,
+        "pass_rate": 0.6254681647940075
+      },
+      "top2": {
+        "n": 2,
+        "days": 1,
+        "critical": 0,
+        "neutral": 1,
+        "strong": 1,
+        "critical_rate": 0.0,
+        "strong_rate": 0.5,
+        "pass_rate": 1.0
+      },
+      "top2_min_score": 0.798761447581678
+    },
+    {
+      "signal_date": "2026-08-27",
+      "pool": {
+        "n": 581,
+        "days": 1,
+        "critical": 116,
+        "neutral": 97,
+        "strong": 368,
+        "critical_rate": 0.19965576592082615,
+        "strong_rate": 0.6333907056798623,
+        "pass_rate": 0.8003442340791739
+      },
+      "top2": {
+        "n": 2,
+        "days": 1,
+        "critical": 0,
+        "neutral": 0,
+        "strong": 2,
+        "critical_rate": 0.0,
+        "strong_rate": 1.0,
+        "pass_rate": 1.0
+      },
+      "top2_min_score": 0.7964014676190178
+    },
+    {
+      "signal_date": "2026-08-28",
+      "pool": {
+        "n": 337,
+        "days": 1,
+        "critical": 153,
+        "neutral": 45,
+        "strong": 139,
+        "critical_rate": 0.4540059347181009,
+        "strong_rate": 0.4124629080118694,
+        "pass_rate": 0.5459940652818991
+      },
+      "top2": {
+        "n": 2,
+        "days": 1,
+        "critical": 0,
+        "neutral": 1,
+        "strong": 1,
+        "critical_rate": 0.0,
+        "strong_rate": 0.5,
+        "pass_rate": 1.0
+      },
+      "top2_min_score": 0.7903873482686622
+    },
+    {
+      "signal_date": "2026-08-31",
+      "pool": {
+        "n": 550,
+        "days": 1,
+        "critical": 156,
+        "neutral": 98,
+        "strong": 296,
+        "critical_rate": 0.28363636363636363,
+        "strong_rate": 0.5381818181818182,
+        "pass_rate": 0.7163636363636363
+      },
+      "top2": {
+        "n": 2,
+        "days": 1,
+        "critical": 0,
+        "neutral": 0,
+        "strong": 2,
+        "critical_rate": 0.0,
+        "strong_rate": 1.0,
+        "pass_rate": 1.0
+      },
+      "top2_min_score": 0.8371577708820227
+    },
+    {
+      "signal_date": "2026-09-01",
+      "pool": {
+        "n": 333,
+        "days": 1,
+        "critical": 196,
+        "neutral": 55,
+        "strong": 82,
+        "critical_rate": 0.5885885885885885,
+        "strong_rate": 0.24624624624624625,
+        "pass_rate": 0.4114114114114114
+      },
+      "top2": {
+        "n": 2,
+        "days": 1,
+        "critical": 0,
+        "neutral": 1,
+        "strong": 1,
+        "critical_rate": 0.0,
+        "strong_rate": 0.5,
+        "pass_rate": 1.0
+      },
+      "top2_min_score": 0.7582443037183483
+    },
+    {
+      "signal_date": "2026-09-02",
+      "pool": {
+        "n": 153,
+        "days": 1,
+        "critical": 31,
+        "neutral": 16,
+        "strong": 106,
+        "critical_rate": 0.20261437908496732,
+        "strong_rate": 0.6928104575163399,
+        "pass_rate": 0.7973856209150327
+      },
+      "top2": {
+        "n": 2,
+        "days": 1,
+        "critical": 0,
+        "neutral": 0,
+        "strong": 2,
+        "critical_rate": 0.0,
+        "strong_rate": 1.0,
+        "pass_rate": 1.0
+      },
+      "top2_min_score": 0.7517153657133148
+    },
+    {
+      "signal_date": "2026-09-03",
+      "pool": {
+        "n": 253,
+        "days": 1,
+        "critical": 35,
+        "neutral": 40,
+        "strong": 178,
+        "critical_rate": 0.1383399209486166,
+        "strong_rate": 0.7035573122529645,
+        "pass_rate": 0.8616600790513834
+      },
+      "top2": {
+        "n": 2,
+        "days": 1,
+        "critical": 0,
+        "neutral": 1,
+        "strong": 1,
+        "critical_rate": 0.0,
+        "strong_rate": 0.5,
+        "pass_rate": 1.0
+      },
+      "top2_min_score": 0.7709149249201276
+    },
+    {
+      "signal_date": "2026-09-04",
+      "pool": {
+        "n": 191,
+        "days": 1,
+        "critical": 34,
+        "neutral": 35,
+        "strong": 122,
+        "critical_rate": 0.17801047120418848,
+        "strong_rate": 0.6387434554973822,
+        "pass_rate": 0.8219895287958116
+      },
+      "top2": {
+        "n": 2,
+        "days": 1,
+        "critical": 1,
+        "neutral": 0,
+        "strong": 1,
+        "critical_rate": 0.5,
+        "strong_rate": 0.5,
+        "pass_rate": 0.5
+      },
+      "top2_min_score": 0.7497716565280824
+    },
+    {
+      "signal_date": "2026-09-07",
+      "pool": {
+        "n": 491,
+        "days": 1,
+        "critical": 129,
+        "neutral": 97,
+        "strong": 265,
+        "critical_rate": 0.26272912423625255,
+        "strong_rate": 0.539714867617108,
+        "pass_rate": 0.7372708757637475
+      },
+      "top2": {
+        "n": 2,
+        "days": 1,
+        "critical": 2,
+        "neutral": 0,
+        "strong": 0,
+        "critical_rate": 1.0,
+        "strong_rate": 0.0,
+        "pass_rate": 0.0
+      },
+      "top2_min_score": 0.8123753236693408
+    },
+    {
+      "signal_date": "2026-09-08",
+      "pool": {
+        "n": 414,
+        "days": 1,
+        "critical": 198,
+        "neutral": 59,
+        "strong": 157,
+        "critical_rate": 0.4782608695652174,
+        "strong_rate": 0.37922705314009664,
+        "pass_rate": 0.5217391304347826
+      },
+      "top2": {
+        "n": 2,
+        "days": 1,
+        "critical": 2,
+        "neutral": 0,
+        "strong": 0,
+        "critical_rate": 1.0,
+        "strong_rate": 0.0,
+        "pass_rate": 0.0
+      },
+      "top2_min_score": 0.7517162910578741
+    },
+    {
+      "signal_date": "2026-09-09",
+      "pool": {
+        "n": 195,
+        "days": 1,
+        "critical": 101,
+        "neutral": 30,
+        "strong": 64,
+        "critical_rate": 0.517948717948718,
+        "strong_rate": 0.3282051282051282,
+        "pass_rate": 0.48205128205128206
+      },
+      "top2": {
+        "n": 2,
+        "days": 1,
+        "critical": 1,
+        "neutral": 0,
+        "strong": 1,
+        "critical_rate": 0.5,
+        "strong_rate": 0.5,
+        "pass_rate": 0.5
+      },
+      "top2_min_score": 0.7593345428174834
+    },
+    {
+      "signal_date": "2026-09-10",
+      "pool": {
+        "n": 123,
+        "days": 1,
+        "critical": 83,
+        "neutral": 8,
+        "strong": 32,
+        "critical_rate": 0.6747967479674797,
+        "strong_rate": 0.2601626016260163,
+        "pass_rate": 0.3252032520325203
+      },
+      "top2": {
+        "n": 2,
+        "days": 1,
+        "critical": 1,
+        "neutral": 1,
+        "strong": 0,
+        "critical_rate": 0.5,
+        "strong_rate": 0.0,
+        "pass_rate": 0.5
+      },
+      "top2_min_score": 0.7436577285038242
+    },
+    {
+      "signal_date": "2026-09-11",
+      "pool": {
+        "n": 76,
+        "days": 1,
+        "critical": 29,
+        "neutral": 6,
+        "strong": 41,
+        "critical_rate": 0.3815789473684211,
+        "strong_rate": 0.5394736842105263,
+        "pass_rate": 0.618421052631579
+      },
+      "top2": {
+        "n": 2,
+        "days": 1,
+        "critical": 1,
+        "neutral": 0,
+        "strong": 1,
+        "critical_rate": 0.5,
+        "strong_rate": 0.5,
+        "pass_rate": 0.5
+      },
+      "top2_min_score": 0.7338139951044949
+    },
+    {
+      "signal_date": "2026-09-14",
+      "pool": {
+        "n": 253,
+        "days": 1,
+        "critical": 83,
+        "neutral": 58,
+        "strong": 112,
+        "critical_rate": 0.32806324110671936,
+        "strong_rate": 0.4426877470355731,
+        "pass_rate": 0.6719367588932806
+      },
+      "top2": {
+        "n": 2,
+        "days": 1,
+        "critical": 2,
+        "neutral": 0,
+        "strong": 0,
+        "critical_rate": 1.0,
+        "strong_rate": 0.0,
+        "pass_rate": 0.0
+      },
+      "top2_min_score": 0.7440910738106107
+    },
+    {
+      "signal_date": "2026-09-15",
+      "pool": {
+        "n": 106,
+        "days": 1,
+        "critical": 30,
+        "neutral": 14,
+        "strong": 62,
+        "critical_rate": 0.2830188679245283,
+        "strong_rate": 0.5849056603773585,
+        "pass_rate": 0.7169811320754716
+      },
+      "top2": {
+        "n": 2,
+        "days": 1,
+        "critical": 0,
+        "neutral": 0,
+        "strong": 2,
+        "critical_rate": 0.0,
+        "strong_rate": 1.0,
+        "pass_rate": 1.0
+      },
+      "top2_min_score": 0.7414458207490657
+    },
+    {
+      "signal_date": "2026-09-16",
+      "pool": {
+        "n": 437,
+        "days": 1,
+        "critical": 110,
+        "neutral": 81,
+        "strong": 246,
+        "critical_rate": 0.2517162471395881,
+        "strong_rate": 0.562929061784897,
+        "pass_rate": 0.7482837528604119
+      },
+      "top2": {
+        "n": 2,
+        "days": 1,
+        "critical": 0,
+        "neutral": 0,
+        "strong": 2,
+        "critical_rate": 0.0,
+        "strong_rate": 1.0,
+        "pass_rate": 1.0
+      },
+      "top2_min_score": 0.7712634028928446
+    },
+    {
+      "signal_date": "2026-09-17",
+      "pool": {
+        "n": 265,
+        "days": 1,
+        "critical": 55,
+        "neutral": 27,
+        "strong": 183,
+        "critical_rate": 0.20754716981132076,
+        "strong_rate": 0.690566037735849,
+        "pass_rate": 0.7924528301886793
+      },
+      "top2": {
+        "n": 2,
+        "days": 1,
+        "critical": 1,
+        "neutral": 1,
+        "strong": 0,
+        "critical_rate": 0.5,
+        "strong_rate": 0.0,
+        "pass_rate": 0.5
+      },
+      "top2_min_score": 0.7361610336584203
+    },
+    {
+      "signal_date": "2026-09-18",
+      "pool": {
+        "n": 583,
+        "days": 1,
+        "critical": 83,
+        "neutral": 81,
+        "strong": 419,
+        "critical_rate": 0.1423670668953688,
+        "strong_rate": 0.7186963979416809,
+        "pass_rate": 0.8576329331046312
+      },
+      "top2": {
+        "n": 2,
+        "days": 1,
+        "critical": 0,
+        "neutral": 0,
+        "strong": 2,
+        "critical_rate": 0.0,
+        "strong_rate": 1.0,
+        "pass_rate": 1.0
+      },
+      "top2_min_score": 0.738420420521786
+    },
+    {
+      "signal_date": "2026-09-21",
+      "pool": {
+        "n": 927,
+        "days": 1,
+        "critical": 319,
+        "neutral": 202,
+        "strong": 406,
+        "critical_rate": 0.3441208198489752,
+        "strong_rate": 0.43797195253505933,
+        "pass_rate": 0.6558791801510249
+      },
+      "top2": {
+        "n": 2,
+        "days": 1,
+        "critical": 1,
+        "neutral": 1,
+        "strong": 0,
+        "critical_rate": 0.5,
+        "strong_rate": 0.0,
+        "pass_rate": 0.5
+      },
+      "top2_min_score": 0.7785034922569938
+    },
+    {
+      "signal_date": "2026-09-22",
+      "pool": {
+        "n": 237,
+        "days": 1,
+        "critical": 102,
+        "neutral": 26,
+        "strong": 109,
+        "critical_rate": 0.43037974683544306,
+        "strong_rate": 0.459915611814346,
+        "pass_rate": 0.569620253164557
+      },
+      "top2": {
+        "n": 2,
+        "days": 1,
+        "critical": 0,
+        "neutral": 0,
+        "strong": 2,
+        "critical_rate": 0.0,
+        "strong_rate": 1.0,
+        "pass_rate": 1.0
+      },
+      "top2_min_score": 0.7483696701730611
+    },
+    {
+      "signal_date": "2026-09-23",
+      "pool": {
+        "n": 226,
+        "days": 1,
+        "critical": 106,
+        "neutral": 32,
+        "strong": 88,
+        "critical_rate": 0.4690265486725664,
+        "strong_rate": 0.3893805309734513,
+        "pass_rate": 0.5309734513274337
+      },
+      "top2": {
+        "n": 2,
+        "days": 1,
+        "critical": 0,
+        "neutral": 0,
+        "strong": 2,
+        "critical_rate": 0.0,
+        "strong_rate": 1.0,
+        "pass_rate": 1.0
+      },
+      "top2_min_score": 0.7466773215795169
+    },
+    {
+      "signal_date": "2026-09-24",
+      "pool": {
+        "n": 118,
+        "days": 1,
+        "critical": 48,
+        "neutral": 21,
+        "strong": 49,
+        "critical_rate": 0.4067796610169492,
+        "strong_rate": 0.4152542372881356,
+        "pass_rate": 0.5932203389830508
+      },
+      "top2": {
+        "n": 2,
+        "days": 1,
+        "critical": 1,
+        "neutral": 0,
+        "strong": 1,
+        "critical_rate": 0.5,
+        "strong_rate": 0.5,
+        "pass_rate": 0.5
+      },
+      "top2_min_score": 0.732847074245529
+    },
+    {
+      "signal_date": "2026-09-28",
+      "pool": {
+        "n": 93,
+        "days": 1,
+        "critical": 49,
+        "neutral": 15,
+        "strong": 29,
+        "critical_rate": 0.5268817204301075,
+        "strong_rate": 0.3118279569892473,
+        "pass_rate": 0.4731182795698925
+      },
+      "top2": {
+        "n": 2,
+        "days": 1,
+        "critical": 1,
+        "neutral": 1,
+        "strong": 0,
+        "critical_rate": 0.5,
+        "strong_rate": 0.0,
+        "pass_rate": 0.5
+      },
+      "top2_min_score": 0.7286818160908007
+    },
+    {
+      "signal_date": "2026-09-29",
+      "pool": {
+        "n": 428,
+        "days": 1,
+        "critical": 122,
+        "neutral": 84,
+        "strong": 222,
+        "critical_rate": 0.2850467289719626,
+        "strong_rate": 0.5186915887850467,
+        "pass_rate": 0.7149532710280374
+      },
+      "top2": {
+        "n": 2,
+        "days": 1,
+        "critical": 0,
+        "neutral": 0,
+        "strong": 2,
+        "critical_rate": 0.0,
+        "strong_rate": 1.0,
+        "pass_rate": 1.0
+      },
+      "top2_min_score": 0.7557492705424628
+    }
+  ],
+  "prior_test_window_top2": {
+    "n": 30,
+    "days": 15,
+    "critical": 11,
+    "neutral": 4,
+    "strong": 15,
+    "critical_rate": 0.36666666666666664,
+    "strong_rate": 0.5,
+    "pass_rate": 0.6333333333333333
+  },
+  "auc_for_pass": 0.5011447899748178,
+  "top2_mean_score_by_outcome": {
+    "pass": 0.7824657903015337,
+    "critical": 0.7772273706530168
+  },
+  "late_execution_issue_top2_count": 0,
+  "fold_coefficients": [
+    {
+      "fold": 1,
+      "train_rows": 4072,
+      "coefficients_for_pass": {
+        "signal_return": 0.064142,
+        "volume_ratio": -0.30121,
+        "turnover_so_far_pct": 0.122544,
+        "float_mv_100m_cny": 0.105326,
+        "volume_4of5_increasing": -0.111922,
+        "ma_bull_5_10_20": -0.401022,
+        "price_above_all_ma": 0.510891,
+        "all_intraday_lows_above_ma": 0.185166
+      }
+    },
+    {
+      "fold": 2,
+      "train_rows": 6471,
+      "coefficients_for_pass": {
+        "signal_return": 0.064056,
+        "volume_ratio": -0.277077,
+        "turnover_so_far_pct": 0.067115,
+        "float_mv_100m_cny": 0.067607,
+        "volume_4of5_increasing": -0.09334,
+        "ma_bull_5_10_20": -0.529656,
+        "price_above_all_ma": 0.067496,
+        "all_intraday_lows_above_ma": 0.132157
+      }
+    },
+    {
+      "fold": 3,
+      "train_rows": 7951,
+      "coefficients_for_pass": {
+        "signal_return": 0.081935,
+        "volume_ratio": -0.207994,
+        "turnover_so_far_pct": 0.021674,
+        "float_mv_100m_cny": 0.076389,
+        "volume_4of5_increasing": -0.023761,
+        "ma_bull_5_10_20": -0.393057,
+        "price_above_all_ma": -0.05683,
+        "all_intraday_lows_above_ma": 0.123609
+      }
+    },
+    {
+      "fold": 4,
+      "train_rows": 9250,
+      "coefficients_for_pass": {
+        "signal_return": 0.081509,
+        "volume_ratio": -0.204433,
+        "turnover_so_far_pct": -0.00347,
+        "float_mv_100m_cny": 0.034422,
+        "volume_4of5_increasing": -0.011455,
+        "ma_bull_5_10_20": -0.31189,
+        "price_above_all_ma": -0.087315,
+        "all_intraday_lows_above_ma": 0.136833
+      }
+    },
+    {
+      "fold": 5,
+      "train_rows": 10894,
+      "coefficients_for_pass": {
+        "signal_return": 0.072196,
+        "volume_ratio": -0.193694,
+        "turnover_so_far_pct": -0.009093,
+        "float_mv_100m_cny": 0.053537,
+        "volume_4of5_increasing": -0.010659,
+        "ma_bull_5_10_20": -0.424569,
+        "price_above_all_ma": -0.037677,
+        "all_intraday_lows_above_ma": 0.170162
+      }
+    },
+    {
+      "fold": 6,
+      "train_rows": 12495,
+      "coefficients_for_pass": {
+        "signal_return": 0.066028,
+        "volume_ratio": -0.214841,
+        "turnover_so_far_pct": -0.006989,
+        "float_mv_100m_cny": 0.045325,
+        "volume_4of5_increasing": 0.028476,
+        "ma_bull_5_10_20": -0.365471,
+        "price_above_all_ma": -0.059643,
+        "all_intraday_lows_above_ma": 0.223313
+      }
+    }
+  ],
+  "sample_audit": {
+    "requested_days": 37,
+    "missing_signal_bar_days": [
+      "2026-08-24"
+    ],
+    "trainable_min": 50,
+    "trainable_max": 953
+  },
+  "provenance_sha256": {
+    "samples": "1486fd98be0d6e633d06a297b96e76560ea2ecd124d6a8e93020fe506a2c2005",
+    "candidates": "02257881317e2f94d9dee876a26d8f101fc9c3057d6b3f795a3c11380ace8855",
+    "standard_summary": "57fdc59ccab9a0210e59f17fd5c5b30074405613e39d017b548a97ad59f37949",
+    "script": "214ef6c7379d3f0739e187a2de996fd33c6cbc7fca44132b9c4c495a8c94fdd6"
+  }
+}

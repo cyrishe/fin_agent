@@ -1,0 +1,6 @@
+interface:
+  display_name: "金融工具局部代码修改"
+  short_description: "最小修改已有工具并用合成正反例验证"
+  default_prompt: "使用 $financial-tool-edit-implementation 按 EditPlan 修改并验证现有工具。"
+policy:
+  allow_implicit_invocation: false

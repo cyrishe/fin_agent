@@ -1,0 +1,15 @@
+{
+  "name": "education_research_agent",
+  "display_name": "教研 Agent",
+  "version": "v1",
+  "status": "placeholder",
+  "enabled": true,
+  "domain": "education",
+  "role": "education_research_agent",
+  "responsibilities": [
+    "解决中国小学、初中和高中各学科的教学、学习与教研问题"
+  ],
+  "skills": [],
+  "tools": [],
+  "static_response": "你好，我是教研 Agent，还未实现。"
+}

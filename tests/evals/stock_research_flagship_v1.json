@@ -1,0 +1,148 @@
+{
+  "version": "stock_research_flagship_v1",
+  "description": "以自然用户表达验证系统旗舰 stock-research 的深度判断、公司原型适配、专业框架选择、证据边界和效率；问题不预先泄露应采用的指标清单。",
+  "cases": [
+    {
+      "id": "quick_moutai_thesis",
+      "expected_skill_id": "stock-research",
+      "research_mode": "fast",
+      "research_depth": "quick",
+      "question": "帮我判断一下，贵州茅台现在最值得关注的投资逻辑是什么？",
+      "review_criteria": [
+        "快速进入一个核心命题，不展开完整报告",
+        "使用适合成熟消费品牌的证据而非通用指标清单",
+        "给出最重要反证、时点和下一验证点"
+      ],
+      "anti_patterns": [
+        "为了完整加载全部专业方法",
+        "把品牌知名度直接等同于护城河",
+        "固定附加技术面和资金面"
+      ]
+    },
+    {
+      "id": "standard_cmb_quality_value",
+      "expected_skill_id": "stock-research",
+      "research_mode": "auto",
+      "research_depth": "standard",
+      "question": "从中长期角度分析招商银行现在的投资价值，重点告诉我逻辑成立和不成立分别要看什么。",
+      "review_criteria": [
+        "识别银行公司原型并采用资产质量、资本与PB-ROE或剩余收益视角",
+        "将经营质量、估值和失效条件连成同一命题",
+        "不因缺少某项行业数据填充默认值"
+      ],
+      "anti_patterns": [
+        "套用普通工业公司的净债务或EV-EBITDA",
+        "只因低PB给出低估结论",
+        "机械综合评分"
+      ]
+    },
+    {
+      "id": "deep_zijin_cycle_report",
+      "expected_skill_id": "stock-research",
+      "research_mode": "deep",
+      "research_depth": "deep",
+      "question": "请为紫金矿业做一份可以导出PDF的研究报告。",
+      "review_criteria": [
+        "自主选择资源周期公司的成本曲线、中周期盈利和资产负债框架",
+        "说明采用的主要方法、证据贡献和局限",
+        "形成基准、上行、下行条件而非单点预测"
+      ],
+      "anti_patterns": [
+        "把现货价格和峰值利润永续化",
+        "按框架分别拼接多个小报告",
+        "用大量原始表格替代分析"
+      ]
+    },
+    {
+      "id": "standard_tech_expectations",
+      "expected_skill_id": "stock-research",
+      "research_mode": "auto",
+      "research_depth": "standard",
+      "question": "中际旭创涨了很多，我想知道基本面是否真的能支撑目前的预期。",
+      "review_criteria": [
+        "区分技术或产品领先、客户采用、收入利润传导与价格隐含预期",
+        "核验事件首次可知时间和市场反应，不用新闻数量代替催化强度",
+        "保留拥挤、客户集中或预期过高的最强反证"
+      ],
+      "anti_patterns": [
+        "只复述近期涨幅和新闻",
+        "事后转载倒推上涨原因",
+        "把高增长直接等同于低估"
+      ]
+    },
+    {
+      "id": "missing_evidence_biotech",
+      "expected_skill_id": "stock-research",
+      "research_mode": "auto",
+      "research_depth": "standard",
+      "question": "帮我研究一下百济神州，但如果关键证据不够就直接告诉我，不要硬凑结论。",
+      "review_criteria": [
+        "识别创新药的管线、里程碑、风险调整价值和现金跑道视角",
+        "缺少正式概率或估值输入时缩小结论",
+        "清楚区分已知事实、机构预测、假设和待验证项"
+      ],
+      "anti_patterns": [
+        "模型临时编造成功概率、WACC或项目价值",
+        "用旧新闻代替缺失的结构化事实",
+        "把证据不足包装成中性评分"
+      ]
+    },
+    {
+      "id": "boundary_simple_price",
+      "expected_skill_id": "",
+      "research_mode": "auto",
+      "research_depth": "none",
+      "question": "贵州茅台现在股价是多少？",
+      "review_criteria": [
+        "作为简单金融数据查询处理，不激活stock-research"
+      ],
+      "anti_patterns": [
+        "为单一行情问题启动深度研究"
+      ]
+    },
+    {
+      "id": "auto_natural_language_deep_report",
+      "expected_skill_id": "stock-research",
+      "research_mode": "auto",
+      "research_depth": "deep",
+      "question": "帮我深度分析一下东山精密。",
+      "review_criteria": [
+        "把完整自然语言交付要求识别为深度报告，而不是因为界面处于智能模式降为标准回答",
+        "在最终综合前读取深度报告模板，并覆盖行业与公司经济引擎、经营财务与资本、增长预测、估值假设、命题反证、条件情景、观察清单和证据附录",
+        "根据公司原型选择专业方法，并用行业到公司、经营到财务、预期到估值的传导链组织分析",
+        "事实表格能够区分历史实际、机构预测和情景假设，并标明单位、时点与来源层级",
+        "新闻失败只作为事件证据缺口，不缩短与新闻独立的结构化研究内容",
+        "最终报告可脱离对话独立阅读，明确数据时点、来源层级和关键缺口"
+      ],
+      "anti_patterns": [
+        "只输出两页左右的摘要式结论并称为完整深度报告",
+        "只扩写公司简介、新闻列表、通用风险或机械评分来增加页数",
+        "没有读取报告模板就直接综合",
+        "因新闻接口失败而省略公司、财务、估值或情景分析",
+        "为了增加篇幅机械堆叠指标、新闻或固定章节"
+      ]
+    },
+    {
+      "id": "professional_maotai_deep_report",
+      "expected_skill_id": "stock-research",
+      "research_mode": "auto",
+      "research_depth": "deep",
+      "question": "请深度分析贵州茅台，生成一份可独立阅读的完整研究报告。",
+      "review_criteria": [
+        "报告具有稳定但自适应的导航，覆盖投资判断、行业与经济引擎、经营财务与资本、增长预测、估值假设、命题反证与情景、观察清单和证据附录",
+        "对白酒消费品牌使用量价、产品结构、渠道库存与价盘、直营经销、现金回款、资本回报和分配等适配镜头，不把高毛利直接等同护城河",
+        "每个主要命题包含直接事实、经营到财务的传导、最强反证和下一验证点",
+        "历史实际、机构预测、情景假设和本轮推断能够被读者区分，关键表格带单位、时点和来源层级",
+        "估值方法与成熟消费品牌、现金创造和数据质量相适配，关键假设可见且结论内部一致",
+        "报告的信息密度和方法深度明显超过固定基本面、技术、资金、新闻评分的旧式多维报告"
+      ],
+      "anti_patterns": [
+        "用固定综合分、星级、技术分、资金分或市场热度分替代投资命题",
+        "把新闻摘要列表、概念标签、公司简介或通用风险作为主要篇幅",
+        "由高毛利率直接推出定价权、护城河或推荐评级",
+        "给出没有正式模型支撑的精确目标价、仓位或止损比例",
+        "数据充分时仍只给四页左右摘要，缺少行业、资本、增长、估值假设或证据附录"
+      ]
+    }
+  ]
+}

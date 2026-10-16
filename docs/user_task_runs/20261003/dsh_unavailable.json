@@ -1,0 +1,5 @@
+{
+  "error_type": "RuntimeError",
+  "message": "DeepSeek Harness Python SDK 源码不可用：/Users/cyrcyrisis/work/fin_harness/python/sdk/src/deepseek_harness/__init__.py",
+  "coverage": "DSH conversation not verified"
+}

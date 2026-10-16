@@ -35,6 +35,7 @@ class AttachmentService:
         ".tsv": "table",
         ".xlsx": "table",
         ".xls": "table",
+        ".txt": "document",
         ".docx": "document",
         ".doc": "document",
     }
@@ -78,10 +79,10 @@ class AttachmentService:
         mime_type = self._detect_mime_type(upload, file_name)
         allowed_mime_types = self.ALLOWED_IMAGE_MIME_TYPES | self.ALLOWED_DOCUMENT_MIME_TYPES
         if mime_type not in allowed_mime_types:
-            raise AttachmentServiceError("当前仅支持 png/jpg/webp/gif 图片以及 csv/tsv/xlsx/docx 文件")
+            raise AttachmentServiceError("当前仅支持 png/jpg/webp/gif 图片以及 csv/tsv/xlsx/txt/docx 文件")
         kind = self._detect_kind(file_name, mime_type)
         if kind == "unknown":
-            raise AttachmentServiceError("当前仅支持 png/jpg/webp/gif 图片以及 csv/tsv/xlsx/docx 文件")
+            raise AttachmentServiceError("当前仅支持 png/jpg/webp/gif 图片以及 csv/tsv/xlsx/txt/docx 文件")
         attachment_id = f"att_{secrets.token_hex(12)}"
         relative_path = self._relative_file_path(attachment_id, file_name)
         absolute_path = self.upload_root / relative_path
@@ -105,7 +106,12 @@ class AttachmentService:
         meta_path.write_text(json.dumps(item, ensure_ascii=False, indent=2), encoding="utf-8")
         return item
 
-    def get_attachment(self, attachment_id: str) -> dict[str, Any] | None:
+    def get_attachment(
+        self,
+        attachment_id: str,
+        *,
+        owner_id: str | None = None,
+    ) -> dict[str, Any] | None:
         normalized_id = self._trim(attachment_id)
         if not normalized_id:
             return None
@@ -113,9 +119,14 @@ class AttachmentService:
         if not meta_path.exists():
             return None
         try:
-            return json.loads(meta_path.read_text(encoding="utf-8"))
+            item = json.loads(meta_path.read_text(encoding="utf-8"))
         except Exception:
             return None
+        if not isinstance(item, dict):
+            return None
+        if owner_id is not None and self._trim(item.get("owner_id")) != self._trim(owner_id):
+            return None
+        return item
 
     def resolve_absolute_path(self, item_or_attachment_id: Any) -> str:
         item = item_or_attachment_id
@@ -141,10 +152,19 @@ class AttachmentService:
             raise AttachmentServiceError("attachment storage_path invalid")
         return str(absolute_path)
 
-    def list_attachments(self, attachment_ids: list[Any] | None) -> list[dict[str, Any]]:
+    def list_attachments(
+        self,
+        attachment_ids: list[Any] | None,
+        *,
+        owner_id: str | None = None,
+        require_all: bool = False,
+    ) -> list[dict[str, Any]]:
         items: list[dict[str, Any]] = []
         for attachment_id in attachment_ids or []:
-            item = self.get_attachment(str(attachment_id))
+            item = self.get_attachment(str(attachment_id), owner_id=owner_id)
             if isinstance(item, dict):
                 items.append(item)
+            elif require_all:
+                # Missing and foreign IDs intentionally share one response.
+                raise AttachmentServiceError("附件不存在或无权访问")
         return items

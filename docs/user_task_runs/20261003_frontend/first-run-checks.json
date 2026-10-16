@@ -1,0 +1,72 @@
+{
+  "run_id": "run_e411b8894b02421bbc0b30913d9b18c9",
+  "constraints": {
+    "horizons": true,
+    "models": true,
+    "tasks": true,
+    "max_symbols": true,
+    "max_trials": true,
+    "rounds": true,
+    "folds": true,
+    "include_minute": true,
+    "probability_threshold": true,
+    "min_signals": true,
+    "min_win_rate": true,
+    "max_drawdown": true,
+    "start": true,
+    "end": true
+  },
+  "artifacts": [
+    {
+      "name": "研究设计",
+      "bytes": 3985,
+      "sha256": "a253d3e4469ef254e0c232e5717c02b67044a7887b581499f824ec0feb1b91e9"
+    },
+    {
+      "name": "report.md",
+      "bytes": 4813,
+      "sha256": "300baba1f98f2b179651237405eca7b594b4be65ed0e4a6d3f5c53ce565b8a6a"
+    },
+    {
+      "name": "report.json",
+      "bytes": 8586,
+      "sha256": "32735167df518356728788d18e18e61cb0418e8d9d139365e68dada3cc1fd8c8"
+    },
+    {
+      "name": "review.md",
+      "bytes": 1646,
+      "sha256": "c7ce2b08401346e5d51718cd574ee08a9e3168a3ab0b2e5a4cfeae91701f20d7"
+    },
+    {
+      "name": "review_status.json",
+      "bytes": 44,
+      "sha256": "0d77367518b7fcba9d780c8efdfea5eee0b9b7b4aa1aa0fb5da2dbc8354cb8c4"
+    },
+    {
+      "name": "review_evidence.json",
+      "bytes": 40535,
+      "sha256": "ccffc8f046b017c2c01522187eae5a5f53f1d2c4d0f850c378c0ab8e9f740f24"
+    },
+    {
+      "name": "sample_counts.json",
+      "bytes": 542,
+      "sha256": "05f30d06f548d7a9f38530b9259cebd703297449a7013b9bb7be176d886a73ef"
+    },
+    {
+      "name": "development.json",
+      "bytes": 98993,
+      "sha256": "558490a52847ec6fac00584c5b7137442b06b11ff521413fd43c7397345e1184"
+    },
+    {
+      "name": "selection.json",
+      "bytes": 6615,
+      "sha256": "075770478680ceaa884ecf1fea7b737475a83b458f28534129f3b504cf0fa24d"
+    },
+    {
+      "name": "spec.json",
+      "bytes": 1738,
+      "sha256": "0e7c2f5b6ece54bb80fe72d08d4c607135f25b955b24e744f06d0ffea376cd3a"
+    }
+  ],
+  "status": "completed"
+}

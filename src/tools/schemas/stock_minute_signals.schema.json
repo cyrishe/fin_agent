@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "required": [
+    "events",
+    "current_conditions",
+    "external_requests"
+  ],
+  "properties": {
+    "events": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "current_conditions": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "external_requests": {
+      "type": "integer"
+    }
+  },
+  "additionalProperties": true
+}

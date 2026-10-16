@@ -1,0 +1,20 @@
+{
+  "picks": 40,
+  "high_hits": 24,
+  "open_hits": 18,
+  "close_hits": 14,
+  "either_endpoint_hits": 18,
+  "high_only_hits": 6,
+  "high_hits_with_second_high_over_1pct": 14,
+  "high_hits_one_bar_only": 10,
+  "high_hits_peak_bar_close_over_1pct": 14,
+  "high_hits_next_bar_close_over_1pct": 11,
+  "high_hits_first_bar_0931": 18,
+  "high_hits_max_at_0931": 15,
+  "high_hits_with_later_bar": 20,
+  "high_hits_later_high_over_1pct": 10,
+  "high_hits_next_after_peak_high_over_1pct": 10,
+  "high_hits_next_after_peak_close_over_1pct": 8,
+  "median_peak_to_bar_close_pct": -0.007805178268251223,
+  "median_max_vs_second_high_pct_points": 0.6840142203282662
+}

@@ -124,6 +124,15 @@ class ToolAdapter:
     @staticmethod
     def _normalize_input_schema(input_schema: Dict[str, Any]) -> Dict[str, Any]:
         schema = deepcopy(input_schema if isinstance(input_schema, dict) else {})
+        # ``$id`` and ``$schema`` are local catalog metadata, not part of the
+        # model-facing function contract.  Several definitions use relative
+        # ids (for example ``financial_news_search.input.schema.json``).  The
+        # DeepSeek/OpenAI-compatible tool validator attempts to resolve those
+        # ids as URLs and rejects them with ``relative URL without a base``.
+        # Keep the callable JSON shape only; local definitions remain intact
+        # on disk for catalog validation and documentation.
+        schema.pop("$id", None)
+        schema.pop("$schema", None)
         properties = schema.get("properties") if isinstance(schema.get("properties"), dict) else {}
         if not properties:
             return schema

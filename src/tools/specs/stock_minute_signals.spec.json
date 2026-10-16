@@ -1,0 +1,47 @@
+{
+  "tool_name": "stock_minute_signals",
+  "purpose": "逐根检查当日完整分钟K，返回均线穿越、连续站稳、session MACD交叉和量能扩张事件及当前条件。普通调用按需回放；用于已有定时任务时按任务归属保存首次发现、修订与事件证据，不发送通知，不调用模型或上游行情API。",
+  "best_for": [
+    "查询指定区间曾出现的技术条件",
+    "持续检查指定股票并保留信号事实"
+  ],
+  "input_guidance": {
+    "required_fields": [
+      "codes"
+    ],
+    "optional_fields": [
+      "period",
+      "rules",
+      "confirm_bars",
+      "volume_ratio_threshold",
+      "as_of",
+      "since",
+      "max_lag_seconds"
+    ],
+    "notes": [
+      "递归指标按当日session起点计算，不等于跨日标准指标。",
+      "执行间隔与K线周期分开。5分钟K的当日MA20首次在11:10可用，MACD信号线首次在13:50可用；10分钟及更大周期当日不足34根，MACD交叉不可用。缺少预热时不产生信号。",
+      "后台任务按已启用规则和时效安排；普通观察可30分钟，较及时任务随约10分钟采集节奏检查，并安排15:10之后的收盘补扫。",
+      "events包含当日已经记录的事件；new_events表示首次发现，corrections表示历史输入修订。发现不代表通知已送达。",
+      "不默认启动任务、不推送每次触发、不将技术事件直接表达为买卖建议。"
+    ]
+  },
+  "output_guidance": {
+    "high_value_for_reasoning": [
+      "events",
+      "new_events",
+      "corrections",
+      "current_conditions",
+      "snapshots"
+    ],
+    "high_value_for_render": [
+      "events",
+      "current_conditions"
+    ],
+    "usually_too_large_for_prompt": [
+      "snapshots"
+    ],
+    "drop_default": [],
+    "recommended_reducers": {}
+  }
+}

@@ -10,6 +10,18 @@ Write one Python function `compute(df)` for a controlled dataframe calculation.
 
 `df` is a pandas DataFrame loaded from the current quote dataview.
 
+The provider serializes dates and timestamps as ISO strings before building
+`df`; they are not pandas datetime columns. Convert the relevant column with
+`pd.to_datetime` before datetime arithmetic or `.dt` access. Security codes and
+names remain text; numeric fields are numbers with missing values preserved.
+
+The data provider has already selected the input window. Use its observed
+coverage below as the calculation input; only narrow it further when the task
+explicitly needs a subwindow. The last observation is a data cutoff, not an
+inferred current date.
+
+{{input_context}}
+
 Available columns:
 
 {{columns}}

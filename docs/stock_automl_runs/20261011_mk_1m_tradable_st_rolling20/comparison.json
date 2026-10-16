@@ -1,0 +1,34 @@
+{
+  "tradable_st_20d": {
+    "selected_days": 115,
+    "observed_days": 115,
+    "ge3": 20,
+    "mean_return_pct": 0.12775215694879036
+  },
+  "no_st_20d": {
+    "selected_days": 113,
+    "observed_days": 113,
+    "ge3": 17,
+    "mean_return_pct": 0.004150351161916851
+  },
+  "original_model_nonlimit_rerank_20d": {
+    "selected_days": 116,
+    "observed_days": 116,
+    "ge3": 17,
+    "mean_return_pct": 0.11635924467679315
+  },
+  "paired_common_days": {
+    "days": 112,
+    "same_top1_stock": 57,
+    "mean_delta_pct_points": -0.02741880351522681,
+    "better_days": 28,
+    "worse_days": 27,
+    "same_return_days": 57
+  },
+  "selected_historical_st": {
+    "trades": 8,
+    "at_entry_limit": 0,
+    "sale_ge3": 0,
+    "mean_sale_return_pct": -0.5653763028530574
+  }
+}

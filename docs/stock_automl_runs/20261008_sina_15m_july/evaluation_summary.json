@@ -1,0 +1,3280 @@
+{
+  "training_signal_dates": [
+    "2026-08-25",
+    "2026-08-26",
+    "2026-08-27",
+    "2026-08-28",
+    "2026-08-31",
+    "2026-09-01",
+    "2026-09-02",
+    "2026-09-03",
+    "2026-09-04",
+    "2026-09-07",
+    "2026-09-08",
+    "2026-09-09",
+    "2026-09-10",
+    "2026-09-11",
+    "2026-09-14",
+    "2026-09-15",
+    "2026-09-16",
+    "2026-09-17",
+    "2026-09-18",
+    "2026-09-21"
+  ],
+  "train_label": "T+1 first 10m high / T 14:50 proxy - 1",
+  "exact_test_label": "T+1 first 10m high / T 14:50 proxy - 1",
+  "july_proxy_label": "T+1 first 15m high / T 14:45 proxy - 1",
+  "score_calibrated": false,
+  "sources": {
+    "exact_1m": {
+      "signal_dates": [
+        "2026-08-05",
+        "2026-08-06",
+        "2026-08-07",
+        "2026-08-10",
+        "2026-08-11",
+        "2026-08-12",
+        "2026-08-13",
+        "2026-08-14",
+        "2026-08-17",
+        "2026-08-18",
+        "2026-08-19",
+        "2026-08-20",
+        "2026-08-21",
+        "2026-08-24",
+        "2026-09-22",
+        "2026-09-23",
+        "2026-09-24",
+        "2026-09-28",
+        "2026-09-29",
+        "2026-09-30"
+      ],
+      "models": [
+        {
+          "model": "固定八因子",
+          "features": [
+            "signal_return",
+            "volume_ratio",
+            "turnover_so_far_pct",
+            "float_mv_100m_cny",
+            "volume_4of5_increasing",
+            "ma_bull_5_10_20",
+            "price_above_all_ma",
+            "all_intraday_lows_above_ma"
+          ],
+          "training_days": 20,
+          "training_rows": 7488,
+          "candidate_pool": {
+            "days": 20,
+            "stocks": 6804,
+            "strong": 3166,
+            "neutral": 923,
+            "critical": 2715,
+            "strong_rate": 0.4653145208700764,
+            "pass_rate": 0.6009700176366843,
+            "critical_rate": 0.3990299823633157
+          },
+          "top1": {
+            "days": 20,
+            "stocks": 20,
+            "strong": 9,
+            "neutral": 6,
+            "critical": 5,
+            "strong_rate": 0.45,
+            "pass_rate": 0.75,
+            "critical_rate": 0.25
+          },
+          "top2": {
+            "days": 20,
+            "stocks": 40,
+            "strong": 24,
+            "neutral": 7,
+            "critical": 9,
+            "strong_rate": 0.6,
+            "pass_rate": 0.775,
+            "critical_rate": 0.225
+          },
+          "top5": {
+            "days": 20,
+            "stocks": 100,
+            "strong": 57,
+            "neutral": 17,
+            "critical": 26,
+            "strong_rate": 0.57,
+            "pass_rate": 0.74,
+            "critical_rate": 0.26
+          },
+          "by_rank": {
+            "1": {
+              "days": 20,
+              "stocks": 20,
+              "strong": 9,
+              "neutral": 6,
+              "critical": 5,
+              "strong_rate": 0.45,
+              "pass_rate": 0.75,
+              "critical_rate": 0.25
+            },
+            "2": {
+              "days": 20,
+              "stocks": 20,
+              "strong": 15,
+              "neutral": 1,
+              "critical": 4,
+              "strong_rate": 0.75,
+              "pass_rate": 0.8,
+              "critical_rate": 0.2
+            },
+            "3": {
+              "days": 20,
+              "stocks": 20,
+              "strong": 10,
+              "neutral": 4,
+              "critical": 6,
+              "strong_rate": 0.5,
+              "pass_rate": 0.7,
+              "critical_rate": 0.3
+            },
+            "4": {
+              "days": 20,
+              "stocks": 20,
+              "strong": 12,
+              "neutral": 3,
+              "critical": 5,
+              "strong_rate": 0.6,
+              "pass_rate": 0.75,
+              "critical_rate": 0.25
+            },
+            "5": {
+              "days": 20,
+              "stocks": 20,
+              "strong": 11,
+              "neutral": 3,
+              "critical": 6,
+              "strong_rate": 0.55,
+              "pass_rate": 0.7,
+              "critical_rate": 0.3
+            }
+          },
+          "daily": {
+            "2026-08-05": {
+              "candidate_pool": {
+                "days": 1,
+                "stocks": 705,
+                "strong": 307,
+                "neutral": 77,
+                "critical": 321,
+                "strong_rate": 0.43546099290780144,
+                "pass_rate": 0.5446808510638298,
+                "critical_rate": 0.4553191489361702
+              },
+              "top2": {
+                "days": 1,
+                "stocks": 2,
+                "strong": 0,
+                "neutral": 0,
+                "critical": 2,
+                "strong_rate": 0.0,
+                "pass_rate": 0.0,
+                "critical_rate": 1.0
+              },
+              "top5": {
+                "days": 1,
+                "stocks": 5,
+                "strong": 2,
+                "neutral": 0,
+                "critical": 3,
+                "strong_rate": 0.4,
+                "pass_rate": 0.4,
+                "critical_rate": 0.6
+              }
+            },
+            "2026-08-06": {
+              "candidate_pool": {
+                "days": 1,
+                "stocks": 311,
+                "strong": 194,
+                "neutral": 40,
+                "critical": 77,
+                "strong_rate": 0.6237942122186495,
+                "pass_rate": 0.752411575562701,
+                "critical_rate": 0.24758842443729903
+              },
+              "top2": {
+                "days": 1,
+                "stocks": 2,
+                "strong": 2,
+                "neutral": 0,
+                "critical": 0,
+                "strong_rate": 1.0,
+                "pass_rate": 1.0,
+                "critical_rate": 0.0
+              },
+              "top5": {
+                "days": 1,
+                "stocks": 5,
+                "strong": 4,
+                "neutral": 1,
+                "critical": 0,
+                "strong_rate": 0.8,
+                "pass_rate": 1.0,
+                "critical_rate": 0.0
+              }
+            },
+            "2026-08-07": {
+              "candidate_pool": {
+                "days": 1,
+                "stocks": 513,
+                "strong": 353,
+                "neutral": 80,
+                "critical": 80,
+                "strong_rate": 0.6881091617933723,
+                "pass_rate": 0.8440545808966862,
+                "critical_rate": 0.15594541910331383
+              },
+              "top2": {
+                "days": 1,
+                "stocks": 2,
+                "strong": 2,
+                "neutral": 0,
+                "critical": 0,
+                "strong_rate": 1.0,
+                "pass_rate": 1.0,
+                "critical_rate": 0.0
+              },
+              "top5": {
+                "days": 1,
+                "stocks": 5,
+                "strong": 5,
+                "neutral": 0,
+                "critical": 0,
+                "strong_rate": 1.0,
+                "pass_rate": 1.0,
+                "critical_rate": 0.0
+              }
+            },
+            "2026-08-10": {
+              "candidate_pool": {
+                "days": 1,
+                "stocks": 718,
+                "strong": 189,
+                "neutral": 136,
+                "critical": 393,
+                "strong_rate": 0.26323119777158777,
+                "pass_rate": 0.45264623955431754,
+                "critical_rate": 0.5473537604456824
+              },
+              "top2": {
+                "days": 1,
+                "stocks": 2,
+                "strong": 1,
+                "neutral": 0,
+                "critical": 1,
+                "strong_rate": 0.5,
+                "pass_rate": 0.5,
+                "critical_rate": 0.5
+              },
+              "top5": {
+                "days": 1,
+                "stocks": 5,
+                "strong": 2,
+                "neutral": 0,
+                "critical": 3,
+                "strong_rate": 0.4,
+                "pass_rate": 0.4,
+                "critical_rate": 0.6
+              }
+            },
+            "2026-08-11": {
+              "candidate_pool": {
+                "days": 1,
+                "stocks": 192,
+                "strong": 103,
+                "neutral": 23,
+                "critical": 66,
+                "strong_rate": 0.5364583333333334,
+                "pass_rate": 0.65625,
+                "critical_rate": 0.34375
+              },
+              "top2": {
+                "days": 1,
+                "stocks": 2,
+                "strong": 2,
+                "neutral": 0,
+                "critical": 0,
+                "strong_rate": 1.0,
+                "pass_rate": 1.0,
+                "critical_rate": 0.0
+              },
+              "top5": {
+                "days": 1,
+                "stocks": 5,
+                "strong": 4,
+                "neutral": 0,
+                "critical": 1,
+                "strong_rate": 0.8,
+                "pass_rate": 0.8,
+                "critical_rate": 0.2
+              }
+            },
+            "2026-08-12": {
+              "candidate_pool": {
+                "days": 1,
+                "stocks": 454,
+                "strong": 296,
+                "neutral": 49,
+                "critical": 109,
+                "strong_rate": 0.6519823788546255,
+                "pass_rate": 0.7599118942731278,
+                "critical_rate": 0.24008810572687225
+              },
+              "top2": {
+                "days": 1,
+                "stocks": 2,
+                "strong": 2,
+                "neutral": 0,
+                "critical": 0,
+                "strong_rate": 1.0,
+                "pass_rate": 1.0,
+                "critical_rate": 0.0
+              },
+              "top5": {
+                "days": 1,
+                "stocks": 5,
+                "strong": 5,
+                "neutral": 0,
+                "critical": 0,
+                "strong_rate": 1.0,
+                "pass_rate": 1.0,
+                "critical_rate": 0.0
+              }
+            },
+            "2026-08-13": {
+              "candidate_pool": {
+                "days": 1,
+                "stocks": 186,
+                "strong": 101,
+                "neutral": 21,
+                "critical": 64,
+                "strong_rate": 0.543010752688172,
+                "pass_rate": 0.6559139784946236,
+                "critical_rate": 0.34408602150537637
+              },
+              "top2": {
+                "days": 1,
+                "stocks": 2,
+                "strong": 2,
+                "neutral": 0,
+                "critical": 0,
+                "strong_rate": 1.0,
+                "pass_rate": 1.0,
+                "critical_rate": 0.0
+              },
+              "top5": {
+                "days": 1,
+                "stocks": 5,
+                "strong": 3,
+                "neutral": 0,
+                "critical": 2,
+                "strong_rate": 0.6,
+                "pass_rate": 0.6,
+                "critical_rate": 0.4
+              }
+            },
+            "2026-08-14": {
+              "candidate_pool": {
+                "days": 1,
+                "stocks": 276,
+                "strong": 183,
+                "neutral": 27,
+                "critical": 66,
+                "strong_rate": 0.6630434782608695,
+                "pass_rate": 0.7608695652173914,
+                "critical_rate": 0.2391304347826087
+              },
+              "top2": {
+                "days": 1,
+                "stocks": 2,
+                "strong": 2,
+                "neutral": 0,
+                "critical": 0,
+                "strong_rate": 1.0,
+                "pass_rate": 1.0,
+                "critical_rate": 0.0
+              },
+              "top5": {
+                "days": 1,
+                "stocks": 5,
+                "strong": 4,
+                "neutral": 0,
+                "critical": 1,
+                "strong_rate": 0.8,
+                "pass_rate": 0.8,
+                "critical_rate": 0.2
+              }
+            },
+            "2026-08-17": {
+              "candidate_pool": {
+                "days": 1,
+                "stocks": 703,
+                "strong": 388,
+                "neutral": 124,
+                "critical": 191,
+                "strong_rate": 0.5519203413940256,
+                "pass_rate": 0.7283072546230441,
+                "critical_rate": 0.2716927453769559
+              },
+              "top2": {
+                "days": 1,
+                "stocks": 2,
+                "strong": 0,
+                "neutral": 2,
+                "critical": 0,
+                "strong_rate": 0.0,
+                "pass_rate": 1.0,
+                "critical_rate": 0.0
+              },
+              "top5": {
+                "days": 1,
+                "stocks": 5,
+                "strong": 2,
+                "neutral": 3,
+                "critical": 0,
+                "strong_rate": 0.4,
+                "pass_rate": 1.0,
+                "critical_rate": 0.0
+              }
+            },
+            "2026-08-18": {
+              "candidate_pool": {
+                "days": 1,
+                "stocks": 308,
+                "strong": 68,
+                "neutral": 23,
+                "critical": 217,
+                "strong_rate": 0.22077922077922077,
+                "pass_rate": 0.29545454545454547,
+                "critical_rate": 0.7045454545454546
+              },
+              "top2": {
+                "days": 1,
+                "stocks": 2,
+                "strong": 0,
+                "neutral": 0,
+                "critical": 2,
+                "strong_rate": 0.0,
+                "pass_rate": 0.0,
+                "critical_rate": 1.0
+              },
+              "top5": {
+                "days": 1,
+                "stocks": 5,
+                "strong": 1,
+                "neutral": 0,
+                "critical": 4,
+                "strong_rate": 0.2,
+                "pass_rate": 0.2,
+                "critical_rate": 0.8
+              }
+            },
+            "2026-08-19": {
+              "candidate_pool": {
+                "days": 1,
+                "stocks": 50,
+                "strong": 25,
+                "neutral": 4,
+                "critical": 21,
+                "strong_rate": 0.5,
+                "pass_rate": 0.58,
+                "critical_rate": 0.42
+              },
+              "top2": {
+                "days": 1,
+                "stocks": 2,
+                "strong": 1,
+                "neutral": 1,
+                "critical": 0,
+                "strong_rate": 0.5,
+                "pass_rate": 1.0,
+                "critical_rate": 0.0
+              },
+              "top5": {
+                "days": 1,
+                "stocks": 5,
+                "strong": 4,
+                "neutral": 1,
+                "critical": 0,
+                "strong_rate": 0.8,
+                "pass_rate": 1.0,
+                "critical_rate": 0.0
+              }
+            },
+            "2026-08-20": {
+              "candidate_pool": {
+                "days": 1,
+                "stocks": 672,
+                "strong": 113,
+                "neutral": 64,
+                "critical": 495,
+                "strong_rate": 0.16815476190476192,
+                "pass_rate": 0.26339285714285715,
+                "critical_rate": 0.7366071428571429
+              },
+              "top2": {
+                "days": 1,
+                "stocks": 2,
+                "strong": 0,
+                "neutral": 1,
+                "critical": 1,
+                "strong_rate": 0.0,
+                "pass_rate": 0.5,
+                "critical_rate": 0.5
+              },
+              "top5": {
+                "days": 1,
+                "stocks": 5,
+                "strong": 1,
+                "neutral": 1,
+                "critical": 3,
+                "strong_rate": 0.2,
+                "pass_rate": 0.4,
+                "critical_rate": 0.6
+              }
+            },
+            "2026-08-21": {
+              "candidate_pool": {
+                "days": 1,
+                "stocks": 261,
+                "strong": 156,
+                "neutral": 30,
+                "critical": 75,
+                "strong_rate": 0.5977011494252874,
+                "pass_rate": 0.7126436781609196,
+                "critical_rate": 0.28735632183908044
+              },
+              "top2": {
+                "days": 1,
+                "stocks": 2,
+                "strong": 0,
+                "neutral": 1,
+                "critical": 1,
+                "strong_rate": 0.0,
+                "pass_rate": 0.5,
+                "critical_rate": 0.5
+              },
+              "top5": {
+                "days": 1,
+                "stocks": 5,
+                "strong": 1,
+                "neutral": 3,
+                "critical": 1,
+                "strong_rate": 0.2,
+                "pass_rate": 0.8,
+                "critical_rate": 0.2
+              }
+            },
+            "2026-08-24": {
+              "candidate_pool": {
+                "days": 1,
+                "stocks": 104,
+                "strong": 41,
+                "neutral": 14,
+                "critical": 49,
+                "strong_rate": 0.3942307692307692,
+                "pass_rate": 0.5288461538461539,
+                "critical_rate": 0.47115384615384615
+              },
+              "top2": {
+                "days": 1,
+                "stocks": 2,
+                "strong": 1,
+                "neutral": 0,
+                "critical": 1,
+                "strong_rate": 0.5,
+                "pass_rate": 0.5,
+                "critical_rate": 0.5
+              },
+              "top5": {
+                "days": 1,
+                "stocks": 5,
+                "strong": 2,
+                "neutral": 1,
+                "critical": 2,
+                "strong_rate": 0.4,
+                "pass_rate": 0.6,
+                "critical_rate": 0.4
+              }
+            },
+            "2026-09-22": {
+              "candidate_pool": {
+                "days": 1,
+                "stocks": 237,
+                "strong": 109,
+                "neutral": 26,
+                "critical": 102,
+                "strong_rate": 0.459915611814346,
+                "pass_rate": 0.569620253164557,
+                "critical_rate": 0.43037974683544306
+              },
+              "top2": {
+                "days": 1,
+                "stocks": 2,
+                "strong": 2,
+                "neutral": 0,
+                "critical": 0,
+                "strong_rate": 1.0,
+                "pass_rate": 1.0,
+                "critical_rate": 0.0
+              },
+              "top5": {
+                "days": 1,
+                "stocks": 5,
+                "strong": 3,
+                "neutral": 1,
+                "critical": 1,
+                "strong_rate": 0.6,
+                "pass_rate": 0.8,
+                "critical_rate": 0.2
+              }
+            },
+            "2026-09-23": {
+              "candidate_pool": {
+                "days": 1,
+                "stocks": 226,
+                "strong": 88,
+                "neutral": 32,
+                "critical": 106,
+                "strong_rate": 0.3893805309734513,
+                "pass_rate": 0.5309734513274337,
+                "critical_rate": 0.4690265486725664
+              },
+              "top2": {
+                "days": 1,
+                "stocks": 2,
+                "strong": 2,
+                "neutral": 0,
+                "critical": 0,
+                "strong_rate": 1.0,
+                "pass_rate": 1.0,
+                "critical_rate": 0.0
+              },
+              "top5": {
+                "days": 1,
+                "stocks": 5,
+                "strong": 4,
+                "neutral": 0,
+                "critical": 1,
+                "strong_rate": 0.8,
+                "pass_rate": 0.8,
+                "critical_rate": 0.2
+              }
+            },
+            "2026-09-24": {
+              "candidate_pool": {
+                "days": 1,
+                "stocks": 118,
+                "strong": 49,
+                "neutral": 21,
+                "critical": 48,
+                "strong_rate": 0.4152542372881356,
+                "pass_rate": 0.5932203389830508,
+                "critical_rate": 0.4067796610169492
+              },
+              "top2": {
+                "days": 1,
+                "stocks": 2,
+                "strong": 1,
+                "neutral": 1,
+                "critical": 0,
+                "strong_rate": 0.5,
+                "pass_rate": 1.0,
+                "critical_rate": 0.0
+              },
+              "top5": {
+                "days": 1,
+                "stocks": 5,
+                "strong": 3,
+                "neutral": 1,
+                "critical": 1,
+                "strong_rate": 0.6,
+                "pass_rate": 0.8,
+                "critical_rate": 0.2
+              }
+            },
+            "2026-09-28": {
+              "candidate_pool": {
+                "days": 1,
+                "stocks": 93,
+                "strong": 29,
+                "neutral": 15,
+                "critical": 49,
+                "strong_rate": 0.3118279569892473,
+                "pass_rate": 0.4731182795698925,
+                "critical_rate": 0.5268817204301075
+              },
+              "top2": {
+                "days": 1,
+                "stocks": 2,
+                "strong": 1,
+                "neutral": 0,
+                "critical": 1,
+                "strong_rate": 0.5,
+                "pass_rate": 0.5,
+                "critical_rate": 0.5
+              },
+              "top5": {
+                "days": 1,
+                "stocks": 5,
+                "strong": 1,
+                "neutral": 2,
+                "critical": 2,
+                "strong_rate": 0.2,
+                "pass_rate": 0.6,
+                "critical_rate": 0.4
+              }
+            },
+            "2026-09-29": {
+              "candidate_pool": {
+                "days": 1,
+                "stocks": 428,
+                "strong": 222,
+                "neutral": 84,
+                "critical": 122,
+                "strong_rate": 0.5186915887850467,
+                "pass_rate": 0.7149532710280374,
+                "critical_rate": 0.2850467289719626
+              },
+              "top2": {
+                "days": 1,
+                "stocks": 2,
+                "strong": 2,
+                "neutral": 0,
+                "critical": 0,
+                "strong_rate": 1.0,
+                "pass_rate": 1.0,
+                "critical_rate": 0.0
+              },
+              "top5": {
+                "days": 1,
+                "stocks": 5,
+                "strong": 4,
+                "neutral": 0,
+                "critical": 1,
+                "strong_rate": 0.8,
+                "pass_rate": 0.8,
+                "critical_rate": 0.2
+              }
+            },
+            "2026-09-30": {
+              "candidate_pool": {
+                "days": 1,
+                "stocks": 249,
+                "strong": 152,
+                "neutral": 33,
+                "critical": 64,
+                "strong_rate": 0.6104417670682731,
+                "pass_rate": 0.7429718875502008,
+                "critical_rate": 0.2570281124497992
+              },
+              "top2": {
+                "days": 1,
+                "stocks": 2,
+                "strong": 1,
+                "neutral": 1,
+                "critical": 0,
+                "strong_rate": 0.5,
+                "pass_rate": 1.0,
+                "critical_rate": 0.0
+              },
+              "top5": {
+                "days": 1,
+                "stocks": 5,
+                "strong": 2,
+                "neutral": 3,
+                "critical": 0,
+                "strong_rate": 0.4,
+                "pass_rate": 1.0,
+                "critical_rate": 0.0
+              }
+            }
+          }
+        },
+        {
+          "model": "精确训练七因子_去当前价高于均线",
+          "features": [
+            "signal_return",
+            "volume_ratio",
+            "turnover_so_far_pct",
+            "float_mv_100m_cny",
+            "volume_4of5_increasing",
+            "ma_bull_5_10_20",
+            "all_intraday_lows_above_ma"
+          ],
+          "training_days": 20,
+          "training_rows": 7488,
+          "candidate_pool": {
+            "days": 20,
+            "stocks": 6804,
+            "strong": 3166,
+            "neutral": 923,
+            "critical": 2715,
+            "strong_rate": 0.4653145208700764,
+            "pass_rate": 0.6009700176366843,
+            "critical_rate": 0.3990299823633157
+          },
+          "top1": {
+            "days": 20,
+            "stocks": 20,
+            "strong": 10,
+            "neutral": 5,
+            "critical": 5,
+            "strong_rate": 0.5,
+            "pass_rate": 0.75,
+            "critical_rate": 0.25
+          },
+          "top2": {
+            "days": 20,
+            "stocks": 40,
+            "strong": 24,
+            "neutral": 8,
+            "critical": 8,
+            "strong_rate": 0.6,
+            "pass_rate": 0.8,
+            "critical_rate": 0.2
+          },
+          "top5": {
+            "days": 20,
+            "stocks": 100,
+            "strong": 56,
+            "neutral": 15,
+            "critical": 29,
+            "strong_rate": 0.56,
+            "pass_rate": 0.71,
+            "critical_rate": 0.29
+          },
+          "by_rank": {
+            "1": {
+              "days": 20,
+              "stocks": 20,
+              "strong": 10,
+              "neutral": 5,
+              "critical": 5,
+              "strong_rate": 0.5,
+              "pass_rate": 0.75,
+              "critical_rate": 0.25
+            },
+            "2": {
+              "days": 20,
+              "stocks": 20,
+              "strong": 14,
+              "neutral": 3,
+              "critical": 3,
+              "strong_rate": 0.7,
+              "pass_rate": 0.85,
+              "critical_rate": 0.15
+            },
+            "3": {
+              "days": 20,
+              "stocks": 20,
+              "strong": 11,
+              "neutral": 1,
+              "critical": 8,
+              "strong_rate": 0.55,
+              "pass_rate": 0.6,
+              "critical_rate": 0.4
+            },
+            "4": {
+              "days": 20,
+              "stocks": 20,
+              "strong": 10,
+              "neutral": 3,
+              "critical": 7,
+              "strong_rate": 0.5,
+              "pass_rate": 0.65,
+              "critical_rate": 0.35
+            },
+            "5": {
+              "days": 20,
+              "stocks": 20,
+              "strong": 11,
+              "neutral": 3,
+              "critical": 6,
+              "strong_rate": 0.55,
+              "pass_rate": 0.7,
+              "critical_rate": 0.3
+            }
+          },
+          "daily": {
+            "2026-08-05": {
+              "candidate_pool": {
+                "days": 1,
+                "stocks": 705,
+                "strong": 307,
+                "neutral": 77,
+                "critical": 321,
+                "strong_rate": 0.43546099290780144,
+                "pass_rate": 0.5446808510638298,
+                "critical_rate": 0.4553191489361702
+              },
+              "top2": {
+                "days": 1,
+                "stocks": 2,
+                "strong": 0,
+                "neutral": 0,
+                "critical": 2,
+                "strong_rate": 0.0,
+                "pass_rate": 0.0,
+                "critical_rate": 1.0
+              },
+              "top5": {
+                "days": 1,
+                "stocks": 5,
+                "strong": 2,
+                "neutral": 0,
+                "critical": 3,
+                "strong_rate": 0.4,
+                "pass_rate": 0.4,
+                "critical_rate": 0.6
+              }
+            },
+            "2026-08-06": {
+              "candidate_pool": {
+                "days": 1,
+                "stocks": 311,
+                "strong": 194,
+                "neutral": 40,
+                "critical": 77,
+                "strong_rate": 0.6237942122186495,
+                "pass_rate": 0.752411575562701,
+                "critical_rate": 0.24758842443729903
+              },
+              "top2": {
+                "days": 1,
+                "stocks": 2,
+                "strong": 2,
+                "neutral": 0,
+                "critical": 0,
+                "strong_rate": 1.0,
+                "pass_rate": 1.0,
+                "critical_rate": 0.0
+              },
+              "top5": {
+                "days": 1,
+                "stocks": 5,
+                "strong": 4,
+                "neutral": 0,
+                "critical": 1,
+                "strong_rate": 0.8,
+                "pass_rate": 0.8,
+                "critical_rate": 0.2
+              }
+            },
+            "2026-08-07": {
+              "candidate_pool": {
+                "days": 1,
+                "stocks": 513,
+                "strong": 353,
+                "neutral": 80,
+                "critical": 80,
+                "strong_rate": 0.6881091617933723,
+                "pass_rate": 0.8440545808966862,
+                "critical_rate": 0.15594541910331383
+              },
+              "top2": {
+                "days": 1,
+                "stocks": 2,
+                "strong": 2,
+                "neutral": 0,
+                "critical": 0,
+                "strong_rate": 1.0,
+                "pass_rate": 1.0,
+                "critical_rate": 0.0
+              },
+              "top5": {
+                "days": 1,
+                "stocks": 5,
+                "strong": 5,
+                "neutral": 0,
+                "critical": 0,
+                "strong_rate": 1.0,
+                "pass_rate": 1.0,
+                "critical_rate": 0.0
+              }
+            },
+            "2026-08-10": {
+              "candidate_pool": {
+                "days": 1,
+                "stocks": 718,
+                "strong": 189,
+                "neutral": 136,
+                "critical": 393,
+                "strong_rate": 0.26323119777158777,
+                "pass_rate": 0.45264623955431754,
+                "critical_rate": 0.5473537604456824
+              },
+              "top2": {
+                "days": 1,
+                "stocks": 2,
+                "strong": 1,
+                "neutral": 0,
+                "critical": 1,
+                "strong_rate": 0.5,
+                "pass_rate": 0.5,
+                "critical_rate": 0.5
+              },
+              "top5": {
+                "days": 1,
+                "stocks": 5,
+                "strong": 2,
+                "neutral": 0,
+                "critical": 3,
+                "strong_rate": 0.4,
+                "pass_rate": 0.4,
+                "critical_rate": 0.6
+              }
+            },
+            "2026-08-11": {
+              "candidate_pool": {
+                "days": 1,
+                "stocks": 192,
+                "strong": 103,
+                "neutral": 23,
+                "critical": 66,
+                "strong_rate": 0.5364583333333334,
+                "pass_rate": 0.65625,
+                "critical_rate": 0.34375
+              },
+              "top2": {
+                "days": 1,
+                "stocks": 2,
+                "strong": 2,
+                "neutral": 0,
+                "critical": 0,
+                "strong_rate": 1.0,
+                "pass_rate": 1.0,
+                "critical_rate": 0.0
+              },
+              "top5": {
+                "days": 1,
+                "stocks": 5,
+                "strong": 4,
+                "neutral": 0,
+                "critical": 1,
+                "strong_rate": 0.8,
+                "pass_rate": 0.8,
+                "critical_rate": 0.2
+              }
+            },
+            "2026-08-12": {
+              "candidate_pool": {
+                "days": 1,
+                "stocks": 454,
+                "strong": 296,
+                "neutral": 49,
+                "critical": 109,
+                "strong_rate": 0.6519823788546255,
+                "pass_rate": 0.7599118942731278,
+                "critical_rate": 0.24008810572687225
+              },
+              "top2": {
+                "days": 1,
+                "stocks": 2,
+                "strong": 2,
+                "neutral": 0,
+                "critical": 0,
+                "strong_rate": 1.0,
+                "pass_rate": 1.0,
+                "critical_rate": 0.0
+              },
+              "top5": {
+                "days": 1,
+                "stocks": 5,
+                "strong": 5,
+                "neutral": 0,
+                "critical": 0,
+                "strong_rate": 1.0,
+                "pass_rate": 1.0,
+                "critical_rate": 0.0
+              }
+            },
+            "2026-08-13": {
+              "candidate_pool": {
+                "days": 1,
+                "stocks": 186,
+                "strong": 101,
+                "neutral": 21,
+                "critical": 64,
+                "strong_rate": 0.543010752688172,
+                "pass_rate": 0.6559139784946236,
+                "critical_rate": 0.34408602150537637
+              },
+              "top2": {
+                "days": 1,
+                "stocks": 2,
+                "strong": 2,
+                "neutral": 0,
+                "critical": 0,
+                "strong_rate": 1.0,
+                "pass_rate": 1.0,
+                "critical_rate": 0.0
+              },
+              "top5": {
+                "days": 1,
+                "stocks": 5,
+                "strong": 3,
+                "neutral": 0,
+                "critical": 2,
+                "strong_rate": 0.6,
+                "pass_rate": 0.6,
+                "critical_rate": 0.4
+              }
+            },
+            "2026-08-14": {
+              "candidate_pool": {
+                "days": 1,
+                "stocks": 276,
+                "strong": 183,
+                "neutral": 27,
+                "critical": 66,
+                "strong_rate": 0.6630434782608695,
+                "pass_rate": 0.7608695652173914,
+                "critical_rate": 0.2391304347826087
+              },
+              "top2": {
+                "days": 1,
+                "stocks": 2,
+                "strong": 2,
+                "neutral": 0,
+                "critical": 0,
+                "strong_rate": 1.0,
+                "pass_rate": 1.0,
+                "critical_rate": 0.0
+              },
+              "top5": {
+                "days": 1,
+                "stocks": 5,
+                "strong": 4,
+                "neutral": 0,
+                "critical": 1,
+                "strong_rate": 0.8,
+                "pass_rate": 0.8,
+                "critical_rate": 0.2
+              }
+            },
+            "2026-08-17": {
+              "candidate_pool": {
+                "days": 1,
+                "stocks": 703,
+                "strong": 388,
+                "neutral": 124,
+                "critical": 191,
+                "strong_rate": 0.5519203413940256,
+                "pass_rate": 0.7283072546230441,
+                "critical_rate": 0.2716927453769559
+              },
+              "top2": {
+                "days": 1,
+                "stocks": 2,
+                "strong": 0,
+                "neutral": 2,
+                "critical": 0,
+                "strong_rate": 0.0,
+                "pass_rate": 1.0,
+                "critical_rate": 0.0
+              },
+              "top5": {
+                "days": 1,
+                "stocks": 5,
+                "strong": 2,
+                "neutral": 3,
+                "critical": 0,
+                "strong_rate": 0.4,
+                "pass_rate": 1.0,
+                "critical_rate": 0.0
+              }
+            },
+            "2026-08-18": {
+              "candidate_pool": {
+                "days": 1,
+                "stocks": 308,
+                "strong": 68,
+                "neutral": 23,
+                "critical": 217,
+                "strong_rate": 0.22077922077922077,
+                "pass_rate": 0.29545454545454547,
+                "critical_rate": 0.7045454545454546
+              },
+              "top2": {
+                "days": 1,
+                "stocks": 2,
+                "strong": 1,
+                "neutral": 0,
+                "critical": 1,
+                "strong_rate": 0.5,
+                "pass_rate": 0.5,
+                "critical_rate": 0.5
+              },
+              "top5": {
+                "days": 1,
+                "stocks": 5,
+                "strong": 1,
+                "neutral": 0,
+                "critical": 4,
+                "strong_rate": 0.2,
+                "pass_rate": 0.2,
+                "critical_rate": 0.8
+              }
+            },
+            "2026-08-19": {
+              "candidate_pool": {
+                "days": 1,
+                "stocks": 50,
+                "strong": 25,
+                "neutral": 4,
+                "critical": 21,
+                "strong_rate": 0.5,
+                "pass_rate": 0.58,
+                "critical_rate": 0.42
+              },
+              "top2": {
+                "days": 1,
+                "stocks": 2,
+                "strong": 1,
+                "neutral": 1,
+                "critical": 0,
+                "strong_rate": 0.5,
+                "pass_rate": 1.0,
+                "critical_rate": 0.0
+              },
+              "top5": {
+                "days": 1,
+                "stocks": 5,
+                "strong": 4,
+                "neutral": 1,
+                "critical": 0,
+                "strong_rate": 0.8,
+                "pass_rate": 1.0,
+                "critical_rate": 0.0
+              }
+            },
+            "2026-08-20": {
+              "candidate_pool": {
+                "days": 1,
+                "stocks": 672,
+                "strong": 113,
+                "neutral": 64,
+                "critical": 495,
+                "strong_rate": 0.16815476190476192,
+                "pass_rate": 0.26339285714285715,
+                "critical_rate": 0.7366071428571429
+              },
+              "top2": {
+                "days": 1,
+                "stocks": 2,
+                "strong": 0,
+                "neutral": 1,
+                "critical": 1,
+                "strong_rate": 0.0,
+                "pass_rate": 0.5,
+                "critical_rate": 0.5
+              },
+              "top5": {
+                "days": 1,
+                "stocks": 5,
+                "strong": 0,
+                "neutral": 1,
+                "critical": 4,
+                "strong_rate": 0.0,
+                "pass_rate": 0.2,
+                "critical_rate": 0.8
+              }
+            },
+            "2026-08-21": {
+              "candidate_pool": {
+                "days": 1,
+                "stocks": 261,
+                "strong": 156,
+                "neutral": 30,
+                "critical": 75,
+                "strong_rate": 0.5977011494252874,
+                "pass_rate": 0.7126436781609196,
+                "critical_rate": 0.28735632183908044
+              },
+              "top2": {
+                "days": 1,
+                "stocks": 2,
+                "strong": 0,
+                "neutral": 2,
+                "critical": 0,
+                "strong_rate": 0.0,
+                "pass_rate": 1.0,
+                "critical_rate": 0.0
+              },
+              "top5": {
+                "days": 1,
+                "stocks": 5,
+                "strong": 1,
+                "neutral": 3,
+                "critical": 1,
+                "strong_rate": 0.2,
+                "pass_rate": 0.8,
+                "critical_rate": 0.2
+              }
+            },
+            "2026-08-24": {
+              "candidate_pool": {
+                "days": 1,
+                "stocks": 104,
+                "strong": 41,
+                "neutral": 14,
+                "critical": 49,
+                "strong_rate": 0.3942307692307692,
+                "pass_rate": 0.5288461538461539,
+                "critical_rate": 0.47115384615384615
+              },
+              "top2": {
+                "days": 1,
+                "stocks": 2,
+                "strong": 1,
+                "neutral": 0,
+                "critical": 1,
+                "strong_rate": 0.5,
+                "pass_rate": 0.5,
+                "critical_rate": 0.5
+              },
+              "top5": {
+                "days": 1,
+                "stocks": 5,
+                "strong": 3,
+                "neutral": 0,
+                "critical": 2,
+                "strong_rate": 0.6,
+                "pass_rate": 0.6,
+                "critical_rate": 0.4
+              }
+            },
+            "2026-09-22": {
+              "candidate_pool": {
+                "days": 1,
+                "stocks": 237,
+                "strong": 109,
+                "neutral": 26,
+                "critical": 102,
+                "strong_rate": 0.459915611814346,
+                "pass_rate": 0.569620253164557,
+                "critical_rate": 0.43037974683544306
+              },
+              "top2": {
+                "days": 1,
+                "stocks": 2,
+                "strong": 2,
+                "neutral": 0,
+                "critical": 0,
+                "strong_rate": 1.0,
+                "pass_rate": 1.0,
+                "critical_rate": 0.0
+              },
+              "top5": {
+                "days": 1,
+                "stocks": 5,
+                "strong": 3,
+                "neutral": 1,
+                "critical": 1,
+                "strong_rate": 0.6,
+                "pass_rate": 0.8,
+                "critical_rate": 0.2
+              }
+            },
+            "2026-09-23": {
+              "candidate_pool": {
+                "days": 1,
+                "stocks": 226,
+                "strong": 88,
+                "neutral": 32,
+                "critical": 106,
+                "strong_rate": 0.3893805309734513,
+                "pass_rate": 0.5309734513274337,
+                "critical_rate": 0.4690265486725664
+              },
+              "top2": {
+                "days": 1,
+                "stocks": 2,
+                "strong": 2,
+                "neutral": 0,
+                "critical": 0,
+                "strong_rate": 1.0,
+                "pass_rate": 1.0,
+                "critical_rate": 0.0
+              },
+              "top5": {
+                "days": 1,
+                "stocks": 5,
+                "strong": 2,
+                "neutral": 0,
+                "critical": 3,
+                "strong_rate": 0.4,
+                "pass_rate": 0.4,
+                "critical_rate": 0.6
+              }
+            },
+            "2026-09-24": {
+              "candidate_pool": {
+                "days": 1,
+                "stocks": 118,
+                "strong": 49,
+                "neutral": 21,
+                "critical": 48,
+                "strong_rate": 0.4152542372881356,
+                "pass_rate": 0.5932203389830508,
+                "critical_rate": 0.4067796610169492
+              },
+              "top2": {
+                "days": 1,
+                "stocks": 2,
+                "strong": 2,
+                "neutral": 0,
+                "critical": 0,
+                "strong_rate": 1.0,
+                "pass_rate": 1.0,
+                "critical_rate": 0.0
+              },
+              "top5": {
+                "days": 1,
+                "stocks": 5,
+                "strong": 4,
+                "neutral": 1,
+                "critical": 0,
+                "strong_rate": 0.8,
+                "pass_rate": 1.0,
+                "critical_rate": 0.0
+              }
+            },
+            "2026-09-28": {
+              "candidate_pool": {
+                "days": 1,
+                "stocks": 93,
+                "strong": 29,
+                "neutral": 15,
+                "critical": 49,
+                "strong_rate": 0.3118279569892473,
+                "pass_rate": 0.4731182795698925,
+                "critical_rate": 0.5268817204301075
+              },
+              "top2": {
+                "days": 1,
+                "stocks": 2,
+                "strong": 0,
+                "neutral": 1,
+                "critical": 1,
+                "strong_rate": 0.0,
+                "pass_rate": 0.5,
+                "critical_rate": 0.5
+              },
+              "top5": {
+                "days": 1,
+                "stocks": 5,
+                "strong": 2,
+                "neutral": 1,
+                "critical": 2,
+                "strong_rate": 0.4,
+                "pass_rate": 0.6,
+                "critical_rate": 0.4
+              }
+            },
+            "2026-09-29": {
+              "candidate_pool": {
+                "days": 1,
+                "stocks": 428,
+                "strong": 222,
+                "neutral": 84,
+                "critical": 122,
+                "strong_rate": 0.5186915887850467,
+                "pass_rate": 0.7149532710280374,
+                "critical_rate": 0.2850467289719626
+              },
+              "top2": {
+                "days": 1,
+                "stocks": 2,
+                "strong": 2,
+                "neutral": 0,
+                "critical": 0,
+                "strong_rate": 1.0,
+                "pass_rate": 1.0,
+                "critical_rate": 0.0
+              },
+              "top5": {
+                "days": 1,
+                "stocks": 5,
+                "strong": 4,
+                "neutral": 1,
+                "critical": 0,
+                "strong_rate": 0.8,
+                "pass_rate": 1.0,
+                "critical_rate": 0.0
+              }
+            },
+            "2026-09-30": {
+              "candidate_pool": {
+                "days": 1,
+                "stocks": 249,
+                "strong": 152,
+                "neutral": 33,
+                "critical": 64,
+                "strong_rate": 0.6104417670682731,
+                "pass_rate": 0.7429718875502008,
+                "critical_rate": 0.2570281124497992
+              },
+              "top2": {
+                "days": 1,
+                "stocks": 2,
+                "strong": 0,
+                "neutral": 1,
+                "critical": 1,
+                "strong_rate": 0.0,
+                "pass_rate": 0.5,
+                "critical_rate": 0.5
+              },
+              "top5": {
+                "days": 1,
+                "stocks": 5,
+                "strong": 1,
+                "neutral": 3,
+                "critical": 1,
+                "strong_rate": 0.2,
+                "pass_rate": 0.8,
+                "critical_rate": 0.2
+              }
+            }
+          }
+        }
+      ]
+    },
+    "july_proxy_15m": {
+      "signal_dates": [
+        "2026-07-01",
+        "2026-07-02",
+        "2026-07-03",
+        "2026-07-06",
+        "2026-07-07",
+        "2026-07-08",
+        "2026-07-09",
+        "2026-07-10",
+        "2026-07-13",
+        "2026-07-14",
+        "2026-07-15",
+        "2026-07-16",
+        "2026-07-17",
+        "2026-07-20",
+        "2026-07-21",
+        "2026-07-22",
+        "2026-07-23",
+        "2026-07-24",
+        "2026-07-27",
+        "2026-07-28",
+        "2026-07-29",
+        "2026-07-30",
+        "2026-07-31"
+      ],
+      "models": [
+        {
+          "model": "固定八因子",
+          "features": [
+            "signal_return",
+            "volume_ratio",
+            "turnover_so_far_pct",
+            "float_mv_100m_cny",
+            "volume_4of5_increasing",
+            "ma_bull_5_10_20",
+            "price_above_all_ma",
+            "all_intraday_lows_above_ma"
+          ],
+          "training_days": 20,
+          "training_rows": 7488,
+          "candidate_pool": {
+            "days": 23,
+            "stocks": 13244,
+            "strong": 7626,
+            "neutral": 1773,
+            "critical": 3845,
+            "strong_rate": 0.5758079130172153,
+            "pass_rate": 0.7096798550286922,
+            "critical_rate": 0.29032014497130776
+          },
+          "top1": {
+            "days": 23,
+            "stocks": 23,
+            "strong": 11,
+            "neutral": 3,
+            "critical": 9,
+            "strong_rate": 0.4782608695652174,
+            "pass_rate": 0.6086956521739131,
+            "critical_rate": 0.391304347826087
+          },
+          "top2": {
+            "days": 23,
+            "stocks": 46,
+            "strong": 21,
+            "neutral": 9,
+            "critical": 16,
+            "strong_rate": 0.45652173913043476,
+            "pass_rate": 0.6521739130434783,
+            "critical_rate": 0.34782608695652173
+          },
+          "top5": {
+            "days": 23,
+            "stocks": 115,
+            "strong": 61,
+            "neutral": 15,
+            "critical": 39,
+            "strong_rate": 0.5304347826086957,
+            "pass_rate": 0.6608695652173913,
+            "critical_rate": 0.3391304347826087
+          },
+          "by_rank": {
+            "1": {
+              "days": 23,
+              "stocks": 23,
+              "strong": 11,
+              "neutral": 3,
+              "critical": 9,
+              "strong_rate": 0.4782608695652174,
+              "pass_rate": 0.6086956521739131,
+              "critical_rate": 0.391304347826087
+            },
+            "2": {
+              "days": 23,
+              "stocks": 23,
+              "strong": 10,
+              "neutral": 6,
+              "critical": 7,
+              "strong_rate": 0.43478260869565216,
+              "pass_rate": 0.6956521739130435,
+              "critical_rate": 0.30434782608695654
+            },
+            "3": {
+              "days": 23,
+              "stocks": 23,
+              "strong": 15,
+              "neutral": 1,
+              "critical": 7,
+              "strong_rate": 0.6521739130434783,
+              "pass_rate": 0.6956521739130435,
+              "critical_rate": 0.30434782608695654
+            },
+            "4": {
+              "days": 23,
+              "stocks": 23,
+              "strong": 13,
+              "neutral": 3,
+              "critical": 7,
+              "strong_rate": 0.5652173913043478,
+              "pass_rate": 0.6956521739130435,
+              "critical_rate": 0.30434782608695654
+            },
+            "5": {
+              "days": 23,
+              "stocks": 23,
+              "strong": 12,
+              "neutral": 2,
+              "critical": 9,
+              "strong_rate": 0.5217391304347826,
+              "pass_rate": 0.6086956521739131,
+              "critical_rate": 0.391304347826087
+            }
+          },
+          "daily": {
+            "2026-07-01": {
+              "candidate_pool": {
+                "days": 1,
+                "stocks": 1292,
+                "strong": 1066,
+                "neutral": 88,
+                "critical": 138,
+                "strong_rate": 0.8250773993808049,
+                "pass_rate": 0.8931888544891641,
+                "critical_rate": 0.10681114551083591
+              },
+              "top2": {
+                "days": 1,
+                "stocks": 2,
+                "strong": 2,
+                "neutral": 0,
+                "critical": 0,
+                "strong_rate": 1.0,
+                "pass_rate": 1.0,
+                "critical_rate": 0.0
+              },
+              "top5": {
+                "days": 1,
+                "stocks": 5,
+                "strong": 5,
+                "neutral": 0,
+                "critical": 0,
+                "strong_rate": 1.0,
+                "pass_rate": 1.0,
+                "critical_rate": 0.0
+              }
+            },
+            "2026-07-02": {
+              "candidate_pool": {
+                "days": 1,
+                "stocks": 358,
+                "strong": 282,
+                "neutral": 28,
+                "critical": 48,
+                "strong_rate": 0.7877094972067039,
+                "pass_rate": 0.8659217877094972,
+                "critical_rate": 0.1340782122905028
+              },
+              "top2": {
+                "days": 1,
+                "stocks": 2,
+                "strong": 2,
+                "neutral": 0,
+                "critical": 0,
+                "strong_rate": 1.0,
+                "pass_rate": 1.0,
+                "critical_rate": 0.0
+              },
+              "top5": {
+                "days": 1,
+                "stocks": 5,
+                "strong": 5,
+                "neutral": 0,
+                "critical": 0,
+                "strong_rate": 1.0,
+                "pass_rate": 1.0,
+                "critical_rate": 0.0
+              }
+            },
+            "2026-07-03": {
+              "candidate_pool": {
+                "days": 1,
+                "stocks": 963,
+                "strong": 572,
+                "neutral": 189,
+                "critical": 202,
+                "strong_rate": 0.5939771547248183,
+                "pass_rate": 0.7902388369678089,
+                "critical_rate": 0.20976116303219106
+              },
+              "top2": {
+                "days": 1,
+                "stocks": 2,
+                "strong": 2,
+                "neutral": 0,
+                "critical": 0,
+                "strong_rate": 1.0,
+                "pass_rate": 1.0,
+                "critical_rate": 0.0
+              },
+              "top5": {
+                "days": 1,
+                "stocks": 5,
+                "strong": 5,
+                "neutral": 0,
+                "critical": 0,
+                "strong_rate": 1.0,
+                "pass_rate": 1.0,
+                "critical_rate": 0.0
+              }
+            },
+            "2026-07-06": {
+              "candidate_pool": {
+                "days": 1,
+                "stocks": 316,
+                "strong": 118,
+                "neutral": 47,
+                "critical": 151,
+                "strong_rate": 0.37341772151898733,
+                "pass_rate": 0.5221518987341772,
+                "critical_rate": 0.4778481012658228
+              },
+              "top2": {
+                "days": 1,
+                "stocks": 2,
+                "strong": 1,
+                "neutral": 1,
+                "critical": 0,
+                "strong_rate": 0.5,
+                "pass_rate": 1.0,
+                "critical_rate": 0.0
+              },
+              "top5": {
+                "days": 1,
+                "stocks": 5,
+                "strong": 3,
+                "neutral": 1,
+                "critical": 1,
+                "strong_rate": 0.6,
+                "pass_rate": 0.8,
+                "critical_rate": 0.2
+              }
+            },
+            "2026-07-07": {
+              "candidate_pool": {
+                "days": 1,
+                "stocks": 141,
+                "strong": 74,
+                "neutral": 15,
+                "critical": 52,
+                "strong_rate": 0.524822695035461,
+                "pass_rate": 0.6312056737588653,
+                "critical_rate": 0.36879432624113473
+              },
+              "top2": {
+                "days": 1,
+                "stocks": 2,
+                "strong": 1,
+                "neutral": 1,
+                "critical": 0,
+                "strong_rate": 0.5,
+                "pass_rate": 1.0,
+                "critical_rate": 0.0
+              },
+              "top5": {
+                "days": 1,
+                "stocks": 5,
+                "strong": 3,
+                "neutral": 1,
+                "critical": 1,
+                "strong_rate": 0.6,
+                "pass_rate": 0.8,
+                "critical_rate": 0.2
+              }
+            },
+            "2026-07-08": {
+              "candidate_pool": {
+                "days": 1,
+                "stocks": 215,
+                "strong": 102,
+                "neutral": 19,
+                "critical": 94,
+                "strong_rate": 0.4744186046511628,
+                "pass_rate": 0.5627906976744186,
+                "critical_rate": 0.4372093023255814
+              },
+              "top2": {
+                "days": 1,
+                "stocks": 2,
+                "strong": 2,
+                "neutral": 0,
+                "critical": 0,
+                "strong_rate": 1.0,
+                "pass_rate": 1.0,
+                "critical_rate": 0.0
+              },
+              "top5": {
+                "days": 1,
+                "stocks": 5,
+                "strong": 4,
+                "neutral": 0,
+                "critical": 1,
+                "strong_rate": 0.8,
+                "pass_rate": 0.8,
+                "critical_rate": 0.2
+              }
+            },
+            "2026-07-09": {
+              "candidate_pool": {
+                "days": 1,
+                "stocks": 487,
+                "strong": 342,
+                "neutral": 52,
+                "critical": 93,
+                "strong_rate": 0.702258726899384,
+                "pass_rate": 0.8090349075975359,
+                "critical_rate": 0.19096509240246407
+              },
+              "top2": {
+                "days": 1,
+                "stocks": 2,
+                "strong": 1,
+                "neutral": 0,
+                "critical": 1,
+                "strong_rate": 0.5,
+                "pass_rate": 0.5,
+                "critical_rate": 0.5
+              },
+              "top5": {
+                "days": 1,
+                "stocks": 5,
+                "strong": 3,
+                "neutral": 0,
+                "critical": 2,
+                "strong_rate": 0.6,
+                "pass_rate": 0.6,
+                "critical_rate": 0.4
+              }
+            },
+            "2026-07-10": {
+              "candidate_pool": {
+                "days": 1,
+                "stocks": 876,
+                "strong": 291,
+                "neutral": 158,
+                "critical": 427,
+                "strong_rate": 0.3321917808219178,
+                "pass_rate": 0.5125570776255708,
+                "critical_rate": 0.4874429223744292
+              },
+              "top2": {
+                "days": 1,
+                "stocks": 2,
+                "strong": 0,
+                "neutral": 1,
+                "critical": 1,
+                "strong_rate": 0.0,
+                "pass_rate": 0.5,
+                "critical_rate": 0.5
+              },
+              "top5": {
+                "days": 1,
+                "stocks": 5,
+                "strong": 1,
+                "neutral": 1,
+                "critical": 3,
+                "strong_rate": 0.2,
+                "pass_rate": 0.4,
+                "critical_rate": 0.6
+              }
+            },
+            "2026-07-13": {
+              "candidate_pool": {
+                "days": 1,
+                "stocks": 108,
+                "strong": 71,
+                "neutral": 15,
+                "critical": 22,
+                "strong_rate": 0.6574074074074074,
+                "pass_rate": 0.7962962962962963,
+                "critical_rate": 0.2037037037037037
+              },
+              "top2": {
+                "days": 1,
+                "stocks": 2,
+                "strong": 1,
+                "neutral": 1,
+                "critical": 0,
+                "strong_rate": 0.5,
+                "pass_rate": 1.0,
+                "critical_rate": 0.0
+              },
+              "top5": {
+                "days": 1,
+                "stocks": 5,
+                "strong": 3,
+                "neutral": 2,
+                "critical": 0,
+                "strong_rate": 0.6,
+                "pass_rate": 1.0,
+                "critical_rate": 0.0
+              }
+            },
+            "2026-07-14": {
+              "candidate_pool": {
+                "days": 1,
+                "stocks": 815,
+                "strong": 601,
+                "neutral": 103,
+                "critical": 111,
+                "strong_rate": 0.7374233128834355,
+                "pass_rate": 0.8638036809815951,
+                "critical_rate": 0.1361963190184049
+              },
+              "top2": {
+                "days": 1,
+                "stocks": 2,
+                "strong": 1,
+                "neutral": 0,
+                "critical": 1,
+                "strong_rate": 0.5,
+                "pass_rate": 0.5,
+                "critical_rate": 0.5
+              },
+              "top5": {
+                "days": 1,
+                "stocks": 5,
+                "strong": 4,
+                "neutral": 0,
+                "critical": 1,
+                "strong_rate": 0.8,
+                "pass_rate": 0.8,
+                "critical_rate": 0.2
+              }
+            },
+            "2026-07-15": {
+              "candidate_pool": {
+                "days": 1,
+                "stocks": 568,
+                "strong": 265,
+                "neutral": 111,
+                "critical": 192,
+                "strong_rate": 0.4665492957746479,
+                "pass_rate": 0.6619718309859155,
+                "critical_rate": 0.3380281690140845
+              },
+              "top2": {
+                "days": 1,
+                "stocks": 2,
+                "strong": 1,
+                "neutral": 1,
+                "critical": 0,
+                "strong_rate": 0.5,
+                "pass_rate": 1.0,
+                "critical_rate": 0.0
+              },
+              "top5": {
+                "days": 1,
+                "stocks": 5,
+                "strong": 2,
+                "neutral": 1,
+                "critical": 2,
+                "strong_rate": 0.4,
+                "pass_rate": 0.6,
+                "critical_rate": 0.4
+              }
+            },
+            "2026-07-16": {
+              "candidate_pool": {
+                "days": 1,
+                "stocks": 247,
+                "strong": 156,
+                "neutral": 27,
+                "critical": 64,
+                "strong_rate": 0.631578947368421,
+                "pass_rate": 0.7408906882591093,
+                "critical_rate": 0.2591093117408907
+              },
+              "top2": {
+                "days": 1,
+                "stocks": 2,
+                "strong": 0,
+                "neutral": 0,
+                "critical": 2,
+                "strong_rate": 0.0,
+                "pass_rate": 0.0,
+                "critical_rate": 1.0
+              },
+              "top5": {
+                "days": 1,
+                "stocks": 5,
+                "strong": 2,
+                "neutral": 0,
+                "critical": 3,
+                "strong_rate": 0.4,
+                "pass_rate": 0.4,
+                "critical_rate": 0.6
+              }
+            },
+            "2026-07-17": {
+              "candidate_pool": {
+                "days": 1,
+                "stocks": 69,
+                "strong": 44,
+                "neutral": 6,
+                "critical": 19,
+                "strong_rate": 0.6376811594202898,
+                "pass_rate": 0.7246376811594203,
+                "critical_rate": 0.2753623188405797
+              },
+              "top2": {
+                "days": 1,
+                "stocks": 2,
+                "strong": 1,
+                "neutral": 0,
+                "critical": 1,
+                "strong_rate": 0.5,
+                "pass_rate": 0.5,
+                "critical_rate": 0.5
+              },
+              "top5": {
+                "days": 1,
+                "stocks": 5,
+                "strong": 3,
+                "neutral": 0,
+                "critical": 2,
+                "strong_rate": 0.6,
+                "pass_rate": 0.6,
+                "critical_rate": 0.4
+              }
+            },
+            "2026-07-20": {
+              "candidate_pool": {
+                "days": 1,
+                "stocks": 255,
+                "strong": 147,
+                "neutral": 29,
+                "critical": 79,
+                "strong_rate": 0.5764705882352941,
+                "pass_rate": 0.6901960784313725,
+                "critical_rate": 0.30980392156862746
+              },
+              "top2": {
+                "days": 1,
+                "stocks": 2,
+                "strong": 1,
+                "neutral": 1,
+                "critical": 0,
+                "strong_rate": 0.5,
+                "pass_rate": 1.0,
+                "critical_rate": 0.0
+              },
+              "top5": {
+                "days": 1,
+                "stocks": 5,
+                "strong": 3,
+                "neutral": 2,
+                "critical": 0,
+                "strong_rate": 0.6,
+                "pass_rate": 1.0,
+                "critical_rate": 0.0
+              }
+            },
+            "2026-07-21": {
+              "candidate_pool": {
+                "days": 1,
+                "stocks": 668,
+                "strong": 313,
+                "neutral": 112,
+                "critical": 243,
+                "strong_rate": 0.468562874251497,
+                "pass_rate": 0.6362275449101796,
+                "critical_rate": 0.36377245508982037
+              },
+              "top2": {
+                "days": 1,
+                "stocks": 2,
+                "strong": 1,
+                "neutral": 0,
+                "critical": 1,
+                "strong_rate": 0.5,
+                "pass_rate": 0.5,
+                "critical_rate": 0.5
+              },
+              "top5": {
+                "days": 1,
+                "stocks": 5,
+                "strong": 2,
+                "neutral": 0,
+                "critical": 3,
+                "strong_rate": 0.4,
+                "pass_rate": 0.4,
+                "critical_rate": 0.6
+              }
+            },
+            "2026-07-22": {
+              "candidate_pool": {
+                "days": 1,
+                "stocks": 221,
+                "strong": 128,
+                "neutral": 22,
+                "critical": 71,
+                "strong_rate": 0.579185520361991,
+                "pass_rate": 0.6787330316742082,
+                "critical_rate": 0.3212669683257919
+              },
+              "top2": {
+                "days": 1,
+                "stocks": 2,
+                "strong": 2,
+                "neutral": 0,
+                "critical": 0,
+                "strong_rate": 1.0,
+                "pass_rate": 1.0,
+                "critical_rate": 0.0
+              },
+              "top5": {
+                "days": 1,
+                "stocks": 5,
+                "strong": 4,
+                "neutral": 1,
+                "critical": 0,
+                "strong_rate": 0.8,
+                "pass_rate": 1.0,
+                "critical_rate": 0.0
+              }
+            },
+            "2026-07-23": {
+              "candidate_pool": {
+                "days": 1,
+                "stocks": 1320,
+                "strong": 247,
+                "neutral": 162,
+                "critical": 911,
+                "strong_rate": 0.18712121212121213,
+                "pass_rate": 0.3098484848484849,
+                "critical_rate": 0.6901515151515152
+              },
+              "top2": {
+                "days": 1,
+                "stocks": 2,
+                "strong": 1,
+                "neutral": 0,
+                "critical": 1,
+                "strong_rate": 0.5,
+                "pass_rate": 0.5,
+                "critical_rate": 0.5
+              },
+              "top5": {
+                "days": 1,
+                "stocks": 5,
+                "strong": 2,
+                "neutral": 0,
+                "critical": 3,
+                "strong_rate": 0.4,
+                "pass_rate": 0.4,
+                "critical_rate": 0.6
+              }
+            },
+            "2026-07-24": {
+              "candidate_pool": {
+                "days": 1,
+                "stocks": 84,
+                "strong": 37,
+                "neutral": 12,
+                "critical": 35,
+                "strong_rate": 0.44047619047619047,
+                "pass_rate": 0.5833333333333334,
+                "critical_rate": 0.4166666666666667
+              },
+              "top2": {
+                "days": 1,
+                "stocks": 2,
+                "strong": 0,
+                "neutral": 1,
+                "critical": 1,
+                "strong_rate": 0.0,
+                "pass_rate": 0.5,
+                "critical_rate": 0.5
+              },
+              "top5": {
+                "days": 1,
+                "stocks": 5,
+                "strong": 0,
+                "neutral": 1,
+                "critical": 4,
+                "strong_rate": 0.0,
+                "pass_rate": 0.2,
+                "critical_rate": 0.8
+              }
+            },
+            "2026-07-27": {
+              "candidate_pool": {
+                "days": 1,
+                "stocks": 1853,
+                "strong": 1202,
+                "neutral": 237,
+                "critical": 414,
+                "strong_rate": 0.6486778197517539,
+                "pass_rate": 0.7765785213167836,
+                "critical_rate": 0.2234214786832164
+              },
+              "top2": {
+                "days": 1,
+                "stocks": 2,
+                "strong": 0,
+                "neutral": 0,
+                "critical": 2,
+                "strong_rate": 0.0,
+                "pass_rate": 0.0,
+                "critical_rate": 1.0
+              },
+              "top5": {
+                "days": 1,
+                "stocks": 5,
+                "strong": 0,
+                "neutral": 1,
+                "critical": 4,
+                "strong_rate": 0.0,
+                "pass_rate": 0.2,
+                "critical_rate": 0.8
+              }
+            },
+            "2026-07-28": {
+              "candidate_pool": {
+                "days": 1,
+                "stocks": 197,
+                "strong": 154,
+                "neutral": 17,
+                "critical": 26,
+                "strong_rate": 0.7817258883248731,
+                "pass_rate": 0.868020304568528,
+                "critical_rate": 0.1319796954314721
+              },
+              "top2": {
+                "days": 1,
+                "stocks": 2,
+                "strong": 0,
+                "neutral": 2,
+                "critical": 0,
+                "strong_rate": 0.0,
+                "pass_rate": 1.0,
+                "critical_rate": 0.0
+              },
+              "top5": {
+                "days": 1,
+                "stocks": 5,
+                "strong": 2,
+                "neutral": 2,
+                "critical": 1,
+                "strong_rate": 0.4,
+                "pass_rate": 0.8,
+                "critical_rate": 0.2
+              }
+            },
+            "2026-07-29": {
+              "candidate_pool": {
+                "days": 1,
+                "stocks": 687,
+                "strong": 483,
+                "neutral": 108,
+                "critical": 96,
+                "strong_rate": 0.7030567685589519,
+                "pass_rate": 0.8602620087336245,
+                "critical_rate": 0.13973799126637554
+              },
+              "top2": {
+                "days": 1,
+                "stocks": 2,
+                "strong": 1,
+                "neutral": 0,
+                "critical": 1,
+                "strong_rate": 0.5,
+                "pass_rate": 0.5,
+                "critical_rate": 0.5
+              },
+              "top5": {
+                "days": 1,
+                "stocks": 5,
+                "strong": 3,
+                "neutral": 1,
+                "critical": 1,
+                "strong_rate": 0.6,
+                "pass_rate": 0.8,
+                "critical_rate": 0.2
+              }
+            },
+            "2026-07-30": {
+              "candidate_pool": {
+                "days": 1,
+                "stocks": 182,
+                "strong": 69,
+                "neutral": 18,
+                "critical": 95,
+                "strong_rate": 0.3791208791208791,
+                "pass_rate": 0.47802197802197804,
+                "critical_rate": 0.521978021978022
+              },
+              "top2": {
+                "days": 1,
+                "stocks": 2,
+                "strong": 0,
+                "neutral": 0,
+                "critical": 2,
+                "strong_rate": 0.0,
+                "pass_rate": 0.0,
+                "critical_rate": 1.0
+              },
+              "top5": {
+                "days": 1,
+                "stocks": 5,
+                "strong": 0,
+                "neutral": 0,
+                "critical": 5,
+                "strong_rate": 0.0,
+                "pass_rate": 0.0,
+                "critical_rate": 1.0
+              }
+            },
+            "2026-07-31": {
+              "candidate_pool": {
+                "days": 1,
+                "stocks": 1322,
+                "strong": 862,
+                "neutral": 198,
+                "critical": 262,
+                "strong_rate": 0.6520423600605144,
+                "pass_rate": 0.8018154311649016,
+                "critical_rate": 0.19818456883509833
+              },
+              "top2": {
+                "days": 1,
+                "stocks": 2,
+                "strong": 0,
+                "neutral": 0,
+                "critical": 2,
+                "strong_rate": 0.0,
+                "pass_rate": 0.0,
+                "critical_rate": 1.0
+              },
+              "top5": {
+                "days": 1,
+                "stocks": 5,
+                "strong": 2,
+                "neutral": 1,
+                "critical": 2,
+                "strong_rate": 0.4,
+                "pass_rate": 0.6,
+                "critical_rate": 0.4
+              }
+            }
+          }
+        },
+        {
+          "model": "精确训练七因子_去当前价高于均线",
+          "features": [
+            "signal_return",
+            "volume_ratio",
+            "turnover_so_far_pct",
+            "float_mv_100m_cny",
+            "volume_4of5_increasing",
+            "ma_bull_5_10_20",
+            "all_intraday_lows_above_ma"
+          ],
+          "training_days": 20,
+          "training_rows": 7488,
+          "candidate_pool": {
+            "days": 23,
+            "stocks": 13244,
+            "strong": 7626,
+            "neutral": 1773,
+            "critical": 3845,
+            "strong_rate": 0.5758079130172153,
+            "pass_rate": 0.7096798550286922,
+            "critical_rate": 0.29032014497130776
+          },
+          "top1": {
+            "days": 23,
+            "stocks": 23,
+            "strong": 13,
+            "neutral": 2,
+            "critical": 8,
+            "strong_rate": 0.5652173913043478,
+            "pass_rate": 0.6521739130434783,
+            "critical_rate": 0.34782608695652173
+          },
+          "top2": {
+            "days": 23,
+            "stocks": 46,
+            "strong": 22,
+            "neutral": 9,
+            "critical": 15,
+            "strong_rate": 0.4782608695652174,
+            "pass_rate": 0.6739130434782609,
+            "critical_rate": 0.32608695652173914
+          },
+          "top5": {
+            "days": 23,
+            "stocks": 115,
+            "strong": 67,
+            "neutral": 14,
+            "critical": 34,
+            "strong_rate": 0.5826086956521739,
+            "pass_rate": 0.7043478260869566,
+            "critical_rate": 0.2956521739130435
+          },
+          "by_rank": {
+            "1": {
+              "days": 23,
+              "stocks": 23,
+              "strong": 13,
+              "neutral": 2,
+              "critical": 8,
+              "strong_rate": 0.5652173913043478,
+              "pass_rate": 0.6521739130434783,
+              "critical_rate": 0.34782608695652173
+            },
+            "2": {
+              "days": 23,
+              "stocks": 23,
+              "strong": 9,
+              "neutral": 7,
+              "critical": 7,
+              "strong_rate": 0.391304347826087,
+              "pass_rate": 0.6956521739130435,
+              "critical_rate": 0.30434782608695654
+            },
+            "3": {
+              "days": 23,
+              "stocks": 23,
+              "strong": 16,
+              "neutral": 4,
+              "critical": 3,
+              "strong_rate": 0.6956521739130435,
+              "pass_rate": 0.8695652173913043,
+              "critical_rate": 0.13043478260869565
+            },
+            "4": {
+              "days": 23,
+              "stocks": 23,
+              "strong": 13,
+              "neutral": 1,
+              "critical": 9,
+              "strong_rate": 0.5652173913043478,
+              "pass_rate": 0.6086956521739131,
+              "critical_rate": 0.391304347826087
+            },
+            "5": {
+              "days": 23,
+              "stocks": 23,
+              "strong": 16,
+              "neutral": 0,
+              "critical": 7,
+              "strong_rate": 0.6956521739130435,
+              "pass_rate": 0.6956521739130435,
+              "critical_rate": 0.30434782608695654
+            }
+          },
+          "daily": {
+            "2026-07-01": {
+              "candidate_pool": {
+                "days": 1,
+                "stocks": 1292,
+                "strong": 1066,
+                "neutral": 88,
+                "critical": 138,
+                "strong_rate": 0.8250773993808049,
+                "pass_rate": 0.8931888544891641,
+                "critical_rate": 0.10681114551083591
+              },
+              "top2": {
+                "days": 1,
+                "stocks": 2,
+                "strong": 2,
+                "neutral": 0,
+                "critical": 0,
+                "strong_rate": 1.0,
+                "pass_rate": 1.0,
+                "critical_rate": 0.0
+              },
+              "top5": {
+                "days": 1,
+                "stocks": 5,
+                "strong": 5,
+                "neutral": 0,
+                "critical": 0,
+                "strong_rate": 1.0,
+                "pass_rate": 1.0,
+                "critical_rate": 0.0
+              }
+            },
+            "2026-07-02": {
+              "candidate_pool": {
+                "days": 1,
+                "stocks": 358,
+                "strong": 282,
+                "neutral": 28,
+                "critical": 48,
+                "strong_rate": 0.7877094972067039,
+                "pass_rate": 0.8659217877094972,
+                "critical_rate": 0.1340782122905028
+              },
+              "top2": {
+                "days": 1,
+                "stocks": 2,
+                "strong": 2,
+                "neutral": 0,
+                "critical": 0,
+                "strong_rate": 1.0,
+                "pass_rate": 1.0,
+                "critical_rate": 0.0
+              },
+              "top5": {
+                "days": 1,
+                "stocks": 5,
+                "strong": 5,
+                "neutral": 0,
+                "critical": 0,
+                "strong_rate": 1.0,
+                "pass_rate": 1.0,
+                "critical_rate": 0.0
+              }
+            },
+            "2026-07-03": {
+              "candidate_pool": {
+                "days": 1,
+                "stocks": 963,
+                "strong": 572,
+                "neutral": 189,
+                "critical": 202,
+                "strong_rate": 0.5939771547248183,
+                "pass_rate": 0.7902388369678089,
+                "critical_rate": 0.20976116303219106
+              },
+              "top2": {
+                "days": 1,
+                "stocks": 2,
+                "strong": 2,
+                "neutral": 0,
+                "critical": 0,
+                "strong_rate": 1.0,
+                "pass_rate": 1.0,
+                "critical_rate": 0.0
+              },
+              "top5": {
+                "days": 1,
+                "stocks": 5,
+                "strong": 5,
+                "neutral": 0,
+                "critical": 0,
+                "strong_rate": 1.0,
+                "pass_rate": 1.0,
+                "critical_rate": 0.0
+              }
+            },
+            "2026-07-06": {
+              "candidate_pool": {
+                "days": 1,
+                "stocks": 316,
+                "strong": 118,
+                "neutral": 47,
+                "critical": 151,
+                "strong_rate": 0.37341772151898733,
+                "pass_rate": 0.5221518987341772,
+                "critical_rate": 0.4778481012658228
+              },
+              "top2": {
+                "days": 1,
+                "stocks": 2,
+                "strong": 0,
+                "neutral": 1,
+                "critical": 1,
+                "strong_rate": 0.0,
+                "pass_rate": 0.5,
+                "critical_rate": 0.5
+              },
+              "top5": {
+                "days": 1,
+                "stocks": 5,
+                "strong": 3,
+                "neutral": 1,
+                "critical": 1,
+                "strong_rate": 0.6,
+                "pass_rate": 0.8,
+                "critical_rate": 0.2
+              }
+            },
+            "2026-07-07": {
+              "candidate_pool": {
+                "days": 1,
+                "stocks": 141,
+                "strong": 74,
+                "neutral": 15,
+                "critical": 52,
+                "strong_rate": 0.524822695035461,
+                "pass_rate": 0.6312056737588653,
+                "critical_rate": 0.36879432624113473
+              },
+              "top2": {
+                "days": 1,
+                "stocks": 2,
+                "strong": 1,
+                "neutral": 1,
+                "critical": 0,
+                "strong_rate": 0.5,
+                "pass_rate": 1.0,
+                "critical_rate": 0.0
+              },
+              "top5": {
+                "days": 1,
+                "stocks": 5,
+                "strong": 3,
+                "neutral": 1,
+                "critical": 1,
+                "strong_rate": 0.6,
+                "pass_rate": 0.8,
+                "critical_rate": 0.2
+              }
+            },
+            "2026-07-08": {
+              "candidate_pool": {
+                "days": 1,
+                "stocks": 215,
+                "strong": 102,
+                "neutral": 19,
+                "critical": 94,
+                "strong_rate": 0.4744186046511628,
+                "pass_rate": 0.5627906976744186,
+                "critical_rate": 0.4372093023255814
+              },
+              "top2": {
+                "days": 1,
+                "stocks": 2,
+                "strong": 2,
+                "neutral": 0,
+                "critical": 0,
+                "strong_rate": 1.0,
+                "pass_rate": 1.0,
+                "critical_rate": 0.0
+              },
+              "top5": {
+                "days": 1,
+                "stocks": 5,
+                "strong": 4,
+                "neutral": 1,
+                "critical": 0,
+                "strong_rate": 0.8,
+                "pass_rate": 1.0,
+                "critical_rate": 0.0
+              }
+            },
+            "2026-07-09": {
+              "candidate_pool": {
+                "days": 1,
+                "stocks": 487,
+                "strong": 342,
+                "neutral": 52,
+                "critical": 93,
+                "strong_rate": 0.702258726899384,
+                "pass_rate": 0.8090349075975359,
+                "critical_rate": 0.19096509240246407
+              },
+              "top2": {
+                "days": 1,
+                "stocks": 2,
+                "strong": 1,
+                "neutral": 0,
+                "critical": 1,
+                "strong_rate": 0.5,
+                "pass_rate": 0.5,
+                "critical_rate": 0.5
+              },
+              "top5": {
+                "days": 1,
+                "stocks": 5,
+                "strong": 4,
+                "neutral": 0,
+                "critical": 1,
+                "strong_rate": 0.8,
+                "pass_rate": 0.8,
+                "critical_rate": 0.2
+              }
+            },
+            "2026-07-10": {
+              "candidate_pool": {
+                "days": 1,
+                "stocks": 876,
+                "strong": 291,
+                "neutral": 158,
+                "critical": 427,
+                "strong_rate": 0.3321917808219178,
+                "pass_rate": 0.5125570776255708,
+                "critical_rate": 0.4874429223744292
+              },
+              "top2": {
+                "days": 1,
+                "stocks": 2,
+                "strong": 1,
+                "neutral": 0,
+                "critical": 1,
+                "strong_rate": 0.5,
+                "pass_rate": 0.5,
+                "critical_rate": 0.5
+              },
+              "top5": {
+                "days": 1,
+                "stocks": 5,
+                "strong": 2,
+                "neutral": 1,
+                "critical": 2,
+                "strong_rate": 0.4,
+                "pass_rate": 0.6,
+                "critical_rate": 0.4
+              }
+            },
+            "2026-07-13": {
+              "candidate_pool": {
+                "days": 1,
+                "stocks": 108,
+                "strong": 71,
+                "neutral": 15,
+                "critical": 22,
+                "strong_rate": 0.6574074074074074,
+                "pass_rate": 0.7962962962962963,
+                "critical_rate": 0.2037037037037037
+              },
+              "top2": {
+                "days": 1,
+                "stocks": 2,
+                "strong": 1,
+                "neutral": 1,
+                "critical": 0,
+                "strong_rate": 0.5,
+                "pass_rate": 1.0,
+                "critical_rate": 0.0
+              },
+              "top5": {
+                "days": 1,
+                "stocks": 5,
+                "strong": 4,
+                "neutral": 1,
+                "critical": 0,
+                "strong_rate": 0.8,
+                "pass_rate": 1.0,
+                "critical_rate": 0.0
+              }
+            },
+            "2026-07-14": {
+              "candidate_pool": {
+                "days": 1,
+                "stocks": 815,
+                "strong": 601,
+                "neutral": 103,
+                "critical": 111,
+                "strong_rate": 0.7374233128834355,
+                "pass_rate": 0.8638036809815951,
+                "critical_rate": 0.1361963190184049
+              },
+              "top2": {
+                "days": 1,
+                "stocks": 2,
+                "strong": 1,
+                "neutral": 0,
+                "critical": 1,
+                "strong_rate": 0.5,
+                "pass_rate": 0.5,
+                "critical_rate": 0.5
+              },
+              "top5": {
+                "days": 1,
+                "stocks": 5,
+                "strong": 4,
+                "neutral": 0,
+                "critical": 1,
+                "strong_rate": 0.8,
+                "pass_rate": 0.8,
+                "critical_rate": 0.2
+              }
+            },
+            "2026-07-15": {
+              "candidate_pool": {
+                "days": 1,
+                "stocks": 568,
+                "strong": 265,
+                "neutral": 111,
+                "critical": 192,
+                "strong_rate": 0.4665492957746479,
+                "pass_rate": 0.6619718309859155,
+                "critical_rate": 0.3380281690140845
+              },
+              "top2": {
+                "days": 1,
+                "stocks": 2,
+                "strong": 1,
+                "neutral": 1,
+                "critical": 0,
+                "strong_rate": 0.5,
+                "pass_rate": 1.0,
+                "critical_rate": 0.0
+              },
+              "top5": {
+                "days": 1,
+                "stocks": 5,
+                "strong": 2,
+                "neutral": 1,
+                "critical": 2,
+                "strong_rate": 0.4,
+                "pass_rate": 0.6,
+                "critical_rate": 0.4
+              }
+            },
+            "2026-07-16": {
+              "candidate_pool": {
+                "days": 1,
+                "stocks": 247,
+                "strong": 156,
+                "neutral": 27,
+                "critical": 64,
+                "strong_rate": 0.631578947368421,
+                "pass_rate": 0.7408906882591093,
+                "critical_rate": 0.2591093117408907
+              },
+              "top2": {
+                "days": 1,
+                "stocks": 2,
+                "strong": 2,
+                "neutral": 0,
+                "critical": 0,
+                "strong_rate": 1.0,
+                "pass_rate": 1.0,
+                "critical_rate": 0.0
+              },
+              "top5": {
+                "days": 1,
+                "stocks": 5,
+                "strong": 4,
+                "neutral": 0,
+                "critical": 1,
+                "strong_rate": 0.8,
+                "pass_rate": 0.8,
+                "critical_rate": 0.2
+              }
+            },
+            "2026-07-17": {
+              "candidate_pool": {
+                "days": 1,
+                "stocks": 69,
+                "strong": 44,
+                "neutral": 6,
+                "critical": 19,
+                "strong_rate": 0.6376811594202898,
+                "pass_rate": 0.7246376811594203,
+                "critical_rate": 0.2753623188405797
+              },
+              "top2": {
+                "days": 1,
+                "stocks": 2,
+                "strong": 1,
+                "neutral": 0,
+                "critical": 1,
+                "strong_rate": 0.5,
+                "pass_rate": 0.5,
+                "critical_rate": 0.5
+              },
+              "top5": {
+                "days": 1,
+                "stocks": 5,
+                "strong": 3,
+                "neutral": 0,
+                "critical": 2,
+                "strong_rate": 0.6,
+                "pass_rate": 0.6,
+                "critical_rate": 0.4
+              }
+            },
+            "2026-07-20": {
+              "candidate_pool": {
+                "days": 1,
+                "stocks": 255,
+                "strong": 147,
+                "neutral": 29,
+                "critical": 79,
+                "strong_rate": 0.5764705882352941,
+                "pass_rate": 0.6901960784313725,
+                "critical_rate": 0.30980392156862746
+              },
+              "top2": {
+                "days": 1,
+                "stocks": 2,
+                "strong": 1,
+                "neutral": 1,
+                "critical": 0,
+                "strong_rate": 0.5,
+                "pass_rate": 1.0,
+                "critical_rate": 0.0
+              },
+              "top5": {
+                "days": 1,
+                "stocks": 5,
+                "strong": 2,
+                "neutral": 2,
+                "critical": 1,
+                "strong_rate": 0.4,
+                "pass_rate": 0.8,
+                "critical_rate": 0.2
+              }
+            },
+            "2026-07-21": {
+              "candidate_pool": {
+                "days": 1,
+                "stocks": 668,
+                "strong": 313,
+                "neutral": 112,
+                "critical": 243,
+                "strong_rate": 0.468562874251497,
+                "pass_rate": 0.6362275449101796,
+                "critical_rate": 0.36377245508982037
+              },
+              "top2": {
+                "days": 1,
+                "stocks": 2,
+                "strong": 1,
+                "neutral": 0,
+                "critical": 1,
+                "strong_rate": 0.5,
+                "pass_rate": 0.5,
+                "critical_rate": 0.5
+              },
+              "top5": {
+                "days": 1,
+                "stocks": 5,
+                "strong": 3,
+                "neutral": 0,
+                "critical": 2,
+                "strong_rate": 0.6,
+                "pass_rate": 0.6,
+                "critical_rate": 0.4
+              }
+            },
+            "2026-07-22": {
+              "candidate_pool": {
+                "days": 1,
+                "stocks": 221,
+                "strong": 128,
+                "neutral": 22,
+                "critical": 71,
+                "strong_rate": 0.579185520361991,
+                "pass_rate": 0.6787330316742082,
+                "critical_rate": 0.3212669683257919
+              },
+              "top2": {
+                "days": 1,
+                "stocks": 2,
+                "strong": 1,
+                "neutral": 1,
+                "critical": 0,
+                "strong_rate": 0.5,
+                "pass_rate": 1.0,
+                "critical_rate": 0.0
+              },
+              "top5": {
+                "days": 1,
+                "stocks": 5,
+                "strong": 3,
+                "neutral": 1,
+                "critical": 1,
+                "strong_rate": 0.6,
+                "pass_rate": 0.8,
+                "critical_rate": 0.2
+              }
+            },
+            "2026-07-23": {
+              "candidate_pool": {
+                "days": 1,
+                "stocks": 1320,
+                "strong": 247,
+                "neutral": 162,
+                "critical": 911,
+                "strong_rate": 0.18712121212121213,
+                "pass_rate": 0.3098484848484849,
+                "critical_rate": 0.6901515151515152
+              },
+              "top2": {
+                "days": 1,
+                "stocks": 2,
+                "strong": 1,
+                "neutral": 0,
+                "critical": 1,
+                "strong_rate": 0.5,
+                "pass_rate": 0.5,
+                "critical_rate": 0.5
+              },
+              "top5": {
+                "days": 1,
+                "stocks": 5,
+                "strong": 2,
+                "neutral": 1,
+                "critical": 2,
+                "strong_rate": 0.4,
+                "pass_rate": 0.6,
+                "critical_rate": 0.4
+              }
+            },
+            "2026-07-24": {
+              "candidate_pool": {
+                "days": 1,
+                "stocks": 84,
+                "strong": 37,
+                "neutral": 12,
+                "critical": 35,
+                "strong_rate": 0.44047619047619047,
+                "pass_rate": 0.5833333333333334,
+                "critical_rate": 0.4166666666666667
+              },
+              "top2": {
+                "days": 1,
+                "stocks": 2,
+                "strong": 0,
+                "neutral": 1,
+                "critical": 1,
+                "strong_rate": 0.0,
+                "pass_rate": 0.5,
+                "critical_rate": 0.5
+              },
+              "top5": {
+                "days": 1,
+                "stocks": 5,
+                "strong": 0,
+                "neutral": 1,
+                "critical": 4,
+                "strong_rate": 0.0,
+                "pass_rate": 0.2,
+                "critical_rate": 0.8
+              }
+            },
+            "2026-07-27": {
+              "candidate_pool": {
+                "days": 1,
+                "stocks": 1853,
+                "strong": 1202,
+                "neutral": 237,
+                "critical": 414,
+                "strong_rate": 0.6486778197517539,
+                "pass_rate": 0.7765785213167836,
+                "critical_rate": 0.2234214786832164
+              },
+              "top2": {
+                "days": 1,
+                "stocks": 2,
+                "strong": 0,
+                "neutral": 0,
+                "critical": 2,
+                "strong_rate": 0.0,
+                "pass_rate": 0.0,
+                "critical_rate": 1.0
+              },
+              "top5": {
+                "days": 1,
+                "stocks": 5,
+                "strong": 0,
+                "neutral": 0,
+                "critical": 5,
+                "strong_rate": 0.0,
+                "pass_rate": 0.0,
+                "critical_rate": 1.0
+              }
+            },
+            "2026-07-28": {
+              "candidate_pool": {
+                "days": 1,
+                "stocks": 197,
+                "strong": 154,
+                "neutral": 17,
+                "critical": 26,
+                "strong_rate": 0.7817258883248731,
+                "pass_rate": 0.868020304568528,
+                "critical_rate": 0.1319796954314721
+              },
+              "top2": {
+                "days": 1,
+                "stocks": 2,
+                "strong": 0,
+                "neutral": 2,
+                "critical": 0,
+                "strong_rate": 0.0,
+                "pass_rate": 1.0,
+                "critical_rate": 0.0
+              },
+              "top5": {
+                "days": 1,
+                "stocks": 5,
+                "strong": 3,
+                "neutral": 2,
+                "critical": 0,
+                "strong_rate": 0.6,
+                "pass_rate": 1.0,
+                "critical_rate": 0.0
+              }
+            },
+            "2026-07-29": {
+              "candidate_pool": {
+                "days": 1,
+                "stocks": 687,
+                "strong": 483,
+                "neutral": 108,
+                "critical": 96,
+                "strong_rate": 0.7030567685589519,
+                "pass_rate": 0.8602620087336245,
+                "critical_rate": 0.13973799126637554
+              },
+              "top2": {
+                "days": 1,
+                "stocks": 2,
+                "strong": 1,
+                "neutral": 0,
+                "critical": 1,
+                "strong_rate": 0.5,
+                "pass_rate": 0.5,
+                "critical_rate": 0.5
+              },
+              "top5": {
+                "days": 1,
+                "stocks": 5,
+                "strong": 3,
+                "neutral": 0,
+                "critical": 2,
+                "strong_rate": 0.6,
+                "pass_rate": 0.6,
+                "critical_rate": 0.4
+              }
+            },
+            "2026-07-30": {
+              "candidate_pool": {
+                "days": 1,
+                "stocks": 182,
+                "strong": 69,
+                "neutral": 18,
+                "critical": 95,
+                "strong_rate": 0.3791208791208791,
+                "pass_rate": 0.47802197802197804,
+                "critical_rate": 0.521978021978022
+              },
+              "top2": {
+                "days": 1,
+                "stocks": 2,
+                "strong": 0,
+                "neutral": 0,
+                "critical": 2,
+                "strong_rate": 0.0,
+                "pass_rate": 0.0,
+                "critical_rate": 1.0
+              },
+              "top5": {
+                "days": 1,
+                "stocks": 5,
+                "strong": 1,
+                "neutral": 0,
+                "critical": 4,
+                "strong_rate": 0.2,
+                "pass_rate": 0.2,
+                "critical_rate": 0.8
+              }
+            },
+            "2026-07-31": {
+              "candidate_pool": {
+                "days": 1,
+                "stocks": 1322,
+                "strong": 862,
+                "neutral": 198,
+                "critical": 262,
+                "strong_rate": 0.6520423600605144,
+                "pass_rate": 0.8018154311649016,
+                "critical_rate": 0.19818456883509833
+              },
+              "top2": {
+                "days": 1,
+                "stocks": 2,
+                "strong": 0,
+                "neutral": 0,
+                "critical": 2,
+                "strong_rate": 0.0,
+                "pass_rate": 0.0,
+                "critical_rate": 1.0
+              },
+              "top5": {
+                "days": 1,
+                "stocks": 5,
+                "strong": 2,
+                "neutral": 1,
+                "critical": 2,
+                "strong_rate": 0.4,
+                "pass_rate": 0.6,
+                "critical_rate": 0.4
+              }
+            }
+          }
+        }
+      ]
+    }
+  },
+  "frozen_model3_sha256": "9641bea8a6357492b9dfec69f6acc156a7b16d408a5f858a8eab4c2e294164f7",
+  "seven_factor_model_sha256": "de04586fe320ae4d6f18670578ebf1a195362f0f378c15b97cb0ea182f782539",
+  "input_sha256": {
+    "outputs/stock_automl/tail_expanded_august/trainable_1440.csv": "1486fd98be0d6e633d06a297b96e76560ea2ecd124d6a8e93020fe506a2c2005",
+    "outputs/stock_automl/tail_sep30_check/trainable_1440.csv": "30221c49fe0244a4333555897e01675d839513defe520526a6ab1ffb9a759b4a",
+    "outputs/stock_automl/tail_aug05_aug06_exact/trainable_1440.csv": "5ec7b327d50b513bbc72a4807a5efaa270a38803a9bfa2656aca7dd4f7dac792",
+    "outputs/stock_automl/tail_aug24_exact/trainable_1440.csv": "b5cdc37be54b9cb014fd32bec2cce78a2e4f1864c862c301b6ffb3907386654a",
+    "outputs/stock_automl/sina_15m_july/trainable_proxy_candidates.csv": "eae28c46679401e0191f08bd7c1e62c67079aecd0b905eb6c51105d202b3a015"
+  }
+}

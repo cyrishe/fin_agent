@@ -1,0 +1,30 @@
+{
+  "unweighted": {
+    "common_test_rows": 5628,
+    "argmax_flips": 495,
+    "median_abs_p_ge3_change_percentage_points": 0.5621576398951562,
+    "p90_abs_p_ge3_change_percentage_points": 1.4904772726704363,
+    "top1_old_new_overlap": 13,
+    "top2_old_new_overlap": 29
+  },
+  "balanced_class_weight": {
+    "common_test_rows": 5628,
+    "argmax_flips": 801,
+    "median_abs_p_ge3_change_percentage_points": 0.982870800212976,
+    "p90_abs_p_ge3_change_percentage_points": 2.748791307837228,
+    "top1_old_new_overlap": 14,
+    "top2_old_new_overlap": 28
+  },
+  "unweighted_top2_0940_return_decomposition": {
+    "shared_count": 29,
+    "shared_mean_pct": 0.3633458882527801,
+    "old_only_count": 11,
+    "old_only_mean_pct": 0.8033316932408601,
+    "new_only_count": 11,
+    "new_only_mean_pct": -1.81643722445981,
+    "old_median_pct": 0.717220733555755,
+    "new_median_pct": -0.7262234283025251,
+    "old_winsor_5pct_mean_pct": 0.45620874329485445,
+    "new_winsor_5pct_mean_pct": -0.1842300516468702
+  }
+}

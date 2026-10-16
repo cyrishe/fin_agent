@@ -1,0 +1,285 @@
+{
+  "train_window": 20,
+  "test_dates": [
+    "2026-09-02",
+    "2026-09-03",
+    "2026-09-04",
+    "2026-09-07",
+    "2026-09-08",
+    "2026-09-09",
+    "2026-09-10",
+    "2026-09-11",
+    "2026-09-14",
+    "2026-09-15",
+    "2026-09-16",
+    "2026-09-17",
+    "2026-09-18",
+    "2026-09-21",
+    "2026-09-22",
+    "2026-09-23",
+    "2026-09-24",
+    "2026-09-28",
+    "2026-09-29",
+    "2026-09-30"
+  ],
+  "candidate_rows": 14783,
+  "feature_availability": {
+    "drawdown_from_high_1440": {
+      "available": 14783,
+      "missing": 0,
+      "min": -0.1242675287936956,
+      "median": -0.0111352525801196,
+      "max": 0.0
+    },
+    "max_rising_5m_volume_blocks": {
+      "available": 14783,
+      "missing": 0,
+      "min": 1.0,
+      "median": 3.0,
+      "max": 8.0
+    }
+  },
+  "arms": {
+    "seven_factors": {
+      "top1": {
+        "picks": 20,
+        "known_outcomes": 20,
+        "unknown_outcomes": 0,
+        "selected_days": 20,
+        "ge3": 4,
+        "ge1": 12,
+        "lt0": 5,
+        "below_minus1": 0,
+        "mean_0940_return_pct": 0.37941838762356017
+      },
+      "top2": {
+        "picks": 39,
+        "known_outcomes": 39,
+        "unknown_outcomes": 0,
+        "selected_days": 20,
+        "ge3": 7,
+        "ge1": 19,
+        "lt0": 11,
+        "below_minus1": 3,
+        "mean_0940_return_pct": 0.2527048762184575
+      },
+      "four_class_accuracy": 0.33641715727502103,
+      "balanced_accuracy": 0.28013065354943656,
+      "ge3_auc": 0.6138476294860453,
+      "confusion_rows_actual_columns_predicted": [
+        [
+          1060,
+          476,
+          313,
+          1
+        ],
+        [
+          820,
+          613,
+          369,
+          0
+        ],
+        [
+          880,
+          384,
+          325,
+          0
+        ],
+        [
+          450,
+          117,
+          135,
+          2
+        ]
+      ]
+    },
+    "plus_drawdown": {
+      "top1": {
+        "picks": 20,
+        "known_outcomes": 20,
+        "unknown_outcomes": 0,
+        "selected_days": 20,
+        "ge3": 0,
+        "ge1": 7,
+        "lt0": 8,
+        "below_minus1": 2,
+        "mean_0940_return_pct": -1.1706979476118329
+      },
+      "top2": {
+        "picks": 39,
+        "known_outcomes": 39,
+        "unknown_outcomes": 0,
+        "selected_days": 20,
+        "ge3": 3,
+        "ge1": 16,
+        "lt0": 13,
+        "below_minus1": 4,
+        "mean_0940_return_pct": -0.6704905141342007
+      },
+      "four_class_accuracy": 0.33658536585365856,
+      "balanced_accuracy": 0.28052892111383165,
+      "ge3_auc": 0.6309533876255399,
+      "confusion_rows_actual_columns_predicted": [
+        [
+          1033,
+          473,
+          343,
+          1
+        ],
+        [
+          801,
+          611,
+          390,
+          0
+        ],
+        [
+          844,
+          387,
+          357,
+          1
+        ],
+        [
+          465,
+          98,
+          141,
+          0
+        ]
+      ]
+    },
+    "plus_volume_trend": {
+      "top1": {
+        "picks": 20,
+        "known_outcomes": 20,
+        "unknown_outcomes": 0,
+        "selected_days": 20,
+        "ge3": 2,
+        "ge1": 10,
+        "lt0": 6,
+        "below_minus1": 1,
+        "mean_0940_return_pct": -0.045331594290554666
+      },
+      "top2": {
+        "picks": 40,
+        "known_outcomes": 40,
+        "unknown_outcomes": 0,
+        "selected_days": 20,
+        "ge3": 6,
+        "ge1": 17,
+        "lt0": 15,
+        "below_minus1": 6,
+        "mean_0940_return_pct": -0.4178662279864323
+      },
+      "four_class_accuracy": 0.3377628259041211,
+      "balanced_accuracy": 0.2808497648959055,
+      "ge3_auc": 0.6182904459593068,
+      "confusion_rows_actual_columns_predicted": [
+        [
+          1069,
+          466,
+          314,
+          1
+        ],
+        [
+          826,
+          610,
+          366,
+          0
+        ],
+        [
+          875,
+          385,
+          329,
+          0
+        ],
+        [
+          448,
+          117,
+          139,
+          0
+        ]
+      ]
+    },
+    "plus_both": {
+      "top1": {
+        "picks": 20,
+        "known_outcomes": 20,
+        "unknown_outcomes": 0,
+        "selected_days": 20,
+        "ge3": 3,
+        "ge1": 9,
+        "lt0": 6,
+        "below_minus1": 2,
+        "mean_0940_return_pct": -0.733441522976826
+      },
+      "top2": {
+        "picks": 40,
+        "known_outcomes": 40,
+        "unknown_outcomes": 0,
+        "selected_days": 20,
+        "ge3": 6,
+        "ge1": 18,
+        "lt0": 13,
+        "below_minus1": 4,
+        "mean_0940_return_pct": -0.31937493750594154
+      },
+      "four_class_accuracy": 0.33540790580319596,
+      "balanced_accuracy": 0.27981015287720135,
+      "ge3_auc": 0.6314439471995282,
+      "confusion_rows_actual_columns_predicted": [
+        [
+          1023,
+          487,
+          339,
+          1
+        ],
+        [
+          791,
+          613,
+          398,
+          0
+        ],
+        [
+          840,
+          391,
+          357,
+          1
+        ],
+        [
+          454,
+          106,
+          143,
+          1
+        ]
+      ]
+    }
+  },
+  "paired_top1": {
+    "plus_drawdown": {
+      "common_known_days": 20,
+      "mean_delta_pct_points": -1.550116335235393,
+      "better_days": 3,
+      "worse_days": 13,
+      "same_days": 4
+    },
+    "plus_volume_trend": {
+      "common_known_days": 20,
+      "mean_delta_pct_points": -0.42474998191411484,
+      "better_days": 1,
+      "worse_days": 6,
+      "same_days": 13
+    },
+    "plus_both": {
+      "common_known_days": 20,
+      "mean_delta_pct_points": -1.112859910600386,
+      "better_days": 3,
+      "worse_days": 10,
+      "same_days": 7
+    }
+  },
+  "sources_sha256": {
+    "docs/stock_automl_runs/20261010_four_class_similar_days/prepared_candidates.csv.gz": "c0a4d1ea86c0ea7bbcb21d98cb8efe133efeaf8bd981ca0a86557e00bff00c08",
+    "docs/stock_automl_runs/20261010_four_class_similar_days/market_states_1440.csv": "a7086a79b8223442d3fdbb65d11ffc880e649b687ebc95d36d07a89b15ba3a15",
+    "outputs/stock_automl/four_class_intraday_factors/features.csv.gz": "c9837989d2ecf8ebb9247fd00f588e44962320fa9a28617fd7da895af7acb222",
+    "/Users/imac/.codex/worktrees/automl-five-class/fin_agent/scripts/experiment_automl_four_class_intraday_factors.py": "14fe1fcdc015f63e7741a74a88784639d8e5624b1be3f92f64695e2494332172"
+  }
+}

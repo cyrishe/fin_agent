@@ -1,0 +1,2233 @@
+{
+  "label": "T+1 09:31-09:40 high / T 14:50 proxy - 1; >1%=strong, <0.5%=critical",
+  "model": "eight-factor logistic regression C=0.2; class 0 or 1 is pass",
+  "common_test_dates": [
+    "2026-08-07",
+    "2026-08-10",
+    "2026-08-11",
+    "2026-08-12",
+    "2026-08-13",
+    "2026-08-14",
+    "2026-08-17",
+    "2026-08-18",
+    "2026-08-19",
+    "2026-08-20",
+    "2026-08-21",
+    "2026-09-22",
+    "2026-09-23",
+    "2026-09-24",
+    "2026-09-28",
+    "2026-09-29",
+    "2026-09-30"
+  ],
+  "common_test_candidate_baseline": {
+    "days": 17,
+    "selections": 5684,
+    "strong": 2624,
+    "neutral": 792,
+    "critical": 2268,
+    "strong_rate": 0.4616467276565799,
+    "pass_rate": 0.6009852216748769,
+    "critical_rate": 0.39901477832512317
+  },
+  "training_pool_candidate_counts": {
+    "2026-08-25": 953,
+    "2026-08-26": 267,
+    "2026-08-27": 581,
+    "2026-08-28": 337,
+    "2026-08-31": 550,
+    "2026-09-01": 333,
+    "2026-09-02": 153,
+    "2026-09-03": 253,
+    "2026-09-04": 191,
+    "2026-09-07": 491,
+    "2026-09-08": 414,
+    "2026-09-09": 195,
+    "2026-09-10": 123,
+    "2026-09-11": 76,
+    "2026-09-14": 253,
+    "2026-09-15": 106,
+    "2026-09-16": 437,
+    "2026-09-17": 265,
+    "2026-09-18": 583,
+    "2026-09-21": 927
+  },
+  "experiments": [
+    {
+      "experiment": "全部20日",
+      "training_dates": [
+        "2026-08-25",
+        "2026-08-26",
+        "2026-08-27",
+        "2026-08-28",
+        "2026-08-31",
+        "2026-09-01",
+        "2026-09-02",
+        "2026-09-03",
+        "2026-09-04",
+        "2026-09-07",
+        "2026-09-08",
+        "2026-09-09",
+        "2026-09-10",
+        "2026-09-11",
+        "2026-09-14",
+        "2026-09-15",
+        "2026-09-16",
+        "2026-09-17",
+        "2026-09-18",
+        "2026-09-21"
+      ],
+      "training_rows": 7488,
+      "training_day_candidate_counts": {
+        "2026-08-25": 953,
+        "2026-08-26": 267,
+        "2026-08-27": 581,
+        "2026-08-28": 337,
+        "2026-08-31": 550,
+        "2026-09-01": 333,
+        "2026-09-02": 153,
+        "2026-09-03": 253,
+        "2026-09-04": 191,
+        "2026-09-07": 491,
+        "2026-09-08": 414,
+        "2026-09-09": 195,
+        "2026-09-10": 123,
+        "2026-09-11": 76,
+        "2026-09-14": 253,
+        "2026-09-15": 106,
+        "2026-09-16": 437,
+        "2026-09-17": 265,
+        "2026-09-18": 583,
+        "2026-09-21": 927
+      },
+      "common_17_days": {
+        "top2": {
+          "days": 17,
+          "selections": 34,
+          "strong": 21,
+          "neutral": 7,
+          "critical": 6,
+          "strong_rate": 0.6176470588235294,
+          "pass_rate": 0.8235294117647058,
+          "critical_rate": 0.17647058823529413
+        },
+        "top5": {
+          "days": 17,
+          "selections": 85,
+          "strong": 49,
+          "neutral": 15,
+          "critical": 21,
+          "strong_rate": 0.5764705882352941,
+          "pass_rate": 0.7529411764705882,
+          "critical_rate": 0.24705882352941178
+        }
+      },
+      "all_nontraining_days": {
+        "top2": {
+          "days": 17,
+          "selections": 34,
+          "strong": 21,
+          "neutral": 7,
+          "critical": 6,
+          "strong_rate": 0.6176470588235294,
+          "pass_rate": 0.8235294117647058,
+          "critical_rate": 0.17647058823529413
+        },
+        "top5": {
+          "days": 17,
+          "selections": 85,
+          "strong": 49,
+          "neutral": 15,
+          "critical": 21,
+          "strong_rate": 0.5764705882352941,
+          "pass_rate": 0.7529411764705882,
+          "critical_rate": 0.24705882352941178
+        }
+      },
+      "daily": {
+        "2026-08-07": {
+          "top2": {
+            "days": 1,
+            "selections": 2,
+            "strong": 2,
+            "neutral": 0,
+            "critical": 0,
+            "strong_rate": 1.0,
+            "pass_rate": 1.0,
+            "critical_rate": 0.0
+          },
+          "top5": {
+            "days": 1,
+            "selections": 5,
+            "strong": 5,
+            "neutral": 0,
+            "critical": 0,
+            "strong_rate": 1.0,
+            "pass_rate": 1.0,
+            "critical_rate": 0.0
+          }
+        },
+        "2026-08-10": {
+          "top2": {
+            "days": 1,
+            "selections": 2,
+            "strong": 1,
+            "neutral": 0,
+            "critical": 1,
+            "strong_rate": 0.5,
+            "pass_rate": 0.5,
+            "critical_rate": 0.5
+          },
+          "top5": {
+            "days": 1,
+            "selections": 5,
+            "strong": 2,
+            "neutral": 0,
+            "critical": 3,
+            "strong_rate": 0.4,
+            "pass_rate": 0.4,
+            "critical_rate": 0.6
+          }
+        },
+        "2026-08-11": {
+          "top2": {
+            "days": 1,
+            "selections": 2,
+            "strong": 2,
+            "neutral": 0,
+            "critical": 0,
+            "strong_rate": 1.0,
+            "pass_rate": 1.0,
+            "critical_rate": 0.0
+          },
+          "top5": {
+            "days": 1,
+            "selections": 5,
+            "strong": 4,
+            "neutral": 0,
+            "critical": 1,
+            "strong_rate": 0.8,
+            "pass_rate": 0.8,
+            "critical_rate": 0.2
+          }
+        },
+        "2026-08-12": {
+          "top2": {
+            "days": 1,
+            "selections": 2,
+            "strong": 2,
+            "neutral": 0,
+            "critical": 0,
+            "strong_rate": 1.0,
+            "pass_rate": 1.0,
+            "critical_rate": 0.0
+          },
+          "top5": {
+            "days": 1,
+            "selections": 5,
+            "strong": 5,
+            "neutral": 0,
+            "critical": 0,
+            "strong_rate": 1.0,
+            "pass_rate": 1.0,
+            "critical_rate": 0.0
+          }
+        },
+        "2026-08-13": {
+          "top2": {
+            "days": 1,
+            "selections": 2,
+            "strong": 2,
+            "neutral": 0,
+            "critical": 0,
+            "strong_rate": 1.0,
+            "pass_rate": 1.0,
+            "critical_rate": 0.0
+          },
+          "top5": {
+            "days": 1,
+            "selections": 5,
+            "strong": 3,
+            "neutral": 0,
+            "critical": 2,
+            "strong_rate": 0.6,
+            "pass_rate": 0.6,
+            "critical_rate": 0.4
+          }
+        },
+        "2026-08-14": {
+          "top2": {
+            "days": 1,
+            "selections": 2,
+            "strong": 2,
+            "neutral": 0,
+            "critical": 0,
+            "strong_rate": 1.0,
+            "pass_rate": 1.0,
+            "critical_rate": 0.0
+          },
+          "top5": {
+            "days": 1,
+            "selections": 5,
+            "strong": 4,
+            "neutral": 0,
+            "critical": 1,
+            "strong_rate": 0.8,
+            "pass_rate": 0.8,
+            "critical_rate": 0.2
+          }
+        },
+        "2026-08-17": {
+          "top2": {
+            "days": 1,
+            "selections": 2,
+            "strong": 0,
+            "neutral": 2,
+            "critical": 0,
+            "strong_rate": 0.0,
+            "pass_rate": 1.0,
+            "critical_rate": 0.0
+          },
+          "top5": {
+            "days": 1,
+            "selections": 5,
+            "strong": 2,
+            "neutral": 3,
+            "critical": 0,
+            "strong_rate": 0.4,
+            "pass_rate": 1.0,
+            "critical_rate": 0.0
+          }
+        },
+        "2026-08-18": {
+          "top2": {
+            "days": 1,
+            "selections": 2,
+            "strong": 0,
+            "neutral": 0,
+            "critical": 2,
+            "strong_rate": 0.0,
+            "pass_rate": 0.0,
+            "critical_rate": 1.0
+          },
+          "top5": {
+            "days": 1,
+            "selections": 5,
+            "strong": 1,
+            "neutral": 0,
+            "critical": 4,
+            "strong_rate": 0.2,
+            "pass_rate": 0.2,
+            "critical_rate": 0.8
+          }
+        },
+        "2026-08-19": {
+          "top2": {
+            "days": 1,
+            "selections": 2,
+            "strong": 1,
+            "neutral": 1,
+            "critical": 0,
+            "strong_rate": 0.5,
+            "pass_rate": 1.0,
+            "critical_rate": 0.0
+          },
+          "top5": {
+            "days": 1,
+            "selections": 5,
+            "strong": 4,
+            "neutral": 1,
+            "critical": 0,
+            "strong_rate": 0.8,
+            "pass_rate": 1.0,
+            "critical_rate": 0.0
+          }
+        },
+        "2026-08-20": {
+          "top2": {
+            "days": 1,
+            "selections": 2,
+            "strong": 0,
+            "neutral": 1,
+            "critical": 1,
+            "strong_rate": 0.0,
+            "pass_rate": 0.5,
+            "critical_rate": 0.5
+          },
+          "top5": {
+            "days": 1,
+            "selections": 5,
+            "strong": 1,
+            "neutral": 1,
+            "critical": 3,
+            "strong_rate": 0.2,
+            "pass_rate": 0.4,
+            "critical_rate": 0.6
+          }
+        },
+        "2026-08-21": {
+          "top2": {
+            "days": 1,
+            "selections": 2,
+            "strong": 0,
+            "neutral": 1,
+            "critical": 1,
+            "strong_rate": 0.0,
+            "pass_rate": 0.5,
+            "critical_rate": 0.5
+          },
+          "top5": {
+            "days": 1,
+            "selections": 5,
+            "strong": 1,
+            "neutral": 3,
+            "critical": 1,
+            "strong_rate": 0.2,
+            "pass_rate": 0.8,
+            "critical_rate": 0.2
+          }
+        },
+        "2026-09-22": {
+          "top2": {
+            "days": 1,
+            "selections": 2,
+            "strong": 2,
+            "neutral": 0,
+            "critical": 0,
+            "strong_rate": 1.0,
+            "pass_rate": 1.0,
+            "critical_rate": 0.0
+          },
+          "top5": {
+            "days": 1,
+            "selections": 5,
+            "strong": 3,
+            "neutral": 1,
+            "critical": 1,
+            "strong_rate": 0.6,
+            "pass_rate": 0.8,
+            "critical_rate": 0.2
+          }
+        },
+        "2026-09-23": {
+          "top2": {
+            "days": 1,
+            "selections": 2,
+            "strong": 2,
+            "neutral": 0,
+            "critical": 0,
+            "strong_rate": 1.0,
+            "pass_rate": 1.0,
+            "critical_rate": 0.0
+          },
+          "top5": {
+            "days": 1,
+            "selections": 5,
+            "strong": 4,
+            "neutral": 0,
+            "critical": 1,
+            "strong_rate": 0.8,
+            "pass_rate": 0.8,
+            "critical_rate": 0.2
+          }
+        },
+        "2026-09-24": {
+          "top2": {
+            "days": 1,
+            "selections": 2,
+            "strong": 1,
+            "neutral": 1,
+            "critical": 0,
+            "strong_rate": 0.5,
+            "pass_rate": 1.0,
+            "critical_rate": 0.0
+          },
+          "top5": {
+            "days": 1,
+            "selections": 5,
+            "strong": 3,
+            "neutral": 1,
+            "critical": 1,
+            "strong_rate": 0.6,
+            "pass_rate": 0.8,
+            "critical_rate": 0.2
+          }
+        },
+        "2026-09-28": {
+          "top2": {
+            "days": 1,
+            "selections": 2,
+            "strong": 1,
+            "neutral": 0,
+            "critical": 1,
+            "strong_rate": 0.5,
+            "pass_rate": 0.5,
+            "critical_rate": 0.5
+          },
+          "top5": {
+            "days": 1,
+            "selections": 5,
+            "strong": 1,
+            "neutral": 2,
+            "critical": 2,
+            "strong_rate": 0.2,
+            "pass_rate": 0.6,
+            "critical_rate": 0.4
+          }
+        },
+        "2026-09-29": {
+          "top2": {
+            "days": 1,
+            "selections": 2,
+            "strong": 2,
+            "neutral": 0,
+            "critical": 0,
+            "strong_rate": 1.0,
+            "pass_rate": 1.0,
+            "critical_rate": 0.0
+          },
+          "top5": {
+            "days": 1,
+            "selections": 5,
+            "strong": 4,
+            "neutral": 0,
+            "critical": 1,
+            "strong_rate": 0.8,
+            "pass_rate": 0.8,
+            "critical_rate": 0.2
+          }
+        },
+        "2026-09-30": {
+          "top2": {
+            "days": 1,
+            "selections": 2,
+            "strong": 1,
+            "neutral": 1,
+            "critical": 0,
+            "strong_rate": 0.5,
+            "pass_rate": 1.0,
+            "critical_rate": 0.0
+          },
+          "top5": {
+            "days": 1,
+            "selections": 5,
+            "strong": 2,
+            "neutral": 3,
+            "critical": 0,
+            "strong_rate": 0.4,
+            "pass_rate": 1.0,
+            "critical_rate": 0.0
+          }
+        }
+      }
+    },
+    {
+      "experiment": "前15日",
+      "training_dates": [
+        "2026-08-25",
+        "2026-08-26",
+        "2026-08-27",
+        "2026-08-28",
+        "2026-08-31",
+        "2026-09-01",
+        "2026-09-02",
+        "2026-09-03",
+        "2026-09-04",
+        "2026-09-07",
+        "2026-09-08",
+        "2026-09-09",
+        "2026-09-10",
+        "2026-09-11",
+        "2026-09-14"
+      ],
+      "training_rows": 5170,
+      "training_day_candidate_counts": {
+        "2026-08-25": 953,
+        "2026-08-26": 267,
+        "2026-08-27": 581,
+        "2026-08-28": 337,
+        "2026-08-31": 550,
+        "2026-09-01": 333,
+        "2026-09-02": 153,
+        "2026-09-03": 253,
+        "2026-09-04": 191,
+        "2026-09-07": 491,
+        "2026-09-08": 414,
+        "2026-09-09": 195,
+        "2026-09-10": 123,
+        "2026-09-11": 76,
+        "2026-09-14": 253
+      },
+      "common_17_days": {
+        "top2": {
+          "days": 17,
+          "selections": 34,
+          "strong": 19,
+          "neutral": 4,
+          "critical": 11,
+          "strong_rate": 0.5588235294117647,
+          "pass_rate": 0.6764705882352942,
+          "critical_rate": 0.3235294117647059
+        },
+        "top5": {
+          "days": 17,
+          "selections": 85,
+          "strong": 49,
+          "neutral": 13,
+          "critical": 23,
+          "strong_rate": 0.5764705882352941,
+          "pass_rate": 0.7294117647058823,
+          "critical_rate": 0.27058823529411763
+        }
+      },
+      "all_nontraining_days": {
+        "top2": {
+          "days": 22,
+          "selections": 44,
+          "strong": 27,
+          "neutral": 5,
+          "critical": 12,
+          "strong_rate": 0.6136363636363636,
+          "pass_rate": 0.7272727272727273,
+          "critical_rate": 0.2727272727272727
+        },
+        "top5": {
+          "days": 22,
+          "selections": 110,
+          "strong": 65,
+          "neutral": 17,
+          "critical": 28,
+          "strong_rate": 0.5909090909090909,
+          "pass_rate": 0.7454545454545455,
+          "critical_rate": 0.2545454545454545
+        }
+      },
+      "daily": {
+        "2026-08-07": {
+          "top2": {
+            "days": 1,
+            "selections": 2,
+            "strong": 2,
+            "neutral": 0,
+            "critical": 0,
+            "strong_rate": 1.0,
+            "pass_rate": 1.0,
+            "critical_rate": 0.0
+          },
+          "top5": {
+            "days": 1,
+            "selections": 5,
+            "strong": 5,
+            "neutral": 0,
+            "critical": 0,
+            "strong_rate": 1.0,
+            "pass_rate": 1.0,
+            "critical_rate": 0.0
+          }
+        },
+        "2026-08-10": {
+          "top2": {
+            "days": 1,
+            "selections": 2,
+            "strong": 0,
+            "neutral": 0,
+            "critical": 2,
+            "strong_rate": 0.0,
+            "pass_rate": 0.0,
+            "critical_rate": 1.0
+          },
+          "top5": {
+            "days": 1,
+            "selections": 5,
+            "strong": 3,
+            "neutral": 0,
+            "critical": 2,
+            "strong_rate": 0.6,
+            "pass_rate": 0.6,
+            "critical_rate": 0.4
+          }
+        },
+        "2026-08-11": {
+          "top2": {
+            "days": 1,
+            "selections": 2,
+            "strong": 1,
+            "neutral": 0,
+            "critical": 1,
+            "strong_rate": 0.5,
+            "pass_rate": 0.5,
+            "critical_rate": 0.5
+          },
+          "top5": {
+            "days": 1,
+            "selections": 5,
+            "strong": 3,
+            "neutral": 0,
+            "critical": 2,
+            "strong_rate": 0.6,
+            "pass_rate": 0.6,
+            "critical_rate": 0.4
+          }
+        },
+        "2026-08-12": {
+          "top2": {
+            "days": 1,
+            "selections": 2,
+            "strong": 2,
+            "neutral": 0,
+            "critical": 0,
+            "strong_rate": 1.0,
+            "pass_rate": 1.0,
+            "critical_rate": 0.0
+          },
+          "top5": {
+            "days": 1,
+            "selections": 5,
+            "strong": 5,
+            "neutral": 0,
+            "critical": 0,
+            "strong_rate": 1.0,
+            "pass_rate": 1.0,
+            "critical_rate": 0.0
+          }
+        },
+        "2026-08-13": {
+          "top2": {
+            "days": 1,
+            "selections": 2,
+            "strong": 1,
+            "neutral": 0,
+            "critical": 1,
+            "strong_rate": 0.5,
+            "pass_rate": 0.5,
+            "critical_rate": 0.5
+          },
+          "top5": {
+            "days": 1,
+            "selections": 5,
+            "strong": 2,
+            "neutral": 1,
+            "critical": 2,
+            "strong_rate": 0.4,
+            "pass_rate": 0.6,
+            "critical_rate": 0.4
+          }
+        },
+        "2026-08-14": {
+          "top2": {
+            "days": 1,
+            "selections": 2,
+            "strong": 0,
+            "neutral": 1,
+            "critical": 1,
+            "strong_rate": 0.0,
+            "pass_rate": 0.5,
+            "critical_rate": 0.5
+          },
+          "top5": {
+            "days": 1,
+            "selections": 5,
+            "strong": 2,
+            "neutral": 2,
+            "critical": 1,
+            "strong_rate": 0.4,
+            "pass_rate": 0.8,
+            "critical_rate": 0.2
+          }
+        },
+        "2026-08-17": {
+          "top2": {
+            "days": 1,
+            "selections": 2,
+            "strong": 1,
+            "neutral": 0,
+            "critical": 1,
+            "strong_rate": 0.5,
+            "pass_rate": 0.5,
+            "critical_rate": 0.5
+          },
+          "top5": {
+            "days": 1,
+            "selections": 5,
+            "strong": 3,
+            "neutral": 1,
+            "critical": 1,
+            "strong_rate": 0.6,
+            "pass_rate": 0.8,
+            "critical_rate": 0.2
+          }
+        },
+        "2026-08-18": {
+          "top2": {
+            "days": 1,
+            "selections": 2,
+            "strong": 0,
+            "neutral": 1,
+            "critical": 1,
+            "strong_rate": 0.0,
+            "pass_rate": 0.5,
+            "critical_rate": 0.5
+          },
+          "top5": {
+            "days": 1,
+            "selections": 5,
+            "strong": 0,
+            "neutral": 1,
+            "critical": 4,
+            "strong_rate": 0.0,
+            "pass_rate": 0.2,
+            "critical_rate": 0.8
+          }
+        },
+        "2026-08-19": {
+          "top2": {
+            "days": 1,
+            "selections": 2,
+            "strong": 2,
+            "neutral": 0,
+            "critical": 0,
+            "strong_rate": 1.0,
+            "pass_rate": 1.0,
+            "critical_rate": 0.0
+          },
+          "top5": {
+            "days": 1,
+            "selections": 5,
+            "strong": 4,
+            "neutral": 0,
+            "critical": 1,
+            "strong_rate": 0.8,
+            "pass_rate": 0.8,
+            "critical_rate": 0.2
+          }
+        },
+        "2026-08-20": {
+          "top2": {
+            "days": 1,
+            "selections": 2,
+            "strong": 1,
+            "neutral": 0,
+            "critical": 1,
+            "strong_rate": 0.5,
+            "pass_rate": 0.5,
+            "critical_rate": 0.5
+          },
+          "top5": {
+            "days": 1,
+            "selections": 5,
+            "strong": 3,
+            "neutral": 0,
+            "critical": 2,
+            "strong_rate": 0.6,
+            "pass_rate": 0.6,
+            "critical_rate": 0.4
+          }
+        },
+        "2026-08-21": {
+          "top2": {
+            "days": 1,
+            "selections": 2,
+            "strong": 1,
+            "neutral": 0,
+            "critical": 1,
+            "strong_rate": 0.5,
+            "pass_rate": 0.5,
+            "critical_rate": 0.5
+          },
+          "top5": {
+            "days": 1,
+            "selections": 5,
+            "strong": 3,
+            "neutral": 1,
+            "critical": 1,
+            "strong_rate": 0.6,
+            "pass_rate": 0.8,
+            "critical_rate": 0.2
+          }
+        },
+        "2026-09-15": {
+          "top2": {
+            "days": 1,
+            "selections": 2,
+            "strong": 2,
+            "neutral": 0,
+            "critical": 0,
+            "strong_rate": 1.0,
+            "pass_rate": 1.0,
+            "critical_rate": 0.0
+          },
+          "top5": {
+            "days": 1,
+            "selections": 5,
+            "strong": 4,
+            "neutral": 1,
+            "critical": 0,
+            "strong_rate": 0.8,
+            "pass_rate": 1.0,
+            "critical_rate": 0.0
+          }
+        },
+        "2026-09-16": {
+          "top2": {
+            "days": 1,
+            "selections": 2,
+            "strong": 2,
+            "neutral": 0,
+            "critical": 0,
+            "strong_rate": 1.0,
+            "pass_rate": 1.0,
+            "critical_rate": 0.0
+          },
+          "top5": {
+            "days": 1,
+            "selections": 5,
+            "strong": 4,
+            "neutral": 1,
+            "critical": 0,
+            "strong_rate": 0.8,
+            "pass_rate": 1.0,
+            "critical_rate": 0.0
+          }
+        },
+        "2026-09-17": {
+          "top2": {
+            "days": 1,
+            "selections": 2,
+            "strong": 1,
+            "neutral": 0,
+            "critical": 1,
+            "strong_rate": 0.5,
+            "pass_rate": 0.5,
+            "critical_rate": 0.5
+          },
+          "top5": {
+            "days": 1,
+            "selections": 5,
+            "strong": 2,
+            "neutral": 0,
+            "critical": 3,
+            "strong_rate": 0.4,
+            "pass_rate": 0.4,
+            "critical_rate": 0.6
+          }
+        },
+        "2026-09-18": {
+          "top2": {
+            "days": 1,
+            "selections": 2,
+            "strong": 1,
+            "neutral": 1,
+            "critical": 0,
+            "strong_rate": 0.5,
+            "pass_rate": 1.0,
+            "critical_rate": 0.0
+          },
+          "top5": {
+            "days": 1,
+            "selections": 5,
+            "strong": 2,
+            "neutral": 1,
+            "critical": 2,
+            "strong_rate": 0.4,
+            "pass_rate": 0.6,
+            "critical_rate": 0.4
+          }
+        },
+        "2026-09-21": {
+          "top2": {
+            "days": 1,
+            "selections": 2,
+            "strong": 2,
+            "neutral": 0,
+            "critical": 0,
+            "strong_rate": 1.0,
+            "pass_rate": 1.0,
+            "critical_rate": 0.0
+          },
+          "top5": {
+            "days": 1,
+            "selections": 5,
+            "strong": 4,
+            "neutral": 1,
+            "critical": 0,
+            "strong_rate": 0.8,
+            "pass_rate": 1.0,
+            "critical_rate": 0.0
+          }
+        },
+        "2026-09-22": {
+          "top2": {
+            "days": 1,
+            "selections": 2,
+            "strong": 2,
+            "neutral": 0,
+            "critical": 0,
+            "strong_rate": 1.0,
+            "pass_rate": 1.0,
+            "critical_rate": 0.0
+          },
+          "top5": {
+            "days": 1,
+            "selections": 5,
+            "strong": 3,
+            "neutral": 1,
+            "critical": 1,
+            "strong_rate": 0.6,
+            "pass_rate": 0.8,
+            "critical_rate": 0.2
+          }
+        },
+        "2026-09-23": {
+          "top2": {
+            "days": 1,
+            "selections": 2,
+            "strong": 1,
+            "neutral": 0,
+            "critical": 1,
+            "strong_rate": 0.5,
+            "pass_rate": 0.5,
+            "critical_rate": 0.5
+          },
+          "top5": {
+            "days": 1,
+            "selections": 5,
+            "strong": 2,
+            "neutral": 0,
+            "critical": 3,
+            "strong_rate": 0.4,
+            "pass_rate": 0.4,
+            "critical_rate": 0.6
+          }
+        },
+        "2026-09-24": {
+          "top2": {
+            "days": 1,
+            "selections": 2,
+            "strong": 1,
+            "neutral": 1,
+            "critical": 0,
+            "strong_rate": 0.5,
+            "pass_rate": 1.0,
+            "critical_rate": 0.0
+          },
+          "top5": {
+            "days": 1,
+            "selections": 5,
+            "strong": 2,
+            "neutral": 2,
+            "critical": 1,
+            "strong_rate": 0.4,
+            "pass_rate": 0.8,
+            "critical_rate": 0.2
+          }
+        },
+        "2026-09-28": {
+          "top2": {
+            "days": 1,
+            "selections": 2,
+            "strong": 1,
+            "neutral": 1,
+            "critical": 0,
+            "strong_rate": 0.5,
+            "pass_rate": 1.0,
+            "critical_rate": 0.0
+          },
+          "top5": {
+            "days": 1,
+            "selections": 5,
+            "strong": 3,
+            "neutral": 2,
+            "critical": 0,
+            "strong_rate": 0.6,
+            "pass_rate": 1.0,
+            "critical_rate": 0.0
+          }
+        },
+        "2026-09-29": {
+          "top2": {
+            "days": 1,
+            "selections": 2,
+            "strong": 2,
+            "neutral": 0,
+            "critical": 0,
+            "strong_rate": 1.0,
+            "pass_rate": 1.0,
+            "critical_rate": 0.0
+          },
+          "top5": {
+            "days": 1,
+            "selections": 5,
+            "strong": 4,
+            "neutral": 0,
+            "critical": 1,
+            "strong_rate": 0.8,
+            "pass_rate": 0.8,
+            "critical_rate": 0.2
+          }
+        },
+        "2026-09-30": {
+          "top2": {
+            "days": 1,
+            "selections": 2,
+            "strong": 1,
+            "neutral": 0,
+            "critical": 1,
+            "strong_rate": 0.5,
+            "pass_rate": 0.5,
+            "critical_rate": 0.5
+          },
+          "top5": {
+            "days": 1,
+            "selections": 5,
+            "strong": 2,
+            "neutral": 2,
+            "critical": 1,
+            "strong_rate": 0.4,
+            "pass_rate": 0.8,
+            "critical_rate": 0.2
+          }
+        }
+      }
+    },
+    {
+      "experiment": "后15日",
+      "training_dates": [
+        "2026-09-01",
+        "2026-09-02",
+        "2026-09-03",
+        "2026-09-04",
+        "2026-09-07",
+        "2026-09-08",
+        "2026-09-09",
+        "2026-09-10",
+        "2026-09-11",
+        "2026-09-14",
+        "2026-09-15",
+        "2026-09-16",
+        "2026-09-17",
+        "2026-09-18",
+        "2026-09-21"
+      ],
+      "training_rows": 4800,
+      "training_day_candidate_counts": {
+        "2026-09-01": 333,
+        "2026-09-02": 153,
+        "2026-09-03": 253,
+        "2026-09-04": 191,
+        "2026-09-07": 491,
+        "2026-09-08": 414,
+        "2026-09-09": 195,
+        "2026-09-10": 123,
+        "2026-09-11": 76,
+        "2026-09-14": 253,
+        "2026-09-15": 106,
+        "2026-09-16": 437,
+        "2026-09-17": 265,
+        "2026-09-18": 583,
+        "2026-09-21": 927
+      },
+      "common_17_days": {
+        "top2": {
+          "days": 17,
+          "selections": 34,
+          "strong": 17,
+          "neutral": 7,
+          "critical": 10,
+          "strong_rate": 0.5,
+          "pass_rate": 0.7058823529411765,
+          "critical_rate": 0.29411764705882354
+        },
+        "top5": {
+          "days": 17,
+          "selections": 85,
+          "strong": 52,
+          "neutral": 16,
+          "critical": 17,
+          "strong_rate": 0.611764705882353,
+          "pass_rate": 0.8,
+          "critical_rate": 0.2
+        }
+      },
+      "all_nontraining_days": {
+        "top2": {
+          "days": 22,
+          "selections": 44,
+          "strong": 20,
+          "neutral": 12,
+          "critical": 12,
+          "strong_rate": 0.45454545454545453,
+          "pass_rate": 0.7272727272727273,
+          "critical_rate": 0.2727272727272727
+        },
+        "top5": {
+          "days": 22,
+          "selections": 110,
+          "strong": 60,
+          "neutral": 25,
+          "critical": 25,
+          "strong_rate": 0.5454545454545454,
+          "pass_rate": 0.7727272727272727,
+          "critical_rate": 0.22727272727272727
+        }
+      },
+      "daily": {
+        "2026-08-07": {
+          "top2": {
+            "days": 1,
+            "selections": 2,
+            "strong": 2,
+            "neutral": 0,
+            "critical": 0,
+            "strong_rate": 1.0,
+            "pass_rate": 1.0,
+            "critical_rate": 0.0
+          },
+          "top5": {
+            "days": 1,
+            "selections": 5,
+            "strong": 5,
+            "neutral": 0,
+            "critical": 0,
+            "strong_rate": 1.0,
+            "pass_rate": 1.0,
+            "critical_rate": 0.0
+          }
+        },
+        "2026-08-10": {
+          "top2": {
+            "days": 1,
+            "selections": 2,
+            "strong": 1,
+            "neutral": 0,
+            "critical": 1,
+            "strong_rate": 0.5,
+            "pass_rate": 0.5,
+            "critical_rate": 0.5
+          },
+          "top5": {
+            "days": 1,
+            "selections": 5,
+            "strong": 2,
+            "neutral": 1,
+            "critical": 2,
+            "strong_rate": 0.4,
+            "pass_rate": 0.6,
+            "critical_rate": 0.4
+          }
+        },
+        "2026-08-11": {
+          "top2": {
+            "days": 1,
+            "selections": 2,
+            "strong": 1,
+            "neutral": 0,
+            "critical": 1,
+            "strong_rate": 0.5,
+            "pass_rate": 0.5,
+            "critical_rate": 0.5
+          },
+          "top5": {
+            "days": 1,
+            "selections": 5,
+            "strong": 4,
+            "neutral": 0,
+            "critical": 1,
+            "strong_rate": 0.8,
+            "pass_rate": 0.8,
+            "critical_rate": 0.2
+          }
+        },
+        "2026-08-12": {
+          "top2": {
+            "days": 1,
+            "selections": 2,
+            "strong": 2,
+            "neutral": 0,
+            "critical": 0,
+            "strong_rate": 1.0,
+            "pass_rate": 1.0,
+            "critical_rate": 0.0
+          },
+          "top5": {
+            "days": 1,
+            "selections": 5,
+            "strong": 5,
+            "neutral": 0,
+            "critical": 0,
+            "strong_rate": 1.0,
+            "pass_rate": 1.0,
+            "critical_rate": 0.0
+          }
+        },
+        "2026-08-13": {
+          "top2": {
+            "days": 1,
+            "selections": 2,
+            "strong": 1,
+            "neutral": 0,
+            "critical": 1,
+            "strong_rate": 0.5,
+            "pass_rate": 0.5,
+            "critical_rate": 0.5
+          },
+          "top5": {
+            "days": 1,
+            "selections": 5,
+            "strong": 4,
+            "neutral": 0,
+            "critical": 1,
+            "strong_rate": 0.8,
+            "pass_rate": 0.8,
+            "critical_rate": 0.2
+          }
+        },
+        "2026-08-14": {
+          "top2": {
+            "days": 1,
+            "selections": 2,
+            "strong": 2,
+            "neutral": 0,
+            "critical": 0,
+            "strong_rate": 1.0,
+            "pass_rate": 1.0,
+            "critical_rate": 0.0
+          },
+          "top5": {
+            "days": 1,
+            "selections": 5,
+            "strong": 5,
+            "neutral": 0,
+            "critical": 0,
+            "strong_rate": 1.0,
+            "pass_rate": 1.0,
+            "critical_rate": 0.0
+          }
+        },
+        "2026-08-17": {
+          "top2": {
+            "days": 1,
+            "selections": 2,
+            "strong": 0,
+            "neutral": 2,
+            "critical": 0,
+            "strong_rate": 0.0,
+            "pass_rate": 1.0,
+            "critical_rate": 0.0
+          },
+          "top5": {
+            "days": 1,
+            "selections": 5,
+            "strong": 2,
+            "neutral": 3,
+            "critical": 0,
+            "strong_rate": 0.4,
+            "pass_rate": 1.0,
+            "critical_rate": 0.0
+          }
+        },
+        "2026-08-18": {
+          "top2": {
+            "days": 1,
+            "selections": 2,
+            "strong": 0,
+            "neutral": 0,
+            "critical": 2,
+            "strong_rate": 0.0,
+            "pass_rate": 0.0,
+            "critical_rate": 1.0
+          },
+          "top5": {
+            "days": 1,
+            "selections": 5,
+            "strong": 1,
+            "neutral": 0,
+            "critical": 4,
+            "strong_rate": 0.2,
+            "pass_rate": 0.2,
+            "critical_rate": 0.8
+          }
+        },
+        "2026-08-19": {
+          "top2": {
+            "days": 1,
+            "selections": 2,
+            "strong": 1,
+            "neutral": 1,
+            "critical": 0,
+            "strong_rate": 0.5,
+            "pass_rate": 1.0,
+            "critical_rate": 0.0
+          },
+          "top5": {
+            "days": 1,
+            "selections": 5,
+            "strong": 4,
+            "neutral": 1,
+            "critical": 0,
+            "strong_rate": 0.8,
+            "pass_rate": 1.0,
+            "critical_rate": 0.0
+          }
+        },
+        "2026-08-20": {
+          "top2": {
+            "days": 1,
+            "selections": 2,
+            "strong": 0,
+            "neutral": 1,
+            "critical": 1,
+            "strong_rate": 0.0,
+            "pass_rate": 0.5,
+            "critical_rate": 0.5
+          },
+          "top5": {
+            "days": 1,
+            "selections": 5,
+            "strong": 2,
+            "neutral": 1,
+            "critical": 2,
+            "strong_rate": 0.4,
+            "pass_rate": 0.6,
+            "critical_rate": 0.4
+          }
+        },
+        "2026-08-21": {
+          "top2": {
+            "days": 1,
+            "selections": 2,
+            "strong": 0,
+            "neutral": 2,
+            "critical": 0,
+            "strong_rate": 0.0,
+            "pass_rate": 1.0,
+            "critical_rate": 0.0
+          },
+          "top5": {
+            "days": 1,
+            "selections": 5,
+            "strong": 0,
+            "neutral": 4,
+            "critical": 1,
+            "strong_rate": 0.0,
+            "pass_rate": 0.8,
+            "critical_rate": 0.2
+          }
+        },
+        "2026-08-25": {
+          "top2": {
+            "days": 1,
+            "selections": 2,
+            "strong": 0,
+            "neutral": 1,
+            "critical": 1,
+            "strong_rate": 0.0,
+            "pass_rate": 0.5,
+            "critical_rate": 0.5
+          },
+          "top5": {
+            "days": 1,
+            "selections": 5,
+            "strong": 1,
+            "neutral": 2,
+            "critical": 2,
+            "strong_rate": 0.2,
+            "pass_rate": 0.6,
+            "critical_rate": 0.4
+          }
+        },
+        "2026-08-26": {
+          "top2": {
+            "days": 1,
+            "selections": 2,
+            "strong": 0,
+            "neutral": 2,
+            "critical": 0,
+            "strong_rate": 0.0,
+            "pass_rate": 1.0,
+            "critical_rate": 0.0
+          },
+          "top5": {
+            "days": 1,
+            "selections": 5,
+            "strong": 2,
+            "neutral": 2,
+            "critical": 1,
+            "strong_rate": 0.4,
+            "pass_rate": 0.8,
+            "critical_rate": 0.2
+          }
+        },
+        "2026-08-27": {
+          "top2": {
+            "days": 1,
+            "selections": 2,
+            "strong": 1,
+            "neutral": 1,
+            "critical": 0,
+            "strong_rate": 0.5,
+            "pass_rate": 1.0,
+            "critical_rate": 0.0
+          },
+          "top5": {
+            "days": 1,
+            "selections": 5,
+            "strong": 1,
+            "neutral": 2,
+            "critical": 2,
+            "strong_rate": 0.2,
+            "pass_rate": 0.6,
+            "critical_rate": 0.4
+          }
+        },
+        "2026-08-28": {
+          "top2": {
+            "days": 1,
+            "selections": 2,
+            "strong": 0,
+            "neutral": 1,
+            "critical": 1,
+            "strong_rate": 0.0,
+            "pass_rate": 0.5,
+            "critical_rate": 0.5
+          },
+          "top5": {
+            "days": 1,
+            "selections": 5,
+            "strong": 2,
+            "neutral": 1,
+            "critical": 2,
+            "strong_rate": 0.4,
+            "pass_rate": 0.6,
+            "critical_rate": 0.4
+          }
+        },
+        "2026-08-31": {
+          "top2": {
+            "days": 1,
+            "selections": 2,
+            "strong": 2,
+            "neutral": 0,
+            "critical": 0,
+            "strong_rate": 1.0,
+            "pass_rate": 1.0,
+            "critical_rate": 0.0
+          },
+          "top5": {
+            "days": 1,
+            "selections": 5,
+            "strong": 2,
+            "neutral": 2,
+            "critical": 1,
+            "strong_rate": 0.4,
+            "pass_rate": 0.8,
+            "critical_rate": 0.2
+          }
+        },
+        "2026-09-22": {
+          "top2": {
+            "days": 1,
+            "selections": 2,
+            "strong": 1,
+            "neutral": 1,
+            "critical": 0,
+            "strong_rate": 0.5,
+            "pass_rate": 1.0,
+            "critical_rate": 0.0
+          },
+          "top5": {
+            "days": 1,
+            "selections": 5,
+            "strong": 2,
+            "neutral": 3,
+            "critical": 0,
+            "strong_rate": 0.4,
+            "pass_rate": 1.0,
+            "critical_rate": 0.0
+          }
+        },
+        "2026-09-23": {
+          "top2": {
+            "days": 1,
+            "selections": 2,
+            "strong": 2,
+            "neutral": 0,
+            "critical": 0,
+            "strong_rate": 1.0,
+            "pass_rate": 1.0,
+            "critical_rate": 0.0
+          },
+          "top5": {
+            "days": 1,
+            "selections": 5,
+            "strong": 4,
+            "neutral": 0,
+            "critical": 1,
+            "strong_rate": 0.8,
+            "pass_rate": 0.8,
+            "critical_rate": 0.2
+          }
+        },
+        "2026-09-24": {
+          "top2": {
+            "days": 1,
+            "selections": 2,
+            "strong": 2,
+            "neutral": 0,
+            "critical": 0,
+            "strong_rate": 1.0,
+            "pass_rate": 1.0,
+            "critical_rate": 0.0
+          },
+          "top5": {
+            "days": 1,
+            "selections": 5,
+            "strong": 4,
+            "neutral": 1,
+            "critical": 0,
+            "strong_rate": 0.8,
+            "pass_rate": 1.0,
+            "critical_rate": 0.0
+          }
+        },
+        "2026-09-28": {
+          "top2": {
+            "days": 1,
+            "selections": 2,
+            "strong": 0,
+            "neutral": 0,
+            "critical": 2,
+            "strong_rate": 0.0,
+            "pass_rate": 0.0,
+            "critical_rate": 1.0
+          },
+          "top5": {
+            "days": 1,
+            "selections": 5,
+            "strong": 2,
+            "neutral": 1,
+            "critical": 2,
+            "strong_rate": 0.4,
+            "pass_rate": 0.6,
+            "critical_rate": 0.4
+          }
+        },
+        "2026-09-29": {
+          "top2": {
+            "days": 1,
+            "selections": 2,
+            "strong": 1,
+            "neutral": 0,
+            "critical": 1,
+            "strong_rate": 0.5,
+            "pass_rate": 0.5,
+            "critical_rate": 0.5
+          },
+          "top5": {
+            "days": 1,
+            "selections": 5,
+            "strong": 3,
+            "neutral": 0,
+            "critical": 2,
+            "strong_rate": 0.6,
+            "pass_rate": 0.6,
+            "critical_rate": 0.4
+          }
+        },
+        "2026-09-30": {
+          "top2": {
+            "days": 1,
+            "selections": 2,
+            "strong": 1,
+            "neutral": 0,
+            "critical": 1,
+            "strong_rate": 0.5,
+            "pass_rate": 0.5,
+            "critical_rate": 0.5
+          },
+          "top5": {
+            "days": 1,
+            "selections": 5,
+            "strong": 3,
+            "neutral": 1,
+            "critical": 1,
+            "strong_rate": 0.6,
+            "pass_rate": 0.8,
+            "critical_rate": 0.2
+          }
+        }
+      }
+    },
+    {
+      "experiment": "市场宽度分层15日",
+      "training_dates": [
+        "2026-08-25",
+        "2026-08-26",
+        "2026-08-27",
+        "2026-08-28",
+        "2026-09-02",
+        "2026-09-03",
+        "2026-09-07",
+        "2026-09-08",
+        "2026-09-09",
+        "2026-09-11",
+        "2026-09-14",
+        "2026-09-15",
+        "2026-09-16",
+        "2026-09-17",
+        "2026-09-21"
+      ],
+      "training_rows": 5708,
+      "training_day_candidate_counts": {
+        "2026-08-25": 953,
+        "2026-08-26": 267,
+        "2026-08-27": 581,
+        "2026-08-28": 337,
+        "2026-09-02": 153,
+        "2026-09-03": 253,
+        "2026-09-07": 491,
+        "2026-09-08": 414,
+        "2026-09-09": 195,
+        "2026-09-11": 76,
+        "2026-09-14": 253,
+        "2026-09-15": 106,
+        "2026-09-16": 437,
+        "2026-09-17": 265,
+        "2026-09-21": 927
+      },
+      "common_17_days": {
+        "top2": {
+          "days": 17,
+          "selections": 34,
+          "strong": 23,
+          "neutral": 4,
+          "critical": 7,
+          "strong_rate": 0.6764705882352942,
+          "pass_rate": 0.7941176470588235,
+          "critical_rate": 0.20588235294117646
+        },
+        "top5": {
+          "days": 17,
+          "selections": 85,
+          "strong": 52,
+          "neutral": 11,
+          "critical": 22,
+          "strong_rate": 0.611764705882353,
+          "pass_rate": 0.7411764705882353,
+          "critical_rate": 0.25882352941176473
+        }
+      },
+      "all_nontraining_days": {
+        "top2": {
+          "days": 22,
+          "selections": 44,
+          "strong": 28,
+          "neutral": 6,
+          "critical": 10,
+          "strong_rate": 0.6363636363636364,
+          "pass_rate": 0.7727272727272727,
+          "critical_rate": 0.22727272727272727
+        },
+        "top5": {
+          "days": 22,
+          "selections": 110,
+          "strong": 66,
+          "neutral": 14,
+          "critical": 30,
+          "strong_rate": 0.6,
+          "pass_rate": 0.7272727272727273,
+          "critical_rate": 0.2727272727272727
+        }
+      },
+      "daily": {
+        "2026-08-07": {
+          "top2": {
+            "days": 1,
+            "selections": 2,
+            "strong": 2,
+            "neutral": 0,
+            "critical": 0,
+            "strong_rate": 1.0,
+            "pass_rate": 1.0,
+            "critical_rate": 0.0
+          },
+          "top5": {
+            "days": 1,
+            "selections": 5,
+            "strong": 5,
+            "neutral": 0,
+            "critical": 0,
+            "strong_rate": 1.0,
+            "pass_rate": 1.0,
+            "critical_rate": 0.0
+          }
+        },
+        "2026-08-10": {
+          "top2": {
+            "days": 1,
+            "selections": 2,
+            "strong": 1,
+            "neutral": 0,
+            "critical": 1,
+            "strong_rate": 0.5,
+            "pass_rate": 0.5,
+            "critical_rate": 0.5
+          },
+          "top5": {
+            "days": 1,
+            "selections": 5,
+            "strong": 2,
+            "neutral": 0,
+            "critical": 3,
+            "strong_rate": 0.4,
+            "pass_rate": 0.4,
+            "critical_rate": 0.6
+          }
+        },
+        "2026-08-11": {
+          "top2": {
+            "days": 1,
+            "selections": 2,
+            "strong": 2,
+            "neutral": 0,
+            "critical": 0,
+            "strong_rate": 1.0,
+            "pass_rate": 1.0,
+            "critical_rate": 0.0
+          },
+          "top5": {
+            "days": 1,
+            "selections": 5,
+            "strong": 5,
+            "neutral": 0,
+            "critical": 0,
+            "strong_rate": 1.0,
+            "pass_rate": 1.0,
+            "critical_rate": 0.0
+          }
+        },
+        "2026-08-12": {
+          "top2": {
+            "days": 1,
+            "selections": 2,
+            "strong": 2,
+            "neutral": 0,
+            "critical": 0,
+            "strong_rate": 1.0,
+            "pass_rate": 1.0,
+            "critical_rate": 0.0
+          },
+          "top5": {
+            "days": 1,
+            "selections": 5,
+            "strong": 5,
+            "neutral": 0,
+            "critical": 0,
+            "strong_rate": 1.0,
+            "pass_rate": 1.0,
+            "critical_rate": 0.0
+          }
+        },
+        "2026-08-13": {
+          "top2": {
+            "days": 1,
+            "selections": 2,
+            "strong": 2,
+            "neutral": 0,
+            "critical": 0,
+            "strong_rate": 1.0,
+            "pass_rate": 1.0,
+            "critical_rate": 0.0
+          },
+          "top5": {
+            "days": 1,
+            "selections": 5,
+            "strong": 3,
+            "neutral": 0,
+            "critical": 2,
+            "strong_rate": 0.6,
+            "pass_rate": 0.6,
+            "critical_rate": 0.4
+          }
+        },
+        "2026-08-14": {
+          "top2": {
+            "days": 1,
+            "selections": 2,
+            "strong": 2,
+            "neutral": 0,
+            "critical": 0,
+            "strong_rate": 1.0,
+            "pass_rate": 1.0,
+            "critical_rate": 0.0
+          },
+          "top5": {
+            "days": 1,
+            "selections": 5,
+            "strong": 5,
+            "neutral": 0,
+            "critical": 0,
+            "strong_rate": 1.0,
+            "pass_rate": 1.0,
+            "critical_rate": 0.0
+          }
+        },
+        "2026-08-17": {
+          "top2": {
+            "days": 1,
+            "selections": 2,
+            "strong": 1,
+            "neutral": 0,
+            "critical": 1,
+            "strong_rate": 0.5,
+            "pass_rate": 0.5,
+            "critical_rate": 0.5
+          },
+          "top5": {
+            "days": 1,
+            "selections": 5,
+            "strong": 3,
+            "neutral": 1,
+            "critical": 1,
+            "strong_rate": 0.6,
+            "pass_rate": 0.8,
+            "critical_rate": 0.2
+          }
+        },
+        "2026-08-18": {
+          "top2": {
+            "days": 1,
+            "selections": 2,
+            "strong": 1,
+            "neutral": 0,
+            "critical": 1,
+            "strong_rate": 0.5,
+            "pass_rate": 0.5,
+            "critical_rate": 0.5
+          },
+          "top5": {
+            "days": 1,
+            "selections": 5,
+            "strong": 1,
+            "neutral": 0,
+            "critical": 4,
+            "strong_rate": 0.2,
+            "pass_rate": 0.2,
+            "critical_rate": 0.8
+          }
+        },
+        "2026-08-19": {
+          "top2": {
+            "days": 1,
+            "selections": 2,
+            "strong": 2,
+            "neutral": 0,
+            "critical": 0,
+            "strong_rate": 1.0,
+            "pass_rate": 1.0,
+            "critical_rate": 0.0
+          },
+          "top5": {
+            "days": 1,
+            "selections": 5,
+            "strong": 4,
+            "neutral": 1,
+            "critical": 0,
+            "strong_rate": 0.8,
+            "pass_rate": 1.0,
+            "critical_rate": 0.0
+          }
+        },
+        "2026-08-20": {
+          "top2": {
+            "days": 1,
+            "selections": 2,
+            "strong": 0,
+            "neutral": 1,
+            "critical": 1,
+            "strong_rate": 0.0,
+            "pass_rate": 0.5,
+            "critical_rate": 0.5
+          },
+          "top5": {
+            "days": 1,
+            "selections": 5,
+            "strong": 0,
+            "neutral": 1,
+            "critical": 4,
+            "strong_rate": 0.0,
+            "pass_rate": 0.2,
+            "critical_rate": 0.8
+          }
+        },
+        "2026-08-21": {
+          "top2": {
+            "days": 1,
+            "selections": 2,
+            "strong": 1,
+            "neutral": 0,
+            "critical": 1,
+            "strong_rate": 0.5,
+            "pass_rate": 0.5,
+            "critical_rate": 0.5
+          },
+          "top5": {
+            "days": 1,
+            "selections": 5,
+            "strong": 2,
+            "neutral": 2,
+            "critical": 1,
+            "strong_rate": 0.4,
+            "pass_rate": 0.8,
+            "critical_rate": 0.2
+          }
+        },
+        "2026-08-31": {
+          "top2": {
+            "days": 1,
+            "selections": 2,
+            "strong": 2,
+            "neutral": 0,
+            "critical": 0,
+            "strong_rate": 1.0,
+            "pass_rate": 1.0,
+            "critical_rate": 0.0
+          },
+          "top5": {
+            "days": 1,
+            "selections": 5,
+            "strong": 4,
+            "neutral": 1,
+            "critical": 0,
+            "strong_rate": 0.8,
+            "pass_rate": 1.0,
+            "critical_rate": 0.0
+          }
+        },
+        "2026-09-01": {
+          "top2": {
+            "days": 1,
+            "selections": 2,
+            "strong": 0,
+            "neutral": 1,
+            "critical": 1,
+            "strong_rate": 0.0,
+            "pass_rate": 0.5,
+            "critical_rate": 0.5
+          },
+          "top5": {
+            "days": 1,
+            "selections": 5,
+            "strong": 2,
+            "neutral": 1,
+            "critical": 2,
+            "strong_rate": 0.4,
+            "pass_rate": 0.6,
+            "critical_rate": 0.4
+          }
+        },
+        "2026-09-04": {
+          "top2": {
+            "days": 1,
+            "selections": 2,
+            "strong": 1,
+            "neutral": 1,
+            "critical": 0,
+            "strong_rate": 0.5,
+            "pass_rate": 1.0,
+            "critical_rate": 0.0
+          },
+          "top5": {
+            "days": 1,
+            "selections": 5,
+            "strong": 3,
+            "neutral": 1,
+            "critical": 1,
+            "strong_rate": 0.6,
+            "pass_rate": 0.8,
+            "critical_rate": 0.2
+          }
+        },
+        "2026-09-10": {
+          "top2": {
+            "days": 1,
+            "selections": 2,
+            "strong": 0,
+            "neutral": 0,
+            "critical": 2,
+            "strong_rate": 0.0,
+            "pass_rate": 0.0,
+            "critical_rate": 1.0
+          },
+          "top5": {
+            "days": 1,
+            "selections": 5,
+            "strong": 1,
+            "neutral": 0,
+            "critical": 4,
+            "strong_rate": 0.2,
+            "pass_rate": 0.2,
+            "critical_rate": 0.8
+          }
+        },
+        "2026-09-18": {
+          "top2": {
+            "days": 1,
+            "selections": 2,
+            "strong": 2,
+            "neutral": 0,
+            "critical": 0,
+            "strong_rate": 1.0,
+            "pass_rate": 1.0,
+            "critical_rate": 0.0
+          },
+          "top5": {
+            "days": 1,
+            "selections": 5,
+            "strong": 4,
+            "neutral": 0,
+            "critical": 1,
+            "strong_rate": 0.8,
+            "pass_rate": 0.8,
+            "critical_rate": 0.2
+          }
+        },
+        "2026-09-22": {
+          "top2": {
+            "days": 1,
+            "selections": 2,
+            "strong": 1,
+            "neutral": 1,
+            "critical": 0,
+            "strong_rate": 0.5,
+            "pass_rate": 1.0,
+            "critical_rate": 0.0
+          },
+          "top5": {
+            "days": 1,
+            "selections": 5,
+            "strong": 3,
+            "neutral": 1,
+            "critical": 1,
+            "strong_rate": 0.6,
+            "pass_rate": 0.8,
+            "critical_rate": 0.2
+          }
+        },
+        "2026-09-23": {
+          "top2": {
+            "days": 1,
+            "selections": 2,
+            "strong": 2,
+            "neutral": 0,
+            "critical": 0,
+            "strong_rate": 1.0,
+            "pass_rate": 1.0,
+            "critical_rate": 0.0
+          },
+          "top5": {
+            "days": 1,
+            "selections": 5,
+            "strong": 3,
+            "neutral": 0,
+            "critical": 2,
+            "strong_rate": 0.6,
+            "pass_rate": 0.6,
+            "critical_rate": 0.4
+          }
+        },
+        "2026-09-24": {
+          "top2": {
+            "days": 1,
+            "selections": 2,
+            "strong": 0,
+            "neutral": 1,
+            "critical": 1,
+            "strong_rate": 0.0,
+            "pass_rate": 0.5,
+            "critical_rate": 0.5
+          },
+          "top5": {
+            "days": 1,
+            "selections": 5,
+            "strong": 2,
+            "neutral": 1,
+            "critical": 2,
+            "strong_rate": 0.4,
+            "pass_rate": 0.6,
+            "critical_rate": 0.4
+          }
+        },
+        "2026-09-28": {
+          "top2": {
+            "days": 1,
+            "selections": 2,
+            "strong": 1,
+            "neutral": 0,
+            "critical": 1,
+            "strong_rate": 0.5,
+            "pass_rate": 0.5,
+            "critical_rate": 0.5
+          },
+          "top5": {
+            "days": 1,
+            "selections": 5,
+            "strong": 2,
+            "neutral": 1,
+            "critical": 2,
+            "strong_rate": 0.4,
+            "pass_rate": 0.6,
+            "critical_rate": 0.4
+          }
+        },
+        "2026-09-29": {
+          "top2": {
+            "days": 1,
+            "selections": 2,
+            "strong": 2,
+            "neutral": 0,
+            "critical": 0,
+            "strong_rate": 1.0,
+            "pass_rate": 1.0,
+            "critical_rate": 0.0
+          },
+          "top5": {
+            "days": 1,
+            "selections": 5,
+            "strong": 5,
+            "neutral": 0,
+            "critical": 0,
+            "strong_rate": 1.0,
+            "pass_rate": 1.0,
+            "critical_rate": 0.0
+          }
+        },
+        "2026-09-30": {
+          "top2": {
+            "days": 1,
+            "selections": 2,
+            "strong": 1,
+            "neutral": 1,
+            "critical": 0,
+            "strong_rate": 0.5,
+            "pass_rate": 1.0,
+            "critical_rate": 0.0
+          },
+          "top5": {
+            "days": 1,
+            "selections": 5,
+            "strong": 2,
+            "neutral": 3,
+            "critical": 0,
+            "strong_rate": 0.4,
+            "pass_rate": 1.0,
+            "critical_rate": 0.0
+          }
+        }
+      }
+    }
+  ],
+  "input_sha256": {
+    "outputs/stock_automl/tail_expanded_august/trainable_1440.csv": "1486fd98be0d6e633d06a297b96e76560ea2ecd124d6a8e93020fe506a2c2005",
+    "outputs/stock_automl/tail_sep30_check/trainable_1440.csv": "30221c49fe0244a4333555897e01675d839513defe520526a6ab1ffb9a759b4a"
+  }
+}

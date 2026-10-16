@@ -1,0 +1,236 @@
+{
+  "candidate": {
+    "horizon": 7,
+    "task": "classification",
+    "model": "linear",
+    "sampler": "all",
+    "features": "enriched",
+    "depth": 6,
+    "strength": 3.0,
+    "id": "fddc822e3a0e"
+  },
+  "columns": [
+    "return_1",
+    "return_3",
+    "return_7",
+    "return_20",
+    "volatility_20",
+    "range_ratio",
+    "open_gap",
+    "ma_distance",
+    "volume_ratio",
+    "amount_log",
+    "turn_ratio",
+    "total_mv",
+    "pe_ttm",
+    "pb_mrq",
+    "industry",
+    "news_count_7d"
+  ],
+  "folds": [
+    {
+      "train_end": "2024-11-01T00:00:00",
+      "validation_start": "2024-11-04T00:00:00",
+      "validation_end": "2025-03-18T00:00:00",
+      "prediction": {
+        "rows": 656,
+        "companies": 8,
+        "signal_count": 16,
+        "signal_win_rate_after_cost": 0.0,
+        "descriptive_wilson_interval": [
+          0.0,
+          0.19361341827271994
+        ],
+        "mean_signal_net_return": -0.06978119047988636,
+        "unconditional_up_rate": 0.5,
+        "prediction_range": {
+          "min": 0.5241638825916404,
+          "max": 0.6030152550560413,
+          "mean": 0.5508991914614173
+        },
+        "calibration": [
+          {
+            "lower": 0.5,
+            "n": 640,
+            "predicted": 0.5496364563972301,
+            "observed": 0.5125
+          },
+          {
+            "lower": 0.6,
+            "n": 16,
+            "predicted": 0.6014085940289053,
+            "observed": 0.0
+          }
+        ],
+        "brier": 0.25478893050775464,
+        "baseline_brier": 0.2501906647174148,
+        "roc_auc": 0.4817259071980964,
+        "skill_vs_constant": -0.018379046218744755,
+        "by_month": [
+          {
+            "month": "2024-11",
+            "n": 7,
+            "mean_return": -0.06198123640001163,
+            "win_rate_after_cost": 0.0
+          },
+          {
+            "month": "2024-12",
+            "n": 9,
+            "mean_return": -0.07033671031978891,
+            "win_rate_after_cost": 0.0
+          }
+        ],
+        "by_industry": [
+          {
+            "industry": "房地产",
+            "n": 16,
+            "mean_return": -0.06668119047988635
+          }
+        ]
+      },
+      "portfolio": {
+        "total_return": -0.09635411289422446,
+        "annualized_return": -0.249396042867971,
+        "annualized_volatility": 0.09908587835453905,
+        "sharpe_ratio": -2.843648850025777,
+        "max_drawdown": -0.09635411289422446,
+        "turnover_ratio": 2.0813022142520197,
+        "trade_count": 2,
+        "total_commission": "571.2194771454245982801348",
+        "total_tax": "452.1835534886228859168960",
+        "total_slippage_cost": "1903.971497079715483532"
+      }
+    },
+    {
+      "train_end": "2025-03-18T00:00:00",
+      "validation_start": "2025-03-19T00:00:00",
+      "validation_end": "2025-08-08T00:00:00",
+      "prediction": {
+        "rows": 720,
+        "companies": 8,
+        "signal_count": 103,
+        "signal_win_rate_after_cost": 0.6699029126213593,
+        "descriptive_wilson_interval": [
+          0.5744161092063891,
+          0.7531716468736398
+        ],
+        "mean_signal_net_return": 0.020031395737614754,
+        "unconditional_up_rate": 0.5847222222222223,
+        "prediction_range": {
+          "min": 0.49448614989316647,
+          "max": 0.6716786439112682,
+          "mean": 0.5636765459528247
+        },
+        "calibration": [
+          {
+            "lower": 0.4,
+            "n": 9,
+            "predicted": 0.4963685212308473,
+            "observed": 0.6666666666666666
+          },
+          {
+            "lower": 0.5,
+            "n": 608,
+            "predicted": 0.5558438330409292,
+            "observed": 0.5625
+          },
+          {
+            "lower": 0.6,
+            "n": 103,
+            "predicted": 0.6157936495735067,
+            "observed": 0.7087378640776699
+          }
+        ],
+        "brier": 0.23997057093366309,
+        "baseline_brier": 0.24847421317069068,
+        "roc_auc": 0.5834015205077892,
+        "skill_vs_constant": 0.03422343964194774,
+        "by_month": [
+          {
+            "month": "2025-03",
+            "n": 3,
+            "mean_return": -0.024178509414522337,
+            "win_rate_after_cost": 0.3333333333333333
+          },
+          {
+            "month": "2025-04",
+            "n": 54,
+            "mean_return": 0.025593281529664818,
+            "win_rate_after_cost": 0.7037037037037037
+          },
+          {
+            "month": "2025-05",
+            "n": 22,
+            "mean_return": 0.006397574174063997,
+            "win_rate_after_cost": 0.45454545454545453
+          },
+          {
+            "month": "2025-06",
+            "n": 17,
+            "mean_return": 0.039219100888593685,
+            "win_rate_after_cost": 0.7647058823529411
+          },
+          {
+            "month": "2025-07",
+            "n": 7,
+            "mean_return": 0.03793724852578368,
+            "win_rate_after_cost": 1.0
+          }
+        ],
+        "by_industry": [
+          {
+            "industry": "家用电器",
+            "n": 3,
+            "mean_return": 0.03322717266494631
+          },
+          {
+            "industry": "房地产",
+            "n": 28,
+            "mean_return": -0.006656831880148322
+          },
+          {
+            "industry": "有色金属",
+            "n": 48,
+            "mean_return": 0.023590859063884254
+          },
+          {
+            "industry": "电力设备",
+            "n": 17,
+            "mean_return": 0.06535268984750246
+          },
+          {
+            "industry": "银行",
+            "n": 2,
+            "mean_return": 0.02907015914481781
+          },
+          {
+            "industry": "非银金融",
+            "n": 5,
+            "mean_return": 0.03354925097200234
+          }
+        ]
+      },
+      "portfolio": {
+        "total_return": 0.1281527616280591,
+        "annualized_return": 0.36788186913025567,
+        "annualized_volatility": 0.2001014652214222,
+        "sharpe_ratio": 1.6667285004335322,
+        "max_drawdown": -0.0741138601016309,
+        "turnover_ratio": 10.367591578843507,
+        "trade_count": 25,
+        "total_commission": "3213.7506695763230927826756",
+        "total_tax": "2711.6450973290103772560705",
+        "total_slippage_cost": "10712.647022725494665970"
+      }
+    }
+  ],
+  "meets_constraints": false,
+  "constraint_checks": {
+    "enough_signals": true,
+    "each_fold_win_rate": false,
+    "drawdown_within_limit": true,
+    "each_fold_beats_constant": false
+  },
+  "score": -0.018379046218744755,
+  "signal_count": 119
+}

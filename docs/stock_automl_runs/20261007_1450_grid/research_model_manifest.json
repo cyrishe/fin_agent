@@ -1,0 +1,81 @@
+{
+  "purpose": "research_only_not_live_trading",
+  "model_file": "research_model.joblib",
+  "model_sha256": "5daca6e4227a23de42b6d9eb005cd84f2d92dc9073e552303ab3c9f2d5625267",
+  "script_sha256": "59c6786376f8034407a7c5b2023372da46b370157bb89f5a8ef3d57c271f0efa",
+  "summary_sha256": "2667dca38d59910ee6a643c76803dc738bf964dc6ab00a039dda70c549de446f",
+  "source_table": "aiia_stock_realtime_minute_snapshot_full",
+  "source_host_schema": "47.94.1.2:3312/kingdomai",
+  "split": {
+    "train": [
+      "2026-08-25",
+      "2026-09-14"
+    ],
+    "validation": [
+      "2026-09-15",
+      "2026-09-21"
+    ],
+    "test": [
+      "2026-09-22",
+      "2026-09-29"
+    ]
+  },
+  "training_labeled_rows": 63101,
+  "features": [
+    "market_return",
+    "market_breadth",
+    "market_dispersion",
+    "sector_return",
+    "sector_breadth",
+    "sector_relative",
+    "day_return",
+    "open_return",
+    "tail_return_19m",
+    "tail_return_9m",
+    "tail_return_4m",
+    "tail_amount_ratio"
+  ],
+  "selected_by_validation": {
+    "target": "hit1",
+    "groups": "market+intraday",
+    "model": "hgb_leaf7",
+    "loss_probability_penalty": 0.5,
+    "gate_quantile_of_validation_daily_max": 0.5,
+    "top_k_per_day": 5,
+    "gate": 0.458959,
+    "validation": {
+      "signals": 11,
+      "days": 3,
+      "unobserved": 0,
+      "hit_rate": 0.90909,
+      "hit_after_30bp": 0.81818,
+      "safe_rate": 0.54545,
+      "severe_down_rate": 0.18182,
+      "exit_safe_rate": 0.72727,
+      "exit_nonnegative_rate": 0.72727,
+      "exit_severe_down_rate": 0.0,
+      "exit_severe_or_unobserved_rate": 0.0,
+      "mean_exit_return": 0.006633,
+      "mean_exit_return_net_30bp": 0.003633
+    },
+    "test": {
+      "signals": 25,
+      "days": 5,
+      "unobserved": 0,
+      "hit_rate": 0.68,
+      "hit_after_30bp": 0.52,
+      "safe_rate": 0.32,
+      "severe_down_rate": 0.48,
+      "exit_safe_rate": 0.76,
+      "exit_nonnegative_rate": 0.72,
+      "exit_severe_down_rate": 0.2,
+      "exit_severe_or_unobserved_rate": 0.2,
+      "mean_exit_return": 0.004786,
+      "mean_exit_return_net_30bp": 0.001786
+    },
+    "trials_considered": 20
+  },
+  "python_sklearn_version": "1.7.1",
+  "serialization": "joblib/pickle; load only from trusted repository artifacts",
+  "data_snapshot_version": null
+}

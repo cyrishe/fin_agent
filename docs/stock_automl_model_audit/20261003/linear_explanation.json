@@ -1,0 +1,776 @@
+{
+  "run_id": "20261003T042758Z_5370a71f",
+  "audit_git_commit": "e61b275ea207b50420a5c1f258df1b5e858654b7",
+  "script_sha256": "a4cd7c81ed4e83df250c607df5b3ad4b7465e89241b30b01912f0c84a9bdda6f",
+  "environment": {
+    "python": "3.13.5",
+    "pandas": "2.3.2",
+    "sklearn": "1.7.1"
+  },
+  "source_manifest_sha256": "8e9c722a569352344aa573922b8c259e28b936d6b7d7e15c544f24693f113484",
+  "source_spec_sha256": "9d55a9416e1c914a1ce6966f183a7dcc82acb1e9ae05d88ceba7da7c322ba1fb",
+  "implementation_sha256": {
+    "quant_research/automl/config.py": "332c577e1a1c37a0a6ca1aa3f01311b41265d70ce1eccf803addad7a9a16affb",
+    "quant_research/automl/learning.py": "2aa25a5bef45058beefbcdd7c33dbce273af8abfc8d8e8e6fc589f76b3e28d37",
+    "quant_research/automl/features.py": "62eaf52e16a30973daf0dcc99b749719afc4e3a5a772b4fce9819b60ad782c58",
+    "quant_research/automl/evaluation.py": "aa5266830caa42debc123ca16600a59630f625763267e9176af413c59954e2a5",
+    "backtest/__init__.py": "ff16ffc2f3c213293238e1bc77bde831382d7d0638d06b86d00d4eb11793d3d2",
+    "backtest/contracts.py": "1c29cc3ae9bb3d1538f0575114e6f1736eb62feb88002f8e08e450f1c92d763a",
+    "backtest/data.py": "8414f0b964df479782f58121c2920d2c41837b6cc60ef91790fbb123814f5b0a",
+    "backtest/engine.py": "5134d57a90016b2fbdb9f777102c3cab7a7572c196519c02a4aa283e8cf3aee3",
+    "backtest/execution.py": "e17fc0a57d08507baef8923a4a1206896d11932c5b2c5cf880344ef69b32330f",
+    "backtest/metrics.py": "e6f187498f7f7c0ef5b000e12f14742398ef6064d854f5fa124ad48ee373ca28",
+    "backtest/strategy.py": "c4be2ce816016534237faab06d74fb5155d3ac8c88650d4c9a3fbd0492031541"
+  },
+  "source_model_sha256": "05385feffb1c249519f854fb7f62b60057d7f640079f7560ae10336002e80c8d",
+  "source_panel_sha256": "b955063c16cbc91b75457d21a5e9b27cb6aeb33c214998ed6a04b5ec6bbc8945",
+  "candidate": {
+    "horizon": 7,
+    "task": "classification",
+    "model": "linear",
+    "sampler": "all",
+    "features": "enriched",
+    "depth": 6,
+    "strength": 3.0,
+    "id": "fddc822e3a0e"
+  },
+  "training_counts": {
+    "input_rows": 4679,
+    "fit_rows": 3406,
+    "calibration_rows": 1169,
+    "purged_rows": 104,
+    "budget_sampled_out_rows": 0
+  },
+  "scope": "development only; no held-out outcome evaluated, no production model replaced",
+  "original_artifacts_unchanged": true,
+  "original_final_prediction_max_error": 0.0,
+  "explanation": {
+    "raw_feature_count": 16,
+    "transformed_feature_count": 25,
+    "nonzero_coefficients": 25,
+    "calibration_slope": 0.5295143663666826,
+    "calibration_intercept": 0.291455531694192,
+    "calibrated_intercept": 0.3339339416875964,
+    "centered_calibrated_intercept": 0.31479644726392786,
+    "reconstruction_max_absolute_error": 2.7755575615628914e-16,
+    "reference_rows": 3406,
+    "coefficients": [
+      {
+        "transformed_feature": "numeric__return_1",
+        "original_feature": "return_1",
+        "base_coefficient": -0.05652551182278771,
+        "calibrated_log_odds_coefficient": -0.029931070576395862,
+        "mean_absolute_centered_contribution": 0.020557683510157725
+      },
+      {
+        "transformed_feature": "numeric__return_3",
+        "original_feature": "return_3",
+        "base_coefficient": 0.003013526557901971,
+        "calibrated_log_odds_coefficient": 0.0015957056058366322,
+        "mean_absolute_centered_contribution": 0.0010896144165855604
+      },
+      {
+        "transformed_feature": "numeric__return_7",
+        "original_feature": "return_7",
+        "base_coefficient": -0.27075660013465186,
+        "calibrated_log_odds_coefficient": -0.1433695095598974,
+        "mean_absolute_centered_contribution": 0.10071482746841859
+      },
+      {
+        "transformed_feature": "numeric__return_20",
+        "original_feature": "return_20",
+        "base_coefficient": -0.15179591231351175,
+        "calibrated_log_odds_coefficient": -0.08037811632574168,
+        "mean_absolute_centered_contribution": 0.05962464662947606
+      },
+      {
+        "transformed_feature": "numeric__volatility_20",
+        "original_feature": "volatility_20",
+        "base_coefficient": 0.4928518485281626,
+        "calibrated_log_odds_coefficient": 0.26097213428603827,
+        "mean_absolute_centered_contribution": 0.19516429993623471
+      },
+      {
+        "transformed_feature": "numeric__range_ratio",
+        "original_feature": "range_ratio",
+        "base_coefficient": 0.18614229333063328,
+        "calibrated_log_odds_coefficient": 0.09856501850701145,
+        "mean_absolute_centered_contribution": 0.07068369344429429
+      },
+      {
+        "transformed_feature": "numeric__open_gap",
+        "original_feature": "open_gap",
+        "base_coefficient": -0.03223413265714148,
+        "calibrated_log_odds_coefficient": -0.01706843632932586,
+        "mean_absolute_centered_contribution": 0.00843636692076059
+      },
+      {
+        "transformed_feature": "numeric__ma_distance",
+        "original_feature": "ma_distance",
+        "base_coefficient": 0.26393745830955023,
+        "calibrated_log_odds_coefficient": 0.1397586759972142,
+        "mean_absolute_centered_contribution": 0.10096493936091018
+      },
+      {
+        "transformed_feature": "numeric__volume_ratio",
+        "original_feature": "volume_ratio",
+        "base_coefficient": 0.05802695006297572,
+        "calibrated_log_odds_coefficient": 0.03072610369478772,
+        "mean_absolute_centered_contribution": 0.020864277593128783
+      },
+      {
+        "transformed_feature": "numeric__amount_log",
+        "original_feature": "amount_log",
+        "base_coefficient": -0.19787845814533445,
+        "calibrated_log_odds_coefficient": -0.10477948638244289,
+        "mean_absolute_centered_contribution": 0.08428826986663393
+      },
+      {
+        "transformed_feature": "numeric__turn_ratio",
+        "original_feature": "turn_ratio",
+        "base_coefficient": -0.3455405572284329,
+        "calibrated_log_odds_coefficient": -0.18296868921480408,
+        "mean_absolute_centered_contribution": 0.11244420385144827
+      },
+      {
+        "transformed_feature": "numeric__total_mv",
+        "original_feature": "total_mv",
+        "base_coefficient": -0.251691399189812,
+        "calibrated_log_odds_coefficient": -0.13327421176193704,
+        "mean_absolute_centered_contribution": 0.08384036967367085
+      },
+      {
+        "transformed_feature": "numeric__pe_ttm",
+        "original_feature": "pe_ttm",
+        "base_coefficient": 0.08494561845758818,
+        "calibrated_log_odds_coefficient": 0.04497992533319578,
+        "mean_absolute_centered_contribution": 0.019897458804288348
+      },
+      {
+        "transformed_feature": "numeric__pb_mrq",
+        "original_feature": "pb_mrq",
+        "base_coefficient": 0.04263404227239362,
+        "calibrated_log_odds_coefficient": 0.022575337879516866,
+        "mean_absolute_centered_contribution": 0.011604480797668171
+      },
+      {
+        "transformed_feature": "numeric__news_count_7d",
+        "original_feature": "news_count_7d",
+        "base_coefficient": 0.016255849007043018,
+        "calibrated_log_odds_coefficient": 0.00860770558671685,
+        "mean_absolute_centered_contribution": 0.002125345149017041
+      },
+      {
+        "transformed_feature": "industry__industry_公用事业",
+        "original_feature": "industry",
+        "base_coefficient": -0.09853758934884417,
+        "calibrated_log_odds_coefficient": -0.05217706918735359,
+        "mean_absolute_centered_contribution": 0.007409761304712938
+      },
+      {
+        "transformed_feature": "industry__industry_医药生物",
+        "original_feature": "industry",
+        "base_coefficient": -0.19052801175068354,
+        "calibrated_log_odds_coefficient": -0.10088731941726704,
+        "mean_absolute_centered_contribution": 0.014327193290026088
+      },
+      {
+        "transformed_feature": "industry__industry_国防军工",
+        "original_feature": "industry",
+        "base_coefficient": 1.1807651094489962,
+        "calibrated_log_odds_coefficient": 0.6252320887577718,
+        "mean_absolute_centered_contribution": 0.08879035579992027
+      },
+      {
+        "transformed_feature": "industry__industry_建筑装饰",
+        "original_feature": "industry",
+        "base_coefficient": -0.7466238250701196,
+        "calibrated_log_odds_coefficient": -0.39534804164627324,
+        "mean_absolute_centered_contribution": 0.05614410058881989
+      },
+      {
+        "transformed_feature": "industry__industry_房地产",
+        "original_feature": "industry",
+        "base_coefficient": -0.4061306243751498,
+        "calibrated_log_odds_coefficient": -0.2150520002281126,
+        "mean_absolute_centered_contribution": 0.030539929026477543
+      },
+      {
+        "transformed_feature": "industry__industry_机械设备",
+        "original_feature": "industry",
+        "base_coefficient": -0.419361098156715,
+        "calibrated_log_odds_coefficient": -0.22205772616928912,
+        "mean_absolute_centered_contribution": 0.07883706254530974
+      },
+      {
+        "transformed_feature": "industry__industry_电子",
+        "original_feature": "industry",
+        "base_coefficient": 0.5532773523378426,
+        "calibrated_log_odds_coefficient": 0.2929683066482085,
+        "mean_absolute_centered_contribution": 0.04160496662459766
+      },
+      {
+        "transformed_feature": "industry__industry_纺织服饰",
+        "original_feature": "industry",
+        "base_coefficient": 0.34455772086331765,
+        "calibrated_log_odds_coefficient": 0.18244826323968794,
+        "mean_absolute_centered_contribution": 0.02590981253107994
+      },
+      {
+        "transformed_feature": "industry__industry_计算机",
+        "original_feature": "industry",
+        "base_coefficient": 0.3000922302844933,
+        "calibrated_log_odds_coefficient": 0.15890314717065807,
+        "mean_absolute_centered_contribution": 0.04137123358289322
+      },
+      {
+        "transformed_feature": "industry__industry_轻工制造",
+        "original_feature": "industry",
+        "base_coefficient": -0.4487220491072703,
+        "calibrated_log_odds_coefficient": -0.23760477150779566,
+        "mean_absolute_centered_contribution": 0.03374268944489406
+      }
+    ],
+    "grouped_model_reliance": [
+      {
+        "feature": "industry",
+        "mean_absolute_centered_log_odds_contribution": 0.23294498847774228
+      },
+      {
+        "feature": "volatility_20",
+        "mean_absolute_centered_log_odds_contribution": 0.19516429993623471
+      },
+      {
+        "feature": "turn_ratio",
+        "mean_absolute_centered_log_odds_contribution": 0.11244420385144827
+      },
+      {
+        "feature": "ma_distance",
+        "mean_absolute_centered_log_odds_contribution": 0.10096493936091018
+      },
+      {
+        "feature": "return_7",
+        "mean_absolute_centered_log_odds_contribution": 0.10071482746841859
+      },
+      {
+        "feature": "amount_log",
+        "mean_absolute_centered_log_odds_contribution": 0.08428826986663393
+      },
+      {
+        "feature": "total_mv",
+        "mean_absolute_centered_log_odds_contribution": 0.08384036967367085
+      },
+      {
+        "feature": "range_ratio",
+        "mean_absolute_centered_log_odds_contribution": 0.07068369344429429
+      },
+      {
+        "feature": "return_20",
+        "mean_absolute_centered_log_odds_contribution": 0.05962464662947606
+      },
+      {
+        "feature": "volume_ratio",
+        "mean_absolute_centered_log_odds_contribution": 0.020864277593128783
+      },
+      {
+        "feature": "return_1",
+        "mean_absolute_centered_log_odds_contribution": 0.020557683510157725
+      },
+      {
+        "feature": "pe_ttm",
+        "mean_absolute_centered_log_odds_contribution": 0.019897458804288348
+      },
+      {
+        "feature": "pb_mrq",
+        "mean_absolute_centered_log_odds_contribution": 0.011604480797668171
+      },
+      {
+        "feature": "open_gap",
+        "mean_absolute_centered_log_odds_contribution": 0.00843636692076059
+      },
+      {
+        "feature": "news_count_7d",
+        "mean_absolute_centered_log_odds_contribution": 0.002125345149017041
+      },
+      {
+        "feature": "return_3",
+        "mean_absolute_centered_log_odds_contribution": 0.0010896144165855604
+      }
+    ],
+    "interpretation": "Exact calibrated log-odds contributions on base-fit rows; not percentage-point effects, causality, SHAP, or out-of-sample importance."
+  },
+  "industry_support": [
+    {
+      "industry": "公用事业",
+      "companies": 1,
+      "rows": 262
+    },
+    {
+      "industry": "医药生物",
+      "companies": 1,
+      "rows": 262
+    },
+    {
+      "industry": "国防军工",
+      "companies": 1,
+      "rows": 262
+    },
+    {
+      "industry": "建筑装饰",
+      "companies": 1,
+      "rows": 262
+    },
+    {
+      "industry": "房地产",
+      "companies": 1,
+      "rows": 262
+    },
+    {
+      "industry": "机械设备",
+      "companies": 3,
+      "rows": 786
+    },
+    {
+      "industry": "电子",
+      "companies": 1,
+      "rows": 262
+    },
+    {
+      "industry": "纺织服饰",
+      "companies": 1,
+      "rows": 262
+    },
+    {
+      "industry": "计算机",
+      "companies": 2,
+      "rows": 524
+    },
+    {
+      "industry": "轻工制造",
+      "companies": 1,
+      "rows": 262
+    }
+  ],
+  "development_simplifications": [
+    {
+      "variant": "original",
+      "columns": [
+        "return_1",
+        "return_3",
+        "return_7",
+        "return_20",
+        "volatility_20",
+        "range_ratio",
+        "open_gap",
+        "ma_distance",
+        "volume_ratio",
+        "amount_log",
+        "turn_ratio",
+        "total_mv",
+        "pe_ttm",
+        "pb_mrq",
+        "industry",
+        "news_count_7d"
+      ],
+      "C": 3.0,
+      "folds": [
+        {
+          "validation_start": "2024-11-04T00:00:00",
+          "validation_end": "2025-03-18T00:00:00",
+          "training": {
+            "input_rows": 2236,
+            "fit_rows": 1573,
+            "calibration_rows": 559,
+            "purged_rows": 104,
+            "budget_sampled_out_rows": 0
+          },
+          "transformed_feature_count": 25,
+          "nonzero_coefficients": 24,
+          "calibration_slope": 0.14265414063729176,
+          "prediction": {
+            "rows": 1066,
+            "companies": 13,
+            "signal_count": 413,
+            "signal_win_rate_after_cost": 0.5326876513317191,
+            "mean_signal_net_return": 0.006039052704027936,
+            "brier": 0.2523099097553886,
+            "baseline_brier": 0.25045482277517594,
+            "roc_auc": 0.5514949931749162,
+            "skill_vs_constant": -0.007406872663330066
+          },
+          "portfolio": {
+            "total_return": 0.052827622433886834,
+            "annualized_return": 0.1569210762552562,
+            "annualized_volatility": 0.29947035486213924,
+            "sharpe_ratio": 0.6350224099987131,
+            "max_drawdown": -0.1759243247337402,
+            "turnover_ratio": 12.878763512764102,
+            "trade_count": 66,
+            "total_commission": "3879.64367443069134318340824",
+            "total_tax": "3248.02521819053649299658870",
+            "total_slippage_cost": "12932.2184689454332642060"
+          }
+        },
+        {
+          "validation_start": "2025-03-19T00:00:00",
+          "validation_end": "2025-08-08T00:00:00",
+          "training": {
+            "input_rows": 3406,
+            "fit_rows": 2444,
+            "calibration_rows": 858,
+            "purged_rows": 104,
+            "budget_sampled_out_rows": 0
+          },
+          "transformed_feature_count": 25,
+          "nonzero_coefficients": 24,
+          "calibration_slope": 0.0802810903421611,
+          "prediction": {
+            "rows": 1169,
+            "companies": 13,
+            "signal_count": 5,
+            "signal_win_rate_after_cost": 0.8,
+            "mean_signal_net_return": 0.07904675929215708,
+            "brier": 0.2462019840350866,
+            "baseline_brier": 0.24945335109814057,
+            "roc_auc": 0.5807339449541284,
+            "skill_vs_constant": 0.013033968269982488
+          },
+          "portfolio": {
+            "total_return": 0.0,
+            "annualized_return": 0.0,
+            "annualized_volatility": 0.0,
+            "sharpe_ratio": null,
+            "max_drawdown": 0.0,
+            "turnover_ratio": 0.0,
+            "trade_count": 0,
+            "total_commission": "0",
+            "total_tax": "0",
+            "total_slippage_cost": "0"
+          }
+        }
+      ],
+      "constraint_checks": {
+        "enough_signals": true,
+        "each_fold_win_rate": true,
+        "drawdown_within_limit": true,
+        "each_fold_beats_constant": false
+      }
+    },
+    {
+      "variant": "without_industry",
+      "columns": [
+        "return_1",
+        "return_3",
+        "return_7",
+        "return_20",
+        "volatility_20",
+        "range_ratio",
+        "open_gap",
+        "ma_distance",
+        "volume_ratio",
+        "amount_log",
+        "turn_ratio",
+        "total_mv",
+        "pe_ttm",
+        "pb_mrq",
+        "news_count_7d"
+      ],
+      "C": 3.0,
+      "folds": [
+        {
+          "validation_start": "2024-11-04T00:00:00",
+          "validation_end": "2025-03-18T00:00:00",
+          "training": {
+            "input_rows": 2236,
+            "fit_rows": 1573,
+            "calibration_rows": 559,
+            "purged_rows": 104,
+            "budget_sampled_out_rows": 0
+          },
+          "transformed_feature_count": 15,
+          "nonzero_coefficients": 14,
+          "calibration_slope": 0.3372616841932205,
+          "prediction": {
+            "rows": 1066,
+            "companies": 13,
+            "signal_count": 567,
+            "signal_win_rate_after_cost": 0.5008818342151675,
+            "mean_signal_net_return": 0.003043230499391874,
+            "brier": 0.26282800837085885,
+            "baseline_brier": 0.25045482277517594,
+            "roc_auc": 0.489141591390871,
+            "skill_vs_constant": -0.049402864191558704
+          },
+          "portfolio": {
+            "total_return": -0.027944896935098718,
+            "annualized_return": -0.07711577267582981,
+            "annualized_volatility": 0.3115273816029171,
+            "sharpe_ratio": -0.10322974760695605,
+            "max_drawdown": -0.2118410520433449,
+            "turnover_ratio": 11.278620518908282,
+            "trade_count": 79,
+            "total_commission": "3355.28794176066877348362459",
+            "total_tax": "2790.62353843683201614676285",
+            "total_slippage_cost": "11184.2825244992988430639"
+          }
+        },
+        {
+          "validation_start": "2025-03-19T00:00:00",
+          "validation_end": "2025-08-08T00:00:00",
+          "training": {
+            "input_rows": 3406,
+            "fit_rows": 2444,
+            "calibration_rows": 858,
+            "purged_rows": 104,
+            "budget_sampled_out_rows": 0
+          },
+          "transformed_feature_count": 15,
+          "nonzero_coefficients": 14,
+          "calibration_slope": -0.10472818779789678,
+          "prediction": {
+            "rows": 1169,
+            "companies": 13,
+            "signal_count": 0,
+            "signal_win_rate_after_cost": null,
+            "mean_signal_net_return": null,
+            "brier": 0.2506972918173607,
+            "baseline_brier": 0.24945335109814057,
+            "roc_auc": 0.47008056927781694,
+            "skill_vs_constant": -0.004986666700383502
+          },
+          "portfolio": {
+            "total_return": 0.0,
+            "annualized_return": 0.0,
+            "annualized_volatility": 0.0,
+            "sharpe_ratio": null,
+            "max_drawdown": 0.0,
+            "turnover_ratio": 0.0,
+            "trade_count": 0,
+            "total_commission": "0",
+            "total_tax": "0",
+            "total_slippage_cost": "0"
+          }
+        }
+      ],
+      "constraint_checks": {
+        "enough_signals": true,
+        "each_fold_win_rate": false,
+        "drawdown_within_limit": true,
+        "each_fold_beats_constant": false
+      }
+    },
+    {
+      "variant": "stronger_l2",
+      "columns": [
+        "return_1",
+        "return_3",
+        "return_7",
+        "return_20",
+        "volatility_20",
+        "range_ratio",
+        "open_gap",
+        "ma_distance",
+        "volume_ratio",
+        "amount_log",
+        "turn_ratio",
+        "total_mv",
+        "pe_ttm",
+        "pb_mrq",
+        "industry",
+        "news_count_7d"
+      ],
+      "C": 0.3,
+      "folds": [
+        {
+          "validation_start": "2024-11-04T00:00:00",
+          "validation_end": "2025-03-18T00:00:00",
+          "training": {
+            "input_rows": 2236,
+            "fit_rows": 1573,
+            "calibration_rows": 559,
+            "purged_rows": 104,
+            "budget_sampled_out_rows": 0
+          },
+          "transformed_feature_count": 25,
+          "nonzero_coefficients": 24,
+          "calibration_slope": 0.1737985484269602,
+          "prediction": {
+            "rows": 1066,
+            "companies": 13,
+            "signal_count": 422,
+            "signal_win_rate_after_cost": 0.5308056872037915,
+            "mean_signal_net_return": 0.005632121841603227,
+            "brier": 0.2535052824615968,
+            "baseline_brier": 0.25045482277517594,
+            "roc_auc": 0.5472941276061415,
+            "skill_vs_constant": -0.012179680361592116
+          },
+          "portfolio": {
+            "total_return": 0.028103071327566953,
+            "annualized_return": 0.08163646386207613,
+            "annualized_volatility": 0.32751580219164117,
+            "sharpe_ratio": 0.4014424817623599,
+            "max_drawdown": -0.16529023557474598,
+            "turnover_ratio": 13.637947108247484,
+            "trade_count": 65,
+            "total_commission": "4153.93070145574594637388750",
+            "total_tax": "3470.54080358794093671055545",
+            "total_slippage_cost": "13846.4852455472313124032"
+          }
+        },
+        {
+          "validation_start": "2025-03-19T00:00:00",
+          "validation_end": "2025-08-08T00:00:00",
+          "training": {
+            "input_rows": 3406,
+            "fit_rows": 2444,
+            "calibration_rows": 858,
+            "purged_rows": 104,
+            "budget_sampled_out_rows": 0
+          },
+          "transformed_feature_count": 25,
+          "nonzero_coefficients": 24,
+          "calibration_slope": 0.09267062751263049,
+          "prediction": {
+            "rows": 1169,
+            "companies": 13,
+            "signal_count": 7,
+            "signal_win_rate_after_cost": 0.7142857142857143,
+            "mean_signal_net_return": 0.06220551412377195,
+            "brier": 0.2464925015152752,
+            "baseline_brier": 0.24945335109814057,
+            "roc_auc": 0.5718772053634439,
+            "skill_vs_constant": 0.011869351803979189
+          },
+          "portfolio": {
+            "total_return": 0.0,
+            "annualized_return": 0.0,
+            "annualized_volatility": 0.0,
+            "sharpe_ratio": null,
+            "max_drawdown": 0.0,
+            "turnover_ratio": 0.0,
+            "trade_count": 0,
+            "total_commission": "0",
+            "total_tax": "0",
+            "total_slippage_cost": "0"
+          }
+        }
+      ],
+      "constraint_checks": {
+        "enough_signals": true,
+        "each_fold_win_rate": true,
+        "drawdown_within_limit": true,
+        "each_fold_beats_constant": false
+      }
+    },
+    {
+      "variant": "sparse_elastic_net",
+      "columns": [
+        "return_1",
+        "return_3",
+        "return_7",
+        "return_20",
+        "volatility_20",
+        "range_ratio",
+        "open_gap",
+        "ma_distance",
+        "volume_ratio",
+        "amount_log",
+        "turn_ratio",
+        "total_mv",
+        "pe_ttm",
+        "pb_mrq",
+        "industry",
+        "news_count_7d"
+      ],
+      "C": 0.3,
+      "folds": [
+        {
+          "validation_start": "2024-11-04T00:00:00",
+          "validation_end": "2025-03-18T00:00:00",
+          "training": {
+            "input_rows": 2236,
+            "fit_rows": 1573,
+            "calibration_rows": 559,
+            "purged_rows": 104,
+            "budget_sampled_out_rows": 0
+          },
+          "transformed_feature_count": 25,
+          "nonzero_coefficients": 23,
+          "calibration_slope": 0.19293181818088667,
+          "prediction": {
+            "rows": 1066,
+            "companies": 13,
+            "signal_count": 442,
+            "signal_win_rate_after_cost": 0.5316742081447964,
+            "mean_signal_net_return": 0.005383533407715493,
+            "brier": 0.25394369586946175,
+            "baseline_brier": 0.25045482277517594,
+            "roc_auc": 0.5395872499673736,
+            "skill_vs_constant": -0.013930149380344092
+          },
+          "portfolio": {
+            "total_return": 0.0026887152721055685,
+            "annualized_return": 0.007631749760243833,
+            "annualized_volatility": 0.31174320595628424,
+            "sharpe_ratio": 0.17853930296631249,
+            "max_drawdown": -0.1640574881736857,
+            "turnover_ratio": 13.202207751898989,
+            "trade_count": 66,
+            "total_commission": "3915.39136796815138337737254",
+            "total_tax": "3265.29349000597942462591200",
+            "total_slippage_cost": "13051.3274806214486457938"
+          }
+        },
+        {
+          "validation_start": "2025-03-19T00:00:00",
+          "validation_end": "2025-08-08T00:00:00",
+          "training": {
+            "input_rows": 3406,
+            "fit_rows": 2444,
+            "calibration_rows": 858,
+            "purged_rows": 104,
+            "budget_sampled_out_rows": 0
+          },
+          "transformed_feature_count": 25,
+          "nonzero_coefficients": 22,
+          "calibration_slope": 0.08756578602758137,
+          "prediction": {
+            "rows": 1169,
+            "companies": 13,
+            "signal_count": 6,
+            "signal_win_rate_after_cost": 0.6666666666666666,
+            "mean_signal_net_return": 0.06083467955657446,
+            "brier": 0.24673266940843971,
+            "baseline_brier": 0.24945335109814057,
+            "roc_auc": 0.5665990355210538,
+            "skill_vs_constant": 0.010906575027851528
+          },
+          "portfolio": {
+            "total_return": 0.0,
+            "annualized_return": 0.0,
+            "annualized_volatility": 0.0,
+            "sharpe_ratio": null,
+            "max_drawdown": 0.0,
+            "turnover_ratio": 0.0,
+            "trade_count": 0,
+            "total_commission": "0",
+            "total_tax": "0",
+            "total_slippage_cost": "0"
+          }
+        }
+      ],
+      "constraint_checks": {
+        "enough_signals": true,
+        "each_fold_win_rate": true,
+        "drawdown_within_limit": true,
+        "each_fold_beats_constant": false
+      }
+    }
+  ],
+  "limitations": [
+    "Four predeclared variants, two expanding time folds; exploratory comparison, not a fresh blind test.",
+    "A winning development variant still needs untouched companies/time before a generalization claim.",
+    "Signal outcomes overlap in time and are not counts of independent executed round trips."
+  ]
+}

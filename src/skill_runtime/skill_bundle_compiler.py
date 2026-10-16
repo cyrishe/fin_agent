@@ -286,8 +286,8 @@ class SkillBundleCompiler:
         input_payload: Dict[str, Any],
         tool_mode: str = "",
     ) -> Dict[str, Any]:
+        skill = self.runner.require_active_skill(skill_name)
         spec = self.bundle_to_skill_spec(skill_name)
-        skill = self.runner.load_skill(skill_name)
         if tool_mode:
             policy = dict(skill.config.get("tool_policy") or {})
             policy["mode"] = tool_mode

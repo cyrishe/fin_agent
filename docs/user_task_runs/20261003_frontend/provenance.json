@@ -1,0 +1,180 @@
+{
+  "base_head": "8d2c22adaeb8b99498170a19b398978609ff1078",
+  "final_commit_runtime_bound": false,
+  "real_runs": [
+    {
+      "label": "first-run",
+      "task_run_id": "run_e411b8894b02421bbc0b30913d9b18c9",
+      "research_run_id": "20261003T084220Z_8105c7b1",
+      "git_commit": "8d2c22adaeb8b99498170a19b398978609ff1078",
+      "working_tree_dirty": true,
+      "implementation_sha256": "eb240d3e472715d3f88bfc81f849280107a7f9267fcf9a21b55dd40506c604fa",
+      "panel_sha256": "b955063c16cbc91b75457d21a5e9b27cb6aeb33c214998ed6a04b5ec6bbc8945",
+      "environment": {
+        "python": "3.13.5",
+        "pandas": "2.3.2",
+        "sklearn": "1.7.1"
+      },
+      "started_at": "2026-10-03T08:41:21.674260+00:00",
+      "finished_at": "2026-10-03T08:42:50.052400+00:00",
+      "worker_wall_seconds": 88.37814,
+      "evaluable_candidates": 12,
+      "attempted_candidates": 12,
+      "development_constraints_met": false,
+      "selected": {
+        "horizon": 3,
+        "task": "classification",
+        "model": "linear",
+        "sampler": "all",
+        "features": "enriched",
+        "depth": 3,
+        "strength": 0.3,
+        "id": "0f89212a98b0"
+      },
+      "snapshot_scope": "报告修改前的实际前端首次提交",
+      "created_at": "2026-10-03T08:42:20.918185+00:00",
+      "test_start": "2025-08-11T00:00:00",
+      "rows": 7760,
+      "sessions": 485,
+      "repeated_holdout_warning": "同一数据反复运行会污染盲测；后续研究须指定未揭盲的新时间窗口。"
+    },
+    {
+      "label": "second-run",
+      "task_run_id": "run_5fce84c5ecc6460bb5c260f6e17615b0",
+      "research_run_id": "20261003T084916Z_9f2c50f8",
+      "git_commit": "8d2c22adaeb8b99498170a19b398978609ff1078",
+      "working_tree_dirty": true,
+      "implementation_sha256": "dd4153595c2e8d1addaaf2df398a496ba4f9ee81c56bf2083ee217dda26d5b86",
+      "panel_sha256": "b955063c16cbc91b75457d21a5e9b27cb6aeb33c214998ed6a04b5ec6bbc8945",
+      "environment": {
+        "python": "3.13.5",
+        "pandas": "2.3.2",
+        "sklearn": "1.7.1"
+      },
+      "started_at": "2026-10-03T08:48:54.719560+00:00",
+      "finished_at": "2026-10-03T08:49:40.889837+00:00",
+      "worker_wall_seconds": 46.170277,
+      "evaluable_candidates": 12,
+      "attempted_candidates": 12,
+      "development_constraints_met": false,
+      "selected": {
+        "horizon": 1,
+        "task": "classification",
+        "model": "linear",
+        "sampler": "all",
+        "features": "enriched",
+        "depth": 6,
+        "strength": 3.0,
+        "id": "3e966eb3db07"
+      },
+      "snapshot_scope": "含报告展示修复；不含随后完成的候选/轮次进度边界修复",
+      "created_at": "2026-10-03T08:49:17.135749+00:00",
+      "test_start": "2025-08-11T00:00:00",
+      "rows": 7760,
+      "sessions": 485,
+      "repeated_holdout_warning": "同一数据反复运行会污染盲测；后续研究须指定未揭盲的新时间窗口。"
+    }
+  ],
+  "published_files": [
+    {
+      "path": "first-run/report.md",
+      "bytes": 4813,
+      "sha256": "300baba1f98f2b179651237405eca7b594b4be65ed0e4a6d3f5c53ce565b8a6a",
+      "byte_identical_to_run_artifact": true
+    },
+    {
+      "path": "first-run/review.md",
+      "bytes": 1646,
+      "sha256": "c7ce2b08401346e5d51718cd574ee08a9e3168a3ab0b2e5a4cfeae91701f20d7",
+      "byte_identical_to_run_artifact": true
+    },
+    {
+      "path": "first-run/report.json",
+      "bytes": 8586,
+      "sha256": "32735167df518356728788d18e18e61cb0418e8d9d139365e68dada3cc1fd8c8",
+      "byte_identical_to_run_artifact": true
+    },
+    {
+      "path": "second-run/report.md",
+      "bytes": 7425,
+      "sha256": "5cf7c7b4de34d14dc66c7dc2e2d115865574453919bf2d6b253ab7bf600ce819",
+      "byte_identical_to_run_artifact": true
+    },
+    {
+      "path": "second-run/review.md",
+      "bytes": 2798,
+      "sha256": "610e855e6f98d805073cc35112afe94d909fbe7235f6484bf6226f98e72e01f1",
+      "byte_identical_to_run_artifact": true
+    },
+    {
+      "path": "second-run/report.json",
+      "bytes": 7723,
+      "sha256": "f2651a00446da1daee5d6168a73e05c279cca30c7e01c73cceb3dbe5c7c1f658",
+      "byte_identical_to_run_artifact": true
+    }
+  ],
+  "data_boundary": "仅聚合指标、任务配置、原报告/评审、原型和界面截图；不含行情面板、逐行预测、模型二进制、SQLite或凭据。",
+  "browser_verification": {
+    "real_app_viewport_width": 821,
+    "confirmed_flows": [
+      "自然语言生成方案",
+      "真实创建并执行",
+      "再次运行",
+      "展开报告",
+      "查看长要求末尾",
+      "切换运行历史",
+      "刷新后保留旧运行选择",
+      "切回第二次运行"
+    ],
+    "console_observation": "核对时刻当前 warn/error 列表为空；未推断初次完整加载全过程均无控制台错误。",
+    "prototype_only": {
+      "outer_viewport_widths": [
+        320,
+        736,
+        1024
+      ],
+      "inner_content_widths": [
+        273,
+        689,
+        977
+      ],
+      "horizontal_page_overflow": false,
+      "interactions": [
+        "9阶段点击",
+        "线性解释切换",
+        "报告3个tab",
+        "所有任务入口",
+        "非ML通用结构按钮"
+      ]
+    },
+    "prototype_numeric_source": "先前7日历史研究和离线解释/剪枝审计，非本次真实前端1日/3日结果。"
+  },
+  "regression_verification": {
+    "automl": {
+      "command": "OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 .venv-automl/bin/python -m pytest tests/automl -q && git diff --check",
+      "passed": 56,
+      "scope": "tests/automl/，含报告、模型审计、任务集成与受控候选进度边界回归；未执行第三次真实KingdomAI训练。",
+      "seconds": 33.51,
+      "cwd": "repository root",
+      "log_file": null,
+      "evidence": "执行agent确认工具结果：56 passed in 33.51s，exit 0；随后git diff --check通过。未落盘pytest日志。"
+    },
+    "frontend": {
+      "cwd": "frontend",
+      "command": "npm test -- --reporter=dot",
+      "passed": 163,
+      "test_files": 27
+    },
+    "build": {
+      "cwd": "frontend",
+      "command": "npm run build",
+      "result": "passed",
+      "scope": "tsc -b + vite build",
+      "warnings": [
+        "既有打包chunk size warning"
+      ]
+    },
+    "whole_repository_suite_rerun": false
+  },
+  "comparison_boundary": "两次完整spec和panel哈希相同；LLM参与规划导致实际候选搜索清单可能不同。本轮没有修改训练或候选选择算法，3日到1日最佳候选变化不是报告修复对模型效果的对照实验。"
+}

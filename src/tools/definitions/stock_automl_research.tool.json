@@ -1,0 +1,306 @@
+{
+  "name": "stock_automl_research",
+  "version": "v1",
+  "status": "active",
+  "auth": "public",
+  "identity": {
+    "display_name": "股票 AutoML 研究任务",
+    "description": "一次性、需求驱动的股票机器学习研究与训练：自然语言设计一个或多个研究方向，共享实验预算，分别训练、解释并交付可复用模型策略及时间/公司留出回测证据。支持精确率优先、局部股票范围，允许未达标或无信号。必须由授权后台任务执行。日常选股应加载已有模型预测，不应重复调用本训练工具；本工具不代替模型推理或实盘交易。",
+    "domain": "stock",
+    "owner": "tools"
+  },
+  "availability": {
+    "lifecycle": "active",
+    "retrieval_mode": "retrievable",
+    "visibility": "visible"
+  },
+  "capabilities": [
+    "stock_automl_research",
+    "model_training",
+    "out_of_sample_backtest"
+  ],
+  "match_contract": {
+    "request_families": [
+      "research"
+    ],
+    "work_item_types": [
+      "tool"
+    ],
+    "capability_classes": [
+      "quantitative_research"
+    ],
+    "side_effect_level": "write"
+  },
+  "profiles": {
+    "real": {
+      "enabled": true,
+      "implementation": {
+        "kind": "python_callable",
+        "target": "src.tools.stock_automl_research_tool:run"
+      }
+    }
+  },
+  "runtime_hints": {
+    "cost_class": "high",
+    "latency_class": "high",
+    "supports_async_submit": true,
+    "supports_stream": false
+  },
+  "safety": {
+    "network": true,
+    "persistence": true,
+    "side_effect": "write"
+  },
+  "schemas": {
+    "input": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "requirement_brief"
+      ],
+      "properties": {
+        "requirement_brief": {
+          "type": "string",
+          "minLength": 1,
+          "description": "完整用户研究目标和明确限制。自然语言提交时原样传递，不自行缩写或丢弃约束。"
+        },
+        "spec": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "start",
+            "end"
+          ],
+          "properties": {
+            "start": {
+              "type": "string",
+              "description": "研究开始日期 YYYY-MM-DD"
+            },
+            "end": {
+              "type": "string",
+              "description": "研究结束日期 YYYY-MM-DD"
+            },
+            "objective": {
+              "type": "string"
+            },
+            "symbols": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "max_symbols": {
+              "type": [
+                "integer",
+                "null"
+              ],
+              "minimum": 1,
+              "description": "默认 null 使用研究区间全股票池；明确设置整数才按固定种子限制公司数。"
+            },
+            "horizons": {
+              "type": "array",
+              "items": {
+                "type": "integer"
+              },
+              "description": "持有到期的交易日数；不是期间任一日触及目标"
+            },
+            "tasks": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "models": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "samplers": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "feature_sets": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "max_trials": {
+              "type": "integer",
+              "maximum": 200
+            },
+            "rounds": {
+              "type": "integer"
+            },
+            "max_train_rows": {
+              "type": "integer"
+            },
+            "seed": {
+              "type": "integer"
+            },
+            "folds": {
+              "type": "integer"
+            },
+            "test_fraction": {
+              "type": "number"
+            },
+            "company_holdout_fraction": {
+              "type": "number"
+            },
+            "target_return": {
+              "type": "number"
+            },
+            "probability_threshold": {
+              "type": "number"
+            },
+            "regression_threshold": {
+              "type": "number"
+            },
+            "top_k": {
+              "type": "integer"
+            },
+            "min_signals": {
+              "type": "integer"
+            },
+            "min_win_rate": {
+              "type": "number"
+            },
+            "max_drawdown": {
+              "type": "number"
+            },
+            "commission_rate": {
+              "type": "number"
+            },
+            "sell_tax_rate": {
+              "type": "number"
+            },
+            "slippage_rate": {
+              "type": "number"
+            },
+            "initial_cash": {
+              "type": "number"
+            },
+            "include_minute": {
+              "type": "boolean"
+            },
+            "industries": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "min_market_cap": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "max_market_cap": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "min_amount": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "feature_names": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "研究方向要使用的已有特征名；空列表使用feature_sets全部可用特征。"
+            },
+            "min_precision": {
+              "type": [
+                "number",
+                "null"
+              ],
+              "minimum": 0,
+              "maximum": 1,
+              "description": "选中事件达到target_return的最低精确率；自然语言研究默认0.6。"
+            },
+            "optimize_threshold": {
+              "type": "boolean",
+              "description": "只在开发数据选择筛选门槛，冻结后用于留出测试和复用。"
+            },
+            "min_signal_dates": {
+              "type": "integer",
+              "minimum": 1,
+              "description": "开发选择所需的最少不同出手日期数。"
+            }
+          },
+          "description": "仅用于用户明确提供的完整结构化研究配置；提供时以字段为执行约束，说明文字不再隐式改写。自然语言任务请省略，由业务规划器编译。"
+        },
+        "source": {
+          "type": "string",
+          "enum": [
+            "kingdomai",
+            "demo"
+          ],
+          "default": "kingdomai",
+          "description": "实际股票研究用 kingdomai；仅在明确验证程序时使用合成 demo。"
+        },
+        "llm_review": {
+          "type": "boolean",
+          "default": true,
+          "description": "启用开发候选的 LLM 辅助选择及独立结果评审；关闭时仍保留确定性指标与报告，自然语言参数编译不受此字段影响。"
+        }
+      }
+    },
+    "output": {
+      "type": "object",
+      "required": [
+        "ok",
+        "summary",
+        "artifacts"
+      ],
+      "properties": {
+        "ok": {
+          "type": "boolean"
+        },
+        "summary": {
+          "type": "string"
+        },
+        "report_markdown": {
+          "type": "string"
+        },
+        "metrics": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "artifacts": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "domain_result": {
+          "type": "object"
+        }
+      }
+    }
+  },
+  "invocation_example": "stock_automl_research(requirement_brief=\"研究近三年银行股，预测持有3/7个交易日的上涨概率，最多12个实验\")",
+  "tags": [
+    "stock",
+    "automl",
+    "background-task"
+  ],
+  "subject_tags": [
+    "stock"
+  ],
+  "tool_priority": 1,
+  "tests": {
+    "golden_cases": [],
+    "sample_inputs": []
+  }
+}

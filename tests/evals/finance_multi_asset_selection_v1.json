@@ -1,0 +1,18 @@
+{
+  "version": "finance_multi_asset_selection_v1",
+  "description": "新增与增强 Skill 的自然入口检查；gold 在运行前冻结，允许必要的总分组合。",
+  "cases": [
+    {"id":"fund_etf","question":"帮我分析沪深300ETF（510300.SH）最近一个月的表现，价格和净值有没有偏离，交易是否活跃？","primary":"fund-analysis","acceptable":["fund-analysis"],"expected_generic":false},
+    {"id":"fund_compare","question":"510300.SH 和 159919.SZ 都是沪深300ETF，我该从哪些角度比较它们？请结合最近行情，讲清楚差异和风险。","primary":"fund-analysis","acceptable":["fund-analysis"],"expected_generic":false},
+    {"id":"fund_manager","question":"想了解一只主动权益基金的长期表现是不是靠基金经理能力。如果现在只有基金价格和单位净值，你能评价哪些部分，还缺什么材料？","primary":"fund-analysis","acceptable":["fund-analysis"],"expected_generic":false},
+    {"id":"bond_convertible","question":"帮我分析113684.SH这只可转债，重点看最近价格、成交，以及判断转股溢价和赎回风险需要什么条款。","primary":"bond-analysis","acceptable":["bond-analysis","stock-research"],"expected_generic":false},
+    {"id":"bond_compare","question":"两只信用债，一只票息高但成交很少，一只票息低但到期更近，怎样比较回报和风险？请说明哪些结论需要补充数据。","primary":"bond-analysis","acceptable":["bond-analysis","financial-quality-analysis"],"expected_generic":false},
+    {"id":"flow_divergence","question":"宁德时代最近20个交易日主力净流入，但股价却走弱，怎么理解？融资余额变化能提供什么验证？","primary":"capital-flow-analysis","acceptable":["capital-flow-analysis","stock-research","technical-structure-analysis"],"expected_generic":false},
+    {"id":"flow_plate","question":"白酒板块最近一周的资金是普遍回流，还是主要集中在少数公司？请结合成交和成分表现解释。","primary":"capital-flow-analysis","acceptable":["capital-flow-analysis","sector-theme-analysis"],"expected_generic":false},
+    {"id":"hot_discovery","question":"最近市场有哪些热点概念正在升温？哪些只是少数公司拉动，哪些参与范围更广？","primary":"sector-theme-analysis","acceptable":["sector-theme-analysis","market-overview","capital-flow-analysis"],"expected_generic":false},
+    {"id":"hot_reverse","question":"宁德时代最近关联哪些市场热点？这些关联是业务受益还是市场延伸出来的概念？","primary":"sector-theme-analysis","acceptable":["sector-theme-analysis","stock-research","equity-report-analysis"],"expected_generic":false},
+    {"id":"comparison_cross_sector","question":"从中长期投资角度比较招商银行和金山办公，商业模式不同应怎样看增长兑现、资本需求、估值和风险？","primary":"stock-comparison","acceptable":["stock-comparison","stock-research","valuation-analysis","financial-quality-analysis"],"expected_generic":false},
+    {"id":"stock_regression","question":"从中期投资视角分析宁德时代，重点讲核心逻辑、主要风险，以及什么变化会推翻判断。","primary":"stock-research","acceptable":["stock-research","equity-report-analysis","valuation-analysis","financial-quality-analysis","sector-theme-analysis"],"expected_generic":false},
+    {"id":"report_regression","question":"不同机构对今世缘的估值方法有何差异？","primary":"equity-report-analysis","acceptable":["equity-report-analysis","valuation-analysis","stock-research"],"expected_generic":false}
+  ]
+}

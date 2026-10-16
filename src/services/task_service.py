@@ -78,6 +78,10 @@ class AsyncTaskService:
         normalized_skill = str(skill_name or "").strip()
         if not normalized_skill:
             raise ValueError("skill_name 不能为空")
+        # Reject retired compiled Skills before capacity checks, persistence,
+        # or worker submission.  SkillRunner repeats the same check at the
+        # execution boundary so queued work cannot bypass a later retirement.
+        self.runner.require_active_skill(normalized_skill)
         normalized_source_type = self._normalize_source_type(source_type)
         job_id = f"job_{uuid.uuid4().hex[:24]}"
         runtime_trace: Dict[str, Any] = {}
@@ -1145,6 +1149,7 @@ class AsyncTaskService:
             "stock_reports": "查询研报",
             "equity_research_search": "查询研报",
             "financial_news_search": "查询新闻",
+            "general_search": "查询资料",
             "company_news": "查询新闻",
         }
         return mapping.get(str(tool_name or "").strip(), f"调用 {tool_name}")
@@ -1160,6 +1165,7 @@ class AsyncTaskService:
             "stock_reports": "正在抓取研报与机构观点。",
             "equity_research_search": "正在抓取研报与机构观点。",
             "financial_news_search": "正在抓取相关新闻与催化事件。",
+            "general_search": "正在检索相关资料与新闻证据。",
             "company_news": "正在抓取公司相关新闻与催化事件。",
         }
         return mapping.get(str(tool_name or "").strip(), "正在调用工具。")
@@ -1188,7 +1194,7 @@ class AsyncTaskService:
         if tool_name in {"stock_reports", "equity_research_search"}:
             total = len(data if isinstance(data, list) else (data.get("items") or []))
             return f"已收集研报 {total} 篇。"
-        if tool_name in {"company_news", "financial_news_search"}:
+        if tool_name in {"company_news", "financial_news_search", "general_search"}:
             total = len(data if isinstance(data, list) else (data.get("items") or []))
             return f"已收集新闻 {total} 条。"
         return "工具已返回结果。"

@@ -1,0 +1,129 @@
+{
+  "model": "eight-factor binary logistic regression",
+  "positive_label": "original class 0 or 1; next first-ten-minute high / T 14:50 entry proxy - 1 >= 0.005",
+  "training_rows": 8590,
+  "training_signal_period": [
+    "2026-08-25",
+    "2026-09-29"
+  ],
+  "regularization_C": 0.2,
+  "effective_regularization": "L2",
+  "l1_ratio": 0.0,
+  "scikit_learn_version": "1.9.1",
+  "solver": "lbfgs",
+  "max_iter": 2000,
+  "intercept": 0.9245793333627681,
+  "features": [
+    {
+      "name": "signal_return",
+      "type": "numeric_standardized",
+      "training_mean": 0.04097766683701979,
+      "training_std": 0.008245338483851769,
+      "coefficient": 0.05550613998585314,
+      "odds_ratio_per_standard_deviation": 1.057075507481159,
+      "fold_coefficients": [
+        0.074091,
+        0.098672,
+        0.05932
+      ]
+    },
+    {
+      "name": "volume_ratio",
+      "type": "numeric_standardized",
+      "training_mean": 1.5490740662072175,
+      "training_std": 0.8511169559652465,
+      "coefficient": -0.18399917003928187,
+      "odds_ratio_per_standard_deviation": 0.8319364943009955,
+      "fold_coefficients": [
+        -0.115333,
+        -0.123008,
+        -0.163208
+      ]
+    },
+    {
+      "name": "turnover_so_far_pct",
+      "type": "numeric_standardized",
+      "training_mean": 4.50401543861234,
+      "training_std": 4.163445098623678,
+      "coefficient": -0.08286475999691535,
+      "odds_ratio_per_standard_deviation": 0.9204756239290393,
+      "fold_coefficients": [
+        -0.090009,
+        -0.117114,
+        -0.075563
+      ]
+    },
+    {
+      "name": "float_mv_100m_cny",
+      "type": "numeric_standardized",
+      "training_mean": 151.21471613999532,
+      "training_std": 456.3310479887258,
+      "coefficient": 0.009073857848839186,
+      "odds_ratio_per_standard_deviation": 1.0091151500958002,
+      "fold_coefficients": [
+        -0.010216,
+        -0.020945,
+        0.01468
+      ]
+    },
+    {
+      "name": "volume_4of5_increasing",
+      "type": "binary_0_or_1",
+      "training_one_fraction": 0.1331781140861467,
+      "coefficient": 0.10575237820622507,
+      "odds_ratio_from_0_to_1": 1.111546599262841,
+      "fold_coefficients": [
+        -0.005036,
+        0.090452,
+        0.070841
+      ]
+    },
+    {
+      "name": "ma_bull_5_10_20",
+      "type": "binary_0_or_1",
+      "training_one_fraction": 0.2844004656577416,
+      "coefficient": -0.05245764259135527,
+      "odds_ratio_from_0_to_1": 0.9488945129172282,
+      "fold_coefficients": [
+        0.102036,
+        0.064998,
+        -0.090054
+      ]
+    },
+    {
+      "name": "price_above_all_ma",
+      "type": "binary_0_or_1",
+      "training_one_fraction": 0.7006984866123399,
+      "coefficient": -0.2443773990055929,
+      "odds_ratio_from_0_to_1": 0.7831920025978545,
+      "fold_coefficients": [
+        -0.375495,
+        -0.324617,
+        -0.166307
+      ]
+    },
+    {
+      "name": "all_intraday_lows_above_ma",
+      "type": "binary_0_or_1",
+      "training_one_fraction": 0.259604190919674,
+      "coefficient": 0.1913339899413491,
+      "odds_ratio_from_0_to_1": 1.2108638008831631,
+      "fold_coefficients": [
+        -0.064111,
+        -0.028942,
+        0.182143
+      ]
+    }
+  ],
+  "ma_state_counts": {
+    "neither": 2571,
+    "price_above_only": 3789,
+    "both": 2230,
+    "low_above_only_impossible": 0
+  },
+  "float_mv_training_max_100m_cny": 13046.38536897,
+  "float_mv_training_999pct_100m_cny": 5878.584004901772,
+  "formula_reconstruction_max_abs_error": 0.0,
+  "samples_sha256": "3978d45bd9a145828b6f7445c3646e79a90f33a6437268bd402413cc810396f8",
+  "script_sha256": "c71266b0f23034cf446460c1a460f6b15b788db1a51c82d410e3fc9b6f756a6e"
+}

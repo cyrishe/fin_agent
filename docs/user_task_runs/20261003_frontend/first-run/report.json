@@ -1,0 +1,237 @@
+{
+  "run_id": "20261003T084220Z_8105c7b1",
+  "objective": "使用 KingdomAI 库 2024-01-01 至 2025-12-31 的日K，随机选取16家公司，研究持有1、3、7个交易日到期的上涨概率与收益回归，仅比较逻辑回归、Ridge和决策树。使用全部样本，技术特征及已有的行业、市值、估值和新闻数量特征，不使用分钟数据。最多12个候选实验、2轮、2个按时间验证折，保留其他公司和后续时间段作评估，考虑佣金、滑点和印花税。概率信号门槛60%，每轮研究至少15个信号、最低胜率50%、最大回撤30%；不保证找到达标模型，没有符合条件的模型也要如实报告。输出研究设计、样本划分、候选比较、阶段回测、最终留出结果和大模型评审。最多运行15分钟。历史窗口已使用过，本次仅验收流程，不将重复留出结果称为新的盲测。",
+  "selected": {
+    "horizon": 3,
+    "task": "classification",
+    "model": "linear",
+    "sampler": "all",
+    "features": "enriched",
+    "depth": 3,
+    "strength": 0.3,
+    "id": "0f89212a98b0"
+  },
+  "development_constraints_met": false,
+  "development_constraint_checks": {
+    "enough_signals": true,
+    "each_fold_win_rate": false,
+    "drawdown_within_limit": true,
+    "each_fold_beats_constant": true
+  },
+  "decision_policy": {
+    "probability_threshold": 0.6,
+    "regression_threshold": 0.005,
+    "target_return": 0.0,
+    "top_k": 5,
+    "min_signals": 15,
+    "min_win_rate": 0.5,
+    "max_drawdown": 0.3
+  },
+  "sample_counts": {
+    "panel_rows": 7760,
+    "companies": 16,
+    "sessions": 485,
+    "eligible_by_horizon": {
+      "1": 7405,
+      "3": 7373,
+      "7": 7309
+    },
+    "development": {
+      "input_rows": 4731,
+      "fit_rows": 3497,
+      "calibration_rows": 1182,
+      "purged_rows": 52,
+      "budget_sampled_out_rows": 0
+    },
+    "test_start": "2025-08-11T00:00:00",
+    "test_signal_end": "2025-12-19T00:00:00",
+    "heldout_companies": [
+      "002330.SZ",
+      "002650.SZ",
+      "300345.SZ"
+    ],
+    "heldout_rows": {
+      "new_period": 1156,
+      "new_companies_and_period": 267
+    }
+  },
+  "attempted_trials": 12,
+  "successful_trials": 12,
+  "evaluation": {
+    "new_period": {
+      "prediction": {
+        "rows": 1156,
+        "companies": 13,
+        "signal_count": 3,
+        "signal_win_rate_after_cost": 0.6666666666666666,
+        "descriptive_wilson_interval": [
+          0.2076549551264879,
+          0.9385096847238394
+        ],
+        "mean_signal_net_return": 0.026975977313797927,
+        "unconditional_up_rate": 0.4852941176470588,
+        "prediction_range": {
+          "min": 0.3157282063361148,
+          "max": 0.6108543613201487,
+          "mean": 0.50516985989608
+        },
+        "calibration": [
+          {
+            "lower": 0.3,
+            "n": 8,
+            "predicted": 0.3611631619619722,
+            "observed": 0.0
+          },
+          {
+            "lower": 0.4,
+            "n": 385,
+            "predicted": 0.4832232105097726,
+            "observed": 0.43376623376623374
+          },
+          {
+            "lower": 0.5,
+            "n": 760,
+            "predicted": 0.5173975967515754,
+            "observed": 0.5157894736842106
+          },
+          {
+            "lower": 0.6,
+            "n": 3,
+            "predicted": 0.6079810555710184,
+            "observed": 0.6666666666666666
+          }
+        ],
+        "brier": 0.24764433388782875,
+        "baseline_brier": 0.24982687654065158,
+        "roc_auc": 0.5615422639644092,
+        "skill_vs_constant": 0.008736220390073601,
+        "by_month": [
+          {
+            "month": "2025-09",
+            "n": 3,
+            "mean_return": 0.030075977313797925,
+            "win_rate_after_cost": 0.6666666666666666
+          }
+        ],
+        "by_industry": [
+          {
+            "industry": "公用事业",
+            "n": 1,
+            "mean_return": 0.12027656202157733
+          },
+          {
+            "industry": "房地产",
+            "n": 2,
+            "mean_return": -0.015024315040091774
+          }
+        ]
+      },
+      "portfolio": {
+        "total_return": 0.004501794548197546,
+        "annualized_return": 0.012379326972576488,
+        "annualized_volatility": 0.01554019917109438,
+        "sharpe_ratio": 0.7993967677881234,
+        "max_drawdown": -0.0050636190304346185,
+        "turnover_ratio": 1.9697845215097047,
+        "trade_count": 2,
+        "total_commission": "592.53684793102221453764346",
+        "total_tax": "495.17808397921214038692360",
+        "total_slippage_cost": "1975.1303910766118995838"
+      },
+      "benchmark": {
+        "total_return": 0.05457821457709522,
+        "annualized_return": 0.15668693728535255,
+        "annualized_volatility": 0.19087766268494194,
+        "sharpe_ratio": 0.8575826373397031,
+        "max_drawdown": -0.07686878241735451,
+        "turnover_ratio": 2.7208085665140844,
+        "trade_count": 402,
+        "total_commission": "851.48386217056281275800296",
+        "total_tax": "723.60821180490332031416295",
+        "total_slippage_cost": "2838.3385322137259934914"
+      },
+      "excess_total_return": -0.05007642002889767,
+      "execution_issue_count": 0
+    },
+    "new_companies_and_period": {
+      "prediction": {
+        "rows": 267,
+        "companies": 3,
+        "signal_count": 0,
+        "signal_win_rate_after_cost": null,
+        "descriptive_wilson_interval": null,
+        "mean_signal_net_return": null,
+        "unconditional_up_rate": 0.45692883895131087,
+        "prediction_range": {
+          "min": 0.38149828273394737,
+          "max": 0.5818009434375857,
+          "mean": 0.5123444042289675
+        },
+        "calibration": [
+          {
+            "lower": 0.3,
+            "n": 1,
+            "predicted": 0.38149828273394737,
+            "observed": 1.0
+          },
+          {
+            "lower": 0.4,
+            "n": 64,
+            "predicted": 0.4853608775449839,
+            "observed": 0.296875
+          },
+          {
+            "lower": 0.5,
+            "n": 202,
+            "predicted": 0.5215413934827792,
+            "observed": 0.504950495049505
+          }
+        ],
+        "brier": 0.2501793815792629,
+        "baseline_brier": 0.24936521379290846,
+        "roc_auc": 0.5486715658564161,
+        "skill_vs_constant": -0.003264961355157414,
+        "by_month": [],
+        "by_industry": []
+      },
+      "portfolio": {
+        "total_return": 0.0,
+        "annualized_return": 0.0,
+        "annualized_volatility": 0.0,
+        "sharpe_ratio": null,
+        "max_drawdown": 0.0,
+        "turnover_ratio": 0.0,
+        "trade_count": 0,
+        "total_commission": "0",
+        "total_tax": "0",
+        "total_slippage_cost": "0"
+      },
+      "benchmark": {
+        "total_return": 0.007085499486545022,
+        "annualized_return": 0.01952789518992315,
+        "annualized_volatility": 0.23957186057417207,
+        "sharpe_ratio": 0.19848197039259677,
+        "max_drawdown": -0.13056854221669667,
+        "turnover_ratio": 2.5888487629027233,
+        "trade_count": 93,
+        "total_commission": "793.92339871458536365110465",
+        "total_tax": "663.73862263912916072781750",
+        "total_slippage_cost": "2646.4225186326444102455"
+      },
+      "excess_total_return": -0.007085499486545022,
+      "execution_issue_count": 0
+    }
+  },
+  "elapsed_seconds": 25.87,
+  "limitations": [
+    "研究回测使用复权价格及1份单位，未完整模拟A股100股整手、开盘涨跌停排队与停复牌可成交性；不作为实盘回报。",
+    "交易成本为任务假设，不自动推断历史税费制度；复权数据可能被供应商修订。",
+    "信号胜率是重叠持有期样本统计，不能视为独立已成交交易胜率；组合收益另由逐日现金账本计算。",
+    "horizon定义：收盘后信号，下一交易日开盘买入，持有h个交易日后开盘退出；不是期间触及目标价概率。",
+    "随机起始股票池可含后来退市股票，但退市清算和历史数据库完整性尚未认证。",
+    "所有盲测只评估开发集选定的一名候选；本轮报告不触发自动再训练或交易。",
+    "估值按下一自然日可用处理；原库未提供历史修订版本，不能证明原始发布时点。",
+    "行业按 SW2021 生效区间对齐，未取得分类历史版本；用于研究特征和分组，非严格历史成分认证。",
+    "新闻热度为已入库新闻的7日数量代理，不代表全网热度；不读取或上传新闻正文。"
+  ]
+}

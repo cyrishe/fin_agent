@@ -1,0 +1,377 @@
+{
+  "signal_date": "2026-10-08",
+  "exit_date": "2026-10-09",
+  "training_signal_dates": [
+    "2026-09-02",
+    "2026-09-30"
+  ],
+  "training_rows": 5818,
+  "candidate_rows": 178,
+  "selection_frozen_before_outcome_query": true,
+  "weights": {
+    "lt0": 0.8013774104683196,
+    "0to1": 0.8268902785673679,
+    "1to3": 0.9371778350515464,
+    "ge3": 2.101878612716763
+  },
+  "models": {
+    "balanced_class_weight": {
+      "candidate_class_counts": {
+        "lt0": 77,
+        "0to1": 40,
+        "1to3": 45,
+        "ge3": 16
+      },
+      "predicted_class_counts": {
+        "lt0": 38,
+        "0to1": 74,
+        "1to3": 19,
+        "ge3": 47
+      },
+      "candidate_confusion_rows_actual_columns_predicted": [
+        [
+          22,
+          20,
+          10,
+          25
+        ],
+        [
+          6,
+          26,
+          3,
+          5
+        ],
+        [
+          7,
+          22,
+          3,
+          13
+        ],
+        [
+          3,
+          6,
+          3,
+          4
+        ]
+      ],
+      "candidate_accuracy": 0.3089887640449438,
+      "selection": {
+        "class_priority_fallback": {
+          "top1": {
+            "labels": {
+              "selected": 1,
+              "days": 1,
+              "actual_ge1": 0,
+              "actual_ge3": 0,
+              "actual_0to1": 1,
+              "actual_lt0": 0,
+              "actual_below_minus1": 0,
+              "mean_second_high_return_pct": 0.0
+            },
+            "exits": {
+              "always_0940": {
+                "trades": 1,
+                "mean_trade_return_pct": -0.4844961240310197,
+                "positive": 0,
+                "below_minus1": 0
+              },
+              "no_rebound": {
+                "trades": 1,
+                "mean_trade_return_pct": -0.4844961240310197,
+                "positive": 0,
+                "below_minus1": 0
+              },
+              "original_four_rules": {
+                "trades": 1,
+                "mean_trade_return_pct": -1.2273901808785626,
+                "positive": 0,
+                "below_minus1": 1
+              }
+            }
+          },
+          "top2": {
+            "labels": {
+              "selected": 2,
+              "days": 1,
+              "actual_ge1": 1,
+              "actual_ge3": 0,
+              "actual_0to1": 1,
+              "actual_lt0": 0,
+              "actual_below_minus1": 0,
+              "mean_second_high_return_pct": 0.8513513513513593
+            },
+            "exits": {
+              "always_0940": {
+                "trades": 2,
+                "mean_trade_return_pct": 1.1361303163628766,
+                "positive": 1,
+                "below_minus1": 0
+              },
+              "no_rebound": {
+                "trades": 2,
+                "mean_trade_return_pct": 0.3793735596061165,
+                "positive": 1,
+                "below_minus1": 0
+              },
+              "original_four_rules": {
+                "trades": 2,
+                "mean_trade_return_pct": -0.4785599553041475,
+                "positive": 1,
+                "below_minus1": 1
+              }
+            }
+          }
+        },
+        "p_ge3": {
+          "top1": {
+            "labels": {
+              "selected": 1,
+              "days": 1,
+              "actual_ge1": 0,
+              "actual_ge3": 0,
+              "actual_0to1": 1,
+              "actual_lt0": 0,
+              "actual_below_minus1": 0,
+              "mean_second_high_return_pct": 0.0
+            },
+            "exits": {
+              "always_0940": {
+                "trades": 1,
+                "mean_trade_return_pct": -0.4844961240310197,
+                "positive": 0,
+                "below_minus1": 0
+              },
+              "no_rebound": {
+                "trades": 1,
+                "mean_trade_return_pct": -0.4844961240310197,
+                "positive": 0,
+                "below_minus1": 0
+              },
+              "original_four_rules": {
+                "trades": 1,
+                "mean_trade_return_pct": -1.2273901808785626,
+                "positive": 0,
+                "below_minus1": 1
+              }
+            }
+          },
+          "top2": {
+            "labels": {
+              "selected": 2,
+              "days": 1,
+              "actual_ge1": 1,
+              "actual_ge3": 0,
+              "actual_0to1": 1,
+              "actual_lt0": 0,
+              "actual_below_minus1": 0,
+              "mean_second_high_return_pct": 0.8513513513513593
+            },
+            "exits": {
+              "always_0940": {
+                "trades": 2,
+                "mean_trade_return_pct": 1.1361303163628766,
+                "positive": 1,
+                "below_minus1": 0
+              },
+              "no_rebound": {
+                "trades": 2,
+                "mean_trade_return_pct": 0.3793735596061165,
+                "positive": 1,
+                "below_minus1": 0
+              },
+              "original_four_rules": {
+                "trades": 2,
+                "mean_trade_return_pct": -0.4785599553041475,
+                "positive": 1,
+                "below_minus1": 1
+              }
+            }
+          }
+        }
+      }
+    },
+    "unweighted": {
+      "candidate_class_counts": {
+        "lt0": 77,
+        "0to1": 40,
+        "1to3": 45,
+        "ge3": 16
+      },
+      "predicted_class_counts": {
+        "lt0": 77,
+        "0to1": 85,
+        "1to3": 14,
+        "ge3": 2
+      },
+      "candidate_confusion_rows_actual_columns_predicted": [
+        [
+          43,
+          26,
+          8,
+          0
+        ],
+        [
+          7,
+          29,
+          3,
+          1
+        ],
+        [
+          18,
+          25,
+          1,
+          1
+        ],
+        [
+          9,
+          5,
+          2,
+          0
+        ]
+      ],
+      "candidate_accuracy": 0.4101123595505618,
+      "selection": {
+        "class_priority_fallback": {
+          "top1": {
+            "labels": {
+              "selected": 1,
+              "days": 1,
+              "actual_ge1": 0,
+              "actual_ge3": 0,
+              "actual_0to1": 1,
+              "actual_lt0": 0,
+              "actual_below_minus1": 0,
+              "mean_second_high_return_pct": 0.0
+            },
+            "exits": {
+              "always_0940": {
+                "trades": 1,
+                "mean_trade_return_pct": -0.4844961240310197,
+                "positive": 0,
+                "below_minus1": 0
+              },
+              "no_rebound": {
+                "trades": 1,
+                "mean_trade_return_pct": -0.4844961240310197,
+                "positive": 0,
+                "below_minus1": 0
+              },
+              "original_four_rules": {
+                "trades": 1,
+                "mean_trade_return_pct": -1.2273901808785626,
+                "positive": 0,
+                "below_minus1": 1
+              }
+            }
+          },
+          "top2": {
+            "labels": {
+              "selected": 2,
+              "days": 1,
+              "actual_ge1": 1,
+              "actual_ge3": 0,
+              "actual_0to1": 1,
+              "actual_lt0": 0,
+              "actual_below_minus1": 0,
+              "mean_second_high_return_pct": 1.026545002073831
+            },
+            "exits": {
+              "always_0940": {
+                "trades": 2,
+                "mean_trade_return_pct": 0.11030274677752971,
+                "positive": 1,
+                "below_minus1": 0
+              },
+              "no_rebound": {
+                "trades": 2,
+                "mean_trade_return_pct": 0.7220820914477788,
+                "positive": 1,
+                "below_minus1": 0
+              },
+              "original_four_rules": {
+                "trades": 2,
+                "mean_trade_return_pct": -0.872923626316513,
+                "positive": 0,
+                "below_minus1": 1
+              }
+            }
+          }
+        },
+        "p_ge3": {
+          "top1": {
+            "labels": {
+              "selected": 1,
+              "days": 1,
+              "actual_ge1": 0,
+              "actual_ge3": 0,
+              "actual_0to1": 1,
+              "actual_lt0": 0,
+              "actual_below_minus1": 0,
+              "mean_second_high_return_pct": 0.0
+            },
+            "exits": {
+              "always_0940": {
+                "trades": 1,
+                "mean_trade_return_pct": -0.4844961240310197,
+                "positive": 0,
+                "below_minus1": 0
+              },
+              "no_rebound": {
+                "trades": 1,
+                "mean_trade_return_pct": -0.4844961240310197,
+                "positive": 0,
+                "below_minus1": 0
+              },
+              "original_four_rules": {
+                "trades": 1,
+                "mean_trade_return_pct": -1.2273901808785626,
+                "positive": 0,
+                "below_minus1": 1
+              }
+            }
+          },
+          "top2": {
+            "labels": {
+              "selected": 2,
+              "days": 1,
+              "actual_ge1": 1,
+              "actual_ge3": 0,
+              "actual_0to1": 1,
+              "actual_lt0": 0,
+              "actual_below_minus1": 0,
+              "mean_second_high_return_pct": 1.026545002073831
+            },
+            "exits": {
+              "always_0940": {
+                "trades": 2,
+                "mean_trade_return_pct": 0.11030274677752971,
+                "positive": 1,
+                "below_minus1": 0
+              },
+              "no_rebound": {
+                "trades": 2,
+                "mean_trade_return_pct": 0.7220820914477788,
+                "positive": 1,
+                "below_minus1": 0
+              },
+              "original_four_rules": {
+                "trades": 2,
+                "mean_trade_return_pct": -0.872923626316513,
+                "positive": 0,
+                "below_minus1": 1
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "source_sha256": {
+    "docs/stock_automl_runs/20261009_close9_target/exact_1440_to_close9_candidates.csv.gz": "99263a8722907209d1cc45ffd6e3e73a1386fc36050f67e5d55f78b0c3e8942a",
+    "docs/stock_automl_runs/20261009_second_high_regression/second_high_prices.csv.gz": "3e979277eac24110e0b7abb63d6ef59fd2977788ff66185c6e6fc4e579d1811c",
+    "docs/stock_automl_runs/20261009_seven_factor_cash_backtest/20261008_exact_candidates.csv": "fc45294ee301f2edc3581c25e3a23b3c6226ddf8332bdd4c3ac87764308b5355",
+    "docs/stock_automl_runs/20261010_second_high_four_class_oct9/predictions_before_outcomes.csv": "ad2ed94a4de1f0202556c858184e8b70ab63ec25c31bc0653ca5ce5fde1d46e1",
+    "docs/stock_automl_runs/20261010_second_high_four_class_oct9/selected_before_outcomes.csv": "9891d391481f33b76d9563e6c71fc0a8c592928c28fe79dab9b21c7bce33bd8f",
+    "docs/stock_automl_runs/20261010_second_high_four_class_oct9/morning_bars.csv": "ecc7f7f76d212e946412f29796218b413c77a6b24df894b63af722be85ee32d0"
+  }
+}

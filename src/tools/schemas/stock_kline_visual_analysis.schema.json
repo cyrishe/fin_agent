@@ -1,0 +1,36 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "code"
+  ],
+  "properties": {
+    "code": {
+      "type": "string",
+      "pattern": "^[0-9]{6}\\.(SH|SZ|BJ)$",
+      "description": "完整股票代码；不确定时先解析证券身份。"
+    },
+    "question": {
+      "type": "string",
+      "maxLength": 4000,
+      "description": "本轮需要观察的走势问题；沿用当前证券和用户期限。"
+    },
+    "as_of": {
+      "type": "string",
+      "format": "date",
+      "description": "分析截止日 YYYY-MM-DD；未来或未收盘日期截至最新已完成日线。"
+    },
+    "window": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 60,
+      "default": 10,
+      "description": "显示/扫描的已完成日K数量，默认10；指标用完整历史预热。"
+    },
+    "review_patterns": {
+      "type": "boolean",
+      "default": true,
+      "description": "true：基础看图、数值筛选及最多3个独立形态视觉复核；false：只做独立基础看图，适合综合研究的量价背景。"
+    }
+  }
+}

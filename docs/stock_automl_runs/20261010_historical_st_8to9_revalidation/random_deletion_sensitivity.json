@@ -1,0 +1,47 @@
+{
+  "method": "For each original 20-day training fold, delete the same number of randomly selected training rows as the historical-ST filter; score the common ST-free test candidates. Three fixed seeds. This is a sensitivity diagnostic, not a model evaluation or confidence interval.",
+  "random_deletions": [
+    {
+      "seed": 11,
+      "test_rows": 5628,
+      "selected_trades": 39,
+      "selection_days": 20,
+      "argmax_flips": 455,
+      "median_abs_p_ge3_change_pp": 0.4958291977338041,
+      "top1_overlap_with_original": 13,
+      "top2_overlap_with_original": 26,
+      "top1_mean_0940_pct": 0.5983169300777558,
+      "top2_mean_0940_pct": -0.1895023715842378
+    },
+    {
+      "seed": 22,
+      "test_rows": 5628,
+      "selected_trades": 40,
+      "selection_days": 20,
+      "argmax_flips": 435,
+      "median_abs_p_ge3_change_pp": 0.5071003013692316,
+      "top1_overlap_with_original": 11,
+      "top2_overlap_with_original": 22,
+      "top1_mean_0940_pct": 0.5350631402634416,
+      "top2_mean_0940_pct": -0.5041202760780524
+    },
+    {
+      "seed": 33,
+      "test_rows": 5628,
+      "selected_trades": 40,
+      "selection_days": 20,
+      "argmax_flips": 466,
+      "median_abs_p_ge3_change_pp": 0.49475237145191475,
+      "top1_overlap_with_original": 12,
+      "top2_overlap_with_original": 29,
+      "top1_mean_0940_pct": 0.5565258019044661,
+      "top2_mean_0940_pct": -0.12416952779189387
+    }
+  ],
+  "actual_st_deletion": {
+    "top1_overlap_with_original": 13,
+    "top2_overlap_with_original": 29,
+    "top1_mean_0940_pct": 0.9075239094943667,
+    "top2_mean_0940_pct": -0.23609446774318227
+  }
+}

@@ -1,0 +1,61 @@
+{
+  "methods": [
+    {
+      "model": "小型提升树",
+      "global_max_spearman": 0.04857290144690048,
+      "global_max_pearson": 0.0725514028565225,
+      "within_day_max_spearman_mean": 0.051451267406712645,
+      "global_second_spearman": 0.03964526531255602,
+      "within_day_second_spearman_mean": 0.03691889680291206
+    },
+    {
+      "model": "岭回归",
+      "global_max_spearman": -0.0025925456204591475,
+      "global_max_pearson": 0.04689360556119027,
+      "within_day_max_spearman_mean": 0.04679625284580952,
+      "global_second_spearman": 0.003439313514573282,
+      "within_day_second_spearman_mean": 0.054325132083555536
+    },
+    {
+      "model": "浅回归树",
+      "global_max_spearman": 0.03336470641387973,
+      "global_max_pearson": 0.07277976449386796,
+      "within_day_max_spearman_mean": 0.04626750187576348,
+      "global_second_spearman": 0.02736223338929423,
+      "within_day_second_spearman_mean": 0.03350623114704655
+    }
+  ],
+  "boosted_tree_daily_tails": {
+    "全体": {
+      "stocks": 5818,
+      "max_mean_pct": 1.4745749795121024,
+      "max_median_pct": 1.0330578512396604,
+      "second_mean_pct": 0.8832970527309701,
+      "max_below_zero_share": 0.15486421450670335,
+      "actual_max_top_tenth_share": 0.10175317978686833
+    },
+    "预测最低10%": {
+      "stocks": 592,
+      "max_mean_pct": 1.2467889914216401,
+      "max_median_pct": 0.9323355406992917,
+      "second_mean_pct": 0.5307285836422817,
+      "max_below_zero_share": 0.17567567567567569,
+      "actual_max_top_tenth_share": 0.10304054054054054
+    },
+    "预测最高10%": {
+      "stocks": 592,
+      "max_mean_pct": 1.8296357523169988,
+      "max_median_pct": 1.459591601955712,
+      "second_mean_pct": 1.1854836310820664,
+      "max_below_zero_share": 0.16554054054054054,
+      "actual_max_top_tenth_share": 0.14527027027027026
+    }
+  },
+  "top_minus_bottom_daily_mean_max_pct_points": 0.5588372013696663,
+  "days_top_above_bottom": 16,
+  "top_minus_bottom_day_bootstrap_95pct_ci": [
+    0.1864784866669343,
+    0.9332641808390708
+  ],
+  "bootstrap_seed": 20261009
+}

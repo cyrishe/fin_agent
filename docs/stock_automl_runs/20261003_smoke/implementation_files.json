@@ -1,0 +1,21 @@
+{
+  "backtest/__init__.py": "ff16ffc2f3c213293238e1bc77bde831382d7d0638d06b86d00d4eb11793d3d2",
+  "backtest/contracts.py": "1c29cc3ae9bb3d1538f0575114e6f1736eb62feb88002f8e08e450f1c92d763a",
+  "backtest/data.py": "8414f0b964df479782f58121c2920d2c41837b6cc60ef91790fbb123814f5b0a",
+  "backtest/engine.py": "5134d57a90016b2fbdb9f777102c3cab7a7572c196519c02a4aa283e8cf3aee3",
+  "backtest/execution.py": "e17fc0a57d08507baef8923a4a1206896d11932c5b2c5cf880344ef69b32330f",
+  "backtest/metrics.py": "e6f187498f7f7c0ef5b000e12f14742398ef6064d854f5fa124ad48ee373ca28",
+  "backtest/strategy.py": "c4be2ce816016534237faab06d74fb5155d3ac8c88650d4c9a3fbd0492031541",
+  "quant_research/automl/__init__.py": "feef3471bb92f9a2cd8ac696a132e939f491af21181a500074e1d4a8b9b3b439",
+  "quant_research/automl/advisor.py": "c9c74c1f91a8079f2dd2cdb59722d4bce414b5663f2947dc55a3f77f9a5bac61",
+  "quant_research/automl/config.py": "332c577e1a1c37a0a6ca1aa3f01311b41265d70ce1eccf803addad7a9a16affb",
+  "quant_research/automl/data.py": "dee9af88c941b8046fdfc20aa2ca83cab225f7230cef1c2ae0736f9df85a5020",
+  "quant_research/automl/demo.py": "ccee61e0040210f304985a18898e4a1d146afea8803f18d6f770779237d0a67c",
+  "quant_research/automl/evaluation.py": "aa5266830caa42debc123ca16600a59630f625763267e9176af413c59954e2a5",
+  "quant_research/automl/features.py": "62eaf52e16a30973daf0dcc99b749719afc4e3a5a772b4fce9819b60ad782c58",
+  "quant_research/automl/inference.py": "7c5641c44cb89b3cb94f471686100f45b1dcf2cd8d56aeaaa52829a33d847b07",
+  "quant_research/automl/learning.py": "9ece80b05f9358abd5d1ccdd20a56516891e3c381b4ecd97aafe3f96fa85441f",
+  "quant_research/automl/prompts/plan.md": "82faabab92adb087222abb71b965929466129a033ef07401413905f3a33f5e8e",
+  "quant_research/automl/prompts/review.md": "e9dc344f31a57974f7160cca5636f9978b944246ad226293732cb057fa653aee",
+  "quant_research/automl/runner.py": "11d0259aa9707cb55100745f190f63ad6e67993bb3d7e66670167f212a655260"
+}

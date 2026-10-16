@@ -1,0 +1,138 @@
+{
+  "boundary": {
+    "lt0": "return < 0",
+    "0to1": "0 <= return < 0.01",
+    "1to3": "0.01 <= return < 0.03",
+    "ge3": "return >= 0.03"
+  },
+  "target": "second highest of T+1 09:31–09:40 exact 1m highs / T 14:40 price - 1",
+  "ranking": "daily_top2.csv is the forced-two ranking baseline, not a trade decision",
+  "selection": "diagnostic argmax ge3 gate, then at most two by P(ge3); zero allowed; not a trade rule",
+  "training": "previous 20 available signal days only; 20 forward test days",
+  "models": {
+    "logistic": {
+      "rows": 5818,
+      "days": 20,
+      "accuracy": 0.3319009969061533,
+      "balanced_accuracy": 0.2730911654274792,
+      "log_loss": 1.3225289914998057,
+      "confusion_rows_actual_columns_predicted": [
+        [
+          1087,
+          509,
+          217,
+          2
+        ],
+        [
+          837,
+          664,
+          257,
+          1
+        ],
+        [
+          913,
+          459,
+          180,
+          0
+        ],
+        [
+          481,
+          124,
+          87,
+          0
+        ]
+      ],
+      "pool_classes": {
+        "lt0": 1815,
+        "0to1": 1759,
+        "1to3": 1552,
+        "ge3": 692
+      },
+      "top2_classes": {
+        "lt0": 19,
+        "0to1": 10,
+        "1to3": 8,
+        "ge3": 3
+      },
+      "top2_mean_second_high_return_pct": 0.1733015380588454,
+      "daily_equal_weight_pool_ge3_rate": 0.127167509307083,
+      "top2_ge3_rate": 0.075,
+      "top2_below_minus1": 13,
+      "days_with_top2_ge3": 3,
+      "argmax_ge3_gate": {
+        "selected": 3,
+        "days_with_selection": 3,
+        "days_skipped": 17,
+        "actual_ge3": 0,
+        "actual_lt0": 2,
+        "actual_below_minus1": 2,
+        "mean_second_high_return_pct": -0.997046673740328,
+        "median_lead_over_next_class": 0.010697706083880654
+      }
+    },
+    "small_boosted_tree": {
+      "rows": 5818,
+      "days": 20,
+      "accuracy": 0.3312134754211069,
+      "balanced_accuracy": 0.27609300107383705,
+      "log_loss": 1.3216571202989758,
+      "confusion_rows_actual_columns_predicted": [
+        [
+          1039,
+          460,
+          314,
+          2
+        ],
+        [
+          798,
+          573,
+          387,
+          1
+        ],
+        [
+          878,
+          363,
+          311,
+          0
+        ],
+        [
+          446,
+          121,
+          121,
+          4
+        ]
+      ],
+      "pool_classes": {
+        "lt0": 1815,
+        "0to1": 1759,
+        "1to3": 1552,
+        "ge3": 692
+      },
+      "top2_classes": {
+        "lt0": 14,
+        "0to1": 7,
+        "1to3": 11,
+        "ge3": 8
+      },
+      "top2_mean_second_high_return_pct": 1.0337532733315304,
+      "daily_equal_weight_pool_ge3_rate": 0.127167509307083,
+      "top2_ge3_rate": 0.2,
+      "top2_below_minus1": 7,
+      "days_with_top2_ge3": 8,
+      "argmax_ge3_gate": {
+        "selected": 7,
+        "days_with_selection": 7,
+        "days_skipped": 13,
+        "actual_ge3": 4,
+        "actual_lt0": 2,
+        "actual_below_minus1": 0,
+        "mean_second_high_return_pct": 2.2788228294121766,
+        "median_lead_over_next_class": 0.02068402619689791
+      }
+    }
+  },
+  "source_sha256": {
+    "docs/stock_automl_runs/20261009_close9_target/exact_1440_to_close9_candidates.csv.gz": "99263a8722907209d1cc45ffd6e3e73a1386fc36050f67e5d55f78b0c3e8942a",
+    "docs/stock_automl_runs/20261009_second_high_regression/second_high_prices.csv.gz": "3e979277eac24110e0b7abb63d6ef59fd2977788ff66185c6e6fc4e579d1811c"
+  }
+}

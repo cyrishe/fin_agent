@@ -1,0 +1,106 @@
+{
+  "models": 400,
+  "days": 20,
+  "unique_top1_per_day": {
+    "min": 2,
+    "median": 6.0,
+    "max": 12
+  },
+  "oracle_tminus1_return_pct": 3.109112626872792,
+  "full19_tminus1_return_pct": 0.8415463662701131,
+  "random_model_tminus1_mean_pct": -0.08508932265931979,
+  "metrics": {
+    "train_loss": {
+      "direction": "min",
+      "within_day_spearman_mean": 0.13203244043942908,
+      "within_day_spearman_median": 0.1588980221343616,
+      "positive_correlation_days": 15,
+      "correlation_days": 20,
+      "selected_tminus1_mean_pct": -0.6185299942495115,
+      "selected_last10_mean_pct": -0.996695965503457,
+      "selected_t_mean_pct": 0.515628238658134,
+      "selected_t_last10_mean_pct": 0.561170064439699,
+      "vs_full19_better_days": 3,
+      "vs_full19_worse_days": 11,
+      "vs_full19_same_days": 6
+    },
+    "oob_loss": {
+      "direction": "min",
+      "within_day_spearman_mean": -0.14768097911974798,
+      "within_day_spearman_median": -0.14195911795762484,
+      "positive_correlation_days": 4,
+      "correlation_days": 20,
+      "selected_tminus1_mean_pct": 0.6135847301324127,
+      "selected_last10_mean_pct": 0.48183764904686677,
+      "selected_t_mean_pct": 0.4274738018846394,
+      "selected_t_last10_mean_pct": 0.5764337292846697,
+      "vs_full19_better_days": 6,
+      "vs_full19_worse_days": 6,
+      "vs_full19_same_days": 8
+    },
+    "all19_loss": {
+      "direction": "min",
+      "within_day_spearman_mean": -0.00740943099318626,
+      "within_day_spearman_median": -0.006294805694384009,
+      "positive_correlation_days": 10,
+      "correlation_days": 20,
+      "selected_tminus1_mean_pct": 0.16364768195370527,
+      "selected_last10_mean_pct": 0.4233557048086178,
+      "selected_t_mean_pct": 0.5116380310586679,
+      "selected_t_last10_mean_pct": 0.6242718309095929,
+      "vs_full19_better_days": 5,
+      "vs_full19_worse_days": 6,
+      "vs_full19_same_days": 9
+    },
+    "top1_p_ge3": {
+      "direction": "max",
+      "within_day_spearman_mean": 0.15924195953786313,
+      "within_day_spearman_median": 0.18169887726311826,
+      "positive_correlation_days": 13,
+      "correlation_days": 20,
+      "selected_tminus1_mean_pct": 1.9270350252007407,
+      "selected_last10_mean_pct": 3.502331734951505,
+      "selected_t_mean_pct": 0.920790938468363,
+      "selected_t_last10_mean_pct": 1.4902517760428233,
+      "vs_full19_better_days": 6,
+      "vs_full19_worse_days": 6,
+      "vs_full19_same_days": 8
+    },
+    "top1_p_good_minus_bad": {
+      "direction": "max",
+      "within_day_spearman_mean": 0.040166441664426664,
+      "within_day_spearman_median": 0.13481965033648935,
+      "positive_correlation_days": 13,
+      "correlation_days": 20,
+      "selected_tminus1_mean_pct": 0.35161410848183416,
+      "selected_last10_mean_pct": 0.3431494953831937,
+      "selected_t_mean_pct": 0.5245070014037424,
+      "selected_t_last10_mean_pct": 0.334435810961507,
+      "vs_full19_better_days": 6,
+      "vs_full19_worse_days": 8,
+      "vs_full19_same_days": 6
+    },
+    "top1_confidence": {
+      "direction": "max",
+      "within_day_spearman_mean": -0.1373506666421583,
+      "within_day_spearman_median": -0.0599002002074276,
+      "positive_correlation_days": 10,
+      "correlation_days": 20,
+      "selected_tminus1_mean_pct": -0.4388001244815587,
+      "selected_last10_mean_pct": -1.038055593587358,
+      "selected_t_mean_pct": 0.5740035990795784,
+      "selected_t_last10_mean_pct": 0.695285582147247,
+      "vs_full19_better_days": 5,
+      "vs_full19_worse_days": 10,
+      "vs_full19_same_days": 5
+    }
+  },
+  "sources_sha256": {
+    "docs/stock_automl_runs/20261010_four_class_similar_days/prepared_candidates.csv.gz": "c0a4d1ea86c0ea7bbcb21d98cb8efe133efeaf8bd981ca0a86557e00bff00c08",
+    "docs/stock_automl_runs/20261010_four_class_baseline_recent20/minute_api_label_audit.csv": "d054e741e368093ef7b45a3b32da213ac1c0fb4ef944064bcdb3e67b2a2bb5f2",
+    "docs/stock_automl_runs/20261010_four_class_subset_selection/tminus1_subset_returns.csv": "edfb9a94860afb87bef20d4386710537d1cf1d91e667821451cf71f8186103f5",
+    "docs/stock_automl_runs/20261010_four_class_subset_selection/chosen_subsets.csv": "b3a3e23cadaae32a4d6ae558f85bf7e29a3885c94c86e21843967004e071d470",
+    "docs/stock_automl_runs/20261010_four_class_subset_selection/candidate_t_returns.csv": "e4030fc40fcc6766638ff53fc1cda58cecf8f88405e8ac9789f70ca876557293",
+    "/Users/imac/.codex/worktrees/automl-five-class/fin_agent/scripts/analyze_automl_tminus1_model_diagnostics.py": "6338ef1dc123a09b1af164f2944502a5c498cb1bb8735b59966bf0441e492a32"
+  }
+}

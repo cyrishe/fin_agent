@@ -1,0 +1,45 @@
+{
+  "version": "stock_research_adaptive_v2",
+  "description": "自然入口与证据驱动选路评测资产。问题不预装 Skill，也不把评审标准传给模型；本文件不是已执行或已通过的结果。",
+  "cases": [
+    {"id":"consumer","question":"帮我分析一下贵州茅台现在的中长期投资逻辑。","research_mode":"auto","review_criteria":["识别收入结构、渠道和现金的证据需求，不以品牌名代替护城河证明","区分公司质量与当前价格；需要机构预期时自主组合研报方法"]},
+    {"id":"bank","question":"招商银行现在还有长期配置价值吗？","research_mode":"auto","review_criteria":["使用适配银行的资产质量、资本、ROE与估值口径","缺少净息差或资本指标时说明限制，不默认工业企业FCFF"]},
+    {"id":"cycle","question":"紫金矿业看起来市盈率不高，帮我研究是不是便宜。","research_mode":"auto","review_criteria":["区分周期利润与持续盈利，核验价格成本暴露","不能由单期低PE下低估结论"]},
+    {"id":"hot_theme","question":"工业富联很热门，AI业务真能支撑它的预期吗？","research_mode":"auto","review_criteria":["用户描述的热门不是已验证热度","把行业资本开支连接到目标公司的业务、订单与利润；需要时读研报线索方法"]},
+    {"id":"low_attention","question":"我很少看到伟星新材的讨论，帮我看看是不是被忽视了。","research_mode":"auto","review_criteria":["不把缺少讨论或热点数据等同于低关注事实或低估","检查经营、现金、估值与潜在兑现节点，保留流动性和信息缺口"]},
+    {"id":"biotech","question":"帮我研究恒瑞医药未来几年的增长逻辑和主要风险。","research_mode":"auto","review_criteria":["区分商业化产品与管线里程碑，考虑支付竞争和资本需要","无可用概率或模型时不补造rNPV"]},
+    {"id":"same_industry","question":"比较一下宁德时代和亿纬锂能，现在最重要的差别是什么？","research_mode":"auto","review_criteria":["允许stock-comparison主导而非强制stock-research","检查业务、客户、阶段和口径可比性，不堆两份公司报告"]},
+    {"id":"cross_industry","question":"招商银行和中际旭创，如果看未来三年，该怎么比较取舍？","research_mode":"auto","review_criteria":["允许比较方法主导，行业镜头分别适配","使用现金可见度、增长兑现、资本需求和估值条件，不以统一PE排名"]},
+    {"id":"report_composition","question":"分析安琪酵母的经营前景，机构最近的判断有没有变化？","research_mode":"auto","review_criteria":["综合经营与机构预期，授权时使用研报方法处理修订","区分报告内前值、机构间分歧和已披露实际；不自动加载全部研报参考"]},
+    {"id":"deep_export","question":"请给我一份能独立阅读的思源电气深度研究报告。","research_mode":"auto","review_criteria":["遵从自然语言深度要求，按设备业务检查订单验收与回款","最终按报告模板综合，不为章节追加无关资金或新闻查询"]},
+    {"id":"quick","question":"简单讲讲中国神华最核心的逻辑和风险。","research_mode":"fast","review_criteria":["聚焦少量证据与一个主要判断","不因周期或分红方法可用就展开全部分支"]},
+    {"id":"price_only","question":"贵州茅台最近一个交易日收盘价多少？","research_mode":"auto","review_criteria":["直接事实取数，无需加载stock-research","保留行情日期与口径"]},
+    {"id":"report_only","question":"最近机构对安琪酵母的盈利预测有什么分歧？","research_mode":"auto","review_criteria":["研报Skill可直接主导，不绕行个股综合研究","可比样本、年度、单位和来源清楚"]}
+  ],
+  "evidence_pairs": [
+    {
+      "id":"cash_changes_path","synthetic":true,"question":"研究一下示例设备公司的成长性。",
+      "shared_evidence":"虚构测试数据，2026H1同口径：主营设备收入同比增长30%，净利润同比增长25%；有订单增长记录，未提供估值与机构预测。",
+      "variants":{
+        "a":{"evidence":"2026H1经营现金流为正且与净利润相近，应收周转与存货周转同比稳定。","review_criteria":"保持增长兑现、再投资与竞争的主线；不能仅因测试涉及现金就扩大风险排查。"},
+        "b":{"evidence":"2026H1经营现金流为负，应收周转天数从90天升至150天；未提供账龄及期后回款。","review_criteria":"优先核实回款和营运资本，考虑季节性或收入确认解释；不直接判造假，不虚构期后回款。"}
+      }
+    },
+    {
+      "id":"segment_changes_theme","synthetic":true,"question":"示例公司是不是这轮AI投资的核心受益者？",
+      "shared_evidence":"虚构测试数据：公司有AI概念关联，近期股价上涨。行业投资增长不是目标公司订单证明。",
+      "variants":{
+        "a":{"evidence":"已披露AI设备分部收入占主营60%，有本期已验收客户订单和分部利润增长；未提供市场隐含预期测算。","review_criteria":"检验订单延续、利润转化与估值预期，不把直接业务证据仍写成纯概念。"},
+        "b":{"evidence":"公司正式披露AI相关收入低于1%，相关产品仍在验证，暂无量产合同。","review_criteria":"改为商业化里程碑和预期兑现研究，不能沿用核心受益或高增长分部结论。"}
+      }
+    },
+    {
+      "id":"report_availability_changes_branch","synthetic":true,"question":"分析示例酵母公司的经营前景，机构判断有没有变化？",
+      "shared_evidence":"虚构测试材料：本期收入增长、毛利改善，财务费用上升，归母净利润增速低于收入。",
+      "variants":{
+        "a":{"evidence":"授权研报库返回报告R1，机构甲于2026-08-20将2027年归母净利润预测从20亿元降至18亿元，解释为汇兑和运费扰动，评级维持买入。","review_criteria":"由研报方法解释同机构修订和评级维持，保留R1和日期；与公司实际分开。"},
+        "b":{"evidence":"研报查询成功但为零行；业务、财务数据有效。没有可用机构预测。","review_criteria":"保留经营研究主线，说明机构预期未覆盖；不生成一致预期或称没有机构关注。"}
+      }
+    }
+  ]
+}

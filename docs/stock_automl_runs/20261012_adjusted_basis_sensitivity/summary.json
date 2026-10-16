@@ -1,0 +1,41 @@
+{
+  "source_sha256": "d160e906712f8d9f0d7b1f052079c023fd2e8d7def5611fd71c31c738e4b90f2",
+  "factors_sha256": "081238aa9bb95f9836874d7b31da734c5c2eac7d53a6b64aeef2a7f42a07ddd5",
+  "factor_source": "kcrp_stock_price.adjclose / close, read on 2026-10-12",
+  "scope": "daily-factor adjusted-label proxy; not original MK/post minute bars",
+  "test_days": 118,
+  "label_audit": {
+    "candidate_rows": 58317,
+    "mature_rows": 56944,
+    "mature_factor_rows": 56944,
+    "missing_mature_factors": 0,
+    "class_flips": 666,
+    "raw_ge3": 8477,
+    "adjusted_ge3": 8487,
+    "ratio_abs_over_1pct": 105,
+    "ratio_abs_over_5pct": 36,
+    "ratio_abs_over_10pct": 34,
+    "ratio_min": 0.9999237866598074,
+    "ratio_max": 1.4991352090773873,
+    "factor_change_floor": 0.0
+  },
+  "raw_model": {
+    "gate_pass_days": 97,
+    "trades": 94,
+    "mean_raw_0940_return_pct": 0.5117235862942326,
+    "sum_raw_0940_return_pct": 48.10201711165787,
+    "price_proxy_compound_pct": 50.771433225875285,
+    "missing_exit_prices": 0
+  },
+  "adjusted_label_model": {
+    "gate_pass_days": 97,
+    "trades": 92,
+    "mean_raw_0940_return_pct": -0.014064878149478965,
+    "sum_raw_0940_return_pct": -1.2939687897520646,
+    "price_proxy_compound_pct": -7.90881400679649,
+    "missing_exit_prices": 0
+  },
+  "different_top1_days": 42,
+  "different_top1_gate_days": 37,
+  "factors_file": "docs/stock_automl_runs/20261012_adjusted_basis_sensitivity/daily_adjustment_factors.csv.gz"
+}

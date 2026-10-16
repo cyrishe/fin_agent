@@ -1,0 +1,340 @@
+{
+  "git_commit": "19abeb37fc26841c7be542e288cf77e7f8287e8d",
+  "created_at": "2026-10-03T04:33:16.511224+00:00",
+  "environment": "isolated SQLite + spawned Python workers",
+  "identity": "evaluation fixture; production authentication not exercised by this script",
+  "cases": [
+    {
+      "case": "document-two-steps",
+      "task_id": "sch_8bdbea27127b4aab910faeb58469cf45",
+      "run_id": "run_9c6f4847ac144b03a549a1c9bcaeebe6",
+      "status": "completed",
+      "duration_seconds": 4.16,
+      "step_count": 2,
+      "artifact_downloads": [
+        {
+          "name": "研究说明.md",
+          "bytes": 73
+        }
+      ],
+      "constraint_checks": {
+        "runtime_budget_preserved": true
+      },
+      "summary": "文件已生成。\n已读取本次任务文件。",
+      "research": []
+    },
+    {
+      "case": "automl-structured-demo",
+      "task_id": "sch_3c61cd1a504a4def9fa8557cac3bf048",
+      "run_id": "run_883d93050b5742f195c516a50b441749",
+      "status": "completed",
+      "duration_seconds": 6.91,
+      "step_count": 1,
+      "artifact_downloads": [
+        {
+          "name": "研究设计",
+          "bytes": 1453
+        },
+        {
+          "name": "report.md",
+          "bytes": 2058
+        },
+        {
+          "name": "report.json",
+          "bytes": 6112
+        },
+        {
+          "name": "review.md",
+          "bytes": 51
+        },
+        {
+          "name": "review_status.json",
+          "bytes": 46
+        },
+        {
+          "name": "review_evidence.json",
+          "bytes": 17870
+        },
+        {
+          "name": "sample_counts.json",
+          "bytes": 469
+        },
+        {
+          "name": "development.json",
+          "bytes": 20856
+        },
+        {
+          "name": "selection.json",
+          "bytes": 4033
+        },
+        {
+          "name": "spec.json",
+          "bytes": 893
+        }
+      ],
+      "constraint_checks": {
+        "runtime_budget_preserved": true,
+        "classification_and_regression_preserved": true,
+        "algorithm_families_preserved": true,
+        "symbols_budget_preserved": true,
+        "trial_budget_preserved": true,
+        "horizons_preserved": true,
+        "folds_preserved": true,
+        "dates_preserved": true,
+        "trials_within_budget": true,
+        "both_prediction_tasks_trained": true
+      },
+      "summary": "合成数据流程验证。完成 4 个候选实验，其中 4 个可评估。本轮未找到满足全部开发集条件的模型，已保存最佳候选及未达标证据。",
+      "research": [
+        {
+          "design": "研究 2023-01-02 至 2023-12-29 的行情，股票上限 6，持有周期 [1] 个交易日；最多 4 个实验，2 个时间验证折。先冻结公司与未来时间留出集，仅用开发集比较候选，再做最终训练、留出回测及报告。 本次采用显式结构化配置，说明文字不另行改写执行参数。",
+          "development_constraints_met": false,
+          "evaluation": {
+            "new_companies_and_period": {
+              "benchmark": {
+                "annualized_return": 0.11388945294653374,
+                "annualized_volatility": 0.2227427317185039,
+                "max_drawdown": -0.10790965511198025,
+                "sharpe_ratio": 0.5929855494791009,
+                "total_commission": "599.8559143141793467573689",
+                "total_return": 0.022068367133011746,
+                "total_slippage_cost": "1999.544887821935678081",
+                "total_tax": "505.6734027076578608208705",
+                "trade_count": 47,
+                "turnover_ratio": 2.00267488843112
+              },
+              "excess_total_return": -0.022068367133011746,
+              "execution_issue_count": 0,
+              "portfolio": {
+                "annualized_return": 0.0,
+                "annualized_volatility": 0.0,
+                "max_drawdown": 0.0,
+                "sharpe_ratio": null,
+                "total_commission": "0",
+                "total_return": 0.0,
+                "total_slippage_cost": "0",
+                "total_tax": "0",
+                "trade_count": 0,
+                "turnover_ratio": 0.0
+              },
+              "prediction": {
+                "baseline_rmse": 0.013980615761030542,
+                "by_industry": [],
+                "by_month": [],
+                "calibration": [],
+                "companies": 1,
+                "descriptive_wilson_interval": null,
+                "mean_signal_net_return": null,
+                "prediction_range": {
+                  "max": 0.002052788012385352,
+                  "mean": -0.0006243835295743375,
+                  "min": -0.0032651930935049594
+                },
+                "rank_ic": 0.12067226890756304,
+                "rmse": 0.013878116974985203,
+                "rows": 50,
+                "signal_count": 0,
+                "signal_win_rate_after_cost": null,
+                "skill_vs_constant": 0.01460923513337431,
+                "unconditional_up_rate": 0.52
+              }
+            },
+            "new_period": {
+              "benchmark": {
+                "annualized_return": -0.23440830832756254,
+                "annualized_volatility": 0.1678903281463915,
+                "max_drawdown": -0.0947076555555122,
+                "sharpe_ratio": -1.5082922413488502,
+                "total_commission": "703.1311811867700340576983",
+                "total_return": -0.05262210926969779,
+                "total_slippage_cost": "2343.721601805596420685",
+                "total_tax": "573.1061830126004191109940",
+                "trade_count": 251,
+                "turnover_ratio": 2.386797803838809
+              },
+              "excess_total_return": 0.033030590624620215,
+              "execution_issue_count": 0,
+              "portfolio": {
+                "annualized_return": -0.0931389167538258,
+                "annualized_volatility": 0.035272774412090445,
+                "max_drawdown": -0.019591518645077577,
+                "sharpe_ratio": -2.7537165926908584,
+                "total_commission": "582.6623873994911434451760",
+                "total_return": -0.019591518645077577,
+                "total_slippage_cost": "1942.191372253423823280",
+                "total_tax": "480.9200054365155459351600",
+                "trade_count": 2,
+                "turnover_ratio": 1.950131374784404
+              },
+              "prediction": {
+                "baseline_rmse": 0.015837186134904587,
+                "by_industry": [
+                  {
+                    "industry": "industry_1",
+                    "mean_return": -0.01693479542405596,
+                    "n": 1
+                  }
+                ],
+                "by_month": [
+                  {
+                    "mean_return": -0.01693479542405596,
+                    "month": "2023-12",
+                    "n": 1,
+                    "win_rate_after_cost": 0.0
+                  }
+                ],
+                "calibration": [],
+                "companies": 5,
+                "descriptive_wilson_interval": [
+                  0.0,
+                  0.7934567085261071
+                ],
+                "mean_signal_net_return": -0.020034795424055958,
+                "prediction_range": {
+                  "max": 0.0052729761124084,
+                  "mean": 8.436044824436757e-05,
+                  "min": -0.003457820047105146
+                },
+                "rank_ic": 0.062495079921278736,
+                "rmse": 0.015867535062413816,
+                "rows": 250,
+                "signal_count": 1,
+                "signal_win_rate_after_cost": 0.0,
+                "skill_vs_constant": -0.0038362883655884694,
+                "unconditional_up_rate": 0.444
+              }
+            }
+          },
+          "limitations": [
+            "研究回测使用复权价格及1份单位，未完整模拟A股100股整手、开盘涨跌停排队与停复牌可成交性；不作为实盘回报。",
+            "交易成本为任务假设，不自动推断历史税费制度；复权数据可能被供应商修订。",
+            "信号胜率是重叠持有期样本统计，不能视为独立已成交交易胜率；组合收益另由逐日现金账本计算。",
+            "horizon定义：收盘后信号，下一交易日开盘买入，持有h个交易日后开盘退出；不是期间触及目标价概率。",
+            "随机起始股票池可含后来退市股票，但退市清算和历史数据库完整性尚未认证。",
+            "所有盲测只评估开发集选定的一名候选；本轮报告不触发自动再训练或交易。",
+            "合成数据仅验证程序，不用于股票效果或投资判断。"
+          ],
+          "review_status": {
+            "completed": false,
+            "requested": false
+          },
+          "sample_counts": {
+            "companies": 6,
+            "development": {
+              "budget_sampled_out_rows": 0,
+              "calibration_rows": 0,
+              "fit_rows": 930,
+              "input_rows": 930,
+              "purged_rows": 0
+            },
+            "eligible_by_horizon": {
+              "1": 1428
+            },
+            "heldout_companies": [
+              "000004.SZ"
+            ],
+            "heldout_rows": {
+              "new_companies_and_period": 50,
+              "new_period": 250
+            },
+            "panel_rows": 1560,
+            "sessions": 260,
+            "test_signal_end": "2023-12-27T00:00:00",
+            "test_start": "2023-10-19T00:00:00"
+          },
+          "selected": {
+            "depth": 3,
+            "features": "technical",
+            "horizon": 1,
+            "id": "04273c14e4b2",
+            "model": "linear",
+            "sampler": "all",
+            "strength": 0.3,
+            "task": "regression"
+          },
+          "spec": {
+            "commission_rate": 0.0003,
+            "company_holdout_fraction": 0.2,
+            "end": "2023-12-29",
+            "feature_sets": [
+              "technical"
+            ],
+            "folds": 2,
+            "horizons": [
+              1
+            ],
+            "include_minute": false,
+            "industries": [],
+            "initial_cash": 1000000,
+            "max_drawdown": 0.3,
+            "max_market_cap": null,
+            "max_symbols": 6,
+            "max_train_rows": 20000,
+            "max_trials": 4,
+            "min_amount": null,
+            "min_market_cap": null,
+            "min_signals": 15,
+            "min_win_rate": 0.5,
+            "models": [
+              "linear"
+            ],
+            "objective": "探索具有样本外稳定性的股票量价规律",
+            "probability_threshold": 0.6,
+            "regression_threshold": 0.005,
+            "rounds": 1,
+            "samplers": [
+              "all"
+            ],
+            "seed": 42,
+            "sell_tax_rate": 0.0005,
+            "slippage_rate": 0.001,
+            "start": "2023-01-02",
+            "symbols": [],
+            "target_return": 0.0,
+            "tasks": [
+              "classification",
+              "regression"
+            ],
+            "test_fraction": 0.2,
+            "top_k": 5
+          }
+        }
+      ]
+    }
+  ],
+  "implementation_sha256": {
+    "scripts/eval_user_task_runtime.py": "b0c3969f02e1b5bf88ed337f8783667b4eeefe7408aaf4cb63773bdbf9db2415",
+    "src/prompts/system/assistant.scheduled_task_compile.json": "bea2f07d1865086e3d8da49a5f84cc595a38a45efd8ab2bc723a1b07c3f58f32",
+    "src/prompts/system/assistant.scheduled_task_compile.system.md": "0751fb524c5f1ba4a699f1f28a868c1461cfc8e3a665f0a61a163791ffbd46bf",
+    "src/prompts/system/assistant.scheduled_task_compile.user.md": "aed08c4c43b51fbee6bdb2d37b0ceac5a0cbdcb90d84a45df77eedb79816fe94",
+    "src/quant_research/automl/__init__.py": "feef3471bb92f9a2cd8ac696a132e939f491af21181a500074e1d4a8b9b3b439",
+    "src/quant_research/automl/__main__.py": "e77dfcf7b9db6511474415aa4a5c6c38dbf3dac152a4f8e3f26b1ca7b12bbcf3",
+    "src/quant_research/automl/advisor.py": "c9c74c1f91a8079f2dd2cdb59722d4bce414b5663f2947dc55a3f77f9a5bac61",
+    "src/quant_research/automl/cli.py": "630daae51ca42faf3a5716a47bf69a294b3f634576213f35045c4095e13ced01",
+    "src/quant_research/automl/config.py": "332c577e1a1c37a0a6ca1aa3f01311b41265d70ce1eccf803addad7a9a16affb",
+    "src/quant_research/automl/data.py": "b6559e56836d35d02add9dadb043c2cf8a1d720c281c382eb68fc616f3c47efe",
+    "src/quant_research/automl/demo.py": "62ea13331013d960a7873a9a78bd95861200fa37d71181286760d9ca9971e4a5",
+    "src/quant_research/automl/evaluation.py": "aa5266830caa42debc123ca16600a59630f625763267e9176af413c59954e2a5",
+    "src/quant_research/automl/features.py": "62eaf52e16a30973daf0dcc99b749719afc4e3a5a772b4fce9819b60ad782c58",
+    "src/quant_research/automl/inference.py": "7c5641c44cb89b3cb94f471686100f45b1dcf2cd8d56aeaaa52829a33d847b07",
+    "src/quant_research/automl/learning.py": "2aa25a5bef45058beefbcdd7c33dbce273af8abfc8d8e8e6fc589f76b3e28d37",
+    "src/quant_research/automl/planning.py": "64044d53fea73b14d81bf14f3d8ce099ceb95811a3e21ef4a9a332545be3539a",
+    "src/quant_research/automl/prompts/compile.md": "d8b009dae2c5b99277f192589db13d615fe4a815fdd698c07a28420668d16992",
+    "src/quant_research/automl/prompts/plan.md": "82faabab92adb087222abb71b965929466129a033ef07401413905f3a33f5e8e",
+    "src/quant_research/automl/prompts/review.md": "3ffd23e0a09cc36417221bee9f7d69c6dd192f9973616a051020e60d29c9c90a",
+    "src/quant_research/automl/runner.py": "ba064bbd3ef1e065eec973601cc1c16bd63d6c90b2fb1c14f1c9f96ee6d90d68",
+    "src/services/conversation_task_finalizer_service.py": "3978a0eda7f6c5b06c44bf3fd06bea4c2d532aa8164313ee7bf5404f7d102be1",
+    "src/services/scheduled_task_compiler.py": "bc2919d55e4653febf7484d97732645a3b555b0fdb33b4c84086a3d27b46749e",
+    "src/services/scheduled_task_executor.py": "ea99086f62d8b93cbd2729428a0b036b86253d1bddc2b870b0e95ed353519f34",
+    "src/services/scheduled_task_protocol.py": "57c3cce6f1480c0ef2cc0705672777f73a2464e7fce5603ee428e74327464f66",
+    "src/services/scheduled_task_service.py": "7c5a2eae5d57e7f592bd19339dd7b7ac48a15e93b8e45619326f8f88c9bcc143",
+    "src/services/scheduled_task_store.py": "433e9b50c489e5626beac6b8878994e1038c4966b53ecac57c418265a9de633e",
+    "src/services/scheduled_task_worker.py": "318da7d1622cbe2d59120b67a4ebb0cc8a5fcbdf48985840363b6f6dae40f4cb",
+    "src/services/task_artifacts.py": "710f02fec50e7f16342a130b2724abebdbd99755cf2776f6e0b60245c58a723a",
+    "src/services/task_service.py": "570870b55de36e1cdda0fc42bacf6f1299904cb8e8dfdcf87e5c50bf47dd1c8e",
+    "src/services/user_task_agent_tools.py": "b6b7aa5abd23f9a980d90ed2da9fb75849446a6238746e5b5ee696d0cddf6d62",
+    "src/tools/stock_automl_research_tool.py": "85bc82b16b5d24c3f016a5b91e73247239d192f6fdc936217bcabcc72ba7fbe8",
+    "src/tools/task_file_access.py": "1317afd65297611f9ab56f4b6ba014497d17024ac088cccafd19998b74f2d823",
+    "src/tools/user_task_tools.py": "0e23bfeeaec8d9211f1afd9664e0b7812c77b6ba55e69d3fa0481e669af6a5a2"
+  }
+}

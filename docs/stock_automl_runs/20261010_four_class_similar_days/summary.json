@@ -1,0 +1,212 @@
+{
+  "model": "unweighted four-class small boosted tree, same parameters for both",
+  "pool": "All feature-complete 3-6% 14:40 candidates; current-day labels never gate inference",
+  "market_state": "14:40 exchange equal-weight returns and 3%-6% basket cumulative volume by exchange; not official index levels",
+  "test_dates": [
+    "2026-09-02",
+    "2026-09-03",
+    "2026-09-04",
+    "2026-09-07",
+    "2026-09-08",
+    "2026-09-09",
+    "2026-09-10",
+    "2026-09-11",
+    "2026-09-14",
+    "2026-09-15",
+    "2026-09-16",
+    "2026-09-17",
+    "2026-09-18",
+    "2026-09-21",
+    "2026-09-22",
+    "2026-09-23",
+    "2026-09-24",
+    "2026-09-28",
+    "2026-09-29",
+    "2026-09-30"
+  ],
+  "similarity_skipped_dates": [
+    "2026-09-14",
+    "2026-09-15"
+  ],
+  "folds": 38,
+  "candidate_rows": 14783,
+  "observable_outcomes": 14724,
+  "missing_outcomes": 59,
+  "metrics": {
+    "recent20": {
+      "top1": {
+        "picks": 20,
+        "known_outcomes": 20,
+        "unknown_outcomes": 0,
+        "selected_days": 20,
+        "ge3": 4,
+        "ge1": 12,
+        "lt0": 5,
+        "below_minus1": 0,
+        "mean_0940_return_pct": 0.37941838762356017
+      },
+      "top2": {
+        "picks": 39,
+        "known_outcomes": 39,
+        "unknown_outcomes": 0,
+        "selected_days": 20,
+        "ge3": 7,
+        "ge1": 19,
+        "lt0": 11,
+        "below_minus1": 3,
+        "mean_0940_return_pct": 0.2527048762184575
+      }
+    },
+    "similar20": {
+      "top1": {
+        "picks": 18,
+        "known_outcomes": 18,
+        "unknown_outcomes": 0,
+        "selected_days": 18,
+        "ge3": 4,
+        "ge1": 9,
+        "lt0": 7,
+        "below_minus1": 3,
+        "mean_0940_return_pct": -0.3740072209694442
+      },
+      "top2": {
+        "picks": 36,
+        "known_outcomes": 36,
+        "unknown_outcomes": 0,
+        "selected_days": 18,
+        "ge3": 7,
+        "ge1": 16,
+        "lt0": 17,
+        "below_minus1": 11,
+        "mean_0940_return_pct": -0.5049808994733177
+      }
+    },
+    "common_days": {
+      "recent20": {
+        "top1": {
+          "picks": 18,
+          "known_outcomes": 18,
+          "unknown_outcomes": 0,
+          "selected_days": 18,
+          "ge3": 3,
+          "ge1": 11,
+          "lt0": 5,
+          "below_minus1": 0,
+          "mean_0940_return_pct": 0.20472720268272146
+        },
+        "top2": {
+          "picks": 35,
+          "known_outcomes": 35,
+          "unknown_outcomes": 0,
+          "selected_days": 18,
+          "ge3": 6,
+          "ge1": 18,
+          "lt0": 9,
+          "below_minus1": 2,
+          "mean_0940_return_pct": 0.27881582409095285
+        }
+      },
+      "similar20": {
+        "top1": {
+          "picks": 18,
+          "known_outcomes": 18,
+          "unknown_outcomes": 0,
+          "selected_days": 18,
+          "ge3": 4,
+          "ge1": 9,
+          "lt0": 7,
+          "below_minus1": 3,
+          "mean_0940_return_pct": -0.3740072209694442
+        },
+        "top2": {
+          "picks": 36,
+          "known_outcomes": 36,
+          "unknown_outcomes": 0,
+          "selected_days": 18,
+          "ge3": 7,
+          "ge1": 16,
+          "lt0": 17,
+          "below_minus1": 11,
+          "mean_0940_return_pct": -0.5049808994733177
+        }
+      }
+    },
+    "candidate_classification_common_days": {
+      "recent20": {
+        "candidate_rows": 5600,
+        "known_labels": 5579,
+        "unknown_labels": 21,
+        "accuracy": 0.3384119017745116,
+        "balanced_accuracy": 0.28307849048197486,
+        "ge3_auc": 0.6136795650997406,
+        "confusion_rows_actual_columns_predicted": [
+          [
+            972,
+            455,
+            297,
+            1
+          ],
+          [
+            735,
+            596,
+            354,
+            0
+          ],
+          [
+            808,
+            373,
+            318,
+            0
+          ],
+          [
+            420,
+            117,
+            131,
+            2
+          ]
+        ]
+      },
+      "similar20": {
+        "candidate_rows": 5600,
+        "known_labels": 5579,
+        "unknown_labels": 21,
+        "accuracy": 0.34396845312780067,
+        "balanced_accuracy": 0.2874337283070091,
+        "ge3_auc": 0.6150457733739126,
+        "confusion_rows_actual_columns_predicted": [
+          [
+            1121,
+            279,
+            323,
+            2
+          ],
+          [
+            859,
+            441,
+            385,
+            0
+          ],
+          [
+            901,
+            240,
+            357,
+            1
+          ],
+          [
+            422,
+            78,
+            170,
+            0
+          ]
+        ]
+      }
+    },
+    "paired_top1": {
+      "known_days": 18,
+      "similar_minus_recent_mean_pct": -0.5787344236521658,
+      "similar_better_days": 6,
+      "recent_better_days": 8,
+      "same_return_days": 4
+    }
+  }
+}

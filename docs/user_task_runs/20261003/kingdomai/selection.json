@@ -1,0 +1,283 @@
+{
+  "candidate": {
+    "horizon": 7,
+    "task": "classification",
+    "model": "linear",
+    "sampler": "all",
+    "features": "enriched",
+    "depth": 6,
+    "strength": 3.0,
+    "id": "fddc822e3a0e"
+  },
+  "columns": [
+    "return_1",
+    "return_3",
+    "return_7",
+    "return_20",
+    "volatility_20",
+    "range_ratio",
+    "open_gap",
+    "ma_distance",
+    "volume_ratio",
+    "amount_log",
+    "turn_ratio",
+    "total_mv",
+    "pe_ttm",
+    "pb_mrq",
+    "industry",
+    "news_count_7d"
+  ],
+  "folds": [
+    {
+      "train_end": "2024-11-01T00:00:00",
+      "validation_start": "2024-11-04T00:00:00",
+      "validation_end": "2025-03-18T00:00:00",
+      "training": {
+        "input_rows": 2236,
+        "fit_rows": 1573,
+        "calibration_rows": 559,
+        "purged_rows": 104,
+        "budget_sampled_out_rows": 0
+      },
+      "validation_rows": 1066,
+      "prediction": {
+        "rows": 1066,
+        "companies": 13,
+        "signal_count": 413,
+        "signal_win_rate_after_cost": 0.5326876513317191,
+        "descriptive_wilson_interval": [
+          0.4844882156785975,
+          0.5802845901066215
+        ],
+        "mean_signal_net_return": 0.006039052704027936,
+        "unconditional_up_rate": 0.5225140712945591,
+        "prediction_range": {
+          "min": 0.40686915791053496,
+          "max": 0.6885725504180759,
+          "mean": 0.589545206707502
+        },
+        "calibration": [
+          {
+            "lower": 0.4,
+            "n": 6,
+            "predicted": 0.46795074163927036,
+            "observed": 0.6666666666666666
+          },
+          {
+            "lower": 0.5,
+            "n": 647,
+            "predicted": 0.5696339682773277,
+            "observed": 0.5038639876352395
+          },
+          {
+            "lower": 0.6,
+            "n": 413,
+            "predicted": 0.6225043787528581,
+            "observed": 0.549636803874092
+          }
+        ],
+        "brier": 0.2523099097553886,
+        "baseline_brier": 0.25045482277517594,
+        "roc_auc": 0.5514949931749162,
+        "skill_vs_constant": -0.007406872663330066,
+        "by_month": [
+          {
+            "month": "2024-11",
+            "n": 126,
+            "mean_return": 0.023107904972026118,
+            "win_rate_after_cost": 0.6111111111111112
+          },
+          {
+            "month": "2024-12",
+            "n": 93,
+            "mean_return": -0.042708607183575296,
+            "win_rate_after_cost": 0.21505376344086022
+          },
+          {
+            "month": "2025-01",
+            "n": 142,
+            "mean_return": 0.026334637905858656,
+            "win_rate_after_cost": 0.6690140845070423
+          },
+          {
+            "month": "2025-02",
+            "n": 44,
+            "mean_return": 0.016543849157040366,
+            "win_rate_after_cost": 0.5
+          },
+          {
+            "month": "2025-03",
+            "n": 8,
+            "mean_return": 0.04591065785238045,
+            "win_rate_after_cost": 0.75
+          }
+        ],
+        "by_industry": [
+          {
+            "industry": "公用事业",
+            "n": 22,
+            "mean_return": 0.02782857812135942
+          },
+          {
+            "industry": "医药生物",
+            "n": 20,
+            "mean_return": 0.02490339105329361
+          },
+          {
+            "industry": "国防军工",
+            "n": 82,
+            "mean_return": -0.013403159025122553
+          },
+          {
+            "industry": "建筑装饰",
+            "n": 70,
+            "mean_return": -0.0031081037388568586
+          },
+          {
+            "industry": "房地产",
+            "n": 13,
+            "mean_return": -0.026733555134118517
+          },
+          {
+            "industry": "机械设备",
+            "n": 54,
+            "mean_return": 0.037174420674587066
+          },
+          {
+            "industry": "电子",
+            "n": 31,
+            "mean_return": -0.0015550271791346614
+          },
+          {
+            "industry": "纺织服饰",
+            "n": 40,
+            "mean_return": 0.010542010347886807
+          },
+          {
+            "industry": "计算机",
+            "n": 54,
+            "mean_return": 0.029358741346647333
+          },
+          {
+            "industry": "轻工制造",
+            "n": 27,
+            "mean_return": 0.013408497223791572
+          }
+        ]
+      },
+      "portfolio": {
+        "total_return": 0.052827622433886834,
+        "annualized_return": 0.1569210762552562,
+        "annualized_volatility": 0.29947035486213924,
+        "sharpe_ratio": 0.6350224099987131,
+        "max_drawdown": -0.1759243247337402,
+        "turnover_ratio": 12.878763512764102,
+        "trade_count": 66,
+        "total_commission": "3879.64367443069134318340824",
+        "total_tax": "3248.02521819053649299658870",
+        "total_slippage_cost": "12932.2184689454332642060"
+      }
+    },
+    {
+      "train_end": "2025-03-18T00:00:00",
+      "validation_start": "2025-03-19T00:00:00",
+      "validation_end": "2025-08-08T00:00:00",
+      "training": {
+        "input_rows": 3406,
+        "fit_rows": 2444,
+        "calibration_rows": 858,
+        "purged_rows": 104,
+        "budget_sampled_out_rows": 0
+      },
+      "validation_rows": 1169,
+      "prediction": {
+        "rows": 1169,
+        "companies": 13,
+        "signal_count": 5,
+        "signal_win_rate_after_cost": 0.8,
+        "descriptive_wilson_interval": [
+          0.3755282641185388,
+          0.9637768390302125
+        ],
+        "mean_signal_net_return": 0.07904675929215708,
+        "unconditional_up_rate": 0.5337895637296834,
+        "prediction_range": {
+          "min": 0.4198741344908033,
+          "max": 0.6362030720210395,
+          "mean": 0.5284617606331133
+        },
+        "calibration": [
+          {
+            "lower": 0.4,
+            "n": 61,
+            "predicted": 0.4761607673741562,
+            "observed": 0.36065573770491804
+          },
+          {
+            "lower": 0.5,
+            "n": 1103,
+            "predicted": 0.530986550064394,
+            "observed": 0.5421577515865821
+          },
+          {
+            "lower": 0.6,
+            "n": 5,
+            "predicted": 0.6095653298518768,
+            "observed": 0.8
+          }
+        ],
+        "brier": 0.2462019840350866,
+        "baseline_brier": 0.24945335109814057,
+        "roc_auc": 0.5807339449541284,
+        "skill_vs_constant": 0.013033968269982488,
+        "by_month": [
+          {
+            "month": "2025-03",
+            "n": 1,
+            "mean_return": -0.1167190276670772,
+            "win_rate_after_cost": 0.0
+          },
+          {
+            "month": "2025-04",
+            "n": 4,
+            "mean_return": 0.13186320603196566,
+            "win_rate_after_cost": 1.0
+          }
+        ],
+        "by_industry": [
+          {
+            "industry": "机械设备",
+            "n": 4,
+            "mean_return": 0.07951754850827383
+          },
+          {
+            "industry": "电子",
+            "n": 1,
+            "mean_return": 0.09266360242769012
+          }
+        ]
+      },
+      "portfolio": {
+        "total_return": 0.0,
+        "annualized_return": 0.0,
+        "annualized_volatility": 0.0,
+        "sharpe_ratio": null,
+        "max_drawdown": 0.0,
+        "turnover_ratio": 0.0,
+        "trade_count": 0,
+        "total_commission": "0",
+        "total_tax": "0",
+        "total_slippage_cost": "0"
+      }
+    }
+  ],
+  "meets_constraints": false,
+  "constraint_checks": {
+    "enough_signals": true,
+    "each_fold_win_rate": true,
+    "drawdown_within_limit": true,
+    "each_fold_beats_constant": false
+  },
+  "score": -0.007406872663330066,
+  "signal_count": 418
+}

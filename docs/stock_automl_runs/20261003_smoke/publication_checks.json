@@ -1,0 +1,26 @@
+{
+  "git_base_commit": "d4b354bbe8f7f623f4c67e086f64b18cb04554a1",
+  "python": "3.13.5",
+  "tested_source_sha256": "960937b47200a99507fde42ae8883c6e9586c87478ad2b855ec60523dbc16628",
+  "checks": {
+    "targeted_tests": {
+      "command": "python -m pytest -q tests/automl tests/test_backtest_core.py --disable-warnings",
+      "result": "52 passed in 4.10s"
+    },
+    "module_cli_help": "passed",
+    "legacy_script_cli_help": "passed",
+    "module_synthetic_smoke": "2/2 experiments completed, no database or LLM calls",
+    "compileall": "passed",
+    "diff_whitespace": "passed",
+    "historical_implementation_file_hashes": "all preserved",
+    "repository_dependencies": [
+      "src.backtest",
+      "src.quant_research.automl.advisor",
+      "src.quant_research.automl.config",
+      "src.quant_research.automl.data",
+      "src.quant_research.automl.demo",
+      "src.quant_research.automl.runner"
+    ]
+  },
+  "scope": "Module entrypoint organization changed; historic live research was not rerun. Full repository suite and production runtime were not assessed."
+}

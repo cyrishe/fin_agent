@@ -1,20 +1,18 @@
 from __future__ import annotations
 
-import datetime as dt
 from typing import Any, Dict, List, Optional
 
 from src.services.assistant_interaction_preprocessor import AssistantInteractionPreprocessor
-from src.services.assistant_intent_service import AssistantIntentService
 from src.services.agent_runtime_llm_planner_service import AgentRuntimeLLMPlannerService
 from src.services.context_resolution_service import ContextResolutionService
-from src.services.context_write_policy_service import ContextWritePolicyService
 from src.services.conversation_runtime_contract_service import ConversationRuntimeContractService
 from src.services.conversation_mainline_contract_service import ConversationMainlineContractService
-from src.services.conversation_state_machine_service import ConversationStateMachineService
-from src.services.conversation_task_finalizer_service import ConversationTaskFinalizerService
 from src.services.execution_plan_service import AgentRuntimePlanner, ExecutionPlanService
-from src.services.interaction_frame_service import InteractionFrameService
 from src.services.system_command_service import SystemCommandService
+
+
+class ConversationPreprocessError(RuntimeError):
+    pass
 
 
 class ConversationPreprocessService:
@@ -22,34 +20,30 @@ class ConversationPreprocessService:
         self,
         *,
         interaction_preprocessor: Optional[AssistantInteractionPreprocessor] = None,
-        assistant_intent_service: Optional[AssistantIntentService] = None,
         agent_runtime_planner: Optional[AgentRuntimePlanner] = None,
         agent_runtime_llm_planner_service: Optional[AgentRuntimeLLMPlannerService] = None,
         execution_plan_service: Optional[ExecutionPlanService] = None,
-        interaction_frame_service: Optional[InteractionFrameService] = None,
-        conversation_state_machine_service: Optional[ConversationStateMachineService] = None,
-        context_write_policy_service: Optional[ContextWritePolicyService] = None,
         runtime_contract_service: Optional[ConversationRuntimeContractService] = None,
         mainline_contract_service: Optional[ConversationMainlineContractService] = None,
         system_command_service: Optional[SystemCommandService] = None,
         context_resolution_service: Optional[ContextResolutionService] = None,
-        conversation_task_finalizer_service: Optional[ConversationTaskFinalizerService] = None,
+        agent_owned_runtime_names: Optional[set[str]] = None,
     ) -> None:
         self.interaction_preprocessor = interaction_preprocessor or AssistantInteractionPreprocessor()
-        self.assistant_intent_service = assistant_intent_service or AssistantIntentService()
         self.agent_runtime_planner = agent_runtime_planner or execution_plan_service or AgentRuntimePlanner()
-        self.interaction_frame_service = interaction_frame_service or InteractionFrameService()
-        self.conversation_state_machine_service = conversation_state_machine_service or ConversationStateMachineService()
-        self.context_write_policy_service = context_write_policy_service or ContextWritePolicyService()
         self.runtime_contract_service = runtime_contract_service or ConversationRuntimeContractService()
         self.mainline_contract_service = mainline_contract_service or ConversationMainlineContractService()
         self.context_resolution_service = context_resolution_service or ContextResolutionService()
-        self.conversation_task_finalizer_service = conversation_task_finalizer_service or ConversationTaskFinalizerService()
         self.agent_runtime_llm_planner_service = agent_runtime_llm_planner_service or AgentRuntimeLLMPlannerService(
             fallback_planner=self.agent_runtime_planner,
             prompt_context_compiler=None,
         )
         self.system_command_service = system_command_service or SystemCommandService()
+        self.agent_owned_runtime_names = {
+            self._trim(item)
+            for item in (agent_owned_runtime_names or set())
+            if self._trim(item)
+        }
 
     @staticmethod
     def _trim(value: Any) -> str:
@@ -119,18 +113,45 @@ class ConversationPreprocessService:
             work_context["preferred_runtime"] = "code"
         normalized_command = normalized_input.get("normalized_command") if isinstance(normalized_input.get("normalized_command"), dict) else {}
         command_action = self._trim(normalized_command.get("action"))
-        is_free_chat = not command_action
-        active_workflow = work_context.get("active_workflow") if isinstance(work_context.get("active_workflow"), dict) else {}
-        is_active_custom_tool_flow = is_free_chat and self._trim(active_workflow.get("type")) == "custom_tool_authoring"
-        preprocess_enable_llm = enable_llm and not is_active_custom_tool_flow
+        is_slash_command = self._trim((normalized_input.get("slash_command") or {}).get("kind")) == "slash"
+        thread_state = self._build_thread_state(
+            thread_context=thread_context,
+            work_context=work_context,
+        )
+        context_window = self._build_context_window(
+            thread_context=thread_context,
+        )
+        pre_context_signals = self._build_preprocessing_signals(
+            normalized_input=normalized_input,
+            thread_context=thread_context,
+            work_context=work_context,
+            interaction={},
+        )
+        context_resolution = self.context_resolution_service.resolve(
+            user_text=normalized_input["text"],
+            context_window=context_window,
+            thread_state=thread_state,
+            preprocessing_signals=pre_context_signals,
+            interaction_result={},
+            enable_llm=enable_llm and not is_slash_command,
+        )
         interaction = (
+            self._classify_slash_command(
+                normalized_command=normalized_command,
+                application_context=application_context,
+            )
+            if is_slash_command
+            else
             self.interaction_preprocessor.classify(
                 user_text=normalized_input["text"],
                 thread_context=thread_context,
                 application_context=application_context,
+                context_resolution=context_resolution,
             )
-            if preprocess_enable_llm and is_free_chat
+            if enable_llm
             else {
+                "agent_name": "",
+                "turn_mode": "",
                 "analize": "",
                 "domain_hint": "",
                 "agent_hint": "",
@@ -139,61 +160,54 @@ class ConversationPreprocessService:
                 "source": "disabled",
             }
         )
-        intent = (
-            self.assistant_intent_service.classify(
-                user_text=normalized_input["text"],
-                thread_context=thread_context,
-            )
-            if not is_free_chat
-            else {"intent_type": "none", "source": "disabled_for_free_chat"}
-        )
+        intent = {
+            "intent_type": "explicit_command" if is_slash_command else "llm_top_intent",
+            "source": "shortcut:command" if is_slash_command else "interaction_preprocess",
+        }
         preprocessing_signals = self._build_preprocessing_signals(
             normalized_input=normalized_input,
             thread_context=thread_context,
             work_context=work_context,
             interaction=interaction,
         )
-        thread_state = self._build_thread_state(
-            thread_context=thread_context,
-            work_context=work_context,
-        )
-        context_window = self._build_context_window(
-            thread_context=thread_context,
-        )
-        context_resolution = self.context_resolution_service.resolve(
-            user_text=normalized_input["text"],
-            context_window=context_window,
-            thread_state=thread_state,
-            preprocessing_signals=preprocessing_signals,
-            interaction_result=interaction,
-            enable_llm=preprocess_enable_llm,
-        )
         normalized_request = self._build_normalized_request(
             normalized_input=normalized_input,
             interaction=interaction,
             preprocessing_signals=preprocessing_signals,
             context_resolution=context_resolution,
-            enable_llm=preprocess_enable_llm,
         )
-        if is_active_custom_tool_flow:
+        turn_mode = self._resolve_turn_mode(
+            interaction=interaction,
+            normalized_command=normalized_command,
+        )
+        if turn_mode == "tool_development":
             task_domain_decision = self._decision(
-                "system_operation",
-                "thread_context",
-                "continue active custom tool authoring flow",
+                "business_dialog",
+                "top_intent",
+                "turn_mode_tool_development",
             )
-            task_domain = "system_operation"
+            task_domain = "business_dialog"
             capability_family_decision = self._decision(
                 "custom_tool_authoring",
-                "thread_context",
-                "active custom tool state is present",
+                "top_intent",
+                "turn_mode_tool_development",
             )
             capability_family = "custom_tool_authoring"
-            selected_agent = "custom_tool_builder"
+            selected_agent = self._select_agent_name(
+                task_domain=task_domain,
+                work_context=work_context,
+                interaction=interaction,
+                application_context=application_context,
+            )
             execution_plan_preview = {}
         else:
-            task_domain_decision = self._decide_task_domain(
-                normalized_input=normalized_input,
-                normalized_request=normalized_request,
+            task_domain_decision = (
+                self._decision("system_operation", "top_intent", "turn_mode_system_operation")
+                if turn_mode == "system_operation"
+                else self._decide_task_domain(
+                    normalized_input=normalized_input,
+                    normalized_request=normalized_request,
+                )
             )
             task_domain = self._trim(task_domain_decision.get("value")) or "business_dialog"
             capability_family_decision = self._decide_capability_family(
@@ -206,6 +220,7 @@ class ConversationPreprocessService:
                 task_domain=task_domain,
                 work_context=work_context,
                 interaction=interaction,
+                application_context=application_context,
             )
             execution_plan_preview = self._build_execution_plan_preview(
                 normalized_request=normalized_request,
@@ -214,8 +229,6 @@ class ConversationPreprocessService:
                 task_domain=task_domain,
                 capability_family=capability_family,
                 selected_agent=selected_agent,
-                interaction_frame=None,
-                conversation_state=None,
                 enable_llm=enable_llm,
             )
         dispatch_plan = self._build_dispatch_plan(
@@ -226,50 +239,11 @@ class ConversationPreprocessService:
             selected_agent=selected_agent,
             execution_plan_preview=execution_plan_preview,
         )
-        turn_frame = self._build_turn_frame(
-            normalized_input=normalized_input,
-            normalized_request=normalized_request,
-            dispatch_plan=dispatch_plan,
-            thread_context=thread_context,
-        )
-        interaction_compat = self._build_interaction_compat(normalized_request=normalized_request)
-        interaction_frame = self.interaction_frame_service.build_frame(
-            normalized_input=normalized_input,
-            work_context=work_context,
-            task_domain=task_domain,
-            capability_family=capability_family,
-            interaction=interaction_compat,
-            dispatch_plan=dispatch_plan,
-            execution_plan_preview=execution_plan_preview,
-            thread_context=thread_context,
-        )
-        conversation_state = self.conversation_state_machine_service.derive_state(
-            interaction_frame=interaction_frame,
-            dispatch_plan=dispatch_plan,
-            work_context=work_context,
-        )
-        observation_preview = self._build_observation_preview(
-            conversation_state=conversation_state,
-            dispatch_plan=dispatch_plan,
-        )
-        context_write_policy = self.context_write_policy_service.build_policy(
-            normalized_input=normalized_input,
-            interaction_frame=interaction_frame,
-            conversation_state=conversation_state,
-            dispatch_plan=dispatch_plan,
-            execution_plan_preview=execution_plan_preview,
-            work_context=work_context,
-        )
-        continuity_axes = self._build_continuity_axes(
-            task_domain=task_domain,
-            interaction_frame=interaction_frame,
-            dispatch_plan=dispatch_plan,
-            execution_plan_preview=execution_plan_preview,
-        )
-        thread_context_patch_preview = self._build_thread_context_patch_preview(
-            context_write_policy=context_write_policy,
-            continuity_axes=continuity_axes,
-        )
+        dispatch_plan["turn_mode"] = turn_mode
+        # Conversation routing is already decided by the SOFT context and intent
+        # stages above. Do not derive another state machine from the result or
+        # persist synthetic focus/resume state that could constrain a later turn.
+        thread_context_patch_preview: Dict[str, Any] = {}
         runtime_contract = self.runtime_contract_service.build_preprocess_contract(
             normalized_input=normalized_input,
             interaction=interaction,
@@ -280,9 +254,6 @@ class ConversationPreprocessService:
             selected_agent=selected_agent,
             dispatch_plan=dispatch_plan,
             execution_plan_preview=execution_plan_preview,
-            interaction_frame=interaction_frame,
-            conversation_state=conversation_state,
-            context_write_policy=context_write_policy,
             thread_context_patch_preview=thread_context_patch_preview,
         )
         conversation_mainline = self.mainline_contract_service.build_contract(
@@ -290,15 +261,13 @@ class ConversationPreprocessService:
             dispatch_plan=dispatch_plan,
             execution_plan=execution_plan_preview,
             work_context=work_context,
-            conversation_state=conversation_state,
         )
-        domain = self._trim(continuity_axes.get("domain")) or self._normalize_domain(task_domain)
-        interaction_mode = self._trim(interaction_frame.get("interaction_mode")) or "execute_business_task"
-        execution_path = self._trim(continuity_axes.get("execution_path")) or self._normalize_execution_path(dispatch_plan, execution_plan_preview)
+        domain = self._normalize_domain(task_domain)
+        interaction_mode = turn_mode
+        execution_path = self._normalize_execution_path(dispatch_plan, execution_plan_preview)
         llm_usage = self._merge_llm_usage(
             interaction.get("llm_usage") if isinstance(interaction, dict) else None,
             context_resolution.get("llm_usage") if isinstance(context_resolution, dict) else None,
-            normalized_request.get("llm_usage") if isinstance(normalized_request, dict) else None,
             execution_plan_preview.get("llm_usage") if isinstance(execution_plan_preview, dict) else None,
         )
         return {
@@ -314,12 +283,6 @@ class ConversationPreprocessService:
             "preprocessing_signals": preprocessing_signals,
             "context_resolution": context_resolution,
             "normalized_request": normalized_request,
-            "turn_frame": turn_frame,
-            "interaction_frame": interaction_frame,
-            "conversation_state": conversation_state,
-            "observation_preview": observation_preview,
-            "context_write_policy": context_write_policy,
-            "continuity_axes": continuity_axes,
             "thread_context_patch_preview": thread_context_patch_preview,
             "runtime_contract": runtime_contract,
             "conversation_mainline": conversation_mainline,
@@ -327,7 +290,6 @@ class ConversationPreprocessService:
             "runtime_node_results": runtime_contract.get("node_results") if isinstance(runtime_contract.get("node_results"), list) else [],
             "runtime_feedback_protocol": runtime_contract.get("feedback_protocol") if isinstance(runtime_contract.get("feedback_protocol"), dict) else {},
             "interaction": interaction,
-            "interaction_compat": interaction_compat,
             "intent": intent,
             "capability_family": capability_family,
             "decision_sources": {
@@ -335,17 +297,17 @@ class ConversationPreprocessService:
                 "intent": "rule",
                 "domain": {
                     "value": domain,
-                    "source": "derived.continuity_axes",
+                    "source": "top_intent",
                     "reason": self._trim(task_domain_decision.get("reason")) or "derived_from_task_domain",
                 },
                 "interaction_mode": {
                     "value": interaction_mode,
-                    "source": "derived.interaction_frame",
-                    "reason": "derived_from_interaction_frame",
+                    "source": "top_intent",
+                    "reason": "same_as_turn_mode",
                 },
                 "execution_path": {
                     "value": execution_path,
-                    "source": "derived.continuity_axes",
+                    "source": "dispatch_plan",
                     "reason": "derived_from_dispatch_or_selected_path",
                 },
                 "task_domain": task_domain_decision,
@@ -379,7 +341,7 @@ class ConversationPreprocessService:
                 code_runtime_hint = True
                 normalized_text = self._trim(parts[1] if len(parts) > 1 else "")
         normalized_attachments = self._normalize_attachments(attachments)
-        parsed_command = self._parse_slash_command(normalized_text)
+        parsed_command = self._parse_slash_command(raw_text if code_runtime_hint else normalized_text)
         normalized_command = (
             self.system_command_service.normalize(
                 command=str(parsed_command.get("command") or ""),
@@ -443,8 +405,7 @@ class ConversationPreprocessService:
     ) -> Dict[str, Any]:
         ctx = thread_context if isinstance(thread_context, dict) else {}
         app_ctx = application_context if isinstance(application_context, dict) else {}
-        assistant_agent = app_ctx.get("assistant_agent") if isinstance(app_ctx.get("assistant_agent"), dict) else {}
-        execution_agent = app_ctx.get("execution_agent") if isinstance(app_ctx.get("execution_agent"), dict) else {}
+        default_agent = app_ctx.get("default_agent") if isinstance(app_ctx.get("default_agent"), dict) else {}
         custom_tool_state = ctx.get("custom_tool_state") if isinstance(ctx.get("custom_tool_state"), dict) else {}
         image_ids = [
             self._trim(item) for item in (ctx.get("last_image_attachment_ids") or [])
@@ -461,18 +422,24 @@ class ConversationPreprocessService:
             )
         work_context = {
             "application_name": self._trim(app_ctx.get("application_name")),
-            "assistant_agent": self._trim(assistant_agent.get("agent_name")),
-            "execution_agent": self._trim(execution_agent.get("agent_name")),
+            "default_agent": self._trim(default_agent.get("agent_name")),
             "thread_active_skill_name": self._trim(ctx.get("active_skill_name")),
             "thread_active_skill_canonical_name": self._trim(ctx.get("active_skill_canonical_name")),
             "recent_attachments": recent_attachments,
             "recent_result_subject": self._trim(ctx.get("recent_result_subject")),
         }
         if custom_tool_state:
+            tool_name = self._trim(custom_tool_state.get("tool_name"))
+            display_name = self._trim(
+                ((custom_tool_state.get("design_contract") or {}) if isinstance(custom_tool_state.get("design_contract"), dict) else {}).get("display_name")
+            )
+            context_name = tool_name or display_name or "current"
             work_context["active_workflow"] = {
                 "type": "custom_tool_authoring",
-                "status": self._trim(custom_tool_state.get("status")),
-                "tool_name": self._trim(custom_tool_state.get("tool_name")),
+                "tool_name": tool_name,
+                "context_ref": f"custom_tool:{context_name}",
+                "summary": f"最近的工具开发任务：{display_name or tool_name or '当前工具'}",
+                "owner_agent": self._trim(custom_tool_state.get("owner_agent") or default_agent.get("agent_name")),
             }
         owner_ids = [
             self._trim(item)
@@ -493,18 +460,12 @@ class ConversationPreprocessService:
     ) -> Dict[str, Any]:
         text = self._trim(normalized_input.get("text"))
         return {
-            "needs_reference_resolution": self._should_resolve_reference(
-                text=text,
-                interaction=interaction,
-            ),
+            "needs_reference_resolution": bool(interaction.get("needs_reference_resolution")),
             "code_runtime_hint": bool(normalized_input.get("code_runtime_hint")),
             "info_ready": bool(interaction.get("info_ready")),
-            "time_refs": self._extract_time_refs(text),
-            "resolved_references": self._extract_resolved_references(
-                text=text,
-                thread_context=thread_context,
-            ),
-            "correction_signals": self._extract_correction_signals(text),
+            "time_refs": [],
+            "resolved_references": [],
+            "correction_signals": [],
             "attachment_signals": self._extract_attachment_signals(normalized_input),
             "recent_result_subject": self._trim((work_context or {}).get("recent_result_subject")),
         }
@@ -518,16 +479,28 @@ class ConversationPreprocessService:
         ctx = thread_context if isinstance(thread_context, dict) else {}
         work = work_context if isinstance(work_context, dict) else {}
         reference_memory = ctx.get("reference_memory") if isinstance(ctx.get("reference_memory"), dict) else {}
+        active_workflow = work.get("active_workflow") if isinstance(work.get("active_workflow"), dict) else {}
+        context_objects: List[Dict[str, str]] = []
+        if active_workflow:
+            context_ref = self._trim(active_workflow.get("context_ref"))
+            if context_ref:
+                context_objects.append(
+                    {
+                        "context_ref": context_ref,
+                        "summary": self._trim(active_workflow.get("summary")),
+                    }
+                )
         return {
             "session_application_name": self._trim(work.get("application_name")),
-            "session_assistant_agent": self._trim(work.get("assistant_agent")),
-            "session_execution_agent": self._trim(work.get("execution_agent")),
+            "session_default_agent": self._trim(work.get("default_agent")),
             "thread_active_skill_name": self._trim(work.get("thread_active_skill_name")),
             "thread_active_skill_canonical_name": self._trim(work.get("thread_active_skill_canonical_name")),
             "recent_attachments": self._work_context_recent_attachments(work),
             "recent_result_subject": self._trim(work.get("recent_result_subject")),
             "reference_memory": reference_memory,
             "thread_summary": self._trim(ctx.get("thread_summary")),
+            "active_workflow": active_workflow,
+            "context_objects": context_objects,
         }
 
     def _build_context_window(
@@ -594,62 +567,99 @@ class ConversationPreprocessService:
         interaction: Dict[str, Any],
         preprocessing_signals: Dict[str, Any],
         context_resolution: Dict[str, Any],
-        enable_llm: bool,
     ) -> Dict[str, Any]:
         text = self._trim(normalized_input.get("text"))
-        context_relation = self._derive_context_relation(
-            text=text,
-            interaction=interaction,
-            preprocessing_signals=preprocessing_signals,
-        )
-        focus = self._build_fallback_focus(
+        context_refs = context_resolution.get("context_refs") if isinstance(context_resolution.get("context_refs"), list) else []
+        context_relation = "referential" if context_refs else "new"
+        focus = self._build_focus_from_structured_context(
             preprocessing_signals=preprocessing_signals,
             context_resolution=context_resolution,
         )
-        target_asset = self._build_fallback_target_asset(
-            text=text,
-            domain_hint=self._trim(interaction.get("domain_hint")),
-        )
-        domain = "system" if self._trim(interaction.get("domain_hint")) == "system" else "business"
-        command = normalized_input.get("normalized_command") if isinstance(normalized_input.get("normalized_command"), dict) else {}
-        resolved_items = context_resolution.get("resolved_items") if isinstance(context_resolution.get("resolved_items"), list) else []
-        has_context_resolution = bool(resolved_items) or bool(self._trim(context_resolution.get("resolution_summary")))
-        interaction_requires_reference = bool(interaction.get("needs_reference_resolution"))
-        should_finalize_with_llm = (
-            enable_llm
-            and not self._trim(command.get("action"))
-            and (
-                interaction_requires_reference
-                or has_context_resolution
-                or (context_relation == "corrective")
-            )
-        )
-        finalized: Dict[str, Any] = {}
-        if should_finalize_with_llm:
-            finalized = self.conversation_task_finalizer_service.finalize(
-                raw_user_text=text,
-                interaction_result=interaction,
-                preprocessing_signals=preprocessing_signals,
-                context_resolution=context_resolution,
-                context_relation=context_relation,
-                focus=focus,
-                target_asset=target_asset,
-                domain=domain,
-            )
-        round_task_desc = self._trim(finalized.get("round_task_desc")) or text
+        target_asset = {"type": "", "label": ""}
+        domain = "system" if self._trim(interaction.get("turn_mode")) == "system_operation" or self._trim(interaction.get("domain_hint")) == "system" else "business"
+        ori_question = self._trim(context_resolution.get("ori_question")) or text
+        resolved_question = self._trim(context_resolution.get("resolved_question"))
+        if not resolved_question:
+            raise ConversationPreprocessError("上下文语义协议错误：resolved_question 不能为空")
         return {
-            "raw_user_text": text,
-            "analize": self._trim(finalized.get("analize")),
-            "round_task_desc": round_task_desc,
+            "ori_question": ori_question,
+            "resolved_question": resolved_question,
+            "context_refs": list(context_refs),
+            # Compatibility fields while the execution runtime migrates to the v1 turn protocol.
+            "raw_user_text": ori_question,
+            "analize": "",
+            "round_task_desc": resolved_question,
             "task_splitd": [],
             "domain": domain,
             "context_relation": context_relation,
             "focus": focus,
             "target_asset": target_asset,
-            "needs_reference_resolution": bool(preprocessing_signals.get("needs_reference_resolution")),
-            "info_ready": bool(preprocessing_signals.get("info_ready")),
-            "source": self._trim(finalized.get("source")) or "raw_input",
-            "llm_usage": finalized.get("llm_usage") if isinstance(finalized.get("llm_usage"), dict) else {},
+            "needs_reference_resolution": bool(context_refs),
+            "info_ready": True,
+            "source": self._trim(context_resolution.get("source")) or "context_resolution",
+            "llm_usage": context_resolution.get("llm_usage") if isinstance(context_resolution.get("llm_usage"), dict) else {},
+        }
+
+    def _resolve_turn_mode(
+        self,
+        *,
+        interaction: Dict[str, Any],
+        normalized_command: Dict[str, Any],
+    ) -> str:
+        action = self._trim(normalized_command.get("action"))
+        args = normalized_command.get("args") if isinstance(normalized_command.get("args"), list) else []
+        sub_action = self._trim(args[0]).lower() if args else ""
+        if action:
+            if action == "custom_tool" and sub_action in {"create", "edit"}:
+                return "tool_development"
+            return "system_operation"
+        turn_mode = self._trim(interaction.get("turn_mode"))
+        if turn_mode in {"normal_qa", "system_operation", "tool_development"}:
+            return turn_mode
+        raise ValueError("顶层意图协议错误：自然语言请求缺少有效 turn_mode")
+
+    def _classify_slash_command(
+        self,
+        *,
+        normalized_command: Dict[str, Any],
+        application_context: Optional[Dict[str, Any]],
+    ) -> Dict[str, Any]:
+        action = self._trim(normalized_command.get("action"))
+        args = normalized_command.get("args") if isinstance(normalized_command.get("args"), list) else []
+        sub_action = self._trim(args[0]).lower() if args else ""
+        turn_mode = (
+            "tool_development"
+            if action == "custom_tool" and sub_action in {"create", "edit"}
+            else "system_operation"
+        )
+        app = application_context if isinstance(application_context, dict) else {}
+        rows = app.get("available_agents") if isinstance(app.get("available_agents"), list) else []
+        available_names = [
+            self._trim(item.get("agent_name") or item.get("name"))
+            for item in rows
+            if isinstance(item, dict) and self._trim(item.get("agent_name") or item.get("name"))
+        ]
+        if action == "custom_tool":
+            default_agent = app.get("default_agent") if isinstance(app.get("default_agent"), dict) else {}
+            preferred = self._trim(default_agent.get("agent_name"))
+        else:
+            general_agent = next(
+                (
+                    item for item in rows
+                    if isinstance(item, dict) and self._trim(item.get("role")) == "general_assistant"
+                ),
+                {},
+            )
+            preferred = self._trim(general_agent.get("agent_name"))
+        agent_name = preferred if preferred in available_names else (available_names[0] if available_names else preferred)
+        return {
+            "agent_name": agent_name,
+            "turn_mode": turn_mode,
+            "agent_hint": agent_name,
+            "domain_hint": "system" if turn_mode == "system_operation" else "business",
+            "needs_reference_resolution": False,
+            "info_ready": True,
+            "source": "rule:slash_command",
         }
 
     def _work_context_active_skill(self, work_context: Dict[str, Any]) -> str:
@@ -687,83 +697,6 @@ class ConversationPreprocessService:
     def _decision(self, value: str, source: str, reason: str) -> Dict[str, str]:
         return {"value": value, "source": source, "reason": reason}
 
-    def _should_resolve_reference(
-        self,
-        *,
-        text: str,
-        interaction: Dict[str, Any],
-    ) -> bool:
-        if bool(interaction.get("needs_reference_resolution")):
-            return True
-        normalized = self._trim(text)
-        return self._contains_any(
-            normalized,
-            [
-                "第二个",
-                "第2个",
-                "他们",
-                "它们",
-                "前面那个",
-                "刚才那个",
-                "上一轮",
-                "上一步",
-                "前面图里",
-                "这张图",
-                "那张图",
-                "你前面",
-                "刚才说的",
-                "第二点计划",
-            ],
-        )
-
-    def _extract_time_refs(self, text: str) -> List[Dict[str, str]]:
-        normalized = self._trim(text)
-        today = dt.date.today()
-        rows: List[Dict[str, str]] = []
-        mapping = {
-            "今天": today.strftime("%Y-%m-%d"),
-            "明天": (today + dt.timedelta(days=1)).strftime("%Y-%m-%d"),
-            "昨天": (today - dt.timedelta(days=1)).strftime("%Y-%m-%d"),
-        }
-        for raw, normalized_value in mapping.items():
-            if raw in normalized:
-                rows.append({"raw": raw, "normalized": normalized_value})
-        return rows
-
-    def _extract_resolved_references(
-        self,
-        *,
-        text: str,
-        thread_context: Optional[Dict[str, Any]],
-    ) -> List[Dict[str, Any]]:
-        ctx = thread_context if isinstance(thread_context, dict) else {}
-        reference_memory = ctx.get("reference_memory") if isinstance(ctx.get("reference_memory"), dict) else {}
-        objects = reference_memory.get("objects") if isinstance(reference_memory.get("objects"), list) else []
-        normalized_objects: List[Dict[str, str]] = []
-        for item in objects:
-            if not isinstance(item, dict):
-                continue
-            item_type = self._trim(item.get("object_type") or item.get("type"))
-            item_id = self._trim(item.get("object_id") or item.get("id"))
-            item_label = self._trim(item.get("display_name")) or item_id
-            if not item_type or not item_label:
-                continue
-            normalized_objects.append({"type": item_type, "label": item_label})
-        if not normalized_objects:
-            return []
-        if self._contains_any(text, ["第二个", "第2个"]) and len(normalized_objects) >= 2:
-            item = normalized_objects[1]
-            return [{"raw": "第二个", "type": item["type"], "label": item["label"]}]
-        if self._contains_any(text, ["最后一个", "最后那个"]) and normalized_objects:
-            item = normalized_objects[-1]
-            return [{"raw": "最后一个", "type": item["type"], "label": item["label"]}]
-        if self._contains_any(text, ["他们", "它们"]) and len(normalized_objects) >= 2:
-            return [{"raw": "他们", "type": "group", "label": "、".join(item["label"] for item in normalized_objects[:4])}]
-        for item in normalized_objects:
-            if item["label"] and item["label"] in text:
-                return [{"raw": item["label"], "type": item["type"], "label": item["label"]}]
-        return []
-
     def _extract_attachment_signals(self, normalized_input: Dict[str, Any]) -> List[Dict[str, Any]]:
         rows = normalized_input.get("attachments") if isinstance(normalized_input.get("attachments"), list) else []
         normalized: List[Dict[str, Any]] = []
@@ -784,40 +717,7 @@ class ConversationPreprocessService:
             )
         return normalized
 
-    def _extract_correction_signals(self, text: str) -> List[Dict[str, str]]:
-        normalized = self._trim(text)
-        rows: List[Dict[str, str]] = []
-        if self._contains_any(normalized, ["你前面", "你刚才", "理解错", "不是这个", "不对", "核实", "纠正"]):
-            rows.append(
-                {
-                    "type": "user_correction",
-                    "raw": normalized,
-                    "summary": "用户在纠正、质疑或要求核实上一轮内容",
-                }
-            )
-        return rows
-
-    def _derive_context_relation(
-        self,
-        *,
-        text: str,
-        interaction: Dict[str, Any],
-        preprocessing_signals: Dict[str, Any],
-    ) -> str:
-        normalized = self._trim(text)
-        if self._contains_any(normalized, ["不对", "错了", "理解错", "核实", "重新核实", "纠正", "不是"]):
-            return "corrective"
-        if bool(preprocessing_signals.get("needs_reference_resolution")):
-            if self._contains_any(normalized, ["好的", "继续", "接着", "那就继续", "行", "可以", "好"]):
-                return "followup"
-            return "referential"
-        if self._contains_any(normalized, ["好的", "继续", "接着", "进一步", "展开", "再看看"]):
-            return "followup"
-        if self._trim(interaction.get("domain_hint")) == "system":
-            return "new"
-        return "new"
-
-    def _build_fallback_focus(
+    def _build_focus_from_structured_context(
         self,
         *,
         preprocessing_signals: Dict[str, Any],
@@ -836,18 +736,6 @@ class ConversationPreprocessService:
             source_type = self._trim(first.get("source_type"))
             focus_type = "attachment" if source_type == "attachment" else "reference"
             return {"type": focus_type, "label": self._trim(first.get("summary"))}
-        return {"type": "", "label": ""}
-
-    def _build_fallback_target_asset(
-        self,
-        *,
-        text: str,
-        domain_hint: str,
-    ) -> Dict[str, str]:
-        if domain_hint == "system" and self._contains_any(text, ["技能", "skill"]):
-            return {"type": "skill", "label": ""}
-        if domain_hint == "system" and self._contains_any(text, ["工具", "tool"]):
-            return {"type": "tool", "label": ""}
         return {"type": "", "label": ""}
 
     def _decide_task_domain(
@@ -876,7 +764,7 @@ class ConversationPreprocessService:
             return self._decision("business_dialog", "rule.command", "slash_run_command_as_business")
         if self._trim(normalized_request.get("domain")) == "system":
             return self._decision("system_operation", "normalized_request", "domain_hint_system")
-        return self._decision("business_dialog", "default", "fallback_business_dialog")
+        return self._decision("business_dialog", "default", "business_dialog_default")
 
     def _decide_capability_family(
         self,
@@ -904,7 +792,7 @@ class ConversationPreprocessService:
             return self._decision("business_analysis", "default.business", "business_dialog_default")
         if has_images:
             return self._decision("visual_analysis", "rule.modality", "image_input")
-        return self._decision("business_analysis", "default.business", "fallback_business_analysis")
+        return self._decision("business_analysis", "default.business", "business_analysis_default")
 
     def _build_dispatch_plan(
         self,
@@ -1016,18 +904,21 @@ class ConversationPreprocessService:
         task_domain: str,
         capability_family: str,
         selected_agent: str,
-        interaction_frame: Optional[Dict[str, Any]],
-        conversation_state: Optional[Dict[str, Any]],
         enable_llm: bool,
     ) -> Dict[str, Any]:
         if task_domain not in {"business_dialog"}:
             return {}
         if capability_family not in {"business_analysis", "visual_analysis", "visual_followup", "agent_route"}:
             return {}
-        if self._trim(selected_agent) and self._trim(selected_agent) != self._trim(work_context.get("execution_agent")):
+        if self._trim(selected_agent) in self.agent_owned_runtime_names:
             return self.agent_runtime_planner.build_agent_route_plan(
                 target_agent=self._trim(selected_agent),
-                reason="selected_non_execution_agent_for_business_request",
+                reason="selected_agent_owns_normal_qa_runtime",
+            )
+        if self._trim(selected_agent) and self._trim(selected_agent) != self._trim(work_context.get("default_agent")):
+            return self.agent_runtime_planner.build_agent_route_plan(
+                target_agent=self._trim(selected_agent),
+                reason="selected_non_default_agent_for_business_request",
             )
         if enable_llm:
             planner_result = self.agent_runtime_llm_planner_service.build_plan(
@@ -1036,8 +927,6 @@ class ConversationPreprocessService:
                 tool_queries=[self._trim(item) for item in (normalized_request.get("task_splitd") or []) if self._trim(item)],
                 work_context=work_context,
                 application_context=application_context if isinstance(application_context, dict) else {},
-                interaction_frame=interaction_frame if isinstance(interaction_frame, dict) else {},
-                conversation_state=conversation_state if isinstance(conversation_state, dict) else {},
                 enable_llm=True,
                 allow_fallback=False,
             )
@@ -1046,6 +935,10 @@ class ConversationPreprocessService:
                     execution_plan=planner_result.get("execution_plan"),
                     planner_result=planner_result,
                 )
+            error = self._trim(planner_result.get("error"))
+            raise ConversationPreprocessError(
+                f"Agent 执行规划失败：{error or '模型没有返回可执行计划'}"
+            )
         return self.agent_runtime_planner.build_business_dialog_plan(
             text=self._trim(normalized_request.get("round_task_desc") or normalized_request.get("raw_user_text")),
             recall_query=self._trim(normalized_request.get("raw_user_text")),
@@ -1077,179 +970,6 @@ class ConversationPreprocessService:
             normalized_plan["planner_result_source"] = planner_source
         return normalized_plan
 
-    def _build_turn_frame(
-        self,
-        *,
-        normalized_input: Dict[str, Any],
-        normalized_request: Dict[str, Any],
-        dispatch_plan: Dict[str, Any],
-        thread_context: Optional[Dict[str, Any]],
-    ) -> Dict[str, Any]:
-        focus_hint = normalized_request.get("focus") if isinstance(normalized_request.get("focus"), dict) else {}
-        target_hint = normalized_request.get("target_asset") if isinstance(normalized_request.get("target_asset"), dict) else {}
-        target = dispatch_plan.get("target") if isinstance(dispatch_plan.get("target"), dict) else {}
-        existing_frame = (
-            (thread_context or {}).get("interaction_frame")
-            if isinstance((thread_context or {}).get("interaction_frame"), dict)
-            else {}
-        )
-        focus_type = self._trim(focus_hint.get("type")) or self._trim(target.get("type"))
-        focus_id = self._trim(focus_hint.get("label")) or self._trim(target.get("name"))
-        if not focus_type:
-            focus_type, focus_id = self._resolve_turn_frame_focus(
-                work_context={},
-                existing_frame=existing_frame,
-            )
-        target_asset_type = self._trim(target_hint.get("type"))
-        target_asset_id = self._trim(target_hint.get("label"))
-        if not target_asset_type:
-            target_asset_type = self._trim(target.get("type"))
-            target_asset_id = target_asset_id or self._trim(target.get("name"))
-
-        return {
-            "current_goal": self._trim(normalized_request.get("round_task_desc")) or self._trim(normalized_input.get("text")),
-            "focus_object": {
-                "type": focus_type or "unknown",
-                "id": focus_id,
-            },
-            "target_asset": {
-                "type": target_asset_type,
-                "id": target_asset_id,
-            },
-            "resolved_references": [],
-            "unresolved_references": ["context_reference"] if bool(normalized_request.get("needs_reference_resolution")) else [],
-            "accepted_constraints": [],
-            "pending_questions": [],
-        }
-
-    def _resolve_turn_frame_focus(
-        self,
-        *,
-        work_context: Dict[str, Any],
-        existing_frame: Dict[str, Any],
-    ) -> tuple[str, str]:
-        active_focus_type = self._trim(existing_frame.get("active_focus_type"))
-        active_focus_id = self._trim(existing_frame.get("active_focus_id"))
-        if active_focus_type:
-            return active_focus_type, active_focus_id
-        active_skill = self._work_context_active_skill(work_context)
-        if active_skill:
-            return "skill", active_skill
-        recent_subject = self._trim(work_context.get("recent_result_subject"))
-        if recent_subject:
-            return "task", recent_subject
-        recent_attachments = self._work_context_recent_attachments(work_context)
-        if recent_attachments:
-            first = recent_attachments[0]
-            attachment_ids = first.get("attachment_ids") if isinstance(first.get("attachment_ids"), list) else []
-            if attachment_ids:
-                return self._trim(first.get("kind")) or "attachment", self._trim(attachment_ids[0])
-            return self._trim(first.get("kind")) or "attachment", "recent_attachment"
-        return "unknown", ""
-
-    def _build_continuity_axes(
-        self,
-        *,
-        task_domain: str,
-        interaction_frame: Dict[str, Any],
-        dispatch_plan: Dict[str, Any],
-        execution_plan_preview: Dict[str, Any],
-    ) -> Dict[str, str]:
-        interaction_mode = self._trim(interaction_frame.get("interaction_mode"))
-        selected_path = execution_plan_preview.get("selected_path") if isinstance(execution_plan_preview.get("selected_path"), dict) else {}
-        execution_path = self._trim(selected_path.get("type")) or self._trim(dispatch_plan.get("entry")) or "agent_route"
-        return {
-            "domain": "system" if task_domain in {"system_operation", "design_refinement"} else "business",
-            "interaction_mode": interaction_mode,
-            "execution_path": execution_path,
-        }
-
-    def _build_observation_preview(
-        self,
-        *,
-        conversation_state: Dict[str, Any],
-        dispatch_plan: Dict[str, Any],
-    ) -> Dict[str, str]:
-        state = self._trim(conversation_state.get("state")) or "idle"
-        entry = self._trim(dispatch_plan.get("entry")) or "agent_route"
-        if state == "awaiting_user_clarification":
-            return {
-                "state": state,
-                "next_action": "wait_user",
-                "reason": "clarification_required",
-            }
-        if state == "suspended":
-            return {
-                "state": state,
-                "next_action": "suspend",
-                "reason": "task_suspended",
-            }
-        if state == "resuming":
-            return {
-                "state": state,
-                "next_action": "continue",
-                "reason": "resume_previous_task",
-            }
-        if entry in {"catalog_browse", "asset_open", "skill_refine", "skill_run", "tool_plan_run", "planned_run", "vision_intake", "agent_route"}:
-            return {
-                "state": state or "active",
-                "next_action": "continue",
-                "reason": f"dispatch_to_{entry}",
-            }
-        return {
-            "state": state or "idle",
-            "next_action": "idle",
-            "reason": "no_dispatch_entry",
-        }
-
-    def _build_thread_context_patch_preview(
-        self,
-        *,
-        context_write_policy: Dict[str, Any],
-        continuity_axes: Dict[str, str],
-    ) -> Dict[str, Any]:
-        interaction_frame_update = (
-            context_write_policy.get("interaction_frame_update")
-            if isinstance(context_write_policy.get("interaction_frame_update"), dict)
-            else {}
-        )
-        task_state_update = (
-            context_write_policy.get("task_state_update")
-            if isinstance(context_write_policy.get("task_state_update"), dict)
-            else {}
-        )
-        active_focus_update = (
-            context_write_policy.get("active_focus_update")
-            if isinstance(context_write_policy.get("active_focus_update"), dict)
-            else {}
-        )
-        reference_memory_update = (
-            context_write_policy.get("reference_memory_update")
-            if isinstance(context_write_policy.get("reference_memory_update"), dict)
-            else {}
-        )
-        return {
-            "interaction_frame": interaction_frame_update,
-            "conversation_state": {
-                "state": self._trim(task_state_update.get("state")),
-                "resume_hint": self._trim(task_state_update.get("resume_hint")),
-                "suspended_task_stack": task_state_update.get("suspended_task_stack") if isinstance(task_state_update.get("suspended_task_stack"), list) else [],
-            },
-            "continuity_axes": {
-                "domain": self._trim(continuity_axes.get("domain")),
-                "interaction_mode": self._trim(continuity_axes.get("interaction_mode")),
-                "execution_path": self._trim(continuity_axes.get("execution_path")),
-            },
-            "active_focus_type": self._trim(active_focus_update.get("type")),
-            "active_focus_id": self._trim(active_focus_update.get("id")),
-            "reference_scope": reference_memory_update.get("reference_scope") if isinstance(reference_memory_update.get("reference_scope"), list) else [],
-            "reference_memory": {
-                "recent_result_subject": self._trim(reference_memory_update.get("recent_result_subject")),
-                "recent_attachment_ids": reference_memory_update.get("recent_attachment_ids") if isinstance(reference_memory_update.get("recent_attachment_ids"), list) else [],
-                "objects": reference_memory_update.get("objects") if isinstance(reference_memory_update.get("objects"), list) else [],
-            },
-        }
-
     def _normalize_domain(self, task_domain: str) -> str:
         return "system" if task_domain in {"system_operation", "design_refinement"} else "business"
 
@@ -1257,130 +977,26 @@ class ConversationPreprocessService:
         selected_path = execution_plan_preview.get("selected_path") if isinstance(execution_plan_preview.get("selected_path"), dict) else {}
         return self._trim(selected_path.get("type")) or self._trim(dispatch_plan.get("entry")) or "agent_route"
 
-    def _build_interaction_compat(self, *, normalized_request: Dict[str, Any]) -> Dict[str, Any]:
-        focus = normalized_request.get("focus") if isinstance(normalized_request.get("focus"), dict) else {}
-        target = normalized_request.get("target_asset") if isinstance(normalized_request.get("target_asset"), dict) else {}
-        return {
-            "needs_reference_resolution": bool(normalized_request.get("needs_reference_resolution")),
-            "interaction_mode_hint": "",
-            "resume_from_context": False,
-            "turn_frame_hints": {
-                "current_goal": self._trim(normalized_request.get("round_task_desc")),
-                "focus_object": {
-                    "type": self._trim(focus.get("type")),
-                    "id": self._trim(focus.get("label")),
-                },
-                "target_asset": {
-                    "type": self._trim(target.get("type")),
-                    "id": self._trim(target.get("label")),
-                },
-            },
-        }
-
     def _select_agent_name(
         self,
         *,
         task_domain: str,
         work_context: Dict[str, Any],
         interaction: Dict[str, Any],
+        application_context: Optional[Dict[str, Any]] = None,
     ) -> str:
-        if task_domain == "system_operation":
-            return "system_agent"
-        if task_domain == "design_refinement":
-            return "system_agent"
-        if task_domain == "business_dialog":
-            agent_hint = self._trim(interaction.get("agent_hint"))
-            if agent_hint in {"default_assistant", "investment_analyst", "system_agent"}:
-                return agent_hint
-            return self._trim(work_context.get("execution_agent")) or self._trim(work_context.get("assistant_agent"))
-        return self._trim(work_context.get("assistant_agent"))
-
-    @staticmethod
-    def _contains_any(text: str, keywords: List[str]) -> bool:
-        return any(keyword in text for keyword in keywords)
-
-    def _looks_like_visual_followup(self, text: str) -> bool:
-        normalized = self._trim(text).lower()
-        if not normalized:
-            return False
-        return self._contains_any(
-            normalized,
-            [
-                "图片",
-                "截图",
-                "刚刚那张",
-                "刚才那张",
-                "还能看到",
-                "k线",
-                "k线图",
-                "均线",
-                "量能",
-                "图上",
-                "图里",
-            ],
-        )
-
-    def _looks_like_design_refine_request(self, text: str) -> bool:
-        normalized = self._trim(text).lower()
-        if not normalized:
-            return False
-        if not self._contains_any(
-            normalized,
-            [
-                "优化",
-                "修改",
-                "调整",
-                "重写",
-                "改一下",
-                "改",
-                "融入",
-                "纳入",
-                "加进去",
-                "加入",
-            ],
-        ):
-            return False
-        return self._contains_any(
-            normalized,
-            [
-                "skill",
-                "技能",
-                "提示词",
-                "当前这个",
-                "刚才那个",
-                "图表分析能力",
-                "这种图表",
-                "这种k线",
-                "处理方式",
-            ],
-        )
-
-    def _looks_like_active_skill_run_request(self, text: str) -> bool:
-        normalized = self._trim(text).lower()
-        if not normalized:
-            return False
-        if not self._contains_any(
-            normalized,
-            [
-                "运行",
-                "执行",
-                "跑一下",
-                "run",
-                "用",
-                "基于",
-                "当前这个",
-                "刚才那个",
-            ],
-        ):
-            return False
-        return self._contains_any(
-            normalized,
-            [
-                "skill",
-                "技能",
-                "当前这个",
-                "刚才那个",
-                "当前",
-                "这个",
-            ],
-        )
+        app = application_context if isinstance(application_context, dict) else {}
+        rows = app.get("available_agents") if isinstance(app.get("available_agents"), list) else []
+        allowed_ordered = [
+            self._trim(item.get("agent_name") or item.get("name"))
+            for item in rows
+            if isinstance(item, dict) and self._trim(item.get("agent_name") or item.get("name"))
+        ]
+        allowed_names = set(allowed_ordered)
+        agent_name = self._trim(interaction.get("agent_name") or interaction.get("agent_hint"))
+        if agent_name and (not allowed_names or agent_name in allowed_names):
+            return agent_name
+        configured_agent = self._trim(work_context.get("default_agent"))
+        if configured_agent and (not allowed_names or configured_agent in allowed_names):
+            return configured_agent
+        return allowed_ordered[0] if allowed_ordered else self._trim(work_context.get("default_agent"))

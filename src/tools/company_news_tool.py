@@ -4,6 +4,7 @@ import datetime as dt
 
 from src.crawler.site_news_crawler import SiteNewsCrawler, StockCodeResolver, load_site_configs
 from src.utils.mysql_utils import MySQLUtils, PAGE_TYPE_NEWS
+from src.services.search_gateway_service import SearchGatewayService
 
 
 DEFAULT_NEWS_SITES = ["jiuyangongshe_search", "10jqka_stockpage_news", "cnstock_search"]
@@ -190,6 +191,21 @@ class CompanyNewsTool:
                     keep_days_override=max(0, int(keep_days)),
                 )
                 normalized_items = [self._normalize_item(item) for item in raw_items]
+                search_errors = getattr(crawler, "last_search_errors", {})
+                selected_site_count = len(getattr(crawler, "sites", []) or [])
+                if (
+                    not normalized_items
+                    and isinstance(search_errors, dict)
+                    and search_errors
+                    and len(search_errors) >= selected_site_count > 0
+                ):
+                    details = "; ".join(
+                        f"{name}: {str(error).strip()}"
+                        for name, error in search_errors.items()
+                    )
+                    raise RuntimeError(
+                        f"金融新闻检索站点全部执行失败：{details}"
+                    )
 
             normalized_items = self._dedupe_items(normalized_items)
             history_records = self._build_history_records(actual_query, normalized_items)
@@ -216,15 +232,33 @@ def search_company_news(
 ) -> Dict[str, Any]:
     if not str(query or "").strip():
         raise ValueError("query 不能为空")
-    tool = CompanyNewsTool()
-    return tool.search(
-        query=query,
-        entity_type=entity_type,
-        max_results_per_site=max_results_per_site,
-        keep_days=keep_days,
-        site_names=site_names,
-        db=db,
+    # Compatibility entry only. New financial QA should use general_search.
+    # Deliberately do not fall back to browser crawling here:
+    # provider failure and a legitimate zero-result search must stay distinct.
+    start_time = ""
+    if int(keep_days or 0) > 0:
+        start_time = (dt.datetime.now() - dt.timedelta(days=int(keep_days))).date().isoformat()
+    result = SearchGatewayService().search(
+        query=str(query or "").strip(),
+        limit=min(50, max(1, int(max_results_per_site or 6)) * max(1, len(site_names or DEFAULT_NEWS_SITES))),
+        start_time=start_time,
     )
+    if result.get("status") != "ok":
+        raise RuntimeError(str(result.get("reason") or "金融新闻搜索服务执行失败"))
+    items = []
+    for item in result.get("items") or []:
+        if not isinstance(item, dict):
+            continue
+        items.append(
+            {
+                "title": str(item.get("title") or ""),
+                "url": str(item.get("url") or ""),
+                "site": str(item.get("source") or ""),
+                "publish_time": str(item.get("publish_time") or ""),
+                "snippet": str(item.get("snippet") or ""),
+            }
+        )
+    return {"items": items}
 
 
 def run(args: Dict[str, Any]) -> Dict[str, Any]:
@@ -255,6 +289,6 @@ def run(args: Dict[str, Any]) -> Dict[str, Any]:
         return {
             "tool": TOOL_NAME,
             "ok": False,
-            "data": {},
+            "data": [],
             "error": str(exc),
         }

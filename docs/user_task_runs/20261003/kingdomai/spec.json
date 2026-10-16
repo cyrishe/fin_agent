@@ -1,0 +1,50 @@
+{
+  "start": "2024-01-01",
+  "end": "2025-12-31",
+  "objective": "立即用kingdomai库2024-01-01到2025-12-31的日K，对随机16只股票研究持有1/3/7个交易日到期收益。同时探索上涨概率分类和收益回归，仅比较逻辑回归/Ridge及决策树；样本不另筛选，特征可以使用技术及已支持的扩展特征。最多8个实验、2轮、2个时间验证折，保留其他公司与未来时间窗口，计入成本，输出设计、样本统计、各阶段回测和大模型评审。不要求保证达标，最多运行15分钟。",
+  "symbols": [],
+  "max_symbols": 16,
+  "horizons": [
+    1,
+    3,
+    7
+  ],
+  "tasks": [
+    "classification",
+    "regression"
+  ],
+  "models": [
+    "linear",
+    "tree"
+  ],
+  "samplers": [
+    "all"
+  ],
+  "feature_sets": [
+    "technical",
+    "enriched"
+  ],
+  "max_trials": 8,
+  "rounds": 2,
+  "max_train_rows": 20000,
+  "seed": 42,
+  "folds": 2,
+  "test_fraction": 0.2,
+  "company_holdout_fraction": 0.2,
+  "target_return": 0.0,
+  "probability_threshold": 0.6,
+  "regression_threshold": 0.005,
+  "top_k": 5,
+  "min_signals": 15,
+  "min_win_rate": 0.5,
+  "max_drawdown": 0.3,
+  "commission_rate": 0.0003,
+  "sell_tax_rate": 0.0005,
+  "slippage_rate": 0.001,
+  "initial_cash": 1000000,
+  "include_minute": false,
+  "industries": [],
+  "min_market_cap": null,
+  "max_market_cap": null,
+  "min_amount": null
+}

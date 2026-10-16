@@ -1,0 +1,114 @@
+{
+  "candidate": {
+    "horizon": 1,
+    "task": "classification",
+    "model": "tree",
+    "sampler": "all",
+    "features": "technical",
+    "depth": 3,
+    "strength": 0.3,
+    "id": "752023b80aba"
+  },
+  "fold": 1,
+  "alpha": 0.0034605064529373633,
+  "tree": {
+    "depth": 2,
+    "leaves": 3,
+    "nodes": 5,
+    "ccp_alpha": 0.0034605064529373633,
+    "max_depth_parameter": 3,
+    "min_samples_leaf": 20,
+    "calibration": {
+      "coefficient_on_raw_log_odds": 0.29747123962750427,
+      "intercept": 0.17869701977897637
+    }
+  },
+  "selection_basis": "minimum first-fold leaf count >1; no validation performance selection",
+  "rules": [
+    {
+      "leaf": 1,
+      "conditions": [
+        {
+          "transformed_feature": "numeric__volatility_20",
+          "standardized_threshold": 0.6217952072620392,
+          "feature": "volatility_20",
+          "original_threshold": 0.03687241816928649,
+          "missing_imputed_as": 0.026523785160522787,
+          "operator": "<="
+        }
+      ],
+      "fit_support": 1368,
+      "fit_target_hit_rate": 0.4407894736842105,
+      "fit_mean_return": -0.002482179925604362,
+      "validation_support": 857,
+      "validation_target_hit_rate": 0.5029171528588098,
+      "validation_win_rate_after_cost": 0.4515752625437573,
+      "validation_mean_net_return": -0.0019507346853974098,
+      "raw_leaf_probability": 0.4407894736842105,
+      "calibrated_probability": 0.5269516434092143,
+      "emits_signal": false
+    },
+    {
+      "leaf": 3,
+      "conditions": [
+        {
+          "transformed_feature": "numeric__volatility_20",
+          "standardized_threshold": 0.6217952072620392,
+          "feature": "volatility_20",
+          "original_threshold": 0.03687241816928649,
+          "missing_imputed_as": 0.026523785160522787,
+          "operator": ">"
+        },
+        {
+          "transformed_feature": "numeric__ma_distance",
+          "standardized_threshold": 1.1697603464126587,
+          "feature": "ma_distance",
+          "original_threshold": 0.07156642919662584,
+          "missing_imputed_as": -0.011174144271377529,
+          "operator": "<="
+        }
+      ],
+      "fit_support": 269,
+      "fit_target_hit_rate": 0.6356877323420075,
+      "fit_mean_return": 0.012904417331827627,
+      "validation_support": 213,
+      "validation_target_hit_rate": 0.4694835680751174,
+      "validation_win_rate_after_cost": 0.4460093896713615,
+      "validation_mean_net_return": -0.004134585702661271,
+      "raw_leaf_probability": 0.6356877323420075,
+      "calibrated_probability": 0.5852342016345132,
+      "emits_signal": false
+    },
+    {
+      "leaf": 4,
+      "conditions": [
+        {
+          "transformed_feature": "numeric__volatility_20",
+          "standardized_threshold": 0.6217952072620392,
+          "feature": "volatility_20",
+          "original_threshold": 0.03687241816928649,
+          "missing_imputed_as": 0.026523785160522787,
+          "operator": ">"
+        },
+        {
+          "transformed_feature": "numeric__ma_distance",
+          "standardized_threshold": 1.1697603464126587,
+          "feature": "ma_distance",
+          "original_threshold": 0.07156642919662584,
+          "missing_imputed_as": -0.011174144271377529,
+          "operator": ">"
+        }
+      ],
+      "fit_support": 92,
+      "fit_target_hit_rate": 0.42391304347826086,
+      "fit_mean_return": -0.010054386604279208,
+      "validation_support": 87,
+      "validation_target_hit_rate": 0.45977011494252873,
+      "validation_win_rate_after_cost": 0.4482758620689655,
+      "validation_mean_net_return": -0.003939453010373323,
+      "raw_leaf_probability": 0.42391304347826086,
+      "calibrated_probability": 0.5218494728653225,
+      "emits_signal": false
+    }
+  ]
+}

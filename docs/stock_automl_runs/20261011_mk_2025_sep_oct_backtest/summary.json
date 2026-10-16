@@ -1,0 +1,34 @@
+{
+  "Top1": {
+    "trades": 39,
+    "fixed_mean_pct": 0.08317693400761134,
+    "new_mean_pct": -0.10840686314163843,
+    "difference_mean_percentage_points": -0.19158379714924978,
+    "fixed_compound_pct": 0.7340198333659176,
+    "new_compound_pct": -5.866210495726953,
+    "new_better": 7,
+    "new_worse": 7,
+    "new_equal": 25,
+    "sell_rule_counts": {
+      "到时卖出": 25,
+      "亏损中较前一分钟上涨至少1%": 8,
+      "涨幅超过3%": 6
+    }
+  },
+  "Top2": {
+    "trades": 36,
+    "fixed_mean_pct": 0.2921455988777833,
+    "new_mean_pct": 0.3128673504145406,
+    "difference_mean_percentage_points": 0.020721751536757295,
+    "fixed_compound_pct": 10.040109548555742,
+    "new_compound_pct": 10.82647445515148,
+    "new_better": 4,
+    "new_worse": 6,
+    "new_equal": 26,
+    "sell_rule_counts": {
+      "到时卖出": 26,
+      "涨幅超过3%": 7,
+      "亏损中较前一分钟上涨至少1%": 3
+    }
+  }
+}

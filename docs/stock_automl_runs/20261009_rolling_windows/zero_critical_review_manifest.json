@@ -1,0 +1,10 @@
+{
+  "method": "No retraining or reranking. Success >1%, new critical <0%, neutral 0%-1% inclusive at zero and one percent.",
+  "source_hashes": {
+    "docs/stock_automl_runs/20261009_rolling_windows/daily_top5.csv": "078ae4865d46f9ec78a7f623d647c66bbcf01e28535abeb0d88932e4068e49bd",
+    "docs/stock_automl_runs/20261009_rolling_windows/summary.csv": "7c36f553d092ce0522ebe762955b303de165d6e37f109007760305ba00c34921",
+    "docs/stock_automl_runs/20261009_rolling_windows/manifest.json": "2ded30ff42c7202e312efd8c8c1a6c7d18993cbbd38e96be0641546b392d6451",
+    "docs/stock_automl_runs/20261009_close9_target/exact_1440_to_close9_candidates.csv.gz": "99263a8722907209d1cc45ffd6e3e73a1386fc36050f67e5d55f78b0c3e8942a",
+    "docs/stock_automl_runs/20261009_tenbar_matrix/tenbar_price_extrema.csv.gz": "502d38a7e88ffa48e5663dc9727cdc105dfb32c8bd8b5e49b24a5fb0ab796ff9"
+  }
+}

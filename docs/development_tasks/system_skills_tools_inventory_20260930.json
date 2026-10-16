@@ -1,0 +1,1372 @@
+{
+  "date": "2026-09-30",
+  "commit": "93f8815d34359f2cc6493efc47284dcc7e14afb0",
+  "scope": "current workspace built-in system assets; no user-created tools or DB skill candidates",
+  "counts": {
+    "business_skills": 18,
+    "internal_skills": 8,
+    "retired_legacy_skills": 2,
+    "active_static_tools": 28,
+    "inactive_static_tools": 25,
+    "subjects": 7,
+    "views": 37,
+    "method_entries": 55
+  },
+  "business_skills": [
+    {
+      "id": "market-overview",
+      "name": "市场环境分析",
+      "category": "market-and-sector",
+      "description": "分析证券市场或大盘的整体环境，适用于市场复盘、大盘强弱、行情参与度、风格分化和风险偏好等问题。结合指定时点或区间的指数、涨跌宽度、成交及板块表现，解释市场结构、主要分歧和后续观察点。",
+      "evidence": "index.quote、stock.quote、plate.quote；市场宽度工具",
+      "relationship": "可按需结合行业主题、资金分析",
+      "source": "src/skills/finance-business/skills/market-overview/SKILL.md"
+    },
+    {
+      "id": "sector-theme-analysis",
+      "name": "行业、热点板块与概念分析",
+      "category": "market-and-sector",
+      "description": "分析行业、热点板块与概念主题，适用于寻找近期热点、比较板块强弱、判断热度演变与持续性、识别领涨分化及解释公司受益关系等问题。结合热点事件、行情资金、成分表现和业务证据，区分市场关注、交易表现与产业兑现。",
+      "evidence": "hot_event.*、plate.*、industry.*、stock.quote / moneyflow",
+      "relationship": "可将代表公司交给个股研究方法分析",
+      "source": "src/skills/finance-business/skills/sector-theme-analysis/SKILL.md"
+    },
+    {
+      "id": "stock-research",
+      "name": "个股分析",
+      "category": "equity-research",
+      "description": "围绕单只股票开展分析，适用于投资逻辑、经营前景、价格走势、风险判断和持仓复盘等问题。按需结合基本面、技术面、资金面、研报观点、新闻热点、行业板块与宏观环境、同业对比，依据用户关注点和查询结果灵活选择、组合与调整分析方法。",
+      "evidence": "stock.basic_info / financial_3_table / business_segment / pricevalue / report / report_metric；按需行情、资金、公告搜索",
+      "relationship": "综合组织研报、业绩、财务质量、估值、比较、技术、K线、相对强弱、资金、分红等方法",
+      "source": "src/skills/finance-business/skills/stock-research/SKILL.md"
+    },
+    {
+      "id": "equity-report-analysis",
+      "name": "个股研报解读",
+      "category": "equity-research",
+      "description": "从研报中检索、解读和综合与个股相关的机构观点与研究证据。适用于机构看法、预测指标、评级与目标价、看多看空理由，以及研报涉及的行业景气、公司经营、管理层、风险和产业链等问题；支持观点提炼、共识分歧比较和预期变化追踪，可独立使用或为个股分析提供证据。",
+      "evidence": "stock.report、stock.report_metric；按需 general_search",
+      "relationship": "为个股研究、估值与比较提供机构观点和预测证据",
+      "source": "src/skills/finance-business/skills/equity-report-analysis/SKILL.md"
+    },
+    {
+      "id": "earnings-analysis",
+      "name": "业绩与财报变化分析",
+      "category": "equity-research",
+      "description": "解读公司的业绩预告、快报或定期报告，适用于本期业绩如何、增长由什么驱动、利润质量如何及是否超出预期等问题。对齐报告期和比较基准，分析收入利润、利润率、现金流与一次性因素，说明新增变化及其对经营判断的影响。",
+      "evidence": "stock.financial_3_table / performance_notice / business_segment / report_metric",
+      "relationship": "与财务质量、估值、研报方法协作",
+      "source": "src/skills/finance-business/skills/earnings-analysis/SKILL.md"
+    },
+    {
+      "id": "stock-screening",
+      "name": "自然语言选股",
+      "category": "screening-and-factor",
+      "description": "按用户的自然语言条件筛选股票，适用于寻找符合估值、成长、财务、量价、资金或行业主题要求的候选等问题。明确股票范围、时间窗口、必要条件、偏好与排序，利用可用数据执行筛选，解释入选依据和数据缺口。",
+      "evidence": "股票身份/成分范围；stock.pricevalue / financial_3_table / technical / moneyflow 等",
+      "relationship": "按条件选择数据；可结合因子解释，不等于自动启动旧量化工具",
+      "source": "src/skills/finance-business/skills/stock-screening/SKILL.md"
+    },
+    {
+      "id": "factor-analysis",
+      "name": "因子研究与解释",
+      "category": "screening-and-factor",
+      "description": "分析已定义的投资因子，适用于因子含义与计算口径、股票间因子值或排名差异、因子随时间变化和适用局限等问题。围绕样本与窗口检查底层数据和计算结果，解释因子反映的股票特征；有相应测试数据时分析有效性与风险。",
+      "evidence": "stock.technical、stock.technical_series；按需行情窗口、dynamic_cal、行业/规模数据",
+      "relationship": "解释工具算出的因子，可与选股、技术结构组合",
+      "source": "src/skills/finance-business/skills/factor-analysis/SKILL.md"
+    },
+    {
+      "id": "valuation-analysis",
+      "name": "个股估值分析",
+      "category": "equity-research",
+      "description": "评估公司的估值与价格隐含预期，适用于贵不贵、估值是否有基本面支撑、历史位置、同业溢价折价和关键假设敏感性等问题。根据商业模式与盈利阶段选择估值口径，结合增长、回报率和现金流形成有条件的判断。",
+      "evidence": "stock.pricevalue / financial_3_table / business_segment / report_metric",
+      "relationship": "与财务质量、研报、可比公司方法组合",
+      "source": "src/skills/finance-business/skills/valuation-analysis/SKILL.md"
+    },
+    {
+      "id": "financial-quality-analysis",
+      "name": "财务质量分析",
+      "category": "equity-research",
+      "description": "分析公司跨期财务质量，适用于盈利能否持续、利润是否转化为现金、应收存货是否异常、偿债压力和财务风险等问题。交叉核对多个可比报告期的盈利、现金流、营运效率与资产负债，识别趋势、背离和需要进一步验证的风险线索。",
+      "evidence": "stock.financial_3_table、stock.business_segment；按需披露材料",
+      "relationship": "为个股研究、业绩、估值、分红提供质量判断",
+      "source": "src/skills/finance-business/skills/financial-quality-analysis/SKILL.md"
+    },
+    {
+      "id": "stock-comparison",
+      "name": "个股与可比公司比较",
+      "category": "equity-research",
+      "description": "比较两只或多只股票，适用于同业竞争、跨行业或不同成长阶段的投资取舍、寻找可比公司及指定指标对比等问题。围绕共同问题结合业务、财务、估值、市场表现与机构预期，按对象差异调整方法，解释相对优势、代价和结论成立条件。",
+      "evidence": "各股票同口径财务、估值、业务、行情、研报；行业/板块关系",
+      "relationship": "复用各专业方法，形成一个可比结论",
+      "source": "src/skills/finance-business/skills/stock-comparison/SKILL.md"
+    },
+    {
+      "id": "technical-structure-analysis",
+      "name": "技术结构分析",
+      "category": "equity-research",
+      "description": "围绕同周期数值行情和技术指标判断价格、成交与趋势结构，适用于趋势强弱、支撑阻力、波动、突破条件及指标变化。需要直观量价背景时复用基础看图，需要具体形态演变时组合K线分析；数值证据与图像观察分别保留。",
+      "evidence": "stock.quote / technical / technical_series / technical_minute / technical_minute_series / technical_realtime；按需 corporate_action",
+      "relationship": "正文明确可组合 kline-analysis、relative-strength-analysis",
+      "source": "src/skills/finance-business/skills/technical-structure-analysis/SKILL.md"
+    },
+    {
+      "id": "kline-analysis",
+      "name": "个股K线与近期形态解读",
+      "category": "equity-research",
+      "description": "细致解读个股已完成日K及近期形态，适用于看看K线、近期出现过哪些形态、历史信号是否仍值得关注。通过授权看图工具取得独立基础解读、数值扫描和最多3个局部视觉复核，由主Agent综合当前结构、历史含义与后续演变；无典型形态也正常分析走势。",
+      "evidence": "stock_kline_visual_analysis；同源已完成日线、独立VLM和程序事实",
+      "relationship": "综合数值扫描、独立基础看图与局部复核；正式工具按授权与视觉配置执行",
+      "source": "src/skills/finance-business/skills/kline-analysis/SKILL.md"
+    },
+    {
+      "id": "kline-basic-reading",
+      "name": "近期K线基础解读",
+      "category": "equity-research",
+      "description": "独立看图解读个股近期日K的走势、均线与量价背景，适合直接看K线或个股研究中的简要技术面分支；只读取一张同源近期价格与成交量图，不扫描形态，不接收候选或其他模型结论。",
+      "evidence": "stock_kline_visual_analysis；同源已完成日线、独立VLM和程序事实",
+      "relationship": "直接回答基础量价，或供个股/K线研究复用；通过正式视觉工具关闭形态扫描执行",
+      "source": "src/skills/finance-business/skills/kline-basic-reading/SKILL.md"
+    },
+    {
+      "id": "relative-strength-analysis",
+      "name": "个股与基准相对强弱",
+      "category": "equity-research",
+      "description": "比较个股与行业、宽基或风格指数的同期表现，适用于判断跑赢跑输、市场共振、个股独立强弱和技术走势的外部背景。依据用户指定或业务可比的基准对齐区间和收益口径，区分绝对涨跌、相对表现及证据边界，可独立使用或配合K线与个股研究。",
+      "evidence": "stock.quote、index.quote、plate.quote；行业/成分定位、公司行为",
+      "relationship": "与技术/K线/个股研究组合，统一区间和收益口径",
+      "source": "src/skills/finance-business/skills/relative-strength-analysis/SKILL.md"
+    },
+    {
+      "id": "dividend-analysis",
+      "name": "分红质量与可持续性分析",
+      "category": "equity-research",
+      "description": "分析公司的现金分红质量，适用于股息水平、分红是否稳定、高股息是否可靠及未来能否持续等问题。区分预案、已实施和特别分红，结合多期利润、现金流、负债与资本需求，判断分红支撑、主要风险和可持续条件。",
+      "evidence": "stock.corporate_action / financial_3_table / pricevalue / quote",
+      "relationship": "与财务质量、估值方法组合",
+      "source": "src/skills/finance-business/skills/dividend-analysis/SKILL.md"
+    },
+    {
+      "id": "fund-analysis",
+      "name": "基金分析",
+      "category": "fund-research",
+      "description": "分析一只基金或比较多只基金，适用于基金表现、ETF折溢价与交易活跃度、同类产品差异和持有风险等问题。先识别产品与份额类别，结合可用行情、净值和披露材料选择方法；取得持仓、费用或经理信息时进一步分析策略暴露与管理表现。",
+      "evidence": "fund.basic_info、fund.quote；按需公开披露材料",
+      "relationship": "现有目录重点是身份、行情与净值；持仓/经理/费用须另取证",
+      "source": "src/skills/finance-business/skills/fund-analysis/SKILL.md"
+    },
+    {
+      "id": "bond-analysis",
+      "name": "债券分析",
+      "category": "fixed-income",
+      "description": "分析单只或多只债券的市场表现与风险，适用于债券价格变化、交易活跃度、发行人风险和债券比较等问题。结合可用行情与已取得的条款材料，按普通债或可转债选择方法，分析收益口径、利率信用风险及转股赎回条件。",
+      "evidence": "bond.basic_info、bond.quote；按需发行条款及发行人材料",
+      "relationship": "目录并未自动提供完整利率曲线、久期或信用评级计算",
+      "source": "src/skills/finance-business/skills/bond-analysis/SKILL.md"
+    },
+    {
+      "id": "capital-flow-analysis",
+      "name": "资金流与交易结构",
+      "category": "market-and-sector",
+      "description": "分析个股或板块的资金流与交易结构，适用于资金持续流入流出、资金与价格背离、板块资金集中以及两融变化等问题。结合分单资金、成交、行情及按需的融资融券和股东披露，区分短期交易信号、杠杆变化与持有人结构，解释证据及风险。",
+      "evidence": "stock.moneyflow、plate.moneyflow、stock.margin / shareholder / quote",
+      "relationship": "与技术、K线、行业及个股研究组合，区分流量/存量/持有人",
+      "source": "src/skills/finance-business/skills/capital-flow-analysis/SKILL.md"
+    }
+  ],
+  "internal_skills": [
+    {
+      "id": "financial-tool-requirement",
+      "name": "需求理解与澄清",
+      "description": "把用户目标形成可确认需求",
+      "source": "src/skills/financial-tool-development/skills/financial-tool-requirement/SKILL.md"
+    },
+    {
+      "id": "financial-tool-design",
+      "name": "工具设计",
+      "description": "形成实现流程、模块、输入输出和数据使用方式",
+      "source": "src/skills/financial-tool-development/skills/financial-tool-design/SKILL.md"
+    },
+    {
+      "id": "financial-tool-flowchart",
+      "name": "流程图表达",
+      "description": "基于已有设计绘图",
+      "source": "src/skills/financial-tool-development/skills/financial-tool-flowchart/SKILL.md"
+    },
+    {
+      "id": "financial-tool-implementation",
+      "name": "代码实现",
+      "description": "实现设计并运行技术测试",
+      "source": "src/skills/financial-tool-development/skills/financial-tool-implementation/SKILL.md"
+    },
+    {
+      "id": "financial-tool-test-execution",
+      "name": "业务测试执行",
+      "description": "组织真实或指定样本与执行证据",
+      "source": "src/skills/financial-tool-development/skills/financial-tool-test-execution/SKILL.md"
+    },
+    {
+      "id": "financial-tool-edit-planning",
+      "name": "修改规划",
+      "description": "判断局部修改范围与修订方案",
+      "source": "src/skills/financial-tool-development/skills/financial-tool-edit-planning/SKILL.md"
+    },
+    {
+      "id": "financial-tool-edit-implementation",
+      "name": "局部代码修改",
+      "description": "依据修改计划实现并验证",
+      "source": "src/skills/financial-tool-development/skills/financial-tool-edit-implementation/SKILL.md"
+    },
+    {
+      "id": "skill-authoring",
+      "name": "Skill 编写与修订",
+      "description": "从已注册能力生成待审核 Skill 候选",
+      "source": "src/skills/skill-system/skills/skill-authoring/SKILL.md"
+    }
+  ],
+  "static_tools": [
+    {
+      "id": "equity_research_search",
+      "name": "个股研报查询",
+      "description": "查询指定个股的专业的研究报告，提供机构对个股的看多看空以及依据、目标价、预测分析、风险提示、个股所在行业的经营分析等内容",
+      "status": "disabled",
+      "availability": {
+        "lifecycle": "retired",
+        "retrieval_mode": "direct_only",
+        "visibility": "hidden"
+      },
+      "auth": "public",
+      "implementation": "src.tools.stock_reports_tool:run",
+      "source": "src/tools/definitions/equity_research_search.tool.json"
+    },
+    {
+      "id": "stock_funds",
+      "name": "个股资金查询",
+      "description": "输入证券代码或公司名称，获取个股资金流向、主力净额、行业资金和资金相关新闻，用于资金面和情绪面分析。",
+      "status": "disabled",
+      "availability": {
+        "lifecycle": "retired",
+        "retrieval_mode": "direct_only",
+        "visibility": "hidden"
+      },
+      "auth": "public",
+      "implementation": "src.tools.stock_funds_tool:run",
+      "source": "src/tools/definitions/stock_funds.tool.json"
+    },
+    {
+      "id": "stock_realtime_funds_flow",
+      "name": "个股实时资金流向",
+      "description": "输入个股名称或代码，查询当前资金流入流出，按特大单、大单、中单、小单四档返回。适合做单只股票的实时资金确认。",
+      "status": "disabled",
+      "availability": {
+        "lifecycle": "retired",
+        "retrieval_mode": "direct_only",
+        "visibility": "hidden"
+      },
+      "auth": "public",
+      "implementation": "src.tools.stock_funds_split_tools:run_realtime_funds_flow",
+      "source": "src/tools/definitions/stock_realtime_funds_flow.tool.json"
+    },
+    {
+      "id": "stock_history_funds_flow",
+      "name": "个股资金历史",
+      "description": "查询指定个股的最近N天的日资金流向历史。适合看近期主力净流入变化。",
+      "status": "disabled",
+      "availability": {
+        "lifecycle": "retired",
+        "retrieval_mode": "direct_only",
+        "visibility": "hidden"
+      },
+      "auth": "public",
+      "implementation": "src.tools.stock_funds_split_tools:run_history_funds_flow",
+      "source": "src/tools/definitions/stock_history_funds_flow.tool.json"
+    },
+    {
+      "id": "stock_industry_funds_flow",
+      "name": "行业资金对比",
+      "description": "输入个股名称或代码，查询该个股所属行业资金流情况，以及行业内主力净流入和净流出靠前的公司。\n主要是看资金面，分大单小单（主力/散户）的流入流出量和对比",
+      "status": "disabled",
+      "availability": {
+        "lifecycle": "retired",
+        "retrieval_mode": "direct_only",
+        "visibility": "hidden"
+      },
+      "auth": "public",
+      "implementation": "src.tools.stock_funds_split_tools:run_industry_funds_flow",
+      "source": "src/tools/definitions/stock_industry_funds_flow.tool.json"
+    },
+    {
+      "id": "capital_flow_query",
+      "name": "资金流向查询",
+      "description": "查询个股、板块、行业、概念、指数或市场的资金流向序列，返回主力、散户和分档净流入数据。",
+      "status": "retired",
+      "availability": {
+        "lifecycle": "retired",
+        "retrieval_mode": "direct_only",
+        "visibility": "hidden"
+      },
+      "auth": "public",
+      "implementation": "src.tools.capital_flow_query_tool:run",
+      "source": "src/tools/definitions/capital_flow_query.tool.json"
+    },
+    {
+      "id": "stock_capital_flow_query",
+      "name": "个股资金流向",
+      "description": "获取单只股票在指定 start/end 交易日范围内的日级资金流向序列。",
+      "status": "active",
+      "availability": {
+        "lifecycle": "active",
+        "retrieval_mode": "retrievable",
+        "visibility": "visible"
+      },
+      "auth": "public",
+      "implementation": "src.tools.stock_capital_flow_query_tool:run",
+      "source": "src/tools/definitions/stock_capital_flow_query.tool.json"
+    },
+    {
+      "id": "plate_capital_flow_query",
+      "name": "板块资金流向",
+      "description": "查询板块、行业或概念的资金流向序列。",
+      "status": "retired",
+      "availability": {
+        "lifecycle": "retired",
+        "retrieval_mode": "direct_only",
+        "visibility": "hidden"
+      },
+      "auth": "public",
+      "implementation": "src.tools.plate_capital_flow_query_tool:run",
+      "source": "src/tools/definitions/plate_capital_flow_query.tool.json"
+    },
+    {
+      "id": "stock_quote",
+      "name": "个股行情查询",
+      "description": "查询个股行情和 K 线。",
+      "status": "deprecated",
+      "availability": {
+        "lifecycle": "retired",
+        "retrieval_mode": "direct_only",
+        "visibility": "hidden"
+      },
+      "auth": "public",
+      "implementation": "src.tools.stock_quote_tool:run",
+      "source": "src/tools/definitions/stock_quote.tool.json"
+    },
+    {
+      "id": "stock_realtime_quote",
+      "name": "个股实时行情",
+      "description": "查询单只股票的实时行情快照。",
+      "status": "active",
+      "availability": {
+        "lifecycle": "active",
+        "retrieval_mode": "retrievable",
+        "visibility": "visible"
+      },
+      "auth": "public",
+      "implementation": "src.tools.stock_realtime_quote_tool:run",
+      "source": "src/tools/definitions/stock_realtime_quote.tool.json"
+    },
+    {
+      "id": "stock_history_kline",
+      "name": "个股历史日K",
+      "description": "查询指定个股最近N天的历史日K，结果中包括当天最新一根日K（如果未收盘则为盘中实时K线）。",
+      "status": "deprecated",
+      "availability": {
+        "lifecycle": "retired",
+        "retrieval_mode": "direct_only",
+        "visibility": "hidden"
+      },
+      "auth": "public",
+      "implementation": "src.tools.stock_quote_tool:run_history_kline",
+      "source": "src/tools/definitions/stock_history_kline.tool.json"
+    },
+    {
+      "id": "stock_intraday_kline",
+      "name": "个股日内分钟K线",
+      "description": "查询个股日内分钟 K 线。",
+      "status": "deprecated",
+      "availability": {
+        "lifecycle": "retired",
+        "retrieval_mode": "direct_only",
+        "visibility": "hidden"
+      },
+      "auth": "public",
+      "implementation": "src.tools.stock_quote_tool:run_intraday_kline",
+      "source": "src/tools/definitions/stock_intraday_kline.tool.json"
+    },
+    {
+      "id": "stock_daily_kline_query",
+      "name": "个股日K查询",
+      "description": "获取单只股票在指定 start/end 交易日范围内的日级 K 线行情序列。",
+      "status": "active",
+      "availability": {
+        "lifecycle": "active",
+        "retrieval_mode": "retrievable",
+        "visibility": "visible"
+      },
+      "auth": "public",
+      "implementation": "src.tools.stock_daily_kline_query_tool:run",
+      "source": "src/tools/definitions/stock_daily_kline_query.tool.json"
+    },
+    {
+      "id": "stock_intraday_kline_query",
+      "name": "个股分钟线查询",
+      "description": "获取单只股票最近可用交易日的日内分钟行情序列。",
+      "status": "active",
+      "availability": {
+        "lifecycle": "active",
+        "retrieval_mode": "retrievable",
+        "visibility": "visible"
+      },
+      "auth": "public",
+      "implementation": "src.tools.stock_intraday_kline_query_tool:run",
+      "source": "src/tools/definitions/stock_intraday_kline_query.tool.json"
+    },
+    {
+      "id": "stock_valuation_query",
+      "name": "个股估值查询",
+      "description": "获取单只 A 股在指定 start/end 交易日范围内的日级估值和市值序列。",
+      "status": "active",
+      "availability": {
+        "lifecycle": "active",
+        "retrieval_mode": "retrievable",
+        "visibility": "visible"
+      },
+      "auth": "public",
+      "implementation": "src.tools.stock_valuation_query_tool:run",
+      "source": "src/tools/definitions/stock_valuation_query.tool.json"
+    },
+    {
+      "id": "stock_fundamental_snapshot",
+      "name": "个股基础资料查询",
+      "description": "获取单只 A 股的基础资料和公司资料快照。",
+      "status": "active",
+      "availability": {
+        "lifecycle": "active",
+        "retrieval_mode": "retrievable",
+        "visibility": "visible"
+      },
+      "auth": "public",
+      "implementation": "src.tools.stock_fundamental_snapshot_tool:run",
+      "source": "src/tools/definitions/stock_fundamental_snapshot.tool.json"
+    },
+    {
+      "id": "stock_financial_statement_query",
+      "name": "个股财务三表查询",
+      "description": "查询单只股票的核心财务三表数据。输入 stock 表示股票代码、简称或公司名称。可选择资产负债表、利润表、现金流量表或一次返回三表。该工具只返回结构化报表字段，不返回估值、行情或公司简介。",
+      "status": "active",
+      "availability": {
+        "lifecycle": "active",
+        "retrieval_mode": "retrievable",
+        "visibility": "visible"
+      },
+      "auth": "public",
+      "implementation": "src.tools.stock_financial_statement_query_tool:run",
+      "source": "src/tools/definitions/stock_financial_statement_query.tool.json"
+    },
+    {
+      "id": "fund_daily_market_query",
+      "name": "基金日行情查询",
+      "description": "获取单只基金或 ETF 在指定 start/end 交易日范围内的日级行情序列。",
+      "status": "active",
+      "availability": {
+        "lifecycle": "active",
+        "retrieval_mode": "retrievable",
+        "visibility": "visible"
+      },
+      "auth": "public",
+      "implementation": "src.tools.fund_daily_market_query_tool:run",
+      "source": "src/tools/definitions/fund_daily_market_query.tool.json"
+    },
+    {
+      "id": "fund_profile_query",
+      "name": "基金基础资料查询",
+      "description": "查询单只基金或 ETF 的基础资料和最新交易属性快照。",
+      "status": "active",
+      "availability": {
+        "lifecycle": "active",
+        "retrieval_mode": "retrievable",
+        "visibility": "visible"
+      },
+      "auth": "public",
+      "implementation": "src.tools.fund_profile_query_tool:run",
+      "source": "src/tools/definitions/fund_profile_query.tool.json"
+    },
+    {
+      "id": "index_daily_market_query",
+      "name": "指数日行情查询",
+      "description": "获取单只指数在指定 start/end 交易日范围内的日级行情和估值序列。",
+      "status": "active",
+      "availability": {
+        "lifecycle": "active",
+        "retrieval_mode": "retrievable",
+        "visibility": "visible"
+      },
+      "auth": "public",
+      "implementation": "src.tools.index_daily_market_query_tool:run",
+      "source": "src/tools/definitions/index_daily_market_query.tool.json"
+    },
+    {
+      "id": "stock_announcement_query",
+      "name": "股票公告查询",
+      "description": "查询单只股票的交易所公告和披露记录。输入 stock 表示股票代码、简称或公司名称。可按公告日期范围和关键词过滤，默认返回最近公告。该工具只返回公告元数据和可选截断正文，不做事件判断或投资结论。",
+      "status": "active",
+      "availability": {
+        "lifecycle": "active",
+        "retrieval_mode": "retrievable",
+        "visibility": "visible"
+      },
+      "auth": "public",
+      "implementation": "src.tools.stock_announcement_query_tool:run",
+      "source": "src/tools/definitions/stock_announcement_query.tool.json"
+    },
+    {
+      "id": "finance_data_query",
+      "name": "金融数据协议查询",
+      "description": "金融数据查询顶层工具。执行 subject/dataview/function 协议请求串，内部由金融数据 catalog、validator 和 provider 处理。",
+      "status": "active",
+      "availability": {
+        "lifecycle": "active",
+        "retrieval_mode": "retrievable",
+        "visibility": "visible"
+      },
+      "auth": "public",
+      "implementation": "src.tools.finance_data_query_tool:run",
+      "source": "src/tools/definitions/finance_data_query.tool.json"
+    },
+    {
+      "id": "stock_minute_signals",
+      "name": "分钟技术信号检查",
+      "description": "逐根检查当日完整分钟K，返回均线穿越、连续站稳、session MACD交叉和量能扩张事件及当前条件。普通调用按需回放；用于已有定时任务时按任务归属保存首次发现、修订与事件证据，不发送通知，不调用模型或上游行情API。",
+      "status": "active",
+      "availability": {
+        "lifecycle": "active",
+        "retrieval_mode": "retrievable",
+        "visibility": "visible"
+      },
+      "auth": "public",
+      "implementation": "src.tools.stock_minute_signals_tool:run",
+      "source": "src/tools/definitions/stock_minute_signals.tool.json"
+    },
+    {
+      "id": "stock_protocol_data_query",
+      "name": "个股协议化数据查询",
+      "description": "按 stock subject/domain/data_view/op 协议查询个股基础数据。当前用于旁路验证，不进入 planner 默认候选。",
+      "status": "active",
+      "availability": {
+        "lifecycle": "active",
+        "retrieval_mode": "direct_only",
+        "visibility": "hidden"
+      },
+      "auth": "public",
+      "implementation": "src.tools.stock_protocol_data_query_tool:run",
+      "source": "src/tools/definitions/stock_protocol_data_query.tool.json"
+    },
+    {
+      "id": "security_universe_query",
+      "name": "股票集合过滤聚合",
+      "description": "对股票集合执行过滤、聚合和排序查询。",
+      "status": "disabled",
+      "availability": {
+        "lifecycle": "disabled",
+        "retrieval_mode": "direct_only",
+        "visibility": "hidden"
+      },
+      "auth": "public",
+      "implementation": "src.tools.security_universe_query_tool:run",
+      "source": "src/tools/definitions/security_universe_query.tool.json"
+    },
+    {
+      "id": "financial_news_search",
+      "name": "金融新闻查询",
+      "description": "兼容查询公司、行业、板块、主题或事件相关新闻；新查询统一使用 general_search。",
+      "status": "active",
+      "availability": {
+        "lifecycle": "active",
+        "retrieval_mode": "retrievable",
+        "visibility": "visible"
+      },
+      "auth": "public",
+      "implementation": "src.tools.company_news_tool:run",
+      "source": "src/tools/definitions/financial_news_search.tool.json"
+    },
+    {
+      "id": "general_search",
+      "name": "资料搜索",
+      "description": "查询公开资料与新闻。个股可传 stock_code 读取按时间倒序的新浪资讯标题目录；结合问题选择链接后传 urls 读取去噪 Markdown 正文。其他问题通过配置的搜索服务查询。",
+      "status": "active",
+      "availability": {
+        "lifecycle": "active",
+        "retrieval_mode": "retrievable",
+        "visibility": "visible"
+      },
+      "auth": "public",
+      "implementation": "src.tools.general_search_tool:run",
+      "source": "src/tools/definitions/general_search.tool.json"
+    },
+    {
+      "id": "market_realtime_breadth",
+      "name": "大盘实时涨跌情况",
+      "description": "查询市场实时上涨、下跌、平盘、涨停和跌停家数。",
+      "status": "active",
+      "availability": {
+        "lifecycle": "active",
+        "retrieval_mode": "retrievable",
+        "visibility": "visible"
+      },
+      "auth": "public",
+      "implementation": "src.tools.market_snapshot_tools:run_market_realtime_breadth",
+      "source": "src/tools/definitions/market_realtime_breadth.tool.json"
+    },
+    {
+      "id": "market_history_amount",
+      "name": "市场整体资金",
+      "description": "查询指定市场最近多个交易日的总成交额序列。",
+      "status": "disabled",
+      "availability": {
+        "lifecycle": "disabled",
+        "retrieval_mode": "direct_only",
+        "visibility": "hidden"
+      },
+      "auth": "public",
+      "implementation": "src.tools.market_snapshot_tools:run_market_history_amount",
+      "source": "src/tools/definitions/market_history_amount.tool.json"
+    },
+    {
+      "id": "market_minute_amount_series",
+      "name": "市场分钟成交额序列",
+      "description": "查询市场当前分钟与历史同分钟累计成交额序列。",
+      "status": "disabled",
+      "availability": {
+        "lifecycle": "disabled",
+        "retrieval_mode": "direct_only",
+        "visibility": "hidden"
+      },
+      "auth": "public",
+      "implementation": "src.tools.market_snapshot_tools:run_market_minute_amount_series",
+      "source": "src/tools/definitions/market_minute_amount_series.tool.json"
+    },
+    {
+      "id": "get_hot_industries_and_leaders",
+      "name": "热门行业与行业龙头",
+      "description": "获取当前市场的热门行业及对应龙头股列表\n行业是最稳定的市场个股分类维度，一般有标准的申万行业体系、证监会行业体系等",
+      "status": "retired",
+      "availability": {
+        "lifecycle": "retired",
+        "retrieval_mode": "direct_only",
+        "visibility": "hidden"
+      },
+      "auth": "public",
+      "implementation": "src.tools.mock_market_taxonomy_tools:get_hot_industries_and_leaders",
+      "source": "src/tools/definitions/get_hot_industries_and_leaders.tool.json"
+    },
+    {
+      "id": "get_hot_sectors_and_leaders",
+      "name": "热门板块与板块龙头",
+      "description": "获取当前热门板块及对应龙头股列表，用于板块热点观察和板块龙头识别。\n热门板块是介于相对稳定的行业分类和相对实时动态的热点概念分类中间的分类体系，相对灵活",
+      "status": "retired",
+      "availability": {
+        "lifecycle": "retired",
+        "retrieval_mode": "direct_only",
+        "visibility": "hidden"
+      },
+      "auth": "public",
+      "implementation": "src.tools.mock_market_taxonomy_tools:get_hot_sectors_and_leaders",
+      "source": "src/tools/definitions/get_hot_sectors_and_leaders.tool.json"
+    },
+    {
+      "id": "get_hot_concepts_and_leaders",
+      "name": "热点概念与概念龙头",
+      "description": "获取当前市场的热点概念及对应龙头股列表。\n热点概念是最热最新的一种时效性的、动态的分类",
+      "status": "retired",
+      "availability": {
+        "lifecycle": "retired",
+        "retrieval_mode": "direct_only",
+        "visibility": "hidden"
+      },
+      "auth": "public",
+      "implementation": "src.tools.mock_market_taxonomy_tools:get_hot_concepts_and_leaders",
+      "source": "src/tools/definitions/get_hot_concepts_and_leaders.tool.json"
+    },
+    {
+      "id": "plate_rank_query",
+      "name": "热门板块排名",
+      "description": "查询热门板块的行情、成交额和主力资金排名。可用 plate 按板块代码或名称过滤，也可以不传 plate 直接取全市场排名。sort_by 支持涨跌幅、成交额和主力净流入。include_members 可附带每个板块内的代表个股，但该工具不替代板块成分股明细查询。",
+      "status": "active",
+      "availability": {
+        "lifecycle": "active",
+        "retrieval_mode": "retrievable",
+        "visibility": "visible"
+      },
+      "auth": "public",
+      "implementation": "src.tools.plate_rank_query_tool:run",
+      "source": "src/tools/definitions/plate_rank_query.tool.json"
+    },
+    {
+      "id": "plate_member_query",
+      "name": "板块成分查询",
+      "description": "查询板块成分股或单只股票所属板块关系。",
+      "status": "disabled",
+      "availability": {
+        "lifecycle": "disabled",
+        "retrieval_mode": "direct_only",
+        "visibility": "hidden"
+      },
+      "auth": "public",
+      "implementation": "src.tools.plate_member_query_tool:run",
+      "source": "src/tools/definitions/plate_member_query.tool.json"
+    },
+    {
+      "id": "plate_members_query",
+      "name": "板块成分股查询",
+      "description": "获取指定板块的成分股列表。",
+      "status": "active",
+      "availability": {
+        "lifecycle": "active",
+        "retrieval_mode": "retrievable",
+        "visibility": "visible"
+      },
+      "auth": "public",
+      "implementation": "src.tools.plate_members_query_tool:run",
+      "source": "src/tools/definitions/plate_members_query.tool.json"
+    },
+    {
+      "id": "stock_plate_membership_query",
+      "name": "个股所属板块查询",
+      "description": "获取指定股票所属的板块关系列表。",
+      "status": "active",
+      "availability": {
+        "lifecycle": "active",
+        "retrieval_mode": "retrievable",
+        "visibility": "visible"
+      },
+      "auth": "public",
+      "implementation": "src.tools.stock_plate_membership_query_tool:run",
+      "source": "src/tools/definitions/stock_plate_membership_query.tool.json"
+    },
+    {
+      "id": "theme_leaders",
+      "name": "主题龙头查询",
+      "description": "查询指定主题、概念或板块的龙头股候选列表。",
+      "status": "disabled",
+      "availability": {
+        "lifecycle": "disabled",
+        "retrieval_mode": "direct_only",
+        "visibility": "hidden"
+      },
+      "auth": "public",
+      "implementation": "src.tools.theme_leaders_tool:run",
+      "source": "src/tools/definitions/theme_leaders.tool.json"
+    },
+    {
+      "id": "get_company_taxonomy_profile",
+      "name": "股票板块归属查询",
+      "description": "获取单只股票所属的板块归属画像。",
+      "status": "active",
+      "availability": {
+        "lifecycle": "active",
+        "retrieval_mode": "retrievable",
+        "visibility": "visible"
+      },
+      "auth": "public",
+      "implementation": "src.tools.company_taxonomy_profile_tool:run",
+      "source": "src/tools/definitions/get_company_taxonomy_profile.tool.json"
+    },
+    {
+      "id": "大盘情绪指标",
+      "name": "大盘情绪指标",
+      "description": "基于全市场历史K线计算大盘情绪轮动比，当前只输出 bpwl_brwl_ratio，并附带固定说明文本。",
+      "status": "disabled",
+      "availability": {
+        "lifecycle": "disabled",
+        "retrieval_mode": "direct_only",
+        "visibility": "hidden"
+      },
+      "auth": "public",
+      "implementation": "src.tools.market_sentiment_indicator_tool:run",
+      "source": "src/tools/definitions/大盘情绪指标.tool.json"
+    },
+    {
+      "id": "大盘整体情况",
+      "name": "大盘整体情况",
+      "description": "查询市场整体状态。",
+      "status": "deprecated",
+      "availability": {
+        "lifecycle": "retired",
+        "retrieval_mode": "direct_only",
+        "visibility": "hidden"
+      },
+      "auth": "public",
+      "implementation": "src.tools.market_overview_tool:run",
+      "source": "src/tools/definitions/大盘整体情况.tool.json"
+    },
+    {
+      "id": "indicator_series_query",
+      "name": "指标序列查询",
+      "description": "获取已计算好的指标时间序列。当前支持 close_ma_5、close_ma_10、close_ma_20。",
+      "status": "active",
+      "availability": {
+        "lifecycle": "active",
+        "retrieval_mode": "retrievable",
+        "visibility": "visible"
+      },
+      "auth": "public",
+      "implementation": "src.tools.indicator_series_tool:run",
+      "source": "src/tools/definitions/indicator_series_query.tool.json"
+    },
+    {
+      "id": "个股动量排名",
+      "name": "个股动量排名",
+      "description": "查询个股动量排名。",
+      "status": "disabled",
+      "availability": {
+        "lifecycle": "disabled",
+        "retrieval_mode": "direct_only",
+        "visibility": "hidden"
+      },
+      "auth": "public",
+      "implementation": "src.tools.stock_momentum_ranking_tool:run_unified",
+      "source": "src/tools/definitions/个股动量排名.tool.json"
+    },
+    {
+      "id": "实时个股动量排名",
+      "name": "实时个股动量排名",
+      "description": "查询实时个股动量排名。",
+      "status": "disabled",
+      "availability": {
+        "lifecycle": "disabled",
+        "retrieval_mode": "direct_only",
+        "visibility": "hidden"
+      },
+      "auth": "public",
+      "implementation": "src.tools.stock_momentum_ranking_tool:run",
+      "source": "src/tools/definitions/实时个股动量排名.tool.json"
+    },
+    {
+      "id": "实时行情排名查询",
+      "name": "实时行情排名",
+      "description": "获取市场内股票的实时行情 TopK 排名。",
+      "status": "active",
+      "availability": {
+        "lifecycle": "active",
+        "retrieval_mode": "retrievable",
+        "visibility": "visible"
+      },
+      "auth": "public",
+      "implementation": "src.tools.realtime_market_ranking_tool:run",
+      "source": "src/tools/definitions/实时行情排名查询.tool.json"
+    },
+    {
+      "id": "涨跌停列表查询",
+      "name": "涨跌停列表查询",
+      "description": "查询指定市场的涨停股或跌停股列表。",
+      "status": "active",
+      "availability": {
+        "lifecycle": "active",
+        "retrieval_mode": "retrievable",
+        "visibility": "visible"
+      },
+      "auth": "public",
+      "implementation": "src.tools.limit_board_list_tool:run",
+      "source": "src/tools/definitions/涨跌停列表查询.tool.json"
+    },
+    {
+      "id": "file_read_excel",
+      "name": "Excel 文件读取",
+      "description": "读取 Excel xlsx 表格文件并返回结构化行列数据。",
+      "status": "retired",
+      "availability": {
+        "lifecycle": "retired",
+        "retrieval_mode": "direct_only",
+        "visibility": "hidden"
+      },
+      "auth": "public",
+      "implementation": "src.tools.file_intake_tools:run_excel",
+      "source": "src/tools/definitions/file_read_excel.tool.json"
+    },
+    {
+      "id": "file_read_csv",
+      "name": "CSV/TSV 文件读取",
+      "description": "读取 CSV 或 TSV 表格文件并返回结构化行列数据。",
+      "status": "retired",
+      "availability": {
+        "lifecycle": "retired",
+        "retrieval_mode": "direct_only",
+        "visibility": "hidden"
+      },
+      "auth": "public",
+      "implementation": "src.tools.file_intake_tools:run_csv",
+      "source": "src/tools/definitions/file_read_csv.tool.json"
+    },
+    {
+      "id": "file_read_word",
+      "name": "Word 文件读取",
+      "description": "读取 Word docx 文档并返回标题、段落和预览文本。",
+      "status": "retired",
+      "availability": {
+        "lifecycle": "retired",
+        "retrieval_mode": "direct_only",
+        "visibility": "hidden"
+      },
+      "auth": "public",
+      "implementation": "src.tools.file_intake_tools:run_word",
+      "source": "src/tools/definitions/file_read_word.tool.json"
+    },
+    {
+      "id": "file_io",
+      "name": "文件读写",
+      "description": "统一文件读写工具。读取时按文件后缀或 MIME 规则路由 CSV、Excel、Word、文本等解析器；写入时生成 runtime artifact，不直接覆盖本地文件。",
+      "status": "active",
+      "availability": {
+        "lifecycle": "active",
+        "retrieval_mode": "retrievable",
+        "visibility": "visible"
+      },
+      "auth": "public",
+      "implementation": "src.tools.file_io_tool:run",
+      "source": "src/tools/definitions/file_io.tool.json"
+    },
+    {
+      "id": "quant_data_provider",
+      "name": "量化选股数据 Provider",
+      "description": "按股票池和数据需求准备量化选股数据 artifact。",
+      "status": "active",
+      "availability": {
+        "lifecycle": "active",
+        "retrieval_mode": "retrievable"
+      },
+      "auth": "internal",
+      "implementation": "src.tools.quant_data_provider_tool:run",
+      "source": "src/tools/definitions/quant_data_provider.tool.json"
+    },
+    {
+      "id": "quant_factor_screening",
+      "name": "自然语言量化与消息面选股",
+      "description": "执行量化因子筛选并返回候选股、因子表和审计信息。",
+      "status": "active",
+      "availability": {
+        "lifecycle": "active",
+        "retrieval_mode": "retrievable"
+      },
+      "auth": "internal",
+      "implementation": "src.tools.quant_factor_screening_tool:run",
+      "source": "src/tools/definitions/quant_factor_screening.tool.json"
+    },
+    {
+      "id": "stock_kline_visual_analysis",
+      "name": "K线独立看图与形态复核",
+      "description": "取得同源已完成日线并绘图，独立视觉模型读取K线、均线和成交量；可选数值形态扫描、语义筛选与最多3个局部视觉复核。返回计算事实、图像解读和证据，不另写最终研究报告。",
+      "status": "active",
+      "availability": {
+        "lifecycle": "active",
+        "retrieval_mode": "retrievable",
+        "visibility": "visible"
+      },
+      "auth": "public",
+      "implementation": "src.tools.stock_kline_visual_analysis_tool:run",
+      "source": "src/tools/definitions/stock_kline_visual_analysis.tool.json"
+    }
+  ],
+  "data_views": [
+    {
+      "id": "stock.basic_info",
+      "subject": "stock",
+      "subject_name": "股票",
+      "name": "基础信息",
+      "description": "股票代码、名称、行业与上市日期。",
+      "methods": [
+        "stock.basic_info.query"
+      ]
+    },
+    {
+      "id": "stock.quote",
+      "subject": "stock",
+      "subject_name": "股票",
+      "name": "行情",
+      "description": "股票历史日 K、分钟 K 与实时行情快照。",
+      "methods": [
+        "stock.quote.query",
+        "stock.quote.kd_<field>_<method>",
+        "stock.quote.agg",
+        "stock.quote.dynamic_cal"
+      ]
+    },
+    {
+      "id": "stock.moneyflow",
+      "subject": "stock",
+      "subject_name": "股票",
+      "name": "资金流",
+      "description": "股票资金流入、流出与净流入，按主力、散户及单笔规模分类。",
+      "methods": [
+        "stock.moneyflow.query",
+        "stock.moneyflow.kd_<field>_<method>"
+      ]
+    },
+    {
+      "id": "stock.pricevalue",
+      "subject": "stock",
+      "subject_name": "股票",
+      "name": "估值",
+      "description": "股票市值及 PE、PB、PS 等估值指标，支持历史估值百分位。",
+      "methods": [
+        "stock.pricevalue.query",
+        "stock.pricevalue.kd_<field>_percentile"
+      ]
+    },
+    {
+      "id": "stock.financial_3_table",
+      "subject": "stock",
+      "subject_name": "股票",
+      "name": "财务三表与财务指标",
+      "description": "公司实际披露的财务三表与财务指标，按公司、报告期返回收入利润、资产负债、现金流、费用、每股收益及比率。",
+      "methods": [
+        "stock.financial_3_table.query"
+      ]
+    },
+    {
+      "id": "stock.report",
+      "subject": "stock",
+      "subject_name": "股票",
+      "name": "研报明细",
+      "description": "逐篇机构研报的评级与变动、目标价、核心观点、风险和来源；核心观点提供增长催化、业绩驱动、竞争格局与市场份额、竞争优势及战略展望的分析依据。",
+      "methods": [
+        "stock.report.query",
+        "stock.report.agg"
+      ]
+    },
+    {
+      "id": "stock.report_metric",
+      "subject": "stock",
+      "subject_name": "股票",
+      "name": "研报预测指标",
+      "description": "研报标准年度指标事实，按公司、机构、年份和值类型查询 EPS、归母净利润及增速、营业收入及增速、PE、PB、ROE。",
+      "methods": [
+        "stock.report_metric.query",
+        "stock.report_metric.agg"
+      ]
+    },
+    {
+      "id": "stock.margin",
+      "subject": "stock",
+      "subject_name": "股票",
+      "name": "融资融券",
+      "description": "股票融资融券余额、买入、偿还、净买入、融券余量及融资余额占流通市值比例。",
+      "methods": [
+        "stock.margin.query",
+        "stock.margin.kd_<field>_<method>"
+      ]
+    },
+    {
+      "id": "stock.shareholder",
+      "subject": "stock",
+      "subject_name": "股票",
+      "name": "股东",
+      "description": "公司股东户数、前十大股东、第一大股东与前十大流通股东。",
+      "methods": [
+        "stock.shareholder.query"
+      ]
+    },
+    {
+      "id": "stock.pledge",
+      "subject": "stock",
+      "subject_name": "股票",
+      "name": "股权质押",
+      "description": "公司股权质押比例、质押解押明细及股东累计质押冻结汇总。",
+      "methods": [
+        "stock.pledge.query"
+      ]
+    },
+    {
+      "id": "stock.corporate_action",
+      "subject": "stock",
+      "subject_name": "股票",
+      "name": "股本事件",
+      "description": "公司分红送转、增发、配股、限售解禁与 IPO 事项。",
+      "methods": [
+        "stock.corporate_action.query"
+      ]
+    },
+    {
+      "id": "stock.performance_notice",
+      "subject": "stock",
+      "subject_name": "股票",
+      "name": "业绩预告",
+      "description": "公司披露的业绩预告类型、变动原因及净利润、收入预测区间。",
+      "methods": [
+        "stock.performance_notice.query"
+      ]
+    },
+    {
+      "id": "stock.business_segment",
+      "subject": "stock",
+      "subject_name": "股票",
+      "name": "业务分部与客户供应商",
+      "description": "公司各报告期的业务、产品、地区分部及前五大客户供应商，覆盖收入、成本、利润、毛利率、收入占比与增速。",
+      "methods": [
+        "stock.business_segment.query"
+      ]
+    },
+    {
+      "id": "stock.technical",
+      "subject": "stock",
+      "subject_name": "股票",
+      "name": "日线技术指标",
+      "description": "标准日线技术指标，读取公共盘后计算结果，用于趋势、量能、突破和波动筛选。",
+      "methods": [
+        "stock.technical.query",
+        "stock.technical.kd_<field>_<method>",
+        "stock.technical.agg"
+      ]
+    },
+    {
+      "id": "stock.technical_minute",
+      "subject": "stock",
+      "subject_name": "股票",
+      "name": "分钟技术指标",
+      "description": "基于已采集分钟K按需计算的趋势、量能与当日指标，支持当前周期试算并返回数据时点。",
+      "methods": [
+        "stock.technical_minute.query"
+      ]
+    },
+    {
+      "id": "stock.technical_realtime",
+      "subject": "stock",
+      "subject_name": "股票",
+      "name": "实时快照指标",
+      "description": "最新行情的日内走势、跳空、振幅、回撤与区间位置，按需读取现有实时行情源。",
+      "methods": [
+        "stock.technical_realtime.query"
+      ]
+    },
+    {
+      "id": "stock.technical_minute_series",
+      "subject": "stock",
+      "subject_name": "股票",
+      "name": "分钟技术指标序列",
+      "description": "返回当日完整K线逐根指标，保留区间内发生后消失的变化；缺口不填充。",
+      "methods": [
+        "stock.technical_minute_series.query"
+      ]
+    },
+    {
+      "id": "stock.technical_series",
+      "subject": "stock",
+      "subject_name": "股票",
+      "name": "日线技术指标序列",
+      "description": "对指定个股按需计算已完成日线及27项指标序列，用于分析近期趋势、指标变化和因子比较。无需已有盘后发布批次。",
+      "methods": [
+        "stock.technical_series.query"
+      ]
+    },
+    {
+      "id": "stock.kline_patterns",
+      "subject": "stock",
+      "subject_name": "股票",
+      "name": "K线数值形态扫描",
+      "description": "对指定个股近期已完成日K运行形态定义库，返回命中、程度和后续演变；无命中仍返回扫描范围与背景事实。仅数值扫描，未做视觉确认。",
+      "methods": [
+        "stock.kline_patterns.query"
+      ]
+    },
+    {
+      "id": "index.basic_info",
+      "subject": "index",
+      "subject_name": "指数",
+      "name": "基础信息",
+      "description": "指数代码、名称、类型与简介。",
+      "methods": [
+        "index.basic_info.query"
+      ]
+    },
+    {
+      "id": "index.quote",
+      "subject": "index",
+      "subject_name": "指数",
+      "name": "行情",
+      "description": "指数日行情与 K 日窗口指标。",
+      "methods": [
+        "index.quote.query",
+        "index.quote.kd_<field>_<method>"
+      ]
+    },
+    {
+      "id": "index.pricevalue",
+      "subject": "index",
+      "subject_name": "指数",
+      "name": "估值",
+      "description": "指数市值及 PE、PB、PS 等估值指标。",
+      "methods": [
+        "index.pricevalue.query"
+      ]
+    },
+    {
+      "id": "index.constitution",
+      "subject": "index",
+      "subject_name": "指数",
+      "name": "成分股",
+      "description": "指数与成分股的对应关系及权重，支持按指数统计成分股指标。",
+      "methods": [
+        "index.constitution.query",
+        "index.constitution.agg"
+      ]
+    },
+    {
+      "id": "industry.basic_info",
+      "subject": "industry",
+      "subject_name": "行业",
+      "name": "基础信息",
+      "description": "行业代码、名称、级别与层级关系。",
+      "methods": [
+        "industry.basic_info.query"
+      ]
+    },
+    {
+      "id": "industry.constitution",
+      "subject": "industry",
+      "subject_name": "行业",
+      "name": "成分股",
+      "description": "行业与成分股的对应关系，支持按行业统计成分股指标。",
+      "methods": [
+        "industry.constitution.query",
+        "industry.constitution.agg"
+      ]
+    },
+    {
+      "id": "plate.basic_info",
+      "subject": "plate",
+      "subject_name": "板块",
+      "name": "基础信息",
+      "description": "板块代码、名称、类型与简介。",
+      "methods": [
+        "plate.basic_info.query"
+      ]
+    },
+    {
+      "id": "plate.quote",
+      "subject": "plate",
+      "subject_name": "板块",
+      "name": "行情",
+      "description": "板块日行情与 K 日窗口指标。",
+      "methods": [
+        "plate.quote.query",
+        "plate.quote.kd_<field>_<method>"
+      ]
+    },
+    {
+      "id": "plate.moneyflow",
+      "subject": "plate",
+      "subject_name": "板块",
+      "name": "资金流",
+      "description": "板块资金流入、流出、净流入及 K 日窗口指标。",
+      "methods": [
+        "plate.moneyflow.query",
+        "plate.moneyflow.kd_<field>_<method>"
+      ]
+    },
+    {
+      "id": "plate.pricevalue",
+      "subject": "plate",
+      "subject_name": "板块",
+      "name": "估值",
+      "description": "板块市值及 PE、PB 等估值指标。",
+      "methods": [
+        "plate.pricevalue.query"
+      ]
+    },
+    {
+      "id": "plate.constitution",
+      "subject": "plate",
+      "subject_name": "板块",
+      "name": "成分股",
+      "description": "板块与成分股的对应关系，支持按板块统计成分股指标。",
+      "methods": [
+        "plate.constitution.query",
+        "plate.constitution.agg"
+      ]
+    },
+    {
+      "id": "fund.basic_info",
+      "subject": "fund",
+      "subject_name": "基金",
+      "name": "基础信息",
+      "description": "基金代码、简称与全称。",
+      "methods": [
+        "fund.basic_info.query"
+      ]
+    },
+    {
+      "id": "fund.quote",
+      "subject": "fund",
+      "subject_name": "基金",
+      "name": "行情",
+      "description": "基金日行情、净值与 K 日窗口指标。",
+      "methods": [
+        "fund.quote.query",
+        "fund.quote.kd_<field>_<method>"
+      ]
+    },
+    {
+      "id": "bond.basic_info",
+      "subject": "bond",
+      "subject_name": "债券",
+      "name": "基础信息",
+      "description": "债券代码、简称与发行主体。",
+      "methods": [
+        "bond.basic_info.query"
+      ]
+    },
+    {
+      "id": "bond.quote",
+      "subject": "bond",
+      "subject_name": "债券",
+      "name": "行情",
+      "description": "债券日行情与 K 日窗口指标。",
+      "methods": [
+        "bond.quote.query",
+        "bond.quote.kd_<field>_<method>"
+      ]
+    },
+    {
+      "id": "hot_event.base_info",
+      "subject": "hot_event",
+      "subject_name": "市场热点",
+      "name": "热点信息",
+      "description": "市场热点的触发时间、激活次数、沉寂天数、核心事件与关联公司数量。",
+      "methods": [
+        "hot_event.base_info.query"
+      ]
+    },
+    {
+      "id": "hot_event.state",
+      "subject": "hot_event",
+      "subject_name": "市场热点",
+      "name": "热度走势",
+      "description": "市场热点的热度、变化、趋势方向与市场强弱对比。",
+      "methods": [
+        "hot_event.state.query"
+      ]
+    },
+    {
+      "id": "hot_event.member",
+      "subject": "hot_event",
+      "subject_name": "市场热点",
+      "name": "关联股票",
+      "description": "热点与关联股票的对应关系，支持从股票反查热点。",
+      "methods": [
+        "hot_event.member.query"
+      ]
+    }
+  ],
+  "source_hashes": {
+    "src/skills/finance-business/catalog.json": "a360a6f32c35ef9315d614b686ed600334b3cc157f91e8db8ddd8cf1d2ae424e",
+    "src/tools/registry.py": "3862eed55d36bbe95d66a231d9dfb73a7722e8fe79de5e7fa38fa353e615f3ca",
+    "src/tools/finance_data/catalog/api_view_catalog.json": "5905f3dbd13c38490a5dd19668d4c79412bf72984be529e74b549a8f0b93e5f1",
+    "src/scenarios/financial_qa/dsh_mcp_server.py": "7849adb964cdc62952c4b3b31a09fe1c93125738c2d15f2030e01c45cc146e1d",
+    "src/finance_api/app.py": "de21289f2fb4ff80f80ff4d7b20934aad9e3cd476064734b446b97926851a689",
+    "src/tools/definitions/stock_kline_visual_analysis.tool.json": "cf27c8f2ecc126eabea237e6f13def0bd67f34702a3dafd42cc0d977da16a871",
+    "src/tools/stock_kline_visual_analysis_tool.py": "255941bc4b2c1f5bfaa3092db58162ff2698b28e38f2c5faa0346c36eac83058",
+    "src/services/stock_kline_visual.py": "136cfe947443ed772a395fa82dfdd13a49b62432a3378f9d77ffc9732f322484",
+    "src/agents/investment_analyst/agent.json": "8e36eca0f40c452c64c310a37627dffb9e4d87e80a0764fe48cc74cdd3972e89"
+  }
+}

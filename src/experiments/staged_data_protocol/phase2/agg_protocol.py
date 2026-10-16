@@ -37,6 +37,30 @@ def metric_column(metric: str) -> str:
     return text
 
 
+def median_query(filtered_sql: str, *, group_fields: list[str], alias: str) -> str:
+    """Median over provider-owned rows projected as __metric_value.
+
+    Identifiers and the source query are supplied by providers, never raw model
+    SQL. Ranking only non-null values handles odd/even groups identically.
+    """
+    groups = ", ".join(f"`{field}`" for field in group_fields)
+    partition = f"PARTITION BY {groups}" if groups else ""
+    return f"""
+        SELECT {groups + ', ' if groups else ''}AVG(__metric_value) AS `{alias}`
+        FROM (
+            SELECT filtered.*,
+                ROW_NUMBER() OVER ({partition} ORDER BY __metric_value) AS __median_row,
+                COUNT(*) OVER ({partition}) AS __median_count
+            FROM ({filtered_sql}) filtered
+            WHERE __metric_value IS NOT NULL
+        ) ranked
+        WHERE __median_row IN (
+            FLOOR((__median_count + 1) / 2), FLOOR((__median_count + 2) / 2)
+        )
+        {'GROUP BY ' + groups if groups else ''}
+    """
+
+
 def output_alias(outputs: list[str], *, default: str, exclude: set[str] | None = None) -> str:
     excluded = exclude or set()
     for output in outputs:
