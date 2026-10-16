@@ -36,9 +36,9 @@
   <div class="controls"><label for="strategy-filter">策略</label><select id="strategy-filter"><option value="">全部策略</option></select><label for="owner-filter" id="owner-label" class="hidden">用户</label><select id="owner-filter" class="hidden"></select><button id="refresh" class="refresh" type="button">刷新数据</button></div>
   <div id="error" class="error hidden" role="alert"></div>
   <div class="metrics"><div class="metric"><strong id="metric-days">—</strong><span>交易日</span></div><div class="metric"><strong id="metric-picks">—</strong><span>选股记录</span></div><div class="metric done"><strong id="metric-done">—</strong><span>已回填价格</span></div><div class="metric pending"><strong id="metric-pending">—</strong><span>可执行且待卖出／回填</span></div></div>
-  <section class="market-section" aria-label="今日股票分钟行情"><div class="section-head"><div class="market-heading"><span class="live-dot"></span><h2>今日选股 · 分钟行情</h2></div><p id="market-update">读取中 · 每 10 秒刷新</p></div><div id="market-list" class="market-list" aria-live="polite"><div class="market-empty">正在读取今日选股与分钟 K 线…</div></div></section>
+  <section class="market-section" aria-label="今日股票分钟行情"><div class="section-head"><div class="market-heading"><span class="live-dot"></span><h2>今日选股 / 买入 · 分钟行情</h2></div><p id="market-update">读取中 · 每 10 秒刷新</p></div><div id="market-list" class="market-list" aria-live="polite"><div class="market-empty">正在读取今日选股与分钟 K 线…</div></div></section>
   <section aria-label="每日选股"><div class="section-head"><h2>每日记录</h2><p id="range">按信号日期排列</p></div><div id="days" aria-live="polite"></div></section>
-  <p class="notice">买卖价若标为“行情代理”，表示该时点的市场观察价，不代表券商真实成交；涨跌只在策略任务已回填卖价后显示。轮空或观察位不计作交易。未回填不会被填成 0%。</p>
+  <p class="notice">买卖价若标为“行情代理”或“模拟行情”，表示该时点的市场观察价，不代表券商真实成交；涨跌只在策略任务已回填卖价后显示。轮空或观察位不计作交易。未回填不会被填成 0%。</p>
 </main>
 <script>
 (() => {
@@ -53,7 +53,7 @@
   const node = (tag, className, text) => { const item=document.createElement(tag); if(className)item.className=className; if(text!==undefined)item.textContent=String(text); return item; };
   const price = value => value == null ? "—" : Number(value).toFixed(2);
   const shortTime = value => value ? String(value).replace("T", " ").slice(11,16) : "—";
-  const basis = (value, side) => !value ? `${side}价` : /proxy/i.test(value) ? `${side}价 · 行情代理` : /broker|fill/i.test(value) ? `${side}价 · 成交回报` : `${side}价 · ${value}`;
+  const basis = (value, side) => !value ? `${side}价` : /proxy/i.test(value) ? `${side}价 · 行情代理` : /simulation/i.test(value) ? `${side}价 · 模拟行情` : /broker|fill/i.test(value) ? `${side}价 · 成交回报` : `${side}价 · ${value}`;
   const fmtDate = value => { const [y,m,d] = value.split("-"); return `${m}月${d}日`; };
   const signed = value => value == null ? "—" : `${Number(value)>0?"+":""}${Number(value).toFixed(2)}%`;
   const priceClass = value => value == null ? "flat" : Number(value)>0 ? "up" : Number(value)<0 ? "down" : "flat";
@@ -84,7 +84,7 @@
   function renderMarket(payload) {
     const container=$("market-list");container.replaceChildren();
     $("market-update").textContent=`${payload.trade_date} · ${payload.requested_minutes} 根应完成分钟 · 每 10 秒刷新`;
-    if(!payload.stocks.length){container.append(node("div","market-empty","今天暂无选股记录。历史选股仍可在下方查看。"));return;}
+    if(!payload.stocks.length){container.append(node("div","market-empty","今天尚无选股或确认买入。历史记录仍可在下方查看。"));return;}
     for(const stock of payload.stocks){
       const card=node("article","market-card"), top=node("div","market-top"), identity=node("div"), name=node("div","market-name");
       name.append(node("span","",stock.name),node("span","market-code",stock.code));
@@ -180,7 +180,7 @@
     }
   }
   async function load() {
-    const owner = $("owner-filter").value;
+    const owner = $("owner-filter").value || new URLSearchParams(location.search).get("user_id") || "";
     $("refresh").disabled = true; $("error").classList.add("hidden");
     try {
       const url = new URL(api, location.origin); if(owner)url.searchParams.set("user_id",owner);
@@ -200,6 +200,7 @@
         for(const id of data.owners){const option=node("option","",id);option.value=id;$("owner-filter").append(option);}
         if(!data.owners.includes(current)){const option=node("option","",current);option.value=current;$("owner-filter").append(option);}
         $("owner-filter").value=current;
+        const viewUrl=new URL(location.href);viewUrl.searchParams.set("user_id",current);history.replaceState(null,"",viewUrl);
       }
       render();
       void loadMarket();

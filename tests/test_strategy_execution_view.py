@@ -3,6 +3,7 @@ from datetime import date, datetime
 from decimal import Decimal
 from zoneinfo import ZoneInfo
 
+import pytest
 from flask import Flask
 
 from src.services import strategy_execution_view_service as view_module
@@ -64,7 +65,8 @@ def test_completed_minute_count_respects_lunch_and_market_close():
         assert view_module.completed_session_minutes(now) == expected
 
 
-def test_today_market_only_reads_todays_selected_codes_and_bars(monkeypatch):
+@pytest.mark.parametrize("table", ["automl_strategy_selection", "strategy_execution"])
+def test_today_market_only_reads_todays_selected_codes_and_bars(monkeypatch, table):
     @contextmanager
     def connection(_name):
         yield object()
@@ -73,8 +75,8 @@ def test_today_market_only_reads_todays_selected_codes_and_bars(monkeypatch):
     def query(_conn, sql, args=()):
         calls.append((sql, args))
         if "information_schema.tables" in sql:
-            return [{"table_name": "automl_strategy_selection"}]
-        if "FROM automl_strategy_selection" in sql:
+            return [{"table_name": table}]
+        if f"FROM {table}" in sql:
             return [{"stock_code": "002636", "stock_name": "金安国纪"}]
         if "FROM aiia_stock_realtime_minute_snapshot" in sql:
             return [{"stk_code": "002636", "bar_end_time": datetime(2026, 10, 15, 9, 31),
@@ -94,9 +96,14 @@ def test_today_market_only_reads_todays_selected_codes_and_bars(monkeypatch):
     assert result["stocks"][0]["bars"][0]["time"] == "09:31"
     assert result["stocks"][0]["quote"]["close"] == 70.5
     assert all(args[0] == "alice" for sql, args in calls
-               if "FROM automl_strategy_selection" in sql)
+               if f"FROM {table}" in sql)
     assert any("trade_date=%s" in sql and "bar_end_time<=%s" in sql
                for sql, _ in calls)
+
+    if table == "strategy_execution":
+        pick_sql, pick_args = next((s,a) for s,a in calls if "FROM strategy_execution" in s)
+        assert "buy_at>=%s AND buy_at<%s" in pick_sql
+        assert pick_args == ("alice", "2026-10-15", "2026-10-15", "2026-10-16")
 
 
 def test_legacy_selection_stays_pending_without_db_outcome(monkeypatch):

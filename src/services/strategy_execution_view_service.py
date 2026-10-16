@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 from contextlib import contextmanager
-from datetime import date, datetime, time
+from datetime import date, datetime, time, timedelta
 from decimal import Decimal
 import os
 import json
@@ -87,8 +87,14 @@ class StrategyExecutionViewService:
                           ("automl_strategy_execution", "automl_strategy_selection")):
                 if table not in tables:
                     continue
+                where = "signal_date=%s"
+                params = (owner_user_id, today)
+                if table == "strategy_execution":
+                    where = "(signal_date=%s OR (buy_at>=%s AND buy_at<%s))"
+                    params = (owner_user_id, today, today,
+                              (current.date() + timedelta(days=1)).isoformat())
                 for row in query(conn, f"""SELECT DISTINCT stock_code,stock_name FROM {table}
-                    WHERE user_id=%s AND signal_date=%s""", (owner_user_id, today)):
+                    WHERE user_id=%s AND {where}""", params):
                     code = str(row["stock_code"]).strip()
                     if re.fullmatch(r"[0-9]{6}", code):
                         picks.setdefault(code, str(row["stock_name"]).strip())
