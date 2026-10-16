@@ -154,12 +154,21 @@ function options(){
  if(JSON.stringify([...$('strategy-filter').options].map(o=>[o.value,o.textContent]))!==JSON.stringify(opts.map(s=>[s.strategy_id,s.name]))){$('strategy-filter').replaceChildren(...opts.map(s=>{const o=el('option','',s.name);o.value=s.strategy_id;return o;}));$('strategy-filter').value=opts.some(o=>o.strategy_id===selected)?selected:'';}
  if(records.owners.length){$('owner-filter').classList.remove('hidden');$('owner-label').classList.remove('hidden');const owners=[...new Set([...records.owners,records.owner_user_id])];$('owner-filter').replaceChildren(...owners.map(v=>{const o=el('option','',v);o.value=v;return o;}));$('owner-filter').value=records.owner_user_id;owner=records.owner_user_id;const url=new URL(location.href);url.searchParams.set('user_id',owner);history.replaceState(null,'',url);}
 }
+function refreshHistoricalCache(picks){
+ // Execution records can gain stocks after a historical backfill. Keep only
+ // cached responses that still cover the selected stocks and have chart data.
+ const required=new Map();
+ for(const p of picks){if(!required.has(p.signal_date))required.set(p.signal_date,new Set());required.get(p.signal_date).add(p.stock_code);}
+ const incomplete=(data,codes)=>{const stocks=new Map((data.stocks||[]).map(s=>[s.code,s]));return data.error||[...codes].some(code=>{const s=stocks.get(code);return !s||!s.daily_bars?.length||(data.requested_minutes>0&&!s.bars?.length);});};
+ for(const [day,data]of historicalMarkets){const codes=required.get(day);if(!codes||incomplete(data,codes))historicalMarkets.delete(day);}
+ for(const [key,data]of minuteMarkets){const code=key.split(':').at(-1);if(incomplete(data,[code]))minuteMarkets.delete(key);}
+}
 async function refresh(force=false){
  if(document.hidden&&!force)return;if(request&&!force)return;if(request)request.abort();const active=new AbortController();request=active;
  $('refresh-state').textContent='正在刷新…';
  const params=owner?`?user_id=${encodeURIComponent(owner)}`:'';
  async function get(path){const r=await fetch(`${base}${path}${params}`,{credentials:'same-origin',cache:'no-store',signal:active.signal});const data=await r.json();if(!r.ok||!data.ok)throw new Error(data.error||`HTTP ${r.status}`);return data;}
- try{const [r,m]=await Promise.all([get('/api/strategies/executions'),get('/api/strategies/market')]);if(request!==active)return;records=r;market=m;options();render();await Promise.all([...visibleMinuteViews.values()].filter(v=>v.day===market.trade_date).map(v=>ensureMinuteMarket(v.pick,v.offset,true)));if(request!==active)return;$('error').classList.add('hidden');$('refresh-state').textContent='每 10 秒自动刷新';}
+ try{const [r,m]=await Promise.all([get('/api/strategies/executions'),get('/api/strategies/market')]);if(request!==active)return;refreshHistoricalCache(r.picks);records=r;market=m;options();render();await Promise.all([...visibleMinuteViews.values()].filter(v=>v.day===market.trade_date).map(v=>ensureMinuteMarket(v.pick,v.offset,true)));if(request!==active)return;$('error').classList.add('hidden');$('refresh-state').textContent='每 10 秒自动刷新';}
  catch(e){if(request!==active||e.name==='AbortError')return;$('error').textContent=`更新失败，保留上次画面：${e.message}`;$('error').classList.remove('hidden');$('refresh-state').textContent='更新失败 · 10 秒后重试';}
  finally{if(request===active)request=null;}
 }
