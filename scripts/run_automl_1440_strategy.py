@@ -613,6 +613,28 @@ def backfill_execution(env_file: Path, user_id: str, strategy_id: str,
             raise
 
 
+def settle_execution(env_file: Path, user_id: str, as_of_date: str, *, write_db: bool) -> dict:
+    """Run the morning price backfill without loading or training a model."""
+    with write_connection(env_file) as db:
+        try:
+            with db.cursor() as cursor:
+                settled = settle_previous(cursor, user_id=user_id,
+                    strategy_id=STRATEGY_ID, as_of_date=as_of_date)
+                cursor.execute("""SELECT signal_date,stock_code FROM strategy_execution
+                    WHERE user_id=%s AND strategy_name='收盘开盘' AND model_version='v1.0'
+                      AND actionable=1 AND buy_price IS NOT NULL AND sell_price IS NULL
+                      AND signal_date<%s ORDER BY signal_date,selection_rank""", (user_id, as_of_date))
+                pending = cursor.fetchall()
+            if write_db:
+                db.commit()
+            else:
+                db.rollback()
+            return dict(settled_previous=settled, pending=pending, saved_to_kingdomai=write_db)
+        except Exception:
+            db.rollback()
+            raise
+
+
 def save_selection(env_file: Path, user_id: str, day: str, picks: list[dict],
                    meta: dict, candidate_count: int, source: str,
                    captured_at: str | None, *, strategy_id: str = STRATEGY_ID,
@@ -797,7 +819,7 @@ def extract_tar(archive_tar: Path, needed: list[str], output: Path) -> Path:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("mode", choices=("init-db", "backfill-execution", "prepare", "run"),
+    parser.add_argument("mode", choices=("init-db", "backfill-execution", "settle", "prepare", "run"),
                         nargs="?", default="run")
     parser.add_argument("--date", default=datetime.now(SHANGHAI).date().isoformat())
     parser.add_argument("--user-id", default=getpass.getuser())
@@ -814,6 +836,10 @@ def main() -> int:
     if args.mode == "init-db":
         init_db(args.env_file)
         print("kingdomai策略表和选股结果表已准备")
+        return 0
+    if args.mode == "settle":
+        result = settle_execution(args.env_file, args.user_id, day, write_db=args.write_db)
+        print(json.dumps(result, ensure_ascii=False, indent=2, default=str))
         return 0
     if args.mode == "backfill-execution":
         if not args.write_db:

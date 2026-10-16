@@ -3,8 +3,8 @@ set -euo pipefail
 
 release_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 mode=${1:-}
-if [[ "$mode" != prepare && "$mode" != run ]]; then
-  echo "usage: $0 prepare|run [strategy arguments]" >&2
+if [[ "$mode" != prepare && "$mode" != run && "$mode" != settle ]]; then
+  echo "usage: $0 prepare|run|settle [strategy arguments]" >&2
   exit 2
 fi
 shift

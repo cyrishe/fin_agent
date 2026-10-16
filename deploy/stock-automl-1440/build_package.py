@@ -40,6 +40,7 @@ def main() -> None:
     OUTPUT.mkdir(parents=True, exist_ok=True)
     files = script_closure() + [
         ROOT / "deploy/sql/automl_1440_strategy.sql",
+        ROOT / "deploy/sql/strategy_execution.sql",
         HERE / "requirements-linux-py312.txt",
         HERE / "automl1440.sh",
         HERE / "install_runtime.sh",

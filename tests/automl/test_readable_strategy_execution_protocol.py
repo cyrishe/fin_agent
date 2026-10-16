@@ -103,7 +103,8 @@ def test_readable_close_open_settlement_retains_next_trade_day_rule():
     assert settle_previous(c,user_id='imac',strategy_id=CLOSE_OPEN_ID,as_of_date='2026-10-18') == []
     assert not any(sql.lstrip().startswith('UPDATE') for sql,_ in c.calls)
     c = Prices()
-    result = settle_previous(c,user_id='imac',strategy_id=CLOSE_OPEN_ID,as_of_date='2026-10-19')
+    result = settle_previous(c,user_id='imac',strategy_id=CLOSE_OPEN_ID,as_of_date='2026-10-19',
+        price_loader=lambda *args: Decimal('10.25'))
     assert result[0]['gross_return_pct'] == '2.500'
     update = next(args for sql,args in c.calls if sql.lstrip().startswith('UPDATE'))
     assert update[5:7] == ('收盘开盘','v1.0')
@@ -158,3 +159,71 @@ def test_b2_scan_updates_readable_trade_and_preserves_confirmation(monkeypatch):
     import json
     saved=json.loads(args[4])
     assert saved['choice_confirmed_at']=='09:35:00' and saved['exit_rule']==b.EXIT_RULE
+
+
+def test_close_open_records_buy_at_signal_and_keeps_skipped_pick_empty(monkeypatch):
+    from scripts import readable_strategy_execution as m
+    saved=[]
+    monkeypatch.setattr(m,'record_selection',lambda c,**kw:saved.append(kw))
+    m.record_decisions(None,user_id='imac',strategy_id=m.CLOSE_OPEN_ID,strategy_name='收盘开盘',
+        signal_date='2026-10-16',signal_at='2026-10-16 14:40:07',model_sha256='model',environment={},
+        picks=[dict(selection_rank=1,symbol6='002636',name='金安国纪',signal_price=70.81),
+               dict(selection_rank=2,symbol6='603216',name='梦天家居',signal_price=25.98,actionable=False)])
+    assert saved[0]['buy_at']=='2026-10-16 14:40:07' and saved[0]['buy_price']==70.81
+    assert saved[0]['actionable'] is True
+    assert saved[1]['buy_at'] is None and saved[1]['buy_price'] is None
+
+
+def test_0940_api_uses_exact_date_and_minute_and_rejects_later_quote(monkeypatch):
+    from scripts import readable_strategy_execution as m
+    from datetime import datetime
+    from zoneinfo import ZoneInfo
+    class Days(Cursor):
+        def fetchone(self): return {'days':0}
+    rows=[{'sttDateTime':{'iDate':20261016,'shtTime':580},'fClose':10.25},
+          {'sttDateTime':{'iDate':20261016,'shtTime':581},'fClose':99},
+          {'sttDateTime':{'iDate':20261015,'shtTime':580},'fClose':88}]
+    calls=[]
+    class Response:
+        def raise_for_status(self): pass
+        def json(self): return {'stRsp':{'vAnalyData':rows}}
+    def post(url,**kwargs): calls.append(kwargs);return Response()
+    monkeypatch.setattr(m.requests,'post',post)
+    now=datetime(2026,10,16,9,40,5,tzinfo=ZoneInfo('Asia/Shanghai'))
+    assert m.api_0940_close(Days(),'2026-10-16','002636',now=now)==Decimal('10.25')
+    assert calls[0]['json']['stReq']['eLineType']==1
+    assert calls[0]['json']['stReq']['shtWantNum']==11
+    rows.pop(0)
+    assert m.api_0940_close(Days(),'2026-10-16','002636',now=now) is None
+    calls.clear()
+    assert m.api_0940_close(Days(),'2026-10-16','002636',now=now.replace(minute=39)) is None
+    assert not calls
+
+
+def test_missing_exact_sell_bar_stays_pending_and_repeat_is_noop():
+    from scripts.readable_strategy_execution import settle_previous, CLOSE_OPEN_ID
+    class Pending(Cursor):
+        rowcount=1
+        def fetchall(self):
+            return [dict(signal_date='2026-10-15',selection_rank=1,stock_code='002636',
+                         buy_price=Decimal('10'),exit_date='2026-10-16')]
+    c=Pending()
+    assert settle_previous(c,user_id='imac',strategy_id=CLOSE_OPEN_ID,as_of_date='2026-10-16',price_loader=lambda *a:None)==[]
+    assert not any(sql.lstrip().startswith('UPDATE') for sql,args in c.calls)
+    assert 'sell_price IS NULL' in c.calls[0][0] and 'e.actionable=1' in c.calls[0][0]
+
+
+def test_0940_api_retries_history_with_trade_day_count(monkeypatch):
+    from scripts import readable_strategy_execution as m
+    from datetime import datetime
+    from zoneinfo import ZoneInfo
+    class Days(Cursor):
+        def fetchone(self): return {'days':1}
+    calls=[]
+    class Response:
+        def raise_for_status(self): pass
+        def json(self): return {'stRsp':{'vAnalyData':[{'sttDateTime':{'iDate':20261016,'shtTime':580},'fClose':'10.25'}]}}
+    def post(url,**kw): calls.append(kw);return Response()
+    monkeypatch.setattr(m.requests,'post',post)
+    assert m.api_0940_close(Days(),'2026-10-16','002636',now=datetime(2026,10,19,9,40,5,tzinfo=ZoneInfo('Asia/Shanghai')))==Decimal('10.25')
+    assert calls[0]['json']['stReq']['shtWantNum']==251
