@@ -316,7 +316,11 @@ def fit_days(args,plan):
                       input_sha256=input_sha,model_sha256=sha(dest/'model.joblib'),training_sha256=sha(dest/'training.csv.gz'),sklearn=sklearn.__version__)
             save_json(stamp,meta);folds.append(meta);result.append(picked)
             print('fit',day,len(train),picked.symbol6.tolist(),flush=True)
-    pd.concat(result,ignore_index=True).to_csv(out/'picks.csv',index=False,float_format='%.17g');save_json(out/'folds.json',folds)
+    combined=pd.concat(result,ignore_index=True)
+    # Empty no-pick folds otherwise coerce this boolean column to float.
+    combined['actionable']=combined.actionable.astype(bool)
+    combined['amount_gate']=combined.amount_gate.astype('boolean')
+    combined.to_csv(out/'picks.csv',index=False,float_format='%.17g');save_json(out/'folds.json',folds)
 
 
 def refresh_api_exits(args):
@@ -360,7 +364,7 @@ def write_results(args):
             try:
                 with db.cursor() as cur:
                     key=dict(user_id=args.user_id,strategy_name='收盘开盘',model_version=args.version,version_desc=VERSION_DESC,signal_date=day)
-                    record_daily_run(cur,**key,signal_at=day+' 14:40:00',candidate_count=fold['candidate_count'],selection_count=len(rows),model_sha256=fold['model_sha256'],environment={'sklearn':'1.7.1','run':'B1_20261016_history_rebuild','input_sha256':fold['input_sha256'],'training_sha256':fold['training_sha256'],'simulation_only':True})
+                    record_daily_run(cur,**key,signal_at=day+' 14:40:00',candidate_count=fold['candidate_count'],selection_count=len(rows),model_sha256=fold['model_sha256'],environment={'sklearn':'1.7.1','run':'B1_20261016_history_rebuild','input_sha256':fold['input_sha256'],'training_sha256':fold['training_sha256'],'consistency_audit_sha256':sha(out/'audit/report.json') if (out/'audit/report.json').exists() else None,'acceptance_sha256':sha(out/'acceptance.json') if (out/'acceptance.json').exists() else None,'simulation_only':True})
                     for p in rows.to_dict('records'):
                         actionable=bool(p['actionable']);buy=price(p['signal_price']) if actionable else None
                         record_selection(cur,**key,selection_rank=int(p['selection_rank']),stock_code=p['symbol6'],stock_name=p['name'],actionable=actionable,
