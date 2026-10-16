@@ -144,11 +144,11 @@ function options(){
 }
 async function getData(path,params={}){const q=new URLSearchParams(params);if(owner)q.set('user_id',owner);const r=await fetch(`${base}${path}?${q}`,{credentials:'same-origin',cache:'no-store'});const data=await r.json();if(!r.ok||!data.ok)throw new Error(data.error||`HTTP ${r.status}`);return data;}
 function mergeRecords(previous,next){if(!previous)return next;const picks=new Map(previous.picks.map(p=>[rowKey(p),p]));for(const p of next.picks)picks.set(rowKey(p),p);return {...previous,...next,owners:next.owners.length?next.owners:previous.owners,trade_dates:[...new Set([...previous.trade_dates,...next.trade_dates])].sort().reverse(),picks:[...picks.values()]};}
-async function loadPage(reset=false){
+async function loadPage(reset=false,forceHistory=false){
  if(loadingPage&&!reset)return;if(!reset&&!nextBefore)return;
  const epoch=reset?++pageEpoch:pageEpoch;loadingPage=true;$('load-more').disabled=true;$('load-more').textContent='正在整批读取 20 个交易日…';
  if(reset){historyEpoch++;historicalMarkets.clear();minuteMarkets.clear();minuteRequests.clear();minuteOffsets.clear();rowNodes.clear();chartObserver.disconnect();records=null;market=null;needLiveDaily=true;$('stock-list').replaceChildren(el('div','empty','正在读取选股和历史图表…'));}
- try{const data=await getData('/api/strategies/page',!reset&&nextBefore?{before:nextBefore}:{});if(epoch!==pageEpoch)return;
+ try{const data=await getData('/api/strategies/page',{...(!reset&&nextBefore?{before:nextBefore}:{}),...(forceHistory?{refresh:'1'}:{})});if(epoch!==pageEpoch)return;
  records=mergeRecords(records,data.records);nextBefore=data.next_before;for(const [day,value]of Object.entries(data.markets))historicalMarkets.set(day,value);
  if(!market)market={trade_date:data.trade_date,as_of:'',stocks:[]};const todayHistory=historicalMarkets.get(market.trade_date);if(todayHistory&&!market.stocks.length)market={...todayHistory,as_of:''};
  options();render();$('error').classList.add('hidden');if(reset)await refresh(true);
@@ -173,8 +173,8 @@ $('close-history').addEventListener('click',()=>$('selection-history').close());
 $('selection-history').addEventListener('close',()=>historyFocus?.isConnected&&historyFocus.focus());
 $('owner-filter').addEventListener('change',()=>{owner=$('owner-filter').value;$('selection-history').close();loadPage(true);});
 $('load-more').addEventListener('click',()=>loadPage(!records));
-const pageObserver=new IntersectionObserver(entries=>{if(entries.some(e=>e.isIntersecting)&&records&&nextBefore&&!loadingPage)loadPage();},{rootMargin:'300px'});pageObserver.observe($('load-footer'));
-$('refresh').addEventListener('click',()=>loadPage(true));setInterval(()=>refresh(),10000);
+const pageObserver=new IntersectionObserver(entries=>{if(entries.some(e=>e.isIntersecting)&&records&&nextBefore&&!loadingPage)loadPage();},{rootMargin:'4800px'});pageObserver.observe($('load-footer'));
+$('refresh').addEventListener('click',()=>loadPage(true,true));setInterval(()=>refresh(),10000);
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)refresh(true);});loadPage(true);
 })();
 </script></body></html>

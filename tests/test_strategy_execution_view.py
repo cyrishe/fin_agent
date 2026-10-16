@@ -415,7 +415,7 @@ def test_page_route_cursor_and_owner_are_validated():
     assert not service.calls
     response=client.get('/api/strategies/page?user_id=imac&before=2026-09-11')
     assert response.status_code==200
-    assert service.calls[-1]==dict(owner_user_id='alice',include_owners=False,before='2026-09-11')
+    assert service.calls[-1]==dict(owner_user_id='alice',include_owners=False,before='2026-09-11',refresh_history=False)
     assert client.get('/api/strategies/live?user_id=imac').status_code==200
     assert service.calls[-1]==dict(owner_user_id='alice',include_daily=False)
     assert client.get('/api/strategies/live?daily=1').status_code==200
@@ -453,3 +453,19 @@ def test_batch_history_queries_each_data_type_once_and_keeps_dates_separate(monk
     assert data['2026-10-16']['stocks'][0]['daily_bars'][-1]['date']=='2026-10-15'
     assert data['2026-10-16']['stocks'][0]['bars']==[]
     assert data['2026-10-14']['minute_dates']==['2026-10-12','2026-10-13','2026-10-14','2026-10-15','2026-10-16']
+
+
+def test_history_batch_cache_reuses_data_but_new_selection_gets_a_fresh_batch(monkeypatch):
+    view_module._cached_history_batch.cache_clear()
+    calls=[]
+    def read(self,picks,today):
+        calls.append(picks)
+        return {today:dict(stocks=[p['stock_code'] for p in picks])}
+    monkeypatch.setattr(view_module.StrategyExecutionViewService,'_read_history_batch',read)
+    s=view_module.StrategyExecutionViewService()
+    picks=[dict(signal_date='2026-10-13',stock_code='603629',stock_name='利通电子')]
+    a=s.load_history_batch(picks,'2026-10-16')
+    assert s.load_history_batch(picks,'2026-10-16') == a
+    s.load_history_batch(picks+[dict(signal_date='2026-10-13',stock_code='688498',stock_name='源杰科技')],'2026-10-16')
+    assert len(calls)==2
+    view_module._cached_history_batch.cache_clear()

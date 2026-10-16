@@ -5,7 +5,9 @@ from contextlib import contextmanager
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import date, datetime, time, timedelta
 from decimal import Decimal
+from functools import lru_cache
 import os
+import gzip
 import json
 import re
 from urllib.parse import unquote, urlparse
@@ -242,7 +244,9 @@ class StrategyExecutionViewService:
                       if c in quotes else None) for c in codes])
 
     def load_page(self, *, owner_user_id: str, include_owners: bool = False,
-                  before: str | None = None) -> dict:
+                  before: str | None = None, refresh_history: bool = False) -> dict:
+        if refresh_history:
+            _cached_history_batch.cache_clear()
         records = self.load(owner_user_id=owner_user_id, include_owners=include_owners,
                             before=before, include_open=False)
         today = datetime.now(ZoneInfo("Asia/Shanghai")).date().isoformat()
@@ -260,6 +264,12 @@ class StrategyExecutionViewService:
             owner_user_id=owner_user_id, include_daily=include_daily))
 
     def load_history_batch(self, picks: list[dict], today: str) -> dict:
+        # The cache key includes the actual authorized stock/date set. A
+        # selection backfill changes it; manual refresh can reread source bars.
+        key=tuple(sorted({(p['signal_date'],p['stock_code'],p['stock_name']) for p in picks}))
+        return json.loads(gzip.decompress(_cached_history_batch(key,today)))
+
+    def _read_history_batch(self, picks: list[dict], today: str) -> dict:
         """One minute query and one daily query for the entire owned page."""
         groups = {}
         for p in picks:
@@ -471,3 +481,9 @@ class StrategyExecutionViewService:
                              first_date=_iso(r['first_date']),last_date=_iso(r['last_date'])) for r in versions],
             runs=[{**normalized(r),'strategy_id':key(r),
                    'environment_json':decode(r['environment_json'])} for r in runs],picks=picks)
+
+
+@lru_cache(maxsize=16)
+def _cached_history_batch(key: tuple, today: str) -> bytes:
+    picks=[dict(signal_date=day,stock_code=code,stock_name=name) for day,code,name in key]
+    return gzip.compress(json.dumps(StrategyExecutionViewService()._read_history_batch(picks,today),ensure_ascii=False).encode(),compresslevel=3)
