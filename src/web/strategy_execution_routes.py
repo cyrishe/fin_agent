@@ -2,6 +2,8 @@
 from __future__ import annotations
 
 from typing import Callable
+from datetime import date, datetime
+from zoneinfo import ZoneInfo
 
 from flask import Blueprint, current_app, jsonify, render_template, request
 
@@ -52,16 +54,27 @@ def create_strategy_execution_blueprint(
             return None, False, (jsonify({"ok": False, "error": "用户标识过长。"}), 400)
         return owner_id, is_admin, None
 
+    @blueprint.get("/api/strategies/market")
     @blueprint.get("/api/strategies/today-market")
     def today_market():
         owner, _is_admin, error = resolve_owner()
         if error:
             return error
+        args = {"owner_user_id": owner}
+        requested_date = request.args.get("date")
+        if requested_date:
+            try:
+                day = date.fromisoformat(requested_date)
+                if day > datetime.now(ZoneInfo("Asia/Shanghai")).date():
+                    raise ValueError()
+                args["signal_date"] = day.isoformat()
+            except ValueError:
+                return jsonify({"ok": False, "error": "选股日期无效。"}), 400
         try:
-            result = view_service.load_today_market(owner_user_id=owner)
+            result = view_service.load_today_market(**args)
         except Exception:
             current_app.logger.exception("strategy today market unavailable")
-            return jsonify({"ok": False, "error": "今日行情暂时不可用，请稍后重试。"}), 503
+            return jsonify({"ok": False, "error": "行情暂时不可用，请稍后重试。"}), 503
         response = jsonify({"ok": True, **result})
         response.headers["Cache-Control"] = "no-store, private"
         response.headers["Vary"] = "Cookie"

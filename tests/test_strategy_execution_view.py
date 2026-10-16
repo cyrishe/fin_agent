@@ -240,3 +240,71 @@ def test_readable_versions_are_authoritative_and_keep_unsold_positions(monkeypat
     assert result['picks'][0]['entry_price']==10.1
     assert result['picks'][0]['signal_date']=='2026-09-01'
     assert not any('FROM automl_strategy_selection' in s for s in calls)
+
+
+def test_history_uses_selection_date_database_bars_and_never_live_api(monkeypatch):
+    @contextmanager
+    def connection(_): yield object()
+    calls=[]
+    def query(_conn,sql,args=()):
+        calls.append((sql,args))
+        if 'information_schema.tables' in sql:return [{'table_name':'strategy_execution'}]
+        if 'aiia_trade_calendar' in sql:return [{'calendar_date':date(2026,10,16)},{'calendar_date':date(2026,9,11)}]
+        if 'FROM strategy_execution' in sql:
+            assert 'AND signal_date=%s' in sql and args[0]=='alice'
+            return [{'stock_code':'000823','stock_name':'超声电子'}]
+        if 'FROM kcrp_stock_price' in sql:
+            assert 'trade_date<=%s' in sql
+            day=date.fromisoformat(args[-1])
+            return [dict(stk_code='000823.SZ',trade_date=day,preclose=20,open=20.1,high=22,low=20,close=21,volume=1000,amount=21000)]
+        if 'FROM aiia_stock_realtime_minute_snapshot_full' in sql:
+            assert args[1:] == ('000823',)
+            assert 'is_finalized=1' in sql and 'is_fallback=0' in sql
+            return [dict(stk_code='000823',end=datetime.fromisoformat(args[0]+' '+t),open=20,high=22,low=20,close=21,volume=100,amount=2100) for t in ['09:31:00','15:00:00']]
+        raise AssertionError(sql)
+    def forbidden(*args):raise AssertionError('Historical selections must not call a live API')
+    monkeypatch.setattr(view_module,'kingdom_connection',connection)
+    monkeypatch.setattr(view_module,'query',query)
+    now=datetime(2026,10,16,10,55,tzinfo=ZoneInfo('Asia/Shanghai'))
+    for day in ['2026-10-14','2026-10-15']:
+        result=view_module.StrategyExecutionViewService().load_today_market(owner_user_id='alice',signal_date=day,now=now,quote_loader=forbidden,minute_loader=forbidden)
+        assert result['trade_date']==day and result['is_live'] is False
+        assert result['minute_source']=='minute_database' and result['requested_minutes']==240
+        stock=result['stocks'][0]
+        assert {b['date'] for b in stock['bars']}=={day}
+        assert stock['daily_bars'][-1]['date']==day
+        assert stock['quote']['close']==21 and stock['quote']['preclose']==20
+        assert stock['quote']['pct']==pytest.approx(5)
+        assert stock['quote']['snapshot_time']==day+' 15:00:00'
+        assert next(args for sql,args in reversed(calls) if 'FROM strategy_execution' in sql)[-1]==day
+
+
+def test_history_missing_bars_stay_empty_instead_of_using_today(monkeypatch):
+    @contextmanager
+    def connection(_):yield object()
+    def query(_conn,sql,args=()):
+        if 'information_schema.tables' in sql:return [{'table_name':'strategy_execution'}]
+        if 'aiia_trade_calendar' in sql:return [{'calendar_date':date(2026,10,16)}]
+        if 'FROM strategy_execution' in sql:return [{'stock_code':'000823','stock_name':'超声电子'}]
+        return []
+    monkeypatch.setattr(view_module,'kingdom_connection',connection)
+    monkeypatch.setattr(view_module,'query',query)
+    def forbidden(*args):raise AssertionError('No live fallback for missing history')
+    result=view_module.StrategyExecutionViewService().load_today_market(owner_user_id='alice',signal_date='2026-10-14',
+        now=datetime(2026,10,16,10,55,tzinfo=ZoneInfo('Asia/Shanghai')),quote_loader=forbidden,minute_loader=forbidden)
+    stock=result['stocks'][0]
+    assert stock['bars']==[] and stock['daily_bars']==[] and stock['quote'] is None
+    assert stock['minute_error']=='该日分钟数据缺失'
+
+
+def test_market_date_route_scopes_owner_and_rejects_invalid_or_future_date():
+    service=FakeView()
+    client=_app({'user_type':'member','user_id':'alice'},service).test_client()
+    response=client.get('/api/strategies/market?date=2026-10-14&user_id=imac')
+    assert response.status_code==200
+    assert service.calls[-1]=={'owner_user_id':'alice','signal_date':'2026-10-14'}
+    count=len(service.calls)
+    for day in ['not-a-date','2026-02-30','9999-01-01']:
+        assert client.get('/api/strategies/market?date='+day).status_code==400
+    assert len(service.calls)==count
+    assert _app(None,service).test_client().get('/api/strategies/market?date=2026-10-14').status_code==403

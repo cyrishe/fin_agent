@@ -117,15 +117,19 @@ def load_live_minutes(code: str, now: datetime) -> list[dict]:
 
 
 class StrategyExecutionViewService:
-    """Reads decisions from DB; intraday charts always use the live minute API."""
+    """Read selection-day charts: historical DB snapshots or today’s live minute API."""
 
     def load_today_market(self, *, owner_user_id: str, now: datetime | None = None,
-                          quote_loader=None, minute_loader=None) -> dict:
+                          quote_loader=None, minute_loader=None, signal_date: str | None = None) -> dict:
         current = (now or datetime.now(ZoneInfo("Asia/Shanghai"))).astimezone(ZoneInfo("Asia/Shanghai"))
         today = current.date().isoformat()
-        requested_minutes = completed_session_minutes(current)
-        picks = {}
-        daily = {}
+        target = date.fromisoformat(signal_date).isoformat() if signal_date else today
+        if target > today:
+            raise ValueError("选股日期不能晚于今天")
+        live = target == today
+        requested_minutes = completed_session_minutes(current) if live else 240
+        picks, daily, bars, errors, quotes = {}, {}, {}, {}, {}
+        quote_error = None
         with kingdom_connection("KINGDOMAI_DB_URL") as conn:
             tables = _tables(conn)
             # Exactly the same 20-trading-day scope and older unsold positions
@@ -144,7 +148,7 @@ class StrategyExecutionViewService:
                     where = "(signal_date BETWEEN %s AND %s OR (signal_date<%s AND buy_price IS NOT NULL AND sell_price IS NULL))"
                     args += (first,)
                 for row in query(conn, f"""SELECT DISTINCT stock_code,stock_name FROM {table}
-                    WHERE user_id=%s AND {where}""", args):
+                    WHERE user_id=%s AND {where} AND signal_date=%s""", (*args, target)):
                     code = str(row["stock_code"]).strip()
                     if re.fullmatch(r"[0-9]{6}", code):
                         picks.setdefault(code, str(row["stock_name"]).strip())
@@ -153,21 +157,43 @@ class StrategyExecutionViewService:
                 # Daily history is raw/unadjusted, matching the live quotes.
                 symbols = tuple(c + (".SH" if c.startswith("6") else ".BJ" if c.startswith(("9","4","8")) else ".SZ") for c in codes)
                 marks = ','.join(['%s'] * len(symbols))
-                rows = query(conn, f"""SELECT stk_code,trade_date,open,high,low,close,volume,amount
+                rows = query(conn, f"""SELECT stk_code,trade_date,preclose,open,high,low,close,volume,amount
                     FROM kcrp_stock_price WHERE stk_code IN ({marks})
-                    AND trade_date>=%s AND trade_date<%s ORDER BY stk_code,trade_date DESC""",
-                    (*symbols, (current.date()-timedelta(days=60)).isoformat(), today))
+                    AND trade_date>=%s AND trade_date{'<' if live else '<='}%s ORDER BY stk_code,trade_date DESC""",
+                    (*symbols, (date.fromisoformat(target)-timedelta(days=60)).isoformat(), target))
                 for row in rows:
                     code = str(row['stk_code'])[:6]
                     history = daily.setdefault(code, [])
+                    if not live and _iso(row['trade_date']) == target:
+                        close, reference = _number(row['close']), _number(row['preclose'])
+                        quotes[code] = {**{k:_number(row[k]) for k in ('open','high','low','close','preclose','amount')},
+                            'pct': (float(close)/float(reference)-1)*100 if close and reference else None,
+                            'snapshot_time': target+' 15:00:00', 'source': 'daily_database'}
                     if len(history) < 20:
                         history.append({"date": _iso(row['trade_date']), "time": _iso(row['trade_date'])[5:],
                                         **{k:_number(row[k]) for k in ('open','high','low','close','volume','amount')}})
                 for rows in daily.values():
                     rows.reverse()
-        bars, errors, quotes = {}, {}, {}
-        quote_error = None
-        if codes:
+                if not live:
+                    marks = ','.join(['%s'] * len(codes))
+                    rows = query(conn, f"""SELECT stk_code,bar_end_time AS end,
+                        open_price AS open,high_price AS high,low_price AS low,
+                        latest_price AS close,volume,amount
+                        FROM aiia_stock_realtime_minute_snapshot_full
+                        WHERE trade_date=%s AND stk_code IN ({marks})
+                          AND kline_type='1m' AND period_minutes=1
+                          AND is_finalized=1 AND is_fallback=0
+                          AND source_snapshot_time=bar_end_time
+                        ORDER BY stk_code,bar_end_time""", (target, *codes))
+                    by_code = {}
+                    for row in rows:
+                        by_code.setdefault(str(row['stk_code'])[:6], []).append(row)
+                    end = datetime.fromisoformat(target+'T15:00:00').replace(tzinfo=current.tzinfo)
+                    for code in codes:
+                        bars[code] = today_minute_bars(by_code.get(code, []), end)
+                        if not bars[code]:
+                            errors[code] = '该日分钟数据缺失'
+        if codes and live:
             if quote_loader is None:
                 from src.experiments.staged_data_protocol.phase2.realtime_quote_provider import load_realtime_rows
                 quote_loader = load_realtime_rows
@@ -186,8 +212,8 @@ class StrategyExecutionViewService:
                     quotes = {str(r.get('code')):r for r in quote_rows if str(r.get('tradedate')) == today}
                 except Exception:
                     quote_error = "实时行情接口暂不可用"
-        return dict(trade_date=today, as_of=current.isoformat(), requested_minutes=requested_minutes,
-            quote_error=quote_error, minute_source='upchina_1m_api', stocks=[dict(
+        return dict(trade_date=target, as_of=current.isoformat(), requested_minutes=requested_minutes,
+            is_live=live, quote_error=quote_error, minute_source='upchina_1m_api' if live else 'minute_database', stocks=[dict(
                 code=c, name=picks[c], bars=bars.get(c,[]), daily_bars=daily.get(c,[]),
                 minute_error=errors.get(c),
                 quote={k:_number(quotes[c].get(k)) for k in
