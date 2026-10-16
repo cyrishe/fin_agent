@@ -1,0 +1,7 @@
+{
+  "days": 187,
+  "selections": 362,
+  "verified_at": "2026-10-16T12:10:06.417752+08:00",
+  "picks_sha256": "6407024a482a5ecf5e8ad5487f011b6f9ccb2db575d2d21b9501225f7fab134d",
+  "verified_fields": "identity, candidate/selection counts, model hash, actionable, signal/buy/sell prices, times, return"
+}

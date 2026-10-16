@@ -1,0 +1,10 @@
+{
+  "user_id": "imac",
+  "strategy_name": "收盘开盘",
+  "version": "v1.1",
+  "days": 187,
+  "picks": 362,
+  "actionable": 140,
+  "settled": 140,
+  "written_at": "2026-10-16T12:10:06.291429+08:00"
+}
