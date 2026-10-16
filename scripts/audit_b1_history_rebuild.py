@@ -29,6 +29,7 @@ def compare_picks(actual, reference, dates, output):
 
 
 def compare_inputs(actual, reference, output):
+    reference=reference[reference.signal_date.between(actual.signal_date.min(),actual.signal_date.max())]
     dates=set(reference.signal_date);a=actual[actual.signal_date.isin(dates)]
     keys=['signal_date','symbol6'];cols=[*FEATURES,'signal_price','second_high']
     j=a[keys+cols].merge(reference[keys+cols],on=keys,how='outer',suffixes=('_new','_old'),indicator=True,validate='one_to_one')
@@ -47,15 +48,19 @@ def compare_inputs(actual, reference, output):
 
 def audit(run, repo):
     dest=run/'audit';dest.mkdir(exist_ok=True)
-    p=read(run/'picks.csv');c=read(run/'candidates.csv.gz');folds=json.loads((run/'folds.json').read_text());report={}
+    p=read(run/'picks.csv');c=read(run/'candidates.csv.gz');folds=json.loads((run/'folds.json').read_text());report={'picks_sha256':sha(run/'picks.csv'),'candidates_sha256':sha(run/'candidates.csv.gz')}
+    c=c[c.signal_date.le(folds[-1]['day'])]
     sources={
         'original_feb_jul':repo/'docs/stock_automl_runs/20261011_mk_1m_tradable_st_rolling20/top2_verified.csv',
         'independent_aug_oct':repo/'docs/stock_automl_runs/20261011_aug_oct_independent20/top2_verified.csv'}
     for name,path in sources.items():
-        old=read(path);dates=sorted(set(old.signal_date)&{f['day'] for f in folds})
+        old=read(path)
+        date_file=path.parent/'folds.json'
+        reference_dates={f['test_date'] for f in json.loads(date_file.read_text())} if date_file.exists() else set(old.signal_date)
+        dates=sorted(reference_dates&{f['day'] for f in folds})
         report[name]=compare_picks(p,old,dates,dest/(name+'_picks.csv'))
         report[name]['reference_sha256']=sha(path)
-        report[name]['scope']='Reference days with saved picks; complete daily/no-pick comparison is CO7 below.'
+        report[name]['scope']='Complete archived folds including no-pick days.' if date_file.exists() else 'Reference days with saved picks; complete daily/no-pick comparison is CO7 below.'
     path=repo/'docs/stock_automl_runs/20261015_close_open_conditional_b1/daily.csv'
     old=read(path);old=old[old.model.eq('B1_171')&old.signal_date.ge('2026-01-01')]
     dates=sorted(set(old.signal_date)&{f['day'] for f in folds})
@@ -69,6 +74,13 @@ def audit(run, repo):
     a['new_return']=a.close_40/a.signal_price-1
     report['CO7_top1']['same_stock_return_max_delta']=float((a.new_return-a.close40_return).abs().max())
     a.to_csv(dest/'CO7_same_stock_execution.csv',index=False,float_format='%.17g')
+    execution_path=repo/'outputs/stock_automl/b1_market_trade_gate_co8/dataset.csv.gz'
+    previous=read(execution_path)
+    prices=p[p.selection_rank.eq(1)].merge(previous,on=['signal_date','symbol6'],suffixes=('_new','_old'),validate='one_to_one')
+    report['CO7_top1']['execution_price_reference_sha256']=sha(execution_path)
+    report['CO7_top1']['same_stock_price_rows']=len(prices)
+    report['CO7_top1']['buy_price_max_delta']=float((prices.signal_price_new-prices.signal_price_old).abs().max())
+    report['CO7_top1']['sell_price_max_delta']=float((prices.close_40-prices.exit_0940).abs().max())
     for name,path in {
         'jan_jul_inputs':repo/'outputs/stock_automl/mk_1m_jan_jul/tradable_st_candidates.csv.gz',
         'aug_oct_inputs':repo/'docs/stock_automl_runs/20261011_aug_oct_independent20/candidates.csv.gz'}.items():

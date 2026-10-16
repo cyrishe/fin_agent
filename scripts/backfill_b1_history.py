@@ -9,6 +9,7 @@ from concurrent.futures import ProcessPoolExecutor
 from datetime import datetime
 from decimal import Decimal
 import hashlib
+from io import StringIO
 import json
 from pathlib import Path
 import subprocess
@@ -138,6 +139,9 @@ def prepare_sources(args):
             names=query(db,'SELECT LEFT(stk_code,6) AS symbol6,stk_name AS name FROM kcrp_stock_baseinfo')
             names.drop_duplicates('symbol6').to_csv(out/'names.csv',index=False)
             st=load_st_intervals(db);st.to_csv(out/'st.csv.gz',index=False)
+        if not (out/'older_adjusted.csv.gz').exists():
+            older=query(db,"SELECT trade_date AS date,LEFT(stk_code,6) AS symbol6,adjclose FROM kcrp_stock_price WHERE trade_date BETWEEN %s AND %s",('2024-11-01','2025-09-30'))
+            older.to_csv(out/'older_adjusted.csv.gz',index=False,float_format='%.17g')
     manifest=json.loads(args.minute_manifest.read_text()) if args.minute_manifest else []
     paths={Path(r['path']).name[:10]:r for r in manifest}
     tasks=[(args,day,paths.get(day),days[-1]) for day in needed]
@@ -175,12 +179,50 @@ def prepare_minute(task):
     return day,'built'
 
 
+def original_b1_profile(raw, older_adjusted):
+    """Recreate CO7's extended history and the archived Jan-Jul builder window.
+
+    Rolling MA sums retain floating-point state from their starting date. These
+    input contexts are part of the frozen B1 recipe, even for equal-price ties.
+    Other profile fields use at most 20 prior observations.
+    """
+    value=raw.loc[raw.turn_ratio.gt(0)&raw.volume.gt(0)&raw.close.gt(0)&
+                  np.isfinite(raw.float_share)&np.isfinite(raw.float_mv),
+                  ['date','symbol6','float_share','float_mv']].copy()
+    profile,_=prior_profile(raw,value)
+    older=older_adjusted.copy();older['date']=pd.to_datetime(older.date)
+    adj=pd.concat([older,raw[['date','symbol6','adjclose']]],ignore_index=True)
+    adj=adj[adj.symbol6.str.startswith(('0','3','6'))].sort_values(['symbol6','date'])
+    if adj.duplicated(['date','symbol6']).any():raise ValueError('Overlapping adjusted history')
+    for w in (5,10,20):
+        adj[f'ma{w}_adj']=adj.groupby('symbol6').adjclose.transform(lambda x:x.rolling(w,min_periods=w).mean())
+    cols=[f'ma{w}_adj' for w in (5,10,20)]
+    profile=profile.drop(columns=cols).merge(adj[['date','symbol6',*cols]].rename(columns={'date':'prior_date'}),on=['prior_date','symbol6'],how='left',validate='one_to_one')
+    # The original raw archive began 2026-01-05, and its builder loaded 70
+    # calendar days of daily history. CO7 retained this Jan-Jul input context.
+    legacy_start=pd.Timestamp('2026-01-05')-pd.Timedelta(days=70)
+    legacy,_=prior_profile(raw[raw.date.ge(legacy_start)].copy(),value[value.date.ge(legacy_start)].copy())
+    in_legacy=lambda f: pd.to_datetime(f.signal_date).between('2026-01-05','2026-07-31')
+    return pd.concat([profile[~in_legacy(profile)],legacy[in_legacy(legacy)]],ignore_index=True)
+
+
+def legacy_csv_floats(frame):
+    """Preserve the two original default CSV parsing boundaries before fitting."""
+    result=frame.copy();mask=result.signal_date.between('2026-01-05','2026-07-31')
+    cols=[*FEATURES,'signal_price','second_high']
+    values=result.loc[mask,cols]
+    # trainable_candidates -> tradable_st_candidates -> training read. The
+    # outer new snapshot is round-trip encoded only after these boundaries.
+    for _ in range(2):values=pd.read_csv(StringIO(values.to_csv(index=False)))
+    result.loc[mask,cols]=values.to_numpy()
+    return result
+
+
 def build_candidates(args,plan):
     out=args.output;raw=read(out/'daily.csv.gz');raw=raw[raw.symbol6.str.startswith(('0','3','6'))].copy()
     raw['date']=pd.to_datetime(raw.date)
     raw['float_share']=raw.volume/(raw.turn_ratio/100);raw['float_mv']=raw.float_share*raw.close
-    valid=raw.turn_ratio.gt(0)&raw.volume.gt(0)&raw.close.gt(0)&np.isfinite(raw.float_share)&np.isfinite(raw.float_mv)
-    profile,_=prior_profile(raw,raw.loc[valid,['date','symbol6','float_share','float_mv']].copy())
+    profile=original_b1_profile(raw,read(out/'older_adjusted.csv.gz'))
     profile['signal_date']=pd.to_datetime(profile.signal_date).dt.strftime('%Y-%m-%d')
     calendar=read(out/'calendar.csv').date.tolist();nextday=dict(zip(calendar[:-1],calendar[1:]))
     names=read(out/'names.csv').set_index('symbol6').name
@@ -220,6 +262,7 @@ def build_candidates(args,plan):
     candidates=candidates[~(candidates.historical_st&candidates.entry_at_limit)].copy()
     for col in FEATURES:candidates[col]=candidates[col].astype(float)
     candidates=candidates.sort_values(['signal_date','symbol6']).reset_index(drop=True)
+    candidates=legacy_csv_floats(candidates)
     candidates.to_csv(out/'candidates.csv.gz',index=False,float_format='%.17g')
     pd.concat(amounts,ignore_index=True).to_csv(out/'amounts.csv.gz',index=False,float_format='%.17g')
     return candidates
