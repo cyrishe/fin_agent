@@ -1,0 +1,32 @@
+[
+  {
+    "module": "scripts.replay_b2_next_minute_mean_20261016",
+    "exit_code": 0,
+    "seconds": 3.44,
+    "summary_monthly_sha256": {
+      "summary.csv": "cf3e15e468263e18e168f39e8f8ab96170bf3b77c66e88f66089d6381e0d1d55",
+      "monthly.csv": "8206d2d9b79a0c79173973c7df61f9dd457a397133a72531f83b76e56470f28a"
+    },
+    "exact_reproduction": true
+  },
+  {
+    "module": "scripts.replay_b2_d2_takeprofit8_20261016",
+    "exit_code": 0,
+    "seconds": 1.56,
+    "summary_monthly_sha256": {
+      "summary.csv": "a97c44c1604b500a27ea130111d925aa95d827cd4c674286319a23cba995761d",
+      "monthly.csv": "8b2edc5798300d55b6feda53c316b466eabd3b07d38b634e3e5a70216ac71d3f"
+    },
+    "exact_reproduction": true
+  },
+  {
+    "module": "scripts.replay_b2_tail_vwap_20261016",
+    "exit_code": 0,
+    "seconds": 3.56,
+    "summary_monthly_sha256": {
+      "summary.csv": "f0471590df7de58fc3ffef7b9a495bbe80a0e661f7e9af5f3e52a6ad95ba8d77",
+      "monthly.csv": "ab3b631fd4bbcc12d1e168daef946365a48da3d1e98d88fbedeb055d3d80dbac"
+    },
+    "exact_reproduction": true
+  }
+]

@@ -1,0 +1,774 @@
+{
+  "reproduction": [
+    {
+      "variant": "five_original",
+      "exact_reproduced": 106
+    },
+    {
+      "variant": "four_original",
+      "exact_reproduced": 134
+    },
+    {
+      "variant": "five_lock_delay",
+      "exact_reproduced": 98
+    },
+    {
+      "variant": "four_B2",
+      "exact_reproduced": 122
+    }
+  ],
+  "minute_sources": [
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-01-05_raw.pkl",
+      "sha256": "3c816fd572a9f7bfab44655e9e45f996c7fb0503e91267cdccad1dda87f22969"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-01-06_raw.pkl",
+      "sha256": "a06f6df33d8650b4a1ec7fb4b896d391ee4f0062c5752480f22564c726f9713e"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-01-07_raw.pkl",
+      "sha256": "4ed08ce26d103a53d52393135fed64c280879eedacf518e6ee2a97c35f52c6c4"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-01-08_raw.pkl",
+      "sha256": "1dd2927de90aa17f6a286862fb654d48e45f2215792d89fbba5bbb1a786ff303"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-01-09_raw.pkl",
+      "sha256": "7e7560123226743182e2e3a8d2ae9831387705ef7560629f46542e3d50cdef7a"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-01-12_raw.pkl",
+      "sha256": "06995e63b8ad1db467883cf864bfa778e0c546782576e5112322dbdd4749c9e3"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-01-13_raw.pkl",
+      "sha256": "0030a0b6a0e7f8fa679e79eaa6ec572af7afe6d8e5d6c1c3ff8027f9ef1d9b0f"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-01-14_raw.pkl",
+      "sha256": "71b43a99be87da2edfab9283b2477b89ed97a861bb8e57539c55b3540f30258f"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-01-15_raw.pkl",
+      "sha256": "2a3aef01f7d8babd0d8c555c3495280f49e7ab8cf71f6efcc0e49575ef7dfe19"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-01-16_raw.pkl",
+      "sha256": "0890118440712e9c58fca2e3ed548259aa3dcc2f22ecbce332d5db856493797c"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-01-19_raw.pkl",
+      "sha256": "2c2a3f70c4a9ee083d9a542d80fa07aca4adf0925c541425fc4c036ab6364e5d"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-01-20_raw.pkl",
+      "sha256": "14f866567d163dc47865e572278e4f3d4bd6559ca8539ec1bc643cced647dcef"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-01-21_raw.pkl",
+      "sha256": "85059ea981d89e9ccb360652b77470a4f0f4d8cf57c08c4baef994d1755a1397"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-01-22_raw.pkl",
+      "sha256": "01184215f250d0b95e69df66ee2873459bd8857d6c675a4b94b64e1727440430"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-01-23_raw.pkl",
+      "sha256": "0aa1545aad00d4bd77ff3ca740cec12b6ceed316355731e2fc46750e9f2511c5"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-01-26_raw.pkl",
+      "sha256": "b30777a40d53353959f6c641e5b59f94eedf2ab2b36e0b75a74c4340cd31572a"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-01-27_raw.pkl",
+      "sha256": "12b3a2767b4b33537abdd83e48e1a73abef040b6e1d31354643bd2a3ae5a7589"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-01-28_raw.pkl",
+      "sha256": "78fcfea30b959679c69282ced5b80ac798aa4f59af81c3a1a0b54a27517e90a1"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-01-29_raw.pkl",
+      "sha256": "6696224848233a04f76b41bf9b60c85ba46b65bc68209a3e1652086dd80dfe42"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-01-30_raw.pkl",
+      "sha256": "32a25bb8592ba221574da5256f5d3f498d68e24ad0b4708c30b6cd44885af2e6"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-02-02_raw.pkl",
+      "sha256": "b5d52e8a26682bfe032cf3a1cfa6d533de4e9129b6ab2d31add93937d2e0b83b"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-02-03_raw.pkl",
+      "sha256": "7984a713f667d93d27adc3d54eb2369282caf271b4b1793c943371fe20a9c22f"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-02-04_raw.pkl",
+      "sha256": "2616e6d9745c7fe1b85c9e1171432d278f8d141365661ce789d4a9f74a0dcf50"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-02-05_raw.pkl",
+      "sha256": "7447569ea74e7dd27e555bd9b80b00c57c22ab2c873759ac1bffb6f63f5022f3"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-02-06_raw.pkl",
+      "sha256": "2804b55d36963541fdd9ed682a262a52e47f340a0fe7f0a8d448ca407d66320f"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-02-09_raw.pkl",
+      "sha256": "5a6b0c837f9d233b3f623ae90175d9a608202ba6ad2a7e5a028518621b4b1ae3"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-02-10_raw.pkl",
+      "sha256": "881f9a58aa0e5845540871cbaead77d228daae968f2879a80fe069e65c524701"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-02-11_raw.pkl",
+      "sha256": "eeaf18120a60f44b88702ac230939925dbd0a92df8ed9b928e698585e6d2d095"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-02-12_raw.pkl",
+      "sha256": "be88d2424fcb8ae6ff087ae547b65dc5ec3cd1ce2344e1e2808d4d860dbcec2f"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-02-13_raw.pkl",
+      "sha256": "dde4c94091ff167ac7db54ed4927c69951dcfe4b5c256643cfc6c383f44e080b"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-02-24_raw.pkl",
+      "sha256": "e481e414ffc2a4d47af5d8611eb2d7bf36f3c4020dda15caafb1c28fc48f8eef"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-02-25_raw.pkl",
+      "sha256": "7190a5646bf65572bb1d7e48f6b9646643b5d4e5a1cf9812123b6cade9a20980"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-02-26_raw.pkl",
+      "sha256": "2baac757c8515bc148c2ce734ec4ea922ee3719589b6172c7531145d399f385f"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-02-27_raw.pkl",
+      "sha256": "f4a7a2fa864e1459638ab3960c735f2d70bcff5334718f0ae2058212cf268abd"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-03-02_raw.pkl",
+      "sha256": "35ec46e77c3164ffbdc5844e10781545138038ce1ac8ad85ef3aebd37fe09942"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-03-03_raw.pkl",
+      "sha256": "533dfc5aafc3dd7e91a4b2209c075ec029bf693fd071521a89f511b2a97c7473"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-03-04_raw.pkl",
+      "sha256": "003ed849704ff3d9703b7e1e558d036d9ba4a636992f9a41ac788ada928872eb"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-03-05_raw.pkl",
+      "sha256": "424dbeca35c12c4d2c1d27f3c4cd28e7125dee0a7523f081317a2c74fa541718"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-03-06_raw.pkl",
+      "sha256": "532a0520fde76158ff9e5aa4a8add8ff15826d93ed2f5ff43ddf2e6f271e1b1e"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-03-09_raw.pkl",
+      "sha256": "d3cded1360018952e6cf0fe35e8581cf1f89427cd14657770f672f02576e15ad"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-03-10_raw.pkl",
+      "sha256": "31b16667b69c0f6042aa9901496d4a8ba7ae68c70dd469831d8defef51d6cac7"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-03-11_raw.pkl",
+      "sha256": "ebfa9c3523a8e90a4b3d861b0ab9c3c04c36055e1769234a303072ee25734757"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-03-12_raw.pkl",
+      "sha256": "4ef1f04bf020a6a56d58cdc9b6102447f3cc490031b93fa65a1404c4dc1773cc"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-03-13_raw.pkl",
+      "sha256": "2f20558cc3e9156e0642af06d87eead7c7396ac8d5e17c68822c84cc7f81933e"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-03-16_raw.pkl",
+      "sha256": "a3d5069057ad9ab941314cb5bf47511e80da2144a58f7b68f6ebd658216a2e34"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-03-17_raw.pkl",
+      "sha256": "069c91c82f2bfb8ec724cc99b5c0bfdd86a269095abbb08137f01b3290aed184"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-03-18_raw.pkl",
+      "sha256": "f9876a3791ad95d49863b42f432044c4f46ae4ef27cb97b1bfa70a8a8233fb71"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-03-19_raw.pkl",
+      "sha256": "fa939cb6fac9001b66522d0256b342d504a17cd9112aa0da188407f2894333ec"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-03-20_raw.pkl",
+      "sha256": "228fc5d946f2a6f0c92a26206376eb6921c9571cf8f19bc61dfc4f9f6210346e"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-03-23_raw.pkl",
+      "sha256": "13dc93a0f1adf94dd360ebc82fa1d23f2c10cf420a54b1e9abe911337fd76a44"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-03-24_raw.pkl",
+      "sha256": "700de0753bf18f8115afc5449c3f4f12bbccb89fcd087b664fa39f5d1df79f7f"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-03-25_raw.pkl",
+      "sha256": "ed4bce25c775baefa6b2f93ac738953b2a285820924d3bf8971d05500ad33d9d"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-03-26_raw.pkl",
+      "sha256": "2d5242f65b810d3fab1eb8dc18718744d514367b28ffa52bf9f6f482622464be"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-03-27_raw.pkl",
+      "sha256": "8f15aabf26cd7462a78dd62420004df095aefbe4a3cf88915e7bf72b14834cd9"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-03-30_raw.pkl",
+      "sha256": "652a922b06799177638218d27861e328cac00ae66d0e67fe4ad5425c446f479e"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-03-31_raw.pkl",
+      "sha256": "1dbc4c686625c0f75911616c7a351dfd26d2f9126bcbfa09fb8ec3ebcb242766"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-04-01_raw.pkl",
+      "sha256": "2aca63bcf4f51d14f0fc96caf1f736356e2a28896ec56694374293a1518111f6"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-04-02_raw.pkl",
+      "sha256": "6313fd9cc19703f14f5742f41dc92c50ba512a66e470bf936fb4dd43764637ae"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-04-03_raw.pkl",
+      "sha256": "07f87b9c9a5141cc3de09936de90c6f1c0392d4c81833895e9485d07ffec9a68"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-04-07_raw.pkl",
+      "sha256": "1eadde9ec38ad28d569f88edf46c5ee12d8a1d1ceea811d94a85da3576bbb452"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-04-08_raw.pkl",
+      "sha256": "d2cea5158919eefd46f4bec93a4fb877a84ebc4a333c28961b0e9ee2b69a0b0f"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-04-09_raw.pkl",
+      "sha256": "32e8779d410c96f71fc586e7eafa7afb835198c30d5075cc766e46ae7158cc9d"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-04-10_raw.pkl",
+      "sha256": "6174b817c85769af19eefb2327110997bccc81556d71f2007dff87632339a400"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-04-13_raw.pkl",
+      "sha256": "02c63754453a3ca1207773f8a0b122368eeba98f89467394cea1b5c65ccfedde"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-04-14_raw.pkl",
+      "sha256": "c11bc3c0a41f75387520d0467c29f519cb79a2617a350a06095b3741f93183d8"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-04-15_raw.pkl",
+      "sha256": "f4e3dab1b3e17010a044271537a3047f96dce1f784b4cd782d38eb4520f01a75"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-04-16_raw.pkl",
+      "sha256": "f095642c28799f53979926e8227106210b897ca6f78e85e6718dfca0718da7ab"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-04-17_raw.pkl",
+      "sha256": "76878b0c54338d054647545853027683443328879ef7431deed5bae91209fb31"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-04-20_raw.pkl",
+      "sha256": "004def876ddfc10692b6ea88a0568ea611870445d791905f131350c51f375258"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-04-21_raw.pkl",
+      "sha256": "46387b4038d38a2e53aac030fe4892c921a2fd39049174e279244edd1418f7b2"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-04-22_raw.pkl",
+      "sha256": "42bf78ee2e8a228cd4998217c282183c75c126a2a025cc652e6e050ae5463a3a"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-04-23_raw.pkl",
+      "sha256": "a1f30ac8f497937c2190d7abca4e45371b1714be571b3946087b67df4a01a3a5"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-04-24_raw.pkl",
+      "sha256": "cecfdd31406e8a2c8762125d803194ae9c5ced8900cf4c8ba278311a3635c576"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-04-27_raw.pkl",
+      "sha256": "71b69d678d3bfdefbb295105256a5f6a6d7abf3bd66d064b24852022739ca0d7"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-04-28_raw.pkl",
+      "sha256": "983e999394800dd150664c7c6fec5e109c4956d09631fa2826764693e39b5051"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-04-29_raw.pkl",
+      "sha256": "1801b6d6a35508efef9ccc73a686221bcda749b48ec104576d5fde55de4552ea"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-04-30_raw.pkl",
+      "sha256": "20194b1b511009f18263da894fe015f5c2eaafe3395743c976ae48b4f4ed60f9"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-05-06_raw.pkl",
+      "sha256": "d0138c9e2b544465cce7fb01d9995ba8808d66117454c5576d7d05377c1323e8"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-05-07_raw.pkl",
+      "sha256": "310ea52f1e8249542e2e98413e6e4c9ee6f1363fb328070de8ce458103a9205f"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-05-08_raw.pkl",
+      "sha256": "9079a729037c098309eddeb196eb1d0936c8eeefa0ca51466e48c04823be551c"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-05-11_raw.pkl",
+      "sha256": "04c2cc4ea0891f3ac3e06c326650438316fe4cab5b44cb6b1471e3a846630812"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-05-12_raw.pkl",
+      "sha256": "2aec881d9bf6fb8d144b9045ddb85dfabb7e63cc4ff44e83e9a7c8381a954f5b"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-05-13_raw.pkl",
+      "sha256": "2804b3984856ad31cbfcd2cc237636def47d20da27dcd6089f2c5a9577eeae31"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-05-14_raw.pkl",
+      "sha256": "3bd454c995ac73abb562e279e8ab65d5d94a185dce0b17ee9371ea73d51d6e15"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-05-15_raw.pkl",
+      "sha256": "ddf1c9a8c20d82e43eb74f0c738bdc43879c0ff24f2281d837d449dfaca9195b"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-05-18_raw.pkl",
+      "sha256": "311020de2a2b91b4697fd89db6bc9cebbf0f7992263a3a1f0dbab2b3446702a6"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-05-19_raw.pkl",
+      "sha256": "006bee65d6bef821a4eaad0fd5acbe87c2aa8d3849f47e263dd1cfd5bd438058"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-05-20_raw.pkl",
+      "sha256": "1316fd28dc7a357487b64702e5bf8597bbb0d81462520c1f101037f21fa836b9"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-05-21_raw.pkl",
+      "sha256": "50a9734bf419101181752516705b81dd6c7f4bd6ae72a8944a092a99c3cb2647"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-05-22_raw.pkl",
+      "sha256": "e1477b61ad3136472a5f30fc32db08579cfa57353f53c36104a9f07f68a365d8"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-05-25_raw.pkl",
+      "sha256": "5c3b1547df863583331aaee68597972cbd5d4273e61d4d326782f921ef486769"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-05-26_raw.pkl",
+      "sha256": "9538f46bacfe3ce1324e54826b94eb5696a6e8404c3c03328b5d0a72ebf186b5"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-05-27_raw.pkl",
+      "sha256": "f5d6e94a0f6384ab0af9367025358820deef6a298e1dfde7dbe478ae34485968"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-05-28_raw.pkl",
+      "sha256": "fbf7592b18cfce894c1b0ac77f5f6b09ac73f0b97ae74fd1329b4a1e7ad446ad"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-05-29_raw.pkl",
+      "sha256": "ee7edfd46fbe56bc3da14aa4fab35208273d6a742c37242ce57f3f1a3beaf77c"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-06-01_raw.pkl",
+      "sha256": "2f4aab56538b7ea8b91e3efadb9cfb34cbefd6ae445cacabab689a0debcd414e"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-06-02_raw.pkl",
+      "sha256": "6531610f49a9d44f9b00ae9a6c97ad3331c455dbbc0c7d0292d0c27a1aeffd13"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-06-03_raw.pkl",
+      "sha256": "0eec75d7ccab20417c2348b39d745f071cceac1a5a7a6249740e5d8bc3ce98ff"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-06-04_raw.pkl",
+      "sha256": "b2958927e4b23f3cdbc32882f29ebde0a8e92abadce14d2e15b84c08e6a97f7a"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-06-05_raw.pkl",
+      "sha256": "4d14b8d44c4b76f910e55cce2d469b7604e3bf69f88fc49926ec4d3e19e2f4fe"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-06-08_raw.pkl",
+      "sha256": "e1d5f0b20ae5afa4b7e7799f72f950a15548ceb28107437a6e7b7b97fd25fc9e"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-06-09_raw.pkl",
+      "sha256": "d613b4740ed86a11422ecfb1a53058c767fe62dd36f8bdb6cb9bb72b5d4dad22"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-06-10_raw.pkl",
+      "sha256": "b5a61292de6b434ac63897a3350948edfbe12f767289d158e9972d4117eea521"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-06-11_raw.pkl",
+      "sha256": "e8b616687a6eb3c9fb1f9b191a5daa6880986b9a1879c11e89c75bf68cb839f0"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-06-12_raw.pkl",
+      "sha256": "8b9527dbd7257b33bcad9e882b873480c7ac189436c169e26ab8580a718ef9cc"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-06-15_raw.pkl",
+      "sha256": "1e7df0a1d132b11518bcf41444faaf76daf922b2ce61604926be4bfbd197f642"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-06-16_raw.pkl",
+      "sha256": "b3f0f5cc2a1505bfc0b2d34e628c8adbeb96103ca43e8f8460fd6a175e0221cb"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-06-17_raw.pkl",
+      "sha256": "63e99fec2a8ad1028ef7f60743b6bf65522f0d41ea1c542ebbea7a7cc1380883"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-06-18_raw.pkl",
+      "sha256": "cbb0605b9ad135d1fa0df017f2922ff585e6353e30257252c055bf35557af5d2"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-06-22_raw.pkl",
+      "sha256": "6c023500604b3f0c05b299bc4fe7f79e272141c20e8fc2dccb378e47d2c083e7"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-06-23_raw.pkl",
+      "sha256": "7a1f9079db6407c107b700382ab46820a1c498a995745b3dbdada2b97777a58e"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-06-24_raw.pkl",
+      "sha256": "0e564185195aff1f6ee3053063015d43ca124667764e2b81b56a681e9089f4d5"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-06-25_raw.pkl",
+      "sha256": "a8d89c8876ee07aa55fcd2f536971cd2d129720ce5414db1f90cfcf8f67bd5e4"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-06-26_raw.pkl",
+      "sha256": "4f0d83762239f258a7f93490e85b848d570b37fc53bee536a7aafb4168424539"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-06-29_raw.pkl",
+      "sha256": "7f5a6530644a5506c575cd0dd3acd4db04cef8efd0f1e5386b98bc989622ca62"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-06-30_raw.pkl",
+      "sha256": "ec663538c0ee356f976082b05a087e4f2660557bc13f2e741384cfc83f5289ac"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-07-01_raw.pkl",
+      "sha256": "f0a9da4678a5c59c28cd3f248c41abf0a7066c0eb50718439de2350a932a446f"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-07-02_raw.pkl",
+      "sha256": "88ba437249af535189b17ffd060b5706fbcfbe8b39cacbbd7e88a40f3f34c04d"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-07-03_raw.pkl",
+      "sha256": "44eea306e0d0f072c6cf91a27fe9b8652268553433f8324745dd03f44bc278e7"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-07-06_raw.pkl",
+      "sha256": "2c41dffbfc6cf765da10b4fbcdfe4d86c48e1bea70eb88a41f0c01687302befb"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-07-07_raw.pkl",
+      "sha256": "3f160b3eae3c837e0e41295865404d426fe497a6f890a331bc8bca3d330e4163"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-07-08_raw.pkl",
+      "sha256": "fdbf03e420749dde94e53e448e641f55bcb4943bb631163daaef3f01a8b0cfcb"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-07-09_raw.pkl",
+      "sha256": "7dbd8e44d1601ef76c19a4d513b489990c297fea6212184b7c69afd77a61fd95"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-07-10_raw.pkl",
+      "sha256": "9dc6bb668ee6c41817dfe66e8550af8622f1115c42c21a27a4831e37b9951e5a"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-07-13_raw.pkl",
+      "sha256": "6cf652c4af03e1c58b3fb8f878a330895c498be6e4bf9097f126e28699f7d3fd"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-07-14_raw.pkl",
+      "sha256": "cd23032b7f72ef246023ef3964ce3de1b62aa1d2b8395b6d1576c8d87e339bba"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-07-15_raw.pkl",
+      "sha256": "e7f2d8f2dc17c8670fe30ec5cd8c94208a75c239e8c31041e8d34d3c886ee971"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-07-16_raw.pkl",
+      "sha256": "3c1c9d597ae71a9df2ad16c63dbf3c2892a6b4c1c5b0ee301b77a94ecf2e1285"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-07-17_raw.pkl",
+      "sha256": "0d04c746dafaa24e99decff662e1c0ac7845a92c405391ebf9a046c330098b11"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-07-20_raw.pkl",
+      "sha256": "a54894e8309476eb403a9f45d4d42a77d2818908868b750955967de15f48b887"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-07-21_raw.pkl",
+      "sha256": "3eb84e86b266ad40e3cf9190e48962e51d38b921357ffb78f99f07857d10eda3"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-07-22_raw.pkl",
+      "sha256": "60f7b6f6f8af86226b30933a9ed02e2e078b8604a52ae6a4f0b673468e109b0b"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-07-23_raw.pkl",
+      "sha256": "441ca7ab1334c48572dd12608eaf0ef4c82d97153692ef1c52abbe5111f8aedd"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-07-24_raw.pkl",
+      "sha256": "68ea669cbf3de3847a9f44ee1122bbef8f87a6188bc7e20b1d273bbf2b9abb60"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-07-27_raw.pkl",
+      "sha256": "9fb85d5cbda6ec48d1aa66ec89b4b4f57066949a1ff6cc0d19fe589c10c359bf"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-07-28_raw.pkl",
+      "sha256": "06d97712674adf4ed83235eede83d048e331f4e8acb30ff87162cd762eb4f7cb"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-07-29_raw.pkl",
+      "sha256": "084a10f327c3ec91e06ceb21de430f3927b057693ffbc1eacc76ce47f8870ac2"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-07-30_raw.pkl",
+      "sha256": "2d4bbcd3238fef2ebee0e1a71c84a2de54a0ea3e4a1a0197183cfd2608d5a7be"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-07-31_raw.pkl",
+      "sha256": "9822a29398331f0edcc92c6f5658d2147d24a97c17e6b986fb6728857ded5c64"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-08-03_raw.pkl",
+      "sha256": "cc0530dc9085f9a1723466a0922bf5f2e6150f29f9501c42a59b989a6aeb1d98"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-08-04_raw.pkl",
+      "sha256": "a8869061be4a9c5f9c174bc5c259b87cbdc7d127adf64b2fe062a5c8315af772"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-08-05_raw.pkl",
+      "sha256": "8214ce100e2e5f2ecf21d8035097c2ee8ab3b272a9ebd0b67f8cd9f3b87ee49a"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-08-06_raw.pkl",
+      "sha256": "445993906ff1aa93536c3bd6493ef569299af3ea3246c1f92d827e20a2ec5d0e"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-08-07_raw.pkl",
+      "sha256": "35f90775a124de22413e8f8d8d1c40f9ded04fbf0300b7829d37f4605e145053"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-08-10_raw.pkl",
+      "sha256": "e6f43647b7329fa599039c7d00a9faff69d15699b58cfb401d16d8810770a50e"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-08-11_raw.pkl",
+      "sha256": "2025f65117a6d76e770a5a2e708e1a60e321da6d994b3b6c98173d7e817c8892"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-08-12_raw.pkl",
+      "sha256": "d1c38e0e5104c9b688d37a54d659d3ba0e2597084446bd8c6e7f4b3f6789de92"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-08-13_raw.pkl",
+      "sha256": "9c6bc40682c3f2c7d9f40c00792c7e85fe4936179bfef471181059280ddf618f"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-08-14_raw.pkl",
+      "sha256": "53b258ef6080d65bc33883679622abd178587f4076c8a5c7cd3f6591d757d133"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-08-17_raw.pkl",
+      "sha256": "2fd97ca4a5a153135d23615c56f123e997b84f11cbb05a6e7d5b7d740183066e"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-08-18_raw.pkl",
+      "sha256": "7fd44a7e28176261b0cd6e9de2e2a908b3997227e59922418d72f7069a2bc498"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-08-19_raw.pkl",
+      "sha256": "48ca6a296fe9880affde71a2bb529ae4470b204b2a0f63ee7d823f8addc68aea"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-08-20_raw.pkl",
+      "sha256": "f13ffb7ae29398a4b8a74f5998891ca4ef00838099bdd5499a410a80d806f60d"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-08-21_raw.pkl",
+      "sha256": "bbe29aafea8063ee92c6fdf198caea34ac117b6f01b7ff18ebbc1b36ac16cd31"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-08-24_raw.pkl",
+      "sha256": "6133ca359b336a5592667dc088a293dadcff36f37941de1fd29459b2d6be3222"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-08-25_raw.pkl",
+      "sha256": "d69699aaa71d51957da0e5f5eb14432124b41d37e3ad94bbc2d7a2302270816d"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-08-26_raw.pkl",
+      "sha256": "ed04d343c2cbf8c6de6343ef58cbff302e5fe5f36072a0590eddaf6bd83acfed"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-08-27_raw.pkl",
+      "sha256": "4e72a6c9328127a9c50ca8b8133666182255c08f8f938937daf0cc3491fdcf3f"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-08-28_raw.pkl",
+      "sha256": "ec6e61ac24aee25651e20161f6d7a8d2b4812f0f17b1c9839cd3d4f564ac8d43"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-08-31_raw.pkl",
+      "sha256": "365c23bb92fecd8b7d74276f07b64db68ae57f73f54e4b4446230a363b1c23f1"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-09-01_raw.pkl",
+      "sha256": "7eb1683bf84bf88a3f7b2f4247893c542feb5c98553d9c6394dcdc104c2568d8"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-09-02_raw.pkl",
+      "sha256": "7cf9744160125cd5faa8208c5de5467c2fdbe8ae64a488e83b868321c3695f0e"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-09-03_raw.pkl",
+      "sha256": "102b9c87883526bdb322a0e8b5813e02df2f3d596ee213df10be84c7f7022928"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-09-04_raw.pkl",
+      "sha256": "c09a004ac73d241b5f286cad2126597d05d3c43f885534eeecdf91c5e0a053dc"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-09-07_raw.pkl",
+      "sha256": "2e303fae5dbdc5a778f9c970613f105b49e51d0580b3ed0b72bf22f6d909627b"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-09-08_raw.pkl",
+      "sha256": "875a11414a032875d5fdc2012e09dcb960e7387f0cb51d8c4d6cd62ccdc308ec"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-09-09_raw.pkl",
+      "sha256": "3f2dfdf2c9e82dc6f56109d386773dce649f1a00688e893772f0d2331bbf2315"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-09-10_raw.pkl",
+      "sha256": "accc5e36089b5e2716d8aacc295da6c82f2e824f11b42e28503dc7d09a40de5a"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-09-11_raw.pkl",
+      "sha256": "4cabf31a04ed0745a156bacc6ab5301cb31736ac587720e5a2abf4e10f9e6c82"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-09-14_raw.pkl",
+      "sha256": "aabf396ffa6d548feb99ed71d281b01f5b55724188d819408d6ebc788d2b9643"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-09-15_raw.pkl",
+      "sha256": "1627df4398dc2f33b9f1ad183bd70cf6a6e0a1a6bc66d5b4b737d812d3bbcf4e"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-09-16_raw.pkl",
+      "sha256": "3926b2107c32b57fa8ef0cd35311e1af1b9f576cafc1f39a6b538b18f1567f83"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-09-17_raw.pkl",
+      "sha256": "e5bcce5a312732af37f509ea475758e9dfc2b63ecdd771401b3b09adc68499c7"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-09-18_raw.pkl",
+      "sha256": "43b5507a839e478620b3de19b4463fba314d2336040981aa1d2c3bad5fbed51e"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-09-21_raw.pkl",
+      "sha256": "6a8f88080739b1b1fbd739a065859ee4eb1c5260cfa8e1e1195ebec7645b04d2"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-09-22_raw.pkl",
+      "sha256": "a6ddf41363ebb2241fcdc73c3d453f9a6b029c3f7d6ff389cb52a033f8048751"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-09-23_raw.pkl",
+      "sha256": "65ccac297966ce2d0a7a6eaea60d5ad73c642010391dc676d0d3e223319e89e3"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-09-24_raw.pkl",
+      "sha256": "70869ed2e9db40d8f52043d8152460a794edd2f18ac6248f8dc543ee5371d99c"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-09-28_raw.pkl",
+      "sha256": "cc9fc2f4e28e3d0dc908f56f6e4dc16e0979875d6969673092dc57d862e93397"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-09-29_raw.pkl",
+      "sha256": "40d21a8f863339c25dd29d99a0edff1343d01fa70bda62db0e446b2a6da9cb88"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-09-30_raw.pkl",
+      "sha256": "c47a55a0145c91fba510cc5f0a7a8a3b7f7e35933ec87670d8ac4565847e7112"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-10-08_raw.pkl",
+      "sha256": "36ccff8ccd92dd0c9c24fcc2b2d37bb1564ab63a6a9cd78ceec2a48a11c3e4f2"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-10-09_raw.pkl",
+      "sha256": "68ff87733abd30b9fc4bcf1aebde8ca8e4e8c89042502d938b408a212a78428a"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-10-12_raw.pkl",
+      "sha256": "62fc8cde21f705893bf8acad56b2375327cb3f68e145a8c8b165c181b2d94a63"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-10-13_raw.pkl",
+      "sha256": "aff7106ba3597999ed343053c22f63dfb2131120e354025ac8555dc2f1e0fb60"
+    },
+    {
+      "path": "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-10-14_raw.pkl",
+      "sha256": "746536dec170669bc5dd34872728ab754b3ef1736f676cd49cd1ba8148a603d2"
+    }
+  ],
+  "rules_sources": {
+    "outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/rules_frozen.json": "e18cf06b9917bd508dfdb031935b7864f35bb864603964e70a5ce977069b2f86",
+    "outputs/stock_automl/limit_rebound_four_minutes_r24_20261015/four_rules_frozen.json": "81f297e033f8911f967d14a4801faff5edc308ace8b4e35b3f2447a9ebd7df49"
+  },
+  "fee_each_side": 0.001,
+  "no_retraining": true,
+  "minute_labels": "end; open clock = label - 1 minute",
+  "limitation": "Minute open/volume are retrospective fill proxies, not tick-level executable quotes; original audit eligibility retained; all variants are historical sensitivity tests."
+}
