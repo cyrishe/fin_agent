@@ -66,44 +66,78 @@ def test_completed_minute_count_respects_lunch_and_market_close():
 
 
 @pytest.mark.parametrize("table", ["automl_strategy_selection", "strategy_execution"])
-def test_today_market_only_reads_todays_selected_codes_and_bars(monkeypatch, table):
+def test_market_reads_owned_list_and_live_api_without_minute_database(monkeypatch, table):
     @contextmanager
     def connection(_name):
         yield object()
-
     calls = []
     def query(_conn, sql, args=()):
         calls.append((sql, args))
+        assert "minute_snapshot" not in sql
         if "information_schema.tables" in sql:
             return [{"table_name": table}]
+        if 'aiia_trade_calendar' in sql:
+            return [{'calendar_date':date(2026,10,15)}, {'calendar_date':date(2026,9,15)}]
         if f"FROM {table}" in sql:
-            return [{"stock_code": "002636", "stock_name": "金安国纪"}]
-        if "FROM aiia_stock_realtime_minute_snapshot" in sql:
-            return [{"stk_code": "002636", "bar_end_time": datetime(2026, 10, 15, 9, 31),
-                     "open_price": Decimal("70"), "high_price": Decimal("71"),
-                     "low_price": Decimal("69"), "latest_price": Decimal("70.5"),
-                     "volume": Decimal("100"), "amount": Decimal("7050")}]
+            return [{"stock_code":"002636", "stock_name":"金安国纪"}]
+        if 'FROM kcrp_stock_price' in sql:
+            assert args[0]=='002636.SZ' and args[-1]=='2026-10-15'
+            return [dict(stk_code='002636.SZ',trade_date=date(2026,10,14),
+                open=70,high=71,low=69,close=70.5,volume=100,amount=7050)]
         raise AssertionError(sql)
+    monkeypatch.setattr(view_module, 'kingdom_connection', connection)
+    monkeypatch.setattr(view_module, 'query', query)
+    got=[]
+    def minutes(code,now):
+        got.append((code,now))
+        return [dict(date='2026-10-15',time='09:31',open=70,high=71,low=69,close=70.5,volume=100)]
+    now=datetime(2026,10,15,9,31,tzinfo=ZoneInfo('Asia/Shanghai'))
+    result=view_module.StrategyExecutionViewService().load_today_market(
+        owner_user_id='alice',now=now,minute_loader=minutes,
+        quote_loader=lambda args: ([dict(code='002636',tradedate='2026-10-15',close=70.5)],{}))
+    assert got==[('002636',now)]
+    assert result['stocks'][0]['daily_bars'][0]['date']=='2026-10-14'
+    assert result['stocks'][0]['bars'][0]['time']=='09:31'
+    assert result['minute_source']=='upchina_1m_api'
+    scoped = next(args for sql,args in calls if f'FROM {table}' in sql)
+    assert scoped[:3] == ('alice','2026-09-15','2026-10-15')
 
-    monkeypatch.setattr(view_module, "kingdom_connection", connection)
-    monkeypatch.setattr(view_module, "query", query)
-    now = datetime(2026, 10, 15, 9, 31, tzinfo=ZoneInfo("Asia/Shanghai"))
-    result = view_module.StrategyExecutionViewService().load_today_market(
-        owner_user_id="alice", now=now,
-        quote_loader=lambda args: ([{"code": "002636", "tradedate": "2026-10-15",
-                                    "close": 70.5, "pct": 1.0, "snapshot_time": "2026-10-15 09:31:00"}], {}))
-    assert result["requested_minutes"] == 1
-    assert result["stocks"][0]["bars"][0]["time"] == "09:31"
-    assert result["stocks"][0]["quote"]["close"] == 70.5
-    assert all(args[0] == "alice" for sql, args in calls
-               if f"FROM {table}" in sql)
-    assert any("trade_date=%s" in sql and "bar_end_time<=%s" in sql
-               for sql, _ in calls)
 
-    if table == "strategy_execution":
-        pick_sql, pick_args = next((s,a) for s,a in calls if "FROM strategy_execution" in s)
-        assert "buy_at>=%s AND buy_at<%s" in pick_sql
-        assert pick_args == ("alice", "2026-10-15", "2026-10-15", "2026-10-16")
+def test_live_minute_request_uses_one_minute_type_and_elapsed_count(monkeypatch):
+    calls=[]
+    class Response:
+        def raise_for_status(self): pass
+        def json(self):
+            # Previous day, one complete bar, and a still-forming bar.
+            return {'stRsp':{'vAnalyData':[dict(sttDateTime=dict(iDate=d,shtTime=t),
+                fOpen=10,fHigh=11,fLow=9,fClose=10.5,lVolume=2,fAmount=2100)
+                for d,t in [(20261014,900),(20261015,571),(20261015,572)]]}}
+    def post(url,**kwargs): calls.append((url,kwargs));return Response()
+    monkeypatch.setattr(view_module.requests,'post',post)
+    now=datetime(2026,10,15,9,31,20,tzinfo=ZoneInfo('Asia/Shanghai'))
+    bars=view_module.load_live_minutes('002636',now)
+    request=calls[0][1]['json']['stReq']
+    assert request['eLineType']==1 and request['shtStartxh']==0
+    assert request['shtWantNum']==2  # one completed + the provider's forming bar
+    assert len(bars)==1 and bars[0]['time']=='09:31' and bars[0]['date']=='2026-10-15'
+    assert bars[0]['volume']==200
+
+
+def test_minute_filter_excludes_history_future_lunch_and_duplicates():
+    from datetime import timedelta
+    now=datetime(2026,10,15,10,10,10,tzinfo=ZoneInfo('Asia/Shanghai'))
+    start=datetime(2026,10,15,9,30)
+    rows=[dict(end=start+timedelta(minutes=i),open=10,high=11,low=9,close=10.5)
+          for i in range(-240,241)]
+    rows += [rows[250],dict(end=datetime(2026,10,14,15),open=10,high=11,low=9,close=10)]
+    bars=view_module.today_minute_bars(rows,now)
+    assert len(bars)==40
+    assert bars[0]['time']=='09:31' and bars[-1]['time']=='10:10'
+    assert all(b['date']=='2026-10-15' for b in bars)
+    assert view_module.today_minute_bars(rows,now.replace(hour=9,minute=30))==[]
+    lunch=datetime(2026,10,15,12,30,tzinfo=ZoneInfo('Asia/Shanghai'))
+    bars=view_module.today_minute_bars(rows,lunch)
+    assert len(bars)==120 and bars[-1]['time']=='11:30'
 
 
 def test_legacy_selection_stays_pending_without_db_outcome(monkeypatch):

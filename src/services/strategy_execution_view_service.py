@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from contextlib import contextmanager
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import date, datetime, time, timedelta
 from decimal import Decimal
 import os
@@ -11,6 +12,7 @@ from urllib.parse import unquote, urlparse
 from zoneinfo import ZoneInfo
 
 import pymysql
+import requests
 
 
 @contextmanager
@@ -70,90 +72,127 @@ def completed_session_minutes(now: datetime) -> int:
     return elapsed(time(9, 30), time(11, 30)) + elapsed(time(13), time(15))
 
 
+def today_minute_bars(rows: list[dict], now: datetime) -> list[dict]:
+    """Keep only today's completed session bars, deduplicated and capped at N."""
+    current = now.astimezone(ZoneInfo("Asia/Shanghai")).replace(tzinfo=None)
+    count = completed_session_minutes(now)
+    if not count:
+        return []
+    by_end = {}
+    for row in rows:
+        end = row["end"]
+        if end.date() != current.date() or end > current or end.second or end.microsecond:
+            continue
+        if not (time(9,30) < end.time() <= time(11,30) or time(13) < end.time() <= time(15)):
+            continue
+        by_end[end] = {"date": end.date().isoformat(), "time": end.strftime("%H:%M"),
+                       **{k: _number(row.get(k)) for k in ("open","high","low","close","volume","amount")}}
+    return [by_end[end] for end in sorted(by_end)[-count:]]
+
+
+def load_live_minutes(code: str, now: datetime) -> list[dict]:
+    """Stock Agent's Upchina endpoint; native line type 1 means ONE minute."""
+    count = completed_session_minutes(now)
+    if not count:
+        return []
+    local = now.astimezone(ZoneInfo("Asia/Shanghai"))
+    clock = local.time()
+    # Upchina includes the forming bar. One spare retains 09:31 before we
+    # discard that unfinished bar; the displayed result still contains <= N.
+    forming = time(9,30) <= clock < time(11,30) or time(13) <= clock < time(15)
+    market = 1 if code.startswith("6") else 7 if code.startswith(("9","4","8")) else 0
+    response = requests.post("http://jzyzwup.upoem1.com/json/hq_marketdata/kLineData",
+        json={"stReq": {"stHeader": {"shtMarket": market}, "sCode": code,
+                        "eLineType": 1, "shtStartxh": 0, "shtWantNum": count + int(forming)}},
+        timeout=(2,4))
+    response.raise_for_status()
+    values = []
+    for item in response.json().get("stRsp", {}).get("vAnalyData", []):
+        stamp = item["sttDateTime"]
+        end = datetime.strptime(str(stamp["iDate"]), "%Y%m%d") + timedelta(minutes=int(stamp["shtTime"]))
+        values.append(dict(end=end, open=float(item["fOpen"]), high=float(item["fHigh"]),
+            low=float(item["fLow"]), close=float(item["fClose"]),
+            volume=float(item.get("lVolume") or 0)*100, amount=float(item.get("fAmount") or 0)))
+    return today_minute_bars(values, now)
+
+
 class StrategyExecutionViewService:
-    """Only reads persisted decisions; it never estimates missing outcomes."""
+    """Reads decisions from DB; intraday charts always use the live minute API."""
 
     def load_today_market(self, *, owner_user_id: str, now: datetime | None = None,
-                          quote_loader=None) -> dict:
-        current = (now or datetime.now(ZoneInfo("Asia/Shanghai"))).astimezone(
-            ZoneInfo("Asia/Shanghai"))
+                          quote_loader=None, minute_loader=None) -> dict:
+        current = (now or datetime.now(ZoneInfo("Asia/Shanghai"))).astimezone(ZoneInfo("Asia/Shanghai"))
         today = current.date().isoformat()
         requested_minutes = completed_session_minutes(current)
-        picks: dict[str, str] = {}
-        bars: dict[str, list[dict]] = {}
+        picks = {}
+        daily = {}
         with kingdom_connection("KINGDOMAI_DB_URL") as conn:
             tables = _tables(conn)
+            # Exactly the same 20-trading-day scope and older unsold positions
+            # as the execution list. Codes are never accepted from the browser.
+            days = query(conn, """SELECT calendar_date FROM aiia_trade_calendar
+                WHERE market_code='CN_A' AND is_trade_day=1 AND calendar_date<=%s
+                ORDER BY calendar_date DESC LIMIT 20""", (today,))
+            first = _iso(days[-1]["calendar_date"]) if days else today
             for table in (("strategy_execution",) if "strategy_execution" in tables else
                           ("automl_strategy_execution", "automl_strategy_selection")):
                 if table not in tables:
                     continue
-                where = "signal_date=%s"
-                params = (owner_user_id, today)
+                where = "signal_date BETWEEN %s AND %s"
+                args = (owner_user_id, first, today)
                 if table == "strategy_execution":
-                    where = "(signal_date=%s OR (buy_at>=%s AND buy_at<%s))"
-                    params = (owner_user_id, today, today,
-                              (current.date() + timedelta(days=1)).isoformat())
+                    where = "(signal_date BETWEEN %s AND %s OR (signal_date<%s AND buy_price IS NOT NULL AND sell_price IS NULL))"
+                    args += (first,)
                 for row in query(conn, f"""SELECT DISTINCT stock_code,stock_name FROM {table}
-                    WHERE user_id=%s AND {where}""", params):
+                    WHERE user_id=%s AND {where}""", args):
                     code = str(row["stock_code"]).strip()
                     if re.fullmatch(r"[0-9]{6}", code):
                         picks.setdefault(code, str(row["stock_name"]).strip())
             codes = sorted(picks)
-            if codes and requested_minutes:
-                placeholders = ",".join(["%s"] * len(codes))
-                rows = query(conn, f"""SELECT stk_code,bar_end_time,open_price,
-                    high_price,low_price,latest_price,volume,amount
-                    FROM aiia_stock_realtime_minute_snapshot
-                    WHERE stk_code IN ({placeholders}) AND trade_date=%s
-                      AND kline_type='1m' AND period_minutes=1
-                      AND is_finalized=1 AND source_bar_count=1
-                      AND bar_end_time<=%s
-                    ORDER BY stk_code,bar_end_time""",
-                    (*codes, today, current.replace(tzinfo=None)))
-                bars = {code: [] for code in codes}
+            if codes:
+                # Daily history is raw/unadjusted, matching the live quotes.
+                symbols = tuple(c + (".SH" if c.startswith("6") else ".BJ" if c.startswith(("9","4","8")) else ".SZ") for c in codes)
+                marks = ','.join(['%s'] * len(symbols))
+                rows = query(conn, f"""SELECT stk_code,trade_date,open,high,low,close,volume,amount
+                    FROM kcrp_stock_price WHERE stk_code IN ({marks})
+                    AND trade_date>=%s AND trade_date<%s ORDER BY stk_code,trade_date DESC""",
+                    (*symbols, (current.date()-timedelta(days=60)).isoformat(), today))
                 for row in rows:
-                    code = str(row["stk_code"]).strip()
-                    end = row["bar_end_time"]
-                    clock = end.time()
-                    if not (time(9, 30) < clock <= time(11, 30)
-                            or time(13) < clock <= time(15)):
-                        continue
-                    bars[code].append({
-                        "time": end.strftime("%H:%M"),
-                        "open": _number(row["open_price"]),
-                        "high": _number(row["high_price"]),
-                        "low": _number(row["low_price"]),
-                        "close": _number(row["latest_price"]),
-                        "volume": _number(row["volume"]),
-                        "amount": _number(row["amount"]),
-                    })
-        codes = sorted(picks)
+                    code = str(row['stk_code'])[:6]
+                    history = daily.setdefault(code, [])
+                    if len(history) < 20:
+                        history.append({"date": _iso(row['trade_date']), "time": _iso(row['trade_date'])[5:],
+                                        **{k:_number(row[k]) for k in ('open','high','low','close','volume','amount')}})
+                for rows in daily.values():
+                    rows.reverse()
+        bars, errors, quotes = {}, {}, {}
         quote_error = None
-        quote_rows = []
         if codes:
-            try:
-                if quote_loader is None:
-                    from src.experiments.staged_data_protocol.phase2.realtime_quote_provider import load_realtime_rows
-                    quote_loader = load_realtime_rows
-                quote_rows, _ = quote_loader({"codes": codes})
-            except Exception:
-                quote_error = "实时行情源暂不可用"
-        quotes = {str(row.get("code")): row for row in quote_rows
-                  if str(row.get("tradedate")) == today}
-        return {
-            "trade_date": today,
-            "as_of": current.isoformat(),
-            "requested_minutes": requested_minutes,
-            "quote_error": quote_error,
-            "stocks": [{
-                "code": code, "name": picks[code],
-                "bars": bars.get(code, []),
-                "quote": ({key: _number(quotes[code].get(key)) for key in
-                           ("close", "pct", "preclose", "open", "high", "low",
-                            "amount", "volumn", "snapshot_time", "source")}
-                          if code in quotes else None),
-            } for code in codes],
-        }
+            if quote_loader is None:
+                from src.experiments.staged_data_protocol.phase2.realtime_quote_provider import load_realtime_rows
+                quote_loader = load_realtime_rows
+            minute_loader = minute_loader or load_live_minutes
+            with ThreadPoolExecutor(max_workers=min(8, len(codes)+1)) as pool:
+                quote_future = pool.submit(quote_loader, {"codes": codes})
+                jobs = {pool.submit(minute_loader, code, current):code for code in codes} if requested_minutes else {}
+                for job in as_completed(jobs):
+                    code = jobs[job]
+                    try:
+                        bars[code] = job.result()
+                    except Exception:
+                        errors[code] = "分钟接口暂不可用"
+                try:
+                    quote_rows, _ = quote_future.result()
+                    quotes = {str(r.get('code')):r for r in quote_rows if str(r.get('tradedate')) == today}
+                except Exception:
+                    quote_error = "实时行情接口暂不可用"
+        return dict(trade_date=today, as_of=current.isoformat(), requested_minutes=requested_minutes,
+            quote_error=quote_error, minute_source='upchina_1m_api', stocks=[dict(
+                code=c, name=picks[c], bars=bars.get(c,[]), daily_bars=daily.get(c,[]),
+                minute_error=errors.get(c),
+                quote={k:_number(quotes[c].get(k)) for k in
+                       ('close','pct','preclose','open','high','low','amount','volumn','snapshot_time','source')}
+                      if c in quotes else None) for c in codes])
 
     def load(self, *, owner_user_id: str, include_owners: bool = False) -> dict:
         today = datetime.now(ZoneInfo("Asia/Shanghai")).date().isoformat()
