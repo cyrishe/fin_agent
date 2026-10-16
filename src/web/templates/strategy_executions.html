@@ -78,7 +78,7 @@ function stockRow(pick,names,stockMap,dayMarket){
  const head=el('div','row-head'),identity=el('div','identity'),name=el('div');name.append(el('strong','',pick.stock_name),el('span','code',pick.stock_code));identity.append(name,el('span','model',names.get(pick.strategy_id)||pick.strategy_id));
  const quote=el('div',`quote ${color(q?.pct)}`);quote.append(el('b','',price(q?.close)),el('span','',signed(q?.pct)));head.append(identity,quote);
  head.append(el('div','quote-time',q?(live?`行情 ${q.snapshot_time?.slice(11,19)||''}`:`${pick.signal_date.slice(5)} 收盘`):dayMarket?.quote_error||dayMarket?.error||(dayMarket?'该日行情缺失':'加载中…')));
- const stats=el('div','stats');for(const [name,value]of [['昨收',q?.preclose],['今开',q?.open],['最高',q?.high],['最低',q?.low]]){const v=el('div','stat',name);v.append(el('b','',price(value)));stats.append(v);}head.append(stats);article.append(head);
+ const stats=el('div','stats');for(const [name,value]of [[live?'昨收':'前收',q?.preclose],[live?'今开':'开盘',q?.open],['最高',q?.high],['最低',q?.low]]){const v=el('div','stat',name);v.append(el('b','',price(value)));stats.append(v);}head.append(stats);article.append(head);
  const meta=el('div','selection-meta'),eligible=pick.actionable==null||Boolean(Number(pick.actionable));
  meta.append(el('span','selection-date',`${pick.signal_date} 选股`),el('span','',`第${pick.selection_rank}名`),el('span',`badge ${eligible?'holding':''}`,eligible?'被选中可交易':'观察 / 轮空'));
  const history=recentHistory(pick),same=history.filter(p=>modelName(p)===modelName(pick)),other=history.filter(p=>modelName(p)!==modelName(pick));
