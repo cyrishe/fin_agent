@@ -1,0 +1,23 @@
+{
+  "dates": 34,
+  "matching_daily_lists": 24,
+  "mismatching_dates": [
+    "2026-01-07",
+    "2026-01-13",
+    "2026-01-14",
+    "2026-01-16",
+    "2026-01-30",
+    "2026-02-02",
+    "2026-02-04",
+    "2026-02-05",
+    "2026-02-09",
+    "2026-02-10"
+  ],
+  "reference_picks": 34,
+  "new_picks": 34,
+  "matching_ranked_stocks": 24,
+  "probabilities_for_same_stock": {},
+  "reference_sha256": null,
+  "same_stock_gate_equal": 24,
+  "same_stock_gate_comparable": 24
+}
