@@ -12,15 +12,17 @@
 @media(max-width:680px){.shell{padding:8px 10px 24px}.row-body{display:block}.chart-panel+.chart-panel{border-left:0;border-top:1px solid #293e54}.row-head{gap:12px;padding:10px 14px}.stats{margin-left:0;flex:0 1 auto}.identity{min-width:145px}.quote{min-width:130px}.quote b{font-size:24px}.toolbar{gap:9px}h1{font-size:19px}.toolbar select{max-width:180px}.execution{gap:20px;padding:8px 0 0}.selection-meta{padding:0;gap:8px}.history-trigger{font-size:10px}.trade-return b{display:block;margin:3px 0 0}.chart-head{flex-wrap:wrap}}
 
 .stock-row{background:var(--row-bg);content-visibility:auto;contain-intrinsic-size:auto 270px}.stock-row .row-head{background:var(--head-bg)}
-.date-tone-0{--row-bg:#102131;--head-bg:#172b3c}.date-tone-1{--row-bg:#172238;--head-bg:#202e45}
+.date-tone-0{--row-bg:#0e1c2c;--head-bg:#142638;--date-accent:#75bdce;--date-border:#33586c}.date-tone-1{--row-bg:#26394a;--head-bg:#30495b;--date-accent:#b2d9d5;--date-border:#5d7d8b}
+.stock-row{border-color:var(--date-border);border-left:4px solid var(--date-accent)}.stock-row .record-date{color:var(--date-accent)}
+#actionable-filter{display:inline-flex;align-items:center;gap:7px;white-space:nowrap}#actionable-filter::before{content:'✓';display:inline-grid;place-items:center;width:16px;height:16px;border:1px solid #7894a8;border-radius:4px;color:transparent;font-size:12px}#actionable-filter[aria-pressed="true"]{background:#214b49;border-color:#79cfc1;color:#dcfff5}#actionable-filter[aria-pressed="true"]::before{background:#8ee0cb;border-color:#8ee0cb;color:#10382e}button:focus-visible{outline:2px solid #9bd8e8;outline-offset:3px}
 .row-head{gap:18px}.record-date{min-width:134px;flex-shrink:0;color:#e2eff7;font-size:21px;font-weight:650;letter-spacing:.2px}.record-date small{display:block;color:#88b2c5;font-size:10px;letter-spacing:1px;margin-bottom:5px;font-weight:400}
-.selection-meta .selection-date{display:none}.identity{min-width:155px}.decision-summary{min-width:300px}.list{gap:12px}.stock-row.new-date{margin-top:14px;border-top:2px solid #527589}.stock-row:first-child{margin-top:0}
+.selection-meta .selection-date{display:none}.identity{min-width:155px}.decision-summary{min-width:300px}.list{gap:12px}.stock-row.new-date{margin-top:20px;border-top:2px solid var(--date-border)}.stock-row:first-child{margin-top:0}
 .chart-slot{height:118px;width:100%}.chart-slot canvas{display:block;width:100%;height:118px}.load-footer{text-align:center;padding:28px 0 12px;color:#91a6ba}.load-footer button{min-width:230px;padding:12px 22px}.load-footer small{display:block;margin-top:10px;font-size:12px}
 @media(max-width:680px){.record-date{font-size:19px;min-width:122px}.row-head{gap:10px 18px}.identity{min-width:130px}.decision-summary{min-width:0;width:100%;flex-basis:100%}.stock-row{contain-intrinsic-size:auto 440px}.stats{gap:14px}}
 </style>
 </head>
 <body><main class="shell">
-<header class="toolbar"><h1>策略选股总览</h1><label for="strategy-filter">模型</label><select id="strategy-filter"><option value="">全部模型</option></select><label for="owner-filter" id="owner-label" class="hidden">用户</label><select id="owner-filter" class="hidden"></select><span class="spacer"></span><span class="live" id="refresh-state">每 10 秒自动刷新</span><button id="refresh" type="button">立即刷新</button><a id="home-link" href="#">工作台</a></header>
+<header class="toolbar"><h1>策略选股总览</h1><label for="strategy-filter">模型</label><select id="strategy-filter"><option value="">全部模型</option></select><label for="owner-filter" id="owner-label" class="hidden">用户</label><select id="owner-filter" class="hidden"></select><button id="actionable-filter" type="button" aria-pressed="false">仅实际选中</button><span class="spacer"></span><span class="live" id="refresh-state">每 10 秒自动刷新</span><button id="refresh" type="button">立即刷新</button><a id="home-link" href="#">工作台</a></header>
 <div class="subtitle"><span id="summary">最近 20 个交易日 · 按选股日期</span><span id="asof">正在读取…</span></div>
 <div id="error" class="error hidden" role="alert"></div><section id="stock-list" class="list" aria-label="选股与实时行情列表"><div class="empty">正在加载股票列表…</div></section>
 <div id="load-footer" class="load-footer"><button id="load-more" type="button">再看 20 个交易日</button><small>向下滚动加载更早记录</small></div>
@@ -127,13 +129,15 @@ async function ensureMinuteMarket(pick,offset,force=false){
 function rowKey(p){return `${pickKey(p)}:${p.selection_rank}`;}
 function makeRow(p){const dayMarket=p.signal_date===market?.trade_date?market:historicalMarkets.get(p.signal_date),stocks=new Map((dayMarket?.stocks||[]).map(s=>[s.code,s]));return stockRow(p,new Map(records.strategies.map(s=>[s.strategy_id,s.name])),stocks,dayMarket);}
 function replaceRow(p){const key=rowKey(p),old=rowNodes.get(key);if(!old?.isConnected)return;const node=makeRow(p);node.className=old.className;old.replaceWith(node);rowNodes.set(key,node);drawCharts();}
+function isActionable(p){return p.actionable==null||Number(p.actionable)===1;}
+function visiblePicks(picks,selected,onlyActionable){return picks.filter(p=>(!selected||p.strategy_id===selected)&&(!onlyActionable||isActionable(p)));}
 function render(){
  if(!records)return;pendingCharts=[];
- const selected=$('strategy-filter').value,picks=records.picks.filter(p=>!selected||p.strategy_id===selected).sort((a,b)=>b.signal_date.localeCompare(a.signal_date)||a.strategy_id.localeCompare(b.strategy_id)||a.selection_rank-b.selection_rank);
+ const selected=$('strategy-filter').value,onlyActionable=$('actionable-filter').getAttribute('aria-pressed')==='true',picks=visiblePicks(records.picks,selected,onlyActionable).sort((a,b)=>b.signal_date.localeCompare(a.signal_date)||a.strategy_id.localeCompare(b.strategy_id)||a.selection_rank-b.selection_rank);
  const fragment=document.createDocumentFragment();let last=null,tone=-1;
  for(const p of picks){const newDate=p.signal_date!==last;if(newDate){tone++;last=p.signal_date;}const key=rowKey(p);let node=rowNodes.get(key);if(!node){node=makeRow(p);rowNodes.set(key,node);}node.className=`stock-row date-tone-${tone%2}${newDate?' new-date':''}`;fragment.append(node);}
- $('stock-list').replaceChildren(fragment);if(!picks.length)$('stock-list').append(el('div','empty','这个日期范围暂无选股记录。'));
- const dates=records.trade_dates;$('summary').textContent=`已加载 ${dates.length} 个交易日 · ${dates.at(-1)||''} — ${dates[0]||''}`;
+ $('stock-list').replaceChildren(fragment);if(!picks.length)$('stock-list').append(el('div','empty',onlyActionable?'已加载日期内暂无符合交易条件的选股。':'这个日期范围暂无选股记录。'));
+ const dates=records.trade_dates;$('summary').textContent=`已加载 ${dates.length} 个交易日 · ${picks.length} 条${onlyActionable?'实际选中':'记录'} · ${dates.at(-1)||''} — ${dates[0]||''}`;
  $('load-more').disabled=loadingPage||!nextBefore;$('load-more').textContent=loadingPage?'正在读取更早记录…':nextBefore?'再看 20 个交易日':'已显示全部记录';
  drawCharts();
 }
@@ -174,6 +178,7 @@ async function refresh(force=false){
  finally{request=null;}
 }
 $('strategy-filter').addEventListener('change',render);
+$('actionable-filter').addEventListener('click',()=>{const button=$('actionable-filter');button.setAttribute('aria-pressed',String(button.getAttribute('aria-pressed')!=='true'));render();});
 $('close-history').addEventListener('click',()=>$('selection-history').close());
 $('selection-history').addEventListener('close',()=>historyFocus?.isConnected&&historyFocus.focus());
 $('owner-filter').addEventListener('change',()=>{owner=$('owner-filter').value;$('selection-history').close();loadPage(true);});

@@ -35,7 +35,7 @@ from scripts.strategy_execution_store import record_daily_run, record_selection
 ZONE=ZoneInfo('Asia/Shanghai')
 CLOCKS=tuple(pd.date_range('09:31',periods=120,freq='min').strftime('%H:%M:%S'))+tuple(pd.date_range('13:01',periods=100,freq='min').strftime('%H:%M:%S'))
 PROBS=['p_lt0','p_0to1','p_1to3','p_ge3']
-VERSION_DESC='B1七因子20日·分钟文件及数据库重建'
+VERSION_DESC='20日滚动·七因子四分类'
 
 
 def sha(path):
@@ -430,7 +430,7 @@ def main():
     p.add_argument('phase',choices=['prepare','fit','write','verify','all']);p.add_argument('--start',default='2026-01-01');p.add_argument('--end',default='2026-10-31')
     p.add_argument('--env-file',type=Path,default=Path('.env'));p.add_argument('--output',type=Path,default=Path('outputs/stock_automl/b1_history_20261016'))
     p.add_argument('--minute-root',type=Path,default=Path('.'));p.add_argument('--minute-manifest',type=Path);p.add_argument('--workers',type=int,default=2)
-    p.add_argument('--user-id',default='imac');p.add_argument('--version',default='v1.1');p.add_argument('--write-db',action='store_true')
+    p.add_argument('--user-id',default='imac');p.add_argument('--version',default='v1.0');p.add_argument('--write-db',action='store_true')
     args=p.parse_args()
     if args.phase in ['prepare','all']:
         plan=prepare_sources(args);build_candidates(args,plan)
