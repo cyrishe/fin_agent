@@ -106,3 +106,49 @@ def test_legacy_csv_boundary_preserves_archived_float_contract_only_for_legacy_p
     assert actual.loc[0,'signal_return']==raw and actual.loc[2,'signal_return']==raw
     assert actual.signal_date.tolist()==frame.signal_date.tolist()
     assert actual.signal_price.tolist()==frame.signal_price.tolist()
+
+
+def test_empty_current_morning_uses_api_later_but_missing_history_is_an_error(monkeypatch):
+    from scripts import backfill_b1_history as m
+    class Today(datetime):
+        @classmethod
+        def now(cls,zone):return cls(2026,10,16,12,0,tzinfo=zone)
+    monkeypatch.setattr(m,'datetime',Today)
+    monkeypatch.setattr(m,'query',lambda *a:pd.DataFrame())
+    signal,morning=m.database_summary(None,'2026-10-16',signal=False)
+    assert signal.empty and list(morning.columns)==['symbol6','second_high','close_40']
+    with pytest.raises(ValueError,match='no morning'):m.database_summary(None,'2026-10-15',signal=False)
+    with pytest.raises(ValueError,match='no morning'):m.database_summary(None,'2026-10-16',signal=True)
+
+
+def test_api_exit_backfill_is_only_for_selected_current_morning(tmp_path,monkeypatch):
+    from contextlib import contextmanager
+    from decimal import Decimal
+    from types import SimpleNamespace
+    from scripts import backfill_b1_history as m
+    from scripts import readable_strategy_execution as api
+    class Today(datetime):
+        @classmethod
+        def now(cls,zone):return cls(2026,10,16,12,0,tzinfo=zone)
+    monkeypatch.setattr(m,'datetime',Today)
+    rows=[dict(signal_date='2026-10-15',next_date='2026-10-16',symbol6='002636',actionable=True,close_40=float('nan')),
+          dict(signal_date='2026-10-15',next_date='2026-10-16',symbol6='002131',actionable=False,close_40=float('nan')),
+          dict(signal_date='2026-10-14',next_date='2026-10-15',symbol6='002698',actionable=True,close_40=float('nan'))]
+    pd.DataFrame(rows).to_csv(tmp_path/'picks.csv',index=False)
+    (tmp_path/'models/2026-10-15').mkdir(parents=True)
+    calls=[]
+    class DB:
+        @contextmanager
+        def cursor(self):yield None
+    @contextmanager
+    def connection(_):yield DB()
+    monkeypatch.setattr(m,'db_connection',connection)
+    def close(cur,day,code,**kwargs):calls.append((day,code));return Decimal('10.55')
+    monkeypatch.setattr(api,'api_0940_close',close)
+    m.refresh_api_exits(SimpleNamespace(output=tmp_path,env_file=None))
+    actual=m.read(tmp_path/'picks.csv')
+    assert calls==[('2026-10-16','002636')]
+    assert actual.iloc[0].close_40==10.55 and actual.iloc[0].exit_price_basis=='09:40_minute_api_close_proxy'
+    assert actual.iloc[1:].close_40.isna().all()
+    m.refresh_api_exits(SimpleNamespace(output=tmp_path,env_file=None))
+    assert len(calls)==1
