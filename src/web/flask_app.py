@@ -89,6 +89,7 @@ from src.web.auth_routes import create_auth_blueprint
 from src.web.assistant_result_routes import create_assistant_result_blueprint
 from src.web.backtest_routes import create_backtest_blueprint
 from src.web.scheduled_task_routes import create_scheduled_task_blueprint
+from src.web.strategy_execution_routes import create_strategy_execution_blueprint
 
 
 app = Flask(__name__, static_folder="static", static_url_path="/static")
@@ -328,6 +329,11 @@ app.register_blueprint(
     )
 )
 app.register_blueprint(create_backtest_blueprint())
+app.register_blueprint(
+    create_strategy_execution_blueprint(
+        identity_resolver=_resolve_current_member_identity,
+    )
+)
 app.register_blueprint(
     create_assistant_result_blueprint(
         conversation_service=runtime_conversation_service,

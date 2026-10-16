@@ -1,0 +1,70 @@
+"""Authenticated, read-only strategy execution dashboard."""
+from __future__ import annotations
+
+from typing import Callable
+
+from flask import Blueprint, current_app, jsonify, render_template, request
+
+from src.services.strategy_execution_view_service import StrategyExecutionViewService
+
+
+def create_strategy_execution_blueprint(
+    *, identity_resolver: Callable[[], dict | None],
+    service: StrategyExecutionViewService | None = None,
+) -> Blueprint:
+    blueprint = Blueprint("strategy_execution_dashboard", __name__)
+    view_service = service or StrategyExecutionViewService()
+
+    @blueprint.get("/strategies")
+    @blueprint.get("/strategies/")
+    def page():
+        response = current_app.make_response(render_template("strategy_executions.html"))
+        response.headers["Cache-Control"] = "no-store, private"
+        return response
+
+    @blueprint.get("/api/strategies/executions")
+    def recent_executions():
+        owner, is_admin, error = resolve_owner()
+        if error:
+            return error
+        try:
+            result = view_service.load(owner_user_id=owner,
+                                       include_owners=is_admin)
+        except Exception:
+            current_app.logger.exception("strategy execution view unavailable")
+            return jsonify({"ok": False, "error": "策略记录暂时不可用，请稍后重试。"}), 503
+        response = jsonify({"ok": True, **result})
+        response.headers["Cache-Control"] = "no-store, private"
+        response.headers["Vary"] = "Cookie"
+        return response
+
+    def resolve_owner():
+        identity = identity_resolver()
+        if not identity or identity.get("user_type") not in {"member", "admin"}:
+            return None, False, (jsonify({"ok": False, "error": "请登录后查看策略记录。"}), 403)
+        own_id = str(identity.get("user_id") or "").strip()
+        if not own_id:
+            return None, False, (jsonify({"ok": False, "error": "账户身份不可用。"}), 403)
+        is_admin = identity.get("user_type") == "admin"
+        requested_owner = str(request.args.get("user_id") or "").strip()
+        owner_id = requested_owner if is_admin and requested_owner else own_id
+        if len(owner_id) > 128:
+            return None, False, (jsonify({"ok": False, "error": "用户标识过长。"}), 400)
+        return owner_id, is_admin, None
+
+    @blueprint.get("/api/strategies/today-market")
+    def today_market():
+        owner, _is_admin, error = resolve_owner()
+        if error:
+            return error
+        try:
+            result = view_service.load_today_market(owner_user_id=owner)
+        except Exception:
+            current_app.logger.exception("strategy today market unavailable")
+            return jsonify({"ok": False, "error": "今日行情暂时不可用，请稍后重试。"}), 503
+        response = jsonify({"ok": True, **result})
+        response.headers["Cache-Control"] = "no-store, private"
+        response.headers["Vary"] = "Cookie"
+        return response
+
+    return blueprint

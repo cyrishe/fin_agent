@@ -1,4 +1,4 @@
-import { BookOpen, CalendarClock, LogOut, MessageSquarePlus, PanelLeftClose, Search, Sparkles } from "lucide-react";
+import { BookOpen, CalendarClock, ChartNoAxesCombined, LogOut, MessageSquarePlus, PanelLeftClose, Search, Sparkles } from "lucide-react";
 import { appPath } from "../appPath";
 import type { AuthUser, ThreadSummary } from "../types";
 
@@ -45,6 +45,7 @@ export default function Sidebar(props: Props) {
       <button className="new-chat" type="button" onClick={props.onNew}><MessageSquarePlus size={17} />新建对话</button>
       <button className="schedule-nav-button" type="button" onClick={props.onOpenSchedules}><CalendarClock size={17} />任务中心</button>
       <button className="schedule-nav-button" type="button" onClick={props.onOpenSkills}><BookOpen size={17} />Skill 方法库</button>
+      <a className="schedule-nav-button" href={appPath("/strategies")}><ChartNoAxesCombined size={17} />策略执行</a>
       <label className="history-search"><Search size={16} /><input value={props.query} onChange={(event) => props.onQuery(event.target.value)} placeholder="搜索会话" /></label>
       <div className="history-label">最近对话</div>
       <nav className="thread-list" aria-label="会话历史">
