@@ -93,7 +93,12 @@ def database_summary(db,day,signal=True):
     base="FROM aiia_stock_realtime_minute_snapshot_full WHERE trade_date=%s AND kline_type='1m' AND period_minutes=1"
     exact="is_finalized=1 AND is_fallback=0 AND source_snapshot_time=bar_end_time"
     morning=query(db,"SELECT stk_code AS symbol,bar_end_time AS time,open_price AS open,high_price AS high,low_price AS low,latest_price AS close,volume*100 AS volume,amount AS turnover "+base+" AND bar_end_time BETWEEN %s AND %s AND "+exact,(day,day+' 09:31:00',day+' 09:40:00'))
-    if morning.empty:raise ValueError(f'{day}: no morning data')
+    if morning.empty:
+        if not signal and day==datetime.now(ZONE).date().isoformat():
+            # Today's DB batch may not be ingested yet. Only selected exits
+            # are fetched from the minute API after all prediction is complete.
+            return pd.DataFrame(),pd.DataFrame(columns=['symbol6','second_high','close_40'])
+        raise ValueError(f'{day}: no morning data')
     morning['time']=morning.time.astype(str)
     for c in ['open','high','low','close','volume','turnover']:morning[c]=pd.to_numeric(morning[c])
     _,labels=raw_summary(morning,day)
@@ -314,6 +319,33 @@ def fit_days(args,plan):
     pd.concat(result,ignore_index=True).to_csv(out/'picks.csv',index=False,float_format='%.17g');save_json(out/'folds.json',folds)
 
 
+def refresh_api_exits(args):
+    from scripts.readable_strategy_execution import api_0940_close
+    import requests
+    path=args.output/'picks.csv';picks=read(path);now=datetime.now(ZONE)
+    wanted=picks.actionable & picks.close_40.isna() & picks.next_date.eq(now.date().isoformat())
+    if not wanted.any():return
+    receipts=[]
+    if 'exit_price_basis' not in picks:picks['exit_price_basis']='09:40_minute_close_proxy'
+    with db_connection(args.env_file) as db:
+        with db.cursor() as cur:
+            for index,p in picks[wanted].iterrows():
+                receipt={'signal_date':p.signal_date,'exit_date':p.next_date,'symbol6':p.symbol6,
+                         'minute':'09:40:00','fetched_at':now.isoformat(),'source':'hq_marketdata/kLineData'}
+                try:
+                    value=api_0940_close(cur,p.next_date,p.symbol6,now=now)
+                    receipt['price']=str(value) if value else None
+                    if value is not None:
+                        picks.loc[index,'close_40']=float(value)
+                        picks.loc[index,'exit_price_basis']='09:40_minute_api_close_proxy'
+                except requests.RequestException as exc:receipt['error']=str(exc)
+                receipts.append(receipt)
+    picks.to_csv(path,index=False,float_format='%.17g')
+    for day in picks.loc[wanted,'signal_date'].unique():
+        picks[picks.signal_date.eq(day)].to_csv(args.output/'models'/day/'picks.csv',index=False,float_format='%.17g')
+    save_json(args.output/'api_exit_receipts.json',receipts)
+
+
 def price(value):
     if value is None or pd.isna(value):return None
     return Decimal(str(value)).quantize(Decimal('.0001'))
@@ -347,7 +379,7 @@ def write_results(args):
                                 if existing['sell_price']!=sell or str(existing['sell_at'])!=sale_at:raise ValueError('Existing exit differs')
                             else:
                                 cur.execute('UPDATE strategy_execution SET sell_at=%s,sell_price=%s,sell_price_basis=%s,gross_return_pct=%s WHERE user_id=%s AND strategy_name=%s AND model_version=%s AND signal_date=%s AND selection_rank=%s AND sell_price IS NULL',
-                                    (sale_at,sell,'09:40_minute_close_proxy',(sell/buy-1)*100,*identity))
+                                    (sale_at,sell,p.get('exit_price_basis','09:40_minute_close_proxy'),(sell/buy-1)*100,*identity))
                 db.commit();complete.append(day)
             except Exception:db.rollback();raise
     save_json(out/'write_receipt.json',dict(user_id=args.user_id,strategy_name='收盘开盘',version=args.version,days=len(complete),picks=len(picks),actionable=int(picks.actionable.sum()),settled=int((picks.actionable&picks.close_40.notna()).sum()),written_at=datetime.now(ZONE).isoformat()))
@@ -398,6 +430,7 @@ def main():
         plan=prepare_sources(args);build_candidates(args,plan)
     else:plan=json.loads((args.output/'plan.json').read_text())
     if args.phase in ['fit','all']:fit_days(args,plan)
+    if args.phase in ['fit','all','write']:refresh_api_exits(args)
     if args.phase=='write' or args.phase=='all' and args.write_db:
         if not args.write_db:raise ValueError('Use --write-db to persist the reviewed replay')
         write_results(args);verify_results(args)
