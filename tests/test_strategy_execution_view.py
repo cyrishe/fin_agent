@@ -415,7 +415,7 @@ def test_page_route_cursor_and_owner_are_validated():
     assert not service.calls
     response=client.get('/api/strategies/page?user_id=imac&before=2026-09-11')
     assert response.status_code==200
-    assert service.calls[-1]==dict(owner_user_id='alice',include_owners=False,before='2026-09-11',refresh_history=False)
+    assert service.calls[-1]==dict(owner_user_id='alice',include_owners=False,before='2026-09-11',refresh_history=False,include_charts=True)
     assert client.get('/api/strategies/live?user_id=imac').status_code==200
     assert service.calls[-1]==dict(owner_user_id='alice',include_daily=False)
     assert client.get('/api/strategies/live?daily=1').status_code==200
@@ -469,3 +469,12 @@ def test_history_batch_cache_reuses_data_but_new_selection_gets_a_fresh_batch(mo
     s.load_history_batch(picks+[dict(signal_date='2026-10-13',stock_code='688498',stock_name='源杰科技')],'2026-10-16')
     assert len(calls)==2
     view_module._cached_history_batch.cache_clear()
+
+
+def test_light_page_does_not_wait_for_historical_charts(monkeypatch):
+    service=view_module.StrategyExecutionViewService()
+    monkeypatch.setattr(service,'load',lambda **kwargs:dict(trade_dates=['2026-10-15'],strategies=[],picks=[]))
+    def no_history(*a):raise AssertionError('List response must not query historical candles')
+    monkeypatch.setattr(service,'load_history_batch',no_history)
+    result=service.load_page(owner_user_id='alice',include_charts=False)
+    assert result['records']['trade_dates']==['2026-10-15'] and result['markets']=={}

@@ -244,7 +244,8 @@ class StrategyExecutionViewService:
                       if c in quotes else None) for c in codes])
 
     def load_page(self, *, owner_user_id: str, include_owners: bool = False,
-                  before: str | None = None, refresh_history: bool = False) -> dict:
+                  before: str | None = None, refresh_history: bool = False,
+                  include_charts: bool = True) -> dict:
         if refresh_history:
             _cached_history_batch.cache_clear()
         records = self.load(owner_user_id=owner_user_id, include_owners=include_owners,
@@ -253,7 +254,7 @@ class StrategyExecutionViewService:
         days = records['trade_dates']
         first_dates = [s.get('first_date') for s in records['strategies'] if s.get('first_date')]
         has_more = bool(days and first_dates and min(first_dates) < days[-1])
-        return dict(ok=True, records=records, markets=self.load_history_batch(records['picks'], today),
+        return dict(ok=True, records=records, markets=self.load_history_batch(records['picks'], today) if include_charts else {},
                     trade_date=today, next_before=days[-1] if has_more else None)
 
     def load_live(self, *, owner_user_id: str, include_daily: bool = False) -> dict:

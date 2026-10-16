@@ -53,7 +53,7 @@ def create_strategy_execution_blueprint(
             except ValueError:
                 return jsonify(ok=False,error='分页日期无效。'),400
         try:
-            result = view_service.load_page(owner_user_id=owner,include_owners=is_admin,before=before,refresh_history=request.args.get("refresh")=="1")
+            result = view_service.load_page(owner_user_id=owner,include_owners=is_admin,before=before,refresh_history=request.args.get("refresh")=="1",include_charts=request.args.get("charts")!="0")
         except Exception:
             current_app.logger.exception('strategy page unavailable')
             return jsonify(ok=False,error='选股数据暂不可用，请重试。'),503

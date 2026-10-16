@@ -148,10 +148,15 @@ async function loadPage(reset=false,forceHistory=false){
  if(loadingPage&&!reset)return;if(!reset&&!nextBefore)return;
  const epoch=reset?++pageEpoch:pageEpoch;loadingPage=true;$('load-more').disabled=true;$('load-more').textContent='正在整批读取 20 个交易日…';
  if(reset){historyEpoch++;historicalMarkets.clear();minuteMarkets.clear();minuteRequests.clear();minuteOffsets.clear();rowNodes.clear();chartObserver.disconnect();records=null;market=null;needLiveDaily=true;$('stock-list').replaceChildren(el('div','empty','正在读取选股和历史图表…'));}
- try{const data=await getData('/api/strategies/page',{...(!reset&&nextBefore?{before:nextBefore}:{}),...(forceHistory?{refresh:'1'}:{})});if(epoch!==pageEpoch)return;
- records=mergeRecords(records,data.records);nextBefore=data.next_before;for(const [day,value]of Object.entries(data.markets))historicalMarkets.set(day,value);
- if(!market)market={trade_date:data.trade_date,as_of:'',stocks:[]};const todayHistory=historicalMarkets.get(market.trade_date);if(todayHistory&&!market.stocks.length)market={...todayHistory,as_of:''};
- options();render();$('error').classList.add('hidden');if(reset)await refresh(true);
+ const params={...(!reset&&nextBefore?{before:nextBefore}:{})};
+ try{const data=await getData('/api/strategies/page',{...params,charts:'0'});if(epoch!==pageEpoch)return;
+ records=mergeRecords(records,data.records);nextBefore=data.next_before;
+ if(!market)market={trade_date:data.trade_date,as_of:'',stocks:[]};
+ options();render();$('error').classList.add('hidden');if(reset)refresh(true);
+ const history=await getData('/api/strategies/page',{...params,...(forceHistory?{refresh:'1'}:{})});if(epoch!==pageEpoch)return;
+ for(const [day,value]of Object.entries(history.markets))historicalMarkets.set(day,value);
+ for(const p of data.records.picks)rowNodes.delete(rowKey(p));
+ render();
  }catch(e){if(epoch===pageEpoch){$('error').textContent=e.message;$('error').classList.remove('hidden');}}
  finally{if(epoch===pageEpoch){loadingPage=false;if(records)render();else{$('load-more').disabled=false;$('load-more').textContent='重试加载';}}}
 }
