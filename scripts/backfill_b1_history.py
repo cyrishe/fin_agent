@@ -5,7 +5,7 @@ No orders are placed. Each day is cached once; every fit uses only its previous
 """
 from __future__ import annotations
 import argparse
-from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import ProcessPoolExecutor
 from datetime import datetime
 from decimal import Decimal
 import hashlib
@@ -132,7 +132,7 @@ def prepare_sources(args):
         if len(calendar[:first])<20:raise ValueError('Missing warmup calendar')
         plan={'requested_start':args.start,'requested_end':args.end,'signal_days':days,'minute_days':needed,'as_of':now.isoformat()}
         save_json(out/'plan.json',plan)
-        if not (out/'daily.csv.gz').exists():
+        if not all((out/f).exists() for f in ('daily.csv.gz','names.csv','st.csv.gz')):
             raw=query(db,"SELECT trade_date AS date,LEFT(stk_code,6) AS symbol6,preclose,close,adjpreclose,adjclose,volume,turn_ratio FROM kcrp_stock_price WHERE trade_date BETWEEN %s AND %s",('2025-10-01',days[-1]))
             raw['date']=raw.date.astype(str);raw.to_csv(out/'daily.csv.gz',index=False,float_format='%.17g')
             names=query(db,'SELECT LEFT(stk_code,6) AS symbol6,stk_name AS name FROM kcrp_stock_baseinfo')
@@ -140,31 +140,39 @@ def prepare_sources(args):
             st=load_st_intervals(db);st.to_csv(out/'st.csv.gz',index=False)
     manifest=json.loads(args.minute_manifest.read_text()) if args.minute_manifest else []
     paths={Path(r['path']).name[:10]:r for r in manifest}
-    def one(day):
-        dest=out/'minutes'/day;dest.mkdir(parents=True,exist_ok=True)
-        if (dest/'complete.json').exists():return day,'cached'
-        started=time.perf_counter();source=paths.get(day)
-        if source:
-            path=args.minute_root/source['path']
-            if sha(path)!=source['sha256']:raise ValueError(f'{day}: uploaded minute hash differs')
-            with subprocess.Popen(['zstd','-dc',str(path)],stdout=subprocess.PIPE) as proc:
-                b=pd.read_csv(proc.stdout,dtype={'symbol':str})
-                if proc.wait()!=0:raise ValueError('zstd decoding failed')
-            summary,labels=raw_summary(b,day)
-        else:
-            with db_connection(args.env_file) as db:
-                summary,labels=database_summary(db,day,signal=day<=days[-1])
-            source={'path':'kingdomai minute table','source':'exact finalized 1m'}
-        summary.to_csv(dest/'signal.csv.gz',index=False,float_format='%.17g')
-        labels.to_csv(dest/'morning.csv.gz',index=False,float_format='%.17g')
-        meta={'day':day,'signal_rows':len(summary),'morning_rows':len(labels),'source':source,
-              'signal_sha256':sha(dest/'signal.csv.gz'),'morning_sha256':sha(dest/'morning.csv.gz'),
-              'seconds':time.perf_counter()-started}
-        save_json(dest/'complete.json',meta);print('minute',day,len(summary),round(meta['seconds'],2),flush=True)
-        return day,'built'
-    with ThreadPoolExecutor(max_workers=args.workers) as pool:
-        list(pool.map(one,needed))
+    tasks=[(args,day,paths.get(day),days[-1]) for day in needed]
+    # File decoding/aggregation uses separate processes; cap DB readers at two.
+    for from_file in (True,False):
+        selected=[task for task in tasks if bool(task[2])==from_file]
+        with ProcessPoolExecutor(max_workers=args.workers if from_file else min(args.workers,2)) as pool:
+            list(pool.map(prepare_minute,selected))
     return plan
+
+
+def prepare_minute(task):
+    args,day,source_record,last_signal=task
+    out=args.output
+    dest=out/'minutes'/day;dest.mkdir(parents=True,exist_ok=True)
+    if (dest/'complete.json').exists():return day,'cached'
+    started=time.perf_counter();source=source_record
+    if source:
+        path=args.minute_root/source['path']
+        if sha(path)!=source['sha256']:raise ValueError(f'{day}: uploaded minute hash differs')
+        with subprocess.Popen(['zstd','-dc',str(path)],stdout=subprocess.PIPE) as proc:
+            b=pd.read_csv(proc.stdout,dtype={'symbol':str})
+            if proc.wait()!=0:raise ValueError('zstd decoding failed')
+        summary,labels=raw_summary(b,day)
+    else:
+        with db_connection(args.env_file) as db:
+            summary,labels=database_summary(db,day,signal=day<=last_signal)
+        source={'path':'kingdomai minute table','source':'exact finalized 1m'}
+    summary.to_csv(dest/'signal.csv.gz',index=False,float_format='%.17g')
+    labels.to_csv(dest/'morning.csv.gz',index=False,float_format='%.17g')
+    meta={'day':day,'signal_rows':len(summary),'morning_rows':len(labels),'source':source,
+          'signal_sha256':sha(dest/'signal.csv.gz'),'morning_sha256':sha(dest/'morning.csv.gz'),
+          'seconds':time.perf_counter()-started}
+    save_json(dest/'complete.json',meta);print('minute',day,len(summary),round(meta['seconds'],2),flush=True)
+    return day,'built'
 
 
 def build_candidates(args,plan):
@@ -194,6 +202,15 @@ def build_candidates(args,plan):
         d=d[keep].copy();d['next_date']=nextday[day];d['name']=d.symbol6.map(names).fillna(d.symbol6)
         labelpath=out/'minutes'/nextday[day]/'morning.csv.gz'
         labels=read(labelpath) if labelpath.exists() else pd.DataFrame(columns=['symbol6','second_high','close_40'])
+        # Preserve B1's archived training-label eligibility: its raw builder
+        # included a morning label only when that stock's next-day prefix was
+        # complete. The independently observed sale remains available.
+        nextsignal=out/'minutes'/nextday[day]/'signal.csv.gz'
+        if nextsignal.exists() and nextday[day]<=plan['signal_days'][-1]:
+            labelkeys=read(nextsignal).symbol6
+            labels.loc[~labels.symbol6.isin(labelkeys),'second_high']=np.nan
+        else:
+            labels['second_high']=np.nan
         d=d.merge(labels,on='symbol6',how='left',validate='one_to_one');parts.append(d)
     candidates=pd.concat(parts,ignore_index=True)
     st=read(out/'st.csv.gz')
@@ -293,9 +310,43 @@ def write_results(args):
     save_json(out/'write_receipt.json',dict(user_id=args.user_id,strategy_name='收盘开盘',version=args.version,days=len(complete),picks=len(picks),actionable=int(picks.actionable.sum()),settled=int((picks.actionable&picks.close_40.notna()).sum()),written_at=datetime.now(ZONE).isoformat()))
 
 
+def verify_results(args):
+    """Read back every replayed row and compare persisted dates/prices to output."""
+    picks=read(args.output/'picks.csv');folds=json.loads((args.output/'folds.json').read_text())
+    with db_connection(args.env_file) as db:
+        identity=(args.user_id,'收盘开盘',args.version,folds[0]['day'],folds[-1]['day'])
+        where=' WHERE user_id=%s AND strategy_name=%s AND model_version=%s AND signal_date BETWEEN %s AND %s'
+        runs=query(db,'SELECT signal_date,candidate_count,selection_count,model_sha256 FROM strategy_daily_run'+where,identity)
+        rows=query(db,'SELECT signal_date,selection_rank,stock_code,actionable,signal_price,buy_at,buy_price,sell_at,sell_price,gross_return_pct FROM strategy_execution'+where,identity)
+    if len(runs)!=len(folds) or len(rows)!=len(picks):raise ValueError('DB row counts differ')
+    runs['signal_date']=runs.signal_date.astype(str);rows['signal_date']=rows.signal_date.astype(str)
+    runs=runs.set_index('signal_date');rows=rows.set_index(['signal_date','selection_rank'])
+    for fold in folds:
+        r=runs.loc[fold['day']]
+        for col in ['candidate_count','selection_count','model_sha256']:
+            if r[col]!=fold[col]:raise ValueError(f"DB daily fact differs: {fold['day']} {col}")
+    for p in picks.to_dict('records'):
+        r=rows.loc[(p['signal_date'],p['selection_rank'])]
+        buy=price(p['signal_price']) if p['actionable'] else None
+        sell=price(p['close_40']) if p['actionable'] else None
+        expected={'stock_code':p['symbol6'],'actionable':int(p['actionable']),'signal_price':price(p['signal_price']),
+                  'buy_price':buy,'sell_price':sell,
+                  'buy_at':p['signal_date']+' 14:40:00' if buy else None,
+                  'sell_at':p['next_date']+' 09:40:00' if sell else None}
+        for col,val in expected.items():
+            got=None if pd.isna(r[col]) else str(r[col]) if col.endswith('_at') else r[col]
+            if got!=val:raise ValueError(f"DB execution differs: {p['signal_date']} {p['symbol6']} {col}")
+        if sell and abs(Decimal(str(r.gross_return_pct))-(sell/buy-1)*100)>Decimal('0.00001'):
+            raise ValueError('DB return differs')
+        if not sell and pd.notna(r.gross_return_pct):raise ValueError('Unsettled record has a return')
+    receipt={'days':len(runs),'selections':len(rows),'verified_at':datetime.now(ZONE).isoformat(),
+             'picks_sha256':sha(args.output/'picks.csv'),'verified_fields':'identity, candidate/selection counts, model hash, actionable, signal/buy/sell prices, times, return'}
+    save_json(args.output/'db_readback.json',receipt);print(json.dumps(receipt,ensure_ascii=False))
+
+
 def main():
     p=argparse.ArgumentParser(description=__doc__)
-    p.add_argument('phase',choices=['prepare','fit','write','all']);p.add_argument('--start',default='2026-01-01');p.add_argument('--end',default='2026-10-31')
+    p.add_argument('phase',choices=['prepare','fit','write','verify','all']);p.add_argument('--start',default='2026-01-01');p.add_argument('--end',default='2026-10-31')
     p.add_argument('--env-file',type=Path,default=Path('.env'));p.add_argument('--output',type=Path,default=Path('outputs/stock_automl/b1_history_20261016'))
     p.add_argument('--minute-root',type=Path,default=Path('.'));p.add_argument('--minute-manifest',type=Path);p.add_argument('--workers',type=int,default=2)
     p.add_argument('--user-id',default='imac');p.add_argument('--version',default='v1.1');p.add_argument('--write-db',action='store_true')
@@ -306,6 +357,7 @@ def main():
     if args.phase in ['fit','all']:fit_days(args,plan)
     if args.phase=='write' or args.phase=='all' and args.write_db:
         if not args.write_db:raise ValueError('Use --write-db to persist the reviewed replay')
-        write_results(args)
+        write_results(args);verify_results(args)
+    if args.phase=='verify':verify_results(args)
 
 if __name__=='__main__':main()

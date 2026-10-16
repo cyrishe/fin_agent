@@ -54,3 +54,41 @@ def test_training_uses_exact_past20_and_only_mature_labels():
 def test_database_price_precision_and_unknown():
     assert str(price(12.34567))=='12.3457'
     assert price(float('nan')) is None and price(None) is None
+
+
+@pytest.mark.parametrize('previous_sell',[None,10.5,99])
+def test_history_writer_records_d0_buy_d1_sell_and_preserves_existing_exit(tmp_path,monkeypatch,previous_sell):
+    from contextlib import contextmanager
+    from decimal import Decimal
+    from types import SimpleNamespace
+    from scripts import backfill_b1_history as m
+    from scripts import run_automl_1440_strategy as runner
+    m.save_json(tmp_path/'folds.json',[dict(day='2026-01-05',candidate_count=20,model_sha256='m',input_sha256='i',training_sha256='t',training_dates=['2025-12-31'])])
+    pd.DataFrame([dict(signal_date='2026-01-05',next_date='2026-01-06',symbol6='002636',name='金安国纪',selection_rank=1,signal_price=10,close_40=10.5,actionable=True),
+                  dict(signal_date='2026-01-05',next_date='2026-01-06',symbol6='002131',name='利欧股份',selection_rank=2,signal_price=11,close_40=12,actionable=False)]).to_csv(tmp_path/'picks.csv',index=False)
+    calls=[];saved=[];commits=[];rollbacks=[]
+    class Cursor:
+        def execute(self,sql,args):calls.append((sql,args))
+        def fetchone(self):return dict(actionable=1,buy_price=Decimal('10'),sell_price=Decimal(str(previous_sell)) if previous_sell else None,sell_at='2026-01-06 09:40:00' if previous_sell else None)
+    class DB:
+        @contextmanager
+        def cursor(self):yield Cursor()
+        def commit(self):commits.append(1)
+        def rollback(self):rollbacks.append(1)
+    @contextmanager
+    def connection(_):yield DB()
+    monkeypatch.setattr(runner,'write_connection',connection)
+    monkeypatch.setattr(m,'record_daily_run',lambda *a,**kw:None)
+    monkeypatch.setattr(m,'record_selection',lambda *a,**kw:saved.append(kw))
+    args=SimpleNamespace(output=tmp_path,env_file=None,user_id='imac',version='v1.1')
+    if previous_sell==99:
+        with pytest.raises(ValueError,match='exit differs'):m.write_results(args)
+        assert rollbacks and not commits
+        return
+    m.write_results(args)
+    assert saved[0]['buy_at']=='2026-01-05 14:40:00' and saved[0]['buy_price']==Decimal('10')
+    assert saved[1]['buy_price'] is None and saved[1]['buy_at'] is None
+    updates=[args for sql,args in calls if sql.startswith('UPDATE')]
+    assert len(updates)==(previous_sell is None)
+    if updates:assert updates[0][:4]==('2026-01-06 09:40:00',Decimal('10.5'),'09:40_minute_close_proxy',Decimal('5'))
+    assert commits and not rollbacks
