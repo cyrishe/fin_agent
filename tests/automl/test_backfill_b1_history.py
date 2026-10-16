@@ -152,3 +152,25 @@ def test_api_exit_backfill_is_only_for_selected_current_morning(tmp_path,monkeyp
     assert actual.iloc[1:].close_40.isna().all()
     m.refresh_api_exits(SimpleNamespace(output=tmp_path,env_file=None))
     assert len(calls)==1
+
+
+def test_no_pick_day_does_not_change_actionable_csv_type(tmp_path,monkeypatch):
+    from types import SimpleNamespace
+    from scripts import backfill_b1_history as m
+    days=pd.bdate_range('2026-01-01',periods=23).strftime('%Y-%m-%d').tolist()
+    rows=[dict(signal_date=d,next_date=days[i+1],symbol6='002636',name='金安国纪',signal_price=10.,second_high=11.,close_40=10.5,**{f:1. for f in m.FEATURES}) for i,d in enumerate(days[:-1])]
+    pd.DataFrame(rows).to_csv(tmp_path/'candidates.csv.gz',index=False)
+    pd.DataFrame({'date':days}).to_csv(tmp_path/'calendar.csv',index=False)
+    pd.DataFrame([{'signal_date':d,'symbol6':'002636','amount':100.} for d in days]).to_csv(tmp_path/'amounts.csv.gz',index=False)
+    monkeypatch.setattr(m,'train_model',lambda *a:'test model')
+    monkeypatch.setattr(m,'infer',lambda model,rows:rows)
+    def select(rows):
+        result=rows.iloc[:0].copy() if rows.iloc[0].signal_date==days[20] else rows.copy()
+        result['selection_rank']=1
+        return result
+    monkeypatch.setattr(m,'select_top',select)
+    m.fit_days(SimpleNamespace(output=tmp_path),{'signal_days':days[20:22]})
+    picks=m.read(tmp_path/'picks.csv')
+    assert len(picks)==1 and picks.actionable.dtype==bool and bool(picks.iloc[0].actionable)
+    m.fit_days(SimpleNamespace(output=tmp_path),{'signal_days':days[20:22]})
+    pd.testing.assert_frame_equal(picks,m.read(tmp_path/'picks.csv'))

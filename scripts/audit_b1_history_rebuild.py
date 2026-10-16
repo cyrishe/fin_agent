@@ -67,6 +67,15 @@ def audit(run, repo):
     ref=old[old.selected].copy();ref['selection_rank']=1
     report['CO7_top1']=compare_picks(p[p.selection_rank.eq(1)],ref,dates,dest/'CO7_picks.csv')
     report['CO7_top1']['reference_sha256']=sha(path)
+    reference_trades=old.set_index('signal_date').trade.reindex(dates).astype(bool)
+    replay_trades=p.groupby('signal_date').actionable.any().reindex(dates,fill_value=False)
+    report['CO7_top1']['matching_daily_trade_decisions']=int(reference_trades.eq(replay_trades).sum())
+    old_trades=old[old.trade&old.signal_date.isin(dates)]
+    new_trades=p[p.actionable&p.signal_date.isin(dates)]
+    trade_keys=new_trades.merge(old_trades,on=['signal_date','symbol6'],how='outer',indicator=True)
+    report['CO7_top1']['reference_trades']=len(old_trades)
+    report['CO7_top1']['replayed_trades']=len(new_trades)
+    report['CO7_top1']['identical_trade_keys']=int(trade_keys._merge.eq('both').sum())
     a=p[p.selection_rank.eq(1)].merge(old,on=['signal_date','symbol6'],suffixes=('_new','_old'),validate='one_to_one')
     gateeq=a.amount_gate_new.fillna(-1).eq(a.amount_gate_old.fillna(-1))
     report['CO7_top1']['same_stock_gate_comparable']=len(a)
@@ -88,6 +97,14 @@ def audit(run, repo):
         report[name]['reference_sha256']=sha(path)
     p['gross_return_pct']=np.where(p.actionable,p.close_40/p.signal_price*100-100,np.nan)
     p.to_csv(dest/'selections_with_returns.csv',index=False,float_format='%.17g')
+    settled=p.actionable&p.close_40.notna()
+    export=pd.DataFrame({'模型':'收盘开盘','版本':'v1.1','选股日期':p.signal_date,'排名':p.selection_rank,
+                         '股票代码':p.symbol6,'股票名称':p.name,'可交易':p.actionable.astype(int),
+                         '信号价格':p.signal_price,'买入时间':np.where(p.actionable,p.signal_date+' 14:40',''),
+                         '买入价格':p.signal_price.where(p.actionable),
+                         '卖出时间':np.where(settled,p.next_date+' 09:40',''),
+                         '卖出价格':p.close_40.where(settled),'毛收益(%)':p.gross_return_pct})
+    export.to_csv(dest/'选股与买卖明细.csv',index=False,encoding='utf-8-sig')
     monthly=[]
     for month in sorted({f['day'][:7] for f in folds}):
         rows=p[p.signal_date.str.startswith(month)];trade=rows[rows.actionable];settled=trade[trade.close_40.notna()]
