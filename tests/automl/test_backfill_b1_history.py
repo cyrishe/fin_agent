@@ -92,3 +92,17 @@ def test_history_writer_records_d0_buy_d1_sell_and_preserves_existing_exit(tmp_p
     assert len(updates)==(previous_sell is None)
     if updates:assert updates[0][:4]==('2026-01-06 09:40:00',Decimal('10.5'),'09:40_minute_close_proxy',Decimal('5'))
     assert commits and not rollbacks
+
+
+def test_legacy_csv_boundary_preserves_archived_float_contract_only_for_legacy_period():
+    from scripts.backfill_b1_history import legacy_csv_floats, FEATURES
+    # Raw recomputed return vs. the value consumed by the archived B1 fitter.
+    raw=0.05193482688391038
+    frame=pd.DataFrame([{**{c:1. for c in FEATURES},'signal_date':day,
+                         'signal_return':raw,'signal_price':10.33,'second_high':10.4}
+                        for day in ['2025-12-30','2026-01-13','2026-08-03']])
+    actual=legacy_csv_floats(frame)
+    assert actual.loc[1,'signal_return']==0.0519348268839103
+    assert actual.loc[0,'signal_return']==raw and actual.loc[2,'signal_return']==raw
+    assert actual.signal_date.tolist()==frame.signal_date.tolist()
+    assert actual.signal_price.tolist()==frame.signal_price.tolist()
