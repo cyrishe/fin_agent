@@ -22,7 +22,7 @@
 </style>
 </head>
 <body><main class="shell">
-<header class="toolbar"><h1>策略选股总览</h1><label for="strategy-filter">模型</label><select id="strategy-filter"><option value="">全部模型</option></select><label for="owner-filter" id="owner-label" class="hidden">用户</label><select id="owner-filter" class="hidden"></select><button id="actionable-filter" type="button" aria-pressed="false">仅实际选中</button><span class="spacer"></span><span class="live" id="refresh-state">每 10 秒自动刷新</span><button id="refresh" type="button">立即刷新</button><a id="home-link" href="#">工作台</a></header>
+<header class="toolbar"><h1>策略选股总览</h1><label for="strategy-filter">模型</label><select id="strategy-filter"><option value="">全部模型</option></select><label for="owner-filter" id="owner-label" class="hidden">用户</label><select id="owner-filter" class="hidden"></select><button id="actionable-filter" type="button" aria-pressed="false">仅实际选中</button><span class="spacer"></span><span class="live" id="refresh-state">每 10 秒自动刷新</span><button id="refresh" type="button">刷新今日分钟</button><a id="home-link" href="#">工作台</a></header>
 <div class="subtitle"><span id="summary">最近 20 个交易日 · 按选股日期</span><span id="asof">正在读取…</span></div>
 <div id="error" class="error hidden" role="alert"></div><section id="stock-list" class="list" aria-label="选股与实时行情列表"><div class="empty">正在加载股票列表…</div></section>
 <div id="load-footer" class="load-footer"><button id="load-more" type="button">再看 20 个交易日</button><small>向下滚动加载更早记录</small></div>
@@ -98,7 +98,12 @@ function stockRow(pick,names,stockMap,dayMarket){
  const execution=el('div','execution');
  for(const [label,value,at]of [['买',pick.entry_price,pick.entry_at],['卖',pick.exit_price,pick.exit_at]]){const cell=el('div','trade');cell.append(el('span','trade-label',label),el('b',label==='卖'&&value==null?'waiting':'',label==='卖'&&value==null?'暂未卖出':price(value)));if(at)cell.append(el('time','',dateTime(at)));execution.append(cell);}
  const ret=el('div','trade-return','收益');ret.append(el('b',color(pick.gross_return_pct),signed(pick.gross_return_pct)));execution.append(ret);decision.append(execution);
- const body=el('div','row-body'),offset=minuteOffsets.get(pickKey(pick))||0;
+ const body=el('div','row-body');body.append(makeMinutePanel(pick,dayMarket,stock));
+ let daily=[...(stock?.daily_bars||[])];if(live&&q&&q.open>0&&q.high>0&&q.low>0&&q.close>0){daily.push({date:market.trade_date,time:market.trade_date.slice(5),open:q.open,high:q.high,low:q.low,close:q.close,volume:q.volumn==null?null:Number(q.volumn)*100,amount:q.amount});}daily=daily.slice(-20);
+ body.append(panel('近 20 日日 K',`截至 ${pick.signal_date.slice(5)}`,daily,dayMarket?.error||(dayMarket?'该日数据缺失':'加载中…'),{reference:q?.preclose}));article.append(body);return article;
+}
+function makeMinutePanel(pick,dayMarket,stock){
+ const offset=minuteOffsets.get(pickKey(pick))||0;
  const minuteMarket=offset?minuteMarkets.get(minuteKey(pick,offset)):dayMarket;
  const minuteStock=offset?minuteMarket?.stocks?.find(s=>s.code===pick.stock_code):stock;
  const dates=dayMarket?.minute_dates||[pick.signal_date],index=dates.indexOf(pick.signal_date)+offset;
@@ -110,13 +115,12 @@ function stockRow(pick,names,stockMap,dayMarket){
  prev.type=next.type=reset.type='button';prev.setAttribute('aria-label',`${pick.stock_name}前一交易日分钟K`);next.setAttribute('aria-label',`${pick.stock_name}后一交易日分钟K`);
  prev.disabled=index<=0;next.disabled=index>=dates.length-1||minuteDay>=market?.trade_date;
  reset.disabled=offset===0;reset.setAttribute('aria-label',`${pick.stock_name}返回选股日分钟K`);
- const change=value=>{minuteOffsets.set(pickKey(pick),value);replaceRow(pick);};
+ const change=value=>{minuteOffsets.set(pickKey(pick),value);replaceMinuteFrame(pick);};
  prev.addEventListener('click',()=>change(offset-1));next.addEventListener('click',()=>change(offset+1));reset.addEventListener('click',()=>change(0));
  nav.append(prev,el('span','minute-date',`${minuteDay.slice(5)}${minuteLive?' 今日':''} · 1 分钟 K`),next,reset);
- minutePanel.querySelector('h3').replaceWith(nav);minutePanel.dataset.minuteDate=minuteDay;body.append(minutePanel);
+ minutePanel.querySelector('h3').replaceWith(nav);minutePanel.dataset.minuteDate=minuteDay;
  if(offset){ensureMinuteMarket(pick,offset);}
- let daily=[...(stock?.daily_bars||[])];if(live&&q&&q.open>0&&q.high>0&&q.low>0&&q.close>0){daily.push({date:market.trade_date,time:market.trade_date.slice(5),open:q.open,high:q.high,low:q.low,close:q.close,volume:q.volumn==null?null:Number(q.volumn)*100,amount:q.amount});}daily=daily.slice(-20);
- body.append(panel('近 20 日日 K',`截至 ${pick.signal_date.slice(5)}`,daily,dayMarket?.error||(dayMarket?'该日数据缺失':'加载中…'),{reference:q?.preclose}));article.append(body);return article;
+ return minutePanel;
 }
 async function ensureMinuteMarket(pick,offset,force=false){
  const key=minuteKey(pick,offset);if(minuteRequests.has(key)||(!force&&minuteMarkets.has(key)))return;
@@ -124,11 +128,23 @@ async function ensureMinuteMarket(pick,offset,force=false){
  minuteRequests.set(key,true);
  try{const response=await fetch(`${base}/api/strategies/market?${params}`,{credentials:'same-origin',cache:'no-store'});const data=await response.json();if(!response.ok||!data.ok)throw new Error(data.error||'分钟行情加载失败');if(epoch===historyEpoch)minuteMarkets.set(key,data);}
  catch(e){if(epoch===historyEpoch)minuteMarkets.set(key,{stocks:[],error:e.message});}
- finally{if(epoch===historyEpoch){minuteRequests.delete(key);replaceRow(pick);}}
+ finally{if(epoch===historyEpoch){minuteRequests.delete(key);replaceMinuteFrame(pick);}}
 }
 function rowKey(p){return `${pickKey(p)}:${p.selection_rank}`;}
 function makeRow(p){const dayMarket=p.signal_date===market?.trade_date?market:historicalMarkets.get(p.signal_date),stocks=new Map((dayMarket?.stocks||[]).map(s=>[s.code,s]));return stockRow(p,new Map(records.strategies.map(s=>[s.strategy_id,s.name])),stocks,dayMarket);}
-function replaceRow(p){const key=rowKey(p),old=rowNodes.get(key);if(!old?.isConnected)return;const node=makeRow(p);node.className=old.className;old.replaceWith(node);rowNodes.set(key,node);drawCharts();}
+function replaceMinuteFrame(p){
+ const row=rowNodes.get(rowKey(p));if(!row?.isConnected)return;
+ const dayMarket=p.signal_date===market?.trade_date?market:historicalMarkets.get(p.signal_date),stock=dayMarket?.stocks?.find(s=>s.code===p.stock_code);
+ const old=row.querySelector('.row-body > .chart-panel');if(!old)return;
+ const next=makeMinutePanel(p,dayMarket,stock),slot=old.querySelector('.chart-slot');if(slot)chartObserver.unobserve(slot);
+ old.replaceWith(next);drawCharts();
+}
+function updateLiveQuote(p){
+ const row=rowNodes.get(rowKey(p)),q=market?.stocks?.find(s=>s.code===p.stock_code)?.quote;if(!row?.isConnected||!q)return;
+ const quote=row.querySelector('.quote');quote.className=`quote ${color(q.pct)}`;quote.querySelector('b').textContent=price(q.close);quote.querySelector('span').textContent=signed(q.pct);
+ row.querySelector('.quote-time').textContent=`行情 ${q.snapshot_time?.slice(11,19)||''}`;
+ row.querySelectorAll('.stat b').forEach((node,i)=>node.textContent=price([q.preclose,q.open,q.high,q.low][i]));
+}
 function isActionable(p){return p.actionable==null||Number(p.actionable)===1;}
 function visiblePicks(picks,selected,onlyActionable){return picks.filter(p=>(!selected||p.strategy_id===selected)&&(!onlyActionable||isActionable(p)));}
 function render(){
@@ -169,9 +185,8 @@ async function refresh(force=false){
  try{const data=await getData('/api/strategies/live',needLiveDaily?{daily:'1'}:{});if(epoch!==pageEpoch)return;
  const prior=new Map((market?.stocks||[]).map(s=>[s.code,s]));for(const s of data.market.stocks)if(!s.daily_bars?.length)s.daily_bars=prior.get(s.code)?.daily_bars||[];
  market=data.market;needLiveDaily=market.stocks.some(s=>!s.daily_bars.length);
- const day=market.trade_date,oldToday=records.picks.filter(p=>p.signal_date===day),changed=JSON.stringify(oldToday)!==JSON.stringify(data.records.picks);
- records=mergeRecords({...records,picks:records.picks.filter(p=>p.signal_date!==day)},data.records);
- if(changed){for(const p of oldToday)rowNodes.delete(rowKey(p));options();render();}else for(const p of data.records.picks)replaceRow(p);
+ const day=market.trade_date;
+ for(const p of records.picks)if(p.signal_date===day){updateLiveQuote(p);if(!(minuteOffsets.get(pickKey(p))||0))replaceMinuteFrame(p);}
  for(const p of records.picks){const offset=minuteOffsets.get(pickKey(p))||0;const d=historicalMarkets.get(p.signal_date),dates=d?.minute_dates||[];if(offset&&dates[dates.indexOf(p.signal_date)+offset]===day&&rowNodes.get(rowKey(p))?.isConnected)await ensureMinuteMarket(p,offset,true);}
  $('asof').textContent=`${market.trade_date} · ${market.as_of.slice(11,19)} 更新`;$('refresh-state').textContent='当天行情 · 每 10 秒刷新';
  }catch(e){if(epoch===pageEpoch){$('refresh-state').textContent='实时行情暂不可用 · 正在重试';}}
@@ -184,7 +199,7 @@ $('selection-history').addEventListener('close',()=>historyFocus?.isConnected&&h
 $('owner-filter').addEventListener('change',()=>{owner=$('owner-filter').value;$('selection-history').close();loadPage(true);});
 $('load-more').addEventListener('click',()=>loadPage(!records));
 const pageObserver=new IntersectionObserver(entries=>{if(entries.some(e=>e.isIntersecting)&&records&&nextBefore&&!loadingPage)loadPage();},{rootMargin:'4800px'});pageObserver.observe($('load-footer'));
-$('refresh').addEventListener('click',()=>loadPage(true,true));setInterval(()=>refresh(),10000);
+$('refresh').addEventListener('click',()=>refresh(true));setInterval(()=>refresh(),10000);
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)refresh(true);});loadPage(true);
 })();
 </script></body></html>
