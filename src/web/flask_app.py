@@ -4176,6 +4176,8 @@ def login_resume_thread(thread_id: int):
     return response
 
 
+@app.route("/backtests", methods=["GET"])
+@app.route("/backtests/", methods=["GET"])
 @app.route("/assistant", methods=["GET"])
 @app.route("/assistant/", methods=["GET"])
 def conversation_workbench_page():
