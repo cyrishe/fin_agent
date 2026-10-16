@@ -41,7 +41,7 @@ from scripts.run_automl_four_class_pipeline import (
     train_model,
 )
 from scripts.audit_automl_minute_api_backfill import request_bars
-from scripts.automl_strategy_execution import record_decisions, record_run, settle_previous
+from scripts.readable_strategy_execution import record_decisions, record_run, settle_previous
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -542,7 +542,8 @@ def write_connection(env_file: Path):
 def init_db(env_file: Path) -> None:
     # Full-line SQL comments may contain punctuation, including semicolons.
     # Remove them before splitting this repository's simple CREATE statements.
-    sql = "\n".join(line for line in SCHEMA.read_text().splitlines()
+    sql = "\n".join(line for line in (SCHEMA.read_text() + "\n" +
+                                 (SCHEMA.parent / "strategy_execution.sql").read_text()).splitlines()
                     if not line.lstrip().startswith("--"))
     statements = [part.strip() for part in sql.split(";") if part.strip()]
     with write_connection(env_file) as db:

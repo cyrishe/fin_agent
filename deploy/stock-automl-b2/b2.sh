@@ -2,7 +2,7 @@
 set -euo pipefail
 release_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 mode=${1:-}
-case "$mode" in register|close|scan|settle) ;; *) echo "usage: $0 register|close|scan|settle [args]" >&2; exit 2;; esac
+case "$mode" in register|close|scan|settle|report) ;; *) echo "usage: $0 register|close|scan|settle|report [args]" >&2; exit 2;; esac
 shift
 cd "$release_dir"
 export TZ=Asia/Shanghai OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1

@@ -9,8 +9,8 @@
 1. D0盘后 `close --write-db`：使用D0所属月份冻结的R18完整分段51因子随机森林，给所有原口径封板候选评分，原Top3全入库，actionable=0。
 2. D1从09:30运行 `scan --watch --write-db`，每3秒直接读取三只候选的原始1分钟接口。只消费已经结束的K，忽略尚未完结或别的日期的K。四根K完成后应用当月四K规则。
 3. 激活检查结束标签09:35—09:40：分钟有量且open低于涨停价0.005元。最早分钟优先，同分钟D0排名优先。锁定一只后不换股，实体≤−8%则轮空。
-4. 锁定后的下一根及以后合格K开盘价为模拟买价，最迟结束标签09:40；唯一最终买入者actionable=1。该价发生在K开始，确认最早在该K结束；entry_at与decision_json.actionable_confirmed_at分别保存，两者通常至少差一分钟。
-5. D2收盘 `settle --write-db`：写入日线收盘模拟卖价、毛收益及decision_json.net_return_pct（买卖各0.1%）。卖价缺失、无成交或价格断裂保留待核对。
+4. 锁定后的下一根及以后合格K开盘价为模拟买价，最迟结束标签09:40；唯一最终买入者actionable=1。该价发生在K开始，确认最早在该K结束；buy_at与details_json.actionable_confirmed_at分别保存，两者通常至少差一分钟。
+5. D2收盘 `settle --write-db`：写入日线收盘模拟卖价、毛收益及独立列net_return_pct（买卖各0.1%）。卖价缺失、无成交或价格断裂保留待核对。
 
 服务只记录模拟盘，没有券商接口。100万元两份资金轮换是历史基准的账户回放口径；线上此服务保存候选与逐笔模拟价格/收益，不假称真实账户持仓或订单成交。
 
@@ -26,19 +26,39 @@
 
 ## 数据与表
 
-复用既有部署SQL创建 `automl_strategy_run` 和 `automl_strategy_execution`。
-旧 `automl_strategy_selection` 的四分类必填字段不适合B2，不向其中填伪概率。B2每日记录和Top3在新通用表中查询。
+生产模型定义仍在 `automl_strategy_definition`，定义ID为 `B2`。执行身份为
+`strategy_name=涨停冷静`、`model_version=v1.0`，由 `readable_strategy_execution.py` 统一映射。
+`strategy_daily_run` 保存每天运行和模型哈希，`strategy_execution` 保存原Top3及模拟买卖。
+`environment_json` 保存模型月份、训练/验证窗口、规则哈希及来源；`details_json` 保存评分、因子、形态和筛选原因。
+旧 `automl_*` 执行表仅供追溯，当前任务不再往旧表双写。
 
 ```sql
 SELECT signal_date,selection_rank,stock_code,stock_name,actionable,
- JSON_EXTRACT(decision_json,'$.score') AS score,
- JSON_UNQUOTE(JSON_EXTRACT(decision_json,'$.first_open_bar_end')) AS first_open_bar_end,
- JSON_UNQUOTE(JSON_EXTRACT(decision_json,'$.actionable_confirmed_at')) AS confirmed_at,
- entry_at,entry_price,exit_at,exit_price,gross_return_pct,
- JSON_EXTRACT(decision_json,'$.net_return_pct') AS net_return_pct
-FROM automl_strategy_execution WHERE user_id='imac' AND strategy_id='B2'
+ JSON_EXTRACT(details_json,'$.score') AS score,
+ JSON_UNQUOTE(JSON_EXTRACT(details_json,'$.first_open_bar_end')) AS first_open_bar_end,
+ JSON_UNQUOTE(JSON_EXTRACT(details_json,'$.actionable_confirmed_at')) AS confirmed_at,
+ buy_at,buy_price,sell_at,sell_price,gross_return_pct,net_return_pct
+FROM strategy_execution
+WHERE user_id='imac' AND strategy_name='涨停冷静' AND model_version='v1.0'
 ORDER BY signal_date DESC,selection_rank;
 ```
+
+`./b2.sh report --day YYYY-MM-DD` 读取该D0信号日的最新数据库事实。默认输出中文紧凑摘要：
+排名、评分、四K形态、actionable、模拟买卖、实际确认时间和筛选原因；`--full-output` 可读完整明细。
+盘后重复运行也从数据库输出当前买卖事实，避免把已买入股票重新显示为未激活。
+
+## 历史回填
+
+独立脚本 `scripts.backfill_automl_b2` 先 `prepare` 再 `write`，两个命令均需
+`--assets assets --output outputs/backfill_TAG --env-file /path/to/.env`，日期用 `--start`、`--end` 指定D0。
+prepare只读数据库，使用对应月份的冻结模型和规则，逐条复现原评分/排名/交易，再生成带哈希的待写材料。
+write整批事务写入，重跑不会重复插入；已存在的实时日保留。首次write自动保存本用户现存记录到db_before.json，再执行写入。
+最后运行同参的 `verify`，独立回读身份、评分、明细、价格及收益，并核对既有记录未改变。
+
+历史行明确记录 `environment_json.source=historical_replay` 与 `details_json.historical_replay=true`。
+买卖都是回放模拟价，实际实时确认时间留空。未到D2不提前结算；原研究缺分钟的候选保留名单并注明审计排除。
+历史交易日取已完成的全市场日线快照，未来D1/D2取服务器交易日历，避免仅有当年日历时漏回填往年。
+本脚本不重新训练，也不改B2选股与买卖规则。
 
 日线缓存从经核验的研究快照增量追加；源种子daily.joblib不改，追加到live_daily.joblib。
 新月模型有独立manifest。SEED_MANIFEST只描述最初交付资产，不把后来追加的缓存冒充原资产。

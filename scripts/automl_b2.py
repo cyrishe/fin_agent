@@ -178,6 +178,7 @@ def evaluate_morning(picks: list[dict], bars: dict[str, pd.DataFrame], day: str,
             z["reason"] = "等待前四根完整K"; continue
         f = first_features(first, p["preclose"], p["cap"], 4)
         z.update(shape_ready=True, shape_pass=bool(mask(pd.DataFrame([f]), rule).iloc[0]), shape_features=f)
+        z["reason"] = "等待开板激活" if z["shape_pass"] else "四K形态未通过"
         ready[code] = b.set_index(b.time.dt.strftime("%H:%M"))
     # Missing shape of any ordinary original Top3 prevents silently dropping it.
     if any(p["ordinary"] and not result[p["symbol6"]]["shape_ready"] for p in picks):
@@ -216,4 +217,8 @@ def evaluate_morning(picks: list[dict], bars: dict[str, pd.DataFrame], day: str,
                 break
     if winner is not None and not result[winner["symbol6"]]["actionable"]:
         result[winner["symbol6"]]["reason"] = "等待同股下一根合格K" if as_of.strftime("%H:%M") < "09:40" else "窗口结束，无延后买点，不替补"
+    for z in result.values():
+        if z["shape_pass"] and not z["chosen"]:
+            z["reason"] = "已有更早或同分钟排名更高的候选" if winner else (
+                "窗口结束，未激活" if as_of.strftime("%H:%M") >= "09:40" else "等待开板激活")
     return list(result.values())

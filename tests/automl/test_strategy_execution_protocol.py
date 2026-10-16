@@ -26,7 +26,7 @@ def test_schema_initialization_ignores_semicolons_in_comments(monkeypatch):
         yield Connection()
     monkeypatch.setattr(runner, "write_connection", connection)
     runner.init_db(Path("unused"))
-    assert len(calls) == 4
+    assert len(calls) == 6
     assert all(sql.startswith("CREATE TABLE IF NOT EXISTS") for sql in calls)
 
 

@@ -1,0 +1,13 @@
+{
+  "related_tests": 27,
+  "result": "passed",
+  "test_scope": [
+    "test_automl_b2.py",
+    "test_b2_backfill.py",
+    "test_readable_strategy_execution_protocol.py (deployed snapshot, 8 tests)",
+    "test_strategy_execution_protocol.py",
+    "test_limit_rebound_four_minutes_r24.py"
+  ],
+  "shared_adapter_sha256": "4933739dc460f5dbba38168f15f646ba68bbaed77b9ee15490958cf59f44ad11",
+  "other_workspace_changes": "Concurrent close-open enhancements kept outside this B2 commit and deployment."
+}

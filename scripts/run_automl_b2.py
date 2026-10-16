@@ -14,7 +14,8 @@ import pandas as pd
 
 from scripts.automl_b2 import STRATEGY_ID, TITLE, EXIT_RULE, definition, digest, evaluate_morning, historical_states, build_features
 from scripts.automl_b2_data import calendar, refresh_daily, status_source, prepare_month, model_bundle, score, api_minutes, runtime
-from scripts.automl_strategy_execution import record_run
+from scripts.readable_strategy_execution import record_run, identity
+from scripts.strategy_execution_store import record_selection
 from scripts.benchmark_automl_1440_inference import db_connection, query, fetch_full_market
 from scripts.experiment_automl_limit_rebound_d0_open_r5 import cap_price
 from scripts.experiment_limit_rebound_short_mixed_r12 import dump, sha
@@ -22,6 +23,7 @@ from scripts.run_automl_1440_strategy import write_connection, init_db
 
 
 SHANGHAI = ZoneInfo("Asia/Shanghai")
+IDENTITY_KEY = (identity(STRATEGY_ID)["strategy_name"], identity(STRATEGY_ID)["model_version"])
 
 
 def json_text(value):
@@ -55,18 +57,11 @@ def save_close(args, result):
                     candidate_count=result["candidate_count"], selection_count=len(result["picks"]),
                     model_sha256=result["model_sha256"], environment=result["environment"])
                 for p in result["picks"]:
-                    key = (args.user_id, STRATEGY_ID, result["signal_date"], p["selection_rank"])
-                    c.execute("SELECT stock_code,model_sha256 FROM automl_strategy_execution WHERE user_id=%s AND strategy_id=%s AND signal_date=%s AND selection_rank=%s", key)
-                    old = c.fetchone()
-                    if old:
-                        if old["stock_code"] != p["symbol6"] or old["model_sha256"] != result["model_sha256"]:
-                            raise ValueError("B2已有名单身份不一致")
-                        continue
-                    c.execute("""INSERT INTO automl_strategy_execution (user_id,strategy_id,signal_date,selection_rank,
-                        strategy_name,stock_code,stock_name,actionable,signal_at,signal_price,exit_rule,
-                        model_sha256,environment_json,decision_json) VALUES (%s,%s,%s,%s,%s,%s,%s,0,%s,%s,%s,%s,%s,%s)""",
-                        (*key, TITLE, p["symbol6"], p["name"], result["signal_date"] + " 15:00:00", p["signal_price"],
-                         EXIT_RULE, result["model_sha256"], json_text(result["environment"]), json_text(p)))
+                    record_selection(c, user_id=args.user_id, **identity(STRATEGY_ID),
+                        signal_date=result["signal_date"], selection_rank=p["selection_rank"],
+                        stock_code=p["symbol6"], stock_name=p["name"], actionable=False,
+                        signal_at=result["signal_date"] + " 15:00:00", signal_price=p["signal_price"],
+                        details={**p, "legacy_strategy_id": STRATEGY_ID, "exit_rule": EXIT_RULE})
             db.commit()
         except Exception:
             db.rollback(); raise
@@ -107,11 +102,18 @@ def after_close(args):
             picks.append({"symbol6": r.symbol, "name": name_map.get(r.symbol, ""), "selection_rank": int(r.d0_rank),
                 "score": float(r.score), "signal_price": float(r.close), "state0": states.loc[r.symbol, "st_type"],
                 "rate": float(r.rate), "rule": frozen["selected"], "model_month": args.day[:7],
-                "features": values, "recorded_at": now.isoformat(), "simulation_only": True})
+                "features": values, "recorded_at": now.isoformat(), "simulation_only": True,
+                "d1_date": cal[cal.index(args.day) + 1], "planned_exit_date": cal[cal.index(args.day) + 2],
+                "observation_bars": 4, "rule_text": frozen["selected"]["text"].replace("五分", "四分"),
+                "historical_replay": False})
         result = {"strategy_id": STRATEGY_ID, "signal_date": args.day, "candidate_count": len(all_scores),
             "d1_date": cal[cal.index(args.day) + 1], "model_sha256": meta["files"]["model.joblib"],
             "rule_sha256": meta["files"]["rule.json"], "picks": picks,
             "environment": {**runtime(), "definition_sha256": digest(definition()),
+                **identity(STRATEGY_ID), "legacy_strategy_id": STRATEGY_ID,
+                "source": "daily_autorun", "model_month": args.day[:7],
+                "training_window": meta.get("window") or meta.get("source_metrics", {}).get("window"),
+                "rule_sha256": meta["files"]["rule.json"], "observation_bars": 4,
                 "release": args.release, "monthly_manifest_sha256": sha(args.assets / "months" / args.day[:7] / "manifest.json"),
                 "deployment_manifest_sha256": sha(Path("MANIFEST.json")) if Path("MANIFEST.json").exists() else None,
                 "all_scores_sha256": sha(folder / "all_scores.pkl"), "simulation_only": True},
@@ -129,8 +131,8 @@ def load_picks(args, day):
         if day not in cal:
             return None, []
         d0 = cal[cal.index(day) - 1]
-        rows = query(db, """SELECT stock_code,selection_rank,decision_json,actionable,entry_price
-            FROM automl_strategy_execution WHERE user_id=%s AND strategy_id=%s AND signal_date=%s ORDER BY selection_rank""", (args.user_id, STRATEGY_ID, d0))
+        rows = query(db, """SELECT stock_code,selection_rank,details_json AS decision_json,actionable,buy_price AS entry_price
+            FROM strategy_execution WHERE user_id=%s AND strategy_name=%s AND model_version=%s AND signal_date=%s ORDER BY selection_rank""", (args.user_id, *IDENTITY_KEY, d0))
         db.rollback()
     if rows.empty:
         return d0, []
@@ -141,8 +143,8 @@ def persist_scan(args, d0, values, observed_at):
     with write_connection(args.env_file) as db:
         try:
             with db.cursor() as c:
-                c.execute("""SELECT selection_rank,stock_code,actionable,entry_price,decision_json FROM automl_strategy_execution
-                    WHERE user_id=%s AND strategy_id=%s AND signal_date=%s ORDER BY selection_rank FOR UPDATE""", (args.user_id, STRATEGY_ID, d0))
+                c.execute("""SELECT selection_rank,stock_code,actionable,buy_price AS entry_price,details_json AS decision_json FROM strategy_execution
+                    WHERE user_id=%s AND strategy_name=%s AND model_version=%s AND signal_date=%s ORDER BY selection_rank FOR UPDATE""", (args.user_id, *IDENTITY_KEY, d0))
                 previous = {int(r["selection_rank"]): r for r in c.fetchall()}
                 if len(previous) != len(values) or set(previous) != {int(v["selection_rank"]) for v in values}:
                     raise ValueError("B2扫描与已存Top3数量不一致")
@@ -162,12 +164,13 @@ def persist_scan(args, d0, values, observed_at):
                                         ("chosen", "choice_confirmed_at"), ("actionable", "actionable_confirmed_at")]:
                         if z.get(fact):
                             z[stamp] = saved.get(stamp) or observed_at.isoformat()
+                    z.update(legacy_strategy_id=STRATEGY_ID, exit_rule=EXIT_RULE)
                     z["last_observed_at"] = observed_at.isoformat()
                     z["entry_price_basis"] = "completed_minute_open_simulation" if z["actionable"] else None
-                    c.execute("""UPDATE automl_strategy_execution SET actionable=%s,entry_at=%s,entry_price=%s,
-                        entry_price_basis=%s,decision_json=%s WHERE user_id=%s AND strategy_id=%s AND signal_date=%s AND selection_rank=%s""",
+                    c.execute("""UPDATE strategy_execution SET actionable=%s,buy_at=%s,buy_price=%s,
+                        buy_price_basis=%s,details_json=%s WHERE user_id=%s AND strategy_name=%s AND model_version=%s AND signal_date=%s AND selection_rank=%s""",
                         (z["actionable"], z.get("entry_at"), z.get("entry_price"), z["entry_price_basis"], json_text(z),
-                         args.user_id, STRATEGY_ID, d0, rank))
+                         args.user_id, *IDENTITY_KEY, d0, rank))
             db.commit()
         except Exception:
             db.rollback(); raise
@@ -240,13 +243,15 @@ def settle(args):
         try:
             cal = calendar(db)
             with db.cursor() as c:
-                c.execute("""SELECT signal_date,selection_rank,stock_code,entry_price,decision_json
-                    FROM automl_strategy_execution WHERE user_id=%s AND strategy_id=%s AND actionable=1
-                    AND exit_price IS NULL AND exit_rule=%s ORDER BY signal_date,selection_rank FOR UPDATE""",
-                    (args.user_id, STRATEGY_ID, EXIT_RULE))
+                c.execute("""SELECT signal_date,selection_rank,stock_code,buy_price AS entry_price,details_json AS decision_json
+                    FROM strategy_execution WHERE user_id=%s AND strategy_name=%s AND model_version=%s AND actionable=1
+                    AND sell_price IS NULL AND JSON_UNQUOTE(JSON_EXTRACT(details_json,'$.exit_rule'))=%s ORDER BY signal_date,selection_rank FOR UPDATE""",
+                    (args.user_id, *IDENTITY_KEY, EXIT_RULE))
                 rows = c.fetchall(); completed = []
                 for r in rows:
-                    d0 = str(r["signal_date"]); d2 = cal[cal.index(d0) + 2]
+                    facts = json.loads(r["decision_json"]) if isinstance(r["decision_json"], str) else r["decision_json"]
+                    d0 = str(r["signal_date"])
+                    d2 = facts.get("planned_exit_date") or cal[cal.index(d0) + 2]
                     if d2 > args.day:
                         continue
                     c.execute("SELECT close,preclose,volume FROM kcrp_stock_price WHERE trade_date=%s AND LEFT(stk_code,6)=%s", (d2, r["stock_code"]))
@@ -254,9 +259,8 @@ def settle(args):
                     if len(quotes) != 1 or not quotes[0]["close"] or float(quotes[0]["volume"] or 0) <= 0:
                         continue
                     price = Decimal(str(quotes[0]["close"])); entry = Decimal(str(r["entry_price"]))
-                    facts = json.loads(r["decision_json"]) if isinstance(r["decision_json"], str) else r["decision_json"]
                     # Match the research continuity requirement through D2.
-                    d1 = cal[cal.index(d0) + 1]
+                    d1 = facts.get("d1_date") or cal[cal.index(d0) + 1]
                     c.execute("SELECT close FROM kcrp_stock_price WHERE trade_date=%s AND LEFT(stk_code,6)=%s", (d1, r["stock_code"]))
                     prior = c.fetchall()
                     if len(prior) != 1 or abs(Decimal(str(quotes[0]["preclose"])) - Decimal(str(prior[0]["close"]))) > Decimal("0.011"):
@@ -265,10 +269,10 @@ def settle(args):
                     net = (price * Decimal("0.999") / (entry * Decimal("1.001")) - 1) * 100
                     facts.update(net_return_pct=float(net), fee_per_side=.001, exit_confirmed_at=now.isoformat())
                     if args.write_db:
-                        c.execute("""UPDATE automl_strategy_execution SET exit_at=%s,exit_price=%s,exit_price_basis=%s,
-                            gross_return_pct=%s,decision_json=%s WHERE user_id=%s AND strategy_id=%s AND signal_date=%s
-                            AND selection_rank=%s AND exit_price IS NULL""", (d2 + " 15:00:00", price,
-                            "D2_daily_close_simulation", gross, json_text(facts), args.user_id, STRATEGY_ID, d0, r["selection_rank"]))
+                        c.execute("""UPDATE strategy_execution SET sell_at=%s,sell_price=%s,sell_price_basis=%s,
+                            gross_return_pct=%s,net_return_pct=%s,details_json=%s WHERE user_id=%s AND strategy_name=%s AND model_version=%s AND signal_date=%s
+                            AND selection_rank=%s AND sell_price IS NULL""", (d2 + " 15:00:00", price,
+                            "D2_daily_close_simulation", gross, net, json_text(facts), args.user_id, *IDENTITY_KEY, d0, r["selection_rank"]))
                     completed.append({"signal_date": d0, "rank": r["selection_rank"], "exit_date": d2,
                                       "gross_return_pct": float(gross), "net_return_pct": float(net)})
             if args.write_db:
@@ -280,9 +284,49 @@ def settle(args):
             db.rollback(); raise
 
 
+def report(args):
+    """Read the authoritative current rows, including previously confirmed buys."""
+    with db_connection(args.env_file) as db:
+        runs = query(db, "SELECT * FROM strategy_daily_run WHERE user_id=%s AND strategy_name=%s AND model_version=%s AND signal_date=%s", (args.user_id, *IDENTITY_KEY, args.day))
+        rows = query(db, "SELECT * FROM strategy_execution WHERE user_id=%s AND strategy_name=%s AND model_version=%s AND signal_date=%s ORDER BY selection_rank", (args.user_id, *IDENTITY_KEY, args.day))
+        db.rollback()
+    picks = []
+    for r in rows.to_dict("records"):
+        for key in ("buy_at", "buy_price", "sell_at", "sell_price", "net_return_pct"):
+            if pd.isna(r[key]):
+                r[key] = None
+        d = json.loads(r["details_json"]) if isinstance(r["details_json"], str) else r["details_json"] or {}
+        d.update(symbol6=r["stock_code"], name=r["stock_name"], selection_rank=r["selection_rank"],
+                 actionable=r["actionable"], entry_at=r["buy_at"], entry_price=r["buy_price"],
+                 sell_at=r["sell_at"], sell_price=r["sell_price"], net_return_pct=r["net_return_pct"])
+        picks.append(d)
+    return dict(signal_date=args.day, candidate_count=None if runs.empty else int(runs.candidate_count.iloc[0]), picks=picks)
+
+
+def concise(result):
+    """Small operational output; full source features remain in saved artifacts/DB."""
+    if "picks" not in result:
+        return result
+    values = []
+    for p in result["picks"]:
+        f = p.get("shape_features", {})
+        pct = lambda k: round(f[k]*100, 4) if k in f else None
+        reason = p.get("reason") or ("四K形态未通过" if p.get("shape_ready") and not p.get("shape_pass")
+                                     else "等待开板激活" if p.get("shape_ready") else "等待次日四K判断")
+        values.append({"排名": p["selection_rank"], "代码": p["symbol6"], "名称": p["name"],
+            "评分": round(p["score"], 6), "四K最高%": pct("high5"), "四K最低%": pct("low5"),
+            "四K实体%": pct("body5"), "actionable": p.get("actionable", 0),
+            "模拟买价": p.get("entry_price"), "模拟买时": p.get("entry_at"),
+            "实际确认": p.get("actionable_confirmed_at"), "模拟卖价": p.get("sell_price"),
+            "净收益%": p.get("net_return_pct"), "历史回放": p.get("historical_replay", False),
+            "说明": reason})
+    return {"策略": IDENTITY_KEY[0], "版本": IDENTITY_KEY[1], "信号日": result.get("signal_date"),
+            "候选数": result.get("candidate_count"), "前三": values}
+
+
 def main():
     p = argparse.ArgumentParser(description=__doc__)
-    p.add_argument("command", choices=["register", "close", "scan", "settle"])
+    p.add_argument("command", choices=["register", "close", "scan", "settle", "report"])
     p.add_argument("--env-file", type=Path, default=Path(".env"))
     p.add_argument("--assets", type=Path, default=Path("outputs/stock_automl/b2_assets_20261015"))
     p.add_argument("--output", type=Path, default=Path("outputs/stock_automl/b2_live"))
@@ -292,13 +336,15 @@ def main():
     p.add_argument("--watch", action="store_true")
     p.add_argument("--poll-seconds", type=float, default=3)
     p.add_argument("--release", default="B2_20261015")
+    p.add_argument("--full-output", action="store_true", help="Print full saved details instead of the concise operational output")
     args = p.parse_args()
     if args.command == "register" and not args.write_db:
         print(json_text(definition())); return
     if args.poll_seconds < 1:
         raise ValueError("扫描间隔至少1秒")
-    result = {"register": register, "close": after_close, "scan": scan, "settle": settle}[args.command](args)
-    print(json.dumps(result, ensure_ascii=False, indent=2, default=str, allow_nan=False))
+    result = {"register": register, "close": after_close, "scan": scan, "settle": settle, "report": report}[args.command](args)
+    current = report(args) if args.command == "close" and args.write_db and "picks" in result else result
+    print(json.dumps(result if args.full_output else concise(current), ensure_ascii=False, indent=2, default=str, allow_nan=False))
 
 
 if __name__ == "__main__":

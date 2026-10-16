@@ -52,3 +52,7 @@ B2 = R18完整分段51因子随机森林 + R24每月四K形态选优 + `four_fit
 15项业务/协议测试通过。186个D1日、1,302个可见分钟截面、122笔买入的股票/时间/价格与原R24逐笔一致；208个D0日共14,822条预测分数最大差0。独立重建13,413行2026年日线因子一致。2026-10月独立重训7,939行，训练键、形态训练/验证键、最终规则完全一致，全月预测差0。证据分别为`verification_local.json`与`verification_monthly.json`。
 
 最终运行回执见[DEPLOYMENT](DEPLOYMENT.md)。完整归档以`archive_receipt_r2.json`为准，R2已修复初始化器注释分隔问题；此前包保留为过程证据。R2云盘仍待上传及独立哈希回读。
+
+## 2026-10-16运行更新
+
+生产执行表已切换为`strategy_daily_run`、`strategy_execution`，身份为“涨停冷静 / v1.0”；`buy_at`及`details_json.actionable_confirmed_at`分别表示模拟价时刻和真实确认时刻。近一年回填、当前代码及回读证据见[运行更新](../20261016_b2_backfill/README.md)。上文为10月15日冻结交付记录，模型和交易规则保持一致。

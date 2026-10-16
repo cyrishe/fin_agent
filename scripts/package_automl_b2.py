@@ -14,7 +14,7 @@ OUTPUT = ROOT / "outputs/stock_automl/deployment/b2-20261015.tar.gz"
 
 
 def closure():
-    pending = ["run_automl_b2", "verify_automl_b2"]; seen = set()
+    pending = ["run_automl_b2", "verify_automl_b2", "backfill_automl_b2"]; seen = set()
     while pending:
         name = pending.pop()
         if name in seen:
@@ -27,7 +27,7 @@ def closure():
 
 
 def main():
-    sources = closure() + [ROOT / "deploy/sql/automl_1440_strategy.sql"]
+    sources = closure() + [ROOT / "deploy/sql/automl_1440_strategy.sql", ROOT / "deploy/sql/strategy_execution.sql"]
     pairs = [(p, str(p.relative_to(ROOT))) for p in sources]
     pairs += [(p, p.name) for p in (ROOT / "deploy/stock-automl-b2").iterdir() if p.is_file()]
     seed = json.loads((ASSETS / "SEED_MANIFEST.json").read_text())

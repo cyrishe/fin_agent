@@ -1,0 +1,104 @@
+{
+  "verified_selections": 723,
+  "existing_records_unchanged": true,
+  "definition_unchanged": true,
+  "total_days": 242,
+  "total_selections": 726,
+  "total_trades": 148,
+  "closed": 146,
+  "monthly": [
+    {
+      "month": "2025-10",
+      "days": 12,
+      "selections": 36,
+      "trades": 6,
+      "closed": 6
+    },
+    {
+      "month": "2025-11",
+      "days": 20,
+      "selections": 60,
+      "trades": 10,
+      "closed": 10
+    },
+    {
+      "month": "2025-12",
+      "days": 23,
+      "selections": 69,
+      "trades": 9,
+      "closed": 9
+    },
+    {
+      "month": "2026-01",
+      "days": 20,
+      "selections": 60,
+      "trades": 12,
+      "closed": 12
+    },
+    {
+      "month": "2026-02",
+      "days": 14,
+      "selections": 42,
+      "trades": 14,
+      "closed": 14
+    },
+    {
+      "month": "2026-03",
+      "days": 22,
+      "selections": 66,
+      "trades": 14,
+      "closed": 14
+    },
+    {
+      "month": "2026-04",
+      "days": 21,
+      "selections": 63,
+      "trades": 9,
+      "closed": 9
+    },
+    {
+      "month": "2026-05",
+      "days": 18,
+      "selections": 54,
+      "trades": 13,
+      "closed": 13
+    },
+    {
+      "month": "2026-06",
+      "days": 21,
+      "selections": 63,
+      "trades": 9,
+      "closed": 9
+    },
+    {
+      "month": "2026-07",
+      "days": 23,
+      "selections": 69,
+      "trades": 19,
+      "closed": 19
+    },
+    {
+      "month": "2026-08",
+      "days": 21,
+      "selections": 63,
+      "trades": 14,
+      "closed": 14
+    },
+    {
+      "month": "2026-09",
+      "days": 21,
+      "selections": 63,
+      "trades": 16,
+      "closed": 16
+    },
+    {
+      "month": "2026-10",
+      "days": 6,
+      "selections": 18,
+      "trades": 3,
+      "closed": 1
+    }
+  ],
+  "payload_sha256": "287752671dbceff684eca5f2d215778024e6f261f26aaf389dad32b202b04ea7",
+  "verified_at": "2026-10-16T10:44:13.037787+08:00"
+}

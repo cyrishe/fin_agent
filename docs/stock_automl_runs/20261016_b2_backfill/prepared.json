@@ -1,0 +1,43 @@
+{
+  "start": "2025-10-16",
+  "end": "2026-10-15",
+  "days": 242,
+  "historical_days": 241,
+  "preserved_live_days": 1,
+  "selections": 723,
+  "trades": 147,
+  "closed": 146,
+  "missing_minutes": [
+    {
+      "signal_date": "2026-04-27",
+      "stock_code": "603272",
+      "reason": "分钟缺失"
+    },
+    {
+      "signal_date": "2026-04-28",
+      "stock_code": "002175",
+      "reason": "分钟缺失"
+    },
+    {
+      "signal_date": "2026-07-09",
+      "stock_code": "002677",
+      "reason": "分钟缺失"
+    },
+    {
+      "signal_date": "2026-07-31",
+      "stock_code": "603221",
+      "reason": "分钟缺失"
+    },
+    {
+      "signal_date": "2026-10-12",
+      "stock_code": "600825",
+      "reason": "分钟缺失"
+    }
+  ],
+  "reproduced_prediction_rows": 16738,
+  "max_score_difference": 0.0,
+  "reproduced_reference_entries": 146,
+  "payload_sha256": "287752671dbceff684eca5f2d215778024e6f261f26aaf389dad32b202b04ea7",
+  "prepared_at": "2026-10-16T10:38:27.484014+08:00",
+  "calendar_source": "已完成日期取全市场日K快照，并合并服务器交易日历的未来日期"
+}
