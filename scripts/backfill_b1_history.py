@@ -370,6 +370,8 @@ def write_results(args):
                         sell=price(p['close_40']) if actionable else None
                         if sell is not None:
                             sale_at=p['next_date']+' 09:40:00'
+                            basis=p.get('exit_price_basis')
+                            basis=basis if isinstance(basis,str) and basis else '09:40_minute_close_proxy'
                             if sale_at>datetime.now(ZONE).strftime('%Y-%m-%d %H:%M:%S'):continue
                             identity=(args.user_id,'收盘开盘',args.version,day,int(p['selection_rank']))
                             cur.execute('SELECT actionable,buy_price,sell_price,sell_at FROM strategy_execution WHERE user_id=%s AND strategy_name=%s AND model_version=%s AND signal_date=%s AND selection_rank=%s FOR UPDATE',identity)
@@ -379,7 +381,7 @@ def write_results(args):
                                 if existing['sell_price']!=sell or str(existing['sell_at'])!=sale_at:raise ValueError('Existing exit differs')
                             else:
                                 cur.execute('UPDATE strategy_execution SET sell_at=%s,sell_price=%s,sell_price_basis=%s,gross_return_pct=%s WHERE user_id=%s AND strategy_name=%s AND model_version=%s AND signal_date=%s AND selection_rank=%s AND sell_price IS NULL',
-                                    (sale_at,sell,p.get('exit_price_basis','09:40_minute_close_proxy'),(sell/buy-1)*100,*identity))
+                                    (sale_at,sell,basis,(sell/buy-1)*100,*identity))
                 db.commit();complete.append(day)
             except Exception:db.rollback();raise
     save_json(out/'write_receipt.json',dict(user_id=args.user_id,strategy_name='收盘开盘',version=args.version,days=len(complete),picks=len(picks),actionable=int(picks.actionable.sum()),settled=int((picks.actionable&picks.close_40.notna()).sum()),written_at=datetime.now(ZONE).isoformat()))

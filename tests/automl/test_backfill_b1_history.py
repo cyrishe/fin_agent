@@ -64,7 +64,7 @@ def test_history_writer_records_d0_buy_d1_sell_and_preserves_existing_exit(tmp_p
     from scripts import backfill_b1_history as m
     from scripts import run_automl_1440_strategy as runner
     m.save_json(tmp_path/'folds.json',[dict(day='2026-01-05',candidate_count=20,model_sha256='m',input_sha256='i',training_sha256='t',training_dates=['2025-12-31'])])
-    pd.DataFrame([dict(signal_date='2026-01-05',next_date='2026-01-06',symbol6='002636',name='金安国纪',selection_rank=1,signal_price=10,close_40=10.5,actionable=True),
+    pd.DataFrame([dict(signal_date='2026-01-05',next_date='2026-01-06',symbol6='002636',name='金安国纪',selection_rank=1,signal_price=10,close_40=10.5,actionable=True,exit_price_basis=float('nan')),
                   dict(signal_date='2026-01-05',next_date='2026-01-06',symbol6='002131',name='利欧股份',selection_rank=2,signal_price=11,close_40=12,actionable=False)]).to_csv(tmp_path/'picks.csv',index=False)
     calls=[];saved=[];commits=[];rollbacks=[]
     class Cursor:
