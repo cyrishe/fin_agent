@@ -1,0 +1,6 @@
+gate,matched_month_random_median_return_pct,matched_month_random_median_drawdown_pct,fraction_random_return_at_least_actual,fraction_random_drawdown_at_most_actual,reps,nav_return_pct,settled_max_drawdown_pct
+up10,37.2541227495,11.0527154148,0.486333333333,0.137666666667,3000,,
+up20,36.4736806905,11.0527154148,0.235666666667,0.525,3000,,
+today_up,28.8875569974,15.6474662068,0.246666666667,0.509666666667,3000,,
+constant_equal_up10_weighted_exposure,,,,,,53.7110733958,18.0012445425
+up10_weighted_50,57.8921545557,13.0940768731,0.465666666667,0.463,3000,,

@@ -1,0 +1,47 @@
+{
+  "experiment": "CO16_20261017_B1_strong_market_timing",
+  "frozen_trades": 104,
+  "gates": [
+    "all",
+    "up10",
+    "up20",
+    "rsi_high",
+    "today_up",
+    "breadth_high",
+    "up10_and_rsi_high",
+    "up10_weighted_50",
+    "rsi_high_weighted_50",
+    "constant_75pct",
+    "down10",
+    "rsi_low"
+  ],
+  "periods": {
+    "2026_02_05": [
+      "2026-02-01",
+      "2026-05-31"
+    ],
+    "2026_06_07": [
+      "2026-06-01",
+      "2026-07-31"
+    ],
+    "2026_09": [
+      "2026-09-01",
+      "2026-09-30"
+    ],
+    "all": [
+      "2026-02-01",
+      "2026-09-30"
+    ]
+  },
+  "input_sha256": {
+    "outputs/stock_automl/capital_replay_20261012/replay.json": "c26c60173ee6caba8ade5f821fec048cfc06d9a491f85d3df0fce5c788699559",
+    "docs/stock_automl_runs/20261011_mk_1m_tradable_st_rolling20/top1_verified.csv": "0db9abfe1090c8c7f7ad49674812d9831b103e807bdb5d49c0dc52d7a9747f19",
+    "docs/stock_automl_runs/20261011_aug_oct_independent20/top2_verified.csv": "741b0bb6c496d33e6016ba35dfc71a4f9f83d470b5a56928e0d0c1f8556555a1",
+    "outputs/stock_automl/b1_market_gate_co14_20261017/market_input.csv": "b9cac963bfa1b293103ed39d987ae7b2fd3cff5e558a9289155abe77067d8ab4",
+    "outputs/stock_automl/b1_market_gate_co14_20261017/market_eod.csv": "46c52be0719ac65bd720caf78d5663333265fd395ab79d1b3683dc15238eae90"
+  },
+  "code_sha256": "0adb7db14dc68a308e6b84eb1f734e30223952c9d5d249c4b78d719115b36fad",
+  "fee_rule": "same as CO15",
+  "market_scope": "asof D0 14:40",
+  "random_seed": 20261018
+}

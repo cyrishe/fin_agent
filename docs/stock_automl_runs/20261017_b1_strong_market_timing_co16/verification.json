@@ -1,0 +1,9 @@
+{
+  "passed": true,
+  "frozen_identity_and_prices": 104,
+  "asof_gate_checks": 624,
+  "independent_ledger_rows": 1248,
+  "gates": 12,
+  "source_hashes": 5,
+  "baseline_net_pct": 78.0506875731
+}
