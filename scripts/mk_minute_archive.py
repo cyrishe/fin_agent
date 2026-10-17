@@ -6,6 +6,7 @@ from pathlib import Path
 
 COMPACT_ROOT = Path("outputs/stock_automl/mk_1m_compact")
 COMPACT_ROOT_2025 = Path("outputs/stock_automl/mk_1m_compact_2025")
+COMPACT_ROOT_2024 = Path("outputs/stock_automl/mk_1m_compact_2024")
 SUFFIXES = (".csv.zst", ".csv")
 
 
