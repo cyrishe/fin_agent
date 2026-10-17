@@ -1,0 +1,18 @@
+{
+  "experiment_id": "CO16_20261017_B1_strong_market_timing",
+  "folder": "20261017_CO16_最高收益B1冻结名单_强市时机",
+  "local_package": "/Users/cyrcyrisis/work/fin_agent/outputs/stock_automl/b1_strong_market_timing_co16_20261017/package/20261017_CO16_最高收益B1冻结名单_强市时机",
+  "zip_path": "/Users/cyrcyrisis/work/fin_agent/outputs/stock_automl/b1_strong_market_timing_co16_20261017/CO16_B1冻结名单_强市时机_20261017.zip",
+  "zip_bytes": 321211,
+  "zip_sha256": "85120e55cfc2c5ab0c8105c0b3a703273ab8cc2b8f0c9e8dc2b385b8445c7508",
+  "manifest_sha256": "297c3108f81c3e6722bcab612bdefb21654804f2c3052c787bd8ce4a564b4345",
+  "files": 21,
+  "all_zip_members_readback": true,
+  "new_models": 0,
+  "cloud_path": "策略训练/收盘开盘_20261014/02_联合目标与尾部风险/20261017_CO16_最高收益B1冻结名单_强市时机",
+  "cloud_verified_at": "2026-10-17T17:38:20.671023",
+  "cloud_folder_id": "6ad341dcc90cb38a73f64763aa6f0f2f18645bda",
+  "cloud_download_path": "/Users/cyrcyrisis/work/fin_agent/outputs/stock_automl/b1_strong_market_timing_co16_20261017/cloud_readback/CO16_B1冻结名单_强市时机_20261017.zip",
+  "cloud_zip_and_all_members_verified": true,
+  "database_cloud_record_readback": true
+}
