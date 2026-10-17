@@ -1,0 +1,16 @@
+{
+  "archive_sha256": "66abaedc1bcf6be9d4171e1e77f9ad92996467fcdabe63808cd8cafc4cfa62a6",
+  "files": {
+    "top1_four.pkl": "cffae4e6f5f347752abfc4fca8f32de8670b8a8b2f575a4a72c895756ce38096",
+    "top3_four.pkl": "85c4de08d51c7a20f020b70f9679dc71e6558c44327178bb254ead25f0074221",
+    "four_rules_frozen.json": "9a8b5d88f38368593cfc238048b16ca5cf40ca679b919f1b184c9d3888621fb1",
+    "decisions.pkl": "3bf66acebe1190fd03bb3a186297e9b1b198e7b55a16593939c71743c045664d",
+    "signals.pkl": "cc48daa5902e198575f27d0ff3dfc69afd2c5dcc5be491f8ce0846fa655a0f4b",
+    "daily_nav.pkl": "453a4abf5810705e4b74cf616197fd42ec6d028cd0e3a8e0f86407dd5ef1a1f8",
+    "ledger.pkl": "29fcc89e6dce93547494f1c451cccfde588f1275f516e952fe46f754b41a5a35",
+    "summary.json": "50e2b908fc64f651f678e29486f09e8eea7c5ed857c601a570752f50e9228337",
+    "monthly.json": "e6090fe60a8513031911dfda2eacdd84bb40fb07178c074b42ae87d380e80d37",
+    "receipt.json": "9cbb7568bb7d851eddfdaad6ff11b0e63ce4d5ae38bd2cf4d64b68b25acdd365"
+  },
+  "readback_verified": true
+}
