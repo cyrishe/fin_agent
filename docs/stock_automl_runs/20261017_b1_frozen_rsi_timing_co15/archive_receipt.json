@@ -1,0 +1,14 @@
+{
+  "experiment_id": "CO15_20261017_B1_frozen_RSI_timing",
+  "folder": "20261017_CO15_最高收益B1冻结名单_RSI时机",
+  "local_package": "/Users/cyrcyrisis/work/fin_agent/outputs/stock_automl/b1_frozen_rsi_timing_co15_20261017/package/20261017_CO15_最高收益B1冻结名单_RSI时机",
+  "zip_path": "/Users/cyrcyrisis/work/fin_agent/outputs/stock_automl/b1_frozen_rsi_timing_co15_20261017/CO15_B1冻结名单_RSI时机_20261017.zip",
+  "zip_bytes": 282386,
+  "zip_sha256": "a7ac5e6b14f8142bd12df8a75fb917e6b48b72e6786968ba938dfbaaaa333ff4",
+  "manifest_sha256": "99219f1ae9fe921c6ef5df6194db43e953af8ed939ccdf01648e711639c545c7",
+  "files": 19,
+  "all_zip_members_readback": true,
+  "new_models": 0,
+  "cloud_path": "策略训练/收盘开盘_20261014/02_联合目标与尾部风险/20261017_CO15_最高收益B1冻结名单_RSI时机",
+  "cloud_verified_at": null
+}

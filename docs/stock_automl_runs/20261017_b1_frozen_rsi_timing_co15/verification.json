@@ -1,0 +1,10 @@
+{
+  "passed": true,
+  "frozen_trade_identity_price_and_gross": 104,
+  "causal_market_feature_checks": 104,
+  "independent_ledger_rows": 1040,
+  "gates": 10,
+  "source_hashes": 5,
+  "baseline_gross_pct": 97.98174059753015,
+  "baseline_net_pct": 78.0506875731
+}

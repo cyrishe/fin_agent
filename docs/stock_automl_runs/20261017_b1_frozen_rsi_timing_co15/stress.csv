@@ -1,0 +1,15 @@
+gate,stress,return_pct
+all,remove_best_month,39.7225401363
+all,remove_monthly_best_trade,1.85329174194
+down10,remove_best_month,4.65754231308
+down10,remove_monthly_best_trade,-20.4073747926
+rsi_low,remove_best_month,18.5228698307
+rsi_low,remove_monthly_best_trade,3.8847675222
+down10_and_rsi_low,remove_best_month,9.10924618752
+down10_and_rsi_low,remove_monthly_best_trade,-7.39865540599
+mild_down10,remove_best_month,5.98201985306
+mild_down10,remove_monthly_best_trade,-9.35576307413
+rsi_low_turnup5,remove_best_month,-4.43365116149
+rsi_low_turnup5,remove_monthly_best_trade,-5.93506074914
+down10_turnup5,remove_best_month,0.563761764686
+down10_turnup5,remove_monthly_best_trade,-11.3339520515
