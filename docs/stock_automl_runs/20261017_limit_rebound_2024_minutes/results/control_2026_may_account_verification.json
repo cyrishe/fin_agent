@@ -1,0 +1,44 @@
+{
+  "month": "2026-05",
+  "rule_2026_05": {
+    "id": "all",
+    "atoms": [],
+    "family": "none",
+    "text": "全部保留"
+  },
+  "entries": 15,
+  "trading_days": 18,
+  "original_month": {
+    "month": "2026-05",
+    "days": 18,
+    "entries": 15,
+    "closed": 15,
+    "opening_nav": 1714845.708054006,
+    "closing_nav": 1621416.733749106,
+    "profit": -93428.97430490004,
+    "return_": -0.054482437612957346,
+    "fees": 26429.575684062223,
+    "drawdown": 0.10698818816923006,
+    "sharpe": -1.3369397880041411,
+    "cash": 818533.8087521358,
+    "market_value": 802882.9249969702
+  },
+  "recomputed_month": {
+    "month": "2026-05",
+    "days": 18,
+    "entries": 15,
+    "closed": 15,
+    "opening_nav": 1714845.708054006,
+    "closing_nav": 1621416.733749106,
+    "profit": -93428.97430490004,
+    "return_": -0.054482437612957346,
+    "fees": 26429.575684062223,
+    "drawdown": 0.10698818816923006,
+    "sharpe": -1.3369397880041411,
+    "cash": 818533.8087521358,
+    "market_value": 802882.9249969702
+  },
+  "monthly_equal": true,
+  "daily_equal": true,
+  "ledger_equal": true
+}

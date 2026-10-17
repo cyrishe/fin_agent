@@ -1,0 +1,129 @@
+{
+  "month": "2025-10",
+  "original_run": "outputs/stock_automl/limit_rebound_shape_r19_20261015",
+  "new_control_run": "outputs/stock_automl/limit_rebound_2025_oct_control_20261018",
+  "r18_panel_sha256": "72000be89c9d2cceba0f680d010e4c7f848d5e2982009eaff8dbb8b2ead27351",
+  "new_control_test_sha256": "efa186753e2b2baa053ff0b6b01f343f0f1f78c96ac77ab3f0a3db924b2161aa",
+  "candidates": 17,
+  "minute_audit_pass": 17,
+  "rule": {
+    "id": "r011",
+    "atoms": [
+      [
+        "low5",
+        ">=",
+        0
+      ]
+    ],
+    "family": "单条件",
+    "text": "五分最低涨幅>=0%"
+  },
+  "test_metrics": [
+    {
+      "月份": "2025-10",
+      "集合": "test",
+      "方案": "全部Top1",
+      "规则": "五分最低涨幅>=0%",
+      "signals": 17,
+      "fills": 7,
+      "known": 7,
+      "hits": 4,
+      "hit": 0.5714285714285714,
+      "no_fill": 10,
+      "whole_entry": 6,
+      "ret2": {
+        "n": 7,
+        "mean": -0.0008544981456334945,
+        "win": 0.5714285714285714,
+        "bad5": 0.42857142857142855
+      },
+      "ret3": {
+        "n": 7,
+        "mean": 0.010439540929083755,
+        "win": 0.42857142857142855,
+        "bad5": 0.42857142857142855
+      },
+      "ret4": {
+        "n": 7,
+        "mean": -0.0032193385987579087,
+        "win": 0.2857142857142857,
+        "bad5": 0.5714285714285714
+      },
+      "strategy": {
+        "n": 7,
+        "mean": -0.031650646876309745,
+        "win": 0.2857142857142857,
+        "bad5": 0.42857142857142855
+      }
+    },
+    {
+      "月份": "2025-10",
+      "集合": "test",
+      "方案": "五分规则",
+      "规则": "五分最低涨幅>=0%",
+      "signals": 12,
+      "fills": 2,
+      "known": 2,
+      "hits": 2,
+      "hit": 1.0,
+      "no_fill": 10,
+      "whole_entry": 1,
+      "ret2": {
+        "n": 2,
+        "mean": 0.09525993648052788,
+        "win": 1.0,
+        "bad5": 0.0
+      },
+      "ret3": {
+        "n": 2,
+        "mean": 0.20500158027812898,
+        "win": 1.0,
+        "bad5": 0.0
+      },
+      "ret4": {
+        "n": 2,
+        "mean": 0.22589401344392723,
+        "win": 1.0,
+        "bad5": 0.0
+      },
+      "strategy": {
+        "n": 2,
+        "mean": 0.09525993648052788,
+        "win": 1.0,
+        "bad5": 0.0
+      }
+    }
+  ],
+  "columns_compared": [
+    "symbol",
+    "d0_date",
+    "d1_date",
+    "score",
+    "d0_rank",
+    "audit_ok",
+    "reason",
+    "eligible",
+    "high5",
+    "low5",
+    "body5",
+    "pullback5",
+    "position5",
+    "below5",
+    "whole5",
+    "touch5",
+    "shape",
+    "fill",
+    "entry_time",
+    "entry",
+    "ret2",
+    "ret3",
+    "ret4",
+    "strategy",
+    "label_3",
+    "rule_pass",
+    "selected_trade"
+  ],
+  "rules_equal": true,
+  "test_metrics_equal": true,
+  "candidate_fields_equal": true
+}
