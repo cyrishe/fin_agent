@@ -10,5 +10,9 @@
   "all_zip_members_readback": true,
   "new_models": 0,
   "cloud_path": "策略训练/收盘开盘_20261014/02_联合目标与尾部风险/20261017_CO15_最高收益B1冻结名单_RSI时机",
-  "cloud_verified_at": null
+  "cloud_verified_at": "2026-10-17T16:16:22.722951",
+  "cloud_folder_id": "6ad32dead300b220ee3d430389accbab885256a9",
+  "cloud_download_path": "/Users/cyrcyrisis/work/fin_agent/outputs/stock_automl/b1_frozen_rsi_timing_co15_20261017/cloud_readback/CO15_B1冻结名单_RSI时机_20261017.zip",
+  "cloud_zip_and_all_members_verified": true,
+  "database_cloud_record_readback": true
 }

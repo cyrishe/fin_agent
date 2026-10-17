@@ -54,4 +54,4 @@
 
 ## 复现与归档
 
-运行 `python -m scripts.research_b1_frozen_rsi_timing_co15`，再运行 `python -m scripts.verify_b1_frozen_rsi_timing_co15`。独立核验104笔原股票/买卖价/毛收益、5份源哈希、104个当时可见市场状态和五日滞后、未来行情扰动不改变过去指标、10规则共1,040行费用与资金账本、逐月和全期连乘，均通过：[清单](manifest.json)、[核验](verification.json)。原价及市场源文件已在既有归档，CO15研究包另行保存冻结输入和完整结果；云盘未独立回读前为**待同步**。本轮未改数据库选股、生产交易或模型权重。
+运行 `python -m scripts.research_b1_frozen_rsi_timing_co15`，再运行 `python -m scripts.verify_b1_frozen_rsi_timing_co15`。独立核验104笔原股票/买卖价/毛收益、5份源哈希、104个当时可见市场状态和五日滞后、未来行情扰动不改变过去指标、10规则共1,040行费用与资金账本、逐月和全期连乘，均通过：[清单](manifest.json)、[核验](verification.json)。原价及市场源文件已在既有归档，CO15研究包另行保存冻结输入和完整结果；已上传阿里云盘指定目录并独立下载回读；完整 ZIP SHA-256、字节数和包内19个文件哈希一致，数据库云端核验时间已回读，见[归档回执](archive_receipt.json)。研究包在上传前冻结，包内说明保留当时的待同步状态。本轮未改数据库选股、生产交易或模型权重。
