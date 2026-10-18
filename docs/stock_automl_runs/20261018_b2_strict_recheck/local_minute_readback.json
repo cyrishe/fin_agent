@@ -1,0 +1,8 @@
+{
+  "status": "PASS",
+  "scope": "R24 test months local minute sources only",
+  "source_files": 225,
+  "stock_days": 669,
+  "bars": 6690,
+  "database_stock_days_not_rechecked": 125
+}

@@ -1,0 +1,63 @@
+{
+  "experiment_id": "B2_20261018_STRICT_RECHECK",
+  "strategy_id": "B2",
+  "strategy_name": "涨停冷静",
+  "model_version": "v1.0",
+  "source_baseline_commit": "9c79009c35895b1c5c2f9919f933fab497473689",
+  "file_count": 10,
+  "files": [
+    {
+      "file": "B2四K_复跑审计_总体逐月逐日逐笔_训练选规.xlsx",
+      "bytes": 263485,
+      "sha256": "ebf5fc518d22bf8fb7777660170a7a449f4848368309f1a1db2f3b3b32fe9c44"
+    },
+    {
+      "file": "README.md",
+      "bytes": 5555,
+      "sha256": "0bb6742ad0389c1c09df95f9f118facd7f7432ee9e85deb9394f884ca7d99c86"
+    },
+    {
+      "file": "audit_receipt.json",
+      "bytes": 975,
+      "sha256": "f8c8889e0037a3e13d4362c67da38d7ca34495a6b6b9110dcccc20807d49c554"
+    },
+    {
+      "file": "db_registry_readback.json",
+      "bytes": 1297,
+      "sha256": "b0d8c85a5dd00f9e3629c68cf24eaf8dec46a04f51631f83081946d57fdf7636"
+    },
+    {
+      "file": "local_minute_readback.json",
+      "bytes": 183,
+      "sha256": "a6fac22bf2f9762a2a898b90ddba980e35687dfedc9b81e93f71fec92077d5a2"
+    },
+    {
+      "file": "四K规则候选.csv",
+      "bytes": 226116,
+      "sha256": "9554602f0cecbc58436e44c6aeea0bb732e1026864dd1953ade7c57e130b6d64"
+    },
+    {
+      "file": "四K逐月入选.csv",
+      "bytes": 1701,
+      "sha256": "84f77a5647a196ba83a213a554e46e7a2636796cf5be2a25881cc325707fce26"
+    },
+    {
+      "file": "日线方案对照.csv",
+      "bytes": 454,
+      "sha256": "5a9c6d5b1081c5fbc68b9dd39e0665c5a40c0958f24b30dedcb1adcc9d70c29a"
+    },
+    {
+      "file": "日线逐月训练.csv",
+      "bytes": 2323,
+      "sha256": "de29eac072c6c2b6e451d90a61760ed6dbb1ee1aa7f9cd12ee16fe4e8eaa77dd"
+    },
+    {
+      "file": "模型月交易结果.csv",
+      "bytes": 1494,
+      "sha256": "4271985d8c76d2b90b87ff97ae518811e8c63423f45aee647c0cc615e031bd05"
+    }
+  ],
+  "full_replay_local": "outputs/stock_automl/b2_independent_recheck_20261018",
+  "training_source": "existing R18/R24 training assets; this package is a verification index, not a duplicate trained-model bundle",
+  "cloud_verified": false
+}

@@ -1,0 +1,23 @@
+{
+  "status": "PASS",
+  "git_commit": "9c79009c35895b1c5c2f9919f933fab497473689",
+  "scope": "2025-05 through 2026-10-14, original B2 four-K rules and D2 close exit",
+  "complete_test_months": 17,
+  "partial_test_months": 1,
+  "daily_models_checked": 18,
+  "daily_model_scores_max_abs_diff": 0.0,
+  "daily_top3_exact": true,
+  "shape_rules_per_month": 79,
+  "candidate_rule_rows": 1422,
+  "selected_rules_recomputed_exact": 18,
+  "entries": 226,
+  "closed": 225,
+  "account_days": 351,
+  "replay_sha256": "fe3e16d00e36a1b33a2765e5488ee29f95afd269e1767c08a0068cd52fd5d419",
+  "same_as_previous_replay": true,
+  "initial_cash": 1000000.0,
+  "ending_nav": 2608535.0649773777,
+  "total_return": 1.6085350649773775,
+  "max_drawdown": 0.40200598254909237,
+  "limit": "Old Sep-2025 onward minute inputs are frozen first-ten-minute evidence; May-Aug-2025 was reread from minute archive. Historical strategy/model design was researched on these years, not an untouched blind test."
+}

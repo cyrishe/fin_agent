@@ -1,0 +1,48 @@
+{
+  "status": "PASS",
+  "checked_at": "2026-10-18T23:54:23.248727+08:00",
+  "database": "kingdomai",
+  "user_id": "imac",
+  "strategy_id": "B2",
+  "strategy_name": "涨停冷静",
+  "model_version": "v1.0",
+  "definition_sha256": "157b9d77bb9951214b0978365cec407320b1d5663636b80fe60939ae94172c0c",
+  "existing_database": {
+    "first_day": "2025-10-16",
+    "last_day": "2026-10-16",
+    "days": 243,
+    "candidates": 729,
+    "buys": 148
+  },
+  "replay_overlap": {
+    "first_day": "2025-10-16",
+    "last_day": "2026-10-13",
+    "days": 240,
+    "candidates": 720,
+    "buys": 146,
+    "max_score_abs_diff": 0.0,
+    "max_buy_price_abs_diff": 0.0,
+    "max_sell_price_abs_diff": 0.0,
+    "max_net_return_pct_abs_diff": 4.932358521614333e-09
+  },
+  "before_database_range": {
+    "first_day": "2025-05-06",
+    "last_day": "2025-10-15",
+    "days": 110,
+    "candidates": 330,
+    "buys": 80
+  },
+  "training_archive": [
+    {
+      "experiment_id": "B2_20261015",
+      "cloud_verified": false
+    },
+    {
+      "experiment_id": "B2_20261015_R2",
+      "cloud_verified": false
+    }
+  ],
+  "mismatches": [],
+  "note": "Read-only snapshot. Existing live rows and historical replay rows were not updated.",
+  "replay_sha256": "fe3e16d00e36a1b33a2765e5488ee29f95afd269e1767c08a0068cd52fd5d419"
+}
