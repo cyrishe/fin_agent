@@ -234,11 +234,13 @@ def run() -> dict:
     if sklearn.__version__ != '1.7.1':
         raise RuntimeError('Run with the original scikit-learn 1.7.1 environment')
     imported = json.loads((MINUTE_2024 / 'manifest.json').read_text())
-    if imported['days'] != 80:
+    calendar = json.loads((R18 / 'calendar.json').read_text())
+    required = {day for day in calendar if '2024-09-01' <= day <= '2024-12-31'}
+    archived = {row['day'] for row in imported['rows']}
+    if not required.issubset(archived):
         raise RuntimeError('2024 September–December minute archive is incomplete')
     OUT.mkdir(parents=True, exist_ok=True)
     panel = pd.read_pickle(R18 / 'panel.pkl')
-    calendar = json.loads((R18 / 'calendar.json').read_text())
     early_forecasts(panel, calendar)
     result = enrich(candidate_rows(panel, calendar))
     r19.OUT, r19.TEST_MONTHS = OUT, MONTHS
@@ -259,7 +261,7 @@ def run() -> dict:
     trading = best_strategy_extension(calendar)
     summary = {'new_test_months': MONTHS[:-1], 'control_month': MONTHS[-1],
                'control_rule_reproduced': True, 'control_metrics_reproduced': True,
-               'imported_days': imported['days'],
+               'imported_days': len(required), 'archive_days': imported['days'],
                'input_hashes': {
                    'r18_panel': sha(R18 / 'panel.pkl'),
                    'minute_2024_manifest': sha(MINUTE_2024 / 'manifest.json'),

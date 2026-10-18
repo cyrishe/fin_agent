@@ -22,6 +22,7 @@ SOURCE = Path('/Volumes/ext/tushare_market_data/2024')
 OUT = Path('outputs/stock_automl/mk_1m_compact_2024')
 DAILY = Path('outputs/stock_automl/limit_rebound_2y_r1/price_months')
 SEPTEMBER_DAILY = Path('outputs/stock_automl/limit_rebound_2024_may_sep_r11_20261014/price_months')
+EARLY_DAILY = Path('outputs/stock_automl/limit_rebound_short_mixed_r12_20261014/price_months')
 COLUMNS = ['time', 'symbol', 'open', 'high', 'low', 'close', 'volume', 'turnover']
 CLOCK = [
     f'{hour:02d}:{minute:02d}'
@@ -94,9 +95,20 @@ def daily_match(frame: pd.DataFrame, day: str, daily: pd.DataFrame) -> dict:
 
 
 def run(source: Path = SOURCE, out: Path = OUT, daily_root: Path = DAILY,
-        start: str = '2024-09-01', end: str = '2024-12-31') -> dict:
+        start: str = '2024-09-01', end: str = '2024-12-31',
+        append_existing: bool = False) -> dict:
     out.mkdir(parents=True, exist_ok=True)
-    rows = []
+    manifest_path = out / 'manifest.json'
+    if append_existing:
+        previous = json.loads(manifest_path.read_text())
+        if previous['source'] != str(source) or previous['output'] != str(out):
+            raise ValueError('Existing manifest belongs to another archive')
+        existing = {row['day']: row for row in previous['rows']}
+        if len(existing) != previous['days']:
+            raise ValueError('Existing manifest has duplicate or missing days')
+    else:
+        existing = {}
+    rows = list(existing.values())
     monthly = {}
     for path in sorted(source.glob('2024????.csv.gz')):
         day = f'{path.name[:4]}-{path.name[4:6]}-{path.name[6:8]}'
@@ -110,29 +122,46 @@ def run(source: Path = SOURCE, out: Path = OUT, daily_root: Path = DAILY,
         if metadata['bars'] != metadata['codes_with_bars'] * 241:
             raise ValueError(f'{day}: source bars are not complete')
         dest = out / f'{day}.csv.zst'
+        if day in existing:
+            old = existing[day]
+            if (not dest.exists() or old['source_sha256'] != source_hash
+                    or old['compact_sha256'] != sha256(dest)):
+                raise ValueError(f'{day}: existing source or compact archive changed')
+            continue
         if dest.exists():
             raise FileExistsError(f'{dest}: use a new output directory for a new source snapshot')
         raw = pd.read_csv(path, dtype={'ts_code': str, 'trade_time': str})
         converted = convert(raw, day)
         month = day[:7]
         if month not in monthly:
-            daily_path = (SEPTEMBER_DAILY if month == '2024-09' else daily_root) / f'price_{month}.csv.gz'
+            daily_base = (EARLY_DAILY if month <= '2024-03' else
+                          SEPTEMBER_DAILY if month <= '2024-09' else daily_root)
+            daily_path = daily_base / f'price_{month}.csv.gz'
             monthly[month] = pd.read_csv(daily_path, dtype={'trade_date': str, 'stk_code': str})
         quality = daily_match(converted, day, monthly[month])
         if quality['joined_symbols'] == 0:
             raise ValueError(f'{day}: no matching daily snapshot')
-        with dest.open('wb') as raw_out:
+        temporary = dest.with_name(dest.name + '.tmp')
+        with temporary.open('wb') as raw_out:
             with zstd.ZstdCompressor(level=3).stream_writer(raw_out) as compressed:
                 with io.TextIOWrapper(compressed, encoding='utf-8') as text_out:
                     converted.to_csv(text_out, index=False)
+        temporary.replace(dest)
         rows.append({'day': day, 'source': str(path), 'source_sha256': source_hash,
                      'source_bytes': path.stat().st_size, 'compact_sha256': sha256(dest),
                      'compact_bytes': dest.stat().st_size, 'bars': len(converted), **quality})
+        rows.sort(key=lambda row: row['day'])
+        manifest = {'source': str(source), 'output': str(out), 'days': len(rows),
+                    'date_range': [rows[0]['day'], rows[-1]['day']], 'rows': rows}
+        pending = manifest_path.with_name(manifest_path.name + '.tmp')
+        pending.write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + '\n')
+        pending.replace(manifest_path)
         print(day, quality['price_volume_match'], '/', quality['joined_symbols'], flush=True)
+    rows.sort(key=lambda row: row['day'])
     manifest = {'source': str(source), 'output': str(out), 'days': len(rows),
                 'date_range': [rows[0]['day'], rows[-1]['day']] if rows else [],
                 'rows': rows}
-    (out / 'manifest.json').write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + '\n')
+    manifest_path.write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + '\n')
     return manifest
 
 
@@ -143,7 +172,9 @@ if __name__ == '__main__':
     parser.add_argument('--daily-root', type=Path, default=DAILY)
     parser.add_argument('--start', default='2024-09-01')
     parser.add_argument('--end', default='2024-12-31')
+    parser.add_argument('--append-existing', action='store_true')
     args = parser.parse_args()
-    result = run(args.source, args.out, args.daily_root, args.start, args.end)
+    result = run(args.source, args.out, args.daily_root, args.start, args.end,
+                 args.append_existing)
     print(json.dumps({'days': result['days'], 'date_range': result['date_range']},
                      ensure_ascii=False), flush=True)

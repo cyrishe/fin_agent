@@ -1,6 +1,9 @@
+import json
+
 import pandas as pd
 import pytest
 
+import scripts.import_tushare_minutes_2024 as importer
 from scripts.import_tushare_minutes_2024 import CLOCK, convert
 
 
@@ -31,3 +34,36 @@ def test_missing_exchange_minute_rejected():
     frame.loc[5, 'trade_time'] = f'{day} 12:00:00'
     with pytest.raises(ValueError, match='minute clock'):
         convert(frame, day)
+
+
+def test_append_preserves_verified_days_and_merges_manifest(tmp_path, monkeypatch):
+    source = tmp_path / 'source'
+    output = tmp_path / 'compact'
+    daily_root = tmp_path / 'daily'
+    source.mkdir()
+    daily_root.mkdir()
+    monkeypatch.setattr(importer, 'EARLY_DAILY', daily_root)
+    days = ['2024-01-02', '2024-01-03']
+    pd.DataFrame([{'trade_date': day, 'stk_code': '000001.SZ',
+                   'open': 10, 'high': 10, 'low': 10, 'close': 10,
+                   'volume': 241, 'amount': 2410} for day in days]).to_csv(
+        daily_root / 'price_2024-01.csv.gz', index=False)
+    for day in days:
+        raw = pd.DataFrame([{'ts_code': '000001.SZ',
+                             'trade_time': f'{day} {clock}:00',
+                             'open': 10, 'high': 10, 'low': 10, 'close': 10,
+                             'vol': 1, 'amount': 10} for clock in CLOCK])
+        path = source / f'{day.replace("-", "")}.csv.gz'
+        raw.to_csv(path, index=False)
+        path.with_suffix('').with_suffix('.json').write_text(json.dumps({
+            'trade_date': day.replace('-', ''), 'sha256': importer.sha256(path),
+            'bars': 241, 'codes_with_bars': 1}))
+    importer.run(source, output, start=days[0], end=days[0])
+    original_hash = importer.sha256(output / f'{days[0]}.csv.zst')
+    result = importer.run(source, output, start=days[0], end=days[1],
+                          append_existing=True)
+    assert result['days'] == 2
+    assert [row['day'] for row in result['rows']] == days
+    assert importer.sha256(output / f'{days[0]}.csv.zst') == original_hash
+    assert importer.run(source, output, start=days[0], end=days[1],
+                        append_existing=True)['days'] == 2

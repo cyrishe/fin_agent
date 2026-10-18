@@ -1,0 +1,168 @@
+{
+  "status": "PASS",
+  "raw_days": 242,
+  "archive_days": 242,
+  "prior_days": 80,
+  "added_days": 162,
+  "first_day": "2024-01-02",
+  "last_day": "2024-12-31",
+  "bars": 310356480,
+  "stock_days": 1293152,
+  "matched_stock_days": 1225951,
+  "joined_stock_days": 1293152,
+  "monthly": {
+    "2024-01": {
+      "days": 22,
+      "stock_days": 117359,
+      "matched": 111344,
+      "bars": 28166160
+    },
+    "2024-02": {
+      "days": 15,
+      "stock_days": 80168,
+      "matched": 76725,
+      "bars": 19240320
+    },
+    "2024-03": {
+      "days": 21,
+      "stock_days": 112307,
+      "matched": 106648,
+      "bars": 26953680
+    },
+    "2024-04": {
+      "days": 20,
+      "stock_days": 107066,
+      "matched": 101819,
+      "bars": 25695840
+    },
+    "2024-05": {
+      "days": 20,
+      "stock_days": 106795,
+      "matched": 100965,
+      "bars": 25630800
+    },
+    "2024-06": {
+      "days": 19,
+      "stock_days": 101505,
+      "matched": 95440,
+      "bars": 24361200
+    },
+    "2024-07": {
+      "days": 23,
+      "stock_days": 122705,
+      "matched": 114900,
+      "bars": 29449200
+    },
+    "2024-08": {
+      "days": 22,
+      "stock_days": 117389,
+      "matched": 110457,
+      "bars": 28173360
+    },
+    "2024-09": {
+      "days": 19,
+      "stock_days": 101440,
+      "matched": 95212,
+      "bars": 24345600
+    },
+    "2024-10": {
+      "days": 18,
+      "stock_days": 96211,
+      "matched": 92456,
+      "bars": 23090640
+    },
+    "2024-11": {
+      "days": 21,
+      "stock_days": 112173,
+      "matched": 107251,
+      "bars": 26921520
+    },
+    "2024-12": {
+      "days": 22,
+      "stock_days": 118034,
+      "matched": 112734,
+      "bars": 28328160
+    }
+  },
+  "prior_manifest_sha256": "44b64ffba00ae29d7ddefe8c4555f0aad0b02f7fb214f8494c8dc8535ac73716",
+  "full_manifest_sha256": "7e40d0450e1113861b2b52afb7b6af55ce5cbc8a90fff568ef6a2073984e7fbf",
+  "first_panel_month": "2024-01",
+  "first_full_stage1_month": "2024-09",
+  "causal_window_check": [
+    {
+      "test_month": "2025-01",
+      "train_months": [
+        "2024-05",
+        "2024-06",
+        "2024-07",
+        "2024-08",
+        "2024-09",
+        "2024-10"
+      ],
+      "missing_causal_score_months": [
+        "2024-05",
+        "2024-06",
+        "2024-07",
+        "2024-08"
+      ]
+    },
+    {
+      "test_month": "2025-02",
+      "train_months": [
+        "2024-06",
+        "2024-07",
+        "2024-08",
+        "2024-09",
+        "2024-10",
+        "2024-11"
+      ],
+      "missing_causal_score_months": [
+        "2024-06",
+        "2024-07",
+        "2024-08"
+      ]
+    },
+    {
+      "test_month": "2025-03",
+      "train_months": [
+        "2024-07",
+        "2024-08",
+        "2024-09",
+        "2024-10",
+        "2024-11",
+        "2024-12"
+      ],
+      "missing_causal_score_months": [
+        "2024-07",
+        "2024-08"
+      ]
+    },
+    {
+      "test_month": "2025-04",
+      "train_months": [
+        "2024-08",
+        "2024-09",
+        "2024-10",
+        "2024-11",
+        "2024-12",
+        "2025-01"
+      ],
+      "missing_causal_score_months": [
+        "2024-08"
+      ]
+    },
+    {
+      "test_month": "2025-05",
+      "train_months": [
+        "2024-09",
+        "2024-10",
+        "2024-11",
+        "2024-12",
+        "2025-01",
+        "2025-02"
+      ],
+      "missing_causal_score_months": []
+    }
+  ],
+  "earliest_same_rule_test_month": "2025-05"
+}

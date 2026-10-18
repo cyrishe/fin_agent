@@ -30,9 +30,21 @@
 - 连续总账重新判定原 R24 后续区间的 165 笔选股及买价，与保存信号完全一致；对 225 笔已卖出交易逐一核对 D2 收盘价与费后公式，351 日现金与持仓市值由交易表独立加总核对。[连续回执](continuous_receipt.json)。
 - 新增四个月共 61 笔，全部完成 D2 卖出；另对 88 个账户日独立核算现金与净值。[新增回执](extension_receipt.json)、[冻结规则](extension_four_rules_frozen.json)。训练/验证/测试的四 K 特征、候选、信号、逐日资金与回执保存在 [小型复现包](extension_repro_bundle.zip)，包内 10 文件已独立回读并核对哈希，见[归档回执](extension_archive_receipt.json)。
 
+## 2024 全年分钟档案与可回测范围（10 月 18 日补充）
+
+2024 年 242 个交易日的 Tushare 压缩源现已全部接入同一个本机分钟档案 `outputs/stock_automl/mk_1m_compact_2024/`：新增 1—8 月 162 天，原有 9—12 月 80 天逐项核对原归档哈希后保留。全年共 310,356,480 根 240 根/日格式的分钟 K、1,293,152 个股票日。原始压缩文件、逐日元数据与成品文件已全部独立回读并核对 SHA-256，242 天与原交易日历完全一致；[全年接入回执](2024_full_coverage_receipt.json)保存逐月数量、质量和训练窗口检查。原 80 天的冻结快照仍在[此前复现包](../20261017_limit_rebound_2024_minutes/results/repro_bundle.zip)中。
+
+以原日 K 核对，全年 1,225,951/1,293,152 个股票日（94.80%）的开高低收与成交量同时吻合。其余 67,201 个股票日保留为**数据质量冲突**，不能把全年分钟档案直接视为全部可用于交易回测；策略候选仍须经过逐股审计。
+
+**B2 原口径没有新增可测试月份。** 日线候选面板从 2024 年 1 月开始，完整的“前 6 月训练＋前 2 月验证”首次能在 2024 年 9 月给出折外日线排序；四 K 规则又要使用连续 6 个月这种折外排序训练、2 个月验证，因此首次可按月冻结并测试的是 **2025 年 5 月**，已包含在上面的 18 个月总账。2025 年 1/2/3/4 月分别缺 4/3/2/1 个所需训练月的合格折外排序；将后来训练的模型倒用到这些月份会引入未来信息。若要更早同口径测试，需要补齐 2023 年相应的日 K、候选与标签，并重建更早的折外排序。
+
+接入全年档案后重新运行 B2 五月至八月：61 笔信号、月度冻结规则及 88 日日净值文件的哈希与补档前**完全相同**；收益 +12.75%、最大回撤 40.20% 均未改变。连续总账也重跑为原来的 226 笔、+160.85%、最大回撤 40.20%。全年档案增加的是可核验的数据覆盖，不应被写成额外四个月的 B2 策略收益。
+
 从仓库根目录，以本机已验证的 scikit-learn 1.7.1 环境运行：
 
 ```sh
+PYTHONPATH=. /Users/cyrcyrisis/work/fin_agent/.venv-automl/bin/python -m scripts.import_tushare_minutes_2024 --start 2024-01-02 --end 2024-12-31 --append-existing
+PYTHONPATH=. /Users/cyrcyrisis/work/fin_agent/.venv-automl/bin/python -m scripts.audit_b2_2024_full_coverage
 PYTHONPATH=. /Users/cyrcyrisis/work/fin_agent/.venv-automl/bin/python -m scripts.verify_automl_b2 --output outputs/stock_automl/b2_full_replay_20261018
 PYTHONPATH=. /Users/cyrcyrisis/work/fin_agent/.venv-automl/bin/python -m scripts.report_b2_frozen_full_replay
 PYTHONPATH=. /Users/cyrcyrisis/work/fin_agent/.venv-automl/bin/python -m scripts.extend_b2_fourk_2024_minutes
