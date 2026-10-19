@@ -1,0 +1,10 @@
+{
+  "months": 18,
+  "return_better_months": 9,
+  "drawdown_lower_months": 7,
+  "both_better_months": 5,
+  "mean_monthly_return_delta": -0.030631649349923098,
+  "mean_monthly_drawdown_delta": 0.030361044869315443,
+  "full_month_return_better": 8,
+  "full_months": 17
+}

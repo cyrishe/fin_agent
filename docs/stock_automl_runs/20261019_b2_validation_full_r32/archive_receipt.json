@@ -1,0 +1,8 @@
+{
+  "path": "outputs/stock_automl/b2_validation_full_r32_20261019_assets.tar.gz",
+  "bytes": 146910265,
+  "sha256": "ff5e39d198d796b01ac34b41bf7f8756756737fe953ab1f5c7f056ebec15a6ef",
+  "verified_members": 510,
+  "local_readback": true,
+  "cloud_uploaded": false
+}

@@ -1,0 +1,30 @@
+[
+  {
+    "variant": "D2S2",
+    "year": "2025",
+    "months": 8,
+    "return_": 0.2043380257304488,
+    "positive": 5
+  },
+  {
+    "variant": "D2S2",
+    "year": "2026",
+    "months": 10,
+    "return_": 1.165949267769124,
+    "positive": 8
+  },
+  {
+    "variant": "D1S1",
+    "year": "2025",
+    "months": 8,
+    "return_": -0.3841364958661978,
+    "positive": 1
+  },
+  {
+    "variant": "D1S1",
+    "year": "2026",
+    "months": 10,
+    "return_": 1.4111762698640868,
+    "positive": 7
+  }
+]

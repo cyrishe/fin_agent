@@ -1,0 +1,32 @@
+[
+  {
+    "variant": "D1S2",
+    "return_better_months": 4,
+    "drawdown_lower_months": 2,
+    "mean_monthly_delta": 0.024203934073189975,
+    "descriptive_bootstrap95": [
+      -0.1290576609041488,
+      0.15683892928332288
+    ]
+  },
+  {
+    "variant": "D2S1",
+    "return_better_months": 1,
+    "drawdown_lower_months": 2,
+    "mean_monthly_delta": -0.03608609536453453,
+    "descriptive_bootstrap95": [
+      -0.15684707359561864,
+      0.05479844439781625
+    ]
+  },
+  {
+    "variant": "D1S1",
+    "return_better_months": 5,
+    "drawdown_lower_months": 3,
+    "mean_monthly_delta": 0.0743135505754589,
+    "descriptive_bootstrap95": [
+      -0.0548020003744503,
+      0.2035970585198629
+    ]
+  }
+]

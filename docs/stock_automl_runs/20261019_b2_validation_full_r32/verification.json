@@ -1,0 +1,14 @@
+{
+  "baseline_full_account_exact": true,
+  "r31_six_rules_exact": true,
+  "r31_six_picks_exact": true,
+  "r31_six_reset_account_exact": true,
+  "independent_cash_rows": 1262,
+  "d2_price_and_fees_exact": true,
+  "model_reload_count": 45,
+  "model_score_max_diff": 0.0,
+  "production_evaluator_exact": 305,
+  "candidate_decisions": 1176,
+  "training_sample_windows_exact": true,
+  "four_bar_no_future_feature_checks": 1333
+}

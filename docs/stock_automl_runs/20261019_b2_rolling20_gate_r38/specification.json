@@ -1,0 +1,35 @@
+{
+  "name": "R38_B2_rolling_NAV_gate",
+  "strategy": "frozen D2S2 B2, no refit or rule change",
+  "strategy_registry": "kingdomai.automl_strategy_definition / imac / B2 / v1.0",
+  "strategy_definition_sha256": "157b9d77bb9951214b0978365cec407320b1d5663636b80fe60939ae94172c0c",
+  "experiment_code_sha256": "e94abda9c37d6dc58640ef426a2ae8df5335ccf8dedb845a835bf71f2cb1194e",
+  "source_signals": "outputs/stock_automl/b2_two_month_2024_r35_20261019/signals.pkl",
+  "source_sha256": "4bac8813bab12dcc00603fb8ae23bf48b33a19e4424e2953b007c5a72ccf2bee",
+  "calendar": "outputs/stock_automl/b2_full_2024_r34_20261019/calendar.json",
+  "calendar_sha256": "3c78b65ecc61bf98f2a0108d9912becfa22f6b9dd6baa8b57f2e42e59489d518",
+  "lookback": "At D1 before buy: prior close NAV divided by NAV 20 completed market days earlier minus 1; initial NAV anchors first 20 days; current day never used.",
+  "gate": "If 20-day return <= threshold, skip all new purchases that day. Existing positions are sold on original D2 close. Gate uses its own iteratively recomputed NAV; no signal replacement.",
+  "primary": "20 trading days, -10% cutoff copied from exploratory prior calendar-month loss idea, not optimized on target outcomes",
+  "calendar_month_comparator": "At first market day of each month, prior full calendar-month return of this own gated account; <=-10% blocks all buys that month.",
+  "shadow_comparator": "Same 20-day -10% gate, but rolling return is from a non-trading full-B2 paper NAV that continues tracking every frozen signal; only closes before current D1 are read.",
+  "sensitivity": "20d -5/-15%, 10/30d -10%, inspected only; no best-of-test selection",
+  "account": "1m initial, flat half cash or carried all remaining cash; 0.1% each side; no integer share/queue/slippage",
+  "period": [
+    "2024-03-01",
+    "2026-09-30"
+  ],
+  "reset_robustness": [
+    [
+      "2025五月重置",
+      "2025-05-01"
+    ],
+    [
+      "2026一月重置",
+      "2026-01-01"
+    ]
+  ],
+  "scope": "historical research, not unseen blind test or production strategy change",
+  "db_status": "research output not inserted into production registry",
+  "cloud_status": "local only; no independent cloud readback"
+}

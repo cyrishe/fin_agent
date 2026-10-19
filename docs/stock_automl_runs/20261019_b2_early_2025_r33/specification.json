@@ -1,0 +1,17 @@
+{
+  "experiment": "R33 B2 early 2025 one-month extension",
+  "months": [
+    "2025-01",
+    "2025-02"
+  ],
+  "daily_models": [
+    "2024-06",
+    "2024-07"
+  ],
+  "train_months": 6,
+  "valid_months": 1,
+  "source_panel": "aaf4350fd279b18c092ba54acf2944892ec2b894ecd312d9e1ebf5e8c4a8fc03",
+  "model": "R32 RF51 exact family, balanced weights, sklearn1.7.1",
+  "no_future_test_selection": true,
+  "production_changed": false
+}

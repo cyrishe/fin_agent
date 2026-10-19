@@ -1,0 +1,7 @@
+{
+  "stock_days": 1339,
+  "minute_ok": 1333,
+  "failed": {
+    "分钟缺失": 6
+  }
+}

@@ -1,0 +1,22 @@
+[
+  {
+    "file": "docs/stock_automl_runs/20261019_b2_accuracy_return_r36/月度对照.json",
+    "sha256": "77e349eee7bdf868bf6d6cc539f1d719f9088d3cd34ac37262f8da4a8ae3d9fd"
+  },
+  {
+    "file": "outputs/stock_automl/b2_two_month_2024_r35_20261019/daily_metrics.json",
+    "sha256": "b1bb86e4e9723045c3b18b7446022a1adfdcccd1c1601ef3eb9d35985e2a1c96"
+  },
+  {
+    "file": "outputs/stock_automl/b2_two_month_2024_r35_20261019/ledger.pkl",
+    "sha256": "326d02106665ebe4b80db654adb379f14d48011600ab784817b02a61e202d3f6"
+  },
+  {
+    "file": "outputs/stock_automl/b2_full_2024_r34_20261019/daily_metrics.json",
+    "sha256": "179d922e736e24866ee23a7560132eeb98f7be5f27dee9cb431be419d6783330"
+  },
+  {
+    "file": "outputs/stock_automl/b2_full_2024_r34_20261019/ledger.pkl",
+    "sha256": "4249950fcd2c37879bbc3be5e53a3c261d74ea1c2054587740028a7834fb5c25"
+  }
+]

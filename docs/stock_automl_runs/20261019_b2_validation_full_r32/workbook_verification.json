@@ -1,0 +1,20 @@
+{
+  "file": "outputs/stock_automl/b2_validation_full_r32_20261019/B2_两层一月全期对照_R32_20261019.xlsx",
+  "sha256": "cb1c8a5927da3d1286b3b0e4805d8c7733c82fdda485a7d9dd06139f169c7e19",
+  "bytes": 580538,
+  "verified_data_cells": 85966,
+  "cached_formulas": 575,
+  "sheet_rows": {
+    "总体": 4,
+    "月度": 20,
+    "D2评估": 62,
+    "日线评估": 228,
+    "每月规则": 38,
+    "每日": 1095,
+    "逐笔": 531,
+    "前三候选": 2226
+  },
+  "zip_integrity": true,
+  "formula_errors": 0,
+  "date_types_checked": true
+}

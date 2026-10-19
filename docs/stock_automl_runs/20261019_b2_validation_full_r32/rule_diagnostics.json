@@ -1,0 +1,16 @@
+[
+  {
+    "variant": "D2S2",
+    "months": 18,
+    "fallback": 3,
+    "valid_min": 15,
+    "valid_max": 27
+  },
+  {
+    "variant": "D1S1",
+    "months": 18,
+    "fallback": 14,
+    "valid_min": 4,
+    "valid_max": 13
+  }
+]

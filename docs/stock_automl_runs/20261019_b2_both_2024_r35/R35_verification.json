@@ -1,0 +1,12 @@
+{
+  "existing_signal_exact": 226,
+  "existing_common_account_exact": true,
+  "fourk_frozen_before_account": true,
+  "d2_price_and_fees_exact": true,
+  "cash_reconciliation": true,
+  "model_reload_count": 40,
+  "model_score_max_diff": 0.0,
+  "production_evaluator_exact": 406,
+  "candidate_decisions": 1898,
+  "four_bar_no_future_feature_checks": 2211
+}

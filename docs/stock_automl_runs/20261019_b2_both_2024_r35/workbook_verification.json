@@ -1,0 +1,21 @@
+{
+  "file": "docs/stock_automl_runs/20261019_b2_both_2024_r35/B2_一月两月验证_2024起全期_R35_20261019.xlsx",
+  "sha256": "b7d19d00ff08d068154e5ec22aa31996e5bce8636cab5a7aa68fdbc274de73b3",
+  "bytes": 1054253,
+  "verified_data_cells": 157925,
+  "cached_formulas": 910,
+  "sheet_rows": {
+    "总体": 8,
+    "月度": 34,
+    "五月同起": 18,
+    "D2评估": 174,
+    "日线评估": 396,
+    "每月规则": 66,
+    "每日": 2641,
+    "逐笔": 902,
+    "前三候选": 3909
+  },
+  "zip_integrity": true,
+  "formula_errors": 0,
+  "date_types_checked": true
+}

@@ -1,0 +1,12 @@
+{
+  "baseline_trade_rows_exact": true,
+  "baseline_rules_exact": true,
+  "independent_cash_rows": 500,
+  "sample_label_maturity_checked": true,
+  "account_not_used_for_rule_selection": true,
+  "model_reload_count": 20,
+  "model_max_score_diff": 0.0,
+  "production_evaluator_same_signals": 327,
+  "candidate_decisions": 1498,
+  "original_input_spec_sha256": "95d3bc5ca8989fbff44108642b92ee9341da833ce0b470c12c3c629962ea44d4"
+}

@@ -1,0 +1,42 @@
+[
+  {
+    "方案": "一月验证",
+    "文件": "outputs/stock_automl/b2_full_2024_r34_20261019/daily_metrics.json",
+    "sha256": "179d922e736e24866ee23a7560132eeb98f7be5f27dee9cb431be419d6783330"
+  },
+  {
+    "方案": "一月验证",
+    "文件": "outputs/stock_automl/b2_full_2024_r34_20261019/rules_frozen.json",
+    "sha256": "1fbae68142e6d1f0feda996d43f7abb40a8e0e34e503b94126fa69a1780a893d"
+  },
+  {
+    "方案": "一月验证",
+    "文件": "outputs/stock_automl/b2_full_2024_r34_20261019/monthly.json",
+    "sha256": "dd9da64d8d8b1ddf4ed574573bcddaa14aff943b94877ad184c1035729d6fbba"
+  },
+  {
+    "方案": "一月验证",
+    "文件": "outputs/stock_automl/b2_full_2024_r34_20261019/ledger.pkl",
+    "sha256": "4249950fcd2c37879bbc3be5e53a3c261d74ea1c2054587740028a7834fb5c25"
+  },
+  {
+    "方案": "两月验证",
+    "文件": "outputs/stock_automl/b2_two_month_2024_r35_20261019/daily_metrics.json",
+    "sha256": "b1bb86e4e9723045c3b18b7446022a1adfdcccd1c1601ef3eb9d35985e2a1c96"
+  },
+  {
+    "方案": "两月验证",
+    "文件": "outputs/stock_automl/b2_two_month_2024_r35_20261019/rules_frozen.json",
+    "sha256": "e9c6e38fc7a3d8d41c4657856750756365f357edec7ab2fca095c159f7de0d3b"
+  },
+  {
+    "方案": "两月验证",
+    "文件": "outputs/stock_automl/b2_two_month_2024_r35_20261019/monthly.json",
+    "sha256": "8567e5f8cb6c5466bb6c5d57cbd15e03a93d7d751ce4c5c154ad886dc6695ce2"
+  },
+  {
+    "方案": "两月验证",
+    "文件": "outputs/stock_automl/b2_two_month_2024_r35_20261019/ledger.pkl",
+    "sha256": "326d02106665ebe4b80db654adb379f14d48011600ab784817b02a61e202d3f6"
+  }
+]
