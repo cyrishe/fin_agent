@@ -1,5 +1,7 @@
 # 涨停冷静 B2 模型与回测登记入口
 
+最新接手说明：[B2_HANDOFF_20261019.md](B2_HANDOFF_20261019.md)。完整保存两层滚动窗口、首个测试月的来源、训练/预测/选规/买卖/回测口径、候选方案选择逻辑及未完成事项；继续本策略时先读。
+
 稳定策略身份为 `kingdomai.automl_strategy_definition` 中的 `imac / B2`，生产展示身份为 `kingdomai.strategy_daily_run` 和 `kingdomai.strategy_execution` 中的 `涨停冷静 / v1.0`。定义 SHA-256：`157b9d77bb9951214b0978365cec407320b1d5663636b80fe60939ae94172c0c`。实际拟合模型按月变化；策略版本、月模型、形态规则、逐日选股、交易和账户回测须分别溯源。
 
 | 管理对象 | 权威入口 | 本次核对状态 |
