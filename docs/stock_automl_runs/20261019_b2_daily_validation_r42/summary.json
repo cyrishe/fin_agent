@@ -1,0 +1,334 @@
+{
+  "description": "Frozen B2 validation metrics vs next month unfiltered B2; 50% split descriptive only",
+  "monthly_sources": {
+    "monthly_sha256": "3bb0aa7598dc48d9f2115d60c1d56a1c6edc7795eb52a56f3d9ceb85e70a632c",
+    "signals_sha256": "9c0efb3713e5a77e35ef1318e466105227d4fce3e50691eb3753fbb73d1969d5"
+  },
+  "metric_sources": [
+    {
+      "month": "2023-05",
+      "path": "outputs/stock_automl/b2_2022_minute_r41_20261019/daily2/2023-05/metrics.json",
+      "sha256": "6094ad2fb31c5e317a0aa3271d38dd3d9fb1840a06066d2af82016a38c281ae0"
+    },
+    {
+      "month": "2023-06",
+      "path": "outputs/stock_automl/b2_2022_minute_r41_20261019/daily2/2023-06/metrics.json",
+      "sha256": "7769d8a427c5b93716fb152ceecd601b271dd0ca52292da3d3f231cd601835de"
+    },
+    {
+      "month": "2023-07",
+      "path": "outputs/stock_automl/b2_two_month_2024_r35_20261019/daily2/2023-07/metrics.json",
+      "sha256": "b83f203bf36d99bd0af974311a4b253e5daded9930db8ef9c4d77b5807f26b80"
+    },
+    {
+      "month": "2023-08",
+      "path": "outputs/stock_automl/b2_two_month_2024_r35_20261019/daily2/2023-08/metrics.json",
+      "sha256": "0295fe19067560a2784e8352f77ea6cca32eaf06bf5e46a55b80ff1551777081"
+    },
+    {
+      "month": "2023-09",
+      "path": "outputs/stock_automl/b2_two_month_2024_r35_20261019/daily2/2023-09/metrics.json",
+      "sha256": "79f3ce71e4a41716655f1ae752591a288ec46187d6214d33239ac983a6b2caef"
+    },
+    {
+      "month": "2023-10",
+      "path": "outputs/stock_automl/b2_two_month_2024_r35_20261019/daily2/2023-10/metrics.json",
+      "sha256": "18410ac90c67615dfd8d932dd97038301fca9976edf9fcd8d354f57962bcea44"
+    },
+    {
+      "month": "2023-11",
+      "path": "outputs/stock_automl/b2_two_month_2024_r35_20261019/daily2/2023-11/metrics.json",
+      "sha256": "91a275499a235f1b35defcaf17b30bc8d176d892d803dfcd5fffbea6bac13844"
+    },
+    {
+      "month": "2023-12",
+      "path": "outputs/stock_automl/b2_two_month_2024_r35_20261019/daily2/2023-12/metrics.json",
+      "sha256": "09ba62cb6c85dd8d77711ea6613556f06c30a48a017dd866f993f591538fe8eb"
+    },
+    {
+      "month": "2024-01",
+      "path": "outputs/stock_automl/b2_two_month_2024_r35_20261019/daily2/2024-01/metrics.json",
+      "sha256": "eb6c7f69a9b793648c5d03f45fd09a24abccca783a8f6a091f3f89dee2f5a5ae"
+    },
+    {
+      "month": "2024-02",
+      "path": "outputs/stock_automl/b2_two_month_2024_r35_20261019/daily2/2024-02/metrics.json",
+      "sha256": "1d8c8e8dbe3dae93b2921a871d6cdf1ef6bc6c2eeef336bc809fc079a1c8ff5c"
+    },
+    {
+      "month": "2024-03",
+      "path": "outputs/stock_automl/b2_two_month_2024_r35_20261019/daily2/2024-03/metrics.json",
+      "sha256": "2a922c1f17cc2288716c22c53add5c7d5e008f06afb6a2409b48496ac2e5c7b7"
+    },
+    {
+      "month": "2024-04",
+      "path": "outputs/stock_automl/b2_two_month_2024_r35_20261019/daily2/2024-04/metrics.json",
+      "sha256": "ad574c1042daafc4048cbc4fa1851053a29c2d160a7be4e8f0a26f1f194b884c"
+    },
+    {
+      "month": "2024-05",
+      "path": "outputs/stock_automl/b2_two_month_2024_r35_20261019/daily2/2024-05/metrics.json",
+      "sha256": "40f7633bddd83d268a5b7d95906bc1e03aa6aa364ea2616ba5bda994da932131"
+    },
+    {
+      "month": "2024-06",
+      "path": "outputs/stock_automl/b2_two_month_2024_r35_20261019/daily2/2024-06/metrics.json",
+      "sha256": "e1fc467759f869f38b878b27b327c2994da6f433d997f516e7279b899365b3d7"
+    },
+    {
+      "month": "2024-07",
+      "path": "outputs/stock_automl/b2_two_month_2024_r35_20261019/daily2/2024-07/metrics.json",
+      "sha256": "a12e8ff16223579aed03879c63d30eef5d43e3d3720baad4cf6818f509d5f34d"
+    },
+    {
+      "month": "2024-08",
+      "path": "outputs/stock_automl/b2_two_month_2024_r35_20261019/daily2/2024-08/metrics.json",
+      "sha256": "8aa3a05f5c84678654d92f52eb97193e59863c8a19c8879896d50fe28d7d9770"
+    },
+    {
+      "month": "2024-09",
+      "path": "outputs/stock_automl/b2_two_month_2024_r35_20261019/daily2/2024-09/metrics.json",
+      "sha256": "44ebb8b47ef62037cb997d0950da032470fcf65f7c35b5aa558ef9a002fd456a"
+    },
+    {
+      "month": "2024-10",
+      "path": "outputs/stock_automl/b2_two_month_2024_r35_20261019/daily2/2024-10/metrics.json",
+      "sha256": "9a4ee3b0d74d48a762916543621c5ed813b821a6f497168eaaa885935faa6d1f"
+    },
+    {
+      "month": "2024-11",
+      "path": "outputs/stock_automl/b2_two_month_2024_r35_20261019/daily2/2024-11/metrics.json",
+      "sha256": "b675c680880afcf6709e35ee69d0141f1b2098081fca7fecfa02b93097623240"
+    },
+    {
+      "month": "2024-12",
+      "path": "outputs/stock_automl/b2_two_month_2024_r35_20261019/daily2/2024-12/metrics.json",
+      "sha256": "63d41809de5e31e0735d5405e8e6fc49359b0052feb07fd60d2182a36a6f3ce8"
+    },
+    {
+      "month": "2025-01",
+      "path": "outputs/stock_automl/limit_rebound_segments_r18_20261015/2025-01/segments_metrics.json",
+      "sha256": "d8c1039cb0c5f6f787e2583a5c9366b4b6ed851c4a8bd9370b80734d0ad58cd7"
+    },
+    {
+      "month": "2025-02",
+      "path": "outputs/stock_automl/limit_rebound_segments_r18_20261015/2025-02/segments_metrics.json",
+      "sha256": "0b962c8a07c520cc08e8c10db5a5a1b9ef9b7394b35264cb798894b0891d69cb"
+    },
+    {
+      "month": "2025-03",
+      "path": "outputs/stock_automl/limit_rebound_segments_r18_20261015/2025-03/segments_metrics.json",
+      "sha256": "16850299b7fbe52dd98e5584b84465bf10c156a5f4aa1e7ac8a3a65422beccb0"
+    },
+    {
+      "month": "2025-04",
+      "path": "outputs/stock_automl/limit_rebound_segments_r18_20261015/2025-04/segments_metrics.json",
+      "sha256": "520b8b6bc435bdec7765006bc0bb87c11639590ba9c0415f14c88efed9b28ec6"
+    },
+    {
+      "month": "2025-05",
+      "path": "outputs/stock_automl/limit_rebound_segments_r18_20261015/2025-05/segments_metrics.json",
+      "sha256": "a1c24e37834ac324aa15e80253680e570a11bb930b8a5e95e56c6efe5484ec7c"
+    },
+    {
+      "month": "2025-06",
+      "path": "outputs/stock_automl/limit_rebound_segments_r18_20261015/2025-06/segments_metrics.json",
+      "sha256": "b9113638cdb96d486ad6ee9dd1ce681182e114579f9e0964803038172b16e937"
+    },
+    {
+      "month": "2025-07",
+      "path": "outputs/stock_automl/limit_rebound_segments_r18_20261015/2025-07/segments_metrics.json",
+      "sha256": "8f72559d8e035b6546572e755b7478e77be286699ea09416310116ed9eafc3f1"
+    },
+    {
+      "month": "2025-08",
+      "path": "outputs/stock_automl/limit_rebound_segments_r18_20261015/2025-08/segments_metrics.json",
+      "sha256": "6f4b5fae3486f52a26a8149921d193466f2c890ffa5b08c2100c2201d0c38ac6"
+    },
+    {
+      "month": "2025-09",
+      "path": "outputs/stock_automl/limit_rebound_segments_r18_20261015/2025-09/segments_metrics.json",
+      "sha256": "7fac403b363de4669543dd2a44ce5b6cd81d9122f28cbeb35cf8631ee79d04ee"
+    },
+    {
+      "month": "2025-10",
+      "path": "outputs/stock_automl/limit_rebound_segments_r18_20261015/2025-10/segments_metrics.json",
+      "sha256": "b93a53ed7c3bbeef5428ffe1bbcc04826920c9ede8052913cc2f32438f260cc9"
+    },
+    {
+      "month": "2025-11",
+      "path": "outputs/stock_automl/limit_rebound_segments_r18_20261015/2025-11/segments_metrics.json",
+      "sha256": "3c30340bcf8a894f4feef0a6207e6f7c00aaec7148e06e2add21355965740589"
+    },
+    {
+      "month": "2025-12",
+      "path": "outputs/stock_automl/limit_rebound_segments_r18_20261015/2025-12/segments_metrics.json",
+      "sha256": "638bfc53a1dd339b8b19af0aefabc39c963c43933f247925319da7944d2b4f84"
+    },
+    {
+      "month": "2026-01",
+      "path": "outputs/stock_automl/limit_rebound_segments_r18_20261015/2026-01/segments_metrics.json",
+      "sha256": "4ae59c7c648702e5f5bf8a34b0107acd960fa61d094118091149a6c6581a3a80"
+    },
+    {
+      "month": "2026-02",
+      "path": "outputs/stock_automl/limit_rebound_segments_r18_20261015/2026-02/segments_metrics.json",
+      "sha256": "38e7f4c286933dfa9ff5ecfd925bf84ed07ef105e2af011d892310d0d0d788de"
+    },
+    {
+      "month": "2026-03",
+      "path": "outputs/stock_automl/limit_rebound_segments_r18_20261015/2026-03/segments_metrics.json",
+      "sha256": "1e0380117a2808ed5de9a3badda06d2b5e2da26dc7413777bbacf0448653b40f"
+    },
+    {
+      "month": "2026-04",
+      "path": "outputs/stock_automl/limit_rebound_segments_r18_20261015/2026-04/segments_metrics.json",
+      "sha256": "b61da085e0204873b5e7cc9fb3f266120d5994ca60f7ed845f698d3445d5cb73"
+    },
+    {
+      "month": "2026-05",
+      "path": "outputs/stock_automl/limit_rebound_segments_r18_20261015/2026-05/segments_metrics.json",
+      "sha256": "b95241cf93d2b595bb11188be049f39dacffbc22601e68f981685a1eefe40650"
+    },
+    {
+      "month": "2026-06",
+      "path": "outputs/stock_automl/limit_rebound_segments_r18_20261015/2026-06/segments_metrics.json",
+      "sha256": "a66f1b48ebc57e0a09a0fcfb0e18b767b881fd3aab39483111e399e4035b73d5"
+    },
+    {
+      "month": "2026-07",
+      "path": "outputs/stock_automl/limit_rebound_segments_r18_20261015/2026-07/segments_metrics.json",
+      "sha256": "845d13e559d2a07d1d2126e2542c07a6a2df6d21af7a8734d96defbb0ac75ddd"
+    },
+    {
+      "month": "2026-08",
+      "path": "outputs/stock_automl/limit_rebound_segments_r18_20261015/2026-08/segments_metrics.json",
+      "sha256": "e0c0303899543527875c6bbc0732e9593ce6af0ab1a281b840fd92b5be92cd70"
+    },
+    {
+      "month": "2026-09",
+      "path": "outputs/stock_automl/limit_rebound_segments_r18_20261015/2026-09/segments_metrics.json",
+      "sha256": "9ac52b5e2f710b645df9d07b1154e68ec6b94e2dc86af8939381aa2976f5b81d"
+    }
+  ],
+  "groups": {
+    "full": {
+      "months": 41,
+      "corr_valid_top1_d2_net": 0.09023502209537065,
+      "corr_valid_top1_b2_month": 0.20155303287035417,
+      "corr_valid_top3_d2_net": 0.250157768278989,
+      "corr_valid_top3_b2_month": 0.2994476816950979,
+      "descriptive_50pct_split": {
+        "valid_top1_below50": {
+          "months": 12,
+          "mean_b2_month_return": -0.050863753404410905,
+          "mean_d2_net": -0.010135242303236962
+        },
+        "valid_top1_atleast50": {
+          "months": 29,
+          "mean_b2_month_return": -0.03877389037107652,
+          "mean_d2_net": -0.008882352291177188
+        },
+        "valid_top3_below50": {
+          "months": 19,
+          "mean_b2_month_return": -0.09942031287871334,
+          "mean_d2_net": -0.01554833909446413
+        },
+        "valid_top3_atleast50": {
+          "months": 22,
+          "mean_b2_month_return": 0.007008094685518314,
+          "mean_d2_net": -0.003808758240371071
+        }
+      }
+    },
+    "2023_May_Dec": {
+      "months": 8,
+      "corr_valid_top1_d2_net": 0.7112720414585492,
+      "corr_valid_top1_b2_month": 0.7656487077551982,
+      "corr_valid_top3_d2_net": 0.07077227909904117,
+      "corr_valid_top3_b2_month": 0.15864207492240331,
+      "descriptive_50pct_split": {
+        "valid_top1_below50": {
+          "months": 3,
+          "mean_b2_month_return": -0.15046968201631739,
+          "mean_d2_net": -0.01899574220053108
+        },
+        "valid_top1_atleast50": {
+          "months": 5,
+          "mean_b2_month_return": 0.008594877154112756,
+          "mean_d2_net": 0.0030226932121972536
+        },
+        "valid_top3_below50": {
+          "months": 5,
+          "mean_b2_month_return": -0.0899627705237542,
+          "mean_d2_net": -0.00688357651274811
+        },
+        "valid_top3_atleast50": {
+          "months": 3,
+          "mean_b2_month_return": 0.013793064113460892,
+          "mean_d2_net": -0.0024852926589554757
+        }
+      }
+    },
+    "2024": {
+      "months": 12,
+      "corr_valid_top1_d2_net": -0.49814403987461714,
+      "corr_valid_top1_b2_month": -0.45893452186393885,
+      "corr_valid_top3_d2_net": 0.07975123892977559,
+      "corr_valid_top3_b2_month": 0.16527783845610022,
+      "descriptive_50pct_split": {
+        "valid_top1_below50": {
+          "months": 4,
+          "mean_b2_month_return": -0.11240428297228189,
+          "mean_d2_net": -0.02681457521591428
+        },
+        "valid_top1_atleast50": {
+          "months": 8,
+          "mean_b2_month_return": -0.1748126432727684,
+          "mean_d2_net": -0.04063020189525462
+        },
+        "valid_top3_below50": {
+          "months": 7,
+          "mean_b2_month_return": -0.16709908479006721,
+          "mean_d2_net": -0.03351278994012837
+        },
+        "valid_top3_atleast50": {
+          "months": 5,
+          "mean_b2_month_return": -0.1356849369081609,
+          "mean_d2_net": -0.0395420772889591
+        }
+      }
+    },
+    "2025_2026_Sep": {
+      "months": 21,
+      "corr_valid_top1_d2_net": 0.08030816536649218,
+      "corr_valid_top1_b2_month": 0.12934105594272874,
+      "corr_valid_top3_d2_net": 0.23850219416657298,
+      "corr_valid_top3_b2_month": 0.24962854625131706,
+      "descriptive_50pct_split": {
+        "valid_top1_below50": {
+          "months": 5,
+          "mean_b2_month_return": 0.058132227417029766,
+          "mean_d2_net": 0.008524523965281361
+        },
+        "valid_top1_atleast50": {
+          "months": 16,
+          "mean_b2_month_return": 0.014442746228147778,
+          "mean_d2_net": 0.0032712457910570123
+        },
+        "valid_top3_below50": {
+          "months": 7,
+          "mean_b2_month_return": -0.03849692836375878,
+          "mean_d2_net": -0.0037730043785970447
+        },
+        "valid_top3_atleast50": {
+          "months": 14,
+          "mean_b2_month_return": 0.056515969662987484,
+          "mean_d2_net": 0.008669541652392738
+        }
+      }
+    }
+  },
+  "checked_months": 41,
+  "checked_signals": 543
+}
