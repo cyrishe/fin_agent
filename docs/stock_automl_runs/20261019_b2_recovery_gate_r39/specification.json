@@ -1,0 +1,32 @@
+{
+  "name": "R39_B2_30d_loss_10d_recovery",
+  "strategy_registry": "kingdomai.automl_strategy_definition / imac / B2 / v1.0",
+  "strategy_definition_sha256": "157b9d77bb9951214b0978365cec407320b1d5663636b80fe60939ae94172c0c",
+  "source_signals": "outputs/stock_automl/b2_two_month_2024_r35_20261019/signals.pkl",
+  "source_sha256": "4bac8813bab12dcc00603fb8ae23bf48b33a19e4424e2953b007c5a72ccf2bee",
+  "calendar_sha256": "3c78b65ecc61bf98f2a0108d9912becfa22f6b9dd6baa8b57f2e42e59489d518",
+  "experiment_code_sha256": "2281c71cd22bb79eef97f6395ba7a1954052677a0e6465f084e959ec637dd359",
+  "gate": "At D1 before buy, 30 completed market-day return <=-10%; if a 10-day condition is present, pause only when 10 completed market-day return <+1%. Both use only previous close.",
+  "shadow": "Frozen B2 runs on paper every day, including paused days; all shadow returns read only prior market closes. Real cash is not changed by paper trades.",
+  "start_and_end": [
+    [
+      [
+        "全期连续",
+        "2024-03-01"
+      ],
+      [
+        "2025五月重置",
+        "2025-05-01"
+      ],
+      [
+        "2026一月重置",
+        "2026-01-01"
+      ]
+    ],
+    "2026-09-30"
+  ],
+  "account": "1m initial; half available cash if flat, all remaining cash if carrying; D2 close sell; 0.1% each side",
+  "scope": "research on already seen historical data; B2 production unchanged",
+  "db_status": "research output not inserted into production registry",
+  "cloud_status": "local only; no independent cloud readback"
+}
