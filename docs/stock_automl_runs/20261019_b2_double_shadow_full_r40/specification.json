@@ -1,0 +1,19 @@
+{
+  "experiment": "R40_B2_double_shadow_30_10_full_sequential",
+  "strategy_registry": "kingdomai.automl_strategy_definition / imac / B2 / v1.0",
+  "strategy_definition_sha256": "157b9d77bb9951214b0978365cec407320b1d5663636b80fe60939ae94172c0c",
+  "code_sha256": "7902505fdfe90b87a72a38543238a786b37e2604a750e8bb12c052aca4907b1d",
+  "source_signal_sha256": "4bac8813bab12dcc00603fb8ae23bf48b33a19e4424e2953b007c5a72ccf2bee",
+  "calendar_sha256": "3c78b65ecc61bf98f2a0108d9912becfa22f6b9dd6baa8b57f2e42e59489d518",
+  "period": [
+    "2024-03-01",
+    "2026-09-30"
+  ],
+  "training": "R35 original rolling 6 month train, 2 month validation; no retraining",
+  "gate": "D1 buy-before: previous close paper NAV over 30 completed trading days <= -10% AND over 10 completed trading days < +1%; paper B2 trades every day, real B2 skips new buy while gate true",
+  "capital": "2024-03-01 CNY 1m; flat buy half available cash, carrying one position buy all remaining cash; no borrowing or integer-lot constraint",
+  "timing": "frozen R35 original eligible 09:35-09:40 next-minute-open proxy; D2 close sell; buy before sell on same day; 0.1% per side; no orderbook fill/slippage model",
+  "account": "one continuous real and one continuous paper account; 2025 and 2026 are not restarted",
+  "evidence": "joint sequential replay reconciled to canonical B2 cash replay and saved R39 daily NAV, 404 decisions and pre-decision 30/10 returns",
+  "study_status": "already examined historical period, no untouched holdout; production B2 unchanged; not written to production DB or cloud"
+}
