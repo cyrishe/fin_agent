@@ -1,0 +1,569 @@
+[
+  {
+    "day": "2022-09-01",
+    "path": "/Volumes/ext/tushare_market_data/2022/20220901.csv.gz",
+    "sha256": "a129cdfe11dc1e7c8a1e8856e434d796b55eded0b1f3addd3325f0335408b247",
+    "bars": 1182587,
+    "symbols": 4907
+  },
+  {
+    "day": "2022-09-02",
+    "path": "/Volumes/ext/tushare_market_data/2022/20220902.csv.gz",
+    "sha256": "f10d6fdc53d1d37a5c63122c1fb8ffd4c29a6db15b2c4393c27d91d566408d66",
+    "bars": 1183069,
+    "symbols": 4909
+  },
+  {
+    "day": "2022-09-05",
+    "path": "/Volumes/ext/tushare_market_data/2022/20220905.csv.gz",
+    "sha256": "3598f05dbe3b6e209a1f5bd3c2e00591c0f67434bf4bdc937e535c0929a0565a",
+    "bars": 1183310,
+    "symbols": 4910
+  },
+  {
+    "day": "2022-09-06",
+    "path": "/Volumes/ext/tushare_market_data/2022/20220906.csv.gz",
+    "sha256": "800d961521b3b433816cbaf2a314924ac6a8392dd89b6feec20828f9bbab259d",
+    "bars": 1184274,
+    "symbols": 4914
+  },
+  {
+    "day": "2022-09-07",
+    "path": "/Volumes/ext/tushare_market_data/2022/20220907.csv.gz",
+    "sha256": "180d4b313d80ee2f96cceee6a5d02a08f1fc7189e469bb3139ca244ce32ef246",
+    "bars": 1184033,
+    "symbols": 4913
+  },
+  {
+    "day": "2022-09-08",
+    "path": "/Volumes/ext/tushare_market_data/2022/20220908.csv.gz",
+    "sha256": "010d03ea1227824ebf6bf53c88f49b71d038a5a917e579b541d8481da10308cd",
+    "bars": 1185720,
+    "symbols": 4920
+  },
+  {
+    "day": "2022-09-09",
+    "path": "/Volumes/ext/tushare_market_data/2022/20220909.csv.gz",
+    "sha256": "504aa059277089cedd7db15158c9afb6c4277efc192c854cd3bc53a4c5b7ecf4",
+    "bars": 1185720,
+    "symbols": 4920
+  },
+  {
+    "day": "2022-09-13",
+    "path": "/Volumes/ext/tushare_market_data/2022/20220913.csv.gz",
+    "sha256": "8309270dd306473165a2ea075849c4374edb6aefd5edea5505ad3488c2402d77",
+    "bars": 1186925,
+    "symbols": 4925
+  },
+  {
+    "day": "2022-09-14",
+    "path": "/Volumes/ext/tushare_market_data/2022/20220914.csv.gz",
+    "sha256": "8094f7ecccd11281337ab9c9f54f916bcfbace9268cc577ca85a458e7afb0440",
+    "bars": 1186202,
+    "symbols": 4922
+  },
+  {
+    "day": "2022-09-15",
+    "path": "/Volumes/ext/tushare_market_data/2022/20220915.csv.gz",
+    "sha256": "522129822d496096c35bc2bc5d7c9ba0d15676d88d51be4d08068c1e62a28311",
+    "bars": 1184997,
+    "symbols": 4917
+  },
+  {
+    "day": "2022-09-16",
+    "path": "/Volumes/ext/tushare_market_data/2022/20220916.csv.gz",
+    "sha256": "0d1761e36df45bf224b614f3f9737c8dfde630dcb9ebce7cc4474a946087dc6c",
+    "bars": 1185961,
+    "symbols": 4921
+  },
+  {
+    "day": "2022-09-19",
+    "path": "/Volumes/ext/tushare_market_data/2022/20220919.csv.gz",
+    "sha256": "dff0a008d98d21819a114fef181c27353251328fc35689f447d40e60cdae0e3d",
+    "bars": 1186443,
+    "symbols": 4923
+  },
+  {
+    "day": "2022-09-20",
+    "path": "/Volumes/ext/tushare_market_data/2022/20220920.csv.gz",
+    "sha256": "30a47fd0d7aac624236b907430ae78c5f59666559418493aac36b3855e38df67",
+    "bars": 1186925,
+    "symbols": 4925
+  },
+  {
+    "day": "2022-09-21",
+    "path": "/Volumes/ext/tushare_market_data/2022/20220921.csv.gz",
+    "sha256": "4a1fa69ab9d91760162f885d1a247a0a6816b33d014d133d508502e7a3092401",
+    "bars": 1188130,
+    "symbols": 4930
+  },
+  {
+    "day": "2022-09-22",
+    "path": "/Volumes/ext/tushare_market_data/2022/20220922.csv.gz",
+    "sha256": "711380f7557be7c08388167f61a3e9978800f91d82cf7b76efe90da4e3c57ac7",
+    "bars": 1187889,
+    "symbols": 4929
+  },
+  {
+    "day": "2022-09-23",
+    "path": "/Volumes/ext/tushare_market_data/2022/20220923.csv.gz",
+    "sha256": "63a26872454fd9c3c93f6395ed351f46c70d8c2800121eb08ef81babe8d3a612",
+    "bars": 1188130,
+    "symbols": 4930
+  },
+  {
+    "day": "2022-09-26",
+    "path": "/Volumes/ext/tushare_market_data/2022/20220926.csv.gz",
+    "sha256": "67c44c4cc8af008d7fe51ee9779d002f9eb944c892fc6a06ab7f38dcfa739a06",
+    "bars": 1189576,
+    "symbols": 4936
+  },
+  {
+    "day": "2022-09-27",
+    "path": "/Volumes/ext/tushare_market_data/2022/20220927.csv.gz",
+    "sha256": "d85ca637fde116ac3847ea1ef4b50c32b01f0441e424bb7d67213b93925f88c3",
+    "bars": 1190540,
+    "symbols": 4940
+  },
+  {
+    "day": "2022-09-28",
+    "path": "/Volumes/ext/tushare_market_data/2022/20220928.csv.gz",
+    "sha256": "c7b7846d3d60a96e47be0cea8b947e5f7d8a03c612189eda3df880b9d1cec1a5",
+    "bars": 1191022,
+    "symbols": 4942
+  },
+  {
+    "day": "2022-09-29",
+    "path": "/Volumes/ext/tushare_market_data/2022/20220929.csv.gz",
+    "sha256": "3effc7bbf42dec3f41ab0afa70ff91b7b92a488136cafd5784d65684875aca17",
+    "bars": 1191263,
+    "symbols": 4943
+  },
+  {
+    "day": "2022-09-30",
+    "path": "/Volumes/ext/tushare_market_data/2022/20220930.csv.gz",
+    "sha256": "cac842355516a4f80fd4ab6e4a351d901d8b131f9cbd66261bad847f601bdba8",
+    "bars": 1191504,
+    "symbols": 4944
+  },
+  {
+    "day": "2022-10-10",
+    "path": "/Volumes/ext/tushare_market_data/2022/20221010.csv.gz",
+    "sha256": "47dbfa531c8889e7b6858e6db0add8c163761cda8f779510921fea4c7458970c",
+    "bars": 1191986,
+    "symbols": 4946
+  },
+  {
+    "day": "2022-10-11",
+    "path": "/Volumes/ext/tushare_market_data/2022/20221011.csv.gz",
+    "sha256": "a26a0272f44d76510022e6bed7f6dbf7695b19981483cce1a19d73f785b616d5",
+    "bars": 1192227,
+    "symbols": 4947
+  },
+  {
+    "day": "2022-10-12",
+    "path": "/Volumes/ext/tushare_market_data/2022/20221012.csv.gz",
+    "sha256": "7f01e59fc1d9326b331992156b7369ce1f53b79b82e7bd8f6fb9a747927b4aaf",
+    "bars": 1192468,
+    "symbols": 4948
+  },
+  {
+    "day": "2022-10-13",
+    "path": "/Volumes/ext/tushare_market_data/2022/20221013.csv.gz",
+    "sha256": "88838180ec484ba10b2fee6311696618dc3505c1e356993084a948d3a8616276",
+    "bars": 1193673,
+    "symbols": 4953
+  },
+  {
+    "day": "2022-10-14",
+    "path": "/Volumes/ext/tushare_market_data/2022/20221014.csv.gz",
+    "sha256": "e7effd446f364bf3b87395eba05629fba97e70cc0dd6203a24b333d6ca7507bf",
+    "bars": 1194637,
+    "symbols": 4957
+  },
+  {
+    "day": "2022-10-17",
+    "path": "/Volumes/ext/tushare_market_data/2022/20221017.csv.gz",
+    "sha256": "276c9af9a1105f550a18a0c989d16bae81f9c6ea22c5192d91b819effcfdc228",
+    "bars": 1193914,
+    "symbols": 4954
+  },
+  {
+    "day": "2022-10-18",
+    "path": "/Volumes/ext/tushare_market_data/2022/20221018.csv.gz",
+    "sha256": "10447fc4070196e92e96d39c408973a856adf4d65b4584c7ad54e86ac29d1c07",
+    "bars": 1195119,
+    "symbols": 4959
+  },
+  {
+    "day": "2022-10-19",
+    "path": "/Volumes/ext/tushare_market_data/2022/20221019.csv.gz",
+    "sha256": "64b0bdcba44787e08dcf6a2cc7b04528ce7fdee306b9ac4d034ed2f8c5a288dd",
+    "bars": 1196324,
+    "symbols": 4964
+  },
+  {
+    "day": "2022-10-20",
+    "path": "/Volumes/ext/tushare_market_data/2022/20221020.csv.gz",
+    "sha256": "054c604581fa69869d2aeba93fae80f42e2e6950803d155b072d99e75e9d88dc",
+    "bars": 1195601,
+    "symbols": 4961
+  },
+  {
+    "day": "2022-10-21",
+    "path": "/Volumes/ext/tushare_market_data/2022/20221021.csv.gz",
+    "sha256": "6c696d332dd707d82178c0a0764bae81534eace97a2fe8c6071cbbe9e86c991e",
+    "bars": 1196083,
+    "symbols": 4963
+  },
+  {
+    "day": "2022-10-24",
+    "path": "/Volumes/ext/tushare_market_data/2022/20221024.csv.gz",
+    "sha256": "82afff6630b3de8d640fe35441b89b16d8ae9ee5cb43df917c7ff245a67534f8",
+    "bars": 1196083,
+    "symbols": 4963
+  },
+  {
+    "day": "2022-10-25",
+    "path": "/Volumes/ext/tushare_market_data/2022/20221025.csv.gz",
+    "sha256": "4aa3f643c56e26efdf92117b6febc8ab5854704014463f78ea8b7a3adf9d61a5",
+    "bars": 1196083,
+    "symbols": 4963
+  },
+  {
+    "day": "2022-10-26",
+    "path": "/Volumes/ext/tushare_market_data/2022/20221026.csv.gz",
+    "sha256": "b5a47549a11da228221656cd5f1851b01f1db7113af36f9292693f373cb36d54",
+    "bars": 1197047,
+    "symbols": 4967
+  },
+  {
+    "day": "2022-10-27",
+    "path": "/Volumes/ext/tushare_market_data/2022/20221027.csv.gz",
+    "sha256": "73e041121ef22bc9c64afd83dd2e859807b269209dd6869dd8c24dd2ee97758e",
+    "bars": 1197047,
+    "symbols": 4967
+  },
+  {
+    "day": "2022-10-28",
+    "path": "/Volumes/ext/tushare_market_data/2022/20221028.csv.gz",
+    "sha256": "96ef77e02554ededb593b84436176ff94d7541295f0f4d2c44c5de844482bafd",
+    "bars": 1198252,
+    "symbols": 4972
+  },
+  {
+    "day": "2022-10-31",
+    "path": "/Volumes/ext/tushare_market_data/2022/20221031.csv.gz",
+    "sha256": "08b7baa3e759f72433e6058e7fc554007d9fbbe9461520cfb229eb7cdcd43888",
+    "bars": 1198252,
+    "symbols": 4972
+  },
+  {
+    "day": "2022-11-01",
+    "path": "/Volumes/ext/tushare_market_data/2022/20221101.csv.gz",
+    "sha256": "73b1910ae7aa97e1568fd4f4392739842109379ed087fd34e30915dce52326fa",
+    "bars": 1199216,
+    "symbols": 4976
+  },
+  {
+    "day": "2022-11-02",
+    "path": "/Volumes/ext/tushare_market_data/2022/20221102.csv.gz",
+    "sha256": "0058e6988eb6f1d58b48a8cb2b223073d4a267f205e17aa72a3268cb0901d7ea",
+    "bars": 1198734,
+    "symbols": 4974
+  },
+  {
+    "day": "2022-11-03",
+    "path": "/Volumes/ext/tushare_market_data/2022/20221103.csv.gz",
+    "sha256": "be857950f97b2795804478d7add13e23b0de05bd63f7d23b5ce79edcec78ef87",
+    "bars": 1198975,
+    "symbols": 4975
+  },
+  {
+    "day": "2022-11-04",
+    "path": "/Volumes/ext/tushare_market_data/2022/20221104.csv.gz",
+    "sha256": "f5665821a413f32ea19bbb8b20f74c7ef2e88749f30c86d4f77bea751fd64139",
+    "bars": 1199698,
+    "symbols": 4978
+  },
+  {
+    "day": "2022-11-07",
+    "path": "/Volumes/ext/tushare_market_data/2022/20221107.csv.gz",
+    "sha256": "9c0f52dc0c7634780ecedfc1dbb26f78fe85b904e4f7c466443bdabe0bf64821",
+    "bars": 1200421,
+    "symbols": 4981
+  },
+  {
+    "day": "2022-11-08",
+    "path": "/Volumes/ext/tushare_market_data/2022/20221108.csv.gz",
+    "sha256": "f114cd7afdf9c24bb5e01dadfe229199d039d87b916d311194f5c2c410982eda",
+    "bars": 1199457,
+    "symbols": 4977
+  },
+  {
+    "day": "2022-11-09",
+    "path": "/Volumes/ext/tushare_market_data/2022/20221109.csv.gz",
+    "sha256": "cd1b8949a96d55e2a1955d252cb41e626a000596facf8de6124b5a2bf36f820f",
+    "bars": 1200421,
+    "symbols": 4981
+  },
+  {
+    "day": "2022-11-10",
+    "path": "/Volumes/ext/tushare_market_data/2022/20221110.csv.gz",
+    "sha256": "d9db099112c1a4cfc8123226a6b4753c5e844243032850e644e5ccd22693f747",
+    "bars": 1201144,
+    "symbols": 4984
+  },
+  {
+    "day": "2022-11-11",
+    "path": "/Volumes/ext/tushare_market_data/2022/20221111.csv.gz",
+    "sha256": "ee1c9e9cb97dad5e368c8a2560d4fade57bde6d4f1114c7c87c6f46f316594a5",
+    "bars": 1202590,
+    "symbols": 4990
+  },
+  {
+    "day": "2022-11-14",
+    "path": "/Volumes/ext/tushare_market_data/2022/20221114.csv.gz",
+    "sha256": "a3ab02f7506c20735bb56b99ca2321463402b7280c08aef17795aca725352a5d",
+    "bars": 1202108,
+    "symbols": 4988
+  },
+  {
+    "day": "2022-11-15",
+    "path": "/Volumes/ext/tushare_market_data/2022/20221115.csv.gz",
+    "sha256": "f3989a41d2deb04ec915c707df9460a3a605300736560d8b17ebd2eaf0cff4e8",
+    "bars": 1202831,
+    "symbols": 4991
+  },
+  {
+    "day": "2022-11-16",
+    "path": "/Volumes/ext/tushare_market_data/2022/20221116.csv.gz",
+    "sha256": "ec627947b261e95f24b0c6138b381ca1d5b8866b360e3d239e24ff213e9eb258",
+    "bars": 1203313,
+    "symbols": 4993
+  },
+  {
+    "day": "2022-11-17",
+    "path": "/Volumes/ext/tushare_market_data/2022/20221117.csv.gz",
+    "sha256": "55d470740828f9f2bbfad4f6178abcb66788ab0e6e0f26106b310b26a66e3ab5",
+    "bars": 1203072,
+    "symbols": 4992
+  },
+  {
+    "day": "2022-11-18",
+    "path": "/Volumes/ext/tushare_market_data/2022/20221118.csv.gz",
+    "sha256": "6b5acd7a71b537389aedf50043de8a7a1e8a6c07ad2d0887576eef888b143671",
+    "bars": 1204518,
+    "symbols": 4998
+  },
+  {
+    "day": "2022-11-21",
+    "path": "/Volumes/ext/tushare_market_data/2022/20221121.csv.gz",
+    "sha256": "f461218a2de907db611577a804969a61fa1e88ae2f628441a55e78b924cd0399",
+    "bars": 1205000,
+    "symbols": 5000
+  },
+  {
+    "day": "2022-11-22",
+    "path": "/Volumes/ext/tushare_market_data/2022/20221122.csv.gz",
+    "sha256": "7336f288b836b49392dd5b153bf0113b3cbd4a043eedb422004328e3ed86f161",
+    "bars": 1205482,
+    "symbols": 5002
+  },
+  {
+    "day": "2022-11-23",
+    "path": "/Volumes/ext/tushare_market_data/2022/20221123.csv.gz",
+    "sha256": "6f6d497785610135c0a7ba989869bd2b3fa521705132695f9ea34d35ad8fe72a",
+    "bars": 1205000,
+    "symbols": 5000
+  },
+  {
+    "day": "2022-11-24",
+    "path": "/Volumes/ext/tushare_market_data/2022/20221124.csv.gz",
+    "sha256": "7f2834be5d815ee9032d98cd2bb65093e899aa17989665cc7ebd0ad1babf2696",
+    "bars": 1205964,
+    "symbols": 5004
+  },
+  {
+    "day": "2022-11-25",
+    "path": "/Volumes/ext/tushare_market_data/2022/20221125.csv.gz",
+    "sha256": "6700290eed227facab62b935cbc45995039a3ae7ae5fa2e10f1255763eacae28",
+    "bars": 1206446,
+    "symbols": 5006
+  },
+  {
+    "day": "2022-11-28",
+    "path": "/Volumes/ext/tushare_market_data/2022/20221128.csv.gz",
+    "sha256": "c37578b36f3753722da79ffdcf3b7cf584a9291a2afd0c9df0ab81b37ae4ef5c",
+    "bars": 1206687,
+    "symbols": 5007
+  },
+  {
+    "day": "2022-11-29",
+    "path": "/Volumes/ext/tushare_market_data/2022/20221129.csv.gz",
+    "sha256": "194a632e65667471cc6beff77fb13e1304d59f7168e33ffb3e9ca092e99f1853",
+    "bars": 1207892,
+    "symbols": 5012
+  },
+  {
+    "day": "2022-11-30",
+    "path": "/Volumes/ext/tushare_market_data/2022/20221130.csv.gz",
+    "sha256": "140f438ce7a1914f104a8cb5c4dba5952fe68c304c80f47815deddda12e0db7b",
+    "bars": 1208133,
+    "symbols": 5013
+  },
+  {
+    "day": "2022-12-01",
+    "path": "/Volumes/ext/tushare_market_data/2022/20221201.csv.gz",
+    "sha256": "2b4a00bf20077336b75f1452eb2d0c75092efd45e4a5c64e4a81f26de261c2b8",
+    "bars": 1209097,
+    "symbols": 5017
+  },
+  {
+    "day": "2022-12-02",
+    "path": "/Volumes/ext/tushare_market_data/2022/20221202.csv.gz",
+    "sha256": "6edaae940cbf33b9513a252d66ee3a7250a01ebaced4ea1f18ca31cbab00a421",
+    "bars": 1209338,
+    "symbols": 5018
+  },
+  {
+    "day": "2022-12-05",
+    "path": "/Volumes/ext/tushare_market_data/2022/20221205.csv.gz",
+    "sha256": "dc8031464f2db98aeb5c10f174e593d84775b38e51632bd0f4c3b1e797749c09",
+    "bars": 1208615,
+    "symbols": 5015
+  },
+  {
+    "day": "2022-12-06",
+    "path": "/Volumes/ext/tushare_market_data/2022/20221206.csv.gz",
+    "sha256": "964e63f18c5273a49066e5c7aef48e514c2745fc35100b00500eb0442a0c8ec4",
+    "bars": 1208856,
+    "symbols": 5016
+  },
+  {
+    "day": "2022-12-07",
+    "path": "/Volumes/ext/tushare_market_data/2022/20221207.csv.gz",
+    "sha256": "74d51e3926073b979ee98881799e3f3a51b641f78d3f207286ef1040eb5a8b6a",
+    "bars": 1209097,
+    "symbols": 5017
+  },
+  {
+    "day": "2022-12-08",
+    "path": "/Volumes/ext/tushare_market_data/2022/20221208.csv.gz",
+    "sha256": "52af1e17e114fe1ff4be51593c25a73dacd05ebaf725a5e205b3cd31af8d85f4",
+    "bars": 1210061,
+    "symbols": 5021
+  },
+  {
+    "day": "2022-12-09",
+    "path": "/Volumes/ext/tushare_market_data/2022/20221209.csv.gz",
+    "sha256": "05ac6d86eb95e94843b78e337d43f250a697c01ea5bd13ed6e2cb7b6ff36b710",
+    "bars": 1211025,
+    "symbols": 5025
+  },
+  {
+    "day": "2022-12-12",
+    "path": "/Volumes/ext/tushare_market_data/2022/20221212.csv.gz",
+    "sha256": "26a8e0a7de4d5ea5dc569c618ab8025cfa8ef9408809d901ae550012295b9d31",
+    "bars": 1211989,
+    "symbols": 5029
+  },
+  {
+    "day": "2022-12-13",
+    "path": "/Volumes/ext/tushare_market_data/2022/20221213.csv.gz",
+    "sha256": "79f73b87cc00228a04d057d85fccad58dd2523f510b893ee6af812a3755d6e92",
+    "bars": 1212230,
+    "symbols": 5030
+  },
+  {
+    "day": "2022-12-14",
+    "path": "/Volumes/ext/tushare_market_data/2022/20221214.csv.gz",
+    "sha256": "0aeb25426a5eb20d9fe184e0c092d603bf1908a9e71b4feee5dea066c93eac0b",
+    "bars": 1212712,
+    "symbols": 5032
+  },
+  {
+    "day": "2022-12-15",
+    "path": "/Volumes/ext/tushare_market_data/2022/20221215.csv.gz",
+    "sha256": "f1a27e893b1a5daa8ff12d8772beb808e062f96102afab769c1910a8ecd5a81e",
+    "bars": 1213435,
+    "symbols": 5035
+  },
+  {
+    "day": "2022-12-16",
+    "path": "/Volumes/ext/tushare_market_data/2022/20221216.csv.gz",
+    "sha256": "caed5264412af471204a6990b43e726e1763ba3ac862176b2580bc8255f567f8",
+    "bars": 1214399,
+    "symbols": 5039
+  },
+  {
+    "day": "2022-12-19",
+    "path": "/Volumes/ext/tushare_market_data/2022/20221219.csv.gz",
+    "sha256": "16908a606507bfa2ebfef89d41b9932be56eb587c259b3cd734b841b54292186",
+    "bars": 1213676,
+    "symbols": 5036
+  },
+  {
+    "day": "2022-12-20",
+    "path": "/Volumes/ext/tushare_market_data/2022/20221220.csv.gz",
+    "sha256": "d93c2b5ab6eff79b7398e0e76f7bf051449dec6a168a2be716b9cfceb2e1bbd8",
+    "bars": 1213917,
+    "symbols": 5037
+  },
+  {
+    "day": "2022-12-21",
+    "path": "/Volumes/ext/tushare_market_data/2022/20221221.csv.gz",
+    "sha256": "bd0f2d991d7a01da93074fd5979864a02a2fc42a18d41c0f8808efa7ebcf0c0c",
+    "bars": 1213194,
+    "symbols": 5034
+  },
+  {
+    "day": "2022-12-22",
+    "path": "/Volumes/ext/tushare_market_data/2022/20221222.csv.gz",
+    "sha256": "ef73ed75a7977e7ae672b13860ecb72454114ac97cf8193735c93915a4da54f7",
+    "bars": 1215363,
+    "symbols": 5043
+  },
+  {
+    "day": "2022-12-23",
+    "path": "/Volumes/ext/tushare_market_data/2022/20221223.csv.gz",
+    "sha256": "cd00fe5cde8005e219d82268bfe4cf1f7a2bccc45b1dd8fcf215af8d179d42ee",
+    "bars": 1216809,
+    "symbols": 5049
+  },
+  {
+    "day": "2022-12-26",
+    "path": "/Volumes/ext/tushare_market_data/2022/20221226.csv.gz",
+    "sha256": "63f4a533610a16f34b45bfa6dc10a941c595ab83107412109f56253a15c14888",
+    "bars": 1216568,
+    "symbols": 5048
+  },
+  {
+    "day": "2022-12-27",
+    "path": "/Volumes/ext/tushare_market_data/2022/20221227.csv.gz",
+    "sha256": "5b4c1e01490668b9e50068d3981e32e86c5f82054ef47af0b700569394b02974",
+    "bars": 1218014,
+    "symbols": 5054
+  },
+  {
+    "day": "2022-12-28",
+    "path": "/Volumes/ext/tushare_market_data/2022/20221228.csv.gz",
+    "sha256": "ead171e958b25a1b371fdbab66bdd970d2ee1026e4ad1fa329aa281bb40523b7",
+    "bars": 1217773,
+    "symbols": 5053
+  },
+  {
+    "day": "2022-12-29",
+    "path": "/Volumes/ext/tushare_market_data/2022/20221229.csv.gz",
+    "sha256": "67c77e73f14649b2c28c955174452999d78eb495bece2e5897161147cd0a216e",
+    "bars": 1218978,
+    "symbols": 5058
+  },
+  {
+    "day": "2022-12-30",
+    "path": "/Volumes/ext/tushare_market_data/2022/20221230.csv.gz",
+    "sha256": "bcb8e461bec2d40191dd3bec44e91354cb985a9a889f2a669d0decef6511bd1c",
+    "bars": 1219701,
+    "symbols": 5061
+  }
+]

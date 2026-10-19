@@ -1,0 +1,11 @@
+{
+  "experiment": "R41 extended B2 historical 30/10 gate",
+  "source_spec_sha256": "8794a66e9f4566894d3adce59458c9dbbb6e1c21cfbb189a0b5b4069398a177d",
+  "source_signals_sha256": "da2aae9be809f4987df67d8d39e6e88ddfa0621646c050770113b352c7ca9441",
+  "old_signal_sha256": "4bac8813bab12dcc00603fb8ae23bf48b33a19e4424e2953b007c5a72ccf2bee",
+  "gate": "At D1 before buy: prior close unfiltered B2 account return over 30 trading days <=-10% and over 10 days <+1%; no other filter added",
+  "account": "One continuous 1m account from 2023-05; B2 flat half cash or carried all remaining; D2 close sell; 0.1% each side",
+  "original_B2_2024_03_onward_signals_exact": true,
+  "reproducibility": "Parallel day-by-day reference and gated accounts each agree with canonical cash replay",
+  "status": "historical research, no production strategy change or DB write"
+}

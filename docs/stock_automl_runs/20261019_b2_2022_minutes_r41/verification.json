@@ -1,0 +1,77 @@
+{
+  "model_checks": [
+    {
+      "month": "2022-09",
+      "rows": 890,
+      "max_diff": 0.0,
+      "model_sha256": "39f7ef317f23685ccb66961f9e96ef69e9c471a6ad779ee97745b0e6ccec12c8"
+    },
+    {
+      "month": "2022-10",
+      "rows": 952,
+      "max_diff": 0.0,
+      "model_sha256": "02bbd08952c292b46e838b3d49836cc403cbab8cb45102597ca0d8174fcf1e14"
+    },
+    {
+      "month": "2022-11",
+      "rows": 1255,
+      "max_diff": 0.0,
+      "model_sha256": "19adb56a6e66ff4ac50543b71474f12d889e722a67d593d05e9b7b3b155366a6"
+    },
+    {
+      "month": "2022-12",
+      "rows": 943,
+      "max_diff": 0.0,
+      "model_sha256": "e77704c1bcd6aa5b22880d7fb092a3b38eb4026b3fdf7b1aebc2d5798f94573f"
+    },
+    {
+      "month": "2023-01",
+      "rows": 677,
+      "max_diff": 0.0,
+      "model_sha256": "22ef264b553dc633a76acdab3cf57b00b9bfcd439c0ecbf3ce066ab02e6e063c"
+    },
+    {
+      "month": "2023-02",
+      "rows": 614,
+      "max_diff": 0.0,
+      "model_sha256": "0d37f413c043a04af2467efe505352357f2224a937777069a3b4250a818e08d1"
+    },
+    {
+      "month": "2023-03",
+      "rows": 556,
+      "max_diff": 0.0,
+      "model_sha256": "9bad621133b9fdfa4d254178b63db1dc632d5d5397017dd4bf07a751b857975e"
+    },
+    {
+      "month": "2023-04",
+      "rows": 675,
+      "max_diff": 0.0,
+      "model_sha256": "841e6f905f196fa58318bbf7344685027950a76ae87903440058b2c84b28c546"
+    },
+    {
+      "month": "2023-05",
+      "rows": 808,
+      "max_diff": 0.0,
+      "model_sha256": "093eebb49ccab9a11213dbe5f1c887fc97f1a91842ed28e0092babb2bb289782"
+    },
+    {
+      "month": "2023-06",
+      "rows": 947,
+      "max_diff": 0.0,
+      "model_sha256": "460417e56574eb0194ee71b147e1bfea59300d171d7879f8a0d7b06f07de3673"
+    }
+  ],
+  "model_max_score_diff": 0.0,
+  "new_signals": 139,
+  "production_evaluator_exact": 139,
+  "candidate_decisions": 603,
+  "minute_2022_coverage": {
+    "stock_days": 811,
+    "minute_ok": 805,
+    "failed": {
+      "分钟日线价格冲突": 3,
+      "分钟缺失": 2,
+      "D1日线缺失": 1
+    }
+  }
+}
