@@ -37,6 +37,9 @@ def first_text(*items):
 
 
 def main() -> None:
+    calendar = json.loads(CALENDAR.read_text())
+    last_entry_day = calendar[calendar.index(END) - 1]
+    last_forecast_day = calendar[calendar.index(END) - 2]
     overall = json.loads((OUT / 'overall.json').read_text())
     monthly = json.loads((OUT / 'monthly.json').read_text())
     yearly = json.loads((OUT / 'yearly.json').read_text())
@@ -80,18 +83,21 @@ def main() -> None:
     decision_rows = []
     for r in decisions.sort_values(['d0_date', 'shape_variant']).to_dict('records'):
         name = r['shape_variant']
+        passed = bool(r.get('shape_pass', False))
+        filled = (name, r.get('d1_date')) in fill_days
+        reason = '成交' if filled else ('四K实体未过' if not passed else '窗口未成交')
         decision_rows.append([
             r['d0_date'], text(r.get('d1_date')), PLAN_NAMES[name],
             number(r.get('d0_rank')), number(r.get('score')),
             text(r.get('shape_model')), number(r.get('high5')),
             number(r.get('low5')), number(r.get('body5')),
-            int((name, r.get('d1_date')) in fill_days),
+            int(passed), int(filled), reason,
             text(r.get('delayed_time')), number(r.get('delayed_entry')),
             number(r.get('delayed_net')), number(r.get('label_3')),
             int(gate_lookup.get((name, r.get('d1_date')), False)),
         ])
 
-    calendars = [d for d in json.loads(CALENDAR.read_text()) if START <= d <= END]
+    calendars = [d for d in calendar if START <= d <= last_forecast_day]
     shape_models = []
     for variant in MODES:
         first_mode = MODES[variant][0]
@@ -122,7 +128,7 @@ def main() -> None:
                 sum(v for k, v in choices.items() if k != 'rank_only'),
                 float(train), float(valid), float(valid_base)])
 
-    payload = dict(scope='D1 2023-05-05—2026-09-30；2023 年 5 月起，2026 年截至 9 月；D2 收盘卖，买卖各 0.1%。',
+    payload = dict(scope=f'D1 2023-05-05—{last_entry_day}；账户截至 {END}；D2 收盘卖，买卖各 0.1%。',
                    overview=overview, yearly=years, monthly=months,
                    classification=metrics, ledger=ledger_rows,
                    decisions=decision_rows, shape_models=shape_models)

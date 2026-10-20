@@ -50,13 +50,13 @@ def specification() -> dict:
         source_daily=str(daily.ROOT), source_spec_sha256=sha(daily.ROOT / 'specification.json'),
         source_panel_sha256=sha(PANEL), source_calendar_sha256=sha(CALENDAR),
         period=[START, END], variants=MODES, features=SHAPE_FEATURES,
-        selector='At each D0 fit three standardized Ridge regressions alpha=1,10,100 on eligible historical causal daily Top3 candidates passing the four-bar body > -8% gate, targeting clipped [-20%,+20%] D2 fee-adjusted payoff. A candidate with no valid post-09:34 simulated buy is payoff zero. Validation chooses penalty only when six-month train and one/two-month validation opportunity-day payoff are each at least the rank-only baseline; otherwise use original D0 rank.',
+        selector='At each D0 fit three standardized Ridge regressions alpha=1,10,100 on eligible historical causal daily Top3 candidates, targeting clipped [-20%,+20%] D2 fee-adjusted payoff. A candidate rejected by the four-bar body > -8% gate or with no valid post-09:34 simulated buy has zero payoff. Validation chooses penalty only when six-month train and one/two-month validation opportunity-day payoff are each at least the rank-only baseline; otherwise use original D0 rank.',
         stage2_windows='For each D0, six prior calendar months ending one/two calendar months before D0 train; immediately following one/two months validate. D4 maturity and active-board-event purge at both boundaries. All historical candidates scored by their own prior daily model.',
-        decision='D1 after four complete bars ending 09:31..09:34, preselect highest stage2 score among original D0 Top3 with valid historical status, audited four bars and four-bar body > -8%; do not substitute if selected stock never opens or cannot be bought after one extra qualifying minute.',
+        decision='D1 after four complete bars ending 09:31..09:34, preselect highest stage2 score among original D0 Top3 with valid historical status and audited minute bars; then apply four-bar body > -8% to that one stock. If it fails the body gate, never opens, or cannot be bought after one extra qualifying minute, the day is skipped with no substitute.',
         execution='Original B2 open-below-cap positive-volume minutes ending 09:35..09:40; same-stock next qualifying minute open by09:40 as simulated buy; D2 close sell; 0.1% fee each side. Simulation price is not guaranteed executable.',
         missing_price='D2 training target requires valid D1/D2 reference-price continuity. D4 continuity never filters a D1 trade; the account replay records and excludes invalid D1/D2 price observations by the original B2 rule.',
         quality='Historical minute audit compares full D1 minute record with daily totals; it is a retrospective data-quality exclusion, not a live 09:34 predictor. Coverage and failed reasons are reported separately.',
-        comparison='Compare original monthly B2, daily gap2+shape2, daily direct6+shape1, daily direct6+shape2 over identical D0 dates and continuous 100w accounts. Also report unfiltered trade and 30/10 shadow gate separately.',
+        comparison='Compare original monthly B2, daily gap2+shape2, daily direct6+shape1, daily direct6+shape2 over the same D1 trading dates and continuous 100w accounts. Last admitted D1 must have D2 by the September 30 account cutoff, so no final open position remains. Report raw and 30/10 shadow gate separately.',
         production_changed=False, prior_history_studied=True)
     value = json.loads(json.dumps(value, ensure_ascii=False))
     p = OUT / 'specification.json'
@@ -73,7 +73,8 @@ def assemble() -> pd.DataFrame:
     if saved.exists():
         return pd.read_pickle(saved)
     calendar = json.loads(CALENDAR.read_text())
-    days = [d for d in calendar if daily.FIRST <= d <= END]
+    last_forecast_day = calendar[calendar.index(END) - 2]
+    days = [d for d in calendar if daily.FIRST <= d <= last_forecast_day]
     for mode in daily.MODES:
         assert all((daily.ROOT / mode / d / 'complete.json').exists() for d in days), mode
     rows = []
@@ -220,7 +221,7 @@ def opportunity(frame: pd.DataFrame, scores: np.ndarray) -> tuple[float, int, fl
     """Equal-weight mean over D0 opportunities; no-fill days contribute zero."""
     q = frame.copy()
     q['refine_score'] = np.asarray(scores, dtype=float)
-    q = q[q.eligible & q.body5.gt(-.08 + 1e-12)]
+    q = q[q.eligible]
     if q.empty:
         return 0., 0, 0.
     picked = q.sort_values(['d0_date', 'refine_score', 'symbol'],
@@ -247,11 +248,9 @@ def train_one_shape(day: str, variant: str, all_rows: pd.DataFrame,
     train_end_i = int(np.searchsorted(calendar, boundary) - 1)
     day_i = int(np.searchsorted(calendar, day))
     train = q[(q.d0_date.ge(start)) & (q.d0_date.lt(boundary))
-              & q.date_i.add(4).le(train_end_i) & q.eligible
-              & q.body5.gt(-.08 + 1e-12)].copy()
+              & q.date_i.add(4).le(train_end_i) & q.eligible].copy()
     valid = q[(q.d0_date.ge(boundary)) & (q.d0_date.lt(day))
-              & q.date_i.add(4).lt(day_i) & q.eligible
-              & q.body5.gt(-.08 + 1e-12)].copy()
+              & q.date_i.add(4).lt(day_i) & q.eligible].copy()
     test = q[q.d0_date.eq(day)].copy()
     # An apparent fill with a broken or incomplete D2 price is unknown,
     # whereas a genuine no-fill is a zero-payoff opportunity.
@@ -297,9 +296,10 @@ def train_one_shape(day: str, variant: str, all_rows: pd.DataFrame,
     scores = (-test.d0_rank.to_numpy() if restored is None else
               restored.predict(features(test)))
     test['refine_score'] = scores
-    eligible_test = test[test.eligible & test.body5.gt(-.08 + 1e-12)].sort_values(
+    eligible_test = test[test.eligible].sort_values(
         ['refine_score', 'symbol'], ascending=[False, True])
     selected = eligible_test.head(1).copy()
+    selected['shape_pass'] = selected.body5.gt(-.08 + 1e-12)
     selected['shape_variant'] = variant
     selected['shape_model'] = winner['name']
     selected.to_pickle(root / 'decision.pkl')
@@ -308,7 +308,8 @@ def train_one_shape(day: str, variant: str, all_rows: pd.DataFrame,
         train_days=train.d0_date.nunique(), valid_days=valid.d0_date.nunique(),
         selected=winner['name'], candidates=candidate,
         preselected_symbol=selected.symbol.iloc[0] if len(selected) else None,
-        simulated_buy=bool(len(selected) and pd.notna(selected.delayed_entry.iloc[0])),
+        simulated_buy=bool(len(selected) and selected.shape_pass.iloc[0]
+                           and pd.notna(selected.delayed_entry.iloc[0])),
         training_keys_sha256=sha_bytes(train[KEY].to_csv(index=False).encode()),
         model_sha256=sha(root / 'model.joblib'),
         no_test_selection=True)
@@ -325,11 +326,12 @@ def fit_shape(first: str | None, last: str | None) -> None:
     specification()
     f = delayed_candidates()
     calendar = json.loads(CALENDAR.read_text())
+    last_forecast_day = calendar[calendar.index(END) - 2]
     panel = pd.read_pickle(PANEL)
     active_events = {int(day_i): pd.MultiIndex.from_frame(
         group[['symbol', 'first_limit_date']])
         for day_i, group in panel.groupby('date_i')}
-    days = [d for d in calendar if START <= d <= END and
+    days = [d for d in calendar if START <= d <= last_forecast_day and
             (first is None or d >= first) and (last is None or d <= last)]
     for i, day in enumerate(days, 1):
         for variant in MODES:
@@ -363,7 +365,9 @@ def shadow_gate(signals: pd.DataFrame, calendar: list[str]) -> tuple[pd.DataFram
 def report() -> None:
     specification()
     calendar = json.loads(CALENDAR.read_text())
-    days = [d for d in calendar if START <= d <= END]
+    last_forecast_day = calendar[calendar.index(END) - 2]
+    days = [d for d in calendar if START <= d <= last_forecast_day]
+    last_entry_day = calendar[calendar.index(END) - 1]
     plans = {'fixed_monthly_B2': pd.read_pickle(r41.OUT / 'signals.pkl')}
     decisions = []
     for variant in MODES:
@@ -379,13 +383,13 @@ def report() -> None:
         assert not signal.d1_date.duplicated().any()
         plans[variant] = signal
     pd.concat(decisions, ignore_index=True).to_pickle(OUT / 'daily_decisions.pkl')
-    pd.concat((p[p.d1_date.between(START, END)].assign(plan=name)
+    pd.concat((p[p.d1_date.between(START, last_entry_day)].assign(plan=name)
                for name, p in plans.items()),
               ignore_index=True).to_pickle(OUT / 'all_signals.pkl')
     overall, monthly, yearly, classifications, exclusions, navs, ledgers = [], [], [], [], [], [], []
     gate_decisions = []
     for name, source in plans.items():
-        source = source[source.d1_date.between(START, END)].sort_values('d1_date')
+        source = source[source.d1_date.between(START, last_entry_day)].sort_values('d1_date')
         raw_result = replay(source, calendar, start=START, end=END, fee_rate=.001)
         raw_excluded = {(e['symbol'], e['d1_date']) for e in raw_result[-1]}
         valid_source = source[~pd.MultiIndex.from_frame(source[['symbol', 'd1_date']]).isin(
@@ -420,7 +424,7 @@ def report() -> None:
             loss_gt5=float(net.lt(-.05).mean())))
     enriched = pd.read_pickle(OUT / 'enriched.pkl')
     for mode in daily.MODES:
-        q = enriched[enriched.variant.eq(mode) & enriched.d1_date.between(START, END)]
+        q = enriched[enriched.variant.eq(mode) & enriched.d1_date.between(START, last_entry_day)]
         for k in (1, 3):
             for stage, opened in [('全量', False), ('D1开盘打开', True)]:
                 x = q[q.d0_rank.le(k) & q.observed_3
