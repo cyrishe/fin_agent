@@ -1,0 +1,30 @@
+[
+  {
+    "file": "outputs/stock_automl/b2_two_month_2024_r35_20261019/enriched.pkl",
+    "sha256": "46e7367efe6c0b53c3ef1376560ef2b3374742e892126289ee341542edc817da"
+  },
+  {
+    "file": "outputs/stock_automl/b2_two_month_2024_r35_20261019/rules_frozen.json",
+    "sha256": "e9c6e38fc7a3d8d41c4657856750756365f357edec7ab2fca095c159f7de0d3b"
+  },
+  {
+    "file": "outputs/stock_automl/b2_two_month_2024_r35_20261019/nav.pkl",
+    "sha256": "8d6952459f4cc78ae836967b4f138b7881c3e7eae27e39e6b1b6f71e57e07cf9"
+  },
+  {
+    "file": "outputs/stock_automl/b2_two_month_2024_r35_20261019/ledger.pkl",
+    "sha256": "326d02106665ebe4b80db654adb379f14d48011600ab784817b02a61e202d3f6"
+  },
+  {
+    "file": "docs/stock_automl_runs/20261020_b2_validation_vs_month_r52/验证期逐笔_延迟买入.csv",
+    "sha256": "63d356b1df061f8471ec98c32c1965aa6ba827bc1e682f3a16a5db70aa58e2da"
+  },
+  {
+    "file": "docs/stock_automl_runs/20261020_b2_no_shape_last_valid_r53/31月简表_原口径加末月及无四K.csv",
+    "sha256": "7fd202e05368160c1ef8e45cab3b97870394cf872cf99f557522927d398bd84d"
+  },
+  {
+    "file": "docs/stock_automl_runs/20261020_b2_validation_vs_month_r52/31月逐月对照.csv",
+    "sha256": "e4717342d1108b32578c2863c1c55fdcb0a2b65eff4b5b54360d71362cae7e1a"
+  }
+]

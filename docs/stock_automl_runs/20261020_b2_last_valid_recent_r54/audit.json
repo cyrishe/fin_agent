@@ -1,0 +1,8 @@
+{
+  "months": 31,
+  "last_month_shape_uses_target_model_validation": true,
+  "recent_days_use_prior_month_active_b2": true,
+  "recent_account_returns_from_frozen_nav": true,
+  "recent_wins_from_trades_exited_in_window": true,
+  "pre_2024_03_active_b2_unavailable": true
+}
