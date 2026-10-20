@@ -1,0 +1,9 @@
+{
+  "months": 31,
+  "validation_records": 363,
+  "monthly_account_source_sha256": "8567e5f8cb6c5466bb6c5d57cbd15e03a93d7d751ce4c5c154ad886dc6695ce2",
+  "no_month_after_2026_09": true,
+  "validation_labels_matured_before_target": true,
+  "frozen_shape_metrics_recomputed": true,
+  "validation_delay_replayed_with_original_fee_and_account": true
+}

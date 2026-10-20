@@ -1,0 +1,34 @@
+[
+  {
+    "file": "outputs/stock_automl/b2_two_month_2024_r35_20261019/daily_metrics.json",
+    "sha256": "b1bb86e4e9723045c3b18b7446022a1adfdcccd1c1601ef3eb9d35985e2a1c96"
+  },
+  {
+    "file": "outputs/stock_automl/b2_two_month_2024_r35_20261019/rules_frozen.json",
+    "sha256": "e9c6e38fc7a3d8d41c4657856750756365f357edec7ab2fca095c159f7de0d3b"
+  },
+  {
+    "file": "outputs/stock_automl/b2_two_month_2024_r35_20261019/monthly.json",
+    "sha256": "8567e5f8cb6c5466bb6c5d57cbd15e03a93d7d751ce4c5c154ad886dc6695ce2"
+  },
+  {
+    "file": "outputs/stock_automl/b2_two_month_2024_r35_20261019/ledger.pkl",
+    "sha256": "326d02106665ebe4b80db654adb379f14d48011600ab784817b02a61e202d3f6"
+  },
+  {
+    "file": "outputs/stock_automl/b2_two_month_2024_r35_20261019/enriched.pkl",
+    "sha256": "46e7367efe6c0b53c3ef1376560ef2b3374742e892126289ee341542edc817da"
+  },
+  {
+    "file": "outputs/stock_automl/b2_two_month_2024_r35_20261019/first10.pkl",
+    "sha256": "553b337b4a5ec7419fcaadde3f846ef9dc76a6f59b61f79c01a2507ba1bc6390"
+  },
+  {
+    "file": "outputs/stock_automl/b2_two_month_2024_r35_20261019/signals.pkl",
+    "sha256": "4bac8813bab12dcc00603fb8ae23bf48b33a19e4424e2953b007c5a72ccf2bee"
+  },
+  {
+    "file": "outputs/stock_automl/b2_full_2024_r34_20261019/calendar.json",
+    "sha256": "3c78b65ecc61bf98f2a0108d9912becfa22f6b9dd6baa8b57f2e42e59489d518"
+  }
+]
