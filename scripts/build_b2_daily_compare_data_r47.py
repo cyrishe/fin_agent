@@ -133,7 +133,7 @@ def main() -> None:
                 sum(v for k, v in choices.items() if k != 'rank_only'),
                 float(train), float(valid), float(valid_base)])
 
-    payload = dict(scope=f'D1 2023-05-05—{last_entry_day}；账户截至 {END}；D2 收盘卖，买卖各 0.1%。',
+    payload = dict(scope=f'初始100万元；D1 2023-05-05—{last_entry_day}；账户截至 {END}；D2 收盘卖，买卖各 0.1%；末月标签可延至 10 月。',
                    overview=overview, yearly=years, monthly=months,
                    classification=metrics, ledger=ledger_rows,
                    decisions=decision_rows, shape_models=shape_models)

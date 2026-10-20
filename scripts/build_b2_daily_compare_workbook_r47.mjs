@@ -53,7 +53,7 @@ function sheet(name, title, headers, rows, widths, formats = [], dateCol = null)
 }
 
 const overview = sheet("总览", "B2 日更模型对比",
-  ["方案", "停手", "买入笔数", "期末资产", "总收益", "最大回撤", "年化夏普", "三日再板", "D2笔均费后", "买卖费用"],
+  ["方案", "停手", "买入笔数", "期末资产", "总收益", "最大回撤", "年化夏普", "D1-D3再板", "D2笔均费后", "买卖费用"],
   data.overview, [23, 13, 13, 17, 13, 13, 13, 13, 15, 15],
   [[3, cash], [4, pct], [5, pct], [6, "0.00"], [7, pct], [8, pct], [9, cash]]);
 overview.getRange("A3").values = [[data.scope]];
@@ -72,21 +72,27 @@ for (const col of [4, 5]) overview.getRangeByIndexes(18, col, data.yearly.length
 for (const col of [6, 7]) overview.getRangeByIndexes(18, col, data.yearly.length, 1).format.numberFormat = pct;
 overview.getRangeByIndexes(18, 8, data.yearly.length, 1).format.numberFormat = "0.00";
 
-sheet("逐月", "按持仓日历月统计", ["月份", "方案", "停手", "买入笔数", "月初资产", "月末资产", "月收益", "月内回撤", "月夏普", "买卖费用"],
+const monthlySheet = sheet("逐月", "按持仓日历月统计", ["月份", "方案", "停手", "买入笔数", "月初资产", "月末资产", "月收益", "月内回撤", "月夏普", "买卖费用"],
   data.monthly, [15, 23, 13, 13, 17, 17, 13, 13, 13, 15],
   [[4, cash], [5, cash], [6, pct], [7, pct], [8, "0.00"], [9, cash]], 0);
-sheet("分类效果", "三日再板与 D2 实际收益", ["方案", "阶段", "样本数", "三日再板率", "D2笔均费后", "D2亏超5%"],
+monthlySheet.getRange("A3").values = [["收益、回撤按持仓日历月；月夏普由该月每日账户收益年化。"]];
+monthlySheet.getRange("A3").format.font = { name: "Arial", size: 10, italic: true, color: muted };
+sheet("分类效果", "D1—D3 再板与 D2 实际收益", ["方案", "阶段", "样本数", "D1-D3再板率", "D2笔均费后", "D2亏超5%"],
   data.classification, [23, 18, 13, 17, 17, 17], [[3, pct], [4, pct], [5, pct]]);
-const training = sheet("模型训练", "日线与四 K 每日重训的月度摘要", ["月份", "方案", "重训日数", "日线训练均数", "日线历史验Top1", "四K训练均数", "四K验证均数", "沿用D0排名", "选择Ridge", "训练机会收益", "验证机会收益", "排名验证收益"],
+const training = sheet("模型训练", "日线与四 K 每日重训的月度摘要", ["月份", "方案", "重训日数", "日线训练均数", "日线验开板Top1", "四K训练均数", "四K验证均数", "沿用D0排名", "选择Ridge", "训练机会收益", "验证机会收益", "排名验证收益"],
   data.shape_models, [15, 23, 13, 15, 18, 15, 15, 15, 13, 17, 17, 17], [[4, pct], [9, pct], [10, pct], [11, pct]], 0);
-training.getRange("A3").values = [["每日历史窗口互相重叠；这里是模型选择证据，实际收益看总览和逐月。"]];
+training.getRange("A3").values = [["每日窗口互相重叠；排名基准为 D0 排名最前的唯一预选，实际收益看总览和逐月。"]];
 training.getRange("A3").format.font = { name: "Arial", size: 10, italic: true, color: muted };
-sheet("逐笔成交", "账户实际买入明细", ["D1日期", "方案", "停手", "D0名次", "D0评分", "形态模型", "四K最高", "四K最低", "四K实体", "买入时刻", "买入价", "投入金额", "卖出日期", "卖出价", "费后收益", "三日再板"],
-  data.ledger, [16, 23, 13, 11, 13, 15, 12, 12, 12, 13, 13, 16, 16, 13, 14, 12],
+const tradeSheet = sheet("逐笔成交", "账户实际买入明细", ["D1日期", "方案", "停手", "D0名次", "D0评分", "形态模型", "四K最高涨幅", "四K最低涨幅", "四K实体涨幅", "买入时刻", "买入价", "投入金额", "卖出日期", "卖出价", "费后收益", "D1-D3再板"],
+  data.ledger, [16, 23, 13, 11, 13, 15, 17, 17, 17, 13, 13, 16, 16, 13, 14, 12],
   [[4, "0.0000"], [6, pct], [7, pct], [8, pct], [10, "0.00"], [11, cash], [13, "0.00"], [14, pct]], 0);
-sheet("逐日预选", "四 K 精排预选，含未成交", ["D0日期", "D1日期", "方案", "D0名次", "D0评分", "形态模型", "四K最高", "四K最低", "四K实体", "实体通过", "可成交", "结果", "买入时刻", "模拟买价", "D2费后", "三日再板", "影子停手"],
-  data.decisions, [16, 16, 23, 11, 13, 15, 12, 12, 12, 11, 11, 16, 13, 13, 14, 12, 12],
+tradeSheet.getRange("A3").values = [["四 K 最高/最低相对 D1 昨收；实体相对首根开盘价。"]];
+tradeSheet.getRange("A3").format.font = { name: "Arial", size: 10, italic: true, color: muted };
+const decisionSheet = sheet("逐日预选", "四 K 精排预选，含未成交", ["D0日期", "D1日期", "方案", "D0名次", "D0评分", "形态模型", "四K最高涨幅", "四K最低涨幅", "四K实体涨幅", "实体通过", "可成交", "结果", "买入时刻", "模拟买价", "D2费后", "D1-D3再板", "影子停手"],
+  data.decisions, [16, 16, 23, 11, 13, 15, 17, 17, 17, 11, 11, 16, 13, 13, 14, 12, 12],
   [[4, "0.0000"], [6, pct], [7, pct], [8, pct], [13, "0.00"], [14, pct]], 0);
+decisionSheet.getRange("A3").values = [["先预选唯一股票，再检查四 K 实体与买入窗口；不合格当天不顺延。"]];
+decisionSheet.getRange("A3").format.font = { name: "Arial", size: 10, italic: true, color: muted };
 
 wb.recalculate();
 const scan = await wb.inspect({ kind: "match", searchTerm: "#REF!|#DIV/0!|#VALUE!|#NAME\\?|#N/A|#NUM!|#NULL!|#SPILL!|#CALC!",
