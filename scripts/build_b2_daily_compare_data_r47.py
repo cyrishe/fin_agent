@@ -50,17 +50,21 @@ def main() -> None:
     signal = pd.read_pickle(OUT / 'all_signals.pkl')
     assert set(PLAN_NAMES) == set(x['plan'] for x in overall)
     assert len(trades) == sum(x['entries'] for x in overall)
-    hits = {x['plan']: x for x in classification if x['stage'] == '可成交信号'}
-    overview = [[PLAN_NAMES[x['plan']], GATE_NAMES[x['gate']], x['entries'],
-                 x['final_nav'], x['total_return'], x['max_drawdown'],
-                 x['sharpe'], hits[x['plan']]['hit'], hits[x['plan']]['d2_fee_mean']]
-                for x in overall]
+    overview = []
+    for x in overall:
+        lot = trades[trades.plan.eq(x['plan']) & trades.gate.eq(x['gate'])]
+        known = lot[lot.observed_3.eq(True)]
+        overview.append([PLAN_NAMES[x['plan']], GATE_NAMES[x['gate']], x['entries'],
+                         x['final_nav'], x['total_return'], x['max_drawdown'],
+                         x['sharpe'], float(known.label_3.mean()) if len(known) else None,
+                         float(lot.return_.dropna().mean()) if len(lot.return_.dropna()) else None,
+                         x['total_fees']])
     years = [[x['year'], PLAN_NAMES[x['plan']], GATE_NAMES[x['gate']],
               x['entries'], x['opening_nav'], x['closing_nav'], x['return_'],
               x['drawdown'], x['sharpe']] for x in yearly]
     months = [[x['month'], PLAN_NAMES[x['plan']], GATE_NAMES[x['gate']],
                x['entries'], x['opening_nav'], x['closing_nav'], x['return_'],
-               x['drawdown'], x['fees']] for x in monthly]
+               x['drawdown'], x['sharpe'], x['fees']] for x in monthly]
     metrics = [[PLAN_NAMES.get(x['plan'], x['plan']), x['stage'], x['n'],
                 x['hit'], x.get('d2_fee_mean'), x.get('loss_gt5')]
                for x in classification]

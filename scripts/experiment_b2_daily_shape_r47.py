@@ -238,7 +238,9 @@ def train_one_shape(day: str, variant: str, all_rows: pd.DataFrame,
     first_mode, valid_months = MODES[variant]
     root = OUT / 'daily_shape' / variant / day
     done = root / 'complete.json'
-    if done.exists() and (root / 'decision.pkl').exists():
+    if done.exists() and all((root / name).exists() for name in
+                             ('decision.pkl', 'model.joblib', 'training_idx.npy',
+                              'validation_idx.npy')):
         return json.loads(done.read_text()), pd.read_pickle(root / 'decision.pkl')
     root.mkdir(parents=True, exist_ok=True)
     q = all_rows[all_rows.variant.eq(first_mode)]
@@ -264,6 +266,8 @@ def train_one_shape(day: str, variant: str, all_rows: pd.DataFrame,
             active)
         train = train.loc[~overlap]
     assert train.d0_date.max() < boundary <= day
+    np.save(root / 'training_idx.npy', train.index.to_numpy(dtype=np.int32))
+    np.save(root / 'validation_idx.npy', valid.index.to_numpy(dtype=np.int32))
     target = train.delayed_net.fillna(0).clip(-.2, .2)
     candidate = []
     base_train = opportunity(train, -train.d0_rank.to_numpy())
@@ -311,6 +315,9 @@ def train_one_shape(day: str, variant: str, all_rows: pd.DataFrame,
         simulated_buy=bool(len(selected) and selected.shape_pass.iloc[0]
                            and pd.notna(selected.delayed_entry.iloc[0])),
         training_keys_sha256=sha_bytes(train[KEY].to_csv(index=False).encode()),
+        validation_keys_sha256=sha_bytes(valid[KEY].to_csv(index=False).encode()),
+        training_index_sha256=sha(root / 'training_idx.npy'),
+        validation_index_sha256=sha(root / 'validation_idx.npy'),
         model_sha256=sha(root / 'model.joblib'),
         no_test_selection=True)
     dump(done, receipt)

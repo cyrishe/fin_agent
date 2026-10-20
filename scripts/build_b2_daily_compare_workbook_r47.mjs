@@ -53,11 +53,13 @@ function sheet(name, title, headers, rows, widths, formats = [], dateCol = null)
 }
 
 const overview = sheet("总览", "B2 日更模型对比",
-  ["方案", "停手", "买入笔数", "期末资产", "总收益", "最大回撤", "年化夏普", "三日再板", "D2笔均费后"],
-  data.overview, [23, 13, 13, 17, 13, 13, 13, 13, 15],
-  [[3, cash], [4, pct], [5, pct], [6, "0.00"], [7, pct], [8, pct]]);
+  ["方案", "停手", "买入笔数", "期末资产", "总收益", "最大回撤", "年化夏普", "三日再板", "D2笔均费后", "买卖费用"],
+  data.overview, [23, 13, 13, 17, 13, 13, 13, 13, 15, 15],
+  [[3, cash], [4, pct], [5, pct], [6, "0.00"], [7, pct], [8, pct], [9, cash]]);
 overview.getRange("A3").values = [[data.scope]];
 overview.getRange("A3").format.font = { name: "Arial", size: 10, italic: true, color: muted };
+overview.getRange("A14").values = [["三日再板率与 D2 笔均费后按该账户实际买入的股票计算。"]];
+overview.getRange("A14").format.font = { name: "Arial", size: 10, italic: true, color: muted };
 overview.getRange("A16").values = [["逐年账户结果"]];
 overview.getRange("A16").format.font = { name: "Arial", size: 12, bold: true, color: navy };
 const annualHeaders = ["年份", "方案", "停手", "买入笔数", "年初资产", "年末资产", "年收益", "年内回撤", "年化夏普"];
@@ -70,9 +72,9 @@ for (const col of [4, 5]) overview.getRangeByIndexes(18, col, data.yearly.length
 for (const col of [6, 7]) overview.getRangeByIndexes(18, col, data.yearly.length, 1).format.numberFormat = pct;
 overview.getRangeByIndexes(18, 8, data.yearly.length, 1).format.numberFormat = "0.00";
 
-sheet("逐月", "按持仓日历月统计", ["月份", "方案", "停手", "买入笔数", "月初资产", "月末资产", "月收益", "月内回撤", "买卖费用"],
-  data.monthly, [15, 23, 13, 13, 17, 17, 13, 13, 15],
-  [[4, cash], [5, cash], [6, pct], [7, pct], [8, cash]], 0);
+sheet("逐月", "按持仓日历月统计", ["月份", "方案", "停手", "买入笔数", "月初资产", "月末资产", "月收益", "月内回撤", "月夏普", "买卖费用"],
+  data.monthly, [15, 23, 13, 13, 17, 17, 13, 13, 13, 15],
+  [[4, cash], [5, cash], [6, pct], [7, pct], [8, "0.00"], [9, cash]], 0);
 sheet("分类效果", "三日再板与 D2 实际收益", ["方案", "阶段", "样本数", "三日再板率", "D2笔均费后", "D2亏超5%"],
   data.classification, [23, 18, 13, 17, 17, 17], [[3, pct], [4, pct], [5, pct]]);
 const training = sheet("模型训练", "日线与四 K 每日重训的月度摘要", ["月份", "方案", "重训日数", "日线训练均数", "日线历史验Top1", "四K训练均数", "四K验证均数", "沿用D0排名", "选择Ridge", "训练机会收益", "验证机会收益", "排名验证收益"],
@@ -90,7 +92,7 @@ wb.recalculate();
 const scan = await wb.inspect({ kind: "match", searchTerm: "#REF!|#DIV/0!|#VALUE!|#NAME\\?|#N/A|#NUM!|#NULL!|#SPILL!|#CALC!",
   options: { useRegex: true, maxResults: 50 }, maxChars: 2000 });
 console.log(scan.ndjson);
-const preview = await wb.render({ sheetName: "总览", range: "A1:I44", scale: 1.2, format: "png" });
+const preview = await wb.render({ sheetName: "总览", range: "A1:J44", scale: 1.2, format: "png" });
 await fs.writeFile(path.join(root, "workbook_preview.png"), new Uint8Array(await preview.arrayBuffer()));
 const output = await SpreadsheetFile.exportXlsx(wb);
 const filename = path.join(root, "B2_日更模型_三方案对比_R46-R47_20261020.xlsx");
