@@ -50,10 +50,12 @@ def specification() -> dict:
         source_daily=str(daily.ROOT), source_spec_sha256=sha(daily.ROOT / 'specification.json'),
         source_panel_sha256=sha(PANEL), source_calendar_sha256=sha(CALENDAR),
         period=[START, END], variants=MODES, features=SHAPE_FEATURES,
-        selector='At each D0 fit three standardized Ridge regressions alpha=1,10,100 to clipped [-20%,+20%] D2 fee-adjusted payoff of historical causal daily Top3 candidates. A candidate with no valid post-09:34 simulated buy is payoff zero. Validation chooses penalty only when six-month train and one/two-month validation opportunity-day payoff are each at least the rank-only baseline; otherwise use original D0 rank.',
+        selector='At each D0 fit three standardized Ridge regressions alpha=1,10,100 on eligible historical causal daily Top3 candidates passing the four-bar body > -8% gate, targeting clipped [-20%,+20%] D2 fee-adjusted payoff. A candidate with no valid post-09:34 simulated buy is payoff zero. Validation chooses penalty only when six-month train and one/two-month validation opportunity-day payoff are each at least the rank-only baseline; otherwise use original D0 rank.',
         stage2_windows='For each D0, six prior calendar months ending one/two calendar months before D0 train; immediately following one/two months validate. D4 maturity and active-board-event purge at both boundaries. All historical candidates scored by their own prior daily model.',
         decision='D1 after four complete bars ending 09:31..09:34, preselect highest stage2 score among original D0 Top3 with valid historical status, audited four bars and four-bar body > -8%; do not substitute if selected stock never opens or cannot be bought after one extra qualifying minute.',
         execution='Original B2 open-below-cap positive-volume minutes ending 09:35..09:40; same-stock next qualifying minute open by09:40 as simulated buy; D2 close sell; 0.1% fee each side. Simulation price is not guaranteed executable.',
+        missing_price='D2 training target requires valid D1/D2 reference-price continuity. D4 continuity never filters a D1 trade; the account replay records and excludes invalid D1/D2 price observations by the original B2 rule.',
+        quality='Historical minute audit compares full D1 minute record with daily totals; it is a retrospective data-quality exclusion, not a live 09:34 predictor. Coverage and failed reasons are reported separately.',
         comparison='Compare original monthly B2, daily gap2+shape2, daily direct6+shape1, daily direct6+shape2 over identical D0 dates and continuous 100w accounts. Also report unfiltered trade and 30/10 shadow gate separately.',
         production_changed=False, prior_history_studied=True)
     value = json.loads(json.dumps(value, ensure_ascii=False))
@@ -198,8 +200,10 @@ def delayed_candidates() -> pd.DataFrame:
         columns={'entry': 'delayed_entry', 'entry_time': 'delayed_time',
                  'complete': 'delayed_complete'})
     out = f.merge(keys, on=KEY, how='left', validate='many_to_one')
-    out['delayed_net'] = np.where(out.delayed_complete.eq(True) & out.delayed_entry.gt(0)
-                                  & out.d2_close.gt(0),
+    d2_known = (out.delayed_entry.gt(0) & out.d2_close.gt(0)
+                & out.d1_preclose.sub(out['close']).abs().le(.011)
+                & out.d2_preclose.sub(out.d1_close).abs().le(.011))
+    out['delayed_net'] = np.where(d2_known,
         out.d2_close / out.delayed_entry * .999 / 1.001 - 1, np.nan)
     out.to_pickle(path)
     dump(OUT / 'delayed_manifest.json', dict(source_sha256=sha(OUT / 'enriched.pkl'),
@@ -243,14 +247,16 @@ def train_one_shape(day: str, variant: str, all_rows: pd.DataFrame,
     train_end_i = int(np.searchsorted(calendar, boundary) - 1)
     day_i = int(np.searchsorted(calendar, day))
     train = q[(q.d0_date.ge(start)) & (q.d0_date.lt(boundary))
-              & q.date_i.add(4).le(train_end_i) & q.eligible].copy()
+              & q.date_i.add(4).le(train_end_i) & q.eligible
+              & q.body5.gt(-.08 + 1e-12)].copy()
     valid = q[(q.d0_date.ge(boundary)) & (q.d0_date.lt(day))
-              & q.date_i.add(4).lt(day_i) & q.eligible].copy()
+              & q.date_i.add(4).lt(day_i) & q.eligible
+              & q.body5.gt(-.08 + 1e-12)].copy()
     test = q[q.d0_date.eq(day)].copy()
-    # An apparent fill with a broken or incomplete D2/D4 price is unknown,
+    # An apparent fill with a broken or incomplete D2 price is unknown,
     # whereas a genuine no-fill is a zero-payoff opportunity.
-    train = train[~(train.delayed_entry.notna() & ~train.delayed_complete.eq(True))]
-    valid = valid[~(valid.delayed_entry.notna() & ~valid.delayed_complete.eq(True))]
+    train = train[~(train.delayed_entry.notna() & train.delayed_net.isna())]
+    valid = valid[~(valid.delayed_entry.notna() & valid.delayed_net.isna())]
     assert len(train) and len(valid) and len(test), (day, variant, len(train), len(valid), len(test))
     # Purge the board event still running at the training/validation boundary.
     active = active_events.get(train_end_i)
@@ -366,26 +372,30 @@ def report() -> None:
         chosen = [pd.read_pickle(r / 'decision.pkl') for r in roots]
         all_decisions = pd.concat(chosen, ignore_index=True)
         decisions.append(all_decisions)
-        signal = all_decisions[all_decisions.delayed_complete.eq(True)
-                               & all_decisions.delayed_entry.gt(0)].copy()
+        signal = all_decisions[all_decisions.delayed_entry.gt(0)].copy()
         signal['entry'] = signal.delayed_entry
         signal['entry_time'] = signal.delayed_time
         signal = four.reprice(signal)
-        assert signal.complete.all() and not signal.d1_date.duplicated().any()
+        assert not signal.d1_date.duplicated().any()
         plans[variant] = signal
     pd.concat(decisions, ignore_index=True).to_pickle(OUT / 'daily_decisions.pkl')
-    pd.concat((p.assign(plan=name) for name, p in plans.items()),
+    pd.concat((p[p.d1_date.between(START, END)].assign(plan=name)
+               for name, p in plans.items()),
               ignore_index=True).to_pickle(OUT / 'all_signals.pkl')
     overall, monthly, yearly, classifications, exclusions, navs, ledgers = [], [], [], [], [], [], []
     gate_decisions = []
     for name, source in plans.items():
         source = source[source.d1_date.between(START, END)].sort_values('d1_date')
-        gated, gate_log = shadow_gate(source, calendar)
+        raw_result = replay(source, calendar, start=START, end=END, fee_rate=.001)
+        raw_excluded = {(e['symbol'], e['d1_date']) for e in raw_result[-1]}
+        valid_source = source[~pd.MultiIndex.from_frame(source[['symbol', 'd1_date']]).isin(
+            pd.MultiIndex.from_tuples(list(raw_excluded), names=['symbol', 'd1_date']))]
+        gated, gate_log = shadow_gate(valid_source, calendar)
         gate_log['plan'] = name
         gate_decisions.append(gate_log)
         for gate, signals in [('raw', source), ('shadow30_10', gated)]:
-            stats, months, nav, ledger, errors = replay(
-                signals, calendar, start=START, end=END, fee_rate=.001)
+            stats, months, nav, ledger, errors = (raw_result if gate == 'raw' else
+                replay(signals, calendar, start=START, end=END, fee_rate=.001))
             overall.append(dict(plan=name, gate=gate, **stats))
             monthly.extend(dict(plan=name, gate=gate, **m) for m in months)
             navs.append(nav.assign(plan=name, gate=gate))
@@ -401,20 +411,22 @@ def report() -> None:
                     sharpe=sharpe(group.return_),
                     entries=int(ledger.entry_date.str.startswith(year).sum()) if len(ledger) else 0))
                 previous = closing
-        known = source[source.observed_3]
-        net = source.d2_close / source.entry * .999 / 1.001 - 1
-        classifications.append(dict(plan=name, stage='实际买入', n=len(known),
+        known = valid_source[valid_source.observed_3]
+        net = known.d2_close / known.entry * .999 / 1.001 - 1
+        classifications.append(dict(plan=name, stage='可成交信号', n=len(known),
             hits=int(known.label_3.sum()),
             hit=float(known.label_3.mean()) if len(known) else None,
             d2_fee_mean=float(net.mean()),
             loss_gt5=float(net.lt(-.05).mean())))
     enriched = pd.read_pickle(OUT / 'enriched.pkl')
     for mode in daily.MODES:
-        q = enriched[enriched.variant.eq(mode) & enriched.d0_date.between(START, END)]
+        q = enriched[enriched.variant.eq(mode) & enriched.d1_date.between(START, END)]
         for k in (1, 3):
-            x = q[q.d0_rank.le(k) & q.observed_3]
-            classifications.append(dict(plan=mode, stage=f'D0_Top{k}', n=len(x),
-                hits=int(x.label_3.sum()), hit=float(x.label_3.mean()) if len(x) else None))
+            for stage, opened in [('全量', False), ('D1开盘打开', True)]:
+                x = q[q.d0_rank.le(k) & q.observed_3
+                      & (q.activated if opened else True)]
+                classifications.append(dict(plan=mode, stage=f'Top{k}_{stage}', n=len(x),
+                    hits=int(x.label_3.sum()), hit=float(x.label_3.mean()) if len(x) else None))
     dump(OUT / 'overall.json', overall)
     dump(OUT / 'monthly.json', monthly)
     dump(OUT / 'yearly.json', yearly)
