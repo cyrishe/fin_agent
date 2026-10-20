@@ -1,0 +1,14 @@
+{
+  "signal_sha256": "c0fab9e454c92c0f3b0a9ba102224dcd6fef00fe377d215fbff1fb373708d1da",
+  "calendar_sha256": "48467afcb0babf08ea8481f396b13e71562c5e414abf09902751355d842de965",
+  "old_R41_signal_sha256": "da2aae9be809f4987df67d8d39e6e88ddfa0621646c050770113b352c7ca9441",
+  "old_R57_month_sha256": "d379e6a4a527249dbde2673cadbac93ba6dc5eb285c8fc30967130040ce1fb14",
+  "original_B2_overlap_replayed_exact": true,
+  "overlapping_gates_from_2023_06_exact": true,
+  "months": 53,
+  "new_test_months": 12,
+  "first_month_without_prior_B2_history": "2022-05",
+  "paused_months": 29,
+  "fee_rate": 0.001,
+  "production_changed": false
+}
