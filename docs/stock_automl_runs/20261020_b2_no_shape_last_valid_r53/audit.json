@@ -1,0 +1,9 @@
+{
+  "months": 31,
+  "frozen_b2_signals_sha256": "4bac8813bab12dcc00603fb8ae23bf48b33a19e4424e2953b007c5a72ccf2bee",
+  "all_validation_labels_mature_before_test": true,
+  "all_accounts_d2_close_and_fee_verified": true,
+  "no_four_k_shape_or_body_filter": true,
+  "minute_used_only_for_same_entry_window": true,
+  "rows_of_trade_policies": 1580
+}
