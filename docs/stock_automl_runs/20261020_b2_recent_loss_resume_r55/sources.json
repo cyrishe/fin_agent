@@ -1,0 +1,14 @@
+[
+  {
+    "file": "outputs/stock_automl/b2_2022_minute_r41_20261019/signals.pkl",
+    "sha256": "da2aae9be809f4987df67d8d39e6e88ddfa0621646c050770113b352c7ca9441"
+  },
+  {
+    "file": "outputs/stock_automl/b2_2022_minute_r41_20261019/calendar.json",
+    "sha256": "74beda67d788b7b5ee89e381f110d7725d51e8141664fa129a45641815a6512d"
+  },
+  {
+    "file": "docs/stock_automl_runs/20261019_b2_2022_minutes_r41/summary.json",
+    "sha256": "d7c064347acdff28c75166f033dea885f36329fac76f93e6dec3438361f3ae2e"
+  }
+]
