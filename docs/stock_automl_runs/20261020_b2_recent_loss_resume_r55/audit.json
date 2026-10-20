@@ -4,7 +4,7 @@
   "months": 41,
   "shadow_signals": 543,
   "gate_months": 17,
-  "previous_month_zero_candidate_never_pauses": true,
+  "previous_month_zero_candidate_pauses": true,
   "previous_month_zero_candidate_unit_checked": true,
   "previous_month_zero_candidate_observed": 0,
   "previous_month_candidate_min": 5,

@@ -29,8 +29,11 @@ def prior_return(nav: pd.DataFrame, previous_month: str, n: int) -> float | None
 
 def should_pause(previous_candidates: int | None, r5: float | None,
                  r10: float | None) -> bool:
-    return bool(previous_candidates is not None and previous_candidates > 0 and
-                r5 is not None and r10 is not None and r5 < 0 and r10 < 0)
+    if previous_candidates is None:
+        return False
+    if previous_candidates == 0:
+        return True
+    return bool(r5 is not None and r10 is not None and r5 < 0 and r10 < 0)
 
 
 def first_shadow_win_cross(ledger: pd.DataFrame, month: str) -> dict | None:
@@ -47,7 +50,9 @@ def first_shadow_win_cross(ledger: pd.DataFrame, month: str) -> dict | None:
 
 
 def main() -> None:
-    assert not should_pause(0, -.01, -.02)
+    assert should_pause(0, -.01, -.02)
+    assert should_pause(0, 0, 0)
+    assert should_pause(0, None, None)
     assert not should_pause(None, -.01, -.02)
     assert not should_pause(1, 0, -.02)
     assert should_pause(1, -.01, -.02)
@@ -161,7 +166,7 @@ def main() -> None:
     starts = pd.DataFrame(start_rows)
     assert len(monthly_df) == len(months) == 41
     assert monthly_df.前月候选数.dropna().gt(0).all()
-    assert not monthly_df.loc[monthly_df.前月候选数.fillna(0).eq(0), "月初暂停"].any()
+    assert monthly_df.loc[monthly_df.前月候选数.eq(0), "月初暂停"].all()
     assert np.isclose(np.prod(1 + monthly_df["原B2月收益"]) - 1, base["total_return"])
     for name in variants:
         assert np.isclose(np.prod(1 + monthly_df[name+"月收益"]) - 1,
@@ -176,7 +181,7 @@ def main() -> None:
     dump(OUT / "audit.json", dict(source_signals=sha(paths[0]), baseline_replayed_exact=True,
                                    months=len(months), shadow_signals=len(signals),
                                    gate_months=int(monthly_df.月初暂停.sum()),
-                                   previous_month_zero_candidate_never_pauses=True,
+                                   previous_month_zero_candidate_pauses=True,
                                    previous_month_zero_candidate_unit_checked=True,
                                    previous_month_zero_candidate_observed=int(
                                        monthly_df.前月候选数.fillna(-1).eq(0).sum()),

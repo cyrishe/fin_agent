@@ -83,7 +83,7 @@ const overview = wb.worksheets.add("总览");
 overview.showGridLines = false;
 overview.getRange("A2").values = [["B2 近 5／10 日亏损停手回测"]];
 overview.getRange("A2").format.font = { name: "Arial", size: 14, bold: true, color: "#153D4B" };
-overview.getRange("A3").values = [["原 B2 月模型；上月两窗口均亏则停。恢复方案仅在当月影子 D2 胜率超过 50% 后买下一笔。"]];
+overview.getRange("A3").values = [["原 B2 月模型；上月两窗口均亏或零候选则停。恢复方案仅在当月影子 D2 胜率超过 50% 后买下一笔。"]];
 overview.getRange("A3").format.font = { name: "Arial", size: 10, italic: true, color: "#536471" };
 table(overview, 5, total, { signed: ["总收益", "D2费后笔均"],
   unsigned: ["最大回撤", "D2费后胜率"], money: ["期末资金", "交易费"],
