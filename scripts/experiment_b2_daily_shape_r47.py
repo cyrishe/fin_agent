@@ -49,6 +49,7 @@ def specification() -> dict:
     value = dict(experiment='R47 B2 daily four-bar refinement, research only',
         source_daily=str(daily.ROOT), source_spec_sha256=sha(daily.ROOT / 'specification.json'),
         source_panel_sha256=sha(PANEL), source_calendar_sha256=sha(CALENDAR),
+        baseline_signals_sha256=sha(r41.OUT / 'signals.pkl'),
         period=[START, END], variants=MODES, features=SHAPE_FEATURES,
         selector='At each D0 fit three standardized Ridge regressions alpha=1,10,100 on eligible historical causal daily Top3 candidates, targeting clipped [-20%,+20%] D2 fee-adjusted payoff. A candidate rejected by the four-bar body > -8% gate or with no valid post-09:34 simulated buy has zero payoff. Validation chooses penalty only when six-month train and one/two-month validation opportunity-day payoff are each at least the rank-only baseline; otherwise use original D0 rank.',
         stage2_windows='For each D0, six prior calendar months ending one/two calendar months before D0 train; immediately following one/two months validate. D4 maturity and active-board-event purge at both boundaries. All historical candidates scored by their own prior daily model.',
@@ -407,6 +408,9 @@ def report() -> None:
         for gate, signals in [('raw', source), ('shadow30_10', gated)]:
             stats, months, nav, ledger, errors = (raw_result if gate == 'raw' else
                 replay(signals, calendar, start=START, end=END, fee_rate=.001))
+            assert stats['pending'] == 0, (name, gate, stats['pending'])
+            assert np.isclose(np.prod([1 + m['return_'] for m in months]) - 1,
+                              stats['total_return'], atol=1e-10), (name, gate)
             overall.append(dict(plan=name, gate=gate, **stats))
             monthly.extend(dict(plan=name, gate=gate, **m) for m in months)
             navs.append(nav.assign(plan=name, gate=gate))
@@ -427,9 +431,16 @@ def report() -> None:
         classifications.append(dict(plan=name, stage='可成交信号', n=len(known),
             hits=int(known.label_3.sum()),
             hit=float(known.label_3.mean()) if len(known) else None,
-            d2_fee_mean=float(net.mean()),
-            loss_gt5=float(net.lt(-.05).mean())))
+            d2_fee_mean=float(net.mean()) if len(net) else None,
+            loss_gt5=float(net.lt(-.05).mean()) if len(net) else None))
     enriched = pd.read_pickle(OUT / 'enriched.pkl')
+    for name, selected in zip(MODES, decisions):
+        q = selected[selected.d1_date.between(START, last_entry_day)
+                     & selected.observed_3.eq(True)]
+        for stage, rows in [('四K预选', q), ('实体通过', q[q.shape_pass.eq(True)])]:
+            classifications.append(dict(plan=name, stage=stage, n=len(rows),
+                hits=int(rows.label_3.sum()),
+                hit=float(rows.label_3.mean()) if len(rows) else None))
     for mode in daily.MODES:
         q = enriched[enriched.variant.eq(mode) & enriched.d1_date.between(START, last_entry_day)]
         for k in (1, 3):

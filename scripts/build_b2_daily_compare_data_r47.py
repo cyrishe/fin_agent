@@ -65,7 +65,8 @@ def main() -> None:
     months = [[x['month'], PLAN_NAMES[x['plan']], GATE_NAMES[x['gate']],
                x['entries'], x['opening_nav'], x['closing_nav'], x['return_'],
                x['drawdown'], x['sharpe'], x['fees']] for x in monthly]
-    metrics = [[PLAN_NAMES.get(x['plan'], x['plan']), x['stage'], x['n'],
+    label_names = {**PLAN_NAMES, 'gap2': '日线6训2验', 'direct6': '日线直训6月'}
+    metrics = [[label_names.get(x['plan'], x['plan']), x['stage'], x['n'],
                 x['hit'], x.get('d2_fee_mean'), x.get('loss_gt5')]
                for x in classification]
 
