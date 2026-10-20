@@ -36,6 +36,11 @@ _panel: pd.DataFrame | None = None
 _calendar: list[str] | None = None
 
 
+def finished(root: Path) -> bool:
+    return all((root / name).exists() for name in
+               ('complete.json', 'model.joblib', 'scores.pkl', 'training_idx.npy'))
+
+
 def spec() -> dict:
     assert sklearn.__version__ == '1.7.1', sklearn.__version__
     ROOT.mkdir(parents=True, exist_ok=True)
@@ -69,7 +74,7 @@ def one(day: str, mode: str) -> tuple[str, str, int, float]:
     assert _panel is not None and _calendar is not None
     root = ROOT / mode / day
     manifest = root / 'complete.json'
-    if manifest.exists() and (root / 'model.joblib').exists() and (root / 'scores.pkl').exists():
+    if finished(root):
         return day, mode, -1, 0.
     root.mkdir(parents=True, exist_ok=True)
     panel, calendar = _panel, _calendar
@@ -133,7 +138,7 @@ def fit(workers: int, first: str | None, last: str | None) -> None:
     days = [d for d in calendar if FIRST <= d <= LAST
             and (first is None or d >= first) and (last is None or d <= last)]
     jobs = [(d, mode) for d in days for mode in MODES
-            if not (ROOT / mode / d / 'complete.json').exists()]
+            if not finished(ROOT / mode / d)]
     print('FIT jobs', len(jobs), 'days', len(days), 'workers', workers, flush=True)
     with ProcessPoolExecutor(max_workers=workers, initializer=init_worker) as pool:
         futures = [pool.submit(one, day, mode) for day, mode in jobs]
