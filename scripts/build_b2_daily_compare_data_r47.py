@@ -59,12 +59,22 @@ def main() -> None:
                          x['sharpe'], float(known.label_3.mean()) if len(known) else None,
                          float(lot.return_.dropna().mean()) if len(lot.return_.dropna()) else None,
                          x['total_fees']])
-    years = [[x['year'], PLAN_NAMES[x['plan']], GATE_NAMES[x['gate']],
-              x['entries'], x['opening_nav'], x['closing_nav'], x['return_'],
-              x['drawdown'], x['sharpe']] for x in yearly]
+    years = []
+    for x in yearly:
+        lot = trades[trades.plan.eq(x['plan']) & trades.gate.eq(x['gate'])
+                     & trades.entry_date.str.startswith(x['year'])]
+        known = lot[lot.observed_3.eq(True)]
+        closed = lot.return_.dropna()
+        years.append([x['year'], PLAN_NAMES[x['plan']], GATE_NAMES[x['gate']],
+                      x['entries'], x['opening_nav'], x['closing_nav'], x['return_'],
+                      x['drawdown'], x['sharpe'],
+                      float(known.label_3.mean()) if len(known) else None,
+                      float(closed.mean()) if len(closed) else None])
+    years.sort(key=lambda row: (row[0], row[1], row[2]))
     months = [[x['month'], PLAN_NAMES[x['plan']], GATE_NAMES[x['gate']],
                x['entries'], x['opening_nav'], x['closing_nav'], x['return_'],
                x['drawdown'], x['sharpe'], x['fees']] for x in monthly]
+    months.sort(key=lambda row: (row[0], row[1], row[2]))
     label_names = {**PLAN_NAMES, 'gap2': '日线6训2验', 'direct6': '日线直训6月'}
     metrics = [[label_names.get(x['plan'], x['plan']), x['stage'], x['n'],
                 x['hit'], x.get('d2_fee_mean'), x.get('loss_gt5')]
@@ -132,6 +142,7 @@ def main() -> None:
                 choices.get('rank_only', 0),
                 sum(v for k, v in choices.items() if k != 'rank_only'),
                 float(train), float(valid), float(valid_base)])
+    shape_models.sort(key=lambda row: (row[0], row[1]))
 
     payload = dict(scope=f'初始100万元；D1 2023-05-05—{last_entry_day}；账户截至 {END}；D2 收盘卖，买卖各 0.1%；末月标签可延至 10 月。',
                    overview=overview, yearly=years, monthly=months,

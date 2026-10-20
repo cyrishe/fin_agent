@@ -89,8 +89,14 @@ def assemble() -> pd.DataFrame:
     f = pd.concat(rows, ignore_index=True).merge(panel, on=KEY, validate='many_to_one')
     assert not f.duplicated(['variant', *KEY]).any()
     f.to_pickle(saved)
+    model_receipts = [json.loads((daily.ROOT / mode / d / 'complete.json').read_text())
+                      for mode in daily.MODES for d in days]
+    model_tree_sha = sha_bytes(json.dumps(
+        [(r['day'], r['mode'], r['model_sha256'], r['score_sha256'])
+         for r in model_receipts], separators=(',', ':')).encode())
     dump(OUT / 'candidate_sources.json', dict(source_spec_sha256=sha(daily.ROOT / 'specification.json'),
          modes={mode: dict(days=len(days), top3=int(f.variant.eq(mode).sum())) for mode in daily.MODES},
+         daily_models=len(model_receipts), daily_model_tree_sha256=model_tree_sha,
          candidate_sha256=sha(saved)))
     return f
 
@@ -260,12 +266,20 @@ def train_one_shape(day: str, variant: str, all_rows: pd.DataFrame,
     train = train[~(train.delayed_entry.notna() & train.delayed_net.isna())]
     valid = valid[~(valid.delayed_entry.notna() & valid.delayed_net.isna())]
     assert len(train) and len(valid) and len(test), (day, variant, len(train), len(valid), len(test))
+    before_purge = (len(train), len(valid))
     # Purge the board event still running at the training/validation boundary.
     active = active_events.get(train_end_i)
     if active is not None and len(active):
         overlap = pd.MultiIndex.from_frame(train[['symbol', 'first_limit_date']]).isin(
             active)
         train = train.loc[~overlap]
+    active_today = active_events.get(day_i)
+    if active_today is not None and len(active_today):
+        train = train.loc[~pd.MultiIndex.from_frame(
+            train[['symbol', 'first_limit_date']]).isin(active_today)]
+        valid = valid.loc[~pd.MultiIndex.from_frame(
+            valid[['symbol', 'first_limit_date']]).isin(active_today)]
+    assert len(train) and len(valid), (day, variant, len(train), len(valid))
     assert train.d0_date.max() < boundary <= day
     np.save(root / 'training_idx.npy', train.index.to_numpy(dtype=np.int32))
     np.save(root / 'validation_idx.npy', valid.index.to_numpy(dtype=np.int32))
@@ -310,6 +324,8 @@ def train_one_shape(day: str, variant: str, all_rows: pd.DataFrame,
     selected.to_pickle(root / 'decision.pkl')
     receipt = dict(day=day, variant=variant, train=[start, boundary],
         valid=[boundary, day], train_rows=len(train), valid_rows=len(valid),
+        purged_train=before_purge[0]-len(train),
+        purged_valid=before_purge[1]-len(valid),
         train_days=train.d0_date.nunique(), valid_days=valid.d0_date.nunique(),
         selected=winner['name'], candidates=candidate,
         preselected_symbol=selected.symbol.iloc[0] if len(selected) else None,
