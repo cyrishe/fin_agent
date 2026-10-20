@@ -1,0 +1,8 @@
+{
+  "original_signal_rows": 391,
+  "original_source_sha256": "4bac8813bab12dcc00603fb8ae23bf48b33a19e4424e2953b007c5a72ccf2bee",
+  "alternative_signals": 359,
+  "selected_rules": 30,
+  "same_scope_and_account_for_both": true,
+  "no_matured_signal_exclusions": true
+}

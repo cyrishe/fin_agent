@@ -1,0 +1,669 @@
+[
+  {
+    "month": "2023-08",
+    "window": {
+      "train": [
+        "2022-11",
+        "2023-04"
+      ],
+      "valid": [
+        "2023-05",
+        "2023-07"
+      ],
+      "test": "2023-08"
+    },
+    "fit_rows": 4054,
+    "scored_rows": 709,
+    "max_score_diff": 0.0,
+    "model_path": "outputs/stock_automl/b2_daily_gap3_sample_r50_20261020/daily3/2023-08/segments.joblib",
+    "model_sha256": "5206216dcb22e46da5d2bb9d5ebe804a231220b17b8b3dcda0747e97029e7bc6",
+    "training_sample_path": "outputs/stock_automl/b2_daily_gap3_sample_r50_20261020/daily3/2023-08/training_samples.pkl",
+    "training_sample_sha256": "7ceff5a75f82f40f3157ec94bc25055d2de23e3daf7e73a564ee05e3bb6e2fce",
+    "validation_score_sha256": "dadf58bdb044f382d4f4071133a82781e95a28bb41569290bcd5b23db2471749",
+    "forecast_score_sha256": "3b8bd7db020a9396a8742fdfd56eb410e9f6b6f26ea1012a11ae82b8b7b3034f"
+  },
+  {
+    "month": "2023-09",
+    "window": {
+      "train": [
+        "2022-12",
+        "2023-05"
+      ],
+      "valid": [
+        "2023-06",
+        "2023-08"
+      ],
+      "test": "2023-09"
+    },
+    "fit_rows": 3765,
+    "scored_rows": 579,
+    "max_score_diff": 0.0,
+    "model_path": "outputs/stock_automl/b2_daily_gap3_sample_r50_20261020/daily3/2023-09/segments.joblib",
+    "model_sha256": "35726a241245869e779159070a030da77ee83e1c1bd4f1f51c8d567f4b4ac2c9",
+    "training_sample_path": "outputs/stock_automl/b2_daily_gap3_sample_r50_20261020/daily3/2023-09/training_samples.pkl",
+    "training_sample_sha256": "7117b5405d9267365da8d46c7564085ab617869b0d9cce40800041e490ef7f17",
+    "validation_score_sha256": "cfb61e177d6bed20e56417f2b52ca5abfff06bfe3f81db46436ae70619fbe604",
+    "forecast_score_sha256": "f9aecfe72f37891db56e148bbbe662dd0a1a63f733508f07420076b68a585ad2"
+  },
+  {
+    "month": "2023-10",
+    "window": {
+      "train": [
+        "2023-01",
+        "2023-06"
+      ],
+      "valid": [
+        "2023-07",
+        "2023-09"
+      ],
+      "test": "2023-10"
+    },
+    "fit_rows": 3754,
+    "scored_rows": 773,
+    "max_score_diff": 0.0,
+    "model_path": "outputs/stock_automl/b2_daily_gap3_sample_r50_20261020/daily3/2023-10/segments.joblib",
+    "model_sha256": "421d8f8847c94a6b34dd8631e77eb102e81274128b5b8cbc251507f0f14ecc28",
+    "training_sample_path": "outputs/stock_automl/b2_daily_gap3_sample_r50_20261020/daily3/2023-10/training_samples.pkl",
+    "training_sample_sha256": "434fad5a2a72242bb81ea9cb34576c4155410315393adc152a8dd744bdff580f",
+    "validation_score_sha256": "9f8ee893947a82347b197a018fd1a573d3875dd38c00153058bf01102dd0dcda",
+    "forecast_score_sha256": "dabf740ca7574ac73216ea1f336405a42ebd42c1262e82c37e5c9e3f09e56049"
+  },
+  {
+    "month": "2023-11",
+    "window": {
+      "train": [
+        "2023-02",
+        "2023-07"
+      ],
+      "valid": [
+        "2023-08",
+        "2023-10"
+      ],
+      "test": "2023-11"
+    },
+    "fit_rows": 3856,
+    "scored_rows": 1004,
+    "max_score_diff": 0.0,
+    "model_path": "outputs/stock_automl/b2_daily_gap3_sample_r50_20261020/daily3/2023-11/segments.joblib",
+    "model_sha256": "fefd7826caf36fb2c40de2528422b139dcf6354f30b45c06da2777a0947de423",
+    "training_sample_path": "outputs/stock_automl/b2_daily_gap3_sample_r50_20261020/daily3/2023-11/training_samples.pkl",
+    "training_sample_sha256": "2e5edbe671901f7995a844f4c06b109db0847355928e765fc57079cada223422",
+    "validation_score_sha256": "21f54d5f9b471b9f06f1f28c620042388136875984098fee006458b0b80c9aed",
+    "forecast_score_sha256": "c2c9bf365866c74d027ea144a96fa0896cbebfb6879687ffcfbb74a4611e96b2"
+  },
+  {
+    "month": "2023-12",
+    "window": {
+      "train": [
+        "2023-03",
+        "2023-08"
+      ],
+      "valid": [
+        "2023-09",
+        "2023-11"
+      ],
+      "test": "2023-12"
+    },
+    "fit_rows": 3944,
+    "scored_rows": 875,
+    "max_score_diff": 0.0,
+    "model_path": "outputs/stock_automl/b2_daily_gap3_sample_r50_20261020/daily3/2023-12/segments.joblib",
+    "model_sha256": "85e19ff624a28a94217e61f93b2823e01e09299dbab683ea875ba6ce5f23a5f9",
+    "training_sample_path": "outputs/stock_automl/b2_daily_gap3_sample_r50_20261020/daily3/2023-12/training_samples.pkl",
+    "training_sample_sha256": "9201484f795d9195e0d16fd31f753cde8b14c6a034318198dcd88a9c9567ced0",
+    "validation_score_sha256": "3b6457759d1947bba72a8008f372a216a31922251b9aeb6e57e595189615432e",
+    "forecast_score_sha256": "302fe242550d4a936a15123e9a4fe7b993aade760bd15b9f8657d2192c9d0c12"
+  },
+  {
+    "month": "2024-01",
+    "window": {
+      "train": [
+        "2023-04",
+        "2023-09"
+      ],
+      "valid": [
+        "2023-10",
+        "2023-12"
+      ],
+      "test": "2024-01"
+    },
+    "fit_rows": 4020,
+    "scored_rows": 923,
+    "max_score_diff": 0.0,
+    "model_path": "outputs/stock_automl/b2_daily_gap3_sample_r50_20261020/daily3/2024-01/segments.joblib",
+    "model_sha256": "596903658c2ae55c64cdac8f54b83f4e02bbafd9df221e4395d1d508eecde1c2",
+    "training_sample_path": "outputs/stock_automl/b2_daily_gap3_sample_r50_20261020/daily3/2024-01/training_samples.pkl",
+    "training_sample_sha256": "3d7caddb8c972c23a80475d6e547eb9b8078345257b7eaaffbbc995802e00d3f",
+    "validation_score_sha256": "e84a744ef8e1cca8f75fe34a53dbf66972c99242e67bd4a8cf5c85d5f1909672",
+    "forecast_score_sha256": "06d45e6d4d0caf3a37d8ec4cbc0fc8464a7c9cd67cd43df5b22d622019352263"
+  },
+  {
+    "month": "2024-02",
+    "window": {
+      "train": [
+        "2023-05",
+        "2023-10"
+      ],
+      "valid": [
+        "2023-11",
+        "2024-01"
+      ],
+      "test": "2024-02"
+    },
+    "fit_rows": 3974,
+    "scored_rows": 1901,
+    "max_score_diff": 0.0,
+    "model_path": "outputs/stock_automl/b2_daily_gap3_sample_r50_20261020/daily3/2024-02/segments.joblib",
+    "model_sha256": "259322237fc9ebcd524cf415fc800f85c0646dd44e0d1beac22c3d584b0ab5a5",
+    "training_sample_path": "outputs/stock_automl/b2_daily_gap3_sample_r50_20261020/daily3/2024-02/training_samples.pkl",
+    "training_sample_sha256": "583933fb517f96cbdcd959f4954b6359d45204a046f776eab4af727026fc36ee",
+    "validation_score_sha256": "943501b450c5b202541329b1625a174a42d53fda854e0059eccf6b737f1c38c0",
+    "forecast_score_sha256": "0f1e02b53eaf4f2d5f519d305d8e6258a7ad9fb66cc3ea5d894ea5cb6c393299"
+  },
+  {
+    "month": "2024-03",
+    "window": {
+      "train": [
+        "2023-06",
+        "2023-11"
+      ],
+      "valid": [
+        "2023-12",
+        "2024-02"
+      ],
+      "test": "2024-03"
+    },
+    "fit_rows": 4125,
+    "scored_rows": 1399,
+    "max_score_diff": 0.0,
+    "model_path": "outputs/stock_automl/b2_daily_gap3_sample_r50_20261020/daily3/2024-03/segments.joblib",
+    "model_sha256": "32e5d0aba5d5923c0fd51d44cbcc027649026183894d26646239353ddf280c5f",
+    "training_sample_path": "outputs/stock_automl/b2_daily_gap3_sample_r50_20261020/daily3/2024-03/training_samples.pkl",
+    "training_sample_sha256": "a3a3f66ec021ba60097972ba80513361fc39ba8c658a3c9cb440b6c7e4bd9362",
+    "validation_score_sha256": "8bc6253137c80e26c76c3e70d4efb145c6f28976ba075accec5cf9d3686ad97c",
+    "forecast_score_sha256": "611a4b527eb43b37b2071b34b72c9f3bae298ff7b1eee7c8553a37b0acb02eb7"
+  },
+  {
+    "month": "2024-04",
+    "window": {
+      "train": [
+        "2023-07",
+        "2023-12"
+      ],
+      "valid": [
+        "2024-01",
+        "2024-03"
+      ],
+      "test": "2024-04"
+    },
+    "fit_rows": 3981,
+    "scored_rows": 1289,
+    "max_score_diff": 0.0,
+    "model_path": "outputs/stock_automl/b2_daily_gap3_sample_r50_20261020/daily3/2024-04/segments.joblib",
+    "model_sha256": "de024b1ccdb4f22b0b1ea62fc3578bced3ae8b5c04caa3ed2b48ea0ef7aaaf01",
+    "training_sample_path": "outputs/stock_automl/b2_daily_gap3_sample_r50_20261020/daily3/2024-04/training_samples.pkl",
+    "training_sample_sha256": "1e97b6cd3258a0de511c23363b4c0e11c7d371771324e1081b410568a1976d91",
+    "validation_score_sha256": "1d860b949ddcab90fe4cbe50293b4883458e1b371aae0ee6506d63c8e15a4a11",
+    "forecast_score_sha256": "483deae1a990ecf083f4768ac49bf11be8798dff515c1e1b3e6fc346cf2c28e0"
+  },
+  {
+    "month": "2024-05",
+    "window": {
+      "train": [
+        "2023-08",
+        "2024-01"
+      ],
+      "valid": [
+        "2024-02",
+        "2024-04"
+      ],
+      "test": "2024-05"
+    },
+    "fit_rows": 4175,
+    "scored_rows": 834,
+    "max_score_diff": 0.0,
+    "model_path": "outputs/stock_automl/b2_daily_gap3_sample_r50_20261020/daily3/2024-05/segments.joblib",
+    "model_sha256": "be1bd6048a45e8710a40df0170714a5c1613ba761b2c2529d96700fcf45604c0",
+    "training_sample_path": "outputs/stock_automl/b2_daily_gap3_sample_r50_20261020/daily3/2024-05/training_samples.pkl",
+    "training_sample_sha256": "a113888520f188e414f135b54025746c942bdfba4c009e7a4e000796e4e74917",
+    "validation_score_sha256": "2f9a7a37eb6b834a8bc7935260791e6cd1de8869df32a4b3a3f4c64c2bdadf38",
+    "forecast_score_sha256": "09bf1fa7d89107cc38f0ae147b4448175cd1a95164f3c59cab6f3bbc8d7e5465"
+  },
+  {
+    "month": "2024-06",
+    "window": {
+      "train": [
+        "2023-09",
+        "2024-02"
+      ],
+      "valid": [
+        "2024-03",
+        "2024-05"
+      ],
+      "test": "2024-06"
+    },
+    "fit_rows": 5068,
+    "scored_rows": 679,
+    "max_score_diff": 0.0,
+    "model_path": "outputs/stock_automl/b2_daily_gap3_sample_r50_20261020/daily3/2024-06/segments.joblib",
+    "model_sha256": "10ada4fe79c17370e221f0e5b81f5a8763100a89009c9c5ce43199d097a30cc1",
+    "training_sample_path": "outputs/stock_automl/b2_daily_gap3_sample_r50_20261020/daily3/2024-06/training_samples.pkl",
+    "training_sample_sha256": "cad673d91409dac7d0714dd182141d0aa2ca15e4975875e5768d06bb4ae80dee",
+    "validation_score_sha256": "11eddacdadfb6d072e477bd6ad6200cb7959254e496ad04fb87c45ee976ee53f",
+    "forecast_score_sha256": "a64f409b4e82ab429d634d3e22c46837d406030f464604485a751585eecc9754"
+  },
+  {
+    "month": "2024-07",
+    "window": {
+      "train": [
+        "2023-10",
+        "2024-03"
+      ],
+      "valid": [
+        "2024-04",
+        "2024-06"
+      ],
+      "test": "2024-07"
+    },
+    "fit_rows": 5838,
+    "scored_rows": 1015,
+    "max_score_diff": 0.0,
+    "model_path": "outputs/stock_automl/b2_daily_gap3_sample_r50_20261020/daily3/2024-07/segments.joblib",
+    "model_sha256": "373d6e84ac07896a68edfc2413805f82004f6dfc5565eb50ecf91fb170e5afc5",
+    "training_sample_path": "outputs/stock_automl/b2_daily_gap3_sample_r50_20261020/daily3/2024-07/training_samples.pkl",
+    "training_sample_sha256": "6ad9633f285332ae53247716ef05233670de1d65f0b9269a91324035acbbcab4",
+    "validation_score_sha256": "e3ed6ba769d757f1664e755ccc30f8179e777108e1d52cdc10a3a145721efcb6",
+    "forecast_score_sha256": "b37d691385dd7080f927c5ebe350cb6667169b152aa25985dc97016faded0e7d"
+  },
+  {
+    "month": "2024-08",
+    "window": {
+      "train": [
+        "2023-11",
+        "2024-04"
+      ],
+      "valid": [
+        "2024-05",
+        "2024-07"
+      ],
+      "test": "2024-08"
+    },
+    "fit_rows": 6302,
+    "scored_rows": 938,
+    "max_score_diff": 0.0,
+    "model_path": "outputs/stock_automl/b2_daily_gap3_sample_r50_20261020/daily3/2024-08/segments.joblib",
+    "model_sha256": "79ca790a81740f6a911f3c5b54c67c2f341b5af7a053cb07f25bb87ced08771b",
+    "training_sample_path": "outputs/stock_automl/b2_daily_gap3_sample_r50_20261020/daily3/2024-08/training_samples.pkl",
+    "training_sample_sha256": "18119f6474d577cebb7297a846b464aa6f3bc1a3eaf1ad0cc8b55cdbcab96d09",
+    "validation_score_sha256": "6297dfb1dfec5a9511af417660be3fa435863997bf222ce433d980114725caa9",
+    "forecast_score_sha256": "dff02cc88b6fbf9e34c2729aef7b0917306dfcbac283761958c6a4276c644610"
+  },
+  {
+    "month": "2024-09",
+    "window": {
+      "train": [
+        "2023-12",
+        "2024-05"
+      ],
+      "valid": [
+        "2024-06",
+        "2024-08"
+      ],
+      "test": "2024-09"
+    },
+    "fit_rows": 6370,
+    "scored_rows": 1877,
+    "max_score_diff": 0.0,
+    "model_path": "outputs/stock_automl/b2_daily_gap3_sample_r50_20261020/daily3/2024-09/segments.joblib",
+    "model_sha256": "f6a3116e109fe6e9a35ed5f0305f1d36cfb86bc73a51a3024c4616c1505c1a63",
+    "training_sample_path": "outputs/stock_automl/b2_daily_gap3_sample_r50_20261020/daily3/2024-09/training_samples.pkl",
+    "training_sample_sha256": "3b82c31b0c21b2ac994fae1220384cd552024e8de5fb40c88ee3e2c3fa14c3f6",
+    "validation_score_sha256": "409ce4432bd19682ad7ff7951350212332382c602112c34220604e43c4fc11d8",
+    "forecast_score_sha256": "336b878a841cf3852dde8be2901688431e80ecfe4acfb9b22cb6b81f0803a971"
+  },
+  {
+    "month": "2024-10",
+    "window": {
+      "train": [
+        "2024-01",
+        "2024-06"
+      ],
+      "valid": [
+        "2024-07",
+        "2024-09"
+      ],
+      "test": "2024-10"
+    },
+    "fit_rows": 6179,
+    "scored_rows": 2863,
+    "max_score_diff": 0.0,
+    "model_path": "outputs/stock_automl/b2_daily_gap3_sample_r50_20261020/daily3/2024-10/segments.joblib",
+    "model_sha256": "fb09168d8ab655781a8906d578f6c32b78715ea4389079958dd3525e5d0221d6",
+    "training_sample_path": "outputs/stock_automl/b2_daily_gap3_sample_r50_20261020/daily3/2024-10/training_samples.pkl",
+    "training_sample_sha256": "7d59effa1315f3428160709662da87de3ee40992d2551821f99a0af03244f70f",
+    "validation_score_sha256": "5154f02664f749753e1abfc082d8b020c8cb671cee0b6a1b27dea4ec19fe00c6",
+    "forecast_score_sha256": "166d827cbd430bc335ace734c96f289ea7a14d9e97595dd6c74e77b29084911d"
+  },
+  {
+    "month": "2024-11",
+    "window": {
+      "train": [
+        "2024-02",
+        "2024-07"
+      ],
+      "valid": [
+        "2024-08",
+        "2024-10"
+      ],
+      "test": "2024-11"
+    },
+    "fit_rows": 6223,
+    "scored_rows": 2468,
+    "max_score_diff": 0.0,
+    "model_path": "outputs/stock_automl/b2_daily_gap3_sample_r50_20261020/daily3/2024-11/segments.joblib",
+    "model_sha256": "7b405b7a90f6b06e559111fba524f513cdd5f47ac67e514c73a40d01ec6dcb10",
+    "training_sample_path": "outputs/stock_automl/b2_daily_gap3_sample_r50_20261020/daily3/2024-11/training_samples.pkl",
+    "training_sample_sha256": "3fc27b00d21e8480c63786104404a1dbbaece082deff6021a73e9cdf8d18f767",
+    "validation_score_sha256": "5d779b514986282feb2fca20b6846daf6e4d42f688fde57813cef876101f1c1e",
+    "forecast_score_sha256": "224e546657d3159265792a0a1b2b7b4d124dd19674336d9017dbfcf50a891a2e"
+  },
+  {
+    "month": "2024-12",
+    "window": {
+      "train": [
+        "2024-03",
+        "2024-08"
+      ],
+      "valid": [
+        "2024-09",
+        "2024-11"
+      ],
+      "test": "2024-12"
+    },
+    "fit_rows": 5440,
+    "scored_rows": 2013,
+    "max_score_diff": 0.0,
+    "model_path": "outputs/stock_automl/b2_daily_gap3_sample_r50_20261020/daily3/2024-12/segments.joblib",
+    "model_sha256": "9c482bda9b7649c1ba124848119fcb7f93b9dc5106c8ca1045df128d8d228fb1",
+    "training_sample_path": "outputs/stock_automl/b2_daily_gap3_sample_r50_20261020/daily3/2024-12/training_samples.pkl",
+    "training_sample_sha256": "fe5769d3367b01e10e9c0aec49abfd1dd674b01996efa558c336ee21896dc8a4",
+    "validation_score_sha256": "1c7a6ae651897915de0a24d8d2af6a647701bded3f77dfafffefb06e0d6da7f6",
+    "forecast_score_sha256": "36f285c65ffe2a42d1f0ae9c126160fb5c4ee8f586df4bcda6afd7b6d0718c20"
+  },
+  {
+    "month": "2025-01",
+    "window": {
+      "train": [
+        "2024-04",
+        "2024-09"
+      ],
+      "valid": [
+        "2024-10",
+        "2024-12"
+      ],
+      "test": "2025-01"
+    },
+    "fit_rows": 4983,
+    "scored_rows": 1136,
+    "max_score_diff": 0.0,
+    "model_path": "outputs/stock_automl/b2_daily_gap3_sample_r50_20261020/daily3/2025-01/segments.joblib",
+    "model_sha256": "db05f1c1a223df640718c03012fdd7e94a2d3c13abd9923f2fc26bc9d6f0ee6d",
+    "training_sample_path": "outputs/stock_automl/b2_daily_gap3_sample_r50_20261020/daily3/2025-01/training_samples.pkl",
+    "training_sample_sha256": "619c71d9b02387bf01caa1c2e38565e0a35e7c7d2c46bec119ea5f775279c383",
+    "validation_score_sha256": "f5105e32c8a2479df27fce866229c1fe845239682216d014a77f576a86f8b764",
+    "forecast_score_sha256": "d8a783cdd70f42aae9c0e54ac55f444a539dbdba9ab2cbbe8d03a652f16f9d6a"
+  },
+  {
+    "month": "2025-02",
+    "window": {
+      "train": [
+        "2024-05",
+        "2024-10"
+      ],
+      "valid": [
+        "2024-11",
+        "2025-01"
+      ],
+      "test": "2025-02"
+    },
+    "fit_rows": 6124,
+    "scored_rows": 1519,
+    "max_score_diff": 0.0,
+    "model_path": "outputs/stock_automl/b2_daily_gap3_sample_r50_20261020/daily3/2025-02/segments.joblib",
+    "model_sha256": "92f6b9e56e9f25396ae4cd4ec1c68a803ff7acb8a277fdc41e102c0055f88b76",
+    "training_sample_path": "outputs/stock_automl/b2_daily_gap3_sample_r50_20261020/daily3/2025-02/training_samples.pkl",
+    "training_sample_sha256": "4c313216459d1d1311df6a694b5424151f49673db5543ef24b24406834881d53",
+    "validation_score_sha256": "733317d15e3eee07db329d528b807abccb8afcfe4ae3fb1143de9a88e7b55670",
+    "forecast_score_sha256": "d0c852475281e4decee5bdfc4c0f857d485f0350e076dfc1a485a73c7ddde189"
+  },
+  {
+    "month": "2025-03",
+    "window": {
+      "train": [
+        "2024-06",
+        "2024-11"
+      ],
+      "valid": [
+        "2024-12",
+        "2025-02"
+      ],
+      "test": "2025-03"
+    },
+    "fit_rows": 7633,
+    "scored_rows": 1312,
+    "max_score_diff": 0.0,
+    "model_path": "outputs/stock_automl/b2_daily_gap3_sample_r50_20261020/daily3/2025-03/segments.joblib",
+    "model_sha256": "156cc4156be0397db794c5a2b3cd3a8788a5d10f57f4fe04a4786ad69b361153",
+    "training_sample_path": "outputs/stock_automl/b2_daily_gap3_sample_r50_20261020/daily3/2025-03/training_samples.pkl",
+    "training_sample_sha256": "3ca3cdbe32d11391ee8282728304b22f773ffe339e154d44899ba89491b91afd",
+    "validation_score_sha256": "bc5ba0eadbae3fa66c32363274ae92b73e21195a226662653ad7b8da372d9cc7",
+    "forecast_score_sha256": "1dfd20ed712a009a6d168697cec7948aa201cf704144c36a57ba6067068f2efe"
+  },
+  {
+    "month": "2025-04",
+    "window": {
+      "train": [
+        "2024-07",
+        "2024-12"
+      ],
+      "valid": [
+        "2025-01",
+        "2025-03"
+      ],
+      "test": "2025-04"
+    },
+    "fit_rows": 8888,
+    "scored_rows": 1560,
+    "max_score_diff": 0.0,
+    "model_path": "outputs/stock_automl/b2_daily_gap3_sample_r50_20261020/daily3/2025-04/segments.joblib",
+    "model_sha256": "74d550c9caa16530eb371c6ae2871c4ab4b027a123afa06c24375e43f8dcf3c0",
+    "training_sample_path": "outputs/stock_automl/b2_daily_gap3_sample_r50_20261020/daily3/2025-04/training_samples.pkl",
+    "training_sample_sha256": "93c4f769b820297425d94ef216d57989cb3fe43ef9680d80b27d474706df2b42",
+    "validation_score_sha256": "4a4d96400d0cfc9ea18cd84d45a0e88fd0ef6ebecf0876ca2cd316a310ec999f",
+    "forecast_score_sha256": "efb0cdf98ef3b6f1787ee87e2ddf302a53c238206a7e8d71e8844c20380e8e53"
+  },
+  {
+    "month": "2025-06",
+    "window": {
+      "train": [
+        "2024-09",
+        "2025-02"
+      ],
+      "valid": [
+        "2025-03",
+        "2025-05"
+      ],
+      "test": "2025-06"
+    },
+    "fit_rows": 9407,
+    "scored_rows": 1176,
+    "max_score_diff": 0.0,
+    "model_path": "outputs/stock_automl/b2_daily_gap3_sample_r50_20261020/daily3/2025-06/segments.joblib",
+    "model_sha256": "a0b8040af3c21b5c454b43dee82f0507819e7d5d532943b417d7f177bbceddd5",
+    "training_sample_path": "outputs/stock_automl/b2_daily_gap3_sample_r50_20261020/daily3/2025-06/training_samples.pkl",
+    "training_sample_sha256": "10886840222781f55dd3f4a603c20f3bb7c7a79f686e890ffd86d195f56cd1cd",
+    "validation_score_sha256": "2ffc0aa55d04ce5c597f7312c5a630d03d7a3b3ef3b9d0444647073680aadfda",
+    "forecast_score_sha256": "e0d5680557590a29787d5d7d676900c41fb6c1ad32d5d9d9c674002d5ab33a51"
+  },
+  {
+    "month": "2026-01",
+    "window": {
+      "train": [
+        "2025-04",
+        "2025-09"
+      ],
+      "valid": [
+        "2025-10",
+        "2025-12"
+      ],
+      "test": "2026-01"
+    },
+    "fit_rows": 7029,
+    "scored_rows": 1711,
+    "max_score_diff": 0.0,
+    "model_path": "outputs/stock_automl/b2_daily_gap3_sample_r50_20261020/daily3/2026-01/segments.joblib",
+    "model_sha256": "aec8c199bb621ec546137eb517484081f1fa3b6b7a26d15b325b9020d4de30dd",
+    "training_sample_path": "outputs/stock_automl/b2_daily_gap3_sample_r50_20261020/daily3/2026-01/training_samples.pkl",
+    "training_sample_sha256": "c0df85a0ae40e45c69f450b52e16292a12fe59f37cf71d4ba85d11505ff9bd14",
+    "validation_score_sha256": "dec0b2338e467184770d33c1c12440ccfa4d3e84f4667d1b65105debaf993bfb",
+    "forecast_score_sha256": "16716a1dea345e849603ee3f503a87303544712a751432e8c90444aef2279b73"
+  },
+  {
+    "month": "2026-02",
+    "window": {
+      "train": [
+        "2025-05",
+        "2025-10"
+      ],
+      "valid": [
+        "2025-11",
+        "2026-01"
+      ],
+      "test": "2026-02"
+    },
+    "fit_rows": 6496,
+    "scored_rows": 870,
+    "max_score_diff": 0.0,
+    "model_path": "outputs/stock_automl/b2_daily_gap3_sample_r50_20261020/daily3/2026-02/segments.joblib",
+    "model_sha256": "6b6ac95f6776cd345d5fbccd0d0af046ef28d8439a08cad8638eb884b5ca2878",
+    "training_sample_path": "outputs/stock_automl/b2_daily_gap3_sample_r50_20261020/daily3/2026-02/training_samples.pkl",
+    "training_sample_sha256": "3103972025a7c4beea64cf93366f0744e750c03448ddc3c5c3f035836f27c5e2",
+    "validation_score_sha256": "d8fe115af47350298f343bccddf72e684272cdccc2217b47a4a23c70cbb44876",
+    "forecast_score_sha256": "ece30a63ae22a6c92ab4c22ddf58d6d55dc4055390b4fcfb473c20a0d5237f6f"
+  },
+  {
+    "month": "2026-03",
+    "window": {
+      "train": [
+        "2025-06",
+        "2025-11"
+      ],
+      "valid": [
+        "2025-12",
+        "2026-02"
+      ],
+      "test": "2026-03"
+    },
+    "fit_rows": 6562,
+    "scored_rows": 1255,
+    "max_score_diff": 0.0,
+    "model_path": "outputs/stock_automl/b2_daily_gap3_sample_r50_20261020/daily3/2026-03/segments.joblib",
+    "model_sha256": "f5e75d7c2cd59825f0659787884a4a6756b082b88f1a85acd917b8c8038abeb6",
+    "training_sample_path": "outputs/stock_automl/b2_daily_gap3_sample_r50_20261020/daily3/2026-03/training_samples.pkl",
+    "training_sample_sha256": "e9380ab1d5c69d6848be18943de504f5410700ebe0325dde864b4ea8e3555306",
+    "validation_score_sha256": "02bec83dcdbdb2d431cfc2904488515b394b92a01816f80f97626c2dee028933",
+    "forecast_score_sha256": "ea01607cf8884fbebbccff03f20fc5ca49060aca598ff40ce98fbf3e82a3a4c3"
+  },
+  {
+    "month": "2026-04",
+    "window": {
+      "train": [
+        "2025-07",
+        "2025-12"
+      ],
+      "valid": [
+        "2026-01",
+        "2026-03"
+      ],
+      "test": "2026-04"
+    },
+    "fit_rows": 6784,
+    "scored_rows": 1369,
+    "max_score_diff": 0.0,
+    "model_path": "outputs/stock_automl/b2_daily_gap3_sample_r50_20261020/daily3/2026-04/segments.joblib",
+    "model_sha256": "7197dab79dba826cd649b6f2b590d7e910e061340d2dc85fbfcd52314687074f",
+    "training_sample_path": "outputs/stock_automl/b2_daily_gap3_sample_r50_20261020/daily3/2026-04/training_samples.pkl",
+    "training_sample_sha256": "2ef88abc9891637b8243535ae3f6c29f8b70017e04b2862c55655862f593726b",
+    "validation_score_sha256": "9c040c8371cf5a8d35fb1964f53e75c904b446ef7285cff1bf1295c69de2ac1c",
+    "forecast_score_sha256": "3aa771c8dcc2cfd763117186bdfb1c78adf600968bc6faffc8d95a8bc0a143bf"
+  },
+  {
+    "month": "2026-05",
+    "window": {
+      "train": [
+        "2025-08",
+        "2026-01"
+      ],
+      "valid": [
+        "2026-02",
+        "2026-04"
+      ],
+      "test": "2026-05"
+    },
+    "fit_rows": 7088,
+    "scored_rows": 1413,
+    "max_score_diff": 0.0,
+    "model_path": "outputs/stock_automl/b2_daily_gap3_sample_r50_20261020/daily3/2026-05/segments.joblib",
+    "model_sha256": "40ea2471c41ab641f0cbb3ea72ef55b5c63cbbc189cda0a4e44a07c8c8da2bb1",
+    "training_sample_path": "outputs/stock_automl/b2_daily_gap3_sample_r50_20261020/daily3/2026-05/training_samples.pkl",
+    "training_sample_sha256": "aa6b63cd00082ccbaa0232be97aea869a358eb221778811e13126c3265ee0c53",
+    "validation_score_sha256": "83c8a1876b28fd578983fe3e68c14fb55dc1e86ff6b3356614a84be4cc4af8bc",
+    "forecast_score_sha256": "c8aec96fb7820e30b5435f494db7d8bad7a4bb3a291ab3823b07384947a58b40"
+  },
+  {
+    "month": "2026-06",
+    "window": {
+      "train": [
+        "2025-09",
+        "2026-02"
+      ],
+      "valid": [
+        "2026-03",
+        "2026-05"
+      ],
+      "test": "2026-06"
+    },
+    "fit_rows": 6567,
+    "scored_rows": 2014,
+    "max_score_diff": 0.0,
+    "model_path": "outputs/stock_automl/b2_daily_gap3_sample_r50_20261020/daily3/2026-06/segments.joblib",
+    "model_sha256": "ecb775f67b6acb331ef71c1b840683c85b7b57dfd01a05c4a3d324bf1a616599",
+    "training_sample_path": "outputs/stock_automl/b2_daily_gap3_sample_r50_20261020/daily3/2026-06/training_samples.pkl",
+    "training_sample_sha256": "e7cf72e7ad2fe9826ca363e0fa84aceedb5fa04427f039b779aa11fad6393270",
+    "validation_score_sha256": "87700e8ef3c1dacd34033112c075082ae70cefc0350f31c3d9d8df3bfb4cdf71",
+    "forecast_score_sha256": "7c5a57847c0cf1fe9fd1f5cb71c8c4049fc49b111bd1d85e9c699cb83763d2d4"
+  },
+  {
+    "month": "2026-09",
+    "window": {
+      "train": [
+        "2025-12",
+        "2026-05"
+      ],
+      "valid": [
+        "2026-06",
+        "2026-08"
+      ],
+      "test": "2026-09"
+    },
+    "fit_rows": 7181,
+    "scored_rows": 1226,
+    "max_score_diff": 0.0,
+    "model_path": "outputs/stock_automl/b2_daily_gap3_sample_r50_20261020/daily3/2026-09/segments.joblib",
+    "model_sha256": "4168f3be1931510ee0ca2414a3a53d12783c5aa74ccd89dba40a9f6106daa7a2",
+    "training_sample_path": "outputs/stock_automl/b2_daily_gap3_sample_r50_20261020/daily3/2026-09/training_samples.pkl",
+    "training_sample_sha256": "ec305821f7e4cc3069ffeb698d84a9c805c2fb6e62f4e28997f3c82f5ce77462",
+    "validation_score_sha256": "a9e0dc8e854448e0211bd572d21c78128e8422fdd33565dff1b04429faee551a",
+    "forecast_score_sha256": "947963b9eebb60e1d27b49993f82546846183a87982d0b4083ee2864276f577c"
+  }
+]

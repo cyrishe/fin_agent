@@ -1,0 +1,20 @@
+{
+  "model_count": 29,
+  "exact_forecast_scores": true,
+  "exact_training_keys": true,
+  "d2_close_and_fees_exact": true,
+  "all_models_reloaded": true,
+  "minute_coverage": {
+    "stock_days": 932,
+    "minute_ok": 919,
+    "failed": {
+      "分钟缺失": 12,
+      "分钟日线价格冲突": 1
+    }
+  },
+  "prior_overlap": {
+    "shared_rows": 815,
+    "total_unique": 932,
+    "shared_status_and_audit_exact": true
+  }
+}

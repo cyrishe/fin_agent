@@ -1,0 +1,50 @@
+[
+  {
+    "month": "2024-04",
+    "common": 2,
+    "new_only": 8,
+    "original_only": 3,
+    "reselected_rule": "r051",
+    "original_rule": "r051"
+  },
+  {
+    "month": "2024-08",
+    "common": 7,
+    "new_only": 4,
+    "original_only": 2,
+    "reselected_rule": "r063",
+    "original_rule": "r051"
+  },
+  {
+    "month": "2024-10",
+    "common": 5,
+    "new_only": 5,
+    "original_only": 5,
+    "reselected_rule": "all",
+    "original_rule": "all"
+  },
+  {
+    "month": "2025-04",
+    "common": 7,
+    "new_only": 9,
+    "original_only": 8,
+    "reselected_rule": "r029",
+    "original_rule": "all"
+  },
+  {
+    "month": "2025-06",
+    "common": 11,
+    "new_only": 6,
+    "original_only": 8,
+    "reselected_rule": "all",
+    "original_rule": "r028"
+  },
+  {
+    "month": "2026-09",
+    "common": 4,
+    "new_only": 5,
+    "original_only": 12,
+    "reselected_rule": "r026",
+    "original_rule": "r001"
+  }
+]

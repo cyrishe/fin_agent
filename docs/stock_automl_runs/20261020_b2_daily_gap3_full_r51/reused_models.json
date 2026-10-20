@@ -1,0 +1,147 @@
+[
+  {
+    "month": "2023-08",
+    "model_sha256": "5206216dcb22e46da5d2bb9d5ebe804a231220b17b8b3dcda0747e97029e7bc6",
+    "original_spec_sha256": "618d20b465bfc46512e00527e7c485cb8a8855d9d2dbaaa64a749cb339b765a4"
+  },
+  {
+    "month": "2023-09",
+    "model_sha256": "35726a241245869e779159070a030da77ee83e1c1bd4f1f51c8d567f4b4ac2c9",
+    "original_spec_sha256": "618d20b465bfc46512e00527e7c485cb8a8855d9d2dbaaa64a749cb339b765a4"
+  },
+  {
+    "month": "2023-10",
+    "model_sha256": "421d8f8847c94a6b34dd8631e77eb102e81274128b5b8cbc251507f0f14ecc28",
+    "original_spec_sha256": "618d20b465bfc46512e00527e7c485cb8a8855d9d2dbaaa64a749cb339b765a4"
+  },
+  {
+    "month": "2023-11",
+    "model_sha256": "fefd7826caf36fb2c40de2528422b139dcf6354f30b45c06da2777a0947de423",
+    "original_spec_sha256": "618d20b465bfc46512e00527e7c485cb8a8855d9d2dbaaa64a749cb339b765a4"
+  },
+  {
+    "month": "2023-12",
+    "model_sha256": "85e19ff624a28a94217e61f93b2823e01e09299dbab683ea875ba6ce5f23a5f9",
+    "original_spec_sha256": "618d20b465bfc46512e00527e7c485cb8a8855d9d2dbaaa64a749cb339b765a4"
+  },
+  {
+    "month": "2024-01",
+    "model_sha256": "596903658c2ae55c64cdac8f54b83f4e02bbafd9df221e4395d1d508eecde1c2",
+    "original_spec_sha256": "618d20b465bfc46512e00527e7c485cb8a8855d9d2dbaaa64a749cb339b765a4"
+  },
+  {
+    "month": "2024-02",
+    "model_sha256": "259322237fc9ebcd524cf415fc800f85c0646dd44e0d1beac22c3d584b0ab5a5",
+    "original_spec_sha256": "618d20b465bfc46512e00527e7c485cb8a8855d9d2dbaaa64a749cb339b765a4"
+  },
+  {
+    "month": "2024-03",
+    "model_sha256": "32e5d0aba5d5923c0fd51d44cbcc027649026183894d26646239353ddf280c5f",
+    "original_spec_sha256": "618d20b465bfc46512e00527e7c485cb8a8855d9d2dbaaa64a749cb339b765a4"
+  },
+  {
+    "month": "2024-04",
+    "model_sha256": "de024b1ccdb4f22b0b1ea62fc3578bced3ae8b5c04caa3ed2b48ea0ef7aaaf01",
+    "original_spec_sha256": "618d20b465bfc46512e00527e7c485cb8a8855d9d2dbaaa64a749cb339b765a4"
+  },
+  {
+    "month": "2024-05",
+    "model_sha256": "be1bd6048a45e8710a40df0170714a5c1613ba761b2c2529d96700fcf45604c0",
+    "original_spec_sha256": "618d20b465bfc46512e00527e7c485cb8a8855d9d2dbaaa64a749cb339b765a4"
+  },
+  {
+    "month": "2024-06",
+    "model_sha256": "10ada4fe79c17370e221f0e5b81f5a8763100a89009c9c5ce43199d097a30cc1",
+    "original_spec_sha256": "618d20b465bfc46512e00527e7c485cb8a8855d9d2dbaaa64a749cb339b765a4"
+  },
+  {
+    "month": "2024-07",
+    "model_sha256": "373d6e84ac07896a68edfc2413805f82004f6dfc5565eb50ecf91fb170e5afc5",
+    "original_spec_sha256": "618d20b465bfc46512e00527e7c485cb8a8855d9d2dbaaa64a749cb339b765a4"
+  },
+  {
+    "month": "2024-08",
+    "model_sha256": "79ca790a81740f6a911f3c5b54c67c2f341b5af7a053cb07f25bb87ced08771b",
+    "original_spec_sha256": "618d20b465bfc46512e00527e7c485cb8a8855d9d2dbaaa64a749cb339b765a4"
+  },
+  {
+    "month": "2024-09",
+    "model_sha256": "f6a3116e109fe6e9a35ed5f0305f1d36cfb86bc73a51a3024c4616c1505c1a63",
+    "original_spec_sha256": "618d20b465bfc46512e00527e7c485cb8a8855d9d2dbaaa64a749cb339b765a4"
+  },
+  {
+    "month": "2024-10",
+    "model_sha256": "fb09168d8ab655781a8906d578f6c32b78715ea4389079958dd3525e5d0221d6",
+    "original_spec_sha256": "618d20b465bfc46512e00527e7c485cb8a8855d9d2dbaaa64a749cb339b765a4"
+  },
+  {
+    "month": "2024-11",
+    "model_sha256": "7b405b7a90f6b06e559111fba524f513cdd5f47ac67e514c73a40d01ec6dcb10",
+    "original_spec_sha256": "618d20b465bfc46512e00527e7c485cb8a8855d9d2dbaaa64a749cb339b765a4"
+  },
+  {
+    "month": "2024-12",
+    "model_sha256": "9c482bda9b7649c1ba124848119fcb7f93b9dc5106c8ca1045df128d8d228fb1",
+    "original_spec_sha256": "618d20b465bfc46512e00527e7c485cb8a8855d9d2dbaaa64a749cb339b765a4"
+  },
+  {
+    "month": "2025-01",
+    "model_sha256": "db05f1c1a223df640718c03012fdd7e94a2d3c13abd9923f2fc26bc9d6f0ee6d",
+    "original_spec_sha256": "618d20b465bfc46512e00527e7c485cb8a8855d9d2dbaaa64a749cb339b765a4"
+  },
+  {
+    "month": "2025-02",
+    "model_sha256": "92f6b9e56e9f25396ae4cd4ec1c68a803ff7acb8a277fdc41e102c0055f88b76",
+    "original_spec_sha256": "618d20b465bfc46512e00527e7c485cb8a8855d9d2dbaaa64a749cb339b765a4"
+  },
+  {
+    "month": "2025-03",
+    "model_sha256": "156cc4156be0397db794c5a2b3cd3a8788a5d10f57f4fe04a4786ad69b361153",
+    "original_spec_sha256": "618d20b465bfc46512e00527e7c485cb8a8855d9d2dbaaa64a749cb339b765a4"
+  },
+  {
+    "month": "2025-04",
+    "model_sha256": "74d550c9caa16530eb371c6ae2871c4ab4b027a123afa06c24375e43f8dcf3c0",
+    "original_spec_sha256": "618d20b465bfc46512e00527e7c485cb8a8855d9d2dbaaa64a749cb339b765a4"
+  },
+  {
+    "month": "2025-06",
+    "model_sha256": "a0b8040af3c21b5c454b43dee82f0507819e7d5d532943b417d7f177bbceddd5",
+    "original_spec_sha256": "618d20b465bfc46512e00527e7c485cb8a8855d9d2dbaaa64a749cb339b765a4"
+  },
+  {
+    "month": "2026-01",
+    "model_sha256": "aec8c199bb621ec546137eb517484081f1fa3b6b7a26d15b325b9020d4de30dd",
+    "original_spec_sha256": "618d20b465bfc46512e00527e7c485cb8a8855d9d2dbaaa64a749cb339b765a4"
+  },
+  {
+    "month": "2026-02",
+    "model_sha256": "6b6ac95f6776cd345d5fbccd0d0af046ef28d8439a08cad8638eb884b5ca2878",
+    "original_spec_sha256": "618d20b465bfc46512e00527e7c485cb8a8855d9d2dbaaa64a749cb339b765a4"
+  },
+  {
+    "month": "2026-03",
+    "model_sha256": "f5e75d7c2cd59825f0659787884a4a6756b082b88f1a85acd917b8c8038abeb6",
+    "original_spec_sha256": "618d20b465bfc46512e00527e7c485cb8a8855d9d2dbaaa64a749cb339b765a4"
+  },
+  {
+    "month": "2026-04",
+    "model_sha256": "7197dab79dba826cd649b6f2b590d7e910e061340d2dc85fbfcd52314687074f",
+    "original_spec_sha256": "618d20b465bfc46512e00527e7c485cb8a8855d9d2dbaaa64a749cb339b765a4"
+  },
+  {
+    "month": "2026-05",
+    "model_sha256": "40ea2471c41ab641f0cbb3ea72ef55b5c63cbbc189cda0a4e44a07c8c8da2bb1",
+    "original_spec_sha256": "618d20b465bfc46512e00527e7c485cb8a8855d9d2dbaaa64a749cb339b765a4"
+  },
+  {
+    "month": "2026-06",
+    "model_sha256": "ecb775f67b6acb331ef71c1b840683c85b7b57dfd01a05c4a3d324bf1a616599",
+    "original_spec_sha256": "618d20b465bfc46512e00527e7c485cb8a8855d9d2dbaaa64a749cb339b765a4"
+  },
+  {
+    "month": "2026-09",
+    "model_sha256": "4168f3be1931510ee0ca2414a3a53d12783c5aa74ccd89dba40a9f6106daa7a2",
+    "original_spec_sha256": "618d20b465bfc46512e00527e7c485cb8a8855d9d2dbaaa64a749cb339b765a4"
+  }
+]

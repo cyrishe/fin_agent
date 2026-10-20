@@ -1,0 +1,2162 @@
+[
+  {
+    "variant": "D3S2",
+    "month": "2024-04",
+    "part": "train",
+    "keep_month": "2023-08",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2023-08/segments_forecast_scores.pkl",
+    "sha256": "3b8bd7db020a9396a8742fdfd56eb410e9f6b6f26ea1012a11ae82b8b7b3034f"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2024-04",
+    "part": "train",
+    "keep_month": "2023-09",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2023-09/segments_forecast_scores.pkl",
+    "sha256": "f9aecfe72f37891db56e148bbbe662dd0a1a63f733508f07420076b68a585ad2"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2024-04",
+    "part": "train",
+    "keep_month": "2023-10",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2023-10/segments_forecast_scores.pkl",
+    "sha256": "dabf740ca7574ac73216ea1f336405a42ebd42c1262e82c37e5c9e3f09e56049"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2024-04",
+    "part": "train",
+    "keep_month": "2023-11",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2023-11/segments_forecast_scores.pkl",
+    "sha256": "c2c9bf365866c74d027ea144a96fa0896cbebfb6879687ffcfbb74a4611e96b2"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2024-04",
+    "part": "train",
+    "keep_month": "2023-12",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2023-12/segments_forecast_scores.pkl",
+    "sha256": "302fe242550d4a936a15123e9a4fe7b993aade760bd15b9f8657d2192c9d0c12"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2024-04",
+    "part": "train",
+    "keep_month": "2024-01",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2024-01/segments_forecast_scores.pkl",
+    "sha256": "06d45e6d4d0caf3a37d8ec4cbc0fc8464a7c9cd67cd43df5b22d622019352263"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2024-04",
+    "part": "valid",
+    "keep_month": "2024-02",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2024-04/segments_valid_scores.pkl",
+    "sha256": "1d860b949ddcab90fe4cbe50293b4883458e1b371aae0ee6506d63c8e15a4a11"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2024-04",
+    "part": "valid",
+    "keep_month": "2024-03",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2024-04/segments_valid_scores.pkl",
+    "sha256": "1d860b949ddcab90fe4cbe50293b4883458e1b371aae0ee6506d63c8e15a4a11"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2024-04",
+    "part": "test",
+    "keep_month": "2024-04",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2024-04/segments_forecast_scores.pkl",
+    "sha256": "483deae1a990ecf083f4768ac49bf11be8798dff515c1e1b3e6fc346cf2c28e0"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2024-05",
+    "part": "train",
+    "keep_month": "2023-09",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2023-09/segments_forecast_scores.pkl",
+    "sha256": "f9aecfe72f37891db56e148bbbe662dd0a1a63f733508f07420076b68a585ad2"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2024-05",
+    "part": "train",
+    "keep_month": "2023-10",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2023-10/segments_forecast_scores.pkl",
+    "sha256": "dabf740ca7574ac73216ea1f336405a42ebd42c1262e82c37e5c9e3f09e56049"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2024-05",
+    "part": "train",
+    "keep_month": "2023-11",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2023-11/segments_forecast_scores.pkl",
+    "sha256": "c2c9bf365866c74d027ea144a96fa0896cbebfb6879687ffcfbb74a4611e96b2"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2024-05",
+    "part": "train",
+    "keep_month": "2023-12",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2023-12/segments_forecast_scores.pkl",
+    "sha256": "302fe242550d4a936a15123e9a4fe7b993aade760bd15b9f8657d2192c9d0c12"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2024-05",
+    "part": "train",
+    "keep_month": "2024-01",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2024-01/segments_forecast_scores.pkl",
+    "sha256": "06d45e6d4d0caf3a37d8ec4cbc0fc8464a7c9cd67cd43df5b22d622019352263"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2024-05",
+    "part": "train",
+    "keep_month": "2024-02",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2024-02/segments_forecast_scores.pkl",
+    "sha256": "0f1e02b53eaf4f2d5f519d305d8e6258a7ad9fb66cc3ea5d894ea5cb6c393299"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2024-05",
+    "part": "valid",
+    "keep_month": "2024-03",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2024-05/segments_valid_scores.pkl",
+    "sha256": "2f9a7a37eb6b834a8bc7935260791e6cd1de8869df32a4b3a3f4c64c2bdadf38"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2024-05",
+    "part": "valid",
+    "keep_month": "2024-04",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2024-05/segments_valid_scores.pkl",
+    "sha256": "2f9a7a37eb6b834a8bc7935260791e6cd1de8869df32a4b3a3f4c64c2bdadf38"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2024-05",
+    "part": "test",
+    "keep_month": "2024-05",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2024-05/segments_forecast_scores.pkl",
+    "sha256": "09bf1fa7d89107cc38f0ae147b4448175cd1a95164f3c59cab6f3bbc8d7e5465"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2024-06",
+    "part": "train",
+    "keep_month": "2023-10",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2023-10/segments_forecast_scores.pkl",
+    "sha256": "dabf740ca7574ac73216ea1f336405a42ebd42c1262e82c37e5c9e3f09e56049"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2024-06",
+    "part": "train",
+    "keep_month": "2023-11",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2023-11/segments_forecast_scores.pkl",
+    "sha256": "c2c9bf365866c74d027ea144a96fa0896cbebfb6879687ffcfbb74a4611e96b2"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2024-06",
+    "part": "train",
+    "keep_month": "2023-12",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2023-12/segments_forecast_scores.pkl",
+    "sha256": "302fe242550d4a936a15123e9a4fe7b993aade760bd15b9f8657d2192c9d0c12"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2024-06",
+    "part": "train",
+    "keep_month": "2024-01",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2024-01/segments_forecast_scores.pkl",
+    "sha256": "06d45e6d4d0caf3a37d8ec4cbc0fc8464a7c9cd67cd43df5b22d622019352263"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2024-06",
+    "part": "train",
+    "keep_month": "2024-02",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2024-02/segments_forecast_scores.pkl",
+    "sha256": "0f1e02b53eaf4f2d5f519d305d8e6258a7ad9fb66cc3ea5d894ea5cb6c393299"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2024-06",
+    "part": "train",
+    "keep_month": "2024-03",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2024-03/segments_forecast_scores.pkl",
+    "sha256": "611a4b527eb43b37b2071b34b72c9f3bae298ff7b1eee7c8553a37b0acb02eb7"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2024-06",
+    "part": "valid",
+    "keep_month": "2024-04",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2024-06/segments_valid_scores.pkl",
+    "sha256": "11eddacdadfb6d072e477bd6ad6200cb7959254e496ad04fb87c45ee976ee53f"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2024-06",
+    "part": "valid",
+    "keep_month": "2024-05",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2024-06/segments_valid_scores.pkl",
+    "sha256": "11eddacdadfb6d072e477bd6ad6200cb7959254e496ad04fb87c45ee976ee53f"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2024-06",
+    "part": "test",
+    "keep_month": "2024-06",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2024-06/segments_forecast_scores.pkl",
+    "sha256": "a64f409b4e82ab429d634d3e22c46837d406030f464604485a751585eecc9754"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2024-07",
+    "part": "train",
+    "keep_month": "2023-11",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2023-11/segments_forecast_scores.pkl",
+    "sha256": "c2c9bf365866c74d027ea144a96fa0896cbebfb6879687ffcfbb74a4611e96b2"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2024-07",
+    "part": "train",
+    "keep_month": "2023-12",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2023-12/segments_forecast_scores.pkl",
+    "sha256": "302fe242550d4a936a15123e9a4fe7b993aade760bd15b9f8657d2192c9d0c12"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2024-07",
+    "part": "train",
+    "keep_month": "2024-01",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2024-01/segments_forecast_scores.pkl",
+    "sha256": "06d45e6d4d0caf3a37d8ec4cbc0fc8464a7c9cd67cd43df5b22d622019352263"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2024-07",
+    "part": "train",
+    "keep_month": "2024-02",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2024-02/segments_forecast_scores.pkl",
+    "sha256": "0f1e02b53eaf4f2d5f519d305d8e6258a7ad9fb66cc3ea5d894ea5cb6c393299"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2024-07",
+    "part": "train",
+    "keep_month": "2024-03",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2024-03/segments_forecast_scores.pkl",
+    "sha256": "611a4b527eb43b37b2071b34b72c9f3bae298ff7b1eee7c8553a37b0acb02eb7"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2024-07",
+    "part": "train",
+    "keep_month": "2024-04",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2024-04/segments_forecast_scores.pkl",
+    "sha256": "483deae1a990ecf083f4768ac49bf11be8798dff515c1e1b3e6fc346cf2c28e0"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2024-07",
+    "part": "valid",
+    "keep_month": "2024-05",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2024-07/segments_valid_scores.pkl",
+    "sha256": "e3ed6ba769d757f1664e755ccc30f8179e777108e1d52cdc10a3a145721efcb6"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2024-07",
+    "part": "valid",
+    "keep_month": "2024-06",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2024-07/segments_valid_scores.pkl",
+    "sha256": "e3ed6ba769d757f1664e755ccc30f8179e777108e1d52cdc10a3a145721efcb6"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2024-07",
+    "part": "test",
+    "keep_month": "2024-07",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2024-07/segments_forecast_scores.pkl",
+    "sha256": "b37d691385dd7080f927c5ebe350cb6667169b152aa25985dc97016faded0e7d"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2024-08",
+    "part": "train",
+    "keep_month": "2023-12",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2023-12/segments_forecast_scores.pkl",
+    "sha256": "302fe242550d4a936a15123e9a4fe7b993aade760bd15b9f8657d2192c9d0c12"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2024-08",
+    "part": "train",
+    "keep_month": "2024-01",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2024-01/segments_forecast_scores.pkl",
+    "sha256": "06d45e6d4d0caf3a37d8ec4cbc0fc8464a7c9cd67cd43df5b22d622019352263"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2024-08",
+    "part": "train",
+    "keep_month": "2024-02",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2024-02/segments_forecast_scores.pkl",
+    "sha256": "0f1e02b53eaf4f2d5f519d305d8e6258a7ad9fb66cc3ea5d894ea5cb6c393299"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2024-08",
+    "part": "train",
+    "keep_month": "2024-03",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2024-03/segments_forecast_scores.pkl",
+    "sha256": "611a4b527eb43b37b2071b34b72c9f3bae298ff7b1eee7c8553a37b0acb02eb7"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2024-08",
+    "part": "train",
+    "keep_month": "2024-04",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2024-04/segments_forecast_scores.pkl",
+    "sha256": "483deae1a990ecf083f4768ac49bf11be8798dff515c1e1b3e6fc346cf2c28e0"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2024-08",
+    "part": "train",
+    "keep_month": "2024-05",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2024-05/segments_forecast_scores.pkl",
+    "sha256": "09bf1fa7d89107cc38f0ae147b4448175cd1a95164f3c59cab6f3bbc8d7e5465"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2024-08",
+    "part": "valid",
+    "keep_month": "2024-06",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2024-08/segments_valid_scores.pkl",
+    "sha256": "6297dfb1dfec5a9511af417660be3fa435863997bf222ce433d980114725caa9"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2024-08",
+    "part": "valid",
+    "keep_month": "2024-07",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2024-08/segments_valid_scores.pkl",
+    "sha256": "6297dfb1dfec5a9511af417660be3fa435863997bf222ce433d980114725caa9"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2024-08",
+    "part": "test",
+    "keep_month": "2024-08",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2024-08/segments_forecast_scores.pkl",
+    "sha256": "dff02cc88b6fbf9e34c2729aef7b0917306dfcbac283761958c6a4276c644610"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2024-09",
+    "part": "train",
+    "keep_month": "2024-01",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2024-01/segments_forecast_scores.pkl",
+    "sha256": "06d45e6d4d0caf3a37d8ec4cbc0fc8464a7c9cd67cd43df5b22d622019352263"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2024-09",
+    "part": "train",
+    "keep_month": "2024-02",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2024-02/segments_forecast_scores.pkl",
+    "sha256": "0f1e02b53eaf4f2d5f519d305d8e6258a7ad9fb66cc3ea5d894ea5cb6c393299"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2024-09",
+    "part": "train",
+    "keep_month": "2024-03",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2024-03/segments_forecast_scores.pkl",
+    "sha256": "611a4b527eb43b37b2071b34b72c9f3bae298ff7b1eee7c8553a37b0acb02eb7"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2024-09",
+    "part": "train",
+    "keep_month": "2024-04",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2024-04/segments_forecast_scores.pkl",
+    "sha256": "483deae1a990ecf083f4768ac49bf11be8798dff515c1e1b3e6fc346cf2c28e0"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2024-09",
+    "part": "train",
+    "keep_month": "2024-05",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2024-05/segments_forecast_scores.pkl",
+    "sha256": "09bf1fa7d89107cc38f0ae147b4448175cd1a95164f3c59cab6f3bbc8d7e5465"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2024-09",
+    "part": "train",
+    "keep_month": "2024-06",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2024-06/segments_forecast_scores.pkl",
+    "sha256": "a64f409b4e82ab429d634d3e22c46837d406030f464604485a751585eecc9754"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2024-09",
+    "part": "valid",
+    "keep_month": "2024-07",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2024-09/segments_valid_scores.pkl",
+    "sha256": "409ce4432bd19682ad7ff7951350212332382c602112c34220604e43c4fc11d8"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2024-09",
+    "part": "valid",
+    "keep_month": "2024-08",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2024-09/segments_valid_scores.pkl",
+    "sha256": "409ce4432bd19682ad7ff7951350212332382c602112c34220604e43c4fc11d8"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2024-09",
+    "part": "test",
+    "keep_month": "2024-09",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2024-09/segments_forecast_scores.pkl",
+    "sha256": "336b878a841cf3852dde8be2901688431e80ecfe4acfb9b22cb6b81f0803a971"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2024-10",
+    "part": "train",
+    "keep_month": "2024-02",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2024-02/segments_forecast_scores.pkl",
+    "sha256": "0f1e02b53eaf4f2d5f519d305d8e6258a7ad9fb66cc3ea5d894ea5cb6c393299"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2024-10",
+    "part": "train",
+    "keep_month": "2024-03",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2024-03/segments_forecast_scores.pkl",
+    "sha256": "611a4b527eb43b37b2071b34b72c9f3bae298ff7b1eee7c8553a37b0acb02eb7"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2024-10",
+    "part": "train",
+    "keep_month": "2024-04",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2024-04/segments_forecast_scores.pkl",
+    "sha256": "483deae1a990ecf083f4768ac49bf11be8798dff515c1e1b3e6fc346cf2c28e0"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2024-10",
+    "part": "train",
+    "keep_month": "2024-05",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2024-05/segments_forecast_scores.pkl",
+    "sha256": "09bf1fa7d89107cc38f0ae147b4448175cd1a95164f3c59cab6f3bbc8d7e5465"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2024-10",
+    "part": "train",
+    "keep_month": "2024-06",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2024-06/segments_forecast_scores.pkl",
+    "sha256": "a64f409b4e82ab429d634d3e22c46837d406030f464604485a751585eecc9754"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2024-10",
+    "part": "train",
+    "keep_month": "2024-07",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2024-07/segments_forecast_scores.pkl",
+    "sha256": "b37d691385dd7080f927c5ebe350cb6667169b152aa25985dc97016faded0e7d"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2024-10",
+    "part": "valid",
+    "keep_month": "2024-08",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2024-10/segments_valid_scores.pkl",
+    "sha256": "5154f02664f749753e1abfc082d8b020c8cb671cee0b6a1b27dea4ec19fe00c6"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2024-10",
+    "part": "valid",
+    "keep_month": "2024-09",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2024-10/segments_valid_scores.pkl",
+    "sha256": "5154f02664f749753e1abfc082d8b020c8cb671cee0b6a1b27dea4ec19fe00c6"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2024-10",
+    "part": "test",
+    "keep_month": "2024-10",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2024-10/segments_forecast_scores.pkl",
+    "sha256": "166d827cbd430bc335ace734c96f289ea7a14d9e97595dd6c74e77b29084911d"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2024-11",
+    "part": "train",
+    "keep_month": "2024-03",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2024-03/segments_forecast_scores.pkl",
+    "sha256": "611a4b527eb43b37b2071b34b72c9f3bae298ff7b1eee7c8553a37b0acb02eb7"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2024-11",
+    "part": "train",
+    "keep_month": "2024-04",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2024-04/segments_forecast_scores.pkl",
+    "sha256": "483deae1a990ecf083f4768ac49bf11be8798dff515c1e1b3e6fc346cf2c28e0"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2024-11",
+    "part": "train",
+    "keep_month": "2024-05",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2024-05/segments_forecast_scores.pkl",
+    "sha256": "09bf1fa7d89107cc38f0ae147b4448175cd1a95164f3c59cab6f3bbc8d7e5465"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2024-11",
+    "part": "train",
+    "keep_month": "2024-06",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2024-06/segments_forecast_scores.pkl",
+    "sha256": "a64f409b4e82ab429d634d3e22c46837d406030f464604485a751585eecc9754"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2024-11",
+    "part": "train",
+    "keep_month": "2024-07",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2024-07/segments_forecast_scores.pkl",
+    "sha256": "b37d691385dd7080f927c5ebe350cb6667169b152aa25985dc97016faded0e7d"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2024-11",
+    "part": "train",
+    "keep_month": "2024-08",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2024-08/segments_forecast_scores.pkl",
+    "sha256": "dff02cc88b6fbf9e34c2729aef7b0917306dfcbac283761958c6a4276c644610"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2024-11",
+    "part": "valid",
+    "keep_month": "2024-09",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2024-11/segments_valid_scores.pkl",
+    "sha256": "5d779b514986282feb2fca20b6846daf6e4d42f688fde57813cef876101f1c1e"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2024-11",
+    "part": "valid",
+    "keep_month": "2024-10",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2024-11/segments_valid_scores.pkl",
+    "sha256": "5d779b514986282feb2fca20b6846daf6e4d42f688fde57813cef876101f1c1e"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2024-11",
+    "part": "test",
+    "keep_month": "2024-11",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2024-11/segments_forecast_scores.pkl",
+    "sha256": "224e546657d3159265792a0a1b2b7b4d124dd19674336d9017dbfcf50a891a2e"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2024-12",
+    "part": "train",
+    "keep_month": "2024-04",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2024-04/segments_forecast_scores.pkl",
+    "sha256": "483deae1a990ecf083f4768ac49bf11be8798dff515c1e1b3e6fc346cf2c28e0"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2024-12",
+    "part": "train",
+    "keep_month": "2024-05",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2024-05/segments_forecast_scores.pkl",
+    "sha256": "09bf1fa7d89107cc38f0ae147b4448175cd1a95164f3c59cab6f3bbc8d7e5465"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2024-12",
+    "part": "train",
+    "keep_month": "2024-06",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2024-06/segments_forecast_scores.pkl",
+    "sha256": "a64f409b4e82ab429d634d3e22c46837d406030f464604485a751585eecc9754"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2024-12",
+    "part": "train",
+    "keep_month": "2024-07",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2024-07/segments_forecast_scores.pkl",
+    "sha256": "b37d691385dd7080f927c5ebe350cb6667169b152aa25985dc97016faded0e7d"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2024-12",
+    "part": "train",
+    "keep_month": "2024-08",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2024-08/segments_forecast_scores.pkl",
+    "sha256": "dff02cc88b6fbf9e34c2729aef7b0917306dfcbac283761958c6a4276c644610"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2024-12",
+    "part": "train",
+    "keep_month": "2024-09",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2024-09/segments_forecast_scores.pkl",
+    "sha256": "336b878a841cf3852dde8be2901688431e80ecfe4acfb9b22cb6b81f0803a971"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2024-12",
+    "part": "valid",
+    "keep_month": "2024-10",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2024-12/segments_valid_scores.pkl",
+    "sha256": "1c7a6ae651897915de0a24d8d2af6a647701bded3f77dfafffefb06e0d6da7f6"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2024-12",
+    "part": "valid",
+    "keep_month": "2024-11",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2024-12/segments_valid_scores.pkl",
+    "sha256": "1c7a6ae651897915de0a24d8d2af6a647701bded3f77dfafffefb06e0d6da7f6"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2024-12",
+    "part": "test",
+    "keep_month": "2024-12",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2024-12/segments_forecast_scores.pkl",
+    "sha256": "36f285c65ffe2a42d1f0ae9c126160fb5c4ee8f586df4bcda6afd7b6d0718c20"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2025-01",
+    "part": "train",
+    "keep_month": "2024-05",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2024-05/segments_forecast_scores.pkl",
+    "sha256": "09bf1fa7d89107cc38f0ae147b4448175cd1a95164f3c59cab6f3bbc8d7e5465"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2025-01",
+    "part": "train",
+    "keep_month": "2024-06",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2024-06/segments_forecast_scores.pkl",
+    "sha256": "a64f409b4e82ab429d634d3e22c46837d406030f464604485a751585eecc9754"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2025-01",
+    "part": "train",
+    "keep_month": "2024-07",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2024-07/segments_forecast_scores.pkl",
+    "sha256": "b37d691385dd7080f927c5ebe350cb6667169b152aa25985dc97016faded0e7d"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2025-01",
+    "part": "train",
+    "keep_month": "2024-08",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2024-08/segments_forecast_scores.pkl",
+    "sha256": "dff02cc88b6fbf9e34c2729aef7b0917306dfcbac283761958c6a4276c644610"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2025-01",
+    "part": "train",
+    "keep_month": "2024-09",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2024-09/segments_forecast_scores.pkl",
+    "sha256": "336b878a841cf3852dde8be2901688431e80ecfe4acfb9b22cb6b81f0803a971"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2025-01",
+    "part": "train",
+    "keep_month": "2024-10",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2024-10/segments_forecast_scores.pkl",
+    "sha256": "166d827cbd430bc335ace734c96f289ea7a14d9e97595dd6c74e77b29084911d"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2025-01",
+    "part": "valid",
+    "keep_month": "2024-11",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2025-01/segments_valid_scores.pkl",
+    "sha256": "f5105e32c8a2479df27fce866229c1fe845239682216d014a77f576a86f8b764"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2025-01",
+    "part": "valid",
+    "keep_month": "2024-12",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2025-01/segments_valid_scores.pkl",
+    "sha256": "f5105e32c8a2479df27fce866229c1fe845239682216d014a77f576a86f8b764"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2025-01",
+    "part": "test",
+    "keep_month": "2025-01",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2025-01/segments_forecast_scores.pkl",
+    "sha256": "d8a783cdd70f42aae9c0e54ac55f444a539dbdba9ab2cbbe8d03a652f16f9d6a"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2025-02",
+    "part": "train",
+    "keep_month": "2024-06",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2024-06/segments_forecast_scores.pkl",
+    "sha256": "a64f409b4e82ab429d634d3e22c46837d406030f464604485a751585eecc9754"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2025-02",
+    "part": "train",
+    "keep_month": "2024-07",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2024-07/segments_forecast_scores.pkl",
+    "sha256": "b37d691385dd7080f927c5ebe350cb6667169b152aa25985dc97016faded0e7d"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2025-02",
+    "part": "train",
+    "keep_month": "2024-08",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2024-08/segments_forecast_scores.pkl",
+    "sha256": "dff02cc88b6fbf9e34c2729aef7b0917306dfcbac283761958c6a4276c644610"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2025-02",
+    "part": "train",
+    "keep_month": "2024-09",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2024-09/segments_forecast_scores.pkl",
+    "sha256": "336b878a841cf3852dde8be2901688431e80ecfe4acfb9b22cb6b81f0803a971"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2025-02",
+    "part": "train",
+    "keep_month": "2024-10",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2024-10/segments_forecast_scores.pkl",
+    "sha256": "166d827cbd430bc335ace734c96f289ea7a14d9e97595dd6c74e77b29084911d"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2025-02",
+    "part": "train",
+    "keep_month": "2024-11",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2024-11/segments_forecast_scores.pkl",
+    "sha256": "224e546657d3159265792a0a1b2b7b4d124dd19674336d9017dbfcf50a891a2e"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2025-02",
+    "part": "valid",
+    "keep_month": "2024-12",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2025-02/segments_valid_scores.pkl",
+    "sha256": "733317d15e3eee07db329d528b807abccb8afcfe4ae3fb1143de9a88e7b55670"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2025-02",
+    "part": "valid",
+    "keep_month": "2025-01",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2025-02/segments_valid_scores.pkl",
+    "sha256": "733317d15e3eee07db329d528b807abccb8afcfe4ae3fb1143de9a88e7b55670"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2025-02",
+    "part": "test",
+    "keep_month": "2025-02",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2025-02/segments_forecast_scores.pkl",
+    "sha256": "d0c852475281e4decee5bdfc4c0f857d485f0350e076dfc1a485a73c7ddde189"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2025-03",
+    "part": "train",
+    "keep_month": "2024-07",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2024-07/segments_forecast_scores.pkl",
+    "sha256": "b37d691385dd7080f927c5ebe350cb6667169b152aa25985dc97016faded0e7d"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2025-03",
+    "part": "train",
+    "keep_month": "2024-08",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2024-08/segments_forecast_scores.pkl",
+    "sha256": "dff02cc88b6fbf9e34c2729aef7b0917306dfcbac283761958c6a4276c644610"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2025-03",
+    "part": "train",
+    "keep_month": "2024-09",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2024-09/segments_forecast_scores.pkl",
+    "sha256": "336b878a841cf3852dde8be2901688431e80ecfe4acfb9b22cb6b81f0803a971"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2025-03",
+    "part": "train",
+    "keep_month": "2024-10",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2024-10/segments_forecast_scores.pkl",
+    "sha256": "166d827cbd430bc335ace734c96f289ea7a14d9e97595dd6c74e77b29084911d"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2025-03",
+    "part": "train",
+    "keep_month": "2024-11",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2024-11/segments_forecast_scores.pkl",
+    "sha256": "224e546657d3159265792a0a1b2b7b4d124dd19674336d9017dbfcf50a891a2e"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2025-03",
+    "part": "train",
+    "keep_month": "2024-12",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2024-12/segments_forecast_scores.pkl",
+    "sha256": "36f285c65ffe2a42d1f0ae9c126160fb5c4ee8f586df4bcda6afd7b6d0718c20"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2025-03",
+    "part": "valid",
+    "keep_month": "2025-01",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2025-03/segments_valid_scores.pkl",
+    "sha256": "bc5ba0eadbae3fa66c32363274ae92b73e21195a226662653ad7b8da372d9cc7"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2025-03",
+    "part": "valid",
+    "keep_month": "2025-02",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2025-03/segments_valid_scores.pkl",
+    "sha256": "bc5ba0eadbae3fa66c32363274ae92b73e21195a226662653ad7b8da372d9cc7"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2025-03",
+    "part": "test",
+    "keep_month": "2025-03",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2025-03/segments_forecast_scores.pkl",
+    "sha256": "1dfd20ed712a009a6d168697cec7948aa201cf704144c36a57ba6067068f2efe"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2025-04",
+    "part": "train",
+    "keep_month": "2024-08",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2024-08/segments_forecast_scores.pkl",
+    "sha256": "dff02cc88b6fbf9e34c2729aef7b0917306dfcbac283761958c6a4276c644610"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2025-04",
+    "part": "train",
+    "keep_month": "2024-09",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2024-09/segments_forecast_scores.pkl",
+    "sha256": "336b878a841cf3852dde8be2901688431e80ecfe4acfb9b22cb6b81f0803a971"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2025-04",
+    "part": "train",
+    "keep_month": "2024-10",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2024-10/segments_forecast_scores.pkl",
+    "sha256": "166d827cbd430bc335ace734c96f289ea7a14d9e97595dd6c74e77b29084911d"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2025-04",
+    "part": "train",
+    "keep_month": "2024-11",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2024-11/segments_forecast_scores.pkl",
+    "sha256": "224e546657d3159265792a0a1b2b7b4d124dd19674336d9017dbfcf50a891a2e"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2025-04",
+    "part": "train",
+    "keep_month": "2024-12",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2024-12/segments_forecast_scores.pkl",
+    "sha256": "36f285c65ffe2a42d1f0ae9c126160fb5c4ee8f586df4bcda6afd7b6d0718c20"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2025-04",
+    "part": "train",
+    "keep_month": "2025-01",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2025-01/segments_forecast_scores.pkl",
+    "sha256": "d8a783cdd70f42aae9c0e54ac55f444a539dbdba9ab2cbbe8d03a652f16f9d6a"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2025-04",
+    "part": "valid",
+    "keep_month": "2025-02",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2025-04/segments_valid_scores.pkl",
+    "sha256": "4a4d96400d0cfc9ea18cd84d45a0e88fd0ef6ebecf0876ca2cd316a310ec999f"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2025-04",
+    "part": "valid",
+    "keep_month": "2025-03",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2025-04/segments_valid_scores.pkl",
+    "sha256": "4a4d96400d0cfc9ea18cd84d45a0e88fd0ef6ebecf0876ca2cd316a310ec999f"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2025-04",
+    "part": "test",
+    "keep_month": "2025-04",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2025-04/segments_forecast_scores.pkl",
+    "sha256": "efb0cdf98ef3b6f1787ee87e2ddf302a53c238206a7e8d71e8844c20380e8e53"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2025-05",
+    "part": "train",
+    "keep_month": "2024-09",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2024-09/segments_forecast_scores.pkl",
+    "sha256": "336b878a841cf3852dde8be2901688431e80ecfe4acfb9b22cb6b81f0803a971"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2025-05",
+    "part": "train",
+    "keep_month": "2024-10",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2024-10/segments_forecast_scores.pkl",
+    "sha256": "166d827cbd430bc335ace734c96f289ea7a14d9e97595dd6c74e77b29084911d"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2025-05",
+    "part": "train",
+    "keep_month": "2024-11",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2024-11/segments_forecast_scores.pkl",
+    "sha256": "224e546657d3159265792a0a1b2b7b4d124dd19674336d9017dbfcf50a891a2e"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2025-05",
+    "part": "train",
+    "keep_month": "2024-12",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2024-12/segments_forecast_scores.pkl",
+    "sha256": "36f285c65ffe2a42d1f0ae9c126160fb5c4ee8f586df4bcda6afd7b6d0718c20"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2025-05",
+    "part": "train",
+    "keep_month": "2025-01",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2025-01/segments_forecast_scores.pkl",
+    "sha256": "d8a783cdd70f42aae9c0e54ac55f444a539dbdba9ab2cbbe8d03a652f16f9d6a"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2025-05",
+    "part": "train",
+    "keep_month": "2025-02",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2025-02/segments_forecast_scores.pkl",
+    "sha256": "d0c852475281e4decee5bdfc4c0f857d485f0350e076dfc1a485a73c7ddde189"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2025-05",
+    "part": "valid",
+    "keep_month": "2025-03",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2025-05/segments_valid_scores.pkl",
+    "sha256": "70bc085680fd6c90398679941cb6745c0b17fcdaccb9537b3e98dc3b81ace04d"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2025-05",
+    "part": "valid",
+    "keep_month": "2025-04",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2025-05/segments_valid_scores.pkl",
+    "sha256": "70bc085680fd6c90398679941cb6745c0b17fcdaccb9537b3e98dc3b81ace04d"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2025-05",
+    "part": "test",
+    "keep_month": "2025-05",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2025-05/segments_forecast_scores.pkl",
+    "sha256": "77d4140aeb35f2b11a39e96ff4f60ab57948c0f5bd12aefb91cc4b24b381923d"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2025-06",
+    "part": "train",
+    "keep_month": "2024-10",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2024-10/segments_forecast_scores.pkl",
+    "sha256": "166d827cbd430bc335ace734c96f289ea7a14d9e97595dd6c74e77b29084911d"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2025-06",
+    "part": "train",
+    "keep_month": "2024-11",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2024-11/segments_forecast_scores.pkl",
+    "sha256": "224e546657d3159265792a0a1b2b7b4d124dd19674336d9017dbfcf50a891a2e"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2025-06",
+    "part": "train",
+    "keep_month": "2024-12",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2024-12/segments_forecast_scores.pkl",
+    "sha256": "36f285c65ffe2a42d1f0ae9c126160fb5c4ee8f586df4bcda6afd7b6d0718c20"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2025-06",
+    "part": "train",
+    "keep_month": "2025-01",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2025-01/segments_forecast_scores.pkl",
+    "sha256": "d8a783cdd70f42aae9c0e54ac55f444a539dbdba9ab2cbbe8d03a652f16f9d6a"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2025-06",
+    "part": "train",
+    "keep_month": "2025-02",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2025-02/segments_forecast_scores.pkl",
+    "sha256": "d0c852475281e4decee5bdfc4c0f857d485f0350e076dfc1a485a73c7ddde189"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2025-06",
+    "part": "train",
+    "keep_month": "2025-03",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2025-03/segments_forecast_scores.pkl",
+    "sha256": "1dfd20ed712a009a6d168697cec7948aa201cf704144c36a57ba6067068f2efe"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2025-06",
+    "part": "valid",
+    "keep_month": "2025-04",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2025-06/segments_valid_scores.pkl",
+    "sha256": "2ffc0aa55d04ce5c597f7312c5a630d03d7a3b3ef3b9d0444647073680aadfda"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2025-06",
+    "part": "valid",
+    "keep_month": "2025-05",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2025-06/segments_valid_scores.pkl",
+    "sha256": "2ffc0aa55d04ce5c597f7312c5a630d03d7a3b3ef3b9d0444647073680aadfda"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2025-06",
+    "part": "test",
+    "keep_month": "2025-06",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2025-06/segments_forecast_scores.pkl",
+    "sha256": "e0d5680557590a29787d5d7d676900c41fb6c1ad32d5d9d9c674002d5ab33a51"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2025-07",
+    "part": "train",
+    "keep_month": "2024-11",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2024-11/segments_forecast_scores.pkl",
+    "sha256": "224e546657d3159265792a0a1b2b7b4d124dd19674336d9017dbfcf50a891a2e"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2025-07",
+    "part": "train",
+    "keep_month": "2024-12",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2024-12/segments_forecast_scores.pkl",
+    "sha256": "36f285c65ffe2a42d1f0ae9c126160fb5c4ee8f586df4bcda6afd7b6d0718c20"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2025-07",
+    "part": "train",
+    "keep_month": "2025-01",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2025-01/segments_forecast_scores.pkl",
+    "sha256": "d8a783cdd70f42aae9c0e54ac55f444a539dbdba9ab2cbbe8d03a652f16f9d6a"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2025-07",
+    "part": "train",
+    "keep_month": "2025-02",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2025-02/segments_forecast_scores.pkl",
+    "sha256": "d0c852475281e4decee5bdfc4c0f857d485f0350e076dfc1a485a73c7ddde189"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2025-07",
+    "part": "train",
+    "keep_month": "2025-03",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2025-03/segments_forecast_scores.pkl",
+    "sha256": "1dfd20ed712a009a6d168697cec7948aa201cf704144c36a57ba6067068f2efe"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2025-07",
+    "part": "train",
+    "keep_month": "2025-04",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2025-04/segments_forecast_scores.pkl",
+    "sha256": "efb0cdf98ef3b6f1787ee87e2ddf302a53c238206a7e8d71e8844c20380e8e53"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2025-07",
+    "part": "valid",
+    "keep_month": "2025-05",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2025-07/segments_valid_scores.pkl",
+    "sha256": "57365368a8eeb1c53c8bf4dd8f2846c2897b9ea474e6ec71ee0ad5c5e95ba38c"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2025-07",
+    "part": "valid",
+    "keep_month": "2025-06",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2025-07/segments_valid_scores.pkl",
+    "sha256": "57365368a8eeb1c53c8bf4dd8f2846c2897b9ea474e6ec71ee0ad5c5e95ba38c"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2025-07",
+    "part": "test",
+    "keep_month": "2025-07",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2025-07/segments_forecast_scores.pkl",
+    "sha256": "c951baba4477013c9f0751b02d3b0dbafb71b55b55870d5f7d09ab118e0f932e"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2025-08",
+    "part": "train",
+    "keep_month": "2024-12",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2024-12/segments_forecast_scores.pkl",
+    "sha256": "36f285c65ffe2a42d1f0ae9c126160fb5c4ee8f586df4bcda6afd7b6d0718c20"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2025-08",
+    "part": "train",
+    "keep_month": "2025-01",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2025-01/segments_forecast_scores.pkl",
+    "sha256": "d8a783cdd70f42aae9c0e54ac55f444a539dbdba9ab2cbbe8d03a652f16f9d6a"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2025-08",
+    "part": "train",
+    "keep_month": "2025-02",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2025-02/segments_forecast_scores.pkl",
+    "sha256": "d0c852475281e4decee5bdfc4c0f857d485f0350e076dfc1a485a73c7ddde189"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2025-08",
+    "part": "train",
+    "keep_month": "2025-03",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2025-03/segments_forecast_scores.pkl",
+    "sha256": "1dfd20ed712a009a6d168697cec7948aa201cf704144c36a57ba6067068f2efe"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2025-08",
+    "part": "train",
+    "keep_month": "2025-04",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2025-04/segments_forecast_scores.pkl",
+    "sha256": "efb0cdf98ef3b6f1787ee87e2ddf302a53c238206a7e8d71e8844c20380e8e53"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2025-08",
+    "part": "train",
+    "keep_month": "2025-05",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2025-05/segments_forecast_scores.pkl",
+    "sha256": "77d4140aeb35f2b11a39e96ff4f60ab57948c0f5bd12aefb91cc4b24b381923d"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2025-08",
+    "part": "valid",
+    "keep_month": "2025-06",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2025-08/segments_valid_scores.pkl",
+    "sha256": "284720fb5221588f944d0b7e7f4203d79f6c90c6d0a50c735e35e9e4c5cf1f2b"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2025-08",
+    "part": "valid",
+    "keep_month": "2025-07",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2025-08/segments_valid_scores.pkl",
+    "sha256": "284720fb5221588f944d0b7e7f4203d79f6c90c6d0a50c735e35e9e4c5cf1f2b"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2025-08",
+    "part": "test",
+    "keep_month": "2025-08",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2025-08/segments_forecast_scores.pkl",
+    "sha256": "9994262ab6d5130f334ebaf65cda783aa17b91acfd572b80586c77bc255c6aac"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2025-09",
+    "part": "train",
+    "keep_month": "2025-01",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2025-01/segments_forecast_scores.pkl",
+    "sha256": "d8a783cdd70f42aae9c0e54ac55f444a539dbdba9ab2cbbe8d03a652f16f9d6a"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2025-09",
+    "part": "train",
+    "keep_month": "2025-02",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2025-02/segments_forecast_scores.pkl",
+    "sha256": "d0c852475281e4decee5bdfc4c0f857d485f0350e076dfc1a485a73c7ddde189"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2025-09",
+    "part": "train",
+    "keep_month": "2025-03",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2025-03/segments_forecast_scores.pkl",
+    "sha256": "1dfd20ed712a009a6d168697cec7948aa201cf704144c36a57ba6067068f2efe"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2025-09",
+    "part": "train",
+    "keep_month": "2025-04",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2025-04/segments_forecast_scores.pkl",
+    "sha256": "efb0cdf98ef3b6f1787ee87e2ddf302a53c238206a7e8d71e8844c20380e8e53"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2025-09",
+    "part": "train",
+    "keep_month": "2025-05",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2025-05/segments_forecast_scores.pkl",
+    "sha256": "77d4140aeb35f2b11a39e96ff4f60ab57948c0f5bd12aefb91cc4b24b381923d"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2025-09",
+    "part": "train",
+    "keep_month": "2025-06",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2025-06/segments_forecast_scores.pkl",
+    "sha256": "e0d5680557590a29787d5d7d676900c41fb6c1ad32d5d9d9c674002d5ab33a51"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2025-09",
+    "part": "valid",
+    "keep_month": "2025-07",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2025-09/segments_valid_scores.pkl",
+    "sha256": "fa0e393f82eea75ec2292e2cac2f4012b3aa3c03c39c2e42617922fed3039659"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2025-09",
+    "part": "valid",
+    "keep_month": "2025-08",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2025-09/segments_valid_scores.pkl",
+    "sha256": "fa0e393f82eea75ec2292e2cac2f4012b3aa3c03c39c2e42617922fed3039659"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2025-09",
+    "part": "test",
+    "keep_month": "2025-09",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2025-09/segments_forecast_scores.pkl",
+    "sha256": "b21959781666ac52bfafe40dfbe5283361fb17609eeaa01e86041b797c0a9a68"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2025-10",
+    "part": "train",
+    "keep_month": "2025-02",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2025-02/segments_forecast_scores.pkl",
+    "sha256": "d0c852475281e4decee5bdfc4c0f857d485f0350e076dfc1a485a73c7ddde189"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2025-10",
+    "part": "train",
+    "keep_month": "2025-03",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2025-03/segments_forecast_scores.pkl",
+    "sha256": "1dfd20ed712a009a6d168697cec7948aa201cf704144c36a57ba6067068f2efe"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2025-10",
+    "part": "train",
+    "keep_month": "2025-04",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2025-04/segments_forecast_scores.pkl",
+    "sha256": "efb0cdf98ef3b6f1787ee87e2ddf302a53c238206a7e8d71e8844c20380e8e53"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2025-10",
+    "part": "train",
+    "keep_month": "2025-05",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2025-05/segments_forecast_scores.pkl",
+    "sha256": "77d4140aeb35f2b11a39e96ff4f60ab57948c0f5bd12aefb91cc4b24b381923d"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2025-10",
+    "part": "train",
+    "keep_month": "2025-06",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2025-06/segments_forecast_scores.pkl",
+    "sha256": "e0d5680557590a29787d5d7d676900c41fb6c1ad32d5d9d9c674002d5ab33a51"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2025-10",
+    "part": "train",
+    "keep_month": "2025-07",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2025-07/segments_forecast_scores.pkl",
+    "sha256": "c951baba4477013c9f0751b02d3b0dbafb71b55b55870d5f7d09ab118e0f932e"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2025-10",
+    "part": "valid",
+    "keep_month": "2025-08",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2025-10/segments_valid_scores.pkl",
+    "sha256": "5fa4a363e9df169b67f20cf40fc73a11f2b83c8d42733ed586c2d04986c1f3a8"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2025-10",
+    "part": "valid",
+    "keep_month": "2025-09",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2025-10/segments_valid_scores.pkl",
+    "sha256": "5fa4a363e9df169b67f20cf40fc73a11f2b83c8d42733ed586c2d04986c1f3a8"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2025-10",
+    "part": "test",
+    "keep_month": "2025-10",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2025-10/segments_forecast_scores.pkl",
+    "sha256": "16c54bf06effa226dc8a69f0bdd38afc5154836b332d6790db2f6d5917b6cb08"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2025-11",
+    "part": "train",
+    "keep_month": "2025-03",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2025-03/segments_forecast_scores.pkl",
+    "sha256": "1dfd20ed712a009a6d168697cec7948aa201cf704144c36a57ba6067068f2efe"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2025-11",
+    "part": "train",
+    "keep_month": "2025-04",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2025-04/segments_forecast_scores.pkl",
+    "sha256": "efb0cdf98ef3b6f1787ee87e2ddf302a53c238206a7e8d71e8844c20380e8e53"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2025-11",
+    "part": "train",
+    "keep_month": "2025-05",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2025-05/segments_forecast_scores.pkl",
+    "sha256": "77d4140aeb35f2b11a39e96ff4f60ab57948c0f5bd12aefb91cc4b24b381923d"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2025-11",
+    "part": "train",
+    "keep_month": "2025-06",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2025-06/segments_forecast_scores.pkl",
+    "sha256": "e0d5680557590a29787d5d7d676900c41fb6c1ad32d5d9d9c674002d5ab33a51"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2025-11",
+    "part": "train",
+    "keep_month": "2025-07",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2025-07/segments_forecast_scores.pkl",
+    "sha256": "c951baba4477013c9f0751b02d3b0dbafb71b55b55870d5f7d09ab118e0f932e"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2025-11",
+    "part": "train",
+    "keep_month": "2025-08",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2025-08/segments_forecast_scores.pkl",
+    "sha256": "9994262ab6d5130f334ebaf65cda783aa17b91acfd572b80586c77bc255c6aac"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2025-11",
+    "part": "valid",
+    "keep_month": "2025-09",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2025-11/segments_valid_scores.pkl",
+    "sha256": "212b9efc3af1cf7673fc41e0fd42dc7b483c69a37e0ad642982b6c754abbdd3a"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2025-11",
+    "part": "valid",
+    "keep_month": "2025-10",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2025-11/segments_valid_scores.pkl",
+    "sha256": "212b9efc3af1cf7673fc41e0fd42dc7b483c69a37e0ad642982b6c754abbdd3a"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2025-11",
+    "part": "test",
+    "keep_month": "2025-11",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2025-11/segments_forecast_scores.pkl",
+    "sha256": "b7cb1ecdb8fec6d0146f477ed3c127729e728563c8fc7f56742286cbefddcb16"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2025-12",
+    "part": "train",
+    "keep_month": "2025-04",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2025-04/segments_forecast_scores.pkl",
+    "sha256": "efb0cdf98ef3b6f1787ee87e2ddf302a53c238206a7e8d71e8844c20380e8e53"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2025-12",
+    "part": "train",
+    "keep_month": "2025-05",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2025-05/segments_forecast_scores.pkl",
+    "sha256": "77d4140aeb35f2b11a39e96ff4f60ab57948c0f5bd12aefb91cc4b24b381923d"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2025-12",
+    "part": "train",
+    "keep_month": "2025-06",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2025-06/segments_forecast_scores.pkl",
+    "sha256": "e0d5680557590a29787d5d7d676900c41fb6c1ad32d5d9d9c674002d5ab33a51"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2025-12",
+    "part": "train",
+    "keep_month": "2025-07",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2025-07/segments_forecast_scores.pkl",
+    "sha256": "c951baba4477013c9f0751b02d3b0dbafb71b55b55870d5f7d09ab118e0f932e"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2025-12",
+    "part": "train",
+    "keep_month": "2025-08",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2025-08/segments_forecast_scores.pkl",
+    "sha256": "9994262ab6d5130f334ebaf65cda783aa17b91acfd572b80586c77bc255c6aac"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2025-12",
+    "part": "train",
+    "keep_month": "2025-09",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2025-09/segments_forecast_scores.pkl",
+    "sha256": "b21959781666ac52bfafe40dfbe5283361fb17609eeaa01e86041b797c0a9a68"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2025-12",
+    "part": "valid",
+    "keep_month": "2025-10",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2025-12/segments_valid_scores.pkl",
+    "sha256": "dd39f54f99d3eb9a3da61f5cd13684f129f270c0ec60ef88ecefb532d6b2e09d"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2025-12",
+    "part": "valid",
+    "keep_month": "2025-11",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2025-12/segments_valid_scores.pkl",
+    "sha256": "dd39f54f99d3eb9a3da61f5cd13684f129f270c0ec60ef88ecefb532d6b2e09d"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2025-12",
+    "part": "test",
+    "keep_month": "2025-12",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2025-12/segments_forecast_scores.pkl",
+    "sha256": "f22acaeb55cd81b336dd7b83e83154136d629faee265c5fa4d8163a9a64dacb7"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2026-01",
+    "part": "train",
+    "keep_month": "2025-05",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2025-05/segments_forecast_scores.pkl",
+    "sha256": "77d4140aeb35f2b11a39e96ff4f60ab57948c0f5bd12aefb91cc4b24b381923d"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2026-01",
+    "part": "train",
+    "keep_month": "2025-06",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2025-06/segments_forecast_scores.pkl",
+    "sha256": "e0d5680557590a29787d5d7d676900c41fb6c1ad32d5d9d9c674002d5ab33a51"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2026-01",
+    "part": "train",
+    "keep_month": "2025-07",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2025-07/segments_forecast_scores.pkl",
+    "sha256": "c951baba4477013c9f0751b02d3b0dbafb71b55b55870d5f7d09ab118e0f932e"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2026-01",
+    "part": "train",
+    "keep_month": "2025-08",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2025-08/segments_forecast_scores.pkl",
+    "sha256": "9994262ab6d5130f334ebaf65cda783aa17b91acfd572b80586c77bc255c6aac"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2026-01",
+    "part": "train",
+    "keep_month": "2025-09",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2025-09/segments_forecast_scores.pkl",
+    "sha256": "b21959781666ac52bfafe40dfbe5283361fb17609eeaa01e86041b797c0a9a68"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2026-01",
+    "part": "train",
+    "keep_month": "2025-10",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2025-10/segments_forecast_scores.pkl",
+    "sha256": "16c54bf06effa226dc8a69f0bdd38afc5154836b332d6790db2f6d5917b6cb08"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2026-01",
+    "part": "valid",
+    "keep_month": "2025-11",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2026-01/segments_valid_scores.pkl",
+    "sha256": "dec0b2338e467184770d33c1c12440ccfa4d3e84f4667d1b65105debaf993bfb"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2026-01",
+    "part": "valid",
+    "keep_month": "2025-12",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2026-01/segments_valid_scores.pkl",
+    "sha256": "dec0b2338e467184770d33c1c12440ccfa4d3e84f4667d1b65105debaf993bfb"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2026-01",
+    "part": "test",
+    "keep_month": "2026-01",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2026-01/segments_forecast_scores.pkl",
+    "sha256": "16716a1dea345e849603ee3f503a87303544712a751432e8c90444aef2279b73"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2026-02",
+    "part": "train",
+    "keep_month": "2025-06",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2025-06/segments_forecast_scores.pkl",
+    "sha256": "e0d5680557590a29787d5d7d676900c41fb6c1ad32d5d9d9c674002d5ab33a51"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2026-02",
+    "part": "train",
+    "keep_month": "2025-07",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2025-07/segments_forecast_scores.pkl",
+    "sha256": "c951baba4477013c9f0751b02d3b0dbafb71b55b55870d5f7d09ab118e0f932e"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2026-02",
+    "part": "train",
+    "keep_month": "2025-08",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2025-08/segments_forecast_scores.pkl",
+    "sha256": "9994262ab6d5130f334ebaf65cda783aa17b91acfd572b80586c77bc255c6aac"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2026-02",
+    "part": "train",
+    "keep_month": "2025-09",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2025-09/segments_forecast_scores.pkl",
+    "sha256": "b21959781666ac52bfafe40dfbe5283361fb17609eeaa01e86041b797c0a9a68"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2026-02",
+    "part": "train",
+    "keep_month": "2025-10",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2025-10/segments_forecast_scores.pkl",
+    "sha256": "16c54bf06effa226dc8a69f0bdd38afc5154836b332d6790db2f6d5917b6cb08"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2026-02",
+    "part": "train",
+    "keep_month": "2025-11",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2025-11/segments_forecast_scores.pkl",
+    "sha256": "b7cb1ecdb8fec6d0146f477ed3c127729e728563c8fc7f56742286cbefddcb16"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2026-02",
+    "part": "valid",
+    "keep_month": "2025-12",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2026-02/segments_valid_scores.pkl",
+    "sha256": "d8fe115af47350298f343bccddf72e684272cdccc2217b47a4a23c70cbb44876"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2026-02",
+    "part": "valid",
+    "keep_month": "2026-01",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2026-02/segments_valid_scores.pkl",
+    "sha256": "d8fe115af47350298f343bccddf72e684272cdccc2217b47a4a23c70cbb44876"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2026-02",
+    "part": "test",
+    "keep_month": "2026-02",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2026-02/segments_forecast_scores.pkl",
+    "sha256": "ece30a63ae22a6c92ab4c22ddf58d6d55dc4055390b4fcfb473c20a0d5237f6f"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2026-03",
+    "part": "train",
+    "keep_month": "2025-07",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2025-07/segments_forecast_scores.pkl",
+    "sha256": "c951baba4477013c9f0751b02d3b0dbafb71b55b55870d5f7d09ab118e0f932e"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2026-03",
+    "part": "train",
+    "keep_month": "2025-08",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2025-08/segments_forecast_scores.pkl",
+    "sha256": "9994262ab6d5130f334ebaf65cda783aa17b91acfd572b80586c77bc255c6aac"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2026-03",
+    "part": "train",
+    "keep_month": "2025-09",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2025-09/segments_forecast_scores.pkl",
+    "sha256": "b21959781666ac52bfafe40dfbe5283361fb17609eeaa01e86041b797c0a9a68"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2026-03",
+    "part": "train",
+    "keep_month": "2025-10",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2025-10/segments_forecast_scores.pkl",
+    "sha256": "16c54bf06effa226dc8a69f0bdd38afc5154836b332d6790db2f6d5917b6cb08"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2026-03",
+    "part": "train",
+    "keep_month": "2025-11",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2025-11/segments_forecast_scores.pkl",
+    "sha256": "b7cb1ecdb8fec6d0146f477ed3c127729e728563c8fc7f56742286cbefddcb16"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2026-03",
+    "part": "train",
+    "keep_month": "2025-12",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2025-12/segments_forecast_scores.pkl",
+    "sha256": "f22acaeb55cd81b336dd7b83e83154136d629faee265c5fa4d8163a9a64dacb7"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2026-03",
+    "part": "valid",
+    "keep_month": "2026-01",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2026-03/segments_valid_scores.pkl",
+    "sha256": "02bec83dcdbdb2d431cfc2904488515b394b92a01816f80f97626c2dee028933"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2026-03",
+    "part": "valid",
+    "keep_month": "2026-02",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2026-03/segments_valid_scores.pkl",
+    "sha256": "02bec83dcdbdb2d431cfc2904488515b394b92a01816f80f97626c2dee028933"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2026-03",
+    "part": "test",
+    "keep_month": "2026-03",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2026-03/segments_forecast_scores.pkl",
+    "sha256": "ea01607cf8884fbebbccff03f20fc5ca49060aca598ff40ce98fbf3e82a3a4c3"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2026-04",
+    "part": "train",
+    "keep_month": "2025-08",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2025-08/segments_forecast_scores.pkl",
+    "sha256": "9994262ab6d5130f334ebaf65cda783aa17b91acfd572b80586c77bc255c6aac"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2026-04",
+    "part": "train",
+    "keep_month": "2025-09",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2025-09/segments_forecast_scores.pkl",
+    "sha256": "b21959781666ac52bfafe40dfbe5283361fb17609eeaa01e86041b797c0a9a68"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2026-04",
+    "part": "train",
+    "keep_month": "2025-10",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2025-10/segments_forecast_scores.pkl",
+    "sha256": "16c54bf06effa226dc8a69f0bdd38afc5154836b332d6790db2f6d5917b6cb08"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2026-04",
+    "part": "train",
+    "keep_month": "2025-11",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2025-11/segments_forecast_scores.pkl",
+    "sha256": "b7cb1ecdb8fec6d0146f477ed3c127729e728563c8fc7f56742286cbefddcb16"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2026-04",
+    "part": "train",
+    "keep_month": "2025-12",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2025-12/segments_forecast_scores.pkl",
+    "sha256": "f22acaeb55cd81b336dd7b83e83154136d629faee265c5fa4d8163a9a64dacb7"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2026-04",
+    "part": "train",
+    "keep_month": "2026-01",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2026-01/segments_forecast_scores.pkl",
+    "sha256": "16716a1dea345e849603ee3f503a87303544712a751432e8c90444aef2279b73"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2026-04",
+    "part": "valid",
+    "keep_month": "2026-02",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2026-04/segments_valid_scores.pkl",
+    "sha256": "9c040c8371cf5a8d35fb1964f53e75c904b446ef7285cff1bf1295c69de2ac1c"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2026-04",
+    "part": "valid",
+    "keep_month": "2026-03",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2026-04/segments_valid_scores.pkl",
+    "sha256": "9c040c8371cf5a8d35fb1964f53e75c904b446ef7285cff1bf1295c69de2ac1c"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2026-04",
+    "part": "test",
+    "keep_month": "2026-04",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2026-04/segments_forecast_scores.pkl",
+    "sha256": "3aa771c8dcc2cfd763117186bdfb1c78adf600968bc6faffc8d95a8bc0a143bf"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2026-05",
+    "part": "train",
+    "keep_month": "2025-09",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2025-09/segments_forecast_scores.pkl",
+    "sha256": "b21959781666ac52bfafe40dfbe5283361fb17609eeaa01e86041b797c0a9a68"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2026-05",
+    "part": "train",
+    "keep_month": "2025-10",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2025-10/segments_forecast_scores.pkl",
+    "sha256": "16c54bf06effa226dc8a69f0bdd38afc5154836b332d6790db2f6d5917b6cb08"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2026-05",
+    "part": "train",
+    "keep_month": "2025-11",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2025-11/segments_forecast_scores.pkl",
+    "sha256": "b7cb1ecdb8fec6d0146f477ed3c127729e728563c8fc7f56742286cbefddcb16"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2026-05",
+    "part": "train",
+    "keep_month": "2025-12",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2025-12/segments_forecast_scores.pkl",
+    "sha256": "f22acaeb55cd81b336dd7b83e83154136d629faee265c5fa4d8163a9a64dacb7"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2026-05",
+    "part": "train",
+    "keep_month": "2026-01",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2026-01/segments_forecast_scores.pkl",
+    "sha256": "16716a1dea345e849603ee3f503a87303544712a751432e8c90444aef2279b73"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2026-05",
+    "part": "train",
+    "keep_month": "2026-02",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2026-02/segments_forecast_scores.pkl",
+    "sha256": "ece30a63ae22a6c92ab4c22ddf58d6d55dc4055390b4fcfb473c20a0d5237f6f"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2026-05",
+    "part": "valid",
+    "keep_month": "2026-03",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2026-05/segments_valid_scores.pkl",
+    "sha256": "83c8a1876b28fd578983fe3e68c14fb55dc1e86ff6b3356614a84be4cc4af8bc"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2026-05",
+    "part": "valid",
+    "keep_month": "2026-04",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2026-05/segments_valid_scores.pkl",
+    "sha256": "83c8a1876b28fd578983fe3e68c14fb55dc1e86ff6b3356614a84be4cc4af8bc"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2026-05",
+    "part": "test",
+    "keep_month": "2026-05",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2026-05/segments_forecast_scores.pkl",
+    "sha256": "c8aec96fb7820e30b5435f494db7d8bad7a4bb3a291ab3823b07384947a58b40"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2026-06",
+    "part": "train",
+    "keep_month": "2025-10",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2025-10/segments_forecast_scores.pkl",
+    "sha256": "16c54bf06effa226dc8a69f0bdd38afc5154836b332d6790db2f6d5917b6cb08"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2026-06",
+    "part": "train",
+    "keep_month": "2025-11",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2025-11/segments_forecast_scores.pkl",
+    "sha256": "b7cb1ecdb8fec6d0146f477ed3c127729e728563c8fc7f56742286cbefddcb16"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2026-06",
+    "part": "train",
+    "keep_month": "2025-12",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2025-12/segments_forecast_scores.pkl",
+    "sha256": "f22acaeb55cd81b336dd7b83e83154136d629faee265c5fa4d8163a9a64dacb7"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2026-06",
+    "part": "train",
+    "keep_month": "2026-01",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2026-01/segments_forecast_scores.pkl",
+    "sha256": "16716a1dea345e849603ee3f503a87303544712a751432e8c90444aef2279b73"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2026-06",
+    "part": "train",
+    "keep_month": "2026-02",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2026-02/segments_forecast_scores.pkl",
+    "sha256": "ece30a63ae22a6c92ab4c22ddf58d6d55dc4055390b4fcfb473c20a0d5237f6f"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2026-06",
+    "part": "train",
+    "keep_month": "2026-03",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2026-03/segments_forecast_scores.pkl",
+    "sha256": "ea01607cf8884fbebbccff03f20fc5ca49060aca598ff40ce98fbf3e82a3a4c3"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2026-06",
+    "part": "valid",
+    "keep_month": "2026-04",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2026-06/segments_valid_scores.pkl",
+    "sha256": "87700e8ef3c1dacd34033112c075082ae70cefc0350f31c3d9d8df3bfb4cdf71"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2026-06",
+    "part": "valid",
+    "keep_month": "2026-05",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2026-06/segments_valid_scores.pkl",
+    "sha256": "87700e8ef3c1dacd34033112c075082ae70cefc0350f31c3d9d8df3bfb4cdf71"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2026-06",
+    "part": "test",
+    "keep_month": "2026-06",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2026-06/segments_forecast_scores.pkl",
+    "sha256": "7c5a57847c0cf1fe9fd1f5cb71c8c4049fc49b111bd1d85e9c699cb83763d2d4"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2026-07",
+    "part": "train",
+    "keep_month": "2025-11",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2025-11/segments_forecast_scores.pkl",
+    "sha256": "b7cb1ecdb8fec6d0146f477ed3c127729e728563c8fc7f56742286cbefddcb16"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2026-07",
+    "part": "train",
+    "keep_month": "2025-12",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2025-12/segments_forecast_scores.pkl",
+    "sha256": "f22acaeb55cd81b336dd7b83e83154136d629faee265c5fa4d8163a9a64dacb7"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2026-07",
+    "part": "train",
+    "keep_month": "2026-01",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2026-01/segments_forecast_scores.pkl",
+    "sha256": "16716a1dea345e849603ee3f503a87303544712a751432e8c90444aef2279b73"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2026-07",
+    "part": "train",
+    "keep_month": "2026-02",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2026-02/segments_forecast_scores.pkl",
+    "sha256": "ece30a63ae22a6c92ab4c22ddf58d6d55dc4055390b4fcfb473c20a0d5237f6f"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2026-07",
+    "part": "train",
+    "keep_month": "2026-03",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2026-03/segments_forecast_scores.pkl",
+    "sha256": "ea01607cf8884fbebbccff03f20fc5ca49060aca598ff40ce98fbf3e82a3a4c3"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2026-07",
+    "part": "train",
+    "keep_month": "2026-04",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2026-04/segments_forecast_scores.pkl",
+    "sha256": "3aa771c8dcc2cfd763117186bdfb1c78adf600968bc6faffc8d95a8bc0a143bf"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2026-07",
+    "part": "valid",
+    "keep_month": "2026-05",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2026-07/segments_valid_scores.pkl",
+    "sha256": "66de9b75d444e46fc50e455b2b273370e4c421267a490735e7e56556735dfc78"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2026-07",
+    "part": "valid",
+    "keep_month": "2026-06",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2026-07/segments_valid_scores.pkl",
+    "sha256": "66de9b75d444e46fc50e455b2b273370e4c421267a490735e7e56556735dfc78"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2026-07",
+    "part": "test",
+    "keep_month": "2026-07",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2026-07/segments_forecast_scores.pkl",
+    "sha256": "94858592e37b20f8f44536485d2094dbab86e1c8cc8ec87333be45a34c63b00e"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2026-08",
+    "part": "train",
+    "keep_month": "2025-12",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2025-12/segments_forecast_scores.pkl",
+    "sha256": "f22acaeb55cd81b336dd7b83e83154136d629faee265c5fa4d8163a9a64dacb7"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2026-08",
+    "part": "train",
+    "keep_month": "2026-01",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2026-01/segments_forecast_scores.pkl",
+    "sha256": "16716a1dea345e849603ee3f503a87303544712a751432e8c90444aef2279b73"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2026-08",
+    "part": "train",
+    "keep_month": "2026-02",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2026-02/segments_forecast_scores.pkl",
+    "sha256": "ece30a63ae22a6c92ab4c22ddf58d6d55dc4055390b4fcfb473c20a0d5237f6f"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2026-08",
+    "part": "train",
+    "keep_month": "2026-03",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2026-03/segments_forecast_scores.pkl",
+    "sha256": "ea01607cf8884fbebbccff03f20fc5ca49060aca598ff40ce98fbf3e82a3a4c3"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2026-08",
+    "part": "train",
+    "keep_month": "2026-04",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2026-04/segments_forecast_scores.pkl",
+    "sha256": "3aa771c8dcc2cfd763117186bdfb1c78adf600968bc6faffc8d95a8bc0a143bf"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2026-08",
+    "part": "train",
+    "keep_month": "2026-05",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2026-05/segments_forecast_scores.pkl",
+    "sha256": "c8aec96fb7820e30b5435f494db7d8bad7a4bb3a291ab3823b07384947a58b40"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2026-08",
+    "part": "valid",
+    "keep_month": "2026-06",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2026-08/segments_valid_scores.pkl",
+    "sha256": "ca7092d85db926bfaf91b96881ccbaf48aecfbbf1eb295a5bb1009f0582a6ce3"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2026-08",
+    "part": "valid",
+    "keep_month": "2026-07",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2026-08/segments_valid_scores.pkl",
+    "sha256": "ca7092d85db926bfaf91b96881ccbaf48aecfbbf1eb295a5bb1009f0582a6ce3"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2026-08",
+    "part": "test",
+    "keep_month": "2026-08",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2026-08/segments_forecast_scores.pkl",
+    "sha256": "21471ec5402ea18929c3aeabcd08d54bdea9cc2427317612dfe15538f15475c8"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2026-09",
+    "part": "train",
+    "keep_month": "2026-01",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2026-01/segments_forecast_scores.pkl",
+    "sha256": "16716a1dea345e849603ee3f503a87303544712a751432e8c90444aef2279b73"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2026-09",
+    "part": "train",
+    "keep_month": "2026-02",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2026-02/segments_forecast_scores.pkl",
+    "sha256": "ece30a63ae22a6c92ab4c22ddf58d6d55dc4055390b4fcfb473c20a0d5237f6f"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2026-09",
+    "part": "train",
+    "keep_month": "2026-03",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2026-03/segments_forecast_scores.pkl",
+    "sha256": "ea01607cf8884fbebbccff03f20fc5ca49060aca598ff40ce98fbf3e82a3a4c3"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2026-09",
+    "part": "train",
+    "keep_month": "2026-04",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2026-04/segments_forecast_scores.pkl",
+    "sha256": "3aa771c8dcc2cfd763117186bdfb1c78adf600968bc6faffc8d95a8bc0a143bf"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2026-09",
+    "part": "train",
+    "keep_month": "2026-05",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2026-05/segments_forecast_scores.pkl",
+    "sha256": "c8aec96fb7820e30b5435f494db7d8bad7a4bb3a291ab3823b07384947a58b40"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2026-09",
+    "part": "train",
+    "keep_month": "2026-06",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2026-06/segments_forecast_scores.pkl",
+    "sha256": "7c5a57847c0cf1fe9fd1f5cb71c8c4049fc49b111bd1d85e9c699cb83763d2d4"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2026-09",
+    "part": "valid",
+    "keep_month": "2026-07",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2026-09/segments_valid_scores.pkl",
+    "sha256": "a9e0dc8e854448e0211bd572d21c78128e8422fdd33565dff1b04429faee551a"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2026-09",
+    "part": "valid",
+    "keep_month": "2026-08",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2026-09/segments_valid_scores.pkl",
+    "sha256": "a9e0dc8e854448e0211bd572d21c78128e8422fdd33565dff1b04429faee551a"
+  },
+  {
+    "variant": "D3S2",
+    "month": "2026-09",
+    "part": "test",
+    "keep_month": "2026-09",
+    "path": "outputs/stock_automl/b2_daily_gap3_full_r51_20261020/daily3/2026-09/segments_forecast_scores.pkl",
+    "sha256": "947963b9eebb60e1d27b49993f82546846183a87982d0b4083ee2864276f577c"
+  }
+]
