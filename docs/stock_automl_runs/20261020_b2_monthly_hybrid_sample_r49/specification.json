@@ -1,0 +1,51 @@
+{
+  "name": "R49 exploratory monthly daily6+1 shape6+2 paired sample",
+  "months": [
+    "2024-04",
+    "2024-08",
+    "2024-10",
+    "2024-11",
+    "2025-03",
+    "2025-04",
+    "2025-06",
+    "2025-12",
+    "2026-06",
+    "2026-09"
+  ],
+  "selection": "predeclared original B2 high/low months before reading hybrid test results",
+  "daily": "R34 RF51 monthly fit 6 months, validate one month; validation does not choose daily model",
+  "shape": "original 79 four-K rules, 6 months causal historical top1 training, 2 months validation",
+  "sources": {
+    "outputs/stock_automl/b2_full_2024_r34_20261019/enriched.pkl": "69d10d10dff264a2ae953ce92b4bf91eca427d344fcce587988575be88fb178d",
+    "outputs/stock_automl/b2_full_2024_r34_20261019/first10.pkl": "86f30578d03e0e365668f3e70e296071cf296f3b20e93c4b4200ef79df995259",
+    "outputs/stock_automl/b2_two_month_2024_r35_20261019/enriched.pkl": "46e7367efe6c0b53c3ef1376560ef2b3374742e892126289ee341542edc817da",
+    "outputs/stock_automl/b2_two_month_2024_r35_20261019/first10.pkl": "553b337b4a5ec7419fcaadde3f846ef9dc76a6f59b61f79c01a2507ba1bc6390",
+    "outputs/stock_automl/b2_two_month_2024_r35_20261019/signals.pkl": "4bac8813bab12dcc00603fb8ae23bf48b33a19e4424e2953b007c5a72ccf2bee",
+    "outputs/stock_automl/b2_two_month_2024_r35_20261019/rules_frozen.json": "e9c6e38fc7a3d8d41c4657856750756365f357edec7ab2fca095c159f7de0d3b",
+    "outputs/stock_automl/b2_full_2024_r34_20261019/panel.pkl": "c710c3003c19b36bc589abefafa485bbc6323545ff1e2cbc0b1ee6e28d8ec819",
+    "outputs/stock_automl/b2_full_2024_r34_20261019/calendar.json": "3c78b65ecc61bf98f2a0108d9912becfa22f6b9dd6baa8b57f2e42e59489d518"
+  },
+  "daily_models": {
+    "2024-03": "93b45348a049f3ee5e33ac9f4d8dc664fab09b9e13dbec36f8a86ccf4ca0a849",
+    "2024-04": "f748b42413a8cc5b8b522908dfa1c084e4d2de9d96a7d56dd2f95e8d7c532256",
+    "2024-07": "d4babee8274ebaa3d7631d2a8c4192e991827521b5ed0125aabfcf98373c49e0",
+    "2024-08": "27e5ffb288e206ced5c3d0dcf4fed132a74387627b39095663c5c01724f3d29f",
+    "2024-09": "52e211981fd07825bdcd012d0cbd14292fd35e663d361797509666c97d1212db",
+    "2024-10": "852e8bff5a4a31114675f6da14bc85b1567fb552243546912c2356c5cb80accd",
+    "2024-11": "1251be116995b7a033e94a99de622c030d0d5e59bd9220c1ba666854af3abd9e",
+    "2025-02": "6f4f73feff29363f72e7a93bd228bfe7ac9961056f175a3ed2fb719161c83beb",
+    "2025-03": "4be83179901a3deeb5648ff0d5b186e5454f6d830288f69ade4bd59a1882134f",
+    "2025-04": "0a5d64e24451141bdbafcc9754975fd6820995f85bd5f8182586e777464fde8d",
+    "2025-05": "a0135a2852a12c9b3ee4c1321430a32fda2a0cef7ae6066196c6c3e441a3ec73",
+    "2025-06": "c3de56afe40650179201a6ce0d959f88fea25804abdab18a45f254cdf2a9d7fe",
+    "2025-11": "08a8f07be84d33411162240585bfddf47d3c69747984eb578f10147f6edb20f3",
+    "2025-12": "0b1e17619a94d23613088236fea8054c8817e6a201b99e7309ae63eba343c4d6",
+    "2026-05": "3c1a15fb3f53d5ce88e07b3b11160a414d2237c435311b5ff467305c8b553fc7",
+    "2026-06": "d9a199962842f3a30eeb04b639445f447b060722cef2963934efc6b821d4c770",
+    "2026-08": "2b69a5ce309be49fe6960db4e61cb8ada126df64351619c5554f4d20d5dc4fca",
+    "2026-09": "428112bda6070345ce6021b388825de416c85c262b67eefaec650a4c7a2b8f9c"
+  },
+  "execution": "D0 Top3; D1 four bars; 09:35-09:40 next qualifying open; D2 close; 0.1% each side",
+  "account": "Each target D0 month is an independent 1m account cohort, half cash when flat, all free cash if carrying; finish last D2; no shadow gate because sampled months are non-contiguous",
+  "production_changed": false
+}

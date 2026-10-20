@@ -1,0 +1,92 @@
+[
+  {
+    "month": "2024-04",
+    "common_trades": 2,
+    "hybrid_only": 12,
+    "baseline_only": 3,
+    "same_rule": false,
+    "hybrid_rule": "all",
+    "baseline_rule": "r051"
+  },
+  {
+    "month": "2024-08",
+    "common_trades": 6,
+    "hybrid_only": 5,
+    "baseline_only": 3,
+    "same_rule": false,
+    "hybrid_rule": "r007",
+    "baseline_rule": "r051"
+  },
+  {
+    "month": "2024-10",
+    "common_trades": 5,
+    "hybrid_only": 3,
+    "baseline_only": 5,
+    "same_rule": true,
+    "hybrid_rule": "all",
+    "baseline_rule": "all"
+  },
+  {
+    "month": "2024-11",
+    "common_trades": 8,
+    "hybrid_only": 4,
+    "baseline_only": 6,
+    "same_rule": true,
+    "hybrid_rule": "all",
+    "baseline_rule": "all"
+  },
+  {
+    "month": "2025-03",
+    "common_trades": 8,
+    "hybrid_only": 5,
+    "baseline_only": 11,
+    "same_rule": false,
+    "hybrid_rule": "r029",
+    "baseline_rule": "all"
+  },
+  {
+    "month": "2025-04",
+    "common_trades": 6,
+    "hybrid_only": 10,
+    "baseline_only": 9,
+    "same_rule": true,
+    "hybrid_rule": "all",
+    "baseline_rule": "all"
+  },
+  {
+    "month": "2025-06",
+    "common_trades": 12,
+    "hybrid_only": 6,
+    "baseline_only": 7,
+    "same_rule": false,
+    "hybrid_rule": "r029",
+    "baseline_rule": "r028"
+  },
+  {
+    "month": "2025-12",
+    "common_trades": 2,
+    "hybrid_only": 10,
+    "baseline_only": 7,
+    "same_rule": false,
+    "hybrid_rule": "r051",
+    "baseline_rule": "r026"
+  },
+  {
+    "month": "2026-06",
+    "common_trades": 3,
+    "hybrid_only": 10,
+    "baseline_only": 6,
+    "same_rule": false,
+    "hybrid_rule": "r019",
+    "baseline_rule": "r011"
+  },
+  {
+    "month": "2026-09",
+    "common_trades": 2,
+    "hybrid_only": 11,
+    "baseline_only": 14,
+    "same_rule": false,
+    "hybrid_rule": "r017",
+    "baseline_rule": "r001"
+  }
+]
