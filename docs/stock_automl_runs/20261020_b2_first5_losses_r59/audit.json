@@ -1,0 +1,15 @@
+{
+  "source_hashes": {
+    "docs/stock_automl_runs/20261020_b2_sum_loss_r57/逐月.csv": "d379e6a4a527249dbde2673cadbac93ba6dc5eb285c8fc30967130040ce1fb14",
+    "outputs/stock_automl/b2_2022_minute_r41_20261019/signals.pkl": "da2aae9be809f4987df67d8d39e6e88ddfa0621646c050770113b352c7ca9441",
+    "outputs/stock_automl/b2_2022_minute_r41_20261019/calendar.json": "74beda67d788b7b5ee89e381f110d7725d51e8141664fa129a45641815a6512d"
+  },
+  "R57_full_pause_account_replayed_exact": true,
+  "active_months": 14,
+  "first_five_trades": 70,
+  "triggered_months": 6,
+  "fourth_trade_decisions": 3,
+  "fifth_trade_decisions": 3,
+  "triggered_months_eventually_negative": 1,
+  "decision_requires_D2_close": true
+}
