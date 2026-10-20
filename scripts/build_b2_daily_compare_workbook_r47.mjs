@@ -62,17 +62,17 @@ overview.getRange("A14").values = [["三日再板率与 D2 笔均费后按该账
 overview.getRange("A14").format.font = { name: "Arial", size: 10, italic: true, color: muted };
 overview.getRange("A16").values = [["逐年账户结果"]];
 overview.getRange("A16").format.font = { name: "Arial", size: 12, bold: true, color: navy };
-const annualHeaders = ["年份", "方案", "停手", "买入笔数", "年初资产", "年末资产", "年收益", "年内回撤", "年化夏普", "D1-D3再板", "D2笔均费后"];
-overview.getRange("A18:K18").values = [annualHeaders];
-overview.getRange("A18:K18").format = { fill: navy, font: { name: "Arial", size: 10, bold: true, color: "#FFFFFF" } };
-overview.getRange("A18:K18").format.horizontalAlignment = "center";
-overview.getRangeByIndexes(18, 0, data.yearly.length, 11).values = data.yearly;
-overview.getRangeByIndexes(18, 0, data.yearly.length, 11).format.font = { name: "Arial", size: 10, color: "#22313A" };
+const annualHeaders = ["年份", "方案", "停手", "买入笔数", "年初资产", "年末资产", "年收益", "年内回撤", "年化夏普", "D1-D3再板", "D2笔均费后", "D2亏超5%"];
+overview.getRange("A18:L18").values = [annualHeaders];
+overview.getRange("A18:L18").format = { fill: navy, font: { name: "Arial", size: 10, bold: true, color: "#FFFFFF" } };
+overview.getRange("A18:L18").format.horizontalAlignment = "center";
+overview.getRangeByIndexes(18, 0, data.yearly.length, 12).values = data.yearly;
+overview.getRangeByIndexes(18, 0, data.yearly.length, 12).format.font = { name: "Arial", size: 10, color: "#22313A" };
 for (const col of [4, 5]) overview.getRangeByIndexes(18, col, data.yearly.length, 1).format.numberFormat = cash;
 for (const col of [6, 7]) overview.getRangeByIndexes(18, col, data.yearly.length, 1).format.numberFormat = pct;
 overview.getRangeByIndexes(18, 8, data.yearly.length, 1).format.numberFormat = "0.00";
-for (const col of [9, 10]) overview.getRangeByIndexes(18, col, data.yearly.length, 1).format.numberFormat = pct;
-overview.getRange("K:K").format.columnWidth = 17;
+for (const col of [9, 10, 11]) overview.getRangeByIndexes(18, col, data.yearly.length, 1).format.numberFormat = pct;
+overview.getRange("K:L").format.columnWidth = 17;
 
 const monthlySheet = sheet("逐月", "按持仓日历月统计", ["月份", "方案", "停手", "买入笔数", "月初资产", "月末资产", "月收益", "月内回撤", "月夏普", "买卖费用"],
   data.monthly, [15, 23, 13, 13, 17, 17, 13, 13, 13, 15],
@@ -83,7 +83,7 @@ sheet("分类效果", "D1—D3 再板与 D2 实际收益", ["方案", "阶段", 
   data.classification, [23, 18, 13, 17, 17, 17], [[3, pct], [4, pct], [5, pct]]);
 const training = sheet("模型训练", "日线与四 K 每日重训的月度摘要", ["月份", "方案", "重训日数", "日线训练均数", "日线验开板Top1", "四K训练均数", "四K验证均数", "沿用D0排名", "选择Ridge", "训练机会收益", "验证机会收益", "排名验证收益"],
   data.shape_models, [15, 23, 13, 15, 18, 15, 15, 15, 13, 17, 17, 17], [[4, pct], [9, pct], [10, pct], [11, pct]], 0);
-training.getRange("A3").values = [["每日窗口互相重叠；排名基准为 D0 排名最前的唯一预选，实际收益看总览和逐月。"]];
+training.getRange("A3").values = [["机会收益按有候选日均值，未买记 0；窗口重叠，排名基准为 D0 首位，实际账户看总览。"]];
 training.getRange("A3").format.font = { name: "Arial", size: 10, italic: true, color: muted };
 const tradeSheet = sheet("逐笔成交", "账户实际买入明细", ["D1日期", "方案", "停手", "D0名次", "D0评分", "形态模型", "四K最高涨幅", "四K最低涨幅", "四K实体涨幅", "买入时刻", "买入价", "投入金额", "卖出日期", "卖出价", "费后收益", "D1-D3再板"],
   data.ledger, [16, 23, 13, 11, 13, 15, 17, 17, 17, 13, 13, 16, 16, 13, 14, 12],
@@ -100,7 +100,7 @@ wb.recalculate();
 const scan = await wb.inspect({ kind: "match", searchTerm: "#REF!|#DIV/0!|#VALUE!|#NAME\\?|#N/A|#NUM!|#NULL!|#SPILL!|#CALC!",
   options: { useRegex: true, maxResults: 50 }, maxChars: 2000 });
 console.log(scan.ndjson);
-const preview = await wb.render({ sheetName: "总览", range: "A1:K53", scale: 1.2, format: "png" });
+const preview = await wb.render({ sheetName: "总览", range: "A1:L53", scale: 1.2, format: "png" });
 await fs.writeFile(path.join(root, "workbook_preview.png"), new Uint8Array(await preview.arrayBuffer()));
 const output = await SpreadsheetFile.exportXlsx(wb);
 const filename = path.join(root, "B2_日更模型_三方案对比_R46-R47_20261020.xlsx");

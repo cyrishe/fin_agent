@@ -69,7 +69,8 @@ def main() -> None:
                       x['entries'], x['opening_nav'], x['closing_nav'], x['return_'],
                       x['drawdown'], x['sharpe'],
                       float(known.label_3.mean()) if len(known) else None,
-                      float(closed.mean()) if len(closed) else None])
+                      float(closed.mean()) if len(closed) else None,
+                      float(closed.lt(-.05).mean()) if len(closed) else None])
     years.sort(key=lambda row: (row[0], row[1], row[2]))
     months = [[x['month'], PLAN_NAMES[x['plan']], GATE_NAMES[x['gate']],
                x['entries'], x['opening_nav'], x['closing_nav'], x['return_'],

@@ -116,7 +116,7 @@ def minute_cache() -> tuple[pd.DataFrame, dict]:
             for key, group in raw.groupby(KEY):
                 bars.setdefault(key, group)
     cache = pd.concat(facts, ignore_index=True).drop_duplicates(
-        ['symbol', 'd1_date'], keep='first').set_index(['symbol', 'd1_date'])
+        ['symbol', 'd1_date'], keep='first').set_index(['symbol', 'd1_date']).sort_index()
     return cache, bars
 
 
@@ -458,7 +458,9 @@ def report() -> None:
                 hits=int(rows.label_3.sum()),
                 hit=float(rows.label_3.mean()) if len(rows) else None))
     for mode in daily.MODES:
-        q = enriched[enriched.variant.eq(mode) & enriched.d1_date.between(START, last_entry_day)]
+        q = enriched[enriched.variant.eq(mode)
+                     & enriched.d0_date.between(START, last_forecast_day)
+                     & enriched.d1_date.between(START, last_entry_day)]
         for k in (1, 3):
             for stage, opened in [('全量', False), ('D1开盘打开', True)]:
                 x = q[q.d0_rank.le(k) & q.observed_3
