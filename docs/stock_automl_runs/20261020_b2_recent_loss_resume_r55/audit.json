@@ -1,6 +1,7 @@
 {
   "source_signals": "da2aae9be809f4987df67d8d39e6e88ddfa0621646c050770113b352c7ca9441",
   "baseline_replayed_exact": true,
+  "gate_rule": "both_negative",
   "months": 41,
   "shadow_signals": 543,
   "gate_months": 17,

@@ -1,0 +1,19 @@
+{
+  "source_signals": "da2aae9be809f4987df67d8d39e6e88ddfa0621646c050770113b352c7ca9441",
+  "baseline_replayed_exact": true,
+  "gate_rule": "sum_negative",
+  "months": 41,
+  "shadow_signals": 543,
+  "gate_months": 22,
+  "previous_month_zero_candidate_pauses": true,
+  "previous_month_zero_candidate_unit_checked": true,
+  "previous_month_zero_candidate_observed": 0,
+  "previous_month_candidate_min": 5,
+  "no_buy_on_trigger_trade": true,
+  "all_resumed_buys_after_trigger_close": true,
+  "baseline_superset_resume_superset_full_pause": true,
+  "fee_rate": 0.001,
+  "manual_labels_sha256": "609348bc8864cbb7931246d2b1292692131cc3956cb16993aef21c07b6bc0074",
+  "manual_labels_matched": 31,
+  "manual_labels_total": 31
+}

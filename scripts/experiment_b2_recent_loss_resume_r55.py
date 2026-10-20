@@ -1,4 +1,4 @@
-"""Frozen monthly B2; pause on prior-month last 5/10-day losses, then optionally resume."""
+"""Replay frozen monthly B2 with either the legacy R55 or corrected R57 gate."""
 from __future__ import annotations
 
 import json
@@ -28,12 +28,18 @@ def prior_return(nav: pd.DataFrame, previous_month: str, n: int) -> float | None
 
 
 def should_pause(previous_candidates: int | None, r5: float | None,
-                 r10: float | None) -> bool:
+                 r10: float | None, rule: str = "both_negative") -> bool:
     if previous_candidates is None:
         return False
     if previous_candidates == 0:
         return True
-    return bool(r5 is not None and r10 is not None and r5 < 0 and r10 < 0)
+    if r5 is None or r10 is None:
+        return False
+    if rule == "both_negative":
+        return r5 < 0 and r10 < 0
+    if rule == "sum_negative":
+        return r5 + r10 < 0
+    raise ValueError(f"Unknown gate rule: {rule}")
 
 
 def first_shadow_win_cross(ledger: pd.DataFrame, month: str) -> dict | None:
@@ -49,14 +55,17 @@ def first_shadow_win_cross(ledger: pd.DataFrame, month: str) -> dict | None:
     return None
 
 
-def main() -> None:
+def main(*, gate_rule: str = "both_negative", out: Path = OUT) -> None:
     assert should_pause(0, -.01, -.02)
     assert should_pause(0, 0, 0)
     assert should_pause(0, None, None)
     assert not should_pause(None, -.01, -.02)
     assert not should_pause(1, 0, -.02)
     assert should_pause(1, -.01, -.02)
-    OUT.mkdir(parents=True, exist_ok=True)
+    assert should_pause(1, .01, -.02, "sum_negative")
+    assert not should_pause(1, .02, -.01, "sum_negative")
+    assert not should_pause(1, .01, -.01, "sum_negative")
+    out.mkdir(parents=True, exist_ok=True)
     paths = [SOURCE / "signals.pkl", SOURCE / "calendar.json", REFERENCE]
     frame = pd.read_pickle(paths[0]); calendar = json.loads(paths[1].read_text())
     signals = frame[frame.d1_date.between(START, END)].sort_values("d1_date").copy()
@@ -78,7 +87,7 @@ def main() -> None:
         previous_candidates = shadow_candidate_count.get(prev, 0) if prev else None
         r5 = prior_return(paper_nav, prev, 5) if prev else None
         r10 = prior_return(paper_nav, prev, 10) if prev else None
-        pause = should_pause(previous_candidates, r5, r10)
+        pause = should_pause(previous_candidates, r5, r10, gate_rule)
         cross = first_shadow_win_cross(paper_ledger, month)
         month_gate[month] = dict(前月=prev, 前月候选数=previous_candidates,
                                  前月末5日=r5, 前月末10日=r10,
@@ -162,7 +171,9 @@ def main() -> None:
             assert not rejected
             start_rows.append(dict(起点=start[:7], 方案=name, 买入=account["entries"],
                                    总收益=account["total_return"],
-                                   最大回撤=account["max_drawdown"], 年化夏普=account["sharpe"]))
+                                   最大回撤=account["max_drawdown"], 年化夏普=account["sharpe"],
+                                   D2费后胜率=account["closed_win_rate"],
+                                   D2费后笔均=account["closed_mean_return"]))
     starts = pd.DataFrame(start_rows)
     assert len(monthly_df) == len(months) == 41
     assert monthly_df.前月候选数.dropna().gt(0).all()
@@ -172,13 +183,14 @@ def main() -> None:
         assert np.isclose(np.prod(1 + monthly_df[name+"月收益"]) - 1,
                           variants[name][0]["total_return"])
     assert decisions.全月暂停买入.sum() <= decisions.胜率恢复买入.sum() <= len(signals)
-    results.to_csv(OUT / "总体.csv", index=False, encoding="utf-8-sig")
-    monthly_df.to_csv(OUT / "逐月.csv", index=False, encoding="utf-8-sig")
-    yearly.to_csv(OUT / "逐年.csv", index=False, encoding="utf-8-sig")
-    starts.to_csv(OUT / "不同起点.csv", index=False, encoding="utf-8-sig")
-    decisions.to_csv(OUT / "逐笔候选.csv", index=False, encoding="utf-8-sig")
-    dump(OUT / "sources.json", [{"file": str(path), "sha256": sha(path)} for path in paths])
-    dump(OUT / "audit.json", dict(source_signals=sha(paths[0]), baseline_replayed_exact=True,
+    results.to_csv(out / "总体.csv", index=False, encoding="utf-8-sig")
+    monthly_df.to_csv(out / "逐月.csv", index=False, encoding="utf-8-sig")
+    yearly.to_csv(out / "逐年.csv", index=False, encoding="utf-8-sig")
+    starts.to_csv(out / "不同起点.csv", index=False, encoding="utf-8-sig")
+    decisions.to_csv(out / "逐笔候选.csv", index=False, encoding="utf-8-sig")
+    dump(out / "sources.json", [{"file": str(path), "sha256": sha(path)} for path in paths])
+    dump(out / "audit.json", dict(source_signals=sha(paths[0]), baseline_replayed_exact=True,
+                                   gate_rule=gate_rule,
                                    months=len(months), shadow_signals=len(signals),
                                    gate_months=int(monthly_df.月初暂停.sum()),
                                    previous_month_zero_candidate_pauses=True,

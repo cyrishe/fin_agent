@@ -5,7 +5,9 @@ import { Workbook, SpreadsheetFile } from "@oai/artifact-tool";
 
 const root = process.env.B2_R55_OUTPUT_DIR ??
   "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261020_b2_recent_loss_resume_r55";
-const out = path.join(root, "B2_近5_10日亏损停手_R55_20261020.xlsx");
+const sumGate = process.env.B2_GATE_MODE === "sum_negative";
+const out = path.join(root, sumGate ? "B2_末5_10日收益和停手_R57_20261020.xlsx" :
+  "B2_近5_10日亏损停手_R55_20261020.xlsx");
 const wb = Workbook.create();
 
 async function rows(file, names, numeric = [], dates = []) {
@@ -73,24 +75,29 @@ function table(sheet, startRow, matrix, formats = {}) {
 
 const totalKeys = ["方案", "信号", "买入", "跳过", "总收益", "最大回撤", "年化夏普",
   "D2费后胜率", "D2费后笔均", "期末资金", "交易费"];
-const startKeys = ["起点", "方案", "买入", "总收益", "最大回撤", "年化夏普"];
+const startKeys = ["起点", "方案", "买入", "总收益", "最大回撤", "年化夏普",
+  "D2费后胜率", "D2费后笔均"];
 const total = await rows("总体.csv", totalKeys, totalKeys.filter((x) => x !== "方案"));
 const starts = await rows("不同起点.csv", startKeys,
-  ["买入", "总收益", "最大回撤", "年化夏普"]);
+  ["买入", "总收益", "最大回撤", "年化夏普", "D2费后胜率", "D2费后笔均"]);
 const years = await rows("逐年.csv", ["方案", "年份", "买入", "收益", "最大回撤"],
   ["年份", "买入", "收益", "最大回撤"]);
 const overview = wb.worksheets.add("总览");
 overview.showGridLines = false;
-overview.getRange("A2").values = [["B2 近 5／10 日亏损停手回测"]];
+overview.getRange("A2").values = [[sumGate ? "B2 末 5／10 日收益和停手回测" :
+  "B2 近 5／10 日亏损停手回测"]];
 overview.getRange("A2").format.font = { name: "Arial", size: 14, bold: true, color: "#153D4B" };
-overview.getRange("A3").values = [["原 B2 月模型；上月两窗口均亏或零候选则停。恢复方案仅在当月影子 D2 胜率超过 50% 后买下一笔。"]];
+overview.getRange("A3").values = [[sumGate ?
+  "原 B2 月模型；上月末 5 日＋10 日收益之和为负或零候选则停；恢复方案在影子 D2 胜率超过 50% 后买下一笔。" :
+  "原 B2 月模型；上月两窗口均亏或零候选则停。恢复方案仅在当月影子 D2 胜率超过 50% 后买下一笔。"]];
 overview.getRange("A3").format.font = { name: "Arial", size: 10, italic: true, color: "#536471" };
 table(overview, 5, total, { signed: ["总收益", "D2费后笔均"],
   unsigned: ["最大回撤", "D2费后胜率"], money: ["期末资金", "交易费"],
   decimals3: ["年化夏普"] });
 overview.getRange("A10").values = [["不同起点：门槛始终用 2023-05 起的完整影子历史"]];
 overview.getRange("A10").format.font = { name: "Arial", size: 11, bold: true, color: "#153D4B" };
-table(overview, 11, starts, { signed: ["总收益"], unsigned: ["最大回撤"],
+table(overview, 11, starts, { signed: ["总收益", "D2费后笔均"],
+  unsigned: ["最大回撤", "D2费后胜率"],
   decimals3: ["年化夏普"] });
 overview.getRange("A26").values = [["逐年：同一账户连续运行，年初不重置"]];
 overview.getRange("A26").format.font = { name: "Arial", size: 11, bold: true, color: "#153D4B" };
