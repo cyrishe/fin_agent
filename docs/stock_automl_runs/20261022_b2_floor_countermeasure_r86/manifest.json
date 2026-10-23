@@ -1,0 +1,21 @@
+{
+  "sources_sha256": {
+    "R74_factors": "534db8207d3a69738b349154d72f927baa092af479747ab8cf5b812198efe9ef",
+    "R75_predictions": "2deaa1bfa8aab76fc73cc27159b5def32248093173fedb02dd66cbe582e9a03b",
+    "R76_joined": "0f953e31e8ed57fd6167f8092b8e5e304d0de5c8389acc07659c0f2dafec92c8",
+    "R79_D2_touch": "f40721018bc6aaa37faa044897d703eb719b4ad790e50d7bd6dab0cab50b9698",
+    "R84_D1_bars": "7d485cd4b2f34dc0f713c2e510b0b01436074c72bf295885f1c08416378c10c2",
+    "R85_D1_prebuy": "14e841ac65ed22c4c6935b220e6b6424dd1c31a866d4c6f5fa1c974c7a2337ff"
+  },
+  "outputs_sha256": {
+    "analyze.py": "f3c73bf89beea8d7c45687163169042265096247f15dd239f76fa292f2aaf24f",
+    "run.log": "e217727d15152ac93544591734b3165adead8e694532dbf6d0f0b99a4e825731",
+    "买前策略分期_跌停与经济得失.csv": "d7d9506373619f841fe8ad5df4bad63b8831faf253b96a95b1be826226101214",
+    "买前信号交叉和独有增量.csv": "b49de7b6397968e0f384eb4102af1fcdeab498c36ce5d2f351f214378facf3b1",
+    "组合_年度与全期账户价格假设.csv": "0a63debacabf06790c29e1085dc25126498fa0a869e9ffbf82273f79819c5582",
+    "D1盘末跌停_次晨退出价格对照.csv": "0ac634ed79d3831dce2621a51275fb7a453b712d03eb0d0681cd8654cc7ea8d9",
+    "买后_D1盘末与D2早卖对照.csv": "a5fecb63608f72caf69bb281ee921742947e0beb88dddec552874d11df7411df",
+    "306笔_综合因子与基线.csv": "b3e7c2be434e9bb319104dcd2b38bbbf252729a37b768f949bc723ee9d64091b",
+    "README.md": "60b697fd2c031ac743bc7f9a9b352b86e92b380876848dfa28140698d3c81aae"
+  }
+}

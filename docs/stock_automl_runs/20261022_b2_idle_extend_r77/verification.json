@@ -1,0 +1,15 @@
+{
+  "source_R76_sha256": "0f953e31e8ed57fd6167f8092b8e5e304d0de5c8389acc07659c0f2dafec92c8",
+  "source_board_csv_sha256": "7c0351a92d53938c23cdf265a91220f0e24bb5f586d0972c60c22fa0e2011285",
+  "cohort": 306,
+  "idle": 112,
+  "d3_floor_idle": 17,
+  "dividend_preclose_mismatch_idle": 0,
+  "baseline_daily_reproduced_for": [
+    "close",
+    "morning7"
+  ],
+  "baseline_annual_reproduced_count": 10,
+  "month_cross_count": 3,
+  "assumed_fills": true
+}

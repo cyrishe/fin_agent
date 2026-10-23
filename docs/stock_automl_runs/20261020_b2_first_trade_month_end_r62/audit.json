@@ -1,0 +1,27 @@
+{
+  "模型月": 53,
+  "放行模型月": 24,
+  "停摆模型月": 29,
+  "自然月有首笔买入": 29,
+  "其中属于上月模型": 14,
+  "自然月有首笔卖出": 33,
+  "其中属于上月模型_与R61一致": 20,
+  "月末最后交易日存在D0信号": 37,
+  "其中当月放行": 15,
+  "信号模型月与D0一致": 709,
+  "信号四K规则与D0月冻结规则一致": 709,
+  "已保存末5末10逐月复算一致": 52,
+  "已保存前月候选数逐月复算一致": 52,
+  "九月完整D0候选": 16,
+  "R60九月截止D1记载候选": 15,
+  "源哈希": {
+    "outputs/stock_automl/b2_2021_minute_r60_20261020/signals.pkl": "c0fab9e454c92c0f3b0a9ba102224dcd6fef00fe377d215fbff1fb373708d1da",
+    "outputs/stock_automl/b2_2021_minute_r60_20261020/calendar.json": "48467afcb0babf08ea8481f396b13e71562c5e414abf09902751355d842de965",
+    "docs/stock_automl_runs/20261020_b2_2021_minutes_r60/逐月.csv": "c73aeffc30ec7cd33091621f960164d329841b83062b6a1a45939d46a5c321ee",
+    "docs/stock_automl_runs/20261020_b2_2021_minutes_r60/逐日净值.csv": "a57a08790635498281ab520b82634099b163591d7e35c90a2111ba513a8617b1",
+    "docs/stock_automl_runs/20261020_b2_model_month_r61/模型归属.json": "7051be0ee86ee826e6de42bcc530dc1fb01a957960272d47060a4f31bc98d27e",
+    "outputs/stock_automl/b2_2021_minute_r60_20261020/rules_frozen.json": "c271d219318bc7c220932f0307320e8f34ef7180d7fe119c8ec6d7f07696b2cb",
+    "outputs/stock_automl/b2_2022_minute_r41_20261019/rules_frozen.json": "aad725803a813d8f1fa8610a7e1976d7a0f79d272728f21195570e50d3c10ed7",
+    "outputs/stock_automl/b2_two_month_2024_r35_20261019/rules_frozen.json": "e9c6e38fc7a3d8d41c4657856750756365f357edec7ab2fca095c159f7de0d3b"
+  }
+}

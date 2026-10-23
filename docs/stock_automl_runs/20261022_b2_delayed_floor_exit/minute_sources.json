@@ -1,0 +1,244 @@
+[
+  {
+    "sequence": 3,
+    "path": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_delayed_floor_exit/minutes/2022-05-16_601368.csv.gz",
+    "sha256": "8d08dbbd7dcb322a8f3f986b1bc9114a9f5d4c14a257e65f2bca0ee9e87673b4",
+    "source": "/Volumes/ext/tushare_market_data/2022/20220516.csv.gz",
+    "source_sha256": "48715157aeb7f37fc8dd32b45ad26cea45f4ac360640f56b351b7909906f6f00"
+  },
+  {
+    "sequence": 4,
+    "path": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_delayed_floor_exit/minutes/2022-05-19_000926.csv.gz",
+    "sha256": "8b4b5e681cf0c88b0c89d0c0ced95f82b87f3d31f5ca901ea82e7a7421a5f6b1",
+    "source": "/Volumes/ext/tushare_market_data/2022/20220519.csv.gz",
+    "source_sha256": "fafcb4423f33c5cd5f37df8154b386b44c47d687c7610e2c5c7c90140046a7b4"
+  },
+  {
+    "sequence": 7,
+    "path": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_delayed_floor_exit/minutes/2022-05-24_000779.csv.gz",
+    "sha256": "617edbf18320aaaf3173b65215fb31a5a3b6e531cd81f8070e537cbc4558d904",
+    "source": "/Volumes/ext/tushare_market_data/2022/20220524.csv.gz",
+    "source_sha256": "4b8ab8e94f67ce80566fe44eed538b68194222492c648865629b560ca3b90c77"
+  },
+  {
+    "sequence": 10,
+    "path": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_delayed_floor_exit/minutes/2022-05-27_603166.csv.gz",
+    "sha256": "96b18d48ad4abc6f34709a91e9ecfe5303f2c1ab6f0f11f88b58d91a8b127673",
+    "source": "/Volumes/ext/tushare_market_data/2022/20220527.csv.gz",
+    "source_sha256": "e6e07015316a99060f28e9fddba17adaaa78b30f962fb9d8f3f732691c029ea8"
+  },
+  {
+    "sequence": 13,
+    "path": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_delayed_floor_exit/minutes/2022-06-02_600962.csv.gz",
+    "sha256": "a88826f5d62b30fc38f20471e4b11ac97b7969d70f9fddc74c4beb277fb7677e",
+    "source": "/Volumes/ext/tushare_market_data/2022/20220602.csv.gz",
+    "source_sha256": "76d7e9c9c9cd634cebe7060bccd3bbf6abeb37255048a0d5a6d9ca71b4c831e4"
+  },
+  {
+    "sequence": 14,
+    "path": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_delayed_floor_exit/minutes/2022-06-06_000151.csv.gz",
+    "sha256": "99569818830968d4c252062d6305e0041ccb723abbf39f7f1f5cd0d2573a2d76",
+    "source": "/Volumes/ext/tushare_market_data/2022/20220606.csv.gz",
+    "source_sha256": "b9abce84fd533c78706cc8cf802f58f37b1dd452171c44205cf0c17a757a9eb0"
+  },
+  {
+    "sequence": 16,
+    "path": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_delayed_floor_exit/minutes/2022-06-08_002066.csv.gz",
+    "sha256": "f7e1f44c0b961b1a4007d837d1a68f9b5afc9c8f87a076595e3a917ab021676a",
+    "source": "/Volumes/ext/tushare_market_data/2022/20220608.csv.gz",
+    "source_sha256": "b9d7e1c34dd6936bc968cb8bed0307db5315e0c9f7140313c0068219fc0ebd56"
+  },
+  {
+    "sequence": 18,
+    "path": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_delayed_floor_exit/minutes/2022-06-14_002630.csv.gz",
+    "sha256": "48876757b9769d2a39d7e656c21f9b3f433ae394a9a66baee48bd5b1b0e267ec",
+    "source": "/Volumes/ext/tushare_market_data/2022/20220614.csv.gz",
+    "source_sha256": "17d154afa17899e7805dcce69ad7874ce3e5a3c537478b03f3e59b62bc141601"
+  },
+  {
+    "sequence": 28,
+    "path": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_delayed_floor_exit/minutes/2022-08-10_002868.csv.gz",
+    "sha256": "5e9e7ae9de63be995f2d9e3ccbfbf9536ad5084c6faf62d87d37a3ba35512195",
+    "source": "/Volumes/ext/tushare_market_data/2022/20220810.csv.gz",
+    "source_sha256": "a4fc740cbc455db80b983abe3b35ce30357ad460e949f9c1068790cd81fed38c"
+  },
+  {
+    "sequence": 62,
+    "path": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_delayed_floor_exit/minutes/2023-06-02_603291.csv.gz",
+    "sha256": "0140aa8f68e615a67dce762dbf927a27420b52aba1b5c8788dbc181a06238f54",
+    "source": "/Volumes/ext/tushare_market_data/2023/20230602.csv.gz",
+    "source_sha256": "e101da42a04d5b90f172debf7158b01616e8d6907ecb47508be20e597f124437"
+  },
+  {
+    "sequence": 74,
+    "path": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_delayed_floor_exit/minutes/2023-10-18_002708.csv.gz",
+    "sha256": "20cd1fd87639c16f47147cfdcf4f86db66886f365f03fb27ce60ae087ca21eaf",
+    "source": "/Volumes/ext/tushare_market_data/2023/20231018.csv.gz",
+    "source_sha256": "77b23fa47f670db2095158db2ef81927c93592be25fd116c536769d535f8da96"
+  },
+  {
+    "sequence": 76,
+    "path": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_delayed_floor_exit/minutes/2023-10-20_002316.csv.gz",
+    "sha256": "647ca3858c45ff9ccb60a2780c4c1f3e2a5c645a66244d81b8058613fa8b3ae6",
+    "source": "/Volumes/ext/tushare_market_data/2023/20231020.csv.gz",
+    "source_sha256": "b7b3d501b94d2191e7976bcd43ce9ede124e980155110c8b72e6795ac0773e95"
+  },
+  {
+    "sequence": 79,
+    "path": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_delayed_floor_exit/minutes/2023-10-26_600520.csv.gz",
+    "sha256": "dbbc754125e3c9a65adc085b0a1d38bf6bd9816ec9866cba4dfd37d9b314fa86",
+    "source": "/Volumes/ext/tushare_market_data/2023/20231026.csv.gz",
+    "source_sha256": "e02960d78df1d328c43627bf86498ed87db7e50249f2276fb922a0841497cfb5"
+  },
+  {
+    "sequence": 88,
+    "path": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_delayed_floor_exit/minutes/2023-12-12_002451.csv.gz",
+    "sha256": "33f76551664e6280a6d17cc00fa8cf3fe8bf9eecc5714e3200e140305d102db0",
+    "source": "/Volumes/ext/tushare_market_data/2023/20231212.csv.gz",
+    "source_sha256": "1f7d38054c1824d6baaec8ad659136f474fb90d3f254094556243f7f102a2d29"
+  },
+  {
+    "sequence": 103,
+    "path": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_delayed_floor_exit/minutes/2024-01-12_002347.csv.gz",
+    "sha256": "e2f65eaa6e8767b09ab121de7794589e4f7f5cfac032bb5fec1f29c38a8f7c59",
+    "source": "/Volumes/ext/tushare_market_data/2024/20240112.csv.gz",
+    "source_sha256": "29315de7ef35f2673716d5e91bcec97de9a4c2c15b1850c7b0196d7799c883e3"
+  },
+  {
+    "sequence": 107,
+    "path": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_delayed_floor_exit/minutes/2024-01-19_002868.csv.gz",
+    "sha256": "b717271380f609a69b852f2f0db3a325f270d5e6375d2651ee9f07cc4dd8c72b",
+    "source": "/Volumes/ext/tushare_market_data/2024/20240119.csv.gz",
+    "source_sha256": "a1f8867eff21b00128d4b9877beaaa4d2705daee24adb6d07f35a2ca51f330a3"
+  },
+  {
+    "sequence": 112,
+    "path": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_delayed_floor_exit/minutes/2024-01-26_603810.csv.gz",
+    "sha256": "c3ccaadfac79f979b6d12ca01f25e77b2a99a4647499a744c0bbd82521d5a485",
+    "source": "/Volumes/ext/tushare_market_data/2024/20240126.csv.gz",
+    "source_sha256": "79b3a23841045b5affb3109a54e532d4f49a27394c206386a9575a7e22e87b0f"
+  },
+  {
+    "sequence": 114,
+    "path": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_delayed_floor_exit/minutes/2024-01-31_600053.csv.gz",
+    "sha256": "610de7ecb8804ec403b218c91abe4344fb39284458fc5894e06ce40dc1a9be1f",
+    "source": "/Volumes/ext/tushare_market_data/2024/20240131.csv.gz",
+    "source_sha256": "60e447bd61a6da3f5e51894c704e65ae7f51fb90b85b3d292ba20bf8749e80de"
+  },
+  {
+    "sequence": 117,
+    "path": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_delayed_floor_exit/minutes/2024-09-19_002816.csv.gz",
+    "sha256": "abfc72e0e982ef5c88017fc9ed9291d020bc5cf860f223bc871e0740dde691d4",
+    "source": "/Volumes/ext/tushare_market_data/2024/20240919.csv.gz",
+    "source_sha256": "70509f916a05a02c6811eef0f14c90375e33df81113d374e56ff6a40faa4d3f2"
+  },
+  {
+    "sequence": 120,
+    "path": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_delayed_floor_exit/minutes/2024-09-24_600719.csv.gz",
+    "sha256": "1cc99121770e0282e20e1f59ba0016e3a1ac397b6f5f6db06f1ff248b3d5e977",
+    "source": "/Volumes/ext/tushare_market_data/2024/20240924.csv.gz",
+    "source_sha256": "1b95365ed04ba84f8cc6f8e04111b121443e5afc455893d69bd3299ee42268f3"
+  },
+  {
+    "sequence": 122,
+    "path": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_delayed_floor_exit/minutes/2024-09-26_000004.csv.gz",
+    "sha256": "fc40b7d2e9468d910028548567609b039cdb3deaf63416067aaa9e2281c31230",
+    "source": "/Volumes/ext/tushare_market_data/2024/20240926.csv.gz",
+    "source_sha256": "d157f81831dc14b6ce11faab3c632916e59470bd414fbfd81ae4821c9b585a67"
+  },
+  {
+    "sequence": 126,
+    "path": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_delayed_floor_exit/minutes/2024-11-12_002765.csv.gz",
+    "sha256": "86309bb161060eba6cbedb4feabe76af2138528330155d6b520da7911de3d99a",
+    "source": "/Volumes/ext/tushare_market_data/2024/20241112.csv.gz",
+    "source_sha256": "273377e6958fe38ee8d408582c2b0e99d9ffbc1327f16ef0e97b56bfb87e948c"
+  },
+  {
+    "sequence": 142,
+    "path": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_delayed_floor_exit/minutes/2024-12-12_603825.csv.gz",
+    "sha256": "d9c6146ed076f8e211cdd5b1a712f50d29f61094e6b54f0d35c744742d38cbf1",
+    "source": "/Volumes/ext/tushare_market_data/2024/20241212.csv.gz",
+    "source_sha256": "2b92c130825a60271a7d7b08ea6ff797b677fb6bb94c0c473c4b2baf8594b078"
+  },
+  {
+    "sequence": 146,
+    "path": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_delayed_floor_exit/minutes/2024-12-19_000530.csv.gz",
+    "sha256": "7eaa2dae8b54629bf9af8982ec3780c8919074b95004c3cc883809e0a87e24f0",
+    "source": "/Volumes/ext/tushare_market_data/2024/20241219.csv.gz",
+    "source_sha256": "8f26eeacc2a9a2db70f2572e9a7fd8fcef5f51a5963b9dc22e6958102f017cee"
+  },
+  {
+    "sequence": 148,
+    "path": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_delayed_floor_exit/minutes/2024-12-24_002181.csv.gz",
+    "sha256": "2cdbd1b60fb7b65204f95ec5b50dc48cf98548d0235ad36c01b2da53af6c7a73",
+    "source": "/Volumes/ext/tushare_market_data/2024/20241224.csv.gz",
+    "source_sha256": "78712efed8b039929d04747ec39fceaadf97b6f4cb10b29bbfa5cca887c0aa52"
+  },
+  {
+    "sequence": 175,
+    "path": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_delayed_floor_exit/minutes/2025-09-08_002547.csv.gz",
+    "sha256": "1ebae3452bc0c9732aaf94e622aabb76cc283f7a62bdd27a6b0bd6aae0279c8c",
+    "source": "/Volumes/ext/fin_agent/outputs/stock_automl/mk_1m_compact_2025/2025-09-08.csv.zst",
+    "source_sha256": "d378b0d2f09b4adc03239ec65509dc478e53f45deda77faad5f03b9ee7cc6200"
+  },
+  {
+    "sequence": 207,
+    "path": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_delayed_floor_exit/minutes/2025-11-24_000546.csv.gz",
+    "sha256": "8a50b6a172a00c17d32a22a0d11b263835d70c63a21533acca9f492a8ac06747",
+    "source": "/Volumes/ext/fin_agent/outputs/stock_automl/mk_1m_compact_2025/2025-11-24.csv.zst",
+    "source_sha256": "0f0165f8c696f868168bb1e2509496e90627150d4b4a9f4676e47c05883cf745"
+  },
+  {
+    "sequence": 219,
+    "path": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_delayed_floor_exit/minutes/2026-02-03_601212.csv.gz",
+    "sha256": "47c1a34f318d200522840b15fbcb4d67ba896b71810fe32741e079a7e8f769d9",
+    "source": "/Volumes/ext/fin_agent/outputs/stock_automl/mk_1m_compact/2026-02-03.csv.zst",
+    "source_sha256": "45b407694f64c113544a5730533f51b186d74efeb3305031aa1e248aef04435e"
+  },
+  {
+    "sequence": 235,
+    "path": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_delayed_floor_exit/minutes/2026-03-05_600301.csv.gz",
+    "sha256": "bd4308039692a2ffe10d281bfc79a2a71c9a09c35dbc777537468b0231c003d5",
+    "source": "/Volumes/ext/fin_agent/outputs/stock_automl/mk_1m_compact/2026-03-05.csv.zst",
+    "source_sha256": "b08d1d48301057ee6d940c2169bc020a22221e00bd4c33d866eb587d9fc4f48e"
+  },
+  {
+    "sequence": 291,
+    "missing": false,
+    "day": "2026-09-07",
+    "symbol": "600892",
+    "path": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_delayed_floor_exit/minutes/2026-09-07_600892.csv.gz",
+    "sha256": "affd39001db071af2f4b5ed7c4fb80cecfe77864e4cd88ef935803925cac367b",
+    "source": "finalized database minutes; volume lots*100"
+  },
+  {
+    "sequence": 296,
+    "missing": false,
+    "day": "2026-09-14",
+    "symbol": "002295",
+    "path": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_delayed_floor_exit/minutes/2026-09-14_002295.csv.gz",
+    "sha256": "b6fd05c83a9806863adea225f0bd1f0dfa94fb9032d5b9a905633f82e958d093",
+    "source": "finalized database minutes; volume lots*100"
+  },
+  {
+    "sequence": 267,
+    "path": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_delayed_floor_exit/minutes/2026-07-17_603137.csv.gz",
+    "sha256": "c00bd0dac6fa900dc4a5e2df3ba15e92e664817ccd18dfaf29c24714cca65a8e",
+    "source": "/Volumes/ext/fin_agent/outputs/stock_automl/mk_1m_compact/2026-07-17.csv.zst",
+    "source_sha256": "b84ab8aa3757018658a1041a903936c8e4c64bec3014d9472f2634c1fe6b735b"
+  },
+  {
+    "sequence": 268,
+    "path": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_delayed_floor_exit/minutes/2026-07-20_603137.csv.gz",
+    "sha256": "30ae7cbd26f83fb3b818c00bb28eee1aa25167af4179130767ce495f1c84a00b",
+    "source": "/Volumes/ext/fin_agent/outputs/stock_automl/mk_1m_compact/2026-07-20.csv.zst",
+    "source_sha256": "d0133ee7920aa4cb5d4d844448c220a63200217a07a58c5f8d7e8615dd3a7fe4"
+  },
+  {
+    "sequence": 269,
+    "path": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_delayed_floor_exit/minutes/2026-07-21_600664.csv.gz",
+    "sha256": "71c9dbfee10f5286d75418a70c584c30e63bb5cdcc3681fc509b5f1dca08e466",
+    "source": "/Volumes/ext/fin_agent/outputs/stock_automl/mk_1m_compact/2026-07-21.csv.zst",
+    "source_sha256": "6a27d4fd4f9df57a61ded4538e40b5445da55f340c325353378fd1c30da59cf2"
+  }
+]

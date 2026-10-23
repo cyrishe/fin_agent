@@ -1,0 +1,10 @@
+{
+  "experiment": "B2_DELAYED_FLOOR_EXIT_20261022",
+  "git_head": "9c05719cbf999f6de3b5fa4e53fb7cac1bc8a60a",
+  "git_branch": "codex/stock-automl-strategies",
+  "worktree_note": "Existing unrelated dirty changes retained; evidence binds exact analysis/source hashes, not HEAD alone.",
+  "python": "3.13.5",
+  "pandas": "2.3.2",
+  "analysis_sha256": "19b3e3a757cf9a16e71b57e8f55e83d9726462fd43357aa5b3ccd7ceee69f9ac",
+  "calendar_sha256": "48467afcb0babf08ea8481f396b13e71562c5e414abf09902751355d842de965"
+}

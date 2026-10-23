@@ -1,0 +1,7 @@
+{
+  "python": "3.13.5",
+  "numpy": "2.3.2",
+  "pandas": "2.3.2",
+  "sklearn": "1.7.1",
+  "git_base": "9c05719cbf999f6de3b5fa4e53fb7cac1bc8a60a"
+}

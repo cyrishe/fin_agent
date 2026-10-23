@@ -1,0 +1,89 @@
+{
+  "selection": "max validation mean(AP - class prevalence) for crash and strong; tie balanced accuracy",
+  "selected": "full_rf",
+  "classes": [
+    "中间状态",
+    "急跌",
+    "持续大涨"
+  ],
+  "model_sha256": "e8af0c3905a746198e0f2940a88f507c657f4119b9c40c585446aba30e64f7ca",
+  "train_counts": {
+    "中间状态": 179,
+    "急跌": 175,
+    "持续大涨": 65
+  },
+  "validation_counts": {
+    "中间状态": 81,
+    "急跌": 62,
+    "持续大涨": 22
+  },
+  "test_counts": {
+    "中间状态": 76,
+    "急跌": 26,
+    "持续大涨": 18
+  },
+  "validation": {
+    "candidate": "full_rf",
+    "split": "validation",
+    "n": 165,
+    "ap_crash": 0.3945117477669679,
+    "ap_strong": 0.2277109121688951,
+    "auc_crash": 0.43838083307234577,
+    "auc_strong": 0.5718372536554355,
+    "base_crash": 0.37575757575757573,
+    "base_strong": 0.13333333333333333,
+    "mean_ap_minus_base": 0.05656587542247697,
+    "balanced_accuracy": 0.29516792778441525,
+    "predicted_crash": 103,
+    "predicted_strong": 0
+  },
+  "test": {
+    "candidate": "full_rf",
+    "split": "test",
+    "n": 120,
+    "ap_crash": 0.27994610979778356,
+    "ap_strong": 0.2874815422844632,
+    "auc_crash": 0.604746317512275,
+    "auc_strong": 0.6802832244008714,
+    "base_crash": 0.21666666666666667,
+    "base_strong": 0.15,
+    "mean_ap_minus_base": 0.10038049270779005,
+    "balanced_accuracy": 0.3984480431848853,
+    "predicted_crash": 50,
+    "predicted_strong": 0
+  },
+  "validation_confusion": {
+    "急跌": {
+      "急跌": 35,
+      "中间状态": 55,
+      "持续大涨": 13
+    },
+    "中间状态": {
+      "急跌": 27,
+      "中间状态": 26,
+      "持续大涨": 9
+    },
+    "持续大涨": {
+      "急跌": 0,
+      "中间状态": 0,
+      "持续大涨": 0
+    }
+  },
+  "test_confusion": {
+    "急跌": {
+      "急跌": 15,
+      "中间状态": 29,
+      "持续大涨": 6
+    },
+    "中间状态": {
+      "急跌": 11,
+      "中间状态": 47,
+      "持续大涨": 12
+    },
+    "持续大涨": {
+      "急跌": 0,
+      "中间状态": 0,
+      "持续大涨": 0
+    }
+  }
+}

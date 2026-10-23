@@ -1,0 +1,20 @@
+{
+  "inputs": {
+    "/data/cyris/work/b2_d2_open_volume_ranks_r81_20261022/09_31仍封死19笔_核心变量与结局.csv": "0d82838ed09499d9a9d82c3840c632f3b076ddcba5f1df0fa6b3ac597e91a1ad",
+    "/data/cyris/work/b2_board_volume_r71_20261022/B2_V2放行连板量能特征_306笔.csv": "3c0d18a42d5922e7a920718a003b583887e9629fdfb3624276069139c3585df2",
+    "/data/cyris/work/b2_d2_floor_volume_r79_20261022/100笔D2触跌停_成交量逐笔.csv": "f40721018bc6aaa37faa044897d703eb719b4ad790e50d7bd6dab0cab50b9698",
+    "/data/cyris/work/b2_news_flow_years_r76_20261022/2022_morning7_baseline_ledger.csv": "ee461e141f00b74a3444c91b98b95c6229784c0dbd9d290880eac4e55db3666c",
+    "/data/cyris/work/b2_news_flow_years_r76_20261022/2023_morning7_baseline_ledger.csv": "080806dc2f39af8f54ccb72aca851c06bc2cf3748d03f9914101b97e3b6d4096",
+    "/data/cyris/work/b2_news_flow_years_r76_20261022/2024_morning7_baseline_ledger.csv": "d61bcf6d803a439e410e608bc5c69ac810209ef66e4249615094c459fc0290f0",
+    "/data/cyris/work/b2_news_flow_years_r76_20261022/2025_morning7_baseline_ledger.csv": "8c8f5ad97a474d26a38c4056e974949f1a43d2121415feae46542f8adcdf2f36",
+    "/data/cyris/work/b2_news_flow_years_r76_20261022/2026_morning7_baseline_ledger.csv": "3fe3677793f68df10f0945e6b95e550354b14f5f81f768b59b01d42912637970"
+  },
+  "outputs": {
+    "/data/cyris/work/b2_d2_open_volume_opportunity_r82_20261022/analyze.py": "bb586ad129dfb8c9acfabfb17e19d5615909a07acf7f3ebb42f48e3dc5dc76a4",
+    "/data/cyris/work/b2_d2_open_volume_opportunity_r82_20261022/README.md": "3771fe559d294d56a31be19fb2fb765a37d16121ab55da91766d9e3b32c3ecc1",
+    "/data/cyris/work/b2_d2_open_volume_opportunity_r82_20261022/19笔09_31仍封死_费后收益与D3.csv": "8d6bc69690a04cf7a90753879ddde7a3e293716ef7c2f76483cefaf9e991e33a",
+    "/data/cyris/work/b2_d2_open_volume_opportunity_r82_20261022/306笔D0已知量比_原交易收益.csv": "8a520c5564cd680e9b3a74730aa7b13989cc55e8b7eeb8b17c4561d39dd348d2",
+    "/data/cyris/work/b2_d2_open_volume_opportunity_r82_20261022/D0量比五档误拦得失.csv": "381664c358a7868463badef096f13076b794ba8078ae7210765e80299c6664b6",
+    "/data/cyris/work/b2_d2_open_volume_opportunity_r82_20261022/低20%各年误拦得失.csv": "321997e75a24ca3420d10c0d7f5b1f1b91192557d843a828ee970f89540fb92e"
+  }
+}

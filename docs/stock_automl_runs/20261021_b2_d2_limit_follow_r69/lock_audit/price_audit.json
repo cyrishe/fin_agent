@@ -1,0 +1,688 @@
+[
+  {
+    "D2": "2022-05-13",
+    "股票": "601368.SH",
+    "sha256": "7106273790c0c13e28763c9a8362958b98d4d8aa883f1087970ae5c00689e71c",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 33958155.0,
+    "daily_volume": 33958155.0,
+    "volume_ratio": 1.0
+  },
+  {
+    "D2": "2022-05-23",
+    "股票": "000779.SZ",
+    "sha256": "c2e254b547daa8ad8f93cf4ab3017ab2d574f45060782e74281f3bb833d9cfcb",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 3182700.0,
+    "daily_volume": 3182700.0,
+    "volume_ratio": 1.0
+  },
+  {
+    "D2": "2022-05-26",
+    "股票": "603166.SH",
+    "sha256": "33032f50404dbf3de58590493be523ceaae9fd513308703d6b260bccf0378cb4",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 62252680.0,
+    "daily_volume": 62252679.0,
+    "volume_ratio": 1.0000000160635658
+  },
+  {
+    "D2": "2022-06-01",
+    "股票": "600962.SH",
+    "sha256": "de82b02c42e8a199bde4fd49317b578c71de3e8a10c29526109923d5ca1edcb3",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 2448600.0,
+    "daily_volume": 2448600.0,
+    "volume_ratio": 1.0
+  },
+  {
+    "D2": "2022-06-06",
+    "股票": "000595.SZ",
+    "sha256": "6de28584463adc78399058e1b44f7723db7e0e9ec5633187d99a6d7e778c5371",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 42184400.0,
+    "daily_volume": 42184400.0,
+    "volume_ratio": 1.0
+  },
+  {
+    "D2": "2022-06-15",
+    "股票": "600653.SH",
+    "sha256": "9ab3f634e7774fc8032ddb6b10615458aa6eb9864f2be5e0787baaeab8eadd8c",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 345906451.0,
+    "daily_volume": 345906450.0,
+    "volume_ratio": 1.000000002890955
+  },
+  {
+    "D2": "2022-07-01",
+    "股票": "001316.SZ",
+    "sha256": "3cf49dcba7e0f24b2fa1da52ce6e5f48180806963e718f230d5239948fd85895",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 7866063.0,
+    "daily_volume": 7866063.0,
+    "volume_ratio": 1.0
+  },
+  {
+    "D2": "2022-08-03",
+    "股票": "000678.SZ",
+    "sha256": "8bb86a2d4171c18976046f03587aa734208a05f9b589482e5d224a37e06a7828",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 103528707.0,
+    "daily_volume": 103528707.0,
+    "volume_ratio": 1.0
+  },
+  {
+    "D2": "2022-08-09",
+    "股票": "002868.SZ",
+    "sha256": "bbc4acc68f94c275d1c43a587c772a89d7d3f42b3e6dbc432332c87ae640b8ca",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 1344000.0,
+    "daily_volume": 1344000.0,
+    "volume_ratio": 1.0
+  },
+  {
+    "D2": "2022-08-22",
+    "股票": "002272.SZ",
+    "sha256": "1dc7574bbf4e49965066fa1a51162a8b04e45d34fdc75f798ff73e86ee9fcc00",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 41111700.0,
+    "daily_volume": 41111700.0,
+    "volume_ratio": 1.0
+  },
+  {
+    "D2": "2023-02-20",
+    "股票": "001339.SZ",
+    "sha256": "f62c95ec22cf0f863bdb38f44a18e0712e0d84cd1e6f9b35dc1cecab3f4bd9b5",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 36389037.0,
+    "daily_volume": 36389037.0,
+    "volume_ratio": 1.0
+  },
+  {
+    "D2": "2023-05-10",
+    "股票": "600228.SH",
+    "sha256": "460ceeea1ac28a4b837f9eba78814429cb9004d3a63b1d4c9b5d6141f621a31d",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 52377613.0,
+    "daily_volume": 52377613.0,
+    "volume_ratio": 1.0
+  },
+  {
+    "D2": "2023-06-01",
+    "股票": "603291.SH",
+    "sha256": "a827bffa7a245215011809c6ada48f0b7ff670819ad687fc15c3c08f3967eaf9",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 4279600.0,
+    "daily_volume": 4279600.0,
+    "volume_ratio": 1.0
+  },
+  {
+    "D2": "2023-10-17",
+    "股票": "002708.SZ",
+    "sha256": "d7864a063140379839b7db719e2bfb34bdc5e51facec3a7be1c9d4c4c596a0f8",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 84419117.0,
+    "daily_volume": 84419117.0,
+    "volume_ratio": 1.0
+  },
+  {
+    "D2": "2023-10-25",
+    "股票": "600520.SH",
+    "sha256": "22a90cc92496fec20e90cbbfaf5a8408ad940a1a24a90f42366d40a97198c802",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 2556300.0,
+    "daily_volume": 2556300.0,
+    "volume_ratio": 1.0
+  },
+  {
+    "D2": "2023-12-22",
+    "股票": "600692.SH",
+    "sha256": "d896f7c9961bfb6caa4d65bfae7f1a72286b31c9870bc8537d874d62264463af",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 58929093.0,
+    "daily_volume": 58929093.0,
+    "volume_ratio": 1.0
+  },
+  {
+    "D2": "2024-01-18",
+    "股票": "002868.SZ",
+    "sha256": "bb96f0507b804369b27caf77dff47acc7fd76e342728c07a234ad22b842008b6",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 11800671.0,
+    "daily_volume": 11800671.0,
+    "volume_ratio": 1.0
+  },
+  {
+    "D2": "2024-01-26",
+    "股票": "600200.SH",
+    "sha256": "85a185a12df8a699e0e1bbd3b02f54a4a3c3f60c0397b32ed75c408dc7cbe904",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 129068427.0,
+    "daily_volume": 129068427.0,
+    "volume_ratio": 1.0
+  },
+  {
+    "D2": "2024-01-30",
+    "股票": "600053.SH",
+    "sha256": "826faac21806c0e1442f57c9af79f7e770971ead4f1b4b800f2dde803397806e",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 1573800.0,
+    "daily_volume": 1573800.0,
+    "volume_ratio": 1.0
+  },
+  {
+    "D2": "2024-11-11",
+    "股票": "002765.SZ",
+    "sha256": "60ea08d2eaa3cec49837070369fa09c6671ae1add660e94d53173fdf3a810faf",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 24318400.0,
+    "daily_volume": 24318400.0,
+    "volume_ratio": 1.0
+  },
+  {
+    "D2": "2024-11-12",
+    "股票": "000981.SZ",
+    "sha256": "20188e1139ff7a7bc5273d81e2358998f19bbe9222bdbf901529ea05429b32bc",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 1214697761.0,
+    "daily_volume": 1214697761.0,
+    "volume_ratio": 1.0
+  },
+  {
+    "D2": "2024-12-09",
+    "股票": "000056.SZ",
+    "sha256": "ee525f55b29a766f905da39cad3bb9e6dd2f08bc831f63ecff959816725e3531",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 54531800.0,
+    "daily_volume": 54531800.0,
+    "volume_ratio": 1.0
+  },
+  {
+    "D2": "2024-12-10",
+    "股票": "600172.SH",
+    "sha256": "c9446ac0ccdf6f3e666518fd2602849be2c916c8be805c2ad06db58718eca92d",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 412895633.0,
+    "daily_volume": 412895633.0,
+    "volume_ratio": 1.0
+  },
+  {
+    "D2": "2024-12-11",
+    "股票": "603825.SH",
+    "sha256": "a4776cf6dd7ef4514d359e89f5134ce09a44a0edc32760fe45ba8861d2bfd650",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 10084600.0,
+    "daily_volume": 10084600.0,
+    "volume_ratio": 1.0
+  },
+  {
+    "D2": "2024-12-12",
+    "股票": "002681.SZ",
+    "sha256": "455488ead1d633ab896e3bc750aa2e7fa0cd0c441e9d2402254cf41fb9db1f93",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 473635023.0,
+    "daily_volume": 473635025.0,
+    "volume_ratio": 0.9999999957773393
+  },
+  {
+    "D2": "2024-12-13",
+    "股票": "603088.SH",
+    "sha256": "394f39367e047af817f257d036e973705f11fffa15f65ea55f4e5c6ff0f576a2",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 80042574.0,
+    "daily_volume": 80042574.0,
+    "volume_ratio": 1.0
+  },
+  {
+    "D2": "2024-12-19",
+    "股票": "002354.SZ",
+    "sha256": "4f3ca974ca69f68d75bcb8c88ca5c724dbd05c710b3ce40a9242a25e58a3691e",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 463144069.0,
+    "daily_volume": 463144069.0,
+    "volume_ratio": 1.0
+  },
+  {
+    "D2": "2024-12-23",
+    "股票": "002181.SZ",
+    "sha256": "c22ecd1da506bcd10e70c5fad1577809fd6acd4574047ddfe20d647080dd85e1",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 2446800.0,
+    "daily_volume": 2446800.0,
+    "volume_ratio": 1.0
+  },
+  {
+    "D2": "2025-06-13",
+    "股票": "002181.SZ",
+    "sha256": "bb1bdca02dfc7a750aaba6da0ba18eec850779eca442cfea2b5d213c1fef794a",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 195282608.0,
+    "daily_volume": 195282608.0,
+    "volume_ratio": 1.0
+  },
+  {
+    "D2": "2025-06-20",
+    "股票": "600722.SH",
+    "sha256": "11fe85d03050dab9f504b0a9bfa7ea7404cf4d54806e28be1e823477f6cc0160",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 114837217.0,
+    "daily_volume": 114837217.0,
+    "volume_ratio": 1.0
+  },
+  {
+    "D2": "2025-09-19",
+    "股票": "000559.SZ",
+    "sha256": "09ff0c0b532eeabff54cc76cbbfa4cebb69edb290b1c091b6a19f331babd718c",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 289655801.0,
+    "daily_volume": 289655801.0,
+    "volume_ratio": 1.0
+  },
+  {
+    "D2": "2025-09-26",
+    "股票": "600167.SH",
+    "sha256": "23ec5e949107e2272b76af3484fd75f59f9a0400fd0e23b0fc960ed2c891f253",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 91685394.0,
+    "daily_volume": 91685394.0,
+    "volume_ratio": 1.0
+  },
+  {
+    "D2": "2025-10-22",
+    "股票": "000626.SZ",
+    "sha256": "5964cc107a627b7a87542ecb2b4c04fde57f365382bfba5fed3fc1615198cdbb",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 66030262.0,
+    "daily_volume": 66030262.0,
+    "volume_ratio": 1.0
+  },
+  {
+    "D2": "2025-11-06",
+    "股票": "000592.SZ",
+    "sha256": "83688c6ed9df2340ed2e7abce25e572a428fd3db3ce3d8c92b80d0b496faa450",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 673317168.0,
+    "daily_volume": 673317168.0,
+    "volume_ratio": 1.0
+  },
+  {
+    "D2": "2025-11-18",
+    "股票": "600693.SH",
+    "sha256": "397a86c19d1fc175cb238ebcb05bcde1c5367ff546ed87748e6912a72e7eba8a",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 77958586.0,
+    "daily_volume": 77958586.0,
+    "volume_ratio": 1.0
+  },
+  {
+    "D2": "2025-11-19",
+    "股票": "002083.SZ",
+    "sha256": "327f7260e0bb8497cf786f79fed25a7b9f56cf10d5228fe386ce425d74df094e",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 256256546.0,
+    "daily_volume": 256256546.0,
+    "volume_ratio": 1.0
+  },
+  {
+    "D2": "2025-11-21",
+    "股票": "000546.SZ",
+    "sha256": "6ccd34fe31180ad5869f2e5aa42de4bc1e45a842395bcd922ea63a6946a45807",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 13116900.0,
+    "daily_volume": 13116900.0,
+    "volume_ratio": 1.0
+  },
+  {
+    "D2": "2026-01-13",
+    "股票": "002774.SZ",
+    "sha256": "29347bdefdfdf656651e311af35167e95b4667a1fdb2e91b26f0d4c338b0287e",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 16258057.0,
+    "daily_volume": 16258057.0,
+    "volume_ratio": 1.0
+  },
+  {
+    "D2": "2026-01-26",
+    "股票": "000036.SZ",
+    "sha256": "d052bbd10a04c4bdd3b9c795367deb88962f97f9f2544ca7eb0ccd84911db262",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 156480027.0,
+    "daily_volume": 156480027.0,
+    "volume_ratio": 1.0
+  },
+  {
+    "D2": "2026-02-02",
+    "股票": "601212.SH",
+    "sha256": "48c56cfb9cd31b10a2dba167f0c175a2d9cd490b6370095b0e9ac42f590ec3f3",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 9183500.0,
+    "daily_volume": 9183500.0,
+    "volume_ratio": 1.0
+  },
+  {
+    "D2": "2026-02-10",
+    "股票": "600814.SH",
+    "sha256": "eb5782a323b5f2e5c04c2c8fc88b729417694a11dfd664aa8bf22ef98eadd269",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 92293633.0,
+    "daily_volume": 92293633.0,
+    "volume_ratio": 1.0
+  },
+  {
+    "D2": "2026-03-13",
+    "股票": "600108.SH",
+    "sha256": "a08b95df544fa9d852940f9f7e62a6e877120490534815861f895d0c503e7610",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 361044318.0,
+    "daily_volume": 361044318.0,
+    "volume_ratio": 1.0
+  },
+  {
+    "D2": "2026-07-16",
+    "股票": "603137.SH",
+    "sha256": "67f2943ecd85e8866808e20bad8a0d1bf062c5bd5fb40b3664c09096f261f518",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 2709400.0,
+    "daily_volume": 2709400.0,
+    "volume_ratio": 1.0
+  },
+  {
+    "D2": "2026-07-17",
+    "股票": "603137.SH",
+    "sha256": "ebe081b16dff59023f8087298b922c175492a1cf282105ad611ffc3f24858393",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 2309400.0,
+    "daily_volume": 2309400.0,
+    "volume_ratio": 1.0
+  },
+  {
+    "D2": "2026-07-30",
+    "股票": "000533.SZ",
+    "sha256": "1710315da7a9c0400e5cf0499f90ab406a86ae31bc69baa2292b855167f66422",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 140420355.0,
+    "daily_volume": 140420355.0,
+    "volume_ratio": 1.0
+  },
+  {
+    "D2": "2026-08-18",
+    "股票": "002172.SZ",
+    "sha256": "0affe4afc857ce287e5634c8ae24431e04b296750f8c6924ccb1d62e8d3af062",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 184119600.0,
+    "daily_volume": 184119503.0,
+    "volume_ratio": 1.0000005268317502
+  },
+  {
+    "D2": "2026-08-21",
+    "股票": "603395.SH",
+    "sha256": "fceea6bff7778cedc24c0b1f141e6e3e0468d9f68a58e5e1f089ba31609ef868",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 9766700.0,
+    "daily_volume": 9766464.0,
+    "volume_ratio": 1.000024164323956
+  },
+  {
+    "D2": "2026-09-04",
+    "股票": "600892.SH",
+    "sha256": "151d11471ffb63ef97b374756e8bcc5af7b7e5cb8a89eefdeb3ac0575a9a6745",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 166486400.0,
+    "daily_volume": 166486400.0,
+    "volume_ratio": 1.0
+  },
+  {
+    "D2": "2026-09-11",
+    "股票": "002295.SZ",
+    "sha256": "046429126d546bb692a6c2deb8d73112e2e84cd34a271bec5dc06c5cdcf341b8",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 3451400.0,
+    "daily_volume": 3451400.0,
+    "volume_ratio": 1.0
+  }
+]

@@ -1,0 +1,36 @@
+{
+  "reason": "Pandas JSON rounded binary64 values to 15 decimal places; strict > at tied tree scores changed behavior.",
+  "repair": "Reconstruct original Q75 model thresholds and single-rule quantiles from training X and saved fitted models; lossless JSON serialization.",
+  "original_selection_sha256": "8c3708c9421bfd4c7280c20000821ace53d5cae7854d86769de7b92ee0bead54",
+  "original_test_sha256": "cf0fc89bbd1a3c7f11d375efa3409fe1a0cb5385a5933ccc23cb50a8b90ac263",
+  "code_sha256": "e40d1dbb6744ca3e781717df1b0cfcbee4950427c5241fff4f70ebdffb5dc256",
+  "differences": [
+    {
+      "id": "tree",
+      "split": "train",
+      "changed": 21,
+      "rounded_flags": 45,
+      "exact_flags": 24
+    },
+    {
+      "id": "tree",
+      "split": "valid",
+      "changed": 5,
+      "rounded_flags": 12,
+      "exact_flags": 7
+    },
+    {
+      "id": "tree",
+      "split": "test",
+      "changed": 9,
+      "rounded_flags": 25,
+      "exact_flags": 16
+    }
+  ],
+  "models_refit": false,
+  "new_rule_search": false,
+  "original_train_validation_counts_recovered": true,
+  "validation_choice_unchanged": true,
+  "selected_predictions_all_splits_unchanged": true,
+  "selected_id": "logistic"
+}

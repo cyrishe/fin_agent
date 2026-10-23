@@ -1,0 +1,17 @@
+{
+  "rows": 709,
+  "v2_rows": 306,
+  "case_trades": 20,
+  "case_companies": 19,
+  "latest_report_loss_companies": 7,
+  "official_windows_complete": 709,
+  "media_windows_complete": 30,
+  "v2_media_windows_complete": 30,
+  "public_search_windows": 306,
+  "window_nesting": true,
+  "missing_media_is_nan": true,
+  "numeric_csv_no_apostrophe": true,
+  "financial_numbers_in_primary_pdf": true,
+  "account_baseline": "evaluate_factors.py asserted R73 daily NAV and cash-ledger conservation",
+  "production_changed": false
+}

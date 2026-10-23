@@ -1,0 +1,18 @@
+{
+  "sample_v2": 306,
+  "d2_intraday_touch": 100,
+  "d2_open_floor": 34,
+  "d2_close_floor": 52,
+  "d2_open_or_close_floor": 67,
+  "all_day_locked": 14,
+  "complete_minute_days_checked": 100,
+  "minute_ohlc_matches_daily": true,
+  "minute_volume_matches_daily_within_0_01pct_or_5000shares": true,
+  "minute_volume_max_abs_diff_shares": 236.0,
+  "minute_volume_max_relative_diff": 2.416432395593738e-05,
+  "morning7_sell_proxy_before_first_floor_touch": 3,
+  "baseline20_available": 97,
+  "official_preclose_used_for_floor": true,
+  "one_adjustment_boundary": "601279.SH D2 2025-06-17 official preclose 4.37 vs D1 close 4.38; low/close 3.94 not floor 3.93",
+  "no_production_db_write": true
+}

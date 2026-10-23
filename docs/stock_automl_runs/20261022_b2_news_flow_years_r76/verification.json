@@ -1,0 +1,15 @@
+{
+  "cohort_year_counts": {
+    "2022": 35,
+    "2023": 65,
+    "2024": 54,
+    "2025": 54,
+    "2026": 98
+  },
+  "2026_reproduced_policy_count": 9,
+  "year_accounts_reconciled": 90,
+  "full_accounts_reconciled": 18,
+  "data_prices": "306 complete minute days; 2026 exit minute and eight accounts match R73/R75",
+  "window": "D0 year cohort, each reset 1m; full single account reset 2022-01-01",
+  "not_actual_fills": "close-floor/zero-last-volume exits retained as unverified, no delayed positions"
+}

@@ -1,0 +1,11 @@
+{
+  "sample": 100,
+  "opening_floor": 34,
+  "all_day_one_price": 14,
+  "opening_still_floor_through_0931": 21,
+  "valid_preboard_stock_days": 1806,
+  "archived_source_days": 562,
+  "checked_ratio_cells": 819,
+  "complete_baselines_all": 91,
+  "complete_baselines_opening": 32
+}

@@ -1,0 +1,68 @@
+{
+  "panel_rows_2018_2021": 55444,
+  "legacy_chinext_d0_candidates": {
+    "total": 10825,
+    "by_d0_year": {
+      "2018": 3037,
+      "2019": 4154,
+      "2020": 3634
+    }
+  },
+  "legacy_chinext_cap10_confirmed_rows": 10825,
+  "legacy_chinext_would_match_cap20": 0,
+  "legacy_chinext_shadow_signals": {
+    "total": 124,
+    "by_d0_year": {
+      "2018": 49,
+      "2019": 53,
+      "2020": 22
+    }
+  },
+  "legacy_chinext_allowed_signals": {
+    "total": 55,
+    "by_d0_year": {
+      "2018": 19,
+      "2019": 27,
+      "2020": 9
+    }
+  },
+  "star_d0_candidates": {
+    "total": 316,
+    "by_d0_year": {
+      "2019": 12,
+      "2020": 96,
+      "2021": 208
+    }
+  },
+  "star_shadow_signals": {
+    "total": 1,
+    "by_d0_year": {
+      "2021": 1
+    }
+  },
+  "star_allowed_signals": {
+    "total": 0,
+    "by_d0_year": {}
+  },
+  "post_reform_chinext_shadow_signals": {
+    "total": 13,
+    "by_d0_year": {
+      "2020": 12,
+      "2021": 1
+    }
+  },
+  "post_reform_chinext_allowed_signals": {
+    "total": 4,
+    "by_d0_year": {
+      "2020": 4
+    }
+  },
+  "minute_d1_extrema_gap_allowed": 140,
+  "minute_d1_extrema_gap_shadow": 297,
+  "new_listing_first5_source_rows": 3187,
+  "new_listing_first5_source_limit_flags": 0,
+  "new_listing_first5_panel_candidates": 0,
+  "unknown_st_rows": 69,
+  "unknown_st_latest": "2017-11-15",
+  "unknown_st_unique_stocks": 22
+}

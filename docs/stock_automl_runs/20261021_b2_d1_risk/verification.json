@@ -1,0 +1,13 @@
+{
+  "minute_days": 306,
+  "all_minute_hashes_ohlc_and_volume_verified": true,
+  "early_features_unchanged_when_future_bars_and_aggregates_changed": true,
+  "features_recomputed": true,
+  "train_only_preprocessing": true,
+  "model_thresholds_lossless": true,
+  "temporal_splits_and_boundary_purge": true,
+  "prediction_checks": 78,
+  "selection_matches_predeclared_validation_rule": true,
+  "no_production_strategy_change": true,
+  "code_sha256": "91c85ac0b218ccd25723c2ece8d2b029b850d58974df594dbfdf957d2d808637"
+}

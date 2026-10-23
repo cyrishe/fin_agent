@@ -1,0 +1,17 @@
+{
+  "experiment": "R90 B2 V2 2016-2021 historical extension",
+  "parent_strategy": "imac/B2_V2",
+  "parent_definition_sha256": "54ebe0150dfefa6ce9837d403fd83b331f2720ad835271525e3106aae7529f00",
+  "daily_training_months": 6,
+  "daily_validation_months": 2,
+  "shape_training_months": 6,
+  "shape_validation_months": 2,
+  "first_daily_forecast": "2016-09",
+  "first_full_test": "2017-05",
+  "last_full_test": "2021-12",
+  "daily_snapshot_sha256": "15e83f5a69c6525ba16b328adb4ee17fde506a3c3bce7d2577a37a96318c31f2",
+  "model_family": "R18 RF51 240 trees same parameters/seed",
+  "execution": "Original fourK79 and Top3 no substitute after lock; D2 morning >7% next traded minute open else close; fees 0.1% each side",
+  "historical_market_rule": "ChiNext 10% before 2020-08-24 and 20% from that date, original cap rounding",
+  "production_changed": false
+}

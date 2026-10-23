@@ -1,0 +1,29 @@
+{
+  "experiment": "B2_R76_NEWS_FLOW_ALL_YEARS_20261022",
+  "parent_strategy": "imac/B2_V2",
+  "definition_sha256": "54ebe0150dfefa6ce9837d403fd83b331f2720ad835271525e3106aae7529f00",
+  "parent_experiment": "B2_R75_NEWS_FLOW_COMBO_20261022",
+  "sample_count": 306,
+  "per_D0_year": {
+    "2022": 35,
+    "2023": 65,
+    "2024": 54,
+    "2025": 54,
+    "2026": 98
+  },
+  "new_training": false,
+  "replay_modes": [
+    "D2_close",
+    "morning7_next_minute_open_else_D2_close"
+  ],
+  "account_modes": [
+    "independent_1m_per_D0_year",
+    "single_continuous_1m_from_2022"
+  ],
+  "policy_count": 9,
+  "source_manifest": "minute_source_manifest.json",
+  "verification": "verification.json",
+  "production_registration": "not_submitted",
+  "cloud_readback": "not_done",
+  "server_artifact_root": "/data/cyris/work/b2_news_flow_years_r76_20261022"
+}

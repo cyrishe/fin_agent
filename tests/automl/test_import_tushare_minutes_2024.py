@@ -36,6 +36,25 @@ def test_missing_exchange_minute_rejected():
         convert(frame, day)
 
 
+@pytest.mark.parametrize('symbol,previous,opening', [
+    ('300543.SZ', 43.16, 47.48),
+    ('300553.SZ', 39.52, 43.47),
+])
+def test_zero_volume_auction_does_not_create_a_false_open_or_low(symbol, previous, opening):
+    # Historical source examples: 09:30 is a stale zero-volume quote,
+    # while actual trading starts at the upper limit in 09:31.
+    day = '2016-09-14'
+    rows = [{'ts_code': symbol, 'trade_time': f'{day} {clock}:00',
+             'open': opening, 'high': opening, 'low': opening, 'close': opening,
+             'vol': 100, 'amount': 100 * opening} for clock in CLOCK]
+    rows[0].update(open=previous, high=previous, low=previous, close=previous,
+                   vol=0, amount=0)
+    result = convert(pd.DataFrame(rows), day)
+    assert result.iloc[0][['open', 'high', 'low', 'close']].tolist() == [opening] * 4
+    assert result.low.min() == opening
+    assert result.volume.sum() == 24000
+
+
 def test_append_preserves_verified_days_and_merges_manifest(tmp_path, monkeypatch):
     source = tmp_path / 'source'
     output = tmp_path / 'compact'

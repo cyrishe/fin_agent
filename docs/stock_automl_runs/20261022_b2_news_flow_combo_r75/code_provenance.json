@@ -1,0 +1,13 @@
+{
+  "server_base_commit": "unavailable",
+  "research_code_version": "hashes of scripts in manifest.json; research scripts outside base commit",
+  "execution": "server only",
+  "runtime": {
+    "python": "3.12.12",
+    "pandas": "2.3.3",
+    "numpy": "2.5.2",
+    "sklearn": "1.7.1",
+    "host": "iZ2zed8q1y8llzqxiyxzfmZ",
+    "server_workdir": "/data/cyris/work/b2_news_flow_combo_r75_20261022"
+  }
+}

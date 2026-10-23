@@ -1,0 +1,29 @@
+{
+  "sample": 100,
+  "main_0931_still_sealed": 19,
+  "main_unique_stocks": 18,
+  "main_good": 6,
+  "main_bad": 13,
+  "nonopening_before_0931_touch": 51,
+  "nonopening_good": 47,
+  "nonopening_bad": 4,
+  "rank_rows": 1003,
+  "summary_rows": 32,
+  "f05_low5_good_bad": [
+    0,
+    5
+  ],
+  "f05_middle9_good_bad": [
+    2,
+    7
+  ],
+  "f05_high5_good_bad": [
+    4,
+    1
+  ],
+  "f08_high5_good_bad": [
+    0,
+    5
+  ],
+  "all_main_f05_recomputed_from_R80_preboard_minutes": true
+}

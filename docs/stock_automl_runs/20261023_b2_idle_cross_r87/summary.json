@@ -1,0 +1,15 @@
+{
+  "all_days": 201,
+  "missing_days": 6,
+  "days": 195,
+  "base_buys": 130,
+  "idle_days": 65,
+  "reasons": {
+    "无合格激活": 50,
+    "锁定后无确认买点": 12,
+    "锁定后实体门槛失败": 3
+  },
+  "body_extra": 2,
+  "Q75_flagged": 54,
+  "Q75_unchecked_alt": 19
+}

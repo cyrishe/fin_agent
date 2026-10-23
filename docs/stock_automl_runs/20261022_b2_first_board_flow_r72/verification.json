@@ -1,0 +1,18 @@
+{
+  "source_read_only": true,
+  "rows": 709,
+  "features": 51,
+  "split_counts": {
+    "train": 419,
+    "validation": 165,
+    "test": 120,
+    "purged": 5
+  },
+  "d2_floor": 161,
+  "v2_d2_floor": 67,
+  "crash": 265,
+  "strong": 106,
+  "temporal_order_pass": true,
+  "no_episode_cross_split": true,
+  "saved_model_scores_match": true
+}

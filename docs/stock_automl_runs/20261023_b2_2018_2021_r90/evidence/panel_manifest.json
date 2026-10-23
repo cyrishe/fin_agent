@@ -1,0 +1,15 @@
+{
+  "rows": 75876,
+  "min_d0": "2016-01-04",
+  "max_d0": "2021-12-31",
+  "quality": {
+    "d0_board_stock_days": 89374,
+    "nonst_supported_standard_d0_with_d1": 77025,
+    "activated_rows": 61503,
+    "open_below_cap_but_zero_day_volume": 175,
+    "d1_close_reboard_activated": 9485,
+    "open_at_or_above_cap_or_no_open": 15522
+  },
+  "panel_sha256": "fbf0660641f4d2e43548b767b0bd947c08818f94738c0efd49e274fb2929fad0",
+  "calendar_sha256": "5f498f0a0f347234bfa0422f2e00b0e495ae26b54a03fab6755ea0b4cf71b37a"
+}

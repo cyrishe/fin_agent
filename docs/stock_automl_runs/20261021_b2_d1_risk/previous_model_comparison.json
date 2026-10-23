@@ -1,0 +1,26 @@
+{
+  "previous_selection_sha256": "0d8301de467adc93b2593ce196aa5a73b3ee4aafd992523c4199e4323e221338",
+  "groups": [
+    {
+      "group": "两版都提示",
+      "n": 12,
+      "risk": 4
+    },
+    {
+      "group": "仅新提示",
+      "n": 29,
+      "risk": 5
+    },
+    {
+      "group": "仅旧提示",
+      "n": 3,
+      "risk": 0
+    },
+    {
+      "group": "两版都不提示",
+      "n": 54,
+      "risk": 5
+    }
+  ],
+  "note": "Previous frozen model unchanged; current baseline models use different winsorization and are not the previous model."
+}

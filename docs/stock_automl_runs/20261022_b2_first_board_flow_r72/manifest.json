@@ -1,0 +1,45 @@
+{
+  "sources": {
+    "r69_signals_sha256": "88084043099b9df80684d5c5ada5aea88a8625700bde74c6ef05b5b4063adba7",
+    "r69_daily_sha256": "dca42800a19e24d1484e6fb24e9b032cd81b374a46bfb5c761a0037bc2e32e47",
+    "r71_preboard_sha256": "8858d0bb6c9fee39f65ede9148bc713c13c974c3a215e947d5178a42087da61a",
+    "r71_board_sha256": "9611602d678470011d57a8ce4ad52c74f011f469095758e1573d21cfc84d9441"
+  },
+  "fetch": {
+    "table": "kingdomai.kcrp_stock_price",
+    "mode": "read-only",
+    "unique_pairs": 12198,
+    "actual_rows": 12198,
+    "original_episode_rows": 12423
+  },
+  "files": {
+    "preboard_ohlcv_source.csv.gz": "7cdb2e1483b6d8037be5914085274756be0c5f57e42f434b179cfcd43c63afb4",
+    "feature_columns.json": "3881de0fa60e663ed7532376e2659666f4a1d036c36ba25f3767635a773f1fb6",
+    "首板前量价资金趋势_709候选.csv": "0c2a5c56f87951933cc4c0f18325ff06659b1229e59cf23fa7e6afeb75c1e0e8",
+    "prepare.py": "7063c1bcf1fa0f1741f94bbc6b80c029ad393595696f73788e7fad7ba596a484",
+    "features.py": "49ad000ebd1233609bc026ee15c06aecbcbf3e08338a1da858cf0daf941f8022",
+    "模型候选与分期指标.csv": "ff8bf8e7a71ada4fea6402e079f6e4f514ed80e319fc5491cf1570f1fed05f33",
+    "逐笔冻结预测_709候选.csv": "3ba42a982e662835792582b6924b3fdead2646d56968e1f47547d349e21e65c7",
+    "selection.json": "9b262072519b789037f2846dc0de0301783c9e023fa09d68f84d7c1dac4e72f9",
+    "model.py": "3f3a5bffd75566966f86141b1e07c5093868e22de363a35b620eb3785e1455d8",
+    "crash_full_hgb_train2022_24.joblib": "0a8ea1a0f9acb4b6d6e9b031e1d2ba8c4c80cbfc6625c3e6bb01066d9613f6a9",
+    "strong_full_hgb_train2022_24.joblib": "50e0e913b54246a22c454520be9663c4dea206996c4d302a8994b1e632113445",
+    "diagnostics.py": "4171e92a4f25941c5ad19aa29b8f9884c1aa57db8843330818d533628c527d79",
+    "diagnostics.json": "5a2381e68f9d12b875ea345b35a72b5a460d600a38c929de55950823efd896a1",
+    "资金趋势代理_按结果中位数.csv": "ec7a59e3fb4ba91d72db280d128fac0dc4057e204aa851dbd18dae44c4f9606b",
+    "verify.py": "5df48ce85732eb965f8c1648b9daf4997795f7a3ccd9fe4875ee162842cd5995",
+    "verification.json": "8fd1e991b6098482ac4494cc7d44b14ff8585d782c31683db5bc69112756bf79",
+    "训练验证测试分组.csv": "5cec57bd805f70b093f9eb89ba31ff09539347136712cba5df66ec2808559723",
+    "README.md": "ac74ffa95709d23df641fdfb29d0a22619e51693b7e5640fd3adfc65756cf9c8",
+    "unified.py": "2d5912578f6623782ecb0d8afb1bbaa27541c5ddb9a43bf3543ec48e69a419d4",
+    "统一三分类候选指标.csv": "0341c0f5554065b9e0956a06697672953e3214bf1378d394e6a1a59eb3214306",
+    "统一三分类逐笔预测.csv": "e298428d03b31b4036af5efe92a2b1bfc3e56a02333ec341262dbd1767ff2362",
+    "unified_selection.json": "3a02091a7be77d48c6d0b5eb7acb3a509ce1785a8efb3c112201a2545f3110a2",
+    "unified_full_rf_train2022_24.joblib": "e8af0c3905a746198e0f2940a88f507c657f4119b9c40c585446aba30e64f7ca",
+    "unified_balanced.py": "85bcaf88c0f05fd05400af0bbfd39a03c5dc68a637d057365b0e18b10f4254e3",
+    "统一三分类平衡候选指标.csv": "c2a73ae73ba97bfa7f642728bf6f577f15f93a7c93066db39a284190b2a2f755",
+    "统一三分类平衡逐笔预测.csv": "0fa9196fcdfdd118ea84cc6d3c0c4de70e35a8fa0697b15602142d92829094a9",
+    "unified_balanced_selection.json": "12649dda58be9d05d804fafc71db8d5681a86506ea7ad280757c7e2b0ed77962",
+    "unified_balanced_balanced_hgb_train2022_24.joblib": "a9ff62e861ed664736f1404ab8cf3e93f780179888449a3f5f33994d934ef03c"
+  }
+}

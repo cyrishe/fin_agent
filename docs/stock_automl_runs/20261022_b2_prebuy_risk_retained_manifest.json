@@ -1,0 +1,33 @@
+{
+  "source_experiment": "B2/V2 306 selected trades",
+  "research_candidates": [
+    {
+      "candidate": "logistic",
+      "files_sha256": {
+        "20261021_b2_floor_risk/selection_exact.json": "0d8301de467adc93b2593ce196aa5a73b3ee4aafd992523c4199e4323e221338",
+        "20261021_b2_floor_risk/logistic.joblib": "161870a9a671e11b86f8762384a2764ade73cc15fdc44c87a1a89d2e1eade2bb",
+        "20261021_b2_floor_risk/test_predictions_exact.csv": "61ad8eed0c5f953ac88371807fc3613def6806cb18a85622a0162da7bfe4400c",
+        "20261021_b2_floor_risk/protocol.json": "783bbc844d68206161f5bba806f2594c5fb7368a1ff92771f358ee9f771e0ae1"
+      }
+    },
+    {
+      "candidate": "close_early_lr1",
+      "files_sha256": {
+        "20261021_b2_d1_risk/selection_frozen.json": "97b8b0f034183081fcbdd40f60cdd83fed478049577d63a996a4d2f1cf56c92d",
+        "20261021_b2_d1_risk/close_early_lr1.joblib": "8fed06dad8b0ac20b7a3d731cacea5d388e9863f9ba450be61729eb4cb62ad1d",
+        "20261021_b2_d1_risk/test_predictions.csv": "27945bb87a02ed7cc4d5aae00e1acc346fb73665611d71186623a8b80f5432be",
+        "20261021_b2_d1_risk/protocol.json": "fe9b7f953fbcc3ec4842db3903d537a97cef270461584bc0a95da720c32f6380"
+      }
+    },
+    {
+      "candidate": "union_early_lr01",
+      "files_sha256": {
+        "20261021_b2_d1_risk/selection_frozen.json": "97b8b0f034183081fcbdd40f60cdd83fed478049577d63a996a4d2f1cf56c92d",
+        "20261021_b2_d1_risk/union_early_lr01.joblib": "7ea20139b24d334b5a5d8fc26f1a9ac860ec4f5eb4149aae1768fbe1be889712",
+        "20261021_b2_d1_risk/test_predictions.csv": "27945bb87a02ed7cc4d5aae00e1acc346fb73665611d71186623a8b80f5432be",
+        "20261021_b2_d1_risk/protocol.json": "fe9b7f953fbcc3ec4842db3903d537a97cef270461584bc0a95da720c32f6380"
+      }
+    }
+  ],
+  "use": "Preserved comparison candidates; no production strategy change"
+}

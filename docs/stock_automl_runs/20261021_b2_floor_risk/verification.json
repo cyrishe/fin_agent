@@ -1,0 +1,20 @@
+{
+  "input_source_and_frozen_selection_hashes": true,
+  "training_validation_test_temporal_disjoint": true,
+  "two_boundary_labels_purged": true,
+  "buy_before_information_whitelist": true,
+  "all_four_K_finished_before_buy": true,
+  "preprocessing_fit_on_training_only": true,
+  "selected_on_validation_only": true,
+  "saved_models_reproduce_all_16_test_predictions": true,
+  "future_fields_and_labels_cannot_change_predictions": true,
+  "independent_confusion_matrices_match": true,
+  "exact_thresholds_recover_original_fit_counts": true,
+  "precision_repair_keeps_selected_predictions": true,
+  "test_month_cluster_bootstrap_draws": 3000,
+  "training_rows": 152,
+  "validation_rows": 54,
+  "test_rows": 98,
+  "production_changed": false,
+  "code_sha256": "f9cddf9a6f3603ecb6c93c31a700865c5835121a354dc7ee6379d6fd237058e8"
+}

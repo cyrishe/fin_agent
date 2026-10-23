@@ -1,0 +1,24 @@
+{
+  "scope": "709 final B2 candidates, 306 V2 allowed; consecutive=20 trades/19 companies (D2+D3 close floor)",
+  "windows": "D0 and preceding 5/10 exchange trading days, including intervening calendar dates",
+  "cutoffs": [
+    "D0 15:00",
+    "D1 09:30"
+  ],
+  "date_only_rule": "date-only disclosure conservatively available from next calendar day 00:00; D0 same-day announcements excluded from D0 cut, included at D1; D1 date-only excluded",
+  "features": [
+    "announcement_count",
+    "abnormal_count",
+    "severe_abnormal_count",
+    "explicit_risk_warning_count",
+    "reduction_plan_count",
+    "enforcement_count",
+    "earnings_negative_count",
+    "deal_change_count",
+    "restructuring_count",
+    "pledge_freeze_count",
+    "news_count",
+    "news_negative_count"
+  ],
+  "evaluation": "title categories are observable mentions, not proof of misconduct or sentiment; do not equate routine abnormal announcements with negative news; no model fit this round; report coverage and equal-ticket PnL before account claims"
+}

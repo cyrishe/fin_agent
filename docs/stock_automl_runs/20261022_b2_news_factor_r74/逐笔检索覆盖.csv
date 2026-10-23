@@ -1,0 +1,710 @@
+﻿id,stock,D0,official_ok,official_docs,media_complete,media_docs_observed,media_discarded_unverified_entity_or_time,media_error
+002062.SZ|2022-05-05,002062.SZ,2022-05-05,1,26,1,10,0,
+000506.SZ|2022-05-06,000506.SZ,2022-05-06,1,34,1,0,0,
+601368.SH|2022-05-11,601368.SH,2022-05-11,1,27,1,7,0,
+000926.SZ|2022-05-16,000926.SZ,2022-05-16,1,30,1,0,0,
+002766.SZ|2022-05-17,002766.SZ,2022-05-17,1,19,1,9,2,
+002309.SZ|2022-05-18,002309.SZ,2022-05-18,1,14,1,19,0,
+000779.SZ|2022-05-19,000779.SZ,2022-05-19,1,3,1,16,8,
+000909.SZ|2022-05-20,000909.SZ,2022-05-20,1,2,1,30,7,
+002309.SZ|2022-05-23,002309.SZ,2022-05-23,1,15,1,20,0,
+603166.SH|2022-05-24,603166.SH,2022-05-24,1,6,1,6,0,
+000957.SZ|2022-05-25,000957.SZ,2022-05-25,1,3,1,14,4,
+000957.SZ|2022-05-27,000957.SZ,2022-05-27,1,5,0,57,3,HTTPError: 429 Client Error: Too Many Requests for url: https://search.sina.com.cn/api/news?q=%E4%B8%AD%E9%80%9A%E5%AE%A2%E8%BD%A6&tp=news&sort=1&page=4&size=20&from=search_result&stime=1652371200&etime=16538742
+600962.SH|2022-05-30,600962.SH,2022-05-30,1,9,1,6,0,
+000151.SZ|2022-05-31,000151.SZ,2022-05-31,1,7,0,7,0,HTTPError: 429 Client Error: Too Many Requests for url: https://search.sina.com.cn/api/news?q=%E4%B8%AD%E6%88%90%E8%82%A1%E4%BB%BD&tp=news&sort=1&page=2&size=20&from=search_result&stime=1652716800&etime=16540470
+000595.SZ|2022-06-01,000595.SZ,2022-06-01,1,4,1,0,0,
+002066.SZ|2022-06-02,002066.SZ,2022-06-02,1,5,0,0,0,HTTPError: 429 Client Error: Too Many Requests for url: https://search.sina.com.cn/api/news?q=002066&tp=news&sort=1&page=1&size=20&from=search_result&stime=1652889600&etime=1654479000
+603051.SH|2022-06-08,603051.SH,2022-06-08,1,45,0,0,0,HTTPError: 429 Client Error: Too Many Requests for url: https://search.sina.com.cn/api/news?q=603051&tp=news&sort=1&page=1&size=20&from=search_result&stime=1653321600&etime=1654738200
+002630.SZ|2022-06-09,002630.SZ,2022-06-09,1,7,0,0,0,HTTPError: 429 Client Error: Too Many Requests for url: https://search.sina.com.cn/api/news?q=002630&tp=news&sort=1&page=1&size=20&from=search_result&stime=1653408000&etime=1654824600
+002630.SZ|2022-06-10,002630.SZ,2022-06-10,1,5,0,0,0,HTTPError: 429 Client Error: Too Many Requests for url: https://search.sina.com.cn/api/news?q=002630&tp=news&sort=1&page=1&size=20&from=search_result&stime=1653494400&etime=1655083800
+600653.SH|2022-06-13,600653.SH,2022-06-13,1,8,0,0,0,HTTPError: 429 Client Error: Too Many Requests for url: https://search.sina.com.cn/api/news?q=600653&tp=news&sort=1&page=1&size=20&from=search_result&stime=1653580800&etime=1655170200
+002703.SZ|2022-06-16,002703.SZ,2022-06-16,1,1,0,0,0,HTTPError: 429 Client Error: Too Many Requests for url: https://search.sina.com.cn/api/news?q=002703&tp=news&sort=1&page=1&size=20&from=search_result&stime=1654012800&etime=1655429400
+001270.SZ|2022-06-20,001270.SZ,2022-06-20,1,5,0,0,0,HTTPError: 429 Client Error: Too Many Requests for url: https://search.sina.com.cn/api/news?q=001270&tp=news&sort=1&page=1&size=20&from=search_result&stime=1654444800&etime=1655775000
+002909.SZ|2022-06-23,002909.SZ,2022-06-23,1,7,0,0,0,HTTPError: 429 Client Error: Too Many Requests for url: https://search.sina.com.cn/api/news?q=002909&tp=news&sort=1&page=1&size=20&from=search_result&stime=1654704000&etime=1656034200
+001316.SZ|2022-06-28,001316.SZ,2022-06-28,1,9,0,0,0,HTTPError: 429 Client Error: Too Many Requests for url: https://search.sina.com.cn/api/news?q=001316&tp=news&sort=1&page=1&size=20&from=search_result&stime=1655136000&etime=1656466200
+001316.SZ|2022-06-29,001316.SZ,2022-06-29,1,9,0,0,0,HTTPError: 429 Client Error: Too Many Requests for url: https://search.sina.com.cn/api/news?q=001316&tp=news&sort=1&page=1&size=20&from=search_result&stime=1655222400&etime=1656552600
+002528.SZ|2022-07-04,002528.SZ,2022-07-04,1,4,0,0,0,HTTPError: 429 Client Error: Too Many Requests for url: https://search.sina.com.cn/api/news?q=002528&tp=news&sort=1&page=1&size=20&from=search_result&stime=1655654400&etime=1656984600
+002219.SZ|2022-07-07,002219.SZ,2022-07-07,1,21,0,0,0,HTTPError: 429 Client Error: Too Many Requests for url: https://search.sina.com.cn/api/news?q=002219&tp=news&sort=1&page=1&size=20&from=search_result&stime=1655913600&etime=1657243800
+600192.SH|2022-07-12,600192.SH,2022-07-12,1,3,0,0,0,HTTPError: 429 Client Error: Too Many Requests for url: https://search.sina.com.cn/api/news?q=600192&tp=news&sort=1&page=1&size=20&from=search_result&stime=1656345600&etime=1657675800
+002514.SZ|2022-07-13,002514.SZ,2022-07-13,1,10,0,0,0,HTTPError: 429 Client Error: Too Many Requests for url: https://search.sina.com.cn/api/news?q=002514&tp=news&sort=1&page=1&size=20&from=search_result&stime=1656432000&etime=1657762200
+000755.SZ|2022-07-14,000755.SZ,2022-07-14,1,5,0,0,0,HTTPError: 429 Client Error: Too Many Requests for url: https://search.sina.com.cn/api/news?q=000755&tp=news&sort=1&page=1&size=20&from=search_result&stime=1656518400&etime=1657848600
+600992.SH|2022-07-15,600992.SH,2022-07-15,1,3,0,0,0,HTTPError: 429 Client Error: Too Many Requests for url: https://search.sina.com.cn/api/news?q=600992&tp=news&sort=1&page=1&size=20&from=search_result&stime=1656604800&etime=1658107800
+002796.SZ|2022-07-18,002796.SZ,2022-07-18,1,4,0,0,0,HTTPError: 429 Client Error: Too Many Requests for url: https://search.sina.com.cn/api/news?q=002796&tp=news&sort=1&page=1&size=20&from=search_result&stime=1656864000&etime=1658194200
+002866.SZ|2022-07-19,002866.SZ,2022-07-19,1,5,0,0,0,HTTPError: 429 Client Error: Too Many Requests for url: https://search.sina.com.cn/api/news?q=002866&tp=news&sort=1&page=1&size=20&from=search_result&stime=1656950400&etime=1658280600
+605088.SH|2022-07-20,605088.SH,2022-07-20,1,3,0,0,0,HTTPError: 429 Client Error: Too Many Requests for url: https://search.sina.com.cn/api/news?q=605088&tp=news&sort=1&page=1&size=20&from=search_result&stime=1657036800&etime=1658367000
+002547.SZ|2022-07-21,002547.SZ,2022-07-21,1,5,0,0,0,HTTPError: 429 Client Error: Too Many Requests for url: https://search.sina.com.cn/api/news?q=002547&tp=news&sort=1&page=1&size=20&from=search_result&stime=1657123200&etime=1658453400
+002168.SZ|2022-07-22,002168.SZ,2022-07-22,1,9,0,0,0,HTTPError: 429 Client Error: Too Many Requests for url: https://search.sina.com.cn/api/news?q=002168&tp=news&sort=1&page=1&size=20&from=search_result&stime=1657209600&etime=1658712600
+002150.SZ|2022-07-26,002150.SZ,2022-07-26,1,6,0,0,0,HTTPError: 429 Client Error: Too Many Requests for url: https://search.sina.com.cn/api/news?q=002150&tp=news&sort=1&page=1&size=20&from=search_result&stime=1657555200&etime=1658885400
+000678.SZ|2022-07-28,000678.SZ,2022-07-28,1,5,0,0,0,HTTPError: 429 Client Error: Too Many Requests for url: https://search.sina.com.cn/api/news?q=000678&tp=news&sort=1&page=1&size=20&from=search_result&stime=1657728000&etime=1659058200
+000837.SZ|2022-07-29,000837.SZ,2022-07-29,1,1,0,0,0,HTTPError: 429 Client Error: Too Many Requests for url: https://search.sina.com.cn/api/news?q=000837&tp=news&sort=1&page=1&size=20&from=search_result&stime=1657814400&etime=1659317400
+000678.SZ|2022-08-01,000678.SZ,2022-08-01,1,3,1,27,2,
+600586.SH|2022-08-04,600586.SH,2022-08-04,1,10,0,0,0,HTTPError: 429 Client Error: Too Many Requests for url: https://search.sina.com.cn/api/news?q=600586&tp=news&sort=1&page=1&size=20&from=search_result&stime=1658332800&etime=1659663000
+002868.SZ|2022-08-05,002868.SZ,2022-08-05,1,22,0,0,0,HTTPError: 429 Client Error: Too Many Requests for url: https://search.sina.com.cn/api/news?q=002868&tp=news&sort=1&page=1&size=20&from=search_result&stime=1658419200&etime=1659922200
+002553.SZ|2022-08-09,002553.SZ,2022-08-09,1,1,0,0,0,HTTPError: 429 Client Error: Too Many Requests for url: https://search.sina.com.cn/api/news?q=002553&tp=news&sort=1&page=1&size=20&from=search_result&stime=1658764800&etime=1660095000
+603389.SH|2022-08-16,603389.SH,2022-08-16,1,1,0,0,0,HTTPError: 429 Client Error: Too Many Requests for url: https://search.sina.com.cn/api/news?q=603389&tp=news&sort=1&page=1&size=20&from=search_result&stime=1659369600&etime=1660699800
+002272.SZ|2022-08-18,002272.SZ,2022-08-18,1,3,0,0,0,HTTPError: 429 Client Error: Too Many Requests for url: https://search.sina.com.cn/api/news?q=002272&tp=news&sort=1&page=1&size=20&from=search_result&stime=1659542400&etime=1660872600
+002334.SZ|2022-08-19,002334.SZ,2022-08-19,1,12,0,0,0,HTTPError: 429 Client Error: Too Many Requests for url: https://search.sina.com.cn/api/news?q=002334&tp=news&sort=1&page=1&size=20&from=search_result&stime=1659628800&etime=1661131800
+603255.SH|2022-08-22,603255.SH,2022-08-22,1,6,0,0,0,HTTPError: 429 Client Error: Too Many Requests for url: https://search.sina.com.cn/api/news?q=603255&tp=news&sort=1&page=1&size=20&from=search_result&stime=1659888000&etime=1661218200
+001236.SZ|2022-08-29,001236.SZ,2022-08-29,1,21,0,0,0,HTTPError: 429 Client Error: Too Many Requests for url: https://search.sina.com.cn/api/news?q=001236&tp=news&sort=1&page=1&size=20&from=search_result&stime=1660492800&etime=1661823000
+002543.SZ|2022-08-30,002543.SZ,2022-08-30,1,9,0,0,0,HTTPError: 429 Client Error: Too Many Requests for url: https://search.sina.com.cn/api/news?q=002543&tp=news&sort=1&page=1&size=20&from=search_result&stime=1660579200&etime=1661909400
+000892.SZ|2022-09-02,000892.SZ,2022-09-02,1,5,0,0,0,HTTPError: 429 Client Error: Too Many Requests for url: https://search.sina.com.cn/api/news?q=000892&tp=news&sort=1&page=1&size=20&from=search_result&stime=1660838400&etime=1662341400
+001259.SZ|2022-09-05,001259.SZ,2022-09-05,1,7,0,0,0,HTTPError: 429 Client Error: Too Many Requests for url: https://search.sina.com.cn/api/news?q=001259&tp=news&sort=1&page=1&size=20&from=search_result&stime=1661097600&etime=1662427800
+002866.SZ|2022-09-06,002866.SZ,2022-09-06,1,13,0,0,0,HTTPError: 429 Client Error: Too Many Requests for url: https://search.sina.com.cn/api/news?q=002866&tp=news&sort=1&page=1&size=20&from=search_result&stime=1661184000&etime=1662514200
+002868.SZ|2022-09-07,002868.SZ,2022-09-07,1,12,0,0,0,HTTPError: 429 Client Error: Too Many Requests for url: https://search.sina.com.cn/api/news?q=002868&tp=news&sort=1&page=1&size=20&from=search_result&stime=1661270400&etime=1662600600
+000573.SZ|2022-09-08,000573.SZ,2022-09-08,1,7,0,0,0,HTTPError: 429 Client Error: Too Many Requests for url: https://search.sina.com.cn/api/news?q=000573&tp=news&sort=1&page=1&size=20&from=search_result&stime=1661356800&etime=1662687000
+002800.SZ|2022-09-09,002800.SZ,2022-09-09,1,4,0,0,0,HTTPError: 429 Client Error: Too Many Requests for url: https://search.sina.com.cn/api/news?q=002800&tp=news&sort=1&page=1&size=20&from=search_result&stime=1661443200&etime=1663032600
+001331.SZ|2022-09-13,001331.SZ,2022-09-13,1,11,0,0,0,HTTPError: 429 Client Error: Too Many Requests for url: https://search.sina.com.cn/api/news?q=001331&tp=news&sort=1&page=1&size=20&from=search_result&stime=1661702400&etime=1663119000
+603182.SH|2022-09-16,603182.SH,2022-09-16,1,9,0,0,0,HTTPError: 429 Client Error: Too Many Requests for url: https://search.sina.com.cn/api/news?q=603182&tp=news&sort=1&page=1&size=20&from=search_result&stime=1661961600&etime=1663551000
+002703.SZ|2022-09-19,002703.SZ,2022-09-19,1,1,0,0,0,HTTPError: 429 Client Error: Too Many Requests for url: https://search.sina.com.cn/api/news?q=002703&tp=news&sort=1&page=1&size=20&from=search_result&stime=1662048000&etime=1663637400
+000620.SZ|2022-09-20,000620.SZ,2022-09-20,1,4,0,0,0,HTTPError: 429 Client Error: Too Many Requests for url: https://search.sina.com.cn/api/news?q=000620&tp=news&sort=1&page=1&size=20&from=search_result&stime=1662307200&etime=1663723800
+003027.SZ|2022-09-22,003027.SZ,2022-09-22,1,16,0,0,0,not retrieved
+003027.SZ|2022-09-23,003027.SZ,2022-09-23,1,17,0,0,0,not retrieved
+001238.SZ|2022-09-26,001238.SZ,2022-09-26,1,10,0,0,0,not retrieved
+001238.SZ|2022-09-27,001238.SZ,2022-09-27,1,8,0,0,0,not retrieved
+002693.SZ|2022-09-28,002693.SZ,2022-09-28,1,5,0,0,0,not retrieved
+603057.SH|2022-09-29,603057.SH,2022-09-29,1,7,0,0,0,not retrieved
+603057.SH|2022-09-30,603057.SH,2022-09-30,1,9,0,0,0,not retrieved
+002476.SZ|2022-10-10,002476.SZ,2022-10-10,1,1,0,0,0,not retrieved
+001255.SZ|2022-10-12,001255.SZ,2022-10-12,1,9,0,0,0,not retrieved
+002380.SZ|2022-10-13,002380.SZ,2022-10-13,1,1,0,0,0,not retrieved
+000948.SZ|2022-10-14,000948.SZ,2022-10-14,1,3,0,0,0,not retrieved
+002093.SZ|2022-10-18,002093.SZ,2022-10-18,1,2,0,0,0,not retrieved
+000638.SZ|2022-10-19,000638.SZ,2022-10-19,1,22,0,0,0,not retrieved
+002907.SZ|2022-10-21,002907.SZ,2022-10-21,1,6,0,0,0,not retrieved
+002907.SZ|2022-10-24,002907.SZ,2022-10-24,1,7,0,0,0,not retrieved
+001300.SZ|2022-10-25,001300.SZ,2022-10-25,1,12,0,0,0,not retrieved
+002296.SZ|2022-10-26,002296.SZ,2022-10-26,1,3,0,0,0,not retrieved
+002771.SZ|2022-10-27,002771.SZ,2022-10-27,1,3,0,0,0,not retrieved
+002279.SZ|2022-10-28,002279.SZ,2022-10-28,1,10,0,0,0,not retrieved
+002279.SZ|2022-10-31,002279.SZ,2022-10-31,1,11,0,0,0,not retrieved
+600613.SH|2022-11-01,600613.SH,2022-11-01,1,6,0,0,0,not retrieved
+001299.SZ|2022-11-02,001299.SZ,2022-11-02,1,9,0,0,0,not retrieved
+603029.SH|2022-11-03,603029.SH,2022-11-03,1,5,0,0,0,not retrieved
+603029.SH|2022-11-04,603029.SH,2022-11-04,1,5,0,0,0,not retrieved
+000980.SZ|2022-11-07,000980.SZ,2022-11-07,1,12,0,0,0,not retrieved
+603029.SH|2022-11-08,603029.SH,2022-11-08,1,9,0,0,0,not retrieved
+603029.SH|2022-11-09,603029.SH,2022-11-09,1,11,0,0,0,not retrieved
+002467.SZ|2022-11-11,002467.SZ,2022-11-11,1,18,0,0,0,not retrieved
+600556.SH|2022-11-14,600556.SH,2022-11-14,1,9,0,0,0,not retrieved
+000153.SZ|2022-11-15,000153.SZ,2022-11-15,1,0,0,0,0,not retrieved
+600613.SH|2022-11-17,600613.SH,2022-11-17,1,6,0,0,0,not retrieved
+600222.SH|2022-11-21,600222.SH,2022-11-21,1,18,0,0,0,not retrieved
+002181.SZ|2022-11-22,002181.SZ,2022-11-22,1,4,0,0,0,not retrieved
+002181.SZ|2022-11-23,002181.SZ,2022-11-23,1,6,0,0,0,not retrieved
+001338.SZ|2022-11-24,001338.SZ,2022-11-24,1,21,0,0,0,not retrieved
+000151.SZ|2022-11-25,000151.SZ,2022-11-25,1,8,0,0,0,not retrieved
+000797.SZ|2022-11-30,000797.SZ,2022-11-30,1,12,0,0,0,not retrieved
+000006.SZ|2022-12-01,000006.SZ,2022-12-01,1,4,0,0,0,not retrieved
+001318.SZ|2022-12-02,001318.SZ,2022-12-02,1,0,0,0,0,not retrieved
+001338.SZ|2022-12-05,001338.SZ,2022-12-05,1,18,0,0,0,not retrieved
+002150.SZ|2022-12-06,002150.SZ,2022-12-06,1,18,0,0,0,not retrieved
+002193.SZ|2022-12-07,002193.SZ,2022-12-07,1,2,0,0,0,not retrieved
+002193.SZ|2022-12-08,002193.SZ,2022-12-08,1,2,0,0,0,not retrieved
+002336.SZ|2022-12-12,002336.SZ,2022-12-12,1,7,0,0,0,not retrieved
+002336.SZ|2022-12-13,002336.SZ,2022-12-13,1,9,0,0,0,not retrieved
+000721.SZ|2022-12-15,000721.SZ,2022-12-15,1,8,0,0,0,not retrieved
+000721.SZ|2022-12-16,000721.SZ,2022-12-16,1,8,0,0,0,not retrieved
+600661.SH|2022-12-19,600661.SH,2022-12-19,1,9,0,0,0,not retrieved
+002095.SZ|2022-12-20,002095.SZ,2022-12-20,1,1,0,0,0,not retrieved
+002582.SZ|2022-12-22,002582.SZ,2022-12-22,1,6,0,0,0,not retrieved
+002574.SZ|2022-12-23,002574.SZ,2022-12-23,1,1,0,0,0,not retrieved
+000529.SZ|2022-12-26,000529.SZ,2022-12-26,1,2,0,0,0,not retrieved
+002159.SZ|2022-12-27,002159.SZ,2022-12-27,1,10,0,0,0,not retrieved
+002719.SZ|2022-12-28,002719.SZ,2022-12-28,1,2,0,0,0,not retrieved
+002719.SZ|2022-12-29,002719.SZ,2022-12-29,1,3,0,0,0,not retrieved
+002719.SZ|2022-12-30,002719.SZ,2022-12-30,1,4,0,0,0,not retrieved
+002231.SZ|2023-01-03,002231.SZ,2023-01-03,1,7,0,0,0,not retrieved
+002576.SZ|2023-01-10,002576.SZ,2023-01-10,1,1,0,0,0,not retrieved
+002762.SZ|2023-01-12,002762.SZ,2023-01-12,1,4,0,0,0,not retrieved
+002560.SZ|2023-01-16,002560.SZ,2023-01-16,1,13,0,0,0,not retrieved
+001236.SZ|2023-01-18,001236.SZ,2023-01-18,1,5,0,0,0,not retrieved
+002808.SZ|2023-01-19,002808.SZ,2023-01-19,1,1,0,0,0,not retrieved
+002808.SZ|2023-01-31,002808.SZ,2023-01-31,1,3,0,0,0,not retrieved
+002362.SZ|2023-02-06,002362.SZ,2023-02-06,1,3,0,0,0,not retrieved
+002354.SZ|2023-02-07,002354.SZ,2023-02-07,1,3,0,0,0,not retrieved
+601059.SH|2023-02-08,601059.SH,2023-02-08,1,8,0,0,0,not retrieved
+605389.SH|2023-02-14,605389.SH,2023-02-14,1,13,0,0,0,not retrieved
+001314.SZ|2023-02-15,001314.SZ,2023-02-15,1,9,0,0,0,not retrieved
+001339.SZ|2023-02-16,001339.SZ,2023-02-16,1,9,0,0,0,not retrieved
+002713.SZ|2023-02-21,002713.SZ,2023-02-21,1,7,0,0,0,not retrieved
+603307.SH|2023-02-23,603307.SH,2023-02-23,1,9,0,0,0,not retrieved
+601566.SH|2023-02-27,601566.SH,2023-02-27,1,2,0,0,0,not retrieved
+000925.SZ|2023-02-28,000925.SZ,2023-02-28,1,3,0,0,0,not retrieved
+601566.SH|2023-03-01,601566.SH,2023-03-01,1,3,0,0,0,not retrieved
+002808.SZ|2023-03-02,002808.SZ,2023-03-02,1,1,0,0,0,not retrieved
+603042.SH|2023-03-03,603042.SH,2023-03-03,1,7,0,0,0,not retrieved
+603860.SH|2023-03-07,603860.SH,2023-03-07,1,7,0,0,0,not retrieved
+605398.SH|2023-03-08,605398.SH,2023-03-08,1,4,0,0,0,not retrieved
+603061.SH|2023-03-09,603061.SH,2023-03-09,1,7,0,0,0,not retrieved
+001278.SZ|2023-03-10,001278.SZ,2023-03-10,1,7,0,0,0,not retrieved
+001366.SZ|2023-03-14,001366.SZ,2023-03-14,1,9,0,0,0,not retrieved
+603153.SH|2023-03-16,603153.SH,2023-03-16,1,7,0,0,0,not retrieved
+000065.SZ|2023-03-17,000065.SZ,2023-03-17,1,13,0,0,0,not retrieved
+001337.SZ|2023-03-21,001337.SZ,2023-03-21,1,5,0,0,0,not retrieved
+002280.SZ|2023-03-22,002280.SZ,2023-03-22,1,2,0,0,0,not retrieved
+603065.SH|2023-03-23,603065.SH,2023-03-23,1,7,0,0,0,not retrieved
+002229.SZ|2023-03-24,002229.SZ,2023-03-24,1,7,0,0,0,not retrieved
+002888.SZ|2023-03-27,002888.SZ,2023-03-27,1,5,0,0,0,not retrieved
+002717.SZ|2023-03-28,002717.SZ,2023-03-28,1,2,0,0,0,not retrieved
+603083.SH|2023-03-29,603083.SH,2023-03-29,1,25,0,0,0,not retrieved
+601116.SH|2023-03-30,601116.SH,2023-03-30,1,2,0,0,0,not retrieved
+601116.SH|2023-03-31,601116.SH,2023-03-31,1,3,0,0,0,not retrieved
+001366.SZ|2023-04-03,001366.SZ,2023-04-03,1,30,0,0,0,not retrieved
+001366.SZ|2023-04-04,001366.SZ,2023-04-04,1,31,0,0,0,not retrieved
+002681.SZ|2023-04-06,002681.SZ,2023-04-06,1,12,0,0,0,not retrieved
+603083.SH|2023-04-07,603083.SH,2023-04-07,1,24,0,0,0,not retrieved
+002292.SZ|2023-04-11,002292.SZ,2023-04-11,1,1,0,0,0,not retrieved
+600706.SH|2023-04-13,600706.SH,2023-04-13,1,4,0,0,0,not retrieved
+002316.SZ|2023-04-18,002316.SZ,2023-04-18,1,6,0,0,0,not retrieved
+603322.SH|2023-04-19,603322.SH,2023-04-19,1,4,0,0,0,not retrieved
+601949.SH|2023-04-21,601949.SH,2023-04-21,1,4,0,0,0,not retrieved
+603168.SH|2023-04-24,603168.SH,2023-04-24,1,8,0,0,0,not retrieved
+002229.SZ|2023-04-25,002229.SZ,2023-04-25,1,14,0,0,0,not retrieved
+002315.SZ|2023-04-26,002315.SZ,2023-04-26,1,3,0,0,0,not retrieved
+301103.SZ|2023-04-27,301103.SZ,2023-04-27,1,33,0,0,0,not retrieved
+002315.SZ|2023-04-28,002315.SZ,2023-04-28,1,14,0,0,0,not retrieved
+600228.SH|2023-05-04,600228.SH,2023-05-04,1,26,0,0,0,not retrieved
+600228.SH|2023-05-08,600228.SH,2023-05-08,1,28,0,0,0,not retrieved
+600088.SH|2023-05-09,600088.SH,2023-05-09,1,24,0,0,0,not retrieved
+002992.SZ|2023-05-10,002992.SZ,2023-05-10,1,41,0,0,0,not retrieved
+605011.SH|2023-05-16,605011.SH,2023-05-16,1,9,0,0,0,not retrieved
+301368.SZ|2023-05-19,301368.SZ,2023-05-19,1,4,0,0,0,not retrieved
+603196.SH|2023-05-22,603196.SH,2023-05-22,1,40,0,0,0,not retrieved
+605011.SH|2023-05-24,605011.SH,2023-05-24,1,14,0,0,0,not retrieved
+605580.SH|2023-05-26,605580.SH,2023-05-26,1,3,0,0,0,not retrieved
+603291.SH|2023-05-30,603291.SH,2023-05-30,1,8,0,0,0,not retrieved
+605118.SH|2023-05-31,605118.SH,2023-05-31,1,5,0,0,0,not retrieved
+605588.SH|2023-06-05,605588.SH,2023-06-05,1,22,0,0,0,not retrieved
+002902.SZ|2023-06-06,002902.SZ,2023-06-06,1,26,0,0,0,not retrieved
+002902.SZ|2023-06-07,002902.SZ,2023-06-07,1,26,0,0,0,not retrieved
+603779.SH|2023-06-12,603779.SH,2023-06-12,1,37,0,0,0,not retrieved
+002725.SZ|2023-06-15,002725.SZ,2023-06-15,1,1,0,0,0,not retrieved
+002896.SZ|2023-06-19,002896.SZ,2023-06-19,1,4,0,0,0,not retrieved
+605162.SH|2023-06-26,605162.SH,2023-06-26,1,6,0,0,0,not retrieved
+000037.SZ|2023-06-28,000037.SZ,2023-06-28,1,2,0,0,0,not retrieved
+603767.SH|2023-06-29,603767.SH,2023-06-29,1,10,0,0,0,not retrieved
+002535.SZ|2023-07-04,002535.SZ,2023-07-04,1,6,0,0,0,not retrieved
+002535.SZ|2023-07-05,002535.SZ,2023-07-05,1,5,0,0,0,not retrieved
+000004.SZ|2023-07-06,000004.SZ,2023-07-06,1,10,0,0,0,not retrieved
+002513.SZ|2023-07-14,002513.SZ,2023-07-14,1,24,0,0,0,not retrieved
+000004.SZ|2023-07-17,000004.SZ,2023-07-17,1,3,0,0,0,not retrieved
+002877.SZ|2023-07-18,002877.SZ,2023-07-18,1,4,0,0,0,not retrieved
+603767.SH|2023-07-19,603767.SH,2023-07-19,1,1,0,0,0,not retrieved
+002316.SZ|2023-07-20,002316.SZ,2023-07-20,1,2,0,0,0,not retrieved
+002719.SZ|2023-07-24,002719.SZ,2023-07-24,1,3,0,0,0,not retrieved
+000638.SZ|2023-07-25,000638.SZ,2023-07-25,1,5,0,0,0,not retrieved
+000656.SZ|2023-07-26,000656.SZ,2023-07-26,1,3,0,0,0,not retrieved
+603682.SH|2023-07-27,603682.SH,2023-07-27,1,9,0,0,0,not retrieved
+601086.SH|2023-07-28,601086.SH,2023-07-28,1,4,0,0,0,not retrieved
+601086.SH|2023-07-31,601086.SH,2023-07-31,1,4,0,0,0,not retrieved
+002377.SZ|2023-08-01,002377.SZ,2023-08-01,1,19,0,0,0,not retrieved
+000890.SZ|2023-08-02,000890.SZ,2023-08-02,1,2,0,0,0,not retrieved
+603536.SH|2023-08-03,603536.SH,2023-08-03,1,5,0,0,0,not retrieved
+603828.SH|2023-08-04,603828.SH,2023-08-04,1,7,0,0,0,not retrieved
+600468.SH|2023-08-07,600468.SH,2023-08-07,1,11,0,0,0,not retrieved
+603536.SH|2023-08-08,603536.SH,2023-08-08,1,3,0,0,0,not retrieved
+603106.SH|2023-08-09,603106.SH,2023-08-09,1,5,0,0,0,not retrieved
+301281.SZ|2023-08-10,301281.SZ,2023-08-10,1,2,0,0,0,not retrieved
+603716.SH|2023-08-11,603716.SH,2023-08-11,1,10,0,0,0,not retrieved
+000719.SZ|2023-08-14,000719.SZ,2023-08-14,1,6,0,0,0,not retrieved
+600272.SH|2023-08-15,600272.SH,2023-08-15,1,5,0,0,0,not retrieved
+600272.SH|2023-08-16,600272.SH,2023-08-16,1,6,0,0,0,not retrieved
+600272.SH|2023-08-17,600272.SH,2023-08-17,1,9,0,0,0,not retrieved
+301487.SZ|2023-08-18,301487.SZ,2023-08-18,1,22,0,0,0,not retrieved
+000826.SZ|2023-08-21,000826.SZ,2023-08-21,1,4,0,0,0,not retrieved
+002279.SZ|2023-08-22,002279.SZ,2023-08-22,1,1,0,0,0,not retrieved
+002355.SZ|2023-08-23,002355.SZ,2023-08-23,1,12,0,0,0,not retrieved
+605398.SH|2023-08-24,605398.SH,2023-08-24,1,8,0,0,0,not retrieved
+000010.SZ|2023-08-25,000010.SZ,2023-08-25,1,3,0,0,0,not retrieved
+002333.SZ|2023-08-28,002333.SZ,2023-08-28,1,17,0,0,0,not retrieved
+000609.SZ|2023-08-29,000609.SZ,2023-08-29,1,11,0,0,0,not retrieved
+603767.SH|2023-08-30,603767.SH,2023-08-30,1,10,0,0,0,not retrieved
+603767.SH|2023-08-31,603767.SH,2023-08-31,1,12,0,0,0,not retrieved
+603767.SH|2023-09-01,603767.SH,2023-09-01,1,13,0,0,0,not retrieved
+603767.SH|2023-09-04,603767.SH,2023-09-04,1,13,0,0,0,not retrieved
+002861.SZ|2023-09-05,002861.SZ,2023-09-05,1,15,0,0,0,not retrieved
+301348.SZ|2023-09-06,301348.SZ,2023-09-06,1,37,0,0,0,not retrieved
+000536.SZ|2023-09-07,000536.SZ,2023-09-07,1,4,0,0,0,not retrieved
+002642.SZ|2023-09-11,002642.SZ,2023-09-11,1,2,0,0,0,not retrieved
+000766.SZ|2023-09-12,000766.SZ,2023-09-12,1,3,0,0,0,not retrieved
+603607.SH|2023-09-13,603607.SH,2023-09-13,1,2,0,0,0,not retrieved
+605365.SH|2023-09-14,605365.SH,2023-09-14,1,3,0,0,0,not retrieved
+600189.SH|2023-09-15,600189.SH,2023-09-15,1,4,0,0,0,not retrieved
+002889.SZ|2023-09-18,002889.SZ,2023-09-18,1,6,0,0,0,not retrieved
+601188.SH|2023-09-19,601188.SH,2023-09-19,1,12,0,0,0,not retrieved
+003015.SZ|2023-09-20,003015.SZ,2023-09-20,1,1,0,0,0,not retrieved
+002855.SZ|2023-09-21,002855.SZ,2023-09-21,1,5,0,0,0,not retrieved
+603042.SH|2023-09-22,603042.SH,2023-09-22,1,2,0,0,0,not retrieved
+002892.SZ|2023-09-25,002892.SZ,2023-09-25,1,5,0,0,0,not retrieved
+002855.SZ|2023-09-26,002855.SZ,2023-09-26,1,6,0,0,0,not retrieved
+002691.SZ|2023-09-27,002691.SZ,2023-09-27,1,4,0,0,0,not retrieved
+600355.SH|2023-09-28,600355.SH,2023-09-28,1,14,0,0,0,not retrieved
+000727.SZ|2023-10-10,000727.SZ,2023-10-10,1,3,0,0,0,not retrieved
+002708.SZ|2023-10-13,002708.SZ,2023-10-13,1,1,0,0,0,not retrieved
+600721.SH|2023-10-16,600721.SH,2023-10-16,1,19,0,0,0,not retrieved
+002316.SZ|2023-10-17,002316.SZ,2023-10-17,1,0,0,0,0,not retrieved
+603178.SH|2023-10-18,603178.SH,2023-10-18,1,12,0,0,0,not retrieved
+603178.SH|2023-10-19,603178.SH,2023-10-19,1,15,0,0,0,not retrieved
+600520.SH|2023-10-23,600520.SH,2023-10-23,1,17,0,0,0,not retrieved
+002122.SZ|2023-10-25,002122.SZ,2023-10-25,1,2,0,0,0,not retrieved
+000541.SZ|2023-10-26,000541.SZ,2023-10-26,1,7,0,0,0,not retrieved
+600203.SH|2023-10-30,600203.SH,2023-10-30,1,5,0,0,0,not retrieved
+603266.SH|2023-10-31,603266.SH,2023-10-31,1,11,0,0,0,not retrieved
+603929.SH|2023-11-03,603929.SH,2023-11-03,1,6,0,0,0,not retrieved
+603266.SH|2023-11-07,603266.SH,2023-11-07,1,18,0,0,0,not retrieved
+600119.SH|2023-11-13,600119.SH,2023-11-13,1,2,0,0,0,not retrieved
+003032.SZ|2023-11-15,003032.SZ,2023-11-15,1,1,0,0,0,not retrieved
+002786.SZ|2023-11-16,002786.SZ,2023-11-16,1,3,0,0,0,not retrieved
+600506.SH|2023-11-17,600506.SH,2023-11-17,1,12,0,0,0,not retrieved
+605218.SH|2023-11-22,605218.SH,2023-11-22,1,9,0,0,0,not retrieved
+603598.SH|2023-11-23,603598.SH,2023-11-23,1,8,0,0,0,not retrieved
+603286.SH|2023-11-27,603286.SH,2023-11-27,1,6,0,0,0,not retrieved
+603721.SH|2023-11-28,603721.SH,2023-11-28,1,2,0,0,0,not retrieved
+600178.SH|2023-11-29,600178.SH,2023-11-29,1,14,0,0,0,not retrieved
+600178.SH|2023-11-30,600178.SH,2023-11-30,1,17,0,0,0,not retrieved
+603536.SH|2023-12-01,603536.SH,2023-12-01,1,19,0,0,0,not retrieved
+600228.SH|2023-12-04,600228.SH,2023-12-04,1,3,0,0,0,not retrieved
+603860.SH|2023-12-05,603860.SH,2023-12-05,1,4,0,0,0,not retrieved
+605179.SH|2023-12-06,605179.SH,2023-12-06,1,3,0,0,0,not retrieved
+002451.SZ|2023-12-07,002451.SZ,2023-12-07,1,1,0,0,0,not retrieved
+600715.SH|2023-12-08,600715.SH,2023-12-08,1,4,0,0,0,not retrieved
+000421.SZ|2023-12-11,000421.SZ,2023-12-11,1,16,0,0,0,not retrieved
+603729.SH|2023-12-12,603729.SH,2023-12-12,1,3,0,0,0,not retrieved
+603598.SH|2023-12-14,603598.SH,2023-12-14,1,27,0,0,0,not retrieved
+002445.SZ|2023-12-15,002445.SZ,2023-12-15,1,1,0,0,0,not retrieved
+603721.SH|2023-12-19,603721.SH,2023-12-19,1,20,0,0,0,not retrieved
+600692.SH|2023-12-20,600692.SH,2023-12-20,1,2,1,6,0,
+600630.SH|2023-12-21,600630.SH,2023-12-21,1,7,0,0,0,not retrieved
+603628.SH|2023-12-25,603628.SH,2023-12-25,1,5,0,0,0,not retrieved
+002682.SZ|2023-12-26,002682.SZ,2023-12-26,1,18,0,0,0,not retrieved
+002682.SZ|2023-12-27,002682.SZ,2023-12-27,1,10,0,0,0,not retrieved
+002578.SZ|2023-12-29,002578.SZ,2023-12-29,1,2,0,0,0,not retrieved
+605167.SH|2024-01-03,605167.SH,2024-01-03,1,5,0,0,0,not retrieved
+603099.SH|2024-01-05,603099.SH,2024-01-05,1,13,0,0,0,not retrieved
+002347.SZ|2024-01-09,002347.SZ,2024-01-09,1,8,0,0,0,not retrieved
+603099.SH|2024-01-10,603099.SH,2024-01-10,1,17,0,0,0,not retrieved
+002641.SZ|2024-01-12,002641.SZ,2024-01-12,1,36,0,0,0,not retrieved
+600819.SH|2024-01-15,600819.SH,2024-01-15,1,1,0,0,0,not retrieved
+002868.SZ|2024-01-16,002868.SZ,2024-01-16,1,13,1,10,0,
+600318.SH|2024-01-17,600318.SH,2024-01-17,1,4,0,0,0,not retrieved
+000017.SZ|2024-01-18,000017.SZ,2024-01-18,1,5,0,0,0,not retrieved
+000017.SZ|2024-01-19,000017.SZ,2024-01-19,1,6,0,0,0,not retrieved
+000017.SZ|2024-01-22,000017.SZ,2024-01-22,1,7,0,0,0,not retrieved
+603810.SH|2024-01-23,603810.SH,2024-01-23,1,2,0,0,0,not retrieved
+600200.SH|2024-01-24,600200.SH,2024-01-24,1,5,0,0,0,not retrieved
+600053.SH|2024-01-26,600053.SH,2024-01-26,1,3,1,5,0,
+600088.SH|2024-01-31,600088.SH,2024-01-31,1,9,1,20,0,
+600088.SH|2024-02-01,600088.SH,2024-02-01,1,10,0,0,0,not retrieved
+003042.SZ|2024-02-02,003042.SZ,2024-02-02,1,2,0,0,0,not retrieved
+002085.SZ|2024-02-07,002085.SZ,2024-02-07,1,4,0,0,0,not retrieved
+002312.SZ|2024-02-08,002312.SZ,2024-02-08,1,5,0,0,0,not retrieved
+603516.SH|2024-02-20,603516.SH,2024-02-20,1,6,0,0,0,not retrieved
+002789.SZ|2024-02-22,002789.SZ,2024-02-22,1,4,0,0,0,not retrieved
+002403.SZ|2024-02-26,002403.SZ,2024-02-26,1,0,0,0,0,not retrieved
+603066.SH|2024-02-27,603066.SH,2024-02-27,1,4,0,0,0,not retrieved
+600715.SH|2024-03-04,600715.SH,2024-03-04,1,15,0,0,0,not retrieved
+605178.SH|2024-03-05,605178.SH,2024-03-05,1,5,0,0,0,not retrieved
+002009.SZ|2024-03-07,002009.SZ,2024-03-07,1,10,0,0,0,not retrieved
+603388.SH|2024-03-08,603388.SH,2024-03-08,1,2,0,0,0,not retrieved
+603516.SH|2024-03-11,603516.SH,2024-03-11,1,3,0,0,0,not retrieved
+002076.SZ|2024-03-14,002076.SZ,2024-03-14,1,10,0,0,0,not retrieved
+600083.SH|2024-03-18,600083.SH,2024-03-18,1,0,0,0,0,not retrieved
+603377.SH|2024-03-19,603377.SH,2024-03-19,1,5,0,0,0,not retrieved
+605277.SH|2024-03-20,605277.SH,2024-03-20,1,3,0,0,0,not retrieved
+002148.SZ|2024-03-21,002148.SZ,2024-03-21,1,1,0,0,0,not retrieved
+603499.SH|2024-03-25,603499.SH,2024-03-25,1,14,0,0,0,not retrieved
+600243.SH|2024-03-26,600243.SH,2024-03-26,1,4,0,0,0,not retrieved
+603626.SH|2024-03-27,603626.SH,2024-03-27,1,4,0,0,0,not retrieved
+002676.SZ|2024-03-28,002676.SZ,2024-03-28,1,1,0,0,0,not retrieved
+603172.SH|2024-04-03,603172.SH,2024-04-03,1,2,0,0,0,not retrieved
+002900.SZ|2024-04-17,002900.SZ,2024-04-17,1,3,0,0,0,not retrieved
+603860.SH|2024-04-18,603860.SH,2024-04-18,1,6,0,0,0,not retrieved
+603488.SH|2024-04-23,603488.SH,2024-04-23,1,7,0,0,0,not retrieved
+002590.SZ|2024-04-24,002590.SZ,2024-04-24,1,42,0,0,0,not retrieved
+002455.SZ|2024-05-08,002455.SZ,2024-05-08,1,48,0,0,0,not retrieved
+600866.SH|2024-05-09,600866.SH,2024-05-09,1,50,0,0,0,not retrieved
+002076.SZ|2024-05-10,002076.SZ,2024-05-10,1,46,0,0,0,not retrieved
+600665.SH|2024-05-16,600665.SH,2024-05-16,1,33,0,0,0,not retrieved
+000560.SZ|2024-05-20,000560.SZ,2024-05-20,1,6,0,0,0,not retrieved
+600714.SH|2024-05-22,600714.SH,2024-05-22,1,7,0,0,0,not retrieved
+000702.SZ|2024-05-23,000702.SZ,2024-05-23,1,2,0,0,0,not retrieved
+002897.SZ|2024-05-24,002897.SZ,2024-05-24,1,5,0,0,0,not retrieved
+000638.SZ|2024-05-27,000638.SZ,2024-05-27,1,10,0,0,0,not retrieved
+600310.SH|2024-05-29,600310.SH,2024-05-29,1,7,0,0,0,not retrieved
+600501.SH|2024-05-30,600501.SH,2024-05-30,1,10,0,0,0,not retrieved
+002323.SZ|2024-05-31,002323.SZ,2024-05-31,1,4,0,0,0,not retrieved
+600996.SH|2024-06-03,600996.SH,2024-06-03,1,5,0,0,0,not retrieved
+002811.SZ|2024-06-04,002811.SZ,2024-06-04,1,7,0,0,0,not retrieved
+000692.SZ|2024-06-05,000692.SZ,2024-06-05,1,5,0,0,0,not retrieved
+003026.SZ|2024-06-06,003026.SZ,2024-06-06,1,2,0,0,0,not retrieved
+003026.SZ|2024-06-07,003026.SZ,2024-06-07,1,2,0,0,0,not retrieved
+003026.SZ|2024-06-11,003026.SZ,2024-06-11,1,3,0,0,0,not retrieved
+600774.SH|2024-06-12,600774.SH,2024-06-12,1,4,0,0,0,not retrieved
+002861.SZ|2024-06-13,002861.SZ,2024-06-13,1,5,0,0,0,not retrieved
+000793.SZ|2024-06-14,000793.SZ,2024-06-14,1,8,0,0,0,not retrieved
+600192.SH|2024-06-17,600192.SH,2024-06-17,1,5,0,0,0,not retrieved
+002199.SZ|2024-06-18,002199.SZ,2024-06-18,1,2,0,0,0,not retrieved
+002199.SZ|2024-06-20,002199.SZ,2024-06-20,1,4,0,0,0,not retrieved
+600889.SH|2024-06-21,600889.SH,2024-06-21,1,5,0,0,0,not retrieved
+000010.SZ|2024-06-24,000010.SZ,2024-06-24,1,6,0,0,0,not retrieved
+001266.SZ|2024-06-25,001266.SZ,2024-06-25,1,10,0,0,0,not retrieved
+605178.SH|2024-06-26,605178.SH,2024-06-26,1,8,0,0,0,not retrieved
+605178.SH|2024-06-27,605178.SH,2024-06-27,1,10,0,0,0,not retrieved
+000861.SZ|2024-07-03,000861.SZ,2024-07-03,1,4,0,0,0,not retrieved
+600811.SH|2024-07-04,600811.SH,2024-07-04,1,15,0,0,0,not retrieved
+600476.SH|2024-07-05,600476.SH,2024-07-05,1,12,0,0,0,not retrieved
+002823.SZ|2024-07-10,002823.SZ,2024-07-10,1,17,0,0,0,not retrieved
+000861.SZ|2024-07-12,000861.SZ,2024-07-12,1,11,0,0,0,not retrieved
+600650.SH|2024-07-16,600650.SH,2024-07-16,1,4,0,0,0,not retrieved
+600676.SH|2024-07-18,600676.SH,2024-07-18,1,4,0,0,0,not retrieved
+001212.SZ|2024-07-24,001212.SZ,2024-07-24,1,6,0,0,0,not retrieved
+600187.SH|2024-07-25,600187.SH,2024-07-25,1,8,0,0,0,not retrieved
+600501.SH|2024-07-29,600501.SH,2024-07-29,1,5,0,0,0,not retrieved
+600676.SH|2024-07-30,600676.SH,2024-07-30,1,7,0,0,0,not retrieved
+600692.SH|2024-07-31,600692.SH,2024-07-31,1,4,0,0,0,not retrieved
+600386.SH|2024-08-01,600386.SH,2024-08-01,1,3,0,0,0,not retrieved
+000016.SZ|2024-08-02,000016.SZ,2024-08-02,1,2,0,0,0,not retrieved
+002072.SZ|2024-08-08,002072.SZ,2024-08-08,1,7,0,0,0,not retrieved
+002285.SZ|2024-08-09,002285.SZ,2024-08-09,1,1,0,0,0,not retrieved
+000509.SZ|2024-08-13,000509.SZ,2024-08-13,1,3,0,0,0,not retrieved
+603118.SH|2024-08-23,603118.SH,2024-08-23,1,11,0,0,0,not retrieved
+000062.SZ|2024-08-26,000062.SZ,2024-08-26,1,6,0,0,0,not retrieved
+002302.SZ|2024-08-28,002302.SZ,2024-08-28,1,12,0,0,0,not retrieved
+003015.SZ|2024-08-30,003015.SZ,2024-08-30,1,1,0,0,0,not retrieved
+605100.SH|2024-09-04,605100.SH,2024-09-04,1,14,0,0,0,not retrieved
+002816.SZ|2024-09-12,002816.SZ,2024-09-12,1,8,0,0,0,not retrieved
+002717.SZ|2024-09-13,002717.SZ,2024-09-13,1,24,0,0,0,not retrieved
+600107.SH|2024-09-18,600107.SH,2024-09-18,1,6,0,0,0,not retrieved
+600719.SH|2024-09-19,600719.SH,2024-09-19,1,5,0,0,0,not retrieved
+600550.SH|2024-09-20,600550.SH,2024-09-20,1,10,1,27,0,
+000004.SZ|2024-09-23,000004.SZ,2024-09-23,1,4,0,0,0,not retrieved
+002583.SZ|2024-09-24,002583.SZ,2024-09-24,1,3,0,0,0,not retrieved
+600696.SH|2024-10-08,600696.SH,2024-10-08,1,3,0,0,0,not retrieved
+002347.SZ|2024-10-10,002347.SZ,2024-10-10,1,2,0,0,0,not retrieved
+002094.SZ|2024-10-15,002094.SZ,2024-10-15,1,1,0,0,0,not retrieved
+600622.SH|2024-10-16,600622.SH,2024-10-16,1,6,0,0,0,not retrieved
+002199.SZ|2024-10-17,002199.SZ,2024-10-17,1,4,0,0,0,not retrieved
+002628.SZ|2024-10-18,002628.SZ,2024-10-18,1,13,0,0,0,not retrieved
+002542.SZ|2024-10-22,002542.SZ,2024-10-22,1,1,0,0,0,not retrieved
+002272.SZ|2024-10-24,002272.SZ,2024-10-24,1,3,0,0,0,not retrieved
+600811.SH|2024-10-28,600811.SH,2024-10-28,1,8,0,0,0,not retrieved
+000520.SZ|2024-10-29,000520.SZ,2024-10-29,1,10,0,0,0,not retrieved
+000010.SZ|2024-11-04,000010.SZ,2024-11-04,1,10,0,0,0,not retrieved
+002513.SZ|2024-11-05,002513.SZ,2024-11-05,1,24,0,0,0,not retrieved
+002765.SZ|2024-11-07,002765.SZ,2024-11-07,1,16,1,10,0,
+000981.SZ|2024-11-08,000981.SZ,2024-11-08,1,8,0,0,0,not retrieved
+000826.SZ|2024-11-11,000826.SZ,2024-11-11,1,11,0,0,0,not retrieved
+603918.SH|2024-11-12,603918.SH,2024-11-12,1,13,0,0,0,not retrieved
+603955.SH|2024-11-13,603955.SH,2024-11-13,1,16,0,0,0,not retrieved
+603366.SH|2024-11-14,603366.SH,2024-11-14,1,18,0,0,0,not retrieved
+300840.SZ|2024-11-15,300840.SZ,2024-11-15,1,1,0,0,0,not retrieved
+600676.SH|2024-11-19,600676.SH,2024-11-19,1,5,0,0,0,not retrieved
+000605.SZ|2024-11-20,000605.SZ,2024-11-20,1,7,0,0,0,not retrieved
+603527.SH|2024-11-21,603527.SH,2024-11-21,1,3,0,0,0,not retrieved
+002467.SZ|2024-11-26,002467.SZ,2024-11-26,1,2,0,0,0,not retrieved
+600327.SH|2024-11-28,600327.SH,2024-11-28,1,4,0,0,0,not retrieved
+002640.SZ|2024-12-03,002640.SZ,2024-12-03,1,39,0,0,0,not retrieved
+603002.SH|2024-12-04,603002.SH,2024-12-04,1,3,0,0,0,not retrieved
+000056.SZ|2024-12-05,000056.SZ,2024-12-05,1,5,0,0,0,not retrieved
+600172.SH|2024-12-06,600172.SH,2024-12-06,1,10,0,0,0,not retrieved
+603825.SH|2024-12-09,603825.SH,2024-12-09,1,5,0,0,0,not retrieved
+002681.SZ|2024-12-10,002681.SZ,2024-12-10,1,9,0,0,0,not retrieved
+603088.SH|2024-12-11,603088.SH,2024-12-11,1,8,0,0,0,not retrieved
+601010.SH|2024-12-12,601010.SH,2024-12-12,1,4,0,0,0,not retrieved
+000530.SZ|2024-12-16,000530.SZ,2024-12-16,1,11,0,0,0,not retrieved
+002354.SZ|2024-12-17,002354.SZ,2024-12-17,1,9,1,4,0,
+002181.SZ|2024-12-19,002181.SZ,2024-12-19,1,3,1,2,0,
+002878.SZ|2024-12-20,002878.SZ,2024-12-20,1,14,0,0,0,not retrieved
+000880.SZ|2024-12-23,000880.SZ,2024-12-23,1,1,0,0,0,not retrieved
+605001.SH|2024-12-24,605001.SH,2024-12-24,1,5,0,0,0,not retrieved
+600391.SH|2024-12-27,600391.SH,2024-12-27,1,8,0,0,0,not retrieved
+600857.SH|2024-12-30,600857.SH,2024-12-30,1,3,0,0,0,not retrieved
+600778.SH|2024-12-31,600778.SH,2024-12-31,1,6,1,6,0,
+603777.SH|2025-01-02,603777.SH,2025-01-02,1,8,0,0,0,not retrieved
+000981.SZ|2025-01-03,000981.SZ,2025-01-03,1,9,0,0,0,not retrieved
+002364.SZ|2025-01-06,002364.SZ,2025-01-06,1,3,0,0,0,not retrieved
+002269.SZ|2025-01-07,002269.SZ,2025-01-07,1,6,0,0,0,not retrieved
+603269.SH|2025-01-09,603269.SH,2025-01-09,1,9,0,0,0,not retrieved
+002917.SZ|2025-01-10,002917.SZ,2025-01-10,1,8,0,0,0,not retrieved
+000820.SZ|2025-01-13,000820.SZ,2025-01-13,1,7,0,0,0,not retrieved
+300344.SZ|2025-01-14,300344.SZ,2025-01-14,1,10,0,0,0,not retrieved
+002131.SZ|2025-01-15,002131.SZ,2025-01-15,1,3,0,0,0,not retrieved
+002291.SZ|2025-01-16,002291.SZ,2025-01-16,1,4,0,0,0,not retrieved
+002122.SZ|2025-01-17,002122.SZ,2025-01-17,1,3,0,0,0,not retrieved
+603042.SH|2025-01-24,603042.SH,2025-01-24,1,7,0,0,0,not retrieved
+605069.SH|2025-01-27,605069.SH,2025-01-27,1,7,0,0,0,not retrieved
+000532.SZ|2025-02-05,000532.SZ,2025-02-05,1,3,0,0,0,not retrieved
+000818.SZ|2025-02-06,000818.SZ,2025-02-06,1,4,0,0,0,not retrieved
+603390.SH|2025-02-07,603390.SH,2025-02-07,1,2,0,0,0,not retrieved
+600666.SH|2025-02-10,600666.SH,2025-02-10,1,4,0,0,0,not retrieved
+002881.SZ|2025-02-11,002881.SZ,2025-02-11,1,6,0,0,0,not retrieved
+600126.SH|2025-02-13,600126.SH,2025-02-13,1,12,0,0,0,not retrieved
+002313.SZ|2025-02-14,002313.SZ,2025-02-14,1,2,0,0,0,not retrieved
+603825.SH|2025-02-17,603825.SH,2025-02-17,1,33,0,0,0,not retrieved
+002065.SZ|2025-02-18,002065.SZ,2025-02-18,1,4,0,0,0,not retrieved
+600678.SH|2025-02-19,600678.SH,2025-02-19,1,4,0,0,0,not retrieved
+600143.SH|2025-02-20,600143.SH,2025-02-20,1,4,0,0,0,not retrieved
+002343.SZ|2025-02-21,002343.SZ,2025-02-21,1,5,0,0,0,not retrieved
+600590.SH|2025-02-24,600590.SH,2025-02-24,1,12,0,0,0,not retrieved
+603316.SH|2025-02-27,603316.SH,2025-02-27,1,9,0,0,0,not retrieved
+002276.SZ|2025-02-28,002276.SZ,2025-02-28,1,1,0,0,0,not retrieved
+002227.SZ|2025-03-04,002227.SZ,2025-03-04,1,1,0,0,0,not retrieved
+605066.SH|2025-03-05,605066.SH,2025-03-05,1,7,0,0,0,not retrieved
+603048.SH|2025-03-06,603048.SH,2025-03-06,1,3,0,0,0,not retrieved
+002757.SZ|2025-03-07,002757.SZ,2025-03-07,1,2,0,0,0,not retrieved
+002162.SZ|2025-03-10,002162.SZ,2025-03-10,1,34,0,0,0,not retrieved
+605303.SH|2025-03-11,605303.SH,2025-03-11,1,14,0,0,0,not retrieved
+000665.SZ|2025-03-12,000665.SZ,2025-03-12,1,4,0,0,0,not retrieved
+600539.SH|2025-03-13,600539.SH,2025-03-13,1,23,0,0,0,not retrieved
+002905.SZ|2025-03-14,002905.SZ,2025-03-14,1,2,0,0,0,not retrieved
+002086.SZ|2025-03-17,002086.SZ,2025-03-17,1,1,0,0,0,not retrieved
+600610.SH|2025-03-18,600610.SH,2025-03-18,1,4,0,0,0,not retrieved
+603949.SH|2025-03-20,603949.SH,2025-03-20,1,3,0,0,0,not retrieved
+002713.SZ|2025-03-21,002713.SZ,2025-03-21,1,6,0,0,0,not retrieved
+001202.SZ|2025-03-24,001202.SZ,2025-03-24,1,1,0,0,0,not retrieved
+002300.SZ|2025-03-25,002300.SZ,2025-03-25,1,2,0,0,0,not retrieved
+603011.SH|2025-03-26,603011.SH,2025-03-26,1,3,0,0,0,not retrieved
+002686.SZ|2025-03-27,002686.SZ,2025-03-27,1,1,0,0,0,not retrieved
+000953.SZ|2025-03-28,000953.SZ,2025-03-28,1,1,0,0,0,not retrieved
+002549.SZ|2025-03-31,002549.SZ,2025-03-31,1,2,0,0,0,not retrieved
+002132.SZ|2025-04-01,002132.SZ,2025-04-01,1,2,0,0,0,not retrieved
+002923.SZ|2025-04-02,002923.SZ,2025-04-02,1,5,0,0,0,not retrieved
+002549.SZ|2025-04-07,002549.SZ,2025-04-07,1,4,0,0,0,not retrieved
+002688.SZ|2025-04-09,002688.SZ,2025-04-09,1,5,0,0,0,not retrieved
+002800.SZ|2025-04-10,002800.SZ,2025-04-10,1,2,0,0,0,not retrieved
+600337.SH|2025-04-11,600337.SH,2025-04-11,1,4,0,0,0,not retrieved
+600712.SH|2025-04-14,600712.SH,2025-04-14,1,30,0,0,0,not retrieved
+000510.SZ|2025-04-15,000510.SZ,2025-04-15,1,2,0,0,0,not retrieved
+603128.SH|2025-04-16,603128.SH,2025-04-16,1,3,0,0,0,not retrieved
+605138.SH|2025-04-17,605138.SH,2025-04-17,1,9,0,0,0,not retrieved
+002194.SZ|2025-04-21,002194.SZ,2025-04-21,1,1,0,0,0,not retrieved
+002537.SZ|2025-04-23,002537.SZ,2025-04-23,1,3,0,0,0,not retrieved
+601956.SH|2025-04-28,601956.SH,2025-04-28,1,11,0,0,0,not retrieved
+603065.SH|2025-04-29,603065.SH,2025-04-29,1,43,0,0,0,not retrieved
+603359.SH|2025-04-30,603359.SH,2025-04-30,1,30,0,0,0,not retrieved
+600410.SH|2025-05-07,600410.SH,2025-05-07,1,30,0,0,0,not retrieved
+002490.SZ|2025-05-08,002490.SZ,2025-05-08,1,10,0,0,0,not retrieved
+603912.SH|2025-05-09,603912.SH,2025-05-09,1,12,0,0,0,not retrieved
+000559.SZ|2025-05-12,000559.SZ,2025-05-12,1,36,0,0,0,not retrieved
+605055.SH|2025-05-13,605055.SH,2025-05-13,1,28,0,0,0,not retrieved
+603332.SH|2025-05-14,603332.SH,2025-05-14,1,11,0,0,0,not retrieved
+002040.SZ|2025-05-15,002040.SZ,2025-05-15,1,2,0,0,0,not retrieved
+601022.SH|2025-05-16,601022.SH,2025-05-16,1,9,0,0,0,not retrieved
+600281.SH|2025-05-19,600281.SH,2025-05-19,1,13,0,0,0,not retrieved
+002735.SZ|2025-05-20,002735.SZ,2025-05-20,1,30,0,0,0,not retrieved
+002510.SZ|2025-05-21,002510.SZ,2025-05-21,1,3,0,0,0,not retrieved
+603192.SH|2025-05-22,603192.SH,2025-05-22,1,16,0,0,0,not retrieved
+002471.SZ|2025-05-23,002471.SZ,2025-05-23,1,7,0,0,0,not retrieved
+603332.SH|2025-05-26,603332.SH,2025-05-26,1,13,0,0,0,not retrieved
+002366.SZ|2025-05-27,002366.SZ,2025-05-27,1,3,0,0,0,not retrieved
+603390.SH|2025-05-29,603390.SH,2025-05-29,1,9,0,0,0,not retrieved
+002537.SZ|2025-05-30,002537.SZ,2025-05-30,1,9,0,0,0,not retrieved
+603123.SH|2025-06-03,603123.SH,2025-06-03,1,9,0,0,0,not retrieved
+002177.SZ|2025-06-04,002177.SZ,2025-06-04,1,2,0,0,0,not retrieved
+603093.SH|2025-06-05,603093.SH,2025-06-05,1,5,0,0,0,not retrieved
+002298.SZ|2025-06-06,002298.SZ,2025-06-06,1,3,0,0,0,not retrieved
+003040.SZ|2025-06-09,003040.SZ,2025-06-09,1,6,0,0,0,not retrieved
+002940.SZ|2025-06-10,002940.SZ,2025-06-10,1,2,0,0,0,not retrieved
+002181.SZ|2025-06-11,002181.SZ,2025-06-11,1,4,0,0,0,not retrieved
+600281.SH|2025-06-12,600281.SH,2025-06-12,1,12,0,0,0,not retrieved
+601279.SH|2025-06-13,601279.SH,2025-06-13,1,3,0,0,0,not retrieved
+002828.SZ|2025-06-16,002828.SZ,2025-06-16,1,12,0,0,0,not retrieved
+600722.SH|2025-06-18,600722.SH,2025-06-18,1,8,0,0,0,not retrieved
+002490.SZ|2025-06-19,002490.SZ,2025-06-19,1,11,0,0,0,not retrieved
+002579.SZ|2025-06-20,002579.SZ,2025-06-20,1,4,0,0,0,not retrieved
+600798.SH|2025-06-23,600798.SH,2025-06-23,1,1,0,0,0,not retrieved
+603928.SH|2025-06-24,603928.SH,2025-06-24,1,3,0,0,0,not retrieved
+002125.SZ|2025-06-25,002125.SZ,2025-06-25,1,16,0,0,0,not retrieved
+002759.SZ|2025-06-26,002759.SZ,2025-06-26,1,2,0,0,0,not retrieved
+002263.SZ|2025-06-27,002263.SZ,2025-06-27,1,1,0,0,0,not retrieved
+600241.SH|2025-06-30,600241.SH,2025-06-30,1,7,0,0,0,not retrieved
+603316.SH|2025-07-02,603316.SH,2025-07-02,1,6,0,0,0,not retrieved
+603716.SH|2025-07-04,603716.SH,2025-07-04,1,12,0,0,0,not retrieved
+600744.SH|2025-07-07,600744.SH,2025-07-07,1,5,0,0,0,not retrieved
+600744.SH|2025-07-08,600744.SH,2025-07-08,1,6,0,0,0,not retrieved
+605500.SH|2025-07-10,605500.SH,2025-07-10,1,10,0,0,0,not retrieved
+002645.SZ|2025-07-15,002645.SZ,2025-07-15,1,4,0,0,0,not retrieved
+600822.SH|2025-07-16,600822.SH,2025-07-16,1,4,0,0,0,not retrieved
+002394.SZ|2025-07-17,002394.SZ,2025-07-17,1,2,0,0,0,not retrieved
+601003.SH|2025-07-21,601003.SH,2025-07-21,1,3,0,0,0,not retrieved
+600678.SH|2025-07-22,600678.SH,2025-07-22,1,3,0,0,0,not retrieved
+603616.SH|2025-07-28,603616.SH,2025-07-28,1,2,0,0,0,not retrieved
+300528.SZ|2025-07-29,300528.SZ,2025-07-29,1,4,0,0,0,not retrieved
+603839.SH|2025-07-31,603839.SH,2025-07-31,1,3,0,0,0,not retrieved
+002775.SZ|2025-08-05,002775.SZ,2025-08-05,1,16,0,0,0,not retrieved
+600203.SH|2025-08-06,600203.SH,2025-08-06,1,15,0,0,0,not retrieved
+002148.SZ|2025-08-07,002148.SZ,2025-08-07,1,3,0,0,0,not retrieved
+601929.SH|2025-08-11,601929.SH,2025-08-11,1,5,0,0,0,not retrieved
+600581.SH|2025-08-12,600581.SH,2025-08-12,1,7,0,0,0,not retrieved
+601929.SH|2025-08-13,601929.SH,2025-08-13,1,8,0,0,0,not retrieved
+002939.SZ|2025-08-15,002939.SZ,2025-08-15,1,3,0,0,0,not retrieved
+601609.SH|2025-08-18,601609.SH,2025-08-18,1,57,0,0,0,not retrieved
+002272.SZ|2025-08-19,002272.SZ,2025-08-19,1,10,0,0,0,not retrieved
+002217.SZ|2025-08-25,002217.SZ,2025-08-25,1,4,0,0,0,not retrieved
+002217.SZ|2025-08-26,002217.SZ,2025-08-26,1,5,0,0,0,not retrieved
+605188.SH|2025-08-28,605188.SH,2025-08-28,1,16,0,0,0,not retrieved
+002115.SZ|2025-09-01,002115.SZ,2025-09-01,1,34,0,0,0,not retrieved
+002547.SZ|2025-09-03,002547.SZ,2025-09-03,1,14,0,0,0,not retrieved
+600376.SH|2025-09-05,600376.SH,2025-09-05,1,16,0,0,0,not retrieved
+002759.SZ|2025-09-09,002759.SZ,2025-09-09,1,4,0,0,0,not retrieved
+600173.SH|2025-09-10,600173.SH,2025-09-10,1,3,0,0,0,not retrieved
+000718.SZ|2025-09-12,000718.SZ,2025-09-12,1,31,0,0,0,not retrieved
+600629.SH|2025-09-15,600629.SH,2025-09-15,1,4,0,0,0,not retrieved
+600170.SH|2025-09-16,600170.SH,2025-09-16,1,6,0,0,0,not retrieved
+000559.SZ|2025-09-17,000559.SZ,2025-09-17,1,4,0,0,0,not retrieved
+600162.SH|2025-09-18,600162.SH,2025-09-18,1,4,0,0,0,not retrieved
+603618.SH|2025-09-19,603618.SH,2025-09-19,1,4,0,0,0,not retrieved
+600400.SH|2025-09-22,600400.SH,2025-09-22,1,3,0,0,0,not retrieved
+600167.SH|2025-09-24,600167.SH,2025-09-24,1,5,0,0,0,not retrieved
+600167.SH|2025-09-25,600167.SH,2025-09-25,1,6,0,0,0,not retrieved
+603156.SH|2025-09-26,603156.SH,2025-09-26,1,3,0,0,0,not retrieved
+600629.SH|2025-09-29,600629.SH,2025-09-29,1,11,0,0,0,not retrieved
+600629.SH|2025-09-30,600629.SH,2025-09-30,1,11,0,0,0,not retrieved
+601212.SH|2025-10-13,601212.SH,2025-10-13,1,10,0,0,0,not retrieved
+600617.SH|2025-10-15,600617.SH,2025-10-15,1,13,0,0,0,not retrieved
+000626.SZ|2025-10-16,000626.SZ,2025-10-16,1,4,0,0,0,not retrieved
+000626.SZ|2025-10-20,000626.SZ,2025-10-20,1,5,1,16,0,
+600403.SH|2025-10-22,600403.SH,2025-10-22,1,6,0,0,0,not retrieved
+002748.SZ|2025-10-24,002748.SZ,2025-10-24,1,40,0,0,0,not retrieved
+000592.SZ|2025-10-29,000592.SZ,2025-10-29,1,5,0,0,0,not retrieved
+002679.SZ|2025-10-31,002679.SZ,2025-10-31,1,10,0,0,0,not retrieved
+000592.SZ|2025-11-03,000592.SZ,2025-11-03,1,29,0,0,0,not retrieved
+000592.SZ|2025-11-04,000592.SZ,2025-11-04,1,29,0,0,0,not retrieved
+603122.SH|2025-11-05,603122.SH,2025-11-05,1,11,0,0,0,not retrieved
+000993.SZ|2025-11-06,000993.SZ,2025-11-06,1,4,0,0,0,not retrieved
+600939.SH|2025-11-10,600939.SH,2025-11-10,1,18,0,0,0,not retrieved
+600693.SH|2025-11-12,600693.SH,2025-11-12,1,2,0,0,0,not retrieved
+600693.SH|2025-11-14,600693.SH,2025-11-14,1,4,1,18,0,
+002083.SZ|2025-11-17,002083.SZ,2025-11-17,1,8,0,0,0,not retrieved
+000546.SZ|2025-11-19,000546.SZ,2025-11-19,1,3,0,0,0,not retrieved
+000070.SZ|2025-11-25,000070.SZ,2025-11-25,1,5,0,0,0,not retrieved
+002413.SZ|2025-12-01,002413.SZ,2025-12-01,1,1,0,0,0,not retrieved
+002300.SZ|2025-12-04,002300.SZ,2025-12-04,1,2,0,0,0,not retrieved
+600693.SH|2025-12-10,600693.SH,2025-12-10,1,4,0,0,0,not retrieved
+001317.SZ|2025-12-17,001317.SZ,2025-12-17,1,44,0,0,0,not retrieved
+600865.SH|2025-12-18,600865.SH,2025-12-18,1,10,0,0,0,not retrieved
+002788.SZ|2025-12-19,002788.SZ,2025-12-19,1,2,0,0,0,not retrieved
+002596.SZ|2025-12-23,002596.SZ,2025-12-23,1,5,0,0,0,not retrieved
+002347.SZ|2025-12-29,002347.SZ,2025-12-29,1,1,0,0,0,not retrieved
+002347.SZ|2025-12-31,002347.SZ,2025-12-31,1,2,0,0,0,not retrieved
+002766.SZ|2026-01-05,002766.SZ,2026-01-05,1,5,0,0,0,not retrieved
+002774.SZ|2026-01-09,002774.SZ,2026-01-09,1,1,0,0,0,not retrieved
+002112.SZ|2026-01-14,002112.SZ,2026-01-14,1,3,0,0,0,not retrieved
+600785.SH|2026-01-16,600785.SH,2026-01-16,1,7,0,0,0,not retrieved
+600785.SH|2026-01-19,600785.SH,2026-01-19,1,8,0,0,0,not retrieved
+002716.SZ|2026-01-21,002716.SZ,2026-01-21,1,12,0,0,0,not retrieved
+000036.SZ|2026-01-22,000036.SZ,2026-01-22,1,1,0,0,0,not retrieved
+601212.SH|2026-01-23,601212.SH,2026-01-23,1,19,0,0,0,not retrieved
+002218.SZ|2026-01-26,002218.SZ,2026-01-26,1,6,0,0,0,not retrieved
+601212.SH|2026-01-27,601212.SH,2026-01-27,1,21,0,0,0,not retrieved
+601212.SH|2026-01-29,601212.SH,2026-01-29,1,12,1,33,0,
+000995.SZ|2026-01-30,000995.SZ,2026-01-30,1,22,0,0,0,not retrieved
+603861.SH|2026-02-02,603861.SH,2026-02-02,1,15,0,0,0,not retrieved
+002471.SZ|2026-02-03,002471.SZ,2026-02-03,1,4,0,0,0,not retrieved
+603618.SH|2026-02-04,603618.SH,2026-02-04,1,3,0,0,0,not retrieved
+601015.SH|2026-02-05,601015.SH,2026-02-05,1,1,0,0,0,not retrieved
+600814.SH|2026-02-06,600814.SH,2026-02-06,1,2,0,0,0,not retrieved
+002506.SZ|2026-02-09,002506.SZ,2026-02-09,1,6,0,0,0,not retrieved
+002455.SZ|2026-02-10,002455.SZ,2026-02-10,1,6,0,0,0,not retrieved
+002455.SZ|2026-02-11,002455.SZ,2026-02-11,1,6,0,0,0,not retrieved
+600397.SH|2026-02-12,600397.SH,2026-02-12,1,19,0,0,0,not retrieved
+002951.SZ|2026-02-13,002951.SZ,2026-02-13,1,6,0,0,0,not retrieved
+001896.SZ|2026-02-24,001896.SZ,2026-02-24,1,4,0,0,0,not retrieved
+000890.SZ|2026-02-25,000890.SZ,2026-02-25,1,16,0,0,0,not retrieved
+000890.SZ|2026-02-26,000890.SZ,2026-02-26,1,16,0,0,0,not retrieved
+000899.SZ|2026-02-27,000899.SZ,2026-02-27,1,1,0,0,0,not retrieved
+600301.SH|2026-03-02,600301.SH,2026-03-02,1,6,0,0,0,not retrieved
+600722.SH|2026-03-03,600722.SH,2026-03-03,1,1,0,0,0,not retrieved
+600545.SH|2026-03-06,600545.SH,2026-03-06,1,4,0,0,0,not retrieved
+601789.SH|2026-03-10,601789.SH,2026-03-10,1,2,0,0,0,not retrieved
+600108.SH|2026-03-11,600108.SH,2026-03-11,1,6,0,0,0,not retrieved
+600722.SH|2026-03-12,600722.SH,2026-03-12,1,2,0,0,0,not retrieved
+000890.SZ|2026-03-13,000890.SZ,2026-03-13,1,8,0,0,0,not retrieved
+600370.SH|2026-03-16,600370.SH,2026-03-16,1,6,0,0,0,not retrieved
+600396.SH|2026-03-23,600396.SH,2026-03-23,1,27,0,0,0,not retrieved
+002309.SZ|2026-03-24,002309.SZ,2026-03-24,1,4,0,0,0,not retrieved
+002491.SZ|2026-03-25,002491.SZ,2026-03-25,1,1,0,0,0,not retrieved
+000720.SZ|2026-03-27,000720.SZ,2026-03-27,1,1,0,0,0,not retrieved
+000890.SZ|2026-03-30,000890.SZ,2026-03-30,1,5,0,0,0,not retrieved
+002634.SZ|2026-03-31,002634.SZ,2026-03-31,1,2,0,0,0,not retrieved
+002560.SZ|2026-04-01,002560.SZ,2026-04-01,1,32,0,0,0,not retrieved
+002560.SZ|2026-04-02,002560.SZ,2026-04-02,1,32,0,0,0,not retrieved
+600488.SH|2026-04-03,600488.SH,2026-04-03,1,8,0,0,0,not retrieved
+002580.SZ|2026-04-13,002580.SZ,2026-04-13,1,6,0,0,0,not retrieved
+600396.SH|2026-04-14,600396.SH,2026-04-14,1,0,0,0,0,not retrieved
+002580.SZ|2026-04-15,002580.SZ,2026-04-15,1,7,0,0,0,not retrieved
+002217.SZ|2026-04-20,002217.SZ,2026-04-20,1,30,0,0,0,not retrieved
+603115.SH|2026-04-22,603115.SH,2026-04-22,1,29,0,0,0,not retrieved
+600156.SH|2026-04-29,600156.SH,2026-04-29,1,6,0,0,0,not retrieved
+002081.SZ|2026-05-06,002081.SZ,2026-05-06,1,40,0,0,0,not retrieved
+000889.SZ|2026-05-07,000889.SZ,2026-05-07,1,27,0,0,0,not retrieved
+002918.SZ|2026-05-12,002918.SZ,2026-05-12,1,41,0,0,0,not retrieved
+600530.SH|2026-05-13,600530.SH,2026-05-13,1,28,0,0,0,not retrieved
+002918.SZ|2026-05-15,002918.SZ,2026-05-15,1,11,0,0,0,not retrieved
+601133.SH|2026-05-18,601133.SH,2026-05-18,1,11,0,0,0,not retrieved
+600903.SH|2026-05-19,600903.SH,2026-05-19,1,6,0,0,0,not retrieved
+002421.SZ|2026-05-20,002421.SZ,2026-05-20,1,6,0,0,0,not retrieved
+603779.SH|2026-05-21,603779.SH,2026-05-21,1,21,0,0,0,not retrieved
+600303.SH|2026-05-22,600303.SH,2026-05-22,1,6,0,0,0,not retrieved
+002585.SZ|2026-05-25,002585.SZ,2026-05-25,1,3,0,0,0,not retrieved
+002388.SZ|2026-05-26,002388.SZ,2026-05-26,1,11,0,0,0,not retrieved
+000539.SZ|2026-05-29,000539.SZ,2026-05-29,1,2,0,0,0,not retrieved
+603890.SH|2026-06-02,603890.SH,2026-06-02,1,5,0,0,0,not retrieved
+600255.SH|2026-06-03,600255.SH,2026-06-03,1,3,0,0,0,not retrieved
+603330.SH|2026-06-04,603330.SH,2026-06-04,1,7,0,0,0,not retrieved
+600500.SH|2026-06-11,600500.SH,2026-06-11,1,41,0,0,0,not retrieved
+000510.SZ|2026-06-15,000510.SZ,2026-06-15,1,2,0,0,0,not retrieved
+600110.SH|2026-06-17,600110.SH,2026-06-17,1,10,0,0,0,not retrieved
+000811.SZ|2026-06-18,000811.SZ,2026-06-18,1,1,0,0,0,not retrieved
+605069.SH|2026-06-23,605069.SH,2026-06-23,1,3,0,0,0,not retrieved
+605366.SH|2026-06-25,605366.SH,2026-06-25,1,5,0,0,0,not retrieved
+002273.SZ|2026-07-01,002273.SZ,2026-07-01,1,3,0,0,0,not retrieved
+000566.SZ|2026-07-02,000566.SZ,2026-07-02,1,8,0,0,0,not retrieved
+600793.SH|2026-07-03,600793.SH,2026-07-03,1,5,0,0,0,not retrieved
+000656.SZ|2026-07-06,000656.SZ,2026-07-06,1,9,0,0,0,not retrieved
+600793.SH|2026-07-07,600793.SH,2026-07-07,1,8,0,0,0,not retrieved
+001229.SZ|2026-07-08,001229.SZ,2026-07-08,1,5,0,0,0,not retrieved
+002490.SZ|2026-07-09,002490.SZ,2026-07-09,1,5,0,0,0,not retrieved
+603898.SH|2026-07-10,603898.SH,2026-07-10,1,2,0,0,0,not retrieved
+600992.SH|2026-07-13,600992.SH,2026-07-13,1,6,0,0,0,not retrieved
+603137.SH|2026-07-14,603137.SH,2026-07-14,1,29,1,39,0,
+603137.SH|2026-07-15,603137.SH,2026-07-15,1,30,1,36,0,
+600664.SH|2026-07-16,600664.SH,2026-07-16,1,7,0,0,0,not retrieved
+002829.SZ|2026-07-17,002829.SZ,2026-07-17,1,4,0,0,0,not retrieved
+000722.SZ|2026-07-20,000722.SZ,2026-07-20,1,2,0,0,0,not retrieved
+600744.SH|2026-07-21,600744.SH,2026-07-21,1,3,0,0,0,not retrieved
+603407.SH|2026-07-22,603407.SH,2026-07-22,1,2,0,0,0,not retrieved
+603988.SH|2026-07-23,603988.SH,2026-07-23,1,2,0,0,0,not retrieved
+000533.SZ|2026-07-27,000533.SZ,2026-07-27,1,1,0,0,0,not retrieved
+000533.SZ|2026-07-28,000533.SZ,2026-07-28,1,2,0,0,0,not retrieved
+002354.SZ|2026-08-03,002354.SZ,2026-08-03,1,1,0,0,0,not retrieved
+003032.SZ|2026-08-05,003032.SZ,2026-08-05,1,4,0,0,0,not retrieved
+600397.SH|2026-08-06,600397.SH,2026-08-06,1,21,0,0,0,not retrieved
+600206.SH|2026-08-07,600206.SH,2026-08-07,1,16,0,0,0,not retrieved
+002552.SZ|2026-08-10,002552.SZ,2026-08-10,1,1,0,0,0,not retrieved
+002329.SZ|2026-08-13,002329.SZ,2026-08-13,1,7,0,0,0,not retrieved
+002172.SZ|2026-08-14,002172.SZ,2026-08-14,1,1,1,3,0,
+603958.SH|2026-08-18,603958.SH,2026-08-18,1,2,0,0,0,not retrieved
+603395.SH|2026-08-19,603395.SH,2026-08-19,1,2,0,0,0,not retrieved
+002491.SZ|2026-08-20,002491.SZ,2026-08-20,1,6,0,0,0,not retrieved
+002038.SZ|2026-08-21,002038.SZ,2026-08-21,1,1,0,0,0,not retrieved
+000017.SZ|2026-08-25,000017.SZ,2026-08-25,1,6,0,0,0,not retrieved
+603118.SH|2026-08-26,603118.SH,2026-08-26,1,9,0,0,0,not retrieved
+000712.SZ|2026-08-28,000712.SZ,2026-08-28,1,10,0,0,0,not retrieved
+600892.SH|2026-09-02,600892.SH,2026-09-02,1,10,0,0,0,not retrieved
+002909.SZ|2026-09-03,002909.SZ,2026-09-03,1,11,0,0,0,not retrieved
+605580.SH|2026-09-04,605580.SH,2026-09-04,1,5,0,0,0,not retrieved
+002702.SZ|2026-09-07,002702.SZ,2026-09-07,1,6,0,0,0,not retrieved
+600354.SH|2026-09-08,600354.SH,2026-09-08,1,21,0,0,0,not retrieved
+002295.SZ|2026-09-09,002295.SZ,2026-09-09,1,9,1,21,0,
+000978.SZ|2026-09-10,000978.SZ,2026-09-10,1,9,0,0,0,not retrieved
+603090.SH|2026-09-15,603090.SH,2026-09-15,1,2,0,0,0,not retrieved
+002631.SZ|2026-09-16,002631.SZ,2026-09-16,1,1,0,0,0,not retrieved
+600371.SH|2026-09-17,600371.SH,2026-09-17,1,3,0,0,0,not retrieved
+002285.SZ|2026-09-18,002285.SZ,2026-09-18,1,2,0,0,0,not retrieved
+601123.SH|2026-09-21,601123.SH,2026-09-21,1,0,0,0,0,not retrieved
+000560.SZ|2026-09-23,000560.SZ,2026-09-23,1,2,0,0,0,not retrieved
+601811.SH|2026-09-24,601811.SH,2026-09-24,1,9,0,0,0,not retrieved
+600802.SH|2026-09-28,600802.SH,2026-09-28,1,2,0,0,0,not retrieved
+605388.SH|2026-09-30,605388.SH,2026-09-30,1,5,0,0,0,not retrieved

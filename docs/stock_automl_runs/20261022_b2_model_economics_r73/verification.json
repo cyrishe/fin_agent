@@ -1,0 +1,20 @@
+{
+  "definition": "imac/B2_V2",
+  "definition_sha256": "54ebe0150dfefa6ce9837d403fd83b331f2720ad835271525e3106aae7529f00",
+  "model_source": "R72 frozen 2022-24 fit / 2025 select / 2026 retrospective test; no refit or threshold change",
+  "database_registration": "not submitted; no production writes",
+  "cloud_archive": "not synchronized or independently read back",
+  "server": "/data/cyris/work/b2_model_economics_r73_20261022",
+  "minute_reconciliations": 98,
+  "seven_triggers": 41,
+  "all_close_daily_nav_vs_existing_replay_max_delta": 0,
+  "cash_ledger_scenarios_checked": 12,
+  "preclose_discrepancies": 0,
+  "d3_preclose_discrepancies_cancelled6": 0,
+  "source_model_hashes": {
+    "/data/cyris/work/b2_first_board_flow_r72_20261022/crash_full_hgb_train2022_24.joblib": "0a8ea1a0f9acb4b6d6e9b031e1d2ba8c4c80cbfc6625c3e6bb01066d9613f6a9",
+    "/data/cyris/work/b2_first_board_flow_r72_20261022/strong_full_hgb_train2022_24.joblib": "50e0e913b54246a22c454520be9663c4dea206996c4d302a8994b1e632113445",
+    "/data/cyris/work/b2_first_board_flow_r72_20261022/unified_full_rf_train2022_24.joblib": "e8af0c3905a746198e0f2940a88f507c657f4119b9c40c585446aba30e64f7ca",
+    "/data/cyris/work/b2_first_board_flow_r72_20261022/unified_balanced_balanced_hgb_train2022_24.joblib": "a9ff62e861ed664736f1404ab8cf3e93f780179888449a3f5f33994d934ef03c"
+  }
+}

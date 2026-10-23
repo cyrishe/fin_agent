@@ -1,0 +1,9 @@
+{
+  "path": "/Volumes/ext/fin_agent/outputs/b2_d1_risk_20261021/B2_D1_FLOOR_RISK_20261021.zip",
+  "bytes": 2158145,
+  "sha256": "19b85a771290a0f411c3b084af27b321a9f5a309038928d82b4497376d651b08",
+  "readback_files": 698,
+  "all_hashes_match": true,
+  "cloud": "pending_sync",
+  "review_csv_counts_verified": true
+}

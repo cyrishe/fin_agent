@@ -1,0 +1,21 @@
+{
+  "checked_at_utc": "2026-10-20T11:00:18.772545+00:00",
+  "user_id": "imac",
+  "base_definition_sha256": "157b9d77bb9951214b0978365cec407320b1d5663636b80fe60939ae94172c0c",
+  "base_content_sha256": "157b9d77bb9951214b0978365cec407320b1d5663636b80fe60939ae94172c0c",
+  "base_definition_matches": true,
+  "v2_strategy_id": "B2_V2",
+  "v2_expected_definition_sha256": "54ebe0150dfefa6ce9837d403fd83b331f2720ad835271525e3106aae7529f00",
+  "v2_registered_definition_sha256": "54ebe0150dfefa6ce9837d403fd83b331f2720ad835271525e3106aae7529f00",
+  "v2_content_sha256": "54ebe0150dfefa6ce9837d403fd83b331f2720ad835271525e3106aae7529f00",
+  "v2_definition_matches": true,
+  "daily_run_versions": [
+    {
+      "model_version": "v1.0",
+      "run_days": 245,
+      "first_day": "2025-10-16",
+      "last_day": "2026-10-20"
+    }
+  ],
+  "september_2026_v1_final_D0_candidates": 16
+}

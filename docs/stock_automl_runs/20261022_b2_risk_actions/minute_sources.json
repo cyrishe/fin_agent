@@ -1,0 +1,931 @@
+[
+  {
+    "sequence": 3,
+    "cache": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_risk_actions/minutes/2022-05-13_601368.csv.gz",
+    "sha256": "ae3113d3d7fdda9a1439a5188d8414a37ed84e373c23ea434cea9c92ebafeddc",
+    "source": "/Volumes/ext/tushare_market_data/2022/20220513.csv.gz",
+    "source_sha256": "4acfa04a1d62ba21d29cca4431b76c4efc64f5a0ba94c2c37a7b85d7aaa0cb47"
+  },
+  {
+    "sequence": 4,
+    "cache": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_risk_actions/minutes/2022-05-18_000926.csv.gz",
+    "sha256": "8c05fe764a636fff15e956f4c33b4b13e435edb9217a5ab029522bc8b1705a13",
+    "source": "/Volumes/ext/tushare_market_data/2022/20220518.csv.gz",
+    "source_sha256": "dc35c493661bd52546bddf127336fc6d18a0325e9260ea656d2c724701afeaa5"
+  },
+  {
+    "sequence": 7,
+    "cache": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_risk_actions/minutes/2022-05-23_000779.csv.gz",
+    "sha256": "768ab8de966cbd5fcbaf7408f56b5d71f6fd7a7cb28c3d7221e54c13b685a61b",
+    "source": "/Volumes/ext/tushare_market_data/2022/20220523.csv.gz",
+    "source_sha256": "454aa71120b75d1fbe46f0baed322b6aceb59c8562aaf6083b532ae1b25d00e7"
+  },
+  {
+    "sequence": 10,
+    "cache": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_risk_actions/minutes/2022-05-26_603166.csv.gz",
+    "sha256": "72bf0a0eddb294dff9f1425e605adf612b4ada26529dc850556950b168973990",
+    "source": "/Volumes/ext/tushare_market_data/2022/20220526.csv.gz",
+    "source_sha256": "276fc18d3f4c0cc4e0084a5a1ee3ddb8841243e68cb998243aeeb483b4c39102"
+  },
+  {
+    "sequence": 13,
+    "cache": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_risk_actions/minutes/2022-06-01_600962.csv.gz",
+    "sha256": "e69c76f4ac8fe20bba654b36758b77219512a2ca1e949c3fa9ca53a7a36f4743",
+    "source": "/Volumes/ext/tushare_market_data/2022/20220601.csv.gz",
+    "source_sha256": "6ccaf0db6c33660e02474da7f4c507fccac0eb8bac34a5bb4c8160ca72d65b37"
+  },
+  {
+    "sequence": 16,
+    "cache": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_risk_actions/minutes/2022-06-07_002066.csv.gz",
+    "sha256": "a66f7ceb5a381b5d80cdf25bcd44d5e23f65f01996d53cb199dffb888cf88706",
+    "source": "/Volumes/ext/tushare_market_data/2022/20220607.csv.gz",
+    "source_sha256": "d256af842c219ce2f753872b75b8baa444fb1b19446de4b7bb3fec597687b368"
+  },
+  {
+    "sequence": 14,
+    "cache": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_risk_actions/minutes/2022-06-02_000151.csv.gz",
+    "sha256": "dd10b079b98cf89fdb03be7c31d9acb382efa387a474137c03bf7a2c46ee5c7e",
+    "source": "/Volumes/ext/tushare_market_data/2022/20220602.csv.gz",
+    "source_sha256": "76d7e9c9c9cd634cebe7060bccd3bbf6abeb37255048a0d5a6d9ca71b4c831e4"
+  },
+  {
+    "sequence": 18,
+    "cache": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_risk_actions/minutes/2022-06-13_002630.csv.gz",
+    "sha256": "5d0252db117d3f72346f03e51c888784ccac913af3b8ae509b0619601688687f",
+    "source": "/Volumes/ext/tushare_market_data/2022/20220613.csv.gz",
+    "source_sha256": "eae956b37c3674eafea00e8b7c071e20cd5bf9815a6628a88daefdd6e0a2d472"
+  },
+  {
+    "sequence": 28,
+    "cache": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_risk_actions/minutes/2022-08-09_002868.csv.gz",
+    "sha256": "ee6eec5d4f38bdb3dfe7bbb68540fe9e01cd945f97b045f88672aeb9476ea5fd",
+    "source": "/Volumes/ext/tushare_market_data/2022/20220809.csv.gz",
+    "source_sha256": "148f442e93195972b34fab421fc6df8bde33a2e3caa4a87cae596dca67d4bd1a"
+  },
+  {
+    "sequence": 62,
+    "cache": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_risk_actions/minutes/2023-06-01_603291.csv.gz",
+    "sha256": "713e045f73dba033d7d21ffd2350f2a4b48da11d2e8e406c1b18af180442c73e",
+    "source": "/Volumes/ext/tushare_market_data/2023/20230601.csv.gz",
+    "source_sha256": "f569378f4f1a8db6aa86125db0631f0384c65e5dcf4bb7100c1b6b9e023e5e83"
+  },
+  {
+    "sequence": 74,
+    "cache": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_risk_actions/minutes/2023-10-17_002708.csv.gz",
+    "sha256": "549b3d411e7fcd13dd4bb942846a0e9a4b008a0272463362bb2b27a0f7710eb5",
+    "source": "/Volumes/ext/tushare_market_data/2023/20231017.csv.gz",
+    "source_sha256": "e3e772cbdd0a253eacef10728f6c946ef5a4715e4ba8267f8d5a658b0d61ee39"
+  },
+  {
+    "sequence": 76,
+    "cache": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_risk_actions/minutes/2023-10-19_002316.csv.gz",
+    "sha256": "b2aa3abb5d114b11f0c54c7cbc419bb6bd9e0ba904d44249835bddacf2888ef3",
+    "source": "/Volumes/ext/tushare_market_data/2023/20231019.csv.gz",
+    "source_sha256": "b6d2526552c02eafd9c80ceb4de0e8d7eaff5ee6045735d4e4de312609087d7e"
+  },
+  {
+    "sequence": 79,
+    "cache": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_risk_actions/minutes/2023-10-25_600520.csv.gz",
+    "sha256": "4eb0df6156991016b5c26a391fae6d6b7c4600dc00267b89109540babd1843a8",
+    "source": "/Volumes/ext/tushare_market_data/2023/20231025.csv.gz",
+    "source_sha256": "93e39ed77a2ff7ebf844c4fcea7b450195ff9ab1937464b3f7cd53c5a2094fb6"
+  },
+  {
+    "sequence": 88,
+    "cache": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_risk_actions/minutes/2023-12-11_002451.csv.gz",
+    "sha256": "358f1f83aa862610f591eaba63a9405201fdc8e7fc4677dbd18cfe463363893a",
+    "source": "/Volumes/ext/tushare_market_data/2023/20231211.csv.gz",
+    "source_sha256": "3393b853bf89ed8113750fb2c74c70a1c6624553afd117b974359c78398bdd6a"
+  },
+  {
+    "sequence": 103,
+    "cache": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_risk_actions/minutes/2024-01-11_002347.csv.gz",
+    "sha256": "4659d242cb97f1a231b7846e7bede737a74f0f7eaeee92cd9c11aa07e34060e5",
+    "source": "/Volumes/ext/tushare_market_data/2024/20240111.csv.gz",
+    "source_sha256": "bec6dbc2f3d59b8a2e105d8d6f9818ed05374bf6c1a58457620eadf4d7ed7047"
+  },
+  {
+    "sequence": 107,
+    "cache": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_risk_actions/minutes/2024-01-18_002868.csv.gz",
+    "sha256": "ab25c8f5b452c0984248fc99ca9dcf947aeb0625d726563460708b6bdfe50163",
+    "source": "/Volumes/ext/tushare_market_data/2024/20240118.csv.gz",
+    "source_sha256": "eab5d7fc4dad8de94857f98f6aee61ef328d1a7c45351ddbf30787bffc887290"
+  },
+  {
+    "sequence": 112,
+    "cache": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_risk_actions/minutes/2024-01-25_603810.csv.gz",
+    "sha256": "e071d1b76e36c288c963e3455220dbf2ca57047d444d9abc4b62a4e5a2a84a89",
+    "source": "/Volumes/ext/tushare_market_data/2024/20240125.csv.gz",
+    "source_sha256": "570468b818ec0132cd16b3d56fc696c8bf7266bdefad8688caeb0ede5658c65f"
+  },
+  {
+    "sequence": 117,
+    "cache": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_risk_actions/minutes/2024-09-18_002816.csv.gz",
+    "sha256": "26e90e06fae417441358ddabef88e3c4d0307c32cf7a498f49a723e6df55e18d",
+    "source": "/Volumes/ext/tushare_market_data/2024/20240918.csv.gz",
+    "source_sha256": "eab534228b9869cfd8c294b8a229a7eaa74387958b057b27f140edda833604bf"
+  },
+  {
+    "sequence": 114,
+    "cache": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_risk_actions/minutes/2024-01-30_600053.csv.gz",
+    "sha256": "b251f911dd19e4f6a64c5b49379c655ddfff187936741611b78281b674ad8a2d",
+    "source": "/Volumes/ext/tushare_market_data/2024/20240130.csv.gz",
+    "source_sha256": "23ae2ae35d3f6744c208d8a6190b967cc6974c9f8e9c6d87212a655f7269bd42"
+  },
+  {
+    "sequence": 120,
+    "cache": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_risk_actions/minutes/2024-09-23_600719.csv.gz",
+    "sha256": "74555bb99f0a544235063331516e289e0a97d962128dfbb49f19e0c30f73dce5",
+    "source": "/Volumes/ext/tushare_market_data/2024/20240923.csv.gz",
+    "source_sha256": "8e72ff35eefbd3bc33517e80182e388e315afc4c0af3c504b584551a461fc0f3"
+  },
+  {
+    "sequence": 122,
+    "cache": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_risk_actions/minutes/2024-09-25_000004.csv.gz",
+    "sha256": "c7599e50ff64bbd2d64957151450be10a83097e7d92fbfb1f3cbfc46eb0d48e7",
+    "source": "/Volumes/ext/tushare_market_data/2024/20240925.csv.gz",
+    "source_sha256": "2b8547597d2a15861a21e8b173b39807b5c77386573eec51e3f9efb4bfb6b393"
+  },
+  {
+    "sequence": 126,
+    "cache": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_risk_actions/minutes/2024-11-11_002765.csv.gz",
+    "sha256": "c0d6c282646b82e21a37761646e48e29a4490538aae749fa1148bb308bded250",
+    "source": "/Volumes/ext/tushare_market_data/2024/20241111.csv.gz",
+    "source_sha256": "2f2705c5a8d1f0c98297091ae3422262654441ad2e22336d57bdc951f38d2826"
+  },
+  {
+    "sequence": 142,
+    "cache": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_risk_actions/minutes/2024-12-11_603825.csv.gz",
+    "sha256": "a36dfd91d7863c4d8585536a9c0c0660babb4de891ad9d1d9d19d6476cd7f7f9",
+    "source": "/Volumes/ext/tushare_market_data/2024/20241211.csv.gz",
+    "source_sha256": "4232ed80db54fa29d4c47460f08840d2dbfbbe8227ca07878780430f711e0316"
+  },
+  {
+    "sequence": 146,
+    "cache": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_risk_actions/minutes/2024-12-18_000530.csv.gz",
+    "sha256": "561ff13997f54082ac711fbbfd89a19f616a3b3fd8282e249870c76af0473700",
+    "source": "/Volumes/ext/tushare_market_data/2024/20241218.csv.gz",
+    "source_sha256": "fdad700be998b76fc17be6449c8ab4140c796183efb42e414a6cd4c712777bc4"
+  },
+  {
+    "sequence": 148,
+    "cache": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_risk_actions/minutes/2024-12-23_002181.csv.gz",
+    "sha256": "54830c5a4c5eabf140787be9cf19f895a60d7b98d4000c6b11da9710952e2b29",
+    "source": "/Volumes/ext/tushare_market_data/2024/20241223.csv.gz",
+    "source_sha256": "aa8e0b5eda9eb66bb855a772e8aeffe7ad9c564e846834cbf134a8d2d3e0c6c8"
+  },
+  {
+    "sequence": 175,
+    "cache": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_risk_actions/minutes/2025-09-05_002547.csv.gz",
+    "sha256": "c56df1812c80b3e06e40e432fa47a3a46d07693fa4ee336b4f6e6549c325e64f",
+    "source": "/Volumes/ext/fin_agent/outputs/stock_automl/mk_1m_compact_2025/2025-09-05.csv.zst",
+    "source_sha256": "b980383bfafe3197ae2e171bdc29233bdda7e4e9113e5dcd597047f746e67fc9"
+  },
+  {
+    "sequence": 207,
+    "cache": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_risk_actions/minutes/2025-11-21_000546.csv.gz",
+    "sha256": "c666780370dfdeb08e946945be0a873622086004a6a757986c5c2efe9e6a2bc0",
+    "source": "/Volumes/ext/fin_agent/outputs/stock_automl/mk_1m_compact_2025/2025-11-21.csv.zst",
+    "source_sha256": "aef640db01c2ba0f87308641394d443c16b6c0bf9677546dccb5405b1e2d629b"
+  },
+  {
+    "sequence": 209,
+    "cache": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_risk_actions/minutes/2026-01-07_002766.csv.gz",
+    "sha256": "db990e14910d4405e75b3c5b9b50615c00cb2ac6f68c3bb3673509b5324e2583",
+    "source": "/Volumes/ext/fin_agent/outputs/stock_automl/mk_1m_compact/2026-01-07.csv.zst",
+    "source_sha256": "53f5e7f130e3c280bd781c5b235a6bd2149350d5e9201fd0363b95a557683d98"
+  },
+  {
+    "sequence": 210,
+    "cache": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_risk_actions/minutes/2026-01-13_002774.csv.gz",
+    "sha256": "459db2a0999727a8b30a0422d135f205680d11faf338613dfffc0e2257d5e4c4",
+    "source": "/Volumes/ext/fin_agent/outputs/stock_automl/mk_1m_compact/2026-01-13.csv.zst",
+    "source_sha256": "d516ef7466015f071d3955ea6d181620641549b80609ff06ed1bcd57524e9961"
+  },
+  {
+    "sequence": 213,
+    "cache": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_risk_actions/minutes/2026-01-21_600785.csv.gz",
+    "sha256": "5366ab4e1402875a909e7f9b1a624cc18b36a27e57a4ffa1a49c2382bfb20dc2",
+    "source": "/Volumes/ext/fin_agent/outputs/stock_automl/mk_1m_compact/2026-01-21.csv.zst",
+    "source_sha256": "1ed29cd28352a7145ac677ea3337c131cbcd9c0c3d2178c42b1aebe22db5d2d0"
+  },
+  {
+    "sequence": 211,
+    "cache": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_risk_actions/minutes/2026-01-16_002112.csv.gz",
+    "sha256": "e9aa764d17db0a6772688e60944030c2cf9864d7abf901a39818f4a914078b3d",
+    "source": "/Volumes/ext/fin_agent/outputs/stock_automl/mk_1m_compact/2026-01-16.csv.zst",
+    "source_sha256": "3184101b5ff417f68341e8d73d9322e17039fb4bd660e73bda238a064bdcb94b"
+  },
+  {
+    "sequence": 212,
+    "cache": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_risk_actions/minutes/2026-01-20_600785.csv.gz",
+    "sha256": "37c3b2e745aeb502e370a5528bf5a06ad65c83b0bf0c4e36e9e439dc249ecfe1",
+    "source": "/Volumes/ext/fin_agent/outputs/stock_automl/mk_1m_compact/2026-01-20.csv.zst",
+    "source_sha256": "a4a930a1e3e33adf6e7fa919e7ca49af4cc13cfbed698d85723bbcf3f4f94d88"
+  },
+  {
+    "sequence": 214,
+    "cache": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_risk_actions/minutes/2026-01-23_002716.csv.gz",
+    "sha256": "bb5e3723af59ce1dc676e7c511ffde5ef422441412e0c16a104a5c2098a07b61",
+    "source": "/Volumes/ext/fin_agent/outputs/stock_automl/mk_1m_compact/2026-01-23.csv.zst",
+    "source_sha256": "4b5d5f984c4d911d487d4063510df30afda7efa1664876227b95049e92f5f378"
+  },
+  {
+    "sequence": 217,
+    "cache": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_risk_actions/minutes/2026-01-28_002218.csv.gz",
+    "sha256": "23921a6e419e49d26b73591e688cd47579f1887cc050088866d29b3e70852f1c",
+    "source": "/Volumes/ext/fin_agent/outputs/stock_automl/mk_1m_compact/2026-01-28.csv.zst",
+    "source_sha256": "ab246c0b10498bb7fd290db694d15fb718104f4663fb8d77027a147387f63681"
+  },
+  {
+    "sequence": 215,
+    "cache": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_risk_actions/minutes/2026-01-26_000036.csv.gz",
+    "sha256": "e74823a959e0d82101552e3c46fb7c6c9d147cf13f120fbebbbfda3192b84b3f",
+    "source": "/Volumes/ext/fin_agent/outputs/stock_automl/mk_1m_compact/2026-01-26.csv.zst",
+    "source_sha256": "1204bece7222343618194c7daeccc77cba2339183c87402dd403223e331cb3bd"
+  },
+  {
+    "sequence": 216,
+    "cache": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_risk_actions/minutes/2026-01-27_601212.csv.gz",
+    "sha256": "51121e382e259fa44d4980d7e3c5ad527b30e7aa1c1d1820c461879dee6cd921",
+    "source": "/Volumes/ext/fin_agent/outputs/stock_automl/mk_1m_compact/2026-01-27.csv.zst",
+    "source_sha256": "6338741c9618cf908e20b17c939b295ac3f0d433c2f797569cb92ee5043e3454"
+  },
+  {
+    "sequence": 218,
+    "cache": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_risk_actions/minutes/2026-01-29_601212.csv.gz",
+    "sha256": "22c559798d0caa74f5a0666fe012e6d4aa2dd2d12299df3e534aa90a290282e7",
+    "source": "/Volumes/ext/fin_agent/outputs/stock_automl/mk_1m_compact/2026-01-29.csv.zst",
+    "source_sha256": "00d44a66ce62bdad6c0e06d0c6b21d0ad251156d66eeeb8afe944914e1f0ab1d"
+  },
+  {
+    "sequence": 220,
+    "cache": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_risk_actions/minutes/2026-02-03_000995.csv.gz",
+    "sha256": "418d27d3d3ae43eb95d22e9cad3961cb97075373bd90e7caaea1cdf1830b2b54",
+    "source": "/Volumes/ext/fin_agent/outputs/stock_automl/mk_1m_compact/2026-02-03.csv.zst",
+    "source_sha256": "45b407694f64c113544a5730533f51b186d74efeb3305031aa1e248aef04435e"
+  },
+  {
+    "sequence": 219,
+    "cache": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_risk_actions/minutes/2026-02-02_601212.csv.gz",
+    "sha256": "3bd814bff67747936b2b20d45186489e1f51950d432f4c4f5104068dae4dd2b8",
+    "source": "/Volumes/ext/fin_agent/outputs/stock_automl/mk_1m_compact/2026-02-02.csv.zst",
+    "source_sha256": "249132608af3bb598cfac239c0c1c4f8d889200f69cea7d576efe0ba2ebb8a21"
+  },
+  {
+    "sequence": 221,
+    "cache": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_risk_actions/minutes/2026-02-04_603861.csv.gz",
+    "sha256": "8bd3300238691f5b786227ecb08fc68d0d850ca83692bffec8b9ce3302940659",
+    "source": "/Volumes/ext/fin_agent/outputs/stock_automl/mk_1m_compact/2026-02-04.csv.zst",
+    "source_sha256": "1e4d6eda0e2078efd03729ff7fe850e01433aae46279fa20062c743972a0bfdb"
+  },
+  {
+    "sequence": 222,
+    "cache": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_risk_actions/minutes/2026-02-05_002471.csv.gz",
+    "sha256": "a5f258d6371dd32f21f86ad51a4bec485023e9aeb1b63b3b8fddf9169e562c31",
+    "source": "/Volumes/ext/fin_agent/outputs/stock_automl/mk_1m_compact/2026-02-05.csv.zst",
+    "source_sha256": "16ea805547324f42858cbc5aab6c6036aac1ebc3050c1c90bf9738c752fac7de"
+  },
+  {
+    "sequence": 223,
+    "cache": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_risk_actions/minutes/2026-02-06_603618.csv.gz",
+    "sha256": "9ab22298ddce2f8539ed8331d2cc0bfa745e25a237341eaa88a0fd18d6c5fa09",
+    "source": "/Volumes/ext/fin_agent/outputs/stock_automl/mk_1m_compact/2026-02-06.csv.zst",
+    "source_sha256": "dee2b07c1c7894bf387b20bf23bf881b4f78eb0907aa4276ce1bad96116dd8db"
+  },
+  {
+    "sequence": 224,
+    "cache": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_risk_actions/minutes/2026-02-09_601015.csv.gz",
+    "sha256": "dad4e7c68ae68ee321ad9a6456818f577e3146b7c03d8f43301e3c7efda9a305",
+    "source": "/Volumes/ext/fin_agent/outputs/stock_automl/mk_1m_compact/2026-02-09.csv.zst",
+    "source_sha256": "1751b4dd700bd9b282ca29fceb14238775884b1c57850b830f39e5a5d9972202"
+  },
+  {
+    "sequence": 225,
+    "cache": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_risk_actions/minutes/2026-02-10_600814.csv.gz",
+    "sha256": "75ee64f7591bc01b3fd3a2643e51ce33910691b9105202dfe3d83fc3f3aaa700",
+    "source": "/Volumes/ext/fin_agent/outputs/stock_automl/mk_1m_compact/2026-02-10.csv.zst",
+    "source_sha256": "76e776520bbe0e05c3c172c1ee0eb37aac26907fdaa78590d8fdc13ca7990994"
+  },
+  {
+    "sequence": 226,
+    "cache": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_risk_actions/minutes/2026-02-11_002506.csv.gz",
+    "sha256": "9bbd90106d015aa402a58988a3c859213f2a99d4593cd437b6dc12827d99da4b",
+    "source": "/Volumes/ext/fin_agent/outputs/stock_automl/mk_1m_compact/2026-02-11.csv.zst",
+    "source_sha256": "e08971d30f160878d76410042491ad9501d7e4746985d67a85daa8a22a352473"
+  },
+  {
+    "sequence": 227,
+    "cache": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_risk_actions/minutes/2026-02-12_002455.csv.gz",
+    "sha256": "835ab07db3d29792b934a47f53a94020e4e86a438e18f1950d9f4f901ba85031",
+    "source": "/Volumes/ext/fin_agent/outputs/stock_automl/mk_1m_compact/2026-02-12.csv.zst",
+    "source_sha256": "5c4a1ed87d3107f7634105f43a453de94befb827c49814f0f6494dfa240c3114"
+  },
+  {
+    "sequence": 228,
+    "cache": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_risk_actions/minutes/2026-02-13_002455.csv.gz",
+    "sha256": "d0bacd9a8ed7646524b9fb12cff5cae268d12c4fa90e3ba1375df9b5b55e5d27",
+    "source": "/Volumes/ext/fin_agent/outputs/stock_automl/mk_1m_compact/2026-02-13.csv.zst",
+    "source_sha256": "a0e4c340777fbc8b9719210659913da34a467df8e292f93e4221440a7adb5e1f"
+  },
+  {
+    "sequence": 229,
+    "cache": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_risk_actions/minutes/2026-02-24_600397.csv.gz",
+    "sha256": "5fc803d3b025a263386640a813bb746072a8effeabb2bd26624f39045ac64fac",
+    "source": "/Volumes/ext/fin_agent/outputs/stock_automl/mk_1m_compact/2026-02-24.csv.zst",
+    "source_sha256": "8b88a5cd7de04ad8de059846e8532916aa177408cb2f03da30f846dbe7c8a37d"
+  },
+  {
+    "sequence": 230,
+    "cache": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_risk_actions/minutes/2026-02-25_002951.csv.gz",
+    "sha256": "4d7838eeb804d9d0ce1631c74d8fa4d3696f5d8b20ba0c0a393e202def2456b9",
+    "source": "/Volumes/ext/fin_agent/outputs/stock_automl/mk_1m_compact/2026-02-25.csv.zst",
+    "source_sha256": "53a6fb5d9685c8eb967413769c8722fa5a6bc6b9791064a7186eb4fe1a1356cc"
+  },
+  {
+    "sequence": 231,
+    "cache": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_risk_actions/minutes/2026-02-26_001896.csv.gz",
+    "sha256": "dac884c17270b10d1a6bbe59b5ac681a48763d664f79ecf93734379a3d3e951f",
+    "source": "/Volumes/ext/fin_agent/outputs/stock_automl/mk_1m_compact/2026-02-26.csv.zst",
+    "source_sha256": "d26b4353b428b49f910568d09d4cfd2f622467ae020ea2881edd638cbed61e13"
+  },
+  {
+    "sequence": 232,
+    "cache": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_risk_actions/minutes/2026-02-27_000890.csv.gz",
+    "sha256": "3f34ba08de7419bb8695eae456237becbb084bfe1cfac660f094bcd95e58f417",
+    "source": "/Volumes/ext/fin_agent/outputs/stock_automl/mk_1m_compact/2026-02-27.csv.zst",
+    "source_sha256": "c3ec3421797757665c6b1a2d184eb0ffe44f099b35ef50c981b600522d289332"
+  },
+  {
+    "sequence": 233,
+    "cache": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_risk_actions/minutes/2026-03-02_000890.csv.gz",
+    "sha256": "6f557364b2bb2eaf9019db520f5dd8dabf51a433be838c88be42e5ff6e619299",
+    "source": "/Volumes/ext/fin_agent/outputs/stock_automl/mk_1m_compact/2026-03-02.csv.zst",
+    "source_sha256": "6ce32aaa81a70b71d45470f80e8a4caee6110f8b9d731e55aa8ce8d4ea911261"
+  },
+  {
+    "sequence": 234,
+    "cache": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_risk_actions/minutes/2026-03-03_000899.csv.gz",
+    "sha256": "4d852b2cc629090f1152ecd47c225c8d69ded0407006082d4b4759ad1a653701",
+    "source": "/Volumes/ext/fin_agent/outputs/stock_automl/mk_1m_compact/2026-03-03.csv.zst",
+    "source_sha256": "ebf1adbfc96588c74153e2a48b4657dc8469428a1181b1b003711215b1aee044"
+  },
+  {
+    "sequence": 235,
+    "cache": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_risk_actions/minutes/2026-03-04_600301.csv.gz",
+    "sha256": "8ce3f8617388454bb59d81bf49642296b8894a7082bdecb5ea6f14bbc507b966",
+    "source": "/Volumes/ext/fin_agent/outputs/stock_automl/mk_1m_compact/2026-03-04.csv.zst",
+    "source_sha256": "60fa4ad14ffc1e3340e02dc127d60547ad952032507535a9279adb91baa6c72e"
+  },
+  {
+    "sequence": 236,
+    "cache": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_risk_actions/minutes/2026-03-05_600722.csv.gz",
+    "sha256": "df815e9d55a8b914a8872157f045f2ba3c5deb367e042769def6ac94c1fe8f8c",
+    "source": "/Volumes/ext/fin_agent/outputs/stock_automl/mk_1m_compact/2026-03-05.csv.zst",
+    "source_sha256": "b08d1d48301057ee6d940c2169bc020a22221e00bd4c33d866eb587d9fc4f48e"
+  },
+  {
+    "sequence": 237,
+    "cache": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_risk_actions/minutes/2026-03-10_600545.csv.gz",
+    "sha256": "46745d34180565ffe6ab6a5b865410b7bee8d8e98afd3e1e7780fb1fcda16834",
+    "source": "/Volumes/ext/fin_agent/outputs/stock_automl/mk_1m_compact/2026-03-10.csv.zst",
+    "source_sha256": "928e11511a9666fde1f6df8bc77fd45dd94f55262c1d3d4b850d198912f6f516"
+  },
+  {
+    "sequence": 238,
+    "cache": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_risk_actions/minutes/2026-03-12_601789.csv.gz",
+    "sha256": "b682a207c091dcb1e8671d9f2962d85fd5c9b649272778d531ec6c1ae2015ada",
+    "source": "/Volumes/ext/fin_agent/outputs/stock_automl/mk_1m_compact/2026-03-12.csv.zst",
+    "source_sha256": "7918ca1eb28d8a88c9a4938f7170684ba1e540062213b470e5536d3c4cc38f25"
+  },
+  {
+    "sequence": 240,
+    "cache": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_risk_actions/minutes/2026-03-16_600722.csv.gz",
+    "sha256": "6209d541a22c357db34557d9ea54917eb5620b6070b55398968bc8835ba46ea6",
+    "source": "/Volumes/ext/fin_agent/outputs/stock_automl/mk_1m_compact/2026-03-16.csv.zst",
+    "source_sha256": "451d5def3cfc8cb66963033835d8f4648a069c466bc844224a5b6c98f0c29500"
+  },
+  {
+    "sequence": 239,
+    "cache": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_risk_actions/minutes/2026-03-13_600108.csv.gz",
+    "sha256": "2d3f8675e103c7619cca71667014730c10bbd7be119b3262c12d93047dc10ce0",
+    "source": "/Volumes/ext/fin_agent/outputs/stock_automl/mk_1m_compact/2026-03-13.csv.zst",
+    "source_sha256": "ef3041cfacf8f1908595b38fd9d5744c171890ddb2bc64a082187fee448705bd"
+  },
+  {
+    "sequence": 241,
+    "cache": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_risk_actions/minutes/2026-03-17_000890.csv.gz",
+    "sha256": "ea3471720d60cd428518ab9dd118f0ff7abc62c05472126f4a23bb957a530d4b",
+    "source": "/Volumes/ext/fin_agent/outputs/stock_automl/mk_1m_compact/2026-03-17.csv.zst",
+    "source_sha256": "58c7b4f2ebc4c5ec1ccbbc34faee1a52b1b4ec38fc0096ce076a4cf52c96993a"
+  },
+  {
+    "sequence": 242,
+    "cache": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_risk_actions/minutes/2026-03-18_600370.csv.gz",
+    "sha256": "de2c7779f260d33e1ff6758b5a36b443d52ddd2ae76fd60d74b6f25c94a9e6cc",
+    "source": "/Volumes/ext/fin_agent/outputs/stock_automl/mk_1m_compact/2026-03-18.csv.zst",
+    "source_sha256": "70e5e139d8fae85b4680780394890cdc51f50341576ad87c01cbb9592c6ecf7d"
+  },
+  {
+    "sequence": 243,
+    "cache": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_risk_actions/minutes/2026-03-25_600396.csv.gz",
+    "sha256": "c96d21671d0f2222fd6ca09def87b685d09b2abc12f6964f7de4aa7c95998663",
+    "source": "/Volumes/ext/fin_agent/outputs/stock_automl/mk_1m_compact/2026-03-25.csv.zst",
+    "source_sha256": "c8e5bab1dc0668c3f0b510a17bc54201b8d23bb4ff259d474e501d0586086ac9"
+  },
+  {
+    "sequence": 244,
+    "cache": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_risk_actions/minutes/2026-03-26_002309.csv.gz",
+    "sha256": "60cf1121de0292ed9796c5a8eb0b2e06a0b2623ed56f2e127627936a097606b2",
+    "source": "/Volumes/ext/fin_agent/outputs/stock_automl/mk_1m_compact/2026-03-26.csv.zst",
+    "source_sha256": "33967e7cd7ab08e4e14d8e8f5f38a008a94b2ec6e56474292e3dddf68360b4b6"
+  },
+  {
+    "sequence": 245,
+    "cache": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_risk_actions/minutes/2026-03-27_002491.csv.gz",
+    "sha256": "a2cf2567025864ef2092b8a1a424e5436170ddacb9cb8e5f3fada4d3d738b880",
+    "source": "/Volumes/ext/fin_agent/outputs/stock_automl/mk_1m_compact/2026-03-27.csv.zst",
+    "source_sha256": "4765fb5dc8553ccab12eb687b235e375e4015db99ec677020846c29a0636fe9c"
+  },
+  {
+    "sequence": 246,
+    "cache": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_risk_actions/minutes/2026-03-31_000720.csv.gz",
+    "sha256": "6dcbbbbdebf8c4ae0615984e13fc8a5d6a269989843771d2d1b3f1b6faf91011",
+    "source": "/Volumes/ext/fin_agent/outputs/stock_automl/mk_1m_compact/2026-03-31.csv.zst",
+    "source_sha256": "7d569e40b1d3058242514708b4f15640824f8b45cdab8ce266f5c30429f431c1"
+  },
+  {
+    "sequence": 247,
+    "cache": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_risk_actions/minutes/2026-04-01_000890.csv.gz",
+    "sha256": "e3ffff0b960fdc1c26710cf2e8519379d0ae0bde9cce4a6e9c1a1520f1615399",
+    "source": "/Volumes/ext/fin_agent/outputs/stock_automl/mk_1m_compact/2026-04-01.csv.zst",
+    "source_sha256": "6f13fac783dd981eabde07d67ba7864506376b207115cdba06f2b7bc01a084c9"
+  },
+  {
+    "sequence": 248,
+    "cache": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_risk_actions/minutes/2026-04-02_002634.csv.gz",
+    "sha256": "0c9a2524dfc880676338b23027a9152e869cc7368a08c0272e9f527b608e9e77",
+    "source": "/Volumes/ext/fin_agent/outputs/stock_automl/mk_1m_compact/2026-04-02.csv.zst",
+    "source_sha256": "bd1719c2f6e56b6c3bb9b5ef6509a70b993a8d577609bdbf7e0a96a9f4e3027a"
+  },
+  {
+    "sequence": 249,
+    "cache": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_risk_actions/minutes/2026-04-03_002560.csv.gz",
+    "sha256": "bea2b38d8b7afd7093f1546916e288e6b535b787beb1887cab087e7651966aad",
+    "source": "/Volumes/ext/fin_agent/outputs/stock_automl/mk_1m_compact/2026-04-03.csv.zst",
+    "source_sha256": "65762a46f4540078ebf0ea81e999484d46f256d6e718b8dd648d889926556923"
+  },
+  {
+    "sequence": 251,
+    "cache": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_risk_actions/minutes/2026-04-08_600488.csv.gz",
+    "sha256": "5564f2e319623c4bf1be21b484221def9a01cf455fb3dc45d3c1aca1ba61e1e0",
+    "source": "/Volumes/ext/fin_agent/outputs/stock_automl/mk_1m_compact/2026-04-08.csv.zst",
+    "source_sha256": "1c76f197e330eff1cce90b439c7b70024981e74748d87062724cfb04d0407b1d"
+  },
+  {
+    "sequence": 250,
+    "cache": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_risk_actions/minutes/2026-04-07_002560.csv.gz",
+    "sha256": "9f69c47f03814ab3a6950b294bc526647a800aa6dad2a9d9a698741e3191f128",
+    "source": "/Volumes/ext/fin_agent/outputs/stock_automl/mk_1m_compact/2026-04-07.csv.zst",
+    "source_sha256": "ba83c110db6b081e9994ca9f938669e9748f0dfa0709d0e07be7615e4f9d8938"
+  },
+  {
+    "sequence": 252,
+    "cache": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_risk_actions/minutes/2026-04-15_002580.csv.gz",
+    "sha256": "5763224747a37be21953ba466538c33ba0850c3d0752eba33619bc5ae29f98af",
+    "source": "/Volumes/ext/fin_agent/outputs/stock_automl/mk_1m_compact/2026-04-15.csv.zst",
+    "source_sha256": "9b3f92a5b8eb3334d11f7f91d375e1045a49e692dbfa21d7c064693d761a9413"
+  },
+  {
+    "sequence": 253,
+    "cache": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_risk_actions/minutes/2026-04-16_600396.csv.gz",
+    "sha256": "602e610d6ad8439071810f54afef297602e116d78442dbe4a019674e31f3bc46",
+    "source": "/Volumes/ext/fin_agent/outputs/stock_automl/mk_1m_compact/2026-04-16.csv.zst",
+    "source_sha256": "da6ed38750fb68b0bf2b43362097211b19daf5923ed9432e3915012f39ce9b82"
+  },
+  {
+    "sequence": 254,
+    "cache": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_risk_actions/minutes/2026-04-17_002580.csv.gz",
+    "sha256": "8122ff50dd280275c09217d191ddbd29674e6f8328574f3c4092679e0f20bd1b",
+    "source": "/Volumes/ext/fin_agent/outputs/stock_automl/mk_1m_compact/2026-04-17.csv.zst",
+    "source_sha256": "5ef4a9377c60a20e10198c1d47ddc59d601925e99ca7783f83d4dd52767efa9e"
+  },
+  {
+    "sequence": 255,
+    "cache": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_risk_actions/minutes/2026-04-22_002217.csv.gz",
+    "sha256": "b6ade74862bc549e07ff1f050c9bcb64d25703d36d401345b08c02762f67c12c",
+    "source": "/Volumes/ext/fin_agent/outputs/stock_automl/mk_1m_compact/2026-04-22.csv.zst",
+    "source_sha256": "2923d1b9f610023732fb0d266835140459c586e0f8c28b8baf426c9e3fb5b3f4"
+  },
+  {
+    "sequence": 256,
+    "cache": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_risk_actions/minutes/2026-04-24_603115.csv.gz",
+    "sha256": "2707a75a9fec84e232c0b34ee7fe4ebc863719acc2002ce907f8f0b4498088ac",
+    "source": "/Volumes/ext/fin_agent/outputs/stock_automl/mk_1m_compact/2026-04-24.csv.zst",
+    "source_sha256": "86345bf661a05979be8f6e8ce3a55c7ad40efd88bdb0d0070834024023f3141f"
+  },
+  {
+    "sequence": 257,
+    "cache": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_risk_actions/minutes/2026-05-06_600156.csv.gz",
+    "sha256": "ae90d61edaa92ded62b4613c8d6be45c5647dac2ed775d8820831dd3c148c4bf",
+    "source": "/Volumes/ext/fin_agent/outputs/stock_automl/mk_1m_compact/2026-05-06.csv.zst",
+    "source_sha256": "7728d3b16233b5736b5edaf17aee40443092e6c1488b5f3e42a591df198295e3"
+  },
+  {
+    "sequence": 258,
+    "cache": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_risk_actions/minutes/2026-07-03_002273.csv.gz",
+    "sha256": "76c7851d604366162b1ab4175df436580732a7d1a0cff10f69e3dfa697d1e153",
+    "source": "/Volumes/ext/fin_agent/outputs/stock_automl/mk_1m_compact/2026-07-03.csv.zst",
+    "source_sha256": "78b583b73019205283eda707ab8516b2a1c485bbe4961697538d28411bd3148c"
+  },
+  {
+    "sequence": 259,
+    "cache": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_risk_actions/minutes/2026-07-06_000566.csv.gz",
+    "sha256": "f9a6d4d97df52b38cfe228b0d3b0d6a5f002fa8aa9361683cade1360a1ecc4a1",
+    "source": "/Volumes/ext/fin_agent/outputs/stock_automl/mk_1m_compact/2026-07-06.csv.zst",
+    "source_sha256": "84a982a175a11081a5f09655c61573295ab4f4d805a4a3a68095059dde50416c"
+  },
+  {
+    "sequence": 260,
+    "cache": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_risk_actions/minutes/2026-07-07_600793.csv.gz",
+    "sha256": "3515566903132d58292d2db088250509828472412c949599f2633b3a9888df03",
+    "source": "/Volumes/ext/fin_agent/outputs/stock_automl/mk_1m_compact/2026-07-07.csv.zst",
+    "source_sha256": "1f857b2d2d9a91c9f8b8fffefa0abb9c669c455c7998289af4502c950defc53f"
+  },
+  {
+    "sequence": 261,
+    "cache": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_risk_actions/minutes/2026-07-08_000656.csv.gz",
+    "sha256": "0b82b83c8f694c5cfed7ecdac00a74ff79acfc4767af249e80d0c7f403d0d624",
+    "source": "/Volumes/ext/fin_agent/outputs/stock_automl/mk_1m_compact/2026-07-08.csv.zst",
+    "source_sha256": "9ca4c3226ca9ed98f51b09f50152413c485022ccfc39568ec1b70b3a4d5c5fbb"
+  },
+  {
+    "sequence": 262,
+    "cache": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_risk_actions/minutes/2026-07-09_600793.csv.gz",
+    "sha256": "15734b7789d05fbfcb37461d27fe4149fa333aca66b4e68bb9952b6a5d39b12b",
+    "source": "/Volumes/ext/fin_agent/outputs/stock_automl/mk_1m_compact/2026-07-09.csv.zst",
+    "source_sha256": "11f7f6a12a0e7be69e59a2bf3ec221a0d2f43dbdec6b9143447b5df3a595d06a"
+  },
+  {
+    "sequence": 264,
+    "cache": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_risk_actions/minutes/2026-07-13_002490.csv.gz",
+    "sha256": "d0f281f27e1af4484a53c8e9585ec7457eb2fef0366a0f273726149ad2dd3623",
+    "source": "/Volumes/ext/fin_agent/outputs/stock_automl/mk_1m_compact/2026-07-13.csv.zst",
+    "source_sha256": "0a70a33bfccc955a470e4c8c6d4a18a8c81fae0ef9155d5cd8d20ea8dcd4aa08"
+  },
+  {
+    "sequence": 263,
+    "cache": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_risk_actions/minutes/2026-07-10_001229.csv.gz",
+    "sha256": "dc7ec53568cd3e2ef362f61dc3b6531099fa56890005177ed371adc4d5c150a8",
+    "source": "/Volumes/ext/fin_agent/outputs/stock_automl/mk_1m_compact/2026-07-10.csv.zst",
+    "source_sha256": "55ac79547a95b0259ed027ddc12d72eaa25a5aaf985cd97f74263ebd68edca2a"
+  },
+  {
+    "sequence": 265,
+    "cache": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_risk_actions/minutes/2026-07-14_603898.csv.gz",
+    "sha256": "ccfe98212cec4af2dc47ce569bfaa8ba0dda5f1e30cdf5305ad8fec1e9a6e203",
+    "source": "/Volumes/ext/fin_agent/outputs/stock_automl/mk_1m_compact/2026-07-14.csv.zst",
+    "source_sha256": "bff2df4d9bb81e27731b1f7b2decc5f32cf0c2974fbfbeb9987cb0cf1f0f6533"
+  },
+  {
+    "sequence": 266,
+    "cache": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_risk_actions/minutes/2026-07-15_600992.csv.gz",
+    "sha256": "a39df5cc345e0106a9533810a9738bd5034d2cc3c93e349aa0877a481465ea56",
+    "source": "/Volumes/ext/fin_agent/outputs/stock_automl/mk_1m_compact/2026-07-15.csv.zst",
+    "source_sha256": "5172c808ebf301a20035bf508150b6d7f664a9adfd6aff2f17f7e19cb6eceda9"
+  },
+  {
+    "sequence": 267,
+    "cache": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_risk_actions/minutes/2026-07-16_603137.csv.gz",
+    "sha256": "005a7a34c7467f9a18ba6ecfed92ffb357ebb9f0656b30a7c01286a514d73097",
+    "source": "/Volumes/ext/fin_agent/outputs/stock_automl/mk_1m_compact/2026-07-16.csv.zst",
+    "source_sha256": "a721becc4f3ea7deb0902cea869e7cb5af6345ede2f3e44eb6741e5d97626756"
+  },
+  {
+    "sequence": 268,
+    "cache": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_risk_actions/minutes/2026-07-17_603137.csv.gz",
+    "sha256": "a57cac597978619776156745c3ab53ab697c111d94b02cddcf71b51fd6656180",
+    "source": "/Volumes/ext/fin_agent/outputs/stock_automl/mk_1m_compact/2026-07-17.csv.zst",
+    "source_sha256": "b84ab8aa3757018658a1041a903936c8e4c64bec3014d9472f2634c1fe6b735b"
+  },
+  {
+    "sequence": 269,
+    "cache": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_risk_actions/minutes/2026-07-20_600664.csv.gz",
+    "sha256": "9f495dda461ca893cdab36ad696ed8f61341750a4a1bc1dd15752d789594380d",
+    "source": "/Volumes/ext/fin_agent/outputs/stock_automl/mk_1m_compact/2026-07-20.csv.zst",
+    "source_sha256": "d0133ee7920aa4cb5d4d844448c220a63200217a07a58c5f8d7e8615dd3a7fe4"
+  },
+  {
+    "sequence": 270,
+    "cache": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_risk_actions/minutes/2026-07-21_002829.csv.gz",
+    "sha256": "f618f7294d699d2aa045860429908d64220b131640dc209f0647e057d9610bae",
+    "source": "/Volumes/ext/fin_agent/outputs/stock_automl/mk_1m_compact/2026-07-21.csv.zst",
+    "source_sha256": "6a27d4fd4f9df57a61ded4538e40b5445da55f340c325353378fd1c30da59cf2"
+  },
+  {
+    "sequence": 271,
+    "cache": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_risk_actions/minutes/2026-07-22_000722.csv.gz",
+    "sha256": "07a1edc83f5888ff664fcc0accb66ce052223cbbf9e634b3057868c9ef614cc1",
+    "source": "/Volumes/ext/fin_agent/outputs/stock_automl/mk_1m_compact/2026-07-22.csv.zst",
+    "source_sha256": "f882e2e2b2e79f939aa1cd0e372c44c79f35716e4adc2b15d4b3f219d5864309"
+  },
+  {
+    "sequence": 273,
+    "cache": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_risk_actions/minutes/2026-07-24_603407.csv.gz",
+    "sha256": "902bf9926c1352bb76e4562ce56ae3edcb4bec63d843e246ac20804570599cf0",
+    "source": "/Volumes/ext/fin_agent/outputs/stock_automl/mk_1m_compact/2026-07-24.csv.zst",
+    "source_sha256": "69585ed1a854bbc1e45e690cba42117ebfcde58fa186e3fb9ba3ce6af3446220"
+  },
+  {
+    "sequence": 272,
+    "cache": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_risk_actions/minutes/2026-07-23_600744.csv.gz",
+    "sha256": "2c2ae541b0bf13ec5d92eaa0303fd75354d8c7dba6031a6a1d3ddc5b3e1cde1c",
+    "source": "/Volumes/ext/fin_agent/outputs/stock_automl/mk_1m_compact/2026-07-23.csv.zst",
+    "source_sha256": "2589638c1e53e48d18c320d74009fb1e9f1b926e4968f26d7e54e3e982ddf775"
+  },
+  {
+    "sequence": 274,
+    "cache": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_risk_actions/minutes/2026-07-27_603988.csv.gz",
+    "sha256": "4b1e1caa6e7679fa07cf92ca873d22515a20e80b9e6a57c25eced9cd8e0c1435",
+    "source": "/Volumes/ext/fin_agent/outputs/stock_automl/mk_1m_compact/2026-07-27.csv.zst",
+    "source_sha256": "3b53bc559cc49196a17c3ca78576ea5fa2249464be56b3cd4c746c8700044528"
+  },
+  {
+    "sequence": 275,
+    "cache": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_risk_actions/minutes/2026-07-29_000533.csv.gz",
+    "sha256": "579b03979770e074730c823d6950f1c28e3f6c5e18f7985f3e0251a785b44598",
+    "source": "/Volumes/ext/fin_agent/outputs/stock_automl/mk_1m_compact/2026-07-29.csv.zst",
+    "source_sha256": "74ff1f62a246cada26925cde7794ce5743005c1f484eb665d6a21cb9bdcf74be"
+  },
+  {
+    "sequence": 279,
+    "missing": false,
+    "day": "2026-08-10",
+    "symbol": "600397",
+    "cache": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_risk_actions/minutes/2026-08-10_600397.csv.gz",
+    "sha256": "0ac128e65bdb87477b56e10f8328755a1b80dfbb5526ad1dc2f6b0c442d6f620",
+    "source": "read-only finalized DB minute; volume lots*100"
+  },
+  {
+    "sequence": 280,
+    "missing": false,
+    "day": "2026-08-11",
+    "symbol": "600206",
+    "cache": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_risk_actions/minutes/2026-08-11_600206.csv.gz",
+    "sha256": "1e8bddaf939fbc83834bfa5fe8403e217f4e9ac65b99087de3a3137031972a64",
+    "source": "read-only finalized DB minute; volume lots*100"
+  },
+  {
+    "sequence": 281,
+    "missing": false,
+    "day": "2026-08-12",
+    "symbol": "002552",
+    "cache": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_risk_actions/minutes/2026-08-12_002552.csv.gz",
+    "sha256": "eae2e5800e573dbac7ca06d3061abd35a7d157f51d73dca51dd5eb1a0484ae5d",
+    "source": "read-only finalized DB minute; volume lots*100"
+  },
+  {
+    "sequence": 282,
+    "missing": false,
+    "day": "2026-08-17",
+    "symbol": "002329",
+    "cache": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_risk_actions/minutes/2026-08-17_002329.csv.gz",
+    "sha256": "fbb78cb958091a6541597d8de6da0d9a92b8debbf86c5faa3e1961363653e676",
+    "source": "read-only finalized DB minute; volume lots*100"
+  },
+  {
+    "sequence": 283,
+    "missing": false,
+    "day": "2026-08-18",
+    "symbol": "002172",
+    "cache": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_risk_actions/minutes/2026-08-18_002172.csv.gz",
+    "sha256": "c545121cc5693d9f7c14e85cf24c18b84f082bf3b5f3a5c5faa7ac44d43a4161",
+    "source": "read-only finalized DB minute; volume lots*100"
+  },
+  {
+    "sequence": 284,
+    "missing": false,
+    "day": "2026-08-20",
+    "symbol": "603958",
+    "cache": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_risk_actions/minutes/2026-08-20_603958.csv.gz",
+    "sha256": "beff812f3c2649ab9fe9bc21f1d33a1b591688e0a02f5e813170f8cdcef9b7cb",
+    "source": "read-only finalized DB minute; volume lots*100"
+  },
+  {
+    "sequence": 285,
+    "missing": false,
+    "day": "2026-08-21",
+    "symbol": "603395",
+    "cache": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_risk_actions/minutes/2026-08-21_603395.csv.gz",
+    "sha256": "f7b25648b881eb215affe5c078d229ace7e0893713952065290457057b70fa0e",
+    "source": "read-only finalized DB minute; volume lots*100"
+  },
+  {
+    "sequence": 286,
+    "missing": false,
+    "day": "2026-08-24",
+    "symbol": "002491",
+    "cache": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_risk_actions/minutes/2026-08-24_002491.csv.gz",
+    "sha256": "74bcffc4d5ac720b29e4a491819b2d97b56767f67f6733da9a38b526f3a5c1aa",
+    "source": "read-only finalized DB minute; volume lots*100"
+  },
+  {
+    "sequence": 287,
+    "missing": false,
+    "day": "2026-08-25",
+    "symbol": "002038",
+    "cache": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_risk_actions/minutes/2026-08-25_002038.csv.gz",
+    "sha256": "b5ebafc3ccb717ae95e40e2681c9f91a20a74081316efcd26a19d9c95469d353",
+    "source": "read-only finalized DB minute; volume lots*100"
+  },
+  {
+    "sequence": 288,
+    "missing": false,
+    "day": "2026-08-27",
+    "symbol": "000017",
+    "cache": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_risk_actions/minutes/2026-08-27_000017.csv.gz",
+    "sha256": "41fe9248e1c9aa2749d388582625404ec79713830fcc4549a4f7f97d7ecab72c",
+    "source": "read-only finalized DB minute; volume lots*100"
+  },
+  {
+    "sequence": 289,
+    "missing": false,
+    "day": "2026-08-28",
+    "symbol": "603118",
+    "cache": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_risk_actions/minutes/2026-08-28_603118.csv.gz",
+    "sha256": "64169c9bfdf544abdca151d5a6857b645f3946b9640674bee12e1f2574b9f246",
+    "source": "read-only finalized DB minute; volume lots*100"
+  },
+  {
+    "sequence": 276,
+    "cache": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_risk_actions/minutes/2026-07-30_000533.csv.gz",
+    "sha256": "46d4168aa3d8a04bfb16a3c6a1ae153b9f303def85fe2dba58542d856931edf4",
+    "source": "/Volumes/ext/fin_agent/outputs/stock_automl/mk_1m_compact/2026-07-30.csv.zst",
+    "source_sha256": "37ea2380d15aab7ab31edca2895475f0ec61d643a0d9fcca7036f9614a2c7aaa"
+  },
+  {
+    "sequence": 277,
+    "cache": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_risk_actions/minutes/2026-08-05_002354.csv.gz",
+    "sha256": "5c4eba1eb594434aacc7304407ea193fa38da7e7d6a25c96e99b1be91e68fb2c",
+    "source": "/Volumes/ext/fin_agent/outputs/stock_automl/mk_1m_compact/2026-08-05.csv.zst",
+    "source_sha256": "a3e79e43b728164a415323ed35b1b33b45aaf0f662d4f3a13b3ec0b863395597"
+  },
+  {
+    "sequence": 290,
+    "cache": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_risk_actions/minutes/2026-09-01_000712.csv.gz",
+    "sha256": "3a05ae4fc43a118df5f2d867c03530cfb63109a649cd51f1375cc52d0951fa32",
+    "source": "/Volumes/ext/fin_agent/outputs/stock_automl/limit_rebound_shape_top3_r20_20261015/minute_days/2026-09-01_raw.pkl",
+    "source_sha256": "7eb1683bf84bf88a3f7b2f4247893c542feb5c98553d9c6394dcdc104c2568d8"
+  },
+  {
+    "sequence": 291,
+    "missing": false,
+    "day": "2026-09-04",
+    "symbol": "600892",
+    "cache": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_risk_actions/minutes/2026-09-04_600892.csv.gz",
+    "sha256": "07ac2b1641fa9d6d6a8c13047cc340d277a85a7ce9c37d2023cce93233e4e9b4",
+    "source": "read-only finalized DB minute; volume lots*100"
+  },
+  {
+    "sequence": 292,
+    "missing": false,
+    "day": "2026-09-07",
+    "symbol": "002909",
+    "cache": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_risk_actions/minutes/2026-09-07_002909.csv.gz",
+    "sha256": "c994b0e02582f14a3ac94fd478414c81b0877234b30c528b46f6a79b098f4066",
+    "source": "read-only finalized DB minute; volume lots*100"
+  },
+  {
+    "sequence": 294,
+    "missing": false,
+    "day": "2026-09-09",
+    "symbol": "002702",
+    "cache": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_risk_actions/minutes/2026-09-09_002702.csv.gz",
+    "sha256": "cc75c6479c75b70037e36b173505a3290ababf4c44d1154e254f498184099cc9",
+    "source": "read-only finalized DB minute; volume lots*100"
+  },
+  {
+    "sequence": 293,
+    "missing": false,
+    "day": "2026-09-08",
+    "symbol": "605580",
+    "cache": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_risk_actions/minutes/2026-09-08_605580.csv.gz",
+    "sha256": "b2780ef52b9c51d4e8dff34b376ff257f00a73560c63d170fcc21819d3315e41",
+    "source": "read-only finalized DB minute; volume lots*100"
+  },
+  {
+    "sequence": 296,
+    "missing": false,
+    "day": "2026-09-11",
+    "symbol": "002295",
+    "cache": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_risk_actions/minutes/2026-09-11_002295.csv.gz",
+    "sha256": "89ee8374e5c1b3678bd56fd5e9f61f1132f74d4819521766a78f2232d8986e41",
+    "source": "read-only finalized DB minute; volume lots*100"
+  },
+  {
+    "sequence": 295,
+    "missing": false,
+    "day": "2026-09-10",
+    "symbol": "600354",
+    "cache": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_risk_actions/minutes/2026-09-10_600354.csv.gz",
+    "sha256": "cf9631c4366671cf8cc1768cbf5a9421f8b83c3cb25c6fb7f99359a0d273ce4f",
+    "source": "read-only finalized DB minute; volume lots*100"
+  },
+  {
+    "sequence": 297,
+    "missing": false,
+    "day": "2026-09-14",
+    "symbol": "000978",
+    "cache": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_risk_actions/minutes/2026-09-14_000978.csv.gz",
+    "sha256": "e2d49bcc5aa271ed2f54d280ce1cb860ffecb7b23c8a655aaa2e171e97b5644c",
+    "source": "read-only finalized DB minute; volume lots*100"
+  },
+  {
+    "sequence": 298,
+    "missing": false,
+    "day": "2026-09-17",
+    "symbol": "603090",
+    "cache": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_risk_actions/minutes/2026-09-17_603090.csv.gz",
+    "sha256": "b7154e104dc7f1e659c9d2d550f6de74412bc861833ba554860a6a055db0de0f",
+    "source": "read-only finalized DB minute; volume lots*100"
+  },
+  {
+    "sequence": 299,
+    "missing": false,
+    "day": "2026-09-18",
+    "symbol": "002631",
+    "cache": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_risk_actions/minutes/2026-09-18_002631.csv.gz",
+    "sha256": "c1b9b9d9be5a3e1ff1374d9f7df1c6b1f43a4034cce6a1491fb4d7cceafadbbb",
+    "source": "read-only finalized DB minute; volume lots*100"
+  },
+  {
+    "sequence": 300,
+    "missing": false,
+    "day": "2026-09-21",
+    "symbol": "600371",
+    "cache": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_risk_actions/minutes/2026-09-21_600371.csv.gz",
+    "sha256": "40b0506376da901fc9226d3b9aaa6263c248b9e38bdf00d9eff0083617b45072",
+    "source": "read-only finalized DB minute; volume lots*100"
+  },
+  {
+    "sequence": 302,
+    "missing": false,
+    "day": "2026-09-23",
+    "symbol": "601123",
+    "cache": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_risk_actions/minutes/2026-09-23_601123.csv.gz",
+    "sha256": "613bb26497fef9113f738890d4806a8002b3a47226afa27b6fdb6227b6406001",
+    "source": "read-only finalized DB minute; volume lots*100"
+  },
+  {
+    "sequence": 303,
+    "missing": false,
+    "day": "2026-09-28",
+    "symbol": "000560",
+    "cache": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_risk_actions/minutes/2026-09-28_000560.csv.gz",
+    "sha256": "f8d1803a1ae3c4a55e6ce53a95b4db3c5601d9fd6043dd4e69bbd9fd29cb3a3b",
+    "source": "read-only finalized DB minute; volume lots*100"
+  },
+  {
+    "sequence": 301,
+    "missing": false,
+    "day": "2026-09-22",
+    "symbol": "002285",
+    "cache": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_risk_actions/minutes/2026-09-22_002285.csv.gz",
+    "sha256": "265615894e706084587e8eb4ab5ab933f3e3e65cab859e3b8940982fe87e76c3",
+    "source": "read-only finalized DB minute; volume lots*100"
+  },
+  {
+    "sequence": 304,
+    "missing": false,
+    "day": "2026-09-29",
+    "symbol": "601811",
+    "cache": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_risk_actions/minutes/2026-09-29_601811.csv.gz",
+    "sha256": "b8fd54f0c8f712b1799d8d06e35c9cd7385e2837bb2aa98b0e643e680a7191b5",
+    "source": "read-only finalized DB minute; volume lots*100"
+  },
+  {
+    "sequence": 306,
+    "missing": false,
+    "day": "2026-10-09",
+    "symbol": "605388",
+    "cache": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_risk_actions/minutes/2026-10-09_605388.csv.gz",
+    "sha256": "0447b3c60fcf8cb1a7c9e90856b703d17d6815c285ee7a263de623ecab733121",
+    "source": "read-only finalized DB minute; volume lots*100"
+  },
+  {
+    "sequence": 305,
+    "missing": false,
+    "day": "2026-09-30",
+    "symbol": "600802",
+    "cache": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_risk_actions/minutes/2026-09-30_600802.csv.gz",
+    "sha256": "83ae5daf7e6479a02c0e7125d57f772e3cfed5c4dde94ad7b9bb4e4b1e0a95eb",
+    "source": "read-only finalized DB minute; volume lots*100"
+  },
+  {
+    "sequence": 278,
+    "cache": "/Volumes/ext/fin_agent/docs/stock_automl_runs/20261022_b2_risk_actions/minutes/2026-08-07_003032.csv.gz",
+    "sha256": "9dfe37fb0d33970515517ad6cba9e795ccf338335b5a22787b2b2b3a5bc129cb",
+    "source": "/Volumes/ext/fin_agent/outputs/stock_automl/mk_1m_compact/2026-08-07.csv.zst",
+    "source_sha256": "c07d042af1a5432fe27968fa92d57302bf1abf753dbad8bd7d5d9b582abe59f4"
+  }
+]

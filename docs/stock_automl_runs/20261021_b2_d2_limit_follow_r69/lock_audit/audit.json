@@ -1,0 +1,23 @@
+{
+  "summary": {
+    "total": 49,
+    "full_day_locked": 14,
+    "whole_afternoon_locked": 23,
+    "morning_open_but_afternoon_locked": 9,
+    "afternoon_opened": 26,
+    "volume_positive_all": true,
+    "price_open_but_no_volume_count": 0
+  },
+  "reference_r69_audit_sha256": "42dbcce17b395cd0b2fb97e46649950fee339bd1365cf8fbf93e8f0bf9e9c8d1",
+  "script_sha256": "c0c06019c506ac3dcbdbc607d0a893c8ee25a298f40cfa974fa52aae2507c630",
+  "files": {
+    "sample.pkl": "bcd1b53a2030f194a25600211b16271405459637e1f539f0f271778efe693b73",
+    "minute_sources.json": "ca4d44fb90fe25b8fb25dd252416c5d7f3e10b8b91f9a4502b958316c8fe77a1",
+    "minute_failures.json": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+    "price_audit.json": "eba9771e7a7c2e77a49d5601ecbeb2148c1a6b5dbb7a0cb5045ac38fcf8aea1b",
+    "summary.json": "d0aa6703d5a4fd9a497d8316fe2eb34fd781cb837cb1489c46d68769fe2b2d0d",
+    "49笔封板核对.csv": "506970ed980e7af17a9530904f8679566922a99524dd58bee4de4a7bb6bf449c",
+    "README.md": "991ebcc7c29051978c3b80340ffca72a8ea7bd914420c42a0f12fc3121af830b"
+  },
+  "production_modified": false
+}

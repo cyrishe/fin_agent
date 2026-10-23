@@ -1,0 +1,17 @@
+{
+  "status": "PASS",
+  "trades": 34,
+  "policy_trade_rows": 204,
+  "D3_complete_minutes": 34,
+  "checks": [
+    "Source and code hashes",
+    "34 retained in every policy; 15 D2 exits / 19 deferred",
+    "Exact 240-bar session grid",
+    "Independent signal and next-bar exit reconstruction",
+    "No floor-price execution; unfilled has zero sale proceeds and no sale fee",
+    "Independent cash / position / dividend accounting",
+    "12 summary groups reconcile",
+    "Synthetic signal-bar lookahead and all-floor nonfill cases"
+  ],
+  "verifier_sha256": "6f71c45cfc4e182dc9c867445ace905e22e70e2e37313889fcc11d798cb6813c"
+}

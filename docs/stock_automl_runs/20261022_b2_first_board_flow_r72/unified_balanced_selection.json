@@ -1,0 +1,74 @@
+{
+  "selection": "max 2025 validation macro F1, tie balanced accuracy; class-balanced candidate models",
+  "selected": "balanced_hgb",
+  "model_sha256": "a9ff62e861ed664736f1404ab8cf3e93f780179888449a3f5f33994d934ef03c",
+  "validation": {
+    "candidate": "balanced_hgb",
+    "split": "validation",
+    "n": 165,
+    "macro_f1": 0.34074074074074073,
+    "balanced_accuracy": 0.3468978917007591,
+    "急跌_ap": 0.40305257162534,
+    "急跌_auc": 0.4598340119010335,
+    "急跌_predicted": 83,
+    "急跌_correct": 29,
+    "持续大涨_ap": 0.219022427077471,
+    "持续大涨_auc": 0.5343293070565797,
+    "持续大涨_predicted": 23,
+    "持续大涨_correct": 5
+  },
+  "test": {
+    "candidate": "balanced_hgb",
+    "split": "test",
+    "n": 120,
+    "macro_f1": 0.3297628894403088,
+    "balanced_accuracy": 0.33663217873744194,
+    "急跌_ap": 0.23128666299290468,
+    "急跌_auc": 0.5110474631751227,
+    "急跌_predicted": 39,
+    "急跌_correct": 9,
+    "持续大涨_ap": 0.21347005653014062,
+    "持续大涨_auc": 0.616557734204793,
+    "持续大涨_predicted": 13,
+    "持续大涨_correct": 2
+  },
+  "class_order": [
+    "急跌",
+    "中间状态",
+    "持续大涨"
+  ],
+  "validation_confusion": [
+    [
+      29,
+      24,
+      9
+    ],
+    [
+      44,
+      28,
+      9
+    ],
+    [
+      10,
+      7,
+      5
+    ]
+  ],
+  "test_confusion": [
+    [
+      9,
+      14,
+      3
+    ],
+    [
+      26,
+      42,
+      8
+    ],
+    [
+      4,
+      12,
+      2
+    ]
+  ]
+}

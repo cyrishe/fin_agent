@@ -1,0 +1,29 @@
+{
+  "title_patterns": {
+    "abnormal": "(股票|股价|证券).*异常波动|股票异常波动",
+    "severe_abnormal": "严重异常波动",
+    "risk_warning": "股票交易风险提示|股票交易风险.{0,3}提示|股票交易.*风险提示|股票交易风险的提示|股票交易风险提示性",
+    "reduction_plan": "减持.*(?:计划|预披露)|减持股份预披露",
+    "enforcement": "立案调查|立案告知|行政处罚|监管警示|纪律处分|监管函|警示函",
+    "earnings_negative_title": "预亏|预减|亏损|业绩下滑",
+    "earnings_forecast": "业绩预告|业绩预盈|业绩预亏|业绩预增|业绩预减",
+    "restructuring": "重大资产重组|购买资产|收购.{0,15}股权|资产购买|控制权.{0,8}变更",
+    "pledge_freeze": "股份.{0,8}冻结|股份.{0,8}质押|股权.{0,8}冻结|股权.{0,8}质押",
+    "positive_catalyst": "中标|重大合同|增持计划|回购股份方案|业绩预增|业绩预盈"
+  },
+  "body_patterns": {
+    "valuation_warning": "(?:市盈率|市净率|估值)[^。；]{0,100}(?:远高于|明显高于|显著高于|高于行业|高于同行|较高|过高|偏高)",
+    "theme_denial": "(?:不涉及|未涉及|未开展|未从事)[^。；]{0,35}(?:业务|经营|概念)|无[^。；]{0,15}经营资质",
+    "deal_uncertainty": "(?:交易|重组|收购)[^。；]{0,100}(?:不确定性|无法纳入|尚未完成)",
+    "earnings_loss_mention": "(?:净利润|经营业绩|业绩)[^。；]{0,70}(?:亏损|预亏)|(?:归属于)[^。；]{0,70}净利润[^。；]{0,25}-[0-9]"
+  },
+  "body_scope": "uniform retrieved risk warnings / reduction plans / enforcement / earnings forecasts; excludes case-only extra documents",
+  "rules": {
+    "explicit_warning_5": "D1-known risk warning publication days >=1 in D0 plus prior5 sessions",
+    "repeated_warning_5": "D1-known risk warning publication days >=2 in same window",
+    "specific_adverse_5": "D1-known reduction plan (not completed/terminated) or enforcement or explicit earnings-negative title",
+    "valuation_warning_5": "D1-known valuation-warning wording in uniform document set",
+    "theme_denial_5": "D1-known explicit theme-denial wording in uniform document set",
+    "media_adverse_5": "D1-known non-price-only media headline adverse mention; only complete public search retrievals"
+  }
+}

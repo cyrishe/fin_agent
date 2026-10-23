@@ -1,0 +1,21 @@
+{
+  "original_cells_preserved": {
+    "模型月汇总": 870,
+    "月首归属": 464,
+    "前五笔对照": 190,
+    "跨月卖出": 396,
+    "全部实买": 3731
+  },
+  "all_306_trade_factor_cells_match": true,
+  "all_67_special_rows_match": true,
+  "original_51_factors_included": true,
+  "opening": 34,
+  "closing": 52,
+  "both": 19,
+  "missing_is_blank_not_zero": true,
+  "filters_and_freeze_panes": true,
+  "no_excel_error_cells": true,
+  "source_workbook_sha256": "fa3edf3ffd2fea86058a43d0379ce5dd0dfac4538c2c57c1648ea7f57fd6029f",
+  "output_workbook_sha256": "060bc91c8c1247c6db40871f4b853d5d0cdd9f058dd8ae2a25ff9758a2571324",
+  "workbook": "outputs/b2_floor_factor_review_20261021/B2_跌停专项与全量因子.xlsx"
+}

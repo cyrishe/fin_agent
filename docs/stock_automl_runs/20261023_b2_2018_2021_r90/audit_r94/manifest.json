@@ -1,0 +1,39 @@
+{
+  "strategy": "imac/B2_V2",
+  "definition_sha256": "54ebe0150dfefa6ce9837d403fd83b331f2720ad835271525e3106aae7529f00",
+  "source_root": "/data/cyris/work/b2_2016_2020_r90_20261023",
+  "production_changed": false,
+  "database_registration": "未提交",
+  "cloud_archive": "待同步",
+  "script_sha256": "a8aaca0bb521cbd210ba2b6f210035d86f85d790190cf8bb7dabd2874d2215b5",
+  "source_hashes": {
+    "panel.pkl": "fbf0660641f4d2e43548b767b0bd947c08818f94738c0efd49e274fb2929fad0",
+    "enriched.pkl": "f5f222bfcccdc6e48257cbf4f7d20e1128a638dfe32567590e2c0f1bb82b5f48",
+    "rules_frozen.json": "f43dedfa51158d7e78ca513aae34bdec024cf9c61b2f9bf3083d9389ae5dcfc2",
+    "signals_exit.pkl": "d4ae59478419ec9c22ac9f51cfd07319c1d9f6a476e7b4097cfbf6aab4583c1f",
+    "overall.json": "57cfce9c002b2130456d948266f7d753336ebf4815e57206895884ae1269342d",
+    "calendar.json": "5f498f0a0f347234bfa0422f2e00b0e495ae26b54a03fab6755ea0b4cf71b37a",
+    "rejected_strict_extrema/rules_frozen.json": "7ee334856e86fc6e34ae0fd60e64a32e59968ed5b1adbaea60affb89006b9ecb"
+  },
+  "output_hashes": {
+    "training_monthly.csv": "681985e103100300cffe00cd27e967288a35648a16de2a869c3aa9f317986b6f",
+    "training_yearly.csv": "e0a30b9784890d45e991a106caf502fbaf465aa39e9c10ad5e88355f0906e7e4",
+    "index_daily.csv": "2fb474601697e0055e3f6051c390c527d8fe45b04e36ac141ac7defd0b5d95a2",
+    "market_monthly.csv": "fa9d741311f0616b046ad26b390e8c0348931c27c1bf920a4dc94785ef0ac1ba",
+    "monthly_all.csv": "4c3ae7f9e671da7412dec5868b2fd2e269171eb1d10d0dd24aae014280d5effd",
+    "trades_all.csv": "390fd6aed24bb645b9679cde30fbf88898b21212b0848f1ddc68c544af6fb930",
+    "paused_months.csv": "79450cf4f72c68b9a749fd2d3d455dab6fbfa234118d0f537c64ff08da7a2c89",
+    "large_loss_months.csv": "eb0053562a69e18dcacdfa66974879913a4bc0f42ffd6d8c3efcaff64e776ae8",
+    "large_loss_trades.csv": "7d97c9e0ed042eb9493363acbb5a3ebf3e7f72e4f463048ad18e5b3907fd10f9",
+    "large_loss_market.csv": "ef2175f0c3665ad3476488086b1b86e28b5be6c19fe6668a11dd15ae2420d71e",
+    "annual.csv": "fa50846842d9b0c96eb1d67ee8dcd1ee53697f8eb431337fb1c2509ad170eff9",
+    "market_yearly.csv": "4d92ba55be9211874450d19f3c59fb27dc966338964448cba0691a571163fa64"
+  },
+  "checks": [
+    "642 shadow trades / 295 allowed",
+    "48 months / 26 paused",
+    "annual allowed returns reproduce R90 <1e-10",
+    "monthly ledger PnL equals account result",
+    "four-K selected keys equal frozen training denominator"
+  ]
+}

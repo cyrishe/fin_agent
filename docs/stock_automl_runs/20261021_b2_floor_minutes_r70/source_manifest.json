@@ -1,0 +1,27 @@
+{
+  "prior_r69_audit_sha256": "42dbcce17b395cd0b2fb97e46649950fee339bd1365cf8fbf93e8f0bf9e9c8d1",
+  "prior_49_audit_sha256": "3ef6149c3b7e55475e6b1551492c5134eeb9ddc431d4a012844322ef8c542124",
+  "sample_sha256": "87e3a1ea697a1f47004a8fef5141d5e4c3a75f2b579e22ffd2f11a540f48fb40",
+  "minute_sources_sha256": "a0767f1bd4789401e938e9bd4be94194993ce555721f394290958ee1ca953372",
+  "strategy_link": {
+    "source_definitions": [
+      {
+        "user_id": "imac",
+        "strategy_id": "B2",
+        "title": "B2｜D0涨停前三·D1四K形态·延后一K模拟买入",
+        "definition_sha256": "157b9d77bb9951214b0978365cec407320b1d5663636b80fe60939ae94172c0c"
+      },
+      {
+        "user_id": "imac",
+        "strategy_id": "B2_V2",
+        "title": "涨停冷静 V2 - 月度停摆",
+        "definition_sha256": "54ebe0150dfefa6ce9837d403fd83b331f2720ad835271525e3106aae7529f00"
+      }
+    ],
+    "experiment": "B2_D2_INTRADAY_R67_20261021",
+    "production_modified": false,
+    "new_training": false,
+    "new_experiment_database_record": false,
+    "note": "本研究复用R60冻结模型及V2停摆，实验资产保存在服务器，尚未新增数据库实验登记或云端独立回读。"
+  }
+}

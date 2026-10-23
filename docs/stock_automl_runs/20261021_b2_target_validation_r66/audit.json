@@ -1,0 +1,16 @@
+{
+  "months": 53,
+  "target_signals": 709,
+  "new_validation_trades": 701,
+  "newly_enriched": 11,
+  "r52_existing_trades_matched": 363,
+  "old_shadow_nav_replayed": true,
+  "model_scoring_sklearn": "1.7.1",
+  "model_rule_post_selection_diagnostic": true,
+  "source_sha256": {
+    "outputs/stock_automl/b2_2021_minute_r60_20261020/panel.pkl": "21b117816527dabb521b08de60096ac84ccf8adf2661db26737770dba3c88977",
+    "outputs/stock_automl/b2_2021_minute_r60_20261020/signals.pkl": "c0fab9e454c92c0f3b0a9ba102224dcd6fef00fe377d215fbff1fb373708d1da",
+    "docs/stock_automl_runs/20261020_b2_model_month_r61/模型归属.json": "7051be0ee86ee826e6de42bcc530dc1fb01a957960272d47060a4f31bc98d27e",
+    "docs/stock_automl_runs/20261020_b2_validation_vs_month_r52/验证期逐笔_延迟买入.csv": "63d356b1df061f8471ec98c32c1965aa6ba827bc1e682f3a16a5db70aa58e2da"
+  }
+}

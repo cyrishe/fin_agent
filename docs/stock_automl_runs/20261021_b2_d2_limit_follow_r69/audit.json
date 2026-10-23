@@ -1,0 +1,29 @@
+{
+  "all_signals": 709,
+  "v2_signals": 306,
+  "selected": 316,
+  "v2_selected": 143,
+  "daily_flag_mismatch": 0,
+  "minute_checked": 186,
+  "daily_high_excluded": 130,
+  "zero_next_volume": 1,
+  "next_reference_adjustments": 1,
+  "production_modified": false,
+  "new_database_record": false,
+  "files": {
+    "prepare.py": "f0f6235f1aca90bd2a1dd116507d0bf3cdd4c501fa3e2d08f9eaffc722dba90c",
+    "minutes.py": "ff1acaedbfc4ac17c7b9b6f92f55d39f441ef393377454c9e9784e31f8d5f303",
+    "report.py": "40bae20bc7ccc6d52bb900f7f8b6ab3a23a2701bac4f6b9aab6bdf3bb47ef91d",
+    "specification.json": "8520cd5b3813dcd320fd963cde7fe70f36b8f648987e8a4d2fd83f3f1bf24f73",
+    "source_manifest.json": "365f892acff546bb7ceb25fdca872ff57afe240dc129877116832001cb26aab9",
+    "sample.pkl": "30c4ff6b4e984a032f3f53e7387cbe42084d5daef99689068be36ac3c84c2986",
+    "daily.pkl": "dca42800a19e24d1484e6fb24e9b032cd81b374a46bfb5c761a0037bc2e32e47",
+    "minute_price_audit.json": "f25374d0c7f0b6cdc7a9d6cbca3652a8939edfce9385fedf865820e3162bb092",
+    "results.json": "44c0dbbbc7387a8d5f053509390e3b558a22bb4efe2014734f88b73f43ffe965",
+    "V2封板.csv": "e2b815da0abfeedf08a12f6306744188e3c5520a593882d14ce5a5142ba15f9c",
+    "全部封板.csv": "cf73565787df36e4c8c20de90c2c72da40488a2ac8d393af4ae7e86706609684",
+    "封板汇总.csv": "33956354f665428da543b041b1d2aac02edb2a1617c2a37f96b3179a4416d57d",
+    "封板浏览.html": "206d9b2d78a8418dd3419c8111e897ea0443bff4aee7a8edb9b2c4b7607a1288",
+    "README.md": "7ad9439a9fd29111917debbc54e1359db5cd955960bd2506e8bdd3d312be9022"
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "experiment_id": "B2_D2_LIMIT_D3_EARLY_EXIT_R78_20261022",
+  "parent_strategy_owner": "imac",
+  "parent_strategy_id": "B2_V2",
+  "parent_definition_sha256": "54ebe0150dfefa6ce9837d403fd83b331f2720ad835271525e3106aae7529f00",
+  "record_kind": "read_only_counterfactual_research",
+  "cohort": "306_frozen_V2_buys_91_D2_close_limit",
+  "intervention": "14:55 known limit price signal; study D3 opening and first eligible minute exits",
+  "production_db_status": "NOT_WRITTEN_REQUIRES_HUMAN_GATE",
+  "cloud_readback_status": "PENDING",
+  "training": "no_new_model"
+}

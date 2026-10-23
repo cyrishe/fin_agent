@@ -65,9 +65,14 @@ def convert(frame: pd.DataFrame, day: str) -> pd.DataFrame:
     indices = regular.trade_time.eq(day + ' 09:31:00')
     a = auction.reindex(regular.loc[indices, 'ts_code'])
     b = regular.loc[indices]
-    regular.loc[indices, 'open'] = a.open.to_numpy()
-    regular.loc[indices, 'high'] = np.maximum(a.high.to_numpy(), b.high.to_numpy())
-    regular.loc[indices, 'low'] = np.minimum(a.low.to_numpy(), b.low.to_numpy())
+    # A zero-volume auction row can carry yesterday's price. It is a
+    # placeholder, not an opening trade, and must not change the first bar.
+    auction_traded = a.vol.to_numpy() > 0
+    regular.loc[indices, 'open'] = np.where(auction_traded, a.open.to_numpy(), b.open.to_numpy())
+    regular.loc[indices, 'high'] = np.where(
+        auction_traded, np.maximum(a.high.to_numpy(), b.high.to_numpy()), b.high.to_numpy())
+    regular.loc[indices, 'low'] = np.where(
+        auction_traded, np.minimum(a.low.to_numpy(), b.low.to_numpy()), b.low.to_numpy())
     regular.loc[indices, 'vol'] = a.vol.to_numpy() + b.vol.to_numpy()
     regular.loc[indices, 'amount'] = a.amount.to_numpy() + b.amount.to_numpy()
     result = regular.rename(columns={'trade_time': 'time', 'ts_code': 'symbol',

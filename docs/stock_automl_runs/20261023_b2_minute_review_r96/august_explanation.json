@@ -1,0 +1,36 @@
+{
+  "august_base_gate": {
+    "previous_month": "2021-07",
+    "previous_candidates": 13,
+    "previous_r5": 0.027139873806896198,
+    "previous_r10": -0.07040067200580025,
+    "paused": true
+  },
+  "august_strict_gate": {
+    "previous_month": "2021-07",
+    "previous_candidates": 11,
+    "previous_r5": 0.07309249006150664,
+    "previous_r10": -0.028811865768985312,
+    "paused": false
+  },
+  "august_strict_return": -0.13319277202906998,
+  "common_shadow_entry_exit_prices_equal": true,
+  "july_removed": [
+    {
+      "symbol": "002529",
+      "d0_date": "2021-07-01",
+      "d1_date": "2021-07-02",
+      "entry": 10.81,
+      "d2_close": 12.11,
+      "extrema_proxy_gap_pct": 0.001998001998002133
+    },
+    {
+      "symbol": "000695",
+      "d0_date": "2021-07-28",
+      "d1_date": "2021-07-29",
+      "entry": 7.98,
+      "d2_close": 7.3,
+      "extrema_proxy_gap_pct": 0.006684491978609601
+    }
+  ]
+}

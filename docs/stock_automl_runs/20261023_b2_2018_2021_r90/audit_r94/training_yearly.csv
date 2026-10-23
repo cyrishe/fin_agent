@@ -1,0 +1,5 @@
+﻿year,rf_fit,rf_historical_growth,train_n,train_extrema_gap,valid_n,valid_extrema_gap
+2018,40473,12640,158,0,82,0
+2019,65661,17620,535,291,279,189
+2020,73818,21628,819,620,255,187
+2021,70328,3482,831,494,233,81

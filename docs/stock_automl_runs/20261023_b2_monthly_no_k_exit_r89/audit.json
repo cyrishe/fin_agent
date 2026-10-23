@@ -1,0 +1,12 @@
+{
+  "unique_D2_stock_days": 214,
+  "need_minute": 95,
+  "existing_cache": 53,
+  "tushare_fetched": 42,
+  "minute_ohlc_daily_match": 95,
+  "R67_original_overlap": 64,
+  "R67_morning_overlap": 31,
+  "R67_morning_price_time_trigger_exact": true,
+  "missing_buy_clock": 0,
+  "minute_failures": 0
+}

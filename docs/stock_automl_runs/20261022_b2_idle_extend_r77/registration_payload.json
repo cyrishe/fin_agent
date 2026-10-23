@@ -1,0 +1,12 @@
+{
+  "experiment_id": "B2_IDLE_D3_EXTEND_R77_20261022",
+  "parent_strategy_owner": "imac",
+  "parent_strategy_id": "B2_V2",
+  "parent_definition_sha256": "54ebe0150dfefa6ce9837d403fd83b331f2720ad835271525e3106aae7529f00",
+  "record_kind": "read_only_counterfactual_research",
+  "cohort": "frozen_306_v2_buys_D0_2022-05_to_2026-09",
+  "intervention": "on D2 no new buy in frozen v2 cohort, delay old holding from D2 close to D3 close",
+  "production_db_status": "NOT_WRITTEN_REQUIRES_HUMAN_GATE",
+  "cloud_readback_status": "PENDING",
+  "training": "no_new_model"
+}

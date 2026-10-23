@@ -1,0 +1,64 @@
+{
+  "experiment": "B2_FLOOR_RISK_20261021",
+  "source_sha256": "5c2014a35d80e4c0759c0afb35997479116b72717c2ad1c0c0b42462be7e25ec",
+  "seed": 20261021,
+  "target": "D2 opening OR closing at historical lower price limit; not all intraday touches",
+  "partitions": {
+    "train": "D0 2022-05 through 2024-12; exclude exits >=2025-01-01",
+    "valid": "D0 2025; exclude exits >=2026-01-01",
+    "test": "D0 2026-01 through 2026-09; label exits through 2026-10-09"
+  },
+  "numeric_features": {
+    "total_mv_yi": "D0总市值亿",
+    "float_mv_yi": "D0流通市值亿",
+    "d0_turnover_pct": "D0换手率",
+    "board_streak_days": "连板数",
+    "open_gap": "D1开盘涨幅",
+    "body5": "D1四K实体",
+    "d0_normal_volume_ratio": "D0对板前量比",
+    "d0_amount_100m": "D0成交额亿",
+    "streak_return": "本轮连板涨幅",
+    "board_turnover_sum": "板段累计换手",
+    "market_limit_count": "市场涨停家数",
+    "market_median_return": "市场涨幅中位",
+    "market_reseal_fraction": "市场连板延续率",
+    "close_sealed_minutes": "D0收在板上分钟数"
+  },
+  "categorical_feature": "opened_after_touch",
+  "model_features": [
+    "total_mv_yi",
+    "d0_turnover_pct",
+    "board_streak_days",
+    "open_gap",
+    "body5",
+    "opened_after_touch"
+  ],
+  "single_rules": "Train Q25/Q50/Q75 thresholds, both directions; board counts floor threshold; three independent D0-open categories",
+  "shortlist": "Train flags >=12 and <=40% of train, lift>1; rank excess positives, then precision; keep best five distinct factors",
+  "pairs": "AND only, between shortlisted single rules; train >=12 and <=40%, positive lift",
+  "models": {
+    "logistic": {
+      "C": 1,
+      "penalty": "l2",
+      "class_weight": null,
+      "max_iter": 2000
+    },
+    "tree": {
+      "max_depth": 2,
+      "min_samples_leaf": 20,
+      "class_weight": null
+    }
+  },
+  "model_preprocessing": "Training-only imputation, log1p total_mv and nonnegative turnover/board; standardized numeric; explicit three open-state categories",
+  "model_threshold": "Training score Q75; flag strictly above threshold",
+  "selection": "Validation flags >=6 and <=35%; >=3 true positives; precision/base>=1.25; maximize reduction of remaining risk rate, then fewer flags, lower complexity, id. None if no eligible rule.",
+  "refit": "No refit on validation; frozen training models/thresholds tested as-is",
+  "tests": "One held-out run of frozen candidates; winner remains validation-selected, never selected by test",
+  "uncertainty": "Wilson risk intervals; 3000 month-cluster bootstrap draws on held-out predictions; diagnostic, no multiple-search significance claim",
+  "limitations": [
+    "Retrospective: V2 and this historical cohort already researched; not virgin prospective evidence.",
+    "Cohort fixed by V2 monthly gate; no account replay, no claim of executable limit-down sales.",
+    "Historical market cap dates can be revised; 96 earlier-share estimates, no future-dated shares.",
+    "D1 full-day and all D2 columns excluded from X; original_net used only for after-the-fact opportunity-cost diagnostics."
+  ]
+}

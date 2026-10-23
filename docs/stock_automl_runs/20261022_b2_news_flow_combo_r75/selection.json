@@ -1,0 +1,21 @@
+{
+  "chosen": "flow",
+  "eligible_validation": [
+    {
+      "model": "flow",
+      "split": "valid",
+      "n": 54,
+      "alerts": 11,
+      "caught": 3,
+      "total_risk": 10,
+      "auc": 0.5022727272727273,
+      "ap": 0.2480698900911667,
+      "cancel_net_1w": 340.4271172736298,
+      "risk_retained": 0.16279069767441862,
+      "risk_base": 0.18518518518518517,
+      "consecutive_caught": 0,
+      "lift": 1.4727272727272727
+    }
+  ],
+  "note": "Flow-involving candidates are snapshot-only exploratory, not production-eligible irrespective of validation."
+}

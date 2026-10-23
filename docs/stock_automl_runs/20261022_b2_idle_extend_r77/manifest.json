@@ -1,0 +1,365 @@
+{
+  "experiment_id": "B2_IDLE_D3_EXTEND_R77_20261022",
+  "files": {
+    "0940筛选账户对照.csv": {
+      "size": 1360,
+      "sha256": "2f48ad2e7d24f87abb8fe9d7f5146e4ccbefdf5fb4235a4de2e7b4d8f750608e"
+    },
+    "2022_close_0940筛选延期_账本.csv": {
+      "size": 6464,
+      "sha256": "92dd30deeaf58c2bf3bcd1c9fd41137bfbfff07a94d56e26c0402185925de944"
+    },
+    "2022_close_0940筛选延期_逐日.csv": {
+      "size": 10271,
+      "sha256": "de534f6d15b91bccf6ca11d033a94462ff32eb0de8793af07e2d2e8eb5b94178"
+    },
+    "2022_close_D3轮空延期_账本.csv": {
+      "size": 6437,
+      "sha256": "5b81b581a9f262f334ae0693466adf479af0982e8c916fd44e55debb24243c38"
+    },
+    "2022_close_D3轮空延期_逐日.csv": {
+      "size": 10325,
+      "sha256": "ada7a22cae8a6e8543ae48c71bed0f6b5c1d665cecaacfba497dfa3fdb9ed26c"
+    },
+    "2022_close_原D2卖出_账本.csv": {
+      "size": 6453,
+      "sha256": "35e0b84162933bb7bfe8f124a09ee2b794d26e8ff6465efca4690cceda878b31"
+    },
+    "2022_close_原D2卖出_逐日.csv": {
+      "size": 10278,
+      "sha256": "1e7b3711fe3540f4a9d52fa011384834f9c35e56f24514af3484fabea4ea9ddf"
+    },
+    "2022_morning7_0940筛选延期_账本.csv": {
+      "size": 6459,
+      "sha256": "d441e44b0eed0e586aca9c6a59b6b5501bd08b1c5fb3835b6caf8e097e0d17f7"
+    },
+    "2022_morning7_0940筛选延期_逐日.csv": {
+      "size": 10313,
+      "sha256": "1ed3334d84305979c0952af7f5dc9527985918abc7241c3386f7ec8e128118ac"
+    },
+    "2022_morning7_D3轮空延期_账本.csv": {
+      "size": 6433,
+      "sha256": "26ff08c1aff7e2c8c3bdcd89b5579960e53014410f7a5e3986d4ecffd206d623"
+    },
+    "2022_morning7_D3轮空延期_逐日.csv": {
+      "size": 10367,
+      "sha256": "d4b47e2088c03868887df2095ba082a5948757c6d421eda8c4e5e7668eb871cf"
+    },
+    "2022_morning7_原D2卖出_账本.csv": {
+      "size": 6447,
+      "sha256": "f3c205c394959fb11fdf1804cb86428b7d036c182c5927d05f7cfa1011a0d902"
+    },
+    "2022_morning7_原D2卖出_逐日.csv": {
+      "size": 10264,
+      "sha256": "aceb04ce21a70b1193b80003057a7bc485740e5307fa3bc8f905809eb2a721ff"
+    },
+    "2023_close_0940筛选延期_账本.csv": {
+      "size": 11894,
+      "sha256": "7f0caa6ad39eab029845e987fc42100b97556a4e164ff901777d90e922605998"
+    },
+    "2023_close_0940筛选延期_逐日.csv": {
+      "size": 15586,
+      "sha256": "45a7f4a52845c7bb4d2f277e0c685391674509f6687dcd827ad3be980ec1cbcc"
+    },
+    "2023_close_D3轮空延期_账本.csv": {
+      "size": 11838,
+      "sha256": "b56e66ecebf98eb01e3adb551b5d700575d65f0cc8c503d4be1bcb31d178c922"
+    },
+    "2023_close_D3轮空延期_逐日.csv": {
+      "size": 15623,
+      "sha256": "43e162371dadb01e0144e00bfb6f39202381433347ed81fd620951da84e22676"
+    },
+    "2023_close_原D2卖出_账本.csv": {
+      "size": 11857,
+      "sha256": "ca3b48a882a581c0a5806afcd4fbdeef19f132471820f6a38672585f52f79db0"
+    },
+    "2023_close_原D2卖出_逐日.csv": {
+      "size": 15591,
+      "sha256": "c3ed7c05cc68ef6dc158ced0cf4b8c893a96cdf7a2172ff96bc1d9c8e1c8be9f"
+    },
+    "2023_morning7_0940筛选延期_账本.csv": {
+      "size": 11900,
+      "sha256": "1b6253bee8ba74750d7011be9fe2c1de1e17d34c0b057e8ab7f2a190ff1e1ab9"
+    },
+    "2023_morning7_0940筛选延期_逐日.csv": {
+      "size": 15591,
+      "sha256": "1c888245f18e1cc89ee06752b04401585475e575f9764594b69f3b6b0d45b91a"
+    },
+    "2023_morning7_D3轮空延期_账本.csv": {
+      "size": 11839,
+      "sha256": "6e8ba66e191d72035c81048c90c8eb58837ba6e2a2504727cd5b4a69467ce4d8"
+    },
+    "2023_morning7_D3轮空延期_逐日.csv": {
+      "size": 15625,
+      "sha256": "5fcb20c26e67e66679f593211e1749e0e679e442bb1ba7f13341c58e1a2f17fb"
+    },
+    "2023_morning7_原D2卖出_账本.csv": {
+      "size": 11859,
+      "sha256": "43a84fdc5da096ea0557091c5e2572f642f334649dc636bde7344acfd56313d6"
+    },
+    "2023_morning7_原D2卖出_逐日.csv": {
+      "size": 15591,
+      "sha256": "b923e4477cc878ce39867e32c14b4b2c92885e1f1392f77f7b637ce62851ac5e"
+    },
+    "2024_close_0940筛选延期_账本.csv": {
+      "size": 9877,
+      "sha256": "f0e2f0dc2eaf259d2ed76d1da3183fd7297cd09a65c6481eadff6b68eddb1f9d"
+    },
+    "2024_close_0940筛选延期_逐日.csv": {
+      "size": 15187,
+      "sha256": "0f81d08c149f0b285ed26ea9c536708b4451769536c762fb4041b6e39b37e4f2"
+    },
+    "2024_close_D3轮空延期_账本.csv": {
+      "size": 9850,
+      "sha256": "65d980cec3646f48a430935a17787461ce9f7c06d785e46e841d97766906980c"
+    },
+    "2024_close_D3轮空延期_逐日.csv": {
+      "size": 15248,
+      "sha256": "1f450f79d8afba14dcbea2fd0494d7492bcfe582f2c2358d91a6878f1d167982"
+    },
+    "2024_close_原D2卖出_账本.csv": {
+      "size": 9872,
+      "sha256": "ba0ce240c69e2e9c3b32dc3d53009d836e52a469df5b8c4dc528caf233cabca4"
+    },
+    "2024_close_原D2卖出_逐日.csv": {
+      "size": 15181,
+      "sha256": "4d6681347aa1f56284d22e08ad2aa20f419e6d97ae6ccb5c3d99cad0438eb3ce"
+    },
+    "2024_morning7_0940筛选延期_账本.csv": {
+      "size": 9872,
+      "sha256": "117c23af31b85d8449308db8655e9b9c69c7c0c46410d961d601f778f042f53e"
+    },
+    "2024_morning7_0940筛选延期_逐日.csv": {
+      "size": 15201,
+      "sha256": "aa891b7b6672d9f6a2951b464db69e7220edc574af53d976b83af8b26d192eaf"
+    },
+    "2024_morning7_D3轮空延期_账本.csv": {
+      "size": 9846,
+      "sha256": "f15d27019355604f62e0d3e969d1f377ed50702f96ea991514a3198e2e534094"
+    },
+    "2024_morning7_D3轮空延期_逐日.csv": {
+      "size": 15255,
+      "sha256": "538fa1a02e726c47aed8365d8279c239796f17cf30aa1212ebc44aff509e3e50"
+    },
+    "2024_morning7_原D2卖出_账本.csv": {
+      "size": 9865,
+      "sha256": "9dbc631173844386cc8bff384d2f521a96ccc8ff5e5cdd251fc812d177fa6948"
+    },
+    "2024_morning7_原D2卖出_逐日.csv": {
+      "size": 15206,
+      "sha256": "d479a5f8dcacca1426d4928d532732a34b6e445513f9db53a9488bc24a889712"
+    },
+    "2025_close_0940筛选延期_账本.csv": {
+      "size": 9889,
+      "sha256": "dffcba17b13f6e2480c98cd15c96f6d9713c622fb7cf0715ac749c9b1fbaf0b0"
+    },
+    "2025_close_0940筛选延期_逐日.csv": {
+      "size": 13997,
+      "sha256": "b64eb289295e4cbdb95aa49986250738a3ac861dcaaf99946e68b036c2a2e4b6"
+    },
+    "2025_close_D3轮空延期_账本.csv": {
+      "size": 9851,
+      "sha256": "3164cd0f3b24363987921e2db331f36b78a6d790593940602f237836de23b44a"
+    },
+    "2025_close_D3轮空延期_逐日.csv": {
+      "size": 14046,
+      "sha256": "6149d5ff8cb943d5b7ebdc10060cb1a6d71262c0d9f0bc5297907b2b11ba6b32"
+    },
+    "2025_close_原D2卖出_账本.csv": {
+      "size": 9874,
+      "sha256": "87b83a5ff77aa27a32c3e92ee0919dc263009e5723d5ef6d928e7f7a02112161"
+    },
+    "2025_close_原D2卖出_逐日.csv": {
+      "size": 14002,
+      "sha256": "c7bc9aa32b2d338eeec677c45b3f5851709f5e376d8a7779571fe721ab4f6420"
+    },
+    "2025_morning7_0940筛选延期_账本.csv": {
+      "size": 9887,
+      "sha256": "15b32a3ead16b812a40d10d1d5ea7fe9ecdbbf41af0680d66091fe255828e6ba"
+    },
+    "2025_morning7_0940筛选延期_逐日.csv": {
+      "size": 13997,
+      "sha256": "145aac6eb2e0cf657952759f3e35a576a907fe3764f9f07f2c45b9ca9945b1fe"
+    },
+    "2025_morning7_D3轮空延期_账本.csv": {
+      "size": 9853,
+      "sha256": "9a30925faae7b9f7937fea51c6a1080028acac3844bf86313e48b6b4c17e940f"
+    },
+    "2025_morning7_D3轮空延期_逐日.csv": {
+      "size": 14046,
+      "sha256": "e66d4fd8c20bafa2e1ccbcf64edfd8738ec48c18c89a4ba3ebda1b530aeaca54"
+    },
+    "2025_morning7_原D2卖出_账本.csv": {
+      "size": 9872,
+      "sha256": "d3af35d54e6b96d0249617308bc21465795ad5ca63b7fd23988d82eaa7e476f5"
+    },
+    "2025_morning7_原D2卖出_逐日.csv": {
+      "size": 14002,
+      "sha256": "bbde414e2df1416a065adf45852b284b503ffc7523e88ef6f4ce927f4127fecb"
+    },
+    "2026_close_0940筛选延期_账本.csv": {
+      "size": 17872,
+      "sha256": "fafad6a64d7d8f507dad12157287eb0bedd8872a00160d85d44707069136f2d5"
+    },
+    "2026_close_0940筛选延期_逐日.csv": {
+      "size": 11664,
+      "sha256": "e0d5526154848027a8ec8ec6f4168f97fa039b3defb11a43462fb5e6903204eb"
+    },
+    "2026_close_D3轮空延期_账本.csv": {
+      "size": 17820,
+      "sha256": "b6eadee347aed73d64b99268c21daaa0f5ea12180cd65e57efe06134fbb7b9e9"
+    },
+    "2026_close_D3轮空延期_逐日.csv": {
+      "size": 11709,
+      "sha256": "4924f2a876bb80b8a04065ffc04bba381ad822f2c562d0462c014cb818bce770"
+    },
+    "2026_close_原D2卖出_账本.csv": {
+      "size": 17877,
+      "sha256": "aea7e13f8d4ed4cdb4b58ce55b5cfcc2bf45e249da65cf2d10085b220818b808"
+    },
+    "2026_close_原D2卖出_逐日.csv": {
+      "size": 11669,
+      "sha256": "1b6bff618c9e9faa89aee1f60397e8d717dd136a163ee7a8fb51a5bf1a586c5d"
+    },
+    "2026_morning7_0940筛选延期_账本.csv": {
+      "size": 17910,
+      "sha256": "58f37055c86d6d9b9895fb359c583c7fd48e28091444edc025da196fb131cbae"
+    },
+    "2026_morning7_0940筛选延期_逐日.csv": {
+      "size": 11683,
+      "sha256": "42ec80ba2518fad62099af4119c010da5e48689d76dd470d6471c7fafd616a3b"
+    },
+    "2026_morning7_D3轮空延期_账本.csv": {
+      "size": 17845,
+      "sha256": "ce0b29d9d19edeb3644d03b511511dbcff73db7655f27ca7e8451592d07dbefa"
+    },
+    "2026_morning7_D3轮空延期_逐日.csv": {
+      "size": 11728,
+      "sha256": "f8cb59a4db3054c2d7029a670da9a09c2b83c5a3513c678c6c6d9ceea06bcec9"
+    },
+    "2026_morning7_原D2卖出_账本.csv": {
+      "size": 17927,
+      "sha256": "7f4621a3e74147b54b304daa6e0c72e671bb35eeceacdc8489a066195ed340e6"
+    },
+    "2026_morning7_原D2卖出_逐日.csv": {
+      "size": 11708,
+      "sha256": "efac1a00fe27f64b6f23b2b90949de20879075df389598e99ce61111c1677e58"
+    },
+    "306笔逐笔对照.csv": {
+      "size": 63168,
+      "sha256": "de39316ce74546fad236a01c6c44e43f33b4a3fa10bd0729789f42a8da71d45d"
+    },
+    "README.md": {
+      "size": 6778,
+      "sha256": "f0055cd339e50d29a34bbcef8133da5d795051f3ad1fdb16380b03328943d869"
+    },
+    "diagnostic.py": {
+      "size": 2019,
+      "sha256": "1588dbd56bc66a169e5dfa36ec9d9769d2b3c7b7eaf4dae84d42e5706948ffd8"
+    },
+    "finalize.py": {
+      "size": 1146,
+      "sha256": "434b8bc7f5d78fe0a876ae86fe99fbfdb10a4407f53a92392c33baa4d0e2f74e"
+    },
+    "inputs/逐笔D3涨幅与连板.csv": {
+      "size": 47519,
+      "sha256": "7c0351a92d53938c23cdf265a91220f0e24bb5f586d0972c60c22fa0e2011285"
+    },
+    "morning.py": {
+      "size": 2719,
+      "sha256": "9cad44db8245d9c557444c47f88f256f8a76f69efdb90582d1b653d595126388"
+    },
+    "registration_payload.json": {
+      "size": 564,
+      "sha256": "fac580ebaef1c98f27da0bfed3321403aa58d55ba26915c9f174fa9d76dbee4e"
+    },
+    "replay.py": {
+      "size": 9390,
+      "sha256": "152c10dffd15fdd2cd6e03734dcf6ee3b36cba64ad73d311fe0c87ca334c9c06"
+    },
+    "selective.py": {
+      "size": 1233,
+      "sha256": "ee9735bec57be85c07e3e61327fd8c719585d115ed3acfc967c8d7e13b2806f7"
+    },
+    "verification.json": {
+      "size": 449,
+      "sha256": "3e71363a1a5b014d6c4f9e9762c2e2009f61c36c4be5a0f31f46c3a5d00d2d23"
+    },
+    "全期_close_0940筛选延期_账本.csv": {
+      "size": 55559,
+      "sha256": "93f372455a2356c3ad735fa6806837b78edf7297795f732a77c83fb875840661"
+    },
+    "全期_close_0940筛选延期_逐日.csv": {
+      "size": 73262,
+      "sha256": "5e013e3e8d9b417fe85cd73e459001db073e99b7e246fc4b006d38df06e09373"
+    },
+    "全期_close_D3轮空延期_账本.csv": {
+      "size": 55135,
+      "sha256": "dcd0a764da836e7bf07b3f53e0d37b434bac6b46e6c6d5d4a650b9e1891a8fa5"
+    },
+    "全期_close_D3轮空延期_逐日.csv": {
+      "size": 72705,
+      "sha256": "07e27edee709892cff141cceaab06a91f0da20f0252a3bc9936ac4d0d120a903"
+    },
+    "全期_close_原D2卖出_账本.csv": {
+      "size": 55333,
+      "sha256": "c3f1aa0ebec506aaed4bad395a0353d07932fd800632d408136c938849bca1de"
+    },
+    "全期_close_原D2卖出_逐日.csv": {
+      "size": 72944,
+      "sha256": "70baf28b34f01f7c1b95d48a38d9e927775b64db81417cccb0ea356f73819638"
+    },
+    "全期_morning7_0940筛选延期_账本.csv": {
+      "size": 55823,
+      "sha256": "7d32b72d1ddf841378e099f8f913dc8e6f2852f137fac9ff5a41baab7ff71d61"
+    },
+    "全期_morning7_0940筛选延期_逐日.csv": {
+      "size": 73426,
+      "sha256": "085b00a2ee7e36ddb7e439ae5444108371279dfd7a920697fa38f9c70543ddc7"
+    },
+    "全期_morning7_D3轮空延期_账本.csv": {
+      "size": 55276,
+      "sha256": "74a6751094a64c0ae0e091745cb03431b095a43b7faf0f972e8fd195a5c382bc"
+    },
+    "全期_morning7_D3轮空延期_逐日.csv": {
+      "size": 73262,
+      "sha256": "0f39781fb2c236e6bf5b28ad7c0e028eeb62eed9228148e52718c2c3fec2df07"
+    },
+    "全期_morning7_原D2卖出_账本.csv": {
+      "size": 55447,
+      "sha256": "03fd079048fac7e8963c79be5af68d5ffba7a6a34f6767fa41552df3a7a7ab31"
+    },
+    "全期_morning7_原D2卖出_逐日.csv": {
+      "size": 73250,
+      "sha256": "eca92e1d84b2fb456a8c52a5be0e12649731e6c1f68b154a588df4f74c912193"
+    },
+    "全期账户对照.csv": {
+      "size": 449,
+      "sha256": "e7cd325550dddca6e96c77bdce45a23ab9618a613f005148228c0d98fdad98d0"
+    },
+    "轮空0940分组.csv": {
+      "size": 234,
+      "sha256": "739b444b51c53b97d6a80c1c9b35955b79b676a7ab749a48567019c57175fdd5"
+    },
+    "轮空0940已知特征.csv": {
+      "size": 16974,
+      "sha256": "71d5ca83dae71db5f39649680f87cc7db14968dcfbbe0c05f686e3ea298ac973"
+    },
+    "轮空0940逐年.csv": {
+      "size": 585,
+      "sha256": "f8fb5e7ea950e052e8fcc306a2f86d3a32c87b7a169a9795f9e8393f6b8cc452"
+    },
+    "轮空分组对照.csv": {
+      "size": 768,
+      "sha256": "7468234ef1ac2dee96516a8a3282163edd4db5814d4d9ffd373bf5b5b762e369"
+    },
+    "轮空逐年逐笔差额.csv": {
+      "size": 502,
+      "sha256": "e634b29aec579c2ff8216bbebb81dcc6b0402a5821379d694bc464ac4a2927dd"
+    },
+    "逐年独立账户对照.csv": {
+      "size": 1899,
+      "sha256": "5e2bb70d8e31e0a87d99597d28728a83e38fe9f6f88e3ec18d7968ce084b8340"
+    }
+  }
+}

@@ -1,0 +1,421 @@
+{
+  "strategy_id": "imac/B2_V2",
+  "definition_sha256": "54ebe0150dfefa6ce9837d403fd83b331f2720ad835271525e3106aae7529f00",
+  "early_panel_sha256": "fbf0660641f4d2e43548b767b0bd947c08818f94738c0efd49e274fb2929fad0",
+  "later_panel_sha256": "72000be89c9d2cceba0f680d010e4c7f848d5e2982009eaff8dbb8b2ead27351",
+  "code_sha256": {
+    "audit_r91.py": "2a66c96e6e7e159ac1e7880296b72a1f63fa1f553f38533e0ce17e0e7157d993",
+    "independent_r91.py": "a7f098101b478b5396af7049d27b29ccb17ec0d2db15d0f548f84e5cc069eff4",
+    "prefix_audit_r91.py": "0dab918eab2cd2dca77847d07768ca524c85a1cd5198c8c8da852e19d729226d",
+    "live_gate_compare_r91.py": "9158ae9f90f9b2fb7eced52b7b6e723014ab45d3f8ee6401dd33945bd00fecf3",
+    "ablate_absolute_r91.py": "7a39f477eebe3613fc17c4f7f06f1b8d6e167ecaff59579ccf9f2cc331d02e7e",
+    "ablate_late_r91.py": "c6f8378feb488cfd6d76587ccf8e7f2197c6b7ad2ff098dea73b3ea86fa151a7",
+    "calibration_r91.py": "708aef2224e9b4d86a264c29d5e250155b719b9251e07ca93418b308c21c6b0f",
+    "later_model_metrics_r91.py": "60cab0d7934a5209724a21fa3d8844cf36833bff9147856563371d314b13ffb9"
+  },
+  "deployed_code_sha256": {
+    "automl_b2.py": "63794d7aa49fd4fa8f2636b0fa5f564d351b3cf131393e823779d8b0b168867e",
+    "automl_b2_data.py": "a51f7ec20f1b4993950a49c9805379edf34d9be99bf6a132e2480c2a080d0640",
+    "run_automl_b2.py": "98f0c20033ce67efb90828f1398e72524faf9ab63ba4232f87b3d0f114e5165f",
+    "run_b2_monthly.py": "30efb507fbaf5795cc93cb32b3bc4b73812e037089e3298c9496a163e11c98ce",
+    "b2_monthly_pause.py": "395c82c248b90a34dc7959f5bd0b21aa70352d724be87d85182a529ab56814a8"
+  },
+  "output_sha256": {
+    "model_months.csv": "dafe6522b2204bc6c429496b123e0215555c57a5291d6113c056e5f47f8448fb",
+    "model_years.csv": "8f1e6b94f3941e09b8fbdf9b6222a371d1d85c75a73c00658dbf8cccd7051a61",
+    "later_model_months.csv": "d2042cbf602ce7ea7eb2f410cdcb85bc3167adc20c75b2518284c42a392cdb2a",
+    "later_model_years.csv": "281e591dc493091ec1a930ee1fc0cb30ff789c097191a699b9c0b4eece02998d",
+    "feature_drift.csv": "2bd6927bcd536ca0580fcfe2848b49c56371cbafab30b1088ab41c6d32ab9ce3",
+    "later_feature_drift.csv": "40450197d3ce3cb080f0d55ba8090b4ed46eacffd6baffef84277875322ea2b8",
+    "score_calibration.csv": "51aac96e9d6930e14a5e20b4f6506caa9b86d6e2c1ae1c80e4c1673f03afc55e",
+    "independent_replay.json": "8fed739e7aa45c65f1f6d777fb7804b5faf0b8d13fa4d2df4ff49df9b6a6b6c1",
+    "prefix_sensitivity.csv": "2b9efb7a2a471927fe8bf85b8fd39616ffc65befc7fad99ba0113713bcff31b7",
+    "live_gate_compare.csv": "a82f0be984fda6974f5fa9a99c1e5ff48af8e1f63bcba086eabb864ca3c33919",
+    "absolute_ablation/monthly.csv": "003454304fdb14be05e4eef50a56241ec7df975f6e2b96bf6a089c8b7c6bf8fb",
+    "absolute_ablation/yearly.csv": "2747675feb6b3851581c8df9ccee16eaa36ddd7755a37d66d837989e689053f9",
+    "absolute_ablation_late/monthly.csv": "8eddf8fbb92c27c2129be111355e0ac8b8207f6531c8ff3b27127393dda6c504"
+  },
+  "early_model_count": 48,
+  "late_model_count": 6,
+  "models": [
+    {
+      "month": "2018-01",
+      "kind": "early_absolute_ablation",
+      "model_sha256": "856b3831f10908c824da656dc9d981e8a268925a28fcc24c85ae23c7e72202c2",
+      "training_sha256": "58ef75f680a87cae7278df398b60b4428f8a9108a5c54bd59fb2a0259b69c85a",
+      "parent_model_sha256": "80fc72906716a98af062fdaa183fc360906d42b13cadfec9ffe6b4bd3881e3d0"
+    },
+    {
+      "month": "2018-02",
+      "kind": "early_absolute_ablation",
+      "model_sha256": "6125ad4ca702e963d25607d2656f028052a05b74e45e22822d3bd9f0613cb0ee",
+      "training_sha256": "baddc21c9b4daf862cf6352260664bf47e18708934794e82e3bf48cc9d368ef3",
+      "parent_model_sha256": "74902d59aca2a6184a7833fa16205ff8a796b19414b7cbf8d971e998ac301d72"
+    },
+    {
+      "month": "2018-03",
+      "kind": "early_absolute_ablation",
+      "model_sha256": "00b5a3cd36379fd32a62c2e3b4afa17adadcd0e982b7ff36bd6f118e62aef87a",
+      "training_sha256": "19dd77abf9d99f7c1afd95d6bbca2d6b4d8659e3225b74b2e4457dc4547e8c41",
+      "parent_model_sha256": "f755eeca2ebe87d011949b2912000fff23055e54398ad0ec5d8efe01871bd3db"
+    },
+    {
+      "month": "2018-04",
+      "kind": "early_absolute_ablation",
+      "model_sha256": "a700bf44c4ef2dd542f7e1c98838720ef841bad5c1bb97dfc1eb130d46396ce0",
+      "training_sha256": "f7868ebb448cbcbc512be0b826686555c85c1f31788a1e448fa4b7fda7cc1a3e",
+      "parent_model_sha256": "b5c136c1d9f65cf8915381400b7795b2a2e895db0da1aa48132d659ec6d1073e"
+    },
+    {
+      "month": "2018-05",
+      "kind": "early_absolute_ablation",
+      "model_sha256": "2488ac1328a59c80c5f1fbbc8417aca73eb2038205600a6a112cc90c0a4c5202",
+      "training_sha256": "64435cea27fbc4c6a4c9b0ef46d806ad1a2e15260b9c193eeeea116083267840",
+      "parent_model_sha256": "b6cb8efa2e0f1c2f240298f48f669d700f8c784dc1e157f10abaefab8536c8ef"
+    },
+    {
+      "month": "2018-06",
+      "kind": "early_absolute_ablation",
+      "model_sha256": "fa6322f5c8575042876b26d6af06cde26ee8f0092212b6dfe9c474b3042a6b1d",
+      "training_sha256": "7918fd51e69407b297e53714b0851aa49c9ddc3f78201d646b4370d896ad3178",
+      "parent_model_sha256": "f85c65cd64d14743460e093b51c2de7459e56e4ab35297983a6fc619bcea474c"
+    },
+    {
+      "month": "2018-07",
+      "kind": "early_absolute_ablation",
+      "model_sha256": "c88b7cf11f34712c48d44c6c782d7b94939a87fbd4a04810a10b395664f67eaf",
+      "training_sha256": "7c4ff2a961c835bb7d7a69539d3c6184e730ac8d4d8c97f64e5e327a7816d697",
+      "parent_model_sha256": "e2d2d8900ca25fbdbdcb38b8b3a1e1a7f160a6e84a3f77850ab62799c636f418"
+    },
+    {
+      "month": "2018-08",
+      "kind": "early_absolute_ablation",
+      "model_sha256": "d6c0da5af03a839d1710d033b931c91dd8df6308f520975463f589fd2bac7d78",
+      "training_sha256": "ce1c0737e6dae8570c74c7f66177d41b829d3271acb9d08a69719f597d619b51",
+      "parent_model_sha256": "1f6e089316e5858f1c2d2102eab7892bd3f780953980ac29629aee4aab466e45"
+    },
+    {
+      "month": "2018-09",
+      "kind": "early_absolute_ablation",
+      "model_sha256": "144666ead35e18f27acfc38922b06c313b4945bf9fd28e58cb1f262cdb8f8fd5",
+      "training_sha256": "019fea8d1c3f0120574facb97dc82aaddb30c9eb70adacb9b15953cf6d5cebb8",
+      "parent_model_sha256": "b6fad87eabbb13f7d27264f67db945e34b8c4b474c28b4bb8415f14f2f48e44f"
+    },
+    {
+      "month": "2018-10",
+      "kind": "early_absolute_ablation",
+      "model_sha256": "22f1a37458b3cf37eaefd6d48d4095d2681eca475152bc401ac6e102fc4e0c36",
+      "training_sha256": "22961aa2796b14e636b82c773cd96e6fd3c8ab64802b74277de1e9912e2ae217",
+      "parent_model_sha256": "108df842f7727d6faa3cb587ac3b6e9938153293c8c6a3435700b735d979b066"
+    },
+    {
+      "month": "2018-11",
+      "kind": "early_absolute_ablation",
+      "model_sha256": "75e54fdd8fcb0adeb15129d6a366c4d6972f59a124d8734523af2b5f9f161f3c",
+      "training_sha256": "ff946cd034976bd5548383b4c73a70871519723e653ff9122e28741145f98ff7",
+      "parent_model_sha256": "7b4c16e94574b4fb9c3538454a2aa2fcbe7cbea32d02ffb2f549145f355c0414"
+    },
+    {
+      "month": "2018-12",
+      "kind": "early_absolute_ablation",
+      "model_sha256": "bd5a78986a533033880d5b1182ee0fb1ac9b25d0adc1364366f512ba9b8d2169",
+      "training_sha256": "0fd799570ccd8072d70ab53eccdb6051f398d991ee550964ace11b53c036afd5",
+      "parent_model_sha256": "37879e0074eefd3c124335ada2c1247734b546d33b8c8edc13f6f2b3e08a9721"
+    },
+    {
+      "month": "2019-01",
+      "kind": "early_absolute_ablation",
+      "model_sha256": "ab7ddb3ff639d94cea62d1342580ed169b841db8924b08ba12adf9173e2fe36a",
+      "training_sha256": "f7089e0e6786fbac4270e44a47b0aa419bd6b0d0078d553a3abab594786ba675",
+      "parent_model_sha256": "0afebd18f54f72402b67601ff7f55f6694f3b0f577a7d2fc2c2809a66b758b37"
+    },
+    {
+      "month": "2019-02",
+      "kind": "early_absolute_ablation",
+      "model_sha256": "c37465c16092a1cc0f7fa97d0f5e546818fefcafe6c3a8978590295b31d2f5ce",
+      "training_sha256": "9e2dcae574b9f3a7a4b0d60d39f6987c16ceacd8b45a8a0f48a2eb89046dfd89",
+      "parent_model_sha256": "d4c87a8bd657fff1d0ba8ec87a958ab61531b4f9a8692cdd5d31f656fa2aee40"
+    },
+    {
+      "month": "2019-03",
+      "kind": "early_absolute_ablation",
+      "model_sha256": "7eb622e62802ca0b3d7a1ee653ed06926e18fb310c24c9a3401344dd8d0f295c",
+      "training_sha256": "db530d1f6ceba8b964af5805f3ab10eeebd16315093bc99300e257747054decd",
+      "parent_model_sha256": "481b131bff682a20083c00e6d11dce1600235f9e5e86f262c2be77f81977d960"
+    },
+    {
+      "month": "2019-04",
+      "kind": "early_absolute_ablation",
+      "model_sha256": "7da81f0c1e089ba3a955f941e47cb23b285a5efacaf3dc32ea044634a2ad8b5a",
+      "training_sha256": "5980ffaff0fa0d4139b8ca5424fffec97b9bed940492b7dfc006ec3128b2387f",
+      "parent_model_sha256": "90a6ea726bb744eef2b49caca32036b9cd30c4c4cbb1a4d1fc9f753ea485f6b4"
+    },
+    {
+      "month": "2019-05",
+      "kind": "early_absolute_ablation",
+      "model_sha256": "0eab4f3705de859fc8b5b708b3d3f69f156346cefad6cd6e889f49f5109f67d5",
+      "training_sha256": "14eb3e4fa9cb060153cba439cc7457ee1d7ffa8c3a0059f9f3ef34c0f5116000",
+      "parent_model_sha256": "461d7b4864d072ec7033ef5f752e69cce9f63d55eb391004135d61eb43247a39"
+    },
+    {
+      "month": "2019-06",
+      "kind": "early_absolute_ablation",
+      "model_sha256": "9a4d4e0eb10bdc0986732b121f8d51f537912b9403d2d7a367300d7f1da1dca5",
+      "training_sha256": "a08d06d7558b18273671fd300e2007ec050ffaa294b7d4afe5950f4a8fa9e18c",
+      "parent_model_sha256": "0577c560d36182e7feb6c5417668916bc077b920da55d58e68a90b8fdcf346ea"
+    },
+    {
+      "month": "2019-07",
+      "kind": "early_absolute_ablation",
+      "model_sha256": "81d8151e2ef68f806b6bc8833a1e9ee0aa5ab200a4397db993b225e8ace8e8db",
+      "training_sha256": "966b01543d3895f7cf45d91b0c775d0cdef25aec706e21032350c97d981e0c03",
+      "parent_model_sha256": "5d4c43736a7de898bd02e74b134e33611fa0677ed1ad3d491b61a0337ec8e15a"
+    },
+    {
+      "month": "2019-08",
+      "kind": "early_absolute_ablation",
+      "model_sha256": "a44d3006d64cfd2bfc467ce3ce2dd0f1ac93b9a8d39b234671c5e89a0d34e178",
+      "training_sha256": "48e0e4223f69a8764e96bab35bb5a8b50a1fd90739d8ead43fc1dcce5087ed64",
+      "parent_model_sha256": "1d7eb7a0957146ce2196bab0f80116c893d985987002dbaf4022d8eca63b8b08"
+    },
+    {
+      "month": "2019-09",
+      "kind": "early_absolute_ablation",
+      "model_sha256": "a6b400576c466a5ffef9d02b966edb5b4cc4cf814ec672a3d2ea8b105b570164",
+      "training_sha256": "a55ee92be5dd08f845c037be740f56c7bdc65026e2102e2383c5060c64dcba5c",
+      "parent_model_sha256": "8b0434083afb99ad229b8df8107a4281d9770c55eaa335c79a1c829cc644a60c"
+    },
+    {
+      "month": "2019-10",
+      "kind": "early_absolute_ablation",
+      "model_sha256": "1e6f9545b62a441760ba6bfca495944fc22f742809176a79019b3ecbf51abfc4",
+      "training_sha256": "2eec90c11aa222612362537ec1420eff35de97dbb0909bdbe2ccdb45cb5cb2cc",
+      "parent_model_sha256": "2f86410b5b94c541e433ecef3bdcbdb50f3f71edd8517f1d18b7f1a6f79223d7"
+    },
+    {
+      "month": "2019-11",
+      "kind": "early_absolute_ablation",
+      "model_sha256": "6dbc38d146fabfb0345955f02cae98cd4f6846cbe3b6bf1da173d33071abe99a",
+      "training_sha256": "2fea7f6128c3aa976883f88f6bb83961605a513d3462b4926c2100a8645683d6",
+      "parent_model_sha256": "0797f857fcb54417d6e6e87bf0fc779807ee21f39059a022417a83f6c9127d1f"
+    },
+    {
+      "month": "2019-12",
+      "kind": "early_absolute_ablation",
+      "model_sha256": "fffa6fad3a630ca91628eaac887dea77a4331aa2ca57a15c336a0b3a54064305",
+      "training_sha256": "9b988a5a05cc8043deae6f9c81c2670b2e3f1d76c0ffb75be03b7aff111c55d4",
+      "parent_model_sha256": "d0feb1de3f2360123e86a1f6f34d16e77c9ae1b353ad6b42238e4e4cee49a787"
+    },
+    {
+      "month": "2020-01",
+      "kind": "early_absolute_ablation",
+      "model_sha256": "c3c353d8fb4634f673f252c7523a3a98da696839f704783e2b3c61ceb2b70601",
+      "training_sha256": "48eb4504f955be821e04e522d80a4c42d644f7d58d590af186867cc29757efed",
+      "parent_model_sha256": "28278516769d3320c542a7a279011a192628f38546aec3d152d5b7aad33910b8"
+    },
+    {
+      "month": "2020-02",
+      "kind": "early_absolute_ablation",
+      "model_sha256": "126d90c6b1efe06ca4e3c2d58a951d037d00259ad836ab55d8891fb5d3f9494e",
+      "training_sha256": "0111b67064cc9635aa6212f7c5718c20e72871d62cb73bcff09946a2db551fd4",
+      "parent_model_sha256": "38835272d1b7a1b8c151a2da7e7820ed2743a2aa8e42909c84d33cfcc4f676f7"
+    },
+    {
+      "month": "2020-03",
+      "kind": "early_absolute_ablation",
+      "model_sha256": "ecb12c4423362a909597191926cfee1846bfbee42e1af8e81018a8c8b8028419",
+      "training_sha256": "fd6e4483f269c1d74667f6e6659924c17f950b3315d731099dad6e0e17e8e34c",
+      "parent_model_sha256": "f58bb4d9489f8bb78aeb9d09810ded31332bf23037409f76af8dfd1cd4efc1d3"
+    },
+    {
+      "month": "2020-04",
+      "kind": "early_absolute_ablation",
+      "model_sha256": "a22c98845c9de38d4c31ec450083b7d90b32f07ed550dc7bb6552f1e1354d393",
+      "training_sha256": "cd6a3d1f34181570a57ba2ce95dabd3860f001922db9a107b00fb5f22562556c",
+      "parent_model_sha256": "1060d28cdab5f5186f81b42efeb4741817a710d424d61551e19ce31f7a078891"
+    },
+    {
+      "month": "2020-05",
+      "kind": "early_absolute_ablation",
+      "model_sha256": "3cdea8e5ba3e627b43053a6492a443bf27c32af26a8b8f586d1d648ea7420ef2",
+      "training_sha256": "7c8b73a10d179990ae6532866593beeac0fa601b89ecd154fc0ff21ec3e66ab1",
+      "parent_model_sha256": "ca916a09780a58e7f7ff6ae308ff14c85dcda69afa0747cd8978b8b873597342"
+    },
+    {
+      "month": "2020-06",
+      "kind": "early_absolute_ablation",
+      "model_sha256": "a337f123d8c39eae0803773adb7157f9c262fcb83dc18b5bf83fe43bffa57130",
+      "training_sha256": "bf0ac72c09575ec2a1f1e6e61eb0888c52ce1c7e0a1e4ad3f197d9b3b173b30c",
+      "parent_model_sha256": "e78fc9c6732ca46655faab93906b4a2c33388de83b2a0a78ba791060911ebc63"
+    },
+    {
+      "month": "2020-07",
+      "kind": "early_absolute_ablation",
+      "model_sha256": "30fc2445c4b1f85ad27b7c0daaf6bbc1003e1546f9c8c30be1dd44ce558a561e",
+      "training_sha256": "b919f1f2c48c5212b5e6e8ffbe70afffbef56cb72f831aa90b54d856f6bc4e66",
+      "parent_model_sha256": "039ee72a989d7094cf0e512773d99dc4556f23112470b7e6417cc6e43668c8e1"
+    },
+    {
+      "month": "2020-08",
+      "kind": "early_absolute_ablation",
+      "model_sha256": "8ac0f08c6918fcd62c347b09c47869f62c66bcb12aebf86c892101323d1af75c",
+      "training_sha256": "4a5085cd148366a56691a4fe77c9dd766d59b09f3567747a3055252233471239",
+      "parent_model_sha256": "06c6031c4f48c913f2399fcef2e861360e31859c2a7294c18b57693bdf75757d"
+    },
+    {
+      "month": "2020-09",
+      "kind": "early_absolute_ablation",
+      "model_sha256": "a0add3b8fe347673bf63d77ca681e8f94e5618e86aebdaf0061fc0cbb6e9693a",
+      "training_sha256": "81c1f150fe40cfeb7df8adaefdbd268f3db38afe71e90d261bc62fc1e63d92dd",
+      "parent_model_sha256": "00c50e6e2c79ff4988c6f32b4fcaf7441986715095231a4a0ce38f9b53f19094"
+    },
+    {
+      "month": "2020-10",
+      "kind": "early_absolute_ablation",
+      "model_sha256": "85c2705dc5d394b0927f202def5f71e419fd1eef0dc191831a91368b5dd7f25a",
+      "training_sha256": "a2f1fcf5f6727c1373154d05b6900861a30ba064d7e1db2deee09f2436c6dc20",
+      "parent_model_sha256": "46e22b2badd56752301d53eb432321341ab3a64d69a08e77851b6cc9a41d9f59"
+    },
+    {
+      "month": "2020-11",
+      "kind": "early_absolute_ablation",
+      "model_sha256": "01061db4f7357e78751f3bcf860b2b4577c62c56d8213f27f4d8dc56e0161e4a",
+      "training_sha256": "184d2923001c2d143cd18a38e72e52b13ae36bdac79f62211dc9a8674565e99b",
+      "parent_model_sha256": "c288232e52a05fab7d56d25394476ff304fc46a9ac53edf94b8e39799af47a9b"
+    },
+    {
+      "month": "2020-12",
+      "kind": "early_absolute_ablation",
+      "model_sha256": "51de5732b1b5e4b2670b9329fa9a28e493af9cae48d4a6b1aadd07148c161c91",
+      "training_sha256": "8af9a9d37528f3f1e88d6ac75727cfd1d6d0069bbdd1046a78e2d7e8590f28b6",
+      "parent_model_sha256": "89a8cf1bb45db8b5ff7f0242c135ee15e3b3252de13079c12b60268bb0312b2a"
+    },
+    {
+      "month": "2021-01",
+      "kind": "early_absolute_ablation",
+      "model_sha256": "22dd0731e97d413b89ed2450e3f951341bb2e6bace3e95496949027a3fb2b16f",
+      "training_sha256": "80f03e9817426281dc2f532efd5200344e88f4752d1d080948750759ff2f7dfb",
+      "parent_model_sha256": "68e7b69df4197101845d3a8102d1c0591f071d5953f023f657fc9e8552bdd6f3"
+    },
+    {
+      "month": "2021-02",
+      "kind": "early_absolute_ablation",
+      "model_sha256": "87d6f06cc1e371c83b1a733c4c95e623c63cda8acb082a9b34438832cc6ee342",
+      "training_sha256": "4d711bf0b502a5fbe5ba0e7aa9c64714f65824b83fd971eeefeceba6d1f6d016",
+      "parent_model_sha256": "3b0485befbd500c35e2341fba9913b400d302b69a0fbf91c9af05e9614505cbb"
+    },
+    {
+      "month": "2021-03",
+      "kind": "early_absolute_ablation",
+      "model_sha256": "6be5b3fecd5126e54b1adc59b39e057f547d9919f56bcf148026b90c9272c82f",
+      "training_sha256": "2a333b19c0964e5ec3698399ce575a8dc873214bf0f28addaff78be4c5487539",
+      "parent_model_sha256": "5d4691eb3060e2f4d3e2973211861c28127e58af474f5376db093776f9d98c48"
+    },
+    {
+      "month": "2021-04",
+      "kind": "early_absolute_ablation",
+      "model_sha256": "cc5456a5df67d062c06fdcb31e8da526d8b758fc2e62243eb5e1af3e4d32047b",
+      "training_sha256": "35d119eb3cd8fe143efd70336d0610262e237f7bab0729153020d7cdf97a1119",
+      "parent_model_sha256": "2e2bdb1495ca4b3aba4b2d8ebfb0ebe44196e1202c28fad8e326ac3dd239dcf7"
+    },
+    {
+      "month": "2021-05",
+      "kind": "early_absolute_ablation",
+      "model_sha256": "52694ca38e82d96c48653ce46970ba03a9b619b72916de7a3a1a87e9018db57d",
+      "training_sha256": "48adb8ccd3afd33a138fe1efe95110a9b60a4ddcee72b1d0c645a3eed00db26f",
+      "parent_model_sha256": "c9e5640ec438ad3d1369ee76b512d78e005d9d3d1c41812503d5fc7e76a9f9a5"
+    },
+    {
+      "month": "2021-06",
+      "kind": "early_absolute_ablation",
+      "model_sha256": "a3d56396573d1005cf2471c08251934dd3a1fbd4b5063d63009667f01b648053",
+      "training_sha256": "26dd7d99b7c0881aade8e6c687fc7ef2b5bc8025d1306342a68edfafc888affd",
+      "parent_model_sha256": "5bde12fcdf2c22583a2983ccc1897eacef493dee70f2f1d9021925aaa4660a93"
+    },
+    {
+      "month": "2021-07",
+      "kind": "early_absolute_ablation",
+      "model_sha256": "0d1fb9bb7c1601ee3fffd6f6808168e7f69fb01079b05de799aa6dee795d11ce",
+      "training_sha256": "3d5e97129bb08c983be8bf71393e96b09f9bc81022ce1e55aa3b5fa7dbfdb1f8",
+      "parent_model_sha256": "a3ed8b75a3c259e822108fa58944381987e51b556c2e80ca8d563998c8649a0f"
+    },
+    {
+      "month": "2021-08",
+      "kind": "early_absolute_ablation",
+      "model_sha256": "ddbd476cab07b8b9ba0baa61beeb379e49b15974842168d7b3ce00f5ff936eef",
+      "training_sha256": "8a71a575bd32bb5263f329b234153f303b7b8bea4ce7def2b454ac03166fb857",
+      "parent_model_sha256": "588f36f2993a3ddfc48776261f79060ff2da783f724de244dd0123e15f379010"
+    },
+    {
+      "month": "2021-09",
+      "kind": "early_absolute_ablation",
+      "model_sha256": "a62a1351dc422a827330d3b56e1d3042e234afc6d68a73df6ac8bacb18813e65",
+      "training_sha256": "c22203ac25a773b526425430349138d31bacc25c47571f6bc34c0e46e45ee7f4",
+      "parent_model_sha256": "7a1234c01081a830381949f27327abedbf74643f080be63322276129131379a4"
+    },
+    {
+      "month": "2021-10",
+      "kind": "early_absolute_ablation",
+      "model_sha256": "b52636cab99877fb7dcc3dad64e8e7e0f059f2e84412f4809edae4f760bafd4f",
+      "training_sha256": "88aaf09b08163444da5c03308c31c44d260a831a20c7b46f8833b2706116445f",
+      "parent_model_sha256": "26a4bc5a4d08e1a46fe53d0978b0d50a32db3c5ba781644d3ddfd184cad2e6b8"
+    },
+    {
+      "month": "2021-11",
+      "kind": "early_absolute_ablation",
+      "model_sha256": "1dc1fe133bbdd8c54e9f32a9a99b0aed17e909d5d3ee23760228ad4681d5fb9d",
+      "training_sha256": "6a99a5a3b98fb6f0d61fe9d3fb02cfb4cf1e020230fc8e6d0c0f5b1cbaf1b415",
+      "parent_model_sha256": "c8c8629e34b34ea54415e8d706922becd3118544104030c8ce23f48cddafd313"
+    },
+    {
+      "month": "2021-12",
+      "kind": "early_absolute_ablation",
+      "model_sha256": "395b40d1046f33e59339153a8446792935da6930309dd01df81846e503128c5e",
+      "training_sha256": "39c693abb9bb364d4541dddd1b109ac1aaa6be1a7f6f35f30fc0bf00141ebb5a",
+      "parent_model_sha256": "3ce2ee3d9f29a634f752602ade60177e7545d7649c9c47f2bb9314b1f7ac5466"
+    },
+    {
+      "month": "2026-04",
+      "kind": "late_absolute_ablation",
+      "model_sha256": "0a7c2ce6dd3ae090e7fe9a2ee9bc8d8957f43fd47f83ddc5c8d7c4c1554918e6",
+      "training_sha256": "c4969325f0081a3c5cb9887e3bab93607b55c74325f86a73faea912670d55327",
+      "parent_model_sha256": "bf565f806d6fb60569244e9db262f3de7a98802067350ab974841ca334cfbbf8"
+    },
+    {
+      "month": "2026-05",
+      "kind": "late_absolute_ablation",
+      "model_sha256": "50d173f05cc56a473743d7598700a19b1a25452c618815d59fede6b0b55dd392",
+      "training_sha256": "5775be8f8f31672f03fd8ecd4ea20469c87defe911e4fc340ae19ac7e3bb63f0",
+      "parent_model_sha256": "e8af463c338e55a1288532c807f981b1f46dfa3f77aa97ff8baf60bd0871c465"
+    },
+    {
+      "month": "2026-06",
+      "kind": "late_absolute_ablation",
+      "model_sha256": "0869f0e71534a15ce26757210069f10a030f58620f9502f13e0bed4b843a1d9f",
+      "training_sha256": "e03da3749c0ca3d31a11c46f47f6f8f75f6504820e694b70013aa00a075c88db",
+      "parent_model_sha256": "1d4948a89a138bce80dd010c1489f3bc4495a908fdb965a6bc4c10ff5a2b57b9"
+    },
+    {
+      "month": "2026-07",
+      "kind": "late_absolute_ablation",
+      "model_sha256": "d8626a16cde01c9e87a05be156913180c54b0349bad9e03e1fbafd71d9f4cf1f",
+      "training_sha256": "92584f77d0885bbfce949696864b8d7cb7c8a0d9245907041205bff91113f171",
+      "parent_model_sha256": "431befae44cf12e94cce32698cc303be4618d145167b36d44ee1325de135b0bf"
+    },
+    {
+      "month": "2026-08",
+      "kind": "late_absolute_ablation",
+      "model_sha256": "d0f4a2cfd6b0e7012d2d39ae1086730a36da68eb02b7c1333a3884ae81fe634a",
+      "training_sha256": "e6347112672a7138523ba9b2ffe0b7bb72424266171d187f8aee4b378143c471",
+      "parent_model_sha256": "65be0b842c5201d4c53aa8533588e881111e1679999bca32683d63c50304572a"
+    },
+    {
+      "month": "2026-09",
+      "kind": "late_absolute_ablation",
+      "model_sha256": "c17c393b2f24a098de3d59ff2758a4cc83dd3e3a97e79c3d394f8f1de36700a5",
+      "training_sha256": "e7404309d504ec55848cfdb2f576d10c708f9b6e47436984310397628bf66174",
+      "parent_model_sha256": "3b72922a470ed409ced0f7202f2bb074683162a224720ea19b50825327f3feb6"
+    }
+  ],
+  "storage": "server research directory only; production DB and cloud archive not updated"
+}

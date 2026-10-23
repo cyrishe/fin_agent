@@ -1,0 +1,18 @@
+{
+  "experiment": "B2_R74_NEWS_FACTORS_20261022",
+  "parent_strategy": "imac/B2_V2",
+  "definition_sha256": "54ebe0150dfefa6ce9837d403fd83b331f2720ad835271525e3106aae7529f00",
+  "parent_runs": [
+    "R69",
+    "R72",
+    "R73"
+  ],
+  "sample_count": 709,
+  "selected_count": 306,
+  "new_model": false,
+  "production_registration": "not_submitted",
+  "cloud_readback": "not_done",
+  "server_artifact_root": "/data/cyris/work/b2_news_factor_r74_20261022",
+  "signal_join_key": "stk_code|d0_date",
+  "sources": "manifest.json"
+}

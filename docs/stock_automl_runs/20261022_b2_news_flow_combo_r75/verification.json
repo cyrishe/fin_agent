@@ -1,0 +1,25 @@
+{
+  "rows_and_splits": "PASS",
+  "ten_models_reload_max_probability_error": 0,
+  "frozen_D1_reproduced": "PASS",
+  "709_news_windows_independent_count_and_cutoff": "PASS",
+  "flow_main_equals_huge_plus_large": "PASS",
+  "flow_vintage": {
+    "train152_timestamp_supported": 37,
+    "valid54": 54,
+    "test98": 97,
+    "D0_close_available": 0,
+    "fully_point_in_time_verified": false
+  },
+  "accounts_cash_reconciliation": 97,
+  "R73_daily_baseline_exact": "PASS",
+  "csv_no_leading_apostrophes": "PASS",
+  "runtime": {
+    "python": "3.12.12",
+    "pandas": "2.3.3",
+    "numpy": "2.5.2",
+    "sklearn": "1.7.1",
+    "host": "iZ2zed8q1y8llzqxiyxzfmZ",
+    "server_workdir": "/data/cyris/work/b2_news_flow_combo_r75_20261022"
+  }
+}

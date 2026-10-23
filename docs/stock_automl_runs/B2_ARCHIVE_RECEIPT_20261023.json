@@ -1,0 +1,20 @@
+{
+  "archive": "B2_session_20261023.tar.gz",
+  "sha256": "21ba590ebb0f31545423212c3aeb9e19a42c9a5275f9753f592f429a02b581f8",
+  "bytes": 558936645,
+  "files": 7752,
+  "git_files": 1616,
+  "git_bytes": 64380111,
+  "server_path": "/data/cyris/work/b2_handoff_20261023/B2_session_20261023.tar.gz",
+  "local_archive_readback": "all member hashes verified",
+  "server_readback": "complete archive SHA-256 matched",
+  "database": "not submitted",
+  "aliyun_drive": "pending",
+  "latest_handoff": {
+    "path": "docs/stock_automl_runs/B2_MACHINE_HANDOFF_20261023.md",
+    "sha256": "23194263889f674f529ca9ed7866b6b32aecf0f76d658a3d732e8547927559aa",
+    "server_path": "/data/cyris/work/b2_handoff_20261023/B2_MACHINE_HANDOFF_20261023.md",
+    "readback": "server/local hashes matched",
+    "note": "Includes two late user questions; supersedes handoff inside earlier frozen tar. Use Git HEAD for latest documents and code."
+  }
+}

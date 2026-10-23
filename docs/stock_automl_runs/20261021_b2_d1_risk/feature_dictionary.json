@@ -1,0 +1,284 @@
+[
+  {
+    "key": "total_mv_yi",
+    "label": "D0总市值亿",
+    "group": "D0",
+    "known_at": "D0收盘"
+  },
+  {
+    "key": "d0_turnover_pct",
+    "label": "D0换手率",
+    "group": "D0",
+    "known_at": "D0收盘"
+  },
+  {
+    "key": "board_streak_days",
+    "label": "连板数",
+    "group": "D0",
+    "known_at": "D0收盘"
+  },
+  {
+    "key": "d0_normal_volume_ratio",
+    "label": "D0对板前量比",
+    "group": "D0",
+    "known_at": "D0收盘"
+  },
+  {
+    "key": "close_sealed_minutes",
+    "label": "D0收在板上分钟数",
+    "group": "D0",
+    "known_at": "D0收盘"
+  },
+  {
+    "key": "last30_amount_fraction",
+    "label": "D0尾30分额占比",
+    "group": "D0",
+    "known_at": "D0收盘"
+  },
+  {
+    "key": "open_gap",
+    "label": "D1开盘涨幅",
+    "group": "early",
+    "known_at": "D1 09:34"
+  },
+  {
+    "key": "body5",
+    "label": "四K实体",
+    "group": "early",
+    "known_at": "D1 09:34"
+  },
+  {
+    "key": "high5",
+    "label": "四K最高涨幅",
+    "group": "early",
+    "known_at": "D1 09:34"
+  },
+  {
+    "key": "low5",
+    "label": "四K最低涨幅",
+    "group": "early",
+    "known_at": "D1 09:34"
+  },
+  {
+    "key": "pullback5",
+    "label": "四K冲高回吐",
+    "group": "early",
+    "known_at": "D1 09:34"
+  },
+  {
+    "key": "position5",
+    "label": "四K收盘位置",
+    "group": "early",
+    "known_at": "D1 09:34"
+  },
+  {
+    "key": "early_volume_ratio",
+    "label": "四K量/D0全天量",
+    "group": "early",
+    "known_at": "D1 09:34"
+  },
+  {
+    "key": "early_volume_accel",
+    "label": "后两K量/前两K量",
+    "group": "early",
+    "known_at": "D1 09:34"
+  },
+  {
+    "key": "early_down_volume",
+    "label": "阴K成交量占比",
+    "group": "early",
+    "known_at": "D1 09:34"
+  },
+  {
+    "key": "early_up_count",
+    "label": "四K阳线根数",
+    "group": "early",
+    "known_at": "D1 09:34"
+  },
+  {
+    "key": "early_slope",
+    "label": "四K收盘线性斜率",
+    "group": "early",
+    "known_at": "D1 09:34"
+  },
+  {
+    "key": "early_path",
+    "label": "四K收盘路径长度",
+    "group": "early",
+    "known_at": "D1 09:34"
+  },
+  {
+    "key": "early_below_d0",
+    "label": "四K收低于D0比例",
+    "group": "early",
+    "known_at": "D1 09:34"
+  },
+  {
+    "key": "early_drawdown",
+    "label": "四K收盘最大回撤",
+    "group": "early",
+    "known_at": "D1 09:34"
+  },
+  {
+    "key": "early_upper",
+    "label": "四K上影",
+    "group": "early",
+    "known_at": "D1 09:34"
+  },
+  {
+    "key": "early_lower",
+    "label": "四K下影",
+    "group": "early",
+    "known_at": "D1 09:34"
+  },
+  {
+    "key": "day_return",
+    "label": "D1全天涨幅",
+    "group": "close",
+    "known_at": "D1 15:00"
+  },
+  {
+    "key": "day_body",
+    "label": "D1全天实体",
+    "group": "close",
+    "known_at": "D1 15:00"
+  },
+  {
+    "key": "day_range",
+    "label": "D1全天振幅",
+    "group": "close",
+    "known_at": "D1 15:00"
+  },
+  {
+    "key": "day_upper",
+    "label": "D1上影",
+    "group": "close",
+    "known_at": "D1 15:00"
+  },
+  {
+    "key": "day_lower",
+    "label": "D1下影",
+    "group": "close",
+    "known_at": "D1 15:00"
+  },
+  {
+    "key": "day_position",
+    "label": "D1收盘位置",
+    "group": "close",
+    "known_at": "D1 15:00"
+  },
+  {
+    "key": "day_volume_ratio",
+    "label": "D1量/D0量",
+    "group": "close",
+    "known_at": "D1 15:00"
+  },
+  {
+    "key": "day_turnover",
+    "label": "D1换手率",
+    "group": "close",
+    "known_at": "D1 15:00"
+  },
+  {
+    "key": "day_turnover_ratio",
+    "label": "D1换手/D0换手",
+    "group": "close",
+    "known_at": "D1 15:00"
+  },
+  {
+    "key": "after4_return",
+    "label": "四K后至收盘涨幅",
+    "group": "close",
+    "known_at": "D1 15:00"
+  },
+  {
+    "key": "after4_low",
+    "label": "四K后最低相对四K收盘",
+    "group": "close",
+    "known_at": "D1 15:00"
+  },
+  {
+    "key": "morning_return",
+    "label": "上午收盘相对开盘",
+    "group": "close",
+    "known_at": "D1 15:00"
+  },
+  {
+    "key": "afternoon_return",
+    "label": "午后相对上午收盘",
+    "group": "close",
+    "known_at": "D1 15:00"
+  },
+  {
+    "key": "tail_return",
+    "label": "尾30分钟涨幅",
+    "group": "close",
+    "known_at": "D1 15:00"
+  },
+  {
+    "key": "day_drawdown",
+    "label": "D1分钟收盘最大回撤",
+    "group": "close",
+    "known_at": "D1 15:00"
+  },
+  {
+    "key": "afternoon_volume",
+    "label": "下午量占比",
+    "group": "close",
+    "known_at": "D1 15:00"
+  },
+  {
+    "key": "tail_volume",
+    "label": "尾30分钟量占比",
+    "group": "close",
+    "known_at": "D1 15:00"
+  },
+  {
+    "key": "early_volume_share",
+    "label": "前四K量占D1全天",
+    "group": "close",
+    "known_at": "D1 15:00"
+  },
+  {
+    "key": "day_down_volume",
+    "label": "D1阴K量占比",
+    "group": "close",
+    "known_at": "D1 15:00"
+  },
+  {
+    "key": "close_vs_weighted",
+    "label": "D1收盘相对成交量加权典型价",
+    "group": "close",
+    "known_at": "D1 15:00"
+  },
+  {
+    "key": "limit_up_fraction",
+    "label": "D1分钟收在涨停比例",
+    "group": "close",
+    "known_at": "D1 15:00"
+  },
+  {
+    "key": "day_close_limit",
+    "label": "D1收盘涨停",
+    "group": "close",
+    "known_at": "D1 15:00"
+  },
+  {
+    "key": "return_change",
+    "label": "D1涨幅减D0涨幅",
+    "group": "close",
+    "known_at": "D1 15:00"
+  },
+  {
+    "key": "body_change",
+    "label": "D1实体减D0实体",
+    "group": "close",
+    "known_at": "D1 15:00"
+  },
+  {
+    "key": "opened_after_touch",
+    "label": "D0触板后打开",
+    "group": "D0",
+    "known_at": "D0收盘"
+  }
+]

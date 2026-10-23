@@ -1,0 +1,1217 @@
+[
+  {
+    "path": "2022_close_baseline_daily.csv",
+    "bytes": 10278,
+    "sha256": "1e7b3711fe3540f4a9d52fa011384834f9c35e56f24514af3484fabea4ea9ddf"
+  },
+  {
+    "path": "2022_close_baseline_ledger.csv",
+    "bytes": 4285,
+    "sha256": "cf5f99a3b701f1ca9bfddce013795e417fc7610f06fe1afef3b0488794845407"
+  },
+  {
+    "path": "2022_close_fit_D1_flow_daily.csv",
+    "bytes": 10383,
+    "sha256": "4b24e5ab9a739c064196ef5dd0cd15263ab56878d3daffbc9914cd9691e08b91"
+  },
+  {
+    "path": "2022_close_fit_D1_flow_ledger.csv",
+    "bytes": 3192,
+    "sha256": "8c2f81e013dd890fa0e06d2e7ae740f639a40c2b2e3aa93ddd58f9e698c6833c"
+  },
+  {
+    "path": "2022_close_fit_D1_news_daily.csv",
+    "bytes": 10383,
+    "sha256": "690bf221a9d05e4d2f0f99a63ee83dcdf9ffbdeba5ab2a510fcce7b60a68c7b7"
+  },
+  {
+    "path": "2022_close_fit_D1_news_flow_daily.csv",
+    "bytes": 10383,
+    "sha256": "690bf221a9d05e4d2f0f99a63ee83dcdf9ffbdeba5ab2a510fcce7b60a68c7b7"
+  },
+  {
+    "path": "2022_close_fit_D1_news_flow_ledger.csv",
+    "bytes": 3192,
+    "sha256": "d39ba54c3ab015c41ffb52d67bfc54a6363ced919b83e193a0aab9946563dbea"
+  },
+  {
+    "path": "2022_close_fit_D1_news_ledger.csv",
+    "bytes": 3192,
+    "sha256": "d39ba54c3ab015c41ffb52d67bfc54a6363ced919b83e193a0aab9946563dbea"
+  },
+  {
+    "path": "2022_close_fit_econ_D1_news_flow_q80_daily.csv",
+    "bytes": 10350,
+    "sha256": "326a303c3ea42312191ac8e41b6170c2c2cdf64ac4b6f990df8eedd1df5ae257"
+  },
+  {
+    "path": "2022_close_fit_econ_D1_news_flow_q80_ledger.csv",
+    "bytes": 3798,
+    "sha256": "8163a03e47e7f062c170d29fda8e039d3d369b91f6564c2f3706bd12acf2b9ef"
+  },
+  {
+    "path": "2022_close_fit_sens_D1_flow_q80_daily.csv",
+    "bytes": 10381,
+    "sha256": "3f0e27304bd7de0105e4b7da7de901bc430afb1db6242fa93304edb32e72f95f"
+  },
+  {
+    "path": "2022_close_fit_sens_D1_flow_q80_ledger.csv",
+    "bytes": 3436,
+    "sha256": "062d165277058e0b98b92ac03b61302ccb95688a19a9bd35ebbc6c6822865661"
+  },
+  {
+    "path": "2022_close_fit_sens_D1_news_flow_q80_daily.csv",
+    "bytes": 10381,
+    "sha256": "f4dfae41f1d79853018e67236342ac8217a0c31996eb56e35a4a589f7523d22c"
+  },
+  {
+    "path": "2022_close_fit_sens_D1_news_flow_q80_ledger.csv",
+    "bytes": 3436,
+    "sha256": "12d80a9c752a46c3e05f62d78f2816e4fab2d1106815789f34db266d254a42dc"
+  },
+  {
+    "path": "2022_close_fit_sens_D1_q80_daily.csv",
+    "bytes": 10343,
+    "sha256": "497ff91f3a3dd5bcb0da36d7088556dfdbce5c71dcb939f215c15fda96499f0b"
+  },
+  {
+    "path": "2022_close_fit_sens_D1_q80_ledger.csv",
+    "bytes": 3314,
+    "sha256": "a182c28d4f8595a6566aedab445fe44b0958918acdb85fae7d347339e3920684"
+  },
+  {
+    "path": "2022_close_union_early_lr01_daily.csv",
+    "bytes": 10385,
+    "sha256": "b388e5ebf85f495fcc91ab1a2817742591eabab5fd16c6b8f7325670c1c170c9"
+  },
+  {
+    "path": "2022_close_union_early_lr01_ledger.csv",
+    "bytes": 2951,
+    "sha256": "e7e11c9e844aa2d62fb4fbe5fe1a805e21aac7bde6cc682131ca207a40090302"
+  },
+  {
+    "path": "2022_morning7_baseline_daily.csv",
+    "bytes": 10264,
+    "sha256": "aceb04ce21a70b1193b80003057a7bc485740e5307fa3bc8f905809eb2a721ff"
+  },
+  {
+    "path": "2022_morning7_baseline_ledger.csv",
+    "bytes": 4279,
+    "sha256": "ee461e141f00b74a3444c91b98b95c6229784c0dbd9d290880eac4e55db3666c"
+  },
+  {
+    "path": "2022_morning7_fit_D1_flow_daily.csv",
+    "bytes": 10358,
+    "sha256": "c3d24f81bd63a02a7307e4fd301f868f442f505ad43d23ddc7719708bec5eb00"
+  },
+  {
+    "path": "2022_morning7_fit_D1_flow_ledger.csv",
+    "bytes": 3189,
+    "sha256": "50cf052e51c49172441381fa70036638129fdb08736cb9ba78ef1a86a0d93ed4"
+  },
+  {
+    "path": "2022_morning7_fit_D1_news_daily.csv",
+    "bytes": 10352,
+    "sha256": "30f6ff7c27f6ebca4f85e314ee8a617811b9204427e9d8770dfb5fe3911d3191"
+  },
+  {
+    "path": "2022_morning7_fit_D1_news_flow_daily.csv",
+    "bytes": 10352,
+    "sha256": "30f6ff7c27f6ebca4f85e314ee8a617811b9204427e9d8770dfb5fe3911d3191"
+  },
+  {
+    "path": "2022_morning7_fit_D1_news_flow_ledger.csv",
+    "bytes": 3189,
+    "sha256": "03edc5c4faf2031964ab47a1c87d12ca673d09f379deb9a3485e2d1d3c33d9bd"
+  },
+  {
+    "path": "2022_morning7_fit_D1_news_ledger.csv",
+    "bytes": 3189,
+    "sha256": "03edc5c4faf2031964ab47a1c87d12ca673d09f379deb9a3485e2d1d3c33d9bd"
+  },
+  {
+    "path": "2022_morning7_fit_econ_D1_news_flow_q80_daily.csv",
+    "bytes": 10293,
+    "sha256": "67743781636934b53a5226153d4344f89b7635c6363df9a588e8f38514dc9265"
+  },
+  {
+    "path": "2022_morning7_fit_econ_D1_news_flow_q80_ledger.csv",
+    "bytes": 3794,
+    "sha256": "8fc2a9e9aa34d35bf004c519a445b36bc74536d9bc1e8a74edcbf0a648f1cfab"
+  },
+  {
+    "path": "2022_morning7_fit_sens_D1_flow_q80_daily.csv",
+    "bytes": 10358,
+    "sha256": "67179200f3cc93d5c7d97a0045bbe90618b3496c0cbe076b6091ee61e3d01a57"
+  },
+  {
+    "path": "2022_morning7_fit_sens_D1_flow_q80_ledger.csv",
+    "bytes": 3432,
+    "sha256": "b903c8a03165fb24691ec244c3cfbaacfd0593f7cdc153f39372a3718b7fd7e8"
+  },
+  {
+    "path": "2022_morning7_fit_sens_D1_news_flow_q80_daily.csv",
+    "bytes": 10373,
+    "sha256": "471a745a32d2166fad37cb08e50bae683ea5626a1c0e86d1c128f6280e6c154a"
+  },
+  {
+    "path": "2022_morning7_fit_sens_D1_news_flow_q80_ledger.csv",
+    "bytes": 3432,
+    "sha256": "a826a93d4d8098a2a440927ff45da4a21a9caade58ae75ab3a38f71346b7c79f"
+  },
+  {
+    "path": "2022_morning7_fit_sens_D1_q80_daily.csv",
+    "bytes": 10281,
+    "sha256": "23dc4b163c2a0bb625c5c6d29d3f680d7c738ac6293b46a89374e52ac87156fd"
+  },
+  {
+    "path": "2022_morning7_fit_sens_D1_q80_ledger.csv",
+    "bytes": 3310,
+    "sha256": "0a3c62a7e11aad34cc99dd7c63641e2161a2143d645f2bf6898c0ed5f5b616cc"
+  },
+  {
+    "path": "2022_morning7_union_early_lr01_daily.csv",
+    "bytes": 10383,
+    "sha256": "3f7382f50730e2bd44309a2b0ec7e94eed7f4116b4bfbd98a796280cf2df048c"
+  },
+  {
+    "path": "2022_morning7_union_early_lr01_ledger.csv",
+    "bytes": 2947,
+    "sha256": "21f37b74e0dd117e4cddef01e4bb857229cd70d0512bd07b35857edc6c245c8c"
+  },
+  {
+    "path": "2023_close_baseline_daily.csv",
+    "bytes": 15591,
+    "sha256": "c3ed7c05cc68ef6dc158ced0cf4b8c893a96cdf7a2172ff96bc1d9c8e1c8be9f"
+  },
+  {
+    "path": "2023_close_baseline_ledger.csv",
+    "bytes": 7910,
+    "sha256": "3d71e656542229e3b74bc7de937fcd009690d9e399243e7dfd5ba3d5c8838131"
+  },
+  {
+    "path": "2023_close_fit_D1_flow_daily.csv",
+    "bytes": 15614,
+    "sha256": "9f4d1c6a487fdae7f2f8172bf89ed4d47be6e91f3b10b85938f5b8e75e203de8"
+  },
+  {
+    "path": "2023_close_fit_D1_flow_ledger.csv",
+    "bytes": 6235,
+    "sha256": "2b5edfffdf7a63ec6b5f6925bdadd9932a3bb2c10696cc07b2ecb6af6df81e53"
+  },
+  {
+    "path": "2023_close_fit_D1_news_daily.csv",
+    "bytes": 15607,
+    "sha256": "9d36c3a3d07481dcb749d0704e973113a33bb0661528078fa6b992bcd0a5aee3"
+  },
+  {
+    "path": "2023_close_fit_D1_news_flow_daily.csv",
+    "bytes": 15607,
+    "sha256": "70a6d6c74f0c0f7c3c4aed03e6d6fc589c11d005dcc2afca3beb050f5956fe0e"
+  },
+  {
+    "path": "2023_close_fit_D1_news_flow_ledger.csv",
+    "bytes": 6468,
+    "sha256": "a4d4e309d51a26a1f9eb355a148480da6c64d4bd22c9b20a9e5e6a3bfeaf7453"
+  },
+  {
+    "path": "2023_close_fit_D1_news_ledger.csv",
+    "bytes": 6469,
+    "sha256": "cf993b3bdf76fc467f01ed92f2d04d040e61dae373d4eca04a562e70ff74fd5c"
+  },
+  {
+    "path": "2023_close_fit_econ_D1_news_flow_q80_daily.csv",
+    "bytes": 15616,
+    "sha256": "e950861691d7c4c034b3e637fa3bb223fdccfafcfe6a82905942930d98e874cc"
+  },
+  {
+    "path": "2023_close_fit_econ_D1_news_flow_q80_ledger.csv",
+    "bytes": 6117,
+    "sha256": "ebb9cbe58cd16ca0e407a4a2607d968fe73c508a04f301ad8ef6b569f4c835cc"
+  },
+  {
+    "path": "2023_close_fit_sens_D1_flow_q80_daily.csv",
+    "bytes": 15610,
+    "sha256": "827691d572b892bd12a8fc284232e16a81325fe1af87abe24753689dc819fe21"
+  },
+  {
+    "path": "2023_close_fit_sens_D1_flow_q80_ledger.csv",
+    "bytes": 6720,
+    "sha256": "84a32fd2ede0245561b0851c1fe850b27d66d1c949b42fd3f91e6de5630b93cf"
+  },
+  {
+    "path": "2023_close_fit_sens_D1_news_flow_q80_daily.csv",
+    "bytes": 15607,
+    "sha256": "4b99501fe6026b97eb5d4e5999309335e38a6e9aada6e8b826b2579a675b7182"
+  },
+  {
+    "path": "2023_close_fit_sens_D1_news_flow_q80_ledger.csv",
+    "bytes": 6715,
+    "sha256": "6bd55f64c13d3f3ef8b7672a1500517e109936efe76ed917af900bbffab2205a"
+  },
+  {
+    "path": "2023_close_fit_sens_D1_q80_daily.csv",
+    "bytes": 15610,
+    "sha256": "827691d572b892bd12a8fc284232e16a81325fe1af87abe24753689dc819fe21"
+  },
+  {
+    "path": "2023_close_fit_sens_D1_q80_ledger.csv",
+    "bytes": 6720,
+    "sha256": "84a32fd2ede0245561b0851c1fe850b27d66d1c949b42fd3f91e6de5630b93cf"
+  },
+  {
+    "path": "2023_close_union_early_lr01_daily.csv",
+    "bytes": 15613,
+    "sha256": "94ebbec32d23e6ee87cf60a6a4ab4141662e0c3aabd20b153263fa64627309a8"
+  },
+  {
+    "path": "2023_close_union_early_lr01_ledger.csv",
+    "bytes": 6480,
+    "sha256": "aaf9d2bb15c10d4c3c770698633bbc8730ab6603d3f35b596e48c51b172fa937"
+  },
+  {
+    "path": "2023_morning7_baseline_daily.csv",
+    "bytes": 15591,
+    "sha256": "b923e4477cc878ce39867e32c14b4b2c92885e1f1392f77f7b637ce62851ac5e"
+  },
+  {
+    "path": "2023_morning7_baseline_ledger.csv",
+    "bytes": 7912,
+    "sha256": "080806dc2f39af8f54ccb72aca851c06bc2cf3748d03f9914101b97e3b6d4096"
+  },
+  {
+    "path": "2023_morning7_fit_D1_flow_daily.csv",
+    "bytes": 15613,
+    "sha256": "4b7d2a3875e114301bd276c4b514fc6ce4a907890af55e849a6e820f3094e886"
+  },
+  {
+    "path": "2023_morning7_fit_D1_flow_ledger.csv",
+    "bytes": 6233,
+    "sha256": "e4cd1cbbc1ef7396105610749773d3ccbabd7fb1b98840685b94959265165016"
+  },
+  {
+    "path": "2023_morning7_fit_D1_news_daily.csv",
+    "bytes": 15607,
+    "sha256": "e3a364ba87adce749c3db11148a498a62b70fa4d098ab20e7ebcfc9b8a320a3b"
+  },
+  {
+    "path": "2023_morning7_fit_D1_news_flow_daily.csv",
+    "bytes": 15607,
+    "sha256": "7121f28485544416fc1bc2b9b60b688694c2d964c65dc520daeed9788055ff67"
+  },
+  {
+    "path": "2023_morning7_fit_D1_news_flow_ledger.csv",
+    "bytes": 6465,
+    "sha256": "6423e493e93eb84a8364b95a1b1b5e5d02c0db2a21110f5d7b60f421d96d14d4"
+  },
+  {
+    "path": "2023_morning7_fit_D1_news_ledger.csv",
+    "bytes": 6464,
+    "sha256": "098f4387ffe7c8f1477f9ae8fc4a4f0f4161e14d75dc0d61db187aef759d3e65"
+  },
+  {
+    "path": "2023_morning7_fit_econ_D1_news_flow_q80_daily.csv",
+    "bytes": 15616,
+    "sha256": "2bc12b7582dc11b76aa159a087456ac0f47fecf1614830827d16962f669eee65"
+  },
+  {
+    "path": "2023_morning7_fit_econ_D1_news_flow_q80_ledger.csv",
+    "bytes": 6117,
+    "sha256": "be4c01c8e3035fc8c8a90ed523c326b4747e2eeddc89c5be8aeb014a6a179116"
+  },
+  {
+    "path": "2023_morning7_fit_sens_D1_flow_q80_daily.csv",
+    "bytes": 15608,
+    "sha256": "e2b45c9d80515521d7cbcf8df2a00b8239bf6ba06dab09d6872bf936bf7679d8"
+  },
+  {
+    "path": "2023_morning7_fit_sens_D1_flow_q80_ledger.csv",
+    "bytes": 6715,
+    "sha256": "87dd2cb21c49f53f91528f93c57469f8be78bba67cc113799b6009b0ccea535d"
+  },
+  {
+    "path": "2023_morning7_fit_sens_D1_news_flow_q80_daily.csv",
+    "bytes": 15605,
+    "sha256": "4489fbb8726f760a1cdc3bdbcc7f26cd2ebe93713f43b9f99c5eb7a7a3617281"
+  },
+  {
+    "path": "2023_morning7_fit_sens_D1_news_flow_q80_ledger.csv",
+    "bytes": 6708,
+    "sha256": "b4ddc4ad1904ad418812b87f841142cff0389141f461c0cd2223c729e58c4fc6"
+  },
+  {
+    "path": "2023_morning7_fit_sens_D1_q80_daily.csv",
+    "bytes": 15608,
+    "sha256": "e2b45c9d80515521d7cbcf8df2a00b8239bf6ba06dab09d6872bf936bf7679d8"
+  },
+  {
+    "path": "2023_morning7_fit_sens_D1_q80_ledger.csv",
+    "bytes": 6715,
+    "sha256": "87dd2cb21c49f53f91528f93c57469f8be78bba67cc113799b6009b0ccea535d"
+  },
+  {
+    "path": "2023_morning7_union_early_lr01_daily.csv",
+    "bytes": 15612,
+    "sha256": "93ebe41184f4c0284897421ed0090531d214515f1d4ba9e5abb3973478266236"
+  },
+  {
+    "path": "2023_morning7_union_early_lr01_ledger.csv",
+    "bytes": 6477,
+    "sha256": "73eddaa31ce5cb8db5b98c3348115b1e165e7020d0ed0b27f5c86181d74a705d"
+  },
+  {
+    "path": "2024_close_baseline_daily.csv",
+    "bytes": 15181,
+    "sha256": "4d6681347aa1f56284d22e08ad2aa20f419e6d97ae6ccb5c3d99cad0438eb3ce"
+  },
+  {
+    "path": "2024_close_baseline_ledger.csv",
+    "bytes": 6588,
+    "sha256": "ed223bf97569c6cd1e17f3bb6204c40fa0ea38da07388b9208bee95ed8328737"
+  },
+  {
+    "path": "2024_close_fit_D1_flow_daily.csv",
+    "bytes": 15226,
+    "sha256": "4a64e2053100e641be34a86581add344d130f1a35889683a72eae09a57b03e66"
+  },
+  {
+    "path": "2024_close_fit_D1_flow_ledger.csv",
+    "bytes": 4766,
+    "sha256": "e287a001c7af38d80ef7cc5a0a9e66cd8c01582854f111785d3e47de03b28f62"
+  },
+  {
+    "path": "2024_close_fit_D1_news_daily.csv",
+    "bytes": 15235,
+    "sha256": "aa3514df68a83f2f42d71766a70d0adb95e3b477e9efbdfe4aceb258fec7f46a"
+  },
+  {
+    "path": "2024_close_fit_D1_news_flow_daily.csv",
+    "bytes": 15235,
+    "sha256": "7e3e11c0313cbcc7b17db7dbd8d03fc06f65f81ca06e1e4e719dd4e52e691892"
+  },
+  {
+    "path": "2024_close_fit_D1_news_flow_ledger.csv",
+    "bytes": 4524,
+    "sha256": "017dac66af6cd9cec01e57e5abdef1e587491a5e4bc0bea6bc14800fde6e45fd"
+  },
+  {
+    "path": "2024_close_fit_D1_news_ledger.csv",
+    "bytes": 4523,
+    "sha256": "6c4745e6129461a45ee18c73b5160b69ba152b70de5670c55213f034c259eda7"
+  },
+  {
+    "path": "2024_close_fit_econ_D1_news_flow_q80_daily.csv",
+    "bytes": 15225,
+    "sha256": "f177de62a802480e39ca5b3bbe38a981d67b04dc653920efd908b33f7e907925"
+  },
+  {
+    "path": "2024_close_fit_econ_D1_news_flow_q80_ledger.csv",
+    "bytes": 5129,
+    "sha256": "49a97af70f29488e2b810d30711fc5a9fd92d2b24f7e8b91835eee2fe60cc76d"
+  },
+  {
+    "path": "2024_close_fit_sens_D1_flow_q80_daily.csv",
+    "bytes": 15230,
+    "sha256": "f9daaba3c311be3acfe746195b111d3c3f71de717dc92213992ef8632820a9cf"
+  },
+  {
+    "path": "2024_close_fit_sens_D1_flow_q80_ledger.csv",
+    "bytes": 4886,
+    "sha256": "a4f1ad7c51b37170c445189921dd76ccb67bf63781eedb1acc666f5122cf8956"
+  },
+  {
+    "path": "2024_close_fit_sens_D1_news_flow_q80_daily.csv",
+    "bytes": 15230,
+    "sha256": "f9daaba3c311be3acfe746195b111d3c3f71de717dc92213992ef8632820a9cf"
+  },
+  {
+    "path": "2024_close_fit_sens_D1_news_flow_q80_ledger.csv",
+    "bytes": 4886,
+    "sha256": "a4f1ad7c51b37170c445189921dd76ccb67bf63781eedb1acc666f5122cf8956"
+  },
+  {
+    "path": "2024_close_fit_sens_D1_q80_daily.csv",
+    "bytes": 15229,
+    "sha256": "0eaf607b3205bec9e4849f20de3513630ce599655ff2be68275bde17bceadc9e"
+  },
+  {
+    "path": "2024_close_fit_sens_D1_q80_ledger.csv",
+    "bytes": 5008,
+    "sha256": "7c00dd53cfefe9af697fdb11fb8699d9b0ce704adc582c8accfbd63df2f1b114"
+  },
+  {
+    "path": "2024_close_union_early_lr01_daily.csv",
+    "bytes": 15224,
+    "sha256": "905ae9ed1a22d1d491ec5a98ccb1f006a716d372ef4488f5a9d5f5724692c117"
+  },
+  {
+    "path": "2024_close_union_early_lr01_ledger.csv",
+    "bytes": 4767,
+    "sha256": "70f689d82effc71be3cc98f2313c3936adffe1cd949414c8feadcac6589d858d"
+  },
+  {
+    "path": "2024_morning7_baseline_daily.csv",
+    "bytes": 15206,
+    "sha256": "d479a5f8dcacca1426d4928d532732a34b6e445513f9db53a9488bc24a889712"
+  },
+  {
+    "path": "2024_morning7_baseline_ledger.csv",
+    "bytes": 6582,
+    "sha256": "d61bcf6d803a439e410e608bc5c69ac810209ef66e4249615094c459fc0290f0"
+  },
+  {
+    "path": "2024_morning7_fit_D1_flow_daily.csv",
+    "bytes": 15238,
+    "sha256": "882e5b261143b01157841603e7fc348b76789b8e42bc3c2431b39f7ebd2d33fb"
+  },
+  {
+    "path": "2024_morning7_fit_D1_flow_ledger.csv",
+    "bytes": 4764,
+    "sha256": "e8fe48de75c1096204f8168015e077a0ef544b4ee0e36c2400b955c2f56b6cec"
+  },
+  {
+    "path": "2024_morning7_fit_D1_news_daily.csv",
+    "bytes": 15553,
+    "sha256": "aeae0ef73e79f411215c69ac9ae366efd1e2c09813800a5a988c9be5747551cb"
+  },
+  {
+    "path": "2024_morning7_fit_D1_news_flow_daily.csv",
+    "bytes": 15559,
+    "sha256": "f005c64cefeffa077f6ca2c4b012d032956b99b0c828d515ced041eb83df5a8b"
+  },
+  {
+    "path": "2024_morning7_fit_D1_news_flow_ledger.csv",
+    "bytes": 4521,
+    "sha256": "f860ad21174d5529a504788d7d899843f0afa811682f0e4bf2203dc39e233177"
+  },
+  {
+    "path": "2024_morning7_fit_D1_news_ledger.csv",
+    "bytes": 4520,
+    "sha256": "a37c11db147eba845f6420d1d25f3f1e7a8005e04469ce5fe968f500f1f30517"
+  },
+  {
+    "path": "2024_morning7_fit_econ_D1_news_flow_q80_daily.csv",
+    "bytes": 15528,
+    "sha256": "42ad89faf76380e219c42789403035ff25a2e81efa79eac0643357317908718a"
+  },
+  {
+    "path": "2024_morning7_fit_econ_D1_news_flow_q80_ledger.csv",
+    "bytes": 5126,
+    "sha256": "f0d60869b89cc99efe601c6a8978859dceffb179166f1be0c3872ecf7b8d70af"
+  },
+  {
+    "path": "2024_morning7_fit_sens_D1_flow_q80_daily.csv",
+    "bytes": 15244,
+    "sha256": "d0e6af59d00ebb114e7a28084d8c8da2bbace7199a4731a61408903f679d1231"
+  },
+  {
+    "path": "2024_morning7_fit_sens_D1_flow_q80_ledger.csv",
+    "bytes": 4884,
+    "sha256": "aa0483e01ae679a2f49006620988a67979f8100ff62eb590bb69ec7482b3e708"
+  },
+  {
+    "path": "2024_morning7_fit_sens_D1_news_flow_q80_daily.csv",
+    "bytes": 15244,
+    "sha256": "d0e6af59d00ebb114e7a28084d8c8da2bbace7199a4731a61408903f679d1231"
+  },
+  {
+    "path": "2024_morning7_fit_sens_D1_news_flow_q80_ledger.csv",
+    "bytes": 4884,
+    "sha256": "aa0483e01ae679a2f49006620988a67979f8100ff62eb590bb69ec7482b3e708"
+  },
+  {
+    "path": "2024_morning7_fit_sens_D1_q80_daily.csv",
+    "bytes": 15243,
+    "sha256": "481cfaf108e3f823a851502cb56aa4737ef2c47764e722f665e7248921c1b0bf"
+  },
+  {
+    "path": "2024_morning7_fit_sens_D1_q80_ledger.csv",
+    "bytes": 5006,
+    "sha256": "f4bb110f4722767d408f83520b770de792b098a2f53cd8295cbd313a5d32fbe6"
+  },
+  {
+    "path": "2024_morning7_union_early_lr01_daily.csv",
+    "bytes": 15233,
+    "sha256": "54e586942f0f2c8e76f448104a9968927ec2ef719516e3f022c3d6e94e877c36"
+  },
+  {
+    "path": "2024_morning7_union_early_lr01_ledger.csv",
+    "bytes": 4766,
+    "sha256": "7dc4016c6752b5da57419b0b86900ee6dcc96b13c6564aed98aea8b9a35abad4"
+  },
+  {
+    "path": "2025_close_baseline_daily.csv",
+    "bytes": 14002,
+    "sha256": "c7bc9aa32b2d338eeec677c45b3f5851709f5e376d8a7779571fe721ab4f6420"
+  },
+  {
+    "path": "2025_close_baseline_ledger.csv",
+    "bytes": 6584,
+    "sha256": "e05e17ae01f329959e184a25b9f42733a9205910abf101fae33c201871b6839f"
+  },
+  {
+    "path": "2025_close_fit_D1_flow_daily.csv",
+    "bytes": 14023,
+    "sha256": "dbb2df410a69159a9eaa5ba57cbad8964abf46818733ab07b6b444d2eb846f76"
+  },
+  {
+    "path": "2025_close_fit_D1_flow_ledger.csv",
+    "bytes": 4158,
+    "sha256": "a4c340ee9527c7673f97edb8c83cb4bafcedeb3e64741a5906e66b4e49bdd5d7"
+  },
+  {
+    "path": "2025_close_fit_D1_news_daily.csv",
+    "bytes": 14028,
+    "sha256": "dc01fe34545577e475e552ee1a1bcc6e978619d9554d9ecc6184d3e77d59915a"
+  },
+  {
+    "path": "2025_close_fit_D1_news_flow_daily.csv",
+    "bytes": 14027,
+    "sha256": "f7e488e24bb15136a2dc3be41e54dbc4bcc04b75421ad7bb69df1f8d23c71a30"
+  },
+  {
+    "path": "2025_close_fit_D1_news_flow_ledger.csv",
+    "bytes": 3677,
+    "sha256": "89e5f086230592cc2288d7c7fccec757a9760411ced04377e01416e0cd24bc10"
+  },
+  {
+    "path": "2025_close_fit_D1_news_ledger.csv",
+    "bytes": 3557,
+    "sha256": "476d28db24153a0faf27ffb8c38871dbdd31c2ce7b311aa7e84473aff8b2ddea"
+  },
+  {
+    "path": "2025_close_fit_econ_D1_news_flow_q80_daily.csv",
+    "bytes": 14020,
+    "sha256": "f625bc5163b6cc70d6cbf52c6354fa76610fa1ee6f3c470c3d8ce464c31d5d89"
+  },
+  {
+    "path": "2025_close_fit_econ_D1_news_flow_q80_ledger.csv",
+    "bytes": 4527,
+    "sha256": "d3920d6ce220318d9d1d24dce7c257ea200b070232668f52123f1ec94b6f4b4b"
+  },
+  {
+    "path": "2025_close_fit_sens_D1_flow_q80_daily.csv",
+    "bytes": 14016,
+    "sha256": "775f11e3f60f2a1a98ae4217877df9a30810d6e568dd498398f4deb1a33c90db"
+  },
+  {
+    "path": "2025_close_fit_sens_D1_flow_q80_ledger.csv",
+    "bytes": 4883,
+    "sha256": "e37b8d5fe02fb750e087eb9f4ec465238b6e3ff0a804af001293be59e6a0cf29"
+  },
+  {
+    "path": "2025_close_fit_sens_D1_news_flow_q80_daily.csv",
+    "bytes": 14019,
+    "sha256": "47663286aed2a1e8920b4f58bc17f402ffd3d6e79d9151ce2d2f2c76f2dc6fd6"
+  },
+  {
+    "path": "2025_close_fit_sens_D1_news_flow_q80_ledger.csv",
+    "bytes": 4643,
+    "sha256": "e9fac60d11d21ead6f610cbbaf9b87aeee90448482f1a038bf51496b7d7eff95"
+  },
+  {
+    "path": "2025_close_fit_sens_D1_q80_daily.csv",
+    "bytes": 14014,
+    "sha256": "b983b34648f8fe37ae8d288ecc621c414d0715699244ffce1af77803475350a3"
+  },
+  {
+    "path": "2025_close_fit_sens_D1_q80_ledger.csv",
+    "bytes": 5124,
+    "sha256": "fe6edd02f67f4c116f79cdb3ee660215e873d630bd685f5b63876c61df7b13b7"
+  },
+  {
+    "path": "2025_close_union_early_lr01_daily.csv",
+    "bytes": 14020,
+    "sha256": "ff72fc0a53550286443b3ecf3af586984aaddc328e740a50285425d97649c5e5"
+  },
+  {
+    "path": "2025_close_union_early_lr01_ledger.csv",
+    "bytes": 4397,
+    "sha256": "71e01edaebaa8770e4d2f4afe45c2f36b09f27ab8d85e1dbc918c6e2c77fcba7"
+  },
+  {
+    "path": "2025_morning7_baseline_daily.csv",
+    "bytes": 14002,
+    "sha256": "bbde414e2df1416a065adf45852b284b503ffc7523e88ef6f4ce927f4127fecb"
+  },
+  {
+    "path": "2025_morning7_baseline_ledger.csv",
+    "bytes": 6583,
+    "sha256": "8c8f5ad97a474d26a38c4056e974949f1a43d2121415feae46542f8adcdf2f36"
+  },
+  {
+    "path": "2025_morning7_fit_D1_flow_daily.csv",
+    "bytes": 14023,
+    "sha256": "051b5e4263841467ddf91e16bee7e2a91e968c2bfbbc70d2321ca30af0c71b45"
+  },
+  {
+    "path": "2025_morning7_fit_D1_flow_ledger.csv",
+    "bytes": 4158,
+    "sha256": "04bb8e808c9c7c8c61a66b3b3998ab9eff399cade480d3aca6bc503c6ee63a06"
+  },
+  {
+    "path": "2025_morning7_fit_D1_news_daily.csv",
+    "bytes": 14028,
+    "sha256": "e2159945b0bc04afbe3051a6995759e64b4d50241a0614ebab180f3bfd0ffa95"
+  },
+  {
+    "path": "2025_morning7_fit_D1_news_flow_daily.csv",
+    "bytes": 14027,
+    "sha256": "943bf9c81d2ddba3ddc2887edb6813a6fea8e6005d7f495aecce47eacaec5bd1"
+  },
+  {
+    "path": "2025_morning7_fit_D1_news_flow_ledger.csv",
+    "bytes": 3676,
+    "sha256": "6d026db6daed74691eaa66d913d274a2c0ee7a83100b8f269f438a52381732ac"
+  },
+  {
+    "path": "2025_morning7_fit_D1_news_ledger.csv",
+    "bytes": 3556,
+    "sha256": "e7b5687183e6eef6d28d957d56b12a7186dc656ddf2050fecdb40fe52d3b8d55"
+  },
+  {
+    "path": "2025_morning7_fit_econ_D1_news_flow_q80_daily.csv",
+    "bytes": 14020,
+    "sha256": "5bf0a5d4913b4fd0567c766b8b86f69f0e2c8adb6cbede6da0c34ac69a989e05"
+  },
+  {
+    "path": "2025_morning7_fit_econ_D1_news_flow_q80_ledger.csv",
+    "bytes": 4527,
+    "sha256": "aa391fbd7e551b27a45feaea581e26efb82e6c3ee2822d44b806a38815513021"
+  },
+  {
+    "path": "2025_morning7_fit_sens_D1_flow_q80_daily.csv",
+    "bytes": 14016,
+    "sha256": "15eef958e776a00fa72f528c564f11d719da538f89d52fc2aedbe0040d405756"
+  },
+  {
+    "path": "2025_morning7_fit_sens_D1_flow_q80_ledger.csv",
+    "bytes": 4884,
+    "sha256": "8c0ff2c67889fad136e90b4639c109b9a133b4b0d7f6171f8b8d6c7d024c0f87"
+  },
+  {
+    "path": "2025_morning7_fit_sens_D1_news_flow_q80_daily.csv",
+    "bytes": 14019,
+    "sha256": "e7ed56b70010a34fcc3975e08c86c083006c8fa4556428b0a69e01a8cc53c397"
+  },
+  {
+    "path": "2025_morning7_fit_sens_D1_news_flow_q80_ledger.csv",
+    "bytes": 4643,
+    "sha256": "16f40893ea512bf3a76b3acab087e0300df087e325233e31c9987322f2b35385"
+  },
+  {
+    "path": "2025_morning7_fit_sens_D1_q80_daily.csv",
+    "bytes": 14014,
+    "sha256": "eb1680c922666e2bf0abd7f32e6ae5b0c45c6dd19c2f980518f40956ccc914c4"
+  },
+  {
+    "path": "2025_morning7_fit_sens_D1_q80_ledger.csv",
+    "bytes": 5126,
+    "sha256": "48a649d07680e87bf17637f8acc41714378a5797459f87ac1a7eada822543265"
+  },
+  {
+    "path": "2025_morning7_union_early_lr01_daily.csv",
+    "bytes": 14020,
+    "sha256": "a877c98741a67acf79d57677b15916484e39c6e52991303c7783f731e386f1a9"
+  },
+  {
+    "path": "2025_morning7_union_early_lr01_ledger.csv",
+    "bytes": 4396,
+    "sha256": "ecd7cec3e8678d5c7b09f583af43205c75d270a8532be4661e4f66d156bcc68b"
+  },
+  {
+    "path": "2026_close_baseline_daily.csv",
+    "bytes": 11669,
+    "sha256": "1b6bff618c9e9faa89aee1f60397e8d717dd136a163ee7a8fb51a5bf1a586c5d"
+  },
+  {
+    "path": "2026_close_baseline_ledger.csv",
+    "bytes": 11963,
+    "sha256": "8e65584da9d70f0e17e45804444ba4e96641c42696b973543175cdf227f98730"
+  },
+  {
+    "path": "2026_close_fit_D1_flow_daily.csv",
+    "bytes": 11707,
+    "sha256": "1eb3edefc9dd7bf71773cc6b9d1e04177ee5005fd3233506a9945bf58b1add91"
+  },
+  {
+    "path": "2026_close_fit_D1_flow_ledger.csv",
+    "bytes": 6984,
+    "sha256": "56ce69aa8671587cb9295d76f6ded0fcd4c5d3807e1c8f1b7a728243106c981d"
+  },
+  {
+    "path": "2026_close_fit_D1_news_daily.csv",
+    "bytes": 11705,
+    "sha256": "b96f173e36ece166cb6ed2dd686f61ab69b83083f5120c0e3c8922eb2b1c2fcf"
+  },
+  {
+    "path": "2026_close_fit_D1_news_flow_daily.csv",
+    "bytes": 11713,
+    "sha256": "f4c0407e658ba0dc9e8d9cea4c5150d5ef594db1fa690b1a7934648880df546b"
+  },
+  {
+    "path": "2026_close_fit_D1_news_flow_ledger.csv",
+    "bytes": 6870,
+    "sha256": "250c81277cbd9900c20ab42bc8e038888acfcb74fda952d0888d5309277239eb"
+  },
+  {
+    "path": "2026_close_fit_D1_news_ledger.csv",
+    "bytes": 6735,
+    "sha256": "3c4d5d9a59cf908bdb486954f2a9ca45d5f46bf160b7ebc729cc1456a59c7b84"
+  },
+  {
+    "path": "2026_close_fit_econ_D1_news_flow_q80_daily.csv",
+    "bytes": 11683,
+    "sha256": "5bc1633893fcbb771a25c232401911ee2c4c0e0aeda05caec95639b4be3a775d"
+  },
+  {
+    "path": "2026_close_fit_econ_D1_news_flow_q80_ledger.csv",
+    "bytes": 6933,
+    "sha256": "5a944165e6485e398bb762f3409099745417bb1d324a42540cb2831ca5ed9f8d"
+  },
+  {
+    "path": "2026_close_fit_sens_D1_flow_q80_daily.csv",
+    "bytes": 11699,
+    "sha256": "cd61a0cdf2e9e7d6033ecbe6fa950036a80018232444af35acc24f1edab56b15"
+  },
+  {
+    "path": "2026_close_fit_sens_D1_flow_q80_ledger.csv",
+    "bytes": 8434,
+    "sha256": "aaa3977fb41c00e8e698a14c050859a128defbd1ec3e1d13507db29e7d7b529e"
+  },
+  {
+    "path": "2026_close_fit_sens_D1_news_flow_q80_daily.csv",
+    "bytes": 11701,
+    "sha256": "b273706596831d3a590e8aa3e52b2638e1d1d3131aecba69a61906166a4c8e19"
+  },
+  {
+    "path": "2026_close_fit_sens_D1_news_flow_q80_ledger.csv",
+    "bytes": 7824,
+    "sha256": "1bfefbb3b0802223d4b78803a03dc03ca30fb063234d5a28eb43198720b41c06"
+  },
+  {
+    "path": "2026_close_fit_sens_D1_q80_daily.csv",
+    "bytes": 11693,
+    "sha256": "f77c0890f09ec52436510c5d434b953a0995ce5a3dcd6b5fd0c2330de9b9c203"
+  },
+  {
+    "path": "2026_close_fit_sens_D1_q80_ledger.csv",
+    "bytes": 8551,
+    "sha256": "e4f612348a3bcccefac6e90bd2b0948e701a84fb891051a3ed33b8b3ffd10632"
+  },
+  {
+    "path": "2026_close_union_early_lr01_daily.csv",
+    "bytes": 11704,
+    "sha256": "0706ab1c2638bcfffe63a133823201f6d14396c1d99a156a0eedcb4c90f44956"
+  },
+  {
+    "path": "2026_close_union_early_lr01_ledger.csv",
+    "bytes": 6976,
+    "sha256": "1e1b837393f60c2cc8d41632d2807c4c052ee87ddcb335fe25e737fdaa0368aa"
+  },
+  {
+    "path": "2026_morning7_baseline_daily.csv",
+    "bytes": 11708,
+    "sha256": "efac1a00fe27f64b6f23b2b90949de20879075df389598e99ce61111c1677e58"
+  },
+  {
+    "path": "2026_morning7_baseline_ledger.csv",
+    "bytes": 12013,
+    "sha256": "3fe3677793f68df10f0945e6b95e550354b14f5f81f768b59b01d42912637970"
+  },
+  {
+    "path": "2026_morning7_fit_D1_flow_daily.csv",
+    "bytes": 11726,
+    "sha256": "47cb7caf0864be0b6314583125e230bb52bdd878e63177cf46c131c02740267b"
+  },
+  {
+    "path": "2026_morning7_fit_D1_flow_ledger.csv",
+    "bytes": 6991,
+    "sha256": "d52fdb7bb0ac9336c46bf2f05988666cbf5e41003938c806c7dd8aba17b5884a"
+  },
+  {
+    "path": "2026_morning7_fit_D1_news_daily.csv",
+    "bytes": 11722,
+    "sha256": "e005a54b3266aac94d27364dc178892214fb55cb4789554365d955a6f77103e3"
+  },
+  {
+    "path": "2026_morning7_fit_D1_news_flow_daily.csv",
+    "bytes": 11731,
+    "sha256": "65963ccb70eb9382971105f9936da51dfa18b8b6945832b211caad34f053b0a4"
+  },
+  {
+    "path": "2026_morning7_fit_D1_news_flow_ledger.csv",
+    "bytes": 6881,
+    "sha256": "980b139a0c7950aede985697ad6533c67b069b773ca55bf2e067fd50839a6b8a"
+  },
+  {
+    "path": "2026_morning7_fit_D1_news_ledger.csv",
+    "bytes": 6739,
+    "sha256": "49393c12530f63845f93bdcb2fe6d1cf9f846f2f916273a8c13f471c57cccd79"
+  },
+  {
+    "path": "2026_morning7_fit_econ_D1_news_flow_q80_daily.csv",
+    "bytes": 11709,
+    "sha256": "6f774199b934cdd31bf27d4072f7e63a70985451e65d66e9afdec694cf5d0a6c"
+  },
+  {
+    "path": "2026_morning7_fit_econ_D1_news_flow_q80_ledger.csv",
+    "bytes": 6959,
+    "sha256": "86f284c1867d4eeffbf7d6aea6b61d958a2191c24e89000f5dc8a50c44f639f9"
+  },
+  {
+    "path": "2026_morning7_fit_sens_D1_flow_q80_daily.csv",
+    "bytes": 11720,
+    "sha256": "64e105ffcd74e922f95156b6e7026c2aec1055ff5dca25908e51a37d77f5c310"
+  },
+  {
+    "path": "2026_morning7_fit_sens_D1_flow_q80_ledger.csv",
+    "bytes": 8458,
+    "sha256": "777902e2f29b0976b1354b014c4cf3c91a2b4dcf390f973378f6e7cdd234ccda"
+  },
+  {
+    "path": "2026_morning7_fit_sens_D1_news_flow_q80_daily.csv",
+    "bytes": 11723,
+    "sha256": "ee071fccc42ee7d9ca9e0fe64ffc3ee95322ec550dc69f2ff2731d0d16431b1b"
+  },
+  {
+    "path": "2026_morning7_fit_sens_D1_news_flow_q80_ledger.csv",
+    "bytes": 7847,
+    "sha256": "25e02fd38f0453e97f21405cc7bdf9a05d05c94e100b3538315c6f6708e6bd37"
+  },
+  {
+    "path": "2026_morning7_fit_sens_D1_q80_daily.csv",
+    "bytes": 11714,
+    "sha256": "d7bedb8ceb51729273e53cd87f4cc5fdec3452778135fb5973b3792e6c711b1c"
+  },
+  {
+    "path": "2026_morning7_fit_sens_D1_q80_ledger.csv",
+    "bytes": 8572,
+    "sha256": "c5495cb6e72cc948dd00527cfa94845939c2bee8e83b96906fc9848446a55c11"
+  },
+  {
+    "path": "2026_morning7_union_early_lr01_daily.csv",
+    "bytes": 11722,
+    "sha256": "2ac1c2274151edbb78d2c2feb5f43cb2271c7015d8fa420877acc95e11a1bfda"
+  },
+  {
+    "path": "2026_morning7_union_early_lr01_ledger.csv",
+    "bytes": 6985,
+    "sha256": "0e35eb3f5f8713c7a0fc3dff55ffb0898d5f54268f4168408f5ab4bd8036c55e"
+  },
+  {
+    "path": "306笔_全年同卖法价格.csv",
+    "bytes": 62407,
+    "sha256": "758a8525cf3ab9b93f058ab7939583f9ed2c3eb03a6251e7daea4e85c448273b"
+  },
+  {
+    "path": "306笔_逐方案经济归因.csv",
+    "bytes": 728215,
+    "sha256": "9643fe850c7c8f1dd58ba8cc227c765807f54513d8029c26b8aa1989925d92d8"
+  },
+  {
+    "path": "README.md",
+    "bytes": 7525,
+    "sha256": "112c6fc26f1597c2bb32665302846b62ed7c170f448b27c7278b4ed71710b22e"
+  },
+  {
+    "path": "joined_306.pkl",
+    "bytes": 55953,
+    "sha256": "0f953e31e8ed57fd6167f8092b8e5e304d0de5c8389acc07659c0f2dafec92c8"
+  },
+  {
+    "path": "minute_source_manifest.json",
+    "bytes": 114166,
+    "sha256": "0a146a10dc5fba309da9808f5a7315118bb9dcd7a78d3c3372309e97135dde93"
+  },
+  {
+    "path": "prepare.py",
+    "bytes": 5620,
+    "sha256": "7f6e58d41871b5d6c8fa5c502b44566baf9ad6d4bf744fb761a04c7bfde1247d"
+  },
+  {
+    "path": "raw/outputs/stock_automl/mk_1m_compact_2024/2024-11-06.csv.zst",
+    "bytes": 21592486,
+    "sha256": "28b5c3594a5165c9aa860880a0f56b1d2fd646ec182827f7d7e9d5fc68a0a088"
+  },
+  {
+    "path": "raw/outputs/stock_automl/mk_1m_compact_2024/2024-11-12.csv.zst",
+    "bytes": 21763850,
+    "sha256": "feaaad2fb8fd38f26251421e76f6ce6d9066c416d6fb53e17657d18be2bd6699"
+  },
+  {
+    "path": "raw/outputs/stock_automl/mk_1m_compact_2024/2024-11-13.csv.zst",
+    "bytes": 21426396,
+    "sha256": "9f04123c07bf83720f44a84cb099818ab4cf7e4ac4b04d1954fba345df7651e2"
+  },
+  {
+    "path": "raw/outputs/stock_automl/mk_1m_compact_2024/2024-11-14.csv.zst",
+    "bytes": 21242978,
+    "sha256": "79533c484caba399e7e729332232fcc68a046ba0ab0bdfafbfdd3dc93b4bb7c9"
+  },
+  {
+    "path": "raw/outputs/stock_automl/mk_1m_compact_2024/2024-11-19.csv.zst",
+    "bytes": 21151171,
+    "sha256": "6e1db691c4cff4613673744b3a15ff50b791d151233052bfd55342439e6bf918"
+  },
+  {
+    "path": "raw/outputs/stock_automl/mk_1m_compact_2024/2024-11-21.csv.zst",
+    "bytes": 20933265,
+    "sha256": "20d2969e8837ec1bfec328ec760f1843f2bf96dbaa78b5db5c8fa25f4b2e2433"
+  },
+  {
+    "path": "raw/outputs/stock_automl/mk_1m_compact_2024/2024-12-02.csv.zst",
+    "bytes": 21071986,
+    "sha256": "84e143187a8f9d9261b50d95ee3d19abc50da89c58f700515df0716d582bf3f4"
+  },
+  {
+    "path": "raw/outputs/stock_automl/mk_1m_compact_2025/2025-10-15.csv.zst",
+    "bytes": 16151852,
+    "sha256": "1d9962c34a31d37eb83badde52555fe444351d3d662680d94660af941dda274c"
+  },
+  {
+    "path": "raw/outputs/stock_automl/mk_1m_compact_2025/2025-10-22.csv.zst",
+    "bytes": 15652017,
+    "sha256": "7888b2b01e3fcfe6afbfb24d17cd85a0f9abe137decd422638eb11d123c30de8"
+  },
+  {
+    "path": "raw/outputs/stock_automl/mk_1m_compact_2025/2025-10-24.csv.zst",
+    "bytes": 15803610,
+    "sha256": "e0e1dd5f6ec6075863af5c74984c3fdfea5c2f477d0ce9648571931726ea00cb"
+  },
+  {
+    "path": "raw/outputs/stock_automl/mk_1m_compact_2025/2025-10-28.csv.zst",
+    "bytes": 16034353,
+    "sha256": "c58002dcd3c7093ad07777be9a8cc48c9bf229095b7ee592327c1821c1fc1189"
+  },
+  {
+    "path": "registration_payload.json",
+    "bytes": 844,
+    "sha256": "efbd36ea248f5eeb113f28f42968c0e3a6480bee5d0a55e2446b9872586a49b0"
+  },
+  {
+    "path": "replay.py",
+    "bytes": 8226,
+    "sha256": "53e80475ab91dee58387ead0040970225faf086a3c09d531e389257b2c5263a7"
+  },
+  {
+    "path": "report.log",
+    "bytes": 1784,
+    "sha256": "27a38051c15c9e1496070aa047477bbe2f310367ad77d51b9b36a1e76ae538a3"
+  },
+  {
+    "path": "report.py",
+    "bytes": 10886,
+    "sha256": "d6587a870176f00c156c476e6742b169b4cb06b2656017523b1c30d2eab451af"
+  },
+  {
+    "path": "verification.json",
+    "bytes": 501,
+    "sha256": "6781fb3c663753538ae7b9b0066914e0fa63af4dfabb7073fb13991cb91c2245"
+  },
+  {
+    "path": "全期_close_baseline_daily.csv",
+    "bytes": 72944,
+    "sha256": "70baf28b34f01f7c1b95d48a38d9e927775b64db81417cccb0ea356f73819638"
+  },
+  {
+    "path": "全期_close_baseline_ledger.csv",
+    "bytes": 37154,
+    "sha256": "275811002937f284e8538b94e6182027c6fc558d35192c4a5795ab8c3f53c997"
+  },
+  {
+    "path": "全期_close_fit_D1_flow_daily.csv",
+    "bytes": 73799,
+    "sha256": "cd578d86655f70caa982a0621957ccde3cf5f98dc4522a1279c28c6d881e6c83"
+  },
+  {
+    "path": "全期_close_fit_D1_flow_ledger.csv",
+    "bytes": 25477,
+    "sha256": "8bb27203fba034d3d31279e5ff8093abbf1053e6fadee77f779c2526f40c7378"
+  },
+  {
+    "path": "全期_close_fit_D1_news_daily.csv",
+    "bytes": 73749,
+    "sha256": "cb3090c196b67a8c0b01f55c2d224795a7d53131095f7de45056420abd568584"
+  },
+  {
+    "path": "全期_close_fit_D1_news_flow_daily.csv",
+    "bytes": 73727,
+    "sha256": "73a2efeb3617adbbd1176f8ddf9bea7210028df755d0f69087cafab3656046e5"
+  },
+  {
+    "path": "全期_close_fit_D1_news_flow_ledger.csv",
+    "bytes": 24811,
+    "sha256": "4ca2b5b0e4b9ef7719e72cd2d84383561b8aa675c10bf0099e95caa9bc9963c0"
+  },
+  {
+    "path": "全期_close_fit_D1_news_ledger.csv",
+    "bytes": 24567,
+    "sha256": "1b323ff35be275f5f877eb112eb1f14d043ea3d43d92939ab02d1c4402d5c494"
+  },
+  {
+    "path": "全期_close_fit_econ_D1_news_flow_q80_daily.csv",
+    "bytes": 73666,
+    "sha256": "7662abafbf49ba71f65181317dff0f6af17adea8b700fe1b4ff61d2767a313ff"
+  },
+  {
+    "path": "全期_close_fit_econ_D1_news_flow_q80_ledger.csv",
+    "bytes": 26667,
+    "sha256": "641c035d15d068e5b79972ddff4eaac972b3c2565b2d8157023ff2527d01981e"
+  },
+  {
+    "path": "全期_close_fit_sens_D1_flow_q80_daily.csv",
+    "bytes": 73795,
+    "sha256": "a3a998bbf79ab77140c1b0b723c0986717e51065b5b3915633a6486a31e7fabc"
+  },
+  {
+    "path": "全期_close_fit_sens_D1_flow_q80_ledger.csv",
+    "bytes": 28552,
+    "sha256": "57a6893c56a994b8d77e7402bba01b80752feffe9cfd6a7e9919f360fe49f4c7"
+  },
+  {
+    "path": "全期_close_fit_sens_D1_news_flow_q80_daily.csv",
+    "bytes": 73773,
+    "sha256": "ceae82c26d55fb5e22dabec50539f48aeb84bd432551f5cb029a5da35c7d8a91"
+  },
+  {
+    "path": "全期_close_fit_sens_D1_news_flow_q80_ledger.csv",
+    "bytes": 27657,
+    "sha256": "6ce6c3be1c57abd411d64977f7a4c21454f03220a4689042bb53816ba6ca388c"
+  },
+  {
+    "path": "全期_close_fit_sens_D1_q80_daily.csv",
+    "bytes": 73723,
+    "sha256": "723899f5e942743448a9086faf12023069bb32126b75a3d2328a8fe3749b17e8"
+  },
+  {
+    "path": "全期_close_fit_sens_D1_q80_ledger.csv",
+    "bytes": 28863,
+    "sha256": "30c1cd8c1c62ea5ded5fef8196a61f41442429e97f64198e0c4beea48530064a"
+  },
+  {
+    "path": "全期_close_union_early_lr01_daily.csv",
+    "bytes": 73795,
+    "sha256": "0c93cde01b5df0adf7235fffe3acddbf3d3fadc4b0dd814435335270e8c6546b"
+  },
+  {
+    "path": "全期_close_union_early_lr01_ledger.csv",
+    "bytes": 25708,
+    "sha256": "527b19045e9d6de4060a81fab9d247597530b521d3c8829c4459fa3a7070450d"
+  },
+  {
+    "path": "全期_morning7_baseline_daily.csv",
+    "bytes": 73250,
+    "sha256": "eca92e1d84b2fb456a8c52a5be0e12649731e6c1f68b154a588df4f74c912193"
+  },
+  {
+    "path": "全期_morning7_baseline_ledger.csv",
+    "bytes": 37270,
+    "sha256": "036f357b2e59b86b9efd6e1fbdebd3ff8bcd1f741e55c8fff4a14e28e5fe8e7a"
+  },
+  {
+    "path": "全期_morning7_fit_D1_flow_daily.csv",
+    "bytes": 73759,
+    "sha256": "5d461ca742b5cf7e7c5d1845451d6655a7fa628b4889a2bc46a829117d3d9475"
+  },
+  {
+    "path": "全期_morning7_fit_D1_flow_ledger.csv",
+    "bytes": 25440,
+    "sha256": "324df1c743e80751b221f387255ecd70148ff3abb285a1e6137bf11265492be8"
+  },
+  {
+    "path": "全期_morning7_fit_D1_news_daily.csv",
+    "bytes": 73748,
+    "sha256": "6fe92f0eaa56a70315596e772b0e7f166c3d0da37fba940e3af4d7a48397badc"
+  },
+  {
+    "path": "全期_morning7_fit_D1_news_flow_daily.csv",
+    "bytes": 73751,
+    "sha256": "1a07fdb4b95c37a6763210d946b10d203897d29cdb7030480aba8048eec08db8"
+  },
+  {
+    "path": "全期_morning7_fit_D1_news_flow_ledger.csv",
+    "bytes": 24805,
+    "sha256": "d043e2cf121ac1572cd1d670e0f7b79077d484527fdf214342d1d90f3ce41c4c"
+  },
+  {
+    "path": "全期_morning7_fit_D1_news_ledger.csv",
+    "bytes": 24560,
+    "sha256": "3b689f29da4dd1bbfa5ed324ceef0870a7dd1d80631928e99c3bfc634f25b46c"
+  },
+  {
+    "path": "全期_morning7_fit_econ_D1_news_flow_q80_daily.csv",
+    "bytes": 73454,
+    "sha256": "ac2aa705212fb356d5fd3a6958af80ff098f9be595c711a4dfdb7829a552f152"
+  },
+  {
+    "path": "全期_morning7_fit_econ_D1_news_flow_q80_ledger.csv",
+    "bytes": 26664,
+    "sha256": "5433392b98b480ffedb74fe26c6fac83c6e90cd533596e678bb15360c172d478"
+  },
+  {
+    "path": "全期_morning7_fit_sens_D1_flow_q80_daily.csv",
+    "bytes": 73764,
+    "sha256": "9c71f526bc744300697c03036e3fc1af2f18ce5ee561530e40209e7031b08990"
+  },
+  {
+    "path": "全期_morning7_fit_sens_D1_flow_q80_ledger.csv",
+    "bytes": 28512,
+    "sha256": "b7531cd7de3372bac4dff0a7a8ed717debf95b64d665f50bc1de77cda47ef354"
+  },
+  {
+    "path": "全期_morning7_fit_sens_D1_news_flow_q80_daily.csv",
+    "bytes": 73769,
+    "sha256": "5ece653abe9a35e7fa7772d76d399bb219d71e95fe894658fd63e7ee08296111"
+  },
+  {
+    "path": "全期_morning7_fit_sens_D1_news_flow_q80_ledger.csv",
+    "bytes": 27643,
+    "sha256": "c02dfceb37b4b473734dfdb642bbd1629c29f568d9167801da1b2c0facf39524"
+  },
+  {
+    "path": "全期_morning7_fit_sens_D1_q80_daily.csv",
+    "bytes": 73498,
+    "sha256": "f45f29fb3b05fd16e661e707d9a80a847f44f57062ed18d60a77838ab20f89b3"
+  },
+  {
+    "path": "全期_morning7_fit_sens_D1_q80_ledger.csv",
+    "bytes": 28861,
+    "sha256": "0ec02ebfb60abc57e4a4e29d424f4d2f8250ee9b27a101237584c8cf94c6929a"
+  },
+  {
+    "path": "全期_morning7_union_early_lr01_daily.csv",
+    "bytes": 73782,
+    "sha256": "351e8bb75b5b9c61a20962ef815a2957ef2c744ee84dc38c89789c3ffd97bcbb"
+  },
+  {
+    "path": "全期_morning7_union_early_lr01_ledger.csv",
+    "bytes": 25677,
+    "sha256": "4b27320cc5ee0605221b920d7f25a3355168c3502cfd28cb3ae41f8ef04d2e76"
+  },
+  {
+    "path": "全期连续账户_全部方案.csv",
+    "bytes": 2513,
+    "sha256": "a12f1634e537335705b873147051737e58f6e1d755530e8c73620548850991a7"
+  },
+  {
+    "path": "全期连续账户_逐自然年.csv",
+    "bytes": 8572,
+    "sha256": "dc84d44a7378061289384cb4f329014b5d0712e9cb8ca9a2b7e19d66eef79edf"
+  },
+  {
+    "path": "年度对比_简表.csv",
+    "bytes": 4490,
+    "sha256": "7278d9c3eed1d0d9f91bdce34b5266d6dcb3c343351d0b6473869434a31aac91"
+  },
+  {
+    "path": "逐年D3估值敏感性_非成交.csv",
+    "bytes": 1550,
+    "sha256": "ed0a6a59cb9e7b87d4905e6df73a5d851f7d47b17b019701fc64c55c55e94799"
+  },
+  {
+    "path": "逐年独立重置_全部方案.csv",
+    "bytes": 14281,
+    "sha256": "371cf6f249af62dea796cb5dd15f04d1583fc8c403b141d1d36ec6fd3380539d"
+  }
+]

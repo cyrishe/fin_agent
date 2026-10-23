@@ -1,0 +1,9 @@
+{
+  "total": 49,
+  "full_day_locked": 14,
+  "whole_afternoon_locked": 23,
+  "morning_open_but_afternoon_locked": 9,
+  "afternoon_opened": 26,
+  "volume_positive_all": true,
+  "price_open_but_no_volume_count": 0
+}

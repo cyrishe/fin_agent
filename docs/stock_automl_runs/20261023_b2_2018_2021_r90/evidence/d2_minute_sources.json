@@ -1,0 +1,4142 @@
+[
+  {
+    "day": "2017-05-05",
+    "path": "/data/cyris/tushare_market_data/2017/20170505.csv.gz",
+    "sha256": "988929150154597ce832240d853f32e4d5ecf1f75599e665df7bc7b5af19499b",
+    "bars": 713360
+  },
+  {
+    "day": "2017-05-08",
+    "path": "/data/cyris/tushare_market_data/2017/20170508.csv.gz",
+    "sha256": "1b5617d107fe712b8bcebc5ac1ced0e732bd03bbe2f251d8c92fbcd3e7e8dca7",
+    "bars": 713119
+  },
+  {
+    "day": "2017-05-10",
+    "path": "/data/cyris/tushare_market_data/2017/20170510.csv.gz",
+    "sha256": "514ea6849f90086d891b3db31974e0c1e7e27d94e5eaae1affb0b067e8197672",
+    "bars": 713842
+  },
+  {
+    "day": "2017-05-17",
+    "path": "/data/cyris/tushare_market_data/2017/20170517.csv.gz",
+    "sha256": "3bddc66566de2bd2f582ea7f06401ccce81056f1ac95b5cc5d2857c541289c73",
+    "bars": 713119
+  },
+  {
+    "day": "2017-05-19",
+    "path": "/data/cyris/tushare_market_data/2017/20170519.csv.gz",
+    "sha256": "49a7759eb4586382e8a312ea2f00e2c4b96e615e221be51b107c691c3d5a12e1",
+    "bars": 716975
+  },
+  {
+    "day": "2017-05-22",
+    "path": "/data/cyris/tushare_market_data/2017/20170522.csv.gz",
+    "sha256": "08dc51793a4b7fb61c5ac7821a5ce87dc9aef4eeeaa9766ad4a4a6cd8502376f",
+    "bars": 717216
+  },
+  {
+    "day": "2017-05-25",
+    "path": "/data/cyris/tushare_market_data/2017/20170525.csv.gz",
+    "sha256": "d64714ad0b1fb1158ce896641801d0c4fa7d54e8578c1befc152331ddff16bf7",
+    "bars": 717939
+  },
+  {
+    "day": "2017-06-07",
+    "path": "/data/cyris/tushare_market_data/2017/20170607.csv.gz",
+    "sha256": "dc2af2470931d7950448b140da4ff114fc5c954b1a59b77778541b5d4a28f7a0",
+    "bars": 716493
+  },
+  {
+    "day": "2017-06-08",
+    "path": "/data/cyris/tushare_market_data/2017/20170608.csv.gz",
+    "sha256": "07f2798e01acff20600c6e4f70098b3f271955a7a295905f8fc1d71b45d51a9c",
+    "bars": 716734
+  },
+  {
+    "day": "2017-06-13",
+    "path": "/data/cyris/tushare_market_data/2017/20170613.csv.gz",
+    "sha256": "7a685e457e488128fe8474f0197511c59f1e74f3abdcbf3b25ab33cfc979f857",
+    "bars": 719144
+  },
+  {
+    "day": "2017-06-16",
+    "path": "/data/cyris/tushare_market_data/2017/20170616.csv.gz",
+    "sha256": "d89d6790eace041c5428ec271ec417fbefd3f5c7d6ca534d875f556dc580c209",
+    "bars": 723241
+  },
+  {
+    "day": "2017-06-20",
+    "path": "/data/cyris/tushare_market_data/2017/20170620.csv.gz",
+    "sha256": "26843be3b146595e0b691ab13094694cf9556a8575a93cee4fe02a9f6ecf0ce3",
+    "bars": 724928
+  },
+  {
+    "day": "2017-06-21",
+    "path": "/data/cyris/tushare_market_data/2017/20170621.csv.gz",
+    "sha256": "f9f39851afbbf7249856e70a4bedafd3d2604deae87ff2ded6411c79f058b9a3",
+    "bars": 726615
+  },
+  {
+    "day": "2017-06-23",
+    "path": "/data/cyris/tushare_market_data/2017/20170623.csv.gz",
+    "sha256": "377ade7d522fbde2cdb879350b7f7f9ec00fc8965e5a7b5ad5c7ae277dd623e1",
+    "bars": 727097
+  },
+  {
+    "day": "2017-06-28",
+    "path": "/data/cyris/tushare_market_data/2017/20170628.csv.gz",
+    "sha256": "329f91228c06f243c5742c89bbe57e115104b8e31767ce00bbdcc88d8dc4ef93",
+    "bars": 727579
+  },
+  {
+    "day": "2017-07-03",
+    "path": "/data/cyris/tushare_market_data/2017/20170703.csv.gz",
+    "sha256": "57c45bde4c4014d72fbb6e6a4069365d10f6dfd03fdf5b1fa6f2ed77e93205d1",
+    "bars": 726856
+  },
+  {
+    "day": "2017-07-10",
+    "path": "/data/cyris/tushare_market_data/2017/20170710.csv.gz",
+    "sha256": "76d030a393fbff427f99afb85fea76bb6c2d962c75a4e5f395c08d46a0142e37",
+    "bars": 727579
+  },
+  {
+    "day": "2017-07-12",
+    "path": "/data/cyris/tushare_market_data/2017/20170712.csv.gz",
+    "sha256": "6324a8cb32719e1934250a820fa4a8e3668ba371e037df1a664412464a3af56b",
+    "bars": 729025
+  },
+  {
+    "day": "2017-07-13",
+    "path": "/data/cyris/tushare_market_data/2017/20170713.csv.gz",
+    "sha256": "49022687269d4b832ef269c5aadfd70dc2f2878f90c6e1da53cae8f39a11724a",
+    "bars": 728302
+  },
+  {
+    "day": "2017-07-18",
+    "path": "/data/cyris/tushare_market_data/2017/20170718.csv.gz",
+    "sha256": "a7156922429a0019759c01addb0c132a5cc301ed71e91d2d24c3f616588b759c",
+    "bars": 726856
+  },
+  {
+    "day": "2017-07-27",
+    "path": "/data/cyris/tushare_market_data/2017/20170727.csv.gz",
+    "sha256": "51f30d9465c0d9030b1450e651c975cf5c41fc6dcab9579ba8599e195d2a2afd",
+    "bars": 733122
+  },
+  {
+    "day": "2017-08-02",
+    "path": "/data/cyris/tushare_market_data/2017/20170802.csv.gz",
+    "sha256": "18c5b11a65fa8e0f3833d98ae8fe0c114319d7141b23d268df17d97c0bdae9e0",
+    "bars": 737701
+  },
+  {
+    "day": "2017-08-04",
+    "path": "/data/cyris/tushare_market_data/2017/20170804.csv.gz",
+    "sha256": "3816306a2894cb4f086a4e79acbc6f08d7467ebcfe27ffe6392c01b85c87dec3",
+    "bars": 737460
+  },
+  {
+    "day": "2017-08-08",
+    "path": "/data/cyris/tushare_market_data/2017/20170808.csv.gz",
+    "sha256": "65e7aa9abf8f51e38d4b3be83c2035053f31198b807bce59c3bd6b8e5301fade",
+    "bars": 739629
+  },
+  {
+    "day": "2017-08-15",
+    "path": "/data/cyris/tushare_market_data/2017/20170815.csv.gz",
+    "sha256": "3b4f13010267c0cde232cc3723f7370a76003b7e91bb5c90ef937b3b849b7726",
+    "bars": 743726
+  },
+  {
+    "day": "2017-08-16",
+    "path": "/data/cyris/tushare_market_data/2017/20170816.csv.gz",
+    "sha256": "a53611debd18a525eaeca982bedc7940bf49b2ab17e38a9e6cf188c87853b08b",
+    "bars": 744690
+  },
+  {
+    "day": "2017-08-17",
+    "path": "/data/cyris/tushare_market_data/2017/20170817.csv.gz",
+    "sha256": "e47c069a049f64bd46ffa8c175150ddad335464e4c676271e1729dd2b8a8abe5",
+    "bars": 743485
+  },
+  {
+    "day": "2017-08-31",
+    "path": "/data/cyris/tushare_market_data/2017/20170831.csv.gz",
+    "sha256": "3240d25c146cb3e38576ddb1d2f072616b3c2e5e17e7412121fa53e3278377d0",
+    "bars": 749510
+  },
+  {
+    "day": "2017-09-05",
+    "path": "/data/cyris/tushare_market_data/2017/20170905.csv.gz",
+    "sha256": "038c1bf1bf38fb01a98cd3a7dc2036510b81734d44283a4d797d1597d993baa2",
+    "bars": 754089
+  },
+  {
+    "day": "2017-09-07",
+    "path": "/data/cyris/tushare_market_data/2017/20170907.csv.gz",
+    "sha256": "2e0f414e314ba3d697ec5351e061e9b0dd366e159ddfffcf390a3ef0802bec10",
+    "bars": 753607
+  },
+  {
+    "day": "2017-09-19",
+    "path": "/data/cyris/tushare_market_data/2017/20170919.csv.gz",
+    "sha256": "2e35d5030b6e3d913f15cba8006f8cb4044ce82f7d4e883087a42995ad8beeb0",
+    "bars": 757222
+  },
+  {
+    "day": "2017-10-09",
+    "path": "/data/cyris/tushare_market_data/2017/20171009.csv.gz",
+    "sha256": "139e5d6562436fd266bdb8e2ac24fc62fac308dfcabbe3cdca65bf7521503444",
+    "bars": 764934
+  },
+  {
+    "day": "2017-10-26",
+    "path": "/data/cyris/tushare_market_data/2017/20171026.csv.gz",
+    "sha256": "76d03d105c9dceb671c7d32672073703787d59b37299c14d3e2ff23ee31ffeb6",
+    "bars": 769031
+  },
+  {
+    "day": "2017-10-31",
+    "path": "/data/cyris/tushare_market_data/2017/20171031.csv.gz",
+    "sha256": "d2b078f182029df2a8a1bd4be7b7403fedb3c44894eab8a258bd8f9795c7eceb",
+    "bars": 773369
+  },
+  {
+    "day": "2017-11-16",
+    "path": "/data/cyris/tushare_market_data/2017/20171116.csv.gz",
+    "sha256": "9ad6f94538cef51ddd4a6556cdd551d068eaf5d341583881351b134dc5d57d46",
+    "bars": 778912
+  },
+  {
+    "day": "2017-11-20",
+    "path": "/data/cyris/tushare_market_data/2017/20171120.csv.gz",
+    "sha256": "bef5b35eb9158972c42746c77a21c683d0f7e994c619d973ef727ec1b3fabbaf",
+    "bars": 780117
+  },
+  {
+    "day": "2017-11-22",
+    "path": "/data/cyris/tushare_market_data/2017/20171122.csv.gz",
+    "sha256": "c86358daf0e655524ed6a5650a80ef00bfb869f25acbfba934ca6051353f026b",
+    "bars": 780117
+  },
+  {
+    "day": "2017-11-30",
+    "path": "/data/cyris/tushare_market_data/2017/20171130.csv.gz",
+    "sha256": "7a30a2090cf24c3f0886737b194e3b80910441eb586a3ccf28f355517c1cd4b6",
+    "bars": 778189
+  },
+  {
+    "day": "2017-12-05",
+    "path": "/data/cyris/tushare_market_data/2017/20171205.csv.gz",
+    "sha256": "4f82b2d5ddb890d1ae319e39a11c6334f3543f97278a9f0e63628e4365c0b28f",
+    "bars": 779153
+  },
+  {
+    "day": "2017-12-08",
+    "path": "/data/cyris/tushare_market_data/2017/20171208.csv.gz",
+    "sha256": "f2c9bb8d6e0dd4e8da0a30544b856ff80dcb0589d18d354724f82189afe5ee16",
+    "bars": 778189
+  },
+  {
+    "day": "2017-12-14",
+    "path": "/data/cyris/tushare_market_data/2017/20171214.csv.gz",
+    "sha256": "263ce9f29df0a96f1c933bb4a03c7891da8ec484acea101a0172490e773d5985",
+    "bars": 777948
+  },
+  {
+    "day": "2017-12-19",
+    "path": "/data/cyris/tushare_market_data/2017/20171219.csv.gz",
+    "sha256": "c1fddcefb79f35d5edfa8867b5d13ec290198b7e0e2e269b8e9a2b05438f71b3",
+    "bars": 779394
+  },
+  {
+    "day": "2017-12-21",
+    "path": "/data/cyris/tushare_market_data/2017/20171221.csv.gz",
+    "sha256": "40f225ceb67cd9d24db1b45281b7b69fb8c0a95a82ff5ba6314d867daa976a9d",
+    "bars": 780599
+  },
+  {
+    "day": "2017-12-22",
+    "path": "/data/cyris/tushare_market_data/2017/20171222.csv.gz",
+    "sha256": "c8a02db9cdb47836748727334e43b8ac93a3c84ca6302473d02caf2546baa1e8",
+    "bars": 781322
+  },
+  {
+    "day": "2017-12-25",
+    "path": "/data/cyris/tushare_market_data/2017/20171225.csv.gz",
+    "sha256": "e4c6c9b515a39ca0345bfc79a435012ef502086339eb2683859259f6b88f4d8c",
+    "bars": 782286
+  },
+  {
+    "day": "2017-12-27",
+    "path": "/data/cyris/tushare_market_data/2017/20171227.csv.gz",
+    "sha256": "2b3b280cab017bd0200dc59d08fd6d761adc2ef4672e8dff5a232e1fb3088666",
+    "bars": 782045
+  },
+  {
+    "day": "2017-12-28",
+    "path": "/data/cyris/tushare_market_data/2017/20171228.csv.gz",
+    "sha256": "e909c1223183d3d38436c7890cb36e3caef6e11b0615b872d7a10c42ecdb98ce",
+    "bars": 780840
+  },
+  {
+    "day": "2018-01-03",
+    "path": "/data/cyris/tushare_market_data/2018/20180103.csv.gz",
+    "sha256": "b729e3be097e0680a749e76e86bf08778a66fd1c525364fce7433ac320c2f4de",
+    "bars": 784455
+  },
+  {
+    "day": "2018-01-19",
+    "path": "/data/cyris/tushare_market_data/2018/20180119.csv.gz",
+    "sha256": "e1389e2e79f776a2845393b60a0744730d1760102ed36a09a9487e5646a2550d",
+    "bars": 788793
+  },
+  {
+    "day": "2018-01-23",
+    "path": "/data/cyris/tushare_market_data/2018/20180123.csv.gz",
+    "sha256": "2ba649d1721b6ad37bddd8c9269f5a5d2c6629c643d436bae9c87b9540d83138",
+    "bars": 787588
+  },
+  {
+    "day": "2018-02-02",
+    "path": "/data/cyris/tushare_market_data/2018/20180202.csv.gz",
+    "sha256": "d3f3b0775737ac43fc5b47cbbc511b8cad66e7b5458745a318900a370fab9697",
+    "bars": 773610
+  },
+  {
+    "day": "2018-02-06",
+    "path": "/data/cyris/tushare_market_data/2018/20180206.csv.gz",
+    "sha256": "90f28d841e7d2c8db01c325d7e7aa53b50390f03885be27f312dc1cdd453914f",
+    "bars": 760596
+  },
+  {
+    "day": "2018-02-13",
+    "path": "/data/cyris/tushare_market_data/2018/20180213.csv.gz",
+    "sha256": "816cf75b45e3b5d65bddaaa680a1cd73f13ae11a1c500f9c6e0d75331df1d0a7",
+    "bars": 763488
+  },
+  {
+    "day": "2018-02-23",
+    "path": "/data/cyris/tushare_market_data/2018/20180223.csv.gz",
+    "sha256": "a1330355d66c8ae2601ec280f000ff63effbd63914a873c764f642dd996fd981",
+    "bars": 771923
+  },
+  {
+    "day": "2018-02-26",
+    "path": "/data/cyris/tushare_market_data/2018/20180226.csv.gz",
+    "sha256": "c25fa26b56198a203d3ff1b63861af5d83b706c2f33a11c35d1f246ee23af73a",
+    "bars": 775779
+  },
+  {
+    "day": "2018-02-27",
+    "path": "/data/cyris/tushare_market_data/2018/20180227.csv.gz",
+    "sha256": "e7e37c0812853ff423a7dfb42281fb135176a535a6f35c123f543f61bebbc5fd",
+    "bars": 777948
+  },
+  {
+    "day": "2018-02-28",
+    "path": "/data/cyris/tushare_market_data/2018/20180228.csv.gz",
+    "sha256": "b14ce307df96183de842811f8049459cb30e6d0c7cb41e72e9d16fefb3ba81b5",
+    "bars": 776743
+  },
+  {
+    "day": "2018-03-01",
+    "path": "/data/cyris/tushare_market_data/2018/20180301.csv.gz",
+    "sha256": "22e6f2e6036947332f3e1b80199edac30527b495f764ff5bc2e23bb35bf519f0",
+    "bars": 776020
+  },
+  {
+    "day": "2018-03-05",
+    "path": "/data/cyris/tushare_market_data/2018/20180305.csv.gz",
+    "sha256": "f88d8da83c5b287741491ead3dac6adad4c2214c05fd06d60abe5e31125b9f41",
+    "bars": 777225
+  },
+  {
+    "day": "2018-03-06",
+    "path": "/data/cyris/tushare_market_data/2018/20180306.csv.gz",
+    "sha256": "9a5969e836a4fec5cad93910a39e2a6f95b34ca93743ea32aa2e7bcd65378642",
+    "bars": 777466
+  },
+  {
+    "day": "2018-03-08",
+    "path": "/data/cyris/tushare_market_data/2018/20180308.csv.gz",
+    "sha256": "9e32c4e4b613b42ce10d51e88e5499420d67a86241873fd0e841fb30d534eaf4",
+    "bars": 777707
+  },
+  {
+    "day": "2018-03-09",
+    "path": "/data/cyris/tushare_market_data/2018/20180309.csv.gz",
+    "sha256": "c0548980727e78c3bfe1970ddb938b10836ebea454f502abdb0e6a2f641ed8ef",
+    "bars": 778189
+  },
+  {
+    "day": "2018-03-13",
+    "path": "/data/cyris/tushare_market_data/2018/20180313.csv.gz",
+    "sha256": "4966a2b9b873aad6fd57609b5defe07075179a0c85f52f4db7b30cf30c030680",
+    "bars": 777948
+  },
+  {
+    "day": "2018-03-14",
+    "path": "/data/cyris/tushare_market_data/2018/20180314.csv.gz",
+    "sha256": "6d0547d7b0ab73258b1ac3d2321fce124ac2d2c86bb9963cf1bad7a0c0157b57",
+    "bars": 777707
+  },
+  {
+    "day": "2018-03-15",
+    "path": "/data/cyris/tushare_market_data/2018/20180315.csv.gz",
+    "sha256": "bdde5a8f942a0ede84a962cf1184e41ecc088c5a37864a02df0ae0f129350445",
+    "bars": 779394
+  },
+  {
+    "day": "2018-03-16",
+    "path": "/data/cyris/tushare_market_data/2018/20180316.csv.gz",
+    "sha256": "e9a228225ec7eec78a1214a17551d0ae3482539f90ace3d08708062238986f87",
+    "bars": 780117
+  },
+  {
+    "day": "2018-03-19",
+    "path": "/data/cyris/tushare_market_data/2018/20180319.csv.gz",
+    "sha256": "2fa95170678bfe1cd13f8b05d78e3f2e5b718a61e745484b7980ab91218513d4",
+    "bars": 780840
+  },
+  {
+    "day": "2018-03-20",
+    "path": "/data/cyris/tushare_market_data/2018/20180320.csv.gz",
+    "sha256": "397ca1c4bebf66691d32eb084d65e7e1ff4dbbc578d09366a9ecd31e03405974",
+    "bars": 779876
+  },
+  {
+    "day": "2018-03-21",
+    "path": "/data/cyris/tushare_market_data/2018/20180321.csv.gz",
+    "sha256": "8838f74c19652b1eff4b1b5f2bdf00693f2510cdad2cc41895bffc8fbab78483",
+    "bars": 780840
+  },
+  {
+    "day": "2018-03-23",
+    "path": "/data/cyris/tushare_market_data/2018/20180323.csv.gz",
+    "sha256": "c12d4a24ebcd47dcea3000cca310ca2e25d0b08142939286e77c9e203002f5df",
+    "bars": 782527
+  },
+  {
+    "day": "2018-03-26",
+    "path": "/data/cyris/tushare_market_data/2018/20180326.csv.gz",
+    "sha256": "2585ecae667191dcaac1db8a714a8b51854fde022b01ac373ae5dd48db37bf50",
+    "bars": 782768
+  },
+  {
+    "day": "2018-03-27",
+    "path": "/data/cyris/tushare_market_data/2018/20180327.csv.gz",
+    "sha256": "ec9bc1d4b12ebafc91bacdbbefbe210626b4e303a210687cc50ad0ceea3989dd",
+    "bars": 781322
+  },
+  {
+    "day": "2018-03-28",
+    "path": "/data/cyris/tushare_market_data/2018/20180328.csv.gz",
+    "sha256": "4338a73fa11dba29e70c64a1f236c400fe81fd6f9b61ad927c85d3519f63d868",
+    "bars": 780599
+  },
+  {
+    "day": "2018-03-29",
+    "path": "/data/cyris/tushare_market_data/2018/20180329.csv.gz",
+    "sha256": "5c8b5ffb43911b4c98d398670ef35cbb8407688ee3a2dee3d17826c24eff4f43",
+    "bars": 780599
+  },
+  {
+    "day": "2018-03-30",
+    "path": "/data/cyris/tushare_market_data/2018/20180330.csv.gz",
+    "sha256": "5245d28fc46b17a1bf17c571bb7e0f0bef00609c1e35c98c9e11f10436ea8f1a",
+    "bars": 782045
+  },
+  {
+    "day": "2018-04-10",
+    "path": "/data/cyris/tushare_market_data/2018/20180410.csv.gz",
+    "sha256": "79e093a78eec925ec11e130ad1dafdcd5f4306974ab2728befd7aedb2645cc6c",
+    "bars": 783973
+  },
+  {
+    "day": "2018-04-13",
+    "path": "/data/cyris/tushare_market_data/2018/20180413.csv.gz",
+    "sha256": "0e41fe2310a8b663d0fb45e8e95255ce992d17abc775c64048bcdbd94601f669",
+    "bars": 786142
+  },
+  {
+    "day": "2018-04-17",
+    "path": "/data/cyris/tushare_market_data/2018/20180417.csv.gz",
+    "sha256": "3b444b18ea38a25088d5ae02a0cba66c3ee57a97e05576c3f52fe5f77972bb66",
+    "bars": 784937
+  },
+  {
+    "day": "2018-04-19",
+    "path": "/data/cyris/tushare_market_data/2018/20180419.csv.gz",
+    "sha256": "8c65257a606c239fe82c62216f1ff86ed7c9982b8f282ae9f948e31e70667c60",
+    "bars": 783973
+  },
+  {
+    "day": "2018-04-25",
+    "path": "/data/cyris/tushare_market_data/2018/20180425.csv.gz",
+    "sha256": "1eb98a49954a88da7c4e856aa5d458d237a8b3b8a76b9e06b66d068b88ea47b9",
+    "bars": 786142
+  },
+  {
+    "day": "2018-04-27",
+    "path": "/data/cyris/tushare_market_data/2018/20180427.csv.gz",
+    "sha256": "97ef0b6328482b3501d86ad0f57dc6d1acc3d792667c87fb348acd3806d39078",
+    "bars": 787588
+  },
+  {
+    "day": "2018-05-02",
+    "path": "/data/cyris/tushare_market_data/2018/20180502.csv.gz",
+    "sha256": "1b0a8744b307a0b845fb281ce90408e6e69e565984c3f5d61607ebfda228fa1c",
+    "bars": 786624
+  },
+  {
+    "day": "2018-05-03",
+    "path": "/data/cyris/tushare_market_data/2018/20180503.csv.gz",
+    "sha256": "666437ab0d5261fa96a2e793852923ffa17bbcec725dedbc6c9180a282b922f3",
+    "bars": 789275
+  },
+  {
+    "day": "2018-05-23",
+    "path": "/data/cyris/tushare_market_data/2018/20180523.csv.gz",
+    "sha256": "31f07a09c9fc05a7ddd7983737fdb83eb4814eb965cbbf9575d6736354eb6e8d",
+    "bars": 796023
+  },
+  {
+    "day": "2018-05-25",
+    "path": "/data/cyris/tushare_market_data/2018/20180525.csv.gz",
+    "sha256": "cff84a0aa7561f67d51064b57bed08caf3ab08468587fd7e65c02b219b386a7a",
+    "bars": 795782
+  },
+  {
+    "day": "2018-06-13",
+    "path": "/data/cyris/tushare_market_data/2018/20180613.csv.gz",
+    "sha256": "6ca56787d1428715805177d0be982fc2691918f11adff66de36a8c84e3196ca9",
+    "bars": 796505
+  },
+  {
+    "day": "2018-06-14",
+    "path": "/data/cyris/tushare_market_data/2018/20180614.csv.gz",
+    "sha256": "374d4b1598609e516f4392e543ae88ace5933a8ad813234c1e9342072fa58ce0",
+    "bars": 795782
+  },
+  {
+    "day": "2018-06-20",
+    "path": "/data/cyris/tushare_market_data/2018/20180620.csv.gz",
+    "sha256": "f0a1828de32742d89cc7ac7261318d26597fdb591cd5546f246ade2ee2a80ff5",
+    "bars": 791685
+  },
+  {
+    "day": "2018-06-21",
+    "path": "/data/cyris/tushare_market_data/2018/20180621.csv.gz",
+    "sha256": "433a8a85c597c9876a8973aac76b2cbe04fa2d6a756c2657ba2c0c5b23eecf37",
+    "bars": 791444
+  },
+  {
+    "day": "2018-06-25",
+    "path": "/data/cyris/tushare_market_data/2018/20180625.csv.gz",
+    "sha256": "9d0a336f4cd6224437bbc584b2a92a109a2ce0e0f16cbafaf9379409c0bad7c8",
+    "bars": 794095
+  },
+  {
+    "day": "2018-06-27",
+    "path": "/data/cyris/tushare_market_data/2018/20180627.csv.gz",
+    "sha256": "988b96102bf0e7a46382f175a349e03e3885e7fc9ebf1313fad05a36fb2aaa7d",
+    "bars": 797469
+  },
+  {
+    "day": "2018-06-28",
+    "path": "/data/cyris/tushare_market_data/2018/20180628.csv.gz",
+    "sha256": "317a65627656c269c6181fccecdd0ac15ce38b3f88fece3a305fde0c9402679e",
+    "bars": 798674
+  },
+  {
+    "day": "2018-06-29",
+    "path": "/data/cyris/tushare_market_data/2018/20180629.csv.gz",
+    "sha256": "782978a5ad17341904d1f10378a608e0aa63ee6b1029f21658cc81e75b8be0e6",
+    "bars": 800361
+  },
+  {
+    "day": "2018-07-02",
+    "path": "/data/cyris/tushare_market_data/2018/20180702.csv.gz",
+    "sha256": "3d19f5fa8b9e22db6e5913862c4543cb341916c446dc5facb7dcf7edbaf4f2e4",
+    "bars": 803012
+  },
+  {
+    "day": "2018-07-04",
+    "path": "/data/cyris/tushare_market_data/2018/20180704.csv.gz",
+    "sha256": "ee2d8080ef362d061ec964dbd39038a44e4bdd525e901b5fdf50adc98c67bebf",
+    "bars": 805422
+  },
+  {
+    "day": "2018-07-05",
+    "path": "/data/cyris/tushare_market_data/2018/20180705.csv.gz",
+    "sha256": "5928362361a5a1469125e8716af884bfb8fb8a6493e4eb77d323971b14f5d877",
+    "bars": 806386
+  },
+  {
+    "day": "2018-07-06",
+    "path": "/data/cyris/tushare_market_data/2018/20180706.csv.gz",
+    "sha256": "9ae01cdd0ddc1ec125281ffcafc07e0e9ebbb935578ff533d533df11aa114a62",
+    "bars": 806386
+  },
+  {
+    "day": "2018-07-12",
+    "path": "/data/cyris/tushare_market_data/2018/20180712.csv.gz",
+    "sha256": "7d9e05074b5b049d6860200d27b943da4781d21956b63661f32da1d560e1a30d",
+    "bars": 808073
+  },
+  {
+    "day": "2018-07-16",
+    "path": "/data/cyris/tushare_market_data/2018/20180716.csv.gz",
+    "sha256": "398315baf000a436f4b08b42cdecff44ad019170dcae4a839ee072892fd40253",
+    "bars": 811929
+  },
+  {
+    "day": "2018-07-19",
+    "path": "/data/cyris/tushare_market_data/2018/20180719.csv.gz",
+    "sha256": "e405bf5a3e6d4ab926c39775622c4510cbebb42439500534f0c51ee9426ecfb7",
+    "bars": 813616
+  },
+  {
+    "day": "2018-07-20",
+    "path": "/data/cyris/tushare_market_data/2018/20180720.csv.gz",
+    "sha256": "0936de4c94706bc8eb8a7a062fb3d7f1ddbddb53cab34c1412d2f4d4fe9f858e",
+    "bars": 814580
+  },
+  {
+    "day": "2018-07-23",
+    "path": "/data/cyris/tushare_market_data/2018/20180723.csv.gz",
+    "sha256": "0e63bbb7f54795ee2f097430da3badd82c89787f6c602dd0600f354ced9c716d",
+    "bars": 814821
+  },
+  {
+    "day": "2018-07-31",
+    "path": "/data/cyris/tushare_market_data/2018/20180731.csv.gz",
+    "sha256": "3d72464ac45d0b107a05c9e3a26b6e744ea2ebb4d06e26bb0063308e86bfcd13",
+    "bars": 816990
+  },
+  {
+    "day": "2018-08-02",
+    "path": "/data/cyris/tushare_market_data/2018/20180802.csv.gz",
+    "sha256": "4da2c2bbcb51f3616e6cca07035426e2e85cdf65b2d4edf20f6e4b5f7174cbf4",
+    "bars": 818436
+  },
+  {
+    "day": "2018-08-03",
+    "path": "/data/cyris/tushare_market_data/2018/20180803.csv.gz",
+    "sha256": "df37d453e44a74b8cc42a057ef9163eb03590755aa31c19c917be5dbcb71a920",
+    "bars": 819400
+  },
+  {
+    "day": "2018-08-06",
+    "path": "/data/cyris/tushare_market_data/2018/20180806.csv.gz",
+    "sha256": "f38675a7ce38bf80dbfd52dbc6cdce3d70ccee117c7454652f2460ec5fe1faea",
+    "bars": 820123
+  },
+  {
+    "day": "2018-08-07",
+    "path": "/data/cyris/tushare_market_data/2018/20180807.csv.gz",
+    "sha256": "a3a34a419e1fc27e8248eb606d175d97164a9ded59b23cc6954f5b6c1c268df3",
+    "bars": 821328
+  },
+  {
+    "day": "2018-08-08",
+    "path": "/data/cyris/tushare_market_data/2018/20180808.csv.gz",
+    "sha256": "8789b6ac0c407bb29fbcfec9c689e0e68553a66b7019053af213d568be4f8023",
+    "bars": 820846
+  },
+  {
+    "day": "2018-08-09",
+    "path": "/data/cyris/tushare_market_data/2018/20180809.csv.gz",
+    "sha256": "72a023b5b084a53c88360ba47ed659e3e1128291e5e3b4e97b2b5bf7e760767b",
+    "bars": 821328
+  },
+  {
+    "day": "2018-08-10",
+    "path": "/data/cyris/tushare_market_data/2018/20180810.csv.gz",
+    "sha256": "977b2469672ea50995875890e992555fea0ada5d7a4c756569fdafee0c46a3a2",
+    "bars": 821328
+  },
+  {
+    "day": "2018-08-13",
+    "path": "/data/cyris/tushare_market_data/2018/20180813.csv.gz",
+    "sha256": "297357d2410e28073c524373f2eb765b3f5c4e51cbac1dc7f025959727fb5109",
+    "bars": 821328
+  },
+  {
+    "day": "2018-08-14",
+    "path": "/data/cyris/tushare_market_data/2018/20180814.csv.gz",
+    "sha256": "3527ed49406978bd44d17f14d73333b7c8a90e2ac25a2a376d5544401f48ee54",
+    "bars": 821810
+  },
+  {
+    "day": "2018-08-15",
+    "path": "/data/cyris/tushare_market_data/2018/20180815.csv.gz",
+    "sha256": "bac0b3a43c8a25769d552d344842dded3b490411cd22ad9cec7bab29c60901ff",
+    "bars": 822292
+  },
+  {
+    "day": "2018-08-16",
+    "path": "/data/cyris/tushare_market_data/2018/20180816.csv.gz",
+    "sha256": "140cd6b24eb3d54ca19719b6bab80681fa49280a6821d979af7c1a7f8f72cfc7",
+    "bars": 822292
+  },
+  {
+    "day": "2018-08-17",
+    "path": "/data/cyris/tushare_market_data/2018/20180817.csv.gz",
+    "sha256": "bd0b567ce8d2fcc5b5ae51791d56b5308a0603b87506203703c4939e1ec5f3b9",
+    "bars": 823256
+  },
+  {
+    "day": "2018-08-21",
+    "path": "/data/cyris/tushare_market_data/2018/20180821.csv.gz",
+    "sha256": "d7bd77bb44c6a980b42e6bf734b38046091195a3b4a5c37e5a8d7d034f4e8017",
+    "bars": 824461
+  },
+  {
+    "day": "2018-08-22",
+    "path": "/data/cyris/tushare_market_data/2018/20180822.csv.gz",
+    "sha256": "1c09d7b78200f8055e6b05de5fd329f8e3f2ab58af69080cc03a4431235f7f54",
+    "bars": 824461
+  },
+  {
+    "day": "2018-08-23",
+    "path": "/data/cyris/tushare_market_data/2018/20180823.csv.gz",
+    "sha256": "def424bebd9c1f6ee5431f5203bddc8b175e4271ad6f9e3d6d1a6e44dac2a809",
+    "bars": 823979
+  },
+  {
+    "day": "2018-08-24",
+    "path": "/data/cyris/tushare_market_data/2018/20180824.csv.gz",
+    "sha256": "8d128240c8da9fb075e24594b19b46f75248e879a2b35b0246fc71b790623f3c",
+    "bars": 824943
+  },
+  {
+    "day": "2018-08-27",
+    "path": "/data/cyris/tushare_market_data/2018/20180827.csv.gz",
+    "sha256": "b541b2abcc6c610d8ae50b6b542a8d9b4d411dc89fee3504837d92988abf00ea",
+    "bars": 825666
+  },
+  {
+    "day": "2018-08-28",
+    "path": "/data/cyris/tushare_market_data/2018/20180828.csv.gz",
+    "sha256": "05279d1c824f77c824db0e5158671ec6673a5516db9ee928d9fc052d879d09ee",
+    "bars": 826630
+  },
+  {
+    "day": "2018-08-29",
+    "path": "/data/cyris/tushare_market_data/2018/20180829.csv.gz",
+    "sha256": "6c15699ba5440e665afd30b4bc82bee946223aa7d8e36a6632d5feba172135ec",
+    "bars": 826630
+  },
+  {
+    "day": "2018-08-30",
+    "path": "/data/cyris/tushare_market_data/2018/20180830.csv.gz",
+    "sha256": "7abffa67588f197add8e626e10797ea99dd0dd3fde1ed9688794c07ab74d472b",
+    "bars": 827112
+  },
+  {
+    "day": "2018-09-04",
+    "path": "/data/cyris/tushare_market_data/2018/20180904.csv.gz",
+    "sha256": "083e91b4e7f51fc0885d064bcde61e3b27ea75c63e7aac4b8b0068c86193fe95",
+    "bars": 828317
+  },
+  {
+    "day": "2018-09-07",
+    "path": "/data/cyris/tushare_market_data/2018/20180907.csv.gz",
+    "sha256": "9161f2b6a84ece85c90f926033d141f5227345be6286bcd8d938a3915d0a4beb",
+    "bars": 827594
+  },
+  {
+    "day": "2018-09-11",
+    "path": "/data/cyris/tushare_market_data/2018/20180911.csv.gz",
+    "sha256": "d425061790bc8cc926a5085010d101b285e8a263739883a13d218dcf939b1ce1",
+    "bars": 828076
+  },
+  {
+    "day": "2018-09-12",
+    "path": "/data/cyris/tushare_market_data/2018/20180912.csv.gz",
+    "sha256": "a48ab8bbd77b5438d052412a815a4e14d31b217ffd2cf3f3197648cf8ff570a1",
+    "bars": 828317
+  },
+  {
+    "day": "2018-09-13",
+    "path": "/data/cyris/tushare_market_data/2018/20180913.csv.gz",
+    "sha256": "25c2415c84615c8efb39da924c098cadeecadd587c0496dad680a8000f4f06e4",
+    "bars": 830004
+  },
+  {
+    "day": "2018-09-14",
+    "path": "/data/cyris/tushare_market_data/2018/20180914.csv.gz",
+    "sha256": "aae2d7e2b225b9105a17a43a7a56e08981bf503c18dfe52d647215d7954feccf",
+    "bars": 830245
+  },
+  {
+    "day": "2018-09-17",
+    "path": "/data/cyris/tushare_market_data/2018/20180917.csv.gz",
+    "sha256": "bf52e0a25e19d72555aed6b4c1ab2a9b8e260fd5bd2c55d46e231ceb66f0bb74",
+    "bars": 830004
+  },
+  {
+    "day": "2018-09-18",
+    "path": "/data/cyris/tushare_market_data/2018/20180918.csv.gz",
+    "sha256": "219f09b857962de5b3f422407acb26c9355cae50e618079909c50a89a17e7200",
+    "bars": 830968
+  },
+  {
+    "day": "2018-09-19",
+    "path": "/data/cyris/tushare_market_data/2018/20180919.csv.gz",
+    "sha256": "d49b0a2babcd4dd277ab149c01dd265cee251746fa4075bfa942222832b56bac",
+    "bars": 830727
+  },
+  {
+    "day": "2018-09-20",
+    "path": "/data/cyris/tushare_market_data/2018/20180920.csv.gz",
+    "sha256": "bc2488cb25c3ec323c1c1ba7ee5e6656bbd47c86534b6679823c839d7685e321",
+    "bars": 831209
+  },
+  {
+    "day": "2018-09-21",
+    "path": "/data/cyris/tushare_market_data/2018/20180921.csv.gz",
+    "sha256": "4ccd2c77c390e81eb9b87019aa452739ab66183ebb89ebdd8b70888c5312a940",
+    "bars": 832414
+  },
+  {
+    "day": "2018-09-25",
+    "path": "/data/cyris/tushare_market_data/2018/20180925.csv.gz",
+    "sha256": "604443bbb44b60ae48b32a212ba1c40bd9abe2c765b17a486d22b9ea234621d1",
+    "bars": 833860
+  },
+  {
+    "day": "2018-09-26",
+    "path": "/data/cyris/tushare_market_data/2018/20180926.csv.gz",
+    "sha256": "ecbc82316622d1a8fa82b76dfe80d3732fd3569dd68f6cc2715c4e52e1fbafe7",
+    "bars": 834583
+  },
+  {
+    "day": "2018-09-27",
+    "path": "/data/cyris/tushare_market_data/2018/20180927.csv.gz",
+    "sha256": "e846cb3450fc43050eacd55350e2cc6c6fd04c068f6fb5f07d75f7358551d6d5",
+    "bars": 834824
+  },
+  {
+    "day": "2018-09-28",
+    "path": "/data/cyris/tushare_market_data/2018/20180928.csv.gz",
+    "sha256": "515168205fa257d59f96e61bf41aacd8068f9e6dc8f742eef4cb19aa311bb54d",
+    "bars": 835306
+  },
+  {
+    "day": "2018-10-12",
+    "path": "/data/cyris/tushare_market_data/2018/20181012.csv.gz",
+    "sha256": "b1b4b4927842ae545e2a69173c2461a8d0ea2ee755aadc0c6a4b166a7dc370f7",
+    "bars": 837957
+  },
+  {
+    "day": "2018-10-15",
+    "path": "/data/cyris/tushare_market_data/2018/20181015.csv.gz",
+    "sha256": "0ff86bb5850b3a75fa383da29d0314f09468d72b72fd0f9be3fed8a08b9039ae",
+    "bars": 837475
+  },
+  {
+    "day": "2018-10-16",
+    "path": "/data/cyris/tushare_market_data/2018/20181016.csv.gz",
+    "sha256": "14c39d70856cd8b06d88c9ceddccbb047f9c7451e0292babfe6704b0f6485a24",
+    "bars": 838680
+  },
+  {
+    "day": "2018-10-19",
+    "path": "/data/cyris/tushare_market_data/2018/20181019.csv.gz",
+    "sha256": "c17dfd837206345e3b836b4a27071599db0d26f6a036bf6ab3c1a7864679b5a5",
+    "bars": 837475
+  },
+  {
+    "day": "2018-10-22",
+    "path": "/data/cyris/tushare_market_data/2018/20181022.csv.gz",
+    "sha256": "43996373b5de22b1006d5570befa2d346caf6948a6b7bfddd6409d43dae39bed",
+    "bars": 836270
+  },
+  {
+    "day": "2018-10-23",
+    "path": "/data/cyris/tushare_market_data/2018/20181023.csv.gz",
+    "sha256": "539243331610417ea25846e21f43d6e8f3e6d92fcfc47690299f6e8804f21293",
+    "bars": 836511
+  },
+  {
+    "day": "2018-10-25",
+    "path": "/data/cyris/tushare_market_data/2018/20181025.csv.gz",
+    "sha256": "2782ae5ba654995d251fa735b12af89148e09764b0e5171c44db5868e7712add",
+    "bars": 835547
+  },
+  {
+    "day": "2018-10-26",
+    "path": "/data/cyris/tushare_market_data/2018/20181026.csv.gz",
+    "sha256": "3e8961c256243dd8e4ff55fb72ae1360565cce8aba57f41524409ed5cd950412",
+    "bars": 836029
+  },
+  {
+    "day": "2018-10-29",
+    "path": "/data/cyris/tushare_market_data/2018/20181029.csv.gz",
+    "sha256": "36ea1120b5135e450c7ad809bb2ef3fde9eef953175361b8bf42d92815337324",
+    "bars": 837716
+  },
+  {
+    "day": "2018-10-30",
+    "path": "/data/cyris/tushare_market_data/2018/20181030.csv.gz",
+    "sha256": "f5e056e8f9653a53bc2a3092cdbb887fec92173e0ba95b9fc507595141231093",
+    "bars": 838680
+  },
+  {
+    "day": "2018-10-31",
+    "path": "/data/cyris/tushare_market_data/2018/20181031.csv.gz",
+    "sha256": "0c5600a31ee3b9f307ef2c41fb83c12cd2e4d9e952b21a84db62df47de592669",
+    "bars": 837475
+  },
+  {
+    "day": "2018-11-02",
+    "path": "/data/cyris/tushare_market_data/2018/20181102.csv.gz",
+    "sha256": "6d95257ebfe47562f816935c4039ef37e7b8ad1b44814b15b54e5d95707732b9",
+    "bars": 838198
+  },
+  {
+    "day": "2018-11-05",
+    "path": "/data/cyris/tushare_market_data/2018/20181105.csv.gz",
+    "sha256": "4beaa0f732273a2c639a639e1abc446232ed8af1e83899eb132febe0c21f7993",
+    "bars": 840608
+  },
+  {
+    "day": "2018-11-06",
+    "path": "/data/cyris/tushare_market_data/2018/20181106.csv.gz",
+    "sha256": "8dfc887cebe38c9b59e938d1875a451926d71a27669cc8e18192e4fb6496a8d8",
+    "bars": 840367
+  },
+  {
+    "day": "2018-11-07",
+    "path": "/data/cyris/tushare_market_data/2018/20181107.csv.gz",
+    "sha256": "d2c28a239dd7d79b33dd931655e856710699522eaaf218100e9b2f56edabc680",
+    "bars": 841331
+  },
+  {
+    "day": "2018-11-08",
+    "path": "/data/cyris/tushare_market_data/2018/20181108.csv.gz",
+    "sha256": "22f228a25326e3f26b2bd9efec3bfda4d532ddb9fa4264528a6fd3b4c60d9bd2",
+    "bars": 842054
+  },
+  {
+    "day": "2018-11-12",
+    "path": "/data/cyris/tushare_market_data/2018/20181112.csv.gz",
+    "sha256": "87b9ab42223eb6a7849428fdd1382ac9675e663cbc4c4fc2e411c5eae7c3ff34",
+    "bars": 843982
+  },
+  {
+    "day": "2018-11-13",
+    "path": "/data/cyris/tushare_market_data/2018/20181113.csv.gz",
+    "sha256": "02bf0af584db91214d11f0f39c6cf55e84d52d9b31ca8f538545e587faefc393",
+    "bars": 844464
+  },
+  {
+    "day": "2018-11-16",
+    "path": "/data/cyris/tushare_market_data/2018/20181116.csv.gz",
+    "sha256": "462b1cc24334362ead57554348653188fe9050a7282a0aec9d5e415a9f3365fc",
+    "bars": 847356
+  },
+  {
+    "day": "2018-11-19",
+    "path": "/data/cyris/tushare_market_data/2018/20181119.csv.gz",
+    "sha256": "16f2c5a827863fe4a9e991a79d98f3c5c12777b303da294103f225264f294be0",
+    "bars": 847356
+  },
+  {
+    "day": "2018-11-21",
+    "path": "/data/cyris/tushare_market_data/2018/20181121.csv.gz",
+    "sha256": "67fa36a5db7fd15ed4abe9c3beef8fa2a0159d86ea10e25e816a622ab5c9fb37",
+    "bars": 847115
+  },
+  {
+    "day": "2018-11-26",
+    "path": "/data/cyris/tushare_market_data/2018/20181126.csv.gz",
+    "sha256": "c3bab090c37fe06aa1b9ab16e5094184205c6db66d7314af63d79cc39e6adf54",
+    "bars": 848561
+  },
+  {
+    "day": "2018-11-27",
+    "path": "/data/cyris/tushare_market_data/2018/20181127.csv.gz",
+    "sha256": "43b36933bb7ef803126353242e9c2bb7eb53cd9bf5950d151f352c657eb616b5",
+    "bars": 848802
+  },
+  {
+    "day": "2018-11-28",
+    "path": "/data/cyris/tushare_market_data/2018/20181128.csv.gz",
+    "sha256": "e89239668511bfbd8436816246deb428ac6e6f79072a5c6bd21872e11289a5b3",
+    "bars": 850489
+  },
+  {
+    "day": "2018-11-29",
+    "path": "/data/cyris/tushare_market_data/2018/20181129.csv.gz",
+    "sha256": "d2ef5944a37dd32449fad48b1248cdbbec0babcb8fdd89ea641fa71d80a5015b",
+    "bars": 850489
+  },
+  {
+    "day": "2018-11-30",
+    "path": "/data/cyris/tushare_market_data/2018/20181130.csv.gz",
+    "sha256": "1ac73472dcbb0dbae495f156c2d903622233b69cb66995623e3e5ff521a28ccd",
+    "bars": 851212
+  },
+  {
+    "day": "2018-12-03",
+    "path": "/data/cyris/tushare_market_data/2018/20181203.csv.gz",
+    "sha256": "a88e3fed701d72e8492e6117932d6da2b10ecba7f9027b28775666d564ad1af4",
+    "bars": 851694
+  },
+  {
+    "day": "2018-12-06",
+    "path": "/data/cyris/tushare_market_data/2018/20181206.csv.gz",
+    "sha256": "379280216830192fcd180110967b7fa9be5b898550be956efb4aae6f1818fe2b",
+    "bars": 852417
+  },
+  {
+    "day": "2018-12-10",
+    "path": "/data/cyris/tushare_market_data/2018/20181210.csv.gz",
+    "sha256": "969a7c2dacbb5b523cdffd637e742141863588b67841cdb199b0c0fb79303b0e",
+    "bars": 854104
+  },
+  {
+    "day": "2018-12-11",
+    "path": "/data/cyris/tushare_market_data/2018/20181211.csv.gz",
+    "sha256": "552c32274fa5c0609bdfaa9974cea9a3d5551e9a70c55f5b0062852f03fedf13",
+    "bars": 853140
+  },
+  {
+    "day": "2018-12-13",
+    "path": "/data/cyris/tushare_market_data/2018/20181213.csv.gz",
+    "sha256": "75529ebfafbfa9ee7dc351895ec33d6db24c26a1e31c0d717c837bba4c744667",
+    "bars": 854104
+  },
+  {
+    "day": "2018-12-14",
+    "path": "/data/cyris/tushare_market_data/2018/20181214.csv.gz",
+    "sha256": "c13d6c87cdc185e10bda44971cbc237c26d39db0e62fd5ae24c7af206cfff861",
+    "bars": 854104
+  },
+  {
+    "day": "2018-12-17",
+    "path": "/data/cyris/tushare_market_data/2018/20181217.csv.gz",
+    "sha256": "c1cc8de961b0923d0f9f236cd3822ffa1f103fef09f10fd89ccb0b6c7291c0ee",
+    "bars": 853863
+  },
+  {
+    "day": "2018-12-18",
+    "path": "/data/cyris/tushare_market_data/2018/20181218.csv.gz",
+    "sha256": "344df1dd8e9c930dbb3a4502f0c998a11e85b2ae8f50f6663a36fea74a9263b4",
+    "bars": 853381
+  },
+  {
+    "day": "2018-12-19",
+    "path": "/data/cyris/tushare_market_data/2018/20181219.csv.gz",
+    "sha256": "e5913fd741d25a265dfb8648deec3b747897b8a9368a70f7e0753487b6de4e63",
+    "bars": 853140
+  },
+  {
+    "day": "2018-12-20",
+    "path": "/data/cyris/tushare_market_data/2018/20181220.csv.gz",
+    "sha256": "e21dca0be1c40f78379b881cb34b01b60b0250a8d6894eb8b07f2e2dea17b931",
+    "bars": 854345
+  },
+  {
+    "day": "2018-12-21",
+    "path": "/data/cyris/tushare_market_data/2018/20181221.csv.gz",
+    "sha256": "19f04dcee4f3e0806049b7db7a1c30da25fb39f7d89c57d378f5806aeb9b7724",
+    "bars": 854586
+  },
+  {
+    "day": "2018-12-24",
+    "path": "/data/cyris/tushare_market_data/2018/20181224.csv.gz",
+    "sha256": "76e7ce1af909bf6176ed1c94495e619214cc38cfb50b749456a28107c12633bd",
+    "bars": 854586
+  },
+  {
+    "day": "2018-12-25",
+    "path": "/data/cyris/tushare_market_data/2018/20181225.csv.gz",
+    "sha256": "f1e1265c49bb61c10f2cc8a13c5e0e50132736b9e01f2fb361d77b378cc91143",
+    "bars": 853381
+  },
+  {
+    "day": "2018-12-28",
+    "path": "/data/cyris/tushare_market_data/2018/20181228.csv.gz",
+    "sha256": "1a894a1b0318b0e43a53c8cadeb1b91147be4dcb2afbd736644b358e0ba1ff02",
+    "bars": 854827
+  },
+  {
+    "day": "2019-01-02",
+    "path": "/data/cyris/tushare_market_data/2019/20190102.csv.gz",
+    "sha256": "f1475cd124bd97d26112a0530779248ad2a45cd5f3dc2bd7e64af9b5851641a2",
+    "bars": 855791
+  },
+  {
+    "day": "2019-01-03",
+    "path": "/data/cyris/tushare_market_data/2019/20190103.csv.gz",
+    "sha256": "241504a2ca9cfb41de9aa0f4f40e60206bbf5dc106f540da473d1df55e151376",
+    "bars": 856032
+  },
+  {
+    "day": "2019-01-04",
+    "path": "/data/cyris/tushare_market_data/2019/20190104.csv.gz",
+    "sha256": "a8eb9d030485a8da53fcd8ea6cab189c9351239d09aff887383a186ccdb2af19",
+    "bars": 856032
+  },
+  {
+    "day": "2019-01-07",
+    "path": "/data/cyris/tushare_market_data/2019/20190107.csv.gz",
+    "sha256": "14e3be1b1ca0276f90cc92233c38466f2c351d3efc0238c8e2280f8ee147884b",
+    "bars": 855791
+  },
+  {
+    "day": "2019-01-08",
+    "path": "/data/cyris/tushare_market_data/2019/20190108.csv.gz",
+    "sha256": "1dc62fe21c796b415b24435e9df842c3202e587ba1f4893e36589dd5350fd073",
+    "bars": 856514
+  },
+  {
+    "day": "2019-01-09",
+    "path": "/data/cyris/tushare_market_data/2019/20190109.csv.gz",
+    "sha256": "43fe8be377de383fa0dfacc156e768ab57be84d184e132a0190148dae4ab30ef",
+    "bars": 856514
+  },
+  {
+    "day": "2019-01-10",
+    "path": "/data/cyris/tushare_market_data/2019/20190110.csv.gz",
+    "sha256": "74dcb4b379f9e2df215ddd12d2aa9cb1a703ca3d491a13b0d34b502c233a1015",
+    "bars": 856996
+  },
+  {
+    "day": "2019-01-11",
+    "path": "/data/cyris/tushare_market_data/2019/20190111.csv.gz",
+    "sha256": "ca74bbdee08b27461450e61fed4e9c5e58b45b8be7d5981c4e33af2768bb5129",
+    "bars": 857237
+  },
+  {
+    "day": "2019-01-14",
+    "path": "/data/cyris/tushare_market_data/2019/20190114.csv.gz",
+    "sha256": "84d176724cf3c337917fb2f1da22bb6adeacee7d829d9d6bc15a24784735f564",
+    "bars": 856514
+  },
+  {
+    "day": "2019-01-18",
+    "path": "/data/cyris/tushare_market_data/2019/20190118.csv.gz",
+    "sha256": "2d54386f9a60344a7e787ee1cc4ac4e9bd6db39663c720a725d65192b04966cc",
+    "bars": 857237
+  },
+  {
+    "day": "2019-01-21",
+    "path": "/data/cyris/tushare_market_data/2019/20190121.csv.gz",
+    "sha256": "3a5398fa49aa94a3c2daea92a61f03d08a998dfb7b2eb21fc352d3acbc45d109",
+    "bars": 857237
+  },
+  {
+    "day": "2019-01-22",
+    "path": "/data/cyris/tushare_market_data/2019/20190122.csv.gz",
+    "sha256": "e7b6a91251fad75912b180ea6162c4d646909d15ba66ec0cb27aa653bda5f3ca",
+    "bars": 857478
+  },
+  {
+    "day": "2019-01-28",
+    "path": "/data/cyris/tushare_market_data/2019/20190128.csv.gz",
+    "sha256": "30052e0c03f461be09e2d5907365094cfe2912581d5dd269908e6d186f21b95b",
+    "bars": 858442
+  },
+  {
+    "day": "2019-01-29",
+    "path": "/data/cyris/tushare_market_data/2019/20190129.csv.gz",
+    "sha256": "c412f7ae0b2a9c468f452c2f5b0d0108579d748bead2193471b7a9e4b010b505",
+    "bars": 858442
+  },
+  {
+    "day": "2019-01-30",
+    "path": "/data/cyris/tushare_market_data/2019/20190130.csv.gz",
+    "sha256": "7caf285ee705a5bfe7afcc5bbcd5246ea7e1a77d56049d3711a9859e54c42d28",
+    "bars": 859406
+  },
+  {
+    "day": "2019-02-13",
+    "path": "/data/cyris/tushare_market_data/2019/20190213.csv.gz",
+    "sha256": "8e904eb79d1874bd11ea197e51785b5ab10580f62ce246f75ae3f0afae1854c6",
+    "bars": 860129
+  },
+  {
+    "day": "2019-02-14",
+    "path": "/data/cyris/tushare_market_data/2019/20190214.csv.gz",
+    "sha256": "e84b830e1f6e98ebc717f2facba43b62ebec9b2515d3d25a9308a14b6e0bdfff",
+    "bars": 860370
+  },
+  {
+    "day": "2019-02-15",
+    "path": "/data/cyris/tushare_market_data/2019/20190215.csv.gz",
+    "sha256": "1dd9cfa1550a02930eb4620e289f7f41c64c36f5ff2ea7554f91f8977e99cf59",
+    "bars": 860370
+  },
+  {
+    "day": "2019-02-18",
+    "path": "/data/cyris/tushare_market_data/2019/20190218.csv.gz",
+    "sha256": "52a0e0a8ef7b0713ba1a73694bc48067ffffc20be734b802c10a7910f5262370",
+    "bars": 860129
+  },
+  {
+    "day": "2019-02-19",
+    "path": "/data/cyris/tushare_market_data/2019/20190219.csv.gz",
+    "sha256": "39dc1927277d0368a398a6e649a302dc969916d7344cb08f6c37d8fe2ca5829e",
+    "bars": 860129
+  },
+  {
+    "day": "2019-02-20",
+    "path": "/data/cyris/tushare_market_data/2019/20190220.csv.gz",
+    "sha256": "8170ab9016843823ef13a69661264c2371e228efc796408b60513e7710684468",
+    "bars": 858924
+  },
+  {
+    "day": "2019-02-21",
+    "path": "/data/cyris/tushare_market_data/2019/20190221.csv.gz",
+    "sha256": "864a22612d3cafd00e646f7f0432dbac70e24850bf092dd670843865f8eea19d",
+    "bars": 860129
+  },
+  {
+    "day": "2019-02-22",
+    "path": "/data/cyris/tushare_market_data/2019/20190222.csv.gz",
+    "sha256": "c2fc4f02b2b3ac46d8d1df3a4a57bc61daf8094a6d5c38c3c7df9cc8ca961e23",
+    "bars": 860611
+  },
+  {
+    "day": "2019-02-26",
+    "path": "/data/cyris/tushare_market_data/2019/20190226.csv.gz",
+    "sha256": "66bdfda1b91a392d70dadfb64df4fc1bd2cf02e644479f935fb1ccefce99c00c",
+    "bars": 859647
+  },
+  {
+    "day": "2019-02-28",
+    "path": "/data/cyris/tushare_market_data/2019/20190228.csv.gz",
+    "sha256": "819686af1da64523db6bc4b53d3106333a3e49e50a739781ce8e8011d5aa07e8",
+    "bars": 859647
+  },
+  {
+    "day": "2019-03-01",
+    "path": "/data/cyris/tushare_market_data/2019/20190301.csv.gz",
+    "sha256": "7f76dc2730ec92981206866988b940077b83787ea7ea8db2ad9d4ed83efed095",
+    "bars": 860611
+  },
+  {
+    "day": "2019-03-04",
+    "path": "/data/cyris/tushare_market_data/2019/20190304.csv.gz",
+    "sha256": "c188b9c7da35d97879ec62cfd7921298731a2f71c40494dc6b1480fa1230ae23",
+    "bars": 860611
+  },
+  {
+    "day": "2019-03-06",
+    "path": "/data/cyris/tushare_market_data/2019/20190306.csv.gz",
+    "sha256": "571cc550183b710afdb625c72ce468e6dfafd15ee6fba835d9d8a77b835b4095",
+    "bars": 859165
+  },
+  {
+    "day": "2019-03-07",
+    "path": "/data/cyris/tushare_market_data/2019/20190307.csv.gz",
+    "sha256": "2b3f147d81c96c427712dd88e34d3a7eb9f1a849c3debcded03ae9375849b85e",
+    "bars": 860129
+  },
+  {
+    "day": "2019-03-08",
+    "path": "/data/cyris/tushare_market_data/2019/20190308.csv.gz",
+    "sha256": "a1532bade7cfe124819a6cecf049dc715eebd9761e0b9761f503f4d249e14c3c",
+    "bars": 860852
+  },
+  {
+    "day": "2019-03-11",
+    "path": "/data/cyris/tushare_market_data/2019/20190311.csv.gz",
+    "sha256": "b9c13ab77d6b0b5a3eba9b81c1c370f269a4d83495a9ab9189fbcf0e342aa1d3",
+    "bars": 861093
+  },
+  {
+    "day": "2019-03-12",
+    "path": "/data/cyris/tushare_market_data/2019/20190312.csv.gz",
+    "sha256": "9504e915bcfe9ebe813834d431fe14b2bdf32b384969687078ad80f07ef71fee",
+    "bars": 860370
+  },
+  {
+    "day": "2019-03-13",
+    "path": "/data/cyris/tushare_market_data/2019/20190313.csv.gz",
+    "sha256": "9646ec0298d7ec3458e17f774751d39d5e680460606ae2065bbbbb59b84549a3",
+    "bars": 859888
+  },
+  {
+    "day": "2019-03-14",
+    "path": "/data/cyris/tushare_market_data/2019/20190314.csv.gz",
+    "sha256": "014e0af48246b1f15766db5b9f06761201be19428b3a6ce4013dd98909b95f14",
+    "bars": 860370
+  },
+  {
+    "day": "2019-03-15",
+    "path": "/data/cyris/tushare_market_data/2019/20190315.csv.gz",
+    "sha256": "8ed92264a959728835587df90cbc00ac792a9f4c73702112cc68b75ba234263d",
+    "bars": 860852
+  },
+  {
+    "day": "2019-03-18",
+    "path": "/data/cyris/tushare_market_data/2019/20190318.csv.gz",
+    "sha256": "689436a900a9ac3e9f2c6e85c5488b9a05fc4388324a98f3ebbb95658d7e7351",
+    "bars": 859888
+  },
+  {
+    "day": "2019-03-19",
+    "path": "/data/cyris/tushare_market_data/2019/20190319.csv.gz",
+    "sha256": "b0c65ca7afe678c47a12daf6fc488dcc0ae4cc439ebd9441e1938e9a03a2cc18",
+    "bars": 860129
+  },
+  {
+    "day": "2019-03-20",
+    "path": "/data/cyris/tushare_market_data/2019/20190320.csv.gz",
+    "sha256": "00c603b6c4635548a759eab05761294b7f3b2f52eb2519e0bc03ded061904a8e",
+    "bars": 860611
+  },
+  {
+    "day": "2019-03-21",
+    "path": "/data/cyris/tushare_market_data/2019/20190321.csv.gz",
+    "sha256": "c6e9363d564113316350a79aa6fe4e36c7b2eba815e74d9437ff83aa7777b4f7",
+    "bars": 860370
+  },
+  {
+    "day": "2019-03-22",
+    "path": "/data/cyris/tushare_market_data/2019/20190322.csv.gz",
+    "sha256": "9690e60cc12d068d409cb020bb528bd6e90485edee8bb39de127196d93d29e39",
+    "bars": 859888
+  },
+  {
+    "day": "2019-03-26",
+    "path": "/data/cyris/tushare_market_data/2019/20190326.csv.gz",
+    "sha256": "403a50beeae03abf9b31fd94b7673790af627131a11cd7ee1997e94441433519",
+    "bars": 858683
+  },
+  {
+    "day": "2019-03-27",
+    "path": "/data/cyris/tushare_market_data/2019/20190327.csv.gz",
+    "sha256": "0deb0f94613f876e72c7b674f08399e6136382c236250d5b05436a63b501cfca",
+    "bars": 857478
+  },
+  {
+    "day": "2019-03-28",
+    "path": "/data/cyris/tushare_market_data/2019/20190328.csv.gz",
+    "sha256": "62f13298c8a18d99a867dd7d45f81072d78adb046989175c74b15a38cdddaeba",
+    "bars": 857960
+  },
+  {
+    "day": "2019-04-01",
+    "path": "/data/cyris/tushare_market_data/2019/20190401.csv.gz",
+    "sha256": "c36a4d7f54507f3240f5be6213238e0047c90a6b2473d335d5cc533255018a50",
+    "bars": 859647
+  },
+  {
+    "day": "2019-04-02",
+    "path": "/data/cyris/tushare_market_data/2019/20190402.csv.gz",
+    "sha256": "0617994c81a2cad5a8b86d9011c5f20a98acf81b74c76778fc161325f6bd5eae",
+    "bars": 860852
+  },
+  {
+    "day": "2019-04-04",
+    "path": "/data/cyris/tushare_market_data/2019/20190404.csv.gz",
+    "sha256": "a4fc4120bf1d3f98bba86601666486489e3d32d51bca6c04ee638e8166f61465",
+    "bars": 859406
+  },
+  {
+    "day": "2019-04-08",
+    "path": "/data/cyris/tushare_market_data/2019/20190408.csv.gz",
+    "sha256": "b3e820d5572c7043b9bb8655e7b80945634c532aa0803a3c883ac2ff3b2e335c",
+    "bars": 861093
+  },
+  {
+    "day": "2019-04-09",
+    "path": "/data/cyris/tushare_market_data/2019/20190409.csv.gz",
+    "sha256": "1baf86a0e8b11c32b466b997287efabfe0a7ec0194af4e8a29e7c1478612887d",
+    "bars": 861093
+  },
+  {
+    "day": "2019-04-10",
+    "path": "/data/cyris/tushare_market_data/2019/20190410.csv.gz",
+    "sha256": "944aa33574604af7a418e3c52279ee34ecfc1c0bbdb67af7ce91e7cfd7a75898",
+    "bars": 861816
+  },
+  {
+    "day": "2019-04-11",
+    "path": "/data/cyris/tushare_market_data/2019/20190411.csv.gz",
+    "sha256": "959716c5650e8410d3c9d816bcf228d7cc73dbfa9d2915782484e8c1e6e5a36f",
+    "bars": 860852
+  },
+  {
+    "day": "2019-04-15",
+    "path": "/data/cyris/tushare_market_data/2019/20190415.csv.gz",
+    "sha256": "1988ea58f39333e824fe50c7f476e7a89c88a583b3e490f11b142b69dc2c47f0",
+    "bars": 862539
+  },
+  {
+    "day": "2019-04-16",
+    "path": "/data/cyris/tushare_market_data/2019/20190416.csv.gz",
+    "sha256": "9282393a2570db38ec5ca10b8d1e41ee8a6c4ed95dcbe662833643ecef040b2e",
+    "bars": 862298
+  },
+  {
+    "day": "2019-04-17",
+    "path": "/data/cyris/tushare_market_data/2019/20190417.csv.gz",
+    "sha256": "a53c49c07aebc2c907189a28e6c56b624135c18a3f816b17b9cde4def439489c",
+    "bars": 863744
+  },
+  {
+    "day": "2019-04-18",
+    "path": "/data/cyris/tushare_market_data/2019/20190418.csv.gz",
+    "sha256": "d18715d3752bd9a4c7d9fe89d50e3ff9c55e383cbc2c0d66bf54a95ff7e7d8a6",
+    "bars": 864708
+  },
+  {
+    "day": "2019-04-19",
+    "path": "/data/cyris/tushare_market_data/2019/20190419.csv.gz",
+    "sha256": "deeea8ab5c4629ac38022bbe3993790a063ce4a225de2dfb1e149fe57d7b96da",
+    "bars": 864226
+  },
+  {
+    "day": "2019-04-22",
+    "path": "/data/cyris/tushare_market_data/2019/20190422.csv.gz",
+    "sha256": "f0c0885be41f6b898dee5df854691cde051c4fdef63b1bf2e9cb996fec242811",
+    "bars": 863985
+  },
+  {
+    "day": "2019-04-23",
+    "path": "/data/cyris/tushare_market_data/2019/20190423.csv.gz",
+    "sha256": "2081dfae27d3374e97a05229329831d1bd49c9806c0f3867d675fce851cae4b1",
+    "bars": 863744
+  },
+  {
+    "day": "2019-04-24",
+    "path": "/data/cyris/tushare_market_data/2019/20190424.csv.gz",
+    "sha256": "06d327c796f240452e11d787bd52e9f13f1344f02e02a57429752bedaf85d254",
+    "bars": 864226
+  },
+  {
+    "day": "2019-04-25",
+    "path": "/data/cyris/tushare_market_data/2019/20190425.csv.gz",
+    "sha256": "7df97e8b4022d2864128c346d03fd4b5a63a4e4c11ad411206d02f2101a47f17",
+    "bars": 862298
+  },
+  {
+    "day": "2019-04-26",
+    "path": "/data/cyris/tushare_market_data/2019/20190426.csv.gz",
+    "sha256": "a657e55ef54aa0b2441bbb7417b2bcb0ecc7796cc2d9ecc977111b7999d3b2dc",
+    "bars": 861816
+  },
+  {
+    "day": "2019-04-29",
+    "path": "/data/cyris/tushare_market_data/2019/20190429.csv.gz",
+    "sha256": "a4df888025c9449a25255aa64b4c24b7ffbc44b6e1533096d86cf3cedca9f210",
+    "bars": 859406
+  },
+  {
+    "day": "2019-04-30",
+    "path": "/data/cyris/tushare_market_data/2019/20190430.csv.gz",
+    "sha256": "f1bdf79966d7d7dbb6ce1121c412f29d969268f516ca1a4fecacd785f39fbb60",
+    "bars": 855550
+  },
+  {
+    "day": "2019-05-06",
+    "path": "/data/cyris/tushare_market_data/2019/20190506.csv.gz",
+    "sha256": "60d1274b516928e0e6df6b0019dc3fc70c8233584f984d566a2b7437ae2d595a",
+    "bars": 861093
+  },
+  {
+    "day": "2019-05-07",
+    "path": "/data/cyris/tushare_market_data/2019/20190507.csv.gz",
+    "sha256": "a7dd0c1be95d1f28543947a0375f954b3919fd97480b1ff89b67e099eeb0137f",
+    "bars": 861575
+  },
+  {
+    "day": "2019-05-09",
+    "path": "/data/cyris/tushare_market_data/2019/20190509.csv.gz",
+    "sha256": "7dc99430b7e207e40e9d78c00bb05f58818afa430630d28a28795795ec04ca3f",
+    "bars": 863021
+  },
+  {
+    "day": "2019-05-10",
+    "path": "/data/cyris/tushare_market_data/2019/20190510.csv.gz",
+    "sha256": "5fe87f1e46440f1af36bfd455ce76bf1f563069739b1ad012f49149957f1fba7",
+    "bars": 863262
+  },
+  {
+    "day": "2019-05-14",
+    "path": "/data/cyris/tushare_market_data/2019/20190514.csv.gz",
+    "sha256": "9f8ba3b2ab9ac075fc69f574440881fe3025618e2810ec7454e24b7a0d581a17",
+    "bars": 862780
+  },
+  {
+    "day": "2019-05-16",
+    "path": "/data/cyris/tushare_market_data/2019/20190516.csv.gz",
+    "sha256": "2729185d17e7cff2591135159b6366fdcc790a17f2141bdb18f6bb56e4a8ad49",
+    "bars": 863744
+  },
+  {
+    "day": "2019-05-17",
+    "path": "/data/cyris/tushare_market_data/2019/20190517.csv.gz",
+    "sha256": "fa8ef6295332c46b7004bdadf2780a48b3e62bacbd68457bd3b9ab41eb91465a",
+    "bars": 864467
+  },
+  {
+    "day": "2019-05-20",
+    "path": "/data/cyris/tushare_market_data/2019/20190520.csv.gz",
+    "sha256": "af7f66372784c78cfb55f6111b9086a58a5882f54a8de438ab4dcea1c8464e3e",
+    "bars": 863744
+  },
+  {
+    "day": "2019-05-21",
+    "path": "/data/cyris/tushare_market_data/2019/20190521.csv.gz",
+    "sha256": "41d899ebba788ddea2e6ec6b619f5ec6cb3cb67b5f2d9ee1c831505ea2dc838c",
+    "bars": 864708
+  },
+  {
+    "day": "2019-05-22",
+    "path": "/data/cyris/tushare_market_data/2019/20190522.csv.gz",
+    "sha256": "a49e454dbb79f30caa366e99c4d43078af48df05a0b229340ee92d7aa718351a",
+    "bars": 865190
+  },
+  {
+    "day": "2019-05-23",
+    "path": "/data/cyris/tushare_market_data/2019/20190523.csv.gz",
+    "sha256": "f96da96e7308c1bf076f84d3a2e1caf9036979149135902b3a7997b8da7a617a",
+    "bars": 865431
+  },
+  {
+    "day": "2019-05-27",
+    "path": "/data/cyris/tushare_market_data/2019/20190527.csv.gz",
+    "sha256": "4a338b3bbed74fb30c7658cb6fc21f0fc5c8d9db270b573902663bcbb6482137",
+    "bars": 866636
+  },
+  {
+    "day": "2019-05-30",
+    "path": "/data/cyris/tushare_market_data/2019/20190530.csv.gz",
+    "sha256": "d1b78060424d692c7671803733bad79550a35ad7d962b706080165231cd508f0",
+    "bars": 866636
+  },
+  {
+    "day": "2019-05-31",
+    "path": "/data/cyris/tushare_market_data/2019/20190531.csv.gz",
+    "sha256": "a51830feafc687c54cd896aa13417f46a2aff83b74a51ea26435d8d24653dbe4",
+    "bars": 866877
+  },
+  {
+    "day": "2019-06-03",
+    "path": "/data/cyris/tushare_market_data/2019/20190603.csv.gz",
+    "sha256": "242ef5a78d6152056872aac9990393e9a68790858dc78c953807023fac37b810",
+    "bars": 865913
+  },
+  {
+    "day": "2019-06-04",
+    "path": "/data/cyris/tushare_market_data/2019/20190604.csv.gz",
+    "sha256": "d003022c5f5f03fcf4622c2212f41a4f803398d1b1ed21b7f9fbe15a6a992716",
+    "bars": 866154
+  },
+  {
+    "day": "2019-06-05",
+    "path": "/data/cyris/tushare_market_data/2019/20190605.csv.gz",
+    "sha256": "9c12c0ae6d3a05c0883c845ff1213125343af80be27b917ba59eaab250ff2eb2",
+    "bars": 866154
+  },
+  {
+    "day": "2019-06-12",
+    "path": "/data/cyris/tushare_market_data/2019/20190612.csv.gz",
+    "sha256": "c5adb15e6d677aab3bf5f7bfc13cc292996011e796e84cae30792d985e3ed305",
+    "bars": 865913
+  },
+  {
+    "day": "2019-06-13",
+    "path": "/data/cyris/tushare_market_data/2019/20190613.csv.gz",
+    "sha256": "3e795691169fda0a8ef0c6aa9e0384c045060977ac14f67599b90ca2f13d1961",
+    "bars": 865913
+  },
+  {
+    "day": "2019-06-17",
+    "path": "/data/cyris/tushare_market_data/2019/20190617.csv.gz",
+    "sha256": "9dbbe7380b4379873db71aad109174aead30b49aefca8a064ffea126363bfb5f",
+    "bars": 866154
+  },
+  {
+    "day": "2019-06-18",
+    "path": "/data/cyris/tushare_market_data/2019/20190618.csv.gz",
+    "sha256": "981b63e91cc4893506659b43c6cddbbeefbae0991835b785fc1d4b547793da5f",
+    "bars": 866636
+  },
+  {
+    "day": "2019-06-19",
+    "path": "/data/cyris/tushare_market_data/2019/20190619.csv.gz",
+    "sha256": "7867df2a79cfe349fc5d9f57285993b0c9a6cc43ba51cf80e6c8545afc574e3d",
+    "bars": 866877
+  },
+  {
+    "day": "2019-06-21",
+    "path": "/data/cyris/tushare_market_data/2019/20190621.csv.gz",
+    "sha256": "818203577768338c84f5b77166671b2d6e299e2377c4fb6a85aba87db837891a",
+    "bars": 867600
+  },
+  {
+    "day": "2019-06-25",
+    "path": "/data/cyris/tushare_market_data/2019/20190625.csv.gz",
+    "sha256": "dd4300891d7809a8be945dec4f182f27150289885731bff4fcc12254b297080b",
+    "bars": 868323
+  },
+  {
+    "day": "2019-06-26",
+    "path": "/data/cyris/tushare_market_data/2019/20190626.csv.gz",
+    "sha256": "54ca2220561e185c7260943c06b4573ed29d5ea1c8d125cd3213404283e57bda",
+    "bars": 868323
+  },
+  {
+    "day": "2019-07-01",
+    "path": "/data/cyris/tushare_market_data/2019/20190701.csv.gz",
+    "sha256": "0ffd2955376334e26ecbe09d7cbe606adda428deda06c28a56e9dd7f5fd01706",
+    "bars": 869528
+  },
+  {
+    "day": "2019-07-02",
+    "path": "/data/cyris/tushare_market_data/2019/20190702.csv.gz",
+    "sha256": "eae60b52fbc01b50283eb553786defd472b43096f460c5c3e4df14d041f15b51",
+    "bars": 869769
+  },
+  {
+    "day": "2019-07-04",
+    "path": "/data/cyris/tushare_market_data/2019/20190704.csv.gz",
+    "sha256": "1231f14aa6b3888a79d538e5c7169fc317fe4bdc064a6b8e0e06e47c7cef7e89",
+    "bars": 868805
+  },
+  {
+    "day": "2019-07-05",
+    "path": "/data/cyris/tushare_market_data/2019/20190705.csv.gz",
+    "sha256": "cc06f83cb2cc56bcfaf9bb9ad1160bf3a37c6e89e8eff7ec6e449da45de80a07",
+    "bars": 870010
+  },
+  {
+    "day": "2019-07-08",
+    "path": "/data/cyris/tushare_market_data/2019/20190708.csv.gz",
+    "sha256": "9af5ea62b32e21d4e498e778eb14faab915b21b22146d25456357101b8fc3afe",
+    "bars": 869287
+  },
+  {
+    "day": "2019-07-09",
+    "path": "/data/cyris/tushare_market_data/2019/20190709.csv.gz",
+    "sha256": "95678a1a355e24757b1b0bafefda006989ad239baa0d55f0457f3a003589a809",
+    "bars": 868323
+  },
+  {
+    "day": "2019-07-11",
+    "path": "/data/cyris/tushare_market_data/2019/20190711.csv.gz",
+    "sha256": "aad7cb4a136539368810381b2554f9c7db2741c45e2c1fa20367a50a123c7517",
+    "bars": 868323
+  },
+  {
+    "day": "2019-07-15",
+    "path": "/data/cyris/tushare_market_data/2019/20190715.csv.gz",
+    "sha256": "bf15bb3af765fc4d6a2d356268c1f3f0d6f6bcc09a6e080db73a6259f7f0a823",
+    "bars": 869769
+  },
+  {
+    "day": "2019-07-16",
+    "path": "/data/cyris/tushare_market_data/2019/20190716.csv.gz",
+    "sha256": "bd47d61c96f247e1d4e6ae9411d4e160ed95a84929bbc6048453fc1dcecdb0db",
+    "bars": 870251
+  },
+  {
+    "day": "2019-07-18",
+    "path": "/data/cyris/tushare_market_data/2019/20190718.csv.gz",
+    "sha256": "a43cc3b47114935924c690d0d20d8a8271e387f6f0bdfc8423f0ede1b6a9c7e1",
+    "bars": 870251
+  },
+  {
+    "day": "2019-07-19",
+    "path": "/data/cyris/tushare_market_data/2019/20190719.csv.gz",
+    "sha256": "3bd0065d307104ef796e01d08d49d69d700453d50e72249adff5e5e979311626",
+    "bars": 870251
+  },
+  {
+    "day": "2019-07-22",
+    "path": "/data/cyris/tushare_market_data/2019/20190722.csv.gz",
+    "sha256": "85b6626f659e274caeb989cd8fac880bbb820ecdb4d6f312014943e61d88c399",
+    "bars": 876758
+  },
+  {
+    "day": "2019-07-23",
+    "path": "/data/cyris/tushare_market_data/2019/20190723.csv.gz",
+    "sha256": "092eb5163a931ccbfa9d86afc31e20d7d418e3b1cb13b133214ad02a17ede332",
+    "bars": 876758
+  },
+  {
+    "day": "2019-07-29",
+    "path": "/data/cyris/tushare_market_data/2019/20190729.csv.gz",
+    "sha256": "c2e395ae83ee913e3921d8f2fe5135238b3ac23eaa8e214cc1565f65eb8c8447",
+    "bars": 877722
+  },
+  {
+    "day": "2019-07-30",
+    "path": "/data/cyris/tushare_market_data/2019/20190730.csv.gz",
+    "sha256": "fb5dde60d4dddfe2c2dd55f31fb593899f7432f4aa379d8d0265cbc716311bba",
+    "bars": 877722
+  },
+  {
+    "day": "2019-08-02",
+    "path": "/data/cyris/tushare_market_data/2019/20190802.csv.gz",
+    "sha256": "c263ef05184dc5a6c1b9938a5eb16e51cd916aaf6275fb4fedc15399949506d6",
+    "bars": 878686
+  },
+  {
+    "day": "2019-08-05",
+    "path": "/data/cyris/tushare_market_data/2019/20190805.csv.gz",
+    "sha256": "0b7185cf4f67da085960d6b7762f3449f18f782ef613f4ba5ab348576de652ef",
+    "bars": 878927
+  },
+  {
+    "day": "2019-08-06",
+    "path": "/data/cyris/tushare_market_data/2019/20190806.csv.gz",
+    "sha256": "82b4894479d3f0e5cd11e082cb71c7223c028f2f305b56afe68021c7419ad945",
+    "bars": 879409
+  },
+  {
+    "day": "2019-08-07",
+    "path": "/data/cyris/tushare_market_data/2019/20190807.csv.gz",
+    "sha256": "b9bc03ec1fc690cf60e7698982895e90db2949cdc6a3b0060bfc5495c4691ad8",
+    "bars": 879168
+  },
+  {
+    "day": "2019-08-08",
+    "path": "/data/cyris/tushare_market_data/2019/20190808.csv.gz",
+    "sha256": "042393531f98dc829ce630be9a23f4f4c05e3d5d239a4d30198372e754b00568",
+    "bars": 879168
+  },
+  {
+    "day": "2019-08-09",
+    "path": "/data/cyris/tushare_market_data/2019/20190809.csv.gz",
+    "sha256": "27531e7994d6f757da41588ad669256dc079d7e212ff044f3b60f3164800963d",
+    "bars": 879650
+  },
+  {
+    "day": "2019-08-12",
+    "path": "/data/cyris/tushare_market_data/2019/20190812.csv.gz",
+    "sha256": "ec25c510c963adc08e61947a79b41a41f269b5df435e67ea6532049af217c8ef",
+    "bars": 879891
+  },
+  {
+    "day": "2019-08-13",
+    "path": "/data/cyris/tushare_market_data/2019/20190813.csv.gz",
+    "sha256": "2a79a1e22147d100f65ba07e1f65b951b45ef87d12d56b47159938353b897c9d",
+    "bars": 879650
+  },
+  {
+    "day": "2019-08-14",
+    "path": "/data/cyris/tushare_market_data/2019/20190814.csv.gz",
+    "sha256": "05bf4c73a7d93609df2ad66a5a0dac2aea35127893b53cc87ee534d34a6b11a9",
+    "bars": 879168
+  },
+  {
+    "day": "2019-08-15",
+    "path": "/data/cyris/tushare_market_data/2019/20190815.csv.gz",
+    "sha256": "ddf2fa31e27696b7cec70137e307cd1f114378f2d292fd61da4fdea1339d6987",
+    "bars": 880373
+  },
+  {
+    "day": "2019-08-16",
+    "path": "/data/cyris/tushare_market_data/2019/20190816.csv.gz",
+    "sha256": "720d6cc26f5129b6a92d89b5bf8a614035cace5b1ae0d05cab2d037e26e27fc0",
+    "bars": 880132
+  },
+  {
+    "day": "2019-08-19",
+    "path": "/data/cyris/tushare_market_data/2019/20190819.csv.gz",
+    "sha256": "938298b80210a99cdd44194002e58ea1108be056b9b1c06ce006ef2deac4bdc9",
+    "bars": 879409
+  },
+  {
+    "day": "2019-08-20",
+    "path": "/data/cyris/tushare_market_data/2019/20190820.csv.gz",
+    "sha256": "97ae1ad76f8c59f5545d57a426eb88364488ad088d5ae3670f6895397575f356",
+    "bars": 879409
+  },
+  {
+    "day": "2019-08-22",
+    "path": "/data/cyris/tushare_market_data/2019/20190822.csv.gz",
+    "sha256": "feedfa8470a7383e4ab7ab35abcb73864212fb174622e28ec72e24e661e6f632",
+    "bars": 879409
+  },
+  {
+    "day": "2019-08-23",
+    "path": "/data/cyris/tushare_market_data/2019/20190823.csv.gz",
+    "sha256": "489551660399cb1049e6facf7ae5d86737a7b6bb8d2386439ab73fa77890472b",
+    "bars": 879409
+  },
+  {
+    "day": "2019-08-26",
+    "path": "/data/cyris/tushare_market_data/2019/20190826.csv.gz",
+    "sha256": "c88391ebf248f2546857d231f73ce63f1cd618d8cdae3abcf9e8c555cfaa5534",
+    "bars": 879891
+  },
+  {
+    "day": "2019-08-27",
+    "path": "/data/cyris/tushare_market_data/2019/20190827.csv.gz",
+    "sha256": "219eac44e0e63bed0ce6561d4f479e76182801255b4e5b931936f22487c46789",
+    "bars": 880132
+  },
+  {
+    "day": "2019-08-28",
+    "path": "/data/cyris/tushare_market_data/2019/20190828.csv.gz",
+    "sha256": "1b29dd2ce6327fad4add49442039cc0fa39f38d6176bf26811da89400d274f0f",
+    "bars": 880855
+  },
+  {
+    "day": "2019-08-29",
+    "path": "/data/cyris/tushare_market_data/2019/20190829.csv.gz",
+    "sha256": "56e7a577da6d33bf5aeb80472c3cf45f948214efabcf7728964de77d57c938e7",
+    "bars": 880614
+  },
+  {
+    "day": "2019-08-30",
+    "path": "/data/cyris/tushare_market_data/2019/20190830.csv.gz",
+    "sha256": "ae06b9947c361839b074eb2337c95e34a96dc6f5393734b06bad40a7a08697f3",
+    "bars": 881578
+  },
+  {
+    "day": "2019-09-02",
+    "path": "/data/cyris/tushare_market_data/2019/20190902.csv.gz",
+    "sha256": "2262d6bdff9749287bac0f9d0a212a1769e02a74c71494b8df94cf9afd600911",
+    "bars": 881819
+  },
+  {
+    "day": "2019-09-04",
+    "path": "/data/cyris/tushare_market_data/2019/20190904.csv.gz",
+    "sha256": "32a9047629e75426a4142ff5ae3cae701a5767f6ab38236869d4e8232f8d818d",
+    "bars": 881819
+  },
+  {
+    "day": "2019-09-05",
+    "path": "/data/cyris/tushare_market_data/2019/20190905.csv.gz",
+    "sha256": "72452b0f75376087ff7789354a2089678b6d9327863703a12a0a1eb85b09e958",
+    "bars": 882301
+  },
+  {
+    "day": "2019-09-06",
+    "path": "/data/cyris/tushare_market_data/2019/20190906.csv.gz",
+    "sha256": "e2fe481078f5279b4b40a244a7cadd4a2e75b288fff6c538fda340aa8917367b",
+    "bars": 882301
+  },
+  {
+    "day": "2019-09-09",
+    "path": "/data/cyris/tushare_market_data/2019/20190909.csv.gz",
+    "sha256": "6b8e80558fce859909a8a8aaa92d364763e55f038a9d6569762cb26336cefb9d",
+    "bars": 882783
+  },
+  {
+    "day": "2019-09-10",
+    "path": "/data/cyris/tushare_market_data/2019/20190910.csv.gz",
+    "sha256": "dcfc7529e541c23ae1ac9fa2e90cf71786c4ea6e3030abb962eb18336c80e4d6",
+    "bars": 882060
+  },
+  {
+    "day": "2019-09-11",
+    "path": "/data/cyris/tushare_market_data/2019/20190911.csv.gz",
+    "sha256": "6e62bf0541a2b6a418404aa1a32851bfc395661f93a74a683de8bc237f627acf",
+    "bars": 882060
+  },
+  {
+    "day": "2019-09-12",
+    "path": "/data/cyris/tushare_market_data/2019/20190912.csv.gz",
+    "sha256": "43f65d57c6a9b93d6ed199b1cc25f5c5f6f462c287641297da71a27e6ebcec12",
+    "bars": 882060
+  },
+  {
+    "day": "2019-09-16",
+    "path": "/data/cyris/tushare_market_data/2019/20190916.csv.gz",
+    "sha256": "f2fbd7d5e65d00c420751484531d63993ef882be2670ca84b64fa4f1bcff9409",
+    "bars": 882060
+  },
+  {
+    "day": "2019-09-18",
+    "path": "/data/cyris/tushare_market_data/2019/20190918.csv.gz",
+    "sha256": "bb06b74bcf2c013df00d2c10e90983882a7d498a2ffff0cdc57c9f31cfe41379",
+    "bars": 882542
+  },
+  {
+    "day": "2019-09-20",
+    "path": "/data/cyris/tushare_market_data/2019/20190920.csv.gz",
+    "sha256": "e17973feeab6919830b2bae82a91931dffcefd99ebbdc349645d17521f951772",
+    "bars": 882783
+  },
+  {
+    "day": "2019-09-23",
+    "path": "/data/cyris/tushare_market_data/2019/20190923.csv.gz",
+    "sha256": "b8cd112e3b1f0bd070844965c2902e48183c7d6e14a774755d936bdedd352db6",
+    "bars": 882301
+  },
+  {
+    "day": "2019-09-25",
+    "path": "/data/cyris/tushare_market_data/2019/20190925.csv.gz",
+    "sha256": "9150c8129c3c77d199633579f4b849751ec2715e9c7a5352663b8ebfc748ec49",
+    "bars": 882783
+  },
+  {
+    "day": "2019-09-26",
+    "path": "/data/cyris/tushare_market_data/2019/20190926.csv.gz",
+    "sha256": "eb1f97768d97e9f53ac20c8283d5947c0b603e9500a687439f2ff70cb2791343",
+    "bars": 882301
+  },
+  {
+    "day": "2019-09-27",
+    "path": "/data/cyris/tushare_market_data/2019/20190927.csv.gz",
+    "sha256": "ce3db6d20c2c4b0c817660d2bdd9996e8c0ef8f65afdd404d9ddffa8b5c95d3e",
+    "bars": 882542
+  },
+  {
+    "day": "2019-09-30",
+    "path": "/data/cyris/tushare_market_data/2019/20190930.csv.gz",
+    "sha256": "5e1d21457db4e83e617a28df46dd9d6c54ac9cd276ae3dcae5fad9df3036021b",
+    "bars": 883988
+  },
+  {
+    "day": "2019-10-09",
+    "path": "/data/cyris/tushare_market_data/2019/20191009.csv.gz",
+    "sha256": "5742cb4fab39cbe24e949741c238ee52d3c089327b697774b3dde2b917d20bee",
+    "bars": 883024
+  },
+  {
+    "day": "2019-10-10",
+    "path": "/data/cyris/tushare_market_data/2019/20191010.csv.gz",
+    "sha256": "efc0d511e9e2ce7588379bf62f8e0ef3ee8d3b6bb25f73568fb190d9a441db47",
+    "bars": 883265
+  },
+  {
+    "day": "2019-10-11",
+    "path": "/data/cyris/tushare_market_data/2019/20191011.csv.gz",
+    "sha256": "d618e6edf73c3bc17c2cfe2ac9cb118177128c082a0090da4c8805e9eaa76aaa",
+    "bars": 883747
+  },
+  {
+    "day": "2019-10-14",
+    "path": "/data/cyris/tushare_market_data/2019/20191014.csv.gz",
+    "sha256": "a63916df69df8cafa68da585ca82de170d1dd85dc8f6c4ab60ec6b32b6885f4a",
+    "bars": 883988
+  },
+  {
+    "day": "2019-10-15",
+    "path": "/data/cyris/tushare_market_data/2019/20191015.csv.gz",
+    "sha256": "41d87a2ba7b312b667dcc27f713e20bfecd98022faf0399f674c2c30332c7dd7",
+    "bars": 884470
+  },
+  {
+    "day": "2019-10-16",
+    "path": "/data/cyris/tushare_market_data/2019/20191016.csv.gz",
+    "sha256": "5fbb83db66fc57ee678e6d7229dff7ec465effaaf380240fe7c494d9cf62fa62",
+    "bars": 884470
+  },
+  {
+    "day": "2019-10-17",
+    "path": "/data/cyris/tushare_market_data/2019/20191017.csv.gz",
+    "sha256": "0e1315a073e96da7aef0a91e0eb46ab5ebb3f3d6b017167e59014ec79780a2d3",
+    "bars": 884229
+  },
+  {
+    "day": "2019-10-18",
+    "path": "/data/cyris/tushare_market_data/2019/20191018.csv.gz",
+    "sha256": "4308987500031ed475e3905b4a466b78b122de252b1e64c57bbb141a595f87f0",
+    "bars": 884711
+  },
+  {
+    "day": "2019-10-21",
+    "path": "/data/cyris/tushare_market_data/2019/20191021.csv.gz",
+    "sha256": "8e0c4a66f2cce48564b2907e4ce7c95d08a45961465cc100415f5fce097f9217",
+    "bars": 884229
+  },
+  {
+    "day": "2019-10-22",
+    "path": "/data/cyris/tushare_market_data/2019/20191022.csv.gz",
+    "sha256": "13335d3f32767958a998a54bac728a152432aebaa86ab4d306691eca1deae7ca",
+    "bars": 884952
+  },
+  {
+    "day": "2019-10-23",
+    "path": "/data/cyris/tushare_market_data/2019/20191023.csv.gz",
+    "sha256": "517e07981c01aaffb8c6f2293a892fce52473e354503e23c13fb16ee2cd81228",
+    "bars": 884952
+  },
+  {
+    "day": "2019-10-24",
+    "path": "/data/cyris/tushare_market_data/2019/20191024.csv.gz",
+    "sha256": "e2edbd82d29064f60bc33c0ccc61073ee7c42c55ff1c91fe880a23452ea6ddc3",
+    "bars": 885193
+  },
+  {
+    "day": "2019-10-28",
+    "path": "/data/cyris/tushare_market_data/2019/20191028.csv.gz",
+    "sha256": "cab6b614ea0adc314de080eb188f02fcf50e7a1ca98e0a54490dcc9ed0aea6fd",
+    "bars": 885916
+  },
+  {
+    "day": "2019-10-31",
+    "path": "/data/cyris/tushare_market_data/2019/20191031.csv.gz",
+    "sha256": "bc9d4de0d1e0d74308cef7cfac29ba023acb1cd4ea8455e2e9f5a4b63d04b7b2",
+    "bars": 886880
+  },
+  {
+    "day": "2019-11-01",
+    "path": "/data/cyris/tushare_market_data/2019/20191101.csv.gz",
+    "sha256": "b366713eb7555b070054a2470dd988a0a57d5a574e7bba3daa53bad863c55258",
+    "bars": 887121
+  },
+  {
+    "day": "2019-11-04",
+    "path": "/data/cyris/tushare_market_data/2019/20191104.csv.gz",
+    "sha256": "f9d0c96256b88e322369c20597c778d65e2afe51229ee5581ef9d6d9180faabc",
+    "bars": 887603
+  },
+  {
+    "day": "2019-11-05",
+    "path": "/data/cyris/tushare_market_data/2019/20191105.csv.gz",
+    "sha256": "749009b18c4b25a7d8b6b76ab757a65041effadaf9f25869b50741d1f0443dd5",
+    "bars": 889049
+  },
+  {
+    "day": "2019-11-06",
+    "path": "/data/cyris/tushare_market_data/2019/20191106.csv.gz",
+    "sha256": "c1f8afc38a6b530106cb8b72d501b9f10510e426254fad95eeae8780618d958b",
+    "bars": 889049
+  },
+  {
+    "day": "2019-11-07",
+    "path": "/data/cyris/tushare_market_data/2019/20191107.csv.gz",
+    "sha256": "90dfa937b4ee47229a48d8071bc7d7bd34ba4e25c3630cd5f3b79e69b74c5fb5",
+    "bars": 890254
+  },
+  {
+    "day": "2019-11-08",
+    "path": "/data/cyris/tushare_market_data/2019/20191108.csv.gz",
+    "sha256": "5bcfaa27829f2f980aaa9d97626b93cc390f3db148c75afcde0ed7f7638e3a08",
+    "bars": 890977
+  },
+  {
+    "day": "2019-11-11",
+    "path": "/data/cyris/tushare_market_data/2019/20191111.csv.gz",
+    "sha256": "bd470fceb9d5089a93a7a2566e098e27661be294e0f2c98432dcf1a729479883",
+    "bars": 891459
+  },
+  {
+    "day": "2019-11-12",
+    "path": "/data/cyris/tushare_market_data/2019/20191112.csv.gz",
+    "sha256": "b82d376ef30ede770eb66cad84c598f4316bd8d267bc910b4d5ebc5e3c7c7f55",
+    "bars": 891941
+  },
+  {
+    "day": "2019-11-13",
+    "path": "/data/cyris/tushare_market_data/2019/20191113.csv.gz",
+    "sha256": "da85c0e8f3e7b38585d959a2972e954d54e79715f0c7d945e9ee1707b2f63760",
+    "bars": 890495
+  },
+  {
+    "day": "2019-11-14",
+    "path": "/data/cyris/tushare_market_data/2019/20191114.csv.gz",
+    "sha256": "0926e7f8fd1a938c0f0928c28fbca207aad2ab5de72e458a4f18b0ae863697ce",
+    "bars": 891459
+  },
+  {
+    "day": "2019-11-15",
+    "path": "/data/cyris/tushare_market_data/2019/20191115.csv.gz",
+    "sha256": "db669d03ba841d8b33a3eb0955fed853ba4e37f61443807641ca1e84ff8fba5a",
+    "bars": 891941
+  },
+  {
+    "day": "2019-11-18",
+    "path": "/data/cyris/tushare_market_data/2019/20191118.csv.gz",
+    "sha256": "d63dec64e9d8233ba62c361733a7587acbe8d130e1de2d672c62be902c2a3f1a",
+    "bars": 893146
+  },
+  {
+    "day": "2019-11-19",
+    "path": "/data/cyris/tushare_market_data/2019/20191119.csv.gz",
+    "sha256": "1612af69a8aaba6cf2071d32b521046d77b656cc5ffda841fe45b95aea23c133",
+    "bars": 892905
+  },
+  {
+    "day": "2019-11-21",
+    "path": "/data/cyris/tushare_market_data/2019/20191121.csv.gz",
+    "sha256": "ff5322cc720ab79ec8aff006747cd86ea08daadbdca61aec2ccfbdb1072df401",
+    "bars": 893628
+  },
+  {
+    "day": "2019-11-25",
+    "path": "/data/cyris/tushare_market_data/2019/20191125.csv.gz",
+    "sha256": "fc310d5803f837a8656d28f3b1852eb31092c70a5549a92bdc7b188f66388772",
+    "bars": 894833
+  },
+  {
+    "day": "2019-11-27",
+    "path": "/data/cyris/tushare_market_data/2019/20191127.csv.gz",
+    "sha256": "b3865edcfda7a67f0ca840ef731660ea9eca8db54c0ee725b02146a917eefb16",
+    "bars": 894592
+  },
+  {
+    "day": "2019-11-28",
+    "path": "/data/cyris/tushare_market_data/2019/20191128.csv.gz",
+    "sha256": "a6c4e8f8c230d4a3e6f7517d5e1d7d836c22af97bb717501df456b355cacea1b",
+    "bars": 894110
+  },
+  {
+    "day": "2019-12-02",
+    "path": "/data/cyris/tushare_market_data/2019/20191202.csv.gz",
+    "sha256": "ca7e37593c6898a6dccf8698cc1763e6899c8519aed455c45a25b98c5d587586",
+    "bars": 893869
+  },
+  {
+    "day": "2019-12-03",
+    "path": "/data/cyris/tushare_market_data/2019/20191203.csv.gz",
+    "sha256": "0b28ab88eea0ed61f3aa910836b6a7cfa0b50ad90f759cb3c41486497fd28d9d",
+    "bars": 895074
+  },
+  {
+    "day": "2019-12-04",
+    "path": "/data/cyris/tushare_market_data/2019/20191204.csv.gz",
+    "sha256": "f97c33b4b472d2b010b567bd30edf55e284ac1d37a686db8610825675072895b",
+    "bars": 895074
+  },
+  {
+    "day": "2019-12-06",
+    "path": "/data/cyris/tushare_market_data/2019/20191206.csv.gz",
+    "sha256": "fd4d54d146aedecd271d5939a86ee48402ba8dd20feb096386897d316ae82d98",
+    "bars": 895797
+  },
+  {
+    "day": "2019-12-09",
+    "path": "/data/cyris/tushare_market_data/2019/20191209.csv.gz",
+    "sha256": "06855b05400d401da74ecff6041b36b60c9c2aa50f31d23ade445580e1d353c0",
+    "bars": 896038
+  },
+  {
+    "day": "2019-12-10",
+    "path": "/data/cyris/tushare_market_data/2019/20191210.csv.gz",
+    "sha256": "15ebd2964e9412b7463b5abd4f2d29513c67482771c2849d0e5c53470d6d621f",
+    "bars": 895797
+  },
+  {
+    "day": "2019-12-11",
+    "path": "/data/cyris/tushare_market_data/2019/20191211.csv.gz",
+    "sha256": "cf305a1472afa684d2294538d93d54ce83d77977fb6e66385473b0bf838f7e3e",
+    "bars": 896520
+  },
+  {
+    "day": "2019-12-12",
+    "path": "/data/cyris/tushare_market_data/2019/20191212.csv.gz",
+    "sha256": "fc49801316ae1def5df1a12da4fcd5f47e931e325016a8d6b87aad45a74055d9",
+    "bars": 897002
+  },
+  {
+    "day": "2019-12-13",
+    "path": "/data/cyris/tushare_market_data/2019/20191213.csv.gz",
+    "sha256": "13d783f60484e1e863fff2aa3df6bfa3d15d5133c65e8f9c8cd6f7bc1b89c8b8",
+    "bars": 897725
+  },
+  {
+    "day": "2019-12-16",
+    "path": "/data/cyris/tushare_market_data/2019/20191216.csv.gz",
+    "sha256": "146818ad0279adde918ffc12d1af1d9e5da72157c0bd7223043da029316094af",
+    "bars": 898930
+  },
+  {
+    "day": "2019-12-17",
+    "path": "/data/cyris/tushare_market_data/2019/20191217.csv.gz",
+    "sha256": "6e07f53695cc7e225300b325847888a4bb9e162613ae07423156b26191853162",
+    "bars": 898930
+  },
+  {
+    "day": "2019-12-18",
+    "path": "/data/cyris/tushare_market_data/2019/20191218.csv.gz",
+    "sha256": "c679822bb2822b41cde495c9dc829e385e3351b7693669091a085846b19b4050",
+    "bars": 898930
+  },
+  {
+    "day": "2019-12-19",
+    "path": "/data/cyris/tushare_market_data/2019/20191219.csv.gz",
+    "sha256": "843716e4bc524e1508f9928dbd8ffab2e98a39195f2a11a0b8d92df0fecc8ae2",
+    "bars": 899171
+  },
+  {
+    "day": "2019-12-20",
+    "path": "/data/cyris/tushare_market_data/2019/20191220.csv.gz",
+    "sha256": "b1550df53ba0664774977e00058c1f5ecd05bb9af3c79cff473fac5621e97a0f",
+    "bars": 898930
+  },
+  {
+    "day": "2019-12-24",
+    "path": "/data/cyris/tushare_market_data/2019/20191224.csv.gz",
+    "sha256": "a2e748b3c86c54e829e3a2b02d6590f80b1b5c5f7355fa1d72f257a12df5d14c",
+    "bars": 900617
+  },
+  {
+    "day": "2019-12-25",
+    "path": "/data/cyris/tushare_market_data/2019/20191225.csv.gz",
+    "sha256": "bf204e89ae3e979d55d7729a57526b79f8c83f2b052318fdded8927792c20486",
+    "bars": 899894
+  },
+  {
+    "day": "2019-12-26",
+    "path": "/data/cyris/tushare_market_data/2019/20191226.csv.gz",
+    "sha256": "39bc5583f9dd7b0ad611303f9aeef9391031c13b2419190626388cb3e9a28952",
+    "bars": 900135
+  },
+  {
+    "day": "2019-12-30",
+    "path": "/data/cyris/tushare_market_data/2019/20191230.csv.gz",
+    "sha256": "eca124920c7cb49aaa95fdf5dbdeaa78576db655354369e5bf3462006243600f",
+    "bars": 901099
+  },
+  {
+    "day": "2019-12-31",
+    "path": "/data/cyris/tushare_market_data/2019/20191231.csv.gz",
+    "sha256": "7c88e0a8b2021de7f8647d236632722e3945e512576d31e3ef8963512b97a33c",
+    "bars": 901340
+  },
+  {
+    "day": "2020-01-02",
+    "path": "/data/cyris/tushare_market_data/2020/20200102.csv.gz",
+    "sha256": "12955a2d737f8bee60c0f3d7832b82b88123d986393bc9e27ab3596caaabdf3e",
+    "bars": 901099
+  },
+  {
+    "day": "2020-01-03",
+    "path": "/data/cyris/tushare_market_data/2020/20200103.csv.gz",
+    "sha256": "5d7f0a11ec49dee887f54c99e32cdfb8a21d7e94cb5b7e6ba4de4e1fdc6d13f2",
+    "bars": 901340
+  },
+  {
+    "day": "2020-01-07",
+    "path": "/data/cyris/tushare_market_data/2020/20200107.csv.gz",
+    "sha256": "a6561f2c91b59bb343c3e8ad16c4156e7e39be4e22fa3aa492d7c6204a20bd06",
+    "bars": 901822
+  },
+  {
+    "day": "2020-01-08",
+    "path": "/data/cyris/tushare_market_data/2020/20200108.csv.gz",
+    "sha256": "4bdeb4fecac5874e1ed51762d19a490b0cf2f3e4f5b0578ee77326b50738bf1e",
+    "bars": 901581
+  },
+  {
+    "day": "2020-01-09",
+    "path": "/data/cyris/tushare_market_data/2020/20200109.csv.gz",
+    "sha256": "65e123a1a00ace3896b0e1ffb0f1b1c3837ea498d4fe1a2f49e02ef66b838cec",
+    "bars": 901581
+  },
+  {
+    "day": "2020-01-10",
+    "path": "/data/cyris/tushare_market_data/2020/20200110.csv.gz",
+    "sha256": "a16579d960d47e12982d9555222777f0365ff644a0457abf18d1708a64dadb5d",
+    "bars": 901099
+  },
+  {
+    "day": "2020-01-14",
+    "path": "/data/cyris/tushare_market_data/2020/20200114.csv.gz",
+    "sha256": "7d61710016d4d9136154381deea6458eb985a1b6ed1581d8f8423a208ea69a47",
+    "bars": 901822
+  },
+  {
+    "day": "2020-01-15",
+    "path": "/data/cyris/tushare_market_data/2020/20200115.csv.gz",
+    "sha256": "03a33c87812cdfbe476bfd4ef27d6254206fba718b2ad0b608e946a09ba2c1be",
+    "bars": 901822
+  },
+  {
+    "day": "2020-01-16",
+    "path": "/data/cyris/tushare_market_data/2020/20200116.csv.gz",
+    "sha256": "cd5ca66a46e3b2fc29cee4d6b8f7dd80df1775ef402c0c53343bc1cc5780c33b",
+    "bars": 902063
+  },
+  {
+    "day": "2020-01-17",
+    "path": "/data/cyris/tushare_market_data/2020/20200117.csv.gz",
+    "sha256": "bb2c01a00daf78817820e76853d8a444fad2abda6a25d3be4ad68c8112a4645e",
+    "bars": 903027
+  },
+  {
+    "day": "2020-01-20",
+    "path": "/data/cyris/tushare_market_data/2020/20200120.csv.gz",
+    "sha256": "7d9c74d16fbae1301bf442c71cf227ec356f98ca002b521b06dce59275ab67df",
+    "bars": 903750
+  },
+  {
+    "day": "2020-01-21",
+    "path": "/data/cyris/tushare_market_data/2020/20200121.csv.gz",
+    "sha256": "3ea33abcf53efaa38d1bfd2666b90f2f2e8a1c594bcd3dc42504cc7de55e3bdb",
+    "bars": 904232
+  },
+  {
+    "day": "2020-01-23",
+    "path": "/data/cyris/tushare_market_data/2020/20200123.csv.gz",
+    "sha256": "d36c589d520761b3c88aaf34bf866093cf05a77ac9bb2a6b58325490b3ba5813",
+    "bars": 905919
+  },
+  {
+    "day": "2020-02-03",
+    "path": "/data/cyris/tushare_market_data/2020/20200203.csv.gz",
+    "sha256": "839bcb99acd5d0c8bcba30091fe3de97c30866fa70ecbc1f37f1af94d73142f3",
+    "bars": 905919
+  },
+  {
+    "day": "2020-02-04",
+    "path": "/data/cyris/tushare_market_data/2020/20200204.csv.gz",
+    "sha256": "9080cec531c2e4197fd5e091ade090871bb801a677dd576597b09668dc4708b1",
+    "bars": 906160
+  },
+  {
+    "day": "2020-02-05",
+    "path": "/data/cyris/tushare_market_data/2020/20200205.csv.gz",
+    "sha256": "3551f0a6f3d1b84a2a3968720e395a5187e833e6c3a4db0a22d6cdcd8dc3002a",
+    "bars": 906883
+  },
+  {
+    "day": "2020-02-06",
+    "path": "/data/cyris/tushare_market_data/2020/20200206.csv.gz",
+    "sha256": "3a3e30868a97c6a6fc8acad5da2ad326b42ef1f9fc1f2893be08a0c195cf8245",
+    "bars": 907124
+  },
+  {
+    "day": "2020-02-13",
+    "path": "/data/cyris/tushare_market_data/2020/20200213.csv.gz",
+    "sha256": "87b0b6baf4d8527b6ceac397903cf2ac7e791f45447c9b27c54850935ad0f9a5",
+    "bars": 909052
+  },
+  {
+    "day": "2020-02-14",
+    "path": "/data/cyris/tushare_market_data/2020/20200214.csv.gz",
+    "sha256": "97af16c413db285f8b909bb60abcff6b42dea78db32169a17b0a527c6c8bd9fd",
+    "bars": 909293
+  },
+  {
+    "day": "2020-02-17",
+    "path": "/data/cyris/tushare_market_data/2020/20200217.csv.gz",
+    "sha256": "1a6d7c808485b28a7bb9728a4c77d218e3b9b1f39f854b78b1b058255372e08c",
+    "bars": 909534
+  },
+  {
+    "day": "2020-02-18",
+    "path": "/data/cyris/tushare_market_data/2020/20200218.csv.gz",
+    "sha256": "f10af40192d479143c640fe5ee598d9940c901691060fc6b31e250b26576dfd9",
+    "bars": 909534
+  },
+  {
+    "day": "2020-02-19",
+    "path": "/data/cyris/tushare_market_data/2020/20200219.csv.gz",
+    "sha256": "91ee9b03b6a21243e0ec72cf701c9f3eb115cc38e89f2ed634b1a142fa0aa22d",
+    "bars": 910016
+  },
+  {
+    "day": "2020-02-21",
+    "path": "/data/cyris/tushare_market_data/2020/20200221.csv.gz",
+    "sha256": "19c279b98963421090fd38b2cb389a518873410a5028f932636f1d08d6884f8c",
+    "bars": 910739
+  },
+  {
+    "day": "2020-02-24",
+    "path": "/data/cyris/tushare_market_data/2020/20200224.csv.gz",
+    "sha256": "0fe4e35b076f6be4b474acecafc4a48553a3cec028778a13569b1a722ac8acf0",
+    "bars": 910980
+  },
+  {
+    "day": "2020-02-25",
+    "path": "/data/cyris/tushare_market_data/2020/20200225.csv.gz",
+    "sha256": "d639ea47e25ba97d408cbf7e7ddbedc4f9448404d9c8ded3c3ec213982ecf797",
+    "bars": 910980
+  },
+  {
+    "day": "2020-02-27",
+    "path": "/data/cyris/tushare_market_data/2020/20200227.csv.gz",
+    "sha256": "54eed087ff1d0b73445e843a4d3403cf59c3e7d065d3e60eb565a39dc45c2a24",
+    "bars": 911221
+  },
+  {
+    "day": "2020-03-03",
+    "path": "/data/cyris/tushare_market_data/2020/20200303.csv.gz",
+    "sha256": "8777735e16c385d726300c6f284aee1793f0a229bb63d9852495c489d153d83a",
+    "bars": 910980
+  },
+  {
+    "day": "2020-03-06",
+    "path": "/data/cyris/tushare_market_data/2020/20200306.csv.gz",
+    "sha256": "f71544ac00ae802c1ba5a333ac990fd8704826d32b4e27fb004c9ad360501063",
+    "bars": 910257
+  },
+  {
+    "day": "2020-03-10",
+    "path": "/data/cyris/tushare_market_data/2020/20200310.csv.gz",
+    "sha256": "a6949f260a3890512a7921105157c13ca25a4e5c9280c920c3026ab3384567ad",
+    "bars": 910257
+  },
+  {
+    "day": "2020-03-11",
+    "path": "/data/cyris/tushare_market_data/2020/20200311.csv.gz",
+    "sha256": "298ea6234a905cc4036f97c330d81d0b14a410a36d22249caa831c8886d8c3f9",
+    "bars": 909775
+  },
+  {
+    "day": "2020-03-18",
+    "path": "/data/cyris/tushare_market_data/2020/20200318.csv.gz",
+    "sha256": "1bd3ac7afe07ac37de1266f9a1497cfc28d57bd4caaed6636655c332e13ed7bd",
+    "bars": 910016
+  },
+  {
+    "day": "2020-03-19",
+    "path": "/data/cyris/tushare_market_data/2020/20200319.csv.gz",
+    "sha256": "0104b618ee33453a3e38dda8a36d4243ce24d41f59d8dc2033383c963042caa4",
+    "bars": 910980
+  },
+  {
+    "day": "2020-03-20",
+    "path": "/data/cyris/tushare_market_data/2020/20200320.csv.gz",
+    "sha256": "7de7f7b90335fd124e5b294617aa94336bf3f356b9d55e26d983084ada1dc6d7",
+    "bars": 911462
+  },
+  {
+    "day": "2020-03-23",
+    "path": "/data/cyris/tushare_market_data/2020/20200323.csv.gz",
+    "sha256": "c0e1285df13840e4e1e7bcd136dc2a08b3d64c764ea843ae98afcd20e57331a6",
+    "bars": 912185
+  },
+  {
+    "day": "2020-03-24",
+    "path": "/data/cyris/tushare_market_data/2020/20200324.csv.gz",
+    "sha256": "fbcc0814e300c66bdc8afb68e6a42430570e3a59509e455bc0171434ecf1949e",
+    "bars": 911944
+  },
+  {
+    "day": "2020-03-25",
+    "path": "/data/cyris/tushare_market_data/2020/20200325.csv.gz",
+    "sha256": "aa9a135a2b0dedb7aa5617ddc51e5853d29c6ee584bf9ed157aa22349b40c4e2",
+    "bars": 911703
+  },
+  {
+    "day": "2020-03-27",
+    "path": "/data/cyris/tushare_market_data/2020/20200327.csv.gz",
+    "sha256": "2bd3cda4ea13828c72e8ee081c7194feaf608136a944ff41c3fe3e952d644183",
+    "bars": 913149
+  },
+  {
+    "day": "2020-03-30",
+    "path": "/data/cyris/tushare_market_data/2020/20200330.csv.gz",
+    "sha256": "63de3abb05f98303f77ddd17401653e0120351aa6e78cfc650d20fb597f645a4",
+    "bars": 912908
+  },
+  {
+    "day": "2020-04-02",
+    "path": "/data/cyris/tushare_market_data/2020/20200402.csv.gz",
+    "sha256": "7665c55e47d72acb3c6cdd49ff2fcb385b036a1a1399e4f55a00457bf3254d61",
+    "bars": 913390
+  },
+  {
+    "day": "2020-04-03",
+    "path": "/data/cyris/tushare_market_data/2020/20200403.csv.gz",
+    "sha256": "bf103c71109a1faa6b30a614e7764c9cad1c347e75371ae2dc18192ba50c10e6",
+    "bars": 913631
+  },
+  {
+    "day": "2020-04-07",
+    "path": "/data/cyris/tushare_market_data/2020/20200407.csv.gz",
+    "sha256": "d2a4753206c54b55eaa7337bfa72f45fa1116dde0fccc68f60796041a9830bee",
+    "bars": 912908
+  },
+  {
+    "day": "2020-04-08",
+    "path": "/data/cyris/tushare_market_data/2020/20200408.csv.gz",
+    "sha256": "be38257445ae41d4ba73ef331012eaaeb21e9b84d524be24c18e253537395127",
+    "bars": 912908
+  },
+  {
+    "day": "2020-04-09",
+    "path": "/data/cyris/tushare_market_data/2020/20200409.csv.gz",
+    "sha256": "30a8f834754722f9aa0c576103a1ec573c7d93051b50bf4d48fc5e8e586c7194",
+    "bars": 913390
+  },
+  {
+    "day": "2020-04-10",
+    "path": "/data/cyris/tushare_market_data/2020/20200410.csv.gz",
+    "sha256": "81d823199591f2f394ca25759cee18eb4da1fbd4b3cf2b858b85e71c85ea0177",
+    "bars": 913631
+  },
+  {
+    "day": "2020-04-13",
+    "path": "/data/cyris/tushare_market_data/2020/20200413.csv.gz",
+    "sha256": "42c394dc6a548c863e79b31a753be70b2e7f64e62912b103bf020663801a2f67",
+    "bars": 913390
+  },
+  {
+    "day": "2020-04-14",
+    "path": "/data/cyris/tushare_market_data/2020/20200414.csv.gz",
+    "sha256": "4fb2f7dd9a05593593460722d5b60f7b2462a1a67dd6f09690aac4329629e590",
+    "bars": 913631
+  },
+  {
+    "day": "2020-04-15",
+    "path": "/data/cyris/tushare_market_data/2020/20200415.csv.gz",
+    "sha256": "f64fb63500806db972721de5763194ec25ac531d768d881fd63bae03ba648a3e",
+    "bars": 913390
+  },
+  {
+    "day": "2020-04-16",
+    "path": "/data/cyris/tushare_market_data/2020/20200416.csv.gz",
+    "sha256": "bb17409b0149a68c6ef7e58e7d30d8d6b882d1b34ba453d64b4e3357e261facb",
+    "bars": 914836
+  },
+  {
+    "day": "2020-04-17",
+    "path": "/data/cyris/tushare_market_data/2020/20200417.csv.gz",
+    "sha256": "549d3ca820779e94702c97f07fde4508bf747f4efcf5c9826570a68e0cb4c541",
+    "bars": 915559
+  },
+  {
+    "day": "2020-04-20",
+    "path": "/data/cyris/tushare_market_data/2020/20200420.csv.gz",
+    "sha256": "1d6b2d9be93143501bd4d5ded4c8f996bc028cf897c4bb40cf357900dced647a",
+    "bars": 914836
+  },
+  {
+    "day": "2020-04-21",
+    "path": "/data/cyris/tushare_market_data/2020/20200421.csv.gz",
+    "sha256": "1e85dc446b8d3e520fb20e5719fde2ad8de9c5dea057a8acdd95168c8135ac36",
+    "bars": 915077
+  },
+  {
+    "day": "2020-04-22",
+    "path": "/data/cyris/tushare_market_data/2020/20200422.csv.gz",
+    "sha256": "639acacc2e50feea8ac1f2410501f9d6a2affb52fbbe435ec8070fb7d0c012c7",
+    "bars": 916041
+  },
+  {
+    "day": "2020-04-23",
+    "path": "/data/cyris/tushare_market_data/2020/20200423.csv.gz",
+    "sha256": "25f1099c790b03cdf88e23f73ad57af0f0350c3fd1aaf2229efc25573288c009",
+    "bars": 916282
+  },
+  {
+    "day": "2020-04-27",
+    "path": "/data/cyris/tushare_market_data/2020/20200427.csv.gz",
+    "sha256": "9571094cf8c16ddac4c119238669977b2101b92d89b62874a0761ca23d72b4b4",
+    "bars": 916041
+  },
+  {
+    "day": "2020-04-28",
+    "path": "/data/cyris/tushare_market_data/2020/20200428.csv.gz",
+    "sha256": "8c6cdbd4debc6a53cc6c166106035fd913ce53d51171178c413f49026233ff3c",
+    "bars": 914113
+  },
+  {
+    "day": "2020-04-29",
+    "path": "/data/cyris/tushare_market_data/2020/20200429.csv.gz",
+    "sha256": "c810d561088e9658624f7b15e8f47d822f07a9007edeedaa45a8cd353be7f237",
+    "bars": 911944
+  },
+  {
+    "day": "2020-04-30",
+    "path": "/data/cyris/tushare_market_data/2020/20200430.csv.gz",
+    "sha256": "7256743f3257d32d1bd77c6d4faa921bb40e832bbf81b0ea54193c53735df7ee",
+    "bars": 908570
+  },
+  {
+    "day": "2020-05-06",
+    "path": "/data/cyris/tushare_market_data/2020/20200506.csv.gz",
+    "sha256": "7d3d2c2bba8971f7bd92a5d3557279d66e2a0312bb73e7ec3ad43ca2fd3a2082",
+    "bars": 915077
+  },
+  {
+    "day": "2020-05-13",
+    "path": "/data/cyris/tushare_market_data/2020/20200513.csv.gz",
+    "sha256": "fde750825097a1ef89c1b47922e88b917f75fbd0e3eb95b17264bb9101d81429",
+    "bars": 917969
+  },
+  {
+    "day": "2020-05-14",
+    "path": "/data/cyris/tushare_market_data/2020/20200514.csv.gz",
+    "sha256": "15fa8ef3c8aad716b8caf5756c09fa23d79f420283765f3a864eab73956defd1",
+    "bars": 918451
+  },
+  {
+    "day": "2020-05-18",
+    "path": "/data/cyris/tushare_market_data/2020/20200518.csv.gz",
+    "sha256": "f5d95dac9991f5e2675b0f97d00e4fa83e8daa56c1cef03a87d6819cb04b1edb",
+    "bars": 918451
+  },
+  {
+    "day": "2020-05-21",
+    "path": "/data/cyris/tushare_market_data/2020/20200521.csv.gz",
+    "sha256": "cef13f9eaafd2f31848280ab94c5987d00303e6461b2c3d98fa228578dfe2b39",
+    "bars": 918933
+  },
+  {
+    "day": "2020-06-01",
+    "path": "/data/cyris/tushare_market_data/2020/20200601.csv.gz",
+    "sha256": "2e9467e1add186f0a4b4c8e06ddcacb9ca95a7e1561e69e17854909ff0852bfb",
+    "bars": 918451
+  },
+  {
+    "day": "2020-06-02",
+    "path": "/data/cyris/tushare_market_data/2020/20200602.csv.gz",
+    "sha256": "dbee59d06fc9a7073df4e5f6a68bef1fe76d82563138aeda6a12cea5f07de013",
+    "bars": 919656
+  },
+  {
+    "day": "2020-06-04",
+    "path": "/data/cyris/tushare_market_data/2020/20200604.csv.gz",
+    "sha256": "3a8c23b5895d2c7013c315fbdfc1a6939ccf3695ae99d223a52adb9646e17be7",
+    "bars": 919897
+  },
+  {
+    "day": "2020-06-05",
+    "path": "/data/cyris/tushare_market_data/2020/20200605.csv.gz",
+    "sha256": "e6f8937034465f467ee43951646509fc1dc81e57d078b4f5fbd54c75fb695255",
+    "bars": 920138
+  },
+  {
+    "day": "2020-06-08",
+    "path": "/data/cyris/tushare_market_data/2020/20200608.csv.gz",
+    "sha256": "6833cf07e7ccc7519b4e008771f872461efa007664bbafac7a18160ce34bdb67",
+    "bars": 921102
+  },
+  {
+    "day": "2020-06-10",
+    "path": "/data/cyris/tushare_market_data/2020/20200610.csv.gz",
+    "sha256": "ee5bff4d6aeead9fdcb75cbf4a643fe73fc665470e2c09caf70cd49dae318311",
+    "bars": 922066
+  },
+  {
+    "day": "2020-06-12",
+    "path": "/data/cyris/tushare_market_data/2020/20200612.csv.gz",
+    "sha256": "c4b3d488c45a5e2b0acba3f7234995c0de8ea70d133b1fb299adbbe72a08bc92",
+    "bars": 922066
+  },
+  {
+    "day": "2020-06-15",
+    "path": "/data/cyris/tushare_market_data/2020/20200615.csv.gz",
+    "sha256": "5f8255c1bbc969e0c05192ff773ea4b145ecc90e53a3ee96b2d5cbc99ba2fddc",
+    "bars": 922789
+  },
+  {
+    "day": "2020-06-16",
+    "path": "/data/cyris/tushare_market_data/2020/20200616.csv.gz",
+    "sha256": "4819834c27c07eb3fa7d15c1d2eacbe2e1681d63bac44f5aacfe08dcece19aa8",
+    "bars": 923994
+  },
+  {
+    "day": "2020-06-17",
+    "path": "/data/cyris/tushare_market_data/2020/20200617.csv.gz",
+    "sha256": "68c0a0496c14feeab9d6da507f5940b22924b2ceaba03294ec6e0162e001dddd",
+    "bars": 923512
+  },
+  {
+    "day": "2020-06-18",
+    "path": "/data/cyris/tushare_market_data/2020/20200618.csv.gz",
+    "sha256": "469e814edb39550839892c7564876f66198f0dd2e13ce1c56bab921b6f0740c4",
+    "bars": 924235
+  },
+  {
+    "day": "2020-06-22",
+    "path": "/data/cyris/tushare_market_data/2020/20200622.csv.gz",
+    "sha256": "47d466c0e17f9624233997530cbba76649fefa27e2fa12a46927f057e53d1096",
+    "bars": 924717
+  },
+  {
+    "day": "2020-06-23",
+    "path": "/data/cyris/tushare_market_data/2020/20200623.csv.gz",
+    "sha256": "6c0bb062fcbe3762315e79972ca28a06fb515800b52bdec52d2cde6693362a10",
+    "bars": 924476
+  },
+  {
+    "day": "2020-06-29",
+    "path": "/data/cyris/tushare_market_data/2020/20200629.csv.gz",
+    "sha256": "54f07ccc4a0961ebda3b0f102b49387f58e446c134324df446afc1b53d37d1c7",
+    "bars": 925199
+  },
+  {
+    "day": "2020-07-01",
+    "path": "/data/cyris/tushare_market_data/2020/20200701.csv.gz",
+    "sha256": "8370dd57c65fd7a62a871ece6c920f6a3ed0003631235c5beb819d3e8b987bba",
+    "bars": 926645
+  },
+  {
+    "day": "2020-07-02",
+    "path": "/data/cyris/tushare_market_data/2020/20200702.csv.gz",
+    "sha256": "f7eb32ab1088e5aa9265a9295fafc3b82b977491f830c8d05c56ae6ccacda8f0",
+    "bars": 927127
+  },
+  {
+    "day": "2020-07-03",
+    "path": "/data/cyris/tushare_market_data/2020/20200703.csv.gz",
+    "sha256": "15d9d1542de36e0f8adb0931ce793904276a1cddd037b3391fd43831cd55a7bd",
+    "bars": 927609
+  },
+  {
+    "day": "2020-07-09",
+    "path": "/data/cyris/tushare_market_data/2020/20200709.csv.gz",
+    "sha256": "6ceadffca774e58d2ccbf97357a5a7c397593fc6ad930549b9bf283623751efa",
+    "bars": 929055
+  },
+  {
+    "day": "2020-07-10",
+    "path": "/data/cyris/tushare_market_data/2020/20200710.csv.gz",
+    "sha256": "10e36d3f5984fec4315c453f57cbf989bdfb1bac97e692e451e21bf7ec0ba355",
+    "bars": 929537
+  },
+  {
+    "day": "2020-07-13",
+    "path": "/data/cyris/tushare_market_data/2020/20200713.csv.gz",
+    "sha256": "759483f49604f68de1d80e5628682b31190b7b4b436fc38e50a11865a6fee80f",
+    "bars": 930019
+  },
+  {
+    "day": "2020-07-15",
+    "path": "/data/cyris/tushare_market_data/2020/20200715.csv.gz",
+    "sha256": "d672a69bbb1d5eb7e5c18e2af891c7955cdf0825b85fdddf6fa26dab96cba6aa",
+    "bars": 930742
+  },
+  {
+    "day": "2020-07-24",
+    "path": "/data/cyris/tushare_market_data/2020/20200724.csv.gz",
+    "sha256": "6d20f03a768c5c40b962afa0ec8e604950d64343aaedc7f9d46fa7d37a8a13c5",
+    "bars": 935321
+  },
+  {
+    "day": "2020-07-27",
+    "path": "/data/cyris/tushare_market_data/2020/20200727.csv.gz",
+    "sha256": "71608f6c8b51fda694fe93c8df580e0e76ccb8bfc84e9ab3254861d4f5a0d710",
+    "bars": 935803
+  },
+  {
+    "day": "2020-08-03",
+    "path": "/data/cyris/tushare_market_data/2020/20200803.csv.gz",
+    "sha256": "f0bb22134237b33f47d7594a6fec4621dd5790c35fb320ad610ac2544a8b3b92",
+    "bars": 938213
+  },
+  {
+    "day": "2020-08-10",
+    "path": "/data/cyris/tushare_market_data/2020/20200810.csv.gz",
+    "sha256": "f9a6b0e5131c8733b12ffce1741a5a57a9dae1db769320f6e4cadd8cbe0f65c2",
+    "bars": 941105
+  },
+  {
+    "day": "2020-08-11",
+    "path": "/data/cyris/tushare_market_data/2020/20200811.csv.gz",
+    "sha256": "fa7ea29f51d022e7af95d5f548dc11d1600f1cccf277a8a9d755433f924020bf",
+    "bars": 940864
+  },
+  {
+    "day": "2020-08-17",
+    "path": "/data/cyris/tushare_market_data/2020/20200817.csv.gz",
+    "sha256": "f3cc83934ba075cf4cc5293ed7996df0f0240fab99db4fc28fee9234964f6f6c",
+    "bars": 943274
+  },
+  {
+    "day": "2020-08-18",
+    "path": "/data/cyris/tushare_market_data/2020/20200818.csv.gz",
+    "sha256": "88df6765f2b781ed5d12b4802da3db7e51994ee3ca18fbe30676607d9b7d940a",
+    "bars": 943997
+  },
+  {
+    "day": "2020-08-24",
+    "path": "/data/cyris/tushare_market_data/2020/20200824.csv.gz",
+    "sha256": "c2ab2629a83953e29b3ffc6c3ebd4f25845a7338822532f591bacee73c486933",
+    "bars": 949299
+  },
+  {
+    "day": "2020-08-27",
+    "path": "/data/cyris/tushare_market_data/2020/20200827.csv.gz",
+    "sha256": "2fe491ec0915a379bfa7a04633e37396c9dc8de4f16ccedc4885e0f393a381ac",
+    "bars": 950263
+  },
+  {
+    "day": "2020-09-03",
+    "path": "/data/cyris/tushare_market_data/2020/20200903.csv.gz",
+    "sha256": "dbb37c729823c8e50a75b1143c8fc858a3dc550564cd7df9e7665b6b8b352b1d",
+    "bars": 954360
+  },
+  {
+    "day": "2020-09-07",
+    "path": "/data/cyris/tushare_market_data/2020/20200907.csv.gz",
+    "sha256": "c8dd846ec5a76b38fd3d5eb6a400c1e897f6d2fa183745cb12ec1b1b429225a4",
+    "bars": 953637
+  },
+  {
+    "day": "2020-09-09",
+    "path": "/data/cyris/tushare_market_data/2020/20200909.csv.gz",
+    "sha256": "c66686d638350ecc0206aa7ab170b88129f7a32c73f84a8ee3712d161d0e2bc3",
+    "bars": 953396
+  },
+  {
+    "day": "2020-09-14",
+    "path": "/data/cyris/tushare_market_data/2020/20200914.csv.gz",
+    "sha256": "2ae8ed8828241e0e8f4ab3f6d911053678526f8b887ae57b85f632a797a0fcfd",
+    "bars": 954842
+  },
+  {
+    "day": "2020-09-16",
+    "path": "/data/cyris/tushare_market_data/2020/20200916.csv.gz",
+    "sha256": "7a0399a5a3661540ca3a71bbece4a2e4f6283611a14c5d5569a4e7f3b664ccdd",
+    "bars": 957252
+  },
+  {
+    "day": "2020-09-25",
+    "path": "/data/cyris/tushare_market_data/2020/20200925.csv.gz",
+    "sha256": "fb833313d2cdefabe0b8ed9ee570a52807da8b30add0e70e8fd9796f42b2559c",
+    "bars": 964482
+  },
+  {
+    "day": "2020-10-12",
+    "path": "/data/cyris/tushare_market_data/2020/20201012.csv.gz",
+    "sha256": "1e0034e03afb1590e7f538882769e0aa22ffef0c9bf0a9d87176a875f63d76c5",
+    "bars": 967856
+  },
+  {
+    "day": "2020-10-13",
+    "path": "/data/cyris/tushare_market_data/2020/20201013.csv.gz",
+    "sha256": "d261f1355c05683917883e1f1b6e71ba8deea42f6e02c91c4ccf422d64b6d21c",
+    "bars": 969061
+  },
+  {
+    "day": "2020-10-14",
+    "path": "/data/cyris/tushare_market_data/2020/20201014.csv.gz",
+    "sha256": "dd61c76666ffe6bd115720cc122b6dfdb0414eb028b5a5df3e0ff268f59f76e0",
+    "bars": 968579
+  },
+  {
+    "day": "2020-10-15",
+    "path": "/data/cyris/tushare_market_data/2020/20201015.csv.gz",
+    "sha256": "21061c7e378e781849e8c26929e74fad842fb097da4786d6483da43741a5a7ae",
+    "bars": 969061
+  },
+  {
+    "day": "2020-10-16",
+    "path": "/data/cyris/tushare_market_data/2020/20201016.csv.gz",
+    "sha256": "67c91878dd40103d6b015a6c9ac292d201c90f977b850ad45e7c572785516b35",
+    "bars": 969543
+  },
+  {
+    "day": "2020-10-19",
+    "path": "/data/cyris/tushare_market_data/2020/20201019.csv.gz",
+    "sha256": "d0d2d5e191ec02a5a2b5ec6717bc4f1949f23760f21ccaf49ab010595144f481",
+    "bars": 970266
+  },
+  {
+    "day": "2020-10-22",
+    "path": "/data/cyris/tushare_market_data/2020/20201022.csv.gz",
+    "sha256": "07899bfd6a647299e1bf30859cceb3487313f1f2bcc03a82380dba75a145b6dc",
+    "bars": 971712
+  },
+  {
+    "day": "2020-10-23",
+    "path": "/data/cyris/tushare_market_data/2020/20201023.csv.gz",
+    "sha256": "cb16df58f386f5556f1b25e8ad81c1da2fbd1a10a7115646fa99f206b68eb61e",
+    "bars": 972194
+  },
+  {
+    "day": "2020-10-26",
+    "path": "/data/cyris/tushare_market_data/2020/20201026.csv.gz",
+    "sha256": "eb54f4c87bfc9283cee383a036853657511841b8f9bb775d96cafc146ea5dc7c",
+    "bars": 972435
+  },
+  {
+    "day": "2020-10-28",
+    "path": "/data/cyris/tushare_market_data/2020/20201028.csv.gz",
+    "sha256": "9435d3e2974d68d3fd985540e4e0c869bf814c60fe3027e44ba6373ffd68d74d",
+    "bars": 972917
+  },
+  {
+    "day": "2020-10-29",
+    "path": "/data/cyris/tushare_market_data/2020/20201029.csv.gz",
+    "sha256": "7447e6aa4883db0101329bf02933db9d5cc839ce1efb3f9e19d51bb26eadcb4c",
+    "bars": 974122
+  },
+  {
+    "day": "2020-10-30",
+    "path": "/data/cyris/tushare_market_data/2020/20201030.csv.gz",
+    "sha256": "dc118df23d34af07b68c4956e075c9ab43c39cc09aa50d1fb4440be065f8159e",
+    "bars": 974363
+  },
+  {
+    "day": "2020-11-02",
+    "path": "/data/cyris/tushare_market_data/2020/20201102.csv.gz",
+    "sha256": "f58c821885c938381fb7705b0971afdfe91f2026ceb0c52b3f11000de586c9c9",
+    "bars": 974363
+  },
+  {
+    "day": "2020-11-03",
+    "path": "/data/cyris/tushare_market_data/2020/20201103.csv.gz",
+    "sha256": "d6399fa349d1e6811a7bbb4abea39bdca3ff145b4285492120d039449d0a1b54",
+    "bars": 974363
+  },
+  {
+    "day": "2020-11-04",
+    "path": "/data/cyris/tushare_market_data/2020/20201104.csv.gz",
+    "sha256": "bf3d7b5ee0e5a4ca4602f2ed9062907cd358d5f9bd4eb2b29f89b0e7d250b320",
+    "bars": 974604
+  },
+  {
+    "day": "2020-11-05",
+    "path": "/data/cyris/tushare_market_data/2020/20201105.csv.gz",
+    "sha256": "14cab02d4c1ad457b802818b7c09789b0bb1b037b5904b3dfbb3f748e017cdba",
+    "bars": 975568
+  },
+  {
+    "day": "2020-11-06",
+    "path": "/data/cyris/tushare_market_data/2020/20201106.csv.gz",
+    "sha256": "9b9e69e5fa18381b766f9c50ae906a0797a9b90638c897a5958aa056e0978901",
+    "bars": 975809
+  },
+  {
+    "day": "2020-11-09",
+    "path": "/data/cyris/tushare_market_data/2020/20201109.csv.gz",
+    "sha256": "7f42a2718a458411fc154571b609191bae10171b2553f9ec6f9af1e36ad18c42",
+    "bars": 977255
+  },
+  {
+    "day": "2020-11-10",
+    "path": "/data/cyris/tushare_market_data/2020/20201110.csv.gz",
+    "sha256": "fa731e0e6b57301faccc96b2d3b38d5a9ab7c94f9bb3646e91ac7d4d5a5721c2",
+    "bars": 977496
+  },
+  {
+    "day": "2020-11-11",
+    "path": "/data/cyris/tushare_market_data/2020/20201111.csv.gz",
+    "sha256": "7eb081adc6f2cebeee97f54d9ca332f9bcd86a8ce244eaa7064db47855f77ac1",
+    "bars": 977978
+  },
+  {
+    "day": "2020-11-12",
+    "path": "/data/cyris/tushare_market_data/2020/20201112.csv.gz",
+    "sha256": "4d5153397d09bacb67e9213fa871f1ebec2742878b5c91b571a608b5b279a9bf",
+    "bars": 978701
+  },
+  {
+    "day": "2020-11-13",
+    "path": "/data/cyris/tushare_market_data/2020/20201113.csv.gz",
+    "sha256": "c26089089671987c9a47986f20f05de46981a965e3d1dd05d3831c82e4a94186",
+    "bars": 977978
+  },
+  {
+    "day": "2020-11-16",
+    "path": "/data/cyris/tushare_market_data/2020/20201116.csv.gz",
+    "sha256": "477cec0820da3502f665ec67e6c7b8af06b1ce1ae211a62931eaa5004298231d",
+    "bars": 978219
+  },
+  {
+    "day": "2020-11-17",
+    "path": "/data/cyris/tushare_market_data/2020/20201117.csv.gz",
+    "sha256": "a93f7baff80f95b8fd60a0a8baa24c9fb2305e5582533c6e3845acad6f96aee7",
+    "bars": 978701
+  },
+  {
+    "day": "2020-11-18",
+    "path": "/data/cyris/tushare_market_data/2020/20201118.csv.gz",
+    "sha256": "b93ceb2df37c175d57493e13c1308df93524c93f0fa551fb8531ae3de2e913b5",
+    "bars": 979665
+  },
+  {
+    "day": "2020-11-19",
+    "path": "/data/cyris/tushare_market_data/2020/20201119.csv.gz",
+    "sha256": "64eeea7f6e83e52aed848ec5961d76194231d1d74ef26307c638ad28d355ae08",
+    "bars": 979424
+  },
+  {
+    "day": "2020-11-20",
+    "path": "/data/cyris/tushare_market_data/2020/20201120.csv.gz",
+    "sha256": "a2662e5db7376eb746a04c991dba267fdafc510801cfab45a5462b68076469fa",
+    "bars": 979424
+  },
+  {
+    "day": "2020-11-23",
+    "path": "/data/cyris/tushare_market_data/2020/20201123.csv.gz",
+    "sha256": "e0f184ce9740af391216b751c131d416f45c9eecbd963e63c5f008ed2e1cd5eb",
+    "bars": 979665
+  },
+  {
+    "day": "2020-11-24",
+    "path": "/data/cyris/tushare_market_data/2020/20201124.csv.gz",
+    "sha256": "e1e79415e9b72b4f6ffb0f07572aa684ad197c1bdf88d87334654fe6aaf996ef",
+    "bars": 979424
+  },
+  {
+    "day": "2020-11-25",
+    "path": "/data/cyris/tushare_market_data/2020/20201125.csv.gz",
+    "sha256": "a61a342dea476526d301f62db69793fe8190e541abdc9381e9565c20e7d1ca1a",
+    "bars": 979183
+  },
+  {
+    "day": "2020-11-26",
+    "path": "/data/cyris/tushare_market_data/2020/20201126.csv.gz",
+    "sha256": "d167eec9193334ca59f1a6e13151753250f0850439d6b1fd8e146505e78de0af",
+    "bars": 980388
+  },
+  {
+    "day": "2020-11-27",
+    "path": "/data/cyris/tushare_market_data/2020/20201127.csv.gz",
+    "sha256": "543bfa801307a746a34a3e208d6432b99a4bdee93112c2dd780ba61017b87532",
+    "bars": 980388
+  },
+  {
+    "day": "2020-11-30",
+    "path": "/data/cyris/tushare_market_data/2020/20201130.csv.gz",
+    "sha256": "8bfede6b1038b129ffa2f9682d556a7c1ee95d44875b1b472e59cd6c940e712e",
+    "bars": 979906
+  },
+  {
+    "day": "2020-12-01",
+    "path": "/data/cyris/tushare_market_data/2020/20201201.csv.gz",
+    "sha256": "8e9b176527b5eb357b6898e5741f43d3eea0fbd3f6c65f9cbb460b90b4bf36be",
+    "bars": 980388
+  },
+  {
+    "day": "2020-12-02",
+    "path": "/data/cyris/tushare_market_data/2020/20201202.csv.gz",
+    "sha256": "52985e26608af8750191d5a16c5565034dfe4b8059378018fe105d539a8c9db6",
+    "bars": 980388
+  },
+  {
+    "day": "2020-12-03",
+    "path": "/data/cyris/tushare_market_data/2020/20201203.csv.gz",
+    "sha256": "31981efd82f327345118e9f684ee7c2eb7611a9c2af095b4e4ee6cd897cbedc2",
+    "bars": 981111
+  },
+  {
+    "day": "2020-12-04",
+    "path": "/data/cyris/tushare_market_data/2020/20201204.csv.gz",
+    "sha256": "b2a79ec238cef8df59ea362cfba53fb2a710d47b15ff04d6a90bb38a94b93288",
+    "bars": 981352
+  },
+  {
+    "day": "2020-12-07",
+    "path": "/data/cyris/tushare_market_data/2020/20201207.csv.gz",
+    "sha256": "2d33d12c82e580d2fafa51ae209d03f8ca4e9b5c75156791229fa97969c3c969",
+    "bars": 981593
+  },
+  {
+    "day": "2020-12-08",
+    "path": "/data/cyris/tushare_market_data/2020/20201208.csv.gz",
+    "sha256": "1a41470825be3aaf62d82d0e96888f2a24546498568b3e61cf7cf47272f73505",
+    "bars": 982798
+  },
+  {
+    "day": "2020-12-10",
+    "path": "/data/cyris/tushare_market_data/2020/20201210.csv.gz",
+    "sha256": "b29e6192bb1f76371587d9e5857eca1e69ec8759aeba83543cd7773b5a3d8a81",
+    "bars": 983039
+  },
+  {
+    "day": "2020-12-11",
+    "path": "/data/cyris/tushare_market_data/2020/20201211.csv.gz",
+    "sha256": "c6ed207df834af6d0c4a5e15a2ff7090dac71ba0c5523cf5ecf23e65a05d0ac8",
+    "bars": 983762
+  },
+  {
+    "day": "2020-12-14",
+    "path": "/data/cyris/tushare_market_data/2020/20201214.csv.gz",
+    "sha256": "42e764c86e80e9d29bc50de2320c7d19cf182034f473f81d97037275a6dc5193",
+    "bars": 984485
+  },
+  {
+    "day": "2020-12-16",
+    "path": "/data/cyris/tushare_market_data/2020/20201216.csv.gz",
+    "sha256": "52b9ca536eec301b9c54bfe884a28e0f6a6ee201c73b944360577df9bc5df454",
+    "bars": 986172
+  },
+  {
+    "day": "2020-12-17",
+    "path": "/data/cyris/tushare_market_data/2020/20201217.csv.gz",
+    "sha256": "4d68378b000f24412c02ca2214f6f0c6df4702ab236af390a444a9bfa8a8676f",
+    "bars": 985931
+  },
+  {
+    "day": "2020-12-18",
+    "path": "/data/cyris/tushare_market_data/2020/20201218.csv.gz",
+    "sha256": "9203bc846259acf5614720d0ad8527ff79d25be2981c91e7cc3b1d024045e8d7",
+    "bars": 986654
+  },
+  {
+    "day": "2020-12-21",
+    "path": "/data/cyris/tushare_market_data/2020/20201221.csv.gz",
+    "sha256": "388f4bfe172fcb31e4aeaf6a8f98db2b6f659977bb978d7a94083dccfc35ace7",
+    "bars": 987136
+  },
+  {
+    "day": "2020-12-22",
+    "path": "/data/cyris/tushare_market_data/2020/20201222.csv.gz",
+    "sha256": "89b12f411e0f63d769f2e65e19eb74ae8060846224deaf352b10505ce86460c5",
+    "bars": 986895
+  },
+  {
+    "day": "2020-12-23",
+    "path": "/data/cyris/tushare_market_data/2020/20201223.csv.gz",
+    "sha256": "93c80f8c0025f754be739e6320c860981bda052e3d465b1add63205aa19d7fbf",
+    "bars": 987618
+  },
+  {
+    "day": "2020-12-24",
+    "path": "/data/cyris/tushare_market_data/2020/20201224.csv.gz",
+    "sha256": "c2ec763952471494257f26c518093833aa04dcbf2c570771bc7a08d903f619d2",
+    "bars": 988100
+  },
+  {
+    "day": "2020-12-25",
+    "path": "/data/cyris/tushare_market_data/2020/20201225.csv.gz",
+    "sha256": "a07d90e51ab2cd115e7f41279d7d021563137a568c9bb86fff87a5a8c3159565",
+    "bars": 988823
+  },
+  {
+    "day": "2020-12-28",
+    "path": "/data/cyris/tushare_market_data/2020/20201228.csv.gz",
+    "sha256": "845cb26250d392402171dbe9e6bc03233ecc0d0cc07ee6f0552c5dbb7237ec24",
+    "bars": 989546
+  },
+  {
+    "day": "2020-12-29",
+    "path": "/data/cyris/tushare_market_data/2020/20201229.csv.gz",
+    "sha256": "9aad38fdd67df85d460d7dfb5c054611ac4ccb5f98a75f86a72161eed68a5f07",
+    "bars": 990992
+  },
+  {
+    "day": "2020-12-30",
+    "path": "/data/cyris/tushare_market_data/2020/20201230.csv.gz",
+    "sha256": "ebe08c93b6e041ef450c2e1ca1f8d18573e1fabea2842f76093519cbe473c820",
+    "bars": 991474
+  },
+  {
+    "day": "2020-12-31",
+    "path": "/data/cyris/tushare_market_data/2020/20201231.csv.gz",
+    "sha256": "8beaa144b64b267d92195fc0a2fc5f58caef3113c4a70c4a59fe4d3ebf9d89c8",
+    "bars": 991956
+  },
+  {
+    "day": "2021-01-04",
+    "path": "/data/cyris/tushare_market_data/2021/20210104.csv.gz",
+    "sha256": "b5651197c74ab87896f8940a241d76a92a0055ce8349c36c201e863f838c75f2",
+    "bars": 992679
+  },
+  {
+    "day": "2021-01-05",
+    "path": "/data/cyris/tushare_market_data/2021/20210105.csv.gz",
+    "sha256": "bed381cd71ba4065d112ebd291398b6d1195bf725fe35b6ed2eff921c8e19cf3",
+    "bars": 992920
+  },
+  {
+    "day": "2021-01-07",
+    "path": "/data/cyris/tushare_market_data/2021/20210107.csv.gz",
+    "sha256": "95e69812a4c6f2aeb7a89edbe45a723be23d4436c5e57e29cd5d88b09ad2e242",
+    "bars": 994607
+  },
+  {
+    "day": "2021-01-08",
+    "path": "/data/cyris/tushare_market_data/2021/20210108.csv.gz",
+    "sha256": "a9c20f5093e8a3306f8b8c25eff0df2d57d8ec146d045ce1113b11f7e661ff4a",
+    "bars": 994848
+  },
+  {
+    "day": "2021-01-11",
+    "path": "/data/cyris/tushare_market_data/2021/20210111.csv.gz",
+    "sha256": "e03775aea22da2c45a0dd5cd36bd1b2c76fed5bb9d87a8ad3338543ccf73cacc",
+    "bars": 993884
+  },
+  {
+    "day": "2021-01-12",
+    "path": "/data/cyris/tushare_market_data/2021/20210112.csv.gz",
+    "sha256": "0bb4e3ddf77995d09442364bc9d532315cd3cd2d9704563038d9c3961a6ee8a8",
+    "bars": 994125
+  },
+  {
+    "day": "2021-01-13",
+    "path": "/data/cyris/tushare_market_data/2021/20210113.csv.gz",
+    "sha256": "fccdc0efc6891e1cc596b4c703246bd345f53457ca2b91d96c7952a1ff954aeb",
+    "bars": 994607
+  },
+  {
+    "day": "2021-01-14",
+    "path": "/data/cyris/tushare_market_data/2021/20210114.csv.gz",
+    "sha256": "9c3435cdf87476eadc1ea20896e4ec639e40ceea1c4eabf226afd1885c7e746f",
+    "bars": 993884
+  },
+  {
+    "day": "2021-01-15",
+    "path": "/data/cyris/tushare_market_data/2021/20210115.csv.gz",
+    "sha256": "434a77bc440c26cec320559f3ace71e63f1922d99702145cb6294f4fd4c4243b",
+    "bars": 993161
+  },
+  {
+    "day": "2021-01-18",
+    "path": "/data/cyris/tushare_market_data/2021/20210118.csv.gz",
+    "sha256": "010635cccfd116386e2056003331e19c8b18557b235ce711fe30cda694b5ef4e",
+    "bars": 993884
+  },
+  {
+    "day": "2021-01-20",
+    "path": "/data/cyris/tushare_market_data/2021/20210120.csv.gz",
+    "sha256": "27b5b0493b0411ef0633da788f7bc128973402ca7ce5578976b872876051e2fa",
+    "bars": 994848
+  },
+  {
+    "day": "2021-01-21",
+    "path": "/data/cyris/tushare_market_data/2021/20210121.csv.gz",
+    "sha256": "fc0da47e9c88ac6e352436d3c734276ca144862e79699562a32169423d4f8c1d",
+    "bars": 995571
+  },
+  {
+    "day": "2021-01-25",
+    "path": "/data/cyris/tushare_market_data/2021/20210125.csv.gz",
+    "sha256": "904902fb635d1f86aec58aae6644937941e71f46cc48ca53540defe7a78ade88",
+    "bars": 996535
+  },
+  {
+    "day": "2021-01-26",
+    "path": "/data/cyris/tushare_market_data/2021/20210126.csv.gz",
+    "sha256": "64d49228df292f69b9a16cb4519e4b19a992b43394f514849b3e3a92bf8c551f",
+    "bars": 997017
+  },
+  {
+    "day": "2021-01-27",
+    "path": "/data/cyris/tushare_market_data/2021/20210127.csv.gz",
+    "sha256": "8ab3ca0d8c36277f84b58e35f7a9d014b0b7c4cf18ae8ae05e97c0608092a134",
+    "bars": 997981
+  },
+  {
+    "day": "2021-01-28",
+    "path": "/data/cyris/tushare_market_data/2021/20210128.csv.gz",
+    "sha256": "3dee8b98ef836fb5874a5027e997d6cbdeedc4810da41c99501b745b6dd355b2",
+    "bars": 999427
+  },
+  {
+    "day": "2021-01-29",
+    "path": "/data/cyris/tushare_market_data/2021/20210129.csv.gz",
+    "sha256": "6671a2e8cc051a3cbfa4b86b520e6fe79b6e6a709be1d759857ea972cb641d47",
+    "bars": 999909
+  },
+  {
+    "day": "2021-02-01",
+    "path": "/data/cyris/tushare_market_data/2021/20210201.csv.gz",
+    "sha256": "56b1e3c3e56fde728dbb941afdee079ffc05ac3159dba257c8e8726d460ddc1c",
+    "bars": 1000632
+  },
+  {
+    "day": "2021-02-03",
+    "path": "/data/cyris/tushare_market_data/2021/20210203.csv.gz",
+    "sha256": "b004530fb3dd74c5a4ceac9d3ffb976f561d71a09dc3ba8a50e89eef6df2487d",
+    "bars": 1001114
+  },
+  {
+    "day": "2021-02-04",
+    "path": "/data/cyris/tushare_market_data/2021/20210204.csv.gz",
+    "sha256": "f16207f5f34e224da131744fd3d4466efd56ea18fbd68a1816d3f0c352763a2e",
+    "bars": 1001355
+  },
+  {
+    "day": "2021-02-05",
+    "path": "/data/cyris/tushare_market_data/2021/20210205.csv.gz",
+    "sha256": "7ee4772f6a0f4f3bc9816c3ffdbdfe830a666fc963b30e3dd5cd9ebfbcb878c3",
+    "bars": 1001355
+  },
+  {
+    "day": "2021-02-10",
+    "path": "/data/cyris/tushare_market_data/2021/20210210.csv.gz",
+    "sha256": "151fa052d4f2f2e0d4bab2b2154f518469677a3bc3501652764577bcca48a5a6",
+    "bars": 1005452
+  },
+  {
+    "day": "2021-02-18",
+    "path": "/data/cyris/tushare_market_data/2021/20210218.csv.gz",
+    "sha256": "e8b2d0205d2253847499bf9adbda9109a71cb4b1af125ab58bffaa42a64de3ac",
+    "bars": 1004247
+  },
+  {
+    "day": "2021-02-19",
+    "path": "/data/cyris/tushare_market_data/2021/20210219.csv.gz",
+    "sha256": "c6e0d947e561e839c1725547fcaf91e2fe2477f3ed08813b0ca8db59d9e7f2c3",
+    "bars": 1005211
+  },
+  {
+    "day": "2021-02-22",
+    "path": "/data/cyris/tushare_market_data/2021/20210222.csv.gz",
+    "sha256": "4d3ca7b746c3c67c13b942031e9a542deb791d4fd5b679b36827220bd1f090af",
+    "bars": 1005211
+  },
+  {
+    "day": "2021-02-23",
+    "path": "/data/cyris/tushare_market_data/2021/20210223.csv.gz",
+    "sha256": "7fab6f63ea4109707e62a81a2e9c48e91e2d1b8e43f4650ea7011cdc8ad02add",
+    "bars": 1005211
+  },
+  {
+    "day": "2021-02-24",
+    "path": "/data/cyris/tushare_market_data/2021/20210224.csv.gz",
+    "sha256": "3d89d91b2a7bff92d3cd13ec916f553c571a836fbb7b5db1b3071ba7237e07dd",
+    "bars": 1005934
+  },
+  {
+    "day": "2021-02-26",
+    "path": "/data/cyris/tushare_market_data/2021/20210226.csv.gz",
+    "sha256": "0e730a27f58b9f881ad02da35de1874b9c516b9e4d865f5de71361ab1626fc76",
+    "bars": 1006416
+  },
+  {
+    "day": "2021-03-01",
+    "path": "/data/cyris/tushare_market_data/2021/20210301.csv.gz",
+    "sha256": "174422528aa47a227375a236eaa51bff18098f8a2c79bf33ccbb3d9272f62f3e",
+    "bars": 1006657
+  },
+  {
+    "day": "2021-03-02",
+    "path": "/data/cyris/tushare_market_data/2021/20210302.csv.gz",
+    "sha256": "2390569f763b7239cc5ee632967d9c236a28d02e05e5d4876a026fbb6ea80ecb",
+    "bars": 1006898
+  },
+  {
+    "day": "2021-03-03",
+    "path": "/data/cyris/tushare_market_data/2021/20210303.csv.gz",
+    "sha256": "833864c5e604599981b0606bb51246a1790327e6acf79c3741d6c78f0d7cf91f",
+    "bars": 1007139
+  },
+  {
+    "day": "2021-03-05",
+    "path": "/data/cyris/tushare_market_data/2021/20210305.csv.gz",
+    "sha256": "e2a141b84e8d321a5b425cbebc07140093f3b74c57826d45120c563a9ad74f4d",
+    "bars": 1007380
+  },
+  {
+    "day": "2021-03-08",
+    "path": "/data/cyris/tushare_market_data/2021/20210308.csv.gz",
+    "sha256": "1e9ba1c1dbe1ba53731b72de63dc68ed9c5e5bba2d95ccc428872f90a925ff33",
+    "bars": 1007862
+  },
+  {
+    "day": "2021-03-09",
+    "path": "/data/cyris/tushare_market_data/2021/20210309.csv.gz",
+    "sha256": "5aea98b4a73f3bb24b92e9930cc943c0dd3381e1c64028802767f4d5d5df10a8",
+    "bars": 1008103
+  },
+  {
+    "day": "2021-03-10",
+    "path": "/data/cyris/tushare_market_data/2021/20210310.csv.gz",
+    "sha256": "f39322674e36f08b250da754da1c5b8083e6e77e269a364b9265e0d5c3cb948e",
+    "bars": 1008344
+  },
+  {
+    "day": "2021-03-11",
+    "path": "/data/cyris/tushare_market_data/2021/20210311.csv.gz",
+    "sha256": "7bffe8bb060c0d52e740a997e0918890f264663cd271472264ebf0cb44d14829",
+    "bars": 1008344
+  },
+  {
+    "day": "2021-03-12",
+    "path": "/data/cyris/tushare_market_data/2021/20210312.csv.gz",
+    "sha256": "a2045286f9614d8d424a379c3a17422cb01a3ea92dab4470fffca13eee4684d0",
+    "bars": 1008585
+  },
+  {
+    "day": "2021-03-16",
+    "path": "/data/cyris/tushare_market_data/2021/20210316.csv.gz",
+    "sha256": "a64c0bda460ec69417dee03f8e6c79732e01ceb6a75461c2ef441c080cdaf383",
+    "bars": 1009308
+  },
+  {
+    "day": "2021-03-17",
+    "path": "/data/cyris/tushare_market_data/2021/20210317.csv.gz",
+    "sha256": "1c3c4451a9535570c0f92cd7b2fc9fc0f05097a9bdc8f962388f22c84840db8b",
+    "bars": 1009549
+  },
+  {
+    "day": "2021-03-18",
+    "path": "/data/cyris/tushare_market_data/2021/20210318.csv.gz",
+    "sha256": "9c0c8ea997a1247a80b00609cc4e668a04e83c824b5712b42dec1efc39687190",
+    "bars": 1010031
+  },
+  {
+    "day": "2021-03-19",
+    "path": "/data/cyris/tushare_market_data/2021/20210319.csv.gz",
+    "sha256": "9705b2217d331fa86118d9ab9ba92dcf94febeb219c2a1dbe08a22bac8a9269e",
+    "bars": 1009790
+  },
+  {
+    "day": "2021-03-22",
+    "path": "/data/cyris/tushare_market_data/2021/20210322.csv.gz",
+    "sha256": "813f88197c8a8cb9a12c5c6e5370915c378b72dde6c77cdec18af36b522033a9",
+    "bars": 1012200
+  },
+  {
+    "day": "2021-03-23",
+    "path": "/data/cyris/tushare_market_data/2021/20210323.csv.gz",
+    "sha256": "187ad239e3d8e2bdc4e15b7365515e6daee86091b1bae0c4bb5dce5b5f790f87",
+    "bars": 1012682
+  },
+  {
+    "day": "2021-03-24",
+    "path": "/data/cyris/tushare_market_data/2021/20210324.csv.gz",
+    "sha256": "de421e94ef7219be7b73939b23a25076f466d957d54043d1f841aadc2475bf97",
+    "bars": 1012923
+  },
+  {
+    "day": "2021-03-26",
+    "path": "/data/cyris/tushare_market_data/2021/20210326.csv.gz",
+    "sha256": "6732c0c9374ccb6d58996589724429232f497f9caab92431e38043914515255f",
+    "bars": 1014369
+  },
+  {
+    "day": "2021-03-29",
+    "path": "/data/cyris/tushare_market_data/2021/20210329.csv.gz",
+    "sha256": "06a37661efb41c17ca6f30388b18e87b41687fa5d2d607f3536e31ed31289571",
+    "bars": 1015333
+  },
+  {
+    "day": "2021-03-30",
+    "path": "/data/cyris/tushare_market_data/2021/20210330.csv.gz",
+    "sha256": "ead05d05c8e8f7cadbb939bb08b2253905b8a0956683e9f640cd5343f76d1789",
+    "bars": 1016056
+  },
+  {
+    "day": "2021-03-31",
+    "path": "/data/cyris/tushare_market_data/2021/20210331.csv.gz",
+    "sha256": "62abeafcf4a3e4b591357044ff2e2046d6d5bc9f6cffec4f7e02a70825a0f8e6",
+    "bars": 1015574
+  },
+  {
+    "day": "2021-04-01",
+    "path": "/data/cyris/tushare_market_data/2021/20210401.csv.gz",
+    "sha256": "af3d72cfe61d2416820fec3c33906783a6fe58283fed54d4826200092fb9146a",
+    "bars": 1016779
+  },
+  {
+    "day": "2021-04-02",
+    "path": "/data/cyris/tushare_market_data/2021/20210402.csv.gz",
+    "sha256": "5f0a77669f170e291328fdc77067c81936352af9ea8802755984c2153f42ffb0",
+    "bars": 1016779
+  },
+  {
+    "day": "2021-04-06",
+    "path": "/data/cyris/tushare_market_data/2021/20210406.csv.gz",
+    "sha256": "97e24dc63a1bbfed6e0da4a86928afbc00eb44a1c353af6c8d51c2e0a16db8f7",
+    "bars": 1018466
+  },
+  {
+    "day": "2021-04-07",
+    "path": "/data/cyris/tushare_market_data/2021/20210407.csv.gz",
+    "sha256": "e068b5591d23851016e0299336cc56108e41a9abf026e6c8f5d6f1023d988cae",
+    "bars": 1017984
+  },
+  {
+    "day": "2021-04-08",
+    "path": "/data/cyris/tushare_market_data/2021/20210408.csv.gz",
+    "sha256": "ad258ed68344247f0b4549e12b73146de59b321d931f1b14901b903ce6844a3f",
+    "bars": 1018707
+  },
+  {
+    "day": "2021-04-09",
+    "path": "/data/cyris/tushare_market_data/2021/20210409.csv.gz",
+    "sha256": "3e023c03caafc52eedf12da277feb9e5044bc25ca11049dee85607a00da666c1",
+    "bars": 1019671
+  },
+  {
+    "day": "2021-04-15",
+    "path": "/data/cyris/tushare_market_data/2021/20210415.csv.gz",
+    "sha256": "76e47a1c6b9b17e8d6e4b2f53e808a38ddc725ee9f5576ac2651634b33a2ab18",
+    "bars": 1021599
+  },
+  {
+    "day": "2021-04-19",
+    "path": "/data/cyris/tushare_market_data/2021/20210419.csv.gz",
+    "sha256": "92f4b9af3670b1e48bb62871ebca2815f41c7b47aaf927328348e428574c4775",
+    "bars": 1023527
+  },
+  {
+    "day": "2021-04-20",
+    "path": "/data/cyris/tushare_market_data/2021/20210420.csv.gz",
+    "sha256": "bbf81025329c4c503b4af41e46a5da1c3f32d0f73b89a89fb6e47d589f1a410e",
+    "bars": 1024250
+  },
+  {
+    "day": "2021-04-21",
+    "path": "/data/cyris/tushare_market_data/2021/20210421.csv.gz",
+    "sha256": "0f8291c36870969fec5e0999c2a1af7f257bf89521713e55777be1784884690a",
+    "bars": 1026178
+  },
+  {
+    "day": "2021-04-22",
+    "path": "/data/cyris/tushare_market_data/2021/20210422.csv.gz",
+    "sha256": "3a9e3e0e64a39568766bec4f24e5d5c11e883b5fe333ee8c81ede7a415cb0792",
+    "bars": 1026178
+  },
+  {
+    "day": "2021-04-23",
+    "path": "/data/cyris/tushare_market_data/2021/20210423.csv.gz",
+    "sha256": "da352c3f251fcc9ba7129af08df619ed96995929463d77c6d3c1bc183eecdfa0",
+    "bars": 1024250
+  },
+  {
+    "day": "2021-04-26",
+    "path": "/data/cyris/tushare_market_data/2021/20210426.csv.gz",
+    "sha256": "2994a31ebaf2a7cb20942c01b4b748cf521298cf3d60782baeb0ae9d35287fc2",
+    "bars": 1025696
+  },
+  {
+    "day": "2021-05-06",
+    "path": "/data/cyris/tushare_market_data/2021/20210506.csv.gz",
+    "sha256": "a71077f239e2b3cff2e1c81092fdaeac8106b9eb68f31e9c0f392092ba5ac607",
+    "bars": 1027865
+  },
+  {
+    "day": "2021-05-07",
+    "path": "/data/cyris/tushare_market_data/2021/20210507.csv.gz",
+    "sha256": "9f54279ca08386dc32bed29a1f3a22cb92d982f96051fff43969b9a57f873032",
+    "bars": 1027624
+  },
+  {
+    "day": "2021-05-12",
+    "path": "/data/cyris/tushare_market_data/2021/20210512.csv.gz",
+    "sha256": "c111e4129ddde1ad0877c2a54b213cd9b630e900d973afac0a30847ba68f2511",
+    "bars": 1030034
+  },
+  {
+    "day": "2021-05-13",
+    "path": "/data/cyris/tushare_market_data/2021/20210513.csv.gz",
+    "sha256": "c0a466728942f3ede18b014e943cc0f041e41c563b5f48e23380cd7d05485674",
+    "bars": 1031721
+  },
+  {
+    "day": "2021-05-14",
+    "path": "/data/cyris/tushare_market_data/2021/20210514.csv.gz",
+    "sha256": "6664e17742ff14e98b4dc114a0ab2a561d1083368f3f009ec400b264797611dd",
+    "bars": 1031239
+  },
+  {
+    "day": "2021-05-20",
+    "path": "/data/cyris/tushare_market_data/2021/20210520.csv.gz",
+    "sha256": "fee2fecd958465629882e953f7832b0a741cf235df5f42493d7dae259af1461d",
+    "bars": 1034613
+  },
+  {
+    "day": "2021-05-21",
+    "path": "/data/cyris/tushare_market_data/2021/20210521.csv.gz",
+    "sha256": "21c847bfb89a2e13344676076e90f80bc727da0499485e8d25e6214a49c437bd",
+    "bars": 1034854
+  },
+  {
+    "day": "2021-05-24",
+    "path": "/data/cyris/tushare_market_data/2021/20210524.csv.gz",
+    "sha256": "77e976c2fc63fac493bbfcb781e4dbc931ed94b0ac58e5975cc6f859e5ea0c93",
+    "bars": 1034372
+  },
+  {
+    "day": "2021-05-25",
+    "path": "/data/cyris/tushare_market_data/2021/20210525.csv.gz",
+    "sha256": "ac29b89b79c33f9bf3dea2367b4d12645608430ca4db8f8fae0f287d9136d6e4",
+    "bars": 1035818
+  },
+  {
+    "day": "2021-05-26",
+    "path": "/data/cyris/tushare_market_data/2021/20210526.csv.gz",
+    "sha256": "cd9ce9b08df622b98e17513bf1655b5eb3343c14bd5684bcd94d5233a18280fb",
+    "bars": 1037023
+  },
+  {
+    "day": "2021-05-27",
+    "path": "/data/cyris/tushare_market_data/2021/20210527.csv.gz",
+    "sha256": "fde53301a35f496e076d7ff1402da888e8fb8f25b46527e6bf3fde105574b600",
+    "bars": 1037505
+  },
+  {
+    "day": "2021-05-28",
+    "path": "/data/cyris/tushare_market_data/2021/20210528.csv.gz",
+    "sha256": "3718cd08df5be56d3aa7ecb530eeb936f65849b621a41dee6c5a715fa49f8d2d",
+    "bars": 1038228
+  },
+  {
+    "day": "2021-05-31",
+    "path": "/data/cyris/tushare_market_data/2021/20210531.csv.gz",
+    "sha256": "a797c9de01b142afad456f2b1d59f6129f5a9076eabf872faf969a4ad69d9d5e",
+    "bars": 1038710
+  },
+  {
+    "day": "2021-06-01",
+    "path": "/data/cyris/tushare_market_data/2021/20210601.csv.gz",
+    "sha256": "451a29f9d0d3c38f92a6b97641d369e2dc6c1b317542afb6f6411c57ff4ad526",
+    "bars": 1038951
+  },
+  {
+    "day": "2021-06-02",
+    "path": "/data/cyris/tushare_market_data/2021/20210602.csv.gz",
+    "sha256": "c6a008a22c9b07fa9831b32785ba7fdd4db56303e4cd21103a221ca15f1b1346",
+    "bars": 1039674
+  },
+  {
+    "day": "2021-06-03",
+    "path": "/data/cyris/tushare_market_data/2021/20210603.csv.gz",
+    "sha256": "c16b70824514cc8880b0d8bfc4de6f3fdf133b268cf4874b67a0bf60a0305430",
+    "bars": 1040397
+  },
+  {
+    "day": "2021-06-04",
+    "path": "/data/cyris/tushare_market_data/2021/20210604.csv.gz",
+    "sha256": "2b3e3d249e0606fdae3248c91243327b092021ba6db30140bc460ca19065d522",
+    "bars": 1040638
+  },
+  {
+    "day": "2021-06-07",
+    "path": "/data/cyris/tushare_market_data/2021/20210607.csv.gz",
+    "sha256": "9000d338549caab79c60a543c396a87c646f0b81c4682ee1640dcb04b85d4751",
+    "bars": 1040638
+  },
+  {
+    "day": "2021-06-11",
+    "path": "/data/cyris/tushare_market_data/2021/20210611.csv.gz",
+    "sha256": "03df6871210ccb6a2f01320f4787098b4439a33e77f77f40cfaf2aa351ff930c",
+    "bars": 1043530
+  },
+  {
+    "day": "2021-06-16",
+    "path": "/data/cyris/tushare_market_data/2021/20210616.csv.gz",
+    "sha256": "8b76b39ae5587ee2f764b181e3546692c0187c91283f494764ccde699fecf333",
+    "bars": 1043048
+  },
+  {
+    "day": "2021-06-17",
+    "path": "/data/cyris/tushare_market_data/2021/20210617.csv.gz",
+    "sha256": "b7ed5d99021ae7c54fdf2609964931a8f949a8bf51b22c46f5be350e78198499",
+    "bars": 1044253
+  },
+  {
+    "day": "2021-06-18",
+    "path": "/data/cyris/tushare_market_data/2021/20210618.csv.gz",
+    "sha256": "acb8f8f8ac93a81d0aedc85cf397234551b4db780c167af982aa12583323c5c0",
+    "bars": 1044494
+  },
+  {
+    "day": "2021-06-23",
+    "path": "/data/cyris/tushare_market_data/2021/20210623.csv.gz",
+    "sha256": "9225ea1911ceecdf3b882b1bf123d51ca4952f71c7d413982e25026ee9b4c136",
+    "bars": 1045699
+  },
+  {
+    "day": "2021-06-24",
+    "path": "/data/cyris/tushare_market_data/2021/20210624.csv.gz",
+    "sha256": "870a77b14556bf830d7b8e70abf1d36b07375f9f5e652764bf63b286a6a333c3",
+    "bars": 1046422
+  },
+  {
+    "day": "2021-07-05",
+    "path": "/data/cyris/tushare_market_data/2021/20210705.csv.gz",
+    "sha256": "49496bc774da1779117dcd3f76583d8e7eb67d224d48ddf7c2651b04f0f21d07",
+    "bars": 1051483
+  },
+  {
+    "day": "2021-07-09",
+    "path": "/data/cyris/tushare_market_data/2021/20210709.csv.gz",
+    "sha256": "4e2aab39560ee18bbc0ef945bb6d50cddde2567038a977e02548e5fbe4d0883a",
+    "bars": 1055098
+  },
+  {
+    "day": "2021-07-12",
+    "path": "/data/cyris/tushare_market_data/2021/20210712.csv.gz",
+    "sha256": "1044741ddc6ba73d01300a0d010fd6111165398396a2dc239a5fa7fbc180f1e2",
+    "bars": 1055098
+  },
+  {
+    "day": "2021-07-13",
+    "path": "/data/cyris/tushare_market_data/2021/20210713.csv.gz",
+    "sha256": "faa83368c67e122525e4d4a9181ef5f2d8ae95b7787adbf15eee75affb96f823",
+    "bars": 1055580
+  },
+  {
+    "day": "2021-07-16",
+    "path": "/data/cyris/tushare_market_data/2021/20210716.csv.gz",
+    "sha256": "b8eaa459d8b881ec1a6c3856396f019c5bac3dc66b9b3d6a53156990372dae22",
+    "bars": 1056062
+  },
+  {
+    "day": "2021-07-19",
+    "path": "/data/cyris/tushare_market_data/2021/20210719.csv.gz",
+    "sha256": "328b3408e79d9a70f1278eb9e1a02794e44dc977786048a96c3e6c441eb5b996",
+    "bars": 1055821
+  },
+  {
+    "day": "2021-07-21",
+    "path": "/data/cyris/tushare_market_data/2021/20210721.csv.gz",
+    "sha256": "bf9cfbbb45d108e77e0b6ce5e7b4f1d27ff450ca48e6e043d885f1678a0a21dd",
+    "bars": 1056303
+  },
+  {
+    "day": "2021-07-22",
+    "path": "/data/cyris/tushare_market_data/2021/20210722.csv.gz",
+    "sha256": "d68ae00a77ea44106c080ce1f9bf03b19abb28ec28cf3261d955d5b50fdbdcbb",
+    "bars": 1057749
+  },
+  {
+    "day": "2021-07-27",
+    "path": "/data/cyris/tushare_market_data/2021/20210727.csv.gz",
+    "sha256": "4859b14bb3ffca1701c5142ead4940ef65f6bf4d2079f588456483780257ff45",
+    "bars": 1059436
+  },
+  {
+    "day": "2021-07-28",
+    "path": "/data/cyris/tushare_market_data/2021/20210728.csv.gz",
+    "sha256": "a9eb521f06465c4f69f1dc9eb42c5f6902056674a2539ca674198bb1aeaeb9a6",
+    "bars": 1060400
+  },
+  {
+    "day": "2021-07-29",
+    "path": "/data/cyris/tushare_market_data/2021/20210729.csv.gz",
+    "sha256": "992767b26bcd2ecea18827a2a7e7d1fcf22e6fc9968b5315a4be84698de57d6a",
+    "bars": 1060882
+  },
+  {
+    "day": "2021-07-30",
+    "path": "/data/cyris/tushare_market_data/2021/20210730.csv.gz",
+    "sha256": "6579b034d9897332c1485b43a8e50c74fe0f0c8c705c4e7e29e08cac3538c579",
+    "bars": 1061605
+  },
+  {
+    "day": "2021-08-02",
+    "path": "/data/cyris/tushare_market_data/2021/20210802.csv.gz",
+    "sha256": "942a2a1da8e62bcea534c2f5ba281607fb1a183c004c1eef494f2a6f8b57ce5d",
+    "bars": 1061846
+  },
+  {
+    "day": "2021-08-04",
+    "path": "/data/cyris/tushare_market_data/2021/20210804.csv.gz",
+    "sha256": "38b60a8863e3d6145c10021f9bf19da8e5b997678dd7c20e8a918b24377e8c3e",
+    "bars": 1063774
+  },
+  {
+    "day": "2021-08-05",
+    "path": "/data/cyris/tushare_market_data/2021/20210805.csv.gz",
+    "sha256": "7a4b1592696de084a8590389b75500aabbb7be832547e8122c20db905e4e4173",
+    "bars": 1064738
+  },
+  {
+    "day": "2021-08-06",
+    "path": "/data/cyris/tushare_market_data/2021/20210806.csv.gz",
+    "sha256": "5a06be9c91dfebd1d3faf3a376162777e243d8727e94e178114c21eccf60c1b6",
+    "bars": 1065220
+  },
+  {
+    "day": "2021-08-09",
+    "path": "/data/cyris/tushare_market_data/2021/20210809.csv.gz",
+    "sha256": "c2f27cb48e8f04afad4e9504890180829e76339ef6df81825d847a42fda009ee",
+    "bars": 1064979
+  },
+  {
+    "day": "2021-08-10",
+    "path": "/data/cyris/tushare_market_data/2021/20210810.csv.gz",
+    "sha256": "033c016a66bf6e3ae2fbb85d89d1c6705c9c3b039352d6085714c32f3a52a058",
+    "bars": 1065943
+  },
+  {
+    "day": "2021-08-13",
+    "path": "/data/cyris/tushare_market_data/2021/20210813.csv.gz",
+    "sha256": "9bc098b80d979f49a0b8accefd2e99b3ee7c79423ffc067fb95042c481a54dba",
+    "bars": 1068112
+  },
+  {
+    "day": "2021-08-16",
+    "path": "/data/cyris/tushare_market_data/2021/20210816.csv.gz",
+    "sha256": "5cf1daf55a4408c8e0a86d61b0ade2ef9ac42c4754a325607ea70626b0ddf4d1",
+    "bars": 1068594
+  },
+  {
+    "day": "2021-08-17",
+    "path": "/data/cyris/tushare_market_data/2021/20210817.csv.gz",
+    "sha256": "58895667ce73274538f60751a05db1bd3fc6a2fecf22ce01efc32eba3cb79906",
+    "bars": 1069317
+  },
+  {
+    "day": "2021-08-18",
+    "path": "/data/cyris/tushare_market_data/2021/20210818.csv.gz",
+    "sha256": "71b3fe26515481fe2839c9e56145be939fcdf74bb802f530ef6eb4c81d8ec633",
+    "bars": 1069317
+  },
+  {
+    "day": "2021-08-19",
+    "path": "/data/cyris/tushare_market_data/2021/20210819.csv.gz",
+    "sha256": "d9e121cd05520c5966d5c8f5cf1291cc673be9cb9dd70ad019b476f6c253762f",
+    "bars": 1070040
+  },
+  {
+    "day": "2021-08-20",
+    "path": "/data/cyris/tushare_market_data/2021/20210820.csv.gz",
+    "sha256": "94e6afbab938e91c0a14a94c60be8e5ae14cf94cf76b0c8b58d5a8276896ce1e",
+    "bars": 1070763
+  },
+  {
+    "day": "2021-08-23",
+    "path": "/data/cyris/tushare_market_data/2021/20210823.csv.gz",
+    "sha256": "5d4fecf7e0cd330e21fa7e2c1129243103d3747cb7dc9bc28d6d04e71e4ebdc8",
+    "bars": 1070763
+  },
+  {
+    "day": "2021-08-24",
+    "path": "/data/cyris/tushare_market_data/2021/20210824.csv.gz",
+    "sha256": "9dd2bbaa2f92ed4136fe1e0dfe9d14c6a7119b9f0d28f75da5f8126f1f2f7f35",
+    "bars": 1071727
+  },
+  {
+    "day": "2021-08-27",
+    "path": "/data/cyris/tushare_market_data/2021/20210827.csv.gz",
+    "sha256": "2c776d2e42213e8457b24e3af8bb58ef6e609aa4c37187f77eefd7a6d771aa58",
+    "bars": 1072209
+  },
+  {
+    "day": "2021-08-30",
+    "path": "/data/cyris/tushare_market_data/2021/20210830.csv.gz",
+    "sha256": "c95304ef9a5c70a0750072e17d0792d73fa1389e8dd2d262c8228882d8ecbb30",
+    "bars": 1072209
+  },
+  {
+    "day": "2021-08-31",
+    "path": "/data/cyris/tushare_market_data/2021/20210831.csv.gz",
+    "sha256": "3fab2f9a8413c648b3f942c2614cd8636c0467e439e4cc2d16c60be1f5964aef",
+    "bars": 1071968
+  },
+  {
+    "day": "2021-09-01",
+    "path": "/data/cyris/tushare_market_data/2021/20210901.csv.gz",
+    "sha256": "cfd6572da7619ad2d2f0313669073af881487857cd43aa16b679973598981a71",
+    "bars": 1072209
+  },
+  {
+    "day": "2021-09-02",
+    "path": "/data/cyris/tushare_market_data/2021/20210902.csv.gz",
+    "sha256": "aac7ef20a4facad9db2b3355854c2bd33ff41e961dad1083de7fd5684631e07d",
+    "bars": 1071727
+  },
+  {
+    "day": "2021-09-03",
+    "path": "/data/cyris/tushare_market_data/2021/20210903.csv.gz",
+    "sha256": "11a4fb54a1686ca12f50bb3de793ae96eee8bc4a8cbb0d63915bc7f6067f00ea",
+    "bars": 1071727
+  },
+  {
+    "day": "2021-09-06",
+    "path": "/data/cyris/tushare_market_data/2021/20210906.csv.gz",
+    "sha256": "4bc7f06397e63ee006162ceb2dba8a6d34079d018c3aaef107dcb791a013eaf4",
+    "bars": 1072209
+  },
+  {
+    "day": "2021-09-07",
+    "path": "/data/cyris/tushare_market_data/2021/20210907.csv.gz",
+    "sha256": "8e09c372e14f0db07a2f14a17df49c008cd98fd319fb3b858fdcb152f1dc24e0",
+    "bars": 1073173
+  },
+  {
+    "day": "2021-09-08",
+    "path": "/data/cyris/tushare_market_data/2021/20210908.csv.gz",
+    "sha256": "cb4d0c87437bfffada0f699f07c2a2009158b0dc8cbc08b91c2b6169334bc5e0",
+    "bars": 1073655
+  },
+  {
+    "day": "2021-09-09",
+    "path": "/data/cyris/tushare_market_data/2021/20210909.csv.gz",
+    "sha256": "299da1686c49d34f9d0d1244eeb40a157f44c24031bb35e8f897eead77e469aa",
+    "bars": 1074860
+  },
+  {
+    "day": "2021-09-14",
+    "path": "/data/cyris/tushare_market_data/2021/20210914.csv.gz",
+    "sha256": "1636fa796136d5adfea259127aa5337a1da26613469014a8abad839d9af8e503",
+    "bars": 1077511
+  },
+  {
+    "day": "2021-09-15",
+    "path": "/data/cyris/tushare_market_data/2021/20210915.csv.gz",
+    "sha256": "b45424ef8d9e7894f8c92b70a593bf772c9f15c482b8d28cd4c08d4ff468f65b",
+    "bars": 1077511
+  },
+  {
+    "day": "2021-09-16",
+    "path": "/data/cyris/tushare_market_data/2021/20210916.csv.gz",
+    "sha256": "db90904a0590d803505f91d17f9519c0a9047440b960420c332ffa491361ca8a",
+    "bars": 1077511
+  },
+  {
+    "day": "2021-09-17",
+    "path": "/data/cyris/tushare_market_data/2021/20210917.csv.gz",
+    "sha256": "bc8c0b83fcef5e6701138277180b44d9602add8946ce7dc9121afbf2d9a0a1ca",
+    "bars": 1077752
+  },
+  {
+    "day": "2021-09-24",
+    "path": "/data/cyris/tushare_market_data/2021/20210924.csv.gz",
+    "sha256": "820e94990218031f312bf3c7debccb65f18263e0a2a5efa4d0244619da6ea5c7",
+    "bars": 1077270
+  },
+  {
+    "day": "2021-09-27",
+    "path": "/data/cyris/tushare_market_data/2021/20210927.csv.gz",
+    "sha256": "329de0d4c55d97ba78f927788d435948ab13a28f8e0a429d6912adb39204a5f4",
+    "bars": 1076788
+  },
+  {
+    "day": "2021-09-28",
+    "path": "/data/cyris/tushare_market_data/2021/20210928.csv.gz",
+    "sha256": "9d9f8c254a3bcf7c6dfb8b46e892afe986dd84c0ac9d31535f7ef926d8df7f8c",
+    "bars": 1077752
+  },
+  {
+    "day": "2021-09-29",
+    "path": "/data/cyris/tushare_market_data/2021/20210929.csv.gz",
+    "sha256": "8ff8c02ca729058975fa4f7e2a85d2d693fd9cd5b9b3e6401f349fcc66d38d41",
+    "bars": 1078957
+  },
+  {
+    "day": "2021-09-30",
+    "path": "/data/cyris/tushare_market_data/2021/20210930.csv.gz",
+    "sha256": "557758f70bb4f7742d4fb02fd3ad1655be38a728780ddf0f481eb510f7b9da4a",
+    "bars": 1079439
+  },
+  {
+    "day": "2021-10-11",
+    "path": "/data/cyris/tushare_market_data/2021/20211011.csv.gz",
+    "sha256": "4024c5a55d619af764d90d2a4bc168ff8a341fa7ae2dede4e3d2f7d02fb9c3a3",
+    "bars": 1080162
+  },
+  {
+    "day": "2021-10-13",
+    "path": "/data/cyris/tushare_market_data/2021/20211013.csv.gz",
+    "sha256": "89d8a25c4ad42c105b715bdcf1c0c395319fa5d3066469cb186f14689aa30832",
+    "bars": 1081126
+  },
+  {
+    "day": "2021-10-14",
+    "path": "/data/cyris/tushare_market_data/2021/20211014.csv.gz",
+    "sha256": "b9a60c0b02ab82df05df6d4bb997510989bc266c137f743e2dccce0bee56fe63",
+    "bars": 1081367
+  },
+  {
+    "day": "2021-10-15",
+    "path": "/data/cyris/tushare_market_data/2021/20211015.csv.gz",
+    "sha256": "c9b6f9692fd563dd25f0647fcb5ff781c66280e032f11330c882493a85427d6d",
+    "bars": 1081849
+  },
+  {
+    "day": "2021-10-18",
+    "path": "/data/cyris/tushare_market_data/2021/20211018.csv.gz",
+    "sha256": "fe460d5882cc7c146b0f979a43f8a2251a52a6306e47c16a7392f6e5dd0b844c",
+    "bars": 1083054
+  },
+  {
+    "day": "2021-10-19",
+    "path": "/data/cyris/tushare_market_data/2021/20211019.csv.gz",
+    "sha256": "7769b7fd6f930614952ee8a4965e87545c4c012830c4b3bbc7e72c06f56d3feb",
+    "bars": 1083536
+  },
+  {
+    "day": "2021-10-20",
+    "path": "/data/cyris/tushare_market_data/2021/20211020.csv.gz",
+    "sha256": "966f80dbb6058a46c0adce0f2a4b49f2ea975a99eab1b8a41b6601eb2212f921",
+    "bars": 1084018
+  },
+  {
+    "day": "2021-10-21",
+    "path": "/data/cyris/tushare_market_data/2021/20211021.csv.gz",
+    "sha256": "27e3e9c6716b6e7c4dcc203ddbbd1932921b013077f4dd0c100316ddaf3802f7",
+    "bars": 1084982
+  },
+  {
+    "day": "2021-10-25",
+    "path": "/data/cyris/tushare_market_data/2021/20211025.csv.gz",
+    "sha256": "1a8c828367a8278725043badec0990974f48b62e78124a0383631bd348455b05",
+    "bars": 1085223
+  },
+  {
+    "day": "2021-10-26",
+    "path": "/data/cyris/tushare_market_data/2021/20211026.csv.gz",
+    "sha256": "320260d34d7b42562641cd5546a3ab98bddc807f1e86b91ecb2b3776561c4bdc",
+    "bars": 1085946
+  },
+  {
+    "day": "2021-10-27",
+    "path": "/data/cyris/tushare_market_data/2021/20211027.csv.gz",
+    "sha256": "c7c9cbdaa6eab0bb636dc7571445f2ea7500e0867f701a5a046b29f942577a2d",
+    "bars": 1087392
+  },
+  {
+    "day": "2021-10-29",
+    "path": "/data/cyris/tushare_market_data/2021/20211029.csv.gz",
+    "sha256": "ff24fd95d04e9969bc6e332a969cb9a1a4934b6a505ac688d3cbab71eb346cca",
+    "bars": 1089079
+  },
+  {
+    "day": "2021-11-02",
+    "path": "/data/cyris/tushare_market_data/2021/20211102.csv.gz",
+    "sha256": "059032af914b7f6c603e467974cf1a745007d820a7105873c8d6499a109d582e",
+    "bars": 1090043
+  },
+  {
+    "day": "2021-11-03",
+    "path": "/data/cyris/tushare_market_data/2021/20211103.csv.gz",
+    "sha256": "b71735bcfe071b3faaceeaa75d07a96d26b2ee1b534df3ca35a22e80823feca9",
+    "bars": 1090043
+  },
+  {
+    "day": "2021-11-04",
+    "path": "/data/cyris/tushare_market_data/2021/20211104.csv.gz",
+    "sha256": "edd537f5e773e0dda07be84cbfa7bed1b0470bfa05e5ad6a55d406b32410cd58",
+    "bars": 1090284
+  },
+  {
+    "day": "2021-11-05",
+    "path": "/data/cyris/tushare_market_data/2021/20211105.csv.gz",
+    "sha256": "8a9448bffb9c2c84b2739b942f868bdb321d6e577ed6e4242132add2be9c4e97",
+    "bars": 1090284
+  },
+  {
+    "day": "2021-11-08",
+    "path": "/data/cyris/tushare_market_data/2021/20211108.csv.gz",
+    "sha256": "9bd847c83ac10708fb1411e4f2e196029b1dd7b2749bdb5ae61227c449988549",
+    "bars": 1090525
+  },
+  {
+    "day": "2021-11-10",
+    "path": "/data/cyris/tushare_market_data/2021/20211110.csv.gz",
+    "sha256": "5758e255ceb69dfd200e1fcbb19e235a5d036c53e200e21cd29c4e7f34886d8a",
+    "bars": 1090284
+  },
+  {
+    "day": "2021-11-11",
+    "path": "/data/cyris/tushare_market_data/2021/20211111.csv.gz",
+    "sha256": "73343f7341bcaa8bb1df72ce0d12d3a5eae78aeb6b7354956471dc9f356c6b9e",
+    "bars": 1090043
+  },
+  {
+    "day": "2021-11-12",
+    "path": "/data/cyris/tushare_market_data/2021/20211112.csv.gz",
+    "sha256": "d73ed455739ce42522d6b5742e9c6c01127db012e61e8606a1a2b17470d58dd4",
+    "bars": 1091248
+  },
+  {
+    "day": "2021-11-18",
+    "path": "/data/cyris/tushare_market_data/2021/20211118.csv.gz",
+    "sha256": "214a15a26d7108f67cff67abbaeba3deb91a90692f921fa10d92a56c9a8ca604",
+    "bars": 1094140
+  },
+  {
+    "day": "2021-11-19",
+    "path": "/data/cyris/tushare_market_data/2021/20211119.csv.gz",
+    "sha256": "8b55ff4c13144db8131377e4d70868e5bf9ca5f809dc098394f8fe7ce03cbda8",
+    "bars": 1094622
+  },
+  {
+    "day": "2021-11-23",
+    "path": "/data/cyris/tushare_market_data/2021/20211123.csv.gz",
+    "sha256": "7d4fffda9e23f81a1455434a8d11328bbe92d3b9544d0da9aec04087afa3eb3c",
+    "bars": 1095586
+  },
+  {
+    "day": "2021-11-24",
+    "path": "/data/cyris/tushare_market_data/2021/20211124.csv.gz",
+    "sha256": "800db2391930211c7f6ba40c4908be0d9f3fe0032e78992ed6e694ddebbbc374",
+    "bars": 1095345
+  },
+  {
+    "day": "2021-11-25",
+    "path": "/data/cyris/tushare_market_data/2021/20211125.csv.gz",
+    "sha256": "fea3525054567607d3021232ea2af45ff827f159448e6ab6498a8419442da2e2",
+    "bars": 1095586
+  },
+  {
+    "day": "2021-12-01",
+    "path": "/data/cyris/tushare_market_data/2021/20211201.csv.gz",
+    "sha256": "92c45fd4c894f2b20ba478ddd7c76f2b68ac2439f4c99f370bafdf576771869f",
+    "bars": 1096550
+  },
+  {
+    "day": "2021-12-03",
+    "path": "/data/cyris/tushare_market_data/2021/20211203.csv.gz",
+    "sha256": "08622ea76b55c944eea65e9f2583e65d4cb866a8d77f1e55cd14be5328c8c753",
+    "bars": 1097032
+  },
+  {
+    "day": "2021-12-07",
+    "path": "/data/cyris/tushare_market_data/2021/20211207.csv.gz",
+    "sha256": "dc505fdc1c460967d4fad8b2f9d30fd5440590c59597b46c429b08a9515746d8",
+    "bars": 1098719
+  },
+  {
+    "day": "2021-12-08",
+    "path": "/data/cyris/tushare_market_data/2021/20211208.csv.gz",
+    "sha256": "72283f5142d3c09e5eb1d56af5a5c3b97557b1ff363470d4c776fd99753bc48b",
+    "bars": 1098960
+  },
+  {
+    "day": "2021-12-09",
+    "path": "/data/cyris/tushare_market_data/2021/20211209.csv.gz",
+    "sha256": "cb2155408bebbc768b6637dfad492253134d2e404fce12517c3757a4a4f9d85e",
+    "bars": 1099442
+  },
+  {
+    "day": "2021-12-10",
+    "path": "/data/cyris/tushare_market_data/2021/20211210.csv.gz",
+    "sha256": "1aec24ba4874ca621ba1d93bedf150fca9fdfc136d64dcdf466e670194259f5f",
+    "bars": 1100165
+  },
+  {
+    "day": "2021-12-13",
+    "path": "/data/cyris/tushare_market_data/2021/20211213.csv.gz",
+    "sha256": "f9a640014ad2f91b43265d409c4ad07d10780b632b32768f7b400094d0262678",
+    "bars": 1100165
+  },
+  {
+    "day": "2021-12-16",
+    "path": "/data/cyris/tushare_market_data/2021/20211216.csv.gz",
+    "sha256": "a5c10366a2f267702608a86a6a5968234bd3e37296479f159a36310ef919429b",
+    "bars": 1100888
+  },
+  {
+    "day": "2021-12-17",
+    "path": "/data/cyris/tushare_market_data/2021/20211217.csv.gz",
+    "sha256": "ea89f596be7517f51966078e17195b47adea09c5f0e6eafa9d2fb0feedbe7ce8",
+    "bars": 1100888
+  },
+  {
+    "day": "2021-12-21",
+    "path": "/data/cyris/tushare_market_data/2021/20211221.csv.gz",
+    "sha256": "b97dbd2bccee44364ef0f19d947265c61dfa11e46627a26c650aed995d176d3c",
+    "bars": 1101370
+  },
+  {
+    "day": "2021-12-22",
+    "path": "/data/cyris/tushare_market_data/2021/20211222.csv.gz",
+    "sha256": "52bb13865f73d2c32633391d35ba1f6a587ed048d5c832fe5965dff1b6d6dd62",
+    "bars": 1102334
+  },
+  {
+    "day": "2021-12-23",
+    "path": "/data/cyris/tushare_market_data/2021/20211223.csv.gz",
+    "sha256": "8e9548425f521aba1ec6ca4fdf9fc057bf4134a28de66b9146ba5309a385b8e8",
+    "bars": 1104021
+  },
+  {
+    "day": "2021-12-24",
+    "path": "/data/cyris/tushare_market_data/2021/20211224.csv.gz",
+    "sha256": "5a64d46c183f2c8f263b876e5aa868156c7cb46e3c241a5e25fba6882fc1f3d0",
+    "bars": 1104744
+  },
+  {
+    "day": "2021-12-27",
+    "path": "/data/cyris/tushare_market_data/2021/20211227.csv.gz",
+    "sha256": "e2f6e7a22580c9fe96faf167b20b567141a1e0a92a40ce605f51af5b0640bbb0",
+    "bars": 1104985
+  },
+  {
+    "day": "2021-12-28",
+    "path": "/data/cyris/tushare_market_data/2021/20211228.csv.gz",
+    "sha256": "88c33a2d37b92fba01b184eff8a423f667524a1f7e75380b59653868e7095f26",
+    "bars": 1105708
+  },
+  {
+    "day": "2021-12-30",
+    "path": "/data/cyris/tushare_market_data/2021/20211230.csv.gz",
+    "sha256": "c974d290024d836e97ae14e9401f9d138ebd78db51afbd144d8dc4ccb7ed0085",
+    "bars": 1106431
+  },
+  {
+    "day": "2022-01-05",
+    "path": "/data/cyris/tushare_market_data/2022/20220105.csv.gz",
+    "sha256": "12d6b4d84b5c5ec44a6830f53717d0be0660933cb7ae181d3fcbcc5e823521fa",
+    "bars": 1106672
+  }
+]

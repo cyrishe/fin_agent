@@ -1,0 +1,8 @@
+{
+  "prebuy_discontinuities": 2,
+  "held_discontinuities": 1,
+  "matched_actions": 1,
+  "signals_sha256": "35fd14fae14b01c18976b5a6f1c59b58bcedbd79be665d218408d00c26e0fec9",
+  "account_ready_sha256": "0e8cfe6c1e6e325136e131d1809bd270b1b082aeffc79181184cbcca3ec0f449",
+  "notes": "D0-to-D1 gap occurs before the strategy buys. D1-to-D2 cash dividend is applied to the held shares, with selling fee charged only on share proceeds."
+}

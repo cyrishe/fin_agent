@@ -1,0 +1,9 @@
+{
+  "full_day_excluded_candidates": 49,
+  "affected_d0_days": 47,
+  "valid_prefix_candidates": 32,
+  "complete_days": 30,
+  "complete_days_changed": 14,
+  "incomplete_days": 17,
+  "incomplete_days_with_original_trade": 7
+}

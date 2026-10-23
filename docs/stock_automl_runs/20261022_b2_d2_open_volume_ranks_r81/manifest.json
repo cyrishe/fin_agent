@@ -1,0 +1,98 @@
+{
+  "source_inputs": {
+    "R80_100_trades": {
+      "server_path": "/data/cyris/work/b2_d2_open_volume_r80_20261022/100笔D2开盘同刻量比.csv",
+      "sha256": "3a5f78ed85fd53aa0459b6d30d167cbbc07a5f418c17f327a0368446ec156b38",
+      "bytes": 62033
+    },
+    "R80_preboard_minutes": {
+      "server_path": "/data/cyris/work/b2_d2_open_volume_r80_20261022/首板前同刻分钟源_逐股日.csv.gz",
+      "sha256": "93bf93a273b9ceb1b2b6acc43b80fcec3e2910bec6188c8e2e96b0c224837885",
+      "bytes": 46353
+    },
+    "R80_preboard_daily": {
+      "server_path": "/data/cyris/work/b2_d2_open_volume_r80_20261022/preboard_daily_selected.csv.gz",
+      "sha256": "6c959e7c2cf38a5761ad96c5f03c6dd61055958021e2c5e614ab23156409c49b",
+      "bytes": 42411
+    },
+    "R80_manifest": {
+      "server_path": "/data/cyris/work/b2_d2_open_volume_r80_20261022/manifest.json",
+      "sha256": "46b11460c618c2ce9802f304215cb64c597aa9e4cf9bb68e687685ef72bfb8bf",
+      "bytes": 4366
+    }
+  },
+  "outputs": {
+    "09_31仍封死19笔_核心变量与结局.csv": {
+      "sha256": "0d82838ed09499d9a9d82c3840c632f3b076ddcba5f1df0fa6b3ac597e91a1ad",
+      "bytes": 3307
+    },
+    "100笔_开盘量能候选变量.csv": {
+      "sha256": "b3f84db3b88255fb5864d5f43d77958b4ffe69adca9f82884fe80a56f6145b39",
+      "bytes": 77890
+    },
+    "AUDIT.md": {
+      "sha256": "3c84c52372ac9d3e508d18a69c48d99b56ce83dd086e570a0a91477dfef9ac6c",
+      "bytes": 3698
+    },
+    "F05逐年独立复核.csv": {
+      "sha256": "a2c3c4726901c2c3d9705c9fd568160060e4eafc382f97a4de6c4107ea2cbac3",
+      "bytes": 126
+    },
+    "README.md": {
+      "sha256": "43b2c9cb44e91c7db22058623373b35023a6224a7aadb3788661e9dfebd7eb32",
+      "bytes": 7545
+    },
+    "analysis.json": {
+      "sha256": "b34e56f6b14bd668c6c4e8771f13eb8260bf1a20b6e193529430ae6971d335f2",
+      "bytes": 1790
+    },
+    "analyze.py": {
+      "sha256": "4638c7ad73cfe2a27a6e96ecba0baba790e8452153cd291878fa590d735bb2d5",
+      "bytes": 8417
+    },
+    "audit_raw.py": {
+      "sha256": "851c354481cb32d0c536874dc87c1a71174ca665dbbf50e024aaacc36452b6bf",
+      "bytes": 6710
+    },
+    "extra.py": {
+      "sha256": "a3d757b119c72f7950414b60d6b245e034cf0b8ab9aad4b4de494ff484d4c9f3",
+      "bytes": 3462
+    },
+    "raw_audit.json": {
+      "sha256": "3dd157dc8c60abcf253819c4e4d5e6fbdb61f098ad43ca8debd0daa7559f54d4",
+      "bytes": 978
+    },
+    "verification.json": {
+      "sha256": "9d55b66228e7aa05ffc19116870da6ef66acff52e80dd2db638012b5b1727ba5",
+      "bytes": 483
+    },
+    "verify.py": {
+      "sha256": "220920036e67ca0de21e3a78e9ff7ed37dde73c1de12c5cda8ac1dba0dcbe39d",
+      "bytes": 4433
+    },
+    "原始分钟独立复算19笔.csv": {
+      "sha256": "ff6e6626335c33812213f77810b33809aeac15cf8d8f51870cb20e356372a80c",
+      "bytes": 3352
+    },
+    "变量三等分_good_bad.csv": {
+      "sha256": "70afc21640d4ed831f90639c9d2aaf05b7a35ba2f758dbabf4e3928f62b359c7",
+      "bytes": 10908
+    },
+    "变量高低极值_good_bad.csv": {
+      "sha256": "e92572a411cb312dbd7cd99245287cc619d68fc2afaad07210c290755785ed02",
+      "bytes": 4933
+    },
+    "开盘未跌停51笔_09_31变量与触板后结局.csv": {
+      "sha256": "aef26a6494446ba26323f242bb2b1808a8bf4e745230e48cd99c90fd746dcb17",
+      "bytes": 4801
+    },
+    "极值取3_5_7笔敏感性.csv": {
+      "sha256": "e0bc108d3c70b56604217df872af4c6ab9dbd0f846ac5259b9fdc12aca924bea",
+      "bytes": 2166
+    },
+    "逐变量逐笔高低排序.csv": {
+      "sha256": "86ac1bae83df751066b2e918d985ac70d84c40b87201fae61a9e204fc5515c8d",
+      "bytes": 139221
+    }
+  }
+}

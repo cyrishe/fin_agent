@@ -1,0 +1,21 @@
+{
+  "news_cutoff": "D0 15:00, date-only conservative next calendar day; exact last5 vs preceding5 exchange-availability days",
+  "fund_cutoff": "D0 EOD data for D1 prebuy; never D1 EOD input. Historical snapshots not fully PIT verified. Flow models exploratory.",
+  "split": "unchanged train152/valid54/test98/purged2",
+  "models": "6 fixed logistic C0.1, no class weights; 2/98 train clipping, median, scale; strict score>trainingQ75",
+  "primary_target": "D2 open OR close floor",
+  "secondary_targets": "D2D3 consecutive close floor; all-day lock; R72 three-day crash",
+  "selection": "validation-only: >=6 alerts, <=35% alerts, >=3 target caught, >=1.25 precision lift, nonnegative equal-ticket original-close cancellation benefit; maximize remaining-risk reduction then fewer alerts. None if no eligible candidate. No choosing 2026 winner.",
+  "rules": [
+    "repeat risk>=2 last5",
+    "announcement days last5>=3 and rise>=2 vs preceding5",
+    "risk days last3>=2 and increase>=1 vs preceding3",
+    "specific denial",
+    "generic denial",
+    "D0 main net negative",
+    "D0 main net/turnover<-5% and drop>5pp vs prior5",
+    "(repeat/attention/specific denial) AND main outflow"
+  ],
+  "comparisons": "fixed D1 frozen union41/close34, each rule alone / OR union / AND union / incremental half-size beyond union; all reported",
+  "limits": "all 2026 outcomes previously observed; no new blind test; price-only liquidation assumptions; flow source timestamps audited but not original vendor vintage archive"
+}

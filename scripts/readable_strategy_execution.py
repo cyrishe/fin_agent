@@ -13,6 +13,7 @@ CLOSE_OPEN_ID = 'rolling20_7f_hgb_sklearn171_dbapi_amount_v2'
 IDENTITIES = {
     CLOSE_OPEN_ID: ('收盘开盘', 'v1.0', '20日滚动·七因子四分类'),
     'B2': ('涨停冷静', 'v1.0', '四K形态后延后一根K模拟买入'),
+    'B2_V2': ('涨停冷静', 'v2.0', '月度停摆'),
 }
 
 

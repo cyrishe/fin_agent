@@ -1,0 +1,442 @@
+{
+  "experiment_id": "B2_D2_LIMIT_D3_EARLY_EXIT_R78_20261022",
+  "files": {
+    "1455持有_分钟与解封退出账户.csv": {
+      "size": 509,
+      "sha256": "ee95671187375c4a9f3be5171416ae08be016ece4f527be2f7591ed5590a895b"
+    },
+    "2022_1455持有_分钟成交代理_账本.csv": {
+      "size": 5840,
+      "sha256": "4d54bcd71c9a6368ad9f0b25d7c38a6040b5b911cc263cd29b93e5efeaf58785"
+    },
+    "2022_1455持有_分钟成交代理_逐日.csv": {
+      "size": 10327,
+      "sha256": "b091194440491471e887bfa508b5922609a27d463d5dc4bcabed2dbf1e88eb21"
+    },
+    "2022_14:55已涨停_D3close_账本.csv": {
+      "size": 5531,
+      "sha256": "723ee9c0716a2480973eb8e4741ad1ebc7b8c99aa70cd76b5e7d5fa77896c855"
+    },
+    "2022_14:55已涨停_D3close_逐日.csv": {
+      "size": 10347,
+      "sha256": "c1a3a0020c6a6a29e40178a9fde021a83defa7cab306ff5fa012bf72f18c1347"
+    },
+    "2022_14:55已涨停_D3open_账本.csv": {
+      "size": 6032,
+      "sha256": "3a689ab29567d1e096b10b0e98387891cca389d11bae2619c275efcca6b939f1"
+    },
+    "2022_14:55已涨停_D3open_逐日.csv": {
+      "size": 10327,
+      "sha256": "b091194440491471e887bfa508b5922609a27d463d5dc4bcabed2dbf1e88eb21"
+    },
+    "2022_最终收盘涨停_后验_D3close_账本.csv": {
+      "size": 5530,
+      "sha256": "6f79ef2b7c24affdfb39f3d3f93e9a167303594c82fcd4ececfc8f5a7f0d7df5"
+    },
+    "2022_最终收盘涨停_后验_D3close_逐日.csv": {
+      "size": 10342,
+      "sha256": "96f99b9d2c750bba96462ba0ce66e9dbd1786722575677e332b517c4c655ab9b"
+    },
+    "2022_最终收盘涨停_后验_D3open_账本.csv": {
+      "size": 6033,
+      "sha256": "1f9913e4c79808318a3c6a65703d6ab3f1c5035136a1ca1dfba01091e1196095"
+    },
+    "2022_最终收盘涨停_后验_D3open_逐日.csv": {
+      "size": 10322,
+      "sha256": "31ec2202d4cf07a11fcbfe055637d0bf9344389a7d2e6a63fd730d19c3a42d99"
+    },
+    "2022_轮空D3开盘假设_账本.csv": {
+      "size": 6438,
+      "sha256": "28a3a381a14d01f3cd5136e9ce2b7820da068f673e0d8afa41e31f4a8db10ceb"
+    },
+    "2022_轮空D3开盘假设_逐日.csv": {
+      "size": 10328,
+      "sha256": "c26e31876e207b7f0f373198e785d198f20a90989cdc491fa9e056241d1b7111"
+    },
+    "2023_1455持有_分钟成交代理_账本.csv": {
+      "size": 10785,
+      "sha256": "b1c6638098dcf600b199eac06353cf13b3256cf48b486d7ff661aab85dc2a09d"
+    },
+    "2023_1455持有_分钟成交代理_逐日.csv": {
+      "size": 15529,
+      "sha256": "485452cb6ceccb04cc903000066e72c7ef11997f7f2222f32b07d60568e8c8ee"
+    },
+    "2023_14:55已涨停_D3close_账本.csv": {
+      "size": 10626,
+      "sha256": "5be1c35055b3c9899ff5f5a0faf8309922d59add888341f5299f6ce6736ca6d8"
+    },
+    "2023_14:55已涨停_D3close_逐日.csv": {
+      "size": 15562,
+      "sha256": "14f6d676800411d3bbb906b54d5d790b777093db6c250cf3d3fb68b734d60322"
+    },
+    "2023_14:55已涨停_D3open_账本.csv": {
+      "size": 11097,
+      "sha256": "73a9453dde8b96a4d98cbf9c3198e7dbf8f6c3a7f47e7e79bb599f5cbeca3702"
+    },
+    "2023_14:55已涨停_D3open_逐日.csv": {
+      "size": 15529,
+      "sha256": "485452cb6ceccb04cc903000066e72c7ef11997f7f2222f32b07d60568e8c8ee"
+    },
+    "2023_最终收盘涨停_后验_D3close_账本.csv": {
+      "size": 10627,
+      "sha256": "477d704dc08039c6db587b160e569d7d2d5e55258796ae288283ddecfcb13739"
+    },
+    "2023_最终收盘涨停_后验_D3close_逐日.csv": {
+      "size": 15562,
+      "sha256": "d94a076776717696b0bffc805a61645cb39ae0543196d99fecfde7cdc717f7c9"
+    },
+    "2023_最终收盘涨停_后验_D3open_账本.csv": {
+      "size": 11101,
+      "sha256": "3371e8200c6b89b53d10838f38e4f56bc22c1010c5cbd2a24f87ff4ee8777810"
+    },
+    "2023_最终收盘涨停_后验_D3open_逐日.csv": {
+      "size": 15535,
+      "sha256": "99b34ddfb855dc31a7ed0925a894e99d7a037fccdf36499ef0ae829449102868"
+    },
+    "2023_轮空D3开盘假设_账本.csv": {
+      "size": 11832,
+      "sha256": "ed3a46cd0045bcbfcc5a0895707721f2a6fc57364e0bdb2afb963ed226be133a"
+    },
+    "2023_轮空D3开盘假设_逐日.csv": {
+      "size": 15609,
+      "sha256": "5d587fe3184eda301779099f4fee01454782c039486513669941477d1e0e0115"
+    },
+    "2024_1455持有_分钟成交代理_账本.csv": {
+      "size": 8943,
+      "sha256": "1659283786f4d73891b570be5db625e50ddc035eb99cb4492eabb0eeeb67c217"
+    },
+    "2024_1455持有_分钟成交代理_逐日.csv": {
+      "size": 15142,
+      "sha256": "9d0b6666913d7d61073577c7638b4c983d12e83c13055542bf6164fda53d437f"
+    },
+    "2024_14:55已涨停_D3close_账本.csv": {
+      "size": 8545,
+      "sha256": "43c5de426913c0525dfebc32cfa49248da05e8fadb93d7740226521063f60ab2"
+    },
+    "2024_14:55已涨停_D3close_逐日.csv": {
+      "size": 15152,
+      "sha256": "800c0310d16efdcb26becc68477424b249e7e179cab155fe6c0790ce1c1a6d4b"
+    },
+    "2024_14:55已涨停_D3open_账本.csv": {
+      "size": 9226,
+      "sha256": "b6d68ec6cbf78b964db959b1eb0ecd7d81cc54bd6f20a38c021071499ec09ca3"
+    },
+    "2024_14:55已涨停_D3open_逐日.csv": {
+      "size": 15149,
+      "sha256": "a9e409ba6740bfdb65726ae7b38b588c2ee217758766addc18175f8821234704"
+    },
+    "2024_最终收盘涨停_后验_D3close_账本.csv": {
+      "size": 8545,
+      "sha256": "1c9200f3c9e7842e5006244cd8475d1aadf3c465727847c1a96f5f6e43987fc8"
+    },
+    "2024_最终收盘涨停_后验_D3close_逐日.csv": {
+      "size": 15144,
+      "sha256": "c188e95441d67dc02ec18ecc949fbe1bff3f8d8ee64fcf41ba0155e4436fcdc0"
+    },
+    "2024_最终收盘涨停_后验_D3open_账本.csv": {
+      "size": 9225,
+      "sha256": "6c76db18f9f152b101fd33f352bd6c1dcc0edf97c24b751dea497dfabfb5262c"
+    },
+    "2024_最终收盘涨停_后验_D3open_逐日.csv": {
+      "size": 15137,
+      "sha256": "383b86566f5dcdf32cd52a03b4bf4ac8c69c4799080930713e3c2cd60d042676"
+    },
+    "2024_轮空D3开盘假设_账本.csv": {
+      "size": 9843,
+      "sha256": "1f70f1c410d90ee0f0cdd41632d6349e9404eff589b62cac29b745ba90a486f1"
+    },
+    "2024_轮空D3开盘假设_逐日.csv": {
+      "size": 15240,
+      "sha256": "0bd1de3ebab66f974dea167a271e3c38bea620369dcc851a68a0bf1fd089bf7e"
+    },
+    "2025_1455持有_分钟成交代理_账本.csv": {
+      "size": 8788,
+      "sha256": "f52271209701b48675ba9e7133b29953b2a3751607cb5f06dd86ea015e617f7d"
+    },
+    "2025_1455持有_分钟成交代理_逐日.csv": {
+      "size": 13945,
+      "sha256": "73dfa7e5345f9a67f1cfb42a168c860536da5ed037cfc8d8d0ebf1444838a1b3"
+    },
+    "2025_14:55已涨停_D3close_账本.csv": {
+      "size": 8374,
+      "sha256": "40ad1537b18b43a3ca826303513b7057f17c80c6dda19072df90a2e6b7605d9c"
+    },
+    "2025_14:55已涨停_D3close_逐日.csv": {
+      "size": 13863,
+      "sha256": "cf59fbda9afefbba8462067e6930343b551f3849bbf74b72d97a759db324c8a5"
+    },
+    "2025_14:55已涨停_D3open_账本.csv": {
+      "size": 9215,
+      "sha256": "0a4348509e2a04c63aba892ee6479e1f34a5bcc2baad78c4d34a631e9dca8762"
+    },
+    "2025_14:55已涨停_D3open_逐日.csv": {
+      "size": 13934,
+      "sha256": "6899072b5560172c416056d849da79594f10e2ea57aa80f3904abae7b946c86f"
+    },
+    "2025_最终收盘涨停_后验_D3close_账本.csv": {
+      "size": 8372,
+      "sha256": "acbbe2c150284de2390468feb527b76b6b9b03424eaaebb8f8b54b1b83d324dc"
+    },
+    "2025_最终收盘涨停_后验_D3close_逐日.csv": {
+      "size": 13843,
+      "sha256": "5389d42a1c303f04cfcffdc7dfbeb3d04883efec5104d88ec0a3c7317d61aab5"
+    },
+    "2025_最终收盘涨停_后验_D3open_账本.csv": {
+      "size": 9214,
+      "sha256": "e37a7781daa34ea33a521a6d2b57ae840f8e23ca57044eba1cf62b6e086d258a"
+    },
+    "2025_最终收盘涨停_后验_D3open_逐日.csv": {
+      "size": 13925,
+      "sha256": "04896d0843033962e941ce47f64a1d3bdae583dbf7472dca318830eeea3f5f8f"
+    },
+    "2025_轮空D3开盘假设_账本.csv": {
+      "size": 9852,
+      "sha256": "7b0aada8ef1ff0fab69a530c0f9287abbc1325d4987bda6f57c5f9b71c29b7c5"
+    },
+    "2025_轮空D3开盘假设_逐日.csv": {
+      "size": 14041,
+      "sha256": "3310c2472f66bc59b421f78b1a5631c019472664bcb67e9dc38e7a122e487a60"
+    },
+    "2026_1455持有_分钟成交代理_账本.csv": {
+      "size": 15878,
+      "sha256": "d784f960c5ed4a5144c5ba8aa11fa030bdfb9fb389b34c75c04de0abefa27bc1"
+    },
+    "2026_1455持有_分钟成交代理_逐日.csv": {
+      "size": 11559,
+      "sha256": "0d4e1d28ce70ea0c1c7a2d0c999e5d809726e48f8616fd720bc73693156a342e"
+    },
+    "2026_14:55已涨停_D3close_账本.csv": {
+      "size": 14514,
+      "sha256": "9ab0b765aeed193bbd333bfa4a4c51fa9b6a38ea0396332da182a4d35d663fd1"
+    },
+    "2026_14:55已涨停_D3close_逐日.csv": {
+      "size": 11602,
+      "sha256": "f9b63f42a5ef93f6c8ec557245a3465d1772a9611e5d6bb73a8a8354b49ed1b3"
+    },
+    "2026_14:55已涨停_D3open_账本.csv": {
+      "size": 16737,
+      "sha256": "c9a9bce50d5cffa649991b86998612487c622de2762bf7a55e219a8234f38de3"
+    },
+    "2026_14:55已涨停_D3open_逐日.csv": {
+      "size": 11591,
+      "sha256": "708cb2d67f36a116ce9f4ac3131424d91a040b98d48ecc3d801eeb7f3c82bbc8"
+    },
+    "2026_最终收盘涨停_后验_D3close_账本.csv": {
+      "size": 14670,
+      "sha256": "771cb924819c9d07d8ab20f1057c7acdbba12197c61a7e119552c179d9165dbb"
+    },
+    "2026_最终收盘涨停_后验_D3close_逐日.csv": {
+      "size": 11597,
+      "sha256": "514a4d17c46305f662c23ddaaa39343e09a00b4ec19d9b973bb5f74f4f83773c"
+    },
+    "2026_最终收盘涨停_后验_D3open_账本.csv": {
+      "size": 16749,
+      "sha256": "c83c1b183585610ffaf78c90b40a67649a70dd3e43e259793a2588428c251007"
+    },
+    "2026_最终收盘涨停_后验_D3open_逐日.csv": {
+      "size": 11601,
+      "sha256": "724ee21ce4c0212b246acff005bb3d603ff586e223640108131c500d09820aed"
+    },
+    "2026_轮空D3开盘假设_账本.csv": {
+      "size": 17786,
+      "sha256": "b1617f186a92f47dad8250a0e6f1bc9406a2e5cfc76fe5a094e648c236c6d65c"
+    },
+    "2026_轮空D3开盘假设_逐日.csv": {
+      "size": 11684,
+      "sha256": "6edd8f00de42574aa081a79c4aaffd52bd2182c58028ed2904256c28750e5f6e"
+    },
+    "2笔1455误报D3分钟核验.csv": {
+      "size": 495,
+      "sha256": "b0c540069b3fd58c8e9b407ac84af74f33468fd41245cf1a04265f527c3f01b8"
+    },
+    "306笔D2_1455事前信号.csv": {
+      "size": 46187,
+      "sha256": "40a00308a2231c9f724fca9e17edaa6b193bc424ce4b3576fa105b581a0ef12f"
+    },
+    "4笔跌停后续官方日线.csv": {
+      "size": 5557,
+      "sha256": "0a33f05ac7fec7f38a38157997c7cd6a72bbdcbd0c09d7a79a42a363d4c80649"
+    },
+    "4笔跌停延至D4收盘估值_账本.csv": {
+      "size": 45706,
+      "sha256": "4afc5f04aeb582fd865b4e3cd893bbc26d01cdd405e71a87f611e2402c7cefe7"
+    },
+    "4笔跌停延至D4收盘估值_逐日.csv": {
+      "size": 73238,
+      "sha256": "8f8cee885e75dacadc8e4bd17c6c3ada98e86a192366f6af5bbd7a34cdb1b4da"
+    },
+    "84笔分钟预约卖出对照.csv": {
+      "size": 89547,
+      "sha256": "2834b2d7779edbe78d412a68afba2e3d7075425cd70273cf72789c17e7f0529c"
+    },
+    "84笔各年时点汇总.csv": {
+      "size": 1933,
+      "sha256": "5b76007996524d8ff131cf7289ef17aa5ada6bb769ec4ad9a3ba97420287d197"
+    },
+    "91笔D3开收对照.csv": {
+      "size": 19913,
+      "sha256": "d02849afec8cbbd0aa2ea7bd7b94140eb1664feae8c1eee430d2a29bc7233f8d"
+    },
+    "91笔含开盘跌停.csv": {
+      "size": 42666,
+      "sha256": "dd0b578a5484a0bef72c0bd052342026512be890b407dd7a119c3198d4121de6"
+    },
+    "91笔开收分组汇总.csv": {
+      "size": 759,
+      "sha256": "b5364cc2d4c81647ae77250a55dbfc48c4dc60e47d6a886aed2986f1eed376b4"
+    },
+    "91笔逐年开收.csv": {
+      "size": 414,
+      "sha256": "294d86d3d5db074176db5b525d504786cdf19531a6d083a4bbd617c94eb375c1"
+    },
+    "D2_1455条件延持账户.csv": {
+      "size": 2553,
+      "sha256": "ef039b13ebd3f005a4bfb5e074b30808b56b5c1981a2b1b754c0803a926ffea7"
+    },
+    "D3开盘全可售假设_账本.csv": {
+      "size": 46089,
+      "sha256": "ce8fd58a21238bc27f1a415ef07791ba2791c3fc4f88646954c3ef4ee46800e3"
+    },
+    "D3开盘全可售假设_逐日.csv": {
+      "size": 73271,
+      "sha256": "a383b65f633beb5067e39dcf3ca8a809af675bb6300a8909099e91bc81a1fabb"
+    },
+    "D3开盘跌停4笔D4估值压力.csv": {
+      "size": 235,
+      "sha256": "ebfc9689be54c3705ab27388f59497f603e7dce469f14dbac009f5fb4fa920a4"
+    },
+    "D3首个可卖分钟容量.csv": {
+      "size": 16549,
+      "sha256": "14a489a27958e3c99419f92fc4fc2adfc9aa643f42d8847e2095af440eaccdbb"
+    },
+    "README.md": {
+      "size": 8605,
+      "sha256": "ae76c0ef84d72b9a746734b44d9c51044dd9d84711feca3e3192d959bda420b5"
+    },
+    "capacity.py": {
+      "size": 1989,
+      "sha256": "325b11a7779a0ddf612535cd9863c1921d6e48d70a6b0948e0002d73963221a1"
+    },
+    "d2_signal.py": {
+      "size": 2790,
+      "sha256": "f63a7e1bdb0acf49ff8f1cadf9e1621b9e868300d47ad79b29ad284d82a85fb6"
+    },
+    "d3_dates.csv": {
+      "size": 1846,
+      "sha256": "4a7b0c6fc81436b111b3f4aeea0ec0e7da91afabbeb759e3d76bddaf26cbb9b0"
+    },
+    "false_positive_minutes.py": {
+      "size": 2044,
+      "sha256": "b7b6c8c6a33ce877c0dcca641ee1e135b0aa8d92cae77e7ea0e444001b197f87"
+    },
+    "finalize.py": {
+      "size": 3649,
+      "sha256": "31d1f2374ca35aa53873d1a8dc7dcfb0a2a09a257002c25b00306c42d0111656"
+    },
+    "four_follow.py": {
+      "size": 1202,
+      "sha256": "59fe59a68076cf4e75cdcd60c9cd8535a933276d244a9c606bb36d6ff94bea55"
+    },
+    "joined91.pkl": {
+      "size": 29911,
+      "sha256": "9bc886e87f6763fcb79f3b023e173c208a51d412279ee9c80b14ab718b33dd42"
+    },
+    "prepare.py": {
+      "size": 7056,
+      "sha256": "cd2dc67b9f75686e9d55dc172d378870578dabf2a17a98ca7eba2c13e61dba62"
+    },
+    "r20_coverage.csv": {
+      "size": 2720,
+      "sha256": "ddba138e3e938253aa71262d0a7919d014548419c118a825ea4f22ffb7a2233d"
+    },
+    "registration_payload.json": {
+      "size": 567,
+      "sha256": "141bf83d654499b92a85e3c939f968d18409d1dbbba3dd7cc2f21dda33577115"
+    },
+    "replay_1455.py": {
+      "size": 4235,
+      "sha256": "2a910bf68962f91f11fe2c2618b45b97cb6b813c4d7cdbec29e05c2c141700ab"
+    },
+    "replay_idle_open.py": {
+      "size": 1616,
+      "sha256": "1fb7a8a3b03cd09dfadf2e037c41080426d9dc84f0f27874b481811e78377a64"
+    },
+    "replay_proxy.py": {
+      "size": 5056,
+      "sha256": "86dae839143fe8771396b7ea160ad887c55df295207ba397439acfa4039041be"
+    },
+    "stress_d4.py": {
+      "size": 3775,
+      "sha256": "e1c6d9606155c8148f6880e01d488788419f101c09f0cf38dc911e5e7a515278"
+    },
+    "summarize.py": {
+      "size": 4082,
+      "sha256": "31e8e4f2743ccc6b93cf5d8bde44af75993f5879c8ea4cb78a23c6e081ebeb6b"
+    },
+    "verification.json": {
+      "size": 879,
+      "sha256": "c383924919ae63f39068a79dd4d29a220491c00d596f0dd382236a70b073fada"
+    },
+    "全期_1455持有_分钟成交代理_账本.csv": {
+      "size": 50025,
+      "sha256": "351a7ccc8fd3493a92d98b45699aed7720cb9788f13c6c34a81a567e4bde32ca"
+    },
+    "全期_1455持有_分钟成交代理_逐日.csv": {
+      "size": 73269,
+      "sha256": "9f062756eb8fae34ab0fe816fd2445f1d49a99d7eaa3a5f4eb69468cbc231fb4"
+    },
+    "全期_14:55已涨停_D3close_账本.csv": {
+      "size": 47381,
+      "sha256": "989e00fb2865e73f0f856b2338b90cfd4f28333d65662e0f11a5361d1d433a6d"
+    },
+    "全期_14:55已涨停_D3close_逐日.csv": {
+      "size": 73415,
+      "sha256": "33b967cf23e1778d5f8d680a67ee68cc5f492f189ee3e1aff2735fde03e69f9f"
+    },
+    "全期_14:55已涨停_D3open_账本.csv": {
+      "size": 52027,
+      "sha256": "1764aa9a45343129463208ef86dfa7afce8d8a6cb8c49573ee8e06f4f685e168"
+    },
+    "全期_14:55已涨停_D3open_逐日.csv": {
+      "size": 73271,
+      "sha256": "a383b65f633beb5067e39dcf3ca8a809af675bb6300a8909099e91bc81a1fabb"
+    },
+    "全期_最终收盘涨停_后验_D3close_账本.csv": {
+      "size": 47490,
+      "sha256": "7414efae58e07e05a3d5433c073cc521100f6b33d5ae86750fa9a4db58e3a239"
+    },
+    "全期_最终收盘涨停_后验_D3close_逐日.csv": {
+      "size": 73373,
+      "sha256": "d71d243c2b77b3200be1f978c00b62f75282a7ede1d65f56770be7aa72ad4373"
+    },
+    "全期_最终收盘涨停_后验_D3open_账本.csv": {
+      "size": 51969,
+      "sha256": "217301a588c96ce454fb80f7329c39b8486939c1d1f60ba4aeeaef5e76ff820d"
+    },
+    "全期_最终收盘涨停_后验_D3open_逐日.csv": {
+      "size": 73244,
+      "sha256": "be756ee4586aee2bb7acdcaa1372955fac1456932c0d585546b6e7b30c083b79"
+    },
+    "全期_轮空D3开盘假设_账本.csv": {
+      "size": 55083,
+      "sha256": "8ab1306a6b8cbacb3317ca37eb2a6357483e30973a5c363f774f2fa6b794795e"
+    },
+    "全期_轮空D3开盘假设_逐日.csv": {
+      "size": 71762,
+      "sha256": "3bf6bb922faa3b385193f809c4248cd27863c72321bfd4c60e1ce8ec3e6e7ae0"
+    },
+    "分钟来源及核验.csv": {
+      "size": 17749,
+      "sha256": "9a31149775ac17b797ce84beccb1c1cb6e7f024f498bff86851d6e59debe2bb9"
+    },
+    "缺失分钟7笔.csv": {
+      "size": 555,
+      "sha256": "abe81790ca3a55144c9942619e3c6cacf5794ac42548eef3938fac518bfd31f8"
+    },
+    "轮空112笔D3开盘账户.csv": {
+      "size": 459,
+      "sha256": "4b839906532edd0ccb4028eb05064daa921a11e3016d4f06f54f65430da0d6e1"
+    }
+  },
+  "raw_source_location": "server only; source hashes in 分钟来源及核验.csv"
+}

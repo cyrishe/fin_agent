@@ -1,0 +1,320 @@
+{
+  "status": "PASS",
+  "experiment": "R64 逐笔收益和与冻结V2净值门槛对照",
+  "alternative": "各取前月末5/10个交易日内D2卖出的原B2影子交易，分别等权加总单笔双边费后收益；两和之和<0或上月D0零候选则停摆",
+  "alternative_is_registered_v2": false,
+  "compared_months": 52,
+  "different_months": 7,
+  "association": {
+    "pearson": 0.9720316083503738,
+    "spearman": 0.965081533339025,
+    "same_pause": 45
+  },
+  "decomposition": {
+    "frozen_shadow_nav_replayed_exact": true,
+    "weighted_realized_only_different_months": 6,
+    "simple_daily_sum_different_months": 1,
+    "flipped_months_with_month_end_position": 7
+  },
+  "flipped_D0_cohorts": [
+    {
+      "month": "2022-07",
+      "D0_signals": 14,
+      "independent_month_cohort_return": 0.24563992048468153,
+      "mean_fee_net_trade_return": 0.036439104847083355
+    },
+    {
+      "month": "2022-09",
+      "D0_signals": 17,
+      "independent_month_cohort_return": -0.36269900064233185,
+      "mean_fee_net_trade_return": -0.04691652159743718
+    },
+    {
+      "month": "2022-10",
+      "D0_signals": 13,
+      "independent_month_cohort_return": -0.21788668865010496,
+      "mean_fee_net_trade_return": -0.031048125862559135
+    },
+    {
+      "month": "2024-08",
+      "D0_signals": 9,
+      "independent_month_cohort_return": -0.346173737384748,
+      "mean_fee_net_trade_return": -0.08817041605826606
+    },
+    {
+      "month": "2025-03",
+      "D0_signals": 19,
+      "independent_month_cohort_return": -0.14357965209531698,
+      "mean_fee_net_trade_return": -0.012604855877434476
+    },
+    {
+      "month": "2025-10",
+      "D0_signals": 8,
+      "independent_month_cohort_return": 0.04066137409264825,
+      "mean_fee_net_trade_return": 0.011595521316103433
+    },
+    {
+      "month": "2026-05",
+      "D0_signals": 13,
+      "independent_month_cohort_return": -0.0008229951543587966,
+      "mean_fee_net_trade_return": 0.0015222198432264245
+    }
+  ],
+  "different_decisions": [
+    {
+      "目标月": "2022-07",
+      "V2停摆": true,
+      "逐笔收益和停摆": false
+    },
+    {
+      "目标月": "2022-09",
+      "V2停摆": true,
+      "逐笔收益和停摆": false
+    },
+    {
+      "目标月": "2022-10",
+      "V2停摆": true,
+      "逐笔收益和停摆": false
+    },
+    {
+      "目标月": "2024-08",
+      "V2停摆": true,
+      "逐笔收益和停摆": false
+    },
+    {
+      "目标月": "2025-03",
+      "V2停摆": true,
+      "逐笔收益和停摆": false
+    },
+    {
+      "目标月": "2025-10",
+      "V2停摆": false,
+      "逐笔收益和停摆": true
+    },
+    {
+      "目标月": "2026-05",
+      "V2停摆": true,
+      "逐笔收益和停摆": false
+    }
+  ],
+  "accounts": {
+    "全53个D0月": {
+      "原B2": {
+        "entries": 709,
+        "closed": 709,
+        "final_nav": 43250.68495311595,
+        "total_return": -0.9567493150468841,
+        "max_drawdown": 0.9876066169446098,
+        "sharpe": -0.7745918561732429,
+        "yearly": [
+          {
+            "year": "2022",
+            "opening_nav": 1000000.0,
+            "closing_nav": 731451.7062283573,
+            "return_": -0.2685482937716427,
+            "entries": 114
+          },
+          {
+            "year": "2023",
+            "opening_nav": 731451.7062283573,
+            "closing_nav": 342962.23187485343,
+            "return_": -0.5311211540632027,
+            "entries": 166
+          },
+          {
+            "year": "2024",
+            "opening_nav": 342962.23187485343,
+            "closing_nav": 34053.41035565638,
+            "return_": -0.9007079870879706,
+            "entries": 141
+          },
+          {
+            "year": "2025",
+            "opening_nav": 34053.41035565638,
+            "closing_nav": 19431.61861710836,
+            "return_": -0.4293781910779838,
+            "entries": 167
+          },
+          {
+            "year": "2026",
+            "opening_nav": 19431.61861710836,
+            "closing_nav": 43250.68495311595,
+            "return_": 1.2257891020481613,
+            "entries": 121
+          }
+        ]
+      },
+      "V2净值门槛": {
+        "entries": 306,
+        "closed": 306,
+        "final_nav": 2610749.5568606267,
+        "total_return": 1.6107495568606267,
+        "max_drawdown": 0.38562637568888625,
+        "sharpe": 0.743950505696653,
+        "yearly": [
+          {
+            "year": "2022",
+            "opening_nav": 1000000.0,
+            "closing_nav": 855249.6674976586,
+            "return_": -0.14475033250234137,
+            "entries": 35
+          },
+          {
+            "year": "2023",
+            "opening_nav": 855249.6674976586,
+            "closing_nav": 1297689.4427973817,
+            "return_": 0.5173223587379345,
+            "entries": 64
+          },
+          {
+            "year": "2024",
+            "opening_nav": 1297689.4427973817,
+            "closing_nav": 926064.546705167,
+            "return_": -0.2863742925203402,
+            "entries": 54
+          },
+          {
+            "year": "2025",
+            "opening_nav": 926064.546705167,
+            "closing_nav": 1074985.793005893,
+            "return_": 0.16081087093828494,
+            "entries": 55
+          },
+          {
+            "year": "2026",
+            "opening_nav": 1074985.793005893,
+            "closing_nav": 2610749.5568606267,
+            "return_": 1.4286363353327727,
+            "entries": 98
+          }
+        ]
+      },
+      "逐笔收益和门槛": {
+        "entries": 383,
+        "closed": 383,
+        "final_nav": 878494.557828855,
+        "total_return": -0.121505442171145,
+        "max_drawdown": 0.7460226612665373,
+        "sharpe": 0.17803546849772056,
+        "yearly": [
+          {
+            "year": "2022",
+            "opening_nav": 1000000.0,
+            "closing_nav": 535020.5379755689,
+            "return_": -0.4649794620244311,
+            "entries": 79
+          },
+          {
+            "year": "2023",
+            "opening_nav": 535020.5379755689,
+            "closing_nav": 811798.6246543296,
+            "return_": 0.5173223587379359,
+            "entries": 64
+          },
+          {
+            "year": "2024",
+            "opening_nav": 811798.6246543296,
+            "closing_nav": 378774.87096823234,
+            "return_": -0.5334127707724096,
+            "entries": 63
+          },
+          {
+            "year": "2025",
+            "opening_nav": 378774.87096823234,
+            "closing_nav": 362021.32748934027,
+            "return_": -0.044230873700956685,
+            "entries": 66
+          },
+          {
+            "year": "2026",
+            "opening_nav": 362021.32748934027,
+            "closing_nav": 878494.557828855,
+            "return_": 1.426637579397093,
+            "entries": 111
+          }
+        ]
+      }
+    },
+    "2025-05至2026-09的D0月": {
+      "原B2": {
+        "entries": 225,
+        "closed": 225,
+        "final_nav": 2680602.4528530305,
+        "total_return": 1.6806024528530306,
+        "max_drawdown": 0.40200598254909237,
+        "sharpe": 1.4787449686790606,
+        "yearly": [
+          {
+            "year": "2025",
+            "opening_nav": 1000000.0,
+            "closing_nav": 1204338.0257304485,
+            "return_": 0.20433802573044857,
+            "entries": 104
+          },
+          {
+            "year": "2026",
+            "opening_nav": 1204338.0257304485,
+            "closing_nav": 2680602.4528530305,
+            "return_": 1.2257891020481613,
+            "entries": 121
+          }
+        ]
+      },
+      "V2净值门槛": {
+        "entries": 152,
+        "closed": 152,
+        "final_nav": 2789330.7751657655,
+        "total_return": 1.7893307751657654,
+        "max_drawdown": 0.30936769216984916,
+        "sharpe": 1.716338448314898,
+        "yearly": [
+          {
+            "year": "2025",
+            "opening_nav": 1000000.0,
+            "closing_nav": 1148517.2706120992,
+            "return_": 0.14851727061209918,
+            "entries": 54
+          },
+          {
+            "year": "2026",
+            "opening_nav": 1148517.2706120992,
+            "closing_nav": 2789330.7751657655,
+            "return_": 1.4286363353327713,
+            "entries": 98
+          }
+        ]
+      },
+      "逐笔收益和门槛": {
+        "entries": 157,
+        "closed": 157,
+        "final_nav": 2679458.3017920656,
+        "total_return": 1.6794583017920655,
+        "max_drawdown": 0.33602543269523744,
+        "sharpe": 1.6770961702944664,
+        "yearly": [
+          {
+            "year": "2025",
+            "opening_nav": 1000000.0,
+            "closing_nav": 1104185.6124464138,
+            "return_": 0.10418561244641378,
+            "entries": 46
+          },
+          {
+            "year": "2026",
+            "opening_nav": 1104185.6124464138,
+            "closing_nav": 2679458.3017920656,
+            "return_": 1.426637579397096,
+            "entries": 111
+          }
+        ]
+      }
+    }
+  },
+  "source_sha256": {
+    "outputs/stock_automl/b2_2021_minute_r60_20261020/signals.pkl": "c0fab9e454c92c0f3b0a9ba102224dcd6fef00fe377d215fbff1fb373708d1da",
+    "outputs/stock_automl/b2_2021_minute_r60_20261020/calendar.json": "48467afcb0babf08ea8481f396b13e71562c5e414abf09902751355d842de965",
+    "docs/stock_automl_runs/20261020_b2_2021_minutes_r60/逐月.csv": "c73aeffc30ec7cd33091621f960164d329841b83062b6a1a45939d46a5c321ee",
+    "docs/stock_automl_runs/20261020_b2_2021_minutes_r60/逐日净值.csv": "a57a08790635498281ab520b82634099b163591d7e35c90a2111ba513a8617b1"
+  },
+  "limitation": "已见历史；逐笔收益和只计窗口内卖出，不计未卖持仓估值、资金权重和复利。"
+}

@@ -1,0 +1,6091 @@
+{
+  "selected": {
+    "id": "logistic",
+    "description": "逻辑回归：风险分数>0.3445",
+    "selected": true,
+    "train": {
+      "n": 152,
+      "positives": 42,
+      "base_rate": 0.276315789473684,
+      "flagged": 38,
+      "caught": 15,
+      "false_flags": 23,
+      "missed": 27,
+      "precision": 0.394736842105263,
+      "recall": 0.357142857142857,
+      "false_positive_rate": 0.209090909090909,
+      "reject_fraction": 0.25,
+      "lift": 1.428571428571428,
+      "retained_risk": 0.236842105263158,
+      "retained_risk_reduction": 0.039473684210526,
+      "flagged_risk_ci": [
+        0.255980757481604,
+        0.55282132003957
+      ],
+      "retained_risk_ci": [
+        0.168182664299654,
+        0.322658669468156
+      ],
+      "flagged_original_profit_count": 12,
+      "false_flag_original_profit_count": 11,
+      "original_net_mean_flagged": -0.042506201968075,
+      "original_net_mean_retained": 0.017809705431518
+    },
+    "valid": {
+      "n": 54,
+      "positives": 10,
+      "base_rate": 0.185185185185185,
+      "flagged": 13,
+      "caught": 4,
+      "false_flags": 9,
+      "missed": 6,
+      "precision": 0.307692307692308,
+      "recall": 0.4,
+      "false_positive_rate": 0.204545454545455,
+      "reject_fraction": 0.240740740740741,
+      "lift": 1.661538461538462,
+      "retained_risk": 0.146341463414634,
+      "retained_risk_reduction": 0.038843721770551,
+      "flagged_risk_ci": [
+        0.126807036557108,
+        0.576306568194503
+      ],
+      "retained_risk_ci": [
+        0.068842481412961,
+        0.284434580424805
+      ],
+      "flagged_original_profit_count": 6,
+      "false_flag_original_profit_count": 6,
+      "original_net_mean_flagged": -0.002515793439674,
+      "original_net_mean_retained": 0.011994994254519
+    },
+    "test": {
+      "n": 98,
+      "positives": 14,
+      "base_rate": 0.142857142857143,
+      "flagged": 15,
+      "caught": 4,
+      "false_flags": 11,
+      "missed": 10,
+      "precision": 0.266666666666667,
+      "recall": 0.285714285714286,
+      "false_positive_rate": 0.130952380952381,
+      "reject_fraction": 0.153061224489796,
+      "lift": 1.866666666666667,
+      "retained_risk": 0.120481927710843,
+      "retained_risk_reduction": 0.022375215146299,
+      "flagged_risk_ci": [
+        0.108974533256926,
+        0.519504340559799
+      ],
+      "retained_risk_ci": [
+        0.066776902980843,
+        0.207763151325714
+      ],
+      "flagged_original_profit_count": 7,
+      "false_flag_original_profit_count": 7,
+      "original_net_mean_flagged": -0.009556680664889,
+      "original_net_mean_retained": 0.025465493141551
+    },
+    "uncertainty": {
+      "months": 7,
+      "valid_draws": 3000,
+      "retained_risk_reduction_ci": [
+        -0.017791297935103,
+        0.067695370831259
+      ],
+      "lift_ci": [
+        0.34921433937352,
+        4.157142857142857
+      ]
+    },
+    "test_score_metrics": {
+      "auc": 0.548469387755102,
+      "average_precision": 0.17678622893286,
+      "brier": 0.140868981539619
+    }
+  },
+  "candidates": [
+    {
+      "id": "S037",
+      "description": "D0对板前量比<=0.2827",
+      "selected": false,
+      "train": {
+        "n": 152,
+        "positives": 42,
+        "base_rate": 0.276315789473684,
+        "flagged": 36,
+        "caught": 16,
+        "false_flags": 20,
+        "missed": 26,
+        "precision": 0.444444444444444,
+        "recall": 0.380952380952381,
+        "false_positive_rate": 0.181818181818182,
+        "reject_fraction": 0.236842105263158,
+        "lift": 1.608465608465608,
+        "retained_risk": 0.224137931034483,
+        "retained_risk_reduction": 0.052177858439201,
+        "flagged_risk_ci": [
+          0.295412687400806,
+          0.604189382443023
+        ],
+        "retained_risk_ci": [
+          0.157797613536499,
+          0.308163493497784
+        ],
+        "flagged_original_profit_count": 17,
+        "false_flag_original_profit_count": 15,
+        "original_net_mean_flagged": -0.003668301317597,
+        "original_net_mean_retained": 0.004716634412411
+      },
+      "valid": {
+        "n": 54,
+        "positives": 10,
+        "base_rate": 0.185185185185185,
+        "flagged": 8,
+        "caught": 2,
+        "false_flags": 6,
+        "missed": 8,
+        "precision": 0.25,
+        "recall": 0.2,
+        "false_positive_rate": 0.136363636363636,
+        "reject_fraction": 0.148148148148148,
+        "lift": 1.35,
+        "retained_risk": 0.173913043478261,
+        "retained_risk_reduction": 0.011272141706924,
+        "flagged_risk_ci": [
+          0.071479212752111,
+          0.590724569689823
+        ],
+        "retained_risk_ci": [
+          0.090857917022465,
+          0.307233537163781
+        ],
+        "flagged_original_profit_count": 4,
+        "false_flag_original_profit_count": 4,
+        "original_net_mean_flagged": -0.004638075850899,
+        "original_net_mean_retained": 0.010786827315798
+      },
+      "test": {
+        "n": 98,
+        "positives": 14,
+        "base_rate": 0.142857142857143,
+        "flagged": 7,
+        "caught": 0,
+        "false_flags": 7,
+        "missed": 14,
+        "precision": 0.0,
+        "recall": 0.0,
+        "false_positive_rate": 0.083333333333333,
+        "reject_fraction": 0.071428571428571,
+        "lift": 0.0,
+        "retained_risk": 0.153846153846154,
+        "retained_risk_reduction": -0.010989010989011,
+        "flagged_risk_ci": [
+          0.0,
+          0.354330435066675
+        ],
+        "retained_risk_ci": [
+          0.093912134059156,
+          0.241821407122375
+        ],
+        "flagged_original_profit_count": 4,
+        "false_flag_original_profit_count": 4,
+        "original_net_mean_flagged": 0.034658130921171,
+        "original_net_mean_retained": 0.018985481366233
+      },
+      "uncertainty": {
+        "months": 7,
+        "valid_draws": 2990,
+        "retained_risk_reduction_ci": [
+          -0.023529411764706,
+          -0.0028129395218
+        ],
+        "lift_ci": [
+          0.0,
+          0.0
+        ]
+      }
+    },
+    {
+      "id": "S013",
+      "description": "D0换手率<=1.99%",
+      "selected": false,
+      "train": {
+        "n": 152,
+        "positives": 42,
+        "base_rate": 0.276315789473684,
+        "flagged": 38,
+        "caught": 15,
+        "false_flags": 23,
+        "missed": 27,
+        "precision": 0.394736842105263,
+        "recall": 0.357142857142857,
+        "false_positive_rate": 0.209090909090909,
+        "reject_fraction": 0.25,
+        "lift": 1.428571428571428,
+        "retained_risk": 0.236842105263158,
+        "retained_risk_reduction": 0.039473684210526,
+        "flagged_risk_ci": [
+          0.255980757481604,
+          0.55282132003957
+        ],
+        "retained_risk_ci": [
+          0.168182664299654,
+          0.322658669468156
+        ],
+        "flagged_original_profit_count": 16,
+        "false_flag_original_profit_count": 16,
+        "original_net_mean_flagged": -0.016667598963582,
+        "original_net_mean_retained": 0.009196837763354
+      },
+      "valid": {
+        "n": 54,
+        "positives": 10,
+        "base_rate": 0.185185185185185,
+        "flagged": 10,
+        "caught": 2,
+        "false_flags": 8,
+        "missed": 8,
+        "precision": 0.2,
+        "recall": 0.2,
+        "false_positive_rate": 0.181818181818182,
+        "reject_fraction": 0.185185185185185,
+        "lift": 1.08,
+        "retained_risk": 0.181818181818182,
+        "retained_risk_reduction": 0.003367003367003,
+        "flagged_risk_ci": [
+          0.056682151454377,
+          0.50983752846335
+        ],
+        "retained_risk_ci": [
+          0.095128057156279,
+          0.319605508871842
+        ],
+        "flagged_original_profit_count": 5,
+        "false_flag_original_profit_count": 5,
+        "original_net_mean_flagged": 0.001932646204026,
+        "original_net_mean_retained": 0.009994613356347
+      },
+      "test": {
+        "n": 98,
+        "positives": 14,
+        "base_rate": 0.142857142857143,
+        "flagged": 13,
+        "caught": 0,
+        "false_flags": 13,
+        "missed": 14,
+        "precision": 0.0,
+        "recall": 0.0,
+        "false_positive_rate": 0.154761904761905,
+        "reject_fraction": 0.13265306122449,
+        "lift": 0.0,
+        "retained_risk": 0.164705882352941,
+        "retained_risk_reduction": -0.021848739495798,
+        "flagged_risk_ci": [
+          0.0,
+          0.228095372354189
+        ],
+        "retained_risk_ci": [
+          0.100724620653967,
+          0.257683033197808
+        ],
+        "flagged_original_profit_count": 6,
+        "false_flag_original_profit_count": 6,
+        "original_net_mean_flagged": 0.016147778665375,
+        "original_net_mean_retained": 0.020710171742653
+      },
+      "uncertainty": {
+        "months": 7,
+        "valid_draws": 3000,
+        "retained_risk_reduction_ci": [
+          -0.030597271309302,
+          -0.012833354463308
+        ],
+        "lift_ci": [
+          0.0,
+          0.0
+        ]
+      }
+    },
+    {
+      "id": "S043",
+      "description": "D0成交额亿<=0.8569",
+      "selected": false,
+      "train": {
+        "n": 152,
+        "positives": 42,
+        "base_rate": 0.276315789473684,
+        "flagged": 38,
+        "caught": 15,
+        "false_flags": 23,
+        "missed": 27,
+        "precision": 0.394736842105263,
+        "recall": 0.357142857142857,
+        "false_positive_rate": 0.209090909090909,
+        "reject_fraction": 0.25,
+        "lift": 1.428571428571428,
+        "retained_risk": 0.236842105263158,
+        "retained_risk_reduction": 0.039473684210526,
+        "flagged_risk_ci": [
+          0.255980757481604,
+          0.55282132003957
+        ],
+        "retained_risk_ci": [
+          0.168182664299654,
+          0.322658669468156
+        ],
+        "flagged_original_profit_count": 15,
+        "false_flag_original_profit_count": 13,
+        "original_net_mean_flagged": -0.006198978030441,
+        "original_net_mean_retained": 0.005707297452306
+      },
+      "valid": {
+        "n": 54,
+        "positives": 10,
+        "base_rate": 0.185185185185185,
+        "flagged": 7,
+        "caught": 2,
+        "false_flags": 5,
+        "missed": 8,
+        "precision": 0.285714285714286,
+        "recall": 0.2,
+        "false_positive_rate": 0.113636363636364,
+        "reject_fraction": 0.12962962962963,
+        "lift": 1.542857142857143,
+        "retained_risk": 0.170212765957447,
+        "retained_risk_reduction": 0.014972419227738,
+        "flagged_risk_ci": [
+          0.082218924004059,
+          0.641065548167373
+        ],
+        "retained_risk_ci": [
+          0.088863638764904,
+          0.30139775972624
+        ],
+        "flagged_original_profit_count": 3,
+        "false_flag_original_profit_count": 3,
+        "original_net_mean_flagged": -0.015160183313484,
+        "original_net_mean_retained": 0.012025760274764
+      },
+      "test": {
+        "n": 98,
+        "positives": 14,
+        "base_rate": 0.142857142857143,
+        "flagged": 12,
+        "caught": 2,
+        "false_flags": 10,
+        "missed": 12,
+        "precision": 0.166666666666667,
+        "recall": 0.142857142857143,
+        "false_positive_rate": 0.119047619047619,
+        "reject_fraction": 0.122448979591837,
+        "lift": 1.166666666666667,
+        "retained_risk": 0.13953488372093,
+        "retained_risk_reduction": 0.003322259136213,
+        "flagged_risk_ci": [
+          0.046965142183855,
+          0.448030862252965
+        ],
+        "retained_risk_ci": [
+          0.081658471555716,
+          0.22823697299912
+        ],
+        "flagged_original_profit_count": 6,
+        "false_flag_original_profit_count": 6,
+        "original_net_mean_flagged": 0.018032800586571,
+        "original_net_mean_retained": 0.020394094345774
+      },
+      "uncertainty": {
+        "months": 7,
+        "valid_draws": 2994,
+        "retained_risk_reduction_ci": [
+          -0.0309516522355,
+          0.04703120953121
+        ],
+        "lift_ci": [
+          0.0,
+          3.277499999999993
+        ]
+      }
+    },
+    {
+      "id": "S012",
+      "description": "D0流通市值亿>62.13",
+      "selected": false,
+      "train": {
+        "n": 152,
+        "positives": 42,
+        "base_rate": 0.276315789473684,
+        "flagged": 38,
+        "caught": 14,
+        "false_flags": 24,
+        "missed": 28,
+        "precision": 0.368421052631579,
+        "recall": 0.333333333333333,
+        "false_positive_rate": 0.218181818181818,
+        "reject_fraction": 0.25,
+        "lift": 1.333333333333333,
+        "retained_risk": 0.245614035087719,
+        "retained_risk_reduction": 0.030701754385965,
+        "flagged_risk_ci": [
+          0.233842192471563,
+          0.527160404429906
+        ],
+        "retained_risk_ci": [
+          0.175747336655557,
+          0.332065952653327
+        ],
+        "flagged_original_profit_count": 15,
+        "false_flag_original_profit_count": 15,
+        "original_net_mean_flagged": -0.022795295426476,
+        "original_net_mean_retained": 0.011239403250985
+      },
+      "valid": {
+        "n": 54,
+        "positives": 10,
+        "base_rate": 0.185185185185185,
+        "flagged": 34,
+        "caught": 6,
+        "false_flags": 28,
+        "missed": 4,
+        "precision": 0.176470588235294,
+        "recall": 0.6,
+        "false_positive_rate": 0.636363636363636,
+        "reject_fraction": 0.62962962962963,
+        "lift": 0.952941176470588,
+        "retained_risk": 0.2,
+        "retained_risk_reduction": -0.014814814814815,
+        "flagged_risk_ci": [
+          0.083489690453725,
+          0.335137373998423
+        ],
+        "retained_risk_ci": [
+          0.0806576625798,
+          0.416017432251887
+        ],
+        "flagged_original_profit_count": 17,
+        "false_flag_original_profit_count": 17,
+        "original_net_mean_flagged": 0.005813702710113,
+        "original_net_mean_retained": 0.013071177878784
+      },
+      "test": {
+        "n": 98,
+        "positives": 14,
+        "base_rate": 0.142857142857143,
+        "flagged": 55,
+        "caught": 8,
+        "false_flags": 47,
+        "missed": 6,
+        "precision": 0.145454545454545,
+        "recall": 0.571428571428571,
+        "false_positive_rate": 0.55952380952381,
+        "reject_fraction": 0.561224489795918,
+        "lift": 1.018181818181818,
+        "retained_risk": 0.13953488372093,
+        "retained_risk_reduction": 0.003322259136213,
+        "flagged_risk_ci": [
+          0.075592891477594,
+          0.261609129314519
+        ],
+        "retained_risk_ci": [
+          0.06555723427965,
+          0.272635879673824
+        ],
+        "flagged_original_profit_count": 30,
+        "false_flag_original_profit_count": 30,
+        "original_net_mean_flagged": 0.020652723137876,
+        "original_net_mean_retained": 0.019404324376563
+      },
+      "uncertainty": {
+        "months": 7,
+        "valid_draws": 3000,
+        "retained_risk_reduction_ci": [
+          -0.067547169811321,
+          0.078341013824885
+        ],
+        "lift_ci": [
+          0.47966527520099,
+          1.327586206896552
+        ]
+      }
+    },
+    {
+      "id": "S066",
+      "description": "市场涨停家数>99.25",
+      "selected": false,
+      "train": {
+        "n": 152,
+        "positives": 42,
+        "base_rate": 0.276315789473684,
+        "flagged": 38,
+        "caught": 14,
+        "false_flags": 24,
+        "missed": 28,
+        "precision": 0.368421052631579,
+        "recall": 0.333333333333333,
+        "false_positive_rate": 0.218181818181818,
+        "reject_fraction": 0.25,
+        "lift": 1.333333333333333,
+        "retained_risk": 0.245614035087719,
+        "retained_risk_reduction": 0.030701754385965,
+        "flagged_risk_ci": [
+          0.233842192471563,
+          0.527160404429906
+        ],
+        "retained_risk_ci": [
+          0.175747336655557,
+          0.332065952653327
+        ],
+        "flagged_original_profit_count": 17,
+        "false_flag_original_profit_count": 17,
+        "original_net_mean_flagged": 0.003260667712725,
+        "original_net_mean_retained": 0.002554082204584
+      },
+      "valid": {
+        "n": 54,
+        "positives": 10,
+        "base_rate": 0.185185185185185,
+        "flagged": 3,
+        "caught": 1,
+        "false_flags": 2,
+        "missed": 9,
+        "precision": 0.333333333333333,
+        "recall": 0.1,
+        "false_positive_rate": 0.045454545454545,
+        "reject_fraction": 0.055555555555556,
+        "lift": 1.8,
+        "retained_risk": 0.176470588235294,
+        "retained_risk_reduction": 0.008714596949891,
+        "flagged_risk_ci": [
+          0.061491944720399,
+          0.792340399197945
+        ],
+        "retained_risk_ci": [
+          0.095724034691265,
+          0.302541425243077
+        ],
+        "flagged_original_profit_count": 1,
+        "false_flag_original_profit_count": 1,
+        "original_net_mean_flagged": -0.032460706526596,
+        "original_net_mean_retained": 0.010911207241163
+      },
+      "test": {
+        "n": 98,
+        "positives": 14,
+        "base_rate": 0.142857142857143,
+        "flagged": 20,
+        "caught": 2,
+        "false_flags": 18,
+        "missed": 12,
+        "precision": 0.1,
+        "recall": 0.142857142857143,
+        "false_positive_rate": 0.214285714285714,
+        "reject_fraction": 0.204081632653061,
+        "lift": 0.7,
+        "retained_risk": 0.153846153846154,
+        "retained_risk_reduction": -0.010989010989011,
+        "flagged_risk_ci": [
+          0.027866481213769,
+          0.30103364522848
+        ],
+        "retained_risk_ci": [
+          0.090255049083872,
+          0.24993266533226
+        ],
+        "flagged_original_profit_count": 11,
+        "false_flag_original_profit_count": 11,
+        "original_net_mean_flagged": 0.023395144975361,
+        "original_net_mean_retained": 0.019261318221387
+      },
+      "uncertainty": {
+        "months": 7,
+        "valid_draws": 3000,
+        "retained_risk_reduction_ci": [
+          -0.046538261322228,
+          0.017861164736165
+        ],
+        "lift_ci": [
+          0.0,
+          1.650209627329194
+        ]
+      }
+    },
+    {
+      "id": "A_S037_S013",
+      "description": "D0对板前量比<=0.2827 且 D0换手率<=1.99%",
+      "selected": false,
+      "train": {
+        "n": 152,
+        "positives": 42,
+        "base_rate": 0.276315789473684,
+        "flagged": 25,
+        "caught": 12,
+        "false_flags": 13,
+        "missed": 30,
+        "precision": 0.48,
+        "recall": 0.285714285714286,
+        "false_positive_rate": 0.118181818181818,
+        "reject_fraction": 0.164473684210526,
+        "lift": 1.737142857142857,
+        "retained_risk": 0.236220472440945,
+        "retained_risk_reduction": 0.040095317032739,
+        "flagged_risk_ci": [
+          0.300312859541134,
+          0.665014830496428
+        ],
+        "retained_risk_ci": [
+          0.170773042799043,
+          0.317156848812626
+        ],
+        "flagged_original_profit_count": 10,
+        "false_flag_original_profit_count": 10,
+        "original_net_mean_flagged": -0.020132944609829,
+        "original_net_mean_retained": 0.007231451650802
+      },
+      "valid": {
+        "n": 54,
+        "positives": 10,
+        "base_rate": 0.185185185185185,
+        "flagged": 6,
+        "caught": 2,
+        "false_flags": 4,
+        "missed": 8,
+        "precision": 0.333333333333333,
+        "recall": 0.2,
+        "false_positive_rate": 0.090909090909091,
+        "reject_fraction": 0.111111111111111,
+        "lift": 1.8,
+        "retained_risk": 0.166666666666667,
+        "retained_risk_reduction": 0.018518518518519,
+        "flagged_risk_ci": [
+          0.096771411105784,
+          0.7000066848616
+        ],
+        "retained_risk_ci": [
+          0.086955135764857,
+          0.295778284012552
+        ],
+        "flagged_original_profit_count": 3,
+        "false_flag_original_profit_count": 3,
+        "original_net_mean_flagged": -0.0236660335093,
+        "original_net_mean_retained": 0.012522617724486
+      },
+      "test": {
+        "n": 98,
+        "positives": 14,
+        "base_rate": 0.142857142857143,
+        "flagged": 6,
+        "caught": 0,
+        "false_flags": 6,
+        "missed": 14,
+        "precision": 0.0,
+        "recall": 0.0,
+        "false_positive_rate": 0.071428571428571,
+        "reject_fraction": 0.061224489795918,
+        "lift": 0.0,
+        "retained_risk": 0.152173913043478,
+        "retained_risk_reduction": -0.009316770186335,
+        "flagged_risk_ci": [
+          0.0,
+          0.390334287902152
+        ],
+        "retained_risk_ci": [
+          0.092865402701437,
+          0.239365128975515
+        ],
+        "flagged_original_profit_count": 4,
+        "false_flag_original_profit_count": 4,
+        "original_net_mean_flagged": 0.046710842906343,
+        "original_net_mean_retained": 0.018369789818884
+      },
+      "uncertainty": {
+        "months": 7,
+        "valid_draws": 2990,
+        "retained_risk_reduction_ci": [
+          -0.018179846228132,
+          -0.002641829215017
+        ],
+        "lift_ci": [
+          0.0,
+          0.0
+        ]
+      }
+    },
+    {
+      "id": "A_S037_S043",
+      "description": "D0对板前量比<=0.2827 且 D0成交额亿<=0.8569",
+      "selected": false,
+      "train": {
+        "n": 152,
+        "positives": 42,
+        "base_rate": 0.276315789473684,
+        "flagged": 19,
+        "caught": 10,
+        "false_flags": 9,
+        "missed": 32,
+        "precision": 0.526315789473684,
+        "recall": 0.238095238095238,
+        "false_positive_rate": 0.081818181818182,
+        "reject_fraction": 0.125,
+        "lift": 1.904761904761904,
+        "retained_risk": 0.240601503759398,
+        "retained_risk_reduction": 0.035714285714286,
+        "flagged_risk_ci": [
+          0.317078092451136,
+          0.7267019483882
+        ],
+        "retained_risk_ci": [
+          0.175895994719169,
+          0.319870854051333
+        ],
+        "flagged_original_profit_count": 8,
+        "false_flag_original_profit_count": 6,
+        "original_net_mean_flagged": -0.003172889107964,
+        "original_net_mean_retained": 0.003574102537274
+      },
+      "valid": {
+        "n": 54,
+        "positives": 10,
+        "base_rate": 0.185185185185185,
+        "flagged": 4,
+        "caught": 2,
+        "false_flags": 2,
+        "missed": 8,
+        "precision": 0.5,
+        "recall": 0.2,
+        "false_positive_rate": 0.045454545454545,
+        "reject_fraction": 0.074074074074074,
+        "lift": 2.7,
+        "retained_risk": 0.16,
+        "retained_risk_reduction": 0.025185185185185,
+        "flagged_risk_ci": [
+          0.150038989152154,
+          0.849961010847846
+        ],
+        "retained_risk_ci": [
+          0.083374206780336,
+          0.285142160630346
+        ],
+        "flagged_original_profit_count": 1,
+        "false_flag_original_profit_count": 1,
+        "original_net_mean_flagged": -0.078514719263939,
+        "original_net_mean_retained": 0.015462966535505
+      },
+      "test": {
+        "n": 98,
+        "positives": 14,
+        "base_rate": 0.142857142857143,
+        "flagged": 2,
+        "caught": 0,
+        "false_flags": 2,
+        "missed": 14,
+        "precision": 0.0,
+        "recall": 0.0,
+        "false_positive_rate": 0.023809523809524,
+        "reject_fraction": 0.020408163265306,
+        "lift": 0.0,
+        "retained_risk": 0.145833333333333,
+        "retained_risk_reduction": -0.00297619047619,
+        "flagged_risk_ci": [
+          0.0,
+          0.657619772493334
+        ],
+        "retained_risk_ci": [
+          0.088902057801388,
+          0.230018150264465
+        ],
+        "flagged_original_profit_count": 2,
+        "false_flag_original_profit_count": 2,
+        "original_net_mean_flagged": 0.157394610513941,
+        "original_net_mean_retained": 0.017244755205703
+      },
+      "uncertainty": {
+        "months": 7,
+        "valid_draws": 2712,
+        "retained_risk_reduction_ci": [
+          -0.006923076923077,
+          -0.001181271477663
+        ],
+        "lift_ci": [
+          0.0,
+          0.0
+        ]
+      }
+    },
+    {
+      "id": "A_S037_S012",
+      "description": "D0对板前量比<=0.2827 且 D0流通市值亿>62.13",
+      "selected": false,
+      "train": {
+        "n": 152,
+        "positives": 42,
+        "base_rate": 0.276315789473684,
+        "flagged": 15,
+        "caught": 7,
+        "false_flags": 8,
+        "missed": 35,
+        "precision": 0.466666666666667,
+        "recall": 0.166666666666667,
+        "false_positive_rate": 0.072727272727273,
+        "reject_fraction": 0.098684210526316,
+        "lift": 1.688888888888889,
+        "retained_risk": 0.255474452554745,
+        "retained_risk_reduction": 0.02084133691894,
+        "flagged_risk_ci": [
+          0.248095353657378,
+          0.698830199745011
+        ],
+        "retained_risk_ci": [
+          0.189808602980374,
+          0.334479198629959
+        ],
+        "flagged_original_profit_count": 7,
+        "false_flag_original_profit_count": 7,
+        "original_net_mean_flagged": -0.015771853832813,
+        "original_net_mean_retained": 0.004756558772981
+      },
+      "valid": {
+        "n": 54,
+        "positives": 10,
+        "base_rate": 0.185185185185185,
+        "flagged": 6,
+        "caught": 2,
+        "false_flags": 4,
+        "missed": 8,
+        "precision": 0.333333333333333,
+        "recall": 0.2,
+        "false_positive_rate": 0.090909090909091,
+        "reject_fraction": 0.111111111111111,
+        "lift": 1.8,
+        "retained_risk": 0.166666666666667,
+        "retained_risk_reduction": 0.018518518518519,
+        "flagged_risk_ci": [
+          0.096771411105784,
+          0.7000066848616
+        ],
+        "retained_risk_ci": [
+          0.086955135764857,
+          0.295778284012552
+        ],
+        "flagged_original_profit_count": 4,
+        "false_flag_original_profit_count": 4,
+        "original_net_mean_flagged": 0.018360306033257,
+        "original_net_mean_retained": 0.007269325281666
+      },
+      "test": {
+        "n": 98,
+        "positives": 14,
+        "base_rate": 0.142857142857143,
+        "flagged": 5,
+        "caught": 0,
+        "false_flags": 5,
+        "missed": 14,
+        "precision": 0.0,
+        "recall": 0.0,
+        "false_positive_rate": 0.05952380952381,
+        "reject_fraction": 0.051020408163265,
+        "lift": 0.0,
+        "retained_risk": 0.150537634408602,
+        "retained_risk_reduction": -0.007680491551459,
+        "flagged_risk_ci": [
+          5.55111512312578e-17,
+          0.434482464783161
+        ],
+        "retained_risk_ci": [
+          0.091841770218917,
+          0.236958097197885
+        ],
+        "flagged_original_profit_count": 3,
+        "false_flag_original_profit_count": 3,
+        "original_net_mean_flagged": 0.035695652968693,
+        "original_net_mean_retained": 0.019266746837978
+      },
+      "uncertainty": {
+        "months": 7,
+        "valid_draws": 2990,
+        "retained_risk_reduction_ci": [
+          -0.014322250639386,
+          -0.002518093304176
+        ],
+        "lift_ci": [
+          0.0,
+          0.0
+        ]
+      }
+    },
+    {
+      "id": "A_S037_S066",
+      "description": "D0对板前量比<=0.2827 且 市场涨停家数>99.25",
+      "selected": false,
+      "train": {
+        "n": 152,
+        "positives": 42,
+        "base_rate": 0.276315789473684,
+        "flagged": 18,
+        "caught": 8,
+        "false_flags": 10,
+        "missed": 34,
+        "precision": 0.444444444444444,
+        "recall": 0.19047619047619,
+        "false_positive_rate": 0.090909090909091,
+        "reject_fraction": 0.118421052631579,
+        "lift": 1.608465608465608,
+        "retained_risk": 0.253731343283582,
+        "retained_risk_reduction": 0.022584446190102,
+        "flagged_risk_ci": [
+          0.245595181270061,
+          0.662835843579567
+        ],
+        "retained_risk_ci": [
+          0.187628192443473,
+          0.333560856448894
+        ],
+        "flagged_original_profit_count": 8,
+        "false_flag_original_profit_count": 8,
+        "original_net_mean_flagged": -0.00027393789316,
+        "original_net_mean_retained": 0.003134340496142
+      },
+      "valid": {
+        "n": 54,
+        "positives": 10,
+        "base_rate": 0.185185185185185,
+        "flagged": 1,
+        "caught": 1,
+        "false_flags": 0,
+        "missed": 9,
+        "precision": 1.0,
+        "recall": 0.1,
+        "false_positive_rate": 0.0,
+        "reject_fraction": 0.018518518518519,
+        "lift": 5.4,
+        "retained_risk": 0.169811320754717,
+        "retained_risk_reduction": 0.015373864430468,
+        "flagged_risk_ci": [
+          0.206549314377246,
+          1.0
+        ],
+        "retained_risk_ci": [
+          0.091999453796191,
+          0.292252802810957
+        ],
+        "flagged_original_profit_count": 0,
+        "false_flag_original_profit_count": 0,
+        "original_net_mean_flagged": -0.182790182790183,
+        "original_net_mean_retained": 0.012110936462447
+      },
+      "test": {
+        "n": 98,
+        "positives": 14,
+        "base_rate": 0.142857142857143,
+        "flagged": 3,
+        "caught": 0,
+        "false_flags": 3,
+        "missed": 14,
+        "precision": 0.0,
+        "recall": 0.0,
+        "false_positive_rate": 0.035714285714286,
+        "reject_fraction": 0.030612244897959,
+        "lift": 0.0,
+        "retained_risk": 0.147368421052632,
+        "retained_risk_reduction": -0.004511278195489,
+        "flagged_risk_ci": [
+          0.0,
+          0.561497031755032
+        ],
+        "retained_risk_ci": [
+          0.089860806536169,
+          0.232285984907458
+        ],
+        "flagged_original_profit_count": 1,
+        "false_flag_original_profit_count": 1,
+        "original_net_mean_flagged": 0.029620652630596,
+        "original_net_mean_retained": 0.019804460661933
+      },
+      "uncertainty": {
+        "months": 7,
+        "valid_draws": 2942,
+        "retained_risk_reduction_ci": [
+          -0.010507455294322,
+          -0.001198883052724
+        ],
+        "lift_ci": [
+          0.0,
+          0.0
+        ]
+      }
+    },
+    {
+      "id": "A_S013_S043",
+      "description": "D0换手率<=1.99% 且 D0成交额亿<=0.8569",
+      "selected": false,
+      "train": {
+        "n": 152,
+        "positives": 42,
+        "base_rate": 0.276315789473684,
+        "flagged": 27,
+        "caught": 11,
+        "false_flags": 16,
+        "missed": 31,
+        "precision": 0.407407407407407,
+        "recall": 0.261904761904762,
+        "false_positive_rate": 0.145454545454545,
+        "reject_fraction": 0.177631578947368,
+        "lift": 1.474426807760141,
+        "retained_risk": 0.248,
+        "retained_risk_reduction": 0.028315789473684,
+        "flagged_risk_ci": [
+          0.245147570743959,
+          0.592732990319348
+        ],
+        "retained_risk_ci": [
+          0.18056747174956,
+          0.330459486679435
+        ],
+        "flagged_original_profit_count": 11,
+        "false_flag_original_profit_count": 11,
+        "original_net_mean_flagged": -0.016882389368596,
+        "original_net_mean_retained": 0.006967162058866
+      },
+      "valid": {
+        "n": 54,
+        "positives": 10,
+        "base_rate": 0.185185185185185,
+        "flagged": 6,
+        "caught": 2,
+        "false_flags": 4,
+        "missed": 8,
+        "precision": 0.333333333333333,
+        "recall": 0.2,
+        "false_positive_rate": 0.090909090909091,
+        "reject_fraction": 0.111111111111111,
+        "lift": 1.8,
+        "retained_risk": 0.166666666666667,
+        "retained_risk_reduction": 0.018518518518519,
+        "flagged_risk_ci": [
+          0.096771411105784,
+          0.7000066848616
+        ],
+        "retained_risk_ci": [
+          0.086955135764857,
+          0.295778284012552
+        ],
+        "flagged_original_profit_count": 2,
+        "false_flag_original_profit_count": 2,
+        "original_net_mean_flagged": -0.05502579732337,
+        "original_net_mean_retained": 0.016442588201244
+      },
+      "test": {
+        "n": 98,
+        "positives": 14,
+        "base_rate": 0.142857142857143,
+        "flagged": 6,
+        "caught": 0,
+        "false_flags": 6,
+        "missed": 14,
+        "precision": 0.0,
+        "recall": 0.0,
+        "false_positive_rate": 0.071428571428571,
+        "reject_fraction": 0.061224489795918,
+        "lift": 0.0,
+        "retained_risk": 0.152173913043478,
+        "retained_risk_reduction": -0.009316770186335,
+        "flagged_risk_ci": [
+          0.0,
+          0.390334287902152
+        ],
+        "retained_risk_ci": [
+          0.092865402701437,
+          0.239365128975515
+        ],
+        "flagged_original_profit_count": 3,
+        "false_flag_original_profit_count": 3,
+        "original_net_mean_flagged": 0.043160215756829,
+        "original_net_mean_retained": 0.01860135245907
+      },
+      "uncertainty": {
+        "months": 7,
+        "valid_draws": 2994,
+        "retained_risk_reduction_ci": [
+          -0.016535329043535,
+          -0.002759420485446
+        ],
+        "lift_ci": [
+          0.0,
+          0.0
+        ]
+      }
+    },
+    {
+      "id": "A_S013_S012",
+      "description": "D0换手率<=1.99% 且 D0流通市值亿>62.13",
+      "selected": false,
+      "train": {
+        "n": 152,
+        "positives": 42,
+        "base_rate": 0.276315789473684,
+        "flagged": 17,
+        "caught": 8,
+        "false_flags": 9,
+        "missed": 34,
+        "precision": 0.470588235294118,
+        "recall": 0.19047619047619,
+        "false_positive_rate": 0.081818181818182,
+        "reject_fraction": 0.111842105263158,
+        "lift": 1.703081232492997,
+        "retained_risk": 0.251851851851852,
+        "retained_risk_reduction": 0.024463937621832,
+        "flagged_risk_ci": [
+          0.261651064424099,
+          0.690367649399951
+        ],
+        "retained_risk_ci": [
+          0.186188966276,
+          0.331246239540104
+        ],
+        "flagged_original_profit_count": 7,
+        "false_flag_original_profit_count": 7,
+        "original_net_mean_flagged": -0.03172299291898,
+        "original_net_mean_retained": 0.007069345363177
+      },
+      "valid": {
+        "n": 54,
+        "positives": 10,
+        "base_rate": 0.185185185185185,
+        "flagged": 8,
+        "caught": 2,
+        "false_flags": 6,
+        "missed": 8,
+        "precision": 0.25,
+        "recall": 0.2,
+        "false_positive_rate": 0.136363636363636,
+        "reject_fraction": 0.148148148148148,
+        "lift": 1.35,
+        "retained_risk": 0.173913043478261,
+        "retained_risk_reduction": 0.011272141706924,
+        "flagged_risk_ci": [
+          0.071479212752111,
+          0.590724569689823
+        ],
+        "retained_risk_ci": [
+          0.090857917022465,
+          0.307233537163781
+        ],
+        "flagged_original_profit_count": 4,
+        "false_flag_original_profit_count": 4,
+        "original_net_mean_flagged": 0.003709512383194,
+        "original_net_mean_retained": 0.009335072840304
+      },
+      "test": {
+        "n": 98,
+        "positives": 14,
+        "base_rate": 0.142857142857143,
+        "flagged": 9,
+        "caught": 0,
+        "false_flags": 9,
+        "missed": 14,
+        "precision": 0.0,
+        "recall": 0.0,
+        "false_positive_rate": 0.107142857142857,
+        "reject_fraction": 0.091836734693878,
+        "lift": 0.0,
+        "retained_risk": 0.157303370786517,
+        "retained_risk_reduction": -0.014446227929374,
+        "flagged_risk_ci": [
+          0.0,
+          0.299145048419532
+        ],
+        "retained_risk_ci": [
+          0.096078096666207,
+          0.246887850068751
+        ],
+        "flagged_original_profit_count": 5,
+        "false_flag_original_profit_count": 5,
+        "original_net_mean_flagged": 0.032684323712394,
+        "original_net_mean_retained": 0.018832885475998
+      },
+      "uncertainty": {
+        "months": 7,
+        "valid_draws": 3000,
+        "retained_risk_reduction_ci": [
+          -0.018093168201838,
+          -0.010502625656414
+        ],
+        "lift_ci": [
+          0.0,
+          0.0
+        ]
+      }
+    },
+    {
+      "id": "A_S013_S066",
+      "description": "D0换手率<=1.99% 且 市场涨停家数>99.25",
+      "selected": false,
+      "train": {
+        "n": 152,
+        "positives": 42,
+        "base_rate": 0.276315789473684,
+        "flagged": 20,
+        "caught": 9,
+        "false_flags": 11,
+        "missed": 33,
+        "precision": 0.45,
+        "recall": 0.214285714285714,
+        "false_positive_rate": 0.1,
+        "reject_fraction": 0.131578947368421,
+        "lift": 1.628571428571428,
+        "retained_risk": 0.25,
+        "retained_risk_reduction": 0.026315789473684,
+        "flagged_risk_ci": [
+          0.258197858255628,
+          0.657914657549653
+        ],
+        "retained_risk_ci": [
+          0.183910390885538,
+          0.330229102513765
+        ],
+        "flagged_original_profit_count": 8,
+        "false_flag_original_profit_count": 8,
+        "original_net_mean_flagged": -0.008588540265076,
+        "original_net_mean_retained": 0.004445769315967
+      },
+      "valid": {
+        "n": 54,
+        "positives": 10,
+        "base_rate": 0.185185185185185,
+        "flagged": 1,
+        "caught": 1,
+        "false_flags": 0,
+        "missed": 9,
+        "precision": 1.0,
+        "recall": 0.1,
+        "false_positive_rate": 0.0,
+        "reject_fraction": 0.018518518518519,
+        "lift": 5.4,
+        "retained_risk": 0.169811320754717,
+        "retained_risk_reduction": 0.015373864430468,
+        "flagged_risk_ci": [
+          0.206549314377246,
+          1.0
+        ],
+        "retained_risk_ci": [
+          0.091999453796191,
+          0.292252802810957
+        ],
+        "flagged_original_profit_count": 0,
+        "false_flag_original_profit_count": 0,
+        "original_net_mean_flagged": -0.182790182790183,
+        "original_net_mean_retained": 0.012110936462447
+      },
+      "test": {
+        "n": 98,
+        "positives": 14,
+        "base_rate": 0.142857142857143,
+        "flagged": 2,
+        "caught": 0,
+        "false_flags": 2,
+        "missed": 14,
+        "precision": 0.0,
+        "recall": 0.0,
+        "false_positive_rate": 0.023809523809524,
+        "reject_fraction": 0.020408163265306,
+        "lift": 0.0,
+        "retained_risk": 0.145833333333333,
+        "retained_risk_reduction": -0.00297619047619,
+        "flagged_risk_ci": [
+          0.0,
+          0.657619772493334
+        ],
+        "retained_risk_ci": [
+          0.088902057801388,
+          0.230018150264465
+        ],
+        "flagged_original_profit_count": 1,
+        "false_flag_original_profit_count": 1,
+        "original_net_mean_flagged": 0.063260049440827,
+        "original_net_mean_retained": 0.019205891894726
+      },
+      "uncertainty": {
+        "months": 7,
+        "valid_draws": 2712,
+        "retained_risk_reduction_ci": [
+          -0.006923076923077,
+          -0.001181271477663
+        ],
+        "lift_ci": [
+          0.0,
+          0.0
+        ]
+      }
+    },
+    {
+      "id": "A_S043_S066",
+      "description": "D0成交额亿<=0.8569 且 市场涨停家数>99.25",
+      "selected": false,
+      "train": {
+        "n": 152,
+        "positives": 42,
+        "base_rate": 0.276315789473684,
+        "flagged": 14,
+        "caught": 6,
+        "false_flags": 8,
+        "missed": 36,
+        "precision": 0.428571428571429,
+        "recall": 0.142857142857143,
+        "false_positive_rate": 0.072727272727273,
+        "reject_fraction": 0.092105263157895,
+        "lift": 1.551020408163265,
+        "retained_risk": 0.260869565217391,
+        "retained_risk_reduction": 0.015446224256293,
+        "flagged_risk_ci": [
+          0.213807989044745,
+          0.674093554203487
+        ],
+        "retained_risk_ci": [
+          0.194792793422709,
+          0.339898963495608
+        ],
+        "flagged_original_profit_count": 6,
+        "false_flag_original_profit_count": 6,
+        "original_net_mean_flagged": 0.001305097967722,
+        "original_net_mean_retained": 0.002875357774334
+      },
+      "valid": {
+        "n": 54,
+        "positives": 10,
+        "base_rate": 0.185185185185185,
+        "flagged": 1,
+        "caught": 1,
+        "false_flags": 0,
+        "missed": 9,
+        "precision": 1.0,
+        "recall": 0.1,
+        "false_positive_rate": 0.0,
+        "reject_fraction": 0.018518518518519,
+        "lift": 5.4,
+        "retained_risk": 0.169811320754717,
+        "retained_risk_reduction": 0.015373864430468,
+        "flagged_risk_ci": [
+          0.206549314377246,
+          1.0
+        ],
+        "retained_risk_ci": [
+          0.091999453796191,
+          0.292252802810957
+        ],
+        "flagged_original_profit_count": 0,
+        "false_flag_original_profit_count": 0,
+        "original_net_mean_flagged": -0.182790182790183,
+        "original_net_mean_retained": 0.012110936462447
+      },
+      "test": {
+        "n": 98,
+        "positives": 14,
+        "base_rate": 0.142857142857143,
+        "flagged": 3,
+        "caught": 0,
+        "false_flags": 3,
+        "missed": 14,
+        "precision": 0.0,
+        "recall": 0.0,
+        "false_positive_rate": 0.035714285714286,
+        "reject_fraction": 0.030612244897959,
+        "lift": 0.0,
+        "retained_risk": 0.147368421052632,
+        "retained_risk_reduction": -0.004511278195489,
+        "flagged_risk_ci": [
+          0.0,
+          0.561497031755032
+        ],
+        "retained_risk_ci": [
+          0.089860806536169,
+          0.232285984907458
+        ],
+        "flagged_original_profit_count": 3,
+        "false_flag_original_profit_count": 3,
+        "original_net_mean_flagged": 0.128972602261196,
+        "original_net_mean_retained": 0.016667030673598
+      },
+      "uncertainty": {
+        "months": 7,
+        "valid_draws": 2712,
+        "retained_risk_reduction_ci": [
+          -0.012006861063465,
+          -0.001181271477663
+        ],
+        "lift_ci": [
+          0.0,
+          0.0
+        ]
+      }
+    },
+    {
+      "id": "A_S012_S066",
+      "description": "D0流通市值亿>62.13 且 市场涨停家数>99.25",
+      "selected": false,
+      "train": {
+        "n": 152,
+        "positives": 42,
+        "base_rate": 0.276315789473684,
+        "flagged": 13,
+        "caught": 6,
+        "false_flags": 7,
+        "missed": 36,
+        "precision": 0.461538461538462,
+        "recall": 0.142857142857143,
+        "false_positive_rate": 0.063636363636364,
+        "reject_fraction": 0.085526315789474,
+        "lift": 1.67032967032967,
+        "retained_risk": 0.258992805755396,
+        "retained_risk_reduction": 0.017322983718289,
+        "flagged_risk_ci": [
+          0.232060678095388,
+          0.708562042854934
+        ],
+        "retained_risk_ci": [
+          0.193340867840774,
+          0.33760763581387
+        ],
+        "flagged_original_profit_count": 6,
+        "false_flag_original_profit_count": 6,
+        "original_net_mean_flagged": 0.005743590078843,
+        "original_net_mean_retained": 0.00244895016821
+      },
+      "valid": {
+        "n": 54,
+        "positives": 10,
+        "base_rate": 0.185185185185185,
+        "flagged": 3,
+        "caught": 1,
+        "false_flags": 2,
+        "missed": 9,
+        "precision": 0.333333333333333,
+        "recall": 0.1,
+        "false_positive_rate": 0.045454545454545,
+        "reject_fraction": 0.055555555555556,
+        "lift": 1.8,
+        "retained_risk": 0.176470588235294,
+        "retained_risk_reduction": 0.008714596949891,
+        "flagged_risk_ci": [
+          0.061491944720399,
+          0.792340399197945
+        ],
+        "retained_risk_ci": [
+          0.095724034691265,
+          0.302541425243077
+        ],
+        "flagged_original_profit_count": 1,
+        "false_flag_original_profit_count": 1,
+        "original_net_mean_flagged": -0.032460706526596,
+        "original_net_mean_retained": 0.010911207241163
+      },
+      "test": {
+        "n": 98,
+        "positives": 14,
+        "base_rate": 0.142857142857143,
+        "flagged": 9,
+        "caught": 1,
+        "false_flags": 8,
+        "missed": 13,
+        "precision": 0.111111111111111,
+        "recall": 0.071428571428571,
+        "false_positive_rate": 0.095238095238095,
+        "reject_fraction": 0.091836734693878,
+        "lift": 0.777777777777778,
+        "retained_risk": 0.146067415730337,
+        "retained_risk_reduction": -0.003210272873194,
+        "flagged_risk_ci": [
+          0.019890887638546,
+          0.434999705576646
+        ],
+        "retained_risk_ci": [
+          0.087394602734141,
+          0.234029243893767
+        ],
+        "flagged_original_profit_count": 6,
+        "false_flag_original_profit_count": 6,
+        "original_net_mean_flagged": 0.047055147803601,
+        "original_net_mean_retained": 0.017379656073517
+      },
+      "uncertainty": {
+        "months": 7,
+        "valid_draws": 3000,
+        "retained_risk_reduction_ci": [
+          -0.026426252708464,
+          0.022036560077061
+        ],
+        "lift_ci": [
+          0.0,
+          3.239208916083918
+        ]
+      }
+    },
+    {
+      "id": "logistic",
+      "description": "逻辑回归：风险分数>0.3445",
+      "selected": true,
+      "train": {
+        "n": 152,
+        "positives": 42,
+        "base_rate": 0.276315789473684,
+        "flagged": 38,
+        "caught": 15,
+        "false_flags": 23,
+        "missed": 27,
+        "precision": 0.394736842105263,
+        "recall": 0.357142857142857,
+        "false_positive_rate": 0.209090909090909,
+        "reject_fraction": 0.25,
+        "lift": 1.428571428571428,
+        "retained_risk": 0.236842105263158,
+        "retained_risk_reduction": 0.039473684210526,
+        "flagged_risk_ci": [
+          0.255980757481604,
+          0.55282132003957
+        ],
+        "retained_risk_ci": [
+          0.168182664299654,
+          0.322658669468156
+        ],
+        "flagged_original_profit_count": 12,
+        "false_flag_original_profit_count": 11,
+        "original_net_mean_flagged": -0.042506201968075,
+        "original_net_mean_retained": 0.017809705431518
+      },
+      "valid": {
+        "n": 54,
+        "positives": 10,
+        "base_rate": 0.185185185185185,
+        "flagged": 13,
+        "caught": 4,
+        "false_flags": 9,
+        "missed": 6,
+        "precision": 0.307692307692308,
+        "recall": 0.4,
+        "false_positive_rate": 0.204545454545455,
+        "reject_fraction": 0.240740740740741,
+        "lift": 1.661538461538462,
+        "retained_risk": 0.146341463414634,
+        "retained_risk_reduction": 0.038843721770551,
+        "flagged_risk_ci": [
+          0.126807036557108,
+          0.576306568194503
+        ],
+        "retained_risk_ci": [
+          0.068842481412961,
+          0.284434580424805
+        ],
+        "flagged_original_profit_count": 6,
+        "false_flag_original_profit_count": 6,
+        "original_net_mean_flagged": -0.002515793439674,
+        "original_net_mean_retained": 0.011994994254519
+      },
+      "test": {
+        "n": 98,
+        "positives": 14,
+        "base_rate": 0.142857142857143,
+        "flagged": 15,
+        "caught": 4,
+        "false_flags": 11,
+        "missed": 10,
+        "precision": 0.266666666666667,
+        "recall": 0.285714285714286,
+        "false_positive_rate": 0.130952380952381,
+        "reject_fraction": 0.153061224489796,
+        "lift": 1.866666666666667,
+        "retained_risk": 0.120481927710843,
+        "retained_risk_reduction": 0.022375215146299,
+        "flagged_risk_ci": [
+          0.108974533256926,
+          0.519504340559799
+        ],
+        "retained_risk_ci": [
+          0.066776902980843,
+          0.207763151325714
+        ],
+        "flagged_original_profit_count": 7,
+        "false_flag_original_profit_count": 7,
+        "original_net_mean_flagged": -0.009556680664889,
+        "original_net_mean_retained": 0.025465493141551
+      },
+      "uncertainty": {
+        "months": 7,
+        "valid_draws": 3000,
+        "retained_risk_reduction_ci": [
+          -0.017791297935103,
+          0.067695370831259
+        ],
+        "lift_ci": [
+          0.34921433937352,
+          4.157142857142857
+        ]
+      },
+      "test_score_metrics": {
+        "auc": 0.548469387755102,
+        "average_precision": 0.17678622893286,
+        "brier": 0.140868981539619
+      }
+    },
+    {
+      "id": "tree",
+      "description": "两层决策树：风险分数>0.3333",
+      "selected": false,
+      "train": {
+        "n": 152,
+        "positives": 42,
+        "base_rate": 0.276315789473684,
+        "flagged": 24,
+        "caught": 13,
+        "false_flags": 11,
+        "missed": 29,
+        "precision": 0.541666666666667,
+        "recall": 0.30952380952381,
+        "false_positive_rate": 0.1,
+        "reject_fraction": 0.157894736842105,
+        "lift": 1.96031746031746,
+        "retained_risk": 0.2265625,
+        "retained_risk_reduction": 0.049753289473684,
+        "flagged_risk_ci": [
+          0.3507486535892,
+          0.721086662687886
+        ],
+        "retained_risk_ci": [
+          0.162632484586469,
+          0.306426788375605
+        ],
+        "flagged_original_profit_count": 8,
+        "false_flag_original_profit_count": 7,
+        "original_net_mean_flagged": -0.03721724998813,
+        "original_net_mean_retained": 0.010220974563448
+      },
+      "valid": {
+        "n": 54,
+        "positives": 10,
+        "base_rate": 0.185185185185185,
+        "flagged": 7,
+        "caught": 1,
+        "false_flags": 6,
+        "missed": 9,
+        "precision": 0.142857142857143,
+        "recall": 0.1,
+        "false_positive_rate": 0.136363636363636,
+        "reject_fraction": 0.12962962962963,
+        "lift": 0.771428571428572,
+        "retained_risk": 0.191489361702128,
+        "retained_risk_reduction": -0.006304176516942,
+        "flagged_risk_ci": [
+          0.025679624344745,
+          0.513127829274309
+        ],
+        "retained_risk_ci": [
+          0.104159326985424,
+          0.325440045796614
+        ],
+        "flagged_original_profit_count": 3,
+        "false_flag_original_profit_count": 3,
+        "original_net_mean_flagged": -0.012042137933887,
+        "original_net_mean_retained": 0.011561370537377
+      },
+      "test": {
+        "n": 98,
+        "positives": 14,
+        "base_rate": 0.142857142857143,
+        "flagged": 25,
+        "caught": 3,
+        "false_flags": 22,
+        "missed": 11,
+        "precision": 0.12,
+        "recall": 0.214285714285714,
+        "false_positive_rate": 0.261904761904762,
+        "reject_fraction": 0.255102040816327,
+        "lift": 0.84,
+        "retained_risk": 0.150684931506849,
+        "retained_risk_reduction": -0.007827788649706,
+        "flagged_risk_ci": [
+          0.041668171504405,
+          0.299557939209267
+        ],
+        "retained_risk_ci": [
+          0.08627676663595,
+          0.250019019744079
+        ],
+        "flagged_original_profit_count": 13,
+        "false_flag_original_profit_count": 13,
+        "original_net_mean_flagged": 0.008416006072458,
+        "original_net_mean_retained": 0.024108021492657
+      },
+      "uncertainty": {
+        "months": 7,
+        "valid_draws": 3000,
+        "retained_risk_reduction_ci": [
+          -0.050674815380698,
+          0.04951357630318
+        ],
+        "lift_ci": [
+          0.0,
+          2.098821548821549
+        ]
+      },
+      "test_score_metrics": {
+        "auc": 0.433673469387755,
+        "average_precision": 0.133852040816327,
+        "brier": 0.164225142296316
+      }
+    }
+  ],
+  "selection_sha256": "8c3708c9421bfd4c7280c20000821ace53d5cae7854d86769de7b92ee0bead54",
+  "source_sha256": "5c2014a35d80e4c0759c0afb35997479116b72717c2ad1c0c0b42462be7e25ec",
+  "split_counts": {
+    "purged": {
+      "n": 2,
+      "risk": 1,
+      "rate": 0.5
+    },
+    "test": {
+      "n": 98,
+      "risk": 14,
+      "rate": 0.142857142857143
+    },
+    "train": {
+      "n": 152,
+      "risk": 42,
+      "rate": 0.276315789473684
+    },
+    "valid": {
+      "n": 54,
+      "risk": 10,
+      "rate": 0.185185185185185
+    }
+  },
+  "numeric": [
+    {
+      "split": "train",
+      "feature": "total_mv_yi",
+      "label": "D0总市值亿",
+      "n_risk": 42,
+      "n_control": 110,
+      "risk_median": 54.258136820800004,
+      "control_median": 53.938229016985005,
+      "risk_mean": 67.44390261485266,
+      "control_mean": 63.419646820446594,
+      "cliffs_delta": 0.033333333333333
+    },
+    {
+      "split": "train",
+      "feature": "float_mv_yi",
+      "label": "D0流通市值亿",
+      "n_risk": 42,
+      "n_control": 110,
+      "risk_median": 42.939114144499996,
+      "control_median": 41.089220517200005,
+      "risk_mean": 56.6947530691122,
+      "control_mean": 44.62987032070926,
+      "cliffs_delta": 0.12034632034632
+    },
+    {
+      "split": "train",
+      "feature": "d0_turnover_pct",
+      "label": "D0换手率",
+      "n_risk": 42,
+      "n_control": 110,
+      "risk_median": 0.050604,
+      "control_median": 0.0902725,
+      "risk_mean": 0.093249952380952,
+      "control_mean": 0.130888872727273,
+      "cliffs_delta": -0.23982683982684
+    },
+    {
+      "split": "train",
+      "feature": "board_streak_days",
+      "label": "连板数",
+      "n_risk": 42,
+      "n_control": 110,
+      "risk_median": 3.0,
+      "control_median": 3.0,
+      "risk_mean": 3.547619047619047,
+      "control_mean": 3.818181818181818,
+      "cliffs_delta": 0.042424242424242
+    },
+    {
+      "split": "train",
+      "feature": "open_gap",
+      "label": "D1开盘涨幅",
+      "n_risk": 42,
+      "n_control": 110,
+      "risk_median": 0.041797693920336,
+      "control_median": 0.040198067677204,
+      "risk_mean": 0.034268039952981,
+      "control_mean": 0.036986023883809,
+      "cliffs_delta": 0.012337662337662
+    },
+    {
+      "split": "train",
+      "feature": "body5",
+      "label": "D1四K实体",
+      "n_risk": 42,
+      "n_control": 110,
+      "risk_median": 0.00098231827112,
+      "control_median": 0.006502390196234,
+      "risk_mean": 0.004550986656973,
+      "control_mean": 0.008869349572323,
+      "cliffs_delta": -0.055411255411255
+    },
+    {
+      "split": "train",
+      "feature": "d0_normal_volume_ratio",
+      "label": "D0对板前量比",
+      "n_risk": 41,
+      "n_control": 101,
+      "risk_median": 0.42117307838421,
+      "control_median": 0.992575956786306,
+      "risk_mean": 1.675874536317736,
+      "control_mean": 3.952985146396374,
+      "cliffs_delta": -0.352813330113499
+    },
+    {
+      "split": "train",
+      "feature": "d0_amount_100m",
+      "label": "D0成交额亿",
+      "n_risk": 42,
+      "n_control": 110,
+      "risk_median": 1.7141064112,
+      "control_median": 3.36814577845,
+      "risk_mean": 4.599323319711904,
+      "control_mean": 4.964586662765455,
+      "cliffs_delta": -0.182683982683983
+    },
+    {
+      "split": "train",
+      "feature": "streak_return",
+      "label": "本轮连板涨幅",
+      "n_risk": 42,
+      "n_control": 110,
+      "risk_median": 0.332099285384344,
+      "control_median": 0.331957231957232,
+      "risk_mean": 0.431054499780853,
+      "control_mean": 0.541824360862946,
+      "cliffs_delta": 0.022294372294372
+    },
+    {
+      "split": "train",
+      "feature": "board_turnover_sum",
+      "label": "板段累计换手",
+      "n_risk": 42,
+      "n_control": 110,
+      "risk_median": 0.2826355,
+      "control_median": 0.26172,
+      "risk_mean": 0.299338238095238,
+      "control_mean": 0.388821518181818,
+      "cliffs_delta": -0.09047619047619
+    },
+    {
+      "split": "train",
+      "feature": "market_limit_count",
+      "label": "市场涨停家数",
+      "n_risk": 42,
+      "n_control": 110,
+      "risk_median": 75.5,
+      "control_median": 53.5,
+      "risk_mean": 82.26190476190476,
+      "control_mean": 70.74545454545455,
+      "cliffs_delta": 0.185714285714286
+    },
+    {
+      "split": "train",
+      "feature": "market_median_return",
+      "label": "市场涨幅中位",
+      "n_risk": 42,
+      "n_control": 110,
+      "risk_median": 0.0,
+      "control_median": 0.0,
+      "risk_mean": -0.003713338897367,
+      "control_mean": -0.000967490021694,
+      "cliffs_delta": -0.071428571428571
+    },
+    {
+      "split": "train",
+      "feature": "market_reseal_fraction",
+      "label": "市场连板延续率",
+      "n_risk": 42,
+      "n_control": 110,
+      "risk_median": 0.28150112504018,
+      "control_median": 0.26928147659855,
+      "risk_mean": 0.272769058292182,
+      "control_mean": 0.266237395845066,
+      "cliffs_delta": 0.048268398268398
+    },
+    {
+      "split": "train",
+      "feature": "close_sealed_minutes",
+      "label": "D0收在板上分钟数",
+      "n_risk": 42,
+      "n_control": 110,
+      "risk_median": 240.0,
+      "control_median": 239.5,
+      "risk_mean": 222.61904761904762,
+      "control_mean": 208.20909090909092,
+      "cliffs_delta": 0.217316017316017
+    },
+    {
+      "split": "valid",
+      "feature": "total_mv_yi",
+      "label": "D0总市值亿",
+      "n_risk": 10,
+      "n_control": 44,
+      "risk_median": 94.69024085090001,
+      "control_median": 79.05386468110001,
+      "risk_mean": 126.6899715433,
+      "control_mean": 108.74903776950455,
+      "cliffs_delta": 0.172727272727273
+    },
+    {
+      "split": "valid",
+      "feature": "float_mv_yi",
+      "label": "D0流通市值亿",
+      "n_risk": 10,
+      "n_control": 44,
+      "risk_median": 93.57029231335,
+      "control_median": 77.2109307506,
+      "risk_mean": 125.54314838789,
+      "control_mean": 106.65911595529089,
+      "cliffs_delta": 0.2
+    },
+    {
+      "split": "valid",
+      "feature": "d0_turnover_pct",
+      "label": "D0换手率",
+      "n_risk": 10,
+      "n_control": 44,
+      "risk_median": 0.0623815,
+      "control_median": 0.0693345,
+      "risk_mean": 0.0739909,
+      "control_mean": 0.107185704545455,
+      "cliffs_delta": -0.122727272727273
+    },
+    {
+      "split": "valid",
+      "feature": "board_streak_days",
+      "label": "连板数",
+      "n_risk": 10,
+      "n_control": 44,
+      "risk_median": 3.0,
+      "control_median": 3.0,
+      "risk_mean": 3.9,
+      "control_mean": 3.431818181818182,
+      "cliffs_delta": 0.134090909090909
+    },
+    {
+      "split": "valid",
+      "feature": "open_gap",
+      "label": "D1开盘涨幅",
+      "n_risk": 10,
+      "n_control": 44,
+      "risk_median": 0.041451150949401,
+      "control_median": 0.032934592692722,
+      "risk_mean": 0.034485657014954,
+      "control_mean": 0.028597137201847,
+      "cliffs_delta": 0.090909090909091
+    },
+    {
+      "split": "valid",
+      "feature": "body5",
+      "label": "D1四K实体",
+      "n_risk": 10,
+      "n_control": 44,
+      "risk_median": 0.027889630078836,
+      "control_median": 0.018291548804588,
+      "risk_mean": 0.011636658524125,
+      "control_mean": 0.014826913381786,
+      "cliffs_delta": 0.05
+    },
+    {
+      "split": "valid",
+      "feature": "d0_normal_volume_ratio",
+      "label": "D0对板前量比",
+      "n_risk": 10,
+      "n_control": 44,
+      "risk_median": 0.900692611022939,
+      "control_median": 1.92060454540725,
+      "risk_mean": 3.123697283813372,
+      "control_mean": 3.071174825452645,
+      "cliffs_delta": -0.25
+    },
+    {
+      "split": "valid",
+      "feature": "d0_amount_100m",
+      "label": "D0成交额亿",
+      "n_risk": 10,
+      "n_control": 44,
+      "risk_median": 5.03530348,
+      "control_median": 5.38984505045,
+      "risk_mean": 7.58219924813,
+      "control_mean": 8.503360499074999,
+      "cliffs_delta": -0.1
+    },
+    {
+      "split": "valid",
+      "feature": "streak_return",
+      "label": "本轮连板涨幅",
+      "n_risk": 10,
+      "n_control": 44,
+      "risk_median": 0.331872118509561,
+      "control_median": 0.331618619412854,
+      "risk_mean": 0.46983767859616,
+      "control_mean": 0.396616534771083,
+      "cliffs_delta": 0.104545454545454
+    },
+    {
+      "split": "valid",
+      "feature": "board_turnover_sum",
+      "label": "板段累计换手",
+      "n_risk": 10,
+      "n_control": 44,
+      "risk_median": 0.3009855,
+      "control_median": 0.274123,
+      "risk_mean": 0.3337796,
+      "control_mean": 0.316677431818182,
+      "cliffs_delta": 0.104545454545454
+    },
+    {
+      "split": "valid",
+      "feature": "market_limit_count",
+      "label": "市场涨停家数",
+      "n_risk": 10,
+      "n_control": 44,
+      "risk_median": 76.0,
+      "control_median": 74.0,
+      "risk_mean": 75.0,
+      "control_mean": 75.20454545454545,
+      "cliffs_delta": 0.05
+    },
+    {
+      "split": "valid",
+      "feature": "market_median_return",
+      "label": "市场涨幅中位",
+      "n_risk": 10,
+      "n_control": 44,
+      "risk_median": -0.002769780262802,
+      "control_median": 0.0,
+      "risk_mean": -0.002997017212101,
+      "control_mean": 3.0825993289e-05,
+      "cliffs_delta": -0.181818181818182
+    },
+    {
+      "split": "valid",
+      "feature": "market_reseal_fraction",
+      "label": "市场连板延续率",
+      "n_risk": 10,
+      "n_control": 44,
+      "risk_median": 0.263575819672131,
+      "control_median": 0.246212121212121,
+      "risk_mean": 0.262718330351627,
+      "control_mean": 0.249266015404666,
+      "cliffs_delta": 0.145454545454546
+    },
+    {
+      "split": "valid",
+      "feature": "close_sealed_minutes",
+      "label": "D0收在板上分钟数",
+      "n_risk": 10,
+      "n_control": 44,
+      "risk_median": 240.0,
+      "control_median": 239.5,
+      "risk_mean": 234.2,
+      "control_mean": 208.27272727272728,
+      "cliffs_delta": 0.136363636363636
+    },
+    {
+      "split": "test",
+      "feature": "total_mv_yi",
+      "label": "D0总市值亿",
+      "n_risk": 14,
+      "n_control": 84,
+      "risk_median": 77.3221917322,
+      "control_median": 77.78856841819999,
+      "risk_mean": 173.28463382726432,
+      "control_mean": 121.3454838070634,
+      "cliffs_delta": -0.02891156462585
+    },
+    {
+      "split": "test",
+      "feature": "float_mv_yi",
+      "label": "D0流通市值亿",
+      "n_risk": 14,
+      "n_control": 84,
+      "risk_median": 71.8909068959,
+      "control_median": 71.88888767559999,
+      "risk_mean": 150.37190202844286,
+      "control_mean": 110.1338055303258,
+      "cliffs_delta": -0.030612244897959
+    },
+    {
+      "split": "test",
+      "feature": "d0_turnover_pct",
+      "label": "D0换手率",
+      "n_risk": 14,
+      "n_control": 84,
+      "risk_median": 0.0898935,
+      "control_median": 0.0922775,
+      "risk_mean": 0.107998142857143,
+      "control_mean": 0.107972476190476,
+      "cliffs_delta": 0.057823129251701
+    },
+    {
+      "split": "test",
+      "feature": "board_streak_days",
+      "label": "连板数",
+      "n_risk": 14,
+      "n_control": 84,
+      "risk_median": 3.0,
+      "control_median": 3.0,
+      "risk_mean": 3.357142857142857,
+      "control_mean": 2.916666666666666,
+      "cliffs_delta": 0.142006802721088
+    },
+    {
+      "split": "test",
+      "feature": "open_gap",
+      "label": "D1开盘涨幅",
+      "n_risk": 14,
+      "n_control": 84,
+      "risk_median": -0.001684446939922,
+      "control_median": 0.01908276609161,
+      "risk_mean": -0.010545151523702,
+      "control_mean": 0.018038296725271,
+      "cliffs_delta": -0.310374149659864
+    },
+    {
+      "split": "test",
+      "feature": "body5",
+      "label": "D1四K实体",
+      "n_risk": 14,
+      "n_control": 84,
+      "risk_median": 0.010933364637582,
+      "control_median": 0.009944678609062,
+      "risk_mean": 0.014080344434133,
+      "control_mean": 0.009690136107815,
+      "cliffs_delta": 0.074829931972789
+    },
+    {
+      "split": "test",
+      "feature": "d0_normal_volume_ratio",
+      "label": "D0对板前量比",
+      "n_risk": 14,
+      "n_control": 84,
+      "risk_median": 1.024636424091742,
+      "control_median": 0.960236082423716,
+      "risk_mean": 2.609743761933457,
+      "control_mean": 1.871778989602069,
+      "cliffs_delta": 0.146258503401361
+    },
+    {
+      "split": "test",
+      "feature": "d0_amount_100m",
+      "label": "D0成交额亿",
+      "n_risk": 14,
+      "n_control": 84,
+      "risk_median": 7.247785845,
+      "control_median": 6.02186987,
+      "risk_mean": 14.400629415871432,
+      "control_mean": 10.192992735008334,
+      "cliffs_delta": 0.066326530612245
+    },
+    {
+      "split": "test",
+      "feature": "streak_return",
+      "label": "本轮连板涨幅",
+      "n_risk": 14,
+      "n_control": 84,
+      "risk_median": 0.331039575400946,
+      "control_median": 0.330446531849548,
+      "risk_mean": 0.39588062083907,
+      "control_mean": 0.330334482562426,
+      "cliffs_delta": 0.163265306122449
+    },
+    {
+      "split": "test",
+      "feature": "board_turnover_sum",
+      "label": "板段累计换手",
+      "n_risk": 14,
+      "n_control": 84,
+      "risk_median": 0.3433595,
+      "control_median": 0.251992,
+      "risk_mean": 0.310164285714286,
+      "control_mean": 0.298008369047619,
+      "cliffs_delta": 0.144557823129252
+    },
+    {
+      "split": "test",
+      "feature": "market_limit_count",
+      "label": "市场涨停家数",
+      "n_risk": 14,
+      "n_control": 84,
+      "risk_median": 67.5,
+      "control_median": 75.0,
+      "risk_mean": 72.21428571428571,
+      "control_mean": 78.45238095238095,
+      "cliffs_delta": -0.085884353741497
+    },
+    {
+      "split": "test",
+      "feature": "market_median_return",
+      "label": "市场涨幅中位",
+      "n_risk": 14,
+      "n_control": 84,
+      "risk_median": -0.001916755383297,
+      "control_median": 0.000482189823638,
+      "risk_mean": -0.004371414659378,
+      "control_mean": -0.0011281683937,
+      "cliffs_delta": -0.141156462585034
+    },
+    {
+      "split": "test",
+      "feature": "market_reseal_fraction",
+      "label": "市场连板延续率",
+      "n_risk": 14,
+      "n_control": 84,
+      "risk_median": 0.196491228070176,
+      "control_median": 0.2,
+      "risk_mean": 0.198184776722405,
+      "control_mean": 0.207324968893947,
+      "cliffs_delta": -0.033163265306122
+    },
+    {
+      "split": "test",
+      "feature": "close_sealed_minutes",
+      "label": "D0收在板上分钟数",
+      "n_risk": 14,
+      "n_control": 84,
+      "risk_median": 238.5,
+      "control_median": 239.0,
+      "risk_mean": 194.57142857142858,
+      "control_mean": 216.01190476190476,
+      "cliffs_delta": -0.074829931972789
+    },
+    {
+      "split": "all",
+      "feature": "total_mv_yi",
+      "label": "D0总市值亿",
+      "n_risk": 67,
+      "n_control": 239,
+      "risk_median": 61.7002560489,
+      "control_median": 61.2455067,
+      "risk_mean": 97.81855317515391,
+      "control_mean": 91.94270214484833,
+      "cliffs_delta": -0.021544994691813
+    },
+    {
+      "split": "all",
+      "feature": "float_mv_yi",
+      "label": "D0流通市值亿",
+      "n_risk": 67,
+      "n_control": 239,
+      "risk_median": 52.94959565599999,
+      "control_median": 55.313657983999995,
+      "risk_mean": 86.12100259632257,
+      "control_mean": 78.96942620324805,
+      "cliffs_delta": -0.002060825579217
+    },
+    {
+      "split": "all",
+      "feature": "d0_turnover_pct",
+      "label": "D0换手率",
+      "n_risk": 67,
+      "n_control": 239,
+      "risk_median": 0.058099,
+      "control_median": 0.081143,
+      "risk_mean": 0.094482820895522,
+      "control_mean": 0.118491912133891,
+      "cliffs_delta": -0.157809279960032
+    },
+    {
+      "split": "all",
+      "feature": "board_streak_days",
+      "label": "连板数",
+      "n_risk": 67,
+      "n_control": 239,
+      "risk_median": 3.0,
+      "control_median": 3.0,
+      "risk_mean": 3.537313432835821,
+      "control_mean": 3.418410041841004,
+      "cliffs_delta": 0.099419221882221
+    },
+    {
+      "split": "all",
+      "feature": "open_gap",
+      "label": "D1开盘涨幅",
+      "n_risk": 67,
+      "n_control": 239,
+      "risk_median": 0.032727272727273,
+      "control_median": 0.030927835051547,
+      "risk_mean": 0.025311762200552,
+      "control_mean": 0.028613458359273,
+      "cliffs_delta": 0.007931056016986
+    },
+    {
+      "split": "all",
+      "feature": "body5",
+      "label": "D1四K实体",
+      "n_risk": 67,
+      "n_control": 239,
+      "risk_median": 0.007352941176471,
+      "control_median": 0.009615384615385,
+      "risk_mean": 0.008074292580342,
+      "control_mean": 0.01034358997231,
+      "cliffs_delta": -0.013676387934803
+    },
+    {
+      "split": "all",
+      "feature": "d0_normal_volume_ratio",
+      "label": "D0对板前量比",
+      "n_risk": 66,
+      "n_control": 230,
+      "risk_median": 0.64455291360592,
+      "control_median": 1.061150106726299,
+      "risk_mean": 2.080218323804832,
+      "control_mean": 3.011743897397441,
+      "cliffs_delta": -0.239789196310935
+    },
+    {
+      "split": "all",
+      "feature": "d0_amount_100m",
+      "label": "D0成交额亿",
+      "n_risk": 67,
+      "n_control": 239,
+      "risk_median": 3.3703016573,
+      "control_median": 4.4980285,
+      "risk_mean": 7.091268734647761,
+      "control_mean": 7.443673868343933,
+      "cliffs_delta": -0.158059076999938
+    },
+    {
+      "split": "all",
+      "feature": "streak_return",
+      "label": "本轮连板涨幅",
+      "n_risk": 67,
+      "n_control": 239,
+      "risk_median": 0.331683168316832,
+      "control_median": 0.331236237810632,
+      "risk_mean": 0.426199710750776,
+      "control_mean": 0.438913267603171,
+      "cliffs_delta": 0.10060575782177
+    },
+    {
+      "split": "all",
+      "feature": "board_turnover_sum",
+      "label": "板段累计换手",
+      "n_risk": 67,
+      "n_control": 239,
+      "risk_median": 0.289461,
+      "control_median": 0.257104,
+      "risk_mean": 0.307793686567164,
+      "control_mean": 0.342564054393305,
+      "cliffs_delta": 0.006557172297508
+    },
+    {
+      "split": "all",
+      "feature": "market_limit_count",
+      "label": "市场涨停家数",
+      "n_risk": 67,
+      "n_control": 239,
+      "risk_median": 72.0,
+      "control_median": 70.0,
+      "risk_mean": 78.73134328358209,
+      "control_mean": 74.2092050209205,
+      "cliffs_delta": 0.076812589770811
+    },
+    {
+      "split": "all",
+      "feature": "market_median_return",
+      "label": "市场涨幅中位",
+      "n_risk": 67,
+      "n_control": 239,
+      "risk_median": -0.001243783018649,
+      "control_median": 0.0,
+      "risk_mean": -0.004048491782779,
+      "control_mean": -0.000883136647735,
+      "cliffs_delta": -0.115843377255979
+    },
+    {
+      "split": "all",
+      "feature": "market_reseal_fraction",
+      "label": "市场连板延续率",
+      "n_risk": 67,
+      "n_control": 239,
+      "risk_median": 0.25,
+      "control_median": 0.238372093023256,
+      "risk_mean": 0.256497661987676,
+      "control_mean": 0.242087820190693,
+      "cliffs_delta": 0.10429026416037
+    },
+    {
+      "split": "all",
+      "feature": "close_sealed_minutes",
+      "label": "D0收在板上分钟数",
+      "n_risk": 67,
+      "n_control": 239,
+      "risk_median": 240.0,
+      "control_median": 239.0,
+      "risk_mean": 218.6417910447761,
+      "control_mean": 210.18828451882845,
+      "cliffs_delta": 0.155311309560982
+    }
+  ],
+  "categorical": [
+    {
+      "split": "train",
+      "state": "分钟内顺序不明",
+      "n": 29,
+      "risk": 8,
+      "rate": 0.275862068965517,
+      "ci": [
+        0.146987551020882,
+        0.457171324168654
+      ]
+    },
+    {
+      "split": "train",
+      "state": "否",
+      "n": 64,
+      "risk": 23,
+      "rate": 0.359375,
+      "ci": [
+        0.25288402291452,
+        0.481791493902206
+      ]
+    },
+    {
+      "split": "train",
+      "state": "是",
+      "n": 59,
+      "risk": 11,
+      "rate": 0.186440677966102,
+      "ci": [
+        0.107427219420055,
+        0.303789504469624
+      ]
+    },
+    {
+      "split": "valid",
+      "state": "分钟内顺序不明",
+      "n": 11,
+      "risk": 1,
+      "rate": 0.090909090909091,
+      "ci": [
+        0.016232172885885,
+        0.377358436451586
+      ]
+    },
+    {
+      "split": "valid",
+      "state": "否",
+      "n": 14,
+      "risk": 4,
+      "rate": 0.285714285714286,
+      "ci": [
+        0.117213786445772,
+        0.546490843298925
+      ]
+    },
+    {
+      "split": "valid",
+      "state": "是",
+      "n": 29,
+      "risk": 5,
+      "rate": 0.172413793103448,
+      "ci": [
+        0.075978572528914,
+        0.345484398901947
+      ]
+    },
+    {
+      "split": "test",
+      "state": "分钟内顺序不明",
+      "n": 23,
+      "risk": 2,
+      "rate": 0.08695652173913,
+      "ci": [
+        0.024180004484221,
+        0.26795981075743
+      ]
+    },
+    {
+      "split": "test",
+      "state": "否",
+      "n": 21,
+      "risk": 3,
+      "rate": 0.142857142857143,
+      "ci": [
+        0.049810124997254,
+        0.346360602806203
+      ]
+    },
+    {
+      "split": "test",
+      "state": "是",
+      "n": 54,
+      "risk": 9,
+      "rate": 0.166666666666667,
+      "ci": [
+        0.090243916429974,
+        0.287365142297288
+      ]
+    },
+    {
+      "split": "all",
+      "state": "分钟内顺序不明",
+      "n": 63,
+      "risk": 11,
+      "rate": 0.174603174603175,
+      "ci": [
+        0.10039396579468,
+        0.286214275207586
+      ]
+    },
+    {
+      "split": "all",
+      "state": "否",
+      "n": 99,
+      "risk": 30,
+      "rate": 0.303030303030303,
+      "ci": [
+        0.221262896341552,
+        0.399512611442742
+      ]
+    },
+    {
+      "split": "all",
+      "state": "是",
+      "n": 144,
+      "risk": 26,
+      "rate": 0.180555555555556,
+      "ci": [
+        0.126299422367193,
+        0.251412345807524
+      ]
+    }
+  ],
+  "bins": [
+    {
+      "split": "train",
+      "feature": "total_mv_yi",
+      "label": "D0总市值亿",
+      "lower": null,
+      "upper": 41.215,
+      "n": 38,
+      "risk": 11,
+      "rate": 0.289473684210526,
+      "ci": [
+        0.170032778284833,
+        0.447571376757516
+      ]
+    },
+    {
+      "split": "train",
+      "feature": "total_mv_yi",
+      "label": "D0总市值亿",
+      "lower": 41.215,
+      "upper": 53.938229016985005,
+      "n": 38,
+      "risk": 10,
+      "rate": 0.263157894736842,
+      "ci": [
+        0.149716212547984,
+        0.420088461874659
+      ]
+    },
+    {
+      "split": "train",
+      "feature": "total_mv_yi",
+      "label": "D0总市值亿",
+      "lower": 53.938229016985005,
+      "upper": 72.05294410035,
+      "n": 38,
+      "risk": 8,
+      "rate": 0.210526315789474,
+      "ci": [
+        0.110747918429961,
+        0.363457794753269
+      ]
+    },
+    {
+      "split": "train",
+      "feature": "total_mv_yi",
+      "label": "D0总市值亿",
+      "lower": 72.05294410035,
+      "upper": null,
+      "n": 38,
+      "risk": 13,
+      "rate": 0.342105263157895,
+      "ci": [
+        0.212124151799597,
+        0.501078964482165
+      ]
+    },
+    {
+      "split": "train",
+      "feature": "float_mv_yi",
+      "label": "D0流通市值亿",
+      "lower": null,
+      "upper": 26.6909043794,
+      "n": 38,
+      "risk": 9,
+      "rate": 0.236842105263158,
+      "ci": [
+        0.129937070170543,
+        0.392068123632393
+      ]
+    },
+    {
+      "split": "train",
+      "feature": "float_mv_yi",
+      "label": "D0流通市值亿",
+      "lower": 26.6909043794,
+      "upper": 41.916059169600004,
+      "n": 38,
+      "risk": 11,
+      "rate": 0.289473684210526,
+      "ci": [
+        0.170032778284833,
+        0.447571376757516
+      ]
+    },
+    {
+      "split": "train",
+      "feature": "float_mv_yi",
+      "label": "D0流通市值亿",
+      "lower": 41.916059169600004,
+      "upper": 62.1349331016,
+      "n": 38,
+      "risk": 8,
+      "rate": 0.210526315789474,
+      "ci": [
+        0.110747918429961,
+        0.363457794753269
+      ]
+    },
+    {
+      "split": "train",
+      "feature": "float_mv_yi",
+      "label": "D0流通市值亿",
+      "lower": 62.1349331016,
+      "upper": null,
+      "n": 38,
+      "risk": 14,
+      "rate": 0.368421052631579,
+      "ci": [
+        0.233842192471563,
+        0.527160404429906
+      ]
+    },
+    {
+      "split": "train",
+      "feature": "d0_turnover_pct",
+      "label": "D0换手率",
+      "lower": null,
+      "upper": 0.019931,
+      "n": 38,
+      "risk": 15,
+      "rate": 0.394736842105263,
+      "ci": [
+        0.255980757481604,
+        0.55282132003957
+      ]
+    },
+    {
+      "split": "train",
+      "feature": "d0_turnover_pct",
+      "label": "D0换手率",
+      "lower": 0.019931,
+      "upper": 0.0726835,
+      "n": 38,
+      "risk": 11,
+      "rate": 0.289473684210526,
+      "ci": [
+        0.170032778284833,
+        0.447571376757516
+      ]
+    },
+    {
+      "split": "train",
+      "feature": "d0_turnover_pct",
+      "label": "D0换手率",
+      "lower": 0.0726835,
+      "upper": 0.17524175,
+      "n": 38,
+      "risk": 9,
+      "rate": 0.236842105263158,
+      "ci": [
+        0.129937070170543,
+        0.392068123632393
+      ]
+    },
+    {
+      "split": "train",
+      "feature": "d0_turnover_pct",
+      "label": "D0换手率",
+      "lower": 0.17524175,
+      "upper": null,
+      "n": 38,
+      "risk": 7,
+      "rate": 0.184210526315789,
+      "ci": [
+        0.092217651852214,
+        0.334188580711309
+      ]
+    },
+    {
+      "split": "train",
+      "feature": "board_streak_days",
+      "label": "连板数",
+      "lower": null,
+      "upper": 2.0,
+      "n": 54,
+      "risk": 12,
+      "rate": 0.222222222222222,
+      "ci": [
+        0.131954165676333,
+        0.349386716596385
+      ]
+    },
+    {
+      "split": "train",
+      "feature": "board_streak_days",
+      "label": "连板数",
+      "lower": 2.0,
+      "upper": 3.0,
+      "n": 34,
+      "risk": 11,
+      "rate": 0.323529411764706,
+      "ci": [
+        0.191316435640258,
+        0.491571054060913
+      ]
+    },
+    {
+      "split": "train",
+      "feature": "board_streak_days",
+      "label": "连板数",
+      "lower": 3.0,
+      "upper": 4.0,
+      "n": 27,
+      "risk": 9,
+      "rate": 0.333333333333333,
+      "ci": [
+        0.18643261498716,
+        0.521752394926794
+      ]
+    },
+    {
+      "split": "train",
+      "feature": "board_streak_days",
+      "label": "连板数",
+      "lower": 4.0,
+      "upper": null,
+      "n": 37,
+      "risk": 10,
+      "rate": 0.27027027027027,
+      "ci": [
+        0.153974615110493,
+        0.429781683247138
+      ]
+    },
+    {
+      "split": "train",
+      "feature": "open_gap",
+      "label": "D1开盘涨幅",
+      "lower": null,
+      "upper": 0.004347775834303,
+      "n": 38,
+      "risk": 10,
+      "rate": 0.263157894736842,
+      "ci": [
+        0.149716212547984,
+        0.420088461874659
+      ]
+    },
+    {
+      "split": "train",
+      "feature": "open_gap",
+      "label": "D1开盘涨幅",
+      "lower": 0.004347775834303,
+      "upper": 0.04051337510735,
+      "n": 38,
+      "risk": 10,
+      "rate": 0.263157894736842,
+      "ci": [
+        0.149716212547984,
+        0.420088461874659
+      ]
+    },
+    {
+      "split": "train",
+      "feature": "open_gap",
+      "label": "D1开盘涨幅",
+      "lower": 0.04051337510735,
+      "upper": 0.082328146569632,
+      "n": 38,
+      "risk": 12,
+      "rate": 0.31578947368421,
+      "ci": [
+        0.190846036755965,
+        0.474557598906091
+      ]
+    },
+    {
+      "split": "train",
+      "feature": "open_gap",
+      "label": "D1开盘涨幅",
+      "lower": 0.082328146569632,
+      "upper": null,
+      "n": 38,
+      "risk": 10,
+      "rate": 0.263157894736842,
+      "ci": [
+        0.149716212547984,
+        0.420088461874659
+      ]
+    },
+    {
+      "split": "train",
+      "feature": "body5",
+      "label": "D1四K实体",
+      "lower": null,
+      "upper": -0.017509574280654,
+      "n": 38,
+      "risk": 9,
+      "rate": 0.236842105263158,
+      "ci": [
+        0.129937070170543,
+        0.392068123632393
+      ]
+    },
+    {
+      "split": "train",
+      "feature": "body5",
+      "label": "D1四K实体",
+      "lower": -0.017509574280654,
+      "upper": 0.005874125874126,
+      "n": 38,
+      "risk": 14,
+      "rate": 0.368421052631579,
+      "ci": [
+        0.233842192471563,
+        0.527160404429906
+      ]
+    },
+    {
+      "split": "train",
+      "feature": "body5",
+      "label": "D1四K实体",
+      "lower": 0.005874125874126,
+      "upper": 0.031694328570161,
+      "n": 38,
+      "risk": 9,
+      "rate": 0.236842105263158,
+      "ci": [
+        0.129937070170543,
+        0.392068123632393
+      ]
+    },
+    {
+      "split": "train",
+      "feature": "body5",
+      "label": "D1四K实体",
+      "lower": 0.031694328570161,
+      "upper": null,
+      "n": 38,
+      "risk": 10,
+      "rate": 0.263157894736842,
+      "ci": [
+        0.149716212547984,
+        0.420088461874659
+      ]
+    },
+    {
+      "split": "train",
+      "feature": "d0_normal_volume_ratio",
+      "label": "D0对板前量比",
+      "lower": null,
+      "upper": 0.28272738008469,
+      "n": 36,
+      "risk": 16,
+      "rate": 0.444444444444444,
+      "ci": [
+        0.295412687400806,
+        0.604189382443023
+      ]
+    },
+    {
+      "split": "train",
+      "feature": "d0_normal_volume_ratio",
+      "label": "D0对板前量比",
+      "lower": 0.28272738008469,
+      "upper": 0.787840464137946,
+      "n": 35,
+      "risk": 12,
+      "rate": 0.342857142857143,
+      "ci": [
+        0.208316949870493,
+        0.508480504860033
+      ]
+    },
+    {
+      "split": "train",
+      "feature": "d0_normal_volume_ratio",
+      "label": "D0对板前量比",
+      "lower": 0.787840464137946,
+      "upper": 2.20027434582704,
+      "n": 35,
+      "risk": 8,
+      "rate": 0.228571428571429,
+      "ci": [
+        0.120658798341919,
+        0.390173168919898
+      ]
+    },
+    {
+      "split": "train",
+      "feature": "d0_normal_volume_ratio",
+      "label": "D0对板前量比",
+      "lower": 2.20027434582704,
+      "upper": null,
+      "n": 36,
+      "risk": 5,
+      "rate": 0.138888888888889,
+      "ci": [
+        0.06081815009133,
+        0.286595303893557
+      ]
+    },
+    {
+      "split": "train",
+      "feature": "d0_amount_100m",
+      "label": "D0成交额亿",
+      "lower": null,
+      "upper": 0.8569085825,
+      "n": 38,
+      "risk": 15,
+      "rate": 0.394736842105263,
+      "ci": [
+        0.255980757481604,
+        0.55282132003957
+      ]
+    },
+    {
+      "split": "train",
+      "feature": "d0_amount_100m",
+      "label": "D0成交额亿",
+      "lower": 0.8569085825,
+      "upper": 2.73914077,
+      "n": 38,
+      "risk": 10,
+      "rate": 0.263157894736842,
+      "ci": [
+        0.149716212547984,
+        0.420088461874659
+      ]
+    },
+    {
+      "split": "train",
+      "feature": "d0_amount_100m",
+      "label": "D0成交额亿",
+      "lower": 2.73914077,
+      "upper": 6.36289058,
+      "n": 38,
+      "risk": 9,
+      "rate": 0.236842105263158,
+      "ci": [
+        0.129937070170543,
+        0.392068123632393
+      ]
+    },
+    {
+      "split": "train",
+      "feature": "d0_amount_100m",
+      "label": "D0成交额亿",
+      "lower": 6.36289058,
+      "upper": null,
+      "n": 38,
+      "risk": 8,
+      "rate": 0.210526315789474,
+      "ci": [
+        0.110747918429961,
+        0.363457794753269
+      ]
+    },
+    {
+      "split": "train",
+      "feature": "streak_return",
+      "label": "本轮连板涨幅",
+      "lower": null,
+      "upper": 0.210457532861476,
+      "n": 38,
+      "risk": 10,
+      "rate": 0.263157894736842,
+      "ci": [
+        0.149716212547984,
+        0.420088461874659
+      ]
+    },
+    {
+      "split": "train",
+      "feature": "streak_return",
+      "label": "本轮连板涨幅",
+      "lower": 0.210457532861476,
+      "upper": 0.332015068857174,
+      "n": 38,
+      "risk": 11,
+      "rate": 0.289473684210526,
+      "ci": [
+        0.170032778284833,
+        0.447571376757516
+      ]
+    },
+    {
+      "split": "train",
+      "feature": "streak_return",
+      "label": "本轮连板涨幅",
+      "lower": 0.332015068857174,
+      "upper": 0.610472695096926,
+      "n": 38,
+      "risk": 10,
+      "rate": 0.263157894736842,
+      "ci": [
+        0.149716212547984,
+        0.420088461874659
+      ]
+    },
+    {
+      "split": "train",
+      "feature": "streak_return",
+      "label": "本轮连板涨幅",
+      "lower": 0.610472695096926,
+      "upper": null,
+      "n": 38,
+      "risk": 11,
+      "rate": 0.289473684210526,
+      "ci": [
+        0.170032778284833,
+        0.447571376757516
+      ]
+    },
+    {
+      "split": "train",
+      "feature": "board_turnover_sum",
+      "label": "板段累计换手",
+      "lower": null,
+      "upper": 0.1275365,
+      "n": 38,
+      "risk": 12,
+      "rate": 0.31578947368421,
+      "ci": [
+        0.190846036755965,
+        0.474557598906091
+      ]
+    },
+    {
+      "split": "train",
+      "feature": "board_turnover_sum",
+      "label": "板段累计换手",
+      "lower": 0.1275365,
+      "upper": 0.271995,
+      "n": 38,
+      "risk": 8,
+      "rate": 0.210526315789474,
+      "ci": [
+        0.110747918429961,
+        0.363457794753269
+      ]
+    },
+    {
+      "split": "train",
+      "feature": "board_turnover_sum",
+      "label": "板段累计换手",
+      "lower": 0.271995,
+      "upper": 0.46569125,
+      "n": 38,
+      "risk": 17,
+      "rate": 0.447368421052632,
+      "ci": [
+        0.301464009980516,
+        0.602937028780071
+      ]
+    },
+    {
+      "split": "train",
+      "feature": "board_turnover_sum",
+      "label": "板段累计换手",
+      "lower": 0.46569125,
+      "upper": null,
+      "n": 38,
+      "risk": 5,
+      "rate": 0.131578947368421,
+      "ci": [
+        0.057538676901203,
+        0.273268594422908
+      ]
+    },
+    {
+      "split": "train",
+      "feature": "market_limit_count",
+      "label": "市场涨停家数",
+      "lower": null,
+      "upper": 43.0,
+      "n": 40,
+      "risk": 8,
+      "rate": 0.2,
+      "ci": [
+        0.104999897254379,
+        0.34757306346399
+      ]
+    },
+    {
+      "split": "train",
+      "feature": "market_limit_count",
+      "label": "市场涨停家数",
+      "lower": 43.0,
+      "upper": 60.0,
+      "n": 37,
+      "risk": 8,
+      "rate": 0.216216216216216,
+      "ci": [
+        0.113865119933858,
+        0.371951483919687
+      ]
+    },
+    {
+      "split": "train",
+      "feature": "market_limit_count",
+      "label": "市场涨停家数",
+      "lower": 60.0,
+      "upper": 99.25,
+      "n": 37,
+      "risk": 12,
+      "rate": 0.324324324324324,
+      "ci": [
+        0.196332665281445,
+        0.485363327580273
+      ]
+    },
+    {
+      "split": "train",
+      "feature": "market_limit_count",
+      "label": "市场涨停家数",
+      "lower": 99.25,
+      "upper": null,
+      "n": 38,
+      "risk": 14,
+      "rate": 0.368421052631579,
+      "ci": [
+        0.233842192471563,
+        0.527160404429906
+      ]
+    },
+    {
+      "split": "train",
+      "feature": "market_median_return",
+      "label": "市场涨幅中位",
+      "lower": null,
+      "upper": -0.007386278535254,
+      "n": 38,
+      "risk": 10,
+      "rate": 0.263157894736842,
+      "ci": [
+        0.149716212547984,
+        0.420088461874659
+      ]
+    },
+    {
+      "split": "train",
+      "feature": "market_median_return",
+      "label": "市场涨幅中位",
+      "lower": -0.007386278535254,
+      "upper": 0.0,
+      "n": 44,
+      "risk": 14,
+      "rate": 0.318181818181818,
+      "ci": [
+        0.199993077108537,
+        0.465568960621818
+      ]
+    },
+    {
+      "split": "train",
+      "feature": "market_median_return",
+      "label": "市场涨幅中位",
+      "lower": 0.0,
+      "upper": 0.005174879905004,
+      "n": 32,
+      "risk": 9,
+      "rate": 0.28125,
+      "ci": [
+        0.15564580497743,
+        0.453745094259161
+      ]
+    },
+    {
+      "split": "train",
+      "feature": "market_median_return",
+      "label": "市场涨幅中位",
+      "lower": 0.005174879905004,
+      "upper": null,
+      "n": 38,
+      "risk": 9,
+      "rate": 0.236842105263158,
+      "ci": [
+        0.129937070170543,
+        0.392068123632393
+      ]
+    },
+    {
+      "split": "train",
+      "feature": "market_reseal_fraction",
+      "label": "市场连板延续率",
+      "lower": null,
+      "upper": 0.212752525252525,
+      "n": 38,
+      "risk": 11,
+      "rate": 0.289473684210526,
+      "ci": [
+        0.170032778284833,
+        0.447571376757516
+      ]
+    },
+    {
+      "split": "train",
+      "feature": "market_reseal_fraction",
+      "label": "市场连板延续率",
+      "lower": 0.212752525252525,
+      "upper": 0.271446078431372,
+      "n": 38,
+      "risk": 8,
+      "rate": 0.210526315789474,
+      "ci": [
+        0.110747918429961,
+        0.363457794753269
+      ]
+    },
+    {
+      "split": "train",
+      "feature": "market_reseal_fraction",
+      "label": "市场连板延续率",
+      "lower": 0.271446078431372,
+      "upper": 0.317762967255868,
+      "n": 38,
+      "risk": 12,
+      "rate": 0.31578947368421,
+      "ci": [
+        0.190846036755965,
+        0.474557598906091
+      ]
+    },
+    {
+      "split": "train",
+      "feature": "market_reseal_fraction",
+      "label": "市场连板延续率",
+      "lower": 0.317762967255868,
+      "upper": null,
+      "n": 38,
+      "risk": 11,
+      "rate": 0.289473684210526,
+      "ci": [
+        0.170032778284833,
+        0.447571376757516
+      ]
+    },
+    {
+      "split": "train",
+      "feature": "close_sealed_minutes",
+      "label": "D0收在板上分钟数",
+      "lower": null,
+      "upper": 227.75,
+      "n": 38,
+      "risk": 6,
+      "rate": 0.157894736842105,
+      "ci": [
+        0.074438634151591,
+        0.304168117792227
+      ]
+    },
+    {
+      "split": "train",
+      "feature": "close_sealed_minutes",
+      "label": "D0收在板上分钟数",
+      "lower": 227.75,
+      "upper": 240.0,
+      "n": 114,
+      "risk": 36,
+      "rate": 0.31578947368421,
+      "ci": [
+        0.237654639528547,
+        0.40593429410892
+      ]
+    },
+    {
+      "split": "train",
+      "feature": "close_sealed_minutes",
+      "label": "D0收在板上分钟数",
+      "lower": 240.0,
+      "upper": null,
+      "n": 0,
+      "risk": 0,
+      "rate": null,
+      "ci": [
+        null,
+        null
+      ]
+    },
+    {
+      "split": "valid",
+      "feature": "total_mv_yi",
+      "label": "D0总市值亿",
+      "lower": null,
+      "upper": 41.215,
+      "n": 5,
+      "risk": 0,
+      "rate": 0.0,
+      "ci": [
+        5.55111512312578e-17,
+        0.434482464783161
+      ]
+    },
+    {
+      "split": "valid",
+      "feature": "total_mv_yi",
+      "label": "D0总市值亿",
+      "lower": 41.215,
+      "upper": 53.938229016985005,
+      "n": 6,
+      "risk": 1,
+      "rate": 0.166666666666667,
+      "ci": [
+        0.030053369748308,
+        0.56350282218646
+      ]
+    },
+    {
+      "split": "valid",
+      "feature": "total_mv_yi",
+      "label": "D0总市值亿",
+      "lower": 53.938229016985005,
+      "upper": 72.05294410035,
+      "n": 13,
+      "risk": 3,
+      "rate": 0.230769230769231,
+      "ci": [
+        0.081795287184988,
+        0.502563759467268
+      ]
+    },
+    {
+      "split": "valid",
+      "feature": "total_mv_yi",
+      "label": "D0总市值亿",
+      "lower": 72.05294410035,
+      "upper": null,
+      "n": 30,
+      "risk": 6,
+      "rate": 0.2,
+      "ci": [
+        0.095051071772901,
+        0.373056964131477
+      ]
+    },
+    {
+      "split": "valid",
+      "feature": "float_mv_yi",
+      "label": "D0流通市值亿",
+      "lower": null,
+      "upper": 26.6909043794,
+      "n": 1,
+      "risk": 0,
+      "rate": 0.0,
+      "ci": [
+        0.0,
+        0.793450685622754
+      ]
+    },
+    {
+      "split": "valid",
+      "feature": "float_mv_yi",
+      "label": "D0流通市值亿",
+      "lower": 26.6909043794,
+      "upper": 41.916059169600004,
+      "n": 4,
+      "risk": 0,
+      "rate": 0.0,
+      "ci": [
+        0.0,
+        0.489890836454584
+      ]
+    },
+    {
+      "split": "valid",
+      "feature": "float_mv_yi",
+      "label": "D0流通市值亿",
+      "lower": 41.916059169600004,
+      "upper": 62.1349331016,
+      "n": 15,
+      "risk": 4,
+      "rate": 0.266666666666667,
+      "ci": [
+        0.108974533256926,
+        0.519504340559799
+      ]
+    },
+    {
+      "split": "valid",
+      "feature": "float_mv_yi",
+      "label": "D0流通市值亿",
+      "lower": 62.1349331016,
+      "upper": null,
+      "n": 34,
+      "risk": 6,
+      "rate": 0.176470588235294,
+      "ci": [
+        0.083489690453725,
+        0.335137373998423
+      ]
+    },
+    {
+      "split": "valid",
+      "feature": "d0_turnover_pct",
+      "label": "D0换手率",
+      "lower": null,
+      "upper": 0.019931,
+      "n": 10,
+      "risk": 2,
+      "rate": 0.2,
+      "ci": [
+        0.056682151454377,
+        0.50983752846335
+      ]
+    },
+    {
+      "split": "valid",
+      "feature": "d0_turnover_pct",
+      "label": "D0换手率",
+      "lower": 0.019931,
+      "upper": 0.0726835,
+      "n": 20,
+      "risk": 5,
+      "rate": 0.25,
+      "ci": [
+        0.111861701407668,
+        0.468700877618738
+      ]
+    },
+    {
+      "split": "valid",
+      "feature": "d0_turnover_pct",
+      "label": "D0换手率",
+      "lower": 0.0726835,
+      "upper": 0.17524175,
+      "n": 13,
+      "risk": 1,
+      "rate": 0.076923076923077,
+      "ci": [
+        0.013710421242557,
+        0.333139509210987
+      ]
+    },
+    {
+      "split": "valid",
+      "feature": "d0_turnover_pct",
+      "label": "D0换手率",
+      "lower": 0.17524175,
+      "upper": null,
+      "n": 11,
+      "risk": 2,
+      "rate": 0.181818181818182,
+      "ci": [
+        0.051367689746087,
+        0.476980561960836
+      ]
+    },
+    {
+      "split": "valid",
+      "feature": "board_streak_days",
+      "label": "连板数",
+      "lower": null,
+      "upper": 2.0,
+      "n": 8,
+      "risk": 1,
+      "rate": 0.125,
+      "ci": [
+        0.022417491450058,
+        0.470888182212844
+      ]
+    },
+    {
+      "split": "valid",
+      "feature": "board_streak_days",
+      "label": "连板数",
+      "lower": 2.0,
+      "upper": 3.0,
+      "n": 27,
+      "risk": 5,
+      "rate": 0.185185185185185,
+      "ci": [
+        0.081807071429767,
+        0.366986836185479
+      ]
+    },
+    {
+      "split": "valid",
+      "feature": "board_streak_days",
+      "label": "连板数",
+      "lower": 3.0,
+      "upper": 4.0,
+      "n": 9,
+      "risk": 1,
+      "rate": 0.111111111111111,
+      "ci": [
+        0.019890887638546,
+        0.434999705576646
+      ]
+    },
+    {
+      "split": "valid",
+      "feature": "board_streak_days",
+      "label": "连板数",
+      "lower": 4.0,
+      "upper": null,
+      "n": 10,
+      "risk": 3,
+      "rate": 0.3,
+      "ci": [
+        0.107791267406304,
+        0.603221852538847
+      ]
+    },
+    {
+      "split": "valid",
+      "feature": "open_gap",
+      "label": "D1开盘涨幅",
+      "lower": null,
+      "upper": 0.004347775834303,
+      "n": 16,
+      "risk": 2,
+      "rate": 0.125,
+      "ci": [
+        0.034977487743242,
+        0.360228272657579
+      ]
+    },
+    {
+      "split": "valid",
+      "feature": "open_gap",
+      "label": "D1开盘涨幅",
+      "lower": 0.004347775834303,
+      "upper": 0.04051337510735,
+      "n": 13,
+      "risk": 3,
+      "rate": 0.230769230769231,
+      "ci": [
+        0.081795287184988,
+        0.502563759467268
+      ]
+    },
+    {
+      "split": "valid",
+      "feature": "open_gap",
+      "label": "D1开盘涨幅",
+      "lower": 0.04051337510735,
+      "upper": 0.082328146569632,
+      "n": 18,
+      "risk": 3,
+      "rate": 0.166666666666667,
+      "ci": [
+        0.058365768058616,
+        0.39222038103915
+      ]
+    },
+    {
+      "split": "valid",
+      "feature": "open_gap",
+      "label": "D1开盘涨幅",
+      "lower": 0.082328146569632,
+      "upper": null,
+      "n": 7,
+      "risk": 2,
+      "rate": 0.285714285714286,
+      "ci": [
+        0.082218924004059,
+        0.641065548167373
+      ]
+    },
+    {
+      "split": "valid",
+      "feature": "body5",
+      "label": "D1四K实体",
+      "lower": null,
+      "upper": -0.017509574280654,
+      "n": 10,
+      "risk": 2,
+      "rate": 0.2,
+      "ci": [
+        0.056682151454377,
+        0.50983752846335
+      ]
+    },
+    {
+      "split": "valid",
+      "feature": "body5",
+      "label": "D1四K实体",
+      "lower": -0.017509574280654,
+      "upper": 0.005874125874126,
+      "n": 14,
+      "risk": 2,
+      "rate": 0.142857142857143,
+      "ci": [
+        0.040093921271466,
+        0.399413794969696
+      ]
+    },
+    {
+      "split": "valid",
+      "feature": "body5",
+      "label": "D1四K实体",
+      "lower": 0.005874125874126,
+      "upper": 0.031694328570161,
+      "n": 13,
+      "risk": 3,
+      "rate": 0.230769230769231,
+      "ci": [
+        0.081795287184988,
+        0.502563759467268
+      ]
+    },
+    {
+      "split": "valid",
+      "feature": "body5",
+      "label": "D1四K实体",
+      "lower": 0.031694328570161,
+      "upper": null,
+      "n": 17,
+      "risk": 3,
+      "rate": 0.176470588235294,
+      "ci": [
+        0.061911266376212,
+        0.410294585688334
+      ]
+    },
+    {
+      "split": "valid",
+      "feature": "d0_normal_volume_ratio",
+      "label": "D0对板前量比",
+      "lower": null,
+      "upper": 0.28272738008469,
+      "n": 8,
+      "risk": 2,
+      "rate": 0.25,
+      "ci": [
+        0.071479212752111,
+        0.590724569689823
+      ]
+    },
+    {
+      "split": "valid",
+      "feature": "d0_normal_volume_ratio",
+      "label": "D0对板前量比",
+      "lower": 0.28272738008469,
+      "upper": 0.787840464137946,
+      "n": 8,
+      "risk": 3,
+      "rate": 0.375,
+      "ci": [
+        0.136844285823601,
+        0.694257605397366
+      ]
+    },
+    {
+      "split": "valid",
+      "feature": "d0_normal_volume_ratio",
+      "label": "D0对板前量比",
+      "lower": 0.787840464137946,
+      "upper": 2.20027434582704,
+      "n": 17,
+      "risk": 3,
+      "rate": 0.176470588235294,
+      "ci": [
+        0.061911266376212,
+        0.410294585688334
+      ]
+    },
+    {
+      "split": "valid",
+      "feature": "d0_normal_volume_ratio",
+      "label": "D0对板前量比",
+      "lower": 2.20027434582704,
+      "upper": null,
+      "n": 21,
+      "risk": 2,
+      "rate": 0.095238095238095,
+      "ci": [
+        0.026518767438075,
+        0.289141390739176
+      ]
+    },
+    {
+      "split": "valid",
+      "feature": "d0_amount_100m",
+      "label": "D0成交额亿",
+      "lower": null,
+      "upper": 0.8569085825,
+      "n": 7,
+      "risk": 2,
+      "rate": 0.285714285714286,
+      "ci": [
+        0.082218924004059,
+        0.641065548167373
+      ]
+    },
+    {
+      "split": "valid",
+      "feature": "d0_amount_100m",
+      "label": "D0成交额亿",
+      "lower": 0.8569085825,
+      "upper": 2.73914077,
+      "n": 8,
+      "risk": 1,
+      "rate": 0.125,
+      "ci": [
+        0.022417491450058,
+        0.470888182212844
+      ]
+    },
+    {
+      "split": "valid",
+      "feature": "d0_amount_100m",
+      "label": "D0成交额亿",
+      "lower": 2.73914077,
+      "upper": 6.36289058,
+      "n": 15,
+      "risk": 2,
+      "rate": 0.133333333333333,
+      "ci": [
+        0.037361259103067,
+        0.378819828323216
+      ]
+    },
+    {
+      "split": "valid",
+      "feature": "d0_amount_100m",
+      "label": "D0成交额亿",
+      "lower": 6.36289058,
+      "upper": null,
+      "n": 24,
+      "risk": 5,
+      "rate": 0.208333333333333,
+      "ci": [
+        0.092448253528521,
+        0.404704532531881
+      ]
+    },
+    {
+      "split": "valid",
+      "feature": "streak_return",
+      "label": "本轮连板涨幅",
+      "lower": null,
+      "upper": 0.210457532861476,
+      "n": 3,
+      "risk": 0,
+      "rate": 0.0,
+      "ci": [
+        0.0,
+        0.561497031755032
+      ]
+    },
+    {
+      "split": "valid",
+      "feature": "streak_return",
+      "label": "本轮连板涨幅",
+      "lower": 0.210457532861476,
+      "upper": 0.332015068857174,
+      "n": 29,
+      "risk": 5,
+      "rate": 0.172413793103448,
+      "ci": [
+        0.075978572528914,
+        0.345484398901947
+      ]
+    },
+    {
+      "split": "valid",
+      "feature": "streak_return",
+      "label": "本轮连板涨幅",
+      "lower": 0.332015068857174,
+      "upper": 0.610472695096926,
+      "n": 12,
+      "risk": 2,
+      "rate": 0.166666666666667,
+      "ci": [
+        0.046965142183855,
+        0.448030862252965
+      ]
+    },
+    {
+      "split": "valid",
+      "feature": "streak_return",
+      "label": "本轮连板涨幅",
+      "lower": 0.610472695096926,
+      "upper": null,
+      "n": 10,
+      "risk": 3,
+      "rate": 0.3,
+      "ci": [
+        0.107791267406304,
+        0.603221852538847
+      ]
+    },
+    {
+      "split": "valid",
+      "feature": "board_turnover_sum",
+      "label": "板段累计换手",
+      "lower": null,
+      "upper": 0.1275365,
+      "n": 10,
+      "risk": 2,
+      "rate": 0.2,
+      "ci": [
+        0.056682151454377,
+        0.50983752846335
+      ]
+    },
+    {
+      "split": "valid",
+      "feature": "board_turnover_sum",
+      "label": "板段累计换手",
+      "lower": 0.1275365,
+      "upper": 0.271995,
+      "n": 16,
+      "risk": 2,
+      "rate": 0.125,
+      "ci": [
+        0.034977487743242,
+        0.360228272657579
+      ]
+    },
+    {
+      "split": "valid",
+      "feature": "board_turnover_sum",
+      "label": "板段累计换手",
+      "lower": 0.271995,
+      "upper": 0.46569125,
+      "n": 20,
+      "risk": 2,
+      "rate": 0.1,
+      "ci": [
+        0.027866481213769,
+        0.30103364522848
+      ]
+    },
+    {
+      "split": "valid",
+      "feature": "board_turnover_sum",
+      "label": "板段累计换手",
+      "lower": 0.46569125,
+      "upper": null,
+      "n": 8,
+      "risk": 4,
+      "rate": 0.5,
+      "ci": [
+        0.215216062213883,
+        0.784783937786117
+      ]
+    },
+    {
+      "split": "valid",
+      "feature": "market_limit_count",
+      "label": "市场涨停家数",
+      "lower": null,
+      "upper": 43.0,
+      "n": 2,
+      "risk": 1,
+      "rate": 0.5,
+      "ci": [
+        0.094531205734235,
+        0.905468794265765
+      ]
+    },
+    {
+      "split": "valid",
+      "feature": "market_limit_count",
+      "label": "市场涨停家数",
+      "lower": 43.0,
+      "upper": 60.0,
+      "n": 7,
+      "risk": 1,
+      "rate": 0.142857142857143,
+      "ci": [
+        0.025679624344745,
+        0.513127829274309
+      ]
+    },
+    {
+      "split": "valid",
+      "feature": "market_limit_count",
+      "label": "市场涨停家数",
+      "lower": 60.0,
+      "upper": 99.25,
+      "n": 42,
+      "risk": 7,
+      "rate": 0.166666666666667,
+      "ci": [
+        0.083159166463982,
+        0.306040027446484
+      ]
+    },
+    {
+      "split": "valid",
+      "feature": "market_limit_count",
+      "label": "市场涨停家数",
+      "lower": 99.25,
+      "upper": null,
+      "n": 3,
+      "risk": 1,
+      "rate": 0.333333333333333,
+      "ci": [
+        0.061491944720399,
+        0.792340399197945
+      ]
+    },
+    {
+      "split": "valid",
+      "feature": "market_median_return",
+      "label": "市场涨幅中位",
+      "lower": null,
+      "upper": -0.007386278535254,
+      "n": 11,
+      "risk": 3,
+      "rate": 0.272727272727273,
+      "ci": [
+        0.097460592900252,
+        0.565645301176122
+      ]
+    },
+    {
+      "split": "valid",
+      "feature": "market_median_return",
+      "label": "市场涨幅中位",
+      "lower": -0.007386278535254,
+      "upper": 0.0,
+      "n": 19,
+      "risk": 4,
+      "rate": 0.210526315789474,
+      "ci": [
+        0.085076766329165,
+        0.433342784438135
+      ]
+    },
+    {
+      "split": "valid",
+      "feature": "market_median_return",
+      "label": "市场涨幅中位",
+      "lower": 0.0,
+      "upper": 0.005174879905004,
+      "n": 8,
+      "risk": 1,
+      "rate": 0.125,
+      "ci": [
+        0.022417491450058,
+        0.470888182212844
+      ]
+    },
+    {
+      "split": "valid",
+      "feature": "market_median_return",
+      "label": "市场涨幅中位",
+      "lower": 0.005174879905004,
+      "upper": null,
+      "n": 16,
+      "risk": 2,
+      "rate": 0.125,
+      "ci": [
+        0.034977487743242,
+        0.360228272657579
+      ]
+    },
+    {
+      "split": "valid",
+      "feature": "market_reseal_fraction",
+      "label": "市场连板延续率",
+      "lower": null,
+      "upper": 0.212752525252525,
+      "n": 14,
+      "risk": 1,
+      "rate": 0.071428571428571,
+      "ci": [
+        0.012722215247891,
+        0.314687044241503
+      ]
+    },
+    {
+      "split": "valid",
+      "feature": "market_reseal_fraction",
+      "label": "市场连板延续率",
+      "lower": 0.212752525252525,
+      "upper": 0.271446078431372,
+      "n": 20,
+      "risk": 4,
+      "rate": 0.2,
+      "ci": [
+        0.0806576625798,
+        0.416017432251887
+      ]
+    },
+    {
+      "split": "valid",
+      "feature": "market_reseal_fraction",
+      "label": "市场连板延续率",
+      "lower": 0.271446078431372,
+      "upper": 0.317762967255868,
+      "n": 13,
+      "risk": 4,
+      "rate": 0.307692307692308,
+      "ci": [
+        0.126807036557108,
+        0.576306568194503
+      ]
+    },
+    {
+      "split": "valid",
+      "feature": "market_reseal_fraction",
+      "label": "市场连板延续率",
+      "lower": 0.317762967255868,
+      "upper": null,
+      "n": 7,
+      "risk": 1,
+      "rate": 0.142857142857143,
+      "ci": [
+        0.025679624344745,
+        0.513127829274309
+      ]
+    },
+    {
+      "split": "valid",
+      "feature": "close_sealed_minutes",
+      "label": "D0收在板上分钟数",
+      "lower": null,
+      "upper": 227.75,
+      "n": 13,
+      "risk": 2,
+      "rate": 0.153846153846154,
+      "ci": [
+        0.043258178358083,
+        0.422346310194817
+      ]
+    },
+    {
+      "split": "valid",
+      "feature": "close_sealed_minutes",
+      "label": "D0收在板上分钟数",
+      "lower": 227.75,
+      "upper": 240.0,
+      "n": 41,
+      "risk": 8,
+      "rate": 0.195121951219512,
+      "ci": [
+        0.102344373851582,
+        0.34013585187063
+      ]
+    },
+    {
+      "split": "valid",
+      "feature": "close_sealed_minutes",
+      "label": "D0收在板上分钟数",
+      "lower": 240.0,
+      "upper": null,
+      "n": 0,
+      "risk": 0,
+      "rate": null,
+      "ci": [
+        null,
+        null
+      ]
+    },
+    {
+      "split": "test",
+      "feature": "total_mv_yi",
+      "label": "D0总市值亿",
+      "lower": null,
+      "upper": 41.215,
+      "n": 17,
+      "risk": 3,
+      "rate": 0.176470588235294,
+      "ci": [
+        0.061911266376212,
+        0.410294585688334
+      ]
+    },
+    {
+      "split": "test",
+      "feature": "total_mv_yi",
+      "label": "D0总市值亿",
+      "lower": 41.215,
+      "upper": 53.938229016985005,
+      "n": 13,
+      "risk": 1,
+      "rate": 0.076923076923077,
+      "ci": [
+        0.013710421242557,
+        0.333139509210987
+      ]
+    },
+    {
+      "split": "test",
+      "feature": "total_mv_yi",
+      "label": "D0总市值亿",
+      "lower": 53.938229016985005,
+      "upper": 72.05294410035,
+      "n": 12,
+      "risk": 2,
+      "rate": 0.166666666666667,
+      "ci": [
+        0.046965142183855,
+        0.448030862252965
+      ]
+    },
+    {
+      "split": "test",
+      "feature": "total_mv_yi",
+      "label": "D0总市值亿",
+      "lower": 72.05294410035,
+      "upper": null,
+      "n": 56,
+      "risk": 8,
+      "rate": 0.142857142857143,
+      "ci": [
+        0.074207885369208,
+        0.25735921228705
+      ]
+    },
+    {
+      "split": "test",
+      "feature": "float_mv_yi",
+      "label": "D0流通市值亿",
+      "lower": null,
+      "upper": 26.6909043794,
+      "n": 3,
+      "risk": 1,
+      "rate": 0.333333333333333,
+      "ci": [
+        0.061491944720399,
+        0.792340399197945
+      ]
+    },
+    {
+      "split": "test",
+      "feature": "float_mv_yi",
+      "label": "D0流通市值亿",
+      "lower": 26.6909043794,
+      "upper": 41.916059169600004,
+      "n": 22,
+      "risk": 3,
+      "rate": 0.136363636363636,
+      "ci": [
+        0.047490037140554,
+        0.333349871665711
+      ]
+    },
+    {
+      "split": "test",
+      "feature": "float_mv_yi",
+      "label": "D0流通市值亿",
+      "lower": 41.916059169600004,
+      "upper": 62.1349331016,
+      "n": 18,
+      "risk": 2,
+      "rate": 0.111111111111111,
+      "ci": [
+        0.031019522645613,
+        0.327997651301781
+      ]
+    },
+    {
+      "split": "test",
+      "feature": "float_mv_yi",
+      "label": "D0流通市值亿",
+      "lower": 62.1349331016,
+      "upper": null,
+      "n": 55,
+      "risk": 8,
+      "rate": 0.145454545454545,
+      "ci": [
+        0.075592891477594,
+        0.261609129314519
+      ]
+    },
+    {
+      "split": "test",
+      "feature": "d0_turnover_pct",
+      "label": "D0换手率",
+      "lower": null,
+      "upper": 0.019931,
+      "n": 13,
+      "risk": 0,
+      "rate": 0.0,
+      "ci": [
+        0.0,
+        0.228095372354189
+      ]
+    },
+    {
+      "split": "test",
+      "feature": "d0_turnover_pct",
+      "label": "D0换手率",
+      "lower": 0.019931,
+      "upper": 0.0726835,
+      "n": 28,
+      "risk": 6,
+      "rate": 0.214285714285714,
+      "ci": [
+        0.102124603328981,
+        0.395385856537213
+      ]
+    },
+    {
+      "split": "test",
+      "feature": "d0_turnover_pct",
+      "label": "D0换手率",
+      "lower": 0.0726835,
+      "upper": 0.17524175,
+      "n": 35,
+      "risk": 4,
+      "rate": 0.114285714285714,
+      "ci": [
+        0.045351793330975,
+        0.259514686462133
+      ]
+    },
+    {
+      "split": "test",
+      "feature": "d0_turnover_pct",
+      "label": "D0换手率",
+      "lower": 0.17524175,
+      "upper": null,
+      "n": 22,
+      "risk": 4,
+      "rate": 0.181818181818182,
+      "ci": [
+        0.073068845834222,
+        0.385166074371259
+      ]
+    },
+    {
+      "split": "test",
+      "feature": "board_streak_days",
+      "label": "连板数",
+      "lower": null,
+      "upper": 2.0,
+      "n": 45,
+      "risk": 5,
+      "rate": 0.111111111111111,
+      "ci": [
+        0.048404717945673,
+        0.234990969957682
+      ]
+    },
+    {
+      "split": "test",
+      "feature": "board_streak_days",
+      "label": "连板数",
+      "lower": 2.0,
+      "upper": 3.0,
+      "n": 28,
+      "risk": 5,
+      "rate": 0.178571428571429,
+      "ci": [
+        0.078785019456044,
+        0.355914247893424
+      ]
+    },
+    {
+      "split": "test",
+      "feature": "board_streak_days",
+      "label": "连板数",
+      "lower": 3.0,
+      "upper": 4.0,
+      "n": 14,
+      "risk": 1,
+      "rate": 0.071428571428571,
+      "ci": [
+        0.012722215247891,
+        0.314687044241503
+      ]
+    },
+    {
+      "split": "test",
+      "feature": "board_streak_days",
+      "label": "连板数",
+      "lower": 4.0,
+      "upper": null,
+      "n": 11,
+      "risk": 3,
+      "rate": 0.272727272727273,
+      "ci": [
+        0.097460592900252,
+        0.565645301176122
+      ]
+    },
+    {
+      "split": "test",
+      "feature": "open_gap",
+      "label": "D1开盘涨幅",
+      "lower": null,
+      "upper": 0.004347775834303,
+      "n": 44,
+      "risk": 8,
+      "rate": 0.181818181818182,
+      "ci": [
+        0.095128057156279,
+        0.319605508871842
+      ]
+    },
+    {
+      "split": "test",
+      "feature": "open_gap",
+      "label": "D1开盘涨幅",
+      "lower": 0.004347775834303,
+      "upper": 0.04051337510735,
+      "n": 24,
+      "risk": 5,
+      "rate": 0.208333333333333,
+      "ci": [
+        0.092448253528521,
+        0.404704532531881
+      ]
+    },
+    {
+      "split": "test",
+      "feature": "open_gap",
+      "label": "D1开盘涨幅",
+      "lower": 0.04051337510735,
+      "upper": 0.082328146569632,
+      "n": 21,
+      "risk": 0,
+      "rate": 0.0,
+      "ci": [
+        0.0,
+        0.15463901892484
+      ]
+    },
+    {
+      "split": "test",
+      "feature": "open_gap",
+      "label": "D1开盘涨幅",
+      "lower": 0.082328146569632,
+      "upper": null,
+      "n": 9,
+      "risk": 1,
+      "rate": 0.111111111111111,
+      "ci": [
+        0.019890887638546,
+        0.434999705576646
+      ]
+    },
+    {
+      "split": "test",
+      "feature": "body5",
+      "label": "D1四K实体",
+      "lower": null,
+      "upper": -0.017509574280654,
+      "n": 22,
+      "risk": 0,
+      "rate": 0.0,
+      "ci": [
+        0.0,
+        0.148654874608614
+      ]
+    },
+    {
+      "split": "test",
+      "feature": "body5",
+      "label": "D1四K实体",
+      "lower": -0.017509574280654,
+      "upper": 0.005874125874126,
+      "n": 23,
+      "risk": 6,
+      "rate": 0.260869565217391,
+      "ci": [
+        0.125486160449866,
+        0.464700048374248
+      ]
+    },
+    {
+      "split": "test",
+      "feature": "body5",
+      "label": "D1四K实体",
+      "lower": 0.005874125874126,
+      "upper": 0.031694328570161,
+      "n": 25,
+      "risk": 5,
+      "rate": 0.2,
+      "ci": [
+        0.088605846868028,
+        0.391309503695398
+      ]
+    },
+    {
+      "split": "test",
+      "feature": "body5",
+      "label": "D1四K实体",
+      "lower": 0.031694328570161,
+      "upper": null,
+      "n": 28,
+      "risk": 3,
+      "rate": 0.107142857142857,
+      "ci": [
+        0.037118366829301,
+        0.271958515486716
+      ]
+    },
+    {
+      "split": "test",
+      "feature": "d0_normal_volume_ratio",
+      "label": "D0对板前量比",
+      "lower": null,
+      "upper": 0.28272738008469,
+      "n": 7,
+      "risk": 0,
+      "rate": 0.0,
+      "ci": [
+        0.0,
+        0.354330435066675
+      ]
+    },
+    {
+      "split": "test",
+      "feature": "d0_normal_volume_ratio",
+      "label": "D0对板前量比",
+      "lower": 0.28272738008469,
+      "upper": 0.787840464137946,
+      "n": 30,
+      "risk": 4,
+      "rate": 0.133333333333333,
+      "ci": [
+        0.053096554840549,
+        0.296813266820358
+      ]
+    },
+    {
+      "split": "test",
+      "feature": "d0_normal_volume_ratio",
+      "label": "D0对板前量比",
+      "lower": 0.787840464137946,
+      "upper": 2.20027434582704,
+      "n": 33,
+      "risk": 6,
+      "rate": 0.181818181818182,
+      "ci": [
+        0.086107682089408,
+        0.343882316346694
+      ]
+    },
+    {
+      "split": "test",
+      "feature": "d0_normal_volume_ratio",
+      "label": "D0对板前量比",
+      "lower": 2.20027434582704,
+      "upper": null,
+      "n": 28,
+      "risk": 4,
+      "rate": 0.142857142857143,
+      "ci": [
+        0.056990053197495,
+        0.314898021635247
+      ]
+    },
+    {
+      "split": "test",
+      "feature": "d0_amount_100m",
+      "label": "D0成交额亿",
+      "lower": null,
+      "upper": 0.8569085825,
+      "n": 12,
+      "risk": 2,
+      "rate": 0.166666666666667,
+      "ci": [
+        0.046965142183855,
+        0.448030862252965
+      ]
+    },
+    {
+      "split": "test",
+      "feature": "d0_amount_100m",
+      "label": "D0成交额亿",
+      "lower": 0.8569085825,
+      "upper": 2.73914077,
+      "n": 14,
+      "risk": 2,
+      "rate": 0.142857142857143,
+      "ci": [
+        0.040093921271466,
+        0.399413794969696
+      ]
+    },
+    {
+      "split": "test",
+      "feature": "d0_amount_100m",
+      "label": "D0成交额亿",
+      "lower": 2.73914077,
+      "upper": 6.36289058,
+      "n": 24,
+      "risk": 2,
+      "rate": 0.083333333333333,
+      "ci": [
+        0.023158815297044,
+        0.258488021932101
+      ]
+    },
+    {
+      "split": "test",
+      "feature": "d0_amount_100m",
+      "label": "D0成交额亿",
+      "lower": 6.36289058,
+      "upper": null,
+      "n": 48,
+      "risk": 8,
+      "rate": 0.166666666666667,
+      "ci": [
+        0.086955135764857,
+        0.295778284012552
+      ]
+    },
+    {
+      "split": "test",
+      "feature": "streak_return",
+      "label": "本轮连板涨幅",
+      "lower": null,
+      "upper": 0.210457532861476,
+      "n": 39,
+      "risk": 5,
+      "rate": 0.128205128205128,
+      "ci": [
+        0.056028175369715,
+        0.26705743379745
+      ]
+    },
+    {
+      "split": "test",
+      "feature": "streak_return",
+      "label": "本轮连板涨幅",
+      "lower": 0.210457532861476,
+      "upper": 0.332015068857174,
+      "n": 28,
+      "risk": 5,
+      "rate": 0.178571428571429,
+      "ci": [
+        0.078785019456044,
+        0.355914247893424
+      ]
+    },
+    {
+      "split": "test",
+      "feature": "streak_return",
+      "label": "本轮连板涨幅",
+      "lower": 0.332015068857174,
+      "upper": 0.610472695096926,
+      "n": 22,
+      "risk": 1,
+      "rate": 0.045454545454545,
+      "ci": [
+        0.008069427621264,
+        0.217980458386567
+      ]
+    },
+    {
+      "split": "test",
+      "feature": "streak_return",
+      "label": "本轮连板涨幅",
+      "lower": 0.610472695096926,
+      "upper": null,
+      "n": 9,
+      "risk": 3,
+      "rate": 0.333333333333333,
+      "ci": [
+        0.120583818386914,
+        0.645797864419596
+      ]
+    },
+    {
+      "split": "test",
+      "feature": "board_turnover_sum",
+      "label": "板段累计换手",
+      "lower": null,
+      "upper": 0.1275365,
+      "n": 26,
+      "risk": 4,
+      "rate": 0.153846153846154,
+      "ci": [
+        0.061500337235785,
+        0.335311993282129
+      ]
+    },
+    {
+      "split": "test",
+      "feature": "board_turnover_sum",
+      "label": "板段累计换手",
+      "lower": 0.1275365,
+      "upper": 0.271995,
+      "n": 27,
+      "risk": 2,
+      "rate": 0.074074074074074,
+      "ci": [
+        0.020554654060989,
+        0.233695926830226
+      ]
+    },
+    {
+      "split": "test",
+      "feature": "board_turnover_sum",
+      "label": "板段累计换手",
+      "lower": 0.271995,
+      "upper": 0.46569125,
+      "n": 27,
+      "risk": 6,
+      "rate": 0.222222222222222,
+      "ci": [
+        0.106072394523603,
+        0.40756928866632
+      ]
+    },
+    {
+      "split": "test",
+      "feature": "board_turnover_sum",
+      "label": "板段累计换手",
+      "lower": 0.46569125,
+      "upper": null,
+      "n": 18,
+      "risk": 2,
+      "rate": 0.111111111111111,
+      "ci": [
+        0.031019522645613,
+        0.327997651301781
+      ]
+    },
+    {
+      "split": "test",
+      "feature": "market_limit_count",
+      "label": "市场涨停家数",
+      "lower": null,
+      "upper": 43.0,
+      "n": 11,
+      "risk": 1,
+      "rate": 0.090909090909091,
+      "ci": [
+        0.016232172885885,
+        0.377358436451586
+      ]
+    },
+    {
+      "split": "test",
+      "feature": "market_limit_count",
+      "label": "市场涨停家数",
+      "lower": 43.0,
+      "upper": 60.0,
+      "n": 19,
+      "risk": 3,
+      "rate": 0.157894736842105,
+      "ci": [
+        0.055204716385343,
+        0.375654752703284
+      ]
+    },
+    {
+      "split": "test",
+      "feature": "market_limit_count",
+      "label": "市场涨停家数",
+      "lower": 60.0,
+      "upper": 99.25,
+      "n": 48,
+      "risk": 8,
+      "rate": 0.166666666666667,
+      "ci": [
+        0.086955135764857,
+        0.295778284012552
+      ]
+    },
+    {
+      "split": "test",
+      "feature": "market_limit_count",
+      "label": "市场涨停家数",
+      "lower": 99.25,
+      "upper": null,
+      "n": 20,
+      "risk": 2,
+      "rate": 0.1,
+      "ci": [
+        0.027866481213769,
+        0.30103364522848
+      ]
+    },
+    {
+      "split": "test",
+      "feature": "market_median_return",
+      "label": "市场涨幅中位",
+      "lower": null,
+      "upper": -0.007386278535254,
+      "n": 26,
+      "risk": 4,
+      "rate": 0.153846153846154,
+      "ci": [
+        0.061500337235785,
+        0.335311993282129
+      ]
+    },
+    {
+      "split": "test",
+      "feature": "market_median_return",
+      "label": "市场涨幅中位",
+      "lower": -0.007386278535254,
+      "upper": 0.0,
+      "n": 24,
+      "risk": 5,
+      "rate": 0.208333333333333,
+      "ci": [
+        0.092448253528521,
+        0.404704532531881
+      ]
+    },
+    {
+      "split": "test",
+      "feature": "market_median_return",
+      "label": "市场涨幅中位",
+      "lower": 0.0,
+      "upper": 0.005174879905004,
+      "n": 14,
+      "risk": 1,
+      "rate": 0.071428571428571,
+      "ci": [
+        0.012722215247891,
+        0.314687044241503
+      ]
+    },
+    {
+      "split": "test",
+      "feature": "market_median_return",
+      "label": "市场涨幅中位",
+      "lower": 0.005174879905004,
+      "upper": null,
+      "n": 34,
+      "risk": 4,
+      "rate": 0.117647058823529,
+      "ci": [
+        0.046714466648825,
+        0.266208427703713
+      ]
+    },
+    {
+      "split": "test",
+      "feature": "market_reseal_fraction",
+      "label": "市场连板延续率",
+      "lower": null,
+      "upper": 0.212752525252525,
+      "n": 59,
+      "risk": 9,
+      "rate": 0.152542372881356,
+      "ci": [
+        0.082384639985966,
+        0.265179837837732
+      ]
+    },
+    {
+      "split": "test",
+      "feature": "market_reseal_fraction",
+      "label": "市场连板延续率",
+      "lower": 0.212752525252525,
+      "upper": 0.271446078431372,
+      "n": 21,
+      "risk": 4,
+      "rate": 0.19047619047619,
+      "ci": [
+        0.07667565052762,
+        0.400005646902043
+      ]
+    },
+    {
+      "split": "test",
+      "feature": "market_reseal_fraction",
+      "label": "市场连板延续率",
+      "lower": 0.271446078431372,
+      "upper": 0.317762967255868,
+      "n": 14,
+      "risk": 1,
+      "rate": 0.071428571428571,
+      "ci": [
+        0.012722215247891,
+        0.314687044241503
+      ]
+    },
+    {
+      "split": "test",
+      "feature": "market_reseal_fraction",
+      "label": "市场连板延续率",
+      "lower": 0.317762967255868,
+      "upper": null,
+      "n": 4,
+      "risk": 0,
+      "rate": 0.0,
+      "ci": [
+        0.0,
+        0.489890836454584
+      ]
+    },
+    {
+      "split": "test",
+      "feature": "close_sealed_minutes",
+      "label": "D0收在板上分钟数",
+      "lower": null,
+      "upper": 227.75,
+      "n": 29,
+      "risk": 5,
+      "rate": 0.172413793103448,
+      "ci": [
+        0.075978572528914,
+        0.345484398901947
+      ]
+    },
+    {
+      "split": "test",
+      "feature": "close_sealed_minutes",
+      "label": "D0收在板上分钟数",
+      "lower": 227.75,
+      "upper": 240.0,
+      "n": 69,
+      "risk": 9,
+      "rate": 0.130434782608696,
+      "ci": [
+        0.070166278396036,
+        0.22968299939587
+      ]
+    },
+    {
+      "split": "test",
+      "feature": "close_sealed_minutes",
+      "label": "D0收在板上分钟数",
+      "lower": 240.0,
+      "upper": null,
+      "n": 0,
+      "risk": 0,
+      "rate": null,
+      "ci": [
+        null,
+        null
+      ]
+    },
+    {
+      "split": "all",
+      "feature": "total_mv_yi",
+      "label": "D0总市值亿",
+      "lower": null,
+      "upper": 41.215,
+      "n": 62,
+      "risk": 15,
+      "rate": 0.241935483870968,
+      "ci": [
+        0.152458962053339,
+        0.361525075160271
+      ]
+    },
+    {
+      "split": "all",
+      "feature": "total_mv_yi",
+      "label": "D0总市值亿",
+      "lower": 41.215,
+      "upper": 53.938229016985005,
+      "n": 57,
+      "risk": 12,
+      "rate": 0.210526315789474,
+      "ci": [
+        0.124745483030348,
+        0.332861210831901
+      ]
+    },
+    {
+      "split": "all",
+      "feature": "total_mv_yi",
+      "label": "D0总市值亿",
+      "lower": 53.938229016985005,
+      "upper": 72.05294410035,
+      "n": 63,
+      "risk": 13,
+      "rate": 0.206349206349206,
+      "ci": [
+        0.12475319615494,
+        0.32169814328613
+      ]
+    },
+    {
+      "split": "all",
+      "feature": "total_mv_yi",
+      "label": "D0总市值亿",
+      "lower": 72.05294410035,
+      "upper": null,
+      "n": 124,
+      "risk": 27,
+      "rate": 0.217741935483871,
+      "ci": [
+        0.154180860308744,
+        0.298265938673895
+      ]
+    },
+    {
+      "split": "all",
+      "feature": "float_mv_yi",
+      "label": "D0流通市值亿",
+      "lower": null,
+      "upper": 26.6909043794,
+      "n": 43,
+      "risk": 10,
+      "rate": 0.232558139534884,
+      "ci": [
+        0.131536784793847,
+        0.377445202978086
+      ]
+    },
+    {
+      "split": "all",
+      "feature": "float_mv_yi",
+      "label": "D0流通市值亿",
+      "lower": 26.6909043794,
+      "upper": 41.916059169600004,
+      "n": 65,
+      "risk": 15,
+      "rate": 0.230769230769231,
+      "ci": [
+        0.145138348461612,
+        0.346447091481463
+      ]
+    },
+    {
+      "split": "all",
+      "feature": "float_mv_yi",
+      "label": "D0流通市值亿",
+      "lower": 41.916059169600004,
+      "upper": 62.1349331016,
+      "n": 71,
+      "risk": 14,
+      "rate": 0.197183098591549,
+      "ci": [
+        0.121255323012024,
+        0.30419681705088
+      ]
+    },
+    {
+      "split": "all",
+      "feature": "float_mv_yi",
+      "label": "D0流通市值亿",
+      "lower": 62.1349331016,
+      "upper": null,
+      "n": 127,
+      "risk": 28,
+      "rate": 0.220472440944882,
+      "ci": [
+        0.157172430494242,
+        0.3001861113629
+      ]
+    },
+    {
+      "split": "all",
+      "feature": "d0_turnover_pct",
+      "label": "D0换手率",
+      "lower": null,
+      "upper": 0.019931,
+      "n": 61,
+      "risk": 17,
+      "rate": 0.278688524590164,
+      "ci": [
+        0.181885438925662,
+        0.401714305881698
+      ]
+    },
+    {
+      "split": "all",
+      "feature": "d0_turnover_pct",
+      "label": "D0换手率",
+      "lower": 0.019931,
+      "upper": 0.0726835,
+      "n": 86,
+      "risk": 22,
+      "rate": 0.255813953488372,
+      "ci": [
+        0.175430752680157,
+        0.357079064598925
+      ]
+    },
+    {
+      "split": "all",
+      "feature": "d0_turnover_pct",
+      "label": "D0换手率",
+      "lower": 0.0726835,
+      "upper": 0.17524175,
+      "n": 88,
+      "risk": 15,
+      "rate": 0.170454545454545,
+      "ci": [
+        0.106108221156329,
+        0.262368709145531
+      ]
+    },
+    {
+      "split": "all",
+      "feature": "d0_turnover_pct",
+      "label": "D0换手率",
+      "lower": 0.17524175,
+      "upper": null,
+      "n": 71,
+      "risk": 13,
+      "rate": 0.183098591549296,
+      "ci": [
+        0.110247261042851,
+        0.288481722743909
+      ]
+    },
+    {
+      "split": "all",
+      "feature": "board_streak_days",
+      "label": "连板数",
+      "lower": null,
+      "upper": 2.0,
+      "n": 109,
+      "risk": 19,
+      "rate": 0.174311926605505,
+      "ci": [
+        0.114528711068776,
+        0.256269923209609
+      ]
+    },
+    {
+      "split": "all",
+      "feature": "board_streak_days",
+      "label": "连板数",
+      "lower": 2.0,
+      "upper": 3.0,
+      "n": 89,
+      "risk": 21,
+      "rate": 0.235955056179775,
+      "ci": [
+        0.159824387008109,
+        0.333936260476203
+      ]
+    },
+    {
+      "split": "all",
+      "feature": "board_streak_days",
+      "label": "连板数",
+      "lower": 3.0,
+      "upper": 4.0,
+      "n": 50,
+      "risk": 11,
+      "rate": 0.22,
+      "ci": [
+        0.127539159702146,
+        0.352415495812533
+      ]
+    },
+    {
+      "split": "all",
+      "feature": "board_streak_days",
+      "label": "连板数",
+      "lower": 4.0,
+      "upper": null,
+      "n": 58,
+      "risk": 16,
+      "rate": 0.275862068965517,
+      "ci": [
+        0.177523521389127,
+        0.40204655189479
+      ]
+    },
+    {
+      "split": "all",
+      "feature": "open_gap",
+      "label": "D1开盘涨幅",
+      "lower": null,
+      "upper": 0.004347775834303,
+      "n": 99,
+      "risk": 20,
+      "rate": 0.202020202020202,
+      "ci": [
+        0.134757298041358,
+        0.29154411117078
+      ]
+    },
+    {
+      "split": "all",
+      "feature": "open_gap",
+      "label": "D1开盘涨幅",
+      "lower": 0.004347775834303,
+      "upper": 0.04051337510735,
+      "n": 75,
+      "risk": 18,
+      "rate": 0.24,
+      "ci": [
+        0.157548736600031,
+        0.347787661491027
+      ]
+    },
+    {
+      "split": "all",
+      "feature": "open_gap",
+      "label": "D1开盘涨幅",
+      "lower": 0.04051337510735,
+      "upper": 0.082328146569632,
+      "n": 78,
+      "risk": 16,
+      "rate": 0.205128205128205,
+      "ci": [
+        0.130397952198322,
+        0.307539730452458
+      ]
+    },
+    {
+      "split": "all",
+      "feature": "open_gap",
+      "label": "D1开盘涨幅",
+      "lower": 0.082328146569632,
+      "upper": null,
+      "n": 54,
+      "risk": 13,
+      "rate": 0.240740740740741,
+      "ci": [
+        0.146442914952846,
+        0.369475241835024
+      ]
+    },
+    {
+      "split": "all",
+      "feature": "body5",
+      "label": "D1四K实体",
+      "lower": null,
+      "upper": -0.017509574280654,
+      "n": 70,
+      "risk": 11,
+      "rate": 0.157142857142857,
+      "ci": [
+        0.090076205598619,
+        0.259882465768419
+      ]
+    },
+    {
+      "split": "all",
+      "feature": "body5",
+      "label": "D1四K实体",
+      "lower": -0.017509574280654,
+      "upper": 0.005874125874126,
+      "n": 75,
+      "risk": 22,
+      "rate": 0.293333333333333,
+      "ci": [
+        0.202401403219035,
+        0.404404451673857
+      ]
+    },
+    {
+      "split": "all",
+      "feature": "body5",
+      "label": "D1四K实体",
+      "lower": 0.005874125874126,
+      "upper": 0.031694328570161,
+      "n": 77,
+      "risk": 17,
+      "rate": 0.220779220779221,
+      "ci": [
+        0.142664030410989,
+        0.325430674616863
+      ]
+    },
+    {
+      "split": "all",
+      "feature": "body5",
+      "label": "D1四K实体",
+      "lower": 0.031694328570161,
+      "upper": null,
+      "n": 84,
+      "risk": 17,
+      "rate": 0.202380952380952,
+      "ci": [
+        0.130374567896326,
+        0.30041812758859
+      ]
+    },
+    {
+      "split": "all",
+      "feature": "d0_normal_volume_ratio",
+      "label": "D0对板前量比",
+      "lower": null,
+      "upper": 0.28272738008469,
+      "n": 51,
+      "risk": 18,
+      "rate": 0.352941176470588,
+      "ci": [
+        0.236344884515211,
+        0.490139415454944
+      ]
+    },
+    {
+      "split": "all",
+      "feature": "d0_normal_volume_ratio",
+      "label": "D0对板前量比",
+      "lower": 0.28272738008469,
+      "upper": 0.787840464137946,
+      "n": 73,
+      "risk": 19,
+      "rate": 0.26027397260274,
+      "ci": [
+        0.173421834636385,
+        0.371094881506772
+      ]
+    },
+    {
+      "split": "all",
+      "feature": "d0_normal_volume_ratio",
+      "label": "D0对板前量比",
+      "lower": 0.787840464137946,
+      "upper": 2.20027434582704,
+      "n": 87,
+      "risk": 18,
+      "rate": 0.206896551724138,
+      "ci": [
+        0.135073596041602,
+        0.303508735615294
+      ]
+    },
+    {
+      "split": "all",
+      "feature": "d0_normal_volume_ratio",
+      "label": "D0对板前量比",
+      "lower": 2.20027434582704,
+      "upper": null,
+      "n": 85,
+      "risk": 11,
+      "rate": 0.129411764705882,
+      "ci": [
+        0.073823527981254,
+        0.217048089433865
+      ]
+    },
+    {
+      "split": "all",
+      "feature": "d0_amount_100m",
+      "label": "D0成交额亿",
+      "lower": null,
+      "upper": 0.8569085825,
+      "n": 57,
+      "risk": 19,
+      "rate": 0.333333333333333,
+      "ci": [
+        0.22493806075151,
+        0.462774884199482
+      ]
+    },
+    {
+      "split": "all",
+      "feature": "d0_amount_100m",
+      "label": "D0成交额亿",
+      "lower": 0.8569085825,
+      "upper": 2.73914077,
+      "n": 61,
+      "risk": 13,
+      "rate": 0.213114754098361,
+      "ci": [
+        0.128997737400576,
+        0.331224154016372
+      ]
+    },
+    {
+      "split": "all",
+      "feature": "d0_amount_100m",
+      "label": "D0成交额亿",
+      "lower": 2.73914077,
+      "upper": 6.36289058,
+      "n": 78,
+      "risk": 14,
+      "rate": 0.17948717948718,
+      "ci": [
+        0.11003915918926,
+        0.279023539344196
+      ]
+    },
+    {
+      "split": "all",
+      "feature": "d0_amount_100m",
+      "label": "D0成交额亿",
+      "lower": 6.36289058,
+      "upper": null,
+      "n": 110,
+      "risk": 21,
+      "rate": 0.190909090909091,
+      "ci": [
+        0.128394077297369,
+        0.27428399179604
+      ]
+    },
+    {
+      "split": "all",
+      "feature": "streak_return",
+      "label": "本轮连板涨幅",
+      "lower": null,
+      "upper": 0.210457532861476,
+      "n": 82,
+      "risk": 16,
+      "rate": 0.195121951219512,
+      "ci": [
+        0.123828974731818,
+        0.2937018933719
+      ]
+    },
+    {
+      "split": "all",
+      "feature": "streak_return",
+      "label": "本轮连板涨幅",
+      "lower": 0.210457532861476,
+      "upper": 0.332015068857174,
+      "n": 95,
+      "risk": 21,
+      "rate": 0.221052631578947,
+      "ci": [
+        0.149373529472454,
+        0.31441423092325
+      ]
+    },
+    {
+      "split": "all",
+      "feature": "streak_return",
+      "label": "本轮连板涨幅",
+      "lower": 0.332015068857174,
+      "upper": 0.610472695096926,
+      "n": 72,
+      "risk": 13,
+      "rate": 0.180555555555556,
+      "ci": [
+        0.1086681651002,
+        0.284803417391979
+      ]
+    },
+    {
+      "split": "all",
+      "feature": "streak_return",
+      "label": "本轮连板涨幅",
+      "lower": 0.610472695096926,
+      "upper": null,
+      "n": 57,
+      "risk": 17,
+      "rate": 0.298245614035088,
+      "ci": [
+        0.195325500748183,
+        0.426642801034596
+      ]
+    },
+    {
+      "split": "all",
+      "feature": "board_turnover_sum",
+      "label": "板段累计换手",
+      "lower": null,
+      "upper": 0.1275365,
+      "n": 74,
+      "risk": 18,
+      "rate": 0.243243243243243,
+      "ci": [
+        0.159764978407807,
+        0.352063286687634
+      ]
+    },
+    {
+      "split": "all",
+      "feature": "board_turnover_sum",
+      "label": "板段累计换手",
+      "lower": 0.1275365,
+      "upper": 0.271995,
+      "n": 82,
+      "risk": 12,
+      "rate": 0.146341463414634,
+      "ci": [
+        0.085741622102307,
+        0.238594184898006
+      ]
+    },
+    {
+      "split": "all",
+      "feature": "board_turnover_sum",
+      "label": "板段累计换手",
+      "lower": 0.271995,
+      "upper": 0.46569125,
+      "n": 86,
+      "risk": 26,
+      "rate": 0.302325581395349,
+      "ci": [
+        0.2154352168148,
+        0.40612034955398
+      ]
+    },
+    {
+      "split": "all",
+      "feature": "board_turnover_sum",
+      "label": "板段累计换手",
+      "lower": 0.46569125,
+      "upper": null,
+      "n": 64,
+      "risk": 11,
+      "rate": 0.171875,
+      "ci": [
+        0.098777423012448,
+        0.282132116226579
+      ]
+    },
+    {
+      "split": "all",
+      "feature": "market_limit_count",
+      "label": "市场涨停家数",
+      "lower": null,
+      "upper": 43.0,
+      "n": 53,
+      "risk": 10,
+      "rate": 0.188679245283019,
+      "ci": [
+        0.105853251076861,
+        0.313584590867022
+      ]
+    },
+    {
+      "split": "all",
+      "feature": "market_limit_count",
+      "label": "市场涨停家数",
+      "lower": 43.0,
+      "upper": 60.0,
+      "n": 65,
+      "risk": 13,
+      "rate": 0.2,
+      "ci": [
+        0.120779592412056,
+        0.312701326381656
+      ]
+    },
+    {
+      "split": "all",
+      "feature": "market_limit_count",
+      "label": "市场涨停家数",
+      "lower": 60.0,
+      "upper": 99.25,
+      "n": 127,
+      "risk": 27,
+      "rate": 0.21259842519685,
+      "ci": [
+        0.150424717494937,
+        0.291648149484942
+      ]
+    },
+    {
+      "split": "all",
+      "feature": "market_limit_count",
+      "label": "市场涨停家数",
+      "lower": 99.25,
+      "upper": null,
+      "n": 61,
+      "risk": 17,
+      "rate": 0.278688524590164,
+      "ci": [
+        0.181885438925662,
+        0.401714305881698
+      ]
+    },
+    {
+      "split": "all",
+      "feature": "market_median_return",
+      "label": "市场涨幅中位",
+      "lower": null,
+      "upper": -0.007386278535254,
+      "n": 77,
+      "risk": 18,
+      "rate": 0.233766233766234,
+      "ci": [
+        0.153296200910497,
+        0.33953828527885
+      ]
+    },
+    {
+      "split": "all",
+      "feature": "market_median_return",
+      "label": "市场涨幅中位",
+      "lower": -0.007386278535254,
+      "upper": 0.0,
+      "n": 87,
+      "risk": 23,
+      "rate": 0.264367816091954,
+      "ci": [
+        0.183100240134464,
+        0.365563987275982
+      ]
+    },
+    {
+      "split": "all",
+      "feature": "market_median_return",
+      "label": "市场涨幅中位",
+      "lower": 0.0,
+      "upper": 0.005174879905004,
+      "n": 54,
+      "risk": 11,
+      "rate": 0.203703703703704,
+      "ci": [
+        0.117740540874216,
+        0.32902306688335
+      ]
+    },
+    {
+      "split": "all",
+      "feature": "market_median_return",
+      "label": "市场涨幅中位",
+      "lower": 0.005174879905004,
+      "upper": null,
+      "n": 88,
+      "risk": 15,
+      "rate": 0.170454545454545,
+      "ci": [
+        0.106108221156329,
+        0.262368709145531
+      ]
+    },
+    {
+      "split": "all",
+      "feature": "market_reseal_fraction",
+      "label": "市场连板延续率",
+      "lower": null,
+      "upper": 0.212752525252525,
+      "n": 112,
+      "risk": 21,
+      "rate": 0.1875,
+      "ci": [
+        0.126034555405388,
+        0.269691286511451
+      ]
+    },
+    {
+      "split": "all",
+      "feature": "market_reseal_fraction",
+      "label": "市场连板延续率",
+      "lower": 0.212752525252525,
+      "upper": 0.271446078431372,
+      "n": 79,
+      "risk": 16,
+      "rate": 0.20253164556962,
+      "ci": [
+        0.128691102707067,
+        0.303960124479442
+      ]
+    },
+    {
+      "split": "all",
+      "feature": "market_reseal_fraction",
+      "label": "市场连板延续率",
+      "lower": 0.271446078431372,
+      "upper": 0.317762967255868,
+      "n": 65,
+      "risk": 17,
+      "rate": 0.261538461538462,
+      "ci": [
+        0.170181934132216,
+        0.379508026960222
+      ]
+    },
+    {
+      "split": "all",
+      "feature": "market_reseal_fraction",
+      "label": "市场连板延续率",
+      "lower": 0.317762967255868,
+      "upper": null,
+      "n": 50,
+      "risk": 13,
+      "rate": 0.26,
+      "ci": [
+        0.158715274935526,
+        0.395531572648484
+      ]
+    },
+    {
+      "split": "all",
+      "feature": "close_sealed_minutes",
+      "label": "D0收在板上分钟数",
+      "lower": null,
+      "upper": 227.75,
+      "n": 81,
+      "risk": 13,
+      "rate": 0.160493827160494,
+      "ci": [
+        0.096261542267115,
+        0.25547049105119
+      ]
+    },
+    {
+      "split": "all",
+      "feature": "close_sealed_minutes",
+      "label": "D0收在板上分钟数",
+      "lower": 227.75,
+      "upper": 240.0,
+      "n": 225,
+      "risk": 54,
+      "rate": 0.24,
+      "ci": [
+        0.188858505458122,
+        0.2998705010648
+      ]
+    },
+    {
+      "split": "all",
+      "feature": "close_sealed_minutes",
+      "label": "D0收在板上分钟数",
+      "lower": 240.0,
+      "upper": null,
+      "n": 0,
+      "risk": 0,
+      "rate": null,
+      "ci": [
+        null,
+        null
+      ]
+    }
+  ],
+  "sensitivity": [
+    {
+      "group": "当日市值",
+      "metrics": {
+        "n": 54,
+        "positives": 8,
+        "base_rate": 0.148148148148148,
+        "flagged": 8,
+        "caught": 3,
+        "false_flags": 5,
+        "missed": 5,
+        "precision": 0.375,
+        "recall": 0.375,
+        "false_positive_rate": 0.108695652173913,
+        "reject_fraction": 0.148148148148148,
+        "lift": 2.53125,
+        "retained_risk": 0.108695652173913,
+        "retained_risk_reduction": 0.039452495974235,
+        "flagged_risk_ci": [
+          0.136844285823601,
+          0.694257605397366
+        ],
+        "retained_risk_ci": [
+          0.04733145858099,
+          0.230378286442504
+        ],
+        "flagged_original_profit_count": 2,
+        "false_flag_original_profit_count": 2,
+        "original_net_mean_flagged": -0.047662673755848,
+        "original_net_mean_retained": 0.025281075800191
+      }
+    },
+    {
+      "group": "估算市值",
+      "metrics": {
+        "n": 44,
+        "positives": 6,
+        "base_rate": 0.136363636363636,
+        "flagged": 7,
+        "caught": 1,
+        "false_flags": 6,
+        "missed": 5,
+        "precision": 0.142857142857143,
+        "recall": 0.166666666666667,
+        "false_positive_rate": 0.157894736842105,
+        "reject_fraction": 0.159090909090909,
+        "lift": 1.047619047619048,
+        "retained_risk": 0.135135135135135,
+        "retained_risk_reduction": 0.001228501228501,
+        "flagged_risk_ci": [
+          0.025679624344745,
+          0.513127829274309
+        ],
+        "retained_risk_ci": [
+          0.059132944257321,
+          0.279774117840093
+        ],
+        "flagged_original_profit_count": 5,
+        "false_flag_original_profit_count": 5,
+        "original_net_mean_flagged": 0.03399302572478,
+        "original_net_mean_retained": 0.025694768755133
+      }
+    },
+    {
+      "group": "上半年",
+      "metrics": {
+        "n": 49,
+        "positives": 6,
+        "base_rate": 0.122448979591837,
+        "flagged": 7,
+        "caught": 1,
+        "false_flags": 6,
+        "missed": 5,
+        "precision": 0.142857142857143,
+        "recall": 0.166666666666667,
+        "false_positive_rate": 0.13953488372093,
+        "reject_fraction": 0.142857142857143,
+        "lift": 1.166666666666667,
+        "retained_risk": 0.119047619047619,
+        "retained_risk_reduction": 0.003401360544218,
+        "flagged_risk_ci": [
+          0.025679624344745,
+          0.513127829274309
+        ],
+        "retained_risk_ci": [
+          0.051938033277584,
+          0.250003902620092
+        ],
+        "flagged_original_profit_count": 5,
+        "false_flag_original_profit_count": 5,
+        "original_net_mean_flagged": 0.03399302572478,
+        "original_net_mean_retained": 0.025883359074796
+      }
+    },
+    {
+      "group": "第三季度",
+      "metrics": {
+        "n": 49,
+        "positives": 8,
+        "base_rate": 0.163265306122449,
+        "flagged": 8,
+        "caught": 3,
+        "false_flags": 5,
+        "missed": 5,
+        "precision": 0.375,
+        "recall": 0.375,
+        "false_positive_rate": 0.121951219512195,
+        "reject_fraction": 0.163265306122449,
+        "lift": 2.296875,
+        "retained_risk": 0.121951219512195,
+        "retained_risk_reduction": 0.041314086610254,
+        "flagged_risk_ci": [
+          0.136844285823601,
+          0.694257605397366
+        ],
+        "retained_risk_ci": [
+          0.053233364685778,
+          0.255442115209764
+        ],
+        "flagged_original_profit_count": 2,
+        "false_flag_original_profit_count": 2,
+        "original_net_mean_flagged": -0.047662673755848,
+        "original_net_mean_retained": 0.025037435356275
+      }
+    }
+  ],
+  "monthly": [
+    {
+      "month": "2026-01",
+      "metrics": {
+        "n": 12,
+        "positives": 3,
+        "base_rate": 0.25,
+        "flagged": 2,
+        "caught": 1,
+        "false_flags": 1,
+        "missed": 2,
+        "precision": 0.5,
+        "recall": 0.333333333333333,
+        "false_positive_rate": 0.111111111111111,
+        "reject_fraction": 0.166666666666667,
+        "lift": 2.0,
+        "retained_risk": 0.2,
+        "retained_risk_reduction": 0.05,
+        "flagged_risk_ci": [
+          0.094531205734235,
+          0.905468794265765
+        ],
+        "retained_risk_ci": [
+          0.056682151454377,
+          0.50983752846335
+        ],
+        "flagged_original_profit_count": 1,
+        "false_flag_original_profit_count": 1,
+        "original_net_mean_flagged": -0.025343436473844,
+        "original_net_mean_retained": 0.066437506721052
+      }
+    },
+    {
+      "month": "2026-02",
+      "metrics": {
+        "n": 14,
+        "positives": 1,
+        "base_rate": 0.071428571428571,
+        "flagged": 2,
+        "caught": 0,
+        "false_flags": 2,
+        "missed": 1,
+        "precision": 0.0,
+        "recall": 0.0,
+        "false_positive_rate": 0.153846153846154,
+        "reject_fraction": 0.142857142857143,
+        "lift": 0.0,
+        "retained_risk": 0.083333333333333,
+        "retained_risk_reduction": -0.011904761904762,
+        "flagged_risk_ci": [
+          0.0,
+          0.657619772493334
+        ],
+        "retained_risk_ci": [
+          0.014865094404918,
+          0.353879911141108
+        ],
+        "flagged_original_profit_count": 2,
+        "false_flag_original_profit_count": 2,
+        "original_net_mean_flagged": 0.107466784079853,
+        "original_net_mean_retained": -0.001963093994604
+      }
+    },
+    {
+      "month": "2026-03",
+      "metrics": {
+        "n": 14,
+        "positives": 2,
+        "base_rate": 0.142857142857143,
+        "flagged": 3,
+        "caught": 0,
+        "false_flags": 3,
+        "missed": 2,
+        "precision": 0.0,
+        "recall": 0.0,
+        "false_positive_rate": 0.25,
+        "reject_fraction": 0.214285714285714,
+        "lift": 0.0,
+        "retained_risk": 0.181818181818182,
+        "retained_risk_reduction": -0.038961038961039,
+        "flagged_risk_ci": [
+          0.0,
+          0.561497031755032
+        ],
+        "retained_risk_ci": [
+          0.051367689746087,
+          0.476980561960836
+        ],
+        "flagged_original_profit_count": 2,
+        "false_flag_original_profit_count": 2,
+        "original_net_mean_flagged": 0.02456816162048,
+        "original_net_mean_retained": 0.029759657836414
+      }
+    },
+    {
+      "month": "2026-04",
+      "metrics": {
+        "n": 9,
+        "positives": 0,
+        "base_rate": 0.0,
+        "flagged": 0,
+        "caught": 0,
+        "false_flags": 0,
+        "missed": 0,
+        "precision": null,
+        "recall": null,
+        "false_positive_rate": 0.0,
+        "reject_fraction": 0.0,
+        "lift": null,
+        "retained_risk": 0.0,
+        "retained_risk_reduction": 0.0,
+        "flagged_risk_ci": [
+          null,
+          null
+        ],
+        "retained_risk_ci": [
+          0.0,
+          0.299145048419532
+        ],
+        "flagged_original_profit_count": 0,
+        "false_flag_original_profit_count": 0,
+        "original_net_mean_flagged": null,
+        "original_net_mean_retained": 0.013214100629511
+      }
+    },
+    {
+      "month": "2026-07",
+      "metrics": {
+        "n": 19,
+        "positives": 4,
+        "base_rate": 0.210526315789474,
+        "flagged": 3,
+        "caught": 0,
+        "false_flags": 3,
+        "missed": 4,
+        "precision": 0.0,
+        "recall": 0.0,
+        "false_positive_rate": 0.2,
+        "reject_fraction": 0.157894736842105,
+        "lift": 0.0,
+        "retained_risk": 0.25,
+        "retained_risk_reduction": -0.039473684210526,
+        "flagged_risk_ci": [
+          0.0,
+          0.561497031755032
+        ],
+        "retained_risk_ci": [
+          0.101820674912133,
+          0.494983165355081
+        ],
+        "flagged_original_profit_count": 1,
+        "false_flag_original_profit_count": 1,
+        "original_net_mean_flagged": -0.054446524853482,
+        "original_net_mean_retained": 0.019010126724535
+      }
+    },
+    {
+      "month": "2026-08",
+      "metrics": {
+        "n": 14,
+        "positives": 2,
+        "base_rate": 0.142857142857143,
+        "flagged": 1,
+        "caught": 1,
+        "false_flags": 0,
+        "missed": 1,
+        "precision": 1.0,
+        "recall": 0.5,
+        "false_positive_rate": 0.0,
+        "reject_fraction": 0.071428571428571,
+        "lift": 7.0,
+        "retained_risk": 0.076923076923077,
+        "retained_risk_reduction": 0.065934065934066,
+        "flagged_risk_ci": [
+          0.206549314377246,
+          1.0
+        ],
+        "retained_risk_ci": [
+          0.013710421242557,
+          0.333139509210987
+        ],
+        "flagged_original_profit_count": 0,
+        "false_flag_original_profit_count": 0,
+        "original_net_mean_flagged": -0.038405800208375,
+        "original_net_mean_retained": 0.034261478868178
+      }
+    },
+    {
+      "month": "2026-09",
+      "metrics": {
+        "n": 16,
+        "positives": 2,
+        "base_rate": 0.125,
+        "flagged": 4,
+        "caught": 2,
+        "false_flags": 2,
+        "missed": 0,
+        "precision": 0.5,
+        "recall": 1.0,
+        "false_positive_rate": 0.142857142857143,
+        "reject_fraction": 0.25,
+        "lift": 4.0,
+        "retained_risk": 0.0,
+        "retained_risk_reduction": 0.125,
+        "flagged_risk_ci": [
+          0.150038989152154,
+          0.849961010847846
+        ],
+        "retained_risk_ci": [
+          0.0,
+          0.242494006655231
+        ],
+        "flagged_original_profit_count": 1,
+        "false_flag_original_profit_count": 1,
+        "original_net_mean_flagged": -0.044889003819491,
+        "original_net_mean_retained": 0.0230811330607
+      }
+    }
+  ],
+  "subtargets": [
+    {
+      "target": "开盘跌停",
+      "metrics": {
+        "n": 98,
+        "positives": 7,
+        "base_rate": 0.071428571428571,
+        "flagged": 15,
+        "caught": 3,
+        "false_flags": 12,
+        "missed": 4,
+        "precision": 0.2,
+        "recall": 0.428571428571429,
+        "false_positive_rate": 0.131868131868132,
+        "reject_fraction": 0.153061224489796,
+        "lift": 2.8,
+        "retained_risk": 0.048192771084337,
+        "retained_risk_reduction": 0.023235800344234,
+        "flagged_risk_ci": [
+          0.070475493469817,
+          0.451854487151686
+        ],
+        "retained_risk_ci": [
+          0.018898615503293,
+          0.117458592004513
+        ],
+        "flagged_original_profit_count": 7,
+        "false_flag_original_profit_count": 7,
+        "original_net_mean_flagged": -0.009556680664889,
+        "original_net_mean_retained": 0.025465493141551
+      }
+    },
+    {
+      "target": "收盘跌停",
+      "metrics": {
+        "n": 98,
+        "positives": 12,
+        "base_rate": 0.122448979591837,
+        "flagged": 15,
+        "caught": 4,
+        "false_flags": 11,
+        "missed": 8,
+        "precision": 0.266666666666667,
+        "recall": 0.333333333333333,
+        "false_positive_rate": 0.127906976744186,
+        "reject_fraction": 0.153061224489796,
+        "lift": 2.177777777777778,
+        "retained_risk": 0.096385542168675,
+        "retained_risk_reduction": 0.026063437423162,
+        "flagged_risk_ci": [
+          0.108974533256926,
+          0.519504340559799
+        ],
+        "retained_risk_ci": [
+          0.049652740358923,
+          0.178826365014717
+        ],
+        "flagged_original_profit_count": 7,
+        "false_flag_original_profit_count": 7,
+        "original_net_mean_flagged": -0.009556680664889,
+        "original_net_mean_retained": 0.025465493141551
+      }
+    },
+    {
+      "target": "全天封死",
+      "metrics": {
+        "n": 98,
+        "positives": 4,
+        "base_rate": 0.040816326530612,
+        "flagged": 15,
+        "caught": 2,
+        "false_flags": 13,
+        "missed": 2,
+        "precision": 0.133333333333333,
+        "recall": 0.5,
+        "false_positive_rate": 0.138297872340426,
+        "reject_fraction": 0.153061224489796,
+        "lift": 3.266666666666667,
+        "retained_risk": 0.024096385542169,
+        "retained_risk_reduction": 0.016719940988444,
+        "flagged_risk_ci": [
+          0.037361259103067,
+          0.378819828323216
+        ],
+        "retained_risk_ci": [
+          0.006633166140728,
+          0.083663092434161
+        ],
+        "flagged_original_profit_count": 7,
+        "false_flag_original_profit_count": 7,
+        "original_net_mean_flagged": -0.009556680664889,
+        "original_net_mean_retained": 0.025465493141551
+      }
+    }
+  ],
+  "selection_unchanged": true
+}

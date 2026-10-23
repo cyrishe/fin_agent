@@ -1,0 +1,22 @@
+{
+  "source_D1_count": 306,
+  "source_D1_manifest_sha256": "b8ae0c60e9a86cfe76278397dde335682ca4866a02d06e48bed604991d90d451",
+  "source_R83_outcome_sha256": "d6eb2a2186ac8d6f3b9408b3d74b3f3f36920eaa65b75112a02921eb9d3af757",
+  "source_R75_panel_sha256": "f2e3c01a0fe55b37a6424ca415eabfbaf25dbb5da0fa7261f1c1a42b98b0ff76",
+  "source_R76_joined_sha256": "0f953e31e8ed57fd6167f8092b8e5e304d0de5c8389acc07659c0f2dafec92c8",
+  "outputs_sha256": {
+    "README.md": "8635b1431da49f6280289c5c15a4e0371b7add751509a75966e4ac5bbb0e7a2f",
+    "analyze.py": "29b96e7b074e58c4a1270d15d87ce99973f2c638b0877c2e4c89ab537e637682",
+    "replay.py": "d7316784efd78b9c1f6e7e1f899c0707c502de26a6d225e22a5bfecd43a254d2",
+    "306笔D1开盘五分钟逐笔.csv": "7d485cd4b2f34dc0f713c2e510b0b01436074c72bf295885f1c08416378c10c2",
+    "候选禁买规则分期得失.csv": "06d42eea70c1e8ba21f88fbd08e5358403d4e3b23bf07e387a63f4c30ec57236",
+    "各禁买口径逐年与连续账户价格假设.csv": "f1dbbfd42dddbec5743251d7614356f53222cfe0a8a1016295edd99982055ff8",
+    "五分钟收盘次数.csv": "db6dc21cd4067b858b71b3becbc019e8a2fc0595c502dc11c046283f8e08b4c1",
+    "四分钟收盘次数.csv": "458bf6f37ffbb92df2232ce0be2ec7d18c952c8265b461da4f37a81c675d62f9",
+    "五分钟触板次数.csv": "26e00b875bd11a822e7f155865ef5f7e90430bcda6ee063b9523646dfb8e6e54",
+    "五分钟整根次数.csv": "986205098ea9d6d09f96f7d76905ea31e173a5a198f038909823da80dc838a47",
+    "开盘跌停.csv": "a790634017ec918557ff966fac17fd77c5ff995bc8288182625499033c0102de",
+    "0935跌停.csv": "d554de8ccc399439b3984384b077c457a9b0029ce10ecd5200c67ee0b9f44ac6",
+    "12笔_五分钟曾收盘跌停.csv": "c7aac9e79dd23f0c2d8fdcdb662bf1ecf8dd989e7fd6becc54d2705744d340c9"
+  }
+}

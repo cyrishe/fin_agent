@@ -1,0 +1,11 @@
+{
+  "sample": 100,
+  "preboard_unique_pairs": 1880,
+  "preboard_valid_pairs": 1806,
+  "complete_5": 91,
+  "complete_10": 91,
+  "complete_20": 91,
+  "d2_minute_days": 100,
+  "all_daily_volume_checked": true,
+  "same_clock_0931_includes_auction": true
+}

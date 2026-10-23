@@ -1,0 +1,14 @@
+{
+  "scope": "2022-05—2026-09完整D0模型月，原B2 709笔，V2放行306笔；按D0月判停摆",
+  "selection": "D2收盘价等于按D2历史ST及板块算出的涨/跌停价，四舍五入至分；与数据库is_limit_price核对",
+  "next_day": "D2之后下一市场交易日D3；开盘/收盘价格÷D2收盘价−1，未扣费，不混用买入收益",
+  "morning_7": "D2 09:31—11:30已完成分钟最高价/D1收盘−1严格>7%；记录首次触发分钟，不用收盘涨停推断上午触发",
+  "simplified_exit": "按用户最新口径：上午超过7%卖出，其余默认盘末；本轮只研究封板后的次日变化，不执行生产替换",
+  "data_sources": {
+    "r67": "/data/cyris/work/b2_d2_intraday_r67_20261021",
+    "daily": "kingdomai.kcrp_stock_price",
+    "st": "kingdomai.kcrp_stock_st"
+  },
+  "new_database_record": false,
+  "production_modified": false
+}

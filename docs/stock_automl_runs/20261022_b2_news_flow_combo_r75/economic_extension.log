@@ -1,0 +1,26 @@
+VALIDATION ONLY SELECTED fit_econ_D1_news_flow_q80
+        family        model                    policy threshold_rule  threshold split   n  alerts  losers_avoided  winners_missed   forgone_1w   avoided_1w       net_1w  floor_caught  continuous_caught
+money_weighted D1_news_flow fit_econ_D1_news_flow_q80            q80   0.739251 train 152      31              27               4   166.133716 22447.111120 22280.977404            18                  6
+money_weighted D1_news_flow fit_econ_D1_news_flow_q80            q80   0.739251 valid  54      17              10               7  4393.434652  7824.813783  3431.379131             4                  0
+money_weighted D1_news_flow fit_econ_D1_news_flow_q80            q80   0.739251  test  98      41              23              18 15301.269019 12067.378699 -3233.890320             3                  1
+       model threshold_rule  alerts   forgone_1w   avoided_1w       net_1w
+D1_news_flow            q80      17  4393.434652  7824.813783  3431.379131
+          D1            q60      30 10579.695346 13900.112043  3320.416697
+D1_news_flow            q90       9  2190.566933  4926.272955  2735.706023
+     D1_news            q80      18  5501.630804  7824.813783  2323.182979
+          D1            q70      21  5901.788412  8182.053540  2280.265128
+     D1_flow            q60      32 12968.388831 15195.969998  2227.581167
+          D1            q90       8  1711.702314  3805.728555  2094.026241
+     D1_flow            q70      22  7196.057856  9223.823530  2027.765674
+D1_news_flow            q70      25  8661.700861 10254.281877  1592.581016
+          D1            q80      14  4348.076087  5477.191063  1129.114977
+     D1_news            q90       9  2270.888621  3249.378421   978.489800
+     D1_flow           half      40 17459.859955 18015.621645   555.761690
+     D1_flow            q90       8  3545.989094  4080.478285   534.489191
+     D1_flow            q80      13  4348.076087  4429.089812    81.013726
+     D1_news            q70      24  9101.124323  8958.423921  -142.700401
+          D1           half      41 18568.056107 18015.621645  -552.434462
+     D1_news           half      42 18906.756221 17953.983992  -952.772229
+D1_news_flow           half      43 19934.547328 17953.983992 -1980.563336
+     D1_news            q60      33 14642.389729 11872.015748 -2770.373982
+D1_news_flow            q60      36 18338.977777 11872.015748 -6466.962030

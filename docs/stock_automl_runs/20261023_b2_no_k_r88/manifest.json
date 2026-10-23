@@ -1,0 +1,9 @@
+{
+  "inputs": {
+    "/data/cyris/work/b2_idle_cross_r87_20261023/monthly_gate.csv": "2fb90314fd1dd89f092397de13d95d21380927ffbb6e1f494ab15d08a14006a2",
+    "/data/cyris/work/b2_floor_countermeasure_r86_20261022/306笔_综合因子与基线.csv": "b3e7c2be434e9bb319104dcd2b38bbbf252729a37b768f949bc723ee9d64091b",
+    "/data/cyris/work/b2_d2_intraday_r67_20261021/inputs/calendar.json": "48467afcb0babf08ea8481f396b13e71562c5e414abf09902751355d842de965",
+    "/data/cyris/fin_agent_deploy/b2-v2-20261021/assets/reference/four_all_top3.pkl": "d64e267e191a77f8b926e61ed8cfcae658369a873b428453941a30e7da287f68"
+  },
+  "script_sha256": "1627b33d9d77181015924e56afc7e5361b00fbd19245494245eabb9e124d5ba5"
+}

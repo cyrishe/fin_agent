@@ -1,0 +1,1612 @@
+[
+  {
+    "date": "2022-05-13",
+    "stock": "601368.SH",
+    "sha256": "7106273790c0c13e28763c9a8362958b98d4d8aa883f1087970ae5c00689e71c",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 33958155.0,
+    "daily_volume": 33958155.0,
+    "volume_ratio": 1.0
+  },
+  {
+    "date": "2022-05-18",
+    "stock": "000926.SZ",
+    "sha256": "4a10d4f43dffd9cc21a9e9f73a798af80a29a50817b8060f53f61201b48355e2",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 268328480.0,
+    "daily_volume": 268328479.0,
+    "volume_ratio": 1.0000000037267756
+  },
+  {
+    "date": "2022-05-23",
+    "stock": "000779.SZ",
+    "sha256": "c2e254b547daa8ad8f93cf4ab3017ab2d574f45060782e74281f3bb833d9cfcb",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 3182700.0,
+    "daily_volume": 3182700.0,
+    "volume_ratio": 1.0
+  },
+  {
+    "date": "2022-05-26",
+    "stock": "603166.SH",
+    "sha256": "33032f50404dbf3de58590493be523ceaae9fd513308703d6b260bccf0378cb4",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 62252680.0,
+    "daily_volume": 62252679.0,
+    "volume_ratio": 1.0000000160635658
+  },
+  {
+    "date": "2022-06-01",
+    "stock": "600962.SH",
+    "sha256": "de82b02c42e8a199bde4fd49317b578c71de3e8a10c29526109923d5ca1edcb3",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 2448600.0,
+    "daily_volume": 2448600.0,
+    "volume_ratio": 1.0
+  },
+  {
+    "date": "2022-06-02",
+    "stock": "000151.SZ",
+    "sha256": "dd78d22c1f2b523997d824ec66c27d9330f1558f598d6eaeddc1861303723078",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 97486549.0,
+    "daily_volume": 97486549.0,
+    "volume_ratio": 1.0
+  },
+  {
+    "date": "2022-06-06",
+    "stock": "000595.SZ",
+    "sha256": "6de28584463adc78399058e1b44f7723db7e0e9ec5633187d99a6d7e778c5371",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 42184400.0,
+    "daily_volume": 42184400.0,
+    "volume_ratio": 1.0
+  },
+  {
+    "date": "2022-06-07",
+    "stock": "002066.SZ",
+    "sha256": "090e2a12d1ce4ccfb443db2d2dfe5ada7ab2cbe741fafabc8847a1a8bae45c58",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 69465788.0,
+    "daily_volume": 69465787.0,
+    "volume_ratio": 1.0000000143955758
+  },
+  {
+    "date": "2022-06-13",
+    "stock": "002630.SZ",
+    "sha256": "00e1f6dd1960d9980e5c05f2c20a1e8c8c06db323f7a989cf1e27b506ba142ad",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 521244573.0,
+    "daily_volume": 521244572.0,
+    "volume_ratio": 1.0000000019184851
+  },
+  {
+    "date": "2022-06-15",
+    "stock": "600653.SH",
+    "sha256": "9ab3f634e7774fc8032ddb6b10615458aa6eb9864f2be5e0787baaeab8eadd8c",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 345906451.0,
+    "daily_volume": 345906450.0,
+    "volume_ratio": 1.000000002890955
+  },
+  {
+    "date": "2022-07-01",
+    "stock": "001316.SZ",
+    "sha256": "3cf49dcba7e0f24b2fa1da52ce6e5f48180806963e718f230d5239948fd85895",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 7866063.0,
+    "daily_volume": 7866063.0,
+    "volume_ratio": 1.0
+  },
+  {
+    "date": "2022-07-06",
+    "stock": "002528.SZ",
+    "sha256": "2381d16ce6da6c8caddca49be9228a1dbbca863a96a9d46a64387ff8ec27bb4b",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 12290300.0,
+    "daily_volume": 12290300.0,
+    "volume_ratio": 1.0
+  },
+  {
+    "date": "2022-07-14",
+    "stock": "600192.SH",
+    "sha256": "27fe32f35411928e70283d8a120bb8ececfb210831f399636c0ef118be26e37d",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 117368370.0,
+    "daily_volume": 117368370.0,
+    "volume_ratio": 1.0
+  },
+  {
+    "date": "2022-08-03",
+    "stock": "000678.SZ",
+    "sha256": "8bb86a2d4171c18976046f03587aa734208a05f9b589482e5d224a37e06a7828",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 103528707.0,
+    "daily_volume": 103528707.0,
+    "volume_ratio": 1.0
+  },
+  {
+    "date": "2022-08-09",
+    "stock": "002868.SZ",
+    "sha256": "bbc4acc68f94c275d1c43a587c772a89d7d3f42b3e6dbc432332c87ae640b8ca",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 1344000.0,
+    "daily_volume": 1344000.0,
+    "volume_ratio": 1.0
+  },
+  {
+    "date": "2022-08-22",
+    "stock": "002272.SZ",
+    "sha256": "1dc7574bbf4e49965066fa1a51162a8b04e45d34fdc75f798ff73e86ee9fcc00",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 41111700.0,
+    "daily_volume": 41111700.0,
+    "volume_ratio": 1.0
+  },
+  {
+    "date": "2022-09-13",
+    "stock": "000573.SZ",
+    "sha256": "13e98ca124ee41685ecca3890a9a5fe03762897727b08ed8f271c82995c44df7",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 153475881.0,
+    "daily_volume": 153475885.0,
+    "volume_ratio": 0.9999999739372736
+  },
+  {
+    "date": "2022-09-29",
+    "stock": "001238.SZ",
+    "sha256": "32616386c526ae4809b6aff07c96dddbc22fe8e2116bd8e3a8add46a3fb2523b",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 6194293.0,
+    "daily_volume": 6194293.0,
+    "volume_ratio": 1.0
+  },
+  {
+    "date": "2022-10-25",
+    "stock": "002907.SZ",
+    "sha256": "f1d6214cabe5da63d10f7944f7cf262738b203f40047971033807a6fea00b32c",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 4944400.0,
+    "daily_volume": 4944400.0,
+    "volume_ratio": 1.0
+  },
+  {
+    "date": "2022-10-27",
+    "stock": "001300.SZ",
+    "sha256": "9c88a71b701fd05a6d257062c41ac05f12ff4cbc79a58660bce9a74acdaef9d5",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 12214300.0,
+    "daily_volume": 12214300.0,
+    "volume_ratio": 1.0
+  },
+  {
+    "date": "2022-10-28",
+    "stock": "002296.SZ",
+    "sha256": "206a42d052a4486ab9590b5d9f610f58a0c48caa729a6cda6e51e682b0b52397",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 118776633.0,
+    "daily_volume": 118776633.0,
+    "volume_ratio": 1.0
+  },
+  {
+    "date": "2022-11-28",
+    "stock": "001338.SZ",
+    "sha256": "8b350f250dafdd13ec36df57b6381a020646e557ecb58e42dbd97c4d9c5800eb",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 65714612.0,
+    "daily_volume": 65714612.0,
+    "volume_ratio": 1.0
+  },
+  {
+    "date": "2022-12-02",
+    "stock": "000797.SZ",
+    "sha256": "dde319d33b538eb768c06c1952b1b9ed502052ca7511c4a282c1d240d5e58b65",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 51682400.0,
+    "daily_volume": 51682400.0,
+    "volume_ratio": 1.0
+  },
+  {
+    "date": "2023-02-20",
+    "stock": "001339.SZ",
+    "sha256": "f62c95ec22cf0f863bdb38f44a18e0712e0d84cd1e6f9b35dc1cecab3f4bd9b5",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 36389037.0,
+    "daily_volume": 36389037.0,
+    "volume_ratio": 1.0
+  },
+  {
+    "date": "2023-05-10",
+    "stock": "600228.SH",
+    "sha256": "460ceeea1ac28a4b837f9eba78814429cb9004d3a63b1d4c9b5d6141f621a31d",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 52377613.0,
+    "daily_volume": 52377613.0,
+    "volume_ratio": 1.0
+  },
+  {
+    "date": "2023-06-01",
+    "stock": "603291.SH",
+    "sha256": "a827bffa7a245215011809c6ada48f0b7ff670819ad687fc15c3c08f3967eaf9",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 4279600.0,
+    "daily_volume": 4279600.0,
+    "volume_ratio": 1.0
+  },
+  {
+    "date": "2023-09-27",
+    "stock": "002892.SZ",
+    "sha256": "e7239c34005543079891c3a8592e9abb6fcb0bb3aa31f84ddbfc61d9f3e1a1ff",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 20628300.0,
+    "daily_volume": 20628300.0,
+    "volume_ratio": 1.0
+  },
+  {
+    "date": "2023-10-09",
+    "stock": "002691.SZ",
+    "sha256": "a7b68807212ab7bd369ae56d44226caa47223d8a526aae463ff7dcf5b319c7d2",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 8368200.0,
+    "daily_volume": 8368200.0,
+    "volume_ratio": 1.0
+  },
+  {
+    "date": "2023-10-17",
+    "stock": "002708.SZ",
+    "sha256": "d7864a063140379839b7db719e2bfb34bdc5e51facec3a7be1c9d4c4c596a0f8",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 84419117.0,
+    "daily_volume": 84419117.0,
+    "volume_ratio": 1.0
+  },
+  {
+    "date": "2023-10-19",
+    "stock": "002316.SZ",
+    "sha256": "104019771bb33eabe41bb04fb1df6e60775b60e7b83e7954497c35f9a13ab362",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 111508653.0,
+    "daily_volume": 111508653.0,
+    "volume_ratio": 1.0
+  },
+  {
+    "date": "2023-10-25",
+    "stock": "600520.SH",
+    "sha256": "22a90cc92496fec20e90cbbfaf5a8408ad940a1a24a90f42366d40a97198c802",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 2556300.0,
+    "daily_volume": 2556300.0,
+    "volume_ratio": 1.0
+  },
+  {
+    "date": "2023-11-09",
+    "stock": "603266.SH",
+    "sha256": "b934e6f168211d842a2f5676b6192f968820f7562428888c00c1343d282e49a6",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 42570198.0,
+    "daily_volume": 42570198.0,
+    "volume_ratio": 1.0
+  },
+  {
+    "date": "2023-11-27",
+    "stock": "603598.SH",
+    "sha256": "958a44b7424e70bf2c62483ec70b334c6973e052fb1fae37c3cca1f6bd88f3fa",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 43320794.0,
+    "daily_volume": 43320794.0,
+    "volume_ratio": 1.0
+  },
+  {
+    "date": "2023-12-11",
+    "stock": "002451.SZ",
+    "sha256": "152b2e1c86e604f375161f2c6fde48b919af06c8978ac662578760d8e1d82441",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 96185271.0,
+    "daily_volume": 96185271.0,
+    "volume_ratio": 1.0
+  },
+  {
+    "date": "2023-12-22",
+    "stock": "600692.SH",
+    "sha256": "d896f7c9961bfb6caa4d65bfae7f1a72286b31c9870bc8537d874d62264463af",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 58929093.0,
+    "daily_volume": 58929093.0,
+    "volume_ratio": 1.0
+  },
+  {
+    "date": "2024-01-11",
+    "stock": "002347.SZ",
+    "sha256": "4b9250aa8e0258f2f7be808e1e16b168cca14173b9212ecf5acaa934f93d3c96",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 148271994.0,
+    "daily_volume": 148271994.0,
+    "volume_ratio": 1.0
+  },
+  {
+    "date": "2024-01-18",
+    "stock": "002868.SZ",
+    "sha256": "bb96f0507b804369b27caf77dff47acc7fd76e342728c07a234ad22b842008b6",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 11800671.0,
+    "daily_volume": 11800671.0,
+    "volume_ratio": 1.0
+  },
+  {
+    "date": "2024-01-25",
+    "stock": "603810.SH",
+    "sha256": "4dfa96e2d1267a429da8f96a300c3726a4ff08e6af9b908a4ecad3b917733a34",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 45284326.0,
+    "daily_volume": 45284326.0,
+    "volume_ratio": 1.0
+  },
+  {
+    "date": "2024-01-26",
+    "stock": "600200.SH",
+    "sha256": "85a185a12df8a699e0e1bbd3b02f54a4a3c3f60c0397b32ed75c408dc7cbe904",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 129068427.0,
+    "daily_volume": 129068427.0,
+    "volume_ratio": 1.0
+  },
+  {
+    "date": "2024-01-30",
+    "stock": "600053.SH",
+    "sha256": "826faac21806c0e1442f57c9af79f7e770971ead4f1b4b800f2dde803397806e",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 1573800.0,
+    "daily_volume": 1573800.0,
+    "volume_ratio": 1.0
+  },
+  {
+    "date": "2024-02-05",
+    "stock": "600088.SH",
+    "sha256": "73b6df409dcbe56afdac247b94e77d5ecf566456fe72e5ed3f098a3c123a77ab",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 3625300.0,
+    "daily_volume": 3625300.0,
+    "volume_ratio": 1.0
+  },
+  {
+    "date": "2024-02-06",
+    "stock": "003042.SZ",
+    "sha256": "feb5c173714d15d9d14f9453893c37cbbe966072aa21e0764279dc5bc9ea6970",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 16597045.0,
+    "daily_volume": 16597045.0,
+    "volume_ratio": 1.0
+  },
+  {
+    "date": "2024-03-27",
+    "stock": "603499.SH",
+    "sha256": "d08b879e754990813fb52ac0b7969775fe9dbe0000ef57f4bc36068d2ffcece7",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 5780700.0,
+    "daily_volume": 5780700.0,
+    "volume_ratio": 1.0
+  },
+  {
+    "date": "2024-03-28",
+    "stock": "600243.SH",
+    "sha256": "d39d32882c3a81f67a5ec23a3b073edd7bc9207eb3bdbf53e6f272865e860da9",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 133187986.0,
+    "daily_volume": 133187987.0,
+    "volume_ratio": 0.9999999924918154
+  },
+  {
+    "date": "2024-03-29",
+    "stock": "603626.SH",
+    "sha256": "d5efb19e726ddee5958080c5219d1d5811700847d8a24519b3650226ef6d141a",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 122672673.0,
+    "daily_volume": 122672673.0,
+    "volume_ratio": 1.0
+  },
+  {
+    "date": "2024-04-09",
+    "stock": "603172.SH",
+    "sha256": "181f309418608f1f0b6efecc03d68d73911d223c57260080a0404fa0f268a6f6",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 1178200.0,
+    "daily_volume": 1178200.0,
+    "volume_ratio": 1.0
+  },
+  {
+    "date": "2024-04-19",
+    "stock": "002900.SZ",
+    "sha256": "97e1f572525bc51b785f2533f852110a5e033a3c5c47d43945478e36cda9def7",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 26659165.0,
+    "daily_volume": 26659165.0,
+    "volume_ratio": 1.0
+  },
+  {
+    "date": "2024-04-22",
+    "stock": "603860.SH",
+    "sha256": "997b18a9e183460b755f64e53ddd1b452e6f2cb6e255f3d02b32cb509aeb1a70",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 1708700.0,
+    "daily_volume": 1708700.0,
+    "volume_ratio": 1.0
+  },
+  {
+    "date": "2024-05-14",
+    "stock": "002076.SZ",
+    "sha256": "fdfb4922aa3080f6f8ff038250c3efaca5bc6a511934ade0acef832bb2bfd8e2",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 114802894.0,
+    "daily_volume": 114802894.0,
+    "volume_ratio": 1.0
+  },
+  {
+    "date": "2024-05-29",
+    "stock": "000638.SZ",
+    "sha256": "0d3960d11e9e29948ad2543c9b82c97902bc053ae948ab78d5a5aa3930f1c2a0",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 8399500.0,
+    "daily_volume": 8399500.0,
+    "volume_ratio": 1.0
+  },
+  {
+    "date": "2024-06-06",
+    "stock": "002811.SZ",
+    "sha256": "cf7cd89cb7b802759cfa1a850ad35f92b2fe8bf5895fc31eea2d1daf0404114c",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 3368550.0,
+    "daily_volume": 3368550.0,
+    "volume_ratio": 1.0
+  },
+  {
+    "date": "2024-06-24",
+    "stock": "002199.SZ",
+    "sha256": "f76d4ac3b8dcf3d47887b914c021e90ba73245bc053825960d96ec4325af4510",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 61743992.0,
+    "daily_volume": 61743992.0,
+    "volume_ratio": 1.0
+  },
+  {
+    "date": "2024-06-25",
+    "stock": "600889.SH",
+    "sha256": "2a00a49648a543efabe6a46db4e98b8c5665bc1341d58785ac907a20b2761c3c",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 80133155.0,
+    "daily_volume": 80133155.0,
+    "volume_ratio": 1.0
+  },
+  {
+    "date": "2024-06-26",
+    "stock": "000010.SZ",
+    "sha256": "1d484d0adaa4f018cfbd03c207a5c1676a9aa79d11783011fa25bbf204e893fa",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 81084401.0,
+    "daily_volume": 81084401.0,
+    "volume_ratio": 1.0
+  },
+  {
+    "date": "2024-06-27",
+    "stock": "001266.SZ",
+    "sha256": "42d0357a46a92f166a7db9a36c37ad18756af4e289e24f65a799456121097b67",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 3079100.0,
+    "daily_volume": 3079100.0,
+    "volume_ratio": 1.0
+  },
+  {
+    "date": "2024-06-28",
+    "stock": "605178.SH",
+    "sha256": "64d4a8b108735399399eb122885716b65adc963b1eb7f9dd5c1cdd27ecdaf65b",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 3871700.0,
+    "daily_volume": 3871700.0,
+    "volume_ratio": 1.0
+  },
+  {
+    "date": "2024-07-01",
+    "stock": "605178.SH",
+    "sha256": "a2edd3375dfbb07437f4accf949ec12acbdacac6777e148396b85891c585cb1a",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 17944425.0,
+    "daily_volume": 17944425.0,
+    "volume_ratio": 1.0
+  },
+  {
+    "date": "2024-07-09",
+    "stock": "600476.SH",
+    "sha256": "bc2b718eb727e6f6636871f28d7e947f54e57c9d63b9559e410cc735704bd28d",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 28937914.0,
+    "daily_volume": 28937914.0,
+    "volume_ratio": 1.0
+  },
+  {
+    "date": "2024-07-18",
+    "stock": "600650.SH",
+    "sha256": "9df5942d3263a2210fd452ca42b612db5350bb6735312be7718a134ad25498ef",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 80215343.0,
+    "daily_volume": 80215343.0,
+    "volume_ratio": 1.0
+  },
+  {
+    "date": "2024-07-22",
+    "stock": "600676.SH",
+    "sha256": "0ac8d6dbfd5d383b52c8ac36edba74b178f6d1aa767f34ba0e4cb53c1d9d4292",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 110674295.0,
+    "daily_volume": 110674295.0,
+    "volume_ratio": 1.0
+  },
+  {
+    "date": "2024-08-12",
+    "stock": "002072.SZ",
+    "sha256": "017aea2094e19f59c9d4d03a868aba849781be47d36ad37a1f451213655e4a3a",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 49837004.0,
+    "daily_volume": 49837004.0,
+    "volume_ratio": 1.0
+  },
+  {
+    "date": "2024-08-13",
+    "stock": "002285.SZ",
+    "sha256": "4844c766458dfdda4ed335380c6f89f1c57ceb2b8692bcae274f79e516260fd5",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 175316618.0,
+    "daily_volume": 175316618.0,
+    "volume_ratio": 1.0
+  },
+  {
+    "date": "2024-08-15",
+    "stock": "000509.SZ",
+    "sha256": "eca84288805af681263b874c01ddb11635f85e6f31d7c14cb536382c8bd20176",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 133812541.0,
+    "daily_volume": 133812542.0,
+    "volume_ratio": 0.999999992526859
+  },
+  {
+    "date": "2024-09-03",
+    "stock": "003015.SZ",
+    "sha256": "ab0cc3fd4554e4d57955f47bd8ab40b4130249bf5905957ee50b7fddadaec52a",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 63970259.0,
+    "daily_volume": 63970259.0,
+    "volume_ratio": 1.0
+  },
+  {
+    "date": "2024-09-18",
+    "stock": "002816.SZ",
+    "sha256": "5fb4ae07e159e2666d5a4b8f2257c24881a121e58f619a5fec2812f957dff228",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 8996446.0,
+    "daily_volume": 8996446.0,
+    "volume_ratio": 1.0
+  },
+  {
+    "date": "2024-09-23",
+    "stock": "600719.SH",
+    "sha256": "61de7cd783374453c1cd679bbda820b59ce33604be78734d496d3bd8c6d41d29",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 82976421.0,
+    "daily_volume": 82976421.0,
+    "volume_ratio": 1.0
+  },
+  {
+    "date": "2024-09-25",
+    "stock": "000004.SZ",
+    "sha256": "e696af1ca0a079fee94a5444c65d9598c50853416a42d0170d6beac22d74502f",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 45748342.0,
+    "daily_volume": 45748342.0,
+    "volume_ratio": 1.0
+  },
+  {
+    "date": "2024-10-14",
+    "stock": "002347.SZ",
+    "sha256": "900505ae59ac701fb1969303e94efb49f272e7926ad5f0d6bdab206db4c8c3c7",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 131959369.0,
+    "daily_volume": 131959369.0,
+    "volume_ratio": 1.0
+  },
+  {
+    "date": "2024-11-11",
+    "stock": "002765.SZ",
+    "sha256": "60ea08d2eaa3cec49837070369fa09c6671ae1add660e94d53173fdf3a810faf",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 24318400.0,
+    "daily_volume": 24318400.0,
+    "volume_ratio": 1.0
+  },
+  {
+    "date": "2024-11-12",
+    "stock": "000981.SZ",
+    "sha256": "20188e1139ff7a7bc5273d81e2358998f19bbe9222bdbf901529ea05429b32bc",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 1214697761.0,
+    "daily_volume": 1214697761.0,
+    "volume_ratio": 1.0
+  },
+  {
+    "date": "2024-12-09",
+    "stock": "000056.SZ",
+    "sha256": "ee525f55b29a766f905da39cad3bb9e6dd2f08bc831f63ecff959816725e3531",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 54531800.0,
+    "daily_volume": 54531800.0,
+    "volume_ratio": 1.0
+  },
+  {
+    "date": "2024-12-10",
+    "stock": "600172.SH",
+    "sha256": "c9446ac0ccdf6f3e666518fd2602849be2c916c8be805c2ad06db58718eca92d",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 412895633.0,
+    "daily_volume": 412895633.0,
+    "volume_ratio": 1.0
+  },
+  {
+    "date": "2024-12-11",
+    "stock": "603825.SH",
+    "sha256": "a4776cf6dd7ef4514d359e89f5134ce09a44a0edc32760fe45ba8861d2bfd650",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 10084600.0,
+    "daily_volume": 10084600.0,
+    "volume_ratio": 1.0
+  },
+  {
+    "date": "2024-12-12",
+    "stock": "002681.SZ",
+    "sha256": "455488ead1d633ab896e3bc750aa2e7fa0cd0c441e9d2402254cf41fb9db1f93",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 473635023.0,
+    "daily_volume": 473635025.0,
+    "volume_ratio": 0.9999999957773393
+  },
+  {
+    "date": "2024-12-13",
+    "stock": "603088.SH",
+    "sha256": "394f39367e047af817f257d036e973705f11fffa15f65ea55f4e5c6ff0f576a2",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 80042574.0,
+    "daily_volume": 80042574.0,
+    "volume_ratio": 1.0
+  },
+  {
+    "date": "2024-12-18",
+    "stock": "000530.SZ",
+    "sha256": "6886c57b4508a5680c37d123cf427c9e9fa516fef6970fec05aac6826ad186e3",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 169963715.0,
+    "daily_volume": 169963715.0,
+    "volume_ratio": 1.0
+  },
+  {
+    "date": "2024-12-19",
+    "stock": "002354.SZ",
+    "sha256": "4f3ca974ca69f68d75bcb8c88ca5c724dbd05c710b3ce40a9242a25e58a3691e",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 463144069.0,
+    "daily_volume": 463144069.0,
+    "volume_ratio": 1.0
+  },
+  {
+    "date": "2024-12-23",
+    "stock": "002181.SZ",
+    "sha256": "c22ecd1da506bcd10e70c5fad1577809fd6acd4574047ddfe20d647080dd85e1",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 2446800.0,
+    "daily_volume": 2446800.0,
+    "volume_ratio": 1.0
+  },
+  {
+    "date": "2025-01-13",
+    "stock": "603269.SH",
+    "sha256": "28996d4bedc591a077b371b7b99bad2a6c8836076a31a7990775f0e1f9aacdca",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 21639667.0,
+    "daily_volume": 21639667.0,
+    "volume_ratio": 1.0
+  },
+  {
+    "date": "2025-01-20",
+    "stock": "002291.SZ",
+    "sha256": "c7aac0e2f1ce54a6ccc819f0bc76293e677f045a3b763d74522eaebce75b26f0",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 94398034.0,
+    "daily_volume": 94398034.0,
+    "volume_ratio": 1.0
+  },
+  {
+    "date": "2025-02-06",
+    "stock": "605069.SH",
+    "sha256": "2ec3688c1fcf10b6cf19e7574f6ba4b4f84338d84a6ae969a3ab1841d6892565",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 23933541.0,
+    "daily_volume": 23933541.0,
+    "volume_ratio": 1.0
+  },
+  {
+    "date": "2025-02-18",
+    "stock": "002313.SZ",
+    "sha256": "aec6a082b23cb62388fcf9aafa815a74b998e5f3362a6409e49e7dfb45f52ca3",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 12636100.0,
+    "daily_volume": 12636100.0,
+    "volume_ratio": 1.0
+  },
+  {
+    "date": "2025-02-25",
+    "stock": "002343.SZ",
+    "sha256": "2710e207730e4bc982c55546a482ff029750800dcfd785fea29a9b423e6e8604",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 115078368.0,
+    "daily_volume": 115078368.0,
+    "volume_ratio": 1.0
+  },
+  {
+    "date": "2025-03-26",
+    "stock": "001202.SZ",
+    "sha256": "1a061be5a25f447cfec0b40f69a4a778da68bcc389616e3d2cb19c26112df8fd",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 2476300.0,
+    "daily_volume": 2476300.0,
+    "volume_ratio": 1.0
+  },
+  {
+    "date": "2025-04-07",
+    "stock": "002923.SZ",
+    "sha256": "d6643ea22de74bab839428700d0f1bb4046eeed6f261fd3bd1e4076aa6d1650e",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 2489700.0,
+    "daily_volume": 2489700.0,
+    "volume_ratio": 1.0
+  },
+  {
+    "date": "2025-04-14",
+    "stock": "002800.SZ",
+    "sha256": "9904f16c99f81b5748576f80c09a67aba9c3c9993634f8566b25fbdfe38f2ae7",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 35445059.0,
+    "daily_volume": 35445059.0,
+    "volume_ratio": 1.0
+  },
+  {
+    "date": "2025-04-30",
+    "stock": "601956.SH",
+    "sha256": "8a1eefb8600a582d8a66d2c311f536abaa17132e8d941117f23d3bf4be06eb28",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 140455796.0,
+    "daily_volume": 140455796.0,
+    "volume_ratio": 1.0
+  },
+  {
+    "date": "2025-06-13",
+    "stock": "002181.SZ",
+    "sha256": "bb1bdca02dfc7a750aaba6da0ba18eec850779eca442cfea2b5d213c1fef794a",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 195282608.0,
+    "daily_volume": 195282608.0,
+    "volume_ratio": 1.0
+  },
+  {
+    "date": "2025-06-20",
+    "stock": "600722.SH",
+    "sha256": "11fe85d03050dab9f504b0a9bfa7ea7404cf4d54806e28be1e823477f6cc0160",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 114837217.0,
+    "daily_volume": 114837217.0,
+    "volume_ratio": 1.0
+  },
+  {
+    "date": "2025-08-04",
+    "stock": "603839.SH",
+    "sha256": "faab88a6dd483594531c041070652c9bce6dafa921ce844f9608d50a42c65289",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 41591581.0,
+    "daily_volume": 41591581.0,
+    "volume_ratio": 1.0
+  },
+  {
+    "date": "2025-08-07",
+    "stock": "002775.SZ",
+    "sha256": "cbf5639eab3baf177f273910a89fb909e6224bc161188193ece09fa593bdb4f8",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 28711200.0,
+    "daily_volume": 28711200.0,
+    "volume_ratio": 1.0
+  },
+  {
+    "date": "2025-09-05",
+    "stock": "002547.SZ",
+    "sha256": "5ab84323c51c9a457f621fc63214585f7b0abd39662c02381a8d415781bcb48b",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 363198263.0,
+    "daily_volume": 363198263.0,
+    "volume_ratio": 1.0
+  },
+  {
+    "date": "2025-09-19",
+    "stock": "000559.SZ",
+    "sha256": "09ff0c0b532eeabff54cc76cbbfa4cebb69edb290b1c091b6a19f331babd718c",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 289655801.0,
+    "daily_volume": 289655801.0,
+    "volume_ratio": 1.0
+  },
+  {
+    "date": "2025-09-26",
+    "stock": "600167.SH",
+    "sha256": "23ec5e949107e2272b76af3484fd75f59f9a0400fd0e23b0fc960ed2c891f253",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 91685394.0,
+    "daily_volume": 91685394.0,
+    "volume_ratio": 1.0
+  },
+  {
+    "date": "2025-10-22",
+    "stock": "000626.SZ",
+    "sha256": "5964cc107a627b7a87542ecb2b4c04fde57f365382bfba5fed3fc1615198cdbb",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 66030262.0,
+    "daily_volume": 66030262.0,
+    "volume_ratio": 1.0
+  },
+  {
+    "date": "2025-11-06",
+    "stock": "000592.SZ",
+    "sha256": "83688c6ed9df2340ed2e7abce25e572a428fd3db3ce3d8c92b80d0b496faa450",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 673317168.0,
+    "daily_volume": 673317168.0,
+    "volume_ratio": 1.0
+  },
+  {
+    "date": "2025-11-18",
+    "stock": "600693.SH",
+    "sha256": "397a86c19d1fc175cb238ebcb05bcde1c5367ff546ed87748e6912a72e7eba8a",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 77958586.0,
+    "daily_volume": 77958586.0,
+    "volume_ratio": 1.0
+  },
+  {
+    "date": "2025-11-19",
+    "stock": "002083.SZ",
+    "sha256": "327f7260e0bb8497cf786f79fed25a7b9f56cf10d5228fe386ce425d74df094e",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 256256546.0,
+    "daily_volume": 256256546.0,
+    "volume_ratio": 1.0
+  },
+  {
+    "date": "2025-11-21",
+    "stock": "000546.SZ",
+    "sha256": "6ccd34fe31180ad5869f2e5aa42de4bc1e45a842395bcd922ea63a6946a45807",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 13116900.0,
+    "daily_volume": 13116900.0,
+    "volume_ratio": 1.0
+  },
+  {
+    "date": "2026-01-13",
+    "stock": "002774.SZ",
+    "sha256": "29347bdefdfdf656651e311af35167e95b4667a1fdb2e91b26f0d4c338b0287e",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 16258057.0,
+    "daily_volume": 16258057.0,
+    "volume_ratio": 1.0
+  },
+  {
+    "date": "2026-01-26",
+    "stock": "000036.SZ",
+    "sha256": "d052bbd10a04c4bdd3b9c795367deb88962f97f9f2544ca7eb0ccd84911db262",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 156480027.0,
+    "daily_volume": 156480027.0,
+    "volume_ratio": 1.0
+  },
+  {
+    "date": "2026-02-02",
+    "stock": "601212.SH",
+    "sha256": "48c56cfb9cd31b10a2dba167f0c175a2d9cd490b6370095b0e9ac42f590ec3f3",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 9183500.0,
+    "daily_volume": 9183500.0,
+    "volume_ratio": 1.0
+  },
+  {
+    "date": "2026-02-10",
+    "stock": "600814.SH",
+    "sha256": "eb5782a323b5f2e5c04c2c8fc88b729417694a11dfd664aa8bf22ef98eadd269",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 92293633.0,
+    "daily_volume": 92293633.0,
+    "volume_ratio": 1.0
+  },
+  {
+    "date": "2026-03-04",
+    "stock": "600301.SH",
+    "sha256": "b5e69523e449fdbc927371656d2c3664f13e0de7b8cd5b8b537e6540bde8ff9b",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 19160750.0,
+    "daily_volume": 19160750.0,
+    "volume_ratio": 1.0
+  },
+  {
+    "date": "2026-03-13",
+    "stock": "600108.SH",
+    "sha256": "a08b95df544fa9d852940f9f7e62a6e877120490534815861f895d0c503e7610",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 361044318.0,
+    "daily_volume": 361044318.0,
+    "volume_ratio": 1.0
+  },
+  {
+    "date": "2026-05-08",
+    "stock": "002081.SZ",
+    "sha256": "d10408f888f5a95aa477f52f82f044afed22239c16eacbd4e976bec10c8fa1b3",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 576091082.0,
+    "daily_volume": 576091082.0,
+    "volume_ratio": 1.0
+  },
+  {
+    "date": "2026-06-08",
+    "stock": "603330.SH",
+    "sha256": "edc40912c83c2475767da9590b5068be204da50072cebca7a2ac5ecc40ef46e8",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 91019487.0,
+    "daily_volume": 91019487.0,
+    "volume_ratio": 1.0
+  },
+  {
+    "date": "2026-07-16",
+    "stock": "603137.SH",
+    "sha256": "67f2943ecd85e8866808e20bad8a0d1bf062c5bd5fb40b3664c09096f261f518",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 2709400.0,
+    "daily_volume": 2709400.0,
+    "volume_ratio": 1.0
+  },
+  {
+    "date": "2026-07-17",
+    "stock": "603137.SH",
+    "sha256": "ebe081b16dff59023f8087298b922c175492a1cf282105ad611ffc3f24858393",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 2309400.0,
+    "daily_volume": 2309400.0,
+    "volume_ratio": 1.0
+  },
+  {
+    "date": "2026-07-20",
+    "stock": "600664.SH",
+    "sha256": "956fbe215c7da5cbaf5fff82fe144cefcc1369d2d354580a722d3df64c899be6",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 741867065.0,
+    "daily_volume": 741867065.0,
+    "volume_ratio": 1.0
+  },
+  {
+    "date": "2026-07-30",
+    "stock": "000533.SZ",
+    "sha256": "1710315da7a9c0400e5cf0499f90ab406a86ae31bc69baa2292b855167f66422",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 140420355.0,
+    "daily_volume": 140420355.0,
+    "volume_ratio": 1.0
+  },
+  {
+    "date": "2026-08-18",
+    "stock": "002172.SZ",
+    "sha256": "0affe4afc857ce287e5634c8ae24431e04b296750f8c6924ccb1d62e8d3af062",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 184119600.0,
+    "daily_volume": 184119503.0,
+    "volume_ratio": 1.0000005268317502
+  },
+  {
+    "date": "2026-08-21",
+    "stock": "603395.SH",
+    "sha256": "fceea6bff7778cedc24c0b1f141e6e3e0468d9f68a58e5e1f089ba31609ef868",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 9766700.0,
+    "daily_volume": 9766464.0,
+    "volume_ratio": 1.000024164323956
+  },
+  {
+    "date": "2026-09-04",
+    "stock": "600892.SH",
+    "sha256": "151d11471ffb63ef97b374756e8bcc5af7b7e5cb8a89eefdeb3ac0575a9a6745",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 166486400.0,
+    "daily_volume": 166486400.0,
+    "volume_ratio": 1.0
+  },
+  {
+    "date": "2026-09-11",
+    "stock": "002295.SZ",
+    "sha256": "046429126d546bb692a6c2deb8d73112e2e84cd34a271bec5dc06c5cdcf341b8",
+    "price_differences": {
+      "open": 0.0,
+      "high": 0.0,
+      "low": 0.0,
+      "close": 0.0
+    },
+    "minute_volume": 3451400.0,
+    "daily_volume": 3451400.0,
+    "volume_ratio": 1.0
+  }
+]

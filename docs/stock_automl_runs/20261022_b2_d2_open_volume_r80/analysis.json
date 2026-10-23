@@ -1,0 +1,12 @@
+{
+  "n_all_touch": 100,
+  "n_open_floor": 34,
+  "n_all_day_locked": 14,
+  "n_first_minute_still_locked": 21,
+  "n_opened_first_minute": 13,
+  "n_complete5_all": 91,
+  "n_complete10_all": 91,
+  "n_complete20_all": 91,
+  "n_complete5_opening": 32,
+  "feature_clock_starts_at_0931_including_auction": true
+}

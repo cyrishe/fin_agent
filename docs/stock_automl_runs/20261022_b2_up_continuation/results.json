@@ -1,0 +1,571 @@
+{
+  "experiment": "B2_UP_CONTINUATION_20261022",
+  "scope": "Frozen V2 306 selected and purchased trades",
+  "period": "D0 2022-05 through 2026-09; last D2 2026-10-09",
+  "definitions": {
+    "D2": "Original planned sell day",
+    "D3": "Next exchange trading day after D2",
+    "limit_up": "Historical board/ST rounded upper price at daily close",
+    "d3_return": "D3 close / D3 official reference preclose - 1, before fees; bins left-closed/right-open"
+  },
+  "counts": {
+    "selected": 306,
+    "d2_up": 91,
+    "d3_up": 52,
+    "consecutive_up": 29,
+    "d3_up_after_d2_not_up": 23,
+    "d2_up_without_d3_up": 62,
+    "d2_morning_7pct_within_consecutive": 29,
+    "overlapping_observed_intervals": 28
+  },
+  "bands": [
+    {
+      "band": "跌超10%",
+      "全部选中306笔": 21,
+      "D2涨停91笔": 8,
+      "D2未涨停215笔": 13
+    },
+    {
+      "band": "跌5%至10%",
+      "全部选中306笔": 85,
+      "D2涨停91笔": 18,
+      "D2未涨停215笔": 67
+    },
+    {
+      "band": "跌不足5%",
+      "全部选中306笔": 69,
+      "D2涨停91笔": 16,
+      "D2未涨停215笔": 53
+    },
+    {
+      "band": "涨0%至5%",
+      "全部选中306笔": 54,
+      "D2涨停91笔": 9,
+      "D2未涨停215笔": 45
+    },
+    {
+      "band": "涨5%至10%",
+      "全部选中306笔": 52,
+      "D2涨停91笔": 26,
+      "D2未涨停215笔": 26
+    },
+    {
+      "band": "涨至少10%",
+      "全部选中306笔": 25,
+      "D2涨停91笔": 14,
+      "D2未涨停215笔": 11
+    }
+  ],
+  "years": [
+    {
+      "year": "2022",
+      "selected": 35,
+      "d2_up": 11,
+      "d3_up": 9,
+      "consecutive": 5
+    },
+    {
+      "year": "2023",
+      "selected": 64,
+      "d2_up": 22,
+      "d3_up": 15,
+      "consecutive": 9
+    },
+    {
+      "year": "2024",
+      "selected": 53,
+      "d2_up": 16,
+      "d3_up": 9,
+      "consecutive": 4
+    },
+    {
+      "year": "2025",
+      "selected": 56,
+      "d2_up": 20,
+      "d3_up": 6,
+      "consecutive": 3
+    },
+    {
+      "year": "2026",
+      "selected": 98,
+      "d2_up": 22,
+      "d3_up": 13,
+      "consecutive": 8
+    }
+  ],
+  "months": [
+    {
+      "month": "2022-05",
+      "selected": 12,
+      "d2_up": 6,
+      "d3_up": 6,
+      "consecutive": 4
+    },
+    {
+      "month": "2022-06",
+      "selected": 12,
+      "d2_up": 2,
+      "d3_up": 3,
+      "consecutive": 1
+    },
+    {
+      "month": "2022-07",
+      "selected": 1,
+      "d2_up": 0,
+      "d3_up": 0,
+      "consecutive": 0
+    },
+    {
+      "month": "2022-08",
+      "selected": 9,
+      "d2_up": 3,
+      "d3_up": 0,
+      "consecutive": 0
+    },
+    {
+      "month": "2022-09",
+      "selected": 1,
+      "d2_up": 0,
+      "d3_up": 0,
+      "consecutive": 0
+    },
+    {
+      "month": "2023-01",
+      "selected": 6,
+      "d2_up": 5,
+      "d3_up": 1,
+      "consecutive": 1
+    },
+    {
+      "month": "2023-02",
+      "selected": 9,
+      "d2_up": 0,
+      "d3_up": 0,
+      "consecutive": 0
+    },
+    {
+      "month": "2023-03",
+      "selected": 2,
+      "d2_up": 1,
+      "d3_up": 1,
+      "consecutive": 1
+    },
+    {
+      "month": "2023-05",
+      "selected": 9,
+      "d2_up": 4,
+      "d3_up": 4,
+      "consecutive": 1
+    },
+    {
+      "month": "2023-06",
+      "selected": 10,
+      "d2_up": 0,
+      "d3_up": 1,
+      "consecutive": 0
+    },
+    {
+      "month": "2023-07",
+      "selected": 1,
+      "d2_up": 0,
+      "d3_up": 0,
+      "consecutive": 0
+    },
+    {
+      "month": "2023-10",
+      "selected": 9,
+      "d2_up": 3,
+      "d3_up": 4,
+      "consecutive": 3
+    },
+    {
+      "month": "2023-11",
+      "selected": 2,
+      "d2_up": 2,
+      "d3_up": 1,
+      "consecutive": 1
+    },
+    {
+      "month": "2023-12",
+      "selected": 16,
+      "d2_up": 7,
+      "d3_up": 3,
+      "consecutive": 2
+    },
+    {
+      "month": "2024-01",
+      "selected": 15,
+      "d2_up": 4,
+      "d3_up": 4,
+      "consecutive": 2
+    },
+    {
+      "month": "2024-02",
+      "selected": 1,
+      "d2_up": 0,
+      "d3_up": 0,
+      "consecutive": 0
+    },
+    {
+      "month": "2024-09",
+      "selected": 8,
+      "d2_up": 2,
+      "d3_up": 0,
+      "consecutive": 0
+    },
+    {
+      "month": "2024-11",
+      "selected": 13,
+      "d2_up": 6,
+      "d3_up": 3,
+      "consecutive": 1
+    },
+    {
+      "month": "2024-12",
+      "selected": 16,
+      "d2_up": 4,
+      "d3_up": 2,
+      "consecutive": 1
+    },
+    {
+      "month": "2025-01",
+      "selected": 2,
+      "d2_up": 1,
+      "d3_up": 0,
+      "consecutive": 0
+    },
+    {
+      "month": "2025-06",
+      "selected": 17,
+      "d2_up": 7,
+      "d3_up": 1,
+      "consecutive": 0
+    },
+    {
+      "month": "2025-07",
+      "selected": 2,
+      "d2_up": 0,
+      "d3_up": 0,
+      "consecutive": 0
+    },
+    {
+      "month": "2025-09",
+      "selected": 15,
+      "d2_up": 4,
+      "d3_up": 2,
+      "consecutive": 1
+    },
+    {
+      "month": "2025-10",
+      "selected": 9,
+      "d2_up": 3,
+      "d3_up": 3,
+      "consecutive": 2
+    },
+    {
+      "month": "2025-11",
+      "selected": 11,
+      "d2_up": 5,
+      "d3_up": 0,
+      "consecutive": 0
+    },
+    {
+      "month": "2026-01",
+      "selected": 10,
+      "d2_up": 2,
+      "d3_up": 3,
+      "consecutive": 1
+    },
+    {
+      "month": "2026-02",
+      "selected": 14,
+      "d2_up": 4,
+      "d3_up": 4,
+      "consecutive": 3
+    },
+    {
+      "month": "2026-03",
+      "selected": 14,
+      "d2_up": 5,
+      "d3_up": 1,
+      "consecutive": 0
+    },
+    {
+      "month": "2026-04",
+      "selected": 10,
+      "d2_up": 2,
+      "d3_up": 1,
+      "consecutive": 1
+    },
+    {
+      "month": "2026-05",
+      "selected": 1,
+      "d2_up": 0,
+      "d3_up": 0,
+      "consecutive": 0
+    },
+    {
+      "month": "2026-07",
+      "selected": 19,
+      "d2_up": 2,
+      "d3_up": 1,
+      "consecutive": 0
+    },
+    {
+      "month": "2026-08",
+      "selected": 13,
+      "d2_up": 3,
+      "d3_up": 2,
+      "consecutive": 2
+    },
+    {
+      "month": "2026-09",
+      "selected": 16,
+      "d2_up": 4,
+      "d3_up": 1,
+      "consecutive": 1
+    },
+    {
+      "month": "2026-10",
+      "selected": 1,
+      "d2_up": 0,
+      "d3_up": 0,
+      "consecutive": 0
+    }
+  ],
+  "overlap_windows": [
+    {
+      "symbol": "000017",
+      "start": "2024-01-22",
+      "end": "2024-01-23",
+      "sequences": [
+        109
+      ]
+    },
+    {
+      "symbol": "000017",
+      "start": "2026-08-27",
+      "end": "2026-08-28",
+      "sequences": [
+        288
+      ]
+    },
+    {
+      "symbol": "000592",
+      "start": "2025-10-31",
+      "end": "2025-11-03",
+      "sequences": [
+        197
+      ]
+    },
+    {
+      "symbol": "000727",
+      "start": "2023-10-12",
+      "end": "2023-10-13",
+      "sequences": [
+        73
+      ]
+    },
+    {
+      "symbol": "000880",
+      "start": "2024-12-25",
+      "end": "2024-12-26",
+      "sequences": [
+        150
+      ]
+    },
+    {
+      "symbol": "000957",
+      "start": "2022-05-27",
+      "end": "2022-05-30",
+      "sequences": [
+        11
+      ]
+    },
+    {
+      "symbol": "001896",
+      "start": "2026-02-26",
+      "end": "2026-02-27",
+      "sequences": [
+        231
+      ]
+    },
+    {
+      "symbol": "002062",
+      "start": "2022-05-09",
+      "end": "2022-05-10",
+      "sequences": [
+        1
+      ]
+    },
+    {
+      "symbol": "002309",
+      "start": "2022-05-20",
+      "end": "2022-05-23",
+      "sequences": [
+        6
+      ]
+    },
+    {
+      "symbol": "002580",
+      "start": "2026-04-15",
+      "end": "2026-04-16",
+      "sequences": [
+        252
+      ]
+    },
+    {
+      "symbol": "002703",
+      "start": "2022-06-20",
+      "end": "2022-06-21",
+      "sequences": [
+        21
+      ]
+    },
+    {
+      "symbol": "002766",
+      "start": "2022-05-19",
+      "end": "2022-05-20",
+      "sequences": [
+        5
+      ]
+    },
+    {
+      "symbol": "002808",
+      "start": "2023-01-30",
+      "end": "2023-01-31",
+      "sequences": [
+        41
+      ]
+    },
+    {
+      "symbol": "002909",
+      "start": "2026-09-07",
+      "end": "2026-09-08",
+      "sequences": [
+        292
+      ]
+    },
+    {
+      "symbol": "600376",
+      "start": "2025-09-09",
+      "end": "2025-09-10",
+      "sequences": [
+        176
+      ]
+    },
+    {
+      "symbol": "600397",
+      "start": "2026-02-24",
+      "end": "2026-02-25",
+      "sequences": [
+        229
+      ]
+    },
+    {
+      "symbol": "600617",
+      "start": "2025-10-17",
+      "end": "2025-10-20",
+      "sequences": [
+        192
+      ]
+    },
+    {
+      "symbol": "600715",
+      "start": "2023-12-12",
+      "end": "2023-12-13",
+      "sequences": [
+        89
+      ]
+    },
+    {
+      "symbol": "601212",
+      "start": "2026-01-27",
+      "end": "2026-01-28",
+      "sequences": [
+        216
+      ]
+    },
+    {
+      "symbol": "601566",
+      "start": "2023-03-01",
+      "end": "2023-03-02",
+      "sequences": [
+        51
+      ]
+    },
+    {
+      "symbol": "603099",
+      "start": "2024-01-09",
+      "end": "2024-01-10",
+      "sequences": [
+        102
+      ]
+    },
+    {
+      "symbol": "603178",
+      "start": "2023-10-20",
+      "end": "2023-10-24",
+      "sequences": [
+        77,
+        78
+      ]
+    },
+    {
+      "symbol": "603196",
+      "start": "2023-05-24",
+      "end": "2023-05-25",
+      "sequences": [
+        59
+      ]
+    },
+    {
+      "symbol": "603266",
+      "start": "2023-11-02",
+      "end": "2023-11-03",
+      "sequences": [
+        83
+      ]
+    },
+    {
+      "symbol": "603618",
+      "start": "2026-02-06",
+      "end": "2026-02-09",
+      "sequences": [
+        223
+      ]
+    },
+    {
+      "symbol": "603628",
+      "start": "2023-12-27",
+      "end": "2023-12-28",
+      "sequences": [
+        97
+      ]
+    },
+    {
+      "symbol": "603955",
+      "start": "2024-11-15",
+      "end": "2024-11-18",
+      "sequences": [
+        130
+      ]
+    },
+    {
+      "symbol": "603958",
+      "start": "2026-08-20",
+      "end": "2026-08-21",
+      "sequences": [
+        284
+      ]
+    }
+  ],
+  "sources": {
+    "docs/stock_automl_runs/20261021_b2_floor_factor_review/workbook_data.json": "5c2014a35d80e4c0759c0afb35997479116b72717c2ad1c0c0b42462be7e25ec",
+    "outputs/stock_automl/b2_2021_minute_r60_20261020/calendar.json": "48467afcb0babf08ea8481f396b13e71562c5e414abf09902751355d842de965",
+    "docs/stock_automl_runs/20261021_b2_floor_factor_review/st.csv.gz": "075ac41cd552cb42ff4869f0956f046c14f72db94be5ed471ef47020a9aa4548",
+    "docs/stock_automl_runs/20261021_b2_d2_limit_follow_r69/results.json": "44c0dbbbc7387a8d5f053509390e3b558a22bb4efe2014734f88b73f43ffe965"
+  },
+  "code_sha256": "b7f891618e5e0790f80266b6780265b97c7e6dd93a9149b3f0af0603eb761559",
+  "verification": "All 306 D2/D3 upper limits independently reconstructed; all 91 D2 upper closes matched R69 dates and D3 prices; band totals reconcile."
+}

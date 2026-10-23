@@ -1,0 +1,3357 @@
+{
+  "selection_sha256": "97b8b0f034183081fcbdd40f60cdd83fed478049577d63a996a4d2f1cf56c92d",
+  "choices": {
+    "close_early": "close_early_lr1",
+    "close_close": null,
+    "union_early": "union_early_lr01",
+    "union_close": null
+  },
+  "candidates": [
+    {
+      "id": "close_baseline_lr1",
+      "target": "close",
+      "stage": "baseline",
+      "rule": {
+        "id": "close_baseline_lr1",
+        "kind": "model",
+        "file": "close_baseline_lr1.joblib",
+        "columns": [
+          "total_mv_yi",
+          "d0_turnover_pct",
+          "board_streak_days",
+          "open_gap",
+          "body5",
+          "opened_after_touch"
+        ],
+        "threshold": 0.24990846505719727
+      },
+      "train": {
+        "n": 152,
+        "positives": 30,
+        "base_rate": 0.19736842105263158,
+        "flagged": 38,
+        "caught": 13,
+        "false_flags": 25,
+        "missed": 17,
+        "precision": 0.34210526315789475,
+        "recall": 0.43333333333333335,
+        "false_positive_rate": 0.20491803278688525,
+        "reject_fraction": 0.25,
+        "lift": 1.7333333333333334,
+        "retained_risk": 0.14912280701754385,
+        "retained_risk_reduction": 0.04824561403508773,
+        "flagged_risk_ci": [
+          0.21212415179959707,
+          0.5010789644821648
+        ],
+        "retained_risk_ci": [
+          0.09523783734016908,
+          0.22588394101691153
+        ],
+        "flagged_original_profit_count": 14,
+        "false_flag_original_profit_count": 14,
+        "original_net_mean_flagged": -0.025370475932373734,
+        "original_net_mean_retained": 0.01209779675295079
+      },
+      "valid": {
+        "n": 54,
+        "positives": 9,
+        "base_rate": 0.16666666666666666,
+        "flagged": 21,
+        "caught": 4,
+        "false_flags": 17,
+        "missed": 5,
+        "precision": 0.19047619047619047,
+        "recall": 0.4444444444444444,
+        "false_positive_rate": 0.37777777777777777,
+        "reject_fraction": 0.3888888888888889,
+        "lift": 1.1428571428571428,
+        "retained_risk": 0.15151515151515152,
+        "retained_risk_reduction": 0.015151515151515138,
+        "flagged_risk_ci": [
+          0.07667565052761979,
+          0.4000056469020429
+        ],
+        "retained_risk_ci": [
+          0.06650457281607718,
+          0.30919875880441616
+        ],
+        "flagged_original_profit_count": 10,
+        "false_flag_original_profit_count": 10,
+        "original_net_mean_flagged": -0.013527972565139188,
+        "original_net_mean_retained": 0.022520511320831486
+      },
+      "test": {
+        "n": 98,
+        "positives": 12,
+        "base_rate": 0.12244897959183673,
+        "flagged": 38,
+        "caught": 2,
+        "false_flags": 36,
+        "missed": 10,
+        "precision": 0.05263157894736842,
+        "recall": 0.16666666666666666,
+        "false_positive_rate": 0.4186046511627907,
+        "reject_fraction": 0.3877551020408163,
+        "lift": 0.4298245614035088,
+        "retained_risk": 0.16666666666666666,
+        "retained_risk_reduction": -0.044217687074829926,
+        "flagged_risk_ci": [
+          0.014554208147292844,
+          0.1728546213176992
+        ],
+        "retained_risk_ci": [
+          0.09313176979191601,
+          0.2803161316361418
+        ],
+        "flagged_original_profit_count": 19,
+        "false_flag_original_profit_count": 19,
+        "original_net_mean_flagged": 0.015105383199388103,
+        "original_net_mean_retained": 0.02327135265331055
+      },
+      "uncertainty": {
+        "months": 7,
+        "valid_draws": 3000,
+        "retained_risk_reduction_ci": [
+          -0.0887844059776273,
+          0.004078605858361145
+        ],
+        "lift_ci": [
+          0.0,
+          1.0689655172413792
+        ]
+      },
+      "selected": false,
+      "auc": 0.43992248062015504,
+      "ap": 0.11476448947674275
+    },
+    {
+      "id": "close_early_lr01",
+      "target": "close",
+      "stage": "early",
+      "rule": {
+        "id": "close_early_lr01",
+        "kind": "model",
+        "file": "close_early_lr01.joblib",
+        "columns": [
+          "total_mv_yi",
+          "d0_turnover_pct",
+          "board_streak_days",
+          "d0_normal_volume_ratio",
+          "close_sealed_minutes",
+          "last30_amount_fraction",
+          "opened_after_touch",
+          "open_gap",
+          "body5",
+          "high5",
+          "low5",
+          "pullback5",
+          "position5",
+          "early_volume_ratio",
+          "early_volume_accel",
+          "early_down_volume",
+          "early_up_count",
+          "early_slope",
+          "early_path",
+          "early_below_d0",
+          "early_drawdown",
+          "early_upper",
+          "early_lower"
+        ],
+        "threshold": 0.2525861299066634
+      },
+      "train": {
+        "n": 152,
+        "positives": 30,
+        "base_rate": 0.19736842105263158,
+        "flagged": 38,
+        "caught": 16,
+        "false_flags": 22,
+        "missed": 14,
+        "precision": 0.42105263157894735,
+        "recall": 0.5333333333333333,
+        "false_positive_rate": 0.18032786885245902,
+        "reject_fraction": 0.25,
+        "lift": 2.1333333333333333,
+        "retained_risk": 0.12280701754385964,
+        "retained_risk_reduction": 0.07456140350877194,
+        "flagged_risk_ci": [
+          0.27852501157759046,
+          0.5780765465632904
+        ],
+        "retained_risk_ci": [
+          0.07458120778594124,
+          0.19562470394792042
+        ],
+        "flagged_original_profit_count": 11,
+        "false_flag_original_profit_count": 11,
+        "original_net_mean_flagged": -0.040736829557465215,
+        "original_net_mean_retained": 0.01721991462798128
+      },
+      "valid": {
+        "n": 54,
+        "positives": 9,
+        "base_rate": 0.16666666666666666,
+        "flagged": 19,
+        "caught": 5,
+        "false_flags": 14,
+        "missed": 4,
+        "precision": 0.2631578947368421,
+        "recall": 0.5555555555555556,
+        "false_positive_rate": 0.3111111111111111,
+        "reject_fraction": 0.35185185185185186,
+        "lift": 1.5789473684210527,
+        "retained_risk": 0.11428571428571428,
+        "retained_risk_reduction": 0.052380952380952375,
+        "flagged_risk_ci": [
+          0.11806412346782766,
+          0.48791550897814473
+        ],
+        "retained_risk_ci": [
+          0.04535179333097469,
+          0.25951468646213327
+        ],
+        "flagged_original_profit_count": 7,
+        "false_flag_original_profit_count": 7,
+        "original_net_mean_flagged": -0.028633119641686734,
+        "original_net_mean_retained": 0.0286605349403304
+      },
+      "test": {
+        "n": 98,
+        "positives": 12,
+        "base_rate": 0.12244897959183673,
+        "flagged": 38,
+        "caught": 6,
+        "false_flags": 32,
+        "missed": 6,
+        "precision": 0.15789473684210525,
+        "recall": 0.5,
+        "false_positive_rate": 0.37209302325581395,
+        "reject_fraction": 0.3877551020408163,
+        "lift": 1.2894736842105263,
+        "retained_risk": 0.1,
+        "retained_risk_reduction": 0.022448979591836726,
+        "flagged_risk_ci": [
+          0.0744386341515908,
+          0.30416811779222663
+        ],
+        "retained_risk_ci": [
+          0.04664283447388512,
+          0.20149464723978425
+        ],
+        "flagged_original_profit_count": 14,
+        "false_flag_original_profit_count": 13,
+        "original_net_mean_flagged": -0.009045010769681394,
+        "original_net_mean_retained": 0.03856660216705456
+      },
+      "uncertainty": {
+        "months": 7,
+        "valid_draws": 3000,
+        "retained_risk_reduction_ci": [
+          -0.06817968650048398,
+          0.10892524401994064
+        ],
+        "lift_ci": [
+          0.23724489795918363,
+          2.457680250783699
+        ]
+      },
+      "selected": false,
+      "auc": 0.5988372093023255,
+      "ap": 0.22442569285732206
+    },
+    {
+      "id": "close_early_lr1",
+      "target": "close",
+      "stage": "early",
+      "rule": {
+        "id": "close_early_lr1",
+        "kind": "model",
+        "file": "close_early_lr1.joblib",
+        "columns": [
+          "total_mv_yi",
+          "d0_turnover_pct",
+          "board_streak_days",
+          "d0_normal_volume_ratio",
+          "close_sealed_minutes",
+          "last30_amount_fraction",
+          "opened_after_touch",
+          "open_gap",
+          "body5",
+          "high5",
+          "low5",
+          "pullback5",
+          "position5",
+          "early_volume_ratio",
+          "early_volume_accel",
+          "early_down_volume",
+          "early_up_count",
+          "early_slope",
+          "early_path",
+          "early_below_d0",
+          "early_drawdown",
+          "early_upper",
+          "early_lower"
+        ],
+        "threshold": 0.2674991635576828
+      },
+      "train": {
+        "n": 152,
+        "positives": 30,
+        "base_rate": 0.19736842105263158,
+        "flagged": 38,
+        "caught": 18,
+        "false_flags": 20,
+        "missed": 12,
+        "precision": 0.47368421052631576,
+        "recall": 0.6,
+        "false_positive_rate": 0.16393442622950818,
+        "reject_fraction": 0.25,
+        "lift": 2.4,
+        "retained_risk": 0.10526315789473684,
+        "retained_risk_reduction": 0.09210526315789475,
+        "flagged_risk_ci": [
+          0.32479023322526424,
+          0.6274102861550293
+        ],
+        "retained_risk_ci": [
+          0.06124687756235458,
+          0.1750151230893611
+        ],
+        "flagged_original_profit_count": 9,
+        "false_flag_original_profit_count": 9,
+        "original_net_mean_flagged": -0.052227416685870665,
+        "original_net_mean_retained": 0.021050110337449763
+      },
+      "valid": {
+        "n": 54,
+        "positives": 9,
+        "base_rate": 0.16666666666666666,
+        "flagged": 17,
+        "caught": 5,
+        "false_flags": 12,
+        "missed": 4,
+        "precision": 0.29411764705882354,
+        "recall": 0.5555555555555556,
+        "false_positive_rate": 0.26666666666666666,
+        "reject_fraction": 0.3148148148148148,
+        "lift": 1.7647058823529413,
+        "retained_risk": 0.10810810810810811,
+        "retained_risk_reduction": 0.05855855855855854,
+        "flagged_risk_ci": [
+          0.1327998961029552,
+          0.5313311006653921
+        ],
+        "retained_risk_ci": [
+          0.04285189940411574,
+          0.24708531544125548
+        ],
+        "flagged_original_profit_count": 7,
+        "false_flag_original_profit_count": 7,
+        "original_net_mean_flagged": -0.019355639264173354,
+        "original_net_mean_retained": 0.0213009545192017
+      },
+      "test": {
+        "n": 98,
+        "positives": 12,
+        "base_rate": 0.12244897959183673,
+        "flagged": 34,
+        "caught": 5,
+        "false_flags": 29,
+        "missed": 7,
+        "precision": 0.14705882352941177,
+        "recall": 0.4166666666666667,
+        "false_positive_rate": 0.3372093023255814,
+        "reject_fraction": 0.3469387755102041,
+        "lift": 1.200980392156863,
+        "retained_risk": 0.109375,
+        "retained_risk_reduction": 0.013073979591836732,
+        "flagged_risk_ci": [
+          0.06449441444782597,
+          0.3012805649545167
+        ],
+        "retained_risk_ci": [
+          0.054001133444168986,
+          0.20898641326895787
+        ],
+        "flagged_original_profit_count": 13,
+        "false_flag_original_profit_count": 12,
+        "original_net_mean_flagged": -0.0057238723946201175,
+        "original_net_mean_retained": 0.03382652159675727
+      },
+      "uncertainty": {
+        "months": 7,
+        "valid_draws": 3000,
+        "retained_risk_reduction_ci": [
+          -0.05026333340682598,
+          0.07021317458736884
+        ],
+        "lift_ci": [
+          0.2719298245614035,
+          2.1677419354838707
+        ]
+      },
+      "selected": true,
+      "auc": 0.6356589147286822,
+      "ap": 0.2445012248863584
+    },
+    {
+      "id": "close_early_tree",
+      "target": "close",
+      "stage": "early",
+      "rule": {
+        "id": "close_early_tree",
+        "kind": "model",
+        "file": "close_early_tree.joblib",
+        "columns": [
+          "total_mv_yi",
+          "d0_turnover_pct",
+          "board_streak_days",
+          "d0_normal_volume_ratio",
+          "close_sealed_minutes",
+          "last30_amount_fraction",
+          "opened_after_touch",
+          "open_gap",
+          "body5",
+          "high5",
+          "low5",
+          "pullback5",
+          "position5",
+          "early_volume_ratio",
+          "early_volume_accel",
+          "early_down_volume",
+          "early_up_count",
+          "early_slope",
+          "early_path",
+          "early_below_d0",
+          "early_drawdown",
+          "early_upper",
+          "early_lower"
+        ],
+        "threshold": 0.25925925925925924
+      },
+      "train": {
+        "n": 152,
+        "positives": 30,
+        "base_rate": 0.19736842105263158,
+        "flagged": 24,
+        "caught": 13,
+        "false_flags": 11,
+        "missed": 17,
+        "precision": 0.5416666666666666,
+        "recall": 0.43333333333333335,
+        "false_positive_rate": 0.09016393442622951,
+        "reject_fraction": 0.15789473684210525,
+        "lift": 2.744444444444444,
+        "retained_risk": 0.1328125,
+        "retained_risk_reduction": 0.06455592105263158,
+        "flagged_risk_ci": [
+          0.3507486535891995,
+          0.721086662687886
+        ],
+        "retained_risk_ci": [
+          0.08460228531840494,
+          0.2024201669449517
+        ],
+        "flagged_original_profit_count": 7,
+        "false_flag_original_profit_count": 7,
+        "original_net_mean_flagged": -0.055793866680714586,
+        "original_net_mean_retained": 0.013704090193307327
+      },
+      "valid": {
+        "n": 54,
+        "positives": 9,
+        "base_rate": 0.16666666666666666,
+        "flagged": 5,
+        "caught": 2,
+        "false_flags": 3,
+        "missed": 7,
+        "precision": 0.4,
+        "recall": 0.2222222222222222,
+        "false_positive_rate": 0.06666666666666667,
+        "reject_fraction": 0.09259259259259259,
+        "lift": 2.4000000000000004,
+        "retained_risk": 0.14285714285714285,
+        "retained_risk_reduction": 0.023809523809523808,
+        "flagged_risk_ci": [
+          0.11762077423265177,
+          0.7692757187239805
+        ],
+        "retained_risk_ci": [
+          0.07096423720406896,
+          0.26667706223914006
+        ],
+        "flagged_original_profit_count": 3,
+        "false_flag_original_profit_count": 3,
+        "original_net_mean_flagged": -0.004470900463136996,
+        "original_net_mean_retained": 0.00982538677622859
+      },
+      "test": {
+        "n": 98,
+        "positives": 12,
+        "base_rate": 0.12244897959183673,
+        "flagged": 11,
+        "caught": 0,
+        "false_flags": 11,
+        "missed": 12,
+        "precision": 0.0,
+        "recall": 0.0,
+        "false_positive_rate": 0.12790697674418605,
+        "reject_fraction": 0.11224489795918367,
+        "lift": 0.0,
+        "retained_risk": 0.13793103448275862,
+        "retained_risk_reduction": -0.015482054890921887,
+        "flagged_risk_ci": [
+          0.0,
+          0.25883296696802116
+        ],
+        "retained_risk_ci": [
+          0.08069778291221522,
+          0.22578627384042202
+        ],
+        "flagged_original_profit_count": 5,
+        "false_flag_original_profit_count": 5,
+        "original_net_mean_flagged": 0.020845836915261276,
+        "original_net_mean_retained": 0.0200112817782472
+      },
+      "uncertainty": {
+        "months": 7,
+        "valid_draws": 3000,
+        "retained_risk_reduction_ci": [
+          -0.02609219297010501,
+          -0.00684556407447974
+        ],
+        "lift_ci": [
+          0.0,
+          0.0
+        ]
+      },
+      "selected": false,
+      "auc": 0.4471899224806202,
+      "ap": 0.11925253972556765
+    },
+    {
+      "id": "close_early_early_up_count_q0_<=",
+      "target": "close",
+      "stage": "early",
+      "rule": {
+        "id": "close_early_early_up_count_q0_<=",
+        "kind": "single",
+        "feature": "early_up_count",
+        "op": "<=",
+        "value": 1.0
+      },
+      "train": {
+        "n": 152,
+        "positives": 30,
+        "base_rate": 0.19736842105263158,
+        "flagged": 46,
+        "caught": 16,
+        "false_flags": 30,
+        "missed": 14,
+        "precision": 0.34782608695652173,
+        "recall": 0.5333333333333333,
+        "false_positive_rate": 0.2459016393442623,
+        "reject_fraction": 0.3026315789473684,
+        "lift": 1.76231884057971,
+        "retained_risk": 0.1320754716981132,
+        "retained_risk_reduction": 0.06529294935451838,
+        "flagged_risk_ci": [
+          0.22680993370754618,
+          0.4922994115793684
+        ],
+        "retained_risk_ci": [
+          0.08033205324120661,
+          0.20955356155813948
+        ],
+        "flagged_original_profit_count": 18,
+        "false_flag_original_profit_count": 18,
+        "original_net_mean_flagged": -0.0076828957727448025,
+        "original_net_mean_retained": 0.007249848584457065
+      },
+      "valid": {
+        "n": 54,
+        "positives": 9,
+        "base_rate": 0.16666666666666666,
+        "flagged": 12,
+        "caught": 2,
+        "false_flags": 10,
+        "missed": 7,
+        "precision": 0.16666666666666666,
+        "recall": 0.2222222222222222,
+        "false_positive_rate": 0.2222222222222222,
+        "reject_fraction": 0.2222222222222222,
+        "lift": 1.0,
+        "retained_risk": 0.16666666666666666,
+        "retained_risk_reduction": 0.0,
+        "flagged_risk_ci": [
+          0.04696514218385531,
+          0.4480308622529653
+        ],
+        "retained_risk_ci": [
+          0.08315916646398232,
+          0.3060400274464841
+        ],
+        "flagged_original_profit_count": 7,
+        "false_flag_original_profit_count": 7,
+        "original_net_mean_flagged": -0.008063250283989005,
+        "original_net_mean_retained": 0.013234486979223428
+      },
+      "test": {
+        "n": 98,
+        "positives": 12,
+        "base_rate": 0.12244897959183673,
+        "flagged": 25,
+        "caught": 4,
+        "false_flags": 21,
+        "missed": 8,
+        "precision": 0.16,
+        "recall": 0.3333333333333333,
+        "false_positive_rate": 0.2441860465116279,
+        "reject_fraction": 0.25510204081632654,
+        "lift": 1.3066666666666666,
+        "retained_risk": 0.1095890410958904,
+        "retained_risk_reduction": 0.012859938495946327,
+        "flagged_risk_ci": [
+          0.06403451456676595,
+          0.3465362160717827
+        ],
+        "retained_risk_ci": [
+          0.05658671784680723,
+          0.2016262198720492
+        ],
+        "flagged_original_profit_count": 9,
+        "false_flag_original_profit_count": 9,
+        "original_net_mean_flagged": -0.0035435822224358393,
+        "original_net_mean_retained": 0.028203770908716123
+      },
+      "uncertainty": {
+        "months": 7,
+        "valid_draws": 3000,
+        "retained_risk_reduction_ci": [
+          -0.027405507336699986,
+          0.06254295532646048
+        ],
+        "lift_ci": [
+          0.30407523510971785,
+          2.6769230769230767
+        ]
+      },
+      "selected": false
+    },
+    {
+      "id": "close_early_total_mv_yi_q2_>",
+      "target": "close",
+      "stage": "early",
+      "rule": {
+        "id": "close_early_total_mv_yi_q2_>",
+        "kind": "single",
+        "feature": "total_mv_yi",
+        "op": ">",
+        "value": 72.05294410035
+      },
+      "train": {
+        "n": 152,
+        "positives": 30,
+        "base_rate": 0.19736842105263158,
+        "flagged": 38,
+        "caught": 13,
+        "false_flags": 25,
+        "missed": 17,
+        "precision": 0.34210526315789475,
+        "recall": 0.43333333333333335,
+        "false_positive_rate": 0.20491803278688525,
+        "reject_fraction": 0.25,
+        "lift": 1.7333333333333334,
+        "retained_risk": 0.14912280701754385,
+        "retained_risk_reduction": 0.04824561403508773,
+        "flagged_risk_ci": [
+          0.21212415179959707,
+          0.5010789644821648
+        ],
+        "retained_risk_ci": [
+          0.09523783734016908,
+          0.22588394101691153
+        ],
+        "flagged_original_profit_count": 16,
+        "false_flag_original_profit_count": 16,
+        "original_net_mean_flagged": -0.021002120353856443,
+        "original_net_mean_retained": 0.01064167822677836
+      },
+      "valid": {
+        "n": 54,
+        "positives": 9,
+        "base_rate": 0.16666666666666666,
+        "flagged": 30,
+        "caught": 6,
+        "false_flags": 24,
+        "missed": 3,
+        "precision": 0.2,
+        "recall": 0.6666666666666666,
+        "false_positive_rate": 0.5333333333333333,
+        "reject_fraction": 0.5555555555555556,
+        "lift": 1.2000000000000002,
+        "retained_risk": 0.125,
+        "retained_risk_reduction": 0.04166666666666666,
+        "flagged_risk_ci": [
+          0.09505107177290062,
+          0.37305696413147726
+        ],
+        "retained_risk_ci": [
+          0.043443340801235575,
+          0.31003881270499467
+        ],
+        "flagged_original_profit_count": 13,
+        "false_flag_original_profit_count": 13,
+        "original_net_mean_flagged": -0.011635264280545569,
+        "original_net_mean_retained": 0.033672807422328456
+      },
+      "test": {
+        "n": 98,
+        "positives": 12,
+        "base_rate": 0.12244897959183673,
+        "flagged": 56,
+        "caught": 6,
+        "false_flags": 50,
+        "missed": 6,
+        "precision": 0.10714285714285714,
+        "recall": 0.5,
+        "false_positive_rate": 0.5813953488372093,
+        "reject_fraction": 0.5714285714285714,
+        "lift": 0.875,
+        "retained_risk": 0.14285714285714285,
+        "retained_risk_reduction": -0.020408163265306117,
+        "flagged_risk_ci": [
+          0.050039355711171726,
+          0.21468445171071115
+        ],
+        "retained_risk_ci": [
+          0.06715967015962783,
+          0.27841089474444336
+        ],
+        "flagged_original_profit_count": 29,
+        "false_flag_original_profit_count": 28,
+        "original_net_mean_flagged": 0.015594945450073125,
+        "original_net_mean_retained": 0.026118304180268715
+      },
+      "uncertainty": {
+        "months": 7,
+        "valid_draws": 3000,
+        "retained_risk_reduction_ci": [
+          -0.045688847235238986,
+          0.030961791831357055
+        ],
+        "lift_ci": [
+          0.5823441176470588,
+          1.1381149373881934
+        ]
+      },
+      "selected": false
+    },
+    {
+      "id": "close_early_d0_normal_volume_ratio_q0_<=",
+      "target": "close",
+      "stage": "early",
+      "rule": {
+        "id": "close_early_d0_normal_volume_ratio_q0_<=",
+        "kind": "single",
+        "feature": "d0_normal_volume_ratio",
+        "op": "<=",
+        "value": 0.2827273800846903
+      },
+      "train": {
+        "n": 152,
+        "positives": 30,
+        "base_rate": 0.19736842105263158,
+        "flagged": 36,
+        "caught": 12,
+        "false_flags": 24,
+        "missed": 18,
+        "precision": 0.3333333333333333,
+        "recall": 0.4,
+        "false_positive_rate": 0.19672131147540983,
+        "reject_fraction": 0.23684210526315788,
+        "lift": 1.6888888888888887,
+        "retained_risk": 0.15517241379310345,
+        "retained_risk_reduction": 0.04219600725952813,
+        "flagged_risk_ci": [
+          0.202146188243056,
+          0.49666002128843023
+        ],
+        "retained_risk_ci": [
+          0.10046608139198239,
+          0.23198530240087073
+        ],
+        "flagged_original_profit_count": 17,
+        "false_flag_original_profit_count": 17,
+        "original_net_mean_flagged": -0.0036683013175968057,
+        "original_net_mean_retained": 0.004716634412410975
+      },
+      "valid": {
+        "n": 54,
+        "positives": 9,
+        "base_rate": 0.16666666666666666,
+        "flagged": 8,
+        "caught": 2,
+        "false_flags": 6,
+        "missed": 7,
+        "precision": 0.25,
+        "recall": 0.2222222222222222,
+        "false_positive_rate": 0.13333333333333333,
+        "reject_fraction": 0.14814814814814814,
+        "lift": 1.5,
+        "retained_risk": 0.15217391304347827,
+        "retained_risk_reduction": 0.014492753623188387,
+        "flagged_risk_ci": [
+          0.07147921275211133,
+          0.5907245696898228
+        ],
+        "retained_risk_ci": [
+          0.0757228222780561,
+          0.28224139552060584
+        ],
+        "flagged_original_profit_count": 4,
+        "false_flag_original_profit_count": 4,
+        "original_net_mean_flagged": -0.004638075850898624,
+        "original_net_mean_retained": 0.010786827315797934
+      },
+      "test": {
+        "n": 98,
+        "positives": 12,
+        "base_rate": 0.12244897959183673,
+        "flagged": 7,
+        "caught": 0,
+        "false_flags": 7,
+        "missed": 12,
+        "precision": 0.0,
+        "recall": 0.0,
+        "false_positive_rate": 0.08139534883720931,
+        "reject_fraction": 0.07142857142857142,
+        "lift": 0.0,
+        "retained_risk": 0.13186813186813187,
+        "retained_risk_reduction": -0.00941915227629514,
+        "flagged_risk_ci": [
+          0.0,
+          0.35433043506667483
+        ],
+        "retained_risk_ci": [
+          0.0770710751453858,
+          0.21648681785719476
+        ],
+        "flagged_original_profit_count": 4,
+        "false_flag_original_profit_count": 4,
+        "original_net_mean_flagged": 0.03465813092117057,
+        "original_net_mean_retained": 0.01898548136623282
+      },
+      "uncertainty": {
+        "months": 7,
+        "valid_draws": 2990,
+        "retained_risk_reduction_ci": [
+          -0.020297325060076376,
+          -0.002670689560964941
+        ],
+        "lift_ci": [
+          0.0,
+          0.0
+        ]
+      },
+      "selected": false
+    },
+    {
+      "id": "close_close_lr01",
+      "target": "close",
+      "stage": "close",
+      "rule": {
+        "id": "close_close_lr01",
+        "kind": "model",
+        "file": "close_close_lr01.joblib",
+        "columns": [
+          "total_mv_yi",
+          "d0_turnover_pct",
+          "board_streak_days",
+          "d0_normal_volume_ratio",
+          "close_sealed_minutes",
+          "last30_amount_fraction",
+          "opened_after_touch",
+          "open_gap",
+          "body5",
+          "high5",
+          "low5",
+          "pullback5",
+          "position5",
+          "early_volume_ratio",
+          "early_volume_accel",
+          "early_down_volume",
+          "early_up_count",
+          "early_slope",
+          "early_path",
+          "early_below_d0",
+          "early_drawdown",
+          "early_upper",
+          "early_lower",
+          "day_return",
+          "day_body",
+          "day_range",
+          "day_upper",
+          "day_lower",
+          "day_position",
+          "day_volume_ratio",
+          "day_turnover",
+          "day_turnover_ratio",
+          "after4_return",
+          "after4_low",
+          "morning_return",
+          "afternoon_return",
+          "tail_return",
+          "day_drawdown",
+          "afternoon_volume",
+          "tail_volume",
+          "early_volume_share",
+          "day_down_volume",
+          "close_vs_weighted",
+          "limit_up_fraction",
+          "day_close_limit",
+          "return_change",
+          "body_change"
+        ],
+        "threshold": 0.2640173491966141
+      },
+      "train": {
+        "n": 152,
+        "positives": 30,
+        "base_rate": 0.19736842105263158,
+        "flagged": 38,
+        "caught": 21,
+        "false_flags": 17,
+        "missed": 9,
+        "precision": 0.5526315789473685,
+        "recall": 0.7,
+        "false_positive_rate": 0.13934426229508196,
+        "reject_fraction": 0.25,
+        "lift": 2.8000000000000003,
+        "retained_risk": 0.07894736842105263,
+        "retained_risk_reduction": 0.11842105263157895,
+        "flagged_risk_ci": [
+          0.3970629712199288,
+          0.6985359900194841
+        ],
+        "retained_risk_ci": [
+          0.04208861457422779,
+          0.14325751945426896
+        ],
+        "flagged_original_profit_count": 7,
+        "false_flag_original_profit_count": 7,
+        "original_net_mean_flagged": -0.08143747706876368,
+        "original_net_mean_retained": 0.030786797131747437
+      },
+      "valid": {
+        "n": 54,
+        "positives": 9,
+        "base_rate": 0.16666666666666666,
+        "flagged": 21,
+        "caught": 5,
+        "false_flags": 16,
+        "missed": 4,
+        "precision": 0.23809523809523808,
+        "recall": 0.5555555555555556,
+        "false_positive_rate": 0.35555555555555557,
+        "reject_fraction": 0.3888888888888889,
+        "lift": 1.4285714285714286,
+        "retained_risk": 0.12121212121212122,
+        "retained_risk_reduction": 0.04545454545454544,
+        "flagged_risk_ci": [
+          0.10628013022636704,
+          0.45091173682950136
+        ],
+        "retained_risk_ci": [
+          0.04816161309413676,
+          0.2732550517107473
+        ],
+        "flagged_original_profit_count": 9,
+        "false_flag_original_profit_count": 9,
+        "original_net_mean_flagged": -0.025228961912986334,
+        "original_net_mean_retained": 0.02996659545127966
+      },
+      "test": {
+        "n": 98,
+        "positives": 12,
+        "base_rate": 0.12244897959183673,
+        "flagged": 34,
+        "caught": 3,
+        "false_flags": 31,
+        "missed": 9,
+        "precision": 0.08823529411764706,
+        "recall": 0.25,
+        "false_positive_rate": 0.36046511627906974,
+        "reject_fraction": 0.3469387755102041,
+        "lift": 0.7205882352941178,
+        "retained_risk": 0.140625,
+        "retained_risk_reduction": -0.018176020408163268,
+        "flagged_risk_ci": [
+          0.03046594367464936,
+          0.22960486562808377
+        ],
+        "retained_risk_ci": [
+          0.07578572556030985,
+          0.24616281741576682
+        ],
+        "flagged_original_profit_count": 10,
+        "false_flag_original_profit_count": 10,
+        "original_net_mean_flagged": -0.020338342216258087,
+        "original_net_mean_retained": 0.04159045868950244
+      },
+      "uncertainty": {
+        "months": 7,
+        "valid_draws": 3000,
+        "retained_risk_reduction_ci": [
+          -0.0761904761904762,
+          0.038362346872985176
+        ],
+        "lift_ci": [
+          0.0,
+          1.6457142857142855
+        ]
+      },
+      "selected": false,
+      "auc": 0.5329457364341085,
+      "ap": 0.22664835826561297
+    },
+    {
+      "id": "close_close_lr1",
+      "target": "close",
+      "stage": "close",
+      "rule": {
+        "id": "close_close_lr1",
+        "kind": "model",
+        "file": "close_close_lr1.joblib",
+        "columns": [
+          "total_mv_yi",
+          "d0_turnover_pct",
+          "board_streak_days",
+          "d0_normal_volume_ratio",
+          "close_sealed_minutes",
+          "last30_amount_fraction",
+          "opened_after_touch",
+          "open_gap",
+          "body5",
+          "high5",
+          "low5",
+          "pullback5",
+          "position5",
+          "early_volume_ratio",
+          "early_volume_accel",
+          "early_down_volume",
+          "early_up_count",
+          "early_slope",
+          "early_path",
+          "early_below_d0",
+          "early_drawdown",
+          "early_upper",
+          "early_lower",
+          "day_return",
+          "day_body",
+          "day_range",
+          "day_upper",
+          "day_lower",
+          "day_position",
+          "day_volume_ratio",
+          "day_turnover",
+          "day_turnover_ratio",
+          "after4_return",
+          "after4_low",
+          "morning_return",
+          "afternoon_return",
+          "tail_return",
+          "day_drawdown",
+          "afternoon_volume",
+          "tail_volume",
+          "early_volume_share",
+          "day_down_volume",
+          "close_vs_weighted",
+          "limit_up_fraction",
+          "day_close_limit",
+          "return_change",
+          "body_change"
+        ],
+        "threshold": 0.2829990249700872
+      },
+      "train": {
+        "n": 152,
+        "positives": 30,
+        "base_rate": 0.19736842105263158,
+        "flagged": 38,
+        "caught": 22,
+        "false_flags": 16,
+        "missed": 8,
+        "precision": 0.5789473684210527,
+        "recall": 0.7333333333333333,
+        "false_positive_rate": 0.13114754098360656,
+        "reject_fraction": 0.25,
+        "lift": 2.9333333333333336,
+        "retained_risk": 0.07017543859649122,
+        "retained_risk_reduction": 0.12719298245614036,
+        "flagged_risk_ci": [
+          0.42192345343670956,
+          0.7214749884224094
+        ],
+        "retained_risk_ci": [
+          0.03598534342897065,
+          0.1323888350584531
+        ],
+        "flagged_original_profit_count": 7,
+        "false_flag_original_profit_count": 7,
+        "original_net_mean_flagged": -0.07790132572266743,
+        "original_net_mean_retained": 0.02960808001638202
+      },
+      "valid": {
+        "n": 54,
+        "positives": 9,
+        "base_rate": 0.16666666666666666,
+        "flagged": 20,
+        "caught": 4,
+        "false_flags": 16,
+        "missed": 5,
+        "precision": 0.2,
+        "recall": 0.4444444444444444,
+        "false_positive_rate": 0.35555555555555557,
+        "reject_fraction": 0.37037037037037035,
+        "lift": 1.2000000000000002,
+        "retained_risk": 0.14705882352941177,
+        "retained_risk_reduction": 0.019607843137254888,
+        "flagged_risk_ci": [
+          0.08065766257979998,
+          0.41601743225188714
+        ],
+        "retained_risk_ci": [
+          0.06449441444782597,
+          0.3012805649545167
+        ],
+        "flagged_original_profit_count": 9,
+        "false_flag_original_profit_count": 9,
+        "original_net_mean_flagged": -0.014061267616906398,
+        "original_net_mean_retained": 0.021773964766401293
+      },
+      "test": {
+        "n": 98,
+        "positives": 12,
+        "base_rate": 0.12244897959183673,
+        "flagged": 32,
+        "caught": 6,
+        "false_flags": 26,
+        "missed": 6,
+        "precision": 0.1875,
+        "recall": 0.5,
+        "false_positive_rate": 0.3023255813953488,
+        "reject_fraction": 0.32653061224489793,
+        "lift": 1.53125,
+        "retained_risk": 0.09090909090909091,
+        "retained_risk_reduction": 0.03153988868274582,
+        "flagged_risk_ci": [
+          0.08889544689566137,
+          0.3530915520137545
+        ],
+        "retained_risk_ci": [
+          0.04233297507051223,
+          0.1844872988496556
+        ],
+        "flagged_original_profit_count": 9,
+        "false_flag_original_profit_count": 8,
+        "original_net_mean_flagged": -0.023861390247371436,
+        "original_net_mean_retained": 0.041421972858958586
+      },
+      "uncertainty": {
+        "months": 7,
+        "valid_draws": 3000,
+        "retained_risk_reduction_ci": [
+          -0.025717703349282292,
+          0.0790731061343494
+        ],
+        "lift_ci": [
+          0.5757575757575758,
+          2.633283535788924
+        ]
+      },
+      "selected": false,
+      "auc": 0.626937984496124,
+      "ap": 0.2674788633050705
+    },
+    {
+      "id": "close_close_tree",
+      "target": "close",
+      "stage": "close",
+      "rule": {
+        "id": "close_close_tree",
+        "kind": "model",
+        "file": "close_close_tree.joblib",
+        "columns": [
+          "total_mv_yi",
+          "d0_turnover_pct",
+          "board_streak_days",
+          "d0_normal_volume_ratio",
+          "close_sealed_minutes",
+          "last30_amount_fraction",
+          "opened_after_touch",
+          "open_gap",
+          "body5",
+          "high5",
+          "low5",
+          "pullback5",
+          "position5",
+          "early_volume_ratio",
+          "early_volume_accel",
+          "early_down_volume",
+          "early_up_count",
+          "early_slope",
+          "early_path",
+          "early_below_d0",
+          "early_drawdown",
+          "early_upper",
+          "early_lower",
+          "day_return",
+          "day_body",
+          "day_range",
+          "day_upper",
+          "day_lower",
+          "day_position",
+          "day_volume_ratio",
+          "day_turnover",
+          "day_turnover_ratio",
+          "after4_return",
+          "after4_low",
+          "morning_return",
+          "afternoon_return",
+          "tail_return",
+          "day_drawdown",
+          "afternoon_volume",
+          "tail_volume",
+          "early_volume_share",
+          "day_down_volume",
+          "close_vs_weighted",
+          "limit_up_fraction",
+          "day_close_limit",
+          "return_change",
+          "body_change"
+        ],
+        "threshold": 0.3
+      },
+      "train": {
+        "n": 152,
+        "positives": 30,
+        "base_rate": 0.19736842105263158,
+        "flagged": 24,
+        "caught": 13,
+        "false_flags": 11,
+        "missed": 17,
+        "precision": 0.5416666666666666,
+        "recall": 0.43333333333333335,
+        "false_positive_rate": 0.09016393442622951,
+        "reject_fraction": 0.15789473684210525,
+        "lift": 2.744444444444444,
+        "retained_risk": 0.1328125,
+        "retained_risk_reduction": 0.06455592105263158,
+        "flagged_risk_ci": [
+          0.3507486535891995,
+          0.721086662687886
+        ],
+        "retained_risk_ci": [
+          0.08460228531840494,
+          0.2024201669449517
+        ],
+        "flagged_original_profit_count": 7,
+        "false_flag_original_profit_count": 7,
+        "original_net_mean_flagged": -0.055793866680714586,
+        "original_net_mean_retained": 0.013704090193307327
+      },
+      "valid": {
+        "n": 54,
+        "positives": 9,
+        "base_rate": 0.16666666666666666,
+        "flagged": 5,
+        "caught": 2,
+        "false_flags": 3,
+        "missed": 7,
+        "precision": 0.4,
+        "recall": 0.2222222222222222,
+        "false_positive_rate": 0.06666666666666667,
+        "reject_fraction": 0.09259259259259259,
+        "lift": 2.4000000000000004,
+        "retained_risk": 0.14285714285714285,
+        "retained_risk_reduction": 0.023809523809523808,
+        "flagged_risk_ci": [
+          0.11762077423265177,
+          0.7692757187239805
+        ],
+        "retained_risk_ci": [
+          0.07096423720406896,
+          0.26667706223914006
+        ],
+        "flagged_original_profit_count": 3,
+        "false_flag_original_profit_count": 3,
+        "original_net_mean_flagged": -0.004470900463136996,
+        "original_net_mean_retained": 0.00982538677622859
+      },
+      "test": {
+        "n": 98,
+        "positives": 12,
+        "base_rate": 0.12244897959183673,
+        "flagged": 11,
+        "caught": 0,
+        "false_flags": 11,
+        "missed": 12,
+        "precision": 0.0,
+        "recall": 0.0,
+        "false_positive_rate": 0.12790697674418605,
+        "reject_fraction": 0.11224489795918367,
+        "lift": 0.0,
+        "retained_risk": 0.13793103448275862,
+        "retained_risk_reduction": -0.015482054890921887,
+        "flagged_risk_ci": [
+          0.0,
+          0.25883296696802116
+        ],
+        "retained_risk_ci": [
+          0.08069778291221522,
+          0.22578627384042202
+        ],
+        "flagged_original_profit_count": 5,
+        "false_flag_original_profit_count": 5,
+        "original_net_mean_flagged": 0.020845836915261276,
+        "original_net_mean_retained": 0.0200112817782472
+      },
+      "uncertainty": {
+        "months": 7,
+        "valid_draws": 3000,
+        "retained_risk_reduction_ci": [
+          -0.02609219297010501,
+          -0.00684556407447974
+        ],
+        "lift_ci": [
+          0.0,
+          0.0
+        ]
+      },
+      "selected": false,
+      "auc": 0.4016472868217054,
+      "ap": 0.1157171201814059
+    },
+    {
+      "id": "close_close_early_up_count_q0_<=",
+      "target": "close",
+      "stage": "close",
+      "rule": {
+        "id": "close_close_early_up_count_q0_<=",
+        "kind": "single",
+        "feature": "early_up_count",
+        "op": "<=",
+        "value": 1.0
+      },
+      "train": {
+        "n": 152,
+        "positives": 30,
+        "base_rate": 0.19736842105263158,
+        "flagged": 46,
+        "caught": 16,
+        "false_flags": 30,
+        "missed": 14,
+        "precision": 0.34782608695652173,
+        "recall": 0.5333333333333333,
+        "false_positive_rate": 0.2459016393442623,
+        "reject_fraction": 0.3026315789473684,
+        "lift": 1.76231884057971,
+        "retained_risk": 0.1320754716981132,
+        "retained_risk_reduction": 0.06529294935451838,
+        "flagged_risk_ci": [
+          0.22680993370754618,
+          0.4922994115793684
+        ],
+        "retained_risk_ci": [
+          0.08033205324120661,
+          0.20955356155813948
+        ],
+        "flagged_original_profit_count": 18,
+        "false_flag_original_profit_count": 18,
+        "original_net_mean_flagged": -0.0076828957727448025,
+        "original_net_mean_retained": 0.007249848584457065
+      },
+      "valid": {
+        "n": 54,
+        "positives": 9,
+        "base_rate": 0.16666666666666666,
+        "flagged": 12,
+        "caught": 2,
+        "false_flags": 10,
+        "missed": 7,
+        "precision": 0.16666666666666666,
+        "recall": 0.2222222222222222,
+        "false_positive_rate": 0.2222222222222222,
+        "reject_fraction": 0.2222222222222222,
+        "lift": 1.0,
+        "retained_risk": 0.16666666666666666,
+        "retained_risk_reduction": 0.0,
+        "flagged_risk_ci": [
+          0.04696514218385531,
+          0.4480308622529653
+        ],
+        "retained_risk_ci": [
+          0.08315916646398232,
+          0.3060400274464841
+        ],
+        "flagged_original_profit_count": 7,
+        "false_flag_original_profit_count": 7,
+        "original_net_mean_flagged": -0.008063250283989005,
+        "original_net_mean_retained": 0.013234486979223428
+      },
+      "test": {
+        "n": 98,
+        "positives": 12,
+        "base_rate": 0.12244897959183673,
+        "flagged": 25,
+        "caught": 4,
+        "false_flags": 21,
+        "missed": 8,
+        "precision": 0.16,
+        "recall": 0.3333333333333333,
+        "false_positive_rate": 0.2441860465116279,
+        "reject_fraction": 0.25510204081632654,
+        "lift": 1.3066666666666666,
+        "retained_risk": 0.1095890410958904,
+        "retained_risk_reduction": 0.012859938495946327,
+        "flagged_risk_ci": [
+          0.06403451456676595,
+          0.3465362160717827
+        ],
+        "retained_risk_ci": [
+          0.05658671784680723,
+          0.2016262198720492
+        ],
+        "flagged_original_profit_count": 9,
+        "false_flag_original_profit_count": 9,
+        "original_net_mean_flagged": -0.0035435822224358393,
+        "original_net_mean_retained": 0.028203770908716123
+      },
+      "uncertainty": {
+        "months": 7,
+        "valid_draws": 3000,
+        "retained_risk_reduction_ci": [
+          -0.027405507336699986,
+          0.06254295532646048
+        ],
+        "lift_ci": [
+          0.30407523510971785,
+          2.6769230769230767
+        ]
+      },
+      "selected": false
+    },
+    {
+      "id": "close_close_total_mv_yi_q2_>",
+      "target": "close",
+      "stage": "close",
+      "rule": {
+        "id": "close_close_total_mv_yi_q2_>",
+        "kind": "single",
+        "feature": "total_mv_yi",
+        "op": ">",
+        "value": 72.05294410035
+      },
+      "train": {
+        "n": 152,
+        "positives": 30,
+        "base_rate": 0.19736842105263158,
+        "flagged": 38,
+        "caught": 13,
+        "false_flags": 25,
+        "missed": 17,
+        "precision": 0.34210526315789475,
+        "recall": 0.43333333333333335,
+        "false_positive_rate": 0.20491803278688525,
+        "reject_fraction": 0.25,
+        "lift": 1.7333333333333334,
+        "retained_risk": 0.14912280701754385,
+        "retained_risk_reduction": 0.04824561403508773,
+        "flagged_risk_ci": [
+          0.21212415179959707,
+          0.5010789644821648
+        ],
+        "retained_risk_ci": [
+          0.09523783734016908,
+          0.22588394101691153
+        ],
+        "flagged_original_profit_count": 16,
+        "false_flag_original_profit_count": 16,
+        "original_net_mean_flagged": -0.021002120353856443,
+        "original_net_mean_retained": 0.01064167822677836
+      },
+      "valid": {
+        "n": 54,
+        "positives": 9,
+        "base_rate": 0.16666666666666666,
+        "flagged": 30,
+        "caught": 6,
+        "false_flags": 24,
+        "missed": 3,
+        "precision": 0.2,
+        "recall": 0.6666666666666666,
+        "false_positive_rate": 0.5333333333333333,
+        "reject_fraction": 0.5555555555555556,
+        "lift": 1.2000000000000002,
+        "retained_risk": 0.125,
+        "retained_risk_reduction": 0.04166666666666666,
+        "flagged_risk_ci": [
+          0.09505107177290062,
+          0.37305696413147726
+        ],
+        "retained_risk_ci": [
+          0.043443340801235575,
+          0.31003881270499467
+        ],
+        "flagged_original_profit_count": 13,
+        "false_flag_original_profit_count": 13,
+        "original_net_mean_flagged": -0.011635264280545569,
+        "original_net_mean_retained": 0.033672807422328456
+      },
+      "test": {
+        "n": 98,
+        "positives": 12,
+        "base_rate": 0.12244897959183673,
+        "flagged": 56,
+        "caught": 6,
+        "false_flags": 50,
+        "missed": 6,
+        "precision": 0.10714285714285714,
+        "recall": 0.5,
+        "false_positive_rate": 0.5813953488372093,
+        "reject_fraction": 0.5714285714285714,
+        "lift": 0.875,
+        "retained_risk": 0.14285714285714285,
+        "retained_risk_reduction": -0.020408163265306117,
+        "flagged_risk_ci": [
+          0.050039355711171726,
+          0.21468445171071115
+        ],
+        "retained_risk_ci": [
+          0.06715967015962783,
+          0.27841089474444336
+        ],
+        "flagged_original_profit_count": 29,
+        "false_flag_original_profit_count": 28,
+        "original_net_mean_flagged": 0.015594945450073125,
+        "original_net_mean_retained": 0.026118304180268715
+      },
+      "uncertainty": {
+        "months": 7,
+        "valid_draws": 3000,
+        "retained_risk_reduction_ci": [
+          -0.045688847235238986,
+          0.030961791831357055
+        ],
+        "lift_ci": [
+          0.5823441176470588,
+          1.1381149373881934
+        ]
+      },
+      "selected": false
+    },
+    {
+      "id": "close_close_d0_normal_volume_ratio_q0_<=",
+      "target": "close",
+      "stage": "close",
+      "rule": {
+        "id": "close_close_d0_normal_volume_ratio_q0_<=",
+        "kind": "single",
+        "feature": "d0_normal_volume_ratio",
+        "op": "<=",
+        "value": 0.2827273800846903
+      },
+      "train": {
+        "n": 152,
+        "positives": 30,
+        "base_rate": 0.19736842105263158,
+        "flagged": 36,
+        "caught": 12,
+        "false_flags": 24,
+        "missed": 18,
+        "precision": 0.3333333333333333,
+        "recall": 0.4,
+        "false_positive_rate": 0.19672131147540983,
+        "reject_fraction": 0.23684210526315788,
+        "lift": 1.6888888888888887,
+        "retained_risk": 0.15517241379310345,
+        "retained_risk_reduction": 0.04219600725952813,
+        "flagged_risk_ci": [
+          0.202146188243056,
+          0.49666002128843023
+        ],
+        "retained_risk_ci": [
+          0.10046608139198239,
+          0.23198530240087073
+        ],
+        "flagged_original_profit_count": 17,
+        "false_flag_original_profit_count": 17,
+        "original_net_mean_flagged": -0.0036683013175968057,
+        "original_net_mean_retained": 0.004716634412410975
+      },
+      "valid": {
+        "n": 54,
+        "positives": 9,
+        "base_rate": 0.16666666666666666,
+        "flagged": 8,
+        "caught": 2,
+        "false_flags": 6,
+        "missed": 7,
+        "precision": 0.25,
+        "recall": 0.2222222222222222,
+        "false_positive_rate": 0.13333333333333333,
+        "reject_fraction": 0.14814814814814814,
+        "lift": 1.5,
+        "retained_risk": 0.15217391304347827,
+        "retained_risk_reduction": 0.014492753623188387,
+        "flagged_risk_ci": [
+          0.07147921275211133,
+          0.5907245696898228
+        ],
+        "retained_risk_ci": [
+          0.0757228222780561,
+          0.28224139552060584
+        ],
+        "flagged_original_profit_count": 4,
+        "false_flag_original_profit_count": 4,
+        "original_net_mean_flagged": -0.004638075850898624,
+        "original_net_mean_retained": 0.010786827315797934
+      },
+      "test": {
+        "n": 98,
+        "positives": 12,
+        "base_rate": 0.12244897959183673,
+        "flagged": 7,
+        "caught": 0,
+        "false_flags": 7,
+        "missed": 12,
+        "precision": 0.0,
+        "recall": 0.0,
+        "false_positive_rate": 0.08139534883720931,
+        "reject_fraction": 0.07142857142857142,
+        "lift": 0.0,
+        "retained_risk": 0.13186813186813187,
+        "retained_risk_reduction": -0.00941915227629514,
+        "flagged_risk_ci": [
+          0.0,
+          0.35433043506667483
+        ],
+        "retained_risk_ci": [
+          0.0770710751453858,
+          0.21648681785719476
+        ],
+        "flagged_original_profit_count": 4,
+        "false_flag_original_profit_count": 4,
+        "original_net_mean_flagged": 0.03465813092117057,
+        "original_net_mean_retained": 0.01898548136623282
+      },
+      "uncertainty": {
+        "months": 7,
+        "valid_draws": 2990,
+        "retained_risk_reduction_ci": [
+          -0.020297325060076376,
+          -0.002670689560964941
+        ],
+        "lift_ci": [
+          0.0,
+          0.0
+        ]
+      },
+      "selected": false
+    },
+    {
+      "id": "union_baseline_lr1",
+      "target": "union",
+      "stage": "baseline",
+      "rule": {
+        "id": "union_baseline_lr1",
+        "kind": "model",
+        "file": "union_baseline_lr1.joblib",
+        "columns": [
+          "total_mv_yi",
+          "d0_turnover_pct",
+          "board_streak_days",
+          "open_gap",
+          "body5",
+          "opened_after_touch"
+        ],
+        "threshold": 0.3366890590154408
+      },
+      "train": {
+        "n": 152,
+        "positives": 42,
+        "base_rate": 0.27631578947368424,
+        "flagged": 38,
+        "caught": 15,
+        "false_flags": 23,
+        "missed": 27,
+        "precision": 0.39473684210526316,
+        "recall": 0.35714285714285715,
+        "false_positive_rate": 0.20909090909090908,
+        "reject_fraction": 0.25,
+        "lift": 1.4285714285714284,
+        "retained_risk": 0.23684210526315788,
+        "retained_risk_reduction": 0.039473684210526355,
+        "flagged_risk_ci": [
+          0.2559807574816042,
+          0.5528213200395704
+        ],
+        "retained_risk_ci": [
+          0.16818266429965406,
+          0.32265866946815636
+        ],
+        "flagged_original_profit_count": 14,
+        "false_flag_original_profit_count": 14,
+        "original_net_mean_flagged": -0.03432537638900008,
+        "original_net_mean_retained": 0.015082763571826238
+      },
+      "valid": {
+        "n": 54,
+        "positives": 10,
+        "base_rate": 0.18518518518518517,
+        "flagged": 20,
+        "caught": 5,
+        "false_flags": 15,
+        "missed": 5,
+        "precision": 0.25,
+        "recall": 0.5,
+        "false_positive_rate": 0.3409090909090909,
+        "reject_fraction": 0.37037037037037035,
+        "lift": 1.35,
+        "retained_risk": 0.14705882352941177,
+        "retained_risk_reduction": 0.038126361655773405,
+        "flagged_risk_ci": [
+          0.11186170140766816,
+          0.4687008776187378
+        ],
+        "retained_risk_ci": [
+          0.06449441444782597,
+          0.3012805649545167
+        ],
+        "flagged_original_profit_count": 9,
+        "false_flag_original_profit_count": 9,
+        "original_net_mean_flagged": 0.0015188283134430019,
+        "original_net_mean_retained": 0.012609202454431064
+      },
+      "test": {
+        "n": 98,
+        "positives": 14,
+        "base_rate": 0.14285714285714285,
+        "flagged": 34,
+        "caught": 3,
+        "false_flags": 31,
+        "missed": 11,
+        "precision": 0.08823529411764706,
+        "recall": 0.21428571428571427,
+        "false_positive_rate": 0.36904761904761907,
+        "reject_fraction": 0.3469387755102041,
+        "lift": 0.6176470588235294,
+        "retained_risk": 0.171875,
+        "retained_risk_reduction": -0.02901785714285715,
+        "flagged_risk_ci": [
+          0.03046594367464936,
+          0.22960486562808377
+        ],
+        "retained_risk_ci": [
+          0.09877742301244796,
+          0.2821321162265786
+        ],
+        "flagged_original_profit_count": 17,
+        "false_flag_original_profit_count": 17,
+        "original_net_mean_flagged": 0.01476437882548594,
+        "original_net_mean_retained": 0.022942138136075922
+      },
+      "uncertainty": {
+        "months": 7,
+        "valid_draws": 3000,
+        "retained_risk_reduction_ci": [
+          -0.061386138613861385,
+          0.010816340941799953
+        ],
+        "lift_ci": [
+          0.17762751786874595,
+          1.1730207872622735
+        ]
+      },
+      "selected": false,
+      "auc": 0.5017006802721089,
+      "ap": 0.14228821003626105
+    },
+    {
+      "id": "union_early_lr01",
+      "target": "union",
+      "stage": "early",
+      "rule": {
+        "id": "union_early_lr01",
+        "kind": "model",
+        "file": "union_early_lr01.joblib",
+        "columns": [
+          "total_mv_yi",
+          "d0_turnover_pct",
+          "board_streak_days",
+          "d0_normal_volume_ratio",
+          "close_sealed_minutes",
+          "last30_amount_fraction",
+          "opened_after_touch",
+          "open_gap",
+          "body5",
+          "high5",
+          "low5",
+          "pullback5",
+          "position5",
+          "early_volume_ratio",
+          "early_volume_accel",
+          "early_down_volume",
+          "early_up_count",
+          "early_slope",
+          "early_path",
+          "early_below_d0",
+          "early_drawdown",
+          "early_upper",
+          "early_lower"
+        ],
+        "threshold": 0.3378533507959022
+      },
+      "train": {
+        "n": 152,
+        "positives": 42,
+        "base_rate": 0.27631578947368424,
+        "flagged": 38,
+        "caught": 23,
+        "false_flags": 15,
+        "missed": 19,
+        "precision": 0.6052631578947368,
+        "recall": 0.5476190476190477,
+        "false_positive_rate": 0.13636363636363635,
+        "reject_fraction": 0.25,
+        "lift": 2.1904761904761902,
+        "retained_risk": 0.16666666666666666,
+        "retained_risk_reduction": 0.10964912280701758,
+        "flagged_risk_ci": [
+          0.4471786799604296,
+          0.7440192425183958
+        ],
+        "retained_risk_ci": [
+          0.10937385401254587,
+          0.2456918354266807
+        ],
+        "flagged_original_profit_count": 7,
+        "false_flag_original_profit_count": 6,
+        "original_net_mean_flagged": -0.05817786577222399,
+        "original_net_mean_retained": 0.023033593366234204
+      },
+      "valid": {
+        "n": 54,
+        "positives": 10,
+        "base_rate": 0.18518518518518517,
+        "flagged": 18,
+        "caught": 6,
+        "false_flags": 12,
+        "missed": 4,
+        "precision": 0.3333333333333333,
+        "recall": 0.6,
+        "false_positive_rate": 0.2727272727272727,
+        "reject_fraction": 0.3333333333333333,
+        "lift": 1.8,
+        "retained_risk": 0.1111111111111111,
+        "retained_risk_reduction": 0.07407407407407407,
+        "flagged_risk_ci": [
+          0.16278774750834019,
+          0.5625053270405429
+        ],
+        "retained_risk_ci": [
+          0.04406640300315755,
+          0.25314808590364374
+        ],
+        "flagged_original_profit_count": 6,
+        "false_flag_original_profit_count": 6,
+        "original_net_mean_flagged": -0.02309986945117172,
+        "original_net_mean_retained": 0.02430241944001686
+      },
+      "test": {
+        "n": 98,
+        "positives": 14,
+        "base_rate": 0.14285714285714285,
+        "flagged": 41,
+        "caught": 9,
+        "false_flags": 32,
+        "missed": 5,
+        "precision": 0.21951219512195122,
+        "recall": 0.6428571428571429,
+        "false_positive_rate": 0.38095238095238093,
+        "reject_fraction": 0.41836734693877553,
+        "lift": 1.5365853658536586,
+        "retained_risk": 0.08771929824561403,
+        "retained_risk_reduction": 0.05513784461152882,
+        "flagged_risk_ci": [
+          0.12003174778217772,
+          0.36705005988225725
+        ],
+        "retained_risk_ci": [
+          0.03805167177792311,
+          0.18944877099558316
+        ],
+        "flagged_original_profit_count": 13,
+        "false_flag_original_profit_count": 12,
+        "original_net_mean_flagged": -0.01602587168931539,
+        "original_net_mean_retained": 0.046093797544514245
+      },
+      "uncertainty": {
+        "months": 7,
+        "valid_draws": 3000,
+        "retained_risk_reduction_ci": [
+          -0.0017318159327065763,
+          0.09963813444296836
+        ],
+        "lift_ci": [
+          0.9789473684210526,
+          1.9573673999299803
+        ]
+      },
+      "selected": true,
+      "auc": 0.6785714285714286,
+      "ap": 0.2115372744968023
+    },
+    {
+      "id": "union_early_lr1",
+      "target": "union",
+      "stage": "early",
+      "rule": {
+        "id": "union_early_lr1",
+        "kind": "model",
+        "file": "union_early_lr1.joblib",
+        "columns": [
+          "total_mv_yi",
+          "d0_turnover_pct",
+          "board_streak_days",
+          "d0_normal_volume_ratio",
+          "close_sealed_minutes",
+          "last30_amount_fraction",
+          "opened_after_touch",
+          "open_gap",
+          "body5",
+          "high5",
+          "low5",
+          "pullback5",
+          "position5",
+          "early_volume_ratio",
+          "early_volume_accel",
+          "early_down_volume",
+          "early_up_count",
+          "early_slope",
+          "early_path",
+          "early_below_d0",
+          "early_drawdown",
+          "early_upper",
+          "early_lower"
+        ],
+        "threshold": 0.35745120676271336
+      },
+      "train": {
+        "n": 152,
+        "positives": 42,
+        "base_rate": 0.27631578947368424,
+        "flagged": 38,
+        "caught": 24,
+        "false_flags": 14,
+        "missed": 18,
+        "precision": 0.631578947368421,
+        "recall": 0.5714285714285714,
+        "false_positive_rate": 0.12727272727272726,
+        "reject_fraction": 0.25,
+        "lift": 2.2857142857142856,
+        "retained_risk": 0.15789473684210525,
+        "retained_risk_reduction": 0.11842105263157898,
+        "flagged_risk_ci": [
+          0.4728395955700943,
+          0.7661578075284372
+        ],
+        "retained_risk_ci": [
+          0.10227261187561147,
+          0.23582112202254213
+        ],
+        "flagged_original_profit_count": 8,
+        "false_flag_original_profit_count": 7,
+        "original_net_mean_flagged": -0.050851066333559604,
+        "original_net_mean_retained": 0.02059132688667941
+      },
+      "valid": {
+        "n": 54,
+        "positives": 10,
+        "base_rate": 0.18518518518518517,
+        "flagged": 19,
+        "caught": 5,
+        "false_flags": 14,
+        "missed": 5,
+        "precision": 0.2631578947368421,
+        "recall": 0.5,
+        "false_positive_rate": 0.3181818181818182,
+        "reject_fraction": 0.35185185185185186,
+        "lift": 1.4210526315789473,
+        "retained_risk": 0.14285714285714285,
+        "retained_risk_reduction": 0.042328042328042326,
+        "flagged_risk_ci": [
+          0.11806412346782766,
+          0.48791550897814473
+        ],
+        "retained_risk_ci": [
+          0.06260231079433852,
+          0.2937555408659466
+        ],
+        "flagged_original_profit_count": 9,
+        "false_flag_original_profit_count": 9,
+        "original_net_mean_flagged": -0.006583553134112894,
+        "original_net_mean_retained": 0.016690770264790312
+      },
+      "test": {
+        "n": 98,
+        "positives": 14,
+        "base_rate": 0.14285714285714285,
+        "flagged": 37,
+        "caught": 8,
+        "false_flags": 29,
+        "missed": 6,
+        "precision": 0.21621621621621623,
+        "recall": 0.5714285714285714,
+        "false_positive_rate": 0.34523809523809523,
+        "reject_fraction": 0.37755102040816324,
+        "lift": 1.5135135135135136,
+        "retained_risk": 0.09836065573770492,
+        "retained_risk_reduction": 0.04449648711943793,
+        "flagged_risk_ci": [
+          0.11386511993385787,
+          0.3719514839196868
+        ],
+        "retained_risk_ci": [
+          0.045864575815471445,
+          0.1984460721682561
+        ],
+        "flagged_original_profit_count": 14,
+        "false_flag_original_profit_count": 13,
+        "original_net_mean_flagged": -0.006851164550300488,
+        "original_net_mean_retained": 0.036455390313713094
+      },
+      "uncertainty": {
+        "months": 7,
+        "valid_draws": 3000,
+        "retained_risk_reduction_ci": [
+          -0.020574162679425828,
+          0.10017329892329895
+        ],
+        "lift_ci": [
+          0.6851155462184876,
+          2.052631578947368
+        ]
+      },
+      "selected": false,
+      "auc": 0.7057823129251701,
+      "ap": 0.2545831181715885
+    },
+    {
+      "id": "union_early_tree",
+      "target": "union",
+      "stage": "early",
+      "rule": {
+        "id": "union_early_tree",
+        "kind": "model",
+        "file": "union_early_tree.joblib",
+        "columns": [
+          "total_mv_yi",
+          "d0_turnover_pct",
+          "board_streak_days",
+          "d0_normal_volume_ratio",
+          "close_sealed_minutes",
+          "last30_amount_fraction",
+          "opened_after_touch",
+          "open_gap",
+          "body5",
+          "high5",
+          "low5",
+          "pullback5",
+          "position5",
+          "early_volume_ratio",
+          "early_volume_accel",
+          "early_down_volume",
+          "early_up_count",
+          "early_slope",
+          "early_path",
+          "early_below_d0",
+          "early_drawdown",
+          "early_upper",
+          "early_lower"
+        ],
+        "threshold": 0.3225806451612903
+      },
+      "train": {
+        "n": 152,
+        "positives": 42,
+        "base_rate": 0.27631578947368424,
+        "flagged": 23,
+        "caught": 15,
+        "false_flags": 8,
+        "missed": 27,
+        "precision": 0.6521739130434783,
+        "recall": 0.35714285714285715,
+        "false_positive_rate": 0.07272727272727272,
+        "reject_fraction": 0.1513157894736842,
+        "lift": 2.360248447204969,
+        "retained_risk": 0.20930232558139536,
+        "retained_risk_reduction": 0.06701346389228888,
+        "flagged_risk_ci": [
+          0.4489033537726354,
+          0.8118872406120192
+        ],
+        "retained_risk_ci": [
+          0.1480208557750125,
+          0.2873963651301483
+        ],
+        "flagged_original_profit_count": 5,
+        "false_flag_original_profit_count": 4,
+        "original_net_mean_flagged": -0.05623837758078948,
+        "original_net_mean_retained": 0.013244600222979427
+      },
+      "valid": {
+        "n": 54,
+        "positives": 10,
+        "base_rate": 0.18518518518518517,
+        "flagged": 6,
+        "caught": 2,
+        "false_flags": 4,
+        "missed": 8,
+        "precision": 0.3333333333333333,
+        "recall": 0.2,
+        "false_positive_rate": 0.09090909090909091,
+        "reject_fraction": 0.1111111111111111,
+        "lift": 1.8,
+        "retained_risk": 0.16666666666666666,
+        "retained_risk_reduction": 0.018518518518518517,
+        "flagged_risk_ci": [
+          0.09677141110578363,
+          0.7000066848616004
+        ],
+        "retained_risk_ci": [
+          0.08695513576485722,
+          0.2957782840125519
+        ],
+        "flagged_original_profit_count": 4,
+        "false_flag_original_profit_count": 4,
+        "original_net_mean_flagged": 0.029288330746285007,
+        "original_net_mean_retained": 0.005903322192537623
+      },
+      "test": {
+        "n": 98,
+        "positives": 14,
+        "base_rate": 0.14285714285714285,
+        "flagged": 16,
+        "caught": 2,
+        "false_flags": 14,
+        "missed": 12,
+        "precision": 0.125,
+        "recall": 0.14285714285714285,
+        "false_positive_rate": 0.16666666666666666,
+        "reject_fraction": 0.16326530612244897,
+        "lift": 0.875,
+        "retained_risk": 0.14634146341463414,
+        "retained_risk_reduction": -0.0034843205574912883,
+        "flagged_risk_ci": [
+          0.03497748774324158,
+          0.3602282726575794
+        ],
+        "retained_risk_ci": [
+          0.08574162210230707,
+          0.2385941848980061
+        ],
+        "flagged_original_profit_count": 3,
+        "false_flag_original_profit_count": 3,
+        "original_net_mean_flagged": -0.028209858853629123,
+        "original_net_mean_retained": 0.02953223734674936
+      },
+      "uncertainty": {
+        "months": 7,
+        "valid_draws": 3000,
+        "retained_risk_reduction_ci": [
+          -0.03527435610302351,
+          0.04444444444444444
+        ],
+        "lift_ci": [
+          0.0,
+          2.4871794871794872
+        ]
+      },
+      "selected": false,
+      "auc": 0.5178571428571429,
+      "ap": 0.1589896521989077
+    },
+    {
+      "id": "union_early_d0_normal_volume_ratio_q0_<=",
+      "target": "union",
+      "stage": "early",
+      "rule": {
+        "id": "union_early_d0_normal_volume_ratio_q0_<=",
+        "kind": "single",
+        "feature": "d0_normal_volume_ratio",
+        "op": "<=",
+        "value": 0.2827273800846903
+      },
+      "train": {
+        "n": 152,
+        "positives": 42,
+        "base_rate": 0.27631578947368424,
+        "flagged": 36,
+        "caught": 16,
+        "false_flags": 20,
+        "missed": 26,
+        "precision": 0.4444444444444444,
+        "recall": 0.38095238095238093,
+        "false_positive_rate": 0.18181818181818182,
+        "reject_fraction": 0.23684210526315788,
+        "lift": 1.6084656084656082,
+        "retained_risk": 0.22413793103448276,
+        "retained_risk_reduction": 0.052177858439201474,
+        "flagged_risk_ci": [
+          0.29541268740080573,
+          0.6041893824430229
+        ],
+        "retained_risk_ci": [
+          0.15779761353649868,
+          0.30816349349778377
+        ],
+        "flagged_original_profit_count": 17,
+        "false_flag_original_profit_count": 15,
+        "original_net_mean_flagged": -0.0036683013175968057,
+        "original_net_mean_retained": 0.004716634412410975
+      },
+      "valid": {
+        "n": 54,
+        "positives": 10,
+        "base_rate": 0.18518518518518517,
+        "flagged": 8,
+        "caught": 2,
+        "false_flags": 6,
+        "missed": 8,
+        "precision": 0.25,
+        "recall": 0.2,
+        "false_positive_rate": 0.13636363636363635,
+        "reject_fraction": 0.14814814814814814,
+        "lift": 1.35,
+        "retained_risk": 0.17391304347826086,
+        "retained_risk_reduction": 0.01127214170692431,
+        "flagged_risk_ci": [
+          0.07147921275211133,
+          0.5907245696898228
+        ],
+        "retained_risk_ci": [
+          0.09085791702246479,
+          0.30723353716378077
+        ],
+        "flagged_original_profit_count": 4,
+        "false_flag_original_profit_count": 4,
+        "original_net_mean_flagged": -0.004638075850898624,
+        "original_net_mean_retained": 0.010786827315797934
+      },
+      "test": {
+        "n": 98,
+        "positives": 14,
+        "base_rate": 0.14285714285714285,
+        "flagged": 7,
+        "caught": 0,
+        "false_flags": 7,
+        "missed": 14,
+        "precision": 0.0,
+        "recall": 0.0,
+        "false_positive_rate": 0.08333333333333333,
+        "reject_fraction": 0.07142857142857142,
+        "lift": 0.0,
+        "retained_risk": 0.15384615384615385,
+        "retained_risk_reduction": -0.010989010989011005,
+        "flagged_risk_ci": [
+          0.0,
+          0.35433043506667483
+        ],
+        "retained_risk_ci": [
+          0.09391213405915602,
+          0.24182140712237496
+        ],
+        "flagged_original_profit_count": 4,
+        "false_flag_original_profit_count": 4,
+        "original_net_mean_flagged": 0.03465813092117057,
+        "original_net_mean_retained": 0.01898548136623282
+      },
+      "uncertainty": {
+        "months": 7,
+        "valid_draws": 2990,
+        "retained_risk_reduction_ci": [
+          -0.023529411764705882,
+          -0.002812939521800284
+        ],
+        "lift_ci": [
+          0.0,
+          0.0
+        ]
+      },
+      "selected": false
+    },
+    {
+      "id": "union_early_d0_turnover_pct_q0_<=",
+      "target": "union",
+      "stage": "early",
+      "rule": {
+        "id": "union_early_d0_turnover_pct_q0_<=",
+        "kind": "single",
+        "feature": "d0_turnover_pct",
+        "op": "<=",
+        "value": 0.019931
+      },
+      "train": {
+        "n": 152,
+        "positives": 42,
+        "base_rate": 0.27631578947368424,
+        "flagged": 38,
+        "caught": 15,
+        "false_flags": 23,
+        "missed": 27,
+        "precision": 0.39473684210526316,
+        "recall": 0.35714285714285715,
+        "false_positive_rate": 0.20909090909090908,
+        "reject_fraction": 0.25,
+        "lift": 1.4285714285714284,
+        "retained_risk": 0.23684210526315788,
+        "retained_risk_reduction": 0.039473684210526355,
+        "flagged_risk_ci": [
+          0.2559807574816042,
+          0.5528213200395704
+        ],
+        "retained_risk_ci": [
+          0.16818266429965406,
+          0.32265866946815636
+        ],
+        "flagged_original_profit_count": 16,
+        "false_flag_original_profit_count": 16,
+        "original_net_mean_flagged": -0.016667598963582317,
+        "original_net_mean_retained": 0.009196837763353645
+      },
+      "valid": {
+        "n": 54,
+        "positives": 10,
+        "base_rate": 0.18518518518518517,
+        "flagged": 10,
+        "caught": 2,
+        "false_flags": 8,
+        "missed": 8,
+        "precision": 0.2,
+        "recall": 0.2,
+        "false_positive_rate": 0.18181818181818182,
+        "reject_fraction": 0.18518518518518517,
+        "lift": 1.08,
+        "retained_risk": 0.18181818181818182,
+        "retained_risk_reduction": 0.0033670033670033517,
+        "flagged_risk_ci": [
+          0.05668215145437705,
+          0.5098375284633498
+        ],
+        "retained_risk_ci": [
+          0.09512805715627895,
+          0.31960550887184247
+        ],
+        "flagged_original_profit_count": 5,
+        "false_flag_original_profit_count": 5,
+        "original_net_mean_flagged": 0.0019326462040263003,
+        "original_net_mean_retained": 0.009994613356346656
+      },
+      "test": {
+        "n": 98,
+        "positives": 14,
+        "base_rate": 0.14285714285714285,
+        "flagged": 13,
+        "caught": 0,
+        "false_flags": 13,
+        "missed": 14,
+        "precision": 0.0,
+        "recall": 0.0,
+        "false_positive_rate": 0.15476190476190477,
+        "reject_fraction": 0.1326530612244898,
+        "lift": 0.0,
+        "retained_risk": 0.16470588235294117,
+        "retained_risk_reduction": -0.021848739495798325,
+        "flagged_risk_ci": [
+          0.0,
+          0.22809537235418867
+        ],
+        "retained_risk_ci": [
+          0.10072462065396655,
+          0.2576830331978076
+        ],
+        "flagged_original_profit_count": 6,
+        "false_flag_original_profit_count": 6,
+        "original_net_mean_flagged": 0.016147778665374847,
+        "original_net_mean_retained": 0.020710171742653032
+      },
+      "uncertainty": {
+        "months": 7,
+        "valid_draws": 3000,
+        "retained_risk_reduction_ci": [
+          -0.030597271309301705,
+          -0.012833354463308034
+        ],
+        "lift_ci": [
+          0.0,
+          0.0
+        ]
+      },
+      "selected": false
+    },
+    {
+      "id": "union_early_early_up_count_q0_<=",
+      "target": "union",
+      "stage": "early",
+      "rule": {
+        "id": "union_early_early_up_count_q0_<=",
+        "kind": "single",
+        "feature": "early_up_count",
+        "op": "<=",
+        "value": 1.0
+      },
+      "train": {
+        "n": 152,
+        "positives": 42,
+        "base_rate": 0.27631578947368424,
+        "flagged": 46,
+        "caught": 17,
+        "false_flags": 29,
+        "missed": 25,
+        "precision": 0.3695652173913043,
+        "recall": 0.40476190476190477,
+        "false_positive_rate": 0.2636363636363636,
+        "reject_fraction": 0.3026315789473684,
+        "lift": 1.3374741200828155,
+        "retained_risk": 0.2358490566037736,
+        "retained_risk_reduction": 0.04046673286991065,
+        "flagged_risk_ci": [
+          0.24523754590839922,
+          0.5139990357660991
+        ],
+        "retained_risk_ci": [
+          0.16516041197111675,
+          0.3250138755771317
+        ],
+        "flagged_original_profit_count": 18,
+        "false_flag_original_profit_count": 18,
+        "original_net_mean_flagged": -0.0076828957727448025,
+        "original_net_mean_retained": 0.007249848584457065
+      },
+      "valid": {
+        "n": 54,
+        "positives": 10,
+        "base_rate": 0.18518518518518517,
+        "flagged": 12,
+        "caught": 2,
+        "false_flags": 10,
+        "missed": 8,
+        "precision": 0.16666666666666666,
+        "recall": 0.2,
+        "false_positive_rate": 0.22727272727272727,
+        "reject_fraction": 0.2222222222222222,
+        "lift": 0.9,
+        "retained_risk": 0.19047619047619047,
+        "retained_risk_reduction": -0.005291005291005291,
+        "flagged_risk_ci": [
+          0.04696514218385531,
+          0.4480308622529653
+        ],
+        "retained_risk_ci": [
+          0.09982008281647918,
+          0.3330077401003825
+        ],
+        "flagged_original_profit_count": 7,
+        "false_flag_original_profit_count": 7,
+        "original_net_mean_flagged": -0.008063250283989005,
+        "original_net_mean_retained": 0.013234486979223428
+      },
+      "test": {
+        "n": 98,
+        "positives": 14,
+        "base_rate": 0.14285714285714285,
+        "flagged": 25,
+        "caught": 4,
+        "false_flags": 21,
+        "missed": 10,
+        "precision": 0.16,
+        "recall": 0.2857142857142857,
+        "false_positive_rate": 0.25,
+        "reject_fraction": 0.25510204081632654,
+        "lift": 1.12,
+        "retained_risk": 0.136986301369863,
+        "retained_risk_reduction": 0.005870841487279843,
+        "flagged_risk_ci": [
+          0.06403451456676595,
+          0.3465362160717827
+        ],
+        "retained_risk_ci": [
+          0.07614389609394254,
+          0.2341242740656959
+        ],
+        "flagged_original_profit_count": 9,
+        "false_flag_original_profit_count": 9,
+        "original_net_mean_flagged": -0.0035435822224358393,
+        "original_net_mean_retained": 0.028203770908716123
+      },
+      "uncertainty": {
+        "months": 7,
+        "valid_draws": 3000,
+        "retained_risk_reduction_ci": [
+          -0.0325966493589202,
+          0.05947026486756621
+        ],
+        "lift_ci": [
+          0.2675,
+          2.3733750000000002
+        ]
+      },
+      "selected": false
+    },
+    {
+      "id": "union_close_lr01",
+      "target": "union",
+      "stage": "close",
+      "rule": {
+        "id": "union_close_lr01",
+        "kind": "model",
+        "file": "union_close_lr01.joblib",
+        "columns": [
+          "total_mv_yi",
+          "d0_turnover_pct",
+          "board_streak_days",
+          "d0_normal_volume_ratio",
+          "close_sealed_minutes",
+          "last30_amount_fraction",
+          "opened_after_touch",
+          "open_gap",
+          "body5",
+          "high5",
+          "low5",
+          "pullback5",
+          "position5",
+          "early_volume_ratio",
+          "early_volume_accel",
+          "early_down_volume",
+          "early_up_count",
+          "early_slope",
+          "early_path",
+          "early_below_d0",
+          "early_drawdown",
+          "early_upper",
+          "early_lower",
+          "day_return",
+          "day_body",
+          "day_range",
+          "day_upper",
+          "day_lower",
+          "day_position",
+          "day_volume_ratio",
+          "day_turnover",
+          "day_turnover_ratio",
+          "after4_return",
+          "after4_low",
+          "morning_return",
+          "afternoon_return",
+          "tail_return",
+          "day_drawdown",
+          "afternoon_volume",
+          "tail_volume",
+          "early_volume_share",
+          "day_down_volume",
+          "close_vs_weighted",
+          "limit_up_fraction",
+          "day_close_limit",
+          "return_change",
+          "body_change"
+        ],
+        "threshold": 0.407150558048075
+      },
+      "train": {
+        "n": 152,
+        "positives": 42,
+        "base_rate": 0.27631578947368424,
+        "flagged": 38,
+        "caught": 24,
+        "false_flags": 14,
+        "missed": 18,
+        "precision": 0.631578947368421,
+        "recall": 0.5714285714285714,
+        "false_positive_rate": 0.12727272727272726,
+        "reject_fraction": 0.25,
+        "lift": 2.2857142857142856,
+        "retained_risk": 0.15789473684210525,
+        "retained_risk_reduction": 0.11842105263157898,
+        "flagged_risk_ci": [
+          0.4728395955700943,
+          0.7661578075284372
+        ],
+        "retained_risk_ci": [
+          0.10227261187561147,
+          0.23582112202254213
+        ],
+        "flagged_original_profit_count": 6,
+        "false_flag_original_profit_count": 5,
+        "original_net_mean_flagged": -0.08528798615648045,
+        "original_net_mean_retained": 0.03207030016098636
+      },
+      "valid": {
+        "n": 54,
+        "positives": 10,
+        "base_rate": 0.18518518518518517,
+        "flagged": 13,
+        "caught": 3,
+        "false_flags": 10,
+        "missed": 7,
+        "precision": 0.23076923076923078,
+        "recall": 0.3,
+        "false_positive_rate": 0.22727272727272727,
+        "reject_fraction": 0.24074074074074073,
+        "lift": 1.2461538461538464,
+        "retained_risk": 0.17073170731707318,
+        "retained_risk_reduction": 0.014453477868111991,
+        "flagged_risk_ci": [
+          0.08179528718498785,
+          0.5025637594672676
+        ],
+        "retained_risk_ci": [
+          0.0852525197759516,
+          0.3126261240040373
+        ],
+        "flagged_original_profit_count": 4,
+        "false_flag_original_profit_count": 4,
+        "original_net_mean_flagged": -0.05251631124082738,
+        "original_net_mean_retained": 0.027848816971957853
+      },
+      "test": {
+        "n": 98,
+        "positives": 14,
+        "base_rate": 0.14285714285714285,
+        "flagged": 27,
+        "caught": 4,
+        "false_flags": 23,
+        "missed": 10,
+        "precision": 0.14814814814814814,
+        "recall": 0.2857142857142857,
+        "false_positive_rate": 0.27380952380952384,
+        "reject_fraction": 0.2755102040816326,
+        "lift": 1.037037037037037,
+        "retained_risk": 0.14084507042253522,
+        "retained_risk_reduction": 0.0020120724346076313,
+        "flagged_risk_ci": [
+          0.059159277762444756,
+          0.32478685427812415
+        ],
+        "retained_risk_ci": [
+          0.07834202212357293,
+          0.24021749283475485
+        ],
+        "flagged_original_profit_count": 6,
+        "false_flag_original_profit_count": 6,
+        "original_net_mean_flagged": -0.02976253879079837,
+        "original_net_mean_retained": 0.03906865166375967
+      },
+      "uncertainty": {
+        "months": 7,
+        "valid_draws": 3000,
+        "retained_risk_reduction_ci": [
+          -0.04633204633204635,
+          0.06123698714023269
+        ],
+        "lift_ci": [
+          0.21176470588235294,
+          2.226192358366272
+        ]
+      },
+      "selected": false,
+      "auc": 0.5731292517006803,
+      "ap": 0.20172897228054362
+    },
+    {
+      "id": "union_close_lr1",
+      "target": "union",
+      "stage": "close",
+      "rule": {
+        "id": "union_close_lr1",
+        "kind": "model",
+        "file": "union_close_lr1.joblib",
+        "columns": [
+          "total_mv_yi",
+          "d0_turnover_pct",
+          "board_streak_days",
+          "d0_normal_volume_ratio",
+          "close_sealed_minutes",
+          "last30_amount_fraction",
+          "opened_after_touch",
+          "open_gap",
+          "body5",
+          "high5",
+          "low5",
+          "pullback5",
+          "position5",
+          "early_volume_ratio",
+          "early_volume_accel",
+          "early_down_volume",
+          "early_up_count",
+          "early_slope",
+          "early_path",
+          "early_below_d0",
+          "early_drawdown",
+          "early_upper",
+          "early_lower",
+          "day_return",
+          "day_body",
+          "day_range",
+          "day_upper",
+          "day_lower",
+          "day_position",
+          "day_volume_ratio",
+          "day_turnover",
+          "day_turnover_ratio",
+          "after4_return",
+          "after4_low",
+          "morning_return",
+          "afternoon_return",
+          "tail_return",
+          "day_drawdown",
+          "afternoon_volume",
+          "tail_volume",
+          "early_volume_share",
+          "day_down_volume",
+          "close_vs_weighted",
+          "limit_up_fraction",
+          "day_close_limit",
+          "return_change",
+          "body_change"
+        ],
+        "threshold": 0.44254339479891647
+      },
+      "train": {
+        "n": 152,
+        "positives": 42,
+        "base_rate": 0.27631578947368424,
+        "flagged": 38,
+        "caught": 28,
+        "false_flags": 10,
+        "missed": 14,
+        "precision": 0.7368421052631579,
+        "recall": 0.6666666666666666,
+        "false_positive_rate": 0.09090909090909091,
+        "reject_fraction": 0.25,
+        "lift": 2.666666666666666,
+        "retained_risk": 0.12280701754385964,
+        "retained_risk_reduction": 0.1535087719298246,
+        "flagged_risk_ci": [
+          0.5799115381253408,
+          0.8502837874520162
+        ],
+        "retained_risk_ci": [
+          0.07458120778594124,
+          0.19562470394792042
+        ],
+        "flagged_original_profit_count": 4,
+        "false_flag_original_profit_count": 3,
+        "original_net_mean_flagged": -0.09110035772688994,
+        "original_net_mean_retained": 0.034007757351122866
+      },
+      "valid": {
+        "n": 54,
+        "positives": 10,
+        "base_rate": 0.18518518518518517,
+        "flagged": 13,
+        "caught": 3,
+        "false_flags": 10,
+        "missed": 7,
+        "precision": 0.23076923076923078,
+        "recall": 0.3,
+        "false_positive_rate": 0.22727272727272727,
+        "reject_fraction": 0.24074074074074073,
+        "lift": 1.2461538461538464,
+        "retained_risk": 0.17073170731707318,
+        "retained_risk_reduction": 0.014453477868111991,
+        "flagged_risk_ci": [
+          0.08179528718498785,
+          0.5025637594672676
+        ],
+        "retained_risk_ci": [
+          0.0852525197759516,
+          0.3126261240040373
+        ],
+        "flagged_original_profit_count": 4,
+        "false_flag_original_profit_count": 4,
+        "original_net_mean_flagged": -0.045556938369111157,
+        "original_net_mean_retained": 0.025642186549218557
+      },
+      "test": {
+        "n": 98,
+        "positives": 14,
+        "base_rate": 0.14285714285714285,
+        "flagged": 25,
+        "caught": 5,
+        "false_flags": 20,
+        "missed": 9,
+        "precision": 0.2,
+        "recall": 0.35714285714285715,
+        "false_positive_rate": 0.23809523809523808,
+        "reject_fraction": 0.25510204081632654,
+        "lift": 1.4000000000000001,
+        "retained_risk": 0.1232876712328767,
+        "retained_risk_reduction": 0.019569471624266144,
+        "flagged_risk_ci": [
+          0.0886058468680277,
+          0.39130950369539763
+        ],
+        "retained_risk_ci": [
+          0.06623751038903036,
+          0.2180030435502171
+        ],
+        "flagged_original_profit_count": 7,
+        "false_flag_original_profit_count": 7,
+        "original_net_mean_flagged": -0.023783881904047316,
+        "original_net_mean_retained": 0.03513538038872006
+      },
+      "uncertainty": {
+        "months": 7,
+        "valid_draws": 3000,
+        "retained_risk_reduction_ci": [
+          -0.028235951915012575,
+          0.07763023493360571
+        ],
+        "lift_ci": [
+          0.29690259740259745,
+          2.4871794871794872
+        ]
+      },
+      "selected": false,
+      "auc": 0.6471088435374149,
+      "ap": 0.2629169037974638
+    },
+    {
+      "id": "union_close_tree",
+      "target": "union",
+      "stage": "close",
+      "rule": {
+        "id": "union_close_tree",
+        "kind": "model",
+        "file": "union_close_tree.joblib",
+        "columns": [
+          "total_mv_yi",
+          "d0_turnover_pct",
+          "board_streak_days",
+          "d0_normal_volume_ratio",
+          "close_sealed_minutes",
+          "last30_amount_fraction",
+          "opened_after_touch",
+          "open_gap",
+          "body5",
+          "high5",
+          "low5",
+          "pullback5",
+          "position5",
+          "early_volume_ratio",
+          "early_volume_accel",
+          "early_down_volume",
+          "early_up_count",
+          "early_slope",
+          "early_path",
+          "early_below_d0",
+          "early_drawdown",
+          "early_upper",
+          "early_lower",
+          "day_return",
+          "day_body",
+          "day_range",
+          "day_upper",
+          "day_lower",
+          "day_position",
+          "day_volume_ratio",
+          "day_turnover",
+          "day_turnover_ratio",
+          "after4_return",
+          "after4_low",
+          "morning_return",
+          "afternoon_return",
+          "tail_return",
+          "day_drawdown",
+          "afternoon_volume",
+          "tail_volume",
+          "early_volume_share",
+          "day_down_volume",
+          "close_vs_weighted",
+          "limit_up_fraction",
+          "day_close_limit",
+          "return_change",
+          "body_change"
+        ],
+        "threshold": 0.36065573770491804
+      },
+      "train": {
+        "n": 152,
+        "positives": 42,
+        "base_rate": 0.27631578947368424,
+        "flagged": 24,
+        "caught": 15,
+        "false_flags": 9,
+        "missed": 27,
+        "precision": 0.625,
+        "recall": 0.35714285714285715,
+        "false_positive_rate": 0.08181818181818182,
+        "reject_fraction": 0.15789473684210525,
+        "lift": 2.261904761904762,
+        "retained_risk": 0.2109375,
+        "retained_risk_reduction": 0.06537828947368424,
+        "flagged_risk_ci": [
+          0.4270996244267478,
+          0.7884063244045088
+        ],
+        "retained_risk_ci": [
+          0.14921308750498186,
+          0.2895067153406394
+        ],
+        "flagged_original_profit_count": 4,
+        "false_flag_original_profit_count": 3,
+        "original_net_mean_flagged": -0.0989815540696302,
+        "original_net_mean_retained": 0.02180178157872901
+      },
+      "valid": {
+        "n": 54,
+        "positives": 10,
+        "base_rate": 0.18518518518518517,
+        "flagged": 8,
+        "caught": 1,
+        "false_flags": 7,
+        "missed": 9,
+        "precision": 0.125,
+        "recall": 0.1,
+        "false_positive_rate": 0.1590909090909091,
+        "reject_fraction": 0.14814814814814814,
+        "lift": 0.675,
+        "retained_risk": 0.1956521739130435,
+        "retained_risk_reduction": -0.010466988727858312,
+        "flagged_risk_ci": [
+          0.02241749145005756,
+          0.47088818221284356
+        ],
+        "retained_risk_ci": [
+          0.10650610134398716,
+          0.33171258922984204
+        ],
+        "flagged_original_profit_count": 1,
+        "false_flag_original_profit_count": 1,
+        "original_net_mean_flagged": -0.08980645032984474,
+        "original_net_mean_retained": 0.025598718529527692
+      },
+      "test": {
+        "n": 98,
+        "positives": 14,
+        "base_rate": 0.14285714285714285,
+        "flagged": 9,
+        "caught": 1,
+        "false_flags": 8,
+        "missed": 13,
+        "precision": 0.1111111111111111,
+        "recall": 0.07142857142857142,
+        "false_positive_rate": 0.09523809523809523,
+        "reject_fraction": 0.09183673469387756,
+        "lift": 0.7777777777777778,
+        "retained_risk": 0.14606741573033707,
+        "retained_risk_reduction": -0.0032102728731942254,
+        "flagged_risk_ci": [
+          0.019890887638545657,
+          0.43499970557664625
+        ],
+        "retained_risk_ci": [
+          0.08739460273414085,
+          0.23402924389376667
+        ],
+        "flagged_original_profit_count": 1,
+        "false_flag_original_profit_count": 1,
+        "original_net_mean_flagged": -0.042799870493928555,
+        "original_net_mean_retained": 0.026466118597985824
+      },
+      "uncertainty": {
+        "months": 7,
+        "valid_draws": 2989,
+        "retained_risk_reduction_ci": [
+          -0.013994577101373223,
+          0.011936339522546427
+        ],
+        "lift_ci": [
+          0.0,
+          1.7037037037037035
+        ]
+      },
+      "selected": false,
+      "auc": 0.5467687074829932,
+      "ap": 0.15589569160997732
+    },
+    {
+      "id": "union_close_close_vs_weighted_q0_<=",
+      "target": "union",
+      "stage": "close",
+      "rule": {
+        "id": "union_close_close_vs_weighted_q0_<=",
+        "kind": "single",
+        "feature": "close_vs_weighted",
+        "op": "<=",
+        "value": -0.025349770571055225
+      },
+      "train": {
+        "n": 152,
+        "positives": 42,
+        "base_rate": 0.27631578947368424,
+        "flagged": 38,
+        "caught": 19,
+        "false_flags": 19,
+        "missed": 23,
+        "precision": 0.5,
+        "recall": 0.4523809523809524,
+        "false_positive_rate": 0.17272727272727273,
+        "reject_fraction": 0.25,
+        "lift": 1.8095238095238093,
+        "retained_risk": 0.20175438596491227,
+        "retained_risk_reduction": 0.07456140350877197,
+        "flagged_risk_ci": [
+          0.3484992836439549,
+          0.6515007163560451
+        ],
+        "retained_risk_ci": [
+          0.13837064215120498,
+          0.28458286945231354
+        ],
+        "flagged_original_profit_count": 6,
+        "false_flag_original_profit_count": 5,
+        "original_net_mean_flagged": -0.0922620706064821,
+        "original_net_mean_retained": 0.03439499497765358
+      },
+      "valid": {
+        "n": 54,
+        "positives": 10,
+        "base_rate": 0.18518518518518517,
+        "flagged": 13,
+        "caught": 2,
+        "false_flags": 11,
+        "missed": 8,
+        "precision": 0.15384615384615385,
+        "recall": 0.2,
+        "false_positive_rate": 0.25,
+        "reject_fraction": 0.24074074074074073,
+        "lift": 0.8307692307692308,
+        "retained_risk": 0.1951219512195122,
+        "retained_risk_reduction": -0.009936766034327027,
+        "flagged_risk_ci": [
+          0.043258178358082544,
+          0.42234631019481733
+        ],
+        "retained_risk_ci": [
+          0.10234437385158211,
+          0.3401358518706299
+        ],
+        "flagged_original_profit_count": 3,
+        "false_flag_original_profit_count": 3,
+        "original_net_mean_flagged": -0.08056570020251753,
+        "original_net_mean_retained": 0.0367425256671279
+      },
+      "test": {
+        "n": 98,
+        "positives": 14,
+        "base_rate": 0.14285714285714285,
+        "flagged": 20,
+        "caught": 1,
+        "false_flags": 19,
+        "missed": 13,
+        "precision": 0.05,
+        "recall": 0.07142857142857142,
+        "false_positive_rate": 0.2261904761904762,
+        "reject_fraction": 0.20408163265306123,
+        "lift": 0.35000000000000003,
+        "retained_risk": 0.16666666666666666,
+        "retained_risk_reduction": -0.023809523809523808,
+        "flagged_risk_ci": [
+          0.008881448800795763,
+          0.236131193446735
+        ],
+        "retained_risk_ci": [
+          0.10006945416721788,
+          0.26455575230757666
+        ],
+        "flagged_original_profit_count": 4,
+        "false_flag_original_profit_count": 4,
+        "original_net_mean_flagged": -0.042168602598463445,
+        "original_net_mean_retained": 0.03607253554800833
+      },
+      "uncertainty": {
+        "months": 7,
+        "valid_draws": 3000,
+        "retained_risk_reduction_ci": [
+          -0.04318739704248554,
+          -0.004860088365242987
+        ],
+        "lift_ci": [
+          0.0,
+          0.8965517241379309
+        ]
+      },
+      "selected": false
+    },
+    {
+      "id": "union_close_afternoon_return_q0_<=",
+      "target": "union",
+      "stage": "close",
+      "rule": {
+        "id": "union_close_afternoon_return_q0_<=",
+        "kind": "single",
+        "feature": "afternoon_return",
+        "op": "<=",
+        "value": -0.015446595280600522
+      },
+      "train": {
+        "n": 152,
+        "positives": 42,
+        "base_rate": 0.27631578947368424,
+        "flagged": 38,
+        "caught": 17,
+        "false_flags": 21,
+        "missed": 25,
+        "precision": 0.4473684210526316,
+        "recall": 0.40476190476190477,
+        "false_positive_rate": 0.19090909090909092,
+        "reject_fraction": 0.25,
+        "lift": 1.6190476190476188,
+        "retained_risk": 0.21929824561403508,
+        "retained_risk_reduction": 0.05701754385964916,
+        "flagged_risk_ci": [
+          0.30146400998051603,
+          0.6029370287800713
+        ],
+        "retained_risk_ci": [
+          0.15318376080646473,
+          0.30371366187919974
+        ],
+        "flagged_original_profit_count": 9,
+        "false_flag_original_profit_count": 8,
+        "original_net_mean_flagged": -0.07007843396709691,
+        "original_net_mean_retained": 0.027000449431191852
+      },
+      "valid": {
+        "n": 54,
+        "positives": 10,
+        "base_rate": 0.18518518518518517,
+        "flagged": 15,
+        "caught": 2,
+        "false_flags": 13,
+        "missed": 8,
+        "precision": 0.13333333333333333,
+        "recall": 0.2,
+        "false_positive_rate": 0.29545454545454547,
+        "reject_fraction": 0.2777777777777778,
+        "lift": 0.7200000000000001,
+        "retained_risk": 0.20512820512820512,
+        "retained_risk_reduction": -0.019943019943019946,
+        "flagged_risk_ci": [
+          0.037361259103066535,
+          0.37881982832321587
+        ],
+        "retained_risk_ci": [
+          0.10779718230710575,
+          0.3553396801358183
+        ],
+        "flagged_original_profit_count": 5,
+        "false_flag_original_profit_count": 5,
+        "original_net_mean_flagged": -0.0627416850933584,
+        "original_net_mean_retained": 0.03590294169538184
+      },
+      "test": {
+        "n": 98,
+        "positives": 14,
+        "base_rate": 0.14285714285714285,
+        "flagged": 20,
+        "caught": 2,
+        "false_flags": 18,
+        "missed": 12,
+        "precision": 0.1,
+        "recall": 0.14285714285714285,
+        "false_positive_rate": 0.21428571428571427,
+        "reject_fraction": 0.20408163265306123,
+        "lift": 0.7000000000000001,
+        "retained_risk": 0.15384615384615385,
+        "retained_risk_reduction": -0.010989010989011005,
+        "flagged_risk_ci": [
+          0.027866481213769084,
+          0.3010336452284804
+        ],
+        "retained_risk_ci": [
+          0.0902550490838725,
+          0.24993266533226033
+        ],
+        "flagged_original_profit_count": 4,
+        "false_flag_original_profit_count": 4,
+        "original_net_mean_flagged": -0.0355910410690132,
+        "original_net_mean_retained": 0.03438598130968775
+      },
+      "uncertainty": {
+        "months": 7,
+        "valid_draws": 2999,
+        "retained_risk_reduction_ci": [
+          -0.03891794046661304,
+          0.01750867547205641
+        ],
+        "lift_ci": [
+          0.0,
+          1.558641975308642
+        ]
+      },
+      "selected": false
+    },
+    {
+      "id": "union_close_day_return_q0_<=",
+      "target": "union",
+      "stage": "close",
+      "rule": {
+        "id": "union_close_day_return_q0_<=",
+        "kind": "single",
+        "feature": "day_return",
+        "op": "<=",
+        "value": -0.025519333607568917
+      },
+      "train": {
+        "n": 152,
+        "positives": 42,
+        "base_rate": 0.27631578947368424,
+        "flagged": 38,
+        "caught": 17,
+        "false_flags": 21,
+        "missed": 25,
+        "precision": 0.4473684210526316,
+        "recall": 0.40476190476190477,
+        "false_positive_rate": 0.19090909090909092,
+        "reject_fraction": 0.25,
+        "lift": 1.6190476190476188,
+        "retained_risk": 0.21929824561403508,
+        "retained_risk_reduction": 0.05701754385964916,
+        "flagged_risk_ci": [
+          0.30146400998051603,
+          0.6029370287800713
+        ],
+        "retained_risk_ci": [
+          0.15318376080646473,
+          0.30371366187919974
+        ],
+        "flagged_original_profit_count": 8,
+        "false_flag_original_profit_count": 8,
+        "original_net_mean_flagged": -0.08410604754856832,
+        "original_net_mean_retained": 0.03167632062501566
+      },
+      "valid": {
+        "n": 54,
+        "positives": 10,
+        "base_rate": 0.18518518518518517,
+        "flagged": 9,
+        "caught": 1,
+        "false_flags": 8,
+        "missed": 9,
+        "precision": 0.1111111111111111,
+        "recall": 0.1,
+        "false_positive_rate": 0.18181818181818182,
+        "reject_fraction": 0.16666666666666666,
+        "lift": 0.6,
+        "retained_risk": 0.2,
+        "retained_risk_reduction": -0.014814814814814836,
+        "flagged_risk_ci": [
+          0.019890887638545657,
+          0.43499970557664625
+        ],
+        "retained_risk_ci": [
+          0.10896126807831469,
+          0.338229691161416
+        ],
+        "flagged_original_profit_count": 2,
+        "false_flag_original_profit_count": 2,
+        "original_net_mean_flagged": -0.07441194715272455,
+        "original_net_mean_retained": 0.025084377202089708
+      },
+      "test": {
+        "n": 98,
+        "positives": 14,
+        "base_rate": 0.14285714285714285,
+        "flagged": 29,
+        "caught": 3,
+        "false_flags": 26,
+        "missed": 11,
+        "precision": 0.10344827586206896,
+        "recall": 0.21428571428571427,
+        "false_positive_rate": 0.30952380952380953,
+        "reject_fraction": 0.29591836734693877,
+        "lift": 0.7241379310344828,
+        "retained_risk": 0.15942028985507245,
+        "retained_risk_reduction": -0.0165631469979296,
+        "flagged_risk_ci": [
+          0.03581489135067803,
+          0.26385081090773255
+        ],
+        "retained_risk_ci": [
+          0.09141824277768175,
+          0.2633448171481922
+        ],
+        "flagged_original_profit_count": 11,
+        "false_flag_original_profit_count": 11,
+        "original_net_mean_flagged": -0.020445759531672342,
+        "original_net_mean_retained": 0.03714801082889678
+      },
+      "uncertainty": {
+        "months": 7,
+        "valid_draws": 3000,
+        "retained_risk_reduction_ci": [
+          -0.05466372018191044,
+          0.041560102301790275
+        ],
+        "lift_ci": [
+          0.0,
+          1.8001048951048957
+        ]
+      },
+      "selected": false
+    }
+  ],
+  "counts": {
+    "close": {
+      "purged": {
+        "n": 2,
+        "risk": 1
+      },
+      "test": {
+        "n": 98,
+        "risk": 12
+      },
+      "train": {
+        "n": 152,
+        "risk": 30
+      },
+      "valid": {
+        "n": 54,
+        "risk": 9
+      }
+    },
+    "union": {
+      "purged": {
+        "n": 2,
+        "risk": 1
+      },
+      "test": {
+        "n": 98,
+        "risk": 14
+      },
+      "train": {
+        "n": 152,
+        "risk": 42
+      },
+      "valid": {
+        "n": 54,
+        "risk": 10
+      }
+    }
+  }
+}

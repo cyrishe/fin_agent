@@ -1,0 +1,450 @@
+[
+  {
+    "month": "2016-09",
+    "forecast_rows": 604,
+    "training_rows": 4743,
+    "max_score_diff": 0.0,
+    "model_sha256": "fc7002fa8f70bf4543fea59e450fc8ed0a2ecc183462f9e6d8521f3f48301b51"
+  },
+  {
+    "month": "2016-10",
+    "forecast_rows": 648,
+    "training_rows": 4325,
+    "max_score_diff": 0.0,
+    "model_sha256": "1022c0d50b4305282e90f0e5adbb4b90d3a10cf45e382cf1564a66edfd774b84"
+  },
+  {
+    "month": "2016-11",
+    "forecast_rows": 1055,
+    "training_rows": 3842,
+    "max_score_diff": 0.0,
+    "model_sha256": "36fab69abb3739024432150e9a6872c6ee634006dc33ade7e0032daa5f8e56e6"
+  },
+  {
+    "month": "2016-12",
+    "forecast_rows": 928,
+    "training_rows": 2973,
+    "max_score_diff": 0.0,
+    "model_sha256": "5b902da4920155669238fcc09700e1b85b525e8be3cbc2a7a0ab4b09c88bee68"
+  },
+  {
+    "month": "2017-01",
+    "forecast_rows": 833,
+    "training_rows": 2762,
+    "max_score_diff": 0.0,
+    "model_sha256": "7728f9de7d48c708398fec1a8a000235ad0125245a838601b830ef8ddb2b8b7e"
+  },
+  {
+    "month": "2017-02",
+    "forecast_rows": 963,
+    "training_rows": 2817,
+    "max_score_diff": 0.0,
+    "model_sha256": "2240409a625e37ce9c16c323b99129f81f45ed8dcfca4888aaa1d3797527b6bd"
+  },
+  {
+    "month": "2017-03",
+    "forecast_rows": 922,
+    "training_rows": 2466,
+    "max_score_diff": 0.0,
+    "model_sha256": "25b2fd08d87164fdfb0b4e9d78dd795e180abdd72912178a49e471e2aeb327a2"
+  },
+  {
+    "month": "2017-04",
+    "forecast_rows": 884,
+    "training_rows": 2425,
+    "max_score_diff": 0.0,
+    "model_sha256": "fb49553c336183107a98eccbf1f6e0fa76032d12cd62e5bca8480bba7d3c2ead"
+  },
+  {
+    "month": "2017-05",
+    "forecast_rows": 761,
+    "training_rows": 2428,
+    "max_score_diff": 0.0,
+    "model_sha256": "0d6c79a03469cdb6e4e20f50785281bda9c7bc51d55d9e326c3696194918514c"
+  },
+  {
+    "month": "2017-06",
+    "forecast_rows": 749,
+    "training_rows": 2545,
+    "max_score_diff": 0.0,
+    "model_sha256": "b3100d8d58db07ab71214636891f95259ea727eac35009aa9684f4c5c0a2a276"
+  },
+  {
+    "month": "2017-07",
+    "forecast_rows": 615,
+    "training_rows": 2583,
+    "max_score_diff": 0.0,
+    "model_sha256": "92c6f301a75546fb2a52b2e2a7f481fba2f2ad183465013f92c205d0f65455fb"
+  },
+  {
+    "month": "2017-08",
+    "forecast_rows": 893,
+    "training_rows": 2511,
+    "max_score_diff": 0.0,
+    "model_sha256": "82f51b8486db1fa13ab1fe5aecbeb3b21169aa08e6e3818b1466050dddec2cee"
+  },
+  {
+    "month": "2017-09",
+    "forecast_rows": 860,
+    "training_rows": 2588,
+    "max_score_diff": 0.0,
+    "model_sha256": "fcbc599aa520a698e98d61dff2faa8a271e532b97a6926e671fdab253add16cc"
+  },
+  {
+    "month": "2017-10",
+    "forecast_rows": 665,
+    "training_rows": 2525,
+    "max_score_diff": 0.0,
+    "model_sha256": "88ccbcd86fcfce0b143f122d47fbb21ff97f341dab401f066630ba44207d88c7"
+  },
+  {
+    "month": "2017-11",
+    "forecast_rows": 779,
+    "training_rows": 2624,
+    "max_score_diff": 0.0,
+    "model_sha256": "64d0502f354efcc45d4adbb3ce8f6b941b09dd8a29e24c453c3484f8d0d99d5e"
+  },
+  {
+    "month": "2017-12",
+    "forecast_rows": 530,
+    "training_rows": 2750,
+    "max_score_diff": 0.0,
+    "model_sha256": "c0e1f4fe0163b4977ee2e3b9e87d3cbade2417d3011b86ef750595ae9fac66df"
+  },
+  {
+    "month": "2018-01",
+    "forecast_rows": 796,
+    "training_rows": 2718,
+    "max_score_diff": 0.0,
+    "model_sha256": "80fc72906716a98af062fdaa183fc360906d42b13cadfec9ffe6b4bd3881e3d0"
+  },
+  {
+    "month": "2018-02",
+    "forecast_rows": 550,
+    "training_rows": 2686,
+    "max_score_diff": 0.0,
+    "model_sha256": "74902d59aca2a6184a7833fa16205ff8a796b19414b7cbf8d971e998ac301d72"
+  },
+  {
+    "month": "2018-03",
+    "forecast_rows": 1127,
+    "training_rows": 2563,
+    "max_score_diff": 0.0,
+    "model_sha256": "f755eeca2ebe87d011949b2912000fff23055e54398ad0ec5d8efe01871bd3db"
+  },
+  {
+    "month": "2018-04",
+    "forecast_rows": 818,
+    "training_rows": 2811,
+    "max_score_diff": 0.0,
+    "model_sha256": "b5c136c1d9f65cf8915381400b7795b2a2e895db0da1aa48132d659ec6d1073e"
+  },
+  {
+    "month": "2018-05",
+    "forecast_rows": 941,
+    "training_rows": 2626,
+    "max_score_diff": 0.0,
+    "model_sha256": "b6cb8efa2e0f1c2f240298f48f669d700f8c784dc1e157f10abaefab8536c8ef"
+  },
+  {
+    "month": "2018-06",
+    "forecast_rows": 766,
+    "training_rows": 3050,
+    "max_score_diff": 0.0,
+    "model_sha256": "f85c65cd64d14743460e093b51c2de7459e56e4ab35297983a6fc619bcea474c"
+  },
+  {
+    "month": "2018-07",
+    "forecast_rows": 1104,
+    "training_rows": 3408,
+    "max_score_diff": 0.0,
+    "model_sha256": "e2d2d8900ca25fbdbdcb38b8b3a1e1a7f160a6e84a3f77850ab62799c636f418"
+  },
+  {
+    "month": "2018-08",
+    "forecast_rows": 680,
+    "training_rows": 3776,
+    "max_score_diff": 0.0,
+    "model_sha256": "1f6e089316e5858f1c2d2102eab7892bd3f780953980ac29629aee4aab466e45"
+  },
+  {
+    "month": "2018-09",
+    "forecast_rows": 597,
+    "training_rows": 3956,
+    "max_score_diff": 0.0,
+    "model_sha256": "b6fad87eabbb13f7d27264f67db945e34b8c4b474c28b4bb8415f14f2f48e44f"
+  },
+  {
+    "month": "2018-10",
+    "forecast_rows": 855,
+    "training_rows": 4320,
+    "max_score_diff": 0.0,
+    "model_sha256": "108df842f7727d6faa3cb587ac3b6e9938153293c8c6a3435700b735d979b066"
+  },
+  {
+    "month": "2018-11",
+    "forecast_rows": 1334,
+    "training_rows": 4523,
+    "max_score_diff": 0.0,
+    "model_sha256": "7b4c16e94574b4fb9c3538454a2aa2fcbe7cbea32d02ffb2f549145f355c0414"
+  },
+  {
+    "month": "2018-12",
+    "forecast_rows": 579,
+    "training_rows": 4036,
+    "max_score_diff": 0.0,
+    "model_sha256": "37879e0074eefd3c124335ada2c1247734b546d33b8c8edc13f6f2b3e08a9721"
+  },
+  {
+    "month": "2019-01",
+    "forecast_rows": 909,
+    "training_rows": 3964,
+    "max_score_diff": 0.0,
+    "model_sha256": "0afebd18f54f72402b67601ff7f55f6694f3b0f577a7d2fc2c2809a66b758b37"
+  },
+  {
+    "month": "2019-02",
+    "forecast_rows": 1368,
+    "training_rows": 4333,
+    "max_score_diff": 0.0,
+    "model_sha256": "d4c87a8bd657fff1d0ba8ec87a958ab61531b4f9a8692cdd5d31f656fa2aee40"
+  },
+  {
+    "month": "2019-03",
+    "forecast_rows": 2285,
+    "training_rows": 4226,
+    "max_score_diff": 0.0,
+    "model_sha256": "481b131bff682a20083c00e6d11dce1600235f9e5e86f262c2be77f81977d960"
+  },
+  {
+    "month": "2019-04",
+    "forecast_rows": 1582,
+    "training_rows": 4107,
+    "max_score_diff": 0.0,
+    "model_sha256": "90a6ea726bb744eef2b49caca32036b9cd30c4c4cbb1a4d1fc9f753ea485f6b4"
+  },
+  {
+    "month": "2019-05",
+    "forecast_rows": 1292,
+    "training_rows": 4235,
+    "max_score_diff": 0.0,
+    "model_sha256": "461d7b4864d072ec7033ef5f752e69cce9f63d55eb391004135d61eb43247a39"
+  },
+  {
+    "month": "2019-06",
+    "forecast_rows": 1120,
+    "training_rows": 5820,
+    "max_score_diff": 0.0,
+    "model_sha256": "0577c560d36182e7feb6c5417668916bc077b920da55d58e68a90b8fdcf346ea"
+  },
+  {
+    "month": "2019-07",
+    "forecast_rows": 808,
+    "training_rows": 6535,
+    "max_score_diff": 0.0,
+    "model_sha256": "5d4c43736a7de898bd02e74b134e33611fa0677ed1ad3d491b61a0337ec8e15a"
+  },
+  {
+    "month": "2019-08",
+    "forecast_rows": 945,
+    "training_rows": 6489,
+    "max_score_diff": 0.0,
+    "model_sha256": "1d7eb7a0957146ce2196bab0f80116c893d985987002dbaf4022d8eca63b8b08"
+  },
+  {
+    "month": "2019-09",
+    "forecast_rows": 945,
+    "training_rows": 6983,
+    "max_score_diff": 0.0,
+    "model_sha256": "8b0434083afb99ad229b8df8107a4281d9770c55eaa335c79a1c829cc644a60c"
+  },
+  {
+    "month": "2019-10",
+    "forecast_rows": 787,
+    "training_rows": 6921,
+    "max_score_diff": 0.0,
+    "model_sha256": "2f86410b5b94c541e433ecef3bdcbdb50f3f71edd8517f1d18b7f1a6f79223d7"
+  },
+  {
+    "month": "2019-11",
+    "forecast_rows": 658,
+    "training_rows": 6517,
+    "max_score_diff": 0.0,
+    "model_sha256": "0797f857fcb54417d6e6e87bf0fc779807ee21f39059a022417a83f6c9127d1f"
+  },
+  {
+    "month": "2019-12",
+    "forecast_rows": 936,
+    "training_rows": 5531,
+    "max_score_diff": 0.0,
+    "model_sha256": "d0feb1de3f2360123e86a1f6f34d16e77c9ae1b353ad6b42238e4e4cee49a787"
+  },
+  {
+    "month": "2020-01",
+    "forecast_rows": 913,
+    "training_rows": 4790,
+    "max_score_diff": 0.0,
+    "model_sha256": "28278516769d3320c542a7a279011a192628f38546aec3d152d5b7aad33910b8"
+  },
+  {
+    "month": "2020-02",
+    "forecast_rows": 2429,
+    "training_rows": 4351,
+    "max_score_diff": 0.0,
+    "model_sha256": "38835272d1b7a1b8c151a2da7e7820ed2743a2aa8e42909c84d33cfcc4f676f7"
+  },
+  {
+    "month": "2020-03",
+    "forecast_rows": 1827,
+    "training_rows": 4117,
+    "max_score_diff": 0.0,
+    "model_sha256": "f58bb4d9489f8bb78aeb9d09810ded31332bf23037409f76af8dfd1cd4efc1d3"
+  },
+  {
+    "month": "2020-04",
+    "forecast_rows": 1364,
+    "training_rows": 4204,
+    "max_score_diff": 0.0,
+    "model_sha256": "1060d28cdab5f5186f81b42efeb4741817a710d424d61551e19ce31f7a078891"
+  },
+  {
+    "month": "2020-05",
+    "forecast_rows": 1170,
+    "training_rows": 5271,
+    "max_score_diff": 0.0,
+    "model_sha256": "ca916a09780a58e7f7ff6ae308ff14c85dcda69afa0747cd8978b8b873597342"
+  },
+  {
+    "month": "2020-06",
+    "forecast_rows": 1259,
+    "training_rows": 6160,
+    "max_score_diff": 0.0,
+    "model_sha256": "e78fc9c6732ca46655faab93906b4a2c33388de83b2a0a78ba791060911ebc63"
+  },
+  {
+    "month": "2020-07",
+    "forecast_rows": 2512,
+    "training_rows": 6715,
+    "max_score_diff": 0.0,
+    "model_sha256": "039ee72a989d7094cf0e512773d99dc4556f23112470b7e6417cc6e43668c8e1"
+  },
+  {
+    "month": "2020-08",
+    "forecast_rows": 1562,
+    "training_rows": 7069,
+    "max_score_diff": 0.0,
+    "model_sha256": "06c6031c4f48c913f2399fcef2e861360e31859c2a7294c18b57693bdf75757d"
+  },
+  {
+    "month": "2020-09",
+    "forecast_rows": 729,
+    "training_rows": 7389,
+    "max_score_diff": 0.0,
+    "model_sha256": "00c50e6e2c79ff4988c6f32b4fcaf7441986715095231a4a0ce38f9b53f19094"
+  },
+  {
+    "month": "2020-10",
+    "forecast_rows": 510,
+    "training_rows": 8545,
+    "max_score_diff": 0.0,
+    "model_sha256": "46e22b2badd56752301d53eb432321341ab3a64d69a08e77851b6cc9a41d9f59"
+  },
+  {
+    "month": "2020-11",
+    "forecast_rows": 745,
+    "training_rows": 8055,
+    "max_score_diff": 0.0,
+    "model_sha256": "c288232e52a05fab7d56d25394476ff304fc46a9ac53edf94b8e39799af47a9b"
+  },
+  {
+    "month": "2020-12",
+    "forecast_rows": 1032,
+    "training_rows": 7152,
+    "max_score_diff": 0.0,
+    "model_sha256": "89a8cf1bb45db8b5ff7f0242c135ee15e3b3252de13079c12b60268bb0312b2a"
+  },
+  {
+    "month": "2021-01",
+    "forecast_rows": 1297,
+    "training_rows": 6362,
+    "max_score_diff": 0.0,
+    "model_sha256": "68e7b69df4197101845d3a8102d1c0591f071d5953f023f657fc9e8552bdd6f3"
+  },
+  {
+    "month": "2021-02",
+    "forecast_rows": 953,
+    "training_rows": 6054,
+    "max_score_diff": 0.0,
+    "model_sha256": "3b0485befbd500c35e2341fba9913b400d302b69a0fbf91c9af05e9614505cbb"
+  },
+  {
+    "month": "2021-03",
+    "forecast_rows": 1361,
+    "training_rows": 5767,
+    "max_score_diff": 0.0,
+    "model_sha256": "5d4691eb3060e2f4d3e2973211861c28127e58af474f5376db093776f9d98c48"
+  },
+  {
+    "month": "2021-04",
+    "forecast_rows": 1249,
+    "training_rows": 4892,
+    "max_score_diff": 0.0,
+    "model_sha256": "2e2bdb1495ca4b3aba4b2d8ebfb0ebe44196e1202c28fad8e326ac3dd239dcf7"
+  },
+  {
+    "month": "2021-05",
+    "forecast_rows": 1146,
+    "training_rows": 4441,
+    "max_score_diff": 0.0,
+    "model_sha256": "c9e5640ec438ad3d1369ee76b512d78e005d9d3d1c41812503d5fc7e76a9f9a5"
+  },
+  {
+    "month": "2021-06",
+    "forecast_rows": 1224,
+    "training_rows": 5010,
+    "max_score_diff": 0.0,
+    "model_sha256": "5bde12fcdf2c22583a2983ccc1897eacef493dee70f2f1d9021925aaa4660a93"
+  },
+  {
+    "month": "2021-07",
+    "forecast_rows": 1313,
+    "training_rows": 5728,
+    "max_score_diff": 0.0,
+    "model_sha256": "a3ed8b75a3c259e822108fa58944381987e51b556c2e80ca8d563998c8649a0f"
+  },
+  {
+    "month": "2021-08",
+    "forecast_rows": 1576,
+    "training_rows": 5971,
+    "max_score_diff": 0.0,
+    "model_sha256": "588f36f2993a3ddfc48776261f79060ff2da783f724de244dd0123e15f379010"
+  },
+  {
+    "month": "2021-09",
+    "forecast_rows": 1407,
+    "training_rows": 6195,
+    "max_score_diff": 0.0,
+    "model_sha256": "7a1234c01081a830381949f27327abedbf74643f080be63322276129131379a4"
+  },
+  {
+    "month": "2021-10",
+    "forecast_rows": 839,
+    "training_rows": 6188,
+    "max_score_diff": 0.0,
+    "model_sha256": "26a4bc5a4d08e1a46fe53d0978b0d50a32db3c5ba781644d3ddfd184cad2e6b8"
+  },
+  {
+    "month": "2021-11",
+    "forecast_rows": 1512,
+    "training_rows": 6791,
+    "max_score_diff": 0.0,
+    "model_sha256": "c8c8629e34b34ea54415e8d706922becd3118544104030c8ce23f48cddafd313"
+  },
+  {
+    "month": "2021-12",
+    "forecast_rows": 1733,
+    "training_rows": 6929,
+    "max_score_diff": 0.0,
+    "model_sha256": "3ce2ee3d9f29a634f752602ade60177e7545d7649c9c47f2bb9314b1f7ac5466"
+  }
+]

@@ -1,0 +1,20 @@
+{
+  "source_hashes": true,
+  "opening_distribution": [
+    19,
+    2,
+    5,
+    5,
+    2,
+    1
+  ],
+  "minute_records": 125,
+  "original_returns_reproduced": true,
+  "first_post_trigger_open_above_floor_reproduced": true,
+  "unavailable_minutes_never_counted_as_fills": true,
+  "cancellation_gains_and_losses_reconcile": true,
+  "independent_cash_replay_accounts": 4,
+  "all_daily_cash_nav_and_drawdown_match": true,
+  "code_sha256": "a66280d595d401b90a397cdb51ee30d38653c3a8d791f1b27d8ea898985b9c74",
+  "production_modified": false
+}

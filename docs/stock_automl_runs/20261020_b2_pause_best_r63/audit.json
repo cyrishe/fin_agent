@@ -1,0 +1,163 @@
+{
+  "status": "PASS",
+  "name": "涨停冷静 V2 - 月度停摆",
+  "basis": "R57 monthly gate over frozen B2",
+  "v2_strategy_id": "B2_V2",
+  "v2_definition_sha256": "54ebe0150dfefa6ce9837d403fd83b331f2720ad835271525e3106aae7529f00",
+  "source_sha256": {
+    "outputs/stock_automl/b2_2021_minute_r60_20261020/signals.pkl": "c0fab9e454c92c0f3b0a9ba102224dcd6fef00fe377d215fbff1fb373708d1da",
+    "outputs/stock_automl/b2_2021_minute_r60_20261020/calendar.json": "48467afcb0babf08ea8481f396b13e71562c5e414abf09902751355d842de965",
+    "docs/stock_automl_runs/20261020_b2_2021_minutes_r60/逐月.csv": "c73aeffc30ec7cd33091621f960164d329841b83062b6a1a45939d46a5c321ee",
+    "docs/stock_automl_runs/20261020_b2_2021_minutes_r60/逐日净值.csv": "a57a08790635498281ab520b82634099b163591d7e35c90a2111ba513a8617b1",
+    "docs/stock_automl_runs/20261018_b2_full_replay/continuous_receipt.json": "f5644dec969632ffa949d2563387fe51a4217e3423b104b8841ab1b9b6057a78"
+  },
+  "baseline_receipt_reproduced": true,
+  "existing_month_gates_reproduced": 52,
+  "primary_original": {
+    "start": "2025-05-01",
+    "end": "2026-10-14",
+    "market_days": 351,
+    "initial": 1000000.0,
+    "fee_rate": 0.001,
+    "signals": 226,
+    "entries": 226,
+    "closed": 225,
+    "pending": 1,
+    "final_nav": 2608535.0649773777,
+    "total_return": 1.6085350649773775,
+    "max_drawdown": 0.40200598254909237,
+    "sharpe": 1.4391790701619462,
+    "total_fees": 371910.9030014836,
+    "closed_win_rate": 0.5155555555555555,
+    "closed_mean_return": 0.011324160403064592
+  },
+  "primary_paused": {
+    "start": "2025-05-01",
+    "end": "2026-10-14",
+    "market_days": 351,
+    "initial": 1000000.0,
+    "fee_rate": 0.001,
+    "signals": 153,
+    "entries": 153,
+    "closed": 152,
+    "pending": 1,
+    "final_nav": 2714340.251049287,
+    "total_return": 1.7143402510492871,
+    "max_drawdown": 0.30936769216984916,
+    "sharpe": 1.668631544262715,
+    "total_fees": 268846.43692526885,
+    "closed_win_rate": 0.5328947368421053,
+    "closed_mean_return": 0.015982731384834883
+  },
+  "primary_return_advantage_pp": 10.580518607190958,
+  "primary_drawdown_reduction_pp": 9.26382903792432,
+  "primary_paused_D0_months": [
+    "2025-05",
+    "2025-07",
+    "2025-08",
+    "2025-12",
+    "2026-05",
+    "2026-06"
+  ],
+  "primary_skipped_signals": 73,
+  "october_gate": {
+    "model_month": "2026-10",
+    "prior_month": "2026-09",
+    "prior_D0_candidates": 16,
+    "prior_last5_return": -0.03554915733705866,
+    "prior_last10_return": 0.11544322146240527,
+    "pause": false,
+    "D0_candidates": 1
+  },
+  "settled": {
+    "strong_D0_months": {
+      "original": {
+        "start": "2025-05-01",
+        "end": "2026-10-09",
+        "market_days": 348,
+        "initial": 1000000.0,
+        "fee_rate": 0.001,
+        "signals": 225,
+        "entries": 225,
+        "closed": 225,
+        "pending": 0,
+        "final_nav": 2680602.4528530305,
+        "total_return": 1.6806024528530306,
+        "max_drawdown": 0.40200598254909237,
+        "sharpe": 1.4787449686790606,
+        "total_fees": 370571.94073732133,
+        "closed_win_rate": 0.5155555555555555,
+        "closed_mean_return": 0.011324160403064592
+      },
+      "paused": {
+        "start": "2025-05-01",
+        "end": "2026-10-09",
+        "market_days": 348,
+        "initial": 1000000.0,
+        "fee_rate": 0.001,
+        "signals": 152,
+        "entries": 152,
+        "closed": 152,
+        "pending": 0,
+        "final_nav": 2789330.7751657655,
+        "total_return": 1.7893307751657654,
+        "max_drawdown": 0.30936769216984916,
+        "sharpe": 1.716338448314898,
+        "total_fees": 267453.1648098015,
+        "closed_win_rate": 0.5328947368421053,
+        "closed_mean_return": 0.015982731384834883
+      },
+      "D0_months": 17
+    },
+    "all_53_D0_months": {
+      "original": {
+        "start": "2022-05-01",
+        "end": "2026-10-09",
+        "market_days": 1075,
+        "initial": 1000000.0,
+        "fee_rate": 0.001,
+        "signals": 709,
+        "entries": 709,
+        "closed": 709,
+        "pending": 0,
+        "final_nav": 43250.68495311595,
+        "total_return": -0.9567493150468841,
+        "max_drawdown": 0.9876066169446098,
+        "sharpe": -0.7745918561732429,
+        "total_fees": 203902.84618736946,
+        "closed_win_rate": 0.44569816643159377,
+        "closed_mean_return": -0.005509748772605727
+      },
+      "paused": {
+        "start": "2022-05-01",
+        "end": "2026-10-09",
+        "market_days": 1075,
+        "initial": 1000000.0,
+        "fee_rate": 0.001,
+        "signals": 306,
+        "entries": 306,
+        "closed": 306,
+        "pending": 0,
+        "final_nav": 2610749.5568606267,
+        "total_return": 1.6107495568606267,
+        "max_drawdown": 0.38562637568888625,
+        "sharpe": 0.743950505696653,
+        "total_fees": 419354.8641364987,
+        "closed_win_rate": 0.49673202614379086,
+        "closed_mean_return": 0.009385076648378654
+      },
+      "D0_months": 53
+    }
+  },
+  "phases": {
+    "2025-05_to_2025-12": {
+      "original": 0.20433802573044857,
+      "paused": 0.14851727061209918
+    },
+    "2026-01_to_2026-10-14": {
+      "original": 1.165949267769124,
+      "paused": 1.3633429992765254
+    }
+  },
+  "limitations": "Historical research; selected strong period; minute open proxy, no live fill proof."
+}

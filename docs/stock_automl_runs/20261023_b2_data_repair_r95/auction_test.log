@@ -1,0 +1,9 @@
+.....                                                                    [100%]
+=============================== warnings summary ===============================
+test_import_tushare_minutes_fixed.py::test_append_preserves_verified_days_and_merges_manifest
+test_import_tushare_minutes_fixed.py::test_append_preserves_verified_days_and_merges_manifest
+  /data/cyris/work/b2_data_repair_r95_20261023/import_tushare_minutes_fixed.py:90: Pandas4Warning: The 'lsuffix' and 'rsuffix' keywords in DataFrame.join are deprecated and will be removed in a future version. Use the 'suffixes' keyword instead.
+    joined = grouped.join(target[['open', 'high', 'low', 'close', 'volume', 'amount']],
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+5 passed, 2 warnings in 2.40s

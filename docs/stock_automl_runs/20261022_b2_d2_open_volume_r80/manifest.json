@@ -1,0 +1,118 @@
+{
+  "source_inputs": {
+    "R79_100_floor_trades": {
+      "server_path": "/data/cyris/work/b2_d2_floor_volume_r79_20261022/100笔D2触跌停_成交量逐笔.csv",
+      "sha256": "f40721018bc6aaa37faa044897d703eb719b4ad790e50d7bd6dab0cab50b9698",
+      "bytes": 34304
+    },
+    "R71_preboard_daily": {
+      "server_path": "/data/cyris/work/b2_board_volume_r71_20261022/preboard_daily_source.csv.gz",
+      "sha256": "8858d0bb6c9fee39f65ede9148bc713c13c974c3a215e947d5178a42087da61a",
+      "bytes": 273877
+    },
+    "R76_d2_minute_manifest": {
+      "server_path": "/data/cyris/work/b2_news_flow_years_r76_20261022/minute_source_manifest.json",
+      "sha256": "0a146a10dc5fba309da9808f5a7315118bb9dcd7a78d3c3372309e97135dde93",
+      "bytes": 114166
+    }
+  },
+  "server_raw_archive_manifest": "首板前压缩源清单.json",
+  "outputs": {
+    "09_31_跨年与基线稳健性.csv": {
+      "sha256": "b592ff192399338376674d4964b16d6221f37efe10ed76963eff25d2be0b08fe",
+      "bytes": 2422
+    },
+    "09_31仍封死_固定量比阈值.csv": {
+      "sha256": "98dd88a0c0fb090776bda7f7cd8524eb59a30d0b7f2fc241d6b7ab654bf0f78a",
+      "bytes": 237
+    },
+    "100笔D2开盘同刻量比.csv": {
+      "sha256": "3a5f78ed85fd53aa0459b6d30d167cbbc07a5f418c17f327a0368446ec156b38",
+      "bytes": 62033
+    },
+    "100笔_开盘量比分组.csv": {
+      "sha256": "a97a35b295b874d6daad9ab18bd8c812f1145dc49cea6eed4c33100531699049",
+      "bytes": 725
+    },
+    "100笔开盘量比与触板后离板.csv": {
+      "sha256": "0e02932cd1e826fc4f663f84f4f0ddde51d985022c82c9703b67515723efc114",
+      "bytes": 584
+    },
+    "D2开盘分钟源_100笔.csv": {
+      "sha256": "97859f2becfe7c56b375d7b046ca6a6ec36733dc67821416fd85775a125591b1",
+      "bytes": 25512
+    },
+    "README.md": {
+      "sha256": "8fdc4304b53c0e8a64da9e2b85b3fb1bacf8c6c48b649666b32db860d256a01e",
+      "bytes": 6904
+    },
+    "analysis.json": {
+      "sha256": "f2d8335a8a1950930fb1089f08a643a9ee2de89b0e616506651cd8cc5adc0da4",
+      "bytes": 305
+    },
+    "analyze.py": {
+      "sha256": "72292154263156a2c46e636b201fd707b2de1cd7cdf53f17f91fc2ee228b231c",
+      "bytes": 6400
+    },
+    "extract.py": {
+      "sha256": "ccfbd6d05373e9b6e43200638f3fcf059be314fbfde4a54307ecd9ca70d5caf1",
+      "bytes": 9932
+    },
+    "extract_verification.json": {
+      "sha256": "927103155dd3ed8ee219d95a02a55581925eeee059ad916c09e75d7ffc2dc01d",
+      "bytes": 252
+    },
+    "inventory.json": {
+      "sha256": "207c9249722400d96611c4c87b29e9ac698cb92a8bd7a7d1094ae4d172baf045",
+      "bytes": 56640
+    },
+    "inventory.py": {
+      "sha256": "183308cb81d04eb5af755b847a775e4ef944f66d9d752f4e622521e67a443394",
+      "bytes": 1976
+    },
+    "missing_archive_relative_paths.txt": {
+      "sha256": "17b3cefb9cfc7c791fe7b202b0f78b332c5ee61412dfdbd7c5cfe1ae9bb5feec",
+      "bytes": 1056
+    },
+    "preboard_daily_selected.csv.gz": {
+      "sha256": "6c959e7c2cf38a5761ad96c5f03c6dd61055958021e2c5e614ab23156409c49b",
+      "bytes": 42411
+    },
+    "supplement.py": {
+      "sha256": "7ec9236670c9ffccad1aa1516ea27dbfc1e5e89b77cce7f4c046030cc73be8ae",
+      "bytes": 3274
+    },
+    "verification.json": {
+      "sha256": "d47f095c538e36ca987ee84f9e67839e9da0d71c61dff0b477be5d9679f7f74d",
+      "bytes": 278
+    },
+    "verify.py": {
+      "sha256": "7eb352964c8d6c404d1fc9cdd045f72532eafc1529fb61221484d079ffd90a1d",
+      "bytes": 3848
+    },
+    "开盘跌停34笔_同刻量比分辨力.csv": {
+      "sha256": "f99727208a6e02e1849cf26bc2a7b0ffbe7b8fe6d1d3085ff1513a423e8dbd28",
+      "bytes": 834
+    },
+    "开盘跌停34笔_固定量比阈值.csv": {
+      "sha256": "83e65f5e2df093b7ee5fcc0c02b1e8c061c4179233cfc4665cf81186a190e546",
+      "bytes": 818
+    },
+    "开盘跌停34笔_逐笔同刻成交量.csv": {
+      "sha256": "a12ce84c734e682a52e8ca2e17ba6fda1adc6c9d7c8794d6c28d61d529f75195",
+      "bytes": 8950
+    },
+    "逐年同刻覆盖.csv": {
+      "sha256": "305a4880b05947ce1aae02e2d385eb4c6231851067d46be72fbe1176d51058e2",
+      "bytes": 352
+    },
+    "首板前压缩源清单.json": {
+      "sha256": "f1a0bc38ccd3085f932520d394a292b49e246c05b62578f6ca81155580788de5",
+      "bytes": 130054
+    },
+    "首板前同刻分钟源_逐股日.csv.gz": {
+      "sha256": "93bf93a273b9ceb1b2b6acc43b80fcec3e2910bec6188c8e2e96b0c224837885",
+      "bytes": 46353
+    }
+  }
+}

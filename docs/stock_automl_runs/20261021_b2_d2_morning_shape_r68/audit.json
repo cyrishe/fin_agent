@@ -1,0 +1,32 @@
+{
+  "experiment": "B2_D2_MORNING_SHAPE_R68_20261021",
+  "samples": 193,
+  "classified": 151,
+  "counts": {
+    "一致高位": 22,
+    "逐渐走高": 21,
+    "中位震荡": 7,
+    "逐渐走低": 13,
+    "持续低位": 30,
+    "反复震荡": 58,
+    "待复核": 42
+  },
+  "morning_points": 23160,
+  "synthetic_checks": 8,
+  "decision_available_at": "11:30",
+  "server_only": true,
+  "future_features": false,
+  "production_modified": false,
+  "new_database_record": false,
+  "files": {
+    "analyze.py": "1363c251f813cdb6f1a7cdfd23690051bee68e89953f9953deaf58bd1ecac90a",
+    "specification.json": "f38a3365df553bd707327640a27a6ba84def906c1a98e69c4781f92ad967f84b",
+    "source_manifest.json": "6780b7aa83130035dd24c544a0a7e3b70be8abef0dbf988398fb79a7e68d67d5",
+    "上午分类.csv": "13088ba76ddaf8776eac4dba5f2c2a322bcc30f02f63e469150151aa9e2eb9de",
+    "data.json": "e0fb7498fce27de4345f1d1c13d2871bb260694c3fa743ee6c1dc269f1dd6d42",
+    "六类样本.png": "68a865763949438843db5fa6e84e22965856b80d66dc2b122867e9e54eb3165f",
+    "分类复核.png": "d65d387000b8389129e400be6f54d6c9e8200719e0af2401fae78c6b603db7c0",
+    "走势浏览.html": "cb0ce863474792948e6ab98a8171cdad8f13c7ae33278768c90e55e1c3b7bba5",
+    "README.md": "1d4394f2cb2671c8c6c279b720eb8749793ca80ee4b52d20e89cb3816d0ee9e3"
+  }
+}

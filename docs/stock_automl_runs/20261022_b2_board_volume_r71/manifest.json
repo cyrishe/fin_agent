@@ -1,0 +1,33 @@
+{
+  "source": {
+    "signals": "/data/cyris/work/b2_d2_limit_follow_r69_20261021/all_signals.pkl",
+    "signals_sha256": "88084043099b9df80684d5c5ada5aea88a8625700bde74c6ef05b5b4063adba7",
+    "daily": "/data/cyris/work/b2_d2_limit_follow_r69_20261021/daily.pkl",
+    "daily_sha256": "dca42800a19e24d1484e6fb24e9b032cd81b374a46bfb5c761a0037bc2e32e47",
+    "calendar": "/data/cyris/work/b2_d2_intraday_r67_20261021/inputs/calendar.json",
+    "calendar_sha256": "48467afcb0babf08ea8481f396b13e71562c5e414abf09902751355d842de965",
+    "preboard_and_board": "KingdomAI kcrp_stock_price read-only at build time"
+  },
+  "counts": {
+    "all_candidates": 709,
+    "v2_allowed": 306,
+    "preboard20_complete": 678,
+    "max_board_streak": 17
+  },
+  "v2_outcomes": {
+    "D2开盘跌停": 34,
+    "D2收盘跌停": 52,
+    "D2开收跌停并集": 67,
+    "D2D3连续收盘跌停": 20
+  },
+  "files": {
+    "B2_候选连板量能特征_709笔.csv": "39d47a8ce500dc0e2143d5f03c297690433e43d14214b5b0daf5df6056ba79cf",
+    "B2_V2放行连板量能特征_306笔.csv": "3c0d18a42d5922e7a920718a003b583887e9629fdfb3624276069139c3585df2",
+    "board_daily_source.csv.gz": "9611602d678470011d57a8ce4ad52c74f011f469095758e1573d21cfc84d9441",
+    "preboard_daily_source.csv.gz": "8858d0bb6c9fee39f65ede9148bc713c13c974c3a215e947d5178a42087da61a",
+    "量能假设_分期对照.csv": "c5de8b1601378cb6b38f713b43680449b7560e8c8237faf7453a5d26bdb4e10e",
+    "README.md": "5d7d0826c810787e5370f603b2e862f7293597eb103f073b65931e8847b41f2d",
+    "build.py": "de1ca0d26a16eeffa440fa2ca97b238c108e9fee2c7762b16f1debdc0fcd6ea1",
+    "analyze.py": "5fab54338df83a8abdc3528b5d17359ac61db21971ce72342bdadb3f7b33ca0e"
+  }
+}

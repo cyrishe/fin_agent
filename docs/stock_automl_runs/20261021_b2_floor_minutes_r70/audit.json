@@ -1,0 +1,31 @@
+{
+  "union_sample": 115,
+  "minutes_per_sample": 240,
+  "group49": 49,
+  "opening_all": 85,
+  "opening_v2": 34,
+  "prior49_lock_flags_match": true,
+  "minute_partition_and_denominators_verified": true,
+  "bands_exhaustive_and_disjoint_verified": true,
+  "production_modified": false,
+  "new_database_record": false,
+  "files": {
+    "prepare.py": "28b6ac210fff640711ce0ab733e4a1b71e8c0be5e51593ffa5efeb26db60e845",
+    "analyze.py": "bdc07b9c613a62ba3c4c71c6a02fc3ef6227f06942b75afb5fe2cbee3b6e1a9a",
+    "report.py": "95eeb6d0a332d6d1bc1e19e7ea55cae4c9c6e48b02f832b81123567dc89e0359",
+    "specification.json": "f347a62bdeca25c34b75116191a60dbb3a519e130bb85934e12702546b1f8b90",
+    "source_manifest.json": "cddcff3302cd8896acf695c8657885a91d5528bf59e408ea61b4ae5e45885fa5",
+    "results.json": "40b0b5fbbe020f367548653f3222d53024721eb6cd07cf327c0476f256a75399",
+    "price_audit.json": "c90e401e5d50eb4d89f84b12083767cc4e0045fcd3aaff38556ec1fe53b264eb",
+    "49笔分钟比例.csv": "605c5a05f65ec18068048aa541ce5adacbb54b96c15c7fcce6779d7eef0241f3",
+    "49笔分时段.csv": "700e99c474f499349f58605f21287d0efdf99cd01edd68fe30b35f2c28d0685e",
+    "开盘跌停全部.csv": "284bd8c1338b9609749ab981162991aad7f7f21dff7c6f9fa02c7ac60322207d",
+    "开盘跌停V2.csv": "3ce217f23b295757625ffec1089851643341cf7835b0ea9ee78ef138b3620777",
+    "开盘封板统计.csv": "1d3192c20baddf65ebafaabfaad44095b6277988815f52cef3494d49987e8350",
+    "收盘分段.csv": "ba029546e6a830d75fae536fce3086d4c9d26afa0bce680f1df3d708936be9c6",
+    "README.md": "c3103744198f17ab88bd8ec1a9d2eaace4dd2d8b790a7d5739c5c75dc7aa22b7",
+    "分钟比例与分段.html": "1e5d39051ed991660a8449d259b29abd6bd78eab84136200ac77f3f930f80082",
+    "49笔离板时段.png": "cabf59c8f0d255c442770b139a50ca750fc7b2cd7abb64049cfc28e289cf54d6",
+    "分钟路径样本.png": "57aed43b4fdefbe67f87b65c325967451cea13e6d190c60d27894d08cdedfcab"
+  }
+}

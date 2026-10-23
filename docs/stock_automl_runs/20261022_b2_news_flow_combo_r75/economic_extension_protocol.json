@@ -1,0 +1,7 @@
+{
+  "target": "original D2-close net return<0; sample weight=abs(net return)/training mean abs return. Weighted probability balances avoided monetary losses vs forgone monetary profits, not floor recall.",
+  "models": "Clone four fitted preprocessing/model configurations; refit all preprocessing on train152 and logistic C0.1 with profit/loss weights.",
+  "thresholds": "0.5 OR strict >training score quantile 0.60/0.70/0.80/0.90. All combinations disclosed.",
+  "selection": "maximize 2025 equal-ticket original-close cancellation net contribution; if <=0 choose no new filter. No minimum recall or requirement to catch every consecutive floor. Fixed quantile classification sensitivity also fully disclosed.",
+  "limits": "2026 already observed; 20 extra candidate policies increase validation selection uncertainty. Original-close objective differs from current morning7 sale; test both. Flow historical vintage incomplete. No production change."
+}

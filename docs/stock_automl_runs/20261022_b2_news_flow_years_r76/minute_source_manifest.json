@@ -1,0 +1,3674 @@
+[
+  {
+    "id": "002062.SZ|2022-05-05",
+    "source": {
+      "type": "R69 minute",
+      "path": "/data/cyris/work/b2_d2_limit_follow_r69_20261021/minutes/2022-05-09_002062.pkl",
+      "sha256": "ed0e29eee97028445f79f7f32b5b585bb2d047313b2281e8a5a84b9bf8ab8283"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "09:31",
+    "seven_proxy": true
+  },
+  {
+    "id": "000506.SZ|2022-05-06",
+    "source": {
+      "type": "R69 minute",
+      "path": "/data/cyris/work/b2_d2_limit_follow_r69_20261021/minutes/2022-05-10_000506.pkl",
+      "sha256": "a7de7c105dab4a9f9b2c13f68afb80b8fd8264be6b778544e48d8e15b61ff12f"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "09:34",
+    "seven_proxy": true
+  },
+  {
+    "id": "601368.SH|2022-05-11",
+    "source": {
+      "type": "R73 minute",
+      "path": "/data/cyris/work/b2_model_economics_r73_20261022/minutes/2022-05-13_601368.csv.gz",
+      "sha256": "ae3113d3d7fdda9a1439a5188d8414a37ed84e373c23ea434cea9c92ebafeddc"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "000926.SZ|2022-05-16",
+    "source": {
+      "type": "R73 minute",
+      "path": "/data/cyris/work/b2_model_economics_r73_20261022/minutes/2022-05-18_000926.csv.gz",
+      "sha256": "8c05fe764a636fff15e956f4c33b4b13e435edb9217a5ab029522bc8b1705a13"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "002766.SZ|2022-05-17",
+    "source": {
+      "type": "R69 minute",
+      "path": "/data/cyris/work/b2_d2_limit_follow_r69_20261021/minutes/2022-05-19_002766.pkl",
+      "sha256": "be0258fcd259676f349ddcf834afead3195ffaf48e4fc76ad439be38b301c7b4"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "09:31",
+    "seven_proxy": true
+  },
+  {
+    "id": "002309.SZ|2022-05-18",
+    "source": {
+      "type": "R69 minute",
+      "path": "/data/cyris/work/b2_d2_limit_follow_r69_20261021/minutes/2022-05-20_002309.pkl",
+      "sha256": "645ee8714e9f04f22ac652f4c78364c75f14ff8163f78c092012f1dede649652"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "09:31",
+    "seven_proxy": true
+  },
+  {
+    "id": "000779.SZ|2022-05-19",
+    "source": {
+      "type": "R73 minute",
+      "path": "/data/cyris/work/b2_model_economics_r73_20261022/minutes/2022-05-23_000779.csv.gz",
+      "sha256": "768ab8de966cbd5fcbaf7408f56b5d71f6fd7a7cb28c3d7221e54c13b685a61b"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "000909.SZ|2022-05-20",
+    "source": {
+      "type": "R67 minute",
+      "path": "/data/cyris/work/b2_d2_intraday_r67_20261021/minutes/2022-05-24_000909.pkl",
+      "sha256": "41eb4bc7dfcece6da5293b465bd7d3fa80b4d653729e7c4e260769bb33e0d409"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "09:31",
+    "seven_proxy": true
+  },
+  {
+    "id": "002309.SZ|2022-05-23",
+    "source": {
+      "type": "R67 minute",
+      "path": "/data/cyris/work/b2_d2_intraday_r67_20261021/minutes/2022-05-25_002309.pkl",
+      "sha256": "ebaa93e8298f298872874e8b9208087626b4116646c17a87fd684d26f5fa0c8d"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "603166.SH|2022-05-24",
+    "source": {
+      "type": "R73 minute",
+      "path": "/data/cyris/work/b2_model_economics_r73_20261022/minutes/2022-05-26_603166.csv.gz",
+      "sha256": "72bf0a0eddb294dff9f1425e605adf612b4ada26529dc850556950b168973990"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "000957.SZ|2022-05-25",
+    "source": {
+      "type": "R69 minute",
+      "path": "/data/cyris/work/b2_d2_limit_follow_r69_20261021/minutes/2022-05-27_000957.pkl",
+      "sha256": "e058eea22e155dda07d4bdbf29c121fe22b77b4c365913f4d50fadb14b933ab9"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "09:37",
+    "seven_proxy": true
+  },
+  {
+    "id": "000957.SZ|2022-05-27",
+    "source": {
+      "type": "R69 minute",
+      "path": "/data/cyris/work/b2_d2_limit_follow_r69_20261021/minutes/2022-05-31_000957.pkl",
+      "sha256": "1bf9b2d8afb647bb908c81b0e91b8c7a9450b6d03660578ac09f194abf3d80e7"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "09:59",
+    "seven_proxy": true
+  },
+  {
+    "id": "600962.SH|2022-05-30",
+    "source": {
+      "type": "R73 minute",
+      "path": "/data/cyris/work/b2_model_economics_r73_20261022/minutes/2022-06-01_600962.csv.gz",
+      "sha256": "e69c76f4ac8fe20bba654b36758b77219512a2ca1e949c3fa9ca53a7a36f4743"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "000151.SZ|2022-05-31",
+    "source": {
+      "type": "R73 minute",
+      "path": "/data/cyris/work/b2_model_economics_r73_20261022/minutes/2022-06-02_000151.csv.gz",
+      "sha256": "dd10b079b98cf89fdb03be7c31d9acb382efa387a474137c03bf7a2c46ee5c7e"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "000595.SZ|2022-06-01",
+    "source": {
+      "type": "R67 minute",
+      "path": "/data/cyris/work/b2_d2_intraday_r67_20261021/minutes/2022-06-06_000595.pkl",
+      "sha256": "6de28584463adc78399058e1b44f7723db7e0e9ec5633187d99a6d7e778c5371"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "002066.SZ|2022-06-02",
+    "source": {
+      "type": "R73 minute",
+      "path": "/data/cyris/work/b2_model_economics_r73_20261022/minutes/2022-06-07_002066.csv.gz",
+      "sha256": "a66f7ceb5a381b5d80cdf25bcd44d5e23f65f01996d53cb199dffb888cf88706"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "603051.SH|2022-06-08",
+    "source": {
+      "type": "R69 minute",
+      "path": "/data/cyris/work/b2_d2_limit_follow_r69_20261021/minutes/2022-06-10_603051.pkl",
+      "sha256": "1e0305cc8d4bcd7a3bfc4e58e3ed653b78c27a70dd3cfada9578f3d288d9685e"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "09:31",
+    "seven_proxy": true
+  },
+  {
+    "id": "002630.SZ|2022-06-09",
+    "source": {
+      "type": "R73 minute",
+      "path": "/data/cyris/work/b2_model_economics_r73_20261022/minutes/2022-06-13_002630.csv.gz",
+      "sha256": "5d0252db117d3f72346f03e51c888784ccac913af3b8ae509b0619601688687f"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "002630.SZ|2022-06-10",
+    "source": {
+      "type": "R67 minute",
+      "path": "/data/cyris/work/b2_d2_intraday_r67_20261021/minutes/2022-06-14_002630.pkl",
+      "sha256": "8e592e26a1da78428c2e1bce30702877718e78f27c98cd7b9ad4e3ac42d57c11"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "600653.SH|2022-06-13",
+    "source": {
+      "type": "R67 minute",
+      "path": "/data/cyris/work/b2_d2_intraday_r67_20261021/minutes/2022-06-15_600653.pkl",
+      "sha256": "9ab3f634e7774fc8032ddb6b10615458aa6eb9864f2be5e0787baaeab8eadd8c"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "002703.SZ|2022-06-16",
+    "source": {
+      "type": "R69 minute",
+      "path": "/data/cyris/work/b2_d2_limit_follow_r69_20261021/minutes/2022-06-20_002703.pkl",
+      "sha256": "a3efb04c29b304438b79444a433e75c8184fc7e18e8d4511233b62c509c59ca4"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "09:31",
+    "seven_proxy": true
+  },
+  {
+    "id": "001270.SZ|2022-06-20",
+    "source": {
+      "type": "R67 minute",
+      "path": "/data/cyris/work/b2_d2_intraday_r67_20261021/minutes/2022-06-22_001270.pkl",
+      "sha256": "5ff17d219039903de4ab8ff33f044c107fa0944afe9889e34836e06ea6141683"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "10:15",
+    "seven_proxy": true
+  },
+  {
+    "id": "002909.SZ|2022-06-23",
+    "source": {
+      "type": "R67 minute",
+      "path": "/data/cyris/work/b2_d2_intraday_r67_20261021/minutes/2022-06-27_002909.pkl",
+      "sha256": "a9a6791b4fb414236c208db998ea0996d9f262a14e2c659bf720bdfd4877e4fd"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "001316.SZ|2022-06-28",
+    "source": {
+      "type": "R67 minute",
+      "path": "/data/cyris/work/b2_d2_intraday_r67_20261021/minutes/2022-06-30_001316.pkl",
+      "sha256": "77731bd1e6eb433374dcdfff3dd4466d030ebceece74520e5a01e4fc4787cf84"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "09:36",
+    "seven_proxy": true
+  },
+  {
+    "id": "001316.SZ|2022-06-29",
+    "source": {
+      "type": "R67 minute",
+      "path": "/data/cyris/work/b2_d2_intraday_r67_20261021/minutes/2022-07-01_001316.pkl",
+      "sha256": "3cf49dcba7e0f24b2fa1da52ce6e5f48180806963e718f230d5239948fd85895"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "000678.SZ|2022-08-01",
+    "source": {
+      "type": "R67 minute",
+      "path": "/data/cyris/work/b2_d2_intraday_r67_20261021/minutes/2022-08-03_000678.pkl",
+      "sha256": "8bb86a2d4171c18976046f03587aa734208a05f9b589482e5d224a37e06a7828"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "600586.SH|2022-08-04",
+    "source": {
+      "type": "R69 minute",
+      "path": "/data/cyris/work/b2_d2_limit_follow_r69_20261021/minutes/2022-08-08_600586.pkl",
+      "sha256": "3e5bcb2e5edb71c5eed73dec9f970d25e44c4ceb048ca1afa6ce94430e71d9e5"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "09:54",
+    "seven_proxy": true
+  },
+  {
+    "id": "002868.SZ|2022-08-05",
+    "source": {
+      "type": "R73 minute",
+      "path": "/data/cyris/work/b2_model_economics_r73_20261022/minutes/2022-08-09_002868.csv.gz",
+      "sha256": "ee6eec5d4f38bdb3dfe7bbb68540fe9e01cd945f97b045f88672aeb9476ea5fd"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "002553.SZ|2022-08-09",
+    "source": {
+      "type": "R67 minute",
+      "path": "/data/cyris/work/b2_d2_intraday_r67_20261021/minutes/2022-08-11_002553.pkl",
+      "sha256": "611653153cc27ace6e3e9278a290af349111b39d4aa8a84af0ad8c2aab6dd383"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "603389.SH|2022-08-16",
+    "source": {
+      "type": "R67 minute",
+      "path": "/data/cyris/work/b2_d2_intraday_r67_20261021/minutes/2022-08-18_603389.pkl",
+      "sha256": "3d456971b1a29f3132983206c719e6a146cf58192a0b4e44b28e159797b85bc7"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "10:23",
+    "seven_proxy": true
+  },
+  {
+    "id": "002272.SZ|2022-08-18",
+    "source": {
+      "type": "R67 minute",
+      "path": "/data/cyris/work/b2_d2_intraday_r67_20261021/minutes/2022-08-22_002272.pkl",
+      "sha256": "1dc7574bbf4e49965066fa1a51162a8b04e45d34fdc75f798ff73e86ee9fcc00"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "002334.SZ|2022-08-19",
+    "source": {
+      "type": "R67 minute",
+      "path": "/data/cyris/work/b2_d2_intraday_r67_20261021/minutes/2022-08-23_002334.pkl",
+      "sha256": "2d7cbd5093dcf012e4b26674e81c99bd4fa190ba6b779f1be99597b310e4e007"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "603255.SH|2022-08-22",
+    "source": {
+      "type": "R69 minute",
+      "path": "/data/cyris/work/b2_d2_limit_follow_r69_20261021/minutes/2022-08-24_603255.pkl",
+      "sha256": "85abde30d70f9ea6b6eb696d8280cb6cdfcbf5ba4fb672aad0d270328c87507d"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "09:37",
+    "seven_proxy": true
+  },
+  {
+    "id": "001236.SZ|2022-08-29",
+    "source": {
+      "type": "R69 minute",
+      "path": "/data/cyris/work/b2_d2_limit_follow_r69_20261021/minutes/2022-08-31_001236.pkl",
+      "sha256": "7a47affbf87d3b0d323db1957ad50194cae4ed3e194c6eb133d3e80c72e09830"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "002543.SZ|2022-08-30",
+    "source": {
+      "type": "R67 minute",
+      "path": "/data/cyris/work/b2_d2_intraday_r67_20261021/minutes/2022-09-01_002543.pkl",
+      "sha256": "08e11730b79ea727c3129412d73e424e4fbf270da3bc87d6d830774851b20acf"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "002231.SZ|2023-01-03",
+    "source": {
+      "type": "R69 minute",
+      "path": "/data/cyris/work/b2_d2_limit_follow_r69_20261021/minutes/2023-01-05_002231.pkl",
+      "sha256": "95e542b47ac9d0261d9237c7118686d95504069936008caf9d4869455de34eca"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "09:34",
+    "seven_proxy": true
+  },
+  {
+    "id": "002576.SZ|2023-01-10",
+    "source": {
+      "type": "R69 minute",
+      "path": "/data/cyris/work/b2_d2_limit_follow_r69_20261021/minutes/2023-01-12_002576.pkl",
+      "sha256": "ceceefc841e91c696d65c62b44e9aa805eb04149df1fc82ee4c060105ba60ead"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "09:31",
+    "seven_proxy": true
+  },
+  {
+    "id": "002762.SZ|2023-01-12",
+    "source": {
+      "type": "R69 minute",
+      "path": "/data/cyris/work/b2_d2_limit_follow_r69_20261021/minutes/2023-01-16_002762.pkl",
+      "sha256": "cf6e5dde961c3dd4f13387efb354b91bdcc7a767a833dcf208d27ec36653e13e"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "09:35",
+    "seven_proxy": true
+  },
+  {
+    "id": "002560.SZ|2023-01-16",
+    "source": {
+      "type": "R69 minute",
+      "path": "/data/cyris/work/b2_d2_limit_follow_r69_20261021/minutes/2023-01-18_002560.pkl",
+      "sha256": "fe225c3f63bd6acfea121fe43c75f165026db2aa75127284dfe3eb04f9ec5d3e"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "09:33",
+    "seven_proxy": true
+  },
+  {
+    "id": "001236.SZ|2023-01-18",
+    "source": {
+      "type": "R67 minute",
+      "path": "/data/cyris/work/b2_d2_intraday_r67_20261021/minutes/2023-01-20_001236.pkl",
+      "sha256": "a3b078e8cb26e7e894d2c6b393904a6947de33914c0aec30694a1cbe6921acfd"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "002808.SZ|2023-01-19",
+    "source": {
+      "type": "R69 minute",
+      "path": "/data/cyris/work/b2_d2_limit_follow_r69_20261021/minutes/2023-01-30_002808.pkl",
+      "sha256": "229b0c32a5519d9af860cd88d7012669dd4f01f0fe1d3246641adb347ee9b700"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "09:31",
+    "seven_proxy": true
+  },
+  {
+    "id": "002808.SZ|2023-01-31",
+    "source": {
+      "type": "R67 minute",
+      "path": "/data/cyris/work/b2_d2_intraday_r67_20261021/minutes/2023-02-02_002808.pkl",
+      "sha256": "1d364173d2874ce8aa759da332b9bb239beb23d37e9f7e47caa3570fbe979119"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "002362.SZ|2023-02-06",
+    "source": {
+      "type": "archive",
+      "path": "/data/cyris/tushare_market_data/2023/20230208.csv.gz",
+      "sha256": "c1711d55c6048ee66083ed34eae0f4d971ab4808c530dc6913f28c96fda2f42b"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "10:13",
+    "seven_proxy": true
+  },
+  {
+    "id": "002354.SZ|2023-02-07",
+    "source": {
+      "type": "archive",
+      "path": "/data/cyris/tushare_market_data/2023/20230209.csv.gz",
+      "sha256": "e60b54cc83bb5d48e46f372b21be158bb5a2167f2e2a22ea2ee5b0a22c5983b5"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "601059.SH|2023-02-08",
+    "source": {
+      "type": "archive",
+      "path": "/data/cyris/tushare_market_data/2023/20230210.csv.gz",
+      "sha256": "9e743a4f01d758bb2f558a70804e3eb6608000cb823bab3d02ffbcabc21f4603"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "605389.SH|2023-02-14",
+    "source": {
+      "type": "archive",
+      "path": "/data/cyris/tushare_market_data/2023/20230216.csv.gz",
+      "sha256": "99dfadd948c7e97e2d5fb5cd9adb8616c70357a77c1d3566c2942a5dee6cdefc"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "001314.SZ|2023-02-15",
+    "source": {
+      "type": "archive",
+      "path": "/data/cyris/tushare_market_data/2023/20230217.csv.gz",
+      "sha256": "59d77cbb48cc55c19fb7469298f64b881c04858153133734e3e88e6688c27862"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "001339.SZ|2023-02-16",
+    "source": {
+      "type": "archive",
+      "path": "/data/cyris/tushare_market_data/2023/20230220.csv.gz",
+      "sha256": "aff30788d016e488edbd053b3e10beca48302ae72ab129d20f888c2aba31bd79"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "002713.SZ|2023-02-21",
+    "source": {
+      "type": "archive",
+      "path": "/data/cyris/tushare_market_data/2023/20230223.csv.gz",
+      "sha256": "2687f2e79bf0930b7ef6611991b312a1f8815dd0c46755a3aad0e5c522a4c19b"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "09:31",
+    "seven_proxy": true
+  },
+  {
+    "id": "603307.SH|2023-02-23",
+    "source": {
+      "type": "archive",
+      "path": "/data/cyris/tushare_market_data/2023/20230227.csv.gz",
+      "sha256": "a668acc4ed599aae8d342fd62edc0917ffb5e02039f1f10d92de3db7c868c261"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "601566.SH|2023-02-27",
+    "source": {
+      "type": "R69 minute",
+      "path": "/data/cyris/work/b2_d2_limit_follow_r69_20261021/minutes/2023-03-01_601566.pkl",
+      "sha256": "28f4670bc3517a00f507eb368018fb4a9fb4714db489102340e207625fcfd581"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "09:31",
+    "seven_proxy": true
+  },
+  {
+    "id": "000925.SZ|2023-02-28",
+    "source": {
+      "type": "archive",
+      "path": "/data/cyris/tushare_market_data/2023/20230302.csv.gz",
+      "sha256": "f27d62be0a1129ab61e6f1e3b9b72e5b8966e76dcd5eee6a209ae69d4cccb0c1"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "600228.SH|2023-05-04",
+    "source": {
+      "type": "R69 minute",
+      "path": "/data/cyris/work/b2_d2_limit_follow_r69_20261021/minutes/2023-05-08_600228.pkl",
+      "sha256": "c4c300cb19e63ce7ac25191d7a28619ee38291e3fa9fdbc72ca1877405bd5901"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "09:31",
+    "seven_proxy": true
+  },
+  {
+    "id": "600228.SH|2023-05-08",
+    "source": {
+      "type": "R67 minute",
+      "path": "/data/cyris/work/b2_d2_intraday_r67_20261021/minutes/2023-05-10_600228.pkl",
+      "sha256": "460ceeea1ac28a4b837f9eba78814429cb9004d3a63b1d4c9b5d6141f621a31d"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "600088.SH|2023-05-09",
+    "source": {
+      "type": "R67 minute",
+      "path": "/data/cyris/work/b2_d2_intraday_r67_20261021/minutes/2023-05-11_600088.pkl",
+      "sha256": "35996568f330c74ea8734f2beff36b152876389e6d7a5f54253e342086f530ee"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "09:31",
+    "seven_proxy": true
+  },
+  {
+    "id": "002992.SZ|2023-05-10",
+    "source": {
+      "type": "R67 minute",
+      "path": "/data/cyris/work/b2_d2_intraday_r67_20261021/minutes/2023-05-12_002992.pkl",
+      "sha256": "ac720670ab2dd814548279ed7fcb6ead472ff9798fda300a27047ee260dcefe5"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "605011.SH|2023-05-16",
+    "source": {
+      "type": "R67 minute",
+      "path": "/data/cyris/work/b2_d2_intraday_r67_20261021/minutes/2023-05-18_605011.pkl",
+      "sha256": "8e66b2ecf265c28cecbfeb4397112d3a3490308f5d5dc29dc5aca83b8c687d05"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "10:30",
+    "seven_proxy": true
+  },
+  {
+    "id": "301368.SZ|2023-05-19",
+    "source": {
+      "type": "R69 minute",
+      "path": "/data/cyris/work/b2_d2_limit_follow_r69_20261021/minutes/2023-05-23_301368.pkl",
+      "sha256": "2e68678f75dff0ad63c378a53e0e72454b4ad7e1dcd0654853c0ed46fb54191c"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "09:34",
+    "seven_proxy": true
+  },
+  {
+    "id": "603196.SH|2023-05-22",
+    "source": {
+      "type": "R69 minute",
+      "path": "/data/cyris/work/b2_d2_limit_follow_r69_20261021/minutes/2023-05-24_603196.pkl",
+      "sha256": "a1eacfd12e154dc27ccb1503ad13e78edf0ee0798b44e2236ede95d91c1f5416"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "09:31",
+    "seven_proxy": true
+  },
+  {
+    "id": "605011.SH|2023-05-24",
+    "source": {
+      "type": "R67 minute",
+      "path": "/data/cyris/work/b2_d2_intraday_r67_20261021/minutes/2023-05-26_605011.pkl",
+      "sha256": "667876272a5aaf3e840fb35fcbe856996d73c559a65abf6ed194e2188dae00b5"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "09:39",
+    "seven_proxy": true
+  },
+  {
+    "id": "605580.SH|2023-05-26",
+    "source": {
+      "type": "R69 minute",
+      "path": "/data/cyris/work/b2_d2_limit_follow_r69_20261021/minutes/2023-05-30_605580.pkl",
+      "sha256": "9ff1b04af67f948a3e0b097e2d9e486dd2497fec80ee2a16ef13f7bbf7daa147"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "09:31",
+    "seven_proxy": true
+  },
+  {
+    "id": "603291.SH|2023-05-30",
+    "source": {
+      "type": "R73 minute",
+      "path": "/data/cyris/work/b2_model_economics_r73_20261022/minutes/2023-06-01_603291.csv.gz",
+      "sha256": "713e045f73dba033d7d21ffd2350f2a4b48da11d2e8e406c1b18af180442c73e"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "605118.SH|2023-05-31",
+    "source": {
+      "type": "R67 minute",
+      "path": "/data/cyris/work/b2_d2_intraday_r67_20261021/minutes/2023-06-02_605118.pkl",
+      "sha256": "81bd8a636417078c9071d01513aa7c687d25c18e0d8965f4675624fa20ad742b"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "09:31",
+    "seven_proxy": true
+  },
+  {
+    "id": "605588.SH|2023-06-05",
+    "source": {
+      "type": "archive",
+      "path": "/data/cyris/tushare_market_data/2023/20230607.csv.gz",
+      "sha256": "78d97978c3a8e22fff8ec28db4611a82ae54896b51896f1ea12e98c34e019fea"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "002902.SZ|2023-06-06",
+    "source": {
+      "type": "archive",
+      "path": "/data/cyris/tushare_market_data/2023/20230608.csv.gz",
+      "sha256": "d8e934017bb78e166de4cd8af3f653bf12673d4823d03b1c80f1b4be436d4747"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "09:31",
+    "seven_proxy": true
+  },
+  {
+    "id": "002902.SZ|2023-06-07",
+    "source": {
+      "type": "archive",
+      "path": "/data/cyris/tushare_market_data/2023/20230609.csv.gz",
+      "sha256": "ce96da18602e8819e674263555de52d5bc21c09af7e02187b2cf7dc27b3baad2"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "603779.SH|2023-06-12",
+    "source": {
+      "type": "archive",
+      "path": "/data/cyris/tushare_market_data/2023/20230614.csv.gz",
+      "sha256": "35cc1fd67adc849b4080fdcad970b056ac10fdbcbf866f7a835c16e18b00a8f1"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "002725.SZ|2023-06-15",
+    "source": {
+      "type": "archive",
+      "path": "/data/cyris/tushare_market_data/2023/20230619.csv.gz",
+      "sha256": "59e5eec81a4f1117cb45e363f3f5bedbceb94b6deb79b7725c83c156fd5e7977"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "09:34",
+    "seven_proxy": true
+  },
+  {
+    "id": "002896.SZ|2023-06-19",
+    "source": {
+      "type": "archive",
+      "path": "/data/cyris/tushare_market_data/2023/20230621.csv.gz",
+      "sha256": "ac2b6a4dfbb771618c831114f30bee636a51fa68a24d5bcb2f8fe9eddf4b8228"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "605162.SH|2023-06-26",
+    "source": {
+      "type": "archive",
+      "path": "/data/cyris/tushare_market_data/2023/20230628.csv.gz",
+      "sha256": "ea9701cea2d8d4e66897881c4ec12f18e06510ef68a6037c712c31f2e0a4820d"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "000037.SZ|2023-06-28",
+    "source": {
+      "type": "archive",
+      "path": "/data/cyris/tushare_market_data/2023/20230630.csv.gz",
+      "sha256": "8bc5dba188fc1b86f83d6959d87ad8b7b64fed3131ef10011ed3a8f399275ead"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "603767.SH|2023-06-29",
+    "source": {
+      "type": "archive",
+      "path": "/data/cyris/tushare_market_data/2023/20230703.csv.gz",
+      "sha256": "9a387e405614e228286827108971213e4f4a79d14593c0160d83d2914d2c6fdd"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "000727.SZ|2023-10-10",
+    "source": {
+      "type": "R69 minute",
+      "path": "/data/cyris/work/b2_d2_limit_follow_r69_20261021/minutes/2023-10-12_000727.pkl",
+      "sha256": "e15d3c60aee54078b32fea4aa6a53b4acb420e5cdca1314940a961b096f4240b"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "09:34",
+    "seven_proxy": true
+  },
+  {
+    "id": "002708.SZ|2023-10-13",
+    "source": {
+      "type": "R73 minute",
+      "path": "/data/cyris/work/b2_model_economics_r73_20261022/minutes/2023-10-17_002708.csv.gz",
+      "sha256": "549b3d411e7fcd13dd4bb942846a0e9a4b008a0272463362bb2b27a0f7710eb5"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "600721.SH|2023-10-16",
+    "source": {
+      "type": "archive",
+      "path": "/data/cyris/tushare_market_data/2023/20231018.csv.gz",
+      "sha256": "77b23fa47f670db2095158db2ef81927c93592be25fd116c536769d535f8da96"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "002316.SZ|2023-10-17",
+    "source": {
+      "type": "R73 minute",
+      "path": "/data/cyris/work/b2_model_economics_r73_20261022/minutes/2023-10-19_002316.csv.gz",
+      "sha256": "b2aa3abb5d114b11f0c54c7cbc419bb6bd9e0ba904d44249835bddacf2888ef3"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "603178.SH|2023-10-18",
+    "source": {
+      "type": "R69 minute",
+      "path": "/data/cyris/work/b2_d2_limit_follow_r69_20261021/minutes/2023-10-20_603178.pkl",
+      "sha256": "a8184aeebb0b82a420b7acd5506607f82c185f1c82a40b461e5a8b874853516b"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "09:35",
+    "seven_proxy": true
+  },
+  {
+    "id": "603178.SH|2023-10-19",
+    "source": {
+      "type": "R69 minute",
+      "path": "/data/cyris/work/b2_d2_limit_follow_r69_20261021/minutes/2023-10-23_603178.pkl",
+      "sha256": "6333ba9274f7fef1310ed302fa4f3df0b1f67b6607a6e3d0b528edbae8a9a069"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "09:32",
+    "seven_proxy": true
+  },
+  {
+    "id": "600520.SH|2023-10-23",
+    "source": {
+      "type": "R73 minute",
+      "path": "/data/cyris/work/b2_model_economics_r73_20261022/minutes/2023-10-25_600520.csv.gz",
+      "sha256": "4eb0df6156991016b5c26a391fae6d6b7c4600dc00267b89109540babd1843a8"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "002122.SZ|2023-10-25",
+    "source": {
+      "type": "archive",
+      "path": "/data/cyris/tushare_market_data/2023/20231027.csv.gz",
+      "sha256": "bbb061c96b697bde482ca19914e18cb65d81098657970872e986bba5d778ef44"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "000541.SZ|2023-10-26",
+    "source": {
+      "type": "archive",
+      "path": "/data/cyris/tushare_market_data/2023/20231030.csv.gz",
+      "sha256": "5f8afc623931b9efdd4276fbbe17e4eec20c601793a67167bd77272d4cd070c6"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "600203.SH|2023-10-30",
+    "source": {
+      "type": "R69 minute",
+      "path": "/data/cyris/work/b2_d2_limit_follow_r69_20261021/minutes/2023-11-01_600203.pkl",
+      "sha256": "0811a0668a10372568a8243ba97bc3234aca0df8e329e58450004c4eaca198a5"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "09:56",
+    "seven_proxy": true
+  },
+  {
+    "id": "603266.SH|2023-10-31",
+    "source": {
+      "type": "R69 minute",
+      "path": "/data/cyris/work/b2_d2_limit_follow_r69_20261021/minutes/2023-11-02_603266.pkl",
+      "sha256": "b9cd6bb11ad59f7339f74a91b50d460deef631f1f941e83d15013d3ddbe4f7cc"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "09:31",
+    "seven_proxy": true
+  },
+  {
+    "id": "603536.SH|2023-12-01",
+    "source": {
+      "type": "R69 minute",
+      "path": "/data/cyris/work/b2_d2_limit_follow_r69_20261021/minutes/2023-12-05_603536.pkl",
+      "sha256": "7f2bed28b9e41c9f7ba875763994ca978d10979e2c3f39ad7813a0b776e26bc3"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "09:38",
+    "seven_proxy": true
+  },
+  {
+    "id": "600228.SH|2023-12-04",
+    "source": {
+      "type": "R69 minute",
+      "path": "/data/cyris/work/b2_d2_limit_follow_r69_20261021/minutes/2023-12-06_600228.pkl",
+      "sha256": "ca70af4cac24b28d26abf949d762ed75b253b2e4481c8718742d21e8b45b3098"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "603860.SH|2023-12-05",
+    "source": {
+      "type": "R67 minute",
+      "path": "/data/cyris/work/b2_d2_intraday_r67_20261021/minutes/2023-12-07_603860.pkl",
+      "sha256": "da2250f4728508c8e5c8c9d33c4b7c24f3a1119011c9289a51722735fa84c9f7"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "605179.SH|2023-12-06",
+    "source": {
+      "type": "R67 minute",
+      "path": "/data/cyris/work/b2_d2_intraday_r67_20261021/minutes/2023-12-08_605179.pkl",
+      "sha256": "099acdef0bd064949102b75a6f78dd4f38706e114fcc0e27004aaa66c6ab8787"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "09:31",
+    "seven_proxy": true
+  },
+  {
+    "id": "002451.SZ|2023-12-07",
+    "source": {
+      "type": "R73 minute",
+      "path": "/data/cyris/work/b2_model_economics_r73_20261022/minutes/2023-12-11_002451.csv.gz",
+      "sha256": "358f1f83aa862610f591eaba63a9405201fdc8e7fc4677dbd18cfe463363893a"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "600715.SH|2023-12-08",
+    "source": {
+      "type": "R69 minute",
+      "path": "/data/cyris/work/b2_d2_limit_follow_r69_20261021/minutes/2023-12-12_600715.pkl",
+      "sha256": "1e7b0c52dd73c12cd023bb7bbdd43351d61657bfe0dbbd68e1c9c7bda07c1f74"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "09:31",
+    "seven_proxy": true
+  },
+  {
+    "id": "000421.SZ|2023-12-11",
+    "source": {
+      "type": "R67 minute",
+      "path": "/data/cyris/work/b2_d2_intraday_r67_20261021/minutes/2023-12-13_000421.pkl",
+      "sha256": "3f37f2f7959cd18b5bcdbcedb4edbf137abe166b10163637d1c7ec3b6b0fa260"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "09:31",
+    "seven_proxy": true
+  },
+  {
+    "id": "603729.SH|2023-12-12",
+    "source": {
+      "type": "R69 minute",
+      "path": "/data/cyris/work/b2_d2_limit_follow_r69_20261021/minutes/2023-12-14_603729.pkl",
+      "sha256": "67a23757e2019fcf31d6f143d85646bab97552ded2d230909390dcb8bad01264"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "09:31",
+    "seven_proxy": true
+  },
+  {
+    "id": "603598.SH|2023-12-14",
+    "source": {
+      "type": "R67 minute",
+      "path": "/data/cyris/work/b2_d2_intraday_r67_20261021/minutes/2023-12-18_603598.pkl",
+      "sha256": "854d34aac88b2fbdd150255d1df6b8ec69f245994c889c39008838ee2340cb19"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "002445.SZ|2023-12-15",
+    "source": {
+      "type": "R67 minute",
+      "path": "/data/cyris/work/b2_d2_intraday_r67_20261021/minutes/2023-12-19_002445.pkl",
+      "sha256": "c96775cebd23830cdd113b8bbf67f5dd9a11e1b05dfe8753c2428e84f6a04338"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "603721.SH|2023-12-19",
+    "source": {
+      "type": "R67 minute",
+      "path": "/data/cyris/work/b2_d2_intraday_r67_20261021/minutes/2023-12-21_603721.pkl",
+      "sha256": "52ee7fffd69e1eee44972ea2fc472f5b3e121d3908138fcbb183f2cb4c1ecffc"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "600692.SH|2023-12-20",
+    "source": {
+      "type": "R67 minute",
+      "path": "/data/cyris/work/b2_d2_intraday_r67_20261021/minutes/2023-12-22_600692.pkl",
+      "sha256": "d896f7c9961bfb6caa4d65bfae7f1a72286b31c9870bc8537d874d62264463af"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "600630.SH|2023-12-21",
+    "source": {
+      "type": "R69 minute",
+      "path": "/data/cyris/work/b2_d2_limit_follow_r69_20261021/minutes/2023-12-25_600630.pkl",
+      "sha256": "e73651af48d7c0d1c4440868df91488008e8f319f922daeee0f5cf3dcd808205"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "09:34",
+    "seven_proxy": true
+  },
+  {
+    "id": "603628.SH|2023-12-25",
+    "source": {
+      "type": "R69 minute",
+      "path": "/data/cyris/work/b2_d2_limit_follow_r69_20261021/minutes/2023-12-27_603628.pkl",
+      "sha256": "7208d654c5a923d68e0add45802ce9bf8ee9a72ecb3ddc6935afd08fe0f5961e"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "09:57",
+    "seven_proxy": true
+  },
+  {
+    "id": "002682.SZ|2023-12-26",
+    "source": {
+      "type": "R67 minute",
+      "path": "/data/cyris/work/b2_d2_intraday_r67_20261021/minutes/2023-12-28_002682.pkl",
+      "sha256": "7a8d6906854aa5ff96314257d4fb715d6c43064a0d932ed2e7ea8fd4befef456"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "09:32",
+    "seven_proxy": true
+  },
+  {
+    "id": "002682.SZ|2023-12-27",
+    "source": {
+      "type": "R69 minute",
+      "path": "/data/cyris/work/b2_d2_limit_follow_r69_20261021/minutes/2023-12-29_002682.pkl",
+      "sha256": "e33b05c53b1e95f948986dabcb90f292153a3c378b310b43c60a4949995807da"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "09:32",
+    "seven_proxy": true
+  },
+  {
+    "id": "002578.SZ|2023-12-29",
+    "source": {
+      "type": "R67 minute",
+      "path": "/data/cyris/work/b2_d2_intraday_r67_20261021/minutes/2024-01-03_002578.pkl",
+      "sha256": "a9f6b800083666919da319cf4d29a02924a8f1372787de37c6dbc1b7de6e030a"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "09:33",
+    "seven_proxy": true
+  },
+  {
+    "id": "605167.SH|2024-01-03",
+    "source": {
+      "type": "R67 minute",
+      "path": "/data/cyris/work/b2_d2_intraday_r67_20261021/minutes/2024-01-05_605167.pkl",
+      "sha256": "3044ad9f8c5aa10cfc34365c7a3fc3896871377d6f989333e3081979bb9a647e"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "09:58",
+    "seven_proxy": true
+  },
+  {
+    "id": "603099.SH|2024-01-05",
+    "source": {
+      "type": "R69 minute",
+      "path": "/data/cyris/work/b2_d2_limit_follow_r69_20261021/minutes/2024-01-09_603099.pkl",
+      "sha256": "41a4b53fd1e0f59479acb0eaeab107caac11f6640a5a7d0c32caa01fd4147f6e"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "09:31",
+    "seven_proxy": true
+  },
+  {
+    "id": "002347.SZ|2024-01-09",
+    "source": {
+      "type": "R73 minute",
+      "path": "/data/cyris/work/b2_model_economics_r73_20261022/minutes/2024-01-11_002347.csv.gz",
+      "sha256": "4659d242cb97f1a231b7846e7bede737a74f0f7eaeee92cd9c11aa07e34060e5"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "603099.SH|2024-01-10",
+    "source": {
+      "type": "R67 minute",
+      "path": "/data/cyris/work/b2_d2_intraday_r67_20261021/minutes/2024-01-12_603099.pkl",
+      "sha256": "d9e48df3198744772540d0d4e8d6552f2b74c3fb785155e601bca678ffefab3d"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "002641.SZ|2024-01-12",
+    "source": {
+      "type": "R67 minute",
+      "path": "/data/cyris/work/b2_d2_intraday_r67_20261021/minutes/2024-01-16_002641.pkl",
+      "sha256": "68108228cc4fc53572b8e23a557ffeeb65ce7ed90331531445d193556d49814f"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "600819.SH|2024-01-15",
+    "source": {
+      "type": "R67 minute",
+      "path": "/data/cyris/work/b2_d2_intraday_r67_20261021/minutes/2024-01-17_600819.pkl",
+      "sha256": "776ccfe50d373a708efefccf2b097499e78d9fbeadb98617ec09c392f4683a12"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "09:58",
+    "seven_proxy": true
+  },
+  {
+    "id": "002868.SZ|2024-01-16",
+    "source": {
+      "type": "R73 minute",
+      "path": "/data/cyris/work/b2_model_economics_r73_20261022/minutes/2024-01-18_002868.csv.gz",
+      "sha256": "ab25c8f5b452c0984248fc99ca9dcf947aeb0625d726563460708b6bdfe50163"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "600318.SH|2024-01-17",
+    "source": {
+      "type": "R67 minute",
+      "path": "/data/cyris/work/b2_d2_intraday_r67_20261021/minutes/2024-01-19_600318.pkl",
+      "sha256": "63a16af43bf7f88605d990f7006926af1b4d6cdda5d8e7363b94178ee1c32691"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "000017.SZ|2024-01-18",
+    "source": {
+      "type": "R69 minute",
+      "path": "/data/cyris/work/b2_d2_limit_follow_r69_20261021/minutes/2024-01-22_000017.pkl",
+      "sha256": "2881efd33234e4e53077f09f0a3093950e43cffd00253d740c632b312199dbbe"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "09:31",
+    "seven_proxy": true
+  },
+  {
+    "id": "000017.SZ|2024-01-19",
+    "source": {
+      "type": "R69 minute",
+      "path": "/data/cyris/work/b2_d2_limit_follow_r69_20261021/minutes/2024-01-23_000017.pkl",
+      "sha256": "477416b714cad80015b2abb2a67f72b795bc639ad10e11b533133cbd56bee5f7"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "09:31",
+    "seven_proxy": true
+  },
+  {
+    "id": "000017.SZ|2024-01-22",
+    "source": {
+      "type": "R67 minute",
+      "path": "/data/cyris/work/b2_d2_intraday_r67_20261021/minutes/2024-01-24_000017.pkl",
+      "sha256": "532054326dbf10e671c708d12ef9658a42d56d18b7f10759c0474399027d3fdf"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "09:31",
+    "seven_proxy": true
+  },
+  {
+    "id": "603810.SH|2024-01-23",
+    "source": {
+      "type": "R73 minute",
+      "path": "/data/cyris/work/b2_model_economics_r73_20261022/minutes/2024-01-25_603810.csv.gz",
+      "sha256": "e071d1b76e36c288c963e3455220dbf2ca57047d444d9abc4b62a4e5a2a84a89"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "600200.SH|2024-01-24",
+    "source": {
+      "type": "R67 minute",
+      "path": "/data/cyris/work/b2_d2_intraday_r67_20261021/minutes/2024-01-26_600200.pkl",
+      "sha256": "85a185a12df8a699e0e1bbd3b02f54a4a3c3f60c0397b32ed75c408dc7cbe904"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "600053.SH|2024-01-26",
+    "source": {
+      "type": "R73 minute",
+      "path": "/data/cyris/work/b2_model_economics_r73_20261022/minutes/2024-01-30_600053.csv.gz",
+      "sha256": "b251f911dd19e4f6a64c5b49379c655ddfff187936741611b78281b674ad8a2d"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "600088.SH|2024-01-31",
+    "source": {
+      "type": "R69 minute",
+      "path": "/data/cyris/work/b2_d2_limit_follow_r69_20261021/minutes/2024-02-02_600088.pkl",
+      "sha256": "803454bc3305a069b6c7c9933228869413bf922228d6ed0edffab2c2edc656f5"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "09:31",
+    "seven_proxy": true
+  },
+  {
+    "id": "605100.SH|2024-09-04",
+    "source": {
+      "type": "R67 minute",
+      "path": "/data/cyris/work/b2_d2_intraday_r67_20261021/minutes/2024-09-06_605100.pkl",
+      "sha256": "fffb77b1c3efffc1b6e86dd79e68ef0dd0784427d37db480550f458214e9515e"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "002816.SZ|2024-09-12",
+    "source": {
+      "type": "R73 minute",
+      "path": "/data/cyris/work/b2_model_economics_r73_20261022/minutes/2024-09-18_002816.csv.gz",
+      "sha256": "26e90e06fae417441358ddabef88e3c4d0307c32cf7a498f49a723e6df55e18d"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "002717.SZ|2024-09-13",
+    "source": {
+      "type": "R69 minute",
+      "path": "/data/cyris/work/b2_d2_limit_follow_r69_20261021/minutes/2024-09-19_002717.pkl",
+      "sha256": "a51bcfcd292acfe903b63f9a858b84970ebc8daca75bc890f6f25a0b44d1b80a"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "09:40",
+    "seven_proxy": true
+  },
+  {
+    "id": "600107.SH|2024-09-18",
+    "source": {
+      "type": "R67 minute",
+      "path": "/data/cyris/work/b2_d2_intraday_r67_20261021/minutes/2024-09-20_600107.pkl",
+      "sha256": "03a39dc7c5d225720b886c63db035c0b76fe193fb82fba12e67832744d4e49fb"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "600719.SH|2024-09-19",
+    "source": {
+      "type": "R73 minute",
+      "path": "/data/cyris/work/b2_model_economics_r73_20261022/minutes/2024-09-23_600719.csv.gz",
+      "sha256": "74555bb99f0a544235063331516e289e0a97d962128dfbb49f19e0c30f73dce5"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "600550.SH|2024-09-20",
+    "source": {
+      "type": "R69 minute",
+      "path": "/data/cyris/work/b2_d2_limit_follow_r69_20261021/minutes/2024-09-24_600550.pkl",
+      "sha256": "ad0a9734a402fa11c560c5d4bb2b721bcd68cd6f140c0bf5316bc01198d2b7f9"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "09:31",
+    "seven_proxy": true
+  },
+  {
+    "id": "000004.SZ|2024-09-23",
+    "source": {
+      "type": "R73 minute",
+      "path": "/data/cyris/work/b2_model_economics_r73_20261022/minutes/2024-09-25_000004.csv.gz",
+      "sha256": "c7599e50ff64bbd2d64957151450be10a83097e7d92fbfb1f3cbfc46eb0d48e7"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "002583.SZ|2024-09-24",
+    "source": {
+      "type": "R69 minute",
+      "path": "/data/cyris/work/b2_d2_limit_follow_r69_20261021/minutes/2024-09-26_002583.pkl",
+      "sha256": "cfb9af16a66908bf0d9e3bfa9f971c92c54c5478daaf849b5727c9c601ff03de"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "09:56",
+    "seven_proxy": true
+  },
+  {
+    "id": "000010.SZ|2024-11-04",
+    "source": {
+      "type": "archive",
+      "path": "/data/cyris/work/b2_news_flow_years_r76_20261022/raw/outputs/stock_automl/mk_1m_compact_2024/2024-11-06.csv.zst",
+      "sha256": "28b5c3594a5165c9aa860880a0f56b1d2fd646ec182827f7d7e9d5fc68a0a088"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "002513.SZ|2024-11-05",
+    "source": {
+      "type": "R69 minute",
+      "path": "/data/cyris/work/b2_d2_limit_follow_r69_20261021/minutes/2024-11-07_002513.pkl",
+      "sha256": "9459e214831b69152f681af3c48820a9398d888da9f9745c060fe294747a923b"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "09:31",
+    "seven_proxy": true
+  },
+  {
+    "id": "002765.SZ|2024-11-07",
+    "source": {
+      "type": "R73 minute",
+      "path": "/data/cyris/work/b2_model_economics_r73_20261022/minutes/2024-11-11_002765.csv.gz",
+      "sha256": "c0d6c282646b82e21a37761646e48e29a4490538aae749fa1148bb308bded250"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "000981.SZ|2024-11-08",
+    "source": {
+      "type": "archive",
+      "path": "/data/cyris/work/b2_news_flow_years_r76_20261022/raw/outputs/stock_automl/mk_1m_compact_2024/2024-11-12.csv.zst",
+      "sha256": "feaaad2fb8fd38f26251421e76f6ce6d9066c416d6fb53e17657d18be2bd6699"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "000826.SZ|2024-11-11",
+    "source": {
+      "type": "archive",
+      "path": "/data/cyris/work/b2_news_flow_years_r76_20261022/raw/outputs/stock_automl/mk_1m_compact_2024/2024-11-13.csv.zst",
+      "sha256": "9f04123c07bf83720f44a84cb099818ab4cf7e4ac4b04d1954fba345df7651e2"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "603918.SH|2024-11-12",
+    "source": {
+      "type": "archive",
+      "path": "/data/cyris/work/b2_news_flow_years_r76_20261022/raw/outputs/stock_automl/mk_1m_compact_2024/2024-11-14.csv.zst",
+      "sha256": "79533c484caba399e7e729332232fcc68a046ba0ab0bdfafbfdd3dc93b4bb7c9"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "603955.SH|2024-11-13",
+    "source": {
+      "type": "R69 minute",
+      "path": "/data/cyris/work/b2_d2_limit_follow_r69_20261021/minutes/2024-11-15_603955.pkl",
+      "sha256": "87eb4c0b487a43bfb4315430564f36e988a7aad3475897a79715b2f24969df3a"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "09:32",
+    "seven_proxy": true
+  },
+  {
+    "id": "603366.SH|2024-11-14",
+    "source": {
+      "type": "R69 minute",
+      "path": "/data/cyris/work/b2_d2_limit_follow_r69_20261021/minutes/2024-11-18_603366.pkl",
+      "sha256": "2280c178215777ae0602f666d268f7767ce3302899ec749f99003bc4965b2fdd"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "09:31",
+    "seven_proxy": true
+  },
+  {
+    "id": "300840.SZ|2024-11-15",
+    "source": {
+      "type": "archive",
+      "path": "/data/cyris/work/b2_news_flow_years_r76_20261022/raw/outputs/stock_automl/mk_1m_compact_2024/2024-11-19.csv.zst",
+      "sha256": "6e1db691c4cff4613673744b3a15ff50b791d151233052bfd55342439e6bf918"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "600676.SH|2024-11-19",
+    "source": {
+      "type": "archive",
+      "path": "/data/cyris/work/b2_news_flow_years_r76_20261022/raw/outputs/stock_automl/mk_1m_compact_2024/2024-11-21.csv.zst",
+      "sha256": "20d2969e8837ec1bfec328ec760f1843f2bf96dbaa78b5db5c8fa25f4b2e2433"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "000605.SZ|2024-11-20",
+    "source": {
+      "type": "R69 minute",
+      "path": "/data/cyris/work/b2_d2_limit_follow_r69_20261021/minutes/2024-11-22_000605.pkl",
+      "sha256": "d4eb6856d562ea0be8a00e3074728bd37adfb4aab4ae6bc3110433260f922184"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "09:31",
+    "seven_proxy": true
+  },
+  {
+    "id": "603527.SH|2024-11-21",
+    "source": {
+      "type": "R69 minute",
+      "path": "/data/cyris/work/b2_d2_limit_follow_r69_20261021/minutes/2024-11-25_603527.pkl",
+      "sha256": "94654208a542a2ff1c5d2df81a5efd6533c13e3a1cf34a6d22c74f6cc9ba172e"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "09:31",
+    "seven_proxy": true
+  },
+  {
+    "id": "002467.SZ|2024-11-26",
+    "source": {
+      "type": "R69 minute",
+      "path": "/data/cyris/work/b2_d2_limit_follow_r69_20261021/minutes/2024-11-28_002467.pkl",
+      "sha256": "4f3a107c53c89f88018e2b6aa65b9adb9e68bf8dd0b2ddb007f95d23bf3e9dba"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "09:35",
+    "seven_proxy": true
+  },
+  {
+    "id": "600327.SH|2024-11-28",
+    "source": {
+      "type": "archive",
+      "path": "/data/cyris/work/b2_news_flow_years_r76_20261022/raw/outputs/stock_automl/mk_1m_compact_2024/2024-12-02.csv.zst",
+      "sha256": "84e143187a8f9d9261b50d95ee3d19abc50da89c58f700515df0716d582bf3f4"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "09:31",
+    "seven_proxy": true
+  },
+  {
+    "id": "002640.SZ|2024-12-03",
+    "source": {
+      "type": "R69 minute",
+      "path": "/data/cyris/work/b2_d2_limit_follow_r69_20261021/minutes/2024-12-05_002640.pkl",
+      "sha256": "0ca7a2e2aa63689c7cf4cded82c947eefcf361534ad7f28ebb643d734e1dd54d"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "09:32",
+    "seven_proxy": true
+  },
+  {
+    "id": "603002.SH|2024-12-04",
+    "source": {
+      "type": "R69 minute",
+      "path": "/data/cyris/work/b2_d2_limit_follow_r69_20261021/minutes/2024-12-06_603002.pkl",
+      "sha256": "276da52d8297c1c5b44ef6c65643a43d60da7cdf1de06ad829478f69bfef2864"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "09:36",
+    "seven_proxy": true
+  },
+  {
+    "id": "000056.SZ|2024-12-05",
+    "source": {
+      "type": "R67 minute",
+      "path": "/data/cyris/work/b2_d2_intraday_r67_20261021/minutes/2024-12-09_000056.pkl",
+      "sha256": "ee525f55b29a766f905da39cad3bb9e6dd2f08bc831f63ecff959816725e3531"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "600172.SH|2024-12-06",
+    "source": {
+      "type": "R67 minute",
+      "path": "/data/cyris/work/b2_d2_intraday_r67_20261021/minutes/2024-12-10_600172.pkl",
+      "sha256": "c9446ac0ccdf6f3e666518fd2602849be2c916c8be805c2ad06db58718eca92d"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "603825.SH|2024-12-09",
+    "source": {
+      "type": "R73 minute",
+      "path": "/data/cyris/work/b2_model_economics_r73_20261022/minutes/2024-12-11_603825.csv.gz",
+      "sha256": "a36dfd91d7863c4d8585536a9c0c0660babb4de891ad9d1d9d19d6476cd7f7f9"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "002681.SZ|2024-12-10",
+    "source": {
+      "type": "R67 minute",
+      "path": "/data/cyris/work/b2_d2_intraday_r67_20261021/minutes/2024-12-12_002681.pkl",
+      "sha256": "455488ead1d633ab896e3bc750aa2e7fa0cd0c441e9d2402254cf41fb9db1f93"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "603088.SH|2024-12-11",
+    "source": {
+      "type": "R67 minute",
+      "path": "/data/cyris/work/b2_d2_intraday_r67_20261021/minutes/2024-12-13_603088.pkl",
+      "sha256": "394f39367e047af817f257d036e973705f11fffa15f65ea55f4e5c6ff0f576a2"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "601010.SH|2024-12-12",
+    "source": {
+      "type": "R69 minute",
+      "path": "/data/cyris/work/b2_d2_limit_follow_r69_20261021/minutes/2024-12-16_601010.pkl",
+      "sha256": "71810bd877fdea74bfb5ff120d78d531383d8f4197845f6b653659a08c17fda7"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "09:53",
+    "seven_proxy": true
+  },
+  {
+    "id": "000530.SZ|2024-12-16",
+    "source": {
+      "type": "R73 minute",
+      "path": "/data/cyris/work/b2_model_economics_r73_20261022/minutes/2024-12-18_000530.csv.gz",
+      "sha256": "561ff13997f54082ac711fbbfd89a19f616a3b3fd8282e249870c76af0473700"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "002354.SZ|2024-12-17",
+    "source": {
+      "type": "R67 minute",
+      "path": "/data/cyris/work/b2_d2_intraday_r67_20261021/minutes/2024-12-19_002354.pkl",
+      "sha256": "4f3ca974ca69f68d75bcb8c88ca5c724dbd05c710b3ce40a9242a25e58a3691e"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "002181.SZ|2024-12-19",
+    "source": {
+      "type": "R73 minute",
+      "path": "/data/cyris/work/b2_model_economics_r73_20261022/minutes/2024-12-23_002181.csv.gz",
+      "sha256": "54830c5a4c5eabf140787be9cf19f895a60d7b98d4000c6b11da9710952e2b29"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "002878.SZ|2024-12-20",
+    "source": {
+      "type": "R67 minute",
+      "path": "/data/cyris/work/b2_d2_intraday_r67_20261021/minutes/2024-12-24_002878.pkl",
+      "sha256": "bbe571efaf94921d3628ef7cea9b2a01ec3d2cdf08f1b4ac3b4f91270109fa36"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "000880.SZ|2024-12-23",
+    "source": {
+      "type": "R69 minute",
+      "path": "/data/cyris/work/b2_d2_limit_follow_r69_20261021/minutes/2024-12-25_000880.pkl",
+      "sha256": "1a27ff824a7faa5998811b7fb41854c3a167eaaf7ea3d538203b33cf3c81edb4"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "09:31",
+    "seven_proxy": true
+  },
+  {
+    "id": "605001.SH|2024-12-24",
+    "source": {
+      "type": "R67 minute",
+      "path": "/data/cyris/work/b2_d2_intraday_r67_20261021/minutes/2024-12-26_605001.pkl",
+      "sha256": "be4371b1215769bfb382ec6995620e0df9a9056c673b707560b975c7db7c3b1e"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "600391.SH|2024-12-27",
+    "source": {
+      "type": "R67 minute",
+      "path": "/data/cyris/work/b2_d2_intraday_r67_20261021/minutes/2024-12-31_600391.pkl",
+      "sha256": "e3e28f97401f5ed9bc15b092693a77d5f679409242efcacdf58ae4f177f65022"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "600857.SH|2024-12-30",
+    "source": {
+      "type": "R69 minute",
+      "path": "/data/cyris/work/b2_d2_limit_follow_r69_20261021/minutes/2025-01-02_600857.pkl",
+      "sha256": "44cbee9c1e60f7fae41c1ee39a222206b656c5a4beb5973563bd0991469416c9"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "09:39",
+    "seven_proxy": true
+  },
+  {
+    "id": "600778.SH|2024-12-31",
+    "source": {
+      "type": "R69 minute",
+      "path": "/data/cyris/work/b2_d2_limit_follow_r69_20261021/minutes/2025-01-03_600778.pkl",
+      "sha256": "1126fe9928fa02c687b7913da8c76c7cf7c4f677dabfd5ab0e48606aa0268528"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "09:31",
+    "seven_proxy": true
+  },
+  {
+    "id": "603123.SH|2025-06-03",
+    "source": {
+      "type": "R69 minute",
+      "path": "/data/cyris/work/b2_d2_limit_follow_r69_20261021/minutes/2025-06-05_603123.pkl",
+      "sha256": "8209bbbb4b97f146dfa99d3e5ebd431f4ed13b966404f40afad46b97cf426673"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "002177.SZ|2025-06-04",
+    "source": {
+      "type": "R67 minute",
+      "path": "/data/cyris/work/b2_d2_intraday_r67_20261021/minutes/2025-06-06_002177.pkl",
+      "sha256": "569fcc0198733c391fd0b2d33edd88fb222289fc75d93ef8ed85a3129c3f1792"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "09:31",
+    "seven_proxy": true
+  },
+  {
+    "id": "603093.SH|2025-06-05",
+    "source": {
+      "type": "R69 minute",
+      "path": "/data/cyris/work/b2_d2_limit_follow_r69_20261021/minutes/2025-06-09_603093.pkl",
+      "sha256": "bcfd1f74894d0cca93eb489ba7d1b376c2d70e95e7a5ef98970ca69bfae4886b"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "09:42",
+    "seven_proxy": true
+  },
+  {
+    "id": "002298.SZ|2025-06-06",
+    "source": {
+      "type": "R69 minute",
+      "path": "/data/cyris/work/b2_d2_limit_follow_r69_20261021/minutes/2025-06-10_002298.pkl",
+      "sha256": "8dd1424dfc8e048cec4ab13bcb7292328fa0236d8d3687a14855c4b24b4e714e"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "09:31",
+    "seven_proxy": true
+  },
+  {
+    "id": "003040.SZ|2025-06-09",
+    "source": {
+      "type": "R69 minute",
+      "path": "/data/cyris/work/b2_d2_limit_follow_r69_20261021/minutes/2025-06-11_003040.pkl",
+      "sha256": "582f203551d56c574a45317ce5d3cc6f8ffbac04e8655fa576c214ec4e6733ac"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "10:03",
+    "seven_proxy": true
+  },
+  {
+    "id": "002940.SZ|2025-06-10",
+    "source": {
+      "type": "R67 minute",
+      "path": "/data/cyris/work/b2_d2_intraday_r67_20261021/minutes/2025-06-12_002940.pkl",
+      "sha256": "f520bd3d2147496eec4456e27e32d41303d1040f7a7aa2e5c02d2b9d809e736d"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "09:31",
+    "seven_proxy": true
+  },
+  {
+    "id": "002181.SZ|2025-06-11",
+    "source": {
+      "type": "R67 minute",
+      "path": "/data/cyris/work/b2_d2_intraday_r67_20261021/minutes/2025-06-13_002181.pkl",
+      "sha256": "bb1bdca02dfc7a750aaba6da0ba18eec850779eca442cfea2b5d213c1fef794a"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "600281.SH|2025-06-12",
+    "source": {
+      "type": "R67 minute",
+      "path": "/data/cyris/work/b2_d2_intraday_r67_20261021/minutes/2025-06-16_600281.pkl",
+      "sha256": "63631a3489b654b9c8d8681f0a6a68c09b4c85035e8632989e2ca7268ab672e5"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "601279.SH|2025-06-13",
+    "source": {
+      "type": "R67 minute",
+      "path": "/data/cyris/work/b2_d2_intraday_r67_20261021/minutes/2025-06-17_601279.pkl",
+      "sha256": "7bfa577ffb6d0d2981b50715f34dbbb73ff9261b1343ec6c1d07401d5b2dcb0f"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "002828.SZ|2025-06-16",
+    "source": {
+      "type": "R69 minute",
+      "path": "/data/cyris/work/b2_d2_limit_follow_r69_20261021/minutes/2025-06-18_002828.pkl",
+      "sha256": "2dd7b3cf182e5babb59d9b0af07df558f566a66cd55e8706fa6123c72b83bfe6"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "09:31",
+    "seven_proxy": true
+  },
+  {
+    "id": "600722.SH|2025-06-18",
+    "source": {
+      "type": "R67 minute",
+      "path": "/data/cyris/work/b2_d2_intraday_r67_20261021/minutes/2025-06-20_600722.pkl",
+      "sha256": "11fe85d03050dab9f504b0a9bfa7ea7404cf4d54806e28be1e823477f6cc0160"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "002490.SZ|2025-06-19",
+    "source": {
+      "type": "R69 minute",
+      "path": "/data/cyris/work/b2_d2_limit_follow_r69_20261021/minutes/2025-06-23_002490.pkl",
+      "sha256": "2ac35fd837286e28cb387472d200cfe79fe4272f0ce87b51fb02c04c64d6c041"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "09:31",
+    "seven_proxy": true
+  },
+  {
+    "id": "002579.SZ|2025-06-20",
+    "source": {
+      "type": "R69 minute",
+      "path": "/data/cyris/work/b2_d2_limit_follow_r69_20261021/minutes/2025-06-24_002579.pkl",
+      "sha256": "ca5220e8ea80510dcbe0d48d5f8528f8364b2678f85c4137d68593be52571e45"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "09:32",
+    "seven_proxy": true
+  },
+  {
+    "id": "600798.SH|2025-06-23",
+    "source": {
+      "type": "R67 minute",
+      "path": "/data/cyris/work/b2_d2_intraday_r67_20261021/minutes/2025-06-25_600798.pkl",
+      "sha256": "4237a2516b0c66a15e1cfe8bc8d339d5b32f14ca677cfed5c93804e5cacd4c03"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "603928.SH|2025-06-24",
+    "source": {
+      "type": "R67 minute",
+      "path": "/data/cyris/work/b2_d2_intraday_r67_20261021/minutes/2025-06-26_603928.pkl",
+      "sha256": "8518c00d42c02944b9a7b4bd5e863657280e3ac4ae1468a58d502c86a385eaf8"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "09:31",
+    "seven_proxy": true
+  },
+  {
+    "id": "002125.SZ|2025-06-25",
+    "source": {
+      "type": "R67 minute",
+      "path": "/data/cyris/work/b2_d2_intraday_r67_20261021/minutes/2025-06-27_002125.pkl",
+      "sha256": "a95a13034d6b0e63fc7eec3ff2401e55c8eee99b71da2b7391073b4495c1c56c"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "002759.SZ|2025-06-26",
+    "source": {
+      "type": "R67 minute",
+      "path": "/data/cyris/work/b2_d2_intraday_r67_20261021/minutes/2025-06-30_002759.pkl",
+      "sha256": "b83a711e7940316d571bfc1910cd9c682fe3ca5efdb0c6cfc2fa091b89ed4573"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "002263.SZ|2025-06-27",
+    "source": {
+      "type": "R67 minute",
+      "path": "/data/cyris/work/b2_d2_intraday_r67_20261021/minutes/2025-07-01_002263.pkl",
+      "sha256": "29737a0b9572bd99956e5f2b29542b463861ab20a4dfe1ed9c36465aa6569d49"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "09:31",
+    "seven_proxy": true
+  },
+  {
+    "id": "600241.SH|2025-06-30",
+    "source": {
+      "type": "R67 minute",
+      "path": "/data/cyris/work/b2_d2_intraday_r67_20261021/minutes/2025-07-02_600241.pkl",
+      "sha256": "71669ce69b430dc2a6567249888db742b21038ba980ee4e6cdc8126682139326"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "002115.SZ|2025-09-01",
+    "source": {
+      "type": "R67 minute",
+      "path": "/data/cyris/work/b2_d2_intraday_r67_20261021/minutes/2025-09-03_002115.pkl",
+      "sha256": "d1f082e81b254be54528b4471a799d1ea1b5a1b729b4e149cfee1d460cad44e7"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "09:56",
+    "seven_proxy": true
+  },
+  {
+    "id": "002547.SZ|2025-09-03",
+    "source": {
+      "type": "R73 minute",
+      "path": "/data/cyris/work/b2_model_economics_r73_20261022/minutes/2025-09-05_002547.csv.gz",
+      "sha256": "c56df1812c80b3e06e40e432fa47a3a46d07693fa4ee336b4f6e6549c325e64f"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "600376.SH|2025-09-05",
+    "source": {
+      "type": "R69 minute",
+      "path": "/data/cyris/work/b2_d2_limit_follow_r69_20261021/minutes/2025-09-09_600376.pkl",
+      "sha256": "7b1ffa728fac736bf3539968802ad53a037e924f4d33c39e8c9f95fcf4d0ae45"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "09:31",
+    "seven_proxy": true
+  },
+  {
+    "id": "002759.SZ|2025-09-09",
+    "source": {
+      "type": "R67 minute",
+      "path": "/data/cyris/work/b2_d2_intraday_r67_20261021/minutes/2025-09-11_002759.pkl",
+      "sha256": "79ede9c1fba5c955c5a0daf943363f514dfd8383c49b1e10175d91e5ef6a6b41"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "600173.SH|2025-09-10",
+    "source": {
+      "type": "R67 minute",
+      "path": "/data/cyris/work/b2_d2_intraday_r67_20261021/minutes/2025-09-12_600173.pkl",
+      "sha256": "6b1dcac8505cce9938ee91c4c3c7bd3df951abbd4f3858acc672a7011b6cfddc"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "000718.SZ|2025-09-12",
+    "source": {
+      "type": "R67 minute",
+      "path": "/data/cyris/work/b2_d2_intraday_r67_20261021/minutes/2025-09-16_000718.pkl",
+      "sha256": "97f9c285c8d325f1dcf0b2cd3b035fdaede32e676f556d0ff56deb8b7aee1921"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "600629.SH|2025-09-15",
+    "source": {
+      "type": "R67 minute",
+      "path": "/data/cyris/work/b2_d2_intraday_r67_20261021/minutes/2025-09-17_600629.pkl",
+      "sha256": "f6e7c66cacd471e0568eecb560b2a3f602437bcff9abb9effa7a9e21e49b4269"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "600170.SH|2025-09-16",
+    "source": {
+      "type": "R69 minute",
+      "path": "/data/cyris/work/b2_d2_limit_follow_r69_20261021/minutes/2025-09-18_600170.pkl",
+      "sha256": "3f79e008c9eff5dd81823148b6411e393868a2973f11a9fc6825567898e9088d"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "09:46",
+    "seven_proxy": true
+  },
+  {
+    "id": "000559.SZ|2025-09-17",
+    "source": {
+      "type": "R67 minute",
+      "path": "/data/cyris/work/b2_d2_intraday_r67_20261021/minutes/2025-09-19_000559.pkl",
+      "sha256": "09ff0c0b532eeabff54cc76cbbfa4cebb69edb290b1c091b6a19f331babd718c"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "600162.SH|2025-09-18",
+    "source": {
+      "type": "R67 minute",
+      "path": "/data/cyris/work/b2_d2_intraday_r67_20261021/minutes/2025-09-22_600162.pkl",
+      "sha256": "de11f28fa1db48451266fa358c87d5bb234a8d86adc66623ad86c663d5928675"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "603618.SH|2025-09-19",
+    "source": {
+      "type": "R69 minute",
+      "path": "/data/cyris/work/b2_d2_limit_follow_r69_20261021/minutes/2025-09-23_603618.pkl",
+      "sha256": "cc9e34fa7def80ac6668d004efcb370ca469055ac750a08d963c2a19f8e11e8f"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "09:32",
+    "seven_proxy": true
+  },
+  {
+    "id": "600400.SH|2025-09-22",
+    "source": {
+      "type": "R69 minute",
+      "path": "/data/cyris/work/b2_d2_limit_follow_r69_20261021/minutes/2025-09-24_600400.pkl",
+      "sha256": "b6045e5fb079703def70e4759e821f467260e991d6d035cdacb57ad040e0a80f"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "09:36",
+    "seven_proxy": true
+  },
+  {
+    "id": "600167.SH|2025-09-24",
+    "source": {
+      "type": "R67 minute",
+      "path": "/data/cyris/work/b2_d2_intraday_r67_20261021/minutes/2025-09-26_600167.pkl",
+      "sha256": "23ec5e949107e2272b76af3484fd75f59f9a0400fd0e23b0fc960ed2c891f253"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "600167.SH|2025-09-25",
+    "source": {
+      "type": "R67 minute",
+      "path": "/data/cyris/work/b2_d2_intraday_r67_20261021/minutes/2025-09-29_600167.pkl",
+      "sha256": "c380b4640bcdd2cf446f7724a21ad9c4f0463b245877ebb7c44619570d246509"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "09:32",
+    "seven_proxy": true
+  },
+  {
+    "id": "603156.SH|2025-09-26",
+    "source": {
+      "type": "R67 minute",
+      "path": "/data/cyris/work/b2_d2_intraday_r67_20261021/minutes/2025-09-30_603156.pkl",
+      "sha256": "bc2d47fac516573fd01814b102e431702de70aa1daa30e0955080302f7614d9c"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "09:47",
+    "seven_proxy": true
+  },
+  {
+    "id": "600629.SH|2025-09-29",
+    "source": {
+      "type": "R67 minute",
+      "path": "/data/cyris/work/b2_d2_intraday_r67_20261021/minutes/2025-10-09_600629.pkl",
+      "sha256": "4bb8853d1e3c9f642dcf7460ababeba96a29e794cf1f42aec314d5031332774c"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "09:32",
+    "seven_proxy": true
+  },
+  {
+    "id": "600629.SH|2025-09-30",
+    "source": {
+      "type": "R67 minute",
+      "path": "/data/cyris/work/b2_d2_intraday_r67_20261021/minutes/2025-10-10_600629.pkl",
+      "sha256": "92d47ebd545ececd55decf9790c6b5da4f8f8542d66bfea49358b67f7838880a"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "10:31",
+    "seven_proxy": true
+  },
+  {
+    "id": "601212.SH|2025-10-13",
+    "source": {
+      "type": "archive",
+      "path": "/data/cyris/work/b2_news_flow_years_r76_20261022/raw/outputs/stock_automl/mk_1m_compact_2025/2025-10-15.csv.zst",
+      "sha256": "1d9962c34a31d37eb83badde52555fe444351d3d662680d94660af941dda274c"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "600617.SH|2025-10-15",
+    "source": {
+      "type": "R69 minute",
+      "path": "/data/cyris/work/b2_d2_limit_follow_r69_20261021/minutes/2025-10-17_600617.pkl",
+      "sha256": "0830e2f419329ab9be590f94cceb9f3ba2737b1c07a433f23a42b56351652005"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "10:12",
+    "seven_proxy": true
+  },
+  {
+    "id": "000626.SZ|2025-10-16",
+    "source": {
+      "type": "R69 minute",
+      "path": "/data/cyris/work/b2_d2_limit_follow_r69_20261021/minutes/2025-10-20_000626.pkl",
+      "sha256": "4572aa21014cc952fa189b4384e9d96872fd8f676d92a089682f59524a24e9ed"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "09:31",
+    "seven_proxy": true
+  },
+  {
+    "id": "000626.SZ|2025-10-20",
+    "source": {
+      "type": "archive",
+      "path": "/data/cyris/work/b2_news_flow_years_r76_20261022/raw/outputs/stock_automl/mk_1m_compact_2025/2025-10-22.csv.zst",
+      "sha256": "7888b2b01e3fcfe6afbfb24d17cd85a0f9abe137decd422638eb11d123c30de8"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "600403.SH|2025-10-22",
+    "source": {
+      "type": "archive",
+      "path": "/data/cyris/work/b2_news_flow_years_r76_20261022/raw/outputs/stock_automl/mk_1m_compact_2025/2025-10-24.csv.zst",
+      "sha256": "e0e1dd5f6ec6075863af5c74984c3fdfea5c2f477d0ce9648571931726ea00cb"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "002748.SZ|2025-10-24",
+    "source": {
+      "type": "archive",
+      "path": "/data/cyris/work/b2_news_flow_years_r76_20261022/raw/outputs/stock_automl/mk_1m_compact_2025/2025-10-28.csv.zst",
+      "sha256": "c58002dcd3c7093ad07777be9a8cc48c9bf229095b7ee592327c1821c1fc1189"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "000592.SZ|2025-10-29",
+    "source": {
+      "type": "R69 minute",
+      "path": "/data/cyris/work/b2_d2_limit_follow_r69_20261021/minutes/2025-10-31_000592.pkl",
+      "sha256": "a74ba09e0825c61c7ab6b34fced50c4e34096027c82f82bda02b0e2ea5806759"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "09:34",
+    "seven_proxy": true
+  },
+  {
+    "id": "002679.SZ|2025-10-31",
+    "source": {
+      "type": "R69 minute",
+      "path": "/data/cyris/work/b2_d2_limit_follow_r69_20261021/minutes/2025-11-04_002679.pkl",
+      "sha256": "6ce7ab6fc4b1b7796e033568bb2de33bc988eba55b8462ab14c878037ed01e42"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "10:26",
+    "seven_proxy": true
+  },
+  {
+    "id": "000592.SZ|2025-11-03",
+    "source": {
+      "type": "R69 minute",
+      "path": "/data/cyris/work/b2_d2_limit_follow_r69_20261021/minutes/2025-11-05_000592.pkl",
+      "sha256": "af2977d12d6820cd4f6e6435a1152d31ee21bbedfe91beadf7f520615b69f6d3"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "09:31",
+    "seven_proxy": true
+  },
+  {
+    "id": "000592.SZ|2025-11-04",
+    "source": {
+      "type": "R67 minute",
+      "path": "/data/cyris/work/b2_d2_intraday_r67_20261021/minutes/2025-11-06_000592.pkl",
+      "sha256": "83688c6ed9df2340ed2e7abce25e572a428fd3db3ce3d8c92b80d0b496faa450"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "603122.SH|2025-11-05",
+    "source": {
+      "type": "R69 minute",
+      "path": "/data/cyris/work/b2_d2_limit_follow_r69_20261021/minutes/2025-11-07_603122.pkl",
+      "sha256": "ad0f1e38a2e2ae75c4f5cae9eedec4ba6281c99de04fc1089dced7111b6ce8f2"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "000993.SZ|2025-11-06",
+    "source": {
+      "type": "R69 minute",
+      "path": "/data/cyris/work/b2_d2_limit_follow_r69_20261021/minutes/2025-11-10_000993.pkl",
+      "sha256": "7dbf1ccdb3ad54317a4c6c47011cb492d2074ab5d7288a1f3706866690def259"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "09:59",
+    "seven_proxy": true
+  },
+  {
+    "id": "600939.SH|2025-11-10",
+    "source": {
+      "type": "R67 minute",
+      "path": "/data/cyris/work/b2_d2_intraday_r67_20261021/minutes/2025-11-12_600939.pkl",
+      "sha256": "86a615066ccf79d8504ae391557178bf8a7c26b3ab366cd7684465b4eb8cb121"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "600693.SH|2025-11-12",
+    "source": {
+      "type": "R69 minute",
+      "path": "/data/cyris/work/b2_d2_limit_follow_r69_20261021/minutes/2025-11-14_600693.pkl",
+      "sha256": "ff2cec7245fc848fb571bb44a93fa99c2f1c1afd13b42fafba1ccc8ce9e2dbf0"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "09:32",
+    "seven_proxy": true
+  },
+  {
+    "id": "600693.SH|2025-11-14",
+    "source": {
+      "type": "R67 minute",
+      "path": "/data/cyris/work/b2_d2_intraday_r67_20261021/minutes/2025-11-18_600693.pkl",
+      "sha256": "397a86c19d1fc175cb238ebcb05bcde1c5367ff546ed87748e6912a72e7eba8a"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "002083.SZ|2025-11-17",
+    "source": {
+      "type": "R67 minute",
+      "path": "/data/cyris/work/b2_d2_intraday_r67_20261021/minutes/2025-11-19_002083.pkl",
+      "sha256": "327f7260e0bb8497cf786f79fed25a7b9f56cf10d5228fe386ce425d74df094e"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "000546.SZ|2025-11-19",
+    "source": {
+      "type": "R73 minute",
+      "path": "/data/cyris/work/b2_model_economics_r73_20261022/minutes/2025-11-21_000546.csv.gz",
+      "sha256": "c666780370dfdeb08e946945be0a873622086004a6a757986c5c2efe9e6a2bc0"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "000070.SZ|2025-11-25",
+    "source": {
+      "type": "R67 minute",
+      "path": "/data/cyris/work/b2_d2_intraday_r67_20261021/minutes/2025-11-27_000070.pkl",
+      "sha256": "587a732c51d05ab608fe6319e0fe0a17106863b7b8f87431953f83238f615fc3"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "002766.SZ|2026-01-05",
+    "source": {
+      "type": "R73 minute",
+      "path": "/data/cyris/work/b2_model_economics_r73_20261022/minutes/2026-01-07_002766.csv.gz",
+      "sha256": "db990e14910d4405e75b3c5b9b50615c00cb2ac6f68c3bb3673509b5324e2583"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "09:31",
+    "seven_proxy": true
+  },
+  {
+    "id": "002774.SZ|2026-01-09",
+    "source": {
+      "type": "R73 minute",
+      "path": "/data/cyris/work/b2_model_economics_r73_20261022/minutes/2026-01-13_002774.csv.gz",
+      "sha256": "459db2a0999727a8b30a0422d135f205680d11faf338613dfffc0e2257d5e4c4"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "002112.SZ|2026-01-14",
+    "source": {
+      "type": "R73 minute",
+      "path": "/data/cyris/work/b2_model_economics_r73_20261022/minutes/2026-01-16_002112.csv.gz",
+      "sha256": "e9aa764d17db0a6772688e60944030c2cf9864d7abf901a39818f4a914078b3d"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "09:31",
+    "seven_proxy": true
+  },
+  {
+    "id": "600785.SH|2026-01-16",
+    "source": {
+      "type": "R73 minute",
+      "path": "/data/cyris/work/b2_model_economics_r73_20261022/minutes/2026-01-20_600785.csv.gz",
+      "sha256": "37c3b2e745aeb502e370a5528bf5a06ad65c83b0bf0c4e36e9e439dc249ecfe1"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "09:42",
+    "seven_proxy": true
+  },
+  {
+    "id": "600785.SH|2026-01-19",
+    "source": {
+      "type": "R73 minute",
+      "path": "/data/cyris/work/b2_model_economics_r73_20261022/minutes/2026-01-21_600785.csv.gz",
+      "sha256": "5366ab4e1402875a909e7f9b1a624cc18b36a27e57a4ffa1a49c2382bfb20dc2"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "09:31",
+    "seven_proxy": true
+  },
+  {
+    "id": "002716.SZ|2026-01-21",
+    "source": {
+      "type": "R73 minute",
+      "path": "/data/cyris/work/b2_model_economics_r73_20261022/minutes/2026-01-23_002716.csv.gz",
+      "sha256": "bb5e3723af59ce1dc676e7c511ffde5ef422441412e0c16a104a5c2098a07b61"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "09:31",
+    "seven_proxy": true
+  },
+  {
+    "id": "000036.SZ|2026-01-22",
+    "source": {
+      "type": "R73 minute",
+      "path": "/data/cyris/work/b2_model_economics_r73_20261022/minutes/2026-01-26_000036.csv.gz",
+      "sha256": "e74823a959e0d82101552e3c46fb7c6c9d147cf13f120fbebbbfda3192b84b3f"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "601212.SH|2026-01-23",
+    "source": {
+      "type": "R73 minute",
+      "path": "/data/cyris/work/b2_model_economics_r73_20261022/minutes/2026-01-27_601212.csv.gz",
+      "sha256": "51121e382e259fa44d4980d7e3c5ad527b30e7aa1c1d1820c461879dee6cd921"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "09:33",
+    "seven_proxy": true
+  },
+  {
+    "id": "002218.SZ|2026-01-26",
+    "source": {
+      "type": "R73 minute",
+      "path": "/data/cyris/work/b2_model_economics_r73_20261022/minutes/2026-01-28_002218.csv.gz",
+      "sha256": "23921a6e419e49d26b73591e688cd47579f1887cc050088866d29b3e70852f1c"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "09:31",
+    "seven_proxy": true
+  },
+  {
+    "id": "601212.SH|2026-01-27",
+    "source": {
+      "type": "R73 minute",
+      "path": "/data/cyris/work/b2_model_economics_r73_20261022/minutes/2026-01-29_601212.csv.gz",
+      "sha256": "22c559798d0caa74f5a0666fe012e6d4aa2dd2d12299df3e534aa90a290282e7"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "09:31",
+    "seven_proxy": true
+  },
+  {
+    "id": "601212.SH|2026-01-29",
+    "source": {
+      "type": "R73 minute",
+      "path": "/data/cyris/work/b2_model_economics_r73_20261022/minutes/2026-02-02_601212.csv.gz",
+      "sha256": "3bd814bff67747936b2b20d45186489e1f51950d432f4c4f5104068dae4dd2b8"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "000995.SZ|2026-01-30",
+    "source": {
+      "type": "R73 minute",
+      "path": "/data/cyris/work/b2_model_economics_r73_20261022/minutes/2026-02-03_000995.csv.gz",
+      "sha256": "418d27d3d3ae43eb95d22e9cad3961cb97075373bd90e7caaea1cdf1830b2b54"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "09:32",
+    "seven_proxy": true
+  },
+  {
+    "id": "603861.SH|2026-02-02",
+    "source": {
+      "type": "R73 minute",
+      "path": "/data/cyris/work/b2_model_economics_r73_20261022/minutes/2026-02-04_603861.csv.gz",
+      "sha256": "8bd3300238691f5b786227ecb08fc68d0d850ca83692bffec8b9ce3302940659"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "002471.SZ|2026-02-03",
+    "source": {
+      "type": "R73 minute",
+      "path": "/data/cyris/work/b2_model_economics_r73_20261022/minutes/2026-02-05_002471.csv.gz",
+      "sha256": "a5f258d6371dd32f21f86ad51a4bec485023e9aeb1b63b3b8fddf9169e562c31"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "603618.SH|2026-02-04",
+    "source": {
+      "type": "R73 minute",
+      "path": "/data/cyris/work/b2_model_economics_r73_20261022/minutes/2026-02-06_603618.csv.gz",
+      "sha256": "9ab22298ddce2f8539ed8331d2cc0bfa745e25a237341eaa88a0fd18d6c5fa09"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "09:34",
+    "seven_proxy": true
+  },
+  {
+    "id": "601015.SH|2026-02-05",
+    "source": {
+      "type": "R73 minute",
+      "path": "/data/cyris/work/b2_model_economics_r73_20261022/minutes/2026-02-09_601015.csv.gz",
+      "sha256": "dad4e7c68ae68ee321ad9a6456818f577e3146b7c03d8f43301e3c7efda9a305"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "600814.SH|2026-02-06",
+    "source": {
+      "type": "R73 minute",
+      "path": "/data/cyris/work/b2_model_economics_r73_20261022/minutes/2026-02-10_600814.csv.gz",
+      "sha256": "75ee64f7591bc01b3fd3a2643e51ce33910691b9105202dfe3d83fc3f3aaa700"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "002506.SZ|2026-02-09",
+    "source": {
+      "type": "R73 minute",
+      "path": "/data/cyris/work/b2_model_economics_r73_20261022/minutes/2026-02-11_002506.csv.gz",
+      "sha256": "9bbd90106d015aa402a58988a3c859213f2a99d4593cd437b6dc12827d99da4b"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "09:38",
+    "seven_proxy": true
+  },
+  {
+    "id": "002455.SZ|2026-02-10",
+    "source": {
+      "type": "R73 minute",
+      "path": "/data/cyris/work/b2_model_economics_r73_20261022/minutes/2026-02-12_002455.csv.gz",
+      "sha256": "835ab07db3d29792b934a47f53a94020e4e86a438e18f1950d9f4f901ba85031"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "002455.SZ|2026-02-11",
+    "source": {
+      "type": "R73 minute",
+      "path": "/data/cyris/work/b2_model_economics_r73_20261022/minutes/2026-02-13_002455.csv.gz",
+      "sha256": "d0bacd9a8ed7646524b9fb12cff5cae268d12c4fa90e3ba1375df9b5b55e5d27"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "600397.SH|2026-02-12",
+    "source": {
+      "type": "R73 minute",
+      "path": "/data/cyris/work/b2_model_economics_r73_20261022/minutes/2026-02-24_600397.csv.gz",
+      "sha256": "5fc803d3b025a263386640a813bb746072a8effeabb2bd26624f39045ac64fac"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "09:31",
+    "seven_proxy": true
+  },
+  {
+    "id": "002951.SZ|2026-02-13",
+    "source": {
+      "type": "R73 minute",
+      "path": "/data/cyris/work/b2_model_economics_r73_20261022/minutes/2026-02-25_002951.csv.gz",
+      "sha256": "4d7838eeb804d9d0ce1631c74d8fa4d3696f5d8b20ba0c0a393e202def2456b9"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "001896.SZ|2026-02-24",
+    "source": {
+      "type": "R73 minute",
+      "path": "/data/cyris/work/b2_model_economics_r73_20261022/minutes/2026-02-26_001896.csv.gz",
+      "sha256": "dac884c17270b10d1a6bbe59b5ac681a48763d664f79ecf93734379a3d3e951f"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "09:31",
+    "seven_proxy": true
+  },
+  {
+    "id": "000890.SZ|2026-02-25",
+    "source": {
+      "type": "R73 minute",
+      "path": "/data/cyris/work/b2_model_economics_r73_20261022/minutes/2026-02-27_000890.csv.gz",
+      "sha256": "3f34ba08de7419bb8695eae456237becbb084bfe1cfac660f094bcd95e58f417"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "000890.SZ|2026-02-26",
+    "source": {
+      "type": "R73 minute",
+      "path": "/data/cyris/work/b2_model_economics_r73_20261022/minutes/2026-03-02_000890.csv.gz",
+      "sha256": "6f557364b2bb2eaf9019db520f5dd8dabf51a433be838c88be42e5ff6e619299"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "09:41",
+    "seven_proxy": true
+  },
+  {
+    "id": "000899.SZ|2026-02-27",
+    "source": {
+      "type": "R73 minute",
+      "path": "/data/cyris/work/b2_model_economics_r73_20261022/minutes/2026-03-03_000899.csv.gz",
+      "sha256": "4d852b2cc629090f1152ecd47c225c8d69ded0407006082d4b4759ad1a653701"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "600301.SH|2026-03-02",
+    "source": {
+      "type": "R73 minute",
+      "path": "/data/cyris/work/b2_model_economics_r73_20261022/minutes/2026-03-04_600301.csv.gz",
+      "sha256": "8ce3f8617388454bb59d81bf49642296b8894a7082bdecb5ea6f14bbc507b966"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "600722.SH|2026-03-03",
+    "source": {
+      "type": "R73 minute",
+      "path": "/data/cyris/work/b2_model_economics_r73_20261022/minutes/2026-03-05_600722.csv.gz",
+      "sha256": "df815e9d55a8b914a8872157f045f2ba3c5deb367e042769def6ac94c1fe8f8c"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "600545.SH|2026-03-06",
+    "source": {
+      "type": "R73 minute",
+      "path": "/data/cyris/work/b2_model_economics_r73_20261022/minutes/2026-03-10_600545.csv.gz",
+      "sha256": "46745d34180565ffe6ab6a5b865410b7bee8d8e98afd3e1e7780fb1fcda16834"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "601789.SH|2026-03-10",
+    "source": {
+      "type": "R73 minute",
+      "path": "/data/cyris/work/b2_model_economics_r73_20261022/minutes/2026-03-12_601789.csv.gz",
+      "sha256": "b682a207c091dcb1e8671d9f2962d85fd5c9b649272778d531ec6c1ae2015ada"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "600108.SH|2026-03-11",
+    "source": {
+      "type": "R73 minute",
+      "path": "/data/cyris/work/b2_model_economics_r73_20261022/minutes/2026-03-13_600108.csv.gz",
+      "sha256": "2d3f8675e103c7619cca71667014730c10bbd7be119b3262c12d93047dc10ce0"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "600722.SH|2026-03-12",
+    "source": {
+      "type": "R73 minute",
+      "path": "/data/cyris/work/b2_model_economics_r73_20261022/minutes/2026-03-16_600722.csv.gz",
+      "sha256": "6209d541a22c357db34557d9ea54917eb5620b6070b55398968bc8835ba46ea6"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "09:34",
+    "seven_proxy": true
+  },
+  {
+    "id": "000890.SZ|2026-03-13",
+    "source": {
+      "type": "R73 minute",
+      "path": "/data/cyris/work/b2_model_economics_r73_20261022/minutes/2026-03-17_000890.csv.gz",
+      "sha256": "ea3471720d60cd428518ab9dd118f0ff7abc62c05472126f4a23bb957a530d4b"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "09:33",
+    "seven_proxy": true
+  },
+  {
+    "id": "600370.SH|2026-03-16",
+    "source": {
+      "type": "R73 minute",
+      "path": "/data/cyris/work/b2_model_economics_r73_20261022/minutes/2026-03-18_600370.csv.gz",
+      "sha256": "de2c7779f260d33e1ff6758b5a36b443d52ddd2ae76fd60d74b6f25c94a9e6cc"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "09:31",
+    "seven_proxy": true
+  },
+  {
+    "id": "600396.SH|2026-03-23",
+    "source": {
+      "type": "R73 minute",
+      "path": "/data/cyris/work/b2_model_economics_r73_20261022/minutes/2026-03-25_600396.csv.gz",
+      "sha256": "c96d21671d0f2222fd6ca09def87b685d09b2abc12f6964f7de4aa7c95998663"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "09:31",
+    "seven_proxy": true
+  },
+  {
+    "id": "002309.SZ|2026-03-24",
+    "source": {
+      "type": "R73 minute",
+      "path": "/data/cyris/work/b2_model_economics_r73_20261022/minutes/2026-03-26_002309.csv.gz",
+      "sha256": "60cf1121de0292ed9796c5a8eb0b2e06a0b2623ed56f2e127627936a097606b2"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "002491.SZ|2026-03-25",
+    "source": {
+      "type": "R73 minute",
+      "path": "/data/cyris/work/b2_model_economics_r73_20261022/minutes/2026-03-27_002491.csv.gz",
+      "sha256": "a2cf2567025864ef2092b8a1a424e5436170ddacb9cb8e5f3fada4d3d738b880"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "11:22",
+    "seven_proxy": true
+  },
+  {
+    "id": "000720.SZ|2026-03-27",
+    "source": {
+      "type": "R73 minute",
+      "path": "/data/cyris/work/b2_model_economics_r73_20261022/minutes/2026-03-31_000720.csv.gz",
+      "sha256": "6dcbbbbdebf8c4ae0615984e13fc8a5d6a269989843771d2d1b3f1b6faf91011"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "09:47",
+    "seven_proxy": true
+  },
+  {
+    "id": "000890.SZ|2026-03-30",
+    "source": {
+      "type": "R73 minute",
+      "path": "/data/cyris/work/b2_model_economics_r73_20261022/minutes/2026-04-01_000890.csv.gz",
+      "sha256": "e3ffff0b960fdc1c26710cf2e8519379d0ae0bde9cce4a6e9c1a1520f1615399"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "002634.SZ|2026-03-31",
+    "source": {
+      "type": "R73 minute",
+      "path": "/data/cyris/work/b2_model_economics_r73_20261022/minutes/2026-04-02_002634.csv.gz",
+      "sha256": "0c9a2524dfc880676338b23027a9152e869cc7368a08c0272e9f527b608e9e77"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "002560.SZ|2026-04-01",
+    "source": {
+      "type": "R73 minute",
+      "path": "/data/cyris/work/b2_model_economics_r73_20261022/minutes/2026-04-03_002560.csv.gz",
+      "sha256": "bea2b38d8b7afd7093f1546916e288e6b535b787beb1887cab087e7651966aad"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "09:31",
+    "seven_proxy": true
+  },
+  {
+    "id": "002560.SZ|2026-04-02",
+    "source": {
+      "type": "R73 minute",
+      "path": "/data/cyris/work/b2_model_economics_r73_20261022/minutes/2026-04-07_002560.csv.gz",
+      "sha256": "9f69c47f03814ab3a6950b294bc526647a800aa6dad2a9d9a698741e3191f128"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "09:40",
+    "seven_proxy": true
+  },
+  {
+    "id": "600488.SH|2026-04-03",
+    "source": {
+      "type": "R73 minute",
+      "path": "/data/cyris/work/b2_model_economics_r73_20261022/minutes/2026-04-08_600488.csv.gz",
+      "sha256": "5564f2e319623c4bf1be21b484221def9a01cf455fb3dc45d3c1aca1ba61e1e0"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "09:31",
+    "seven_proxy": true
+  },
+  {
+    "id": "002580.SZ|2026-04-13",
+    "source": {
+      "type": "R73 minute",
+      "path": "/data/cyris/work/b2_model_economics_r73_20261022/minutes/2026-04-15_002580.csv.gz",
+      "sha256": "5763224747a37be21953ba466538c33ba0850c3d0752eba33619bc5ae29f98af"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "09:31",
+    "seven_proxy": true
+  },
+  {
+    "id": "600396.SH|2026-04-14",
+    "source": {
+      "type": "R73 minute",
+      "path": "/data/cyris/work/b2_model_economics_r73_20261022/minutes/2026-04-16_600396.csv.gz",
+      "sha256": "602e610d6ad8439071810f54afef297602e116d78442dbe4a019674e31f3bc46"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "002580.SZ|2026-04-15",
+    "source": {
+      "type": "R73 minute",
+      "path": "/data/cyris/work/b2_model_economics_r73_20261022/minutes/2026-04-17_002580.csv.gz",
+      "sha256": "8122ff50dd280275c09217d191ddbd29674e6f8328574f3c4092679e0f20bd1b"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "09:31",
+    "seven_proxy": true
+  },
+  {
+    "id": "002217.SZ|2026-04-20",
+    "source": {
+      "type": "R73 minute",
+      "path": "/data/cyris/work/b2_model_economics_r73_20261022/minutes/2026-04-22_002217.csv.gz",
+      "sha256": "b6ade74862bc549e07ff1f050c9bcb64d25703d36d401345b08c02762f67c12c"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "603115.SH|2026-04-22",
+    "source": {
+      "type": "R73 minute",
+      "path": "/data/cyris/work/b2_model_economics_r73_20261022/minutes/2026-04-24_603115.csv.gz",
+      "sha256": "2707a75a9fec84e232c0b34ee7fe4ebc863719acc2002ce907f8f0b4498088ac"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "600156.SH|2026-04-29",
+    "source": {
+      "type": "R73 minute",
+      "path": "/data/cyris/work/b2_model_economics_r73_20261022/minutes/2026-05-06_600156.csv.gz",
+      "sha256": "ae90d61edaa92ded62b4613c8d6be45c5647dac2ed775d8820831dd3c148c4bf"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "002273.SZ|2026-07-01",
+    "source": {
+      "type": "R73 minute",
+      "path": "/data/cyris/work/b2_model_economics_r73_20261022/minutes/2026-07-03_002273.csv.gz",
+      "sha256": "76c7851d604366162b1ab4175df436580732a7d1a0cff10f69e3dfa697d1e153"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "000566.SZ|2026-07-02",
+    "source": {
+      "type": "R73 minute",
+      "path": "/data/cyris/work/b2_model_economics_r73_20261022/minutes/2026-07-06_000566.csv.gz",
+      "sha256": "f9a6d4d97df52b38cfe228b0d3b0d6a5f002fa8aa9361683cade1360a1ecc4a1"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "10:17",
+    "seven_proxy": true
+  },
+  {
+    "id": "600793.SH|2026-07-03",
+    "source": {
+      "type": "R73 minute",
+      "path": "/data/cyris/work/b2_model_economics_r73_20261022/minutes/2026-07-07_600793.csv.gz",
+      "sha256": "3515566903132d58292d2db088250509828472412c949599f2633b3a9888df03"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "09:31",
+    "seven_proxy": true
+  },
+  {
+    "id": "000656.SZ|2026-07-06",
+    "source": {
+      "type": "R73 minute",
+      "path": "/data/cyris/work/b2_model_economics_r73_20261022/minutes/2026-07-08_000656.csv.gz",
+      "sha256": "0b82b83c8f694c5cfed7ecdac00a74ff79acfc4767af249e80d0c7f403d0d624"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "10:22",
+    "seven_proxy": true
+  },
+  {
+    "id": "600793.SH|2026-07-07",
+    "source": {
+      "type": "R73 minute",
+      "path": "/data/cyris/work/b2_model_economics_r73_20261022/minutes/2026-07-09_600793.csv.gz",
+      "sha256": "15734b7789d05fbfcb37461d27fe4149fa333aca66b4e68bb9952b6a5d39b12b"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "001229.SZ|2026-07-08",
+    "source": {
+      "type": "R73 minute",
+      "path": "/data/cyris/work/b2_model_economics_r73_20261022/minutes/2026-07-10_001229.csv.gz",
+      "sha256": "dc7ec53568cd3e2ef362f61dc3b6531099fa56890005177ed371adc4d5c150a8"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "002490.SZ|2026-07-09",
+    "source": {
+      "type": "R73 minute",
+      "path": "/data/cyris/work/b2_model_economics_r73_20261022/minutes/2026-07-13_002490.csv.gz",
+      "sha256": "d0f281f27e1af4484a53c8e9585ec7457eb2fef0366a0f273726149ad2dd3623"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "603898.SH|2026-07-10",
+    "source": {
+      "type": "R73 minute",
+      "path": "/data/cyris/work/b2_model_economics_r73_20261022/minutes/2026-07-14_603898.csv.gz",
+      "sha256": "ccfe98212cec4af2dc47ce569bfaa8ba0dda5f1e30cdf5305ad8fec1e9a6e203"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "600992.SH|2026-07-13",
+    "source": {
+      "type": "R73 minute",
+      "path": "/data/cyris/work/b2_model_economics_r73_20261022/minutes/2026-07-15_600992.csv.gz",
+      "sha256": "a39df5cc345e0106a9533810a9738bd5034d2cc3c93e349aa0877a481465ea56"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "09:42",
+    "seven_proxy": true
+  },
+  {
+    "id": "603137.SH|2026-07-14",
+    "source": {
+      "type": "R73 minute",
+      "path": "/data/cyris/work/b2_model_economics_r73_20261022/minutes/2026-07-16_603137.csv.gz",
+      "sha256": "005a7a34c7467f9a18ba6ecfed92ffb357ebb9f0656b30a7c01286a514d73097"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "603137.SH|2026-07-15",
+    "source": {
+      "type": "R73 minute",
+      "path": "/data/cyris/work/b2_model_economics_r73_20261022/minutes/2026-07-17_603137.csv.gz",
+      "sha256": "a57cac597978619776156745c3ab53ab697c111d94b02cddcf71b51fd6656180"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "600664.SH|2026-07-16",
+    "source": {
+      "type": "R73 minute",
+      "path": "/data/cyris/work/b2_model_economics_r73_20261022/minutes/2026-07-20_600664.csv.gz",
+      "sha256": "9f495dda461ca893cdab36ad696ed8f61341750a4a1bc1dd15752d789594380d"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "002829.SZ|2026-07-17",
+    "source": {
+      "type": "R73 minute",
+      "path": "/data/cyris/work/b2_model_economics_r73_20261022/minutes/2026-07-21_002829.csv.gz",
+      "sha256": "f618f7294d699d2aa045860429908d64220b131640dc209f0647e057d9610bae"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "000722.SZ|2026-07-20",
+    "source": {
+      "type": "R73 minute",
+      "path": "/data/cyris/work/b2_model_economics_r73_20261022/minutes/2026-07-22_000722.csv.gz",
+      "sha256": "07a1edc83f5888ff664fcc0accb66ce052223cbbf9e634b3057868c9ef614cc1"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "10:49",
+    "seven_proxy": true
+  },
+  {
+    "id": "600744.SH|2026-07-21",
+    "source": {
+      "type": "R73 minute",
+      "path": "/data/cyris/work/b2_model_economics_r73_20261022/minutes/2026-07-23_600744.csv.gz",
+      "sha256": "2c2ae541b0bf13ec5d92eaa0303fd75354d8c7dba6031a6a1d3ddc5b3e1cde1c"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "10:01",
+    "seven_proxy": true
+  },
+  {
+    "id": "603407.SH|2026-07-22",
+    "source": {
+      "type": "R73 minute",
+      "path": "/data/cyris/work/b2_model_economics_r73_20261022/minutes/2026-07-24_603407.csv.gz",
+      "sha256": "902bf9926c1352bb76e4562ce56ae3edcb4bec63d843e246ac20804570599cf0"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "603988.SH|2026-07-23",
+    "source": {
+      "type": "R73 minute",
+      "path": "/data/cyris/work/b2_model_economics_r73_20261022/minutes/2026-07-27_603988.csv.gz",
+      "sha256": "4b1e1caa6e7679fa07cf92ca873d22515a20e80b9e6a57c25eced9cd8e0c1435"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "10:24",
+    "seven_proxy": true
+  },
+  {
+    "id": "000533.SZ|2026-07-27",
+    "source": {
+      "type": "R73 minute",
+      "path": "/data/cyris/work/b2_model_economics_r73_20261022/minutes/2026-07-29_000533.csv.gz",
+      "sha256": "579b03979770e074730c823d6950f1c28e3f6c5e18f7985f3e0251a785b44598"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "000533.SZ|2026-07-28",
+    "source": {
+      "type": "R73 minute",
+      "path": "/data/cyris/work/b2_model_economics_r73_20261022/minutes/2026-07-30_000533.csv.gz",
+      "sha256": "46d4168aa3d8a04bfb16a3c6a1ae153b9f303def85fe2dba58542d856931edf4"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "002354.SZ|2026-08-03",
+    "source": {
+      "type": "R73 minute",
+      "path": "/data/cyris/work/b2_model_economics_r73_20261022/minutes/2026-08-05_002354.csv.gz",
+      "sha256": "5c4eba1eb594434aacc7304407ea193fa38da7e7d6a25c96e99b1be91e68fb2c"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "003032.SZ|2026-08-05",
+    "source": {
+      "type": "R73 minute",
+      "path": "/data/cyris/work/b2_model_economics_r73_20261022/minutes/2026-08-07_003032.csv.gz",
+      "sha256": "9dfe37fb0d33970515517ad6cba9e795ccf338335b5a22787b2b2b3a5bc129cb"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "11:24",
+    "seven_proxy": true
+  },
+  {
+    "id": "600397.SH|2026-08-06",
+    "source": {
+      "type": "R73 minute",
+      "path": "/data/cyris/work/b2_model_economics_r73_20261022/minutes/2026-08-10_600397.csv.gz",
+      "sha256": "0ac128e65bdb87477b56e10f8328755a1b80dfbb5526ad1dc2f6b0c442d6f620"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "600206.SH|2026-08-07",
+    "source": {
+      "type": "R73 minute",
+      "path": "/data/cyris/work/b2_model_economics_r73_20261022/minutes/2026-08-11_600206.csv.gz",
+      "sha256": "1e8bddaf939fbc83834bfa5fe8403e217f4e9ac65b99087de3a3137031972a64"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "002552.SZ|2026-08-10",
+    "source": {
+      "type": "R73 minute",
+      "path": "/data/cyris/work/b2_model_economics_r73_20261022/minutes/2026-08-12_002552.csv.gz",
+      "sha256": "eae2e5800e573dbac7ca06d3061abd35a7d157f51d73dca51dd5eb1a0484ae5d"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "10:28",
+    "seven_proxy": true
+  },
+  {
+    "id": "002329.SZ|2026-08-13",
+    "source": {
+      "type": "R73 minute",
+      "path": "/data/cyris/work/b2_model_economics_r73_20261022/minutes/2026-08-17_002329.csv.gz",
+      "sha256": "fbb78cb958091a6541597d8de6da0d9a92b8debbf86c5faa3e1961363653e676"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "002172.SZ|2026-08-14",
+    "source": {
+      "type": "R73 minute",
+      "path": "/data/cyris/work/b2_model_economics_r73_20261022/minutes/2026-08-18_002172.csv.gz",
+      "sha256": "c545121cc5693d9f7c14e85cf24c18b84f082bf3b5f3a5c5faa7ac44d43a4161"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "603958.SH|2026-08-18",
+    "source": {
+      "type": "R73 minute",
+      "path": "/data/cyris/work/b2_model_economics_r73_20261022/minutes/2026-08-20_603958.csv.gz",
+      "sha256": "beff812f3c2649ab9fe9bc21f1d33a1b591688e0a02f5e813170f8cdcef9b7cb"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "09:39",
+    "seven_proxy": true
+  },
+  {
+    "id": "603395.SH|2026-08-19",
+    "source": {
+      "type": "R73 minute",
+      "path": "/data/cyris/work/b2_model_economics_r73_20261022/minutes/2026-08-21_603395.csv.gz",
+      "sha256": "f7b25648b881eb215affe5c078d229ace7e0893713952065290457057b70fa0e"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "002491.SZ|2026-08-20",
+    "source": {
+      "type": "R73 minute",
+      "path": "/data/cyris/work/b2_model_economics_r73_20261022/minutes/2026-08-24_002491.csv.gz",
+      "sha256": "74bcffc4d5ac720b29e4a491819b2d97b56767f67f6733da9a38b526f3a5c1aa"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "002038.SZ|2026-08-21",
+    "source": {
+      "type": "R73 minute",
+      "path": "/data/cyris/work/b2_model_economics_r73_20261022/minutes/2026-08-25_002038.csv.gz",
+      "sha256": "b5ebafc3ccb717ae95e40e2681c9f91a20a74081316efcd26a19d9c95469d353"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "000017.SZ|2026-08-25",
+    "source": {
+      "type": "R73 minute",
+      "path": "/data/cyris/work/b2_model_economics_r73_20261022/minutes/2026-08-27_000017.csv.gz",
+      "sha256": "41fe9248e1c9aa2749d388582625404ec79713830fcc4549a4f7f97d7ecab72c"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "09:31",
+    "seven_proxy": true
+  },
+  {
+    "id": "603118.SH|2026-08-26",
+    "source": {
+      "type": "R73 minute",
+      "path": "/data/cyris/work/b2_model_economics_r73_20261022/minutes/2026-08-28_603118.csv.gz",
+      "sha256": "64169c9bfdf544abdca151d5a6857b645f3946b9640674bee12e1f2574b9f246"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "000712.SZ|2026-08-28",
+    "source": {
+      "type": "R73 minute",
+      "path": "/data/cyris/work/b2_model_economics_r73_20261022/minutes/2026-09-01_000712.csv.gz",
+      "sha256": "3a05ae4fc43a118df5f2d867c03530cfb63109a649cd51f1375cc52d0951fa32"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "600892.SH|2026-09-02",
+    "source": {
+      "type": "R73 minute",
+      "path": "/data/cyris/work/b2_model_economics_r73_20261022/minutes/2026-09-04_600892.csv.gz",
+      "sha256": "07ac2b1641fa9d6d6a8c13047cc340d277a85a7ce9c37d2023cce93233e4e9b4"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "002909.SZ|2026-09-03",
+    "source": {
+      "type": "R73 minute",
+      "path": "/data/cyris/work/b2_model_economics_r73_20261022/minutes/2026-09-07_002909.csv.gz",
+      "sha256": "c994b0e02582f14a3ac94fd478414c81b0877234b30c528b46f6a79b098f4066"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "09:33",
+    "seven_proxy": true
+  },
+  {
+    "id": "605580.SH|2026-09-04",
+    "source": {
+      "type": "R73 minute",
+      "path": "/data/cyris/work/b2_model_economics_r73_20261022/minutes/2026-09-08_605580.csv.gz",
+      "sha256": "b2780ef52b9c51d4e8dff34b376ff257f00a73560c63d170fcc21819d3315e41"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "002702.SZ|2026-09-07",
+    "source": {
+      "type": "R73 minute",
+      "path": "/data/cyris/work/b2_model_economics_r73_20261022/minutes/2026-09-09_002702.csv.gz",
+      "sha256": "cc75c6479c75b70037e36b173505a3290ababf4c44d1154e254f498184099cc9"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "600354.SH|2026-09-08",
+    "source": {
+      "type": "R73 minute",
+      "path": "/data/cyris/work/b2_model_economics_r73_20261022/minutes/2026-09-10_600354.csv.gz",
+      "sha256": "cf9631c4366671cf8cc1768cbf5a9421f8b83c3cb25c6fb7f99359a0d273ce4f"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "10:09",
+    "seven_proxy": true
+  },
+  {
+    "id": "002295.SZ|2026-09-09",
+    "source": {
+      "type": "R73 minute",
+      "path": "/data/cyris/work/b2_model_economics_r73_20261022/minutes/2026-09-11_002295.csv.gz",
+      "sha256": "89ee8374e5c1b3678bd56fd5e9f61f1132f74d4819521766a78f2232d8986e41"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "000978.SZ|2026-09-10",
+    "source": {
+      "type": "R73 minute",
+      "path": "/data/cyris/work/b2_model_economics_r73_20261022/minutes/2026-09-14_000978.csv.gz",
+      "sha256": "e2d49bcc5aa271ed2f54d280ce1cb860ffecb7b23c8a655aaa2e171e97b5644c"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "09:31",
+    "seven_proxy": true
+  },
+  {
+    "id": "603090.SH|2026-09-15",
+    "source": {
+      "type": "R73 minute",
+      "path": "/data/cyris/work/b2_model_economics_r73_20261022/minutes/2026-09-17_603090.csv.gz",
+      "sha256": "b7154e104dc7f1e659c9d2d550f6de74412bc861833ba554860a6a055db0de0f"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "002631.SZ|2026-09-16",
+    "source": {
+      "type": "R73 minute",
+      "path": "/data/cyris/work/b2_model_economics_r73_20261022/minutes/2026-09-18_002631.csv.gz",
+      "sha256": "c1b9b9d9be5a3e1ff1374d9f7df1c6b1f43a4034cce6a1491fb4d7cceafadbbb"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "10:05",
+    "seven_proxy": true
+  },
+  {
+    "id": "600371.SH|2026-09-17",
+    "source": {
+      "type": "R73 minute",
+      "path": "/data/cyris/work/b2_model_economics_r73_20261022/minutes/2026-09-21_600371.csv.gz",
+      "sha256": "40b0506376da901fc9226d3b9aaa6263c248b9e38bdf00d9eff0083617b45072"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "002285.SZ|2026-09-18",
+    "source": {
+      "type": "R73 minute",
+      "path": "/data/cyris/work/b2_model_economics_r73_20261022/minutes/2026-09-22_002285.csv.gz",
+      "sha256": "265615894e706084587e8eb4ab5ab933f3e3e65cab859e3b8940982fe87e76c3"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "601123.SH|2026-09-21",
+    "source": {
+      "type": "R73 minute",
+      "path": "/data/cyris/work/b2_model_economics_r73_20261022/minutes/2026-09-23_601123.csv.gz",
+      "sha256": "613bb26497fef9113f738890d4806a8002b3a47226afa27b6fdb6227b6406001"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "000560.SZ|2026-09-23",
+    "source": {
+      "type": "R73 minute",
+      "path": "/data/cyris/work/b2_model_economics_r73_20261022/minutes/2026-09-28_000560.csv.gz",
+      "sha256": "f8d1803a1ae3c4a55e6ce53a95b4db3c5601d9fd6043dd4e69bbd9fd29cb3a3b"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "601811.SH|2026-09-24",
+    "source": {
+      "type": "R73 minute",
+      "path": "/data/cyris/work/b2_model_economics_r73_20261022/minutes/2026-09-29_601811.csv.gz",
+      "sha256": "b8fd54f0c8f712b1799d8d06e35c9cd7385e2837bb2aa98b0e643e680a7191b5"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "09:31",
+    "seven_proxy": true
+  },
+  {
+    "id": "600802.SH|2026-09-28",
+    "source": {
+      "type": "R73 minute",
+      "path": "/data/cyris/work/b2_model_economics_r73_20261022/minutes/2026-09-30_600802.csv.gz",
+      "sha256": "83ae5daf7e6479a02c0e7125d57f772e3cfed5c4dde94ad7b9bb4e4b1e0a95eb"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  },
+  {
+    "id": "605388.SH|2026-09-30",
+    "source": {
+      "type": "R73 minute",
+      "path": "/data/cyris/work/b2_model_economics_r73_20261022/minutes/2026-10-09_605388.csv.gz",
+      "sha256": "0447b3c60fcf8cb1a7c9e90856b703d17d6815c285ee7a263de623ecab733121"
+    },
+    "bar_count": 240,
+    "daily_prices_match": true,
+    "morning7": "",
+    "seven_proxy": false
+  }
+]

@@ -1,0 +1,14 @@
+{
+  "source_D1_count": 306,
+  "source_D1_manifest_sha256": "b8ae0c60e9a86cfe76278397dde335682ca4866a02d06e48bed604991d90d451",
+  "source_R84_306_sha256": "7d485cd4b2f34dc0f713c2e510b0b01436074c72bf295885f1c08416378c10c2",
+  "output_sha256": {
+    "analyze.py": "1a19bfd6e20aed90b458d146816ca1517481f32316feb5fca9dbc87e31bc15ea",
+    "306笔_买前五根开盘和四根收盘.csv": "14e841ac65ed22c4c6935b220e6b6424dd1c31a866d4c6f5fa1c974c7a2337ff",
+    "前五根开盘跌停数_分档.csv": "bdadb1863d6b8015b707a7417e2e38c949173c24d94b52f02e279213d2a8dcbf",
+    "前四根收盘跌停数_分档.csv": "2aa1077d891f5a0f26c0f9cb85d04c3537cc48eb59408167bca60b06ac683190",
+    "各买前信号分期经济得失.csv": "53ffb59c3cf231440d8dc8485d962e0b4742dbf33c8bd75ebe7e44f547a0ebae",
+    "run.log": "62dc0f776a15de0091d3a017a67f313a0718d22a2d904a73571b806f16a31f1c",
+    "README.md": "d1aa070ba00a0f690eba87c7976ab6ea39b0c65fa05e09b24ce1cdc49d62c81b"
+  }
+}

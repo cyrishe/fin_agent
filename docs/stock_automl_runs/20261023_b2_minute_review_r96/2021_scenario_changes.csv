@@ -1,0 +1,10 @@
+﻿month,base_paused,base_rule,base_shadow,base_trades,strict_paused,strict_rule,strict_shadow,strict_trades
+2021-04,True,r029,13,0,True,r029,12,0
+2021-05,False,all,13,13,False,all,13,13
+2021-06,True,r029,9,0,True,r029,9,0
+2021-07,True,r029,13,0,True,r029,11,0
+2021-08,True,r029,18,0,False,r029,18,18
+2021-09,False,r029,15,15,False,r029,15,15
+2021-10,True,r017,12,0,True,r017,12,0
+2021-11,True,all,13,0,True,all,13,0
+2021-12,False,all,16,16,False,all,16,16

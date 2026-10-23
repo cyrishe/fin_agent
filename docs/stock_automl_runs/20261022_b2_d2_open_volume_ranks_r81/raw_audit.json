@@ -1,0 +1,60 @@
+{
+  "source_level_d2_files": 19,
+  "source_level_preboard_stock_days": 360,
+  "source_level_preboard_archives": 255,
+  "source_level_daily_volume_checked": true,
+  "F05_low_middle_high_good_bad": [
+    [
+      0,
+      5
+    ],
+    [
+      2,
+      7
+    ],
+    [
+      4,
+      1
+    ]
+  ],
+  "F05_full_AUC": 0.8717948717948718,
+  "unique_stock_n": 18,
+  "unique_stock_AUC_earliest_D2": 0.8611111111111112,
+  "yearly": [
+    {
+      "年份": "2022",
+      "笔数": 6,
+      "good": 3,
+      "bad": 3,
+      "F05_AUC": 1.0
+    },
+    {
+      "年份": "2023",
+      "笔数": 3,
+      "good": 1,
+      "bad": 2,
+      "F05_AUC": 0.5
+    },
+    {
+      "年份": "2024",
+      "笔数": 5,
+      "good": 1,
+      "bad": 4,
+      "F05_AUC": 0.5
+    },
+    {
+      "年份": "2025",
+      "笔数": 1,
+      "good": 0,
+      "bad": 1,
+      "F05_AUC": null
+    },
+    {
+      "年份": "2026",
+      "笔数": 4,
+      "good": 1,
+      "bad": 3,
+      "F05_AUC": 1.0
+    }
+  ]
+}

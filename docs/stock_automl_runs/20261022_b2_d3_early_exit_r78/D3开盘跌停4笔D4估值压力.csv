@@ -1,0 +1,3 @@
+﻿scenario,return_rate,max_drawdown,ending_cash,skipped_cash_buys,sold_count
+D3开盘全可售假设,4.5775900582,0.3721149695,5577590.0582148265,0,306
+4笔跌停延至D4收盘估值,3.3785350976,0.3658780642,4378535.0976424655,2,304

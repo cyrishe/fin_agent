@@ -1,0 +1,69 @@
+{
+  "summary": {
+    "total": 306,
+    "opening": 34,
+    "closing": 52,
+    "both": 19,
+    "union": 67,
+    "comparison": 239,
+    "minute_quality": {
+      "完整且日K价一致": 306
+    },
+    "opened": {
+      "是": 144,
+      "否": 99,
+      "分钟内顺序不明": 63
+    },
+    "valuation": {
+      "D0当日历史值": 210,
+      "此前股本估算": 96
+    },
+    "max_share_age": 371,
+    "industry_missing": 0
+  },
+  "all_original_entries_and_exits_match": true,
+  "all_D0_OHLC_match": true,
+  "prior_open_close_sets_exact": true,
+  "original_model_factors": 51,
+  "exported_factors": 113,
+  "new_training": false,
+  "production_modified": false,
+  "sources": [
+    {
+      "path": "outputs/stock_automl/b2_2021_minute_r60_20261020/signals.pkl",
+      "sha256": "c0fab9e454c92c0f3b0a9ba102224dcd6fef00fe377d215fbff1fb373708d1da"
+    },
+    {
+      "path": "docs/stock_automl_runs/20261020_b2_model_month_r61/模型归属.json",
+      "sha256": "7051be0ee86ee826e6de42bcc530dc1fb01a957960272d47060a4f31bc98d27e"
+    },
+    {
+      "path": "docs/stock_automl_runs/20261021_b2_floor_factor_review/valuation.csv.gz",
+      "sha256": "04d801831fe42d26dce06c6ab256ee0f747601651d0f97762f47bf0d657d7bc6"
+    },
+    {
+      "path": "docs/stock_automl_runs/20261021_b2_floor_factor_review/valuation_prior.csv.gz",
+      "sha256": "29e86fe4ebb7822dea038061eefc09ac11b80d769da7d9ae7ec6ef1d0f142d35"
+    },
+    {
+      "path": "docs/stock_automl_runs/20261021_b2_floor_factor_review/prices.csv.gz",
+      "sha256": "6e8a4187e1d152ef24f3271523d17a707c977a15ac4149aea99733341ab7fc97"
+    },
+    {
+      "path": "docs/stock_automl_runs/20261021_b2_floor_factor_review/names.csv.gz",
+      "sha256": "0afefc264cbc30b6b1b854c26cbdc94b21c9c936ec0e3e24d3bf42b45e7d21b9"
+    },
+    {
+      "path": "docs/stock_automl_runs/20261021_b2_floor_factor_review/industry.csv.gz",
+      "sha256": "318d559311bc4619d75682ed470deeba0b3612aa0722fad57dac588f2007a6dd"
+    },
+    {
+      "path": "docs/stock_automl_runs/20261021_b2_floor_factor_review/st.csv.gz",
+      "sha256": "075ac41cd552cb42ff4869f0956f046c14f72db94be5ed471ef47020a9aa4548"
+    },
+    {
+      "path": "docs/stock_automl_runs/20261021_b2_floor_factor_review/d0_minutes.json",
+      "sha256": "9691a8a5a71c04a1d266d2c269d6ecea37df60b2d79bd92db06ac28e354f2316"
+    }
+  ]
+}

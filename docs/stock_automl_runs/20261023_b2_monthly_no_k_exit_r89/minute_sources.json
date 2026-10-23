@@ -1,0 +1,667 @@
+[
+  {
+    "d2": "2025-09-03",
+    "code": "002115",
+    "source": "/data/cyris/work/b2_d2_intraday_r67_20261021/minutes/2025-09-03_002115.pkl",
+    "rows": 240,
+    "sha256": "d1f082e81b254be54528b4471a799d1ea1b5a1b729b4e149cfee1d460cad44e7"
+  },
+  {
+    "d2": "2025-09-09",
+    "code": "600376",
+    "source": "/data/cyris/work/b2_d2_intraday_r67_20261021/minutes/2025-09-09_600376.pkl",
+    "rows": 240,
+    "sha256": "7b1ffa728fac736bf3539968802ad53a037e924f4d33c39e8c9f95fcf4d0ae45"
+  },
+  {
+    "d2": "2025-09-15",
+    "code": "601116",
+    "source": "Tushare stk_mins via api.quicksync.cn",
+    "rows": 240,
+    "sha256": "21af38ff64480f347884dc8c5e4781e4b57d35d34ffa15376a1ffe95a80bfa51"
+  },
+  {
+    "d2": "2025-09-18",
+    "code": "600170",
+    "source": "/data/cyris/work/b2_d2_intraday_r67_20261021/minutes/2025-09-18_600170.pkl",
+    "rows": 240,
+    "sha256": "3f79e008c9eff5dd81823148b6411e393868a2973f11a9fc6825567898e9088d"
+  },
+  {
+    "d2": "2025-09-22",
+    "code": "600376",
+    "source": "Tushare stk_mins via api.quicksync.cn",
+    "rows": 240,
+    "sha256": "8b562ff64730bac0f31903ceacdaacd870d1e0813c7a5a8fc3d35412ca83f75d"
+  },
+  {
+    "d2": "2025-09-23",
+    "code": "603618",
+    "source": "/data/cyris/work/b2_d2_intraday_r67_20261021/minutes/2025-09-23_603618.pkl",
+    "rows": 240,
+    "sha256": "cc9e34fa7def80ac6668d004efcb370ca469055ac750a08d963c2a19f8e11e8f"
+  },
+  {
+    "d2": "2025-09-24",
+    "code": "600400",
+    "source": "/data/cyris/work/b2_d2_intraday_r67_20261021/minutes/2025-09-24_600400.pkl",
+    "rows": 240,
+    "sha256": "b6045e5fb079703def70e4759e821f467260e991d6d035cdacb57ad040e0a80f"
+  },
+  {
+    "d2": "2025-09-26",
+    "code": "002513",
+    "source": "Tushare stk_mins via api.quicksync.cn",
+    "rows": 240,
+    "sha256": "164c94c63698aafe4d870b4a46e680fb2cacfb3a68b9c18972333773b24c2dd9"
+  },
+  {
+    "d2": "2025-09-29",
+    "code": "600167",
+    "source": "/data/cyris/work/b2_d2_intraday_r67_20261021/minutes/2025-09-29_600167.pkl",
+    "rows": 240,
+    "sha256": "c380b4640bcdd2cf446f7724a21ad9c4f0463b245877ebb7c44619570d246509"
+  },
+  {
+    "d2": "2025-09-30",
+    "code": "002513",
+    "source": "Tushare stk_mins via api.quicksync.cn",
+    "rows": 240,
+    "sha256": "d5ecef70d28bbaac7ba480f28f0234fefdf220ba0618e61e4432f266f07a4ee3"
+  },
+  {
+    "d2": "2025-09-30",
+    "code": "603156",
+    "source": "/data/cyris/work/b2_d2_intraday_r67_20261021/minutes/2025-09-30_603156.pkl",
+    "rows": 240,
+    "sha256": "bc2d47fac516573fd01814b102e431702de70aa1daa30e0955080302f7614d9c"
+  },
+  {
+    "d2": "2025-10-09",
+    "code": "600629",
+    "source": "/data/cyris/work/b2_d2_intraday_r67_20261021/minutes/2025-10-09_600629.pkl",
+    "rows": 240,
+    "sha256": "4bb8853d1e3c9f642dcf7460ababeba96a29e794cf1f42aec314d5031332774c"
+  },
+  {
+    "d2": "2025-10-09",
+    "code": "601218",
+    "source": "Tushare stk_mins via api.quicksync.cn",
+    "rows": 240,
+    "sha256": "8be7478041f64ec41e3f39cd8fd6d168517d4cfae659c8093ba021cfd396079a"
+  },
+  {
+    "d2": "2025-10-10",
+    "code": "600629",
+    "source": "/data/cyris/work/b2_d2_intraday_r67_20261021/minutes/2025-10-10_600629.pkl",
+    "rows": 240,
+    "sha256": "92d47ebd545ececd55decf9790c6b5da4f8f8542d66bfea49358b67f7838880a"
+  },
+  {
+    "d2": "2025-10-14",
+    "code": "600635",
+    "source": "Tushare stk_mins via api.quicksync.cn",
+    "rows": 240,
+    "sha256": "1fb3dec708739aff2aaf289c504757b18985217fc2f351c50e72368b5995cfe4"
+  },
+  {
+    "d2": "2025-10-16",
+    "code": "601011",
+    "source": "Tushare stk_mins via api.quicksync.cn",
+    "rows": 240,
+    "sha256": "aada2d1f115f901a1d54a1b983a0ef40e1ec93a9349501b1ee939de6209600ee"
+  },
+  {
+    "d2": "2025-10-17",
+    "code": "600617",
+    "source": "/data/cyris/work/b2_d2_limit_follow_r69_20261021/minutes/2025-10-17_600617.pkl",
+    "rows": 240,
+    "sha256": "0830e2f419329ab9be590f94cceb9f3ba2737b1c07a433f23a42b56351652005"
+  },
+  {
+    "d2": "2025-10-20",
+    "code": "000626",
+    "source": "/data/cyris/work/b2_d2_limit_follow_r69_20261021/minutes/2025-10-20_000626.pkl",
+    "rows": 240,
+    "sha256": "4572aa21014cc952fa189b4384e9d96872fd8f676d92a089682f59524a24e9ed"
+  },
+  {
+    "d2": "2025-10-21",
+    "code": "000626",
+    "source": "Tushare stk_mins via api.quicksync.cn",
+    "rows": 240,
+    "sha256": "d711fc9c8dbc91c80c2c8be2a0b2cf2f1ba850746750839360334e4c33c24690"
+  },
+  {
+    "d2": "2025-10-27",
+    "code": "600403",
+    "source": "Tushare stk_mins via api.quicksync.cn",
+    "rows": 240,
+    "sha256": "3562147d33e55f979a42cfb51aeb98d98efe1040f89e890c38431f86c0c429c0"
+  },
+  {
+    "d2": "2025-10-31",
+    "code": "000592",
+    "source": "/data/cyris/work/b2_d2_limit_follow_r69_20261021/minutes/2025-10-31_000592.pkl",
+    "rows": 240,
+    "sha256": "a74ba09e0825c61c7ab6b34fced50c4e34096027c82f82bda02b0e2ea5806759"
+  },
+  {
+    "d2": "2025-11-04",
+    "code": "002679",
+    "source": "/data/cyris/work/b2_d2_limit_follow_r69_20261021/minutes/2025-11-04_002679.pkl",
+    "rows": 240,
+    "sha256": "6ce7ab6fc4b1b7796e033568bb2de33bc988eba55b8462ab14c878037ed01e42"
+  },
+  {
+    "d2": "2025-11-05",
+    "code": "000592",
+    "source": "/data/cyris/work/b2_d2_intraday_r67_20261021/minutes/2025-11-05_000592.pkl",
+    "rows": 240,
+    "sha256": "af2977d12d6820cd4f6e6435a1152d31ee21bbedfe91beadf7f520615b69f6d3"
+  },
+  {
+    "d2": "2025-11-07",
+    "code": "603122",
+    "source": "/data/cyris/work/b2_d2_intraday_r67_20261021/minutes/2025-11-07_603122.pkl",
+    "rows": 240,
+    "sha256": "ad0f1e38a2e2ae75c4f5cae9eedec4ba6281c99de04fc1089dced7111b6ce8f2"
+  },
+  {
+    "d2": "2025-11-10",
+    "code": "000993",
+    "source": "/data/cyris/work/b2_d2_intraday_r67_20261021/minutes/2025-11-10_000993.pkl",
+    "rows": 240,
+    "sha256": "7dbf1ccdb3ad54317a4c6c47011cb492d2074ab5d7288a1f3706866690def259"
+  },
+  {
+    "d2": "2025-11-13",
+    "code": "002083",
+    "source": "Tushare stk_mins via api.quicksync.cn",
+    "rows": 240,
+    "sha256": "d0c868108a81d747949d45ec5caa5d4c8023e0c9abb76415d1b925abfb621560"
+  },
+  {
+    "d2": "2025-11-14",
+    "code": "600693",
+    "source": "/data/cyris/work/b2_d2_intraday_r67_20261021/minutes/2025-11-14_600693.pkl",
+    "rows": 240,
+    "sha256": "ff2cec7245fc848fb571bb44a93fa99c2f1c1afd13b42fafba1ccc8ce9e2dbf0"
+  },
+  {
+    "d2": "2025-11-24",
+    "code": "002474",
+    "source": "Tushare stk_mins via api.quicksync.cn",
+    "rows": 240,
+    "sha256": "f1da5ec3295b1787085074d49b62f9b247d1863cc3cd0b0565a2707306855c27"
+  },
+  {
+    "d2": "2025-11-26",
+    "code": "000859",
+    "source": "Tushare stk_mins via api.quicksync.cn",
+    "rows": 240,
+    "sha256": "4cfe7eaf8024647ea9a7aab205e9d997a840bbdf35fd33bfc9e982613f7b174e"
+  },
+  {
+    "d2": "2025-11-27",
+    "code": "000070",
+    "source": "/data/cyris/work/b2_d2_intraday_r67_20261021/minutes/2025-11-27_000070.pkl",
+    "rows": 240,
+    "sha256": "587a732c51d05ab608fe6319e0fe0a17106863b7b8f87431953f83238f615fc3"
+  },
+  {
+    "d2": "2025-12-01",
+    "code": "000510",
+    "source": "Tushare stk_mins via api.quicksync.cn",
+    "rows": 240,
+    "sha256": "d99596f4ad84286d7e57644db8c4386b0afb4f7d19e98446106f025768fa07e4"
+  },
+  {
+    "d2": "2025-12-02",
+    "code": "000078",
+    "source": "Tushare stk_mins via api.quicksync.cn",
+    "rows": 240,
+    "sha256": "5de6e716dc509743f96e18a3a9b67d5b72c98d7e2968e13062ddb4dbb3478820"
+  },
+  {
+    "d2": "2026-01-07",
+    "code": "002766",
+    "source": "/data/cyris/work/b2_d2_intraday_r67_20261021/minutes/2026-01-07_002766.pkl",
+    "rows": 240,
+    "sha256": "a017f7e07727162337921a7ac5054916f1475132483b22c7b52d922db22a93e3"
+  },
+  {
+    "d2": "2026-01-09",
+    "code": "002519",
+    "source": "Tushare stk_mins via api.quicksync.cn",
+    "rows": 240,
+    "sha256": "5242e1a8b40957ac3d8c446f251a0c5517e2243351af2ea057d97b1663e9d979"
+  },
+  {
+    "d2": "2026-01-12",
+    "code": "603015",
+    "source": "Tushare stk_mins via api.quicksync.cn",
+    "rows": 240,
+    "sha256": "d474e15c531efd8c8613e6fe60f809ba427d2dd48270fca0837d892c45115d36"
+  },
+  {
+    "d2": "2026-01-14",
+    "code": "002342",
+    "source": "Tushare stk_mins via api.quicksync.cn",
+    "rows": 240,
+    "sha256": "f55a0396a65b22e62de4a4cbd5bc7b0ad8e56d1149ae3561cd7da126f743ef27"
+  },
+  {
+    "d2": "2026-01-15",
+    "code": "600676",
+    "source": "Tushare stk_mins via api.quicksync.cn",
+    "rows": 240,
+    "sha256": "bca87b9e7011098e2b26860fe3a35209cfb65bc768d520870f2561a365c66710"
+  },
+  {
+    "d2": "2026-01-16",
+    "code": "002112",
+    "source": "/data/cyris/work/b2_d2_intraday_r67_20261021/minutes/2026-01-16_002112.pkl",
+    "rows": 240,
+    "sha256": "38c3edbd00e9c01863bee667cef780a36cd95d502c2456312f00a60bb6462552"
+  },
+  {
+    "d2": "2026-01-20",
+    "code": "600785",
+    "source": "/data/cyris/work/b2_d2_intraday_r67_20261021/minutes/2026-01-20_600785.pkl",
+    "rows": 240,
+    "sha256": "ee759f544ebcd09c17cd6b8e4ff2a5447b4701765b4b7192f828cd6145b01793"
+  },
+  {
+    "d2": "2026-01-21",
+    "code": "600785",
+    "source": "/data/cyris/work/b2_d2_intraday_r67_20261021/minutes/2026-01-21_600785.pkl",
+    "rows": 240,
+    "sha256": "48cee5f70d6ade4c01f8fea673f1eb88cb47bab0ca99af68b2c71916a6a9def5"
+  },
+  {
+    "d2": "2026-01-22",
+    "code": "601616",
+    "source": "Tushare stk_mins via api.quicksync.cn",
+    "rows": 240,
+    "sha256": "89d36cbf218418dcec485cb5d778f8f6c05b7b6db2504633efa800b6ad210bdb"
+  },
+  {
+    "d2": "2026-01-23",
+    "code": "002716",
+    "source": "/data/cyris/work/b2_d2_intraday_r67_20261021/minutes/2026-01-23_002716.pkl",
+    "rows": 240,
+    "sha256": "4a8ef3503911dda2edb886b346500297f3add6badd7cde8389b2dd7d2a89190e"
+  },
+  {
+    "d2": "2026-01-27",
+    "code": "601212",
+    "source": "/data/cyris/work/b2_d2_intraday_r67_20261021/minutes/2026-01-27_601212.pkl",
+    "rows": 240,
+    "sha256": "547d23c8133b42a61002d33dcfd90892a1dd57a2f6dcee5c5ea1345b93006ea9"
+  },
+  {
+    "d2": "2026-01-28",
+    "code": "002218",
+    "source": "/data/cyris/work/b2_d2_intraday_r67_20261021/minutes/2026-01-28_002218.pkl",
+    "rows": 240,
+    "sha256": "b2759d432d6736dd23b7d0e215b67daadb085e140180c56fe82394cf0be1d8a5"
+  },
+  {
+    "d2": "2026-01-29",
+    "code": "601212",
+    "source": "/data/cyris/work/b2_d2_intraday_r67_20261021/minutes/2026-01-29_601212.pkl",
+    "rows": 240,
+    "sha256": "24942d85c052d9851d6ad54b86e8390c880dbe47f5a95143b4ec4f54144a1d6b"
+  },
+  {
+    "d2": "2026-02-03",
+    "code": "000995",
+    "source": "/data/cyris/work/b2_d2_intraday_r67_20261021/minutes/2026-02-03_000995.pkl",
+    "rows": 240,
+    "sha256": "f3ac548eac6cbd877c19f9b2ea4be5da87d76e84f618b738d67d122744b4f832"
+  },
+  {
+    "d2": "2026-02-06",
+    "code": "603618",
+    "source": "/data/cyris/work/b2_d2_limit_follow_r69_20261021/minutes/2026-02-06_603618.pkl",
+    "rows": 240,
+    "sha256": "5aa70bb0c123ca8079b6d57b8a8ad972c55ee9c90c3828c788cd85ec3ebe75dc"
+  },
+  {
+    "d2": "2026-02-11",
+    "code": "002506",
+    "source": "Tushare stk_mins via api.quicksync.cn",
+    "rows": 240,
+    "sha256": "cb23514583a41a9641f930500e92e592c9e7e6ecd0f4fe2101b10d178974c0af"
+  },
+  {
+    "d2": "2026-02-24",
+    "code": "600397",
+    "source": "/data/cyris/work/b2_d2_limit_follow_r69_20261021/minutes/2026-02-24_600397.pkl",
+    "rows": 240,
+    "sha256": "c1e4d12f2f3e75d499bb2c0e9a968b6ee08121cbc3ee81b0c28f0ec8163843f0"
+  },
+  {
+    "d2": "2026-02-26",
+    "code": "001896",
+    "source": "/data/cyris/work/b2_d2_limit_follow_r69_20261021/minutes/2026-02-26_001896.pkl",
+    "rows": 240,
+    "sha256": "c980e0e530ce3bbf84ccd533ad51149de88a7c69139cbf7fbcf1f76f72b50103"
+  },
+  {
+    "d2": "2026-03-02",
+    "code": "000890",
+    "source": "/data/cyris/work/b2_d2_limit_follow_r69_20261021/minutes/2026-03-02_000890.pkl",
+    "rows": 240,
+    "sha256": "a3929424c048e572725d33f05f7958a808069662bea698faf1e6980af94402f3"
+  },
+  {
+    "d2": "2026-03-05",
+    "code": "600722",
+    "source": "Tushare stk_mins via api.quicksync.cn",
+    "rows": 240,
+    "sha256": "09da3eb858f780ed3106be9f23b5049c3957d54e48d95ffb9e0c5a8b8670e16e"
+  },
+  {
+    "d2": "2026-03-06",
+    "code": "603318",
+    "source": "Tushare stk_mins via api.quicksync.cn",
+    "rows": 240,
+    "sha256": "a6efefbd416bbfe089678847ec7b3c7dacaf0bbb43ad26c254f75b5bec7cc8d0"
+  },
+  {
+    "d2": "2026-03-12",
+    "code": "601789",
+    "source": "Tushare stk_mins via api.quicksync.cn",
+    "rows": 240,
+    "sha256": "869d50e557c0db8a969400cd51372d4091e082ce906f5e011fbc885d25d89329"
+  },
+  {
+    "d2": "2026-03-16",
+    "code": "600722",
+    "source": "Tushare stk_mins via api.quicksync.cn",
+    "rows": 240,
+    "sha256": "18b5884d55a84ac2776b445e8e7111b638cc51b4c6d208deffacf91f64d90d4c"
+  },
+  {
+    "d2": "2026-03-17",
+    "code": "000890",
+    "source": "/data/cyris/work/b2_d2_limit_follow_r69_20261021/minutes/2026-03-17_000890.pkl",
+    "rows": 240,
+    "sha256": "4450138a05d5870e545858d60ec002584d1d62d5a474e44016e2b416c4828afb"
+  },
+  {
+    "d2": "2026-03-18",
+    "code": "600370",
+    "source": "/data/cyris/work/b2_d2_limit_follow_r69_20261021/minutes/2026-03-18_600370.pkl",
+    "rows": 240,
+    "sha256": "96b2de333c5bea9ee462213bb114b38741a2f1f88ebb392b965d129bc7baafb7"
+  },
+  {
+    "d2": "2026-03-25",
+    "code": "600396",
+    "source": "/data/cyris/work/b2_d2_limit_follow_r69_20261021/minutes/2026-03-25_600396.pkl",
+    "rows": 240,
+    "sha256": "ae4981ea619a55670c1f375666b6d47f604b52eb15fb2547934e96249575f0ba"
+  },
+  {
+    "d2": "2026-03-27",
+    "code": "002491",
+    "source": "Tushare stk_mins via api.quicksync.cn",
+    "rows": 240,
+    "sha256": "3161408cc409dbc0423ebbbae3f2e90b54eb157ad43c45f8546d7398e73d8a23"
+  },
+  {
+    "d2": "2026-03-31",
+    "code": "000720",
+    "source": "/data/cyris/work/b2_d2_limit_follow_r69_20261021/minutes/2026-03-31_000720.pkl",
+    "rows": 240,
+    "sha256": "ac7b6e59438bc189c8502e14f07084925c64d74e1f8f59e076cc183ebe4d946d"
+  },
+  {
+    "d2": "2026-04-02",
+    "code": "002361",
+    "source": "Tushare stk_mins via api.quicksync.cn",
+    "rows": 240,
+    "sha256": "0cd8bcc47884c45f43a30b912de4736d683f23e5b9ffb0276e63d4af7573c378"
+  },
+  {
+    "d2": "2026-04-03",
+    "code": "002560",
+    "source": "/data/cyris/work/b2_d2_intraday_r67_20261021/minutes/2026-04-03_002560.pkl",
+    "rows": 240,
+    "sha256": "64c7e51df83bd4a1636030bdf5d4910e130adf2685e9a7dd17dc47d514866a7c"
+  },
+  {
+    "d2": "2026-04-07",
+    "code": "002560",
+    "source": "/data/cyris/work/b2_d2_intraday_r67_20261021/minutes/2026-04-07_002560.pkl",
+    "rows": 240,
+    "sha256": "79e486eb7dd7386750fdae0f278f9aa867ed76957a9ba448d7c3954574a8dc10"
+  },
+  {
+    "d2": "2026-04-07",
+    "code": "605162",
+    "source": "Tushare stk_mins via api.quicksync.cn",
+    "rows": 240,
+    "sha256": "2afbd9705f8037bfe4e8121322ce354e45adf44505845377fa9b3fbb8e5b667e"
+  },
+  {
+    "d2": "2026-04-08",
+    "code": "600488",
+    "source": "/data/cyris/work/b2_d2_intraday_r67_20261021/minutes/2026-04-08_600488.pkl",
+    "rows": 240,
+    "sha256": "05df7517b9a9326e96d9ef5170897f1dbfce724eebe8c6376e841925126a5607"
+  },
+  {
+    "d2": "2026-04-14",
+    "code": "000889",
+    "source": "Tushare stk_mins via api.quicksync.cn",
+    "rows": 240,
+    "sha256": "1422cf70578450dee640eab5af4a9f5f417335440a2dd4c681db0b1a9ef5e00a"
+  },
+  {
+    "d2": "2026-04-15",
+    "code": "002580",
+    "source": "/data/cyris/work/b2_d2_intraday_r67_20261021/minutes/2026-04-15_002580.pkl",
+    "rows": 240,
+    "sha256": "e4be61e212d8c847e40e2e6dc0ed407011b405ec2ab449237aabec467ec260bc"
+  },
+  {
+    "d2": "2026-04-17",
+    "code": "002580",
+    "source": "/data/cyris/work/b2_d2_intraday_r67_20261021/minutes/2026-04-17_002580.pkl",
+    "rows": 240,
+    "sha256": "cd374a4d021724076031da9f5cede24370eea569a4f71011fe1efe0159644597"
+  },
+  {
+    "d2": "2026-04-22",
+    "code": "002418",
+    "source": "Tushare stk_mins via api.quicksync.cn",
+    "rows": 240,
+    "sha256": "0a253fb31eb31a4d5fa987bb500a6e3d43001423df121174f13f63e404bb05c2"
+  },
+  {
+    "d2": "2026-04-24",
+    "code": "600396",
+    "source": "Tushare stk_mins via api.quicksync.cn",
+    "rows": 240,
+    "sha256": "72a35552444320428e891623fc9fce8997e0174851f27ba1bb2e3efcafc58c65"
+  },
+  {
+    "d2": "2026-04-27",
+    "code": "600396",
+    "source": "Tushare stk_mins via api.quicksync.cn",
+    "rows": 240,
+    "sha256": "3a70ed1b064964c08145a0f91f1f6243933642b21142b41514ee4a89b1b35411"
+  },
+  {
+    "d2": "2026-07-06",
+    "code": "000566",
+    "source": "Tushare stk_mins via api.quicksync.cn",
+    "rows": 240,
+    "sha256": "8f5bc94cba57d821d304b2f13af3389a3a55d3154152d4bc19dd9289f3c8852a"
+  },
+  {
+    "d2": "2026-07-07",
+    "code": "600793",
+    "source": "/data/cyris/work/b2_d2_limit_follow_r69_20261021/minutes/2026-07-07_600793.pkl",
+    "rows": 240,
+    "sha256": "22dd0adac808da0a6145f1443cec5be1bcd7fd68ea1ec833ed588ac0ede8b75b"
+  },
+  {
+    "d2": "2026-07-08",
+    "code": "000656",
+    "source": "Tushare stk_mins via api.quicksync.cn",
+    "rows": 240,
+    "sha256": "90a41c9cc52aa0b4346f4d2840900c2c32565644f100b7cf57f5673f587a9679"
+  },
+  {
+    "d2": "2026-07-10",
+    "code": "001229",
+    "source": "Tushare stk_mins via api.quicksync.cn",
+    "rows": 240,
+    "sha256": "edc0239a5dbfe455d8c5cd98ef7d1a51a9f5bbd2d76b8254342e932ce6091500"
+  },
+  {
+    "d2": "2026-07-13",
+    "code": "002490",
+    "source": "Tushare stk_mins via api.quicksync.cn",
+    "rows": 240,
+    "sha256": "7526bb6f7ffff4f68232729e30be94dc1d8a109cf9b2ba594b22b5354dd4c9c5"
+  },
+  {
+    "d2": "2026-07-15",
+    "code": "600992",
+    "source": "Tushare stk_mins via api.quicksync.cn",
+    "rows": 240,
+    "sha256": "c08a1803d5f3ae16d6ec7c561bc012abc97a9a73f93bb275fa4e2ccebc9cf4fb"
+  },
+  {
+    "d2": "2026-07-21",
+    "code": "002829",
+    "source": "Tushare stk_mins via api.quicksync.cn",
+    "rows": 240,
+    "sha256": "241b2c33c37386c58ff82f3344cbdb109b856c023597ddc8b2b267be77086efa"
+  },
+  {
+    "d2": "2026-07-22",
+    "code": "000722",
+    "source": "Tushare stk_mins via api.quicksync.cn",
+    "rows": 240,
+    "sha256": "c92b17ea4645ce87811c2b950d1b75378e5d2dd57fa52065c189f47228ae74e1"
+  },
+  {
+    "d2": "2026-07-23",
+    "code": "600744",
+    "source": "Tushare stk_mins via api.quicksync.cn",
+    "rows": 240,
+    "sha256": "5539777dc9dbdbb5f6ff218c6a9fcf1bef4171415d73d806559e8a56605a1806"
+  },
+  {
+    "d2": "2026-07-27",
+    "code": "603988",
+    "source": "/data/cyris/work/b2_d2_limit_follow_r69_20261021/minutes/2026-07-27_603988.pkl",
+    "rows": 240,
+    "sha256": "75ff065a26687da04cb82ae386b8af6cffd5d8c93645136f38a5722f25873237"
+  },
+  {
+    "d2": "2026-07-29",
+    "code": "000533",
+    "source": "Tushare stk_mins via api.quicksync.cn",
+    "rows": 240,
+    "sha256": "012d6ebcbc30013d60191b0c7427cb0d9dd2c5e04b0c4c8b91297beb3e328057"
+  },
+  {
+    "d2": "2026-08-07",
+    "code": "003032",
+    "source": "Tushare stk_mins via api.quicksync.cn",
+    "rows": 240,
+    "sha256": "0c52fbb3a6330ab50f85c5d592ee1831fb00e511e8602c95403fd6871da392bf"
+  },
+  {
+    "d2": "2026-08-12",
+    "code": "002552",
+    "source": "/data/cyris/work/b2_d2_limit_follow_r69_20261021/minutes/2026-08-12_002552.pkl",
+    "rows": 240,
+    "sha256": "0e9040045d71492f7cc843054bfe21ef52efe9611f5f0b29f58fc4af9b7069a1"
+  },
+  {
+    "d2": "2026-08-20",
+    "code": "603958",
+    "source": "/data/cyris/work/b2_d2_limit_follow_r69_20261021/minutes/2026-08-20_603958.pkl",
+    "rows": 240,
+    "sha256": "490770af353f9b1463224b8c517b99d5ab694e5208411eafe1963eca4c8eecb8"
+  },
+  {
+    "d2": "2026-08-27",
+    "code": "000017",
+    "source": "/data/cyris/work/b2_d2_limit_follow_r69_20261021/minutes/2026-08-27_000017.pkl",
+    "rows": 240,
+    "sha256": "949de97b7f933205826522262e09200056b3877d18567a588fa8cdb0463fa9eb"
+  },
+  {
+    "d2": "2026-09-07",
+    "code": "002909",
+    "source": "/data/cyris/work/b2_d2_intraday_r67_20261021/minutes/2026-09-07_002909.pkl",
+    "rows": 240,
+    "sha256": "ad09744265902c0b209021fb8ee240230f87d3711399108c2469cbd8bf8fe942"
+  },
+  {
+    "d2": "2026-09-10",
+    "code": "600354",
+    "source": "/data/cyris/work/b2_d2_intraday_r67_20261021/minutes/2026-09-10_600354.pkl",
+    "rows": 240,
+    "sha256": "c24fd311fd34d8c4f96b1de453c93d9e748ed4f4a11c0c6a10197592ed177c91"
+  },
+  {
+    "d2": "2026-09-14",
+    "code": "000978",
+    "source": "/data/cyris/work/b2_d2_intraday_r67_20261021/minutes/2026-09-14_000978.pkl",
+    "rows": 240,
+    "sha256": "d9260c9fc94a5abcc9c38d47c03f265ec7f9e484dedc60dd2696e79038d29006"
+  },
+  {
+    "d2": "2026-09-18",
+    "code": "002631",
+    "source": "/data/cyris/work/b2_d2_intraday_r67_20261021/minutes/2026-09-18_002631.pkl",
+    "rows": 240,
+    "sha256": "fbc2b871247de76dfc7cc5ec2e93c475a21ec159b1d9aea57079fbf991a20d79"
+  },
+  {
+    "d2": "2026-09-21",
+    "code": "600371",
+    "source": "/data/cyris/work/b2_d2_intraday_r67_20261021/minutes/2026-09-21_600371.pkl",
+    "rows": 240,
+    "sha256": "01a1b3a22668db796d7ffc472f1165f77e5c1c0a7ddc65f0c885ecec43cfb773"
+  },
+  {
+    "d2": "2026-09-22",
+    "code": "002285",
+    "source": "/data/cyris/work/b2_d2_intraday_r67_20261021/minutes/2026-09-22_002285.pkl",
+    "rows": 240,
+    "sha256": "f83948b9bd4b3dbfc8eac913948834dfd2750aed94f9451477df29746b00ae6a"
+  },
+  {
+    "d2": "2026-09-29",
+    "code": "601811",
+    "source": "/data/cyris/work/b2_d2_intraday_r67_20261021/minutes/2026-09-29_601811.pkl",
+    "rows": 240,
+    "sha256": "b477e34845e49deba86d98864dbcac277c9db65617e89b15b6cd6166893087ef"
+  },
+  {
+    "d2": "2026-09-30",
+    "code": "600802",
+    "source": "/data/cyris/work/b2_d2_intraday_r67_20261021/minutes/2026-09-30_600802.pkl",
+    "rows": 240,
+    "sha256": "eb5acbfb7ef0e1acd117634aa61c8b63e742b4f0a3474444bdf12fe7e6eb24fe"
+  },
+  {
+    "d2": "2026-10-08",
+    "code": "000678",
+    "source": "Tushare stk_mins via api.quicksync.cn",
+    "rows": 240,
+    "sha256": "5db926ac45b573338f28d6900c3d0984f02a25ab3683707bc2dadc8b806b0d7f"
+  }
+]

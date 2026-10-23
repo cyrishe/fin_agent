@@ -1,0 +1,14 @@
+{
+  "decision_days": 1140,
+  "four_bar_candidates": 3361,
+  "selected": 690,
+  "max_feature_diff": 0.0,
+  "shadow_daily_nav_max_abs_diff": 1.5133991837501526e-09,
+  "gate_months": 48,
+  "gate_differences": 0,
+  "main_entries": 295,
+  "main_daily_nav_max_abs_diff": 2.0954757928848267e-09,
+  "final_nav": 694718.5177522013,
+  "total_return": -0.3052814822477987,
+  "limitation": "full-day audited eligibility and source daily panel are frozen inputs; no independent raw-data reconstruction"
+}
