@@ -1,0 +1,5 @@
+version,scope,minute_day_files,matched_traded_stock_days,extrema_gap_stock_days,extrema_gap_pct
+R98_previous,2024_full,242,1229115,11327,0.921557
+R98_previous,2024-09,19,37403,196,0.524022
+R101_corrected,2024_full,242,1293152,11536,0.892084
+R101_corrected,2024-09,19,101440,405,0.399251

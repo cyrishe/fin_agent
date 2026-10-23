@@ -1,0 +1,9 @@
+{
+  "r90_panel_sha256": "fbf0660641f4d2e43548b767b0bd947c08818f94738c0efd49e274fb2929fad0",
+  "r60_panel_sha256": "21b117816527dabb521b08de60096ac84ccf8adf2661db26737770dba3c88977",
+  "r90_calendar_sha256": "5f498f0a0f347234bfa0422f2e00b0e495ae26b54a03fab6755ea0b4cf71b37a",
+  "r60_calendar_sha256": "48467afcb0babf08ea8481f396b13e71562c5e414abf09902751355d842de965",
+  "monthly_models": 113,
+  "first_model_month": "2017-05",
+  "last_model_month": "2026-09"
+}

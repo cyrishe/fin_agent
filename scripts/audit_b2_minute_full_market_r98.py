@@ -30,12 +30,22 @@ FIELDS = [
 
 
 def daily_paths() -> dict[str, Path]:
-    paths: dict[str, Path] = {}
-    for p in sorted(PRICE_ROOT.glob('*/price_months/price_20??-??.csv.gz')):
+    groups: dict[str, list[Path]] = {}
+    for p in PRICE_ROOT.glob('*/price_months/price_20??-??.csv.gz'):
         month = p.stem.removeprefix('price_').removesuffix('.csv')
-        existing = paths.get(month)
-        if existing is None or ('limit_rebound_2y_r1' in str(p) and 'limit_rebound_2y_r1' not in str(existing)):
-            paths[month] = p
+        groups.setdefault(month, []).append(p)
+    paths: dict[str, Path] = {}
+    for month, candidates in groups.items():
+        if len(candidates) == 1:
+            paths[month] = candidates[0]
+            continue
+        # A preferred snapshot may start mid-month. Compare actual trade-day
+        # coverage before source preference so the denominator is not truncated.
+        def coverage(path: Path) -> tuple[int, int, int, str]:
+            dates = pd.read_csv(path, usecols=['trade_date'], dtype={'trade_date': 'string'})['trade_date']
+            return (dates.nunique(), len(dates),
+                    int('limit_rebound_2y_r1' in str(path)), str(path))
+        paths[month] = max(candidates, key=coverage)
     return paths
 
 

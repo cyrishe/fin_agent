@@ -1,0 +1,19 @@
+{
+  "status": "PASS",
+  "top3_selected_stock_days": 1828,
+  "top3_account_entries": 1824,
+  "reference_price_exclusions": 4,
+  "d2_floor_close": 323,
+  "d2_oneprice_floor": 37,
+  "capped_open_later_low_stock_days": 895,
+  "later_low_without_other_openable_d0_days": 143,
+  "r90_r60_overlap_score_rows_exact": 5491,
+  "result_sha256": {
+    "yearly.csv": "a5629daed3d2c9cda08928c0d880f2326646136e58468aed950da4884283d1ca",
+    "monthly.csv": "0a2d50d62e646748fb59abb26c9b0b45653ce3bf8b47304ed0ff3b23073a2397",
+    "top3_signals.csv": "135370fa505ee463824f5f7feb2816156e04eb12f0bab7c695e9c9a65c68aa33",
+    "top3_d2_daily_floor_audit.csv": "135ebff048e600bf5cc6e464dc6d7cbcf0f29724e52f2bde9312c3f8fb35eecd",
+    "top3_price_quality_summary.csv": "b4f980c89bfc0570fd13cc5b75e502108114d2e7acadad0cff3c2911d4a1aab0",
+    "openability_summary.csv": "bee5822fe873630615f7ad6ad30125c916a99d5cf6e93d3f04e18fa1de11a224"
+  }
+}
