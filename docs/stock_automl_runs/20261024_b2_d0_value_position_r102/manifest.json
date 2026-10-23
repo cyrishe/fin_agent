@@ -1,0 +1,25 @@
+{
+  "experiment": "B2_R102_D0_valuation_position",
+  "command": "python -m scripts.research_b2_d0_valuation_position_r102",
+  "database": "kingdomai read-only current historical rows; valuation as of previous trading day",
+  "candidate_count": 6369,
+  "observed_label_count": 6365,
+  "files": [
+    {
+      "path": "docs/stock_automl_runs/20261024_b2_d0_value_position_r102/d0_top3_positions_raw_cache.csv.gz",
+      "sha256": "d8e7ed62b9261fecf36d11f1c386a56ad4b79a5e8131e2f25525b3597cdffa2f"
+    },
+    {
+      "path": "docs/stock_automl_runs/20261024_b2_d0_value_position_r102/d0_top3_positions_fresh.csv.gz",
+      "sha256": "6b0dafe540ffcf907b82626968547f980d0f556487521aa7a4b060fec0a7d11a"
+    },
+    {
+      "path": "docs/stock_automl_runs/20261023_b2_daily_only_r100/input_manifest.json",
+      "sha256": "34faeae7729bad978f45c9b23e6db1f5ab2316c19090f62ea9dba67e90bfebdf"
+    },
+    {
+      "path": "docs/stock_automl_runs/20261023_b2_daily_only_r100/score_manifest.json",
+      "sha256": "007cfed3d98b5dc441dd34fc678a24e5df2b11e054f11bb477f23728d62bd47f"
+    }
+  ]
+}

@@ -1,0 +1,868 @@
+{
+  "2018-2022_explore": {
+    "price_pct_20": [
+      {
+        "group": "bottom40",
+        "n": 11,
+        "hit": 4,
+        "rate": 0.36363636363636365,
+        "openable_n": 9,
+        "d2_open_proxy_mean": -0.024259312496143257
+      },
+      {
+        "group": "middle40",
+        "n": 39,
+        "hit": 20,
+        "rate": 0.5128205128205128,
+        "openable_n": 33,
+        "d2_open_proxy_mean": 0.00819356872111267
+      },
+      {
+        "group": "top20",
+        "n": 2378,
+        "hit": 1549,
+        "rate": 0.6513877207737595,
+        "openable_n": 1546,
+        "d2_open_proxy_mean": 0.0027366525832788055
+      }
+    ],
+    "price_pct_60": [
+      {
+        "group": "bottom40",
+        "n": 47,
+        "hit": 26,
+        "rate": 0.5531914893617021,
+        "openable_n": 37,
+        "d2_open_proxy_mean": 0.0066335332952129
+      },
+      {
+        "group": "middle40",
+        "n": 109,
+        "hit": 56,
+        "rate": 0.5137614678899083,
+        "openable_n": 80,
+        "d2_open_proxy_mean": -0.006483127265358618
+      },
+      {
+        "group": "top20",
+        "n": 2184,
+        "hit": 1433,
+        "rate": 0.6561355311355311,
+        "openable_n": 1419,
+        "d2_open_proxy_mean": 0.00255777826448223
+      }
+    ],
+    "price_pct_252": [
+      {
+        "group": "bottom40",
+        "n": 164,
+        "hit": 103,
+        "rate": 0.6280487804878049,
+        "openable_n": 117,
+        "d2_open_proxy_mean": 0.011754663445978064
+      },
+      {
+        "group": "middle40",
+        "n": 257,
+        "hit": 143,
+        "rate": 0.556420233463035,
+        "openable_n": 194,
+        "d2_open_proxy_mean": -0.005330727288836809
+      },
+      {
+        "group": "top20",
+        "n": 1823,
+        "hit": 1220,
+        "rate": 0.6692265496434449,
+        "openable_n": 1149,
+        "d2_open_proxy_mean": 0.003383152190508353
+      }
+    ],
+    "mv_pct_20": [
+      {
+        "group": "bottom40",
+        "n": 47,
+        "hit": 22,
+        "rate": 0.46808510638297873,
+        "openable_n": 36,
+        "d2_open_proxy_mean": -0.0015336148267207199
+      },
+      {
+        "group": "middle40",
+        "n": 117,
+        "hit": 68,
+        "rate": 0.5811965811965812,
+        "openable_n": 84,
+        "d2_open_proxy_mean": 0.009120617925405592
+      },
+      {
+        "group": "top20",
+        "n": 2249,
+        "hit": 1470,
+        "rate": 0.6536238328145842,
+        "openable_n": 1462,
+        "d2_open_proxy_mean": 0.002336808794636953
+      }
+    ],
+    "mv_pct_60": [
+      {
+        "group": "bottom40",
+        "n": 117,
+        "hit": 71,
+        "rate": 0.6068376068376068,
+        "openable_n": 84,
+        "d2_open_proxy_mean": 0.00856677075472401
+      },
+      {
+        "group": "middle40",
+        "n": 193,
+        "hit": 103,
+        "rate": 0.533678756476684,
+        "openable_n": 146,
+        "d2_open_proxy_mean": -0.014706095699115794
+      },
+      {
+        "group": "top20",
+        "n": 2028,
+        "hit": 1341,
+        "rate": 0.6612426035502958,
+        "openable_n": 1305,
+        "d2_open_proxy_mean": 0.0037003637858508418
+      }
+    ],
+    "pe_pct_252": [
+      {
+        "group": "bottom40",
+        "n": 240,
+        "hit": 160,
+        "rate": 0.6666666666666666,
+        "openable_n": 162,
+        "d2_open_proxy_mean": 0.0030504826357607337
+      },
+      {
+        "group": "middle40",
+        "n": 294,
+        "hit": 176,
+        "rate": 0.5986394557823129,
+        "openable_n": 198,
+        "d2_open_proxy_mean": -0.008605139803376776
+      },
+      {
+        "group": "top20",
+        "n": 799,
+        "hit": 523,
+        "rate": 0.6545682102628285,
+        "openable_n": 484,
+        "d2_open_proxy_mean": -0.0035971695054332845
+      }
+    ],
+    "pe_pct_504": [
+      {
+        "group": "bottom40",
+        "n": 198,
+        "hit": 137,
+        "rate": 0.6919191919191919,
+        "openable_n": 121,
+        "d2_open_proxy_mean": -0.006909717997245469
+      },
+      {
+        "group": "middle40",
+        "n": 297,
+        "hit": 193,
+        "rate": 0.6498316498316499,
+        "openable_n": 184,
+        "d2_open_proxy_mean": -0.009835258333966502
+      },
+      {
+        "group": "top20",
+        "n": 636,
+        "hit": 422,
+        "rate": 0.6635220125786163,
+        "openable_n": 375,
+        "d2_open_proxy_mean": -0.005372869012940602
+      }
+    ],
+    "pe_state": [
+      {
+        "state": "missing",
+        "n": 853,
+        "hit": 573,
+        "rate": 0.671746776084408
+      },
+      {
+        "state": "positive",
+        "n": 2788,
+        "hit": 2093,
+        "rate": 0.7507173601147776
+      },
+      {
+        "state": "stale_or_missing",
+        "n": 3,
+        "hit": 3,
+        "rate": 1.0
+      }
+    ],
+    "coverage": {
+      "price_pct_20": 2428,
+      "price_pct_60": 2340,
+      "price_pct_252": 2244,
+      "mv_pct_20": 2413,
+      "mv_pct_60": 2338,
+      "pe_pct_252": 1333,
+      "pe_pct_504": 1131
+    },
+    "population": {
+      "n": 3644,
+      "hits": 2669,
+      "rate": 0.7324368825466521
+    }
+  },
+  "2023-2024_validate": {
+    "price_pct_20": [
+      {
+        "group": "bottom40",
+        "n": 27,
+        "hit": 12,
+        "rate": 0.4444444444444444,
+        "openable_n": 21,
+        "d2_open_proxy_mean": 0.004927421436773364
+      },
+      {
+        "group": "middle40",
+        "n": 26,
+        "hit": 13,
+        "rate": 0.5,
+        "openable_n": 14,
+        "d2_open_proxy_mean": -0.04677459808668397
+      },
+      {
+        "group": "top20",
+        "n": 1333,
+        "hit": 818,
+        "rate": 0.6136534133533383,
+        "openable_n": 867,
+        "d2_open_proxy_mean": -0.014724200608862025
+      }
+    ],
+    "price_pct_60": [
+      {
+        "group": "bottom40",
+        "n": 60,
+        "hit": 30,
+        "rate": 0.5,
+        "openable_n": 34,
+        "d2_open_proxy_mean": -0.022110925015092122
+      },
+      {
+        "group": "middle40",
+        "n": 71,
+        "hit": 39,
+        "rate": 0.5492957746478874,
+        "openable_n": 48,
+        "d2_open_proxy_mean": -0.017251532453646152
+      },
+      {
+        "group": "top20",
+        "n": 1246,
+        "hit": 772,
+        "rate": 0.6195826645264848,
+        "openable_n": 811,
+        "d2_open_proxy_mean": -0.013478310784890007
+      }
+    ],
+    "price_pct_252": [
+      {
+        "group": "bottom40",
+        "n": 177,
+        "hit": 99,
+        "rate": 0.559322033898305,
+        "openable_n": 112,
+        "d2_open_proxy_mean": -0.01101390704247437
+      },
+      {
+        "group": "middle40",
+        "n": 169,
+        "hit": 94,
+        "rate": 0.5562130177514792,
+        "openable_n": 97,
+        "d2_open_proxy_mean": -0.05102821966874624
+      },
+      {
+        "group": "top20",
+        "n": 1010,
+        "hit": 636,
+        "rate": 0.6297029702970297,
+        "openable_n": 667,
+        "d2_open_proxy_mean": -0.010870931846434988
+      }
+    ],
+    "mv_pct_20": [
+      {
+        "group": "bottom40",
+        "n": 59,
+        "hit": 23,
+        "rate": 0.3898305084745763,
+        "openable_n": 41,
+        "d2_open_proxy_mean": -0.021627817798143573
+      },
+      {
+        "group": "middle40",
+        "n": 55,
+        "hit": 38,
+        "rate": 0.6909090909090909,
+        "openable_n": 33,
+        "d2_open_proxy_mean": -0.029519033368032653
+      },
+      {
+        "group": "top20",
+        "n": 1272,
+        "hit": 782,
+        "rate": 0.6147798742138365,
+        "openable_n": 828,
+        "d2_open_proxy_mean": -0.01383620992760356
+      }
+    ],
+    "mv_pct_60": [
+      {
+        "group": "bottom40",
+        "n": 96,
+        "hit": 49,
+        "rate": 0.5104166666666666,
+        "openable_n": 56,
+        "d2_open_proxy_mean": -0.019694673463025596
+      },
+      {
+        "group": "middle40",
+        "n": 134,
+        "hit": 70,
+        "rate": 0.5223880597014925,
+        "openable_n": 86,
+        "d2_open_proxy_mean": -0.025700172408769605
+      },
+      {
+        "group": "top20",
+        "n": 1147,
+        "hit": 722,
+        "rate": 0.6294681778552746,
+        "openable_n": 751,
+        "d2_open_proxy_mean": -0.012247188433755425
+      }
+    ],
+    "pe_pct_252": [
+      {
+        "group": "bottom40",
+        "n": 125,
+        "hit": 82,
+        "rate": 0.656,
+        "openable_n": 72,
+        "d2_open_proxy_mean": 0.004039402489615602
+      },
+      {
+        "group": "middle40",
+        "n": 103,
+        "hit": 55,
+        "rate": 0.5339805825242718,
+        "openable_n": 73,
+        "d2_open_proxy_mean": -0.03352025628648639
+      },
+      {
+        "group": "top20",
+        "n": 399,
+        "hit": 241,
+        "rate": 0.6040100250626567,
+        "openable_n": 273,
+        "d2_open_proxy_mean": -0.011711836672842344
+      }
+    ],
+    "pe_pct_504": [
+      {
+        "group": "bottom40",
+        "n": 93,
+        "hit": 53,
+        "rate": 0.5698924731182796,
+        "openable_n": 59,
+        "d2_open_proxy_mean": -0.002480970159820722
+      },
+      {
+        "group": "middle40",
+        "n": 139,
+        "hit": 89,
+        "rate": 0.6402877697841727,
+        "openable_n": 88,
+        "d2_open_proxy_mean": -0.013444873178669093
+      },
+      {
+        "group": "top20",
+        "n": 349,
+        "hit": 210,
+        "rate": 0.6017191977077364,
+        "openable_n": 238,
+        "d2_open_proxy_mean": -0.00882841337644769
+      }
+    ],
+    "pe_state": [
+      {
+        "state": "missing",
+        "n": 657,
+        "hit": 408,
+        "rate": 0.6210045662100456
+      },
+      {
+        "state": "positive",
+        "n": 794,
+        "hit": 485,
+        "rate": 0.610831234256927
+      }
+    ],
+    "coverage": {
+      "price_pct_20": 1386,
+      "price_pct_60": 1377,
+      "price_pct_252": 1356,
+      "mv_pct_20": 1386,
+      "mv_pct_60": 1377,
+      "pe_pct_252": 627,
+      "pe_pct_504": 581
+    },
+    "population": {
+      "n": 1451,
+      "hits": 893,
+      "rate": 0.6154376292212267
+    }
+  },
+  "2025-2026_check": {
+    "price_pct_20": [
+      {
+        "group": "bottom40",
+        "n": 10,
+        "hit": 5,
+        "rate": 0.5,
+        "openable_n": 6,
+        "d2_open_proxy_mean": -0.021187695319542385
+      },
+      {
+        "group": "middle40",
+        "n": 20,
+        "hit": 10,
+        "rate": 0.5,
+        "openable_n": 14,
+        "d2_open_proxy_mean": -0.00608049687329873
+      },
+      {
+        "group": "top20",
+        "n": 1240,
+        "hit": 790,
+        "rate": 0.6370967741935484,
+        "openable_n": 818,
+        "d2_open_proxy_mean": 0.0016396240849112743
+      }
+    ],
+    "price_pct_60": [
+      {
+        "group": "bottom40",
+        "n": 23,
+        "hit": 16,
+        "rate": 0.6956521739130435,
+        "openable_n": 13,
+        "d2_open_proxy_mean": 0.05000974580300066
+      },
+      {
+        "group": "middle40",
+        "n": 58,
+        "hit": 29,
+        "rate": 0.5,
+        "openable_n": 44,
+        "d2_open_proxy_mean": -0.012953433195277643
+      },
+      {
+        "group": "top20",
+        "n": 1187,
+        "hit": 760,
+        "rate": 0.6402695871946082,
+        "openable_n": 780,
+        "d2_open_proxy_mean": 0.0014953137359960886
+      }
+    ],
+    "price_pct_252": [
+      {
+        "group": "bottom40",
+        "n": 46,
+        "hit": 25,
+        "rate": 0.5434782608695652,
+        "openable_n": 31,
+        "d2_open_proxy_mean": 0.008141264903248496
+      },
+      {
+        "group": "middle40",
+        "n": 66,
+        "hit": 37,
+        "rate": 0.5606060606060606,
+        "openable_n": 50,
+        "d2_open_proxy_mean": -0.005743171361038837
+      },
+      {
+        "group": "top20",
+        "n": 1154,
+        "hit": 742,
+        "rate": 0.6429809358752167,
+        "openable_n": 754,
+        "d2_open_proxy_mean": 0.0016740384768600268
+      }
+    ],
+    "mv_pct_20": [
+      {
+        "group": "bottom40",
+        "n": 24,
+        "hit": 11,
+        "rate": 0.4583333333333333,
+        "openable_n": 17,
+        "d2_open_proxy_mean": -0.045693961754594406
+      },
+      {
+        "group": "middle40",
+        "n": 35,
+        "hit": 14,
+        "rate": 0.4,
+        "openable_n": 27,
+        "d2_open_proxy_mean": 0.022581560809904987
+      },
+      {
+        "group": "top20",
+        "n": 425,
+        "hit": 276,
+        "rate": 0.6494117647058824,
+        "openable_n": 251,
+        "d2_open_proxy_mean": -0.013596997521868088
+      }
+    ],
+    "mv_pct_60": [
+      {
+        "group": "bottom40",
+        "n": 33,
+        "hit": 11,
+        "rate": 0.3333333333333333,
+        "openable_n": 27,
+        "d2_open_proxy_mean": -0.011347586553028042
+      },
+      {
+        "group": "middle40",
+        "n": 59,
+        "hit": 44,
+        "rate": 0.7457627118644068,
+        "openable_n": 33,
+        "d2_open_proxy_mean": -0.00013267028435177836
+      },
+      {
+        "group": "top20",
+        "n": 391,
+        "hit": 246,
+        "rate": 0.629156010230179,
+        "openable_n": 234,
+        "d2_open_proxy_mean": -0.013529253402995132
+      }
+    ],
+    "pe_pct_252": [
+      {
+        "group": "bottom40",
+        "n": 40,
+        "hit": 25,
+        "rate": 0.625,
+        "openable_n": 21,
+        "d2_open_proxy_mean": 0.027797780101881237
+      },
+      {
+        "group": "middle40",
+        "n": 28,
+        "hit": 18,
+        "rate": 0.6428571428571429,
+        "openable_n": 19,
+        "d2_open_proxy_mean": 0.0014701569153444255
+      },
+      {
+        "group": "top20",
+        "n": 171,
+        "hit": 115,
+        "rate": 0.672514619883041,
+        "openable_n": 96,
+        "d2_open_proxy_mean": -0.008602228066141077
+      }
+    ],
+    "pe_pct_504": [
+      {
+        "group": "bottom40",
+        "n": 31,
+        "hit": 19,
+        "rate": 0.6129032258064516,
+        "openable_n": 17,
+        "d2_open_proxy_mean": 0.02716562313854079
+      },
+      {
+        "group": "middle40",
+        "n": 54,
+        "hit": 38,
+        "rate": 0.7037037037037037,
+        "openable_n": 24,
+        "d2_open_proxy_mean": -0.01915854290585717
+      },
+      {
+        "group": "top20",
+        "n": 143,
+        "hit": 97,
+        "rate": 0.6783216783216783,
+        "openable_n": 86,
+        "d2_open_proxy_mean": -0.0018929039269073523
+      }
+    ],
+    "pe_state": [
+      {
+        "state": "missing",
+        "n": 212,
+        "hit": 124,
+        "rate": 0.5849056603773585
+      },
+      {
+        "state": "positive",
+        "n": 273,
+        "hit": 177,
+        "rate": 0.6483516483516484
+      },
+      {
+        "state": "stale_or_missing",
+        "n": 785,
+        "hit": 504,
+        "rate": 0.6420382165605095
+      }
+    ],
+    "coverage": {
+      "price_pct_20": 1270,
+      "price_pct_60": 1268,
+      "price_pct_252": 1266,
+      "mv_pct_20": 484,
+      "mv_pct_60": 483,
+      "pe_pct_252": 239,
+      "pe_pct_504": 228
+    },
+    "population": {
+      "n": 1270,
+      "hits": 805,
+      "rate": 0.6338582677165354
+    }
+  },
+  "all": {
+    "price_pct_20": [
+      {
+        "group": "bottom40",
+        "n": 48,
+        "hit": 21,
+        "rate": 0.4375,
+        "openable_n": 36,
+        "d2_open_proxy_mean": -0.00672178150584175
+      },
+      {
+        "group": "middle40",
+        "n": 85,
+        "hit": 43,
+        "rate": 0.5058823529411764,
+        "openable_n": 61,
+        "d2_open_proxy_mean": -0.007698091174476063
+      },
+      {
+        "group": "top20",
+        "n": 4951,
+        "hit": 3157,
+        "rate": 0.6376489598060998,
+        "openable_n": 3231,
+        "d2_open_proxy_mean": -0.0022264947485846247
+      }
+    ],
+    "price_pct_60": [
+      {
+        "group": "bottom40",
+        "n": 130,
+        "hit": 72,
+        "rate": 0.5538461538461539,
+        "openable_n": 84,
+        "d2_open_proxy_mean": 0.0017118568672470705
+      },
+      {
+        "group": "middle40",
+        "n": 238,
+        "hit": 124,
+        "rate": 0.5210084033613446,
+        "openable_n": 172,
+        "d2_open_proxy_mean": -0.01114345813718559
+      },
+      {
+        "group": "top20",
+        "n": 4617,
+        "hit": 2965,
+        "rate": 0.642191899501841,
+        "openable_n": 3010,
+        "d2_open_proxy_mean": -0.0020382318854380594
+      }
+    ],
+    "price_pct_252": [
+      {
+        "group": "bottom40",
+        "n": 387,
+        "hit": 227,
+        "rate": 0.58656330749354,
+        "openable_n": 260,
+        "d2_open_proxy_mean": 0.0015158355631654126
+      },
+      {
+        "group": "middle40",
+        "n": 492,
+        "hit": 274,
+        "rate": 0.556910569105691,
+        "openable_n": 341,
+        "d2_open_proxy_mean": -0.01839019639282894
+      },
+      {
+        "group": "top20",
+        "n": 3987,
+        "hit": 2598,
+        "rate": 0.6516177577125658,
+        "openable_n": 2570,
+        "d2_open_proxy_mean": -0.0008176827482978911
+      }
+    ],
+    "mv_pct_20": [
+      {
+        "group": "bottom40",
+        "n": 130,
+        "hit": 56,
+        "rate": 0.4307692307692308,
+        "openable_n": 94,
+        "d2_open_proxy_mean": -0.01828455333312699
+      },
+      {
+        "group": "middle40",
+        "n": 207,
+        "hit": 120,
+        "rate": 0.5797101449275363,
+        "openable_n": 144,
+        "d2_open_proxy_mean": 0.00278962462816963
+      },
+      {
+        "group": "top20",
+        "n": 3946,
+        "hit": 2528,
+        "rate": 0.6406487582361885,
+        "openable_n": 2541,
+        "d2_open_proxy_mean": -0.004507207296452345
+      }
+    ],
+    "mv_pct_60": [
+      {
+        "group": "bottom40",
+        "n": 246,
+        "hit": 131,
+        "rate": 0.532520325203252,
+        "openable_n": 167,
+        "d2_open_proxy_mean": -0.004129807230325591
+      },
+      {
+        "group": "middle40",
+        "n": 386,
+        "hit": 217,
+        "rate": 0.5621761658031088,
+        "openable_n": 265,
+        "d2_open_proxy_mean": -0.016459180824938493
+      },
+      {
+        "group": "top20",
+        "n": 3566,
+        "hit": 2309,
+        "rate": 0.6475042063937184,
+        "openable_n": 2290,
+        "d2_open_proxy_mean": -0.003290178632976349
+      }
+    ],
+    "pe_pct_252": [
+      {
+        "group": "bottom40",
+        "n": 405,
+        "hit": 267,
+        "rate": 0.6592592592592592,
+        "openable_n": 255,
+        "d2_open_proxy_mean": 0.005367719797588501
+      },
+      {
+        "group": "middle40",
+        "n": 425,
+        "hit": 249,
+        "rate": 0.5858823529411765,
+        "openable_n": 290,
+        "d2_open_proxy_mean": -0.014216770374450223
+      },
+      {
+        "group": "top20",
+        "n": 1369,
+        "hit": 879,
+        "rate": 0.6420745069393718,
+        "openable_n": 853,
+        "d2_open_proxy_mean": -0.0067575326455629695
+      }
+    ],
+    "pe_pct_504": [
+      {
+        "group": "bottom40",
+        "n": 322,
+        "hit": 209,
+        "rate": 0.6490683229813664,
+        "openable_n": 197,
+        "d2_open_proxy_mean": -0.0026428300697509182
+      },
+      {
+        "group": "middle40",
+        "n": 490,
+        "hit": 320,
+        "rate": 0.6530612244897959,
+        "openable_n": 296,
+        "d2_open_proxy_mean": -0.011664329063896245
+      },
+      {
+        "group": "top20",
+        "n": 1128,
+        "hit": 729,
+        "rate": 0.6462765957446809,
+        "openable_n": 699,
+        "d2_open_proxy_mean": -0.006121284694079125
+      }
+    ],
+    "pe_state": [
+      {
+        "state": "missing",
+        "n": 1722,
+        "hit": 1105,
+        "rate": 0.6416957026713124
+      },
+      {
+        "state": "positive",
+        "n": 3855,
+        "hit": 2755,
+        "rate": 0.7146562905317769
+      },
+      {
+        "state": "stale_or_missing",
+        "n": 788,
+        "hit": 507,
+        "rate": 0.6434010152284264
+      }
+    ],
+    "coverage": {
+      "price_pct_20": 5084,
+      "price_pct_60": 4985,
+      "price_pct_252": 4866,
+      "mv_pct_20": 4283,
+      "mv_pct_60": 4198,
+      "pe_pct_252": 2199,
+      "pe_pct_504": 1940
+    },
+    "population": {
+      "n": 6365,
+      "hits": 4367,
+      "rate": 0.6860958366064415
+    }
+  }
+}
