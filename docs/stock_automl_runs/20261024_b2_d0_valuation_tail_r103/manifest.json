@@ -1,0 +1,46 @@
+{
+  "experiment": "B2_R103_D0_valuation_tail",
+  "data_rule": "R102 prior-trading-day valuation only; frozen B2/V2 outcome labels",
+  "files": [
+    {
+      "path": "docs/stock_automl_runs/20261021_b2_floor_factor_review/all_trade_factors.csv.gz",
+      "sha256": "109729828ec0b9d18dfc790cc300e67e2edb03c146e1de6bc41631ca78be6af4"
+    },
+    {
+      "path": "docs/stock_automl_runs/20261024_b2_d0_value_position_r102/d0_top3_positions_fresh.csv.gz",
+      "sha256": "6b0dafe540ffcf907b82626968547f980d0f556487521aa7a4b060fec0a7d11a"
+    },
+    {
+      "path": "docs/stock_automl_runs/20261021_b2_d2_limit_follow_r69/results.json",
+      "sha256": "44c0dbbbc7387a8d5f053509390e3b558a22bb4efe2014734f88b73f43ffe965"
+    },
+    {
+      "path": "docs/stock_automl_runs/20261021_b2_floor_minutes_r70/results.json",
+      "sha256": "40b0b5fbbe020f367548653f3222d53024721eb6cd07cf327c0476f256a75399"
+    },
+    {
+      "path": "outputs/stock_automl/b2_2021_minute_r60_20261020/signals.pkl",
+      "sha256": "c0fab9e454c92c0f3b0a9ba102224dcd6fef00fe377d215fbff1fb373708d1da"
+    },
+    {
+      "path": "docs/stock_automl_runs/20261024_b2_d0_valuation_tail_r103/v2_306_tail_factors.csv.gz",
+      "sha256": "aa5608ff601356dfa169dce1156f339308f18f1c5bd29bdfead7313cd167f8ce"
+    },
+    {
+      "path": "docs/stock_automl_runs/20261024_b2_d0_valuation_tail_r103/b2_709_tail_factors.csv.gz",
+      "sha256": "2c193f7e48f84a2b791f9b2b80b46f8ab3552ca2df422ca245a3214c3cb552a8"
+    },
+    {
+      "path": "docs/stock_automl_runs/20261024_b2_d0_valuation_tail_r103/periods.csv",
+      "sha256": "71ac97cee475e6e1e16c82c01344a0b0f9fa85195ee3337c70e4f46c8d70a9b2"
+    },
+    {
+      "path": "docs/stock_automl_runs/20261024_b2_d0_valuation_tail_r103/factor_bins.csv",
+      "sha256": "a362cd01d415ffc881717098a46dd14fff64c01145f7c18c5d65d4f81bd1be29"
+    },
+    {
+      "path": "docs/stock_automl_runs/20261024_b2_d0_valuation_tail_r103/veto_cost.csv",
+      "sha256": "f6f7106d55a1667d4077e607f80019186de7688e79e011074bb0df8276fcbfc3"
+    }
+  ]
+}
