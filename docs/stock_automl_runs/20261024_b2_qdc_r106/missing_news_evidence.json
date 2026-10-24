@@ -1,0 +1,151 @@
+[
+  {
+    "stk_code": "600870.SH",
+    "d0_date": "2022-06-07",
+    "d1_date": "2022-06-08",
+    "start5": "2022-05-30",
+    "official_complete": true,
+    "documents": 2,
+    "uniform_documents": 1,
+    "theme_denial_5": 0,
+    "evidence": [],
+    "checked": [
+      {
+        "id": "1213591446",
+        "published": "2022-06-02",
+        "title": "厦门华侨电子股份有限公司股票于退市整理期交易的第一次风险提示公告",
+        "url": "https://static.cninfo.com.cn/finalpage/2022-06-02/1213591446.PDF",
+        "ok": true,
+        "theme_denial": false,
+        "evidence": [],
+        "pages": 4
+      }
+    ]
+  },
+  {
+    "stk_code": "000611.SZ",
+    "d0_date": "2022-06-21",
+    "d1_date": "2022-06-22",
+    "start5": "2022-06-14",
+    "official_complete": true,
+    "documents": 10,
+    "uniform_documents": 2,
+    "theme_denial_5": 0,
+    "evidence": [],
+    "checked": [
+      {
+        "id": "1213761710",
+        "published": "2022-06-21",
+        "title": "股票进入退市整理期交易的第四次风险提示公告",
+        "url": "https://static.cninfo.com.cn/finalpage/2022-06-21/1213761710.PDF",
+        "ok": true,
+        "theme_denial": false,
+        "evidence": [],
+        "pages": 3
+      },
+      {
+        "id": "1213741817",
+        "published": "2022-06-20",
+        "title": "股票进入退市整理期交易的第三次风险提示公告",
+        "url": "https://static.cninfo.com.cn/finalpage/2022-06-20/1213741817.PDF",
+        "ok": true,
+        "theme_denial": false,
+        "evidence": [],
+        "pages": 3
+      }
+    ]
+  },
+  {
+    "stk_code": "600452.SH",
+    "d0_date": "2026-03-02",
+    "d1_date": "2026-03-03",
+    "start5": "2026-02-13",
+    "official_complete": true,
+    "documents": 0,
+    "uniform_documents": 0,
+    "theme_denial_5": 0,
+    "evidence": [],
+    "checked": []
+  },
+  {
+    "stk_code": "003018.SZ",
+    "d0_date": "2026-04-21",
+    "d1_date": "2026-04-22",
+    "start5": "2026-04-14",
+    "official_complete": true,
+    "documents": 0,
+    "uniform_documents": 0,
+    "theme_denial_5": 0,
+    "evidence": [],
+    "checked": []
+  },
+  {
+    "stk_code": "000004.SZ",
+    "d0_date": "2026-07-01",
+    "d1_date": "2026-07-02",
+    "start5": "2026-06-24",
+    "official_complete": true,
+    "documents": 1,
+    "uniform_documents": 1,
+    "theme_denial_5": 0,
+    "evidence": [],
+    "checked": [
+      {
+        "id": "1225390440",
+        "published": "2026-06-29",
+        "title": "关于公司股票进入退市整理期交易的第二次风险提示公告",
+        "url": "https://static.cninfo.com.cn/finalpage/2026-06-29/1225390440.PDF",
+        "ok": true,
+        "theme_denial": false,
+        "evidence": [],
+        "pages": 3
+      }
+    ]
+  },
+  {
+    "stk_code": "002808.SZ",
+    "d0_date": "2026-07-02",
+    "d1_date": "2026-07-03",
+    "start5": "2026-06-25",
+    "official_complete": true,
+    "documents": 2,
+    "uniform_documents": 1,
+    "theme_denial_5": 0,
+    "evidence": [],
+    "checked": [
+      {
+        "id": "1225396470",
+        "published": "2026-06-30",
+        "title": "关于公司股票进入退市整理期交易第二次的风险提示公告",
+        "url": "https://static.cninfo.com.cn/finalpage/2026-06-30/1225396470.PDF",
+        "ok": true,
+        "theme_denial": false,
+        "evidence": [],
+        "pages": 3
+      }
+    ]
+  },
+  {
+    "stk_code": "000004.SZ",
+    "d0_date": "2026-07-03",
+    "d1_date": "2026-07-06",
+    "start5": "2026-06-26",
+    "official_complete": true,
+    "documents": 1,
+    "uniform_documents": 1,
+    "theme_denial_5": 0,
+    "evidence": [],
+    "checked": [
+      {
+        "id": "1225390440",
+        "published": "2026-06-29",
+        "title": "关于公司股票进入退市整理期交易的第二次风险提示公告",
+        "url": "https://static.cninfo.com.cn/finalpage/2026-06-29/1225390440.PDF",
+        "ok": true,
+        "theme_denial": false,
+        "evidence": [],
+        "pages": 3
+      }
+    ]
+  }
+]

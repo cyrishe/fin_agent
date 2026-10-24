@@ -1,0 +1,34 @@
+{
+  "old_signals": 306,
+  "qdc_signals": 301,
+  "common": 281,
+  "qdc_only": 20,
+  "old_only": 25,
+  "q75_common_flips": 5,
+  "news_common_flips": 0,
+  "common_entry_diff_over_1c": 32,
+  "common_d2_close_diff_over_1c": 0,
+  "gate_flips": [
+    "2023-12",
+    "2026-05"
+  ],
+  "q75_original_flags_exact": true,
+  "qdc_d0_240_bars": 301,
+  "qdc_d0_ohlc_match": 301,
+  "qdc_d2_240_bars": 301,
+  "qdc_d2_ohlc_match": 301,
+  "historical_mv_exact": 194,
+  "historical_mv_prior_shares": 107,
+  "news_known": 301,
+  "news_veto_total": 9,
+  "q75_veto_total": 97,
+  "retained": 198,
+  "retained_close_floor": 21,
+  "retained_close_unverified": 23,
+  "retained_morning_unverified": 21,
+  "upstream_sha256": {
+    "R105_signals": "5461e06b45f6f53457e23a5709e5720dd7edeb31f0677667c017df69b246597d",
+    "R106_risk_panel": "1f2335376155608b073d7d995b26f70e1c6f396f0b3f5ba77ccc24e5f069190f",
+    "R106_sell_panel": "57dae019a95e6e8af02f32490e1e9ea0422071f550d269ef9b350eab495a97ec"
+  }
+}
