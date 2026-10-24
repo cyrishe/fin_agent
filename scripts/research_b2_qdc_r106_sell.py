@@ -111,7 +111,8 @@ def event_account(frame: pd.DataFrame, calendar: list[str], mode: str,
             else:
                 lot = hold.pop(key)
                 price = row["qdc_d2_close"] if mode == "close" else row["sell7"]
-                proceeds = lot["shares"] * price * .999
+                proceeds = lot["shares"] * (price * .999 +
+                                            float(row.get("d2_cash_dividend", 0) or 0))
                 cash += proceeds
                 ledger.append(dict(stk_code=row["stk_code"], d0_date=row["d0_date"],
                                    d1_date=row["d1_date"], d2_date=row["d2_date"],

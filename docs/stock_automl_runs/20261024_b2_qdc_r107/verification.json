@@ -1,0 +1,38 @@
+{
+  "months": 56,
+  "base_trades": 318,
+  "combo_trades_2018_21": 221,
+  "news_complete": 239,
+  "news_denials": 2,
+  "d0_ohlc_mismatch": 2,
+  "d2_ohlc_mismatch": 9,
+  "raw_news_hashes_checked": 293,
+  "r106_existing_morning7_pct": 954.2292508516887,
+  "quality_sensitivity": {
+    "2017": {
+      "combo_trades": 16,
+      "excluded": 1,
+      "clean_morning7_pct": -11.770750815761065
+    },
+    "2018": {
+      "combo_trades": 46,
+      "excluded": 4,
+      "clean_morning7_pct": -23.711450703691472
+    },
+    "2019": {
+      "combo_trades": 73,
+      "excluded": 0,
+      "clean_morning7_pct": -1.146593367780857
+    },
+    "2020": {
+      "combo_trades": 39,
+      "excluded": 0,
+      "clean_morning7_pct": -29.431000892556014
+    },
+    "2021": {
+      "combo_trades": 63,
+      "excluded": 1,
+      "clean_morning7_pct": 53.910707636545375
+    }
+  }
+}

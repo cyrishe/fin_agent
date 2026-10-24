@@ -159,8 +159,9 @@ def early_features(row: pd.Series, minute: pd.DataFrame) -> dict:
                 early_upper=(h - max(o, c)) / pre, early_lower=(min(o, c) - l) / pre)
 
 
-def features(frame: pd.DataFrame, raw_d0: pd.DataFrame, early: pd.DataFrame, values: pd.DataFrame) -> pd.DataFrame:
-    base = pd.read_pickle(ROOT / "outputs/stock_automl/b2_2021_minute_r60_20261020/panel.pkl")
+def features(frame: pd.DataFrame, raw_d0: pd.DataFrame, early: pd.DataFrame,
+             values: pd.DataFrame, base_panel: Path | None = None) -> pd.DataFrame:
+    base = pd.read_pickle(base_panel or ROOT / "outputs/stock_automl/b2_2021_minute_r60_20261020/panel.pkl")
     base = base[["stk_code", "d0_date", "d0_turnover_pct", "board_streak_days",
                  "d0_normal_volume_ratio", "d0_cap"]]
     result = frame.merge(base, on=["stk_code", "d0_date"], how="left", validate="one_to_one")

@@ -1,0 +1,34 @@
+[
+  {
+    "stk_code": "300152.SZ",
+    "d0_date": "2018-12-17",
+    "documents": [
+      {
+        "id": "1205675003",
+        "published": "2018-12-17",
+        "title": "关于股票交易异常波动及风险提示的公告",
+        "url": "https://static.cninfo.com.cn/finalpage/2018-12-17/1205675003.PDF",
+        "ok": true,
+        "evidence": [
+          "未开展实质业务，不存在达到披露标准而未披露的相关业务"
+        ]
+      }
+    ]
+  },
+  {
+    "stk_code": "603778.SH",
+    "d0_date": "2021-03-26",
+    "documents": [
+      {
+        "id": "1209444371",
+        "published": "2021-03-25",
+        "title": "股票交易异常波动风险提示公告",
+        "url": "https://static.cninfo.com.cn/finalpage/2021-03-25/1209444371.PDF",
+        "ok": true,
+        "evidence": [
+          "未涉及市场热点概念"
+        ]
+      }
+    ]
+  }
+]
