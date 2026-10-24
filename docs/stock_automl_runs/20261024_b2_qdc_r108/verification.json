@@ -1,0 +1,17 @@
+{
+  "overlap_2016_jun_dec": 5871,
+  "feature_mismatch_counts": {},
+  "december_2016_forecast_rows": 928,
+  "max_score_difference": 0.0027406509360314857,
+  "rank_mismatch": 97,
+  "top3_symmetric_difference": 0,
+  "daily_model_months": 40,
+  "full_test_months": 32,
+  "first_full_test": "2014-05",
+  "monthly_rows": 256,
+  "first_bar_coverage": {
+    "True": 1930
+  },
+  "source_files": 1833,
+  "source_hashes_sha256": "a42a873fb4633582852ac179a4c616e877f0644f77b9a19dbefe83ce9ba1b754"
+}

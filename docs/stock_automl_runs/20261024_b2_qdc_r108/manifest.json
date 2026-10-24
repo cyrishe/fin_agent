@@ -1,0 +1,19 @@
+{
+  "signals": 164,
+  "q75_veto": 34,
+  "news_known": 130,
+  "news_unknown": 0,
+  "news_veto": 0,
+  "q75_model_sha256": "7ea20139b24d334b5a5d8fc26f1a9ac860ec4f5eb4149aae1768fbe1be889712",
+  "qdc_manifest_sha256": "8712f16b58f9f234d609ad676c7c332fe2111f51d3c1c43ae7226609575bede9",
+  "panel_sha256": "9105ba20121b720cbe3fd14875f1306a17316d5b9984005fe54d3b1ebcd641a9",
+  "rules_sha256": "734341de6a410289e472d6cff9da854818120b557bab6732f24f26fdd81f4c9b",
+  "yearly_sha256": "5bbfca57843946fc94dc32051c27f425d018a563b16e063504dbb3dc16198b4d",
+  "monthly_sha256": "7d15ab9365bba7e71b957227ec15e990c3b5e21a9f8838c8ca7ed49c6b4363dc",
+  "monthly_summary_sha256": "4bb1aed35890f433450b8e481fa722721605712c8ddc4372dbb66e21ed73d641",
+  "trades_sha256": "3c018a7df76f1cb0f687e6050243fa77e65f6a65f82470c89c3c7f2161a27e44",
+  "historic_stability_sha256": "330893173e3248f5dad0bbd11336cd82581f8f64625283684f1d99b5754a4c32",
+  "floor_delayed_exits_sha256": "885b68509889c8c8cf5d7f12060873cf270e8cc63a90f9edba87a4df15dc96ad",
+  "floor_delay_sensitivity_sha256": "9b097e573bc8e459f35f789e28b47893ab431f276a02a5caf56e73f5b2614cbe",
+  "ohlc_conflict_sensitivity_sha256": "911eb50baa704cbd550fd4d1c02162d5f6d59122589020eb8768f148046b9263"
+}
