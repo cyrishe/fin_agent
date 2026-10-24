@@ -1,0 +1,6 @@
+{
+  "docs/stock_automl_runs/20261023_b2_2018_2021_r90/evidence/signals_exit.pkl": "d4ae59478419ec9c22ac9f51cfd07319c1d9f6a476e7b4097cfbf6aab4583c1f",
+  "outputs/stock_automl/b2_2021_minute_r60_20261020/signals.pkl": "c0fab9e454c92c0f3b0a9ba102224dcd6fef00fe377d215fbff1fb373708d1da",
+  "outputs/stock_automl/b2_2022_minute_r41_20261019/signals.pkl": "da2aae9be809f4987df67d8d39e6e88ddfa0621646c050770113b352c7ca9441",
+  "outputs/stock_automl/b2_two_month_2024_r35_20261019/signals.pkl": "4bac8813bab12dcc00603fb8ae23bf48b33a19e4424e2953b007c5a72ccf2bee"
+}
