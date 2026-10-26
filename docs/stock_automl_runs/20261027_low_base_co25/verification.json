@@ -1,0 +1,11 @@
+{
+  "independent_scalar_rows": 120,
+  "features_and_labels_agree": true,
+  "model_readbacks": 42,
+  "membership_and_maturity_checks": 42,
+  "monthly_pick_checks": 84,
+  "tests": "7 passed; pytest tests/experiments/test_low_base_co25.py -q",
+  "test_fixture_repairs": "Independent copies of OHLC arrays; correct prior20 volume hand denominator 0.98; no production formula change.",
+  "panel_sha256": "6f137211145d6c5774778183bd74f27090790716c2459869724021df6bdcffd8",
+  "predictions_sha256": "ec91016f19550c9420e537f0159e0ff2c9c6b7e6d577a0342fee817ff9168410"
+}
