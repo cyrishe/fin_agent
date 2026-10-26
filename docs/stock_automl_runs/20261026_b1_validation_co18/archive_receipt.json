@@ -1,0 +1,21 @@
+{
+  "user_id": "imac",
+  "experiment_id": "CO18_20261026_rolling_validation",
+  "experiment_date": "2026-10-26",
+  "title": "收盘开盘：18日训练2日验证，选优与可靠性对照",
+  "category_path": "01_时间稳定性_七因子基线",
+  "local_path": "/Volumes/ext/fin_agent/outputs/stock_automl/aliyun_drive_local/策略训练/收盘开盘_20261014/01_时间稳定性_七因子基线/20261026_CO18_18日训练2日验证",
+  "cloud_path": "策略训练/收盘开盘_20261014/01_时间稳定性_七因子基线/20261026_CO18_18日训练2日验证",
+  "source_commit": "bdd94adc11069c064d6cc8afb59c35cb0b0e3437",
+  "manifest_sha256": "53e7e5ba29b3c43c9e624c13a2c0ce1428d3e7deae3a213fadfa84b37239cc04",
+  "file_count": 2872,
+  "db_recorded": true,
+  "cloud_verified": false,
+  "database_readback_verified": true,
+  "local_package_readback_verified": true,
+  "cloud_verified_at": null,
+  "new_models": 531,
+  "reused_baseline_models": 177,
+  "prediction_days": 177,
+  "tests_passed": 7
+}
