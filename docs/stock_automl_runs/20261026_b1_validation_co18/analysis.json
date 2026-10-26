@@ -1,0 +1,907 @@
+{
+  "co17_comparison": {
+    "A": {
+      "co17": {
+        "days": 177,
+        "unknown": 5,
+        "trades": 130,
+        "win_rate": 0.46923076923076923,
+        "mean_trade_net": 0.00018418259504567112,
+        "compound_net": -0.05523792511344883,
+        "compound_gross": 0.22529046585302837,
+        "max_drawdown": -0.30690300235220924
+      },
+      "co18": {
+        "days": 177,
+        "unknown": 5,
+        "trades": 130,
+        "win_rate": 0.46923076923076923,
+        "mean_trade_net": 0.00018418259504567112,
+        "compound_net": -0.05523792511344883,
+        "compound_gross": 0.22529046585302837,
+        "max_drawdown": -0.30690300235220924
+      }
+    },
+    "B": {
+      "co17": {
+        "days": 177,
+        "unknown": 1,
+        "trades": 136,
+        "win_rate": 0.4264705882352941,
+        "mean_trade_net": -0.005059145890234826,
+        "compound_net": -0.5421458878112728,
+        "compound_gross": -0.399026589355963,
+        "max_drawdown": -0.609884106923235
+      },
+      "co18": {
+        "days": 177,
+        "unknown": 5,
+        "trades": 125,
+        "win_rate": 0.488,
+        "mean_trade_net": -0.0030546095433258385,
+        "compound_net": -0.3780440219785932,
+        "compound_gross": -0.2013926496089934,
+        "max_drawdown": -0.4096473156522532
+      }
+    },
+    "C": {
+      "co17": {
+        "days": 177,
+        "unknown": 3,
+        "trades": 134,
+        "win_rate": 0.41044776119402987,
+        "mean_trade_net": -0.005093308854263442,
+        "compound_net": -0.5375077574198586,
+        "compound_gross": -0.3953620353694133,
+        "max_drawdown": -0.6677704750259793
+      },
+      "co18": {
+        "days": 177,
+        "unknown": 2,
+        "trades": 144,
+        "win_rate": 0.3958333333333333,
+        "mean_trade_net": -0.006260439976052778,
+        "compound_net": -0.6370808007011829,
+        "compound_gross": -0.5159538206601413,
+        "max_drawdown": -0.6485214873696308
+      }
+    },
+    "D": {
+      "co17": {
+        "days": 177,
+        "unknown": 3,
+        "trades": 80,
+        "win_rate": 0.4125,
+        "mean_trade_net": -0.001471930921725545,
+        "compound_net": -0.15618008637059366,
+        "compound_gross": -0.009768105384132086,
+        "max_drawdown": -0.3988619249579052
+      },
+      "co18": {
+        "days": 177,
+        "unknown": 2,
+        "trades": 99,
+        "win_rate": 0.43434343434343436,
+        "mean_trade_net": -0.002030776277698482,
+        "compound_net": -0.2281319978382772,
+        "compound_gross": -0.059121870272635046,
+        "max_drawdown": -0.2695850098418028
+      }
+    },
+    "E": {
+      "co17": {
+        "days": 177,
+        "unknown": 3,
+        "trades": 36,
+        "win_rate": 0.3333333333333333,
+        "mean_trade_net": -0.006413045210595821,
+        "compound_net": -0.2276961539936424,
+        "compound_gross": -0.17003952472917172,
+        "max_drawdown": -0.2542579073244474
+      },
+      "co18": {
+        "days": 177,
+        "unknown": 2,
+        "trades": 38,
+        "win_rate": 0.3684210526315789,
+        "mean_trade_net": -0.004232308036864751,
+        "compound_net": -0.1645671376898108,
+        "compound_gross": -0.09859918551071312,
+        "max_drawdown": -0.17950689490396254
+      }
+    }
+  },
+  "validation_no_eligible_days": [
+    "2026-03-23"
+  ],
+  "days": 177,
+  "first": "2026-01-19",
+  "last": "2026-10-15",
+  "baseline_differences": [],
+  "chronology_and_model_checks": 177,
+  "overall": {
+    "A原20日滚动": {
+      "days": 177,
+      "unknown": 5,
+      "trades": 130,
+      "win_rate": 0.46923076923076923,
+      "mean_trade_net": 0.00018418259504567112,
+      "compound_net": -0.05523792511344883,
+      "compound_gross": 0.22529046585302837,
+      "max_drawdown": -0.30690300235220924
+    },
+    "B早18日固定": {
+      "days": 177,
+      "unknown": 5,
+      "trades": 125,
+      "win_rate": 0.488,
+      "mean_trade_net": -0.0030546095433258385,
+      "compound_net": -0.3780440219785932,
+      "compound_gross": -0.2013926496089934,
+      "max_drawdown": -0.4096473156522532
+    },
+    "C验证选优": {
+      "days": 177,
+      "unknown": 2,
+      "trades": 144,
+      "win_rate": 0.3958333333333333,
+      "mean_trade_net": -0.006260439976052778,
+      "compound_net": -0.6370808007011829,
+      "compound_gross": -0.5159538206601413,
+      "max_drawdown": -0.6485214873696308
+    },
+    "D验证盈利才做": {
+      "days": 177,
+      "unknown": 2,
+      "trades": 99,
+      "win_rate": 0.43434343434343436,
+      "mean_trade_net": -0.002030776277698482,
+      "compound_net": -0.2281319978382772,
+      "compound_gross": -0.059121870272635046,
+      "max_drawdown": -0.2695850098418028
+    },
+    "E两日验证均盈利": {
+      "days": 177,
+      "unknown": 2,
+      "trades": 38,
+      "win_rate": 0.3684210526315789,
+      "mean_trade_net": -0.004232308036864751,
+      "compound_net": -0.1645671376898108,
+      "compound_gross": -0.09859918551071312,
+      "max_drawdown": -0.17950689490396254
+    }
+  },
+  "monthly": [
+    {
+      "month": "2026-01",
+      "variant": "A原20日滚动",
+      "days": 10,
+      "unknown": 0,
+      "trades": 9,
+      "win_rate": 0.3333333333333333,
+      "mean_trade_net": -0.0180122888471824,
+      "compound_net": -0.15373895829440698,
+      "compound_gross": -0.13836833380451397,
+      "max_drawdown": -0.15373895829440698
+    },
+    {
+      "month": "2026-01",
+      "variant": "B早18日固定",
+      "days": 10,
+      "unknown": 0,
+      "trades": 10,
+      "win_rate": 0.4,
+      "mean_trade_net": -0.01686194121144926,
+      "compound_net": -0.16129678446588913,
+      "compound_gross": -0.14435384992304068,
+      "max_drawdown": -0.16129678446588913
+    },
+    {
+      "month": "2026-01",
+      "variant": "C验证选优",
+      "days": 10,
+      "unknown": 0,
+      "trades": 10,
+      "win_rate": 0.3,
+      "mean_trade_net": -0.012825625307606092,
+      "compound_net": -0.12476884550780165,
+      "compound_gross": -0.10708799740114539,
+      "max_drawdown": -0.12476884550780165
+    },
+    {
+      "month": "2026-01",
+      "variant": "D验证盈利才做",
+      "days": 10,
+      "unknown": 0,
+      "trades": 8,
+      "win_rate": 0.375,
+      "mean_trade_net": -0.00830804007105354,
+      "compound_net": -0.06728524826068794,
+      "compound_gross": -0.05224178040154781,
+      "max_drawdown": -0.07577645354232143
+    },
+    {
+      "month": "2026-01",
+      "variant": "E两日验证均盈利",
+      "days": 10,
+      "unknown": 0,
+      "trades": 5,
+      "win_rate": 0.4,
+      "mean_trade_net": -0.009813244636674101,
+      "compound_net": -0.049933944949918874,
+      "compound_gross": -0.040385619156952934,
+      "max_drawdown": -0.06857798467317777
+    },
+    {
+      "month": "2026-02",
+      "variant": "A原20日滚动",
+      "days": 14,
+      "unknown": 1,
+      "trades": 11,
+      "win_rate": 0.6363636363636364,
+      "mean_trade_net": 0.009132751385848832,
+      "compound_net": 0.09295557985914349,
+      "compound_gross": 0.11726705640658786,
+      "max_drawdown": -0.07437695048314519
+    },
+    {
+      "month": "2026-02",
+      "variant": "B早18日固定",
+      "days": 14,
+      "unknown": 1,
+      "trades": 10,
+      "win_rate": 0.4,
+      "mean_trade_net": 4.301517873328553e-05,
+      "compound_net": -0.0011379606605553816,
+      "compound_gross": 0.019040397829564792,
+      "max_drawdown": -0.04815197350822675
+    },
+    {
+      "month": "2026-02",
+      "variant": "C验证选优",
+      "days": 14,
+      "unknown": 0,
+      "trades": 14,
+      "win_rate": 0.42857142857142855,
+      "mean_trade_net": -0.0006770961542631222,
+      "compound_net": -0.015165682349655873,
+      "compound_gross": 0.012799371594530928,
+      "max_drawdown": -0.10246824436218605
+    },
+    {
+      "month": "2026-02",
+      "variant": "D验证盈利才做",
+      "days": 14,
+      "unknown": 0,
+      "trades": 12,
+      "win_rate": 0.5,
+      "mean_trade_net": 0.0050239292471052355,
+      "compound_net": 0.058348041756389746,
+      "compound_gross": 0.08405566080201798,
+      "max_drawdown": -0.050930265941221964
+    },
+    {
+      "month": "2026-02",
+      "variant": "E两日验证均盈利",
+      "days": 14,
+      "unknown": 0,
+      "trades": 8,
+      "win_rate": 0.375,
+      "mean_trade_net": -0.0002383956926826497,
+      "compound_net": -0.0033333663389210066,
+      "compound_gross": 0.01274156165144058,
+      "max_drawdown": -0.03702081192696782
+    },
+    {
+      "month": "2026-03",
+      "variant": "A原20日滚动",
+      "days": 22,
+      "unknown": 1,
+      "trades": 14,
+      "win_rate": 0.6428571428571429,
+      "mean_trade_net": 0.005771973718953161,
+      "compound_net": 0.0758969198331163,
+      "compound_gross": 0.10644775956553199,
+      "max_drawdown": -0.07151789470297043
+    },
+    {
+      "month": "2026-03",
+      "variant": "B早18日固定",
+      "days": 22,
+      "unknown": 1,
+      "trades": 15,
+      "win_rate": 0.4,
+      "mean_trade_net": -0.0037214438343456057,
+      "compound_net": -0.06557848317723558,
+      "compound_gross": -0.03712110173746708,
+      "max_drawdown": -0.17409354963333812
+    },
+    {
+      "month": "2026-03",
+      "variant": "C验证选优",
+      "days": 22,
+      "unknown": 0,
+      "trades": 14,
+      "win_rate": 0.35714285714285715,
+      "mean_trade_net": -0.0023899760434060563,
+      "compound_net": -0.04510549693760901,
+      "compound_gross": -0.017990604807470945,
+      "max_drawdown": -0.20809431010022128
+    },
+    {
+      "month": "2026-03",
+      "variant": "D验证盈利才做",
+      "days": 22,
+      "unknown": 0,
+      "trades": 10,
+      "win_rate": 0.2,
+      "mean_trade_net": -0.014282510854445507,
+      "compound_net": -0.14105211525317785,
+      "compound_gross": -0.12370021112614393,
+      "max_drawdown": -0.21225522889969062
+    },
+    {
+      "month": "2026-03",
+      "variant": "E两日验证均盈利",
+      "days": 22,
+      "unknown": 0,
+      "trades": 2,
+      "win_rate": 0.5,
+      "mean_trade_net": 0.00032120322383766275,
+      "compound_net": -0.0003414810738225915,
+      "compound_gross": 0.0036651622819503515,
+      "max_drawdown": -0.0310474227105082
+    },
+    {
+      "month": "2026-04",
+      "variant": "A原20日滚动",
+      "days": 21,
+      "unknown": 0,
+      "trades": 15,
+      "win_rate": 0.4,
+      "mean_trade_net": 0.0012568043023872156,
+      "compound_net": 0.01374233028885441,
+      "compound_gross": 0.04461539095291145,
+      "max_drawdown": -0.05605266501074946
+    },
+    {
+      "month": "2026-04",
+      "variant": "B早18日固定",
+      "days": 21,
+      "unknown": 0,
+      "trades": 16,
+      "win_rate": 0.625,
+      "mean_trade_net": 0.007066041808154712,
+      "compound_net": 0.1121011617894534,
+      "compound_gross": 0.14826392946592404,
+      "max_drawdown": -0.06186176305414248
+    },
+    {
+      "month": "2026-04",
+      "variant": "C验证选优",
+      "days": 21,
+      "unknown": 0,
+      "trades": 19,
+      "win_rate": 0.5263157894736842,
+      "mean_trade_net": -0.004115720616491943,
+      "compound_net": -0.07917656371293458,
+      "compound_gross": -0.04351192464660125,
+      "max_drawdown": -0.1201127788675852
+    },
+    {
+      "month": "2026-04",
+      "variant": "D验证盈利才做",
+      "days": 21,
+      "unknown": 0,
+      "trades": 11,
+      "win_rate": 0.7272727272727273,
+      "mean_trade_net": 0.006472902776093692,
+      "compound_net": 0.07240010855917567,
+      "compound_gross": 0.09625435347924238,
+      "max_drawdown": -0.036425558099564714
+    },
+    {
+      "month": "2026-04",
+      "variant": "E两日验证均盈利",
+      "days": 21,
+      "unknown": 0,
+      "trades": 2,
+      "win_rate": 0.5,
+      "mean_trade_net": 0.004448024398366113,
+      "compound_net": 0.008853600212814783,
+      "compound_gross": 0.012897097564872562,
+      "max_drawdown": -0.003440797121094352
+    },
+    {
+      "month": "2026-05",
+      "variant": "A原20日滚动",
+      "days": 18,
+      "unknown": 2,
+      "trades": 13,
+      "win_rate": 0.5384615384615384,
+      "mean_trade_net": 0.0021426498691354138,
+      "compound_net": 0.017274727416073166,
+      "compound_gross": 0.044070717642892276,
+      "max_drawdown": -0.11226836171263888
+    },
+    {
+      "month": "2026-05",
+      "variant": "B早18日固定",
+      "days": 18,
+      "unknown": 1,
+      "trades": 15,
+      "win_rate": 0.4666666666666667,
+      "mean_trade_net": -0.019035799337901248,
+      "compound_net": -0.26142511481694375,
+      "compound_gross": -0.23893215328824002,
+      "max_drawdown": -0.27987842557936715
+    },
+    {
+      "month": "2026-05",
+      "variant": "C验证选优",
+      "days": 18,
+      "unknown": 0,
+      "trades": 15,
+      "win_rate": 0.4666666666666667,
+      "mean_trade_net": 0.0025934631460793555,
+      "compound_net": 0.026308451670590483,
+      "compound_gross": 0.057564207834420955,
+      "max_drawdown": -0.08570599682947988
+    },
+    {
+      "month": "2026-05",
+      "variant": "D验证盈利才做",
+      "days": 18,
+      "unknown": 0,
+      "trades": 11,
+      "win_rate": 0.36363636363636365,
+      "mean_trade_net": -0.006759840365402175,
+      "compound_net": -0.07982390794202698,
+      "compound_gross": -0.05935570237737764,
+      "max_drawdown": -0.1683179894958673
+    },
+    {
+      "month": "2026-05",
+      "variant": "E两日验证均盈利",
+      "days": 18,
+      "unknown": 0,
+      "trades": 6,
+      "win_rate": 0.3333333333333333,
+      "mean_trade_net": -0.00011810541127915686,
+      "compound_net": -0.0059648738505078125,
+      "compound_gross": 0.006035409359540944,
+      "max_drawdown": -0.08491674743510713
+    },
+    {
+      "month": "2026-06",
+      "variant": "A原20日滚动",
+      "days": 21,
+      "unknown": 0,
+      "trades": 18,
+      "win_rate": 0.5,
+      "mean_trade_net": 0.013500966220347096,
+      "compound_net": 0.2520400389746491,
+      "compound_gross": 0.2979346420190172,
+      "max_drawdown": -0.07072185224703553
+    },
+    {
+      "month": "2026-06",
+      "variant": "B早18日固定",
+      "days": 21,
+      "unknown": 0,
+      "trades": 17,
+      "win_rate": 0.7058823529411765,
+      "mean_trade_net": 0.02591349816533667,
+      "compound_net": 0.524678119782255,
+      "compound_gross": 0.5774085308191934,
+      "max_drawdown": -0.03305078672407957
+    },
+    {
+      "month": "2026-06",
+      "variant": "C验证选优",
+      "days": 21,
+      "unknown": 1,
+      "trades": 14,
+      "win_rate": 0.42857142857142855,
+      "mean_trade_net": 0.006959065368834124,
+      "compound_net": 0.08527493653599794,
+      "compound_gross": 0.11609207156121992,
+      "max_drawdown": -0.1145004061647048
+    },
+    {
+      "month": "2026-06",
+      "variant": "D验证盈利才做",
+      "days": 21,
+      "unknown": 1,
+      "trades": 11,
+      "win_rate": 0.45454545454545453,
+      "mean_trade_net": 0.009252323849969586,
+      "compound_net": 0.0944482917437326,
+      "compound_gross": 0.11879297186380544,
+      "max_drawdown": -0.043849141783665946
+    },
+    {
+      "month": "2026-06",
+      "variant": "E两日验证均盈利",
+      "days": 21,
+      "unknown": 1,
+      "trades": 4,
+      "win_rate": 0.25,
+      "mean_trade_net": -0.014503811715716186,
+      "compound_net": -0.05713760229865783,
+      "compound_gross": -0.04956444836706042,
+      "max_drawdown": -0.05713760229865783
+    },
+    {
+      "month": "2026-07",
+      "variant": "A原20日滚动",
+      "days": 23,
+      "unknown": 0,
+      "trades": 20,
+      "win_rate": 0.35,
+      "mean_trade_net": -0.006626910870695413,
+      "compound_net": -0.1346801082690463,
+      "compound_gross": -0.09936572155497048,
+      "max_drawdown": -0.22707405845327622
+    },
+    {
+      "month": "2026-07",
+      "variant": "B早18日固定",
+      "days": 23,
+      "unknown": 0,
+      "trades": 16,
+      "win_rate": 0.3125,
+      "mean_trade_net": -0.019559279844778114,
+      "compound_net": -0.2800174446584337,
+      "compound_gross": -0.2566054001659762,
+      "max_drawdown": -0.3159277002368217
+    },
+    {
+      "month": "2026-07",
+      "variant": "C验证选优",
+      "days": 23,
+      "unknown": 0,
+      "trades": 20,
+      "win_rate": 0.35,
+      "mean_trade_net": -0.022973558363852054,
+      "compound_net": -0.39033365530205855,
+      "compound_gross": -0.3654526913152576,
+      "max_drawdown": -0.41101233427954487
+    },
+    {
+      "month": "2026-07",
+      "variant": "D验证盈利才做",
+      "days": 23,
+      "unknown": 0,
+      "trades": 10,
+      "win_rate": 0.4,
+      "mean_trade_net": -0.0017094991813878303,
+      "compound_net": -0.020406743275275252,
+      "compound_gross": -0.0006176401457105296,
+      "max_drawdown": -0.04199888766383009
+    },
+    {
+      "month": "2026-07",
+      "variant": "E两日验证均盈利",
+      "days": 23,
+      "unknown": 0,
+      "trades": 2,
+      "win_rate": 0.0,
+      "mean_trade_net": -0.030562565050167134,
+      "compound_net": -0.06022329702102358,
+      "compound_gross": -0.0564566607031084,
+      "max_drawdown": -0.06022329702102358
+    },
+    {
+      "month": "2026-08",
+      "variant": "A原20日滚动",
+      "days": 21,
+      "unknown": 0,
+      "trades": 14,
+      "win_rate": 0.2857142857142857,
+      "mean_trade_net": -0.012607884748926514,
+      "compound_net": -0.1644794746610292,
+      "compound_gross": -0.14075428947625024,
+      "max_drawdown": -0.17165040180729307
+    },
+    {
+      "month": "2026-08",
+      "variant": "B早18日固定",
+      "days": 21,
+      "unknown": 0,
+      "trades": 14,
+      "win_rate": 0.35714285714285715,
+      "mean_trade_net": -0.010432598323474913,
+      "compound_net": -0.1410295356384651,
+      "compound_gross": -0.11663847316041875,
+      "max_drawdown": -0.148401723913828
+    },
+    {
+      "month": "2026-08",
+      "variant": "C验证选优",
+      "days": 21,
+      "unknown": 0,
+      "trades": 18,
+      "win_rate": 0.3888888888888889,
+      "mean_trade_net": -0.00936079695367573,
+      "compound_net": -0.16607483519577704,
+      "compound_gross": -0.135506591995869,
+      "max_drawdown": -0.1879900073521218
+    },
+    {
+      "month": "2026-08",
+      "variant": "D验证盈利才做",
+      "days": 21,
+      "unknown": 0,
+      "trades": 14,
+      "win_rate": 0.42857142857142855,
+      "mean_trade_net": -0.0073626696861893715,
+      "compound_net": -0.10809828382624187,
+      "compound_gross": -0.08277211559804665,
+      "max_drawdown": -0.18799000735212168
+    },
+    {
+      "month": "2026-08",
+      "variant": "E两日验证均盈利",
+      "days": 21,
+      "unknown": 0,
+      "trades": 7,
+      "win_rate": 0.42857142857142855,
+      "mean_trade_net": -0.002541783156535447,
+      "compound_net": -0.024523809098814353,
+      "compound_gross": -0.010771093459513548,
+      "max_drawdown": -0.10728650435430975
+    },
+    {
+      "month": "2026-09",
+      "variant": "A原20日滚动",
+      "days": 21,
+      "unknown": 1,
+      "trades": 12,
+      "win_rate": 0.5833333333333334,
+      "mean_trade_net": 0.006371205194697231,
+      "compound_net": 0.07337311193877949,
+      "compound_gross": 0.0994456948385869,
+      "max_drawdown": -0.04917689151993321
+    },
+    {
+      "month": "2026-09",
+      "variant": "B早18日固定",
+      "days": 21,
+      "unknown": 1,
+      "trades": 9,
+      "win_rate": 0.6666666666666666,
+      "mean_trade_net": 0.0050537626168834565,
+      "compound_net": 0.0393952511279958,
+      "compound_gross": 0.058273768883542854,
+      "max_drawdown": -0.08131725925320221
+    },
+    {
+      "month": "2026-09",
+      "variant": "C验证选优",
+      "days": 21,
+      "unknown": 0,
+      "trades": 15,
+      "win_rate": 0.26666666666666666,
+      "mean_trade_net": -0.010948814720120622,
+      "compound_net": -0.1569409494797127,
+      "compound_gross": -0.13126597031347886,
+      "max_drawdown": -0.1569409494797127
+    },
+    {
+      "month": "2026-09",
+      "variant": "D验证盈利才做",
+      "days": 21,
+      "unknown": 0,
+      "trades": 8,
+      "win_rate": 0.375,
+      "mean_trade_net": -0.00785971878714721,
+      "compound_net": -0.065666599961407,
+      "compound_gross": -0.05059702542429245,
+      "max_drawdown": -0.0823740914903277
+    },
+    {
+      "month": "2026-09",
+      "variant": "E两日验证均盈利",
+      "days": 21,
+      "unknown": 0,
+      "trades": 0,
+      "win_rate": null,
+      "mean_trade_net": null,
+      "compound_net": 0.0,
+      "compound_gross": 0.0,
+      "max_drawdown": 0.0
+    },
+    {
+      "month": "2026-10",
+      "variant": "A原20日滚动",
+      "days": 6,
+      "unknown": 0,
+      "trades": 4,
+      "win_rate": 0.5,
+      "mean_trade_net": -0.013085830891851558,
+      "compound_net": -0.05250625708685186,
+      "compound_gross": -0.04489590378206387,
+      "max_drawdown": -0.07317364542107041
+    },
+    {
+      "month": "2026-10",
+      "variant": "B早18日固定",
+      "days": 6,
+      "unknown": 1,
+      "trades": 3,
+      "win_rate": 0.6666666666666666,
+      "mean_trade_net": -0.004114477417639521,
+      "compound_net": -0.013027462871320616,
+      "compound_gross": -0.007087824572682866,
+      "max_drawdown": -0.03455598994879927
+    },
+    {
+      "month": "2026-10",
+      "variant": "C验证选优",
+      "days": 6,
+      "unknown": 1,
+      "trades": 5,
+      "win_rate": 0.4,
+      "mean_trade_net": 0.0007518939790643441,
+      "compound_net": 0.0029915400276365745,
+      "compound_gross": 0.01307177596582898,
+      "max_drawdown": -0.02862682561058416
+    },
+    {
+      "month": "2026-10",
+      "variant": "D验证盈利才做",
+      "days": 6,
+      "unknown": 1,
+      "trades": 4,
+      "win_rate": 0.5,
+      "mean_trade_net": 0.00809657387647647,
+      "compound_net": 0.03255017378680969,
+      "compound_gross": 0.04084370784570268,
+      "max_drawdown": -0.005027991515630714
+    },
+    {
+      "month": "2026-10",
+      "variant": "E两日验证均盈利",
+      "days": 6,
+      "unknown": 1,
+      "trades": 2,
+      "win_rate": 0.5,
+      "mean_trade_net": 0.00912435980309284,
+      "compound_net": 0.018208266615967528,
+      "compound_gross": 0.022289257583375077,
+      "max_drawdown": -0.0019980019980020414
+    }
+  ],
+  "reliability": {
+    "reliable=False": {
+      "days": 57,
+      "unknown": 0,
+      "trades": 45,
+      "win_rate": 0.3111111111111111,
+      "mean_trade_net": -0.01556570011243223,
+      "compound_net": -0.5298170175698281,
+      "compound_gross": -0.4855378565552163,
+      "max_drawdown": -0.5298170175698281
+    },
+    "reliable=True": {
+      "days": 120,
+      "unknown": 2,
+      "trades": 99,
+      "win_rate": 0.43434343434343436,
+      "mean_trade_net": -0.002030776277698482,
+      "compound_net": -0.2281319978382772,
+      "compound_gross": -0.059121870272635046,
+      "max_drawdown": -0.2695850098418028
+    },
+    "stable=False": {
+      "days": 132,
+      "unknown": 2,
+      "trades": 106,
+      "win_rate": 0.4056603773584906,
+      "mean_trade_net": -0.006987506142931505,
+      "compound_net": -0.565591424910852,
+      "compound_gross": -0.46300672069604387,
+      "max_drawdown": -0.5843853441526969
+    },
+    "stable=True": {
+      "days": 45,
+      "unknown": 0,
+      "trades": 38,
+      "win_rate": 0.3684210526315789,
+      "mean_trade_net": -0.004232308036864751,
+      "compound_net": -0.1645671376898108,
+      "compound_gross": -0.09859918551071312,
+      "max_drawdown": -0.17950689490396254
+    }
+  },
+  "validation_nextday_correlation": 0.06597925841721632,
+  "paired_differences": {
+    "C-B": {
+      "mean_daily_delta": -0.0034816752868722656,
+      "month_bootstrap_95": [
+        -0.008500721923397897,
+        0.002457744076421851
+      ],
+      "positive_months": 4,
+      "months": 10
+    },
+    "D-C": {
+      "mean_daily_delta": 0.004002608600339716,
+      "month_bootstrap_95": [
+        -0.000707054702211163,
+        0.009396775720545392
+      ],
+      "positive_months": 8,
+      "months": 10
+    },
+    "E-D": {
+      "mean_daily_delta": 0.00022982369195022388,
+      "month_bootstrap_95": [
+        -0.0029675948646232147,
+        0.003133944495056769
+      ],
+      "positive_months": 5,
+      "months": 10
+    },
+    "C-A": {
+      "mean_daily_delta": -0.005195410291973783,
+      "month_bootstrap_95": [
+        -0.008800479010819904,
+        -0.0012789280021848314
+      ],
+      "positive_months": 4,
+      "months": 10
+    },
+    "D-A": {
+      "mean_daily_delta": -0.001056765567664471,
+      "month_bootstrap_95": [
+        -0.004693812377034555,
+        0.0030381248501131033
+      ],
+      "positive_months": 5,
+      "months": 10
+    },
+    "E-A": {
+      "mean_daily_delta": -0.001245292474882121,
+      "month_bootstrap_95": [
+        -0.006004980834037565,
+        0.003377584155061517
+      ],
+      "positive_months": 4,
+      "months": 10
+    }
+  },
+  "top1_labels_before_gate": {
+    "A原20日滚动": {
+      "count": 173,
+      "ge3": 43,
+      "between1and3": 52
+    },
+    "B早18日固定": {
+      "count": 175,
+      "ge3": 55,
+      "between1and3": 45
+    },
+    "C验证选优": {
+      "count": 169,
+      "ge3": 45,
+      "between1and3": 42
+    },
+    "D验证盈利才做": {
+      "count": 169,
+      "ge3": 45,
+      "between1and3": 42
+    },
+    "E两日验证均盈利": {
+      "count": 169,
+      "ge3": 45,
+      "between1and3": 42
+    }
+  },
+  "selected_models": {
+    "逻辑回归": 73,
+    "原HGB": 60,
+    "强约束HGB": 44
+  }
+}
