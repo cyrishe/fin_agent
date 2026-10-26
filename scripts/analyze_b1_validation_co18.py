@@ -81,7 +81,7 @@ def main():
     correlation=float(c.loc[~c.unknown,['validation_score','return_net']].corr().iloc[0,1])
     pairs={};rng=np.random.default_rng(42)
     pivot=df.pivot(index='day',columns='variant',values='return_net');pivot.columns=pivot.columns.str[0]
-    for a,b in [('C','B'),('D','C'),('E','D'),('E','A')]:
+    for a,b in [('C','B'),('D','C'),('E','D'),('C','A'),('D','A'),('E','A')]:
         delta=pivot[a]-pivot[b]
         unknown=df.pivot(index='day',columns='variant',values='unknown');unknown.columns=unknown.columns.str[0]
         delta=delta[~(unknown[a]|unknown[b])]
@@ -90,7 +90,9 @@ def main():
         values=month['sum'].to_numpy()[idx].sum(axis=1)/month['count'].to_numpy()[idx].sum(axis=1)
         pairs[a+'-'+b]=dict(mean_daily_delta=float(delta.mean()),month_bootstrap_95=np.quantile(values,[.025,.975]).tolist(),positive_months=int((month['sum']>0).sum()),months=len(month))
     labels={v:dict(count=int(g.label.notna().sum()),ge3=int(g.label.ge(.03).sum()),between1and3=int((g.label.ge(.01)&g.label.lt(.03)).sum())) for v,g in df.groupby('variant')}
-    result=dict(validation_no_eligible_days=no_eligible,days=len(days),first=days[0],last=days[-1],baseline_differences=differences,chronology_and_model_checks=len(audits),overall=overall,monthly=monthly,reliability=reliability,validation_nextday_correlation=correlation,paired_differences=pairs,top1_labels_before_gate=labels,selected_models=c.chosen.value_counts().to_dict())
+    previous_summary=json.loads((ROOT.parent/'b1_validation_co17_20261026/analysis.json').read_text())
+    comparison={key:dict(co17=previous_summary['overall'][old_name],co18=overall[new_name]) for key,old_name,new_name in zip('ABCDE',previous_summary['overall'],overall)}
+    result=dict(co17_comparison=comparison,validation_no_eligible_days=no_eligible,days=len(days),first=days[0],last=days[-1],baseline_differences=differences,chronology_and_model_checks=len(audits),overall=overall,monthly=monthly,reliability=reliability,validation_nextday_correlation=correlation,paired_differences=pairs,top1_labels_before_gate=labels,selected_models=c.chosen.value_counts().to_dict())
     (ROOT/'analysis.json').write_text(json.dumps(result,ensure_ascii=False,indent=2))
     previous=pd.read_csv(ROOT.parent/'b1_validation_co17_20261026/daily.csv')
     common=previous[previous.variant.str.startswith('A')].sort_values('day')
