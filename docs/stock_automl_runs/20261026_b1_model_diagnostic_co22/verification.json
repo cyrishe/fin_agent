@@ -1,0 +1,18 @@
+{
+  "experiment": "CO22_20261026_B1_model_value_audit",
+  "source": "/Users/cyrcyrisis/work/fin_agent/outputs/stock_automl/close_open_conditional_b1_r1",
+  "sklearn": "1.7.1",
+  "folds": 408,
+  "oof_rows": 147152,
+  "mature_target_rows": 147025,
+  "independent_label_matches": 147025,
+  "co21_trade_matches": 308,
+  "max_probability_error": 0.0,
+  "inputs": {
+    "b1_candidates.csv.gz": "463b72a20618d2ed304411c337ec07203ea80686e4b4955ade42b52e30e46d1b",
+    "oof_with_context.csv.gz": "a260d9773fc98e7a9f832152bf02e54cc770f6874b7f43d1ee52483b8f1e3818",
+    "stage1_folds.json": "21d36b15a25febef7600a0f9e1661d2946d8745cfd4b79cd0ed11c79015bff13"
+  },
+  "code_sha256": "afd7d34a15f627be7fb6270db5f7426797e60250c5774e1d18f4d511610205ce",
+  "predictions_sha256": "6085cce321e664f9a48018157c9faaeed68ba38c38b2d8e1c5a37fc22d049a76"
+}

@@ -1,0 +1,45 @@
+{
+  "method": "10000 calendar-month cluster resamples; descriptive historical intervals, no correction for prior research selection",
+  "day_mean_auc_ge3": {
+    "mean": 0.5843581389910794,
+    "low95": 0.5742615170346242,
+    "high95": 0.593411930436522,
+    "months": 20,
+    "rows": 404
+  },
+  "day_mean_logloss_delta": {
+    "mean": -0.016020392237027233,
+    "low95": -0.023000574282147915,
+    "high95": -0.009511460575081317,
+    "months": 20,
+    "rows": 404
+  },
+  "top1_hit_lift": {
+    "mean": 0.04609494212021254,
+    "low95": 0.0018267380004916044,
+    "high95": 0.09363031677777164,
+    "months": 20,
+    "rows": 397
+  },
+  "top1_mean_net": {
+    "mean": -0.0028046301571228996,
+    "low95": -0.005539731992122921,
+    "high95": 2.0397642952408604e-05,
+    "months": 20,
+    "rows": 397
+  },
+  "traded_top1_hit_lift": {
+    "mean": 0.03628398764844301,
+    "low95": -0.01391595914453531,
+    "high95": 0.09109612204910547,
+    "months": 20,
+    "rows": 308
+  },
+  "traded_top1_mean_net": {
+    "mean": -0.0033051117461062726,
+    "low95": -0.006376849305421915,
+    "high95": 0.00012116067823057058,
+    "months": 20,
+    "rows": 308
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "sklearn_reference_metrics_agree": true,
+  "monthly_cash_recomputations": 40,
+  "main_oof_labels": 145932,
+  "rows_unique": true
+}
