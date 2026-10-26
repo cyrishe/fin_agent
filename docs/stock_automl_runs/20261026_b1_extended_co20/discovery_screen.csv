@@ -1,0 +1,15 @@
+gate,discovery_trades,discovery_delta_pp,improved_months,qualifies
+ret5_up,48,12.71236020769124,5,True
+ret5_down,35,32.933939572370164,5,True
+ret20_up,67,3.862340162064669,5,False
+ret20_down,16,47.04267472741156,5,False
+position20_high,57,8.905488205332432,4,True
+position20_low,26,38.43575064763412,5,True
+position60_high,63,6.947559551407366,5,True
+position60_low,20,41.57904770592408,5,True
+fund1_in,28,40.99713173853061,5,True
+fund1_out,55,7.299241174866864,3,False
+fund5_in,35,22.653519969318857,4,True
+fund5_out,48,21.483556541547365,5,True
+ret5_up_position60_low,6,45.58577213199963,5,False
+ret5_up_fund5_in,29,24.09338688169572,4,True
