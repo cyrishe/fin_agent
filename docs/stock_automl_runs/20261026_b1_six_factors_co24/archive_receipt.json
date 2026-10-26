@@ -1,0 +1,18 @@
+{
+  "user_id": "imac",
+  "experiment_id": "CO24_20261026_B1_six_condition_factors",
+  "experiment_date": "2026-10-26",
+  "title": "CO24 原七加六条件因子滚动对照",
+  "category_path": "03_因子筛选_7至14",
+  "local_path": "/Volumes/ext/fin_agent/outputs/stock_automl/aliyun_drive_local/策略训练/收盘开盘_20261014/03_因子筛选_7至14/20261026_CO24_原七加六_条件因子滚动对照",
+  "cloud_path": "策略训练/收盘开盘_20261014/03_因子筛选_7至14/20261026_CO24_原七加六_条件因子滚动对照",
+  "source_commit": "fbac84d420c6436b7a39e661c7b6d55b1f0aa6b1",
+  "manifest_sha256": "118896234020c3b7a19da52382809fffd4583b653c404e94d8251f8e25954687",
+  "file_count": 3312,
+  "local_check": "ok",
+  "db_recorded": true,
+  "cloud_verified_at": null,
+  "cloud_status": "待同步；用户要求先保留本地包",
+  "models": 1810,
+  "training_panel_rows": 137833
+}
