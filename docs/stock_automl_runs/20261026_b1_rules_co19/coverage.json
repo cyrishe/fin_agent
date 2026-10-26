@@ -1,0 +1,55 @@
+{
+  "status": "coverage_only_no_effect_backtest",
+  "rows": 177,
+  "selected_rows": 174,
+  "trades": 130,
+  "price_start": "2024-11-01",
+  "price_end": "2026-10-15",
+  "fund_files": [
+    "2025-12.pkl.gz",
+    "2026-01.pkl.gz",
+    "2026-02.pkl.gz",
+    "2026-03.pkl.gz",
+    "2026-04.pkl.gz",
+    "2026-05.pkl.gz",
+    "2026-06.pkl.gz",
+    "2026-07.pkl.gz",
+    "2026-08.pkl.gz",
+    "2026-09.pkl.gz"
+  ],
+  "coverage": {
+    "prior3_prices": {
+      "all": 174,
+      "executed": 130
+    },
+    "prior5_prices": {
+      "all": 174,
+      "executed": 130
+    },
+    "prior10_prices": {
+      "all": 174,
+      "executed": 130
+    },
+    "prior20_prices": {
+      "all": 174,
+      "executed": 130
+    },
+    "prior60_prices": {
+      "all": 173,
+      "executed": 129
+    },
+    "prior1_funds": {
+      "all": 169,
+      "executed": 127
+    },
+    "prior5_funds": {
+      "all": 169,
+      "executed": 127
+    },
+    "prior20_funds": {
+      "all": 163,
+      "executed": 126
+    }
+  },
+  "fund_vintage_verified": false
+}
