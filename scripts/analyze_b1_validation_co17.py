@@ -76,7 +76,7 @@ def main():
     pd.DataFrame(monthly).to_csv(ROOT/'monthly.csv',index=False)
     c=df[df.variant.str.startswith('C')]
     reliability={f'{field}={value}':metrics(g) for field in ['reliable','stable'] for value,g in c.groupby(field)}
-    correlation=float(c[['validation_score','return_net']].corr().iloc[0,1])
+    correlation=float(c.loc[~c.unknown,['validation_score','return_net']].corr().iloc[0,1])
     pairs={};rng=np.random.default_rng(42)
     pivot=df.pivot(index='day',columns='variant',values='return_net');pivot.columns=pivot.columns.str[0]
     for a,b in [('C','B'),('D','C'),('E','D'),('E','A')]:

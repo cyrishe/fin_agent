@@ -704,7 +704,7 @@
       "max_drawdown": -0.2542579073244474
     }
   },
-  "validation_nextday_correlation": 0.14626314093191814,
+  "validation_nextday_correlation": 0.14592966679888386,
   "paired_differences": {
     "C-B": {
       "mean_daily_delta": 3.184169310709906e-05,
