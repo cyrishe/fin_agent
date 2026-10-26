@@ -26,7 +26,7 @@ def main():
     meta=json.loads((ROOT/'source.json').read_text());days=meta['days']
     cal=read(SOURCE/'calendar.csv').date.tolist();old=read(SOURCE/'picks.csv')
     old=old[old.selection_rank.eq(1)].set_index('signal_date')
-    records=[];validations=[];audits=[];differences=[]
+    records=[];validations=[];audits=[];differences=[];no_eligible=[]
     with threadpool_limits(limits=1):
         for day in days:
             folder=ROOT/'folds'/day;x=json.loads((folder/'result.json').read_text())
@@ -40,6 +40,7 @@ def main():
                 n=int(known.actionable.eq(True).sum());score=float(v.net.fillna(0).sum()/10)
                 stats.append((n,int(v.unknown.sum()),score,v))
             eligible=[k for k,(n,u,_,_) in enumerate(stats) if n>=3 and u==0]
+            if not eligible:no_eligible.append(day)
             k=max(eligible,key=lambda k:(stats[k][2],-k)) if eligible else 0
             passed=bool(eligible) and stats[k][2]>0
             v=stats[k][3];stable=passed and all(h.actionable.eq(True).sum()>=1 and h.net.sum()>0 for h in [v.iloc[:5],v.iloc[5:]])
@@ -87,7 +88,7 @@ def main():
         values=month['sum'].to_numpy()[idx].sum(axis=1)/month['count'].to_numpy()[idx].sum(axis=1)
         pairs[a+'-'+b]=dict(mean_daily_delta=float(delta.mean()),month_bootstrap_95=np.quantile(values,[.025,.975]).tolist(),positive_months=int((month['sum']>0).sum()),months=len(month))
     labels={v:dict(count=int(g.label.notna().sum()),ge3=int(g.label.ge(.03).sum()),between1and3=int((g.label.ge(.01)&g.label.lt(.03)).sum())) for v,g in df.groupby('variant')}
-    result=dict(days=len(days),first=days[0],last=days[-1],baseline_differences=differences,chronology_and_model_checks=len(audits),overall=overall,monthly=monthly,reliability=reliability,validation_nextday_correlation=correlation,paired_differences=pairs,top1_labels_before_gate=labels,selected_models=c.chosen.value_counts().to_dict())
+    result=dict(validation_no_eligible_days=no_eligible,days=len(days),first=days[0],last=days[-1],baseline_differences=differences,chronology_and_model_checks=len(audits),overall=overall,monthly=monthly,reliability=reliability,validation_nextday_correlation=correlation,paired_differences=pairs,top1_labels_before_gate=labels,selected_models=c.chosen.value_counts().to_dict())
     (ROOT/'analysis.json').write_text(json.dumps(result,ensure_ascii=False,indent=2))
     assert not differences,differences
     (ROOT/'complete.json').write_text(json.dumps(dict(days=len(days),input_hashes=meta['hashes'],verified=True),indent=2))
