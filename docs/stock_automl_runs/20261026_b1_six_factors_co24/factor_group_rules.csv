@@ -1,0 +1,7 @@
+factor,lo,hi,n,separable
+breakout_hold_30,0.0,0.0,42045,False
+breakout_support_breach_atr,0.0,0.38691566689697854,11167,True
+pullback_relative_volume,0.5726829014300021,1.2534968353537537,35890,True
+pullback_recovery,0.0,0.5,36193,True
+late_positive_move_share,0.0764780818509705,0.230947993904782,42038,True
+vwap_support_30,0.9,1.0,42045,True

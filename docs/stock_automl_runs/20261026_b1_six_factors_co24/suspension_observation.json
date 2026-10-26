@@ -1,0 +1,22 @@
+{
+  "signal_date": "2025-08-19",
+  "symbol6": "300486",
+  "planned_exit_date": "2025-08-20",
+  "arms": [
+    "C_pullback",
+    "E13"
+  ],
+  "next_day_raw_minute_rows": 0,
+  "daily_volume_20250820_22": [
+    0,
+    0,
+    0
+  ],
+  "daily_close_20250819_22": [
+    23.03,
+    23.03,
+    23.03,
+    23.03
+  ],
+  "interpretation": "No executable 09:40 exit observed; daily zero-volume rows corroborate a trading suspension. No delayed exit or capital occupation simulation performed."
+}
