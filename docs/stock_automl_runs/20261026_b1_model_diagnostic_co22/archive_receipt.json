@@ -1,0 +1,25 @@
+{
+  "user_id": "imac",
+  "experiment_id": "CO22_20261026_B1_model_value_audit",
+  "experiment_date": "2026-10-26",
+  "title": "CO22 原七因子模型区分度与目标诊断",
+  "category_path": "01_时间稳定性_七因子基线",
+  "local_path": "/Volumes/ext/fin_agent/outputs/stock_automl/aliyun_drive_local/策略训练/收盘开盘_20261014/01_时间稳定性_七因子基线/20261026_CO22_七因子_模型区分度与目标诊断",
+  "cloud_path": "策略训练/收盘开盘_20261014/01_时间稳定性_七因子基线/20261026_CO22_七因子_模型区分度与目标诊断",
+  "source_commit": "fbc2f2c019a54fd064136490eee4849ebd9c0498",
+  "manifest_sha256": "4c476a884a9b11dc8cde85550cba162e1975e0643d62f82956af4ccfd2f9bc72",
+  "file_count": 24,
+  "local_check": "ok",
+  "db_recorded": true,
+  "cloud_verified_at": null,
+  "cloud_status": "待同步；遵照用户先保留本地包的安排",
+  "parent_model": {
+    "experiment_id": "CO7_20261015_B1_conditional_risk",
+    "zip_sha256": "274f5b41c7e7a1dfe53868cb4de6105e06fe1b155feef3b640777fa5f2b004ae",
+    "manifest_sha256": "ac013d7020087b14ca2cc6ed43ae4d87ceb2c9c7aa992db32243aadc57348570",
+    "cloud_directory": "策略训练/收盘开盘_20261014/02_联合目标与尾部风险/20261015_CO7_原B1折外TopK_二阶段风险",
+    "local_source": "/Users/cyrcyrisis/work/fin_agent/outputs/stock_automl/close_open_conditional_b1_r1",
+    "source_commit": "fbc2f2c019a54fd064136490eee4849ebd9c0498",
+    "new_training": false
+  }
+}
