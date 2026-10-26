@@ -1,0 +1,364 @@
+{
+  "scope": "Local archive summary screening and selected transcript review; no new media listening, trading, factor computation or backtest",
+  "index_rows": 575,
+  "organized_rows": 131,
+  "deep_read_transcripts": 24,
+  "source_index_sha256": "4651b913d117a6369468073fe1e40d71a3f29fd21cb05cf0b00f0f3c9dfc1468",
+  "inventory": [
+    {
+      "author": "猎人X",
+      "basis": "页面线索",
+      "count": 17
+    },
+    {
+      "author": "猎人X",
+      "basis": "音轨与画面",
+      "count": 61
+    },
+    {
+      "author": "老庞财经",
+      "basis": "音轨与画面",
+      "count": 28
+    },
+    {
+      "author": "老庞财经",
+      "basis": "页面线索",
+      "count": 8
+    },
+    {
+      "author": "竹间老王",
+      "basis": "页面线索",
+      "count": 40
+    },
+    {
+      "author": "张素芬",
+      "basis": "页面线索",
+      "count": 21
+    },
+    {
+      "author": "张素芬",
+      "basis": "音轨与画面",
+      "count": 32
+    },
+    {
+      "author": "张素芬",
+      "basis": "仅画面",
+      "count": 1
+    },
+    {
+      "author": "bike770",
+      "basis": "页面线索",
+      "count": 89
+    },
+    {
+      "author": "bike770",
+      "basis": "音轨与画面",
+      "count": 5
+    },
+    {
+      "author": "晓玉说",
+      "basis": "音轨与画面",
+      "count": 5
+    },
+    {
+      "author": "晓玉说",
+      "basis": "平台摘要",
+      "count": 231
+    },
+    {
+      "author": "晓玉说",
+      "basis": "仅元信息",
+      "count": 37
+    }
+  ],
+  "source_files": [
+    {
+      "path": "docs/research/douyin/猎人X/7698308110968016166/metadata.json",
+      "sha256": "669bf3ea80bef18b5aeffecb009da33ef2ed4c75c8aa30b8fd6cc2b174c16bb1"
+    },
+    {
+      "path": "docs/research/douyin/猎人X/7698308110968016166/transcript.md",
+      "sha256": "63b18469b457dc21b6c3db725a3a7b4f6d33b93366d5f97147a9e643c9df5674"
+    },
+    {
+      "path": "docs/research/douyin/猎人X/7698308110968016166/analysis.md",
+      "sha256": "7d80fcef3266223d758e0ac910ceb72adf306fed3d1a14c89466251ffc28439e"
+    },
+    {
+      "path": "docs/research/douyin/猎人X/7698946434829143338/metadata.json",
+      "sha256": "243a81fd6adbcf82079022638be84ceb93b51de69340e7e6e2afa701c19714a0"
+    },
+    {
+      "path": "docs/research/douyin/猎人X/7698946434829143338/transcript.md",
+      "sha256": "f40d0690e6b0fabf900e77145b2c2c198d3a842c8a5857ff1d85a554e751d4e4"
+    },
+    {
+      "path": "docs/research/douyin/猎人X/7698946434829143338/analysis.md",
+      "sha256": "bbf3f891785544ad8fdcb942104c976e8e144e56a23bbe269efaa2a7fcb0d2de"
+    },
+    {
+      "path": "docs/research/douyin/猎人X/7696093496209427727/metadata.json",
+      "sha256": "eaaf10253fe84974a54c3c8561447c8c91492bad442efeaf000ed1d8fe8e6eac"
+    },
+    {
+      "path": "docs/research/douyin/猎人X/7696093496209427727/transcript.md",
+      "sha256": "4fbe174c72059830a95ca3fb6ee470f4bc39cd26ace1bece80118e796d0ec4be"
+    },
+    {
+      "path": "docs/research/douyin/猎人X/7696093496209427727/analysis.md",
+      "sha256": "7b01f6a3af1eda06652ce5b07912234d3aedc63b6c5b80faaa9b5e4c42a97294"
+    },
+    {
+      "path": "docs/research/douyin/猎人X/7690835606829681974/metadata.json",
+      "sha256": "a13276e550129aad258c5827e9d6dd7919bf98e4babd70055b7b6a996f87491e"
+    },
+    {
+      "path": "docs/research/douyin/猎人X/7690835606829681974/transcript.md",
+      "sha256": "01bb52d7608cb01bcb1bc35ab34b0629540230225754c4450590c744abaf4a7b"
+    },
+    {
+      "path": "docs/research/douyin/猎人X/7690835606829681974/analysis.md",
+      "sha256": "e41a9acc997f7a86fafaca6de9847806ed6ac66e89083c54f3f063c735694379"
+    },
+    {
+      "path": "docs/research/douyin/猎人X/7696694986720496915/metadata.json",
+      "sha256": "df7865527445d962f0c4efe92cdb6c1003944705e5a471da1d781abfc76303fd"
+    },
+    {
+      "path": "docs/research/douyin/猎人X/7696694986720496915/transcript.md",
+      "sha256": "a98121b66b10edec73681287578f6c568194711f42de5ee441b008a978210d71"
+    },
+    {
+      "path": "docs/research/douyin/猎人X/7696694986720496915/analysis.md",
+      "sha256": "9ec278f50bf0a5dcdfa013cba810becaca1dc69863f67ddb61c4b687cbfb51ae"
+    },
+    {
+      "path": "docs/research/douyin/猎人X/7696695216857763072/metadata.json",
+      "sha256": "2764fabc6cbd5c06a210a6e14020b7f9cc7b25f87d900416733690e6c2368585"
+    },
+    {
+      "path": "docs/research/douyin/猎人X/7696695216857763072/transcript.md",
+      "sha256": "6751484b3a1f267efa1c77303fd8936f04897819b62ed37a4a62c141fc79a166"
+    },
+    {
+      "path": "docs/research/douyin/猎人X/7696695216857763072/analysis.md",
+      "sha256": "91089bd4d6536f87ae89564a207f9de5aef351acade19bb0282fc529b858d286"
+    },
+    {
+      "path": "docs/research/douyin/猎人X/7699750811580009766/metadata.json",
+      "sha256": "558e11c90479184442be77da0b7a784f2509269070ac2afcf158fe04db674724"
+    },
+    {
+      "path": "docs/research/douyin/猎人X/7699750811580009766/transcript.md",
+      "sha256": "51d1aa57a07f6470da05ffd655a5b827363ed3945cfad058ebf3ed81acaf7e8f"
+    },
+    {
+      "path": "docs/research/douyin/猎人X/7699750811580009766/analysis.md",
+      "sha256": "0f47ece551f9306d8bf3b72c2dafce08f6cd13f3188756dfe0eba5c9969ceeb6"
+    },
+    {
+      "path": "docs/research/douyin/猎人X/7699747551662066984/metadata.json",
+      "sha256": "6d497e8fa97720e0a0d2353742ee25b5990379809cdbc5c2454f39e5ec7a532d"
+    },
+    {
+      "path": "docs/research/douyin/猎人X/7699747551662066984/transcript.md",
+      "sha256": "6e46b6c26818ee7e117cdaeb5e673d20e33d334218c7caa607af740c106d4759"
+    },
+    {
+      "path": "docs/research/douyin/猎人X/7699747551662066984/analysis.md",
+      "sha256": "8b7084a9058a7492fc71112d24e4d85b27b6462441c4cb9c317dad6bd1cf0d2b"
+    },
+    {
+      "path": "docs/research/douyin/猎人X/7699748166173789481/metadata.json",
+      "sha256": "3283a6f761cdc4daaf041dac52058f51ef7baf72400ede10f8e252f19766e71a"
+    },
+    {
+      "path": "docs/research/douyin/猎人X/7699748166173789481/transcript.md",
+      "sha256": "4a58684c0f948a1ed177804eadefac18b34449488d8f94bea1e99048070320c2"
+    },
+    {
+      "path": "docs/research/douyin/猎人X/7699748166173789481/analysis.md",
+      "sha256": "e5bb40a31e25f0fd048b5da35928193a8b7acff7d445c03fa85f453144acfd97"
+    },
+    {
+      "path": "docs/research/douyin/猎人X/7694595408936455478/metadata.json",
+      "sha256": "217a639d1d16187ef6a13b733294ec1d203639672dd60e58e21c8a93590f0d34"
+    },
+    {
+      "path": "docs/research/douyin/猎人X/7694595408936455478/transcript.md",
+      "sha256": "0c83c80ac7af31bba8e718816b2b8e94a7090a7ea41f669e33cd70f896e86b11"
+    },
+    {
+      "path": "docs/research/douyin/猎人X/7694595408936455478/analysis.md",
+      "sha256": "d45aa799bf9c62532296e913bbda867f42d58e8f07bdf2669b8d1c72865c38ce"
+    },
+    {
+      "path": "docs/research/douyin/老庞财经/7696367217042148634/metadata.json",
+      "sha256": "e583676668c982a1681f4cff49595746224222756a84b20f9742916707916e83"
+    },
+    {
+      "path": "docs/research/douyin/老庞财经/7696367217042148634/transcript.md",
+      "sha256": "dbe908a1378058a630c691ae08726097176bf2c9708d2377d620f7061a40321d"
+    },
+    {
+      "path": "docs/research/douyin/老庞财经/7696367217042148634/analysis.md",
+      "sha256": "b74ef549111806631f7d4132269d13ddcf38cc0eda541f05a5b4ee2f5e232944"
+    },
+    {
+      "path": "docs/research/douyin/老庞财经/7690798422500183315/metadata.json",
+      "sha256": "fdee65b593dec7471a403b48edba7e680c49029bf4e3b2178995a973ab906f14"
+    },
+    {
+      "path": "docs/research/douyin/老庞财经/7690798422500183315/transcript.md",
+      "sha256": "40ab7579b13a6fe36353e15b78a16f3f0f11a8935f4a53fece9e2738d2ee72f1"
+    },
+    {
+      "path": "docs/research/douyin/老庞财经/7690798422500183315/analysis.md",
+      "sha256": "473d4447e6c0fd7427cdc417ee16a51b312fe5f86d23af37a4d5c17f219bc0c1"
+    },
+    {
+      "path": "docs/research/douyin/老庞财经/7697480872425049359/metadata.json",
+      "sha256": "81cbdf3a28dd9f8b4233918b9901982910f6b3040d8a9564782ce6eec7b71d0b"
+    },
+    {
+      "path": "docs/research/douyin/老庞财经/7697480872425049359/transcript.md",
+      "sha256": "62ad3362fcd5280b93ed275937249ec1aeddb0bedc57b3812720a4b9ee0e7b39"
+    },
+    {
+      "path": "docs/research/douyin/老庞财经/7697480872425049359/analysis.md",
+      "sha256": "e83e81b30f174736d09f741fd36c488bb4b30a228277f5826207af8eeca3e7d2"
+    },
+    {
+      "path": "docs/research/douyin/老庞财经/7696695841884556571/metadata.json",
+      "sha256": "96326e5f9d9381cfa11d930cb3cdc06f7bb87ebff5b11b2aba1ee09eb19c5a8e"
+    },
+    {
+      "path": "docs/research/douyin/老庞财经/7696695841884556571/transcript.md",
+      "sha256": "d67d4f26f897a51f1eff240326d0184a381d83833ef6ea05c122c55cb8ff577b"
+    },
+    {
+      "path": "docs/research/douyin/老庞财经/7696695841884556571/analysis.md",
+      "sha256": "5608fda83b81718cf3ce6ccb7f672d7909b7b468c21a2d5fec104300b64cc562"
+    },
+    {
+      "path": "docs/research/douyin/老庞财经/7700047175878806799/metadata.json",
+      "sha256": "98c735cbe58f1f777958d5a24449485448f788b4ae64c0a269d399540cf9d945"
+    },
+    {
+      "path": "docs/research/douyin/老庞财经/7700047175878806799/transcript.md",
+      "sha256": "6a4dbe8d32b1d048bc9f76f65688b7b2a4f8d786f04d9a1a10537720b72592d0"
+    },
+    {
+      "path": "docs/research/douyin/老庞财经/7700047175878806799/analysis.md",
+      "sha256": "8c82056b9bf0f8b2779836c5880cff4c401e4a926a06d275f77840ab25caeaa5"
+    },
+    {
+      "path": "docs/research/douyin/张素芬/7693494917435297078/metadata.json",
+      "sha256": "cf1de76793016b94bff83fe7289d07742229d0680cafdfb69d2288fb31d207ce"
+    },
+    {
+      "path": "docs/research/douyin/张素芬/7693494917435297078/transcript.md",
+      "sha256": "c3ed6d16efb8f66c286631edc7f8cf2b3aaccde81e5338cec3d6e445e2a89981"
+    },
+    {
+      "path": "docs/research/douyin/张素芬/7693494917435297078/analysis.md",
+      "sha256": "ea4464701fb7cc931d80808b4369d860aed1cf5d49dd5b0ec2a30ae5ee92b0cc"
+    },
+    {
+      "path": "docs/research/douyin/张素芬/7693142310552341798/metadata.json",
+      "sha256": "3ac69c75f797fc38d60fd3a158bacf5b4914ce176c2d04742f5fc62bf0b6ed8f"
+    },
+    {
+      "path": "docs/research/douyin/张素芬/7693142310552341798/transcript.md",
+      "sha256": "ddcd6df02efe1f36cb6f415af05c7da9c213ec46ea6ef528cf8a9cc99391a62a"
+    },
+    {
+      "path": "docs/research/douyin/张素芬/7693142310552341798/analysis.md",
+      "sha256": "a45038decec43c1a70eceeeb1870aafc4b8a212b0721691aad39f21b0aceee15"
+    },
+    {
+      "path": "docs/research/douyin/张素芬/7688281886526885155/metadata.json",
+      "sha256": "83501bbb7501cfa4e64af91cdb70a9044736fd590b80da9f2f479a00941ca848"
+    },
+    {
+      "path": "docs/research/douyin/张素芬/7688281886526885155/transcript.md",
+      "sha256": "cb0234b57d497e5d03ee9ddaf484444cdb62bf33a73c088a7d64c354a7e00df1"
+    },
+    {
+      "path": "docs/research/douyin/张素芬/7688281886526885155/analysis.md",
+      "sha256": "23afe5787b5ef205e7c72275730d67a1fc293b46907c04401eb7f42baec810bb"
+    },
+    {
+      "path": "docs/research/douyin/bike770/7682011161609930570/metadata.json",
+      "sha256": "937d9144e1b1583345016f854f774982521be521b2bb84c646a01522c1529705"
+    },
+    {
+      "path": "docs/research/douyin/bike770/7682011161609930570/transcript.md",
+      "sha256": "69a07b59a2263149d0805c0e1eb4f04641c639ae79524cf8ceac32938d525ebc"
+    },
+    {
+      "path": "docs/research/douyin/bike770/7682011161609930570/analysis.md",
+      "sha256": "984a76cc393d223706b6285c408eeeeff83754e2146340e98fd97b925470fa63"
+    },
+    {
+      "path": "docs/research/douyin/晓玉说/7690253708537384207/metadata.json",
+      "sha256": "5157c9904e1d1299ac944dd0dbe8bf24faaf55cebf0c4bf9d59f98348caf6302"
+    },
+    {
+      "path": "docs/research/douyin/晓玉说/7690253708537384207/transcript.md",
+      "sha256": "16430df9f791062f9fdd005f1e52308c39e9f3bc56d80d366e30667cdf9051e8"
+    },
+    {
+      "path": "docs/research/douyin/晓玉说/7690253708537384207/analysis.md",
+      "sha256": "0a66a723cd0b33df64249b9ba00cd05158a610b39028c50e059adf52378c56a3"
+    },
+    {
+      "path": "docs/research/douyin/猎人X/7690464163948203279/metadata.json",
+      "sha256": "ad41f7a5386e28e7fc9b2188680f7a705e7d3e9c39a6dff1da42ced519b9b7eb"
+    },
+    {
+      "path": "docs/research/douyin/猎人X/7690464163948203279/transcript.md",
+      "sha256": "d9014600a67ed6931898208c6bc7cc69a41954b302ce529e2c96289f7160d405"
+    },
+    {
+      "path": "docs/research/douyin/猎人X/7690464163948203279/analysis.md",
+      "sha256": "27bf366e3dab47049886688e699d4c788af555db3c2f01a973316a8f44747b8c"
+    },
+    {
+      "path": "docs/research/douyin/猎人X/7696062540702321971/metadata.json",
+      "sha256": "adc3bb127d989c87ebf296bb57a052b18eaa997ea2ac1ec7da47ead768aa70d9"
+    },
+    {
+      "path": "docs/research/douyin/猎人X/7696062540702321971/transcript.md",
+      "sha256": "15e1ac02cbbe05b69467440ecccd8201e4e77736cd1694981c336230940c4953"
+    },
+    {
+      "path": "docs/research/douyin/猎人X/7696062540702321971/analysis.md",
+      "sha256": "0edca2562270042f25e5d42e89864760e5d0c30e01ebb23755c158fc84da7f67"
+    },
+    {
+      "path": "docs/research/douyin/猎人X/7696065511506939151/metadata.json",
+      "sha256": "5d3f5eafb8b185588e2370eb685a4f1164ce571656e7bf7d753a603180a62d26"
+    },
+    {
+      "path": "docs/research/douyin/猎人X/7696065511506939151/transcript.md",
+      "sha256": "686b54ec2acead26ac3ab60cfafcb649d1784022abb432889c9b24a34fbdcde6"
+    },
+    {
+      "path": "docs/research/douyin/猎人X/7696065511506939151/analysis.md",
+      "sha256": "1b7e09daeba3294318b14a0adf3d344f286713cf837c52ec51fbd6e81ee0c7f9"
+    },
+    {
+      "path": "docs/research/douyin/张素芬/7684189874542366003/metadata.json",
+      "sha256": "861f3c8e03b959f1875b37505ba89d07b01f558f585de7b8d505722b6aeb5a65"
+    },
+    {
+      "path": "docs/research/douyin/张素芬/7684189874542366003/transcript.md",
+      "sha256": "d0191b931aa4a5a439da0fb963dcccd4d7e3747fd1c8cd06ce7dae91407f8064"
+    },
+    {
+      "path": "docs/research/douyin/张素芬/7684189874542366003/analysis.md",
+      "sha256": "e66acb49c0752a5e08c1b5b9cef30f259fcf0fb3a47cf459e13d7d71f58193e5"
+    }
+  ]
+}
