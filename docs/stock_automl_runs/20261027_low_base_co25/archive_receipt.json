@@ -1,0 +1,16 @@
+{
+  "user_id": "imac",
+  "experiment_id": "CO25_20261027_low_base",
+  "experiment_date": "2026-10-27",
+  "title": "CO25 低位蓄势规则与二三日简单预测",
+  "category_path": "03_因子筛选_7至14",
+  "local_path": "/Volumes/ext/fin_agent/outputs/stock_automl/aliyun_drive_local/策略训练/收盘开盘_20261014/03_因子筛选_7至14/20261027_CO25_低位蓄势_二三日涨幅",
+  "cloud_path": "策略训练/收盘开盘_20261014/03_因子筛选_7至14/20261027_CO25_低位蓄势_二三日涨幅",
+  "source_commit": "d1665df6afbf9d39a51645836b7938addf853810",
+  "manifest_sha256": "7b3ff4a49ba305779926e552ef70ea212d05133371c85605d641683e8d8c1310",
+  "file_count": 114,
+  "local_check": "ok",
+  "db_recorded": true,
+  "cloud_verified_at": null,
+  "cloud_status": "待同步；用户要求先保留本地包"
+}
