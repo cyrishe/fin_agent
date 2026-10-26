@@ -1,0 +1,12 @@
+{
+  "experiment_id": "CO20_20261026_B1R_extended_factor_screen",
+  "source_commit": "2eaa97fa90b33b6166f55b12920d70a2cb847f3c",
+  "local_path": "/Volumes/ext/fin_agent/outputs/stock_automl/aliyun_drive_local/策略训练/收盘开盘_20261014/03_因子筛选_7至14/20261026_CO20_B1R_14个月_个股因子筛选",
+  "cloud_path": "策略训练/收盘开盘_20261014/03_因子筛选_7至14/20261026_CO20_B1R_14个月_个股因子筛选",
+  "manifest_sha256": "d3697ad8e6a9b19db00da34ed4ed83b19aa60e4b87376ac2323a2cab0b45fdc6",
+  "file_count": 13,
+  "local_check": "ok",
+  "db_recorded": true,
+  "cloud_verified_at": null,
+  "cloud_status": "待同步；遵照用户先保留本地包的安排"
+}

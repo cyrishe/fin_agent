@@ -1,0 +1,12 @@
+{
+  "experiment_id": "CO21_20261026_B1R_early_extension",
+  "source_commit": "2eaa97fa90b33b6166f55b12920d70a2cb847f3c",
+  "local_path": "/Volumes/ext/fin_agent/outputs/stock_automl/aliyun_drive_local/策略训练/收盘开盘_20261014/01_时间稳定性_七因子基线/20261026_CO21_B1R_20个月_早期冻结回测",
+  "cloud_path": "策略训练/收盘开盘_20261014/01_时间稳定性_七因子基线/20261026_CO21_B1R_20个月_早期冻结回测",
+  "manifest_sha256": "2a6797a182767a89ed57f991a0af19b6e6c409fcade1cb6d2b3bb227f1dd3ad1",
+  "file_count": 13,
+  "local_check": "ok",
+  "db_recorded": true,
+  "cloud_verified_at": null,
+  "cloud_status": "待同步；遵照用户先保留本地包的安排"
+}
