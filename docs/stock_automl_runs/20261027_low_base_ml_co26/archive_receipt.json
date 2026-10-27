@@ -1,0 +1,21 @@
+{
+  "user_id": "imac",
+  "experiment_id": "CO26_20261027_low_base_ml",
+  "experiment_date": "2026-10-27",
+  "title": "CO26 宽低位样本涨跌三分类及时间前推",
+  "category_path": "03_因子筛选_7至14",
+  "local_path": "/Volumes/ext/fin_agent/outputs/stock_automl/aliyun_drive_local/策略训练/收盘开盘_20261014/03_因子筛选_7至14/20261027_CO26_宽低位三分类前推",
+  "cloud_path": "策略训练/收盘开盘_20261014/03_因子筛选_7至14/20261027_CO26_宽低位三分类前推",
+  "source_commit": "39f23b1a4388151785f42e89908f05bf7a2a416f",
+  "manifest_sha256": "b5c0f03644a8dc36eb9922510ab53780e616fe006492692fa6d40c2eb122d5be",
+  "file_count": 242,
+  "db_recorded": true,
+  "cloud_verified": false,
+  "database_readback_verified": true,
+  "local_package_readback_verified": true,
+  "cloud_verified_at": null,
+  "models": 66,
+  "training_windows": 42,
+  "prediction_cutoff": "2026-09-30",
+  "tests_passed": 4
+}
