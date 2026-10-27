@@ -8,7 +8,7 @@ from scripts.train_low_base_co26 import splits,labels
 R=Path('outputs/stock_automl/low_base_rf_co27_20261027');P=Path('outputs/stock_automl/low_base_ml_co26_20261027');D=Path('docs/stock_automl_runs/20261027_low_base_rf_co27')
 
 def metrics(y,p):
- return dict(n=len(y),accuracy=float(accuracy_score(y,np.array([-1,0,1])[p.argmax(axis=1)])),logloss=float(log_loss(y,p,labels=[-1,0,1])),up_auc=float(roc_auc_score(y==1,p[:,2])) if len(np.unique(y==1))==2 else None,down_auc=float(roc_auc_score(y==-1,p[:,0])) if len(np.unique(y==-1))==2 else None)
+ return dict(n=len(y),down_rate=float((y==-1).mean()),middle_rate=float((y==0).mean()),up_rate=float((y==1).mean()),majority_baseline=float(max((y==-1).mean(),(y==0).mean(),(y==1).mean())),accuracy=float(accuracy_score(y,np.array([-1,0,1])[p.argmax(axis=1)])),logloss=float(log_loss(y,p,labels=[-1,0,1])),up_auc=float(roc_auc_score(y==1,p[:,2])) if len(np.unique(y==1))==2 else None,down_auc=float(roc_auc_score(y==-1,p[:,0])) if len(np.unique(y==-1))==2 else None)
 
 def main():
  sample=pd.read_parquet(P/'samples.parquet');months=json.loads((R/'complete.json').read_text())['months'];rows=[];importance=[]
@@ -29,6 +29,6 @@ def main():
     importance.extend(dict(phase=phase,month=m,horizon=h,factor=name,split_importance=float(value)) for name,value in zip(bundle['features'],model.feature_importances_))
     print(m,h,flush=True)
  diag=pd.DataFrame(rows);diag.to_csv(D/'fit_diagnostics.csv',index=False);imp=pd.DataFrame(importance);imp.to_csv(D/'rf_feature_importance.csv',index=False)
- sm=diag.groupby(['phase','horizon','kind']).agg(folds=('month','count'),sample_rows=('n','sum'),accuracy=('accuracy','mean'),logloss=('logloss','mean'),up_auc=('up_auc','mean'),down_auc=('down_auc','mean'),oob_trees=('mean_trees','mean')).reset_index();sm.to_csv(D/'fit_diagnostics_summary.csv',index=False)
+ sm=diag.groupby(['phase','horizon','kind']).agg(folds=('month','count'),sample_rows=('n','sum'),accuracy=('accuracy','mean'),majority_baseline=('majority_baseline','mean'),down_rate=('down_rate','mean'),up_rate=('up_rate','mean'),logloss=('logloss','mean'),up_auc=('up_auc','mean'),down_auc=('down_auc','mean'),oob_trees=('mean_trees','mean')).reset_index();sm.to_csv(D/'fit_diagnostics_summary.csv',index=False)
  ims=imp.groupby(['phase','horizon','factor']).split_importance.agg(folds='count',mean='mean',median='median').reset_index();ims.sort_values(['phase','horizon','mean'],ascending=[True,True,False]).to_csv(D/'rf_feature_importance_summary.csv',index=False);print(sm.to_string(index=False))
 if __name__=='__main__':main()

@@ -1,0 +1,8 @@
+{
+  "months": 21,
+  "models": 42,
+  "members_match_co26": true,
+  "temporal_maturity_verified": true,
+  "sampled_prediction_readback": true,
+  "bootstrap_fraction": 0.1
+}
