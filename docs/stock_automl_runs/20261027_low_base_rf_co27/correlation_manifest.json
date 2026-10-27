@@ -1,0 +1,33 @@
+{
+  "source_sha256": "6f3dadcac8dc5a57da3058e40eaede6a9da275c451bc139f86b39f6b34eb4c6b",
+  "factors": [
+    "position60",
+    "return5",
+    "return20",
+    "ma5_slope3",
+    "range5",
+    "tr_contraction",
+    "volume_contraction",
+    "close_location",
+    "excess5",
+    "log_amount20",
+    "return1",
+    "return3",
+    "return10",
+    "position20",
+    "position120",
+    "volatility20",
+    "close_ma20",
+    "volume1_prior20",
+    "open_gap",
+    "body",
+    "upper_shadow",
+    "lower_shadow"
+  ],
+  "pooled_method": "Pearson pairwise nonmissing (stock-day weighted)",
+  "label_method": "daily Spearman: feature ranks vs net return ranks; feature rank vs binary +/-2% labels",
+  "daily_rows": 29216,
+  "candidate_days": 666,
+  "ic_days": 664,
+  "code_sha256": "c28fc4598b75e42f24c7f459380983af8a49b0299c8343d1192db304b19f2124"
+}

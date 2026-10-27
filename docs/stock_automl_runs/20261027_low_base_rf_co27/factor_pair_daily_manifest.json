@@ -1,0 +1,7 @@
+{
+  "source_sha256": "6f3dadcac8dc5a57da3058e40eaede6a9da275c451bc139f86b39f6b34eb4c6b",
+  "days": 664,
+  "rows": 153384,
+  "method": "Daily within-L candidate-pool Spearman, then date-equal mean; pairwise nonmissing, minimum 30 stocks",
+  "code_sha256": "3b014d362d93dc87c4d619768aeb65a98b23da4798d0e857183d73641fa1d04b"
+}
