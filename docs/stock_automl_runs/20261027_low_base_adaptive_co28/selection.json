@@ -1,0 +1,42 @@
+{
+  "2": {
+    "common_days": 189,
+    "chosen": "long_lr",
+    "validation_mean_net": {
+      "logistic": 0.003996917259348564,
+      "long_lr": 0.008245365803252257,
+      "rank_lr": 0.003169680147707414,
+      "rank_rf": 0.0021174688843631126,
+      "relative_lr": 0.0027924312763489318,
+      "rf": 0.0028952495243670705,
+      "short_lr": 0.00321228108129016,
+      "state_lr": 0.001819566130811954,
+      "state_rf": 0.0021588197477772145
+    },
+    "validation_cutoff": "2026-01-01",
+    "compared_existing": [
+      "logistic",
+      "rf"
+    ]
+  },
+  "3": {
+    "common_days": 187,
+    "chosen": "long_lr",
+    "validation_mean_net": {
+      "logistic": 0.007128734276075907,
+      "long_lr": 0.012039156154853643,
+      "rank_lr": 0.007336895147840039,
+      "rank_rf": 0.006390815400391181,
+      "relative_lr": 0.008354791662991483,
+      "rf": 0.0029785156404375603,
+      "short_lr": 0.005831362415528521,
+      "state_lr": 0.0074783605246060555,
+      "state_rf": 0.004369906838228083
+    },
+    "validation_cutoff": "2026-01-01",
+    "compared_existing": [
+      "logistic",
+      "rf"
+    ]
+  }
+}
