@@ -1,0 +1,26 @@
+{
+  "selected_models": {
+    "2": "logistic",
+    "3": "logistic"
+  },
+  "validation": {
+    "2": {
+      "common_days": 203,
+      "average_daily_excess": {
+        "logistic": 0.0026204651287529955,
+        "hgb": 0.002110589454492091
+      }
+    },
+    "3": {
+      "common_days": 208,
+      "average_daily_excess": {
+        "logistic": 0.0038521769903283073,
+        "hgb": 0.0023854334256790217
+      }
+    }
+  },
+  "design_sha256": "8d72b44690ac65ef4b95120d7f439ce2ab76b0003008345f10cc9d61361db20c",
+  "samples_sha256": "6f3dadcac8dc5a57da3058e40eaede6a9da275c451bc139f86b39f6b34eb4c6b",
+  "label_maturity_cutoff": "2026-01-01",
+  "selection_rule": "paired daily Top3 net excess vs same-day pool, maximum; fixed model order for tie"
+}

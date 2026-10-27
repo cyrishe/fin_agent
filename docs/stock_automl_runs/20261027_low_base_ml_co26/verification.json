@@ -1,0 +1,15 @@
+{
+  "models_verified": 66,
+  "membership_windows_verified": 42,
+  "daily_rank_checks": 296,
+  "input_verify": {
+    "stratified_rows": 120,
+    "feature_values": 1440,
+    "features_match": true,
+    "future_price_perturbation_unchanged": true,
+    "known_net_returns_match": true,
+    "test_count": 4
+  },
+  "tests_passed": 4,
+  "selection_cutoff": "2026-01-01"
+}

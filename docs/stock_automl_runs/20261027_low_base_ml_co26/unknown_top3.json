@@ -1,0 +1,34 @@
+[
+  {
+    "horizon": 2,
+    "days": 181,
+    "slots": 543,
+    "unknown_slots": 27,
+    "days_with_unknown": 23,
+    "assumed_-5pct_mean": -0.009819616060635411,
+    "assumed_+5pct_mean": -0.004847240370027677,
+    "pool_net_on_same_days": -0.0018598215097401583,
+    "known_only_slot_mean": -0.007717154110319823,
+    "reasons": {
+      "entry_one_price": 20,
+      "suspected_exit_lock": 6,
+      "other_missing_path": 1
+    }
+  },
+  {
+    "horizon": 3,
+    "days": 181,
+    "slots": 543,
+    "unknown_slots": 30,
+    "days_with_unknown": 21,
+    "assumed_-5pct_mean": -0.012199352674669192,
+    "assumed_+5pct_mean": -0.006674490796216153,
+    "pool_net_on_same_days": -0.002044453612105882,
+    "known_only_slot_mean": -0.009988788503597216,
+    "reasons": {
+      "entry_one_price": 14,
+      "suspected_exit_lock": 11,
+      "other_missing_path": 5
+    }
+  }
+]
