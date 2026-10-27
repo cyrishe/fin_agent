@@ -11,7 +11,8 @@ def daily(s,model,h):
  out=[]
  for day,g in s.groupby('date',sort=True):
   g=g.sort_values(['score','stk_code'],ascending=[False,True]);p=g.net.dropna();t=g.head(3);v=t.net.dropna();first=g.iloc[0]
-  row=dict(date=day,month=day[:7],model=model,horizon=h,pool_candidates=len(g),pool_known=len(p),pool_unknown=int(g.net.isna().sum()),pool_net=p.mean(),pool_up=(p.round(10)>.02).mean(),pool_down=(p.round(10)<-.02).mean(),top1=first.stk_code,top1_net=first.net,top3_n_known=len(v),top3_net=v.mean() if len(v)==3 else np.nan,top3_up=(v.round(10)>.02).mean() if len(v)==3 else np.nan,top3_down=(v.round(10)<-.02).mean() if len(v)==3 else np.nan,top3_symbols=','.join(t.stk_code.astype(str)))
+  ends=g.label_end.dropna().unique();assert len(ends)<=1
+  row=dict(date=day,label_end=str(ends[0]) if len(ends) else None,month=day[:7],model=model,horizon=h,pool_candidates=len(g),pool_known=len(p),pool_unknown=int(g.net.isna().sum()),pool_net=p.mean(),pool_up=(p.round(10)>.02).mean(),pool_down=(p.round(10)<-.02).mean(),top1=first.stk_code,top1_net=first.net,top3_n_known=len(v),top3_net=v.mean() if len(v)==3 else np.nan,top3_up=(v.round(10)>.02).mean() if len(v)==3 else np.nan,top3_down=(v.round(10)<-.02).mean() if len(v)==3 else np.nan,top3_symbols=','.join(t.stk_code.astype(str)))
   out.append(row)
  return pd.DataFrame(out)
 
@@ -23,6 +24,9 @@ def summarize(df,period):
   base.update(days=len(g),paired_top3_days=len(z),paired_top1_days=len(one),candidate_mean=g.pool_candidates.mean(),pool_known=int(g.pool_known.sum()),pool_unknown=int(g.pool_unknown.sum()),top3_net=z.top3_net.mean(),pool_net=z.pool_net.mean(),top3_net_excess=(z.top3_net-z.pool_net).mean(),top3_up=z.top3_up.mean(),pool_up=z.pool_up.mean(),top3_down=z.top3_down.mean(),pool_down=z.pool_down.mean(),top1_net=one.top1_net.mean(),top1_net_excess=(one.top1_net-one.pool_net).mean(),top1_up=(one.top1_net.round(10)>.02).mean(),top1_down=(one.top1_net.round(10)<-.02).mean())
   rows.append(base)
  return pd.DataFrame(rows)
+
+def selection_eligible(df, cutoff='2026-01-01'):
+ return df[df.label_end.notna() & df.label_end.lt(cutoff)].copy()
 
 def main():
  p=argparse.ArgumentParser();p.add_argument('phase',choices=['validation','test']);a=p.parse_args();complete=json.loads((R/f'{a.phase}_complete.json').read_text());chosen=json.loads((R/'selection.json').read_text())['selected_models'] if a.phase=='test' else None
@@ -40,12 +44,13 @@ def main():
  if a.phase=='validation':
   selected={}; comparisons={}
   for h in [2,3]:
-   vals=df[(df.horizon==h)&df.model.isin(MODELS)].pivot(index='date',columns='model',values='top3_net');common=vals.dropna().index
-   subset=df[(df.horizon==h)&df.model.isin(MODELS)&df.date.isin(common)].copy()
+   available=selection_eligible(df)
+   vals=available[(available.horizon==h)&available.model.isin(MODELS)].pivot(index='date',columns='model',values='top3_net');common=vals.dropna().index
+   subset=available[(available.horizon==h)&available.model.isin(MODELS)&available.date.isin(common)].copy()
    assert len(subset)==2*len(common)
    values={n:float((subset[subset.model.eq(n)].top3_net-subset[subset.model.eq(n)].pool_net).mean()) for n in MODELS}
    selected[str(h)]=max(MODELS,key=lambda n:(values[n],-MODELS.index(n)));comparisons[str(h)]=dict(common_days=len(common),average_daily_excess=values)
-  selection=dict(selected_models=selected,validation=comparisons,design_sha256=complete['design_sha256'],samples_sha256=complete['samples_sha256'],selection_rule='paired daily Top3 net excess vs same-day pool, maximum; fixed model order for tie')
+  selection=dict(selected_models=selected,validation=comparisons,design_sha256=complete['design_sha256'],samples_sha256=complete['samples_sha256'],label_maturity_cutoff='2026-01-01',selection_rule='paired daily Top3 net excess vs same-day pool, maximum; fixed model order for tie')
   (R/'selection.json').write_text(json.dumps(selection,ensure_ascii=False,indent=2));(D/'selection.json').write_text(json.dumps(selection,ensure_ascii=False,indent=2));print(json.dumps(selection,ensure_ascii=False,indent=2))
  print(overall.to_string(index=False),flush=True)
 if __name__=='__main__':main()

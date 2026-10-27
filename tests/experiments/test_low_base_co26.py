@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 from scripts.train_low_base_co26 import labels,splits
-from scripts.evaluate_low_base_co26 import daily
+from scripts.evaluate_low_base_co26 import daily,selection_eligible
 
 def test_mature_labels_and_training_window_do_not_cross_test():
  d=pd.DataFrame({'date':['2024-06-30','2024-07-01','2024-12-29','2024-12-30','2025-01-02'],
@@ -16,9 +16,14 @@ def test_middle_class_is_kept_at_boundaries():
  assert labels([-.021,-.02,0,.02,.021]).tolist()==[-1,0,0,0,1]
 
 def test_unknown_outcome_never_becomes_zero_or_changes_ranking():
- s=pd.DataFrame({'date':['2025-01-02']*4,'stk_code':['a','b','c','d'],'score':[.5,.4,.3,.2],'net':[.01,np.nan,-.01,.03]})
+ s=pd.DataFrame({'date':['2025-01-02']*4,'stk_code':['a','b','c','d'],'score':[.5,.4,.3,.2],'net':[.01,np.nan,-.01,.03],'label_end':['2025-01-06']*4})
  a=daily(s,'x',2).iloc[0]
  assert a.top3_symbols=='a,b,c' and a.top3_n_known==2 and np.isnan(a.top3_net)
  s.loc[0,'net']=-100
  b=daily(s,'x',2).iloc[0]
  assert b.top3_symbols==a.top3_symbols and b.pool_unknown==1
+
+
+def test_validation_choice_excludes_labels_maturing_in_test_year():
+ d=pd.DataFrame({'label_end':['2025-12-31','2026-01-05',None],'value':[1,100,10]})
+ assert selection_eligible(d).value.tolist()==[1]
