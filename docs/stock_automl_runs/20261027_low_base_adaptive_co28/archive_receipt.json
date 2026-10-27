@@ -1,0 +1,21 @@
+{
+  "user_id": "imac",
+  "experiment_id": "CO28_20261027_low_base_adaptive",
+  "experiment_date": "2026-10-27",
+  "title": "CO28 低位因子分位、市场状态与滚动窗口",
+  "category_path": "03_因子筛选_7至14",
+  "local_path": "/Volumes/ext/fin_agent/outputs/stock_automl/aliyun_drive_local/策略训练/收盘开盘_20261014/03_因子筛选_7至14/20261027_CO28_低位因子分位与市场状态",
+  "cloud_path": "策略训练/收盘开盘_20261014/03_因子筛选_7至14/20261027_CO28_低位因子分位与市场状态",
+  "source_commit": "cc9800c175db1c8229912936d70aae1cd8d39b8e",
+  "manifest_sha256": "052aa968e80e78cda6b0810f5cb6c487279b3102af5f550053074b5290981b31",
+  "file_count": 633,
+  "db_recorded": true,
+  "cloud_verified": false,
+  "local_readback": true,
+  "database_readback": true,
+  "cloud_verified_at": null,
+  "models_verified": 294,
+  "months": 21,
+  "independent_feature_and_label_checks": 108,
+  "production_changed": false
+}
