@@ -21,7 +21,7 @@ def summarize(df,period):
  rows=[]
  for key,g in df.groupby(groups,sort=True):
   z=g[g.top3_net.notna()&g.pool_net.notna()];one=g[g.top1_net.notna()&g.pool_net.notna()];base=dict(zip(groups,key if isinstance(key,tuple) else (key,)))
-  base.update(days=len(g),paired_top3_days=len(z),paired_top1_days=len(one),candidate_mean=g.pool_candidates.mean(),pool_known=int(g.pool_known.sum()),pool_unknown=int(g.pool_unknown.sum()),top3_net=z.top3_net.mean(),pool_net=z.pool_net.mean(),top3_net_excess=(z.top3_net-z.pool_net).mean(),top3_up=z.top3_up.mean(),pool_up=z.pool_up.mean(),top3_down=z.top3_down.mean(),pool_down=z.pool_down.mean(),top1_net=one.top1_net.mean(),top1_net_excess=(one.top1_net-one.pool_net).mean(),top1_up=(one.top1_net.round(10)>.02).mean(),top1_down=(one.top1_net.round(10)<-.02).mean())
+  base.update(days=len(g),paired_top3_days=len(z),paired_top1_days=len(one),candidate_mean=g.pool_candidates.mean(),pool_known=int(g.pool_known.sum()),pool_unknown=int(g.pool_unknown.sum()),top3_net=z.top3_net.mean(),pool_net=z.pool_net.mean(),top3_net_excess=(z.top3_net-z.pool_net).mean(),top3_up=z.top3_up.mean(),pool_up=z.pool_up.mean(),top3_down=z.top3_down.mean(),pool_down=z.pool_down.mean(),top1_net=one.top1_net.mean(),top1_net_excess=(one.top1_net-one.pool_net).mean(),top1_up=(one.top1_net.round(10)>.02).mean(),top1_down=(one.top1_net.round(10)<-.02).mean(),top1_pool_up=one.pool_up.mean(),top1_pool_down=one.pool_down.mean())
   rows.append(base)
  return pd.DataFrame(rows)
 
@@ -39,7 +39,9 @@ def main():
     s=pd.read_parquet(folder/f'{name}_h{h}_scores.parquet');days.append(daily(s,name,h))
    # Independent, predetermined lower-position ranking on exactly the same candidate rows.
    s['score']=-s.position60;days.append(daily(s,'lowest_position',h))
- df=pd.concat(days,ignore_index=True);df.to_csv(R/f'{a.phase}_daily.csv.gz',index=False)
+ df=pd.concat(days,ignore_index=True)
+ if a.phase=='validation':df=selection_eligible(df)
+ df.to_csv(R/f'{a.phase}_daily.csv.gz',index=False)
  overall=summarize(df,'overall');monthly=summarize(df,'month');overall.to_csv(D/f'{a.phase}_overall.csv',index=False);monthly.to_csv(D/f'{a.phase}_monthly.csv',index=False)
  if a.phase=='validation':
   selected={}; comparisons={}
