@@ -1,0 +1,21 @@
+{
+  "user_id": "imac",
+  "experiment_id": "CO27_20261027_low_base_rf",
+  "experiment_date": "2026-10-27",
+  "title": "CO27 宽低位随机森林、滚动窗口及因子相关",
+  "category_path": "03_因子筛选_7至14",
+  "local_path": "/Volumes/ext/fin_agent/outputs/stock_automl/aliyun_drive_local/策略训练/收盘开盘_20261014/03_因子筛选_7至14/20261027_CO27_低位随机森林与因子相关",
+  "cloud_path": "策略训练/收盘开盘_20261014/03_因子筛选_7至14/20261027_CO27_低位随机森林与因子相关",
+  "source_commit": "fa71113fe7c8d61729654ad4f54861a2afa1a3e3",
+  "manifest_sha256": "17cf14d9277051368a3b68976d69e61aa53da99d3c889f09dca6b0eb6763efcc",
+  "file_count": 206,
+  "db_recorded": true,
+  "cloud_verified": false,
+  "local_readback": true,
+  "database_readback": true,
+  "cloud_verified_at": null,
+  "models_verified": 42,
+  "months": 21,
+  "correlation_checks": 66,
+  "tests_passed": 5
+}
