@@ -1,0 +1,390 @@
+{
+  "sample_counts": {
+    "train": 120,
+    "validation": 39,
+    "test": 115,
+    "sep_test": 20
+  },
+  "threshold": 0.65,
+  "feature_count": {
+    "morning": 40,
+    "prior": 4
+  },
+  "shallow_tree_rule": "|--- log_volume_5 <= 13.11\n|   |--- log_amount_4 <= 13.59\n|   |   |--- value: [0.30]\n|   |--- log_amount_4 >  13.59\n|   |   |--- value: [-0.26]\n|--- log_volume_5 >  13.11\n|   |--- first6_range_pct <= 3.31\n|   |   |--- value: [0.37]\n|   |--- first6_range_pct >  3.31\n|   |   |--- value: [0.93]\n",
+  "shape_counts": {
+    "2025_top1": {
+      "起伏/其他": 56,
+      "持续走低": 47,
+      "持续升高": 30,
+      "冲高回落": 26
+    },
+    "2026_top1": {
+      "持续升高": 31,
+      "持续走低": 29,
+      "起伏/其他": 29,
+      "冲高回落": 26
+    },
+    "2026_sep_top1": {
+      "冲高回落": 5,
+      "持续升高": 5,
+      "持续走低": 5,
+      "起伏/其他": 5
+    }
+  },
+  "splits": {
+    "2025_validation": {
+      "shape_accuracy": 0.512821,
+      "shape_balanced_accuracy": 0.490873,
+      "shape_confusion": {
+        "持续升高": {
+          "持续升高": 4,
+          "冲高回落": 1,
+          "持续走低": 0,
+          "起伏/其他": 0
+        },
+        "冲高回落": {
+          "持续升高": 2,
+          "冲高回落": 4,
+          "持续走低": 0,
+          "起伏/其他": 0
+        },
+        "持续走低": {
+          "持续升高": 1,
+          "冲高回落": 0,
+          "持续走低": 1,
+          "起伏/其他": 3
+        },
+        "起伏/其他": {
+          "持续升高": 3,
+          "冲高回落": 1,
+          "持续走低": 8,
+          "起伏/其他": 11
+        }
+      },
+      "always_0937_open": {
+        "samples": 39,
+        "early_exits": 39,
+        "baseline_mean_pct": 0.083177,
+        "policy_mean_pct": 0.052185,
+        "paired_improvement_pctpt": -0.030992,
+        "total_improvement_pctpt": -1.2087,
+        "early_wins": 24,
+        "early_losses": 15,
+        "early_delta_median_pctpt": 0.07328
+      },
+      "prefix_rule": {
+        "samples": 39,
+        "early_exits": 15,
+        "baseline_mean_pct": 0.083177,
+        "policy_mean_pct": 0.221975,
+        "paired_improvement_pctpt": 0.138798,
+        "total_improvement_pctpt": 5.413111,
+        "early_wins": 10,
+        "early_losses": 5,
+        "early_delta_median_pctpt": 0.420644
+      },
+      "morning_model": {
+        "samples": 39,
+        "early_exits": 6,
+        "baseline_mean_pct": 0.083177,
+        "policy_mean_pct": 0.042394,
+        "paired_improvement_pctpt": -0.040783,
+        "total_improvement_pctpt": -1.590521,
+        "early_wins": 3,
+        "early_losses": 3,
+        "early_delta_median_pctpt": -0.132565
+      },
+      "morning_plus_prior": {
+        "samples": 39,
+        "early_exits": 6,
+        "baseline_mean_pct": 0.083177,
+        "policy_mean_pct": 0.052553,
+        "paired_improvement_pctpt": -0.030624,
+        "total_improvement_pctpt": -1.194324,
+        "early_wins": 4,
+        "early_losses": 2,
+        "early_delta_median_pctpt": 0.065533
+      },
+      "rolling_plus_prior": {
+        "samples": 39,
+        "early_exits": 6,
+        "baseline_mean_pct": 0.083177,
+        "policy_mean_pct": 0.071276,
+        "paired_improvement_pctpt": -0.011901,
+        "total_improvement_pctpt": -0.464132,
+        "early_wins": 4,
+        "early_losses": 2,
+        "early_delta_median_pctpt": 0.06724
+      },
+      "shallow_tree_exploratory": {
+        "samples": 39,
+        "early_exits": 12,
+        "baseline_mean_pct": 0.083177,
+        "policy_mean_pct": -0.00871,
+        "paired_improvement_pctpt": -0.091887,
+        "total_improvement_pctpt": -3.583606,
+        "early_wins": 6,
+        "early_losses": 6,
+        "early_delta_median_pctpt": -0.124949
+      },
+      "direct_gain_exploratory": {
+        "samples": 39,
+        "early_exits": 4,
+        "baseline_mean_pct": 0.083177,
+        "policy_mean_pct": 0.053225,
+        "paired_improvement_pctpt": -0.029952,
+        "total_improvement_pctpt": -1.168137,
+        "early_wins": 2,
+        "early_losses": 2,
+        "early_delta_median_pctpt": -0.150062
+      },
+      "shape_to_exit": {
+        "samples": 39,
+        "early_exits": 11,
+        "baseline_mean_pct": 0.083177,
+        "policy_mean_pct": -0.079938,
+        "paired_improvement_pctpt": -0.163115,
+        "total_improvement_pctpt": -6.361482,
+        "early_wins": 6,
+        "early_losses": 5,
+        "early_delta_median_pctpt": 0.0612
+      }
+    },
+    "2026_test": {
+      "shape_accuracy": 0.452174,
+      "shape_balanced_accuracy": 0.462522,
+      "shape_confusion": {
+        "持续升高": {
+          "持续升高": 3,
+          "冲高回落": 6,
+          "持续走低": 0,
+          "起伏/其他": 1
+        },
+        "冲高回落": {
+          "持续升高": 22,
+          "冲高回落": 16,
+          "持续走低": 0,
+          "起伏/其他": 2
+        },
+        "持续走低": {
+          "持续升高": 0,
+          "冲高回落": 1,
+          "持续走低": 22,
+          "起伏/其他": 15
+        },
+        "起伏/其他": {
+          "持续升高": 6,
+          "冲高回落": 3,
+          "持续走低": 7,
+          "起伏/其他": 11
+        }
+      },
+      "always_0937_open": {
+        "samples": 115,
+        "early_exits": 115,
+        "baseline_mean_pct": 0.127752,
+        "policy_mean_pct": -0.109711,
+        "paired_improvement_pctpt": -0.237463,
+        "total_improvement_pctpt": -27.308281,
+        "early_wins": 49,
+        "early_losses": 65,
+        "early_delta_median_pctpt": -0.15674
+      },
+      "prefix_rule": {
+        "samples": 115,
+        "early_exits": 43,
+        "baseline_mean_pct": 0.127752,
+        "policy_mean_pct": 0.11391,
+        "paired_improvement_pctpt": -0.013843,
+        "total_improvement_pctpt": -1.591905,
+        "early_wins": 19,
+        "early_losses": 23,
+        "early_delta_median_pctpt": -0.046773
+      },
+      "morning_model": {
+        "samples": 115,
+        "early_exits": 26,
+        "baseline_mean_pct": 0.127752,
+        "policy_mean_pct": 0.03486,
+        "paired_improvement_pctpt": -0.092892,
+        "total_improvement_pctpt": -10.682585,
+        "early_wins": 9,
+        "early_losses": 17,
+        "early_delta_median_pctpt": -0.290392
+      },
+      "morning_plus_prior": {
+        "samples": 115,
+        "early_exits": 36,
+        "baseline_mean_pct": 0.127752,
+        "policy_mean_pct": 0.030812,
+        "paired_improvement_pctpt": -0.09694,
+        "total_improvement_pctpt": -11.148128,
+        "early_wins": 13,
+        "early_losses": 23,
+        "early_delta_median_pctpt": -0.290392
+      },
+      "rolling_plus_prior": {
+        "samples": 115,
+        "early_exits": 15,
+        "baseline_mean_pct": 0.127752,
+        "policy_mean_pct": 0.035465,
+        "paired_improvement_pctpt": -0.092287,
+        "total_improvement_pctpt": -10.613033,
+        "early_wins": 4,
+        "early_losses": 11,
+        "early_delta_median_pctpt": -0.540335
+      },
+      "shallow_tree_exploratory": {
+        "samples": 115,
+        "early_exits": 67,
+        "baseline_mean_pct": 0.127752,
+        "policy_mean_pct": 0.008521,
+        "paired_improvement_pctpt": -0.119231,
+        "total_improvement_pctpt": -13.711607,
+        "early_wins": 31,
+        "early_losses": 36,
+        "early_delta_median_pctpt": -0.083403
+      },
+      "direct_gain_exploratory": {
+        "samples": 115,
+        "early_exits": 25,
+        "baseline_mean_pct": 0.127752,
+        "policy_mean_pct": 0.161218,
+        "paired_improvement_pctpt": 0.033466,
+        "total_improvement_pctpt": 3.848593,
+        "early_wins": 14,
+        "early_losses": 11,
+        "early_delta_median_pctpt": 0.197044
+      },
+      "shape_to_exit": {
+        "samples": 115,
+        "early_exits": 78,
+        "baseline_mean_pct": 0.127752,
+        "policy_mean_pct": -0.115568,
+        "paired_improvement_pctpt": -0.24332,
+        "total_improvement_pctpt": -27.981808,
+        "early_wins": 31,
+        "early_losses": 47,
+        "early_delta_median_pctpt": -0.262997
+      }
+    },
+    "2026_sep_test": {
+      "shape_accuracy": 0.45,
+      "shape_balanced_accuracy": 0.45,
+      "shape_confusion": {
+        "持续升高": {
+          "持续升高": 0,
+          "冲高回落": 0,
+          "持续走低": 0,
+          "起伏/其他": 0
+        },
+        "冲高回落": {
+          "持续升高": 1,
+          "冲高回落": 2,
+          "持续走低": 0,
+          "起伏/其他": 0
+        },
+        "持续走低": {
+          "持续升高": 0,
+          "冲高回落": 0,
+          "持续走低": 3,
+          "起伏/其他": 1
+        },
+        "起伏/其他": {
+          "持续升高": 4,
+          "冲高回落": 3,
+          "持续走低": 2,
+          "起伏/其他": 4
+        }
+      },
+      "always_0937_open": {
+        "samples": 20,
+        "early_exits": 20,
+        "baseline_mean_pct": 0.984472,
+        "policy_mean_pct": 0.667056,
+        "paired_improvement_pctpt": -0.317416,
+        "total_improvement_pctpt": -6.348326,
+        "early_wins": 9,
+        "early_losses": 11,
+        "early_delta_median_pctpt": -0.256425
+      },
+      "prefix_rule": {
+        "samples": 20,
+        "early_exits": 4,
+        "baseline_mean_pct": 0.984472,
+        "policy_mean_pct": 0.893588,
+        "paired_improvement_pctpt": -0.090884,
+        "total_improvement_pctpt": -1.817689,
+        "early_wins": 1,
+        "early_losses": 3,
+        "early_delta_median_pctpt": -0.633091
+      },
+      "morning_model": {
+        "samples": 20,
+        "early_exits": 2,
+        "baseline_mean_pct": 0.984472,
+        "policy_mean_pct": 1.02242,
+        "paired_improvement_pctpt": 0.037948,
+        "total_improvement_pctpt": 0.758965,
+        "early_wins": 2,
+        "early_losses": 0,
+        "early_delta_median_pctpt": 0.379482
+      },
+      "morning_plus_prior": {
+        "samples": 20,
+        "early_exits": 3,
+        "baseline_mean_pct": 0.984472,
+        "policy_mean_pct": 1.103043,
+        "paired_improvement_pctpt": 0.118571,
+        "total_improvement_pctpt": 2.371417,
+        "early_wins": 3,
+        "early_losses": 0,
+        "early_delta_median_pctpt": 0.47089
+      },
+      "rolling_plus_prior": {
+        "samples": 20,
+        "early_exits": 0,
+        "baseline_mean_pct": 0.984472,
+        "policy_mean_pct": 0.984472,
+        "paired_improvement_pctpt": 0.0,
+        "total_improvement_pctpt": 0.0,
+        "early_wins": 0,
+        "early_losses": 0,
+        "early_delta_median_pctpt": null
+      },
+      "shallow_tree_exploratory": {
+        "samples": 20,
+        "early_exits": 11,
+        "baseline_mean_pct": 0.984472,
+        "policy_mean_pct": 0.811133,
+        "paired_improvement_pctpt": -0.173339,
+        "total_improvement_pctpt": -3.466777,
+        "early_wins": 5,
+        "early_losses": 6,
+        "early_delta_median_pctpt": -0.179516
+      },
+      "direct_gain_exploratory": {
+        "samples": 20,
+        "early_exits": 1,
+        "baseline_mean_pct": 0.984472,
+        "policy_mean_pct": 1.012529,
+        "paired_improvement_pctpt": 0.028057,
+        "total_improvement_pctpt": 0.561141,
+        "early_wins": 1,
+        "early_losses": 0,
+        "early_delta_median_pctpt": 0.561141
+      },
+      "shape_to_exit": {
+        "samples": 20,
+        "early_exits": 7,
+        "baseline_mean_pct": 0.984472,
+        "policy_mean_pct": 0.978534,
+        "paired_improvement_pctpt": -0.005938,
+        "total_improvement_pctpt": -0.118768,
+        "early_wins": 5,
+        "early_losses": 2,
+        "early_delta_median_pctpt": 0.197824
+      }
+    }
+  }
+}

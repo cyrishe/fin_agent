@@ -1,0 +1,87 @@
+{
+  "tree": {
+    "max_depth": 7,
+    "min_samples_leaf": 10,
+    "random_state": 42
+  },
+  "development_dates": 14,
+  "validation_dates": 5,
+  "strict_leaf_folds": 7,
+  "strict_leaf_test_candidates": 11,
+  "strict_leaf_test_ge1": 7,
+  "strict_leaf_test_ge1_fraction": 0.6363636363636364,
+  "pool_ge1_fraction": 0.3862230396254807,
+  "arms": {
+    "baseline19": {
+      "trade_days": 20,
+      "second_high_counts": {
+        "ge3": 8,
+        "1to3": 7,
+        "0to1": 3,
+        "lt0": 2
+      },
+      "sell_0940_counts": {
+        "ge3": 3,
+        "1to3": 6,
+        "0to1": 5,
+        "lt0": 6
+      },
+      "same_as_baseline_days": 20
+    },
+    "rare_only": {
+      "trade_days": 3,
+      "second_high_counts": {
+        "ge3": 1,
+        "1to3": 1,
+        "0to1": 1,
+        "lt0": 0
+      },
+      "sell_0940_counts": {
+        "ge3": 0,
+        "1to3": 2,
+        "0to1": 0,
+        "lt0": 1
+      },
+      "same_as_baseline_days": 0
+    },
+    "rare_priority_all": {
+      "trade_days": 20,
+      "second_high_counts": {
+        "ge3": 8,
+        "1to3": 8,
+        "0to1": 2,
+        "lt0": 2
+      },
+      "sell_0940_counts": {
+        "ge3": 2,
+        "1to3": 8,
+        "0to1": 5,
+        "lt0": 5
+      },
+      "same_as_baseline_days": 17
+    },
+    "rare_priority_class": {
+      "trade_days": 20,
+      "second_high_counts": {
+        "ge3": 8,
+        "1to3": 7,
+        "0to1": 3,
+        "lt0": 2
+      },
+      "sell_0940_counts": {
+        "ge3": 3,
+        "1to3": 6,
+        "0to1": 5,
+        "lt0": 6
+      },
+      "same_as_baseline_days": 19
+    }
+  },
+  "sources_sha256": {
+    "docs/stock_automl_runs/20261010_four_class_similar_days/prepared_candidates.csv.gz": "c0a4d1ea86c0ea7bbcb21d98cb8efe133efeaf8bd981ca0a86557e00bff00c08",
+    "docs/stock_automl_runs/20261010_four_class_baseline_recent20/minute_api_label_audit.csv": "d054e741e368093ef7b45a3b32da213ac1c0fb4ef944064bcdb3e67b2a2bb5f2",
+    "docs/stock_automl_runs/20261010_four_class_validated_pure_leaves/candidate_leaf_scores.csv.gz": "8fe4bec846f5afb78ac88dec4d8c46b96f775e8c4a07d1788e6ec64b5dd566a1",
+    "docs/stock_automl_runs/20261010_four_class_validated_pure_leaves/top1_verified.csv": "39cd497449046b1a06036b34ab4c9a84ffbe03de036117166b5135ebe8bb5776",
+    "/Users/imac/.codex/worktrees/automl-five-class/fin_agent/scripts/experiment_automl_rare_pure_leaves.py": "f58421a02c6441abd5aff5ecb40c1552b47dc3c071c17f5af30120215401032b"
+  }
+}

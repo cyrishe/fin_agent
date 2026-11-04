@@ -1,0 +1,33 @@
+{
+  "execution": "Observe each 1m close, fill at next 1m open; 09:40 exits at 09:40 close. Next open is another historical price proxy, not a proven fill.",
+  "results": {
+    "four_class_boosted": {
+      "bought": 39,
+      "mean_fill_return_pct": -0.11232323803151115,
+      "below_zero": 22,
+      "ending_cash": 96494.88,
+      "gross_cash_return": -0.0350512,
+      "max_daily_drawdown": -0.10262625053612216
+    },
+    "four_class_logistic": {
+      "bought": 40,
+      "mean_fill_return_pct": -1.0994980500962295,
+      "below_zero": 28,
+      "ending_cash": 79613.0,
+      "gross_cash_return": -0.20387,
+      "max_daily_drawdown": -0.20387
+    },
+    "previous_second_high_regression": {
+      "bought": 37,
+      "mean_fill_return_pct": 0.48951118083268036,
+      "below_zero": 16,
+      "ending_cash": 110383.9,
+      "gross_cash_return": 0.103839,
+      "max_daily_drawdown": -0.07464280126325382
+    }
+  },
+  "source_sha256": {
+    "docs/stock_automl_runs/20261010_staged_minute_exit/trades.csv": "fe34e5f108b7b33ecfefda2c8cb5fdb686a88418b6ea56890f15ef950127feac",
+    "docs/stock_automl_runs/20261010_staged_minute_exit/selected_morning_opens.csv.gz": "a9e9dab3f1a1520d72bb2d269f16aa5c744ffc87eea3cdfb3f85b248267fba3f"
+  }
+}

@@ -1,0 +1,44 @@
+{
+  "task": {
+    "task_id": "sch_cf83365b9d3e4306ad3bb6450a31b20a",
+    "requirement_brief": "训练一个策略，使用每日收盘最后30-5分钟的行情数据（即尾盘25分钟），结合公司的行业分类和基本面信息，预测次日开盘最可能高开的个股。要求输出候选股列表。",
+    "trigger": {},
+    "execution_plan": {
+      "schema_version": "scheduled_execution_plan.v1",
+      "steps": [
+        {
+          "depends_on": [],
+          "inputs": {
+            "requirement_brief": "训练一个策略，使用每日收盘最后30-5分钟的行情数据（即尾盘25分钟），结合公司的行业分类和基本面信息，预测次日开盘最可能高开的个股。要求输出候选股列表。"
+          },
+          "step_id": "step_1",
+          "target_ref": {
+            "kind": "tool",
+            "name": "stock_automl_research",
+            "version": "v1"
+          },
+          "type": "tool"
+        }
+      ]
+    },
+    "source_ref": "1791023377080"
+  },
+  "run": {
+    "run_id": "run_9691163811fb4c1e8e3ef4c86a7d0d8b",
+    "status": "failed",
+    "progress": {
+      "completed_steps": 0,
+      "message": "将用户要求落实到可执行研究参数",
+      "stage": "研究设计",
+      "step_id": "step_1",
+      "total_steps": 1
+    },
+    "error_text": "UnsupportedResearchRequirement: 暂不能执行以下明确要求：使用每日收盘最后30-5分钟（尾盘25分钟）的分钟级行情数据；当前引擎仅支持全天截至15:00的分钟聚合特征，不支持指定分钟窗口的特征提取。",
+    "started_at": "2026-10-03T10:29:56.349239+00:00",
+    "finished_at": "2026-10-03T10:30:16.176305+00:00",
+    "artifacts": []
+  },
+  "expected_source_fingerprint": "1efd4eb8403c75fed6cb4f98ca53789b4de6458ed024c4778e0002bd26753726",
+  "original_user_text_fingerprint_matches": true,
+  "stored_source_fingerprint": "1efd4eb8403c75fed6cb4f98ca53789b4de6458ed024c4778e0002bd26753726"
+}

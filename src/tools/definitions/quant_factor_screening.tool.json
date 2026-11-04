@@ -55,7 +55,12 @@
         "query": {
           "type": "string"
         },
-        "universe": {},
+        "universe": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
         "date_range": {
           "type": "object"
         },

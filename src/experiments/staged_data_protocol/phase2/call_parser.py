@@ -1,23 +1,73 @@
 from __future__ import annotations
 
 import re
+import ast
 from typing import Any, Dict, List
 
 from src.experiments.staged_data_protocol.phase2.models import ApiCall
 
 
 CALL_RE = re.compile(
-    r"^\s*(r\d+)\s*=\s*([A-Za-z_][\w]*(?:\.[A-Za-z_][\w]*){1,3})\s*\((.*)\)\s*->\s*(.+?)\s*$",
-    flags=re.DOTALL,
+    r"^\s*([A-Za-z_]\w*)\s*=\s*([A-Za-z_][\w]*(?:\.[A-Za-z_][\w]*){1,3})\s*\("
 )
+
+
+def _argument_span(raw: str):
+    match = CALL_RE.match(raw)
+    if not match:
+        raise ValueError(f"invalid API request string: {raw}")
+    # Find the invocation's own closing parenthesis. A greedy regex swallowed
+    # subsequent calls as arguments, producing misleading field/limit errors.
+    quote = ""
+    escaped = False
+    depth = 1
+    end = match.end()
+    for end in range(match.end(), len(raw)):
+        char = raw[end]
+        if quote:
+            if escaped:
+                escaped = False
+            elif char == "\\":
+                escaped = True
+            elif char == quote:
+                quote = ""
+        elif char in {"'", '"'}:
+            quote = char
+        elif char == "(":
+            depth += 1
+        elif char == ")":
+            depth -= 1
+            if depth == 0:
+                break
+    if depth or quote:
+        raise ValueError("invalid API request: unclosed argument list or quoted value")
+    return match, end
+
+
+def rewrite_argument_text(text: str, transform) -> str:
+    """Rewrite one known argument at an integration boundary, not its literals."""
+    raw = _strip_fence(text)
+    match, end = _argument_span(raw)
+    items = []
+    for item in _split_top_level(raw[match.end():end]):
+        key, separator, value = item.partition("=")
+        items.append(f"{key}={transform(key.strip(), value)}" if separator else item)
+    return raw[:match.end()] + ", ".join(items) + raw[end:]
 
 
 def parse_api_call(text: str) -> ApiCall:
     raw = _strip_fence(text)
-    match = CALL_RE.match(raw)
-    if not match:
-        raise ValueError(f"invalid API request string: {raw}")
-    result_id, api, args_text, outputs_text = match.groups()
+    match, end = _argument_span(raw)
+    result_id, api = match.groups()
+    args_text = raw[match.end():end]
+    tail = raw[end + 1:].strip()
+    if not tail.startswith("->"):
+        raise ValueError("invalid API request: expected -> output fields after argument list")
+    outputs_text = tail[2:].strip()
+    if not outputs_text:
+        raise ValueError("invalid API request: missing output fields")
+    if re.search(r"\b[A-Za-z_]\w*\s*=\s*[A-Za-z_]\w*(?:\.[A-Za-z_]\w*)+\s*\(", outputs_text):
+        raise ValueError("Exactly one API call is allowed per request; put each call in a separate steps[].request and use stepN.column references.")
     return ApiCall(
         result_id=result_id,
         api=api,
@@ -48,7 +98,10 @@ def _parse_value(value: str) -> Any:
     if re.fullmatch(r"-?\d+", value):
         return int(value)
     if (value.startswith('"') and value.endswith('"')) or (value.startswith("'") and value.endswith("'")):
-        return value[1:-1]
+        try:
+            return ast.literal_eval(value)
+        except (SyntaxError, ValueError):
+            return value[1:-1]  # Legacy unescaped inner quotes.
     return value
 
 
@@ -56,11 +109,16 @@ def _split_top_level(text: str) -> List[str]:
     rows: List[str] = []
     current: List[str] = []
     quote = ""
+    escaped = False
     depth = 0
     for char in text:
         if quote:
             current.append(char)
-            if char == quote:
+            if escaped:
+                escaped = False
+            elif char == "\\":
+                escaped = True
+            elif char == quote:
                 quote = ""
             continue
         if char in {"'", '"'}:

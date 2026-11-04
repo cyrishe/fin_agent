@@ -1,0 +1,70 @@
+{
+  "version": "kline_skill_methods_v1",
+  "description": "业务方法分阶段测试，合成证据，不提供真实图像或数据工具；不验证图片通道和全链路。复核标准不发送给模型。",
+  "cases": [
+    {
+      "id": "no_upload_needs_data",
+      "skill_id": "kline-analysis",
+      "references": ["references/input-and-time.md", "references/method.md"],
+      "question": "看看平安银行最近两周的K线，我没有截图，你直接帮我分析。",
+      "evidence": "已确认证券000001.SZ。当前是2026-09-29收盘后，用户指最近两个日历周。此隔离测试没有行情、图片或外部查询工具，也没有形态扫描结果。",
+      "review_criteria": ["不要求用户必须上传截图；说明具备授权查询时会主动取数", "区分搜索窗口与预热背景，不硬认定两周就是10根", "无工具时不编造已查询数据、形态、图或走势"]
+    },
+    {
+      "id": "incomplete_historical_upload",
+      "skill_id": "kline-analysis",
+      "references": ["references/input-and-time.md"],
+      "question": "帮我看这张K线图，还缺的信息你自己补。",
+      "evidence": "本测试只提供已有图像读取结果，不实际发送图片：证券为000001.SZ，日线，截图截止2026-08-14；能辨认近几根低点抬高，但成交面板被裁掉、复权未知。用户没有要求截至今天。当前无后续查询工具。",
+      "review_criteria": ["先解释有限可见结构，不冒称亲自看过原图", "补数目标对齐8月14日及日线，不擅自换今天", "不凭裁剪图断言放量、精确形态或关键价位"]
+    },
+    {
+      "id": "multiple_historical_patterns",
+      "skill_id": "kline-analysis",
+      "references": ["references/method.md"],
+      "question": "这只股票最近两周有什么形态，现在还值得注意吗？",
+      "evidence": "合成股票甲，已完成日线截至2026-09-28，同一调整口径。已提供确定性扫描与独立视觉复核记录：9月16日阳包阴符合；9月18日MACD金叉及其等价的柱体过零符合；9月23日另一个锤头候选视觉无法确认。16日结构低点20.0，24日收盘19.5已跌破，28日收盘19.7，仍未收复该低点。成交相对此前均量接近1，当前仍在下移区间，没有收益回测。当前无工具。",
+      "review_criteria": ["按日期与后续演变解释；历史成立不作今天继续看涨的证据", "金叉与柱体过零归并，不能三票看涨", "不延伸未确认锤头；综合普通下移区间；不凭空给胜率"]
+    },
+    {
+      "id": "complete_scan_no_pattern",
+      "skill_id": "kline-analysis",
+      "references": ["references/method.md"],
+      "question": "没有典型形态的话，还能怎么看？",
+      "evidence": "合成股票乙，同一已完成日线截至2026-09-28。指定形态库在目标窗口逐日扫描，预热与数据完整，0命中；本测试仅提供扫描记录，没有图像。已有确定性事实：近20日收盘在50至54区间，量能比过去20日范围0.9至1.1、当前1.0，未突破已记录区间边界。未提供其他指标。",
+      "review_criteria": ["正常做区间与量价分析，不强行命名形态或再调用视觉强找标签", "无命中限于指定库与窗口，不扩成一切形态不存在", "不将正常量能写成背离，不编造动量指标"]
+    },
+    {
+      "id": "visual_rejection",
+      "skill_id": "kline-analysis",
+      "references": ["references/visual-prompts.md", "references/method.md"],
+      "question": "看起来像阳包阴，这是不是反转了？",
+      "evidence": "合成股票丙。独立复核的同源事实：前根开盘113.61收盘114.86，程序判断前根阴线=false；当前为阳线。视觉复核明确不符合指定阳包阴。另有可用背景：近20日仍在震荡区间，当前无已确认突破。没有工具或图片。",
+      "review_criteria": ["停止阳包阴的反转含义解读，不附加假如成立推演", "解释前根是阳线及仍可据背景做震荡分析", "不让视觉相似覆盖必要条件失败"]
+    },
+    {
+      "id": "intraday_line_and_gap",
+      "skill_id": "kline-analysis",
+      "references": ["references/input-and-time.md", "references/method.md"],
+      "question": "看看现在分时是不是转弱了，顺便看看是不是出现吞没？",
+      "evidence": "合成股票丁。当前请求时刻14:40；已有分时价格曲线读图结果仅到14:30，近三段价格下移，成交节奏不明，没有每周期OHLC或分钟蜡烛，也没有补取工具。没有典型形态扫描结果。",
+      "review_criteria": ["只说明截至14:30局部走弱，不称14:40最新", "分时线不足以确认吞没；未扫描不写成0命中", "不把日内走弱外推日线反转"]
+    },
+    {
+      "id": "relative_defensive",
+      "skill_id": "relative-strength-analysis",
+      "references": ["references/method.md"],
+      "question": "这只股这两周强吗，和行业以及沪深300比呢？",
+      "evidence": "合成股票戊，与用户指定沪深300和经核实行业指数对齐2026-09-14至2026-09-28有效收盘，均为价格收益口径。工具已计算：股票-2%，行业-5%，沪深300-4%，收益差分别+3与+2个百分点。没有beta、行业参与宽度或归因模型。",
+      "review_criteria": ["绝对下跌与相对抗跌区分，不称上涨", "收益差用百分点，不叫alpha、显著超额或证明独立资金推动", "不编造市场宽度、行业排名或因果"]
+    },
+    {
+      "id": "missing_benchmark",
+      "skill_id": "relative-strength-analysis",
+      "references": ["references/method.md"],
+      "question": "结合行业和大盘，判断这个突破有多可靠。",
+      "evidence": "合成股票己，已确认用户关注本周日线。个股价格突破上周区间，但成交仅为近20日均量0.9倍；同窗口宽基有效数据缺失。仅有一个同行昨日涨2%，没有对应区间收益、行业成分或行业指数。当前无工具。",
+      "review_criteria": ["基准未完成不阻断个股已有分析", "不把单个同行昨日涨幅当成本周行业表现", "不量化突破可靠性概率，不伪称完成相对比较"]
+    }
+  ]
+}

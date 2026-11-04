@@ -1,0 +1,1907 @@
+{
+  "split_counts": {
+    "train": 120,
+    "validation": 39,
+    "2026_feb_jul": 115,
+    "2026_sep": 20
+  },
+  "architecture": "1D Conv(6->12,k2), Conv(12->12,k2), flattened, dense24, dropout0.35; AdamW, up to 100 epochs; 2025 validation early stop",
+  "market_definition": "Shanghai/Shenzhen A shares with 09:31 open and 09:36 close; equal-weight change, rising share, first-six-minute amount",
+  "seeds": [
+    0,
+    1,
+    2,
+    3,
+    4
+  ],
+  "configurations": {
+    "cnn_sequence": [
+      {
+        "seed": 0,
+        "best_epoch": 2,
+        "splits": {
+          "train": {
+            "samples": 120,
+            "accuracy": 0.35,
+            "balanced_accuracy": 0.25,
+            "predicted_down": 0,
+            "correct_down": 0,
+            "down_precision": null,
+            "down_recall": 0.0
+          },
+          "validation": {
+            "samples": 39,
+            "accuracy": 0.358974,
+            "balanced_accuracy": 0.25,
+            "predicted_down": 0,
+            "correct_down": 0,
+            "down_precision": null,
+            "down_recall": 0.0
+          },
+          "2026_feb_jul": {
+            "samples": 115,
+            "accuracy": 0.252174,
+            "balanced_accuracy": 0.25,
+            "predicted_down": 0,
+            "correct_down": 0,
+            "down_precision": null,
+            "down_recall": 0.0
+          },
+          "2026_sep": {
+            "samples": 20,
+            "accuracy": 0.25,
+            "balanced_accuracy": 0.25,
+            "predicted_down": 0,
+            "correct_down": 0,
+            "down_precision": null,
+            "down_recall": 0.0
+          }
+        }
+      },
+      {
+        "seed": 1,
+        "best_epoch": 97,
+        "splits": {
+          "train": {
+            "samples": 120,
+            "accuracy": 0.633333,
+            "balanced_accuracy": 0.598997,
+            "predicted_down": 36,
+            "correct_down": 25,
+            "down_precision": 0.694444,
+            "down_recall": 0.657895
+          },
+          "validation": {
+            "samples": 39,
+            "accuracy": 0.487179,
+            "balanced_accuracy": 0.425794,
+            "predicted_down": 5,
+            "correct_down": 2,
+            "down_precision": 0.4,
+            "down_recall": 0.222222
+          },
+          "2026_feb_jul": {
+            "samples": 115,
+            "accuracy": 0.356522,
+            "balanced_accuracy": 0.363042,
+            "predicted_down": 23,
+            "correct_down": 10,
+            "down_precision": 0.434783,
+            "down_recall": 0.344828
+          },
+          "2026_sep": {
+            "samples": 20,
+            "accuracy": 0.4,
+            "balanced_accuracy": 0.4,
+            "predicted_down": 3,
+            "correct_down": 2,
+            "down_precision": 0.666667,
+            "down_recall": 0.4
+          }
+        }
+      },
+      {
+        "seed": 2,
+        "best_epoch": 95,
+        "splits": {
+          "train": {
+            "samples": 120,
+            "accuracy": 0.675,
+            "balanced_accuracy": 0.651535,
+            "predicted_down": 41,
+            "correct_down": 30,
+            "down_precision": 0.731707,
+            "down_recall": 0.789474
+          },
+          "validation": {
+            "samples": 39,
+            "accuracy": 0.487179,
+            "balanced_accuracy": 0.452381,
+            "predicted_down": 9,
+            "correct_down": 3,
+            "down_precision": 0.333333,
+            "down_recall": 0.333333
+          },
+          "2026_feb_jul": {
+            "samples": 115,
+            "accuracy": 0.373913,
+            "balanced_accuracy": 0.379727,
+            "predicted_down": 37,
+            "correct_down": 17,
+            "down_precision": 0.459459,
+            "down_recall": 0.586207
+          },
+          "2026_sep": {
+            "samples": 20,
+            "accuracy": 0.4,
+            "balanced_accuracy": 0.4,
+            "predicted_down": 3,
+            "correct_down": 2,
+            "down_precision": 0.666667,
+            "down_recall": 0.4
+          }
+        }
+      },
+      {
+        "seed": 3,
+        "best_epoch": 100,
+        "splits": {
+          "train": {
+            "samples": 120,
+            "accuracy": 0.691667,
+            "balanced_accuracy": 0.671241,
+            "predicted_down": 46,
+            "correct_down": 32,
+            "down_precision": 0.695652,
+            "down_recall": 0.842105
+          },
+          "validation": {
+            "samples": 39,
+            "accuracy": 0.435897,
+            "balanced_accuracy": 0.354762,
+            "predicted_down": 6,
+            "correct_down": 3,
+            "down_precision": 0.5,
+            "down_recall": 0.333333
+          },
+          "2026_feb_jul": {
+            "samples": 115,
+            "accuracy": 0.33913,
+            "balanced_accuracy": 0.339277,
+            "predicted_down": 39,
+            "correct_down": 19,
+            "down_precision": 0.487179,
+            "down_recall": 0.655172
+          },
+          "2026_sep": {
+            "samples": 20,
+            "accuracy": 0.35,
+            "balanced_accuracy": 0.35,
+            "predicted_down": 4,
+            "correct_down": 2,
+            "down_precision": 0.5,
+            "down_recall": 0.4
+          }
+        }
+      },
+      {
+        "seed": 4,
+        "best_epoch": 100,
+        "splits": {
+          "train": {
+            "samples": 120,
+            "accuracy": 0.675,
+            "balanced_accuracy": 0.644987,
+            "predicted_down": 42,
+            "correct_down": 30,
+            "down_precision": 0.714286,
+            "down_recall": 0.789474
+          },
+          "validation": {
+            "samples": 39,
+            "accuracy": 0.333333,
+            "balanced_accuracy": 0.313889,
+            "predicted_down": 9,
+            "correct_down": 2,
+            "down_precision": 0.222222,
+            "down_recall": 0.222222
+          },
+          "2026_feb_jul": {
+            "samples": 115,
+            "accuracy": 0.373913,
+            "balanced_accuracy": 0.384936,
+            "predicted_down": 32,
+            "correct_down": 16,
+            "down_precision": 0.5,
+            "down_recall": 0.551724
+          },
+          "2026_sep": {
+            "samples": 20,
+            "accuracy": 0.35,
+            "balanced_accuracy": 0.35,
+            "predicted_down": 4,
+            "correct_down": 3,
+            "down_precision": 0.75,
+            "down_recall": 0.6
+          }
+        }
+      }
+    ],
+    "cnn_plus_1440": [
+      {
+        "seed": 0,
+        "best_epoch": 14,
+        "splits": {
+          "train": {
+            "samples": 120,
+            "accuracy": 0.408333,
+            "balanced_accuracy": 0.297932,
+            "predicted_down": 21,
+            "correct_down": 10,
+            "down_precision": 0.47619,
+            "down_recall": 0.263158
+          },
+          "validation": {
+            "samples": 39,
+            "accuracy": 0.333333,
+            "balanced_accuracy": 0.232143,
+            "predicted_down": 1,
+            "correct_down": 0,
+            "down_precision": 0.0,
+            "down_recall": 0.0
+          },
+          "2026_feb_jul": {
+            "samples": 115,
+            "accuracy": 0.269565,
+            "balanced_accuracy": 0.267241,
+            "predicted_down": 14,
+            "correct_down": 4,
+            "down_precision": 0.285714,
+            "down_recall": 0.137931
+          },
+          "2026_sep": {
+            "samples": 20,
+            "accuracy": 0.25,
+            "balanced_accuracy": 0.25,
+            "predicted_down": 0,
+            "correct_down": 0,
+            "down_precision": null,
+            "down_recall": 0.0
+          }
+        }
+      },
+      {
+        "seed": 1,
+        "best_epoch": 22,
+        "splits": {
+          "train": {
+            "samples": 120,
+            "accuracy": 0.441667,
+            "balanced_accuracy": 0.338596,
+            "predicted_down": 31,
+            "correct_down": 16,
+            "down_precision": 0.516129,
+            "down_recall": 0.421053
+          },
+          "validation": {
+            "samples": 39,
+            "accuracy": 0.282051,
+            "balanced_accuracy": 0.196429,
+            "predicted_down": 4,
+            "correct_down": 0,
+            "down_precision": 0.0,
+            "down_recall": 0.0
+          },
+          "2026_feb_jul": {
+            "samples": 115,
+            "accuracy": 0.252174,
+            "balanced_accuracy": 0.25,
+            "predicted_down": 21,
+            "correct_down": 5,
+            "down_precision": 0.238095,
+            "down_recall": 0.172414
+          },
+          "2026_sep": {
+            "samples": 20,
+            "accuracy": 0.25,
+            "balanced_accuracy": 0.25,
+            "predicted_down": 0,
+            "correct_down": 0,
+            "down_precision": null,
+            "down_recall": 0.0
+          }
+        }
+      },
+      {
+        "seed": 2,
+        "best_epoch": 25,
+        "splits": {
+          "train": {
+            "samples": 120,
+            "accuracy": 0.408333,
+            "balanced_accuracy": 0.296679,
+            "predicted_down": 12,
+            "correct_down": 8,
+            "down_precision": 0.666667,
+            "down_recall": 0.210526
+          },
+          "validation": {
+            "samples": 39,
+            "accuracy": 0.333333,
+            "balanced_accuracy": 0.232143,
+            "predicted_down": 1,
+            "correct_down": 0,
+            "down_precision": 0.0,
+            "down_recall": 0.0
+          },
+          "2026_feb_jul": {
+            "samples": 115,
+            "accuracy": 0.217391,
+            "balanced_accuracy": 0.215517,
+            "predicted_down": 13,
+            "correct_down": 0,
+            "down_precision": 0.0,
+            "down_recall": 0.0
+          },
+          "2026_sep": {
+            "samples": 20,
+            "accuracy": 0.2,
+            "balanced_accuracy": 0.2,
+            "predicted_down": 1,
+            "correct_down": 0,
+            "down_precision": 0.0,
+            "down_recall": 0.0
+          }
+        }
+      },
+      {
+        "seed": 3,
+        "best_epoch": 100,
+        "splits": {
+          "train": {
+            "samples": 120,
+            "accuracy": 0.7,
+            "balanced_accuracy": 0.682487,
+            "predicted_down": 41,
+            "correct_down": 30,
+            "down_precision": 0.731707,
+            "down_recall": 0.789474
+          },
+          "validation": {
+            "samples": 39,
+            "accuracy": 0.435897,
+            "balanced_accuracy": 0.39246,
+            "predicted_down": 6,
+            "correct_down": 2,
+            "down_precision": 0.333333,
+            "down_recall": 0.222222
+          },
+          "2026_feb_jul": {
+            "samples": 115,
+            "accuracy": 0.426087,
+            "balanced_accuracy": 0.427794,
+            "predicted_down": 28,
+            "correct_down": 15,
+            "down_precision": 0.535714,
+            "down_recall": 0.517241
+          },
+          "2026_sep": {
+            "samples": 20,
+            "accuracy": 0.35,
+            "balanced_accuracy": 0.35,
+            "predicted_down": 2,
+            "correct_down": 1,
+            "down_precision": 0.5,
+            "down_recall": 0.2
+          }
+        }
+      },
+      {
+        "seed": 4,
+        "best_epoch": 7,
+        "splits": {
+          "train": {
+            "samples": 120,
+            "accuracy": 0.341667,
+            "balanced_accuracy": 0.244048,
+            "predicted_down": 0,
+            "correct_down": 0,
+            "down_precision": null,
+            "down_recall": 0.0
+          },
+          "validation": {
+            "samples": 39,
+            "accuracy": 0.358974,
+            "balanced_accuracy": 0.25,
+            "predicted_down": 0,
+            "correct_down": 0,
+            "down_precision": null,
+            "down_recall": 0.0
+          },
+          "2026_feb_jul": {
+            "samples": 115,
+            "accuracy": 0.252174,
+            "balanced_accuracy": 0.25,
+            "predicted_down": 0,
+            "correct_down": 0,
+            "down_precision": null,
+            "down_recall": 0.0
+          },
+          "2026_sep": {
+            "samples": 20,
+            "accuracy": 0.2,
+            "balanced_accuracy": 0.2,
+            "predicted_down": 0,
+            "correct_down": 0,
+            "down_precision": null,
+            "down_recall": 0.0
+          }
+        }
+      }
+    ],
+    "cnn_plus_yesterday": [
+      {
+        "seed": 0,
+        "best_epoch": 13,
+        "splits": {
+          "train": {
+            "samples": 120,
+            "accuracy": 0.408333,
+            "balanced_accuracy": 0.297306,
+            "predicted_down": 17,
+            "correct_down": 9,
+            "down_precision": 0.529412,
+            "down_recall": 0.236842
+          },
+          "validation": {
+            "samples": 39,
+            "accuracy": 0.333333,
+            "balanced_accuracy": 0.251984,
+            "predicted_down": 6,
+            "correct_down": 2,
+            "down_precision": 0.333333,
+            "down_recall": 0.222222
+          },
+          "2026_feb_jul": {
+            "samples": 115,
+            "accuracy": 0.269565,
+            "balanced_accuracy": 0.267241,
+            "predicted_down": 33,
+            "correct_down": 8,
+            "down_precision": 0.242424,
+            "down_recall": 0.275862
+          },
+          "2026_sep": {
+            "samples": 20,
+            "accuracy": 0.3,
+            "balanced_accuracy": 0.3,
+            "predicted_down": 3,
+            "correct_down": 1,
+            "down_precision": 0.333333,
+            "down_recall": 0.2
+          }
+        }
+      },
+      {
+        "seed": 1,
+        "best_epoch": 97,
+        "splits": {
+          "train": {
+            "samples": 120,
+            "accuracy": 0.716667,
+            "balanced_accuracy": 0.704981,
+            "predicted_down": 36,
+            "correct_down": 26,
+            "down_precision": 0.722222,
+            "down_recall": 0.684211
+          },
+          "validation": {
+            "samples": 39,
+            "accuracy": 0.384615,
+            "balanced_accuracy": 0.299206,
+            "predicted_down": 4,
+            "correct_down": 1,
+            "down_precision": 0.25,
+            "down_recall": 0.111111
+          },
+          "2026_feb_jul": {
+            "samples": 115,
+            "accuracy": 0.365217,
+            "balanced_accuracy": 0.373888,
+            "predicted_down": 23,
+            "correct_down": 10,
+            "down_precision": 0.434783,
+            "down_recall": 0.344828
+          },
+          "2026_sep": {
+            "samples": 20,
+            "accuracy": 0.3,
+            "balanced_accuracy": 0.3,
+            "predicted_down": 4,
+            "correct_down": 1,
+            "down_precision": 0.25,
+            "down_recall": 0.2
+          }
+        }
+      },
+      {
+        "seed": 2,
+        "best_epoch": 6,
+        "splits": {
+          "train": {
+            "samples": 120,
+            "accuracy": 0.358333,
+            "balanced_accuracy": 0.279981,
+            "predicted_down": 18,
+            "correct_down": 7,
+            "down_precision": 0.388889,
+            "down_recall": 0.184211
+          },
+          "validation": {
+            "samples": 39,
+            "accuracy": 0.307692,
+            "balanced_accuracy": 0.224206,
+            "predicted_down": 5,
+            "correct_down": 1,
+            "down_precision": 0.2,
+            "down_recall": 0.111111
+          },
+          "2026_feb_jul": {
+            "samples": 115,
+            "accuracy": 0.286957,
+            "balanced_accuracy": 0.282814,
+            "predicted_down": 18,
+            "correct_down": 4,
+            "down_precision": 0.222222,
+            "down_recall": 0.137931
+          },
+          "2026_sep": {
+            "samples": 20,
+            "accuracy": 0.3,
+            "balanced_accuracy": 0.3,
+            "predicted_down": 4,
+            "correct_down": 2,
+            "down_precision": 0.5,
+            "down_recall": 0.4
+          }
+        }
+      },
+      {
+        "seed": 3,
+        "best_epoch": 68,
+        "splits": {
+          "train": {
+            "samples": 120,
+            "accuracy": 0.725,
+            "balanced_accuracy": 0.694424,
+            "predicted_down": 41,
+            "correct_down": 31,
+            "down_precision": 0.756098,
+            "down_recall": 0.815789
+          },
+          "validation": {
+            "samples": 39,
+            "accuracy": 0.307692,
+            "balanced_accuracy": 0.288889,
+            "predicted_down": 10,
+            "correct_down": 2,
+            "down_precision": 0.2,
+            "down_recall": 0.222222
+          },
+          "2026_feb_jul": {
+            "samples": 115,
+            "accuracy": 0.313043,
+            "balanced_accuracy": 0.319179,
+            "predicted_down": 33,
+            "correct_down": 12,
+            "down_precision": 0.363636,
+            "down_recall": 0.413793
+          },
+          "2026_sep": {
+            "samples": 20,
+            "accuracy": 0.35,
+            "balanced_accuracy": 0.35,
+            "predicted_down": 6,
+            "correct_down": 2,
+            "down_precision": 0.333333,
+            "down_recall": 0.4
+          }
+        }
+      },
+      {
+        "seed": 4,
+        "best_epoch": 12,
+        "splits": {
+          "train": {
+            "samples": 120,
+            "accuracy": 0.433333,
+            "balanced_accuracy": 0.319549,
+            "predicted_down": 33,
+            "correct_down": 16,
+            "down_precision": 0.484848,
+            "down_recall": 0.421053
+          },
+          "validation": {
+            "samples": 39,
+            "accuracy": 0.333333,
+            "balanced_accuracy": 0.242063,
+            "predicted_down": 7,
+            "correct_down": 1,
+            "down_precision": 0.142857,
+            "down_recall": 0.111111
+          },
+          "2026_feb_jul": {
+            "samples": 115,
+            "accuracy": 0.252174,
+            "balanced_accuracy": 0.25,
+            "predicted_down": 26,
+            "correct_down": 7,
+            "down_precision": 0.269231,
+            "down_recall": 0.241379
+          },
+          "2026_sep": {
+            "samples": 20,
+            "accuracy": 0.3,
+            "balanced_accuracy": 0.3,
+            "predicted_down": 2,
+            "correct_down": 1,
+            "down_precision": 0.5,
+            "down_recall": 0.2
+          }
+        }
+      }
+    ],
+    "cnn_plus_yesterday_market": [
+      {
+        "seed": 0,
+        "best_epoch": 9,
+        "splits": {
+          "train": {
+            "samples": 120,
+            "accuracy": 0.433333,
+            "balanced_accuracy": 0.353195,
+            "predicted_down": 8,
+            "correct_down": 7,
+            "down_precision": 0.875,
+            "down_recall": 0.184211
+          },
+          "validation": {
+            "samples": 39,
+            "accuracy": 0.307692,
+            "balanced_accuracy": 0.214286,
+            "predicted_down": 1,
+            "correct_down": 0,
+            "down_precision": 0.0,
+            "down_recall": 0.0
+          },
+          "2026_feb_jul": {
+            "samples": 115,
+            "accuracy": 0.243478,
+            "balanced_accuracy": 0.243369,
+            "predicted_down": 11,
+            "correct_down": 3,
+            "down_precision": 0.272727,
+            "down_recall": 0.103448
+          },
+          "2026_sep": {
+            "samples": 20,
+            "accuracy": 0.35,
+            "balanced_accuracy": 0.35,
+            "predicted_down": 1,
+            "correct_down": 1,
+            "down_precision": 1.0,
+            "down_recall": 0.2
+          }
+        }
+      },
+      {
+        "seed": 1,
+        "best_epoch": 17,
+        "splits": {
+          "train": {
+            "samples": 120,
+            "accuracy": 0.45,
+            "balanced_accuracy": 0.334586,
+            "predicted_down": 48,
+            "correct_down": 21,
+            "down_precision": 0.4375,
+            "down_recall": 0.552632
+          },
+          "validation": {
+            "samples": 39,
+            "accuracy": 0.358974,
+            "balanced_accuracy": 0.279762,
+            "predicted_down": 10,
+            "correct_down": 3,
+            "down_precision": 0.3,
+            "down_recall": 0.333333
+          },
+          "2026_feb_jul": {
+            "samples": 115,
+            "accuracy": 0.252174,
+            "balanced_accuracy": 0.25,
+            "predicted_down": 25,
+            "correct_down": 8,
+            "down_precision": 0.32,
+            "down_recall": 0.275862
+          },
+          "2026_sep": {
+            "samples": 20,
+            "accuracy": 0.3,
+            "balanced_accuracy": 0.3,
+            "predicted_down": 5,
+            "correct_down": 2,
+            "down_precision": 0.4,
+            "down_recall": 0.4
+          }
+        }
+      },
+      {
+        "seed": 2,
+        "best_epoch": 4,
+        "splits": {
+          "train": {
+            "samples": 120,
+            "accuracy": 0.375,
+            "balanced_accuracy": 0.314317,
+            "predicted_down": 1,
+            "correct_down": 1,
+            "down_precision": 1.0,
+            "down_recall": 0.026316
+          },
+          "validation": {
+            "samples": 39,
+            "accuracy": 0.282051,
+            "balanced_accuracy": 0.210714,
+            "predicted_down": 0,
+            "correct_down": 0,
+            "down_precision": null,
+            "down_recall": 0.0
+          },
+          "2026_feb_jul": {
+            "samples": 115,
+            "accuracy": 0.278261,
+            "balanced_accuracy": 0.267519,
+            "predicted_down": 0,
+            "correct_down": 0,
+            "down_precision": null,
+            "down_recall": 0.0
+          },
+          "2026_sep": {
+            "samples": 20,
+            "accuracy": 0.2,
+            "balanced_accuracy": 0.2,
+            "predicted_down": 0,
+            "correct_down": 0,
+            "down_precision": null,
+            "down_recall": 0.0
+          }
+        }
+      },
+      {
+        "seed": 3,
+        "best_epoch": 5,
+        "splits": {
+          "train": {
+            "samples": 120,
+            "accuracy": 0.325,
+            "balanced_accuracy": 0.312939,
+            "predicted_down": 33,
+            "correct_down": 14,
+            "down_precision": 0.424242,
+            "down_recall": 0.368421
+          },
+          "validation": {
+            "samples": 39,
+            "accuracy": 0.205128,
+            "balanced_accuracy": 0.200397,
+            "predicted_down": 5,
+            "correct_down": 1,
+            "down_precision": 0.2,
+            "down_recall": 0.111111
+          },
+          "2026_feb_jul": {
+            "samples": 115,
+            "accuracy": 0.234783,
+            "balanced_accuracy": 0.241711,
+            "predicted_down": 18,
+            "correct_down": 0,
+            "down_precision": 0.0,
+            "down_recall": 0.0
+          },
+          "2026_sep": {
+            "samples": 20,
+            "accuracy": 0.3,
+            "balanced_accuracy": 0.3,
+            "predicted_down": 4,
+            "correct_down": 1,
+            "down_precision": 0.25,
+            "down_recall": 0.2
+          }
+        }
+      },
+      {
+        "seed": 4,
+        "best_epoch": 12,
+        "splits": {
+          "train": {
+            "samples": 120,
+            "accuracy": 0.441667,
+            "balanced_accuracy": 0.332675,
+            "predicted_down": 39,
+            "correct_down": 17,
+            "down_precision": 0.435897,
+            "down_recall": 0.447368
+          },
+          "validation": {
+            "samples": 39,
+            "accuracy": 0.333333,
+            "balanced_accuracy": 0.261905,
+            "predicted_down": 8,
+            "correct_down": 3,
+            "down_precision": 0.375,
+            "down_recall": 0.333333
+          },
+          "2026_feb_jul": {
+            "samples": 115,
+            "accuracy": 0.243478,
+            "balanced_accuracy": 0.242374,
+            "predicted_down": 40,
+            "correct_down": 7,
+            "down_precision": 0.175,
+            "down_recall": 0.241379
+          },
+          "2026_sep": {
+            "samples": 20,
+            "accuracy": 0.2,
+            "balanced_accuracy": 0.2,
+            "predicted_down": 5,
+            "correct_down": 1,
+            "down_precision": 0.2,
+            "down_recall": 0.2
+          }
+        }
+      }
+    ],
+    "cnn_relative_sequence": [
+      {
+        "seed": 0,
+        "best_epoch": 93,
+        "splits": {
+          "train": {
+            "samples": 120,
+            "accuracy": 0.708333,
+            "balanced_accuracy": 0.661623,
+            "predicted_down": 35,
+            "correct_down": 29,
+            "down_precision": 0.828571,
+            "down_recall": 0.763158
+          },
+          "validation": {
+            "samples": 39,
+            "accuracy": 0.384615,
+            "balanced_accuracy": 0.362302,
+            "predicted_down": 10,
+            "correct_down": 4,
+            "down_precision": 0.4,
+            "down_recall": 0.444444
+          },
+          "2026_feb_jul": {
+            "samples": 115,
+            "accuracy": 0.426087,
+            "balanced_accuracy": 0.437099,
+            "predicted_down": 33,
+            "correct_down": 18,
+            "down_precision": 0.545455,
+            "down_recall": 0.62069
+          },
+          "2026_sep": {
+            "samples": 20,
+            "accuracy": 0.4,
+            "balanced_accuracy": 0.4,
+            "predicted_down": 5,
+            "correct_down": 2,
+            "down_precision": 0.4,
+            "down_recall": 0.4
+          }
+        }
+      },
+      {
+        "seed": 1,
+        "best_epoch": 90,
+        "splits": {
+          "train": {
+            "samples": 120,
+            "accuracy": 0.766667,
+            "balanced_accuracy": 0.77406,
+            "predicted_down": 34,
+            "correct_down": 27,
+            "down_precision": 0.794118,
+            "down_recall": 0.710526
+          },
+          "validation": {
+            "samples": 39,
+            "accuracy": 0.435897,
+            "balanced_accuracy": 0.423413,
+            "predicted_down": 7,
+            "correct_down": 2,
+            "down_precision": 0.285714,
+            "down_recall": 0.222222
+          },
+          "2026_feb_jul": {
+            "samples": 115,
+            "accuracy": 0.408696,
+            "balanced_accuracy": 0.414766,
+            "predicted_down": 33,
+            "correct_down": 17,
+            "down_precision": 0.515152,
+            "down_recall": 0.586207
+          },
+          "2026_sep": {
+            "samples": 20,
+            "accuracy": 0.4,
+            "balanced_accuracy": 0.4,
+            "predicted_down": 3,
+            "correct_down": 2,
+            "down_precision": 0.666667,
+            "down_recall": 0.4
+          }
+        }
+      },
+      {
+        "seed": 2,
+        "best_epoch": 84,
+        "splits": {
+          "train": {
+            "samples": 120,
+            "accuracy": 0.741667,
+            "balanced_accuracy": 0.719424,
+            "predicted_down": 39,
+            "correct_down": 31,
+            "down_precision": 0.794872,
+            "down_recall": 0.815789
+          },
+          "validation": {
+            "samples": 39,
+            "accuracy": 0.435897,
+            "balanced_accuracy": 0.407937,
+            "predicted_down": 12,
+            "correct_down": 5,
+            "down_precision": 0.416667,
+            "down_recall": 0.555556
+          },
+          "2026_feb_jul": {
+            "samples": 115,
+            "accuracy": 0.469565,
+            "balanced_accuracy": 0.476544,
+            "predicted_down": 41,
+            "correct_down": 23,
+            "down_precision": 0.560976,
+            "down_recall": 0.793103
+          },
+          "2026_sep": {
+            "samples": 20,
+            "accuracy": 0.45,
+            "balanced_accuracy": 0.45,
+            "predicted_down": 4,
+            "correct_down": 2,
+            "down_precision": 0.5,
+            "down_recall": 0.4
+          }
+        }
+      },
+      {
+        "seed": 3,
+        "best_epoch": 100,
+        "splits": {
+          "train": {
+            "samples": 120,
+            "accuracy": 0.741667,
+            "balanced_accuracy": 0.699154,
+            "predicted_down": 35,
+            "correct_down": 30,
+            "down_precision": 0.857143,
+            "down_recall": 0.789474
+          },
+          "validation": {
+            "samples": 39,
+            "accuracy": 0.461538,
+            "balanced_accuracy": 0.430556,
+            "predicted_down": 11,
+            "correct_down": 5,
+            "down_precision": 0.454545,
+            "down_recall": 0.555556
+          },
+          "2026_feb_jul": {
+            "samples": 115,
+            "accuracy": 0.4,
+            "balanced_accuracy": 0.402605,
+            "predicted_down": 45,
+            "correct_down": 22,
+            "down_precision": 0.488889,
+            "down_recall": 0.758621
+          },
+          "2026_sep": {
+            "samples": 20,
+            "accuracy": 0.4,
+            "balanced_accuracy": 0.4,
+            "predicted_down": 6,
+            "correct_down": 3,
+            "down_precision": 0.5,
+            "down_recall": 0.6
+          }
+        }
+      },
+      {
+        "seed": 4,
+        "best_epoch": 100,
+        "splits": {
+          "train": {
+            "samples": 120,
+            "accuracy": 0.75,
+            "balanced_accuracy": 0.718202,
+            "predicted_down": 34,
+            "correct_down": 30,
+            "down_precision": 0.882353,
+            "down_recall": 0.789474
+          },
+          "validation": {
+            "samples": 39,
+            "accuracy": 0.487179,
+            "balanced_accuracy": 0.495635,
+            "predicted_down": 11,
+            "correct_down": 4,
+            "down_precision": 0.363636,
+            "down_recall": 0.444444
+          },
+          "2026_feb_jul": {
+            "samples": 115,
+            "accuracy": 0.417391,
+            "balanced_accuracy": 0.421836,
+            "predicted_down": 35,
+            "correct_down": 19,
+            "down_precision": 0.542857,
+            "down_recall": 0.655172
+          },
+          "2026_sep": {
+            "samples": 20,
+            "accuracy": 0.3,
+            "balanced_accuracy": 0.3,
+            "predicted_down": 3,
+            "correct_down": 2,
+            "down_precision": 0.666667,
+            "down_recall": 0.4
+          }
+        }
+      }
+    ],
+    "cnn_relative_yesterday": [
+      {
+        "seed": 0,
+        "best_epoch": 9,
+        "splits": {
+          "train": {
+            "samples": 120,
+            "accuracy": 0.458333,
+            "balanced_accuracy": 0.382613,
+            "predicted_down": 25,
+            "correct_down": 15,
+            "down_precision": 0.6,
+            "down_recall": 0.394737
+          },
+          "validation": {
+            "samples": 39,
+            "accuracy": 0.282051,
+            "balanced_accuracy": 0.230159,
+            "predicted_down": 2,
+            "correct_down": 1,
+            "down_precision": 0.5,
+            "down_recall": 0.111111
+          },
+          "2026_feb_jul": {
+            "samples": 115,
+            "accuracy": 0.278261,
+            "balanced_accuracy": 0.284814,
+            "predicted_down": 12,
+            "correct_down": 4,
+            "down_precision": 0.333333,
+            "down_recall": 0.137931
+          },
+          "2026_sep": {
+            "samples": 20,
+            "accuracy": 0.25,
+            "balanced_accuracy": 0.25,
+            "predicted_down": 1,
+            "correct_down": 1,
+            "down_precision": 1.0,
+            "down_recall": 0.2
+          }
+        }
+      },
+      {
+        "seed": 1,
+        "best_epoch": 89,
+        "splits": {
+          "train": {
+            "samples": 120,
+            "accuracy": 0.841667,
+            "balanced_accuracy": 0.812375,
+            "predicted_down": 39,
+            "correct_down": 34,
+            "down_precision": 0.871795,
+            "down_recall": 0.894737
+          },
+          "validation": {
+            "samples": 39,
+            "accuracy": 0.358974,
+            "balanced_accuracy": 0.311905,
+            "predicted_down": 5,
+            "correct_down": 0,
+            "down_precision": 0.0,
+            "down_recall": 0.0
+          },
+          "2026_feb_jul": {
+            "samples": 115,
+            "accuracy": 0.365217,
+            "balanced_accuracy": 0.374326,
+            "predicted_down": 32,
+            "correct_down": 14,
+            "down_precision": 0.4375,
+            "down_recall": 0.482759
+          },
+          "2026_sep": {
+            "samples": 20,
+            "accuracy": 0.45,
+            "balanced_accuracy": 0.45,
+            "predicted_down": 5,
+            "correct_down": 3,
+            "down_precision": 0.6,
+            "down_recall": 0.6
+          }
+        }
+      },
+      {
+        "seed": 2,
+        "best_epoch": 61,
+        "splits": {
+          "train": {
+            "samples": 120,
+            "accuracy": 0.766667,
+            "balanced_accuracy": 0.736654,
+            "predicted_down": 36,
+            "correct_down": 30,
+            "down_precision": 0.833333,
+            "down_recall": 0.789474
+          },
+          "validation": {
+            "samples": 39,
+            "accuracy": 0.410256,
+            "balanced_accuracy": 0.39127,
+            "predicted_down": 9,
+            "correct_down": 2,
+            "down_precision": 0.222222,
+            "down_recall": 0.222222
+          },
+          "2026_feb_jul": {
+            "samples": 115,
+            "accuracy": 0.434783,
+            "balanced_accuracy": 0.441185,
+            "predicted_down": 39,
+            "correct_down": 18,
+            "down_precision": 0.461538,
+            "down_recall": 0.62069
+          },
+          "2026_sep": {
+            "samples": 20,
+            "accuracy": 0.3,
+            "balanced_accuracy": 0.3,
+            "predicted_down": 6,
+            "correct_down": 3,
+            "down_precision": 0.5,
+            "down_recall": 0.6
+          }
+        }
+      },
+      {
+        "seed": 3,
+        "best_epoch": 7,
+        "splits": {
+          "train": {
+            "samples": 120,
+            "accuracy": 0.416667,
+            "balanced_accuracy": 0.369361,
+            "predicted_down": 27,
+            "correct_down": 10,
+            "down_precision": 0.37037,
+            "down_recall": 0.263158
+          },
+          "validation": {
+            "samples": 39,
+            "accuracy": 0.205128,
+            "balanced_accuracy": 0.176587,
+            "predicted_down": 14,
+            "correct_down": 1,
+            "down_precision": 0.071429,
+            "down_recall": 0.111111
+          },
+          "2026_feb_jul": {
+            "samples": 115,
+            "accuracy": 0.243478,
+            "balanced_accuracy": 0.247347,
+            "predicted_down": 55,
+            "correct_down": 10,
+            "down_precision": 0.181818,
+            "down_recall": 0.344828
+          },
+          "2026_sep": {
+            "samples": 20,
+            "accuracy": 0.2,
+            "balanced_accuracy": 0.2,
+            "predicted_down": 8,
+            "correct_down": 1,
+            "down_precision": 0.125,
+            "down_recall": 0.2
+          }
+        }
+      },
+      {
+        "seed": 4,
+        "best_epoch": 9,
+        "splits": {
+          "train": {
+            "samples": 120,
+            "accuracy": 0.45,
+            "balanced_accuracy": 0.347964,
+            "predicted_down": 18,
+            "correct_down": 11,
+            "down_precision": 0.611111,
+            "down_recall": 0.289474
+          },
+          "validation": {
+            "samples": 39,
+            "accuracy": 0.307692,
+            "balanced_accuracy": 0.224206,
+            "predicted_down": 6,
+            "correct_down": 1,
+            "down_precision": 0.166667,
+            "down_recall": 0.111111
+          },
+          "2026_feb_jul": {
+            "samples": 115,
+            "accuracy": 0.252174,
+            "balanced_accuracy": 0.25,
+            "predicted_down": 30,
+            "correct_down": 9,
+            "down_precision": 0.3,
+            "down_recall": 0.310345
+          },
+          "2026_sep": {
+            "samples": 20,
+            "accuracy": 0.3,
+            "balanced_accuracy": 0.3,
+            "predicted_down": 2,
+            "correct_down": 1,
+            "down_precision": 0.5,
+            "down_recall": 0.2
+          }
+        }
+      }
+    ],
+    "cnn_relative_market": [
+      {
+        "seed": 0,
+        "best_epoch": 13,
+        "splits": {
+          "train": {
+            "samples": 120,
+            "accuracy": 0.358333,
+            "balanced_accuracy": 0.261591,
+            "predicted_down": 29,
+            "correct_down": 9,
+            "down_precision": 0.310345,
+            "down_recall": 0.236842
+          },
+          "validation": {
+            "samples": 39,
+            "accuracy": 0.333333,
+            "balanced_accuracy": 0.232143,
+            "predicted_down": 1,
+            "correct_down": 0,
+            "down_precision": 0.0,
+            "down_recall": 0.0
+          },
+          "2026_feb_jul": {
+            "samples": 115,
+            "accuracy": 0.252174,
+            "balanced_accuracy": 0.25,
+            "predicted_down": 1,
+            "correct_down": 0,
+            "down_precision": 0.0,
+            "down_recall": 0.0
+          },
+          "2026_sep": {
+            "samples": 20,
+            "accuracy": 0.2,
+            "balanced_accuracy": 0.2,
+            "predicted_down": 2,
+            "correct_down": 0,
+            "down_precision": 0.0,
+            "down_recall": 0.0
+          }
+        }
+      },
+      {
+        "seed": 1,
+        "best_epoch": 83,
+        "splits": {
+          "train": {
+            "samples": 120,
+            "accuracy": 0.741667,
+            "balanced_accuracy": 0.737813,
+            "predicted_down": 40,
+            "correct_down": 29,
+            "down_precision": 0.725,
+            "down_recall": 0.763158
+          },
+          "validation": {
+            "samples": 39,
+            "accuracy": 0.435897,
+            "balanced_accuracy": 0.399206,
+            "predicted_down": 4,
+            "correct_down": 1,
+            "down_precision": 0.25,
+            "down_recall": 0.111111
+          },
+          "2026_feb_jul": {
+            "samples": 115,
+            "accuracy": 0.382609,
+            "balanced_accuracy": 0.393118,
+            "predicted_down": 21,
+            "correct_down": 11,
+            "down_precision": 0.52381,
+            "down_recall": 0.37931
+          },
+          "2026_sep": {
+            "samples": 20,
+            "accuracy": 0.45,
+            "balanced_accuracy": 0.45,
+            "predicted_down": 2,
+            "correct_down": 2,
+            "down_precision": 1.0,
+            "down_recall": 0.4
+          }
+        }
+      },
+      {
+        "seed": 2,
+        "best_epoch": 77,
+        "splits": {
+          "train": {
+            "samples": 120,
+            "accuracy": 0.7,
+            "balanced_accuracy": 0.668139,
+            "predicted_down": 38,
+            "correct_down": 28,
+            "down_precision": 0.736842,
+            "down_recall": 0.736842
+          },
+          "validation": {
+            "samples": 39,
+            "accuracy": 0.384615,
+            "balanced_accuracy": 0.335317,
+            "predicted_down": 6,
+            "correct_down": 2,
+            "down_precision": 0.333333,
+            "down_recall": 0.222222
+          },
+          "2026_feb_jul": {
+            "samples": 115,
+            "accuracy": 0.365217,
+            "balanced_accuracy": 0.374444,
+            "predicted_down": 20,
+            "correct_down": 11,
+            "down_precision": 0.55,
+            "down_recall": 0.37931
+          },
+          "2026_sep": {
+            "samples": 20,
+            "accuracy": 0.4,
+            "balanced_accuracy": 0.4,
+            "predicted_down": 3,
+            "correct_down": 2,
+            "down_precision": 0.666667,
+            "down_recall": 0.4
+          }
+        }
+      },
+      {
+        "seed": 3,
+        "best_epoch": 4,
+        "splits": {
+          "train": {
+            "samples": 120,
+            "accuracy": 0.35,
+            "balanced_accuracy": 0.25,
+            "predicted_down": 0,
+            "correct_down": 0,
+            "down_precision": null,
+            "down_recall": 0.0
+          },
+          "validation": {
+            "samples": 39,
+            "accuracy": 0.358974,
+            "balanced_accuracy": 0.25,
+            "predicted_down": 0,
+            "correct_down": 0,
+            "down_precision": null,
+            "down_recall": 0.0
+          },
+          "2026_feb_jul": {
+            "samples": 115,
+            "accuracy": 0.252174,
+            "balanced_accuracy": 0.25,
+            "predicted_down": 0,
+            "correct_down": 0,
+            "down_precision": null,
+            "down_recall": 0.0
+          },
+          "2026_sep": {
+            "samples": 20,
+            "accuracy": 0.25,
+            "balanced_accuracy": 0.25,
+            "predicted_down": 0,
+            "correct_down": 0,
+            "down_precision": null,
+            "down_recall": 0.0
+          }
+        }
+      },
+      {
+        "seed": 4,
+        "best_epoch": 75,
+        "splits": {
+          "train": {
+            "samples": 120,
+            "accuracy": 0.716667,
+            "balanced_accuracy": 0.674123,
+            "predicted_down": 36,
+            "correct_down": 29,
+            "down_precision": 0.805556,
+            "down_recall": 0.763158
+          },
+          "validation": {
+            "samples": 39,
+            "accuracy": 0.487179,
+            "balanced_accuracy": 0.447619,
+            "predicted_down": 5,
+            "correct_down": 3,
+            "down_precision": 0.6,
+            "down_recall": 0.333333
+          },
+          "2026_feb_jul": {
+            "samples": 115,
+            "accuracy": 0.33913,
+            "balanced_accuracy": 0.346592,
+            "predicted_down": 25,
+            "correct_down": 13,
+            "down_precision": 0.52,
+            "down_recall": 0.448276
+          },
+          "2026_sep": {
+            "samples": 20,
+            "accuracy": 0.4,
+            "balanced_accuracy": 0.4,
+            "predicted_down": 4,
+            "correct_down": 2,
+            "down_precision": 0.5,
+            "down_recall": 0.4
+          }
+        }
+      }
+    ],
+    "cnn_relative_yesterday_market": [
+      {
+        "seed": 0,
+        "best_epoch": 21,
+        "splits": {
+          "train": {
+            "samples": 120,
+            "accuracy": 0.483333,
+            "balanced_accuracy": 0.371209,
+            "predicted_down": 69,
+            "correct_down": 31,
+            "down_precision": 0.449275,
+            "down_recall": 0.815789
+          },
+          "validation": {
+            "samples": 39,
+            "accuracy": 0.25641,
+            "balanced_accuracy": 0.188492,
+            "predicted_down": 7,
+            "correct_down": 1,
+            "down_precision": 0.142857,
+            "down_recall": 0.111111
+          },
+          "2026_feb_jul": {
+            "samples": 115,
+            "accuracy": 0.252174,
+            "balanced_accuracy": 0.25,
+            "predicted_down": 37,
+            "correct_down": 10,
+            "down_precision": 0.27027,
+            "down_recall": 0.344828
+          },
+          "2026_sep": {
+            "samples": 20,
+            "accuracy": 0.25,
+            "balanced_accuracy": 0.25,
+            "predicted_down": 3,
+            "correct_down": 1,
+            "down_precision": 0.333333,
+            "down_recall": 0.2
+          }
+        }
+      },
+      {
+        "seed": 1,
+        "best_epoch": 9,
+        "splits": {
+          "train": {
+            "samples": 120,
+            "accuracy": 0.466667,
+            "balanced_accuracy": 0.362375,
+            "predicted_down": 25,
+            "correct_down": 15,
+            "down_precision": 0.6,
+            "down_recall": 0.394737
+          },
+          "validation": {
+            "samples": 39,
+            "accuracy": 0.333333,
+            "balanced_accuracy": 0.249206,
+            "predicted_down": 4,
+            "correct_down": 1,
+            "down_precision": 0.25,
+            "down_recall": 0.111111
+          },
+          "2026_feb_jul": {
+            "samples": 115,
+            "accuracy": 0.26087,
+            "balanced_accuracy": 0.258065,
+            "predicted_down": 18,
+            "correct_down": 4,
+            "down_precision": 0.222222,
+            "down_recall": 0.137931
+          },
+          "2026_sep": {
+            "samples": 20,
+            "accuracy": 0.3,
+            "balanced_accuracy": 0.3,
+            "predicted_down": 4,
+            "correct_down": 2,
+            "down_precision": 0.5,
+            "down_recall": 0.4
+          }
+        }
+      },
+      {
+        "seed": 2,
+        "best_epoch": 8,
+        "splits": {
+          "train": {
+            "samples": 120,
+            "accuracy": 0.475,
+            "balanced_accuracy": 0.358991,
+            "predicted_down": 36,
+            "correct_down": 21,
+            "down_precision": 0.583333,
+            "down_recall": 0.552632
+          },
+          "validation": {
+            "samples": 39,
+            "accuracy": 0.307692,
+            "balanced_accuracy": 0.221429,
+            "predicted_down": 4,
+            "correct_down": 0,
+            "down_precision": 0.0,
+            "down_recall": 0.0
+          },
+          "2026_feb_jul": {
+            "samples": 115,
+            "accuracy": 0.269565,
+            "balanced_accuracy": 0.268236,
+            "predicted_down": 8,
+            "correct_down": 3,
+            "down_precision": 0.375,
+            "down_recall": 0.103448
+          },
+          "2026_sep": {
+            "samples": 20,
+            "accuracy": 0.25,
+            "balanced_accuracy": 0.25,
+            "predicted_down": 0,
+            "correct_down": 0,
+            "down_precision": null,
+            "down_recall": 0.0
+          }
+        }
+      },
+      {
+        "seed": 3,
+        "best_epoch": 4,
+        "splits": {
+          "train": {
+            "samples": 120,
+            "accuracy": 0.475,
+            "balanced_accuracy": 0.433803,
+            "predicted_down": 27,
+            "correct_down": 15,
+            "down_precision": 0.555556,
+            "down_recall": 0.394737
+          },
+          "validation": {
+            "samples": 39,
+            "accuracy": 0.358974,
+            "balanced_accuracy": 0.284127,
+            "predicted_down": 5,
+            "correct_down": 2,
+            "down_precision": 0.4,
+            "down_recall": 0.222222
+          },
+          "2026_feb_jul": {
+            "samples": 115,
+            "accuracy": 0.226087,
+            "balanced_accuracy": 0.223026,
+            "predicted_down": 38,
+            "correct_down": 9,
+            "down_precision": 0.236842,
+            "down_recall": 0.310345
+          },
+          "2026_sep": {
+            "samples": 20,
+            "accuracy": 0.15,
+            "balanced_accuracy": 0.15,
+            "predicted_down": 3,
+            "correct_down": 1,
+            "down_precision": 0.333333,
+            "down_recall": 0.2
+          }
+        }
+      },
+      {
+        "seed": 4,
+        "best_epoch": 13,
+        "splits": {
+          "train": {
+            "samples": 120,
+            "accuracy": 0.4,
+            "balanced_accuracy": 0.295395,
+            "predicted_down": 5,
+            "correct_down": 5,
+            "down_precision": 1.0,
+            "down_recall": 0.131579
+          },
+          "validation": {
+            "samples": 39,
+            "accuracy": 0.358974,
+            "balanced_accuracy": 0.25,
+            "predicted_down": 1,
+            "correct_down": 0,
+            "down_precision": 0.0,
+            "down_recall": 0.0
+          },
+          "2026_feb_jul": {
+            "samples": 115,
+            "accuracy": 0.252174,
+            "balanced_accuracy": 0.25,
+            "predicted_down": 5,
+            "correct_down": 1,
+            "down_precision": 0.2,
+            "down_recall": 0.034483
+          },
+          "2026_sep": {
+            "samples": 20,
+            "accuracy": 0.25,
+            "balanced_accuracy": 0.25,
+            "predicted_down": 0,
+            "correct_down": 0,
+            "down_precision": null,
+            "down_recall": 0.0
+          }
+        }
+      }
+    ]
+  },
+  "linear_comparisons": {
+    "linear_original40": {
+      "train": {
+        "samples": 120,
+        "accuracy": 0.675,
+        "balanced_accuracy": 0.642481,
+        "predicted_down": 35,
+        "correct_down": 26,
+        "down_precision": 0.742857,
+        "down_recall": 0.684211
+      },
+      "validation": {
+        "samples": 39,
+        "accuracy": 0.512821,
+        "balanced_accuracy": 0.490873,
+        "predicted_down": 5,
+        "correct_down": 1,
+        "down_precision": 0.2,
+        "down_recall": 0.111111
+      },
+      "2026_feb_jul": {
+        "samples": 115,
+        "accuracy": 0.452174,
+        "balanced_accuracy": 0.462522,
+        "predicted_down": 38,
+        "correct_down": 22,
+        "down_precision": 0.578947,
+        "down_recall": 0.758621
+      },
+      "2026_sep": {
+        "samples": 20,
+        "accuracy": 0.45,
+        "balanced_accuracy": 0.45,
+        "predicted_down": 4,
+        "correct_down": 3,
+        "down_precision": 0.75,
+        "down_recall": 0.6
+      }
+    },
+    "linear_plus_yesterday": {
+      "train": {
+        "samples": 120,
+        "accuracy": 0.725,
+        "balanced_accuracy": 0.700971,
+        "predicted_down": 42,
+        "correct_down": 31,
+        "down_precision": 0.738095,
+        "down_recall": 0.815789
+      },
+      "validation": {
+        "samples": 39,
+        "accuracy": 0.384615,
+        "balanced_accuracy": 0.339683,
+        "predicted_down": 6,
+        "correct_down": 1,
+        "down_precision": 0.166667,
+        "down_recall": 0.111111
+      },
+      "2026_feb_jul": {
+        "samples": 115,
+        "accuracy": 0.356522,
+        "balanced_accuracy": 0.364272,
+        "predicted_down": 32,
+        "correct_down": 14,
+        "down_precision": 0.4375,
+        "down_recall": 0.482759
+      },
+      "2026_sep": {
+        "samples": 20,
+        "accuracy": 0.55,
+        "balanced_accuracy": 0.55,
+        "predicted_down": 4,
+        "correct_down": 3,
+        "down_precision": 0.75,
+        "down_recall": 0.6
+      }
+    },
+    "linear_plus_market": {
+      "train": {
+        "samples": 120,
+        "accuracy": 0.666667,
+        "balanced_accuracy": 0.648997,
+        "predicted_down": 34,
+        "correct_down": 25,
+        "down_precision": 0.735294,
+        "down_recall": 0.657895
+      },
+      "validation": {
+        "samples": 39,
+        "accuracy": 0.461538,
+        "balanced_accuracy": 0.424206,
+        "predicted_down": 5,
+        "correct_down": 1,
+        "down_precision": 0.2,
+        "down_recall": 0.111111
+      },
+      "2026_feb_jul": {
+        "samples": 115,
+        "accuracy": 0.373913,
+        "balanced_accuracy": 0.378968,
+        "predicted_down": 27,
+        "correct_down": 15,
+        "down_precision": 0.555556,
+        "down_recall": 0.517241
+      },
+      "2026_sep": {
+        "samples": 20,
+        "accuracy": 0.45,
+        "balanced_accuracy": 0.45,
+        "predicted_down": 4,
+        "correct_down": 3,
+        "down_precision": 0.75,
+        "down_recall": 0.6
+      }
+    },
+    "linear_all_context": {
+      "train": {
+        "samples": 120,
+        "accuracy": 0.708333,
+        "balanced_accuracy": 0.676598,
+        "predicted_down": 41,
+        "correct_down": 32,
+        "down_precision": 0.780488,
+        "down_recall": 0.842105
+      },
+      "validation": {
+        "samples": 39,
+        "accuracy": 0.410256,
+        "balanced_accuracy": 0.35754,
+        "predicted_down": 5,
+        "correct_down": 1,
+        "down_precision": 0.2,
+        "down_recall": 0.111111
+      },
+      "2026_feb_jul": {
+        "samples": 115,
+        "accuracy": 0.33913,
+        "balanced_accuracy": 0.342496,
+        "predicted_down": 28,
+        "correct_down": 13,
+        "down_precision": 0.464286,
+        "down_recall": 0.448276
+      },
+      "2026_sep": {
+        "samples": 20,
+        "accuracy": 0.5,
+        "balanced_accuracy": 0.5,
+        "predicted_down": 3,
+        "correct_down": 2,
+        "down_precision": 0.666667,
+        "down_recall": 0.4
+      }
+    },
+    "linear_relative_all_context": {
+      "train": {
+        "samples": 120,
+        "accuracy": 0.683333,
+        "balanced_accuracy": 0.656861,
+        "predicted_down": 39,
+        "correct_down": 29,
+        "down_precision": 0.74359,
+        "down_recall": 0.763158
+      },
+      "validation": {
+        "samples": 39,
+        "accuracy": 0.358974,
+        "balanced_accuracy": 0.298016,
+        "predicted_down": 5,
+        "correct_down": 1,
+        "down_precision": 0.2,
+        "down_recall": 0.111111
+      },
+      "2026_feb_jul": {
+        "samples": 115,
+        "accuracy": 0.304348,
+        "balanced_accuracy": 0.309682,
+        "predicted_down": 29,
+        "correct_down": 14,
+        "down_precision": 0.482759,
+        "down_recall": 0.482759
+      },
+      "2026_sep": {
+        "samples": 20,
+        "accuracy": 0.45,
+        "balanced_accuracy": 0.45,
+        "predicted_down": 4,
+        "correct_down": 3,
+        "down_precision": 0.75,
+        "down_recall": 0.6
+      }
+    }
+  }
+}

@@ -1,0 +1,201 @@
+{
+  "picks_sha256": "7cb78c551ad214760f76b4cd654f5777f01bfcea5bbfe00b11bf769ef52a4463",
+  "candidates_sha256": "134e2809f98214e1d94346e6b10840054d32ed0720e9020d2f6da945c93b7f08",
+  "original_feb_jul": {
+    "dates": 14,
+    "matching_daily_lists": 14,
+    "mismatching_dates": [],
+    "reference_picks": 28,
+    "new_picks": 28,
+    "matching_ranked_stocks": 28,
+    "probabilities_for_same_stock": {
+      "p_lt0": {
+        "max_abs_delta": 5.551115123125783e-17,
+        "within_1e_12": 28
+      },
+      "p_0to1": {
+        "max_abs_delta": 8.326672684688674e-17,
+        "within_1e_12": 28
+      },
+      "p_1to3": {
+        "max_abs_delta": 8.326672684688674e-17,
+        "within_1e_12": 28
+      },
+      "p_ge3": {
+        "max_abs_delta": 1.1102230246251565e-16,
+        "within_1e_12": 28
+      }
+    },
+    "reference_sha256": "39513baa8de9499f899e292d8e6cd8360c2539452595d0fdb7975327b3ad7fed",
+    "scope": "Complete archived folds including no-pick days."
+  },
+  "independent_aug_oct": {
+    "dates": 0,
+    "matching_daily_lists": 0,
+    "mismatching_dates": [],
+    "reference_picks": 0,
+    "new_picks": 0,
+    "matching_ranked_stocks": 0,
+    "probabilities_for_same_stock": {
+      "p_lt0": {
+        "max_abs_delta": null,
+        "within_1e_12": 0
+      },
+      "p_0to1": {
+        "max_abs_delta": null,
+        "within_1e_12": 0
+      },
+      "p_1to3": {
+        "max_abs_delta": null,
+        "within_1e_12": 0
+      },
+      "p_ge3": {
+        "max_abs_delta": null,
+        "within_1e_12": 0
+      }
+    },
+    "reference_sha256": "741b0bb6c496d33e6016ba35dfc71a4f9f83d470b5a56928e0d0c1f8556555a1",
+    "scope": "Reference days with saved picks; complete daily/no-pick comparison is CO7 below."
+  },
+  "CO7_top1": {
+    "dates": 34,
+    "matching_daily_lists": 34,
+    "mismatching_dates": [],
+    "reference_picks": 34,
+    "new_picks": 34,
+    "matching_ranked_stocks": 34,
+    "probabilities_for_same_stock": {},
+    "reference_sha256": "2919fdd0f0d41b844abeb08bca16da126c71a86ab1e553cd39c38539404241cd",
+    "same_stock_gate_comparable": 34,
+    "same_stock_gate_equal": 34,
+    "same_stock_return_max_delta": 0.0,
+    "execution_price_reference_sha256": "292f4ea31b9d8b388f7825b3ea9b2a9f74703005a6da5a2ba742aae06f07078b",
+    "same_stock_price_rows": 34,
+    "buy_price_max_delta": 0.0,
+    "sell_price_max_delta": 0.0
+  },
+  "jan_jul_inputs": {
+    "new_rows": 13048,
+    "reference_rows": 13048,
+    "common_rows": 13048,
+    "new_only": 0,
+    "reference_only": 0,
+    "columns": {
+      "signal_return": {
+        "different": 0,
+        "max_abs_delta": 0.0
+      },
+      "volume_ratio": {
+        "different": 0,
+        "max_abs_delta": 8.881784197001252e-16
+      },
+      "turnover_so_far_pct": {
+        "different": 0,
+        "max_abs_delta": 1.0658141036401503e-14
+      },
+      "float_mv_100m_cny": {
+        "different": 0,
+        "max_abs_delta": 9.094947017729282e-13
+      },
+      "volume_4of5_increasing": {
+        "different": 0,
+        "max_abs_delta": 0.0
+      },
+      "ma_bull_5_10_20": {
+        "different": 0,
+        "max_abs_delta": 0.0
+      },
+      "all_intraday_lows_above_ma": {
+        "different": 0,
+        "max_abs_delta": 0.0
+      },
+      "signal_price": {
+        "different": 0,
+        "max_abs_delta": 0.0
+      },
+      "second_high": {
+        "different": 0,
+        "max_abs_delta": 0.0
+      }
+    },
+    "reference_sha256": "d160e906712f8d9f0d7b1f052079c023fd2e8d7def5611fd71c31c738e4b90f2"
+  },
+  "aug_oct_inputs": {
+    "new_rows": 0,
+    "reference_rows": 0,
+    "common_rows": 0,
+    "new_only": 0,
+    "reference_only": 0,
+    "columns": {
+      "signal_return": {
+        "different": 0,
+        "max_abs_delta": null
+      },
+      "volume_ratio": {
+        "different": 0,
+        "max_abs_delta": null
+      },
+      "turnover_so_far_pct": {
+        "different": 0,
+        "max_abs_delta": null
+      },
+      "float_mv_100m_cny": {
+        "different": 0,
+        "max_abs_delta": null
+      },
+      "volume_4of5_increasing": {
+        "different": 0,
+        "max_abs_delta": null
+      },
+      "ma_bull_5_10_20": {
+        "different": 0,
+        "max_abs_delta": null
+      },
+      "all_intraday_lows_above_ma": {
+        "different": 0,
+        "max_abs_delta": null
+      },
+      "signal_price": {
+        "different": 0,
+        "max_abs_delta": null
+      },
+      "second_high": {
+        "different": 0,
+        "max_abs_delta": null
+      }
+    },
+    "reference_sha256": "df2667be0370576d7643005042f9f35518a39e6da23ceeb05d1405242ef3f573"
+  },
+  "run": {
+    "first_day": "2026-01-05",
+    "last_day": "2026-02-27",
+    "decision_days": 34,
+    "no_selection_days": 0,
+    "picks": 68,
+    "actionable": 30,
+    "settled": 30,
+    "monthly": [
+      {
+        "month": "2026-01",
+        "decision_days": 20,
+        "selected_rows": 40,
+        "actionable": 19,
+        "settled": 19,
+        "mean_gross_return_pct": -0.30468786180966473,
+        "win_rate_pct": 57.89473684210527,
+        "gross_compound_pct": -6.4423504266729275
+      },
+      {
+        "month": "2026-02",
+        "decision_days": 14,
+        "selected_rows": 28,
+        "actionable": 11,
+        "settled": 11,
+        "mean_gross_return_pct": 1.1153037174408937,
+        "win_rate_pct": 63.63636363636363,
+        "gross_compound_pct": 11.726705640658786
+      }
+    ],
+    "prices": "D0 14:40 / D1 09:40 minute close proxies; no fees/slippage; not broker fills."
+  }
+}

@@ -186,7 +186,14 @@ class KingdomaiStockKlineService:
             code6 = self._code6(stock_code or raw_subject)
             if not code6:
                 raise ValueError(f"cannot resolve stock subject: {subject}")
-            rows = self._query_intraday_rows(db=db, code6=code6, trade_date="", limit=1)
+            rows = self._query_intraday_rows(
+                db=db,
+                code6=code6,
+                trade_date="",
+                limit=1,
+                kline_type="1d",
+                period_minutes=1440,
+            )
             row = rows[0] if rows else {}
             normalized = self._normalize_intraday_row(row) if row else {}
             stock_name = self._trim(identity.get("stock_name")) or self._trim(row.get("stk_name"))
@@ -336,19 +343,23 @@ class KingdomaiStockKlineService:
         code6: str,
         trade_date: str,
         limit: int,
+        kline_type: str = "1m",
+        period_minutes: int = 1,
     ) -> List[Mapping[str, Any]]:
-        params: List[Any] = [code6]
+        params: List[Any] = [code6, kline_type, period_minutes]
         date_clause = """
               AND trade_date = (
                 SELECT MAX(trade_date)
                 FROM aiia_stock_realtime_minute_snapshot
                 WHERE stk_code = %s
+                  AND kline_type = %s
+                  AND period_minutes = %s
               )
         """
-        params.append(code6)
+        params.extend([code6, kline_type, period_minutes])
         if trade_date:
             date_clause = "AND trade_date = %s"
-            params = [code6, trade_date]
+            params = [code6, kline_type, period_minutes, trade_date]
         params.append(limit)
         sql = f"""
             SELECT trade_date, minute_index, snapshot_time, snapshot_slot, stk_code, stk_name,
@@ -356,8 +367,10 @@ class KingdomaiStockKlineService:
                    chg_value, chg_ratio, amount, volume, source, is_fallback
             FROM aiia_stock_realtime_minute_snapshot
             WHERE stk_code = %s
+              AND kline_type = %s
+              AND period_minutes = %s
               {date_clause}
-            ORDER BY trade_date DESC, minute_index DESC
+            ORDER BY trade_date DESC, bar_end_time DESC, snapshot_time DESC
             LIMIT %s
         """
         return self._fetchall(db, sql, tuple(params))

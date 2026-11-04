@@ -1,0 +1,53 @@
+{
+  "name": "task_get",
+  "version": "v1",
+  "status": "active",
+  "availability": {
+    "lifecycle": "active",
+    "retrieval_mode": "retrievable"
+  },
+  "identity": {
+    "display_name": "查看任务进度和结果",
+    "description": "按任务或运行 ID 读取已保存的进度、结果和产物，不重新执行。",
+    "domain": "user_tasks",
+    "owner": "tools"
+  },
+  "schemas": {
+    "input": {
+      "type": "object",
+      "properties": {
+        "task_id": {
+          "type": "string"
+        },
+        "run_id": {
+          "type": "string"
+        }
+      },
+      "required": [],
+      "additionalProperties": false
+    },
+    "output": {
+      "type": "object"
+    }
+  },
+  "profiles": {
+    "real": {
+      "enabled": true,
+      "implementation": {
+        "kind": "python_callable",
+        "target": "src.tools.user_task_tools:run_get"
+      }
+    }
+  },
+  "safety": {
+    "network": false,
+    "persistence": false,
+    "side_effect": "read"
+  },
+  "runtime_hints": {
+    "cost_class": "low",
+    "latency_class": "short",
+    "supports_async_submit": false
+  },
+  "auth": "internal"
+}

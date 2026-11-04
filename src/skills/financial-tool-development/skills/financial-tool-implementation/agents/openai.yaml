@@ -1,0 +1,6 @@
+interface:
+  display_name: "金融工具代码实现"
+  short_description: "按权威设计实现批量取数、业务计算并完成真实验证"
+  default_prompt: "使用 $financial-tool-implementation 实现并真实验证当前金融工具。"
+policy:
+  allow_implicit_invocation: false

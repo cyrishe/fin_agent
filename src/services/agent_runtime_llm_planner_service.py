@@ -131,8 +131,6 @@ class AgentRuntimeLLMPlannerService:
         tool_queries: Optional[List[str]] = None,
         work_context: Optional[Dict[str, Any]] = None,
         application_context: Optional[Dict[str, Any]] = None,
-        interaction_frame: Optional[Dict[str, Any]] = None,
-        conversation_state: Optional[Dict[str, Any]] = None,
         enable_llm: bool = True,
         allow_fallback: bool = True,
     ) -> Dict[str, Any]:
@@ -140,8 +138,6 @@ class AgentRuntimeLLMPlannerService:
         retrieval_query = self._trim(recall_query) or objective
         ctx = work_context if isinstance(work_context, dict) else {}
         app_ctx = application_context if isinstance(application_context, dict) else {}
-        frame = interaction_frame if isinstance(interaction_frame, dict) else {}
-        state = conversation_state if isinstance(conversation_state, dict) else {}
         agent_context = self._build_agent_context(app_ctx, ctx)
         subject_result = self._classify_security_subject(
             objective=objective,
@@ -203,8 +199,6 @@ class AgentRuntimeLLMPlannerService:
         prompt_context_sections = self.prompt_context_compiler.compile_sections(
             profile="planner",
             agent_context=agent_context,
-            interaction_frame=frame,
-            conversation_state=state,
             work_context=ctx,
             candidate_skills=planner_skills,
             candidate_tools=planner_tools,
@@ -464,6 +458,41 @@ class AgentRuntimeLLMPlannerService:
                 "llm_usage": {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0},
             }
 
+        fallback_plan = self._call_fallback_planner(
+            text=objective,
+            recall_query=retrieval_query,
+            tool_queries=[self._trim(item) for item in (tool_queries or []) if self._trim(item)],
+            work_context=ctx,
+            application_context=app_ctx,
+            enable_llm=enable_llm,
+        )
+        normalized_fallback_plan = self._normalize_execution_plan(
+            payload={},
+            fallback_plan=fallback_plan,
+            agent_context=agent_context,
+            analysis_affordances=analysis_affordances,
+            planner_question_contract=planner_question_contract,
+        )
+        return {
+            "ok": True,
+            "source": "planner_empty_fallback",
+            "planner_prompt_key": "system.agent_runtime.planner",
+            "capability_result": capability_result,
+            "structured_task": structured_task,
+            "task_mode_result": task_mode_result,
+            "subject_result": subject_result,
+            "thinking_mode_result": thinking_mode_result,
+            "deep_plan_preview": deep_plan_preview,
+            "prompt_context_sections": prompt_context_sections,
+            "execution_plan": normalized_fallback_plan,
+            "planner_question_contract": planner_question_contract,
+            "clarification_needed": bool(normalized_fallback_plan.get("clarification_needed")),
+            "clarification_questions": normalized_fallback_plan.get("clarification_questions")
+            if isinstance(normalized_fallback_plan.get("clarification_questions"), list)
+            else [],
+            "llm_usage": {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0},
+        }
+
     def _apply_tool_rerank(
         self,
         *,
@@ -521,36 +550,6 @@ class AgentRuntimeLLMPlannerService:
                 ],
             }
         return filtered
-        fallback_plan = self._call_fallback_planner(
-            text=objective,
-            recall_query=retrieval_query,
-            tool_queries=[self._trim(item) for item in (tool_queries or []) if self._trim(item)],
-            work_context=ctx,
-            application_context=app_ctx,
-            enable_llm=enable_llm,
-        )
-        normalized_fallback_plan = self._normalize_execution_plan(
-                payload={},
-                fallback_plan=fallback_plan,
-                agent_context=agent_context,
-                analysis_affordances=analysis_affordances,
-            )
-        return {
-            "ok": True,
-            "source": "planner_empty_fallback",
-            "planner_prompt_key": "system.agent_runtime.planner",
-            "capability_result": capability_result,
-            "structured_task": structured_task,
-            "task_mode_result": task_mode_result,
-            "subject_result": subject_result,
-            "thinking_mode_result": thinking_mode_result,
-            "deep_plan_preview": deep_plan_preview,
-            "prompt_context_sections": prompt_context_sections,
-            "execution_plan": normalized_fallback_plan,
-            "clarification_needed": bool(normalized_fallback_plan.get("clarification_needed")),
-            "clarification_questions": normalized_fallback_plan.get("clarification_questions") if isinstance(normalized_fallback_plan.get("clarification_questions"), list) else [],
-            "llm_usage": {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0},
-        }
 
     def _run_high_level_planner(
         self,
@@ -729,12 +728,10 @@ class AgentRuntimeLLMPlannerService:
         return bool(step_errors)
 
     def _build_agent_context(self, application_context: Dict[str, Any], work_context: Dict[str, Any]) -> Dict[str, Any]:
-        execution_agent = application_context.get("execution_agent") if isinstance(application_context.get("execution_agent"), dict) else {}
-        assistant_agent = application_context.get("assistant_agent") if isinstance(application_context.get("assistant_agent"), dict) else {}
+        default_agent = application_context.get("default_agent") if isinstance(application_context.get("default_agent"), dict) else {}
         return {
             "application_name": self._trim(application_context.get("application_name")),
-            "assistant_agent": self._trim(assistant_agent.get("agent_name")),
-            "execution_agent": self._trim(execution_agent.get("agent_name")) or self._trim(work_context.get("execution_agent")),
+            "default_agent": self._trim(default_agent.get("agent_name")) or self._trim(work_context.get("default_agent")),
             "active_skill_name": self._trim(
                 work_context.get("thread_active_skill_canonical_name")
                 or work_context.get("thread_active_skill_name")
@@ -1140,7 +1137,7 @@ class AgentRuntimeLLMPlannerService:
         return {
             "planner_type": "agent_runtime_llm_planner",
             "planner_scope": "agent_local",
-            "planner_agent": self._trim(agent_context.get("execution_agent")) or "execution_agent",
+            "planner_agent": self._trim(agent_context.get("default_agent")) or "default_agent",
             "objective": self._trim(payload.get("objective")) or self._trim(fallback_plan.get("objective")),
             "domain": "business",
             "legacy_domain": "business_dialog",

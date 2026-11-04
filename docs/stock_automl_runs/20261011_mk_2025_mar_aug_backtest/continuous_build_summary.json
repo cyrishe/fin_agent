@@ -1,0 +1,18 @@
+{
+  "archive": "outputs/stock_automl/mk_1m_2025_continuous/source_days",
+  "signal_days": 183,
+  "first_signal_date": "2025-02-05",
+  "last_signal_date": "2025-11-03",
+  "candidates": 62856,
+  "labeled": 62410,
+  "invalid_bars_anytime": 72,
+  "invalid_required_stock_days": 0,
+  "proxy_float_mv": {
+    "overlap": 617738,
+    "within_1pct": 0.9565106889976009,
+    "within_5pct": 0.9779728622814203,
+    "p95_abs_relative_error": 0.006340636243434918
+  },
+  "feature_source": "unadjusted raw 1m; T-1 daily/derived float share and market value",
+  "universe": "active SH/SZ only; no ST name filter or next-day candidate filter"
+}

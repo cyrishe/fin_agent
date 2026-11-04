@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from src.experiments.staged_data_protocol.phase2 import python_filter as pf
+
 import re
 from dataclasses import dataclass
 from datetime import date, datetime
@@ -114,9 +116,9 @@ OP_SQL = {"=": "=", "==": "=", "!=": "!=", ">": ">", ">=": ">=", "<": "<", "<=":
 FILTER_RE = re.compile(
     r"(?:(?P<connector>\band\b|\bor\b)\s+)?"
     r"(?P<field>[A-Za-z_]\w*)\s*"
-    r"(?P<op>in|=|==|!=|>=|<=|>|<)\s*"
+    r"(?P<op>in|==|=|!=|>=|<=|>|<)\s*"
     r"(?P<value>\[[^\]]+\]|\([^)]+\)|[^,;]+?)"
-    r"(?=\s+(?:and|or)\s+[A-Za-z_]\w*\s*(?:in|=|==|!=|>=|<=|>|<)|[,;]|$)",
+    r"(?=\s+(?:and|or)\s+[A-Za-z_]\w*\s*(?:in|==|=|!=|>=|<=|>|<)|[,;]|$)",
     flags=re.IGNORECASE,
 )
 
@@ -150,8 +152,9 @@ def execute_pricevalue_api(*, subject: str, args: Mapping[str, Any], outputs: Li
     limit = _bounded_limit(args.get("limit"))
     where_sql, params = _build_where(source=source, args=args)
     order_sql = _build_order(source=source, args=args)
-    sql = _build_sql(source=source, columns=columns, where_sql=where_sql, order_sql=order_sql)
-    params.append(limit)
+    sql = _build_sql(source=source, columns=columns, where_sql=where_sql, order_sql=order_sql, limited=limit > 0)
+    if limit > 0:
+        params.append(limit)
 
     db = StockInfoDbUtils(database="kingdomai")
     try:
@@ -329,7 +332,7 @@ def _output_token(output: str) -> str:
 
 
 def _has_unresolved_ref(args: Mapping[str, Any]) -> bool:
-    return any(isinstance(value, str) and re.search(r"\br\d+\.", value) for value in args.values())
+    return pf.has_unresolved_refs(args)
 
 
 def _bounded_limit(value: Any) -> int:
@@ -337,6 +340,8 @@ def _bounded_limit(value: Any) -> int:
         parsed = int(value)
     except Exception:
         parsed = 100
+    if parsed == -1:
+        return -1
     if parsed <= 0:
         parsed = 100
     return max(1, min(parsed, 500))
@@ -399,6 +404,11 @@ def _build_where(*, source: PricevalueSource, args: Mapping[str, Any]) -> tuple[
 
 
 def _build_identity_where(*, source: PricevalueSource, args: Mapping[str, Any]) -> tuple[str, List[Any]]:
+    if pf.condition(args) is not None:
+        direct = _build_identity_where(source=source, args=pf.without_filter(args))
+        sql, params = pf.and_sql((direct[0].removeprefix("AND "), direct[1]),
+                                pf.sql_filter(args, source.fields, allowed={"code", "name"}))
+        return (f"AND ({sql})" if sql else ""), params
     clauses: List[str] = []
     params: List[Any] = []
     for connector, field_name, op, value in _explicit_filters(source=source, args=args):
@@ -425,6 +435,9 @@ def _build_identity_where(*, source: PricevalueSource, args: Mapping[str, Any]) 
 
 
 def _build_filter_clauses(*, source: PricevalueSource, args: Mapping[str, Any]) -> tuple[str, List[Any]]:
+    if pf.condition(args) is not None:
+        return pf.and_sql(_build_filter_clauses(source=source, args=pf.without_filter(args)),
+                          pf.sql_filter(args, source.fields, allowed=set(source.fields)))
     clauses: List[str] = []
     params: List[Any] = []
     for connector, field_name, op, value in _explicit_filters(source=source, args=args):
@@ -458,6 +471,8 @@ def _ignored_filters(*, source: PricevalueSource, args: Mapping[str, Any]) -> Li
 
 
 def _explicit_filters(*, source: PricevalueSource, args: Mapping[str, Any]) -> List[tuple[str, str, str, Any]]:
+    if pf.condition(args) is not None:
+        return _explicit_filters(source=source, args=pf.without_filter(args)) + pf.leaf_items(args)
     rows: List[tuple[str, str, str, Any]] = []
     for field_name in source.fields:
         value = args.get(field_name)
@@ -531,7 +546,7 @@ def _build_order(*, source: PricevalueSource, args: Mapping[str, Any]) -> str:
     return f"{expression} {direction_sql}, {source.fields['tradedate']} DESC"
 
 
-def _build_sql(*, source: PricevalueSource, columns: List[str], where_sql: str, order_sql: str) -> str:
+def _build_sql(*, source: PricevalueSource, columns: List[str], where_sql: str, order_sql: str, limited: bool = True) -> str:
     select_sql = ", ".join(f"{source.fields[column]} AS `{column}`" for column in columns)
     return f"""
         SELECT {select_sql}
@@ -539,7 +554,7 @@ def _build_sql(*, source: PricevalueSource, columns: List[str], where_sql: str, 
         LEFT JOIN {source.base_table} b ON {source.join_on}
         WHERE {where_sql}
         ORDER BY {order_sql}
-        LIMIT %s
+        {'LIMIT %s' if limited else ''}
     """
 
 
@@ -709,6 +724,9 @@ def _normalize_kd_metric_row(row: Mapping[str, Any], *, source: PricevalueSource
 
 
 def _filter_kd_rows(rows: List[Dict[str, Any]], *, args: Mapping[str, Any], field: str) -> List[Dict[str, Any]]:
+    tree = pf.condition(args)
+    if tree is not None:
+        return [row for row in rows if pf.evaluate(tree, row)]
     allowed = {"value", "k", "end_date", "tradedate", "current_value", field}
     filters = [item for item in _explicit_filters(source=_filter_source(allowed), args=args) if item[1] in allowed]
     result = rows

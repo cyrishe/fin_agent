@@ -1,0 +1,70 @@
+{
+  "raw_rows": 59959,
+  "raw_st_rows": 3466,
+  "removed_at_limit_rows": 1642,
+  "removed_at_limit_st_rows": 1642,
+  "retained_rows": 58317,
+  "retained_st_rows": 1824,
+  "retained_st_share": 0.031277329080714025,
+  "aug_sep_reference_rows": 14783,
+  "aug_sep_reference_st_rows": 576,
+  "aug_sep_reference_st_share": 0.03896367449096936,
+  "retained_st_outcomes": {
+    "rows": 1824,
+    "labeled": 1751,
+    "target_ge3": 278,
+    "sale_known": 1751,
+    "sale_0940_ge3": 175
+  },
+  "retained_nonst_outcomes": {
+    "rows": 56493,
+    "labeled": 55193,
+    "target_ge3": 8199,
+    "sale_known": 55193,
+    "sale_0940_ge3": 5389
+  },
+  "aug_sep_st_outcomes": {
+    "rows": 576,
+    "labeled": 575,
+    "target_ge3": 85,
+    "sale_known": 575,
+    "sale_0940_ge3": 64
+  },
+  "monthly": {
+    "2026-01": {
+      "rows": 7719,
+      "st_rows": 195,
+      "st_share": 0.025262339681305868
+    },
+    "2026-02": {
+      "rows": 5329,
+      "st_rows": 127,
+      "st_share": 0.023831863389003564
+    },
+    "2026-03": {
+      "rows": 8520,
+      "st_rows": 249,
+      "st_share": 0.029225352112676056
+    },
+    "2026-04": {
+      "rows": 9383,
+      "st_rows": 256,
+      "st_share": 0.027283384844932323
+    },
+    "2026-05": {
+      "rows": 6771,
+      "st_rows": 263,
+      "st_share": 0.03884212080933393
+    },
+    "2026-06": {
+      "rows": 8296,
+      "st_rows": 250,
+      "st_share": 0.03013500482160077
+    },
+    "2026-07": {
+      "rows": 12299,
+      "st_rows": 484,
+      "st_share": 0.03935279290999268
+    }
+  }
+}

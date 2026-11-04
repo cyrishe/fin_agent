@@ -1,0 +1,792 @@
+From 0433ae61319e1cdbe8adc8f1ca7192306bd2a6e4 Mon Sep 17 00:00:00 2001
+From: iMac <imac@iMac.local>
+Date: Thu, 10 Sep 2026 14:29:44 +0800
+Subject: [PATCH] feat(session): support replayable request history selection
+
+---
+ docs/persistence-catalog.i18n.yaml            |  4 +-
+ docs/persistence-catalog.md                   | 17 +++++-
+ docs/persistence-catalog.zh.md                | 17 +++++-
+ docs/subsystems/session.i18n.yaml             |  4 +-
+ docs/subsystems/session.md                    | 17 +++++-
+ docs/subsystems/session.zh.md                 | 17 +++++-
+ packages/core/agent-loop/README.i18n.yaml     |  4 +-
+ packages/core/agent-loop/README.md            |  2 +-
+ packages/core/agent-loop/README.zh.md         |  2 +-
+ packages/core/agent-loop/src/agent.ts         |  3 +
+ .../tests/contract-regressions.spec.ts        | 43 +++++++++++++++
+ packages/core/session/README.i18n.yaml        |  4 +-
+ packages/core/session/README.md               |  6 +-
+ packages/core/session/README.zh.md            |  6 +-
+ packages/core/session/src/index.ts            | 50 ++++++++++++++++-
+ .../core/session/src/known-event-types.ts     |  1 +
+ packages/core/session/src/types.ts            |  6 ++
+ .../session/tests/request-history.spec.ts     | 55 +++++++++++++++++++
+ .../extensions/tool-cordis/src/api-catalog.ts |  4 +-
+ packages/llm/token-meter/README.i18n.yaml     |  4 +-
+ packages/llm/token-meter/README.md            |  2 +
+ packages/llm/token-meter/README.zh.md         |  2 +
+ packages/llm/token-meter/src/index.ts         | 19 +++++--
+ .../llm/token-meter/src/usage-projection.ts   |  7 +++
+ .../llm/token-meter/tests/token-meter.spec.ts | 18 ++++++
+ .../tests/token-usage-projection.spec.ts      | 11 ++++
+ 26 files changed, 295 insertions(+), 30 deletions(-)
+ create mode 100644 packages/core/session/tests/request-history.spec.ts
+
+diff --git a/docs/persistence-catalog.i18n.yaml b/docs/persistence-catalog.i18n.yaml
+index 39462f81db..924e3c5cb4 100644
+--- a/docs/persistence-catalog.i18n.yaml
++++ b/docs/persistence-catalog.i18n.yaml
+@@ -2,5 +2,5 @@
+ # side as of the last confirmed-consistent state. Both languages carry equal authority;
+ # after editing either side, bring the other along and re-record with:
+ #   pnpm run verify-translation-pairing --write docs/persistence-catalog.md
+-persistence-catalog.md: 2143f7881edad36a986869fcbb458ae464014a44
+-persistence-catalog.zh.md: abe6511a8ad9edbbc0e73ab77e02cf10d6346364
++persistence-catalog.md: 1ee2625491901bb027cc3e1eaeddc794b6e1f8d5
++persistence-catalog.zh.md: 3362947292c2abed19c9c9c8a9585793a429a199
+diff --git a/docs/persistence-catalog.md b/docs/persistence-catalog.md
+index 2143f7881e..1ee2625491 100644
+--- a/docs/persistence-catalog.md
++++ b/docs/persistence-catalog.md
+@@ -79,7 +79,7 @@ export type SessionEvent<T extends SessionEventType = SessionEventType> = {
+ }[T]
+ ```
+ 
+-Sources: [`packages/core/session/src/types.ts:328`](../packages/core/session/src/types.ts) · [`packages/core/session/src/types.ts:335`](../packages/core/session/src/types.ts) · [`packages/core/session/src/types.ts:364`](../packages/core/session/src/types.ts) · [`packages/core/session/src/types.ts:396`](../packages/core/session/src/types.ts)
++Sources: [`packages/core/session/src/types.ts:334`](../packages/core/session/src/types.ts) · [`packages/core/session/src/types.ts:341`](../packages/core/session/src/types.ts) · [`packages/core/session/src/types.ts:370`](../packages/core/session/src/types.ts) · [`packages/core/session/src/types.ts:402`](../packages/core/session/src/types.ts)
+ 
+ ## Events
+ 
+@@ -573,6 +573,21 @@ Source: [`packages/core/session/src/types.ts:301`](../packages/core/session/src/
+ 
+ Source: [`packages/core/session/src/types.ts:291`](../packages/core/session/src/types.ts)
+ 
++<a id="requesthistory--log-only"></a>
++
++#### `request/history` — log-only
++
++```ts persistence-catalog
++/**
++ * Select a model-history suffix at a whole-turn boundary. Omission restores
++ * the complete live surface. This never removes events or rewrites messages;
++ * the selection is durable so resumed and offline requests use the same view.
++ */
++'request/history': { fromTurn?: number }
++```
++
++Source: [`packages/core/session/src/types.ts:330`](../packages/core/session/src/types.ts)
++
+ ### `sandbox/*`
+ 
+ <a id="sandboxmode--log-only"></a>
+diff --git a/docs/persistence-catalog.zh.md b/docs/persistence-catalog.zh.md
+index abe6511a8a..3362947292 100644
+--- a/docs/persistence-catalog.zh.md
++++ b/docs/persistence-catalog.zh.md
+@@ -81,7 +81,7 @@ export type SessionEvent<T extends SessionEventType = SessionEventType> = {
+ }[T]
+ ```
+ 
+-来源：[`packages/core/session/src/types.ts:321`](../packages/core/session/src/types.ts) · [`packages/core/session/src/types.ts:328`](../packages/core/session/src/types.ts) · [`packages/core/session/src/types.ts:357`](../packages/core/session/src/types.ts) · [`packages/core/session/src/types.ts:389`](../packages/core/session/src/types.ts)
++来源：[`packages/core/session/src/types.ts:321`](../packages/core/session/src/types.ts) · [`packages/core/session/src/types.ts:334`](../packages/core/session/src/types.ts) · [`packages/core/session/src/types.ts:357`](../packages/core/session/src/types.ts) · [`packages/core/session/src/types.ts:389`](../packages/core/session/src/types.ts)
+ 
+ ## 事件
+ 
+@@ -575,6 +575,21 @@ export type SessionEvent<T extends SessionEventType = SessionEventType> = {
+ 
+ 来源：[`packages/core/session/src/types.ts:289`](../packages/core/session/src/types.ts)
+ 
++<a id="requesthistory--log-only"></a>
++
++#### `request/history` — log-only
++
++```ts persistence-catalog
++/**
++ * Select a model-history suffix at a whole-turn boundary. Omission restores
++ * the complete live surface. This never removes events or rewrites messages;
++ * the selection is durable so resumed and offline requests use the same view.
++ */
++'request/history': { fromTurn?: number }
++```
++
++来源：[`packages/core/session/src/types.ts:330`](../packages/core/session/src/types.ts)
++
+ ### `sandbox/*`
+ 
+ <a id="sandboxmode--log-only"></a>
+diff --git a/docs/subsystems/session.i18n.yaml b/docs/subsystems/session.i18n.yaml
+index f459ae1fd9..659498ffc6 100644
+--- a/docs/subsystems/session.i18n.yaml
++++ b/docs/subsystems/session.i18n.yaml
+@@ -2,5 +2,5 @@
+ # side as of the last confirmed-consistent state. Both languages carry equal authority;
+ # after editing either side, bring the other along and re-record with:
+ #   pnpm run verify-translation-pairing --write docs/subsystems/session.md
+-session.md: f3c246f7a77386a088f0559d233031bdb8d997f8
+-session.zh.md: bc706a11e9b504f6806cbf7c1beb67b972fb4f75
++session.md: 1da26e2332008505261c095d45a50ad85bdaba43
++session.zh.md: 0cac1dd60a46c27a1391d2a83438e3e52ae0a072
+diff --git a/docs/subsystems/session.md b/docs/subsystems/session.md
+index f3c246f7a7..1da26e2332 100644
+--- a/docs/subsystems/session.md
++++ b/docs/subsystems/session.md
+@@ -128,6 +128,12 @@ interface SessionEventMap {
+    * so tolerating concurrent writers needs a signal beyond the log.
+    */
+   'session/end-seed': Record<string, never>
++  /**
++   * Select a model-history suffix at a whole-turn boundary. Omission restores
++   * the complete live surface. This never removes events or rewrites messages;
++   * the selection is durable so resumed and offline requests use the same view.
++   */
++  'request/history': { fromTurn?: number }
+ }
+ ```
+ 
+@@ -462,16 +468,23 @@ declare class Session {
+    * @returns the latest immutable route metadata.
+    */
+   requestContext(): RequestContext | undefined;
++  /**
++   * Read the logged model-history selection without changing the archive.
++   * @returns the immutable selection; absent fromTurn means the full live surface.
++   */
++  requestHistory(): { fromTurn?: number };
++
+   /**
+    * Derive the LLM message history by walking the ordered sequences of
+    * message-producing events maintained by `surfaceOp` markers. The
+-   * surface is the single source of derived history: every message-producing
++   * surface supplies message content, filtered by the logged request/history
++   * selection. Every message-producing
+    * append records its `surfaceOp`, so a raw event with no marker (a chunk, a
+    * turn boundary) is correctly absent, and a compaction `replace` deletes the
+    * shadowed nodes from the derivation. The projection rules are
+    * {@link deriveEventMessage}, folded per node.
+    *
+-   * CACHED: each surface node is projected exactly once, when first seen — a
++   * Without a history selection, each surface node is projected once when first seen; a
+    * call costs O(new nodes), and a surface rewrite (a `replace`;
+    * {@link SessionSurface.replaceGeneration}) rebuilds. The returned array is
+    * a fresh snapshot per call (later appends never grow an array a caller
+diff --git a/docs/subsystems/session.zh.md b/docs/subsystems/session.zh.md
+index bc706a11e9..0cac1dd60a 100644
+--- a/docs/subsystems/session.zh.md
++++ b/docs/subsystems/session.zh.md
+@@ -128,6 +128,12 @@ interface SessionEventMap {
+    * so tolerating concurrent writers needs a signal beyond the log.
+    */
+   'session/end-seed': Record<string, never>
++  /**
++   * Select a model-history suffix at a whole-turn boundary. Omission restores
++   * the complete live surface. This never removes events or rewrites messages;
++   * the selection is durable so resumed and offline requests use the same view.
++   */
++  'request/history': { fromTurn?: number }
+ }
+ ```
+ 
+@@ -464,16 +470,23 @@ declare class Session {
+    * @returns the latest immutable route metadata.
+    */
+   requestContext(): RequestContext | undefined;
++  /**
++   * Read the logged model-history selection without changing the archive.
++   * @returns the immutable selection; absent fromTurn means the full live surface.
++   */
++  requestHistory(): { fromTurn?: number };
++
+   /**
+    * Derive the LLM message history by walking the ordered sequences of
+    * message-producing events maintained by `surfaceOp` markers. The
+-   * surface is the single source of derived history: every message-producing
++   * surface supplies message content, filtered by the logged request/history
++   * selection. Every message-producing
+    * append records its `surfaceOp`, so a raw event with no marker (a chunk, a
+    * turn boundary) is correctly absent, and a compaction `replace` deletes the
+    * shadowed nodes from the derivation. The projection rules are
+    * {@link deriveEventMessage}, folded per node.
+    *
+-   * CACHED: each surface node is projected exactly once, when first seen — a
++   * Without a history selection, each surface node is projected once when first seen; a
+    * call costs O(new nodes), and a surface rewrite (a `replace`;
+    * {@link SessionSurface.replaceGeneration}) rebuilds. The returned array is
+    * a fresh snapshot per call (later appends never grow an array a caller
+diff --git a/packages/core/agent-loop/README.i18n.yaml b/packages/core/agent-loop/README.i18n.yaml
+index 0e12ae0be0..cdf83cda7f 100644
+--- a/packages/core/agent-loop/README.i18n.yaml
++++ b/packages/core/agent-loop/README.i18n.yaml
+@@ -2,5 +2,5 @@
+ # side as of the last confirmed-consistent state. Both languages carry equal authority;
+ # after editing either side, bring the other along and re-record with:
+ #   pnpm run verify-translation-pairing --write packages/core/agent-loop/README.md
+-README.md: f1830c3293b4ca37fe102aa6868bbb612dc773a1
+-README.zh.md: 671a117d64baeb77f083a6d429e5bb205e667fe6
++README.md: e08f7f5bf4f642e0866fbe8748ee7070adc467c5
++README.zh.md: 20b646b6b5338a699960a0cb014cecfbe2a9fae1
+diff --git a/packages/core/agent-loop/README.md b/packages/core/agent-loop/README.md
+index f1830c3293..e08f7f5bf4 100644
+--- a/packages/core/agent-loop/README.md
++++ b/packages/core/agent-loop/README.md
+@@ -152,7 +152,7 @@ Append-only only while system text, schemas, and earlier history remain byte-ide
+ 
+ #### What the model sees
+ 
+-Accepted user messages, assistant messages, tool calls and results, injected context, and steering are logged and sent on later steps. Raw stream chunks, lifecycle boundaries, and other log-only events are excluded.
++Accepted user messages, assistant messages, tool calls and results, injected context, and steering are logged and sent on later steps. Raw stream chunks, lifecycle boundaries, and other log-only events are excluded. The loop honors the session's [history selection](../session/README.md) for each request. A changed selection starts a distinct request series; restoring full history reuses the retained messages without regenerating them.
+ 
+ #### Token effect
+ 
+diff --git a/packages/core/agent-loop/README.zh.md b/packages/core/agent-loop/README.zh.md
+index 671a117d64..20b646b6b5 100644
+--- a/packages/core/agent-loop/README.zh.md
++++ b/packages/core/agent-loop/README.zh.md
+@@ -152,7 +152,7 @@ const handle = await ctx.agents.create({
+ 
+ #### 模型看到什么
+ 
+-已接纳的 user 消息、assistant 消息、工具调用与结果、注入上下文与 steering 都会记录，并在后续步骤中发送。原始流分片、生命周期边界与其他仅写入日志的事件会被排除。
++已接纳的 user 消息、assistant 消息、工具调用与结果、注入上下文与 steering 都会记录，并在后续步骤中发送。原始流分片、生命周期边界与其他仅写入日志的事件会被排除。循环在每次请求中遵循会话的[历史选择](../session/README.zh.md)。选择变化会开始独立的请求序列；恢复完整历史会复用保留的消息，无需重新生成。
+ 
+ #### Token 影响
+ 
+diff --git a/packages/core/agent-loop/src/agent.ts b/packages/core/agent-loop/src/agent.ts
+index 0d3af9663b..95a763f41f 100644
+--- a/packages/core/agent-loop/src/agent.ts
++++ b/packages/core/agent-loop/src/agent.ts
+@@ -82,6 +82,7 @@ export class ReactLoopAgent implements Agent {
+   private requestHeaderLogged = false
+   /** Surface generation of the preceding built request. */
+   private requestSurfaceGeneration: number | undefined
++  private requestHistoryFromTurn: number | undefined
+   private readonly runtimeContext: RuntimeContextProjection
+ 
+   constructor(
+@@ -502,6 +503,7 @@ export class ReactLoopAgent implements Agent {
+     const baseline = this.session.requestHeader()
+     const startsSeries = startsRequestSeries
+       || this.requestSurfaceGeneration !== surfaceGeneration
++      || this.requestHistoryFromTurn !== session.requestHistory().fromTurn
+     if (!this.requestHeaderLogged) {
+       this.session.append('request/header', { header, reason: baseline === undefined ? 'initial' : 'resume' })
+       this.requestHeaderLogged = true
+@@ -515,6 +517,7 @@ export class ReactLoopAgent implements Agent {
+       this.session.append('request/header', { header, reason: 'series' })
+     }
+     this.requestSurfaceGeneration = surfaceGeneration
++    this.requestHistoryFromTurn = session.requestHistory().fromTurn
+ 
+     const contextWindow = preparedCall?.context?.contextWindow
+     const requestContext: RequestContext = {
+diff --git a/packages/core/agent-loop/tests/contract-regressions.spec.ts b/packages/core/agent-loop/tests/contract-regressions.spec.ts
+index 25a0c7a85a..0e37daf9b8 100644
+--- a/packages/core/agent-loop/tests/contract-regressions.spec.ts
++++ b/packages/core/agent-loop/tests/contract-regressions.spec.ts
+@@ -59,6 +59,49 @@ function inboxText(message: UserMessage): string {
+     .join('')
+ }
+ 
++describe('temporary history scope', () => {
++  it('sends only the selected turn, retains its tool pairs, and restores earlier evidence for a follow-up', async () => {
++    const adapter = new MockAdapter([
++      textResponse('earlier answer'),
++      toolCallResponse('scope-tool', 'proof', {}),
++      textResponse('independent answer'),
++      textResponse('follow-up answer'),
++    ])
++    const ctx = await harness(adapter)
++    ctx.tools.register(defineContentToolFixture({ name: 'proof', description: 'Proof',
++      parameters: {},
++      execute: async () => [{ type: 'text', text: 'current evidence' }],
++    }))
++    const agent = ctx.agentLoop.create(SessionId('temporary-scope'), { provider: 'mock', model: 'mock' })
++    agent.ctx.on('agent/pre-step', async ({ turn }, next) => {
++      const fromTurn = turn === 2 ? 2 : undefined
++      if (agent.session.requestHistory().fromTurn !== fromTurn) {
++        agent.session.append('request/history', fromTurn === undefined ? {} : { fromTurn })
++      }
++      return next()
++    })
++    for (const question of ['earlier question', 'independent question', 'return to the earlier question']) {
++      send(agent, question)
++      await waitForIdle(ctx, agent)
++    }
++    expect(adapter.requests).toHaveLength(4)
++    for (const request of adapter.requests.slice(1, 3)) {
++      expect(JSON.stringify(request.messages)).not.toContain('earlier answer')
++      expect(JSON.stringify(request.messages)).toContain('independent question')
++    }
++    expect(JSON.stringify(adapter.requests[2]?.messages)).toContain('current evidence')
++    expect(JSON.stringify(adapter.requests[3]?.messages)).toContain('earlier answer')
++    expect(JSON.stringify(adapter.requests[3]?.messages)).toContain('independent answer')
++    expect(agent.session.events.filter(event => event.type === 'request/history')).toHaveLength(2)
++    // Reconstruct every exact request boundary solely from the durable log.
++    const ends = agent.session.events.filter(event => event.type === 'assistant/message')
++    for (const [index, event] of ends.entries()) {
++      const replay = Session.create(SessionId(`scope-replay-${index}`), agent.session.events.slice(0, event.seq))
++      expect(replay.deriveMessages()).toEqual(adapter.requests[index]?.messages)
++    }
++  })
++})
++
+ describe('assistant replay provider and model fields', () => {
+   it('records adapter replay state with the assembled assistant content', async () => {
+     const response = textResponse('unchanged')
+diff --git a/packages/core/session/README.i18n.yaml b/packages/core/session/README.i18n.yaml
+index a1255e2fa4..fd6ed887ed 100644
+--- a/packages/core/session/README.i18n.yaml
++++ b/packages/core/session/README.i18n.yaml
+@@ -2,5 +2,5 @@
+ # side as of the last confirmed-consistent state. Both languages carry equal authority;
+ # after editing either side, bring the other along and re-record with:
+ #   pnpm run verify-translation-pairing --write packages/core/session/README.md
+-README.md: b96423846de1f0c902ed656ff879f7d9eb0536ef
+-README.zh.md: 61f1ff77f9427e121b56ae0205b36e7512782030
++README.md: b7bd848c2cf9b55bba999cada205d4688f206569
++README.zh.md: 848e281a8ba2b5496a85ffd54ace30687f7e1e26
+diff --git a/packages/core/session/README.md b/packages/core/session/README.md
+index b96423846d..b7bd848c2c 100644
+--- a/packages/core/session/README.md
++++ b/packages/core/session/README.md
+@@ -49,6 +49,8 @@ session.deriveMessages()         // the derived model history
+ 
+ Surface events (`user/message`, `assistant/message`, `tool/result`) must declare how they join the ordered surface; raw chunks, boundaries, and other log-only events never produce a message.
+ 
++At `agent/pre-step`, a policy can append `request/history` with `fromTurn` naming an existing `turn/start` to select that turn and later surface entries for model requests. Appending the event with `{}` restores the full live surface. `requestHistory()` reads the logged selection; invalid turn boundaries are rejected. Selection preserves message roles, tool pairs and archived events, survives replay, and remains in force until another selection. The policy owns the semantic decision; the session does not classify questions.
++
+ ### Fork a session
+ 
+ `ctx.sessions.fork(source, boundary?, childSessionId?)` selects source events through an inclusive `boundary` seq (default: the current last event), requires the prefix to end outside an open turn, and creates a live child session with lineage metadata. A tool-time delegation that must branch mid-turn clips to a completed prefix instead.
+@@ -128,11 +130,11 @@ The model receives the complete messages from `user/message`, `assistant/message
+ 
+ #### Token effect
+ 
+-Appended surface entries are resent on later steps. A `replace` surface operation removes the shadowed entries from future inputs without deleting their raw log records.
++Selected surface entries are resent on later steps. History selection omits earlier turns without spending a model call or deleting them; restoration includes them again. A `replace` surface operation removes the shadowed entries from future inputs without deleting their raw log records.
+ 
+ #### KV Cache effect
+ 
+-Appended surface entries preserve reusable prefixes. A `replace` operation invalidates reuse from the first shadowed message even though the underlying event log stays append-only.
++Appended surface entries preserve reusable prefixes. History selection or a `replace` operation invalidates reuse from the first changed message even though the underlying event log stays append-only.
+ 
+ ### Crash-repair result
+ 
+diff --git a/packages/core/session/README.zh.md b/packages/core/session/README.zh.md
+index 61f1ff77f9..848e281a8b 100644
+--- a/packages/core/session/README.zh.md
++++ b/packages/core/session/README.zh.md
+@@ -49,6 +49,8 @@ session.deriveMessages()         // the derived model history
+ 
+ 表层事件（`user/message`、`assistant/message`、`tool/result`）必须声明如何进入有序 surface；原始分片、边界与其他仅日志事件从不产生消息。
+ 
++策略可在 `agent/pre-step` 追加 `request/history`，以 `fromTurn` 指向已有的 `turn/start`，为模型请求选择该轮及之后的表层条目。以 `{}` 追加该事件会恢复完整的当前表层。`requestHistory()` 读取已记录的选择；无效轮次边界会被拒绝。选择保留消息角色、工具调用配对和归档事件，可回放，且持续生效直到下一次选择。语义判断由策略负责，会话本身不分类问题。
++
+ ### 派生会话的 fork
+ 
+ `ctx.sessions.fork(source, boundary?, childSessionId?)` 选取截至 `boundary` 事件序号（含该事件）的源事件（默认：当前最后一个事件），要求所选前缀结束时没有开放轮次，再创建带谱系元数据的实时子会话。必须在轮次中途分支的工具时委派会裁剪到已完成前缀。
+@@ -128,11 +130,11 @@ session.deriveMessages()         // the derived model history
+ 
+ #### Token 影响
+ 
+-追加的 surface 条目会在后续步骤中重新发送。`replace` surface 操作会从未来输入中移除被遮蔽条目，但不删除其原始日志记录。
++选中的 surface 条目会在后续步骤中重新发送。历史选择省略较早轮次，不消耗模型调用，也不删除它们；恢复后会再次携带。`replace` surface 操作会从未来输入中移除被遮蔽条目，但不删除其原始日志记录。
+ 
+ #### KV Cache 影响
+ 
+-追加的 surface 条目会保留可复用前缀。即使底层事件日志保持仅追加，`replace` 操作也会从首条被遮蔽消息起使缓存复用失效。
++追加的 surface 条目会保留可复用前缀。即使底层事件日志保持仅追加，历史选择或 `replace` 操作也会从首条改变的消息起使缓存复用失效。
+ 
+ ### 崩溃修复结果
+ 
+diff --git a/packages/core/session/src/index.ts b/packages/core/session/src/index.ts
+index 84a89d325f..b5e05f3b20 100644
+--- a/packages/core/session/src/index.ts
++++ b/packages/core/session/src/index.ts
+@@ -520,6 +520,7 @@ export class Session {
+         }
+         assertSessionEventEnvelope(snapshot, index)
+         assertSupportedRequestHeader(snapshot.type, snapshot.data, `seed event at index ${index}`)
++        if (snapshot.type === 'request/history') this.validateHistorySelection(snapshot.data)
+         if (snapshot.seq !== index) {
+           throw new Error(`seed event at index ${index} has seq ${snapshot.seq} (expected ${index}); seed must be contiguous from 0`)
+         }
+@@ -614,6 +615,7 @@ export class Session {
+       throw new Error(`session event "${type}" carries non-JSON-serializable data`)
+     }
+     assertSupportedRequestHeader(type, dataSnapshot, `session event "${type}"`)
++    if (type === 'request/history') this.validateHistorySelection(dataSnapshot)
+     const surfaceMetadataSnapshot = snapshotJsonValue(surfaceMetadata)
+     if (surfaceMetadataSnapshot === undefined) {
+       throw new Error(`session event "${type}" carries non-JSON-serializable surface metadata`)
+@@ -703,16 +705,51 @@ export class Session {
+   /** {@link SurfaceManager.replaceGeneration} the cache was built under. */
+   private derivedGeneration = 0
+ 
++  private historyFoldedCount = 0
++  private historySelection: { fromTurn?: number } = Object.freeze({})
++  private historyStartSeq = -1
++
++  /**
++   * Read the logged model-history selection without changing the archive.
++   * @returns the immutable selection; absent fromTurn means the full live surface.
++   */
++  requestHistory(): { fromTurn?: number } {
++    for (let index = this.historyFoldedCount; index < this.log.length; index++) {
++      const event = this.log[index]
++      if (event?.type === 'request/history') {
++        this.historySelection = event.data
++        this.historyStartSeq = event.data.fromTurn === undefined ? -1
++          : this.log.findIndex(item => item.type === 'turn/start' && item.data.turn === event.data.fromTurn)
++      }
++    }
++    this.historyFoldedCount = this.log.length
++    return this.historySelection
++  }
++
++  /** Reject a boundary that could silently omit the current task or split a tool pair. */
++  private validateHistorySelection(value: unknown): void {
++    if (!value || typeof value !== 'object' || Array.isArray(value)) {
++      throw new Error('request/history requires an object')
++    }
++    const fromTurn = (value as { fromTurn?: unknown }).fromTurn
++    if (fromTurn === undefined) return
++    if (typeof fromTurn !== 'number' || !Number.isSafeInteger(fromTurn) || fromTurn < 1
++      || !this.log.some(event => event.type === 'turn/start' && event.data.turn === fromTurn)) {
++      throw new Error('request/history fromTurn must identify an existing turn/start')
++    }
++  }
++
+   /**
+    * Derive the LLM message history by walking the ordered sequences of
+    * message-producing events maintained by `surfaceOp` markers. The
+-   * surface is the single source of derived history: every message-producing
++   * surface supplies message content, filtered by the logged request/history
++   * selection. Every message-producing
+    * append records its `surfaceOp`, so a raw event with no marker (a chunk, a
+    * turn boundary) is correctly absent, and a compaction `replace` deletes the
+    * shadowed nodes from the derivation. The projection rules are
+    * {@link deriveEventMessage}, folded per node.
+    *
+-   * CACHED: each surface node is projected exactly once, when first seen — a
++   * Without a history selection, each surface node is projected once when first seen; a
+    * call costs O(new nodes), and a surface rewrite (a `replace`;
+    * {@link SessionSurface.replaceGeneration}) rebuilds. The returned array is
+    * a fresh snapshot per call (later appends never grow an array a caller
+@@ -724,6 +761,15 @@ export class Session {
+   deriveMessages(): Message[] {
+     const surface = this.surface
+     const nodes = surface.nodes
++    const { fromTurn } = this.requestHistory()
++    if (fromTurn !== undefined) {
++      const start = this.historyStartSeq
++      return nodes.filter(seq => seq > start).flatMap((seq) => {
++        const event = this.log[seq]
++        const message = event === undefined ? null : this.deriveEventMessage(event)
++        return message === null ? [] : [message]
++      })
++    }
+     const generation = surface.replaceGeneration
+     if (generation !== this.derivedGeneration) {
+       this.derived = []
+diff --git a/packages/core/session/src/known-event-types.ts b/packages/core/session/src/known-event-types.ts
+index f97c8d4846..efa02a6fee 100644
+--- a/packages/core/session/src/known-event-types.ts
++++ b/packages/core/session/src/known-event-types.ts
+@@ -40,6 +40,7 @@ export const KNOWN_SESSION_EVENT_TYPES: ReadonlySet<string> = new Set([
+   'plan/mode',
+   'request/context',
+   'request/header',
++  'request/history',
+   'sandbox/mode',
+   'schedule/change',
+   'session-log-deepseek/delivery-accepted',
+diff --git a/packages/core/session/src/types.ts b/packages/core/session/src/types.ts
+index bc27c996d0..7e97709bd8 100644
+--- a/packages/core/session/src/types.ts
++++ b/packages/core/session/src/types.ts
+@@ -322,6 +322,12 @@ export interface SessionEventMap {
+    * so tolerating concurrent writers needs a signal beyond the log.
+    */
+   'session/end-seed': Record<string, never>
++  /**
++   * Select a model-history suffix at a whole-turn boundary. Omission restores
++   * the complete live surface. This never removes events or rewrites messages;
++   * the selection is durable so resumed and offline requests use the same view.
++   */
++  'request/history': { fromTurn?: number }
+ }
+ 
+ /** The appendable event-type keys of {@link SessionEventMap}, plugin-merged extensions included. */
+diff --git a/packages/core/session/tests/request-history.spec.ts b/packages/core/session/tests/request-history.spec.ts
+new file mode 100644
+index 0000000000..31647943e8
+--- /dev/null
++++ b/packages/core/session/tests/request-history.spec.ts
+@@ -0,0 +1,55 @@
++import { describe, expect, it } from 'vitest'
++import { Session, SessionId } from '@deepseek-ai/dsh-session'
++import { createUserMessage, createMessage } from '@deepseek-ai/dsh-llm'
++
++function user(session: Session, text: string) {
++  session.append('user/message', createUserMessage({
++    content: [{ type: 'text', text }], source: { kind: 'user' },
++  }), { surfaceOp: 'append' })
++}
++
++describe('request history selection', () => {
++  it('keeps the archive intact, replays a selected turn, and restores the complete view', () => {
++    const session = Session.create(SessionId('request-history'))
++    session.append('turn/start', { turn: 1 })
++    user(session, 'earlier question and complete evidence')
++    session.append('assistant/message', { turn: 1, step: 1,
++      message: createMessage({ role: 'assistant', content: [{ type: 'text', text: 'earlier answer' }],
++        source: { kind: 'model', provider: 'mock', model: 'mock' } }),
++    }, { surfaceOp: 'append' })
++    session.append('turn/end', { turn: 1, reason: { kind: 'completed' } })
++    const archive = [...session.events]
++    session.append('turn/start', { turn: 2 })
++    session.append('request/history', { fromTurn: 2 })
++    user(session, 'independent question')
++    const selected = session.deriveMessages()
++    expect(selected).toHaveLength(1)
++    expect(JSON.stringify(selected)).not.toContain('earlier')
++    expect(session.events.slice(0, archive.length)).toEqual(archive)
++    expect(session.surface.nodes).toHaveLength(3)
++    const replay = Session.create(SessionId('request-history-replay'), [...session.events])
++    expect(replay.deriveMessages()).toEqual(selected)
++    replay.append('request/history', {})
++    expect(replay.deriveMessages()).toHaveLength(3)
++    expect(JSON.stringify(replay.deriveMessages())).toContain('earlier answer')
++    expect(selected).toHaveLength(1)
++    expect(Session.create(SessionId('restore-replay'), [...replay.events]).deriveMessages()).toEqual(replay.deriveMessages())
++  })
++
++  it('defaults legacy sessions to full history and refuses nonexistent or malformed boundaries', () => {
++    const session = Session.create(SessionId('request-history-invalid'))
++    session.append('turn/start', { turn: 1 })
++    user(session, 'keep me')
++    expect(session.requestHistory()).toEqual({})
++    const before = [...session.events]
++    for (const fromTurn of [0, -1, 1.5, 2, '1', null]) {
++      expect(() => session.append('request/history', { fromTurn } as { fromTurn: number })).toThrow(/existing turn/)
++      expect(session.events).toEqual(before)
++    }
++    expect(() => Session.create(SessionId('bad-replay'), [...before, {
++      seq: before.length, time: 1, type: 'request/history', data: { fromTurn: 2 },
++    }])).toThrow(/existing turn/)
++    session.append('request/history', {})
++    expect(session.deriveMessages()).toHaveLength(1)
++  })
++})
+diff --git a/packages/extensions/tool-cordis/src/api-catalog.ts b/packages/extensions/tool-cordis/src/api-catalog.ts
+index 8edd7adb9d..329ddfb99a 100644
+--- a/packages/extensions/tool-cordis/src/api-catalog.ts
++++ b/packages/extensions/tool-cordis/src/api-catalog.ts
+@@ -4740,7 +4740,7 @@ export const TYPE_API: readonly TypeApiEntry[] = [
+   },
+   {
+     name: 'Session',
+-    declaration: 'export class Session {\n    get surface(): SessionSurface;\n    readonly header: SessionHeader;\n    get id(): SessionId;\n    readonly firstLiveSeq: number;\n    static create(id: SessionId, seed?: readonly SessionEvent[], header?: SessionHeader): Session;\n    static fromRestore(id: SessionId, seed: readonly SessionEvent[], header: SessionHeader): Session;\n    get events(): readonly SessionEvent[];\n    get seq(): number;\n    append<T extends SessionEventType>(type: T, data: SessionEventMap[T], ...opts: T extends SurfaceEventType ? [\n        opts: SurfaceIntent\n    ] : [\n    ]): SessionEvent<T>;\n    requestHeader(): EpochHeader | undefined;\n    requestContext(): RequestContext | undefined;\n    deriveMessages(): Message[];\n    deriveEventMessage(event: SessionEvent): Message | null;\n}',
++    declaration: 'export class Session {\n    get surface(): SessionSurface;\n    readonly header: SessionHeader;\n    get id(): SessionId;\n    readonly firstLiveSeq: number;\n    static create(id: SessionId, seed?: readonly SessionEvent[], header?: SessionHeader): Session;\n    static fromRestore(id: SessionId, seed: readonly SessionEvent[], header: SessionHeader): Session;\n    get events(): readonly SessionEvent[];\n    get seq(): number;\n    append<T extends SessionEventType>(type: T, data: SessionEventMap[T], ...opts: T extends SurfaceEventType ? [\n        opts: SurfaceIntent\n    ] : [\n    ]): SessionEvent<T>;\n    requestHeader(): EpochHeader | undefined;\n    requestContext(): RequestContext | undefined;\n    requestHistory(): {\n        fromTurn?: number;\n    };\n    deriveMessages(): Message[];\n    deriveEventMessage(event: SessionEvent): Message | null;\n}',
+   },
+   {
+     name: 'SessionAddress',
+@@ -4804,7 +4804,7 @@ export const TYPE_API: readonly TypeApiEntry[] = [
+   },
+   {
+     name: 'SessionEventMap',
+-    declaration: 'export interface SessionEventMap {\n    \'turn/start\': {\n        turn: number;\n    };\n    \'turn/end\': {\n        turn: number;\n        reason: TurnEndReason;\n    };\n    \'step/start\': {\n        turn: number;\n        step: number;\n    };\n    \'step/end\': {\n        turn: number;\n        step: number;\n    };\n    \'user/message\': UserMessage;\n    \'assistant/chunk\': {\n        turn: number;\n        step: number;\n        chunk: StreamChunk;\n    };\n    \'assistant/message\': {\n        turn: number;\n        step: number;\n        message: AssistantMessage;\n        usage?: TokenUsage;\n        interrupted?: true;\n    };\n    \'tool/call\': {\n        turn: number;\n        step: number;\n        callId: ToolCallId;\n        name: string;\n        arguments: string;\n    };\n    \'tool/result\': {\n        turn: number;\n        step: number;\n        message: ToolResultMessage;\n        error?: {\n            name: string;\n            code: string;\n        };\n        meta?: JsonValue;\n    };\n    \'request/header\': {\n        header: EpochHeader;\n        reason: RequestHeaderReason;\n        startsSeries?: true;\n    };\n    \'request/context\': RequestContext;\n    \'session/end-seed\': Record<string, never>;\n}',
++    declaration: 'export interface SessionEventMap {\n    \'turn/start\': {\n        turn: number;\n    };\n    \'turn/end\': {\n        turn: number;\n        reason: TurnEndReason;\n    };\n    \'step/start\': {\n        turn: number;\n        step: number;\n    };\n    \'step/end\': {\n        turn: number;\n        step: number;\n    };\n    \'user/message\': UserMessage;\n    \'assistant/chunk\': {\n        turn: number;\n        step: number;\n        chunk: StreamChunk;\n    };\n    \'assistant/message\': {\n        turn: number;\n        step: number;\n        message: AssistantMessage;\n        usage?: TokenUsage;\n        interrupted?: true;\n    };\n    \'tool/call\': {\n        turn: number;\n        step: number;\n        callId: ToolCallId;\n        name: string;\n        arguments: string;\n    };\n    \'tool/result\': {\n        turn: number;\n        step: number;\n        message: ToolResultMessage;\n        error?: {\n            name: string;\n            code: string;\n        };\n        meta?: JsonValue;\n    };\n    \'request/header\': {\n        header: EpochHeader;\n        reason: RequestHeaderReason;\n        startsSeries?: true;\n    };\n    \'request/context\': RequestContext;\n    \'session/end-seed\': Record<string, never>;\n    \'request/history\': {\n        fromTurn?: number;\n    };\n}',
+   },
+   {
+     name: 'SessionEventMetadataFilter',
+diff --git a/packages/llm/token-meter/README.i18n.yaml b/packages/llm/token-meter/README.i18n.yaml
+index 9a01b053eb..45425b6f85 100644
+--- a/packages/llm/token-meter/README.i18n.yaml
++++ b/packages/llm/token-meter/README.i18n.yaml
+@@ -2,5 +2,5 @@
+ # side as of the last confirmed-consistent state. Both languages carry equal authority;
+ # after editing either side, bring the other along and re-record with:
+ #   pnpm run verify-translation-pairing --write packages/llm/token-meter/README.md
+-README.md: 4df0c4d4f9f64f70299efb54bf21595c71b4eb0c
+-README.zh.md: 3937e68d1739b752c589de03e04eb6597232505b
++README.md: 9ea2f147f4aff1d22d9b7f6e841460d7db8f178b
++README.zh.md: f5b1419515ceee4e1125a4d237586cdba01e83c4
+diff --git a/packages/llm/token-meter/README.md b/packages/llm/token-meter/README.md
+index 4df0c4d4f9..9ea2f147f4 100644
+--- a/packages/llm/token-meter/README.md
++++ b/packages/llm/token-meter/README.md
+@@ -44,6 +44,8 @@ Each measurement resolves the effective envelope's provider/model through the op
+ 
+ ### Session projections
+ 
++History selection changes request pressure without deleting archived surface nodes. `measure().totalTokens` prices the selected request; its `nodes`, `surfaceTokens`, and `contextBreakdown` still describe the full live surface. `contextPressure` discards the previous provider sample on `request/history` and waits for the next sample before publishing pressure again. Cumulative usage remains unchanged.
++
+ When the composition provides `ctx.sessionProjections`, token-meter registers three projection units. `tokenUsage` carries the complete durable log's `uncachedInputTokens`, `outputTokens`, `cacheReadTokens`, and `cacheWriteTokens`. A final assistant-message sample replaces streaming usage from the same attempt; `llm/retry-started` ends that replacement scope, so a retry in the same step contributes another billed attempt. `contextPressure` carries optional `pressureTokens` (the newest provider-reported prompt size), optional `projectedTokens` (what the next request's prompt would cost), and optional `contextWindow` from the newest `request/context` record. `contextBreakdown` carries heuristic `systemTokens`, `toolsTokens`, and `messageTokens` — the context's composition, not its provider-billed size. Unloading the plugin removes all three keys.
+ 
+ `contextBreakdown` carries heuristic `systemTokens`, `toolsTokens`, and `messageTokens` — the context's composition rather than its provider-billed size. The envelope figures reprice last-wins on every `request/header`; the message figure replays the same O(1) shadow-price fold as `contextPressure`, so on fully metered logs it equals the sum of `measure().nodes[].heuristicTokens` at every event boundary and compaction shrinks it by its logged shadow price. The route-priced `measure().surfaceTokens` diverges when the routed model reprices images. A replacement without an adjacent shadow-price claim leaves this bounded projection unchanged because it cannot reconstruct the replaced range. All three figures use the measurement service's fixed heuristic and are estimates: they will not sum to `projectedTokens`, whose provider anchor carries exactly the error — CJK text and JSON schemas underprice badly at four characters per token — that the composition rows still contain. Present them as an approximate composition, never as a total.
+diff --git a/packages/llm/token-meter/README.zh.md b/packages/llm/token-meter/README.zh.md
+index 3937e68d17..f5b1419515 100644
+--- a/packages/llm/token-meter/README.zh.md
++++ b/packages/llm/token-meter/README.zh.md
+@@ -44,6 +44,8 @@ const price = ctx.tokenMeter.estimateMessage(message)
+ 
+ ### 会话投影
+ 
++历史选择改变请求压力，但不删除归档表层节点。`measure().totalTokens` 计量选中的请求；其中的 `nodes`、`surfaceTokens` 和 `contextBreakdown` 仍描述完整的当前表层。`contextPressure` 在 `request/history` 时丢弃此前提供方样本，等待下一样本后再次发布压力。累计用量不变。
++
+ 当组合提供 `ctx.sessionProjections` 时，token-meter 注册三个投影单元。`tokenUsage` 携带完整持久日志中的 `uncachedInputTokens`、`outputTokens`、`cacheReadTokens` 与 `cacheWriteTokens`。最终 assistant 消息样本会替换同一次尝试的流式用量；`llm/retry-started` 会结束该替换范围，因此同一步骤中的重试会贡献另一次计费用量。`contextPressure` 携带可选 `pressureTokens`（提供方报告的最新提示词规模）、可选 `projectedTokens`（下一个请求的提示词将花费多少）与来自最新一条 `request/context` 记录的可选 `contextWindow`。`contextBreakdown` 携带启发式 `systemTokens`、`toolsTokens` 与 `messageTokens`——上下文的构成，而非提供方计费规模。卸载插件会移除全部三个键。
+ 
+ `contextBreakdown` 携带启发式的 `systemTokens`、`toolsTokens` 与 `messageTokens`，描述上下文的组成而非提供方计费规模。envelope 数字在每条 `request/header` 上按后者胜重新计价；消息数字重放与 `contextPressure` 相同的 O(1) 影子价折叠，因此在完整计量的日志上，它在每个事件边界都等于 `measure().nodes[].heuristicTokens` 之和，压缩会按记录的影子价缩小该值。路由定价的 `measure().surfaceTokens` 在路由模型重新为图片计价时会与该值不同。若替换前没有紧邻的影子价声明，这个有界投影会保持不变，因为它无法重建被替换区间。三个数字都使用测量服务的固定启发式规则，属于估算值。它们加起来不等于 `projectedTokens`，后者的提供方锚点体现了这些明细行仍然带有的误差（按「4 字符 ≈ 1 token」计价时，CJK 文本与 JSON schema 会被严重低估）。请把它们当作近似的**组成**呈现，而不是总量。
+diff --git a/packages/llm/token-meter/src/index.ts b/packages/llm/token-meter/src/index.ts
+index 082bfba087..88d20fe4dd 100644
+--- a/packages/llm/token-meter/src/index.ts
++++ b/packages/llm/token-meter/src/index.ts
+@@ -47,6 +47,7 @@ interface ReplayState {
+   surface: MeterSurfaceNode[]
+   stepStart: { turn: number; step: number; nodes: readonly MeterSurfaceNode[] } | undefined
+   anchor: MeasurementAnchor | undefined
++  historyStartSeq: number
+ }
+ 
+ /** Sum disjoint provider usage buckets without double-counting reasoning output. */
+@@ -133,6 +134,8 @@ export class TokenMeter extends Service {
+       : canonicalHeader(requestHeader)
+     const pricing = this._routeImagePricing(header)
+     const surface = priceSurface(state.surface, pricing)
++    const requestSurface = state.historyStartSeq < 0 ? surface
++      : priceSurface(state.surface.filter(node => node.seq > state.historyStartSeq), pricing)
+     const anchor = state.anchor
+ 
+     let baseline: TokenMeasurementBaseline
+@@ -150,14 +153,14 @@ export class TokenMeter extends Service {
+       baseline = usage !== undefined && usageTokens(usage) >= estimatedAnchorTokens
+         ? { kind: 'usage', tokens: usageTokens(usage), usage }
+         : { kind: 'estimated', tokens: estimatedAnchorTokens }
+-      surfaceDeltaTokens = surface.surfaceTokens - anchorSurfaceTokens
+-    } else if (header === undefined && surface.surfaceTokens === 0) {
++      surfaceDeltaTokens = requestSurface.surfaceTokens - anchorSurfaceTokens
++    } else if (header === undefined && requestSurface.surfaceTokens === 0) {
+       baseline = { kind: 'none', tokens: 0 }
+       surfaceDeltaTokens = 0
+     } else {
+       baseline = {
+         kind: 'estimated',
+-        tokens: estimateHeader(header) + surface.surfaceTokens,
++        tokens: estimateHeader(header) + requestSurface.surfaceTokens,
+       }
+       surfaceDeltaTokens = 0
+     }
+@@ -199,6 +202,7 @@ export class TokenMeter extends Service {
+         surface: [],
+         stepStart: undefined,
+         anchor: undefined,
++        historyStartSeq: -1,
+       }
+       this.states.set(session, state)
+     }
+@@ -221,8 +225,14 @@ export class TokenMeter extends Service {
+     let nextHeader = state.header
+     let nextStepStart = state.stepStart
+     let nextAnchor = state.anchor
++    let nextHistoryStartSeq = state.historyStartSeq
+ 
+     switch (event.type) {
++      case 'request/history':
++        nextHistoryStartSeq = event.data.fromTurn === undefined ? -1
++          : session.events.findIndex(item => item.type === 'turn/start' && item.data.turn === event.data.fromTurn)
++        nextAnchor = undefined
++        break
+       case 'request/header':
+         nextHeader = canonicalHeader(event.data.header)
+         break
+@@ -232,7 +242,7 @@ export class TokenMeter extends Service {
+             `token meter: step/start at seq ${event.seq} arrived before turn ${state.stepStart.turn}/step ${state.stepStart.step} ended`,
+           )
+         }
+-        nextStepStart = { ...event.data, nodes: [...state.surface] }
++        nextStepStart = { ...event.data, nodes: state.surface.filter(node => node.seq > state.historyStartSeq) }
+         break
+       case 'step/end':
+         if (state.stepStart === undefined
+@@ -284,6 +294,7 @@ export class TokenMeter extends Service {
+       commitSurfaceTokens(state.surface, plan)
+     }
+     state.anchor = nextAnchor
++    state.historyStartSeq = nextHistoryStartSeq
+   }
+ 
+   /**
+diff --git a/packages/llm/token-meter/src/usage-projection.ts b/packages/llm/token-meter/src/usage-projection.ts
+index 50f336c61c..c7f9df3f57 100644
+--- a/packages/llm/token-meter/src/usage-projection.ts
++++ b/packages/llm/token-meter/src/usage-projection.ts
+@@ -183,6 +183,13 @@ export const contextPressureProjectionDefinition = {
+   stateSchema: contextPressureStateSchema,
+   init: () => ({ surfaceTokens: 0 }),
+   apply: (state, event) => {
++    if (event.type === 'request/history') {
++      // A sample from another history view cannot predict this request's
++      // occupancy. The next provider sample anchors the selected view again;
++      // cumulative provider usage and the archived surface remain unchanged.
++      const { pressureTokens: _sample, sampledSurfaceTokens: _anchor, claim: _claim, ...rest } = state
++      return rest
++    }
+     const fold = foldSurfaceProjection(state.claim, event)
+     let next = state
+     if (event.type === 'request/context') {
+diff --git a/packages/llm/token-meter/tests/token-meter.spec.ts b/packages/llm/token-meter/tests/token-meter.spec.ts
+index 84f1dd1788..6de9d06b0f 100644
+--- a/packages/llm/token-meter/tests/token-meter.spec.ts
++++ b/packages/llm/token-meter/tests/token-meter.spec.ts
+@@ -129,6 +129,24 @@ describe('TokenMeter configuration and registration', () => {
+ })
+ 
+ describe('TokenMeter pricing', () => {
++  it('prices the selected request separately from the retained archive and restores both on replay', () => {
++    const service = meter()
++    const session = Session.create(SessionId('meter-history'))
++    session.append('turn/start', { turn: 1 })
++    session.append('user/message', createUserMessage({ content: [{ type: 'text', text: 'old evidence '.repeat(100) }], source: { kind: 'user' } }), { surfaceOp: 'append' })
++    session.append('turn/start', { turn: 2 })
++    session.append('user/message', createUserMessage({ content: [{ type: 'text', text: 'new question' }], source: { kind: 'user' } }), { surfaceOp: 'append' })
++    const full = service.measure(session)
++    session.append('request/history', { fromTurn: 2 })
++    const selected = service.measure(session)
++    expect(selected.totalTokens).toBeLessThan(full.totalTokens)
++    expect(selected.nodes).toEqual(full.nodes)
++    expect(selected.surfaceTokens).toBe(full.surfaceTokens)
++    const replay = Session.create(SessionId('meter-history-replay'), [...session.events])
++    expect(service.measure(replay).totalTokens).toBe(selected.totalTokens)
++    replay.append('request/history', {})
++    expect(service.measure(replay).totalTokens).toBe(full.totalTokens)
++  })
+   it('prices every built-in content shape and merge-extended blocks with one fixed heuristic', () => {
+     const service = meter()
+     const blocks: ContentBlock[] = [
+diff --git a/packages/llm/token-meter/tests/token-usage-projection.spec.ts b/packages/llm/token-meter/tests/token-usage-projection.spec.ts
+index 86f60392c9..d7d3b1e85c 100644
+--- a/packages/llm/token-meter/tests/token-usage-projection.spec.ts
++++ b/packages/llm/token-meter/tests/token-usage-projection.spec.ts
+@@ -348,6 +348,17 @@ function appendAssistant(
+ }
+ 
+ describe('contextPressure session projection', () => {
++  it('drops a stale occupancy sample when history selection changes and anchors the next sample', async () => {
++    const { ctx, session } = await harness()
++    session.append('turn/start', { turn: 1 })
++    startStep(session, 1, 1)
++    usageChunk(session, { inputTokens: 100, outputTokens: 10 }, 1, 1)
++    session.append('request/history', { fromTurn: 1 })
++    expect(pressure(ctx, session)).not.toHaveProperty('pressureTokens')
++    expect(pressure(ctx, session)).not.toHaveProperty('projectedTokens')
++    usageChunk(session, { inputTokens: 20, outputTokens: 10 }, 1, 1)
++    expect(pressure(ctx, session).pressureTokens).toBe(20)
++  })
+   it('serves no pressure or capacity for an empty log', async () => {
+     const { ctx, session } = await harness()
+     expect(pressure(ctx, session)).toEqual({})
+-- 
+2.39.2 (Apple Git-143)
+

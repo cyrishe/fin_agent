@@ -1,0 +1,12 @@
+{
+  "experiment_id": "B1R_20261016_original_recipe_history",
+  "manifest_sha256": "fde4c92ba7c99664ccf8992faa931ed08ea989d271d0cb2108c589a01f7d3c5d",
+  "files": 2577,
+  "models": 187,
+  "training_rows_across_folds": 1523996,
+  "zip_path": "/Volumes/ext/fin_agent/outputs/stock_automl/b1_history_20261016/B1R_收盘开盘v1.1_全年重跑_20261016.zip",
+  "zip_bytes": 205540579,
+  "zip_sha256": "4cafa80098085052c498ad97fca5b9f1682f3717afe0c5a3c531717558236916",
+  "zip_all_files_readback": "ok",
+  "cloud_verified_at": null
+}

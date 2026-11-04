@@ -1,0 +1,111 @@
+{
+  "unit": "one stock at one signal date; overlapping holding periods are not independent observations",
+  "raw_rows": 4850,
+  "eligible_rows_by_horizon": {
+    "1": 4630,
+    "3": 4610,
+    "7": 4570
+  },
+  "selected_horizon": 7,
+  "development_folds": [
+    {
+      "train": {
+        "input": {
+          "rows": 1376,
+          "signal_start": "2024-01-30",
+          "signal_end": "2024-10-22",
+          "latest_label_end": "2024-11-01"
+        },
+        "model_fit": {
+          "rows": 968,
+          "signal_start": "2024-01-30",
+          "signal_end": "2024-08-01",
+          "latest_label_end": "2024-08-13"
+        },
+        "calibration": {
+          "rows": 344,
+          "signal_start": "2024-08-14",
+          "signal_end": "2024-10-22",
+          "latest_label_end": "2024-11-01"
+        },
+        "purged_rows": 64
+      },
+      "validation": {
+        "rows": 656,
+        "signal_start": "2024-11-04",
+        "signal_end": "2025-03-06",
+        "latest_label_end": "2025-03-18"
+      }
+    },
+    {
+      "train": {
+        "input": {
+          "rows": 2096,
+          "signal_start": "2024-01-30",
+          "signal_end": "2025-03-06",
+          "latest_label_end": "2025-03-18"
+        },
+        "model_fit": {
+          "rows": 1504,
+          "signal_start": "2024-01-30",
+          "signal_end": "2024-11-13",
+          "latest_label_end": "2024-11-25"
+        },
+        "calibration": {
+          "rows": 528,
+          "signal_start": "2024-11-26",
+          "signal_end": "2025-03-06",
+          "latest_label_end": "2025-03-18"
+        },
+        "purged_rows": 64
+      },
+      "validation": {
+        "rows": 720,
+        "signal_start": "2025-03-19",
+        "signal_end": "2025-07-29",
+        "latest_label_end": "2025-08-08"
+      }
+    }
+  ],
+  "final_training": {
+    "input": {
+      "rows": 2880,
+      "signal_start": "2024-01-30",
+      "signal_end": "2025-07-29",
+      "latest_label_end": "2025-08-08"
+    },
+    "model_fit": {
+      "rows": 2096,
+      "signal_start": "2024-01-30",
+      "signal_end": "2025-03-06",
+      "latest_label_end": "2025-03-18"
+    },
+    "calibration": {
+      "rows": 720,
+      "signal_start": "2025-03-19",
+      "signal_end": "2025-07-29",
+      "latest_label_end": "2025-08-08"
+    },
+    "purged_rows": 64
+  },
+  "final_test": {
+    "new_period": {
+      "rows": 712,
+      "signal_start": "2025-08-11",
+      "signal_end": "2025-12-19",
+      "backtest_start": "2025-08-11",
+      "backtest_end": "2025-12-31",
+      "buy_fills": 8,
+      "sell_fills": 9
+    },
+    "new_companies_and_period": {
+      "rows": 178,
+      "signal_start": "2025-08-11",
+      "signal_end": "2025-12-19",
+      "backtest_start": "2025-08-11",
+      "backtest_end": "2025-12-31",
+      "buy_fills": 0,
+      "sell_fills": 0
+    }
+  }
+}

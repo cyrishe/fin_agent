@@ -1,0 +1,4 @@
+interface:
+  display_name: "市场概览"
+  short_description: "用指数、宽度、成交与风格分化判断证券市场整体环境与风险"
+  default_prompt: "Use $market-overview to assess this market environment, divergence, and risks with current evidence."

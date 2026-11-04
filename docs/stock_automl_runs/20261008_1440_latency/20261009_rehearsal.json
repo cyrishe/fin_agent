@@ -1,0 +1,49 @@
+{
+  "requested_day": "2026-10-09",
+  "prior_trading_day": "2026-10-08",
+  "quote": {
+    "source": "http://jzyzwup.upoem1.com/json/hq_basichq/stockHq",
+    "requested_symbols": 5572,
+    "returned_symbols": 5572,
+    "batches": 28,
+    "workers": 6,
+    "response_megabytes": 27.26,
+    "batch_max_seconds": 0.607,
+    "request_started_at": "2026-10-09T09:54:37+08:00",
+    "request_ended_at": "2026-10-09T09:54:40+08:00",
+    "source_exchange_timestamp": null,
+    "seconds": 2.367
+  },
+  "quote_coverage": 1.0,
+  "within_1440_wall_clock_window": false,
+  "benchmark_only": true,
+  "filter_3_to_6_count": 89,
+  "model_universe_eligible_count": 87,
+  "feature_complete_count": 85,
+  "exclusions": {
+    "incomplete_history": 2,
+    "adjustment_break": 0,
+    "missing_valuation": 0,
+    "invalid_quote": 0
+  },
+  "history_rows": 1791,
+  "valuation_rows": 87,
+  "model": "docs/stock_automl_runs/20261008_sina_15m_july/exact_trained_seven_factor.joblib",
+  "model_validation": {
+    "saved_sklearn": "1.9.1",
+    "runtime_sklearn": "1.9.1",
+    "load_warnings": 0,
+    "archived_score_max_difference": 0.0
+  },
+  "stages": {
+    "prior_calendar_and_universe_seconds": 0.507,
+    "full_market_quote_seconds": 2.367,
+    "three_to_six_percent_filter_seconds": 0.002,
+    "prior_21d_prices_seconds": 0.24,
+    "prior_float_valuation_seconds": 0.06,
+    "factor_calculation_seconds": 0.256,
+    "frozen_model_load_and_score_seconds": 0.367
+  },
+  "total_seconds": 4.142,
+  "top5": []
+}

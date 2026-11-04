@@ -61,7 +61,7 @@ def test_tool_studio_service_loads_finance_data_catalog_tree():
     assert payload["mode"] == "dataview"
     assert payload["subject"] == "stock"
     assert payload["dataview"]["name"] == "margin"
-    assert any(item["api_name"] == "stock.margin" for item in payload["dataview"]["functions"])
+    assert any(item["api_name"] == "stock.margin.query" for item in payload["dataview"]["functions"])
 
 
 def test_tool_studio_service_saves_one_finance_catalog_path(tmp_path: Path):
@@ -81,7 +81,7 @@ def test_tool_studio_service_saves_one_finance_catalog_path(tmp_path: Path):
     saved = json.loads(catalog_path.read_text(encoding="utf-8"))
     function = saved["subjects"]["stock"]["quote"]["api"][0]
     assert function["api_function"] == "updated quote function"
-    assert function["api_name"] == "stock.quote"
+    assert function["api_name"] == "stock.quote.query"
 
 
 def test_tool_studio_service_save_roundtrip_updates_all_design_files(tmp_path):

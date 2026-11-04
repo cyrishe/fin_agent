@@ -1,0 +1,69 @@
+{
+  "start": "2024-01-01",
+  "end": "2025-12-31",
+  "objective": "探索未来1、3、7个交易日收益；比较线性与树模型，重视跨公司泛化和扣成本后的胜率。",
+  "symbols": [
+    "000001.SZ",
+    "000002.SZ",
+    "000333.SZ",
+    "000858.SZ",
+    "002415.SZ",
+    "300750.SZ",
+    "600036.SH",
+    "600519.SH",
+    "601318.SH",
+    "601899.SH"
+  ],
+  "max_symbols": 10,
+  "horizons": [
+    1,
+    3,
+    7
+  ],
+  "tasks": [
+    "classification",
+    "regression"
+  ],
+  "models": [
+    "linear",
+    "elastic_net",
+    "tree",
+    "forest",
+    "svm",
+    "hist_gradient_boosting"
+  ],
+  "samplers": [
+    "all",
+    "momentum",
+    "reversal",
+    "liquid",
+    "low_volatility"
+  ],
+  "feature_sets": [
+    "technical",
+    "enriched"
+  ],
+  "max_trials": 12,
+  "rounds": 2,
+  "max_train_rows": 4000,
+  "seed": 42,
+  "folds": 2,
+  "test_fraction": 0.2,
+  "company_holdout_fraction": 0.2,
+  "target_return": 0.0,
+  "probability_threshold": 0.6,
+  "regression_threshold": 0.005,
+  "top_k": 5,
+  "min_signals": 15,
+  "min_win_rate": 0.5,
+  "max_drawdown": 0.3,
+  "commission_rate": 0.0003,
+  "sell_tax_rate": 0.0005,
+  "slippage_rate": 0.001,
+  "initial_cash": 1000000,
+  "include_minute": true,
+  "industries": [],
+  "min_market_cap": null,
+  "max_market_cap": null,
+  "min_amount": null
+}

@@ -1,0 +1,227 @@
+{
+  "generated_at": "2026-10-08T13:31:13",
+  "signal_period": [
+    "2026-08-24",
+    "2026-09-29"
+  ],
+  "decision_cutoff": "14:49:59",
+  "retrospective_1440_rows": 8995,
+  "retrospective_1440_asof_ready": 0,
+  "strict_1430_candidates": 9034,
+  "strict_1430_trainable": 6706,
+  "execution_feasible_1430": 6699,
+  "strict_1430_label_ready10": 8993,
+  "day_audit": [
+    {
+      "date": "2026-08-24",
+      "candidates_1430": 0,
+      "candidates_1440": 0,
+      "missing_signal_bars": true
+    },
+    {
+      "date": "2026-08-25",
+      "candidates_1430": 981,
+      "candidates_1440": 979,
+      "ready_1430": 361,
+      "execution_feasible_1430": 361,
+      "ready_1440": 0
+    },
+    {
+      "date": "2026-08-26",
+      "candidates_1430": 261,
+      "candidates_1440": 275,
+      "ready_1430": 130,
+      "execution_feasible_1430": 130,
+      "ready_1440": 0
+    },
+    {
+      "date": "2026-08-27",
+      "candidates_1430": 570,
+      "candidates_1440": 595,
+      "ready_1430": 380,
+      "execution_feasible_1430": 380,
+      "ready_1440": 0
+    },
+    {
+      "date": "2026-08-28",
+      "candidates_1430": 372,
+      "candidates_1440": 345,
+      "ready_1430": 252,
+      "execution_feasible_1430": 252,
+      "ready_1440": 0
+    },
+    {
+      "date": "2026-08-31",
+      "candidates_1430": 547,
+      "candidates_1440": 558,
+      "ready_1430": 509,
+      "execution_feasible_1430": 509,
+      "ready_1440": 0
+    },
+    {
+      "date": "2026-09-01",
+      "candidates_1430": 350,
+      "candidates_1440": 342,
+      "ready_1430": 332,
+      "execution_feasible_1430": 332,
+      "ready_1440": 0
+    },
+    {
+      "date": "2026-09-02",
+      "candidates_1430": 170,
+      "candidates_1440": 162,
+      "ready_1430": 153,
+      "execution_feasible_1430": 153,
+      "ready_1440": 0
+    },
+    {
+      "date": "2026-09-03",
+      "candidates_1430": 277,
+      "candidates_1440": 260,
+      "ready_1430": 256,
+      "execution_feasible_1430": 256,
+      "ready_1440": 0
+    },
+    {
+      "date": "2026-09-04",
+      "candidates_1430": 237,
+      "candidates_1440": 194,
+      "ready_1430": 232,
+      "execution_feasible_1430": 232,
+      "ready_1440": 0
+    },
+    {
+      "date": "2026-09-07",
+      "candidates_1430": 495,
+      "candidates_1440": 503,
+      "ready_1430": 470,
+      "execution_feasible_1430": 470,
+      "ready_1440": 0
+    },
+    {
+      "date": "2026-09-08",
+      "candidates_1430": 396,
+      "candidates_1440": 428,
+      "ready_1430": 375,
+      "execution_feasible_1430": 374,
+      "ready_1440": 0
+    },
+    {
+      "date": "2026-09-09",
+      "candidates_1430": 183,
+      "candidates_1440": 200,
+      "ready_1430": 177,
+      "execution_feasible_1430": 177,
+      "ready_1440": 0
+    },
+    {
+      "date": "2026-09-10",
+      "candidates_1430": 114,
+      "candidates_1440": 126,
+      "ready_1430": 108,
+      "execution_feasible_1430": 108,
+      "ready_1440": 0
+    },
+    {
+      "date": "2026-09-11",
+      "candidates_1430": 106,
+      "candidates_1440": 98,
+      "ready_1430": 79,
+      "execution_feasible_1430": 79,
+      "ready_1440": 0
+    },
+    {
+      "date": "2026-09-14",
+      "candidates_1430": 286,
+      "candidates_1440": 279,
+      "ready_1430": 0,
+      "execution_feasible_1430": 0,
+      "ready_1440": 0
+    },
+    {
+      "date": "2026-09-15",
+      "candidates_1430": 134,
+      "candidates_1440": 109,
+      "ready_1430": 0,
+      "execution_feasible_1430": 0,
+      "ready_1440": 0
+    },
+    {
+      "date": "2026-09-16",
+      "candidates_1430": 557,
+      "candidates_1440": 588,
+      "ready_1430": 2,
+      "execution_feasible_1430": 2,
+      "ready_1440": 0
+    },
+    {
+      "date": "2026-09-17",
+      "candidates_1430": 279,
+      "candidates_1440": 279,
+      "ready_1430": 260,
+      "execution_feasible_1430": 260,
+      "ready_1440": 0
+    },
+    {
+      "date": "2026-09-18",
+      "candidates_1430": 575,
+      "candidates_1440": 598,
+      "ready_1430": 554,
+      "execution_feasible_1430": 553,
+      "ready_1440": 0
+    },
+    {
+      "date": "2026-09-21",
+      "candidates_1430": 910,
+      "candidates_1440": 946,
+      "ready_1430": 881,
+      "execution_feasible_1430": 879,
+      "ready_1440": 0
+    },
+    {
+      "date": "2026-09-22",
+      "candidates_1430": 260,
+      "candidates_1440": 241,
+      "ready_1430": 253,
+      "execution_feasible_1430": 252,
+      "ready_1440": 0
+    },
+    {
+      "date": "2026-09-23",
+      "candidates_1430": 249,
+      "candidates_1440": 230,
+      "ready_1430": 241,
+      "execution_feasible_1430": 241,
+      "ready_1440": 0
+    },
+    {
+      "date": "2026-09-24",
+      "candidates_1430": 128,
+      "candidates_1440": 124,
+      "ready_1430": 121,
+      "execution_feasible_1430": 121,
+      "ready_1440": 0
+    },
+    {
+      "date": "2026-09-28",
+      "candidates_1430": 97,
+      "candidates_1440": 96,
+      "ready_1430": 94,
+      "execution_feasible_1430": 93,
+      "ready_1440": 0
+    },
+    {
+      "date": "2026-09-29",
+      "candidates_1430": 500,
+      "candidates_1440": 440,
+      "ready_1430": 486,
+      "execution_feasible_1430": 485,
+      "ready_1440": 0
+    }
+  ],
+  "provenance": {
+    "script_sha256": "771163864fb1dd8b0573c41ec13c90ec6b85dc9f133c5323d22a22c22e3b5a97",
+    "database_snapshot_version": null,
+    "raw_row_location": "outputs/stock_automl/tail_sample"
+  }
+}

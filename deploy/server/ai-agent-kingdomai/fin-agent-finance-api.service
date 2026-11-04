@@ -1,0 +1,21 @@
+[Unit]
+Description=Fin Agent Financial Data API
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=che
+Group=che
+WorkingDirectory=/home/che/cyris/fin_agent
+EnvironmentFile=/home/che/cyris/fin_agent/.env
+ExecStart=/home/che/cyris/fin_agent/.venv/bin/python -m src.finance_api.app
+Restart=on-failure
+RestartSec=5
+TimeoutStopSec=45
+KillSignal=SIGINT
+NoNewPrivileges=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,346 @@
+{
+  "source_signal_days": 25,
+  "entry_rows": 126238,
+  "observed_first5": 125035,
+  "observed_first10": 125035,
+  "excluded_t_final_limit_up": 1499,
+  "excluded_t_final_limit_up_hit5": 1052,
+  "non_limit_observed": 123536,
+  "non_limit_hit5": 42272,
+  "non_limit_hit10": 47703,
+  "non_limit_near_limit_at_entry": 308,
+  "asof_non_limit_observed": 106434,
+  "asof_non_limit_hit5": 37922,
+  "asof_non_limit_hit10": 42566,
+  "daily": [
+    {
+      "date": "2026-08-25",
+      "stocks": 5034,
+      "hit5": 2325,
+      "hit10": 2632,
+      "asof_eligible": 4887
+    },
+    {
+      "date": "2026-08-26",
+      "stocks": 5050,
+      "hit5": 1541,
+      "hit10": 1729,
+      "asof_eligible": 4905
+    },
+    {
+      "date": "2026-08-27",
+      "stocks": 5030,
+      "hit5": 1634,
+      "hit10": 2009,
+      "asof_eligible": 4890
+    },
+    {
+      "date": "2026-08-28",
+      "stocks": 5020,
+      "hit5": 1152,
+      "hit10": 1436,
+      "asof_eligible": 4883
+    },
+    {
+      "date": "2026-08-31",
+      "stocks": 5016,
+      "hit5": 2127,
+      "hit10": 2537,
+      "asof_eligible": 4875
+    },
+    {
+      "date": "2026-09-01",
+      "stocks": 5020,
+      "hit5": 598,
+      "hit10": 678,
+      "asof_eligible": 4894
+    },
+    {
+      "date": "2026-09-02",
+      "stocks": 5050,
+      "hit5": 2949,
+      "hit10": 3067,
+      "asof_eligible": 4915
+    },
+    {
+      "date": "2026-09-03",
+      "stocks": 5055,
+      "hit5": 2973,
+      "hit10": 3362,
+      "asof_eligible": 4886
+    },
+    {
+      "date": "2026-09-04",
+      "stocks": 5058,
+      "hit5": 2590,
+      "hit10": 2693,
+      "asof_eligible": 4911
+    },
+    {
+      "date": "2026-09-07",
+      "stocks": 5006,
+      "hit5": 1471,
+      "hit10": 1811,
+      "asof_eligible": 4861
+    },
+    {
+      "date": "2026-09-08",
+      "stocks": 5025,
+      "hit5": 1296,
+      "hit10": 1434,
+      "asof_eligible": 4883
+    },
+    {
+      "date": "2026-09-09",
+      "stocks": 5048,
+      "hit5": 601,
+      "hit10": 698,
+      "asof_eligible": 4876
+    },
+    {
+      "date": "2026-09-10",
+      "stocks": 5057,
+      "hit5": 454,
+      "hit10": 492,
+      "asof_eligible": 4891
+    },
+    {
+      "date": "2026-09-11",
+      "stocks": 4073,
+      "hit5": 1244,
+      "hit10": 1450,
+      "asof_eligible": 3923
+    },
+    {
+      "date": "2026-09-14",
+      "stocks": 4253,
+      "hit5": 924,
+      "hit10": 1040,
+      "asof_eligible": 0
+    },
+    {
+      "date": "2026-09-15",
+      "stocks": 4436,
+      "hit5": 847,
+      "hit10": 1214,
+      "asof_eligible": 0
+    },
+    {
+      "date": "2026-09-16",
+      "stocks": 5006,
+      "hit5": 1464,
+      "hit10": 1632,
+      "asof_eligible": 0
+    },
+    {
+      "date": "2026-09-17",
+      "stocks": 5050,
+      "hit5": 3329,
+      "hit10": 3574,
+      "asof_eligible": 4882
+    },
+    {
+      "date": "2026-09-18",
+      "stocks": 5026,
+      "hit5": 2678,
+      "hit10": 2924,
+      "asof_eligible": 4863
+    },
+    {
+      "date": "2026-09-21",
+      "stocks": 4995,
+      "hit5": 2273,
+      "hit10": 2347,
+      "asof_eligible": 4845
+    },
+    {
+      "date": "2026-09-22",
+      "stocks": 5034,
+      "hit5": 1133,
+      "hit10": 1307,
+      "asof_eligible": 4884
+    },
+    {
+      "date": "2026-09-23",
+      "stocks": 5045,
+      "hit5": 1192,
+      "hit10": 1596,
+      "asof_eligible": 4880
+    },
+    {
+      "date": "2026-09-24",
+      "stocks": 5047,
+      "hit5": 1355,
+      "hit10": 1414,
+      "asof_eligible": 4875
+    },
+    {
+      "date": "2026-09-28",
+      "stocks": 5060,
+      "hit5": 1617,
+      "hit10": 1932,
+      "asof_eligible": 4835
+    },
+    {
+      "date": "2026-09-29",
+      "stocks": 5042,
+      "hit5": 2505,
+      "hit10": 2695,
+      "asof_eligible": 4890
+    }
+  ],
+  "historical_feature_contrasts": {
+    "prior_return_1": {
+      "positive_median": -0.0003,
+      "negative_median": -0.001631,
+      "daily_median_delta": 0.001158,
+      "positive_delta_days": 17,
+      "compared_days": 25,
+      "mean_within_day_auc": 0.53282,
+      "auc_above_half_days": 17
+    },
+    "prior_return_3": {
+      "positive_median": 0.001949,
+      "negative_median": -0.0,
+      "daily_median_delta": 0.006773,
+      "positive_delta_days": 18,
+      "compared_days": 25,
+      "mean_within_day_auc": 0.55371,
+      "auc_above_half_days": 17
+    },
+    "prior_return_5": {
+      "positive_median": 0.002721,
+      "negative_median": -0.001595,
+      "daily_median_delta": 0.007477,
+      "positive_delta_days": 20,
+      "compared_days": 25,
+      "mean_within_day_auc": 0.55843,
+      "auc_above_half_days": 19
+    },
+    "prior_amount_ratio_5": {
+      "positive_median": 0.916742,
+      "negative_median": 0.89811,
+      "daily_median_delta": 0.039753,
+      "positive_delta_days": 17,
+      "compared_days": 25,
+      "mean_within_day_auc": 0.53841,
+      "auc_above_half_days": 18
+    },
+    "prior_avg_bias_1": {
+      "positive_median": -0.000103,
+      "negative_median": -0.00036,
+      "daily_median_delta": 0.000246,
+      "positive_delta_days": 13,
+      "compared_days": 25,
+      "mean_within_day_auc": 0.51921,
+      "auc_above_half_days": 13
+    },
+    "prior_avg_bias_3": {
+      "positive_median": 0.000554,
+      "negative_median": 5.9e-05,
+      "daily_median_delta": 0.000602,
+      "positive_delta_days": 17,
+      "compared_days": 25,
+      "mean_within_day_auc": 0.53862,
+      "auc_above_half_days": 17
+    }
+  },
+  "prior_return_5_within_day_quintiles": [
+    {
+      "quintile": 1,
+      "rows": 24683,
+      "hit5": 8597,
+      "rate": 0.3483
+    },
+    {
+      "quintile": 2,
+      "rows": 24692,
+      "hit5": 7250,
+      "rate": 0.29362
+    },
+    {
+      "quintile": 3,
+      "rows": 24692,
+      "hit5": 7089,
+      "rate": 0.2871
+    },
+    {
+      "quintile": 4,
+      "rows": 24692,
+      "hit5": 8282,
+      "rate": 0.33541
+    },
+    {
+      "quintile": 5,
+      "rows": 24703,
+      "hit5": 11025,
+      "rate": 0.4463
+    }
+  ],
+  "asof_local_feature_contrasts": {
+    "day_return": {
+      "positive_median": 0.000992,
+      "negative_median": -0.000844,
+      "daily_median_delta": 0.000306,
+      "positive_delta_days": 13,
+      "compared_days": 22,
+      "mean_within_day_auc": 0.50895,
+      "auc_above_half_days": 13
+    },
+    "tail_return_20m": {
+      "positive_median": 0.0,
+      "negative_median": 0.0,
+      "daily_median_delta": 0.0,
+      "positive_delta_days": 10,
+      "compared_days": 22,
+      "mean_within_day_auc": 0.50156,
+      "auc_above_half_days": 12
+    },
+    "tail_amount_log_ratio": {
+      "positive_median": 0.030398,
+      "negative_median": 0.030255,
+      "daily_median_delta": -0.026535,
+      "positive_delta_days": 7,
+      "compared_days": 22,
+      "mean_within_day_auc": 0.49133,
+      "auc_above_half_days": 7
+    },
+    "market_breadth": {
+      "positive_median": 0.55542,
+      "negative_median": 0.55542,
+      "daily_median_delta": 0.0,
+      "positive_delta_days": 0,
+      "compared_days": 22,
+      "mean_within_day_auc": 0.5,
+      "auc_above_half_days": 0
+    }
+  },
+  "missing_signal_days": [
+    "2026-08-24"
+  ],
+  "arrival_audit": {
+    "14:30": {
+      "rows": 130978,
+      "current_rows_present_by_decision": 122403,
+      "source_time_equals_bar_end": 130978
+    },
+    "14:40": {
+      "rows": 130978,
+      "current_rows_present_by_decision": 0,
+      "source_time_equals_bar_end": 130978
+    },
+    "14:49": {
+      "rows": 131336,
+      "current_rows_present_by_decision": 0,
+      "source_time_equals_bar_end": 131336
+    }
+  },
+  "generated_at": "2026-10-08T11:08:04",
+  "provenance": {
+    "source": "47.94.1.2:3312/kingdomai",
+    "script_sha256": "4e673fc6b3bda129f23cacd406923a3f866eda5913f5d580f628480c28c68531",
+    "data_snapshot_version": null
+  },
+  "positive_rows_written_locally": 47703,
+  "cohort_rows_written_locally": 123536
+}

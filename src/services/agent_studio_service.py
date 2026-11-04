@@ -35,7 +35,8 @@ class AgentStudioService:
                     "status": str(config.get("status") or "").strip(),
                     "version": str(config.get("version") or "").strip(),
                     "enabled": bool(config.get("enabled", True)),
-                    "skills": [str(x).strip() for x in config.get("skills", []) if str(x).strip()],
+                    **({"skills": [str(x).strip() for x in config["skills"] if str(x).strip()]}
+                       if isinstance(config.get("skills"), list) else {}),
                     "tools": [str(x).strip() for x in config.get("tools", []) if str(x).strip()],
                     "handoff_agents": [str(x).strip() for x in config.get("handoff_agents", []) if str(x).strip()],
                 }
@@ -100,19 +101,11 @@ class AgentStudioService:
             "version": "v1",
             "status": "draft",
             "enabled": True,
-            "owner": "agents",
             "domain": "generic",
             "role": normalized,
-            "capabilities": [],
-            "tags": [],
-            "keywords": [],
             "responsibilities": [],
-            "context_policy": {},
-            "skill_policy": {"mode": "strict"},
-            "tool_policy": {"mode": "strict"},
             "skills": [],
             "tools": [],
-            "handoff_agents": [],
         }
         schema_obj = {
             "$schema": "https://json-schema.org/draft/2020-12/schema",

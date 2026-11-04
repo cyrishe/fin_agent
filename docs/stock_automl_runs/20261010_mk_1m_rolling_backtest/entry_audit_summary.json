@@ -1,0 +1,26 @@
+{
+  "full19_tminus2": {
+    "selected": 41,
+    "name_contains_st": 25,
+    "zero_volume_1440": 12,
+    "flat_zero_near_five_pct": 11,
+    "ge3_sale_in_flagged": 7,
+    "mean_0940_return_pct_unflagged": 0.5573555209497528
+  },
+  "p3_selected_tminus2": {
+    "selected": 41,
+    "name_contains_st": 24,
+    "zero_volume_1440": 12,
+    "flat_zero_near_five_pct": 11,
+    "ge3_sale_in_flagged": 7,
+    "mean_0940_return_pct_unflagged": 1.1634826420632425
+  },
+  "rolling20_tminus1": {
+    "selected": 41,
+    "name_contains_st": 26,
+    "zero_volume_1440": 12,
+    "flat_zero_near_five_pct": 12,
+    "ge3_sale_in_flagged": 8,
+    "mean_0940_return_pct_unflagged": 1.1261161643551139
+  }
+}

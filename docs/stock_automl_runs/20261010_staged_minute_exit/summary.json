@@ -1,0 +1,70 @@
+{
+  "rule": "09:31–09:33 close > entry×1.03; otherwise any later close >= prior observed minimum close return + 1 percentage point; otherwise 09:34–09:40 close > entry×1.01; otherwise 09:40 close. Each exit uses that minute close.",
+  "execution": "Historical minute-close proxy; T 14:40 close entry and next-morning close exits are not verified fills. No fees, slippage, or order-book constraints.",
+  "capital": "100000 CNY; rank 1 gets 60%, rank 2 gets 40%; existing board-lot buy_quantity; remaining allocation stays cash",
+  "results": {
+    "previous_second_high_regression": {
+      "signal_days": 20,
+      "selected": 40,
+      "bought": 37,
+      "rule_counts": {
+        "rebound_1pp_from_prior_low": 27,
+        "first3_over_3pct": 6,
+        "0940_close": 4,
+        "last7_over_1pct": 3
+      },
+      "mean_selected_return_pct": 0.4842059395541376,
+      "median_selected_return_pct": 0.9207926422063362,
+      "selected_below_zero": 15,
+      "ending_cash": 110224.37,
+      "gross_cash_return": 0.1022437,
+      "always_0940_ending_cash": 114648.94,
+      "always_0940_gross_cash_return": 0.1464894,
+      "max_daily_drawdown": -0.0738269587427643
+    },
+    "four_class_logistic": {
+      "signal_days": 20,
+      "selected": 40,
+      "bought": 40,
+      "rule_counts": {
+        "rebound_1pp_from_prior_low": 36,
+        "0940_close": 3,
+        "last7_over_1pct": 1
+      },
+      "mean_selected_return_pct": -1.0853428283763937,
+      "median_selected_return_pct": -1.0010075173210897,
+      "selected_below_zero": 30,
+      "ending_cash": 79660.0,
+      "gross_cash_return": -0.2034,
+      "always_0940_ending_cash": 75298.0,
+      "always_0940_gross_cash_return": -0.24702,
+      "max_daily_drawdown": -0.2034
+    },
+    "four_class_boosted": {
+      "signal_days": 20,
+      "selected": 40,
+      "bought": 39,
+      "rule_counts": {
+        "rebound_1pp_from_prior_low": 29,
+        "0940_close": 4,
+        "first3_over_3pct": 4,
+        "last7_over_1pct": 3
+      },
+      "mean_selected_return_pct": -0.09316737925020802,
+      "median_selected_return_pct": -0.054460953167456694,
+      "selected_below_zero": 20,
+      "ending_cash": 96960.48,
+      "gross_cash_return": -0.0303952,
+      "always_0940_ending_cash": 99963.7,
+      "always_0940_gross_cash_return": -0.000363,
+      "max_daily_drawdown": -0.10142137549249414
+    }
+  },
+  "source_sha256": {
+    "docs/stock_automl_runs/20261009_second_high_regression/daily_top2_open_review.csv": "93e9195316b8bf5ceece534d518387cd19e6d386c0c6cb4ead19e30e330e40ab",
+    "docs/stock_automl_runs/20261009_second_high_regression/daily_top2_minute_close_returns.csv": "1955cf1dda1ad40d898b76c17ce0b57c1239365f47fff1d2239652604a3de492",
+    "docs/stock_automl_runs/20261010_second_high_four_class/daily_top2.csv": "bee5f5bbe30317767c50d33c9c17aa075e86af8c014648194d3b5394d151386d",
+    "docs/stock_automl_runs/20261009_close9_target/exact_1440_to_close9_candidates.csv.gz": "99263a8722907209d1cc45ffd6e3e73a1386fc36050f67e5d55f78b0c3e8942a",
+    "docs/stock_automl_runs/20261009_close10_target/exact_0931_closes.csv.gz": "c08be955894c1366b4d4dd3f2c194b9b665b03604c32d31206d7b8795693bc50"
+  }
+}

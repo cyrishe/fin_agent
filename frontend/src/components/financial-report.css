@@ -1,0 +1,17 @@
+.financial-report { min-width: 0; max-width: 100%; overflow-wrap: anywhere; line-height: 1.75; }
+.financial-report h1 { font-size: 1.35rem; line-height: 1.5; }
+.financial-report nav { display: flex; flex-wrap: wrap; gap: 8px 14px; padding: 12px 14px; margin: 18px 0; background: #f1f7fa; border-radius: 10px; }
+.financial-report nav a { color: #216a80; font-size: 13px; text-decoration: none; }
+.financial-report nav a:hover { text-decoration: underline; }
+.financial-report nav a:focus-visible { outline: 2px solid #34849e; outline-offset: 3px; }
+.financial-report-section { scroll-margin-top: 24px; }
+.financial-report-section > h2 { font-size: 1.1rem; line-height: 1.6; border-top: 1px solid #dfebf0; padding-top: 20px; margin: 24px 0 12px; }
+.financial-report-figure { margin: 20px 0; max-width: 100%; border: 1px solid #dfebf0; border-radius: 10px; overflow: hidden; background: white; }
+.financial-report-figure img { display: block; width: 100%; max-width: 100%; height: auto; }
+.financial-report-image { overflow: auto; max-width: 100%; }
+.financial-report-image.expanded img { width: 1408px; max-width: none; }
+.financial-report-zoom { margin: 0 14px 12px; padding: 6px 12px; border: 1px solid #c9dfe8; border-radius: 6px; background: #f1f7fa; color: #216a80; cursor: pointer; }
+.financial-report-zoom:focus-visible { outline: 2px solid #34849e; outline-offset: 2px; }
+.financial-report-figure figcaption { display: flex; flex-direction: column; gap: 4px; padding: 10px 14px; font-size: 12px; color: #566f7c; }
+.financial-report-charts > summary { cursor: pointer; color: #216a80; }
+@media (max-width: 640px) { .financial-report nav { gap: 6px 10px; } .financial-report-figure figcaption { padding: 8px 10px; } }

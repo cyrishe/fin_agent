@@ -1,0 +1,287 @@
+{
+  "jan_jul": {
+    "2026-01": {
+      "rows": 7924,
+      "historical_st": 400,
+      "unknown_status": 0,
+      "cohorts": {
+        "non_ST": {
+          "rows": 7524,
+          "labeled": 7522,
+          "label_ge3": 1281,
+          "label_ge3_rate": 0.17030045200744484,
+          "sale_known": 7522,
+          "sale_ge3": 837,
+          "sale_ge3_rate": 0.11127359744748737
+        },
+        "ST": {
+          "rows": 400,
+          "labeled": 396,
+          "label_ge3": 151,
+          "label_ge3_rate": 0.3813131313131313,
+          "sale_known": 396,
+          "sale_ge3": 114,
+          "sale_ge3_rate": 0.2878787878787879
+        }
+      }
+    },
+    "2026-02": {
+      "rows": 5505,
+      "historical_st": 303,
+      "unknown_status": 0,
+      "cohorts": {
+        "non_ST": {
+          "rows": 5202,
+          "labeled": 5200,
+          "label_ge3": 642,
+          "label_ge3_rate": 0.12346153846153846,
+          "sale_known": 5200,
+          "sale_ge3": 440,
+          "sale_ge3_rate": 0.08461538461538462
+        },
+        "ST": {
+          "rows": 303,
+          "labeled": 299,
+          "label_ge3": 125,
+          "label_ge3_rate": 0.4180602006688963,
+          "sale_known": 299,
+          "sale_ge3": 92,
+          "sale_ge3_rate": 0.3076923076923077
+        }
+      }
+    },
+    "2026-03": {
+      "rows": 8740,
+      "historical_st": 469,
+      "unknown_status": 0,
+      "cohorts": {
+        "non_ST": {
+          "rows": 8271,
+          "labeled": 8268,
+          "label_ge3": 1216,
+          "label_ge3_rate": 0.1470730527334301,
+          "sale_known": 8268,
+          "sale_ge3": 813,
+          "sale_ge3_rate": 0.09833091436865021
+        },
+        "ST": {
+          "rows": 469,
+          "labeled": 465,
+          "label_ge3": 159,
+          "label_ge3_rate": 0.3419354838709677,
+          "sale_known": 465,
+          "sale_ge3": 118,
+          "sale_ge3_rate": 0.2537634408602151
+        }
+      }
+    },
+    "2026-04": {
+      "rows": 9599,
+      "historical_st": 472,
+      "unknown_status": 0,
+      "cohorts": {
+        "non_ST": {
+          "rows": 9127,
+          "labeled": 9101,
+          "label_ge3": 1161,
+          "label_ge3_rate": 0.1275683990770245,
+          "sale_known": 9101,
+          "sale_ge3": 819,
+          "sale_ge3_rate": 0.08999011097681574
+        },
+        "ST": {
+          "rows": 472,
+          "labeled": 462,
+          "label_ge3": 193,
+          "label_ge3_rate": 0.41774891774891776,
+          "sale_known": 462,
+          "sale_ge3": 133,
+          "sale_ge3_rate": 0.2878787878787879
+        }
+      }
+    },
+    "2026-05": {
+      "rows": 7128,
+      "historical_st": 620,
+      "unknown_status": 0,
+      "cohorts": {
+        "non_ST": {
+          "rows": 6508,
+          "labeled": 6506,
+          "label_ge3": 1108,
+          "label_ge3_rate": 0.170304334460498,
+          "sale_known": 6506,
+          "sale_ge3": 692,
+          "sale_ge3_rate": 0.10636335690132186
+        },
+        "ST": {
+          "rows": 620,
+          "labeled": 617,
+          "label_ge3": 261,
+          "label_ge3_rate": 0.42301458670988656,
+          "sale_known": 617,
+          "sale_ge3": 194,
+          "sale_ge3_rate": 0.31442463533225284
+        }
+      }
+    },
+    "2026-06": {
+      "rows": 8588,
+      "historical_st": 542,
+      "unknown_status": 0,
+      "cohorts": {
+        "non_ST": {
+          "rows": 8046,
+          "labeled": 8045,
+          "label_ge3": 1513,
+          "label_ge3_rate": 0.18806712243629584,
+          "sale_known": 8045,
+          "sale_ge3": 987,
+          "sale_ge3_rate": 0.12268489745183343
+        },
+        "ST": {
+          "rows": 542,
+          "labeled": 532,
+          "label_ge3": 225,
+          "label_ge3_rate": 0.42293233082706766,
+          "sale_known": 532,
+          "sale_ge3": 153,
+          "sale_ge3_rate": 0.287593984962406
+        }
+      }
+    },
+    "2026-07": {
+      "rows": 12475,
+      "historical_st": 660,
+      "unknown_status": 0,
+      "cohorts": {
+        "non_ST": {
+          "rows": 11815,
+          "labeled": 10551,
+          "label_ge3": 1278,
+          "label_ge3_rate": 0.12112595962468012,
+          "sale_known": 10551,
+          "sale_ge3": 801,
+          "sale_ge3_rate": 0.07591697469434176
+        },
+        "ST": {
+          "rows": 660,
+          "labeled": 602,
+          "label_ge3": 209,
+          "label_ge3_rate": 0.34717607973421927,
+          "sale_known": 602,
+          "sale_ge3": 145,
+          "sale_ge3_rate": 0.24086378737541528
+        }
+      }
+    }
+  },
+  "aug_sep_reference": {
+    "2026-08": {
+      "rows": 8458,
+      "historical_st": 329,
+      "unknown_status": 0,
+      "cohorts": {
+        "non_ST": {
+          "rows": 8129,
+          "labeled": 8109,
+          "label_ge3": 1021,
+          "label_ge3_rate": 0.1259094832901714,
+          "sale_known": 8109,
+          "sale_ge3": 622,
+          "sale_ge3_rate": 0.0767048957947959
+        },
+        "ST": {
+          "rows": 329,
+          "labeled": 329,
+          "label_ge3": 45,
+          "label_ge3_rate": 0.13677811550151975,
+          "sale_known": 329,
+          "sale_ge3": 34,
+          "sale_ge3_rate": 0.1033434650455927
+        }
+      }
+    },
+    "2026-09": {
+      "rows": 6325,
+      "historical_st": 247,
+      "unknown_status": 0,
+      "cohorts": {
+        "non_ST": {
+          "rows": 6078,
+          "labeled": 6040,
+          "label_ge3": 681,
+          "label_ge3_rate": 0.11274834437086093,
+          "sale_known": 6040,
+          "sale_ge3": 430,
+          "sale_ge3_rate": 0.07119205298013245
+        },
+        "ST": {
+          "rows": 247,
+          "labeled": 246,
+          "label_ge3": 40,
+          "label_ge3_rate": 0.16260162601626016,
+          "sale_known": 246,
+          "sale_ge3": 30,
+          "sale_ge3_rate": 0.12195121951219512
+        }
+      }
+    }
+  },
+  "jan_jun_entry_split": {
+    "ST_at_limit": {
+      "labeled": 1447,
+      "label_ge3": 916,
+      "sale_0940_ge3": 679
+    },
+    "ST_not_at_limit": {
+      "labeled": 1324,
+      "label_ge3": 198,
+      "sale_0940_ge3": 125
+    },
+    "non_ST": {
+      "labeled": 44642,
+      "label_ge3": 6921,
+      "sale_0940_ge3": 4588
+    }
+  },
+  "july_before_rule_change_entry_split": {
+    "ST_at_limit": {
+      "labeled": 175,
+      "label_ge3": 129,
+      "sale_0940_ge3": 95
+    },
+    "ST_not_at_limit": {
+      "labeled": 108,
+      "label_ge3": 26,
+      "sale_0940_ge3": 18
+    },
+    "non_ST": {
+      "labeled": 2132,
+      "label_ge3": 339,
+      "sale_0940_ge3": 189
+    }
+  },
+  "july_after_rule_change_entry_split": {
+    "ST_at_limit": {
+      "labeled": 0,
+      "label_ge3": 0,
+      "sale_0940_ge3": 0
+    },
+    "ST_not_at_limit": {
+      "labeled": 319,
+      "label_ge3": 54,
+      "sale_0940_ge3": 32
+    },
+    "non_ST": {
+      "labeled": 8419,
+      "label_ge3": 939,
+      "sale_0940_ge3": 612
+    }
+  },
+  "jan_jul_rows": 59959,
+  "jan_jul_nonst_rows": 56493,
+  "aug_sep_rows": 14783,
+  "source": "outputs/stock_automl/mk_1m_jan_jul/trainable_candidates.csv.gz",
+  "reference": "docs/stock_automl_runs/20261010_four_class_similar_days/prepared_candidates.csv.gz"
+}

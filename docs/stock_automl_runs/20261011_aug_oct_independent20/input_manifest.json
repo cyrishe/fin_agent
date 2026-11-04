@@ -1,0 +1,14 @@
+{
+  "candidate_rows": 15696,
+  "candidate_days": 42,
+  "calendar_days": 44,
+  "excluded_st_at_limit": 0,
+  "labeled_rows": 15198,
+  "source_sha256": {
+    "docs/stock_automl_runs/20261010_four_class_similar_days/prepared_candidates.csv.gz": "c0a4d1ea86c0ea7bbcb21d98cb8efe133efeaf8bd981ca0a86557e00bff00c08",
+    "outputs/stock_automl/sep14_16_rebuilt/candidates_1440.csv": "cb4e81afcadfea8a19098758cf9732382682a255bea24fd8832fe21acfe7b69f",
+    "outputs/stock_automl/oct_20261008_09_standard/candidates_1440.csv": "843b2bcbdd60323044012340375cf250089fcbc3d9227a1681527e7d490d080d",
+    "docs/stock_automl_runs/20261010_four_class_baseline_recent20/minute_api_label_audit.csv": "d054e741e368093ef7b45a3b32da213ac1c0fb4ef944064bcdb3e67b2a2bb5f2",
+    "docs/stock_automl_runs/20261011_aug_oct_single_benchmark/market_context.csv": "f7609de543a798ef27f6984f5da2e2baa959498bc4ca0798f6d62e76866a48f4"
+  }
+}

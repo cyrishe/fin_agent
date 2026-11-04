@@ -1,0 +1,58 @@
+from pathlib import Path
+
+import pandas as pd
+import pytest
+
+from scripts.report_automl_aug_oct_single_benchmark import attach_recovered_labels
+
+
+ROOT = Path("docs/stock_automl_runs/20261011_aug_oct_single_benchmark")
+
+
+def test_recovered_morning_labels_are_used_once_and_conflicts_rejected():
+    rows = pd.DataFrame({"signal_date": ["2026-08-17", "2026-08-18"],
+                         "symbol6": ["688432", "600000"],
+                         "second_high": [float("nan"), 10.0],
+                         "close_40": [float("nan"), 9.9]})
+    audit = pd.DataFrame({"signal_date": ["2026-08-17", "2026-08-18"],
+                          "symbol6": ["688432", "600000"],
+                          "status": ["complete", "no_target_day"],
+                          "second_high": [10.5, float("nan")],
+                          "close_40": [10.1, float("nan")]})
+    filled = attach_recovered_labels(rows, audit)
+    assert filled.second_high.tolist() == [10.5, 10.0]
+    assert filled.close_40.tolist() == [10.1, 9.9]
+    rows.loc[0, "second_high"] = 10.6
+    with pytest.raises(ValueError, match="Conflicting recovered second_high"):
+        attach_recovered_labels(rows, audit)
+
+
+def test_daily_requires_complete_20_day_training_window_without_amount_gate():
+    daily = pd.read_csv(ROOT / "daily.csv", dtype={"Top1股票": str,
+                                                         "Top2股票": str})
+    assert len(daily) == 44
+    assert "是否交易" not in daily and "备注" in daily
+    assert daily["Top1股票"].count() == 22
+    assert daily["Top1 09:40收益（%）"].count() == 21
+    assert daily.loc[daily["选股日"].between("2026-08-05", "2026-09-01"),
+                     "备注"].eq("训练窗口不足").all()
+    assert daily.loc[daily["选股日"].eq("2026-09-02"), "Top1股票"].notna().all()
+    assert daily.loc[daily["选股日"].eq("2026-08-05"),
+                     "前五日平均成交额（亿元）"].isna().all()
+    assert daily.loc[daily["选股日"].eq("2026-10-09"),
+                     "Top1结果"].iloc[0] == "待验证"
+
+
+def test_monthly_reconciles_with_daily_and_repaired_market():
+    daily = pd.read_csv(ROOT / "daily.csv")
+    monthly = pd.read_csv(ROOT / "monthly.csv")
+    market = pd.read_csv(ROOT / "market_context.csv")
+    assert monthly["选股日数"].sum() == len(daily)
+    assert monthly["Top1入选笔数"].sum() == daily["Top1股票"].count()
+    assert monthly["Top1已验证笔数"].sum() == daily["Top1 09:40收益（%）"].count()
+    assert abs(monthly["Top1收益简单求和（%）"].sum() -
+               daily["Top1 09:40收益（%）"].sum()) < 1e-5
+    repaired = market.set_index("trade_date").loc[["2026-09-14", "2026-09-15",
+                                                    "2026-09-16"]]
+    assert repaired.amount_valid.all()
+    assert repaired.symbols_at_1440.ge(5200).all()

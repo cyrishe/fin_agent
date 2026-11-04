@@ -1,0 +1,551 @@
+{
+  "reference": "2026-09-02 CC first-pass random 20; historical labels, not newly adjudicated gold",
+  "source": "outputs/financial_qa_prompt_policy_random20_20260902/cc_results.json",
+  "case_count": 20,
+  "cases": [
+    {
+      "case_id": "RTE003",
+      "question": "鹏鼎控股与沪电股份2026年净利润预测增速有何差异？",
+      "source_case": {
+        "case_id": "RTE003",
+        "source_ordinal": 140,
+        "question": "鹏鼎控股与沪电股份2026年净利润预测增速有何差异？",
+        "category": "观点、风险与战略文本",
+        "data_shape": "明细",
+        "protocol_entry_raw": "stock.report_metric",
+        "accessibility": "当前入口可得",
+        "primary_metric_code": "",
+        "primary_entry": "stock.report_metric",
+        "acceptable_first_entries": [
+          "stock.report_metric"
+        ],
+        "required_entries": [
+          "stock.report_metric"
+        ],
+        "gold_basis": "human_reviewed_full_gold_v2_20260901",
+        "data_source_nature": "第三方机构预测",
+        "data_task_type": "预测明细取数后比较",
+        "current_data_gap": ""
+      }
+    },
+    {
+      "case_id": "RTE009",
+      "question": "吉比特的净利率变化反映了什么行业趋势？",
+      "source_case": {
+        "case_id": "RTE009",
+        "source_ordinal": 152,
+        "question": "吉比特的净利率变化反映了什么行业趋势？",
+        "category": "观点、风险与战略文本",
+        "data_shape": "聚合前明细",
+        "protocol_entry_raw": "stock.financial_3_table",
+        "accessibility": "当前多入口组合",
+        "primary_metric_code": "net_margin",
+        "primary_entry": "stock.financial_3_table",
+        "acceptable_first_entries": [
+          "stock.financial_3_table",
+          "industry.constitution"
+        ],
+        "required_entries": [
+          "stock.financial_3_table",
+          "industry.constitution"
+        ],
+        "gold_basis": "human_reviewed_full_gold_v2_20260901",
+        "data_source_nature": "公司披露/经营事实",
+        "data_task_type": "组合取证后分析",
+        "current_data_gap": "",
+        "mainland_replacement": {
+          "original_question": "网易的净利率变化反映了什么行业趋势？",
+          "original_entity": "网易",
+          "replacement_entity": "吉比特",
+          "principle": "preserve task semantics and Gold route; prefer recent A-share report coverage"
+        }
+      }
+    },
+    {
+      "case_id": "RTE033",
+      "question": "五粮液的护城河是什么？",
+      "source_case": {
+        "case_id": "RTE033",
+        "source_ordinal": 56,
+        "question": "五粮液的护城河是什么？",
+        "category": "观点、风险与战略文本",
+        "data_shape": "明细",
+        "protocol_entry_raw": "stock.report",
+        "accessibility": "当前入口可得",
+        "primary_metric_code": "",
+        "primary_entry": "stock.report",
+        "acceptable_first_entries": [
+          "stock.report"
+        ],
+        "required_entries": [
+          "stock.report"
+        ],
+        "gold_basis": "human_reviewed_full_gold_v2_20260901",
+        "data_source_nature": "第三方研报观点",
+        "data_task_type": "第三方观点取证后分析",
+        "current_data_gap": ""
+      }
+    },
+    {
+      "case_id": "RTE034",
+      "question": "金风科技与明阳智能在风电整机市场份额上各有何优劣？",
+      "source_case": {
+        "case_id": "RTE034",
+        "source_ordinal": 157,
+        "question": "金风科技与明阳智能在风电整机市场份额上各有何优劣？",
+        "category": "经营量与结构化事实",
+        "data_shape": "明细",
+        "protocol_entry_raw": "stock.report",
+        "accessibility": "当前入口可得",
+        "primary_metric_code": "market_share",
+        "primary_entry": "stock.report",
+        "acceptable_first_entries": [
+          "stock.report"
+        ],
+        "required_entries": [
+          "stock.report"
+        ],
+        "gold_basis": "human_reviewed_full_gold_v2_20260901",
+        "data_source_nature": "第三方研报观点",
+        "data_task_type": "第三方观点取证后分析",
+        "current_data_gap": ""
+      }
+    },
+    {
+      "case_id": "RTE044",
+      "question": "机构对重庆啤酒和青岛啤酒的业绩预测有何差异？",
+      "source_case": {
+        "case_id": "RTE044",
+        "source_ordinal": 120,
+        "question": "机构对重庆啤酒和青岛啤酒的业绩预测有何差异？",
+        "category": "观点、风险与战略文本",
+        "data_shape": "明细",
+        "protocol_entry_raw": "stock.report_metric",
+        "accessibility": "当前入口可得",
+        "primary_metric_code": "",
+        "primary_entry": "stock.report_metric",
+        "acceptable_first_entries": [
+          "stock.report_metric"
+        ],
+        "required_entries": [
+          "stock.report_metric"
+        ],
+        "gold_basis": "human_reviewed_full_gold_v2_20260901",
+        "data_source_nature": "第三方机构预测",
+        "data_task_type": "预测明细取数后比较",
+        "current_data_gap": "",
+        "mainland_replacement": {
+          "original_question": "机构对重庆啤酒和华润啤酒的业绩预测有何差异？",
+          "original_entity": "华润啤酒",
+          "replacement_entity": "青岛啤酒",
+          "principle": "preserve task semantics and Gold route; prefer recent A-share report coverage"
+        }
+      }
+    },
+    {
+      "case_id": "RTE045",
+      "question": "吉比特在游戏业务下行周期中为何仍能保持增长？",
+      "source_case": {
+        "case_id": "RTE045",
+        "source_ordinal": 145,
+        "question": "吉比特在游戏业务下行周期中为何仍能保持增长？",
+        "category": "观点、风险与战略文本",
+        "data_shape": "明细",
+        "protocol_entry_raw": "stock.financial_3_table",
+        "accessibility": "当前多入口组合",
+        "primary_metric_code": "",
+        "primary_entry": "stock.financial_3_table",
+        "acceptable_first_entries": [
+          "stock.financial_3_table",
+          "stock.business_segment",
+          "stock.report"
+        ],
+        "required_entries": [
+          "stock.financial_3_table",
+          "stock.business_segment",
+          "stock.report"
+        ],
+        "gold_basis": "human_reviewed_full_gold_v2_20260901",
+        "data_source_nature": "多源事实与分析",
+        "data_task_type": "组合取证后分析",
+        "current_data_gap": "",
+        "mainland_replacement": {
+          "original_question": "哔哩哔哩在广告和游戏业务下行周期中为何仍能保持增长？",
+          "original_entity": "哔哩哔哩",
+          "replacement_entity": "吉比特",
+          "principle": "preserve task semantics and Gold route; prefer recent A-share report coverage"
+        }
+      }
+    },
+    {
+      "case_id": "RTE046",
+      "question": "沪电股份的核心产品业务未来增长前景如何？",
+      "source_case": {
+        "case_id": "RTE046",
+        "source_ordinal": 59,
+        "question": "沪电股份的核心产品业务未来增长前景如何？",
+        "category": "观点、风险与战略文本",
+        "data_shape": "明细",
+        "protocol_entry_raw": "stock.report",
+        "accessibility": "当前入口可得",
+        "primary_metric_code": "",
+        "primary_entry": "stock.report",
+        "acceptable_first_entries": [
+          "stock.report"
+        ],
+        "required_entries": [
+          "stock.report"
+        ],
+        "gold_basis": "human_reviewed_full_gold_v2_20260901",
+        "data_source_nature": "第三方研报观点",
+        "data_task_type": "第三方观点取证后分析",
+        "current_data_gap": ""
+      }
+    },
+    {
+      "case_id": "RTE053",
+      "question": "宁德时代的市场份额与比亚迪相比有何优劣？",
+      "source_case": {
+        "case_id": "RTE053",
+        "source_ordinal": 173,
+        "question": "宁德时代的市场份额与比亚迪相比有何优劣？",
+        "category": "经营量与结构化事实",
+        "data_shape": "明细",
+        "protocol_entry_raw": "stock.report",
+        "accessibility": "当前入口可得",
+        "primary_metric_code": "market_share",
+        "primary_entry": "stock.report",
+        "acceptable_first_entries": [
+          "stock.report"
+        ],
+        "required_entries": [
+          "stock.report"
+        ],
+        "gold_basis": "human_reviewed_full_gold_v2_20260901",
+        "data_source_nature": "第三方研报观点",
+        "data_task_type": "第三方观点取证后分析",
+        "current_data_gap": "",
+        "mainland_replacement": {
+          "original_question": "拼多多的市场份额与哔哩哔哩相比有何优劣？",
+          "original_entity": "拼多多的市场份额与哔哩哔哩",
+          "replacement_entity": "宁德时代的市场份额与比亚迪",
+          "principle": "preserve task semantics and Gold route; prefer recent A-share report coverage"
+        }
+      }
+    },
+    {
+      "case_id": "RTE055",
+      "question": "机构对阳光电源2026年至2028年的营收增速预测分别是多少？",
+      "source_case": {
+        "case_id": "RTE055",
+        "source_ordinal": 39,
+        "question": "机构对阳光电源2026年至2028年的营收增速预测分别是多少？",
+        "category": "标准预测指标",
+        "data_shape": "明细",
+        "protocol_entry_raw": "stock.report_metric",
+        "accessibility": "当前入口可得",
+        "primary_metric_code": "revenue_growth",
+        "primary_entry": "stock.report_metric",
+        "acceptable_first_entries": [
+          "stock.report_metric"
+        ],
+        "required_entries": [
+          "stock.report_metric"
+        ],
+        "gold_basis": "human_reviewed_full_gold_v2_20260901",
+        "data_source_nature": "第三方机构预测",
+        "data_task_type": "第三方预测直接取数",
+        "current_data_gap": "",
+        "mainland_replacement": {
+          "original_question": "机构对信义光能2026年至2028年的营收增速预测分别是多少？",
+          "original_entity": "信义光能",
+          "replacement_entity": "阳光电源",
+          "principle": "preserve task semantics and Gold route; prefer recent A-share report coverage"
+        }
+      }
+    },
+    {
+      "case_id": "RTE056",
+      "question": "机构认为华泰证券估值是否合理的核心依据是什么？",
+      "source_case": {
+        "case_id": "RTE056",
+        "source_ordinal": 76,
+        "question": "机构认为华泰证券估值是否合理的核心依据是什么？",
+        "category": "观点、风险与战略文本",
+        "data_shape": "明细",
+        "protocol_entry_raw": "stock.report",
+        "accessibility": "当前入口可得",
+        "primary_metric_code": "",
+        "primary_entry": "stock.report",
+        "acceptable_first_entries": [
+          "stock.report"
+        ],
+        "required_entries": [
+          "stock.report"
+        ],
+        "gold_basis": "human_reviewed_full_gold_v2_20260901",
+        "data_source_nature": "第三方研报观点",
+        "data_task_type": "第三方观点取证后分析",
+        "current_data_gap": ""
+      }
+    },
+    {
+      "case_id": "RTE059",
+      "question": "如果净利率上涨10%，对新宙邦的利润影响有多大？",
+      "source_case": {
+        "case_id": "RTE059",
+        "source_ordinal": 143,
+        "question": "如果净利率上涨10%，对新宙邦的利润影响有多大？",
+        "category": "研报观点 + 外部数据/情景",
+        "data_shape": "混合",
+        "protocol_entry_raw": "stock.financial_3_table",
+        "accessibility": "当前入口可得",
+        "primary_metric_code": "net_margin",
+        "primary_entry": "stock.financial_3_table",
+        "acceptable_first_entries": [
+          "stock.financial_3_table"
+        ],
+        "required_entries": [
+          "stock.financial_3_table"
+        ],
+        "gold_basis": "human_reviewed_full_gold_v2_20260901",
+        "data_source_nature": "公司披露/经营事实",
+        "data_task_type": "事实取数后分析",
+        "current_data_gap": ""
+      }
+    },
+    {
+      "case_id": "RTE067",
+      "question": "多家券商对上汽集团的营收增速预测差异有多大？",
+      "source_case": {
+        "case_id": "RTE067",
+        "source_ordinal": 129,
+        "question": "多家券商对上汽集团的营收增速预测差异有多大？",
+        "category": "标准预测指标",
+        "data_shape": "明细",
+        "protocol_entry_raw": "stock.report_metric",
+        "accessibility": "当前入口可得",
+        "primary_metric_code": "revenue_growth",
+        "primary_entry": "stock.report_metric",
+        "acceptable_first_entries": [
+          "stock.report_metric"
+        ],
+        "required_entries": [
+          "stock.report_metric"
+        ],
+        "gold_basis": "human_reviewed_full_gold_v2_20260901",
+        "data_source_nature": "第三方机构预测",
+        "data_task_type": "预测明细取数后比较",
+        "current_data_gap": ""
+      }
+    },
+    {
+      "case_id": "RTE070",
+      "question": "关于古井贡酒，不同机构的主要分歧点在哪里？",
+      "source_case": {
+        "case_id": "RTE070",
+        "source_ordinal": 136,
+        "question": "关于古井贡酒，不同机构的主要分歧点在哪里？",
+        "category": "观点、风险与战略文本",
+        "data_shape": "聚合前明细",
+        "protocol_entry_raw": "stock.report",
+        "accessibility": "当前入口可得",
+        "primary_metric_code": "",
+        "primary_entry": "stock.report",
+        "acceptable_first_entries": [
+          "stock.report"
+        ],
+        "required_entries": [
+          "stock.report"
+        ],
+        "gold_basis": "human_reviewed_full_gold_v2_20260901",
+        "data_source_nature": "第三方研报观点",
+        "data_task_type": "第三方观点取证后分析",
+        "current_data_gap": ""
+      }
+    },
+    {
+      "case_id": "RTE073",
+      "question": "机构认为长江电力估值溢价是否合理的核心依据是什么？",
+      "source_case": {
+        "case_id": "RTE073",
+        "source_ordinal": 166,
+        "question": "机构认为长江电力估值溢价是否合理的核心依据是什么？",
+        "category": "观点、风险与战略文本",
+        "data_shape": "明细",
+        "protocol_entry_raw": "stock.report",
+        "accessibility": "当前入口可得",
+        "primary_metric_code": "",
+        "primary_entry": "stock.report",
+        "acceptable_first_entries": [
+          "stock.report"
+        ],
+        "required_entries": [
+          "stock.report"
+        ],
+        "gold_basis": "human_reviewed_full_gold_v2_20260901",
+        "data_source_nature": "第三方研报观点",
+        "data_task_type": "第三方观点取证后分析",
+        "current_data_gap": ""
+      }
+    },
+    {
+      "case_id": "RTE076",
+      "question": "机构对用友网络2026年的EPS预测是多少？",
+      "source_case": {
+        "case_id": "RTE076",
+        "source_ordinal": 7,
+        "question": "机构对用友网络2026年的EPS预测是多少？",
+        "category": "标准预测指标",
+        "data_shape": "明细",
+        "protocol_entry_raw": "stock.report_metric",
+        "accessibility": "当前入口可得",
+        "primary_metric_code": "eps",
+        "primary_entry": "stock.report_metric",
+        "acceptable_first_entries": [
+          "stock.report_metric"
+        ],
+        "required_entries": [
+          "stock.report_metric"
+        ],
+        "gold_basis": "human_reviewed_full_gold_v2_20260901",
+        "data_source_nature": "第三方机构预测",
+        "data_task_type": "第三方预测直接取数",
+        "current_data_gap": ""
+      }
+    },
+    {
+      "case_id": "RTE080",
+      "question": "机构对中国平安的最新业绩预测相比过去半年有何变化？",
+      "source_case": {
+        "case_id": "RTE080",
+        "source_ordinal": 115,
+        "question": "机构对中国平安的最新业绩预测相比过去半年有何变化？",
+        "category": "观点、风险与战略文本",
+        "data_shape": "明细",
+        "protocol_entry_raw": "stock.report_metric",
+        "accessibility": "当前入口可得",
+        "primary_metric_code": "",
+        "primary_entry": "stock.report_metric",
+        "acceptable_first_entries": [
+          "stock.report_metric"
+        ],
+        "required_entries": [
+          "stock.report_metric"
+        ],
+        "gold_basis": "human_reviewed_full_gold_v2_20260901",
+        "data_source_nature": "第三方机构预测",
+        "data_task_type": "预测明细取数后比较",
+        "current_data_gap": ""
+      }
+    },
+    {
+      "case_id": "RTE082",
+      "question": "近期有哪些机构对兴森科技进行了评级调整？",
+      "source_case": {
+        "case_id": "RTE082",
+        "source_ordinal": 126,
+        "question": "近期有哪些机构对兴森科技进行了评级调整？",
+        "category": "评级明细、分布与趋势",
+        "data_shape": "明细",
+        "protocol_entry_raw": "stock.report",
+        "accessibility": "当前入口可得",
+        "primary_metric_code": "",
+        "primary_entry": "stock.report",
+        "acceptable_first_entries": [
+          "stock.report"
+        ],
+        "required_entries": [
+          "stock.report"
+        ],
+        "gold_basis": "human_reviewed_full_gold_v2_20260901",
+        "data_source_nature": "第三方研报观点",
+        "data_task_type": "第三方观点取证后分析",
+        "current_data_gap": ""
+      }
+    },
+    {
+      "case_id": "RTE089",
+      "question": "中国交建在风电赛道的投资逻辑是什么？",
+      "source_case": {
+        "case_id": "RTE089",
+        "source_ordinal": 60,
+        "question": "中国交建在风电赛道的投资逻辑是什么？",
+        "category": "观点、风险与战略文本",
+        "data_shape": "明细",
+        "protocol_entry_raw": "stock.report",
+        "accessibility": "当前入口可得",
+        "primary_metric_code": "",
+        "primary_entry": "stock.report",
+        "acceptable_first_entries": [
+          "stock.report"
+        ],
+        "required_entries": [
+          "stock.report"
+        ],
+        "gold_basis": "human_reviewed_full_gold_v2_20260901",
+        "data_source_nature": "第三方研报观点",
+        "data_task_type": "第三方观点取证后分析",
+        "current_data_gap": ""
+      }
+    },
+    {
+      "case_id": "RTE093",
+      "question": "中国中免近期股价波动与市场竞争加剧有关系吗？",
+      "source_case": {
+        "case_id": "RTE093",
+        "source_ordinal": 144,
+        "question": "中国中免近期股价波动与市场竞争加剧有关系吗？",
+        "category": "研报观点 + 外部数据/情景",
+        "data_shape": "混合",
+        "protocol_entry_raw": "stock.quote",
+        "accessibility": "当前多入口组合",
+        "primary_metric_code": "",
+        "primary_entry": "stock.quote",
+        "acceptable_first_entries": [
+          "stock.quote",
+          "stock.report"
+        ],
+        "required_entries": [
+          "stock.quote",
+          "stock.report"
+        ],
+        "gold_basis": "human_reviewed_full_gold_v2_20260901",
+        "data_source_nature": "多源事实与分析",
+        "data_task_type": "组合取证后分析",
+        "current_data_gap": ""
+      }
+    },
+    {
+      "case_id": "RTE096",
+      "question": "截至2026年8月28日，机构对阳光电源2026年净利润预测相较2026年2月底有何变化？",
+      "source_case": {
+        "case_id": "RTE096",
+        "source_ordinal": 96,
+        "question": "截至2026年8月28日，机构对阳光电源2026年净利润预测相较2026年2月底有何变化？",
+        "category": "观点、风险与战略文本",
+        "data_shape": "明细",
+        "protocol_entry_raw": "stock.report_metric",
+        "accessibility": "当前入口可得",
+        "primary_metric_code": "",
+        "primary_entry": "stock.report_metric",
+        "acceptable_first_entries": [
+          "stock.report_metric"
+        ],
+        "required_entries": [
+          "stock.report_metric"
+        ],
+        "gold_basis": "human_reviewed_full_gold_v2_20260901",
+        "data_source_nature": "第三方机构预测",
+        "data_task_type": "预测明细取数后比较",
+        "current_data_gap": "",
+        "mainland_replacement": {
+          "original_question": "截至2026年8月28日，机构对信义光能2026年净利润预测相较2026年2月底有何变化？",
+          "original_entity": "信义光能",
+          "replacement_entity": "阳光电源",
+          "principle": "preserve task semantics and Gold route; prefer recent A-share report coverage"
+        }
+      }
+    }
+  ]
+}

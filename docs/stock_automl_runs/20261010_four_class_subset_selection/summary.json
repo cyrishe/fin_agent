@@ -1,0 +1,96 @@
+{
+  "definition": "19 most recent signal days ending T-2; within each day randomly sample 80% or 90% of labeled stocks, ten repeats each; choose the highest observed T-1 Top1 09:40 return; selected trained model directly scores T without refit",
+  "candidate_rows": 14783,
+  "test_days": 20,
+  "baseline20_top1_mean_pct": 0.668622517518367,
+  "tminus1_selection": {
+    "chosen_mean_return_pct": 3.1091126268727947,
+    "control19_mean_return_pct": 0.8415463662701146,
+    "unknown_subset_checks": 0,
+    "no_trade_subset_checks": 4,
+    "winner_counts": {
+      "random_90_01": 5,
+      "random_90_03": 3,
+      "random_90_04": 2,
+      "random_90_05": 2,
+      "random_80_05": 1,
+      "random_80_02": 1,
+      "random_90_06": 1,
+      "random_90_09": 1,
+      "random_90_08": 1,
+      "random_80_01": 1,
+      "random_80_03": 1,
+      "random_90_02": 1
+    },
+    "winner_fractions": {
+      "90": 16,
+      "80": 4
+    }
+  },
+  "rules": {
+    "selected_subset": {
+      "top1": {
+        "picks": 20,
+        "known_outcomes": 20,
+        "unknown_outcomes": 0,
+        "selected_days": 20,
+        "ge3": 3,
+        "ge1": 7,
+        "lt0": 6,
+        "below_minus1": 1,
+        "mean_0940_return_pct": 0.012195317580110943
+      },
+      "top2": {
+        "picks": 40,
+        "known_outcomes": 40,
+        "unknown_outcomes": 0,
+        "selected_days": 20,
+        "ge3": 5,
+        "ge1": 16,
+        "lt0": 15,
+        "below_minus1": 5,
+        "mean_0940_return_pct": -0.30258068215963385
+      },
+      "changed_top1_days": 12,
+      "mean_delta_pct_points": -0.6564271999382562,
+      "better_days": 3,
+      "worse_days": 9,
+      "same_days": 8
+    },
+    "full19_control": {
+      "top1": {
+        "picks": 20,
+        "known_outcomes": 20,
+        "unknown_outcomes": 0,
+        "selected_days": 20,
+        "ge3": 8,
+        "ge1": 15,
+        "lt0": 2,
+        "below_minus1": 0,
+        "mean_0940_return_pct": 1.119595340947881
+      },
+      "top2": {
+        "picks": 40,
+        "known_outcomes": 40,
+        "unknown_outcomes": 0,
+        "selected_days": 20,
+        "ge3": 9,
+        "ge1": 23,
+        "lt0": 10,
+        "below_minus1": 3,
+        "mean_0940_return_pct": 0.37007191215113533
+      },
+      "changed_top1_days": 9,
+      "mean_delta_pct_points": 0.450972823429514,
+      "better_days": 5,
+      "worse_days": 4,
+      "same_days": 11
+    }
+  },
+  "sources_sha256": {
+    "docs/stock_automl_runs/20261010_four_class_similar_days/prepared_candidates.csv.gz": "c0a4d1ea86c0ea7bbcb21d98cb8efe133efeaf8bd981ca0a86557e00bff00c08",
+    "docs/stock_automl_runs/20261010_four_class_baseline_recent20/minute_api_label_audit.csv": "d054e741e368093ef7b45a3b32da213ac1c0fb4ef944064bcdb3e67b2a2bb5f2",
+    "docs/stock_automl_runs/20261010_four_class_baseline_recent20/baseline_top1.csv": "c9daacd0fa05014139309215c7c2ce925fae4c3c1ce54c026a684eeb5b2b604d",
+    "/Users/imac/.codex/worktrees/automl-five-class/fin_agent/scripts/experiment_automl_four_class_subset_selection.py": "5f12a3af8101b0209c941b6fa0ddd8ecf991129cdf0e1986a81a6754b67c6533"
+  }
+}

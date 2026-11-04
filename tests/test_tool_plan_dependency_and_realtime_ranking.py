@@ -1,3 +1,4 @@
+import threading
 import time
 
 from src.services.agent_runtime_llm_planner_service import AgentRuntimeLLMPlannerService
@@ -543,6 +544,7 @@ def test_tool_plan_runtime_executes_transform_and_foreach_subset():
         tool_argument_planner=_ToolArgumentPlannerReadyStub(),
         runtime_execution_service=runtime_stub,
         enable_tool_preflight=False,
+        max_parallel_tools=4,
     )
     result = service.execute_for_assistant(
         execution_plan={
@@ -588,7 +590,134 @@ def test_tool_plan_runtime_executes_transform_and_foreach_subset():
     assert items[1]["status"] == "completed"
     assert items[2]["status"] == "completed"
     fund_calls = [call for call in runtime_stub.calls if call[0] == "stock_funds"]
-    assert [call[1]["code"] for call in fund_calls] == ["000001.SZ", "000002.SZ"]
+    assert sorted(call[1]["code"] for call in fund_calls) == ["000001.SZ", "000002.SZ"]
+
+
+def test_tool_plan_runtime_passes_upstream_tool_rows_directly_into_foreach():
+    runtime_stub = _RuntimeExecutionStub()
+    service = ToolPlanRuntimeService(
+        tool_argument_planner=_ToolArgumentPlannerReadyStub(),
+        runtime_execution_service=runtime_stub,
+        enable_tool_preflight=False,
+        max_parallel_tools=4,
+    )
+    result = service.execute_for_assistant(
+        execution_plan={
+            "plan_type": "planned_run",
+            "task_mode": "planned",
+            "objective": "查询股票池后逐股执行策略",
+            "work_items": [
+                {
+                    "step_id": "step_1",
+                    "type": "tool",
+                    "name": "plate_members_query",
+                    "depends_on": [],
+                    "input_binding": {"plate": "机器人"},
+                    "output_binding": {"members": "$result.data"},
+                },
+                {
+                    "step_id": "step_2",
+                    "type": "tool",
+                    "name": "stock_funds",
+                    "execution_mode": "foreach",
+                    "depends_on": ["step_1"],
+                    "foreach_binding": {"items": "${step_1.members}"},
+                    "input_binding": {"code": "${item.stock_code}"},
+                    "output_binding": {"funds_list": "funds_data_list"},
+                },
+            ],
+        },
+        user_text="查询股票池后逐股执行策略",
+        application_context={},
+        thread_context={},
+    )
+
+    assert [item["status"] for item in result["items"]] == ["completed", "completed"]
+    fund_calls = [call for call in runtime_stub.calls if call[0] == "stock_funds"]
+    assert sorted(call[1]["code"] for call in fund_calls) == ["000001.SZ", "000002.SZ"]
+
+
+def test_tool_plan_runtime_foreach_is_bounded_parallel_and_preserves_input_order():
+    class ConcurrentRuntimeStub(_RuntimeExecutionStub):
+        def __init__(self):
+            super().__init__()
+            self.lock = threading.Lock()
+            self.active = 0
+            self.max_active = 0
+            self.active_computations = 0
+            self.max_active_computations = 0
+
+        def execute_tool(self, tool_name, args, executor):
+            code = str(args.get("code") or "")
+            with self.lock:
+                self.active += 1
+                self.max_active = max(self.max_active, self.active)
+            try:
+                # The scheduler owns the complete per-target invocation.  A
+                # fetch phase followed by a calculation phase must therefore
+                # remain concurrent, rather than converging into one serial
+                # calculation loop after parallel data access.
+                time.sleep(0.005)
+                with self.lock:
+                    self.active_computations += 1
+                    self.max_active_computations = max(
+                        self.max_active_computations,
+                        self.active_computations,
+                    )
+                # Reverse completion order so the assertion verifies result ordering,
+                # not merely submission ordering.
+                try:
+                    time.sleep(0.01 * (7 - int(code.split(".", 1)[0][-1])))
+                    return {
+                        "tool": tool_name,
+                        "ok": True,
+                        "data": {"code": code},
+                        "error": "",
+                    }
+                finally:
+                    with self.lock:
+                        self.active_computations -= 1
+            finally:
+                with self.lock:
+                    self.active -= 1
+
+    runtime_stub = ConcurrentRuntimeStub()
+    service = ToolPlanRuntimeService(
+        tool_argument_planner=_ToolArgumentPlannerReadyStub(),
+        runtime_execution_service=runtime_stub,
+        enable_tool_preflight=False,
+        max_parallel_tools=4,
+    )
+    result = service._execute_foreach_step(
+        step={
+            "step_id": "step_1",
+            "type": "tool",
+            "name": "stock_funds",
+            "execution_mode": "foreach",
+            "depends_on": [],
+            "foreach_binding": {
+                "items": [
+                    {"stock_code": f"00000{index}.SZ"}
+                    for index in range(1, 7)
+                ]
+            },
+            "input_binding": {"code": "${item.stock_code}"},
+            "output_binding": {"funds_list": "funds_data_list"},
+        },
+        user_text="批量执行策略",
+        thread_context={},
+        runtime_trace={"local_events": []},
+        shared_outputs={},
+        completed_step_ids=set(),
+        step_outputs={},
+    )
+
+    child_results = result["result"]["data"]
+    assert runtime_stub.max_active == 4
+    assert runtime_stub.max_active_computations == 4
+    assert [item["data"]["code"] for item in child_results] == [
+        f"00000{index}.SZ" for index in range(1, 7)
+    ]
 
 
 def test_tool_plan_runtime_executes_transform_dsl_top1_projection():
@@ -739,6 +868,7 @@ def test_tool_plan_runtime_runs_ready_tool_steps_in_parallel(monkeypatch):
         lambda **kwargs: ({"summary": "ok", "facts": [], "risks": []}, None),
     )
     started_at = time.monotonic()
+    events = []
     result = service.execute_for_assistant(
         execution_plan={
             "plan_type": "planned_run",
@@ -766,11 +896,20 @@ def test_tool_plan_runtime_runs_ready_tool_steps_in_parallel(monkeypatch):
         user_text="并行查行情和新闻",
         application_context={},
         thread_context={},
+        event_sink=events.append,
     )
     elapsed = time.monotonic() - started_at
 
     assert [item["status"] for item in result["items"]] == ["completed", "completed"]
     assert elapsed < 0.38
+    assert any(
+        item["data"]["event_type"] == "tool_batch_progress"
+        and "2/2" in item["content"]
+        for item in events
+    )
+    assert not any(item["block_id"] in {"runtime_step_1", "runtime_step_2"} for item in events)
+    assert events[-1]["block_id"] == "runtime_plan"
+    assert events[-1]["data"]["status"] == "completed"
 
 
 def test_tool_plan_runtime_can_disable_preflight(monkeypatch):

@@ -1,0 +1,44 @@
+from decimal import Decimal
+
+import pandas as pd
+
+from scripts.reprice_automl_first10_high_exit import (
+    audit_exact_labels, exit_at_observed_high, load_inputs, simulate,
+)
+
+
+def bars(highs, last_close=9.8):
+    return pd.DataFrame({"minute": [f"09:{n:02}" for n in range(31, 41)],
+                         "high_price": highs,
+                         "latest_price": [10.0] * 9 + [last_close]})
+
+
+def test_skip_first_three_then_sell_at_first_qualifying_actual_high():
+    morning = bars([10.4, 10.3, 10.2, 10.15, 10.5, 10, 10, 10, 10, 10])
+    assert exit_at_observed_high(Decimal("10"), morning) == (
+        Decimal("10.15"), "09:34分钟最高价", True)
+
+
+def test_first_three_only_falls_back_to_0940_and_boundary_is_strict():
+    morning = bars([10.4, 10, 10, 10.1, 10.1, 10, 10, 10, 10, 10.1])
+    assert exit_at_observed_high(Decimal("10"), morning) == (
+        Decimal("9.8"), "09:40收盘价", False)
+
+
+def test_archived_40_labels_recompute_from_saved_exact_minute_bars():
+    picks, minute_bars = load_inputs()
+    _, _, trades = simulate(picks["old_all"], minute_bars)
+    audit, _ = audit_exact_labels(minute_bars, trades)
+    assert audit["archived_labels"] == {"1": 24, "0": 8, "-1": 8}
+    assert audit["label_mismatch_count"] == 0
+    assert audit["max_return_difference"] < 1e-7
+
+
+def test_open_all_ten_minutes_and_delayed_fill_are_separate_prices():
+    morning = bars([10.3, 10.2, 10, 10, 10, 10, 10, 10, 10, 10])
+    morning["open_price"] = [10.0, 10.08] + [10.0] * 8
+    assert exit_at_observed_high(Decimal("10"), morning, skip_minutes=0) == (
+        Decimal("10.3"), "09:31分钟最高价", True)
+    assert exit_at_observed_high(Decimal("10"), morning, skip_minutes=0,
+                                 fill_mode="next_open") == (
+        Decimal("10.08"), "09:32次分钟开盘价", True)

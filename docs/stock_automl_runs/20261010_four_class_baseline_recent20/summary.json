@@ -1,0 +1,102 @@
+{
+  "candidate_rows": 14783,
+  "original_known_labels": 14724,
+  "recovered_labels": 53,
+  "remaining_unknown_labels": 6,
+  "test_dates": [
+    "2026-09-02",
+    "2026-09-03",
+    "2026-09-04",
+    "2026-09-07",
+    "2026-09-08",
+    "2026-09-09",
+    "2026-09-10",
+    "2026-09-11",
+    "2026-09-14",
+    "2026-09-15",
+    "2026-09-16",
+    "2026-09-17",
+    "2026-09-18",
+    "2026-09-21",
+    "2026-09-22",
+    "2026-09-23",
+    "2026-09-24",
+    "2026-09-28",
+    "2026-09-29",
+    "2026-09-30"
+  ],
+  "arms": {
+    "exclude_missing": {
+      "top1": {
+        "picks": 20,
+        "known_outcomes": 20,
+        "unknown_outcomes": 0,
+        "selected_days": 20,
+        "ge3": 4,
+        "ge1": 12,
+        "lt0": 5,
+        "below_minus1": 0,
+        "mean_0940_return_pct": 0.37941838762356017
+      },
+      "top2": {
+        "picks": 39,
+        "known_outcomes": 39,
+        "unknown_outcomes": 0,
+        "selected_days": 20,
+        "ge3": 7,
+        "ge1": 19,
+        "lt0": 11,
+        "below_minus1": 3,
+        "mean_0940_return_pct": 0.2527048762184575
+      },
+      "known_test_candidates": 5981,
+      "four_class_accuracy": 0.3360642033104832,
+      "ge3_auc": 0.6144566142776696,
+      "mean_training_rows": 7210.3,
+      "mean_recovered_training_rows": 0.0
+    },
+    "recover_53": {
+      "top1": {
+        "picks": 20,
+        "known_outcomes": 20,
+        "unknown_outcomes": 0,
+        "selected_days": 20,
+        "ge3": 7,
+        "ge1": 12,
+        "lt0": 4,
+        "below_minus1": 0,
+        "mean_0940_return_pct": 0.6686225175183674
+      },
+      "top2": {
+        "picks": 40,
+        "known_outcomes": 40,
+        "unknown_outcomes": 0,
+        "selected_days": 20,
+        "ge3": 9,
+        "ge1": 21,
+        "lt0": 10,
+        "below_minus1": 3,
+        "mean_0940_return_pct": 0.28366501360407775
+      },
+      "known_test_candidates": 5981,
+      "four_class_accuracy": 0.3362313994315332,
+      "ge3_auc": 0.6141146046005171,
+      "mean_training_rows": 7242.65,
+      "mean_recovered_training_rows": 32.35
+    }
+  },
+  "paired_top1": {
+    "known_days": 20,
+    "changed_symbols": 7,
+    "mean_delta_pct_points": 0.28920412989480726,
+    "better_days": 4,
+    "worse_days": 3,
+    "same_days": 13
+  },
+  "sources_sha256": {
+    "docs/stock_automl_runs/20261010_four_class_similar_days/prepared_candidates.csv.gz": "c0a4d1ea86c0ea7bbcb21d98cb8efe133efeaf8bd981ca0a86557e00bff00c08",
+    "docs/stock_automl_runs/20261010_four_class_similar_days/market_states_1440.csv": "a7086a79b8223442d3fdbb65d11ffc880e649b687ebc95d36d07a89b15ba3a15",
+    "docs/stock_automl_runs/20261010_four_class_baseline_recent20/minute_api_label_audit.csv": "d054e741e368093ef7b45a3b32da213ac1c0fb4ef944064bcdb3e67b2a2bb5f2",
+    "/Users/imac/.codex/worktrees/automl-five-class/fin_agent/scripts/experiment_automl_recovered_morning_labels.py": "f8f12466e49001d67a17c55242c8b5b089164b5a2de9e86c188730ef4ddcd375"
+  }
+}

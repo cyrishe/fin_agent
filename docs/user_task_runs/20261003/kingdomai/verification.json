@@ -1,0 +1,56 @@
+{
+  "runtime_budget_seconds": 900,
+  "deadline_budget_preserved": true,
+  "all_requested_horizon_task_pairs_trained": true,
+  "candidate_counts": [
+    {
+      "horizon": 1,
+      "task": "classification",
+      "count": 1
+    },
+    {
+      "horizon": 1,
+      "task": "regression",
+      "count": 2
+    },
+    {
+      "horizon": 3,
+      "task": "classification",
+      "count": 1
+    },
+    {
+      "horizon": 3,
+      "task": "regression",
+      "count": 1
+    },
+    {
+      "horizon": 7,
+      "task": "classification",
+      "count": 2
+    },
+    {
+      "horizon": 7,
+      "task": "regression",
+      "count": 1
+    }
+  ],
+  "successful_trials": 8,
+  "failed_trials": 0,
+  "qualified_candidates": 0,
+  "orders": {
+    "new_period": {
+      "order_records": 12,
+      "by_side": {
+        "BUY": 6,
+        "SELL": 6
+      }
+    },
+    "new_companies_and_period": {
+      "order_records": 2,
+      "by_side": {
+        "BUY": 1,
+        "SELL": 1
+      }
+    }
+  }
+}

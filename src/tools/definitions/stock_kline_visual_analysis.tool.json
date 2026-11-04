@@ -1,0 +1,96 @@
+{
+  "name": "stock_kline_visual_analysis",
+  "auth": "public",
+  "availability": {
+    "lifecycle": "active",
+    "retrieval_mode": "retrievable",
+    "visibility": "visible"
+  },
+  "identity": {
+    "display_name": "K线独立看图与形态复核",
+    "description": "取得同源已完成日线并绘图，独立视觉模型读取K线、均线和成交量；可选数值形态扫描、语义筛选与最多3个局部视觉复核。返回计算事实、图像解读和证据，不另写最终研究报告。",
+    "domain": "stock",
+    "owner": "tools"
+  },
+  "capabilities": [
+    "kline_visual_analysis"
+  ],
+  "profiles": {
+    "real": {
+      "enabled": true,
+      "implementation": {
+        "kind": "python_callable",
+        "target": "src.tools.stock_kline_visual_analysis_tool:run"
+      }
+    }
+  },
+  "match_contract": {
+    "request_families": [
+      "data_access"
+    ],
+    "work_item_types": [
+      "tool"
+    ],
+    "capability_classes": [
+      "data_analysis"
+    ],
+    "side_effect_level": "none"
+  },
+  "schemas": {
+    "input": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "code"
+      ],
+      "properties": {
+        "code": {
+          "type": "string",
+          "pattern": "^[0-9]{6}\\.(SH|SZ|BJ)$",
+          "description": "完整股票代码；不确定时先解析证券身份。"
+        },
+        "question": {
+          "type": "string",
+          "maxLength": 4000,
+          "description": "本轮需要观察的走势问题；沿用当前证券和用户期限。"
+        },
+        "as_of": {
+          "type": "string",
+          "format": "date",
+          "description": "分析截止日 YYYY-MM-DD；未来或未收盘日期截至最新已完成日线。"
+        },
+        "window": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 60,
+          "default": 10,
+          "description": "显示/扫描的已完成日K数量，默认10；指标用完整历史预热。"
+        },
+        "review_patterns": {
+          "type": "boolean",
+          "default": true,
+          "description": "true：基础看图、数值筛选及最多3个独立形态视觉复核；false：只做独立基础看图，适合综合研究的量价背景。"
+        }
+      }
+    },
+    "output": {
+      "type": "object"
+    }
+  },
+  "safety": {
+    "network": true,
+    "persistence": false,
+    "side_effect": "none"
+  },
+  "runtime_hints": {
+    "cost_class": "medium",
+    "latency_class": "high",
+    "supports_async_submit": false,
+    "supports_stream": false
+  },
+  "usage_notes": [
+    "日线股票场景；无须先重复查询同一份K线或扫描。沿用已确定证券、截止日和问题，主Agent负责综合。",
+    "视觉模型独立于聊天主模型，需服务端配置LLM_VISION_MODEL；不接受本机文件路径或任意图片URL。",
+    "精确价位以计算事实为准；图像典型性不等于数值定义、预测胜率或投资结论。"
+  ]
+}

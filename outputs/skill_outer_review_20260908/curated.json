@@ -1,0 +1,5939 @@
+{
+  "selection_revision": "1dfb8ae2ff0efa101023781d3ac059f75f6276ae",
+  "mcp_revision": "1dfb8ae",
+  "model": "deepseek-v4-flash-0731",
+  "host": "ws-vcy055rt5dmrgd7b.cn-beijing.maas.aliyuncs.com",
+  "mcp_provider_adapter": "deepseek-official",
+  "endpoint_note": "Selection uses manifest.model_host. MCP runner loads the same server canonical LLM_BASE_URL; a read-only env check confirmed the same Aliyun host. The original MCP manifest records adapter name only, not the observed network destination.",
+  "scope": "26 initial-selection replays plus 8 independent real HTTP MCP both/detail requests. No raw reasoning or credentials included.",
+  "metrics": {
+    "original18_legal": 15,
+    "original18_primary": 14,
+    "server26_legal": 26,
+    "server26_primary": 22,
+    "server26_catalog_ready": 25,
+    "server26_core_and_catalog": 21,
+    "server26_exact_set": 16,
+    "analysis_core": 17,
+    "analysis_total": 17,
+    "generic_empty": 5,
+    "generic_total": 9,
+    "first_generic_empty": 2,
+    "original_mean_skill_count": 2.5,
+    "current18_mean_skill_count": 1.6111111111111112,
+    "selection_tokens": 90886,
+    "selection_mean_model_seconds": 4.2838076923076915,
+    "mcp_complete": 8,
+    "mcp_total": 8,
+    "mcp_mean_seconds": 22.697716500000002,
+    "mcp_tokens": 293333,
+    "mcp_query_steps": 19,
+    "mcp_tool_errors": 2
+  },
+  "selection": [
+    {
+      "id": "market_overview_real",
+      "question": "复盘最近一个完整交易日的A股市场环境：主要指数、成交活跃度、涨跌宽度和大小盘风格分别怎样？目前最值得警惕的风险是什么？",
+      "source": "outputs/financial_qa_cc/finance_business_skills_real_20260729.json",
+      "expected_generic": false,
+      "expected_primary": "market-overview",
+      "original_selected": [
+        "market-overview"
+      ],
+      "first_server_selected": [
+        "market-overview"
+      ],
+      "selected": [
+        "market-overview"
+      ],
+      "original_primary_hit": false,
+      "original_legal": false,
+      "primary_hit": true,
+      "core_match": true,
+      "legal": true,
+      "catalog_issues": [
+        {
+          "arguments": {
+            "subject": "index",
+            "operation": "query"
+          },
+          "error": "指定operation但缺subject/dataview"
+        },
+        {
+          "arguments": {
+            "subject": "stock",
+            "operation": "query"
+          },
+          "error": "指定operation但缺subject/dataview"
+        }
+      ],
+      "catalog_ready": false,
+      "acceptable_selection": true,
+      "catalog_calls": [
+        {
+          "subject": "index",
+          "operation": "query"
+        },
+        {
+          "subject": "stock",
+          "operation": "query"
+        }
+      ],
+      "model_seconds": 5.32,
+      "tokens": 3605,
+      "note": "预期核心方法单独加载。 原生Schema通过，但目录调用缺少dataview，实际handler会拒绝。"
+    },
+    {
+      "id": "sector_theme_real",
+      "question": "分析白酒板块最近20个交易日的表现和内部结构：板块整体强弱、成交变化、领涨与落后公司分别怎样，这种表现是否具有持续性？",
+      "source": "outputs/financial_qa_cc/finance_business_skills_real_20260729.json",
+      "expected_generic": false,
+      "expected_primary": "sector-theme-analysis",
+      "original_selected": [
+        "sector-theme-analysis",
+        "market-overview",
+        "technical-structure-analysis"
+      ],
+      "first_server_selected": [
+        "sector-theme-analysis",
+        "market-overview"
+      ],
+      "selected": [
+        "sector-theme-analysis",
+        "market-overview"
+      ],
+      "original_primary_hit": true,
+      "original_legal": true,
+      "primary_hit": true,
+      "core_match": true,
+      "legal": true,
+      "catalog_issues": [],
+      "catalog_ready": true,
+      "acceptable_selection": false,
+      "catalog_calls": [
+        {
+          "subject": "plate"
+        },
+        {
+          "subject": "plate",
+          "dataview": "constitution"
+        }
+      ],
+      "model_seconds": 4.256,
+      "tokens": 3506,
+      "note": "核心方法已覆盖；辅助方法是否必要需结合执行，不一律判错。"
+    },
+    {
+      "id": "stock_research_real",
+      "question": "从中期投资视角研究宁德时代：结合近期行情、最近三年经营与现金流、当前估值和行业位置，给出核心优势、主要风险及最值得继续观察的三个变量。",
+      "source": "outputs/financial_qa_cc/finance_business_skills_real_20260729.json",
+      "expected_generic": false,
+      "expected_primary": "stock-research",
+      "original_selected": [
+        "stock-research",
+        "valuation-analysis",
+        "financial-quality-analysis",
+        "technical-structure-analysis",
+        "earnings-analysis",
+        "equity-report-analysis"
+      ],
+      "first_server_selected": [
+        "stock-research",
+        "valuation-analysis",
+        "financial-quality-analysis",
+        "earnings-analysis",
+        "equity-report-analysis",
+        "sector-theme-analysis",
+        "market-overview"
+      ],
+      "selected": [
+        "stock-research",
+        "financial-quality-analysis",
+        "valuation-analysis",
+        "earnings-analysis"
+      ],
+      "original_primary_hit": false,
+      "original_legal": false,
+      "primary_hit": true,
+      "core_match": true,
+      "legal": true,
+      "catalog_issues": [],
+      "catalog_ready": true,
+      "acceptable_selection": false,
+      "catalog_calls": [
+        {
+          "subject": "stock",
+          "dataview": "basic_info"
+        },
+        {
+          "subject": "stock",
+          "dataview": "quote"
+        },
+        {
+          "subject": "stock",
+          "dataview": "financial_3_table"
+        },
+        {
+          "subject": "stock",
+          "dataview": "pricevalue"
+        }
+      ],
+      "model_seconds": 6.481,
+      "tokens": 3757,
+      "note": "核心方法已覆盖；辅助方法是否必要需结合执行，不一律判错。"
+    },
+    {
+      "id": "earnings_analysis_real",
+      "question": "分析贵州茅台最近一期年度报告的增长质量。重点看收入与利润增长是否匹配、利润率变化、经营现金流表现，以及增长中是否存在基数或一次性因素。",
+      "source": "outputs/financial_qa_cc/finance_business_skills_real_20260729.json",
+      "expected_generic": false,
+      "expected_primary": "earnings-analysis",
+      "original_selected": [
+        "earnings-analysis",
+        "financial-quality-analysis"
+      ],
+      "first_server_selected": [
+        "earnings-analysis",
+        "financial-quality-analysis"
+      ],
+      "selected": [
+        "earnings-analysis",
+        "financial-quality-analysis"
+      ],
+      "original_primary_hit": true,
+      "original_legal": true,
+      "primary_hit": true,
+      "core_match": true,
+      "legal": true,
+      "catalog_issues": [],
+      "catalog_ready": true,
+      "acceptable_selection": false,
+      "catalog_calls": [
+        {
+          "subject": "stock",
+          "dataview": "financial_3_table",
+          "operation": "query"
+        }
+      ],
+      "model_seconds": 4.576,
+      "tokens": 3535,
+      "note": "核心方法已覆盖；辅助方法是否必要需结合执行，不一律判错。"
+    },
+    {
+      "id": "stock_screening_real",
+      "question": "在沪深300成分股中筛选最近60日走势较强、最新PE TTM低于50倍且最近一期ROE为正的股票，列出前10个候选，并说明每只股票为什么入选。",
+      "source": "outputs/financial_qa_cc/finance_business_skills_real_20260729.json",
+      "expected_generic": false,
+      "expected_primary": "stock-screening",
+      "original_selected": [
+        "stock-screening",
+        "technical-structure-analysis",
+        "financial-quality-analysis"
+      ],
+      "first_server_selected": [
+        "stock-screening",
+        "technical-structure-analysis",
+        "factor-analysis"
+      ],
+      "selected": [
+        "stock-screening"
+      ],
+      "original_primary_hit": true,
+      "original_legal": true,
+      "primary_hit": true,
+      "core_match": true,
+      "legal": true,
+      "catalog_issues": [],
+      "catalog_ready": true,
+      "acceptable_selection": true,
+      "catalog_calls": [
+        {
+          "subject": "index",
+          "dataview": "constitution"
+        },
+        {
+          "subject": "stock",
+          "dataview": "pricevalue"
+        },
+        {
+          "subject": "stock",
+          "dataview": "financial_3_table"
+        }
+      ],
+      "model_seconds": 4.886,
+      "tokens": 3600,
+      "note": "预期核心方法单独加载。"
+    },
+    {
+      "id": "factor_analysis_real",
+      "question": "比较沪深300成分股最近60日动量因子的横截面差异，列出动量靠前和靠后的代表股票，同时检查20日波动率，解释这个因子当前可能偏好的股票特征和主要局限。",
+      "source": "outputs/financial_qa_cc/finance_business_skills_real_20260729.json",
+      "expected_generic": false,
+      "expected_primary": "factor-analysis",
+      "original_selected": [
+        "factor-analysis"
+      ],
+      "first_server_selected": [
+        "factor-analysis"
+      ],
+      "selected": [
+        "factor-analysis"
+      ],
+      "original_primary_hit": true,
+      "original_legal": true,
+      "primary_hit": true,
+      "core_match": true,
+      "legal": true,
+      "catalog_issues": [],
+      "catalog_ready": true,
+      "acceptable_selection": true,
+      "catalog_calls": [
+        {
+          "subject": "index",
+          "dataview": "constitution"
+        },
+        {
+          "subject": "stock",
+          "dataview": "quote"
+        }
+      ],
+      "model_seconds": 4.815,
+      "tokens": 3546,
+      "note": "预期核心方法单独加载。"
+    },
+    {
+      "id": "valuation_analysis_real",
+      "question": "判断美的集团当前估值是否有基本面支撑：分析最新PE、PB及其近五年历史位置，并结合最近三年的盈利增长、ROE和经营现金流给出有条件的估值判断。",
+      "source": "outputs/financial_qa_cc/finance_business_skills_real_20260729.json",
+      "expected_generic": false,
+      "expected_primary": "valuation-analysis",
+      "original_selected": [
+        "valuation-analysis",
+        "stock-research",
+        "financial-quality-analysis",
+        "earnings-analysis"
+      ],
+      "first_server_selected": [
+        "valuation-analysis",
+        "financial-quality-analysis",
+        "stock-research",
+        "equity-report-analysis"
+      ],
+      "selected": [
+        "valuation-analysis"
+      ],
+      "original_primary_hit": true,
+      "original_legal": true,
+      "primary_hit": true,
+      "core_match": true,
+      "legal": true,
+      "catalog_issues": [],
+      "catalog_ready": true,
+      "acceptable_selection": true,
+      "catalog_calls": [
+        {
+          "subject": "stock",
+          "dataview": "pricevalue"
+        },
+        {
+          "subject": "stock",
+          "dataview": "financial_3_table"
+        },
+        {
+          "subject": "stock",
+          "dataview": "basic_info"
+        }
+      ],
+      "model_seconds": 4.736,
+      "tokens": 3595,
+      "note": "预期核心方法单独加载。"
+    },
+    {
+      "id": "financial_quality_real",
+      "question": "评估海天味业最近三年的财务质量：利润现金含量、应收和存货变化、负债与偿债压力、ROE趋势分别怎样？请指出最值得关注的财务背离。",
+      "source": "outputs/financial_qa_cc/finance_business_skills_real_20260729.json",
+      "expected_generic": false,
+      "expected_primary": "financial-quality-analysis",
+      "original_selected": [
+        "financial-quality-analysis",
+        "earnings-analysis"
+      ],
+      "first_server_selected": [
+        "financial-quality-analysis"
+      ],
+      "selected": [
+        "financial-quality-analysis"
+      ],
+      "original_primary_hit": true,
+      "original_legal": true,
+      "primary_hit": true,
+      "core_match": true,
+      "legal": true,
+      "catalog_issues": [],
+      "catalog_ready": true,
+      "acceptable_selection": true,
+      "catalog_calls": [
+        {
+          "subject": "stock",
+          "dataview": "financial_3_table",
+          "operation": "query"
+        }
+      ],
+      "model_seconds": 5.245,
+      "tokens": 3560,
+      "note": "预期核心方法单独加载。"
+    },
+    {
+      "id": "stock_comparison_real",
+      "question": "比较贵州茅台和五粮液最近三年的成长、盈利能力、经营现金流质量、资产负债和当前估值。不要机械打分，而要说明两家公司各自的优势、代价和更适合的投资前提。",
+      "source": "outputs/financial_qa_cc/finance_business_skills_real_20260729.json",
+      "expected_generic": false,
+      "expected_primary": "stock-comparison",
+      "original_selected": [
+        "stock-comparison",
+        "financial-quality-analysis",
+        "valuation-analysis",
+        "dividend-analysis"
+      ],
+      "first_server_selected": [
+        "stock-comparison",
+        "financial-quality-analysis",
+        "valuation-analysis",
+        "earnings-analysis"
+      ],
+      "selected": [
+        "stock-comparison",
+        "financial-quality-analysis",
+        "valuation-analysis"
+      ],
+      "original_primary_hit": true,
+      "original_legal": true,
+      "primary_hit": true,
+      "core_match": true,
+      "legal": true,
+      "catalog_issues": [],
+      "catalog_ready": true,
+      "acceptable_selection": true,
+      "catalog_calls": [
+        {
+          "subject": "stock",
+          "dataview": "financial_3_table",
+          "operation": "query"
+        },
+        {
+          "subject": "stock",
+          "dataview": "pricevalue",
+          "operation": "query"
+        }
+      ],
+      "model_seconds": 4.363,
+      "tokens": 3558,
+      "note": "核心方法已覆盖；辅助方法是否必要需结合执行，不一律判错。"
+    },
+    {
+      "id": "technical_structure_real",
+      "question": "分析宁德时代最近120个交易日的技术结构：趋势和高低点结构、20日与60日均线、成交量确认、20日波动率以及关键支撑阻力分别怎样？给出信号失效条件。",
+      "source": "outputs/financial_qa_cc/finance_business_skills_real_20260729.json",
+      "expected_generic": false,
+      "expected_primary": "technical-structure-analysis",
+      "original_selected": [
+        "technical-structure-analysis"
+      ],
+      "first_server_selected": [
+        "technical-structure-analysis"
+      ],
+      "selected": [
+        "technical-structure-analysis"
+      ],
+      "original_primary_hit": true,
+      "original_legal": true,
+      "primary_hit": true,
+      "core_match": true,
+      "legal": true,
+      "catalog_issues": [],
+      "catalog_ready": true,
+      "acceptable_selection": true,
+      "catalog_calls": [
+        {
+          "subject": "stock",
+          "dataview": "quote"
+        },
+        {
+          "subject": "stock",
+          "dataview": "basic_info"
+        }
+      ],
+      "model_seconds": 3.512,
+      "tokens": 3470,
+      "note": "预期核心方法单独加载。"
+    },
+    {
+      "id": "dividend_analysis_real",
+      "question": "评估中国神华近五年的分红质量和可持续性：分红是否稳定、当前股息率处于什么水平、利润与经营现金流能否支撑，以及高股息背后最大的风险是什么？",
+      "source": "outputs/financial_qa_cc/finance_business_skills_real_20260729.json",
+      "expected_generic": false,
+      "expected_primary": "dividend-analysis",
+      "original_selected": [
+        "dividend-analysis",
+        "financial-quality-analysis"
+      ],
+      "first_server_selected": [
+        "dividend-analysis"
+      ],
+      "selected": [
+        "dividend-analysis",
+        "financial-quality-analysis"
+      ],
+      "original_primary_hit": true,
+      "original_legal": true,
+      "primary_hit": true,
+      "core_match": true,
+      "legal": true,
+      "catalog_issues": [],
+      "catalog_ready": true,
+      "acceptable_selection": false,
+      "catalog_calls": [
+        {
+          "subject": "stock",
+          "dataview": "corporate_action"
+        }
+      ],
+      "model_seconds": 3.321,
+      "tokens": 3458,
+      "note": "核心方法已覆盖；辅助方法是否必要需结合执行，不一律判错。"
+    },
+    {
+      "id": "consensus",
+      "question": "请比较2026年6月8日至9月8日各机构对贵州茅台的研报观点：主要共识和分歧是什么？分歧来自增长预期、渠道判断还是估值假设？请说明实际覆盖的报告与机构范围，并给出来源。",
+      "source": "outputs/server_report_eval_20260908/chat_cases.json",
+      "expected_generic": false,
+      "expected_primary": "equity-report-analysis",
+      "original_selected": [
+        "equity-report-analysis",
+        "stock-research"
+      ],
+      "first_server_selected": [
+        "equity-report-analysis"
+      ],
+      "selected": [
+        "equity-report-analysis"
+      ],
+      "original_primary_hit": true,
+      "original_legal": true,
+      "primary_hit": true,
+      "core_match": true,
+      "legal": true,
+      "catalog_issues": [],
+      "catalog_ready": true,
+      "acceptable_selection": true,
+      "catalog_calls": [
+        {
+          "subject": "stock",
+          "dataview": "report"
+        }
+      ],
+      "model_seconds": 3.053,
+      "tokens": 3394,
+      "note": "预期核心方法单独加载。"
+    },
+    {
+      "id": "sensitivity",
+      "question": "如果糖蜜采购价格上涨10%，会怎样影响安琪酵母的利润？请结合2026年6月8日至9月8日的机构研究，分析水解糖替代、库存和提价能否缓冲；如果资料没有量化测算，不要硬给利润变化比例。",
+      "source": "outputs/server_report_eval_20260908/chat_cases.json",
+      "expected_generic": false,
+      "expected_primary": "equity-report-analysis",
+      "original_selected": [
+        "stock-research",
+        "equity-report-analysis",
+        "earnings-analysis"
+      ],
+      "first_server_selected": [
+        "stock-research",
+        "equity-report-analysis"
+      ],
+      "selected": [
+        "stock-research",
+        "equity-report-analysis",
+        "earnings-analysis"
+      ],
+      "original_primary_hit": true,
+      "original_legal": true,
+      "primary_hit": true,
+      "core_match": true,
+      "legal": true,
+      "catalog_issues": [],
+      "catalog_ready": true,
+      "acceptable_selection": false,
+      "catalog_calls": [
+        {
+          "subject": "stock",
+          "dataview": "report"
+        },
+        {
+          "subject": "stock",
+          "dataview": "basic_info"
+        }
+      ],
+      "model_seconds": 5.06,
+      "tokens": 3591,
+      "note": "核心方法已覆盖；辅助方法是否必要需结合执行，不一律判错。"
+    },
+    {
+      "id": "revisions",
+      "question": "2026年6月8日至9月8日，机构是否调整了安琪酵母的盈利预测？请找出明确的上调或下调及原因，区分同一家机构的预测修订和不同机构之间的分歧，解释为什么下调盈利预测仍可能维持买入评级。",
+      "source": "outputs/server_report_eval_20260908/chat_cases.json",
+      "expected_generic": false,
+      "expected_primary": "equity-report-analysis",
+      "original_selected": [
+        "equity-report-analysis",
+        "stock-research"
+      ],
+      "first_server_selected": [
+        "equity-report-analysis"
+      ],
+      "selected": [
+        "equity-report-analysis",
+        "earnings-analysis"
+      ],
+      "original_primary_hit": true,
+      "original_legal": true,
+      "primary_hit": true,
+      "core_match": true,
+      "legal": true,
+      "catalog_issues": [],
+      "catalog_ready": true,
+      "acceptable_selection": false,
+      "catalog_calls": [
+        {
+          "subject": "stock",
+          "dataview": "basic_info",
+          "operation": "query"
+        }
+      ],
+      "model_seconds": 4.044,
+      "tokens": 3488,
+      "note": "核心方法已覆盖；辅助方法是否必要需结合执行，不一律判错。"
+    },
+    {
+      "id": "RTE001",
+      "question": "泸州老窖在金融科技领域的布局有哪些？",
+      "source": "outputs/server_report_eval_20260908/cases20.json",
+      "expected_generic": false,
+      "expected_primary": "stock-research",
+      "original_selected": [
+        "stock-research",
+        "equity-report-analysis"
+      ],
+      "first_server_selected": [
+        "stock-research"
+      ],
+      "selected": [
+        "stock-research"
+      ],
+      "original_primary_hit": false,
+      "original_legal": false,
+      "primary_hit": true,
+      "core_match": true,
+      "legal": true,
+      "catalog_issues": [],
+      "catalog_ready": true,
+      "acceptable_selection": true,
+      "catalog_calls": [
+        {
+          "subject": "stock",
+          "dataview": "basic_info",
+          "operation": "query"
+        }
+      ],
+      "model_seconds": 4.14,
+      "tokens": 3499,
+      "note": "预期核心方法单独加载。"
+    },
+    {
+      "id": "RTE003",
+      "question": "鹏鼎控股与沪电股份2026年净利润预测增速有何差异？",
+      "source": "outputs/server_report_eval_20260908/cases20.json",
+      "expected_generic": false,
+      "expected_primary": "equity-report-analysis",
+      "original_selected": [
+        "stock-comparison",
+        "equity-report-analysis",
+        "earnings-analysis"
+      ],
+      "first_server_selected": [
+        "stock-comparison",
+        "equity-report-analysis"
+      ],
+      "selected": [
+        "stock-comparison",
+        "equity-report-analysis"
+      ],
+      "original_primary_hit": true,
+      "original_legal": true,
+      "primary_hit": true,
+      "core_match": true,
+      "legal": true,
+      "catalog_issues": [],
+      "catalog_ready": true,
+      "acceptable_selection": true,
+      "catalog_calls": [
+        {
+          "subject": "stock",
+          "dataview": "report_metric"
+        },
+        {
+          "subject": "stock",
+          "dataview": "report"
+        }
+      ],
+      "model_seconds": 4.961,
+      "tokens": 3556,
+      "note": "核心方法已覆盖；辅助方法是否必要需结合执行，不一律判错。"
+    },
+    {
+      "id": "RTE005",
+      "question": "不同机构对今世缘的估值方法有何差异？",
+      "source": "outputs/server_report_eval_20260908/cases20.json",
+      "expected_generic": false,
+      "expected_primary": "equity-report-analysis",
+      "original_selected": [
+        "equity-report-analysis",
+        "valuation-analysis",
+        "stock-research"
+      ],
+      "first_server_selected": [
+        "equity-report-analysis",
+        "valuation-analysis"
+      ],
+      "selected": [
+        "equity-report-analysis"
+      ],
+      "original_primary_hit": true,
+      "original_legal": true,
+      "primary_hit": true,
+      "core_match": true,
+      "legal": true,
+      "catalog_issues": [],
+      "catalog_ready": true,
+      "acceptable_selection": true,
+      "catalog_calls": [
+        {
+          "subject": "stock",
+          "dataview": "report"
+        },
+        {
+          "subject": "stock",
+          "dataview": "report_metric"
+        }
+      ],
+      "model_seconds": 3.375,
+      "tokens": 3431,
+      "note": "预期核心方法单独加载。"
+    },
+    {
+      "id": "raw_quote_control",
+      "question": "宁德时代最近一个交易日的收盘价和涨跌幅是多少？",
+      "source": "outputs/financial_qa_cc/stock_research_rewrite_simple_entry_20260804.json",
+      "expected_generic": true,
+      "expected_primary": null,
+      "original_selected": [
+        "stock-research"
+      ],
+      "first_server_selected": [],
+      "selected": [],
+      "original_primary_hit": false,
+      "original_legal": true,
+      "primary_hit": true,
+      "core_match": true,
+      "legal": true,
+      "catalog_issues": [],
+      "catalog_ready": true,
+      "acceptable_selection": true,
+      "catalog_calls": [
+        {
+          "subject": "stock",
+          "dataview": "quote"
+        }
+      ],
+      "model_seconds": 3.138,
+      "tokens": 3339,
+      "note": "按数据需求走通用路径。"
+    },
+    {
+      "id": "direct_01",
+      "question": "最近 10 个交易日，上证、深证、北证三大市场的总成交额分别是什么走势？帮我按日期列出来。",
+      "source": "tests/fixtures/securities_agent_tool_selection_cases_20260419.json#01_市场整体资金趋势",
+      "expected_generic": true,
+      "expected_primary": null,
+      "original_selected": null,
+      "first_server_selected": [
+        "market-overview"
+      ],
+      "selected": [],
+      "original_primary_hit": null,
+      "original_legal": null,
+      "primary_hit": true,
+      "core_match": true,
+      "legal": true,
+      "catalog_issues": [],
+      "catalog_ready": true,
+      "acceptable_selection": true,
+      "catalog_calls": [
+        {
+          "dataview": "quote",
+          "subject": "index"
+        },
+        {
+          "dataview": "basic_info",
+          "subject": "index"
+        }
+      ],
+      "model_seconds": 3.583,
+      "tokens": 3380,
+      "note": "按数据需求走通用路径。"
+    },
+    {
+      "id": "direct_03",
+      "question": "现在全市场上涨家数和下跌家数分别是多少？涨停和跌停家数也一起给我。",
+      "source": "tests/fixtures/securities_agent_tool_selection_cases_20260419.json#03_大盘实时宽度",
+      "expected_generic": true,
+      "expected_primary": null,
+      "original_selected": null,
+      "first_server_selected": [
+        "market-overview"
+      ],
+      "selected": [
+        "market-overview"
+      ],
+      "original_primary_hit": null,
+      "original_legal": null,
+      "primary_hit": false,
+      "core_match": false,
+      "legal": true,
+      "catalog_issues": [],
+      "catalog_ready": true,
+      "acceptable_selection": false,
+      "catalog_calls": [
+        {
+          "subject": "stock",
+          "dataview": "quote"
+        }
+      ],
+      "model_seconds": 3.22,
+      "tokens": 3376,
+      "note": "预设可直接取数，仍加载分析方法；保留为误入／额外开销。"
+    },
+    {
+      "id": "direct_04",
+      "question": "帮我看一下宁德时代现在的实时价格、开盘价、盘中最高和最低，以及成交额。",
+      "source": "tests/fixtures/securities_agent_tool_selection_cases_20260419.json#04_个股实时行情确认",
+      "expected_generic": true,
+      "expected_primary": null,
+      "original_selected": null,
+      "first_server_selected": [],
+      "selected": [],
+      "original_primary_hit": null,
+      "original_legal": null,
+      "primary_hit": true,
+      "core_match": true,
+      "legal": true,
+      "catalog_issues": [],
+      "catalog_ready": true,
+      "acceptable_selection": true,
+      "catalog_calls": [
+        {
+          "subject": "stock",
+          "dataview": "quote"
+        }
+      ],
+      "model_seconds": 1.701,
+      "tokens": 3234,
+      "note": "按数据需求走通用路径。"
+    },
+    {
+      "id": "direct_05",
+      "question": "比亚迪现在主力资金是净流入还是净流出？特大单和大单分别是什么情况？",
+      "source": "tests/fixtures/securities_agent_tool_selection_cases_20260419.json#05_个股主力资金状态",
+      "expected_generic": true,
+      "expected_primary": null,
+      "original_selected": null,
+      "first_server_selected": [
+        "stock-research"
+      ],
+      "selected": [
+        "stock-research"
+      ],
+      "original_primary_hit": null,
+      "original_legal": null,
+      "primary_hit": false,
+      "core_match": false,
+      "legal": true,
+      "catalog_issues": [],
+      "catalog_ready": true,
+      "acceptable_selection": false,
+      "catalog_calls": [
+        {
+          "subject": "stock",
+          "dataview": "moneyflow"
+        }
+      ],
+      "model_seconds": 2.556,
+      "tokens": 3360,
+      "note": "预设可直接取数，仍加载分析方法；保留为误入／额外开销。"
+    },
+    {
+      "id": "direct_09",
+      "question": "帮我查一下中信证券最近 20 个交易日的 MA5、MA10、MACD 和 RSI 序列。",
+      "source": "tests/fixtures/securities_agent_tool_selection_cases_20260419.json#09_技术指标序列",
+      "expected_generic": true,
+      "expected_primary": null,
+      "original_selected": null,
+      "first_server_selected": [
+        "technical-structure-analysis"
+      ],
+      "selected": [
+        "technical-structure-analysis"
+      ],
+      "original_primary_hit": null,
+      "original_legal": null,
+      "primary_hit": false,
+      "core_match": false,
+      "legal": true,
+      "catalog_issues": [],
+      "catalog_ready": true,
+      "acceptable_selection": false,
+      "catalog_calls": [
+        {
+          "subject": "stock",
+          "dataview": "quote"
+        },
+        {
+          "subject": "stock",
+          "dataview": "basic_info",
+          "operation": "query"
+        }
+      ],
+      "model_seconds": 5.516,
+      "tokens": 3624,
+      "note": "预设可直接取数，仍加载分析方法；保留为误入／额外开销。"
+    },
+    {
+      "id": "direct_10",
+      "question": "现在市场涨停股有哪些？帮我列出涨停列表。",
+      "source": "tests/fixtures/securities_agent_tool_selection_cases_20260419.json#10_涨停列表",
+      "expected_generic": true,
+      "expected_primary": null,
+      "original_selected": null,
+      "first_server_selected": [
+        "market-overview"
+      ],
+      "selected": [
+        "stock-screening"
+      ],
+      "original_primary_hit": null,
+      "original_legal": null,
+      "primary_hit": false,
+      "core_match": false,
+      "legal": true,
+      "catalog_issues": [],
+      "catalog_ready": true,
+      "acceptable_selection": false,
+      "catalog_calls": [
+        {
+          "subject": "stock",
+          "dataview": "quote"
+        }
+      ],
+      "model_seconds": 8.048,
+      "tokens": 3666,
+      "note": "预设可直接取数，仍加载分析方法；保留为误入／额外开销。"
+    },
+    {
+      "id": "direct_13",
+      "question": "帮我看一下现在全市场成交额排名前 20 的股票。",
+      "source": "tests/fixtures/securities_agent_tool_selection_cases_20260419.json#13_实时行情排名",
+      "expected_generic": true,
+      "expected_primary": null,
+      "original_selected": null,
+      "first_server_selected": [
+        "market-overview"
+      ],
+      "selected": [],
+      "original_primary_hit": null,
+      "original_legal": null,
+      "primary_hit": true,
+      "core_match": true,
+      "legal": true,
+      "catalog_issues": [],
+      "catalog_ready": true,
+      "acceptable_selection": true,
+      "catalog_calls": [
+        {
+          "dataview": "quote",
+          "subject": "stock"
+        }
+      ],
+      "model_seconds": 4.626,
+      "tokens": 3440,
+      "note": "按数据需求走通用路径。"
+    },
+    {
+      "id": "direct_17",
+      "question": "帮我看一下兆易创新属于什么行业、板块和热点概念。",
+      "source": "tests/fixtures/securities_agent_tool_selection_cases_20260419.json#17_公司画像",
+      "expected_generic": true,
+      "expected_primary": null,
+      "original_selected": null,
+      "first_server_selected": [
+        "sector-theme-analysis"
+      ],
+      "selected": [],
+      "original_primary_hit": null,
+      "original_legal": null,
+      "primary_hit": true,
+      "core_match": true,
+      "legal": true,
+      "catalog_issues": [],
+      "catalog_ready": true,
+      "acceptable_selection": true,
+      "catalog_calls": [
+        {
+          "subject": "stock",
+          "dataview": "basic_info",
+          "operation": "query"
+        }
+      ],
+      "model_seconds": 2.847,
+      "tokens": 3318,
+      "note": "按数据需求走通用路径。"
+    }
+  ],
+  "mcp": [
+    {
+      "id": "RTE009",
+      "question": "网易的净利率变化反映了什么行业趋势？",
+      "revision": "1dfb8ae",
+      "http_status": 200,
+      "ok": true,
+      "problems": [],
+      "skills": [],
+      "apis": [
+        "stock.basic_info.query",
+        "stock.financial_3_table.query"
+      ],
+      "rows": 0,
+      "turns": 4,
+      "tokens": 28185,
+      "seconds": 22.031629000000002,
+      "model_seconds": 21.66,
+      "api_seconds": 0.045792,
+      "guard_or_tool_errors": 0,
+      "summary": "本次已查询：获取网易基础身份信息；获取网易多期财务数据以观察净利率变化。当前数据范围与查询条件下返回 0 条记录，因此无法从现有结果给出所问数值。",
+      "pages": [
+        {
+          "result_name": "r1",
+          "goal": "获取网易基础身份信息",
+          "data_type": "table",
+          "schema": {
+            "columns": [
+              {
+                "name": "code",
+                "type": "unknown"
+              },
+              {
+                "name": "name",
+                "type": "unknown"
+              },
+              {
+                "name": "industry",
+                "type": "unknown"
+              }
+            ]
+          },
+          "row_count": 0,
+          "rows_returned": 0,
+          "truncated": false,
+          "rows": []
+        },
+        {
+          "result_name": "r2",
+          "goal": "获取网易多期财务数据以观察净利率变化",
+          "data_type": "table",
+          "schema": {
+            "columns": [
+              {
+                "name": "code",
+                "type": "unknown"
+              },
+              {
+                "name": "name",
+                "type": "unknown"
+              },
+              {
+                "name": "report_period",
+                "type": "unknown"
+              },
+              {
+                "name": "revenue",
+                "type": "unknown"
+              },
+              {
+                "name": "net_profit",
+                "type": "unknown"
+              },
+              {
+                "name": "net_margin",
+                "type": "unknown"
+              },
+              {
+                "name": "gross_margin",
+                "type": "unknown"
+              },
+              {
+                "name": "revenue_yoy",
+                "type": "unknown"
+              }
+            ]
+          },
+          "row_count": 0,
+          "rows_returned": 0,
+          "truncated": false,
+          "rows": []
+        }
+      ],
+      "steps": [
+        {
+          "kind": "llm",
+          "request_index": 1,
+          "turn": 1,
+          "step": 1,
+          "duration_ms": 4178,
+          "timing_basis": "step/start to assistant/message (includes request preparation and model response)",
+          "usage": {
+            "turn": 1,
+            "step": 1,
+            "input_tokens": 1082,
+            "cache_read_tokens": 2048,
+            "context_tokens": 3130,
+            "output_tokens": 283,
+            "reasoning_tokens": 119,
+            "non_reasoning_output_tokens": 164,
+            "total_tokens": 3413
+          }
+        },
+        {
+          "kind": "tool",
+          "tool": "read_finance_catalog",
+          "turn": 1,
+          "step": 1,
+          "call_id": "call_2cc764a6eab94d789f50baaa",
+          "duration_ms": 19,
+          "timing_basis": "tool/call to tool/result",
+          "arguments": {
+            "subject": "stock",
+            "dataview": "basic_info",
+            "operation": "query"
+          },
+          "is_error": false
+        },
+        {
+          "kind": "tool",
+          "tool": "read_finance_catalog",
+          "turn": 1,
+          "step": 1,
+          "call_id": "call_220916ba1a344f808bb83533",
+          "duration_ms": 16,
+          "timing_basis": "tool/call to tool/result",
+          "arguments": {
+            "subject": "stock",
+            "dataview": "financial_3_table",
+            "operation": "query"
+          },
+          "is_error": false
+        },
+        {
+          "kind": "llm",
+          "request_index": 2,
+          "turn": 1,
+          "step": 2,
+          "duration_ms": 2532,
+          "timing_basis": "step/start to assistant/message (includes request preparation and model response)",
+          "usage": {
+            "turn": 1,
+            "step": 2,
+            "input_tokens": 4977,
+            "cache_read_tokens": 2048,
+            "context_tokens": 7025,
+            "output_tokens": 213,
+            "reasoning_tokens": 0,
+            "non_reasoning_output_tokens": 213,
+            "total_tokens": 7238
+          }
+        },
+        {
+          "kind": "tool",
+          "tool": "finance_query",
+          "turn": 1,
+          "step": 2,
+          "call_id": "call_f91b79da842f405385a2f1d8",
+          "duration_ms": 98,
+          "timing_basis": "tool/call to tool/result",
+          "arguments": {
+            "steps": [
+              {
+                "goal": "获取网易基础身份信息",
+                "request": "r1 = stock.basic_info.query(filter = \"name == '网易'\", limit = 1) -> code, name, industry"
+              },
+              {
+                "goal": "获取网易多期财务数据以观察净利率变化",
+                "request": "r2 = stock.financial_3_table.query(filter = \"(name == '网易') and (report_period >= '2021-12-31')\", order = \"report_period asc\", limit = 8) -> code, name, report_period, revenue, net_profit, net_margin, gross_margin, revenue_yoy"
+              }
+            ]
+          },
+          "is_error": false
+        },
+        {
+          "kind": "llm",
+          "request_index": 3,
+          "turn": 1,
+          "step": 3,
+          "duration_ms": 2321,
+          "timing_basis": "step/start to assistant/message (includes request preparation and model response)",
+          "usage": {
+            "turn": 1,
+            "step": 3,
+            "input_tokens": 5034,
+            "cache_read_tokens": 3072,
+            "context_tokens": 8106,
+            "output_tokens": 153,
+            "reasoning_tokens": 75,
+            "non_reasoning_output_tokens": 78,
+            "total_tokens": 8259
+          }
+        },
+        {
+          "kind": "tool",
+          "tool": "resolve_security",
+          "turn": 1,
+          "step": 3,
+          "call_id": "call_84fb1e5b80944db89ec777a6",
+          "duration_ms": 36,
+          "timing_basis": "tool/call to tool/result",
+          "arguments": {
+            "identifiers": [
+              "网易",
+              "网易-S",
+              "NetEase"
+            ]
+          },
+          "is_error": false
+        },
+        {
+          "kind": "llm",
+          "request_index": 4,
+          "turn": 1,
+          "step": 4,
+          "duration_ms": 12629,
+          "timing_basis": "step/start to assistant/message (includes request preparation and model response)",
+          "usage": {
+            "turn": 1,
+            "step": 4,
+            "input_tokens": 1245,
+            "cache_read_tokens": 7168,
+            "context_tokens": 8413,
+            "output_tokens": 862,
+            "reasoning_tokens": 396,
+            "non_reasoning_output_tokens": 466,
+            "total_tokens": 9275
+          }
+        }
+      ],
+      "queries": [
+        {
+          "tool": "finance_query",
+          "flow_step": 1,
+          "flow_size": 2,
+          "goal": "获取网易基础身份信息",
+          "submitted_request": "r1 = stock.basic_info.query(filter = \"name == '网易'\", limit = 1) -> code, name, industry",
+          "request": "r1 = stock.basic_info.query(filter = \"name == '网易'\", limit = 1) -> code, name, industry",
+          "attempts": [
+            {
+              "attempt": 1,
+              "static_validation_ms": 4.576,
+              "api_execution_ms": 23.448,
+              "duration_ms": 29.677
+            }
+          ],
+          "static_validation_ms": 4.576,
+          "api_execution_ms": 23.448,
+          "row_count": 0
+        },
+        {
+          "tool": "finance_query",
+          "flow_step": 2,
+          "flow_size": 2,
+          "goal": "获取网易多期财务数据以观察净利率变化",
+          "submitted_request": "r2 = stock.financial_3_table.query(filter = \"(name == '网易') and (report_period >= '2021-12-31')\", order = \"report_period asc\", limit = 8) -> code, name, report_period, revenue, net_profit, net_margin, gross_margin, revenue_yoy",
+          "request": "r2 = stock.financial_3_table.query(filter = \"(name == '网易') and (report_period >= '2021-12-31')\", order = \"report_period asc\", limit = 8) -> code, name, report_period, revenue, net_profit, net_margin, gross_margin, revenue_yoy",
+          "attempts": [
+            {
+              "attempt": 1,
+              "static_validation_ms": 6.665,
+              "api_execution_ms": 22.344,
+              "duration_ms": 30.573
+            }
+          ],
+          "static_validation_ms": 6.665,
+          "api_execution_ms": 22.344,
+          "row_count": 0
+        }
+      ],
+      "judgment": {
+        "recommended": "stock.financial_3_table.query；研报文字可补充行业背景",
+        "coverage_text": "已查询所需财务趋势入口；当前条件下相关数据0条",
+        "short": "财务入口合理，2次查询均执行通过；零行保守返回，未编造净利率。",
+        "detail": "基础信息和财务三表均实际执行，返回0条；随后专用身份工具也无候选。summary准确限定在当前数据范围与查询条件，不把零行当作协议失败。未取得数据，不能评价行业趋势分析质量。先用basic_info查身份仍有冗余；新增身份工具并不意味着模型每次必然优先使用。"
+      }
+    },
+    {
+      "id": "RTE010",
+      "question": "AI大模型技术发展对科大讯飞的业务增长有何催化作用？",
+      "revision": "1dfb8ae",
+      "http_status": 200,
+      "ok": true,
+      "problems": [],
+      "skills": [
+        "equity-report-analysis",
+        "stock-research"
+      ],
+      "apis": [
+        "stock.report.query",
+        "stock.business_segment.query"
+      ],
+      "rows": 58,
+      "turns": 4,
+      "tokens": 42793,
+      "seconds": 20.722661,
+      "model_seconds": 20.141,
+      "api_seconds": 0.20425400000000002,
+      "guard_or_tool_errors": 0,
+      "summary": "基于机构研报证据，AI大模型技术对科大讯飞业务增长的催化作用已进入\"技术→产品→规模化收入\"的兑现期。以下是核心结论（数据截至2026年中报/研报披露）：\n\n## 核心判断\n\nAI大模型是科大讯飞当前增长的核心引擎，催化已从\"概念\"转为\"可验证的收入与订单\"，并同时拉动 B 端项目、C 端产品与海外、以及平台\"Token经济\"三条价值曲线。\n\n## 催化的三个具体路径与证据\n\n**1. B端：大模型产业化中标双第一，直接贡献收入订单**\n- 2025年公司大模型相关项目中标数量和金额在全行业统计中再次双第一，中标金额 **23.16亿元**，位居央国企市场领先。\n- 对应业务增速：数字政府 +30.35%、企业AI解决方案 +33.65%、智慧汽车 +25.41%、智慧医疗 +24.07%。\n\n**2. 平台化：构建\"API经济+Token经济\"新商业模式**\n- 大模型API及MaaS平台服务收入 **3.85亿元，同比+263%**。\n- AI开发者规模突破1000万，大模型开发者达229万（年增124%）；截至2026年3月末，三方开发者大模型日均Tokens同比+4241%（以星辰MaaS+星火底座驱动）。\n\n**3. C端+海外：大模型赋能产品升级，打开增长天花板**\n- 智慧教育：星火智能批阅机服务超三千所学校（市占率超75%）；AI学伴驱动B端民办校业务全年+350%；星火教师助手覆盖超80万名教师。\n- 海外市场：营收同比+275%，其中美日韩等重点市场智能硬件营收+438%（依托星火多语种大模型底座）。\n\n## 盈利与质量佐证\n\n催化不仅体现在收入端，还改善经营质量：2025年毛利率42.36%保持稳定，经营现金流净额32.08亿元创新高；25Q3归母净利同比+202%，1-9月净亏损同比减亏80.6%。模型研发投入进入稳定期，费用率被视为后续有望下降。\n\n---\n\n**边界与风险提示**：以上均为机构研报观点与公司披露口径，非实际披露对照（如API收入占整体收入比重仍小，2025年总营收规模约百亿级，大模型API 3.85亿元占比仍属早期）。主要风险为：AI大模型应用落地与商业化推进不及预期、行业竞争加剧（对标GPT-5等国际模型）。当前证据支持\"催化正在兑现但仍在放量早期\"的判断，API/Token收入的持续高速增长是后续需跟踪的验证点。",
+      "pages": [
+        {
+          "result_name": "r1",
+          "goal": "获取科大讯飞近期机构研报中关于AI大模型催化业务增长的观点",
+          "data_type": "table",
+          "schema": {
+            "columns": [
+              {
+                "name": "code",
+                "type": "string"
+              },
+              {
+                "name": "name",
+                "type": "string"
+              },
+              {
+                "name": "report_date",
+                "type": "string"
+              },
+              {
+                "name": "institution",
+                "type": "string"
+              },
+              {
+                "name": "rating",
+                "type": "string"
+              },
+              {
+                "name": "title",
+                "type": "string"
+              },
+              {
+                "name": "investment_highlights",
+                "type": "string"
+              },
+              {
+                "name": "risk_warnings",
+                "type": "string"
+              }
+            ]
+          },
+          "row_count": 8,
+          "rows_returned": 2,
+          "truncated": true,
+          "rows": [
+            {
+              "code": "002230.SZ",
+              "name": "科大讯飞",
+              "report_date": "2026-05-07T16:00:00",
+              "institution": "信达证券股份有限公司",
+              "rating": "买入",
+              "title": "盈利能力提升，AI大模型商业化加速落地",
+              "investment_highlights": "核心业务保持稳健增长，盈利表现持续改善。收入端：2025年，公司核心业务保持增长。其中，智慧教育实现营收89.67亿元，同比增长24.04%；智慧医疗实现营收8.58亿元，同比增长24.07%；开放平台实现营收60.88亿元，同比增长17.72%；数字政府实现营收15.58亿元，同比增长30.35%；智能硬件业务实现收入21.83亿元，同比增长7.92%；智慧汽车和企业AI解决方案分别同比增长25.41%、33.65%。现金流：2025年上半年，公司销售回款总额超274亿元，较去年同期增长45亿元；报告期末经营活动产生的现金流量净额32.08亿元，创历史新高。\n\n毛利率保持稳定，研发投入保持高位。2025年公司毛利率为42.36%同比下降0.28个百分点。费用方面：公司2025年销售/管理/研发费用率分别为19.15%/5.12%/16.38%，分别较上年同期变动+1.66%/-1.11%/-0.29个百分点。研发投入方面，2025年公司研发投入较上年同比增长7.84亿元，占营业收入比重为19.79%。\n\n星火大模型持续迭代升级，稳固人工智能国家队地位。2025年，公司在全国产算力平台上攻克了长思维链强化学习和MoE模型全链路训练难题，并在11月发布深度推理大模型星火X1.5。在模型参数小一倍的情况下对标业界领先水平，支持多语言数目超130种，整体性能达到GPT-5（high）的95%以上。2025年科大讯飞大模型相关项目的中标数量和金额在全行业统计中再次获得双第一，大模型相关项目中标金额23.16亿元，央国企市场领先地位稳固。\n\n公司构建“API经济”+大模型“Token经济”双轮增长的开发平台新模式。2025年公司AI开发平台\"1+N+X\"模型矩阵全系列升级，平台已开放920项AI能力与解决方案，AI开发者规模突破1000万，大模型开发者达到229万，年度增速124%。AI平台及授权服务收入12.52亿元，其中大模型API及MaaS平台服务收入3.85亿元，同比增长263%截至2026年3月末，依托星辰MaaS底座及星火大模型，平台三方开发者大模型日均Tokens同比增长4241%\n\nAI融合生态不断完善，C端+海外引领新增长曲线。1）智慧教育：星火智能批阅机服务超三千所学校，市占率超75%；2025年4月公司发布新一代AI学伴解决方案，驱动B端民办校业务全年增长350%；星火教师助手覆盖全国超80万名教师。C端AI学习机、智能办公本、翻译机、录音笔等产品连续多年稳居全周期榜首，618全周期销售额同比增长42%，双十一全周期销售额同比增加30%。2）智慧医疗：截至2025年底，智医助力稳居市场份额80%以上，已服务超过7.7万个基层医疗机构，累计提供AI辅诊建议超11亿次；3）AI+汽车：2025年智能汽车业务实现超40个客户400多款车型的智能化产品成功交付，累计出货量超7300万套；4）海外市场：围绕数字营销、AI硬件、多语种技术授权与B端产品方案等核心业务，聚焦东南亚、中东、美国、日韩等关键市场，实现营收同比增长275%，增长态势强劲。其中智能硬件产品在美日韩等重点市场实现营收增长438%。",
+              "risk_warnings": "风险因素：AI大模型应用落地不及预期；商业化推进速度不及预期；行业竞争加剧。"
+            },
+            {
+              "code": "002230.SZ",
+              "name": "科大讯飞",
+              "report_date": "2026-02-02T16:00:00",
+              "institution": "中邮证券研究所",
+              "rating": "买入",
+              "title": "科大讯飞 (002230)：经营质量显著改善，C 端业务打开增长天花板",
+              "investment_highlights": "自主可控的国产化算力底座，保障人工智能技术可持续发展。公司坚持核心技术底座自主可控，算法、算力、数据等要素自主可控的 AI 核心技术研究和模型训练体系领先性得到进一步验证。通过与华为强强联合，合力打造我国通用人工智能新底座，让国产大模型架构在自主创新的软硬件基础之上，实现了大模型核心技术底座自主可控。“讯飞星火”大模型是目前我国唯一基于全国产算力训练出来的全民可下载的主流大模型，整体技术指标持续对标全球第一梯队，并在教育、医疗、安全、能源等行业的模型效果全球领先；星火多语言大模型已覆盖超 130 个语种，有力支撑中国人工智能出海，为世界提供第二种选择的同时，将形成公司业务收入增长的有力支撑。\n\n讯飞星火持续升级迭代，加速规模化商业落地。面对人工智能从技术突破到规模化商业落地的关键阶段，公司强化高端品牌建设，在包括讯飞 AI 学习机在内的 C 端人工智能产品的品牌推广和渠道建设，以及面对人工智能出海方面继续增加营销投入，销售费用同比增长超过 25% 。以讯飞 AI 学习机为例，大模型赋能答疑辅导、精准学、AI 互动，不断提升自主学习效果，连续三年在京东天猫 618、双 11 电商节中获得学习机品类全周期销售额冠军，用户推荐值 NPS 持续行业第一。",
+              "risk_warnings": "技术迭代与竞争加剧风险；商业化落地不及预期风险；宏观经济与政策风险等。"
+            }
+          ]
+        },
+        {
+          "result_name": "r2",
+          "goal": "获取科大讯飞最新业务分部收入结构，观察AI/大模型相关业务增长",
+          "data_type": "table",
+          "schema": {
+            "columns": [
+              {
+                "name": "code",
+                "type": "string"
+              },
+              {
+                "name": "name",
+                "type": "string"
+              },
+              {
+                "name": "report_period",
+                "type": "string"
+              },
+              {
+                "name": "segment_type",
+                "type": "integer"
+              },
+              {
+                "name": "project_name",
+                "type": "string"
+              },
+              {
+                "name": "segment_sales",
+                "type": "number"
+              },
+              {
+                "name": "gross_profit_margin",
+                "type": "number"
+              },
+              {
+                "name": "pct_segment_sales",
+                "type": "number"
+              },
+              {
+                "name": "inc_segment_sales",
+                "type": "unknown"
+              }
+            ]
+          },
+          "row_count": 50,
+          "rows_returned": 2,
+          "truncated": true,
+          "rows": [
+            {
+              "code": "002230.SZ",
+              "name": "科大讯飞",
+              "report_period": "2026-06-30",
+              "segment_type": 1,
+              "project_name": "其他业务",
+              "segment_sales": 31812550.75,
+              "gross_profit_margin": 75.5214,
+              "pct_segment_sales": 0.2737,
+              "inc_segment_sales": null
+            },
+            {
+              "code": "002230.SZ",
+              "name": "科大讯飞",
+              "report_period": "2026-06-30",
+              "segment_type": 1,
+              "project_name": "教育教学",
+              "segment_sales": 183040483.56,
+              "gross_profit_margin": 11.1826,
+              "pct_segment_sales": 1.5748,
+              "inc_segment_sales": null
+            }
+          ]
+        }
+      ],
+      "steps": [
+        {
+          "kind": "llm",
+          "request_index": 1,
+          "turn": 1,
+          "step": 1,
+          "duration_ms": 4438,
+          "timing_basis": "step/start to assistant/message (includes request preparation and model response)",
+          "usage": {
+            "turn": 1,
+            "step": 1,
+            "input_tokens": 1087,
+            "cache_read_tokens": 2048,
+            "context_tokens": 3135,
+            "output_tokens": 380,
+            "reasoning_tokens": 168,
+            "non_reasoning_output_tokens": 212,
+            "total_tokens": 3515
+          }
+        },
+        {
+          "kind": "tool",
+          "tool": "read_finance_skill",
+          "turn": 1,
+          "step": 1,
+          "call_id": "call_9ee324efb3c5442cbf38a586",
+          "duration_ms": 14,
+          "timing_basis": "tool/call to tool/result",
+          "arguments": {
+            "skill_ids": [
+              "equity-report-analysis",
+              "stock-research"
+            ]
+          },
+          "is_error": false
+        },
+        {
+          "kind": "tool",
+          "tool": "read_finance_catalog",
+          "turn": 1,
+          "step": 1,
+          "call_id": "call_1ef0355316214ee1980c17e6",
+          "duration_ms": 24,
+          "timing_basis": "tool/call to tool/result",
+          "arguments": {
+            "subject": "stock",
+            "dataview": "report",
+            "operation": "query"
+          },
+          "is_error": false
+        },
+        {
+          "kind": "tool",
+          "tool": "read_finance_catalog",
+          "turn": 1,
+          "step": 1,
+          "call_id": "call_e91d4b746fdb416c8a158f67",
+          "duration_ms": 23,
+          "timing_basis": "tool/call to tool/result",
+          "arguments": {
+            "subject": "stock",
+            "dataview": "business_segment",
+            "operation": "query"
+          },
+          "is_error": false
+        },
+        {
+          "kind": "llm",
+          "request_index": 2,
+          "turn": 1,
+          "step": 2,
+          "duration_ms": 1777,
+          "timing_basis": "step/start to assistant/message (includes request preparation and model response)",
+          "usage": {
+            "turn": 1,
+            "step": 2,
+            "input_tokens": 9308,
+            "cache_read_tokens": 2048,
+            "context_tokens": 11356,
+            "output_tokens": 79,
+            "reasoning_tokens": 0,
+            "non_reasoning_output_tokens": 79,
+            "total_tokens": 11435
+          }
+        },
+        {
+          "kind": "tool",
+          "tool": "resolve_security",
+          "turn": 1,
+          "step": 2,
+          "call_id": "call_f508f4e491ab4219a9e3678e",
+          "duration_ms": 25,
+          "timing_basis": "tool/call to tool/result",
+          "arguments": {
+            "identifiers": [
+              "科大讯飞"
+            ]
+          },
+          "is_error": false
+        },
+        {
+          "kind": "llm",
+          "request_index": 3,
+          "turn": 1,
+          "step": 3,
+          "duration_ms": 3367,
+          "timing_basis": "step/start to assistant/message (includes request preparation and model response)",
+          "usage": {
+            "turn": 1,
+            "step": 3,
+            "input_tokens": 8626,
+            "cache_read_tokens": 3072,
+            "context_tokens": 11698,
+            "output_tokens": 305,
+            "reasoning_tokens": 44,
+            "non_reasoning_output_tokens": 261,
+            "total_tokens": 12003
+          }
+        },
+        {
+          "kind": "tool",
+          "tool": "finance_query",
+          "turn": 1,
+          "step": 3,
+          "call_id": "call_8238bca1064c4c02a2bb77e1",
+          "duration_ms": 261,
+          "timing_basis": "tool/call to tool/result",
+          "arguments": {
+            "steps": [
+              {
+                "goal": "获取科大讯飞近期机构研报中关于AI大模型催化业务增长的观点",
+                "request": "r1 = stock.report.query(filter = \"(code == '002230.SZ') and (report_date >= '2025-09-01')\", order = \"report_date desc\", limit = 15) -> code, name, report_date, institution, rating, title, investment_highlights, risk_warnings"
+              },
+              {
+                "goal": "获取科大讯飞最新业务分部收入结构，观察AI/大模型相关业务增长",
+                "request": "r2 = stock.business_segment.query(filter = \"(code == '002230.SZ') and (source == 'salessegment')\", order = \"report_period desc, segment_sales desc\", limit = 50) -> code, name, report_period, segment_type, project_name, segment_sales, gross_profit_margin, pct_segment_sales, inc_segment_sales"
+              }
+            ]
+          },
+          "is_error": false
+        },
+        {
+          "kind": "llm",
+          "request_index": 4,
+          "turn": 1,
+          "step": 4,
+          "duration_ms": 10559,
+          "timing_basis": "step/start to assistant/message (includes request preparation and model response)",
+          "usage": {
+            "turn": 1,
+            "step": 4,
+            "input_tokens": 3784,
+            "cache_read_tokens": 11264,
+            "context_tokens": 15048,
+            "output_tokens": 792,
+            "reasoning_tokens": 208,
+            "non_reasoning_output_tokens": 584,
+            "total_tokens": 15840
+          }
+        }
+      ],
+      "queries": [
+        {
+          "tool": "finance_query",
+          "flow_step": 1,
+          "flow_size": 2,
+          "goal": "获取科大讯飞近期机构研报中关于AI大模型催化业务增长的观点",
+          "submitted_request": "r1 = stock.report.query(filter = \"(code == '002230.SZ') and (report_date >= '2025-09-01')\", order = \"report_date desc\", limit = 15) -> code, name, report_date, institution, rating, title, investment_highlights, risk_warnings",
+          "request": "r1 = stock.report.query(filter = \"(code == '002230.SZ') and (report_date >= '2025-09-01')\", order = \"report_date desc\", limit = 15) -> code, name, report_date, institution, rating, title, investment_highlights, risk_warnings",
+          "attempts": [
+            {
+              "attempt": 1,
+              "static_validation_ms": 6.156,
+              "api_execution_ms": 76.228,
+              "duration_ms": 84.013
+            }
+          ],
+          "static_validation_ms": 6.156,
+          "api_execution_ms": 76.228,
+          "row_count": 8
+        },
+        {
+          "tool": "finance_query",
+          "flow_step": 2,
+          "flow_size": 2,
+          "goal": "获取科大讯飞最新业务分部收入结构，观察AI/大模型相关业务增长",
+          "submitted_request": "r2 = stock.business_segment.query(filter = \"(code == '002230.SZ') and (source == 'salessegment')\", order = \"report_period desc, segment_sales desc\", limit = 50) -> code, name, report_period, segment_type, project_name, segment_sales, gross_profit_margin, pct_segment_sales, inc_segment_sales",
+          "request": "r2 = stock.business_segment.query(filter = \"(code == '002230.SZ') and (source == 'salessegment')\", order = \"report_period desc, segment_sales desc\", limit = 50) -> code, name, report_period, segment_type, project_name, segment_sales, gross_profit_margin, pct_segment_sales, inc_segment_sales",
+          "attempts": [
+            {
+              "attempt": 1,
+              "static_validation_ms": 4.555,
+              "api_execution_ms": 128.026,
+              "duration_ms": 134.228
+            }
+          ],
+          "static_validation_ms": 4.555,
+          "api_execution_ms": 128.026,
+          "row_count": 50
+        }
+      ],
+      "judgment": {
+        "recommended": "stock.report.query 核心观点；stock.business_segment.query 辅助经营事实",
+        "coverage_text": "研报观点与业务分部入口覆盖了本题所需数据类别",
+        "short": "8条研报＋50条分部，入口及协议合理；summary有证据，但因果和时点表述偏强。",
+        "detail": "加载研报分析与个股分析，读到report.query和business_segment.query后执行，全部一次通过。中标23.16亿元、API/MaaS收入3.85亿元与263%增速等在返回研报文字中可追溯。分部数据时点2026-06-30，最新返回研报时点2026-05；不能把研报观点一概当成已由半年报对照验证的事实。催化是核心引擎等属于分析判断，不是数据层已证明的因果。"
+      }
+    },
+    {
+      "id": "RTE017",
+      "question": "看多蔚来汽车的机构主要理由是什么？",
+      "revision": "1dfb8ae",
+      "http_status": 200,
+      "ok": true,
+      "problems": [],
+      "skills": [
+        "equity-report-analysis"
+      ],
+      "apis": [
+        "stock.report.query"
+      ],
+      "rows": 5,
+      "turns": 11,
+      "tokens": 100645,
+      "seconds": 43.238951,
+      "model_seconds": 42.529,
+      "api_seconds": 0.171941,
+      "guard_or_tool_errors": 1,
+      "summary": "数据已取得。证据链完整：\n\n- **report 研报数据源**有效且覆盖A股公司（比亚迪002594、宁德时代300750等均能返回研报），但围绕蔚来（名称/标题含\"蔚来\"或\"NIO\"）的多次查询均返回 0 行。\n- **身份库**对\"蔚来/NIO/9866.HK\"均无匹配。\n- report 数据源的 `market` 字段在所有返回中均为空，无法用于证明多市场覆盖，但样本公司全部为A股（.SZ）。\n\n## 结论\n\n**当前授权的金融数据源无法检索到蔚来汽车（NIO）的机构研报，因此无法提供\"看多蔚来汽车的机构主要理由\"。**\n\n### 已执行的取证范围\n\n| 步骤 | 查询 | 结果 |\n|---|---|---|\n| 身份识别 | \"蔚来\"、\"NIO\"、\"9866.HK\"、\"蔚来汽车\"、\"NIO Inc.\" | 均无候选匹配 |\n| 研报查询① | `name contains '蔚来'` | 0 行 |\n| 研报查询② | title 含\"蔚来\"/\"NIO\"/\"锂想\" | 0 行 |\n| 数据源有效性验证 | 比亚迪、宁德时代研报 | 正常返回（买入评级） |\n\n### 数据边界说明\n\n- **核心原因**：蔚来汽车在美国纽交所（NIO.N）和中国香港联交所（9866.HK）上市，**并非A股公司**。当前授权的研报（`stock.report`）与股票基础信息（`stock.basic_info`）数据源实际仅覆盖 **A股市场**（验证样本均为 `.SZ`/`.SH` 代码）。\n- 本阶段已在唯一可能包含蔚来研报的视图（`stock.report`）中穷尽了合理查询（名称、标题多关键词），得到**确定的零行结果**，符合\"零行按当前查询条件下未匹配记录完成\"的交付规范。\n\n### 建议\n\n如需覆盖蔚来看多理由，需获取**港股/美股研报数据源**（或国际市场研报库）。在当前授权范围内，该数据缺口无法通过放宽名称、代码或日期条件弥补。",
+      "pages": [
+        {
+          "result_name": "r1",
+          "goal": "查询蔚来汽车最近机构研报",
+          "data_type": "table",
+          "schema": {
+            "columns": [
+              {
+                "name": "report_id",
+                "type": "unknown"
+              },
+              {
+                "name": "code",
+                "type": "unknown"
+              },
+              {
+                "name": "name",
+                "type": "unknown"
+              },
+              {
+                "name": "report_date",
+                "type": "unknown"
+              },
+              {
+                "name": "institution",
+                "type": "unknown"
+              },
+              {
+                "name": "rating",
+                "type": "unknown"
+              },
+              {
+                "name": "rating_change",
+                "type": "unknown"
+              },
+              {
+                "name": "investment_highlights",
+                "type": "unknown"
+              },
+              {
+                "name": "risk_warnings",
+                "type": "unknown"
+              }
+            ]
+          },
+          "row_count": 0,
+          "rows_returned": 0,
+          "truncated": false,
+          "rows": []
+        },
+        {
+          "result_name": "r2",
+          "goal": "用多个名称变体在研报数据源中尝试匹配蔚来",
+          "data_type": "table",
+          "schema": {
+            "columns": [
+              {
+                "name": "report_id",
+                "type": "unknown"
+              },
+              {
+                "name": "code",
+                "type": "unknown"
+              },
+              {
+                "name": "name",
+                "type": "unknown"
+              },
+              {
+                "name": "market",
+                "type": "unknown"
+              },
+              {
+                "name": "title",
+                "type": "unknown"
+              },
+              {
+                "name": "report_date",
+                "type": "unknown"
+              },
+              {
+                "name": "institution",
+                "type": "unknown"
+              },
+              {
+                "name": "rating",
+                "type": "unknown"
+              }
+            ]
+          },
+          "row_count": 0,
+          "rows_returned": 0,
+          "truncated": false,
+          "rows": []
+        },
+        {
+          "result_name": "r3",
+          "goal": "确认研报数据源的市场覆盖范围，验证是否仅A股",
+          "data_type": "table",
+          "schema": {
+            "columns": [
+              {
+                "name": "code",
+                "type": "string"
+              },
+              {
+                "name": "name",
+                "type": "string"
+              },
+              {
+                "name": "market",
+                "type": "unknown"
+              },
+              {
+                "name": "report_date",
+                "type": "string"
+              },
+              {
+                "name": "institution",
+                "type": "string"
+              },
+              {
+                "name": "rating",
+                "type": "string"
+              }
+            ]
+          },
+          "row_count": 5,
+          "rows_returned": 2,
+          "truncated": true,
+          "rows": [
+            {
+              "code": "002594.SZ",
+              "name": "比亚迪",
+              "market": null,
+              "report_date": "2026-09-03T16:00:00",
+              "institution": "太平洋证券",
+              "rating": "买入"
+            },
+            {
+              "code": "002594.SZ",
+              "name": "比亚迪",
+              "market": null,
+              "report_date": "2026-09-01T16:00:00",
+              "institution": "东吴证券",
+              "rating": "买入"
+            }
+          ]
+        }
+      ],
+      "steps": [
+        {
+          "kind": "llm",
+          "request_index": 1,
+          "turn": 1,
+          "step": 1,
+          "duration_ms": 2771,
+          "timing_basis": "step/start to assistant/message (includes request preparation and model response)",
+          "usage": {
+            "turn": 1,
+            "step": 1,
+            "input_tokens": 1082,
+            "cache_read_tokens": 2048,
+            "context_tokens": 3130,
+            "output_tokens": 114,
+            "reasoning_tokens": 0,
+            "non_reasoning_output_tokens": 114,
+            "total_tokens": 3244
+          }
+        },
+        {
+          "kind": "tool",
+          "tool": "read_finance_skill",
+          "turn": 1,
+          "step": 1,
+          "call_id": "call_3b461d73bed84658aa2e2a1f",
+          "duration_ms": 14,
+          "timing_basis": "tool/call to tool/result",
+          "arguments": {
+            "skill_id": "equity-report-analysis"
+          },
+          "is_error": false
+        },
+        {
+          "kind": "tool",
+          "tool": "read_finance_catalog",
+          "turn": 1,
+          "step": 1,
+          "call_id": "call_d35a4c8e416e4ccf9b7544bb",
+          "duration_ms": 17,
+          "timing_basis": "tool/call to tool/result",
+          "arguments": {
+            "subject": "stock",
+            "dataview": "report"
+          },
+          "is_error": false
+        },
+        {
+          "kind": "llm",
+          "request_index": 2,
+          "turn": 1,
+          "step": 2,
+          "duration_ms": 1450,
+          "timing_basis": "step/start to assistant/message (includes request preparation and model response)",
+          "usage": {
+            "turn": 1,
+            "step": 2,
+            "input_tokens": 5234,
+            "cache_read_tokens": 2048,
+            "context_tokens": 7282,
+            "output_tokens": 61,
+            "reasoning_tokens": 0,
+            "non_reasoning_output_tokens": 61,
+            "total_tokens": 7343
+          }
+        },
+        {
+          "kind": "tool",
+          "tool": "resolve_security",
+          "turn": 1,
+          "step": 2,
+          "call_id": "call_19bc201d5fa5467ba871acee",
+          "duration_ms": 29,
+          "timing_basis": "tool/call to tool/result",
+          "arguments": {
+            "identifiers": [
+              "蔚来"
+            ]
+          },
+          "is_error": false
+        },
+        {
+          "kind": "llm",
+          "request_index": 3,
+          "turn": 1,
+          "step": 3,
+          "duration_ms": 2359,
+          "timing_basis": "step/start to assistant/message (includes request preparation and model response)",
+          "usage": {
+            "turn": 1,
+            "step": 3,
+            "input_tokens": 4358,
+            "cache_read_tokens": 3072,
+            "context_tokens": 7430,
+            "output_tokens": 148,
+            "reasoning_tokens": 72,
+            "non_reasoning_output_tokens": 76,
+            "total_tokens": 7578
+          }
+        },
+        {
+          "kind": "tool",
+          "tool": "resolve_security",
+          "turn": 1,
+          "step": 3,
+          "call_id": "call_ba6d6119def843b5a171ab3a",
+          "duration_ms": 37,
+          "timing_basis": "tool/call to tool/result",
+          "arguments": {
+            "identifiers": [
+              "9866.HK",
+              "NIO",
+              "09866"
+            ]
+          },
+          "is_error": false
+        },
+        {
+          "kind": "llm",
+          "request_index": 4,
+          "turn": 1,
+          "step": 4,
+          "duration_ms": 4092,
+          "timing_basis": "step/start to assistant/message (includes request preparation and model response)",
+          "usage": {
+            "turn": 1,
+            "step": 4,
+            "input_tokens": 567,
+            "cache_read_tokens": 7168,
+            "context_tokens": 7735,
+            "output_tokens": 291,
+            "reasoning_tokens": 134,
+            "non_reasoning_output_tokens": 157,
+            "total_tokens": 8026
+          }
+        },
+        {
+          "kind": "tool",
+          "tool": "finance_query",
+          "turn": 1,
+          "step": 4,
+          "call_id": "call_291ad379f38a49648a4a372e",
+          "duration_ms": 103,
+          "timing_basis": "tool/call to tool/result",
+          "arguments": {
+            "data_request_complete": false,
+            "steps": [
+              {
+                "goal": "查询蔚来汽车最近机构研报",
+                "request": "r1 = stock.report.query(filter=\"name.contains('蔚来')\", order=\"report_date desc\", limit=20) -> report_id, code, name, report_date, institution, rating, rating_change, investment_highlights, risk_warnings"
+              }
+            ]
+          },
+          "is_error": false
+        },
+        {
+          "kind": "llm",
+          "request_index": 5,
+          "turn": 1,
+          "step": 5,
+          "duration_ms": 2885,
+          "timing_basis": "step/start to assistant/message (includes request preparation and model response)",
+          "usage": {
+            "turn": 1,
+            "step": 5,
+            "input_tokens": 1115,
+            "cache_read_tokens": 7168,
+            "context_tokens": 8283,
+            "output_tokens": 230,
+            "reasoning_tokens": 0,
+            "non_reasoning_output_tokens": 230,
+            "total_tokens": 8513
+          }
+        },
+        {
+          "kind": "tool",
+          "tool": "finance_query",
+          "turn": 1,
+          "step": 5,
+          "call_id": "call_f318a62675ee4568ab83588d",
+          "duration_ms": 1,
+          "timing_basis": "tool/call to tool/result",
+          "arguments": {
+            "data_request_complete": true,
+            "steps": [
+              {
+                "goal": "查询蔚来汽车相关机构研报，尝试多个名称变体",
+                "request": "r1 = stock.report.query(filter=\"(name.contains('蔚来')) or (name.contains('NIO'))\", order=\"report_date desc\", limit=20) -> report_id, code, name, report_date, institution, rating, rating_change, investment_highlights"
+              },
+              {
+                "goal": "查询蔚来汽车基本面信息兜底",
+                "request": "r2 = stock.basic_info.query(filter=\"(name.contains('蔚来')) or (code.contains('9866'))\", limit=20) -> code, name, market"
+              }
+            ]
+          },
+          "is_error": true
+        },
+        {
+          "kind": "llm",
+          "request_index": 6,
+          "turn": 1,
+          "step": 6,
+          "duration_ms": 2287,
+          "timing_basis": "step/start to assistant/message (includes request preparation and model response)",
+          "usage": {
+            "turn": 1,
+            "step": 6,
+            "input_tokens": 1694,
+            "cache_read_tokens": 7168,
+            "context_tokens": 8862,
+            "output_tokens": 149,
+            "reasoning_tokens": 61,
+            "non_reasoning_output_tokens": 88,
+            "total_tokens": 9011
+          }
+        },
+        {
+          "kind": "tool",
+          "tool": "read_finance_catalog",
+          "turn": 1,
+          "step": 6,
+          "call_id": "call_e238d40d1e0f40ba97e389d5",
+          "duration_ms": 20,
+          "timing_basis": "tool/call to tool/result",
+          "arguments": {
+            "subject": "stock",
+            "dataview": "basic_info",
+            "operation": "query"
+          },
+          "is_error": false
+        },
+        {
+          "kind": "llm",
+          "request_index": 7,
+          "turn": 1,
+          "step": 7,
+          "duration_ms": 6073,
+          "timing_basis": "step/start to assistant/message (includes request preparation and model response)",
+          "usage": {
+            "turn": 1,
+            "step": 7,
+            "input_tokens": 1017,
+            "cache_read_tokens": 8192,
+            "context_tokens": 9209,
+            "output_tokens": 414,
+            "reasoning_tokens": 0,
+            "non_reasoning_output_tokens": 414,
+            "total_tokens": 9623
+          }
+        },
+        {
+          "kind": "llm",
+          "request_index": 8,
+          "turn": 1,
+          "step": 8,
+          "duration_ms": 3123,
+          "timing_basis": "step/start to assistant/message (includes request preparation and model response)",
+          "usage": {
+            "turn": 1,
+            "step": 8,
+            "input_tokens": 1471,
+            "cache_read_tokens": 8192,
+            "context_tokens": 9663,
+            "output_tokens": 200,
+            "reasoning_tokens": 0,
+            "non_reasoning_output_tokens": 200,
+            "total_tokens": 9863
+          }
+        },
+        {
+          "kind": "tool",
+          "tool": "resolve_security",
+          "turn": 1,
+          "step": 8,
+          "call_id": "call_26fea2de60a74c358b1dc782",
+          "duration_ms": 37,
+          "timing_basis": "tool/call to tool/result",
+          "arguments": {
+            "identifiers": [
+              "蔚来汽车",
+              "NIO Inc.",
+              "蔚来"
+            ]
+          },
+          "is_error": false
+        },
+        {
+          "kind": "tool",
+          "tool": "read_finance_catalog",
+          "turn": 1,
+          "step": 8,
+          "call_id": "call_2ccb110dbd6c4561b147c011",
+          "duration_ms": 15,
+          "timing_basis": "tool/call to tool/result",
+          "arguments": {
+            "subject": "stock",
+            "dataview": "report",
+            "operation": "query"
+          },
+          "is_error": false
+        },
+        {
+          "kind": "llm",
+          "request_index": 9,
+          "turn": 1,
+          "step": 9,
+          "duration_ms": 4865,
+          "timing_basis": "step/start to assistant/message (includes request preparation and model response)",
+          "usage": {
+            "turn": 1,
+            "step": 9,
+            "input_tokens": 1845,
+            "cache_read_tokens": 9216,
+            "context_tokens": 11061,
+            "output_tokens": 334,
+            "reasoning_tokens": 0,
+            "non_reasoning_output_tokens": 334,
+            "total_tokens": 11395
+          }
+        },
+        {
+          "kind": "tool",
+          "tool": "finance_query",
+          "turn": 1,
+          "step": 9,
+          "call_id": "call_87133e9daa274120aa5d4c2b",
+          "duration_ms": 108,
+          "timing_basis": "tool/call to tool/result",
+          "arguments": {
+            "data_request_complete": false,
+            "steps": [
+              {
+                "goal": "用多个名称变体在研报数据源中尝试匹配蔚来",
+                "request": "r1 = stock.report.query(filter=\"(title.contains('蔚来')) or (title.contains('NIO')) or (title.contains('锂想'))\", order=\"report_date desc\", limit=20) -> report_id, code, name, market, title, report_date, institution, rating"
+              }
+            ]
+          },
+          "is_error": false
+        },
+        {
+          "kind": "llm",
+          "request_index": 10,
+          "turn": 1,
+          "step": 10,
+          "duration_ms": 6321,
+          "timing_basis": "step/start to assistant/message (includes request preparation and model response)",
+          "usage": {
+            "turn": 1,
+            "step": 10,
+            "input_tokens": 1624,
+            "cache_read_tokens": 10240,
+            "context_tokens": 11864,
+            "output_tokens": 465,
+            "reasoning_tokens": 0,
+            "non_reasoning_output_tokens": 465,
+            "total_tokens": 12329
+          }
+        },
+        {
+          "kind": "tool",
+          "tool": "finance_query",
+          "turn": 1,
+          "step": 10,
+          "call_id": "call_1cec6e9b273e4256b85a020c",
+          "duration_ms": 126,
+          "timing_basis": "tool/call to tool/result",
+          "arguments": {
+            "data_request_complete": true,
+            "steps": [
+              {
+                "goal": "确认研报数据源的市场覆盖范围，验证是否仅A股",
+                "request": "r1 = stock.report.query(filter=\"(name.contains('宁德时代')) or (name.contains('比亚迪'))\", limit=5) -> code, name, market, report_date, institution, rating"
+              }
+            ]
+          },
+          "is_error": false
+        },
+        {
+          "kind": "llm",
+          "request_index": 11,
+          "turn": 1,
+          "step": 11,
+          "duration_ms": 6303,
+          "timing_basis": "step/start to assistant/message (includes request preparation and model response)",
+          "usage": {
+            "turn": 1,
+            "step": 11,
+            "input_tokens": 5044,
+            "cache_read_tokens": 8192,
+            "context_tokens": 13236,
+            "output_tokens": 484,
+            "reasoning_tokens": 0,
+            "non_reasoning_output_tokens": 484,
+            "total_tokens": 13720
+          }
+        }
+      ],
+      "queries": [
+        {
+          "tool": "finance_query",
+          "flow_step": 1,
+          "flow_size": 1,
+          "goal": "查询蔚来汽车最近机构研报",
+          "submitted_request": "r1 = stock.report.query(filter=\"name.contains('蔚来')\", order=\"report_date desc\", limit=20) -> report_id, code, name, report_date, institution, rating, rating_change, investment_highlights, risk_warnings",
+          "request": "r1 = stock.report.query(filter=\"name.contains('蔚来')\", order=\"report_date desc\", limit=20) -> report_id, code, name, report_date, institution, rating, rating_change, investment_highlights, risk_warnings",
+          "attempts": [
+            {
+              "attempt": 1,
+              "static_validation_ms": 8.081,
+              "api_execution_ms": 72.616,
+              "duration_ms": 83.071
+            }
+          ],
+          "static_validation_ms": 8.081,
+          "api_execution_ms": 72.616,
+          "row_count": 0
+        },
+        {
+          "tool": "finance_query",
+          "flow_step": 1,
+          "flow_size": 1,
+          "goal": "用多个名称变体在研报数据源中尝试匹配蔚来",
+          "submitted_request": "r1 = stock.report.query(filter=\"(title.contains('蔚来')) or (title.contains('NIO')) or (title.contains('锂想'))\", order=\"report_date desc\", limit=20) -> report_id, code, name, market, title, report_date, institution, rating",
+          "request": "r2 = stock.report.query(filter=\"(title.contains('蔚来')) or (title.contains('NIO')) or (title.contains('锂想'))\", order=\"report_date desc\", limit=20) -> report_id, code, name, market, title, report_date, institution, rating",
+          "attempts": [
+            {
+              "attempt": 1,
+              "static_validation_ms": 9.2,
+              "api_execution_ms": 76.732,
+              "duration_ms": 88.448
+            }
+          ],
+          "static_validation_ms": 9.2,
+          "api_execution_ms": 76.732,
+          "row_count": 0
+        },
+        {
+          "tool": "finance_query",
+          "flow_step": 1,
+          "flow_size": 1,
+          "goal": "确认研报数据源的市场覆盖范围，验证是否仅A股",
+          "submitted_request": "r1 = stock.report.query(filter=\"(name.contains('宁德时代')) or (name.contains('比亚迪'))\", limit=5) -> code, name, market, report_date, institution, rating",
+          "request": "r3 = stock.report.query(filter=\"(name.contains('宁德时代')) or (name.contains('比亚迪'))\", limit=5) -> code, name, market, report_date, institution, rating",
+          "attempts": [
+            {
+              "attempt": 1,
+              "static_validation_ms": 4.798,
+              "api_execution_ms": 22.593,
+              "duration_ms": 28.836
+            }
+          ],
+          "static_validation_ms": 4.798,
+          "api_execution_ms": 22.593,
+          "row_count": 5
+        }
+      ],
+      "judgment": {
+        "recommended": "stock.report.query 投资要点与机构",
+        "coverage_text": "研报入口正确；蔚来相关记录0条，5条为其他公司的探测样本",
+        "short": "相关数据0条可接受；11轮扩搜过多，5条诊断样本不是蔚来成果，summary断言过满。",
+        "detail": "初次查询合并了尚未读取执行包的basic_info，框架在数据执行前拦住；后续研报和身份检索均无蔚来匹配。随后查比亚迪／宁德时代返回5条用于诊断覆盖，未当作蔚来的机构理由，但最终称证据完整、仅覆盖A股、穷尽合理查询，不能由几个样本和零行推导。标题扩搜还含无关词“锂想”。本轮保持0相关条的结论，不为此题追加关键词或拒绝规则。"
+      }
+    },
+    {
+      "id": "RTE020",
+      "question": "阳光电源在光伏行业的竞争格局中处于什么位置？",
+      "revision": "1dfb8ae",
+      "http_status": 200,
+      "ok": true,
+      "problems": [],
+      "skills": [
+        "sector-theme-analysis"
+      ],
+      "apis": [
+        "stock.basic_info.query",
+        "stock.business_segment.query",
+        "stock.report.query"
+      ],
+      "rows": 39,
+      "turns": 5,
+      "tokens": 36088,
+      "seconds": 29.748749,
+      "model_seconds": 29.209,
+      "api_seconds": 0.089285,
+      "guard_or_tool_errors": 1,
+      "summary": "## 阳光电源在光伏行业的竞争格局位置\n\n**结论：阳光电源是光伏逆变器全球第一梯队的龙头厂商，与华为、Tesla 同处全球电力电子与储能第一梯队，在光伏逆变器环节保持全球头部地位，并凭借全球化布局维持较高盈利质量。**\n\n**关键证据（来源：公司2026年半年报分部数据、机构研报）：**\n\n**1. 业务结构中光伏仍为核心支柱**\n2026年上半年（2026-06-30 分部数据），光伏行业收入124.2亿元，占公司总营收约40.2%；储能行业收入154.6亿元，占约50%（储能已超光伏成为第一大业务）。光伏绝对规模超过120亿元，在行业内体量领先。\n\n**2. 光伏逆变器环节的龙头地位**\n- 2026H1 逆变器收入123.9亿元，同比-19.2%（主要受国内光伏装机下滑影响）；**发货66GW**，毛利率42.7%、同比+7.0pct，靠海外高毛利业务占比提升对冲量价压力。\n- 机构观点（东吴证券）确认公司\"**深耕电力电子二十余年，稳坐光储龙头**\"，逆变器是其起家核心，具备全球化营销网络（海外20+分支、520+服务网点，销往100多个国家和地区）。\n\n**3. 光伏与储能合并形成的综合竞争力**\n- 东吴证券指出：公司在全球储能系统集成商中\"2023年起市场份额位列全球第二，2025年北美稳居第二、欧洲第一\"，并与特斯拉、华为同处**构网型储能第一梯队**。\n- 2025年公司营收891.8亿元(+14.6%)、归母净利134.6亿元(+22.0%)，再创历史新高，行业地位与盈利能力领先。\n\n**结论性判断：** 就光伏领域而言，阳光电源在**逆变器**环节处于全球第一梯队龙头位置；其更大价值来自\"光伏逆变器+储能系统\"的电力电子平台整合能力，后者是其在行业竞争加剧背景下维持高毛利和全球化优势的关键。需要说明的是，以上市场份额表述主要来源于机构研报观点，具体市占率数据建议以第三方咨询机构口径为基准。\n\n**风险提示（研报披露）：** 光伏国内装机需求下滑、行业竞争加剧、海外贸易政策与汇率波动、AIDC新业务不及预期。",
+      "pages": [
+        {
+          "result_name": "r1",
+          "goal": "获取阳光电源基础身份与行业归属",
+          "data_type": "table",
+          "schema": {
+            "columns": [
+              {
+                "name": "code",
+                "type": "string"
+              },
+              {
+                "name": "name",
+                "type": "string"
+              },
+              {
+                "name": "industry",
+                "type": "string"
+              },
+              {
+                "name": "listed_date",
+                "type": "string"
+              }
+            ]
+          },
+          "row_count": 1,
+          "rows_returned": 1,
+          "truncated": false,
+          "rows": [
+            {
+              "code": "300274.SZ",
+              "name": "阳光电源",
+              "industry": "逆变器",
+              "listed_date": "2011-11-02"
+            }
+          ]
+        },
+        {
+          "result_name": "r2",
+          "goal": "查询阳光电源主营业务分部收入数据，了解光伏相关业务占比",
+          "data_type": "table",
+          "schema": {
+            "columns": [
+              {
+                "name": "code",
+                "type": "string"
+              },
+              {
+                "name": "name",
+                "type": "string"
+              },
+              {
+                "name": "report_period",
+                "type": "string"
+              },
+              {
+                "name": "segment_type",
+                "type": "integer"
+              },
+              {
+                "name": "project_name",
+                "type": "string"
+              },
+              {
+                "name": "segment_sales",
+                "type": "number"
+              },
+              {
+                "name": "segment_profit",
+                "type": "number"
+              },
+              {
+                "name": "gross_profit_margin",
+                "type": "number"
+              },
+              {
+                "name": "pct_segment_sales",
+                "type": "number"
+              },
+              {
+                "name": "inc_segment_sales",
+                "type": "unknown"
+              }
+            ]
+          },
+          "row_count": 30,
+          "rows_returned": 2,
+          "truncated": true,
+          "rows": [
+            {
+              "code": "300274.SZ",
+              "name": "阳光电源",
+              "report_period": "2026-06-30",
+              "segment_type": 1,
+              "project_name": "储能行业",
+              "segment_sales": 15455765101.22,
+              "segment_profit": 5012403338.41,
+              "gross_profit_margin": 32.4306,
+              "pct_segment_sales": 49.9988,
+              "inc_segment_sales": null
+            },
+            {
+              "code": "300274.SZ",
+              "name": "阳光电源",
+              "report_period": "2026-06-30",
+              "segment_type": 1,
+              "project_name": "光伏行业",
+              "segment_sales": 12418666204.49,
+              "segment_profit": null,
+              "gross_profit_margin": null,
+              "pct_segment_sales": 40.1739,
+              "inc_segment_sales": null
+            }
+          ]
+        },
+        {
+          "result_name": "r3",
+          "goal": "查询阳光电源近期机构研报观点，重点看竞争格局与市场份额描述",
+          "data_type": "table",
+          "schema": {
+            "columns": [
+              {
+                "name": "code",
+                "type": "string"
+              },
+              {
+                "name": "name",
+                "type": "string"
+              },
+              {
+                "name": "report_date",
+                "type": "string"
+              },
+              {
+                "name": "institution",
+                "type": "string"
+              },
+              {
+                "name": "rating",
+                "type": "string"
+              },
+              {
+                "name": "investment_highlights",
+                "type": "string"
+              },
+              {
+                "name": "risk_warnings",
+                "type": "string"
+              }
+            ]
+          },
+          "row_count": 8,
+          "rows_returned": 2,
+          "truncated": true,
+          "rows": [
+            {
+              "code": "300274.SZ",
+              "name": "阳光电源",
+              "report_date": "2026-09-04T16:00:00",
+              "institution": "中邮证券",
+              "rating": "买入",
+              "investment_highlights": "事件：2026年8月28日，公司发布2026年半年度报告。2026年上半年公司实现营收309.1亿元，同比-29.0%；归母净利润52.6亿元，同比-32.0%；扣非归母净利润42.8亿元，同比-43.0%；毛利率35.9%，同比+1.6pcts，主要系产品结构优化；归母净利率17.0%，同比-0.8pcts。2026年二季度，公司实现营收153.5亿元，同比-37.3%，环比-1.3%；归母净利润29.7亿元，同比-24.1%，环比+29.5%；扣非归母净利润22.4亿元，同比-41.3%，环比+10.4%；毛利率38.6%，同比+4.9pcts，环比+5.4pcts；归母净利率19.3%，同比+3.4pcts，环比+4.6pcts。\n\n逆变器出货受国内装机影响下滑，海外业务占比提升带动毛利率改善。2026年上半年，公司1）逆变器业务收入123.9亿元，同比-19.2%；发货66GW，同比减少10GW，主要系国内光伏装机下降影响；毛利率42.7%，同比+7.0pcts，主要因海外高毛利业务占比上升。2)新能源投资开发收入12.6亿元，同比-85.0%，上半年净亏损3.8亿元。\n\n储能发货稳步增长，积极拓展户用、工商业渠道。2026年上半年，公司储能业务收入154.6亿元，同比-13.2%，主要是电力储能收入下降，中东同比减少52亿元（去年同期沙特大项目高基数）；发货25GWh，同比增长28%；毛利率32.4%，同比-7.5pcts，主要系原材料价格波动等影响。26H1公司新获阿联酋7.5GWh大单，并且公司新设面向户用和工商业渠道的独立业务单元，目标快速补齐产品型谱，持续稳固提升欧澳日韩等高价值市场地位，积极拓展亚非拉等市场。\n\nAIDC 业务逐步落地，有望成为公司新的增长曲线。1）AIDC 电源方面，公司已推出 EnerNeo 系列 SST 并面向市场供货，除 13.8kV 和 10kV 的 SST 外，公司预计明年上半年完成 35kV SST 研发。公司已向客户交付的 SST 预计在 26Q4 可以投运，有望率先实现 SST 800V 直流供电方案在真实算力场景中的带载运行；上半年公司也与东阳光、中联数据签署战略合作暨框架采购协议。上半年，公司 800V HVDC 相关产品已完成国内市场小批量交付。2）AIDC 配储方面，公司目前在手订单约 2GWh。\n\n汇兑损失同比扩大，备货导致存货增加。2026年上半年公司销售/管理/研发/财务费用率分别为 6.9% / 2.4% / 6.8% / 1.2% ，分别同比 +1.6 / +0.5 / +2.1 / +1.8 pcts；26H1汇兑损失同比增加9.1亿元。至26年中，公司存货期末净值321.5亿元，较年初增加49.0亿元，主要是26Q2增加43.9亿元，其中光储业务基于在手订单及交付计划备货，储能电芯及海外销售库存增加超30亿元，新能源电站项目开发投入增加超10亿元。",
+              "risk_warnings": "需求不及预期的风险；海外政策及汇率波动风险；新业务拓展不及预期风险；行业竞争加剧风险"
+            },
+            {
+              "code": "300274.SZ",
+              "name": "阳光电源",
+              "report_date": "2026-08-31T16:00:00",
+              "institution": "开源证券",
+              "rating": "买入",
+              "investment_highlights": "公司发布2026年半年报，H1实现营业收入309.12亿元，同比下降28.99%；归母净利润52.59亿元，同比下降32.01%；扣非归母净利润42.75亿元，同比下降42.96%。其中，Q2实现营业收入153.52亿元，同比下降37.33%、环比下降1.34% 归母净利润29.67亿元，同比下降24.08%、环比增长29.50%。Q2综合毛利率为38.62%，环比提升5.36pct，盈利能力有所改善；扣非归母净利润22.43亿元，环比增长10.37%。考虑行业竞争加剧，我们下调公司2026-2028年盈利预测，预计2026-2028年归母净利润分别为129.52/161.99/187.01亿元（原2026-2028年154.73/193.47/230.84亿元），EPS分别为6.25/7.81/9.02元，当前股价对应PE为14.6/11.7/10.1。考虑到公司在手订单饱满，维持“买入”评级。\n\n2026H1，公司光伏逆变器等电力电子转换设备实现营业收入 123.88 亿元，同比下降 19.17%，毛利率 42.72%，同比提升 6.98pct。上半年逆变器发货 66GW，2025 年同期为 76GW，发货下降主要来自国内市场。储能系统实现营业收入 154.56 亿元，同比下降 13.18%，毛利率 32.43%，同比下降 7.49pct；储能发货 25GWh，同比增长 28%，收入下降主要受到电力储能业务影响，其中中东地区储能收入同比减少约 52 亿元。此外，新能源投资开发业务收入 12.58 亿元，同比下降 85.02%，对公司整体营收形成较大拖累。新业务方面，公司推进 AIDC 供电产品布局，已推出 Ener Neo 系列固态变压器并面向市场供货，800V 高压直流相关产品完成国内小批量交付。\n\n2026H1，公司经营活动产生的现金流量净额为37.35亿元，同比增长8.75%，在收入下降的情况下仍保持增长。公司财务费用为3.68亿元，2025年同期为-2.63亿元，同比增加6.31亿元，主要系欧元及美元贬值导致汇兑损失增加，对当期利润形成压力。H1研发投入20.95亿元，同比增长2.85%。",
+              "risk_warnings": "海外贸易政策变化；行业竞争加剧；AIDC业务进展不及预期。"
+            }
+          ]
+        }
+      ],
+      "steps": [
+        {
+          "kind": "llm",
+          "request_index": 1,
+          "turn": 1,
+          "step": 1,
+          "duration_ms": 4639,
+          "timing_basis": "step/start to assistant/message (includes request preparation and model response)",
+          "usage": {
+            "turn": 1,
+            "step": 1,
+            "input_tokens": 1084,
+            "cache_read_tokens": 2048,
+            "context_tokens": 3132,
+            "output_tokens": 260,
+            "reasoning_tokens": 119,
+            "non_reasoning_output_tokens": 141,
+            "total_tokens": 3392
+          }
+        },
+        {
+          "kind": "tool",
+          "tool": "read_finance_catalog",
+          "turn": 1,
+          "step": 1,
+          "call_id": "call_0ab9b1fb93f74653b1331094",
+          "duration_ms": 14,
+          "timing_basis": "tool/call to tool/result",
+          "arguments": {
+            "subject": "stock",
+            "dataview": "basic_info",
+            "operation": "query"
+          },
+          "is_error": false
+        },
+        {
+          "kind": "tool",
+          "tool": "read_finance_catalog",
+          "turn": 1,
+          "step": 1,
+          "call_id": "call_aefe6fdb464944989db52bd8",
+          "duration_ms": 6,
+          "timing_basis": "tool/call to tool/result",
+          "arguments": {
+            "subject": "stock",
+            "operation": ""
+          },
+          "is_error": true
+        },
+        {
+          "kind": "llm",
+          "request_index": 2,
+          "turn": 1,
+          "step": 2,
+          "duration_ms": 3191,
+          "timing_basis": "step/start to assistant/message (includes request preparation and model response)",
+          "usage": {
+            "turn": 1,
+            "step": 2,
+            "input_tokens": 2806,
+            "cache_read_tokens": 2048,
+            "context_tokens": 4854,
+            "output_tokens": 259,
+            "reasoning_tokens": 100,
+            "non_reasoning_output_tokens": 159,
+            "total_tokens": 5113
+          }
+        },
+        {
+          "kind": "tool",
+          "tool": "resolve_security",
+          "turn": 1,
+          "step": 2,
+          "call_id": "call_9812c2c71aa24f62b1d046d1",
+          "duration_ms": 26,
+          "timing_basis": "tool/call to tool/result",
+          "arguments": {
+            "identifiers": [
+              "阳光电源"
+            ]
+          },
+          "is_error": false
+        },
+        {
+          "kind": "tool",
+          "tool": "finance_query",
+          "turn": 1,
+          "step": 2,
+          "call_id": "call_42e6fea65164497daf98d1e1",
+          "duration_ms": 44,
+          "timing_basis": "tool/call to tool/result",
+          "arguments": {
+            "data_request_complete": true,
+            "steps": [
+              {
+                "goal": "获取阳光电源基础身份与行业归属",
+                "request": "r1 = stock.basic_info.query(filter = \"name == '阳光电源'\", limit = 1) -> code, name, industry, listed_date"
+              }
+            ]
+          },
+          "is_error": false
+        },
+        {
+          "kind": "llm",
+          "request_index": 3,
+          "turn": 1,
+          "step": 3,
+          "duration_ms": 4647,
+          "timing_basis": "step/start to assistant/message (includes request preparation and model response)",
+          "usage": {
+            "turn": 1,
+            "step": 3,
+            "input_tokens": 1491,
+            "cache_read_tokens": 4096,
+            "context_tokens": 5587,
+            "output_tokens": 342,
+            "reasoning_tokens": 180,
+            "non_reasoning_output_tokens": 162,
+            "total_tokens": 5929
+          }
+        },
+        {
+          "kind": "tool",
+          "tool": "read_finance_catalog",
+          "turn": 1,
+          "step": 3,
+          "call_id": "call_fe03d34afb334c61a97aaad4",
+          "duration_ms": 15,
+          "timing_basis": "tool/call to tool/result",
+          "arguments": {
+            "subject": "stock",
+            "dataview": "business_segment",
+            "operation": "query"
+          },
+          "is_error": false
+        },
+        {
+          "kind": "tool",
+          "tool": "read_finance_catalog",
+          "turn": 1,
+          "step": 3,
+          "call_id": "call_5746ea781f5e4b3ea50cc429",
+          "duration_ms": 17,
+          "timing_basis": "tool/call to tool/result",
+          "arguments": {
+            "subject": "stock",
+            "dataview": "report",
+            "operation": "query"
+          },
+          "is_error": false
+        },
+        {
+          "kind": "llm",
+          "request_index": 4,
+          "turn": 1,
+          "step": 4,
+          "duration_ms": 4038,
+          "timing_basis": "step/start to assistant/message (includes request preparation and model response)",
+          "usage": {
+            "turn": 1,
+            "step": 4,
+            "input_tokens": 4486,
+            "cache_read_tokens": 3072,
+            "context_tokens": 7558,
+            "output_tokens": 345,
+            "reasoning_tokens": 0,
+            "non_reasoning_output_tokens": 345,
+            "total_tokens": 7903
+          }
+        },
+        {
+          "kind": "tool",
+          "tool": "read_finance_skill",
+          "turn": 1,
+          "step": 4,
+          "call_id": "call_23b19f0a4b9e4284a1bd24ac",
+          "duration_ms": 8,
+          "timing_basis": "tool/call to tool/result",
+          "arguments": {
+            "skill_ids": [
+              "sector-theme-analysis"
+            ]
+          },
+          "is_error": false
+        },
+        {
+          "kind": "tool",
+          "tool": "finance_query",
+          "turn": 1,
+          "step": 4,
+          "call_id": "call_a011abc4a36b40cb98b6f78a",
+          "duration_ms": 196,
+          "timing_basis": "tool/call to tool/result",
+          "arguments": {
+            "data_request_complete": true,
+            "steps": [
+              {
+                "goal": "查询阳光电源主营业务分部收入数据，了解光伏相关业务占比",
+                "request": "r1 = stock.business_segment.query(filter = \"(code == '300274.SZ') and (source == 'salessegment')\", order = \"report_period desc, segment_sales desc\", limit = 30) -> code, name, report_period, segment_type, project_name, segment_sales, segment_profit, gross_profit_margin, pct_segment_sales, inc_segment_sales"
+              },
+              {
+                "goal": "查询阳光电源近期机构研报观点，重点看竞争格局与市场份额描述",
+                "request": "r2 = stock.report.query(filter = \"(code == '300274.SZ') and (report_date >= '2025-06-01')\", order = \"report_date desc\", limit = 8) -> code, name, report_date, institution, rating, investment_highlights, risk_warnings"
+              }
+            ]
+          },
+          "is_error": false
+        },
+        {
+          "kind": "llm",
+          "request_index": 5,
+          "turn": 1,
+          "step": 5,
+          "duration_ms": 12694,
+          "timing_basis": "step/start to assistant/message (includes request preparation and model response)",
+          "usage": {
+            "turn": 1,
+            "step": 5,
+            "input_tokens": 7682,
+            "cache_read_tokens": 5120,
+            "context_tokens": 12802,
+            "output_tokens": 949,
+            "reasoning_tokens": 438,
+            "non_reasoning_output_tokens": 511,
+            "total_tokens": 13751
+          }
+        }
+      ],
+      "queries": [
+        {
+          "tool": "finance_query",
+          "flow_step": 1,
+          "flow_size": 1,
+          "goal": "获取阳光电源基础身份与行业归属",
+          "submitted_request": "r1 = stock.basic_info.query(filter = \"name == '阳光电源'\", limit = 1) -> code, name, industry, listed_date",
+          "request": "r1 = stock.basic_info.query(filter = \"name == '阳光电源'\", limit = 1) -> code, name, industry, listed_date",
+          "attempts": [
+            {
+              "attempt": 1,
+              "static_validation_ms": 4.512,
+              "api_execution_ms": 19.611,
+              "duration_ms": 25.527
+            }
+          ],
+          "static_validation_ms": 4.512,
+          "api_execution_ms": 19.611,
+          "row_count": 1
+        },
+        {
+          "tool": "finance_query",
+          "flow_step": 1,
+          "flow_size": 2,
+          "goal": "查询阳光电源主营业务分部收入数据，了解光伏相关业务占比",
+          "submitted_request": "r1 = stock.business_segment.query(filter = \"(code == '300274.SZ') and (source == 'salessegment')\", order = \"report_period desc, segment_sales desc\", limit = 30) -> code, name, report_period, segment_type, project_name, segment_sales, segment_profit, gross_profit_margin, pct_segment_sales, inc_segment_sales",
+          "request": "r2 = stock.business_segment.query(filter = \"(code == '300274.SZ') and (source == 'salessegment')\", order = \"report_period desc, segment_sales desc\", limit = 30) -> code, name, report_period, segment_type, project_name, segment_sales, segment_profit, gross_profit_margin, pct_segment_sales, inc_segment_sales",
+          "attempts": [
+            {
+              "attempt": 1,
+              "static_validation_ms": 4.399,
+              "api_execution_ms": 24.365,
+              "duration_ms": 30.2
+            }
+          ],
+          "static_validation_ms": 4.399,
+          "api_execution_ms": 24.365,
+          "row_count": 30
+        },
+        {
+          "tool": "finance_query",
+          "flow_step": 2,
+          "flow_size": 2,
+          "goal": "查询阳光电源近期机构研报观点，重点看竞争格局与市场份额描述",
+          "submitted_request": "r2 = stock.report.query(filter = \"(code == '300274.SZ') and (report_date >= '2025-06-01')\", order = \"report_date desc\", limit = 8) -> code, name, report_date, institution, rating, investment_highlights, risk_warnings",
+          "request": "r3 = stock.report.query(filter = \"(code == '300274.SZ') and (report_date >= '2025-06-01')\", order = \"report_date desc\", limit = 8) -> code, name, report_date, institution, rating, investment_highlights, risk_warnings",
+          "attempts": [
+            {
+              "attempt": 1,
+              "static_validation_ms": 5.198,
+              "api_execution_ms": 45.309,
+              "duration_ms": 51.994
+            }
+          ],
+          "static_validation_ms": 5.198,
+          "api_execution_ms": 45.309,
+          "row_count": 8
+        }
+      ],
+      "judgment": {
+        "recommended": "stock.report.query；stock.business_segment.query",
+        "coverage_text": "研报观点与主营分部入口已覆盖",
+        "short": "1条基本信息＋30条分部＋8条研报；核心数字有依据。一次目录空operation错误后恢复。",
+        "detail": "初始调用subject=stock并填operation空字符串，被原生Schema拒绝（operation若提供应为操作类别；省略可浏览）；随后正常读包并取得数据。储能154.56亿元／约50%、光伏124.19亿元／约40.2%与返回分部一致，逆变器66GW等有研报文字依据。公司相对位置的分析可基于机构证据，但全球排名和竞争对手结论未做独立查证，不等于数据层已证明。"
+      }
+    },
+    {
+      "id": "raw_quote_control",
+      "question": "宁德时代最近一个交易日的收盘价和涨跌幅是多少？",
+      "revision": "1dfb8ae",
+      "http_status": 200,
+      "ok": true,
+      "problems": [],
+      "skills": [],
+      "apis": [
+        "stock.quote.query"
+      ],
+      "rows": 1,
+      "turns": 3,
+      "tokens": 19478,
+      "seconds": 6.586009,
+      "model_seconds": 6.382,
+      "api_seconds": 0.017454,
+      "guard_or_tool_errors": 0,
+      "summary": "根据最新交易日行情数据，宁德时代（300750.SZ）最近一个交易日（2026-09-07）：\n\n- **收盘价：348.20元**\n- **涨跌幅：-0.80%**\n\n涨跌额为 -2.80元（348.20元 对比前一交易日收盘价的变动幅度）。数据为 2026-09-07 日收盘实际行情。",
+      "pages": [
+        {
+          "result_name": "r1",
+          "goal": "获取宁德时代最新交易日的收盘价和涨跌幅",
+          "data_type": "table",
+          "schema": {
+            "columns": [
+              {
+                "name": "code",
+                "type": "string"
+              },
+              {
+                "name": "name",
+                "type": "string"
+              },
+              {
+                "name": "tradedate",
+                "type": "string"
+              },
+              {
+                "name": "close",
+                "type": "number"
+              },
+              {
+                "name": "pct",
+                "type": "number"
+              }
+            ]
+          },
+          "row_count": 1,
+          "rows_returned": 1,
+          "truncated": false,
+          "rows": [
+            {
+              "code": "300750.SZ",
+              "name": "宁德时代",
+              "tradedate": "2026-09-07",
+              "close": 348.2,
+              "pct": -0.7977
+            }
+          ]
+        }
+      ],
+      "steps": [
+        {
+          "kind": "llm",
+          "request_index": 1,
+          "turn": 1,
+          "step": 1,
+          "duration_ms": 2063,
+          "timing_basis": "step/start to assistant/message (includes request preparation and model response)",
+          "usage": {
+            "turn": 1,
+            "step": 1,
+            "input_tokens": 1085,
+            "cache_read_tokens": 2048,
+            "context_tokens": 3133,
+            "output_tokens": 129,
+            "reasoning_tokens": 0,
+            "non_reasoning_output_tokens": 129,
+            "total_tokens": 3262
+          }
+        },
+        {
+          "kind": "tool",
+          "tool": "read_finance_catalog",
+          "turn": 1,
+          "step": 1,
+          "call_id": "call_50abae21320a4772b9077faa",
+          "duration_ms": 19,
+          "timing_basis": "tool/call to tool/result",
+          "arguments": {
+            "subject": "stock",
+            "dataview": "quote"
+          },
+          "is_error": false
+        },
+        {
+          "kind": "tool",
+          "tool": "read_finance_catalog",
+          "turn": 1,
+          "step": 1,
+          "call_id": "call_2ba5dc94c75b4f3e997b909a",
+          "duration_ms": 19,
+          "timing_basis": "tool/call to tool/result",
+          "arguments": {
+            "subject": "stock",
+            "dataview": "basic_info"
+          },
+          "is_error": false
+        },
+        {
+          "kind": "llm",
+          "request_index": 2,
+          "turn": 1,
+          "step": 2,
+          "duration_ms": 1689,
+          "timing_basis": "step/start to assistant/message (includes request preparation and model response)",
+          "usage": {
+            "turn": 1,
+            "step": 2,
+            "input_tokens": 5674,
+            "cache_read_tokens": 2048,
+            "context_tokens": 7722,
+            "output_tokens": 135,
+            "reasoning_tokens": 0,
+            "non_reasoning_output_tokens": 135,
+            "total_tokens": 7857
+          }
+        },
+        {
+          "kind": "tool",
+          "tool": "finance_query",
+          "turn": 1,
+          "step": 2,
+          "call_id": "call_0347e70aef42432887354113",
+          "duration_ms": 43,
+          "timing_basis": "tool/call to tool/result",
+          "arguments": {
+            "data_request_complete": true,
+            "steps": [
+              {
+                "goal": "获取宁德时代最新交易日的收盘价和涨跌幅",
+                "request": "r1 = stock.quote.query(codes = ['300750.SZ'], order = \"tradedate desc\", mode = 0, count = 1) -> code, name, tradedate, close, pct"
+              }
+            ]
+          },
+          "is_error": false
+        },
+        {
+          "kind": "llm",
+          "request_index": 3,
+          "turn": 1,
+          "step": 3,
+          "duration_ms": 2630,
+          "timing_basis": "step/start to assistant/message (includes request preparation and model response)",
+          "usage": {
+            "turn": 1,
+            "step": 3,
+            "input_tokens": 5203,
+            "cache_read_tokens": 3072,
+            "context_tokens": 8275,
+            "output_tokens": 84,
+            "reasoning_tokens": 0,
+            "non_reasoning_output_tokens": 84,
+            "total_tokens": 8359
+          }
+        }
+      ],
+      "queries": [
+        {
+          "tool": "finance_query",
+          "flow_step": 1,
+          "flow_size": 1,
+          "goal": "获取宁德时代最新交易日的收盘价和涨跌幅",
+          "submitted_request": "r1 = stock.quote.query(codes = ['300750.SZ'], order = \"tradedate desc\", mode = 0, count = 1) -> code, name, tradedate, close, pct",
+          "request": "r1 = stock.quote.query(codes = ['300750.SZ'], order = \"tradedate desc\", mode = 0, count = 1) -> code, name, tradedate, close, pct",
+          "attempts": [
+            {
+              "attempt": 1,
+              "static_validation_ms": 7.1,
+              "api_execution_ms": 17.454,
+              "duration_ms": 26.265
+            }
+          ],
+          "static_validation_ms": 7.1,
+          "api_execution_ms": 17.454,
+          "row_count": 1
+        }
+      ],
+      "judgment": {
+        "recommended": "stock.quote.query 最新可用日K；同时标明实际日期",
+        "coverage_text": "行情入口已覆盖；日K返回的最新日期为09-07",
+        "short": "不选Skill，3轮取得1条；348.20与-0.7977%对应09-07，需区分最新可用数据和最新交易日。",
+        "detail": "mode=0、count=1、日期倒序符合最新日K取数，未发生窗口包错读或执行重试。summary如实给出09-07，但本轮测试已在09-08晚间，不能把最新可用日K无条件称为客观最新交易日。新增的涨跌额-2.80未直接出现在查询字段中，可由收盘价与涨跌幅近似推导，但应与原始返回区分。"
+      }
+    },
+    {
+      "id": "direct_01",
+      "question": "最近 10 个交易日，上证、深证、北证三大市场的总成交额分别是什么走势？帮我按日期列出来。",
+      "revision": "1dfb8ae",
+      "http_status": 200,
+      "ok": true,
+      "problems": [],
+      "skills": [],
+      "apis": [
+        "index.quote.query"
+      ],
+      "rows": 30,
+      "turns": 4,
+      "tokens": 26099,
+      "seconds": 21.765876,
+      "model_seconds": 21.458,
+      "api_seconds": 0.064777,
+      "guard_or_tool_errors": 0,
+      "summary": "三大指数的最近10个交易日成交额已全部取到。用户选择\"快速回答\"模式，我直接按日期列表呈现三大市场成交额走势。\n\n数据已完整（sample_complete=true，各10行），可以直接组织回答。成交额单位换算为亿元更清晰。\n\n**上证指数 (000001.SH) / 深证成指 (399001.SZ) / 北证50 (899050.BJ) 最近10个交易日成交额**\n\n金额单位：亿元\n\n| 交易日 | 上证指数 | 深证成指 | 北证50 |\n|---|---|---|---|\n| 2026-08-26 | 8,572 | 4,972 | 134 |\n| 2026-08-27 | 10,102 | 6,060 | 153 |\n| 2026-08-28 | 9,704 | 6,114 | 163 |\n| 2026-08-31 | 10,143 | 5,982 | 148 |\n| 2026-09-01 | 9,443 | 5,744 | 190 |\n| 2026-09-02 | 8,354 | 4,865 | 294 |\n| 2026-09-03 | 8,199 | 4,554 | 215 |\n| 2026-09-04 | 9,383 | 5,513 | 206 |\n| 2026-09-07 | 8,979 | 5,669 | 184 |\n| 2026-09-08 | 9,156 | 5,303 | 181 |\n\n**走势小结：**\n\n- **上证指数**：成交额在 8,199亿~10,193亿 区间震荡。8月27日~31日放量（万亿上方），随后（9月2日、3日）回落至 8,200亿左右，9月4日后有所回升，9月8日为 9,156亿元。整体呈\"先放量、后回落、再企稳\"的走势。\n- **深证成指**：量能与上证同步，8月26~28日在 5,000~6,100亿，9月2日、3日回落至 4,500~4,900亿的低点后企稳，9月7日回升至 5,669亿，9月8日小幅回落至 5,303亿。\n- **北证50**：绝对规模小（130亿~294亿），但波动最剧烈。9月2日放量至 294亿（10日最高），当日涨幅 +2.50%，其后缩量回落至 180亿左右。8月26日为10日最低的 134亿。\n\n三大市场量能节奏基本同步：8月末放量，9月初（2日、3日）缩量调整，随后企稳；北证波动弹性最大。数据来源为指数日行情（截至 2026-09-08）。",
+      "pages": [
+        {
+          "result_name": "r1",
+          "goal": "获取上证指数最近10个交易日的每日成交额",
+          "data_type": "table",
+          "schema": {
+            "columns": [
+              {
+                "name": "code",
+                "type": "string"
+              },
+              {
+                "name": "name",
+                "type": "string"
+              },
+              {
+                "name": "tradedate",
+                "type": "string"
+              },
+              {
+                "name": "close",
+                "type": "number"
+              },
+              {
+                "name": "pct",
+                "type": "number"
+              },
+              {
+                "name": "amount",
+                "type": "number"
+              }
+            ]
+          },
+          "row_count": 10,
+          "rows_returned": 2,
+          "truncated": true,
+          "rows": [
+            {
+              "code": "000001.SH",
+              "name": "上证指数",
+              "tradedate": "2026-09-08",
+              "close": 3940.5509,
+              "pct": 0.1997,
+              "amount": 915566238948.8
+            },
+            {
+              "code": "000001.SH",
+              "name": "上证指数",
+              "tradedate": "2026-09-07",
+              "close": 3932.6992,
+              "pct": 0.0657,
+              "amount": 897904014869
+            }
+          ]
+        },
+        {
+          "result_name": "r2",
+          "goal": "获取深证成指最近10个交易日的每日成交额",
+          "data_type": "table",
+          "schema": {
+            "columns": [
+              {
+                "name": "code",
+                "type": "string"
+              },
+              {
+                "name": "name",
+                "type": "string"
+              },
+              {
+                "name": "tradedate",
+                "type": "string"
+              },
+              {
+                "name": "close",
+                "type": "number"
+              },
+              {
+                "name": "pct",
+                "type": "number"
+              },
+              {
+                "name": "amount",
+                "type": "number"
+              }
+            ]
+          },
+          "row_count": 10,
+          "rows_returned": 2,
+          "truncated": true,
+          "rows": [
+            {
+              "code": "399001.SZ",
+              "name": "深证成指",
+              "tradedate": "2026-09-08",
+              "close": 13703.2081,
+              "pct": -0.5206,
+              "amount": 530304210346.89
+            },
+            {
+              "code": "399001.SZ",
+              "name": "深证成指",
+              "tradedate": "2026-09-07",
+              "close": 13774.9146,
+              "pct": 1.9083,
+              "amount": 566853327530.6
+            }
+          ]
+        },
+        {
+          "result_name": "r3",
+          "goal": "获取北证50最近10个交易日的每日成交额",
+          "data_type": "table",
+          "schema": {
+            "columns": [
+              {
+                "name": "code",
+                "type": "string"
+              },
+              {
+                "name": "name",
+                "type": "string"
+              },
+              {
+                "name": "tradedate",
+                "type": "string"
+              },
+              {
+                "name": "close",
+                "type": "number"
+              },
+              {
+                "name": "pct",
+                "type": "number"
+              },
+              {
+                "name": "amount",
+                "type": "number"
+              }
+            ]
+          },
+          "row_count": 10,
+          "rows_returned": 2,
+          "truncated": true,
+          "rows": [
+            {
+              "code": "899050.BJ",
+              "name": "北证50",
+              "tradedate": "2026-09-08",
+              "close": 1086.254,
+              "pct": -0.9656,
+              "amount": 18072906308
+            },
+            {
+              "code": "899050.BJ",
+              "name": "北证50",
+              "tradedate": "2026-09-07",
+              "close": 1096.8455,
+              "pct": 0.8464,
+              "amount": 18416855308
+            }
+          ]
+        }
+      ],
+      "steps": [
+        {
+          "kind": "llm",
+          "request_index": 1,
+          "turn": 1,
+          "step": 1,
+          "duration_ms": 5363,
+          "timing_basis": "step/start to assistant/message (includes request preparation and model response)",
+          "usage": {
+            "turn": 1,
+            "step": 1,
+            "input_tokens": 1101,
+            "cache_read_tokens": 2048,
+            "context_tokens": 3149,
+            "output_tokens": 377,
+            "reasoning_tokens": 248,
+            "non_reasoning_output_tokens": 129,
+            "total_tokens": 3526
+          }
+        },
+        {
+          "kind": "tool",
+          "tool": "read_finance_catalog",
+          "turn": 1,
+          "step": 1,
+          "call_id": "call_61e37b39b35e428b82339289",
+          "duration_ms": 11,
+          "timing_basis": "tool/call to tool/result",
+          "arguments": {
+            "subject": "index",
+            "dataview": "quote"
+          },
+          "is_error": false
+        },
+        {
+          "kind": "tool",
+          "tool": "read_finance_catalog",
+          "turn": 1,
+          "step": 1,
+          "call_id": "call_8d2875907a00493a981c12ee",
+          "duration_ms": 14,
+          "timing_basis": "tool/call to tool/result",
+          "arguments": {
+            "subject": "index",
+            "dataview": "basic_info"
+          },
+          "is_error": false
+        },
+        {
+          "kind": "llm",
+          "request_index": 2,
+          "turn": 1,
+          "step": 2,
+          "duration_ms": 2528,
+          "timing_basis": "step/start to assistant/message (includes request preparation and model response)",
+          "usage": {
+            "turn": 1,
+            "step": 2,
+            "input_tokens": 3611,
+            "cache_read_tokens": 2048,
+            "context_tokens": 5659,
+            "output_tokens": 166,
+            "reasoning_tokens": 0,
+            "non_reasoning_output_tokens": 166,
+            "total_tokens": 5825
+          }
+        },
+        {
+          "kind": "tool",
+          "tool": "resolve_security",
+          "turn": 1,
+          "step": 2,
+          "call_id": "call_d531ec4c1ebb4c01b5e44605",
+          "duration_ms": 37,
+          "timing_basis": "tool/call to tool/result",
+          "arguments": {
+            "identifiers": [
+              "上证指数",
+              "深证成指",
+              "北证50"
+            ]
+          },
+          "is_error": false
+        },
+        {
+          "kind": "llm",
+          "request_index": 3,
+          "turn": 1,
+          "step": 3,
+          "duration_ms": 6755,
+          "timing_basis": "step/start to assistant/message (includes request preparation and model response)",
+          "usage": {
+            "turn": 1,
+            "step": 3,
+            "input_tokens": 3161,
+            "cache_read_tokens": 3072,
+            "context_tokens": 6233,
+            "output_tokens": 592,
+            "reasoning_tokens": 284,
+            "non_reasoning_output_tokens": 308,
+            "total_tokens": 6825
+          }
+        },
+        {
+          "kind": "tool",
+          "tool": "finance_query",
+          "turn": 1,
+          "step": 3,
+          "call_id": "call_27be3173ac254799bc61fb29",
+          "duration_ms": 109,
+          "timing_basis": "tool/call to tool/result",
+          "arguments": {
+            "steps": [
+              {
+                "goal": "获取上证指数最近10个交易日的每日成交额",
+                "request": "r1 = index.quote.query(filter = \"code == '000001.SH'\", order = \"tradedate desc\", limit = 10) -> code, name, tradedate, close, pct, amount"
+              },
+              {
+                "goal": "获取深证成指最近10个交易日的每日成交额",
+                "request": "r2 = index.quote.query(filter = \"code == '399001.SZ'\", order = \"tradedate desc\", limit = 10) -> code, name, tradedate, close, pct, amount"
+              },
+              {
+                "goal": "获取北证50最近10个交易日的每日成交额",
+                "request": "r3 = index.quote.query(filter = \"code == '899050.BJ'\", order = \"tradedate desc\", limit = 10) -> code, name, tradedate, close, pct, amount"
+              }
+            ]
+          },
+          "is_error": false
+        },
+        {
+          "kind": "llm",
+          "request_index": 4,
+          "turn": 1,
+          "step": 4,
+          "duration_ms": 6812,
+          "timing_basis": "step/start to assistant/message (includes request preparation and model response)",
+          "usage": {
+            "turn": 1,
+            "step": 4,
+            "input_tokens": 3142,
+            "cache_read_tokens": 6144,
+            "context_tokens": 9286,
+            "output_tokens": 637,
+            "reasoning_tokens": 0,
+            "non_reasoning_output_tokens": 637,
+            "total_tokens": 9923
+          }
+        }
+      ],
+      "queries": [
+        {
+          "tool": "finance_query",
+          "flow_step": 1,
+          "flow_size": 3,
+          "goal": "获取上证指数最近10个交易日的每日成交额",
+          "submitted_request": "r1 = index.quote.query(filter = \"code == '000001.SH'\", order = \"tradedate desc\", limit = 10) -> code, name, tradedate, close, pct, amount",
+          "request": "r1 = index.quote.query(filter = \"code == '000001.SH'\", order = \"tradedate desc\", limit = 10) -> code, name, tradedate, close, pct, amount",
+          "attempts": [
+            {
+              "attempt": 1,
+              "static_validation_ms": 4.053,
+              "api_execution_ms": 21.799,
+              "duration_ms": 27.288
+            }
+          ],
+          "static_validation_ms": 4.053,
+          "api_execution_ms": 21.799,
+          "row_count": 10
+        },
+        {
+          "tool": "finance_query",
+          "flow_step": 2,
+          "flow_size": 3,
+          "goal": "获取深证成指最近10个交易日的每日成交额",
+          "submitted_request": "r2 = index.quote.query(filter = \"code == '399001.SZ'\", order = \"tradedate desc\", limit = 10) -> code, name, tradedate, close, pct, amount",
+          "request": "r2 = index.quote.query(filter = \"code == '399001.SZ'\", order = \"tradedate desc\", limit = 10) -> code, name, tradedate, close, pct, amount",
+          "attempts": [
+            {
+              "attempt": 1,
+              "static_validation_ms": 4.048,
+              "api_execution_ms": 22.772,
+              "duration_ms": 28.138
+            }
+          ],
+          "static_validation_ms": 4.048,
+          "api_execution_ms": 22.772,
+          "row_count": 10
+        },
+        {
+          "tool": "finance_query",
+          "flow_step": 3,
+          "flow_size": 3,
+          "goal": "获取北证50最近10个交易日的每日成交额",
+          "submitted_request": "r3 = index.quote.query(filter = \"code == '899050.BJ'\", order = \"tradedate desc\", limit = 10) -> code, name, tradedate, close, pct, amount",
+          "request": "r3 = index.quote.query(filter = \"code == '899050.BJ'\", order = \"tradedate desc\", limit = 10) -> code, name, tradedate, close, pct, amount",
+          "attempts": [
+            {
+              "attempt": 1,
+              "static_validation_ms": 4.231,
+              "api_execution_ms": 20.206,
+              "duration_ms": 25.706
+            }
+          ],
+          "static_validation_ms": 4.231,
+          "api_execution_ms": 20.206,
+          "row_count": 10
+        }
+      ],
+      "judgment": {
+        "recommended": "stock.quote.agg 按市场范围与交易日汇总成交额（历史market_history_amount不在当前目录）",
+        "coverage_text": "未满足三市场总成交额口径；返回的是代表指数成交额",
+        "short": "实质口径偏离：指数样本成交额替代市场总额。summary还夹带组织回答的草稿文字。",
+        "detail": "index.quote返回上证指数／深证成指／北证50各10日，共30条，语法和执行正常。但代表指数并不自动等于对应交易所全部市场，尤其深证成指与北证50，不能当作原要求完整覆盖。summary虽标题写指数，仍称三大市场且没有清楚限定替代范围，表内最大值与小结也不完全一致。正文开头“数据已完整…可以直接组织回答”是API实际返回的公开文本，原样记录；未把原生reasoning字段加入报告。"
+      }
+    },
+    {
+      "id": "direct_03",
+      "question": "现在全市场上涨家数和下跌家数分别是多少？涨停和跌停家数也一起给我。",
+      "revision": "1dfb8ae",
+      "http_status": 200,
+      "ok": true,
+      "problems": [],
+      "skills": [
+        "market-overview"
+      ],
+      "apis": [
+        "stock.quote.agg"
+      ],
+      "rows": 4,
+      "turns": 3,
+      "tokens": 21906,
+      "seconds": 20.644097000000002,
+      "model_seconds": 10.838,
+      "api_seconds": 9.50125,
+      "guard_or_tool_errors": 0,
+      "summary": "全市场个股实时快照统计如下（数据时点：截至系统日期的当日实时快照，mode=2）：\n\n- **上涨家数**：3,417 家（涨幅 >0）\n- **下跌家数**：2,026 家（跌幅 <0）\n- **涨停家数**：75 家\n- **跌停家数**：1 家\n\n**市场宽度解读**：上涨家数明显多于下跌家数（约 3417:2026），涨跌家数比约 1.69:1，市场整体偏强；涨停 75 家 vs 跌停仅 1 家，赚钱效应占优，风险偏好处于偏积极状态。\n\n注：以上为全市场（含沪深两市全部 A 股口径，不含平盘股票）的当日实时快照统计；涨停/跌停以 `is_limit_price` 状态字段标记（1=涨停、2=跌停）。平盘家数未单独统计。",
+      "pages": [
+        {
+          "result_name": "r1",
+          "goal": "统计上涨家数（pct>0）",
+          "data_type": "table",
+          "schema": {
+            "columns": [
+              {
+                "name": "up_count",
+                "type": "integer"
+              }
+            ]
+          },
+          "row_count": 1,
+          "rows_returned": 1,
+          "truncated": false,
+          "rows": [
+            {
+              "up_count": 3417
+            }
+          ]
+        },
+        {
+          "result_name": "r2",
+          "goal": "统计下跌家数（pct<0）",
+          "data_type": "table",
+          "schema": {
+            "columns": [
+              {
+                "name": "down_count",
+                "type": "integer"
+              }
+            ]
+          },
+          "row_count": 1,
+          "rows_returned": 1,
+          "truncated": false,
+          "rows": [
+            {
+              "down_count": 2026
+            }
+          ]
+        },
+        {
+          "result_name": "r3",
+          "goal": "统计涨停家数（is_limit_price=1）",
+          "data_type": "table",
+          "schema": {
+            "columns": [
+              {
+                "name": "limit_up_count",
+                "type": "integer"
+              }
+            ]
+          },
+          "row_count": 1,
+          "rows_returned": 1,
+          "truncated": false,
+          "rows": [
+            {
+              "limit_up_count": 75
+            }
+          ]
+        },
+        {
+          "result_name": "r4",
+          "goal": "统计跌停家数（is_limit_price=2）",
+          "data_type": "table",
+          "schema": {
+            "columns": [
+              {
+                "name": "limit_down_count",
+                "type": "integer"
+              }
+            ]
+          },
+          "row_count": 1,
+          "rows_returned": 1,
+          "truncated": false,
+          "rows": [
+            {
+              "limit_down_count": 1
+            }
+          ]
+        }
+      ],
+      "steps": [
+        {
+          "kind": "llm",
+          "request_index": 1,
+          "turn": 1,
+          "step": 1,
+          "duration_ms": 3647,
+          "timing_basis": "step/start to assistant/message (includes request preparation and model response)",
+          "usage": {
+            "turn": 1,
+            "step": 1,
+            "input_tokens": 1094,
+            "cache_read_tokens": 2048,
+            "context_tokens": 3142,
+            "output_tokens": 247,
+            "reasoning_tokens": 132,
+            "non_reasoning_output_tokens": 115,
+            "total_tokens": 3389
+          }
+        },
+        {
+          "kind": "tool",
+          "tool": "read_finance_catalog",
+          "turn": 1,
+          "step": 1,
+          "call_id": "call_a50ff024e91e4f0eaf1f8c6a",
+          "duration_ms": 22,
+          "timing_basis": "tool/call to tool/result",
+          "arguments": {
+            "subject": "stock",
+            "dataview": "quote"
+          },
+          "is_error": false
+        },
+        {
+          "kind": "tool",
+          "tool": "read_finance_skill",
+          "turn": 1,
+          "step": 1,
+          "call_id": "call_f3b7ed98f8a3481786288af2",
+          "duration_ms": 22,
+          "timing_basis": "tool/call to tool/result",
+          "arguments": {
+            "skill_ids": [
+              "market-overview"
+            ]
+          },
+          "is_error": false
+        },
+        {
+          "kind": "llm",
+          "request_index": 2,
+          "turn": 1,
+          "step": 2,
+          "duration_ms": 3708,
+          "timing_basis": "step/start to assistant/message (includes request preparation and model response)",
+          "usage": {
+            "turn": 1,
+            "step": 2,
+            "input_tokens": 6168,
+            "cache_read_tokens": 2048,
+            "context_tokens": 8216,
+            "output_tokens": 351,
+            "reasoning_tokens": 0,
+            "non_reasoning_output_tokens": 351,
+            "total_tokens": 8567
+          }
+        },
+        {
+          "kind": "tool",
+          "tool": "finance_query",
+          "turn": 1,
+          "step": 2,
+          "call_id": "call_4a2016e97f3f4174a328426d",
+          "duration_ms": 9588,
+          "timing_basis": "tool/call to tool/result",
+          "arguments": {
+            "data_request_complete": true,
+            "steps": [
+              {
+                "goal": "统计上涨家数（pct>0）",
+                "request": "r1 = stock.quote.agg(filter = \"pct > 0\", agg = count(stock.quote.code), mode = 2) -> up_count"
+              },
+              {
+                "goal": "统计下跌家数（pct<0）",
+                "request": "r2 = stock.quote.agg(filter = \"pct < 0\", agg = count(stock.quote.code), mode = 2) -> down_count"
+              },
+              {
+                "goal": "统计涨停家数（is_limit_price=1）",
+                "request": "r3 = stock.quote.agg(filter = \"is_limit_price == 1\", agg = count(stock.quote.code), mode = 2) -> limit_up_count"
+              },
+              {
+                "goal": "统计跌停家数（is_limit_price=2）",
+                "request": "r4 = stock.quote.agg(filter = \"is_limit_price == 2\", agg = count(stock.quote.code), mode = 2) -> limit_down_count"
+              }
+            ]
+          },
+          "is_error": false
+        },
+        {
+          "kind": "llm",
+          "request_index": 3,
+          "turn": 1,
+          "step": 3,
+          "duration_ms": 3483,
+          "timing_basis": "step/start to assistant/message (includes request preparation and model response)",
+          "usage": {
+            "turn": 1,
+            "step": 3,
+            "input_tokens": 6666,
+            "cache_read_tokens": 3072,
+            "context_tokens": 9738,
+            "output_tokens": 212,
+            "reasoning_tokens": 0,
+            "non_reasoning_output_tokens": 212,
+            "total_tokens": 9950
+          }
+        }
+      ],
+      "queries": [
+        {
+          "tool": "finance_query",
+          "flow_step": 1,
+          "flow_size": 4,
+          "goal": "统计上涨家数（pct>0）",
+          "submitted_request": "r1 = stock.quote.agg(filter = \"pct > 0\", agg = count(stock.quote.code), mode = 2) -> up_count",
+          "request": "r1 = stock.quote.agg(filter = \"pct > 0\", agg = count(stock.quote.code), mode = 2) -> up_count",
+          "attempts": [
+            {
+              "attempt": 1,
+              "static_validation_ms": 8.111,
+              "api_execution_ms": 2418.346,
+              "duration_ms": 2428.314
+            }
+          ],
+          "static_validation_ms": 8.111,
+          "api_execution_ms": 2418.346,
+          "row_count": 1
+        },
+        {
+          "tool": "finance_query",
+          "flow_step": 2,
+          "flow_size": 4,
+          "goal": "统计下跌家数（pct<0）",
+          "submitted_request": "r2 = stock.quote.agg(filter = \"pct < 0\", agg = count(stock.quote.code), mode = 2) -> down_count",
+          "request": "r2 = stock.quote.agg(filter = \"pct < 0\", agg = count(stock.quote.code), mode = 2) -> down_count",
+          "attempts": [
+            {
+              "attempt": 1,
+              "static_validation_ms": 12.103,
+              "api_execution_ms": 2453.288,
+              "duration_ms": 2467.922
+            }
+          ],
+          "static_validation_ms": 12.103,
+          "api_execution_ms": 2453.288,
+          "row_count": 1
+        },
+        {
+          "tool": "finance_query",
+          "flow_step": 3,
+          "flow_size": 4,
+          "goal": "统计涨停家数（is_limit_price=1）",
+          "submitted_request": "r3 = stock.quote.agg(filter = \"is_limit_price == 1\", agg = count(stock.quote.code), mode = 2) -> limit_up_count",
+          "request": "r3 = stock.quote.agg(filter = \"is_limit_price == 1\", agg = count(stock.quote.code), mode = 2) -> limit_up_count",
+          "attempts": [
+            {
+              "attempt": 1,
+              "static_validation_ms": 6.531,
+              "api_execution_ms": 2499.788,
+              "duration_ms": 2507.819
+            }
+          ],
+          "static_validation_ms": 6.531,
+          "api_execution_ms": 2499.788,
+          "row_count": 1
+        },
+        {
+          "tool": "finance_query",
+          "flow_step": 4,
+          "flow_size": 4,
+          "goal": "统计跌停家数（is_limit_price=2）",
+          "submitted_request": "r4 = stock.quote.agg(filter = \"is_limit_price == 2\", agg = count(stock.quote.code), mode = 2) -> limit_down_count",
+          "request": "r4 = stock.quote.agg(filter = \"is_limit_price == 2\", agg = count(stock.quote.code), mode = 2) -> limit_down_count",
+          "attempts": [
+            {
+              "attempt": 1,
+              "static_validation_ms": 6.429,
+              "api_execution_ms": 2129.828,
+              "duration_ms": 2137.731
+            }
+          ],
+          "static_validation_ms": 6.429,
+          "api_execution_ms": 2129.828,
+          "row_count": 1
+        }
+      ],
+      "judgment": {
+        "recommended": "stock.quote.agg 实时涨跌与涨跌停计数",
+        "coverage_text": "四个实时计数入口均覆盖",
+        "short": "4次聚合返回4条，数值与summary一致；仍多选市场分析，额外强弱解读非必需。",
+        "detail": "上涨3417、下跌2026、涨停75、跌停1均与聚合返回一致。没有再先拉5569条快照，较第一轮减少一次冗余查询；4次实时聚合API累计约9.50秒，是否复用快照可后续单独测量。summary的沪深市场范围没有在本题filter中明确限定，市场偏强等是额外分析，不算本轮已验证的数据事实。"
+      }
+    },
+    {
+      "id": "direct_13",
+      "question": "帮我看一下现在全市场成交额排名前 20 的股票。",
+      "revision": "1dfb8ae",
+      "http_status": 200,
+      "ok": true,
+      "problems": [],
+      "skills": [],
+      "apis": [
+        "stock.quote.query"
+      ],
+      "rows": 20,
+      "turns": 3,
+      "tokens": 18139,
+      "seconds": 16.84376,
+      "model_seconds": 14.228,
+      "api_seconds": 2.444547,
+      "guard_or_tool_errors": 0,
+      "summary": "已获取全市场成交额排名前 20 的股票（实时行情快照，成交额降序排列）。以下为结果：\n\n## 全市场成交额排名前 20 的股票\n（数据时间：2026-09-08 实时行情快照，按成交额降序）\n\n| 排名 | 代码 | 名称 | 最新价(元) | 涨跌幅 | 成交额(亿元) | 换手率 |\n|---|---|---|---|---|---|---|\n| 1 | 300308 | 中际旭创 | 902.37 | +0.44% | 262.2 | 2.59% |\n| 2 | 300750 | 宁德时代 | 335.49 | -3.65% | 174.5 | 1.22% |\n| 3 | 300502 | 新易盛 | 416.40 | -0.19% | 155.8 | 2.95% |\n| 4 | 603986 | 兆易创新 | 385.96 | +0.13% | 146.1 | 5.59% |\n| 5 | 688825 | 长鑫科技 | 58.39 | -0.14% | 115.7 | 4.39% |\n| 6 | 002436 | 兴森科技 | 40.12 | +9.17% | 114.1 | 18.75% |\n| 7 | 002384 | 东山精密 | 186.42 | -2.17% | 110.2 | 4.19% |\n| 8 | 603083 | XD剑桥科 | 222.30 | +7.33% | 109.5 | 17.74% |\n| 9 | 300394 | 天孚通信 | 258.50 | -3.18% | 108.9 | 3.78% |\n| 10 | 600183 | 生益科技 | 146.28 | -1.26% | 102.5 | 2.86% |\n| 11 | 600487 | 亨通光电 | 63.11 | -1.39% | 97.0 | 6.14% |\n| 12 | 688256 | 寒武纪 | 1058.99 | -3.06% | 92.9 | 1.37% |\n| 13 | 002463 | 沪电股份 | 124.90 | +1.83% | 87.2 | 3.59% |\n| 14 | 601899 | 紫金矿业 | 33.86 | +3.01% | 84.6 | 1.21% |\n| 15 | 000977 | 浪潮信息 | 72.32 | -3.24% | 77.3 | 7.22% |\n| 16 | 600176 | 中国巨石 | 41.39 | -0.74% | 73.4 | 4.41% |\n| 17 | 600869 | 远东股份 | 22.66 | +8.52% | 70.7 | 14.63% |\n| 18 | 601138 | 工业富联 | 64.75 | -2.73% | 70.6 | 0.54% |\n| 19 | 300475 | 香农芯创 | 179.66 | +1.59% | 69.1 | 8.47% |\n| 20 | 688498 | 源杰科技 | 1715.00 | +0.76% | 68.2 | 3.22% |\n\n几点观察：\n- **中际旭创**以 262.2 亿元成交额居首，显著领先第二名宁德时代（174.5亿元）。\n- **市场结构高度集中在科技/算力链**：光模块（中际旭创、新易盛、天孚通信、源杰科技、剑桥科技）、PCB（沪电、东山精密、生益科技）、存储/半导体（长鑫科技、兆易创新、寒武纪）占主导，另有宁德时代、紫金矿业等权重股。\n- **高换手高波动标的多为算力/PCB 题材**：兴森科技（+9.17%，换手18.75%）、远东股份（+8.52%）、剑桥科技（+7.33%）均大幅放量上涨，短线资金活跃。\n- 宁德时代、寒武纪、浪潮信息、天孚通信等成交居前个股当日回调明显。\n\n注：成交额为元，已折算为亿元；「XD剑桥科」为当日除息标记。数据来自实时行情快照，交易日为单位。",
+      "pages": [
+        {
+          "result_name": "r1",
+          "goal": "查询全市场成交额排名前20的股票最新行情快照",
+          "data_type": "table",
+          "schema": {
+            "columns": [
+              {
+                "name": "code",
+                "type": "string"
+              },
+              {
+                "name": "name",
+                "type": "string"
+              },
+              {
+                "name": "close",
+                "type": "number"
+              },
+              {
+                "name": "pct",
+                "type": "number"
+              },
+              {
+                "name": "amount",
+                "type": "integer"
+              },
+              {
+                "name": "volumn",
+                "type": "integer"
+              },
+              {
+                "name": "turn_ratio",
+                "type": "number"
+              }
+            ]
+          },
+          "row_count": 20,
+          "rows_returned": 2,
+          "truncated": true,
+          "rows": [
+            {
+              "code": "300308",
+              "name": "中际旭创",
+              "close": 902.37,
+              "pct": 0.435189,
+              "amount": 26222814282,
+              "volumn": 287658,
+              "turn_ratio": 2.59
+            },
+            {
+              "code": "300750",
+              "name": "宁德时代",
+              "close": 335.49,
+              "pct": -3.650201,
+              "amount": 17445391393,
+              "volumn": 519551,
+              "turn_ratio": 1.22
+            }
+          ]
+        }
+      ],
+      "steps": [
+        {
+          "kind": "llm",
+          "request_index": 1,
+          "turn": 1,
+          "step": 1,
+          "duration_ms": 3041,
+          "timing_basis": "step/start to assistant/message (includes request preparation and model response)",
+          "usage": {
+            "turn": 1,
+            "step": 1,
+            "input_tokens": 1088,
+            "cache_read_tokens": 2048,
+            "context_tokens": 3136,
+            "output_tokens": 174,
+            "reasoning_tokens": 87,
+            "non_reasoning_output_tokens": 87,
+            "total_tokens": 3310
+          }
+        },
+        {
+          "kind": "tool",
+          "tool": "read_finance_catalog",
+          "turn": 1,
+          "step": 1,
+          "call_id": "call_d52aa2d195ba4e3bb622747e",
+          "duration_ms": 14,
+          "timing_basis": "tool/call to tool/result",
+          "arguments": {
+            "subject": "stock",
+            "dataview": "quote",
+            "operation": "query"
+          },
+          "is_error": false
+        },
+        {
+          "kind": "llm",
+          "request_index": 2,
+          "turn": 1,
+          "step": 2,
+          "duration_ms": 2004,
+          "timing_basis": "step/start to assistant/message (includes request preparation and model response)",
+          "usage": {
+            "turn": 1,
+            "step": 2,
+            "input_tokens": 3971,
+            "cache_read_tokens": 2048,
+            "context_tokens": 6019,
+            "output_tokens": 158,
+            "reasoning_tokens": 0,
+            "non_reasoning_output_tokens": 158,
+            "total_tokens": 6177
+          }
+        },
+        {
+          "kind": "tool",
+          "tool": "finance_query",
+          "turn": 1,
+          "step": 2,
+          "call_id": "call_7b452bff285f48d79a8c0b00",
+          "duration_ms": 2471,
+          "timing_basis": "tool/call to tool/result",
+          "arguments": {
+            "data_request_complete": true,
+            "steps": [
+              {
+                "goal": "查询全市场成交额排名前20的股票最新行情快照",
+                "request": "r1 = stock.quote.query(mode = 2, order = \"amount desc\", limit = 20) -> code, name, close, pct, amount, volumn, turn_ratio"
+              }
+            ]
+          },
+          "is_error": false
+        },
+        {
+          "kind": "llm",
+          "request_index": 3,
+          "turn": 1,
+          "step": 3,
+          "duration_ms": 9183,
+          "timing_basis": "step/start to assistant/message (includes request preparation and model response)",
+          "usage": {
+            "turn": 1,
+            "step": 3,
+            "input_tokens": 4549,
+            "cache_read_tokens": 3072,
+            "context_tokens": 7621,
+            "output_tokens": 1031,
+            "reasoning_tokens": 0,
+            "non_reasoning_output_tokens": 1031,
+            "total_tokens": 8652
+          }
+        }
+      ],
+      "queries": [
+        {
+          "tool": "finance_query",
+          "flow_step": 1,
+          "flow_size": 1,
+          "goal": "查询全市场成交额排名前20的股票最新行情快照",
+          "submitted_request": "r1 = stock.quote.query(mode = 2, order = \"amount desc\", limit = 20) -> code, name, close, pct, amount, volumn, turn_ratio",
+          "request": "r1 = stock.quote.query(mode = 2, order = \"amount desc\", limit = 20) -> code, name, close, pct, amount, volumn, turn_ratio",
+          "attempts": [
+            {
+              "attempt": 1,
+              "static_validation_ms": 7.271,
+              "api_execution_ms": 2444.547,
+              "duration_ms": 2453.34
+            }
+          ],
+          "static_validation_ms": 7.271,
+          "api_execution_ms": 2444.547,
+          "row_count": 20
+        }
+      ],
+      "judgment": {
+        "recommended": "stock.quote.query mode=2，amount倒序前20",
+        "coverage_text": "实时成交额排名入口已覆盖",
+        "short": "不选Skill，3轮返回排名20条；前两条数值与summary一致。附加行业与放量判断证据不足。",
+        "detail": "实时mode、排序、limit均符合问题；前两条中际旭创262.23亿、宁德时代174.45亿与summary四舍五入一致。返回字段没有行业分类，也没有历史成交量基准，故额外的产业链归类和“大幅放量”不能记为本次已取证的结果。"
+      }
+    }
+  ],
+  "selection_iterations": [
+    {
+      "folder": "server_selection",
+      "cases": [
+        {
+          "id": "market_overview_real",
+          "selected": [
+            "market-overview"
+          ],
+          "catalog_calls": [],
+          "primary_hit": true,
+          "acceptable_selection": true,
+          "invalid_calls": [],
+          "seconds": 2.342,
+          "tokens": 1985
+        },
+        {
+          "id": "sector_theme_real",
+          "selected": [
+            "sector-theme-analysis",
+            "market-overview"
+          ],
+          "catalog_calls": [],
+          "primary_hit": true,
+          "acceptable_selection": false,
+          "invalid_calls": [],
+          "seconds": 2.108,
+          "tokens": 1980
+        },
+        {
+          "id": "stock_research_real",
+          "selected": [
+            "stock-research",
+            "valuation-analysis",
+            "financial-quality-analysis",
+            "earnings-analysis",
+            "equity-report-analysis",
+            "sector-theme-analysis",
+            "market-overview"
+          ],
+          "catalog_calls": [],
+          "primary_hit": true,
+          "acceptable_selection": false,
+          "invalid_calls": [],
+          "seconds": 2.382,
+          "tokens": 2006
+        },
+        {
+          "id": "earnings_analysis_real",
+          "selected": [
+            "earnings-analysis",
+            "financial-quality-analysis"
+          ],
+          "catalog_calls": [],
+          "primary_hit": true,
+          "acceptable_selection": false,
+          "invalid_calls": [],
+          "seconds": 3.116,
+          "tokens": 2079
+        },
+        {
+          "id": "stock_screening_real",
+          "selected": [
+            "stock-screening",
+            "technical-structure-analysis",
+            "factor-analysis"
+          ],
+          "catalog_calls": [],
+          "primary_hit": true,
+          "acceptable_selection": false,
+          "invalid_calls": [],
+          "seconds": 2.55,
+          "tokens": 2018
+        },
+        {
+          "id": "factor_analysis_real",
+          "selected": [
+            "factor-analysis"
+          ],
+          "catalog_calls": [],
+          "primary_hit": true,
+          "acceptable_selection": true,
+          "invalid_calls": [],
+          "seconds": 2.217,
+          "tokens": 1998
+        },
+        {
+          "id": "valuation_analysis_real",
+          "selected": [
+            "valuation-analysis",
+            "financial-quality-analysis",
+            "stock-research",
+            "equity-report-analysis"
+          ],
+          "catalog_calls": [],
+          "primary_hit": true,
+          "acceptable_selection": false,
+          "invalid_calls": [],
+          "seconds": 2.096,
+          "tokens": 1985
+        },
+        {
+          "id": "financial_quality_real",
+          "selected": [
+            "financial-quality-analysis"
+          ],
+          "catalog_calls": [],
+          "primary_hit": true,
+          "acceptable_selection": true,
+          "invalid_calls": [],
+          "seconds": 2.71,
+          "tokens": 2009
+        },
+        {
+          "id": "stock_comparison_real",
+          "selected": [
+            "stock-comparison",
+            "financial-quality-analysis",
+            "valuation-analysis",
+            "earnings-analysis"
+          ],
+          "catalog_calls": [],
+          "primary_hit": true,
+          "acceptable_selection": false,
+          "invalid_calls": [],
+          "seconds": 2.284,
+          "tokens": 2021
+        },
+        {
+          "id": "technical_structure_real",
+          "selected": [
+            "technical-structure-analysis"
+          ],
+          "catalog_calls": [],
+          "primary_hit": true,
+          "acceptable_selection": true,
+          "invalid_calls": [],
+          "seconds": 1.969,
+          "tokens": 1976
+        },
+        {
+          "id": "dividend_analysis_real",
+          "selected": [
+            "dividend-analysis"
+          ],
+          "catalog_calls": [],
+          "primary_hit": true,
+          "acceptable_selection": true,
+          "invalid_calls": [],
+          "seconds": 2.476,
+          "tokens": 2022
+        },
+        {
+          "id": "consensus",
+          "selected": [
+            "equity-report-analysis"
+          ],
+          "catalog_calls": [],
+          "primary_hit": true,
+          "acceptable_selection": true,
+          "invalid_calls": [],
+          "seconds": 2.539,
+          "tokens": 2030
+        },
+        {
+          "id": "sensitivity",
+          "selected": [
+            "stock-research",
+            "equity-report-analysis"
+          ],
+          "catalog_calls": [],
+          "primary_hit": true,
+          "acceptable_selection": true,
+          "invalid_calls": [],
+          "seconds": 2.934,
+          "tokens": 2114
+        },
+        {
+          "id": "revisions",
+          "selected": [
+            "equity-report-analysis"
+          ],
+          "catalog_calls": [],
+          "primary_hit": true,
+          "acceptable_selection": true,
+          "invalid_calls": [],
+          "seconds": 2.71,
+          "tokens": 2041
+        },
+        {
+          "id": "RTE001",
+          "selected": [
+            "stock-research"
+          ],
+          "catalog_calls": [],
+          "primary_hit": true,
+          "acceptable_selection": true,
+          "invalid_calls": [],
+          "seconds": 5.238,
+          "tokens": 2236
+        },
+        {
+          "id": "RTE003",
+          "selected": [
+            "stock-comparison",
+            "equity-report-analysis"
+          ],
+          "catalog_calls": [],
+          "primary_hit": true,
+          "acceptable_selection": true,
+          "invalid_calls": [],
+          "seconds": 2.688,
+          "tokens": 2002
+        },
+        {
+          "id": "RTE005",
+          "selected": [
+            "equity-report-analysis",
+            "valuation-analysis"
+          ],
+          "catalog_calls": [],
+          "primary_hit": true,
+          "acceptable_selection": false,
+          "invalid_calls": [],
+          "seconds": 3.391,
+          "tokens": 2061
+        },
+        {
+          "id": "raw_quote_control",
+          "selected": [],
+          "catalog_calls": [],
+          "primary_hit": true,
+          "acceptable_selection": true,
+          "invalid_calls": [],
+          "seconds": 2.745,
+          "tokens": 2034
+        },
+        {
+          "id": "direct_01",
+          "selected": [
+            "market-overview"
+          ],
+          "catalog_calls": [],
+          "primary_hit": false,
+          "acceptable_selection": false,
+          "invalid_calls": [],
+          "seconds": 6.107,
+          "tokens": 2359
+        },
+        {
+          "id": "direct_03",
+          "selected": [
+            "market-overview"
+          ],
+          "catalog_calls": [],
+          "primary_hit": false,
+          "acceptable_selection": false,
+          "invalid_calls": [],
+          "seconds": 2.065,
+          "tokens": 1973
+        },
+        {
+          "id": "direct_04",
+          "selected": [],
+          "catalog_calls": [],
+          "primary_hit": true,
+          "acceptable_selection": true,
+          "invalid_calls": [],
+          "seconds": 3.658,
+          "tokens": 2102
+        },
+        {
+          "id": "direct_05",
+          "selected": [
+            "stock-research"
+          ],
+          "catalog_calls": [],
+          "primary_hit": false,
+          "acceptable_selection": false,
+          "invalid_calls": [],
+          "seconds": 2.732,
+          "tokens": 1994
+        },
+        {
+          "id": "direct_09",
+          "selected": [
+            "technical-structure-analysis"
+          ],
+          "catalog_calls": [],
+          "primary_hit": false,
+          "acceptable_selection": false,
+          "invalid_calls": [],
+          "seconds": 2.851,
+          "tokens": 2058
+        },
+        {
+          "id": "direct_10",
+          "selected": [
+            "market-overview"
+          ],
+          "catalog_calls": [],
+          "primary_hit": false,
+          "acceptable_selection": false,
+          "invalid_calls": [],
+          "seconds": 6.523,
+          "tokens": 2297
+        },
+        {
+          "id": "direct_13",
+          "selected": [
+            "market-overview"
+          ],
+          "catalog_calls": [],
+          "primary_hit": false,
+          "acceptable_selection": false,
+          "invalid_calls": [],
+          "seconds": 5.475,
+          "tokens": 2302
+        },
+        {
+          "id": "direct_17",
+          "selected": [
+            "sector-theme-analysis"
+          ],
+          "catalog_calls": [],
+          "primary_hit": false,
+          "acceptable_selection": false,
+          "invalid_calls": [],
+          "seconds": 2.463,
+          "tokens": 1970
+        }
+      ]
+    },
+    {
+      "folder": "server_selection_v2",
+      "cases": [
+        {
+          "id": "market_overview_real",
+          "selected": [
+            "market-overview"
+          ],
+          "catalog_calls": [],
+          "primary_hit": true,
+          "acceptable_selection": true,
+          "invalid_calls": [],
+          "seconds": 2.709,
+          "tokens": 2074
+        },
+        {
+          "id": "sector_theme_real",
+          "selected": [
+            "sector-theme-analysis"
+          ],
+          "catalog_calls": [],
+          "primary_hit": true,
+          "acceptable_selection": true,
+          "invalid_calls": [],
+          "seconds": 2.21,
+          "tokens": 2000
+        },
+        {
+          "id": "stock_research_real",
+          "selected": [
+            "stock-research",
+            "valuation-analysis",
+            "financial-quality-analysis",
+            "earnings-analysis",
+            "sector-theme-analysis",
+            "stock-comparison"
+          ],
+          "catalog_calls": [],
+          "primary_hit": true,
+          "acceptable_selection": false,
+          "invalid_calls": [],
+          "seconds": 2.701,
+          "tokens": 2074
+        },
+        {
+          "id": "earnings_analysis_real",
+          "selected": [
+            "earnings-analysis",
+            "financial-quality-analysis"
+          ],
+          "catalog_calls": [],
+          "primary_hit": true,
+          "acceptable_selection": false,
+          "invalid_calls": [],
+          "seconds": 1.874,
+          "tokens": 2008
+        },
+        {
+          "id": "stock_screening_real",
+          "selected": [
+            "stock-screening"
+          ],
+          "catalog_calls": [],
+          "primary_hit": true,
+          "acceptable_selection": true,
+          "invalid_calls": [],
+          "seconds": 3.133,
+          "tokens": 2085
+        },
+        {
+          "id": "factor_analysis_real",
+          "selected": [
+            "factor-analysis"
+          ],
+          "catalog_calls": [],
+          "primary_hit": true,
+          "acceptable_selection": true,
+          "invalid_calls": [],
+          "seconds": 2.519,
+          "tokens": 2026
+        },
+        {
+          "id": "valuation_analysis_real",
+          "selected": [
+            "valuation-analysis",
+            "stock-research"
+          ],
+          "catalog_calls": [],
+          "primary_hit": true,
+          "acceptable_selection": true,
+          "invalid_calls": [],
+          "seconds": 2.144,
+          "tokens": 1990
+        },
+        {
+          "id": "financial_quality_real",
+          "selected": [
+            "financial-quality-analysis"
+          ],
+          "catalog_calls": [],
+          "primary_hit": true,
+          "acceptable_selection": true,
+          "invalid_calls": [],
+          "seconds": 2.576,
+          "tokens": 2041
+        },
+        {
+          "id": "stock_comparison_real",
+          "selected": [
+            "stock-comparison",
+            "financial-quality-analysis",
+            "earnings-analysis",
+            "valuation-analysis"
+          ],
+          "catalog_calls": [],
+          "primary_hit": true,
+          "acceptable_selection": false,
+          "invalid_calls": [],
+          "seconds": 2.747,
+          "tokens": 2051
+        },
+        {
+          "id": "technical_structure_real",
+          "selected": [
+            "technical-structure-analysis"
+          ],
+          "catalog_calls": [],
+          "primary_hit": true,
+          "acceptable_selection": true,
+          "invalid_calls": [],
+          "seconds": 1.837,
+          "tokens": 1984
+        },
+        {
+          "id": "dividend_analysis_real",
+          "selected": [
+            "dividend-analysis",
+            "financial-quality-analysis",
+            "equity-report-analysis",
+            "stock-research"
+          ],
+          "catalog_calls": [],
+          "primary_hit": true,
+          "acceptable_selection": false,
+          "invalid_calls": [],
+          "seconds": 2.981,
+          "tokens": 2090
+        },
+        {
+          "id": "consensus",
+          "selected": [
+            "equity-report-analysis"
+          ],
+          "catalog_calls": [],
+          "primary_hit": true,
+          "acceptable_selection": true,
+          "invalid_calls": [],
+          "seconds": 2.502,
+          "tokens": 2059
+        },
+        {
+          "id": "sensitivity",
+          "selected": [
+            "equity-report-analysis",
+            "stock-research"
+          ],
+          "catalog_calls": [],
+          "primary_hit": true,
+          "acceptable_selection": true,
+          "invalid_calls": [],
+          "seconds": 2.62,
+          "tokens": 2084
+        },
+        {
+          "id": "revisions",
+          "selected": [
+            "equity-report-analysis"
+          ],
+          "catalog_calls": [],
+          "primary_hit": true,
+          "acceptable_selection": true,
+          "invalid_calls": [],
+          "seconds": 2.283,
+          "tokens": 2058
+        },
+        {
+          "id": "RTE001",
+          "selected": [
+            "stock-research"
+          ],
+          "catalog_calls": [],
+          "primary_hit": true,
+          "acceptable_selection": true,
+          "invalid_calls": [],
+          "seconds": 3.149,
+          "tokens": 2069
+        },
+        {
+          "id": "RTE003",
+          "selected": [
+            "equity-report-analysis",
+            "stock-comparison",
+            "earnings-analysis"
+          ],
+          "catalog_calls": [],
+          "primary_hit": true,
+          "acceptable_selection": false,
+          "invalid_calls": [],
+          "seconds": 2.398,
+          "tokens": 2038
+        },
+        {
+          "id": "RTE005",
+          "selected": [
+            "valuation-analysis",
+            "equity-report-analysis"
+          ],
+          "catalog_calls": [],
+          "primary_hit": true,
+          "acceptable_selection": false,
+          "invalid_calls": [],
+          "seconds": 2.597,
+          "tokens": 1968
+        },
+        {
+          "id": "raw_quote_control",
+          "selected": [],
+          "catalog_calls": [],
+          "primary_hit": true,
+          "acceptable_selection": true,
+          "invalid_calls": [],
+          "seconds": 7.31,
+          "tokens": 2420
+        },
+        {
+          "id": "direct_01",
+          "selected": [
+            "market-overview"
+          ],
+          "catalog_calls": [],
+          "primary_hit": false,
+          "acceptable_selection": false,
+          "invalid_calls": [],
+          "seconds": 3.611,
+          "tokens": 2110
+        },
+        {
+          "id": "direct_03",
+          "selected": [
+            "market-overview"
+          ],
+          "catalog_calls": [],
+          "primary_hit": false,
+          "acceptable_selection": false,
+          "invalid_calls": [],
+          "seconds": 2.579,
+          "tokens": 2040
+        },
+        {
+          "id": "direct_04",
+          "selected": [],
+          "catalog_calls": [],
+          "primary_hit": true,
+          "acceptable_selection": true,
+          "invalid_calls": [],
+          "seconds": 2.526,
+          "tokens": 2002
+        },
+        {
+          "id": "direct_05",
+          "selected": [
+            "stock-research"
+          ],
+          "catalog_calls": [],
+          "primary_hit": false,
+          "acceptable_selection": false,
+          "invalid_calls": [],
+          "seconds": 2.161,
+          "tokens": 1976
+        },
+        {
+          "id": "direct_09",
+          "selected": [
+            "technical-structure-analysis"
+          ],
+          "catalog_calls": [],
+          "primary_hit": false,
+          "acceptable_selection": false,
+          "invalid_calls": [],
+          "seconds": 2.815,
+          "tokens": 2021
+        },
+        {
+          "id": "direct_10",
+          "selected": [
+            "market-overview"
+          ],
+          "catalog_calls": [],
+          "primary_hit": false,
+          "acceptable_selection": false,
+          "invalid_calls": [],
+          "seconds": 3.885,
+          "tokens": 2130
+        },
+        {
+          "id": "direct_13",
+          "selected": [
+            "market-overview"
+          ],
+          "catalog_calls": [],
+          "primary_hit": false,
+          "acceptable_selection": false,
+          "invalid_calls": [],
+          "seconds": 6.672,
+          "tokens": 2347
+        },
+        {
+          "id": "direct_17",
+          "selected": [],
+          "catalog_calls": [],
+          "primary_hit": true,
+          "acceptable_selection": true,
+          "invalid_calls": [],
+          "seconds": 3.905,
+          "tokens": 2126
+        }
+      ]
+    },
+    {
+      "folder": "server_selection_v3",
+      "cases": [
+        {
+          "id": "market_overview_real",
+          "selected": [
+            "market-overview"
+          ],
+          "catalog_calls": [
+            {
+              "subject": "index",
+              "dataview": "quote"
+            }
+          ],
+          "primary_hit": true,
+          "acceptable_selection": true,
+          "invalid_calls": [],
+          "seconds": 4.153,
+          "tokens": 3348
+        },
+        {
+          "id": "sector_theme_real",
+          "selected": [
+            "sector-theme-analysis"
+          ],
+          "catalog_calls": [
+            {
+              "subject": "plate",
+              "dataview": "basic_info",
+              "operation": "query"
+            }
+          ],
+          "primary_hit": true,
+          "acceptable_selection": true,
+          "invalid_calls": [],
+          "seconds": 3.452,
+          "tokens": 3324
+        },
+        {
+          "id": "stock_research_real",
+          "selected": [
+            "stock-research",
+            "financial-quality-analysis",
+            "valuation-analysis",
+            "equity-report-analysis"
+          ],
+          "catalog_calls": [
+            {
+              "subject": "stock",
+              "dataview": "basic_info",
+              "operation": "query"
+            }
+          ],
+          "primary_hit": true,
+          "acceptable_selection": true,
+          "invalid_calls": [],
+          "seconds": 3.884,
+          "tokens": 3375
+        },
+        {
+          "id": "earnings_analysis_real",
+          "selected": [
+            "earnings-analysis",
+            "financial-quality-analysis"
+          ],
+          "catalog_calls": [
+            {
+              "subject": "stock",
+              "dataview": "financial_3_table",
+              "operation": "query"
+            }
+          ],
+          "primary_hit": true,
+          "acceptable_selection": false,
+          "invalid_calls": [],
+          "seconds": 3.716,
+          "tokens": 3297
+        },
+        {
+          "id": "stock_screening_real",
+          "selected": [
+            "stock-screening",
+            "technical-structure-analysis",
+            "valuation-analysis"
+          ],
+          "catalog_calls": [
+            {
+              "subject": "index",
+              "dataview": "constitution"
+            },
+            {
+              "subject": "stock",
+              "dataview": "pricevalue"
+            },
+            {
+              "subject": "stock",
+              "dataview": "financial_3_table"
+            }
+          ],
+          "primary_hit": true,
+          "acceptable_selection": false,
+          "invalid_calls": [],
+          "seconds": 4.134,
+          "tokens": 3404
+        },
+        {
+          "id": "factor_analysis_real",
+          "selected": [
+            "factor-analysis"
+          ],
+          "catalog_calls": [
+            {
+              "subject": "index",
+              "dataview": "constitution"
+            },
+            {
+              "subject": "stock",
+              "dataview": "quote"
+            }
+          ],
+          "primary_hit": true,
+          "acceptable_selection": true,
+          "invalid_calls": [],
+          "seconds": 3.455,
+          "tokens": 3312
+        },
+        {
+          "id": "valuation_analysis_real",
+          "selected": [
+            "valuation-analysis"
+          ],
+          "catalog_calls": [
+            {
+              "subject": "stock",
+              "dataview": "basic_info",
+              "operation": "query"
+            }
+          ],
+          "primary_hit": true,
+          "acceptable_selection": true,
+          "invalid_calls": [],
+          "seconds": 4.312,
+          "tokens": 3306
+        },
+        {
+          "id": "financial_quality_real",
+          "selected": [
+            "financial-quality-analysis",
+            "earnings-analysis"
+          ],
+          "catalog_calls": [
+            {
+              "subject": "stock",
+              "dataview": "basic_info",
+              "operation": "query"
+            },
+            {
+              "subject": "stock",
+              "dataview": "financial_3_table",
+              "operation": "query"
+            }
+          ],
+          "primary_hit": true,
+          "acceptable_selection": false,
+          "invalid_calls": [],
+          "seconds": 4.245,
+          "tokens": 3368
+        },
+        {
+          "id": "stock_comparison_real",
+          "selected": [
+            "stock-comparison",
+            "financial-quality-analysis",
+            "valuation-analysis"
+          ],
+          "catalog_calls": [
+            {
+              "subject": "stock",
+              "dataview": "basic_info",
+              "operation": "query"
+            }
+          ],
+          "primary_hit": true,
+          "acceptable_selection": true,
+          "invalid_calls": [],
+          "seconds": 3.64,
+          "tokens": 3327
+        },
+        {
+          "id": "technical_structure_real",
+          "selected": [
+            "technical-structure-analysis"
+          ],
+          "catalog_calls": [
+            {
+              "subject": "stock",
+              "dataview": "quote"
+            },
+            {
+              "subject": "stock",
+              "dataview": "basic_info",
+              "operation": "query"
+            }
+          ],
+          "primary_hit": true,
+          "acceptable_selection": true,
+          "invalid_calls": [],
+          "seconds": 4.055,
+          "tokens": 3360
+        },
+        {
+          "id": "dividend_analysis_real",
+          "selected": [
+            "dividend-analysis",
+            "financial-quality-analysis"
+          ],
+          "catalog_calls": [
+            {
+              "subject": "股票",
+              "dataview": "corporate_action",
+              "operation": "query"
+            },
+            {
+              "subject": "股票",
+              "dataview": "financial_3_table",
+              "operation": "query"
+            },
+            {
+              "subject": "股票",
+              "dataview": "pricevalue",
+              "operation": "query"
+            }
+          ],
+          "primary_hit": true,
+          "acceptable_selection": false,
+          "invalid_calls": [],
+          "seconds": 4.392,
+          "tokens": 3425
+        },
+        {
+          "id": "consensus",
+          "selected": [
+            "equity-report-analysis"
+          ],
+          "catalog_calls": [
+            {
+              "subject": "stock",
+              "dataview": "basic_info",
+              "operation": "query"
+            },
+            {
+              "subject": "stock",
+              "dataview": "report",
+              "operation": "query"
+            }
+          ],
+          "primary_hit": true,
+          "acceptable_selection": true,
+          "invalid_calls": [],
+          "seconds": 4.116,
+          "tokens": 3422
+        },
+        {
+          "id": "sensitivity",
+          "selected": [
+            "stock-research",
+            "equity-report-analysis",
+            "earnings-analysis"
+          ],
+          "catalog_calls": [
+            {
+              "subject": "stock",
+              "dataview": "basic_info",
+              "operation": "query"
+            }
+          ],
+          "primary_hit": true,
+          "acceptable_selection": false,
+          "invalid_calls": [],
+          "seconds": 4.4,
+          "tokens": 3402
+        },
+        {
+          "id": "revisions",
+          "selected": [
+            "equity-report-analysis",
+            "stock-research"
+          ],
+          "catalog_calls": [
+            {
+              "subject": "stock",
+              "dataview": "basic_info",
+              "operation": "query"
+            }
+          ],
+          "primary_hit": true,
+          "acceptable_selection": true,
+          "invalid_calls": [],
+          "seconds": 4.509,
+          "tokens": 3452
+        },
+        {
+          "id": "RTE001",
+          "selected": [
+            "stock-research"
+          ],
+          "catalog_calls": [
+            {
+              "subject": "泸州老窖",
+              "dataview": "stock/basic_info",
+              "operation": "query"
+            },
+            {
+              "subject": "泸州老窖",
+              "dataview": "stock/business_segment",
+              "operation": "query"
+            }
+          ],
+          "primary_hit": true,
+          "acceptable_selection": true,
+          "invalid_calls": [],
+          "seconds": 5.186,
+          "tokens": 3424
+        },
+        {
+          "id": "RTE003",
+          "selected": [
+            "stock-comparison",
+            "equity-report-analysis"
+          ],
+          "catalog_calls": [
+            {
+              "subject": "股票",
+              "dataview": "report_metric",
+              "operation": "query"
+            }
+          ],
+          "primary_hit": true,
+          "acceptable_selection": true,
+          "invalid_calls": [],
+          "seconds": 4.941,
+          "tokens": 3359
+        },
+        {
+          "id": "RTE005",
+          "selected": [
+            "equity-report-analysis",
+            "valuation-analysis"
+          ],
+          "catalog_calls": [
+            {
+              "subject": "stock",
+              "dataview": "report",
+              "operation": "query"
+            },
+            {
+              "subject": "stock",
+              "dataview": "basic_info",
+              "operation": "query"
+            }
+          ],
+          "primary_hit": true,
+          "acceptable_selection": false,
+          "invalid_calls": [],
+          "seconds": 4.114,
+          "tokens": 3363
+        },
+        {
+          "id": "raw_quote_control",
+          "selected": [],
+          "catalog_calls": [
+            {
+              "subject": "stock",
+              "dataview": "quote",
+              "operation": "query"
+            }
+          ],
+          "primary_hit": true,
+          "acceptable_selection": true,
+          "invalid_calls": [],
+          "seconds": 1.316,
+          "tokens": 3094
+        },
+        {
+          "id": "direct_01",
+          "selected": [],
+          "catalog_calls": [
+            {
+              "subject": "index",
+              "dataview": "quote",
+              "operation": "window"
+            },
+            {
+              "subject": "index",
+              "dataview": "basic_info",
+              "operation": "query"
+            }
+          ],
+          "primary_hit": true,
+          "acceptable_selection": true,
+          "invalid_calls": [],
+          "seconds": 5.895,
+          "tokens": 3486
+        },
+        {
+          "id": "direct_03",
+          "selected": [
+            "market-overview"
+          ],
+          "catalog_calls": [
+            {
+              "subject": "stock",
+              "dataview": "quote"
+            }
+          ],
+          "primary_hit": false,
+          "acceptable_selection": false,
+          "invalid_calls": [],
+          "seconds": 3.833,
+          "tokens": 3284
+        },
+        {
+          "id": "direct_04",
+          "selected": [],
+          "catalog_calls": [
+            {
+              "subject": "stock",
+              "dataview": "quote"
+            },
+            {
+              "subject": "stock",
+              "dataview": "basic_info"
+            }
+          ],
+          "primary_hit": true,
+          "acceptable_selection": true,
+          "invalid_calls": [],
+          "seconds": 3.09,
+          "tokens": 3263
+        },
+        {
+          "id": "direct_05",
+          "selected": [],
+          "catalog_calls": [
+            {
+              "subject": "比亚迪",
+              "dataview": "moneyflow"
+            }
+          ],
+          "primary_hit": true,
+          "acceptable_selection": true,
+          "invalid_calls": [],
+          "seconds": 4.375,
+          "tokens": 3266
+        },
+        {
+          "id": "direct_09",
+          "selected": [],
+          "catalog_calls": [
+            {
+              "subject": "stock",
+              "dataview": "quote",
+              "operation": "compute"
+            },
+            {
+              "subject": "stock",
+              "dataview": "basic_info",
+              "operation": "query"
+            }
+          ],
+          "primary_hit": true,
+          "acceptable_selection": true,
+          "invalid_calls": [],
+          "seconds": 3.968,
+          "tokens": 3360
+        },
+        {
+          "id": "direct_10",
+          "selected": [],
+          "catalog_calls": [
+            {
+              "dataview": "quote",
+              "subject": "stock"
+            },
+            {
+              "dataview": "quote",
+              "subject": "stock",
+              "operation": "compute"
+            }
+          ],
+          "primary_hit": true,
+          "acceptable_selection": true,
+          "invalid_calls": [],
+          "seconds": 2.81,
+          "tokens": 3215
+        },
+        {
+          "id": "direct_13",
+          "selected": [],
+          "catalog_calls": [
+            {
+              "subject": "stock",
+              "dataview": "quote"
+            },
+            {
+              "subject": "stock",
+              "dataview": "basic_info"
+            }
+          ],
+          "primary_hit": true,
+          "acceptable_selection": true,
+          "invalid_calls": [],
+          "seconds": 2.818,
+          "tokens": 3214
+        },
+        {
+          "id": "direct_17",
+          "selected": [],
+          "catalog_calls": [
+            {
+              "subject": "stock",
+              "dataview": "basic_info",
+              "operation": "query"
+            }
+          ],
+          "primary_hit": true,
+          "acceptable_selection": true,
+          "invalid_calls": [],
+          "seconds": 2.122,
+          "tokens": 3158
+        }
+      ]
+    },
+    {
+      "folder": "server_selection_v4",
+      "cases": [
+        {
+          "id": "market_overview_real",
+          "selected": [
+            "market-overview"
+          ],
+          "catalog_calls": [
+            {
+              "subject": "index",
+              "operation": "query"
+            },
+            {
+              "subject": "stock",
+              "operation": "query"
+            }
+          ],
+          "primary_hit": true,
+          "acceptable_selection": true,
+          "invalid_calls": [],
+          "seconds": 5.32,
+          "tokens": 3605
+        },
+        {
+          "id": "sector_theme_real",
+          "selected": [
+            "sector-theme-analysis",
+            "market-overview"
+          ],
+          "catalog_calls": [
+            {
+              "subject": "plate"
+            },
+            {
+              "subject": "plate",
+              "dataview": "constitution"
+            }
+          ],
+          "primary_hit": true,
+          "acceptable_selection": false,
+          "invalid_calls": [],
+          "seconds": 4.256,
+          "tokens": 3506
+        },
+        {
+          "id": "stock_research_real",
+          "selected": [
+            "stock-research",
+            "financial-quality-analysis",
+            "valuation-analysis",
+            "earnings-analysis"
+          ],
+          "catalog_calls": [
+            {
+              "subject": "stock",
+              "dataview": "basic_info"
+            },
+            {
+              "subject": "stock",
+              "dataview": "quote"
+            },
+            {
+              "subject": "stock",
+              "dataview": "financial_3_table"
+            },
+            {
+              "subject": "stock",
+              "dataview": "pricevalue"
+            }
+          ],
+          "primary_hit": true,
+          "acceptable_selection": false,
+          "invalid_calls": [],
+          "seconds": 6.481,
+          "tokens": 3757
+        },
+        {
+          "id": "earnings_analysis_real",
+          "selected": [
+            "earnings-analysis",
+            "financial-quality-analysis"
+          ],
+          "catalog_calls": [
+            {
+              "subject": "stock",
+              "dataview": "financial_3_table",
+              "operation": "query"
+            }
+          ],
+          "primary_hit": true,
+          "acceptable_selection": false,
+          "invalid_calls": [],
+          "seconds": 4.576,
+          "tokens": 3535
+        },
+        {
+          "id": "stock_screening_real",
+          "selected": [
+            "stock-screening"
+          ],
+          "catalog_calls": [
+            {
+              "subject": "index",
+              "dataview": "constitution"
+            },
+            {
+              "subject": "stock",
+              "dataview": "pricevalue"
+            },
+            {
+              "subject": "stock",
+              "dataview": "financial_3_table"
+            }
+          ],
+          "primary_hit": true,
+          "acceptable_selection": true,
+          "invalid_calls": [],
+          "seconds": 4.886,
+          "tokens": 3600
+        },
+        {
+          "id": "factor_analysis_real",
+          "selected": [
+            "factor-analysis"
+          ],
+          "catalog_calls": [
+            {
+              "subject": "index",
+              "dataview": "constitution"
+            },
+            {
+              "subject": "stock",
+              "dataview": "quote"
+            }
+          ],
+          "primary_hit": true,
+          "acceptable_selection": true,
+          "invalid_calls": [],
+          "seconds": 4.815,
+          "tokens": 3546
+        },
+        {
+          "id": "valuation_analysis_real",
+          "selected": [
+            "valuation-analysis"
+          ],
+          "catalog_calls": [
+            {
+              "subject": "stock",
+              "dataview": "pricevalue"
+            },
+            {
+              "subject": "stock",
+              "dataview": "financial_3_table"
+            },
+            {
+              "subject": "stock",
+              "dataview": "basic_info"
+            }
+          ],
+          "primary_hit": true,
+          "acceptable_selection": true,
+          "invalid_calls": [],
+          "seconds": 4.736,
+          "tokens": 3595
+        },
+        {
+          "id": "financial_quality_real",
+          "selected": [
+            "financial-quality-analysis"
+          ],
+          "catalog_calls": [
+            {
+              "subject": "stock",
+              "dataview": "financial_3_table",
+              "operation": "query"
+            }
+          ],
+          "primary_hit": true,
+          "acceptable_selection": true,
+          "invalid_calls": [],
+          "seconds": 5.245,
+          "tokens": 3560
+        },
+        {
+          "id": "stock_comparison_real",
+          "selected": [
+            "stock-comparison",
+            "financial-quality-analysis",
+            "valuation-analysis"
+          ],
+          "catalog_calls": [
+            {
+              "subject": "stock",
+              "dataview": "financial_3_table",
+              "operation": "query"
+            },
+            {
+              "subject": "stock",
+              "dataview": "pricevalue",
+              "operation": "query"
+            }
+          ],
+          "primary_hit": true,
+          "acceptable_selection": true,
+          "invalid_calls": [],
+          "seconds": 4.363,
+          "tokens": 3558
+        },
+        {
+          "id": "technical_structure_real",
+          "selected": [
+            "technical-structure-analysis"
+          ],
+          "catalog_calls": [
+            {
+              "subject": "stock",
+              "dataview": "quote"
+            },
+            {
+              "subject": "stock",
+              "dataview": "basic_info"
+            }
+          ],
+          "primary_hit": true,
+          "acceptable_selection": true,
+          "invalid_calls": [],
+          "seconds": 3.512,
+          "tokens": 3470
+        },
+        {
+          "id": "dividend_analysis_real",
+          "selected": [
+            "dividend-analysis",
+            "financial-quality-analysis"
+          ],
+          "catalog_calls": [
+            {
+              "subject": "stock",
+              "dataview": "corporate_action"
+            }
+          ],
+          "primary_hit": true,
+          "acceptable_selection": false,
+          "invalid_calls": [],
+          "seconds": 3.321,
+          "tokens": 3458
+        },
+        {
+          "id": "consensus",
+          "selected": [
+            "equity-report-analysis"
+          ],
+          "catalog_calls": [
+            {
+              "subject": "stock",
+              "dataview": "report"
+            }
+          ],
+          "primary_hit": true,
+          "acceptable_selection": true,
+          "invalid_calls": [],
+          "seconds": 3.053,
+          "tokens": 3394
+        },
+        {
+          "id": "sensitivity",
+          "selected": [
+            "stock-research",
+            "equity-report-analysis",
+            "earnings-analysis"
+          ],
+          "catalog_calls": [
+            {
+              "subject": "stock",
+              "dataview": "report"
+            },
+            {
+              "subject": "stock",
+              "dataview": "basic_info"
+            }
+          ],
+          "primary_hit": true,
+          "acceptable_selection": false,
+          "invalid_calls": [],
+          "seconds": 5.06,
+          "tokens": 3591
+        },
+        {
+          "id": "revisions",
+          "selected": [
+            "equity-report-analysis",
+            "earnings-analysis"
+          ],
+          "catalog_calls": [
+            {
+              "subject": "stock",
+              "dataview": "basic_info",
+              "operation": "query"
+            }
+          ],
+          "primary_hit": true,
+          "acceptable_selection": false,
+          "invalid_calls": [],
+          "seconds": 4.044,
+          "tokens": 3488
+        },
+        {
+          "id": "RTE001",
+          "selected": [
+            "stock-research"
+          ],
+          "catalog_calls": [
+            {
+              "subject": "stock",
+              "dataview": "basic_info",
+              "operation": "query"
+            }
+          ],
+          "primary_hit": true,
+          "acceptable_selection": true,
+          "invalid_calls": [],
+          "seconds": 4.14,
+          "tokens": 3499
+        },
+        {
+          "id": "RTE003",
+          "selected": [
+            "stock-comparison",
+            "equity-report-analysis"
+          ],
+          "catalog_calls": [
+            {
+              "subject": "stock",
+              "dataview": "report_metric"
+            },
+            {
+              "subject": "stock",
+              "dataview": "report"
+            }
+          ],
+          "primary_hit": true,
+          "acceptable_selection": true,
+          "invalid_calls": [],
+          "seconds": 4.961,
+          "tokens": 3556
+        },
+        {
+          "id": "RTE005",
+          "selected": [
+            "equity-report-analysis"
+          ],
+          "catalog_calls": [
+            {
+              "subject": "stock",
+              "dataview": "report"
+            },
+            {
+              "subject": "stock",
+              "dataview": "report_metric"
+            }
+          ],
+          "primary_hit": true,
+          "acceptable_selection": true,
+          "invalid_calls": [],
+          "seconds": 3.375,
+          "tokens": 3431
+        },
+        {
+          "id": "raw_quote_control",
+          "selected": [],
+          "catalog_calls": [
+            {
+              "subject": "stock",
+              "dataview": "quote"
+            }
+          ],
+          "primary_hit": true,
+          "acceptable_selection": true,
+          "invalid_calls": [],
+          "seconds": 3.138,
+          "tokens": 3339
+        },
+        {
+          "id": "direct_01",
+          "selected": [],
+          "catalog_calls": [
+            {
+              "dataview": "quote",
+              "subject": "index"
+            },
+            {
+              "dataview": "basic_info",
+              "subject": "index"
+            }
+          ],
+          "primary_hit": true,
+          "acceptable_selection": true,
+          "invalid_calls": [],
+          "seconds": 3.583,
+          "tokens": 3380
+        },
+        {
+          "id": "direct_03",
+          "selected": [
+            "market-overview"
+          ],
+          "catalog_calls": [
+            {
+              "subject": "stock",
+              "dataview": "quote"
+            }
+          ],
+          "primary_hit": false,
+          "acceptable_selection": false,
+          "invalid_calls": [],
+          "seconds": 3.22,
+          "tokens": 3376
+        },
+        {
+          "id": "direct_04",
+          "selected": [],
+          "catalog_calls": [
+            {
+              "subject": "stock",
+              "dataview": "quote"
+            }
+          ],
+          "primary_hit": true,
+          "acceptable_selection": true,
+          "invalid_calls": [],
+          "seconds": 1.701,
+          "tokens": 3234
+        },
+        {
+          "id": "direct_05",
+          "selected": [
+            "stock-research"
+          ],
+          "catalog_calls": [
+            {
+              "subject": "stock",
+              "dataview": "moneyflow"
+            }
+          ],
+          "primary_hit": false,
+          "acceptable_selection": false,
+          "invalid_calls": [],
+          "seconds": 2.556,
+          "tokens": 3360
+        },
+        {
+          "id": "direct_09",
+          "selected": [
+            "technical-structure-analysis"
+          ],
+          "catalog_calls": [
+            {
+              "subject": "stock",
+              "dataview": "quote"
+            },
+            {
+              "subject": "stock",
+              "dataview": "basic_info",
+              "operation": "query"
+            }
+          ],
+          "primary_hit": false,
+          "acceptable_selection": false,
+          "invalid_calls": [],
+          "seconds": 5.516,
+          "tokens": 3624
+        },
+        {
+          "id": "direct_10",
+          "selected": [
+            "stock-screening"
+          ],
+          "catalog_calls": [
+            {
+              "subject": "stock",
+              "dataview": "quote"
+            }
+          ],
+          "primary_hit": false,
+          "acceptable_selection": false,
+          "invalid_calls": [],
+          "seconds": 8.048,
+          "tokens": 3666
+        },
+        {
+          "id": "direct_13",
+          "selected": [],
+          "catalog_calls": [
+            {
+              "dataview": "quote",
+              "subject": "stock"
+            }
+          ],
+          "primary_hit": true,
+          "acceptable_selection": true,
+          "invalid_calls": [],
+          "seconds": 4.626,
+          "tokens": 3440
+        },
+        {
+          "id": "direct_17",
+          "selected": [],
+          "catalog_calls": [
+            {
+              "subject": "stock",
+              "dataview": "basic_info",
+              "operation": "query"
+            }
+          ],
+          "primary_hit": true,
+          "acceptable_selection": true,
+          "invalid_calls": [],
+          "seconds": 2.847,
+          "tokens": 3318
+        }
+      ]
+    }
+  ],
+  "mcp_iterations": [
+    {
+      "folder": "server_mcp",
+      "cases": [
+        {
+          "id": "RTE009",
+          "revision": "4536033",
+          "ok": true,
+          "turns": 8,
+          "seconds": 34.751656000000004,
+          "tokens": 75381,
+          "rows": 0,
+          "apis": [
+            "stock.financial_3_table.query",
+            "stock.report.query",
+            "stock.report_metric.query"
+          ]
+        },
+        {
+          "id": "RTE010",
+          "revision": "4536033",
+          "ok": true,
+          "turns": 6,
+          "seconds": 31.290489,
+          "tokens": 72455,
+          "rows": 15,
+          "apis": [
+            "stock.financial_3_table.query",
+            "stock.report.query"
+          ]
+        },
+        {
+          "id": "RTE017",
+          "revision": "4536033",
+          "ok": true,
+          "turns": 6,
+          "seconds": 21.518764,
+          "tokens": 46751,
+          "rows": 18,
+          "apis": [
+            "stock.report.query"
+          ]
+        },
+        {
+          "id": "RTE020",
+          "revision": "4536033",
+          "ok": true,
+          "turns": 6,
+          "seconds": 35.220495,
+          "tokens": 63403,
+          "rows": 60,
+          "apis": [
+            "stock.business_segment.query",
+            "stock.report.query"
+          ]
+        },
+        {
+          "id": "raw_quote_control",
+          "revision": "4536033",
+          "ok": true,
+          "turns": 7,
+          "seconds": 13.683674000000002,
+          "tokens": 40653,
+          "rows": 1,
+          "apis": [
+            "stock.quote.query"
+          ]
+        },
+        {
+          "id": "direct_01",
+          "revision": "4536033",
+          "ok": true,
+          "turns": 6,
+          "seconds": 45.649586000000006,
+          "tokens": 47353,
+          "rows": 30,
+          "apis": [
+            "index.quote.query"
+          ]
+        },
+        {
+          "id": "direct_03",
+          "revision": "4536033",
+          "ok": true,
+          "turns": 6,
+          "seconds": 32.220241,
+          "tokens": 42362,
+          "rows": 5573,
+          "apis": [
+            "stock.quote.query",
+            "stock.quote.agg"
+          ]
+        },
+        {
+          "id": "direct_13",
+          "revision": "4536033",
+          "ok": true,
+          "turns": 4,
+          "seconds": 20.73178,
+          "tokens": 22349,
+          "rows": 20,
+          "apis": [
+            "stock.quote.query"
+          ]
+        }
+      ]
+    },
+    {
+      "folder": "server_mcp_v3",
+      "cases": [
+        {
+          "id": "RTE009",
+          "revision": "3fe615d",
+          "ok": true,
+          "turns": 3,
+          "seconds": 26.906986,
+          "tokens": 13781,
+          "rows": 0,
+          "apis": []
+        },
+        {
+          "id": "RTE010",
+          "revision": "3fe615d",
+          "ok": true,
+          "turns": 5,
+          "seconds": 32.976833,
+          "tokens": 54035,
+          "rows": 14,
+          "apis": [
+            "stock.financial_3_table.query",
+            "stock.report.query"
+          ]
+        },
+        {
+          "id": "RTE017",
+          "revision": "3fe615d",
+          "ok": true,
+          "turns": 9,
+          "seconds": 30.135391,
+          "tokens": 78528,
+          "rows": 0,
+          "apis": [
+            "stock.report.query",
+            "stock.basic_info.query",
+            "stock.report_metric.query"
+          ]
+        },
+        {
+          "id": "RTE020",
+          "revision": "3fe615d",
+          "ok": true,
+          "turns": 6,
+          "seconds": 25.781325000000002,
+          "tokens": 62666,
+          "rows": 25,
+          "apis": [
+            "stock.business_segment.query",
+            "stock.report.query"
+          ]
+        },
+        {
+          "id": "raw_quote_control",
+          "revision": "3fe615d",
+          "ok": true,
+          "turns": 3,
+          "seconds": 5.458114999999999,
+          "tokens": 15579,
+          "rows": 1,
+          "apis": [
+            "stock.quote.query"
+          ]
+        },
+        {
+          "id": "direct_01",
+          "revision": "3fe615d",
+          "ok": true,
+          "turns": 5,
+          "seconds": 20.925015,
+          "tokens": 31490,
+          "rows": 50,
+          "apis": [
+            "index.quote.query"
+          ]
+        },
+        {
+          "id": "direct_03",
+          "revision": "3fe615d",
+          "ok": true,
+          "turns": 4,
+          "seconds": 33.609008,
+          "tokens": 28670,
+          "rows": 11088,
+          "apis": [
+            "stock.quote.query"
+          ]
+        },
+        {
+          "id": "direct_13",
+          "revision": "3fe615d",
+          "ok": true,
+          "turns": 3,
+          "seconds": 18.150647,
+          "tokens": 22063,
+          "rows": 20,
+          "apis": [
+            "stock.quote.query"
+          ]
+        }
+      ]
+    },
+    {
+      "folder": "server_mcp_v4",
+      "cases": [
+        {
+          "id": "RTE009",
+          "revision": "1dfb8ae",
+          "ok": true,
+          "turns": 4,
+          "seconds": 22.031629000000002,
+          "tokens": 28185,
+          "rows": 0,
+          "apis": [
+            "stock.basic_info.query",
+            "stock.financial_3_table.query"
+          ]
+        },
+        {
+          "id": "RTE010",
+          "revision": "1dfb8ae",
+          "ok": true,
+          "turns": 4,
+          "seconds": 20.722661,
+          "tokens": 42793,
+          "rows": 58,
+          "apis": [
+            "stock.report.query",
+            "stock.business_segment.query"
+          ]
+        },
+        {
+          "id": "RTE017",
+          "revision": "1dfb8ae",
+          "ok": true,
+          "turns": 11,
+          "seconds": 43.238951,
+          "tokens": 100645,
+          "rows": 5,
+          "apis": [
+            "stock.report.query"
+          ]
+        },
+        {
+          "id": "RTE020",
+          "revision": "1dfb8ae",
+          "ok": true,
+          "turns": 5,
+          "seconds": 29.748749,
+          "tokens": 36088,
+          "rows": 39,
+          "apis": [
+            "stock.basic_info.query",
+            "stock.business_segment.query",
+            "stock.report.query"
+          ]
+        },
+        {
+          "id": "raw_quote_control",
+          "revision": "1dfb8ae",
+          "ok": true,
+          "turns": 3,
+          "seconds": 6.586009,
+          "tokens": 19478,
+          "rows": 1,
+          "apis": [
+            "stock.quote.query"
+          ]
+        },
+        {
+          "id": "direct_01",
+          "revision": "1dfb8ae",
+          "ok": true,
+          "turns": 4,
+          "seconds": 21.765876,
+          "tokens": 26099,
+          "rows": 30,
+          "apis": [
+            "index.quote.query"
+          ]
+        },
+        {
+          "id": "direct_03",
+          "revision": "1dfb8ae",
+          "ok": true,
+          "turns": 3,
+          "seconds": 20.644097000000002,
+          "tokens": 21906,
+          "rows": 4,
+          "apis": [
+            "stock.quote.agg"
+          ]
+        },
+        {
+          "id": "direct_13",
+          "revision": "1dfb8ae",
+          "ok": true,
+          "turns": 3,
+          "seconds": 16.84376,
+          "tokens": 18139,
+          "rows": 20,
+          "apis": [
+            "stock.quote.query"
+          ]
+        }
+      ]
+    }
+  ]
+}

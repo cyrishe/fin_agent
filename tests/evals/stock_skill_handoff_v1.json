@@ -1,0 +1,19 @@
+{
+  "description": "冻结个股案例的阶段交接消融；计算计划由评测提供，不表示模型自主选择计算已验证。",
+  "calculations": [
+    {"result_name": "r1", "operation": "endpoint_change", "date_field": "tradedate", "value_field": "adjclose", "start": "2026-08-28", "end": "2026-09-28"},
+    {"result_name": "r1", "operation": "price_range", "date_field": "tradedate", "start": "2026-08-28", "end": "2026-09-28"},
+    {"result_name": "r6", "operation": "endpoint_change", "date_field": "tradedate", "value_field": "close", "start": "2026-08-28", "end": "2026-09-28"},
+    {"result_name": "r7", "operation": "endpoint_change", "date_field": "tradedate", "value_field": "close", "start": "2026-08-28", "end": "2026-09-28"},
+    {"result_name": "r10", "operation": "endpoint_change", "date_field": "tradedate", "value_field": "financing_balance", "start": "2026-08-20", "end": "2026-09-28"},
+    {"result_name": "r10", "operation": "endpoint_change", "date_field": "tradedate", "value_field": "securities_lending_balance", "start": "2026-08-20", "end": "2026-09-28"}
+  ],
+  "manual_review": [
+    "明确区分45行行情、1行指标、最新收盘快照的日期与覆盖范围",
+    "ATR/收盘价不能表述为每日收益率或每日波幅",
+    "期间、价格口径、公式和数字一致",
+    "不从单个指标快照推导连续变化或历史分位",
+    "对资金意图和趋势保持证据约束，并提供反证",
+    "回应用户关注点而非逐个罗列全部指标"
+  ]
+}

@@ -44,7 +44,7 @@ class IntentRouter:
 
         explicit_task_type = str(context.get("task_type") or "").strip()
         if explicit_task_type in {"stock_deep_dive", "hotspot_trace"}:
-            return self._single_skill_route(
+            explicit_route = self._single_skill_route(
                 skill_name=explicit_task_type,
                 confidence=0.98,
                 reason="context.task_type explicitly specifies the skill",
@@ -55,6 +55,7 @@ class IntentRouter:
                     resolved_time=resolved_time,
                 ),
             )
+            return self._apply_skill_constraints(route=explicit_route, context=context)
 
         route = self._route_by_semantics(
             text=text,
@@ -169,9 +170,10 @@ class IntentRouter:
         route: Dict[str, Any],
         context: Dict[str, Any],
     ) -> Dict[str, Any]:
-        allowed_skills = [str(x).strip() for x in (context or {}).get("allowed_skills", []) if str(x).strip()]
-        if not allowed_skills:
+        raw_allowed_skills = (context or {}).get("allowed_skills")
+        if not isinstance(raw_allowed_skills, list):
             return route
+        allowed_skills = [str(x).strip() for x in raw_allowed_skills if str(x).strip()]
 
         allowed_set = set(allowed_skills)
         constrained = dict(route or {})

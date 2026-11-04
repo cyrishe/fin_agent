@@ -1,0 +1,11 @@
+{
+  "candidate_filter": "kcrp_stock_st effective interval; keep N/R",
+  "input_rows": 13992,
+  "test_rows": 5628,
+  "sources": {
+    "outputs/stock_automl/historical_st_8to9/exact_candidates_without_historical_st.csv.gz": "dfa46962033ce984ea94184fe035d12bc83f8e91eaf12ac96e167924629292cd",
+    "docs/stock_automl_runs/20261009_second_high_regression/second_high_prices.csv.gz": "3e979277eac24110e0b7abb63d6ef59fd2977788ff66185c6e6fc4e579d1811c",
+    "scripts/experiment_automl_second_high_five_class.py": "9832e5939db9de2aaaae06a6c0ba1bfab507be818632da6719b518cacdbc26c7",
+    "scripts/audit_automl_four_class_diagnostics.py": "5ede22b395f56f1c7721ed2fbe5b56fab425a6dc0ee113d3d822e73ecc46f546"
+  }
+}

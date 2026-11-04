@@ -1,0 +1,242 @@
+from __future__ import annotations
+
+import asyncio
+import threading
+import time
+from typing import Any
+
+from src.finance_api.models import FinanceQueryRequest
+from src.finance_api.service import FinanceApiGateway
+
+
+class _Engine:
+    def __init__(self) -> None:
+        self.calls: list[dict[str, Any]] = []
+        self.closed = False
+
+    def answer(self, **kwargs: Any) -> dict[str, Any]:
+        self.calls.append(kwargs)
+        return {
+            "summary": "贵州茅台最近三条行情已经取得。",
+            "message": "贵州茅台最近三条行情已经取得。",
+            "model_name": "deepseek-v4-flash",
+            "financial_qa": {
+                "duration_ms": 1234,
+                "reasoning_effort": "low",
+                "tool_calls": [{"tool": "finance_query"}],
+                "result_refs": [
+                    {
+                        "api": "stock.quote",
+                        "row_count": 3,
+                        "result_ref": "dataref_should_not_be_public",
+                    }
+                ],
+                "error": "",
+            },
+            "data": {
+                "format": "row-dict",
+                "results": [
+                    {
+                        "result_name": "r1",
+                        "goal": "查询行情",
+                        "api": "stock.quote",
+                        "data_type": "table",
+                        "schema": {"columns": [{"name": "close"}]},
+                        "row_count": 3,
+                        "result_ref": "dataref_should_not_be_public",
+                        "rows": [
+                            {"close": 1},
+                            {"close": 2},
+                            {"close": 3},
+                        ],
+                    }
+                ],
+            },
+        }
+
+    def close(self) -> None:
+        self.closed = True
+
+
+def test_gateway_data_mode_returns_rows_without_summary_and_caps_output() -> None:
+    engine = _Engine()
+    gateway = FinanceApiGateway(
+        engine=engine,
+        default_runtime="dsh",
+        max_concurrency=1,
+    )
+    response = asyncio.run(
+        gateway.execute(
+            FinanceQueryRequest(
+                query="贵州茅台最近行情",
+                response_mode="data",
+                execution_mode="fast",
+                max_rows=2,
+                conversation_id="conversation-1",
+            ),
+            principal_id="client-a",
+        )
+    )
+
+    assert response.ok is True
+    assert response.execution_mode == "fast"
+    assert response.summary is None
+    assert response.data is not None
+    assert response.data.results[0].rows == [{"close": 1}, {"close": 2}]
+    assert response.data_sources[0].label == "股票 · 行情"
+    assert response.data_sources[0].data_object == "股票"
+    assert response.data_sources[0].data_type == "行情"
+    assert response.data_sources[0].query_goal == "查询行情"
+    assert response.data_sources[0].row_count == 3
+    assert response.data.results[0].truncated is True
+    assert response.execution.truncated is True
+    assert engine.calls[0]["data_only"] is True
+    assert engine.calls[0]["execution_mode"] == "fast"
+    assert engine.calls[0]["isolated_request"] is False
+    assert response.conversation_id == "conversation-1"
+    assert engine.calls[0]["include_response_data"] is True
+    assert engine.calls[0]["response_data_max_rows"] == 2
+    assert engine.calls[0]["runtime"] == "dsh"
+    assert engine.calls[0]["owner_id"] == "finance-api:client-a"
+    assert "dataref_should_not_be_public" not in response.model_dump_json()
+
+
+def test_gateway_summary_mode_omits_structured_rows_and_isolates_principals() -> None:
+    engine = _Engine()
+    gateway = FinanceApiGateway(engine=engine, default_runtime="cc")
+
+    first = asyncio.run(
+        gateway.execute(
+            FinanceQueryRequest(
+                query="解释贵州茅台行情",
+                response_mode="summary",
+                conversation_id="same-public-id",
+            ),
+            principal_id="client-a",
+        )
+    )
+    second = asyncio.run(
+        gateway.execute(
+            FinanceQueryRequest(
+                query="继续",
+                response_mode="summary",
+                conversation_id="same-public-id",
+            ),
+            principal_id="client-b",
+        )
+    )
+
+    assert first.summary
+    assert first.data is None
+    assert first.execution.result_count == 1
+    assert first.execution.total_rows == 3
+    assert first.execution.returned_rows == 0
+    assert [item.label for item in first.data_sources] == ["股票 · 行情"]
+    assert "stock.quote" not in first.model_dump_json()
+    assert engine.calls[0]["data_only"] is False
+    assert engine.calls[0]["include_response_data"] is False
+    assert engine.calls[0]["response_data_max_rows"] == 100
+    assert engine.calls[0]["thread_id"] != engine.calls[1]["thread_id"]
+    assert second.runtime == "cc"
+
+
+def test_gateway_close_closes_shared_execution_core() -> None:
+    engine = _Engine()
+    gateway = FinanceApiGateway(engine=engine)
+    gateway.close()
+    assert engine.closed is True
+
+
+def test_detail_is_opt_in_and_does_not_change_engine_request():
+    class DetailedEngine(_Engine):
+        def answer(self, **kwargs):
+            raw = super().answer(**kwargs)
+            raw["llm_usage"] = {"cumulative_context_tokens": 120, "completion_tokens": 30, "secret": "not_public"}
+            raw["financial_qa"].update(assistant_message_count=2,
+                execution_steps=[{"kind": "llm", "duration_ms": 100, "usage": {"output_tokens": 30}}],
+                prompt_assets={"system_prompt": "not_public"})
+            raw["financial_qa"]["tool_calls"] = [{"tool": "finance_query", "api": "stock.quote", "api_execution_ms": 12,
+                "request": "stock.quote()", "result_ref": "not_public", "attempts": [{"duration_ms": 15}]}]
+            return raw
+    engine = DetailedEngine()
+    gateway = FinanceApiGateway(engine=engine)
+    plain = asyncio.run(gateway.execute(FinanceQueryRequest(query="行情", response_mode="data"), principal_id="a"))
+    rich = asyncio.run(gateway.execute(FinanceQueryRequest(query="行情", response_mode="data", detail=True), principal_id="a"))
+    assert "detail" not in plain.model_dump()
+    assert "detail" not in plain.model_dump_json()
+    assert rich.detail["turns"] == 2
+    assert rich.detail["total_tokens"] == 150
+    assert rich.detail["request_duration_ms"] >= 0
+    assert rich.detail["tool_calls"][0]["api_execution_ms"] == 12
+    assert "not_public" not in rich.model_dump_json()
+    assert rich.summary is None
+    assert all(call["data_only"] for call in engine.calls)
+
+
+def test_gateway_admits_ten_isolated_requests_concurrently() -> None:
+    class _ConcurrentEngine(_Engine):
+        def __init__(self) -> None:
+            super().__init__()
+            self.lock = threading.Lock()
+            self.active = 0
+            self.max_active = 0
+
+        def answer(self, **kwargs: Any) -> dict[str, Any]:
+            with self.lock:
+                self.active += 1
+                self.max_active = max(self.max_active, self.active)
+            time.sleep(0.05)
+            try:
+                return super().answer(**kwargs)
+            finally:
+                with self.lock:
+                    self.active -= 1
+
+    async def execute_all(gateway: FinanceApiGateway):
+        return await asyncio.gather(
+            *[
+                gateway.execute(
+                    FinanceQueryRequest(
+                        query=f"独立查询 {index}",
+                        response_mode="data",
+                    ),
+                    principal_id="client-a",
+                )
+                for index in range(10)
+            ]
+        )
+
+    engine = _ConcurrentEngine()
+    gateway = FinanceApiGateway(
+        engine=engine,
+        default_runtime="dsh",
+        max_concurrency=10,
+    )
+    responses = asyncio.run(execute_all(gateway))
+
+    assert engine.max_active == 10
+    assert len({item["thread_id"] for item in engine.calls}) == 10
+    assert len({item["turn_id"] for item in engine.calls}) == 10
+    assert all(item["isolated_request"] is True for item in engine.calls)
+    assert all(response.conversation_id is None for response in responses)
+
+
+def test_context_is_independent_by_default_and_explicit_id_opts_into_continuity():
+    engine = _Engine()
+    gateway = FinanceApiGateway(engine=engine)
+
+    async def run():
+        for channel in ("mcp", "http_api"):
+            for conversation_id in (None, None, "shared", "shared"):
+                response = await gateway.execute(
+                    FinanceQueryRequest(query="查询行情", conversation_id=conversation_id, response_mode="data"),
+                    principal_id="same-user", request_channel=channel,
+                )
+                assert response.conversation_id == conversation_id
+
+    asyncio.run(run())
+    independent = [c for c in engine.calls if c["isolated_request"]]
+    continued = [c for c in engine.calls if not c["isolated_request"]]
+    assert len(independent) == len(continued) == 4
+    assert len({c["thread_id"] for c in independent}) == 4
+    assert len({c["thread_id"] for c in continued}) == 1

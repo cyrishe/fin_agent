@@ -1,0 +1,313 @@
+{
+  "checked_at_utc": "2026-10-03T15:26:42.086892+00:00",
+  "task_id": "sch_52bdaec61c91414caec3532f8f11c0b8",
+  "run_id": "run_4e14beb462ca40b1b2553d2e055e056f",
+  "run_status": "completed",
+  "started_at": "2026-10-03T15:22:48.514253+00:00",
+  "finished_at": "2026-10-03T15:24:12.806013+00:00",
+  "git_commit": "788a42b8780590571813b6edf87cbc6418a2d018",
+  "working_tree_dirty": true,
+  "requirement_sha256": "58f8dbb56e51c13761984ab09a732e24d78b70c0a69e4ba1bb33faa01a0ba2de",
+  "planning": {
+    "directions": 2,
+    "shared_max_trials": 4,
+    "direction_allocations": [
+      2,
+      2
+    ],
+    "total_attempted_trials": 4,
+    "max_symbols": null,
+    "industries": [
+      "银行"
+    ],
+    "start": "2024-01-01",
+    "end": "2025-12-31",
+    "folds": 2,
+    "rounds": 1,
+    "min_precision": 0.65,
+    "test_fraction": 0.2,
+    "company_holdout_fraction": 0.2,
+    "optimize_threshold": true,
+    "probability_threshold": 0.6,
+    "has_global_winner": false
+  },
+  "semantic_review": {
+    "assessment": "Manual comparison of current plan, actual sampler code, saved model parameters, metrics and both LLM reviews.",
+    "momentum_definition_correct": true,
+    "reversal_definition_correct": true,
+    "no_implicit_fallback_claim": true,
+    "no_invented_observed_holdout_dates": true,
+    "study_uses_recorded_test_start": "2025-08-11",
+    "llm_review_coefficients_match_calibrated_model": true,
+    "review_recognizes_repeated_historical_window": true,
+    "notes": [
+      "Direction 1 plan and review consistently define momentum as return_7 > 0 and price above MA20.",
+      "Direction 2 plan and review consistently define reversal as return_3 < -0.02, without a cross-sectional bottom-30% claim.",
+      "Direction 2 proposes a future evaluation after December 2025; this is explicitly a next-research suggestion, not a fabricated date for the completed run.",
+      "Direction 1 meets development conditions but its out-of-time precision falls to 25% / 0%; direction 2 fails an OOF date-macro precision condition and has out-of-time precision 41.38% / 38.10%. Reviews distinguish these outcomes from future guarantees."
+    ]
+  },
+  "scope_note": "Previously used 2024-2025 bank data: workflow verification only, not a fresh blind test or a validated investment strategy.",
+  "inference_scope": "Validated local Python predict_strategy reuse of the trained assets on the saved historical panel. No fit was permitted during the check. A natural-language scheduled inference task/tool has not been integrated or verified by this run; no daily retraining was added.",
+  "privacy": "Only aggregate evidence and hashes; no credentials, owner identity, raw market rows, row predictions or serialized model contents copied.",
+  "checks": {
+    "run_completed": true,
+    "budget_4_equals_2_plus_2": true,
+    "all_bank_universe_no_company_cap": true,
+    "both_explanations_real_and_sent_to_llm": true,
+    "both_strategy_inferences_match_without_fitting": true,
+    "all_downloads_200_and_hash_match": true,
+    "qualification_matches_saved_development_checks": true,
+    "semantic_sampler_and_date_fidelity": true,
+    "scheduled_natural_language_inference_verified": false
+  },
+  "artifact_count": 27,
+  "full_local_audit_sha256": "3fa3e79611545e62026ce0572b707bc7285987c25116beca8d25061ffd35e077",
+  "directions": [
+    {
+      "id": "direction_1",
+      "strategy_id": "20261003T152332Z_2f8392d4",
+      "attempted_trials": 2,
+      "successful_trials": 2,
+      "candidate": {
+        "horizon": 3,
+        "task": "classification",
+        "model": "linear",
+        "sampler": "momentum",
+        "features": "technical",
+        "depth": 6,
+        "strength": 3.0,
+        "id": "8963423af2f5"
+      },
+      "features": [
+        "return_1",
+        "return_3",
+        "return_7",
+        "ma_distance",
+        "volume_ratio",
+        "volatility_20",
+        "turn_ratio"
+      ],
+      "planned_features_match": true,
+      "sample_counts": {
+        "panel_rows": 20370,
+        "companies": 42,
+        "sessions": 485,
+        "eligible_by_horizon": {
+          "3": 19362
+        },
+        "development_companies": 34,
+        "heldout_company_count": 8,
+        "development_rows_before_sampler": 12376,
+        "development_rows_after_sampler": 6184,
+        "fit_calibration_counts": {
+          "input_rows": 4586,
+          "fit_rows": 3555,
+          "calibration_rows": 924,
+          "purged_rows": 107,
+          "budget_sampled_out_rows": 0
+        },
+        "policy_selection": {
+          "rows": 1510,
+          "signal_start": "2025-04-23T00:00:00",
+          "signal_end": "2025-08-04T00:00:00",
+          "model_latest_label_end": "2025-04-22T00:00:00",
+          "purged_before_policy": 88
+        },
+        "test_start": "2025-08-11T00:00:00",
+        "test_signal_end": "2025-12-25T00:00:00",
+        "heldout_rows_after_sampler": {
+          "new_period": 985,
+          "new_companies_and_period": 228
+        }
+      },
+      "development_constraints_met": true,
+      "development_constraint_checks": {
+        "enough_signals": true,
+        "enough_signal_dates": true,
+        "target_precision_at_least_minimum": true,
+        "date_macro_precision_at_least_minimum": true,
+        "drawdown_within_limit": true,
+        "net_signal_win_rate_at_least_minimum": true,
+        "final_policy_support_and_precision": true,
+        "final_policy_net_signal_win_rate_at_least_minimum": true,
+        "final_policy_drawdown_within_limit": true
+      },
+      "frozen_threshold": 0.49565083146433425,
+      "frozen_top_k": 3,
+      "model_label_end_before_policy": true,
+      "evaluation": {
+        "new_period": {
+          "rows": 985,
+          "companies": 34,
+          "signal_count": 4,
+          "signal_dates": 4,
+          "target_precision": 0.25,
+          "actual_down_count": 3,
+          "actual_down_rate": 0.75,
+          "signal_win_rate_after_cost": 0.25,
+          "portfolio_return": -0.040047269548729725,
+          "portfolio_max_drawdown": -0.040047269548729725
+        },
+        "new_companies_and_period": {
+          "rows": 228,
+          "companies": 8,
+          "signal_count": 2,
+          "signal_dates": 2,
+          "target_precision": 0.0,
+          "actual_down_count": 1,
+          "actual_down_rate": 0.5,
+          "signal_win_rate_after_cost": 0.0,
+          "portfolio_return": -0.006798516499178842,
+          "portfolio_max_drawdown": -0.010019645248122488
+        }
+      },
+      "inference_reuse": {
+        "asof": "2025-12-31",
+        "scored_rows": 16,
+        "selected_count": 0,
+        "predictions_match_frozen_model": true,
+        "selected_match_frozen_policy": true,
+        "model_file_unchanged": true,
+        "fit_and_fit_transform_forbidden_during_check": true
+      },
+      "implementation_sha256": "c48becd2c53d0def20ee31bc17a3d2e4debaa7ee8da643770a853444ab10b7c0",
+      "panel_sha256": "8d6f480a14b0636e6be7a258e8a704382ac8eaf7180d29ec30f86b75f154934e",
+      "explanation": {
+        "estimator": "LogisticRegression",
+        "method": "linear_coefficients",
+        "matches_real_fitted_model": true,
+        "exact_explanation_in_llm_evidence": true,
+        "review_status": {
+          "completed": true,
+          "requested": true
+        },
+        "shared_data_contract_in_snapshot": true,
+        "thinking_enabled_in_snapshotted_review_client": true
+      }
+    },
+    {
+      "id": "direction_2",
+      "strategy_id": "20261003T152355Z_ee1dd0d3",
+      "attempted_trials": 2,
+      "successful_trials": 2,
+      "candidate": {
+        "horizon": 3,
+        "task": "classification",
+        "model": "linear",
+        "sampler": "reversal",
+        "features": "enriched",
+        "depth": 6,
+        "strength": 3.0,
+        "id": "efcfb2caa305"
+      },
+      "features": [
+        "return_3",
+        "return_7",
+        "volatility_20",
+        "range_ratio",
+        "pe_ttm",
+        "pb_mrq",
+        "total_mv",
+        "turn_ratio"
+      ],
+      "planned_features_match": true,
+      "sample_counts": {
+        "panel_rows": 20370,
+        "companies": 42,
+        "sessions": 485,
+        "eligible_by_horizon": {
+          "3": 19362
+        },
+        "development_companies": 34,
+        "heldout_company_count": 8,
+        "development_rows_before_sampler": 12376,
+        "development_rows_after_sampler": 1747,
+        "fit_calibration_counts": {
+          "input_rows": 1373,
+          "fit_rows": 994,
+          "calibration_rows": 372,
+          "purged_rows": 7,
+          "budget_sampled_out_rows": 0
+        },
+        "policy_selection": {
+          "rows": 366,
+          "signal_start": "2025-03-28T00:00:00",
+          "signal_end": "2025-08-04T00:00:00",
+          "model_latest_label_end": "2025-03-25T00:00:00",
+          "purged_before_policy": 8
+        },
+        "test_start": "2025-08-11T00:00:00",
+        "test_signal_end": "2025-12-25T00:00:00",
+        "heldout_rows_after_sampler": {
+          "new_period": 540,
+          "new_companies_and_period": 145
+        }
+      },
+      "development_constraints_met": false,
+      "development_constraint_checks": {
+        "enough_signals": true,
+        "enough_signal_dates": true,
+        "target_precision_at_least_minimum": true,
+        "date_macro_precision_at_least_minimum": false,
+        "drawdown_within_limit": true,
+        "net_signal_win_rate_at_least_minimum": true,
+        "final_policy_support_and_precision": true,
+        "final_policy_net_signal_win_rate_at_least_minimum": true,
+        "final_policy_drawdown_within_limit": true
+      },
+      "frozen_threshold": 0.7323345495679384,
+      "frozen_top_k": 3,
+      "model_label_end_before_policy": true,
+      "evaluation": {
+        "new_period": {
+          "rows": 540,
+          "companies": 34,
+          "signal_count": 29,
+          "signal_dates": 21,
+          "target_precision": 0.41379310344827586,
+          "actual_down_count": 16,
+          "actual_down_rate": 0.5517241379310345,
+          "signal_win_rate_after_cost": 0.3793103448275862,
+          "portfolio_return": 0.03376461601530445,
+          "portfolio_max_drawdown": -0.03742255169437636
+        },
+        "new_companies_and_period": {
+          "rows": 145,
+          "companies": 8,
+          "signal_count": 21,
+          "signal_dates": 17,
+          "target_precision": 0.38095238095238093,
+          "actual_down_count": 12,
+          "actual_down_rate": 0.5714285714285714,
+          "signal_win_rate_after_cost": 0.2857142857142857,
+          "portfolio_return": -0.07840558971667932,
+          "portfolio_max_drawdown": -0.07966494313930339
+        }
+      },
+      "inference_reuse": {
+        "asof": "2025-12-31",
+        "scored_rows": 1,
+        "selected_count": 0,
+        "predictions_match_frozen_model": true,
+        "selected_match_frozen_policy": true,
+        "model_file_unchanged": true,
+        "fit_and_fit_transform_forbidden_during_check": true
+      },
+      "implementation_sha256": "c48becd2c53d0def20ee31bc17a3d2e4debaa7ee8da643770a853444ab10b7c0",
+      "panel_sha256": "8d6f480a14b0636e6be7a258e8a704382ac8eaf7180d29ec30f86b75f154934e",
+      "explanation": {
+        "estimator": "LogisticRegression",
+        "method": "linear_coefficients",
+        "matches_real_fitted_model": true,
+        "exact_explanation_in_llm_evidence": true,
+        "review_status": {
+          "completed": true,
+          "requested": true
+        },
+        "shared_data_contract_in_snapshot": true,
+        "thinking_enabled_in_snapshotted_review_client": true
+      }
+    }
+  ]
+}

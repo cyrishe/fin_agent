@@ -1,0 +1,201 @@
+{
+  "target": "max 09:32–09:40 minute closes / exact T 14:40 price - 1; strong if >1%, critical if <0.5%",
+  "trading": "T 14:40 price proxy; first 09:32–09:40 minute close strictly > entry×1.01 exits at that close; otherwise 09:40 close. Rank 1 gets 60%, rank 2 gets 40%, trading units enforced.",
+  "split_method": "40 exact dates grouped by T-1 market shape; within each group date-spaced 50% train, 25% validation, remaining test; no labels in date selection.",
+  "split_dates": {
+    "train": [
+      "2026-08-05",
+      "2026-08-07",
+      "2026-08-11",
+      "2026-08-12",
+      "2026-08-17",
+      "2026-08-18",
+      "2026-08-20",
+      "2026-08-24",
+      "2026-08-26",
+      "2026-08-31",
+      "2026-09-01",
+      "2026-09-04",
+      "2026-09-08",
+      "2026-09-10",
+      "2026-09-11",
+      "2026-09-17",
+      "2026-09-21",
+      "2026-09-23",
+      "2026-09-28",
+      "2026-09-29",
+      "2026-09-30"
+    ],
+    "validation": [
+      "2026-08-06",
+      "2026-08-14",
+      "2026-08-21",
+      "2026-08-25",
+      "2026-08-27",
+      "2026-09-18",
+      "2026-09-22",
+      "2026-09-24"
+    ],
+    "test": [
+      "2026-08-10",
+      "2026-08-13",
+      "2026-08-19",
+      "2026-08-28",
+      "2026-09-02",
+      "2026-09-03",
+      "2026-09-07",
+      "2026-09-09",
+      "2026-09-14",
+      "2026-09-15",
+      "2026-09-16"
+    ]
+  },
+  "split_rows": {
+    "train": 7793,
+    "validation": 3320,
+    "test": 3179
+  },
+  "train_target_counts": {
+    "1": 2393,
+    "0": 770,
+    "-1": 4630
+  },
+  "validation_top2": {
+    "seven_logistic": {
+      "days": 8,
+      "stocks": 16,
+      "strong": 7,
+      "neutral": 0,
+      "critical": 9
+    },
+    "five_logistic": {
+      "days": 8,
+      "stocks": 16,
+      "strong": 7,
+      "neutral": 0,
+      "critical": 9
+    },
+    "shallow_tree": {
+      "days": 8,
+      "stocks": 16,
+      "strong": 7,
+      "neutral": 2,
+      "critical": 7
+    }
+  },
+  "validation_count_at_or_above_second_score": {
+    "seven_logistic": {
+      "2026-08-06": 2,
+      "2026-08-14": 2,
+      "2026-08-21": 2,
+      "2026-08-25": 2,
+      "2026-08-27": 2,
+      "2026-09-18": 2,
+      "2026-09-22": 2,
+      "2026-09-24": 2
+    },
+    "five_logistic": {
+      "2026-08-06": 2,
+      "2026-08-14": 2,
+      "2026-08-21": 2,
+      "2026-08-25": 2,
+      "2026-08-27": 2,
+      "2026-09-18": 2,
+      "2026-09-22": 2,
+      "2026-09-24": 2
+    },
+    "shallow_tree": {
+      "2026-08-06": 4,
+      "2026-08-14": 30,
+      "2026-08-21": 20,
+      "2026-08-25": 20,
+      "2026-08-27": 30,
+      "2026-09-18": 7,
+      "2026-09-22": 7,
+      "2026-09-24": 5
+    }
+  },
+  "validation_rank_eligible_models": [
+    "five_logistic",
+    "seven_logistic"
+  ],
+  "model_selected_on_validation": "five_logistic",
+  "test": {
+    "seven_logistic": {
+      "signal_days": 11,
+      "selected_stocks": 22,
+      "bought_stocks": 19,
+      "triggered_bought": 5,
+      "strong": 6,
+      "neutral": 2,
+      "critical": 14,
+      "ending_cash": 88694.0,
+      "return": -0.11306,
+      "max_daily_drawdown": -0.14268546784900907
+    },
+    "five_logistic": {
+      "signal_days": 11,
+      "selected_stocks": 22,
+      "bought_stocks": 20,
+      "triggered_bought": 6,
+      "strong": 7,
+      "neutral": 2,
+      "critical": 13,
+      "ending_cash": 88870.1,
+      "return": -0.111299,
+      "max_daily_drawdown": -0.1403337287620467
+    },
+    "shallow_tree": {
+      "signal_days": 11,
+      "selected_stocks": 22,
+      "bought_stocks": 22,
+      "triggered_bought": 9,
+      "strong": 9,
+      "neutral": 3,
+      "critical": 10,
+      "ending_cash": 94965.0,
+      "return": -0.05035,
+      "max_daily_drawdown": -0.08555
+    }
+  },
+  "oct8_extension": {
+    "signal_days": 1,
+    "selected_stocks": 2,
+    "bought_stocks": 2,
+    "triggered_bought": 1,
+    "strong": 1,
+    "neutral": 0,
+    "critical": 1,
+    "ending_cash": 97762.0,
+    "return": -0.02238,
+    "max_daily_drawdown": -0.02238
+  },
+  "model_explanation": {
+    "intercept": -0.9059154925786561,
+    "coefficients": {
+      "signal_return": 0.06401625475682593,
+      "volume_ratio": -0.09790655330979793,
+      "turnover_so_far_pct": 0.07861622464969284,
+      "float_mv_100m_cny": 0.037056791726251134,
+      "all_intraday_lows_above_ma": 0.2810719308922926
+    },
+    "numeric_means": {
+      "signal_return": 0.04128002461953035,
+      "volume_ratio": 1.5265783106672655,
+      "turnover_so_far_pct": 4.663709085724367,
+      "float_mv_100m_cny": 154.6947213596497
+    },
+    "numeric_scales": {
+      "signal_return": 0.008354178619314834,
+      "volume_ratio": 0.8095404993695994,
+      "turnover_so_far_pct": 4.196530771273113,
+      "float_mv_100m_cny": 437.4587065906369
+    }
+  },
+  "hashes": {
+    "docs/stock_automl_runs/20261009_close9_target/exact_1440_to_close9_candidates.csv.gz": "99263a8722907209d1cc45ffd6e3e73a1386fc36050f67e5d55f78b0c3e8942a",
+    "docs/stock_automl_runs/20261009_market_shape_training/market_states.csv": "727471a0f1e272afb065809651ab12be3c8088f0f9c00a5628a2b358b084535d",
+    "docs/stock_automl_runs/20261009_seven_factor_cash_backtest/20261008_exact_candidates.csv": "fc45294ee301f2edc3581c25e3a23b3c6226ddf8332bdd4c3ac87764308b5355",
+    "docs/stock_automl_runs/20261009_close9_target/selected_close9_model.joblib": "ff17156ae39eff2580fd56d3744aaf68425ec9adb6577a474d746d88f81bc28e"
+  }
+}

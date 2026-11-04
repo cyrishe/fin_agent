@@ -1,0 +1,294 @@
+{
+  "target": "high5>=1% relative to 14:50 price AND T final limit flag != 1",
+  "feature_timing": "T-1 daily history plus T 14:30 arrived bars",
+  "train_final_limit_up_excluded": 30,
+  "models": {
+    "history": {
+      "features": [
+        "prior_return_5",
+        "abs_prior_return_5",
+        "prior_amount_log_ratio_5",
+        "prior_avg_bias_3",
+        "market_breadth"
+      ],
+      "train_daily_max_score_gate_80pct": 0.929982,
+      "standardized_coefficients": {
+        "prior_return_5": -0.08186,
+        "abs_prior_return_5": 0.262343,
+        "prior_amount_log_ratio_5": 0.029607,
+        "prior_avg_bias_3": 0.101739,
+        "market_breadth": 0.031654
+      },
+      "partitions": {
+        "train": {
+          "rows": 67487,
+          "days": 14,
+          "base_hits": 22297,
+          "base_rate": 0.33039,
+          "mean_daily_auc": 0.59203,
+          "top10pct": {
+            "rows": 6757,
+            "hits": 3167,
+            "rate": 0.4687,
+            "touch10_hits": 3464,
+            "near_limit_at_entry": 21
+          },
+          "top1pct": {
+            "rows": 680,
+            "hits": 328,
+            "rate": 0.48235,
+            "touch10_hits": 365,
+            "near_limit_at_entry": 5
+          },
+          "top1_per_day": {
+            "rows": 14,
+            "hits": 7,
+            "rate": 0.5,
+            "touch10_hits": 7,
+            "near_limit_at_entry": 0
+          },
+          "top1_per_day_train_gate": {
+            "rows": 3,
+            "hits": 1,
+            "rate": 0.33333,
+            "touch10_hits": 1,
+            "near_limit_at_entry": 0,
+            "candidate_days": 14
+          }
+        },
+        "validation_seen": {
+          "rows": 14595,
+          "days": 3,
+          "base_hits": 8055,
+          "base_rate": 0.5519,
+          "mean_daily_auc": 0.53719,
+          "top10pct": {
+            "rows": 1461,
+            "hits": 921,
+            "rate": 0.63039,
+            "touch10_hits": 970,
+            "near_limit_at_entry": 2
+          },
+          "top1pct": {
+            "rows": 147,
+            "hits": 92,
+            "rate": 0.62585,
+            "touch10_hits": 96,
+            "near_limit_at_entry": 1
+          },
+          "top1_per_day": {
+            "rows": 3,
+            "hits": 1,
+            "rate": 0.33333,
+            "touch10_hits": 1,
+            "near_limit_at_entry": 0
+          },
+          "top1_per_day_train_gate": {
+            "rows": 2,
+            "hits": 0,
+            "rate": 0.0,
+            "touch10_hits": 0,
+            "near_limit_at_entry": 0,
+            "candidate_days": 3
+          }
+        },
+        "later_seen": {
+          "rows": 24377,
+          "days": 5,
+          "base_hits": 7559,
+          "base_rate": 0.31009,
+          "mean_daily_auc": 0.60487,
+          "top10pct": {
+            "rows": 2441,
+            "hits": 1222,
+            "rate": 0.50061,
+            "touch10_hits": 1318,
+            "near_limit_at_entry": 9
+          },
+          "top1pct": {
+            "rows": 245,
+            "hits": 143,
+            "rate": 0.58367,
+            "touch10_hits": 154,
+            "near_limit_at_entry": 1
+          },
+          "top1_per_day": {
+            "rows": 5,
+            "hits": 3,
+            "rate": 0.6,
+            "touch10_hits": 3,
+            "near_limit_at_entry": 0
+          },
+          "top1_per_day_train_gate": {
+            "rows": 1,
+            "hits": 0,
+            "rate": 0.0,
+            "touch10_hits": 0,
+            "near_limit_at_entry": 0,
+            "candidate_days": 5
+          }
+        }
+      }
+    },
+    "history_plus_local": {
+      "features": [
+        "prior_return_5",
+        "abs_prior_return_5",
+        "prior_amount_log_ratio_5",
+        "prior_avg_bias_3",
+        "market_breadth",
+        "day_return",
+        "tail_return_20m"
+      ],
+      "train_daily_max_score_gate_80pct": 0.960899,
+      "standardized_coefficients": {
+        "prior_return_5": -0.102707,
+        "abs_prior_return_5": 0.279838,
+        "prior_amount_log_ratio_5": 0.035716,
+        "prior_avg_bias_3": 0.122979,
+        "market_breadth": -0.005003,
+        "day_return": 0.159883,
+        "tail_return_20m": -0.167765
+      },
+      "partitions": {
+        "train": {
+          "rows": 67487,
+          "days": 14,
+          "base_hits": 22297,
+          "base_rate": 0.33039,
+          "mean_daily_auc": 0.60103,
+          "top10pct": {
+            "rows": 6757,
+            "hits": 3219,
+            "rate": 0.47639,
+            "touch10_hits": 3533,
+            "near_limit_at_entry": 16
+          },
+          "top1pct": {
+            "rows": 680,
+            "hits": 365,
+            "rate": 0.53676,
+            "touch10_hits": 402,
+            "near_limit_at_entry": 7
+          },
+          "top1_per_day": {
+            "rows": 14,
+            "hits": 8,
+            "rate": 0.57143,
+            "touch10_hits": 9,
+            "near_limit_at_entry": 0
+          },
+          "top1_per_day_train_gate": {
+            "rows": 3,
+            "hits": 0,
+            "rate": 0.0,
+            "touch10_hits": 1,
+            "near_limit_at_entry": 0,
+            "candidate_days": 14
+          }
+        },
+        "validation_seen": {
+          "rows": 14595,
+          "days": 3,
+          "base_hits": 8055,
+          "base_rate": 0.5519,
+          "mean_daily_auc": 0.50091,
+          "top10pct": {
+            "rows": 1461,
+            "hits": 889,
+            "rate": 0.60849,
+            "touch10_hits": 941,
+            "near_limit_at_entry": 1
+          },
+          "top1pct": {
+            "rows": 147,
+            "hits": 88,
+            "rate": 0.59864,
+            "touch10_hits": 91,
+            "near_limit_at_entry": 1
+          },
+          "top1_per_day": {
+            "rows": 3,
+            "hits": 1,
+            "rate": 0.33333,
+            "touch10_hits": 1,
+            "near_limit_at_entry": 0
+          },
+          "top1_per_day_train_gate": {
+            "rows": 2,
+            "hits": 1,
+            "rate": 0.5,
+            "touch10_hits": 1,
+            "near_limit_at_entry": 0,
+            "candidate_days": 3
+          }
+        },
+        "later_seen": {
+          "rows": 24377,
+          "days": 5,
+          "base_hits": 7559,
+          "base_rate": 0.31009,
+          "mean_daily_auc": 0.57998,
+          "top10pct": {
+            "rows": 2441,
+            "hits": 1171,
+            "rate": 0.47972,
+            "touch10_hits": 1272,
+            "near_limit_at_entry": 6
+          },
+          "top1pct": {
+            "rows": 245,
+            "hits": 137,
+            "rate": 0.55918,
+            "touch10_hits": 148,
+            "near_limit_at_entry": 3
+          },
+          "top1_per_day": {
+            "rows": 5,
+            "hits": 3,
+            "rate": 0.6,
+            "touch10_hits": 3,
+            "near_limit_at_entry": 0
+          },
+          "top1_per_day_train_gate": {
+            "rows": 1,
+            "hits": 0,
+            "rate": 0.0,
+            "touch10_hits": 0,
+            "near_limit_at_entry": 0,
+            "candidate_days": 5
+          }
+        }
+      }
+    }
+  },
+  "sample_audit": {
+    "asof_candidates": 107468,
+    "observed": 106490,
+    "model_rows": 106459,
+    "t_final_limit_up_in_model_rows": 56
+  },
+  "arrival_audit": {
+    "14:30": {
+      "rows": 130978,
+      "current_rows_present_by_decision": 122403,
+      "source_time_equals_bar_end": 130978
+    },
+    "14:40": {
+      "rows": 130978,
+      "current_rows_present_by_decision": 0,
+      "source_time_equals_bar_end": 130978
+    },
+    "14:49": {
+      "rows": 131336,
+      "current_rows_present_by_decision": 0,
+      "source_time_equals_bar_end": 131336
+    }
+  },
+  "generated_at": "2026-10-08T11:09:39",
+  "provenance": {
+    "source": "47.94.1.2:3312/kingdomai",
+    "script_sha256": "cbc6923ff5abd393022377720aaea5ae26361859b3757e2ae5bf60524fbb767d",
+    "data_snapshot_version": null
+  }
+}

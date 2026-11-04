@@ -1,0 +1,52 @@
+{
+  "comparison": [
+    {
+      "model": "seven_factor",
+      "test_days": 20,
+      "candidates": 5818,
+      "top2": 40,
+      "top2_ge3": 8,
+      "top2_lt0": 14,
+      "top2_lt_minus1": 7,
+      "top2_mean_return_pct": 1.033753273331529
+    },
+    {
+      "model": "seven_plus_Tminus1_and_industry",
+      "test_days": 20,
+      "candidates": 5818,
+      "top2": 40,
+      "top2_ge3": 7,
+      "top2_lt0": 15,
+      "top2_lt_minus1": 9,
+      "top2_mean_return_pct": 0.9516988452086395
+    }
+  ],
+  "feature_set": [
+    "signal_return",
+    "volume_ratio",
+    "turnover_so_far_pct",
+    "float_mv_100m_cny",
+    "volume_4of5_increasing",
+    "ma_bull_5_10_20",
+    "all_intraday_lows_above_ma",
+    "main_net_buy_value_ratio",
+    "large_net_buy_value_ratio",
+    "huge_net_buy_value_ratio",
+    "medium_net_to_amount",
+    "financing_balance_to_float_mv_pct",
+    "financing_net_buy_to_amount",
+    "tminus1_return",
+    "tminus1_body",
+    "tminus1_amplitude",
+    "tminus1_turnover",
+    "industry_name"
+  ],
+  "method": "Same prior-20-day folds and small four-class boosted tree; numeric median imputation and industry one-hot are fitted within each fold. Rank by P(>=3%).",
+  "interpretation": "Feature names were selected after examining these dates; comparison is exploratory and not independent evidence of improvement.",
+  "source_sha256": {
+    "docs/stock_automl_runs/20261009_close9_target/exact_1440_to_close9_candidates.csv.gz": "99263a8722907209d1cc45ffd6e3e73a1386fc36050f67e5d55f78b0c3e8942a",
+    "docs/stock_automl_runs/20261009_second_high_regression/second_high_prices.csv.gz": "3e979277eac24110e0b7abb63d6ef59fd2977788ff66185c6e6fc4e579d1811c",
+    "docs/stock_automl_runs/20261010_second_high_factor_audit/candidate_extra_features.csv.gz": "8b55aeaa62fa132d1e5ff67a11b7d4684d4f33f8ce4bd7f7a474e96dc999e6ad",
+    "docs/stock_automl_runs/20261010_second_high_four_class/predictions.csv.gz": "420ae7e986d030b1bd07375caf564184ab8b10f2ad2b5bec04b3e8466ac4fea4"
+  }
+}

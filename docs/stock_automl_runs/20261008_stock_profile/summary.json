@@ -1,0 +1,746 @@
+{
+  "cohort_rows": 123536,
+  "cohort_hit5": 42272,
+  "asof_rows": 106434,
+  "price_profile_ready": 106259,
+  "total_mv_ready": 96876,
+  "free_float_mv_ready": 96876,
+  "common_profile_ready": 96719,
+  "common_profile_hit5": 34145,
+  "turnover_rule_check": {
+    "rule": "keep within-day top 60% by T-1 five-day mean turnover",
+    "partitions": {
+      "train": {
+        "all_rows": 67369,
+        "all_hit5": 22256,
+        "all_hit10": 25243,
+        "retained_rows": 40427,
+        "retained_hit5": 15656,
+        "retained_hit10": 17485
+      },
+      "validation_seen": {
+        "all_rows": 14567,
+        "all_hit5": 8043,
+        "all_hit10": 8590,
+        "retained_rows": 8741,
+        "retained_hit5": 5634,
+        "retained_hit10": 5948
+      },
+      "later_seen": {
+        "all_rows": 24323,
+        "all_hit5": 7541,
+        "all_hit10": 8648,
+        "retained_rows": 14596,
+        "retained_hit5": 5535,
+        "retained_hit10": 6171
+      }
+    },
+    "within_board_daily_auc": {
+      "CHINEXT": {
+        "rows": 28919,
+        "days": 22,
+        "mean_daily_auc": 0.6003487977250346
+      },
+      "OTHER": {
+        "rows": 264,
+        "days": 0,
+        "mean_daily_auc": null
+      },
+      "SH_MAIN": {
+        "rows": 34801,
+        "days": 22,
+        "mean_daily_auc": 0.6570363713475097
+      },
+      "STAR": {
+        "rows": 12571,
+        "days": 22,
+        "mean_daily_auc": 0.6152173439186478
+      },
+      "SZ_MAIN": {
+        "rows": 29704,
+        "days": 22,
+        "mean_daily_auc": 0.6334990834215434
+      }
+    },
+    "board_cap_quintile_conditional_auc": 0.6212602999420421,
+    "board_cap_quintile_groups": 434
+  },
+  "profile_features": {
+    "total_mv_100m_cny": {
+      "rows": 96876,
+      "positive_median": 60.3831,
+      "negative_median": 68.0110373799,
+      "positive_p10_p90": [
+        25.394424,
+        319.7677603593
+      ],
+      "mean_daily_auc": 0.46872515273473536,
+      "days_auc_above_half": 5,
+      "days_compared": 22,
+      "within_day_quintiles": [
+        {
+          "quintile": 1,
+          "rows": 19367,
+          "hit5": 7370,
+          "rate": 0.3805442247121392
+        },
+        {
+          "quintile": 2,
+          "rows": 19375,
+          "hit5": 7184,
+          "rate": 0.3707870967741935
+        },
+        {
+          "quintile": 3,
+          "rows": 19374,
+          "hit5": 6928,
+          "rate": 0.3575926499432229
+        },
+        {
+          "quintile": 4,
+          "rows": 19375,
+          "hit5": 6760,
+          "rate": 0.3489032258064516
+        },
+        {
+          "quintile": 5,
+          "rows": 19385,
+          "hit5": 5979,
+          "rate": 0.30843435646118134
+        }
+      ]
+    },
+    "free_float_mv_100m_cny": {
+      "rows": 96876,
+      "positive_median": 31.406924035,
+      "negative_median": 35.13622,
+      "positive_p10_p90": [
+        12.1890974073,
+        170.5284351768
+      ],
+      "mean_daily_auc": 0.4702802634693288,
+      "days_auc_above_half": 6,
+      "days_compared": 22,
+      "within_day_quintiles": [
+        {
+          "quintile": 1,
+          "rows": 19367,
+          "hit5": 7396,
+          "rate": 0.3818867145143801
+        },
+        {
+          "quintile": 2,
+          "rows": 19375,
+          "hit5": 7260,
+          "rate": 0.37470967741935485
+        },
+        {
+          "quintile": 3,
+          "rows": 19374,
+          "hit5": 6753,
+          "rate": 0.3485599256735831
+        },
+        {
+          "quintile": 4,
+          "rows": 19375,
+          "hit5": 6564,
+          "rate": 0.33878709677419355
+        },
+        {
+          "quintile": 5,
+          "rows": 19385,
+          "hit5": 6248,
+          "rate": 0.3223110652566417
+        }
+      ]
+    },
+    "avg_volume_5_million": {
+      "rows": 106259,
+      "positive_median": 8.5860838,
+      "negative_median": 9.2573416,
+      "positive_p10_p90": [
+        1.8628027,
+        47.00905939999999
+      ],
+      "mean_daily_auc": 0.4943583699214855,
+      "days_auc_above_half": 10,
+      "days_compared": 22,
+      "within_day_quintiles": [
+        {
+          "quintile": 1,
+          "rows": 21244,
+          "hit5": 7970,
+          "rate": 0.3751647524006778
+        },
+        {
+          "quintile": 2,
+          "rows": 21251,
+          "hit5": 7664,
+          "rate": 0.3606418521481342
+        },
+        {
+          "quintile": 3,
+          "rows": 21251,
+          "hit5": 7529,
+          "rate": 0.3542892099195332
+        },
+        {
+          "quintile": 4,
+          "rows": 21251,
+          "hit5": 7331,
+          "rate": 0.34497200131758504
+        },
+        {
+          "quintile": 5,
+          "rows": 21262,
+          "hit5": 7346,
+          "rate": 0.3454990123224532
+        }
+      ]
+    },
+    "avg_volume_10_million": {
+      "rows": 106259,
+      "positive_median": 8.6736899,
+      "negative_median": 9.5861716,
+      "positive_p10_p90": [
+        1.8989445600000001,
+        46.548553269999985
+      ],
+      "mean_daily_auc": 0.48729868118906183,
+      "days_auc_above_half": 10,
+      "days_compared": 22,
+      "within_day_quintiles": [
+        {
+          "quintile": 1,
+          "rows": 21244,
+          "hit5": 8081,
+          "rate": 0.3803897571078893
+        },
+        {
+          "quintile": 2,
+          "rows": 21251,
+          "hit5": 7761,
+          "rate": 0.3652063432309068
+        },
+        {
+          "quintile": 3,
+          "rows": 21251,
+          "hit5": 7548,
+          "rate": 0.35518328549244743
+        },
+        {
+          "quintile": 4,
+          "rows": 21251,
+          "hit5": 7284,
+          "rate": 0.3427603406898499
+        },
+        {
+          "quintile": 5,
+          "rows": 21262,
+          "hit5": 7166,
+          "rate": 0.33703320477847803
+        }
+      ]
+    },
+    "avg_amount_5_million": {
+      "rows": 106259,
+      "positive_median": 140.632011344,
+      "negative_median": 113.0560536,
+      "positive_p10_p90": [
+        34.08504512,
+        975.2836715412
+      ],
+      "mean_daily_auc": 0.5572506895202286,
+      "days_auc_above_half": 18,
+      "days_compared": 22,
+      "within_day_quintiles": [
+        {
+          "quintile": 1,
+          "rows": 21244,
+          "hit5": 6635,
+          "rate": 0.31232347957070233
+        },
+        {
+          "quintile": 2,
+          "rows": 21251,
+          "hit5": 7066,
+          "rate": 0.3325019999058868
+        },
+        {
+          "quintile": 3,
+          "rows": 21251,
+          "hit5": 7224,
+          "rate": 0.339936944143805
+        },
+        {
+          "quintile": 4,
+          "rows": 21251,
+          "hit5": 7891,
+          "rate": 0.37132370241400403
+        },
+        {
+          "quintile": 5,
+          "rows": 21262,
+          "hit5": 9024,
+          "rate": 0.42441915153795506
+        }
+      ]
+    },
+    "avg_amount_10_million": {
+      "rows": 106259,
+      "positive_median": 143.51680875199997,
+      "negative_median": 118.452788534,
+      "positive_p10_p90": [
+        34.6879822883,
+        973.3544069276995
+      ],
+      "mean_daily_auc": 0.5493962911173514,
+      "days_auc_above_half": 18,
+      "days_compared": 22,
+      "within_day_quintiles": [
+        {
+          "quintile": 1,
+          "rows": 21244,
+          "hit5": 6728,
+          "rate": 0.3167011862172849
+        },
+        {
+          "quintile": 2,
+          "rows": 21251,
+          "hit5": 7138,
+          "rate": 0.33589007576114066
+        },
+        {
+          "quintile": 3,
+          "rows": 21251,
+          "hit5": 7269,
+          "rate": 0.34205449155333867
+        },
+        {
+          "quintile": 4,
+          "rows": 21251,
+          "hit5": 7860,
+          "rate": 0.36986494753188087
+        },
+        {
+          "quintile": 5,
+          "rows": 21262,
+          "hit5": 8845,
+          "rate": 0.4160003762581131
+        }
+      ]
+    },
+    "avg_turn_5_pct": {
+      "rows": 106259,
+      "positive_median": 2.40533,
+      "negative_median": 1.6813200000000001,
+      "positive_p10_p90": [
+        0.8631359999999999,
+        7.292591999999999
+      ],
+      "mean_daily_auc": 0.6319198368849717,
+      "days_auc_above_half": 22,
+      "days_compared": 22,
+      "within_day_quintiles": [
+        {
+          "quintile": 1,
+          "rows": 21244,
+          "hit5": 4540,
+          "rate": 0.21370739973639616
+        },
+        {
+          "quintile": 2,
+          "rows": 21251,
+          "hit5": 6475,
+          "rate": 0.3046915439273446
+        },
+        {
+          "quintile": 3,
+          "rows": 21251,
+          "hit5": 7755,
+          "rate": 0.3649240035763023
+        },
+        {
+          "quintile": 4,
+          "rows": 21251,
+          "hit5": 8891,
+          "rate": 0.41838031151475225
+        },
+        {
+          "quintile": 5,
+          "rows": 21262,
+          "hit5": 10179,
+          "rate": 0.4787414166117957
+        }
+      ]
+    },
+    "avg_turn_10_pct": {
+      "rows": 106259,
+      "positive_median": 2.4414949999999997,
+      "negative_median": 1.75246,
+      "positive_p10_p90": [
+        0.890317,
+        7.158518000000002
+      ],
+      "mean_daily_auc": 0.6243751190160762,
+      "days_auc_above_half": 22,
+      "days_compared": 22,
+      "within_day_quintiles": [
+        {
+          "quintile": 1,
+          "rows": 21243,
+          "hit5": 4660,
+          "rate": 0.2193663795132514
+        },
+        {
+          "quintile": 2,
+          "rows": 21252,
+          "hit5": 6527,
+          "rate": 0.30712403538490496
+        },
+        {
+          "quintile": 3,
+          "rows": 21251,
+          "hit5": 7760,
+          "rate": 0.365159286621806
+        },
+        {
+          "quintile": 4,
+          "rows": 21251,
+          "hit5": 8900,
+          "rate": 0.41880382099665897
+        },
+        {
+          "quintile": 5,
+          "rows": 21262,
+          "hit5": 9993,
+          "rate": 0.46999341548302137
+        }
+      ]
+    },
+    "volume_ratio_5_10": {
+      "rows": 106259,
+      "positive_median": 0.9882309949780476,
+      "negative_median": 0.9681963930953024,
+      "positive_p10_p90": [
+        0.7752796770190599,
+        1.2781758468224609
+      ],
+      "mean_daily_auc": 0.5415220529105214,
+      "days_auc_above_half": 17,
+      "days_compared": 22,
+      "within_day_quintiles": [
+        {
+          "quintile": 1,
+          "rows": 21244,
+          "hit5": 6843,
+          "rate": 0.32211447938241383
+        },
+        {
+          "quintile": 2,
+          "rows": 21251,
+          "hit5": 7413,
+          "rate": 0.3488306432638464
+        },
+        {
+          "quintile": 3,
+          "rows": 21251,
+          "hit5": 7394,
+          "rate": 0.3479365676909322
+        },
+        {
+          "quintile": 4,
+          "rows": 21251,
+          "hit5": 7590,
+          "rate": 0.35715966307467883
+        },
+        {
+          "quintile": 5,
+          "rows": 21262,
+          "hit5": 8600,
+          "rate": 0.4044774715454802
+        }
+      ]
+    }
+  },
+  "model_rows": 96719,
+  "model_check": {
+    "universe": "as-of eligible, observed, T final non-limit retrospective cohort, common profile coverage",
+    "models": {
+      "baseline": {
+        "features": [
+          "prior_return_5",
+          "abs_prior_return_5",
+          "prior_amount_log_ratio_5",
+          "prior_avg_bias_3",
+          "market_breadth"
+        ],
+        "standardized_coefficients": {
+          "prior_return_5": -0.04801743799298591,
+          "abs_prior_return_5": 0.2493732379403206,
+          "prior_amount_log_ratio_5": 0.03384871199959003,
+          "prior_avg_bias_3": 0.09759297518428924,
+          "market_breadth": -0.00233248435106365
+        },
+        "partitions": {
+          "train": {
+            "rows": 58257,
+            "days": 14,
+            "base_rate": 0.32257067820176116,
+            "mean_daily_auc": 0.5965146418597206,
+            "top10pct": {
+              "rows": 5832,
+              "hits": 2700,
+              "rate": 0.46296296296296297,
+              "touch10_hits": 2969,
+              "matched_day_base_rate": 0.32258773637882227,
+              "turnover_mean_daily_auc_inside": 0.5328119025475501
+            },
+            "top1pct": {
+              "rows": 588,
+              "hits": 292,
+              "rate": 0.4965986394557823,
+              "touch10_hits": 325,
+              "matched_day_base_rate": 0.323298806070481,
+              "turnover_mean_daily_auc_inside": 0.44716227886392357,
+              "after_turnover_gate": {
+                "rows": 576,
+                "hits": 285
+              }
+            },
+            "top5_per_day": {
+              "rows": 70,
+              "hits": 37,
+              "rate": 0.5285714285714286,
+              "touch10_hits": 41,
+              "matched_day_base_rate": 0.3242440985102107
+            },
+            "top1_per_day": {
+              "rows": 14,
+              "hits": 6,
+              "rate": 0.42857142857142855,
+              "touch10_hits": 6,
+              "matched_day_base_rate": 0.3242440985102107
+            }
+          },
+          "validation_seen": {
+            "rows": 14368,
+            "days": 3,
+            "base_rate": 0.5496937639198218,
+            "mean_daily_auc": 0.5485995944420891,
+            "top10pct": {
+              "rows": 1438,
+              "hits": 943,
+              "rate": 0.6557719054242003,
+              "touch10_hits": 985,
+              "matched_day_base_rate": 0.5497451544200542,
+              "turnover_mean_daily_auc_inside": 0.5015313013187056
+            },
+            "top1pct": {
+              "rows": 145,
+              "hits": 99,
+              "rate": 0.6827586206896552,
+              "touch10_hits": 103,
+              "matched_day_base_rate": 0.5501455181302672,
+              "turnover_mean_daily_auc_inside": 0.47593166304836787,
+              "after_turnover_gate": {
+                "rows": 144,
+                "hits": 98
+              }
+            },
+            "top5_per_day": {
+              "rows": 15,
+              "hits": 12,
+              "rate": 0.8,
+              "touch10_hits": 13,
+              "matched_day_base_rate": 0.5493825243318392
+            },
+            "top1_per_day": {
+              "rows": 3,
+              "hits": 1,
+              "rate": 0.3333333333333333,
+              "touch10_hits": 1,
+              "matched_day_base_rate": 0.5493825243318392
+            }
+          },
+          "later_seen": {
+            "rows": 24094,
+            "days": 5,
+            "base_rate": 0.3094131319000581,
+            "mean_daily_auc": 0.6089888670357942,
+            "top10pct": {
+              "rows": 2412,
+              "hits": 1217,
+              "rate": 0.5045605306799337,
+              "touch10_hits": 1309,
+              "matched_day_base_rate": 0.3093862230423163,
+              "turnover_mean_daily_auc_inside": 0.5410891843747256
+            },
+            "top1pct": {
+              "rows": 244,
+              "hits": 143,
+              "rate": 0.5860655737704918,
+              "touch10_hits": 154,
+              "matched_day_base_rate": 0.30903192649405065,
+              "turnover_mean_daily_auc_inside": 0.5059571132800946,
+              "after_turnover_gate": {
+                "rows": 241,
+                "hits": 140
+              }
+            },
+            "top5_per_day": {
+              "rows": 25,
+              "hits": 16,
+              "rate": 0.64,
+              "touch10_hits": 18,
+              "matched_day_base_rate": 0.3090817344550116
+            },
+            "top1_per_day": {
+              "rows": 5,
+              "hits": 3,
+              "rate": 0.6,
+              "touch10_hits": 3,
+              "matched_day_base_rate": 0.3090817344550116
+            }
+          }
+        }
+      },
+      "baseline_plus_profile": {
+        "features": [
+          "prior_return_5",
+          "abs_prior_return_5",
+          "prior_amount_log_ratio_5",
+          "prior_avg_bias_3",
+          "market_breadth",
+          "log_total_mv",
+          "log_avg_volume_10",
+          "avg_turn_5_pct",
+          "log_volume_ratio_5_10"
+        ],
+        "standardized_coefficients": {
+          "prior_return_5": -0.09109564852324754,
+          "abs_prior_return_5": 0.155780504083203,
+          "prior_amount_log_ratio_5": 0.04108343839989785,
+          "prior_avg_bias_3": 0.1160900829764751,
+          "market_breadth": -0.0024429469615471094,
+          "log_total_mv": -0.03708467632912099,
+          "log_avg_volume_10": -0.08267090411600675,
+          "avg_turn_5_pct": 0.21693394623435402,
+          "log_volume_ratio_5_10": 0.09187525119500076
+        },
+        "partitions": {
+          "train": {
+            "rows": 58257,
+            "days": 14,
+            "base_rate": 0.32257067820176116,
+            "mean_daily_auc": 0.6271939692728984,
+            "top10pct": {
+              "rows": 5832,
+              "hits": 2707,
+              "rate": 0.4641632373113855,
+              "touch10_hits": 2970,
+              "matched_day_base_rate": 0.32258773637882227
+            },
+            "top1pct": {
+              "rows": 588,
+              "hits": 264,
+              "rate": 0.4489795918367347,
+              "touch10_hits": 291,
+              "matched_day_base_rate": 0.323298806070481
+            },
+            "top5_per_day": {
+              "rows": 70,
+              "hits": 36,
+              "rate": 0.5142857142857142,
+              "touch10_hits": 36,
+              "matched_day_base_rate": 0.3242440985102107
+            },
+            "top1_per_day": {
+              "rows": 14,
+              "hits": 5,
+              "rate": 0.35714285714285715,
+              "touch10_hits": 5,
+              "matched_day_base_rate": 0.3242440985102107
+            }
+          },
+          "validation_seen": {
+            "rows": 14368,
+            "days": 3,
+            "base_rate": 0.5496937639198218,
+            "mean_daily_auc": 0.6304983981013081,
+            "top10pct": {
+              "rows": 1438,
+              "hits": 930,
+              "rate": 0.6467315716272601,
+              "touch10_hits": 986,
+              "matched_day_base_rate": 0.5497451544200542
+            },
+            "top1pct": {
+              "rows": 145,
+              "hits": 90,
+              "rate": 0.6206896551724138,
+              "touch10_hits": 95,
+              "matched_day_base_rate": 0.5501455181302672
+            },
+            "top5_per_day": {
+              "rows": 15,
+              "hits": 11,
+              "rate": 0.7333333333333333,
+              "touch10_hits": 11,
+              "matched_day_base_rate": 0.5493825243318392
+            },
+            "top1_per_day": {
+              "rows": 3,
+              "hits": 2,
+              "rate": 0.6666666666666666,
+              "touch10_hits": 2,
+              "matched_day_base_rate": 0.5493825243318392
+            }
+          },
+          "later_seen": {
+            "rows": 24094,
+            "days": 5,
+            "base_rate": 0.3094131319000581,
+            "mean_daily_auc": 0.6532905354829909,
+            "top10pct": {
+              "rows": 2412,
+              "hits": 1207,
+              "rate": 0.5004145936981758,
+              "touch10_hits": 1310,
+              "matched_day_base_rate": 0.3093862230423163
+            },
+            "top1pct": {
+              "rows": 244,
+              "hits": 147,
+              "rate": 0.6024590163934426,
+              "touch10_hits": 153,
+              "matched_day_base_rate": 0.30903192649405065
+            },
+            "top5_per_day": {
+              "rows": 25,
+              "hits": 15,
+              "rate": 0.6,
+              "touch10_hits": 16,
+              "matched_day_base_rate": 0.3090817344550116
+            },
+            "top1_per_day": {
+              "rows": 5,
+              "hits": 3,
+              "rate": 0.6,
+              "touch10_hits": 3,
+              "matched_day_base_rate": 0.3090817344550116
+            }
+          }
+        }
+      }
+    }
+  },
+  "prior_top5_profile_ready": 197,
+  "prior_top5_rows": 220,
+  "generated_at": "2026-10-08T11:28:26",
+  "provenance": {
+    "script_sha256": "da01c858fd959ae34a6a041105db0c686082faaa98a34bbc68a6f3bf433f3db9",
+    "cohort_source": "outputs/stock_automl/cohorts/cohort_non_limit.csv",
+    "database_snapshot_version": null
+  }
+}

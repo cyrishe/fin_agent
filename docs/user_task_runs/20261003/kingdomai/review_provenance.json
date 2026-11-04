@@ -1,0 +1,28 @@
+{
+  "research_run_id": "20261003T042758Z_5370a71f",
+  "review_only_calls_after_training": 2,
+  "numerical_artifacts_unchanged": true,
+  "numeric_artifact_sha256": {
+    "report.json": "1af0d1efa87b901abfbb6f891ef8df57611c7f24f0597aeeea0a17149536d344",
+    "spec.json": "9d55a9416e1c914a1ce6966f183a7dcc82acb1e9ae05d88ceba7da7c322ba1fb",
+    "development.json": "e46cbedc97b62ec888c1550fbb9fac83c965b8572cefd01d489875d6575f6d59",
+    "selection.json": "685a40ffb3f5bb89bc8b5e74fd186f638545de76b64fece4cf23f417a19b2d52",
+    "sample_counts.json": "d154699cee958a48c05813a2153d19cb60ce0f97c39f04f8fd7773bebea8549e",
+    "model.joblib": "05385feffb1c249519f854fb7f62b60057d7f640079f7560ae10336002e80c8d",
+    "panel.pkl": "7a4b75d9c373951ccc46fb59397804c92dac6da5bf8cf5a6ebd044a786519c93"
+  },
+  "implementation_facts_verified_against_saved_learning": true,
+  "review_source_sha256": {
+    "src/quant_research/automl/runner.py": "ba064bbd3ef1e065eec973601cc1c16bd63d6c90b2fb1c14f1c9f96ee6d90d68",
+    "src/quant_research/automl/prompts/review.md": "3ffd23e0a09cc36417221bee9f7d69c6dd192f9973616a051020e60d29c9c90a",
+    "src/quant_research/automl/learning.py": "2aa25a5bef45058beefbcdd7c33dbce273af8abfc8d8e8e6fc589f76b3e28d37"
+  },
+  "scope": "Only aggregate review input, generated narrative and rendered Markdown were updated; no training, candidate selection, data or model changes.",
+  "original_task_result": "Runtime report retains the original 9-artifact execution snapshot. Review-only updates files without rewriting the completed task result payload.",
+  "review_history": {
+    "review_before.md": "original inline review",
+    "review_intermediate.md": "first evidence-enriched retry",
+    "review.md": "second, concise retry; still requires human fact checking"
+  },
+  "curated_at": "2026-10-03T04:33:05.590704+00:00"
+}

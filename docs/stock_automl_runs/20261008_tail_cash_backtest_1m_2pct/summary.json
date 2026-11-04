@@ -1,0 +1,140 @@
+{
+  "policy": "Eight-factor binary pass score, rank <= 2 per signal day",
+  "backtest_signal_period": [
+    "2026-09-08",
+    "2026-09-29"
+  ],
+  "backtest_exit_period": [
+    "2026-09-09",
+    "2026-09-30"
+  ],
+  "signal_days": 15,
+  "ranked_stocks": 30,
+  "target_pct": 0.02,
+  "target_touched_stocks": 8,
+  "assumptions": [
+    "Buy at the T 14:50 minute latest-price proxy; close all positions the next morning.",
+    "Split available cash equally between the two daily names and roll end cash into the next signal day.",
+    "Ideal equal-weight uses fractional shares. Trading-unit mode uses 100-share multiples for regular A shares, a 200-share minimum and one-share increments thereafter for 688/689, and leaves unaffordable allocations in cash.",
+    "The target percentage rounds upward to the next CNY 0.01. A first-ten-minute high touch is assumed filled at the target (or at the opening price if higher); otherwise sell at the 09:40 minute latest-price proxy.",
+    "No commissions, stamp duty, slippage, queue priority, or actual fill data are included."
+  ],
+  "runs": [
+    {
+      "exit_mode": "next_open",
+      "lot_constrained": false,
+      "target_pct": 0.02,
+      "starting_cash": 1000000.0,
+      "ending_cash": 989606.9009154718,
+      "total_return": -0.010393099084528191,
+      "max_close_to_close_drawdown": -0.02107189873961513,
+      "signal_days": 15,
+      "ranked_stocks": 30,
+      "executed_stocks": 30,
+      "unaffordable_stocks": 0
+    },
+    {
+      "exit_mode": "next_open",
+      "lot_constrained": true,
+      "target_pct": 0.02,
+      "starting_cash": 1000000.0,
+      "ending_cash": 989517.28,
+      "total_return": -0.01048272,
+      "max_close_to_close_drawdown": -0.021038431045191028,
+      "signal_days": 15,
+      "ranked_stocks": 30,
+      "executed_stocks": 30,
+      "unaffordable_stocks": 0
+    },
+    {
+      "exit_mode": "next_0940",
+      "lot_constrained": false,
+      "target_pct": 0.02,
+      "starting_cash": 1000000.0,
+      "ending_cash": 1003120.9308514573,
+      "total_return": 0.003120930851457319,
+      "max_close_to_close_drawdown": -0.035590113719034665,
+      "signal_days": 15,
+      "ranked_stocks": 30,
+      "executed_stocks": 30,
+      "unaffordable_stocks": 0
+    },
+    {
+      "exit_mode": "next_0940",
+      "lot_constrained": true,
+      "target_pct": 0.02,
+      "starting_cash": 1000000.0,
+      "ending_cash": 1003250.55,
+      "total_return": 0.00325055,
+      "max_close_to_close_drawdown": -0.035467260262815006,
+      "signal_days": 15,
+      "ranked_stocks": 30,
+      "executed_stocks": 30,
+      "unaffordable_stocks": 0
+    },
+    {
+      "exit_mode": "limit_then_0940",
+      "lot_constrained": false,
+      "target_pct": 0.02,
+      "starting_cash": 1000000.0,
+      "ending_cash": 984928.5092113806,
+      "total_return": -0.015071490788619362,
+      "max_close_to_close_drawdown": -0.03909328694647115,
+      "signal_days": 15,
+      "ranked_stocks": 30,
+      "executed_stocks": 30,
+      "unaffordable_stocks": 0
+    },
+    {
+      "exit_mode": "limit_then_0940",
+      "lot_constrained": true,
+      "target_pct": 0.02,
+      "starting_cash": 1000000.0,
+      "ending_cash": 984891.71,
+      "total_return": -0.01510829,
+      "max_close_to_close_drawdown": -0.03904873786004607,
+      "signal_days": 15,
+      "ranked_stocks": 30,
+      "executed_stocks": 30,
+      "unaffordable_stocks": 0
+    }
+  ],
+  "same_period_target_sensitivity_not_oos_optimization": [
+    {
+      "target_pct": 0.005,
+      "target_touched_stocks": 24,
+      "ending_cash": 1048612.14
+    },
+    {
+      "target_pct": 0.01,
+      "target_touched_stocks": 20,
+      "ending_cash": 1048456.75
+    },
+    {
+      "target_pct": 0.015,
+      "target_touched_stocks": 17,
+      "ending_cash": 1046353.49
+    },
+    {
+      "target_pct": 0.02,
+      "target_touched_stocks": 8,
+      "ending_cash": 984891.71
+    },
+    {
+      "target_pct": 0.025,
+      "target_touched_stocks": 4,
+      "ending_cash": 957752.47
+    },
+    {
+      "target_pct": 0.03,
+      "target_touched_stocks": 4,
+      "ending_cash": 967536.78
+    }
+  ],
+  "provenance": {
+    "workbook_data_sha256": "42e4a581a0f354c48e01f1a2fa5f1326d666a1101eb928998195c72e2011b054",
+    "candidates_sha256": "4c8f1716f19879dbd10ec33daa1b8cb33007ed1c71eab39fc3b9a2cdf3a0d385",
+    "morning_bars_sha256": "c9a05a1de4e8555a3fa4d0d7c42be8a9a5ba54d0bcd0684da4ee02b779a2d375",
+    "script_sha256": "6e0c066be173950ead14d38c574c0abbf57e252133058219f0005e01ebe99656"
+  }
+}

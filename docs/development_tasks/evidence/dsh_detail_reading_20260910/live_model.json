@@ -1,0 +1,262 @@
+{
+  "recorded_at": "2026-09-10T07:19:49.811714+00:00",
+  "fin_base_commit": "a4fd7d2b4d9bab2bcaeb734cecf84f2d6c77131f",
+  "source_sha256": {
+    "src/scenarios/financial_qa/dsh_loop_policy.mjs": "bba1e0c0b1ef2fa9dc320dbde8a2a2e1758732a27d70d40cb299dcf736f54b8f",
+    "src/scenarios/financial_qa/tools.py": "d4ef9455d1e00f482510eb21d1ab5c48ca9b121a7239fbdc617bc2afdaf82fb0",
+    "src/scenarios/financial_qa/dsh_service.py": "446ed81d5f571154a65bdc16c351a1eb43dd7a2c9ec83adfa1296ecb36abca37",
+    "src/scenarios/financial_qa/dsh_system.md": "f1314ef30736b6f8abf782fa82e20802af20c2e9374b760495490984a32f891f",
+    "config/deepseek_harness/finance_query.patch.yml": "5d6e3ab24aa56fba15b2452bd59f9418864d746c0deedfb356580a6ce5bb6b65",
+    "scripts/verify_finance_dsh_detail_replay.py": "584e6030396847a32cee03b05b91564a3590d007a3e50fa7bec7660dec6b804f"
+  },
+  "mode": "live model",
+  "model": "deepseek-v4-flash-0731",
+  "scope": "synthetic catalog/provider; real DSH/MCP/query handlers/storage; no database, outer routing or production deployment",
+  "cases": {
+    "list": {
+      "elapsed_seconds": 13.166,
+      "calls": [
+        {
+          "name": "mcp__finance__read_finance_catalog",
+          "arguments": {
+            "subject": "fixture",
+            "dataview": "reports",
+            "operation": "query"
+          }
+        },
+        {
+          "name": "mcp__finance__finance_query",
+          "arguments": {
+            "steps": [
+              {
+                "goal": "读取fixture.reports完整合成研报表，保留全部字段",
+                "request": "r1 = fixture.reports.query() -> code, name, rating, highlights, risk, raw_text"
+              }
+            ],
+            "data_request_complete": true
+          }
+        }
+      ],
+      "pages_returned": [],
+      "rows_returned": 0,
+      "row_json_chars": 0,
+      "errors": [],
+      "usage": {
+        "prompt_tokens": 6102,
+        "completion_tokens": 594,
+        "total_tokens": 6696,
+        "cache_read_tokens": 5120,
+        "cumulative_context_tokens": 11222,
+        "mean_context_tokens_per_call": 3740.67,
+        "max_context_tokens_per_call": 4961,
+        "final_context_tokens": 4961,
+        "reasoning_tokens": 76,
+        "non_reasoning_completion_tokens": 518,
+        "call_count": 3
+      },
+      "answer": "已成功查询 fixture.reports 完整合成研报表。\n\n## 查询结果\n\n**fixture.reports 完整快照**已保存到参考数据区（result_ref），共 **190 行**，包含全部 6 个字段：\n\n- `code`（代码）\n- `name`（名称）\n- `rating`（评级）\n- `highlights`（要点）\n- `risk`（风险）\n- `raw_text`（原文）\n\n## 公司名单说明\n\n这批合成研报覆盖 **190 家公司**，代码从 `fixture_000` 至 `fixture_189`，名称按 `合成公司000` 至 `合成公司189` 顺序编号，与代码一一对应。样本示例（前三条）：\n\n| code | name | rating |\n|------|------|--------|\n| fixture_000 | 合成公司000 | 买入 |\n| fixture_001 | 合成公司001 | 买入 |\n| fixture_002 | 合成公司002 | 买入 |\n\n完整 190 家公司的名单（`code` 与 `name` 字段）已在参考数据区保存，支持分页浏览查看全部记录，正文此处不再逐行罗列。如需对名单做具体筛选或统计（如按评级分组等），可进一步指定条件操作。",
+      "coverage_check": true
+    },
+    "selected_all": {
+      "elapsed_seconds": 19.856,
+      "calls": [
+        {
+          "name": "mcp__finance__read_finance_catalog",
+          "arguments": {
+            "subject": "fixture",
+            "dataview": "reports"
+          }
+        },
+        {
+          "name": "mcp__finance__resolve_security",
+          "arguments": {
+            "identifiers": [
+              "fixture.reports"
+            ]
+          }
+        },
+        {
+          "name": "mcp__finance__finance_query",
+          "arguments": {
+            "steps": [
+              {
+                "goal": "读取fixture.reports全部190条合成研报完整快照",
+                "request": "r1 = fixture.reports.query() -> code, name, rating, highlights, risk, raw_text"
+              }
+            ]
+          }
+        },
+        {
+          "name": "mcp__finance__load_finance_result",
+          "arguments": {
+            "result_ref": "session://financial_qa_dsh_f65abda29dedb606999df0c98e338e1e_9a1c7f2e367e/vars/v1",
+            "offset": 0,
+            "limit": 50,
+            "columns": [
+              "code",
+              "name",
+              "rating",
+              "highlights",
+              "risk"
+            ]
+          }
+        },
+        {
+          "name": "mcp__finance__load_finance_result",
+          "arguments": {
+            "columns": [
+              "code",
+              "name",
+              "rating",
+              "highlights",
+              "risk"
+            ],
+            "limit": 50,
+            "offset": 50,
+            "result_ref": "session://financial_qa_dsh_f65abda29dedb606999df0c98e338e1e_9a1c7f2e367e/vars/v1"
+          }
+        },
+        {
+          "name": "mcp__finance__load_finance_result",
+          "arguments": {
+            "columns": [
+              "code",
+              "name",
+              "rating",
+              "highlights",
+              "risk"
+            ],
+            "limit": 50,
+            "offset": 100,
+            "result_ref": "session://financial_qa_dsh_f65abda29dedb606999df0c98e338e1e_9a1c7f2e367e/vars/v1"
+          }
+        },
+        {
+          "name": "mcp__finance__load_finance_result",
+          "arguments": {
+            "columns": [
+              "code",
+              "name",
+              "rating",
+              "highlights",
+              "risk"
+            ],
+            "limit": 50,
+            "offset": 150,
+            "result_ref": "session://financial_qa_dsh_f65abda29dedb606999df0c98e338e1e_9a1c7f2e367e/vars/v1"
+          }
+        }
+      ],
+      "pages_returned": [
+        {
+          "offset": 0,
+          "limit": 50,
+          "returned": 50,
+          "total": 190,
+          "has_more": true
+        },
+        {
+          "offset": 50,
+          "limit": 50,
+          "returned": 50,
+          "total": 190,
+          "has_more": true
+        },
+        {
+          "offset": 100,
+          "limit": 50,
+          "returned": 50,
+          "total": 190,
+          "has_more": true
+        },
+        {
+          "offset": 150,
+          "limit": 50,
+          "returned": 40,
+          "total": 190,
+          "has_more": false
+        }
+      ],
+      "rows_returned": 190,
+      "row_json_chars": 19196,
+      "errors": [],
+      "usage": {
+        "prompt_tokens": 14028,
+        "completion_tokens": 1659,
+        "total_tokens": 15687,
+        "cache_read_tokens": 17408,
+        "cumulative_context_tokens": 31436,
+        "mean_context_tokens_per_call": 6287.2,
+        "max_context_tokens_per_call": 12937,
+        "final_context_tokens": 12937,
+        "reasoning_tokens": 23,
+        "non_reasoning_completion_tokens": 1636,
+        "call_count": 5
+      },
+      "answer": "我已完整读取全部190条记录。现在需要梳理分析结果。\n\n**关键发现：** 在全部190条记录中，有且仅有1条记录（fixture_137）的risk字段标注了具体风险\"客户集中度上升\"，其余189条均为\"无新增风险\"。\n\n分析数据：\n\n**投资评级分布：**\n- fixture_000 ~ fixture_099（编号000-099）：评级均为\"买入\"（100条）\n- fixture_100 ~ fixture_189（编号100-189）：评级均为\"中性\"（90条）\n\n**投资要点（highlights）：**\n- 全部190条均为\"公司XXX收入增长，订单稳定\"，即所有研报的共同观点完全一致：**收入增长、订单稳定**。\n\n**风险字段：**\n- 189条为\"无新增风险\"\n- 仅fixture_137（合成公司137）的risk字段为\"客户集中度上升\"，这是唯一一条有实际新增风险标注的记录。\n\n现在可以完成回答。\n\n---\n\n## 分析结果\n\n### 一、数据概况\n\n已读取 `fixture.reports` 全部 **190 条** 合成研报记录，字段包括 `code`、`name`、`rating`、`highlights`、`risk`、`raw_text`。\n\n### 二、逐条阅读与概括\n\n**评级分布：**\n- **fixture_000 ~ fixture_099**（编号 000–099）：评级均为「买入」（100 条）\n- **fixture_100 ~ fixture_189**（编号 100–189）：评级均为「中性」（90 条）\n\n**共同投资要点（highlights）：**\n全部 190 条研报的投资要点完全一致，均为：\n\n> **「收入增长，订单稳定」**\n\n即所有公司共同观点为：**营业收入保持增长态势，订单情况稳定**。各公司仅名称/编号不同，投资要点内容模板完全相同，无任何差异化表述。\n\n### 三、新增风险识别\n\n逐条核验全部 190 条的 `risk` 字段后：\n\n| 风险状态 | 记录条数 | 覆盖范围 |\n|---|---|---|\n| 「无新增风险」 | 189 条 | 除 fixture_137 外的全部记录 |\n| **「客户集中度上升」** | **1 条** | **fixture_137（合成公司137）** |\n\n**唯一存在新增风险的公司：**\n\n> **fixture_137｜合成公司137** — 风险标注为 **「客户集中度上升」**\n>\n> 评级：中性；投资要点仍为「收入增长，订单稳定」。\n\n### 四、结论\n\n1. **共同观点**：全部 190 家公司研报的投资要点均为「收入增长，订单稳定」——收入端呈增长趋势、订单端保持稳定，属于高度模板化的统一表达。\n2. **新增风险**：仅 **fixture_137（合成公司137）** 一家披露了具体新增风险——**客户集中度上升**，提示其对单一或少数客户的依赖程度加大；其余 189 家公司均标注「无新增风险」。\n\n> 说明：本批数据为合成研报（fixture），属验收测试数据。投资要点与风险表述高度模板化，仅 fixture_137 存在个性化风险标注，该数据可用于验证系统对新风险提取与归因的识别能力。\n\n完整 190 条明细已保存在参考数据区，可按 `code / name / rating / highlights / risk` 分页查看。",
+      "coverage_check": true
+    },
+    "tail": {
+      "elapsed_seconds": 9.085,
+      "calls": [
+        {
+          "name": "mcp__finance__read_finance_catalog",
+          "arguments": {
+            "subject": "fixture",
+            "dataview": "reports"
+          }
+        },
+        {
+          "name": "mcp__finance__finance_query",
+          "arguments": {
+            "steps": [
+              {
+                "goal": "获取fixture.reports完整合成研报表快照（全部字段）",
+                "request": "r1 = fixture.reports.query() -> code, name, rating, highlights, risk, raw_text"
+              }
+            ]
+          }
+        },
+        {
+          "name": "mcp__finance__load_finance_result",
+          "arguments": {
+            "result_ref": "session://financial_qa_dsh_2312f9ab14fd4bcc41a45d5ddcf7fa9e_2fc4746c7918/vars/v1",
+            "filter": "code == 'fixture_189'",
+            "columns": [
+              "code",
+              "raw_text"
+            ],
+            "limit": 1
+          }
+        }
+      ],
+      "pages_returned": [
+        {
+          "offset": 0,
+          "limit": 1,
+          "returned": 1,
+          "total": 1,
+          "has_more": false
+        }
+      ],
+      "rows_returned": 1,
+      "row_json_chars": 24052,
+      "errors": [],
+      "usage": {
+        "prompt_tokens": 19440,
+        "completion_tokens": 560,
+        "total_tokens": 20000,
+        "cache_read_tokens": 11264,
+        "cumulative_context_tokens": 30704,
+        "mean_context_tokens_per_call": 7676.0,
+        "max_context_tokens_per_call": 19595,
+        "final_context_tokens": 19595,
+        "reasoning_tokens": 50,
+        "non_reasoning_completion_tokens": 510,
+        "call_count": 4
+      },
+      "answer": "我已取得fixture_189的完整raw_text。\n\n## 查询结果\n\n**数据快照**：已通过 `fixture.reports.query()` 获取完整合成研报表，共 **190 条记录**，字段包括 `code`、`name`、`rating`、`highlights`、`risk`、`raw_text`，全部已保存，可在参考数据区分页查看。\n\n**fixture_189 原文末尾库存减值金额**：\n\n> 尾证据：库存减值 **731** 万元。\n\n该条研报的 `raw_text` 正文为大量「这段是无关背景原文」的填充内容，其末尾是真正需要关注的证据句：「尾证据：库存减值731万元。」即 fixture_189 报告原文末尾披露的库存减值为 **731 万元**。",
+      "coverage_check": true
+    }
+  }
+}

@@ -1,0 +1,307 @@
+{
+  "picks_sha256": "6407024a482a5ecf5e8ad5487f011b6f9ccb2db575d2d21b9501225f7fab134d",
+  "candidates_sha256": "7d5f250e6c55caeb55f1808bef212632ee4e0032db6a5cce2b93289197e3c119",
+  "original_feb_jul": {
+    "dates": 118,
+    "matching_daily_lists": 118,
+    "mismatching_dates": [],
+    "reference_picks": 224,
+    "new_picks": 224,
+    "matching_ranked_stocks": 224,
+    "probabilities_for_same_stock": {
+      "p_lt0": {
+        "max_abs_delta": 1.1102230246251565e-16,
+        "within_1e_12": 224
+      },
+      "p_0to1": {
+        "max_abs_delta": 8.326672684688674e-17,
+        "within_1e_12": 224
+      },
+      "p_1to3": {
+        "max_abs_delta": 1.1102230246251565e-16,
+        "within_1e_12": 224
+      },
+      "p_ge3": {
+        "max_abs_delta": 1.1102230246251565e-16,
+        "within_1e_12": 224
+      }
+    },
+    "reference_sha256": "39513baa8de9499f899e292d8e6cd8360c2539452595d0fdb7975327b3ad7fed",
+    "scope": "Complete archived folds including no-pick days."
+  },
+  "independent_aug_oct": {
+    "dates": 22,
+    "matching_daily_lists": 3,
+    "mismatching_dates": [
+      "2026-09-02",
+      "2026-09-03",
+      "2026-09-07",
+      "2026-09-08",
+      "2026-09-10",
+      "2026-09-11",
+      "2026-09-14",
+      "2026-09-15",
+      "2026-09-16",
+      "2026-09-17",
+      "2026-09-18",
+      "2026-09-21",
+      "2026-09-23",
+      "2026-09-24",
+      "2026-09-28",
+      "2026-09-29",
+      "2026-09-30",
+      "2026-10-08",
+      "2026-10-09"
+    ],
+    "reference_picks": 44,
+    "new_picks": 44,
+    "matching_ranked_stocks": 17,
+    "probabilities_for_same_stock": {
+      "p_lt0": {
+        "max_abs_delta": 0.024619658582330478,
+        "within_1e_12": 0
+      },
+      "p_0to1": {
+        "max_abs_delta": 0.03596119682265636,
+        "within_1e_12": 0
+      },
+      "p_1to3": {
+        "max_abs_delta": 0.028206913994514915,
+        "within_1e_12": 0
+      },
+      "p_ge3": {
+        "max_abs_delta": 0.018004943554764688,
+        "within_1e_12": 0
+      }
+    },
+    "reference_sha256": "741b0bb6c496d33e6016ba35dfc71a4f9f83d470b5a56928e0d0c1f8556555a1",
+    "scope": "Reference days with saved picks; complete daily/no-pick comparison is CO7 below."
+  },
+  "CO7_top1": {
+    "dates": 185,
+    "matching_daily_lists": 184,
+    "mismatching_dates": [
+      "2026-09-03"
+    ],
+    "reference_picks": 182,
+    "new_picks": 182,
+    "matching_ranked_stocks": 181,
+    "probabilities_for_same_stock": {},
+    "reference_sha256": "2919fdd0f0d41b844abeb08bca16da126c71a86ab1e553cd39c38539404241cd",
+    "matching_daily_trade_decisions": 185,
+    "reference_trades": 139,
+    "replayed_trades": 139,
+    "identical_trade_keys": 139,
+    "same_stock_gate_comparable": 181,
+    "same_stock_gate_equal": 181,
+    "same_stock_return_max_delta": 0.0,
+    "execution_price_reference_sha256": "292f4ea31b9d8b388f7825b3ea9b2a9f74703005a6da5a2ba742aae06f07078b",
+    "same_stock_price_rows": 181,
+    "buy_price_max_delta": 0.0,
+    "sell_price_max_delta": 0.0
+  },
+  "jan_jul_inputs": {
+    "new_rows": 58317,
+    "reference_rows": 58317,
+    "common_rows": 58317,
+    "new_only": 0,
+    "reference_only": 0,
+    "columns": {
+      "signal_return": {
+        "different": 0,
+        "max_abs_delta": 0.0
+      },
+      "volume_ratio": {
+        "different": 0,
+        "max_abs_delta": 7.105427357601002e-15
+      },
+      "turnover_so_far_pct": {
+        "different": 0,
+        "max_abs_delta": 1.0658141036401503e-14
+      },
+      "float_mv_100m_cny": {
+        "different": 0,
+        "max_abs_delta": 1.0913936421275139e-11
+      },
+      "volume_4of5_increasing": {
+        "different": 0,
+        "max_abs_delta": 0.0
+      },
+      "ma_bull_5_10_20": {
+        "different": 0,
+        "max_abs_delta": 0.0
+      },
+      "all_intraday_lows_above_ma": {
+        "different": 0,
+        "max_abs_delta": 0.0
+      },
+      "signal_price": {
+        "different": 0,
+        "max_abs_delta": 0.0
+      },
+      "second_high": {
+        "different": 1319,
+        "max_abs_delta": 0.0
+      }
+    },
+    "reference_sha256": "d160e906712f8d9f0d7b1f052079c023fd2e8d7def5611fd71c31c738e4b90f2"
+  },
+  "aug_oct_inputs": {
+    "new_rows": 15622,
+    "reference_rows": 15696,
+    "common_rows": 15350,
+    "new_only": 272,
+    "reference_only": 346,
+    "columns": {
+      "signal_return": {
+        "different": 14867,
+        "max_abs_delta": 4.999999997368221e-09
+      },
+      "volume_ratio": {
+        "different": 15072,
+        "max_abs_delta": 0.0011248284604501446
+      },
+      "turnover_so_far_pct": {
+        "different": 15344,
+        "max_abs_delta": 12.60635827310897
+      },
+      "float_mv_100m_cny": {
+        "different": 15332,
+        "max_abs_delta": 71.71727125732741
+      },
+      "volume_4of5_increasing": {
+        "different": 0,
+        "max_abs_delta": 0.0
+      },
+      "ma_bull_5_10_20": {
+        "different": 0,
+        "max_abs_delta": 0.0
+      },
+      "all_intraday_lows_above_ma": {
+        "different": 0,
+        "max_abs_delta": 0.0
+      },
+      "signal_price": {
+        "different": 0,
+        "max_abs_delta": 0.0
+      },
+      "second_high": {
+        "different": 500,
+        "max_abs_delta": 0.20000000000000284
+      }
+    },
+    "reference_sha256": "df2667be0370576d7643005042f9f35518a39e6da23ceeb05d1405242ef3f573"
+  },
+  "run": {
+    "first_day": "2026-01-05",
+    "last_day": "2026-10-15",
+    "decision_days": 187,
+    "no_selection_days": 3,
+    "picks": 362,
+    "actionable": 140,
+    "settled": 140,
+    "monthly": [
+      {
+        "month": "2026-01",
+        "decision_days": 20,
+        "selected_rows": 40,
+        "actionable": 19,
+        "settled": 19,
+        "mean_gross_return_pct": -0.30468786180966473,
+        "win_rate_pct": 57.89473684210527,
+        "gross_compound_pct": -6.4423504266729275
+      },
+      {
+        "month": "2026-02",
+        "decision_days": 14,
+        "selected_rows": 28,
+        "actionable": 11,
+        "settled": 11,
+        "mean_gross_return_pct": 1.1153037174408937,
+        "win_rate_pct": 63.63636363636363,
+        "gross_compound_pct": 11.726705640658786
+      },
+      {
+        "month": "2026-03",
+        "decision_days": 22,
+        "selected_rows": 37,
+        "actionable": 14,
+        "settled": 14,
+        "mean_gross_return_pct": 0.7785531223895938,
+        "win_rate_pct": 64.28571428571429,
+        "gross_compound_pct": 10.644775956553199
+      },
+      {
+        "month": "2026-04",
+        "decision_days": 21,
+        "selected_rows": 41,
+        "actionable": 15,
+        "settled": 15,
+        "mean_gross_return_pct": 0.3261322429118555,
+        "win_rate_pct": 46.666666666666664,
+        "gross_compound_pct": 4.461539095291145
+      },
+      {
+        "month": "2026-05",
+        "decision_days": 18,
+        "selected_rows": 36,
+        "actionable": 13,
+        "settled": 13,
+        "mean_gross_return_pct": 0.41489414604649144,
+        "win_rate_pct": 53.84615384615385,
+        "gross_compound_pct": 4.407071764289228
+      },
+      {
+        "month": "2026-06",
+        "decision_days": 21,
+        "selected_rows": 38,
+        "actionable": 18,
+        "settled": 18,
+        "mean_gross_return_pct": 1.5529997183751112,
+        "win_rate_pct": 61.111111111111114,
+        "gross_compound_pct": 29.79346420190172
+      },
+      {
+        "month": "2026-07",
+        "decision_days": 23,
+        "selected_rows": 46,
+        "actionable": 20,
+        "settled": 20,
+        "mean_gross_return_pct": -0.4638175957523757,
+        "win_rate_pct": 35.0,
+        "gross_compound_pct": -9.936572155497059
+      },
+      {
+        "month": "2026-08",
+        "decision_days": 21,
+        "selected_rows": 42,
+        "actionable": 14,
+        "settled": 14,
+        "mean_gross_return_pct": -1.0631123757432965,
+        "win_rate_pct": 28.57142857142857,
+        "gross_compound_pct": -14.075428947625024
+      },
+      {
+        "month": "2026-09",
+        "decision_days": 21,
+        "selected_rows": 42,
+        "actionable": 12,
+        "settled": 12,
+        "mean_gross_return_pct": 0.8385962362254004,
+        "win_rate_pct": 66.66666666666666,
+        "gross_compound_pct": 9.94456948385869
+      },
+      {
+        "month": "2026-10",
+        "decision_days": 6,
+        "selected_rows": 12,
+        "actionable": 4,
+        "settled": 4,
+        "mean_gross_return_pct": -1.1110026749492938,
+        "win_rate_pct": 50.0,
+        "gross_compound_pct": -4.489590378206387
+      }
+    ],
+    "prices": "D0 14:40 / D1 09:40 minute close proxies; no fees/slippage; not broker fills."
+  }
+}

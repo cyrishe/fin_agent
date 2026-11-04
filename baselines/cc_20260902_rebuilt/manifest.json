@@ -1,0 +1,3611 @@
+{
+  "catalog_sha256": "aa5713c6946a5aa1a802b0be62c6d77dec0f94bd6c33cf0b7b5b3006a39335a3",
+  "excluded": "Environment/credentials, runtime or customer data, outputs, caches, dependencies and Git metadata",
+  "files": {
+    "AGENTS.md": {
+      "mode": 420,
+      "sha256": "a8311331f317d31dffc009fce0f71a0bb92468a721088a5b8bcdf50c16c81fb8",
+      "size": 8612
+    },
+    "README.md": {
+      "mode": 420,
+      "sha256": "8e58dd6f721eed2fa4cc7ef8606f961f799a977eaa68ca4cec5d2de1cc82f2af",
+      "size": 3758
+    },
+    "SKILL_requirement_coding.md": {
+      "mode": 420,
+      "sha256": "a0fcc691331c07aae80cef830bf95a767b45b653c2faf3854281dbb95537f3e2",
+      "size": 6870
+    },
+    "SKILL_requirement_understanding.md": {
+      "mode": 420,
+      "sha256": "a8c3942a721c8903af4c822b235e2e292f45f32da942830eb67e3a191abcc0c5",
+      "size": 5134
+    },
+    "SKILL_requirement_understanding_event_format.md": {
+      "mode": 420,
+      "sha256": "119335886dc26f2e10c9604502bf4225d5dbbfc83d368a440e4a174a175eba19",
+      "size": 5864
+    },
+    "config/certs/globalsign-root-r46.pem": {
+      "mode": 420,
+      "sha256": "dcc1a6246e13880ca5b73ef547e082dd0401e4d8837b6d211be82f7be791ac65",
+      "size": 1915
+    },
+    "config/deepseek_harness/finance_query.patch.yml": {
+      "mode": 420,
+      "sha256": "5d6e3ab24aa56fba15b2452bd59f9418864d746c0deedfb356580a6ce5bb6b65",
+      "size": 938
+    },
+    "custom_tools.md": {
+      "mode": 420,
+      "sha256": "b505a99d90eb575a29f12a99330dc23a2ab41407c6daadaf6b3717b39101bba0",
+      "size": 10557
+    },
+    "data/index_subjects.tsv": {
+      "mode": 420,
+      "sha256": "dae3dfe7557498de4c0bee9233df7b598bc6a071a34ec48b806bf92709a3e045",
+      "size": 58
+    },
+    "frontend/.gitignore": {
+      "mode": 420,
+      "sha256": "c6abda09ac64c3acbe2a06dd5cf97ac2dc7700782fd305aad2d99f8156513b6b",
+      "size": 66
+    },
+    "frontend/README.md": {
+      "mode": 420,
+      "sha256": "f3b5795ef9f6200b45138862c7acf6a3c26b1a9b6f0baa79815c38a5b72f0501",
+      "size": 2025
+    },
+    "frontend/index.html": {
+      "mode": 420,
+      "sha256": "78619be9ec17ca9c2ae55ea6dcdda51ffd03ba1b2668dd9f58b31de1259fbcb8",
+      "size": 610
+    },
+    "frontend/package-lock.json": {
+      "mode": 420,
+      "sha256": "8f97ee9cf7283c9d321f90d3cb94aa979c269d139ed5c01f582187d393603828",
+      "size": 214376
+    },
+    "frontend/package.json": {
+      "mode": 420,
+      "sha256": "a508be1d68a75269fd71b7a4dc2d5492888d81ceda3106ecd3b0565e6444b316",
+      "size": 808
+    },
+    "frontend/public/favicon.svg": {
+      "mode": 420,
+      "sha256": "14af1a7455862dc5191ac63e3386e4ee5d51c110700b8cec19e1683a82813fb3",
+      "size": 311
+    },
+    "frontend/src/App.tsx": {
+      "mode": 420,
+      "sha256": "74f40b3384e99b3815beac576c8d4ccf1afc00f336df5e5cfd0316c1312c74c3",
+      "size": 27009
+    },
+    "frontend/src/AuthPage.test.tsx": {
+      "mode": 420,
+      "sha256": "7098fdd7748bdf501bae7bb83e7efbb8a30aa37e465fa886d036cb0855cc3903",
+      "size": 2895
+    },
+    "frontend/src/AuthPage.tsx": {
+      "mode": 420,
+      "sha256": "73065bce847a13780ef542d29dd7409b2d424ce93e5a8d3944fa3dac0028dbf2",
+      "size": 15665
+    },
+    "frontend/src/BacktestPrototype.tsx": {
+      "mode": 420,
+      "sha256": "aea398008cdf922e328163db9de28154285028fe257969cdc1e3b1bf99492d70",
+      "size": 27861
+    },
+    "frontend/src/LandingPage.test.tsx": {
+      "mode": 420,
+      "sha256": "8ad14e1f81b140f1ad653aac1b536eab3d2c32aa16cacf36730d7ce0a90cc0c5",
+      "size": 1974
+    },
+    "frontend/src/LandingPage.tsx": {
+      "mode": 420,
+      "sha256": "8868a6f32a5ca3432d656b35fef46ac30d230ffcf9b34f20eafe701e8ec34460",
+      "size": 22118
+    },
+    "frontend/src/RendererGallery.tsx": {
+      "mode": 420,
+      "sha256": "3abf8984992c1a0e47c6937ef3ea535ff6d19aac06c0e8be0c64603968e4d25e",
+      "size": 11008
+    },
+    "frontend/src/api.ts": {
+      "mode": 420,
+      "sha256": "0def2045a0fe6e347459d7c592df001b47e720ad83bfdd6cbb076e240b4c8c19",
+      "size": 20091
+    },
+    "frontend/src/apiCustomToolTest.test.ts": {
+      "mode": 420,
+      "sha256": "6fb3edaba5a5b18a34812857832668e6f8dac2f286742deffcf857022079a8b2",
+      "size": 1628
+    },
+    "frontend/src/apiInvocationAssets.test.ts": {
+      "mode": 420,
+      "sha256": "8213abae41b718a0f4dabb8fb2546285e383a681e08c16464aa8ca97dd8b9dea",
+      "size": 5274
+    },
+    "frontend/src/auth.css": {
+      "mode": 420,
+      "sha256": "3d54f1d3d84354f94051599d6350f824a93e32db6ffac5c53ef3ed6b9b234cb1",
+      "size": 13519
+    },
+    "frontend/src/backtest-prototype.css": {
+      "mode": 420,
+      "sha256": "a90b1e2cf97f159c23d7a4d4e04242c1c10255f72e80aed67905248b019ab924",
+      "size": 19903
+    },
+    "frontend/src/components/BlockRenderer.test.tsx": {
+      "mode": 420,
+      "sha256": "ac71b090aadbed82b895e243f55736900ab84ba2dcf8e5efd216f27ac7ee5081",
+      "size": 1406
+    },
+    "frontend/src/components/BlockRenderer.tsx": {
+      "mode": 420,
+      "sha256": "c575b3be43cced3c39d88ced579ad6cc9c9a9d7b72e2f6b91c08ad60381ed3b5",
+      "size": 17009
+    },
+    "frontend/src/components/ChartBlock.tsx": {
+      "mode": 420,
+      "sha256": "04960be9a720426f7246ae9a6558e10f8de6c300f2dc6b460292c7c280a08474",
+      "size": 2021
+    },
+    "frontend/src/components/CodeBlock.tsx": {
+      "mode": 420,
+      "sha256": "cdde9f63e9dc45e5527c5754170528153df70fc359401bccf8f6a7b269a1105b",
+      "size": 923
+    },
+    "frontend/src/components/Composer.test.tsx": {
+      "mode": 420,
+      "sha256": "757ec95e204ff7c973ffde3bdce740992c693836efcd77cf7342e0e8033c0c0a",
+      "size": 3170
+    },
+    "frontend/src/components/Composer.tsx": {
+      "mode": 420,
+      "sha256": "818f1fd486833da7786f60ed951550833ba073d369951b2e8201ae298dae244f",
+      "size": 15576
+    },
+    "frontend/src/components/DataTable.test.tsx": {
+      "mode": 420,
+      "sha256": "f7ff85fc1f54ea152c94323ad37b15a53e7913109876317692b90d9e9deb346a",
+      "size": 2639
+    },
+    "frontend/src/components/DataTable.tsx": {
+      "mode": 420,
+      "sha256": "9fb3db6c8c73a3c61046a0c35eef21e5fe663461bb480fd7242defd25d22f2f7",
+      "size": 7904
+    },
+    "frontend/src/components/JsonBlock.tsx": {
+      "mode": 420,
+      "sha256": "c30551f1ff935e2d6a4a457695e771205aa293a2bc1b8bd825e86113dd64410c",
+      "size": 872
+    },
+    "frontend/src/components/MarkdownContent.tsx": {
+      "mode": 420,
+      "sha256": "0407ebfabc06e77b1ce2e2af9cb3f254e717ef3797303413d655930216787060",
+      "size": 624
+    },
+    "frontend/src/components/MermaidDiagram.tsx": {
+      "mode": 420,
+      "sha256": "1d00b488689a950542d0c3bebbc010391ccfa6e627bee0f5c9f0121ea5f4d527",
+      "size": 3040
+    },
+    "frontend/src/components/MessageItem.tsx": {
+      "mode": 420,
+      "sha256": "47bcd76d7ddaf0ba5e8426199fe5aa6587572107853fce9fae59529e58c1a051",
+      "size": 4447
+    },
+    "frontend/src/components/ReportExportButton.test.tsx": {
+      "mode": 420,
+      "sha256": "e9d1dc781162e935091fa16f9ade5e6b87346e7cd2a92f3482605662bee8e2e4",
+      "size": 1345
+    },
+    "frontend/src/components/ReportExportButton.tsx": {
+      "mode": 420,
+      "sha256": "68e957e7953dd65400104e310ef985902de4ea7a406fdaf30e0b08520e0df314",
+      "size": 1381
+    },
+    "frontend/src/components/RunPanel.test.tsx": {
+      "mode": 420,
+      "sha256": "ad8dc175a7c9e411d4e003374c090dfd958f76065b7a733778c3acc9148d5f9a",
+      "size": 3143
+    },
+    "frontend/src/components/RunPanel.tsx": {
+      "mode": 420,
+      "sha256": "d4d3c7f920c7e98aed6c0f4c881451e94d42af08b055cf5f8b381ffa901f04b1",
+      "size": 3087
+    },
+    "frontend/src/components/RunProcessList.tsx": {
+      "mode": 420,
+      "sha256": "7e28e0b69eab5d36b073415a5d7171080374cd1228ddbda99955e37f54803110",
+      "size": 1981
+    },
+    "frontend/src/components/ScheduledTasksPanel.test.tsx": {
+      "mode": 420,
+      "sha256": "7068164874936154001bb983c1d562de42fd6e45b9676423a320c359c1c7e1a5",
+      "size": 2678
+    },
+    "frontend/src/components/ScheduledTasksPanel.tsx": {
+      "mode": 420,
+      "sha256": "7f5501a7df321ac2406e8ed9fbacf4e11d23e0096a6e8d096a17b1d9adab4aeb",
+      "size": 12075
+    },
+    "frontend/src/components/Sidebar.tsx": {
+      "mode": 420,
+      "sha256": "26c8b5034d45cf85aee856e7f3e0f6bb3042ddc3526a99f0a27ddb1dff64beb9",
+      "size": 3690
+    },
+    "frontend/src/components/TurnMeta.tsx": {
+      "mode": 420,
+      "sha256": "e4a69332959a7bc58215384da58572bb29055615a466d94214eff600d6837068",
+      "size": 1811
+    },
+    "frontend/src/components/TurnProcess.test.tsx": {
+      "mode": 420,
+      "sha256": "23caa6f8991b5f6bf3c8fdd5fdbf92a4108bf8e60b2f70bf2ba8afa7a5728929",
+      "size": 2311
+    },
+    "frontend/src/components/TurnProcess.tsx": {
+      "mode": 420,
+      "sha256": "f0ddccc94125155ff97fa201efa99e35c5996cbcf3244469ea52a855a61ad590",
+      "size": 1536
+    },
+    "frontend/src/components/renderers/AuthoritativeFlow.ts": {
+      "mode": 420,
+      "sha256": "87ed9203b8d31a7f23634ee8ef691989a6d69f00eb9970570c3a88db8eecab5a",
+      "size": 2329
+    },
+    "frontend/src/components/renderers/CodeArtifact.tsx": {
+      "mode": 420,
+      "sha256": "6c5f405488ed1be0a0f20d23c0b31ac6a89b6262a2e7055f198fa4d1e2696c44",
+      "size": 3468
+    },
+    "frontend/src/components/renderers/CustomToolTestWorkbench.tsx": {
+      "mode": 420,
+      "sha256": "dbe755a410719b2f2dc50a35de4014ba82528b43d9a6b7a7ca6bb330475c40ff",
+      "size": 12625
+    },
+    "frontend/src/components/renderers/DesignArtifact.test.tsx": {
+      "mode": 420,
+      "sha256": "cabc5501da287dc4dc08f39260d2a107f869a4aca3893db80a0fc87f03dfe4ee",
+      "size": 3723
+    },
+    "frontend/src/components/renderers/DesignArtifact.tsx": {
+      "mode": 420,
+      "sha256": "048cf5fca5ffd768488b486793b75a4b9ec2b8befbdb1700aedf6391e7966921",
+      "size": 9042
+    },
+    "frontend/src/components/renderers/EditSummaryArtifact.test.tsx": {
+      "mode": 420,
+      "sha256": "4bd8bc4a439b540fa791e2d21280f4cf29a2c0d18294997be02788b3b70761a9",
+      "size": 4759
+    },
+    "frontend/src/components/renderers/EditSummaryArtifact.tsx": {
+      "mode": 420,
+      "sha256": "e05a1cbb2a8233aff26b234a9615d6c2e813f00072142243d9edb5181d52e371",
+      "size": 10707
+    },
+    "frontend/src/components/renderers/FinanceChart.tsx": {
+      "mode": 420,
+      "sha256": "a93e10259470f8575b321a6aea9a55298166018f7ea26a3e880cf977918f31f6",
+      "size": 6666
+    },
+    "frontend/src/components/renderers/FlowRenderer.tsx": {
+      "mode": 420,
+      "sha256": "ee32b34b0da1aaa80b441ea1f23c34cf6b2c065d53e9d06fac100cc53f07e304",
+      "size": 2925
+    },
+    "frontend/src/components/renderers/InteractionRenderer.test.tsx": {
+      "mode": 420,
+      "sha256": "6702fd2e62571863579bf6f1d911b4897e1150fc3f9cb033f1ff9144ccd7d923",
+      "size": 4260
+    },
+    "frontend/src/components/renderers/InteractionRenderer.tsx": {
+      "mode": 420,
+      "sha256": "27a158ec5ada06168a7e80bce8966c6ac925ed8cb1154dbe4f3b8715b52de52d",
+      "size": 8379
+    },
+    "frontend/src/components/renderers/MetricStrip.tsx": {
+      "mode": 420,
+      "sha256": "197b98bb0ca7df073e2aae6c6a3262ea28749929d6d6c15339e18c3739a17449",
+      "size": 1413
+    },
+    "frontend/src/components/renderers/RenderMeta.tsx": {
+      "mode": 420,
+      "sha256": "678488a38b01305bb62dd0740873c8027bd9681fcdbe8f69b29d3559ee4f900e",
+      "size": 842
+    },
+    "frontend/src/components/renderers/ToolIdentityArtifact.test.tsx": {
+      "mode": 420,
+      "sha256": "80fffc521291db29c79a1a1429049a02a3b81000baf62b27c907eba55e201c32",
+      "size": 10099
+    },
+    "frontend/src/components/renderers/ToolIdentityArtifact.tsx": {
+      "mode": 420,
+      "sha256": "935ca241611be18ce21d2dc2394fec171d70ef7bd2a37c4fd38cda6dc8e254a5",
+      "size": 13384
+    },
+    "frontend/src/composerSuggestions.test.ts": {
+      "mode": 420,
+      "sha256": "b659119d8e3718bdd4e4f1cc28594cf6c4dc71a6ab0b73e3a02a9c076aaa04c7",
+      "size": 6730
+    },
+    "frontend/src/composerSuggestions.ts": {
+      "mode": 420,
+      "sha256": "8a206a941a5e6f4257bd6d3032a5ffca3d42199b84def5057d2775e54ef07a0a",
+      "size": 10202
+    },
+    "frontend/src/interactionDraft.test.ts": {
+      "mode": 420,
+      "sha256": "bcabe375cf3e075fabc2f91bc4fdf166d52a6267060f5886b26dc22a14702317",
+      "size": 3526
+    },
+    "frontend/src/interactionDraft.ts": {
+      "mode": 420,
+      "sha256": "7f532889af6582b3bb9ef131bb52be67ec77c112236d49d74427bae96af1b7dc",
+      "size": 4824
+    },
+    "frontend/src/landing.css": {
+      "mode": 420,
+      "sha256": "0c370a6cd342e99f04a5b2774a074d6fe965ffaeadd75efff50baea3f79e6bf9",
+      "size": 40723
+    },
+    "frontend/src/main.tsx": {
+      "mode": 420,
+      "sha256": "67f1f91260724226f8afa62c4af8ea1eb0e2f018d52e6ec20c552f6cb663dd8e",
+      "size": 937
+    },
+    "frontend/src/rendering/formatFinancialValue.ts": {
+      "mode": 420,
+      "sha256": "d1c56c72b48d4a98a48c54989eed866f5510f9b447d55002fc5ec8635ae128ce",
+      "size": 769
+    },
+    "frontend/src/rendering/model.ts": {
+      "mode": 420,
+      "sha256": "3d2969d9148f039acd8473d42b16b2b9d2fb1727239c50768c8006c9b5ed7dc4",
+      "size": 2889
+    },
+    "frontend/src/rendering/normalize.ts": {
+      "mode": 420,
+      "sha256": "b62c4c7983b2895fc1a09dd354c45906fcd1f2752a0841453a453bcae7504d71",
+      "size": 10610
+    },
+    "frontend/src/rendering/registry.test.ts": {
+      "mode": 420,
+      "sha256": "dbbd6ac9c20079c12f06f804fa7e7c37d0b21e5ad44e616e89320e88ed7a65d4",
+      "size": 2946
+    },
+    "frontend/src/rendering/registry.ts": {
+      "mode": 420,
+      "sha256": "d7d898c551cdb11f509a86a998c2e70605989d89f50da8d614b54ebfba74f702",
+      "size": 4646
+    },
+    "frontend/src/styles.css": {
+      "mode": 420,
+      "sha256": "e11fa5179966a24a9784c83247044ac6136ce6f87873cca0dd379d22398b8188",
+      "size": 94233
+    },
+    "frontend/src/surface.test.ts": {
+      "mode": 420,
+      "sha256": "8424a30bdf08ef27e6820a54caa780b3c401865e16887d2d21014f6dcf36f418",
+      "size": 16763
+    },
+    "frontend/src/surface.ts": {
+      "mode": 420,
+      "sha256": "5dce5f00dc682c1ba123e0da034acef764ad30a73de540d4592a1165583bb569",
+      "size": 13836
+    },
+    "frontend/src/types.ts": {
+      "mode": 420,
+      "sha256": "fa6fc82cd760e858af7414b90dc64e37dd11a57ff2ea1c4171d6f1e85a73bcde",
+      "size": 4694
+    },
+    "frontend/tsconfig.app.json": {
+      "mode": 420,
+      "sha256": "a7266d1c85fa6947c70073256d9a73e4c459e97b0b4ef24b5c48dcab498ef4c5",
+      "size": 507
+    },
+    "frontend/tsconfig.json": {
+      "mode": 420,
+      "sha256": "770b4140bbb581e2dfd9ea9946ffc9c75a1d86ba7d2db5f77c83e37cbdf9d808",
+      "size": 119
+    },
+    "frontend/tsconfig.node.json": {
+      "mode": 420,
+      "sha256": "3dc28b63563e20fab0d9f652f3039ed50e6c46bbdec66631a14822e8309b230d",
+      "size": 231
+    },
+    "frontend/vite.config.ts": {
+      "mode": 420,
+      "sha256": "d080ab62d6bf038f3524d0cc482e0e40e8f50ce2eaf1b4000542668f8fdbeb44",
+      "size": 535
+    },
+    "main_framework.md": {
+      "mode": 420,
+      "sha256": "9b4e70015d034d7a6ef31a305ea63e20e9c7c71312666c3a3372225454600ecb",
+      "size": 12733
+    },
+    "phase1_check_repair_appendix.md": {
+      "mode": 420,
+      "sha256": "227009bf60cfb9f38d18edabcc1af0389199f641be1a13b96ed47a1c6f07ef64",
+      "size": 1746
+    },
+    "phase2_api_prompt.md": {
+      "mode": 420,
+      "sha256": "4a6361d9b3acb387412c1b1e9d11fc02d953ed465d5a80f15bedcd18dacc0e55",
+      "size": 3167
+    },
+    "phase2_dynamic_cal_code_prompt.md": {
+      "mode": 420,
+      "sha256": "6fe2fc8a1e1501364d48e9fe22430697e730e841933299b15b1fccded9391e00",
+      "size": 1616
+    },
+    "phase2_final_check_prompt.md": {
+      "mode": 420,
+      "sha256": "64ed445d280a6818bd6596d82e002ae6ddf853dfceb3d5170c99425b034bc1f2",
+      "size": 1551
+    },
+    "phrase_1_prompt.md": {
+      "mode": 420,
+      "sha256": "ae37bdc7b077989c6c2e13c2c3319389abad3e0df9536bf2a5ac6c523a7537cf",
+      "size": 2984
+    },
+    "requirements.txt": {
+      "mode": 420,
+      "sha256": "35f13b5d45734d26807cadf540ed39f451d04364d10da766b10a3df81abd1973",
+      "size": 2030
+    },
+    "scripts/dsh_source_runtime.py": {
+      "mode": 420,
+      "sha256": "9f7ab4fbde57d317b166fd261ee0cb0465d68ffd81f01da4517edd56d040a38e",
+      "size": 869
+    },
+    "src/.claude-plugin/plugin.json": {
+      "mode": 420,
+      "sha256": "989bf62ed2e2aa23e6bb3a9b2c13d8cd1dd7e58ec92ce3577a68f55be4994a1e",
+      "size": 99
+    },
+    "src/__init__.py": {
+      "mode": 420,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size": 0
+    },
+    "src/agents/default_assistant/SOUL.md": {
+      "mode": 420,
+      "sha256": "6e780ba34dbc251cd8cf34f392befb2a3d8f990437c3f7a0031ba3136dfb9545",
+      "size": 400
+    },
+    "src/agents/default_assistant/agent.json": {
+      "mode": 420,
+      "sha256": "ef2a5651f3baf42eae9a26335b72bf0f68478229a5057855b76d0b0df67aba7d",
+      "size": 488
+    },
+    "src/agents/default_assistant/schema.json": {
+      "mode": 420,
+      "sha256": "a2fdd1de592d3c284894c76120faaa8a7a3a4b84c6d83fc804a85afa3a52f009",
+      "size": 324
+    },
+    "src/agents/education_research_agent/SOUL.md": {
+      "mode": 420,
+      "sha256": "174742133d36e2e9c8a31d8c6b7547d0a0fb647eb9dae3a3a360b2adf3c0d913",
+      "size": 169
+    },
+    "src/agents/education_research_agent/agent.json": {
+      "mode": 420,
+      "sha256": "33cb1cf9b627b2a4febc01b23d2fefcdfcd75f38127eda411df5344a317f8d6f",
+      "size": 418
+    },
+    "src/agents/education_research_agent/schema.json": {
+      "mode": 420,
+      "sha256": "b77d55ac45bbc9f261d6a89dae8f3bee226ee91762d1684d523294f254f92ab4",
+      "size": 235
+    },
+    "src/agents/investment_analyst/SOUL.md": {
+      "mode": 420,
+      "sha256": "123707c600db4a55c67fbf56d39dcefc6bd0ae1aa2fdca62d52c799d64264e91",
+      "size": 695
+    },
+    "src/agents/investment_analyst/agent.json": {
+      "mode": 420,
+      "sha256": "f8f175ba23b67acec8785f64bcca37cd7b370316746eb7a40357f41f7d91ee0a",
+      "size": 1373
+    },
+    "src/agents/investment_analyst/schema.json": {
+      "mode": 420,
+      "sha256": "50d086236601e7dd6e6791e7d3b786a341020943bec1823a73237a6d50e6a9c7",
+      "size": 325
+    },
+    "src/applications/investment_workbench/APPLICATION.md": {
+      "mode": 420,
+      "sha256": "5b577830ec5760ff64ea82a4365722488d667ecdd80c6b0c29b7657b86486661",
+      "size": 522
+    },
+    "src/applications/investment_workbench/application.json": {
+      "mode": 420,
+      "sha256": "112842cecfc5c8f73f8f8c58461476d8daf51b678c390ee703a104afb6209e47",
+      "size": 4762
+    },
+    "src/applications/investment_workbench/schema.json": {
+      "mode": 420,
+      "sha256": "6e24ba3a49bc1e128b5de288e351e071f58655f7dc273335a97f424dd7f458c1",
+      "size": 337
+    },
+    "src/backtest/__init__.py": {
+      "mode": 420,
+      "sha256": "ff16ffc2f3c213293238e1bc77bde831382d7d0638d06b86d00d4eb11793d3d2",
+      "size": 1140
+    },
+    "src/backtest/contracts.py": {
+      "mode": 420,
+      "sha256": "1c29cc3ae9bb3d1538f0575114e6f1736eb62feb88002f8e08e450f1c92d763a",
+      "size": 11149
+    },
+    "src/backtest/data.py": {
+      "mode": 420,
+      "sha256": "8414f0b964df479782f58121c2920d2c41837b6cc60ef91790fbb123814f5b0a",
+      "size": 8494
+    },
+    "src/backtest/engine.py": {
+      "mode": 420,
+      "sha256": "5134d57a90016b2fbdb9f777102c3cab7a7572c196519c02a4aa283e8cf3aee3",
+      "size": 29095
+    },
+    "src/backtest/execution.py": {
+      "mode": 420,
+      "sha256": "e17fc0a57d08507baef8923a4a1206896d11932c5b2c5cf880344ef69b32330f",
+      "size": 3649
+    },
+    "src/backtest/metrics.py": {
+      "mode": 420,
+      "sha256": "e6f187498f7f7c0ef5b000e12f14742398ef6064d854f5fa124ad48ee373ca28",
+      "size": 2391
+    },
+    "src/backtest/strategy.py": {
+      "mode": 420,
+      "sha256": "c4be2ce816016534237faab06d74fb5155d3ac8c88650d4c9a3fbd0492031541",
+      "size": 6330
+    },
+    "src/bootstrap_runtime_artifacts.py": {
+      "mode": 420,
+      "sha256": "18a908dd042b0b5cc378c595a08f1f8d8850770a55912617813a1ce8f95ab763",
+      "size": 979
+    },
+    "src/crawler/finance_news_sites.json": {
+      "mode": 420,
+      "sha256": "8867e46e9416cd61333f3c97cde108fc27dadbb91b097af9e2462e0303e169cf",
+      "size": 9356
+    },
+    "src/crawler/site_news_crawler.py": {
+      "mode": 420,
+      "sha256": "b28741d4e9d1137509e8efc0c3ab08f4c7d2c2e8355d976353e5e54bbd22bf05",
+      "size": 37563
+    },
+    "src/experiments/staged_data_protocol/__init__.py": {
+      "mode": 420,
+      "sha256": "85ae59842a06bac79f79bac0b0b27c97c5af29b13c17ed105cf5e2173589e319",
+      "size": 52
+    },
+    "src/experiments/staged_data_protocol/fixtures/cases.json": {
+      "mode": 420,
+      "sha256": "64244dce441f3050c4100e37b393f3d198944ee829bb8c8f636acf3c4d4775e1",
+      "size": 7862
+    },
+    "src/experiments/staged_data_protocol/mock_stock_api.py": {
+      "mode": 420,
+      "sha256": "b53cd6650f52a9c91cd819bb31f08fe3507dd2641c55c6e37aa70a560ec7c7cb",
+      "size": 3452
+    },
+    "src/experiments/staged_data_protocol/phase2/__init__.py": {
+      "mode": 420,
+      "sha256": "af88ca0c669906df7d6912d1a48719b7275e122261bd495b0440ea62abbc1f3f",
+      "size": 47
+    },
+    "src/experiments/staged_data_protocol/phase2/agg_protocol.py": {
+      "mode": 420,
+      "sha256": "d23f04d49802b5599044a113b2b3f767a43ddc7b13216bce5524c36d04882706",
+      "size": 1604
+    },
+    "src/experiments/staged_data_protocol/phase2/api_runner.py": {
+      "mode": 420,
+      "sha256": "5e70660aa94af879baf22eb9444a977ed5894a45f8ea4350db053df82039bf51",
+      "size": 23363
+    },
+    "src/experiments/staged_data_protocol/phase2/base_info_provider.py": {
+      "mode": 420,
+      "sha256": "702d0d2c3264b2ea0959610dc7643a617ff1a5af1fcf2fd561bb645f3f3fe284",
+      "size": 14734
+    },
+    "src/experiments/staged_data_protocol/phase2/call_parser.py": {
+      "mode": 420,
+      "sha256": "7efae8599826ff0044ad8d4fe0264cf49e788a1d96ac81605d41131e0caa23bb",
+      "size": 2577
+    },
+    "src/experiments/staged_data_protocol/phase2/call_structure.py": {
+      "mode": 420,
+      "sha256": "b81823fd40c1afa8e273f60050f1be6d4293b327c9f442e304e8a9cf64ff0c88",
+      "size": 30268
+    },
+    "src/experiments/staged_data_protocol/phase2/call_validator.py": {
+      "mode": 420,
+      "sha256": "b3ab71accb14a7f741ccfc89a8b8d22b3e4689dae091decb502235bb42bda8e2",
+      "size": 19945
+    },
+    "src/experiments/staged_data_protocol/phase2/catalog.py": {
+      "mode": 420,
+      "sha256": "33f24552245208a9b24aed7f7ac092b18ab6fe15a71516eebc6cb29b35328dec",
+      "size": 16874
+    },
+    "src/experiments/staged_data_protocol/phase2/constitution_provider.py": {
+      "mode": 420,
+      "sha256": "5f34350cb9c45c7f1260a89c236695ff2339ca77f0de5135456cfeed197b3c5e",
+      "size": 40851
+    },
+    "src/experiments/staged_data_protocol/phase2/context_builder.py": {
+      "mode": 420,
+      "sha256": "00003f080a084d09221c1958a615e7e7c2343051405031cfb50e7d5438fa3008",
+      "size": 16791
+    },
+    "src/experiments/staged_data_protocol/phase2/dynamic_cal_provider.py": {
+      "mode": 420,
+      "sha256": "8a87ab3781c79e495d6b5b32d2442873bf6dd1f80e1cb36a72b1130a20316220",
+      "size": 28014
+    },
+    "src/experiments/staged_data_protocol/phase2/engine.py": {
+      "mode": 420,
+      "sha256": "2ba6dab97e35268ad9ebd14607a4063a2ca9061ee796dd60a0cec248489bd3ad",
+      "size": 36358
+    },
+    "src/experiments/staged_data_protocol/phase2/financial_provider.py": {
+      "mode": 420,
+      "sha256": "5af4c75a5e6d2620db2701331780d4f42d842767c78e6f000ecb98456c2983dc",
+      "size": 26386
+    },
+    "src/experiments/staged_data_protocol/phase2/hot_event_provider.py": {
+      "mode": 420,
+      "sha256": "ade179d8ab40e99d44c8ef658838bbbb466bffec73f862ad129ca88eefabb6b1",
+      "size": 13547
+    },
+    "src/experiments/staged_data_protocol/phase2/intraday_quote_provider.py": {
+      "mode": 420,
+      "sha256": "33bab68f21a7e43da305811fa99bc02787a8f1f5189c2e8cec789631cb3d581a",
+      "size": 43454
+    },
+    "src/experiments/staged_data_protocol/phase2/margin_provider.py": {
+      "mode": 420,
+      "sha256": "1bcefdde97bdcedd887e6ea9182934543fbab7baa6208931dcb7640c7bf0b121",
+      "size": 23256
+    },
+    "src/experiments/staged_data_protocol/phase2/models.py": {
+      "mode": 420,
+      "sha256": "85c26768ff774f72e912bf360da1993470fdef0bc188b3e92104a7554e2dbfc3",
+      "size": 694
+    },
+    "src/experiments/staged_data_protocol/phase2/moneyflow_provider.py": {
+      "mode": 420,
+      "sha256": "62720ba937af6ee25d7159879ad83992632186286c052aec50a2463d1ddcc933",
+      "size": 26003
+    },
+    "src/experiments/staged_data_protocol/phase2/news_provider.py": {
+      "mode": 420,
+      "sha256": "6fa31ea25caa83418105c9f43a38dfe76344ad14753377b8a7088cd01b104775",
+      "size": 9388
+    },
+    "src/experiments/staged_data_protocol/phase2/pricevalue_provider.py": {
+      "mode": 420,
+      "sha256": "7390d0b9815d06520e5bf84ce6275d4aafae1154e72421b11bb5dd42c79eb577",
+      "size": 30086
+    },
+    "src/experiments/staged_data_protocol/phase2/quote_provider.py": {
+      "mode": 420,
+      "sha256": "ba54473369827ce17b53311a4cb287774abc89ea41a5577e1ae8a09f8964b639",
+      "size": 40985
+    },
+    "src/experiments/staged_data_protocol/phase2/report_provider.py": {
+      "mode": 420,
+      "sha256": "78df2bfad44fea6fb49f57f179ad602c76e388fe8dbf8dced1b1b51532ee8c7c",
+      "size": 30577
+    },
+    "src/experiments/staged_data_protocol/phase2/step_parser.py": {
+      "mode": 420,
+      "sha256": "30547aab5bef17cc5defc3f14a4b58c962468fb772b492355a9887ccd221816a",
+      "size": 900
+    },
+    "src/experiments/staged_data_protocol/phase2/stock_corporate_provider.py": {
+      "mode": 420,
+      "sha256": "e2bc9ce6acee73d2a944052679a5308bad3522591bc8caee74b7fe5e2440fa00",
+      "size": 26740
+    },
+    "src/experiments/staged_data_protocol/phase2/trade_date_resolver.py": {
+      "mode": 420,
+      "sha256": "2bf8343dddb82444febbc777bd179a688ef0fad15cf6da2c7690564db5eba3f2",
+      "size": 9112
+    },
+    "src/experiments/staged_data_protocol/phrase1_stage.py": {
+      "mode": 420,
+      "sha256": "d10a73ee287b4970aa28f5634e7995f6e5889654ef03525d60520b3a6fa05602",
+      "size": 14066
+    },
+    "src/experiments/staged_data_protocol/prompts/stage1_plan.md": {
+      "mode": 420,
+      "sha256": "56590b8d1c7d6f00ae55bb8794ac239e21eb83da972c70eece260f5e01b8ce30",
+      "size": 1170
+    },
+    "src/experiments/staged_data_protocol/prompts/stage2_bind_step.md": {
+      "mode": 420,
+      "sha256": "8066a75839964499e50c183a783b80cc8e8eb5786e130fa5d45c76afa912c240",
+      "size": 1676
+    },
+    "src/experiments/staged_data_protocol/staged_loop.py": {
+      "mode": 420,
+      "sha256": "ccfe388f5bc0631916bcfaa0ee4d823e03a286dbd1ef97aaff04b7f22cbcf69f",
+      "size": 20149
+    },
+    "src/experiments/staged_data_protocol/ui_demo.py": {
+      "mode": 420,
+      "sha256": "41791a2fa348844379f1933d21d5335c0dd0f0611667e87b17cef76ef3e3b205",
+      "size": 33558
+    },
+    "src/finance_api/__init__.py": {
+      "mode": 420,
+      "sha256": "ce9068b6372da79ed6c638bc694aff30591881e5b8f15f9121830faafb9ca8e3",
+      "size": 163
+    },
+    "src/finance_api/app.py": {
+      "mode": 420,
+      "sha256": "801e3d673dd0852318dffac4c9eb152e20ad76fbcc9f9660d09a51d585721963",
+      "size": 17361
+    },
+    "src/finance_api/auth.py": {
+      "mode": 420,
+      "sha256": "3dd5f000e6f70d28fe70742b7e624e9b32e5f3de4b52ec768c7827b8aa1a5a62",
+      "size": 4287
+    },
+    "src/finance_api/models.py": {
+      "mode": 420,
+      "sha256": "e3126f921ad57f0f48c1e49908b763141094f1b533d947957ce2924146b24bd4",
+      "size": 4368
+    },
+    "src/finance_api/service.py": {
+      "mode": 420,
+      "sha256": "fac8a8aadfde0a67a1d2450313312c390c26152f6ff45c4b6ffc7b5b36e66c2a",
+      "size": 8308
+    },
+    "src/finance_api/static/data-map.html": {
+      "mode": 420,
+      "sha256": "6a628039daa106ce82e45f39c06cc2ee761ce143604767a0670202f8e04a6d26",
+      "size": 15117
+    },
+    "src/market_info/market_info.py": {
+      "mode": 420,
+      "sha256": "64eb577d8e86cfef329bfb54a2d35d28aaaf56f7a0c0dd818ed2c293ec6f3069",
+      "size": 35886
+    },
+    "src/prompting/__init__.py": {
+      "mode": 420,
+      "sha256": "f1b0ada24a117f668a21e1e7c96975d5d18b2075994fed243419566fbbd9554d",
+      "size": 175
+    },
+    "src/prompting/prompt_registry.py": {
+      "mode": 420,
+      "sha256": "a6ee461ae6e97e7a6937282106333104f9e2a53a5493428e5b2ae56c8c842c8f",
+      "size": 4175
+    },
+    "src/prompts/codex/finance_api_call.system.md": {
+      "mode": 420,
+      "sha256": "cf8e83cf463b200ed6f445dfc5e370e8aee4bedc98df6dd2d0c8f073e5b55298",
+      "size": 2624
+    },
+    "src/prompts/finance_cc/main.system.md": {
+      "mode": 420,
+      "sha256": "823e9c226f8e38ca1132605fdd28b0fd4b47132a6ac2e574153dd5cdfabdf285",
+      "size": 4372
+    },
+    "src/prompts/system/agent_runtime.all_data_view_selector_experiment.json": {
+      "mode": 420,
+      "sha256": "31072938d367329d57b2414aa3513b4f1418e1f48f3c7654edbc646862a1310a",
+      "size": 401
+    },
+    "src/prompts/system/agent_runtime.all_data_view_selector_experiment.system.md": {
+      "mode": 420,
+      "sha256": "f9bbee03a84a5ada19e8cc2b686b8e0668037830801e27acfa6b437230605503",
+      "size": 2001
+    },
+    "src/prompts/system/agent_runtime.all_data_view_selector_experiment.user.md": {
+      "mode": 420,
+      "sha256": "de9d2cc51f964e6de357bd8e3b0dceaeff50e96a7ccd358dbf2b641923b273f3",
+      "size": 110
+    },
+    "src/prompts/system/agent_runtime.deep_assessor.json": {
+      "mode": 420,
+      "sha256": "7a6bd814ec4b6959968296887eb6eef3a28e22eea168198b80bd5f0ed87d1b91",
+      "size": 1726
+    },
+    "src/prompts/system/agent_runtime.deep_execution_preview.json": {
+      "mode": 420,
+      "sha256": "f01bff29a6ede6bb6692ee5379da4419944c36ee8d17d314d6acb5c8bf4e76c7",
+      "size": 1273
+    },
+    "src/prompts/system/agent_runtime.deep_planner.json": {
+      "mode": 420,
+      "sha256": "9c9365cc2094020bd16dce417e89ce6a6b4283180443660df5c804730e4751ce",
+      "size": 2332
+    },
+    "src/prompts/system/agent_runtime.deep_refiner.json": {
+      "mode": 420,
+      "sha256": "8476bb6ddcfd524bf0e4a1140952e318d20913dabc201928770c96f7ee1e28b9",
+      "size": 1284
+    },
+    "src/prompts/system/agent_runtime.finance_operation_planner_experiment.json": {
+      "mode": 420,
+      "sha256": "361d7d814fb7a112464116249fb1b27b9e7570745fc904576c9cba64403ccef2",
+      "size": 447
+    },
+    "src/prompts/system/agent_runtime.finance_operation_planner_experiment.system.md": {
+      "mode": 420,
+      "sha256": "42b7ddd690ecc1257a426862687a4a6267cd81a79bf6338fcae525231e0d671a",
+      "size": 1094
+    },
+    "src/prompts/system/agent_runtime.finance_operation_planner_experiment.user.md": {
+      "mode": 420,
+      "sha256": "b54b770c868697bf68e48cbc218dc1346a635a159376f2e7fa25a675e3eb2b8f",
+      "size": 21
+    },
+    "src/prompts/system/agent_runtime.finance_operation_protocol_compiler_experiment.json": {
+      "mode": 420,
+      "sha256": "7844f5b5e522adb147b5b90d02e15376fe8dbec2bbe1639109eb0af4025e75ff",
+      "size": 487
+    },
+    "src/prompts/system/agent_runtime.finance_operation_protocol_compiler_experiment.system.md": {
+      "mode": 420,
+      "sha256": "83ee113451aa6f03d26ce3a80f7ca421d4a622a721425219c8efc2ad7df5a17f",
+      "size": 1516
+    },
+    "src/prompts/system/agent_runtime.finance_operation_protocol_compiler_experiment.user.md": {
+      "mode": 420,
+      "sha256": "04a968457be6266203f881223e39bd113ec77365daa306127c259f9c1303d37e",
+      "size": 59
+    },
+    "src/prompts/system/agent_runtime.observer.json": {
+      "mode": 420,
+      "sha256": "54271e1d43f478ca5e0dcba86ce809f51b325e97fe7b2c5d0121ef175944e1b6",
+      "size": 1534
+    },
+    "src/prompts/system/agent_runtime.outer_task_structurer.json": {
+      "mode": 420,
+      "sha256": "988aa4828575f2f2597875806fc4caced49bd83ab844274dcb003e391c4cfaa0",
+      "size": 1866
+    },
+    "src/prompts/system/agent_runtime.plan_compiler.json": {
+      "mode": 420,
+      "sha256": "7803503dafe2a1d991bde1b4ddb40d425abec62d6f44e6e97961279a6c144ae9",
+      "size": 417
+    },
+    "src/prompts/system/agent_runtime.plan_compiler.system.md": {
+      "mode": 420,
+      "sha256": "a8825ede94572d0fab51ad1d05108d5db10e4691a37f9d43e531898682d41412",
+      "size": 9671
+    },
+    "src/prompts/system/agent_runtime.plan_compiler.system.md.reviewed": {
+      "mode": 420,
+      "sha256": "97f6c52a6b3188f188d63f96b63d95d57e8d30c12deb5823e227dd563919e2a6",
+      "size": 6527
+    },
+    "src/prompts/system/agent_runtime.plan_compiler_repair.json": {
+      "mode": 420,
+      "sha256": "6be78846d318ce97c39346d0d2bfc4e2fa3d5e69e09347b8df3a5807e3b3e990",
+      "size": 525
+    },
+    "src/prompts/system/agent_runtime.plan_compiler_repair.system.md": {
+      "mode": 420,
+      "sha256": "8189aeae00ccfdb0efa41d3e9bcee9a97ab5692c58b9003c47a7688e7813c943",
+      "size": 1282
+    },
+    "src/prompts/system/agent_runtime.plan_compiler_step_repair.json": {
+      "mode": 420,
+      "sha256": "b334534f72ec0d1c6b8fc78e212e1ed1c2769fef753eba835ef13080179180cd",
+      "size": 201
+    },
+    "src/prompts/system/agent_runtime.plan_compiler_step_repair.system.md": {
+      "mode": 420,
+      "sha256": "9bce13c003ed171ff7a678c47c070fd0a0ac8064b546fb19b5d985349146d965",
+      "size": 1782
+    },
+    "src/prompts/system/agent_runtime.planner.json": {
+      "mode": 420,
+      "sha256": "9678314d7e2ca3d555288bdf487b4912f06f7b042ac87773a0e5e2277a86e5c3",
+      "size": 431
+    },
+    "src/prompts/system/agent_runtime.planner.system.md": {
+      "mode": 420,
+      "sha256": "3acb573236fd33047a013f4cdfe0f7a4f735fdae18a00134ed4377d82e0dd182",
+      "size": 5991
+    },
+    "src/prompts/system/agent_runtime.security_data_request_compiler.json": {
+      "mode": 420,
+      "sha256": "94e1b0dbb0b9b192113d18f82332be6c1e043580463f58d76b85d156b31331a6",
+      "size": 392
+    },
+    "src/prompts/system/agent_runtime.security_data_request_compiler.system.md": {
+      "mode": 420,
+      "sha256": "2da4e285a225309d23e65dff09b791d75be69ceba14ca90d2a6e0e044a2e3d91",
+      "size": 4071
+    },
+    "src/prompts/system/agent_runtime.security_data_request_compiler.user.md": {
+      "mode": 420,
+      "sha256": "fcaa4b318d1bbe06050fb0ed531a16e0ea9bbc6fe56062622204cdd45061bd22",
+      "size": 27
+    },
+    "src/prompts/system/agent_runtime.security_subject_classifier.json": {
+      "mode": 420,
+      "sha256": "5cb34f20e97609795a7382ea5e946a719e1d3fb9a60e80d0751b259bb4910702",
+      "size": 351
+    },
+    "src/prompts/system/agent_runtime.security_subject_classifier.system.md": {
+      "mode": 420,
+      "sha256": "3ce8a771cd575fb9a61c8c433afdc853345730ddf4fca1162cfb26008068028c",
+      "size": 2074
+    },
+    "src/prompts/system/agent_runtime.thinking_mode_router.json": {
+      "mode": 420,
+      "sha256": "9ab782093edb06821c359eb5a6e59b985a672b441d7c8ff827943406ae074858",
+      "size": 379
+    },
+    "src/prompts/system/agent_runtime.thinking_mode_router.system.md": {
+      "mode": 420,
+      "sha256": "6ab82878dde2828c2ea3a5d72f5c382acc1ed00f190351c093f9870f882d5409",
+      "size": 899
+    },
+    "src/prompts/system/agent_runtime.tool_argument_compiler.json": {
+      "mode": 420,
+      "sha256": "76f9f72c18f1592b979b88d6f9b89f589b4be9b0b3a83f8bf51ffad577278b24",
+      "size": 368
+    },
+    "src/prompts/system/agent_runtime.tool_argument_compiler.system.md": {
+      "mode": 420,
+      "sha256": "353e49b2d5d5af598955bfd7ee15260a4774562123c9759f3d29d84c1111f7da",
+      "size": 1627
+    },
+    "src/prompts/system/agent_runtime.tool_argument_compiler.user.md": {
+      "mode": 420,
+      "sha256": "59f0b4081ccefb69af1f20104e0c44591c658792dd0dbed9fcdce7248e271d12",
+      "size": 214
+    },
+    "src/prompts/system/assistant.agent_direct_response.json": {
+      "mode": 420,
+      "sha256": "7619c0b9064dcf473d4cac10123a9953e06b3ebb6576fa0dde61283391114419",
+      "size": 349
+    },
+    "src/prompts/system/assistant.agent_direct_response.system.md": {
+      "mode": 420,
+      "sha256": "24f7c0d480dfe62383e4903475b5e53dc8f2c9af16a3e1da031996b87a609509",
+      "size": 226
+    },
+    "src/prompts/system/assistant.agent_direct_response.user.md": {
+      "mode": 420,
+      "sha256": "3fb67b6e6d16187bbb4b0d15548f3db19d4d178c43d67a24c96dac9c8e88c32b",
+      "size": 11
+    },
+    "src/prompts/system/assistant.answer_summary.json": {
+      "mode": 420,
+      "sha256": "02d767d792b62bd06994532fdc734d27fbbda7cca8fb135c69ebdafcfaf28d88",
+      "size": 328
+    },
+    "src/prompts/system/assistant.answer_summary.system.md": {
+      "mode": 420,
+      "sha256": "3c7d35e8c822d9aa606fa2f8a28987b45b30740dcbb4dacbad08d15024c9e217",
+      "size": 377
+    },
+    "src/prompts/system/assistant.answer_summary.user.md": {
+      "mode": 420,
+      "sha256": "a6b39e8abfb59a5776f7481a6e381964642c0376fc22d22daab7ee21390a7a88",
+      "size": 228
+    },
+    "src/prompts/system/assistant.asset_invocation.json": {
+      "mode": 420,
+      "sha256": "f2d0a608e2de47bdece0565b6f56bb105f91dda7bb707886af4a1e57cf4bf732",
+      "size": 342
+    },
+    "src/prompts/system/assistant.asset_invocation.system.md": {
+      "mode": 420,
+      "sha256": "e233ba2aa18cae862594c3aea9755de9dc2ec32061e0da1834f2984329caa549",
+      "size": 3545
+    },
+    "src/prompts/system/assistant.asset_invocation.user.md": {
+      "mode": 420,
+      "sha256": "b3d59339450a02a84a9f501f6812c40c4ee4bc6e2027719bf4212b77d59686ac",
+      "size": 193
+    },
+    "src/prompts/system/assistant.context_resolution.json": {
+      "mode": 420,
+      "sha256": "99c250f5a760a1ac40a3bdb950d96c24da7d063cac0bce72a336a5aa824b6375",
+      "size": 340
+    },
+    "src/prompts/system/assistant.context_resolution.system.md": {
+      "mode": 420,
+      "sha256": "ed3407d30d04676433049fdce65d20d2bd5e98c1ac284eb7b5c25d9d9babfb8c",
+      "size": 1772
+    },
+    "src/prompts/system/assistant.context_resolution.user.md": {
+      "mode": 420,
+      "sha256": "8f37bd667b6ab13a5a8d9e6f4646229a1ac5c924af9b59aad4eb15061597423b",
+      "size": 328
+    },
+    "src/prompts/system/assistant.conversation_task_finalizer.json": {
+      "mode": 420,
+      "sha256": "8eb8cda55ccc9769436782bdc5283b7145c993a7ac67a28a7d65756fd032c299",
+      "size": 367
+    },
+    "src/prompts/system/assistant.conversation_task_finalizer.system.md": {
+      "mode": 420,
+      "sha256": "3c59d51b850e5367b2bdeb0d71c92eae98123b6d37e88682a03e9c9dc095cb76",
+      "size": 2447
+    },
+    "src/prompts/system/assistant.conversation_task_finalizer.user.md": {
+      "mode": 420,
+      "sha256": "4eff05170cb5b202ebd64bb8b169e113bdaad98c24d21263531189e0769a356d",
+      "size": 506
+    },
+    "src/prompts/system/assistant.interaction_preprocess.json": {
+      "mode": 420,
+      "sha256": "523e4e7c2230bfed7fafef71af3b0017c19d754944b2590672a7a6a0060fa5c5",
+      "size": 352
+    },
+    "src/prompts/system/assistant.interaction_preprocess.system.md": {
+      "mode": 420,
+      "sha256": "9ed4cc05e7c17a33fa5c015e2e6a31d1ee93f1559717d39f4b7aa84937ef8ba1",
+      "size": 3163
+    },
+    "src/prompts/system/assistant.interaction_preprocess.user.md": {
+      "mode": 420,
+      "sha256": "db34e99b95ea690f24505aa2f8e084f33e200614b303b6d3d4d6cfbea3504a23",
+      "size": 396
+    },
+    "src/prompts/system/assistant.result_block_classifier.json": {
+      "mode": 420,
+      "sha256": "273e38e5ef2ac2718a7e544eabd054fe519727f7fbe32aa8f20aebb44a7d3364",
+      "size": 355
+    },
+    "src/prompts/system/assistant.result_block_classifier.system.md": {
+      "mode": 420,
+      "sha256": "06f14ac128f2804eff1c39ee30731137d9e5f15c96937dd5b1da4df6969785e9",
+      "size": 918
+    },
+    "src/prompts/system/assistant.result_block_classifier.user.md": {
+      "mode": 420,
+      "sha256": "c522a224755631fd8deaae921d677b4abca9494133b3e7d559f11e4d50c18644",
+      "size": 217
+    },
+    "src/prompts/system/assistant.scheduled_task_compile.json": {
+      "mode": 420,
+      "sha256": "bea2f07d1865086e3d8da49a5f84cc595a38a45efd8ab2bc723a1b07c3f58f32",
+      "size": 352
+    },
+    "src/prompts/system/assistant.scheduled_task_compile.system.md": {
+      "mode": 420,
+      "sha256": "02aa933937d9c6c831e483ae5a24f430f2d4f5b961132fb44d05e129141aadc7",
+      "size": 1352
+    },
+    "src/prompts/system/assistant.scheduled_task_compile.user.md": {
+      "mode": 420,
+      "sha256": "aed08c4c43b51fbee6bdb2d37b0ceac5a0cbdcb90d84a45df77eedb79816fe94",
+      "size": 104
+    },
+    "src/prompts/system/assistant.tool_candidate_rerank.json": {
+      "mode": 420,
+      "sha256": "521c3a1fff3296eea85e98b17d88c26aa2291668f444866c67804c5cee6b8ce3",
+      "size": 349
+    },
+    "src/prompts/system/assistant.tool_candidate_rerank.system.md": {
+      "mode": 420,
+      "sha256": "5000cc61097bc04467c4c154fc16f2766d079a433340efb3fd683541c0b44df4",
+      "size": 799
+    },
+    "src/prompts/system/assistant.tool_candidate_rerank.user.md": {
+      "mode": 420,
+      "sha256": "bf4eafcfb2be0f8fa461824d3611f21c5cdbd977a61f19da7a8f68ec1dfa6a0e",
+      "size": 221
+    },
+    "src/prompts/system/assistant.tool_plan_synthesis.json": {
+      "mode": 420,
+      "sha256": "d51b4a1208524e585e992343b8e2861d295b61d59126993194749bf877bdc5fd",
+      "size": 1400
+    },
+    "src/prompts/system/assistant.vision_intake.json": {
+      "mode": 420,
+      "sha256": "1b7ef6225aa86d6921ae9f6b663eebf2f80c446fbc6a92a573cf8f9d4641a82f",
+      "size": 1960
+    },
+    "src/prompts/system/skill_blueprint.generate.json": {
+      "mode": 420,
+      "sha256": "f4179265ea7ba2c5946da28f964c5fad3c11b2fdb68aaf2ab0ec8858e2e9841b",
+      "size": 3251
+    },
+    "src/prompts/system/skill_blueprint.refine.json": {
+      "mode": 420,
+      "sha256": "6a1a1b398cb5c0c6b3fafe928a1fda59b8abaa652a836b01e810735bf27dffe8",
+      "size": 3424
+    },
+    "src/prompts/system/skill_runtime.agent_main.json": {
+      "mode": 420,
+      "sha256": "7d823f36b37aac09885c10b615f034cf1b82fd7214a580187087835c0f4a6beb",
+      "size": 1205
+    },
+    "src/prompts/system/skill_runtime.format_retry.json": {
+      "mode": 420,
+      "sha256": "123aadc563eba13a2003c9cba039505064d13e487c1ea209eeec464e667b7d6b",
+      "size": 480
+    },
+    "src/prompts/system/skill_runtime.json_repair.json": {
+      "mode": 420,
+      "sha256": "5d6a1340d894c064087f6d13ac3edf8f245073b3950a6372bae9eee3b68dbde2",
+      "size": 454
+    },
+    "src/prompts/system/tool_prompt_samples/equity_research_search.sample.md": {
+      "mode": 420,
+      "sha256": "4ddddd3e667d9097e8e15c22f173269682af1b6f103210d7407a36a8475906b3",
+      "size": 1073
+    },
+    "src/prompts/system/tool_prompt_samples/financial_news_search.sample.md": {
+      "mode": 420,
+      "sha256": "b765a82790a2ffdd75502d471bfb0bf30abcfd4deb60e4700422046361ce4da8",
+      "size": 701
+    },
+    "src/prompts/system/tool_prompt_samples/general_search.sample.md": {
+      "mode": 420,
+      "sha256": "a06e2474ebeeafc5f300c35e1945d23441222029c594148732b34f328adc3a91",
+      "size": 407
+    },
+    "src/prompts/system/tool_prompt_samples/get_company_taxonomy_profile.sample.md": {
+      "mode": 420,
+      "sha256": "90681fd04147ed122b16dcca3c652342db4c8f2b6c9d482f8eca3bf62c325938",
+      "size": 534
+    },
+    "src/prompts/system/tool_prompt_samples/get_hot_concepts_and_leaders.sample.md": {
+      "mode": 420,
+      "sha256": "ef0c8e921cea9d8a3b77c56e3e62ee70ddfe1c00faffe5b5eb5d169cd800a25c",
+      "size": 1248
+    },
+    "src/prompts/system/tool_prompt_samples/get_hot_industries_and_leaders.sample.md": {
+      "mode": 420,
+      "sha256": "51a62abde569e6e58c99fd0805eeaff879c21be85bc5917073b99cef5d930a9a",
+      "size": 1250
+    },
+    "src/prompts/system/tool_prompt_samples/get_hot_sectors_and_leaders.sample.md": {
+      "mode": 420,
+      "sha256": "2dec2e6dd4c15988b215d8076552d1d3ed5b2a5350179b102457e02237730de7",
+      "size": 1247
+    },
+    "src/prompts/system/tool_prompt_samples/index.md": {
+      "mode": 420,
+      "sha256": "33e0e9401ea91e1fc6ef3ee07c8b61c2cf38fe835e56609c44a9e7773730ee9b",
+      "size": 1618
+    },
+    "src/prompts/system/tool_prompt_samples/indicator_series_query.sample.md": {
+      "mode": 420,
+      "sha256": "aae43dd4392698e52024a250dc46ec39ef37634d9fafe19b1c6b3f43a951c2c3",
+      "size": 1526
+    },
+    "src/prompts/system/tool_prompt_samples/stock_funds.sample.md": {
+      "mode": 420,
+      "sha256": "12d2b3aa29c629c5862f4b661dd1d3b119ca167eddf16842d448ed4c38838482",
+      "size": 1139
+    },
+    "src/prompts/system/tool_prompt_samples/stock_quote.sample.md": {
+      "mode": 420,
+      "sha256": "04403ff4e50d1fbad55b2f0ca2580ca06da8dadf3603240a7bdf9740b80b3f2a",
+      "size": 807
+    },
+    "src/prompts/system/tool_prompt_samples/theme_leaders.sample.md": {
+      "mode": 420,
+      "sha256": "fa191ad2bd0073047dc1087dd962d55b21343b0f315f63bcab2ab302d2a96dbb",
+      "size": 737
+    },
+    "src/prompts/system/tool_selector.auto_rerank.json": {
+      "mode": 420,
+      "sha256": "37d446bb6be40272db314a06b617efe1269749a1fc4bfe355fde96a9ffc8d56c",
+      "size": 592
+    },
+    "src/protocols/agent_surface_protocol_v1.schema.json": {
+      "mode": 420,
+      "sha256": "3c659d0669048bfce753864ea2735e25e0424aed5a64f222307e60e25c84e195",
+      "size": 40069
+    },
+    "src/protocols/security_data_request_protocol.json": {
+      "mode": 420,
+      "sha256": "788068d5015c08033b4edcf2d947e6ae82958f10a882374cdb794e1ffadc508b",
+      "size": 2003
+    },
+    "src/quant_research/factors/price_volume_momentum_v1.json": {
+      "mode": 420,
+      "sha256": "9e4ccdc750c98064e9e08bddfa4701e6ffc991ff973ac7976d5c4ccf1a2c9e43",
+      "size": 964
+    },
+    "src/quant_research/sql_templates/stock_momentum_result_query_v1.json": {
+      "mode": 420,
+      "sha256": "6c380dd74284fcb8cf63a82bd16d0c4a3d1ef61cdf642c70de921a75ca7c1966",
+      "size": 1964
+    },
+    "src/quant_research/strategies/stock_momentum_ranking_v1.json": {
+      "mode": 420,
+      "sha256": "d2bcec2111a3027510e004b5b14ecaea1cccd80c155cd63560e064d618f84684",
+      "size": 936
+    },
+    "src/scenarios/__init__.py": {
+      "mode": 420,
+      "sha256": "62556cfd5f60dfb23eabfee7113f40d87135ce2455f9a97114f7e5307eb50391",
+      "size": 69
+    },
+    "src/scenarios/financial_qa/__init__.py": {
+      "mode": 420,
+      "sha256": "9d032272579e0dd43e8c5574561216246d9fce52664e1eaa769fd98b194149f1",
+      "size": 468
+    },
+    "src/scenarios/financial_qa/business_skills.py": {
+      "mode": 420,
+      "sha256": "534f9bd7a7114a9ea6820c04b2412531918e5355aa6506e1d5575f36b0acc611",
+      "size": 39008
+    },
+    "src/scenarios/financial_qa/data_query.md": {
+      "mode": 420,
+      "sha256": "c4026d069e296b8266cd1946e3765b81d8c8df3ba827f0189aa95d8ef3112f76",
+      "size": 3379
+    },
+    "src/scenarios/financial_qa/dsh_loop_policy.mjs": {
+      "mode": 420,
+      "sha256": "d4997fdd6a51a348109fc378d0d7853c97abc9ad6a3e69acc69db93e3f05a520",
+      "size": 21722
+    },
+    "src/scenarios/financial_qa/dsh_mcp_server.py": {
+      "mode": 420,
+      "sha256": "d8ae103d02ccbfab5314417d3a50cf30fa5d97de817f951fc1f4ccb658fd3645",
+      "size": 8916
+    },
+    "src/scenarios/financial_qa/dsh_service.py": {
+      "mode": 420,
+      "sha256": "872482b8d1869d4b192afd4f8aec5c8ad5246e2282d8a24005a77e32d30039f9",
+      "size": 41196
+    },
+    "src/scenarios/financial_qa/dsh_system.md": {
+      "mode": 420,
+      "sha256": "b4cadf4a071d483121690cdda28bfdd56c11a968e2bfce1e258969bbe51696b9",
+      "size": 2774
+    },
+    "src/scenarios/financial_qa/finance_api_protocol.md": {
+      "mode": 420,
+      "sha256": "015edbc711d310ff4560ce9b9b772ff262c912c29a09ac4801fded337e6266a4",
+      "size": 2964
+    },
+    "src/scenarios/financial_qa/presentation.py": {
+      "mode": 420,
+      "sha256": "07239a398fc754a1fc486e7383e79212d628b1ed4aa98472c41a179eb6f0e712",
+      "size": 30343
+    },
+    "src/scenarios/financial_qa/query_recovery.py": {
+      "mode": 420,
+      "sha256": "94dc48ffd86325db63076412216d4dbaf05ebf3d0bd6d17639048d7edbcd3537",
+      "size": 4186
+    },
+    "src/scenarios/financial_qa/research_mode.py": {
+      "mode": 420,
+      "sha256": "1db041a177935c1ca4efe69e9d970abbde8cf64a1aa423cdc7eb3c71017c5c50",
+      "size": 3041
+    },
+    "src/scenarios/financial_qa/result_registry.py": {
+      "mode": 420,
+      "sha256": "8d047555479dbef0e1fdaaf4bec397e55a3c20c18125bfc8aed649a42daf4382",
+      "size": 10268
+    },
+    "src/scenarios/financial_qa/runtime.py": {
+      "mode": 420,
+      "sha256": "4d7649a9d605db11cfa64b98788aca31c43744441b79b52c4a7634930dd0d215",
+      "size": 738
+    },
+    "src/scenarios/financial_qa/service.py": {
+      "mode": 420,
+      "sha256": "ccc18846bc37f37cb448a4e942620a85dc9cb1f47161ae9ece88643c98870079",
+      "size": 24093
+    },
+    "src/scenarios/financial_qa/system.md": {
+      "mode": 420,
+      "sha256": "19636852e07853aea51c7895e26ae48905374fc3abc6ea365d132abe9bbb66cb",
+      "size": 10330
+    },
+    "src/scenarios/financial_qa/tools.py": {
+      "mode": 420,
+      "sha256": "53c8d0fca15f720b1a27c6a0e910b661c8ec56d1a2250adae58391753bdd726f",
+      "size": 78486
+    },
+    "src/services/active_tool_registry_service.py": {
+      "mode": 420,
+      "sha256": "1bec6d52b628de287ef1a80338ef3904e2cc43694fe01de468a9a8121ab78bf0",
+      "size": 17736
+    },
+    "src/services/agent_direct_response_service.py": {
+      "mode": 420,
+      "sha256": "6c2d7a743de404793471e61c7ae86ae7ea29b3962994bc959a3a5122c0950d99",
+      "size": 2136
+    },
+    "src/services/agent_execution_service.py": {
+      "mode": 420,
+      "sha256": "4951eaae373701f356a0c6c24802ab61d6c5a9e9dc3d10fa01141112c4618d92",
+      "size": 16768
+    },
+    "src/services/agent_providers/__init__.py": {
+      "mode": 420,
+      "sha256": "50fb9363ab695cd915866fa125277bf17929a5f248f8939c0b2e320776f40adc",
+      "size": 1128
+    },
+    "src/services/agent_providers/claude.py": {
+      "mode": 420,
+      "sha256": "3f1a3fe59811ea6255ca44eb983bba08366173b967d72e3bc5fd9af1a9c8cbcc",
+      "size": 49767
+    },
+    "src/services/agent_providers/factory.py": {
+      "mode": 420,
+      "sha256": "21e1a0d8f15f4dcb3c8aa1e3808705dc67f66f0a66305c999e8ea875fb306a8e",
+      "size": 3489
+    },
+    "src/services/agent_providers/protocol.py": {
+      "mode": 420,
+      "sha256": "d4d6ceb5fc67529176ed732696492de812143ae2bfb092135b78634da981afa5",
+      "size": 4760
+    },
+    "src/services/agent_providers/runtime_context.py": {
+      "mode": 420,
+      "sha256": "58ad064dc3e7b3b4abe0544babd6f06f6f7024306a571a088667821f4255a89c",
+      "size": 4964
+    },
+    "src/services/agent_providers/runtime_policy.py": {
+      "mode": 420,
+      "sha256": "669746eee2b347ee39f1304d4e0b6fd4d1f38bba8e4496727a55d1a7f24697fe",
+      "size": 8160
+    },
+    "src/services/agent_providers/skill_support.py": {
+      "mode": 420,
+      "sha256": "5a2dd427226d8961f4467e73bd977889a6034639f4fd15f2f00ca0a8e8427588",
+      "size": 9044
+    },
+    "src/services/agent_runtime_llm_planner_service.py": {
+      "mode": 420,
+      "sha256": "14e6138005d47de38fe09eb638ba25dcf0f07db80feaf4aaeeef1bc803d48394",
+      "size": 111721
+    },
+    "src/services/agent_runtime_observer_service.py": {
+      "mode": 420,
+      "sha256": "979ce3d7b2450823deb2f5b0a17b0e2d5719e76a29251d66bb3165af32b9efda",
+      "size": 5979
+    },
+    "src/services/agent_runtime_service.py": {
+      "mode": 420,
+      "sha256": "92dd5fc59f7a6bd9561e008e71f1ca9583053a4c66d80dbf9712504e992b8d42",
+      "size": 5691
+    },
+    "src/services/agent_studio_service.py": {
+      "mode": 420,
+      "sha256": "398114a9f501abf7b5bb7e1bdacfbee5d4a6fdf1e8f90b3c13745b0219c005c1",
+      "size": 7004
+    },
+    "src/services/answer_summary_service.py": {
+      "mode": 420,
+      "sha256": "1f92b30baa1c373cf87641cbb4574f238f099b9b09d68638cecabc3c1d3e8045",
+      "size": 5029
+    },
+    "src/services/application_runtime_service.py": {
+      "mode": 420,
+      "sha256": "5bfc953ca070ea14931b84a07afc0799c0ae76dcaa8c8ba965a35dac97773ed2",
+      "size": 8866
+    },
+    "src/services/application_studio_service.py": {
+      "mode": 420,
+      "sha256": "68080d489e4ed21a1c4db805111c2e46de08a409560b0384b586e5448c92934e",
+      "size": 7527
+    },
+    "src/services/application_workbench_service.py": {
+      "mode": 420,
+      "sha256": "7420596d50e7ec72093c51282bc6246d83f0118a58791a9a791230e3d7ade3f8",
+      "size": 4741
+    },
+    "src/services/asset_invocation_service.py": {
+      "mode": 420,
+      "sha256": "27b85ba425e73aa7b2a447da13c20bb2bd1b2d0137ad9aca352cecbc8126277a",
+      "size": 67679
+    },
+    "src/services/assistant_dispatch_planner.py": {
+      "mode": 420,
+      "sha256": "6a7ba1e1c0591f2b3200cb147f7d4acb842462bdf19a6679ef1b10ef5fae47d0",
+      "size": 11461
+    },
+    "src/services/assistant_interaction_preprocessor.py": {
+      "mode": 420,
+      "sha256": "a2617c1093085a57553f05a144194fa7f3d7c8062ebab077e71f9fea88895a35",
+      "size": 11162
+    },
+    "src/services/attachment_service.py": {
+      "mode": 420,
+      "sha256": "f83bb2ee5e3ed4cd023a0faffa6709ad7b3780b5a95d3a14ec18ed8cf38df7bf",
+      "size": 6644
+    },
+    "src/services/auth_rate_limit_service.py": {
+      "mode": 420,
+      "sha256": "976fa29bdbb15d0ee8349cc1262ff5b3f9256e54dcc9f622eaa6dd0c5bc3204e",
+      "size": 21821
+    },
+    "src/services/backtest_benchmark_service.py": {
+      "mode": 420,
+      "sha256": "f5e65c7f053d27effc0e899b5986fee60cce6a3d951ef8bf1a043150180c6f70",
+      "size": 13042
+    },
+    "src/services/backtest_run_service.py": {
+      "mode": 420,
+      "sha256": "0cff41640b0def6ad81dcb3007a6b16397b44b212c77f09176e8e024d7581dac",
+      "size": 2842
+    },
+    "src/services/buy_and_hold_backtest_service.py": {
+      "mode": 420,
+      "sha256": "a7feb740b6f75ecade61834f999698ec17f23a586228928087c626547581bbed",
+      "size": 22125
+    },
+    "src/services/capability_embedding_service.py": {
+      "mode": 420,
+      "sha256": "9be584cb00d6b193aaa62409093511cdef7ff4f004fefd5837fc320a474a19a8",
+      "size": 12240
+    },
+    "src/services/capability_search_service.py": {
+      "mode": 420,
+      "sha256": "98a74f1ca8971ea9a7c03c399b0514d3cab80d51eab3801473d44544feecccff",
+      "size": 37689
+    },
+    "src/services/code_work_item_runner.py": {
+      "mode": 420,
+      "sha256": "8e3018f9b238c92b618aad00def66ba17f8d5f365d409dece43d90f216760ce5",
+      "size": 19255
+    },
+    "src/services/codex_exec_skill_harness.py": {
+      "mode": 420,
+      "sha256": "a2b41b6c10ddf113858245e3324118b34206ac5df38803de460feb667c8c4b9e",
+      "size": 110963
+    },
+    "src/services/coding_execution_contract.py": {
+      "mode": 420,
+      "sha256": "1967872e2bf917c55603cf60e531a2d6f05ebf3e99da993f809fbee4ef3dcf70",
+      "size": 3311
+    },
+    "src/services/context_resolution_service.py": {
+      "mode": 420,
+      "sha256": "a531dd09d332e3d87ca0c42d196f01173c41ea7c3597c92874a9564fd2cde6fc",
+      "size": 13731
+    },
+    "src/services/conversation_mainline_contract_service.py": {
+      "mode": 420,
+      "sha256": "b218595046ecc2d01a0914fbf59febf3c02c10d7a197f757256e7e9455c623ff",
+      "size": 7688
+    },
+    "src/services/conversation_preprocess_service.py": {
+      "mode": 420,
+      "sha256": "4d11a6b496579a50bc1481d2f83184836aa4e4d385b0da08b9fd9f6f8d15ecba",
+      "size": 48411
+    },
+    "src/services/conversation_runtime_contract_service.py": {
+      "mode": 420,
+      "sha256": "88a4440cbb4b47c85d665e7017f8bb49f25ca5588239ae498341353be4093c2a",
+      "size": 20283
+    },
+    "src/services/conversation_task_finalizer_service.py": {
+      "mode": 420,
+      "sha256": "3978a0eda7f6c5b06c44bf3fd06bea4c2d532aa8164313ee7bf5404f7d102be1",
+      "size": 3408
+    },
+    "src/services/conversation_title_service.py": {
+      "mode": 420,
+      "sha256": "03840417bba3e370afea1112c09d96dd9a64b617bd74c7ba6a2381c776bbb834",
+      "size": 2876
+    },
+    "src/services/custom_tool_context_bundle_service.py": {
+      "mode": 420,
+      "sha256": "257f74574ee9c8ec8a0f9674584dfb3187be4c10bbb55507558c9533f26d94a2",
+      "size": 54196
+    },
+    "src/services/custom_tool_design_protocol_service.py": {
+      "mode": 420,
+      "sha256": "c68cb6fe2437eb36c7e83cf6ecca53dae013be00d1f8d613f9ee3d9afd5f0a3f",
+      "size": 1030
+    },
+    "src/services/custom_tool_historical_replay_host.py": {
+      "mode": 420,
+      "sha256": "50cda608ef938474b6e9f8c818ebe6c513044b04e53da8a18698f8b9bea48597",
+      "size": 13420
+    },
+    "src/services/custom_tool_run_trace_service.py": {
+      "mode": 420,
+      "sha256": "a22167a29e002806be9557e9c5fba7016320d88663759c17613db393fddddde8",
+      "size": 8639
+    },
+    "src/services/custom_tool_service.py": {
+      "mode": 420,
+      "sha256": "af1aa9fd3bec6e5160a759561abef347f49a75d6c8bbde08742b48ead99ac408",
+      "size": 187557
+    },
+    "src/services/database_custom_tool_store_service.py": {
+      "mode": 420,
+      "sha256": "ca72a4cc7abf3aa34d3ffac50ec9a3e85decc232b32af8db59a984daf597d40a",
+      "size": 39931
+    },
+    "src/services/deep_thinking_assessment_service.py": {
+      "mode": 420,
+      "sha256": "c74382efb26b5af1ea578bc519ff559311f8882c056e06366b1a076ca5b29aa3",
+      "size": 8207
+    },
+    "src/services/deep_thinking_execution_preview_service.py": {
+      "mode": 420,
+      "sha256": "752bc8cc7ab9b349a47c973c6203cc7c7841f6bd9a983c8d0424465112b90c35",
+      "size": 5127
+    },
+    "src/services/deep_thinking_planner_service.py": {
+      "mode": 420,
+      "sha256": "61505009c81576e16791d2763e32d5c2c078e65acfa322e713bb85a9c59f075d",
+      "size": 15970
+    },
+    "src/services/deep_thinking_refiner_service.py": {
+      "mode": 420,
+      "sha256": "2c91fdc622f8531256d000c0799e5d340871716c992548c9e67b43fa78e993d4",
+      "size": 5020
+    },
+    "src/services/design_narrative_service.py": {
+      "mode": 420,
+      "sha256": "7f2297cede6676a4e1bb540184b76fc8eee61eaaabb7e7103007f49f3b20c9b9",
+      "size": 2709
+    },
+    "src/services/display_contract_compiler.py": {
+      "mode": 420,
+      "sha256": "ad2662cdc63d711f41c5d1fde4795dce16c48635b539f54723c0022f1f628bbd",
+      "size": 19647
+    },
+    "src/services/execution_plan_service.py": {
+      "mode": 420,
+      "sha256": "210d488de14b5ccd02a20a426f88e472469feacbed600a4aa4901a6272ee5b8f",
+      "size": 23409
+    },
+    "src/services/file_artifact_service.py": {
+      "mode": 420,
+      "sha256": "994868a751e4cc49612b5e013ac4ab32ca29388a4c32243a600f8bf50bab88a2",
+      "size": 21604
+    },
+    "src/services/file_io_tool_service.py": {
+      "mode": 420,
+      "sha256": "6b469ef549f59a844e21340ff112a770353df7705ac3d8096529a21a32cb2793",
+      "size": 15454
+    },
+    "src/services/finance_cc_system_tools.py": {
+      "mode": 420,
+      "sha256": "ce7901561aff3eb30538b67c882a2f26315bc42760dc018ce66a4cd91ed3f3e5",
+      "size": 34664
+    },
+    "src/services/finance_claude_session_service.py": {
+      "mode": 420,
+      "sha256": "7f7e2982233a843a89a78a7bf5250c81761bd97cd18d8f31e26ff07ae4aa6e12",
+      "size": 78242
+    },
+    "src/services/finance_data_tool_catalog_service.py": {
+      "mode": 420,
+      "sha256": "a61ac16e54bf45326026b7cc284fe0b8eb22f6b8372c3d212516953ad44acd5a",
+      "size": 33524
+    },
+    "src/services/finance_data_tool_runtime_service.py": {
+      "mode": 420,
+      "sha256": "0bd66976d9d8e640eb8d930dc91620bdc37b505cae1c9b50719b99abf9ecda30",
+      "size": 21400
+    },
+    "src/services/finance_tool_profile_service.py": {
+      "mode": 420,
+      "sha256": "1c72072a501fe8423e9124d7a68e95e3acb0fe75ce73a60e93ebd9869bb83b62",
+      "size": 5451
+    },
+    "src/services/finance_universe_input_resolver_service.py": {
+      "mode": 420,
+      "sha256": "3425966f8bf0776d035edbf663c7406ea7c14d7267416a1240060d65a1a766e2",
+      "size": 7814
+    },
+    "src/services/financial_report_pdf_service.py": {
+      "mode": 420,
+      "sha256": "b07fbf6f395ac808aa9453b4e3653f2721bae70649da39c3d36e488bf9f5892b",
+      "size": 13669
+    },
+    "src/services/fixed_upstream_loopback_bridge.py": {
+      "mode": 420,
+      "sha256": "23546f7991fa2a4f95a8c2db6ef1de83b3fccfe8cc52d263704398dac7a70f8a",
+      "size": 12983
+    },
+    "src/services/invocation_input_resolver_service.py": {
+      "mode": 420,
+      "sha256": "895f7767d845c80bbcbaccc4826c78df1f292d795b84501aaca72edd4243faf2",
+      "size": 12524
+    },
+    "src/services/kingdomai_capital_flow_service.py": {
+      "mode": 420,
+      "sha256": "086d0abb066d505f9460caea66c1a63f111b384cdebc7984fe78bc3423b6fcf0",
+      "size": 12589
+    },
+    "src/services/kingdomai_fund_daily_market_service.py": {
+      "mode": 420,
+      "sha256": "22198da78d240710d5070d783aad49b485470e00713cf8e344bd4be5cc5ab2e2",
+      "size": 12931
+    },
+    "src/services/kingdomai_index_daily_market_service.py": {
+      "mode": 420,
+      "sha256": "77952b832515a5ea462a33455569037e72a8a0b2da458f9e215ababd1451f989",
+      "size": 9735
+    },
+    "src/services/kingdomai_plate_member_service.py": {
+      "mode": 420,
+      "sha256": "37a026c0872e585b0fee37bb0115d606e5745f90aa994f9d3fb935c7bffd22ba",
+      "size": 15449
+    },
+    "src/services/kingdomai_plate_rank_service.py": {
+      "mode": 420,
+      "sha256": "ccefc744e16834b34851f4b1450e58166d158e4c3967f5e6bfff72b16997663c",
+      "size": 8828
+    },
+    "src/services/kingdomai_stock_announcement_service.py": {
+      "mode": 420,
+      "sha256": "4b643ab63c2b1c23511afbc67d9728516bf360de71b88003ec4b224cf51efb5e",
+      "size": 9300
+    },
+    "src/services/kingdomai_stock_financial_statement_service.py": {
+      "mode": 420,
+      "sha256": "e9228d5564e2bbc453e82bd609ea880c757b3960ffc5ab947af47c0dd178ad75",
+      "size": 12344
+    },
+    "src/services/kingdomai_stock_fundamental_service.py": {
+      "mode": 420,
+      "sha256": "8eb3008f0a6f16f88d852ebf43e4009d2677a277763a0f2f1b5e82c518052d07",
+      "size": 5087
+    },
+    "src/services/kingdomai_stock_kline_service.py": {
+      "mode": 420,
+      "sha256": "a71ba9c69f8d3336659cc118a3dd3490ef697343a4122ff57fafbd59b18bae84",
+      "size": 18212
+    },
+    "src/services/kingdomai_stock_valuation_service.py": {
+      "mode": 420,
+      "sha256": "3d9ebfbcae2c92e83da4c476e5821c32ba0c007979a0fdd999def2b69a767853",
+      "size": 6197
+    },
+    "src/services/llm_stream_block_service.py": {
+      "mode": 420,
+      "sha256": "ecab80baa437353ee08f1d26c029670f8a0caeda8f4f3ba9485e9327016681cb",
+      "size": 47050
+    },
+    "src/services/phone_account_service.py": {
+      "mode": 420,
+      "sha256": "003faab139390dbad3fcde128d01b82acf9f0b66e308292f8af7f5b92794828e",
+      "size": 21048
+    },
+    "src/services/phone_identity_verification_service.py": {
+      "mode": 420,
+      "sha256": "230d7eb1f56c3e32b617ceb2753eae9462787ef7886f306e54ac809da502c901",
+      "size": 14006
+    },
+    "src/services/phone_possession_verification_service.py": {
+      "mode": 420,
+      "sha256": "bf6a9f1d16ce6404b28ec9810c077cdb23a6d1b86f9e6dc84a4c18b32b47d5ef",
+      "size": 61752
+    },
+    "src/services/planner_question_contract_service.py": {
+      "mode": 420,
+      "sha256": "e52a21503e296f1677c041c33e11320dc539e3d5487e584975dc45129391afeb",
+      "size": 10600
+    },
+    "src/services/prompt_context_compiler_service.py": {
+      "mode": 420,
+      "sha256": "f5fa427653863046e7a0cbe421753a3b00dff6d36fe9e5b186d53caa2fd99d7f",
+      "size": 7209
+    },
+    "src/services/python_execution_runtime.py": {
+      "mode": 420,
+      "sha256": "cdc5bfc277392225c94141505cf0ab08eee66ae224feb6b38af5d7417f26aa0e",
+      "size": 20335
+    },
+    "src/services/quant_data_provider_service.py": {
+      "mode": 420,
+      "sha256": "e68e7110ec600846f991d7e213a0e616112cd64ee5af9935e43845e9fa05cc24",
+      "size": 23624
+    },
+    "src/services/quant_factor_screening_service.py": {
+      "mode": 420,
+      "sha256": "4ffeccd90b1f92376bfeee88b54a286dfef2ad108633705f61791c2cfb1d1b85",
+      "size": 18651
+    },
+    "src/services/quant_research_authoring_affordance_service.py": {
+      "mode": 420,
+      "sha256": "b7aff897eb951544bb1dbfed3a05b8f5e0be2ec5e0225f598eaed2caed2af667",
+      "size": 4882
+    },
+    "src/services/quant_research_capability_adapter_service.py": {
+      "mode": 420,
+      "sha256": "659f781b84fdd5cb943fd04931d723bf4b15d384227ef7804a6f3e189b1cfd9e",
+      "size": 4510
+    },
+    "src/services/quant_research_publication_service.py": {
+      "mode": 420,
+      "sha256": "98063fb172e46f6135eac579d2c66f166db8ee435f2e713602a4a844ca369f8d",
+      "size": 10387
+    },
+    "src/services/quant_research_spec_service.py": {
+      "mode": 420,
+      "sha256": "771dba015a89f4f4f8fa6c29aa37a9f668ce932284d04dcdc3aa062c70d12b5e",
+      "size": 25348
+    },
+    "src/services/quant_run_artifact_service.py": {
+      "mode": 420,
+      "sha256": "69a43eb4973f9b9d8417391bc6428165788ab96db1738a18d2c8ca6f1018a1b1",
+      "size": 6501
+    },
+    "src/services/reference_resolution_service.py": {
+      "mode": 420,
+      "sha256": "38c2157baab5febbda33d73c00cd57d7a58a0e25234dbb5a3fad10f7c94272c9",
+      "size": 3282
+    },
+    "src/services/result_presentation_service.py": {
+      "mode": 420,
+      "sha256": "944a4ca178b98c4efb1bfab015ebf5e807c855247fde96342aa31611fcdbf6ec",
+      "size": 5450
+    },
+    "src/services/runtime_artifact_service.py": {
+      "mode": 420,
+      "sha256": "45e7d2a9bc9c96a1e5651cdf7e4086dccb34122f427ae6315855d3831a23654b",
+      "size": 32794
+    },
+    "src/services/runtime_conversation_service.py": {
+      "mode": 420,
+      "sha256": "aca080c5a4a25b4702f88c416ba6c86aa4904cc10719e89996102da55801a775",
+      "size": 31913
+    },
+    "src/services/runtime_execution_service.py": {
+      "mode": 420,
+      "sha256": "ab30a582410112e43880adca03397939e7cadbdf91ca81925bd97af4cb4339e7",
+      "size": 19616
+    },
+    "src/services/runtime_feedback_service.py": {
+      "mode": 420,
+      "sha256": "630255906c7dabca787d094cdc0480df023d25b48c53d36ce412bd563c06f952",
+      "size": 12517
+    },
+    "src/services/scheduled_task_compiler.py": {
+      "mode": 420,
+      "sha256": "95b84810414c7c81ca79deef588865974875f3b3763a1cc8fd5630341aacdd2f",
+      "size": 11264
+    },
+    "src/services/scheduled_task_executor.py": {
+      "mode": 420,
+      "sha256": "5e4fb33dc1f8bf3bf6f155f417a562c7e1a1cb64e9ac7fe31d2304acdb65f9a2",
+      "size": 7679
+    },
+    "src/services/scheduled_task_protocol.py": {
+      "mode": 420,
+      "sha256": "67c93e657a1e5cbbebac1bf9bc64cb3b32b4dd94e4dd1b3ec2ca2d3d8dfa59be",
+      "size": 13138
+    },
+    "src/services/scheduled_task_service.py": {
+      "mode": 420,
+      "sha256": "b63265e3d917219ad8e95e2a0f92cc29aa9d7b161ef9459df3bc9f0e89bddbd6",
+      "size": 5870
+    },
+    "src/services/scheduled_task_store.py": {
+      "mode": 420,
+      "sha256": "b513f3df59e87e1cef942d5872950b8f09973e7854d6125d48e22d2e93232f56",
+      "size": 30497
+    },
+    "src/services/scheduled_task_worker.py": {
+      "mode": 420,
+      "sha256": "f55cd92a3d859f6094eca6e81d416a7100058c2ccccce7652e777119328d6080",
+      "size": 5465
+    },
+    "src/services/search_gateway_service.py": {
+      "mode": 420,
+      "sha256": "c5768f345737a7295f8c4c2beea4f56a14a6c543f06b703296956a0723b778cb",
+      "size": 12226
+    },
+    "src/services/security_data_request_protocol.py": {
+      "mode": 420,
+      "sha256": "2ec379abc6589930600b46a1aca83e3d92ec25ff616e4d29016cbfbeab25bfe9",
+      "size": 10356
+    },
+    "src/services/security_subject_classifier_service.py": {
+      "mode": 420,
+      "sha256": "c6a8688c992f61a3154425471b48af01181565d4f694008579d64a9a9ce259f5",
+      "size": 3078
+    },
+    "src/services/session_variable_store_service.py": {
+      "mode": 420,
+      "sha256": "dd2ba2a4774671d344bb0964d04dfb131fcb3e9fb07f6441231e8ddb87398cff",
+      "size": 25678
+    },
+    "src/services/skill_authoring_service.py": {
+      "mode": 420,
+      "sha256": "976d64e05871623f6a593df7e2f68dfea3cdf9c6be72ed6715c0f609c605ec58",
+      "size": 33104
+    },
+    "src/services/skill_blueprint_service.py": {
+      "mode": 420,
+      "sha256": "2ae747dbb4e1302650a9e7f2d9e6cc12f61d0dabb8318502dfec14c05e1e0cd0",
+      "size": 32928
+    },
+    "src/services/skill_candidate_store_service.py": {
+      "mode": 420,
+      "sha256": "8eddc2bd72755b6a190f5d2673be2231911e795288d570a132e077132e9b342c",
+      "size": 24161
+    },
+    "src/services/skill_hub_catalog_service.py": {
+      "mode": 420,
+      "sha256": "c0e5b2ecce3e3f479512d6df7a5f874298e26981f5d36c814f3ec6312ae2f402",
+      "size": 8969
+    },
+    "src/services/skill_studio_service.py": {
+      "mode": 420,
+      "sha256": "5229b315b7ee767885d0ae090261ad2c44f9f8038604cc0823758b608bde896e",
+      "size": 20338
+    },
+    "src/services/stock_identity_resolver_service.py": {
+      "mode": 420,
+      "sha256": "007e75f1190ef43ae2dd0bc8ea7ebd9ecb0aa591a997ea33dab7acadc8c25900",
+      "size": 2779
+    },
+    "src/services/stock_momentum_service.py": {
+      "mode": 420,
+      "sha256": "bbb00e51f0f61e3d2dc45d5cd58d76c813670100342facb8799951664d2bbf6c",
+      "size": 9905
+    },
+    "src/services/strategy_backtest_service.py": {
+      "mode": 420,
+      "sha256": "7e65597a78ef6249cb19d8631939be9571cdb9795a76a2e24d9f4e28f045f2bd",
+      "size": 31943
+    },
+    "src/services/strategy_revision_contract_service.py": {
+      "mode": 420,
+      "sha256": "9465bbf319e5e4788849a3d3d589826fef7c4b56043436ccb96857b107006e0c",
+      "size": 10701
+    },
+    "src/services/strategy_run_service.py": {
+      "mode": 420,
+      "sha256": "3b2e318a3aa5d7407c917b65e1dd05de1650e89aaa71ef7b15fa39ce18ba2bef",
+      "size": 44309
+    },
+    "src/services/system_command_service.py": {
+      "mode": 420,
+      "sha256": "4e03d326678c841effe54032fa33033c010d0b1fe247db70cfb0beae5929df91",
+      "size": 3905
+    },
+    "src/services/task_service.py": {
+      "mode": 420,
+      "sha256": "570870b55de36e1cdda0fc42bacf6f1299904cb8e8dfdcf87e5c50bf47dd1c8e",
+      "size": 54221
+    },
+    "src/services/ths_funds_service.py": {
+      "mode": 420,
+      "sha256": "ef93eed3e566644e0db185e34bd359ea8e343a9cc601428714b756fc33f36019",
+      "size": 30779
+    },
+    "src/services/ths_report_service.py": {
+      "mode": 420,
+      "sha256": "9ca4ceb3e6960587e42c264851971257ae11b548e525909232bab4c5e2c7a674",
+      "size": 3293
+    },
+    "src/services/tool_argument_compiler_service.py": {
+      "mode": 420,
+      "sha256": "5f1b68d9c6584b27fcaf443e59b9934e8923a96e4e3e15fd219d9b713828a9a1",
+      "size": 11286
+    },
+    "src/services/tool_candidate_rerank_service.py": {
+      "mode": 420,
+      "sha256": "c5bcbd7c37100d2ce831c151e6ca0ea7271ddda4a803b1cde755cb97c0e88393",
+      "size": 5876
+    },
+    "src/services/tool_plan_runtime_service.py": {
+      "mode": 420,
+      "sha256": "1d001f7510283dc1b2e5375e9a2a3275e3b19f23dfb9a813e95344e4f41f7b61",
+      "size": 167007
+    },
+    "src/services/tool_runtime_preflight_service.py": {
+      "mode": 420,
+      "sha256": "823d87d22192dd1d53c3daf49b01a1f44955f0e6c36da005fec90316621212b7",
+      "size": 10207
+    },
+    "src/services/tool_studio_service.py": {
+      "mode": 420,
+      "sha256": "352d30fe529b57a15da995f112b890e21f30908800a14b7100a41226a01d34c9",
+      "size": 21322
+    },
+    "src/services/top_level_shortcut_service.py": {
+      "mode": 420,
+      "sha256": "e9aae0dfb2a3f2c725a95a310271d214c772d39acf5adf880b4ee431203a42d8",
+      "size": 4547
+    },
+    "src/services/user_session_service.py": {
+      "mode": 420,
+      "sha256": "f5659fadc9ed98603f4e79c172f48e02b3e0669990440d9a5cb2ad9fbd74705d",
+      "size": 23765
+    },
+    "src/services/vision_intake_service.py": {
+      "mode": 420,
+      "sha256": "1d4e168c4b475a76a2eef353bc3da1f96cf00e2414fda3001bb36ee202531c37",
+      "size": 15286
+    },
+    "src/skill_runtime/README.md": {
+      "mode": 420,
+      "sha256": "04e01070cb96e178981e08f50c342a342a835944020e7edbfe4a025f08854d90",
+      "size": 765
+    },
+    "src/skill_runtime/__init__.py": {
+      "mode": 420,
+      "sha256": "0b3fe570b734d62bfedc59a07657d6e98c379b0dd9851ce9c42c2c7b6280d718",
+      "size": 76
+    },
+    "src/skill_runtime/agent_loop.py": {
+      "mode": 420,
+      "sha256": "4cc4a5272ea99609df369aed232eaf157d79e5e266169cf061f7dd2fbd446f6e",
+      "size": 21299
+    },
+    "src/skill_runtime/availability.py": {
+      "mode": 420,
+      "sha256": "9ee56b1d705aa63026206a120b1a6ea44dd2b8f5eba9e6604252096a3140fe0a",
+      "size": 1336
+    },
+    "src/skill_runtime/clarification.py": {
+      "mode": 420,
+      "sha256": "92a63309e7e5d4e2f359af8e3d693445ab372d8527ddbe30b8e41b6814c0bdb2",
+      "size": 1099
+    },
+    "src/skill_runtime/context_retention.py": {
+      "mode": 420,
+      "sha256": "e7bf8641e37da6b60c0bef73628a1ab215ed1bafc10e731d6816d6abb633fbd8",
+      "size": 15098
+    },
+    "src/skill_runtime/debug_intent_router.py": {
+      "mode": 420,
+      "sha256": "165a3afbd9052af10e9eb33a19f0cd24f507c456268812373d327016f4ec67c5",
+      "size": 748
+    },
+    "src/skill_runtime/debug_skill_compiler.py": {
+      "mode": 420,
+      "sha256": "b65fcdabc3a2d02c11aaba95de3e134ef31ff6570397efc2e8f4b39564bf5fad",
+      "size": 1435
+    },
+    "src/skill_runtime/debug_tool_argument_plan.py": {
+      "mode": 420,
+      "sha256": "ab6d93749607a5d6fcf03c7f882d4bbf3db373b470fdbd009b564665661207c3",
+      "size": 718
+    },
+    "src/skill_runtime/debug_tool_selection.py": {
+      "mode": 420,
+      "sha256": "69063ccd22316c3a3ddb774e694fd8baf5b2e9298fd19c47c8df2d72fd43ef2b",
+      "size": 2155
+    },
+    "src/skill_runtime/entity_resolver.py": {
+      "mode": 420,
+      "sha256": "a53ecca98b5f105305c141e410186ea034f1a5f6dfe2170d37fa27e609c86c40",
+      "size": 2430
+    },
+    "src/skill_runtime/intent_router.py": {
+      "mode": 420,
+      "sha256": "6a1f36e56215fc057d7d83de5a1fce6b9edd80c7a9101b0303b661aece70541a",
+      "size": 15002
+    },
+    "src/skill_runtime/models.py": {
+      "mode": 420,
+      "sha256": "03ec105820cc2b74527efb5a4a5bf1e90db2a8577d9d3d4240ea3a2c73bc87aa",
+      "size": 2720
+    },
+    "src/skill_runtime/prompt_builder.py": {
+      "mode": 420,
+      "sha256": "67c11c70c4cf0fa4526e31b81aff7651ff950e70577c1c42a9d0dd06e6da1811",
+      "size": 1461
+    },
+    "src/skill_runtime/run_skill_alpha.py": {
+      "mode": 420,
+      "sha256": "17bbe113bda3d3f758d6d0fdb770f21543c839bacb9fb554c52a6c428735391d",
+      "size": 3200
+    },
+    "src/skill_runtime/runner.py": {
+      "mode": 420,
+      "sha256": "5c39765f8e7ccccb9fba742d5139ca595683b8c9aa73235aba1129e9ae470a54",
+      "size": 4451
+    },
+    "src/skill_runtime/schema_validator.py": {
+      "mode": 420,
+      "sha256": "d1fee791acc4ed235bdb19504fc97f9d6a36cf7e37dfe101fd643499a4399031",
+      "size": 5085
+    },
+    "src/skill_runtime/schemas/clarification_state.schema.json": {
+      "mode": 420,
+      "sha256": "3923311141c640be63d0b1193ae82590c40aa6a9ea2324dc9743435b685a8ba8",
+      "size": 786
+    },
+    "src/skill_runtime/schemas/composite_execution_plan.schema.json": {
+      "mode": 420,
+      "sha256": "273b3e0ae917e4ff1fb01f5f0b2b97da45ff1b36ce01c43d203c7ed4df8fe065",
+      "size": 1076
+    },
+    "src/skill_runtime/schemas/execution_plan.schema.json": {
+      "mode": 420,
+      "sha256": "ba1f5bdef6c16ef1fde21e62a9d32852acb570e8ccbc8c40665043a98898a800",
+      "size": 1529
+    },
+    "src/skill_runtime/schemas/intent_route.schema.json": {
+      "mode": 420,
+      "sha256": "d4ead42c117282d8b7e661edda77214c86557255b1630d20df76a96e07984623",
+      "size": 987
+    },
+    "src/skill_runtime/schemas/route_snapshot.schema.json": {
+      "mode": 420,
+      "sha256": "9ad49d24aeea398c742236a3cbebb4ea4ff3345657424ac2743726a97a7eaa2b",
+      "size": 778
+    },
+    "src/skill_runtime/schemas/skill_spec.schema.json": {
+      "mode": 420,
+      "sha256": "d196ff5f33a6857a34c21f22ce8f51803100c933bec364802610139f9eb2c831",
+      "size": 3883
+    },
+    "src/skill_runtime/schemas/tool_argument_plan.schema.json": {
+      "mode": 420,
+      "sha256": "6303d4d814e41a89c8976876ffa196ff515e89c396c7f1f8ba1c1922f4566e35",
+      "size": 1285
+    },
+    "src/skill_runtime/schemas/tool_retention_plan.schema.json": {
+      "mode": 420,
+      "sha256": "b83d83be48eca87e1b4d3a8da21d99651bd659650b5e9748c91aad26600b3e4a",
+      "size": 1320
+    },
+    "src/skill_runtime/skill_bundle_compiler.py": {
+      "mode": 420,
+      "sha256": "82f32a588e572f699ff724da814e6c49ed9f2ca135131b192e81d0f54beee242",
+      "size": 19822
+    },
+    "src/skill_runtime/step_budget.py": {
+      "mode": 420,
+      "sha256": "a3e02f47cf381e343fd1405a5e1b17dc62a02b6d9ad8a85b5e8d891af9d8e0d5",
+      "size": 1540
+    },
+    "src/skill_runtime/time_resolver.py": {
+      "mode": 420,
+      "sha256": "b424c659f455f646c94a89aeec2fa2d795f99044361f71e837aff899b8b09c39",
+      "size": 2016
+    },
+    "src/skill_runtime/tool_adapter.py": {
+      "mode": 420,
+      "sha256": "a9130d6c10034fbd49dacc269246a3c43ecc69d8ac3b6b7aaf45f1c3ed68b7c3",
+      "size": 7061
+    },
+    "src/skill_runtime/tool_argument_planner.py": {
+      "mode": 420,
+      "sha256": "9a5c24e1eff1197907130b43af5cb09d6d6c497836d527599d17d54ea1358024",
+      "size": 27201
+    },
+    "src/skill_runtime/tool_selector.py": {
+      "mode": 420,
+      "sha256": "9c769cafaf49c583d801e4d62398d59da8610ff503557084c2d304dfbc90748f",
+      "size": 14239
+    },
+    "src/skills/finance-business/.claude-plugin/plugin.json": {
+      "mode": 420,
+      "sha256": "855c4b7a16875d55442fd12ae5fb5973fda7ab773010581050c82724959aef2b",
+      "size": 121
+    },
+    "src/skills/finance-business/catalog.json": {
+      "mode": 420,
+      "sha256": "126d88b01ced35bc6e757b1dac406cd70fb23950dfa992cbbfbd5bf539eb0ebf",
+      "size": 4327
+    },
+    "src/skills/finance-business/skills/dividend-analysis/SKILL.md": {
+      "mode": 420,
+      "sha256": "b463cb6959db3b53bf013444923440dd7ff4482d5a69105e37c9794e003ce23a",
+      "size": 2739
+    },
+    "src/skills/finance-business/skills/dividend-analysis/agents/openai.yaml": {
+      "mode": 420,
+      "sha256": "700add5e1bc27aa4d5e6159f47d44c29ae5ff690070c3d196e7f39b8efec4670",
+      "size": 268
+    },
+    "src/skills/finance-business/skills/dividend-analysis/references/method.md": {
+      "mode": 420,
+      "sha256": "5f91e1b1d955781d897e3f96d400401c503c1c45cc7de8cb111bdfd3d6e3cb05",
+      "size": 1745
+    },
+    "src/skills/finance-business/skills/earnings-analysis/SKILL.md": {
+      "mode": 420,
+      "sha256": "599a15f01cede3c2065754a8f4cdf090301637d35dae65cfe0783991dc85b9e1",
+      "size": 2814
+    },
+    "src/skills/finance-business/skills/earnings-analysis/agents/openai.yaml": {
+      "mode": 420,
+      "sha256": "33bc09c274a29e23d8a7f899b1ff8af5e16025411a9b0a5a7f79d7005794cf4a",
+      "size": 255
+    },
+    "src/skills/finance-business/skills/earnings-analysis/references/method.md": {
+      "mode": 420,
+      "sha256": "07fd539914f7bb33bacc28429d7801b9a1aef33af9963b08817409a7642613cb",
+      "size": 2132
+    },
+    "src/skills/finance-business/skills/factor-analysis/SKILL.md": {
+      "mode": 420,
+      "sha256": "163633904af0b294589413d1d1b128fb8ddd4acffe92f2491d515b7733750a99",
+      "size": 2630
+    },
+    "src/skills/finance-business/skills/factor-analysis/agents/openai.yaml": {
+      "mode": 420,
+      "sha256": "05e033553a30d41c3883a615fd1cd23deca92924a78c77a6833dcd4b5a13ab80",
+      "size": 254
+    },
+    "src/skills/finance-business/skills/factor-analysis/references/method.md": {
+      "mode": 420,
+      "sha256": "18f4930f8fd658680adac12f139e0f1137f9daa80f324f918dd016f497c8224d",
+      "size": 753
+    },
+    "src/skills/finance-business/skills/financial-quality-analysis/SKILL.md": {
+      "mode": 420,
+      "sha256": "b63f4e3b7dc91a0eed4e5ca004e2ed8610757ce45fc5857180490a3421f20b4b",
+      "size": 2778
+    },
+    "src/skills/finance-business/skills/financial-quality-analysis/agents/openai.yaml": {
+      "mode": 420,
+      "sha256": "1cdfccaf2a001f7e1f4df95074fc99a45bf504993504490b12f30db1d59e9212",
+      "size": 277
+    },
+    "src/skills/finance-business/skills/financial-quality-analysis/references/method.md": {
+      "mode": 420,
+      "sha256": "5608f7349da7d33b74ef8d1331c7d6439c8ea9007b37fafb7d3d493af9906a7c",
+      "size": 1914
+    },
+    "src/skills/finance-business/skills/market-overview/SKILL.md": {
+      "mode": 420,
+      "sha256": "4120d1e8d0b1708b5156a6738f8713a65651c237c6eff027faa239e12a88b944",
+      "size": 2799
+    },
+    "src/skills/finance-business/skills/market-overview/agents/openai.yaml": {
+      "mode": 420,
+      "sha256": "9ed917b7984880085fb1aa786bd8c92ba70f2c63f49762a6fe5d2592c898d79f",
+      "size": 268
+    },
+    "src/skills/finance-business/skills/market-overview/references/method.md": {
+      "mode": 420,
+      "sha256": "3a35ef44c7d7e94d237b0a1aa87baef0875b6263e8ab9b56d43da6a74dcedef9",
+      "size": 2097
+    },
+    "src/skills/finance-business/skills/sector-theme-analysis/SKILL.md": {
+      "mode": 420,
+      "sha256": "55762dd79a211235dfe55fd041a71fb7cdef0285a2235d2e49cef3cdcc20e824",
+      "size": 2727
+    },
+    "src/skills/finance-business/skills/sector-theme-analysis/agents/openai.yaml": {
+      "mode": 420,
+      "sha256": "f08063c2f2f253a2305ab75b810cccbf22429bf667d0318e3fa42ba0456e0312",
+      "size": 265
+    },
+    "src/skills/finance-business/skills/sector-theme-analysis/references/method.md": {
+      "mode": 420,
+      "sha256": "c08b8457eda97f79d55000ab084ddc3e11ed675a2b7e41d3b5d1ce49a346a883",
+      "size": 711
+    },
+    "src/skills/finance-business/skills/stock-comparison/SKILL.md": {
+      "mode": 420,
+      "sha256": "757623dd4b7eea901adf63c27607610112e63a8a55db9880394cff7382f8446e",
+      "size": 2652
+    },
+    "src/skills/finance-business/skills/stock-comparison/agents/openai.yaml": {
+      "mode": 420,
+      "sha256": "5a310afd4c1e352e33245ccab0c4edb1a30f17061da55d3ba69a3d564db457b2",
+      "size": 263
+    },
+    "src/skills/finance-business/skills/stock-comparison/references/method.md": {
+      "mode": 420,
+      "sha256": "3e0e03744de566d203348bffde8b269c961d023a17aaa1c89ef540a5ffd9564d",
+      "size": 1908
+    },
+    "src/skills/finance-business/skills/stock-research/SKILL.md": {
+      "mode": 420,
+      "sha256": "ffa2c572546f46dbf219d9e2094b19cd7ce70864d1ee1ff2abda1ccf96470780",
+      "size": 12513
+    },
+    "src/skills/finance-business/skills/stock-research/agents/openai.yaml": {
+      "mode": 420,
+      "sha256": "a7bd2d9c5585aab0ba972242898df22bf123e5b186e6b13786dc1d72d68e481c",
+      "size": 287
+    },
+    "src/skills/finance-business/skills/stock-research/references/catalyst-expectation-redteam.md": {
+      "mode": 420,
+      "sha256": "0be0f41bb79c6b3aa562e36c038230bf273656fa5bf1542b625a6fea23fef544",
+      "size": 2820
+    },
+    "src/skills/finance-business/skills/stock-research/references/company-archetypes.md": {
+      "mode": 420,
+      "sha256": "6ebae4b68e998c894845c94ba5161e768df622f90a2e7e9174fff1b61bb8e3bd",
+      "size": 5410
+    },
+    "src/skills/finance-business/skills/stock-research/references/evidence-and-source-policy.md": {
+      "mode": 420,
+      "sha256": "26de98335081862ba7ec7412e2bb7d840c21008f27c478effaca6fb7672c4c97",
+      "size": 3570
+    },
+    "src/skills/finance-business/skills/stock-research/references/personalization.md": {
+      "mode": 420,
+      "sha256": "2911090fed24572b3bcfe867ad8cbe15b7c4261d1494507ee6f5944102c38208",
+      "size": 2102
+    },
+    "src/skills/finance-business/skills/stock-research/references/report-template.md": {
+      "mode": 420,
+      "sha256": "384b8c6b7581108b258feae1dca8ceb92c7f2554faf77b3be6cdc62ae9233885",
+      "size": 11451
+    },
+    "src/skills/finance-business/skills/stock-research/references/research-method.md": {
+      "mode": 420,
+      "sha256": "67c340d73db95e72b46d76461adad24bb1b26c4c79778fe5e969b15ab1157709",
+      "size": 9536
+    },
+    "src/skills/finance-business/skills/stock-research/references/scoring-and-confidence.md": {
+      "mode": 420,
+      "sha256": "0c1fe0c1a8d93895ef43b2ae451a1e6b6a2fdc3200fc7c4ec3022064c0daf34a",
+      "size": 3218
+    },
+    "src/skills/finance-business/skills/stock-screening/SKILL.md": {
+      "mode": 420,
+      "sha256": "611482b8fd01a7d675e7f81b9929a998560f855ab4327737e40f404fc3552b4b",
+      "size": 2705
+    },
+    "src/skills/finance-business/skills/stock-screening/agents/openai.yaml": {
+      "mode": 420,
+      "sha256": "ccad244670548137d2d8029c4f53c7df71d848a5cd5ad39cb4ee08f674d34834",
+      "size": 273
+    },
+    "src/skills/finance-business/skills/stock-screening/references/method.md": {
+      "mode": 420,
+      "sha256": "3c54619336fd217f30bbbba9a8deb2bc12cd3adad19b41b0354572baf93b3c88",
+      "size": 2077
+    },
+    "src/skills/finance-business/skills/technical-structure-analysis/SKILL.md": {
+      "mode": 420,
+      "sha256": "7b05b07be3d8fe215a0bec4147bd0e8958a49ebf8b2fb3d30d791e2f47da9b6f",
+      "size": 2583
+    },
+    "src/skills/finance-business/skills/technical-structure-analysis/agents/openai.yaml": {
+      "mode": 420,
+      "sha256": "da88c9d678f38280142377e531054c003ba2d8bc95fef4b280e279f4da907f40",
+      "size": 277
+    },
+    "src/skills/finance-business/skills/technical-structure-analysis/references/method.md": {
+      "mode": 420,
+      "sha256": "241b85b085ded48f3a4123784c5ba3637ea22367a3f641ec02803950df479090",
+      "size": 1616
+    },
+    "src/skills/finance-business/skills/valuation-analysis/SKILL.md": {
+      "mode": 420,
+      "sha256": "a23fa88480dc4aa0d4d69c52ac0b66394a55bdd6e304636fe75245280b919e78",
+      "size": 2785
+    },
+    "src/skills/finance-business/skills/valuation-analysis/agents/openai.yaml": {
+      "mode": 420,
+      "sha256": "0700debe274f71001e73c1e0646fab06da1835de89c7d140643af25722a0ebde",
+      "size": 280
+    },
+    "src/skills/finance-business/skills/valuation-analysis/references/method.md": {
+      "mode": 420,
+      "sha256": "5d29c8b69fdb5a77e9ed74d05045812f59b2ae84f7c8bd4c467955591c5c27d9",
+      "size": 1894
+    },
+    "src/skills/financial-tool-development/.claude-plugin/plugin.json": {
+      "mode": 420,
+      "sha256": "0d596751daae2a04f23be0d466ecba7fc85cfbdf3d6722592c3f992f66e38a11",
+      "size": 143
+    },
+    "src/skills/financial-tool-development/schema.json": {
+      "mode": 420,
+      "sha256": "85d0aa1a1497cad1d3a1f87f6efb2eee14a485c50280723bf78cbe7fb38e2f43",
+      "size": 215
+    },
+    "src/skills/financial-tool-development/skills/catalog.json": {
+      "mode": 420,
+      "sha256": "b4d05b138b49b83da6afc5d042b3d41d388cef93e7916ce3450219995592e00a",
+      "size": 1907
+    },
+    "src/skills/financial-tool-development/skills/financial-tool-design/SKILL.md": {
+      "mode": 420,
+      "sha256": "a6d06cb4ca90d5e21410683a6eb0b99e9715f145d0d813295c6756e09f53d2be",
+      "size": 3171
+    },
+    "src/skills/financial-tool-development/skills/financial-tool-design/agents/openai.yaml": {
+      "mode": 420,
+      "sha256": "cca8e488997bcc894bba601aa0536e2a846ffcf772e364db74c143c978dfd4d7",
+      "size": 313
+    },
+    "src/skills/financial-tool-development/skills/financial-tool-edit-implementation/SKILL.md": {
+      "mode": 420,
+      "sha256": "ce9d8e77d90d624e7c19c121b2f52333000fe0d959a0686238ea0486635e7289",
+      "size": 2844
+    },
+    "src/skills/financial-tool-development/skills/financial-tool-edit-implementation/agents/openai.yaml": {
+      "mode": 420,
+      "sha256": "31e38a0a3c4c61b2723d4b1194c9baa170a9aaae58c45e5c74a4137accb8cce0",
+      "size": 285
+    },
+    "src/skills/financial-tool-development/skills/financial-tool-edit-planning/SKILL.md": {
+      "mode": 420,
+      "sha256": "c4296b2ea853a2c01cf4cbd0bb32e0f24acc9d9933aeba0048ea218d17aa6f20",
+      "size": 4079
+    },
+    "src/skills/financial-tool-development/skills/financial-tool-edit-planning/agents/openai.yaml": {
+      "mode": 420,
+      "sha256": "6cb54953b1151428f333e187907e918c95cd53e4f8655236044224fe04bad254",
+      "size": 290
+    },
+    "src/skills/financial-tool-development/skills/financial-tool-edit-planning/schema.json": {
+      "mode": 420,
+      "sha256": "0b2f6bfaa36b728e0e575f3dae87a2af9d2483dcc98c7565b46a03be04641d3d",
+      "size": 1601
+    },
+    "src/skills/financial-tool-development/skills/financial-tool-flowchart/SKILL.md": {
+      "mode": 420,
+      "sha256": "2e42c83c19b9cc3d6d2eb82d1cecd603eb91aba464e1689b0b45622cbea08b04",
+      "size": 1673
+    },
+    "src/skills/financial-tool-development/skills/financial-tool-flowchart/agents/openai.yaml": {
+      "mode": 420,
+      "sha256": "8b2216683859e5742b4fe3747afcf73c8f245f6a32e65e84efdc3ed6ebde60f1",
+      "size": 307
+    },
+    "src/skills/financial-tool-development/skills/financial-tool-flowchart/schema.json": {
+      "mode": 420,
+      "sha256": "3ca217a7e091e62497e40e5cd7066cbd73cba1c42308afac1400e44c43844fe5",
+      "size": 282
+    },
+    "src/skills/financial-tool-development/skills/financial-tool-implementation/SKILL.md": {
+      "mode": 420,
+      "sha256": "ea4a620c65900195d90e6e59df0a718bec33f667ece4592f8d2459a4ca307867",
+      "size": 4864
+    },
+    "src/skills/financial-tool-development/skills/financial-tool-implementation/agents/openai.yaml": {
+      "mode": 420,
+      "sha256": "f072728dd7fb062e3d5ce1b3246fb07106f7ccd772957919a20f12e1d43ed76a",
+      "size": 291
+    },
+    "src/skills/financial-tool-development/skills/financial-tool-implementation/references/coding-output-contract.md": {
+      "mode": 420,
+      "sha256": "da71c58827358e6e697304e6b0ed34d57a297f7931099cd143cd64e4834746bb",
+      "size": 1735
+    },
+    "src/skills/financial-tool-development/skills/financial-tool-implementation/references/coding.md": {
+      "mode": 420,
+      "sha256": "303ac36f78734f4e2339b415a214b833be1ad7a7a7f0370eb342151fe3fe24ce",
+      "size": 606
+    },
+    "src/skills/financial-tool-development/skills/financial-tool-implementation/references/finance-api-coding-guide.md": {
+      "mode": 420,
+      "sha256": "0e492fdac84e7aa20299609be8d2cda946dbf124537f9b179563200b435f859a",
+      "size": 1143
+    },
+    "src/skills/financial-tool-development/skills/financial-tool-implementation/schema.json": {
+      "mode": 420,
+      "sha256": "d919e45d26290c2cfcfc78ab38215943b64c5ecb1c5fbd6e22233616193f8e32",
+      "size": 2146
+    },
+    "src/skills/financial-tool-development/skills/financial-tool-requirement/SKILL.md": {
+      "mode": 420,
+      "sha256": "5c99991a2119263d333d6beb76a3a89af629d925e363412079c689c573238d97",
+      "size": 3418
+    },
+    "src/skills/financial-tool-development/skills/financial-tool-requirement/agents/openai.yaml": {
+      "mode": 420,
+      "sha256": "8eece94f191e6f178f12eaead68c53d35632b9a0bdee2cb00f0d356c2347e299",
+      "size": 279
+    },
+    "src/skills/financial-tool-development/skills/financial-tool-requirement/schema.json": {
+      "mode": 420,
+      "sha256": "e748229000de7c55c84a4dfa69397f0511d4a2df9582d3de88a9b66fed4e4880",
+      "size": 726
+    },
+    "src/skills/financial-tool-development/skills/financial-tool-test-execution/SKILL.md": {
+      "mode": 420,
+      "sha256": "7424e42ee71d618e0e3d4c8a11c733e9c06eac2f09525775aceea308948e7719",
+      "size": 2850
+    },
+    "src/skills/financial-tool-development/skills/financial-tool-test-execution/agents/openai.yaml": {
+      "mode": 420,
+      "sha256": "b5eae26a0fd14a733dcbf54096839038c338ff3b2661f1a8813bbf73bf312f1a",
+      "size": 327
+    },
+    "src/skills/financial-tool-development/skills/financial-tool-test-execution/schema.json": {
+      "mode": 420,
+      "sha256": "5d5de1280d6639533b761e0506a959dc2f922ffb833a18f4b172b5eb51dc20db",
+      "size": 970
+    },
+    "src/skills/quant_factor_screening/SKILL.md": {
+      "mode": 420,
+      "sha256": "d2f3167ac043b81d9958c76961b785a9fae34fee2ee8f8d62a63237799931d52",
+      "size": 1398
+    },
+    "src/skills/quant_factor_screening/schema.json": {
+      "mode": 420,
+      "sha256": "74c26b3295e67eb3a69359eea986e5a22950809d4ebb4944eb11a2f6749adb73",
+      "size": 597
+    },
+    "src/skills/quant_factor_screening/skill.json": {
+      "mode": 420,
+      "sha256": "df11c57931312ebad3103068968fc3372dc0d415061edd81bccd7a4504136dcb",
+      "size": 1209
+    },
+    "src/skills/skill-system/.claude-plugin/plugin.json": {
+      "mode": 420,
+      "sha256": "28b3d658ebf5d6653eb1a7d2064eecc7ae1fcdf9916bbf293fb93c2b11049034",
+      "size": 129
+    },
+    "src/skills/skill-system/skills/skill-authoring/SKILL.md": {
+      "mode": 420,
+      "sha256": "196149204eb07892cd7cce070969e33cd1108bc6d6ce43c04aa986cbd9457f05",
+      "size": 2626
+    },
+    "src/skills/skill-system/skills/skill-authoring/schema.json": {
+      "mode": 420,
+      "sha256": "9c22c465566c7368b5f42e54cd674ce27e719f1d7fb2dd01d83541f2e8b1f085",
+      "size": 1993
+    },
+    "src/skills/stock_deep_dive/ALPHA_README.md": {
+      "mode": 420,
+      "sha256": "c5e14979d342110c240d0145bf802d40149ff4dbeb7968e53db24465622d1480",
+      "size": 786
+    },
+    "src/skills/stock_deep_dive/SKILL.md": {
+      "mode": 420,
+      "sha256": "2cb58ff6bb960c02533f5ec40ab5bf7933098a18482a67f11019635da17b2d9d",
+      "size": 3199
+    },
+    "src/skills/stock_deep_dive/examples/alpha_input.json": {
+      "mode": 420,
+      "sha256": "fcb46fe9acb7ca872ea2e1bd911cafaa2432f48e30e73b9b163a4dddacc91e87",
+      "size": 331
+    },
+    "src/skills/stock_deep_dive/run_once.py": {
+      "mode": 420,
+      "sha256": "c5211e76fe6720eeeebbe4d7f2c45fe051aa631b0a77a6a35858a6ad722ab88e",
+      "size": 2289
+    },
+    "src/skills/stock_deep_dive/schema.json": {
+      "mode": 420,
+      "sha256": "16fb8fe1c946951a927840fdb1c377449f37fbcb23a1957e01a8047eef9a22aa",
+      "size": 7492
+    },
+    "src/skills/stock_deep_dive/skill.json": {
+      "mode": 420,
+      "sha256": "84d9e2366ae05e0d63823b6f20a649abc56635dbe4d194d9bef544174282a325",
+      "size": 2250
+    },
+    "src/subject_catalog.py": {
+      "mode": 420,
+      "sha256": "3da95d78ae4bdf60afd2052cc737b8c7fbca67d5e49db36c35ddab55a19a7321",
+      "size": 4486
+    },
+    "src/tools/capital_flow_query_tool.py": {
+      "mode": 420,
+      "sha256": "7318ca4558754b34a5863ea17bef3f3e6afbf389c51cb91e3c4786df15319abd",
+      "size": 3555
+    },
+    "src/tools/company_news_tool.py": {
+      "mode": 420,
+      "sha256": "07b445b58e5479e61852fe22d094481a2eb82a6275584227ee08c9398910ce41",
+      "size": 11441
+    },
+    "src/tools/company_taxonomy_profile_tool.py": {
+      "mode": 420,
+      "sha256": "91d785ca5cf48fda72fd4eb3e35420287dbb85fece6718c2f5334b9f9341a529",
+      "size": 4352
+    },
+    "src/tools/custom_tool_runtime_tool.py": {
+      "mode": 420,
+      "sha256": "74d66cd3567acd678ae1a0af6a36124fa8d70874d3ff46e077040e4e9faab79b",
+      "size": 451
+    },
+    "src/tools/definitions/capital_flow_query.tool.json": {
+      "mode": 420,
+      "sha256": "bf51ab4cfe07a05154216bbee7e95ee29f0bd97408bc2dc6714d701ec212b87a",
+      "size": 5331
+    },
+    "src/tools/definitions/equity_research_search.tool.json": {
+      "mode": 420,
+      "sha256": "da2a296afab82fdd567bbdec6a492ed7ae46086e40d5300907297b5cbaaa5b5b",
+      "size": 3493
+    },
+    "src/tools/definitions/file_io.tool.json": {
+      "mode": 420,
+      "sha256": "84144c8e607b509f7e278546b32862d4220a526bbe486439fe14e7413aaa2ec0",
+      "size": 5123
+    },
+    "src/tools/definitions/file_read_csv.tool.json": {
+      "mode": 420,
+      "sha256": "5062f58d600a740726035d1b33f25ccd2497ad813c8e07c8b54034dc4391fd95",
+      "size": 2548
+    },
+    "src/tools/definitions/file_read_excel.tool.json": {
+      "mode": 420,
+      "sha256": "3ecebe3c77ea542ce408f3e5fe0a160c873bcbdda221ee16ceb53d62bd4d0ea6",
+      "size": 2558
+    },
+    "src/tools/definitions/file_read_word.tool.json": {
+      "mode": 420,
+      "sha256": "990d554d964ebf69962c509bf07a148a746e9ce14051d5dc09cade5c4be9abcd",
+      "size": 2941
+    },
+    "src/tools/definitions/finance_data_query.tool.json": {
+      "mode": 420,
+      "sha256": "9505eedd41fe93312fa1c1c31928153beeaf6fba48e77770b321cc8e885532a1",
+      "size": 3072
+    },
+    "src/tools/definitions/financial_news_search.tool.json": {
+      "mode": 420,
+      "sha256": "0d07659ff5defa2650ddae5b0f7231815f6a40c207085f551e380cf933632708",
+      "size": 3422
+    },
+    "src/tools/definitions/fund_daily_market_query.tool.json": {
+      "mode": 420,
+      "sha256": "924d42c399a4179ea36ef4e143927532f8465381cc7aa51d6f380a5b96a8a1b1",
+      "size": 3843
+    },
+    "src/tools/definitions/fund_profile_query.tool.json": {
+      "mode": 420,
+      "sha256": "fc0618ead51d80f5981191cc49d665ffb2c3db70c1423f0e6034458e799b8205",
+      "size": 3162
+    },
+    "src/tools/definitions/general_search.tool.json": {
+      "mode": 420,
+      "sha256": "9cfe17c13922a23f755a665151c5aab247ef1d6c12aedec4cd13dfe6ea6bd1e1",
+      "size": 2631
+    },
+    "src/tools/definitions/get_company_taxonomy_profile.tool.json": {
+      "mode": 420,
+      "sha256": "a1e9ce873f389348b3e86c875b86f9a522ef341d408d9e8b203e1a103ab9aa7a",
+      "size": 2551
+    },
+    "src/tools/definitions/get_hot_concepts_and_leaders.tool.json": {
+      "mode": 420,
+      "sha256": "6d248a262db1ac6b0654def01e5e2cb118a31d634be80c50bdab3be28b8a1ddc",
+      "size": 2246
+    },
+    "src/tools/definitions/get_hot_industries_and_leaders.tool.json": {
+      "mode": 420,
+      "sha256": "1409669d71efa39521c6262b55809afd201217853550a72c566affed60219a38",
+      "size": 2288
+    },
+    "src/tools/definitions/get_hot_sectors_and_leaders.tool.json": {
+      "mode": 420,
+      "sha256": "fc6566a4462878d0ccec0536fec3a03dfb5dee5f219bc32b2197abe2198b6d70",
+      "size": 2329
+    },
+    "src/tools/definitions/index_daily_market_query.tool.json": {
+      "mode": 420,
+      "sha256": "e5e8c3b6296b1242303e4e1f09b80c9efea87e06ec5d899c55bf7e90401203f1",
+      "size": 3875
+    },
+    "src/tools/definitions/indicator_series_query.tool.json": {
+      "mode": 420,
+      "sha256": "0d86e361a7c2741643c8d550a7219b0320ca28798a1960e315e6095eabd16b86",
+      "size": 5535
+    },
+    "src/tools/definitions/market_history_amount.tool.json": {
+      "mode": 420,
+      "sha256": "a13a2bf926596cdd145f723b5fa2b4662f574bf58a450b36e6f3c24066a64389",
+      "size": 2904
+    },
+    "src/tools/definitions/market_minute_amount_series.tool.json": {
+      "mode": 420,
+      "sha256": "6150c27ac6ccf6c28ced15e873a28f6decfaeb40d9548a9e081b04b7cc5723a2",
+      "size": 3062
+    },
+    "src/tools/definitions/market_realtime_breadth.tool.json": {
+      "mode": 420,
+      "sha256": "771d83f11598ddedd90dd75b7fe415a2f28f5098da82abbb3fdc598bdea32a43",
+      "size": 2571
+    },
+    "src/tools/definitions/plate_capital_flow_query.tool.json": {
+      "mode": 420,
+      "sha256": "e762abf5ce79a993f7edd74ae9485edca32ac7f5710bdcdc103d421108f9db11",
+      "size": 4731
+    },
+    "src/tools/definitions/plate_member_query.tool.json": {
+      "mode": 420,
+      "sha256": "11ace10b5b214127b6502da6bd6418fb911b7cfc52a0bcf22829760bb287c023",
+      "size": 4877
+    },
+    "src/tools/definitions/plate_members_query.tool.json": {
+      "mode": 420,
+      "sha256": "e111d3d112b158c473815683524c88b6ba4d086100df5471bebe09a91ccc4b78",
+      "size": 3586
+    },
+    "src/tools/definitions/plate_rank_query.tool.json": {
+      "mode": 420,
+      "sha256": "23703b5ce208832dc5f98a2b99623169de8b297432ca2bb4916775319d902eb2",
+      "size": 4671
+    },
+    "src/tools/definitions/quant_data_provider.tool.json": {
+      "mode": 420,
+      "sha256": "01fb0fbb6d8d11bf7be42d325509587f22dc0ab07e8d67615c0535e63ff37102",
+      "size": 4728
+    },
+    "src/tools/definitions/quant_factor_screening.tool.json": {
+      "mode": 420,
+      "sha256": "8660717049c82c3f628c71879f2ededa8d1841cfe9c8d90d7c3dcf7ebe0f97ab",
+      "size": 3088
+    },
+    "src/tools/definitions/security_universe_query.tool.json": {
+      "mode": 420,
+      "sha256": "b6c6b5dfe6142cef56270a314a16f729e6b356e2d2f766d7a7c8983d35a5717f",
+      "size": 5527
+    },
+    "src/tools/definitions/stock_announcement_query.tool.json": {
+      "mode": 420,
+      "sha256": "588d4cc257fc34853635526367df88b8672ecfe1cc1ad921537863f90b23f395",
+      "size": 4819
+    },
+    "src/tools/definitions/stock_capital_flow_query.tool.json": {
+      "mode": 420,
+      "sha256": "817a708a3356da55c88c832c21f8a07834954459f9ee5bcc3cd0600132e3ffb5",
+      "size": 3968
+    },
+    "src/tools/definitions/stock_daily_kline_query.tool.json": {
+      "mode": 420,
+      "sha256": "0675ba21ed4832f6c68b341490ca4a1a055ee8ec4223cfad7c132fcb3ee326b8",
+      "size": 3841
+    },
+    "src/tools/definitions/stock_financial_statement_query.tool.json": {
+      "mode": 420,
+      "sha256": "0fb9cb4cbe0b7d8c44c9d612632ef136831e204e8fc2e8ca6e5456157cc2b8a9",
+      "size": 4792
+    },
+    "src/tools/definitions/stock_fundamental_snapshot.tool.json": {
+      "mode": 420,
+      "sha256": "b1117e6d2d3ea137706c3457b0786e3386c83335ee585bc0679e32660ea42739",
+      "size": 3296
+    },
+    "src/tools/definitions/stock_funds.tool.json": {
+      "mode": 420,
+      "sha256": "2b9f4917cde5e8d911b54b19441a66d4303bdf96dd63a030a9a48638fd2d402a",
+      "size": 3829
+    },
+    "src/tools/definitions/stock_history_funds_flow.tool.json": {
+      "mode": 420,
+      "sha256": "41ddca4a66a8f21ea8e7fa99983d07cde644a8cee7dda1d80de5c574ef406333",
+      "size": 3201
+    },
+    "src/tools/definitions/stock_history_kline.tool.json": {
+      "mode": 420,
+      "sha256": "31e2a86f5e1d805d9bd82aa9d2fe48d1766f850084e329f7804cbb1e18ecdffb",
+      "size": 3651
+    },
+    "src/tools/definitions/stock_industry_funds_flow.tool.json": {
+      "mode": 420,
+      "sha256": "e1ae8f5db77044f070adcc2673cdc3a96b0c127dcce9a7af5add5e63a8d31abc",
+      "size": 3388
+    },
+    "src/tools/definitions/stock_intraday_kline.tool.json": {
+      "mode": 420,
+      "sha256": "e28715240aa53b26866363f527a82c9717e25b79edd58c72fc6991f9dc989388",
+      "size": 3528
+    },
+    "src/tools/definitions/stock_intraday_kline_query.tool.json": {
+      "mode": 420,
+      "sha256": "9668888d8c96a3c6e4ff6225d2ed33db2a140d148b5f7cbc746602a12c5fc66b",
+      "size": 3567
+    },
+    "src/tools/definitions/stock_plate_membership_query.tool.json": {
+      "mode": 420,
+      "sha256": "6db40f1ea3fbdf9e7a5ef8b69ac67e030d3638c5142bb0dcb473efa16c8943ad",
+      "size": 3664
+    },
+    "src/tools/definitions/stock_protocol_data_query.tool.json": {
+      "mode": 420,
+      "sha256": "f9c51dbe396ced340968885d846ee7ebd59ef0afff515a7ce718e79739850672",
+      "size": 4014
+    },
+    "src/tools/definitions/stock_quote.tool.json": {
+      "mode": 420,
+      "sha256": "b542dea128289d0d1a53d87dc60cb7391079cb884032bcad7260c6283da3165e",
+      "size": 3277
+    },
+    "src/tools/definitions/stock_realtime_funds_flow.tool.json": {
+      "mode": 420,
+      "sha256": "d4ba74e59dda921ab0192359302b6155f6c5b968a1080b64194c5bd7e5d10b1d",
+      "size": 3155
+    },
+    "src/tools/definitions/stock_realtime_quote.tool.json": {
+      "mode": 420,
+      "sha256": "5a0b2002a4df280108eee71f51446c91248d5008afb2358a932367e18a1367c9",
+      "size": 3401
+    },
+    "src/tools/definitions/stock_valuation_query.tool.json": {
+      "mode": 420,
+      "sha256": "a7c5bd8b4e66cb355d9dfdd9fe95096e477fbae1a885b0ce94b6dc19a4971362",
+      "size": 3871
+    },
+    "src/tools/definitions/theme_leaders.tool.json": {
+      "mode": 420,
+      "sha256": "fd0fb7afa131a43eff9c92a80dae4c7531d8a67ea4d2c878f9a878ced944a66b",
+      "size": 3970
+    },
+    "src/tools/definitions/个股动量排名.tool.json": {
+      "mode": 420,
+      "sha256": "be2a83a903affc8f178fb03cdd9dafb4fc558b92126ce771fb24ed17fba4737b",
+      "size": 4668
+    },
+    "src/tools/definitions/大盘情绪指标.tool.json": {
+      "mode": 420,
+      "sha256": "aaea9ce6ed1fcae1f307614cc0cda5aaaaba8f3278ce0bde71331b5e0d2bff52",
+      "size": 3871
+    },
+    "src/tools/definitions/大盘整体情况.tool.json": {
+      "mode": 420,
+      "sha256": "a99b5efc04caa7c2a33b7c9b7b42eba2c1fa6b5a51475ed19315009964d55d5a",
+      "size": 3653
+    },
+    "src/tools/definitions/实时个股动量排名.tool.json": {
+      "mode": 420,
+      "sha256": "db484c0beffeadde513700512e2e6375232aa32ff7e0a116b597525e0c8cc858",
+      "size": 3925
+    },
+    "src/tools/definitions/实时行情排名查询.tool.json": {
+      "mode": 420,
+      "sha256": "ec4aba397de1f91140689c51534784be543065153e93e82857a275c5024b4807",
+      "size": 4535
+    },
+    "src/tools/definitions/涨跌停列表查询.tool.json": {
+      "mode": 420,
+      "sha256": "7bb7dfca16a740566021b49218f4a6224e5d8403d67a8c872d2cb967bb7f578f",
+      "size": 3773
+    },
+    "src/tools/examples/company_news_example.py": {
+      "mode": 420,
+      "sha256": "d8d227ed91f2497a522d83ffb108189d394e73f5caba348cd02d4ad09331a381",
+      "size": 356
+    },
+    "src/tools/examples/stock_funds_example.py": {
+      "mode": 420,
+      "sha256": "a31a1f02b08ad7bb421eeb8dd872747fa25221613ac2dfc65b10cdba92af6031",
+      "size": 374
+    },
+    "src/tools/examples/stock_quote_example.py": {
+      "mode": 420,
+      "sha256": "8af9ce184a24cd2ddc072347afdf62582b2f55846c3d836d174218bdbf1b76f0",
+      "size": 310
+    },
+    "src/tools/examples/stock_reports_example.py": {
+      "mode": 420,
+      "sha256": "9beec21372316b13c79b3247b0a451117f906f2095817b8e2b8798f9e81de750",
+      "size": 365
+    },
+    "src/tools/fetch_ths_stock_reports.py": {
+      "mode": 420,
+      "sha256": "cea3001fb972fe4a0ce8af244392a31f2344f944ed4d84c5987b23618467b903",
+      "size": 11666
+    },
+    "src/tools/file_intake_tools.py": {
+      "mode": 420,
+      "sha256": "84c1ca2fb52db58133dfd6370f80bcc195b00960d233dc8dcdb55160ad41d709",
+      "size": 16381
+    },
+    "src/tools/file_io/catalog/file_io_catalog.json": {
+      "mode": 420,
+      "sha256": "f1a592052f68d292fa3c8b3c286320ef0127dceb139d354c06820d0349c25400",
+      "size": 1382
+    },
+    "src/tools/file_io_tool.py": {
+      "mode": 420,
+      "sha256": "c3c9c7656a9817f594c168d2bcce04f59ac4276ad39d60a902401ff862a5824e",
+      "size": 228
+    },
+    "src/tools/finance_data/catalog/api_view_catalog.json": {
+      "mode": 420,
+      "sha256": "aa5713c6946a5aa1a802b0be62c6d77dec0f94bd6c33cf0b7b5b3006a39335a3",
+      "size": 173493
+    },
+    "src/tools/finance_data_query_tool.py": {
+      "mode": 420,
+      "sha256": "3a26081eda2e960e4e6aeb188752167f30f0e595bd3189ed9a7974e07fbbb925",
+      "size": 1642
+    },
+    "src/tools/fund_daily_market_query_tool.py": {
+      "mode": 420,
+      "sha256": "20f6370509f9a231fd91a5502c9291177dbf0fb5ef6ba43640c282de7db1d29f",
+      "size": 957
+    },
+    "src/tools/fund_profile_query_tool.py": {
+      "mode": 420,
+      "sha256": "da1cec6df5c9372d970c72048fa359662d60459425b2f51a43f7c7f3823461d0",
+      "size": 789
+    },
+    "src/tools/general_search_tool.py": {
+      "mode": 420,
+      "sha256": "abf37ee710f715c68006a57ebe3154145a4d06c6926a03a4d8ee7587fff497b8",
+      "size": 1457
+    },
+    "src/tools/http_tool_runner.py": {
+      "mode": 420,
+      "sha256": "ce0693829150e6a274d46de05a7be1d3a2762cb495e57f274501c8c8098e14a4",
+      "size": 3756
+    },
+    "src/tools/index_daily_market_query_tool.py": {
+      "mode": 420,
+      "sha256": "e5804af07158b061467a8067725bc9e5730efa737a800d0a053c932dbf025de9",
+      "size": 1101
+    },
+    "src/tools/indicator_series_tool.py": {
+      "mode": 420,
+      "sha256": "5193dc0f7e20bb764283a8c4b199e555a356892022a633472f97d8f5d9fc4031",
+      "size": 10005
+    },
+    "src/tools/limit_board_list_tool.py": {
+      "mode": 420,
+      "sha256": "c7869819913372481a10720307376d348bb383281c79f17fdbf156b1eed62df0",
+      "size": 2346
+    },
+    "src/tools/market_snapshot_tools.py": {
+      "mode": 420,
+      "sha256": "1f36a5519b50ed6e579e2a93d64c13ea16be10ee076f88f2d3983fe1496a35e5",
+      "size": 11107
+    },
+    "src/tools/plate_members_query_tool.py": {
+      "mode": 420,
+      "sha256": "66e81330bc6c10ce56d2dafaf6723d5f79a9146cd4bc6527b3fe44660a04c4a2",
+      "size": 1006
+    },
+    "src/tools/plate_rank_query_tool.py": {
+      "mode": 420,
+      "sha256": "3d24190aa60cba1208362412c09ea1e55fd175500f16e753e539bd8ea44140ec",
+      "size": 1186
+    },
+    "src/tools/quant_data_provider_tool.py": {
+      "mode": 420,
+      "sha256": "783ee2aefc92dc3b2d73ad7861f82990121e849456faa1c5bdcdffef9e77b200",
+      "size": 1232
+    },
+    "src/tools/quant_factor_screening_tool.py": {
+      "mode": 420,
+      "sha256": "e308bcd7080b606c6785ee8b4599c8c2871e4a00ef5c04dd5b6ab7f7f98dba9b",
+      "size": 1235
+    },
+    "src/tools/realtime_market_ranking_tool.py": {
+      "mode": 420,
+      "sha256": "86afabd15f304ad85e7ab168c58b8234e44c464a6943ec583604d865e4a85511",
+      "size": 8811
+    },
+    "src/tools/registry.py": {
+      "mode": 420,
+      "sha256": "9513a8662947983920c724fe865f0953bed45162b16dcc2e2022d26ce57bb9f3",
+      "size": 18195
+    },
+    "src/tools/schemas/capital_flow_query.schema.json": {
+      "mode": 420,
+      "sha256": "8ca75b97411d1a01afc28a0fbf34589bb267d3c2d12b9dd4c40659e6ae7948cf",
+      "size": 4215
+    },
+    "src/tools/schemas/company_taxonomy_profile.schema.json": {
+      "mode": 420,
+      "sha256": "5005ee2b47c82fccd148b8c1680e0289894cef3ae44e9b9e65cb2538dd825922",
+      "size": 1593
+    },
+    "src/tools/schemas/equity_research_search.schema.json": {
+      "mode": 420,
+      "sha256": "2833dfa9240116cc08d6738ca84c5e96777631a598293cab1de499e723c7a8c7",
+      "size": 2087
+    },
+    "src/tools/schemas/file_io.schema.json": {
+      "mode": 420,
+      "sha256": "5125616758c6321c1b866a1935e8099149b0023227cc24b1445d9a75940ae28a",
+      "size": 1031
+    },
+    "src/tools/schemas/file_read_csv.schema.json": {
+      "mode": 420,
+      "sha256": "895ea02a90aa99a16b8f573c7c9f504efb90e7bf6c94b2a8fff7f3634bc634fa",
+      "size": 671
+    },
+    "src/tools/schemas/file_read_excel.schema.json": {
+      "mode": 420,
+      "sha256": "76c126858f3e17b111d259f9b6fd9c9703e56ccf9463593b1ba5c6bb11f52c77",
+      "size": 673
+    },
+    "src/tools/schemas/file_read_word.schema.json": {
+      "mode": 420,
+      "sha256": "35cfc5602ef4272c62e7206138bb62cfa7e5267c48c5314ac4e03a044d26f172",
+      "size": 696
+    },
+    "src/tools/schemas/finance_data_query.schema.json": {
+      "mode": 420,
+      "sha256": "e5a99885b684351fda1b4e32b0a480f1099185471a9736f04e76fa1798f511dc",
+      "size": 995
+    },
+    "src/tools/schemas/financial_news_search.schema.json": {
+      "mode": 420,
+      "sha256": "e17db3e2ae0d9d70e05940289111dde336d9932df06761a4135791bd76fbf862",
+      "size": 1420
+    },
+    "src/tools/schemas/fund_daily_market_query.schema.json": {
+      "mode": 420,
+      "sha256": "09bffb3aeee3f0eeda352f22be2b4edd3dd805790bb4ca6ab6f68432ecb0bde9",
+      "size": 2356
+    },
+    "src/tools/schemas/fund_profile_query.schema.json": {
+      "mode": 420,
+      "sha256": "50d6862a110f400654afcf7d142598aac6b9d777ec93303d58e588bc858b0463",
+      "size": 2935
+    },
+    "src/tools/schemas/general_search.schema.json": {
+      "mode": 420,
+      "sha256": "1fef3ad122e000d73a0d06ec6c2d60d13530ed3eea88b2c9989009c15353a3f9",
+      "size": 1168
+    },
+    "src/tools/schemas/get_company_taxonomy_profile.schema.json": {
+      "mode": 420,
+      "sha256": "b9a5d9ef3296ee8608ea92e966a1cb6156a1d0e14173e3e7fee1f72c46aa686b",
+      "size": 1018
+    },
+    "src/tools/schemas/get_hot_concepts_and_leaders.schema.json": {
+      "mode": 420,
+      "sha256": "683d331aa10d7e2c405eb59fbb1d572ecf9400abbbdd3f90cf3ffba0a17c3815",
+      "size": 1224
+    },
+    "src/tools/schemas/get_hot_industries_and_leaders.schema.json": {
+      "mode": 420,
+      "sha256": "7df699ca545e8a73a91c7613f4cd8aa5f47cde392cb4bcd6a86a06c5c3c75460",
+      "size": 1249
+    },
+    "src/tools/schemas/get_hot_sectors_and_leaders.schema.json": {
+      "mode": 420,
+      "sha256": "f49a21185b2d8d886b04aae65930d9f6ed8eeff385a73ef33b1648cd2ae463d0",
+      "size": 1247
+    },
+    "src/tools/schemas/hot_theme_leaders_simple.schema.json": {
+      "mode": 420,
+      "sha256": "e88689f0c2e4e2263cfdfda9f345a2b8e11ce3745f0ce1ee094efaf0e8b82689",
+      "size": 1810
+    },
+    "src/tools/schemas/index_daily_market_query.schema.json": {
+      "mode": 420,
+      "sha256": "fcfd6bc88ca82aca9a72545d780dc83f01a6d2b7c23e5ac1e52a2aaa6ad054f9",
+      "size": 2768
+    },
+    "src/tools/schemas/indicator_series_query.schema.json": {
+      "mode": 420,
+      "sha256": "37520dc2be4fe8e2c7c4f338b04d3818b7242ca1d7ce62782a11ad9d3482f09f",
+      "size": 4170
+    },
+    "src/tools/schemas/market_history_amount.schema.json": {
+      "mode": 420,
+      "sha256": "18a7a20078c44b421aff7a2e676ad846420fb63418712011845c3d31ca7b7575",
+      "size": 1447
+    },
+    "src/tools/schemas/market_minute_amount_series.schema.json": {
+      "mode": 420,
+      "sha256": "4976124b9c6b18722b4246abf2bfb31604a2a7bfe78fb157cc35041590090f72",
+      "size": 1810
+    },
+    "src/tools/schemas/market_realtime_breadth.schema.json": {
+      "mode": 420,
+      "sha256": "f4bddfca4ae2037708169264d078d629dc6fcc0bffbf49171c6ab1f5174996b2",
+      "size": 1657
+    },
+    "src/tools/schemas/plate_capital_flow_query.schema.json": {
+      "mode": 420,
+      "sha256": "663c7879ef2a4b3770aa93c0eb0d6ecb8d8d9ac2ae0fad46464acfcaa705ec23",
+      "size": 2654
+    },
+    "src/tools/schemas/plate_member_query.schema.json": {
+      "mode": 420,
+      "sha256": "a49943ea7b62047a954509b325f55546145eeaa1f03defd068f5189db211f334",
+      "size": 2960
+    },
+    "src/tools/schemas/plate_members_query.schema.json": {
+      "mode": 420,
+      "sha256": "121f6e669284061a404c5fb07e923b584f91dd13766d4d07cd088763d61c94d2",
+      "size": 2898
+    },
+    "src/tools/schemas/plate_rank_query.schema.json": {
+      "mode": 420,
+      "sha256": "534d1ff4c04aae384da518eb7582b67c60622a9136d82d6bfc62c824d9b5c24f",
+      "size": 2995
+    },
+    "src/tools/schemas/quant_data_provider.schema.json": {
+      "mode": 420,
+      "sha256": "a562bceda9ecc771621c94719eefcd55c615e58176bcadf1cb9f382e437a17bb",
+      "size": 900
+    },
+    "src/tools/schemas/quant_factor_screening.schema.json": {
+      "mode": 420,
+      "sha256": "e24efd26e0249f67ebd56e756ec17608ff046717da6604bf446d858e2d49a212",
+      "size": 1047
+    },
+    "src/tools/schemas/security_universe_query.schema.json": {
+      "mode": 420,
+      "sha256": "7354d5732aeea1bc81a2aae00b491ab8a71c390ce0b027cecf3977bfa6a0d1d6",
+      "size": 2225
+    },
+    "src/tools/schemas/stock_announcement_query.schema.json": {
+      "mode": 420,
+      "sha256": "a01be4379f6125694742fab09bc5b9199285dfdd1870ef486bed7a40658d8b47",
+      "size": 1756
+    },
+    "src/tools/schemas/stock_capital_flow_query.schema.json": {
+      "mode": 420,
+      "sha256": "f5bc8f192ddd4ea615ff29a4666ad1a06122888d5e845eccda573f3b151f0b36",
+      "size": 2580
+    },
+    "src/tools/schemas/stock_daily_kline_query.schema.json": {
+      "mode": 420,
+      "sha256": "416ffe21892387c61fb809eace0a7ab12739cec93f9cff28dfea8b0e2668bd7a",
+      "size": 2726
+    },
+    "src/tools/schemas/stock_financial_statement_query.schema.json": {
+      "mode": 420,
+      "sha256": "dab1098e7c8ce2bc49a03ae3814a2111afccb72dc2789f0bf28d02edb2cdc4e1",
+      "size": 7193
+    },
+    "src/tools/schemas/stock_fundamental_snapshot.schema.json": {
+      "mode": 420,
+      "sha256": "1b0ff98badeafcfecaec9623a8b4748c9064766784c467647557252531db81d1",
+      "size": 2748
+    },
+    "src/tools/schemas/stock_funds.schema.json": {
+      "mode": 420,
+      "sha256": "6748a9d51364186c034d724e59e23e8f355979dbb094ed16afbc3fddda53e9d9",
+      "size": 2683
+    },
+    "src/tools/schemas/stock_history_funds_flow.schema.json": {
+      "mode": 420,
+      "sha256": "bdfb657e8e19ddf8d1f7581c7b91b93a25629a38f8ff7675899ea82abe165313",
+      "size": 1267
+    },
+    "src/tools/schemas/stock_history_kline.schema.json": {
+      "mode": 420,
+      "sha256": "bdcf0bc04c36d04d1f949fe1b4671d6d4f71942ab3cd2ff2aee882d5e984b97c",
+      "size": 1979
+    },
+    "src/tools/schemas/stock_industry_funds_flow.schema.json": {
+      "mode": 420,
+      "sha256": "7d5f3d0e72837a0a89c7a7bf54966ae7b06816cd659a6dca5a1c95037a92aa4d",
+      "size": 1816
+    },
+    "src/tools/schemas/stock_intraday_kline.schema.json": {
+      "mode": 420,
+      "sha256": "02336f09a26370e99db0c1fc5cc609423054a093777528c0db31b8b0e5213964",
+      "size": 1765
+    },
+    "src/tools/schemas/stock_intraday_kline_query.schema.json": {
+      "mode": 420,
+      "sha256": "e482a83df538ccfab56745800b0d6abf404a04896323f051e507769fe72f6a46",
+      "size": 2654
+    },
+    "src/tools/schemas/stock_plate_membership_query.schema.json": {
+      "mode": 420,
+      "sha256": "c35029eeb520af182039ade9c74cbfe764b65d98dc718341b50b4d311ab404ec",
+      "size": 2925
+    },
+    "src/tools/schemas/stock_protocol_data_query.schema.json": {
+      "mode": 420,
+      "sha256": "51deb58e163ec5e7f900361a0899b0d0985a5feb5d1cda88368560c832289ca2",
+      "size": 451
+    },
+    "src/tools/schemas/stock_quote.schema.json": {
+      "mode": 420,
+      "sha256": "4ba520dfeed816f814d55dd1d917a890f797ffc5c0ffa36772490ffac43d0629",
+      "size": 4921
+    },
+    "src/tools/schemas/stock_realtime_funds_flow.schema.json": {
+      "mode": 420,
+      "sha256": "d8e547c24c71d58a88e800d8bc48873ca55a7974557eb7a989b1546bc4bfc6d3",
+      "size": 1876
+    },
+    "src/tools/schemas/stock_realtime_quote.schema.json": {
+      "mode": 420,
+      "sha256": "4543e9a71df83e54da9d1a1c97f970654673e1ae4c55df086d331f513ba9dd7f",
+      "size": 2208
+    },
+    "src/tools/schemas/stock_valuation_query.schema.json": {
+      "mode": 420,
+      "sha256": "8a8b62a82c7183cc7b1f93c35f2c6157e8c37c7feba90de7e56bbf07345ebca7",
+      "size": 2179
+    },
+    "src/tools/schemas/theme_leaders.schema.json": {
+      "mode": 420,
+      "sha256": "23ce24a42b73faa5d6e1ee3a04d0a9040751740962c9d0eddf5a4364106f66e3",
+      "size": 1298
+    },
+    "src/tools/schemas/个股动量排名.schema.json": {
+      "mode": 420,
+      "sha256": "5cc7a017765493248bec9086f96054ca10feeede3d475b0a455fbecc9db44861",
+      "size": 3417
+    },
+    "src/tools/schemas/大盘情绪指标.schema.json": {
+      "mode": 420,
+      "sha256": "67345478bb8d90600344e1cd85f28a18a03a6d2d4763a9cca05a844feb90fd7c",
+      "size": 1051
+    },
+    "src/tools/schemas/大盘整体情况.schema.json": {
+      "mode": 420,
+      "sha256": "e164ce9cc0556cc0783bcc61d515797b28b598fd384c0cb1a69abd26222724f4",
+      "size": 1694
+    },
+    "src/tools/schemas/实时个股动量排名.schema.json": {
+      "mode": 420,
+      "sha256": "0753fa94cd3a18f1a7cdb62e65db56cf92fda0eff9eee0993223ea43bca93aa2",
+      "size": 2717
+    },
+    "src/tools/schemas/实时行情排名查询.schema.json": {
+      "mode": 420,
+      "sha256": "93bbb37a86f4abd9ecbb6a7f73a0c2e50c4b43b47c7ea517b6eb9de032a9c5cf",
+      "size": 2178
+    },
+    "src/tools/schemas/涨跌停列表查询.schema.json": {
+      "mode": 420,
+      "sha256": "348cfb5d823fb18b20d375c7a69c17e8c34295a1b34a3520fcb8acc7f5973566",
+      "size": 2328
+    },
+    "src/tools/simple_web_tool.py": {
+      "mode": 420,
+      "sha256": "6b3e5d8435fecda53f1fac6c0e29688cea88344340eb1b98f2a9d98eb2ea111b",
+      "size": 6724
+    },
+    "src/tools/specs/capital_flow_query.spec.json": {
+      "mode": 420,
+      "sha256": "d4941490cda0eea2f80f1575f0aa0c82e9fdec4d645f772cedd11abd0874166d",
+      "size": 1766
+    },
+    "src/tools/specs/equity_research_search.spec.json": {
+      "mode": 420,
+      "sha256": "e5d71dd63d8bdd749808fd90c9d2550a778e999df4988fbb2616ccad90ed6c79",
+      "size": 2350
+    },
+    "src/tools/specs/file_io.spec.json": {
+      "mode": 420,
+      "sha256": "7cf2756f664e698f6fca7a43425092ac9116f4819121b340ce5d5e8afe1b9a92",
+      "size": 1566
+    },
+    "src/tools/specs/file_read_csv.spec.json": {
+      "mode": 420,
+      "sha256": "693875c7347327a90be1c2109e3fd3f180731f2c3fec9709fc2506da27766900",
+      "size": 1032
+    },
+    "src/tools/specs/file_read_excel.spec.json": {
+      "mode": 420,
+      "sha256": "2b8a582cb8714c292a1c7e8b5b60649794c53d550935e8d3b05722ea48ac6b49",
+      "size": 1032
+    },
+    "src/tools/specs/file_read_word.spec.json": {
+      "mode": 420,
+      "sha256": "aa6662bc26a4519ed591524e0ae92f5bb0c8f2ce621f73be8679391daa136070",
+      "size": 1287
+    },
+    "src/tools/specs/finance_data_query.spec.json": {
+      "mode": 420,
+      "sha256": "d69f6fce973826e8639bfc44595d3b52e90b356e2ae3437e7273859acc8887e2",
+      "size": 978
+    },
+    "src/tools/specs/financial_news_search.spec.json": {
+      "mode": 420,
+      "sha256": "016d6276fc05d4889f0788dd609efaa18cfcdf3d692bde89c22c2404ef5b8407",
+      "size": 1865
+    },
+    "src/tools/specs/fund_daily_market_query.spec.json": {
+      "mode": 420,
+      "sha256": "0c71511b3f2751d28fa17d6c50769e0fe61b2b7c4b83ab3054b49f0567e3277d",
+      "size": 1341
+    },
+    "src/tools/specs/fund_profile_query.spec.json": {
+      "mode": 420,
+      "sha256": "b8cf982a47ffa64758e9b5eb6d68f486611d5b16ef65b36ecb61adee466efaa3",
+      "size": 1375
+    },
+    "src/tools/specs/general_search.spec.json": {
+      "mode": 420,
+      "sha256": "0f282d7fdfd252b594b9d71c6c5f9389f912839c1e8591a410cc23a7bbf802b3",
+      "size": 1244
+    },
+    "src/tools/specs/get_company_taxonomy_profile.spec.json": {
+      "mode": 420,
+      "sha256": "4655160f3883426411440787af9126ac1f5a9d7fed4253e6080024f227fba985",
+      "size": 1140
+    },
+    "src/tools/specs/get_hot_concepts_and_leaders.spec.json": {
+      "mode": 420,
+      "sha256": "22f0d90bcb63ae5ae0ba62acb018ffbe75620313eed58057808b3f319b8b445e",
+      "size": 1391
+    },
+    "src/tools/specs/get_hot_industries_and_leaders.spec.json": {
+      "mode": 420,
+      "sha256": "47749dea03f01c2c7b5fad75d7a6582ca5b407d2fd2d0b3b5ab984590e8dd03d",
+      "size": 1410
+    },
+    "src/tools/specs/get_hot_sectors_and_leaders.spec.json": {
+      "mode": 420,
+      "sha256": "7ac4e5e4ee8a1df58e889d137812b29d9055710556d44b9be4cb5235c3ea1f99",
+      "size": 1445
+    },
+    "src/tools/specs/index_daily_market_query.spec.json": {
+      "mode": 420,
+      "sha256": "de1f5df5fafc69c1bb473c5f8add796b1644946a1b9547d0dceebb541b428471",
+      "size": 1239
+    },
+    "src/tools/specs/indicator_series_query.spec.json": {
+      "mode": 420,
+      "sha256": "1fc20685d127efae629c50817b683095833be6f753a54018442c0bc69d54ecba",
+      "size": 3170
+    },
+    "src/tools/specs/market_history_amount.spec.json": {
+      "mode": 420,
+      "sha256": "9dbe067cb18cf918db0a0fb2daed96d197b99a7e482052f860c3cad570a905ce",
+      "size": 1478
+    },
+    "src/tools/specs/market_minute_amount_series.spec.json": {
+      "mode": 420,
+      "sha256": "445c5521d485ca11a08a8560f8c8bc99a4c3983fb60db311efc6d32a13ecbde1",
+      "size": 1622
+    },
+    "src/tools/specs/market_realtime_breadth.spec.json": {
+      "mode": 420,
+      "sha256": "ff710840bd4968502afe04c41730c86fda4fddd6317fdcc4f3ed45e83543c00d",
+      "size": 1280
+    },
+    "src/tools/specs/plate_capital_flow_query.spec.json": {
+      "mode": 420,
+      "sha256": "638d52e65e835376e0289f39dbc1655767c2526e363b2a7024d55e144ec0a7d3",
+      "size": 1606
+    },
+    "src/tools/specs/plate_member_query.spec.json": {
+      "mode": 420,
+      "sha256": "e6f8b1a2896817a57819f618098e5abb14b41a3df57bb64a45237b967869b6c0",
+      "size": 1412
+    },
+    "src/tools/specs/plate_members_query.spec.json": {
+      "mode": 420,
+      "sha256": "3ee15c68f676849d8154d1774074d450b9ee4273a87044c1c9e928da01daec9d",
+      "size": 1066
+    },
+    "src/tools/specs/plate_rank_query.spec.json": {
+      "mode": 420,
+      "sha256": "2c5efbf880df45776bc6ae34ba4d60ce8294ecdb77864d1fbeeb34f1d122b630",
+      "size": 1465
+    },
+    "src/tools/specs/quant_data_provider.spec.json": {
+      "mode": 420,
+      "sha256": "404b41d48ab7a71093c382ef750ad6432e71d6a0db54952737d44c788af5253d",
+      "size": 1789
+    },
+    "src/tools/specs/quant_factor_screening.spec.json": {
+      "mode": 420,
+      "sha256": "163d88583e911eb4fa0c254eaf557cde18e7276e6d63e6afecf86bf07c0341ec",
+      "size": 1742
+    },
+    "src/tools/specs/security_universe_query.spec.json": {
+      "mode": 420,
+      "sha256": "327c0e762c45cc34d611f2d5ccead0dc1193c953c58b53e390fe47a9a56cad93",
+      "size": 1678
+    },
+    "src/tools/specs/stock_announcement_query.spec.json": {
+      "mode": 420,
+      "sha256": "6194dec30e597b8961fe73a22be587de347d4dd0eab87b697650a60b72acb6a3",
+      "size": 1334
+    },
+    "src/tools/specs/stock_capital_flow_query.spec.json": {
+      "mode": 420,
+      "sha256": "060f1e69716bbb82be88c09fca23289f2e054736ca3ae595c84b9e6202e39d08",
+      "size": 1265
+    },
+    "src/tools/specs/stock_daily_kline_query.spec.json": {
+      "mode": 420,
+      "sha256": "39a5b0f528fe885426a545c36f7c2628faeb5ae7c5bd987417c852d52141f93a",
+      "size": 1265
+    },
+    "src/tools/specs/stock_financial_statement_query.spec.json": {
+      "mode": 420,
+      "sha256": "8f13af22727126e00377510dff5ae057dcc645a30248cd45eb047543c8c1c113",
+      "size": 1557
+    },
+    "src/tools/specs/stock_fundamental_snapshot.spec.json": {
+      "mode": 420,
+      "sha256": "2c972469516f8959098a9bc5a44cfb4022e611717123131b97bed62ecfa4dc04",
+      "size": 1445
+    },
+    "src/tools/specs/stock_funds.spec.json": {
+      "mode": 420,
+      "sha256": "ba29dc5aa0ba603cff7f07114b4d98d5aab6f490fc8360f77584abcbbf910a19",
+      "size": 2181
+    },
+    "src/tools/specs/stock_history_funds_flow.spec.json": {
+      "mode": 420,
+      "sha256": "911f112f2cf09170d3c42f5ff72efdd01d16cfe9310e2a0c2243a7d7e3cf93c9",
+      "size": 1285
+    },
+    "src/tools/specs/stock_history_kline.spec.json": {
+      "mode": 420,
+      "sha256": "4f3fcbbd757b7c61ca92dfde4fc9aa0e6dd869ebbc7843075942ee31601c2bae",
+      "size": 2077
+    },
+    "src/tools/specs/stock_industry_funds_flow.spec.json": {
+      "mode": 420,
+      "sha256": "176da78330a87e4f30d473047a22e7ae0d644674e53141173b5161f010c73b8b",
+      "size": 1515
+    },
+    "src/tools/specs/stock_intraday_kline.spec.json": {
+      "mode": 420,
+      "sha256": "66d0df89e1caac32c46f9e2e4ff655454d11b76763a03cbb06381ba4210bbd55",
+      "size": 1523
+    },
+    "src/tools/specs/stock_intraday_kline_query.spec.json": {
+      "mode": 420,
+      "sha256": "32bc268fe45ffd573391c6c5eceb42bbc19d28ab33d33ae95677d140ed2d885a",
+      "size": 1204
+    },
+    "src/tools/specs/stock_plate_membership_query.spec.json": {
+      "mode": 420,
+      "sha256": "88f3ad0ec2fe2c09d501b5311a85ae26959edf9ee2af17dae9418b675ebaf8f6",
+      "size": 1067
+    },
+    "src/tools/specs/stock_quote.spec.json": {
+      "mode": 420,
+      "sha256": "d022746a2f7a045adac7852c1cc502f887c62eaa6ec9b96d8dbc24aaa37de02a",
+      "size": 1119
+    },
+    "src/tools/specs/stock_realtime_funds_flow.spec.json": {
+      "mode": 420,
+      "sha256": "d8a0bd96bb4a48d8883e0c01d3733ac91f4611962c4139b64845b252c7da0624",
+      "size": 2272
+    },
+    "src/tools/specs/stock_realtime_quote.spec.json": {
+      "mode": 420,
+      "sha256": "b1682663242b2da6c20456089ded709a40461d9cd6a63cc7a0619d1799d59f48",
+      "size": 1206
+    },
+    "src/tools/specs/stock_valuation_query.spec.json": {
+      "mode": 420,
+      "sha256": "c228ec6fc4ea6ee102776270182376723a106de6ba00c1d861e7c681c51d43a4",
+      "size": 1494
+    },
+    "src/tools/specs/theme_leaders.spec.json": {
+      "mode": 420,
+      "sha256": "f49e308bd6c8e25c52c29cab5682645f9d6d99cc07445a499d036f6fc804f553",
+      "size": 1470
+    },
+    "src/tools/stock_announcement_query_tool.py": {
+      "mode": 420,
+      "sha256": "d02fb3e4e6027721d0e7efd432fa412851294c3fd7ae256069d727ed4e4ba38a",
+      "size": 1642
+    },
+    "src/tools/stock_capital_flow_query_tool.py": {
+      "mode": 420,
+      "sha256": "e847afa93f03826f8fef3b9c65040899ecd3c83db061988bed5c6dad6bb767a2",
+      "size": 317
+    },
+    "src/tools/stock_daily_kline_query_tool.py": {
+      "mode": 420,
+      "sha256": "3a1206af82782dfc83310c0000a1b18b8ce05e283ad6e0de072f2335a2f65135",
+      "size": 968
+    },
+    "src/tools/stock_financial_statement_query_tool.py": {
+      "mode": 420,
+      "sha256": "5670dbed52b153d6dc8e5b80d225c69626ad96860c988997f371927f7ea2da88",
+      "size": 1276
+    },
+    "src/tools/stock_fundamental_snapshot_tool.py": {
+      "mode": 420,
+      "sha256": "6229e01e6c71818e570430c730f9057b967f455bd4fe441284cd08cc1ec02a21",
+      "size": 793
+    },
+    "src/tools/stock_funds_split_tools.py": {
+      "mode": 420,
+      "sha256": "74c72adc1cdfc8aa198158fe04a99d9bff76140de015c30255bd99c5fc91e79e",
+      "size": 6325
+    },
+    "src/tools/stock_funds_tool.py": {
+      "mode": 420,
+      "sha256": "aca8ba1487b8c2f52c9b15753e44a2c96556fff09c2b331824f8a605b73468dc",
+      "size": 11963
+    },
+    "src/tools/stock_intraday_kline_query_tool.py": {
+      "mode": 420,
+      "sha256": "6d1b8029776d79dc5005963f4f88087932e657ccd1a6e26981340e8c75d71de1",
+      "size": 879
+    },
+    "src/tools/stock_momentum_ranking_tool.py": {
+      "mode": 420,
+      "sha256": "a21f6e0ab6198a7a290331efb3e6190bb871c1dbea4c03307e90c3c5bab56ad5",
+      "size": 37886
+    },
+    "src/tools/stock_plate_membership_query_tool.py": {
+      "mode": 420,
+      "sha256": "e8c15f22b441176236663802a0d7518464abf8b2b9b9ee413594d81b6da41317",
+      "size": 1046
+    },
+    "src/tools/stock_quote_tool.py": {
+      "mode": 420,
+      "sha256": "b255ec0a6fd8a4610165f662464b193cf8334d12819e5dc9b5a8bc3fad2d30c6",
+      "size": 28508
+    },
+    "src/tools/stock_realtime_quote_tool.py": {
+      "mode": 420,
+      "sha256": "6efecebc0064a6b720cb5c0fa75b7b1fe6581d5449b30d2d256e817858306664",
+      "size": 946
+    },
+    "src/tools/stock_reports_tool.py": {
+      "mode": 420,
+      "sha256": "56802639334bdaddb03c8a062963b047fa5a8fc550016e9d53891033685456de",
+      "size": 7759
+    },
+    "src/tools/stock_valuation_query_tool.py": {
+      "mode": 420,
+      "sha256": "62123dd5a49f3a5de493efae44a8e838c61ed015c3706a8322f303fddce63ae1",
+      "size": 940
+    },
+    "src/tools/tool_hub.json": {
+      "mode": 420,
+      "sha256": "8974520a24c37bb2da63944f2ee80d33dd956cb93de57bab75ebcf5f6e470b0e",
+      "size": 18121
+    },
+    "src/utils/ai_service.py": {
+      "mode": 420,
+      "sha256": "9e364b303753263b318f6271e00c8bd8f771dcfb20656c81d682199416a3c7a9",
+      "size": 21657
+    },
+    "src/utils/mysql_utils.py": {
+      "mode": 420,
+      "sha256": "dd82c61a6bebcc3470e24c6113a83c5bec548346ab0182040386c9377979c324",
+      "size": 138186
+    },
+    "src/utils/system_db_utils.py": {
+      "mode": 420,
+      "sha256": "57e617620e486d437d10e7f61957b623d641c07bb8807dfa10ee3468b5ae7bd6",
+      "size": 2078
+    },
+    "src/web/REPORT_PAGE_PROTOCOL.md": {
+      "mode": 420,
+      "sha256": "2eca777ec0562c5407577c48c6c6ba2fd28409651df2c4d30c11ffa67c09d4a1",
+      "size": 8637
+    },
+    "src/web/assistant_result_routes.py": {
+      "mode": 420,
+      "sha256": "711b79be5fb00dcc8ecd3cdc39f30ccd79f49128abccbfe6ffbbee7a8cf8c356",
+      "size": 7691
+    },
+    "src/web/auth_routes.py": {
+      "mode": 420,
+      "sha256": "2158952297a872ac613aa6c2ba5174c226ccce5a1611cbaf7ede5043a9b3f74f",
+      "size": 9628
+    },
+    "src/web/backtest_routes.py": {
+      "mode": 420,
+      "sha256": "1993515efa730cb295f1d489c32501dc96cf1159fe25a714cfefdf960c8d3077",
+      "size": 1651
+    },
+    "src/web/flask_app.py": {
+      "mode": 420,
+      "sha256": "d552bf45c89cc1366c5f86af6724ee5c35cd20f5c32448254b91e32756795eab",
+      "size": 281428
+    },
+    "src/web/scheduled_task_routes.py": {
+      "mode": 420,
+      "sha256": "8251486da1cf3c6db11e555995b25e3887c0f3fbd864467f1080d0b6fbaf2043",
+      "size": 8762
+    },
+    "src/web/static/js/stockChartsPlugin.js": {
+      "mode": 420,
+      "sha256": "3719a5cfe623a1ff112dc151ff86655139a9602666f27134561b17ad450b795e",
+      "size": 4292
+    },
+    "src/web/static/vendor/mermaid/LICENSE": {
+      "mode": 420,
+      "sha256": "ec9fb67dcb25eccc416ed56e1aab819222c805a2a4bfe4cb19e7556bf2ffde80",
+      "size": 1089
+    },
+    "src/web/static/vendor/mermaid/mermaid.min.js": {
+      "mode": 420,
+      "sha256": "74d7c46dabca328c2294733910a8aa1ed0c37451776e8d5295da38a2b758fb9b",
+      "size": 3565102
+    },
+    "src/web/templates/agent_studio.html": {
+      "mode": 420,
+      "sha256": "fde8eca2758d4c8d8cb14a80e767e11333e982fa017724493417d5697b47c848",
+      "size": 8938
+    },
+    "src/web/templates/application_studio.html": {
+      "mode": 420,
+      "sha256": "67601f2330fb794b30eb627c6607fcbb3260426739dc9401ad13beaa09297dfc",
+      "size": 9139
+    },
+    "src/web/templates/conversation_workbench.html": {
+      "mode": 420,
+      "sha256": "9169b9fdab54c779ff964051d80f3c98775aa02ffe114c89df0de3ef84deee6e",
+      "size": 175818
+    },
+    "src/web/templates/login_entry.html": {
+      "mode": 420,
+      "sha256": "1bb5d544f5f5e71c2efe395b623149ac46bf19276a1f975fb921cc40f68895c8",
+      "size": 5957
+    },
+    "src/web/templates/report_protocol_demo.html": {
+      "mode": 420,
+      "sha256": "5fef9ac2a92df4c18f3d6cb898184b362077dc219cb9e3459a920188c6f7295f",
+      "size": 87567
+    },
+    "src/web/templates/router_studio.html": {
+      "mode": 420,
+      "sha256": "abd6e7b426525e72d2e58561cd5123c0dc01c0a3fad14cc5524d1116f475d9f8",
+      "size": 20567
+    },
+    "src/web/templates/simple_web_debug.html": {
+      "mode": 420,
+      "sha256": "228053e1a63720695cd77a2308eb3235340e0d66ecd3f5718cb2ebf1539aa2cb",
+      "size": 8237
+    },
+    "src/web/templates/skill_studio.html": {
+      "mode": 420,
+      "sha256": "e0be29fde8cfcfe13eb49224582554683b447f38e024476f2d8b1709c42d21a7",
+      "size": 43923
+    },
+    "src/web/templates/skill_studio_v2.html": {
+      "mode": 420,
+      "sha256": "a7abd99a31ee085702ed172dde45b315dd924ae18056b8b6fb5a40e5da3269bd",
+      "size": 38042
+    },
+    "src/web/templates/skills_catalog.html": {
+      "mode": 420,
+      "sha256": "ec95c328611037446c1692416da00c4179a9d52a6748f089c22a9cc80e1ac084",
+      "size": 10696
+    },
+    "src/web/templates/tool_detail.html": {
+      "mode": 420,
+      "sha256": "7939ac3bff9e141e0abd3ad520ff2524bea069c9ec46e017a79f9a9fcb0b49b2",
+      "size": 26380
+    },
+    "src/web/templates/tool_studio.html": {
+      "mode": 420,
+      "sha256": "697803d1e22efe94af4655cae57646934e617a5fc97513c28fe48f7df94b1925",
+      "size": 40511
+    },
+    "src/web/templates/tools_catalog.html": {
+      "mode": 420,
+      "sha256": "15135d7d2ccf17ec7722031ad3f61e5f208d2ce2adc2fc1054efcbd964b3746b",
+      "size": 10875
+    },
+    "stock_name.tsv": {
+      "mode": 420,
+      "sha256": "60bfbfa5655a751756e66ca8bd63d2590bf112d21b6962c5ddb158d2b090f69f",
+      "size": 128030
+    }
+  },
+  "format_version": 1,
+  "reconstruction_note": "Reconstructed CC reference for the completed 2026-09-02 comparison, using the first integrated Git commit from 2026-09-04. This is not an exact 2026-09-02 workspace snapshot. The catalog SHA256 matches the historical CC result references; complete historical prompts, dependencies and environment were not hash-bound. No current production source is used.",
+  "reference_name": "cc_20260902_rebuilt",
+  "secret_scan": "Reviewed fixed source allowlist and literal credential heuristic; no findings",
+  "source_allowlist": {
+    "directories": [
+      "src",
+      "config",
+      "frontend"
+    ],
+    "files": [
+      "AGENTS.md",
+      "README.md",
+      "requirements.txt",
+      "stock_name.tsv",
+      "main_framework.md",
+      "custom_tools.md",
+      "phrase_1_prompt.md",
+      "phase1_check_repair_appendix.md",
+      "phase2_api_prompt.md",
+      "phase2_dynamic_cal_code_prompt.md",
+      "phase2_final_check_prompt.md",
+      "SKILL_requirement_coding.md",
+      "SKILL_requirement_understanding.md",
+      "SKILL_requirement_understanding_event_format.md",
+      "scripts/dsh_source_runtime.py",
+      "data/index_subjects.tsv"
+    ]
+  },
+  "source_archive": {
+    "name": "source.tar.gz",
+    "sha256": "c0ecf83c4f5e400ef1d94ec8745562ab0e82b48ff1c2b90a942c4d6b0d963ac6"
+  },
+  "source_commit": "2242990c9a092c00a4cd1bb8a0bbb42d9fbc7b7f",
+  "source_commit_date": "2026-09-04T11:17:07+08:00"
+}

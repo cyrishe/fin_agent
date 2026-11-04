@@ -1,0 +1,63 @@
+{
+  "name": "task_submit",
+  "version": "v1",
+  "status": "active",
+  "availability": {
+    "lifecycle": "active",
+    "retrieval_mode": "retrievable"
+  },
+  "identity": {
+    "display_name": "提交后台任务",
+    "description": "用户要求后台、多步、定时或模型训练研究时提交任务。系统自动采用本轮用户原文；只需按需补充前文已确认的 context，不重写任务要求。返回回执和任务中心链接，领域规划和实际工作由独立 worker 执行。",
+    "domain": "user_tasks",
+    "owner": "tools"
+  },
+  "schemas": {
+    "input": {
+      "type": "object",
+      "properties": {
+        "instruction": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4000,
+          "description": "无会话原文的直接调用需提供完整任务说明；聊天调用省略，系统自动采用当前用户原文"
+        },
+        "context": {
+          "type": "string",
+          "maxLength": 4000,
+          "description": "仅补充本轮原文未包含、但前文已确认的对象、约束、时间或预算；没有补充时省略，不复述或改写本轮要求"
+        },
+        "idempotency_key": {
+          "type": "string",
+          "maxLength": 128,
+          "description": "重复提交同一次请求时复用的标识；通常由系统生成"
+        }
+      },
+      "required": [],
+      "additionalProperties": false
+    },
+    "output": {
+      "type": "object"
+    }
+  },
+  "profiles": {
+    "real": {
+      "enabled": true,
+      "implementation": {
+        "kind": "python_callable",
+        "target": "src.tools.user_task_tools:run_submit"
+      }
+    }
+  },
+  "safety": {
+    "network": false,
+    "persistence": true,
+    "side_effect": "write_user_task"
+  },
+  "runtime_hints": {
+    "cost_class": "low",
+    "latency_class": "short",
+    "supports_async_submit": true
+  },
+  "auth": "internal"
+}

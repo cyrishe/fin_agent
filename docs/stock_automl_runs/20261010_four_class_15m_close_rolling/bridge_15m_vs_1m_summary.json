@@ -1,0 +1,36 @@
+{
+  "all": {
+    "pairs": 55301,
+    "exact_price_match": 40490,
+    "within_0_01_cny": 47381,
+    "within_0_1pct": 49217,
+    "median_abs_relative_difference": 0.0,
+    "p99_abs_relative_difference": 0.0034344590726959772
+  },
+  "by_time": {
+    "09:45": {
+      "pairs": 27651,
+      "exact_price_match": 18946,
+      "within_0_01_cny": 22501,
+      "within_0_1pct": 23724,
+      "median_abs_relative_difference": 0.0,
+      "p99_abs_relative_difference": 0.0037071394214250567
+    },
+    "14:45": {
+      "pairs": 27650,
+      "exact_price_match": 21544,
+      "within_0_01_cny": 24880,
+      "within_0_1pct": 25493,
+      "median_abs_relative_difference": 0.0,
+      "p99_abs_relative_difference": 0.003144654088050387
+    }
+  },
+  "source": "Sina 15m close vs KingdomAI finalized, non-fallback 1m latest_price at same bar end",
+  "dates": [
+    "2026-08-05",
+    "2026-08-06",
+    "2026-08-07",
+    "2026-08-10",
+    "2026-08-11"
+  ]
+}

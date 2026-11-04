@@ -1,0 +1,133 @@
+{
+  "year": "2026",
+  "scheme": "board_window",
+  "training_mode": "rolling20",
+  "test_months": [
+    "2026-05",
+    "2026-06",
+    "2026-07"
+  ],
+  "test_days": 61,
+  "test_candidates": 23439,
+  "north_exchange_rows": 0,
+  "outcome_basis": "T+1 raw minute price times T final close / T+1 reference preclose",
+  "features": [
+    "signal_return",
+    "volume_ratio",
+    "turnover_so_far_pct",
+    "float_mv_100m_cny",
+    "volume_4of5_increasing",
+    "ma_bull_5_10_20",
+    "all_intraday_lows_above_ma",
+    "wide_board"
+  ],
+  "top1": {
+    "picks": 61,
+    "target": 11,
+    "acceptable": 17,
+    "neutral": 11,
+    "wrong": 22,
+    "unknown": 0,
+    "mean_0940_pct": -0.9465,
+    "mean_staged_pct": -0.7798,
+    "main_board": 35,
+    "wide_board": 26
+  },
+  "top2": {
+    "picks": 61,
+    "target": 19,
+    "acceptable": 13,
+    "neutral": 8,
+    "wrong": 21,
+    "unknown": 0,
+    "mean_0940_pct": 0.2199,
+    "mean_staged_pct": 0.2696,
+    "main_board": 25,
+    "wide_board": 36
+  },
+  "monthly": {
+    "2026-05": {
+      "test_days": 18,
+      "top1": {
+        "picks": 18,
+        "target": 5,
+        "acceptable": 5,
+        "neutral": 4,
+        "wrong": 4,
+        "unknown": 0,
+        "mean_0940_pct": -0.0357,
+        "mean_staged_pct": 0.3585,
+        "main_board": 8,
+        "wide_board": 10
+      },
+      "top2": {
+        "picks": 18,
+        "target": 6,
+        "acceptable": 4,
+        "neutral": 2,
+        "wrong": 6,
+        "unknown": 0,
+        "mean_0940_pct": 0.4185,
+        "mean_staged_pct": 0.973,
+        "main_board": 3,
+        "wide_board": 15
+      }
+    },
+    "2026-06": {
+      "test_days": 21,
+      "top1": {
+        "picks": 21,
+        "target": 3,
+        "acceptable": 6,
+        "neutral": 3,
+        "wrong": 9,
+        "unknown": 0,
+        "mean_0940_pct": -0.8077,
+        "mean_staged_pct": -0.5358,
+        "main_board": 12,
+        "wide_board": 9
+      },
+      "top2": {
+        "picks": 21,
+        "target": 8,
+        "acceptable": 6,
+        "neutral": 3,
+        "wrong": 4,
+        "unknown": 0,
+        "mean_0940_pct": 1.5849,
+        "mean_staged_pct": 1.0666,
+        "main_board": 10,
+        "wide_board": 11
+      }
+    },
+    "2026-07": {
+      "test_days": 22,
+      "top1": {
+        "picks": 22,
+        "target": 3,
+        "acceptable": 6,
+        "neutral": 4,
+        "wrong": 9,
+        "unknown": 0,
+        "mean_0940_pct": -1.8241,
+        "mean_staged_pct": -1.944,
+        "main_board": 15,
+        "wide_board": 7
+      },
+      "top2": {
+        "picks": 22,
+        "target": 5,
+        "acceptable": 3,
+        "neutral": 3,
+        "wrong": 11,
+        "unknown": 0,
+        "mean_0940_pct": -1.2456,
+        "mean_staged_pct": -1.0667,
+        "main_board": 12,
+        "wide_board": 10
+      }
+    }
+  },
+  "train_rows_mean": 7401.1,
+  "train_window_days": 20
+}

@@ -1,0 +1,31 @@
+{
+  "run_id": "20261002T174618Z_584fcb51",
+  "git_commit": "d4b354bbe8f7f623f4c67e086f64b18cb04554a1",
+  "working_tree_dirty": true,
+  "implementation_sha256": "db3ff25caa6e0592e678fbc7ce3364925c7623062808564883e01d0c71f6516e",
+  "panel_sha256": "8b839c896b99208c3e2c5b2cddfe6870c47a5ad8a631fe5ebaa2fcc5440ad097",
+  "python": "3.13.5",
+  "pandas": "2.3.2",
+  "sklearn": "1.7.1",
+  "created_at": "2026-10-02T17:46:18.623582+00:00",
+  "test_start": "2025-08-11T00:00:00",
+  "heldout_companies": [
+    "000858.SZ",
+    "600519.SH"
+  ],
+  "source": {
+    "source": "kingdomai",
+    "warnings": [
+      "估值按下一自然日可用处理；原库未提供历史修订版本，不能证明原始发布时点。",
+      "行业按 SW2021 生效区间对齐，未取得分类历史版本；用于研究特征和分组，非严格历史成分认证。",
+      "新闻热度为已入库新闻的7日数量代理，不代表全网热度；不读取或上传新闻正文。",
+      "当前连接没有分钟快照表，本轮未使用分钟特征。"
+    ],
+    "price_basis": "vendor_adjusted",
+    "universe": "Explicit ten-company smoke-test pool; not a random full-market sample."
+  },
+  "rows": 4850,
+  "sessions": 485,
+  "repeated_holdout_warning": "同一数据反复运行会污染盲测；后续研究须指定未揭盲的新时间窗口。",
+  "published_scope": "Aggregate metrics and experimental configuration only. Raw data, row-level predictions, model, complete schema catalog and execution ledger remain local."
+}

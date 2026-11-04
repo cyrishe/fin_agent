@@ -1,0 +1,77 @@
+{
+  "source_rows": 59959,
+  "signal_dates": 139,
+  "test_first": "2026-02-02",
+  "test_last": "2026-07-30",
+  "test_days": 118,
+  "arms": {
+    "rolling20_tminus1": {
+      "test_days": 118,
+      "selected_days": 118,
+      "known_outcome_days": 118,
+      "unknown_outcome_days": 0,
+      "second_high_counts": {
+        "ge3": 84,
+        "1to3": 18,
+        "0to1": 5,
+        "lt0": 11
+      },
+      "sale_0940_counts": {
+        "ge3": 60,
+        "1to3": 21,
+        "0to1": 10,
+        "lt0": 27
+      },
+      "mean_0940_return_pct_per_trade": 2.3353372751781696,
+      "median_0940_return_pct_per_trade": 3.21258053444897,
+      "random_expected_ge3_days": 13.908312410405424,
+      "random_p_at_least_ge3_hits": 2.643720890980657e-26
+    },
+    "full19_tminus2": {
+      "test_days": 118,
+      "selected_days": 118,
+      "known_outcome_days": 116,
+      "unknown_outcome_days": 2,
+      "second_high_counts": {
+        "ge3": 83,
+        "1to3": 19,
+        "0to1": 5,
+        "lt0": 9
+      },
+      "sale_0940_counts": {
+        "ge3": 62,
+        "1to3": 19,
+        "0to1": 9,
+        "lt0": 26
+      },
+      "mean_0940_return_pct_per_trade": 2.421603526580678,
+      "median_0940_return_pct_per_trade": 3.586972389442705,
+      "random_expected_ge3_days": 13.908312410405424,
+      "random_p_at_least_ge3_hits": 3.236953573841363e-28
+    },
+    "p3_selected_tminus2": {
+      "test_days": 118,
+      "selected_days": 118,
+      "known_outcome_days": 118,
+      "unknown_outcome_days": 0,
+      "second_high_counts": {
+        "ge3": 89,
+        "1to3": 16,
+        "0to1": 4,
+        "lt0": 9
+      },
+      "sale_0940_counts": {
+        "ge3": 66,
+        "1to3": 21,
+        "0to1": 9,
+        "lt0": 22
+      },
+      "mean_0940_return_pct_per_trade": 2.6088984337224193,
+      "median_0940_return_pct_per_trade": 3.79508894206179,
+      "random_expected_ge3_days": 13.908312410405424,
+      "random_p_at_least_ge3_hits": 3.1438207071402623e-32
+    }
+  },
+  "data_sha256": "7197393104b61b8ab3b73e2b30a42636a63d543352fc57dfcc50fa3ac1534713",
+  "script_sha256": "f9da650a0537471d2db45b2a4b3edae5b1a024de54281bd81330264cc3cb755b"
+}

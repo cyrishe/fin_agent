@@ -1,0 +1,201 @@
+{
+  "qualifier": "next-morning second-high return >=1% relative to T 14:40 entry",
+  "best_slot": "For each qualifying stock, highest among 09:31 open and 09:31-09:40 minute closes; tied stock prices choose first occurrence. Daily modal ties choose earliest slot.",
+  "lag": "A cohort's outcome at its next morning 09:40 chooses one slot for the next signal cohort's following morning; no same-cohort outcome selects its own exit.",
+  "cohort_stock_days": 5996,
+  "cohort_days": 21,
+  "qualifying_stock_days": 2305,
+  "latest_guide": {
+    "signal_date": "2026-10-08",
+    "next_date": "2026-10-09",
+    "qualifying_stocks": 61,
+    "stocks_with_tied_personal_peak": 6,
+    "chosen_slot": "close_31",
+    "max_votes": 9,
+    "tied_modal_slots": "close_31,close_32,close_40",
+    "votes_open_0931": 5,
+    "votes_close_31": 9,
+    "votes_close_32": 9,
+    "votes_close_33": 2,
+    "votes_close_34": 3,
+    "votes_close_35": 7,
+    "votes_close_36": 1,
+    "votes_close_37": 3,
+    "votes_close_38": 6,
+    "votes_close_39": 7,
+    "votes_close_40": 9
+  },
+  "lagged_slot_exact_match_with_next_day": 1,
+  "lagged_transitions": 20,
+  "lagged_results": [
+    {
+      "model": "balanced_class_weight",
+      "strategy": "always_0940",
+      "top_k": 1,
+      "signal_days": 20,
+      "trades": 20,
+      "mean_trade_return_pct": -0.7784645703929821,
+      "positive": 7,
+      "below_minus1": 12
+    },
+    {
+      "model": "balanced_class_weight",
+      "strategy": "always_0940",
+      "top_k": 2,
+      "signal_days": 20,
+      "trades": 40,
+      "mean_trade_return_pct": -0.05373061620656261,
+      "positive": 19,
+      "below_minus1": 18
+    },
+    {
+      "model": "balanced_class_weight",
+      "strategy": "always_open",
+      "top_k": 1,
+      "signal_days": 20,
+      "trades": 20,
+      "mean_trade_return_pct": -0.014946824509762813,
+      "positive": 8,
+      "below_minus1": 8
+    },
+    {
+      "model": "balanced_class_weight",
+      "strategy": "always_open",
+      "top_k": 2,
+      "signal_days": 20,
+      "trades": 40,
+      "mean_trade_return_pct": -0.09867026134312978,
+      "positive": 13,
+      "below_minus1": 16
+    },
+    {
+      "model": "balanced_class_weight",
+      "strategy": "original_four_rules",
+      "top_k": 1,
+      "signal_days": 20,
+      "trades": 20,
+      "mean_trade_return_pct": -0.5036530788149279,
+      "positive": 8,
+      "below_minus1": 11
+    },
+    {
+      "model": "balanced_class_weight",
+      "strategy": "original_four_rules",
+      "top_k": 2,
+      "signal_days": 20,
+      "trades": 40,
+      "mean_trade_return_pct": -0.1853915156103697,
+      "positive": 19,
+      "below_minus1": 17
+    },
+    {
+      "model": "balanced_class_weight",
+      "strategy": "prior_cohort_mode",
+      "top_k": 1,
+      "signal_days": 20,
+      "trades": 20,
+      "mean_trade_return_pct": -0.9255957701772505,
+      "positive": 6,
+      "below_minus1": 11
+    },
+    {
+      "model": "balanced_class_weight",
+      "strategy": "prior_cohort_mode",
+      "top_k": 2,
+      "signal_days": 20,
+      "trades": 40,
+      "mean_trade_return_pct": -0.5277699499912697,
+      "positive": 14,
+      "below_minus1": 16
+    },
+    {
+      "model": "unweighted",
+      "strategy": "always_0940",
+      "top_k": 1,
+      "signal_days": 20,
+      "trades": 20,
+      "mean_trade_return_pct": 1.1424720176472276,
+      "positive": 13,
+      "below_minus1": 5
+    },
+    {
+      "model": "unweighted",
+      "strategy": "always_0940",
+      "top_k": 2,
+      "signal_days": 20,
+      "trades": 40,
+      "mean_trade_return_pct": 0.3826087215961821,
+      "positive": 20,
+      "below_minus1": 14
+    },
+    {
+      "model": "unweighted",
+      "strategy": "always_open",
+      "top_k": 1,
+      "signal_days": 20,
+      "trades": 20,
+      "mean_trade_return_pct": 0.19157145897547467,
+      "positive": 11,
+      "below_minus1": 7
+    },
+    {
+      "model": "unweighted",
+      "strategy": "always_open",
+      "top_k": 2,
+      "signal_days": 20,
+      "trades": 40,
+      "mean_trade_return_pct": 0.022015889851096926,
+      "positive": 19,
+      "below_minus1": 12
+    },
+    {
+      "model": "unweighted",
+      "strategy": "original_four_rules",
+      "top_k": 1,
+      "signal_days": 20,
+      "trades": 20,
+      "mean_trade_return_pct": 0.6887574293790525,
+      "positive": 12,
+      "below_minus1": 6
+    },
+    {
+      "model": "unweighted",
+      "strategy": "original_four_rules",
+      "top_k": 2,
+      "signal_days": 20,
+      "trades": 40,
+      "mean_trade_return_pct": 0.1944143749825928,
+      "positive": 19,
+      "below_minus1": 14
+    },
+    {
+      "model": "unweighted",
+      "strategy": "prior_cohort_mode",
+      "top_k": 1,
+      "signal_days": 20,
+      "trades": 20,
+      "mean_trade_return_pct": 0.6925960636381301,
+      "positive": 11,
+      "below_minus1": 4
+    },
+    {
+      "model": "unweighted",
+      "strategy": "prior_cohort_mode",
+      "top_k": 2,
+      "signal_days": 20,
+      "trades": 40,
+      "mean_trade_return_pct": 0.0766199614358426,
+      "positive": 17,
+      "below_minus1": 13
+    }
+  ],
+  "source_sha256": {
+    "docs/stock_automl_runs/20261009_close9_target/exact_1440_to_close9_candidates.csv.gz": "99263a8722907209d1cc45ffd6e3e73a1386fc36050f67e5d55f78b0c3e8942a",
+    "docs/stock_automl_runs/20261009_close10_target/exact_0931_closes.csv.gz": "c08be955894c1366b4d4dd3f2c194b9b665b03604c32d31206d7b8795693bc50",
+    "docs/stock_automl_runs/20261009_second_high_regression/second_high_prices.csv.gz": "3e979277eac24110e0b7abb63d6ef59fd2977788ff66185c6e6fc4e579d1811c",
+    "docs/stock_automl_runs/20261010_second_high_four_class_weighted/daily_top2.csv": "6d3ff7dbe93f5b5086a4ee7c8f2f6124b63a8e21bf35fa5979e7fa762a75e93a",
+    "docs/stock_automl_runs/20261010_second_high_four_class_oct9/predictions_with_outcomes.csv": "d5470511e715684f0bf7edc4fe17771b5b807cdbe3a7e6019e231f772304f314",
+    "docs/stock_automl_runs/20261010_second_high_four_class_oct9/selected_before_outcomes.csv": "9891d391481f33b76d9563e6c71fc0a8c592928c28fe79dab9b21c7bce33bd8f",
+    "docs/stock_automl_runs/20261010_second_high_sell_minute_mode/opening_prices.csv": "34587f327563bb18bfc710aff1cb3648481cd5326d93ab69d2c427f5fc1ae4b8"
+  }
+}

@@ -1,0 +1,98 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "tool_contract",
+    "implementation_summary"
+  ],
+  "properties": {
+    "tool_contract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "tool_name",
+        "display_name",
+        "description",
+        "inputs",
+        "outputs"
+      ],
+      "properties": {
+        "tool_name": {
+          "type": "string"
+        },
+        "display_name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "inputs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/field"
+          }
+        },
+        "outputs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/field"
+          }
+        }
+      }
+    },
+    "implementation_summary": {
+      "type": "string",
+      "description": "面向用户说明工具功能、已完成的业务模块和功能测试，并用具体实现或测试证据说明需求、Design、实现如何对应；不得只写保持一致，不得出现源码文件名或服务器路径。"
+    }
+  },
+  "$defs": {
+    "field": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "type",
+        "required",
+        "description",
+        "items_type"
+      ],
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "string",
+            "integer",
+            "number",
+            "boolean",
+            "array",
+            "object"
+          ]
+        },
+        "required": {
+          "type": "boolean"
+        },
+        "description": {
+          "type": "string"
+        },
+        "items_type": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "enum": [
+            "string",
+            "integer",
+            "number",
+            "boolean",
+            "object",
+            null
+          ]
+        }
+      }
+    }
+  }
+}

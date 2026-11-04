@@ -1,0 +1,5 @@
+model,train_pool,predict_pool,top_k,selected,days,mean_0940_pct,actual_ge3,actual_ge1,actual_lt0
+logistic,2.5–6.5%,3–6%,1,19,19,-0.63410362,3,7,8
+logistic,2.5–6.5%,3–6%,2,34,19,-0.77562288,5,11,16
+small_boosted_tree,2.5–6.5%,3–6%,1,20,20,-0.19214940,3,9,8
+small_boosted_tree,2.5–6.5%,3–6%,2,40,20,-0.19711839,5,19,15

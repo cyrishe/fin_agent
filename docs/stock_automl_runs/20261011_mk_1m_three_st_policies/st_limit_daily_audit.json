@@ -1,0 +1,19 @@
+{
+  "source_sha256": "7197393104b61b8ab3b73e2b30a42636a63d543352fc57dfcc50fa3ac1534713",
+  "random_seed": 20261011,
+  "limit_signals": 1642,
+  "unique_symbols": 197,
+  "checks_passed": {
+    "daily_preclose_equals_candidate_preclose": 1642,
+    "signal_price_equals_calculated_limit": 1642,
+    "daily_high_equals_calculated_limit": 1642,
+    "daily_volume_positive": 1642
+  },
+  "daily_close_at_limit": 1580,
+  "daily_close_below_limit": 62,
+  "daily_is_limit_price_values": {
+    "1": 1580,
+    "0": 61,
+    "2": 1
+  }
+}

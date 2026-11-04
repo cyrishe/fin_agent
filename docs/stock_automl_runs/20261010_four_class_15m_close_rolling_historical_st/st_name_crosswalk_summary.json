@@ -1,0 +1,41 @@
+{
+  "rows": 40844,
+  "historical_name_matched": 12793,
+  "ambiguous_historical_name_rows": 26,
+  "by_type": {
+    "L": {
+      "rows": 9,
+      "name_matched": 9,
+      "historical_name_st": 0,
+      "source_name_st": 0
+    },
+    "N": {
+      "rows": 39058,
+      "name_matched": 11007,
+      "historical_name_st": 0,
+      "source_name_st": 36
+    },
+    "R": {
+      "rows": 134,
+      "name_matched": 134,
+      "historical_name_st": 0,
+      "source_name_st": 0
+    },
+    "S": {
+      "rows": 774,
+      "name_matched": 774,
+      "historical_name_st": 774,
+      "source_name_st": 562
+    },
+    "Y": {
+      "rows": 869,
+      "name_matched": 869,
+      "historical_name_st": 869,
+      "source_name_st": 653
+    }
+  },
+  "source_name_miss_ST_when_hist_ST": {
+    "june_aug_15m": 128,
+    "old_8to9": 300
+  }
+}

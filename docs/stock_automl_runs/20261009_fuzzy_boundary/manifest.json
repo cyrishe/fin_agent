@@ -1,0 +1,38 @@
+{
+  "methods": {
+    "硬标签": "three classes with hard thresholds at 0% and 1%",
+    "边界降权": "hard classes; weight falls linearly from 1 to 0.5 within 0.2 percentage point of either threshold",
+    "模糊标签": "linear soft memberships across +/-0.2 percentage point at each threshold"
+  },
+  "score": "P(>1%)-P(<0%)",
+  "C": 0.2,
+  "baseline_top2_match": 450,
+  "baseline_top2_total": 450,
+  "common_test_dates": [
+    "2026-09-02",
+    "2026-09-03",
+    "2026-09-04",
+    "2026-09-07",
+    "2026-09-08",
+    "2026-09-09",
+    "2026-09-10",
+    "2026-09-11",
+    "2026-09-14",
+    "2026-09-15",
+    "2026-09-16",
+    "2026-09-17",
+    "2026-09-18",
+    "2026-09-21",
+    "2026-09-22",
+    "2026-09-23",
+    "2026-09-24",
+    "2026-09-28",
+    "2026-09-29",
+    "2026-09-30"
+  ],
+  "source_sha256": {
+    "docs/stock_automl_runs/20261009_close9_target/exact_1440_to_close9_candidates.csv.gz": "99263a8722907209d1cc45ffd6e3e73a1386fc36050f67e5d55f78b0c3e8942a",
+    "docs/stock_automl_runs/20261009_tenbar_matrix/tenbar_price_extrema.csv.gz": "502d38a7e88ffa48e5663dc9727cdc105dfb32c8bd8b5e49b24a5fb0ab796ff9",
+    "docs/stock_automl_runs/20261009_rolling_three_class_cross/daily_top5.csv": "43a6b14843a08dbe93da44b0b310e6b561adc6aa662291875e01b5af931e5e2d"
+  }
+}

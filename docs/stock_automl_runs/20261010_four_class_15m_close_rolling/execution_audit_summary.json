@@ -1,0 +1,41 @@
+{
+  "definition": "Retrospective diagnostic: daily is_limit_price=1, daily close above preclose, and signal 14:45 close equals daily limit close within 0.001 CNY.",
+  "selected_trades": 41,
+  "selected_at_limit_close": 6,
+  "selected_at_flat_five_limit": 6,
+  "limit_close_all_flat_five": true,
+  "july_top1_trades": 15,
+  "july_top1_at_limit_close": 3,
+  "july_top1_reported_mean_0945_pct": 0.922211057557732,
+  "july_top1_excluding_limit_close_trades": 12,
+  "july_top1_excluding_limit_close_mean_0945_pct": -0.12792661315649823,
+  "july_top2_trades": 29,
+  "july_top2_at_limit_close": 6,
+  "july_top2_reported_mean_0945_pct": 1.040347064444711,
+  "july_top2_excluding_limit_close_trades": 23,
+  "july_top2_excluding_limit_close_mean_0945_pct": 0.06586280574781399,
+  "flagged_july_top1": [
+    {
+      "signal_date": "2026-07-01",
+      "symbol6": "002977",
+      "name": "*ST天箭",
+      "signal_price": 22.08,
+      "return_0945_pct": 4.98188405797102
+    },
+    {
+      "signal_date": "2026-07-02",
+      "symbol6": "002977",
+      "name": "*ST天箭",
+      "signal_price": 23.18,
+      "return_0945_pct": 5.0043140638481365
+    },
+    {
+      "signal_date": "2026-07-03",
+      "symbol6": "002977",
+      "name": "*ST天箭",
+      "signal_price": 24.34,
+      "return_0945_pct": 5.382087099424804
+    }
+  ],
+  "caution": "This uses end-of-day data only as a retrospective fill-risk audit; it was not used to filter or rerank the 14:45 predictions. A limit-close flag does not prove an individual order could or could not fill."
+}

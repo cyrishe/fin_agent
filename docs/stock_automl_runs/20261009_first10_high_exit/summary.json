@@ -1,0 +1,81 @@
+{
+  "rule": "Ignore 09:31–09:33; inspect 09:34–09:40 one-minute highs in order. First high strictly above entry ×1.01 exits at that high. Otherwise exit at 09:40 close. Minute-high fill is optimistic, not proven execution.",
+  "starting_cash": 100000.0,
+  "results": {
+    "old_all": {
+      "signal_days": 21,
+      "selected_stocks": 42,
+      "bought_stocks": 34,
+      "unaffordable_stocks": 8,
+      "bought_first_trigger_count": 13,
+      "ending_cash": 96314.51,
+      "return": -0.0368549,
+      "max_daily_drawdown": -0.07002967057423219
+    },
+    "old_common": {
+      "signal_days": 10,
+      "selected_stocks": 20,
+      "bought_stocks": 16,
+      "unaffordable_stocks": 4,
+      "bought_first_trigger_count": 6,
+      "ending_cash": 96796.28,
+      "return": -0.0320372,
+      "max_daily_drawdown": -0.050865782482890746
+    },
+    "new_common": {
+      "signal_days": 10,
+      "selected_stocks": 20,
+      "bought_stocks": 19,
+      "unaffordable_stocks": 1,
+      "bought_first_trigger_count": 10,
+      "ending_cash": 98649.7,
+      "return": -0.013503,
+      "max_daily_drawdown": -0.0492198
+    },
+    "new_all_out_of_training": {
+      "signal_days": 21,
+      "selected_stocks": 42,
+      "bought_stocks": 41,
+      "unaffordable_stocks": 1,
+      "bought_first_trigger_count": 15,
+      "ending_cash": 90032.94,
+      "return": -0.0996706,
+      "max_daily_drawdown": -0.1200179
+    }
+  },
+  "exact_label_trade_reconciliation": {
+    "archived_exact_stocks": 40,
+    "archived_labels": {
+      "1": 24,
+      "0": 8,
+      "-1": 8
+    },
+    "label_mismatch_count": 0,
+    "max_return_difference": 4.676996731740879e-09,
+    "label_by_trade_result": {
+      "-1": {
+        "亏损": 4,
+        "未买入": 3,
+        "盈利": 1
+      },
+      "0": {
+        "亏损": 3,
+        "未买入": 2,
+        "盈利": 3
+      },
+      "1": {
+        "亏损": 8,
+        "未买入": 3,
+        "盈利": 13
+      }
+    }
+  },
+  "input_sha256": {
+    "docs/stock_automl_runs/20261009_seven_factor_cash_backtest/trades.csv": "9d1c25f297014d02cc388fc5f80ca3bc8140495d648ebdc556e51e731cd75bf9",
+    "docs/stock_automl_runs/20261009_seven_factor_cash_backtest/selected_1m_bars.csv": "1bd9e4c5619493a79c947e80cbbe49074e221eb33d1015be3c96773da4313e29",
+    "docs/stock_automl_runs/20261009_market_shape_training/selected_1m_bars.csv": "c506c3081d9ccfea1bbef07bf71e3554eb0397447ccebb6976db77c5a47396ae",
+    "docs/stock_automl_runs/20261009_market_shape_training/old_common_picks.csv": "02900d74cc98a0c6fa4912ae3d52781ca2a63b92868666a92f54669e87bdbb52",
+    "docs/stock_automl_runs/20261009_market_shape_training/new_common_picks.csv": "6bdb66547e1889fef370b7282dbfac57bbf2bae8e9d6ee5e8fa10c0d61a3f0f3",
+    "docs/stock_automl_runs/20261009_market_shape_training/new_all_out_of_training_picks.csv": "59aecfd069f4bc3b5815c430f902dcd5836e4321059468a9b926b6c0952b4cd1"
+  }
+}

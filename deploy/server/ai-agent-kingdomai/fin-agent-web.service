@@ -1,0 +1,21 @@
+[Unit]
+Description=Fin Agent Web and Conversation Service
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=che
+Group=che
+WorkingDirectory=/home/che/cyris/fin_agent
+EnvironmentFile=/home/che/cyris/fin_agent/.env
+ExecStart=/home/che/cyris/fin_agent/.venv/bin/gunicorn --workers 1 --worker-class gthread --threads 8 --bind 127.0.0.1:22056 --timeout 900 --graceful-timeout 45 --access-logfile - --error-logfile - src.web.flask_app:app
+Restart=on-failure
+RestartSec=5
+TimeoutStopSec=45
+KillSignal=SIGTERM
+NoNewPrivileges=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,62 @@
+{
+  "scope": "Original, unweighted four-class boosted tree; 20 prior signal days per fold; class-priority fallback; 2026-09-02 to 2026-09-30 predictions.",
+  "criteria": {
+    "historical_st": "kcrp_stock_st effective signal-date status S/Y, audited separately",
+    "daily_up_limit_close": "kcrp_stock_price is_limit_price=1 and close>preclose",
+    "at_final_limit_at_1440": "daily_up_limit_close and exact 14:40 minute close equals daily close within CNY 0.001",
+    "nominal_5pct": "preclose*1.05 rounded half-up to CNY 0.01; diagnostic only, not the actual board limit for every stock",
+    "execution": "Minute volume or a nonflat bar does not prove that a buy order at the recorded close would fill."
+  },
+  "historical_st_full_candidate_pool": {
+    "stock_days": 300,
+    "daily_up_limit_close": 0,
+    "at_final_limit_at_1440": 0,
+    "at_nominal_5pct": 16,
+    "nominal_5pct_but_daily_high_above": 15,
+    "nominal_5pct_with_zero_1440_volume": 0,
+    "zero_1440_volume": 16,
+    "flat_1440_bar": 97,
+    "minute_name_contains_st": 0
+  },
+  "historical_st_ever_in_rolling_training": {
+    "stock_days": 290,
+    "daily_up_limit_close": 0,
+    "at_final_limit_at_1440": 0,
+    "at_nominal_5pct": 16,
+    "nominal_5pct_but_daily_high_above": 15,
+    "nominal_5pct_with_zero_1440_volume": 0,
+    "zero_1440_volume": 16,
+    "flat_1440_bar": 94,
+    "minute_name_contains_st": 0
+  },
+  "historical_st_test_only_final_date": 10,
+  "original_picks_top1": {
+    "stock_days": 20,
+    "daily_up_limit_close": 0,
+    "at_final_limit_at_1440": 0,
+    "at_nominal_5pct": 0,
+    "nominal_5pct_but_daily_high_above": 0,
+    "nominal_5pct_with_zero_1440_volume": 0,
+    "zero_1440_volume": 0,
+    "flat_1440_bar": 0,
+    "minute_name_contains_st": 0
+  },
+  "original_picks_top2": {
+    "stock_days": 40,
+    "daily_up_limit_close": 0,
+    "at_final_limit_at_1440": 0,
+    "at_nominal_5pct": 0,
+    "nominal_5pct_but_daily_high_above": 0,
+    "nominal_5pct_with_zero_1440_volume": 0,
+    "zero_1440_volume": 0,
+    "flat_1440_bar": 0,
+    "minute_name_contains_st": 0
+  },
+  "historical_st_directly_selected_top2": 0,
+  "original_top2_min_1440_bar_volume": 138.0,
+  "source_sha256": {
+    "docs/stock_automl_runs/20261010_four_class_15m_close_rolling_historical_st/old_8to9_excluded_risk.csv": "7429758ebedcc1b674ed17470278520b8c15fa1185797c606571f8ce42470aeb",
+    "docs/stock_automl_runs/20261010_second_high_four_class_weighted/daily_top2.csv": "6d3ff7dbe93f5b5086a4ee7c8f2f6124b63a8e21bf35fa5979e7fa762a75e93a",
+    "docs/stock_automl_runs/20261009_close9_target/exact_1440_to_close9_candidates.csv.gz": "99263a8722907209d1cc45ffd6e3e73a1386fc36050f67e5d55f78b0c3e8942a"
+  }
+}

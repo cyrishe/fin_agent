@@ -8,6 +8,7 @@ from typing import Any
 from xml.etree import ElementTree as ET
 
 from src.services.file_artifact_service import FileArtifactError, FileArtifactService
+from src.tools.task_file_access import task_file_payload
 
 
 NS_MAIN = {
@@ -18,8 +19,8 @@ NS_REL = {"rel": "http://schemas.openxmlformats.org/package/2006/relationships"}
 NS_WORD = {"w": "http://schemas.openxmlformats.org/wordprocessingml/2006/main"}
 
 
-def run_excel(args: dict[str, Any] | None = None) -> dict[str, Any]:
-    payload = dict(args or {})
+def run_excel(args: dict[str, Any] | None = None, *, runtime_ctx=None) -> dict[str, Any]:
+    payload = task_file_payload(args, runtime_ctx)
     try:
         path = _input_file_path(payload)
         suffix = path.suffix.lower()
@@ -38,8 +39,8 @@ def run_excel(args: dict[str, Any] | None = None) -> dict[str, Any]:
         return _error("file_read_excel", "parse_error", str(exc))
 
 
-def run_csv(args: dict[str, Any] | None = None) -> dict[str, Any]:
-    payload = dict(args or {})
+def run_csv(args: dict[str, Any] | None = None, *, runtime_ctx=None) -> dict[str, Any]:
+    payload = task_file_payload(args, runtime_ctx)
     try:
         path = _input_file_path(payload)
         if path.suffix.lower() not in {".csv", ".tsv"}:
@@ -52,8 +53,8 @@ def run_csv(args: dict[str, Any] | None = None) -> dict[str, Any]:
         return _error("file_read_csv", "parse_error", str(exc))
 
 
-def run_word(args: dict[str, Any] | None = None) -> dict[str, Any]:
-    payload = dict(args or {})
+def run_word(args: dict[str, Any] | None = None, *, runtime_ctx=None) -> dict[str, Any]:
+    payload = task_file_payload(args, runtime_ctx)
     service = _service(payload)
     try:
         file_id = service.reject_path_like_id(payload.get("file_id"))

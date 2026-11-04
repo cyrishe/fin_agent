@@ -1,0 +1,4 @@
+interface:
+  display_name: "K线与近期形态分析"
+  short_description: "结合用户图表与同源行情回看近期形态、复核量价并解释走势条件"
+  default_prompt: "Use $kline-analysis to review this stock chart and recent patterns with price-volume evidence."

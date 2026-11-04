@@ -1,0 +1,24 @@
+{
+  "test_first": "2025-09-01",
+  "test_last": "2025-10-31",
+  "test_days": 39,
+  "source_rows": 20350,
+  "source_sha256": "93bb15984c20cfc48667a471942f23e9246095902a89ff8aeddcba3eba2f548a",
+  "policy_counts": {
+    "只去掉14:40涨停ST": {
+      "rows": 19680,
+      "st_rows": 661,
+      "st_share": 0.03358739837398374,
+      "st_at_limit_rows": 0
+    }
+  },
+  "per_policy": {
+    "只去掉14:40涨停ST": {
+      "top1_days": 39,
+      "top2_days": 36,
+      "suspension_zero_picks": 0,
+      "unknown_picks": 0,
+      "mean_training_rows": 6527.461538461538
+    }
+  }
+}

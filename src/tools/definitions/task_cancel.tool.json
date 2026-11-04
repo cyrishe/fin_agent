@@ -1,0 +1,53 @@
+{
+  "name": "task_cancel",
+  "version": "v1",
+  "status": "active",
+  "availability": {
+    "lifecycle": "active",
+    "retrieval_mode": "retrievable"
+  },
+  "identity": {
+    "display_name": "停止一次任务运行",
+    "description": "在用户要求停止时取消指定运行，保留已有证据；此操作不关闭周期任务的后续安排。",
+    "domain": "user_tasks",
+    "owner": "tools"
+  },
+  "schemas": {
+    "input": {
+      "type": "object",
+      "properties": {
+        "run_id": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "run_id"
+      ],
+      "additionalProperties": false
+    },
+    "output": {
+      "type": "object"
+    }
+  },
+  "profiles": {
+    "real": {
+      "enabled": true,
+      "implementation": {
+        "kind": "python_callable",
+        "target": "src.tools.user_task_tools:run_cancel"
+      }
+    }
+  },
+  "safety": {
+    "network": false,
+    "persistence": true,
+    "side_effect": "write_user_task"
+  },
+  "runtime_hints": {
+    "cost_class": "low",
+    "latency_class": "short",
+    "supports_async_submit": false
+  },
+  "auth": "internal"
+}

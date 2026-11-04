@@ -1,0 +1,136 @@
+{
+  "status": "review",
+  "understanding": {
+    "goal": "判断单只股票在最近 30 或 60 个完整交易日内是否出现 MA5 上穿 MA20 的金叉。",
+    "usage": "用户输入股票代码和观察窗口，可选指定截止日期，工具返回窗口内全部金叉及最近一次信号。",
+    "expected_result": "明确区分出现、未出现、数据不足、输入错误和数据查询错误，并给出可复核的信号日期和均线值。",
+    "confirmed_requirements": [
+      "观察窗口只允许 30 或 60 个交易日",
+      "金叉定义为当日 MA5 大于 MA20 且前一交易日 MA5 小于或等于 MA20",
+      "输出窗口内全部金叉，并标明最近一次金叉"
+    ],
+    "constraints": [
+      "只使用截止日及之前的完整日线数据",
+      "使用复权收盘价 adjclose",
+      "结果是确定性研究信号，不产生交易动作"
+    ],
+    "assumptions": [
+      "未指定截止日时使用数据源最新完整交易日",
+      "指定日期不是交易日时使用不晚于该日期的最近完整交易日"
+    ]
+  },
+  "questions": [],
+  "design": {
+    "tool_name": "recent_golden_cross_30_60",
+    "display_name": "近30/60日金叉判断",
+    "description": "判断单只股票在最近 30 或 60 个完整交易日内是否出现 MA5 上穿 MA20，并返回全部信号及计算依据。",
+    "inputs": [
+      {
+        "name": "stock_code",
+        "label": "股票代码",
+        "type": "string",
+        "required": true,
+        "description": "待判断的股票代码，例如 600519.SH。",
+        "validation": ["不能为空", "必须能映射到股票行情"]
+      },
+      {
+        "name": "lookback_days",
+        "label": "观察交易日数",
+        "type": "integer",
+        "required": true,
+        "description": "检查最近 30 或 60 个完整交易日。",
+        "validation": ["只允许 30 或 60"]
+      },
+      {
+        "name": "as_of_date",
+        "label": "截止日期",
+        "type": "string",
+        "required": false,
+        "description": "可选的自然日上界，格式 YYYY-MM-DD。",
+        "validation": ["为空或 YYYY-MM-DD", "不得使用该日期之后的数据"]
+      }
+    ],
+    "outputs": [
+      {"name": "status", "label": "结果状态", "type": "string", "description": "本次判断的稳定状态。", "values": ["signal_found", "no_signal", "data_insufficient", "input_error", "data_error"]},
+      {"name": "found", "label": "是否出现金叉", "type": "boolean", "description": "窗口内至少有一次金叉时为 true。", "values": []},
+      {"name": "stock_code", "label": "股票代码", "type": "string", "description": "规范化后的股票代码。", "values": []},
+      {"name": "lookback_days", "label": "观察交易日数", "type": "integer", "description": "实际检查的交易日数量。", "values": ["30", "60"]},
+      {"name": "as_of_date", "label": "实际截止交易日", "type": "string", "description": "实际使用的最后一个完整交易日；失败时为空。", "values": []},
+      {"name": "latest_signal_date", "label": "最近金叉日期", "type": "string", "description": "最近一次金叉日期；没有信号时为空。", "values": []},
+      {"name": "signal_count", "label": "金叉次数", "type": "integer", "description": "观察窗口内的金叉次数。", "values": []},
+      {"name": "signals", "label": "金叉明细", "type": "array", "description": "按日期升序返回 date、ma5、ma20、previous_ma5、previous_ma20。", "values": []},
+      {"name": "explanation", "label": "结果说明", "type": "string", "description": "简洁说明计算口径、结果或失败原因。", "values": []}
+    ],
+    "modules": [
+      {
+        "name": "日线数据适配",
+        "responsibility": "按股票、截止日期和所需数量查询完整日线，并规范化去重后的复权收盘价序列。",
+        "functions": [
+          {"name": "build_quote_request", "responsibility": "构造 stock.quote 查询，只请求 code、tradedate 和 adjclose。"},
+          {"name": "extract_price_rows", "responsibility": "校验数据响应并形成按交易日升序的唯一价格序列。"}
+        ],
+        "depends_on": ["stock.quote"]
+      },
+      {
+        "name": "金叉计算",
+        "responsibility": "计算 MA5、MA20，并在指定窗口逐日检测上穿事件。",
+        "functions": [
+          {"name": "moving_average", "responsibility": "计算指定结束位置的简单移动平均。"},
+          {"name": "detect_golden_crosses", "responsibility": "在最近 30/60 个交易日内返回全部确定性金叉明细。"}
+        ],
+        "depends_on": ["日线数据适配"]
+      },
+      {
+        "name": "结果合成",
+        "responsibility": "统一生成正常、数据不足和错误状态的稳定输出。",
+        "functions": [
+          {"name": "make_result", "responsibility": "填充完整输出字段并生成可解释说明。"},
+          {"name": "run", "responsibility": "校验输入、组织查询与计算并返回最终对象。"}
+        ],
+        "depends_on": ["日线数据适配", "金叉计算"]
+      }
+    ],
+    "flow": {
+      "steps": [
+        {"id": "S1", "type": "validate", "name": "校验输入", "description": "校验股票代码、30/60 窗口及可选日期。"},
+        {"id": "S2", "type": "process", "name": "取得完整日线", "description": "查询并规范化 lookback_days+20 条有效复权收盘价。"},
+        {"id": "S3", "type": "decision", "name": "逐日判断金叉", "description": "计算 MA5/MA20 并检测上穿。"},
+        {"id": "S4", "type": "output", "name": "返回判断结果", "description": "返回全部信号、最近信号和解释。"}
+      ],
+      "links": [
+        {"from": "S1", "to": "S2", "condition": "输入有效"},
+        {"from": "S2", "to": "S3", "condition": "有效交易日不少于 lookback_days+20"},
+        {"from": "S3", "to": "S4", "condition": "扫描完成"},
+        {"from": "S1", "to": "S4", "condition": "输入无效"},
+        {"from": "S2", "to": "S4", "condition": "查询失败或数据不足"}
+      ]
+    },
+    "rules": [
+      {"name": "观察窗口", "logic": "只扫描按日期升序序列的最后 lookback_days 个完整交易日，lookback_days 仅允许 30 或 60。", "parameters": ["lookback_days in {30,60}"], "on_missing_data": "不能形成完整窗口时返回 data_insufficient。"},
+      {"name": "均线口径", "logic": "MA5 和 MA20 均为复权收盘价 adjclose 的简单算术平均。", "parameters": ["short_window=5", "long_window=20", "price_field=adjclose"], "on_missing_data": "窗口内任一价格为空或非数值时返回 data_insufficient。"},
+      {"name": "金叉条件", "logic": "交易日 t 满足 MA5(t)>MA20(t) 且 MA5(t-1)<=MA20(t-1) 时记录一次金叉。", "parameters": ["strict_current_cross=true", "previous_allows_equal=true"], "on_missing_data": "无法同时计算当日和前一日均线时不作猜测并返回 data_insufficient。"},
+      {"name": "截止日期", "logic": "只使用不晚于 as_of_date 的完整日线；未指定时使用数据源最新完整交易日。", "parameters": ["realtime=0"], "on_missing_data": "截止日期之前没有数据时返回 data_insufficient。"}
+    ],
+    "data_requirements": [
+      {"name": "股票完整日线", "fields": ["code", "tradedate", "adjclose"], "frequency": "1d", "purpose": "构造复权收盘价序列并计算 MA5/MA20。", "source_ref": "stock.quote", "availability": "verified", "fallback": "不回退到未复权 close；数据不足时返回 data_insufficient。"}
+    ],
+    "exceptions": [
+      {"case": "股票代码、窗口或日期格式无效", "behavior": "返回 input_error，found=false，信号列表为空。"},
+      {"case": "数据查询失败", "behavior": "返回 data_error，found=false，并给出安全化原因。"},
+      {"case": "有效交易日少于 lookback_days+20 或复权价缺失", "behavior": "返回 data_insufficient，不将其解释为未出现金叉。"}
+    ],
+    "acceptance": [
+      {"scenario": "窗口内存在一次由下向上的 MA5/MA20 穿越", "expected": "status=signal_found、found=true、signal_count=1，并返回可复核的日期及前后均线。"},
+      {"scenario": "窗口内始终没有满足上穿条件", "expected": "status=no_signal、found=false、signal_count=0，signals 为空。"},
+      {"scenario": "60 日窗口只有 79 条有效价格", "expected": "status=data_insufficient，不返回 no_signal。"},
+      {"scenario": "lookback_days=45", "expected": "status=input_error，不发起数据查询。"}
+    ]
+  },
+  "existing_analysis": {
+    "analyzed": false,
+    "current_behavior": [],
+    "gaps": [],
+    "affected_areas": [],
+    "evidence": []
+  }
+}

@@ -1,0 +1,186 @@
+{
+  "train_confusion": {
+    "total": 140033,
+    "correct": 57229,
+    "accuracy": 0.40868223918647745,
+    "uniform_random_four_class_accuracy": 0.25,
+    "majority_label": "lt0",
+    "majority_class_accuracy": 0.33926288803353494,
+    "predicted_column_groups": {
+      "ge3": {
+        "predicted_count": 120,
+        "actual_ge1": 81,
+        "actual_0to1": 15,
+        "actual_lt0": 24
+      },
+      "1to3": {
+        "predicted_count": 26734,
+        "actual_ge1": 14169,
+        "actual_0to1": 6363,
+        "actual_lt0": 6202
+      }
+    }
+  },
+  "next_day_confusion": {
+    "total": 5818,
+    "correct": 1927,
+    "accuracy": 0.3312134754211069,
+    "uniform_random_four_class_accuracy": 0.25,
+    "majority_label": "lt0",
+    "majority_class_accuracy": 0.3119628738398075,
+    "predicted_column_groups": {
+      "ge3": {
+        "predicted_count": 7,
+        "actual_ge1": 4,
+        "actual_0to1": 1,
+        "actual_lt0": 2
+      },
+      "1to3": {
+        "predicted_count": 1133,
+        "actual_ge1": 432,
+        "actual_0to1": 387,
+        "actual_lt0": 314
+      }
+    }
+  },
+  "grouping": "Actual second-high return >=1% / [0,1%) / <0%; differs from historical close9 >1% / [0.5,1%] / <0.5% target",
+  "fallback_rule": "predicted ge3 first by P(ge3), then predicted 1to3 by P(>=1); at most two/day; retrospective diagnostic",
+  "fallback": {
+    "selected": 40,
+    "days": 20,
+    "actual_ge1": 21,
+    "actual_ge3": 10,
+    "actual_0to1": 7,
+    "actual_lt0": 12,
+    "actual_below_minus1": 2,
+    "mean_second_high_return_pct": 1.575787571613834
+  },
+  "forced_p_ge3_top2": {
+    "selected": 40,
+    "days": 20,
+    "actual_ge1": 19,
+    "actual_ge3": 8,
+    "actual_0to1": 7,
+    "actual_lt0": 14,
+    "actual_below_minus1": 7,
+    "mean_second_high_return_pct": 1.033753273331529
+  },
+  "top2_by_predicted_class": {
+    "same_fold_train_class_priority": {
+      "lt0": {
+        "selected": 0,
+        "actual_ge1": 0,
+        "actual_0to1": 0,
+        "actual_lt0": 0
+      },
+      "0to1": {
+        "selected": 0,
+        "actual_ge1": 0,
+        "actual_0to1": 0,
+        "actual_lt0": 0
+      },
+      "1to3": {
+        "selected": 681,
+        "actual_ge1": 383,
+        "actual_0to1": 109,
+        "actual_lt0": 189
+      },
+      "ge3": {
+        "selected": 107,
+        "actual_ge1": 72,
+        "actual_0to1": 11,
+        "actual_lt0": 24
+      }
+    },
+    "same_fold_train_forced_p_ge3": {
+      "lt0": {
+        "selected": 534,
+        "actual_ge1": 328,
+        "actual_0to1": 56,
+        "actual_lt0": 150
+      },
+      "0to1": {
+        "selected": 2,
+        "actual_ge1": 1,
+        "actual_0to1": 0,
+        "actual_lt0": 1
+      },
+      "1to3": {
+        "selected": 160,
+        "actual_ge1": 87,
+        "actual_0to1": 39,
+        "actual_lt0": 34
+      },
+      "ge3": {
+        "selected": 104,
+        "actual_ge1": 70,
+        "actual_0to1": 10,
+        "actual_lt0": 24
+      }
+    },
+    "next_day_class_priority": {
+      "lt0": {
+        "selected": 0,
+        "actual_ge1": 0,
+        "actual_0to1": 0,
+        "actual_lt0": 0
+      },
+      "0to1": {
+        "selected": 0,
+        "actual_ge1": 0,
+        "actual_0to1": 0,
+        "actual_lt0": 0
+      },
+      "1to3": {
+        "selected": 33,
+        "actual_ge1": 17,
+        "actual_0to1": 6,
+        "actual_lt0": 10
+      },
+      "ge3": {
+        "selected": 7,
+        "actual_ge1": 4,
+        "actual_0to1": 1,
+        "actual_lt0": 2
+      }
+    },
+    "next_day_forced_p_ge3": {
+      "lt0": {
+        "selected": 29,
+        "actual_ge1": 13,
+        "actual_0to1": 6,
+        "actual_lt0": 10
+      },
+      "0to1": {
+        "selected": 0,
+        "actual_ge1": 0,
+        "actual_0to1": 0,
+        "actual_lt0": 0
+      },
+      "1to3": {
+        "selected": 4,
+        "actual_ge1": 2,
+        "actual_0to1": 0,
+        "actual_lt0": 2
+      },
+      "ge3": {
+        "selected": 7,
+        "actual_ge1": 4,
+        "actual_0to1": 1,
+        "actual_lt0": 2
+      }
+    }
+  },
+  "fallback_minute_close_exit": {
+    "positive": 21,
+    "negative": 19,
+    "below_minus1": 13,
+    "mean_return_pct": 0.3387213360937197
+  },
+  "forced_minute_close_exit": {
+    "positive": 20,
+    "negative": 20,
+    "below_minus1": 14,
+    "mean_return_pct": -0.09316737925020802
+  }
+}

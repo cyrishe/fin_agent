@@ -1,0 +1,30 @@
+{
+  "baseline_commit": "788a42b8780590571813b6edf87cbc6418a2d018",
+  "working_tree_dirty": true,
+  "purpose": "Final UI workload implementation before commit; compare file hashes, not baseline commit alone.",
+  "files": {
+    "src/quant_research/automl/__init__.py": "feef3471bb92f9a2cd8ac696a132e939f491af21181a500074e1d4a8b9b3b439",
+    "src/quant_research/automl/__main__.py": "e77dfcf7b9db6511474415aa4a5c6c38dbf3dac152a4f8e3f26b1ca7b12bbcf3",
+    "src/quant_research/automl/advisor.py": "c9af7ff1ca15ba86afc789fcc0fd8e7edb5ab4c4eccb2a070f989f24255bb818",
+    "src/quant_research/automl/assets.py": "4e76c83fe63dab2fae050cb2251bb3389d51e320f8317de8f5ee8314774a800f",
+    "src/quant_research/automl/cli.py": "6893cfd3ed79e0d08a8350fa0ad09bf1df5e2386dcc0a49bc15349825eae79dd",
+    "src/quant_research/automl/config.py": "a057aee4ba25a41891f450ea1def3bbd91211cc134ac898270445c837b853e92",
+    "src/quant_research/automl/data.py": "8a090dd3204b0f473c96e3d0b95049d73acd136e6768e5ff2a02626e6b942344",
+    "src/quant_research/automl/decision.py": "d138f3c5359f1d4ea0a1e6925acb12dd9e23a6fae274218a3be9deb3d0b609a0",
+    "src/quant_research/automl/demo.py": "62ea13331013d960a7873a9a78bd95861200fa37d71181286760d9ca9971e4a5",
+    "src/quant_research/automl/evaluation.py": "8dfaed2b6a878b1116438ecca10e722c768f6c532a252f7670929098d43f9be8",
+    "src/quant_research/automl/features.py": "b396e12f3b5dad6abfa1d70722b48429cad1b76ea1ce4148e5916106edd5378b",
+    "src/quant_research/automl/inference.py": "0c8a08869790ac8e6da656305451f7e806d693c2ebb3e3638d478ab315bf9815",
+    "src/quant_research/automl/learning.py": "2aa25a5bef45058beefbcdd7c33dbce273af8abfc8d8e8e6fc589f76b3e28d37",
+    "src/quant_research/automl/planning.py": "943616e493e5ad4e009f7122fd057e6c041262c19142b44842e1e6b88b7cbecc",
+    "src/quant_research/automl/prompts/compile.md": "aa75367fe4a34c3473efe68db77a0da7574720eb381c7ac5600f65b15ffea2a9",
+    "src/quant_research/automl/prompts/data_contract.md": "69f6eb006c1ff064cdec8d06c7defa4c5c1374c975831067201fee28f8d29f76",
+    "src/quant_research/automl/prompts/plan.md": "95301c33a3964eceef6bc951e07790905614cdc5398662344192e8993842ac12",
+    "src/quant_research/automl/prompts/review.md": "70087690b1578220fa3e06c595eab4f29dfb0738fe8f7fffc9e680c5a2fd5290",
+    "src/quant_research/automl/runner.py": "bac0934b204864902c4765a6f699276dd2b6b5b3f4f08be013476c8824fdc59e",
+    "src/quant_research/automl/study.py": "a63d6c27df254d4c58e8e3c8a600ccdf121edd7b2eb5676126e4b32fefc4cd48",
+    "src/tools/definitions/stock_automl_research.tool.json": "0146c18b0094c7159a39a5c5af4f1abcd1b3000247ec9fad5642fe07c468affd",
+    "src/tools/stock_automl_research_tool.py": "0546dd36721a513d9bf35fef7c13e11c1c88174985a788334fb898c4f88ebfe7"
+  },
+  "note": "工具描述在最后运行期间按用户澄清明确一次性训练与定时推理边界；执行代码与研究引擎未改变。"
+}

@@ -1,0 +1,51 @@
+{
+  "year": "2026",
+  "scheme": "board",
+  "train_month": "2026-04",
+  "test_month": "2026-05",
+  "train_days": 21,
+  "train_rows": 12128,
+  "test_days": 18,
+  "test_candidates": 8428,
+  "north_exchange_rows": 0,
+  "features": [
+    "signal_return",
+    "volume_ratio",
+    "turnover_so_far_pct",
+    "float_mv_100m_cny",
+    "volume_4of5_increasing",
+    "ma_bull_5_10_20",
+    "all_intraday_lows_above_ma",
+    "wide_board"
+  ],
+  "train_class_counts": {
+    "wrong": 4815,
+    "acceptable": 3092,
+    "neutral": 2228,
+    "target": 1993
+  },
+  "top1": {
+    "picks": 18,
+    "target": 8,
+    "acceptable": 2,
+    "neutral": 1,
+    "wrong": 7,
+    "unknown": 0,
+    "mean_0940_pct": -1.0453,
+    "mean_staged_pct": -0.8863,
+    "main_board": 18,
+    "wide_board": 0
+  },
+  "top2": {
+    "picks": 18,
+    "target": 7,
+    "acceptable": 2,
+    "neutral": 3,
+    "wrong": 6,
+    "unknown": 0,
+    "mean_0940_pct": 0.4927,
+    "mean_staged_pct": 0.3111,
+    "main_board": 17,
+    "wide_board": 1
+  }
+}
